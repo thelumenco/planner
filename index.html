@@ -164,6 +164,21 @@
             align-items: center;
             margin-bottom: 12px;
         }
+        
+        @media (max-width: 767px) {
+            .current-period-header {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .current-period-header > div {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+            }
+        }
 
         .current-period-title {
             font-size: 14px;
@@ -689,7 +704,7 @@
     <div class="quick-views">
         <button class="quick-view-btn active" data-view="current-month" onclick="selectQuickView('current-month')">This Month</button>
         <button class="quick-view-btn" data-view="current-week" onclick="selectQuickView('current-week')">This Week</button>
-        <button class="quick-view-btn" data-view="quarter" onclick="selectQuickView('quarter')">Quarter View</button>
+        <button class="quick-view-btn" data-view="quarter" onclick="selectQuickView('quarter')">This Quarter</button>
     </div>
 
     <div class="income-forecast-card" id="incomeForecastCard">
@@ -827,7 +842,7 @@
                     </div>
                     <p style="font-size: 12px; color: #999; margin-top: 8px;">
                         Warning/Danger thresholds color-code your load bars. The Danger threshold also sets the max number of load bars displayed.
-                        <br><strong>Load Calculation:</strong> All overlapping stages are added together (e.g., Onboarding load 2 + Groundwork load 3 = Total load 5).
+                        <br><strong>Load Calculation:</strong> All overlapping stages are added together. If one project has 3 stages running in the same month (e.g., Onboarding load 2 + Groundwork load 3 + Drafting load 5), the total is 10.
                     </p>
                 </div>
             </div>
@@ -1244,7 +1259,19 @@
                 const { totalIncome, expectedPayments } = calculatePeriodIncome(startDate, endDate);
                 renderLoadIndicator(loadIndicator, totalLoad);
                 
-                loadSummary.textContent = `Total Load: ${totalLoad} (${activeStages.length} active stage${activeStages.length !== 1 ? 's' : ''})`;
+                // Count unique projects by category
+                const projectsInPeriod = getProjectsForDateRange(startDate, endDate);
+                const activeClients = projectsInPeriod.filter(p => p.category === 'active-client').length;
+                const retainers = projectsInPeriod.filter(p => p.category === 'retainer').length;
+                const freelance = projectsInPeriod.filter(p => p.category === 'ad-hoc').length;
+                
+                const breakdownParts = [];
+                if (activeClients > 0) breakdownParts.push(`${activeClients} active client${activeClients !== 1 ? 's' : ''}`);
+                if (retainers > 0) breakdownParts.push(`${retainers} retainer${retainers !== 1 ? 's' : ''}`);
+                if (freelance > 0) breakdownParts.push(`${freelance} freelance project${freelance !== 1 ? 's' : ''}`);
+                
+                const projectBreakdown = breakdownParts.length > 0 ? breakdownParts.join(' | ') : 'No projects';
+                loadSummary.textContent = `Total Load: ${totalLoad} (${projectBreakdown})`;
                 loadSummary.title = activeStages.length > 0 ? 'Stages: ' + activeStages.map(s => `${s.projectName} - ${s.stageName} (${s.load})`).join(', ') : '';
                 
                 // Update income forecast card
