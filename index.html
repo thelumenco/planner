@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Planner - Load Based</title>
+    <title>Fresh Pages Planner</title>
     <style>
         * {
             margin: 0;
@@ -27,10 +27,31 @@
             align-items: center;
         }
 
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            height: 32px;
+            width: auto;
+        }
+
         h1 {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 300;
-            color: #AF8787;
+            color: #2a2a2a;
+        }
+
+        @media (min-width: 768px) {
+            .logo {
+                height: 40px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
         }
 
         .header-actions {
@@ -634,7 +655,8 @@
 </head>
 <body>
     <div class="header">
-        <h1>Business Planner</h1>
+            <h1>Fresh Pages Planner</h1>
+        </div>
         <div class="header-actions">
             <button class="desktop-add-btn" onclick="openModal()">+ Add Project</button>
             <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
@@ -1147,19 +1169,29 @@
             
             if (projectId) {
                 const project = projects.find(p => p.id === projectId);
+                currentProjectStages = project.stages ? JSON.parse(JSON.stringify(project.stages)) : [];
+                
                 document.getElementById('modalTitle').textContent = 'Edit Project';
                 document.getElementById('projectName').value = project.name;
                 document.getElementById('projectCategory').value = project.category;
-                document.getElementById('projectType').value = project.type;
+                
+                // Trigger category change to populate types
+                document.getElementById('projectCategory').dispatchEvent(new Event('change'));
+                
+                setTimeout(() => {
+                    document.getElementById('projectType').value = project.type;
+                }, 0);
+                
                 document.getElementById('startDate').value = project.startDate;
                 document.getElementById('endDate').value = project.endDate;
                 document.getElementById('projectNotes').value = project.notes || '';
                 
-                renderProjectStages(project.stages || []);
+                renderProjectStages(currentProjectStages);
                 deleteBtn.style.display = 'block';
             } else {
                 document.getElementById('modalTitle').textContent = 'Add Project';
                 form.reset();
+                currentProjectStages = [];
                 renderProjectStages([]);
                 deleteBtn.style.display = 'none';
             }
@@ -1206,7 +1238,12 @@
             const container = document.getElementById('stagesList');
             container.innerHTML = '';
             
-            stages.forEach((stage, index) => {
+            // Initialize currentProjectStages if needed
+            if (!currentProjectStages || currentProjectStages.length === 0) {
+                currentProjectStages = stages.map(s => ({ ...s }));
+            }
+            
+            currentProjectStages.forEach((stage, index) => {
                 const stageItem = document.createElement('div');
                 stageItem.className = 'stage-item';
                 
@@ -1218,6 +1255,7 @@
                 stageName.textContent = stage.name || `Stage ${index + 1}`;
                 
                 const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
                 removeBtn.className = 'remove-stage';
                 removeBtn.textContent = '×';
                 removeBtn.onclick = () => removeStageFromProject(index);
@@ -1382,52 +1420,189 @@
             const container = document.getElementById('projectTypesSettings');
             container.innerHTML = '';
             
+            // Group by category
+            const categories = {
+                'active-client': [],
+                'potential-client': [],
+                'freelance': [],
+                'systems': []
+            };
+            
             Object.keys(projectTypes).forEach(typeName => {
-                const typeData = projectTypes[typeName];
-                const typeItem = document.createElement('div');
-                typeItem.className = 'project-type-item';
+                const category = projectTypes[typeName].category;
+                if (categories[category]) {
+                    categories[category].push(typeName);
+                }
+            });
+            
+            // Render each category
+            Object.keys(categories).forEach(category => {
+                const section = document.createElement('div');
+                section.style.marginBottom = '24px';
                 
-                const header = document.createElement('div');
-                header.className = 'project-type-header';
+                const categoryTitle = document.createElement('div');
+                categoryTitle.style.fontSize = '13px';
+                categoryTitle.style.fontWeight = '500';
+                categoryTitle.style.color = '#666';
+                categoryTitle.style.marginBottom = '12px';
+                categoryTitle.style.textTransform = 'uppercase';
+                categoryTitle.textContent = category.replace('-', ' ');
                 
-                const name = document.createElement('div');
-                name.className = 'project-type-name';
-                name.textContent = typeName;
+                section.appendChild(categoryTitle);
                 
-                header.appendChild(name);
-                typeItem.appendChild(header);
-                
-                const stagesContainer = document.createElement('div');
-                stagesContainer.style.marginTop = '12px';
-                
-                typeData.stages.forEach((stage, index) => {
-                    const stageDef = document.createElement('div');
-                    stageDef.className = 'stage-definition';
+                categories[category].forEach(typeName => {
+                    const typeData = projectTypes[typeName];
+                    const typeItem = document.createElement('div');
+                    typeItem.className = 'project-type-item';
                     
-                    const stageName = document.createElement('div');
-                    stageName.textContent = stage.name;
+                    const header = document.createElement('div');
+                    header.className = 'project-type-header';
                     
-                    const loadBtns = document.createElement('div');
-                    loadBtns.className = 'stage-load-selector';
+                    const nameInput = document.createElement('input');
+                    nameInput.value = typeName;
+                    nameInput.style.border = 'none';
+                    nameInput.style.background = 'transparent';
+                    nameInput.style.fontSize = '14px';
+                    nameInput.style.fontWeight = '500';
+                    nameInput.style.padding = '0';
+                    nameInput.onchange = (e) => renameProjectType(typeName, e.target.value);
                     
-                    for (let i = 1; i <= 5; i++) {
-                        const btn = document.createElement('button');
-                        btn.type = 'button';
-                        btn.className = 'load-btn';
-                        if (stage.load === i) btn.classList.add('selected');
-                        btn.textContent = i;
-                        btn.onclick = () => updateTemplateStageLoad(typeName, index, i);
-                        loadBtns.appendChild(btn);
-                    }
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = '×';
+                    deleteBtn.className = 'remove-stage';
+                    deleteBtn.onclick = () => deleteProjectType(typeName);
                     
-                    stageDef.appendChild(stageName);
-                    stageDef.appendChild(loadBtns);
-                    stagesContainer.appendChild(stageDef);
+                    header.appendChild(nameInput);
+                    header.appendChild(deleteBtn);
+                    
+                    const stagesContainer = document.createElement('div');
+                    stagesContainer.style.marginTop = '12px';
+                    
+                    typeData.stages.forEach((stage, index) => {
+                        const stageDef = document.createElement('div');
+                        stageDef.className = 'stage-definition';
+                        
+                        const stageNameInput = document.createElement('input');
+                        stageNameInput.value = stage.name;
+                        stageNameInput.style.border = '1px solid #e0e0e0';
+                        stageNameInput.style.borderRadius = '4px';
+                        stageNameInput.style.padding = '4px 8px';
+                        stageNameInput.style.fontSize = '13px';
+                        stageNameInput.onchange = (e) => {
+                            projectTypes[typeName].stages[index].name = e.target.value;
+                            saveProjectTypes();
+                        };
+                        
+                        const controls = document.createElement('div');
+                        controls.style.display = 'flex';
+                        controls.style.gap = '8px';
+                        controls.style.alignItems = 'center';
+                        
+                        const loadBtns = document.createElement('div');
+                        loadBtns.className = 'stage-load-selector';
+                        
+                        for (let i = 1; i <= 5; i++) {
+                            const btn = document.createElement('button');
+                            btn.type = 'button';
+                            btn.className = 'load-btn';
+                            if (stage.load === i) btn.classList.add('selected');
+                            btn.textContent = i;
+                            btn.onclick = () => updateTemplateStageLoad(typeName, index, i);
+                            loadBtns.appendChild(btn);
+                        }
+                        
+                        const removeStageBtn = document.createElement('button');
+                        removeStageBtn.textContent = '×';
+                        removeStageBtn.className = 'remove-stage';
+                        removeStageBtn.onclick = () => removeStageFromTemplate(typeName, index);
+                        
+                        controls.appendChild(loadBtns);
+                        controls.appendChild(removeStageBtn);
+                        
+                        stageDef.appendChild(stageNameInput);
+                        stageDef.appendChild(controls);
+                        stagesContainer.appendChild(stageDef);
+                    });
+                    
+                    const addStageBtn = document.createElement('button');
+                    addStageBtn.textContent = '+ Add Stage';
+                    addStageBtn.className = 'add-stage-btn';
+                    addStageBtn.style.marginTop = '8px';
+                    addStageBtn.onclick = () => addStageToTemplate(typeName);
+                    stagesContainer.appendChild(addStageBtn);
+                    
+                    typeItem.appendChild(header);
+                    typeItem.appendChild(stagesContainer);
+                    section.appendChild(typeItem);
                 });
                 
-                typeItem.appendChild(stagesContainer);
-                container.appendChild(typeItem);
+                // Add new project type button
+                const addTypeBtn = document.createElement('button');
+                addTypeBtn.textContent = '+ Add Project Type';
+                addTypeBtn.className = 'add-stage-btn';
+                addTypeBtn.onclick = () => addNewProjectType(category);
+                section.appendChild(addTypeBtn);
+                
+                container.appendChild(section);
             });
+        }
+
+        function renameProjectType(oldName, newName) {
+            if (newName && newName !== oldName && !projectTypes[newName]) {
+                projectTypes[newName] = projectTypes[oldName];
+                delete projectTypes[oldName];
+                
+                // Update all existing projects
+                projects.forEach(project => {
+                    if (project.type === oldName) {
+                        project.type = newName;
+                    }
+                });
+                
+                saveProjectTypes();
+                saveProjects();
+                renderProjectTypesSettings();
+            }
+        }
+
+        function deleteProjectType(typeName) {
+            if (confirm(`Delete project type "${typeName}"? Any projects using it will need to be updated.`)) {
+                delete projectTypes[typeName];
+                saveProjectTypes();
+                renderProjectTypesSettings();
+            }
+        }
+
+        function addStageToTemplate(typeName) {
+            projectTypes[typeName].stages.push({
+                name: 'New Stage',
+                load: 3
+            });
+            saveProjectTypes();
+            renderProjectTypesSettings();
+        }
+
+        function removeStageFromTemplate(typeName, index) {
+            if (confirm('Remove this stage from the template?')) {
+                projectTypes[typeName].stages.splice(index, 1);
+                saveProjectTypes();
+                renderProjectTypesSettings();
+            }
+        }
+
+        function addNewProjectType(category) {
+            const name = prompt('Enter project type name:');
+            if (name && !projectTypes[name]) {
+                projectTypes[name] = {
+                    category: category,
+                    color: '#AF8787',
+                    stages: [
+                        { name: 'Stage 1', load: 3 }
+                    ]
+                };
+                saveProjectTypes();
+                renderProjectTypesSettings();
+            }
         }
 
         function updateTemplateStageLoad(typeName, stageIndex, load) {
