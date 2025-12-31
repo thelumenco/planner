@@ -77,6 +77,16 @@
             border-color: #AF8787;
         }
 
+        .icon-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: #666;
+        }
+
+        .icon-btn:hover svg {
+            stroke: #AF8787;
+        }
+
         .load-alert {
             background: #fff3cd;
             border: 1px solid #ffc107;
@@ -659,11 +669,14 @@
         </div>
         <div class="header-actions">
             <button class="desktop-add-btn" onclick="openModal()">+ Add Project</button>
-            <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+            <button class="icon-btn" onclick="openSettings()" title="Settings">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </button>
         </div>
     </div>
-
-    <div class="load-alert" id="loadAlert"></div>
 
     <div class="quick-views">
         <button class="quick-view-btn active" data-view="current-month" onclick="selectQuickView('current-month')">This Month</button>
@@ -683,11 +696,9 @@
         <div class="project-list" id="currentPeriodProjects"></div>
     </div>
 
-    <div class="view-selector">
+    <div class="view-selector" style="display: none;" id="monthSelector">
         <button class="nav-btn" onclick="navigateView(-1)">←</button>
-        <select id="viewSelect" onchange="updateView()">
-            <option value="current">Current Period</option>
-        </select>
+        <select id="monthSelect" onchange="jumpToMonth()"></select>
         <button class="nav-btn" onclick="navigateView(1)">→</button>
     </div>
 
@@ -703,6 +714,11 @@
                 <div class="form-group">
                     <label>Project Name</label>
                     <input type="text" id="projectName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Project Link (Optional)</label>
+                    <input type="url" id="projectLink" placeholder="https://">
                 </div>
                 
                 <div class="form-group">
@@ -732,6 +748,12 @@
                         <label>End Date</label>
                         <input type="date" id="endDate" required>
                     </div>
+                </div>
+
+                <div class="form-group" id="strategyCallGroup" style="display: none;">
+                    <label>Brand Copy Strategy Call Date</label>
+                    <input type="date" id="strategyCallDate">
+                    <p style="font-size: 11px; color: #999; margin-top: 4px;">This will auto-calculate stage dates: Onboarding (now - call), Groundwork (2 weeks after), Drafting (3 weeks), Offboarding (1 week)</p>
                 </div>
 
                 <div class="stages-section">
@@ -869,35 +891,49 @@
         function updateDisplay() {
             updateCurrentPeriod();
             updateMonthsGrid();
-            updateLoadAlert();
-            populateViewSelector();
+            populateMonthSelector();
         }
 
-        function populateViewSelector() {
-            const select = document.getElementById('viewSelect');
-            const options = [];
+        function populateMonthSelector() {
+            const select = document.getElementById('monthSelect');
+            const selector = document.getElementById('monthSelector');
             
-            if (currentView === 'current-month' || currentView === 'next-month') {
-                const targetDate = new Date(currentYear, currentMonth + viewOffset, 1);
-                const monthName = monthNames[targetDate.getMonth()];
-                const year = targetDate.getFullYear();
-                options.push({ value: 'current', label: `${monthName} ${year}` });
-            } else if (currentView === 'current-week') {
-                const today = new Date();
-                const targetDate = new Date(today.getTime() + viewOffset * 7 * 24 * 60 * 60 * 1000);
-                const weekStart = getWeekStart(targetDate);
-                options.push({ 
-                    value: 'current', 
-                    label: `Week of ${weekStart.getDate()} ${monthNames[weekStart.getMonth()].slice(0, 3)}` 
-                });
-            } else {
-                const quarter = Math.floor(currentMonth / 3) + 1 + viewOffset;
-                options.push({ value: 'current', label: `Q${quarter} ${currentYear}` });
+            if (currentView === 'quarter' || currentView === 'current-week') {
+                selector.style.display = 'none';
+                return;
             }
             
-            select.innerHTML = options.map(opt => 
-                `<option value="${opt.value}">${opt.label}</option>`
-            ).join('');
+            selector.style.display = 'flex';
+            select.innerHTML = '';
+            
+            // Populate with all 12 months of current year
+            for (let i = 0; i < 12; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `${monthNames[i]} ${currentYear}`;
+                
+                // Set selected based on current view
+                if (currentView === 'current-month' && i === currentMonth + viewOffset) {
+                    option.selected = true;
+                } else if (currentView === 'next-month' && i === currentMonth + 1 + viewOffset) {
+                    option.selected = true;
+                }
+                
+                select.appendChild(option);
+            }
+        }
+
+        function jumpToMonth() {
+            const select = document.getElementById('monthSelect');
+            const selectedMonth = parseInt(select.value);
+            
+            if (currentView === 'current-month') {
+                viewOffset = selectedMonth - currentMonth;
+            } else if (currentView === 'next-month') {
+                viewOffset = selectedMonth - (currentMonth + 1);
+            }
+            
+            updateDisplay();
         }
 
         function calculatePeriodLoad(startDate, endDate) {
@@ -983,25 +1019,6 @@
                 
                 const periodProjectsData = getProjectsForDateRange(startDate, endDate);
                 renderProjectList(periodProjects, periodProjectsData, startDate, endDate);
-            }
-        }
-
-        function updateLoadAlert() {
-            const alert = document.getElementById('loadAlert');
-            const today = new Date();
-            const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-            const monthEnd = new Date(today.getFullYear(), today.getMonth() + 2, 0);
-            
-            const { totalLoad } = calculatePeriodLoad(nextMonth, monthEnd);
-            
-            if (totalLoad >= settings.dangerThreshold) {
-                alert.textContent = `⚠️ OVERLOADED: Next month has load of ${totalLoad} (threshold: ${settings.dangerThreshold}). Consider rescheduling.`;
-                alert.className = 'load-alert show danger';
-            } else if (totalLoad >= settings.warningThreshold) {
-                alert.textContent = `📊 High load next month: ${totalLoad} (warning threshold: ${settings.warningThreshold})`;
-                alert.className = 'load-alert show warning';
-            } else {
-                alert.className = 'load-alert';
             }
         }
 
@@ -1113,7 +1130,12 @@
         function createProjectCard(project, periodStart, periodEnd) {
             const card = document.createElement('div');
             card.className = 'project-card';
-            card.onclick = () => editProject(project.id);
+            card.onclick = (e) => {
+                // Don't open modal if clicking the link
+                if (e.target.tagName !== 'A') {
+                    editProject(project.id);
+                }
+            };
             
             const projectType = projectTypes[project.type];
             const color = projectType ? projectType.color : '#999';
@@ -1122,9 +1144,28 @@
             const header = document.createElement('div');
             header.className = 'project-header';
             
+            const nameContainer = document.createElement('div');
+            nameContainer.style.display = 'flex';
+            nameContainer.style.alignItems = 'center';
+            nameContainer.style.gap = '6px';
+            nameContainer.style.flex = '1';
+            
             const name = document.createElement('div');
             name.className = 'project-name';
             name.textContent = project.name;
+            
+            nameContainer.appendChild(name);
+            
+            if (project.link) {
+                const link = document.createElement('a');
+                link.href = project.link;
+                link.target = '_blank';
+                link.innerHTML = '🔗';
+                link.style.fontSize = '12px';
+                link.style.textDecoration = 'none';
+                link.onclick = (e) => e.stopPropagation();
+                nameContainer.appendChild(link);
+            }
             
             const loadInd = document.createElement('div');
             loadInd.className = 'load-indicator';
@@ -1133,7 +1174,7 @@
                 renderLoadIndicator(loadInd, currentStage.load, 5);
             }
             
-            header.appendChild(name);
+            header.appendChild(nameContainer);
             header.appendChild(loadInd);
             
             const meta = document.createElement('div');
@@ -1173,6 +1214,7 @@
                 
                 document.getElementById('modalTitle').textContent = 'Edit Project';
                 document.getElementById('projectName').value = project.name;
+                document.getElementById('projectLink').value = project.link || '';
                 document.getElementById('projectCategory').value = project.category;
                 
                 // Trigger category change to populate types
@@ -1180,10 +1222,13 @@
                 
                 setTimeout(() => {
                     document.getElementById('projectType').value = project.type;
+                    // Show strategy call field if it's an active client project
+                    toggleStrategyCallField();
                 }, 0);
                 
                 document.getElementById('startDate').value = project.startDate;
                 document.getElementById('endDate').value = project.endDate;
+                document.getElementById('strategyCallDate').value = project.strategyCallDate || '';
                 document.getElementById('projectNotes').value = project.notes || '';
                 
                 renderProjectStages(currentProjectStages);
@@ -1212,6 +1257,8 @@
                 const category = categorySelect.value;
                 typeSelect.innerHTML = '<option value="">Select type...</option>';
                 
+                toggleStrategyCallField();
+                
                 Object.keys(projectTypes).forEach(typeName => {
                     if (projectTypes[typeName].category === category) {
                         const option = document.createElement('option');
@@ -1224,6 +1271,8 @@
 
             typeSelect.onchange = () => {
                 const typeName = typeSelect.value;
+                toggleStrategyCallField();
+                
                 if (typeName && projectTypes[typeName]) {
                     // Auto-populate stages from template
                     const template = projectTypes[typeName].stages;
@@ -1233,6 +1282,96 @@
                 }
             };
         }
+
+        function toggleStrategyCallField() {
+            const category = document.getElementById('projectCategory').value;
+            const strategyCallGroup = document.getElementById('strategyCallGroup');
+            
+            if (category === 'active-client') {
+                strategyCallGroup.style.display = 'block';
+            } else {
+                strategyCallGroup.style.display = 'none';
+            }
+        }
+
+        function calculateStagesFromStrategyCall() {
+            const strategyCallDate = document.getElementById('strategyCallDate').value;
+            const projectType = document.getElementById('projectType').value;
+            
+            if (!strategyCallDate || !projectTypes[projectType]) return;
+            
+            const callDate = new Date(strategyCallDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Calculate stage dates based on Fresh Pages workflow
+            const stages = projectTypes[projectType].stages;
+            const autoStages = [];
+            
+            stages.forEach((template, index) => {
+                const stage = { ...template };
+                
+                if (stage.name === 'Onboarding') {
+                    // Onboarding: from today until strategy call
+                    stage.startDate = today.toISOString().split('T')[0];
+                    stage.endDate = strategyCallDate;
+                } else if (stage.name === 'Groundwork') {
+                    // Groundwork: 2 weeks after strategy call
+                    const start = new Date(callDate);
+                    start.setDate(start.getDate() + 1);
+                    const end = new Date(start);
+                    end.setDate(end.getDate() + 14);
+                    stage.startDate = start.toISOString().split('T')[0];
+                    stage.endDate = end.toISOString().split('T')[0];
+                } else if (stage.name === 'Drafting') {
+                    // Drafting: 3 weeks after groundwork
+                    const prevStage = autoStages[index - 1];
+                    if (prevStage) {
+                        const start = new Date(prevStage.endDate);
+                        start.setDate(start.getDate() + 1);
+                        const end = new Date(start);
+                        end.setDate(end.getDate() + 21);
+                        stage.startDate = start.toISOString().split('T')[0];
+                        stage.endDate = end.toISOString().split('T')[0];
+                    }
+                } else if (stage.name === 'Offboarding') {
+                    // Offboarding: 1 week
+                    const prevStage = autoStages[index - 1];
+                    if (prevStage) {
+                        const start = new Date(prevStage.endDate);
+                        start.setDate(start.getDate() + 1);
+                        const end = new Date(start);
+                        end.setDate(end.getDate() + 7);
+                        stage.startDate = start.toISOString().split('T')[0];
+                        stage.endDate = end.toISOString().split('T')[0];
+                    }
+                } else {
+                    // For custom stages, keep dates empty
+                    stage.startDate = stage.startDate || '';
+                    stage.endDate = stage.endDate || '';
+                }
+                
+                autoStages.push(stage);
+            });
+            
+            // Update project end date
+            if (autoStages.length > 0) {
+                const lastStage = autoStages[autoStages.length - 1];
+                document.getElementById('endDate').value = lastStage.endDate;
+                document.getElementById('startDate').value = autoStages[0].startDate;
+            }
+            
+            currentProjectStages = autoStages;
+            renderProjectStages(autoStages);
+        }
+
+        // Add event listener to strategy call date
+        document.addEventListener('DOMContentLoaded', () => {
+            const strategyCallInput = document.getElementById('strategyCallDate');
+            if (strategyCallInput) {
+                strategyCallInput.onchange = calculateStagesFromStrategyCall;
+            }
+        });
 
         function renderProjectStages(stages) {
             const container = document.getElementById('stagesList');
@@ -1366,10 +1505,12 @@
             const project = {
                 id: editingProjectId || Date.now(),
                 name: document.getElementById('projectName').value,
+                link: document.getElementById('projectLink').value,
                 category: document.getElementById('projectCategory').value,
                 type: document.getElementById('projectType').value,
                 startDate: document.getElementById('startDate').value,
                 endDate: document.getElementById('endDate').value,
+                strategyCallDate: document.getElementById('strategyCallDate').value,
                 notes: document.getElementById('projectNotes').value,
                 stages: currentProjectStages.filter(s => s.startDate && s.endDate)
             };
