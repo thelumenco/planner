@@ -850,7 +850,7 @@
                     </div>
                     <p style="font-size: 12px; color: #999; margin-top: 8px;">
                         Warning/Danger thresholds color-code your load bars. The Danger threshold also sets the max number of load bars displayed.
-                        <br><strong>Load = Hours Per Week:</strong> Each load bar represents ~1 hour/week (e.g., load 5 = 5 hrs/week, load 20 = 20 hrs/week). All overlapping stages are added together. If you work 40 hours/week on client work, set Danger threshold to 40.
+                        <br><strong>Load = Hours Per Month:</strong> Each load bar represents ~1 hour/month (e.g., load 5 = 5 hrs/month, load 40 = 40 hrs/month). All overlapping stages are added together. If you work 40 hours/month on client work, set Danger threshold to 40. Weekly views show ~10 hours max (40÷4 weeks).
                     </p>
                 </div>
             </div>
@@ -985,7 +985,7 @@
                 category: 'retainer',
                 color: '#9B7EBD',
                 stages: [
-                    { name: 'Ongoing', load: 1 }
+                    { name: 'Ongoing', load: 0 }
                 ],
                 autoCalculation: {
                     enabled: false,
@@ -1129,7 +1129,7 @@
             updateDisplay();
         }
 
-        function calculatePeriodLoad(startDate, endDate) {
+        function calculatePeriodLoad(startDate, endDate, isWeeklyView = false) {
             let totalLoad = 0;
             const activeStages = [];
 
@@ -1142,11 +1142,19 @@
 
                     // Check if stage overlaps with period
                     if (stageStart <= endDate && stageEnd >= startDate) {
-                        totalLoad += stage.load || 0;
+                        let stageLoad = stage.load || 0;
+                        
+                        // For weekly views, divide monthly load by 4 to get weekly load
+                        if (isWeeklyView) {
+                            stageLoad = Math.round(stageLoad / 4);
+                        }
+                        
+                        totalLoad += stageLoad;
                         activeStages.push({
                             projectName: project.name,
                             stageName: stage.name,
-                            load: stage.load
+                            load: stageLoad,
+                            originalLoad: stage.load
                         });
                     }
                 });
@@ -1263,7 +1271,8 @@
             periodTitle.textContent = title;
             
             if (currentView !== 'quarter') {
-                const { totalLoad, activeStages } = calculatePeriodLoad(startDate, endDate);
+                const isWeeklyView = currentView === 'current-week';
+                const { totalLoad, activeStages } = calculatePeriodLoad(startDate, endDate, isWeeklyView);
                 const { totalIncome, expectedPayments } = calculatePeriodIncome(startDate, endDate);
                 renderLoadIndicator(loadIndicator, totalLoad);
                 
@@ -1794,7 +1803,7 @@
                 loadSelector.className = 'stage-load-selector';
                 loadSelector.style.marginTop = '4px';
                 
-                for (let i = 1; i <= 5; i++) {
+                for (let i = 0; i <= 5; i++) {
                     const loadBtn = document.createElement('button');
                     loadBtn.type = 'button';
                     loadBtn.className = 'load-btn';
@@ -1945,10 +1954,10 @@
                 futureEnd.setFullYear(futureEnd.getFullYear() + 10); // 10 years from start
                 endDate = futureEnd.toISOString().split('T')[0];
                 
-                // Create a single ongoing stage with load 1
+                // Create a single ongoing stage with load 0
                 stages = [{
                     name: 'Ongoing',
-                    load: 1,
+                    load: 0,
                     startDate: startDate,
                     endDate: endDate
                 }];
@@ -2096,7 +2105,7 @@
                         const loadBtns = document.createElement('div');
                         loadBtns.className = 'stage-load-selector';
                         
-                        for (let i = 1; i <= 5; i++) {
+                        for (let i = 0; i <= 5; i++) {
                             const btn = document.createElement('button');
                             btn.type = 'button';
                             btn.className = 'load-btn';
