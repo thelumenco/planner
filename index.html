@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Planner</title>
+    <title>Business Planner - Load Based</title>
     <style>
         * {
             margin: 0;
@@ -56,7 +56,7 @@
             border-color: #AF8787;
         }
 
-        .capacity-alert {
+        .load-alert {
             background: #fff3cd;
             border: 1px solid #ffc107;
             padding: 12px 16px;
@@ -66,18 +66,19 @@
             display: none;
         }
 
-        .capacity-alert.show {
+        .load-alert.show {
             display: block;
         }
 
-        .capacity-alert.warning {
+        .load-alert.warning {
             background: #fff3cd;
             border-color: #ffc107;
         }
 
-        .capacity-alert.danger {
+        .load-alert.danger {
             background: #f8d7da;
             border-color: #dc3545;
+            font-weight: 500;
         }
 
         .quick-views {
@@ -132,26 +133,37 @@
             letter-spacing: 0.5px;
         }
 
-        .capacity-badge {
-            font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-weight: 500;
+        .load-indicator {
+            display: flex;
+            gap: 3px;
+            align-items: flex-end;
         }
 
-        .capacity-badge.light {
-            background: #d4edda;
-            color: #155724;
+        .load-bar {
+            width: 4px;
+            height: 16px;
+            background: #e0e0e0;
+            border-radius: 2px;
         }
 
-        .capacity-badge.moderate {
-            background: #fff3cd;
-            color: #856404;
+        .load-bar.filled {
+            background: #AF8787;
         }
 
-        .capacity-badge.heavy {
-            background: #f8d7da;
-            color: #721c24;
+        .load-bar.warning {
+            background: #ffc107;
+        }
+
+        .load-bar.danger {
+            background: #dc3545;
+        }
+
+        .load-summary {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #666;
         }
 
         .view-selector {
@@ -215,9 +227,12 @@
             color: #AF8787;
         }
 
-        .month-count {
+        .month-load {
+            display: flex;
+            gap: 8px;
+            align-items: center;
             font-size: 12px;
-            color: #999;
+            color: #666;
         }
 
         .project-list {
@@ -240,11 +255,18 @@
             background: white;
         }
 
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
         .project-name {
             font-size: 14px;
             font-weight: 500;
-            margin-bottom: 6px;
             color: #2a2a2a;
+            flex: 1;
         }
 
         .project-meta {
@@ -254,6 +276,7 @@
             flex-wrap: wrap;
             gap: 8px;
             align-items: center;
+            margin-bottom: 6px;
         }
 
         .project-type {
@@ -263,11 +286,12 @@
             color: #999;
         }
 
-        .project-duration {
+        .stage-badge {
             font-size: 11px;
             padding: 2px 8px;
             background: #f0f0f0;
             border-radius: 10px;
+            color: #666;
         }
 
         .fab {
@@ -304,6 +328,8 @@
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
         }
 
         .modal.active {
@@ -313,9 +339,9 @@
         .modal-content {
             background: white;
             border-radius: 8px;
-            padding: 32px;
-            width: 90%;
-            max-width: 500px;
+            padding: 24px;
+            width: 100%;
+            max-width: 600px;
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -324,11 +350,11 @@
             font-size: 20px;
             font-weight: 400;
             color: #AF8787;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         label {
@@ -354,9 +380,71 @@
             border-color: #AF8787;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 80px;
+        .date-range {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stages-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .stages-section h3 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #AF8787;
+            margin-bottom: 12px;
+        }
+
+        .stage-item {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .stage-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .stage-name {
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .remove-stage {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 8px;
+        }
+
+        .remove-stage:hover {
+            color: #d45d5d;
+        }
+
+        .add-stage-btn {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .add-stage-btn:hover {
+            border-color: #AF8787;
         }
 
         .form-actions {
@@ -399,49 +487,8 @@
             margin-left: auto;
         }
 
-        .btn-delete:hover {
-            opacity: 0.9;
-        }
-
-        .empty-state {
-            text-align: center;
-            color: #999;
-            font-size: 13px;
-            padding: 40px 20px;
-        }
-
-        .date-range {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .legend {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 24px;
-            padding: 16px;
-            background: white;
-            border-radius: 4px;
-            border: 1px solid #e0e0e0;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            color: #666;
-        }
-
-        .legend-color {
-            width: 20px;
-            height: 3px;
-            border-radius: 2px;
-        }
-
         .settings-section {
-            margin-bottom: 32px;
+            margin-bottom: 24px;
         }
 
         .settings-section-title {
@@ -453,89 +500,88 @@
             letter-spacing: 0.5px;
         }
 
-        .category-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .category-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
+        .project-type-item {
             background: #fafafa;
             border: 1px solid #e0e0e0;
             border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
         }
 
-        .category-color {
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            cursor: pointer;
+        .project-type-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
         }
 
-        .category-name {
-            flex: 1;
+        .project-type-name {
+            font-weight: 500;
             font-size: 14px;
         }
 
-        .category-delete {
+        .expand-btn {
             background: none;
             border: none;
-            color: #999;
             cursor: pointer;
-            font-size: 16px;
-            padding: 4px 8px;
+            font-size: 18px;
+            color: #999;
         }
 
-        .category-delete:hover {
-            color: #d45d5d;
-        }
-
-        .add-category-form {
-            display: flex;
+        .stage-definition {
+            display: grid;
+            grid-template-columns: 1fr auto;
             gap: 8px;
-            margin-top: 8px;
-        }
-
-        .add-category-input {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
+            align-items: center;
+            padding: 6px 0;
             font-size: 13px;
         }
 
-        .add-category-color {
-            width: 40px;
-            height: 34px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            cursor: pointer;
+        .stage-load-selector {
+            display: flex;
+            gap: 4px;
         }
 
-        .add-category-btn {
+        .load-btn {
+            width: 24px;
+            height: 24px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .load-btn.selected {
             background: #AF8787;
             color: white;
-            border: none;
-            padding: 8px 16px;
+            border-color: #AF8787;
+        }
+
+        .threshold-settings {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
             border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
+            padding: 16px;
         }
 
-        .add-category-btn:hover {
-            opacity: 0.9;
+        .threshold-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
         }
 
-        .settings-help {
-            font-size: 12px;
+        .threshold-item input {
+            width: 60px;
+            text-align: center;
+        }
+
+        .empty-state {
+            text-align: center;
             color: #999;
-            margin-top: 8px;
-            font-style: italic;
+            font-size: 13px;
+            padding: 40px 20px;
         }
 
         @media (min-width: 768px) {
@@ -595,7 +641,7 @@
         </div>
     </div>
 
-    <div class="capacity-alert" id="capacityAlert"></div>
+    <div class="load-alert" id="loadAlert"></div>
 
     <div class="quick-views">
         <button class="quick-view-btn active" data-view="current-month" onclick="selectQuickView('current-month')">This Month</button>
@@ -607,7 +653,10 @@
     <div class="current-period" id="currentPeriod">
         <div class="current-period-header">
             <div class="current-period-title" id="periodTitle">January 2025</div>
-            <div class="capacity-badge light" id="capacityBadge">Light Load</div>
+            <div>
+                <div class="load-indicator" id="periodLoadIndicator"></div>
+                <div class="load-summary" id="loadSummary"></div>
+            </div>
         </div>
         <div class="project-list" id="currentPeriodProjects"></div>
     </div>
@@ -624,6 +673,7 @@
 
     <button class="fab" onclick="openModal()">+</button>
 
+    <!-- Project Modal -->
     <div class="modal" id="projectModal">
         <div class="modal-content">
             <div class="modal-header" id="modalTitle">Add Project</div>
@@ -637,6 +687,10 @@
                     <label>Category</label>
                     <select id="projectCategory" required>
                         <option value="">Select category...</option>
+                        <option value="active-client">Active Client</option>
+                        <option value="potential-client">Potential Client</option>
+                        <option value="freelance">Freelance</option>
+                        <option value="systems">Systems</option>
                     </select>
                 </div>
 
@@ -658,6 +712,12 @@
                     </div>
                 </div>
 
+                <div class="stages-section">
+                    <h3>Project Stages</h3>
+                    <div id="stagesList"></div>
+                    <button type="button" class="add-stage-btn" onclick="addStageToProject()">+ Add Stage</button>
+                </div>
+
                 <div class="form-group">
                     <label>Notes (Optional)</label>
                     <textarea id="projectNotes"></textarea>
@@ -672,48 +732,29 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <div class="modal-header">Settings</div>
             
             <div class="settings-section">
-                <div class="settings-section-title">Active Client Types</div>
-                <div class="category-list" id="activeClientList"></div>
-                <div class="add-category-form">
-                    <input type="text" class="add-category-input" id="newActiveClient" placeholder="e.g., MUSE, Full Website Copy">
-                    <input type="color" class="add-category-color" id="newActiveClientColor" value="#AF8787">
-                    <button type="button" class="add-category-btn" onclick="addCategory('active-client')">Add</button>
+                <div class="settings-section-title">Load Thresholds</div>
+                <div class="threshold-settings">
+                    <div class="threshold-item">
+                        <span>Warning Load:</span>
+                        <input type="number" id="warningThreshold" value="10" min="1">
+                    </div>
+                    <div class="threshold-item">
+                        <span>Danger Load:</span>
+                        <input type="number" id="dangerThreshold" value="15" min="1">
+                    </div>
+                    <p style="font-size: 12px; color: #999; margin-top: 8px;">These determine when you'll see warnings about being overloaded.</p>
                 </div>
             </div>
 
             <div class="settings-section">
-                <div class="settings-section-title">Potential Client Types</div>
-                <div class="category-list" id="potentialClientList"></div>
-                <div class="add-category-form">
-                    <input type="text" class="add-category-input" id="newPotentialClient" placeholder="e.g., Discovery Call, Proposal Sent">
-                    <input type="color" class="add-category-color" id="newPotentialClientColor" value="#C4A5A5">
-                    <button type="button" class="add-category-btn" onclick="addCategory('potential-client')">Add</button>
-                </div>
-            </div>
-
-            <div class="settings-section">
-                <div class="settings-section-title">Freelance Types</div>
-                <div class="category-list" id="freelanceList"></div>
-                <div class="add-category-form">
-                    <input type="text" class="add-category-input" id="newFreelance" placeholder="e.g., Blog Writing, Editing">
-                    <input type="color" class="add-category-color" id="newFreelanceColor" value="#8FA7AF">
-                    <button type="button" class="add-category-btn" onclick="addCategory('freelance')">Add</button>
-                </div>
-            </div>
-
-            <div class="settings-section">
-                <div class="settings-section-title">Systems Tasks</div>
-                <div class="category-list" id="systemsList"></div>
-                <div class="add-category-form">
-                    <input type="text" class="add-category-input" id="newSystems" placeholder="e.g., Website Update, Email Sequence">
-                    <input type="color" class="add-category-color" id="newSystemsColor" value="#AFAF87">
-                    <button type="button" class="add-category-btn" onclick="addCategory('systems')">Add</button>
-                </div>
+                <div class="settings-section-title">Project Types & Stages</div>
+                <div id="projectTypesSettings"></div>
             </div>
 
             <div class="form-actions">
@@ -729,15 +770,45 @@
         let viewOffset = 0;
         let projects = [];
         let editingProjectId = null;
-        let categories = {
-            'active-client': [
-                { name: 'MUSE', color: '#AF8787' },
-                { name: 'Full Website Copy', color: '#AF8787' },
-                { name: 'Intensive', color: '#AF8787' }
-            ],
-            'potential-client': [],
-            'freelance': [],
-            'systems': []
+        
+        // Default project type definitions with stages
+        let projectTypes = {
+            'Full Website Copy': {
+                category: 'active-client',
+                color: '#AF8787',
+                stages: [
+                    { name: 'Onboarding', load: 2 },
+                    { name: 'Groundwork', load: 3 },
+                    { name: 'Drafting', load: 5 },
+                    { name: 'Offboarding', load: 1 }
+                ]
+            },
+            'Intensive': {
+                category: 'active-client',
+                color: '#AF8787',
+                stages: [
+                    { name: 'Onboarding', load: 2 },
+                    { name: 'Groundwork', load: 3 },
+                    { name: 'Intensive Day', load: 5 },
+                    { name: 'Offboarding', load: 1 }
+                ]
+            },
+            'MUSE': {
+                category: 'active-client',
+                color: '#AF8787',
+                stages: [
+                    { name: 'Onboarding', load: 2 },
+                    { name: 'Groundwork', load: 3 },
+                    { name: 'Building', load: 4 },
+                    { name: 'Pilot', load: 3 },
+                    { name: 'Offboarding', load: 1 }
+                ]
+            }
+        };
+
+        let settings = {
+            warningThreshold: 10,
+            dangerThreshold: 15
         };
 
         const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
@@ -770,14 +841,13 @@
         }
 
         function updateView() {
-            // Handle view selector change
             updateDisplay();
         }
 
         function updateDisplay() {
             updateCurrentPeriod();
             updateMonthsGrid();
-            updateCapacityAlert();
+            updateLoadAlert();
             populateViewSelector();
         }
 
@@ -794,7 +864,6 @@
                 const today = new Date();
                 const targetDate = new Date(today.getTime() + viewOffset * 7 * 24 * 60 * 60 * 1000);
                 const weekStart = getWeekStart(targetDate);
-                const weekEnd = getWeekEnd(targetDate);
                 options.push({ 
                     value: 'current', 
                     label: `Week of ${weekStart.getDate()} ${monthNames[weekStart.getMonth()].slice(0, 3)}` 
@@ -809,95 +878,122 @@
             ).join('');
         }
 
+        function calculatePeriodLoad(startDate, endDate) {
+            let totalLoad = 0;
+            const activeStages = [];
+
+            projects.forEach(project => {
+                if (!project.stages) return;
+
+                project.stages.forEach(stage => {
+                    const stageStart = new Date(stage.startDate);
+                    const stageEnd = new Date(stage.endDate);
+
+                    // Check if stage overlaps with period
+                    if (stageStart <= endDate && stageEnd >= startDate) {
+                        totalLoad += stage.load || 0;
+                        activeStages.push({
+                            projectName: project.name,
+                            stageName: stage.name,
+                            load: stage.load
+                        });
+                    }
+                });
+            });
+
+            return { totalLoad, activeStages };
+        }
+
+        function renderLoadIndicator(container, load, maxBars = 20) {
+            container.innerHTML = '';
+            
+            for (let i = 0; i < maxBars; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'load-bar';
+                
+                if (i < load) {
+                    bar.classList.add('filled');
+                    
+                    if (load >= settings.dangerThreshold) {
+                        bar.classList.add('danger');
+                    } else if (load >= settings.warningThreshold) {
+                        bar.classList.add('warning');
+                    }
+                }
+                
+                container.appendChild(bar);
+            }
+        }
+
         function updateCurrentPeriod() {
             const periodTitle = document.getElementById('periodTitle');
             const periodProjects = document.getElementById('currentPeriodProjects');
-            const capacityBadge = document.getElementById('capacityBadge');
+            const loadIndicator = document.getElementById('periodLoadIndicator');
+            const loadSummary = document.getElementById('loadSummary');
             
-            let projects = [];
-            let title = '';
+            let startDate, endDate, title;
             
             if (currentView === 'current-month') {
                 const targetDate = new Date(currentYear, currentMonth + viewOffset, 1);
                 title = `${monthNames[targetDate.getMonth()]} ${targetDate.getFullYear()}`;
-                projects = getProjectsForMonth(targetDate.getMonth(), targetDate.getFullYear());
+                startDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+                endDate = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
             } else if (currentView === 'next-month') {
                 const targetDate = new Date(currentYear, currentMonth + 1 + viewOffset, 1);
                 title = `${monthNames[targetDate.getMonth()]} ${targetDate.getFullYear()}`;
-                projects = getProjectsForMonth(targetDate.getMonth(), targetDate.getFullYear());
+                startDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+                endDate = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
             } else if (currentView === 'current-week') {
                 const today = new Date();
                 const targetDate = new Date(today.getTime() + viewOffset * 7 * 24 * 60 * 60 * 1000);
-                const weekStart = getWeekStart(targetDate);
-                const weekEnd = getWeekEnd(targetDate);
-                title = `Week of ${weekStart.getDate()} ${monthNames[weekStart.getMonth()]}`;
-                projects = getProjectsForDateRange(weekStart, weekEnd);
-            } else {
-                const quarter = Math.floor(currentMonth / 3) + 1 + viewOffset;
-                title = `Q${quarter} ${currentYear}`;
-                // Quarter view handled separately in grid
+                startDate = getWeekStart(targetDate);
+                endDate = getWeekEnd(targetDate);
+                title = `Week of ${startDate.getDate()} ${monthNames[startDate.getMonth()]}`;
             }
             
             periodTitle.textContent = title;
             
-            // Calculate capacity
-            const capacity = calculateCapacity(projects);
-            capacityBadge.textContent = capacity.label;
-            capacityBadge.className = `capacity-badge ${capacity.level}`;
-            
-            // Render projects
-            renderProjectList(periodProjects, projects);
-        }
-
-        function calculateCapacity(projects) {
-            const activeClientProjects = projects.filter(p => p.category === 'active-client').length;
-            
-            if (activeClientProjects === 0) {
-                return { level: 'light', label: 'Light Load' };
-            } else if (activeClientProjects <= 2) {
-                return { level: 'moderate', label: 'Moderate' };
-            } else {
-                return { level: 'heavy', label: 'At Capacity' };
+            if (currentView !== 'quarter') {
+                const { totalLoad, activeStages } = calculatePeriodLoad(startDate, endDate);
+                renderLoadIndicator(loadIndicator, totalLoad);
+                
+                loadSummary.textContent = `Load: ${totalLoad} | ${activeStages.length} active stage${activeStages.length !== 1 ? 's' : ''}`;
+                
+                const periodProjectsData = getProjectsForDateRange(startDate, endDate);
+                renderProjectList(periodProjects, periodProjectsData, startDate, endDate);
             }
         }
 
-        function updateCapacityAlert() {
-            const alert = document.getElementById('capacityAlert');
-            const allProjects = window.projects || [];
-            
-            // Check for overlapping heavy periods
+        function updateLoadAlert() {
+            const alert = document.getElementById('loadAlert');
             const today = new Date();
             const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-            const projectsNextMonth = getProjectsForMonth(nextMonth.getMonth(), nextMonth.getFullYear());
+            const monthEnd = new Date(today.getFullYear(), today.getMonth() + 2, 0);
             
-            const capacity = calculateCapacity(projectsNextMonth);
+            const { totalLoad } = calculatePeriodLoad(nextMonth, monthEnd);
             
-            if (capacity.level === 'heavy') {
-                alert.textContent = `⚠️ You have ${projectsNextMonth.filter(p => p.category === 'active-client').length} active client projects next month. Consider your capacity.`;
-                alert.className = 'capacity-alert show danger';
-            } else if (capacity.level === 'moderate') {
-                alert.textContent = `📊 You have ${projectsNextMonth.filter(p => p.category === 'active-client').length} active client projects next month.`;
-                alert.className = 'capacity-alert show warning';
+            if (totalLoad >= settings.dangerThreshold) {
+                alert.textContent = `⚠️ OVERLOADED: Next month has load of ${totalLoad} (threshold: ${settings.dangerThreshold}). Consider rescheduling.`;
+                alert.className = 'load-alert show danger';
+            } else if (totalLoad >= settings.warningThreshold) {
+                alert.textContent = `📊 High load next month: ${totalLoad} (warning threshold: ${settings.warningThreshold})`;
+                alert.className = 'load-alert show warning';
             } else {
-                alert.className = 'capacity-alert';
+                alert.className = 'load-alert';
             }
         }
 
-        function renderProjectList(container, projects) {
+        function renderProjectList(container, projectsData, periodStart, periodEnd) {
             container.innerHTML = '';
             
-            if (projects.length === 0) {
+            if (projectsData.length === 0) {
                 const emptyState = document.createElement('div');
                 emptyState.className = 'empty-state';
                 emptyState.textContent = 'No projects in this period';
-                emptyState.style.textAlign = 'center';
-                emptyState.style.color = '#999';
-                emptyState.style.padding = '20px';
-                emptyState.style.fontSize = '13px';
                 container.appendChild(emptyState);
             } else {
-                projects.forEach(project => {
-                    const card = createProjectCard(project);
+                projectsData.forEach(project => {
+                    const card = createProjectCard(project, periodStart, periodEnd);
                     container.appendChild(card);
                 });
             }
@@ -916,23 +1012,23 @@
                     const year = currentYear + Math.floor((startMonth + i) / 12);
                     renderMonthCard(grid, monthIndex, year);
                 }
+                
+                grid.style.display = 'grid';
+                document.getElementById('currentPeriod').style.display = 'none';
             } else {
-                // Hide grid for single period views
                 grid.style.display = 'none';
                 document.getElementById('currentPeriod').style.display = 'block';
-                return;
             }
-            
-            grid.style.display = 'grid';
-            document.getElementById('currentPeriod').style.display = 'none';
         }
 
         function renderMonthCard(container, monthIndex, year) {
             const monthCard = document.createElement('div');
             monthCard.className = 'month-card';
             
-            const monthProjects = getProjectsForMonth(monthIndex, year);
-            const capacity = calculateCapacity(monthProjects);
+            const monthStart = new Date(year, monthIndex, 1);
+            const monthEnd = new Date(year, monthIndex + 1, 0);
+            const { totalLoad } = calculatePeriodLoad(monthStart, monthEnd);
+            const monthProjects = getProjectsForDateRange(monthStart, monthEnd);
             
             const header = document.createElement('div');
             header.className = 'month-header';
@@ -941,36 +1037,34 @@
             monthName.className = 'month-name';
             monthName.textContent = monthNames[monthIndex];
             
-            const monthCount = document.createElement('div');
-            monthCount.className = 'month-count';
-            monthCount.textContent = `${monthProjects.length} project${monthProjects.length !== 1 ? 's' : ''}`;
+            const monthLoad = document.createElement('div');
+            monthLoad.className = 'month-load';
+            
+            const loadInd = document.createElement('div');
+            loadInd.className = 'load-indicator';
+            renderLoadIndicator(loadInd, totalLoad, 10);
+            
+            const loadText = document.createElement('span');
+            loadText.textContent = totalLoad;
+            
+            monthLoad.appendChild(loadInd);
+            monthLoad.appendChild(loadText);
             
             header.appendChild(monthName);
-            header.appendChild(monthCount);
+            header.appendChild(monthLoad);
             
             const projectList = document.createElement('div');
             projectList.className = 'project-list';
             
-            renderProjectList(projectList, monthProjects);
+            renderProjectList(projectList, monthProjects, monthStart, monthEnd);
             
             monthCard.appendChild(header);
             monthCard.appendChild(projectList);
             container.appendChild(monthCard);
         }
 
-        function getProjectsForMonth(monthIndex, year) {
-            return window.projects.filter(project => {
-                const start = new Date(project.startDate);
-                const end = new Date(project.endDate);
-                const monthStart = new Date(year, monthIndex, 1);
-                const monthEnd = new Date(year, monthIndex + 1, 0);
-                
-                return start <= monthEnd && end >= monthStart;
-            });
-        }
-
         function getProjectsForDateRange(startDate, endDate) {
-            return window.projects.filter(project => {
+            return projects.filter(project => {
                 const projectStart = new Date(project.startDate);
                 const projectEnd = new Date(project.endDate);
                 
@@ -978,21 +1072,47 @@
             });
         }
 
-        function createProjectCard(project) {
+        function getCurrentStage(project, periodStart, periodEnd) {
+            if (!project.stages || project.stages.length === 0) return null;
+
+            // Find stage that overlaps with period
+            for (const stage of project.stages) {
+                const stageStart = new Date(stage.startDate);
+                const stageEnd = new Date(stage.endDate);
+                
+                if (stageStart <= periodEnd && stageEnd >= periodStart) {
+                    return stage;
+                }
+            }
+
+            return null;
+        }
+
+        function createProjectCard(project, periodStart, periodEnd) {
             const card = document.createElement('div');
-            card.className = `project-card`;
+            card.className = 'project-card';
             card.onclick = () => editProject(project.id);
             
-            // Find the color for this project type
-            const categoryTypes = categories[project.category] || [];
-            const typeData = categoryTypes.find(t => t.name === project.type);
-            const color = typeData ? typeData.color : '#999';
-            
+            const projectType = projectTypes[project.type];
+            const color = projectType ? projectType.color : '#999';
             card.style.borderLeft = `3px solid ${color}`;
+            
+            const header = document.createElement('div');
+            header.className = 'project-header';
             
             const name = document.createElement('div');
             name.className = 'project-name';
             name.textContent = project.name;
+            
+            const loadInd = document.createElement('div');
+            loadInd.className = 'load-indicator';
+            const currentStage = getCurrentStage(project, periodStart, periodEnd);
+            if (currentStage) {
+                renderLoadIndicator(loadInd, currentStage.load, 5);
+            }
+            
+            header.appendChild(name);
+            header.appendChild(loadInd);
             
             const meta = document.createElement('div');
             meta.className = 'project-meta';
@@ -1001,126 +1121,19 @@
             type.className = 'project-type';
             type.textContent = project.type;
             
-            const duration = document.createElement('span');
-            duration.className = 'project-duration';
-            duration.textContent = `${formatDate(project.startDate)} - ${formatDate(project.endDate)}`;
-            
             meta.appendChild(type);
-            meta.appendChild(duration);
             
-            card.appendChild(name);
+            if (currentStage) {
+                const stageBadge = document.createElement('span');
+                stageBadge.className = 'stage-badge';
+                stageBadge.textContent = currentStage.name;
+                meta.appendChild(stageBadge);
+            }
+            
+            card.appendChild(header);
             card.appendChild(meta);
             
             return card;
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return `${date.getDate()} ${monthNames[date.getMonth()].slice(0, 3)}`;
-        }
-
-        function openSettings() {
-            renderCategoryLists();
-            document.getElementById('settingsModal').classList.add('active');
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.remove('active');
-            saveCategories();
-            updateDisplay();
-        }
-
-        function renderCategoryLists() {
-            ['active-client', 'potential-client', 'freelance', 'systems'].forEach(category => {
-                const listId = category === 'active-client' ? 'activeClientList' :
-                              category === 'potential-client' ? 'potentialClientList' :
-                              category === 'freelance' ? 'freelanceList' : 'systemsList';
-                
-                const list = document.getElementById(listId);
-                list.innerHTML = '';
-                
-                categories[category].forEach((item, index) => {
-                    const categoryItem = document.createElement('div');
-                    categoryItem.className = 'category-item';
-                    
-                    const colorPicker = document.createElement('input');
-                    colorPicker.type = 'color';
-                    colorPicker.className = 'category-color';
-                    colorPicker.value = item.color;
-                    colorPicker.onchange = (e) => {
-                        categories[category][index].color = e.target.value;
-                        saveCategories();
-                    };
-                    
-                    const name = document.createElement('div');
-                    name.className = 'category-name';
-                    name.textContent = item.name;
-                    
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'category-delete';
-                    deleteBtn.textContent = '×';
-                    deleteBtn.onclick = () => deleteCategory(category, index);
-                    
-                    categoryItem.appendChild(colorPicker);
-                    categoryItem.appendChild(name);
-                    categoryItem.appendChild(deleteBtn);
-                    list.appendChild(categoryItem);
-                });
-            });
-        }
-
-        function addCategory(category) {
-            const inputId = category === 'active-client' ? 'newActiveClient' :
-                           category === 'potential-client' ? 'newPotentialClient' :
-                           category === 'freelance' ? 'newFreelance' : 'newSystems';
-            
-            const colorId = inputId + 'Color';
-            const input = document.getElementById(inputId);
-            const colorInput = document.getElementById(colorId);
-            
-            if (input.value.trim()) {
-                categories[category].push({
-                    name: input.value.trim(),
-                    color: colorInput.value
-                });
-                
-                input.value = '';
-                saveCategories();
-                renderCategoryLists();
-            }
-        }
-
-        function deleteCategory(category, index) {
-            if (confirm('Delete this category? Projects using it will need to be updated.')) {
-                categories[category].splice(index, 1);
-                saveCategories();
-                renderCategoryLists();
-            }
-        }
-
-        function populateProjectTypeDropdowns() {
-            const categorySelect = document.getElementById('projectCategory');
-            const typeSelect = document.getElementById('projectType');
-            
-            categorySelect.innerHTML = '<option value="">Select category...</option>';
-            categorySelect.innerHTML += '<option value="active-client">Active Client</option>';
-            categorySelect.innerHTML += '<option value="potential-client">Potential Client</option>';
-            categorySelect.innerHTML += '<option value="freelance">Freelance</option>';
-            categorySelect.innerHTML += '<option value="systems">Systems</option>';
-            
-            categorySelect.onchange = () => {
-                const selectedCategory = categorySelect.value;
-                typeSelect.innerHTML = '<option value="">Select type...</option>';
-                
-                if (selectedCategory && categories[selectedCategory]) {
-                    categories[selectedCategory].forEach(type => {
-                        const option = document.createElement('option');
-                        option.value = type.name;
-                        option.textContent = type.name;
-                        typeSelect.appendChild(option);
-                    });
-                }
-            };
         }
 
         function openModal(projectId = null) {
@@ -1128,29 +1141,26 @@
             const form = document.getElementById('projectForm');
             const deleteBtn = document.getElementById('deleteBtn');
             
-            populateProjectTypeDropdowns();
             editingProjectId = projectId;
             
+            populateProjectTypeDropdown();
+            
             if (projectId) {
-                const project = window.projects.find(p => p.id === projectId);
+                const project = projects.find(p => p.id === projectId);
                 document.getElementById('modalTitle').textContent = 'Edit Project';
                 document.getElementById('projectName').value = project.name;
                 document.getElementById('projectCategory').value = project.category;
-                
-                // Trigger category change to populate types
-                document.getElementById('projectCategory').dispatchEvent(new Event('change'));
-                
-                setTimeout(() => {
-                    document.getElementById('projectType').value = project.type;
-                }, 0);
-                
+                document.getElementById('projectType').value = project.type;
                 document.getElementById('startDate').value = project.startDate;
                 document.getElementById('endDate').value = project.endDate;
                 document.getElementById('projectNotes').value = project.notes || '';
+                
+                renderProjectStages(project.stages || []);
                 deleteBtn.style.display = 'block';
             } else {
                 document.getElementById('modalTitle').textContent = 'Add Project';
                 form.reset();
+                renderProjectStages([]);
                 deleteBtn.style.display = 'none';
             }
             
@@ -1162,17 +1172,154 @@
             editingProjectId = null;
         }
 
-        function editProject(id) {
-            openModal(id);
+        function populateProjectTypeDropdown() {
+            const categorySelect = document.getElementById('projectCategory');
+            const typeSelect = document.getElementById('projectType');
+            
+            categorySelect.onchange = () => {
+                const category = categorySelect.value;
+                typeSelect.innerHTML = '<option value="">Select type...</option>';
+                
+                Object.keys(projectTypes).forEach(typeName => {
+                    if (projectTypes[typeName].category === category) {
+                        const option = document.createElement('option');
+                        option.value = typeName;
+                        option.textContent = typeName;
+                        typeSelect.appendChild(option);
+                    }
+                });
+            };
+
+            typeSelect.onchange = () => {
+                const typeName = typeSelect.value;
+                if (typeName && projectTypes[typeName]) {
+                    // Auto-populate stages from template
+                    const template = projectTypes[typeName].stages;
+                    if (!editingProjectId && template) {
+                        renderProjectStages(template.map(s => ({ ...s, startDate: '', endDate: '' })));
+                    }
+                }
+            };
         }
 
-        function deleteProject() {
-            if (confirm('Are you sure you want to delete this project?')) {
-                window.projects = window.projects.filter(p => p.id !== editingProjectId);
-                saveProjects();
-                closeModal();
-                updateDisplay();
+        function renderProjectStages(stages) {
+            const container = document.getElementById('stagesList');
+            container.innerHTML = '';
+            
+            stages.forEach((stage, index) => {
+                const stageItem = document.createElement('div');
+                stageItem.className = 'stage-item';
+                
+                const stageHeader = document.createElement('div');
+                stageHeader.className = 'stage-item-header';
+                
+                const stageName = document.createElement('div');
+                stageName.className = 'stage-name';
+                stageName.textContent = stage.name || `Stage ${index + 1}`;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-stage';
+                removeBtn.textContent = '×';
+                removeBtn.onclick = () => removeStageFromProject(index);
+                
+                stageHeader.appendChild(stageName);
+                stageHeader.appendChild(removeBtn);
+                
+                const dateRange = document.createElement('div');
+                dateRange.className = 'date-range';
+                dateRange.style.marginTop = '8px';
+                
+                const startDateDiv = document.createElement('div');
+                const startLabel = document.createElement('label');
+                startLabel.textContent = 'Start';
+                startLabel.style.fontSize = '11px';
+                const startInput = document.createElement('input');
+                startInput.type = 'date';
+                startInput.value = stage.startDate || '';
+                startInput.dataset.stageIndex = index;
+                startInput.dataset.field = 'startDate';
+                startInput.onchange = (e) => updateStageField(index, 'startDate', e.target.value);
+                startDateDiv.appendChild(startLabel);
+                startDateDiv.appendChild(startInput);
+                
+                const endDateDiv = document.createElement('div');
+                const endLabel = document.createElement('label');
+                endLabel.textContent = 'End';
+                endLabel.style.fontSize = '11px';
+                const endInput = document.createElement('input');
+                endInput.type = 'date';
+                endInput.value = stage.endDate || '';
+                endInput.dataset.stageIndex = index;
+                endInput.dataset.field = 'endDate';
+                endInput.onchange = (e) => updateStageField(index, 'endDate', e.target.value);
+                endDateDiv.appendChild(endLabel);
+                endDateDiv.appendChild(endInput);
+                
+                dateRange.appendChild(startDateDiv);
+                dateRange.appendChild(endDateDiv);
+                
+                const loadLabel = document.createElement('label');
+                loadLabel.textContent = 'Load Intensity';
+                loadLabel.style.marginTop = '8px';
+                loadLabel.style.fontSize = '11px';
+                
+                const loadSelector = document.createElement('div');
+                loadSelector.className = 'stage-load-selector';
+                loadSelector.style.marginTop = '4px';
+                
+                for (let i = 1; i <= 5; i++) {
+                    const loadBtn = document.createElement('button');
+                    loadBtn.type = 'button';
+                    loadBtn.className = 'load-btn';
+                    if (stage.load === i) loadBtn.classList.add('selected');
+                    loadBtn.textContent = i;
+                    loadBtn.onclick = () => updateStageLoad(index, i);
+                    loadSelector.appendChild(loadBtn);
+                }
+                
+                stageItem.appendChild(stageHeader);
+                stageItem.appendChild(dateRange);
+                stageItem.appendChild(loadLabel);
+                stageItem.appendChild(loadSelector);
+                
+                container.appendChild(stageItem);
+            });
+        }
+
+        let currentProjectStages = [];
+
+        function addStageToProject() {
+            const typeName = document.getElementById('projectType').value;
+            const defaultStage = projectTypes[typeName]?.stages[currentProjectStages.length] || { name: 'New Stage', load: 3 };
+            
+            currentProjectStages.push({
+                name: defaultStage.name,
+                load: defaultStage.load,
+                startDate: '',
+                endDate: ''
+            });
+            
+            renderProjectStages(currentProjectStages);
+        }
+
+        function removeStageFromProject(index) {
+            currentProjectStages.splice(index, 1);
+            renderProjectStages(currentProjectStages);
+        }
+
+        function updateStageField(index, field, value) {
+            if (!currentProjectStages[index]) {
+                currentProjectStages[index] = {};
             }
+            currentProjectStages[index][field] = value;
+        }
+
+        function updateStageLoad(index, load) {
+            if (!currentProjectStages[index]) {
+                currentProjectStages[index] = {};
+            }
+            currentProjectStages[index].load = load;
+            renderProjectStages(currentProjectStages);
         }
 
         document.getElementById('projectForm').onsubmit = (e) => {
@@ -1185,14 +1332,15 @@
                 type: document.getElementById('projectType').value,
                 startDate: document.getElementById('startDate').value,
                 endDate: document.getElementById('endDate').value,
-                notes: document.getElementById('projectNotes').value
+                notes: document.getElementById('projectNotes').value,
+                stages: currentProjectStages.filter(s => s.startDate && s.endDate)
             };
             
             if (editingProjectId) {
-                const index = window.projects.findIndex(p => p.id === editingProjectId);
-                window.projects[index] = project;
+                const index = projects.findIndex(p => p.id === editingProjectId);
+                projects[index] = project;
             } else {
-                window.projects.push(project);
+                projects.push(project);
             }
             
             saveProjects();
@@ -1200,27 +1348,124 @@
             updateDisplay();
         };
 
+        function editProject(id) {
+            const project = projects.find(p => p.id === id);
+            currentProjectStages = project.stages ? [...project.stages] : [];
+            openModal(id);
+        }
+
+        function deleteProject() {
+            if (confirm('Are you sure you want to delete this project?')) {
+                projects = projects.filter(p => p.id !== editingProjectId);
+                saveProjects();
+                closeModal();
+                updateDisplay();
+            }
+        }
+
+        function openSettings() {
+            document.getElementById('warningThreshold').value = settings.warningThreshold;
+            document.getElementById('dangerThreshold').value = settings.dangerThreshold;
+            renderProjectTypesSettings();
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettings() {
+            settings.warningThreshold = parseInt(document.getElementById('warningThreshold').value);
+            settings.dangerThreshold = parseInt(document.getElementById('dangerThreshold').value);
+            saveSettings();
+            document.getElementById('settingsModal').classList.remove('active');
+            updateDisplay();
+        }
+
+        function renderProjectTypesSettings() {
+            const container = document.getElementById('projectTypesSettings');
+            container.innerHTML = '';
+            
+            Object.keys(projectTypes).forEach(typeName => {
+                const typeData = projectTypes[typeName];
+                const typeItem = document.createElement('div');
+                typeItem.className = 'project-type-item';
+                
+                const header = document.createElement('div');
+                header.className = 'project-type-header';
+                
+                const name = document.createElement('div');
+                name.className = 'project-type-name';
+                name.textContent = typeName;
+                
+                header.appendChild(name);
+                typeItem.appendChild(header);
+                
+                const stagesContainer = document.createElement('div');
+                stagesContainer.style.marginTop = '12px';
+                
+                typeData.stages.forEach((stage, index) => {
+                    const stageDef = document.createElement('div');
+                    stageDef.className = 'stage-definition';
+                    
+                    const stageName = document.createElement('div');
+                    stageName.textContent = stage.name;
+                    
+                    const loadBtns = document.createElement('div');
+                    loadBtns.className = 'stage-load-selector';
+                    
+                    for (let i = 1; i <= 5; i++) {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'load-btn';
+                        if (stage.load === i) btn.classList.add('selected');
+                        btn.textContent = i;
+                        btn.onclick = () => updateTemplateStageLoad(typeName, index, i);
+                        loadBtns.appendChild(btn);
+                    }
+                    
+                    stageDef.appendChild(stageName);
+                    stageDef.appendChild(loadBtns);
+                    stagesContainer.appendChild(stageDef);
+                });
+                
+                typeItem.appendChild(stagesContainer);
+                container.appendChild(typeItem);
+            });
+        }
+
+        function updateTemplateStageLoad(typeName, stageIndex, load) {
+            projectTypes[typeName].stages[stageIndex].load = load;
+            saveProjectTypes();
+            renderProjectTypesSettings();
+        }
+
         function saveProjects() {
-            localStorage.setItem('businessPlannerProjects', JSON.stringify(window.projects));
+            localStorage.setItem('businessPlannerProjects', JSON.stringify(projects));
         }
 
         function loadProjects() {
             const saved = localStorage.getItem('businessPlannerProjects');
             if (saved) {
-                window.projects = JSON.parse(saved);
-            } else {
-                window.projects = [];
+                projects = JSON.parse(saved);
             }
         }
 
-        function saveCategories() {
-            localStorage.setItem('businessPlannerCategories', JSON.stringify(categories));
+        function saveProjectTypes() {
+            localStorage.setItem('businessPlannerProjectTypes', JSON.stringify(projectTypes));
         }
 
-        function loadCategories() {
-            const saved = localStorage.getItem('businessPlannerCategories');
+        function loadProjectTypes() {
+            const saved = localStorage.getItem('businessPlannerProjectTypes');
             if (saved) {
-                categories = JSON.parse(saved);
+                projectTypes = JSON.parse(saved);
+            }
+        }
+
+        function saveSettings() {
+            localStorage.setItem('businessPlannerSettings', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('businessPlannerSettings');
+            if (saved) {
+                settings = JSON.parse(saved);
             }
         }
 
@@ -1238,7 +1483,8 @@
         };
 
         // Initialize
-        loadCategories();
+        loadProjectTypes();
+        loadSettings();
         loadProjects();
         updateDisplay();
     </script>
