@@ -740,6 +740,12 @@
         <button class="nav-btn" onclick="navigateView(1)">→</button>
     </div>
 
+    <div class="view-selector" style="display: none;" id="quarterSelector">
+        <button class="nav-btn" onclick="navigateView(-1)">←</button>
+        <select id="quarterSelect" onchange="jumpToQuarter()"></select>
+        <button class="nav-btn" onclick="navigateView(1)">→</button>
+    </div>
+
     <div class="months-grid" id="monthsGrid"></div>
 
     <button class="fab" onclick="openModal()">+</button>
@@ -838,19 +844,28 @@
             <div class="modal-header">Settings</div>
             
             <div class="settings-section">
-                <div class="settings-section-title">Load Thresholds</div>
+                <div class="settings-section-title">Load Capacity</div>
                 <div class="threshold-settings">
                     <div class="threshold-item">
-                        <span>Warning Load:</span>
-                        <input type="number" id="warningThreshold" value="10" min="1">
+                        <span>Max Load Per Month:</span>
+                        <input type="number" id="maxMonthlyLoad" value="40" min="1">
                     </div>
                     <div class="threshold-item">
-                        <span>Danger Load:</span>
-                        <input type="number" id="dangerThreshold" value="15" min="1">
+                        <span>Max Load Per Week:</span>
+                        <input type="number" id="maxWeeklyLoad" value="10" min="1">
+                    </div>
+                    <div class="threshold-item">
+                        <span>Warning Threshold (%):</span>
+                        <input type="number" id="warningThreshold" value="75" min="1" max="100">
+                    </div>
+                    <div class="threshold-item">
+                        <span>Danger Threshold (%):</span>
+                        <input type="number" id="dangerThreshold" value="90" min="1" max="100">
                     </div>
                     <p style="font-size: 12px; color: #999; margin-top: 8px;">
-                        Warning/Danger thresholds color-code your load bars. The Danger threshold also sets the max number of load bars displayed.
-                        <br><strong>Load = Hours Per Month:</strong> Each load bar represents ~1 hour/month (e.g., load 5 = 5 hrs/month, load 40 = 40 hrs/month). All overlapping stages are added together. If you work 40 hours/month on client work, set Danger threshold to 40. Weekly views show ~10 hours max (40÷4 weeks).
+                        <strong>Max Load:</strong> Set your monthly and weekly capacity in hours. Load bars will scale to these maximums.
+                        <br><strong>Thresholds:</strong> Warning/Danger percentages color-code your load bars (e.g., 75% = yellow, 90% = red).
+                        <br><strong>Example:</strong> If Max Monthly = 40, a load of 30 shows 75% full (yellow at 75%+, red at 90%+).
                     </p>
                 </div>
             </div>
@@ -876,9 +891,9 @@
 
             <div class="settings-section">
                 <div class="settings-section-title">Display Options</div>
-                <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
-                    <input type="checkbox" id="showRetainers" onchange="toggleRetainers()" checked>
-                    <span>Show Retainer Projects in Views</span>
+                <label style="display: block; cursor: pointer;">
+                    <input type="checkbox" id="showRetainers" onchange="toggleRetainers()" checked style="cursor: pointer; margin-right: 8px; vertical-align: middle;">
+                    <span style="font-size: 14px; vertical-align: middle;">Show Retainer Projects in Views</span>
                 </label>
                 <p style="font-size: 11px; color: #999; margin-top: 8px;">When unchecked, retainer projects will be hidden from all views. Income forecasts will still include retainer amounts.</p>
             </div>
@@ -890,6 +905,7 @@
     </div>
 
     <script>
+        // Main Application Code
         let currentYear = new Date().getFullYear();
         let currentMonth = new Date().getMonth();
         let currentView = 'current-month';
@@ -995,8 +1011,10 @@
         };
 
         let settings = {
-            warningThreshold: 10,
-            dangerThreshold: 15,
+            maxMonthlyLoad: 40,
+            maxWeeklyLoad: 10,
+            warningThreshold: 75,
+            dangerThreshold: 90,
             showRetainers: true
         };
 
@@ -1040,16 +1058,48 @@
         }
 
         function populateMonthSelector() {
-            const select = document.getElementById('monthSelect');
-            const selector = document.getElementById('monthSelector');
+            const monthSelect = document.getElementById('monthSelect');
+            const monthSelector = document.getElementById('monthSelector');
+            const quarterSelect = document.getElementById('quarterSelect');
+            const quarterSelector = document.getElementById('quarterSelector');
             
             if (currentView === 'quarter') {
-                selector.style.display = 'none';
+                monthSelector.style.display = 'none';
+                quarterSelector.style.display = 'flex';
+                
+                // Populate quarter selector
+                quarterSelect.innerHTML = '';
+                
+                const currentQuarter = Math.floor(currentMonth / 3) + viewOffset;
+                const currentQuarterYear = currentYear + Math.floor(currentQuarter / 4);
+                const currentQuarterInYear = currentQuarter % 4;
+                
+                // Show current year and adjacent years
+                for (let yearOffset = -1; yearOffset <= 1; yearOffset++) {
+                    const year = currentQuarterYear + yearOffset;
+                    
+                    for (let q = 0; q < 4; q++) {
+                        const option = document.createElement('option');
+                        const quarterStartMonth = q * 3;
+                        const quarterEndMonth = quarterStartMonth + 2;
+                        
+                        option.value = (year - currentYear) * 4 + q - Math.floor(currentMonth / 3);
+                        option.textContent = `Q${q + 1} ${year} (${monthNames[quarterStartMonth].slice(0, 3)} - ${monthNames[quarterEndMonth].slice(0, 3)})`;
+                        
+                        if (year === currentQuarterYear && q === currentQuarterInYear) {
+                            option.selected = true;
+                        }
+                        
+                        quarterSelect.appendChild(option);
+                    }
+                }
+                
                 return;
             }
             
-            selector.style.display = 'flex';
-            select.innerHTML = '';
+            quarterSelector.style.display = 'none';
+            monthSelector.style.display = 'flex';
+            monthSelect.innerHTML = '';
             
             if (currentView === 'current-week') {
                 // Populate with next 4 weeks
@@ -1067,7 +1117,7 @@
                         option.selected = true;
                     }
                     
-                    select.appendChild(option);
+                    monthSelect.appendChild(option);
                 }
             } else {
                 // Calculate the actual target date to determine correct year
@@ -1092,7 +1142,7 @@
                         option.selected = true;
                     }
                     
-                    select.appendChild(option);
+                    monthSelect.appendChild(option);
                 }
             }
         }
@@ -1126,6 +1176,14 @@
             
             viewOffset = monthsInYear - baseMonthsTotal;
             
+            updateDisplay();
+        }
+
+        function jumpToQuarter() {
+            const select = document.getElementById('quarterSelect');
+            const selectedValue = parseInt(select.value);
+            
+            viewOffset = selectedValue;
             updateDisplay();
         }
 
@@ -1172,9 +1230,16 @@
                 if (project.payments) {
                     project.payments.forEach(payment => {
                         const paymentDate = new Date(payment.expectedDate);
+                        paymentDate.setHours(0, 0, 0, 0);
+                        
+                        const periodStart = new Date(startDate);
+                        periodStart.setHours(0, 0, 0, 0);
+                        
+                        const periodEnd = new Date(endDate);
+                        periodEnd.setHours(23, 59, 59, 999);
 
                         // Check if payment falls within period
-                        if (paymentDate >= startDate && paymentDate <= endDate) {
+                        if (paymentDate >= periodStart && paymentDate <= periodEnd) {
                             totalIncome += payment.amount || 0;
                             expectedPayments.push({
                                 projectName: project.name,
@@ -1213,13 +1278,17 @@
             return { totalIncome, expectedPayments };
         }
 
-        function renderLoadIndicator(container, load, maxBars = null) {
+        function renderLoadIndicator(container, load, maxBars = null, isWeekly = false) {
             container.innerHTML = '';
             
-            // Use dangerThreshold as max if not specified
+            // Determine max based on view type
             if (maxBars === null) {
-                maxBars = settings.dangerThreshold || 15;
+                maxBars = isWeekly ? settings.maxWeeklyLoad : settings.maxMonthlyLoad;
             }
+            
+            // Calculate threshold values based on percentages
+            const warningValue = maxBars * (settings.warningThreshold / 100);
+            const dangerValue = maxBars * (settings.dangerThreshold / 100);
             
             for (let i = 0; i < maxBars; i++) {
                 const bar = document.createElement('div');
@@ -1228,9 +1297,9 @@
                 if (i < load) {
                     bar.classList.add('filled');
                     
-                    if (load >= settings.dangerThreshold) {
+                    if (load >= dangerValue) {
                         bar.classList.add('danger');
-                    } else if (load >= settings.warningThreshold) {
+                    } else if (load >= warningValue) {
                         bar.classList.add('warning');
                     }
                 }
@@ -1274,7 +1343,7 @@
                 const isWeeklyView = currentView === 'current-week';
                 const { totalLoad, activeStages } = calculatePeriodLoad(startDate, endDate, isWeeklyView);
                 const { totalIncome, expectedPayments } = calculatePeriodIncome(startDate, endDate);
-                renderLoadIndicator(loadIndicator, totalLoad);
+                renderLoadIndicator(loadIndicator, totalLoad, null, isWeeklyView);
                 
                 // Count unique projects by category
                 const projectsInPeriod = getProjectsForDateRange(startDate, endDate);
@@ -1294,19 +1363,86 @@
                 // Update income forecast card
                 incomeAmount.textContent = `$${totalIncome.toLocaleString()}`;
                 
-                // Create income breakdown
-                const retainerCount = expectedPayments.filter(p => p.description === 'Monthly Retainer').length;
-                const oneTimeCount = expectedPayments.filter(p => p.description !== 'Monthly Retainer').length;
+                // Create detailed income breakdown by project type
+                const incomeByType = {};
                 
-                const incomeBreakdownParts = [];
-                if (retainerCount > 0) {
-                    incomeBreakdownParts.push(`${retainerCount} retainer${retainerCount !== 1 ? 's' : ''}`);
-                }
-                if (oneTimeCount > 0) {
-                    incomeBreakdownParts.push(`${oneTimeCount} payment${oneTimeCount !== 1 ? 's' : ''}`);
-                }
+                expectedPayments.forEach(payment => {
+                    // Find the project to get its type
+                    const project = projects.find(p => p.name === payment.projectName);
+                    if (!project) return;
+                    
+                    const type = project.type;
+                    const isRetainer = project.category === 'retainer';
+                    const isFreelance = project.category === 'ad-hoc';
+                    
+                    if (isRetainer) {
+                        if (!incomeByType['Retainers']) {
+                            incomeByType['Retainers'] = { count: 0, amount: 0, projects: [] };
+                        }
+                        incomeByType['Retainers'].count++;
+                        incomeByType['Retainers'].amount += payment.amount;
+                        incomeByType['Retainers'].projects.push(payment.projectName);
+                    } else if (isFreelance) {
+                        // Show individual freelance project names
+                        const key = payment.projectName;
+                        if (!incomeByType[key]) {
+                            incomeByType[key] = { count: 1, amount: 0, projects: [], isFreelance: true };
+                        }
+                        incomeByType[key].amount += payment.amount;
+                    } else {
+                        // Group by project type for client work
+                        if (!incomeByType[type]) {
+                            incomeByType[type] = { count: 0, amount: 0, projects: [] };
+                        }
+                        if (!incomeByType[type].projects.includes(payment.projectName)) {
+                            incomeByType[type].count++;
+                            incomeByType[type].projects.push(payment.projectName);
+                        }
+                        incomeByType[type].amount += payment.amount;
+                    }
+                });
                 
-                incomeBreakdown.textContent = incomeBreakdownParts.length > 0 ? incomeBreakdownParts.join(' + ') : 'No income expected this period';
+                // Build HTML breakdown
+                let breakdownHTML = '';
+                
+                // Sort: Retainers first, then project types, then freelance
+                const sortedKeys = Object.keys(incomeByType).sort((a, b) => {
+                    if (a === 'Retainers') return -1;
+                    if (b === 'Retainers') return 1;
+                    if (incomeByType[a].isFreelance) return 1;
+                    if (incomeByType[b].isFreelance) return -1;
+                    return 0;
+                });
+                
+                sortedKeys.forEach(key => {
+                    const data = incomeByType[key];
+                    let line = '';
+                    
+                    if (data.isFreelance) {
+                        // Individual freelance project
+                        line = `<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <span>${key}</span>
+                            ${data.amount > 0 ? `<span style="font-weight: 500;">$${data.amount.toLocaleString()}</span>` : ''}
+                        </div>`;
+                    } else if (key === 'Retainers') {
+                        line = `<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <span>${data.count} retainer${data.count !== 1 ? 's' : ''}</span>
+                            ${data.amount > 0 ? `<span style="font-weight: 500;">$${data.amount.toLocaleString()}</span>` : ''}
+                        </div>`;
+                    } else {
+                        // Project type grouping
+                        const typeLabel = key.toLowerCase().includes('website') ? 'website copy project' :
+                                        key.toLowerCase().includes('intensive') ? 'intensive' : key.toLowerCase();
+                        line = `<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <span>${data.count} ${typeLabel}${data.count !== 1 ? 's' : ''}</span>
+                            ${data.amount > 0 ? `<span style="font-weight: 500;">$${data.amount.toLocaleString()}</span>` : ''}
+                        </div>`;
+                    }
+                    
+                    breakdownHTML += line;
+                });
+                
+                incomeBreakdown.innerHTML = breakdownHTML || 'No income expected this period';
                 
                 // Show/hide card based on view
                 incomeForecastCard.style.display = 'block';
@@ -1343,6 +1479,50 @@
                 const quarter = Math.floor(currentMonth / 3) + viewOffset;
                 const startMonth = quarter * 3;
                 
+                // Calculate total quarter income
+                let quarterIncome = 0;
+                for (let i = 0; i < 3; i++) {
+                    const monthIndex = (startMonth + i) % 12;
+                    const year = currentYear + Math.floor((startMonth + i) / 12);
+                    const monthStart = new Date(year, monthIndex, 1);
+                    const monthEnd = new Date(year, monthIndex + 1, 0);
+                    const { totalIncome } = calculatePeriodIncome(monthStart, monthEnd);
+                    quarterIncome += totalIncome;
+                }
+                
+                // Create quarterly income card
+                const incomeCard = document.createElement('div');
+                incomeCard.style.cssText = `
+                    background: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    text-align: center;
+                    grid-column: 1 / -1;
+                `;
+                
+                const incomeTitle = document.createElement('div');
+                incomeTitle.textContent = 'Quarterly Income Forecast';
+                incomeTitle.style.cssText = `
+                    font-size: 13px;
+                    color: #666;
+                    margin-bottom: 8px;
+                `;
+                
+                const incomeAmount = document.createElement('div');
+                incomeAmount.textContent = `$${quarterIncome.toLocaleString()}`;
+                incomeAmount.style.cssText = `
+                    font-size: 32px;
+                    font-weight: 600;
+                    color: #2e7d32;
+                `;
+                
+                incomeCard.appendChild(incomeTitle);
+                incomeCard.appendChild(incomeAmount);
+                grid.appendChild(incomeCard);
+                
+                // Render month cards
                 for (let i = 0; i < 3; i++) {
                     const monthIndex = (startMonth + i) % 12;
                     const year = currentYear + Math.floor((startMonth + i) / 12);
@@ -1379,7 +1559,8 @@
             
             const loadInd = document.createElement('div');
             loadInd.className = 'load-indicator';
-            renderLoadIndicator(loadInd, totalLoad, 10);
+            // Use full monthly max for quarter view cards
+            renderLoadIndicator(loadInd, totalLoad, settings.maxMonthlyLoad, false);
             
             const loadText = document.createElement('span');
             loadText.textContent = totalLoad;
@@ -1638,11 +1819,11 @@
             } else if (category === 'retainer') {
                 strategyCallGroup.style.display = 'none';
                 retainerAmountGroup.style.display = 'block';
-                stagesSection.style.display = 'none';
+                stagesSection.style.display = 'block';
                 paymentsSection.style.display = 'none';
                 endDateGroup.style.display = 'none';
                 endDateInput.required = false;
-                stagesHelpText.textContent = '';
+                stagesHelpText.textContent = 'Set the load for this retainer (0 = no ongoing work, 1-5 = hours per month).';
             } else {
                 strategyCallGroup.style.display = 'none';
                 retainerAmountGroup.style.display = 'none';
@@ -1947,20 +2128,30 @@
             let endDate = document.getElementById('endDate').value;
             let stages = currentProjectStages.filter(s => s.startDate && s.endDate);
             
-            // For retainers, set end date far in future and create minimal stage
+            // For retainers, set end date far in future and use stage from form
             if (category === 'retainer') {
                 const start = new Date(startDate);
                 const futureEnd = new Date(start);
                 futureEnd.setFullYear(futureEnd.getFullYear() + 10); // 10 years from start
                 endDate = futureEnd.toISOString().split('T')[0];
                 
-                // Create a single ongoing stage with load 0
-                stages = [{
-                    name: 'Ongoing',
-                    load: 0,
-                    startDate: startDate,
-                    endDate: endDate
-                }];
+                // Use the stage from the form (with user-selected load) or create default
+                if (currentProjectStages.length > 0 && currentProjectStages[0].name) {
+                    stages = [{
+                        name: currentProjectStages[0].name || 'Ongoing',
+                        load: currentProjectStages[0].load || 0,
+                        startDate: startDate,
+                        endDate: endDate
+                    }];
+                } else {
+                    // Default if no stage was set
+                    stages = [{
+                        name: 'Ongoing',
+                        load: 0,
+                        startDate: startDate,
+                        endDate: endDate
+                    }];
+                }
             }
             
             const project = {
@@ -2006,6 +2197,8 @@
         }
 
         function openSettings() {
+            document.getElementById('maxMonthlyLoad').value = settings.maxMonthlyLoad;
+            document.getElementById('maxWeeklyLoad').value = settings.maxWeeklyLoad;
             document.getElementById('warningThreshold').value = settings.warningThreshold;
             document.getElementById('dangerThreshold').value = settings.dangerThreshold;
             document.getElementById('showRetainers').checked = showRetainers;
@@ -2014,6 +2207,8 @@
         }
 
         function closeSettings() {
+            settings.maxMonthlyLoad = parseInt(document.getElementById('maxMonthlyLoad').value);
+            settings.maxWeeklyLoad = parseInt(document.getElementById('maxWeeklyLoad').value);
             settings.warningThreshold = parseInt(document.getElementById('warningThreshold').value);
             settings.dangerThreshold = parseInt(document.getElementById('dangerThreshold').value);
             saveSettings();
@@ -2478,6 +2673,7 @@
         window.selectQuickView = selectQuickView;
         window.navigateView = navigateView;
         window.jumpToMonth = jumpToMonth;
+        window.jumpToQuarter = jumpToQuarter;
         window.toggleRetainers = toggleRetainers;
         window.exportData = exportData;
         window.importData = importData;
