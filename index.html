@@ -118,6 +118,7 @@
             margin-bottom: 16px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            justify-content: center;
         }
 
         .quick-view-btn {
@@ -129,6 +130,13 @@
             font-size: 12px;
             white-space: nowrap;
             transition: all 0.2s;
+        }
+
+        @media (min-width: 768px) {
+            .quick-view-btn {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
         }
 
         .quick-view-btn:hover {
@@ -842,7 +850,7 @@
                     </div>
                     <p style="font-size: 12px; color: #999; margin-top: 8px;">
                         Warning/Danger thresholds color-code your load bars. The Danger threshold also sets the max number of load bars displayed.
-                        <br><strong>Load Calculation:</strong> All overlapping stages are added together. If one project has 3 stages running in the same month (e.g., Onboarding load 2 + Groundwork load 3 + Drafting load 5), the total is 10.
+                        <br><strong>Load = Hours Per Week:</strong> Each load bar represents ~1 hour/week (e.g., load 5 = 5 hrs/week, load 20 = 20 hrs/week). All overlapping stages are added together. If you work 40 hours/week on client work, set Danger threshold to 40.
                     </p>
                 </div>
             </div>
@@ -1277,19 +1285,19 @@
                 // Update income forecast card
                 incomeAmount.textContent = `$${totalIncome.toLocaleString()}`;
                 
-                // Create breakdown
+                // Create income breakdown
                 const retainerCount = expectedPayments.filter(p => p.description === 'Monthly Retainer').length;
                 const oneTimeCount = expectedPayments.filter(p => p.description !== 'Monthly Retainer').length;
                 
-                const breakdownParts = [];
+                const incomeBreakdownParts = [];
                 if (retainerCount > 0) {
-                    breakdownParts.push(`${retainerCount} retainer${retainerCount !== 1 ? 's' : ''}`);
+                    incomeBreakdownParts.push(`${retainerCount} retainer${retainerCount !== 1 ? 's' : ''}`);
                 }
                 if (oneTimeCount > 0) {
-                    breakdownParts.push(`${oneTimeCount} payment${oneTimeCount !== 1 ? 's' : ''}`);
+                    incomeBreakdownParts.push(`${oneTimeCount} payment${oneTimeCount !== 1 ? 's' : ''}`);
                 }
                 
-                incomeBreakdown.textContent = breakdownParts.length > 0 ? breakdownParts.join(' + ') : 'No income expected this period';
+                incomeBreakdown.textContent = incomeBreakdownParts.length > 0 ? incomeBreakdownParts.join(' + ') : 'No income expected this period';
                 
                 // Show/hide card based on view
                 incomeForecastCard.style.display = 'block';
@@ -1662,34 +1670,26 @@
             const rules = typeData.autoCalculation.rules;
             const autoStages = [];
             
-            let currentStart = new Date(today);
-            
             stages.forEach((template) => {
                 const stage = { ...template };
                 const rule = rules[stage.name];
                 
                 if (rule) {
-                    // Set start date
-                    if (rule.startOffset === 0) {
-                        stage.startDate = currentStart.toISOString().split('T')[0];
-                    } else {
-                        // Start after previous stage
-                        const start = new Date(currentStart);
-                        start.setDate(start.getDate() + rule.startOffset);
-                        stage.startDate = start.toISOString().split('T')[0];
-                        currentStart = start;
-                    }
-                    
-                    // Set end date
+                    // Set start date based on offset from call date
                     if (rule.durationDays === 'tillCall') {
+                        // First stage: from today until call
+                        stage.startDate = today.toISOString().split('T')[0];
                         stage.endDate = strategyCallDate;
-                        currentStart = new Date(callDate);
                     } else {
-                        const end = new Date(currentStart);
+                        // Other stages: start X days after call, run for Y days
+                        const startOffset = rule.startOffset || 1;
+                        const start = new Date(callDate);
+                        start.setDate(start.getDate() + startOffset);
+                        stage.startDate = start.toISOString().split('T')[0];
+                        
+                        const end = new Date(start);
                         end.setDate(end.getDate() + rule.durationDays - 1);
                         stage.endDate = end.toISOString().split('T')[0];
-                        currentStart = new Date(end);
-                        currentStart.setDate(currentStart.getDate() + 1);
                     }
                 } else {
                     // No rule for this stage, keep dates empty
@@ -2183,19 +2183,47 @@
                             stageName.style.fontWeight = '500';
                             stageName.textContent = stage.name + ':';
                             
+                            const startOffsetInput = document.createElement('input');
+                            startOffsetInput.type = 'number';
+                            startOffsetInput.style.width = '40px';
+                            startOffsetInput.style.padding = '2px 4px';
+                            startOffsetInput.style.fontSize = '11px';
+                            startOffsetInput.style.border = '1px solid #ddd';
+                            startOffsetInput.style.borderRadius = '3px';
+                            startOffsetInput.placeholder = '0';
+                            
+                            const startLabel = document.createElement('span');
+                            startLabel.style.fontSize = '10px';
+                            startLabel.textContent = 'days after call';
+                            
                             const durationInput = document.createElement('input');
                             durationInput.type = 'number';
-                            durationInput.style.width = '50px';
+                            durationInput.style.width = '40px';
                             durationInput.style.padding = '2px 4px';
                             durationInput.style.fontSize = '11px';
                             durationInput.style.border = '1px solid #ddd';
                             durationInput.style.borderRadius = '3px';
                             
                             if (rule.durationDays === 'tillCall') {
+                                startOffsetInput.value = '0';
+                                startOffsetInput.disabled = true;
                                 durationInput.value = '';
                                 durationInput.placeholder = 'till call';
                                 durationInput.disabled = true;
+                                startLabel.textContent = 'starts now';
                             } else {
+                                startOffsetInput.value = rule.startOffset || 1;
+                                startOffsetInput.onchange = (e) => {
+                                    if (!projectTypes[typeName].autoCalculation.rules) {
+                                        projectTypes[typeName].autoCalculation.rules = {};
+                                    }
+                                    if (!projectTypes[typeName].autoCalculation.rules[stage.name]) {
+                                        projectTypes[typeName].autoCalculation.rules[stage.name] = { startOffset: 1, durationDays: 7 };
+                                    }
+                                    projectTypes[typeName].autoCalculation.rules[stage.name].startOffset = parseInt(e.target.value) || 1;
+                                    saveProjectTypes();
+                                };
+                                
                                 durationInput.value = rule.durationDays;
                                 durationInput.onchange = (e) => {
                                     if (!projectTypes[typeName].autoCalculation.rules) {
@@ -2210,11 +2238,19 @@
                             }
                             
                             const daysLabel = document.createElement('span');
-                            daysLabel.textContent = 'days';
+                            daysLabel.style.fontSize = '10px';
+                            daysLabel.textContent = 'for';
+                            
+                            const durationLabel = document.createElement('span');
+                            durationLabel.style.fontSize = '10px';
+                            durationLabel.textContent = 'days';
                             
                             ruleRow.appendChild(stageName);
-                            ruleRow.appendChild(durationInput);
+                            ruleRow.appendChild(startOffsetInput);
+                            ruleRow.appendChild(startLabel);
                             ruleRow.appendChild(daysLabel);
+                            ruleRow.appendChild(durationInput);
+                            ruleRow.appendChild(durationLabel);
                             rulesContainer.appendChild(ruleRow);
                         });
                         
@@ -2222,7 +2258,7 @@
                         helpText.style.fontSize = '10px';
                         helpText.style.color = '#999';
                         helpText.style.marginTop = '8px';
-                        helpText.textContent = 'Set duration in days for each stage. First stage runs until strategy call date.';
+                        helpText.textContent = 'Set when each stage starts (days after strategy call) and duration. First stage runs from now until strategy call date.';
                         
                         rulesContainer.appendChild(helpText);
                         autoCalcSection.appendChild(rulesContainer);
@@ -2425,7 +2461,22 @@
             }
         };
 
-        // Initialize
+        // Initialize and expose functions to window
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.openSettings = openSettings;
+        window.closeSettings = closeSettings;
+        window.selectQuickView = selectQuickView;
+        window.navigateView = navigateView;
+        window.jumpToMonth = jumpToMonth;
+        window.toggleRetainers = toggleRetainers;
+        window.exportData = exportData;
+        window.importData = importData;
+        window.addStageToProject = addStageToProject;
+        window.addPaymentToProject = addPaymentToProject;
+        window.editProject = editProject;
+        window.deleteProject = deleteProject;
+        
         loadProjectTypes();
         loadSettings();
         loadProjects();
