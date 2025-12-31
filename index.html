@@ -123,10 +123,10 @@
         .quick-view-btn {
             background: white;
             border: 1px solid #e0e0e0;
-            padding: 8px 16px;
+            padding: 8px 12px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             white-space: nowrap;
             transition: all 0.2s;
         }
@@ -665,9 +665,8 @@
 </head>
 <body>
     <div class="header">
-            <h1>Fresh Pages Planner</h1>
-        </div>
-        <div class="header-actions">
+        <img src="https://storage.googleapis.com/msgsndr/ssBdq3Cs8kH0GpooZW9g/media/690b2c6392b3550e65e8d4f5.png" alt="Fresh Pages" class="logo" style="margin: 0 auto; display: block;">
+        <div class="header-actions" style="position: absolute; right: 16px; top: 16px;">
             <button class="desktop-add-btn" onclick="openModal()">+ Add Project</button>
             <button class="icon-btn" onclick="openSettings()" title="Settings">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -726,9 +725,7 @@
                     <select id="projectCategory" required>
                         <option value="">Select category...</option>
                         <option value="active-client">Active Client</option>
-                        <option value="potential-client">Potential Client</option>
                         <option value="freelance">Freelance</option>
-                        <option value="systems">Systems</option>
                     </select>
                 </div>
 
@@ -799,6 +796,20 @@
             <div class="settings-section">
                 <div class="settings-section-title">Project Types & Stages</div>
                 <div id="projectTypesSettings"></div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-title">Import / Export Data</div>
+                <div style="display: flex; gap: 12px;">
+                    <button type="button" class="btn btn-secondary" onclick="exportData()" style="flex: 1;">
+                        Export All Data
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('importFile').click()" style="flex: 1;">
+                        Import Data
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                </div>
+                <p style="font-size: 11px; color: #999; margin-top: 8px;">Export your projects and settings to backup, or import from a previous backup.</p>
             </div>
 
             <div class="form-actions">
@@ -1298,7 +1309,12 @@
             const strategyCallDate = document.getElementById('strategyCallDate').value;
             const projectType = document.getElementById('projectType').value;
             
-            if (!strategyCallDate || !projectTypes[projectType]) return;
+            console.log('Auto-calculating stages...', { strategyCallDate, projectType });
+            
+            if (!strategyCallDate || !projectTypes[projectType]) {
+                console.log('Missing data for auto-calculation');
+                return;
+            }
             
             const callDate = new Date(strategyCallDate);
             const today = new Date();
@@ -1353,6 +1369,8 @@
                 
                 autoStages.push(stage);
             });
+            
+            console.log('Auto-calculated stages:', autoStages);
             
             // Update project end date
             if (autoStages.length > 0) {
@@ -1564,9 +1582,7 @@
             // Group by category
             const categories = {
                 'active-client': [],
-                'potential-client': [],
-                'freelance': [],
-                'systems': []
+                'freelance': []
             };
             
             Object.keys(projectTypes).forEach(typeName => {
@@ -1783,6 +1799,65 @@
             if (saved) {
                 settings = JSON.parse(saved);
             }
+        }
+
+        function exportData() {
+            const data = {
+                projects: projects,
+                projectTypes: projectTypes,
+                settings: settings,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `fresh-pages-planner-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (confirm('This will replace all your current data. Are you sure?')) {
+                        if (data.projects) {
+                            projects = data.projects;
+                            saveProjects();
+                        }
+                        if (data.projectTypes) {
+                            projectTypes = data.projectTypes;
+                            saveProjectTypes();
+                        }
+                        if (data.settings) {
+                            settings = data.settings;
+                            saveSettings();
+                        }
+                        
+                        alert('Data imported successfully!');
+                        closeSettings();
+                        updateDisplay();
+                        renderProjectTypesSettings();
+                    }
+                } catch (error) {
+                    alert('Error importing data: ' + error.message);
+                }
+                
+                // Reset file input
+                event.target.value = '';
+            };
+            reader.readAsText(file);
         }
 
         // Close modals when clicking outside
