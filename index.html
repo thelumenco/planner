@@ -740,13 +740,13 @@
         <button class="nav-btn" onclick="navigateView(1)">→</button>
     </div>
 
+    <div class="months-grid" id="monthsGrid"></div>
+
     <div class="view-selector" style="display: none;" id="quarterSelector">
         <button class="nav-btn" onclick="navigateView(-1)">←</button>
         <select id="quarterSelect" onchange="jumpToQuarter()"></select>
         <button class="nav-btn" onclick="navigateView(1)">→</button>
     </div>
-
-    <div class="months-grid" id="monthsGrid"></div>
 
     <button class="fab" onclick="openModal()">+</button>
 
@@ -2561,6 +2561,214 @@
             const saved = localStorage.getItem('businessPlannerProjects');
             if (saved) {
                 projects = JSON.parse(saved);
+            } else {
+                // Create sample data if none exists
+                const today = new Date();
+                const currentMonth = today.getMonth();
+                const currentYear = today.getFullYear();
+                
+                projects = [
+                    // 12 Retainers at $100 each
+                    ...Array.from({length: 12}, (_, i) => ({
+                        id: Date.now() + i,
+                        name: `MUSE Retainer ${i + 1}`,
+                        link: '',
+                        category: 'retainer',
+                        type: 'MUSE Retainer',
+                        startDate: new Date(currentYear, 0, 1).toISOString().split('T')[0],
+                        endDate: new Date(currentYear + 10, 0, 1).toISOString().split('T')[0],
+                        retainerAmount: 100,
+                        notes: '',
+                        stages: [{
+                            name: 'Ongoing',
+                            load: 0,
+                            startDate: new Date(currentYear, 0, 1).toISOString().split('T')[0],
+                            endDate: new Date(currentYear + 10, 0, 1).toISOString().split('T')[0]
+                        }],
+                        payments: []
+                    })),
+                    
+                    // Active Client 1 - Full Website Copy (Jan-Mar)
+                    {
+                        id: Date.now() + 100,
+                        name: 'Tech Startup Website',
+                        link: '',
+                        category: 'active-client',
+                        type: 'Full Website Copy',
+                        startDate: new Date(currentYear, 0, 5).toISOString().split('T')[0],
+                        endDate: new Date(currentYear, 2, 10).toISOString().split('T')[0],
+                        strategyCallDate: new Date(currentYear, 0, 20).toISOString().split('T')[0],
+                        retainerAmount: 0,
+                        notes: '',
+                        stages: [
+                            {
+                                name: 'Onboarding',
+                                load: 2,
+                                startDate: new Date(currentYear, 0, 5).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 0, 19).toISOString().split('T')[0]
+                            },
+                            {
+                                name: 'Groundwork',
+                                load: 3,
+                                startDate: new Date(currentYear, 0, 21).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 1, 5).toISOString().split('T')[0]
+                            },
+                            {
+                                name: 'Drafting',
+                                load: 5,
+                                startDate: new Date(currentYear, 1, 6).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 2, 1).toISOString().split('T')[0]
+                            },
+                            {
+                                name: 'Offboarding',
+                                load: 1,
+                                startDate: new Date(currentYear, 2, 2).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 2, 10).toISOString().split('T')[0]
+                            }
+                        ],
+                        payments: [
+                            {
+                                description: 'Deposit',
+                                amount: 2500,
+                                expectedDate: new Date(currentYear, 0, 5).toISOString().split('T')[0]
+                            },
+                            {
+                                description: 'Balance',
+                                amount: 2500,
+                                expectedDate: new Date(currentYear, 2, 10).toISOString().split('T')[0]
+                            }
+                        ]
+                    },
+                    
+                    // Active Client 2 - Intensive (Feb)
+                    {
+                        id: Date.now() + 101,
+                        name: 'E-commerce Brand Intensive',
+                        link: '',
+                        category: 'active-client',
+                        type: 'Intensive',
+                        startDate: new Date(currentYear, 1, 1).toISOString().split('T')[0],
+                        endDate: new Date(currentYear, 1, 28).toISOString().split('T')[0],
+                        strategyCallDate: new Date(currentYear, 1, 10).toISOString().split('T')[0],
+                        retainerAmount: 0,
+                        notes: '',
+                        stages: [
+                            {
+                                name: 'Onboarding',
+                                load: 2,
+                                startDate: new Date(currentYear, 1, 1).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 1, 9).toISOString().split('T')[0]
+                            },
+                            {
+                                name: 'Groundwork',
+                                load: 3,
+                                startDate: new Date(currentYear, 1, 11).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 1, 18).toISOString().split('T')[0]
+                            },
+                            {
+                                name: 'Intensive Day',
+                                load: 5,
+                                startDate: new Date(currentYear, 1, 19).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 1, 19).toISOString().split('T')[0]
+                            },
+                            {
+                                name: 'Offboarding',
+                                load: 1,
+                                startDate: new Date(currentYear, 1, 20).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 1, 28).toISOString().split('T')[0]
+                            }
+                        ],
+                        payments: [
+                            {
+                                description: 'Full Payment',
+                                amount: 3500,
+                                expectedDate: new Date(currentYear, 1, 1).toISOString().split('T')[0]
+                            }
+                        ]
+                    },
+                    
+                    // Active Client 3 - Full Website Copy (Mar-May)
+                    {
+                        id: Date.now() + 102,
+                        name: 'SaaS Company Website',
+                        link: '',
+                        category: 'active-client',
+                        type: 'Full Website Copy',
+                        startDate: new Date(currentYear, 2, 15).toISOString().split('T')[0],
+                        endDate: new Date(currentYear, 4, 20).toISOString().split('T')[0],
+                        strategyCallDate: new Date(currentYear, 3, 1).toISOString().split('T')[0],
+                        retainerAmount: 0,
+                        notes: '',
+                        stages: [
+                            {
+                                name: 'Onboarding',
+                                load: 2,
+                                startDate: new Date(currentYear, 2, 15).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 2, 31).toISOString().split('T')[0]
+                            },
+                            {
+                                name: 'Groundwork',
+                                load: 3,
+                                startDate: new Date(currentYear, 3, 2).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 3, 17).toISOString().split('T')[0]
+                            },
+                            {
+                                name: 'Drafting',
+                                load: 5,
+                                startDate: new Date(currentYear, 3, 18).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 4, 10).toISOString().split('T')[0]
+                            },
+                            {
+                                name: 'Offboarding',
+                                load: 1,
+                                startDate: new Date(currentYear, 4, 11).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 4, 20).toISOString().split('T')[0]
+                            }
+                        ],
+                        payments: [
+                            {
+                                description: 'Deposit (50%)',
+                                amount: 3000,
+                                expectedDate: new Date(currentYear, 2, 15).toISOString().split('T')[0]
+                            },
+                            {
+                                description: 'Final Payment',
+                                amount: 3000,
+                                expectedDate: new Date(currentYear, 4, 20).toISOString().split('T')[0]
+                            }
+                        ]
+                    },
+                    
+                    // Freelance Project (April)
+                    {
+                        id: Date.now() + 103,
+                        name: 'Landing Page Copy',
+                        link: '',
+                        category: 'ad-hoc',
+                        type: 'Freelance Assignment',
+                        startDate: new Date(currentYear, 3, 5).toISOString().split('T')[0],
+                        endDate: new Date(currentYear, 3, 12).toISOString().split('T')[0],
+                        retainerAmount: 0,
+                        notes: '',
+                        stages: [
+                            {
+                                name: 'Work',
+                                load: 3,
+                                startDate: new Date(currentYear, 3, 5).toISOString().split('T')[0],
+                                endDate: new Date(currentYear, 3, 12).toISOString().split('T')[0]
+                            }
+                        ],
+                        payments: [
+                            {
+                                description: 'Payment',
+                                amount: 800,
+                                expectedDate: new Date(currentYear, 3, 12).toISOString().split('T')[0]
+                            }
+                        ]
+                    }
+                ];
+                
+                saveProjects();
             }
         }
 
