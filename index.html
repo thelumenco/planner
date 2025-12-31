@@ -684,13 +684,6 @@
         <button class="quick-view-btn" data-view="quarter" onclick="selectQuickView('quarter')">Quarter View</button>
     </div>
 
-    <div style="text-align: center; margin: 12px 0;">
-        <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #666; cursor: pointer;">
-            <input type="checkbox" id="showRetainers" onchange="toggleRetainers()" checked>
-            <span>Show Retainer Projects</span>
-        </label>
-    </div>
-
     <div class="current-period" id="currentPeriod">
         <div class="current-period-header">
             <div class="current-period-title" id="periodTitle">January 2025</div>
@@ -749,14 +742,14 @@
                     </select>
                 </div>
 
-                <div class="form-group date-range">
+                <div class="form-group date-range" id="dateRangeGroup">
                     <div>
                         <label>Start Date</label>
                         <input type="date" id="startDate" required>
                     </div>
-                    <div>
+                    <div id="endDateGroup">
                         <label>End Date</label>
-                        <input type="date" id="endDate" required>
+                        <input type="date" id="endDate">
                     </div>
                 </div>
 
@@ -772,7 +765,7 @@
                     <p style="font-size: 11px; color: #999; margin-top: 4px;">This amount will be automatically added to income forecast for each month the retainer is active.</p>
                 </div>
 
-                <div class="stages-section">
+                <div class="stages-section" id="stagesSection">
                     <h3>Project Stages</h3>
                     <p id="stagesHelpText" style="font-size: 11px; color: #999; margin-bottom: 12px;"></p>
                     <div id="stagesList"></div>
@@ -784,7 +777,7 @@
                     <textarea id="projectNotes"></textarea>
                 </div>
 
-                <div class="stages-section">
+                <div class="stages-section" id="paymentsSection">
                     <h3>Payment Installments <span style="font-weight: 300; font-size: 12px;">(Optional)</span></h3>
                     <p style="font-size: 11px; color: #999; margin-bottom: 12px;">Track when you expect to receive payments for income forecasting.</p>
                     <div id="paymentsList"></div>
@@ -839,8 +832,17 @@
                 <p style="font-size: 11px; color: #999; margin-top: 8px;">Export your projects and settings to backup, or import from a previous backup.</p>
             </div>
 
+            <div class="settings-section">
+                <div class="settings-section-title">Display Options</div>
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                    <input type="checkbox" id="showRetainers" onchange="toggleRetainers()" checked>
+                    <span>Show Retainer Projects in Views</span>
+                </label>
+                <p style="font-size: 11px; color: #999; margin-top: 8px;">When unchecked, retainer projects will be hidden from all views. Income forecasts will still include retainer amounts.</p>
+            </div>
+
             <div class="form-actions">
-                <button type="button" class="btn btn-primary" onclick="closeSettings()">Done</button>
+                <button type="button" class="btn btn-primary" onclick="closeSettings()" style="width: 100%;">Done</button>
             </div>
         </div>
     </div>
@@ -941,7 +943,7 @@
                 category: 'retainer',
                 color: '#9B7EBD',
                 stages: [
-                    { name: 'Ongoing', load: 0 }
+                    { name: 'Ongoing', load: 1 }
                 ],
                 autoCalculation: {
                     enabled: false,
@@ -952,7 +954,8 @@
 
         let settings = {
             warningThreshold: 10,
-            dangerThreshold: 15
+            dangerThreshold: 15,
+            showRetainers: true
         };
 
         const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
@@ -1330,6 +1333,8 @@
 
         function toggleRetainers() {
             showRetainers = document.getElementById('showRetainers').checked;
+            settings.showRetainers = showRetainers;
+            saveSettings();
             updateDisplay();
         }
 
@@ -1515,22 +1520,42 @@
             const strategyCallGroup = document.getElementById('strategyCallGroup');
             const retainerAmountGroup = document.getElementById('retainerAmountGroup');
             const stagesHelpText = document.getElementById('stagesHelpText');
+            const stagesSection = document.getElementById('stagesSection');
+            const paymentsSection = document.getElementById('paymentsSection');
+            const endDateGroup = document.getElementById('endDateGroup');
+            const endDateInput = document.getElementById('endDate');
             
             if (category === 'active-client') {
                 strategyCallGroup.style.display = 'block';
                 retainerAmountGroup.style.display = 'none';
+                stagesSection.style.display = 'block';
+                paymentsSection.style.display = 'block';
+                endDateGroup.style.display = 'block';
+                endDateInput.required = true;
                 stagesHelpText.textContent = 'Stages will be auto-populated from the template. Set the strategy call date to auto-calculate dates.';
             } else if (category === 'ad-hoc') {
                 strategyCallGroup.style.display = 'none';
                 retainerAmountGroup.style.display = 'none';
+                stagesSection.style.display = 'block';
+                paymentsSection.style.display = 'block';
+                endDateGroup.style.display = 'block';
+                endDateInput.required = true;
                 stagesHelpText.textContent = 'For ad-hoc projects, manually set the start/end dates and load for each stage to track workload.';
             } else if (category === 'retainer') {
                 strategyCallGroup.style.display = 'none';
                 retainerAmountGroup.style.display = 'block';
-                stagesHelpText.textContent = 'Retainer projects have minimal/no load. Set monthly amount for income forecasting.';
+                stagesSection.style.display = 'none';
+                paymentsSection.style.display = 'none';
+                endDateGroup.style.display = 'none';
+                endDateInput.required = false;
+                stagesHelpText.textContent = '';
             } else {
                 strategyCallGroup.style.display = 'none';
                 retainerAmountGroup.style.display = 'none';
+                stagesSection.style.display = 'block';
+                paymentsSection.style.display = 'block';
+                endDateGroup.style.display = 'block';
+                endDateInput.required = true;
                 stagesHelpText.textContent = '';
             }
         }
@@ -1831,18 +1856,39 @@
         document.getElementById('projectForm').onsubmit = (e) => {
             e.preventDefault();
             
+            const category = document.getElementById('projectCategory').value;
+            const startDate = document.getElementById('startDate').value;
+            let endDate = document.getElementById('endDate').value;
+            let stages = currentProjectStages.filter(s => s.startDate && s.endDate);
+            
+            // For retainers, set end date far in future and create minimal stage
+            if (category === 'retainer') {
+                const start = new Date(startDate);
+                const futureEnd = new Date(start);
+                futureEnd.setFullYear(futureEnd.getFullYear() + 10); // 10 years from start
+                endDate = futureEnd.toISOString().split('T')[0];
+                
+                // Create a single ongoing stage with load 1
+                stages = [{
+                    name: 'Ongoing',
+                    load: 1,
+                    startDate: startDate,
+                    endDate: endDate
+                }];
+            }
+            
             const project = {
                 id: editingProjectId || Date.now(),
                 name: document.getElementById('projectName').value,
                 link: document.getElementById('projectLink').value,
-                category: document.getElementById('projectCategory').value,
+                category: category,
                 type: document.getElementById('projectType').value,
-                startDate: document.getElementById('startDate').value,
-                endDate: document.getElementById('endDate').value,
+                startDate: startDate,
+                endDate: endDate,
                 strategyCallDate: document.getElementById('strategyCallDate').value,
                 retainerAmount: parseFloat(document.getElementById('retainerAmount').value) || 0,
                 notes: document.getElementById('projectNotes').value,
-                stages: currentProjectStages.filter(s => s.startDate && s.endDate),
+                stages: stages,
                 payments: currentProjectPayments.filter(p => p.amount && p.expectedDate)
             };
             
@@ -1876,6 +1922,7 @@
         function openSettings() {
             document.getElementById('warningThreshold').value = settings.warningThreshold;
             document.getElementById('dangerThreshold').value = settings.dangerThreshold;
+            document.getElementById('showRetainers').checked = showRetainers;
             renderProjectTypesSettings();
             document.getElementById('settingsModal').classList.add('active');
         }
@@ -2219,6 +2266,13 @@
             const saved = localStorage.getItem('businessPlannerSettings');
             if (saved) {
                 settings = JSON.parse(saved);
+            }
+            
+            // Apply showRetainers setting
+            showRetainers = settings.showRetainers !== undefined ? settings.showRetainers : true;
+            const checkbox = document.getElementById('showRetainers');
+            if (checkbox) {
+                checkbox.checked = showRetainers;
             }
         }
 
