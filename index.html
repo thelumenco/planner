@@ -1,1 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Planner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafafa;
+            color: #2a2a2a;
+            padding: 16px;
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 300;
+            color: #AF8787;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: white;
+            border: 1px solid #e0e0e0;
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            border-color: #AF8787;
+        }
+
+        .capacity-alert {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .capacity-alert.show {
+            display: block;
+        }
+
+        .capacity-alert.warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .capacity-alert.danger {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .quick-views {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .quick-view-btn {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .quick-view-btn:hover {
+            border-color: #AF8787;
+        }
+
+        .quick-view-btn.active {
+            background: #AF8787;
+            color: white;
+            border-color: #AF8787;
+        }
+
+        .current-period {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .current-period-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .current-period-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #AF8787;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .capacity-badge {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .capacity-badge.light {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .capacity-badge.moderate {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .capacity-badge.heavy {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .view-selector {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .view-selector select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 1px solid #e0e0e0;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .months-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .month-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 200px;
+        }
+
+        .month-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .month-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: #AF8787;
+        }
+
+        .month-count {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .project-card {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .project-card:hover {
+            border-color: #AF8787;
+            background: white;
+        }
+
+        .project-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #2a2a2a;
+        }
+
+        .project-meta {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .project-type {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #999;
+        }
+
+        .project-duration {
+            font-size: 11px;
+            padding: 2px 8px;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: #AF8787;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 32px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 400;
+            color: #AF8787;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #AF8787;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary {
+            background: #AF8787;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #e0e0e0;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            border-color: #AF8787;
+        }
+
+        .btn-delete {
+            background: #d45d5d;
+            color: white;
+            margin-left: auto;
+        }
+
+        .btn-delete:hover {
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            padding: 40px 20px;
+        }
+
+        .date-range {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .settings-section {
+            margin-bottom: 32px;
+        }
+
+        .settings-section-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #AF8787;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+
+        .category-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .category-name {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .category-delete {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+        }
+
+        .category-delete:hover {
+            color: #d45d5d;
+        }
+
+        .add-category-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .add-category-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .add-category-color {
+            width: 40px;
+            height: 34px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add-category-btn {
+            background: #AF8787;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .add-category-btn:hover {
+            opacity: 0.9;
+        }
+
+        .settings-help {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 40px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .months-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .quick-views {
+                justify-content: center;
+            }
+
+            .fab {
+                display: none;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .months-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 24px;
+            }
+        }
+
+        .desktop-add-btn {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .desktop-add-btn {
+                display: inline-block;
+                background: #AF8787;
+                color: white;
+                border: none;
+                padding: 8px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Business Planner</h1>
+        <div class="header-actions">
+            <button class="desktop-add-btn" onclick="openModal()">+ Add Project</button>
+            <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+        </div>
+    </div>
+
+    <div class="capacity-alert" id="capacityAlert"></div>
+
+    <div class="quick-views">
+        <button class="quick-view-btn active" data-view="current-month" onclick="selectQuickView('current-month')">This Month</button>
+        <button class="quick-view-btn" data-view="current-week" onclick="selectQuickView('current-week')">This Week</button>
+        <button class="quick-view-btn" data-view="next-month" onclick="selectQuickView('next-month')">Next Month</button>
+        <button class="quick-view-btn" data-view="quarter" onclick="selectQuickView('quarter')">Quarter View</button>
+    </div>
+
+    <div class="current-period" id="currentPeriod">
+        <div class="current-period-header">
+            <div class="current-period-title" id="periodTitle">January 2025</div>
+            <div class="capacity-badge light" id="capacityBadge">Light Load</div>
+        </div>
+        <div class="project-list" id="currentPeriodProjects"></div>
+    </div>
+
+    <div class="view-selector">
+        <button class="nav-btn" onclick="navigateView(-1)">←</button>
+        <select id="viewSelect" onchange="updateView()">
+            <option value="current">Current Period</option>
+        </select>
+        <button class="nav-btn" onclick="navigateView(1)">→</button>
+    </div>
+
+    <div class="months-grid" id="monthsGrid"></div>
+
+    <button class="fab" onclick="openModal()">+</button>
+
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Add Project</div>
+            <form id="projectForm">
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" id="projectName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="projectCategory" required>
+                        <option value="">Select category...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="projectType" required>
+                        <option value="">Select type...</option>
+                    </select>
+                </div>
+
+                <div class="form-group date-range">
+                    <div>
+                        <label>Start Date</label>
+                        <input type="date" id="startDate" required>
+                    </div>
+                    <div>
+                        <label>End Date</label>
+                        <input type="date" id="endDate" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Notes (Optional)</label>
+                    <textarea id="projectNotes"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Project</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="button" class="btn btn-delete" id="deleteBtn" style="display: none;" onclick="deleteProject()">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">Settings</div>
+            
+            <div class="settings-section">
+                <div class="settings-section-title">Active Client Types</div>
+                <div class="category-list" id="activeClientList"></div>
+                <div class="add-category-form">
+                    <input type="text" class="add-category-input" id="newActiveClient" placeholder="e.g., MUSE, Full Website Copy">
+                    <input type="color" class="add-category-color" id="newActiveClientColor" value="#AF8787">
+                    <button type="button" class="add-category-btn" onclick="addCategory('active-client')">Add</button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-title">Potential Client Types</div>
+                <div class="category-list" id="potentialClientList"></div>
+                <div class="add-category-form">
+                    <input type="text" class="add-category-input" id="newPotentialClient" placeholder="e.g., Discovery Call, Proposal Sent">
+                    <input type="color" class="add-category-color" id="newPotentialClientColor" value="#C4A5A5">
+                    <button type="button" class="add-category-btn" onclick="addCategory('potential-client')">Add</button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-title">Freelance Types</div>
+                <div class="category-list" id="freelanceList"></div>
+                <div class="add-category-form">
+                    <input type="text" class="add-category-input" id="newFreelance" placeholder="e.g., Blog Writing, Editing">
+                    <input type="color" class="add-category-color" id="newFreelanceColor" value="#8FA7AF">
+                    <button type="button" class="add-category-btn" onclick="addCategory('freelance')">Add</button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-title">Systems Tasks</div>
+                <div class="category-list" id="systemsList"></div>
+                <div class="add-category-form">
+                    <input type="text" class="add-category-input" id="newSystems" placeholder="e.g., Website Update, Email Sequence">
+                    <input type="color" class="add-category-color" id="newSystemsColor" value="#AFAF87">
+                    <button type="button" class="add-category-btn" onclick="addCategory('systems')">Add</button>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="closeSettings()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth();
+        let currentView = 'current-month';
+        let viewOffset = 0;
+        let projects = [];
+        let editingProjectId = null;
+        let categories = {
+            'active-client': [
+                { name: 'MUSE', color: '#AF8787' },
+                { name: 'Full Website Copy', color: '#AF8787' },
+                { name: 'Intensive', color: '#AF8787' }
+            ],
+            'potential-client': [],
+            'freelance': [],
+            'systems': []
+        };
+
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day;
+            return new Date(d.setDate(diff));
+        }
+
+        function getWeekEnd(date) {
+            const start = getWeekStart(date);
+            return new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000);
+        }
+
+        function selectQuickView(view) {
+            currentView = view;
+            viewOffset = 0;
+            document.querySelectorAll('.quick-view-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.view === view);
+            });
+            updateDisplay();
+        }
+
+        function navigateView(delta) {
+            viewOffset += delta;
+            updateDisplay();
+        }
+
+        function updateView() {
+            // Handle view selector change
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            updateCurrentPeriod();
+            updateMonthsGrid();
+            updateCapacityAlert();
+            populateViewSelector();
+        }
+
+        function populateViewSelector() {
+            const select = document.getElementById('viewSelect');
+            const options = [];
+            
+            if (currentView === 'current-month' || currentView === 'next-month') {
+                const targetDate = new Date(currentYear, currentMonth + viewOffset, 1);
+                const monthName = monthNames[targetDate.getMonth()];
+                const year = targetDate.getFullYear();
+                options.push({ value: 'current', label: `${monthName} ${year}` });
+            } else if (currentView === 'current-week') {
+                const today = new Date();
+                const targetDate = new Date(today.getTime() + viewOffset * 7 * 24 * 60 * 60 * 1000);
+                const weekStart = getWeekStart(targetDate);
+                const weekEnd = getWeekEnd(targetDate);
+                options.push({ 
+                    value: 'current', 
+                    label: `Week of ${weekStart.getDate()} ${monthNames[weekStart.getMonth()].slice(0, 3)}` 
+                });
+            } else {
+                const quarter = Math.floor(currentMonth / 3) + 1 + viewOffset;
+                options.push({ value: 'current', label: `Q${quarter} ${currentYear}` });
+            }
+            
+            select.innerHTML = options.map(opt => 
+                `<option value="${opt.value}">${opt.label}</option>`
+            ).join('');
+        }
+
+        function updateCurrentPeriod() {
+            const periodTitle = document.getElementById('periodTitle');
+            const periodProjects = document.getElementById('currentPeriodProjects');
+            const capacityBadge = document.getElementById('capacityBadge');
+            
+            let projects = [];
+            let title = '';
+            
+            if (currentView === 'current-month') {
+                const targetDate = new Date(currentYear, currentMonth + viewOffset, 1);
+                title = `${monthNames[targetDate.getMonth()]} ${targetDate.getFullYear()}`;
+                projects = getProjectsForMonth(targetDate.getMonth(), targetDate.getFullYear());
+            } else if (currentView === 'next-month') {
+                const targetDate = new Date(currentYear, currentMonth + 1 + viewOffset, 1);
+                title = `${monthNames[targetDate.getMonth()]} ${targetDate.getFullYear()}`;
+                projects = getProjectsForMonth(targetDate.getMonth(), targetDate.getFullYear());
+            } else if (currentView === 'current-week') {
+                const today = new Date();
+                const targetDate = new Date(today.getTime() + viewOffset * 7 * 24 * 60 * 60 * 1000);
+                const weekStart = getWeekStart(targetDate);
+                const weekEnd = getWeekEnd(targetDate);
+                title = `Week of ${weekStart.getDate()} ${monthNames[weekStart.getMonth()]}`;
+                projects = getProjectsForDateRange(weekStart, weekEnd);
+            } else {
+                const quarter = Math.floor(currentMonth / 3) + 1 + viewOffset;
+                title = `Q${quarter} ${currentYear}`;
+                // Quarter view handled separately in grid
+            }
+            
+            periodTitle.textContent = title;
+            
+            // Calculate capacity
+            const capacity = calculateCapacity(projects);
+            capacityBadge.textContent = capacity.label;
+            capacityBadge.className = `capacity-badge ${capacity.level}`;
+            
+            // Render projects
+            renderProjectList(periodProjects, projects);
+        }
+
+        function calculateCapacity(projects) {
+            const activeClientProjects = projects.filter(p => p.category === 'active-client').length;
+            
+            if (activeClientProjects === 0) {
+                return { level: 'light', label: 'Light Load' };
+            } else if (activeClientProjects <= 2) {
+                return { level: 'moderate', label: 'Moderate' };
+            } else {
+                return { level: 'heavy', label: 'At Capacity' };
+            }
+        }
+
+        function updateCapacityAlert() {
+            const alert = document.getElementById('capacityAlert');
+            const allProjects = window.projects || [];
+            
+            // Check for overlapping heavy periods
+            const today = new Date();
+            const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+            const projectsNextMonth = getProjectsForMonth(nextMonth.getMonth(), nextMonth.getFullYear());
+            
+            const capacity = calculateCapacity(projectsNextMonth);
+            
+            if (capacity.level === 'heavy') {
+                alert.textContent = `⚠️ You have ${projectsNextMonth.filter(p => p.category === 'active-client').length} active client projects next month. Consider your capacity.`;
+                alert.className = 'capacity-alert show danger';
+            } else if (capacity.level === 'moderate') {
+                alert.textContent = `📊 You have ${projectsNextMonth.filter(p => p.category === 'active-client').length} active client projects next month.`;
+                alert.className = 'capacity-alert show warning';
+            } else {
+                alert.className = 'capacity-alert';
+            }
+        }
+
+        function renderProjectList(container, projects) {
+            container.innerHTML = '';
+            
+            if (projects.length === 0) {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                emptyState.textContent = 'No projects in this period';
+                emptyState.style.textAlign = 'center';
+                emptyState.style.color = '#999';
+                emptyState.style.padding = '20px';
+                emptyState.style.fontSize = '13px';
+                container.appendChild(emptyState);
+            } else {
+                projects.forEach(project => {
+                    const card = createProjectCard(project);
+                    container.appendChild(card);
+                });
+            }
+        }
+
+        function updateMonthsGrid() {
+            const grid = document.getElementById('monthsGrid');
+            grid.innerHTML = '';
+            
+            if (currentView === 'quarter') {
+                const quarter = Math.floor(currentMonth / 3) + viewOffset;
+                const startMonth = quarter * 3;
+                
+                for (let i = 0; i < 3; i++) {
+                    const monthIndex = (startMonth + i) % 12;
+                    const year = currentYear + Math.floor((startMonth + i) / 12);
+                    renderMonthCard(grid, monthIndex, year);
+                }
+            } else {
+                // Hide grid for single period views
+                grid.style.display = 'none';
+                document.getElementById('currentPeriod').style.display = 'block';
+                return;
+            }
+            
+            grid.style.display = 'grid';
+            document.getElementById('currentPeriod').style.display = 'none';
+        }
+
+        function renderMonthCard(container, monthIndex, year) {
+            const monthCard = document.createElement('div');
+            monthCard.className = 'month-card';
+            
+            const monthProjects = getProjectsForMonth(monthIndex, year);
+            const capacity = calculateCapacity(monthProjects);
+            
+            const header = document.createElement('div');
+            header.className = 'month-header';
+            
+            const monthName = document.createElement('div');
+            monthName.className = 'month-name';
+            monthName.textContent = monthNames[monthIndex];
+            
+            const monthCount = document.createElement('div');
+            monthCount.className = 'month-count';
+            monthCount.textContent = `${monthProjects.length} project${monthProjects.length !== 1 ? 's' : ''}`;
+            
+            header.appendChild(monthName);
+            header.appendChild(monthCount);
+            
+            const projectList = document.createElement('div');
+            projectList.className = 'project-list';
+            
+            renderProjectList(projectList, monthProjects);
+            
+            monthCard.appendChild(header);
+            monthCard.appendChild(projectList);
+            container.appendChild(monthCard);
+        }
+
+        function getProjectsForMonth(monthIndex, year) {
+            return window.projects.filter(project => {
+                const start = new Date(project.startDate);
+                const end = new Date(project.endDate);
+                const monthStart = new Date(year, monthIndex, 1);
+                const monthEnd = new Date(year, monthIndex + 1, 0);
+                
+                return start <= monthEnd && end >= monthStart;
+            });
+        }
+
+        function getProjectsForDateRange(startDate, endDate) {
+            return window.projects.filter(project => {
+                const projectStart = new Date(project.startDate);
+                const projectEnd = new Date(project.endDate);
+                
+                return projectStart <= endDate && projectEnd >= startDate;
+            });
+        }
+
+        function createProjectCard(project) {
+            const card = document.createElement('div');
+            card.className = `project-card`;
+            card.onclick = () => editProject(project.id);
+            
+            // Find the color for this project type
+            const categoryTypes = categories[project.category] || [];
+            const typeData = categoryTypes.find(t => t.name === project.type);
+            const color = typeData ? typeData.color : '#999';
+            
+            card.style.borderLeft = `3px solid ${color}`;
+            
+            const name = document.createElement('div');
+            name.className = 'project-name';
+            name.textContent = project.name;
+            
+            const meta = document.createElement('div');
+            meta.className = 'project-meta';
+            
+            const type = document.createElement('span');
+            type.className = 'project-type';
+            type.textContent = project.type;
+            
+            const duration = document.createElement('span');
+            duration.className = 'project-duration';
+            duration.textContent = `${formatDate(project.startDate)} - ${formatDate(project.endDate)}`;
+            
+            meta.appendChild(type);
+            meta.appendChild(duration);
+            
+            card.appendChild(name);
+            card.appendChild(meta);
+            
+            return card;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return `${date.getDate()} ${monthNames[date.getMonth()].slice(0, 3)}`;
+        }
+
+        function openSettings() {
+            renderCategoryLists();
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
+            saveCategories();
+            updateDisplay();
+        }
+
+        function renderCategoryLists() {
+            ['active-client', 'potential-client', 'freelance', 'systems'].forEach(category => {
+                const listId = category === 'active-client' ? 'activeClientList' :
+                              category === 'potential-client' ? 'potentialClientList' :
+                              category === 'freelance' ? 'freelanceList' : 'systemsList';
+                
+                const list = document.getElementById(listId);
+                list.innerHTML = '';
+                
+                categories[category].forEach((item, index) => {
+                    const categoryItem = document.createElement('div');
+                    categoryItem.className = 'category-item';
+                    
+                    const colorPicker = document.createElement('input');
+                    colorPicker.type = 'color';
+                    colorPicker.className = 'category-color';
+                    colorPicker.value = item.color;
+                    colorPicker.onchange = (e) => {
+                        categories[category][index].color = e.target.value;
+                        saveCategories();
+                    };
+                    
+                    const name = document.createElement('div');
+                    name.className = 'category-name';
+                    name.textContent = item.name;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'category-delete';
+                    deleteBtn.textContent = '×';
+                    deleteBtn.onclick = () => deleteCategory(category, index);
+                    
+                    categoryItem.appendChild(colorPicker);
+                    categoryItem.appendChild(name);
+                    categoryItem.appendChild(deleteBtn);
+                    list.appendChild(categoryItem);
+                });
+            });
+        }
+
+        function addCategory(category) {
+            const inputId = category === 'active-client' ? 'newActiveClient' :
+                           category === 'potential-client' ? 'newPotentialClient' :
+                           category === 'freelance' ? 'newFreelance' : 'newSystems';
+            
+            const colorId = inputId + 'Color';
+            const input = document.getElementById(inputId);
+            const colorInput = document.getElementById(colorId);
+            
+            if (input.value.trim()) {
+                categories[category].push({
+                    name: input.value.trim(),
+                    color: colorInput.value
+                });
+                
+                input.value = '';
+                saveCategories();
+                renderCategoryLists();
+            }
+        }
+
+        function deleteCategory(category, index) {
+            if (confirm('Delete this category? Projects using it will need to be updated.')) {
+                categories[category].splice(index, 1);
+                saveCategories();
+                renderCategoryLists();
+            }
+        }
+
+        function populateProjectTypeDropdowns() {
+            const categorySelect = document.getElementById('projectCategory');
+            const typeSelect = document.getElementById('projectType');
+            
+            categorySelect.innerHTML = '<option value="">Select category...</option>';
+            categorySelect.innerHTML += '<option value="active-client">Active Client</option>';
+            categorySelect.innerHTML += '<option value="potential-client">Potential Client</option>';
+            categorySelect.innerHTML += '<option value="freelance">Freelance</option>';
+            categorySelect.innerHTML += '<option value="systems">Systems</option>';
+            
+            categorySelect.onchange = () => {
+                const selectedCategory = categorySelect.value;
+                typeSelect.innerHTML = '<option value="">Select type...</option>';
+                
+                if (selectedCategory && categories[selectedCategory]) {
+                    categories[selectedCategory].forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type.name;
+                        option.textContent = type.name;
+                        typeSelect.appendChild(option);
+                    });
+                }
+            };
+        }
+
+        function openModal(projectId = null) {
+            const modal = document.getElementById('projectModal');
+            const form = document.getElementById('projectForm');
+            const deleteBtn = document.getElementById('deleteBtn');
+            
+            populateProjectTypeDropdowns();
+            editingProjectId = projectId;
+            
+            if (projectId) {
+                const project = window.projects.find(p => p.id === projectId);
+                document.getElementById('modalTitle').textContent = 'Edit Project';
+                document.getElementById('projectName').value = project.name;
+                document.getElementById('projectCategory').value = project.category;
+                
+                // Trigger category change to populate types
+                document.getElementById('projectCategory').dispatchEvent(new Event('change'));
+                
+                setTimeout(() => {
+                    document.getElementById('projectType').value = project.type;
+                }, 0);
+                
+                document.getElementById('startDate').value = project.startDate;
+                document.getElementById('endDate').value = project.endDate;
+                document.getElementById('projectNotes').value = project.notes || '';
+                deleteBtn.style.display = 'block';
+            } else {
+                document.getElementById('modalTitle').textContent = 'Add Project';
+                form.reset();
+                deleteBtn.style.display = 'none';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('projectModal').classList.remove('active');
+            editingProjectId = null;
+        }
+
+        function editProject(id) {
+            openModal(id);
+        }
+
+        function deleteProject() {
+            if (confirm('Are you sure you want to delete this project?')) {
+                window.projects = window.projects.filter(p => p.id !== editingProjectId);
+                saveProjects();
+                closeModal();
+                updateDisplay();
+            }
+        }
+
+        document.getElementById('projectForm').onsubmit = (e) => {
+            e.preventDefault();
+            
+            const project = {
+                id: editingProjectId || Date.now(),
+                name: document.getElementById('projectName').value,
+                category: document.getElementById('projectCategory').value,
+                type: document.getElementById('projectType').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                notes: document.getElementById('projectNotes').value
+            };
+            
+            if (editingProjectId) {
+                const index = window.projects.findIndex(p => p.id === editingProjectId);
+                window.projects[index] = project;
+            } else {
+                window.projects.push(project);
+            }
+            
+            saveProjects();
+            closeModal();
+            updateDisplay();
+        };
+
+        function saveProjects() {
+            localStorage.setItem('businessPlannerProjects', JSON.stringify(window.projects));
+        }
+
+        function loadProjects() {
+            const saved = localStorage.getItem('businessPlannerProjects');
+            if (saved) {
+                window.projects = JSON.parse(saved);
+            } else {
+                window.projects = [];
+            }
+        }
+
+        function saveCategories() {
+            localStorage.setItem('businessPlannerCategories', JSON.stringify(categories));
+        }
+
+        function loadCategories() {
+            const saved = localStorage.getItem('businessPlannerCategories');
+            if (saved) {
+                categories = JSON.parse(saved);
+            }
+        }
+
+        // Close modals when clicking outside
+        document.getElementById('projectModal').onclick = (e) => {
+            if (e.target.id === 'projectModal') {
+                closeModal();
+            }
+        };
+
+        document.getElementById('settingsModal').onclick = (e) => {
+            if (e.target.id === 'settingsModal') {
+                closeSettings();
+            }
+        };
+
+        // Initialize
+        loadCategories();
+        loadProjects();
+        updateDisplay();
+    </script>
+</body>
+</html>
