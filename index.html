@@ -684,6 +684,13 @@
         <button class="quick-view-btn" data-view="quarter" onclick="selectQuickView('quarter')">Quarter View</button>
     </div>
 
+    <div style="text-align: center; margin: 12px 0;">
+        <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #666; cursor: pointer;">
+            <input type="checkbox" id="showRetainers" onchange="toggleRetainers()" checked>
+            <span>Show Retainer Projects</span>
+        </label>
+    </div>
+
     <div class="current-period" id="currentPeriod">
         <div class="current-period-header">
             <div class="current-period-title" id="periodTitle">January 2025</div>
@@ -726,10 +733,12 @@
                         <option value="">Select category...</option>
                         <option value="active-client">Active Client</option>
                         <option value="ad-hoc">Ad Hoc</option>
+                        <option value="retainer">Retainer</option>
                     </select>
                     <p style="font-size: 11px; color: #999; margin-top: 4px;">
                         Active Client: Standard client projects with auto-calculated stages.<br>
-                        Ad Hoc: Freelance, personal projects, or one-off work with manual stage setup.
+                        Ad Hoc: Freelance, personal projects, or one-off work with manual stage setup.<br>
+                        Retainer: Ongoing monthly projects with recurring income.
                     </p>
                 </div>
 
@@ -755,6 +764,12 @@
                     <label>Brand Copy Strategy Call Date</label>
                     <input type="date" id="strategyCallDate">
                     <p style="font-size: 11px; color: #999; margin-top: 4px;">This will auto-calculate stage dates: Onboarding (now - call), Groundwork (2 weeks after), Drafting (3 weeks), Offboarding (1 week)</p>
+                </div>
+
+                <div class="form-group" id="retainerAmountGroup" style="display: none;">
+                    <label>Monthly Retainer Amount</label>
+                    <input type="number" id="retainerAmount" placeholder="e.g., 500">
+                    <p style="font-size: 11px; color: #999; margin-top: 4px;">This amount will be automatically added to income forecast for each month the retainer is active.</p>
                 </div>
 
                 <div class="stages-section">
@@ -835,6 +850,7 @@
         let currentMonth = new Date().getMonth();
         let currentView = 'current-month';
         let viewOffset = 0;
+        let showRetainers = true;
         let projects = [];
         let editingProjectId = null;
         
@@ -915,6 +931,17 @@
                 color: '#6B9AC4',
                 stages: [
                     { name: 'Work', load: 2 }
+                ],
+                autoCalculation: {
+                    enabled: false,
+                    rules: {}
+                }
+            },
+            'MUSE Retainer': {
+                category: 'retainer',
+                color: '#9B7EBD',
+                stages: [
+                    { name: 'Ongoing', load: 0 }
                 ],
                 autoCalculation: {
                     enabled: false,
@@ -1088,22 +1115,46 @@
             const expectedPayments = [];
 
             projects.forEach(project => {
-                if (!project.payments) return;
+                // Add one-time payments
+                if (project.payments) {
+                    project.payments.forEach(payment => {
+                        const paymentDate = new Date(payment.expectedDate);
 
-                project.payments.forEach(payment => {
-                    const paymentDate = new Date(payment.expectedDate);
-
-                    // Check if payment falls within period
-                    if (paymentDate >= startDate && paymentDate <= endDate) {
-                        totalIncome += payment.amount || 0;
+                        // Check if payment falls within period
+                        if (paymentDate >= startDate && paymentDate <= endDate) {
+                            totalIncome += payment.amount || 0;
+                            expectedPayments.push({
+                                projectName: project.name,
+                                description: payment.description,
+                                amount: payment.amount,
+                                date: payment.expectedDate
+                            });
+                        }
+                    });
+                }
+                
+                // Add recurring retainer income
+                if (project.category === 'retainer' && project.retainerAmount > 0) {
+                    const projectStart = new Date(project.startDate);
+                    const projectEnd = new Date(project.endDate);
+                    
+                    // Check if retainer overlaps with this period
+                    if (projectStart <= endDate && projectEnd >= startDate) {
+                        // Calculate how many months overlap
+                        const overlapStart = new Date(Math.max(startDate.getTime(), projectStart.getTime()));
+                        const overlapEnd = new Date(Math.min(endDate.getTime(), projectEnd.getTime()));
+                        
+                        // For simplicity, add retainer amount once if there's any overlap
+                        // (This assumes monthly billing - adjust if needed for partial months)
+                        totalIncome += project.retainerAmount;
                         expectedPayments.push({
                             projectName: project.name,
-                            description: payment.description,
-                            amount: payment.amount,
-                            date: payment.expectedDate
+                            description: 'Monthly Retainer',
+                            amount: project.retainerAmount,
+                            date: 'Recurring'
                         });
                     }
-                });
+                }
             });
 
             return { totalIncome, expectedPayments };
@@ -1268,8 +1319,18 @@
                 const projectStart = new Date(project.startDate);
                 const projectEnd = new Date(project.endDate);
                 
+                // Filter out retainers if toggle is off
+                if (!showRetainers && project.category === 'retainer') {
+                    return false;
+                }
+                
                 return projectStart <= endDate && projectEnd >= startDate;
             });
+        }
+
+        function toggleRetainers() {
+            showRetainers = document.getElementById('showRetainers').checked;
+            updateDisplay();
         }
 
         function getCurrentStage(project, periodStart, periodEnd) {
@@ -1391,6 +1452,7 @@
                 document.getElementById('startDate').value = project.startDate;
                 document.getElementById('endDate').value = project.endDate;
                 document.getElementById('strategyCallDate').value = project.strategyCallDate || '';
+                document.getElementById('retainerAmount').value = project.retainerAmount || '';
                 document.getElementById('projectNotes').value = project.notes || '';
                 
                 renderProjectStages(currentProjectStages);
@@ -1451,16 +1513,24 @@
         function toggleStrategyCallField() {
             const category = document.getElementById('projectCategory').value;
             const strategyCallGroup = document.getElementById('strategyCallGroup');
+            const retainerAmountGroup = document.getElementById('retainerAmountGroup');
             const stagesHelpText = document.getElementById('stagesHelpText');
             
             if (category === 'active-client') {
                 strategyCallGroup.style.display = 'block';
+                retainerAmountGroup.style.display = 'none';
                 stagesHelpText.textContent = 'Stages will be auto-populated from the template. Set the strategy call date to auto-calculate dates.';
             } else if (category === 'ad-hoc') {
                 strategyCallGroup.style.display = 'none';
+                retainerAmountGroup.style.display = 'none';
                 stagesHelpText.textContent = 'For ad-hoc projects, manually set the start/end dates and load for each stage to track workload.';
+            } else if (category === 'retainer') {
+                strategyCallGroup.style.display = 'none';
+                retainerAmountGroup.style.display = 'block';
+                stagesHelpText.textContent = 'Retainer projects have minimal/no load. Set monthly amount for income forecasting.';
             } else {
                 strategyCallGroup.style.display = 'none';
+                retainerAmountGroup.style.display = 'none';
                 stagesHelpText.textContent = '';
             }
         }
@@ -1770,6 +1840,7 @@
                 startDate: document.getElementById('startDate').value,
                 endDate: document.getElementById('endDate').value,
                 strategyCallDate: document.getElementById('strategyCallDate').value,
+                retainerAmount: parseFloat(document.getElementById('retainerAmount').value) || 0,
                 notes: document.getElementById('projectNotes').value,
                 stages: currentProjectStages.filter(s => s.startDate && s.endDate),
                 payments: currentProjectPayments.filter(p => p.amount && p.expectedDate)
@@ -1821,10 +1892,11 @@
             const container = document.getElementById('projectTypesSettings');
             container.innerHTML = '';
             
-            // Group by category - active-client and ad-hoc
+            // Group by category - active-client, ad-hoc, and retainer
             const categories = {
                 'active-client': [],
-                'ad-hoc': []
+                'ad-hoc': [],
+                'retainer': []
             };
             
             Object.keys(projectTypes).forEach(typeName => {
