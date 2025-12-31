@@ -141,6 +141,15 @@
             border-color: #AF8787;
         }
 
+        .income-forecast-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
         .current-period {
             background: white;
             border: 1px solid #e0e0e0;
@@ -680,8 +689,15 @@
     <div class="quick-views">
         <button class="quick-view-btn active" data-view="current-month" onclick="selectQuickView('current-month')">This Month</button>
         <button class="quick-view-btn" data-view="current-week" onclick="selectQuickView('current-week')">This Week</button>
-        <button class="quick-view-btn" data-view="next-month" onclick="selectQuickView('next-month')">Next Month</button>
         <button class="quick-view-btn" data-view="quarter" onclick="selectQuickView('quarter')">Quarter View</button>
+    </div>
+
+    <div class="income-forecast-card" id="incomeForecastCard">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-size: 13px; font-weight: 500; color: #666;">Income Forecast</div>
+            <div style="font-size: 20px; font-weight: 600; color: #5a9f5a;" id="incomeAmount">$0</div>
+        </div>
+        <div style="font-size: 11px; color: #999;" id="incomeBreakdown"></div>
     </div>
 
     <div class="current-period" id="currentPeriod">
@@ -809,7 +825,10 @@
                         <span>Danger Load:</span>
                         <input type="number" id="dangerThreshold" value="15" min="1">
                     </div>
-                    <p style="font-size: 12px; color: #999; margin-top: 8px;">These determine when you'll see warnings about being overloaded.</p>
+                    <p style="font-size: 12px; color: #999; margin-top: 8px;">
+                        Warning/Danger thresholds color-code your load bars. The Danger threshold also sets the max number of load bars displayed.
+                        <br><strong>Load Calculation:</strong> All overlapping stages are added together (e.g., Onboarding load 2 + Groundwork load 3 = Total load 5).
+                    </p>
                 </div>
             </div>
 
@@ -1163,8 +1182,13 @@
             return { totalIncome, expectedPayments };
         }
 
-        function renderLoadIndicator(container, load, maxBars = 20) {
+        function renderLoadIndicator(container, load, maxBars = null) {
             container.innerHTML = '';
+            
+            // Use dangerThreshold as max if not specified
+            if (maxBars === null) {
+                maxBars = settings.dangerThreshold || 15;
+            }
             
             for (let i = 0; i < maxBars; i++) {
                 const bar = document.createElement('div');
@@ -1189,6 +1213,9 @@
             const periodProjects = document.getElementById('currentPeriodProjects');
             const loadIndicator = document.getElementById('periodLoadIndicator');
             const loadSummary = document.getElementById('loadSummary');
+            const incomeForecastCard = document.getElementById('incomeForecastCard');
+            const incomeAmount = document.getElementById('incomeAmount');
+            const incomeBreakdown = document.getElementById('incomeBreakdown');
             
             let startDate, endDate, title;
             
@@ -1217,11 +1244,34 @@
                 const { totalIncome, expectedPayments } = calculatePeriodIncome(startDate, endDate);
                 renderLoadIndicator(loadIndicator, totalLoad);
                 
-                const incomeText = totalIncome > 0 ? ` | Income: $${totalIncome.toLocaleString()}` : '';
-                loadSummary.textContent = `Load: ${totalLoad} | ${activeStages.length} active stage${activeStages.length !== 1 ? 's' : ''}${incomeText}`;
+                loadSummary.textContent = `Total Load: ${totalLoad} (${activeStages.length} active stage${activeStages.length !== 1 ? 's' : ''})`;
+                loadSummary.title = activeStages.length > 0 ? 'Stages: ' + activeStages.map(s => `${s.projectName} - ${s.stageName} (${s.load})`).join(', ') : '';
+                
+                // Update income forecast card
+                incomeAmount.textContent = `$${totalIncome.toLocaleString()}`;
+                
+                // Create breakdown
+                const retainerCount = expectedPayments.filter(p => p.description === 'Monthly Retainer').length;
+                const oneTimeCount = expectedPayments.filter(p => p.description !== 'Monthly Retainer').length;
+                
+                const breakdownParts = [];
+                if (retainerCount > 0) {
+                    breakdownParts.push(`${retainerCount} retainer${retainerCount !== 1 ? 's' : ''}`);
+                }
+                if (oneTimeCount > 0) {
+                    breakdownParts.push(`${oneTimeCount} payment${oneTimeCount !== 1 ? 's' : ''}`);
+                }
+                
+                incomeBreakdown.textContent = breakdownParts.length > 0 ? breakdownParts.join(' + ') : 'No income expected this period';
+                
+                // Show/hide card based on view
+                incomeForecastCard.style.display = 'block';
                 
                 const periodProjectsData = getProjectsForDateRange(startDate, endDate);
                 renderProjectList(periodProjects, periodProjectsData, startDate, endDate);
+            } else {
+                // Hide income card in quarter view
+                incomeForecastCard.style.display = 'none';
             }
         }
 
