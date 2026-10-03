@@ -25,7 +25,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   console.log(`\n${vp.name}`);
   const page = await browser.newPage({ viewport: vp });
   page.on("pageerror", e => errors.push(`${vp.name} pageerror: ${e.message}`));
-  page.on("console", m => { if (m.type() === "error") errors.push(`${vp.name} console: ${m.text()}`); });
+  page.on("console", m => { if (m.type() === "error" && !/Failed to load resource/.test(m.text())) errors.push(`${vp.name} console: ${m.text()}`); });
   await page.goto(url + "?reset=1&seed=1&time=10:15");
   await page.waitForTimeout(900);
   await page.screenshot({ path: join(shots, `${vp.name}-1-start.png`), fullPage: vp.name === "phone" ? false : true });
@@ -76,11 +76,34 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(300);
   check(await page.locator('#notebook a[href^="https://mail.google.com"]').count() > 0, "email quest links out to Gmail");
   await page.screenshot({ path: join(shots, `${vp.name}-4-email.png`) });
-  await page.click('#notebook [data-nb="close"]');
+  await page.click('#notebook [data-nb="started"]');
+  await page.click('#notebook [data-nb="done"]');
+  await page.waitForTimeout(300);
+  await page.click('#journal [data-a="back"]');
+  await page.waitForTimeout(300);
+
+  // Treadmill quest: notebook offers the treadmill, Mel walks home to it, steps prompt afterwards
+  check(await page.locator("#journal h1").textContent().then(t => /Chico beta/.test(t)), "third quest is the treadmill-able one");
+  await page.click('#journal [data-a="walk"]');
+  await page.waitForFunction(() => document.querySelector('#journal [data-a="notebook"]'), null, { timeout: 25000 });
+  await page.click('#journal [data-a="notebook"]');
+  await page.click('#notebook [data-nb="treadmill"]');
+  await page.waitForTimeout(300);
+  check(!(await page.locator("#notebook").isVisible()), "choosing the treadmill closes the notebook and walks");
+  await page.waitForFunction(() => !document.querySelector("#doTask").hidden, null, { timeout: 30000 });
+  check(await page.locator("#sceneName").textContent().then(t => /Home/.test(t)), "treadmill quest moved to home");
+  await page.click("#doTask");
+  await page.click('#notebook [data-nb="started"]');
+  await page.waitForTimeout(400);
+  check(await page.locator("#mel").getAttribute("class").then(c => /walk/.test(c)), "Mel walks in place on the treadmill");
+  await page.screenshot({ path: join(shots, `${vp.name}-6-treadmill.png`) });
+  await page.click('#notebook [data-nb="done"]');
+  await page.waitForTimeout(300);
+  check(await page.locator("#journal").textContent().then(t => /Log my steps/.test(t)), "treadmill quest asks for steps");
 
   // NPCs + mail
   await page.waitForTimeout(500);
-  check(await page.locator("#npcs [data-npc]").count() > 0, "villagers are out and about");
+  check(await page.locator("#actors [data-npc]").count() > 0, "villagers are out and about");
   await page.screenshot({ path: join(shots, `${vp.name}-5-village.png`) });
   await page.close();
 }

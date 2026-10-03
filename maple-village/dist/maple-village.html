@@ -286,6 +286,84 @@ details[open] summary::after{content:"–"}
 .item .cnt{position:absolute;top:6px;right:8px;font-size:.75rem;font-weight:700;color:var(--soft)}
 .item{position:relative}
 .ready{animation:tw 1.6s ease-in-out infinite}
+
+/* ---------- "Do task" notebook overlay ---------- */
+.notebook{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));
+  background:rgba(47,43,40,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:nbfade .2s ease}
+.notebook[hidden]{display:none}
+@keyframes nbfade{from{opacity:0}to{opacity:1}}
+body.nb-open{overflow:hidden}
+.nbpage{position:relative;width:min(680px,100%);max-height:calc(100dvh - 28px);display:flex;flex-direction:column;
+  background-color:#FFFDF7;color:#2F2B28;
+  background-image:linear-gradient(90deg,transparent 46px,rgba(239,163,166,.55) 46px,rgba(239,163,166,.55) 47.5px,transparent 47.5px),
+    repeating-linear-gradient(180deg,transparent 0 31px,rgba(154,169,221,.28) 31px 32px),var(--fibre);
+  background-position:0 0,0 14px,0 0;
+  padding:30px 26px 0 64px;border-radius:3px;transform:rotate(-.4deg);
+  box-shadow:0 2px 3px rgba(60,40,30,.08),0 30px 60px -30px rgba(40,30,20,.55);
+  clip-path:polygon(0 0,100% 0,100% 100%,97% 99.3%,93% 100%,88% 99.2%,83% 100%,77% 99.4%,71% 100%,64% 99.2%,58% 100%,51% 99.3%,45% 100%,38% 99.2%,31% 100%,25% 99.4%,18% 100%,12% 99.2%,6% 100%,0 99.4%);
+  animation:nbin .32s cubic-bezier(.3,.7,.4,1.1)}
+@keyframes nbin{from{transform:rotate(-2deg) translateY(30px) scale(.96);opacity:.3}to{transform:rotate(-.4deg)}}
+.nbpage::before,.nbpage::after{content:"";position:absolute;top:-6px;width:96px;height:24px;opacity:.85;z-index:2;
+  clip-path:polygon(2% 10%,9% 0,18% 8%,28% 2%,40% 9%,52% 1%,64% 8%,76% 2%,88% 9%,98% 3%,96% 50%,99% 94%,89% 99%,77% 91%,65% 100%,53% 92%,41% 100%,29% 92%,17% 99%,7% 91%,0 97%,3% 50%)}
+.nbpage::before{left:22px;transform:rotate(-8deg);background-color:var(--peri);background-image:radial-gradient(circle,rgba(255,255,255,.85) 1.6px,transparent 2px);background-size:9px 9px}
+.nbpage::after{right:22px;transform:rotate(7deg);background:repeating-linear-gradient(90deg,var(--sage) 0 5px,#CFE0C1 5px 9px)}
+.nbpage > *{position:relative}
+.nbx{position:absolute;top:10px;right:12px;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:#8A8279;font-size:1.05rem;z-index:3}
+.nbx:hover{background:rgba(0,0,0,.05)}
+.nbmeta{margin:0 40px 4px 0;font-size:.72rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:#8A8279}
+.nbpage h2{font-family:"Klee One",serif;font-weight:600;font-size:clamp(1.6rem,5.6vw,2.1rem);line-height:1.2;margin:0 40px 10px 0;letter-spacing:-.01em}
+.nbtimer{display:flex;align-items:baseline;gap:10px;margin:0 0 6px;font-family:"Klee One",serif;font-weight:600;font-size:1.7rem;color:#2F3B73;font-variant-numeric:tabular-nums}
+.nbtimer small{font-family:Mulish,sans-serif;font-weight:600;font-size:.85rem;color:#8A8279}
+.nbbody{overflow:auto;flex:1;min-height:0;padding:4px 4px 18px 0;line-height:32px;font-size:1rem;overscroll-behavior:contain}
+.nbbody p{margin:0}
+.nbbody .hl{color:#2F2B28}
+.nbfirst{margin-bottom:6px!important}
+.nbnotes ul{margin:0;padding-left:20px}
+.nbnotes a,.nbbody a:not(.btn){color:#2F3B73;font-weight:600;text-decoration:underline;text-decoration-color:var(--peri2);text-underline-offset:3px;word-break:break-all}
+.nbnone{color:#8A8279;font-style:italic}
+.nbpep{font-family:"Klee One",serif;color:#8A8279;margin-top:6px!important}
+.nblbl{font-size:.7rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#8A8279;line-height:32px}
+.nbmail{margin:6px 0;padding:0 14px 10px;background:rgba(191,214,230,.32);border-radius:4px;transform:rotate(.3deg)}
+.nbdraft{font:inherit;line-height:1.55;white-space:pre-wrap;background:#FFFFFF;border:1px dashed var(--peri2);border-radius:4px;padding:10px 12px;margin:0 0 10px;max-height:180px;overflow:auto}
+.nbrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0}
+.nbhint{font-size:.85rem;color:#8A8279;line-height:1.5;margin-top:6px!important}
+.nbsay{margin:10px 0 4px;padding:8px 14px;background:var(--butter);color:#3B3320;border-radius:4px;transform:rotate(-.5deg);line-height:1.5}
+.nbsay p{padding:4px 0}
+.nbtalk{margin-top:8px}
+.nbchat{display:grid;gap:8px;max-height:220px;overflow:auto;line-height:1.5;margin:0 0 6px;padding:2px}
+.nbchat p{max-width:88%;padding:7px 12px;border-radius:14px}
+.nbchat p.user{justify-self:end;background:var(--peri);color:#2F3B73;border-bottom-right-radius:4px}
+.nbchat p.assistant{background:#F4EEE3;font-family:"Klee One",serif;font-weight:600;border-bottom-left-radius:4px}
+.nbask input{flex:1;min-width:140px;border:0;border-bottom:1.5px solid var(--peri2);background:transparent;padding:6px 2px;line-height:1.4;color:#2F2B28}
+.nbask input:focus{outline:none;border-bottom-color:#2F3B73}
+.nbactions{display:flex;flex-wrap:wrap;gap:12px 10px;padding:14px 0 26px;border-top:1.5px dashed rgba(154,169,221,.55);background:linear-gradient(180deg,rgba(255,253,247,.85),#FFFDF7)}
+.nbpage .btn.alt{background:#EAE3D8;color:#2F2B28}
+.nbpage .btn{color:#2F3B73}
+.nbpage a.btn{text-decoration:none;display:inline-block}
+.nbpage .btn.yes{color:#3B3320}
+@media (max-width:520px){.nbpage{padding:26px 16px 0 40px;background-position:0 0,0 14px,0 0;background-image:linear-gradient(90deg,transparent 28px,rgba(239,163,166,.55) 28px,rgba(239,163,166,.55) 29.5px,transparent 29.5px),repeating-linear-gradient(180deg,transparent 0 31px,rgba(154,169,221,.28) 31px 32px),var(--fibre)}
+  .nbactions .btn{padding:11px 22px}}
+@media (prefers-reduced-motion:reduce){.notebook,.nbpage{animation:none}}
+
+/* floating "Do task" chip on the map when Mel is at the quest's spot */
+.dotask{position:absolute;left:50%;bottom:14px;transform:translateX(-50%) rotate(-1deg);z-index:4;box-shadow:0 10px 20px -12px rgba(46,58,112,.6);animation:pop2 .35s ease}
+.dotask[hidden]{display:none}
+
+/* letters card */
+.mail li{grid-template-columns:30px 1fr auto}
+.mail li.unread .t{font-weight:700}
+.mail li button.open{background:none;border:0;padding:0;text-align:left;color:inherit;font:inherit}
+.mail li button.open:hover .t{text-decoration:underline;text-underline-offset:3px}
+.mail li small{color:var(--soft);font-size:.8rem}
+
+/* ---------- villagers + messengers ---------- */
+.map .npc{cursor:pointer}
+#npcSay{z-index:4;white-space:normal;max-width:min(64%,260px);width:max-content}
+.ch.npc.run .legL,.ch.npc.run .armR,.ch.npc.run .legR,.ch.npc.run .armL{animation-duration:.18s}
+/* user-count gardens */
+.map [data-ugarden]{cursor:pointer}
+.bloom{transform-box:fill-box;transform-origin:50% 100%;animation:grow .6s ease-out}
+@media (prefers-reduced-motion:reduce){.bloom{animation:none}}
 </style>
 </head>
 <body>
@@ -389,6 +467,8 @@ details[open] summary::after{content:"–"}
         <div class="mprops" id="mprops"></div>
         <p class="speech" id="speech" aria-live="polite"></p>
         <p class="speech small" id="evanSay" hidden></p>
+        <p class="speech small" id="npcSay" hidden aria-live="polite"></p>
+        <button class="btn primary dotask" id="doTask" hidden>Do task</button>
       </div>
       <p class="maphint" id="maphint"></p>
     </div>
@@ -575,6 +655,15 @@ details[open] summary::after{content:"–"}
       </details>
     </section>
 
+    <section class="card log mail" id="mailCard" hidden>
+      <span class="tape sky" aria-hidden="true"></span>
+      <details id="mailBox">
+        <summary id="mailSum">Letters</summary>
+        <ul id="mailList"></ul>
+        <p class="muted">Notes from your helpers: the briefing, inbox triage, digests and the like. A messenger runs each new one over to you.</p>
+      </details>
+    </section>
+
     <section class="card log">
       <span class="tape dots" aria-hidden="true"></span>
       <details id="friend">
@@ -589,6 +678,7 @@ details[open] summary::after{content:"–"}
     </section>
   </section>
 </main>
+<div class="notebook" id="notebook" hidden role="dialog" aria-modal="true" aria-labelledby="nbTitle"><div class="nbpage" id="nbPage"></div></div>
 
 <script>(() => {
   // src/util.js
@@ -634,7 +724,7 @@ details[open] summary::after{content:"–"}
     pond: { name: "Pond", door: [338, 614], spot: true, line: "The pond. Best break spot in town." }
   };
   var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
-  var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], M: [260, 400] };
+  var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], M: [260, 400] };
   var ROOMS = {
     hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", stations: [
       ["table", "Planning table", "C", "table", /plan|strategy|review|ceo|goal|week|month|quarter|budget/, "Big-picture thinking lives here."],
@@ -671,7 +761,8 @@ details[open] summary::after{content:"–"}
       ["kitchen", "Kitchen", "B", "kitchen", /cook|meal|lunch|dinner|bake|grocer|prep/, "Something smells good."],
       ["sofa", "Sofa", "C", "sofa", /read|rest|journal|meditat|book|nap/, "Soft cushions, deep breaths."],
       ["laundry", "Laundry basket", "D", "laundry", /fold|laundry|clothes|wash|iron/, "Fold, stack, done."],
-      ["cupboard", "Cleaning cupboard", "E", "cupboard", /clean|tidy|wipe|hestia|dust/, "Wet wipes live here."]
+      ["cupboard", "Cleaning cupboard", "E", "cupboard", /clean|tidy|wipe|hestia|dust/, "Wet wipes live here."],
+      ["treadmill", "Treadmill", "F", "treadmill", /treadmill/, "1.2 and go. Walk and work.", -12]
     ] },
     market: { name: "Market", wall: "#F8E5E2", trim: "var(--blush)", stations: [
       ["stall", "Shop counter", "M", "shopcounter", null, "Welcome in! Have a browse."]
@@ -680,7 +771,7 @@ details[open] summary::after{content:"–"}
   function stationsOf(scene2) {
     const r = ROOMS[scene2];
     if (!r) return [];
-    return r.stations.map(([id, name, slot, kind, re, line]) => ({ id, name, kind, re, line, x: POS[slot][0], y: POS[slot][1], tx: POS[slot][0], ty: POS[slot][1] + 42 }));
+    return r.stations.map(([id, name, slot2, kind, re, line, dy]) => ({ id, name, kind, re, line, x: POS[slot2][0], y: POS[slot2][1], tx: POS[slot2][0], ty: POS[slot2][1] + (dy ?? 42) }));
   }
   var spotObj = (scene2, id) => id === "board" ? { id: "board", name: "Quest board", tx: 260, ty: 200, line: "This building's quests." } : stationsOf(scene2).find((s) => s.id === id);
   function placeOf(t) {
@@ -695,7 +786,8 @@ details[open] summary::after{content:"–"}
     return "post";
   }
   function spotOf(t) {
-    const pl = placeOf(t), st = stationsOf(pl).filter((s2) => s2.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title));
+    const pl = placeOf(t), st = stationsOf(pl).filter((s2) => (s2.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title)) && s2.id !== "treadmill");
+    if (t.spot === "treadmill" && pl === "home") return "treadmill";
     if (t.spot && st.find((s2) => s2.id === t.spot)) return t.spot;
     const s = t.title.toLowerCase();
     const hit = st.find((x) => x.re && x.re.source !== "." && x.re.test(s));
@@ -765,12 +857,12 @@ details[open] summary::after{content:"–"}
   var setArtContext = (g) => {
     G = g;
   };
-  function tapeLabel(x, y, text, col) {
-    const w = text.length * 8.2 + 22;
-    return `<g transform="translate(${x} ${y}) rotate(-2)" pointer-events="none"><path d="M${-w / 2} -11 l4 -1.5 l${w - 8} 1 l4 -1 l-2 11 l2 11 l-4 1 l${-(w - 8)} -1 l-4 1 l2 -11z" style="fill:${col}" opacity=".85"/><text class="lab" x="0" y="5" text-anchor="middle">${text}</text></g>`;
+  function tapeLabel(x, y, text, col, size) {
+    const w = text.length * (size ? size * 0.56 : 8.2) + 22;
+    return `<g transform="translate(${x} ${y}) rotate(-2)" pointer-events="none"><path d="M${-w / 2} -11 l4 -1.5 l${w - 8} 1 l4 -1 l-2 11 l2 11 l-4 1 l${-(w - 8)} -1 l-4 1 l2 -11z" style="fill:${col}" opacity=".85"/><text class="lab" x="0" y="5" text-anchor="middle"${size ? ` style="font-size:${size}px"` : ""}>${text}</text></g>`;
   }
   var sk = (art, lines) => `<g filter="url(#marker)">${art}</g><g filter="url(#wob)" fill="none" ${ink}>${lines}</g>`;
-  function house(id, x, y, w, h, wall, roof, label, tapeCol, extra) {
+  function house(id, x, y, w, h, wall, roof, label, tapeCol, extra2) {
     const rx = x - 9, rw = w + 18, apex = y - h * 0.62;
     const roofP = `M${rx} ${y} L${x + w / 2} ${apex} L${rx + rw} ${y}Z`;
     const dx = x + w / 2 - 11, dy = y + h - 30;
@@ -782,7 +874,7 @@ details[open] summary::after{content:"–"}
     <rect x="${x + 12}" y="${y + 14}" width="20" height="18" rx="2"/><path d="M${x + 22} ${y + 14} v18 M${x + 12} ${y + 23} h20"/>
     <rect x="${x + w - 32}" y="${y + 14}" width="20" height="18" rx="2"/><path d="M${x + w - 22} ${y + 14} v18 M${x + w - 32} ${y + 23} h20"/>`;
     return `<g data-place="${id}" aria-label="${label}"><ellipse class="hov" cx="${x + w / 2}" cy="${y + h + 4}" rx="${w / 2 + 14}" ry="10" style="fill:var(--butter)"/>
-    ${sk(art + (extra ? extra.art : ""), lines + (extra ? extra.lines : ""))}${tapeLabel(x + w / 2, y + h + 22, label, tapeCol)}</g>`;
+    ${sk(art + (extra2 ? extra2.art : ""), lines + (extra2 ? extra2.lines : ""))}${tapeLabel(x + w / 2, y + h + 22, label, tapeCol)}</g>`;
   }
   function tree(x, y, s) {
     s = s || 1;
@@ -829,7 +921,7 @@ details[open] summary::after{content:"–"}
         <ellipse cx="455" cy="580" rx="7" ry="3.5" style="fill:var(--tree)"/><circle cx="455" cy="577" r="2" style="fill:var(--rose)"/>
         <rect x="322" y="596" width="34" height="6" rx="2" style="fill:var(--wood)"/><path d="M326 602 v8 M352 602 v8 M322 592 h34" /></g>
       ${tapeLabel(430, 630, "Pond", "var(--sky)")}</g>`;
-    return ground + places;
+    return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 34, 536, 8, 2, 12);
   }
   function notesArt(x, y, n) {
     const c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#C3CDEE", "#DCE8C8"];
@@ -927,6 +1019,11 @@ details[open] summary::after{content:"–"}
           `<rect x="${x - 52}" y="${y - 30}" width="104" height="24" rx="3" style="fill:${W2}"/><path d="M${x - 36} ${y - 30} h28 l-4 -10 h-20z" style="fill:var(--butter)"/><rect x="${x + 10}" y="${y - 48}" width="12" height="18" rx="2" style="fill:var(--rose)"/><rect x="${x + 28}" y="${y - 40}" width="20" height="10" style="fill:#FFFDF6"/>`,
           `<rect x="${x - 52}" y="${y - 30}" width="104" height="24" rx="3"/><path d="M${x - 36} ${y - 30} h28 l-4 -10 h-20z M${x - 22} ${y - 40} v-10 h-10 h20"/><rect x="${x + 10}" y="${y - 48}" width="12" height="18" rx="2"/><rect x="${x + 28}" y="${y - 40}" width="20" height="10"/><path d="M${x - 46} ${y - 6} v14 M${x + 46} ${y - 6} v14"/>`
         );
+      case "treadmill":
+        return sk(
+          `<rect x="${x - 24}" y="${y - 74}" width="48" height="74" rx="8" style="fill:var(--sock)"/><rect x="${x - 17}" y="${y - 66}" width="34" height="58" rx="4" style="fill:#6B5A52"/><rect x="${x - 30}" y="${y - 96}" width="60" height="16" rx="4" style="fill:var(--peri)"/><rect x="${x - 14}" y="${y - 93}" width="20" height="9" rx="2" style="fill:#DCE8C8"/>`,
+          `<rect x="${x - 24}" y="${y - 74}" width="48" height="74" rx="8"/><path d="M${x - 17} ${y - 56} h34 M${x - 17} ${y - 44} h34 M${x - 17} ${y - 32} h34 M${x - 17} ${y - 20} h34" opacity=".45"/><path d="M${x - 26} ${y - 80} v28 M${x + 26} ${y - 80} v28" stroke-width="2.4"/><rect x="${x - 30}" y="${y - 96}" width="60" height="16" rx="4"/><rect x="${x - 14}" y="${y - 93}" width="20" height="9" rx="2"/><text x="${x - 4}" y="${y - 86}" text-anchor="middle" font-family="Klee One,serif" font-size="7" stroke="none" style="fill:var(--line)">1.2</text>`
+        );
       case "shopcounter":
         return sk(
           `<rect x="${x - 90}" y="${y - 40}" width="180" height="40" rx="4" style="fill:${W2}"/><path d="M${x - 96} ${y - 118} h192 l-8 18 h-176z" style="fill:var(--card)"/><circle cx="${x - 50}" cy="${y - 52}" r="10" style="fill:var(--rose)"/><circle cx="${x - 24}" cy="${y - 52}" r="10" style="fill:var(--butter)"/><circle cx="${x + 4}" cy="${y - 52}" r="10" style="fill:var(--sage)"/><rect x="${x + 30}" y="${y - 64}" width="40" height="24" rx="3" style="fill:#FFFDF6"/>`,
@@ -987,6 +1084,662 @@ details[open] summary::after{content:"–"}
     <text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none">Back to the village</text></g>`;
     return h;
   }
+  var GARDEN_TIERS = [[0, "daisy"], [100, "tulip"], [250, "sunflower"]];
+  function userGarden(key, x, y, cols, rows, gap) {
+    const st = (G.stats() || {})[key];
+    if (!st || !(st.users >= 0)) return "";
+    const per = st.per > 0 ? st.per : 10, users = Math.floor(st.users), n = Math.min(cols * rows, Math.ceil(users / per));
+    const tier = GARDEN_TIERS.reduce((t, [min, k]) => users >= min ? k : t, "daisy");
+    const cols4 = key === "chord" ? ["#F3C969", "#FFFDF6", "#C3CDEE"] : ["#EFA3A6", "#F4C7CF", "#FFFDF6"];
+    let f = "";
+    for (let i = 0; i < n; i++) {
+      const cx = x + 4 + i % cols * gap + Math.floor(i / cols) % 2 * gap / 2, cy = y + 10 + Math.floor(i / cols) * gap, c = cols4[i % 3];
+      f += `<g class="bloom"><path d="M${cx} ${cy} v${tier === "sunflower" ? -9 : -6}" style="stroke:var(--moss2)" stroke-width="1.2"/>`;
+      if (tier === "daisy") f += `<circle cx="${cx}" cy="${cy - 7}" r="2.6" style="fill:${c}"/><circle cx="${cx}" cy="${cy - 7}" r="1" fill="#F3C969"/>`;
+      else if (tier === "tulip") f += `<path d="M${cx - 3} ${cy - 9} q3 -6 6 0 q-1 4 -3 4 q-2 0 -3 -4z" style="fill:${c}" stroke="var(--line)" stroke-width=".6"/>`;
+      else f += `<circle cx="${cx}" cy="${cy - 11}" r="4.2" fill="#F3C969" stroke="var(--line)" stroke-width=".6"/><circle cx="${cx}" cy="${cy - 11}" r="1.8" fill="#8A5A3A"/>`;
+      f += `</g>`;
+    }
+    const w = cols * gap, signX = x + w / 2 + (key === "chord" ? 8 : 0), signY = y + rows * gap + 10;
+    const tree2 = users >= 500 ? `<g filter="url(#wob)" ${ink}><rect x="${x + w - 6}" y="${y + 4}" width="4" height="12" style="fill:var(--wood)"/><circle cx="${x + w - 4}" cy="${y}" r="9" style="fill:#F4C7CF"/><circle cx="${x + w - 10}" cy="${y + 4}" r="6" style="fill:#EFA3A6"/></g>` : "";
+    const sparkle = users >= 1e3 ? `<text x="${x - 4}" y="${y + 2}" font-size="11" class="twinkle">✨</text><text x="${x + w}" y="${y + rows * gap}" font-size="10" class="twinkle">✨</text>` : "";
+    const label = `${users.toLocaleString()} ${key === "chord" ? "creatives" : "families"}`;
+    return `<g data-ugarden="${key}" aria-label="${label}">${f}${tree2}${sparkle}
+    ${tapeLabel(signX, signY, label, key === "chord" ? "var(--sage)" : "var(--blush)", 10)}</g>`;
+  }
+
+  // src/data/npcs.js
+  var hm = (s) => {
+    const [h, m] = s.split(":").map(Number);
+    return h * 60 + (m || 0);
+  };
+  var slot = (from, to, scene2, where) => Object.assign({ from: hm(from), to: hm(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where });
+  var NPCS = [
+    {
+      id: "hana",
+      name: "Hana",
+      job: "Runs the market",
+      intro: "Hi love, I'm Hana! I moved here from a little seaside town. The honey toast is mine, and yes, I remember everyone's usual.",
+      look: { skin: "#F3D2B8", hair: "#5A3A2A", hairStyle: "bun", top: "#EFA3A6", bottom: "#7A6A8C", extra: "apron" },
+      routine: [
+        slot("8:00", "12:00", "market", [260, 352]),
+        slot("12:00", "13:00", "market", [[200, 352], [320, 352], [260, 352]]),
+        slot("13:00", "15:00", "market", [260, 352]),
+        slot("15:00", "15:40", "village", [[362, 372], [392, 360], [340, 380]]),
+        slot("15:40", "19:00", "market", [260, 352])
+      ],
+      lines: [
+        "Fresh dumplings today. Don't tell Maple, she'll want three.",
+        "You look like a honey toast kind of person today.",
+        "Lunch rush is wild. Everyone wants toast at once!",
+        "Remember to eat something proper, not just snacks.",
+        "The strawberries sell out first. Every time."
+      ],
+      away: "Hana's popped out. The shop still works: honesty box on the counter.",
+      react: { harvest: "Ooh, homegrown! I'll buy anything you grow, you know.", quests3: "Three quests done already? Have a dumpling, you've earned it.", lunch: "Have you had lunch? Proper lunch?" }
+    },
+    {
+      id: "okada",
+      name: "Mr Okada",
+      job: "Retired postmaster, unofficial well-keeper",
+      intro: "Okada. Forty years delivering letters. Retired now, but I still can't stop sorting things. Even the pebbles by the well.",
+      look: { skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses" },
+      routine: [slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "17:00", "village", [[176, 352], [146, 360], [170, 372]]), slot("17:00", "19:30", "village", [380, 612])],
+      lines: [
+        "Letters used to come in sacks. Now it's all on your little phone.",
+        "The well water is sweeter in the afternoon. Don't ask me why.",
+        "I've sorted the pebbles by colour. Then by size. Then by colour again.",
+        "A tidy inbox is a tidy mind. Mine is a shoebox.",
+        "Ducks are very punctual, you know. Six o'clock sharp."
+      ],
+      react: { inbox: "An email quest! Just like the old days. Stamp it and send it.", water: "Good, drink up. Forty years of walking taught me that.", quests3: "Steady work. That's the postmaster's way." }
+    },
+    {
+      id: "juniper",
+      name: "Juniper",
+      job: "Librarian at the Fresh Pages library",
+      intro: "Welcome to the library! I'm Juniper. I love a good semicolon; I also write poetry, but that's a secret. One book recommendation a week, guaranteed.",
+      look: { skin: "#C99A78", hair: "#2B2320", hairStyle: "bob", top: "#B9D2A6", bottom: "#3F4A6B", extra: "glasses" },
+      routine: [
+        slot("8:30", "13:00", "fresh", [[160, 300], [330, 300], [240, 330]]),
+        slot("13:00", "15:30", "fresh", [178, 478]),
+        slot("15:30", "16:00", "village", [[400, 300], [440, 320]]),
+        slot("16:00", "18:00", "fresh", [[90, 330], [180, 330], [140, 312]])
+      ],
+      lines: [
+        "This week's pick: anything with a map in the front.",
+        "A semicolon is a pause that believes in you.",
+        "Shh… the nook is in reading hour. Join me?",
+        "Every first draft is allowed to be terrible. That's the rule.",
+        "I shelve by feeling, not by alphabet. Don't tell anyone."
+      ],
+      react: { writing: "Ooh, a writing quest. Messy first, lovely later.", quests3: "Three chapters done today. Metaphorically." }
+    },
+    {
+      id: "bo",
+      name: "Bo",
+      job: "Carpenter at the Chord workshop",
+      intro: "Bo! Carpenter. If it creaks, wobbles or falls off, I'm your guy. Built half this village. *hums*",
+      look: { skin: "#E2B590", hair: "#3B2A1E", hairStyle: "short", top: "#E9C46A", bottom: "#4F6B8A", extra: "cap" },
+      routine: [
+        slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]),
+        slot("12:30", "13:30", "village", [300, 614]),
+        slot("13:30", "18:00", "village", [[150, 300], [380, 300], [300, 450], [210, 420], [440, 560]])
+      ],
+      lines: [
+        "*hums a tune* Fixed the market's wobbly leg this morning.",
+        "Measure twice, cut once. Or just cut and laugh.",
+        "The workshop smells like sawdust and big ideas.",
+        "Shipping is just building, but braver.",
+        "Need a shelf? I always need a shelf."
+      ],
+      react: { building: "Building something? Tools are out. Go for it.", quests3: "That's three. Nails in straight, every one." }
+    },
+    {
+      id: "lin",
+      name: "Auntie Lin",
+      job: "Gardener",
+      intro: "Auntie Lin. I have opinions about soil, and they're all correct. Plant something and I'll tell you what you did wrong. Lovingly.",
+      look: { skin: "#E9C2A0", hair: "#7C7570", hairStyle: "bun", top: "#9EBE8C", bottom: "#8A6A52", extra: "sunhat" },
+      routine: [slot("6:30", "9:30", "farm", [[45, 250], [475, 400], [250, 560]]), slot("11:30", "14:00", "village", [326, 600]), slot("16:00", "19:00", "farm", [[45, 250], [475, 400], [250, 560]])],
+      lines: [
+        "Water in the morning, not at night. The roots know.",
+        "Tulips are for beginners. That's a compliment.",
+        "Strawberries take a whole day. Patience is a fertiliser.",
+        "Your soil is lovely. Mine is better, but yours is lovely.",
+        "Talk to your plants. They're good listeners."
+      ],
+      gift: "tulip_seed",
+      react: { harvest: "Look at that harvest! Your soil is coming along.", ready: "Something's ready in your garden. Don't leave it sulking!" }
+    },
+    {
+      id: "pip",
+      name: "Pip",
+      job: "Evan's best friend",
+      intro: "I'm Pip! I'm Evan's best friend and I'm the FASTEST. Watch!",
+      kid: true,
+      look: { skin: "#D6A27C", hair: "#1F1A17", hairStyle: "spiky", top: "#F28C6A", bottom: "#4C7BB0", extra: "helmet" },
+      routine: [slot("15:00", "18:30", "village", [[230, 330], [300, 330], [260, 380], [360, 560], [400, 600], [200, 400]])],
+      lines: ["Race you to the pond!", "Evan is SO fast. Almost as fast as me.", "Did you know foxes can't ride bikes? I asked Maple.", "I found a snail! His name is Gary."],
+      react: {}
+    },
+    {
+      id: "theo",
+      name: "Theo",
+      job: "Town hall clerk",
+      intro: "Theo, town clerk. I keep the village records. And, if you have a moment, I have a stamp collection you would not believe.",
+      look: { skin: "#F0D0B4", hair: "#6B4A2E", hairStyle: "short", top: "#C3CDEE", bottom: "#3A3A48", extra: "tie" },
+      routine: [slot("9:00", "12:00", "hall", [[200, 320], [330, 320]]), slot("12:00", "13:00", "village", [354, 606]), slot("13:00", "17:00", "hall", [[200, 320], [330, 320]])],
+      lines: [
+        "Records say you've been busy. I'm very proud. Officially.",
+        "This stamp is from 1962. Look at the little bird!",
+        "Everything filed, everything stamped. Bliss.",
+        "The quest board is the most important document in town.",
+        "I've started a register of Maple's naps. It's long."
+      ],
+      react: { quests3: "I've stamped three completed quests in the register. Gold stamp!", planning: "A planning quest! My favourite kind of paperwork." }
+    }
+  ];
+  var AGENTS = {
+    crier: { name: "Rosa the town crier", skill: "morning-briefing", look: { skin: "#EDC6A6", hair: "#8A3B2A", hairStyle: "bun", top: "#C2505F", bottom: "#3A2E28", extra: "bell" }, hello: "Hear ye! Your morning briefing!" },
+    runner: { name: "Kip, the library runner", skill: "book-digest", look: { skin: "#D8A882", hair: "#2A211D", hairStyle: "spiky", top: "#7C9F6C", bottom: "#5E5A55", extra: "satchel" }, hello: "Today's book digest, hot off the shelf!" },
+    postie: { name: "Penny the postie", skill: "inbox-triage", look: { skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#6E9FD6", bottom: "#2F3B73", extra: "cap" }, hello: "Post! Your inbox, sorted." },
+    chord: { name: "Cora from Chord", skill: "Chord agent", look: { skin: "#E6BC98", hair: "#3B2A1E", hairStyle: "bun", top: "#B9D2A6", bottom: "#4F6B8A", extra: "satchel" }, hello: "News from the Chord workshop!" },
+    chico: { name: "Coco from Chico", skill: "Chico agent", look: { skin: "#C99A78", hair: "#1F1A17", hairStyle: "bob", top: "#F4C7CF", bottom: "#7A6A8C", extra: "satchel" }, hello: "Chico update, fresh from the cottage!" },
+    planner: { name: "Wren the content planner", skill: "content planning", look: { skin: "#F0D0B4", hair: "#C9A27E", hairStyle: "long", top: "#F5C3A4", bottom: "#3F4A6B", extra: "satchel" }, hello: "Content plan's ready for your eyes!" },
+    scout: { name: "Fennel the tender scout", skill: "gebiz-opportunity-scout", look: { skin: "#E2B590", hair: "#5A3A2A", hairStyle: "short", top: "#BFD6E6", bottom: "#5E5A55", extra: "cap" }, hello: "Scouted some tenders for you!" },
+    courier: { name: "Basil the garden courier", skill: "sunsama-tidy / client-health-check", look: { skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#9EBE8C", bottom: "#8A6A52", extra: "satchel" }, hello: "A little tidy-up report!" },
+    winddown: { name: "Luna the evening messenger", skill: "evening-wind-down", look: { skin: "#EDC6A6", hair: "#2B2320", hairStyle: "long", top: "#9AA9DD", bottom: "#2F3B73", extra: "lantern" }, hello: "Time to close the day. A note for you." }
+  };
+
+  // src/ui/notebook.js
+  var api = null;
+  var open = null;
+  var chats = {};
+  var busy = null;
+  var lastFocus = null;
+  function initNotebook(a) {
+    api = a;
+    const root = $("notebook");
+    root.addEventListener("click", (ev) => {
+      if (ev.target === root) return closeNotebook();
+      const b = ev.target.closest("[data-nb]");
+      if (!b) return;
+      const k = b.dataset.nb;
+      if (k === "close") return closeNotebook();
+      if (k === "ask") return ask();
+      if (k === "copy") return copyDraft(b);
+      if (k === "sayb") return api.sayButton(+b.dataset.i);
+      if (open && open.kind === "mail" && k === "thanks") {
+        closeNotebook();
+        return;
+      }
+      const t = api.task();
+      if (!t || !open || open.kind !== "task") return;
+      api.act(k, t);
+    });
+    root.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape") closeNotebook();
+      if (ev.key === "Enter" && ev.target.id === "nbAsk" && !ev.shiftKey) {
+        ev.preventDefault();
+        ask();
+      }
+      if (ev.key === "Tab") trap(ev);
+    });
+  }
+  var notebookOpen = () => !!open;
+  function openTask(t) {
+    open = { kind: "task", id: t.id };
+    show();
+  }
+  function openMail(item) {
+    open = { kind: "mail", item };
+    api.markRead(item);
+    show();
+  }
+  function closeNotebook() {
+    if (!open) return;
+    open = null;
+    busy && busy.abort();
+    busy = null;
+    const root = $("notebook");
+    root.hidden = true;
+    document.body.classList.remove("nb-open");
+    api.onClose && api.onClose();
+    lastFocus && lastFocus.focus && lastFocus.focus();
+  }
+  function show() {
+    const root = $("notebook");
+    if (root.hidden) lastFocus = document.activeElement;
+    root.hidden = false;
+    document.body.classList.add("nb-open");
+    refreshNotebook(true);
+  }
+  function refreshNotebook(focus) {
+    if (!open) return;
+    const page = $("nbPage");
+    if (open.kind === "task") {
+      const t = api.task();
+      if (!t || t.id !== open.id) {
+        closeNotebook();
+        return;
+      }
+      const keep = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
+      page.innerHTML = taskPage(t);
+      if ($("nbAsk")) {
+        $("nbAsk").value = keep;
+        if (typing) $("nbAsk").focus();
+      }
+    } else page.innerHTML = mailPage(open.item);
+    const log = page.querySelector(".nbchat");
+    if (log) log.scrollTop = log.scrollHeight;
+    if (focus) (page.querySelector("[data-nb]:not([data-nb=close])") || page.querySelector("[data-nb]"))?.focus({ preventScroll: true });
+  }
+  var linkify = (s) => esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)]/g, (u) => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u.replace(/^https?:\/\//, "").slice(0, 48)}${u.length > 56 ? "…" : ""} ↗</a>`);
+  function notesHTML(text) {
+    const lines = String(text || "").split(/\r?\n/);
+    let out = "", list = false;
+    for (const ln of lines) {
+      const m = ln.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)/);
+      if (m) {
+        if (!list) {
+          out += "<ul>";
+          list = true;
+        }
+        out += `<li>${linkify(m[1])}</li>`;
+        continue;
+      }
+      if (list) {
+        out += "</ul>";
+        list = false;
+      }
+      if (ln.trim()) out += `<p>${linkify(ln)}</p>`;
+    }
+    return out + (list ? "</ul>" : "");
+  }
+  function taskPage(t) {
+    const S3 = api.S(), fs = api.fs(t), left = api.timerLeft(t), say3 = api.sayNow();
+    const tread = S3.tread && S3.tread[t.id];
+    const em = t.email || null;
+    let h = `<button class="nbx" data-nb="close" aria-label="Close notebook">✕</button>
+    <p class="nbmeta">${esc(api.placeLabel(t))}${t.at ? ` · ⏰ ${esc(t.at)}` : ""}</p>
+    <h2 id="nbTitle">${esc(t.title)}</h2>`;
+    if (left != null) h += `<p class="nbtimer"><span data-tleft>${left}</span> <small>${tread ? "walking at 1.2" : "left on the time box"}</small></p>`;
+    h += `<div class="nbbody">`;
+    h += `<p class="nbfirst"><span class="hl">First step:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}${fs ? " <b>✓</b>" : ""}</p>`;
+    if (t.notes) h += `<div class="nbnotes">${notesHTML(t.notes)}</div>`;
+    else h += `<p class="nbnone">No notes from Sunsama on this one. Ask chat to add some, or talk it through below.</p>`;
+    if (em) {
+      h += `<div class="nbmail"><p class="nblbl">Email</p>
+      ${em.who ? `<p><b>To / from:</b> ${esc(em.who)}</p>` : ""}${em.subject ? `<p><b>Subject:</b> ${esc(em.subject)}</p>` : ""}
+      ${em.draft ? `<p class="nblbl">Draft from chat</p><pre class="nbdraft" id="nbDraft">${esc(em.draft)}</pre>` : ""}
+      <div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(em.link) || "https://mail.google.com/mail/u/0/#inbox")}" target="_blank" rel="noopener noreferrer">Open in Gmail ↗</a>
+      ${em.draft ? `<button class="btn alt small" data-nb="copy">Copy draft</button>` : ""}</div>
+      <p class="nbhint">Sending stays with you in Gmail. Tell chat if you'd like the draft changed.</p></div>`;
+    }
+    if (t.pep) h += `<p class="nbpep">♡ ${esc(t.pep)}</p>`;
+    if (say3 && say3.line) h += `<div class="nbsay"><p><span aria-hidden="true">🦊</span> ${esc(say3.line)}</p>${say3.buttons ? `<div class="nbrow">${say3.buttons.map((b, i) => `<button class="btn alt small" data-nb="sayb" data-i="${i}">${esc(b[0])}</button>`).join("")}</div>` : ""}</div>`;
+    const chat = chats[t.id] || [];
+    if (api.sample() !== null || chat.length) {
+      h += `<div class="nbtalk"><p class="nblbl">Talk to the note</p>
+      ${chat.length ? `<div class="nbchat" aria-live="polite">${chat.map((m) => `<p class="${m.role}">${m.role === "user" ? "" : "🦊 "}${esc(m.content)}</p>`).join("")}</div>` : ""}
+      ${api.sample() ? `<div class="nbrow nbask"><label class="sr" for="nbAsk">Ask about this quest</label><input id="nbAsk" placeholder="${chat.length ? "reply…" : "stuck? ask anything about this quest"}" autocomplete="off" ${busy ? "disabled" : ""}>
+      <button class="btn small" data-nb="ask" ${busy ? "disabled" : ""}>${busy ? "…" : "Ask"}</button></div>` : `<p class="nbhint">Talking to the note isn't available here.</p>`}</div>`;
+    }
+    h += `</div><div class="nbactions">
+    ${!fs ? `<button class="btn primary" data-nb="started">Started</button>` : `<button class="btn alt" data-nb="halfway">Halfway</button>`}
+    <button class="btn alt" data-nb="stuck">Stuck</button>
+    ${fs ? `<button class="btn alt" data-nb="more">Need more time</button>` : ""}
+    ${t.treadmill && !tread ? `<button class="btn alt" data-nb="treadmill">🚶 Do it on the treadmill</button>` : ""}
+    ${fs ? `<button class="btn yes" data-nb="done">Done</button>` : ""}
+  </div>`;
+    return h;
+  }
+  function mailPage(item) {
+    return `<button class="nbx" data-nb="close" aria-label="Close note">✕</button>
+    <p class="nbmeta">a note from ${esc(api.agentName(item.from))}${item.at ? ` · ${new Date(item.at).toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Singapore" })}` : ""}</p>
+    <h2 id="nbTitle">${esc(item.title || "A note for you")}</h2>
+    <div class="nbbody"><div class="nbnotes">${notesHTML(item.body)}</div>
+    ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Open the full thing ↗</a></div>` : ""}</div>
+    <div class="nbactions"><button class="btn yes" data-nb="thanks">Thanks!</button></div>`;
+  }
+  var safeUrl = (u) => typeof u === "string" && /^https?:\/\//i.test(u) ? u : null;
+  async function ask() {
+    const input = $("nbAsk"), sample = api.sample(), t = api.task();
+    if (!input || !sample || !t || busy) return;
+    const q = input.value.trim();
+    if (!q) return;
+    const log = chats[t.id] = chats[t.id] || [];
+    log.push({ role: "user", content: q }, { role: "assistant", content: "…" });
+    input.value = "";
+    busy = new AbortController();
+    refreshNotebook();
+    const S3 = api.S(), left = api.timerLeft(t);
+    const brief = `You are Maple, a tiny fox who coaches Mel through her work day inside a cosy village game. Warm, direct, short sentences, never guilt, no lectures.
+Reply in at most 3 short sentences and end with exactly one tiny physical next action. Plain text, no markdown, at most one emoji.
+If the task involves pricing, remind her to price on the value delivered, not on what the buyer can afford.
+Never claim to have done anything outside this conversation (you can't send emails, tick tasks or set timers).
+Quest: ${t.title}
+First step: ${t.firstStep || "(none given)"}
+Time box: ${t.minutes || 25} minutes${left ? `, ${left} left` : ""}${api.fs(t) ? ", first step done" : ", not started yet"}
+Notes: ${t.notes || "(none)"}${t.email ? `
+Email: ${JSON.stringify(t.email)}` : ""}
+Quests finished today: ${S3.doneIds.length}`;
+    const turns = log.slice(0, -1).map((m, i) => i === 0 ? { role: "user", content: brief + "\n\nMel says: " + m.content } : m);
+    try {
+      const res = await sample(turns, {
+        signal: busy.signal,
+        cache: false,
+        modelTier: "quick",
+        onText: ({ text }) => {
+          log[log.length - 1].content = text;
+          const el = document.querySelector(".nbchat p:last-child");
+          if (el) el.textContent = "🦊 " + text;
+        }
+      });
+      log[log.length - 1].content = res.text.trim() || "Hmm, I lost my words. Try again?";
+    } catch (e) {
+      const msg = { not_granted: "No worries, we'll keep it to buttons. Talking needs your OK first.", rate_limited: "I need a little breather. Try again in a minute.", cancelled: null }[e && e.code];
+      if (e && e.code === "cancelled") log.splice(-2);
+      else log[log.length - 1].content = e && e.text ? e.text : msg || "I couldn't reach Claude just now. Buttons still work!";
+      if (e && e.code === "not_granted") api.sampleDenied();
+    }
+    busy = null;
+    refreshNotebook();
+    $("nbAsk")?.focus();
+  }
+  async function copyDraft(btn) {
+    const t = api.task();
+    const d = t && t.email && t.email.draft;
+    if (!d) return;
+    try {
+      await navigator.clipboard.writeText(d);
+      btn.textContent = "Copied ✓";
+    } catch {
+      const r = document.createRange();
+      r.selectNodeContents($("nbDraft"));
+      const s = getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+      btn.textContent = "Selected, now copy";
+    }
+  }
+  function trap(ev) {
+    const f = [...$("notebook").querySelectorAll("button:not([disabled]),a[href],input:not([disabled])")];
+    if (!f.length) return;
+    const first = f[0], last2 = f[f.length - 1];
+    if (ev.shiftKey && document.activeElement === first) {
+      ev.preventDefault();
+      last2.focus();
+    } else if (!ev.shiftKey && document.activeElement === last2) {
+      ev.preventDefault();
+      first.focus();
+    }
+  }
+
+  // src/art/people.js
+  var S = (c) => `style="fill:${c}"`;
+  function hair(style, c, k) {
+    const y = -46 * k, r = 10.6 * k;
+    switch (style) {
+      case "bun":
+        return `<circle cx="0" cy="${y - r - 3 * k}" r="${5 * k}" ${S(c)}/>` + cap(c, y, r);
+      case "bob":
+        return `<path d="M${-r - 1.2} ${y + 1} c-1 -12 5 -16 ${r + 1} -16 c7 0 ${r + 2} 4 ${r + 1.6} 16 l0 ${7 * k} l${-4 * k} 0 l0 ${-8 * k} c-4 -1 -12 -1 -16 -3 l0 ${11 * k} l${-4 * k} 0z" ${S(c)}/>`;
+      case "long":
+        return `<path d="M${-r - 1} ${y} c-1 -12 5 -16 ${r + 1} -16 c7 0 ${r + 2} 4 ${r + 1} 16 l1 ${18 * k} l${-5 * k} 0 l-1 ${-16 * k} c-4 -2 -11 -2 -15 -5 l-1 ${21 * k} l${-5 * k} 0z" ${S(c)}/>`;
+      case "spiky":
+        return `<path d="M${-r} ${y - 1} l-1 -6 l4 2 l1 -6 l4 4 l3 -6 l3 6 l4 -4 l1 6 l4 -2 l-1 6 c-4 -3 -16 -3 -22 0z" ${S(c)}/>`;
+      default:
+        return cap(c, y, r);
+    }
+  }
+  var cap = (c, y, r) => `<path d="M${-r - 0.2} ${y + 1} c-1 -9 4 -14 ${r} -14 c6 0 ${r + 1} 4 ${r} 14 c-3 -4 -8 -5 -12 -4 c-3 0 -6 2 -8 4z" ${S(c)}/>`;
+  function extra(kind, look, k) {
+    const y = -46 * k, r = 10.6 * k;
+    switch (kind) {
+      case "apron":
+        return `<path d="M${-6 * k} ${-30 * k} h${12 * k} l${1.5 * k} ${15 * k} h${-15 * k}z" ${S("#FFFDF6")}/><path d="M${-5 * k} ${-31 * k} l${-2 * k} ${-5 * k} M${5 * k} ${-31 * k} l${2 * k} ${-5 * k}" fill="none"/>`;
+      case "glasses":
+        return `<circle cx="${-3.8 * k}" cy="${y + 2}" r="${2.6 * k}" fill="none" stroke-width=".9"/><circle cx="${3.8 * k}" cy="${y + 2}" r="${2.6 * k}" fill="none" stroke-width=".9"/><path d="M${-1.2 * k} ${y + 2} h${2.4 * k}" fill="none" stroke-width=".9"/>`;
+      case "cap":
+        return `<path d="M${-r} ${y - 3} c0 -8 ${r * 2} -8 ${r * 2} 0z" ${S(look.top)}/><path d="M${r - 2} ${y - 3} h${7 * k}" stroke-width="2.2" style="stroke:${look.top}"/>`;
+      case "sunhat":
+        return `<ellipse cx="0" cy="${y - 6 * k}" rx="${16 * k}" ry="${3.6 * k}" ${S("#F3DFA6")}/><path d="M${-8 * k} ${y - 6 * k} c0 -10 ${16 * k} -10 ${16 * k} 0z" ${S("#F3DFA6")}/><path d="M${-8 * k} ${y - 7.5 * k} h${16 * k}" style="stroke:var(--rose)" stroke-width="1.6"/>`;
+      case "helmet":
+        return `<path d="M${-r - 1} ${y - 1} c0 -12 ${r * 2 + 2} -12 ${r * 2 + 2} 0z" ${S("#F6E3A1")}/><path d="M${-2 * k} ${y - 11 * k} v${8 * k} M${3 * k} ${y - 11 * k} v${8 * k}" fill="none" stroke-width=".8"/>`;
+      case "tie":
+        return `<path d="M0 ${-35 * k} l${-1.6 * k} ${3 * k} l${1.6 * k} ${8 * k} l${1.6 * k} ${-8 * k}z" ${S("#C2505F")}/>`;
+      case "satchel":
+        return `<path d="M${-7 * k} ${-35 * k} l${14 * k} ${16 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><rect x="${5 * k}" y="${-22 * k}" width="${8 * k}" height="${7 * k}" rx="1.5" ${S("#C9A27E")}/>`;
+      case "bell":
+        return `<path d="M${11 * k} ${-30 * k} l${4 * k} ${-6 * k}" fill="none"/><path d="M${13 * k} ${-37 * k} c0 -5 ${6 * k} -5 ${6 * k} 0 l1 ${3 * k} h${-8 * k}z" ${S("#F3C969")}/>`;
+      case "lantern":
+        return `<path d="M${12 * k} ${-24 * k} v${-4 * k}" fill="none"/><rect x="${9 * k}" y="${-24 * k}" width="${7 * k}" height="${9 * k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5 * k}" cy="${-19.5 * k}" r="${1.8 * k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
+    }
+    return "";
+  }
+  function personArt(look, kid) {
+    const k = kid ? 0.62 : 1;
+    const legH = 13 * k, legY = -15 * k, lw = 5 * k;
+    const shoe = "var(--sock)";
+    return `<g class="flip"><g filter="url(#wob)">
+    <ellipse cx="0" cy="0" rx="${11 * k}" ry="${3.5 * k}" fill="rgba(60,40,30,.18)"/>
+    <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
+      <g class="legL"><rect x="${-6.2 * k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.bottom)}/><ellipse cx="${-3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
+      <g class="legR"><rect x="${1.2 * k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.bottom)}/><ellipse cx="${3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
+      <g class="armL"><rect x="${-12 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/></g>
+      <g class="armR"><rect x="${7.8 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/></g>
+      <path d="M${-8.6 * k} ${-37 * k} q${8.6 * k} ${-2.4 * k} ${17.2 * k} 0 l${1.4 * k} ${23 * k} h${-20 * k}z" ${S(look.top)}/>
+      ${["apron", "tie", "satchel", "bell", "lantern"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${look.hairStyle === "long" || look.hairStyle === "bob" ? hair(look.hairStyle, look.hair, k) : ""}
+      <circle cx="0" cy="${-46 * k}" r="${10.6 * k}" ${S(look.skin)}/>
+      ${look.hairStyle === "long" || look.hairStyle === "bob" ? cap(look.hair, -46 * k, 10.6 * k) : hair(look.hairStyle, look.hair, k)}
+      <ellipse cx="${-3.7 * k}" cy="${-44 * k}" rx="${1.2 * k}" ry="${1.6 * k}" ${S("var(--sock)")} stroke="none"/>
+      <ellipse cx="${3.7 * k}" cy="${-44 * k}" rx="${1.2 * k}" ry="${1.6 * k}" ${S("var(--sock)")} stroke="none"/>
+      <ellipse cx="${-6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
+      <ellipse cx="${6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
+      <path d="M${-1.6 * k} ${-40.4 * k} q${1.6 * k} ${1.4 * k} ${3.2 * k} 0" fill="none" stroke-width="1"/>
+      ${["glasses", "cap", "sunhat", "helmet"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+    </g>
+  </g></g>`;
+  }
+  var letterArt = `<g transform="translate(0 -70)"><g class="qmark"><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.3" stroke-linejoin="round">
+  <rect x="-11" y="-9" width="22" height="16" rx="2" style="fill:#FFFDF6"/><path d="M-11 -9 l11 9 l11 -9" fill="none"/><circle cx="0" cy="1" r="3" style="fill:var(--rose)"/></g></g></g>`;
+
+  // src/game/npcs.js
+  var NS = "http://www.w3.org/2000/svg";
+  var ents = {};
+  var api2 = null;
+  var courier = null;
+  var sayer = null;
+  var sayT = null;
+  var greeted = /* @__PURE__ */ new Set();
+  function initNpcs(a) {
+    api2 = a;
+  }
+  var slotNow = (def) => {
+    const t = sgHM();
+    return def.routine.find((s) => t >= s.from && t < s.to) || null;
+  };
+  var isHere = (id) => {
+    const d = NPCS.find((n) => n.id === id), s = d && slotNow(d);
+    return !!(s && s.scene === api2.scene());
+  };
+  function makeNode(id, look, kid, letter) {
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("class", "ch npc");
+    g.dataset.npc = id;
+    g.setAttribute("role", "button");
+    g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "");
+    $("actors").appendChild(g);
+    return g;
+  }
+  function drop(id) {
+    const e = ents[id];
+    if (!e) return;
+    e.node.remove();
+    delete ents[id];
+    if (sayer === e) hideSay();
+  }
+  function stepTo(e, speed, dt) {
+    const dx = e.tx - e.x, dy = e.ty - e.y, d = Math.hypot(dx, dy);
+    if (d < 1.2) {
+      e.x = e.tx;
+      e.y = e.ty;
+      e.moving = false;
+      return true;
+    }
+    const s = Math.min(d, speed * dt);
+    e.x += dx / d * s;
+    e.y += dy / d * s;
+    e.moving = true;
+    if (Math.abs(dx) > 0.6) e.dir = dx < 0 ? -1 : 1;
+    return false;
+  }
+  var jitter = ([x, y]) => [x + rnd(-10, 10), y + rnd(-6, 6)];
+  function tickVillager(def, dt) {
+    const scene2 = api2.scene(), slot2 = slotNow(def), key = slot2 ? `${slot2.scene}:${slot2.from}` : null;
+    let e = ents[def.id];
+    if (!slot2 || slot2.scene !== scene2) {
+      if (e) drop(def.id);
+      return;
+    }
+    if (!e || e.key !== key) {
+      if (e) drop(def.id);
+      const p = slot2.at || jitter(pick(slot2.wander));
+      e = ents[def.id] = { def, key, kind: "npc", x: p[0], y: p[1], tx: p[0], ty: p[1], dir: Math.random() < 0.5 ? -1 : 1, moving: false, wait: rnd(1, 4), node: makeNode(def.id, def.look, def.kid) };
+    }
+    const b = api2.bounds();
+    if (stepTo(e, def.kid ? 95 : 48, dt)) {
+      e.wait -= dt;
+      if (e.wait <= 0 && slot2.wander) {
+        let p = jitter(pick(slot2.wander));
+        if (def.id === "pip" && scene2 === "village" && Math.random() < 0.35) {
+          p = [372 + rnd(-10, 10), 618];
+          api2.evan.tx = 360 + rnd(-14, 14);
+          api2.evan.ty = 622;
+          api2.evan.run = true;
+          if (Math.random() < 0.6) {
+            say(e, "Race you, Evan!");
+            setTimeout(() => api2.evanSays("race!"), 600);
+          }
+        }
+        e.tx = clamp(p[0], b[0], b[2]);
+        e.ty = clamp(p[1], b[1], b[3]);
+        e.wait = rnd(3, 8);
+      }
+    }
+    e.node.classList.toggle("run", def.kid && e.moving);
+  }
+  function tickCourier(dt) {
+    const scene2 = api2.scene(), mel2 = api2.mel;
+    if (courier && courier.scene !== scene2) {
+      drop(courier.id);
+      courier = null;
+    }
+    if (!courier) {
+      const item = api2.unreadMail()[0];
+      if (!item) return;
+      const ag = AGENTS[item.from] || AGENTS.postie;
+      const start = scene2 === "village" ? mel2.x < 260 ? [540, 330] : [-20, 330] : [260, 640];
+      const id = "agent-" + item.id;
+      courier = ents[id] = { id, kind: "agent", item, ag, scene: scene2, state: "coming", x: start[0], y: start[1], tx: mel2.x, ty: mel2.y, dir: 1, moving: true, wait: 0, node: makeNode(id, ag.look, false, true) };
+    }
+    const c = courier;
+    if (c.state === "coming" || c.state === "waiting") {
+      const side = mel2.x > 260 ? -1 : 1;
+      c.tx = mel2.x + side * 44;
+      c.ty = mel2.y + 2;
+      const arrived = stepTo(c, 150, dt);
+      if (arrived && c.state === "coming") {
+        c.state = "waiting";
+        c.dir = -side;
+        if (!greeted.has(c.item.id)) {
+          greeted.add(c.item.id);
+          say(c, `${c.ag.hello} Tap me for the note.`, 6e3);
+        }
+      }
+    } else if (c.state === "leaving") {
+      if (stepTo(c, 140, dt)) {
+        drop(c.id);
+        courier = null;
+      }
+    }
+    c.node.classList.toggle("run", c.moving && c.state !== "leaving");
+    c.node.classList.toggle("walk", c.moving);
+  }
+  function courierDelivered(itemId) {
+    if (!courier || courier.item.id !== itemId) return;
+    courier.state = "leaving";
+    courier.node.querySelector(".letter")?.remove();
+    say(courier, pick(["Off I go!", "Have a lovely day!", "Bye for now!"]), 2200);
+    const scene2 = api2.scene();
+    courier.tx = scene2 === "village" ? courier.x < 260 ? -30 : 550 : 260;
+    courier.ty = scene2 === "village" ? 330 : 650;
+  }
+  function say(e, text, ms = 3800) {
+    const el = $("npcSay");
+    sayer = e;
+    el.textContent = e.kind === "agent" ? text : `${e.def.name}: ${text}`;
+    el.hidden = false;
+    clearTimeout(sayT);
+    sayT = setTimeout(hideSay, ms);
+  }
+  function hideSay() {
+    $("npcSay").hidden = true;
+    sayer = null;
+  }
+  function tapNpc(id) {
+    const e = ents[id];
+    if (!e) return;
+    if (e.kind === "agent") {
+      api2.openMail(e.item);
+      return;
+    }
+    const def = e.def, F2 = api2.F(), S3 = api2.S();
+    F2.met = F2.met || {};
+    S3.npcSaid = S3.npcSaid || {};
+    e.dir = api2.mel.x < e.x ? -1 : 1;
+    if (!F2.met[id]) {
+      F2.met[id] = true;
+      say(e, def.intro, 7e3);
+      if (def.gift && !(F2.gifts || {})[id]) {
+        F2.gifts = Object.assign(F2.gifts || {}, { [id]: true });
+        setTimeout(() => {
+          api2.gift(def.gift);
+          say(e, "Here, a free packet of seeds. Plant them by morning.", 4500);
+        }, 7200);
+      }
+      api2.save();
+      return;
+    }
+    const facts2 = api2.facts();
+    const cond = Object.keys(def.react || {}).find((k) => facts2[k] && !S3.npcSaid[id + ":" + k]);
+    if (cond) {
+      S3.npcSaid[id + ":" + cond] = true;
+      say(e, def.react[cond], 4500);
+      api2.save();
+      return;
+    }
+    say(e, pick(def.lines));
+  }
+  function tickNpcs(dt) {
+    NPCS.forEach((def) => tickVillager(def, dt));
+    tickCourier(dt);
+    Object.values(ents).forEach((e) => {
+      e.node.setAttribute("transform", `translate(${e.x.toFixed(1)} ${e.y.toFixed(1)})`);
+      e.node.firstElementChild.setAttribute("transform", `scale(${e.dir} 1)`);
+      if (e.kind === "npc") e.node.classList.toggle("walk", e.moving);
+    });
+    const el = $("npcSay");
+    if (sayer && !el.hidden) api2.bubble(el, sayer.x, sayer.y, sayer.kind === "npc" && sayer.def.kid ? 44 : 70, Math.hypot(sayer.x - api2.mel.x, sayer.y - api2.mel.y) < 90);
+  }
+  var npcActors = () => Object.values(ents).map((e) => [e.node, e]);
+  function resetScene() {
+    Object.keys(ents).forEach(drop);
+    courier = null;
+  }
 
   // src/game/core.js
   var freshToday = () => ({
@@ -1011,9 +1764,13 @@ details[open] summary::after{content:"–"}
     lunch: false,
     water2: false,
     last: null,
+    halfway: {},
+    tread: {},
+    npcSaid: {},
+    harvested: 0,
     updatedAt: 0
   });
-  var freshFox = () => ({ name: "Maple", xp: 0, days: 0, streak: 0, lastActive: null, coins: null, inv: null, plots: null, cool: {}, updatedAt: 0 });
+  var freshFox = () => ({ name: "Maple", xp: 0, days: 0, streak: 0, lastActive: null, coins: null, inv: null, plots: null, cool: {}, met: {}, gifts: {}, mailRead: {}, updatedAt: 0 });
   var load = (k, f) => {
     try {
       const v = JSON.parse(localStorage.getItem(k));
@@ -1022,23 +1779,32 @@ details[open] summary::after{content:"–"}
       return f();
     }
   };
-  var S = load("fox.today", freshToday);
+  var S2 = load("fox.today", freshToday);
   var F = load("fox.fox", freshFox);
   var P = load("fox.plan", () => ({ day: null, tasks: [] }));
+  var MAIL = load("fox.mail", () => ({ items: [] }));
+  var ST = load("fox.stats", () => ({}));
+  var sampleCap = null;
   function migrate() {
-    if (S.day !== dayKey()) S = freshToday();
-    if (!S.arrived) S.arrived = {};
-    if (F.coins == null) F.coins = S.berries || 0;
+    if (S2.day !== dayKey()) S2 = freshToday();
+    if (!S2.arrived) S2.arrived = {};
+    if (F.coins == null) F.coins = S2.berries || 0;
     if (!F.inv) {
       F.inv = { tulip_seed: 2, carrot_seed: 1 };
       F.gift = true;
     }
     if (!Array.isArray(F.plots) || F.plots.length !== 12) F.plots = Array.from({ length: 12 }, () => null);
     if (!F.cool) F.cool = {};
+    ["met", "gifts", "mailRead"].forEach((k) => {
+      if (!F[k]) F[k] = {};
+    });
+    ["halfway", "tread", "npcSaid"].forEach((k) => {
+      if (!S2[k]) S2[k] = {};
+    });
   }
   migrate();
-  setArtContext({ F: () => F, S: () => S, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p) });
-  var say = null;
+  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST });
+  var say2 = null;
   var refs = null;
   var writing = {};
   var pending = {};
@@ -1050,7 +1816,7 @@ details[open] summary::after{content:"–"}
   var selPlot = null;
   var shopTab = "seeds";
   function persist(which) {
-    const obj = which === "today" ? S : F;
+    const obj = which === "today" ? S2 : F;
     obj.updatedAt = Date.now();
     try {
       localStorage.setItem("fox." + which, JSON.stringify(obj));
@@ -1067,7 +1833,7 @@ details[open] summary::after{content:"–"}
     }
     writing[which] = true;
     try {
-      await refs[which].set(JSON.parse(JSON.stringify(which === "today" ? S : F)));
+      await refs[which].set(JSON.parse(JSON.stringify(which === "today" ? S2 : F)));
     } catch (e) {
     }
     writing[which] = false;
@@ -1079,12 +1845,38 @@ details[open] summary::after{content:"–"}
   };
   async function initDb() {
     if (!window.claude || !claude.use) return;
+    claude.use("sample").then((sm) => {
+      sampleCap = sm || null;
+      refreshNotebook();
+    }, () => {
+    });
     const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
     if (!db || !user) return;
     const uid = await user.id();
     if (!uid) return;
     const col = db.collection("data/users/" + uid);
-    refs = { today: col.doc("today"), fox: col.doc("fox"), plan: col.doc("plan") };
+    refs = { today: col.doc("today"), fox: col.doc("fox"), plan: col.doc("plan"), mail: col.doc("mail"), stats: col.doc("stats") };
+    refs.mail.onSnapshot((snap) => {
+      MAIL = snap.exists ? Object.assign({ items: [] }, snap.data()) : { items: [] };
+      try {
+        localStorage.setItem("fox.mail", JSON.stringify(MAIL));
+      } catch {
+      }
+      render();
+    }, () => {
+    });
+    refs.stats.onSnapshot((snap) => {
+      const before = ST;
+      ST = snap.exists ? snap.data() || {} : {};
+      try {
+        localStorage.setItem("fox.stats", JSON.stringify(ST));
+      } catch {
+      }
+      const grew = ["chord", "chico"].find((k) => ST[k] && before[k] && ST[k].users > before[k].users);
+      if (grew) speak(`${grew === "chord" ? "Chord" : "Chico"} grew to ${ST[grew].users.toLocaleString()} users! New flowers 🌼`, 5e3);
+      render(scene === "village");
+    }, () => {
+    });
     refs.plan.onSnapshot((snap) => {
       if (!snap.exists) return;
       const was = remaining().length;
@@ -1098,7 +1890,7 @@ details[open] summary::after{content:"–"}
     }, () => {
     });
     const watch = (which) => refs[which].onSnapshot((snap) => {
-      const local = which === "today" ? S : F;
+      const local = which === "today" ? S2 : F;
       if (!snap.exists) {
         persist(which);
         return;
@@ -1109,11 +1901,11 @@ details[open] summary::after{content:"–"}
         return;
       }
       if ((remote.updatedAt || 0) > (local.updatedAt || 0)) {
-        if (which === "today") S = Object.assign(freshToday(), remote);
+        if (which === "today") S2 = Object.assign(freshToday(), remote);
         else F = Object.assign(freshFox(), remote);
         migrate();
         try {
-          localStorage.setItem("fox." + which, JSON.stringify(which === "today" ? S : F));
+          localStorage.setItem("fox." + which, JSON.stringify(which === "today" ? S2 : F));
         } catch {
         }
         render(true);
@@ -1125,25 +1917,25 @@ details[open] summary::after{content:"–"}
   }
   function allTasks() {
     const base = P && P.day === dayKey() && Array.isArray(P.tasks) ? P.tasks : [];
-    const list = [...base, ...S.extra].filter((t) => t && t.id && t.title).map((t) => Object.assign({}, t, S.tweaks[t.id] || {}));
+    const list = [...base, ...S2.extra].filter((t) => t && t.id && t.title).map((t) => Object.assign({}, t, S2.tweaks[t.id] || {}));
     const ids = list.map((t) => t.id);
-    const order = S.order.filter((id) => ids.includes(id));
+    const order = S2.order.filter((id) => ids.includes(id));
     ids.forEach((id) => {
       if (!order.includes(id)) order.push(id);
     });
     return order.map((id) => list.find((t) => t.id === id));
   }
-  var remaining = () => allTasks().filter((t) => !S.doneIds.includes(t.id));
+  var remaining = () => allTasks().filter((t) => !S2.doneIds.includes(t.id));
   var questsIn = (pl) => allTasks().filter((t) => placeOf(t) === pl);
   function phase() {
-    if (!S.cleanDone) return "clean";
-    if (S.mode === "decompress") return "decompress";
-    if (S.mode === "break") return "break";
+    if (!S2.cleanDone) return "clean";
+    if (S2.mode === "decompress") return "decompress";
+    if (S2.mode === "break") return "break";
     if (remaining().length) return "task";
-    return S.doneIds.length ? "recap" : "empty";
+    return S2.doneIds.length ? "recap" : "empty";
   }
-  var arrivedFor = (t) => S.arrived[t.id] || scene === placeOf(t) && atSpot === spotOf(t);
-  var atClean = () => S.wipe || scene === "home" && atSpot === "cupboard";
+  var arrivedFor = (t) => S2.arrived[t.id] || scene === placeOf(t) && atSpot === spotOf(t);
+  var atClean = () => S2.wipe || scene === "home" && atSpot === "cupboard";
   function growth(p) {
     if (!p || !p.crop || !p.wateredAt) return 0;
     return clamp((Date.now() - p.wateredAt + (p.bonus || 0)) / CROPS[p.crop].dur, 0, 1);
@@ -1173,7 +1965,7 @@ details[open] summary::after{content:"–"}
   }
   function earn(n, why) {
     F.coins += n;
-    S.earned += n;
+    S2.earned += n;
     markActive();
     flash(`+${n} 🪙 ${why}`);
     mprop("🪙", mel.x, mel.y - 60, 1800);
@@ -1197,10 +1989,10 @@ details[open] summary::after{content:"–"}
     const ph = phase();
     if (scene === "market") return "Shop's open! Have a browse.";
     if (scene === "farm") return readyCount() ? "Something's ready to harvest!" : "Tap a plot to plant or water.";
-    if (ph === "clean") return atClean() ? S.wipe ? "Five minutes. Hard stop, promise." : sgHM() < 720 ? "Morning! Wet wipe first?" : "Hi! Wet wipe first?" : "To the cleaning cupboard at home!";
+    if (ph === "clean") return atClean() ? S2.wipe ? "Five minutes. Hard stop, promise." : sgHM() < 720 ? "Morning! Wet wipe first?" : "Hi! Wet wipe first?" : "To the cleaning cupboard at home!";
     if (ph === "task") {
       const t = remaining()[0];
-      return arrivedFor(t) ? S.firstStep[t.id] ? "You're doing it. I'm watching the clock." : "We're here. Just the first tiny step." : `Next quest: the ${spotObj(placeOf(t), spotOf(t)).name.toLowerCase()} at ${VILLAGE[placeOf(t)].short}.`;
+      return arrivedFor(t) ? S2.firstStep[t.id] ? "You're doing it. I'm watching the clock." : "We're here. Just the first tiny step." : `Next quest: the ${spotObj(placeOf(t), spotOf(t)).name.toLowerCase()} at ${VILLAGE[placeOf(t)].short}.`;
     }
     if (ph === "break") return "Zzz… break time. Wander, or rest.";
     if (ph === "decompress") return "Go tell chat “call done” 💬";
@@ -1217,11 +2009,11 @@ details[open] summary::after{content:"–"}
     speechLock = ms ? Date.now() + ms : 0;
     if (ms) speechT = setTimeout(() => {
       speechLock = 0;
-      el.textContent = say ? say.line : defaultLine();
+      el.textContent = say2 ? say2.line : defaultLine();
     }, ms);
   }
   function setSay(line, buttons) {
-    say = { line, buttons };
+    say2 = { line, buttons };
     speak(line);
   }
   var evanT;
@@ -1311,7 +2103,7 @@ details[open] summary::after{content:"–"}
       [0, 800, 1600, 2400].forEach((t) => setTimeout(() => prop("z", "p-z", 52, 56, 4800), t));
     }
     if (kind === "crown") {
-      S.crown = true;
+      S2.crown = true;
       hearts(3);
     }
     if (kind === "fort") {
@@ -1357,20 +2149,20 @@ details[open] summary::after{content:"–"}
     }
   }
   function startTimer(kind, mins, id) {
-    S.timer = { kind, endAt: Date.now() + mins * M, total: mins * M, id: id || null, fired: false };
+    S2.timer = { kind, endAt: Date.now() + mins * M, total: mins * M, id: id || null, fired: false };
   }
   var fmt = (left) => left ? `${Math.floor(left / M)}:${String(Math.floor(left / 1e3) % 60).padStart(2, "0")}` : "time!";
   function timerHTML(label) {
-    if (!S.timer) return "";
-    const left = Math.max(0, S.timer.endAt - Date.now()), C = 2 * Math.PI * 28;
-    return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - left / S.timer.total)}"/></svg>
+    if (!S2.timer) return "";
+    const left = Math.max(0, S2.timer.endAt - Date.now()), C = 2 * Math.PI * 28;
+    return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - left / S2.timer.total)}"/></svg>
     <div><span class="t" id="tLeft">${fmt(left)}</span><small>${esc(label)}</small></div></div>`;
   }
   var lastReady = readyCount();
   setInterval(() => {
-    if (S.day !== dayKey()) {
-      S = freshToday();
-      say = null;
+    if (S2.day !== dayKey()) {
+      S2 = freshToday();
+      say2 = null;
       save(true);
       speak(defaultLine());
       return;
@@ -1385,14 +2177,15 @@ details[open] summary::after{content:"–"}
       drawScene();
       if (selPlot != null) ctx();
     }
-    if (!S.timer) return;
-    const left = Math.max(0, S.timer.endAt - Date.now());
+    if (!S2.timer) return;
+    const left = Math.max(0, S2.timer.endAt - Date.now());
     const t = $("tLeft"), r = $("ringFg");
     if (t) t.textContent = fmt(left);
-    if (r) r.style.strokeDashoffset = 2 * Math.PI * 28 * (1 - left / S.timer.total);
-    if (!left && !S.timer.fired) {
-      S.timer.fired = true;
-      timerDone(S.timer.kind);
+    document.querySelectorAll("[data-tleft]").forEach((el) => el.textContent = fmt(left));
+    if (r) r.style.strokeDashoffset = 2 * Math.PI * 28 * (1 - left / S2.timer.total);
+    if (!left && !S2.timer.fired) {
+      S2.timer.fired = true;
+      timerDone(S2.timer.kind);
     }
   }, 1e3);
   function timerDone(kind) {
@@ -1400,7 +2193,7 @@ details[open] summary::after{content:"–"}
     act(kind === "break" ? "cheer" : "nudge");
     if (kind === "clean") setSay("Five minutes! Wipe down. That's your first tick.");
     if (kind === "task") setSay("Time box is up. Done? Or five more?", [["5 more minutes", () => {
-      startTimer("task", 5, S.timer.id);
+      startTimer("task", 5, S2.timer.id);
       setSay("Five more. You've got this.");
     }]]);
     if (kind === "deal") setSay("Five minutes done 🎉 Stop or keep rolling. Both count.");
@@ -1424,34 +2217,34 @@ details[open] summary::after{content:"–"}
       go("village", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => arriveVillageSpot("pond"));
     },
     gotWipe() {
-      S.wipe = true;
+      S2.wipe = true;
       startTimer("clean", 5);
       setSay("Nearest, most annoying spot. You pick!");
       save();
     },
     cleanDone() {
-      S.cleanDone = true;
-      S.timer = null;
+      S2.cleanDone = true;
+      S2.timer = null;
       earn(3, "five-minute clean");
       gainXp(1);
-      S.last = "clean";
+      S2.last = "clean";
       act("cheer");
       setSay("First tick of the day! Look at that ✨");
       save();
     },
     firstStep(t) {
-      S.firstStep[t.id] = true;
-      S.arrived[t.id] = true;
+      S2.firstStep[t.id] = true;
+      S2.arrived[t.id] = true;
       startTimer("task", t.minutes || 25, t.id);
       setSay("Hard part's done. Now the rest, on the clock.");
       save();
     },
     done(t) {
-      S.doneIds.push(t.id);
-      S.timer = null;
+      S2.doneIds.push(t.id);
+      S2.timer = null;
       earn(5, "quest complete");
       gainXp(1);
-      S.last = t.title;
+      S2.last = t.title;
       let grew = 0;
       F.plots.forEach((p) => {
         if (p && p.crop && p.wateredAt && growth(p) < 1) {
@@ -1459,35 +2252,48 @@ details[open] summary::after{content:"–"}
           grew++;
         }
       });
-      if (t.meeting) S.mode = "decompress";
+      if (t.meeting) S2.mode = "decompress";
       else if (remaining().length) {
-        S.mode = "break";
+        S2.mode = "break";
         startTimer("break", 10);
       }
       act("cheer");
       if (evanHere()) evanSays(pick(["yaaay!", "Mama did it!", "hooray!"]));
-      setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : "") + (t.treadmill ? " Steps showing?" : ""));
+      if (S2.tread[t.id]) setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : "") + " Steps showing?", [["Log my steps", () => openSteps(true)]]);
+      else setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : ""));
       save(true);
     },
+    notebook(t) {
+      openTask(t);
+    },
+    treadmill(t) {
+      S2.tread[t.id] = true;
+      S2.arrived[t.id] = false;
+      S2.tweaks[t.id] = Object.assign({}, S2.tweaks[t.id], { place: "home", spot: "treadmill" });
+      closeNotebook();
+      setSay("Treadmill it is! 1.2 and go. I'll walk with you.");
+      save(true);
+      goQuest(allTasks().find((x) => x.id === t.id));
+    },
     proc(t) {
-      S.stalls[t.id] = (S.stalls[t.id] || 0) + 1;
+      S2.stalls[t.id] = (S2.stalls[t.id] || 0) + 1;
       act("nudge");
-      if (S.stalls[t.id] >= 2) {
+      if (S2.stalls[t.id] >= 2) {
         setSay("No shame. What's going on with this one?", [
           ["It's unclear", () => setSay("Tell chat “boss, this one's unclear”. We'll untangle it.")],
           ["It's too big", () => {
-            S.tweaks[t.id] = { firstStep: "do just ten minutes of it. Messy is fine.", minutes: 10 };
-            S.firstStep[t.id] = false;
-            S.stalls[t.id] = 0;
-            S.timer = null;
+            S2.tweaks[t.id] = { firstStep: "do just ten minutes of it. Messy is fine.", minutes: 10 };
+            S2.firstStep[t.id] = false;
+            S2.stalls[t.id] = 0;
+            S2.timer = null;
             setSay("Shrunk it! Ten minutes, then you can stop.");
           }],
           ["I don't want to", () => {
             const ids = allTasks().map((x) => x.id);
-            S.order = ids.filter((id) => id !== t.id).concat(t.id);
-            S.stalls[t.id] = 0;
-            S.firstStep[t.id] = false;
-            S.timer = null;
+            S2.order = ids.filter((id) => id !== t.id).concat(t.id);
+            S2.stalls[t.id] = 0;
+            S2.firstStep[t.id] = false;
+            S2.timer = null;
             setSay("Fair. Moved it to the end. Here's another.");
           }]
         ]);
@@ -1507,39 +2313,122 @@ details[open] summary::after{content:"–"}
       save();
     },
     back() {
-      S.mode = null;
-      S.timer = null;
+      S2.mode = null;
+      S2.timer = null;
       earn(2, "proper break");
       gainXp(1);
       setSay("Welcome back! Fresh quest coming up.");
       save();
     },
     flow() {
-      S.mode = null;
-      S.timer = null;
+      S2.mode = null;
+      S2.timer = null;
       setSay("In flow? Ride it! Break after this one.");
       save();
     },
     decompressed() {
-      S.mode = remaining().length ? "break" : null;
-      if (S.mode) startTimer("break", 10);
+      S2.mode = remaining().length ? "break" : null;
+      if (S2.mode) startTimer("break", 10);
       setSay("Decompressed. Now a proper break.");
       save();
     },
     water() {
-      S.water += 1;
-      if (S.water <= 4) earn(1, "water");
+      S2.water += 1;
+      if (S2.water <= 4) earn(1, "water");
       speak(pick(["Glug glug 💧", "Hydrated boss!", "Water break, good call."]), 3e3);
       save();
     }
   };
   function doNext(id) {
     const ids = allTasks().map((x) => x.id);
-    if (S.timer && S.timer.kind !== "break") S.timer = null;
-    S.order = [id, ...ids.filter((x) => x !== id)];
-    say = null;
+    if (S2.timer && S2.timer.kind !== "break") S2.timer = null;
+    S2.order = [id, ...ids.filter((x) => x !== id)];
+    say2 = null;
     speak("New quest picked! Off we go.", 3e3);
     save(true);
+  }
+  var HALF = ["Halfway! The downhill bit starts now.", "Halfway there. Look at you go.", "Half done. Sip of water, then onwards."];
+  function nbAct(kind, t) {
+    if (kind === "started") {
+      if (!S2.firstStep[t.id]) A.firstStep(t);
+      return;
+    }
+    if (kind === "halfway") {
+      S2.halfway[t.id] = true;
+      act("cheer");
+      setSay(pick(HALF));
+      save();
+      return;
+    }
+    if (kind === "stuck") {
+      A.proc(t);
+      return;
+    }
+    if (kind === "more") {
+      const tm = S2.timer;
+      if (tm && tm.id === t.id && !tm.fired && tm.endAt > Date.now()) {
+        tm.endAt += 10 * M;
+        tm.total += 10 * M;
+      } else startTimer("task", 10, t.id);
+      setSay("Ten more minutes on the clock. Take them, no guilt.");
+      save();
+      return;
+    }
+    if (kind === "treadmill") {
+      A.treadmill(t);
+      return;
+    }
+    if (kind === "done") {
+      A.done(t);
+      return;
+    }
+  }
+  function sayButton(i) {
+    if (!say2 || !say2.buttons || !say2.buttons[i]) return;
+    const fn = say2.buttons[i][1];
+    say2.buttons = null;
+    fn();
+    save();
+  }
+  function timerLeft(t) {
+    if (!S2.timer || S2.timer.id !== t.id || S2.timer.kind !== "task" && S2.timer.kind !== "deal") return null;
+    return fmt(Math.max(0, S2.timer.endAt - Date.now()));
+  }
+  var unreadMail = () => (MAIL.items || []).filter((m) => m && m.id && !F.mailRead[m.id] && (!m.at || Date.now() - m.at < 36 * H)).sort((a, b) => (a.at || 0) - (b.at || 0));
+  function markRead(item) {
+    if (!F.mailRead[item.id]) {
+      F.mailRead[item.id] = Date.now();
+      const ids = Object.keys(F.mailRead).sort((a, b) => F.mailRead[b] - F.mailRead[a]);
+      ids.slice(150).forEach((id) => delete F.mailRead[id]);
+      gainXp(1);
+      save();
+    }
+    courierDelivered(item.id);
+  }
+  var agentName = (from) => AGENTS[from] && AGENTS[from].name || from || "the postie";
+  function mailCard() {
+    const items = (MAIL.items || []).filter((m) => m && m.id).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 20);
+    $("mailCard").hidden = !items.length;
+    if (!items.length) return;
+    const unread = items.filter((m) => !F.mailRead[m.id]).length;
+    $("mailSum").textContent = unread ? `Letters · ${unread} new` : "Letters";
+    $("mailList").innerHTML = items.map((m, i) => `<li class="${F.mailRead[m.id] ? "" : "unread"}"><span class="pl">${F.mailRead[m.id] ? "📄" : "✉️"}</span>
+    <button class="open" data-mail="${i}"><span class="t">${esc(m.title || "A note")}</span><br><small>${esc(agentName(m.from))}${m.at ? " · " + new Date(m.at).toLocaleString("en-GB", { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Singapore" }) : ""}</small></button><span></span></li>`).join("");
+    $("mailList").querySelectorAll("[data-mail]").forEach((b) => b.onclick = () => openMail(items[+b.dataset.mail]));
+  }
+  function facts() {
+    const hm2 = sgHM(), t = phase() === "task" ? remaining()[0] : null, sp = t ? spotOf(t) : null, pl = t ? placeOf(t) : null;
+    return {
+      quests3: S2.doneIds.length >= 3,
+      harvest: S2.harvested > 0,
+      ready: readyCount() > 0,
+      lunch: hm2 >= 690 && hm2 <= 810,
+      water: S2.water >= 4,
+      inbox: pl === "post" && sp === "counter",
+      writing: pl === "fresh" && (sp === "desk" || sp === "typewriter"),
+      building: sp === "bench" || sp === "laptop" && pl !== "post",
+      planning: sp === "table" || sp === "kitchen" && pl === "chico"
+    };
   }
   function useItem(id) {
     const it = ITEMS[id];
@@ -1581,7 +2470,7 @@ details[open] summary::after{content:"–"}
   }
   function buy(id) {
     const it = ITEMS[id];
-    if (!it || F.coins < it.price || it.need && S.earned < it.need) return;
+    if (!it || F.coins < it.price || it.need && S2.earned < it.need) return;
     if (it.kind === "tool" && F.inv[id]) return;
     F.coins -= it.price;
     addInv(id, 1);
@@ -1621,16 +2510,17 @@ details[open] summary::after{content:"–"}
     addInv(p.crop, 1);
     F.plots[i] = null;
     gainXp(1);
+    S2.harvested = (S2.harvested || 0) + 1;
     mprop(CROPS[p.crop].e, PLOTS[i].x + 50, PLOTS[i].y + 20, 1900);
     act("cheer");
     speak(`Harvested a ${CROPS[p.crop].n.toLowerCase()}! It's in your backpack.`, 4e3);
     save(true);
   }
   function notes() {
-    const hm = sgHM();
+    const hm2 = sgHM();
     let out = "";
-    if (!S.lunch && hm >= 645 && hm <= 690 && S.cleanDone) out += `<p class="note">🍲 Start cooking or order lunch now, so it's on its way. <button data-dismiss="lunch">got it</button></p>`;
-    if (!S.water2 && hm >= 780 && hm <= 870 && S.cleanDone) out += `<p class="note">💧 Top up your water bottle, or visit the well. <button data-water2>topped up</button></p>`;
+    if (!S2.lunch && hm2 >= 645 && hm2 <= 690 && S2.cleanDone) out += `<p class="note">🍲 Start cooking or order lunch now, so it's on its way. <button data-dismiss="lunch">got it</button></p>`;
+    if (!S2.water2 && hm2 >= 780 && hm2 <= 870 && S2.cleanDone) out += `<p class="note">💧 Top up your water bottle, or visit the well. <button data-water2>topped up</button></p>`;
     return out;
   }
   function journal() {
@@ -1640,22 +2530,22 @@ details[open] summary::after{content:"–"}
     if (ph === "clean") {
       h += `<h1><span class="lbl">daily quest · home · cleaning cupboard</span>Five-minute clean</h1>`;
       if (!atClean()) h += `<ul class="bujo"><li>Every day starts at the cleaning cupboard at home.</li></ul><div class="actions"><button class="btn primary" data-a="walk">Walk to the cupboard</button></div>`;
-      else h += `${S.wipe ? timerHTML("hard stop at five") + `<ul class="bujo"><li>Wipe down whatever's nearest and most annoying.</li><li>Stop at five, even on a roll.</li></ul>` : `<ul class="bujo"><li class="first"><span><span class="hl">First step only:</span> go get a wet wipe. Grab your water on the way.</span></li>
+      else h += `${S2.wipe ? timerHTML("hard stop at five") + `<ul class="bujo"><li>Wipe down whatever's nearest and most annoying.</li><li>Stop at five, even on a roll.</li></ul>` : `<ul class="bujo"><li class="first"><span><span class="hl">First step only:</span> go get a wet wipe. Grab your water on the way.</span></li>
            <li>Then five minutes on the clock. Hard stop.</li><li class="pep">A tiny win before anything else.</li></ul><p class="checkin">Tell me when you've got the wipe.</p>`}
-      <div class="actions">${S.wipe ? `<button class="btn yes" data-a="cleanDone">Clean done</button>` : `<button class="btn primary" data-a="gotWipe">Got the wipe</button>`}</div>`;
+      <div class="actions">${S2.wipe ? `<button class="btn yes" data-a="cleanDone">Clean done</button>` : `<button class="btn primary" data-a="gotWipe">Got the wipe</button>`}</div>`;
     } else if (ph === "task") {
-      const t = remaining()[0], fs = S.firstStep[t.id], pl = placeOf(t), sp = spotObj(pl, spotOf(t)), at = arrivedFor(t);
-      h += `${S.last ? `<p class="ack">✓ ${esc(S.last === "clean" ? "clean done" : S.last)}</p>` : ""}
+      const t = remaining()[0], fs = S2.firstStep[t.id], pl = placeOf(t), sp = spotObj(pl, spotOf(t)), at = arrivedFor(t);
+      h += `${S2.last ? `<p class="ack">✓ ${esc(S2.last === "clean" ? "clean done" : S2.last)}</p>` : ""}
       <h1><span class="lbl">quest · ${esc(VILLAGE[pl].name)} · ${esc(sp.name)}</span>${esc(t.title)}</h1>
-      ${t.at || t.treadmill || t.chat ? `<p class="stickers">${t.at ? `<span class="sticker">⏰ ${esc(t.at)}</span>` : ""}${t.treadmill ? `<span class="sticker">🚶 treadmill-able, 1.2 and go</span>` : ""}${t.chat ? `<span class="sticker">💬 happens in chat</span>` : ""}</p>` : ""}
+      ${t.at || t.treadmill || t.chat || t.notes || t.email ? `<p class="stickers">${t.at ? `<span class="sticker">⏰ ${esc(t.at)}</span>` : ""}${t.treadmill ? `<span class="sticker">🚶 ${S2.tread[t.id] ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t.notes ? `<span class="sticker">📝 notes</span>` : ""}${t.email ? `<span class="sticker">✉️ email</span>` : ""}${t.chat ? `<span class="sticker">💬 happens in chat</span>` : ""}</p>` : ""}
       ${fs ? timerHTML(`${t.minutes || 25}-minute time box`) : ""}
       <ul class="bujo">${fs ? `<li>Keep going. One thing at a time.</li>` : `<li class="first"><span><span class="hl">First step only:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}</span></li><li>Then ${t.minutes || 25} minutes on the rest.</li>`}
         <li class="pep">${esc(t.pep || PEP[t.title.length % PEP.length])}</li></ul>
       ${at ? `<p class="checkin">${fs ? "Tap done when it's done." : "Tap when the first step's done."}</p>` : ""}
-      <div class="actions">${!at ? `<button class="btn primary" data-a="walk">Walk to the ${esc(sp.name.toLowerCase())}</button>` : fs ? `<button class="btn yes" data-a="done">Quest done</button>` : `<button class="btn primary" data-a="firstStep">First step done</button>`}
+      <div class="actions">${!at ? `<button class="btn primary" data-a="walk">Walk to the ${esc(sp.name.toLowerCase())}</button>` : fs ? `<button class="btn yes" data-a="done">Quest done</button><button class="btn alt" data-a="notebook">Open the notebook</button>` : `<button class="btn primary" data-a="notebook">Do task</button><button class="btn alt" data-a="firstStep">First step done</button>`}
         <button class="btn alt" data-a="proc">I'm procrastinating</button></div>`;
     } else if (ph === "break") {
-      const fresh = S.timer && S.timer.kind === "break" && S.timer.total - (S.timer.endAt - Date.now()) < 6e4;
+      const fresh = S2.timer && S2.timer.kind === "break" && S2.timer.total - (S2.timer.endAt - Date.now()) < 6e4;
       h += `<h1><span class="lbl">side quest · rest</span>Ten-minute break</h1>${timerHTML("away from the desk")}
       <ul class="bujo"><li>Treadmill counts. Scrolling at your desk doesn't.</li><li>Check the garden, or sit by the pond.</li><li class="pep">Rest is part of the plan.</li></ul>
       <div class="actions"><button class="btn yes" data-a="back">I'm back</button>${!(scene === "village" && atSpot === "pond") ? `<button class="btn alt" data-a="pond">Sit by the pond</button>` : ""}${fresh ? `<button class="btn alt" data-a="flow">I'm in flow</button>` : ""}</div>`;
@@ -1664,39 +2554,39 @@ details[open] summary::after{content:"–"}
       <ul class="bujo"><li>Tell chat <span class="hl">“call done”</span>.</li><li>Stomach clench, three quick points, hot drink. Chat files the rest.</li></ul>
       <div class="actions"><button class="btn yes" data-a="decompressed">Done in chat</button></div>`;
     } else if (ph === "recap") {
-      const done = allTasks().filter((t) => S.doneIds.includes(t.id));
+      const done = allTasks().filter((t) => S2.doneIds.includes(t.id));
       h += `<h1><span class="lbl">that's a wrap</span>Work day's shut</h1>
       <ul class="bujo"><li>× five-minute clean</li>${done.map((t) => `<li>× ${esc(t.title)}</li>`).join("")}
-      <li>${S.steps.toLocaleString()} / 5,000 steps</li><li>${S.earned} coins earned today</li>
+      <li>${S2.steps.toLocaleString()} / 5,000 steps</li><li>${S2.earned} coins earned today</li>
       <li class="pep">Garden, shop, spoil Maple. Then tell chat <span class="hl">“wind down”</span>.</li></ul>`;
     } else {
       h += `<h1><span class="lbl">ready when you are</span>The boards are empty</h1>
       <ul class="bujo"><li>Start boss mode in chat and today's quests land on the boards.</li><li>Or add one yourself under All quests.</li></ul>`;
     }
-    if (say && say.buttons) h = h.replace(/<h1>/, `<div class="actions saybtns">${say.buttons.map((x, i) => `<button class="btn alt small" data-say="${i}">${esc(x[0])}</button>`).join("")}</div><h1>`);
+    if (say2 && say2.buttons) h = h.replace(/<h1>/, `<div class="actions saybtns">${say2.buttons.map((x, i) => `<button class="btn alt small" data-say="${i}">${esc(x[0])}</button>`).join("")}</div><h1>`);
     j.innerHTML = h;
     j.querySelectorAll("[data-a]").forEach((el) => el.onclick = () => {
       const t = remaining()[0];
       A[el.dataset.a](t);
     });
     j.querySelectorAll("[data-say]").forEach((el) => el.onclick = () => {
-      const fn = say.buttons[+el.dataset.say][1];
-      say.buttons = null;
+      const fn = say2.buttons[+el.dataset.say][1];
+      say2.buttons = null;
       fn();
       save();
     });
     j.querySelectorAll("[data-dismiss]").forEach((el) => el.onclick = () => {
-      S[el.dataset.dismiss] = true;
+      S2[el.dataset.dismiss] = true;
       save();
     });
     j.querySelectorAll("[data-water2]").forEach((el) => el.onclick = () => {
-      S.water2 = true;
+      S2.water2 = true;
       A.water();
     });
   }
-  function itemBtn(id, label, disabled, extra) {
+  function itemBtn(id, label, disabled, extra2) {
     const it = ITEMS[id];
-    return `<button class="item" data-id="${id}" ${disabled ? "disabled" : ""}><span class="e">${it.e}</span><span class="n">${esc(it.n)}</span><span class="c">${label}</span>${extra || ""}</button>`;
+    return `<button class="item" data-id="${id}" ${disabled ? "disabled" : ""}><span class="e">${it.e}</span><span class="n">${esc(it.n)}</span><span class="c">${label}</span>${extra2 || ""}</button>`;
   }
   function ctx() {
     const c = $("ctx");
@@ -1710,9 +2600,9 @@ details[open] summary::after{content:"–"}
         h += sellable.length ? sellable.map((id) => itemBtn(id, `sell <b>+${ITEMS[id].sell}</b> 🪙`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("") : `<p class="muted" style="grid-column:1/-1">Nothing to sell yet. Grow something in the garden!</p>`;
       } else {
         h += Object.keys(ITEMS).filter((id) => ITEMS[id].tab === shopTab).map((id) => {
-          const it = ITEMS[id], locked = it.need && S.earned < it.need, owned = it.kind === "tool" && F.inv[id];
-          const extra = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)}` : "";
-          return itemBtn(id, locked ? `earn ${it.need} today` : owned ? "owned" : `<b>${it.price}</b> 🪙${extra}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
+          const it = ITEMS[id], locked = it.need && S2.earned < it.need, owned = it.kind === "tool" && F.inv[id];
+          const extra2 = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)}` : "";
+          return itemBtn(id, locked ? `earn ${it.need} today` : owned ? "owned" : `<b>${it.price}</b> 🪙${extra2}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
         }).join("");
       }
       h += `</div>`;
@@ -1734,7 +2624,7 @@ details[open] summary::after{content:"–"}
       const list = scene === "village" ? allTasks() : questsIn(scene), cur = phase() === "task" ? remaining()[0].id : null;
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>${scene === "village" ? "Town quest board" : esc(ROOMS[scene].name) + " quests"}</h2>
       ${list.length ? `<ul class="qlist">${list.map((t) => {
-        const dn = S.doneIds.includes(t.id), sp = spotObj(placeOf(t), spotOf(t));
+        const dn = S2.doneIds.includes(t.id), sp = spotObj(placeOf(t), spotOf(t));
         return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"><span><b>${esc(t.title)}</b><small>${scene === "village" ? VILLAGE[placeOf(t)].emo + " " + esc(VILLAGE[placeOf(t)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : "<span></span>"}</li>`;
       }).join("")}</ul>` : `<p class="sub">No quests ${scene === "village" ? "today yet" : "in here today"}.</p>`}
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
@@ -1777,10 +2667,10 @@ details[open] summary::after{content:"–"}
     w.innerHTML = "";
     for (let i = 0; i < 8; i++) {
       const b = document.createElement("button");
-      b.className = "box" + (i < S.water ? " on" : "");
+      b.className = "box" + (i < S2.water ? " on" : "");
       b.setAttribute("aria-label", `Water bottle ${i + 1}`);
       b.onclick = () => {
-        if (i >= S.water) A.water();
+        if (i >= S2.water) A.water();
       };
       w.appendChild(b);
     }
@@ -1788,17 +2678,20 @@ details[open] summary::after{content:"–"}
     s.innerHTML = "";
     for (let i = 0; i < 5; i++) {
       const b = document.createElement("button");
-      b.className = "box step" + (i < Math.floor(S.steps / 1e3) ? " on" : "");
+      b.className = "box step" + (i < Math.floor(S2.steps / 1e3) ? " on" : "");
       b.setAttribute("aria-label", "Update steps");
       b.onclick = openSteps;
       s.appendChild(b);
     }
-    $("stepNote").textContent = S.steps ? S.steps.toLocaleString() : "tap to log";
+    $("stepNote").textContent = S2.steps ? S2.steps.toLocaleString() : "tap to log";
   }
-  function openSteps() {
+  function openSteps(force) {
     const f = $("stepForm");
-    f.classList.toggle("open");
-    if (f.classList.contains("open")) $("stepIn").focus();
+    f.classList.toggle("open", force === true ? true : !f.classList.contains("open"));
+    if (f.classList.contains("open")) {
+      if (force === true) f.scrollIntoView({ behavior: "smooth", block: "center" });
+      $("stepIn").focus({ preventScroll: force === true });
+    }
   }
   function questMark() {
     const ph = phase(), m = $("qmarkWrap");
@@ -1830,12 +2723,12 @@ details[open] summary::after{content:"–"}
     $("maphint").textContent = scene === "village" ? "Tap anywhere to walk. Tap a building to go inside." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? innerWidth >= 900 ? "The shop is open on the right." : "The shop is open below." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
   }
   function render(redraw) {
-    if (S.day !== dayKey()) S = freshToday();
+    if (S2.day !== dayKey()) S2 = freshToday();
     if (redraw) drawScene();
     const L = level(), next = LEVELS[L + 1];
     $("title").firstChild.textContent = `${F.name}'s village`;
     $("trayName").textContent = F.name;
-    const d = new Date(Date.now() + 6 * H);
+    const d = new Date(now() + 6 * H);
     $("dateLine").textContent = d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }) + (F.streak >= 2 && F.lastActive === dayKey() ? ` · ${F.streak} cosy days in a row` : "");
     $("coins").textContent = F.coins;
     document.title = `${F.name}'s village`;
@@ -1843,20 +2736,20 @@ details[open] summary::after{content:"–"}
     $("plant").style.display = L >= 2 ? "" : "none";
     $("lights").style.display = L >= 3 ? "" : "none";
     $("bunting").style.display = L >= 4 ? "" : "none";
-    $("crown").style.display = S.crown ? "" : "none";
+    $("crown").style.display = S2.crown ? "" : "none";
     pose();
-    if (!speechLock) $("speech").textContent = say ? say.line : defaultLine();
+    if (!speechLock) $("speech").textContent = say2 ? say2.line : defaultLine();
     const span = next ? next.xp - LEVELS[L].xp : 1, into = next ? F.xp - LEVELS[L].xp : 1, filled = Math.round(Math.min(1, into / span) * 5);
     $("friendBody").innerHTML = `<p class="hearts" aria-label="${filled} of 5 hearts to next level">${"♥".repeat(filled)}${"♡".repeat(5 - filled)}</p>
     <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed 💕"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>`;
     const all = allTasks(), rem = remaining(), cur = phase() === "task" && rem[0] ? rem[0].id : null;
     $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
     $("list").innerHTML = all.map((t) => {
-      const dn = S.doneIds.includes(t.id);
+      const dn = S2.doneIds.includes(t.id);
       return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"><span class="pl">${VILLAGE[placeOf(t)].emo}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : String(t.id).startsWith("x") && !dn ? `<button data-rm="${esc(t.id)}" aria-label="Remove">✕</button>` : "<span></span>"}</li>`;
     }).join("");
     $("list").querySelectorAll("[data-rm]").forEach((el) => el.onclick = () => {
-      S.extra = S.extra.filter((x) => x.id !== el.dataset.rm);
+      S2.extra = S2.extra.filter((x) => x.id !== el.dataset.rm);
       save(true);
     });
     $("list").querySelectorAll("[data-next]").forEach((el) => el.onclick = () => doNext(el.dataset.next));
@@ -1865,6 +2758,8 @@ details[open] summary::after{content:"–"}
     ctx();
     bag();
     trackers();
+    mailCard();
+    refreshNotebook();
   }
   var mel = { x: VILLAGE.home.door[0], y: VILLAGE.home.door[1], tx: VILLAGE.home.door[0], ty: VILLAGE.home.door[1], dir: 1, moving: false };
   var maple = { x: mel.x - 24, y: mel.y + 2, tx: mel.x - 24, ty: mel.y + 2, dir: 1, moving: false };
@@ -1882,6 +2777,7 @@ details[open] summary::after{content:"–"}
       atSpot = null;
       boardOpen = false;
       selPlot = null;
+      resetScene();
       const p = at || [260, 596];
       mel.x = mel.tx = p[0];
       mel.y = mel.ty = p[1];
@@ -1898,7 +2794,7 @@ details[open] summary::after{content:"–"}
       render(true);
       w.classList.remove("fading");
       if (route.length) nextLeg();
-      if (id === "market") speak("Welcome to the market! Have a browse.", 4e3);
+      if (id === "market") speak(isHere("hana") ? "Welcome to the market! Hana's in. Have a browse." : NPCS.find((n) => n.id === "hana").away, 4500);
     }, 220);
   }
   function go(target, x, y, fn) {
@@ -1939,14 +2835,14 @@ details[open] summary::after{content:"–"}
       return;
     }
     if (ph === "clean" && scene === "home" && id === "cupboard") {
-      setSay(S.wipe ? "Five minutes. Hard stop, promise." : "Wet wipes live here. Grab one!");
+      setSay(S2.wipe ? "Five minutes. Hard stop, promise." : "Wet wipes live here. Grab one!");
       render();
       return;
     }
     if (ph === "task") {
       const t = remaining()[0];
-      if (placeOf(t) === scene && spotOf(t) === id && !S.arrived[t.id]) {
-        S.arrived[t.id] = true;
+      if (placeOf(t) === scene && spotOf(t) === id && !S2.arrived[t.id]) {
+        S2.arrived[t.id] = true;
         setSay(`Here at the ${spotObj(scene, id).name.toLowerCase()}. First tiny step…`);
         save();
         return;
@@ -1979,6 +2875,17 @@ details[open] summary::after{content:"–"}
     return [p.x, p.y];
   }
   svg.addEventListener("click", (ev) => {
+    const npc = ev.target.closest("[data-npc]");
+    if (npc) {
+      tapNpc(npc.dataset.npc);
+      return;
+    }
+    const ug = ev.target.closest("[data-ugarden]");
+    if (ug) {
+      const k = ug.dataset.ugarden, st = ST[k] || {};
+      speak(`${(st.users || 0).toLocaleString()} ${k === "chord" ? "creatives use Chord" : "families use Chico"}! One flower for every ${st.per > 0 ? st.per : 10}.`, 4500);
+      return;
+    }
     const ent = ev.target.closest("[data-ent]");
     if (ent && ent.dataset.ent === "evan") {
       evanSays(pick(["Mama!", "hug!", "hehe!", "up up!"]));
@@ -2030,7 +2937,7 @@ details[open] summary::after{content:"–"}
     mel.ty = clamp(y, b[1], b[3]);
   });
   window.addEventListener("keydown", (e) => {
-    if (e.target.closest("input")) return;
+    if (e.target.closest("input") || notebookOpen()) return;
     const k = { ArrowUp: "u", ArrowDown: "d", ArrowLeft: "l", ArrowRight: "r", w: "u", s: "d", a: "l", d: "r" }[e.key];
     if (k) {
       keys.add(k);
@@ -2043,7 +2950,7 @@ details[open] summary::after{content:"–"}
     const k = { ArrowUp: "u", ArrowDown: "d", ArrowLeft: "l", ArrowRight: "r", w: "u", s: "d", a: "l", d: "r" }[e.key];
     if (k) keys.delete(k);
   });
-  function stepTo(e, speed, dt) {
+  function stepTo2(e, speed, dt) {
     const dx = e.tx - e.x, dy = e.ty - e.y, d = Math.hypot(dx, dy);
     if (d < 1.2) {
       e.x = e.tx;
@@ -2068,7 +2975,7 @@ details[open] summary::after{content:"–"}
   var EVAN_SPOTS = { village: [[260, 360], [210, 330], [320, 330], [170, 380], [360, 380], [300, 600], [380, 630], [190, 470], [120, 540], [300, 470]], home: [[150, 500], [330, 520], [260, 340], [200, 600], [360, 330]] };
   function tickEvan(dt) {
     if (!evanHere()) return;
-    if (stepTo(evan, evan.run ? 130 : 70, dt)) {
+    if (stepTo2(evan, evan.run ? 130 : 70, dt)) {
       evan.wait -= dt;
       if (evan.wait <= 0) {
         const r = Math.random(), b = bounds();
@@ -2106,14 +3013,14 @@ details[open] summary::after{content:"–"}
     n.firstElementChild.setAttribute("transform", `scale(${e.dir} 1)`);
     n.classList.toggle("walk", e.moving);
   }
-  function bubbleAt(el, ex, ey, off) {
+  function bubbleAt(el, ex, ey, off, forceBelow) {
     if (el.hidden) return;
     const wrap = $("map"), cw = wrap.clientWidth, sc = cw / W;
     const bw = el.offsetWidth, bh = el.offsetHeight, px = ex * sc, py = (ey - off) * sc;
     const left = clamp(px, bw / 2 + 2, cw - bw / 2 - 2);
     el.style.left = left + "px";
     el.style.setProperty("--tail", clamp(px - left + bw / 2, 16, bw - 16) + "px");
-    const below = py - bh - 10 < -6;
+    const below = forceBelow || py - bh - 10 < -6;
     el.classList.toggle("below", below);
     el.style.top = (below ? (ey + 8) * sc + 10 : py - 10) + "px";
   }
@@ -2131,7 +3038,7 @@ details[open] summary::after{content:"–"}
       mel.tx = clamp(mel.x + dx, b[0], b[2]);
       mel.ty = clamp(mel.y + dy, b[1], b[3]);
     }
-    const arrived = stepTo(mel, keys.size ? 190 : 220, dt);
+    const arrived = stepTo2(mel, keys.size ? 190 : 220, dt);
     if (arrived && !keys.size && (mel.wasMoving || mel.force)) {
       mel.force = false;
       if (route.length && route[0].scene === scene) {
@@ -2161,19 +3068,26 @@ details[open] summary::after{content:"–"}
       maple.tx = mel.x - mel.dir * 24;
       maple.ty = mel.y + 3;
       const d = Math.hypot(maple.tx - maple.x, maple.ty - maple.y);
-      stepTo(maple, Math.max(120, d * 3.2), dt);
+      stepTo2(maple, Math.max(120, d * 3.2), dt);
       if (!maple.moving) maple.dir = mel.dir;
     } else maple.moving = false;
     tickEvan(dt);
+    tickNpcs(dt);
     placeNode(nodes.mel, mel);
     placeNode(nodes.maple, maple);
     placeNode(nodes.evan, evan);
+    if (scene === "home" && atSpot === "treadmill" && !route.length && S2.timer && S2.timer.kind === "task" && Math.abs(mel.x - mel.tx) < 2) {
+      nodes.mel.classList.add("walk");
+      mel.dir = 1;
+    }
     nodes.evan.classList.toggle("run", evan.run && evan.moving);
-    const order = [["mel", mel], ["maple", maple], ["evan", evan]].sort((a, b) => a[1].y - b[1].y);
+    const order = [[nodes.mel, mel], [nodes.maple, maple], [nodes.evan, evan], ...npcActors()].sort((a, b) => a[1].y - b[1].y);
     const g = $("actors");
-    order.forEach(([k]) => {
-      if (g.lastElementChild !== nodes[k]) g.appendChild(nodes[k]);
+    order.forEach(([n]) => {
+      if (g.lastElementChild !== n) g.appendChild(n);
     });
+    const chip = !(phase() === "task" && arrivedFor(remaining()[0]) && !notebookOpen() && !route.length);
+    if ($("doTask").hidden !== chip) $("doTask").hidden = chip;
     const close = Math.hypot(maple.x - mel.x, maple.y - mel.y) < 60;
     bubbleAt($("speech"), close ? maple.x * 0.35 + mel.x * 0.65 : maple.x, close ? Math.min(maple.y, mel.y) : maple.y, close ? 76 : sleeping ? 18 : 30);
     if (evanHere()) bubbleAt($("evanSay"), evan.x, evan.y, 40);
@@ -2183,11 +3097,11 @@ details[open] summary::after{content:"–"}
   $("stepForm").onsubmit = (e) => {
     e.preventDefault();
     const v = Math.max(0, parseInt($("stepIn").value, 10) || 0);
-    S.steps = v;
+    S2.steps = v;
     const ms = Math.floor(v / 1e3);
-    if (ms > S.stepMs) {
-      earn(2 * (ms - S.stepMs), "steps");
-      S.stepMs = ms;
+    if (ms > S2.stepMs) {
+      earn(2 * (ms - S2.stepMs), "steps");
+      S2.stepMs = ms;
     }
     speak(v >= 5e3 ? `${v.toLocaleString()}! 5,000 smashed 🎉` : `${v.toLocaleString()}. ${(5e3 - v).toLocaleString()} to go!`, 5e3);
     $("stepIn").value = "";
@@ -2199,7 +3113,7 @@ details[open] summary::after{content:"–"}
     e.preventDefault();
     const title = $("addTitle").value.trim();
     if (!title) return;
-    S.extra.push({ id: "x" + Date.now().toString(36), title, minutes: Math.min(180, Math.max(5, parseInt($("addMin").value, 10) || 25)) });
+    S2.extra.push({ id: "x" + Date.now().toString(36), title, minutes: Math.min(180, Math.max(5, parseInt($("addMin").value, 10) || 25)) });
     $("addTitle").value = "";
     $("addMin").value = "";
     save(true);
@@ -2230,6 +3144,47 @@ details[open] summary::after{content:"–"}
   };
   placeCtx();
   addEventListener("resize", placeCtx);
+  initNotebook({
+    task: () => phase() === "task" ? remaining()[0] : null,
+    S: () => S2,
+    F: () => F,
+    fs: (t) => !!S2.firstStep[t.id],
+    act: nbAct,
+    timerLeft,
+    sayNow: () => say2,
+    sample: () => sampleCap,
+    sampleDenied: () => {
+      sampleCap = null;
+    },
+    sayButton,
+    markRead,
+    agentName,
+    onClose: () => render(),
+    placeLabel: (t) => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`
+  });
+  initNpcs({
+    scene: () => scene,
+    bounds,
+    mel,
+    evan,
+    F: () => F,
+    S: () => S2,
+    save: () => save(),
+    facts,
+    bubble: bubbleAt,
+    evanSays,
+    unreadMail,
+    openMail: (item) => openMail(item),
+    gift: (id) => {
+      addInv(id, 1);
+      flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()} ${ITEMS[id].e}`);
+      save();
+    }
+  });
+  $("doTask").onclick = () => {
+    const t = phase() === "task" && remaining()[0];
+    if (t) A.notebook(t);
+  };
   render(true);
   if (F.gift) setTimeout(() => speak("A welcome gift! Seeds are in your backpack 🌷", 5e3), 1200);
   requestAnimationFrame(frame);

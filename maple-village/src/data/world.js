@@ -15,8 +15,8 @@ export const VILLAGE = {
   pond:   {name:"Pond", door:[338,614], spot:true, line:"The pond. Best break spot in town."}
 };
 export const WORK = ["hall","chord","fresh","chico","post","home"];
-export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], M:[260,400]};
-// station: [id, name, slot, furniture, keyword regex, line]
+export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], M:[260,400]};
+// station: [id, name, slot, furniture, keyword regex, line, standDy?]  (standDy: where Mel stands, relative to the front edge; default +42)
 export const ROOMS = {
   hall:  {name:"Town hall", wall:"#E6E9F5", trim:"var(--peri)", stations:[
     ["table","Planning table","C","table",/plan|strategy|review|ceo|goal|week|month|quarter|budget/,"Big-picture thinking lives here."],
@@ -48,7 +48,8 @@ export const ROOMS = {
     ["kitchen","Kitchen","B","kitchen",/cook|meal|lunch|dinner|bake|grocer|prep/,"Something smells good."],
     ["sofa","Sofa","C","sofa",/read|rest|journal|meditat|book|nap/,"Soft cushions, deep breaths."],
     ["laundry","Laundry basket","D","laundry",/fold|laundry|clothes|wash|iron/,"Fold, stack, done."],
-    ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Wet wipes live here."]]},
+    ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Wet wipes live here."],
+    ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };
@@ -56,7 +57,7 @@ export const ROOMS = {
 export const BOARD = {id:"board", name:"Quest board", x:260, y:200, mark:[260,60]};
 export function stationsOf(scene){
   const r = ROOMS[scene]; if (!r) return [];
-  return r.stations.map(([id, name, slot, kind, re, line]) => ({id, name, kind, re, line, x:POS[slot][0], y:POS[slot][1], tx:POS[slot][0], ty:POS[slot][1] + 42}));
+  return r.stations.map(([id, name, slot, kind, re, line, dy]) => ({id, name, kind, re, line, x:POS[slot][0], y:POS[slot][1], tx:POS[slot][0], ty:POS[slot][1] + (dy ?? 42)}));
 }
 export const spotObj = (scene, id) => id === "board" ? {id:"board", name:"Quest board", tx:260, ty:200, line:"This building's quests."} : stationsOf(scene).find(s => s.id === id);
 
@@ -72,12 +73,14 @@ export function placeOf(t){
   return "post";
 }
 export function spotOf(t){
-  const pl = placeOf(t), st = stationsOf(pl).filter(s => s.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title));
+  // The cupboard and treadmill are only picked on purpose (the clean, or "Do it on the treadmill").
+  const pl = placeOf(t), st = stationsOf(pl).filter(s => (s.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title)) && s.id !== "treadmill");
+  if (t.spot === "treadmill" && pl === "home") return "treadmill";
   if (t.spot && st.find(s => s.id === t.spot)) return t.spot;
   const s = t.title.toLowerCase();
   const hit = st.find(x => x.re && x.re.source !== "." && x.re.test(s));
   if (hit) return hit.id;
-  const fallback = st.filter(x => x.id !== "cupboard");
+  const fallback = st.filter(x => x.id !== "cupboard");  // (treadmill already excluded above)
   const dflt = fallback.find(x => x.re && x.re.source === ".");
   return dflt ? dflt.id : fallback[hash(t.id) % fallback.length].id;
 }

@@ -1,0 +1,68 @@
+/* ---------- "Do task" notebook overlay ---------- */
+.notebook{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));
+  background:rgba(47,43,40,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:nbfade .2s ease}
+.notebook[hidden]{display:none}
+@keyframes nbfade{from{opacity:0}to{opacity:1}}
+body.nb-open{overflow:hidden}
+.nbpage{position:relative;width:min(680px,100%);max-height:calc(100dvh - 28px);display:flex;flex-direction:column;
+  background-color:#FFFDF7;color:#2F2B28;
+  background-image:linear-gradient(90deg,transparent 46px,rgba(239,163,166,.55) 46px,rgba(239,163,166,.55) 47.5px,transparent 47.5px),
+    repeating-linear-gradient(180deg,transparent 0 31px,rgba(154,169,221,.28) 31px 32px),var(--fibre);
+  background-position:0 0,0 14px,0 0;
+  padding:30px 26px 0 64px;border-radius:3px;transform:rotate(-.4deg);
+  box-shadow:0 2px 3px rgba(60,40,30,.08),0 30px 60px -30px rgba(40,30,20,.55);
+  clip-path:polygon(0 0,100% 0,100% 100%,97% 99.3%,93% 100%,88% 99.2%,83% 100%,77% 99.4%,71% 100%,64% 99.2%,58% 100%,51% 99.3%,45% 100%,38% 99.2%,31% 100%,25% 99.4%,18% 100%,12% 99.2%,6% 100%,0 99.4%);
+  animation:nbin .32s cubic-bezier(.3,.7,.4,1.1)}
+@keyframes nbin{from{transform:rotate(-2deg) translateY(30px) scale(.96);opacity:.3}to{transform:rotate(-.4deg)}}
+.nbpage::before,.nbpage::after{content:"";position:absolute;top:-6px;width:96px;height:24px;opacity:.85;z-index:2;
+  clip-path:polygon(2% 10%,9% 0,18% 8%,28% 2%,40% 9%,52% 1%,64% 8%,76% 2%,88% 9%,98% 3%,96% 50%,99% 94%,89% 99%,77% 91%,65% 100%,53% 92%,41% 100%,29% 92%,17% 99%,7% 91%,0 97%,3% 50%)}
+.nbpage::before{left:22px;transform:rotate(-8deg);background-color:var(--peri);background-image:radial-gradient(circle,rgba(255,255,255,.85) 1.6px,transparent 2px);background-size:9px 9px}
+.nbpage::after{right:22px;transform:rotate(7deg);background:repeating-linear-gradient(90deg,var(--sage) 0 5px,#CFE0C1 5px 9px)}
+.nbpage > *{position:relative}
+.nbx{position:absolute;top:10px;right:12px;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:#8A8279;font-size:1.05rem;z-index:3}
+.nbx:hover{background:rgba(0,0,0,.05)}
+.nbmeta{margin:0 40px 4px 0;font-size:.72rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:#8A8279}
+.nbpage h2{font-family:"Klee One",serif;font-weight:600;font-size:clamp(1.6rem,5.6vw,2.1rem);line-height:1.2;margin:0 40px 10px 0;letter-spacing:-.01em}
+.nbtimer{display:flex;align-items:baseline;gap:10px;margin:0 0 6px;font-family:"Klee One",serif;font-weight:600;font-size:1.7rem;color:#2F3B73;font-variant-numeric:tabular-nums}
+.nbtimer small{font-family:Mulish,sans-serif;font-weight:600;font-size:.85rem;color:#8A8279}
+.nbbody{overflow:auto;flex:1;min-height:0;padding:4px 4px 18px 0;line-height:32px;font-size:1rem;overscroll-behavior:contain}
+.nbbody p{margin:0}
+.nbbody .hl{color:#2F2B28}
+.nbfirst{margin-bottom:6px!important}
+.nbnotes ul{margin:0;padding-left:20px}
+.nbnotes a,.nbbody a:not(.btn){color:#2F3B73;font-weight:600;text-decoration:underline;text-decoration-color:var(--peri2);text-underline-offset:3px;word-break:break-all}
+.nbnone{color:#8A8279;font-style:italic}
+.nbpep{font-family:"Klee One",serif;color:#8A8279;margin-top:6px!important}
+.nblbl{font-size:.7rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#8A8279;line-height:32px}
+.nbmail{margin:6px 0;padding:0 14px 10px;background:rgba(191,214,230,.32);border-radius:4px;transform:rotate(.3deg)}
+.nbdraft{font:inherit;line-height:1.55;white-space:pre-wrap;background:#FFFFFF;border:1px dashed var(--peri2);border-radius:4px;padding:10px 12px;margin:0 0 10px;max-height:180px;overflow:auto}
+.nbrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0}
+.nbhint{font-size:.85rem;color:#8A8279;line-height:1.5;margin-top:6px!important}
+.nbsay{margin:10px 0 4px;padding:8px 14px;background:var(--butter);color:#3B3320;border-radius:4px;transform:rotate(-.5deg);line-height:1.5}
+.nbsay p{padding:4px 0}
+.nbtalk{margin-top:8px}
+.nbchat{display:grid;gap:8px;max-height:220px;overflow:auto;line-height:1.5;margin:0 0 6px;padding:2px}
+.nbchat p{max-width:88%;padding:7px 12px;border-radius:14px}
+.nbchat p.user{justify-self:end;background:var(--peri);color:#2F3B73;border-bottom-right-radius:4px}
+.nbchat p.assistant{background:#F4EEE3;font-family:"Klee One",serif;font-weight:600;border-bottom-left-radius:4px}
+.nbask input{flex:1;min-width:140px;border:0;border-bottom:1.5px solid var(--peri2);background:transparent;padding:6px 2px;line-height:1.4;color:#2F2B28}
+.nbask input:focus{outline:none;border-bottom-color:#2F3B73}
+.nbactions{display:flex;flex-wrap:wrap;gap:12px 10px;padding:14px 0 26px;border-top:1.5px dashed rgba(154,169,221,.55);background:linear-gradient(180deg,rgba(255,253,247,.85),#FFFDF7)}
+.nbpage .btn.alt{background:#EAE3D8;color:#2F2B28}
+.nbpage .btn{color:#2F3B73}
+.nbpage a.btn{text-decoration:none;display:inline-block}
+.nbpage .btn.yes{color:#3B3320}
+@media (max-width:520px){.nbpage{padding:26px 16px 0 40px;background-position:0 0,0 14px,0 0;background-image:linear-gradient(90deg,transparent 28px,rgba(239,163,166,.55) 28px,rgba(239,163,166,.55) 29.5px,transparent 29.5px),repeating-linear-gradient(180deg,transparent 0 31px,rgba(154,169,221,.28) 31px 32px),var(--fibre)}
+  .nbactions .btn{padding:11px 22px}}
+@media (prefers-reduced-motion:reduce){.notebook,.nbpage{animation:none}}
+
+/* floating "Do task" chip on the map when Mel is at the quest's spot */
+.dotask{position:absolute;left:50%;bottom:14px;transform:translateX(-50%) rotate(-1deg);z-index:4;box-shadow:0 10px 20px -12px rgba(46,58,112,.6);animation:pop2 .35s ease}
+.dotask[hidden]{display:none}
+
+/* letters card */
+.mail li{grid-template-columns:30px 1fr auto}
+.mail li.unread .t{font-weight:700}
+.mail li button.open{background:none;border:0;padding:0;text-align:left;color:inherit;font:inherit}
+.mail li button.open:hover .t{text-decoration:underline;text-underline-offset:3px}
+.mail li small{color:var(--soft);font-size:.8rem}

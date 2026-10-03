@@ -7,9 +7,9 @@ import { CROPS, PLOTS } from "../data/items.js";
 let G = null;
 export const setArtContext = g => { G = g; };
 
-export function tapeLabel(x, y, text, col){
-  const w = text.length*8.2 + 22;
-  return `<g transform="translate(${x} ${y}) rotate(-2)" pointer-events="none"><path d="M${-w/2} -11 l4 -1.5 l${w-8} 1 l4 -1 l-2 11 l2 11 l-4 1 l${-(w-8)} -1 l-4 1 l2 -11z" style="fill:${col}" opacity=".85"/><text class="lab" x="0" y="5" text-anchor="middle">${text}</text></g>`;
+export function tapeLabel(x, y, text, col, size){
+  const w = text.length*(size ? size*.56 : 8.2) + 22;
+  return `<g transform="translate(${x} ${y}) rotate(-2)" pointer-events="none"><path d="M${-w/2} -11 l4 -1.5 l${w-8} 1 l4 -1 l-2 11 l2 11 l-4 1 l${-(w-8)} -1 l-4 1 l2 -11z" style="fill:${col}" opacity=".85"/><text class="lab" x="0" y="5" text-anchor="middle"${size ? ` style="font-size:${size}px"` : ""}>${text}</text></g>`;
 }
 export const sk = (art, lines) => `<g filter="url(#marker)">${art}</g><g filter="url(#wob)" fill="none" ${ink}>${lines}</g>`;
 export function house(id, x, y, w, h, wall, roof, label, tapeCol, extra){
@@ -75,7 +75,7 @@ export function villageArt(){
         <ellipse cx="455" cy="580" rx="7" ry="3.5" style="fill:var(--tree)"/><circle cx="455" cy="577" r="2" style="fill:var(--rose)"/>
         <rect x="322" y="596" width="34" height="6" rx="2" style="fill:var(--wood)"/><path d="M326 602 v8 M352 602 v8 M322 592 h34" /></g>
       ${tapeLabel(430, 630, "Pond", "var(--sky)")}</g>`;
-  return ground + places;
+  return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 34, 536, 8, 2, 12);
 }
 export function notesArt(x, y, n){
   const c = ["#FFFDF6","#F6E3A1","#F4C7CF","#C3CDEE","#DCE8C8"];
@@ -124,6 +124,8 @@ export function furn(kind, x, y){
       `<rect x="${x-30}" y="${y-92}" width="60" height="92" rx="3"/><path d="M${x-30} ${y-62} h60 M${x-30} ${y-32} h60"/><path d="M${x-8} ${y-78} h16 M${x-8} ${y-48} h16 M${x-8} ${y-18} h16" stroke-width="3"/>`);
     case "scales": return sk(`<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3" style="fill:${W2}"/><path d="M${x-36} ${y-30} h28 l-4 -10 h-20z" style="fill:var(--butter)"/><rect x="${x+10}" y="${y-48}" width="12" height="18" rx="2" style="fill:var(--rose)"/><rect x="${x+28}" y="${y-40}" width="20" height="10" style="fill:#FFFDF6"/>`,
       `<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3"/><path d="M${x-36} ${y-30} h28 l-4 -10 h-20z M${x-22} ${y-40} v-10 h-10 h20"/><rect x="${x+10}" y="${y-48}" width="12" height="18" rx="2"/><rect x="${x+28}" y="${y-40}" width="20" height="10"/><path d="M${x-46} ${y-6} v14 M${x+46} ${y-6} v14"/>`);
+    case "treadmill": return sk(`<rect x="${x-24}" y="${y-74}" width="48" height="74" rx="8" style="fill:var(--sock)"/><rect x="${x-17}" y="${y-66}" width="34" height="58" rx="4" style="fill:#6B5A52"/><rect x="${x-30}" y="${y-96}" width="60" height="16" rx="4" style="fill:var(--peri)"/><rect x="${x-14}" y="${y-93}" width="20" height="9" rx="2" style="fill:#DCE8C8"/>`,
+      `<rect x="${x-24}" y="${y-74}" width="48" height="74" rx="8"/><path d="M${x-17} ${y-56} h34 M${x-17} ${y-44} h34 M${x-17} ${y-32} h34 M${x-17} ${y-20} h34" opacity=".45"/><path d="M${x-26} ${y-80} v28 M${x+26} ${y-80} v28" stroke-width="2.4"/><rect x="${x-30}" y="${y-96}" width="60" height="16" rx="4"/><rect x="${x-14}" y="${y-93}" width="20" height="9" rx="2"/><text x="${x-4}" y="${y-86}" text-anchor="middle" font-family="Klee One,serif" font-size="7" stroke="none" style="fill:var(--line)">1.2</text>`);
     case "shopcounter": return sk(`<rect x="${x-90}" y="${y-40}" width="180" height="40" rx="4" style="fill:${W2}"/><path d="M${x-96} ${y-118} h192 l-8 18 h-176z" style="fill:var(--card)"/><circle cx="${x-50}" cy="${y-52}" r="10" style="fill:var(--rose)"/><circle cx="${x-24}" cy="${y-52}" r="10" style="fill:var(--butter)"/><circle cx="${x+4}" cy="${y-52}" r="10" style="fill:var(--sage)"/><rect x="${x+30}" y="${y-64}" width="40" height="24" rx="3" style="fill:#FFFDF6"/>`,
       `<rect x="${x-90}" y="${y-40}" width="180" height="40" rx="4"/><path d="M${x-96} ${y-118} h192 l-8 18 h-176z"/><path d="M${x-80} ${y-118} l-3 18 M${x-50} ${y-118} l-2 18 M${x-20} ${y-118} l-1 18 M${x+10} ${y-118} v18 M${x+40} ${y-118} l1 18 M${x+70} ${y-118} l2 18" style="stroke:var(--rose)" stroke-width="6"/><path d="M${x-86} ${y-100} v60 M${x+86} ${y-100} v60"/><rect x="${x+30}" y="${y-64}" width="40" height="24" rx="3"/><text x="${x+50}" y="${y-48}" text-anchor="middle" font-family="Klee One,serif" font-size="11" stroke="none" style="fill:var(--line)">open</text>`);
   }
@@ -179,4 +181,31 @@ export function farmArt(){
     <g filter="url(#wob)" ${ink}><path d="M212 590 v34 M308 590 v34" style="stroke:var(--wood)" stroke-width="4"/></g>
     <text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none">Back to the village</text></g>`;
   return h;
+}
+
+/* ---------- user-count gardens (outside Chord and Chico) ----------
+   stats doc: {chord:{users, per?}, chico:{users, per?}}. One flower per `per` users (default 10).
+   Bloom type steps up at 100 / 250 users; a blossom tree joins at 500 and sparkles at 1000. */
+export const GARDEN_TIERS = [[0, "daisy"], [100, "tulip"], [250, "sunflower"]];
+export function userGarden(key, x, y, cols, rows, gap){
+  const st = (G.stats() || {})[key];
+  if (!st || !(st.users >= 0)) return "";
+  const per = st.per > 0 ? st.per : 10, users = Math.floor(st.users), n = Math.min(cols*rows, Math.ceil(users/per));
+  const tier = GARDEN_TIERS.reduce((t, [min, k]) => users >= min ? k : t, "daisy");
+  const cols4 = key === "chord" ? ["#F3C969", "#FFFDF6", "#C3CDEE"] : ["#EFA3A6", "#F4C7CF", "#FFFDF6"];
+  let f = "";
+  for (let i = 0; i < n; i++) {
+    const cx = x + 4 + (i % cols)*gap + (Math.floor(i/cols) % 2)*gap/2, cy = y + 10 + Math.floor(i/cols)*gap, c = cols4[i % 3];
+    f += `<g class="bloom"><path d="M${cx} ${cy} v${tier === "sunflower" ? -9 : -6}" style="stroke:var(--moss2)" stroke-width="1.2"/>`;
+    if (tier === "daisy") f += `<circle cx="${cx}" cy="${cy-7}" r="2.6" style="fill:${c}"/><circle cx="${cx}" cy="${cy-7}" r="1" fill="#F3C969"/>`;
+    else if (tier === "tulip") f += `<path d="M${cx-3} ${cy-9} q3 -6 6 0 q-1 4 -3 4 q-2 0 -3 -4z" style="fill:${c}" stroke="var(--line)" stroke-width=".6"/>`;
+    else f += `<circle cx="${cx}" cy="${cy-11}" r="4.2" fill="#F3C969" stroke="var(--line)" stroke-width=".6"/><circle cx="${cx}" cy="${cy-11}" r="1.8" fill="#8A5A3A"/>`;
+    f += `</g>`;
+  }
+  const w = cols*gap, signX = x + w/2 + (key === "chord" ? 8 : 0), signY = y + rows*gap + 10;
+  const tree = users >= 500 ? `<g filter="url(#wob)" ${ink}><rect x="${x+w-6}" y="${y+4}" width="4" height="12" style="fill:var(--wood)"/><circle cx="${x+w-4}" cy="${y}" r="9" style="fill:#F4C7CF"/><circle cx="${x+w-10}" cy="${y+4}" r="6" style="fill:#EFA3A6"/></g>` : "";
+  const sparkle = users >= 1000 ? `<text x="${x-4}" y="${y+2}" font-size="11" class="twinkle">✨</text><text x="${x+w}" y="${y+rows*gap}" font-size="10" class="twinkle">✨</text>` : "";
+  const label = `${users.toLocaleString()} ${key === "chord" ? "creatives" : "families"}`;
+  return `<g data-ugarden="${key}" aria-label="${label}">${f}${tree}${sparkle}
+    ${tapeLabel(signX, signY, label, key === "chord" ? "var(--sage)" : "var(--blush)", 10)}</g>`;
 }

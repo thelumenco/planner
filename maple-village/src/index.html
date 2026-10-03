@@ -110,6 +110,8 @@
         <div class="mprops" id="mprops"></div>
         <p class="speech" id="speech" aria-live="polite"></p>
         <p class="speech small" id="evanSay" hidden></p>
+        <p class="speech small" id="npcSay" hidden aria-live="polite"></p>
+        <button class="btn primary dotask" id="doTask" hidden>Do task</button>
       </div>
       <p class="maphint" id="maphint"></p>
     </div>
@@ -296,6 +298,15 @@
       </details>
     </section>
 
+    <section class="card log mail" id="mailCard" hidden>
+      <span class="tape sky" aria-hidden="true"></span>
+      <details id="mailBox">
+        <summary id="mailSum">Letters</summary>
+        <ul id="mailList"></ul>
+        <p class="muted">Notes from your helpers: the briefing, inbox triage, digests and the like. A messenger runs each new one over to you.</p>
+      </details>
+    </section>
+
     <section class="card log">
       <span class="tape dots" aria-hidden="true"></span>
       <details id="friend">
@@ -310,6 +321,7 @@
     </section>
   </section>
 </main>
+<div class="notebook" id="notebook" hidden role="dialog" aria-modal="true" aria-labelledby="nbTitle"><div class="nbpage" id="nbPage"></div></div>
 <!--DEVSTUB-->
 <script>/*SCRIPT*/</script>
 </body>

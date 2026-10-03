@@ -1,0 +1,171 @@
+// "Do task" notebook overlay: a big washi-taped notebook page with the quest's notes, progress buttons that drive the
+// quest, an email block for inbox quests, and "talk to the note" via the sample capability. Also shows agent mail.
+import { $, esc } from "../util.js";
+
+let api = null;        // from core: task(), S(), F(), fs(t), act(kind, t), timerLeft(), sayNow(), sample(), placeLabel(t), markRead(item), agentName(from)
+let open = null;       // {kind:"task", id} | {kind:"mail", item}
+const chats = {};      // task id -> [{role, content}]  (memory only)
+let busy = null;       // AbortController while Claude is answering
+let lastFocus = null;
+
+export function initNotebook(a){
+  api = a;
+  const root = $("notebook");
+  root.addEventListener("click", ev => {
+    if (ev.target === root) return closeNotebook();
+    const b = ev.target.closest("[data-nb]"); if (!b) return;
+    const k = b.dataset.nb;
+    if (k === "close") return closeNotebook();
+    if (k === "ask") return ask();
+    if (k === "copy") return copyDraft(b);
+    if (k === "sayb") return api.sayButton(+b.dataset.i);
+    if (open && open.kind === "mail" && k === "thanks") { closeNotebook(); return; }
+    const t = api.task(); if (!t || !open || open.kind !== "task") return;
+    api.act(k, t);
+  });
+  root.addEventListener("keydown", ev => {
+    if (ev.key === "Escape") closeNotebook();
+    if (ev.key === "Enter" && ev.target.id === "nbAsk" && !ev.shiftKey) { ev.preventDefault(); ask(); }
+    if (ev.key === "Tab") trap(ev);
+  });
+}
+export const notebookOpen = () => !!open;
+
+export function openTask(t){ open = {kind: "task", id: t.id}; show(); }
+export function openMail(item){ open = {kind: "mail", item}; api.markRead(item); show(); }
+export function closeNotebook(){
+  if (!open) return;
+  open = null; busy && busy.abort(); busy = null;
+  const root = $("notebook"); root.hidden = true; document.body.classList.remove("nb-open");
+  api.onClose && api.onClose();
+  lastFocus && lastFocus.focus && lastFocus.focus();
+}
+function show(){
+  const root = $("notebook");
+  if (root.hidden) lastFocus = document.activeElement;
+  root.hidden = false; document.body.classList.add("nb-open");
+  refreshNotebook(true);
+}
+
+// Called by core on every render; keeps the page in sync with quest state. Closes itself if the quest moved on.
+export function refreshNotebook(focus){
+  if (!open) return;
+  const page = $("nbPage");
+  if (open.kind === "task") {
+    const t = api.task();
+    if (!t || t.id !== open.id) { closeNotebook(); return; }
+    const keep = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
+    page.innerHTML = taskPage(t);
+    if ($("nbAsk")) { $("nbAsk").value = keep; if (typing) $("nbAsk").focus(); }
+  } else page.innerHTML = mailPage(open.item);
+  const log = page.querySelector(".nbchat"); if (log) log.scrollTop = log.scrollHeight;
+  if (focus) (page.querySelector("[data-nb]:not([data-nb=close])") || page.querySelector("[data-nb]"))?.focus({preventScroll: true});
+}
+
+/* ---------- pages ---------- */
+const linkify = s => esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)]/g, u => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u.replace(/^https?:\/\//, "").slice(0, 48)}${u.length > 56 ? "…" : ""} ↗</a>`);
+function notesHTML(text){
+  const lines = String(text || "").split(/\r?\n/);
+  let out = "", list = false;
+  for (const ln of lines) {
+    const m = ln.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)/);
+    if (m) { if (!list) { out += "<ul>"; list = true; } out += `<li>${linkify(m[1])}</li>`; continue; }
+    if (list) { out += "</ul>"; list = false; }
+    if (ln.trim()) out += `<p>${linkify(ln)}</p>`;
+  }
+  return out + (list ? "</ul>" : "");
+}
+
+function taskPage(t){
+  const S = api.S(), fs = api.fs(t), left = api.timerLeft(t), say = api.sayNow();
+  const tread = S.tread && S.tread[t.id];
+  const em = t.email || null;
+  let h = `<button class="nbx" data-nb="close" aria-label="Close notebook">✕</button>
+    <p class="nbmeta">${esc(api.placeLabel(t))}${t.at ? ` · ⏰ ${esc(t.at)}` : ""}</p>
+    <h2 id="nbTitle">${esc(t.title)}</h2>`;
+  if (left != null) h += `<p class="nbtimer"><span data-tleft>${left}</span> <small>${tread ? "walking at 1.2" : "left on the time box"}</small></p>`;
+  h += `<div class="nbbody">`;
+  h += `<p class="nbfirst"><span class="hl">First step:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}${fs ? " <b>✓</b>" : ""}</p>`;
+  if (t.notes) h += `<div class="nbnotes">${notesHTML(t.notes)}</div>`;
+  else h += `<p class="nbnone">No notes from Sunsama on this one. Ask chat to add some, or talk it through below.</p>`;
+  if (em) {
+    h += `<div class="nbmail"><p class="nblbl">Email</p>
+      ${em.who ? `<p><b>To / from:</b> ${esc(em.who)}</p>` : ""}${em.subject ? `<p><b>Subject:</b> ${esc(em.subject)}</p>` : ""}
+      ${em.draft ? `<p class="nblbl">Draft from chat</p><pre class="nbdraft" id="nbDraft">${esc(em.draft)}</pre>` : ""}
+      <div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(em.link) || "https://mail.google.com/mail/u/0/#inbox")}" target="_blank" rel="noopener noreferrer">Open in Gmail ↗</a>
+      ${em.draft ? `<button class="btn alt small" data-nb="copy">Copy draft</button>` : ""}</div>
+      <p class="nbhint">Sending stays with you in Gmail. Tell chat if you'd like the draft changed.</p></div>`;
+  }
+  if (t.pep) h += `<p class="nbpep">♡ ${esc(t.pep)}</p>`;
+  if (say && say.line) h += `<div class="nbsay"><p><span aria-hidden="true">🦊</span> ${esc(say.line)}</p>${say.buttons ? `<div class="nbrow">${say.buttons.map((b, i) => `<button class="btn alt small" data-nb="sayb" data-i="${i}">${esc(b[0])}</button>`).join("")}</div>` : ""}</div>`;
+  const chat = chats[t.id] || [];
+  if (api.sample() !== null || chat.length) {
+    h += `<div class="nbtalk"><p class="nblbl">Talk to the note</p>
+      ${chat.length ? `<div class="nbchat" aria-live="polite">${chat.map(m => `<p class="${m.role}">${m.role === "user" ? "" : "🦊 "}${esc(m.content)}</p>`).join("")}</div>` : ""}
+      ${api.sample() ? `<div class="nbrow nbask"><label class="sr" for="nbAsk">Ask about this quest</label><input id="nbAsk" placeholder="${chat.length ? "reply…" : "stuck? ask anything about this quest"}" autocomplete="off" ${busy ? "disabled" : ""}>
+      <button class="btn small" data-nb="ask" ${busy ? "disabled" : ""}>${busy ? "…" : "Ask"}</button></div>` : `<p class="nbhint">Talking to the note isn't available here.</p>`}</div>`;
+  }
+  h += `</div><div class="nbactions">
+    ${!fs ? `<button class="btn primary" data-nb="started">Started</button>` : `<button class="btn alt" data-nb="halfway">Halfway</button>`}
+    <button class="btn alt" data-nb="stuck">Stuck</button>
+    ${fs ? `<button class="btn alt" data-nb="more">Need more time</button>` : ""}
+    ${t.treadmill && !tread ? `<button class="btn alt" data-nb="treadmill">🚶 Do it on the treadmill</button>` : ""}
+    ${fs ? `<button class="btn yes" data-nb="done">Done</button>` : ""}
+  </div>`;
+  return h;
+}
+
+function mailPage(item){
+  return `<button class="nbx" data-nb="close" aria-label="Close note">✕</button>
+    <p class="nbmeta">a note from ${esc(api.agentName(item.from))}${item.at ? ` · ${new Date(item.at).toLocaleTimeString("en-GB", {hour: "numeric", minute: "2-digit", timeZone: "Asia/Singapore"})}` : ""}</p>
+    <h2 id="nbTitle">${esc(item.title || "A note for you")}</h2>
+    <div class="nbbody"><div class="nbnotes">${notesHTML(item.body)}</div>
+    ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Open the full thing ↗</a></div>` : ""}</div>
+    <div class="nbactions"><button class="btn yes" data-nb="thanks">Thanks!</button></div>`;
+}
+const safeUrl = u => (typeof u === "string" && /^https?:\/\//i.test(u)) ? u : null;
+
+/* ---------- talk to the note ---------- */
+async function ask(){
+  const input = $("nbAsk"), sample = api.sample(), t = api.task();
+  if (!input || !sample || !t || busy) return;
+  const q = input.value.trim(); if (!q) return;
+  const log = chats[t.id] = chats[t.id] || [];
+  log.push({role: "user", content: q}, {role: "assistant", content: "…"});
+  input.value = ""; busy = new AbortController(); refreshNotebook();
+  const S = api.S(), left = api.timerLeft(t);
+  const brief = `You are Maple, a tiny fox who coaches Mel through her work day inside a cosy village game. Warm, direct, short sentences, never guilt, no lectures.
+Reply in at most 3 short sentences and end with exactly one tiny physical next action. Plain text, no markdown, at most one emoji.
+If the task involves pricing, remind her to price on the value delivered, not on what the buyer can afford.
+Never claim to have done anything outside this conversation (you can't send emails, tick tasks or set timers).
+Quest: ${t.title}
+First step: ${t.firstStep || "(none given)"}
+Time box: ${t.minutes || 25} minutes${left ? `, ${left} left` : ""}${api.fs(t) ? ", first step done" : ", not started yet"}
+Notes: ${t.notes || "(none)"}${t.email ? `\nEmail: ${JSON.stringify(t.email)}` : ""}
+Quests finished today: ${S.doneIds.length}`;
+  const turns = log.slice(0, -1).map((m, i) => i === 0 ? {role: "user", content: brief + "\n\nMel says: " + m.content} : m);
+  try {
+    const res = await sample(turns, {signal: busy.signal, cache: false, modelTier: "quick",
+      onText: ({text}) => { log[log.length - 1].content = text; const el = document.querySelector(".nbchat p:last-child"); if (el) el.textContent = "🦊 " + text; }});
+    log[log.length - 1].content = res.text.trim() || "Hmm, I lost my words. Try again?";
+  } catch (e) {
+    const msg = {not_granted: "No worries, we'll keep it to buttons. Talking needs your OK first.", rate_limited: "I need a little breather. Try again in a minute.", cancelled: null}[e && e.code];
+    if (e && e.code === "cancelled") log.splice(-2); else log[log.length - 1].content = e && e.text ? e.text : (msg || "I couldn't reach Claude just now. Buttons still work!");
+    if (e && e.code === "not_granted") api.sampleDenied();
+  }
+  busy = null; refreshNotebook(); $("nbAsk")?.focus();
+}
+
+async function copyDraft(btn){
+  const t = api.task(); const d = t && t.email && t.email.draft; if (!d) return;
+  try { await navigator.clipboard.writeText(d); btn.textContent = "Copied ✓"; }
+  catch { const r = document.createRange(); r.selectNodeContents($("nbDraft")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Selected, now copy"; }
+}
+
+function trap(ev){
+  const f = [...$("notebook").querySelectorAll("button:not([disabled]),a[href],input:not([disabled])")];
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
+  else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+}
