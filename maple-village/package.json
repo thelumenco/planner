@@ -1,0 +1,13 @@
+{
+  "name": "maple-village",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --dev",
+    "check": "node --check build.mjs && node test/smoke.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}
