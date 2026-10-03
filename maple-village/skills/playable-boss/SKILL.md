@@ -65,6 +65,8 @@ Mel has a companion page with a tiny fox called Maple (she may rename it — use
 
 **Then open the page for her.** Right after the plan is written, call the Artifact tool with `action: "open"` and the url above, so Maple's den pops up on her screen at every kick-off. Do this every time boss mode starts, even if she opened it earlier in the day. If the open fails or the tool isn't available, give her the link in one line instead.
 
+**The page can pull Sunsama itself.** When Mel opens the village and today has no plan, the page fetches today's Sunsama tasks through her Sunsama connector and writes them as the plan with `"source": "sunsama"` (Sunsama ids, notes, time estimates, no first steps or pep talks). Your kick-off plan replaces it. Keep the same Sunsama ids so her progress carries over. Never overwrite a plan of yours with a page pull.
+
 **Whenever the plan changes** (day-reshuffler, a task moved, a new urgent task), rewrite the plan document the same way so the page matches.
 
 **Don't double-run tasks.** If Mel is working from the page, let the page hand out tasks, breaks and pep talks. In chat, handle what she brings over: "call done", "boss, this task is unclear", reshuffles, ticking off, filing. When she reports "done" in chat, check the page's progress too (`read_db` get on `doc_id: "today"`: `doneIds`, `steps`, `water`, `cleanDone`) so you never re-hand her something she finished there.

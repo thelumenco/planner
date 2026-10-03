@@ -5,6 +5,7 @@ import { CROPS, ITEMS, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY } from "../data/item
 import { villageArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
+import { pullSunsama, SUNSAMA_ERRORS } from "./sunsama.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere } from "./npcs.js";
 
 /* =================== STATE =================== */
@@ -52,6 +53,7 @@ const save = (redraw) => { persist("today"); persist("fox"); render(redraw); };
 
 async function initDb(){
   if (!window.claude || !claude.use) return;
+  setTimeout(() => { if (!refs) syncSunsama(); }, 12000);   // no db in this view: still pull Sunsama into the local plan
   claude.use("sample").then(sm => { sampleCap = sm || null; refreshNotebook(); }, () => {});
   const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
   if (!db || !user) return;
@@ -75,13 +77,16 @@ async function initDb(){
     if (grew) speak(`${grew === "chord" ? "Chord" : "Chico"} grew to ${ST[grew].users.toLocaleString()} users! New flowers 🌼`, 5000);
     render(scene === "village");
   }, () => {});
+  let firstPlan = true;
   refs.plan.onSnapshot(snap => {
-    if (!snap.exists) return;
-    const was = remaining().length;
-    P = snap.data(); try { localStorage.setItem("fox.plan", JSON.stringify(P)); } catch {}
-    render(true);
-    if (!was && remaining().length) speak("New quests on the boards!", 5000);
-  }, () => {});
+    if (snap.exists) {
+      const was = remaining().length;
+      P = snap.data(); try { localStorage.setItem("fox.plan", JSON.stringify(P)); } catch {}
+      markSunsamaDone(); render(true);
+      if (!was && remaining().length) speak("New quests on the boards!", 5000);
+    }
+    if (firstPlan) { firstPlan = false; syncSunsama(); }
+  }, () => { if (firstPlan) { firstPlan = false; syncSunsama(); } });
   const watch = (which) => refs[which].onSnapshot(snap => {
     const local = which === "today" ? S : F;
     if (!snap.exists) { persist(which); return; }
@@ -218,7 +223,7 @@ function timerHTML(label){
 }
 let lastReady = readyCount();
 setInterval(() => {
-  if (S.day !== dayKey()) { S = freshToday(); say = null; save(true); speak(defaultLine()); return; }
+  if (S.day !== dayKey()) { S = freshToday(); say = null; save(true); speak(defaultLine()); syncSunsama(); return; }
   const rc = readyCount();
   if (rc > lastReady) { speak(rc === 1 ? "Psst… something in the garden is ready!" : `${rc} crops ready in the garden!`, 5000); if (scene === "farm") drawScene(); }
   lastReady = rc;
@@ -315,6 +320,50 @@ function timerLeft(t){
   if (!S.timer || S.timer.id !== t.id || (S.timer.kind !== "task" && S.timer.kind !== "deal")) return null;
   return fmt(Math.max(0, S.timer.endAt - Date.now()));
 }
+
+/* =================== SUNSAMA PULL =================== */
+// On open (and when the day rolls over or the tab comes back on a new day) the page fetches today's Sunsama tasks.
+// Chat's plan wins: a pull only writes the plan when today has none, or when today's came from an earlier pull.
+// With chat's plan in place, "Check Sunsama" just adds tasks the plan doesn't have yet to the end of the line.
+const sun = {busy: false, at: 0, error: null, added: 0};
+function markSunsamaDone(){
+  (P && P.day === dayKey() && Array.isArray(P.tasks) ? P.tasks : []).forEach(t => { if (t && t.completed && !S.doneIds.includes(t.id)) S.doneIds.push(t.id); });
+}
+async function syncSunsama(manual){
+  if (sun.busy) return;
+  const fromPull = !P || P.day !== dayKey() || P.source === "sunsama";
+  if (!manual && !fromPull) return;
+  sun.busy = true; sun.error = null; render();
+  const day = dayKey(), r = await pullSunsama(day, {fresh: !!manual});
+  sun.busy = false; sun.at = Date.now();
+  if (r.error) { sun.error = r.error === "unavailable" && !manual ? null : r.error; render(); return; }
+  if (fromPull || !P || P.day !== day || P.source === "sunsama") {
+    if (!r.tasks.length && !(P && P.day === day && P.source === "sunsama")) { sun.added = 0; render(); return; }
+    const was = remaining().length;
+    P = {day, source: "sunsama", pulledAt: Date.now(), tasks: r.tasks};
+    try { localStorage.setItem("fox.plan", JSON.stringify(P)); } catch {}
+    if (refs) refs.plan.set(JSON.parse(JSON.stringify(P))).catch(() => {});
+    markSunsamaDone(); save(true);
+    if (!was && remaining().length) speak(`${remaining().length} quests from Sunsama on the boards!`, 5000);
+  } else {
+    const have = new Set(allTasks().map(t => t.id));
+    const fresh = r.tasks.filter(t => !t.completed && !have.has(t.id));
+    S.extra.push(...fresh); sun.added = fresh.length; save(true);
+    speak(fresh.length ? `Added ${fresh.length} new Sunsama task${fresh.length === 1 ? "" : "s"} to the end of the line.` : "Sunsama and the boards match. All set!", 4000);
+  }
+}
+function sunsamaLine(){
+  const el = $("sunsamaLine"); if (!el) return;
+  const src = P && P.day === dayKey() ? (P.source === "sunsama" ? "sunsama" : "chat") : null;
+  let txt = sun.busy ? "Checking Sunsama…"
+    : sun.error ? (SUNSAMA_ERRORS[sun.error] || "Couldn't reach Sunsama just now.")
+    : src === "sunsama" ? `Today's quests came straight from Sunsama${P.pulledAt ? " at " + new Date(P.pulledAt).toLocaleTimeString("en-GB", {hour: "numeric", minute: "2-digit", timeZone: "Asia/Singapore"}) : ""}. Chat's boss-mode plan replaces them with first steps and pep talks.`
+    : src === "chat" ? "Today's plan is from chat's boss mode."
+    : "Your Sunsama tasks load here when you open the village.";
+  el.innerHTML = `${esc(txt)} <button class="next" id="sunBtn" ${sun.busy ? "disabled" : ""}>${src === "chat" ? "check Sunsama for new tasks" : "refresh from Sunsama"}</button>`;
+  $("sunBtn").onclick = () => syncSunsama(true);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden && (!P || P.day !== dayKey())) syncSunsama(); });
 
 /* =================== LIBRARY DIGESTS =================== */
 // Rationed: one when an hour has passed since the last, or once a quest has been finished since the last. No stacking.
@@ -469,7 +518,7 @@ function journal(){
       <li class="pep">Garden, shop, spoil Maple. Then tell chat <span class="hl">“wind down”</span>.</li></ul>`;
   } else {
     h += `<h1><span class="lbl">ready when you are</span>The boards are empty</h1>
-      <ul class="bujo"><li>Start boss mode in chat and today's quests land on the boards.</li><li>Or add one yourself under All quests.</li></ul>`;
+      <ul class="bujo">${sun.busy ? `<li>Fetching today's Sunsama tasks…</li>` : `<li>Start boss mode in chat, or open the village, and today's Sunsama tasks land on the boards.</li>`}<li>Or add one yourself under All quests.</li></ul>`;
   }
   if (say && say.buttons) h = h.replace(/<h1>/, `<div class="actions saybtns">${say.buttons.map((x, i) => `<button class="btn alt small" data-say="${i}">${esc(x[0])}</button>`).join("")}</div><h1>`);
   j.innerHTML = h;
@@ -618,7 +667,7 @@ function render(redraw){
     return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"><span class="pl">${VILLAGE[placeOf(t)].emo}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : String(t.id).startsWith("x") && !dn ? `<button data-rm="${esc(t.id)}" aria-label="Remove">✕</button>` : "<span></span>"}</li>`; }).join("");
   $("list").querySelectorAll("[data-rm]").forEach(el => el.onclick = () => { S.extra = S.extra.filter(x => x.id !== el.dataset.rm); save(true); });
   $("list").querySelectorAll("[data-next]").forEach(el => el.onclick = () => doNext(el.dataset.next));
-  questMark(); journal(); ctx(); bag(); trackers(); mailCard(); refreshNotebook();
+  questMark(); journal(); ctx(); bag(); trackers(); mailCard(); sunsamaLine(); refreshNotebook();
 }
 /* =================== WORLD SIM =================== */
 const mel = {x:VILLAGE.home.door[0], y:VILLAGE.home.door[1], tx:VILLAGE.home.door[0], ty:VILLAGE.home.door[1], dir:1, moving:false};

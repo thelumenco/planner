@@ -5,6 +5,7 @@
 //   ?time=15:30     pretend it's this time in Singapore (NPC routines, nudges)
 //   ?nosample=1     behave as if the sample capability isn't granted
 //   ?reset=1        clear all local game + stub data first
+//   ?sunsama=1      fake Sunsama connector for the page's own Sunsama pull
 (() => {
   const q = new URLSearchParams(location.search);
   if (q.get("reset")) Object.keys(localStorage).filter(k => k.startsWith("stub:") || k.startsWith("fox.")).forEach(k => localStorage.removeItem(k));
@@ -41,7 +42,26 @@
   sample.json = async () => ({});
   sample.limits = async () => ({ maxPromptBytes: 100000 });
 
-  const caps = { db, user: { id: async () => "me", isOwner: () => true, canEdit: () => true }, sample: q.get("nosample") ? null : sample };
+  // ?sunsama=1: a fake Sunsama connector (same response shape as sunsama://tasks/<day>, invented tasks)
+  const mcp = {
+    callTool: async (server, tool, input) => {
+      await new Promise(r => setTimeout(r, 300));
+      if (server !== "Sunsama MCP" || tool !== "read_resource") throw { code: "not_in_manifest", message: "not declared" };
+      const tasks = [
+        { _id: "s1", title: "Comms catchup", timeEstimate: "15 minutes", sortOrder: 1, isWork: true, completed: false,
+          notes: '<ul data-type="taskList"><li data-type="taskItem"><label><input type="checkbox"></label><div><p>Check GHL</p></div></li><li data-type="taskItem"><label><input type="checkbox"></label><div><p>Check emails</p></div></li></ul>', subtasks: [] },
+        { _id: "s2", title: "Draft the Visibility Fix email", channel: "Ambidextrous", timeEstimate: "45 minutes", sortOrder: 2, completed: false,
+          notes: "<p>From the October plan: email the list &amp;amp; post in one community.</p>", subtasks: [] },
+        { _id: "s3", title: "🚶 Treadmill batch", channel: "Ambidextrous", timeEstimate: "50 minutes", sortOrder: 3, completed: false,
+          notes: "<p>Walk-friendly tasks.</p>", subtasks: [{ _id: "x", title: "Post on LinkedIn", completed: false }] },
+        { _id: "s4", title: "Submit to F6S", channel: "Chord", timeEstimate: "1 hour 30 minutes", sortOrder: 4, completed: false, notes: "", subtasks: [] },
+        { _id: "s5", title: "Listen to affirmations", channel: "Personal", isPersonal: true, timeEstimate: "5 minutes", sortOrder: 5, completed: true, notes: "<p></p>", subtasks: [] }
+      ];
+      return { content: [{ type: "text", text: JSON.stringify({ tasks }) }], payload: { tasks } };
+    }
+  };
+
+  const caps = { db, mcp: q.get("sunsama") ? mcp : null, user: { id: async () => "me", isOwner: () => true, canEdit: () => true }, sample: q.get("nosample") ? null : sample };
   window.claude = { use: name => new Promise(r => setTimeout(() => r(caps[name] ?? null), 250)) };
 
   if (q.get("seed")) {

@@ -132,6 +132,22 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.screenshot({ path: join(shots, `${vp.name}-5-village.png`) });
   await page.close();
 }
+// Sunsama pull: no chat plan, the page fetches today's tasks itself
+{
+  console.log("\nsunsama pull");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`sunsama pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&sunsama=1&time=07:45");
+  await page.waitForFunction(() => /came straight from Sunsama/.test(document.querySelector("#sunsamaLine").textContent), null, { timeout: 15000 });
+  const titles = await page.locator("#list .t").allTextContents();
+  check(titles.length === 5, `all five Sunsama tasks became quests (${titles.length})`);
+  check(titles.some(t => /× Listen to affirmations/.test(t)), "a task completed in Sunsama shows as done");
+  const plan = await page.evaluate(() => devDb.get("plan"));
+  check(plan && plan.source === "sunsama" && plan.tasks.find(t => t.id === "s1").notes.includes("- Check GHL"), "notes are cleaned up from Sunsama's HTML");
+  check(plan.tasks.find(t => t.id === "s4").minutes === 90 && plan.tasks.find(t => t.id === "s3").treadmill === true, "time estimates and treadmill flags carry over");
+  check(plan.tasks.find(t => t.id === "s1").email, "comms tasks become email quests at the post office");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

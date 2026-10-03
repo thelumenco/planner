@@ -19,6 +19,7 @@ Dev URL options (from `dev/claude-stub.js`, a stand-in for `window.claude.use()`
 | `?time=15:30` | pretends it's that time in Singapore (villager routines, lunch/water nudges) |
 | `?reset=1` | clears all local game data first |
 | `?nosample=1` | acts as if "talk to the note" isn't allowed |
+| `?sunsama=1` | fake Sunsama connector, for the page's own Sunsama pull (use without `?seed`) |
 
 In the browser console, `devDb.set("plan", {...})` / `devDb.get("today")` read and write the stub's documents.
 
@@ -37,6 +38,7 @@ src/
   art/interiors.js    per-building floors, walls and decor (furniture layout is ROOMS[id].pos)
   art/people.js       villager sprite rig
   game/core.js        state + db sync, quest flow, actions, UI renderers, world sim
+  game/sunsama.js     pulls today's Sunsama tasks via the mcp capability and turns them into quests
   game/npcs.js        villager routines, taps, reactions, mail messengers
   ui/notebook.js      the Do task notebook overlay and agent notes
 dev/claude-stub.js    local runtime stub (dev builds only)
@@ -49,7 +51,7 @@ All docs live under `data/users/<uid>/` in the artifact's `db`.
 
 | Doc | Written by | What |
 |---|---|---|
-| `plan` | chat | `{day, tasks:[{id, title, firstStep, minutes, pep, notes?, email?, treadmill, meeting, chat, at, place, spot}]}` |
+| `plan` | chat, or the page's own Sunsama pull (`source: "sunsama"`; chat's plan always wins) | `{day, tasks:[{id, title, firstStep, minutes, pep, notes?, email?, treadmill, meeting, chat, at, place, spot}]}` |
 | `mail` | chat / agents | `{items:[{id, from, title, body, sections?, link?, at}]}`. `from: "crier"` renders as *The Morning Crier*. `from` picks the messenger (see `AGENTS` in `data/npcs.js`) |
 | `library` | chat / book-digest | `{items:[{id, title, author, body, try?, link?, added}]}` for Juniper's digest shelf (one an hour, or one per quest done) |
 | `stats` | chat | `{chord:{users, per?}, chico:{users, per?}}` for the flower gardens |
@@ -59,7 +61,9 @@ All docs live under `data/users/<uid>/` in the artifact's `db`.
 ## Publishing
 
 1. `npm run build`.
-2. Publish `dist/maple-village.html` to the existing link, with capabilities **`{db: {}, user: {}, sample: {}}`**. Passing capabilities replaces the whole stored set, so all three must be listed. Without `sample`, everything works except "talk to the note".
+2. Publish `dist/maple-village.html` with capabilities **`{db: {}, user: {}, sample: {}, mcp: {servers: [{server: "Sunsama MCP", tools: ["read_resource"]}]}}`**. Passing capabilities replaces the whole stored set, so list them all. Without `sample`, everything works except "talk to the note" and Juniper's own picks. Without `mcp`, the page doesn't pull Sunsama itself and waits for chat's plan.
+
+Preview (private): https://claude.ai/artifact/FLecX7JuweZ4iMJgujA2ET
 3. Her progress lives in `db`, so it carries over.
 
 ## Open questions for Mel
