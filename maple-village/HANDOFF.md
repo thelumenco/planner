@@ -198,3 +198,19 @@ Fixed in the latest build: when Maple is next to Mel, the bubble lifts above Mel
 4. Then NPCs (7.1), treadmill/email (7.5–7.6), agent NPC mail (7.2), user-count gardens (7.3).
 5. Stage 3 ideas still open from earlier: decorating her house, outfits for her character, building upgrades as the businesses grow, weekly story chapters from her Notion week theme, "grumpy critters" for procrastinated tasks, seasons and festivals.
 6. Bring the built HTML back to claude.ai and publish to the same link so her progress (db) and the chat integration carry on.
+
+## 9. Progress in Claude Code (4 Oct 2026)
+
+Done, in `maple-village/` (see `README.md` for how to run and publish):
+
+- **8.1 split + build:** ES modules under `src/`, `build.mjs` inlines everything into `dist/maple-village.html`. The original single file is kept in `legacy/`.
+- **8.2 dev stub:** `dev/claude-stub.js` (db in localStorage, canned `sample`, `?seed`, `?time`, `?reset`).
+- **7.4 notebook overlay:** the **Do task** chip on the map and button on the quest card open a washi-taped notebook page with the Sunsama `notes`, first step, pep line, live timer, Maple's latest line (and her procrastination options), plus Started / Halfway / Stuck / Need more time / Done and "talk to the note" (`sample`, quick tier, no memory beyond the page).
+- **7.1 villagers:** Hana, Mr Okada, Juniper, Bo, Auntie Lin, Pip and Theo follow Singapore-time routines across the village and interiors. Tap for an intro on first meeting, then lines and once-a-day reactions (three quests done, a harvest, an email quest, lunch time…). Auntie Lin gives a free seed packet. Pip races Evan to the pond.
+- **7.5 treadmill:** a treadmill station at home. Treadmill quests offer "Do it on the treadmill" in the notebook, Mel walks in place during the time box, then a "Log my steps" prompt.
+- **7.6 email quests:** `email: {who, subject, draft, link}` on a task shows an email block with "Open in Gmail ↗" and "Copy draft". Nothing is sent from the page.
+- **7.2 agent NPCs:** new `mail` doc. Unread notes (under 36h old) are carried by a messenger who runs to Mel's character. Tap them to open the note in the notebook. A Letters card keeps the last 20.
+- **7.3 user-count gardens:** new `stats` doc. One flower per 10 users outside Chord and Chico, with blooms that step up at 100 and 250 users, a blossom tree at 500 and sparkles at 1,000.
+- `test/smoke.mjs` plays the day loop headlessly on phone and desktop.
+
+Not done yet: publishing the new build to the live link (needs `sample` added to the capabilities), stage 3 ideas (8.5), collision-aware walking and a camera/zoom for small phones (4.6).
