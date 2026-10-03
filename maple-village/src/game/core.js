@@ -4,18 +4,20 @@ import { VILLAGE, WORK, ROOMS, stationsOf, spotObj, placeOf, spotOf } from "../d
 import { CROPS, ITEMS, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY } from "../data/items.js";
 import { villageArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
-import { initNotebook, openTask, openMail, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
+import { initNotebook, openTask, openMail, openDigest, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere } from "./npcs.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
   mode:null, timer:null, berries:0, earned:0, steps:0, stepMs:0, water:0, crown:false, lunch:false, water2:false, last:null,
-  halfway:{}, tread:{}, npcSaid:{}, harvested:0, updatedAt:0});
-const freshFox = () => ({name:"Maple", xp:0, days:0, streak:0, lastActive:null, coins:null, inv:null, plots:null, cool:{}, met:{}, gifts:{}, mailRead:{}, updatedAt:0});
+  halfway:{}, tread:{}, npcSaid:{}, harvested:0, digestMark:0, updatedAt:0});
+const freshFox = () => ({name:"Maple", xp:0, days:0, streak:0, lastActive:null, coins:null, inv:null, plots:null, cool:{}, met:{}, gifts:{}, mailRead:{}, digest:{read:{}, lastAt:0, mine:[]}, updatedAt:0});
 const load = (k, f) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ? Object.assign(f(), v) : f(); } catch { return f(); } };
 let S = load("fox.today", freshToday), F = load("fox.fox", freshFox), P = load("fox.plan", () => ({day:null, tasks:[]}));
 // Written by chat / agents, read-only here: mail = {items:[{id, from, title, body, link?, at}]}, stats = {chord:{users, per?}, chico:{...}}
 let MAIL = load("fox.mail", () => ({items:[]})), ST = load("fox.stats", () => ({}));
+// library = {items:[{id, title, author, body, sections?, try?, link?, added}]}: book digests waiting on Juniper's shelf
+let LIB = load("fox.library", () => ({items:[]}));
 let sampleCap = null;   // the sample capability once granted to this view, else null
 function migrate(){
   if (S.day !== dayKey()) S = freshToday();
@@ -25,12 +27,13 @@ function migrate(){
   if (!Array.isArray(F.plots) || F.plots.length !== 12) F.plots = Array.from({length:12}, () => null);
   if (!F.cool) F.cool = {};
   ["met", "gifts", "mailRead"].forEach(k => { if (!F[k]) F[k] = {}; });
+  F.digest = Object.assign({read:{}, lastAt:0, mine:[]}, F.digest || {});
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
 setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST});
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
-let scene = "village", atSpot = null, boardOpen = false, selPlot = null, shopTab = "seeds";
+let scene = "village", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
 
 function persist(which){
   const obj = which === "today" ? S : F;
@@ -54,7 +57,12 @@ async function initDb(){
   if (!db || !user) return;
   const uid = await user.id(); if (!uid) return;
   const col = db.collection("data/users/" + uid);
-  refs = {today: col.doc("today"), fox: col.doc("fox"), plan: col.doc("plan"), mail: col.doc("mail"), stats: col.doc("stats")};
+  refs = {today: col.doc("today"), fox: col.doc("fox"), plan: col.doc("plan"), mail: col.doc("mail"), stats: col.doc("stats"), library: col.doc("library")};
+  refs.library.onSnapshot(snap => {
+    LIB = snap.exists ? Object.assign({items:[]}, snap.data()) : {items:[]};
+    try { localStorage.setItem("fox.library", JSON.stringify(LIB)); } catch {}
+    if (shelfOpen) ctx();
+  }, () => {});
   refs.mail.onSnapshot(snap => {
     MAIL = snap.exists ? Object.assign({items:[]}, snap.data()) : {items:[]};
     try { localStorage.setItem("fox.mail", JSON.stringify(MAIL)); } catch {}
@@ -215,6 +223,7 @@ setInterval(() => {
   if (rc > lastReady) { speak(rc === 1 ? "Psst… something in the garden is ready!" : `${rc} crops ready in the garden!`, 5000); if (scene === "farm") drawScene(); }
   lastReady = rc;
   if (scene === "farm" && Math.random() < .2) { drawScene(); if (selPlot != null) ctx(); }
+  if (shelfOpen && Math.floor(Date.now()/1000) % 20 === 0) ctx();   // keep "next digest in N min" fresh
   if (!S.timer) return;
   const left = Math.max(0, S.timer.endAt - Date.now());
   const t = $("tLeft"), r = $("ringFg");
@@ -305,6 +314,42 @@ function sayButton(i){ if (!say || !say.buttons || !say.buttons[i]) return; cons
 function timerLeft(t){
   if (!S.timer || S.timer.id !== t.id || (S.timer.kind !== "task" && S.timer.kind !== "deal")) return null;
   return fmt(Math.max(0, S.timer.endAt - Date.now()));
+}
+
+/* =================== LIBRARY DIGESTS =================== */
+// Rationed: one when an hour has passed since the last, or once a quest has been finished since the last. No stacking.
+const DIGEST_GAP = 60*M;
+let digestBusy = false;
+const digestReady = () => Date.now() - (F.digest.lastAt || 0) >= DIGEST_GAP || S.doneIds.length > (S.digestMark || 0);
+const nextDigest = () => (LIB.items || []).filter(d => d && d.id && d.title && !F.digest.read[d.id]).sort((a, b) => (a.added || 0) - (b.added || 0))[0] || null;
+function pastDigests(){
+  const all = [...(LIB.items || []), ...(F.digest.mine || [])].filter(d => d && d.id && F.digest.read[d.id]);
+  return all.sort((a, b) => F.digest.read[b.id] - F.digest.read[a.id]).slice(0, 12);
+}
+function readDigest(d){
+  F.digest.read[d.id] = Date.now(); F.digest.lastAt = Date.now(); S.digestMark = S.doneIds.length;
+  const keep = new Set([...(LIB.items || []), ...(F.digest.mine || [])].map(x => x && x.id));
+  Object.keys(F.digest.read).forEach(id => { if (!keep.has(id)) delete F.digest.read[id]; });
+  gainXp(1); save(); openDigest(d);
+}
+async function askJuniper(){
+  if (!sampleCap || digestBusy || !digestReady()) return;
+  digestBusy = true; ctx();
+  const seen = pastDigests().map(d => d.title).concat((LIB.items || []).map(d => d.title)).filter(Boolean).slice(0, 40);
+  try {
+    const d = await sampleCap.json(`You are Juniper, the librarian in a cosy village game. Pick ONE real, well-regarded nonfiction book that would help Mel: a Singapore-based founder running a small copywriting and brand studio plus two software products, and a parent of a toddler. Favour practical books on creative business, focus, pricing, writing, product, or calm productivity.
+Don't pick any of these: ${seen.join("; ") || "(none yet)"}.
+Return JSON only: {"title": "...", "author": "...", "body": "5 key ideas, one per line, each starting with '- ', each under 25 words", "try": "one small thing to try today, under 20 words"}.
+Only describe ideas the book is genuinely known for; don't invent quotes.`, {modelTier: "quick", cache: false});
+    if (!d || !d.title) throw {code: "empty_completion"};
+    const item = {id: "j" + Date.now().toString(36), gen: true, title: String(d.title).slice(0, 120), author: String(d.author || "").slice(0, 80), body: String(d.body || "").slice(0, 1600), try: String(d.try || "").slice(0, 200)};
+    F.digest.mine = [item, ...(F.digest.mine || [])].slice(0, 30);
+    readDigest(item);
+  } catch (e) {
+    if (e && e.code === "not_granted") sampleCap = null;
+    speak(e && e.code === "rate_limited" ? "Juniper needs a minute. Try again soon." : "Juniper couldn't find one just now. Try again later?", 4000);
+  }
+  digestBusy = false; ctx();
 }
 
 /* =================== MAIL (agent notes) =================== */
@@ -467,6 +512,18 @@ function ctx(){
       else if (g < 1) { const left = cr.dur*(1 - g); h += `<p class="sub">${cr.e} ${cr.n}, growing. About ${dur(left)} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(g*100).toFixed(0)}%"></i></div>`; }
       else h += `<p class="sub">${cr.e} ${cr.n} is ready!</p><div class="actions"><button class="btn yes" data-farm="harvest">Harvest</button></div>`;
     }
+  } else if (shelfOpen) {
+    const ready = digestReady(), next = nextDigest(), past = pastDigests();
+    const wait = Math.max(1, Math.ceil(((F.digest.lastAt || 0) + DIGEST_GAP - Date.now())/M));
+    h = `<span class="tape stripe" aria-hidden="true"></span><h2>Juniper's digest shelf</h2>
+      <p class="sub">One book digest an hour, or one after each quest you finish.</p>
+      <div class="shelf">`;
+    if (ready && next) h += `<p class="status"><b>A digest is ready:</b> ${esc(next.title)}${next.author ? ` by ${esc(next.author)}` : ""}.</p><div class="actions"><button class="btn primary" data-dig="next">Read it</button></div>`;
+    else if (ready && sampleCap) h += `<p class="status">The shelf's empty for now. Ask chat for more digests, or let Juniper pick a book.</p><div class="actions"><button class="btn primary" data-dig="ask" ${digestBusy ? "disabled" : ""}>${digestBusy ? "Juniper's choosing…" : "Ask Juniper to pick one"}</button></div>`;
+    else if (ready) h += `<p class="status">The shelf's empty for now. Ask chat to stock it with your book digests.</p>`;
+    else h += `<p class="status">Next digest in <b>${wait} min</b>, or finish a quest to unlock it sooner.${next ? ` Waiting on the shelf: ${(LIB.items || []).filter(d => d && d.id && !F.digest.read[d.id]).length}.` : ""}</p>`;
+    if (past.length) h += `<p class="eyebrow" style="margin:22px 0 6px">Read before</p><ul class="qlist">${past.map((d, i) => `<li><span><b>${esc(d.title)}</b><small>${esc(d.author || "")}</small></span><button class="next" data-dig="past" data-i="${i}">reread</button></li>`).join("")}</ul>`;
+    h += `</div><div class="actions"><button class="btn alt small" data-close="1">Close shelf</button></div>`;
   } else if (boardOpen) {
     const list = scene === "village" ? allTasks() : questsIn(scene), cur = phase() === "task" ? remaining()[0].id : null;
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>${scene === "village" ? "Town quest board" : esc(ROOMS[scene].name) + " quests"}</h2>
@@ -484,7 +541,13 @@ function ctx(){
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = () => doNext(b.dataset.next));
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; ctx(); });
+  c.querySelectorAll("[data-dig]").forEach(b => b.onclick = () => {
+    const k = b.dataset.dig;
+    if (k === "next") { const d = nextDigest(); if (d && digestReady()) readDigest(d); }
+    else if (k === "ask") askJuniper();
+    else if (k === "past") { const d = pastDigests()[+b.dataset.i]; if (d) openDigest(d); }
+  });
 }
 function bag(){
   const ids = Object.keys(F.inv).filter(id => ITEMS[id] && F.inv[id] > 0);
@@ -569,7 +632,7 @@ const bounds = () => scene === "village" ? [14, 150, W - 14, HH - 14] : [34, 168
 function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
   setTimeout(() => {
-    scene = id; atSpot = null; boardOpen = false; selPlot = null; resetNpcs();
+    scene = id; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; resetNpcs();
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
     if (id === "village") { evan.x = evan.tx = 250; evan.y = evan.ty = 380; }
@@ -589,7 +652,7 @@ function go(target, x, y, fn){
     if (target !== "village") { const d = VILLAGE[target].door; legs.push({scene:"village", x:d[0], y:d[1], fn:() => setScene(target, target === "farm" ? [260, 590] : [260, 596])}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; nextLeg(); render();
 }
 function curDoorKey(s){ return s; }
 function nextLeg(){
@@ -599,6 +662,7 @@ function nextLeg(){
 function arriveSpot(id){
   atSpot = id;
   const ph = phase();
+  if (id === "digest") { shelfOpen = true; speak(digestReady() ? (isHere("juniper") ? "Juniper's waving a digest at you!" : "A fresh digest is ready on the shelf.") : "Digests are rationed. Like dessert.", 3500); render(); return; }
   if (id === "board") { boardOpen = true; speak(scene === "village" ? "All of today's quests!" : "Here's what needs doing in here.", 3500); render(); return; }
   if (ph === "clean" && scene === "home" && id === "cupboard") { setSay(S.wipe ? "Five minutes. Hard stop, promise." : "Wet wipes live here. Grab one!"); render(); return; }
   if (ph === "task") {
@@ -686,7 +750,8 @@ function bubbleAt(el, ex, ey, off, forceBelow){
   const bw = el.offsetWidth, bh = el.offsetHeight, px = ex*sc, py = (ey - off)*sc;
   const left = clamp(px, bw/2 + 2, cw - bw/2 - 2);
   el.style.left = left + "px"; el.style.setProperty("--tail", clamp(px - left + bw/2, 16, bw - 16) + "px");
-  const below = forceBelow || py - bh - 10 < -6; el.classList.toggle("below", below);
+  const roomBelow = (ey + 8)*sc + 10 + bh < wrap.clientHeight + 4;
+  const below = (forceBelow && roomBelow) || py - bh - 10 < -6; el.classList.toggle("below", below);
   el.style.top = (below ? (ey + 8)*sc + 10 : py - 10) + "px";
 }
 let last = performance.now();

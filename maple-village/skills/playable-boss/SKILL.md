@@ -75,9 +75,13 @@ Mel has a companion page with a tiny fox called Maple (she may rename it — use
 - `from` picks the messenger: crier = morning-briefing, runner = book-digest, postie = inbox-triage and leads, chord / chico = product agents, planner = content plan, scout = tenders, courier = sunsama-tidy or client-health-check, winddown = evening-wind-down. Unknown values get the postie.
 - Notes older than 36 hours aren't delivered by a messenger, but stay readable under Letters. The page tracks what she's read; never write read flags.
 
+**The morning briefing as a village paper.** When morning-briefing posts to the village, use `from: "crier"`, a one-line headline as `title`, a 1–2 sentence `body`, and `sections` instead of a long body: `"sections": [{ "heading": "Today", "lines": ["3:00 pm Call with the accountant"] }, { "heading": "The one that matters", "lines": ["..."] }, { "heading": "Inbox", "lines": ["..."] }, { "heading": "This week", "lines": ["Theme: ...", "Revenue action: ..."] }, { "heading": "Little things", "lines": ["..."] }]`. The page lays it out as *The Morning Crier*. Any note can carry `sections`.
+
+**Book digests on Juniper's shelf.** The library has a digest shelf. Mel can take one digest an hour, or one after each quest she finishes (they don't stack). To stock it, `read_db` get `doc_id: "library"`, append, keep the newest 40, `write_db` set with `if_version`. Item: `{ "id": "<stable slug>", "title": "...", "author": "...", "body": "- 3 to 6 key ideas, one per line", "try": "<one small thing to try today>", "link": "<optional https URL>", "added": <epoch ms> }`. The book-digest skill should post here rather than as mail. If the shelf is empty, the page can ask Claude (Juniper) to pick a book itself.
+
 **User-count gardens.** When Mel shares Chord or Chico user numbers (or a connector exposes them), write `doc_id: "stats"` as `{ "chord": { "users": 142 }, "chico": { "users": 58 } }` (optional `"per"`: users per flower, default 10). Flower patches outside each building grow with the count.
 
-**At the end of the day,** read the page's `today` document and fold its finished tasks, the clean and her step total into the wins recap (section 7). Never write to the `today` or `fox` documents. Those belong to the page. Chat owns `plan`, `mail` and `stats`.
+**At the end of the day,** read the page's `today` document and fold its finished tasks, the clean and her step total into the wins recap (section 7). Never write to the `today` or `fox` documents. Those belong to the page. Chat owns `plan`, `mail`, `library` and `stats`.
 
 If the Artifact tool or the page's data isn't available on this surface, say so in half a line and run boss mode in chat as usual.
 

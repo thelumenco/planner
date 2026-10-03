@@ -32,7 +32,7 @@ export const NPCS = [
     id: "juniper", name: "Juniper", job: "Librarian at the Fresh Pages library",
     intro: "Welcome to the library! I'm Juniper. I love a good semicolon; I also write poetry, but that's a secret. One book recommendation a week, guaranteed.",
     look: {skin: "#C99A78", hair: "#2B2320", hairStyle: "bob", top: "#B9D2A6", bottom: "#3F4A6B", extra: "glasses"},
-    routine: [slot("8:30", "13:00", "fresh", [[160, 300], [330, 300], [240, 330]]), slot("13:00", "15:30", "fresh", [178, 478]),
+    routine: [slot("8:30", "13:00", "fresh", [[160, 300], [330, 300], [240, 330]]), slot("13:00", "15:30", "fresh", [356, 330]),
       slot("15:30", "16:00", "village", [[400, 300], [440, 320]]), slot("16:00", "18:00", "fresh", [[90, 330], [180, 330], [140, 312]])],
     lines: ["This week's pick: anything with a map in the front.", "A semicolon is a pause that believes in you.", "Shh… the nook is in reading hour. Join me?",
       "Every first draft is allowed to be terrible. That's the rule.", "I shelve by feeling, not by alphabet. Don't tell anyone."],

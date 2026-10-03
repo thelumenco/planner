@@ -57,8 +57,20 @@
       { id: "t5", title: "Send October invoices", firstStep: "Open Stripe invoices", minutes: 20, place: "post", spot: "scales" }
     ] });
     write("data/users/me/mail", { items: [
-      { id: "m1", from: "crier", title: "Morning briefing", body: "Three meetings today, the big one is the accountant at 3pm.\n\nThis week's theme: Chico charging. Today's quest list is on the board.", at: Date.now() - 3600e3 },
+      { id: "m1", from: "crier", title: "A charging-week Monday, one call at three", at: Date.now() - 3600e3,
+        body: "Good morning, Mel. Five quests on the board, one meeting, and the week's theme is Chico charging.",
+        sections: [
+          { heading: "Today", lines: ["3:00 pm Call with the accountant (Zoom)", "5:30 pm Evan pickup"] },
+          { heading: "The one that matters", lines: ["Fix the Chord onboarding flow: new creatives see it first"] },
+          { heading: "Inbox", lines: ["2 possible leads (one MUSE, one website copy)", "Farzana is waiting on a reply"] },
+          { heading: "This week", lines: ["Theme: Chico charging", "Revenue action: send 3 MUSE follow-ups"] },
+          { heading: "Little things", lines: ["Water bottle by the desk", "Treadmill-able: the Chico feedback review"] }
+        ] },
       { id: "m2", from: "postie", title: "Inbox triage", body: "2 new leads, 1 draft waiting for your OK (Farzana).\nNothing urgent from clients.", link: "https://mail.google.com/mail/u/0/#inbox", at: Date.now() - 600e3 }
+    ] });
+    write("data/users/me/library", { items: [
+      { id: "d1", title: "Show Your Work!", author: "Austin Kleon", added: 1, body: "- Share something small every day\n- Think process, not product\n- Teach what you know\n- Be open, but don't turn into human spam", try: "Post one behind-the-scenes photo of today's work." },
+      { id: "d2", title: "Company of One", author: "Paul Jarvis", added: 2, body: "- Question growth by default\n- Stay small and resilient\n- Build systems before hiring", try: "List one thing to stop doing this month." }
     ] });
     write("data/users/me/stats", { chord: { users: 142, at: Date.now() }, chico: { users: 58, at: Date.now() } });
   }

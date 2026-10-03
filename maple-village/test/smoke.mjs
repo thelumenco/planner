@@ -101,6 +101,31 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(300);
   check(await page.locator("#journal").textContent().then(t => /Log my steps/.test(t)), "treadmill quest asks for steps");
 
+  // Library digest shelf: first read is free, the second is locked until an hour passes or a quest is done
+  await page.locator('#world [data-place="fresh"]').first().click({ force: true }).catch(() => {});
+  await page.evaluate(() => document.querySelector("#world [data-exit]") && document.querySelector("#world [data-exit]").dispatchEvent(new MouseEvent("click", {bubbles: true})));
+  await page.waitForFunction(() => /village/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-place="fresh"]').first().click({ force: true });
+  await page.waitForFunction(() => /library/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 });
+  await page.waitForTimeout(400);
+  await page.locator('#world [data-spot="digest"]').click({ force: true });
+  await page.waitForFunction(() => document.querySelector('#ctx [data-dig="next"]'), null, { timeout: 20000 });
+  await page.click('#ctx [data-dig="next"]');
+  await page.waitForTimeout(300);
+  check(await page.locator("#notebook").textContent().then(t => /Show Your Work/.test(t)), "digest shelf hands out a book digest");
+  await page.screenshot({ path: join(shots, `${vp.name}-7-digest.png`) });
+  await page.click('#notebook [data-nb="thanks"]');
+  await page.waitForTimeout(200);
+  check(await page.locator("#ctx").textContent().then(t => /Next digest in/.test(t)), "the next digest is rationed");
+
+  // Morning briefing as a gazette
+  await page.locator("#mailBox summary").click();
+  await page.locator('#mailList [data-mail]').last().click();
+  await page.waitForTimeout(300);
+  check(await page.locator("#notebook .masthead").count() > 0, "morning briefing opens as The Morning Crier");
+  await page.screenshot({ path: join(shots, `${vp.name}-8-briefing.png`) });
+  await page.click('#notebook [data-nb="thanks"]');
+
   // NPCs + mail
   await page.waitForTimeout(500);
   check(await page.locator("#actors [data-npc]").count() > 0, "villagers are out and about");

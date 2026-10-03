@@ -33,6 +33,8 @@ src/
   data/items.js       shop items, crops, plots, friendship levels
   data/npcs.js        villagers (routines, lines, reactions) and agent messengers
   art/scenes.js       village / interior / garden SVG, furniture, user-count gardens
+  art/buildings.js    the five work buildings, each with its own architecture
+  art/interiors.js    per-building floors, walls and decor (furniture layout is ROOMS[id].pos)
   art/people.js       villager sprite rig
   game/core.js        state + db sync, quest flow, actions, UI renderers, world sim
   game/npcs.js        villager routines, taps, reactions, mail messengers
@@ -48,7 +50,8 @@ All docs live under `data/users/<uid>/` in the artifact's `db`.
 | Doc | Written by | What |
 |---|---|---|
 | `plan` | chat | `{day, tasks:[{id, title, firstStep, minutes, pep, notes?, email?, treadmill, meeting, chat, at, place, spot}]}` |
-| `mail` | chat / agents | `{items:[{id, from, title, body, link?, at}]}`. `from` picks the messenger (see `AGENTS` in `data/npcs.js`) |
+| `mail` | chat / agents | `{items:[{id, from, title, body, sections?, link?, at}]}`. `from: "crier"` renders as *The Morning Crier*. `from` picks the messenger (see `AGENTS` in `data/npcs.js`) |
+| `library` | chat / book-digest | `{items:[{id, title, author, body, try?, link?, added}]}` for Juniper's digest shelf (one an hour, or one per quest done) |
 | `stats` | chat | `{chord:{users, per?}, chico:{users, per?}}` for the flower gardens |
 | `today` | page | resets 2am SGT: doneIds, steps, water, cleanDone, timers, … |
 | `fox` | page | persistent: coins, inventory, garden plots, friendship, villagers met, letters read |

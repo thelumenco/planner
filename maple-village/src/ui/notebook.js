@@ -3,7 +3,7 @@
 import { $, esc } from "../util.js";
 
 let api = null;        // from core: task(), S(), F(), fs(t), act(kind, t), timerLeft(), sayNow(), sample(), placeLabel(t), markRead(item), agentName(from)
-let open = null;       // {kind:"task", id} | {kind:"mail", item}
+let open = null;       // {kind:"task", id} | {kind:"mail", item} | {kind:"digest", item}
 const chats = {};      // task id -> [{role, content}]  (memory only)
 let busy = null;       // AbortController while Claude is answering
 let lastFocus = null;
@@ -19,7 +19,7 @@ export function initNotebook(a){
     if (k === "ask") return ask();
     if (k === "copy") return copyDraft(b);
     if (k === "sayb") return api.sayButton(+b.dataset.i);
-    if (open && open.kind === "mail" && k === "thanks") { closeNotebook(); return; }
+    if (open && open.kind !== "task" && k === "thanks") { closeNotebook(); return; }
     const t = api.task(); if (!t || !open || open.kind !== "task") return;
     api.act(k, t);
   });
@@ -33,6 +33,7 @@ export const notebookOpen = () => !!open;
 
 export function openTask(t){ open = {kind: "task", id: t.id}; show(); }
 export function openMail(item){ open = {kind: "mail", item}; api.markRead(item); show(); }
+export function openDigest(item){ open = {kind: "digest", item}; show(); }
 export function closeNotebook(){
   if (!open) return;
   open = null; busy && busy.abort(); busy = null;
@@ -57,7 +58,7 @@ export function refreshNotebook(focus){
     const keep = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
     page.innerHTML = taskPage(t);
     if ($("nbAsk")) { $("nbAsk").value = keep; if (typing) $("nbAsk").focus(); }
-  } else page.innerHTML = mailPage(open.item);
+  } else page.innerHTML = open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
   const log = page.querySelector(".nbchat"); if (log) log.scrollTop = log.scrollHeight;
   if (focus) (page.querySelector("[data-nb]:not([data-nb=close])") || page.querySelector("[data-nb]"))?.focus({preventScroll: true});
 }
@@ -115,13 +116,32 @@ function taskPage(t){
   return h;
 }
 
+// Optional `sections: [{heading, lines:[...]}]` on a note renders as headed lists. Notes from the town crier
+// (the morning briefing) get a little village-newspaper masthead.
+const sectionsHTML = secs => (Array.isArray(secs) ? secs : []).filter(x => x && (x.heading || (x.lines || []).length)).map(x =>
+  `<section class="nbsec">${x.heading ? `<h3>${esc(x.heading)}</h3>` : ""}<ul>${(x.lines || []).map(l => `<li>${linkify(l)}</li>`).join("")}</ul></section>`).join("");
+const timeOf = at => at ? new Date(at).toLocaleTimeString("en-GB", {hour: "numeric", minute: "2-digit", timeZone: "Asia/Singapore"}) : "";
 function mailPage(item){
-  return `<button class="nbx" data-nb="close" aria-label="Close note">✕</button>
-    <p class="nbmeta">a note from ${esc(api.agentName(item.from))}${item.at ? ` · ${new Date(item.at).toLocaleTimeString("en-GB", {hour: "numeric", minute: "2-digit", timeZone: "Asia/Singapore"})}` : ""}</p>
-    <h2 id="nbTitle">${esc(item.title || "A note for you")}</h2>
-    <div class="nbbody"><div class="nbnotes">${notesHTML(item.body)}</div>
+  const crier = item.from === "crier";
+  const head = crier
+    ? `<div class="gazette"><p class="masthead">The Morning Crier</p><p class="gzline">${new Date(item.at || Date.now()).toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Singapore"})} · ${esc(api.agentName(item.from))}</p></div>
+       <h2 id="nbTitle" class="gzhead">${esc(item.title || "Good morning")}</h2>`
+    : `<p class="nbmeta">a note from ${esc(api.agentName(item.from))}${item.at ? ` · ${timeOf(item.at)}` : ""}</p>
+       <h2 id="nbTitle">${esc(item.title || "A note for you")}</h2>`;
+  return `<button class="nbx" data-nb="close" aria-label="Close note">✕</button>${head}
+    <div class="nbbody">${item.body ? `<div class="nbnotes${crier ? " gzlede" : ""}">${notesHTML(item.body)}</div>` : ""}
+    <div class="${crier ? "gzcols" : ""}">${sectionsHTML(item.sections)}</div>
     ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Open the full thing ↗</a></div>` : ""}</div>
-    <div class="nbactions"><button class="btn yes" data-nb="thanks">Thanks!</button></div>`;
+    <div class="nbactions"><button class="btn yes" data-nb="thanks">${crier ? "Let's go" : "Thanks!"}</button></div>`;
+}
+function digestPage(item){
+  return `<button class="nbx" data-nb="close" aria-label="Close digest">✕</button>
+    <p class="nbmeta">book digest · from Juniper's shelf${item.gen ? " · picked by Juniper" : ""}</p>
+    <h2 id="nbTitle">${esc(item.title || "A book")}${item.author ? `<small class="nbby">by ${esc(item.author)}</small>` : ""}</h2>
+    <div class="nbbody">${item.body ? `<div class="nbnotes">${notesHTML(item.body)}</div>` : ""}${sectionsHTML(item.sections)}
+    ${item.try ? `<p class="nbpep">♡ Try today: ${esc(item.try)}</p>` : ""}
+    ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Read more ↗</a></div>` : ""}</div>
+    <div class="nbactions"><button class="btn yes" data-nb="thanks">Back on the shelf</button></div>`;
 }
 const safeUrl = u => (typeof u === "string" && /^https?:\/\//i.test(u)) ? u : null;
 

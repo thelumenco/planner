@@ -66,3 +66,16 @@ body.nb-open{overflow:hidden}
 .mail li button.open{background:none;border:0;padding:0;text-align:left;color:inherit;font:inherit}
 .mail li button.open:hover .t{text-decoration:underline;text-underline-offset:3px}
 .mail li small{color:var(--soft);font-size:.8rem}
+
+/* sections, gazette (morning briefing), digests */
+.nbsec h3{font-family:"Klee One",serif;font-weight:600;font-size:1.15rem;margin:8px 0 0;line-height:32px}
+.nbsec ul{margin:0;padding-left:20px}
+.gazette{text-align:center;border-bottom:3px double #2F2B28;margin:0 40px 6px 0;padding-bottom:4px}
+.masthead{font-family:"Klee One",serif;font-weight:600;font-size:clamp(1.7rem,7vw,2.4rem);line-height:1.1;margin:0;letter-spacing:.01em}
+.gzline{font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#8A8279;margin:4px 0 0}
+.nbpage h2.gzhead{font-size:clamp(1.3rem,4.6vw,1.6rem);margin:6px 0 4px}
+.gzlede p:first-child::first-letter{font-family:"Klee One",serif;font-weight:600;font-size:2.4em;float:left;line-height:.9;margin:6px 6px 0 0;color:#C2505F}
+@media (min-width:640px){.gzcols{columns:2;column-gap:28px;column-rule:1px dashed rgba(154,169,221,.6)}.gzcols .nbsec{break-inside:avoid}}
+.nbby{display:block;font-family:Mulish,sans-serif;font-weight:600;font-size:.9rem;color:#8A8279;margin-top:2px;letter-spacing:0}
+.shelf .status{margin:0 0 16px}
+.shelf .status b{color:var(--navy)}

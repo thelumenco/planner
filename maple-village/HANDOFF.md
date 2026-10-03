@@ -213,4 +213,10 @@ Done, in `maple-village/` (see `README.md` for how to run and publish):
 - **7.3 user-count gardens:** new `stats` doc. One flower per 10 users outside Chord and Chico, with blooms that step up at 100 and 250 users, a blossom tree at 500 and sparkles at 1,000.
 - `test/smoke.mjs` plays the day loop headlessly on phone and desktop.
 
+Round 2 (same day):
+- Each work building has its own architecture: civic town hall with clock tower and columns, barn-style Chord workshop, Fresh Pages library with a round tower, rounded Chico cottage, flat-roofed post office. Home keeps the classic cottage.
+- Each interior has its own floor, walls, decor and furniture layout (`art/interiors.js`, `ROOMS[id].pos`).
+- Morning briefing notes from the crier render as *The Morning Crier* village paper (`sections` on mail items).
+- Juniper's digest shelf in the library: book digests from a new `library` doc, one an hour or one per quest done, with a "Read before" list and a Claude-picked fallback when the shelf is empty.
+
 Not done yet: publishing the new build to the live link (needs `sample` added to the capabilities), stage 3 ideas (8.5), collision-aware walking and a camera/zoom for small phones (4.6).

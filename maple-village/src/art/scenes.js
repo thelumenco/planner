@@ -3,6 +3,8 @@
 import { ink } from "../util.js";
 import { VILLAGE, ROOMS, stationsOf } from "../data/world.js";
 import { CROPS, PLOTS } from "../data/items.js";
+import { roomShell } from "./interiors.js";
+import { townHall, chordWorkshop, library, chicoCottage, postOffice } from "./buildings.js";
 
 let G = null;
 export const setArtContext = g => { G = g; };
@@ -39,21 +41,11 @@ export function villageArt(){
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
     ${flowers([[30,262,"#EFA3A6"],[44,270,"#F3C969"],[150,206,"#C3CDEE"],[372,206,"#EFA3A6"],[488,270,"#F3C969"],[300,448,"#EFA3A6"],[214,450,"#C3CDEE"],[160,600,"#F3C969"],[176,612,"#EFA3A6"],[470,540,"#C3CDEE"],[20,430,"#F3C969"],[505,380,"#EFA3A6"]])}
     ${tree(170,64,1)}${tree(350,64,1)}${tree(26,96,1.05)}${tree(494,96,1.05)}${tree(24,350,.9)}${tree(498,330,.9)}${tree(190,622,.85)}${tree(504,520,.85)}${tree(24,610,.95)}`;
-  const hallX = {art:`<rect x="232" y="66" width="56" height="8" style="fill:var(--card)"/><circle cx="260" cy="58" r="10" style="fill:var(--card)"/><path d="M296 2 l18 6 l-18 6z" style="fill:var(--peach)"/>`,
-    lines:`<circle cx="260" cy="58" r="10"/><path d="M260 58 v-6 M260 58 l4 3"/><path d="M296 30 v-28 M296 2 l18 6 l-18 6"/>`};
-  const chordX = {art:`<rect x="112" y="128" width="12" height="22" style="fill:var(--stone)"/>`, lines:`<rect x="112" y="128" width="12" height="22"/><path class="smoke" d="M118 124 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>`};
-  const freshX = {art:`<circle cx="435" cy="152" r="8" style="fill:var(--butter)"/>`, lines:`<circle cx="435" cy="152" r="8"/><path d="M431 152 h8 M435 148 v8" opacity=".5"/>`};
-  const chicoX = {art:`<path d="M83 470 c-3 -4 -8 -1 -4 3 l4 4 l4 -4 c4 -4 -1 -7 -4 -3z" style="fill:var(--rose)"/>`, lines:``};
-  const postX = {art:`<rect x="492" y="456" width="12" height="12" rx="2" style="fill:var(--rose)"/><rect x="497" y="468" width="3" height="16" style="fill:var(--wood)"/>`, lines:`<rect x="492" y="456" width="12" height="12" rx="2"/><path d="M497 468 v16"/><path d="M425 400 l10 7 l10 -7 M425 400 h20 v12 h-20z"/>`};
   const homeX = {art:`<rect x="290" y="444" width="12" height="22" style="fill:var(--stone)"/>`, lines:`<rect x="290" y="444" width="12" height="22"/><path class="smoke" d="M296 440 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>`};
   const grown = (G.F().plots || []).filter(p => p && p.crop).length;
   const sprouts = Array.from({length:Math.min(4, grown)}, (_, i) => `<path d="M${160 + i*12} 470 v-8" style="stroke:var(--moss2)"/><ellipse cx="${157 + i*12}" cy="${463}" rx="3.5" ry="2" style="fill:var(--moss)"/><ellipse cx="${163 + i*12}" cy="${461}" rx="3.5" ry="2" style="fill:var(--moss)"/>`).join("");
   const places =
-    house("hall", 200, 90, 120, 80, "var(--card)", "var(--peri)", "Town hall", "var(--peri)", hallX) +
-    house("chord", 30, 186, 110, 74, "#F3EEE4", "var(--sage)", "Chord", "var(--sage)", chordX) +
-    house("fresh", 380, 186, 110, 74, "#F3EEE4", "var(--peach)", "Fresh Pages", "var(--peach)", freshX) +
-    house("chico", 30, 426, 110, 74, "#F3EEE4", "var(--rose)", "Chico", "var(--blush)", chicoX) +
-    house("post", 380, 416, 110, 74, "#F3EEE4", "var(--sky)", "Post office", "var(--sky)", postX) +
+    townHall() + chordWorkshop() + library() + chicoCottage() + postOffice() +
     house("home", 205, 508, 110, 74, "var(--card)", "var(--butter)", "Home", "var(--butter)", homeX) +
     `<g data-place="farm" aria-label="Garden"><ellipse class="hov" cx="182" cy="478" rx="34" ry="10" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><rect x="150" y="446" width="64" height="30" rx="3" style="fill:#B08A6A"/>${sprouts}
@@ -126,6 +118,8 @@ export function furn(kind, x, y){
       `<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3"/><path d="M${x-36} ${y-30} h28 l-4 -10 h-20z M${x-22} ${y-40} v-10 h-10 h20"/><rect x="${x+10}" y="${y-48}" width="12" height="18" rx="2"/><rect x="${x+28}" y="${y-40}" width="20" height="10"/><path d="M${x-46} ${y-6} v14 M${x+46} ${y-6} v14"/>`);
     case "treadmill": return sk(`<rect x="${x-24}" y="${y-74}" width="48" height="74" rx="8" style="fill:var(--sock)"/><rect x="${x-17}" y="${y-66}" width="34" height="58" rx="4" style="fill:#6B5A52"/><rect x="${x-30}" y="${y-96}" width="60" height="16" rx="4" style="fill:var(--peri)"/><rect x="${x-14}" y="${y-93}" width="20" height="9" rx="2" style="fill:#DCE8C8"/>`,
       `<rect x="${x-24}" y="${y-74}" width="48" height="74" rx="8"/><path d="M${x-17} ${y-56} h34 M${x-17} ${y-44} h34 M${x-17} ${y-32} h34 M${x-17} ${y-20} h34" opacity=".45"/><path d="M${x-26} ${y-80} v28 M${x+26} ${y-80} v28" stroke-width="2.4"/><rect x="${x-30}" y="${y-96}" width="60" height="16" rx="4"/><rect x="${x-14}" y="${y-93}" width="20" height="9" rx="2"/><text x="${x-4}" y="${y-86}" text-anchor="middle" font-family="Klee One,serif" font-size="7" stroke="none" style="fill:var(--line)">1.2</text>`);
+    case "bookcase": return furn("shelf", x, y) + sk(`<path d="M${x+20} ${y-104} h30 l-4 8 l4 8 h-30z" style="fill:var(--butter)"/>`,
+      `<path d="M${x+20} ${y-104} h30 l-4 8 l4 8 h-30z"/><text x="${x+33}" y="${y-93}" text-anchor="middle" font-family="Klee One,serif" font-size="8" stroke="none" style="fill:var(--line)">new</text>`);
     case "shopcounter": return sk(`<rect x="${x-90}" y="${y-40}" width="180" height="40" rx="4" style="fill:${W2}"/><path d="M${x-96} ${y-118} h192 l-8 18 h-176z" style="fill:var(--card)"/><circle cx="${x-50}" cy="${y-52}" r="10" style="fill:var(--rose)"/><circle cx="${x-24}" cy="${y-52}" r="10" style="fill:var(--butter)"/><circle cx="${x+4}" cy="${y-52}" r="10" style="fill:var(--sage)"/><rect x="${x+30}" y="${y-64}" width="40" height="24" rx="3" style="fill:#FFFDF6"/>`,
       `<rect x="${x-90}" y="${y-40}" width="180" height="40" rx="4"/><path d="M${x-96} ${y-118} h192 l-8 18 h-176z"/><path d="M${x-80} ${y-118} l-3 18 M${x-50} ${y-118} l-2 18 M${x-20} ${y-118} l-1 18 M${x+10} ${y-118} v18 M${x+40} ${y-118} l1 18 M${x+70} ${y-118} l2 18" style="stroke:var(--rose)" stroke-width="6"/><path d="M${x-86} ${y-100} v60 M${x+86} ${y-100} v60"/><rect x="${x+30}" y="${y-64}" width="40" height="24" rx="3"/><text x="${x+50}" y="${y-48}" text-anchor="middle" font-family="Klee One,serif" font-size="11" stroke="none" style="fill:var(--line)">open</text>`);
   }
@@ -133,12 +127,7 @@ export function furn(kind, x, y){
 }
 export function roomArt(id){
   const r = ROOMS[id], st = stationsOf(id);
-  let h = `<rect width="520" height="640" style="fill:#EBDDC6"/>
-    <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${Array.from({length:12}, (_, i) => `<path d="M0 ${170 + i*40} H520"/>`).join("")}${Array.from({length:24}, (_, i) => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`).join("")}</g>
-    <rect width="520" height="150" style="fill:${r.wall}"/><rect y="138" width="520" height="12" style="fill:${r.trim}" opacity=".9"/>
-    <g filter="url(#wob)" ${ink} fill="none"><path d="M0 150 H520"/></g>
-    ${id === "market" ? "" : sk(`<rect x="60" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/><rect x="390" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/>`, `<rect x="60" y="34" width="70" height="58" rx="30"/><path d="M95 34 v58 M60 66 h70"/><rect x="390" y="34" width="70" height="58" rx="30"/><path d="M425 34 v58 M390 66 h70"/>`)}
-    <g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:${r.trim}"/></g>`;
+  let h = roomShell(id);
   if (id !== "market") h += `<g data-spot="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="204" rx="40" ry="10" style="fill:var(--butter)"/>
     ${sk(`<rect x="222" y="40" width="76" height="56" rx="3" style="fill:var(--wood)"/>`, `<rect x="222" y="40" width="76" height="56" rx="3"/>${notesArt(230, 50, G.questsIn(id).filter(t => !G.S().doneIds.includes(t.id)).length)}`)}${tapeLabel(260, 112, "Quests here", "var(--butter)")}</g>`;
   else h += sk(`<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
