@@ -91,7 +91,7 @@ function taskPage(t){
   let h = `<button class="nbx" data-nb="close" aria-label="Close notebook">✕</button>
     <p class="nbmeta">${esc(api.placeLabel(t))}${t.at ? ` · at ${esc(t.at)}` : ""}</p>
     <h2 id="nbTitle">${esc(t.title)}</h2>`;
-  if (left != null) h += `<p class="nbtimer"><span data-tleft>${left}</span> <small>${tread ? "walking at 1.2" : "left on the time box"}</small></p>`;
+  if (left != null) h += `<p class="nbtimer"><span data-tleft>${left}</span> <small>${S.timer && S.timer.pausedLeft != null ? "paused" : tread ? "walking at 1.2" : "left on the time box"}</small>${api.timerBtns ? api.timerBtns() : ""}</p>`;
   h += `<div class="nbbody">`;
   h += `<p class="nbfirst"><span class="hl">First step:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}${fs ? " <b>✓</b>" : ""}</p>`;
   if (t.notes) h += `<div class="nbnotes">${notesHTML(t.notes)}</div>`;

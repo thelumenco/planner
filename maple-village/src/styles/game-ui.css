@@ -253,3 +253,13 @@
   .hbtn{width:40px;height:40px}
 }
 @media (max-width:360px){.hbtn{width:36px;height:36px}.hbtn .ico{width:20px;height:20px}}
+/* round 10: slimmer tracker column (less white around the bars) + timer pause/reset */
+.map .hudbar{padding:5px 2px;gap:7px;right:6px;background-color:color-mix(in srgb,var(--card) 78%,transparent)}
+.map .hudbar .trk{gap:2px}
+.map .hudbar .bar{width:9px;height:clamp(52px,9vh,84px)}
+.map .hudbar .trk .lbl .ico{width:15px;height:15px}
+.map .hudbar .tnote{font-size:.6rem;letter-spacing:-.02em}
+.tctl{display:inline-flex;gap:6px;margin-left:auto;align-self:center}
+.tbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--edge);background-color:var(--card);background-image:var(--fibre);display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 4px 10px -8px rgba(60,40,30,.5)}
+.tbtn:active{transform:translateY(1px)}
+.nbtimer .tctl{font-size:1rem}

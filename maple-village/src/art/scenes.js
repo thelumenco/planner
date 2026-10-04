@@ -102,7 +102,11 @@ export function baseArt(){
     house("home", 205, 220, 110, 74, "var(--card)", "var(--butter)", "Home", "var(--butter)", homeX) +
     // Darren's repair corner: ladder against the wall, toolbox
     sk(`<rect x="326" y="282" width="20" height="12" rx="2" style="fill:var(--rose)"/>`, `<path d="M316 296 l12 -62 M326 296 l12 -62 M318 284 h10 M320 272 h10 M323 260 h10 M325 248 h10"/><rect x="326" y="282" width="20" height="12" rx="2"/><path d="M332 282 v-4 h8 v4"/>`) +
-    `<g data-place="shed" aria-label="Shed"><ellipse class="hov" cx="430" cy="272" rx="40" ry="9" style="fill:var(--butter)"/>
+    // letterbox: the morning paper sticks out of it until it's read (#paperIn is toggled by core's render)
+    `<g data-place="letterbox" aria-label="Letterbox"><ellipse class="hov" cx="182" cy="314" rx="20" ry="6" style="fill:var(--butter)"/>
+      ${sk(`<rect x="179" y="290" width="5" height="24" style="fill:var(--wood)"/><path d="M168 292 v-10 a13 9 0 0 1 26 0 v10z" style="fill:var(--sky)"/>`, `<path d="M181 314 v-22"/><path d="M168 292 v-10 a13 9 0 0 1 26 0 v10z"/><path d="M168 284 h26" opacity=".5"/>`)}
+      <g id="paperIn" filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.2"><path d="M194 278 v-12 h9 l-3 4 l3 4 h-9" style="fill:var(--rose)"/><rect x="160" y="283" width="14" height="7" rx="3" transform="rotate(-14 167 286)" style="fill:#FFFDF6"/><path d="M162 285 h9" transform="rotate(-14 167 286)" opacity=".6"/></g></g>` +
+`<g data-place="shed" aria-label="Shed"><ellipse class="hov" cx="430" cy="272" rx="40" ry="9" style="fill:var(--butter)"/>
       ${sk(`<path d="M394 222 l36 -24 l40 22 v4 z" style="fill:var(--sage)"/><rect x="398" y="220" width="66" height="50" style="fill:#C9A27E"/><rect x="420" y="236" width="22" height="34" style="fill:var(--wood)"/><rect x="448" y="230" width="12" height="10" style="fill:var(--sky)"/>`,
         `<path d="M394 222 l36 -24 l40 22"/><rect x="398" y="220" width="66" height="50"/><path d="M398 234 h66 M398 248 h66 M398 262 h66" opacity=".35"/><rect x="420" y="236" width="22" height="34"/><circle cx="438" cy="254" r="1.4"/><rect x="448" y="230" width="12" height="10"/><path d="M404 270 l-6 -12 M406 258 v12" opacity=".8"/>`)}
       ${tapeLabel(430, 296, "Shed", "var(--sage)")}</g>

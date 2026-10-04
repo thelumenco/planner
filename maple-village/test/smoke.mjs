@@ -82,6 +82,14 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#notebook [data-nb="started"]');
   await page.waitForTimeout(200);
   check(await page.locator("#notebook .nbtimer").count() > 0, "Started starts the time box inside the notebook");
+  await page.click('#notebook [data-tctl="pause"]');
+  await page.waitForTimeout(1300);
+  const t1 = await page.locator("#notebook .nbtimer [data-tleft]").textContent();
+  await page.waitForTimeout(1200);
+  check(await page.locator("#notebook .nbtimer").textContent().then(t => /paused/.test(t)) && t1 === await page.locator("#notebook .nbtimer [data-tleft]").textContent(), "the time box can be paused");
+  await page.click('#notebook [data-tctl="play"]');
+  await page.click('#notebook [data-tctl="reset"]');
+  check(await page.locator('#notebook [data-tctl="pause"]').count() === 1, "and resumed and restarted");
   await page.click('#notebook [data-nb="halfway"]');
   await page.click('#notebook [data-nb="more"]');
   await page.click('#notebook [data-nb="stuck"]');
@@ -191,6 +199,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(1200);
   check(await page.locator('#actors [data-npc="darren"].act-repair').count() === 1, "Darren is repairing the house at lunchtime");
   await page.screenshot({ path: join(shots, "darren-base.png") });
+  check(await page.locator("#paperIn").isVisible(), "the morning paper is sticking out of the letterbox at home");
+  await page.locator('#world [data-place="letterbox"]').dispatchEvent("click");
+  await page.waitForSelector("#nbPage.news .nmast", { timeout: 15000 });
+  check(true, "tapping the letterbox opens The Morning Crier");
+  await page.click('#notebook [data-nb="thanks"]');
+  await page.waitForTimeout(300);
+  check(await page.locator("#paperIn").isHidden(), "once read, the letterbox is empty");
   await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05");
   await page.waitForTimeout(800);
   await page.locator('#world [data-place="home"]').dispatchEvent("click");

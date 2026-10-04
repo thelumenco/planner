@@ -28,6 +28,9 @@ const I = {
   coin: [`<ellipse cx="12" cy="12.5" rx="8" ry="8" ${f(C.honey)}/><ellipse cx="12" cy="12.5" rx="5" ry="5" ${f(C.butter)}/>`,
     `<circle cx="12" cy="12.5" r="8"/><circle cx="12" cy="12.5" r="5"/><path d="M12 10.3v4.4M10.6 11.3l1.4-1 1.4 1" /><path d="M6.8 8.5c.8-1 1.8-1.7 3-2.1" opacity=".6"/>`],
   // quest-note stickers
+  pause: [`<rect x="6.5" y="5" width="4" height="14" rx="1.2" ${f(C.peri)}/><rect x="13.5" y="5" width="4" height="14" rx="1.2" ${f(C.peri)}/>`, `<rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/>`],
+  play: [`<path d="M7.5 4.5l11 7.5-11 7.5z" ${f(C.sage)}/>`, `<path d="M7.5 4.5l11 7.5-11 7.5z"/>`],
+  reset: [`<circle cx="12" cy="12.5" r="7" ${f(C.paper)}/>`, `<path d="M5.4 10.5A7 7 0 1 1 6 16"/><path d="M4.5 6.5l1 4.2 4.1-1.1"/>`],
   clock: [`<circle cx="12" cy="13" r="8" ${f(C.paper)}/>`, `<circle cx="12" cy="13" r="8"/><path d="M12 8.5V13l3 2M6 4.5l-2 2M18 4.5l2 2"/>`],
   chat: [`<path d="M4 6.5c0-1.4 1.1-2.5 2.5-2.5h11c1.4 0 2.5 1.1 2.5 2.5v7c0 1.4-1.1 2.5-2.5 2.5H10l-4 3.5V16h0c-1.1 0-2-1.1-2-2.5z" ${f(C.peri)}/>`,
     `<path d="M4 6.5c0-1.4 1.1-2.5 2.5-2.5h11c1.4 0 2.5 1.1 2.5 2.5v7c0 1.4-1.1 2.5-2.5 2.5H10l-4 3.5V16h0c-1.1 0-2-1.1-2-2.5z"/><path d="M8 9h8M8 12h5"/>`],

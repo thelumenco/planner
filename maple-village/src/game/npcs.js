@@ -75,7 +75,9 @@ function tickCourier(dt){
   const scene = api.scene(), mel = api.mel;
   if (courier && courier.scene !== scene) { drop(courier.id); courier = null; }
   if (!courier) {
-    const item = api.unreadMail()[0]; if (!item) return;
+    // The morning paper (from the crier) waits in the letterbox at home; only if Mel heads into town without
+    // reading it does Rosa come and find her there. Everyone else delivers wherever Mel is.
+    const item = api.unreadMail().find(m => m.from !== "crier" || scene === "village"); if (!item) return;
     const ag = AGENTS[item.from] || AGENTS.postie;
     const start = outdoors(scene) ? (mel.x < 260 ? [540, 330] : [-20, 330]) : [260, 640];
     const id = "agent-" + item.id;
@@ -88,7 +90,7 @@ function tickCourier(dt){
     const arrived = stepTo(c, 150, dt);
     if (arrived && c.state === "coming") {
       c.state = "waiting"; c.dir = -side;
-      if (!greeted.has(c.item.id)) { greeted.add(c.item.id); say(c, `${c.ag.hello} Tap me for the note.`, 6000); }
+      if (!greeted.has(c.item.id)) { greeted.add(c.item.id); say(c, `${c.item.from === "crier" && c.ag.helloTown ? c.ag.helloTown : c.ag.hello} Tap me for the note.`, 6000); }
     }
   } else if (c.state === "leaving") {
     if (stepTo(c, 140, dt)) { drop(c.id); courier = null; }

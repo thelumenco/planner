@@ -8,7 +8,7 @@ import { villageArt, baseArt, roomArt, farmArt, setArtContext } from "../art/sce
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { pullSunsama, SUNSAMA_ERRORS } from "./sunsama.js";
-import { unlockAudio, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx } from "./audio.js";
+import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx } from "./audio.js";
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere } from "./npcs.js";
 
@@ -229,12 +229,23 @@ function chime(){
   try { navigator.vibrate && navigator.vibrate([120, 80, 120]); } catch {}
 }
 function startTimer(kind, mins, id){ S.timer = {kind, endAt: Date.now() + mins*M, total: mins*M, id: id || null, fired:false}; }
+// Time left on the running timer (a paused timer keeps its remaining time in `pausedLeft`).
+const tLeft = () => !S.timer ? 0 : S.timer.pausedLeft != null ? S.timer.pausedLeft : Math.max(0, S.timer.endAt - Date.now());
+function timerCtl(what){
+  const tm = S.timer; if (!tm) return;
+  if (what === "pause" && tm.pausedLeft == null) { tm.pausedLeft = tLeft(); setSay("Paused. The time box waits for you."); }
+  else if (what === "play" && tm.pausedLeft != null) { tm.endAt = Date.now() + tm.pausedLeft; tm.pausedLeft = null; setSay("And we're off again."); }
+  else if (what === "reset") { tm.endAt = Date.now() + tm.total; tm.pausedLeft = null; tm.fired = false; setSay("Fresh start on the clock."); }
+  sfx("tap"); save();
+}
+const timerBtns = () => S.timer ? `<span class="tctl"><button class="tbtn" data-tctl="${S.timer.pausedLeft != null ? "play" : "pause"}" aria-label="${S.timer.pausedLeft != null ? "Resume the timer" : "Pause the timer"}">${icon(S.timer.pausedLeft != null ? "play" : "pause", 18)}</button><button class="tbtn" data-tctl="reset" aria-label="Restart the timer">${icon("reset", 18)}</button></span>` : "";
+document.addEventListener("click", ev => { const b = ev.target.closest("[data-tctl]"); if (b) { ev.stopPropagation(); timerCtl(b.dataset.tctl); } }, true);
 const fmt = left => left ? `${Math.floor(left/M)}:${String(Math.floor(left/1e3)%60).padStart(2,"0")}` : "time!";
 function timerHTML(label){
   if (!S.timer) return "";
-  const left = Math.max(0, S.timer.endAt - Date.now()), C = 2*Math.PI*28;
+  const left = tLeft(), C = 2*Math.PI*28;
   return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-left/S.timer.total)}"/></svg>
-    <div><span class="t" id="tLeft">${fmt(left)}</span><small>${esc(label)}</small></div></div>`;
+    <div><span class="t" id="tLeft">${fmt(left)}</span><small>${S.timer.pausedLeft != null ? "paused" : esc(label)}</small></div>${timerBtns()}</div>`;
 }
 let lastReady = readyCount();
 setInterval(() => {
@@ -245,7 +256,7 @@ setInterval(() => {
   if (scene === "farm" && Math.random() < .2) { drawScene(); if (selPlot != null) ctx(); }
   if (shelfOpen && Math.floor(Date.now()/1000) % 20 === 0) ctx();   // keep "next digest in N min" fresh
   if (!S.timer) return;
-  const left = Math.max(0, S.timer.endAt - Date.now());
+  const left = tLeft();
   const t = $("tLeft"), r = $("ringFg");
   if (t) t.textContent = fmt(left);
   document.querySelectorAll("[data-tleft]").forEach(el => el.textContent = fmt(left));
@@ -336,7 +347,7 @@ function nbAct(kind, t){
   if (kind === "stuck") { A.proc(t); return; }
   if (kind === "more") {
     const tm = S.timer;
-    if (tm && tm.id === t.id && !tm.fired && tm.endAt > Date.now()) { tm.endAt += 10*M; tm.total += 10*M; }
+    if (tm && tm.id === t.id && !tm.fired && tLeft() > 0) { if (tm.pausedLeft != null) tm.pausedLeft += 10*M; tm.endAt += 10*M; tm.total += 10*M; }
     else startTimer("task", 10, t.id);
     setSay("Ten more minutes on the clock. Take them, no guilt."); save(); return;
   }
@@ -346,7 +357,7 @@ function nbAct(kind, t){
 function sayButton(i){ if (!say || !say.buttons || !say.buttons[i]) return; const fn = say.buttons[i][1]; say.buttons = null; fn(); save(); }
 function timerLeft(t){
   if (!S.timer || S.timer.id !== t.id || (S.timer.kind !== "task" && S.timer.kind !== "deal")) return null;
-  return fmt(Math.max(0, S.timer.endAt - Date.now()));
+  return fmt(tLeft());
 }
 
 /* =================== SUNSAMA PULL =================== */
@@ -503,6 +514,7 @@ function windDown(){
   });
 }
 const unreadMail = () => allMail().filter(m => m && m.id && !F.mailRead[m.id] && (!m.at || Date.now() - m.at < 36*H)).sort((a, b) => (a.at || 0) - (b.at || 0));
+const paperWaiting = () => unreadMail().find(m => m.from === "crier");
 function markRead(item){
   if (!F.mailRead[item.id]) {
     F.mailRead[item.id] = Date.now();
@@ -612,7 +624,7 @@ function journal(){
         : `<button class="btn primary" data-a="notebook">Do task</button><button class="btn alt" data-a="firstStep">First step done</button>`}
         <button class="btn alt" data-a="proc">I'm procrastinating</button></div>`;
   } else if (ph === "break") {
-    const fresh = S.timer && S.timer.kind === "break" && (S.timer.total - (S.timer.endAt - Date.now())) < 60e3;
+    const fresh = S.timer && S.timer.kind === "break" && (S.timer.total - tLeft()) < 60e3;
     h += `<h1><span class="lbl">side quest · rest</span>Ten-minute break</h1>${timerHTML("away from the desk")}
       <ul class="bujo"><li>Treadmill counts. Scrolling at your desk doesn't.</li><li>Check the garden, or sit by the pond.</li><li class="pep">Rest is part of the plan.</li></ul>
       <div class="actions"><button class="btn yes" data-a="back">I'm back</button>${!(scene === "base" && atSpot === "pond") ? `<button class="btn alt" data-a="pond">Sit by the pond</button>` : ""}${fresh ? `<button class="btn alt" data-a="flow">I'm in flow</button>` : ""}</div>`;
@@ -640,7 +652,7 @@ function journal(){
   j.innerHTML = h + `<button class="qnx" data-qn="min" aria-label="Fold the note away">–</button>`;
   if (slim) {
     const title = j.querySelector("h1") ? [...j.querySelector("h1").childNodes].filter(n => !(n.classList && n.classList.contains("lbl"))).map(n => n.textContent).join("").trim() : "";
-    const when = S.timer ? `<span class="when" data-tleft>${fmt(Math.max(0, S.timer.endAt - Date.now()))}</span>` : "";
+    const when = S.timer ? `<span class="when" data-tleft>${fmt(tLeft())}</span>` : "";
     j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(route.length ? "Walking… " + title : title)}</b>${when}<span class="more">open</span></button>`;
   }
   j.classList.toggle("intop", !outside());
@@ -854,6 +866,8 @@ function render(redraw){
   $("list").querySelectorAll("[data-rm]").forEach(el => el.onclick = () => { S.extra = S.extra.filter(x => x.id !== el.dataset.rm); save(true); });
   $("list").querySelectorAll("[data-next]").forEach(el => el.onclick = ev => { ev.stopPropagation(); doNext(el.dataset.next); });
   $("list").querySelectorAll("[data-pick]").forEach(el => el.onclick = () => doNext(el.dataset.pick));
+  const pin = $("paperIn"), paper = paperWaiting(); if (pin) pin.style.display = paper ? "" : "none";
+  if (scene === "base" && paper && S.paperSaid !== paper.id) { S.paperSaid = paper.id; setTimeout(() => speak("The Morning Crier is in the letterbox!", 4500), 1800); }
   questMark(); journal(); ctx(); bag(); trackers(); mailCard(); sunsamaLine(); refreshNotebook();
 }
 /* =================== WORLD SIM =================== */
@@ -917,6 +931,7 @@ function arriveVillageSpot(id){
   const v = VILLAGE[id];
   if (v.bridge) { atSpot = null; setScene(v.bridge, ARRIVE[v.bridge]); return; }
   if (id === "swing") { evan.tx = 112 + rnd(-4, 4); evan.ty = 302; evan.run = true; evan.wait = 6; setTimeout(() => evanSays(pick(["wheee!", "push me!", "higher!"])), 900); speak(v.line, 3500); render(); return; }
+  if (id === "letterbox") { const p = paperWaiting(); if (p) { sfx("paper"); openMail(p); } else speak("Nothing in the letterbox. The Morning Crier comes each morning.", 3800); render(); return; }
   if (id === "shed" || id === "bench") { speak(v.line, 3800); render(); return; }
   if (id === "well") { A.water(); return; }
   if (id === "board") { arriveSpot("board"); return; }
@@ -1087,13 +1102,13 @@ $("pclose").onclick = closePanel;
 $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);
 $("setVol").oninput = e => setMusicVol(+e.target.value);
+$("setTest").onclick = () => { unlockAudio(); setTimeout(() => { alarm(); $("setTestNote").textContent = audioRunning() ? "Sound is on. If you heard nothing, check the volume and the silent switch." : "Your browser is still blocking sound. Tap anywhere on the map, then try again."; }, 120); };
 $("setSfx").onchange = e => { setSfx(e.target.checked); if (e.target.checked) sfx("coin"); };
-document.addEventListener("pointerdown", () => unlockAudio(), {once: true, capture: true});
 ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { qnQuietUntil = 0; }, {capture: true, once: true}));
 document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; ctx(); });
 initNotebook({windDown, onTread, water:() => ({ml: S.waterMl || 0, goal: WATER_GOAL, glass: GLASS}), steps:() => ({n: S.steps, goal: STEP_GOAL}),
   addWater:ml => A.water(ml), setWater, setSteps, task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
-  sayNow:() => say, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),
+  sayNow:() => say, timerBtns, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),
   placeLabel:t => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`});
 initNpcs({sfx, chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});

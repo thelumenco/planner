@@ -688,6 +688,16 @@ body.nb-open{overflow:hidden}
   .hbtn{width:40px;height:40px}
 }
 @media (max-width:360px){.hbtn{width:36px;height:36px}.hbtn .ico{width:20px;height:20px}}
+/* round 10: slimmer tracker column (less white around the bars) + timer pause/reset */
+.map .hudbar{padding:5px 2px;gap:7px;right:6px;background-color:color-mix(in srgb,var(--card) 78%,transparent)}
+.map .hudbar .trk{gap:2px}
+.map .hudbar .bar{width:9px;height:clamp(52px,9vh,84px)}
+.map .hudbar .trk .lbl .ico{width:15px;height:15px}
+.map .hudbar .tnote{font-size:.6rem;letter-spacing:-.02em}
+.tctl{display:inline-flex;gap:6px;margin-left:auto;align-self:center}
+.tbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--edge);background-color:var(--card);background-image:var(--fibre);display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 4px 10px -8px rgba(60,40,30,.5)}
+.tbtn:active{transform:translateY(1px)}
+.nbtimer .tctl{font-size:1rem}
 </style>
 </head>
 <body>
@@ -991,6 +1001,7 @@ body.nb-open{overflow:hidden}
           <label class="setrow"><input type="checkbox" id="setMusic"> <span>Music: a calm piano loop</span></label>
           <label class="setrow slider"><span>Music volume</span><input type="range" id="setVol" min="0" max="1" step="0.05"></label>
           <label class="setrow"><input type="checkbox" id="setSfx"> <span>Sound effects: paper, purrs, coins, hellos</span></label>
+          <div class="setrow"><button class="btn small alt" id="setTest" type="button">Play a test sound</button><span class="muted" id="setTestNote">No sound? Turn the volume up and switch off silent mode.</span></div>
           <h3 class="ph3">Your fox</h3>
           <div class="row">
             <label class="sr" for="nameIn">Fox's name</label>
@@ -1098,6 +1109,9 @@ body.nb-open{overflow:hidden}
       `<circle cx="12" cy="12.5" r="8"/><circle cx="12" cy="12.5" r="5"/><path d="M12 10.3v4.4M10.6 11.3l1.4-1 1.4 1" /><path d="M6.8 8.5c.8-1 1.8-1.7 3-2.1" opacity=".6"/>`
     ],
     // quest-note stickers
+    pause: [`<rect x="6.5" y="5" width="4" height="14" rx="1.2" ${f(C.peri)}/><rect x="13.5" y="5" width="4" height="14" rx="1.2" ${f(C.peri)}/>`, `<rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/>`],
+    play: [`<path d="M7.5 4.5l11 7.5-11 7.5z" ${f(C.sage)}/>`, `<path d="M7.5 4.5l11 7.5-11 7.5z"/>`],
+    reset: [`<circle cx="12" cy="12.5" r="7" ${f(C.paper)}/>`, `<path d="M5.4 10.5A7 7 0 1 1 6 16"/><path d="M4.5 6.5l1 4.2 4.1-1.1"/>`],
     clock: [`<circle cx="12" cy="13" r="8" ${f(C.paper)}/>`, `<circle cx="12" cy="13" r="8"/><path d="M12 8.5V13l3 2M6 4.5l-2 2M18 4.5l2 2"/>`],
     chat: [
       `<path d="M4 6.5c0-1.4 1.1-2.5 2.5-2.5h11c1.4 0 2.5 1.1 2.5 2.5v7c0 1.4-1.1 2.5-2.5 2.5H10l-4 3.5V16h0c-1.1 0-2-1.1-2-2.5z" ${f(C.peri)}/>`,
@@ -1263,6 +1277,7 @@ body.nb-open{overflow:hidden}
     farm: { scene: "base", name: "Garden", short: "the garden", door: [108, 492], mark: [108, 384] },
     pond: { scene: "base", name: "Pond", door: [318, 560], spot: true, line: "The pond. Best break spot there is." },
     shed: { scene: "base", name: "Shed", door: [430, 280], spot: true, line: "Darren's shed. Tools, seed packets and one very old radio." },
+    letterbox: { scene: "base", name: "Letterbox", door: [184, 326], spot: true, line: "The letterbox. The Morning Crier lands here." },
     swing: { scene: "base", name: "Tree swing", door: [112, 318], spot: true, line: "Evan's swing. Push, push, wheee!" },
     toTown: { scene: "base", name: "Bridge to town", door: [260, 114], spot: true, bridge: "village", mark: [260, 62], line: "Over the river to the town square." }
   };
@@ -1717,7 +1732,10 @@ body.nb-open{overflow:hidden}
     ${tree(26, 370, 0.9)}${tree(500, 610, 0.9)}${tree(26, 620, 0.95)}${tree(360, 180, 0.8)}`;
     const homeX = { art: `<rect x="290" y="156" width="12" height="22" style="fill:var(--stone)"/>`, lines: `<rect x="290" y="156" width="12" height="22"/><path class="smoke" d="M296 152 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>` };
     const places = bridge("toTown", 260, 30, 110, "To town", 336, 124) + house("home", 205, 220, 110, 74, "var(--card)", "var(--butter)", "Home", "var(--butter)", homeX) + // Darren's repair corner: ladder against the wall, toolbox
-    sk(`<rect x="326" y="282" width="20" height="12" rx="2" style="fill:var(--rose)"/>`, `<path d="M316 296 l12 -62 M326 296 l12 -62 M318 284 h10 M320 272 h10 M323 260 h10 M325 248 h10"/><rect x="326" y="282" width="20" height="12" rx="2"/><path d="M332 282 v-4 h8 v4"/>`) + `<g data-place="shed" aria-label="Shed"><ellipse class="hov" cx="430" cy="272" rx="40" ry="9" style="fill:var(--butter)"/>
+    sk(`<rect x="326" y="282" width="20" height="12" rx="2" style="fill:var(--rose)"/>`, `<path d="M316 296 l12 -62 M326 296 l12 -62 M318 284 h10 M320 272 h10 M323 260 h10 M325 248 h10"/><rect x="326" y="282" width="20" height="12" rx="2"/><path d="M332 282 v-4 h8 v4"/>`) + // letterbox: the morning paper sticks out of it until it's read (#paperIn is toggled by core's render)
+    `<g data-place="letterbox" aria-label="Letterbox"><ellipse class="hov" cx="182" cy="314" rx="20" ry="6" style="fill:var(--butter)"/>
+      ${sk(`<rect x="179" y="290" width="5" height="24" style="fill:var(--wood)"/><path d="M168 292 v-10 a13 9 0 0 1 26 0 v10z" style="fill:var(--sky)"/>`, `<path d="M181 314 v-22"/><path d="M168 292 v-10 a13 9 0 0 1 26 0 v10z"/><path d="M168 284 h26" opacity=".5"/>`)}
+      <g id="paperIn" filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.2"><path d="M194 278 v-12 h9 l-3 4 l3 4 h-9" style="fill:var(--rose)"/><rect x="160" y="283" width="14" height="7" rx="3" transform="rotate(-14 167 286)" style="fill:#FFFDF6"/><path d="M162 285 h9" transform="rotate(-14 167 286)" opacity=".6"/></g></g><g data-place="shed" aria-label="Shed"><ellipse class="hov" cx="430" cy="272" rx="40" ry="9" style="fill:var(--butter)"/>
       ${sk(
       `<path d="M394 222 l36 -24 l40 22 v4 z" style="fill:var(--sage)"/><rect x="398" y="220" width="66" height="50" style="fill:#C9A27E"/><rect x="420" y="236" width="22" height="34" style="fill:var(--wood)"/><rect x="448" y="230" width="12" height="10" style="fill:var(--sky)"/>`,
       `<path d="M394 222 l36 -24 l40 22"/><rect x="398" y="220" width="66" height="50"/><path d="M398 234 h66 M398 248 h66 M398 262 h66" opacity=".35"/><rect x="420" y="236" width="22" height="34"/><circle cx="438" cy="254" r="1.4"/><rect x="448" y="230" width="12" height="10"/><path d="M404 270 l-6 -12 M406 258 v12" opacity=".8"/>`
@@ -2241,7 +2259,7 @@ body.nb-open{overflow:hidden}
     }
   ];
   var AGENTS = {
-    crier: { name: "Rosa the town crier", skill: "morning-briefing", look: { skin: "#EDC6A6", hair: "#8A3B2A", hairStyle: "bun", top: "#C2505F", bottom: "#3A2E28", extra: "bell" }, hello: "Hear ye! Your morning briefing!" },
+    crier: { name: "Rosa the town crier", skill: "morning-briefing", look: { skin: "#EDC6A6", hair: "#8A3B2A", hairStyle: "bun", top: "#C2505F", bottom: "#3A2E28", extra: "bell" }, hello: "Hear ye! Your morning briefing!", helloTown: "Hear ye! Your paper's still in your letterbox, so I've brought the news to town!" },
     runner: { name: "Kip, the library runner", skill: "book-digest", look: { skin: "#D8A882", hair: "#2A211D", hairStyle: "spiky", top: "#7C9F6C", bottom: "#5E5A55", extra: "satchel" }, hello: "Today's book digest, hot off the shelf!" },
     postie: { name: "Penny the postie", skill: "inbox-triage", look: { skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#6E9FD6", bottom: "#2F3B73", extra: "cap" }, hello: "Post! Your inbox, sorted." },
     chord: { name: "Cora from Chord", skill: "Chord agent", look: { skin: "#E6BC98", hair: "#3B2A1E", hairStyle: "bun", top: "#B9D2A6", bottom: "#4F6B8A", extra: "satchel" }, hello: "News from the Chord workshop!" },
@@ -2305,10 +2323,32 @@ body.nb-open{overflow:hidden}
     return ac;
   }
   function unlockAudio() {
+    try {
+      if (navigator.audioSession) navigator.audioSession.type = "playback";
+    } catch {
+    }
     if (!ensure()) return;
-    if (ac.state === "suspended") ac.resume();
-    if (settings.music) startMusic();
+    try {
+      const b = ac.createBuffer(1, 1, 22050), src = ac.createBufferSource();
+      src.buffer = b;
+      src.connect(ac.destination);
+      src.start(0);
+    } catch {
+    }
+    const go2 = () => {
+      if (settings.music) startMusic();
+    };
+    if (ac.state !== "running") ac.resume().then(go2, () => {
+    });
+    else go2();
   }
+  var audioRunning = () => !!ac && ac.state === "running";
+  var GESTURES = ["touchend", "click", "keydown", "pointerup"];
+  function onGesture() {
+    unlockAudio();
+    if (audioRunning()) GESTURES.forEach((t) => document.removeEventListener(t, onGesture, true));
+  }
+  GESTURES.forEach((t) => document.addEventListener(t, onGesture, true));
   var N = (n) => 440 * Math.pow(2, (n - 69) / 12);
   var BARS = [
     [41, 60, 64, 65, 69, 72],
@@ -2389,7 +2429,7 @@ body.nb-open{overflow:hidden}
   function setMusic(on) {
     settings.music = on;
     saveSettings();
-    on ? (ensure(), ac.resume(), startMusic()) : stopMusic();
+    on ? unlockAudio() : stopMusic();
   }
   function setMusicVol(v) {
     settings.musicVol = v;
@@ -2404,7 +2444,11 @@ body.nb-open{overflow:hidden}
     if (!ac) return;
     if (document.hidden) {
       stopMusic();
-    } else if (settings.music && !playing) startMusic();
+    } else {
+      if (ac.state !== "running") ac.resume().catch(() => {
+      });
+      if (settings.music && !playing) startMusic();
+    }
   });
   function noise(sec) {
     const b = ac.createBuffer(1, Math.max(1, Math.floor(ac.sampleRate * sec)), ac.sampleRate), d = b.getChannelData(0);
@@ -2655,7 +2699,7 @@ body.nb-open{overflow:hidden}
     let h = `<button class="nbx" data-nb="close" aria-label="Close notebook">✕</button>
     <p class="nbmeta">${esc(api.placeLabel(t))}${t.at ? ` · at ${esc(t.at)}` : ""}</p>
     <h2 id="nbTitle">${esc(t.title)}</h2>`;
-    if (left != null) h += `<p class="nbtimer"><span data-tleft>${left}</span> <small>${tread ? "walking at 1.2" : "left on the time box"}</small></p>`;
+    if (left != null) h += `<p class="nbtimer"><span data-tleft>${left}</span> <small>${S3.timer && S3.timer.pausedLeft != null ? "paused" : tread ? "walking at 1.2" : "left on the time box"}</small>${api.timerBtns ? api.timerBtns() : ""}</p>`;
     h += `<div class="nbbody">`;
     h += `<p class="nbfirst"><span class="hl">First step:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}${fs ? " <b>✓</b>" : ""}</p>`;
     if (t.notes) h += `<div class="nbnotes">${notesHTML(t.notes)}</div>`;
@@ -3179,7 +3223,7 @@ Quests finished today: ${S3.doneIds.length}`;
       courier = null;
     }
     if (!courier) {
-      const item = api2.unreadMail()[0];
+      const item = api2.unreadMail().find((m) => m.from !== "crier" || scene2 === "village");
       if (!item) return;
       const ag = AGENTS[item.from] || AGENTS.postie;
       const start = outdoors(scene2) ? mel2.x < 260 ? [540, 330] : [-20, 330] : [260, 640];
@@ -3197,7 +3241,7 @@ Quests finished today: ${S3.doneIds.length}`;
         c.dir = -side;
         if (!greeted.has(c.item.id)) {
           greeted.add(c.item.id);
-          say(c, `${c.ag.hello} Tap me for the note.`, 6e3);
+          say(c, `${c.item.from === "crier" && c.ag.helloTown ? c.ag.helloTown : c.ag.hello} Tap me for the note.`, 6e3);
         }
       }
     } else if (c.state === "leaving") {
@@ -3724,12 +3768,40 @@ Quests finished today: ${S3.doneIds.length}`;
   function startTimer(kind, mins, id) {
     S2.timer = { kind, endAt: Date.now() + mins * M, total: mins * M, id: id || null, fired: false };
   }
+  var tLeft = () => !S2.timer ? 0 : S2.timer.pausedLeft != null ? S2.timer.pausedLeft : Math.max(0, S2.timer.endAt - Date.now());
+  function timerCtl(what) {
+    const tm = S2.timer;
+    if (!tm) return;
+    if (what === "pause" && tm.pausedLeft == null) {
+      tm.pausedLeft = tLeft();
+      setSay("Paused. The time box waits for you.");
+    } else if (what === "play" && tm.pausedLeft != null) {
+      tm.endAt = Date.now() + tm.pausedLeft;
+      tm.pausedLeft = null;
+      setSay("And we're off again.");
+    } else if (what === "reset") {
+      tm.endAt = Date.now() + tm.total;
+      tm.pausedLeft = null;
+      tm.fired = false;
+      setSay("Fresh start on the clock.");
+    }
+    sfx("tap");
+    save();
+  }
+  var timerBtns = () => S2.timer ? `<span class="tctl"><button class="tbtn" data-tctl="${S2.timer.pausedLeft != null ? "play" : "pause"}" aria-label="${S2.timer.pausedLeft != null ? "Resume the timer" : "Pause the timer"}">${icon(S2.timer.pausedLeft != null ? "play" : "pause", 18)}</button><button class="tbtn" data-tctl="reset" aria-label="Restart the timer">${icon("reset", 18)}</button></span>` : "";
+  document.addEventListener("click", (ev) => {
+    const b = ev.target.closest("[data-tctl]");
+    if (b) {
+      ev.stopPropagation();
+      timerCtl(b.dataset.tctl);
+    }
+  }, true);
   var fmt = (left) => left ? `${Math.floor(left / M)}:${String(Math.floor(left / 1e3) % 60).padStart(2, "0")}` : "time!";
   function timerHTML(label) {
     if (!S2.timer) return "";
-    const left = Math.max(0, S2.timer.endAt - Date.now()), C2 = 2 * Math.PI * 28;
+    const left = tLeft(), C2 = 2 * Math.PI * 28;
     return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C2}" stroke-dashoffset="${C2 * (1 - left / S2.timer.total)}"/></svg>
-    <div><span class="t" id="tLeft">${fmt(left)}</span><small>${esc(label)}</small></div></div>`;
+    <div><span class="t" id="tLeft">${fmt(left)}</span><small>${S2.timer.pausedLeft != null ? "paused" : esc(label)}</small></div>${timerBtns()}</div>`;
   }
   var lastReady = readyCount();
   setInterval(() => {
@@ -3753,7 +3825,7 @@ Quests finished today: ${S3.doneIds.length}`;
     }
     if (shelfOpen && Math.floor(Date.now() / 1e3) % 20 === 0) ctx();
     if (!S2.timer) return;
-    const left = Math.max(0, S2.timer.endAt - Date.now());
+    const left = tLeft();
     const t = $("tLeft"), r = $("ringFg");
     if (t) t.textContent = fmt(left);
     document.querySelectorAll("[data-tleft]").forEach((el) => el.textContent = fmt(left));
@@ -3968,7 +4040,8 @@ Quests finished today: ${S3.doneIds.length}`;
     }
     if (kind === "more") {
       const tm = S2.timer;
-      if (tm && tm.id === t.id && !tm.fired && tm.endAt > Date.now()) {
+      if (tm && tm.id === t.id && !tm.fired && tLeft() > 0) {
+        if (tm.pausedLeft != null) tm.pausedLeft += 10 * M;
         tm.endAt += 10 * M;
         tm.total += 10 * M;
       } else startTimer("task", 10, t.id);
@@ -3994,7 +4067,7 @@ Quests finished today: ${S3.doneIds.length}`;
   }
   function timerLeft(t) {
     if (!S2.timer || S2.timer.id !== t.id || S2.timer.kind !== "task" && S2.timer.kind !== "deal") return null;
-    return fmt(Math.max(0, S2.timer.endAt - Date.now()));
+    return fmt(tLeft());
   }
   var sun = { busy: false, at: 0, error: null, added: 0 };
   function creditDone(tasks, quiet) {
@@ -4205,6 +4278,7 @@ Then tell chat "wind down" whenever you're ready.`
     });
   }
   var unreadMail = () => allMail().filter((m) => m && m.id && !F.mailRead[m.id] && (!m.at || Date.now() - m.at < 36 * H)).sort((a, b) => (a.at || 0) - (b.at || 0));
+  var paperWaiting = () => unreadMail().find((m) => m.from === "crier");
   function markRead(item) {
     if (!F.mailRead[item.id]) {
       F.mailRead[item.id] = Date.now();
@@ -4381,7 +4455,7 @@ Then tell chat "wind down" whenever you're ready.`
       <div class="actions">${!at ? `<button class="btn primary" data-a="walk">Walk to the ${esc(sp.name.toLowerCase())}</button>` : fs ? `<button class="btn yes" data-a="done">Quest done</button><button class="btn alt" data-a="notebook">Open the notebook</button>` : `<button class="btn primary" data-a="notebook">Do task</button><button class="btn alt" data-a="firstStep">First step done</button>`}
         <button class="btn alt" data-a="proc">I'm procrastinating</button></div>`;
     } else if (ph === "break") {
-      const fresh = S2.timer && S2.timer.kind === "break" && S2.timer.total - (S2.timer.endAt - Date.now()) < 6e4;
+      const fresh = S2.timer && S2.timer.kind === "break" && S2.timer.total - tLeft() < 6e4;
       h += `<h1><span class="lbl">side quest · rest</span>Ten-minute break</h1>${timerHTML("away from the desk")}
       <ul class="bujo"><li>Treadmill counts. Scrolling at your desk doesn't.</li><li>Check the garden, or sit by the pond.</li><li class="pep">Rest is part of the plan.</li></ul>
       <div class="actions"><button class="btn yes" data-a="back">I'm back</button>${!(scene === "base" && atSpot === "pond") ? `<button class="btn alt" data-a="pond">Sit by the pond</button>` : ""}${fresh ? `<button class="btn alt" data-a="flow">I'm in flow</button>` : ""}</div>`;
@@ -4411,7 +4485,7 @@ Then tell chat "wind down" whenever you're ready.`
     j.innerHTML = h + `<button class="qnx" data-qn="min" aria-label="Fold the note away">–</button>`;
     if (slim) {
       const title = j.querySelector("h1") ? [...j.querySelector("h1").childNodes].filter((n) => !(n.classList && n.classList.contains("lbl"))).map((n) => n.textContent).join("").trim() : "";
-      const when = S2.timer ? `<span class="when" data-tleft>${fmt(Math.max(0, S2.timer.endAt - Date.now()))}</span>` : "";
+      const when = S2.timer ? `<span class="when" data-tleft>${fmt(tLeft())}</span>` : "";
       j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(route.length ? "Walking… " + title : title)}</b>${when}<span class="more">open</span></button>`;
     }
     j.classList.toggle("intop", !outside());
@@ -4724,6 +4798,12 @@ Then tell chat "wind down" whenever you're ready.`
       doNext(el.dataset.next);
     });
     $("list").querySelectorAll("[data-pick]").forEach((el) => el.onclick = () => doNext(el.dataset.pick));
+    const pin = $("paperIn"), paper = paperWaiting();
+    if (pin) pin.style.display = paper ? "" : "none";
+    if (scene === "base" && paper && S2.paperSaid !== paper.id) {
+      S2.paperSaid = paper.id;
+      setTimeout(() => speak("The Morning Crier is in the letterbox!", 4500), 1800);
+    }
     questMark();
     journal();
     ctx();
@@ -4867,6 +4947,15 @@ Then tell chat "wind down" whenever you're ready.`
       evan.wait = 6;
       setTimeout(() => evanSays(pick(["wheee!", "push me!", "higher!"])), 900);
       speak(v.line, 3500);
+      render();
+      return;
+    }
+    if (id === "letterbox") {
+      const p = paperWaiting();
+      if (p) {
+        sfx("paper");
+        openMail(p);
+      } else speak("Nothing in the letterbox. The Morning Crier comes each morning.", 3800);
       render();
       return;
     }
@@ -5208,11 +5297,17 @@ Then tell chat "wind down" whenever you're ready.`
   $("zoomBtn").onclick = () => toggleZoom();
   $("setMusic").onchange = (e) => setMusic(e.target.checked);
   $("setVol").oninput = (e) => setMusicVol(+e.target.value);
+  $("setTest").onclick = () => {
+    unlockAudio();
+    setTimeout(() => {
+      alarm();
+      $("setTestNote").textContent = audioRunning() ? "Sound is on. If you heard nothing, check the volume and the silent switch." : "Your browser is still blocking sound. Tap anywhere on the map, then try again.";
+    }, 120);
+  };
   $("setSfx").onchange = (e) => {
     setSfx(e.target.checked);
     if (e.target.checked) sfx("coin");
   };
-  document.addEventListener("pointerdown", () => unlockAudio(), { once: true, capture: true });
   ["pointerdown", "keydown"].forEach((t) => document.addEventListener(t, () => {
     qnQuietUntil = 0;
   }, { capture: true, once: true }));
@@ -5235,6 +5330,7 @@ Then tell chat "wind down" whenever you're ready.`
     act: nbAct,
     timerLeft,
     sayNow: () => say2,
+    timerBtns,
     sample: () => sampleCap,
     sampleDenied: () => {
       sampleCap = null;

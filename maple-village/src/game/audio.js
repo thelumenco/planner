@@ -24,11 +24,20 @@ function ensure(){
   pianoWave = ac.createPeriodicWave(new Float32Array([0, 1, .42, .18, .09, .05, .02]), new Float32Array(7));
   return ac;
 }
+// iPhone/iPad: audio may only start inside a tap's touchend/click (not pointerdown), plays through the silent switch
+// only when the audio session is "playback", and wants one sound started inside that gesture.
 export function unlockAudio(){
+  try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch {}
   if (!ensure()) return;
-  if (ac.state === "suspended") ac.resume();
-  if (settings.music) startMusic();
+  try { const b = ac.createBuffer(1, 1, 22050), src = ac.createBufferSource(); src.buffer = b; src.connect(ac.destination); src.start(0); } catch {}
+  const go = () => { if (settings.music) startMusic(); };
+  if (ac.state !== "running") ac.resume().then(go, () => {}); else go();
 }
+export const audioRunning = () => !!ac && ac.state === "running";
+// keep trying on every real gesture until the context is running
+const GESTURES = ["touchend", "click", "keydown", "pointerup"];
+function onGesture(){ unlockAudio(); if (audioRunning()) GESTURES.forEach(t => document.removeEventListener(t, onGesture, true)); }
+GESTURES.forEach(t => document.addEventListener(t, onGesture, true));
 
 /* ---------- music ---------- */
 const N = n => 440*Math.pow(2, (n - 69)/12);               // MIDI note -> Hz
@@ -75,10 +84,10 @@ export function stopMusic(){
   playing = false; clearInterval(timerId);
   musicBus.gain.setTargetAtTime(0, ac.currentTime, .4);
 }
-export function setMusic(on){ settings.music = on; saveSettings(); on ? (ensure(), ac.resume(), startMusic()) : stopMusic(); }
+export function setMusic(on){ settings.music = on; saveSettings(); on ? unlockAudio() : stopMusic(); }
 export function setMusicVol(v){ settings.musicVol = v; saveSettings(); if (ac && playing) musicBus.gain.setTargetAtTime(v*.5, ac.currentTime, .2); }
 export function setSfx(on){ settings.sfx = on; saveSettings(); }
-document.addEventListener("visibilitychange", () => { if (!ac) return; if (document.hidden) { stopMusic(); } else if (settings.music && !playing) startMusic(); });
+document.addEventListener("visibilitychange", () => { if (!ac) return; if (document.hidden) { stopMusic(); } else { if (ac.state !== "running") ac.resume().catch(() => {}); if (settings.music && !playing) startMusic(); } });
 
 /* ---------- sound effects ---------- */
 function noise(sec){ const b = ac.createBuffer(1, Math.max(1, Math.floor(ac.sampleRate*sec)), ac.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1; const s = ac.createBufferSource(); s.buffer = b; return s; }

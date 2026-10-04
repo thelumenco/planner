@@ -266,4 +266,10 @@ Round 9:
 - Town folk moved: Bo and Theo lunch on the riverside bench, Okada's evening spot is the bench, Auntie Lin feeds the ducks at the home pond at midday, Pip plays with Evan at home base after 3pm.
 - User-count gardens use the stats doc's `label` ("9 studios", "47 families").
 
+Round 10:
+- Sound on iPhone: audio now starts on touchend/click (Safari ignores pointerdown), keeps retrying on each tap until running, plays a silent buffer inside the gesture and sets `navigator.audioSession.type = "playback"` so it isn't muted by the silent switch where supported. Settings has a "Play a test sound" button.
+- Timers can be paused, resumed and restarted (round buttons next to the time, in the quest note and the notebook). `S.timer.pausedLeft` holds the remaining time while paused.
+- Slimmer tracker column on the map.
+- The Morning Crier is delivered to a letterbox at home base (a paper and a raised flag show while it's unread; tap to read). If Mel walks into town without reading it, Rosa the crier finds her there. Other messengers deliver wherever Mel is.
+
 Not done yet: stage 3 ideas (8.5), collision-aware walking.
