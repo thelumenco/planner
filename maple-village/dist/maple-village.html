@@ -868,6 +868,17 @@ body.nb-open{overflow:hidden}
 .undobar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:14px;background:#2F2B28;color:#FFFDF6;border-radius:999px;padding:9px 10px 9px 18px;font-size:.9rem;box-shadow:0 10px 24px -12px rgba(0,0,0,.5);max-width:calc(100% - 32px)}
 .undobar[hidden]{display:none}
 .undobar button{background:var(--butter);color:#2F2B28;border:0;border-radius:999px;padding:5px 14px;font-weight:800;cursor:pointer}
+/* client table */
+.clchips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.clchip{font-size:.78rem;background:#F4EEE3;border-radius:999px;padding:3px 10px;color:#5A534C}.clchip b{color:#2F2B28}
+.clchip.warn{background:#FBE3D6;color:#9A4524}.clchip.warn b{color:#9A4524}
+.clmoney{margin:4px 0 10px}
+.clprojects li > span{display:grid;gap:2px;flex:1;min-width:0}
+.clbar{display:block;height:6px;border-radius:99px;background:#EDE6DA;overflow:hidden;margin-top:3px;max-width:220px}.clbar i{display:block;height:100%;background:var(--sage)}
+.clchat{max-height:220px;overflow:auto;display:grid;gap:6px;margin:6px 0;padding:8px;background:#FBF8F2;border-radius:8px;border:1px solid rgba(120,104,84,.12)}
+.clchat p{margin:0;padding:7px 10px;border-radius:10px;font-size:.88rem;line-height:1.45;max-width:90%;white-space:pre-wrap}
+.clchat .me{justify-self:end;background:#E3EAF8}.clchat .fox{justify-self:start;background:#FFFDF6;border:1px solid rgba(120,104,84,.12)}
+.clatt li > span{display:grid;gap:2px}
 </style>
 </head>
 <body>
@@ -1568,11 +1579,12 @@ body.nb-open{overflow:hidden}
   var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
   var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
   var ROOMS = {
-    hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [448, 262], B: [110, 258], C: [260, 430], D: [334, 266] }, stations: [
+    hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [448, 262], B: [110, 258], C: [260, 430], D: [334, 266], E: [118, 474] }, stations: [
       ["table", "Planning table", "C", "table", /plan|strategy|review|ceo|goal|week|month|quarter|budget/, "Big-picture thinking lives here."],
       ["whiteboard", "Whiteboard", "B", "whiteboard", /brainstorm|idea|map|outline|launch|offer|pricing/, "Fresh marker, blank board."],
       ["phone", "Phone booth", "D", "phone", /call|meeting|zoom|coffee|interview|podcast|sync/, "Quiet booth for calls."],
-      ["shelf", "Bookshelf", "A", "shelf", /read|research|learn|course|study/, "Smart books, cosy spines."]
+      ["shelf", "Bookshelf", "A", "shelf", /read|research|learn|course|study/, "Smart books, cosy spines."],
+      ["clients", "Client table", "E", "table", /proposal|client|brief|contract|onboard/, "Your client projects, live from Chord."]
     ] },
     chord: { name: "Chord workshop", wall: "#E9F0E2", trim: "var(--sage)", pos: { A: [130, 218], B: [390, 420], C: [420, 262], D: [120, 540], E: [262, 336] }, stations: [
       ["bench", "Workbench", "A", "bench", /build|code|fix|bug|feature|ship|deploy|test|app|flow/, "Tools out. Let's build."],
@@ -1585,7 +1597,6 @@ body.nb-open{overflow:hidden}
       ["desk", "Writing desk", "A", "desk", /write|draft|blog|article|essay|journal/, "Pen, paper, quiet."],
       ["typewriter", "Typewriter", "B", "typewriter", /copy|sales page|website|caption|headline|email/, "Clack clack. Words incoming."],
       ["nook", "Reading nook", "C", "nook", /read|review|edit|research|audit|feedback/, "Comfy chair, good lamp."],
-      ["bigtable", "Client table", "D", "table", /proposal|client|plan|brief|contract|onboard/, "Room for spreading out."],
       ["digest", "Digest shelf", "E", "bookcase", null, "Juniper's shelf of book digests."]
     ] },
     chico: { name: "Chico cottage", wall: "#F7E3E6", trim: "var(--blush)", pos: { A: [400, 530], B: [420, 262], C: [130, 530], D: [130, 320], E: [290, 350] }, stations: [
@@ -1635,17 +1646,17 @@ body.nb-open{overflow:hidden}
     });
   }
   var spotObj = (scene2, id) => scene2 === "base" ? baseSpot(id) : id === "board" ? { id: "board", name: "Quest board", tx: 260, ty: 200, line: "This building's quests." } : stationsOf(scene2).find((s) => s.id === id);
-  var isTreadTask = (t) => !!t && (t.spot === "treadmill" || /🚶|treadmill/i.test(t.title || ""));
-  function placeOf(t) {
-    if (isTreadTask(t)) return "home";
-    if (t.place === "base") return "base";
-    if (t.place && WORK.includes(t.place)) return t.place;
-    const s = (t.title + " " + (t.channel || "")).toLowerCase();
-    if (!WORK_HINT.test(s) && !t.meeting && baseSpotFor(s)) return "base";
+  var isTreadTask = (t2) => !!t2 && (t2.spot === "treadmill" || /🚶|treadmill/i.test(t2.title || ""));
+  function placeOf(t2) {
+    if (isTreadTask(t2)) return "home";
+    if (t2.place === "base") return "base";
+    if (t2.place && WORK.includes(t2.place)) return t2.place;
+    const s = (t2.title + " " + (t2.channel || "")).toLowerCase();
+    if (!WORK_HINT.test(s) && !t2.meeting && baseSpotFor(s)) return "base";
     if (/chord/.test(s)) return "chord";
     if (/chico/.test(s)) return "chico";
     if (/ambidextrous|town hall/.test(s)) return "hall";
-    if (t.meeting) return "hall";
+    if (t2.meeting) return "hall";
     if (/clean|fold|laundry|cook|chore|grocer|wash|tidy|evan|hestia|skincare|gym|workout/.test(s)) return "home";
     if (/copy|write|blog|caption|proposal|audit|muse|fresh pages|newsletter|website|brand/.test(s)) return "fresh";
     if (isWeekend() && !WORK_HINT.test(s) && !/email|inbox|reply|admin|tax|bank/.test(s)) return "home";
@@ -1655,20 +1666,20 @@ body.nb-open{overflow:hidden}
     const v = VILLAGE[id];
     return v ? { id, name: v.name, tx: v.door[0], ty: v.door[1], x: v.door[0], y: v.door[1], line: v.line } : null;
   }
-  function spotOf(t) {
-    if (placeOf(t) === "base") {
-      const s2 = (t.title + " " + (t.channel || "")).toLowerCase();
-      return t.spot && BASE_SPOTS.some(([id]) => id === t.spot) ? t.spot : baseSpotFor(s2) || "pond";
+  function spotOf(t2) {
+    if (placeOf(t2) === "base") {
+      const s2 = (t2.title + " " + (t2.channel || "")).toLowerCase();
+      return t2.spot && BASE_SPOTS.some(([id]) => id === t2.spot) ? t2.spot : baseSpotFor(s2) || "pond";
     }
-    const pl = placeOf(t), st = stationsOf(pl).filter((s2) => (s2.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title)) && s2.id !== "treadmill" && s2.re);
-    if (isTreadTask(t)) return "treadmill";
-    if (t.spot && st.find((s2) => s2.id === t.spot)) return t.spot;
-    const s = t.title.toLowerCase();
-    const hit = st.find((x) => x.re && x.re.source !== "." && x.re.test(s));
+    const pl = placeOf(t2), st2 = stationsOf(pl).filter((s2) => (s2.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t2.title)) && s2.id !== "treadmill" && s2.re);
+    if (isTreadTask(t2)) return "treadmill";
+    if (t2.spot && st2.find((s2) => s2.id === t2.spot)) return t2.spot;
+    const s = t2.title.toLowerCase();
+    const hit = st2.find((x) => x.re && x.re.source !== "." && x.re.test(s));
     if (hit) return hit.id;
-    const fallback = st.filter((x) => x.id !== "cupboard" && x.re);
+    const fallback = st2.filter((x) => x.id !== "cupboard" && x.re);
     const dflt = fallback.find((x) => x.re && x.re.source === ".");
-    return dflt ? dflt.id : fallback[hash(t.id) % fallback.length].id;
+    return dflt ? dflt.id : fallback[hash(t2.id) % fallback.length].id;
   }
 
   // src/data/items.js
@@ -2451,12 +2462,12 @@ body.nb-open{overflow:hidden}
       case "healthchord":
       case "healthchico": {
         const h = G && G.health ? G.health(kind.slice(6)) : null, L = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
-        const st = h ? h.status : "grey", word = { green: "ALL GOOD", amber: "WATCH", red: "NEEDS YOU", grey: "NO REPORT" }[st];
-        const lights = (h && h.checks.length ? h.checks.slice(0, 3).map((c) => c.state) : [st, st, st]).map((c, i) => `<circle cx="${x - 18 + i * 18}" cy="${y - 62}" r="6" style="fill:${L[c]}"/>`).join("");
+        const st2 = h ? h.status : "grey", word = { green: "ALL GOOD", amber: "WATCH", red: "NEEDS YOU", grey: "NO REPORT" }[st2];
+        const lights = (h && h.checks.length ? h.checks.slice(0, 3).map((c) => c.state) : [st2, st2, st2]).map((c, i) => `<circle cx="${x - 18 + i * 18}" cy="${y - 62}" r="6" style="fill:${L[c]}"/>`).join("");
         return sk(
           `<rect x="${x - 3}" y="${y - 30}" width="6" height="30" style="fill:var(--wood)"/><rect x="${x - 34}" y="${y - 80}" width="68" height="52" rx="5" style="fill:#FFFDF6"/>${lights}`,
           `<rect x="${x - 34}" y="${y - 80}" width="68" height="52" rx="5"/><path d="M${x - 3} ${y - 28} v28 M${x + 3} ${y - 28} v28 M${x - 12} ${y} h24"/>${lights.replace(/ style="[^"]*"/g, "")}`
-        ) + `<text x="${x}" y="${y - 38}" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="800" font-size="9" letter-spacing=".6" style="fill:${L[st] === L.grey ? "var(--line)" : L[st]}">${word}</text>`;
+        ) + `<text x="${x}" y="${y - 38}" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="800" font-size="9" letter-spacing=".6" style="fill:${L[st2] === L.grey ? "var(--line)" : L[st2]}">${word}</text>`;
       }
       case "pobox": {
         let c = "";
@@ -2487,15 +2498,15 @@ body.nb-open{overflow:hidden}
     return "";
   }
   function roomArt(id) {
-    const r = ROOMS[id], st = stationsOf(id);
+    const r = ROOMS[id], st2 = stationsOf(id);
     let h = roomShell(id);
     if (id !== "market" && !r.noBoard) h += `<g data-spot="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="204" rx="40" ry="10" style="fill:var(--butter)"/>
-    ${sk(`<rect x="222" y="40" width="76" height="56" rx="3" style="fill:var(--wood)"/>`, `<rect x="222" y="40" width="76" height="56" rx="3"/>${notesArt(230, 50, G.questsIn(id).filter((t) => !G.S().doneIds.includes(t.id)).length)}`)}${tapeLabel(260, 112, "Quests here", "var(--butter)")}</g>`;
+    ${sk(`<rect x="222" y="40" width="76" height="56" rx="3" style="fill:var(--wood)"/>`, `<rect x="222" y="40" width="76" height="56" rx="3"/>${notesArt(230, 50, G.questsIn(id).filter((t2) => !G.S().doneIds.includes(t2.id)).length)}`)}${tapeLabel(260, 112, "Quests here", "var(--butter)")}</g>`;
     else if (id === "market") h += sk(
       `<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
       `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`
     ) + `<g>${[["apple", "dumpling", "fish", "toast"], ["tulip", "carrot", "strawberry", "sunflower"]].map((row2, r2) => row2.map((n, i) => iconAt(n, 64 + i * 30, 62 + r2 * 38, 26)).join("")).join("")}${[["yarn", "ball", "brush", "crown"], ["bath", "fort", "corn", "blueberry"]].map((row2, r2) => row2.map((n, i) => iconAt(n, 374 + i * 30, 62 + r2 * 38, 26)).join("")).join("")}</g>`;
-    st.forEach((s) => {
+    st2.forEach((s) => {
       h += `<g data-spot="${s.id}" aria-label="${s.name}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${tapeLabel(s.x, s.y + 24, s.name, "var(--card)")}</g>`;
     });
     if (id === "room") {
@@ -2543,10 +2554,10 @@ body.nb-open{overflow:hidden}
   }
   var GARDEN_TIERS = [[0, "daisy"], [100, "tulip"], [250, "sunflower"]];
   function userGarden(key, x, y, cols, rows2, gap) {
-    const st = (G.stats() || {})[key];
-    if (!st || !(st.users >= 0)) return "";
-    const per = st.per > 0 ? st.per : 10, users = Math.floor(st.users), n = Math.min(cols * rows2, Math.ceil(users / per));
-    const tier = GARDEN_TIERS.reduce((t, [min, k]) => users >= min ? k : t, "daisy");
+    const st2 = (G.stats() || {})[key];
+    if (!st2 || !(st2.users >= 0)) return "";
+    const per = st2.per > 0 ? st2.per : 10, users = Math.floor(st2.users), n = Math.min(cols * rows2, Math.ceil(users / per));
+    const tier = GARDEN_TIERS.reduce((t2, [min, k]) => users >= min ? k : t2, "daisy");
     const cols4 = key === "chord" ? ["#F3C969", "#FFFDF6", "#C3CDEE"] : ["#EFA3A6", "#F4C7CF", "#FFFDF6"];
     let f2 = "";
     for (let i = 0; i < n; i++) {
@@ -2560,7 +2571,7 @@ body.nb-open{overflow:hidden}
     const w = cols * gap, signX = x + w / 2 + (key === "chord" ? 8 : 0), signY = y + rows2 * gap + 10;
     const tree2 = users >= 500 ? `<g filter="url(#wob)" ${ink}><rect x="${x + w - 6}" y="${y + 4}" width="4" height="12" style="fill:var(--wood)"/><circle cx="${x + w - 4}" cy="${y}" r="9" style="fill:#F4C7CF"/><circle cx="${x + w - 10}" cy="${y + 4}" r="6" style="fill:#EFA3A6"/></g>` : "";
     const sparkle = users >= 1e3 ? `<g class="twinkle">${iconAt("sparkle", x - 2, y - 2, 12)}${iconAt("sparkle", x + w + 2, y + rows2 * gap - 4, 11)}</g>` : "";
-    const label2 = `${users.toLocaleString()} ${st.label || (key === "chord" ? "studios" : "families")}`;
+    const label2 = `${users.toLocaleString()} ${st2.label || (key === "chord" ? "studios" : "families")}`;
     return `<g data-ugarden="${key}" aria-label="${label2}">${f2}${tree2}${sparkle}
     ${tapeLabel(signX, signY, label2, key === "chord" ? "var(--sage)" : "var(--blush)", 10)}</g>`;
   }
@@ -2583,7 +2594,7 @@ body.nb-open{overflow:hidden}
     const n = Math.max(3, Math.round((x2 - x1) / 12)), mid = (y1 + y2) / 2 + 8;
     let f2 = "";
     for (let i = 0; i < n; i++) {
-      const t = (i + 0.5) / n, x = x1 + (x2 - x1) * t, y = (1 - t) * (1 - t) * y1 + 2 * (1 - t) * t * mid + t * t * y2;
+      const t2 = (i + 0.5) / n, x = x1 + (x2 - x1) * t2, y = (1 - t2) * (1 - t2) * y1 + 2 * (1 - t2) * t2 * mid + t2 * t2 * y2;
       f2 += `<path d="M${x - 4} ${y} l4 8 l4 -8z" style="fill:${cols[i % cols.length]}"/>`;
     }
     return sk(f2, `<path d="M${x1} ${y1} Q${(x1 + x2) / 2} ${mid} ${x2} ${y2}"/>${f2.replace(/ style="[^"]*"/g, "")}`);
@@ -2617,7 +2628,7 @@ body.nb-open{overflow:hidden}
     if (has("lights")) {
       let b = "";
       for (let i = 0; i < 9; i++) {
-        const t = i / 8, x = 192 + 136 * t, y = 296 - Math.sin(Math.PI * t) * 22;
+        const t2 = i / 8, x = 192 + 136 * t2, y = 296 - Math.sin(Math.PI * t2) * 22;
         b += `<circle class="twinkle" cx="${x.toFixed(1)}" cy="${(y + 3).toFixed(1)}" r="2.6" fill="${["#FFD66E", "#F7A9A9", "#A9D3A0", "#A9C6E0"][i % 4]}"/>`;
       }
       h += `<g filter="url(#wob)"><path d="M192 296 Q260 252 328 296" fill="none" style="stroke:var(--line)" stroke-width="1.2"/></g><g>${b}</g>`;
@@ -2674,7 +2685,7 @@ body.nb-open{overflow:hidden}
       case "christmas": {
         let b = "";
         for (let i = 0; i < 9; i++) {
-          const t = i / 8, x = 192 + 136 * t, y = 296 - Math.sin(Math.PI * t) * 22;
+          const t2 = i / 8, x = 192 + 136 * t2, y = 296 - Math.sin(Math.PI * t2) * 22;
           b += `<circle class="twinkle" cx="${x.toFixed(1)}" cy="${(y + 3).toFixed(1)}" r="2.4" fill="${["#D9433A", "#F3C969", "#7FA36E"][i % 3]}"/>`;
         }
         return `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.2"><path d="M192 296 Q260 252 328 296" fill="none"/><path d="M318 410 l14 -34 l14 34z" style="fill:#7FA36E"/><rect x="329" y="410" width="6" height="8" style="fill:var(--wood)"/></g>${iconAt("sparkle", 332, 372, 14)}<g>${b}</g>`;
@@ -2965,9 +2976,9 @@ body.nb-open{overflow:hidden}
   var GESTURES = ["touchend", "click", "keydown", "pointerup"];
   function onGesture() {
     unlockAudio();
-    if (audioRunning()) GESTURES.forEach((t) => document.removeEventListener(t, onGesture, true));
+    if (audioRunning()) GESTURES.forEach((t2) => document.removeEventListener(t2, onGesture, true));
   }
-  GESTURES.forEach((t) => document.addEventListener(t, onGesture, true));
+  GESTURES.forEach((t2) => document.addEventListener(t2, onGesture, true));
   var N = (n) => 440 * Math.pow(2, (n - 69) / 12);
   var TRACKS = {
     piano: {
@@ -3046,7 +3057,7 @@ body.nb-open{overflow:hidden}
   var rainSrc = null;
   var bellWave = null;
   var rhodesWave = null;
-  function note(freq, t, dur2, vel) {
+  function note(freq, t2, dur2, vel) {
     const o = ac.createOscillator(), g = ac.createGain(), f2 = ac.createBiquadFilter(), tone = cur().tone;
     if (!bellWave) {
       bellWave = ac.createPeriodicWave(new Float32Array([0, 1, 0, 0.35, 0, 0.12, 0, 0.05]), new Float32Array(8));
@@ -3056,13 +3067,13 @@ body.nb-open{overflow:hidden}
     o.frequency.value = freq;
     f2.type = "lowpass";
     f2.frequency.value = Math.min(4200, 900 + freq * 2.2);
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(vel, t + 6e-3);
-    g.gain.exponentialRampToValueAtTime(vel * 0.35, t + 0.25);
-    g.gain.exponentialRampToValueAtTime(1e-4, t + dur2);
+    g.gain.setValueAtTime(0, t2);
+    g.gain.linearRampToValueAtTime(vel, t2 + 6e-3);
+    g.gain.exponentialRampToValueAtTime(vel * 0.35, t2 + 0.25);
+    g.gain.exponentialRampToValueAtTime(1e-4, t2 + dur2);
     o.connect(f2).connect(g).connect(musicBus);
-    o.start(t);
-    o.stop(t + dur2 + 0.05);
+    o.start(t2);
+    o.stop(t2 + dur2 + 0.05);
   }
   function newMelody() {
     melody = BARS.map((b, i) => {
@@ -3074,23 +3085,23 @@ body.nb-open{overflow:hidden}
   function schedule() {
     const T = cur(), S8 = T.steps || 8, up = T.up || 0;
     while (nextTime < ac.currentTime + 0.6) {
-      const bar = Math.floor(step / S8) % BARS.length, e = step % S8, t = nextTime, b = BARS[bar];
+      const bar = Math.floor(step / S8) % BARS.length, e = step % S8, t2 = nextTime, b = BARS[bar];
       if (bar === 0 && e === 0) {
         if (step) loops++;
         newMelody();
         if (Math.random() > T.mel) melody = melody.map(() => []);
       }
       if (e === 0) {
-        note(N(b[0]), t, 3.4, 0.16);
-        note(N(b[0] + 12), t, 3, 0.08);
+        note(N(b[0]), t2, 3.4, 0.16);
+        note(N(b[0] + 12), t2, 3, 0.08);
       }
-      if (S8 === 8 && e === 4) note(N(b[0] + 7), t, 2.4, 0.09);
-      if (T.bounce && (e === 2 || e === 6)) note(N(b[0] + 12), t, 0.6, 0.07);
-      if (S8 === 6 && (e === 2 || e === 4)) note(N(b[1]), t, 1.2, 0.05);
+      if (S8 === 8 && e === 4) note(N(b[0] + 7), t2, 2.4, 0.09);
+      if (T.bounce && (e === 2 || e === 6)) note(N(b[0] + 12), t2, 0.6, 0.07);
+      if (S8 === 6 && (e === 2 || e === 4)) note(N(b[1]), t2, 1.2, 0.05);
       const arp = (T.arp || [1, 2, 3, 4, 3, 2, 1, 2])[e];
-      note(N(b[Math.min(arp, b.length - 1)] + up), t + (Math.random() - 0.5) * 0.012, 2.2, (T.arpVel || 0.055) + Math.random() * 0.02);
+      note(N(b[Math.min(arp, b.length - 1)] + up), t2 + (Math.random() - 0.5) * 0.012, 2.2, (T.arpVel || 0.055) + Math.random() * 0.02);
       (melody[bar] || []).forEach(([beat, n]) => {
-        if (Math.abs(beat * 2 - e) < 0.01) note(N(n + up), t + 0.01, 2.8, 0.1);
+        if (Math.abs(beat * 2 - e) < 0.01) note(N(n + up), t2 + 0.01, 2.8, 0.1);
       });
       step++;
       nextTime += BEAT / 2;
@@ -3195,24 +3206,24 @@ body.nb-open{overflow:hidden}
     s.buffer = b;
     return s;
   }
-  function bell(freq, t, dur2, vel) {
+  function bell(freq, t2, dur2, vel) {
     [1, 2.76, 5.4].forEach((m, i) => {
       const o = ac.createOscillator(), g = ac.createGain();
       o.type = "sine";
       o.frequency.value = freq * m;
-      g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(vel / (i * 1.8 + 1), t + 4e-3);
-      g.gain.exponentialRampToValueAtTime(1e-4, t + dur2 / (i + 1));
+      g.gain.setValueAtTime(0, t2);
+      g.gain.linearRampToValueAtTime(vel / (i * 1.8 + 1), t2 + 4e-3);
+      g.gain.exponentialRampToValueAtTime(1e-4, t2 + dur2 / (i + 1));
       o.connect(g).connect(sfxBus);
-      o.start(t);
-      o.stop(t + dur2);
+      o.start(t2);
+      o.stop(t2 + dur2);
     });
   }
   var FX = {
     // paper: a handful of tiny filtered crackles
-    paper(t, soft) {
+    paper(t2, soft) {
       for (let i = 0; i < (soft ? 5 : 9); i++) {
-        const s = noise(0.03), f2 = ac.createBiquadFilter(), g = ac.createGain(), at = t + i * (0.018 + Math.random() * 0.03);
+        const s = noise(0.03), f2 = ac.createBiquadFilter(), g = ac.createGain(), at = t2 + i * (0.018 + Math.random() * 0.03);
         f2.type = "bandpass";
         f2.frequency.value = 1800 + Math.random() * 3500;
         f2.Q.value = 1.4;
@@ -3223,62 +3234,62 @@ body.nb-open{overflow:hidden}
       }
     },
     // purr: rumbling low noise, pulsing ~24 times a second, swelling in and out
-    purr(t) {
+    purr(t2) {
       const s = noise(1.8), f2 = ac.createBiquadFilter(), g = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain();
       f2.type = "lowpass";
       f2.frequency.value = 260;
       lfo.frequency.value = 24;
       lg.gain.value = 0.5;
       lfo.connect(lg).connect(g.gain);
-      g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(0.55, t + 0.3);
-      g.gain.linearRampToValueAtTime(0.45, t + 1.2);
-      g.gain.linearRampToValueAtTime(0, t + 1.75);
+      g.gain.setValueAtTime(0, t2);
+      g.gain.linearRampToValueAtTime(0.55, t2 + 0.3);
+      g.gain.linearRampToValueAtTime(0.45, t2 + 1.2);
+      g.gain.linearRampToValueAtTime(0, t2 + 1.75);
       s.connect(f2).connect(g).connect(sfxBus);
-      s.start(t);
-      lfo.start(t);
-      lfo.stop(t + 1.8);
+      s.start(t2);
+      lfo.start(t2);
+      lfo.stop(t2 + 1.8);
     },
     // cha-ching: a quick register clunk then two bright bells
-    chaching(t) {
+    chaching(t2) {
       const s = noise(0.08), f2 = ac.createBiquadFilter(), g = ac.createGain();
       f2.type = "highpass";
       f2.frequency.value = 2500;
-      g.gain.setValueAtTime(0.35, t);
-      g.gain.exponentialRampToValueAtTime(1e-4, t + 0.08);
+      g.gain.setValueAtTime(0.35, t2);
+      g.gain.exponentialRampToValueAtTime(1e-4, t2 + 0.08);
       s.connect(f2).connect(g).connect(sfxBus);
-      s.start(t);
-      bell(1568, t + 0.07, 1.1, 0.22);
-      bell(2093, t + 0.17, 1.4, 0.2);
+      s.start(t2);
+      bell(1568, t2 + 0.07, 1.1, 0.22);
+      bell(2093, t2 + 0.17, 1.4, 0.2);
     },
-    coin(t) {
-      bell(2349, t, 0.7, 0.12);
+    coin(t2) {
+      bell(2349, t2, 0.7, 0.12);
     },
-    bowl(t) {
+    bowl(t2) {
       [220, 550].forEach((f2, i) => {
         const o = ac.createOscillator(), g = ac.createGain();
         o.type = "sine";
         o.frequency.value = f2;
-        g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(i ? 0.05 : 0.16, t + 0.02);
-        g.gain.exponentialRampToValueAtTime(1e-4, t + 3.2);
+        g.gain.setValueAtTime(0, t2);
+        g.gain.linearRampToValueAtTime(i ? 0.05 : 0.16, t2 + 0.02);
+        g.gain.exponentialRampToValueAtTime(1e-4, t2 + 3.2);
         o.connect(g).connect(sfxBus);
-        o.start(t);
-        o.stop(t + 3.3);
+        o.start(t2);
+        o.stop(t2 + 3.3);
       });
     },
     // a soft single chime (ticking things off, gifts); timers ending still use the fuller three-note alarm
-    chime(t) {
-      bell(1046, t, 1.4, 0.055);
+    chime(t2) {
+      bell(1046, t2, 1.4, 0.055);
     },
-    alarm(t) {
-      [660, 880, 1320].forEach((fr, i) => bell(fr, t + i * 0.18, 1.2, 0.14));
+    alarm(t2) {
+      [660, 880, 1320].forEach((fr, i) => bell(fr, t2 + i * 0.18, 1.2, 0.14));
     },
     // villager "hello": a few soft pitched blips, Animal Crossing style, pitch set per villager
-    babble(t, pitch = 1) {
+    babble(t2, pitch = 1) {
       const n = 3 + Math.floor(Math.random() * 3);
       for (let i = 0; i < n; i++) {
-        const o = ac.createOscillator(), f2 = ac.createBiquadFilter(), g = ac.createGain(), at = t + i * 0.075;
+        const o = ac.createOscillator(), f2 = ac.createBiquadFilter(), g = ac.createGain(), at = t2 + i * 0.075;
         o.type = "square";
         o.frequency.value = 330 * pitch * Math.pow(2, [0, 2, 4, 7, 9][Math.floor(Math.random() * 5)] / 12);
         f2.type = "lowpass";
@@ -3291,16 +3302,16 @@ body.nb-open{overflow:hidden}
         o.stop(at + 0.08);
       }
     },
-    tap(t) {
+    tap(t2) {
       const o = ac.createOscillator(), g = ac.createGain();
       o.type = "triangle";
-      o.frequency.setValueAtTime(880, t);
-      o.frequency.exponentialRampToValueAtTime(520, t + 0.06);
-      g.gain.setValueAtTime(0.06, t);
-      g.gain.exponentialRampToValueAtTime(1e-4, t + 0.08);
+      o.frequency.setValueAtTime(880, t2);
+      o.frequency.exponentialRampToValueAtTime(520, t2 + 0.06);
+      g.gain.setValueAtTime(0.06, t2);
+      g.gain.exponentialRampToValueAtTime(1e-4, t2 + 0.08);
       o.connect(g).connect(sfxBus);
-      o.start(t);
-      o.stop(t + 0.1);
+      o.start(t2);
+      o.stop(t2 + 0.1);
     }
   };
   function sfx(name, arg) {
@@ -3347,9 +3358,9 @@ body.nb-open{overflow:hidden}
         return;
       }
       if (open && open.kind === "tracker") return trackerAct(k, b);
-      const t = api.task();
-      if (!t || !open || open.kind !== "task") return;
-      api.act(k, t);
+      const t2 = api.task();
+      if (!t2 || !open || open.kind !== "task") return;
+      api.act(k, t2);
     });
     root.addEventListener("keydown", (ev) => {
       if (ev.key === "Escape") closeNotebook();
@@ -3365,8 +3376,8 @@ body.nb-open{overflow:hidden}
     });
   }
   var notebookOpen = () => !!open;
-  function openTask(t) {
-    open = { kind: "task", id: t.id };
+  function openTask(t2) {
+    open = { kind: "task", id: t2.id };
     show();
   }
   function openMail(item) {
@@ -3409,13 +3420,13 @@ body.nb-open{overflow:hidden}
     if (!open) return;
     const page = $("nbPage");
     if (open.kind === "task") {
-      const t = api.task();
-      if (!t || t.id !== open.id) {
+      const t2 = api.task();
+      if (!t2 || t2.id !== open.id) {
         closeNotebook();
         return;
       }
       const keep = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
-      page.innerHTML = taskPage(t);
+      page.innerHTML = taskPage(t2);
       if ($("nbAsk")) {
         $("nbAsk").value = keep;
         if (typing) $("nbAsk").focus();
@@ -3448,17 +3459,17 @@ body.nb-open{overflow:hidden}
     }
     return out + (list ? "</ul>" : "");
   }
-  function taskPage(t) {
-    const S3 = api.S(), fs = api.fs(t), left2 = api.timerLeft(t), say3 = api.sayNow();
-    const tread = api.onTread(t);
-    const em = t.email || null;
+  function taskPage(t2) {
+    const S3 = api.S(), fs = api.fs(t2), left2 = api.timerLeft(t2), say3 = api.sayNow();
+    const tread = api.onTread(t2);
+    const em = t2.email || null;
     let h = `<button class="nbx" data-nb="close" aria-label="Close notebook">✕</button>
-    <p class="nbmeta">${esc(api.placeLabel(t))}${t.at ? ` · at ${esc(t.at)}` : ""}</p>
-    <h2 id="nbTitle">${esc(t.title)}</h2>`;
+    <p class="nbmeta">${esc(api.placeLabel(t2))}${t2.at ? ` · at ${esc(t2.at)}` : ""}</p>
+    <h2 id="nbTitle">${esc(t2.title)}</h2>`;
     if (left2 != null) h += `<p class="nbtimer"><span data-tleft>${left2}</span> <small>${S3.timer && S3.timer.pausedLeft != null ? "paused" : tread ? "walking at 1.2" : "left on the time box"}</small>${api.timerBtns ? api.timerBtns() : ""}</p>`;
     h += `<div class="nbbody">`;
-    h += `<p class="nbfirst"><span class="hl">First step:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}${fs ? " <b>✓</b>" : ""}</p>`;
-    if (t.notes) h += `<div class="nbnotes">${notesHTML(t.notes)}</div>`;
+    h += `<p class="nbfirst"><span class="hl">First step:</span> ${esc(t2.firstStep || "open whatever you need for it. Just open it.")}${fs ? " <b>✓</b>" : ""}</p>`;
+    if (t2.notes) h += `<div class="nbnotes">${notesHTML(t2.notes)}</div>`;
     else h += `<p class="nbnone">No notes from Sunsama on this one. Ask chat to add some, or talk it through below.</p>`;
     if (em) {
       h += `<div class="nbmail"><p class="nblbl">Email</p>
@@ -3468,9 +3479,9 @@ body.nb-open{overflow:hidden}
       ${em.draft ? `<button class="btn alt small" data-nb="copy">Copy draft</button>` : ""}</div>
       <p class="nbhint">Sending stays with you in Gmail. Tell chat if you'd like the draft changed.</p></div>`;
     }
-    if (t.pep) h += `<p class="nbpep">♡ ${esc(t.pep)}</p>`;
+    if (t2.pep) h += `<p class="nbpep">♡ ${esc(t2.pep)}</p>`;
     if (say3 && say3.line) h += `<div class="nbsay"><p>${icon("fox", 22)} ${esc(plain(say3.line))}</p>${say3.buttons ? `<div class="nbrow">${say3.buttons.map((b, i) => `<button class="btn alt small" data-nb="sayb" data-i="${i}">${esc(b[0])}</button>`).join("")}</div>` : ""}</div>`;
-    const chat = chats[t.id] || [];
+    const chat = chats[t2.id] || [];
     if (api.sample() !== null || chat.length) {
       h += `<div class="nbtalk"><p class="nblbl">Talk to the note</p>
       ${chat.length ? `<div class="nbchat" aria-live="polite">${chat.map((m) => `<p class="${m.role}">${m.role === "user" ? "" : icon("fox", 18) + " "}${esc(m.content)}</p>`).join("")}</div>` : ""}
@@ -3481,7 +3492,7 @@ body.nb-open{overflow:hidden}
     ${!fs ? `<button class="btn primary" data-nb="started">Started</button>` : `<button class="btn alt" data-nb="halfway">Halfway</button>`}
     <button class="btn alt" data-nb="stuck">Stuck</button>
     ${fs ? `<button class="btn alt" data-nb="more">Need more time</button>` : ""}
-    ${t.treadmill && !tread ? `<button class="btn alt" data-nb="treadmill">${icon("walker", 18)} Do it on the treadmill</button>` : ""}
+    ${t2.treadmill && !tread ? `<button class="btn alt" data-nb="treadmill">${icon("walker", 18)} Do it on the treadmill</button>` : ""}
     ${fs ? `<button class="btn yes" data-nb="done">Done</button>` : ""}
   </div>`;
     return h;
@@ -3536,14 +3547,14 @@ body.nb-open{overflow:hidden}
       </div>
       <div class="nbactions"><button class="btn yes" data-nb="thanks">Done</button></div>`;
     }
-    const st = api.steps();
+    const st2 = api.steps();
     return `<button class="nbx" data-nb="close" aria-label="Close">✕</button>
     <p class="nbmeta">${icon("steps", 16)} today's steps</p>
-    <h2 id="nbTitle">${st.n.toLocaleString()} <small class="nbby">of ${st.goal.toLocaleString()}</small></h2>
-    <div class="trbar">${progressBar(st.n / st.goal, "var(--sage)", 5)}</div>
+    <h2 id="nbTitle">${st2.n.toLocaleString()} <small class="nbby">of ${st2.goal.toLocaleString()}</small></h2>
+    <div class="trbar">${progressBar(st2.n / st2.goal, "var(--sage)", 5)}</div>
     <div class="nbbody">
       <p class="nblbl">Steps showing now</p>
-      <div class="nbrow nbask"><label class="sr" for="nbTrack">Steps showing now</label><input id="nbTrack" type="number" inputmode="numeric" min="0" placeholder="${st.n || 2e3}"><button class="btn primary small" data-nb="sset">Save</button></div>
+      <div class="nbrow nbask"><label class="sr" for="nbTrack">Steps showing now</label><input id="nbTrack" type="number" inputmode="numeric" min="0" placeholder="${st2.n || 2e3}"><button class="btn primary small" data-nb="sset">Save</button></div>
       <p class="nbhint">Type the total from your watch or the treadmill. Every 1,000 earns 2 coins.</p>
     </div>
     <div class="nbactions"><button class="btn yes" data-nb="thanks">Done</button></div>`;
@@ -3577,25 +3588,25 @@ body.nb-open{overflow:hidden}
   }
   var safeUrl = (u) => typeof u === "string" && /^https?:\/\//i.test(u) ? u : null;
   async function ask() {
-    const input = $("nbAsk"), sample = api.sample(), t = api.task();
-    if (!input || !sample || !t || busy) return;
+    const input = $("nbAsk"), sample = api.sample(), t2 = api.task();
+    if (!input || !sample || !t2 || busy) return;
     const q = input.value.trim();
     if (!q) return;
-    const log = chats[t.id] = chats[t.id] || [];
+    const log = chats[t2.id] = chats[t2.id] || [];
     log.push({ role: "user", content: q }, { role: "assistant", content: "…" });
     input.value = "";
     busy = new AbortController();
     refreshNotebook();
-    const S3 = api.S(), left2 = api.timerLeft(t);
+    const S3 = api.S(), left2 = api.timerLeft(t2);
     const brief = `You are Maple, a tiny fox who coaches Mel through her work day inside a cosy village game. Warm, direct, short sentences, never guilt, no lectures.
 Reply in at most 3 short sentences and end with exactly one tiny physical next action. Plain text, no markdown, at most one emoji.
 If the task involves pricing, remind her to price on the value delivered, not on what the buyer can afford.
 Never claim to have done anything outside this conversation (you can't send emails, tick tasks or set timers).
-Quest: ${t.title}
-First step: ${t.firstStep || "(none given)"}
-Time box: ${t.minutes || 25} minutes${left2 ? `, ${left2} left` : ""}${api.fs(t) ? ", first step done" : ", not started yet"}
-Notes: ${t.notes || "(none)"}${t.email ? `
-Email: ${JSON.stringify(t.email)}` : ""}
+Quest: ${t2.title}
+First step: ${t2.firstStep || "(none given)"}
+Time box: ${t2.minutes || 25} minutes${left2 ? `, ${left2} left` : ""}${api.fs(t2) ? ", first step done" : ", not started yet"}
+Notes: ${t2.notes || "(none)"}${t2.email ? `
+Email: ${JSON.stringify(t2.email)}` : ""}
 Quests finished today: ${S3.doneIds.length}`;
     const turns = log.slice(0, -1).map((m, i) => i === 0 ? { role: "user", content: brief + "\n\nMel says: " + m.content } : m);
     try {
@@ -3621,8 +3632,8 @@ Quests finished today: ${S3.doneIds.length}`;
     $("nbAsk")?.focus();
   }
   async function copyDraft(btn) {
-    const t = api.task();
-    const d = t && t.email && t.email.draft;
+    const t2 = api.task();
+    const d = t2 && t2.email && t2.email.draft;
     if (!d) return;
     try {
       await navigator.clipboard.writeText(d);
@@ -3652,10 +3663,10 @@ Quests finished today: ${S3.doneIds.length}`;
   // src/game/sunsama.js
   var SUNSAMA = "Sunsama MCP";
   var decode = (s) => {
-    const t = document.createElement("textarea");
+    const t2 = document.createElement("textarea");
     for (let i = 0; i < 2; i++) {
-      t.innerHTML = s;
-      s = t.value;
+      t2.innerHTML = s;
+      s = t2.value;
     }
     return s;
   };
@@ -3670,31 +3681,31 @@ Quests finished today: ${S3.doneIds.length}`;
     const n = (h ? +h[1] * 60 : 0) + (m ? +m[1] : 0);
     return n > 0 ? Math.min(180, n) : 25;
   }
-  function toQuest(t) {
-    let notes2 = htmlToText(t.notes);
-    const subs = (t.subtasks || []).filter((s) => s && s.title);
+  function toQuest(t2) {
+    let notes2 = htmlToText(t2.notes);
+    const subs = (t2.subtasks || []).filter((s) => s && s.title);
     if (subs.length) notes2 = (notes2 ? notes2 + "\n" : "") + "Subtasks:\n" + subs.map((s) => `- ${s.completed ? "✓ " : ""}${s.title}`).join("\n");
-    const q = { id: t._id, title: t.title.trim(), minutes: minutesOf(t.timeEstimate), channel: t.channel || t.category || "", source: "sunsama" };
-    if (t.completed) q.completed = true;
+    const q = { id: t2._id, title: t2.title.trim(), minutes: minutesOf(t2.timeEstimate), channel: t2.channel || t2.category || "", source: "sunsama" };
+    if (t2.completed) q.completed = true;
     if (notes2) q.notes = notes2.slice(0, 4e3);
-    if (/^personal$/i.test(q.channel) || t.isPersonal) q.place = "home";
-    const gmail = /https:\/\/mail\.google\.com\/[^\s"<]+/.exec(decode(t.notes || ""));
-    if (gmail || /\b(email|inbox|reply|comms)\b/i.test(t.title)) {
+    if (/^personal$/i.test(q.channel) || t2.isPersonal) q.place = "home";
+    const gmail = /https:\/\/mail\.google\.com\/[^\s"<]+/.exec(decode(t2.notes || ""));
+    if (gmail || /\b(email|inbox|reply|comms)\b/i.test(t2.title)) {
       q.place = "post";
       q.spot = "counter";
-      q.email = { subject: t.title.replace(/^\[[^\]]*\]\s*/, ""), link: gmail ? gmail[0] : "https://mail.google.com/mail/u/0/#inbox" };
+      q.email = { subject: t2.title.replace(/^\[[^\]]*\]\s*/, ""), link: gmail ? gmail[0] : "https://mail.google.com/mail/u/0/#inbox" };
     }
-    if (/🚶|treadmill/i.test(t.title)) {
+    if (/🚶|treadmill/i.test(t2.title)) {
       q.treadmill = true;
       q.place = "home";
       q.spot = "treadmill";
       delete q.email;
-    } else if (/\bwalk\b/i.test(t.title)) q.treadmill = true;
+    } else if (/\bwalk\b/i.test(t2.title)) q.treadmill = true;
     return q;
   }
   function questsFrom(payload) {
     const list = payload && Array.isArray(payload.tasks) ? payload.tasks : Array.isArray(payload) ? payload : [];
-    return list.filter((t) => t && t._id && t.title && !t.deleted && !t.isArchived && !t.isBacklogged).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map(toQuest);
+    return list.filter((t2) => t2 && t2._id && t2.title && !t2.deleted && !t2.isArchived && !t2.isBacklogged).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map(toQuest);
   }
   async function pullSunsama(day, opts = {}) {
     let mcp = null;
@@ -3827,7 +3838,7 @@ Quests finished today: ${S3.doneIds.length}`;
     const skip = obs.filter((r) => inside(a[0], a[1], r, PAD) || inside(b[0], b[1], r, PAD));
     const d = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.ceil(d / 5));
     for (let i = 1; i < n; i++) {
-      const t = i / n, x = a[0] + (b[0] - a[0]) * t, y = a[1] + (b[1] - a[1]) * t;
+      const t2 = i / n, x = a[0] + (b[0] - a[0]) * t2, y = a[1] + (b[1] - a[1]) * t2;
       for (const r of obs) if (!skip.includes(r) && inside(x, y, r, PAD)) return false;
     }
     return true;
@@ -3917,16 +3928,16 @@ Quests finished today: ${S3.doneIds.length}`;
         } catch {
         }
       }
-      const threads = (p && p.threads || []).map((t) => {
-        const ms = t.messages || [], last2 = ms[ms.length - 1] || {}, first = ms[0] || {};
+      const threads = (p && p.threads || []).map((t2) => {
+        const ms = t2.messages || [], last2 = ms[ms.length - 1] || {}, first = ms[0] || {};
         return {
-          id: t.id,
+          id: t2.id,
           subject: first.subject || last2.subject || "(no subject)",
           from: last2.sender || "",
           snippet: last2.snippet || first.snippet || "",
           at: Date.parse(last2.date || "") || 0,
-          count: t.messageCount || ms.length,
-          url: t.viewUrl || last2.viewUrl || ""
+          count: t2.messageCount || ms.length,
+          url: t2.viewUrl || last2.viewUrl || ""
         };
       }).sort((a, b) => b.at - a.at);
       cache2 = { at: Date.now(), threads, error: null, busy: false };
@@ -3958,7 +3969,7 @@ Quests finished today: ${S3.doneIds.length}`;
     if (c.busy && !c.threads.length) h += `<p class="muted">Penny's checking the post…</p>`;
     else if (c.error && !c.threads.length) h += `<p class="muted">${esc(POST_ERRORS[c.error] || "Couldn't fetch your post just now. Try again in a minute.")}</p>`;
     else if (!c.threads.length) h += `<p class="muted">Nothing unread. A tidy post box!</p>`;
-    else h += `<ul class="hlist post">${c.threads.map((t) => `<li><a href="${esc(t.url)}" target="_blank" rel="noopener"><b>${esc(who(t.from))}</b><span>${esc(t.subject)}${t.count > 1 ? ` <small>(${t.count})</small>` : ""}</span><small>${esc(t.snippet.slice(0, 90))}</small></a><small class="when">${t.at ? ago(t.at) : ""}</small></li>`).join("")}</ul>`;
+    else h += `<ul class="hlist post">${c.threads.map((t2) => `<li><a href="${esc(t2.url)}" target="_blank" rel="noopener"><b>${esc(who(t2.from))}</b><span>${esc(t2.subject)}${t2.count > 1 ? ` <small>(${t2.count})</small>` : ""}</span><small>${esc(t2.snippet.slice(0, 90))}</small></a><small class="when">${t2.at ? ago(t2.at) : ""}</small></li>`).join("")}</ul>`;
     h += `<div class="actions"><a class="btn small alt" href="https://mail.google.com/mail/?authuser=mel@freshpages.co" target="_blank" rel="noopener">Open Gmail</a><button class="btn small alt" data-postfresh="1">Check again</button></div>`;
     return h;
   }
@@ -4269,8 +4280,8 @@ Quests finished today: ${S3.doneIds.length}`;
   var zoneDone = (i) => !!H2.zoneLog[`z${H2.currentZoneIndex}_${i}`];
   function hestiaCounts() {
     tidy();
-    const daily = (H2.dailyTasks || []).filter((t) => !dayDone(t.id)).length;
-    const weeklyToday = (H2.weeklyTasks || []).filter((t) => t.weekday === dow() && !weekDone(t.id)).length;
+    const daily = (H2.dailyTasks || []).filter((t2) => !dayDone(t2.id)).length;
+    const weeklyToday = (H2.weeklyTasks || []).filter((t2) => t2.weekday === dow() && !weekDone(t2.id)).length;
     const shop = (H2.shoppingList || []).filter((s) => !s.purchased).length;
     return { chores: daily + weeklyToday, shop, zoneLeft: (zone().tasks || []).filter((_, i) => !zoneDone(i)).length };
   }
@@ -4331,20 +4342,20 @@ Quests finished today: ${S3.doneIds.length}`;
   }
   function dealCards() {
     const cards = [];
-    (H2.dailyTasks || []).forEach((t) => {
-      if (!dayDone(t.id)) cards.push({ kind: "daily", id: t.id, text: t.text, group: "Daily" });
+    (H2.dailyTasks || []).forEach((t2) => {
+      if (!dayDone(t2.id)) cards.push({ kind: "daily", id: t2.id, text: t2.text, group: "Daily" });
     });
-    (H2.weeklyTasks || []).forEach((t) => {
-      if (!weekDone(t.id)) cards.push({ kind: "weekly", id: t.id, text: t.text, group: "Weekly" });
+    (H2.weeklyTasks || []).forEach((t2) => {
+      if (!weekDone(t2.id)) cards.push({ kind: "weekly", id: t2.id, text: t2.text, group: "Weekly" });
     });
-    (zone().tasks || []).forEach((t, i) => {
-      if (!zoneDone(i)) cards.push({ kind: "zone", id: i, text: t.text, group: zone().name });
+    (zone().tasks || []).forEach((t2, i) => {
+      if (!zoneDone(i)) cards.push({ kind: "zone", id: i, text: t2.text, group: zone().name });
     });
     return cards;
   }
   var effort = (n) => `<span class="heff" title="${["", "Low", "Medium", "High"][n || 1]} effort">${"●".repeat(n || 1)}<i>${"●".repeat(3 - (n || 1))}</i></span>`;
-  function row(kind, id, t, done, badge) {
-    return `<li class="${done ? "done" : ""}"><label><input type="checkbox" data-hdone="${kind}:${id}" ${done ? "checked" : ""}><span>${esc(t.text)}</span></label>${badge || ""}${effort(t.effort)}${kind !== "zone" ? `<button class="hx" data-hdel="${kind}:${id}" aria-label="Remove this chore">✕</button>` : ""}</li>`;
+  function row(kind, id, t2, done, badge) {
+    return `<li class="${done ? "done" : ""}"><label><input type="checkbox" data-hdone="${kind}:${id}" ${done ? "checked" : ""}><span>${esc(t2.text)}</span></label>${badge || ""}${effort(t2.effort)}${kind !== "zone" ? `<button class="hx" data-hdel="${kind}:${id}" aria-label="Remove this chore">✕</button>` : ""}</li>`;
   }
   function timerBlock() {
     if (!timer) return `<div class="htimer"><span>${icon("clock", 18)} Tidy timer</span>${[10, 20, 30].map((m) => `<button class="btn small ${m === H2.timerMinutes ? "primary" : "alt"}" data-htimer="${m}">${m} min</button>`).join("")}</div>`;
@@ -4362,14 +4373,14 @@ Quests finished today: ${S3.doneIds.length}`;
     ${timerBlock()}<div class="actions"><button class="btn small yes" data-hfocus="1">One at a time</button></div>
     <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-htab="${k}" aria-selected="${view.tab === k}">${n}</button>`).join("")}</div><ul class="hlist">`;
     if (view.tab === "daily") {
-      const order = (t) => (dayDone(t.id) ? 10 : 0) + (t.timeOfDay === "morning" ? 0 : t.timeOfDay === "evening" ? 2 : 1);
-      h += [...H2.dailyTasks || []].sort((a, b) => order(a) - order(b)).map((t) => row("daily", t.id, t, dayDone(t.id), t.timeOfDay ? `<span class="hbadge">${t.timeOfDay}</span>` : "")).join("");
+      const order = (t2) => (dayDone(t2.id) ? 10 : 0) + (t2.timeOfDay === "morning" ? 0 : t2.timeOfDay === "evening" ? 2 : 1);
+      h += [...H2.dailyTasks || []].sort((a, b) => order(a) - order(b)).map((t2) => row("daily", t2.id, t2, dayDone(t2.id), t2.timeOfDay ? `<span class="hbadge">${t2.timeOfDay}</span>` : "")).join("");
     } else if (view.tab === "weekly") {
-      const order = (t) => (weekDone(t.id) ? 10 : 0) + (t.weekday === dow() ? 0 : 1);
-      h += [...H2.weeklyTasks || []].sort((a, b) => order(a) - order(b)).map((t) => row("weekly", t.id, t, weekDone(t.id), t.weekday != null ? `<span class="hbadge${t.weekday === dow() ? " now" : ""}">${t.weekday === dow() ? "today" : DAYS[t.weekday]}</span>` : "")).join("");
+      const order = (t2) => (weekDone(t2.id) ? 10 : 0) + (t2.weekday === dow() ? 0 : 1);
+      h += [...H2.weeklyTasks || []].sort((a, b) => order(a) - order(b)).map((t2) => row("weekly", t2.id, t2, weekDone(t2.id), t2.weekday != null ? `<span class="hbadge${t2.weekday === dow() ? " now" : ""}">${t2.weekday === dow() ? "today" : DAYS[t2.weekday]}</span>` : "")).join("");
     } else {
       const z = zone(), n = (z.tasks || []).length, d = (z.tasks || []).filter((_, i) => zoneDone(i)).length;
-      h += `<li class="hzone"><b>${esc(z.name)}</b> <small>week ${H2.currentZoneIndex + 1} of ${H2.zones.length} · ${d}/${n} done</small></li>` + (z.tasks || []).map((t, i) => row("zone", i, t, zoneDone(i))).join("");
+      h += `<li class="hzone"><b>${esc(z.name)}</b> <small>week ${H2.currentZoneIndex + 1} of ${H2.zones.length} · ${d}/${n} done</small></li>` + (z.tasks || []).map((t2, i) => row("zone", i, t2, zoneDone(i))).join("");
     }
     h += `</ul>${view.tab !== "zone" ? `<form class="row hadd" data-hadd="${view.tab}"><input name="t" maxlength="80" placeholder="add a ${view.tab} chore"><button class="btn small alt">Add</button></form>` : `<div class="actions"><button class="btn small alt" data-hnextzone="1">Move on to ${esc(H2.zones[(H2.currentZoneIndex + 1) % H2.zones.length].name)}</button></div>`}`;
     return h;
@@ -4423,14 +4434,14 @@ Quests finished today: ${S3.doneIds.length}`;
     on("[data-hdel]", "click", (el) => {
       const [k, id] = el.dataset.hdel.split(":");
       const key = k === "daily" ? "dailyTasks" : "weeklyTasks";
-      const i = H2[key].findIndex((t) => t.id === id);
+      const i = H2[key].findIndex((t2) => t2.id === id);
       if (i < 0) return;
       const gone = H2[key][i];
-      H2[key] = H2[key].filter((t) => t.id !== id);
+      H2[key] = H2[key].filter((t2) => t2.id !== id);
       save();
       api2.changed();
       api2.undoable(`Removed “${gone.text}”`, () => {
-        if (!H2[key].some((t) => t.id === id)) H2[key].splice(Math.min(i, H2[key].length), 0, gone);
+        if (!H2[key].some((t2) => t2.id === id)) H2[key].splice(Math.min(i, H2[key].length), 0, gone);
         save();
         api2.changed();
       });
@@ -4633,18 +4644,18 @@ Quests finished today: ${S3.doneIds.length}`;
     return text;
   }
   function chatTickChore(text) {
-    const n = norm(text), m = (t) => norm(t.text).includes(n) || n.includes(norm(t.text));
-    const d = (H2.dailyTasks || []).find((t) => m(t) && !dayDone(t.id));
+    const n = norm(text), m = (t2) => norm(t2.text).includes(n) || n.includes(norm(t2.text));
+    const d = (H2.dailyTasks || []).find((t2) => m(t2) && !dayDone(t2.id));
     if (d) {
       setDone("daily", d.id, true);
       return d.text;
     }
-    const w = (H2.weeklyTasks || []).find((t) => m(t) && !weekDone(t.id));
+    const w = (H2.weeklyTasks || []).find((t2) => m(t2) && !weekDone(t2.id));
     if (w) {
       setDone("weekly", w.id, true);
       return w.text;
     }
-    const zi = (zone().tasks || []).findIndex((t, i) => m(t) && !zoneDone(i));
+    const zi = (zone().tasks || []).findIndex((t2, i) => m(t2) && !zoneDone(i));
     if (zi >= 0) {
       setDone("zone", zi, true);
       return zone().tasks[zi].text;
@@ -4659,10 +4670,10 @@ Quests finished today: ${S3.doneIds.length}`;
     tidy();
     const shop = (H2.shoppingList || []).map((s) => (H2.pantryItems.find((i) => i.id === s.id) || {}).name).filter(Boolean);
     return {
-      choresDueToday: [...(H2.dailyTasks || []).filter((t) => !dayDone(t.id)).map((t) => t.text), ...(H2.weeklyTasks || []).filter((t) => t.weekday === dow() && !weekDone(t.id)).map((t) => t.text)],
-      weeklyLeft: (H2.weeklyTasks || []).filter((t) => !weekDone(t.id)).map((t) => t.text),
+      choresDueToday: [...(H2.dailyTasks || []).filter((t2) => !dayDone(t2.id)).map((t2) => t2.text), ...(H2.weeklyTasks || []).filter((t2) => t2.weekday === dow() && !weekDone(t2.id)).map((t2) => t2.text)],
+      weeklyLeft: (H2.weeklyTasks || []).filter((t2) => !weekDone(t2.id)).map((t2) => t2.text),
       zone: zone().name,
-      zoneLeft: (zone().tasks || []).filter((_, i) => !zoneDone(i)).map((t) => t.text),
+      zoneLeft: (zone().tasks || []).filter((_, i) => !zoneDone(i)).map((t2) => t2.text),
       shoppingList: shop,
       pantry: (H2.pantryItems || []).slice(0, 80).map((i) => i.name + (i.inStock ? "" : " (out)")),
       stores: H2.whereToBuyLocations.map((l) => l.name)
@@ -4777,7 +4788,7 @@ Quests finished today: ${S3.doneIds.length}`;
     const rows2 = FIELDS.filter(([k]) => o[k]).map(([k, n]) => `<li><span class="gpic">${garment(k === "layer" ? "layer" : k, o[k])}</span><span><small>${n}</small>${esc(clean(o[k]))}</span></li>`).join("");
     return `<div class="outfit"><p class="olabel">${esc(clean(o.label, 50) || `Option ${i + 1}`)}</p><ul>${rows2}</ul>${o.why ? `<p class="owhy">${esc(clean(o.why, 220))}</p>` : ""}</div>`;
   }
-  function wardrobePanel(F2, st) {
+  function wardrobePanel(F2, st2) {
     const d = todayDoc(), more = extras(F2), inv = inventory();
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The wardrobe</h2>`;
     if (d) h += `<p class="sub">${[d.weather && esc(clean(d.weather, 60)), d.on && esc(clean(d.on, 160))].filter(Boolean).join(" · ") || "Today's picks from your stylist."}</p>`;
@@ -4786,8 +4797,8 @@ Quests finished today: ${S3.doneIds.length}`;
     if (all.length) h += `<div class="outfits">${all.map(card).join("")}</div>`;
     h += `<p class="eyebrow" style="margin:14px 0 6px">Want something different?</p>`;
     if (!inv) h += `<p class="muted">New outfits need your wardrobe list, which comes with the morning drop-off.</p>`;
-    else if (!st.sample) h += `<p class="muted">New outfits need Claude, which isn't reachable from this view just now.</p>`;
-    else h += `<form class="row" id="outfitForm"><label class="sr" for="outfitAsk">What for?</label><input id="outfitAsk" maxlength="120" placeholder="optional: dinner out, school run, more colour..." value="${esc(st.ask || "")}"><button class="btn small" type="submit" ${st.busy ? "disabled" : ""}>${st.busy ? "Picking…" : "New outfit"}</button></form>${st.error ? `<p class="muted">${esc(st.error)}</p>` : ""}`;
+    else if (!st2.sample) h += `<p class="muted">New outfits need Claude, which isn't reachable from this view just now.</p>`;
+    else h += `<form class="row" id="outfitForm"><label class="sr" for="outfitAsk">What for?</label><input id="outfitAsk" maxlength="120" placeholder="optional: dinner out, school run, more colour..." value="${esc(st2.ask || "")}"><button class="btn small" type="submit" ${st2.busy ? "disabled" : ""}>${st2.busy ? "Picking…" : "New outfit"}</button></form>${st2.error ? `<p class="muted">${esc(st2.error)}</p>` : ""}`;
     return h;
   }
   async function newOutfit(F2, sample, ask2, events) {
@@ -4852,9 +4863,9 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     return p;
   };
   var pageText = (p) => {
-    const t = typeof p === "string" ? p : p && (p.text || p.content || "") || "";
-    const m = /<content>([\s\S]*?)<\/content>/.exec(String(t));
-    return (m ? m[1] : String(t)).replace(/\\\$/g, "$").trim();
+    const t2 = typeof p === "string" ? p : p && (p.text || p.content || "") || "";
+    const m = /<content>([\s\S]*?)<\/content>/.exec(String(t2));
+    return (m ? m[1] : String(t2)).replace(/\\\$/g, "$").trim();
   };
   async function readPlan(level2, opts = {}) {
     const title = planTitles()[level2];
@@ -4878,6 +4889,136 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     }
   }
   var PLAN_WORDS = /\b(plan|plans|planned|quarter|q[1-4]|month|monthly|week|weekly|goal|goals|objective|priorit|focus|theme|revenue|target|on track|this week|next week)\b/i;
+
+  // src/game/clients.js
+  var CHORD = "Chord";
+  var unwrap2 = (r) => {
+    let p = r && r.payload !== void 0 ? r.payload : r;
+    if (typeof p === "string") {
+      try {
+        p = JSON.parse(p);
+      } catch {
+      }
+    }
+    if (p && Array.isArray(p.content) && p.content[0] && typeof p.content[0].text === "string") {
+      try {
+        return JSON.parse(p.content[0].text);
+      } catch {
+        return p.content[0].text;
+      }
+    }
+    return p;
+  };
+  async function mcpUse() {
+    try {
+      return window.claude && claude.use ? await claude.use("mcp") : null;
+    } catch {
+      return null;
+    }
+  }
+  async function call(tool, input, fresh2) {
+    const mcp = await mcpUse();
+    if (!mcp) throw { code: "unavailable" };
+    return unwrap2(await mcp.callTool(CHORD, tool, input || {}, { cache: { staleTime: fresh2 ? 0 : 5 * 6e4, refresh: !!fresh2 } }));
+  }
+  var CLIENT_ERRORS = {
+    unavailable: "Chord isn't reachable from this view.",
+    needs_reauth: "Chord needs reconnecting: claude.ai Settings → Connectors.",
+    server_not_connected: "Add the Chord connector in claude.ai Settings → Connectors.",
+    not_in_manifest: "Chord is switched off for this page. Turn it on in the page's Permissions.",
+    not_granted: "Chord isn't allowed for this page yet.",
+    server_unavailable: "Chord didn't answer just now. Try again in a minute."
+  };
+  var st = { snap: null, busy: false, error: null, at: 0, log: [], chatBusy: false };
+  async function loadClients(fresh2) {
+    if (st.busy) return;
+    st.busy = true;
+    st.error = null;
+    try {
+      const [overview, projects, attention] = await Promise.all([call("studio_overview", {}, fresh2), call("list_projects", { status: "active", limit: 60 }, fresh2), call("needs_attention", {}, fresh2).catch(() => null)]);
+      st.snap = { overview: overview || {}, projects: projects && projects.projects || [], attention: attention && attention.items || [] };
+      st.at = Date.now();
+    } catch (e) {
+      st.error = e && e.code || "server_unavailable";
+    }
+    st.busy = false;
+  }
+  var t = (s, n = 90) => esc(plain(String(s ?? "")).slice(0, n));
+  var when = (d) => {
+    if (!d) return "";
+    const x = /* @__PURE__ */ new Date(d + "T00:00:00Z");
+    return isNaN(x) ? t(d, 20) : x.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+  };
+  function clientsPanel(sample) {
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Client table</h2>`;
+    if (st.busy && !st.snap) return h + `<p class="sub">Spreading the client files out…</p>`;
+    if (st.error && !st.snap) return h + `<p class="sub">${esc(CLIENT_ERRORS[st.error] || "Couldn't reach Chord just now.")}</p><div class="actions"><button class="btn alt small" data-cl="refresh">Try again</button></div>`;
+    if (!st.snap) return h + `<p class="sub">Your client projects, live from Chord.</p><div class="actions"><button class="btn primary small" data-cl="refresh">Open the files</button></div>`;
+    const o = st.snap.overview, cur2 = o.currency || "$";
+    const chip = (n, label2, warn) => `<span class="clchip${warn && n ? " warn" : ""}"><b>${Number(n) || 0}</b> ${label2}</span>`;
+    h += `<p class="sub">${t(o.studio || "Your studio", 40)} · today in Chord${st.busy ? " · refreshing…" : ""}</p>
+    <div class="clchips">${chip(o.projects_active, "active projects")}${chip(o.tasks_overdue, "overdue tasks", true)}${chip(o.tasks_waiting_on_clients, "waiting on clients")}${chip(o.client_comments_open, "client comments", true)}${chip(o.proposals_awaiting_reply, "proposals out")}${chip(o.leads_open, "open leads")}</div>
+    <p class="muted clmoney">${o.retainers_running ? `${o.retainers_running} retainers · ${cur2}${Number(o.retainer_income_per_month || 0).toLocaleString()}/month` : ""}${o.money_overdue ? ` · <b>${cur2}${Number(o.money_overdue).toLocaleString()} overdue</b>` : o.money_owed ? ` · ${cur2}${Number(o.money_owed).toLocaleString()} owed` : ""}</p>`;
+    const ps = st.snap.projects;
+    h += `<p class="eyebrow">Active projects</p>` + (ps.length ? `<ul class="hlist clprojects">${ps.slice(0, 20).map((p) => {
+      const pct = p.tasks_total ? Math.round(100 * p.tasks_done / p.tasks_total) : 0;
+      return `<li><span><b>${t(p.name, 70)}</b><small>${t(p.client, 40)}${p.category ? " · " + t(p.category, 20) : ""}${p.due ? " · due " + when(p.due) : ""}${p.key_date ? ` · ${t(p.key_date_label || "key date", 20)} ${when(p.key_date)}` : ""}</small>
+      ${p.tasks_total ? `<span class="clbar"><i style="width:${pct}%"></i></span><small>${p.tasks_done}/${p.tasks_total} tasks</small>` : ""}</span></li>`;
+    }).join("")}</ul>` : `<p class="muted">No active projects right now.</p>`);
+    const att = st.snap.attention;
+    if (att.length) h += `<p class="eyebrow">Needs your attention</p><ul class="hlist clatt">${att.slice(0, 8).map((a) => `<li><span>${t(a.title || a.what || a.summary || a.type || "Item", 90)}<small>${t(a.action || a.todo || a.detail || "", 110)}</small></span></li>`).join("")}</ul>`;
+    const nb = (o.next_bookings || [])[0];
+    if (nb) h += `<p class="muted">Next booking: ${t(nb.meeting, 40)} with ${t(nb.with, 40)}, ${t(nb.starts, 40)}.</p>`;
+    h += `<div class="actions"><button class="btn alt small" data-cl="refresh">Refresh</button></div>`;
+    h += `<p class="eyebrow" style="margin-top:14px">Ask about your clients</p>`;
+    if (!sample) h += `<p class="muted">The chat needs Claude, which isn't reachable from this view just now.</p>`;
+    else h += `<div class="clchat" id="clChat">${st.log.length ? st.log.map((m) => `<p class="${m.role === "user" ? "me" : "fox"}">${esc(m.content)}</p>`).join("") : `<p class="fox">Ask me anything about your clients: who's waiting on you, what's due this week, where a project's at.</p>`}${st.chatBusy ? `<p class="fox">Looking through the files…</p>` : ""}</div>
+    <form class="row" id="clForm"><label class="sr" for="clIn">Ask about your clients</label><input id="clIn" maxlength="400" placeholder="e.g. what's waiting on me this week?" autocomplete="off"><button class="btn small" type="submit" ${st.chatBusy ? "disabled" : ""}>Ask</button></form>`;
+    return h;
+  }
+  var TOOLS = [
+    {
+      name: "chord_project",
+      description: "One Chord project: its stages and every task in order (status, due date, who it's waiting on) and its invoices. Pass a project id from the snapshot.",
+      inputSchema: { type: "object", properties: { project_id: { type: "string" } }, required: ["project_id"] },
+      execute: async (i) => JSON.stringify(await call("get_project", { project_id: String(i.project_id || "") })).slice(0, 24e3)
+    },
+    {
+      name: "chord_upcoming",
+      description: "What's coming up in the next N days in Chord: booked meetings, project key dates, task deadlines and invoices falling due.",
+      inputSchema: { type: "object", properties: { days: { type: "integer", minimum: 1, maximum: 90 } } },
+      execute: async (i) => JSON.stringify(await call("list_upcoming", { days: Math.min(90, Math.max(1, Number(i.days) || 14)) })).slice(0, 24e3)
+    },
+    {
+      name: "chord_clients",
+      description: "Search Chord clients by name, company, email or tag (active by default).",
+      inputSchema: { type: "object", properties: { search: { type: "string" }, status: { type: "string", enum: ["active", "archived", "all"] } } },
+      execute: async (i) => JSON.stringify(await call("list_clients", { search: String(i.search || ""), status: ["active", "archived", "all"].includes(i.status) ? i.status : "active", limit: 30 })).slice(0, 24e3)
+    }
+  ];
+  async function askClients(sample, text, rerender) {
+    text = String(text || "").trim();
+    if (!text || st.chatBusy || !sample) return;
+    st.log.push({ role: "user", content: text });
+    st.chatBusy = true;
+    rerender();
+    const snap = JSON.stringify({ overview: st.snap && st.snap.overview, projects: st.snap && st.snap.projects, needs_attention: st.snap && st.snap.attention }).slice(0, 4e4);
+    const history = st.log.slice(-10, -1).map((m) => (m.role === "user" ? "Mel: " : "You: ") + m.content).join("\n");
+    const prompt = `You are the client desk in Mel's village game: a calm, practical assistant who knows her studio (she runs Fresh Pages Co / Ambidextrous, a copywriting and AI studio in Singapore). Answer in at most 5 short sentences or a short list, plain text, no emoji, no markdown headings. Be specific: names, dates, what's waiting on whom. Only state what the data shows; if it doesn't say, say so. You can't change anything in Chord.
+Snapshot from Chord (today): ${snap}
+${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
+    let reply = "";
+    try {
+      const lim = sample.limits ? await sample.limits().catch(() => null) : null;
+      const r = lim && lim.tools ? await sample(prompt, { tools: TOOLS, modelTier: "default" }) : await sample(prompt, { modelTier: "default", cache: false });
+      reply = plain(String(r && r.text || "")).trim();
+    } catch (e) {
+      reply = e && e.code === "rate_limited" ? "I need a breather. Ask again in a minute?" : "I couldn't get to the files just now. Try again?";
+    }
+    st.log.push({ role: "assistant", content: reply.slice(0, 2e3) || "Hmm, nothing came back. Try again?" });
+    st.chatBusy = false;
+    rerender();
+  }
 
   // src/game/myroom.js
   var JKEY = "fox.journal";
@@ -4994,14 +5135,14 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     keepJ();
     pushJ();
   }
-  var when = (e) => new Date(e.at).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Singapore" });
+  var when2 = (e) => new Date(e.at).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Singapore" });
   function journalPanel(decompress) {
     const list = live().slice(0, 12);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>My journal</h2>
     <p class="sub">${decompress ? "Three quick points from that call or moment. Then let it go." : esc(journalPrompt())}</p>
     <form id="jForm" class="jform"><label class="sr" for="jText">Journal entry</label><textarea id="jText" rows="6" maxlength="8000" placeholder="${decompress ? "1.\n2.\n3." : "Write anything..."}">${esc(draft)}</textarea>
     <div class="actions"><button class="btn primary small" type="submit">Keep this page</button></div></form>`;
-    if (list.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list.map((e) => `<details><summary><b>${when(e)}</b> ${esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary><p>${esc(e.text).replace(/\n/g, "<br>")}</p><button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
+    if (list.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list.map((e) => `<details><summary><b>${when2(e)}</b> ${esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary><p>${esc(e.text).replace(/\n/g, "<br>")}</p><button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
     return h;
   }
   function wireJournal(root, undoable2, done) {
@@ -5155,9 +5296,9 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
   }
   var weekend = () => [0, 6].includes(new Date(now() + 8 * H).getUTCDay());
   var slotNow = (def) => {
-    const t = sgHM(), we = weekend();
+    const t2 = sgHM(), we = weekend();
     const owned = api3 && api3.F().fam && api3.F().fam.owned || {};
-    return def.routine.find((s) => t >= s.from && t < s.to && (!s.days || s.days === "we" === we) && (!s.needs || owned[s.needs])) || null;
+    return def.routine.find((s) => t2 >= s.from && t2 < s.to && (!s.days || s.days === "we" === we) && (!s.needs || owned[s.needs])) || null;
   };
   var whereIs = (id) => {
     const d = NPCS.find((n) => n.id === id), s = d && slotNow(d);
@@ -5281,8 +5422,8 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     e.node.classList.toggle("run", def.kid && e.moving);
   }
   var hellos = () => {
-    const t = sgHM();
-    return [t < 720 ? "Morning, Mel!" : t < 1080 ? "Afternoon, Mel!" : "Evening, Mel!", "Hi!", "Hello there!", "Hiya, Mel!"];
+    const t2 = sgHM();
+    return [t2 < 720 ? "Morning, Mel!" : t2 < 1080 ? "Afternoon, Mel!" : "Evening, Mel!", "Hi!", "Hello there!", "Hiya, Mel!"];
   };
   function tickCourier(dt) {
     const scene2 = api3.scene(), mel2 = api3.mel;
@@ -5487,8 +5628,8 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     return g && F.goodRead !== g.at ? g : null;
   }, lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk(), music: () => settings.music });
   function isDusk() {
-    const t = sgHM();
-    return t >= 19 * 60 || t < 6 * 60;
+    const t2 = sgHM();
+    return t2 >= 19 * 60 || t2 < 6 * 60;
   }
   var say2 = null;
   var refs = null;
@@ -5678,17 +5819,17 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
   }
   function allTasks() {
     const base = P && P.day === dayKey() && Array.isArray(P.tasks) ? P.tasks : [];
-    const list = [...base, ...S2.extra].filter((t) => t && t.id && t.title && !(S2.dropped || []).includes(t.id)).map((t) => Object.assign({}, t, S2.tweaks[t.id] || {}));
-    const ids = list.map((t) => t.id);
+    const list = [...base, ...S2.extra].filter((t2) => t2 && t2.id && t2.title && !(S2.dropped || []).includes(t2.id)).map((t2) => Object.assign({}, t2, S2.tweaks[t2.id] || {}));
+    const ids = list.map((t2) => t2.id);
     const order = S2.order.filter((id) => ids.includes(id));
     ids.forEach((id) => {
       if (!order.includes(id)) order.push(id);
     });
-    return order.map((id) => list.find((t) => t.id === id));
+    return order.map((id) => list.find((t2) => t2.id === id));
   }
   function dropTask(id, quiet) {
-    const t = allTasks().find((x) => x.id === id);
-    if (!t) return;
+    const t2 = allTasks().find((x) => x.id === id);
+    if (!t2) return;
     if (String(id).startsWith("x")) S2.extra = S2.extra.filter((x) => x.id !== id);
     else {
       S2.dropped = S2.dropped || [];
@@ -5697,11 +5838,11 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     if (S2.timer && S2.timer.id === id) S2.timer = null;
     S2.firstStep[id] = false;
     sfx("paper", true);
-    setSay(`Dropped “${t.title}” for today. One less thing.`);
+    setSay(`Dropped “${t2.title}” for today. One less thing.`);
     if (!quiet) save2(true);
     if (!quiet) {
-      const ex = String(id).startsWith("x") ? t : null;
-      undoable(`Dropped “${t.title}”`, () => {
+      const ex = String(id).startsWith("x") ? t2 : null;
+      undoable(`Dropped “${t2.title}”`, () => {
         if (ex) S2.extra.push(ex);
         else S2.dropped = (S2.dropped || []).filter((x) => x !== id);
         setSay("Back on the board.");
@@ -5714,8 +5855,8 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     setSay("Back on the board.");
     save2(true);
   }
-  var remaining = () => allTasks().filter((t) => !S2.doneIds.includes(t.id));
-  var questsIn = (pl) => allTasks().filter((t) => placeOf(t) === pl);
+  var remaining = () => allTasks().filter((t2) => !S2.doneIds.includes(t2.id));
+  var questsIn = (pl) => allTasks().filter((t2) => placeOf(t2) === pl);
   function phase() {
     if (S2.mode === "break") return "break";
     if (S2.mode === "decompress" && S2.decompFree) return "decompress";
@@ -5724,7 +5865,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     if (remaining().length) return "task";
     return S2.doneIds.length ? "recap" : "empty";
   }
-  var arrivedFor = (t) => S2.arrived[t.id] || scene === placeOf(t) && atSpot === spotOf(t);
+  var arrivedFor = (t2) => S2.arrived[t2.id] || scene === placeOf(t2) && atSpot === spotOf(t2);
   var atClean = () => S2.wipe || scene === "home" && atSpot === "cupboard";
   function growth(p) {
     if (!p || !p.crop || !p.wateredAt) return 0;
@@ -5743,6 +5884,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
   var scratchOpen = false;
   var calmOpen = false;
   var recOpen = false;
+  var clientsOpen = false;
   var BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]];
   var CYCLE = 12;
   var breath = null;
@@ -5783,13 +5925,13 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
       stopBreath(true);
       return;
     }
-    let t = el / 1e3 % CYCLE, cue = BREATH[0][1];
+    let t2 = el / 1e3 % CYCLE, cue = BREATH[0][1];
     for (const [d, c2] of BREATH) {
-      if (t < d) {
+      if (t2 < d) {
         cue = c2;
         break;
       }
-      t -= d;
+      t2 -= d;
     }
     const c = $("breathCue"), l = $("breathLeft");
     if (c && c.textContent !== cue) c.textContent = cue;
@@ -5797,14 +5939,14 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
   }
   var ward = { busy: false, error: "", ask: "" };
   function buyTool(id) {
-    const t = SHED[id];
-    if (!t || F.tools[id] || F.coins < t.price) return;
-    F.coins -= t.price;
+    const t2 = SHED[id];
+    if (!t2 || F.tools[id] || F.coins < t2.price) return;
+    F.coins -= t2.price;
     F.tools[id] = true;
     sfx("chaching");
     act("cheer");
-    flash(`New in the shed: ${t.n.toLowerCase()}`);
-    speak(isHere("darren") ? `Darren's setting up the ${t.n.toLowerCase()} for you!` : `The ${t.n.toLowerCase()} is ready in the garden.`, 4500);
+    flash(`New in the shed: ${t2.n.toLowerCase()}`);
+    speak(isHere("darren") ? `Darren's setting up the ${t2.n.toLowerCase()} for you!` : `The ${t2.n.toLowerCase()} is ready in the garden.`, 4500);
     if (id === "can") F.plots.forEach((p, i) => {
       if (p && p.crop && !p.wateredAt) p.wateredAt = Date.now();
     });
@@ -5936,8 +6078,8 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     if (scene === "farm") return readyCount() ? "Something's ready to harvest!" : "Tap a plot to plant or water.";
     if (ph === "clean") return atClean() ? S2.wipe ? "Five minutes. Hard stop, promise." : sgHM() < 720 ? "Morning! Wet wipe first?" : "Hi! Wet wipe first?" : "To the cleaning cupboard at home!";
     if (ph === "task") {
-      const t = remaining()[0];
-      return arrivedFor(t) ? S2.firstStep[t.id] ? "You're doing it. I'm watching the clock." : "We're here. Just the first tiny step." : `Next quest: the ${spotObj(placeOf(t), spotOf(t)).name.toLowerCase()} at ${VILLAGE[placeOf(t)].short}.`;
+      const t2 = remaining()[0];
+      return arrivedFor(t2) ? S2.firstStep[t2.id] ? "You're doing it. I'm watching the clock." : "We're here. Just the first tiny step." : `Next quest: the ${spotObj(placeOf(t2), spotOf(t2)).name.toLowerCase()} at ${VILLAGE[placeOf(t2)].short}.`;
     }
     if (ph === "break") return "Zzz… break time. Wander, or rest.";
     if (ph === "decompress") return S2.decompFree ? "Clench, breathe, then three quick points in your journal." : `${S2.decompFor ? `“${S2.decompFor}” is done. ` : ""}Clench, breathe, then jot three quick points.`;
@@ -5963,9 +6105,9 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     speak(line);
   }
   var evanT;
-  function evanSays(t) {
+  function evanSays(t2) {
     const e = $("evanSay");
-    e.innerHTML = `<b class="who">Evan</b>${esc(plain(t))}`;
+    e.innerHTML = `<b class="who">Evan</b>${esc(plain(t2))}`;
     e.hidden = false;
     clearTimeout(evanT);
     evanT = setTimeout(() => e.hidden = true, 2200);
@@ -6046,7 +6188,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
       d = 7e3;
       portrait.dataset.nap = "1";
       mapleNap = Date.now() + 7e3;
-      [0, 800, 1600, 2400].forEach((t) => setTimeout(() => prop("z", "p-z", 52, 56, 4800), t));
+      [0, 800, 1600, 2400].forEach((t2) => setTimeout(() => prop("z", "p-z", 52, 56, 4800), t2));
     }
     if (kind === "crown") {
       S2.crown = true;
@@ -6139,8 +6281,8 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     if (shelfOpen && Math.floor(Date.now() / 1e3) % 20 === 0) ctx();
     if (!S2.timer) return;
     const left2 = tLeft();
-    const t = $("tLeft"), r = $("ringFg");
-    if (t) t.textContent = fmt(left2);
+    const t2 = $("tLeft"), r = $("ringFg");
+    if (t2) t2.textContent = fmt(left2);
     document.querySelectorAll("[data-tleft]").forEach((el) => el.textContent = fmt(left2));
     if (r) r.style.strokeDashoffset = 2 * Math.PI * 28 * (1 - left2 / S2.timer.total);
     if (!left2 && !S2.timer.fired) {
@@ -6164,18 +6306,18 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     }
     save2();
   }
-  function goQuest(t) {
+  function goQuest(t2) {
     if (phase() === "clean") {
       const c = spotObj("home", "cupboard");
       go("home", c.tx, c.ty, () => arriveSpot("cupboard"));
       return;
     }
-    const pl = placeOf(t), sp = spotObj(pl, spotOf(t));
+    const pl = placeOf(t2), sp = spotObj(pl, spotOf(t2));
     go(pl, sp.tx, sp.ty, () => pl === "base" ? arriveVillageSpot(sp.id) : arriveSpot(sp.id));
   }
   var A = {
-    walk(t) {
-      goQuest(t);
+    walk(t2) {
+      goQuest(t2);
     },
     pond() {
       go("base", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => arriveVillageSpot("pond"));
@@ -6196,23 +6338,23 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
       setSay("First tick of the day! Look at that ✨");
       save2();
     },
-    firstStep(t) {
-      S2.firstStep[t.id] = true;
-      S2.arrived[t.id] = true;
-      startTimer2("task", t.minutes || 25, t.id);
+    firstStep(t2) {
+      S2.firstStep[t2.id] = true;
+      S2.arrived[t2.id] = true;
+      startTimer2("task", t2.minutes || 25, t2.id);
       setSay("Hard part's done. Now the rest, on the clock.");
       save2();
     },
-    done(t) {
-      S2.doneIds.push(t.id);
+    done(t2) {
+      S2.doneIds.push(t2.id);
       S2.timer = null;
       sfx("chaching");
       earn(5, "quest complete");
       gainXp(1);
-      S2.last = t.title;
+      S2.last = t2.title;
       countQuest();
-      if (t.early) {
-        F.early[t.id] = t.early;
+      if (t2.early) {
+        F.early[t2.id] = t2.early;
         setTimeout(() => speak("Done a day early! Tick it off in Sunsama too, and it'll already be done on tomorrow's board.", 6e3), 4200);
       }
       let grew = 0;
@@ -6222,52 +6364,52 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
           grew++;
         }
       });
-      if (t.meeting) {
+      if (t2.meeting) {
         S2.mode = "decompress";
-        S2.decompFor = t.title;
+        S2.decompFor = t2.title;
       } else if (remaining().length) {
         S2.mode = "break";
         startTimer2("break", 10);
       }
       act("cheer");
       if (evanHere()) evanSays(pick(["yaaay!", "Mama did it!", "hooray!"]));
-      if (onTread(t)) setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : "") + " Steps showing?", [["Log my steps", () => openSteps(true)]]);
+      if (onTread(t2)) setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : "") + " Steps showing?", [["Log my steps", () => openSteps(true)]]);
       else setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : ""));
       save2(true);
     },
-    notebook(t) {
-      openTask(t);
+    notebook(t2) {
+      openTask(t2);
     },
-    treadmill(t) {
-      S2.tread[t.id] = true;
-      S2.arrived[t.id] = false;
-      S2.tweaks[t.id] = Object.assign({}, S2.tweaks[t.id], { place: "home", spot: "treadmill" });
+    treadmill(t2) {
+      S2.tread[t2.id] = true;
+      S2.arrived[t2.id] = false;
+      S2.tweaks[t2.id] = Object.assign({}, S2.tweaks[t2.id], { place: "home", spot: "treadmill" });
       closeNotebook();
       setSay("Treadmill it is! 1.2 and go. I'll walk with you.");
       save2(true);
-      goQuest(allTasks().find((x) => x.id === t.id));
+      goQuest(allTasks().find((x) => x.id === t2.id));
     },
-    proc(t) {
-      S2.stalls[t.id] = (S2.stalls[t.id] || 0) + 1;
+    proc(t2) {
+      S2.stalls[t2.id] = (S2.stalls[t2.id] || 0) + 1;
       act("nudge");
-      if (S2.stalls[t.id] >= 2) {
+      if (S2.stalls[t2.id] >= 2) {
         setSay("No shame. What's going on with this one?", [
           ["It's unclear", () => setSay("Tell chat “boss, this one's unclear”. We'll untangle it.")],
           ["It's too big", () => {
-            S2.tweaks[t.id] = { firstStep: "do just ten minutes of it. Messy is fine.", minutes: 10 };
-            S2.firstStep[t.id] = false;
-            S2.stalls[t.id] = 0;
+            S2.tweaks[t2.id] = { firstStep: "do just ten minutes of it. Messy is fine.", minutes: 10 };
+            S2.firstStep[t2.id] = false;
+            S2.stalls[t2.id] = 0;
             S2.timer = null;
             setSay("Shrunk it! Ten minutes, then you can stop.");
           }],
           ["Not needed any more", () => {
-            dropTask(t.id, true);
+            dropTask(t2.id, true);
           }],
           ["I don't want to", () => {
             const ids = allTasks().map((x) => x.id);
-            S2.order = ids.filter((id) => id !== t.id).concat(t.id);
-            S2.stalls[t.id] = 0;
-            S2.firstStep[t.id] = false;
+            S2.order = ids.filter((id) => id !== t2.id).concat(t2.id);
+            S2.stalls[t2.id] = 0;
+            S2.firstStep[t2.id] = false;
             S2.timer = null;
             setSay("Fair. Moved it to the end. Here's another.");
           }]
@@ -6275,11 +6417,11 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
       } else {
         setSay("Totally normal. Smaller: just open it. Nothing else.", [
           ["5-minute deal", () => {
-            startTimer2("deal", 5, t.id);
+            startTimer2("deal", 5, t2.id);
             setSay("Five minutes, then you're allowed to stop.");
           }],
           ["Wet-wipe reset", () => {
-            startTimer2("deal", 5, t.id);
+            startTimer2("deal", 5, t2.id);
             setSay("Wipe something for five. Then back to me.");
           }],
           ["Check the basics", () => setSay("Water? Snack? Too hot? Tired? Fix that first.")]
@@ -6366,40 +6508,40 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     }
   }
   var HALF = ["Halfway! The downhill bit starts now.", "Halfway there. Look at you go.", "Half done. Sip of water, then onwards."];
-  var onTread = (t) => !!(t && (S2.tread[t.id] || isTreadTask(t)));
-  function nbAct(kind, t) {
+  var onTread = (t2) => !!(t2 && (S2.tread[t2.id] || isTreadTask(t2)));
+  function nbAct(kind, t2) {
     if (kind === "started") {
-      if (!S2.firstStep[t.id]) A.firstStep(t);
+      if (!S2.firstStep[t2.id]) A.firstStep(t2);
       return;
     }
     if (kind === "halfway") {
-      S2.halfway[t.id] = true;
+      S2.halfway[t2.id] = true;
       act("cheer");
       setSay(pick(HALF));
       save2();
       return;
     }
     if (kind === "stuck") {
-      A.proc(t);
+      A.proc(t2);
       return;
     }
     if (kind === "more") {
       const tm = S2.timer;
-      if (tm && tm.id === t.id && !tm.fired && tLeft() > 0) {
+      if (tm && tm.id === t2.id && !tm.fired && tLeft() > 0) {
         if (tm.pausedLeft != null) tm.pausedLeft += 10 * M;
         tm.endAt += 10 * M;
         tm.total += 10 * M;
-      } else startTimer2("task", 10, t.id);
+      } else startTimer2("task", 10, t2.id);
       setSay("Ten more minutes on the clock. Take them, no guilt.");
       save2();
       return;
     }
     if (kind === "treadmill") {
-      A.treadmill(t);
+      A.treadmill(t2);
       return;
     }
     if (kind === "done") {
-      A.done(t);
+      A.done(t2);
       return;
     }
   }
@@ -6410,26 +6552,26 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     fn();
     save2();
   }
-  function timerLeft(t) {
-    if (!S2.timer || S2.timer.id !== t.id || S2.timer.kind !== "task" && S2.timer.kind !== "deal") return null;
+  function timerLeft(t2) {
+    if (!S2.timer || S2.timer.id !== t2.id || S2.timer.kind !== "task" && S2.timer.kind !== "deal") return null;
     return fmt(tLeft());
   }
   var sun = { busy: false, at: 0, error: null, added: 0 };
   function creditDone(tasks, quiet) {
-    const ids = new Set(allTasks().map((t) => t.id)), cur2 = phase() === "task" ? remaining()[0] : null, got = [];
-    (tasks || []).forEach((t) => {
-      if (!t || !t.completed || !ids.has(t.id) || S2.doneIds.includes(t.id)) return;
-      S2.doneIds.push(t.id);
-      got.push(t);
+    const ids = new Set(allTasks().map((t2) => t2.id)), cur2 = phase() === "task" ? remaining()[0] : null, got = [];
+    (tasks || []).forEach((t2) => {
+      if (!t2 || !t2.completed || !ids.has(t2.id) || S2.doneIds.includes(t2.id)) return;
+      S2.doneIds.push(t2.id);
+      got.push(t2);
       if (got.length === 1) sfx("chaching");
-      const q = allTasks().find((x) => x.id === t.id);
-      if (q && q.early) F.early[t.id] = q.early;
+      const q = allTasks().find((x) => x.id === t2.id);
+      if (q && q.early) F.early[t2.id] = q.early;
       earn(5, "done in Sunsama");
       gainXp(1);
       countQuest();
-      if (cur2 && cur2.id === t.id) {
-        if (S2.timer && S2.timer.id === t.id) S2.timer = null;
-        S2.firstStep[t.id] = false;
+      if (cur2 && cur2.id === t2.id) {
+        if (S2.timer && S2.timer.id === t2.id) S2.timer = null;
+        S2.firstStep[t2.id] = false;
       }
     });
     if (got.length && !quiet) {
@@ -6474,8 +6616,8 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     }
     const n = creditDone(r.tasks);
     if (manual) {
-      const have = new Set(allTasks().map((t) => t.id));
-      const fresh2 = r.tasks.filter((t) => !t.completed && !have.has(t.id));
+      const have = new Set(allTasks().map((t2) => t2.id));
+      const fresh2 = r.tasks.filter((t2) => !t2.completed && !have.has(t2.id));
       S2.extra.push(...fresh2);
       sun.added = fresh2.length;
       if (!n) speak(fresh2.length ? `Added ${fresh2.length} new Sunsama task${fresh2.length === 1 ? "" : "s"} to the end of the line.` : "Sunsama and the boards match. All set!", 4e3);
@@ -6500,15 +6642,15 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     const r = await pullSunsama(day, { fresh: true });
     tmr.busy = false;
     if (r.error) tmr.error = r.error;
-    else tmr.list = r.tasks.filter((t) => !t.completed);
+    else tmr.list = r.tasks.filter((t2) => !t2.completed);
     renderTomorrow();
   }
   function doEarly(id) {
-    const t = (tmr.list || []).find((x) => x.id === id);
-    if (!t || allTasks().some((x) => x.id === id)) return;
-    S2.extra.push(Object.assign({}, t, { early: tmr.day }));
+    const t2 = (tmr.list || []).find((x) => x.id === id);
+    if (!t2 || allTasks().some((x) => x.id === id)) return;
+    S2.extra.push(Object.assign({}, t2, { early: tmr.day }));
     sfx("paper", true);
-    setSay(`“${t.title}” is on today's board now. Future you says thanks.`);
+    setSay(`“${t2.title}” is on today's board now. Future you says thanks.`);
     save2(true);
   }
   function creditEarly() {
@@ -6516,8 +6658,8 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     Object.keys(F.early || {}).forEach((id) => {
       if (F.early[id] < k) delete F.early[id];
     });
-    allTasks().forEach((t) => {
-      if (F.early[t.id] === k && !S2.doneIds.includes(t.id)) S2.doneIds.push(t.id);
+    allTasks().forEach((t2) => {
+      if (F.early[t2.id] === k && !S2.doneIds.includes(t2.id)) S2.doneIds.push(t2.id);
     });
   }
   function renderTomorrow() {
@@ -6534,10 +6676,10 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     else if (!tmr.list) h += `<button class="btn small alt" data-tmr="peek">Peek at tomorrow's quests</button>`;
     else if (!tmr.list.length) h += `<p class="muted">Nothing planned in Sunsama for tomorrow yet.</p>`;
     else {
-      const today2 = new Set(allTasks().map((t) => t.id));
-      h += `<ul class="hlist tmr">${tmr.list.map((t) => {
-        const early = F.early[t.id] === tmr.day, on = today2.has(t.id);
-        return `<li><span class="pl">${icon(placeOf(t), 18)}</span><span><b>${esc(t.title)}</b><small>${t.minutes || 25} min</small></span>${early ? `<span class="hbadge">done early</span>` : on ? `<span class="hbadge sched">on today's board</span>` : `<button class="next" data-early="${esc(t.id)}">do today</button>`}</li>`;
+      const today2 = new Set(allTasks().map((t2) => t2.id));
+      h += `<ul class="hlist tmr">${tmr.list.map((t2) => {
+        const early = F.early[t2.id] === tmr.day, on = today2.has(t2.id);
+        return `<li><span class="pl">${icon(placeOf(t2), 18)}</span><span><b>${esc(t2.title)}</b><small>${t2.minutes || 25} min</small></span>${early ? `<span class="hbadge">done early</span>` : on ? `<span class="hbadge sched">on today's board</span>` : `<button class="next" data-early="${esc(t2.id)}">do today</button>`}</li>`;
       }).join("")}</ul>`;
     }
     el.innerHTML = h;
@@ -6653,6 +6795,8 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     well: "village:well",
     "town hall": "hall",
     hall: "hall",
+    "client table": "hall:clients",
+    clients: "hall:clients",
     chord: "chord",
     "makers lane": "lane:plot3",
     lane: "lane:plot3",
@@ -6678,7 +6822,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
   }
   var fuzzyTask = (q) => {
     const n = String(q || "").toLowerCase();
-    return remaining().find((t) => t.title.toLowerCase().includes(n)) || remaining().find((t) => n.includes(t.title.toLowerCase().slice(0, 18)));
+    return remaining().find((t2) => t2.title.toLowerCase().includes(n)) || remaining().find((t2) => n.includes(t2.title.toLowerCase().slice(0, 18)));
   };
   function runChatAction(a) {
     if (!a || !a.type) return null;
@@ -6692,12 +6836,12 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
         return d.length ? `Back in the fridge: ${d.join(", ")}` : null;
       }
       case "chore_add": {
-        const t = chatAddChore(a.kind, a.text);
-        return t ? `New ${a.kind === "weekly" ? "weekly" : "daily"} chore: ${t}` : null;
+        const t2 = chatAddChore(a.kind, a.text);
+        return t2 ? `New ${a.kind === "weekly" ? "weekly" : "daily"} chore: ${t2}` : null;
       }
       case "chore_done": {
-        const t = chatTickChore(a.text);
-        return t ? `Ticked: ${t}` : null;
+        const t2 = chatTickChore(a.text);
+        return t2 ? `Ticked: ${t2}` : null;
       }
       case "tidy_timer":
         return `Tidy timer: ${chatTidyTimer(+a.minutes)} minutes`;
@@ -6724,16 +6868,16 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
         return `New quest: ${title}`;
       }
       case "quest_drop": {
-        const t = fuzzyTask(a.title);
-        if (!t) return null;
-        dropTask(t.id);
-        return `Dropped for today: ${t.title}`;
+        const t2 = fuzzyTask(a.title);
+        if (!t2) return null;
+        dropTask(t2.id);
+        return `Dropped for today: ${t2.title}`;
       }
       case "quest_next": {
-        const t = fuzzyTask(a.title);
-        if (!t) return null;
-        doNext(t.id);
-        return `Up next: ${t.title}`;
+        const t2 = fuzzyTask(a.title);
+        if (!t2) return null;
+        doNext(t2.id);
+        return `Up next: ${t2.title}`;
       }
       case "water": {
         const ml = Math.max(50, Math.min(2e3, +a.ml || GLASS));
@@ -6783,7 +6927,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
       where: scene,
       phase: phase(),
       currentQuest: cur2 ? cur2.title : null,
-      questsLeft: rem.map((t) => t.title).slice(0, 15),
+      questsLeft: rem.map((t2) => t2.title).slice(0, 15),
       questsDone: S2.doneIds.length,
       timer: S2.timer ? { kind: S2.timer.kind, minutesLeft: Math.round(tLeft() / M) } : null,
       waterMl: S2.waterMl || 0,
@@ -6827,7 +6971,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -6946,7 +7090,7 @@ Then tell chat "wind down" whenever you're ready.`
     const wins = sec ? sec.lines.map((l) => plain(String(l))).filter(Boolean).slice(0, 9) : [];
     if (!fromRoutine) {
       if (S2.cleanDone) wins.push("Five-minute clean");
-      allTasks().filter((t) => S2.doneIds.includes(t.id)).forEach((t) => wins.push(t.title));
+      allTasks().filter((t2) => S2.doneIds.includes(t2.id)).forEach((t2) => wins.push(t2.title));
       if (S2.steps >= STEP_GOAL) wins.push(`${S2.steps.toLocaleString()} steps`);
       if ((S2.waterMl || 0) >= WATER_GOAL) wins.push("Two litres of water");
       if (S2.harvested) wins.push(`${S2.harvested} harvest${S2.harvested > 1 ? "s" : ""}`);
@@ -7004,7 +7148,7 @@ Then tell chat "wind down" whenever you're ready.`
     $("mailList").querySelectorAll("[data-mail]").forEach((b) => b.onclick = () => openMail(items[+b.dataset.mail]));
   }
   function facts() {
-    const hm2 = sgHM(), t = phase() === "task" ? remaining()[0] : null, sp = t ? spotOf(t) : null, pl = t ? placeOf(t) : null;
+    const hm2 = sgHM(), t2 = phase() === "task" ? remaining()[0] : null, sp = t2 ? spotOf(t2) : null, pl = t2 ? placeOf(t2) : null;
     return {
       quests3: S2.doneIds.length >= 3,
       harvest: S2.harvested > 0,
@@ -7276,13 +7420,13 @@ Then tell chat "wind down" whenever you're ready.`
            <li>Then five minutes on the clock. Hard stop.</li><li class="pep">A tiny win before anything else.</li></ul><p class="checkin">Tell me when you've got the wipe.</p>`}
       <div class="actions">${S2.wipe ? `<button class="btn yes" data-a="cleanDone">Clean done</button>` : `<button class="btn primary" data-a="gotWipe">Got the wipe</button>`}</div>`;
     } else if (ph === "task") {
-      const t = remaining()[0], fs = S2.firstStep[t.id], pl = placeOf(t), sp = spotObj(pl, spotOf(t)), at = arrivedFor(t);
+      const t2 = remaining()[0], fs = S2.firstStep[t2.id], pl = placeOf(t2), sp = spotObj(pl, spotOf(t2)), at = arrivedFor(t2);
       h += `${S2.last ? `<p class="ack">✓ ${esc(S2.last === "clean" ? "clean done" : S2.last)}</p>` : ""}
-      <h1><span class="lbl">quest · ${esc(VILLAGE[pl].name)} · ${esc(sp.name)}</span>${esc(t.title)}</h1>
-      ${t.at || t.treadmill || isTreadTask(t) || t.chat || t.notes || t.email ? `<p class="stickers">${t.at ? `<span class="sticker">${icon("clock", 14)} ${esc(t.at)}</span>` : ""}${t.treadmill || isTreadTask(t) ? `<span class="sticker">${icon("walker", 14)} ${onTread(t) ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t.notes ? `<span class="sticker">${icon("note", 14)} notes</span>` : ""}${t.email ? `<span class="sticker">${icon("letter", 14)} email</span>` : ""}${t.chat ? `<span class="sticker">${icon("chat", 14)} happens in chat</span>` : ""}</p>` : ""}
-      ${fs || S2.timer && S2.timer.id === t.id ? timerHTML(S2.timer && S2.timer.kind === "deal" ? "five-minute deal, then you may stop" : `${t.minutes || 25}-minute time box`) : `<p class="stickers"><span class="sticker">${icon("clock", 14)} ${t.minutes || 25}-minute time box once you start</span></p>`}
-      <ul class="bujo">${fs ? `<li>Keep going. One thing at a time.</li>` : `<li class="first"><span><span class="hl">First step only:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}</span></li><li>Then ${t.minutes || 25} minutes on the rest.</li>`}
-        <li class="pep">${esc(t.pep || PEP[t.title.length % PEP.length])}</li></ul>
+      <h1><span class="lbl">quest · ${esc(VILLAGE[pl].name)} · ${esc(sp.name)}</span>${esc(t2.title)}</h1>
+      ${t2.at || t2.treadmill || isTreadTask(t2) || t2.chat || t2.notes || t2.email ? `<p class="stickers">${t2.at ? `<span class="sticker">${icon("clock", 14)} ${esc(t2.at)}</span>` : ""}${t2.treadmill || isTreadTask(t2) ? `<span class="sticker">${icon("walker", 14)} ${onTread(t2) ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t2.notes ? `<span class="sticker">${icon("note", 14)} notes</span>` : ""}${t2.email ? `<span class="sticker">${icon("letter", 14)} email</span>` : ""}${t2.chat ? `<span class="sticker">${icon("chat", 14)} happens in chat</span>` : ""}</p>` : ""}
+      ${fs || S2.timer && S2.timer.id === t2.id ? timerHTML(S2.timer && S2.timer.kind === "deal" ? "five-minute deal, then you may stop" : `${t2.minutes || 25}-minute time box`) : `<p class="stickers"><span class="sticker">${icon("clock", 14)} ${t2.minutes || 25}-minute time box once you start</span></p>`}
+      <ul class="bujo">${fs ? `<li>Keep going. One thing at a time.</li>` : `<li class="first"><span><span class="hl">First step only:</span> ${esc(t2.firstStep || "open whatever you need for it. Just open it.")}</span></li><li>Then ${t2.minutes || 25} minutes on the rest.</li>`}
+        <li class="pep">${esc(t2.pep || PEP[t2.title.length % PEP.length])}</li></ul>
       ${at ? `<p class="checkin">${fs ? "Tap done when it's done." : "Tap when the first step's done."}</p>` : ""}
       <div class="actions">${!at ? `<button class="btn primary" data-a="walk">Walk to the ${esc(sp.name.toLowerCase())}</button>` : fs ? `<button class="btn yes" data-a="done">Quest done</button><button class="btn alt" data-a="notebook">Open the notebook</button>` : `<button class="btn primary" data-a="notebook">Do task</button><button class="btn alt" data-a="firstStep">First step done</button>`}
         <button class="btn alt" data-a="proc">I'm procrastinating</button></div>`;
@@ -7297,9 +7441,9 @@ Then tell chat "wind down" whenever you're ready.`
       <ul class="bujo"><li class="first"><span><span class="hl">Stomach clench, 30 seconds.</span> Hold, then release.</span></li><li>Three quick points in <span class="hl">your journal</span>${S2.decompFree ? "" : " (or tell chat, and it files them)"}, then let it go.</li><li>Make a hot drink and bring it back.</li></ul>
       <div class="actions">${clench ? "" : `<button class="btn primary" data-a="clench">Start the 30 seconds</button>`}<button class="btn alt" data-a="journal">Open my journal</button><button class="btn yes" data-a="decompressed">All done</button></div>`;
     } else if (ph === "recap") {
-      const done = allTasks().filter((t) => S2.doneIds.includes(t.id));
+      const done = allTasks().filter((t2) => S2.doneIds.includes(t2.id));
       h += `<h1><span class="lbl">that's a wrap</span>The day is done</h1>
-      <ul class="bujo"><li class="tick">Five-minute clean</li>${done.map((t) => `<li class="tick">${esc(t.title)}</li>`).join("")}
+      <ul class="bujo"><li class="tick">Five-minute clean</li>${done.map((t2) => `<li class="tick">${esc(t2.title)}</li>`).join("")}
       <li${S2.steps >= 5e3 ? ` class="tick"` : ""}>${S2.steps.toLocaleString()} / 5,000 steps</li><li>${S2.earned} coins earned today</li>
       <li class="pep">Garden, shop, spoil Maple. Then tell chat <span class="hl">“wind down”</span>.</li></ul>`;
     } else {
@@ -7317,8 +7461,8 @@ Then tell chat "wind down" whenever you're ready.`
     j.innerHTML = h + `<button class="qnx" data-qn="min" aria-label="Fold the note away">–</button>`;
     if (slim) {
       const title = j.querySelector("h1") ? [...j.querySelector("h1").childNodes].filter((n) => !(n.classList && n.classList.contains("lbl"))).map((n) => n.textContent).join("").trim() : "";
-      const when2 = S2.timer ? `<span class="when" data-tleft>${fmt(tLeft())}</span>` : "";
-      j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(route2.length ? "Walking… " + title : title)}</b>${when2}<span class="more">open</span></button>`;
+      const when3 = S2.timer ? `<span class="when" data-tleft>${fmt(tLeft())}</span>` : "";
+      j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(route2.length ? "Walking… " + title : title)}</b>${when3}<span class="more">open</span></button>`;
     }
     j.classList.toggle("intop", !outside());
     j.querySelectorAll("[data-qn]").forEach((el) => el.onclick = (ev) => {
@@ -7328,8 +7472,8 @@ Then tell chat "wind down" whenever you're ready.`
       journal();
     });
     j.querySelectorAll("[data-a]").forEach((el) => el.onclick = () => {
-      const t = remaining()[0];
-      A[el.dataset.a](t);
+      const t2 = remaining()[0];
+      A[el.dataset.a](t2);
     });
     j.querySelectorAll("[data-say]").forEach((el) => el.onclick = () => {
       const fn = say2.buttons[+el.dataset.say][1];
@@ -7381,6 +7525,7 @@ Then tell chat "wind down" whenever you're ready.`
     scratchOpen = false;
     calmOpen = false;
     recOpen = false;
+    clientsOpen = false;
     selPlot = null;
     homeView = null;
     postOpen = false;
@@ -7406,7 +7551,7 @@ Then tell chat "wind down" whenever you're ready.`
     }
     el.innerHTML = `<p class="muted">Opening your calendar…</p>`;
     const r = await todaysEvents(dayKey(), fresh2), nowT = Date.now();
-    const fmtT = (t) => new Date(t).toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore" }).replace(" ", "").toLowerCase();
+    const fmtT = (t2) => new Date(t2).toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore" }).replace(" ", "").toLowerCase();
     let h = `<p class="sub">${new Date(now() + 8 * H).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })}</p>`;
     if (r.error && !r.events.length) h += `<p class="muted">${esc(CAL_ERRORS[r.error] || "Couldn't reach your calendar just now.")}</p>`;
     else if (!r.events.length) h += `<p class="muted">Nothing on the calendar today. A clear runway.</p>`;
@@ -7482,13 +7627,15 @@ Then tell chat "wind down" whenever you're ready.`
     } else if (recOpen && scene === "room") {
       const on = settings.music, ct = currentTrack();
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>Record player</h2><p class="sub">${on ? `Playing: ${esc(TRACKS[ct].name)}.` : "Pick a record to put on."}</p>
-      <div class="records">${Object.entries(TRACKS).map(([id, t]) => `<button class="record${on && id === ct ? " on" : ""}" data-track="${id}"><svg viewBox="0 0 40 40" width="46" height="46" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#2F2B28"/><circle cx="20" cy="20" r="13" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="9" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="6.5" style="fill:${t.col}"/><circle cx="20" cy="20" r="1.4" fill="#FFFDF6"/></svg><span class="n">${esc(t.name)}</span><span class="c">${on && id === ct ? "playing now" : esc(t.mood)}</span></button>`).join("")}</div>
+      <div class="records">${Object.entries(TRACKS).map(([id, t2]) => `<button class="record${on && id === ct ? " on" : ""}" data-track="${id}"><svg viewBox="0 0 40 40" width="46" height="46" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#2F2B28"/><circle cx="20" cy="20" r="13" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="9" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="6.5" style="fill:${t2.col}"/><circle cx="20" cy="20" r="1.4" fill="#FFFDF6"/></svg><span class="n">${esc(t2.name)}</span><span class="c">${on && id === ct ? "playing now" : esc(t2.mood)}</span></button>`).join("")}</div>
       <div class="actions recrow"><label for="recVol" class="muted">Volume</label><input id="recVol" type="range" min="0" max="1" step="0.05" value="${settings.musicVol}">${on ? `<button class="btn alt small" data-rec="stop">Lift the needle</button>` : ""}</div>`;
     } else if (calmOpen && scene === "room") {
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>Calm corner</h2>` + (breath ? `<div class="breathe"><div class="ring" style="animation-delay:-${((Date.now() - breath.start) / 1e3 % CYCLE).toFixed(2)}s"></div><p class="cue" id="breathCue">Breathe in</p></div><p class="sub" style="text-align:center"><span id="breathLeft"></span> left</p><div class="actions" style="justify-content:center"><button class="btn alt small" data-calm="stop">Stop</button></div>` : `<p class="sub">Cushions, ${(F.decor || {}).r_candle ? "a candle, " : ""}one slow breath.</p><p class="eyebrow">Guided breathing</p><div class="actions">${[1, 3, 5].map((m) => `<button class="btn ${m === 3 ? "primary" : "alt"} small" data-calm="${m}">${m} min</button>`).join("")}</div>
         <p class="eyebrow" style="margin-top:14px">After a call, or any time</p><div class="actions"><button class="btn alt small" data-calm="decompress">Decompress</button></div>`);
     } else if (journalOpen && scene === "room") {
       h = journalPanel(S2.mode === "decompress" && S2.decompFree);
+    } else if (clientsOpen && scene === "hall") {
+      h = clientsPanel(!!sampleCap);
     } else if (scratchOpen && scene === "hall") {
       h = scratchPanel();
     } else if (wardOpen && scene === "room") {
@@ -7497,8 +7644,8 @@ Then tell chat "wind down" whenever you're ready.`
       h = runPanel(F);
     } else if (shedOpen) {
       h = `<span class="tape stripe" aria-hidden="true"></span><h2>Darren's shed</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Tools for the garden, bought once and kept forever.${isHere("darren") ? " Darren's around to set them up." : ""}</p><div class="items shop">` + Object.keys(SHED).map((id) => {
-        const t = SHED[id], own = F.tools[id];
-        return `<button class="item" data-tool="${id}" ${own || F.coins < t.price ? "disabled" : ""}><span class="e">${icon(t.ico, 34)}</span><span class="n">${esc(t.n)}</span><span class="c">${own ? "in use" : `<b>${t.price}</b> ${icon("coin", 13)}`}</span><span class="d">${esc(t.what)}</span></button>`;
+        const t2 = SHED[id], own = F.tools[id];
+        return `<button class="item" data-tool="${id}" ${own || F.coins < t2.price ? "disabled" : ""}><span class="e">${icon(t2.ico, 34)}</span><span class="n">${esc(t2.n)}</span><span class="c">${own ? "in use" : `<b>${t2.price}</b> ${icon("coin", 13)}`}</span><span class="d">${esc(t2.what)}</span></button>`;
       }).join("") + `</div><div class="actions"><button class="btn alt small" data-close="1">Close the shed</button></div>`;
     } else if (shelfOpen) {
       const ready = digestReady(), next = nextDigest(), past = pastDigests();
@@ -7515,9 +7662,9 @@ Then tell chat "wind down" whenever you're ready.`
     } else if (boardOpen) {
       const list = outside() ? allTasks() : questsIn(scene), cur2 = phase() === "task" ? remaining()[0].id : null;
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>${outside() ? "Town quest board" : esc(ROOMS[scene].name) + " quests"}</h2>
-      ${list.length ? `<ul class="qlist">${list.map((t) => {
-        const dn = S2.doneIds.includes(t.id), sp = spotObj(placeOf(t), spotOf(t));
-        return `<li class="${dn ? "done" : ""}${t.id === cur2 ? " cur" : ""}"${!dn && t.id !== cur2 && phase() !== "clean" ? ` data-next="${esc(t.id)}" role="button"` : ""}><span><b>${esc(t.title)}</b><small>${outside() ? icon(placeOf(t), 16) + " " + esc(VILLAGE[placeOf(t)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t.id !== cur2 && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : "<span></span>"}</li>`;
+      ${list.length ? `<ul class="qlist">${list.map((t2) => {
+        const dn = S2.doneIds.includes(t2.id), sp = spotObj(placeOf(t2), spotOf(t2));
+        return `<li class="${dn ? "done" : ""}${t2.id === cur2 ? " cur" : ""}"${!dn && t2.id !== cur2 && phase() !== "clean" ? ` data-next="${esc(t2.id)}" role="button"` : ""}><span><b>${esc(t2.title)}</b><small>${outside() ? icon(placeOf(t2), 16) + " " + esc(VILLAGE[placeOf(t2)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t2.id !== cur2 && phase() !== "clean" ? `<button class="next" data-next="${esc(t2.id)}">do next</button>` : "<span></span>"}</li>`;
       }).join("")}</ul>` : `<p class="sub">No quests ${outside() ? "today yet" : "in here today"}.</p>`}
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
     }
@@ -7558,6 +7705,7 @@ Then tell chat "wind down" whenever you're ready.`
       scratchOpen = false;
       calmOpen = false;
       recOpen = false;
+      clientsOpen = false;
       ctx();
     });
     c.querySelectorAll("[data-bed]").forEach((b) => b.onclick = () => bedAction(b.dataset.bed));
@@ -7581,6 +7729,7 @@ Then tell chat "wind down" whenever you're ready.`
       else if (k === "decompress") {
         calmOpen = false;
         recOpen = false;
+        clientsOpen = false;
         A.decompNow();
         drawScene();
       } else startBreath(+k);
@@ -7594,6 +7743,31 @@ Then tell chat "wind down" whenever you're ready.`
       ctx();
     });
     if (scratchOpen && scene === "hall") wireScratch(c, undoable, () => ctx());
+    if (clientsOpen && scene === "hall") {
+      c.querySelectorAll('[data-cl="refresh"]').forEach((b) => b.onclick = () => {
+        loadClients(true).then(() => {
+          if (clientsOpen) ctx();
+        });
+        ctx();
+      });
+      const cf = c.querySelector("#clForm"), cl = c.querySelector("#clChat");
+      if (cl) cl.scrollTop = cl.scrollHeight;
+      if (cf) {
+        const inp = cf.querySelector("#clIn");
+        cf.onsubmit = (ev) => {
+          ev.preventDefault();
+          const v = inp.value;
+          inp.value = "";
+          askClients(sampleCap, v, () => {
+            if (clientsOpen) {
+              ctx();
+              const i = $("clIn");
+              if (i) i.focus();
+            }
+          });
+        };
+      }
+    }
     const of = c.querySelector("#outfitForm");
     if (of) {
       const inp = c.querySelector("#outfitAsk");
@@ -7703,8 +7877,8 @@ Then tell chat "wind down" whenever you're ready.`
     let target = null;
     if (ph === "clean" && !atClean()) target = { pl: "home", sp: "cupboard" };
     if (ph === "task") {
-      const t = remaining()[0];
-      if (!arrivedFor(t)) target = { pl: placeOf(t), sp: spotOf(t) };
+      const t2 = remaining()[0];
+      if (!arrivedFor(t2)) target = { pl: placeOf(t2), sp: spotOf(t2) };
     }
     let pos = null;
     if (target) {
@@ -7796,13 +7970,13 @@ Then tell chat "wind down" whenever you're ready.`
     $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
     $("qBadge").hidden = !rem.length;
     $("qBadge").textContent = rem.length;
-    $("list").innerHTML = all.map((t) => {
-      const dn = S2.doneIds.includes(t.id);
-      const pickable = !dn && t.id !== cur2 && phase() !== "clean";
-      return `<li class="${dn ? "done" : ""}${t.id === cur2 ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? `<i class="tk" aria-label="done"></i>` : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur2 ? " · doing now" : ""}${t.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : "<span></span>"}</li>`;
+    $("list").innerHTML = all.map((t2) => {
+      const dn = S2.doneIds.includes(t2.id);
+      const pickable = !dn && t2.id !== cur2 && phase() !== "clean";
+      return `<li class="${dn ? "done" : ""}${t2.id === cur2 ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t2.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t2), 20)}</span><span class="t">${dn ? `<i class="tk" aria-label="done"></i>` : ""}${esc(t2.title)}</span><small>${esc(VILLAGE[placeOf(t2)].name)} · ${esc(spotObj(placeOf(t2), spotOf(t2)).name)}${t2.id === cur2 ? " · doing now" : ""}${t2.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t2.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t2.id)}">do this now</button>` : "<span></span>"}</li>`;
     }).join("") + ((S2.dropped || []).length ? `<li class="dropped"><small>Dropped today: ${(S2.dropped || []).map((id) => {
-      const t = (P && P.tasks || []).find((x) => x.id === id);
-      return t ? `${esc(t.title)} <button class="drop" data-undrop="${esc(id)}">bring back</button>` : "";
+      const t2 = (P && P.tasks || []).find((x) => x.id === id);
+      return t2 ? `${esc(t2.title)} <button class="drop" data-undrop="${esc(id)}">bring back</button>` : "";
     }).filter(Boolean).join(" · ")}</small></li>` : "");
     $("list").querySelectorAll("[data-drop]").forEach((el) => el.onclick = (ev) => {
       ev.stopPropagation();
@@ -7866,6 +8040,7 @@ Then tell chat "wind down" whenever you're ready.`
       scratchOpen = false;
       calmOpen = false;
       recOpen = false;
+      clientsOpen = false;
       homeView = null;
       postOpen = false;
       healthOpen = false;
@@ -7941,6 +8116,7 @@ Then tell chat "wind down" whenever you're ready.`
     scratchOpen = false;
     calmOpen = false;
     recOpen = false;
+    clientsOpen = false;
     homeView = null;
     postOpen = false;
     healthOpen = false;
@@ -8061,9 +8237,9 @@ Then tell chat "wind down" whenever you're ready.`
       return;
     }
     if (ph === "task") {
-      const t = remaining()[0];
-      if (placeOf(t) === scene && spotOf(t) === id && !S2.arrived[t.id]) {
-        S2.arrived[t.id] = true;
+      const t2 = remaining()[0];
+      if (placeOf(t2) === scene && spotOf(t2) === id && !S2.arrived[t2.id]) {
+        S2.arrived[t2.id] = true;
         setSay(`Here at the ${spotObj(scene, id).name.toLowerCase()}. First tiny step…`);
         save2();
         return;
@@ -8073,6 +8249,15 @@ Then tell chat "wind down" whenever you're ready.`
       scratchOpen = true;
       sfx("paper", true);
       render();
+      return;
+    }
+    if (scene === "hall" && id === "clients") {
+      clientsOpen = true;
+      sfx("paper", true);
+      render();
+      loadClients().then(() => {
+        if (clientsOpen) ctx();
+      });
       return;
     }
     const s = spotObj(scene, id);
@@ -8093,9 +8278,9 @@ Then tell chat "wind down" whenever you're ready.`
       return;
     }
     if (scene === "base" && phase() === "task") {
-      const t = remaining()[0];
-      if (placeOf(t) === "base" && spotOf(t) === id && !S2.arrived[t.id]) {
-        S2.arrived[t.id] = true;
+      const t2 = remaining()[0];
+      if (placeOf(t2) === "base" && spotOf(t2) === id && !S2.arrived[t2.id]) {
+        S2.arrived[t2.id] = true;
         setSay(`Here at the ${v.name.toLowerCase()}. First tiny step…`);
         save2();
         return;
@@ -8177,8 +8362,8 @@ Then tell chat "wind down" whenever you're ready.`
     }
     const ug = ev.target.closest("[data-ugarden]");
     if (ug) {
-      const k = ug.dataset.ugarden, st = ST[k] || {};
-      speak(`${(st.users || 0).toLocaleString()} ${st.label || (k === "chord" ? "studios" : "families")} use ${k === "chord" ? "Chord" : "Chico"}! One flower for every ${st.per > 0 ? st.per : 10}.`, 4500);
+      const k = ug.dataset.ugarden, st2 = ST[k] || {};
+      speak(`${(st2.users || 0).toLocaleString()} ${st2.label || (k === "chord" ? "studios" : "families")} use ${k === "chord" ? "Chord" : "Chico"}! One flower for every ${st2.per > 0 ? st2.per : 10}.`, 4500);
       return;
     }
     const ent = ev.target.closest("[data-ent]");
@@ -8594,7 +8779,7 @@ Then tell chat "wind down" whenever you're ready.`
     setSfx(e.target.checked);
     if (e.target.checked) sfx("coin");
   };
-  ["pointerdown", "keydown"].forEach((t) => document.addEventListener(t, () => {
+  ["pointerdown", "keydown"].forEach((t2) => document.addEventListener(t2, () => {
     qnQuietUntil = 0;
   }, { capture: true, once: true }));
   document.querySelectorAll("[data-open]").forEach((b) => b.onclick = () => {
@@ -8616,7 +8801,7 @@ Then tell chat "wind down" whenever you're ready.`
     task: () => phase() === "task" ? remaining()[0] : null,
     S: () => S2,
     F: () => F,
-    fs: (t) => !!S2.firstStep[t.id],
+    fs: (t2) => !!S2.firstStep[t2.id],
     act: nbAct,
     timerLeft,
     sayNow: () => say2,
@@ -8630,7 +8815,7 @@ Then tell chat "wind down" whenever you're ready.`
     markRead,
     agentName,
     onClose: () => render(),
-    placeLabel: (t) => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`
+    placeLabel: (t2) => `${VILLAGE[placeOf(t2)].name} · ${spotObj(placeOf(t2), spotOf(t2)).name}`
   });
   initHestia({
     sfx,

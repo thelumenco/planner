@@ -584,7 +584,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   console.log("\nscratchpad");
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   page.on("pageerror", e => errors.push(`scratchpad pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&seed=1&nosample=1&time=10:30&date=2026-10-05");
+  await page.goto(url + "?reset=1&seed=1&chord=1&time=10:30&date=2026-10-05");
   await page.waitForTimeout(800);
   await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
   await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
@@ -600,6 +600,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="hall"]').dispatchEvent("click");
   await page.waitForFunction(() => /Town hall/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(400);
+  await page.locator('#world [data-spot="clients"]').dispatchEvent("click");
+  await page.waitForSelector("#ctx .clprojects li", { timeout: 15000 });
+  check(await page.locator("#ctx .clprojects li").count() === 2 && /overdue tasks/.test(await page.locator("#ctx .clchips").textContent()), "the client table in the town hall shows a live Chord snapshot");
+  check(await page.locator("#clForm").count() === 1, "with a chat about your clients");
+  await page.fill("#clIn", "what's waiting on me?"); await page.click("#clForm button");
+  await page.waitForFunction(() => document.querySelectorAll("#clChat .fox").length >= 1 && !/Looking through/.test(document.querySelector("#clChat").textContent), null, { timeout: 15000 });
+  check(await page.locator("#clChat .me").count() === 1 && await page.locator("#clChat .fox").count() >= 1, "and the chat answers");
+  await page.screenshot({ path: join(shots, "client-table.png") });
+  await page.click("#pclose");
   await page.locator('#world [data-spot="whiteboard"]').dispatchEvent("click");
   await page.waitForSelector("#scratchText", { timeout: 15000 });
   await page.fill("#scratchText", "Call the printer about the flyers"); await page.waitForTimeout(1500);

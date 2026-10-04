@@ -355,3 +355,9 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Undo for every delete** (`undoable(msg, restore)` in core, a bar at the bottom for 7 s): Hestia chores and pantry items, dropping a quest, tearing out a journal page, wiping the scratchpad. Journal entries: the newest change wins on merge, so an undo beats the tear-out marker.
 - Wardrobe keeps only the latest two extra picks; all picks clear each day.
 - Curtains sway from the rod; a duck family swims along the river on home base and the town square every ~2 minutes, under the bridges.
+
+## Round 25: client table in the town hall
+- The client table moved from the Fresh Pages library to the town hall (`clients` station, E:[118,474]); the playable-boss skill's spot list is updated.
+- `clients.js`: a live snapshot from Mel's Chord connector through the page's mcp (studio_overview, list_projects active, needs_attention; 5-minute connector cache, Refresh forces fresh): counts, active projects with progress, attention items, next booking. Nothing from Chord is stored in the db.
+- Chat about clients: `sample` with the snapshot in the prompt and page tools (when the view supports them) that call Chord get_project, list_upcoming and list_clients. The chat log lives in the page view only.
+- Capability adds `Chord: studio_overview, list_projects, needs_attention, get_project, list_upcoming, list_clients` (all read-only). The dev stub fakes Chord with `?chord=1`.

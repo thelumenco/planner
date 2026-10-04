@@ -387,3 +387,14 @@
 .undobar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:14px;background:#2F2B28;color:#FFFDF6;border-radius:999px;padding:9px 10px 9px 18px;font-size:.9rem;box-shadow:0 10px 24px -12px rgba(0,0,0,.5);max-width:calc(100% - 32px)}
 .undobar[hidden]{display:none}
 .undobar button{background:var(--butter);color:#2F2B28;border:0;border-radius:999px;padding:5px 14px;font-weight:800;cursor:pointer}
+/* client table */
+.clchips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.clchip{font-size:.78rem;background:#F4EEE3;border-radius:999px;padding:3px 10px;color:#5A534C}.clchip b{color:#2F2B28}
+.clchip.warn{background:#FBE3D6;color:#9A4524}.clchip.warn b{color:#9A4524}
+.clmoney{margin:4px 0 10px}
+.clprojects li > span{display:grid;gap:2px;flex:1;min-width:0}
+.clbar{display:block;height:6px;border-radius:99px;background:#EDE6DA;overflow:hidden;margin-top:3px;max-width:220px}.clbar i{display:block;height:100%;background:var(--sage)}
+.clchat{max-height:220px;overflow:auto;display:grid;gap:6px;margin:6px 0;padding:8px;background:#FBF8F2;border-radius:8px;border:1px solid rgba(120,104,84,.12)}
+.clchat p{margin:0;padding:7px 10px;border-radius:10px;font-size:.88rem;line-height:1.45;max-width:90%;white-space:pre-wrap}
+.clchat .me{justify-self:end;background:#E3EAF8}.clchat .fox{justify-self:start;background:#FFFDF6;border:1px solid rgba(120,104,84,.12)}
+.clatt li > span{display:grid;gap:2px}

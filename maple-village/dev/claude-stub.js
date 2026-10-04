@@ -78,6 +78,14 @@
         ];
         return { content: [], payload: { events } };
       }
+      if (server === "Chord") {
+        const P = { studio_overview: { studio: "Test Studio", currency: "$", projects_active: 2, tasks_overdue: 1, tasks_waiting_on_clients: 2, client_comments_open: 1, proposals_awaiting_reply: 1, leads_open: 2, retainers_running: 3, retainer_income_per_month: 450, next_bookings: [{ meeting: "Coffee Chat", with: "A. Client", starts: "Wed, 21 Oct 2026, 14:30" }] },
+          list_projects: { count: 2, projects: [{ id: "p1", name: "Website copy", client: "Sample Co", category: "Copy", due: "2026-10-16", tasks_done: 3, tasks_total: 8 }, { id: "p2", name: "Claude Setup", client: "Test Client", key_date: "2026-10-07", key_date_label: "Key date", tasks_done: 0, tasks_total: 6 }] },
+          needs_attention: { count: 1, items: [{ title: "New enquiry from a florist", action: "Reply and book a call" }] },
+          get_project: { id: "p1", stages: [] }, list_upcoming: { items: [] }, list_clients: { clients: [] } };
+        if (!P[tool]) throw { code: "not_in_manifest", message: "not declared" };
+        return { content: [], payload: P[tool] };
+      }
       if (server === "Notion" && tool === "notion-search") {
         const q = String(input.query || "");
         return { content: [], payload: { results: [{ id: "plan-" + q.replace(/\W+/g, "-"), title: q, url: "https://app.notion.com/p/x", type: "page" }], type: "ai_search" } };
@@ -108,7 +116,7 @@
     }
   };
 
-  const caps = { db, mcp: q.get("sunsama") || q.get("notion") ? mcp : null, user: { id: async () => "me", isOwner: () => true, canEdit: () => true }, sample: q.get("nosample") ? null : sample };
+  const caps = { db, mcp: q.get("sunsama") || q.get("notion") || q.get("chord") ? mcp : null, user: { id: async () => "me", isOwner: () => true, canEdit: () => true }, sample: q.get("nosample") ? null : sample };
   window.claude = { use: name => new Promise(r => setTimeout(() => r(caps[name] ?? null), 250)) };
 
   if (q.get("seed")) {
