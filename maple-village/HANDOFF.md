@@ -418,3 +418,29 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - The bought "Little bookshelf" in Mel's room moved to the left of the flower print so it doesn't overlap the board.
 - **Home desk:** today's calendar, the work inbox and the personal inbox now sit on one page (no tabs), each filling in as soon as its source answers.
 - The writing desk's legs now meet the desktop. Round-button icons draw their outlines without the wobble filter and slightly bolder (some Android phones dropped them). The heart bullet in the quest note has room before the text.
+
+### Round 34: the courtyard, trophies, the fountain's visualisation
+- **The courtyard** (scene `trophy`, an `INNER` room of the hall, reached through the archway station `trophydoor` on the town hall's west wall): flagstones, a whitewashed arcade with terracotta tiles and bougainvillea, planters and lemon trees.
+  - **Bench:** Mel sits (`.sit`) until she walks.
+  - **Fountain:** a coin wish, or the weekly visualisation.
+  - **Pigeons:** pecking (CSS); a tap makes one flap off.
+  - **Neighbours:** Theo eats lunch on the bench (12–1), Okada strolls 2–3, Juniper reads 3:30–4.
+  - **Wall:** Kind words board (moved from the hall; the pennant is back) and the Affirmations board.
+- **Trophies** (`trophies.js`): milestone families, each with its own look (shape, colour, emblem), the number on the plinth:
+  - Quests: 10, 25, 50 … 2500.
+  - App users for Chord, Chico (and Ohayo, Luna once their stats exist): 20, 50, 100 … 10,000.
+  - The month's revenue goal (needs `F.revTarget`; checked when the revenue chart has loaded).
+  - Sunsama weekly objectives: a rosette per week with all done, plus medals for 5, 10, 25, 50 and 100 done (`F.objDone` / `F.objWeeks`, read from `sunsama://objectives/<day>` for this week and last).
+  - 7- and 14-day water and steps streaks (from `F.history`), Maple friendship levels, kind words, harvests (`F.harvestTotal`), journal pages.
+  - Stored in `F.trophies`. The newest six stand on pedestals; older ones go into the **trophy book** automatically (or by choice): a page each with a Polaroid, the note and the date, with "Back on a pedestal" when there's room.
+  - The first run backfills quietly and Maple mentions the count on entering the hall. New trophies after that get a chime, a flash and Maple.
+  - An empty pedestal shows "coming up" progress.
+- **Affirmations:** five a day. Claude writes them from this week's Notion plan (`sample`); a built-in kind list is the fallback. Favourites can be kept (`F.affirm`).
+- **Fountain visualisation** (`vision.js`), following the weekly-visualisation skill:
+  - Reads only the month's theme and the latest Weekly Visualisations entry (for the one-question look-back, only if under 3 weeks old).
+  - Six questions, one at a time, with a one-line Claude reflection after each.
+  - Then a 150–250 word summary, theme, word and her own actions.
+  - On approval: a page in the Weekly Visualisations data source (`ba8f40af…`) with Week, Date, Theme, Feeling Word, Cycle Phase (from "Period day 1" on The Tans calendar) and Actions Pushed. Ticked actions become Sunsama tasks for the coming Monday; a retried save never duplicates them.
+  - The manifest adds Notion `notion-create-pages` and Sunsama `create_task`.
+- **Home desk:** the personal inbox only. **Routines:** one box per step that starts empty (no doubled tick), and more space above the buttons.
+- **Emotion jars:** blobs are flat, slightly lumpy shapes in one colour (no shine, shade or outline), and the jar and lid are hand-drawn with wobbly lines.
