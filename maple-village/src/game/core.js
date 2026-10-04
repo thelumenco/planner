@@ -776,7 +776,7 @@ function arriveVillageSpot(id){
   if (id === "board") { arriveSpot("board"); return; }
   if (id === "pond") { speak(phase() === "break" ? "Perfect break spot. Breathe." : VILLAGE.pond.line, 4000); render(); }
 }
-function toWorld(ev){ const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY; const p = pt.matrixTransform(svg.getScreenCTM().inverse()); return [p.x, p.y]; }
+function toWorld(ev){ const r = $("map").getBoundingClientRect(); return [(ev.clientX - r.left)/cam.s + cam.x, (ev.clientY - r.top)/cam.s]; }
 svg.addEventListener("click", ev => {
   const npc = ev.target.closest("[data-npc]");
   if (npc) { tapNpc(npc.dataset.npc); return; }
@@ -853,8 +853,14 @@ function updateCam(dt){
   const tx = clamp(mel.x - vw/2, 0, W - vw);
   cam.x = cam.snap ? tx : cam.x + (tx - cam.x)*Math.min(1, dt*3.2); cam.snap = false;
   cam.w = vw; cam.s = vw < W ? ch/HH : cw/W;
-  const key = cam.x.toFixed(1) + "," + vw.toFixed(1);
-  if (key !== cam.key) { cam.key = key; svg.setAttribute("viewBox", `${cam.x.toFixed(1)} 0 ${vw.toFixed(1)} ${HH}`); }
+  // Pan by sliding the already-drawn SVG (GPU transform) rather than changing its viewBox: re-filtering the whole
+  // hand-drawn scene every frame made phones flicker and drop outlines.
+  const px = Math.round(cam.x*cam.s), key = px + "," + cw + "x" + ch + "," + (vw < W);
+  if (key !== cam.key) {
+    cam.key = key;
+    if (vw < W) { svg.style.width = Math.round(W*cam.s) + "px"; svg.style.height = Math.round(HH*cam.s) + "px"; svg.style.transform = `translate3d(${-px}px,0,0)`; }
+    else { svg.style.width = svg.style.height = svg.style.transform = ""; }
+  }
 }
 function measureHud(){
   const hb = document.querySelector(".hudbar"), m = $("map");
@@ -904,9 +910,6 @@ function frame(now){
   nodes.evan.classList.toggle("run", evan.run && evan.moving);
   const order = [[nodes.mel, mel], [nodes.maple, maple], [nodes.evan, evan], ...npcActors()].sort((a, b) => a[1].y - b[1].y);
   const g = $("actors"); order.forEach(([n]) => { if (g.lastElementChild !== n) g.appendChild(n); });
-  // The quest note docks on the opposite half of the map from Mel, so it never sits on top of her.
-  const jn = $("journal"), low = jn.classList.contains("low");
-  if (!low && mel.y < 300) jn.classList.add("low"); else if (low && mel.y > 360) jn.classList.remove("low");
   const close = Math.hypot(maple.x - mel.x, maple.y - mel.y) < 60;
   bubbleAt($("speech"), close ? (maple.x*0.35 + mel.x*0.65) : maple.x, close ? Math.min(maple.y, mel.y) : maple.y, close ? 76 : (sleeping ? 18 : 30));
   if (evanHere()) bubbleAt($("evanSay"), evan.x, evan.y, 40); else $("evanSay").hidden = true;

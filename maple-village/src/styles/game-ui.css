@@ -191,3 +191,9 @@
 .hudbar .bar .pbar{width:100%;height:100%;display:block}
 .hudbar .tnote{min-width:2.4em;text-align:right}
 .hudbar .trk:hover .bar{filter:saturate(1.2)}
+
+/* round 6: folded quest tab lives in the bottom-left corner; smooth camera */
+.map .qnote.slim,.map .qnote.slim.low{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:12px;right:auto;max-width:64%;transform:rotate(-1deg)}
+.map{overflow:hidden}
+.map > svg{transform-origin:0 0;backface-visibility:hidden}
+@media (max-width:640px){.map > svg{position:absolute;left:0;top:0;will-change:transform}}
