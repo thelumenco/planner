@@ -322,3 +322,10 @@
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
 .chips button{border:1px solid var(--edge);background:#FFFDF6;border-radius:999px;padding:4px 10px;font:inherit;font-size:.8rem;color:#5E5A55;cursor:pointer}
 .chatform input{flex:1;min-width:0}
+/* post box: unread work mail */
+.hlist.post li{align-items:flex-start}
+.hlist.post a{display:grid;gap:1px;flex:1;min-width:0;color:inherit;text-decoration:none}
+.hlist.post a b{font-size:.8rem;text-transform:capitalize;color:#2F3B73}
+.hlist.post a span{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hlist.post a small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hlist.post .when{flex:none;padding-top:2px}

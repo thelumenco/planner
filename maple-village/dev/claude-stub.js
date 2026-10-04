@@ -57,6 +57,11 @@
   const mcp = {
     callTool: async (server, tool, input) => {
       await new Promise(r => setTimeout(r, 300));
+      if (server === "Gmail" && tool === "search_threads") {
+        const t = (id, sender, subject, snippet, h) => ({ id, messageCount: 1, viewUrl: "https://mail.google.com/mail/#all/" + id,
+          messages: [{ id, sender, subject, snippet, date: new Date(Date.now() - h*3600e3).toISOString(), labelIds: ["UNREAD", "INBOX"] }] });
+        return { content: [], payload: { resultCountEstimate: "2", threads: [t("g1", "Farzana Ali <farzana@example.com>", "MUSE audit: next steps", "Lovely to hear from you, here's what I'm thinking", 2), t("g2", "studio@example.com", "Invoice question", "Quick one about the October invoice", 20)] } };
+      }
       if (server === "Google Calendar" && tool === "list_events") {
         if (input.calendarId !== "primary") return { content: [], payload: { events: [] } };
         const d = input.startTime.slice(0, 10), at = (h, m) => `${d}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00+08:00`;

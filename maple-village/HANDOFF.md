@@ -298,4 +298,7 @@ Round 15 (talk to Maple):
 - A round chat button on the map opens a chat with Maple (the `sample` capability, quick tier, JSON reply). She answers in a line or two and returns actions the page runs straight away: shopping_add, restocked, chore_add, chore_done, tidy_timer, break/back, quest_add/drop/next, water, steps, go (walk somewhere), open (panel or fridge/cupboard), pet. Each action that ran shows as a green chip under her reply. Context sent: time, scene, phase, quests left, timer, water, steps, coins, and a Hestia summary. Chat history (last 30) is kept per device. A break she starts now takes priority over the morning clean.
 - Polish: home furniture along the walls, names on speech bubbles, gift thank-yous with hearts, broom badge for chores, unticking a chore takes the coin back, a soft single chime, smaller town labels, swaying washing, messengers wait outside the house.
 
+Round 16 (post box):
+- A post box (pigeonholes, against the back wall) in the post office lists unread Primary mail from the Gmail connector (`game/postbox.js`, `search_threads`, `is:unread in:inbox category:primary`, read-only). The connector is Mel's work inbox. Each row opens the thread in Gmail; "Check again" refreshes. Filled pigeonholes show how many are waiting. Manifest now: Sunsama MCP read_resource, Google Calendar list_events, Gmail search_threads, plus sample, db, user.
+
 Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lines; Hestia's custom lists, rhythm notes, equipment/energy filters and reminders weren't carried over.

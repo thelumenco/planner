@@ -764,6 +764,13 @@ body.nb-open{overflow:hidden}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
 .chips button{border:1px solid var(--edge);background:#FFFDF6;border-radius:999px;padding:4px 10px;font:inherit;font-size:.8rem;color:#5E5A55;cursor:pointer}
 .chatform input{flex:1;min-width:0}
+/* post box: unread work mail */
+.hlist.post li{align-items:flex-start}
+.hlist.post a{display:grid;gap:1px;flex:1;min-width:0;color:inherit;text-decoration:none}
+.hlist.post a b{font-size:.8rem;text-transform:capitalize;color:#2F3B73}
+.hlist.post a span{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hlist.post a small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hlist.post .when{flex:none;padding-top:2px}
 </style>
 </head>
 <body>
@@ -1420,11 +1427,12 @@ body.nb-open{overflow:hidden}
       ["sofa", "Cosy sofa", "C", "sofa", /user|beta|tester|feedback|call|interview|parent/, "Perfect for chats with parents."],
       ["kitchen", "Kitchen table", "D", "table", /plan|family|schedule|meal|roadmap/, "Where family plans happen."]
     ] },
-    post: { name: "Post office", wall: "#E3EEF5", trim: "var(--sky)", pos: { A: [260, 340], B: [424, 258], C: [400, 530], D: [110, 216] }, stations: [
+    post: { name: "Post office", wall: "#E3EEF5", trim: "var(--sky)", pos: { A: [260, 340], B: [436, 258], C: [400, 530], D: [110, 216], E: [344, 250] }, stations: [
       ["counter", "Sorting counter", "A", "counter", /email|inbox|reply|message|dm|respond/, "Letters in, letters out."],
       ["cabinet", "Filing cabinet", "B", "cabinet", /admin|file|doc|contract|tax|form|organi/, "A place for everything."],
       ["scales", "Stamps & scales", "C", "scales", /invoice|pay|bill|stripe|account|bank|receipt|expense|price/, "Weigh it, stamp it, send it."],
-      ["ledge", "Writing ledge", "D", "desk", /./, "A tidy little ledge for odd jobs."]
+      ["ledge", "Writing ledge", "D", "desk", /./, "A tidy little ledge for odd jobs."],
+      ["pobox", "Your post box", "E", "pobox", null, "Your post box: unread mail from your work inbox."]
     ] },
     home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { A: [120, 216], B: [414, 228], H: [326, 250], C: [96, 410], D: [464, 452], G: [396, 372], E: [436, 598], F: [96, 596] }, stations: [
       ["desk", "Home desk", "A", "desk", /./, "Your own little desk."],
@@ -2004,6 +2012,11 @@ body.nb-open{overflow:hidden}
           `<rect x="${x - 24}" y="${y - 74}" width="48" height="74" rx="8" style="fill:var(--sock)"/><rect x="${x - 17}" y="${y - 66}" width="34" height="58" rx="4" style="fill:#6B5A52"/><rect x="${x - 30}" y="${y - 96}" width="60" height="16" rx="4" style="fill:var(--peri)"/><rect x="${x - 14}" y="${y - 93}" width="20" height="9" rx="2" style="fill:#DCE8C8"/>`,
           `<rect x="${x - 24}" y="${y - 74}" width="48" height="74" rx="8"/><path d="M${x - 17} ${y - 56} h34 M${x - 17} ${y - 44} h34 M${x - 17} ${y - 32} h34 M${x - 17} ${y - 20} h34" opacity=".45"/><path d="M${x - 26} ${y - 80} v28 M${x + 26} ${y - 80} v28" stroke-width="2.4"/><rect x="${x - 30}" y="${y - 96}" width="60" height="16" rx="4"/><rect x="${x - 14}" y="${y - 93}" width="20" height="9" rx="2"/><text x="${x - 4}" y="${y - 86}" text-anchor="middle" font-family="Klee One,serif" font-size="7" stroke="none" style="fill:var(--line)">1.2</text>`
         );
+      case "pobox": {
+        let c = "";
+        for (let r = 0; r < 3; r++) for (let i = 0; i < 2; i++) c += `<rect x="${x - 20 + i * 21}" y="${y - 80 + r * 24}" width="19" height="20" rx="1" style="fill:${G && G.postCount && G.postCount() > r * 2 + i ? "#FFFDF6" : "#9C7A5C"}"/>`;
+        return sk(`<rect x="${x - 24}" y="${y - 84}" width="48" height="84" rx="3" style="fill:var(--wood)"/>${c}`, `<rect x="${x - 24}" y="${y - 84}" width="48" height="84" rx="3"/>${c.replace(/ style="[^"]*"/g, "")}`);
+      }
       case "fridge":
         return sk(
           `<rect x="${x - 20}" y="${y - 84}" width="40" height="84" rx="5" style="fill:#F4F1EA"/><rect x="${x - 14}" y="${y - 74}" width="13" height="16" style="fill:#FFFDF6"/><circle cx="${x + 9}" cy="${y - 70}" r="3" style="fill:var(--rose)"/><circle cx="${x + 3}" cy="${y - 46}" r="2.6" style="fill:var(--butter)"/>`,
@@ -3306,6 +3319,73 @@ Quests finished today: ${S3.doneIds.length}`;
     return out;
   }
 
+  // src/game/postbox.js
+  var GMAIL = "Gmail";
+  var cache2 = { at: 0, threads: [], error: null, busy: false };
+  async function fetchPost(fresh2) {
+    if (cache2.busy || !fresh2 && Date.now() - cache2.at < 2 * 6e4) return cache2;
+    let mcp = null;
+    try {
+      mcp = window.claude && claude.use ? await claude.use("mcp") : null;
+    } catch {
+    }
+    if (!mcp) return cache2 = { at: Date.now(), threads: [], error: "unavailable", busy: false };
+    cache2.busy = true;
+    try {
+      const r = await mcp.callTool(GMAIL, "search_threads", { query: "is:unread in:inbox category:primary", pageSize: 15, view: "THREAD_VIEW_MINIMAL" }, { cache: { staleTime: fresh2 ? 0 : 6e4, refresh: !!fresh2 } });
+      let p = r && r.payload;
+      if (typeof p === "string") {
+        try {
+          p = JSON.parse(p);
+        } catch {
+        }
+      }
+      const threads = (p && p.threads || []).map((t) => {
+        const ms = t.messages || [], last2 = ms[ms.length - 1] || {}, first = ms[0] || {};
+        return {
+          id: t.id,
+          subject: first.subject || last2.subject || "(no subject)",
+          from: last2.sender || "",
+          snippet: last2.snippet || first.snippet || "",
+          at: Date.parse(last2.date || "") || 0,
+          count: t.messageCount || ms.length,
+          url: t.viewUrl || last2.viewUrl || ""
+        };
+      }).sort((a, b) => b.at - a.at);
+      cache2 = { at: Date.now(), threads, error: null, busy: false };
+    } catch (e) {
+      cache2 = { at: Date.now(), threads: cache2.threads, error: e && e.code || "upstream_error", busy: false };
+    }
+    return cache2;
+  }
+  var postCount = () => cache2.threads.length;
+  var ago = (ms) => {
+    const m = Math.round((Date.now() - ms) / 6e4);
+    return m < 60 ? `${Math.max(1, m)}m` : m < 1440 ? `${Math.round(m / 60)}h` : `${Math.round(m / 1440)}d`;
+  };
+  var who = (s) => {
+    const m = /^(.*?)\s*<.*>$/.exec(s);
+    const n = m ? m[1] : s;
+    return n.includes("@") ? n.split("@")[0].replace(/[._]/g, " ") : n;
+  };
+  var POST_ERRORS = {
+    unavailable: "Your inbox isn't reachable from this view.",
+    needs_reauth: "Gmail needs reconnecting: claude.ai Settings, Connectors.",
+    server_not_connected: "Add the Gmail connector in claude.ai Settings, Connectors.",
+    not_in_manifest: "Gmail is switched off for this page. Turn it on in the page's Permissions.",
+    server_unavailable: "Gmail didn't answer. Try again in a minute."
+  };
+  function postPanel() {
+    const c = cache2;
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Your post box</h2><p class="sub">Unread in your work inbox (Primary). Tap a letter to open it in Gmail.</p>`;
+    if (c.busy && !c.threads.length) h += `<p class="muted">Penny's checking the post…</p>`;
+    else if (c.error && !c.threads.length) h += `<p class="muted">${esc(POST_ERRORS[c.error] || "Couldn't fetch your post just now. Try again in a minute.")}</p>`;
+    else if (!c.threads.length) h += `<p class="muted">Nothing unread. A tidy post box!</p>`;
+    else h += `<ul class="hlist post">${c.threads.map((t) => `<li><a href="${esc(t.url)}" target="_blank" rel="noopener"><b>${esc(who(t.from))}</b><span>${esc(t.subject)}${t.count > 1 ? ` <small>(${t.count})</small>` : ""}</span><small>${esc(t.snippet.slice(0, 90))}</small></a><small class="when">${t.at ? ago(t.at) : ""}</small></li>`).join("")}</ul>`;
+    h += `<div class="actions"><a class="btn small alt" href="https://mail.google.com/mail/?authuser=mel@freshpages.co" target="_blank" rel="noopener">Open Gmail</a><button class="btn small alt" data-postfresh="1">Check again</button></div>`;
+    return h;
+  }
+
   // src/game/hestia.js
   var DEFAULT_ZONES = [
     { id: 1, name: "Living Room & Balcony", icon: "living", tasks: [
@@ -4105,8 +4185,8 @@ Quests finished today: ${S3.doneIds.length}`;
   function say(e, text, ms = 3800) {
     const el = $("npcSay");
     sayer = e;
-    const who = e.kind === "agent" ? e.ag.name.split(/[ ,]/)[0] : e.def.name;
-    el.innerHTML = `<b class="who">${esc(who)}</b>${esc(plain(text))}`;
+    const who2 = e.kind === "agent" ? e.ag.name.split(/[ ,]/)[0] : e.def.name;
+    el.innerHTML = `<b class="who">${esc(who2)}</b>${esc(plain(text))}`;
     el.hidden = false;
     clearTimeout(sayT);
     sayT = setTimeout(hideSay, ms);
@@ -4248,7 +4328,7 @@ Quests finished today: ${S3.doneIds.length}`;
     });
   }
   migrate();
-  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk() });
+  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk() });
   function isDusk() {
     const t = sgHM();
     return t >= 19 * 60 || t < 6 * 60;
@@ -4271,6 +4351,7 @@ Quests finished today: ${S3.doneIds.length}`;
   var openView = null;
   var shopClosed = false;
   var homeView = null;
+  var postOpen = false;
   function persist(which) {
     const obj = which === "today" ? S2 : F;
     obj.updatedAt = Date.now();
@@ -5789,6 +5870,7 @@ Then tell chat "wind down" whenever you're ready.`
     shelfOpen = false;
     selPlot = null;
     homeView = null;
+    postOpen = false;
     if (scene === "market") shopClosed = true;
     ctx();
   }
@@ -5824,6 +5906,7 @@ Then tell chat "wind down" whenever you're ready.`
     const c = $("ctx");
     let h = "";
     if (homeView && scene === "home") h = hestiaPanel(homeView);
+    else if (postOpen && scene === "post") h = postPanel();
     else if (scene === "market" && !shopClosed) {
       const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["care", "Care"], ["family", "Family"], ["home", "Home"], ["sell", "Sell"]];
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
@@ -5887,6 +5970,13 @@ Then tell chat "wind down" whenever you're ready.`
     }
     c.innerHTML = h;
     if (homeView && scene === "home") wireHestia(c, homeView);
+    c.querySelectorAll("[data-postfresh]").forEach((b) => b.onclick = () => {
+      fetchPost(true).then(() => {
+        ctx();
+        drawScene();
+      });
+      ctx();
+    });
     showPanel(!!h, homeView === "fridge" && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
     c.querySelectorAll("[data-shop]").forEach((b) => b.onclick = () => {
       shopTab = b.dataset.shop;
@@ -6130,7 +6220,11 @@ Then tell chat "wind down" whenever you're ready.`
       shopClosed = false;
       shedOpen = false;
       homeView = null;
+      postOpen = false;
       resetScene();
+      if (id === "post") fetchPost().then(() => {
+        if (scene === "post") drawScene();
+      });
       const p = at || [260, 596];
       mel.x = mel.tx = p[0];
       mel.y = mel.ty = p[1];
@@ -6173,6 +6267,7 @@ Then tell chat "wind down" whenever you're ready.`
     shelfOpen = false;
     shedOpen = false;
     homeView = null;
+    postOpen = false;
     openView = null;
     nextLeg();
     render();
@@ -6203,6 +6298,16 @@ Then tell chat "wind down" whenever you're ready.`
     if (id === "stall") {
       shopClosed = false;
       render();
+      return;
+    }
+    if (id === "pobox") {
+      postOpen = true;
+      sfx("paper");
+      render();
+      fetchPost().then(() => {
+        ctx();
+        drawScene();
+      });
       return;
     }
     if (id === "board" && outside()) {

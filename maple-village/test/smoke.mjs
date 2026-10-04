@@ -345,6 +345,24 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#journal").textContent().then(t => /break/i.test(t)), "and a break she asks for starts in the game");
   await page.close();
 }
+// Post box: unread work mail at the post office (Gmail connector, faked by the stub)
+{
+  console.log("\npost box");
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  page.on("pageerror", e => errors.push(`post pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&nosample=1&sunsama=1&time=10:30&date=2026-10-05");
+  await page.waitForTimeout(700);
+  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-place="post"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Post office/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(500);
+  await page.locator('#world [data-spot="pobox"]').dispatchEvent("click");
+  await page.waitForFunction(() => document.querySelectorAll("#ctx .hlist.post li").length === 2, null, { timeout: 15000 });
+  check(await page.locator("#ctx .hlist.post li a").first().getAttribute("href").then(h => /mail\.google\.com/.test(h)), "the post box lists unread work mail, each opening in Gmail");
+  await page.screenshot({ path: join(shots, "postbox.png") });
+  await page.close();
+}
 // Sunsama pull: no chat plan, the page fetches today's tasks itself
 {
   console.log("\nsunsama pull");
