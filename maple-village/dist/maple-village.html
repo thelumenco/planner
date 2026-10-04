@@ -32,7 +32,7 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 *,*::before,*::after{box-sizing:inherit}
 body{margin:0;color:var(--ink);background:var(--bg);font:16px/1.65 Mulish,"Avenir Next",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-button,input{font:inherit;color:inherit}
+button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--navy);outline-offset:3px;border-radius:6px}
 .wrap{max-width:1080px;margin:0 auto;padding:28px 22px 72px;display:grid;gap:36px}
@@ -564,6 +564,9 @@ body.nb-open{overflow:hidden}
 .map .panel{position:absolute;inset:8px;z-index:6;overflow:auto;overscroll-behavior:contain;border-radius:6px;padding:20px 16px 16px;
   background-color:#FFFDF7;background-image:var(--fibre);color:#2F2B28;box-shadow:0 2px 3px rgba(60,40,30,.12),0 24px 40px -24px rgba(40,30,20,.6);animation:pop2 .25s ease}
 .map .panel[hidden]{display:none}
+/* panels are cream paper in both themes: give everything inside (typed text, inputs, pills) the light-theme ink */
+.map .panel{color-scheme:light;--bg:#F2EEE7;--card:#F9F7F2;--edge:rgba(120,104,84,.13);--ink:#2F2B28;--soft:#8A8279;--faint:#B5ADA2;--navy:#2F3B73;--oat:#EAE3D8;--rule:#E4DDD2;--wash1:#F6E4D2;--wash2:#E0EAD8}
+.map .panel input,.map .panel textarea,.map .panel select{color:#2F2B28}
 .pclose{position:sticky;top:-8px;float:right;margin:-10px -6px 0 8px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,253,247,.9);color:#5E5650;font-size:1.05rem;z-index:2}
 .panel h2{font-family:"Klee One",serif;font-weight:600;font-size:1.3rem;line-height:1.2;margin:0 0 6px}
 .panel .ph3{font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;margin:18px 0 0}
@@ -1274,7 +1277,7 @@ body.nb-open{overflow:hidden}
           <label class="setrow"><input type="checkbox" id="setSfx"> <span>Sound effects: paper, purrs, coins, hellos</span></label>
           <div class="setrow"><button class="btn small alt" id="setTest" type="button">Play a test sound</button><span class="muted" id="setTestNote">No sound? Turn the volume up and switch off silent mode.</span></div>
           <h3 class="ph3">Quiet</h3>
-          <label class="setrow"><input type="checkbox" id="setQuiet"> <span>Quiet evenings: once the quests are done and you've wound down, nobody talks unless you tap them</span></label>
+          <label class="setrow"><input type="checkbox" id="setQuiet"> <span>Peace and quiet: when there are no active quests, nobody talks unless you tap them</span></label>
           <h3 class="ph3">Hestia (home)</h3>
           <div class="setrow"><label class="btn small alt" for="hestiaFile">Import from Hestia</label><input type="file" id="hestiaFile" accept=".json,application/json" hidden><span class="muted" id="hestiaNote">In Hestia: Settings, Export. Then pick that file here: your chores, zones and pantry come across.</span></div>
           <h3 class="ph3">Your newspaper</h3>
@@ -2475,7 +2478,7 @@ body.nb-open{overflow:hidden}
       if (!h) return "";
       return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`;
     };
-    const lamps = [[234, 280], [286, 280], [190, 300], [204, 424], [384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
+    const lamps = [[204, 424], [384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
     return lampDefs + ground + lamps + places + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
   }
   var waterBand = (y1, y2) => `<path d="M0 ${y1 + 4} Q65 ${y1 - 4} 130 ${y1 + 3} T260 ${y1 + 2} T390 ${y1 + 4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2 + 5} 390 ${y2 - 2} T260 ${y2} T130 ${y2 - 3} T0 ${y2 + 2}`}z" style="fill:var(--water)"/>`;
@@ -3017,7 +3020,7 @@ body.nb-open{overflow:hidden}
     let h = "";
     for (let i = 0; i < Math.min(n, 9); i++) {
       const x = 370 + i % 5 * 18 + (i > 4 ? 9 : 0), y = 498 + (i > 4 ? 14 : 0) + i % 2 * 3;
-      h += `<g class="floaty" style="animation-delay:${(i * 0.37).toFixed(2)}s">${iconAt("lantern", x, y, 16)}</g>`;
+      h += `<g class="floaty" style="animation-delay:${(i * 0.37).toFixed(2)}s">${lampGlow(x, y, 20)}${iconAt("lantern", x, y, 16)}</g>`;
     }
     return h;
   }
@@ -3756,24 +3759,24 @@ body.nb-open{overflow:hidden}
   var linkify = (s) => esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)]/g, (u) => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u.replace(/^https?:\/\//, "").slice(0, 48)}${u.length > 56 ? "…" : ""} ↗</a>`);
   function notesHTML(text) {
     const lines = String(text || "").split(/\r?\n/);
-    let out = "", list = false;
+    let out = "", list2 = false;
     for (const ln of lines) {
       const m = ln.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)/);
       if (m) {
-        if (!list) {
+        if (!list2) {
           out += "<ul>";
-          list = true;
+          list2 = true;
         }
         out += `<li>${linkify(m[1])}</li>`;
         continue;
       }
-      if (list) {
+      if (list2) {
         out += "</ul>";
-        list = false;
+        list2 = false;
       }
       if (ln.trim()) out += `<p>${linkify(ln)}</p>`;
     }
-    return out + (list ? "</ul>" : "");
+    return out + (list2 ? "</ul>" : "");
   }
   function taskPage(t2) {
     const S3 = api.S(), fs = api.fs(t2), left2 = api.timerLeft(t2), say3 = api.sayNow();
@@ -4020,18 +4023,18 @@ Quests finished today: ${S3.doneIds.length}`;
     return q;
   }
   function questsFrom(payload) {
-    const list = payload && Array.isArray(payload.tasks) ? payload.tasks : Array.isArray(payload) ? payload : [];
-    return list.filter((t2) => t2 && t2._id && t2.title && !t2.deleted && !t2.isArchived && !t2.isBacklogged).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map(toQuest);
+    const list2 = payload && Array.isArray(payload.tasks) ? payload.tasks : Array.isArray(payload) ? payload : [];
+    return list2.filter((t2) => t2 && t2._id && t2.title && !t2.deleted && !t2.isArchived && !t2.isBacklogged).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map(toQuest);
   }
   async function pullSunsama(day, opts = {}) {
-    let mcp = null;
+    let mcp2 = null;
     try {
-      mcp = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp2 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp) return { error: "unavailable" };
+    if (!mcp2) return { error: "unavailable" };
     try {
-      const res = await mcp.callTool(SUNSAMA, "read_resource", { uri: `sunsama://tasks/${day}` }, { cache: { staleTime: opts.fresh ? 0 : 6e4, refresh: !!opts.fresh } });
+      const res = await mcp2.callTool(SUNSAMA, "read_resource", { uri: `sunsama://tasks/${day}` }, { cache: { staleTime: opts.fresh ? 0 : 6e4, refresh: !!opts.fresh } });
       let p = res && res.payload;
       if (typeof p === "string") {
         try {
@@ -4072,16 +4075,16 @@ Quests finished today: ${S3.doneIds.length}`;
   var cache = { day: "", at: 0, events: [], error: null };
   async function todaysEvents(day, fresh2) {
     if (!fresh2 && cache.day === day && Date.now() - cache.at < 5 * 6e4) return cache;
-    let mcp = null;
+    let mcp2 = null;
     try {
-      mcp = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp2 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp) return cache = { day, at: Date.now(), events: [], error: "unavailable" };
+    if (!mcp2) return cache = { day, at: Date.now(), events: [], error: "unavailable" };
     const startTime = `${day}T00:00:00+08:00`, end = new Date(Date.parse(startTime) + 864e5).toISOString().replace(".000Z", "Z");
     const results = await Promise.all(CALENDARS.map(async (c) => {
       try {
-        const r = await mcp.callTool(GCAL, "list_events", { calendarId: c.id, startTime, endTime: end, orderBy: "startTime", timeZone: "Asia/Singapore", pageSize: 60 }, { cache: { staleTime: fresh2 ? 0 : 12e4, refresh: !!fresh2 } });
+        const r = await mcp2.callTool(GCAL, "list_events", { calendarId: c.id, startTime, endTime: end, orderBy: "startTime", timeZone: "Asia/Singapore", pageSize: 60 }, { cache: { staleTime: fresh2 ? 0 : 12e4, refresh: !!fresh2 } });
         let p = r && r.payload;
         if (typeof p === "string") {
           try {
@@ -4228,15 +4231,15 @@ Quests finished today: ${S3.doneIds.length}`;
   var cache2 = { at: 0, threads: [], error: null, busy: false };
   async function fetchPost(fresh2) {
     if (cache2.busy || !fresh2 && Date.now() - cache2.at < 2 * 6e4) return cache2;
-    let mcp = null;
+    let mcp2 = null;
     try {
-      mcp = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp2 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp) return cache2 = { at: Date.now(), threads: [], error: "unavailable", busy: false };
+    if (!mcp2) return cache2 = { at: Date.now(), threads: [], error: "unavailable", busy: false };
     cache2.busy = true;
     try {
-      const r = await mcp.callTool(GMAIL, "search_threads", { query: "is:unread in:inbox category:primary", pageSize: 15, view: "THREAD_VIEW_MINIMAL" }, { cache: { staleTime: fresh2 ? 0 : 6e4, refresh: !!fresh2 } });
+      const r = await mcp2.callTool(GMAIL, "search_threads", { query: "is:unread in:inbox category:primary", pageSize: 15, view: "THREAD_VIEW_MINIMAL" }, { cache: { staleTime: fresh2 ? 0 : 6e4, refresh: !!fresh2 } });
       let p = r && r.payload;
       if (typeof p === "string") {
         try {
@@ -4719,9 +4722,9 @@ Quests finished today: ${S3.doneIds.length}`;
     <div class="tabs" role="tablist"><button role="tab" data-hfr="stock" aria-selected="${view.fridge === "stock"}">What we have</button><button role="tab" data-hfr="shop" aria-selected="${view.fridge === "shop"}">Shopping list${shop.length ? ` (${shop.length})` : ""}</button></div>`;
     if (view.fridge === "stock") {
       h += items.length ? cats.map((c) => {
-        const list = items.filter((i) => i.category === c.id);
-        if (!list.length) return "";
-        return `<p class="eyebrow">${esc(c.name)} · ${list.filter((i) => i.inStock).length}/${list.length}</p><ul class="hlist">${list.map((i) => `<li class="${i.inStock ? "" : "out"}"><label><input type="checkbox" data-hstock="${i.id}" ${i.inStock ? "checked" : ""}><span>${esc(i.name)}${i.notes ? ` <small>${esc(i.notes)}</small>` : ""}</span></label>${i.inStock ? "" : `<span class="hbadge now">to buy</span>`}<button class="hx" data-hitemdel="${i.id}" aria-label="Remove ${esc(i.name)}">✕</button></li>`).join("")}</ul>`;
+        const list2 = items.filter((i) => i.category === c.id);
+        if (!list2.length) return "";
+        return `<p class="eyebrow">${esc(c.name)} · ${list2.filter((i) => i.inStock).length}/${list2.length}</p><ul class="hlist">${list2.map((i) => `<li class="${i.inStock ? "" : "out"}"><label><input type="checkbox" data-hstock="${i.id}" ${i.inStock ? "checked" : ""}><span>${esc(i.name)}${i.notes ? ` <small>${esc(i.notes)}</small>` : ""}</span></label>${i.inStock ? "" : `<span class="hbadge now">to buy</span>`}<button class="hx" data-hitemdel="${i.id}" aria-label="Remove ${esc(i.name)}">✕</button></li>`).join("")}</ul>`;
       }).join("") : `<p class="muted">The fridge is empty. Add what you keep at home, or import your Hestia lists in Settings.</p>`;
       h += `<p class="muted">Untick something when it runs out: it goes on the shopping list.</p>`;
     } else {
@@ -5186,19 +5189,19 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
   async function readPlan(level2, opts = {}) {
     const title = planTitles()[level2];
     if (!title) return { level: level2, error: "unknown level" };
-    let mcp = null;
+    let mcp2 = null;
     try {
-      mcp = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp2 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp) return { level: level2, title, error: "unavailable" };
+    if (!mcp2) return { level: level2, title, error: "unavailable" };
     const cache3 = { staleTime: 30 * 6e4 }, signal = opts.signal;
     try {
-      const s = unwrap(await mcp.callTool(NOTION, "notion-search", { query: title, data_source_url: PLANS_DS, page_size: 5 }, { cache: cache3, signal }));
-      const list = s && Array.isArray(s.results) ? s.results : [];
-      const hit = list.find((x) => x && String(x.title || "").trim() === title) || null;
+      const s = unwrap(await mcp2.callTool(NOTION, "notion-search", { query: title, data_source_url: PLANS_DS, page_size: 5 }, { cache: cache3, signal }));
+      const list2 = s && Array.isArray(s.results) ? s.results : [];
+      const hit = list2.find((x) => x && String(x.title || "").trim() === title) || null;
       if (!hit) return { level: level2, title, error: "not found" };
-      const page = unwrap(await mcp.callTool(NOTION, "notion-fetch", { id: hit.id || hit.url }, { cache: cache3, signal }));
+      const page = unwrap(await mcp2.callTool(NOTION, "notion-fetch", { id: hit.id || hit.url }, { cache: cache3, signal }));
       const raw = typeof page === "string" ? page : page && (page.text || "") || "", pm = /<properties>\s*(\{[\s\S]*?\})\s*<\/properties>/.exec(raw);
       let props2 = {};
       try {
@@ -5239,9 +5242,9 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     }
   }
   async function call(tool, input, fresh2) {
-    const mcp = await mcpUse();
-    if (!mcp) throw { code: "unavailable" };
-    return unwrap2(await mcp.callTool(CHORD, tool, input || {}, { cache: { staleTime: fresh2 ? 0 : 5 * 6e4, refresh: !!fresh2 } }));
+    const mcp2 = await mcpUse();
+    if (!mcp2) throw { code: "unavailable" };
+    return unwrap2(await mcp2.callTool(CHORD, tool, input || {}, { cache: { staleTime: fresh2 ? 0 : 5 * 6e4, refresh: !!fresh2 } }));
   }
   var CLIENT_ERRORS = {
     unavailable: "Chord isn't reachable from this view.",
@@ -5366,7 +5369,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     return `<div class="ptable"><table>${rows2.map((r, i) => `<tr>${r.map((c) => i === 0 && head ? `<th>${c}</th>` : `<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`;
   }
   function md(text) {
-    let h = "", list = false;
+    let h = "", list2 = false;
     const tables = [];
     text = String(text || "").replace(/<table[\s\S]*?<\/table>/g, (m) => {
       tables.push(tableHTML(m));
@@ -5377,44 +5380,44 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     text.split("\n").forEach((l) => {
       const tm = /^\u0000T(\d+)$/.exec(l.trim());
       if (tm) {
-        if (list) {
+        if (list2) {
           h += "</ul>";
-          list = false;
+          list2 = false;
         }
         h += tables[+tm[1]] || "";
         return;
       }
       const line = l.trim().replace(/<\/?[a-z][^>]*>/gi, "").trim();
       if (!line || line === "---") {
-        if (list) {
+        if (list2) {
           h += "</ul>";
-          list = false;
+          list2 = false;
         }
         return;
       }
       if (/^#{1,4} /.test(line)) {
-        if (list) {
+        if (list2) {
           h += "</ul>";
-          list = false;
+          list2 = false;
         }
         h += `<p class="pmh">${inline(line.replace(/^#+ /, ""))}</p>`;
         return;
       }
       if (/^[-*] /.test(line)) {
-        if (!list) {
+        if (!list2) {
           h += `<ul class="pml">`;
-          list = true;
+          list2 = true;
         }
         h += `<li>${inline(line.slice(2))}</li>`;
         return;
       }
-      if (list) {
+      if (list2) {
         h += "</ul>";
-        list = false;
+        list2 = false;
       }
       h += `<p class="pmp">${inline(line)}</p>`;
     });
-    return h + (list ? "</ul>" : "");
+    return h + (list2 ? "</ul>" : "");
   }
   function sections(text) {
     const out = [];
@@ -5518,13 +5521,13 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     return p;
   };
   async function call2(tool, input, fresh2) {
-    let mcp = null;
+    let mcp2 = null;
     try {
-      mcp = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp2 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp) throw { code: "unavailable" };
-    return unwrap3(await mcp.callTool(CHORD, tool, input, { cache: { staleTime: fresh2 ? 0 : 10 * 6e4, refresh: !!fresh2 } }));
+    if (!mcp2) throw { code: "unavailable" };
+    return unwrap3(await mcp2.callTool(CHORD, tool, input, { cache: { staleTime: fresh2 ? 0 : 10 * 6e4, refresh: !!fresh2 } }));
   }
   var st3 = { data: null, busy: false, error: null, editing: false };
   var monthKey = (d) => String(d || "").slice(0, 7);
@@ -5742,12 +5745,12 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   }
   var when3 = (e) => new Date(e.at).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Singapore" });
   function journalPanel(decompress) {
-    const list = live().slice(0, 12);
+    const list2 = live().slice(0, 12);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>My journal</h2>
     <p class="sub">${decompress ? "Three quick points from that call or moment. Then let it go." : esc(journalPrompt())}</p>
     <form id="jForm" class="jform"><label class="sr" for="jText">Journal entry</label><textarea id="jText" rows="6" maxlength="8000" placeholder="${decompress ? "1.\n2.\n3." : "Write anything..."}">${esc(draft)}</textarea>
     <div class="actions"><button class="btn primary small" type="submit">Keep this page</button></div></form>`;
-    if (list.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list.map((e) => `<details${e.kind === "jar" ? " open" : ""}><summary><b>${when3(e)}</b> ${e.kind === "jar" ? "A jar of " + esc(e.jar.label) : esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary>${e.kind === "jar" ? `<div class="polaroid"><div class="pphoto">${jarSVG(e.jar, 74)}</div><p class="pcap">${esc(new Date(e.jar.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" }))}</p></div>${e.jar.blobs && e.text !== e.jar.label ? `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>` : ""}` : `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>`}<button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
+    if (list2.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list2.map((e) => `<details${e.kind === "jar" ? " open" : ""}><summary><b>${when3(e)}</b> ${e.kind === "jar" ? "A jar of " + esc(e.jar.label) : esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary>${e.kind === "jar" ? `<div class="polaroid"><div class="pphoto">${jarSVG(e.jar, 74)}</div><p class="pcap">${esc(new Date(e.jar.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" }))}</p></div>${e.jar.blobs && e.text !== e.jar.label ? `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>` : ""}` : `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>`}<button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
     return h;
   }
   function wireJournal(root, undoable2, done) {
@@ -5808,6 +5811,113 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
         rerender();
       });
     };
+  }
+
+  // src/game/reminders.js
+  var CAL = CALENDARS.find((c) => c.name === "Personal") || CALENDARS[0];
+  var TZ = "Asia/Singapore";
+  var SG = 8 * 36e5;
+  var sgISO = (ms) => new Date(ms + SG).toISOString().slice(0, 19) + "+08:00";
+  var fmtWhen = (ms) => {
+    const t2 = new Date(ms).toLocaleTimeString("en-SG", { hour: "numeric", minute: "2-digit", timeZone: TZ }).replace(/\s/g, "").toLowerCase();
+    const day = (d2) => new Date(d2 + SG).toISOString().slice(0, 10);
+    const today2 = day(Date.now()), tmr2 = day(Date.now() + 864e5), d = day(ms);
+    return d === today2 ? t2 : d === tmr2 ? `${t2} tomorrow` : `${t2} ${new Date(ms).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: TZ })}`;
+  };
+  function whenOf(a) {
+    const m = Number(a && a.minutes);
+    if (m > 0) return Date.now() + Math.min(m, 60 * 24 * 14) * 6e4;
+    const hm2 = /^(\d{1,2}):(\d{2})$/.exec(String(a && a.at || "").trim());
+    if (!hm2 || +hm2[1] > 23 || +hm2[2] > 59) return null;
+    const day = /^\d{4}-\d{2}-\d{2}$/.test(String(a.date || "")) ? a.date : new Date(Date.now() + SG).toISOString().slice(0, 10);
+    let t2 = Date.parse(`${day}T${hm2[1].padStart(2, "0")}:${hm2[2]}:00+08:00`);
+    if (!a.date && t2 <= Date.now() + 3e4) t2 += 864e5;
+    return t2 > Date.now() && t2 < Date.now() + 366 * 864e5 ? t2 : null;
+  }
+  async function mcp() {
+    try {
+      return window.claude && claude.use ? await claude.use("mcp") : null;
+    } catch {
+      return null;
+    }
+  }
+  function eventId(r) {
+    let p = r && r.payload !== void 0 ? r.payload : r;
+    if (typeof p === "string") {
+      try {
+        p = JSON.parse(p);
+      } catch {
+      }
+    }
+    if (p && Array.isArray(p.content) && p.content[0] && typeof p.content[0].text === "string") {
+      try {
+        p = JSON.parse(p.content[0].text);
+      } catch {
+      }
+    }
+    const id = p && (p.id || p.eventId || p.event && p.event.id);
+    return typeof id === "string" ? id : null;
+  }
+  async function createEvent(text, at) {
+    const m = await mcp();
+    if (!m) throw { code: "unavailable" };
+    const r = await m.callTool(GCAL, "create_event", {
+      calendarId: CAL.id,
+      summary: `Reminder: ${text}`,
+      description: "Set by Maple in Maple's village.",
+      startTime: sgISO(at),
+      endTime: sgISO(at + 10 * 6e4),
+      timeZone: TZ,
+      availability: "AVAILABILITY_FREE",
+      useDefaultReminders: false,
+      overrideReminders: [{ method: "popup", minutes: 0 }]
+    });
+    return eventId(r);
+  }
+  var list = (F2) => F2.reminders = Array.isArray(F2.reminders) ? F2.reminders : [];
+  var upcoming = (F2) => list(F2).filter((r) => !r.cancelled && r.at > Date.now() - 30 * 6e4).sort((a, b) => a.at - b.at);
+  async function addReminder(F2, a, save3) {
+    const text = plain(String(a && a.text || "")).replace(/^(to\s+)/i, "").trim().slice(0, 80), at = whenOf(a);
+    if (!text || !at) return { ok: false, line: `I couldn't work out when. Try "in 1 hour" or "at 6:30pm".` };
+    try {
+      const id = await createEvent(text, at);
+      const r = { id: "r" + Date.now().toString(36), text, at, eventId: id, cal: CAL.id, made: Date.now() };
+      list(F2).push(r);
+      F2.reminders = F2.reminders.filter((x) => x.at > Date.now() - 2 * 864e5).slice(-40);
+      save3();
+      return { ok: true, r, line: `Reminder at ${fmtWhen(at)}: ${text}` };
+    } catch (e) {
+      return { ok: false, line: e && e.code === "not_granted" ? "Calendar reminders need your OK first. Allow Google Calendar in the page's Permissions." : CAL_ERRORS[e && e.code] || "I couldn't add that to your calendar just now." };
+    }
+  }
+  async function cancelReminder(F2, id, save3) {
+    const r = list(F2).find((x) => x.id === id);
+    if (!r) return null;
+    r.cancelled = true;
+    save3();
+    const m = await mcp();
+    if (m && r.eventId) {
+      try {
+        await m.callTool(GCAL, "delete_event", { calendarId: r.cal || CAL.id, eventId: r.eventId, notificationLevel: "NONE" });
+      } catch {
+      }
+    }
+    return async () => {
+      if (r.at <= Date.now()) return;
+      try {
+        r.eventId = await createEvent(r.text, r.at);
+      } catch {
+      }
+      r.cancelled = false;
+      save3();
+    };
+  }
+  function dueNow(F2) {
+    const out = list(F2).filter((r) => !r.cancelled && !r.said && r.at <= Date.now() && r.at > Date.now() - 5 * 6e4);
+    out.forEach((r) => {
+      r.said = true;
+    });
+    return out;
   }
 
   // src/art/people.js
@@ -6429,13 +6539,13 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   }
   function allTasks() {
     const base = P && P.day === dayKey() && Array.isArray(P.tasks) ? P.tasks : [];
-    const list = [...base, ...S2.extra].filter((t2) => t2 && t2.id && t2.title && !(S2.dropped || []).includes(t2.id)).map((t2) => Object.assign({}, t2, S2.tweaks[t2.id] || {}));
-    const ids = list.map((t2) => t2.id);
+    const list2 = [...base, ...S2.extra].filter((t2) => t2 && t2.id && t2.title && !(S2.dropped || []).includes(t2.id)).map((t2) => Object.assign({}, t2, S2.tweaks[t2.id] || {}));
+    const ids = list2.map((t2) => t2.id);
     const order = S2.order.filter((id) => ids.includes(id));
     ids.forEach((id) => {
       if (!order.includes(id)) order.push(id);
     });
-    return order.map((id) => list.find((t2) => t2.id === id));
+    return order.map((id) => list2.find((t2) => t2.id === id));
   }
   function dropTask(id, quiet) {
     const t2 = allTasks().find((x) => x.id === id);
@@ -6703,9 +6813,9 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     save2(true);
   }
   function feedAnimals(which) {
-    const list = which === "all" ? F.pets.animals.filter((a) => hungry(a, F)) : F.pets.animals.filter((a) => a.id === which);
+    const list2 = which === "all" ? F.pets.animals.filter((a) => hungry(a, F)) : F.pets.animals.filter((a) => a.id === which);
     let fed = 0, eggs = 0, grew = [], miss = "";
-    list.forEach((a) => {
+    list2.forEach((a) => {
       const r = feedOne(F, a, F.inv, addInv);
       if (r.ok) {
         fed++;
@@ -6722,9 +6832,9 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     gainXp(1);
     if (scene === "base") [0, 300].forEach((d) => setTimeout(() => mprop("heart", 110 + rnd(-30, 30), 520, 1700), d));
     const g = grew[0];
-    speak(g ? `${g.name} is all grown up! ${g.kind === "chick" ? "A proper hen now, eggs from tomorrow." : "A big fluffy rabbit now."}` : eggs ? `${eggs === 1 ? "An egg" : eggs + " eggs"} for your backpack! Fresh from the coop.` : fed > 1 ? "Everyone's munching away. Happy run." : `${list[0].name} gobbles it up. Happy little face.`, 4500);
+    speak(g ? `${g.name} is all grown up! ${g.kind === "chick" ? "A proper hen now, eggs from tomorrow." : "A big fluffy rabbit now."}` : eggs ? `${eggs === 1 ? "An egg" : eggs + " eggs"} for your backpack! Fresh from the coop.` : fed > 1 ? "Everyone's munching away. Happy run." : `${list2[0].name} gobbles it up. Happy little face.`, 4500);
     if (eggs) flash(`+${eggs} fresh egg${eggs > 1 ? "s" : ""} in your backpack`);
-    if (miss && fed < list.length) setTimeout(() => speak(miss, 4e3), 4600);
+    if (miss && fed < list2.length) setTimeout(() => speak(miss, 4e3), 4600);
     save2(true);
     return fed;
   }
@@ -6823,16 +6933,18 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   ["pointerdown", "keydown"].forEach((t2) => document.addEventListener(t2, () => {
     lastInput = Date.now();
   }, { capture: true }));
-  var hushed = () => F.quietEvening !== false && !!S2.pond && S2.pond.shown == null && Date.now() - (S2.pond.done || 0) > 2e4 && !remaining().length && !(S2.timer && !S2.timer.fired);
+  var hushed = () => F.quietEvening !== false && !remaining().length && !(S2.pond && (S2.pond.shown != null || Date.now() - (S2.pond.done || 0) < 2e4)) && !(S2.timer && !S2.timer.fired) && S2.mode !== "decompress";
+  var speechAt = 0;
   var unprompted = () => Date.now() - lastInput > 1500;
   var quietNow = () => hushed() && unprompted();
-  function speak(text, ms) {
+  function speak(text, ms, force) {
     const el = $("speech");
-    if (quietNow()) {
+    if (!force && quietNow()) {
       if (!el.hidden) el.textContent = plain(text);
       return;
     }
     el.hidden = false;
+    speechAt = Date.now();
     el.textContent = plain(text);
     el.classList.remove("pop");
     void el.offsetWidth;
@@ -7002,6 +7114,14 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   var lastDusk = null;
   setInterval(() => {
     if (S2.sleep && S2.sleep.until && Date.now() > S2.sleep.until) wakeUp();
+    if (hushed() && !$("speech").hidden && Date.now() > speechLock && Date.now() - speechAt > 6e3) $("speech").hidden = true;
+    const due = dueNow(F);
+    if (due.length) {
+      chime();
+      act("nudge");
+      speak(`Reminder: ${due.map((r2) => r2.text).join(", and ")}.`, 9e3, true);
+      save2();
+    }
     if (S2.day !== dayKey()) {
       S2 = freshToday();
       say2 = null;
@@ -7669,6 +7789,8 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
         const r = feedAnimals("all");
         return r ? `Fed ${r} in the run` : null;
       }
+      case "remind":
+        return addReminder(F, a, () => save2()).then((x) => x.line);
     }
     return null;
   }
@@ -7713,7 +7835,7 @@ ${p.text}`).join("\n\n")}
     try {
       const d = await sampleCap.json(`You are ${F.name}, a tiny fox who lives in Mel's cosy village game and coaches her through her day, in boss-mode style: one thing at a time, tiny first steps, breaks, no guilt. Warm, direct, short sentences. Mel is a Singapore-based founder (a copywriting studio, the Chord and Chico apps) and a parent of a toddler, Evan; Darren lives with them.
 She can ask you anything. Reply in at most 3 short sentences, plain text, no emoji, no markdown.
-When she asks for something the game can do, include it in "actions" and say in your reply that it's done. Never claim something happened that isn't in actions, and never claim to send emails, edit Sunsama or her calendar: those happen in chat with Claude.
+When she asks for something the game can do, include it in "actions" and say in your reply that it's done. Never claim something happened that isn't in actions, and never claim to send emails, edit Sunsama or change her calendar events: those happen in chat with Claude. The one exception is reminders: the "remind" action puts a reminder on her calendar that pings her phone.
 Available actions (use only these):
 {"type":"shopping_add","items":[{"name":"oat milk","where":"Supermarket"}]}  (where is optional; stores: ${hestiaSummary().stores.join(", ")})
 {"type":"restocked","items":["rice"]}  (bought or found again: back in the fridge)
@@ -7727,19 +7849,20 @@ Available actions (use only these):
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
+{"type":"remind","text":"get the laundry in","minutes":60}  or  {"type":"remind","text":"call mum","at":"18:30","date":"YYYY-MM-DD"}  ("remind me to..."; minutes from now, or a 24-hour Singapore time with an optional date; text is short and starts with a verb; say the time back to her)
 What's happening in the village right now: ${chatContext()}${planText}
 Conversation so far:
 ${history || "(just started)"}
 Mel: ${text}
 Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", cache: false });
       const reply = plain(String(d && d.reply || "Hmm, I lost my words. Try again?")).slice(0, 600);
-      const did = (Array.isArray(d && d.actions) ? d.actions : []).slice(0, 8).map((a) => {
+      const did = (await Promise.all((Array.isArray(d && d.actions) ? d.actions : []).slice(0, 8).map(async (a) => {
         try {
-          return runChatAction(a);
+          return await runChatAction(a);
         } catch {
           return null;
         }
-      }).filter(Boolean);
+      }))).filter(Boolean);
       chatLog.push({ role: "assistant", content: reply, did });
       speak(reply, 5e3);
     } catch (e) {
@@ -7755,7 +7878,7 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
     const el = $("chatLog");
     if (!el) return;
     $("chatName").textContent = F.name;
-    el.innerHTML = (chatLog.length ? "" : `<p class="fox">${icon("fox", 18)}Hi! Ask me anything, or tell me what you need. I can add to your shopping list, tick chores, start a break or a tidy timer, add or drop quests, log water and steps, or walk you somewhere.</p>`) + chatLog.map((m) => m.role === "user" ? `<p class="me">${esc(m.content)}</p>` : `<p class="fox">${icon("fox", 18)}${esc(m.content)}</p>${(m.did || []).map((d) => `<span class="did">${esc(d)}</span>`).join("")}`).join("") + (chatBusy ? `<p class="fox">${icon("fox", 18)}…</p>` : "");
+    el.innerHTML = (chatLog.length ? "" : `<p class="fox">${icon("fox", 18)}Hi! Ask me anything, or tell me what you need. I can add to your shopping list, tick chores, start a break or a tidy timer, add or drop quests, log water and steps, set reminders that ping your phone, or walk you somewhere.</p>`) + chatLog.map((m) => m.role === "user" ? `<p class="me">${esc(m.content)}</p>` : `<p class="fox">${icon("fox", 18)}${esc(m.content)}</p>${(m.did || []).map((d) => `<span class="did">${esc(d)}</span>`).join("")}`).join("") + (chatBusy ? `<p class="fox">${icon("fox", 18)}…</p>` : "");
     el.scrollTop = el.scrollHeight;
     $("chatChips").innerHTML = ["What's next?", "I need a break", "Add milk to the shopping list", "I did the dishes"].map((c) => `<button type="button" data-chip="${esc(c)}">${esc(c)}</button>`).join("");
     $("chatChips").querySelectorAll("[data-chip]").forEach((b) => b.onclick = () => sendChat(b.dataset.chip));
@@ -8324,9 +8447,20 @@ Then tell chat "wind down" whenever you're ready.`
         return mark + `<li class="${past ? "past" : ""}"><span class="when">${e.allDay ? "all day" : fmtT(e.start)}</span><span class="what"><i style="background:${e.color}"></i><b>${esc(plain(e.title) || e.title)}</b>${e.where ? `<small>${esc(e.where.split("\n")[0].slice(0, 60))}</small>` : ""}<small>${esc(e.cal)}${!e.allDay && e.end ? ` · until ${fmtT(e.end)}` : ""}</small></span>${e.link ? `<a href="${esc(e.link)}" target="_blank" rel="noopener noreferrer" aria-label="Open in Google Calendar">↗</a>` : ""}</li>`;
       }).join("") + (nowShown ? "" : `<li class="now"><span>now</span></li>`) + `</ol>`;
     }
+    const rems = upcoming(F);
+    h += `<p class="eyebrow" style="margin:16px 0 6px">Reminders</p>` + (rems.length ? `<ul class="qlist rems">${rems.map((x) => `<li><span><b>${esc(x.text)}</b><small>${esc(fmtWhen(x.at))}${x.at <= nowT ? " · done" : ""}</small></span>${x.at > nowT ? `<button class="next" data-rem="${esc(x.id)}">cancel</button>` : ""}</li>`).join("")}</ul>` : `<p class="muted">None set. Tell ${esc(F.name)} "remind me to get the laundry in in an hour" and your phone will ping you.</p>`);
     h += `<div class="actions"><button class="btn alt small" id="calRefresh">Refresh</button></div>`;
     el.innerHTML = h;
     $("calRefresh").onclick = () => renderCal(true);
+    el.querySelectorAll("[data-rem]").forEach((b) => b.onclick = async () => {
+      b.disabled = true;
+      const restore = await cancelReminder(F, b.dataset.rem, () => save2());
+      renderCal();
+      if (restore) undoable("Reminder cancelled", async () => {
+        await restore();
+        renderCal();
+      });
+    });
   }
   function itemBtn(id, label2, disabled, extra2) {
     const it = ITEMS[id];
@@ -8423,9 +8557,9 @@ Then tell chat "wind down" whenever you're ready.`
       if (past.length) h += `<p class="eyebrow" style="margin:22px 0 6px">Read before</p><ul class="qlist">${past.map((d, i) => `<li><span><b>${esc(d.title)}</b><small>${esc(d.author || "")}</small></span><button class="next" data-dig="past" data-i="${i}">reread</button></li>`).join("")}</ul>`;
       h += `</div><div class="actions"><button class="btn alt small" data-close="1">Close shelf</button></div>`;
     } else if (boardOpen) {
-      const list = outside() ? allTasks() : questsIn(scene), cur2 = phase() === "task" ? remaining()[0].id : null;
+      const list2 = outside() ? allTasks() : questsIn(scene), cur2 = phase() === "task" ? remaining()[0].id : null;
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>${outside() ? "Town quest board" : esc(ROOMS[scene].name) + " quests"}</h2>
-      ${list.length ? `<ul class="qlist">${list.map((t2) => {
+      ${list2.length ? `<ul class="qlist">${list2.map((t2) => {
         const dn = S2.doneIds.includes(t2.id), sp = spotObj(placeOf(t2), spotOf(t2));
         return `<li class="${dn ? "done" : ""}${t2.id === cur2 ? " cur" : ""}"${!dn && t2.id !== cur2 && phase() !== "clean" ? ` data-next="${esc(t2.id)}" role="button"` : ""}><span><b>${esc(t2.title)}</b><small>${outside() ? icon(placeOf(t2), 16) + " " + esc(VILLAGE[placeOf(t2)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t2.id !== cur2 && phase() !== "clean" ? `<button class="next" data-next="${esc(t2.id)}">do next</button>` : "<span></span>"}</li>`;
       }).join("")}</ul>` : `<p class="sub">No quests ${outside() ? "today yet" : "in here today"}.</p>`}
@@ -9295,8 +9429,8 @@ Then tell chat "wind down" whenever you're ready.`
   function nearSpot() {
     if (outside()) return Object.keys(VILLAGE).find((k) => VILLAGE[k].scene === scene && Math.hypot(VILLAGE[k].door[0] - mel.x, VILLAGE[k].door[1] - mel.y) < 22) || null;
     if (scene === "farm") return null;
-    const list = [...stationsOf(scene), scene !== "market" ? { id: "board", tx: 260, ty: 200 } : null].filter(Boolean);
-    const s = list.find((s2) => Math.hypot(s2.tx - mel.x, s2.ty - mel.y) < 26);
+    const list2 = [...stationsOf(scene), scene !== "market" ? { id: "board", tx: 260, ty: 200 } : null].filter(Boolean);
+    const s = list2.find((s2) => Math.hypot(s2.tx - mel.x, s2.ty - mel.y) < 26);
     return s ? s.id : null;
   }
   var EVAN_SPOTS = { base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [380, 580], [240, 560], [420, 340]], home: [[150, 500], [330, 520], [260, 340], [200, 600], [360, 330]] };

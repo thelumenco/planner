@@ -23,7 +23,7 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 *,*::before,*::after{box-sizing:inherit}
 body{margin:0;color:var(--ink);background:var(--bg);font:16px/1.65 Mulish,"Avenir Next",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-button,input{font:inherit;color:inherit}
+button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--navy);outline-offset:3px;border-radius:6px}
 .wrap{max-width:1080px;margin:0 auto;padding:28px 22px 72px;display:grid;gap:36px}

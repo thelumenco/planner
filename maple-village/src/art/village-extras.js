@@ -104,7 +104,7 @@ export function pondLanterns(n){
   let h = "";
   for (let i = 0; i < Math.min(n, 9); i++) {
     const x = 370 + (i % 5)*18 + (i > 4 ? 9 : 0), y = 498 + (i > 4 ? 14 : 0) + (i % 2)*3;   // the pond at home
-    h += `<g class="floaty" style="animation-delay:${(i*.37).toFixed(2)}s">${iconAt("lantern", x, y, 16)}</g>`;
+    h += `<g class="floaty" style="animation-delay:${(i*.37).toFixed(2)}s">${lampGlow(x, y, 20)}${iconAt("lantern", x, y, 16)}</g>`;
   }
   return h;
 }

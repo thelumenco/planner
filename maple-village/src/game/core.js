@@ -23,6 +23,7 @@ import { loadRevenue, revenuePanel, wireRevenue } from "./revenue.js";
 import { attachJars, jarsPanel, makeJar, emptyJar, jarById, addCustom, palette as jarPalette, shelf as jarShelf, MAX_BLOBS, MAX_KINDS } from "./jars.js";
 import { addJarEntry, removeEntry } from "./myroom.js";
 import { attachMyDocs, journalPanel, wireJournal, scratchPanel, wireScratch } from "./myroom.js";
+import { addReminder, cancelReminder, upcoming as upcomingReminders, dueNow, fmtWhen } from "./reminders.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 
 /* =================== STATE =================== */
@@ -338,17 +339,19 @@ function defaultLine(){
   if (ph === "recap") return "We did it! Garden? Shopping? Snacks?";
   return "No quests yet. Bring some from chat?";
 }
-// Quiet evening: once today's quests are all done and Mel has wound down (lanterns lit), nobody pipes up on their
-// own. Bubbles only appear in answer to a tap. Settings can turn it off (F.quietEvening === false).
+// Peace and quiet: whenever there are no active quests (all done, or none yet), nobody pipes up on their own and
+// Maple's bubble tucks itself away after a few seconds. Bubbles only appear in answer to a tap. Not during the
+// lantern wind-down or a running timer. Settings can turn it off (F.quietEvening === false).
 let lastInput = 0;
 ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { lastInput = Date.now(); }, {capture: true}));
-const hushed = () => F.quietEvening !== false && !!S.pond && S.pond.shown == null && Date.now() - (S.pond.done || 0) > 20e3 && !remaining().length && !(S.timer && !S.timer.fired);
+const hushed = () => F.quietEvening !== false && !remaining().length && !(S.pond && (S.pond.shown != null || Date.now() - (S.pond.done || 0) < 20e3)) && !(S.timer && !S.timer.fired) && S.mode !== "decompress";
+let speechAt = 0;
 const unprompted = () => Date.now() - lastInput > 1500;
 const quietNow = () => hushed() && unprompted();
-function speak(text, ms){
+function speak(text, ms, force){
   const el = $("speech");
-  if (quietNow()) { if (!el.hidden) el.textContent = plain(text); return; }
-  el.hidden = false; el.textContent = plain(text); el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
+  if (!force && quietNow()) { if (!el.hidden) el.textContent = plain(text); return; }
+  el.hidden = false; speechAt = Date.now(); el.textContent = plain(text); el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
   clearTimeout(speechT); speechLock = ms ? Date.now() + ms : 0;
   if (ms) speechT = setTimeout(() => { speechLock = 0; el.textContent = plain(say ? say.line : defaultLine()); }, ms);
 }
@@ -423,6 +426,8 @@ function timerHTML(label){
 let lastReady = readyCount(), lastDusk = null;
 setInterval(() => {
   if (S.sleep && S.sleep.until && Date.now() > S.sleep.until) wakeUp();
+  if (hushed() && !$("speech").hidden && Date.now() > speechLock && Date.now() - speechAt > 6000) $("speech").hidden = true;   // tuck Maple's bubble away
+  const due = dueNow(F); if (due.length) { chime(); act("nudge"); speak(`Reminder: ${due.map(r => r.text).join(", and ")}.`, 9000, true); save(); }
   if (S.day !== dayKey()) { S = freshToday(); say = null; save(true); speak(defaultLine()); syncSunsama(); return; }
   const rc = readyCount();
   if (rc > lastReady) { speak(rc === 1 ? "Psst… something in the garden is ready!" : `${rc} crops ready in the garden!`, 5000); if (scene === "farm") drawScene(); }
@@ -723,6 +728,7 @@ function runChatAction(a){
       if (w === "fridge" || w === "chores") { walkToPlace(w === "fridge" ? "fridge" : "cupboard"); return `Off to the ${w === "fridge" ? "fridge" : "cleaning cupboard"}`; } return null; }
     case "pet": hearts(3); sfx("purr"); return null;
     case "feed_animals": { const r = feedAnimals("all"); return r ? `Fed ${r} in the run` : null; }
+    case "remind": return addReminder(F, a, () => save()).then(x => x.line);
   }
   return null;
 }
@@ -745,7 +751,7 @@ async function sendChat(text){
   try {
     const d = await sampleCap.json(`You are ${F.name}, a tiny fox who lives in Mel's cosy village game and coaches her through her day, in boss-mode style: one thing at a time, tiny first steps, breaks, no guilt. Warm, direct, short sentences. Mel is a Singapore-based founder (a copywriting studio, the Chord and Chico apps) and a parent of a toddler, Evan; Darren lives with them.
 She can ask you anything. Reply in at most 3 short sentences, plain text, no emoji, no markdown.
-When she asks for something the game can do, include it in "actions" and say in your reply that it's done. Never claim something happened that isn't in actions, and never claim to send emails, edit Sunsama or her calendar: those happen in chat with Claude.
+When she asks for something the game can do, include it in "actions" and say in your reply that it's done. Never claim something happened that isn't in actions, and never claim to send emails, edit Sunsama or change her calendar events: those happen in chat with Claude. The one exception is reminders: the "remind" action puts a reminder on her calendar that pings her phone.
 Available actions (use only these):
 {"type":"shopping_add","items":[{"name":"oat milk","where":"Supermarket"}]}  (where is optional; stores: ${hestiaSummary().stores.join(", ")})
 {"type":"restocked","items":["rice"]}  (bought or found again: back in the fridge)
@@ -759,13 +765,14 @@ Available actions (use only these):
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
+{"type":"remind","text":"get the laundry in","minutes":60}  or  {"type":"remind","text":"call mum","at":"18:30","date":"YYYY-MM-DD"}  ("remind me to..."; minutes from now, or a 24-hour Singapore time with an optional date; text is short and starts with a verb; say the time back to her)
 What's happening in the village right now: ${chatContext()}${planText}
 Conversation so far:
 ${history || "(just started)"}
 Mel: ${text}
 Return JSON only: {"reply": "...", "actions": [ ... ]}`, {modelTier: "quick", cache: false});
     const reply = plain(String((d && d.reply) || "Hmm, I lost my words. Try again?")).slice(0, 600);
-    const did = (Array.isArray(d && d.actions) ? d.actions : []).slice(0, 8).map(a => { try { return runChatAction(a); } catch { return null; } }).filter(Boolean);
+    const did = (await Promise.all((Array.isArray(d && d.actions) ? d.actions : []).slice(0, 8).map(async a => { try { return await runChatAction(a); } catch { return null; } }))).filter(Boolean);
     chatLog.push({role: "assistant", content: reply, did}); speak(reply, 5000);
   } catch (e) {
     if (e && e.code === "not_granted") sampleCap = null;
@@ -776,7 +783,7 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, {modelTier: "quick", ca
 function renderChat(){
   const el = $("chatLog"); if (!el) return;
   $("chatName").textContent = F.name;
-  el.innerHTML = (chatLog.length ? "" : `<p class="fox">${icon("fox", 18)}Hi! Ask me anything, or tell me what you need. I can add to your shopping list, tick chores, start a break or a tidy timer, add or drop quests, log water and steps, or walk you somewhere.</p>`)
+  el.innerHTML = (chatLog.length ? "" : `<p class="fox">${icon("fox", 18)}Hi! Ask me anything, or tell me what you need. I can add to your shopping list, tick chores, start a break or a tidy timer, add or drop quests, log water and steps, set reminders that ping your phone, or walk you somewhere.</p>`)
     + chatLog.map(m => m.role === "user" ? `<p class="me">${esc(m.content)}</p>` : `<p class="fox">${icon("fox", 18)}${esc(m.content)}</p>${(m.did || []).map(d => `<span class="did">${esc(d)}</span>`).join("")}`).join("")
     + (chatBusy ? `<p class="fox">${icon("fox", 18)}…</p>` : "");
   el.scrollTop = el.scrollHeight;
@@ -1104,8 +1111,14 @@ async function renderCal(fresh){
       return mark + `<li class="${past ? "past" : ""}"><span class="when">${e.allDay ? "all day" : fmtT(e.start)}</span><span class="what"><i style="background:${e.color}"></i><b>${esc(plain(e.title) || e.title)}</b>${e.where ? `<small>${esc(e.where.split("\n")[0].slice(0, 60))}</small>` : ""}<small>${esc(e.cal)}${!e.allDay && e.end ? ` · until ${fmtT(e.end)}` : ""}</small></span>${e.link ? `<a href="${esc(e.link)}" target="_blank" rel="noopener noreferrer" aria-label="Open in Google Calendar">↗</a>` : ""}</li>`;
     }).join("") + (nowShown ? "" : `<li class="now"><span>now</span></li>`) + `</ol>`;
   }
+  const rems = upcomingReminders(F);
+  h += `<p class="eyebrow" style="margin:16px 0 6px">Reminders</p>` + (rems.length ? `<ul class="qlist rems">${rems.map(x => `<li><span><b>${esc(x.text)}</b><small>${esc(fmtWhen(x.at))}${x.at <= nowT ? " · done" : ""}</small></span>${x.at > nowT ? `<button class="next" data-rem="${esc(x.id)}">cancel</button>` : ""}</li>`).join("")}</ul>`
+    : `<p class="muted">None set. Tell ${esc(F.name)} "remind me to get the laundry in in an hour" and your phone will ping you.</p>`);
   h += `<div class="actions"><button class="btn alt small" id="calRefresh">Refresh</button></div>`;
   el.innerHTML = h; $("calRefresh").onclick = () => renderCal(true);
+  el.querySelectorAll("[data-rem]").forEach(b => b.onclick = async () => { b.disabled = true;
+    const restore = await cancelReminder(F, b.dataset.rem, () => save()); renderCal();
+    if (restore) undoable("Reminder cancelled", async () => { await restore(); renderCal(); }); });
 }
 function itemBtn(id, label, disabled, extra){
   const it = ITEMS[id];

@@ -74,7 +74,7 @@ export function villageArt(){
   const L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
   const light = (app, x, y) => { const h = G.health ? G.health(app) : null; if (!h) return "";
     return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`; };
-  const lamps = [[234, 280], [286, 280], [190, 300], [204, 424], [384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
+  const lamps = [[204, 424], [384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
   return lampDefs + ground + lamps + places + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
 }
 /* ---------- the river between the two screens ---------- */

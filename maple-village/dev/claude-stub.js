@@ -54,6 +54,7 @@
     if (/break/.test(t)) acts.push({type: "break", minutes: 10});
     const did = /i did (?:the )?(.+)/.exec(t); if (did) acts.push({type: "chore_done", text: did[1]});
     if (/water/.test(t)) acts.push({type: "water", ml: 250});
+    const rem = /remind me to (.+) in (\d+) (minute|hour)s?/.exec(t); if (rem) acts.push({type: "remind", text: rem[1], minutes: +rem[2]*(rem[3] === "hour" ? 60 : 1)});
     return {reply: acts.length ? "Done! One less thing to hold in your head." : "One thing at a time. What's the smallest next step?", actions: acts};
   };
   sample.limits = async () => ({ maxPromptBytes: 100000 });
@@ -67,6 +68,10 @@
         const t = (id, sender, subject, snippet, h) => ({ id, messageCount: 1, viewUrl: "https://mail.google.com/mail/#all/" + id,
           messages: [{ id, sender, subject, snippet, date: new Date(Date.now() - h*3600e3).toISOString(), labelIds: ["UNREAD", "INBOX"] }] });
         return { content: [], payload: { resultCountEstimate: "2", threads: [t("g1", "Farzana Ali <farzana@example.com>", "MUSE audit: next steps", "Lovely to hear from you, here's what I'm thinking", 2), t("g2", "studio@example.com", "Invoice question", "Quick one about the October invoice", 20)] } };
+      }
+      if (server === "Google Calendar" && (tool === "create_event" || tool === "delete_event")) {
+        (window.__calWrites = window.__calWrites || []).push({tool, input});
+        return tool === "create_event" ? { content: [], payload: { id: "ev" + window.__calWrites.length, summary: input.summary, start: { dateTime: input.startTime } } } : { content: [], payload: {} };
       }
       if (server === "Google Calendar" && tool === "list_events") {
         if (input.calendarId !== "primary") return { content: [], payload: { events: [] } };
