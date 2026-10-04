@@ -5940,7 +5940,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
       return arrivedFor(t) ? S2.firstStep[t.id] ? "You're doing it. I'm watching the clock." : "We're here. Just the first tiny step." : `Next quest: the ${spotObj(placeOf(t), spotOf(t)).name.toLowerCase()} at ${VILLAGE[placeOf(t)].short}.`;
     }
     if (ph === "break") return "Zzz… break time. Wander, or rest.";
-    if (ph === "decompress") return "Go tell chat “call done” 💬";
+    if (ph === "decompress") return S2.decompFree ? "Clench, breathe, then three quick points in your journal." : `${S2.decompFor ? `“${S2.decompFor}” is done. ` : ""}Clench, breathe, then jot three quick points.`;
     if (ph === "recap") return "We did it! Garden? Shopping? Snacks?";
     return "No quests yet. Bring some from chat?";
   }
@@ -6222,8 +6222,10 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
           grew++;
         }
       });
-      if (t.meeting) S2.mode = "decompress";
-      else if (remaining().length) {
+      if (t.meeting) {
+        S2.mode = "decompress";
+        S2.decompFor = t.title;
+      } else if (remaining().length) {
         S2.mode = "break";
         startTimer2("break", 10);
       }
@@ -6327,6 +6329,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
         save2();
         return;
       }
+      S2.decompFor = null;
       S2.mode = remaining().length ? "break" : null;
       if (S2.mode) startTimer2("break", 10);
       setSay("Decompressed. Now a proper break.");
@@ -7290,9 +7293,9 @@ Then tell chat "wind down" whenever you're ready.`
       <div class="actions"><button class="btn yes" data-a="back">I'm back</button>${!(scene === "base" && atSpot === "pond") ? `<button class="btn alt" data-a="pond">Sit by the pond</button>` : ""}${fresh2 ? `<button class="btn alt" data-a="flow">I'm in flow</button>` : ""}</div>`;
     } else if (ph === "decompress") {
       const clench = S2.timer && S2.timer.kind === "clench";
-      h += `<h1><span class="lbl">right now</span>Decompress</h1>${clench ? timerHTML("clench and hold") : ""}
-      <ul class="bujo"><li class="first"><span><span class="hl">Stomach clench, 30 seconds.</span> Hold, then release.</span></li>${S2.decompFree ? `<li>Three quick points in <span class="hl">your journal</span>, then let it go.</li>` : `<li>Tell chat <span class="hl">“call done”</span> and type three quick points. Chat files them.</li>`}<li>Make a hot drink and bring it back.</li></ul>
-      <div class="actions">${clench ? "" : `<button class="btn primary" data-a="clench">Start the 30 seconds</button>`}${S2.decompFree ? `<button class="btn alt" data-a="journal">Open my journal</button><button class="btn yes" data-a="decompressed">All done</button>` : `<button class="btn yes" data-a="decompressed">Done in chat</button>`}</div>`;
+      h += `<h1><span class="lbl">${S2.decompFree || !S2.decompFor ? "right now" : "after " + esc(S2.decompFor)}</span>Decompress</h1>${clench ? timerHTML("clench and hold") : ""}
+      <ul class="bujo"><li class="first"><span><span class="hl">Stomach clench, 30 seconds.</span> Hold, then release.</span></li><li>Three quick points in <span class="hl">your journal</span>${S2.decompFree ? "" : " (or tell chat, and it files them)"}, then let it go.</li><li>Make a hot drink and bring it back.</li></ul>
+      <div class="actions">${clench ? "" : `<button class="btn primary" data-a="clench">Start the 30 seconds</button>`}<button class="btn alt" data-a="journal">Open my journal</button><button class="btn yes" data-a="decompressed">All done</button></div>`;
     } else if (ph === "recap") {
       const done = allTasks().filter((t) => S2.doneIds.includes(t.id));
       h += `<h1><span class="lbl">that's a wrap</span>The day is done</h1>

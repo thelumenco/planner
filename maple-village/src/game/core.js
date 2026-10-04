@@ -294,7 +294,7 @@ function defaultLine(){
   if (ph === "clean") return atClean() ? (S.wipe ? "Five minutes. Hard stop, promise." : (sgHM() < 720 ? "Morning! Wet wipe first?" : "Hi! Wet wipe first?")) : "To the cleaning cupboard at home!";
   if (ph === "task") { const t = remaining()[0]; return arrivedFor(t) ? (S.firstStep[t.id] ? "You're doing it. I'm watching the clock." : "We're here. Just the first tiny step.") : `Next quest: the ${spotObj(placeOf(t), spotOf(t)).name.toLowerCase()} at ${VILLAGE[placeOf(t)].short}.`; }
   if (ph === "break") return "Zzz… break time. Wander, or rest.";
-  if (ph === "decompress") return "Go tell chat “call done” 💬";
+  if (ph === "decompress") return S.decompFree ? "Clench, breathe, then three quick points in your journal." : `${S.decompFor ? `“${S.decompFor}” is done. ` : ""}Clench, breathe, then jot three quick points.`;
   if (ph === "recap") return "We did it! Garden? Shopping? Snacks?";
   return "No quests yet. Bring some from chat?";
 }
@@ -416,7 +416,7 @@ const A = {
     S.doneIds.push(t.id); S.timer = null; sfx("chaching"); earn(5, "quest complete"); gainXp(1); S.last = t.title; countQuest();
     if (t.early) { F.early[t.id] = t.early; setTimeout(() => speak("Done a day early! Tick it off in Sunsama too, and it'll already be done on tomorrow's board.", 6000), 4200); }
     let grew = 0; F.plots.forEach(p => { if (p && p.crop && p.wateredAt && growth(p) < 1) { p.bonus = (p.bonus || 0) + QUEST_BOOST; grew++; } });
-    if (t.meeting) S.mode = "decompress";
+    if (t.meeting) { S.mode = "decompress"; S.decompFor = t.title; }
     else if (remaining().length) { S.mode = "break"; startTimer("break", 10); }
     act("cheer"); if (evanHere()) evanSays(pick(["yaaay!", "Mama did it!", "hooray!"]));
     if (onTread(t)) setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : "") + " Steps showing?", [["Log my steps", () => openSteps(true)]]);
@@ -454,7 +454,7 @@ const A = {
   decompNow(){ if (S.mode !== "decompress") S.modeBefore = S.mode || null; S.mode = "decompress"; S.decompFree = true; S.timer = S.timer && S.timer.kind === "task" ? S.timer : null; setSay("Let's decompress. Clench, breathe, then three quick points."); save(); },
   journal(){ if (scene === "room") { journalOpen = true; render(); } else walkToPlace("journal"); },
   decompressed(){ if (S.decompFree) { S.decompFree = false; S.mode = S.modeBefore || null; S.modeBefore = null; setSay("Decompressed. Lovely. Back to it when you're ready."); save(); return; }
-    S.mode = remaining().length ? "break" : null; if (S.mode) startTimer("break", 10); setSay("Decompressed. Now a proper break."); save(); },
+    S.decompFor = null; S.mode = remaining().length ? "break" : null; if (S.mode) startTimer("break", 10); setSay("Decompressed. Now a proper break."); save(); },
   water(ml){ setWater((S.waterMl || 0) + (ml || GLASS)); speak(pick(["Glug glug!", "Hydrated boss!", "Water break, good call."]), 3000); }
 };
 function doNext(id){
@@ -986,9 +986,9 @@ function journal(){
       <div class="actions"><button class="btn yes" data-a="back">I'm back</button>${!(scene === "base" && atSpot === "pond") ? `<button class="btn alt" data-a="pond">Sit by the pond</button>` : ""}${fresh ? `<button class="btn alt" data-a="flow">I'm in flow</button>` : ""}</div>`;
   } else if (ph === "decompress") {
     const clench = S.timer && S.timer.kind === "clench";
-    h += `<h1><span class="lbl">right now</span>Decompress</h1>${clench ? timerHTML("clench and hold") : ""}
-      <ul class="bujo"><li class="first"><span><span class="hl">Stomach clench, 30 seconds.</span> Hold, then release.</span></li>${S.decompFree ? `<li>Three quick points in <span class="hl">your journal</span>, then let it go.</li>` : `<li>Tell chat <span class="hl">“call done”</span> and type three quick points. Chat files them.</li>`}<li>Make a hot drink and bring it back.</li></ul>
-      <div class="actions">${clench ? "" : `<button class="btn primary" data-a="clench">Start the 30 seconds</button>`}${S.decompFree ? `<button class="btn alt" data-a="journal">Open my journal</button><button class="btn yes" data-a="decompressed">All done</button>` : `<button class="btn yes" data-a="decompressed">Done in chat</button>`}</div>`;
+    h += `<h1><span class="lbl">${S.decompFree || !S.decompFor ? "right now" : "after " + esc(S.decompFor)}</span>Decompress</h1>${clench ? timerHTML("clench and hold") : ""}
+      <ul class="bujo"><li class="first"><span><span class="hl">Stomach clench, 30 seconds.</span> Hold, then release.</span></li><li>Three quick points in <span class="hl">your journal</span>${S.decompFree ? "" : " (or tell chat, and it files them)"}, then let it go.</li><li>Make a hot drink and bring it back.</li></ul>
+      <div class="actions">${clench ? "" : `<button class="btn primary" data-a="clench">Start the 30 seconds</button>`}<button class="btn alt" data-a="journal">Open my journal</button><button class="btn yes" data-a="decompressed">All done</button></div>`;
   } else if (ph === "recap") {
     const done = allTasks().filter(t => S.doneIds.includes(t.id));
     h += `<h1><span class="lbl">that's a wrap</span>The day is done</h1>
