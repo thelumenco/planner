@@ -307,3 +307,18 @@
 @media (prefers-reduced-motion:reduce){.map .washing{animation:none}}
 /* who's talking: the name sits above the words */
 .speech .who{display:block;font-family:Mulish,sans-serif;font-size:.68em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--peri2,#6E7FC8);margin-bottom:1px}
+
+/* talk to Maple */
+.chatbtn{position:absolute;z-index:5;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);width:48px;height:48px;border-radius:50%;border:1px solid var(--edge);
+  background-color:var(--butter);background-image:var(--fibre);display:grid;place-items:center;padding:0;box-shadow:0 8px 16px -10px rgba(60,40,30,.6);cursor:pointer}
+.zoombtn:not([hidden]) ~ .chatbtn{bottom:calc(env(safe-area-inset-bottom,0px) + 66px)}
+.map.panel-open .chatbtn{display:none}
+.chatlog{display:flex;flex-direction:column;gap:8px;max-height:min(46vh,420px);overflow-y:auto;padding:4px 2px 8px}
+.chatlog p{margin:0;max-width:86%;padding:8px 12px;border-radius:14px;line-height:1.4;font-size:.95rem}
+.chatlog p.me{align-self:flex-end;background:var(--peri);color:#2F3B73;border-bottom-right-radius:4px}
+.chatlog p.fox{align-self:flex-start;background:#F4EEE3;font-family:"Klee One",serif;font-weight:600;border-bottom-left-radius:4px}
+.chatlog p.fox .ico{vertical-align:-4px;margin-right:4px}
+.chatlog .did{align-self:flex-start;font-size:.78rem;color:#5E7A4E;background:#EEF4E6;border-radius:999px;padding:3px 10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.chips button{border:1px solid var(--edge);background:#FFFDF6;border-radius:999px;padding:4px 10px;font:inherit;font-size:.8rem;color:#5E5A55;cursor:pointer}
+.chatform input{flex:1;min-width:0}

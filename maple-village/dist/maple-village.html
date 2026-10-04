@@ -749,6 +749,21 @@ body.nb-open{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.map .washing{animation:none}}
 /* who's talking: the name sits above the words */
 .speech .who{display:block;font-family:Mulish,sans-serif;font-size:.68em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--peri2,#6E7FC8);margin-bottom:1px}
+
+/* talk to Maple */
+.chatbtn{position:absolute;z-index:5;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);width:48px;height:48px;border-radius:50%;border:1px solid var(--edge);
+  background-color:var(--butter);background-image:var(--fibre);display:grid;place-items:center;padding:0;box-shadow:0 8px 16px -10px rgba(60,40,30,.6);cursor:pointer}
+.zoombtn:not([hidden]) ~ .chatbtn{bottom:calc(env(safe-area-inset-bottom,0px) + 66px)}
+.map.panel-open .chatbtn{display:none}
+.chatlog{display:flex;flex-direction:column;gap:8px;max-height:min(46vh,420px);overflow-y:auto;padding:4px 2px 8px}
+.chatlog p{margin:0;max-width:86%;padding:8px 12px;border-radius:14px;line-height:1.4;font-size:.95rem}
+.chatlog p.me{align-self:flex-end;background:var(--peri);color:#2F3B73;border-bottom-right-radius:4px}
+.chatlog p.fox{align-self:flex-start;background:#F4EEE3;font-family:"Klee One",serif;font-weight:600;border-bottom-left-radius:4px}
+.chatlog p.fox .ico{vertical-align:-4px;margin-right:4px}
+.chatlog .did{align-self:flex-start;font-size:.78rem;color:#5E7A4E;background:#EEF4E6;border-radius:999px;padding:3px 10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.chips button{border:1px solid var(--edge);background:#FFFDF6;border-radius:999px;padding:4px 10px;font:inherit;font-size:.8rem;color:#5E5A55;cursor:pointer}
+.chatform input{flex:1;min-width:0}
 </style>
 </head>
 <body>
@@ -877,6 +892,7 @@ body.nb-open{overflow:hidden}
     <button class="trk" data-track="steps" aria-label="Steps today. Tap to log your steps"><span class="lbl" aria-hidden="true" data-ico="steps"></span><span class="bar" id="stepBoxes"></span><span class="tnote" id="stepNote"></span></button>
   </div>
       <button class="zoombtn" id="zoomBtn" hidden aria-label="Zoom out to see the whole map"></button>
+      <button class="chatbtn" id="chatBtn" data-open="chat" aria-label="Talk to Maple" title="Talk to Maple"><i data-ico="chat" data-size="26"></i></button>
       <article class="qnote journal" id="journal" aria-live="polite"></article>
       <section class="panel" id="panel" hidden aria-label="Panel">
         <button class="pclose" id="pclose" aria-label="Close">✕</button>
@@ -1045,6 +1061,12 @@ body.nb-open{overflow:hidden}
         <div class="pview" id="calView" hidden>
           <h2>Today</h2>
           <div id="calBody"></div>
+        </div>
+        <div class="pview" id="chatView" hidden>
+          <h2>Talk to <span id="chatName">Maple</span></h2>
+          <div class="chatlog" id="chatLog" aria-live="polite"></div>
+          <div class="chips" id="chatChips"></div>
+          <form class="row chatform" id="chatForm"><label class="sr" for="chatIn">Message</label><input id="chatIn" maxlength="400" autocomplete="off" placeholder="add oat milk to the shopping list…"><button class="btn small primary">Send</button></form>
         </div>
         <div class="pview" id="settingsView" hidden>
           <h2>Settings</h2>
@@ -3748,6 +3770,92 @@ Quests finished today: ${S3.doneIds.length}`;
     api2.changed();
     return `Imported: ${H2.dailyTasks.length} daily, ${(H2.weeklyTasks || []).length} weekly, ${H2.zones.length} zones, ${(H2.pantryItems || []).length} pantry items.`;
   }
+  var norm = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  var findItem = (name) => {
+    const n = norm(name);
+    return (H2.pantryItems || []).find((i) => norm(i.name) === n) || (H2.pantryItems || []).find((i) => norm(i.name).includes(n) || n.includes(norm(i.name)));
+  };
+  function chatAddShopping(items) {
+    const done = [];
+    (items || []).slice(0, 20).forEach((x) => {
+      const name = String(x && x.name || x || "").trim().slice(0, 60);
+      if (!name) return;
+      const loc = H2.whereToBuyLocations.find((l) => norm(l.name) === norm(x && x.where) || l.id === (x && x.where));
+      let it = findItem(name);
+      if (!it) {
+        it = { id: Date.now() + done.length, name: name[0].toUpperCase() + name.slice(1), category: (H2.pantryCategories[0] || {}).id || "food", whereToBuy: [loc ? loc.id : (H2.whereToBuyLocations[0] || {}).id], notes: "", inStock: false };
+        H2.pantryItems.push(it);
+      }
+      it.inStock = false;
+      if (!H2.shoppingList.some((s) => s.id === it.id)) H2.shoppingList.push({ id: it.id, purchased: false });
+      done.push(it.name);
+    });
+    if (done.length) {
+      save();
+      api2.changed();
+    }
+    return done;
+  }
+  function chatRestock(names) {
+    const done = [];
+    (names || []).forEach((n) => {
+      const it = findItem(n);
+      if (!it) return;
+      it.inStock = true;
+      H2.shoppingList = H2.shoppingList.filter((s) => s.id !== it.id);
+      done.push(it.name);
+    });
+    if (done.length) {
+      save();
+      api2.changed();
+    }
+    return done;
+  }
+  function chatAddChore(kind, text) {
+    text = String(text || "").trim().slice(0, 80);
+    if (!text) return null;
+    if (kind === "weekly") H2.weeklyTasks.push({ id: "w" + Date.now(), text, effort: 1, weekday: null });
+    else H2.dailyTasks.push({ id: "d" + Date.now(), text, effort: 1, timeOfDay: null });
+    save();
+    api2.changed();
+    return text;
+  }
+  function chatTickChore(text) {
+    const n = norm(text), m = (t) => norm(t.text).includes(n) || n.includes(norm(t.text));
+    const d = (H2.dailyTasks || []).find((t) => m(t) && !dayDone(t.id));
+    if (d) {
+      setDone("daily", d.id, true);
+      return d.text;
+    }
+    const w = (H2.weeklyTasks || []).find((t) => m(t) && !weekDone(t.id));
+    if (w) {
+      setDone("weekly", w.id, true);
+      return w.text;
+    }
+    const zi = (zone().tasks || []).findIndex((t, i) => m(t) && !zoneDone(i));
+    if (zi >= 0) {
+      setDone("zone", zi, true);
+      return zone().tasks[zi].text;
+    }
+    return null;
+  }
+  function chatTidyTimer(min) {
+    startTimer([10, 20, 30].includes(min) ? min : 20);
+    return H2.timerMinutes;
+  }
+  function hestiaSummary() {
+    tidy();
+    const shop = (H2.shoppingList || []).map((s) => (H2.pantryItems.find((i) => i.id === s.id) || {}).name).filter(Boolean);
+    return {
+      choresDueToday: [...(H2.dailyTasks || []).filter((t) => !dayDone(t.id)).map((t) => t.text), ...(H2.weeklyTasks || []).filter((t) => t.weekday === dow() && !weekDone(t.id)).map((t) => t.text)],
+      weeklyLeft: (H2.weeklyTasks || []).filter((t) => !weekDone(t.id)).map((t) => t.text),
+      zone: zone().name,
+      zoneLeft: (zone().tasks || []).filter((_, i) => !zoneDone(i)).map((t) => t.text),
+      shoppingList: shop,
+      pantry: (H2.pantryItems || []).slice(0, 80).map((i) => i.name + (i.inStock ? "" : " (out)")),
+      stores: H2.whereToBuyLocations.map((l) => l.name)
+    };
+  }
 
   // src/art/people.js
   var S = (c) => `style="fill:${c}"`;
@@ -4325,9 +4433,9 @@ Quests finished today: ${S3.doneIds.length}`;
   var remaining = () => allTasks().filter((t) => !S2.doneIds.includes(t.id));
   var questsIn = (pl) => allTasks().filter((t) => placeOf(t) === pl);
   function phase() {
+    if (S2.mode === "break") return "break";
     if (!S2.cleanDone) return "clean";
     if (S2.mode === "decompress") return "decompress";
-    if (S2.mode === "break") return "break";
     if (remaining().length) return "task";
     return S2.doneIds.length ? "recap" : "empty";
   }
@@ -4977,6 +5085,235 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     digestBusy = false;
     ctx();
   }
+  var chatLog = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("fox.chat")) || [];
+    } catch {
+      return [];
+    }
+  })();
+  var chatBusy = false;
+  var keepChat = () => {
+    chatLog = chatLog.slice(-30);
+    try {
+      localStorage.setItem("fox.chat", JSON.stringify(chatLog));
+    } catch {
+    }
+  };
+  var PLACES = {
+    home: "home",
+    house: "home",
+    fridge: "home:fridge",
+    kitchen: "home:kitchen",
+    cupboard: "home:cupboard",
+    treadmill: "home:treadmill",
+    sofa: "home:sofa",
+    pond: "base:pond",
+    garden: "farm",
+    farm: "farm",
+    shed: "base:shed",
+    swing: "base:swing",
+    letterbox: "base:letterbox",
+    market: "market",
+    well: "village:well",
+    "town hall": "hall",
+    hall: "hall",
+    chord: "chord",
+    library: "fresh",
+    "fresh pages": "fresh",
+    chico: "chico",
+    "post office": "post",
+    post: "post",
+    town: "village:board"
+  };
+  function walkToPlace(name) {
+    const k = PLACES[String(name || "").toLowerCase().trim()];
+    if (!k) return null;
+    const [pl, sp] = k.split(":");
+    if (pl === "base" || pl === "village") {
+      const v = VILLAGE[sp];
+      go(pl, v.door[0], v.door[1], () => arriveVillageSpot(sp));
+    } else if (sp) {
+      const s = spotObj(pl, sp);
+      go(pl, s.tx, s.ty, () => arriveSpot(sp));
+    } else go(pl, 260, pl === "farm" ? 560 : 560, null);
+    return name;
+  }
+  var fuzzyTask = (q) => {
+    const n = String(q || "").toLowerCase();
+    return remaining().find((t) => t.title.toLowerCase().includes(n)) || remaining().find((t) => n.includes(t.title.toLowerCase().slice(0, 18)));
+  };
+  function runChatAction(a) {
+    if (!a || !a.type) return null;
+    switch (a.type) {
+      case "shopping_add": {
+        const d = chatAddShopping(a.items || (a.item ? [a.item] : []));
+        return d.length ? `On the shopping list: ${d.join(", ")}` : null;
+      }
+      case "restocked": {
+        const d = chatRestock(a.items || []);
+        return d.length ? `Back in the fridge: ${d.join(", ")}` : null;
+      }
+      case "chore_add": {
+        const t = chatAddChore(a.kind, a.text);
+        return t ? `New ${a.kind === "weekly" ? "weekly" : "daily"} chore: ${t}` : null;
+      }
+      case "chore_done": {
+        const t = chatTickChore(a.text);
+        return t ? `Ticked: ${t}` : null;
+      }
+      case "tidy_timer":
+        return `Tidy timer: ${chatTidyTimer(+a.minutes)} minutes`;
+      case "break": {
+        const m = Math.max(5, Math.min(30, +a.minutes || 10));
+        if (S2.timer && S2.timer.kind === "task" && S2.timer.pausedLeft == null) S2.timer.pausedLeft = Math.max(0, S2.timer.endAt - Date.now());
+        S2.mode = "break";
+        startTimer2("break", m);
+        setSay(`Break time. ${m} minutes, away from the desk.`);
+        save2();
+        return `${m}-minute break started`;
+      }
+      case "back":
+        if (S2.mode === "break") {
+          A.back();
+          return "Break over";
+        }
+        return null;
+      case "quest_add": {
+        const title = String(a.title || "").trim().slice(0, 120);
+        if (!title) return null;
+        S2.extra.push({ id: "x" + Date.now().toString(36), title, minutes: Math.min(180, Math.max(5, +a.minutes || 25)) });
+        save2(true);
+        return `New quest: ${title}`;
+      }
+      case "quest_drop": {
+        const t = fuzzyTask(a.title);
+        if (!t) return null;
+        dropTask(t.id);
+        return `Dropped for today: ${t.title}`;
+      }
+      case "quest_next": {
+        const t = fuzzyTask(a.title);
+        if (!t) return null;
+        doNext(t.id);
+        return `Up next: ${t.title}`;
+      }
+      case "water": {
+        const ml = Math.max(50, Math.min(2e3, +a.ml || GLASS));
+        A.water(ml);
+        return `+${ml} ml water`;
+      }
+      case "steps": {
+        const n = Math.max(0, Math.min(6e4, +a.total || 0));
+        if (!n) return null;
+        setSteps(n);
+        return `Steps: ${n.toLocaleString()}`;
+      }
+      case "go": {
+        const p = walkToPlace(a.place);
+        return p ? `Walking to the ${p}` : null;
+      }
+      case "open": {
+        const w = String(a.what || "");
+        if (["quests", "bag", "mail", "cal", "settings", "friend"].includes(w)) {
+          setTimeout(() => {
+            openView = w;
+            ctx();
+          }, 900);
+          return `Opening ${w}`;
+        }
+        if (w === "fridge" || w === "chores") {
+          walkToPlace(w === "fridge" ? "fridge" : "cupboard");
+          return `Off to the ${w === "fridge" ? "fridge" : "cleaning cupboard"}`;
+        }
+        return null;
+      }
+      case "pet":
+        hearts(3);
+        sfx("purr");
+        return null;
+    }
+    return null;
+  }
+  function chatContext() {
+    const rem = remaining(), cur = phase() === "task" ? rem[0] : null, h = hestiaSummary();
+    return JSON.stringify({
+      time: `${String(Math.floor(sgHM() / 60)).padStart(2, "0")}:${String(sgHM() % 60).padStart(2, "0")} Singapore, ${WEEKDAY[(/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).getUTCDay()]}`,
+      where: scene,
+      phase: phase(),
+      currentQuest: cur ? cur.title : null,
+      questsLeft: rem.map((t) => t.title).slice(0, 15),
+      questsDone: S2.doneIds.length,
+      timer: S2.timer ? { kind: S2.timer.kind, minutesLeft: Math.round(tLeft() / M) } : null,
+      waterMl: S2.waterMl || 0,
+      steps: S2.steps || 0,
+      coins: F.coins,
+      home: h
+    });
+  }
+  async function sendChat(text) {
+    text = String(text || "").trim();
+    if (!text || chatBusy) return;
+    if (!sampleCap) {
+      chatLog.push({ role: "user", content: text }, { role: "assistant", content: "I can't reach Claude from this view just now. The buttons all still work!" });
+      keepChat();
+      renderChat();
+      return;
+    }
+    chatLog.push({ role: "user", content: text });
+    chatBusy = true;
+    keepChat();
+    renderChat();
+    const history = chatLog.slice(-12, -1).map((m) => (m.role === "user" ? "Mel: " : "Maple: ") + m.content).join("\n");
+    try {
+      const d = await sampleCap.json(`You are ${F.name}, a tiny fox who lives in Mel's cosy village game and coaches her through her day, in boss-mode style: one thing at a time, tiny first steps, breaks, no guilt. Warm, direct, short sentences. Mel is a Singapore-based founder (a copywriting studio, the Chord and Chico apps) and a parent of a toddler, Evan; Darren lives with them.
+She can ask you anything. Reply in at most 3 short sentences, plain text, no emoji, no markdown.
+When she asks for something the game can do, include it in "actions" and say in your reply that it's done. Never claim something happened that isn't in actions, and never claim to send emails, edit Sunsama or her calendar: those happen in chat with Claude.
+Available actions (use only these):
+{"type":"shopping_add","items":[{"name":"oat milk","where":"Supermarket"}]}  (where is optional; stores: ${hestiaSummary().stores.join(", ")})
+{"type":"restocked","items":["rice"]}  (bought or found again: back in the fridge)
+{"type":"chore_add","kind":"daily|weekly","text":"..."}
+{"type":"chore_done","text":"..."}  (tick a home chore she says she did)
+{"type":"tidy_timer","minutes":10|20|30}
+{"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
+{"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
+{"type":"water","ml":250}  {"type":"steps","total":4200}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|pond|garden|shed|swing|letterbox|market|well|town hall|chord|library|chico|post office"}
+{"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
+{"type":"pet"}
+What's happening in the village right now: ${chatContext()}
+Conversation so far:
+${history || "(just started)"}
+Mel: ${text}
+Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", cache: false });
+      const reply = plain(String(d && d.reply || "Hmm, I lost my words. Try again?")).slice(0, 600);
+      const did = (Array.isArray(d && d.actions) ? d.actions : []).slice(0, 8).map((a) => {
+        try {
+          return runChatAction(a);
+        } catch {
+          return null;
+        }
+      }).filter(Boolean);
+      chatLog.push({ role: "assistant", content: reply, did });
+      speak(reply, 5e3);
+    } catch (e) {
+      if (e && e.code === "not_granted") sampleCap = null;
+      chatLog.push({ role: "assistant", content: e && e.code === "rate_limited" ? "I need a little breather. Try again in a minute." : e && e.code === "not_granted" ? "Talking needs your OK first. The buttons still work!" : "I couldn't reach Claude just now. Try again?" });
+    }
+    chatBusy = false;
+    keepChat();
+    renderChat();
+    render();
+  }
+  function renderChat() {
+    const el = $("chatLog");
+    if (!el) return;
+    $("chatName").textContent = F.name;
+    el.innerHTML = (chatLog.length ? "" : `<p class="fox">${icon("fox", 18)}Hi! Ask me anything, or tell me what you need. I can add to your shopping list, tick chores, start a break or a tidy timer, add or drop quests, log water and steps, or walk you somewhere.</p>`) + chatLog.map((m) => m.role === "user" ? `<p class="me">${esc(m.content)}</p>` : `<p class="fox">${icon("fox", 18)}${esc(m.content)}</p>${(m.did || []).map((d) => `<span class="did">${esc(d)}</span>`).join("")}`).join("") + (chatBusy ? `<p class="fox">${icon("fox", 18)}…</p>` : "");
+    el.scrollTop = el.scrollHeight;
+    $("chatChips").innerHTML = ["What's next?", "I need a break", "Add milk to the shopping list", "I did the dishes"].map((c) => `<button type="button" data-chip="${esc(c)}">${esc(c)}</button>`).join("");
+    $("chatChips").querySelectorAll("[data-chip]").forEach((b) => b.onclick = () => sendChat(b.dataset.chip));
+  }
   var sgAt = (day, h, m = 0) => Date.UTC(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8, 10), h - 8, m);
   var WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   var localCache = { key: "", items: [] };
@@ -5424,7 +5761,7 @@ Then tell chat "wind down" whenever you're ready.`
     });
   }
   function showPanel(hasCtx, skin) {
-    const views = { quests: "questsView", bag: "bagView", mail: "mailView", friend: "friendView", cal: "calView", settings: "settingsView" };
+    const views = { quests: "questsView", bag: "bagView", mail: "mailView", friend: "friendView", cal: "calView", settings: "settingsView", chat: "chatView" };
     const view2 = openView || (hasCtx ? "ctx" : null), p = $("panel");
     if (p.hidden === !!view2) sfx("paper", true);
     p.hidden = !view2;
@@ -5438,7 +5775,7 @@ Then tell chat "wind down" whenever you're ready.`
       $("setVol").value = settings.musicVol;
       $("setSfx").checked = settings.sfx;
     }
-    ["ctx", "questsView", "bagView", "mailView", "friendView", "calView", "settingsView"].forEach((id) => $(id).hidden = id !== (views[view2] || view2));
+    ["ctx", "questsView", "bagView", "mailView", "friendView", "calView", "settingsView", "chatView"].forEach((id) => $(id).hidden = id !== (views[view2] || view2));
     p.className = "panel " + (view2 === "quests" ? "cork" : view2 === "ctx" ? skin : "paper");
     document.querySelectorAll("[data-open]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.open === openView)));
   }
@@ -6322,6 +6659,12 @@ Then tell chat "wind down" whenever you're ready.`
   };
   document.querySelectorAll("[data-ico]").forEach((el) => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
   $("pclose").onclick = closePanel;
+  $("chatForm").onsubmit = (e) => {
+    e.preventDefault();
+    const v = $("chatIn").value;
+    $("chatIn").value = "";
+    sendChat(v);
+  };
   $("zoomBtn").onclick = () => toggleZoom();
   $("setMusic").onchange = (e) => setMusic(e.target.checked);
   $("setVol").oninput = (e) => setMusicVol(+e.target.value);
@@ -6342,6 +6685,10 @@ Then tell chat "wind down" whenever you're ready.`
   document.querySelectorAll("[data-open]").forEach((b) => b.onclick = () => {
     openView = openView === b.dataset.open ? null : b.dataset.open;
     ctx();
+    if (openView === "chat") {
+      renderChat();
+      setTimeout(() => $("chatIn").focus(), 60);
+    }
   });
   initNotebook({
     windDown,

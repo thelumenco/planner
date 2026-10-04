@@ -323,6 +323,28 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.screenshot({ path: join(shots, "hestia-cupboard.png") });
   await page.close();
 }
+// Talk to Maple: the chat button, and actions landing in the game
+{
+  console.log("\ntalk to maple");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`chat pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-05");
+  await page.waitForTimeout(800);
+  check(await page.locator("#chatBtn").isVisible(), "a chat button sits on the map");
+  await page.click("#chatBtn");
+  await page.fill("#chatIn", "add oat milk and eggs to the shopping list");
+  await page.click("#chatForm button");
+  await page.waitForSelector("#chatLog .did", { timeout: 10000 });
+  check(await page.locator("#chatLog .did").first().textContent().then(t => /oat milk, eggs/i.test(t)), "asking Maple adds things to the shopping list");
+  await page.fill("#chatIn", "I need a break");
+  await page.click("#chatForm button");
+  await page.waitForFunction(() => document.querySelectorAll("#chatLog .did").length >= 2, null, { timeout: 10000 });
+  await page.screenshot({ path: join(shots, "chat-phone.png") });
+  await page.click("#pclose");
+  await page.waitForTimeout(300);
+  check(await page.locator("#journal").textContent().then(t => /break/i.test(t)), "and a break she asks for starts in the game");
+  await page.close();
+}
 // Sunsama pull: no chat plan, the page fetches today's tasks itself
 {
   console.log("\nsunsama pull");

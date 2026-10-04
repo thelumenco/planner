@@ -11,7 +11,7 @@ import { pullSunsama, SUNSAMA_ERRORS } from "./sunsama.js";
 import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx } from "./audio.js";
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked } from "./paths.js";
-import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia } from "./hestia.js";
+import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 
 /* =================== STATE =================== */
@@ -149,9 +149,9 @@ function undropTask(id){ S.dropped = (S.dropped || []).filter(x => x !== id); se
 const remaining = () => allTasks().filter(t => !S.doneIds.includes(t.id));
 const questsIn = pl => allTasks().filter(t => placeOf(t) === pl);
 function phase(){
+  if (S.mode === "break") return "break";   // a break Mel asks for comes first, even mid-clean
   if (!S.cleanDone) return "clean";
   if (S.mode === "decompress") return "decompress";
-  if (S.mode === "break") return "break";
   if (remaining().length) return "task";
   return S.doneIds.length ? "recap" : "empty";
 }
@@ -492,6 +492,99 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, {mod
   digestBusy = false; ctx();
 }
 
+/* =================== TALK TO MAPLE (Claude, anytime) =================== */
+// Mel can ask for anything. Maple answers in a line or two and, when it's something the village can do, sends
+// actions that run straight away (shopping list, chores, breaks, timers, quests, water, steps, walking somewhere).
+let chatLog = (() => { try { return JSON.parse(localStorage.getItem("fox.chat")) || []; } catch { return []; } })(), chatBusy = false;
+const keepChat = () => { chatLog = chatLog.slice(-30); try { localStorage.setItem("fox.chat", JSON.stringify(chatLog)); } catch {} };
+const PLACES = {home: "home", house: "home", fridge: "home:fridge", kitchen: "home:kitchen", cupboard: "home:cupboard", treadmill: "home:treadmill", sofa: "home:sofa",
+  pond: "base:pond", garden: "farm", farm: "farm", shed: "base:shed", swing: "base:swing", letterbox: "base:letterbox", market: "market", well: "village:well",
+  "town hall": "hall", hall: "hall", chord: "chord", library: "fresh", "fresh pages": "fresh", chico: "chico", "post office": "post", post: "post", town: "village:board"};
+function walkToPlace(name){
+  const k = PLACES[String(name || "").toLowerCase().trim()]; if (!k) return null;
+  const [pl, sp] = k.split(":");
+  if (pl === "base" || pl === "village") { const v = VILLAGE[sp]; go(pl, v.door[0], v.door[1], () => arriveVillageSpot(sp)); }
+  else if (sp) { const s = spotObj(pl, sp); go(pl, s.tx, s.ty, () => arriveSpot(sp)); }
+  else go(pl, 260, pl === "farm" ? 560 : 560, null);
+  return name;
+}
+const fuzzyTask = q => { const n = String(q || "").toLowerCase(); return remaining().find(t => t.title.toLowerCase().includes(n)) || remaining().find(t => n.includes(t.title.toLowerCase().slice(0, 18))); };
+function runChatAction(a){
+  if (!a || !a.type) return null;
+  switch (a.type) {
+    case "shopping_add": { const d = chatAddShopping(a.items || (a.item ? [a.item] : [])); return d.length ? `On the shopping list: ${d.join(", ")}` : null; }
+    case "restocked": { const d = chatRestock(a.items || []); return d.length ? `Back in the fridge: ${d.join(", ")}` : null; }
+    case "chore_add": { const t = chatAddChore(a.kind, a.text); return t ? `New ${a.kind === "weekly" ? "weekly" : "daily"} chore: ${t}` : null; }
+    case "chore_done": { const t = chatTickChore(a.text); return t ? `Ticked: ${t}` : null; }
+    case "tidy_timer": return `Tidy timer: ${chatTidyTimer(+a.minutes)} minutes`;
+    case "break": { const m = Math.max(5, Math.min(30, +a.minutes || 10)); if (S.timer && S.timer.kind === "task" && S.timer.pausedLeft == null) S.timer.pausedLeft = Math.max(0, S.timer.endAt - Date.now());
+      S.mode = "break"; startTimer("break", m); setSay(`Break time. ${m} minutes, away from the desk.`); save(); return `${m}-minute break started`; }
+    case "back": if (S.mode === "break") { A.back(); return "Break over"; } return null;
+    case "quest_add": { const title = String(a.title || "").trim().slice(0, 120); if (!title) return null; S.extra.push({id: "x" + Date.now().toString(36), title, minutes: Math.min(180, Math.max(5, +a.minutes || 25))}); save(true); return `New quest: ${title}`; }
+    case "quest_drop": { const t = fuzzyTask(a.title); if (!t) return null; dropTask(t.id); return `Dropped for today: ${t.title}`; }
+    case "quest_next": { const t = fuzzyTask(a.title); if (!t) return null; doNext(t.id); return `Up next: ${t.title}`; }
+    case "water": { const ml = Math.max(50, Math.min(2000, +a.ml || GLASS)); A.water(ml); return `+${ml} ml water`; }
+    case "steps": { const n = Math.max(0, Math.min(60000, +a.total || 0)); if (!n) return null; setSteps(n); return `Steps: ${n.toLocaleString()}`; }
+    case "go": { const p = walkToPlace(a.place); return p ? `Walking to the ${p}` : null; }
+    case "open": { const w = String(a.what || ""); if (["quests", "bag", "mail", "cal", "settings", "friend"].includes(w)) { setTimeout(() => { openView = w; ctx(); }, 900); return `Opening ${w}`; }
+      if (w === "fridge" || w === "chores") { walkToPlace(w === "fridge" ? "fridge" : "cupboard"); return `Off to the ${w === "fridge" ? "fridge" : "cleaning cupboard"}`; } return null; }
+    case "pet": hearts(3); sfx("purr"); return null;
+  }
+  return null;
+}
+function chatContext(){
+  const rem = remaining(), cur = phase() === "task" ? rem[0] : null, h = hestiaSummary();
+  return JSON.stringify({time: `${String(Math.floor(sgHM()/60)).padStart(2, "0")}:${String(sgHM() % 60).padStart(2, "0")} Singapore, ${WEEKDAY[new Date(dayKey() + "T00:00:00Z").getUTCDay()]}`,
+    where: scene, phase: phase(), currentQuest: cur ? cur.title : null, questsLeft: rem.map(t => t.title).slice(0, 15), questsDone: S.doneIds.length,
+    timer: S.timer ? {kind: S.timer.kind, minutesLeft: Math.round(tLeft()/M)} : null, waterMl: S.waterMl || 0, steps: S.steps || 0, coins: F.coins,
+    home: h});
+}
+async function sendChat(text){
+  text = String(text || "").trim(); if (!text || chatBusy) return;
+  if (!sampleCap) { chatLog.push({role: "user", content: text}, {role: "assistant", content: "I can't reach Claude from this view just now. The buttons all still work!"}); keepChat(); renderChat(); return; }
+  chatLog.push({role: "user", content: text}); chatBusy = true; keepChat(); renderChat();
+  const history = chatLog.slice(-12, -1).map(m => (m.role === "user" ? "Mel: " : "Maple: ") + m.content).join("\n");
+  try {
+    const d = await sampleCap.json(`You are ${F.name}, a tiny fox who lives in Mel's cosy village game and coaches her through her day, in boss-mode style: one thing at a time, tiny first steps, breaks, no guilt. Warm, direct, short sentences. Mel is a Singapore-based founder (a copywriting studio, the Chord and Chico apps) and a parent of a toddler, Evan; Darren lives with them.
+She can ask you anything. Reply in at most 3 short sentences, plain text, no emoji, no markdown.
+When she asks for something the game can do, include it in "actions" and say in your reply that it's done. Never claim something happened that isn't in actions, and never claim to send emails, edit Sunsama or her calendar: those happen in chat with Claude.
+Available actions (use only these):
+{"type":"shopping_add","items":[{"name":"oat milk","where":"Supermarket"}]}  (where is optional; stores: ${hestiaSummary().stores.join(", ")})
+{"type":"restocked","items":["rice"]}  (bought or found again: back in the fridge)
+{"type":"chore_add","kind":"daily|weekly","text":"..."}
+{"type":"chore_done","text":"..."}  (tick a home chore she says she did)
+{"type":"tidy_timer","minutes":10|20|30}
+{"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
+{"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
+{"type":"water","ml":250}  {"type":"steps","total":4200}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|pond|garden|shed|swing|letterbox|market|well|town hall|chord|library|chico|post office"}
+{"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
+{"type":"pet"}
+What's happening in the village right now: ${chatContext()}
+Conversation so far:
+${history || "(just started)"}
+Mel: ${text}
+Return JSON only: {"reply": "...", "actions": [ ... ]}`, {modelTier: "quick", cache: false});
+    const reply = plain(String((d && d.reply) || "Hmm, I lost my words. Try again?")).slice(0, 600);
+    const did = (Array.isArray(d && d.actions) ? d.actions : []).slice(0, 8).map(a => { try { return runChatAction(a); } catch { return null; } }).filter(Boolean);
+    chatLog.push({role: "assistant", content: reply, did}); speak(reply, 5000);
+  } catch (e) {
+    if (e && e.code === "not_granted") sampleCap = null;
+    chatLog.push({role: "assistant", content: e && e.code === "rate_limited" ? "I need a little breather. Try again in a minute." : e && e.code === "not_granted" ? "Talking needs your OK first. The buttons still work!" : "I couldn't reach Claude just now. Try again?"});
+  }
+  chatBusy = false; keepChat(); renderChat(); render();
+}
+function renderChat(){
+  const el = $("chatLog"); if (!el) return;
+  $("chatName").textContent = F.name;
+  el.innerHTML = (chatLog.length ? "" : `<p class="fox">${icon("fox", 18)}Hi! Ask me anything, or tell me what you need. I can add to your shopping list, tick chores, start a break or a tidy timer, add or drop quests, log water and steps, or walk you somewhere.</p>`)
+    + chatLog.map(m => m.role === "user" ? `<p class="me">${esc(m.content)}</p>` : `<p class="fox">${icon("fox", 18)}${esc(m.content)}</p>${(m.did || []).map(d => `<span class="did">${esc(d)}</span>`).join("")}`).join("")
+    + (chatBusy ? `<p class="fox">${icon("fox", 18)}…</p>` : "");
+  el.scrollTop = el.scrollHeight;
+  $("chatChips").innerHTML = ["What's next?", "I need a break", "Add milk to the shopping list", "I did the dishes"].map(c => `<button type="button" data-chip="${esc(c)}">${esc(c)}</button>`).join("");
+  $("chatChips").querySelectorAll("[data-chip]").forEach(b => b.onclick = () => sendChat(b.dataset.chip));
+}
+
 /* =================== MAIL (agent notes) =================== */
 // Notes the page writes itself: the Friday "weekend edition" of the paper and the 6pm wind-down at the pond.
 const sgAt = (day, h, m = 0) => Date.UTC(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8, 10), h - 8, m);
@@ -759,13 +852,13 @@ function journal(){
 // One panel over the map. A HUD view (quests / backpack / letters) takes it when opened; otherwise whatever the
 // current spot offers (shop, room quest board, garden plot, digest shelf).
 function showPanel(hasCtx, skin){
-  const views = {quests:"questsView", bag:"bagView", mail:"mailView", friend:"friendView", cal:"calView", settings:"settingsView"};
+  const views = {quests:"questsView", bag:"bagView", mail:"mailView", friend:"friendView", cal:"calView", settings:"settingsView", chat:"chatView"};
   const view = openView || (hasCtx ? "ctx" : null), p = $("panel");
   if (p.hidden === !!view) sfx("paper", true);
   p.hidden = !view; $("map").classList.toggle("panel-open", !!view);
   if (view === "cal" && !p.dataset.cal) { p.dataset.cal = "1"; renderCal(); } else if (view !== "cal") delete p.dataset.cal;
   if (view === "settings") { $("setMusic").checked = sound.music; $("setVol").value = sound.musicVol; $("setSfx").checked = sound.sfx; }
-  ["ctx", "questsView", "bagView", "mailView", "friendView", "calView", "settingsView"].forEach(id => $(id).hidden = id !== (views[view] || view));
+  ["ctx", "questsView", "bagView", "mailView", "friendView", "calView", "settingsView", "chatView"].forEach(id => $(id).hidden = id !== (views[view] || view));
   p.className = "panel " + (view === "quests" ? "cork" : view === "ctx" ? skin : "paper");
   document.querySelectorAll("[data-open]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.open === openView)));
 }
@@ -1247,13 +1340,15 @@ $("pet").onclick = () => { sfx("purr"); hearts(2); speak(pick(["*leans into the 
 
 document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
 $("pclose").onclick = closePanel;
+$("chatForm").onsubmit = e => { e.preventDefault(); const v = $("chatIn").value; $("chatIn").value = ""; sendChat(v); };
 $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);
 $("setVol").oninput = e => setMusicVol(+e.target.value);
 $("setTest").onclick = () => { unlockAudio(); setTimeout(() => { alarm(); $("setTestNote").textContent = audioRunning() ? "Sound is on. If you heard nothing, check the volume and the silent switch." : "Your browser is still blocking sound. Tap anywhere on the map, then try again."; }, 120); };
 $("setSfx").onchange = e => { setSfx(e.target.checked); if (e.target.checked) sfx("coin"); };
 ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { qnQuietUntil = 0; }, {capture: true, once: true}));
-document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; ctx(); });
+document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; ctx();
+  if (openView === "chat") { renderChat(); setTimeout(() => $("chatIn").focus(), 60); } });
 initNotebook({windDown, onTread, water:() => ({ml: S.waterMl || 0, goal: WATER_GOAL, glass: GLASS}), steps:() => ({n: S.steps, goal: STEP_GOAL}),
   addWater:ml => A.water(ml), setWater, setSteps, task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
   sayNow:() => say, timerBtns, paperName, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),

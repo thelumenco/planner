@@ -227,3 +227,46 @@ export function importHestia(text){
   return `Imported: ${H.dailyTasks.length} daily, ${(H.weeklyTasks || []).length} weekly, ${H.zones.length} zones, ${(H.pantryItems || []).length} pantry items.`;
 }
 export const hestiaTimerOn = () => !!timer;
+
+/* ---------- for Maple's chat: small, forgiving helpers ---------- */
+const norm = s => String(s || "").toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+const findItem = name => { const n = norm(name); return (H.pantryItems || []).find(i => norm(i.name) === n) || (H.pantryItems || []).find(i => norm(i.name).includes(n) || n.includes(norm(i.name))); };
+export function chatAddShopping(items){
+  const done = [];
+  (items || []).slice(0, 20).forEach(x => {
+    const name = String((x && x.name) || x || "").trim().slice(0, 60); if (!name) return;
+    const loc = H.whereToBuyLocations.find(l => norm(l.name) === norm(x && x.where) || l.id === (x && x.where));
+    let it = findItem(name);
+    if (!it) { it = {id: Date.now() + done.length, name: name[0].toUpperCase() + name.slice(1), category: (H.pantryCategories[0] || {}).id || "food", whereToBuy: [loc ? loc.id : (H.whereToBuyLocations[0] || {}).id], notes: "", inStock: false}; H.pantryItems.push(it); }
+    it.inStock = false; if (!H.shoppingList.some(s => s.id === it.id)) H.shoppingList.push({id: it.id, purchased: false});
+    done.push(it.name);
+  });
+  if (done.length) { save(); api.changed(); }
+  return done;
+}
+export function chatRestock(names){
+  const done = [];
+  (names || []).forEach(n => { const it = findItem(n); if (!it) return; it.inStock = true; H.shoppingList = H.shoppingList.filter(s => s.id !== it.id); done.push(it.name); });
+  if (done.length) { save(); api.changed(); }
+  return done;
+}
+export function chatAddChore(kind, text){
+  text = String(text || "").trim().slice(0, 80); if (!text) return null;
+  if (kind === "weekly") H.weeklyTasks.push({id: "w" + Date.now(), text, effort: 1, weekday: null}); else H.dailyTasks.push({id: "d" + Date.now(), text, effort: 1, timeOfDay: null});
+  save(); api.changed(); return text;
+}
+export function chatTickChore(text){
+  const n = norm(text), m = t => norm(t.text).includes(n) || n.includes(norm(t.text));
+  const d = (H.dailyTasks || []).find(t => m(t) && !dayDone(t.id)); if (d) { setDone("daily", d.id, true); return d.text; }
+  const w = (H.weeklyTasks || []).find(t => m(t) && !weekDone(t.id)); if (w) { setDone("weekly", w.id, true); return w.text; }
+  const zi = (zone().tasks || []).findIndex((t, i) => m(t) && !zoneDone(i)); if (zi >= 0) { setDone("zone", zi, true); return zone().tasks[zi].text; }
+  return null;
+}
+export function chatTidyTimer(min){ startTimer([10, 20, 30].includes(min) ? min : 20); return H.timerMinutes; }
+export function hestiaSummary(){
+  tidy();
+  const shop = (H.shoppingList || []).map(s => (H.pantryItems.find(i => i.id === s.id) || {}).name).filter(Boolean);
+  return {choresDueToday: [...(H.dailyTasks || []).filter(t => !dayDone(t.id)).map(t => t.text), ...(H.weeklyTasks || []).filter(t => t.weekday === dow() && !weekDone(t.id)).map(t => t.text)],
+    weeklyLeft: (H.weeklyTasks || []).filter(t => !weekDone(t.id)).map(t => t.text), zone: zone().name, zoneLeft: (zone().tasks || []).filter((_, i) => !zoneDone(i)).map(t => t.text),
+    shoppingList: shop, pantry: (H.pantryItems || []).slice(0, 80).map(i => i.name + (i.inStock ? "" : " (out)")), stores: H.whereToBuyLocations.map(l => l.name)};
+}

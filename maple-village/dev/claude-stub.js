@@ -41,7 +41,16 @@
     for (const w of reply.split(" ")) { await new Promise(r => setTimeout(r, 40)); text += (text ? " " : "") + w; opts.onText && opts.onText({ text, delta: w }); }
     return { text, truncated: false, modelTierApplied: opts.modelTier || "default" };
   };
-  sample.json = async () => ({});
+  // Maple's chat: a tiny fake that turns a few phrases into actions, so the action plumbing can be tested offline
+  sample.json = async (prompt) => {
+    const m = /\nMel: ([^\n]*)\nReturn JSON only/.exec(String(prompt)); if (!m) return {};
+    const t = m[1].toLowerCase(), acts = [];
+    const shop = /add (.+) to (?:the |my )?shopping list/.exec(t); if (shop) acts.push({type: "shopping_add", items: shop[1].split(/,| and /).map(x => ({name: x.trim()})).filter(x => x.name)});
+    if (/break/.test(t)) acts.push({type: "break", minutes: 10});
+    const did = /i did (?:the )?(.+)/.exec(t); if (did) acts.push({type: "chore_done", text: did[1]});
+    if (/water/.test(t)) acts.push({type: "water", ml: 250});
+    return {reply: acts.length ? "Done! One less thing to hold in your head." : "One thing at a time. What's the smallest next step?", actions: acts};
+  };
   sample.limits = async () => ({ maxPromptBytes: 100000 });
 
   // ?sunsama=1: a fake Sunsama connector (same response shape as sunsama://tasks/<day>, invented tasks)
