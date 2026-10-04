@@ -309,4 +309,7 @@ Round 17 (reports from other routines, `game/feeds.js`):
 Round 18 (good news):
 - A Good News board in the town square (sparkles when there's a fresh pin-up). Tap for "Your wins" (the page's own: quests today and yesterday, streak, harvests, green health checks, user counts, plus the routine's) and "In the world" (3-5 real uplifting stories with links). Routine "Village good news (daily)" (trig_01LPCGof2eTZu2Q6NwbooC3s, 7:12am SGT) searches the web and reads the founder pages, then writes the `goodnews` doc.
 
+Round 19 (Makers' Lane, a third screen):
+- `lane` joins OUTDOOR: Chord workshop and Chico cottage moved off the town square to Makers' Lane (through a gate on the town's east edge), with their flower gardens, health lights, the Chord flag and Chico arch upgrades, and a fenced "coming soon" plot for the next app (Luna). Screens chain base - village - lane; `nextHop()` routes through as many bridges/gates as needed, and `ARRIVE` is keyed "from>to". The town square keeps the hall, library, post office, market, well, boards and the bridge home.
+
 Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lines; Hestia's custom lists, rhythm notes, equipment/energy filters and reminders weren't carried over.

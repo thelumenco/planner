@@ -1379,19 +1379,23 @@ body.nb-open{overflow:hidden}
   }
 
   // src/data/world.js
-  var OUTDOOR = ["base", "village"];
+  var OUTDOOR = ["base", "village", "lane"];
   var VILLAGE = {
     // town square
     hall: { scene: "village", name: "Town hall", short: "the town hall", door: [260, 180], mark: [222, 64] },
-    chord: { scene: "village", name: "Chord workshop", short: "the Chord workshop", door: [85, 272], mark: [85, 150] },
+    chord: { scene: "lane", name: "Chord workshop", short: "the Chord workshop", door: [145, 272], mark: [145, 150] },
     fresh: { scene: "village", name: "Fresh Pages library", short: "the library", door: [435, 272], mark: [445, 160] },
-    chico: { scene: "village", name: "Chico cottage", short: "Chico cottage", door: [85, 512], mark: [85, 400] },
+    chico: { scene: "lane", name: "Chico cottage", short: "Chico cottage", door: [380, 282], mark: [380, 170] },
     post: { scene: "village", name: "Post office", short: "the post office", door: [435, 502], mark: [435, 386] },
     market: { scene: "village", name: "Market", short: "the market", door: [362, 350], mark: [362, 290] },
     board: { scene: "village", name: "Quest board", door: [260, 338], spot: true, line: "All of today's quests, in one place." },
     well: { scene: "village", name: "Well", door: [160, 350], spot: true, line: "Fresh water! Glug glug." },
     news: { scene: "village", name: "Good news board", door: [222, 456], spot: true, line: "The good news board. Fresh every morning." },
     bench: { scene: "village", name: "Riverside bench", door: [334, 580], spot: true, line: "A bench by the river. Lunch spot for half the town." },
+    toLane: { scene: "village", name: "Gate to Makers' Lane", door: [500, 330], spot: true, bridge: "lane", mark: [486, 282], line: "Through the gate to Makers' Lane: Chord and Chico." },
+    // Makers' Lane: the apps (Chord, Chico, and a plot waiting for the next one)
+    toTownE: { scene: "lane", name: "Gate to the town square", door: [20, 330], spot: true, bridge: "village", mark: [34, 282], line: "Back to the town square." },
+    plot3: { scene: "lane", name: "Empty plot", door: [262, 540], spot: true, line: "A plot for the next app. Luna, maybe?" },
     toBase: { scene: "village", name: "Bridge home", door: [260, 598], spot: true, bridge: "base", mark: [260, 548], line: "Over the bridge and home." },
     // home base
     home: { scene: "base", name: "Home", short: "home", door: [260, 308], mark: [260, 160] },
@@ -1411,8 +1415,26 @@ body.nb-open{overflow:hidden}
   var WORK_HINT = /chord|chico|ambidextrous|fresh pages|client|muse|proposal|invoice|copy|newsletter|launch|website|brand|audit|meeting|call with|zoom/;
   var isWeekend = () => [0, 6].includes(new Date(now() + 8 * H).getUTCDay());
   var baseSpotFor = (s) => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
-  var BRIDGES = { village: { base: "toBase" }, base: { village: "toTown" } };
-  var ARRIVE = { base: [260, 132], village: [260, 578] };
+  var BRIDGES = { village: { base: "toBase", lane: "toLane" }, base: { village: "toTown" }, lane: { village: "toTownE" } };
+  var ARRIVE = { "village>base": [260, 132], "base>village": [260, 578], "village>lane": [48, 330], "lane>village": [474, 330] };
+  function nextHop(from, to) {
+    if (from === to) return null;
+    if (BRIDGES[from] && BRIDGES[from][to]) return to;
+    const seen = { [from]: null }, q = [from];
+    while (q.length) {
+      const s = q.shift();
+      for (const n of Object.keys(BRIDGES[s] || {})) if (!(n in seen)) {
+        seen[n] = s;
+        if (n === to) {
+          let h = n;
+          while (seen[h] !== from) h = seen[h];
+          return h;
+        }
+        q.push(n);
+      }
+    }
+    return null;
+  }
   var outdoorOf = (s) => OUTDOOR.includes(s) ? s : VILLAGE[s] ? VILLAGE[s].scene : "village";
   var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
   var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
@@ -1832,12 +1854,18 @@ body.nb-open{overflow:hidden}
     const D2 = VILLAGE;
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="120" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="420" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="200" cy="560" rx="80" ry="40" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M260 322 L260 ${D2.hall.door[1]} M260 322 C200 300 120 290 ${D2.chord.door[0]} ${D2.chord.door[1]} M260 322 C320 300 400 290 ${D2.fresh.door[0]} ${D2.fresh.door[1]} M260 322 C200 380 110 430 ${D2.chico.door[0]} ${D2.chico.door[1]} M260 322 C320 380 410 420 ${D2.post.door[0]} ${D2.post.door[1]} M260 322 L260 ${D2.toBase.door[1]} M260 540 C290 560 310 570 ${D2.bench.door[0]} ${D2.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M260 322 L260 ${D2.hall.door[1]} M260 322 C320 300 400 290 ${D2.fresh.door[0]} ${D2.fresh.door[1]} M260 322 C320 380 410 420 ${D2.post.door[0]} ${D2.post.door[1]} M300 340 C380 344 450 330 ${D2.toLane.door[0]} ${D2.toLane.door[1]} M260 322 L260 ${D2.toBase.door[1]} M260 540 C290 560 310 570 ${D2.bench.door[0]} ${D2.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
     ${flowers([[30, 262, "#EFA3A6"], [44, 270, "#F3C969"], [150, 206, "#C3CDEE"], [372, 206, "#EFA3A6"], [488, 270, "#F3C969"], [300, 448, "#EFA3A6"], [214, 450, "#C3CDEE"], [470, 540, "#C3CDEE"], [20, 430, "#F3C969"], [505, 380, "#EFA3A6"]])}
     ${tree(170, 64, 1)}${tree(350, 64, 1)}${tree(26, 96, 1.05)}${tree(494, 96, 1.05)}${tree(24, 350, 0.9)}${tree(498, 330, 0.9)}${tree(504, 520, 0.85)}${tree(190, 470, 0.8)}${tree(330, 470, 0.8)}
     ${flowers([[170, 540, "#F3C969"], [184, 548, "#EFA3A6"], [206, 520, "#C3CDEE"], [300, 520, "#F3C969"], [400, 560, "#EFA3A6"], [150, 580, "#C3CDEE"]])}`;
-    const places = townHall() + chordWorkshop() + library() + chicoCottage() + postOffice() + `<g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
+    const places = townHall() + library() + postOffice() + // east gate to Makers' Lane (Chord and Chico live there now)
+    `<g data-place="toLane" aria-label="Gate to Makers' Lane"><ellipse class="hov" cx="496" cy="330" rx="26" ry="30" style="fill:var(--butter)"/>
+      ${sk(
+      `<rect x="484" y="292" width="6" height="56" style="fill:var(--wood)"/><rect x="508" y="292" width="6" height="56" style="fill:var(--wood)"/><path d="M480 296 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
+      `<rect x="484" y="292" width="6" height="56"/><rect x="508" y="292" width="6" height="56"/><path d="M480 296 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`
+    )}
+      ${tapeLabel(458, 366, "Makers' Lane", "var(--sage)", 11)}</g><g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M238 330 v-40 M282 330 v-40"/><rect x="230" y="282" width="60" height="38" rx="3" style="fill:var(--wood)"/>${notesArt(236, 288, G.remaining().length)}</g>
       ${tapeLabel(260, 280, "Quests", "var(--butter)", 11)}</g>
     <g data-place="well" aria-label="Well"><ellipse class="hov" cx="160" cy="342" rx="26" ry="7" style="fill:var(--butter)"/>
@@ -1861,7 +1889,7 @@ body.nb-open{overflow:hidden}
       if (!h) return "";
       return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`;
     };
-    return ground + places + light("chord", 140, 196) + light("chico", 138, 436) + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 26, 536, 8, 2, 12) + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
+    return ground + places + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
   }
   var waterBand = (y1, y2) => `<path d="M0 ${y1 + 4} Q65 ${y1 - 4} 130 ${y1 + 3} T260 ${y1 + 2} T390 ${y1 + 4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2 + 5} 390 ${y2 - 2} T260 ${y2} T130 ${y2 - 3} T0 ${y2 + 2}`}z" style="fill:var(--water)"/>`;
   function bridge(id, x, y1, y2, label, tapeX, tapeY, size) {
@@ -1939,6 +1967,34 @@ body.nb-open{overflow:hidden}
     <g pointer-events="none">${stars}${win(217, 234, 20, 18)}${win(283, 234, 20, 18)}${win(448, 230, 12, 10)}
       <circle cx="276" cy="602" r="36" fill="#FFB65C" opacity=".28"/>
       <g filter="url(#wob)"><path class="flame" d="M268 604 q-2 -12 8 -20 q-1 8 6 10 q2 6 -2 10z" fill="#F6A23A" style="stroke:var(--line)" stroke-width="1"/><path class="flame" d="M274 604 q0 -7 4 -10 q1 6 3 7 q0 3 -2 3z" fill="#FFE08A"/></g></g>`;
+  }
+  function laneArt() {
+    const L = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
+    const light = (app, x, y) => {
+      const h = G.health ? G.health(app) : null;
+      if (!h) return "";
+      return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`;
+    };
+    const D2 = VILLAGE;
+    const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
+    <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
+    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D2.chico.door[0]} ${D2.chico.door[1]} M150 336 L${D2.chord.door[0]} ${D2.chord.door[1]} M262 344 L${D2.plot3.door[0]} ${D2.plot3.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    ${flowers([[40, 200, "#EFA3A6"], [60, 214, "#F3C969"], [480, 330, "#C3CDEE"], [300, 420, "#EFA3A6"], [200, 600, "#F3C969"], [90, 560, "#C3CDEE"], [460, 600, "#EFA3A6"], [330, 250, "#F3C969"]])}
+    ${tree(30, 120, 1)}${tree(250, 80, 0.9)}${tree(490, 110, 1)}${tree(40, 620, 0.95)}${tree(490, 620, 0.9)}${tree(470, 430, 0.85)}${tree(60, 440, 0.9)}`;
+    const gate = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
+    ${sk(
+      `<rect x="6" y="292" width="6" height="56" style="fill:var(--wood)"/><rect x="30" y="292" width="6" height="56" style="fill:var(--wood)"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
+      `<rect x="6" y="292" width="6" height="56"/><rect x="30" y="292" width="6" height="56"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`
+    )}
+    ${tapeLabel(62, 366, "Town square", "var(--butter)", 11)}</g>`;
+    const plot = `<g data-place="plot3" aria-label="Empty plot"><ellipse class="hov" cx="262" cy="530" rx="70" ry="12" style="fill:var(--butter)"/>
+    ${sk(
+      `<rect x="200" y="452" width="124" height="70" rx="4" style="fill:#C9A27E"/><rect x="236" y="430" width="52" height="22" rx="2" style="fill:#FFFDF6"/>`,
+      `<path d="M196 526 V448 H328 V526 M196 526 H250 M274 526 H328" fill="none"/><path d="M206 470 h112 M206 490 h112 M206 508 h112" opacity=".35"/><rect x="236" y="430" width="52" height="22" rx="2"/><path d="M262 452 v-0"/>`
+    )}
+    <text x="262" y="445" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" style="fill:var(--line)">coming soon</text>
+    ${tapeLabel(262, 552, "Next app", "var(--peach)", 11)}</g>`;
+    return ground + gate + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot + light("chord", 200, 196) + light("chico", 433, 206) + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12) + upgradesArt(G.F().totalQuests || 0, "lane");
   }
   function notesArt(x, y, n) {
     const c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#C3CDEE", "#DCE8C8"];
@@ -2183,18 +2239,21 @@ body.nb-open{overflow:hidden}
       });
       return h;
     }
+    if (where === "lane") {
+      if (has("flag")) h += `<g transform="translate(60 0)">${sk(`<path d="M85 140 l18 6 l-18 6z" style="fill:var(--peach)"/>`, `<path d="M85 160 v-22 M85 140 l18 6 l-18 6"/>`)}</g>`;
+      if (has("arch")) h += `<g transform="translate(295 -230)">${sk(
+        `${[0, 1, 2, 3, 4, 5, 6].map((i) => {
+          const a = Math.PI * (1 - i / 6), x = 85 + Math.cos(a) * 19, y = 486 - Math.sin(a) * 19;
+          return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" style="fill:${["var(--rose)", "#FFFDF6", "var(--butter)"][i % 3]}"/>`;
+        }).join("")}`,
+        `<path d="M66 500 v-14 a19 19 0 0 1 38 0 v14"/>`
+      )}</g>`;
+      return h;
+    }
     if (has("bunting")) h += bunting(330, 300, 394, 300, ["var(--rose)", "var(--butter)", "var(--sage)", "var(--peri)"]);
     if (has("lanterns")) [[232, 236], [288, 236], [226, 430], [294, 430], [196, 362], [324, 362]].forEach(([x, y]) => {
       h += lamp(x, y);
     });
-    if (has("flag")) h += sk(`<path d="M85 140 l18 6 l-18 6z" style="fill:var(--peach)"/>`, `<path d="M85 160 v-22 M85 140 l18 6 l-18 6"/>`);
-    if (has("arch")) h += sk(
-      `${[0, 1, 2, 3, 4, 5, 6].map((i) => {
-        const a = Math.PI * (1 - i / 6), x = 85 + Math.cos(a) * 19, y = 486 - Math.sin(a) * 19;
-        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" style="fill:${["var(--rose)", "#FFFDF6", "var(--butter)"][i % 3]}"/>`;
-      }).join("")}`,
-      `<path d="M66 500 v-14 a19 19 0 0 1 38 0 v14"/>`
-    );
     if (has("bench")) h += sk(`<rect x="456" y="276" width="34" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="456" y="276" width="34" height="6" rx="2"/><path d="M460 282 v8 M486 282 v8 M456 270 h34"/>`);
     if (has("lights")) {
       let b = "";
@@ -3262,9 +3321,7 @@ Quests finished today: ${S3.doneIds.length}`;
   var OBST = {
     village: [
       [190, 40, 330, 172],
-      [25, 150, 145, 254],
       [377, 150, 493, 254],
-      [27, 390, 143, 494],
       [377, 380, 493, 484],
       [334, 304, 390, 336],
       [142, 304, 178, 340],
@@ -3272,6 +3329,7 @@ Quests finished today: ${S3.doneIds.length}`;
       [314, 548, 354, 568],
       [194, 404, 250, 444]
     ],
+    lane: [[85, 150, 205, 254], [322, 160, 438, 264], [196, 448, 328, 526], [234, 428, 290, 452]],
     base: [
       [198, 176, 322, 294],
       [314, 232, 348, 294],
@@ -4192,7 +4250,7 @@ Quests finished today: ${S3.doneIds.length}`;
     return true;
   }
   var PROPS = { water: "can", repair: "hammer", farm: "hoe" };
-  var outdoors = (s) => s === "village" || s === "base";
+  var outdoors = (s) => s === "village" || s === "base" || s === "lane";
   var isHere = (id) => {
     const d = NPCS.find((n) => n.id === id), s = d && slotNow(d);
     return !!(s && s.scene === api3.scene());
@@ -4555,7 +4613,7 @@ Quests finished today: ${S3.doneIds.length}`;
     const col = db.collection("data/users/" + uid);
     attachHestiaDb(col.doc("hestia"));
     attachFeeds(col, (id) => {
-      if (/^health/.test(id) && ["village", "chord", "chico"].includes(scene)) {
+      if (/^health/.test(id) && ["lane", "chord", "chico"].includes(scene)) {
         drawScene();
         ctx();
       }
@@ -5360,6 +5418,8 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     "town hall": "hall",
     hall: "hall",
     chord: "chord",
+    "makers lane": "lane:plot3",
+    lane: "lane:plot3",
     library: "fresh",
     "fresh pages": "fresh",
     chico: "chico",
@@ -5371,7 +5431,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     const k = PLACES[String(name || "").toLowerCase().trim()];
     if (!k) return null;
     const [pl, sp] = k.split(":");
-    if (pl === "base" || pl === "village") {
+    if (pl === "base" || pl === "village" || pl === "lane") {
       const v = VILLAGE[sp];
       go(pl, v.door[0], v.door[1], () => arriveVillageSpot(sp));
     } else if (sp) {
@@ -6279,8 +6339,8 @@ Then tell chat "wind down" whenever you're ready.`
       if (outside() && target.pl === "base") pos = scene === "base" ? (() => {
         const v = VILLAGE[target.sp];
         return v.mark || [v.door[0], v.door[1] - 64];
-      })() : VILLAGE[BRIDGES[scene].base].mark;
-      else if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][outdoorOf(target.pl)]].mark;
+      })() : VILLAGE[BRIDGES[scene][nextHop(scene, "base")]].mark;
+      else if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][nextHop(scene, outdoorOf(target.pl))]].mark;
       else if (scene === target.pl) {
         const s = spotObj(scene, target.sp);
         pos = [s.x, s.y - 70];
@@ -6310,10 +6370,10 @@ Then tell chat "wind down" whenever you're ready.`
       S2.rainSaid = day;
       setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500);
     }
-    $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "farm" ? farmArt() : roomArt(scene);
-    const names = { village: "Town square", base: "Home base", farm: "The garden" };
+    $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "farm" ? farmArt() : roomArt(scene);
+    const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", farm: "The garden" };
     $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-    $("maphint").textContent = scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap anywhere to walk. The bridge at the top goes to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+    $("maphint").textContent = scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap anywhere to walk. The bridge at the top goes to the town square." : scene === "lane" ? "Chord and Chico live here. The gate on the left goes back to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
   }
   function render(redraw) {
     if (S2.day !== dayKey()) S2 = freshToday();
@@ -6396,7 +6456,7 @@ Then tell chat "wind down" whenever you're ready.`
   function outside() {
     return OUTDOOR.includes(scene);
   }
-  var bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : [34, 168, W - 34, 612];
+  var bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : scene === "lane" ? [14, 140, W - 14, HH - 14] : [34, 168, W - 34, 612];
   function setScene(id, at) {
     const w = $("world");
     w.classList.add("fading");
@@ -6444,9 +6504,12 @@ Then tell chat "wind down" whenever you're ready.`
     if (cur !== target) {
       const curOut = outdoorOf(cur), tOut = outdoorOf(target);
       if (!OUTDOOR.includes(cur)) legs.push({ scene: cur, x: 260, y: 606, fn: () => setScene(curOut, VILLAGE[cur].door) });
-      if (curOut !== tOut) {
-        const b = VILLAGE[BRIDGES[curOut][tOut]];
-        legs.push({ scene: curOut, x: b.door[0], y: b.door[1], fn: () => setScene(tOut, ARRIVE[tOut]) });
+      for (let s = curOut, guard = 0; s !== tOut && guard < 6; guard++) {
+        const n = nextHop(s, tOut);
+        if (!n) break;
+        const b = VILLAGE[BRIDGES[s][n]], key = s + ">" + n;
+        legs.push({ scene: s, x: b.door[0], y: b.door[1], fn: () => setScene(n, ARRIVE[key]) });
+        s = n;
       }
       if (!OUTDOOR.includes(target)) {
         const d = VILLAGE[target].door;
@@ -6552,7 +6615,12 @@ Then tell chat "wind down" whenever you're ready.`
     const v = VILLAGE[id];
     if (v.bridge) {
       atSpot = null;
-      setScene(v.bridge, ARRIVE[v.bridge]);
+      setScene(v.bridge, ARRIVE[scene + ">" + v.bridge]);
+      return;
+    }
+    if (id === "plot3") {
+      speak(v.line, 4e3);
+      render();
       return;
     }
     if (scene === "base" && phase() === "task") {

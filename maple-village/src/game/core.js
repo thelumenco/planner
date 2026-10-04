@@ -1,10 +1,10 @@
 // Game core: state + persistence, quest flow, actions, UI renderers and the world sim.
 import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur, plain } from "../util.js";
 import { icon, progressBar, progressBarV } from "../art/icons.js";
-import { VILLAGE, WORK, ROOMS, OUTDOOR, BRIDGES, ARRIVE, outdoorOf, isWeekend, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
+import { VILLAGE, WORK, ROOMS, OUTDOOR, BRIDGES, ARRIVE, nextHop, outdoorOf, isWeekend, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
 import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco } from "../data/items.js";
 import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn } from "../art/village-extras.js";
-import { villageArt, baseArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
+import { villageArt, baseArt, laneArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { pullSunsama, SUNSAMA_ERRORS } from "./sunsama.js";
@@ -87,7 +87,7 @@ async function initDb(){
   const col = db.collection("data/users/" + uid);
   attachHestiaDb(col.doc("hestia"));
   attachFeeds(col, id => {
-    if (/^health/.test(id) && ["village", "chord", "chico"].includes(scene)) { drawScene(); ctx(); }
+    if (/^health/.test(id) && ["lane", "chord", "chico"].includes(scene)) { drawScene(); ctx(); }
     if (/^content/.test(id) && openView === "cal" && calTab === "content") renderCal();
     if (id === "goodnews" && scene === "village") drawScene();
   });
@@ -506,11 +506,11 @@ let chatLog = (() => { try { return JSON.parse(localStorage.getItem("fox.chat"))
 const keepChat = () => { chatLog = chatLog.slice(-30); try { localStorage.setItem("fox.chat", JSON.stringify(chatLog)); } catch {} };
 const PLACES = {home: "home", house: "home", fridge: "home:fridge", kitchen: "home:kitchen", cupboard: "home:cupboard", treadmill: "home:treadmill", sofa: "home:sofa",
   pond: "base:pond", garden: "farm", farm: "farm", shed: "base:shed", swing: "base:swing", letterbox: "base:letterbox", market: "market", well: "village:well",
-  "town hall": "hall", hall: "hall", chord: "chord", library: "fresh", "fresh pages": "fresh", chico: "chico", "post office": "post", post: "post", town: "village:board"};
+  "town hall": "hall", hall: "hall", chord: "chord", "makers lane": "lane:plot3", lane: "lane:plot3", library: "fresh", "fresh pages": "fresh", chico: "chico", "post office": "post", post: "post", town: "village:board"};
 function walkToPlace(name){
   const k = PLACES[String(name || "").toLowerCase().trim()]; if (!k) return null;
   const [pl, sp] = k.split(":");
-  if (pl === "base" || pl === "village") { const v = VILLAGE[sp]; go(pl, v.door[0], v.door[1], () => arriveVillageSpot(sp)); }
+  if (pl === "base" || pl === "village" || pl === "lane") { const v = VILLAGE[sp]; go(pl, v.door[0], v.door[1], () => arriveVillageSpot(sp)); }
   else if (sp) { const s = spotObj(pl, sp); go(pl, s.tx, s.ty, () => arriveSpot(sp)); }
   else go(pl, 260, pl === "farm" ? 560 : 560, null);
   return name;
@@ -1053,8 +1053,8 @@ function questMark(){
   if (ph === "task") { const t = remaining()[0]; if (!arrivedFor(t)) target = {pl:placeOf(t), sp:spotOf(t)}; }
   let pos = null;
   if (target) {
-    if (outside() && target.pl === "base") pos = scene === "base" ? (() => { const v = VILLAGE[target.sp]; return v.mark || [v.door[0], v.door[1] - 64]; })() : VILLAGE[BRIDGES[scene].base].mark;
-    else if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][outdoorOf(target.pl)]].mark;
+    if (outside() && target.pl === "base") pos = scene === "base" ? (() => { const v = VILLAGE[target.sp]; return v.mark || [v.door[0], v.door[1] - 64]; })() : VILLAGE[BRIDGES[scene][nextHop(scene, "base")]].mark;
+    else if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][nextHop(scene, outdoorOf(target.pl))]].mark;
     else if (scene === target.pl) { const s = spotObj(scene, target.sp); pos = [s.x, s.y - 70]; }
     else pos = [260, 582];
   }
@@ -1068,10 +1068,10 @@ function drawScene(){
   else if (scene === "base" && S.hestiaSaid !== day && hestiaCounts().chores) { S.hestiaSaid = day; const n = hestiaCounts().chores; setTimeout(() => speak(`${n} home chore${n > 1 ? "s" : ""} waiting in the cleaning cupboard. No rush.`, 5000), 2600); }
   else if (scene === "base" && isWeekend() && S.weekendSaid !== day) { S.weekendSaid = day; setTimeout(() => speak("Weekend! Home things happen here at home. Any work quests still wait in town.", 5500), 2200); }
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
-  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "farm" ? farmArt() : roomArt(scene);
-  const names = {village:"Town square", base:"Home base", farm:"The garden"};
+  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "farm" ? farmArt() : roomArt(scene);
+  const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", farm:"The garden"};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-  $("maphint").textContent = scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap anywhere to walk. The bridge at the top goes to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+  $("maphint").textContent = scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap anywhere to walk. The bridge at the top goes to the town square." : scene === "lane" ? "Chord and Chico live here. The gate on the left goes back to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
 }
 function render(redraw){
   if (S.day !== dayKey()) S = freshToday();
@@ -1121,7 +1121,7 @@ let route = [], keys = new Set();
 const svg = $("world");
 const evanHere = () => scene === "base" || scene === "home";
 function outside(){ return OUTDOOR.includes(scene); }
-const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : [34, 168, W - 34, 612];
+const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : scene === "lane" ? [14, 140, W - 14, HH - 14] : [34, 168, W - 34, 612];
 
 function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
@@ -1146,7 +1146,10 @@ function go(target, x, y, fn){
     const curOut = outdoorOf(cur), tOut = outdoorOf(target);
     // 1. out of the building, 2. over the bridge if the target is on the other screen, 3. in at the target's door
     if (!OUTDOOR.includes(cur)) legs.push({scene:cur, x:260, y:606, fn:() => setScene(curOut, VILLAGE[cur].door)});
-    if (curOut !== tOut) { const b = VILLAGE[BRIDGES[curOut][tOut]]; legs.push({scene:curOut, x:b.door[0], y:b.door[1], fn:() => setScene(tOut, ARRIVE[tOut])}); }
+    for (let s = curOut, guard = 0; s !== tOut && guard < 6; guard++) {   // one bridge or gate per screen on the way
+      const n = nextHop(s, tOut); if (!n) break; const b = VILLAGE[BRIDGES[s][n]], key = s + ">" + n;
+      legs.push({scene:s, x:b.door[0], y:b.door[1], fn:() => setScene(n, ARRIVE[key])}); s = n;
+    }
     if (!OUTDOOR.includes(target)) { const d = VILLAGE[target].door; legs.push({scene:tOut, x:d[0], y:d[1], fn:() => setScene(target, target === "farm" ? [260, 590] : [260, 596])}); }
   }
   legs.push({scene:target, x, y, fn});
@@ -1184,7 +1187,8 @@ function arriveSpot(id){
 function arriveVillageSpot(id){
   atSpot = id;
   const v = VILLAGE[id];
-  if (v.bridge) { atSpot = null; setScene(v.bridge, ARRIVE[v.bridge]); return; }
+  if (v.bridge) { atSpot = null; setScene(v.bridge, ARRIVE[scene + ">" + v.bridge]); return; }
+  if (id === "plot3") { speak(v.line, 4000); render(); return; }
   // an outdoor quest at home base (Evan outing at the swing, garden jobs at the shed, a walk by the pond)
   if (scene === "base" && phase() === "task") { const t = remaining()[0];
     if (placeOf(t) === "base" && spotOf(t) === id && !S.arrived[t.id]) { S.arrived[t.id] = true; setSay(`Here at the ${v.name.toLowerCase()}. First tiny step…`); save(); return; } }

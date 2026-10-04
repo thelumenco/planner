@@ -30,7 +30,7 @@ const bunting = (x1, y1, x2, y2, cols) => {
 };
 const lamp = (x, y) => sk(`<rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2" style="fill:#F6C26B"/>`, `<path d="M${x} ${y} v-13"/><rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2"/><path d="M${x - 5} ${y} h10"/>`);
 
-// Every upgrade lives in the town square except the blossom trees, which grow by the pond at home.
+// Upgrades live in the town square, except the blossom trees (by the pond at home) and the Chord flag and Chico arch (Makers' Lane).
 export function upgradesArt(n, where){
   const has = id => unlocked(n).some(u => u.id === id);
   let h = "";
@@ -38,11 +38,15 @@ export function upgradesArt(n, where){
     if (has("blossom")) [[346, 474], [490, 560]].forEach(([x, y]) => { h += `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.4"><rect x="${x - 3}" y="${y - 6}" width="6" height="14" style="fill:var(--wood)"/><circle cx="${x}" cy="${y - 18}" r="14" style="fill:#F4C7CF"/><circle cx="${x - 9}" cy="${y - 10}" r="9" style="fill:#EFA3A6"/><circle cx="${x + 9}" cy="${y - 11}" r="9" style="fill:#F4C7CF"/></g>`; });
     return h;
   }
+  if (where === "lane") {
+    // the Chord flag and Chico's flower arch live with their buildings on Makers' Lane
+    if (has("flag")) h += `<g transform="translate(60 0)">${sk(`<path d="M85 140 l18 6 l-18 6z" style="fill:var(--peach)"/>`, `<path d="M85 160 v-22 M85 140 l18 6 l-18 6"/>`)}</g>`;
+    if (has("arch")) h += `<g transform="translate(295 -230)">${sk(`${[0, 1, 2, 3, 4, 5, 6].map(i => { const a = Math.PI*(1 - i/6), x = 85 + Math.cos(a)*19, y = 486 - Math.sin(a)*19; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" style="fill:${["var(--rose)", "#FFFDF6", "var(--butter)"][i % 3]}"/>`; }).join("")}`,
+      `<path d="M66 500 v-14 a19 19 0 0 1 38 0 v14"/>`)}</g>`;
+    return h;
+  }
   if (has("bunting")) h += bunting(330, 300, 394, 300, ["var(--rose)", "var(--butter)", "var(--sage)", "var(--peri)"]);
   if (has("lanterns")) [[232, 236], [288, 236], [226, 430], [294, 430], [196, 362], [324, 362]].forEach(([x, y]) => { h += lamp(x, y); });
-  if (has("flag")) h += sk(`<path d="M85 140 l18 6 l-18 6z" style="fill:var(--peach)"/>`, `<path d="M85 160 v-22 M85 140 l18 6 l-18 6"/>`);
-  if (has("arch")) h += sk(`${[0, 1, 2, 3, 4, 5, 6].map(i => { const a = Math.PI*(1 - i/6), x = 85 + Math.cos(a)*19, y = 486 - Math.sin(a)*19; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" style="fill:${["var(--rose)", "#FFFDF6", "var(--butter)"][i % 3]}"/>`; }).join("")}`,
-    `<path d="M66 500 v-14 a19 19 0 0 1 38 0 v14"/>`);
   if (has("bench")) h += sk(`<rect x="456" y="276" width="34" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="456" y="276" width="34" height="6" rx="2"/><path d="M460 282 v8 M486 282 v8 M456 270 h34"/>`);
   if (has("lights")) { let b = ""; for (let i = 0; i < 9; i++) { const t = i/8, x = 192 + 136*t, y = 296 - Math.sin(Math.PI*t)*22; b += `<circle class="twinkle" cx="${x.toFixed(1)}" cy="${(y + 3).toFixed(1)}" r="2.6" fill="${["#FFD66E", "#F7A9A9", "#A9D3A0", "#A9C6E0"][i % 4]}"/>`; }
     h += `<g filter="url(#wob)"><path d="M192 296 Q260 252 328 296" fill="none" style="stroke:var(--line)" stroke-width="1.2"/></g><g>${b}</g>`; }

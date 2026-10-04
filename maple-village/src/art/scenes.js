@@ -40,13 +40,18 @@ export function villageArt(){
   const D = VILLAGE;
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="120" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="420" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="200" cy="560" rx="80" ry="40" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M260 322 L260 ${D.hall.door[1]} M260 322 C200 300 120 290 ${D.chord.door[0]} ${D.chord.door[1]} M260 322 C320 300 400 290 ${D.fresh.door[0]} ${D.fresh.door[1]} M260 322 C200 380 110 430 ${D.chico.door[0]} ${D.chico.door[1]} M260 322 C320 380 410 420 ${D.post.door[0]} ${D.post.door[1]} M260 322 L260 ${D.toBase.door[1]} M260 540 C290 560 310 570 ${D.bench.door[0]} ${D.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M260 322 L260 ${D.hall.door[1]} M260 322 C320 300 400 290 ${D.fresh.door[0]} ${D.fresh.door[1]} M260 322 C320 380 410 420 ${D.post.door[0]} ${D.post.door[1]} M300 340 C380 344 450 330 ${D.toLane.door[0]} ${D.toLane.door[1]} M260 322 L260 ${D.toBase.door[1]} M260 540 C290 560 310 570 ${D.bench.door[0]} ${D.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
     ${flowers([[30,262,"#EFA3A6"],[44,270,"#F3C969"],[150,206,"#C3CDEE"],[372,206,"#EFA3A6"],[488,270,"#F3C969"],[300,448,"#EFA3A6"],[214,450,"#C3CDEE"],[470,540,"#C3CDEE"],[20,430,"#F3C969"],[505,380,"#EFA3A6"]])}
     ${tree(170,64,1)}${tree(350,64,1)}${tree(26,96,1.05)}${tree(494,96,1.05)}${tree(24,350,.9)}${tree(498,330,.9)}${tree(504,520,.85)}${tree(190,470,.8)}${tree(330,470,.8)}
     ${flowers([[170,540,"#F3C969"],[184,548,"#EFA3A6"],[206,520,"#C3CDEE"],[300,520,"#F3C969"],[400,560,"#EFA3A6"],[150,580,"#C3CDEE"]])}`;
   const places =
-    townHall() + chordWorkshop() + library() + chicoCottage() + postOffice() +
+    townHall() + library() + postOffice() +
+    // east gate to Makers' Lane (Chord and Chico live there now)
+    `<g data-place="toLane" aria-label="Gate to Makers' Lane"><ellipse class="hov" cx="496" cy="330" rx="26" ry="30" style="fill:var(--butter)"/>
+      ${sk(`<rect x="484" y="292" width="6" height="56" style="fill:var(--wood)"/><rect x="508" y="292" width="6" height="56" style="fill:var(--wood)"/><path d="M480 296 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
+        `<rect x="484" y="292" width="6" height="56"/><rect x="508" y="292" width="6" height="56"/><path d="M480 296 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`)}
+      ${tapeLabel(458, 366, "Makers' Lane", "var(--sage)", 11)}</g>` +
     `<g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M238 330 v-40 M282 330 v-40"/><rect x="230" y="282" width="60" height="38" rx="3" style="fill:var(--wood)"/>${notesArt(236, 288, G.remaining().length)}</g>
       ${tapeLabel(260, 280, "Quests", "var(--butter)", 11)}</g>
@@ -66,8 +71,7 @@ export function villageArt(){
   const L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
   const light = (app, x, y) => { const h = G.health ? G.health(app) : null; if (!h) return "";
     return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`; };
-  return ground + places + light("chord", 140, 196) + light("chico", 138, 436) + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 26, 536, 8, 2, 12)
-    + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
+  return ground + places + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
 }
 /* ---------- the river between the two screens ---------- */
 const waterBand = (y1, y2) => `<path d="M0 ${y1+4} Q65 ${y1-4} 130 ${y1+3} T260 ${y1+2} T390 ${y1+4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2+5} 390 ${y2-2} T260 ${y2} T130 ${y2-3} T0 ${y2+2}`}z" style="fill:var(--water)"/>`;
@@ -153,6 +157,33 @@ function duskArt(){
     <g pointer-events="none">${stars}${win(217, 234, 20, 18)}${win(283, 234, 20, 18)}${win(448, 230, 12, 10)}
       <circle cx="276" cy="602" r="36" fill="#FFB65C" opacity=".28"/>
       <g filter="url(#wob)"><path class="flame" d="M268 604 q-2 -12 8 -20 q-1 8 6 10 q2 6 -2 10z" fill="#F6A23A" style="stroke:var(--line)" stroke-width="1"/><path class="flame" d="M274 604 q0 -7 4 -10 q1 6 3 7 q0 3 -2 3z" fill="#FFE08A"/></g></g>`;
+}
+/* ---------- Makers' Lane: the apps ---------- */
+export function laneArt(){
+  const L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
+  const light = (app, x, y) => { const h = G.health ? G.health(app) : null; if (!h) return "";
+    return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`; };
+  const D = VILLAGE;
+  const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
+    <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
+    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D.chico.door[0]} ${D.chico.door[1]} M150 336 L${D.chord.door[0]} ${D.chord.door[1]} M262 344 L${D.plot3.door[0]} ${D.plot3.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    ${flowers([[40,200,"#EFA3A6"],[60,214,"#F3C969"],[480,330,"#C3CDEE"],[300,420,"#EFA3A6"],[200,600,"#F3C969"],[90,560,"#C3CDEE"],[460,600,"#EFA3A6"],[330,250,"#F3C969"]])}
+    ${tree(30,120,1)}${tree(250,80,.9)}${tree(490,110,1)}${tree(40,620,.95)}${tree(490,620,.9)}${tree(470,430,.85)}${tree(60,440,.9)}`;
+  const gate = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
+    ${sk(`<rect x="6" y="292" width="6" height="56" style="fill:var(--wood)"/><rect x="30" y="292" width="6" height="56" style="fill:var(--wood)"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
+      `<rect x="6" y="292" width="6" height="56"/><rect x="30" y="292" width="6" height="56"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`)}
+    ${tapeLabel(62, 366, "Town square", "var(--butter)", 11)}</g>`;
+  // the next app's plot: a fenced patch of turned earth and a little sign
+  const plot = `<g data-place="plot3" aria-label="Empty plot"><ellipse class="hov" cx="262" cy="530" rx="70" ry="12" style="fill:var(--butter)"/>
+    ${sk(`<rect x="200" y="452" width="124" height="70" rx="4" style="fill:#C9A27E"/><rect x="236" y="430" width="52" height="22" rx="2" style="fill:#FFFDF6"/>`,
+      `<path d="M196 526 V448 H328 V526 M196 526 H250 M274 526 H328" fill="none"/><path d="M206 470 h112 M206 490 h112 M206 508 h112" opacity=".35"/><rect x="236" y="430" width="52" height="22" rx="2"/><path d="M262 452 v-0"/>`)}
+    <text x="262" y="445" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" style="fill:var(--line)">coming soon</text>
+    ${tapeLabel(262, 552, "Next app", "var(--peach)", 11)}</g>`;
+  return ground + gate
+    + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot
+    + light("chord", 200, 196) + light("chico", 433, 206)
+    + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12)
+    + upgradesArt(G.F().totalQuests || 0, "lane");
 }
 export function notesArt(x, y, n){
   const c = ["#FFFDF6","#F6E3A1","#F4C7CF","#C3CDEE","#DCE8C8"];

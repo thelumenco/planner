@@ -391,12 +391,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
   await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(300);
-  check(await page.locator('#sceneArt circle[fill="#F3B54A"]').count() >= 1, "the Chord building wears an amber light in the town square");
   await page.locator('#world [data-place="news"]').dispatchEvent("click");
   await page.waitForFunction(() => /Good news/.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
   check(await page.locator("#ctx .hlist.gnews.world li").count() === 1 && await page.locator("#ctx").textContent().then(t => /Chord added 2 studios/.test(t)), "the good news board shows the world's good news and your wins");
   await page.screenshot({ path: join(shots, "good-news.png") });
   await page.click("#pclose");
+  await page.locator('#world [data-place="toLane"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Makers/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(300);
+  check(await page.locator('#sceneArt circle[fill="#F3B54A"]').count() >= 1, "Chord lives on Makers' Lane, through the town's east gate, wearing an amber light");
   await page.locator('#world [data-place="chord"]').dispatchEvent("click");
   await page.waitForFunction(() => /Chord/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(400);
