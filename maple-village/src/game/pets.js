@@ -93,8 +93,11 @@ export function runArt(F){
   const fed = P.animals.length && !hungryCount(F);
   const bowl = sk(`<path d="M${x1 - 24} ${y1 - 12} h14 l-2 6 h-10z" style="fill:var(--sky)"/>${fed ? `<ellipse cx="${x1 - 17}" cy="${y1 - 12}" rx="6" ry="2" style="fill:var(--honey)"/>` : ""}`, `<path d="M${x1 - 24} ${y1 - 12} h14 l-2 6 h-10z"/>`);
   const cols = big ? 4 : 2, gx = big ? 32 : 36, ox = big ? 60 : 118;
-  const animals = P.animals.map((a, i) => { const x = ox + (i % cols)*gx + (i % 2 ? 6 : 0), y = (big ? 546 : 556) + Math.floor(i/cols)*24 + (i % 3)*3, flip = i % 2 ? -1 : 1;
-    return `<g transform="translate(${x} ${y}) scale(${flip} 1)"><g class="${a.kind === "chick" ? "peck" : "hop"}" style="animation-delay:-${(i*0.7).toFixed(1)}s">${animalArt(a, hungry(a, F))}</g></g>`; }).join("");
+  // each animal potters back and forth inside the run (CSS "roam"), facing the way it walks; left-hand columns
+  // wander right and right-hand columns wander left so nobody walks through the fence
+  const animals = P.animals.map((a, i) => { const col = i % cols, x = ox + col*gx + (i % 2 ? 6 : 0), y = (big ? 546 : 556) + Math.floor(i/cols)*24 + (i % 3)*3;
+    const right = col < cols/2, dx = (big ? 20 : 16) + (i % 3)*3, secs = 9 + (i*1.7) % 6;
+    return `<g transform="translate(${x} ${y})"><g class="roam ${right ? "rr" : "rl"}" style="--dx:${right ? dx : -dx}px;animation-duration:${secs.toFixed(1)}s;animation-delay:-${(i*2.3).toFixed(1)}s"><g class="${a.kind === "chick" ? "peck" : "hop"}" style="animation-delay:-${(i*0.7).toFixed(1)}s">${animalArt(a, hungry(a, F))}</g></g></g>`; }).join("");
   return `<g data-place="run" aria-label="Animal run"><ellipse class="hov" cx="${(x0 + x1)/2}" cy="${y1}" rx="${(x1 - x0)/2 + 8}" ry="10" style="fill:var(--butter)"/>${fence}${meadow}${crate}${coop}${bowl}${animals}${tapeLabel(big ? 204 : 137, big ? 500 : 508, "Animal run", "var(--peach)", 11)}</g>`;
 }
 const INK = `style="stroke:var(--line)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"`;

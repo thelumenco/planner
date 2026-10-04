@@ -289,7 +289,11 @@ details[open] summary::after{content:"–"}
 /* Safari lays out <button> grid containers badly (contents spill out and cards overlap): use a flex column */
 .item{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;height:auto;min-width:0}
 .item .n,.item .c,.item .d{display:block;max-width:100%;overflow-wrap:anywhere}
-.items{grid-auto-rows:auto;align-items:stretch}
+/* Safari also stacks grid cards on top of each other in some panels (the market's Animals tab): lay cards out as a
+   wrapping flex row instead, with notes taking a full row of their own */
+.items{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+.items > .item{flex:1 1 86px;max-width:150px}
+.items > :not(.item){flex:1 1 100%}
 
 /* ---------- "Do task" notebook overlay ---------- */
 .notebook{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));
@@ -451,6 +455,13 @@ body.nb-open{overflow:hidden}
 .hlist.pets li > span:nth-child(2){flex:1;min-width:0}.hlist.pets small{display:block}
 .hlist.pets{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));column-gap:14px}
 .hlist.pets li{padding:5px 2px}
+/* animals wander: out along --dx, a pause, turn round, back home, a pause, turn again */
+.map .roam{transform-box:fill-box;transform-origin:50% 100%}
+.map .roam.rr{animation:roamR 11s ease-in-out infinite}
+.map .roam.rl{animation:roamL 11s ease-in-out infinite}
+@keyframes roamR{0%,8%{transform:translateX(0) scaleX(1)}40%,52%{transform:translateX(var(--dx)) scaleX(1)}54%{transform:translateX(var(--dx)) scaleX(-1)}86%,88%{transform:translateX(0) scaleX(-1)}90%,100%{transform:translateX(0) scaleX(1)}}
+@keyframes roamL{0%,8%{transform:translateX(0) scaleX(-1)}40%,52%{transform:translateX(var(--dx)) scaleX(-1)}54%{transform:translateX(var(--dx)) scaleX(1)}86%,88%{transform:translateX(0) scaleX(1)}90%,100%{transform:translateX(0) scaleX(-1)}}
+@media (prefers-reduced-motion:reduce){.map .roam{animation:none}}
 
 /* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
 :root{--mapw:max(300px,min(980px,calc((100dvh - 196px)*520/640 + 26px)))}
@@ -1876,8 +1887,9 @@ body.nb-open{overflow:hidden}
     const bowl = sk(`<path d="M${x1 - 24} ${y1 - 12} h14 l-2 6 h-10z" style="fill:var(--sky)"/>${fed ? `<ellipse cx="${x1 - 17}" cy="${y1 - 12}" rx="6" ry="2" style="fill:var(--honey)"/>` : ""}`, `<path d="M${x1 - 24} ${y1 - 12} h14 l-2 6 h-10z"/>`);
     const cols = big ? 4 : 2, gx = big ? 32 : 36, ox = big ? 60 : 118;
     const animals = P2.animals.map((a, i) => {
-      const x = ox + i % cols * gx + (i % 2 ? 6 : 0), y = (big ? 546 : 556) + Math.floor(i / cols) * 24 + i % 3 * 3, flip = i % 2 ? -1 : 1;
-      return `<g transform="translate(${x} ${y}) scale(${flip} 1)"><g class="${a.kind === "chick" ? "peck" : "hop"}" style="animation-delay:-${(i * 0.7).toFixed(1)}s">${animalArt(a, hungry(a, F2))}</g></g>`;
+      const col = i % cols, x = ox + col * gx + (i % 2 ? 6 : 0), y = (big ? 546 : 556) + Math.floor(i / cols) * 24 + i % 3 * 3;
+      const right = col < cols / 2, dx = (big ? 20 : 16) + i % 3 * 3, secs = 9 + i * 1.7 % 6;
+      return `<g transform="translate(${x} ${y})"><g class="roam ${right ? "rr" : "rl"}" style="--dx:${right ? dx : -dx}px;animation-duration:${secs.toFixed(1)}s;animation-delay:-${(i * 2.3).toFixed(1)}s"><g class="${a.kind === "chick" ? "peck" : "hop"}" style="animation-delay:-${(i * 0.7).toFixed(1)}s">${animalArt(a, hungry(a, F2))}</g></g></g>`;
     }).join("");
     return `<g data-place="run" aria-label="Animal run"><ellipse class="hov" cx="${(x0 + x1) / 2}" cy="${y1}" rx="${(x1 - x0) / 2 + 8}" ry="10" style="fill:var(--butter)"/>${fence}${meadow}${crate}${coop}${bowl}${animals}${tapeLabel(big ? 204 : 137, big ? 500 : 508, "Animal run", "var(--peach)", 11)}</g>`;
   }

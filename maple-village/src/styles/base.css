@@ -280,4 +280,8 @@ details[open] summary::after{content:"–"}
 /* Safari lays out <button> grid containers badly (contents spill out and cards overlap): use a flex column */
 .item{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;height:auto;min-width:0}
 .item .n,.item .c,.item .d{display:block;max-width:100%;overflow-wrap:anywhere}
-.items{grid-auto-rows:auto;align-items:stretch}
+/* Safari also stacks grid cards on top of each other in some panels (the market's Animals tab): lay cards out as a
+   wrapping flex row instead, with notes taking a full row of their own */
+.items{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+.items > .item{flex:1 1 86px;max-width:150px}
+.items > :not(.item){flex:1 1 100%}
