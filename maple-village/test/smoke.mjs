@@ -410,6 +410,42 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.screenshot({ path: join(shots, "health-sign.png") });
   await page.close();
 }
+// Animals: buy chicks and bunnies at the market, feed them in the run at home, upgrade the run; Pancake at the news board
+{
+  console.log("\nanimals");
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  page.on("pageerror", e => errors.push(`animals pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&nosample=1&time=10:00&date=2026-10-05");
+  await page.waitForTimeout(900);
+  await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); f.coins = 200; f.updatedAt = Date.now() + 1e6;
+    localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
+  await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05");
+  await page.waitForTimeout(700);
+  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(300);
+  check(await page.locator('#world [aria-label="Pancake the village dog"]').count() === 1, "Pancake the dog minds the good news board");
+  await page.locator('#world [data-place="market"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-shop="animals"]', { timeout: 20000 });
+  await page.click('#ctx [data-shop="animals"]');
+  for (const id of ["chick", "rabbit", "chickfeed", "rabbitfeed"]) { await page.click(`#ctx .item[data-id="${id}"]`); await page.waitForTimeout(150); }
+  check(await page.locator('#ctx .item[data-id="chick"]').textContent().then(t => /run is full/.test(t)), "a chick and a bunny fill the little run");
+  await page.screenshot({ path: join(shots, "animals-market.png") });
+  await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05");
+  await page.waitForTimeout(900);
+  check(await page.locator('#world [data-place="run"] .peck').count() === 1 && await page.locator('#world [data-place="run"] .hop').count() === 1, "they live in the run at home base");
+  await page.locator('#world [data-place="run"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-feed="all"]', { timeout: 20000 });
+  await page.click('#ctx [data-feed="all"]');
+  await page.waitForTimeout(300);
+  check(await page.locator("#ctx .hlist.pets .hbadge").count() === 2, "feeding everyone uses the feed from the backpack");
+  await page.click('#ctx [data-runup]');
+  await page.waitForTimeout(300);
+  check(await page.locator("#ctx .sub").textContent().then(t => /Bigger run/.test(t)), "the run can be upgraded with coins");
+  await page.screenshot({ path: join(shots, "animals-run.png") });
+  await page.close();
+}
 // Sunsama pull: no chat plan, the page fetches today's tasks itself
 {
   console.log("\nsunsama pull");

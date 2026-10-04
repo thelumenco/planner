@@ -134,6 +134,22 @@ I.hammock = [`<path d="M5 10q7 7 14 0z" ${f(C.peach)}/>`, `<path d="M3 20V6M21 2
 I.hearth = [`<path d="M12 3c1 3.5 5.5 5.5 5.5 10.5a5.5 5.5 0 0 1-11 0c0-2.5 1.2-3.8 2.3-5 .3 1.6 1 2.6 2 3 0-3.3.2-5.8 1.2-8.5z" ${f("#F6A23A")}/><path d="M12 13c.6 1.6 2.4 2.4 2.4 4.3a2.4 2.4 0 0 1-4.8 0c0-1.3.9-2.3 2.4-4.3z" ${f("#FFE08A")}/>`, `<path d="M12 3c1 3.5 5.5 5.5 5.5 10.5a5.5 5.5 0 0 1-11 0c0-2.5 1.2-3.8 2.3-5 .3 1.6 1 2.6 2 3 0-3.3.2-5.8 1.2-8.5z"/>`];
 I.broom = [`<path d="M7 14l-3.5 6.5c2 .8 4.5.6 6.5-.4l1.5-4.4z" ${f(C.butter)}/>`, `<path d="M19.5 3.5L10 15"/><path d="M7 14l-3.5 6.5c2 .8 4.5.6 6.5-.4l1.5-4.4zM8 15.5l-2 4.4M9.8 16.4l-1.3 3.6M7 14l4 1.7"/>`];
 I.fridge = [`<rect x="6" y="2.5" width="12" height="19" rx="2" ${f("#F4F1EA")}/><circle cx="14.5" cy="5.5" r="1.2" ${f(C.rose)}/>`, `<rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M6 9.5h12M8.5 5v2.5M8.5 12v4"/>`];
+// animals at home base
+I.chick = [`<circle cx="11" cy="15" r="6" ${f(C.butter)}/><circle cx="15" cy="9" r="4" ${f(C.butter)}/><path d="M18.8 8.6l2.6 1-2.6 1.2z" ${f(C.honey)}/>`,
+  `<circle cx="11" cy="15" r="6"/><circle cx="15" cy="9" r="4"/><path d="M18.8 8.6l2.6 1-2.6 1.2zM9.5 21v2M12.5 21v2M7.5 14.5c1.2 1 2.6 1.3 4 1"/><circle cx="16" cy="8.4" r=".7"/>`];
+I.hen = [`<path d="M4 9c-1.5 3-.5 6 1 7" ${f(C.paper)}/><ellipse cx="11" cy="14.5" rx="7" ry="5.5" ${f(C.paper)}/><circle cx="16.5" cy="7.5" r="3.5" ${f(C.paper)}/><path d="M14.5 4q1-2.5 2.5-1 1-2 2.5.5" ${f(C.rose)}/><path d="M19.8 7.2l2.4.8-2.4 1.2z" ${f(C.honey)}/>`,
+  `<path d="M4 9c-1.5 3-.5 6 1 7"/><ellipse cx="11" cy="14.5" rx="7" ry="5.5"/><circle cx="16.5" cy="7.5" r="3.5"/><path d="M14.5 4q1-2.5 2.5-1 1-2 2.5.5M19.8 7.2l2.4.8-2.4 1.2zM9.5 20v2.5M12.5 20v2.5M7.5 13.5c1.5 1.4 3.5 1.6 5 .8"/><circle cx="17.3" cy="7" r=".7"/>`];
+I.rabbit = [`<ellipse cx="10.5" cy="16" rx="7" ry="5" ${f("#B9A38C")}/><circle cx="16" cy="12.5" r="3.6" ${f("#B9A38C")}/><ellipse cx="14.5" cy="5.5" rx="1.4" ry="4" ${f("#B9A38C")}/><ellipse cx="17.5" cy="5.8" rx="1.4" ry="4" ${f("#B9A38C")}/><circle cx="3.8" cy="15" r="2" ${f(C.paper)}/>`,
+  `<ellipse cx="10.5" cy="16" rx="7" ry="5"/><circle cx="16" cy="12.5" r="3.6"/><ellipse cx="14.5" cy="5.5" rx="1.4" ry="4"/><ellipse cx="17.5" cy="5.8" rx="1.4" ry="4"/><circle cx="3.8" cy="15" r="2"/><circle cx="17" cy="12" r=".7"/><path d="M19.4 13.4h.1"/>`];
+I.chickfeed = [`<path d="M6 7h12l1 13H5z" ${f("#E8D3A6")}/><path d="M6 7l1.5-3h9L18 7z" ${f(C.honey)}/><circle cx="12" cy="14" r="3" ${f(C.butter)}/>`,
+  `<path d="M6 7h12l1 13H5zM6 7l1.5-3h9L18 7"/><circle cx="12" cy="14" r="3"/><path d="M14.5 13.8l1.2.4-1.2.6"/>`];
+I.rabbitfeed = [`<path d="M6 7h12l1 13H5z" ${f("#DCE8C8")}/><path d="M6 7l1.5-3h9L18 7z" ${f(C.sage)}/><ellipse cx="12" cy="15" rx="3.2" ry="2.4" ${f("#B9A38C")}/><ellipse cx="11" cy="11.2" rx=".8" ry="2" ${f("#B9A38C")}/><ellipse cx="13" cy="11.2" rx=".8" ry="2" ${f("#B9A38C")}/>`,
+  `<path d="M6 7h12l1 13H5zM6 7l1.5-3h9L18 7"/><ellipse cx="12" cy="15" rx="3.2" ry="2.4"/><ellipse cx="11" cy="11.2" rx=".8" ry="2"/><ellipse cx="13" cy="11.2" rx=".8" ry="2"/>`];
+I.egg = [`<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z" ${f("#F6EBDD")}/>`, `<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z"/><path d="M9 12c0-2 .8-3.6 1.8-4.5" opacity=".6"/>`];
+I.coop = [`<path d="M3 11l9-7 9 7z" ${f(C.rose)}/><rect x="5" y="11" width="14" height="9" ${f(C.butter)}/><rect x="10" y="14" width="4" height="6" ${f(C.wood)}/>`,
+  `<path d="M3 11l9-7 9 7"/><rect x="5" y="11" width="14" height="9"/><rect x="10" y="14" width="4" height="6"/><path d="M14 20l5 2.5"/>`];
+I.dog = [`<ellipse cx="10" cy="15" rx="7" ry="4.5" ${f("#E3B07A")}/><circle cx="17" cy="10" r="4" ${f("#E3B07A")}/><path d="M14.5 7.5c-1.5 0-2.5 2-2 4.5 1.2-.3 2-1.5 2-4.5z" ${f("#A9744A")}/>`,
+  `<ellipse cx="10" cy="15" rx="7" ry="4.5"/><circle cx="17" cy="10" r="4"/><path d="M14.5 7.5c-1.5 0-2.5 2-2 4.5 1.2-.3 2-1.5 2-4.5zM3.5 13c-1.5-1-2-2.5-1.5-4M6 19v2.5M13 19v2.5"/><circle cx="18" cy="9.4" r=".7"/><path d="M21 11h.1"/>`];
 I.base = I.sprout;   // quests outdoors at home base
 export const icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
 export const iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size/2}" y="${y - size/2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;

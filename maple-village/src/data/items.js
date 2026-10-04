@@ -36,6 +36,12 @@ export const ITEMS = {
   truck:{n:"Toy truck", kind:"keep", to:"evan", price:35, tab:"family", say:"Vroom vroom! Evan won't put it down."},
   headphones:{n:"Headphones", kind:"keep", to:"darren", price:45, tab:"family", say:"Noise-cancelling! Darren's calls just got calmer."},
   hammock:{n:"Hammock", kind:"keep", to:"darren", price:90, tab:"family", say:"A hammock by the pond. Darren's evenings are sorted."},
+  // Animals tab: chicks and bunnies live in the run at home base; their food goes in the backpack.
+  chick:{n:"Chick", kind:"pet", pet:"chick", price:12, tab:"animals", say:"A fluffy little chick! Cheep cheep."},
+  rabbit:{n:"Bunny", kind:"pet", pet:"rabbit", price:18, tab:"animals", say:"A baby bunny! Look at those ears."},
+  chickfeed:{n:"Chick feed", kind:"feed", price:2, tab:"animals", what:"one meal for a chick or hen"},
+  rabbitfeed:{n:"Rabbit pellets", kind:"feed", price:2, tab:"animals", what:"one meal for a bunny"},
+  egg:{n:"Fresh egg", kind:"food", sell:5, say:"A fresh egg from our hens! Breakfast sorted."},
   tulip:{e:"🌷", n:"Tulip", kind:"flower", sell:4, say:"For me? I'll tuck it behind my ear."},
   sunflower:{e:"🌻", n:"Sunflower", kind:"flower", sell:5, say:"So sunny! Thank you."},
   carrot:{e:"🥕", n:"Carrot", kind:"food", sell:6, say:"Homegrown crunch!"},

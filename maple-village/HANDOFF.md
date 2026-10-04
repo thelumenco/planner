@@ -318,3 +318,12 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - With Chord and Chico gone to Makers' Lane, the square leaned right. Fresh Pages library moved to the west (door [85,272]), the good news board to the south-west (door [90,488]), and the bench upgrade follows the library.
 - The Makers' Lane gate moved up to the north-east (door [444,218]; arrival from the lane at [426,238]). It stays clear of the phone's right-edge trackers.
 - Note: `node build.mjs --dev` starts a server and never exits; use `--dev --once` for a one-off build.
+
+## Round 21: animals and Pancake
+- **Animal run** at home base, bottom left by the garden (`src/game/pets.js`, place `run`, door [198,566]). State lives in `F.pets = {run, animals:[{id, kind, name, feeds, fedDay, col}], next}` inside the fox doc.
+  - Market tab "Animals": chick 12, bunny 18 (straight to the run, random cute name), chick feed 2, rabbit pellets 2 (one meal each). Bunnies also eat garden carrots.
+  - Each animal eats once a day. 3 meals: chick to hen, bunny to rabbit. A fed hen lays an egg into the backpack (sells for 5, or feed it to Maple). Nobody gets ill or leaves.
+  - Run upgrades from the run panel: Little run (2) → Bigger run 35 (4) → Coop and hutch 70 (6) → Clover meadow 120 (8; a meal lasts two days).
+  - Maple nudges once a day on reaching home base if anyone is hungry; Evan sometimes visits the run. Chat can `go` to the "animal run" and `feed_animals`.
+- **Pancake**, the village dog, at the good news board: sits up and wags when fresh news is pinned, naps otherwise.
+- Good news routine (cloud, trig_01LPCGof2eTZu2Q6NwbooC3s) now asks for 5 stories, at least 2 small human-interest ones (animals, kindness, quirky local stories).

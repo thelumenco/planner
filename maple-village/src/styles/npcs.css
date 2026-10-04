@@ -25,3 +25,15 @@
 /* Darren resting in the hammock */
 .ch.npc.act-rest .flip > g{transform:translate(-20px,-6px) rotate(-84deg)}
 .ch.npc.act-rest .bob{animation:cbob 2.6s ease-in-out infinite alternate}
+/* the animal run: chicks peck, bunnies hop; Pancake the dog wags at fresh good news */
+.map .peck{transform-box:fill-box;transform-origin:50% 100%;animation:peck 2.6s ease-in-out infinite}
+@keyframes peck{0%,62%,100%{transform:rotate(0)}70%,78%{transform:rotate(22deg)}74%{transform:rotate(14deg)}}
+.map .hop{animation:hop 3.2s ease-in-out infinite}
+@keyframes hop{0%,70%,100%{transform:translateY(0)}78%{transform:translateY(-5px)}86%{transform:translateY(0)}90%{transform:translateY(-2px)}}
+.map .wag{transform-box:fill-box;transform-origin:100% 100%;animation:wag .35s ease-in-out infinite alternate}
+@keyframes wag{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+@media (prefers-reduced-motion:reduce){.map .peck,.map .hop,.map .wag{animation:none}}
+.hlist.pets .pico{display:inline-flex;flex:none;margin-right:2px}
+.hlist.pets li > span:nth-child(2){flex:1;min-width:0}.hlist.pets small{display:block}
+.hlist.pets{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));column-gap:14px}
+.hlist.pets li{padding:5px 2px}

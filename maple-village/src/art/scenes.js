@@ -5,6 +5,7 @@ import { VILLAGE, ROOMS, stationsOf } from "../data/world.js";
 import { CROPS, PLOTS } from "../data/items.js";
 import { roomShell } from "./interiors.js";
 import { iconAt } from "./icons.js";
+import { runArt } from "../game/pets.js";
 import { upgradesArt, festivalArt, festivalOn, pondLanterns } from "./village-extras.js";
 import { townHall, chordWorkshop, library, chicoCottage, postOffice } from "./buildings.js";
 
@@ -66,7 +67,7 @@ export function villageArt(){
     <g transform="translate(-132 32)"><g data-place="news" aria-label="Good news board"><ellipse class="hov" cx="222" cy="450" rx="34" ry="8" style="fill:var(--butter)"/>
       ${sk(`<rect x="194" y="402" width="56" height="36" rx="3" style="fill:#F6E3A1"/><rect x="200" y="408" width="14" height="12" style="fill:#FFFDF6"/><rect x="218" y="410" width="12" height="14" style="fill:#F4C7CF"/><rect x="233" y="407" width="12" height="11" style="fill:#DCE8C8"/>`,
         `<path d="M202 438 v12 M242 438 v12"/><rect x="194" y="402" width="56" height="36" rx="3"/><rect x="200" y="408" width="14" height="12"/><rect x="218" y="410" width="12" height="14"/><rect x="233" y="407" width="12" height="11"/><path d="M194 402 q28 -10 56 0" opacity=".6"/>`)}
-      ${G.goodNews && G.goodNews() ? `<g class="twinkle">${iconAt("sparkle", 252, 398, 14)}</g>` : ""}${tapeLabel(222, 470, "Good news", "var(--butter)", 11)}</g></g>
+      ${G.goodNews && G.goodNews() ? `<g class="twinkle">${iconAt("sparkle", 252, 398, 14)}</g>` : ""}${dogArt(270, 450, !!(G.goodNews && G.goodNews()))}${tapeLabel(222, 470, "Good news", "var(--butter)", 11)}</g></g>
     ${townRiver()}`;
   const L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
   const light = (app, x, y) => { const h = G.health ? G.health(app) : null; if (!h) return "";
@@ -103,7 +104,7 @@ export function baseArt(){
     <g filter="url(#wob)">${waterBand(40, 98)}<path d="M478 94 C470 180 500 300 470 400 C462 430 458 450 452 474" fill="none" style="stroke:var(--water)" stroke-width="14" stroke-linecap="round"/></g>
     ${ripples([[60, 66], [150, 78], [350, 62], [420, 80]])}
     <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 44 Q65 36 130 43 T260 42 T390 44 T520 40 M0 100 Q65 104 130 95 T260 98 T390 96 T520 102"/></g>
-    <g filter="url(#wob)"><path d="M260 112 L260 ${D.home.door[1]} M260 326 C200 360 130 420 ${D.farm.door[0]} ${D.farm.door[1]} M260 326 C290 420 300 500 ${D.pond.door[0]} ${D.pond.door[1]} M266 312 C330 300 390 290 ${D.shed.door[0]} ${D.shed.door[1]} M254 318 C200 320 150 320 ${D.swing.door[0]} ${D.swing.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M260 112 L260 ${D.home.door[1]} M260 326 C200 360 130 420 ${D.farm.door[0]} ${D.farm.door[1]} M260 326 C290 420 300 500 ${D.pond.door[0]} ${D.pond.door[1]} M266 312 C330 300 390 290 ${D.shed.door[0]} ${D.shed.door[1]} M254 318 C200 320 150 320 ${D.swing.door[0]} ${D.swing.door[1]} M290 500 C270 552 240 566 ${D.run.door[0]} ${D.run.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
       <ellipse cx="260" cy="322" rx="44" ry="20" style="fill:var(--path)"/></g>
     ${flowers([[30,140,"#EFA3A6"],[44,150,"#F3C969"],[200,140,"#C3CDEE"],[330,150,"#EFA3A6"],[488,180,"#F3C969"],[214,410,"#EFA3A6"],[200,470,"#C3CDEE"],[160,600,"#F3C969"],[176,612,"#EFA3A6"],[300,620,"#C3CDEE"],[24,520,"#F3C969"],[372,600,"#EFA3A6"],[400,170,"#C3CDEE"]])}
     ${tree(26,370,.9)}${tree(500,610,.9)}${tree(26,620,.95)}${tree(360,180,.8)}`;
@@ -147,7 +148,7 @@ export function baseArt(){
   const toolArt = (tools.compost ? sk(`<path d="M192 452 h24 l-3 22 h-18z" style="fill:var(--wood)"/><path d="M196 451 c3 -6 13 -6 16 0" style="fill:var(--moss)"/>`, `<path d="M192 452 h24 l-3 22 h-18z M195 460 h18"/>`) : "")
     + (tools.can ? sk(`<rect x="466" y="262" width="14" height="11" rx="2" style="fill:#9CC3E0"/>`, `<rect x="466" y="262" width="14" height="11" rx="2"/><path d="M480 266 l7 -5 M468 262 c0 -5 9 -5 9 0"/>`) : "")
     + (tools.sprinkler ? sk(`<circle cx="108" cy="438" r="4" style="fill:var(--stone)"/>`, `<circle cx="108" cy="438" r="4"/><path d="M108 434 v-4"/><path class="ripple" d="M96 426 q12 -10 24 0" opacity=".7"/>`) : "");
-  return ground + places + famArt + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
+  return ground + places + runArt(G.F()) + famArt + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
 }
 // After 7pm: the light drops, windows glow, the firepit is lit and stars come out over the river.
 function duskArt(){
@@ -157,6 +158,14 @@ function duskArt(){
     <g pointer-events="none">${stars}${win(217, 234, 20, 18)}${win(283, 234, 20, 18)}${win(448, 230, 12, 10)}
       <circle cx="276" cy="602" r="36" fill="#FFB65C" opacity=".28"/>
       <g filter="url(#wob)"><path class="flame" d="M268 604 q-2 -12 8 -20 q-1 8 6 10 q2 6 -2 10z" fill="#F6A23A" style="stroke:var(--line)" stroke-width="1"/><path class="flame" d="M274 604 q0 -7 4 -10 q1 6 3 7 q0 3 -2 3z" fill="#FFE08A"/></g></g>`;
+}
+// Pancake, the village dog who minds the good news board: sits up wagging when fresh news is pinned, naps otherwise.
+function dogArt(x, y, awake){
+  const fur = "#E3B07A", ear = "#A9744A", I2 = `style="stroke:var(--line)" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"`;
+  return `<g transform="translate(${x} ${y})" aria-label="Pancake the village dog"><g filter="url(#wob)" ${I2}>` + (awake
+    ? `<path class="wag" d="M-9 -6 q-9 -4 -8 -14" fill="none"/><ellipse cx="-2" cy="-7" rx="9" ry="7" fill="${fur}"/><path d="M-6 0 v-4 M3 0 v-5" /><ellipse cx="5" cy="-17" rx="6.5" ry="6" fill="${fur}"/><ellipse cx="10" cy="-15" rx="3" ry="2.2" fill="#F2D3AE"/><circle cx="12.4" cy="-15.6" r="1.1" fill="var(--line)" stroke="none"/><path d="M1 -22 q-5 2 -3 9 q4 -2 3 -9z" fill="${ear}"/><circle cx="6.5" cy="-18.5" r=".9" fill="var(--line)" stroke="none"/><path d="M-3 -2 q6 3 11 -1" style="stroke:var(--rose)" stroke-width="2.2"/>`
+    : `<path d="M-14 -3 q-4 -6 2 -9" fill="none"/><ellipse cx="0" cy="-5" rx="13" ry="6" fill="${fur}"/><ellipse cx="10" cy="-6" rx="6" ry="4.6" fill="${fur}"/><path d="M5 -10 q-4 1 -3 6 q3 -1 3 -6z" fill="${ear}"/><path d="M10 -7 q1.5 1 3 0" fill="none"/><text x="16" y="-14" font-size="8" style="fill:var(--line)" opacity=".6">z</text><text x="21" y="-20" font-size="6" style="fill:var(--line)" opacity=".45">z</text>`)
+    + `</g></g>`;
 }
 /* ---------- Makers' Lane: the apps ---------- */
 export function laneArt(){
