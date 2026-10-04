@@ -15,9 +15,9 @@ const SHELLS = {
     <rect x="234" y="150" width="52" height="450" style="fill:var(--rose)" opacity=".45"/><path d="M238 150 V600 M282 150 V600" style="stroke:var(--honey)" stroke-width="2" stroke-dasharray="6 5" opacity=".9"/>
     ${wallBase("#E6E9F5", "var(--peri)")}
     ${sk(`<path d="M44 130 v-70 a24 24 0 0 1 48 0 v70z" style="fill:var(--sky)"/><path d="M428 130 v-70 a24 24 0 0 1 48 0 v70z" style="fill:var(--sky)"/>
-      <path d="M140 20 h26 v54 l-13 -10 l-13 10z" style="fill:var(--peri)"/>`,
+      <path d="M140 20 h26 v54 l-13 -10 l-13 10z" style="fill:var(--peri)"/><path d="M354 20 h26 v54 l-13 -10 l-13 10z" style="fill:var(--peach)"/>`,
       `<path d="M44 130 v-70 a24 24 0 0 1 48 0 v70z M68 36 v94 M44 84 h48"/><path d="M428 130 v-70 a24 24 0 0 1 48 0 v70z M452 36 v94 M428 84 h48"/>
-      <path d="M140 20 h26 v54 l-13 -10 l-13 10z M134 20 h38"/><circle cx="153" cy="40" r="5"/>`)}
+      <path d="M140 20 h26 v54 l-13 -10 l-13 10z M134 20 h38 M354 20 h26 v54 l-13 -10 l-13 10z M348 20 h38"/><circle cx="153" cy="40" r="5"/><circle cx="367" cy="40" r="5"/>`)}
     ${skirting}${plant(70, 600, 1.1)}${plant(474, 610, .9)}`,
 
   // Chord workshop: wide planks with sawdust, a pegboard of tools, a factory window, crates.
@@ -106,6 +106,22 @@ const SHELLS = {
     ${sk(`<rect x="404" y="52" width="80" height="58" rx="3" style="fill:#FFFDF6"/><path d="M414 94 h60" style="stroke:#B98B5E" stroke-width="3"/><path d="M420 92 v-14 h10 v-6 h6 v6 h6 q4 0 4 4 v10z" style="fill:#E86A5C"/><rect x="450" y="80" width="18" height="12" rx="2" style="fill:#7FB8E8"/>`,
       `<rect x="398" y="46" width="92" height="70" rx="3"/><rect x="404" y="52" width="80" height="58" rx="3"/><path d="M420 92 v-14 h10 v-6 h6 v6 h6 q4 0 4 4 v10z"/><rect x="450" y="80" width="18" height="12" rx="2"/>`)}
     ${skirting}`; },
+
+  // The courtyard: warm flagstones, a whitewashed arcade with terracotta tiles and pink bougainvillea, planters, lemon trees
+  trophy: () => { const stones = rows(11, r => rows(9, c => { const w = 52 + ((r*7 + c*13) % 5)*6, x = c*60 + (r % 2)*30 - 20 + ((r + c) % 3)*3, y = 160 + r*44 + ((c*5) % 3)*2;
+      return `<rect x="${x}" y="${y}" width="${w}" height="38" rx="9" style="fill:${["#E9DCC6", "#E3D3BA", "#EEE3D0", "#DFCDB2"][(r*3 + c) % 4]}"/>`; }));
+    const arch = x => `<path d="M${x-30} 150 v-62 a30 30 0 0 1 60 0 v62z" style="fill:#E8D8C2"/><path d="M${x-30} 150 v-62 a30 30 0 0 1 60 0 v62" fill="none" style="stroke:var(--line)" stroke-width="1.4"/>`;
+    const bloom = (x, y) => rows(7, i => `<circle cx="${x + Math.cos(i*0.9)*12 + (i % 3)*4}" cy="${y + Math.sin(i*1.3)*7}" r="${4 + (i % 2)}" style="fill:${["#E86AA0", "#F08FB4", "#D9548C"][i % 3]}"/>`);
+    return `<rect width="520" height="640" style="fill:#D6C3A6"/><g filter="url(#wob)" opacity=".95">${stones}</g>
+    <rect width="520" height="150" style="fill:#F6EEE2"/><rect y="138" width="520" height="12" style="fill:#C9774D" opacity=".85"/>
+    <g filter="url(#wob)">${[66, 196, 324, 454].map(arch).join("")}</g>
+    <g>${rows(26, i => `<path d="M${i*20} 0 h20 v14 q-10 6 -20 0z" style="fill:${i % 2 ? "#C9774D" : "#B8653D"}"/>`)}</g>
+    <g>${bloom(30, 22)}${bloom(130, 18)}${bloom(262, 24)}${bloom(392, 18)}${bloom(492, 24)}</g><path d="M10 28 q40 14 80 0 t80 4 t90 -2 t90 4 t90 -4 t80 2" fill="none" style="stroke:#5C8A3A" stroke-width="2" opacity=".7"/>
+    ${sk(`<rect x="10" y="168" width="44" height="120" rx="6" style="fill:#B9D2A6"/><rect x="466" y="168" width="44" height="120" rx="6" style="fill:#B9D2A6"/><rect x="190" y="560" width="22" height="18" rx="3" style="fill:#C9774D"/><rect x="308" y="560" width="22" height="18" rx="3" style="fill:#C9774D"/>`,
+      `<rect x="10" y="168" width="44" height="120" rx="6"/><rect x="466" y="168" width="44" height="120" rx="6"/><rect x="190" y="560" width="22" height="18" rx="3"/><rect x="308" y="560" width="22" height="18" rx="3"/>`)}
+    <g style="fill:#7FA36E">${rows(9, i => `<circle cx="${20 + (i % 3)*12}" cy="${182 + Math.floor(i/3)*36}" r="9"/><circle cx="${476 + (i % 3)*12}" cy="${182 + Math.floor(i/3)*36}" r="9"/>`)}</g>
+    <g style="fill:#F3C969">${rows(4, i => `<circle cx="${28 + i*6}" cy="${200 + i*20}" r="3"/><circle cx="${484 + i*5}" cy="${206 + i*18}" r="3"/>`)}</g>
+    <g style="fill:#7FA36E">${[201, 319].map(x => `<circle cx="${x}" cy="552" r="11"/><circle cx="${x - 7}" cy="546" r="7"/><circle cx="${x + 7}" cy="545" r="7"/>`).join("")}</g>`; },
 
   market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(24, i => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`)}</g>

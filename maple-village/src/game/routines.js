@@ -78,13 +78,13 @@ export function routinesPanel(){
   }
   if (l.kind === "weekly") {
     const step = (l.days || {})[tk], done = tickOf(l.id, tk);
-    h += step ? `<p class="eyebrow">Today · ${DAY_NAMES[tk]}</p><button class="rtoday${done ? " done" : ""}" data-rt="tickday"><span class="tk" aria-hidden="true"></span><span>${esc(step)}</span></button>`
+    h += step ? `<p class="eyebrow">Today · ${DAY_NAMES[tk]}</p><button class="rtoday${done ? " done" : ""}" data-rt="tickday" aria-pressed="${done}"><span class="rbox${done ? " on" : ""}" aria-hidden="true"></span><span>${esc(step)}</span></button>`
       : `<p class="sub">${Object.keys(l.days || {}).length ? `Nothing on ${DAY_NAMES[tk]}. A rest day.` : "No steps yet. Tap Edit and paste your week in."}</p>`;
     h += `<ul class="rweek">${DAYS.map(d => `<li class="${d === tk ? "now" : ""}"><b>${DAY_NAMES[d].slice(0, 3)}</b><span>${esc((l.days || {})[d] || "—")}</span></li>`).join("")}</ul>`;
   } else {
     const left = l.items.filter(i => !tickOf(l.id, i.id)).length;
     h += `<p class="sub">${l.items.length ? (left ? `${left} to go today.` : "All done today. Lovely start.") : "No steps yet. Tap Edit to add some."} Fresh every morning.</p>
-      <ul class="bujo rcheck">${l.items.map(i => { const on = tickOf(l.id, i.id); return `<li class="${on ? "tick" : ""}" data-rt="tick" data-id="${esc(i.id)}" role="checkbox" aria-checked="${on}" tabindex="0"><span class="tk" aria-hidden="true"></span><span>${esc(i.text)}</span></li>`; }).join("")}</ul>`;
+      <ul class="rcheck">${l.items.map(i => { const on = tickOf(l.id, i.id); return `<li class="${on ? "on" : ""}" data-rt="tick" data-id="${esc(i.id)}" role="checkbox" aria-checked="${on}" tabindex="0"><span class="rbox${on ? " on" : ""}" aria-hidden="true"></span><span>${esc(i.text)}</span></li>`; }).join("")}</ul>`;
   }
   return h + `<div class="actions"><button class="btn alt small" data-rt="edit">Edit</button><button class="btn alt small" data-close="1">Close</button></div>`;
 }

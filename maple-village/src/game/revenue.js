@@ -45,6 +45,8 @@ function chart(d, target){
   const tl = target ? `<path d="M${L} ${y(target)} H${W - L}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W - L}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money(target, d.currency)}</text>` : "";
   return `<svg class="rchart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Paid income by month, last six months"><path d="M${L} ${B} H${W - L}" stroke="#D8CFC2" stroke-width="1"/>${bars}${tl}</svg>`;
 }
+// this month's paid total (for the revenue-goal trophy); null until the chart has loaded once
+export const revenueNow = () => { if (!st.data) return null; const ms = Object.keys(st.data.byMonth); const m = ms[ms.length - 1]; return {month: m, total: st.data.byMonth[m] || 0, cur: st.data.currency}; };
 export function revenuePanel(F){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Revenue</h2>`;
   if (!st.data) return h + (st.error ? `<p class="sub">${esc(CLIENT_ERRORS[st.error] || "Couldn't reach Chord just now.")}</p><div class="actions"><button class="btn alt small" data-rv="refresh">Try again</button></div>` : `<p class="sub">Counting it up from Chord…</p>`);

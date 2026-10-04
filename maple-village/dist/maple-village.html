@@ -1031,12 +1031,18 @@ body.kidmode .scenename span + span{display:none}
 .rtabs{flex-wrap:wrap}
 .rtoday{display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin:4px 0 12px;padding:14px 14px;border:1.5px solid rgba(120,104,84,.25);border-radius:12px;background:#FFF8EC;font-family:"Klee One",serif;font-weight:600;font-size:1.2rem;color:#2F2B28;cursor:pointer}
 .rtoday.done span:last-child{text-decoration:line-through;opacity:.6}
-.rtoday.done .tk::after{content:"";position:absolute;left:4px;top:1px;width:5px;height:9px;border:solid #2F2B28;border-width:0 2px 2px 0;transform:rotate(45deg)}
 .rweek{list-style:none;margin:0;padding:0;display:grid;gap:4px}
 .rweek li{display:grid;grid-template-columns:44px 1fr;gap:8px;padding:6px 8px;border-radius:8px;font-size:.92rem}
 .rweek li.now{background:#FFF3B8}
 .rweek li b{font-family:"Klee One",serif}
-.rcheck li{cursor:pointer}
+.rcheck{list-style:none;margin:0 0 6px;padding:0;display:grid;gap:4px}
+.rcheck li{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:8px;cursor:pointer;font-size:1rem}
+.rcheck li.on span:last-child{text-decoration:line-through;opacity:.55}
+/* one box: empty until ticked */
+.rbox{flex:none;width:20px;height:20px;border:1.8px solid #3b3530;border-radius:5px;background:#FFFDF6;position:relative}
+.rbox.on{background:#EAF3E3}
+.rbox.on::after{content:"";position:absolute;left:5px;top:1px;width:6px;height:11px;border:solid #5C8A3A;border-width:0 2.4px 2.4px 0;transform:rotate(45deg)}
+.rweek{margin-bottom:16px !important}
 .rtedit input:not([type=radio]){width:100%;box-sizing:border-box;border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:7px 10px;font:inherit;color:#2F2B28}
 .rkind{display:grid;gap:4px;margin:10px 0;font-size:.9rem}
 .rday{display:grid;grid-template-columns:44px 1fr;align-items:center;gap:8px;margin:5px 0}
@@ -1050,6 +1056,30 @@ body.kidmode .scenename span + span{display:none}
 .hbtn .ico > g:last-child,.zoombtn .ico > g:last-child,.chatbtn .ico > g:last-child,.trk .ico > g:last-child{filter:none;stroke-width:1.5}
 .hbtn .ico > g:first-child,.zoombtn .ico > g:first-child{filter:none}
 .deskh{margin:16px 0 6px}.deskh small{letter-spacing:0;text-transform:none;font-weight:400;margin-left:6px}
+
+/* Trophy room */
+.tcard{text-align:center}.tbig{display:flex;justify-content:center;margin:6px 0 4px}
+.tnext li{display:grid;grid-template-columns:1fr 90px;align-items:center;gap:10px}
+.tbook{display:grid;gap:16px;margin-top:8px}
+.tpage{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:start;padding:12px;border-radius:6px;background:#FBF6EC;border:1px solid rgba(120,104,84,.15)}
+.tpage h3{margin:0 0 4px;font-family:"Klee One",serif;font-weight:600;font-size:1.05rem}.tpage p{margin:0 0 4px;font-size:.9rem}
+.tpol{margin:0;display:flex;flex-direction:column;align-items:center;transform:rotate(-2deg)}
+.taff{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.taff li{display:grid;grid-template-columns:1fr 30px;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:#FFF8EC;font-family:"Klee One",serif;font-weight:600;font-size:1.02rem;line-height:1.4}
+.taff.kept li{background:#FAD4DC33}
+.taff .kdel{position:static;font-size:1.1rem}.taff .tkeep.on{color:var(--rose)}
+@media (max-width:420px){.tpage{grid-template-columns:96px 1fr}}
+
+/* the courtyard: sitting on the bench, pigeons pecking (and flapping off when tapped) */
+#mel.sit .legL,#mel.sit .legR,.npc.act-sit .legL,.npc.act-sit .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
+#mel.sit > .flip > g,.npc.act-sit > g{transform:translateY(7px)}
+.pigeon .phead{transform-box:fill-box;transform-origin:20% 90%;animation:peck 2.4s ease-in-out infinite;animation-delay:inherit}
+.pigeon{animation:pstroll 9s ease-in-out infinite}
+@keyframes peck{0%,55%,100%{transform:rotate(0)}65%,75%{transform:rotate(38deg) translate(1px,3px)}70%{transform:rotate(30deg) translate(1px,2px)}}
+@keyframes pstroll{0%,100%{transform:translateX(0)}50%{transform:translateX(16px)}}
+.pigeon.flap .pbody{animation:pflap 1.6s ease-in-out}
+@keyframes pflap{0%{transform:translate(0,0)}35%{transform:translate(20px,-60px)}60%{transform:translate(34px,-70px)}100%{transform:translate(0,0)}}
+@media (prefers-reduced-motion:reduce){.pigeon,.pigeon .phead{animation:none}}
 </style>
 </head>
 <body>
@@ -1751,13 +1781,14 @@ body.kidmode .scenename span + span{display:none}
   var outdoorOf = (s) => OUTDOOR.includes(s) ? s : INNER[s] ? outdoorOf(INNER[s].parent) : VILLAGE[s] ? VILLAGE[s].scene : "village";
   var INNER = {
     room: { parent: "home", door: [64, 340], arrive: [456, 400], exit: [486, 410] },
-    kidroom: { parent: "home", door: [456, 340], arrive: [70, 420], exit: [34, 410] }
+    kidroom: { parent: "home", door: [456, 340], arrive: [70, 420], exit: [34, 410] },
+    trophy: { parent: "hall", door: [64, 372], arrive: [456, 400], exit: [486, 410] }
   };
   var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
   var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
   var ROOMS = {
-    hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [448, 262], B: [110, 258], C: [420, 474], D: [334, 266], E: [118, 474], F: [362, 132] }, stations: [
-      ["kudos", "Kind words", "F", "kindboard", null, "Lovely things people have said about you.", 72],
+    hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [448, 262], B: [110, 258], C: [420, 474], D: [334, 266], E: [118, 474], R: [40, 362] }, stations: [
+      ["trophydoor", "Courtyard", "R", "trophydoor", null, "Out to the courtyard: trophies, kind words, a bench in the sun.", 0],
       ["table", "Planning table", "C", "plantable", /plan|strategy|review|ceo|goal|week|month|quarter|budget/, "Your week, month and quarter, from Notion."],
       ["whiteboard", "Whiteboard", "B", "whiteboard", /brainstorm|idea|map|outline|launch|offer|pricing/, "Fresh marker, blank board."],
       ["revenue", "Revenue chart", "D", "chartstand", /invoice|revenue|sales|finance|money|budget|pricing|accounts/, "How the money's flowing, from Chord."],
@@ -1825,6 +1856,21 @@ body.kidmode .scenename span + span{display:none}
       ["train", "Train set", "T", "trainset", null, "Choo choo!", 28],
       ["dino", "Dino eggs", "D", "dinonest", null, "What's inside the eggs?", 22],
       ["cars", "Toy cars", "C", "garage", null, "Beep beep!", 18]
+    ] },
+    // The courtyard, through the archway on the town hall's west wall: a sunny Spanish-style courtyard with a fountain,
+    // a bench, pigeons, the kind words and affirmations boards on the arcade wall, six trophy pedestals and the trophy book
+    trophy: { name: "The courtyard", wall: "#F6EEE2", trim: "#C9774D", noBoard: true, pos: { K: [132, 132], F: [388, 132], B: [260, 262], P: [80, 316], Q: [420, 316], S: [80, 462], T: [420, 470], U: [118, 606], V: [402, 606], N: [260, 604], W: [260, 452] }, stations: [
+      ["kudos", "Kind words", "K", "kindboard", null, "Lovely things people have said about you.", 72],
+      ["affirm", "Affirmations", "F", "affirmboard", null, "Today's affirmations.", 72],
+      ["tbook", "Trophy book", "B", "lectern", null, "Every trophy, with when and why.", 26],
+      ["fountain", "Fountain", "W", "fountain", null, "Make a wish.", 36],
+      ["bench", "Bench", "N", "parkbench", null, "Sit a while.", -14],
+      ["ped0", "", "P", "pedestal", null, "", 24],
+      ["ped1", "", "Q", "pedestal", null, "", 24],
+      ["ped2", "", "S", "pedestal", null, "", 24],
+      ["ped3", "", "T", "pedestal", null, "", 24],
+      ["ped4", "", "U", "pedestal", null, "", 24],
+      ["ped5", "", "V", "pedestal", null, "", 24]
     ] },
     market: { name: "Market", wall: "#F8E5E2", trim: "var(--blush)", stations: [
       ["stall", "Shop counter", "M", "shopcounter", null, "Welcome in! Have a browse."]
@@ -1996,9 +2042,9 @@ body.kidmode .scenename span + span{display:none}
     ${wallBase("#E6E9F5", "var(--peri)")}
     ${sk(
       `<path d="M44 130 v-70 a24 24 0 0 1 48 0 v70z" style="fill:var(--sky)"/><path d="M428 130 v-70 a24 24 0 0 1 48 0 v70z" style="fill:var(--sky)"/>
-      <path d="M140 20 h26 v54 l-13 -10 l-13 10z" style="fill:var(--peri)"/>`,
+      <path d="M140 20 h26 v54 l-13 -10 l-13 10z" style="fill:var(--peri)"/><path d="M354 20 h26 v54 l-13 -10 l-13 10z" style="fill:var(--peach)"/>`,
       `<path d="M44 130 v-70 a24 24 0 0 1 48 0 v70z M68 36 v94 M44 84 h48"/><path d="M428 130 v-70 a24 24 0 0 1 48 0 v70z M452 36 v94 M428 84 h48"/>
-      <path d="M140 20 h26 v54 l-13 -10 l-13 10z M134 20 h38"/><circle cx="153" cy="40" r="5"/>`
+      <path d="M140 20 h26 v54 l-13 -10 l-13 10z M134 20 h38 M354 20 h26 v54 l-13 -10 l-13 10z M348 20 h38"/><circle cx="153" cy="40" r="5"/><circle cx="367" cy="40" r="5"/>`
     )}
     ${skirting}${plant(70, 600, 1.1)}${plant(474, 610, 0.9)}`,
     // Chord workshop: wide planks with sawdust, a pegboard of tools, a factory window, crates.
@@ -2100,6 +2146,27 @@ body.kidmode .scenename span + span{display:none}
         `<rect x="398" y="46" width="92" height="70" rx="3"/><rect x="404" y="52" width="80" height="58" rx="3"/><path d="M420 92 v-14 h10 v-6 h6 v6 h6 q4 0 4 4 v10z"/><rect x="450" y="80" width="18" height="12" rx="2"/>`
       )}
     ${skirting}`;
+    },
+    // The courtyard: warm flagstones, a whitewashed arcade with terracotta tiles and pink bougainvillea, planters, lemon trees
+    trophy: () => {
+      const stones = rows(11, (r) => rows(9, (c) => {
+        const w = 52 + (r * 7 + c * 13) % 5 * 6, x = c * 60 + r % 2 * 30 - 20 + (r + c) % 3 * 3, y = 160 + r * 44 + c * 5 % 3 * 2;
+        return `<rect x="${x}" y="${y}" width="${w}" height="38" rx="9" style="fill:${["#E9DCC6", "#E3D3BA", "#EEE3D0", "#DFCDB2"][(r * 3 + c) % 4]}"/>`;
+      }));
+      const arch = (x) => `<path d="M${x - 30} 150 v-62 a30 30 0 0 1 60 0 v62z" style="fill:#E8D8C2"/><path d="M${x - 30} 150 v-62 a30 30 0 0 1 60 0 v62" fill="none" style="stroke:var(--line)" stroke-width="1.4"/>`;
+      const bloom = (x, y) => rows(7, (i) => `<circle cx="${x + Math.cos(i * 0.9) * 12 + i % 3 * 4}" cy="${y + Math.sin(i * 1.3) * 7}" r="${4 + i % 2}" style="fill:${["#E86AA0", "#F08FB4", "#D9548C"][i % 3]}"/>`);
+      return `<rect width="520" height="640" style="fill:#D6C3A6"/><g filter="url(#wob)" opacity=".95">${stones}</g>
+    <rect width="520" height="150" style="fill:#F6EEE2"/><rect y="138" width="520" height="12" style="fill:#C9774D" opacity=".85"/>
+    <g filter="url(#wob)">${[66, 196, 324, 454].map(arch).join("")}</g>
+    <g>${rows(26, (i) => `<path d="M${i * 20} 0 h20 v14 q-10 6 -20 0z" style="fill:${i % 2 ? "#C9774D" : "#B8653D"}"/>`)}</g>
+    <g>${bloom(30, 22)}${bloom(130, 18)}${bloom(262, 24)}${bloom(392, 18)}${bloom(492, 24)}</g><path d="M10 28 q40 14 80 0 t80 4 t90 -2 t90 4 t90 -4 t80 2" fill="none" style="stroke:#5C8A3A" stroke-width="2" opacity=".7"/>
+    ${sk(
+        `<rect x="10" y="168" width="44" height="120" rx="6" style="fill:#B9D2A6"/><rect x="466" y="168" width="44" height="120" rx="6" style="fill:#B9D2A6"/><rect x="190" y="560" width="22" height="18" rx="3" style="fill:#C9774D"/><rect x="308" y="560" width="22" height="18" rx="3" style="fill:#C9774D"/>`,
+        `<rect x="10" y="168" width="44" height="120" rx="6"/><rect x="466" y="168" width="44" height="120" rx="6"/><rect x="190" y="560" width="22" height="18" rx="3"/><rect x="308" y="560" width="22" height="18" rx="3"/>`
+      )}
+    <g style="fill:#7FA36E">${rows(9, (i) => `<circle cx="${20 + i % 3 * 12}" cy="${182 + Math.floor(i / 3) * 36}" r="9"/><circle cx="${476 + i % 3 * 12}" cy="${182 + Math.floor(i / 3) * 36}" r="9"/>`)}</g>
+    <g style="fill:#F3C969">${rows(4, (i) => `<circle cx="${28 + i * 6}" cy="${200 + i * 20}" r="3"/><circle cx="${484 + i * 5}" cy="${206 + i * 18}" r="3"/>`)}</g>
+    <g style="fill:#7FA36E">${[201, 319].map((x) => `<circle cx="${x}" cy="552" r="11"/><circle cx="${x - 7}" cy="546" r="7"/><circle cx="${x + 7}" cy="545" r="7"/>`).join("")}</g>`;
     },
     market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, (i) => `<path d="M0 ${170 + i * 40} H520"/>`)}${rows(24, (i) => `<path d="M${(i * 97 + i % 3 * 40) % 520} ${170 + i % 12 * 40} v40"/>`)}</g>
@@ -2440,6 +2507,255 @@ body.kidmode .scenename span + span{display:none}
     <div class="jshelf">${row2(0)}<div class="jplank"></div>${row2(1)}<div class="jplank"></div></div>
     <div class="actions"><button class="btn primary" data-jar="make">${full ? "Make a jar (shelf full)" : "Make a jar"}</button></div>
     ${full ? `<p class="muted">The shelf's full. Tap a jar to empty it or send it to your journal, then make a new one.</p>` : ""}`;
+  }
+
+  // src/game/trophies.js
+  var PEDESTALS = 6;
+  var APPS = {
+    chord: { n: "Chord", unit: "studios", col: "#7BB37A", emblem: "note" },
+    chico: { n: "Chico", unit: "families", col: "#F4A0B5", emblem: "chick" },
+    ohayo: { n: "Ohayo", unit: "users", col: "#F2A65A", emblem: "sun" },
+    luna: { n: "Luna", unit: "users", col: "#B9A6E8", emblem: "moon" }
+  };
+  var fmt = (n) => Number(n).toLocaleString("en-GB");
+  var monthName = (ym) => (/* @__PURE__ */ new Date(ym + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
+  var LOOKS = {
+    quests: { shape: "cup", col: "#E8B84A", emblem: "star" },
+    revenue: { shape: "coins", col: "#E8B84A", emblem: "coin" },
+    objweek: { shape: "rosette", col: "#5B8FD6", emblem: "check" },
+    objcount: { shape: "medal", col: "#5B8FD6", emblem: "flag" },
+    water: { shape: "medal", col: "#7FB8E8", emblem: "drop" },
+    steps: { shape: "medal", col: "#F2A65A", emblem: "shoe" },
+    maple: { shape: "plaque", col: "#EE8B3A", emblem: "fox" },
+    kind: { shape: "plaque", col: "#F4A0B5", emblem: "heart" },
+    harvest: { shape: "cup", col: "#7BB37A", emblem: "sprout" },
+    journal: { shape: "star", col: "#C9A3E8", emblem: "book" },
+    ...Object.fromEntries(Object.entries(APPS).map(([k, a]) => [k, { shape: "cup", col: a.col, emblem: a.emblem }]))
+  };
+  var TH = {
+    quests: [10, 25, 50, 100, 250, 500, 1e3, 2500],
+    app: [20, 50, 100, 250, 500, 1e3, 2500, 5e3, 1e4],
+    objcount: [5, 10, 25, 50, 100],
+    kind: [10, 25, 50, 100],
+    harvest: [10, 50, 100, 250, 500],
+    journal: [10, 50, 100, 250],
+    streak: [7, 14]
+  };
+  function reached(c) {
+    const out = [], add = (fam, id, n, label2, note2, short) => out.push({ id, fam, n, label: label2, note: note2, short });
+    TH.quests.filter((t2) => (c.F.totalQuests || 0) >= t2).forEach((t2) => add("quests", "quests-" + t2, t2, `${fmt(t2)} quests done`, `${fmt(t2)} quests finished, one tiny first step at a time.`, fmt(t2)));
+    Object.entries(APPS).forEach(([k, a]) => {
+      const s = c.ST && c.ST[k];
+      if (!s || !(s.users > 0)) return;
+      const unit = s.label || a.unit;
+      TH.app.filter((t2) => s.users >= t2).forEach((t2) => add(k, `${k}-${t2}`, t2, `${fmt(t2)} ${unit} on ${a.n}`, `${a.n} reached ${fmt(t2)} ${unit}.`, fmt(t2)));
+    });
+    if (c.revenue && c.revenue.target > 0 && c.revenue.total >= c.revenue.target)
+      add("revenue", "rev-" + c.revenue.month, c.revenue.target, `Revenue goal · ${monthName(c.revenue.month)}`, `Hit the monthly target of ${c.revenue.cur || "$"}${fmt(Math.round(c.revenue.target))} in ${monthName(c.revenue.month)}.`, monthName(c.revenue.month).split(" ")[0].slice(0, 3));
+    const objs = c.F.objDone || {}, done = Object.keys(objs).length;
+    TH.objcount.filter((t2) => done >= t2).forEach((t2) => add("objcount", "objc-" + t2, t2, `${t2} weekly objectives done`, `${t2} Sunsama weekly objectives ticked off.`, String(t2)));
+    Object.entries(c.F.objWeeks || {}).forEach(([wk, w]) => add("objweek", "objw-" + wk, w.n, `Every objective · week of ${(/* @__PURE__ */ new Date(wk + "T00:00:00Z")).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" })}`, `Every weekly objective done: ${w.titles.join("; ")}.`, "All"));
+    const hist = c.F.history || {}, days = Object.keys(hist).sort(), streak = (key) => {
+      let n = 0, best = 0, prev = null;
+      days.forEach((d) => {
+        const ok = !!key(hist[d]), next = prev && Date.parse(d) - Date.parse(prev) === 864e5;
+        n = ok ? next && n > 0 ? n + 1 : 1 : 0;
+        best = Math.max(best, n);
+        prev = d;
+      });
+      return best;
+    };
+    const wS = streak((h) => (h.water || 0) >= 2e3), sS = streak((h) => (h.steps || 0) >= 5e3);
+    TH.streak.filter((t2) => wS >= t2).forEach((t2) => add("water", "water-" + t2, t2, `${t2} days of 2L water in a row`, `Two litres of water, ${t2} days running.`, t2 + "d"));
+    TH.streak.filter((t2) => sS >= t2).forEach((t2) => add("steps", "steps-" + t2, t2, `${t2} days of 5,000 steps in a row`, `5,000 steps or more, ${t2} days running.`, t2 + "d"));
+    (c.levels || []).forEach((l, i) => {
+      if (i > 0 && i <= c.levelIndex) add("maple", "maple-" + i, i, `Maple: ${l.name}`, `Maple's friendship reached "${l.name}".`, "Lv" + i);
+    });
+    TH.kind.filter((t2) => c.kudos >= t2).forEach((t2) => add("kind", "kind-" + t2, t2, `${t2} kind words pinned`, `${t2} compliments pinned to the Kind words board.`, String(t2)));
+    TH.harvest.filter((t2) => (c.F.harvestTotal || 0) >= t2).forEach((t2) => add("harvest", "harvest-" + t2, t2, `${t2} harvests`, `${t2} crops picked from the garden.`, String(t2)));
+    TH.journal.filter((t2) => c.journal >= t2).forEach((t2) => add("journal", "journal-" + t2, t2, `${t2} journal pages`, `${t2} pages written in your journal.`, String(t2)));
+    return out;
+  }
+  function award(F2, list2) {
+    const first = !Array.isArray(F2.trophies);
+    if (first) F2.trophies = [];
+    const have = new Set(F2.trophies.map((t2) => t2.id)), now2 = Date.now(), fresh2 = [];
+    list2.forEach((m, i) => {
+      if (have.has(m.id)) return;
+      const t2 = { ...m, at: now2 + i, book: false };
+      F2.trophies.push(t2);
+      fresh2.push(t2);
+    });
+    const shown = F2.trophies.filter((t2) => !t2.book).sort((a, b) => b.at - a.at);
+    const moved = shown.slice(PEDESTALS);
+    moved.forEach((t2) => {
+      t2.book = true;
+      t2.bookAt = now2;
+    });
+    return { fresh: fresh2, first, moved };
+  }
+  var onPedestals = (F2) => (F2.trophies || []).filter((t2) => !t2.book).sort((a, b) => b.at - a.at).slice(0, PEDESTALS);
+  var inBook = (F2) => (F2.trophies || []).filter((t2) => t2.book).sort((a, b) => b.at - a.at);
+  function nextUp(c) {
+    const rows2 = [], row2 = (label2, have, need) => rows2.push({ label: label2, have, need });
+    const q = TH.quests.find((t2) => (c.F.totalQuests || 0) < t2);
+    if (q) row2(`${fmt(q)} quests`, c.F.totalQuests || 0, q);
+    Object.entries(APPS).forEach(([k2, a]) => {
+      const s = c.ST && c.ST[k2];
+      if (!s || !(s.users > 0)) return;
+      const t2 = TH.app.find((x) => s.users < x);
+      if (t2) row2(`${fmt(t2)} ${s.label || a.unit} on ${a.n}`, s.users, t2);
+    });
+    const o = TH.objcount.find((t2) => Object.keys(c.F.objDone || {}).length < t2);
+    if (o) row2(`${o} weekly objectives`, Object.keys(c.F.objDone || {}).length, o);
+    const k = TH.kind.find((t2) => c.kudos < t2);
+    if (k) row2(`${k} kind words`, c.kudos, k);
+    if (c.revenue && c.revenue.target > 0 && c.revenue.total < c.revenue.target) row2(`This month's revenue goal`, Math.round(c.revenue.total), Math.round(c.revenue.target));
+    return rows2.slice(0, 6);
+  }
+  var INK2 = "#3A2E28";
+  var sw = `stroke="${INK2}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"`;
+  function emblem(kind, x, y) {
+    switch (kind) {
+      case "star":
+        return `<path d="M${x} ${y - 7} l2.1 4.4 4.8 .6 -3.5 3.3 .9 4.8 -4.3 -2.4 -4.3 2.4 .9 -4.8 -3.5 -3.3 4.8 -.6z" fill="#FFFDF6" ${sw}/>`;
+      case "note":
+        return `<path d="M${x - 2} ${y + 5} v-11 l7 -2 v10" fill="none" ${sw}/><circle cx="${x - 4}" cy="${y + 5}" r="2.6" fill="#FFFDF6" ${sw}/><circle cx="${x + 3}" cy="${y + 3}" r="2.6" fill="#FFFDF6" ${sw}/>`;
+      case "chick":
+        return `<circle cx="${x}" cy="${y + 1}" r="6" fill="#FFE38A" ${sw}/><circle cx="${x + 1.5}" cy="${y - 1}" r=".9" fill="${INK2}"/><path d="M${x + 5} ${y + 1} l3 1 -3 1z" fill="#F2A65A" ${sw}/>`;
+      case "sun":
+        return `<circle cx="${x}" cy="${y}" r="4.5" fill="#FFE38A" ${sw}/><path d="M${x} ${y - 9} v2 M${x} ${y + 7} v2 M${x - 9} ${y} h2 M${x + 7} ${y} h2" ${sw}/>`;
+      case "moon":
+        return `<path d="M${x + 3} ${y - 7} a7 7 0 1 0 4 11 a6 6 0 0 1 -4 -11z" fill="#FFF6D6" ${sw}/>`;
+      case "coin":
+        return `<circle cx="${x}" cy="${y}" r="6.5" fill="#FFE38A" ${sw}/><path d="M${x} ${y - 3.5} v7 M${x + 2.4} ${y - 2.2} q-2.4 -1.6 -4.4 0 q-1 2 2 2.4 q3 .6 2 2.6 q-2 1.5 -4.6 0" fill="none" stroke="${INK2}" stroke-width="1.2"/>`;
+      case "check":
+        return `<path d="M${x - 5} ${y} l3.5 3.5 l7 -7" fill="none" stroke="#FFFDF6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+      case "flag":
+        return `<path d="M${x - 4} ${y + 7} v-14 l9 3 -9 4" fill="#FFFDF6" ${sw}/>`;
+      case "drop":
+        return `<path d="M${x} ${y - 7} q6 7 0 13 q-6 -6 0 -13z" fill="#DCEBF6" ${sw}/>`;
+      case "shoe":
+        return `<path d="M${x - 7} ${y + 3} v-6 h5 l2 3 q6 0 7 3 z" fill="#FFFDF6" ${sw}/>`;
+      case "fox":
+        return `<path d="M${x - 6} ${y - 5} l3 3 h6 l3 -3 v6 q-6 7 -12 0z" fill="#FFFDF6" ${sw}/><circle cx="${x - 2.4}" cy="${y}" r=".8" fill="${INK2}"/><circle cx="${x + 2.4}" cy="${y}" r=".8" fill="${INK2}"/>`;
+      case "heart":
+        return `<path d="M${x} ${y + 5} c-8 -5 -6 -12 0 -8 c6 -4 8 3 0 8z" fill="#FFFDF6" ${sw}/>`;
+      case "sprout":
+        return `<path d="M${x} ${y + 6} v-8 M${x} ${y - 1} q-6 -1 -6 -6 q5 0 6 5 M${x} ${y - 2} q5 -1 6 -6 q-5 0 -6 5" fill="#DCEFD2" ${sw}/>`;
+      case "book":
+        return `<path d="M${x - 7} ${y - 5} h6 q1 0 1 1 v10 q0 -1 -1 -1 h-6z M${x + 7} ${y - 5} h-6 q-1 0 -1 1 v10 q0 -1 1 -1 h6z" fill="#FFFDF6" ${sw}/>`;
+    }
+    return "";
+  }
+  function trophySVG(t2, size = 64) {
+    const L = LOOKS[t2.fam] || LOOKS.quests, c = L.col;
+    let top = "";
+    if (L.shape === "cup") top = `<path d="M16 10 h32 v6 q0 20 -16 22 q-16 -2 -16 -22z" fill="${c}" ${sw}/><path d="M16 14 q-9 0 -8 8 q1 7 10 7 M48 14 q9 0 8 8 q-1 7 -10 7" fill="none" ${sw}/><rect x="28" y="38" width="8" height="8" fill="${c}" ${sw}/><path d="M20 12 q2 14 8 20" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".55"/>${emblem(L.emblem, 32, 22)}`;
+    else if (L.shape === "star") top = `<path d="M32 4 l7 14 15 2 -11 10 3 15 -14 -8 -14 8 3 -15 -11 -10 15 -2z" fill="${c}" ${sw}/><rect x="29" y="40" width="6" height="6" fill="${c}" ${sw}/>${emblem(L.emblem, 32, 24)}`;
+    else if (L.shape === "medal") top = `<path d="M22 4 l8 18 M42 4 l-8 18" stroke="${c}" stroke-width="7" stroke-linecap="round"/><path d="M22 4 l8 18 M42 4 l-8 18" fill="none" stroke="${INK2}" stroke-width="1" opacity=".5"/><circle cx="32" cy="32" r="13" fill="${c}" ${sw}/><circle cx="32" cy="32" r="9.5" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity=".6"/>${emblem(L.emblem, 32, 32)}`;
+    else if (L.shape === "rosette") top = `<path d="M26 34 l-6 14 5 -2 3 5 4 -14 M38 34 l6 14 -5 -2 -3 5 -4 -14" fill="${c}" ${sw}/>${Array.from({ length: 12 }, (_, i) => {
+      const a = i * Math.PI / 6;
+      return `<circle cx="${(32 + Math.cos(a) * 12).toFixed(1)}" cy="${(24 + Math.sin(a) * 12).toFixed(1)}" r="5" fill="${c}" ${sw}/>`;
+    }).join("")}<circle cx="32" cy="24" r="10" fill="#FFFDF6" ${sw}/><circle cx="32" cy="24" r="7" fill="${c}"/>${emblem(L.emblem, 32, 24)}`;
+    else if (L.shape === "plaque") top = `<path d="M14 8 h36 v18 q0 16 -18 20 q-18 -4 -18 -20z" fill="${c}" ${sw}/><path d="M18 12 h28 v14 q0 12 -14 15 q-14 -3 -14 -15z" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity=".6"/>${emblem(L.emblem, 32, 24)}`;
+    else top = `<ellipse cx="32" cy="42" rx="16" ry="4" fill="${c}" ${sw}/><rect x="16" y="30" width="32" height="12" fill="${c}" ${sw}/><ellipse cx="32" cy="30" rx="16" ry="4" fill="${c}" ${sw}/><rect x="20" y="18" width="24" height="12" fill="${c}" ${sw}/><ellipse cx="32" cy="18" rx="12" ry="3.5" fill="${c}" ${sw}/><path d="M22 12 l4 -7 6 6 6 -6 4 7z" fill="${c}" ${sw}/>${emblem(L.emblem, 32, 25)}`;
+    const label2 = esc(String(t2.short || t2.n || "")).slice(0, 6);
+    return `<svg viewBox="0 0 64 72" width="${size}" height="${size * 72 / 64}" aria-hidden="true">${top}<path d="M18 46 h28 l3 10 h-34z" fill="#8B5E3C" ${sw}/><rect x="12" y="56" width="40" height="12" rx="2" fill="#6B4630" ${sw}/><rect x="20" y="58.5" width="24" height="7" rx="1" fill="#E8D3A8"/><text x="32" y="64.2" text-anchor="middle" font-family="Mulish, sans-serif" font-weight="800" font-size="${label2.length > 4 ? 4.6 : 5.6}" fill="${INK2}">${label2}</text></svg>`;
+  }
+  var when2 = (ms) => new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Singapore" });
+  function pedestalPanel(t2, nexts, canBook) {
+    if (!t2) return `<span class="tape gingham" aria-hidden="true"></span><h2>An empty pedestal</h2><p class="sub">Your next trophy stands here. Coming up:</p>` + (nexts.length ? `<ul class="hlist tnext">${nexts.map((r) => `<li><span><b>${esc(r.label)}</b><small>${fmt(r.have)} of ${fmt(r.need)}</small></span><span class="clbar"><i style="width:${Math.min(100, Math.round(100 * r.have / r.need))}%"></i></span></li>`).join("")}</ul>` : `<p class="muted">Keep going: quests, objectives and app milestones all earn trophies.</p>`) + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+    return `<span class="tape gingham" aria-hidden="true"></span><div class="tcard"><div class="tbig">${trophySVG(t2, 150)}</div><h2>${esc(t2.label)}</h2><p class="sub">${esc(t2.note)}</p><p class="muted">Earned ${esc(when2(t2.at))}</p></div>
+    <div class="actions">${canBook ? `<button class="btn primary small" data-tr="book" data-id="${esc(t2.id)}">Put it in the trophy book</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function bookPanel(F2, free) {
+    const pages = inBook(F2);
+    return `<span class="tape stripe" aria-hidden="true"></span><h2>The trophy book</h2><p class="sub">Every trophy that's stepped off its pedestal, with when and why.</p>` + (pages.length ? `<div class="tbook">${pages.map((t2) => `<article class="tpage"><figure class="polaroid tpol">${trophySVG(t2, 92)}<figcaption>${esc(t2.short || "")}</figcaption></figure><div><h3>${esc(t2.label)}</h3><p>${esc(t2.note)}</p><p class="muted">Earned ${esc(when2(t2.at))}</p>${free ? `<button class="btn alt small" data-tr="unbook" data-id="${esc(t2.id)}">Back on a pedestal</button>` : ""}</div></article>`).join("")}</div>` : `<p class="muted">No pages yet. When the pedestals fill up, the oldest trophy steps into the book.</p>`) + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function wireTrophies(root, F2, api4) {
+    root.querySelectorAll("[data-tr]").forEach((b) => b.onclick = () => {
+      const t2 = (F2.trophies || []).find((x) => x.id === b.dataset.id);
+      if (!t2) return;
+      if (b.dataset.tr === "book") {
+        t2.book = true;
+        t2.bookAt = Date.now();
+        api4.save();
+        api4.undoable("Into the trophy book", () => {
+          t2.book = false;
+          api4.save();
+          api4.rerender();
+        });
+        api4.close();
+      }
+      if (b.dataset.tr === "unbook" && onPedestals(F2).length < PEDESTALS) {
+        t2.book = false;
+        api4.save();
+        api4.rerender();
+      }
+    });
+  }
+  var BASE = [
+    "I build things that help people, and it shows.",
+    "I can do hard things and still be gentle with myself.",
+    "Small steps every day add up to big change.",
+    "I'm allowed to rest. Rest is part of the work.",
+    "My ideas are worth sharing.",
+    "I'm a good mum and a good founder, both at once.",
+    "I don't have to do it all today. Just the next thing.",
+    "Clients come back because I care.",
+    "Progress, not perfection.",
+    "I trust myself to figure it out.",
+    "My voice is clear and it matters.",
+    "I'm proud of how far I've come.",
+    "Today I choose calm over rush.",
+    "I'm building something that lasts.",
+    "Good things are on their way to me.",
+    "I keep my promises to myself.",
+    "I am creative, capable and kind.",
+    "Every 'no' makes room for the right 'yes'.",
+    "I celebrate my wins, even the tiny ones.",
+    "My family and my work both get the best of me, in turn."
+  ];
+  function dailyAffirmations(day = dayKey()) {
+    const n = Math.floor(Date.parse(day + "T00:00:00Z") / 864e5), out = [];
+    for (let i = 0; out.length < 5; i++) {
+      const a = BASE[(n * 7 + i * 3) % BASE.length];
+      if (!out.includes(a)) out.push(a);
+    }
+    return out;
+  }
+  function affirmPanel(A2, busy2, canWrite) {
+    const list2 = A2 && A2.day === dayKey() && A2.items && A2.items.length ? A2.items : dailyAffirmations();
+    return `<span class="tape dots" aria-hidden="true"></span><h2>Affirmations</h2><p class="sub">Today's, fresh every morning. Read one out loud.</p>
+    <ul class="taff">${list2.map((a, i) => `<li><span>${esc(a)}</span><button class="kdel tkeep${(A2 && A2.kept || []).includes(a) ? " on" : ""}" data-af="keep" data-i="${i}" aria-label="Keep this one">♡</button></li>`).join("")}</ul>
+    ${A2 && A2.kept && A2.kept.length ? `<p class="eyebrow" style="margin-top:14px">Ones you kept</p><ul class="taff kept">${A2.kept.map((a, i) => `<li><span>${esc(a)}</span><button class="kdel" data-af="unkeep" data-i="${i}" aria-label="Let this one go">×</button></li>`).join("")}</ul>` : ""}
+    <div class="actions">${canWrite ? `<button class="btn alt small" data-af="fresh" ${busy2 ? "disabled" : ""}>${busy2 ? "Writing…" : "Write me new ones"}</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function wireAffirm(root, A2, list2, api4) {
+    root.querySelectorAll("[data-af]").forEach((b) => b.onclick = () => {
+      const k = b.dataset.af;
+      A2.kept = A2.kept || [];
+      if (k === "keep") {
+        const a = list2[+b.dataset.i];
+        if (a && !A2.kept.includes(a)) A2.kept.unshift(a);
+        else A2.kept = A2.kept.filter((x) => x !== a);
+        A2.kept = A2.kept.slice(0, 30);
+        api4.save();
+        api4.rerender();
+      }
+      if (k === "unkeep") {
+        const [gone] = A2.kept.splice(+b.dataset.i, 1);
+        api4.save();
+        api4.undoable("Affirmation let go", () => {
+          A2.kept.unshift(gone);
+          api4.save();
+          api4.rerender();
+        });
+        api4.rerender();
+      }
+      if (k === "fresh") api4.fresh();
+    });
   }
 
   // src/art/buildings.js
@@ -2816,6 +3132,42 @@ body.kidmode .scenename span + span{display:none}
           `<rect x="${x - 46}" y="${y - 116}" width="92" height="92" rx="4" style="fill:#FFFDF6"/><rect x="${x - 38}" y="${y - 104}" width="36" height="44" rx="1" transform="rotate(-3 ${x - 20} ${y - 82})" style="fill:#D6E8F7"/><rect x="${x + 2}" y="${y - 102}" width="36" height="48" rx="1" transform="rotate(2 ${x + 20} ${y - 78})" style="fill:#FAD4DC"/><rect x="${x - 24}" y="${y - 56}" width="48" height="26" rx="1" style="fill:#FFF3B8"/>`,
           `<rect x="${x - 46}" y="${y - 116}" width="92" height="92" rx="4"/><path d="M${x - 32} ${y - 92} h22 M${x - 32} ${y - 84} h18 M${x - 32} ${y - 76} h22 M${x + 8} ${y - 90} h22 M${x + 8} ${y - 82} h18 M${x + 8} ${y - 74} h22 M${x + 8} ${y - 66} h14 M${x - 16} ${y - 46} h30 M${x - 16} ${y - 38} h22" opacity=".55"/><path d="M${x - 36} ${y - 93} l2 2 l4 -4"/><circle cx="${x - 20}" cy="${y - 104}" r="2" style="fill:var(--rose)"/><circle cx="${x + 20}" cy="${y - 102}" r="2" style="fill:var(--peri2)"/><circle cx="${x}" cy="${y - 56}" r="2" style="fill:var(--honey)"/>`
         );
+      // the trophy room: its door in the town hall, the affirmations board, the book on its lectern, pedestals
+      // an open archway in the town hall's west wall, sunlit courtyard and greenery beyond
+      case "trophydoor":
+        return sk(
+          `<path d="M${x - 40} ${y - 104} q14 -12 28 -4 L${x - 12} ${y + 4} L${x - 40} ${y + 14}z" style="fill:#F3E3B8"/><path d="M${x - 40} ${y - 20} q8 -10 14 -2 q6 -9 14 0 L${x - 12} ${y + 4} L${x - 40} ${y + 14}z" style="fill:#9EBE8C"/><circle cx="${x - 28}" cy="${y - 62}" r="5" style="fill:#F08FB4"/><circle cx="${x - 20}" cy="${y - 70}" r="4" style="fill:#E86AA0"/>`,
+          `<path d="M${x - 40} ${y - 104} q14 -12 28 -4 L${x - 12} ${y + 4} L${x - 40} ${y + 14}z"/><path d="M${x - 44} ${y - 106} q16 -14 34 -4" />`
+        );
+      case "fountain":
+        return sk(
+          `<ellipse cx="${x}" cy="${y - 14}" rx="58" ry="20" style="fill:#D9D2C6"/><ellipse cx="${x}" cy="${y - 18}" rx="48" ry="14" style="fill:#9CC3E0"/><rect x="${x - 7}" y="${y - 58}" width="14" height="40" style="fill:#D9D2C6"/><ellipse cx="${x}" cy="${y - 58}" rx="22" ry="7" style="fill:#D9D2C6"/><ellipse cx="${x}" cy="${y - 60}" rx="16" ry="4" style="fill:#9CC3E0"/>`,
+          `<ellipse cx="${x}" cy="${y - 14}" rx="58" ry="20"/><path d="M${x - 58} ${y - 14} v8 a58 20 0 0 0 116 0 v-8"/><ellipse cx="${x}" cy="${y - 18}" rx="48" ry="14"/><rect x="${x - 7}" y="${y - 58}" width="14" height="40"/><ellipse cx="${x}" cy="${y - 58}" rx="22" ry="7"/>
+        <path class="smoke" d="M${x} ${y - 66} q-10 -14 -20 4 M${x} ${y - 66} q10 -14 20 4 M${x} ${y - 68} v-10" opacity=".75" style="stroke:#7FB8E8"/>`
+        );
+      case "parkbench":
+        return sk(
+          `<rect x="${x - 52}" y="${y - 44}" width="104" height="10" rx="3" style="fill:var(--wood)"/><rect x="${x - 56}" y="${y - 22}" width="112" height="10" rx="3" style="fill:var(--wood)"/>`,
+          `<rect x="${x - 52}" y="${y - 44}" width="104" height="10" rx="3"/><path d="M${x - 44} ${y - 34} v12 M${x + 44} ${y - 34} v12"/><rect x="${x - 56}" y="${y - 22}" width="112" height="10" rx="3"/><path d="M${x - 48} ${y - 12} v14 M${x + 48} ${y - 12} v14"/>`
+        );
+      case "affirmboard":
+        return sk(
+          `<rect x="${x - 50}" y="${y - 116}" width="100" height="92" rx="4" style="fill:#FFFDF6"/><circle cx="${x}" cy="${y - 96}" r="9" style="fill:#FFE38A"/>`,
+          `<rect x="${x - 50}" y="${y - 116}" width="100" height="92" rx="4"/><path d="M${x} ${y - 110} v-3 M${x} ${y - 79} v-3 M${x - 15} ${y - 96} h3 M${x + 12} ${y - 96} h3"/><circle cx="${x}" cy="${y - 96}" r="9"/><path d="M${x - 36} ${y - 70} q8 -5 16 0 t16 0 t16 0 t16 0 M${x - 36} ${y - 56} q8 -5 16 0 t16 0 t16 0 M${x - 36} ${y - 42} q8 -5 16 0 t16 0 t16 0 t16 0" opacity=".6"/>`
+        );
+      case "lectern":
+        return sk(
+          `<path d="M${x - 30} ${y - 62} h60 l-8 18 h-44z" style="fill:var(--wood)"/><path d="M${x - 8} ${y - 44} h16 v38 h-16z" style="fill:var(--wood)"/><path d="M${x - 26} ${y - 6} h52 v6 h-52z" style="fill:#8B5E3C"/>
+        <path d="M${x - 36} ${y - 66} q18 -10 36 -4 q18 -6 36 4 l-2 8 q-17 -8 -34 -2 q-17 -6 -34 2z" style="fill:#FFFDF6"/><path d="M${x - 38} ${y - 62} q19 -6 38 -1 q19 -5 38 1 l0 4 q-19 -6 -38 -1 q-19 -5 -38 1z" style="fill:#8E2C48"/>`,
+          `<path d="M${x - 30} ${y - 62} h60 l-8 18 h-44z"/><path d="M${x - 8} ${y - 44} h16 v38 h-16z"/><path d="M${x - 26} ${y - 6} h52 v6 h-52z"/><path d="M${x - 36} ${y - 66} q18 -10 36 -4 q18 -6 36 4 M${x} ${y - 70} v8"/><path d="M${x - 28} ${y - 68} h20 M${x + 8} ${y - 68} h20" opacity=".5"/><path d="M${x + 20} ${y - 64} v10 l3 -2 l3 2 v-10" style="fill:var(--honey)"/>`
+        );
+      case "pedestal": {
+        const t2 = G.ped ? G.ped(x, y) : null;
+        return sk(
+          `<rect x="${x - 30}" y="${y - 62}" width="60" height="10" rx="2" style="fill:#F3EEE6"/><rect x="${x - 24}" y="${y - 52}" width="48" height="44" style="fill:#EAE3D8"/><rect x="${x - 30}" y="${y - 8}" width="60" height="8" rx="2" style="fill:#F3EEE6"/>`,
+          `<rect x="${x - 30}" y="${y - 62}" width="60" height="10" rx="2"/><rect x="${x - 24}" y="${y - 52}" width="48" height="44"/><path d="M${x - 14} ${y - 50} v40 M${x} ${y - 50} v40 M${x + 14} ${y - 50} v40" opacity=".35"/><rect x="${x - 30}" y="${y - 8}" width="60" height="8" rx="2"/>`
+        ) + (t2 ? trophySVG(t2, 64).replace("<svg ", `<svg x="${x - 32}" y="${y - 62 - 72}" class="ptrophy" `) : `<ellipse cx="${x}" cy="${y - 64}" rx="16" ry="3" fill="#000" opacity=".06"/>`);
+      }
       case "kindboard": {
         const n = G.kudos ? G.kudos() : 0, cols = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
         const spots = [[-36, -98], [-8, -102], [20, -97], [-30, -70], [0, -66], [26, -72], [-20, -44], [12, -44]];
@@ -3025,7 +3377,8 @@ body.kidmode .scenename span + span{display:none}
       `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`
     ) + `<g>${[["apple", "dumpling", "fish", "toast"], ["tulip", "carrot", "strawberry", "sunflower"]].map((row2, r2) => row2.map((n, i) => iconAt(n, 64 + i * 30, 62 + r2 * 38, 26)).join("")).join("")}${[["yarn", "ball", "brush", "crown"], ["bath", "fort", "corn", "blueberry"]].map((row2, r2) => row2.map((n, i) => iconAt(n, 374 + i * 30, 62 + r2 * 38, 26)).join("")).join("")}</g>`;
     st6.forEach((s) => {
-      h += `<g data-spot="${s.id}" aria-label="${s.name}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${tapeLabel(s.x, s.y + 24, s.name, "var(--card)")}</g>`;
+      const nm = s.kind === "pedestal" ? (G.ped && G.ped(s.x, s.y) || {}).label || "" : s.name;
+      h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? tapeLabel(s.x, s.y + 24, nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)", s.kind === "pedestal" ? 10 : void 0) : ""}</g>`;
     });
     if (id === "kidroom") {
       const k = G.kid ? G.kid() : {};
@@ -3033,6 +3386,16 @@ body.kidmode .scenename span + span{display:none}
       ${sk(`<path d="M0 346 L28 358 L28 456 L0 466z" style="fill:#F7D35A"/>`, `<path d="M0 346 L28 358 L28 456 L0 466z"/><circle cx="23" cy="410" r="1.8"/>`)}
       ${tapeLabel(50, 492, "To the house", "var(--card)", 11)}</g>`;
       if (k.sleep) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".34" pointer-events="none"/>`;
+      return h;
+    }
+    if (id === "trophy") {
+      h += `<g data-exit="1" aria-label="Back to the town hall"><ellipse class="hov" cx="486" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
+      ${sk(`<path d="M520 346 q-16 -6 -28 8 L492 456 L520 466z" style="fill:#E6E9F5"/>`, `<path d="M520 346 q-16 -6 -28 8 L492 456 L520 466z"/>`)}${tapeLabel(462, 486, "To the town hall", "var(--card)", 11)}</g>`;
+      const pigeon = (x, y, d, flip) => `<g data-pigeon="1" class="pigeon" style="--px:${x}px;--py:${y}px;animation-delay:-${d}s"><g transform="translate(${x} ${y}) scale(${flip ? -1 : 1} 1)"><g class="pbody">
+      <ellipse cx="0" cy="-6" rx="9" ry="6" fill="#A7A9B4" stroke="#3A2E28" stroke-width="1.1"/><path d="M-8 -8 q-6 -1 -9 3 q5 1 9 0z" fill="#8E909C" stroke="#3A2E28" stroke-width="1"/>
+      <g class="phead"><circle cx="8" cy="-12" r="4.2" fill="#8E909C" stroke="#3A2E28" stroke-width="1.1"/><path d="M8.5 -9.5 q2 1 3 -0.5" fill="#7BB37A" stroke="none"/><circle cx="9.4" cy="-13" r=".9" fill="#3A2E28"/><path d="M12 -12 l2.6 .8 -2.6 .6z" fill="#E3A27E"/></g>
+      <path d="M-1 0 v3 M3 0 v3" stroke="#E3A27E" stroke-width="1.3"/></g></g></g>`;
+      h += pigeon(196, 520, 0, false) + pigeon(352, 538, 1.7, true) + pigeon(300, 330, 3.1, false);
       return h;
     }
     if (id === "room") {
@@ -3277,7 +3640,7 @@ body.kidmode .scenename span + span{display:none}
       job: "Retired postmaster, unofficial well-keeper",
       intro: "Okada. Forty years delivering letters. Retired now, but I still can't stop sorting things. Even the pebbles by the well.",
       look: { skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses" },
-      routine: [slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "17:00", "village", [[176, 352], [146, 360], [170, 372]]), slot("17:00", "19:30", "village", [322, 566])],
+      routine: [slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[176, 352], [146, 360], [170, 372]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[176, 352], [146, 360], [170, 372]]), slot("17:00", "19:30", "village", [322, 566])],
       lines: [
         "Letters used to come in sacks. Now it's all on your little phone.",
         "The well water is sweeter in the afternoon. Don't ask me why.",
@@ -3297,7 +3660,7 @@ body.kidmode .scenename span + span{display:none}
       routine: [
         slot("8:30", "13:00", "fresh", [[160, 300], [330, 300], [240, 330]]),
         slot("13:00", "15:30", "fresh", [356, 330]),
-        slot("15:30", "16:00", "village", [[120, 300], [160, 316]]),
+        slot("15:30", "16:00", "trophy", [292, 590], { act: "sit" }),
         slot("16:00", "18:00", "fresh", [[90, 330], [180, 330], [140, 312]])
       ],
       lines: [
@@ -3368,7 +3731,7 @@ body.kidmode .scenename span + span{display:none}
       job: "Town hall clerk",
       intro: "Theo, town clerk. I keep the village records. And, if you have a moment, I have a stamp collection you would not believe.",
       look: { skin: "#F0D0B4", hair: "#6B4A2E", hairStyle: "short", top: "#C3CDEE", bottom: "#3A3A48", extra: "tie" },
-      routine: [slot("9:00", "12:00", "hall", [[200, 320], [330, 320]]), slot("12:00", "13:00", "village", [330, 572]), slot("13:00", "17:00", "hall", [[200, 320], [330, 320]])],
+      routine: [slot("9:00", "12:00", "hall", [[200, 320], [330, 320]]), slot("12:00", "13:00", "trophy", [228, 590], { act: "sit" }), slot("13:00", "17:00", "hall", [[200, 320], [330, 320]])],
       lines: [
         "Records say you've been busy. I'm very proud. Officially.",
         "This stamp is from 1962. Look at the little bird!",
@@ -4354,14 +4717,14 @@ Quests finished today: ${S3.doneIds.length}`;
     return list2.filter((t2) => t2 && t2._id && t2.title && !t2.deleted && !t2.isArchived && !t2.isBacklogged).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map(toQuest);
   }
   async function pullSunsama(day, opts = {}) {
-    let mcp2 = null;
+    let mcp3 = null;
     try {
-      mcp2 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp2) return { error: "unavailable" };
+    if (!mcp3) return { error: "unavailable" };
     try {
-      const res = await mcp2.callTool(SUNSAMA, "read_resource", { uri: `sunsama://tasks/${day}` }, { cache: { staleTime: opts.fresh ? 0 : 6e4, refresh: !!opts.fresh } });
+      const res = await mcp3.callTool(SUNSAMA, "read_resource", { uri: `sunsama://tasks/${day}` }, { cache: { staleTime: opts.fresh ? 0 : 6e4, refresh: !!opts.fresh } });
       let p = res && res.payload;
       if (typeof p === "string") {
         try {
@@ -4402,16 +4765,16 @@ Quests finished today: ${S3.doneIds.length}`;
   var cache = { day: "", at: 0, events: [], error: null };
   async function todaysEvents(day, fresh2) {
     if (!fresh2 && cache.day === day && Date.now() - cache.at < 5 * 6e4) return cache;
-    let mcp2 = null;
+    let mcp3 = null;
     try {
-      mcp2 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp2) return cache = { day, at: Date.now(), events: [], error: "unavailable" };
+    if (!mcp3) return cache = { day, at: Date.now(), events: [], error: "unavailable" };
     const startTime = `${day}T00:00:00+08:00`, end = new Date(Date.parse(startTime) + 864e5).toISOString().replace(".000Z", "Z");
     const results = await Promise.all(CALENDARS.map(async (c) => {
       try {
-        const r = await mcp2.callTool(GCAL, "list_events", { calendarId: c.id, startTime, endTime: end, orderBy: "startTime", timeZone: "Asia/Singapore", pageSize: 60 }, { cache: { staleTime: fresh2 ? 0 : 12e4, refresh: !!fresh2 } });
+        const r = await mcp3.callTool(GCAL, "list_events", { calendarId: c.id, startTime, endTime: end, orderBy: "startTime", timeZone: "Asia/Singapore", pageSize: 60 }, { cache: { staleTime: fresh2 ? 0 : 12e4, refresh: !!fresh2 } });
         let p = r && r.payload;
         if (typeof p === "string") {
           try {
@@ -4558,15 +4921,15 @@ Quests finished today: ${S3.doneIds.length}`;
   var cache2 = { at: 0, threads: [], error: null, busy: false };
   async function fetchPost(fresh2) {
     if (cache2.busy || !fresh2 && Date.now() - cache2.at < 2 * 6e4) return cache2;
-    let mcp2 = null;
+    let mcp3 = null;
     try {
-      mcp2 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp2) return cache2 = { at: Date.now(), threads: [], error: "unavailable", busy: false };
+    if (!mcp3) return cache2 = { at: Date.now(), threads: [], error: "unavailable", busy: false };
     cache2.busy = true;
     try {
-      const r = await mcp2.callTool(GMAIL, "search_threads", { query: "is:unread in:inbox category:primary", pageSize: 15, view: "THREAD_VIEW_MINIMAL" }, { cache: { staleTime: fresh2 ? 0 : 6e4, refresh: !!fresh2 } });
+      const r = await mcp3.callTool(GMAIL, "search_threads", { query: "is:unread in:inbox category:primary", pageSize: 15, view: "THREAD_VIEW_MINIMAL" }, { cache: { staleTime: fresh2 ? 0 : 6e4, refresh: !!fresh2 } });
       let p = r && r.payload;
       if (typeof p === "string") {
         try {
@@ -4593,7 +4956,6 @@ Quests finished today: ${S3.doneIds.length}`;
     return cache2;
   }
   var postCount = () => cache2.threads.length;
-  var postThreads = () => cache2;
   var ago = (ms) => {
     const m = Math.round((Date.now() - ms) / 6e4);
     return m < 60 ? `${Math.max(1, m)}m` : m < 1440 ? `${Math.round(m / 60)}h` : `${Math.round(m / 1440)}d`;
@@ -4622,7 +4984,7 @@ Quests finished today: ${S3.doneIds.length}`;
   }
 
   // src/game/feeds.js
-  var APPS = { chord: { name: "Chord", room: "chord" }, chico: { name: "Chico", room: "chico" } };
+  var APPS2 = { chord: { name: "Chord", room: "chord" }, chico: { name: "Chico", room: "chico" } };
   var BRANDS = { chord: { name: "Chord", color: "var(--sage)" }, ambidextrous: { name: "Ambidextrous", color: "var(--peri)" } };
   var DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
   var KEY3 = "fox.feeds";
@@ -4662,7 +5024,7 @@ Quests finished today: ${S3.doneIds.length}`;
     return m < 60 ? `${Math.max(1, m)} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago`;
   };
   function healthPanel(app) {
-    const a = APPS[app], h = health(app);
+    const a = APPS2[app], h = health(app);
     let s = `<span class="tape stripe" aria-hidden="true"></span><h2>${a.name} health</h2>`;
     if (!h) return s + `<p class="sub">No report yet. When the ${a.name} nightly bug check runs, its results land here.</p>`;
     const word = { green: "All good", amber: "Keep an eye on it", red: "Needs you", grey: "Unknown" }[h.status];
@@ -5517,19 +5879,19 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
   async function readPlan(level2, opts = {}) {
     const title = planTitles()[level2];
     if (!title) return { level: level2, error: "unknown level" };
-    let mcp2 = null;
+    let mcp3 = null;
     try {
-      mcp2 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp2) return { level: level2, title, error: "unavailable" };
+    if (!mcp3) return { level: level2, title, error: "unavailable" };
     const cache3 = { staleTime: 30 * 6e4 }, signal = opts.signal;
     try {
-      const s = unwrap(await mcp2.callTool(NOTION, "notion-search", { query: title, data_source_url: PLANS_DS, page_size: 5 }, { cache: cache3, signal }));
+      const s = unwrap(await mcp3.callTool(NOTION, "notion-search", { query: title, data_source_url: PLANS_DS, page_size: 5 }, { cache: cache3, signal }));
       const list2 = s && Array.isArray(s.results) ? s.results : [];
       const hit = list2.find((x) => x && String(x.title || "").trim() === title) || null;
       if (!hit) return { level: level2, title, error: "not found" };
-      const page = unwrap(await mcp2.callTool(NOTION, "notion-fetch", { id: hit.id || hit.url }, { cache: cache3, signal }));
+      const page = unwrap(await mcp3.callTool(NOTION, "notion-fetch", { id: hit.id || hit.url }, { cache: cache3, signal }));
       const raw = typeof page === "string" ? page : page && (page.text || "") || "", pm = /<properties>\s*(\{[\s\S]*?\})\s*<\/properties>/.exec(raw);
       let props2 = {};
       try {
@@ -5570,9 +5932,9 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     }
   }
   async function call(tool, input, fresh2) {
-    const mcp2 = await mcpUse();
-    if (!mcp2) throw { code: "unavailable" };
-    return unwrap2(await mcp2.callTool(CHORD, tool, input || {}, { cache: { staleTime: fresh2 ? 0 : 5 * 6e4, refresh: !!fresh2 } }));
+    const mcp3 = await mcpUse();
+    if (!mcp3) throw { code: "unavailable" };
+    return unwrap2(await mcp3.callTool(CHORD, tool, input || {}, { cache: { staleTime: fresh2 ? 0 : 5 * 6e4, refresh: !!fresh2 } }));
   }
   var CLIENT_ERRORS = {
     unavailable: "Chord isn't reachable from this view.",
@@ -5597,7 +5959,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     st.busy = false;
   }
   var t = (s, n = 90) => esc(plain(String(s ?? "")).slice(0, n));
-  var when2 = (d) => {
+  var when3 = (d) => {
     if (!d) return "";
     const x = /* @__PURE__ */ new Date(d + "T00:00:00Z");
     return isNaN(x) ? t(d, 20) : x.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
@@ -5615,7 +5977,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     const ps = st.snap.projects;
     h += `<p class="eyebrow">Active projects</p>` + (ps.length ? `<ul class="hlist clprojects">${ps.slice(0, 20).map((p) => {
       const pct = p.tasks_total ? Math.round(100 * p.tasks_done / p.tasks_total) : 0;
-      return `<li><span><b>${t(p.name, 70)}</b><small>${t(p.client, 40)}${p.category ? " · " + t(p.category, 20) : ""}${p.due ? " · due " + when2(p.due) : ""}${p.key_date ? ` · ${t(p.key_date_label || "key date", 20)} ${when2(p.key_date)}` : ""}</small>
+      return `<li><span><b>${t(p.name, 70)}</b><small>${t(p.client, 40)}${p.category ? " · " + t(p.category, 20) : ""}${p.due ? " · due " + when3(p.due) : ""}${p.key_date ? ` · ${t(p.key_date_label || "key date", 20)} ${when3(p.key_date)}` : ""}</small>
       ${p.tasks_total ? `<span class="clbar"><i style="width:${pct}%"></i></span><small>${p.tasks_done}/${p.tasks_total} tasks</small>` : ""}</span></li>`;
     }).join("")}</ul>` : `<p class="muted">No active projects right now.</p>`);
     const att = st.snap.attention;
@@ -5849,13 +6211,13 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     return p;
   };
   async function call2(tool, input, fresh2) {
-    let mcp2 = null;
+    let mcp3 = null;
     try {
-      mcp2 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp2) throw { code: "unavailable" };
-    return unwrap3(await mcp2.callTool(CHORD, tool, input, { cache: { staleTime: fresh2 ? 0 : 10 * 6e4, refresh: !!fresh2 } }));
+    if (!mcp3) throw { code: "unavailable" };
+    return unwrap3(await mcp3.callTool(CHORD, tool, input, { cache: { staleTime: fresh2 ? 0 : 10 * 6e4, refresh: !!fresh2 } }));
   }
   var st3 = { data: null, busy: false, error: null, editing: false };
   var monthKey = (d) => String(d || "").slice(0, 7);
@@ -5903,6 +6265,12 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     const tl = target ? `<path d="M${L} ${y(target)} H${W2 - L}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W2 - L}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money(target, d.currency)}</text>` : "";
     return `<svg class="rchart" viewBox="0 0 ${W2} ${H3}" role="img" aria-label="Paid income by month, last six months"><path d="M${L} ${B} H${W2 - L}" stroke="#D8CFC2" stroke-width="1"/>${bars}${tl}</svg>`;
   }
+  var revenueNow = () => {
+    if (!st3.data) return null;
+    const ms = Object.keys(st3.data.byMonth);
+    const m = ms[ms.length - 1];
+    return { month: m, total: st3.data.byMonth[m] || 0, cur: st3.data.currency };
+  };
   function revenuePanel(F2) {
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Revenue</h2>`;
     if (!st3.data) return h + (st3.error ? `<p class="sub">${esc(CLIENT_ERRORS[st3.error] || "Couldn't reach Chord just now.")}</p><div class="actions"><button class="btn alt small" data-rv="refresh">Try again</button></div>` : `<p class="sub">Counting it up from Chord…</p>`);
@@ -6071,14 +6439,14 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     keepJ();
     pushJ();
   }
-  var when3 = (e) => new Date(e.at).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Singapore" });
+  var when4 = (e) => new Date(e.at).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Singapore" });
   function journalPanel(decompress) {
     const list2 = live().slice(0, 12);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>My journal</h2>
     <p class="sub">${decompress ? "Three quick points from that call or moment. Then let it go." : esc(journalPrompt())}</p>
     <form id="jForm" class="jform"><label class="sr" for="jText">Journal entry</label><textarea id="jText" rows="6" maxlength="8000" placeholder="${decompress ? "1.\n2.\n3." : "Write anything..."}">${esc(draft)}</textarea>
     <div class="actions"><button class="btn primary small" type="submit">Keep this page</button></div></form>`;
-    if (list2.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list2.map((e) => `<details${e.kind === "jar" ? " open" : ""}><summary><b>${when3(e)}</b> ${e.kind === "jar" ? "A jar of " + esc(e.jar.label) : esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary>${e.kind === "jar" ? `<div class="polaroid"><div class="pphoto">${jarSVG(e.jar, 74)}</div><p class="pcap">${esc(new Date(e.jar.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" }))}</p></div>${e.jar.blobs && e.text !== e.jar.label ? `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>` : ""}` : `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>`}<button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
+    if (list2.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list2.map((e) => `<details${e.kind === "jar" ? " open" : ""}><summary><b>${when4(e)}</b> ${e.kind === "jar" ? "A jar of " + esc(e.jar.label) : esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary>${e.kind === "jar" ? `<div class="polaroid"><div class="pphoto">${jarSVG(e.jar, 74)}</div><p class="pcap">${esc(new Date(e.jar.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" }))}</p></div>${e.jar.blobs && e.text !== e.jar.label ? `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>` : ""}` : `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>`}<button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
     return h;
   }
   function wireJournal(root, undoable2, done) {
@@ -6109,6 +6477,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       });
     });
   }
+  var journalCount = () => live().length;
   function scratchPanel() {
     const ago4 = SC.updatedAt ? Math.round((Date.now() - SC.updatedAt) / 6e4) : null;
     return `<span class="tape stripe" aria-hidden="true"></span><h2>Scratchpad</h2><p class="sub">Jot anything down. It saves as you type, and it's only yours.</p>
@@ -6139,6 +6508,272 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
         rerender();
       });
     };
+  }
+
+  // src/game/vision.js
+  var VIS_DS = "ba8f40af-fcf2-4fe5-8831-71cbe1232dd9";
+  var QUESTIONS = [
+    "Close your eyes for a second. It's next Friday afternoon and the week went beautifully. What's the first thing you feel?",
+    "What happened this week that made it feel that way? What's the one thing you're most proud of?",
+    "Who were you in this week? How did you show up: as founder, as mum, as Mel?",
+    "Where did your energy flow easiest? And what did you protect it from?",
+    "Is there anything you're calling in this week? Something you're ready to receive, even if you can't control it?",
+    "If this week had one word, a feeling to return to when things wobble, what is it?"
+  ];
+  var vz = { step: "menu", answers: [], reflect: "", look: null, lookA: "", month: "", sum: null, pick: [], busy: false, error: "", draft: "", saved: null };
+  var unwrap4 = (r) => {
+    let p = r && r.payload !== void 0 ? r.payload : r;
+    if (typeof p === "string") {
+      try {
+        p = JSON.parse(p);
+      } catch {
+      }
+    }
+    if (p && Array.isArray(p.content) && p.content[0] && typeof p.content[0].text === "string") {
+      try {
+        return JSON.parse(p.content[0].text);
+      } catch {
+        return p.content[0].text;
+      }
+    }
+    return p;
+  };
+  async function mcp() {
+    try {
+      return window.claude && claude.use ? await claude.use("mcp") : null;
+    } catch {
+      return null;
+    }
+  }
+  var SG = 8 * 36e5;
+  var iso = (ms) => new Date(ms).toISOString().slice(0, 10);
+  var comingMonday = () => {
+    const t2 = Date.parse(dayKey() + "T00:00:00Z"), dow2 = new Date(t2).getUTCDay();
+    return iso(t2 + ((8 - dow2) % 7 || 7) * 864e5);
+  };
+  var nice = (d) => (/* @__PURE__ */ new Date(d + "T00:00:00Z")).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+  async function lastVision() {
+    const m = await mcp();
+    if (!m) return null;
+    try {
+      const s = unwrap4(await m.callTool(NOTION, "notion-search", { query: "Week of", data_source_url: "collection://" + VIS_DS, page_size: 5 }, { cache: { staleTime: 30 * 6e4 } }));
+      const hits = s && Array.isArray(s.results) ? s.results : [];
+      let best = null;
+      for (const h of hits.slice(0, 3)) {
+        const page = unwrap4(await m.callTool(NOTION, "notion-fetch", { id: h.id || h.url }, { cache: { staleTime: 30 * 6e4 } }));
+        const raw = typeof page === "string" ? page : page && page.text || "", pm = /<properties>\s*(\{[\s\S]*?\})\s*<\/properties>/.exec(raw);
+        let p = {};
+        try {
+          p = pm ? JSON.parse(pm[1]) : {};
+        } catch {
+        }
+        const d = p["date:Date:start"] || "";
+        if (d && (!best || d > best.date)) best = { date: d, theme: String(p.Theme || "").slice(0, 120), word: String(p["Feeling Word"] || "").slice(0, 40) };
+      }
+      if (best && Date.now() - Date.parse(best.date + "T00:00:00Z") < 21 * 864e5 && (best.theme || best.word)) return best;
+    } catch {
+    }
+    return null;
+  }
+  async function cyclePhase() {
+    const m = await mcp(), tans = CALENDARS.find((c) => c.name === "The Tans");
+    if (!m || !tans) return "";
+    try {
+      const end = (/* @__PURE__ */ new Date()).toISOString().replace(/\.\d+Z$/, "Z"), start = new Date(Date.now() - 45 * 864e5).toISOString().replace(/\.\d+Z$/, "Z");
+      const p = unwrap4(await m.callTool(GCAL, "list_events", { calendarId: tans.id, startTime: start, endTime: end, timeZone: "Asia/Singapore", pageSize: 100 }));
+      const d1 = (p && p.events || []).filter((e) => /period day 1/i.test(e.summary || "")).map((e) => (e.start && (e.start.date || e.start.dateTime) || "").slice(0, 10)).filter(Boolean).sort().pop();
+      if (!d1) return "";
+      const n = Math.floor((Date.parse(dayKey() + "T00:00:00Z") - Date.parse(d1 + "T00:00:00Z")) / 864e5) + 1;
+      return n < 1 || n > 40 ? "" : n <= 5 ? "Menstrual" : n <= 13 ? "Follicular" : n <= 16 ? "Ovulatory" : "Luteal";
+    } catch {
+      return "";
+    }
+  }
+  function fountainPanel(canAsk) {
+    const h = `<span class="tape sky" aria-hidden="true"></span><h2>The fountain</h2>`;
+    if (vz.step === "menu") return h + `<p class="sub">The water's catching the light. What kind of wish?</p>
+    <div class="vmenu"><button class="btn alt" data-vz="coin">Toss a coin</button>${canAsk ? `<button class="btn primary" data-vz="start">Visualise my week</button>` : ""}</div>
+    ${canAsk ? `<p class="muted">The visualisation is your Friday ritual: six gentle questions, then the week written back to you. About ten minutes.</p>` : `<p class="muted">The visualisation needs Claude, which isn't reachable from this view just now.</p>`}
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+    if (vz.step === "intro") return h + `<div class="vq"><p>Let's close the week behind you and paint the one ahead: how you want it to feel, who you want to be in it, what you're calling in.</p>
+    ${vz.month ? `<p>This month's word is <i>${esc(vz.month)}</i>. Hold it loosely as you picture the week.</p>` : ""}${vz.busy ? `<p class="muted">Settling in…</p>` : ""}</div>
+    <div class="actions"><button class="btn primary" data-vz="begin" ${vz.busy ? "disabled" : ""}>I'm ready</button><button class="btn alt small" data-vz="menu">Not now</button></div>`;
+    if (vz.step === "look" || vz.step.startsWith("q")) {
+      const i = vz.step === "look" ? -1 : +vz.step.slice(1);
+      const q = i < 0 ? `Last Friday you called the week ${vz.look.word ? `<i>${esc(vz.look.word)}</i>` : "by its theme"}${vz.look.theme ? `: ${esc(vz.look.theme)}` : ""}. Now that it's really happened, how did it land against that?` : esc(QUESTIONS[i]);
+      return h + `<p class="eyebrow">${i < 0 ? "Looking back" : `${i + 1} of ${QUESTIONS.length}`}</p>${vz.reflect ? `<p class="vreflect">${esc(vz.reflect)}</p>` : ""}<div class="vq"><p>${q}</p></div>
+      <label class="sr" for="vzIn">Your answer</label><textarea id="vzIn" class="jnote" rows="3" maxlength="800" placeholder="Take your time…">${esc(vz.draft)}</textarea>
+      <div class="actions"><button class="btn primary" data-vz="next" ${vz.busy ? "disabled" : ""}>${vz.busy ? "Listening…" : i === QUESTIONS.length - 1 ? "That's my week" : "Next"}</button><button class="btn alt small" data-vz="menu">Stop here</button></div>`;
+    }
+    if (vz.step === "writing") return h + `<p class="vreflect">${esc(vz.reflect || "")}</p><p class="muted">Writing your week back to you…</p>`;
+    if (vz.step === "summary" && vz.sum) return h + `<div class="vsum">${vz.sum.text.split(/\n+/).map((p) => `<p>${esc(p)}</p>`).join("")}</div>
+    <p class="muted">Theme: ${esc(vz.sum.theme)} · Your word: <b>${esc(vz.sum.word)}</b></p>
+    ${vz.sum.actions.length ? `<p class="eyebrow">Actions you spoke of</p><ul class="rcheck">${vz.sum.actions.map((a, i) => {
+      const on = vz.pick.includes(i);
+      return `<li class="${on ? "on" : ""}" data-vz="pick" data-i="${i}" role="checkbox" aria-checked="${on}" tabindex="0"><span class="rbox${on ? " on" : ""}" aria-hidden="true"></span><span>${esc(a.title)}</span></li>`;
+    }).join("")}</ul>` : `<p class="muted">The week needs nothing more from you today.</p>`}
+    ${vz.error ? `<p class="jhint">${esc(vz.error)}</p>` : ""}
+    <div class="actions"><button class="btn primary" data-vz="save" ${vz.busy ? "disabled" : ""}>${vz.busy ? "Saving…" : vz.sum.actions.length ? "Save this and set those in motion" : "Save this"}</button><button class="btn alt small" data-vz="menu">Keep it just here</button></div>`;
+    if (vz.step === "done") return h + `<div class="vq"><p>${esc(vz.saved || "")}</p></div><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+    vz.step = "menu";
+    return fountainPanel(canAsk);
+  }
+  function wireFountain(root, api4) {
+    const ta = root.querySelector("#vzIn");
+    if (ta) {
+      ta.oninput = () => {
+        vz.draft = ta.value;
+      };
+      setTimeout(() => ta.focus(), 60);
+    }
+    root.querySelectorAll("[data-vz]").forEach((b) => {
+      const go2 = async () => {
+        const k = b.dataset.vz;
+        if (k === "coin") {
+          api4.coin();
+          return;
+        }
+        if (k === "menu") {
+          Object.assign(vz, { step: "menu", answers: [], reflect: "", draft: "", sum: null, error: "", busy: false });
+          api4.rerender();
+          return;
+        }
+        if (k === "start") {
+          Object.assign(vz, { step: "intro", answers: [], reflect: "", look: null, lookA: "", draft: "", sum: null, pick: [], error: "", busy: true });
+          api4.rerender();
+          const [plan, look] = await Promise.all([readPlan("month").catch(() => null), lastVision()]);
+          vz.month = plan && plan.theme ? plan.theme : "";
+          vz.look = look;
+          vz.busy = false;
+          api4.rerender();
+          return;
+        }
+        if (k === "begin") {
+          vz.step = vz.look ? "look" : "q0";
+          vz.reflect = "";
+          vz.draft = "";
+          api4.rerender();
+          return;
+        }
+        if (k === "pick") {
+          const i = +b.dataset.i;
+          vz.pick = vz.pick.includes(i) ? vz.pick.filter((x) => x !== i) : [...vz.pick, i];
+          api4.rerender();
+          return;
+        }
+        if (k === "next") {
+          const ans = plain(vz.draft).trim();
+          if (!ans) {
+            if (ta) ta.focus();
+            return;
+          }
+          const i = vz.step === "look" ? -1 : +vz.step.slice(1);
+          if (i < 0) vz.lookA = ans;
+          else vz.answers[i] = ans;
+          vz.busy = true;
+          api4.rerender();
+          const q = i < 0 ? "How did last week land against last week's vision?" : QUESTIONS[i];
+          let reflect = "";
+          try {
+            const r = await api4.sample(`You are guiding Mel through her weekly visualisation: warm, expansive, a little cosmic but never saccharine; she's a linguist, so be beautiful and precise. Reflect back her answer in ONE short warm sentence that mirrors her own words (don't paraphrase her into something she didn't say, don't ask a question, no emoji).${i < 0 ? " Honour whatever she says about last week without scoring it as hit or miss." : ""} If something heavy comes up, hold it kindly.
+Question: ${q}
+Her answer: ${ans}`, { modelTier: "quick", cache: false });
+            reflect = plain(String(r && r.text || "")).trim().slice(0, 300);
+          } catch {
+          }
+          vz.reflect = reflect;
+          vz.draft = "";
+          vz.busy = false;
+          if (i < QUESTIONS.length - 1) {
+            vz.step = "q" + (i + 1);
+            api4.rerender();
+            return;
+          }
+          vz.step = "writing";
+          api4.rerender();
+          try {
+            const words = QUESTIONS.map((x, j) => `Q: ${x}
+A: ${vz.answers[j] || ""}`).join("\n\n");
+            const d = await api4.sample.json(`Write Mel's weekly visualisation back to her: 150 to 250 words, second person, present tense, as if the week is already unfolding this way. Use her exact words and images wherever possible. Loosely: an opening line anchored in her feeling word; the week as she painted it; who she is in it; what she's calling in; a one-line closing anchor. Prose, no headings, no lists, no emoji. Warm and precise, a little cosmic, never saccharine.
+Then list only the concrete actions SHE voiced or clearly implied (verb-first, a few words each); never invent tasks. Also a short theme phrase distilling the vision, and her feeling word from the last answer.
+${vz.month ? `This month's theme (a gentle frame only): ${vz.month}
+` : ""}Her answers:
+${words}
+Return JSON only: {"summary": "...", "theme": "...", "word": "...", "actions": [{"title": "...", "why": "one line in her words"}]}`, { modelTier: "default", cache: false });
+            vz.sum = {
+              text: plain(String(d && d.summary || "")).trim(),
+              theme: plain(String(d && d.theme || "")).slice(0, 80),
+              word: plain(String(d && d.word || vz.answers[5] || "")).slice(0, 30),
+              actions: (Array.isArray(d && d.actions) ? d.actions : []).map((a) => ({ title: plain(String(a.title || "")).slice(0, 80), why: plain(String(a.why || "")).slice(0, 160) })).filter((a) => a.title).slice(0, 6)
+            };
+            if (!vz.sum.text) throw 0;
+            vz.pick = vz.sum.actions.map((_, j) => j);
+            vz.step = "summary";
+            api4.keep({ week: comingMonday(), theme: vz.sum.theme, word: vz.sum.word, text: vz.sum.text, at: Date.now() });
+          } catch {
+            vz.step = "q5";
+            vz.draft = vz.answers[5] || "";
+            vz.reflect = "The words got caught in the water. Try that last one again?";
+          }
+          api4.rerender();
+          return;
+        }
+        if (k === "save") {
+          vz.busy = true;
+          vz.error = "";
+          api4.rerender();
+          const m = await mcp();
+          if (!m) {
+            vz.busy = false;
+            vz.error = "Notion and Sunsama aren't reachable from this view. Your visualisation is kept here.";
+            api4.rerender();
+            return;
+          }
+          const mon = comingMonday(), phase2 = await cyclePhase(), chosen = vz.pick.map((i) => vz.sum.actions[i]).filter(Boolean);
+          let pushed = 0;
+          for (const a of chosen) {
+            if (a.pushed) {
+              pushed++;
+              continue;
+            }
+            try {
+              await m.callTool(SUNSAMA, "create_task", { title: a.title, day: mon, timeEstimate: 20, notes: `From your weekly visualisation (${nice(dayKey())}): ${a.why || vz.sum.theme}` });
+              a.pushed = true;
+              pushed++;
+            } catch {
+            }
+          }
+          const content = `${vz.sum.text}
+
+## Her words
+${QUESTIONS.map((q, j) => `**${q}**
+${vz.answers[j] || ""}`).join("\n\n")}${vz.look && vz.lookA ? `
+
+## Last week's vision, in hindsight
+${vz.lookA}` : ""}${chosen.length ? `
+
+## Actions
+${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
+          try {
+            await m.callTool(NOTION, "notion-create-pages", { parent: { type: "data_source_id", data_source_id: VIS_DS }, pages: [{ properties: Object.assign({ "Week": `Week of ${nice(mon)}`, "date:Date:start": dayKey(), "date:Date:is_datetime": 0, "Theme": vz.sum.theme, "Feeling Word": vz.sum.word, "Actions Pushed to Sunsama": pushed }, phase2 ? { "Cycle Phase": phase2 } : {}), content }] });
+            vz.saved = `It's saved${pushed ? `, and ${pushed} action${pushed > 1 ? "s are" : " is"} waiting in Sunsama for Monday` : ""}. Your word is ${vz.sum.word}. Hold it close, and close the laptop on the week.`;
+            vz.step = "done";
+          } catch (e) {
+            vz.error = `Couldn't save to Notion just now${pushed ? ` (${pushed} action${pushed > 1 ? "s" : ""} did reach Sunsama)` : ""}. It's kept here; try again in a minute.`;
+          }
+          vz.busy = false;
+          api4.rerender();
+          return;
+        }
+      };
+      b.onclick = go2;
+      if (b.getAttribute("role") === "checkbox") b.onkeydown = (e) => {
+        if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+          go2();
+        }
+      };
+    });
   }
 
   // src/game/routines.js
@@ -6286,14 +6921,14 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     }
     if (l.kind === "weekly") {
       const step2 = (l.days || {})[tk], done = tickOf(l.id, tk);
-      h += step2 ? `<p class="eyebrow">Today · ${DAY_NAMES[tk]}</p><button class="rtoday${done ? " done" : ""}" data-rt="tickday"><span class="tk" aria-hidden="true"></span><span>${esc(step2)}</span></button>` : `<p class="sub">${Object.keys(l.days || {}).length ? `Nothing on ${DAY_NAMES[tk]}. A rest day.` : "No steps yet. Tap Edit and paste your week in."}</p>`;
+      h += step2 ? `<p class="eyebrow">Today · ${DAY_NAMES[tk]}</p><button class="rtoday${done ? " done" : ""}" data-rt="tickday" aria-pressed="${done}"><span class="rbox${done ? " on" : ""}" aria-hidden="true"></span><span>${esc(step2)}</span></button>` : `<p class="sub">${Object.keys(l.days || {}).length ? `Nothing on ${DAY_NAMES[tk]}. A rest day.` : "No steps yet. Tap Edit and paste your week in."}</p>`;
       h += `<ul class="rweek">${DAYS2.map((d) => `<li class="${d === tk ? "now" : ""}"><b>${DAY_NAMES[d].slice(0, 3)}</b><span>${esc((l.days || {})[d] || "—")}</span></li>`).join("")}</ul>`;
     } else {
       const left2 = l.items.filter((i) => !tickOf(l.id, i.id)).length;
       h += `<p class="sub">${l.items.length ? left2 ? `${left2} to go today.` : "All done today. Lovely start." : "No steps yet. Tap Edit to add some."} Fresh every morning.</p>
-      <ul class="bujo rcheck">${l.items.map((i) => {
+      <ul class="rcheck">${l.items.map((i) => {
         const on = tickOf(l.id, i.id);
-        return `<li class="${on ? "tick" : ""}" data-rt="tick" data-id="${esc(i.id)}" role="checkbox" aria-checked="${on}" tabindex="0"><span class="tk" aria-hidden="true"></span><span>${esc(i.text)}</span></li>`;
+        return `<li class="${on ? "on" : ""}" data-rt="tick" data-id="${esc(i.id)}" role="checkbox" aria-checked="${on}" tabindex="0"><span class="rbox${on ? " on" : ""}" aria-hidden="true"></span><span>${esc(i.text)}</span></li>`;
       }).join("")}</ul>`;
     }
     return h + `<div class="actions"><button class="btn alt small" data-rt="edit">Edit</button><button class="btn alt small" data-close="1">Close</button></div>`;
@@ -6504,7 +7139,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     for (const c of id) h = h * 31 + c.charCodeAt(0) | 0;
     return h;
   };
-  var when4 = (ms) => new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" });
+  var when5 = (ms) => new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" });
   var kv = { mode: "board", pick: null, draft: "", from: "" };
   function kudosPanel() {
     const list2 = kudos();
@@ -6519,7 +7154,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
         kv.mode = "board";
         return kudosPanel();
       }
-      return h + `<div class="kread" style="background:${COLS[Math.abs(tilt(e.id)) % COLS.length]}"><p class="ktext">“${esc(e.text)}”</p><p class="kwho">${e.from ? "— " + esc(e.from) + ", " : ""}${esc(when4(e.made || e.at))}</p></div>
+      return h + `<div class="kread" style="background:${COLS[Math.abs(tilt(e.id)) % COLS.length]}"><p class="ktext">“${esc(e.text)}”</p><p class="kwho">${e.from ? "— " + esc(e.from) + ", " : ""}${esc(when5(e.made || e.at))}</p></div>
       <div class="actions">${list2.length > 1 ? `<button class="btn primary" data-kd="another">Another one</button>` : ""}<button class="btn alt small" data-kd="board">See them all</button></div>`;
     }
     h += `<p class="sub">${list2.length ? `${list2.length} kind word${list2.length === 1 ? "" : "s"}, pinned up for whenever you need them.` : "Nothing pinned yet. When someone says something lovely, pin it here."}</p>
@@ -6582,8 +7217,8 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   var ZAPIER = "Zapier";
   var ZAP_GMAIL = { selected_api: "GoogleMailV2CLIAPI", action: "message", tool_name: "gmail_find_email", connection_id: "0259b139-2fcc-8b64-a2ef-82ac9a87ed8c" };
   var PERSONAL_QUERY = "in:inbox category:primary is:unread newer_than:3d";
-  var st4 = { cal: null, mine: null, mineErr: null, busy: false };
-  var unwrap4 = (r) => {
+  var st4 = { mine: null, mineErr: null, busy: false };
+  var unwrap5 = (r) => {
     let p = r && r.payload !== void 0 ? r.payload : r;
     if (typeof p === "string") {
       try {
@@ -6600,17 +7235,17 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     return p;
   };
   async function fetchPersonal(fresh2) {
-    let mcp2 = null;
+    let mcp3 = null;
     try {
-      mcp2 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp2) {
+    if (!mcp3) {
       st4.mineErr = "unavailable";
       return;
     }
     try {
-      const p = unwrap4(await mcp2.callTool(ZAPIER, "execute_zapier_read_action", { ...ZAP_GMAIL, params: { query: PERSONAL_QUERY } }, { cache: { staleTime: fresh2 ? 0 : 5 * 6e4, refresh: !!fresh2 } }));
+      const p = unwrap5(await mcp3.callTool(ZAPIER, "execute_zapier_read_action", { ...ZAP_GMAIL, params: { query: PERSONAL_QUERY } }, { cache: { staleTime: fresh2 ? 0 : 5 * 6e4, refresh: !!fresh2 } }));
       const list2 = p && Array.isArray(p.results) ? p.results : [];
       st4.mine = list2.slice(0, 12).map((m) => ({
         from: plain(String(m.from && (m.from.name || m.from.email) || "")).slice(0, 40),
@@ -6628,17 +7263,8 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   }) {
     if (st4.busy) return;
     st4.busy = true;
-    await Promise.all([
-      todaysEvents(dayKey(), fresh2).then((r) => {
-        st4.cal = r;
-        rerender();
-      }).catch(() => {
-        st4.cal = { events: [], error: "upstream_error" };
-        rerender();
-      }),
-      fetchPost(fresh2).then(rerender).catch(rerender),
-      fetchPersonal(fresh2).then(rerender).catch(rerender)
-    ]);
+    await fetchPersonal(fresh2).catch(() => {
+    });
     st4.busy = false;
     rerender();
   }
@@ -6657,16 +7283,11 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     const n = m ? m[1] : s;
     return n.includes("@") ? n.split("@")[0].replace(/[._]/g, " ") : n;
   };
-  var fmtT = (t2) => new Date(t2).toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore" }).replace(" ", "").toLowerCase();
   var letters = (list2, empty) => list2.length ? `<ul class="hlist post">${list2.map((t2) => `<li>${t2.url ? `<a href="${esc(t2.url)}" target="_blank" rel="noopener">` : "<span>"}<b>${esc(who2(t2.from))}</b><span>${esc(t2.subject)}</span><small>${esc(t2.snippet)}</small>${t2.url ? "</a>" : "</span>"}${t2.at ? `<small class="when">${ago3(t2.at)}</small>` : ""}</li>`).join("")}</ul>` : `<p class="muted">${empty}</p>`;
   function deskPanel() {
-    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Home desk</h2><p class="sub">Today's calendar and both inboxes, without going into town${st4.busy ? " · checking…" : ""}.</p>`;
-    const r = st4.cal, now2 = Date.now();
-    h += `<p class="eyebrow deskh">Today</p>` + (!r ? `<p class="muted">Opening your calendar…</p>` : r.error && !r.events.length ? `<p class="muted">${esc(CAL_ERRORS[r.error] || "Couldn't reach your calendar just now.")}</p>` : !r.events.length ? `<p class="muted">Nothing on the calendar today.</p>` : `<ol class="calday">${r.events.map((e) => `<li class="${!e.allDay && e.end && e.end < now2 ? "past" : ""}"><span class="when">${e.allDay ? "all day" : fmtT(e.start)}</span><span class="what"><i style="background:${e.color}"></i><b>${esc(plain(e.title) || e.title)}</b><small>${esc(e.cal)}</small></span></li>`).join("")}</ol>`);
-    const c = postThreads();
-    h += `<p class="eyebrow deskh">Work inbox <small>mel@freshpages.co</small></p>` + (c.busy && !c.threads.length && !c.at ? `<p class="muted">Checking…</p>` : c.error && !c.threads.length ? `<p class="muted">${esc(POST_ERRORS[c.error] || "Couldn't fetch it just now.")}</p>` : letters(c.threads, "Nothing unread. Lovely."));
-    h += `<p class="eyebrow deskh">Personal inbox <small>baymelody@gmail.com</small></p>` + (st4.mineErr && !st4.mine ? `<p class="muted">${esc(ZAP_ERRORS[st4.mineErr] || "Couldn't fetch it just now.")}</p>` : !st4.mine ? `<p class="muted">Checking…</p>` : letters(st4.mine, "Nothing unread in your personal inbox."));
-    return h + `<div class="actions"><button class="btn alt small" data-desk="refresh">Refresh</button><button class="btn alt small" data-close="1">Close</button></div>`;
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Home desk</h2><p class="sub">Your personal inbox, baymelody@gmail.com: unread in Primary from the last 3 days${st4.busy ? " · checking…" : ""}.</p>`;
+    h += st4.mineErr && !st4.mine ? `<p class="muted">${esc(ZAP_ERRORS[st4.mineErr] || "Couldn't fetch it just now.")}</p>` : !st4.mine ? `<p class="muted">Checking…</p>` : letters(st4.mine, "Nothing unread in your personal inbox.");
+    return h + `<div class="actions"><a class="btn small alt" href="https://mail.google.com/mail/?authuser=baymelody@gmail.com" target="_blank" rel="noopener">Open Gmail</a><button class="btn alt small" data-desk="refresh">Refresh</button><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function wireDesk(root, rerender) {
     root.querySelectorAll("[data-desk]").forEach((b) => b.onclick = () => {
@@ -6680,55 +7301,55 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
 
   // src/game/kid.js
   var kid = { sleep: false, pending: null, open: null };
-  var INK2 = "#3A2E28";
-  var sw = `stroke="${INK2}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"`;
+  var INK3 = "#3A2E28";
+  var sw2 = `stroke="${INK3}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"`;
   var pick2 = (a) => a[Math.floor(Math.random() * a.length)];
   var SNACKS = {
     milk: {
       n: "Milk",
       say: ["milk!", "gulp gulp!", "mmm milk"],
       fx: "slurp",
-      svg: `<path d="M22 20 h20 l6 10 v32 a3 3 0 0 1 -3 3 h-26 a3 3 0 0 1 -3 -3 v-32z" fill="#FFFDF6" ${sw}/><path d="M22 20 l-6 10 h32" fill="#CFE3F4" ${sw}/><path d="M20 20 h24 v-6 h-24z" fill="#7FB8E8" ${sw}/><circle cx="32" cy="46" r="7" fill="#7FB8E8"/>`
+      svg: `<path d="M22 20 h20 l6 10 v32 a3 3 0 0 1 -3 3 h-26 a3 3 0 0 1 -3 -3 v-32z" fill="#FFFDF6" ${sw2}/><path d="M22 20 l-6 10 h32" fill="#CFE3F4" ${sw2}/><path d="M20 20 h24 v-6 h-24z" fill="#7FB8E8" ${sw2}/><circle cx="32" cy="46" r="7" fill="#7FB8E8"/>`
     },
     juice: {
       n: "Juice",
       say: ["juice!", "slurp!", "yummy juice"],
       fx: "slurp",
-      svg: `<rect x="18" y="22" width="28" height="42" rx="3" fill="#F7B24A" ${sw}/><path d="M36 22 l4 -14 l6 2" fill="none" ${sw}/><circle cx="32" cy="44" r="8" fill="#F2833A" ${sw}/><path d="M32 36 q4 -4 7 -2" fill="none" stroke="#5C8A3A" stroke-width="2.2" stroke-linecap="round"/>`
+      svg: `<rect x="18" y="22" width="28" height="42" rx="3" fill="#F7B24A" ${sw2}/><path d="M36 22 l4 -14 l6 2" fill="none" ${sw2}/><circle cx="32" cy="44" r="8" fill="#F2833A" ${sw2}/><path d="M32 36 q4 -4 7 -2" fill="none" stroke="#5C8A3A" stroke-width="2.2" stroke-linecap="round"/>`
     },
     apple: {
       n: "Apple chips",
       say: ["crunch crunch!", "apple!", "crunchy!"],
       fx: "crunch",
-      svg: `<path d="M8 38 h48 q-2 22 -24 22 q-22 0 -24 -22z" fill="#F4C7CF" ${sw}/>${[[20, 32], [32, 28], [44, 32], [26, 36], [38, 36]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="#FFF3D6" ${sw}/><circle cx="${x}" cy="${y}" r="1.6" fill="${INK2}"/>`).join("")}`
+      svg: `<path d="M8 38 h48 q-2 22 -24 22 q-22 0 -24 -22z" fill="#F4C7CF" ${sw2}/>${[[20, 32], [32, 28], [44, 32], [26, 36], [38, 36]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="#FFF3D6" ${sw2}/><circle cx="${x}" cy="${y}" r="1.6" fill="${INK3}"/>`).join("")}`
     },
     melon: {
       n: "Watermelon",
       say: ["melon!", "juicy!", "nom nom"],
       fx: "crunch",
-      svg: `<path d="M8 24 h48 a24 24 0 0 1 -48 0z" fill="#7BB37A" ${sw}/><path d="M13 24 h38 a19 19 0 0 1 -38 0z" fill="#F26D6D"/>${[[22, 32], [32, 36], [42, 32], [28, 28], [37, 28]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="1.6" ry="2.6" fill="${INK2}"/>`).join("")}<path d="M8 24 h48" ${sw}/>`
+      svg: `<path d="M8 24 h48 a24 24 0 0 1 -48 0z" fill="#7BB37A" ${sw2}/><path d="M13 24 h38 a19 19 0 0 1 -38 0z" fill="#F26D6D"/>${[[22, 32], [32, 36], [42, 32], [28, 28], [37, 28]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="1.6" ry="2.6" fill="${INK3}"/>`).join("")}<path d="M8 24 h48" ${sw2}/>`
     },
     fish: {
       n: "Goldfish crackers",
       say: ["fishies!", "crunch!", "more fish!"],
       fx: "crunch",
-      svg: `<path d="M8 40 h48 q-2 20 -24 20 q-22 0 -24 -20z" fill="#BFD6E6" ${sw}/>${[[20, 32, -10], [36, 28, 8], [30, 37, 0], [46, 35, -6]].map(([x, y, r]) => `<g transform="translate(${x} ${y}) rotate(${r})"><ellipse cx="0" cy="0" rx="8" ry="5" fill="#F3A13A" ${sw}/><path d="M7 0 l6 -5 v10z" fill="#F3A13A" ${sw}/><circle cx="-4" cy="-1" r="1.2" fill="${INK2}"/></g>`).join("")}`
+      svg: `<path d="M8 40 h48 q-2 20 -24 20 q-22 0 -24 -20z" fill="#BFD6E6" ${sw2}/>${[[20, 32, -10], [36, 28, 8], [30, 37, 0], [46, 35, -6]].map(([x, y, r]) => `<g transform="translate(${x} ${y}) rotate(${r})"><ellipse cx="0" cy="0" rx="8" ry="5" fill="#F3A13A" ${sw2}/><path d="M7 0 l6 -5 v10z" fill="#F3A13A" ${sw2}/><circle cx="-4" cy="-1" r="1.2" fill="${INK3}"/></g>`).join("")}`
     }
   };
   var pic = (inner, size = 64) => `<svg viewBox="0 0 64 64" width="${size}" height="${size}" aria-hidden="true">${inner}</svg>`;
   var snackPic = (id, size) => pic(SNACKS[id].svg, size);
   var DINO_COLS = ["#7BB37A", "#7FB8E8", "#F2A65A", "#C9A3E8", "#F4A0B5"];
-  var babyDino = (c) => `<path d="M14 54 q-4 -20 12 -26 q4 -14 16 -12 q10 2 8 12 q-2 6 -10 6 q4 8 2 20z" fill="${c}" ${sw}/><circle cx="44" cy="22" r="2" fill="${INK2}"/><path d="M47 28 q-3 2 -6 1" fill="none" ${sw}/><path d="M26 30 l-3 -5 l5 1 l1 -5 l4 3" fill="#FFFDF6" ${sw}/>`;
-  var egg = (stage) => `<ellipse cx="32" cy="38" rx="20" ry="25" fill="#FFF6E2" ${sw}/><circle cx="24" cy="30" r="3.4" fill="#A8CF8E"/><circle cx="38" cy="44" r="4" fill="#F2A65A"/><circle cx="36" cy="26" r="2.6" fill="#7FB8E8"/>${stage >= 1 ? `<path d="M14 36 l6 -5 l5 6 l6 -7 l6 7 l6 -6 l5 5" fill="none" ${sw}/>` : ""}`;
-  var hatched = (c) => `${babyDino(c)}<path d="M12 44 l6 -5 l5 6 l6 -7 l6 7 l6 -6 l6 5 v6 a20 14 0 0 1 -41 0z" fill="#FFF6E2" ${sw}/>`;
+  var babyDino = (c) => `<path d="M14 54 q-4 -20 12 -26 q4 -14 16 -12 q10 2 8 12 q-2 6 -10 6 q4 8 2 20z" fill="${c}" ${sw2}/><circle cx="44" cy="22" r="2" fill="${INK3}"/><path d="M47 28 q-3 2 -6 1" fill="none" ${sw2}/><path d="M26 30 l-3 -5 l5 1 l1 -5 l4 3" fill="#FFFDF6" ${sw2}/>`;
+  var egg = (stage) => `<ellipse cx="32" cy="38" rx="20" ry="25" fill="#FFF6E2" ${sw2}/><circle cx="24" cy="30" r="3.4" fill="#A8CF8E"/><circle cx="38" cy="44" r="4" fill="#F2A65A"/><circle cx="36" cy="26" r="2.6" fill="#7FB8E8"/>${stage >= 1 ? `<path d="M14 36 l6 -5 l5 6 l6 -7 l6 7 l6 -6 l5 5" fill="none" ${sw2}/>` : ""}`;
+  var hatched = (c) => `${babyDino(c)}<path d="M12 44 l6 -5 l5 6 l6 -7 l6 7 l6 -6 l6 5 v6 a20 14 0 0 1 -41 0z" fill="#FFF6E2" ${sw2}/>`;
   var CAR_COLS = ["#E86A5C", "#5B8FD6", "#F3C14A"];
-  var car = (c) => `<path d="M6 40 v-10 q0 -4 4 -4 h10 l8 -10 h18 q4 0 6 4 l6 10 q6 0 6 6 v4z" fill="${c}" ${sw}/><path d="M30 18 h14 l5 8 h-24z" fill="#DCEBF6" ${sw}/><circle cx="18" cy="42" r="7" fill="#3B3B44" ${sw}/><circle cx="48" cy="42" r="7" fill="#3B3B44" ${sw}/><circle cx="18" cy="42" r="2.4" fill="#D9D9D9"/><circle cx="48" cy="42" r="2.4" fill="#D9D9D9"/><circle cx="62" cy="32" r="2.6" fill="#FFE38A"/>`;
-  var engine = `<svg viewBox="0 0 80 64" width="110" height="88" aria-hidden="true"><path d="M8 50 v-24 h24 v-12 h16 v12 h16 q8 0 8 8 v16z" fill="#E86A5C" ${sw}/><rect x="12" y="30" width="16" height="12" rx="2" fill="#DCEBF6" ${sw}/><path d="M52 26 v-12 h8 v12" fill="#3B3B44" ${sw}/><circle cx="22" cy="54" r="8" fill="#3B3B44" ${sw}/><circle cx="54" cy="54" r="8" fill="#3B3B44" ${sw}/><circle cx="72" cy="40" r="3" fill="#FFE38A"/><g class="puff"><circle cx="58" cy="8" r="5" fill="#FFFFFF" ${sw}/></g></svg>`;
-  var wagon = (c) => `<svg viewBox="0 0 64 64" width="80" height="80" aria-hidden="true"><rect x="6" y="24" width="52" height="26" rx="4" fill="${c}" ${sw}/><circle cx="18" cy="54" r="7" fill="#3B3B44" ${sw}/><circle cx="46" cy="54" r="7" fill="#3B3B44" ${sw}/><path d="M0 40 h6" ${sw}/></svg>`;
+  var car = (c) => `<path d="M6 40 v-10 q0 -4 4 -4 h10 l8 -10 h18 q4 0 6 4 l6 10 q6 0 6 6 v4z" fill="${c}" ${sw2}/><path d="M30 18 h14 l5 8 h-24z" fill="#DCEBF6" ${sw2}/><circle cx="18" cy="42" r="7" fill="#3B3B44" ${sw2}/><circle cx="48" cy="42" r="7" fill="#3B3B44" ${sw2}/><circle cx="18" cy="42" r="2.4" fill="#D9D9D9"/><circle cx="48" cy="42" r="2.4" fill="#D9D9D9"/><circle cx="62" cy="32" r="2.6" fill="#FFE38A"/>`;
+  var engine = `<svg viewBox="0 0 80 64" width="110" height="88" aria-hidden="true"><path d="M8 50 v-24 h24 v-12 h16 v12 h16 q8 0 8 8 v16z" fill="#E86A5C" ${sw2}/><rect x="12" y="30" width="16" height="12" rx="2" fill="#DCEBF6" ${sw2}/><path d="M52 26 v-12 h8 v12" fill="#3B3B44" ${sw2}/><circle cx="22" cy="54" r="8" fill="#3B3B44" ${sw2}/><circle cx="54" cy="54" r="8" fill="#3B3B44" ${sw2}/><circle cx="72" cy="40" r="3" fill="#FFE38A"/><g class="puff"><circle cx="58" cy="8" r="5" fill="#FFFFFF" ${sw2}/></g></svg>`;
+  var wagon = (c) => `<svg viewBox="0 0 64 64" width="80" height="80" aria-hidden="true"><rect x="6" y="24" width="52" height="26" rx="4" fill="${c}" ${sw2}/><circle cx="18" cy="54" r="7" fill="#3B3B44" ${sw2}/><circle cx="46" cy="54" r="7" fill="#3B3B44" ${sw2}/><path d="M0 40 h6" ${sw2}/></svg>`;
   var BAL_COLS = ["#F26D6D", "#F7C548", "#7FB8E8", "#7BB37A", "#C9A3E8", "#F4A0B5"];
-  var balloon = (c) => `<svg viewBox="0 0 64 96" width="74" height="111" aria-hidden="true"><ellipse cx="32" cy="32" rx="24" ry="29" fill="${c}" ${sw}/><path d="M28 61 l4 6 l4 -6z" fill="${c}" ${sw}/><path d="M32 67 q-6 12 2 26" fill="none" stroke="${INK2}" stroke-width="1.6"/><ellipse cx="23" cy="21" rx="5" ry="8" fill="#FFFFFF" opacity=".55"/></svg>`;
-  var star = `<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M12 2 l3 6.5 7 .8 -5.2 4.8 1.4 7 -6.2 -3.5 -6.2 3.5 1.4 -7 L1 9.3 l7 -.8z" fill="#F7C548" ${sw.replace("2.2", "1.4")}/></svg>`;
-  var home = `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M3 11 L12 3 l9 8 M5 10 v10 h14 v-10" fill="none" ${sw}/><rect x="10" y="14" width="4" height="6" fill="#F7C548"/></svg>`;
+  var balloon = (c) => `<svg viewBox="0 0 64 96" width="74" height="111" aria-hidden="true"><ellipse cx="32" cy="32" rx="24" ry="29" fill="${c}" ${sw2}/><path d="M28 61 l4 6 l4 -6z" fill="${c}" ${sw2}/><path d="M32 67 q-6 12 2 26" fill="none" stroke="${INK3}" stroke-width="1.6"/><ellipse cx="23" cy="21" rx="5" ry="8" fill="#FFFFFF" opacity=".55"/></svg>`;
+  var star = `<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M12 2 l3 6.5 7 .8 -5.2 4.8 1.4 7 -6.2 -3.5 -6.2 3.5 1.4 -7 L1 9.3 l7 -.8z" fill="#F7C548" ${sw2.replace("2.2", "1.4")}/></svg>`;
+  var home = `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M3 11 L12 3 l9 8 M5 10 v10 h14 v-10" fill="none" ${sw2}/><rect x="10" y="14" width="4" height="6" fill="#F7C548"/></svg>`;
   var st5 = { eggs: [], wagons: 1, trainBusy: false, popped: 0, spawn: null, timers: [] };
   var later = (fn, ms) => {
     const t2 = setTimeout(fn, ms);
@@ -6872,11 +7493,11 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   // src/game/reminders.js
   var CAL = CALENDARS.find((c) => c.name === "Personal") || CALENDARS[0];
   var TZ = "Asia/Singapore";
-  var SG = 8 * 36e5;
-  var sgISO = (ms) => new Date(ms + SG).toISOString().slice(0, 19) + "+08:00";
+  var SG2 = 8 * 36e5;
+  var sgISO = (ms) => new Date(ms + SG2).toISOString().slice(0, 19) + "+08:00";
   var fmtWhen = (ms) => {
     const t2 = new Date(ms).toLocaleTimeString("en-SG", { hour: "numeric", minute: "2-digit", timeZone: TZ }).replace(/\s/g, "").toLowerCase();
-    const day = (d2) => new Date(d2 + SG).toISOString().slice(0, 10);
+    const day = (d2) => new Date(d2 + SG2).toISOString().slice(0, 10);
     const today2 = day(Date.now()), tmr2 = day(Date.now() + 864e5), d = day(ms);
     return d === today2 ? t2 : d === tmr2 ? `${t2} tomorrow` : `${t2} ${new Date(ms).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: TZ })}`;
   };
@@ -6885,12 +7506,12 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     if (m > 0) return Date.now() + Math.min(m, 60 * 24 * 14) * 6e4;
     const hm2 = /^(\d{1,2}):(\d{2})$/.exec(String(a && a.at || "").trim());
     if (!hm2 || +hm2[1] > 23 || +hm2[2] > 59) return null;
-    const day = /^\d{4}-\d{2}-\d{2}$/.test(String(a.date || "")) ? a.date : new Date(Date.now() + SG).toISOString().slice(0, 10);
+    const day = /^\d{4}-\d{2}-\d{2}$/.test(String(a.date || "")) ? a.date : new Date(Date.now() + SG2).toISOString().slice(0, 10);
     let t2 = Date.parse(`${day}T${hm2[1].padStart(2, "0")}:${hm2[2]}:00+08:00`);
     if (!a.date && t2 <= Date.now() + 3e4) t2 += 864e5;
     return t2 > Date.now() && t2 < Date.now() + 366 * 864e5 ? t2 : null;
   }
-  async function mcp() {
+  async function mcp2() {
     try {
       return window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
@@ -6915,7 +7536,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     return typeof id === "string" ? id : null;
   }
   async function createEvent(text, at) {
-    const m = await mcp();
+    const m = await mcp2();
     if (!m) throw { code: "unavailable" };
     const r = await m.callTool(GCAL, "create_event", {
       calendarId: CAL.id,
@@ -6951,7 +7572,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     if (!r) return null;
     r.cancelled = true;
     save3();
-    const m = await mcp();
+    const m = await mcp2();
     if (m && r.eventId) {
       try {
         await m.callTool(GCAL, "delete_event", { calendarId: r.cal || CAL.id, eventId: r.eventId, notificationLevel: "NONE" });
@@ -7389,6 +8010,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     });
     if (!Array.isArray(F.upgradeLog)) F.upgradeLog = [];
     if (!F.totalQuests) F.totalQuests = 0;
+    if (F.harvestTotal == null) F.harvestTotal = Object.values(F.history || {}).reduce((n, h) => n + (h.harvest || 0), 0);
     if (!Array.isArray(S2.chats)) S2.chats = [];
     ["halfway", "tread", "npcSaid"].forEach((k) => {
       if (!S2[k]) S2[k] = {};
@@ -7398,7 +8020,10 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), goodNews: () => {
     const g = goodNews();
     return g && F.goodRead !== g.at ? g : null;
-  }, lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk(), music: () => settings.music, jars: () => shelf(), kudos: () => kudosCount(), kid: () => ({ sleep: kid.sleep || evanNight() }) });
+  }, lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk(), music: () => settings.music, jars: () => shelf(), kudos: () => kudosCount(), ped: (x, y) => {
+    const i = stationsOf("trophy").filter((s) => s.kind === "pedestal").findIndex((s) => s.x === x && s.y === y);
+    return i < 0 ? null : onPedestals(F)[i] || null;
+  }, kid: () => ({ sleep: kid.sleep || evanNight() }) });
   function isDusk() {
     const t2 = sgHM();
     return t2 >= 19 * 60 || t2 < 6 * 60;
@@ -7504,7 +8129,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       if (routOpen && !/^(rtName|rtNew|rtPaste)$/.test(document.activeElement?.id || "") && !document.activeElement?.dataset?.day && !document.activeElement?.dataset?.item) ctx();
     });
     attachKudos(col, () => {
-      if (scene === "hall") drawScene();
+      if (scene === "trophy") drawScene();
       if (kudosOpen && !/^(kText|kFrom)$/.test(document.activeElement?.id || "")) ctx();
     });
     attachJars(col, () => {
@@ -7659,6 +8284,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     compost: { n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster." },
     sprinkler: { n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them." }
   };
+  var trophyView = null;
   var routOpen = false;
   var kudosOpen = false;
   var deskOpen = false;
@@ -7677,6 +8303,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   deskOpen = false;
   kudosOpen = false;
   routOpen = false;
+  trophyView = null;
   var jv = { mode: "shelf", blobs: [], note: "" };
   var BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]];
   var CYCLE = 12;
@@ -8237,12 +8864,12 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       timerCtl(b.dataset.tctl);
     }
   }, true);
-  var fmt = (left2) => left2 ? `${Math.floor(left2 / M)}:${String(Math.floor(left2 / 1e3) % 60).padStart(2, "0")}` : "time!";
+  var fmt2 = (left2) => left2 ? `${Math.floor(left2 / M)}:${String(Math.floor(left2 / 1e3) % 60).padStart(2, "0")}` : "time!";
   function timerHTML(label2) {
     if (!S2.timer) return "";
     const left2 = tLeft(), C2 = 2 * Math.PI * 28;
     return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C2}" stroke-dashoffset="${C2 * (1 - left2 / S2.timer.total)}"/></svg>
-    <div><span class="t" id="tLeft">${fmt(left2)}</span><small>${S2.timer.pausedLeft != null ? "paused" : esc(label2)}</small></div>${timerBtns()}</div>`;
+    <div><span class="t" id="tLeft">${fmt2(left2)}</span><small>${S2.timer.pausedLeft != null ? "paused" : esc(label2)}</small></div>${timerBtns()}</div>`;
   }
   var lastReady = readyCount();
   var lastDusk = null;
@@ -8289,8 +8916,8 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     if (!S2.timer) return;
     const left2 = tLeft();
     const t2 = $("tLeft"), r = $("ringFg");
-    if (t2) t2.textContent = fmt(left2);
-    document.querySelectorAll("[data-tleft]").forEach((el) => el.textContent = fmt(left2));
+    if (t2) t2.textContent = fmt2(left2);
+    document.querySelectorAll("[data-tleft]").forEach((el) => el.textContent = fmt2(left2));
     if (r) r.style.strokeDashoffset = 2 * Math.PI * 28 * (1 - left2 / S2.timer.total);
     if (!left2 && !S2.timer.fired) {
       S2.timer.fired = true;
@@ -8561,7 +9188,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   }
   function timerLeft(t2) {
     if (!S2.timer || S2.timer.id !== t2.id || S2.timer.kind !== "task" && S2.timer.kind !== "deal") return null;
-    return fmt(tLeft());
+    return fmt2(tLeft());
   }
   var sun = { busy: false, at: 0, error: null, added: 0 };
   function creditDone(tasks, quiet) {
@@ -8805,10 +9432,16 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     well: "village:well",
     "town hall": "hall",
     hall: "hall",
-    "kind words": "hall:kudos",
+    "kind words": "trophy:kudos",
+    "trophy room": "trophy",
+    courtyard: "trophy",
+    fountain: "trophy:fountain",
+    trophies: "trophy",
+    "trophy book": "trophy:tbook",
+    affirmations: "trophy:affirm",
     routines: "room:routines",
     "routine board": "room:routines",
-    compliments: "hall:kudos",
+    compliments: "trophy:kudos",
     "client table": "hall:clients",
     clients: "hall:clients",
     "planning table": "hall:table",
@@ -8999,7 +9632,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -9429,6 +10062,7 @@ Then tell chat "wind down" whenever you're ready.`
     F.plots[i] = null;
     gainXp(1);
     S2.harvested = (S2.harvested || 0) + 1;
+    F.harvestTotal = (F.harvestTotal || 0) + 1;
     mprop(CROPS[p.crop].ico, PLOTS[i].x + 50, PLOTS[i].y + 20, 1900);
     act("cheer");
     speak(`Harvested a ${CROPS[p.crop].n.toLowerCase()}! It's in your backpack.`, 4e3);
@@ -9493,8 +10127,8 @@ Then tell chat "wind down" whenever you're ready.`
     j.innerHTML = h + `<button class="qnx" data-qn="min" aria-label="Fold the note away">–</button>`;
     if (slim) {
       const title = j.querySelector("h1") ? [...j.querySelector("h1").childNodes].filter((n) => !(n.classList && n.classList.contains("lbl"))).map((n) => n.textContent).join("").trim() : "";
-      const when5 = S2.timer ? `<span class="when" data-tleft>${fmt(tLeft())}</span>` : "";
-      j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(title)}</b>${when5}<span class="more">open</span></button>`;
+      const when6 = S2.timer ? `<span class="when" data-tleft>${fmt2(tLeft())}</span>` : "";
+      j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(title)}</b>${when6}<span class="more">open</span></button>`;
     }
     j.classList.toggle("intop", !outside());
     j.querySelectorAll("[data-qn]").forEach((el) => el.onclick = (ev) => {
@@ -9571,6 +10205,7 @@ Then tell chat "wind down" whenever you're ready.`
     deskOpen = false;
     kudosOpen = false;
     routOpen = false;
+    trophyView = null;
     selPlot = null;
     homeView = null;
     postOpen = false;
@@ -9596,7 +10231,7 @@ Then tell chat "wind down" whenever you're ready.`
     }
     el.innerHTML = `<p class="muted">Opening your calendar…</p>`;
     const r = await todaysEvents(dayKey(), fresh2), nowT = Date.now();
-    const fmtT2 = (t2) => new Date(t2).toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore" }).replace(" ", "").toLowerCase();
+    const fmtT = (t2) => new Date(t2).toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore" }).replace(" ", "").toLowerCase();
     let h = `<p class="sub">${new Date(now() + 8 * H).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })}</p>`;
     if (r.error && !r.events.length) h += `<p class="muted">${esc(CAL_ERRORS[r.error] || "Couldn't reach your calendar just now.")}</p>`;
     else if (!r.events.length) h += `<p class="muted">Nothing on the calendar today. A clear runway.</p>`;
@@ -9609,7 +10244,7 @@ Then tell chat "wind down" whenever you're ready.`
           mark = `<li class="now"><span>now</span></li>`;
         }
         const past = !e.allDay && e.end && e.end < nowT;
-        return mark + `<li class="${past ? "past" : ""}"><span class="when">${e.allDay ? "all day" : fmtT2(e.start)}</span><span class="what"><i style="background:${e.color}"></i><b>${esc(plain(e.title) || e.title)}</b>${e.where ? `<small>${esc(e.where.split("\n")[0].slice(0, 60))}</small>` : ""}<small>${esc(e.cal)}${!e.allDay && e.end ? ` · until ${fmtT2(e.end)}` : ""}</small></span>${e.link ? `<a href="${esc(e.link)}" target="_blank" rel="noopener noreferrer" aria-label="Open in Google Calendar">↗</a>` : ""}</li>`;
+        return mark + `<li class="${past ? "past" : ""}"><span class="when">${e.allDay ? "all day" : fmtT(e.start)}</span><span class="what"><i style="background:${e.color}"></i><b>${esc(plain(e.title) || e.title)}</b>${e.where ? `<small>${esc(e.where.split("\n")[0].slice(0, 60))}</small>` : ""}<small>${esc(e.cal)}${!e.allDay && e.end ? ` · until ${fmtT(e.end)}` : ""}</small></span>${e.link ? `<a href="${esc(e.link)}" target="_blank" rel="noopener noreferrer" aria-label="Open in Google Calendar">↗</a>` : ""}</li>`;
       }).join("") + (nowShown ? "" : `<li class="now"><span>now</span></li>`) + `</ol>`;
     }
     const rems = upcoming(F);
@@ -9639,7 +10274,8 @@ Then tell chat "wind down" whenever you're ready.`
     if (kid.open && scene === "kidroom") h = kidPanel(kid.open);
     else if (homeView && scene === "home") h = hestiaPanel(homeView);
     else if (deskOpen && scene === "home") h = deskPanel();
-    else if (kudosOpen && scene === "hall") h = kudosPanel();
+    else if (kudosOpen && scene === "trophy") h = kudosPanel();
+    else if (trophyView && scene === "trophy") h = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : trophyView === "affirm" ? affirmPanel(F.affirm, affirmBusy, !!sampleCap) : trophyView === "fountain" ? fountainPanel(!!sampleCap) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
     else if (routOpen && scene === "room") h = routinesPanel();
     else if (postOpen && scene === "post") h = postPanel();
     else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
@@ -9752,7 +10388,36 @@ Then tell chat "wind down" whenever you're ready.`
       sfx("coin");
       mprop("sparkle", mel.x, mel.y - 60);
     } });
-    if (kudosOpen && scene === "hall") wireKudos(c, { rerender: () => {
+    if (trophyView && scene === "trophy") {
+      wireTrophies(c, F, { save: () => save2(true), undoable, rerender: () => {
+        ctx();
+        drawScene();
+      }, close: () => {
+        trophyView = null;
+        ctx();
+        drawScene();
+      } });
+      if (trophyView === "fountain") wireFountain(c, {
+        sample: sampleCap,
+        rerender: () => ctx(),
+        coin: () => {
+          trophyView = null;
+          ctx();
+          sfx("coin");
+          mprop("sparkle", 260 + rnd(-20, 20), 400);
+          speak(pick(["Plink. Wish made. I won't ask.", "A coin in the fountain. Something good's coming.", "Make it a big one."]), 3500);
+        },
+        keep: (v) => {
+          F.vision = v;
+          save2();
+        }
+      });
+      if (trophyView === "affirm") {
+        F.affirm = F.affirm || {};
+        wireAffirm(c, F.affirm, F.affirm.day === dayKey() && F.affirm.items && F.affirm.items.length ? F.affirm.items : dailyAffirmations(), { save: () => save2(), undoable, rerender: () => ctx(), fresh: freshAffirmations });
+      }
+    }
+    if (kudosOpen && scene === "trophy") wireKudos(c, { rerender: () => {
       ctx();
       drawScene();
     }, undoable, done: () => {
@@ -9802,6 +10467,7 @@ Then tell chat "wind down" whenever you're ready.`
       deskOpen = false;
       kudosOpen = false;
       routOpen = false;
+      trophyView = null;
       ctx();
     });
     c.querySelectorAll("[data-bed]").forEach((b) => b.onclick = () => bedAction(b.dataset.bed));
@@ -9833,6 +10499,7 @@ Then tell chat "wind down" whenever you're ready.`
         deskOpen = false;
         kudosOpen = false;
         routOpen = false;
+        trophyView = null;
         A.decompNow();
         drawScene();
       } else startBreath(+k);
@@ -10185,6 +10852,7 @@ Then tell chat "wind down" whenever you're ready.`
       deskOpen = false;
       kudosOpen = false;
       routOpen = false;
+      trophyView = null;
       homeView = null;
       postOpen = false;
       healthOpen = false;
@@ -10244,9 +10912,19 @@ Then tell chat "wind down" whenever you're ready.`
           setTimeout(() => speak(st6.length ? `${st6[0].name}, today: ${st6[0].text}.` : `${left2} morning routine step${left2 > 1 ? "s" : ""} on the board.`, 5e3), 1500);
         }
       }
-      if (id === "hall" && kudosCount() >= 3 && Date.now() - (F.kudosSeen || 0) > 7 * 864e5 && S2.kudosSaid !== dayKey()) {
+      if (id === "hall" && F.trophyIntro) {
+        const n = F.trophyIntro;
+        F.trophyIntro = 0;
+        setTimeout(() => speak(`${n} trophies are waiting for you out in the courtyard, through the archway.`, 6e3), 1500);
+        save2();
+      } else if (id === "hall" && kudosCount() >= 3 && Date.now() - (F.kudosSeen || 0) > 7 * 864e5 && S2.kudosSaid !== dayKey()) {
         S2.kudosSaid = dayKey();
-        setTimeout(() => speak(`${kudosCount()} kind words on the board up there. Fancy a read?`, 5e3), 1500);
+        setTimeout(() => speak(`${kudosCount()} kind words out in the courtyard. Fancy a read?`, 5e3), 1500);
+      }
+      if (id === "trophy") {
+        fetchObjectives();
+        if (F.revTarget) loadRevenue().then(checkTrophies);
+        setTimeout(() => speak(onPedestals(F).length ? "The courtyard. Look at all this. You did that." : "The courtyard. Your first trophy goes on a pedestal.", 4e3), 900);
       }
       if (id === "market") speak(isHere("hana") ? "Welcome to the market! Hana's in. Have a browse." : NPCS.find((n) => n.id === "hana").away, 4500);
     }, 220);
@@ -10301,6 +10979,7 @@ Then tell chat "wind down" whenever you're ready.`
     deskOpen = false;
     kudosOpen = false;
     routOpen = false;
+    trophyView = null;
     homeView = null;
     postOpen = false;
     healthOpen = false;
@@ -10456,7 +11135,47 @@ Then tell chat "wind down" whenever you're ready.`
       });
       return;
     }
-    if (scene === "hall" && id === "kudos") {
+    if (id === "trophydoor") {
+      setScene("trophy", INNER.trophy.arrive);
+      return;
+    }
+    if (scene === "trophy" && id === "bench") {
+      mel.sitting = true;
+      nodes.mel.classList.add("sit");
+      mel.dir = 1;
+      sfx("paper", true);
+      speak(pick(["Ahh. Sun on your face. Stay as long as you like.", "A little sit. The fountain's doing all the talking.", "Nowhere to be for a minute."]), 4e3);
+      render();
+      return;
+    }
+    if (scene === "trophy" && id === "fountain") {
+      if (vz.step === "done") vz.step = "menu";
+      trophyView = "fountain";
+      sfx("paper", true);
+      render();
+      return;
+    }
+    if (scene === "trophy" && id === "tbook") {
+      trophyView = "book";
+      sfx("paper", true);
+      render();
+      return;
+    }
+    if (scene === "trophy" && id === "affirm") {
+      trophyView = "affirm";
+      sfx("paper", true);
+      render();
+      if (!(F.affirm && F.affirm.day === dayKey()) && sampleCap) freshAffirmations();
+      return;
+    }
+    if (scene === "trophy" && /^ped\d$/.test(id)) {
+      trophyView = id;
+      const t2 = onPedestals(F)[+id.slice(3)];
+      sfx(t2 ? "chime" : "paper", true);
+      render();
+      return;
+    }
+    if (scene === "trophy" && id === "kudos") {
       kudosOpen = true;
       kv.mode = "board";
       F.kudosSeen = Date.now();
@@ -10583,6 +11302,89 @@ Then tell chat "wind down" whenever you're ready.`
       render();
     }
   }
+  function trophyCtx() {
+    const r = revenueNow();
+    return { F, ST, levels: LEVELS, levelIndex: level(), kudos: kudosCount(), journal: journalCount(), revenue: r && F.revTarget ? { ...r, target: Number(F.revTarget) } : null };
+  }
+  function checkTrophies() {
+    const { fresh: fresh2, first, moved } = award(F, reached(trophyCtx()));
+    if (!fresh2.length) return;
+    if (first || fresh2.length > 3) F.trophyIntro = (F.trophyIntro || 0) + fresh2.length;
+    else fresh2.forEach((t2, i) => setTimeout(() => {
+      sfx("yay");
+      flash(`New trophy: ${t2.label}`);
+      speak(`New trophy! ${t2.label}. It's on a pedestal in the courtyard.`, 6e3, true);
+    }, i * 6500));
+    if (moved.length && !first) setTimeout(() => flash(`${moved.length === 1 ? "A trophy" : moved.length + " trophies"} stepped into the trophy book to make room.`), 4e3);
+    save2(scene === "trophy");
+  }
+  var objAt = 0;
+  async function fetchObjectives() {
+    if (Date.now() - objAt < 20 * 6e4) return;
+    objAt = Date.now();
+    let mcp3 = null;
+    try {
+      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
+    } catch {
+    }
+    if (!mcp3) return;
+    const monday = (d) => {
+      const t2 = /* @__PURE__ */ new Date(d + "T00:00:00Z");
+      return new Date(t2.getTime() - (t2.getUTCDay() + 6) % 7 * 864e5).toISOString().slice(0, 10);
+    };
+    const days = [dayKey(), new Date(Date.parse(dayKey() + "T00:00:00Z") - 7 * 864e5).toISOString().slice(0, 10)];
+    for (const d of days) {
+      try {
+        const r = await mcp3.callTool(SUNSAMA, "read_resource", { uri: `sunsama://objectives/${d}` }, { cache: { staleTime: 10 * 6e4 } });
+        let p = r && r.payload;
+        if (typeof p === "string") {
+          try {
+            p = JSON.parse(p);
+          } catch {
+          }
+        }
+        if (p && Array.isArray(p.contents) && p.contents[0] && p.contents[0].text) {
+          try {
+            p = JSON.parse(p.contents[0].text);
+          } catch {
+          }
+        }
+        const list2 = p && Array.isArray(p.objectives) ? p.objectives.filter((o) => o && o._id) : [];
+        F.objDone = F.objDone || {};
+        list2.filter((o) => o.completed).forEach((o) => {
+          F.objDone[o._id] = String(o.title || "").slice(0, 80);
+        });
+        if (list2.length && list2.every((o) => o.completed)) {
+          F.objWeeks = F.objWeeks || {};
+          F.objWeeks[monday(d)] = { n: list2.length, titles: list2.map((o) => String(o.title || "").slice(0, 80)).slice(0, 6) };
+        }
+      } catch {
+      }
+    }
+    checkTrophies();
+  }
+  var affirmBusy = false;
+  async function freshAffirmations() {
+    if (affirmBusy || !sampleCap) return;
+    affirmBusy = true;
+    if (trophyView === "affirm") ctx();
+    try {
+      const plan = await readPlan("week").catch(() => null);
+      const d = await sampleCap.json(`Write 5 short, warm, first-person affirmations for Mel: a Singapore founder (Fresh Pages Co copywriting studio, the apps Chord and Chico, AI training as Ambidextrous) and mum to Evan (2). Plain, believable, specific to her life, max 14 words each, no emoji, no cliches like "I am enough".${plan && plan.text ? "\nThis week's plan, for context:\n" + plan.text.slice(0, 1500) : ""}
+Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache: false });
+      const items = (d && Array.isArray(d.affirmations) ? d.affirmations : []).map((a) => plain(String(a)).trim().slice(0, 140)).filter(Boolean).slice(0, 5);
+      if (items.length) {
+        F.affirm = Object.assign(F.affirm || {}, { day: dayKey(), items });
+        save2();
+      }
+    } catch {
+    }
+    affirmBusy = false;
+    if (trophyView === "affirm") ctx();
+  }
+  setInterval(checkTrophies, 3e4);
+  setTimeout(checkTrophies, 4e3);
+  setTimeout(fetchObjectives, 9e3);
   function kidTap(ev) {
     if (ev.target.closest("[data-exit]")) {
       leaveKidRoom();
@@ -10686,6 +11488,15 @@ Then tell chat "wind down" whenever you're ready.`
   svg.addEventListener("click", (ev) => {
     if (scene === "kidroom") {
       kidTap(ev);
+      return;
+    }
+    const pg = ev.target.closest("[data-pigeon]");
+    if (pg) {
+      pg.classList.remove("flap");
+      void pg.getBBox();
+      pg.classList.add("flap");
+      sfx("paper", true);
+      setTimeout(() => pg.classList.remove("flap"), 1600);
       return;
     }
     if (S2.sleep && scene === "room") {
@@ -11041,6 +11852,10 @@ Then tell chat "wind down" whenever you're ready.`
           go(I2.parent, I2.door[0] + 30, I2.door[1] + 20, null);
         } else if (scene === "farm" && mel.y > 592 && Math.abs(mel.x - 260) < 50) go("base", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
       }
+    }
+    if (mel.sitting && (mel.moving || scene !== "trophy")) {
+      mel.sitting = false;
+      nodes.mel.classList.remove("sit");
     }
     mel.wasMoving = mel.moving;
     const inRoom = scene === "room", MB = [238, 298];

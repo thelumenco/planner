@@ -8,6 +8,7 @@ import { iconAt } from "./icons.js";
 import { runArt } from "../game/pets.js";
 import { jarArt } from "../game/jars.js";
 import { upgradesArt, festivalArt, festivalOn, pondLanterns, streetLamp, lampDefs } from "./village-extras.js";
+import { trophySVG } from "../game/trophies.js";
 import { townHall, chordWorkshop, library, chicoCottage, postOffice } from "./buildings.js";
 
 let G = null;
@@ -253,6 +254,24 @@ export function furn(kind, x, y){
     // Mel's routines noticeboard (her room's back wall): pinned lists, one ticked
     case "routineboard": return sk(`<rect x="${x-46}" y="${y-116}" width="92" height="92" rx="4" style="fill:#FFFDF6"/><rect x="${x-38}" y="${y-104}" width="36" height="44" rx="1" transform="rotate(-3 ${x-20} ${y-82})" style="fill:#D6E8F7"/><rect x="${x+2}" y="${y-102}" width="36" height="48" rx="1" transform="rotate(2 ${x+20} ${y-78})" style="fill:#FAD4DC"/><rect x="${x-24}" y="${y-56}" width="48" height="26" rx="1" style="fill:#FFF3B8"/>`,
       `<rect x="${x-46}" y="${y-116}" width="92" height="92" rx="4"/><path d="M${x-32} ${y-92} h22 M${x-32} ${y-84} h18 M${x-32} ${y-76} h22 M${x+8} ${y-90} h22 M${x+8} ${y-82} h18 M${x+8} ${y-74} h22 M${x+8} ${y-66} h14 M${x-16} ${y-46} h30 M${x-16} ${y-38} h22" opacity=".55"/><path d="M${x-36} ${y-93} l2 2 l4 -4"/><circle cx="${x-20}" cy="${y-104}" r="2" style="fill:var(--rose)"/><circle cx="${x+20}" cy="${y-102}" r="2" style="fill:var(--peri2)"/><circle cx="${x}" cy="${y-56}" r="2" style="fill:var(--honey)"/>`);
+    // the trophy room: its door in the town hall, the affirmations board, the book on its lectern, pedestals
+    // an open archway in the town hall's west wall, sunlit courtyard and greenery beyond
+    case "trophydoor": return sk(`<path d="M${x-40} ${y-104} q14 -12 28 -4 L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:#F3E3B8"/><path d="M${x-40} ${y-20} q8 -10 14 -2 q6 -9 14 0 L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:#9EBE8C"/><circle cx="${x-28}" cy="${y-62}" r="5" style="fill:#F08FB4"/><circle cx="${x-20}" cy="${y-70}" r="4" style="fill:#E86AA0"/>`,
+      `<path d="M${x-40} ${y-104} q14 -12 28 -4 L${x-12} ${y+4} L${x-40} ${y+14}z"/><path d="M${x-44} ${y-106} q16 -14 34 -4" />`);
+    case "fountain": return sk(`<ellipse cx="${x}" cy="${y-14}" rx="58" ry="20" style="fill:#D9D2C6"/><ellipse cx="${x}" cy="${y-18}" rx="48" ry="14" style="fill:#9CC3E0"/><rect x="${x-7}" y="${y-58}" width="14" height="40" style="fill:#D9D2C6"/><ellipse cx="${x}" cy="${y-58}" rx="22" ry="7" style="fill:#D9D2C6"/><ellipse cx="${x}" cy="${y-60}" rx="16" ry="4" style="fill:#9CC3E0"/>`,
+      `<ellipse cx="${x}" cy="${y-14}" rx="58" ry="20"/><path d="M${x-58} ${y-14} v8 a58 20 0 0 0 116 0 v-8"/><ellipse cx="${x}" cy="${y-18}" rx="48" ry="14"/><rect x="${x-7}" y="${y-58}" width="14" height="40"/><ellipse cx="${x}" cy="${y-58}" rx="22" ry="7"/>
+        <path class="smoke" d="M${x} ${y-66} q-10 -14 -20 4 M${x} ${y-66} q10 -14 20 4 M${x} ${y-68} v-10" opacity=".75" style="stroke:#7FB8E8"/>`);
+    case "parkbench": return sk(`<rect x="${x-52}" y="${y-44}" width="104" height="10" rx="3" style="fill:var(--wood)"/><rect x="${x-56}" y="${y-22}" width="112" height="10" rx="3" style="fill:var(--wood)"/>`,
+      `<rect x="${x-52}" y="${y-44}" width="104" height="10" rx="3"/><path d="M${x-44} ${y-34} v12 M${x+44} ${y-34} v12"/><rect x="${x-56}" y="${y-22}" width="112" height="10" rx="3"/><path d="M${x-48} ${y-12} v14 M${x+48} ${y-12} v14"/>`);
+    case "affirmboard": return sk(`<rect x="${x-50}" y="${y-116}" width="100" height="92" rx="4" style="fill:#FFFDF6"/><circle cx="${x}" cy="${y-96}" r="9" style="fill:#FFE38A"/>`,
+      `<rect x="${x-50}" y="${y-116}" width="100" height="92" rx="4"/><path d="M${x} ${y-110} v-3 M${x} ${y-79} v-3 M${x-15} ${y-96} h3 M${x+12} ${y-96} h3"/><circle cx="${x}" cy="${y-96}" r="9"/><path d="M${x-36} ${y-70} q8 -5 16 0 t16 0 t16 0 t16 0 M${x-36} ${y-56} q8 -5 16 0 t16 0 t16 0 M${x-36} ${y-42} q8 -5 16 0 t16 0 t16 0 t16 0" opacity=".6"/>`);
+    case "lectern": return sk(`<path d="M${x-30} ${y-62} h60 l-8 18 h-44z" style="fill:var(--wood)"/><path d="M${x-8} ${y-44} h16 v38 h-16z" style="fill:var(--wood)"/><path d="M${x-26} ${y-6} h52 v6 h-52z" style="fill:#8B5E3C"/>
+        <path d="M${x-36} ${y-66} q18 -10 36 -4 q18 -6 36 4 l-2 8 q-17 -8 -34 -2 q-17 -6 -34 2z" style="fill:#FFFDF6"/><path d="M${x-38} ${y-62} q19 -6 38 -1 q19 -5 38 1 l0 4 q-19 -6 -38 -1 q-19 -5 -38 1z" style="fill:#8E2C48"/>`,
+      `<path d="M${x-30} ${y-62} h60 l-8 18 h-44z"/><path d="M${x-8} ${y-44} h16 v38 h-16z"/><path d="M${x-26} ${y-6} h52 v6 h-52z"/><path d="M${x-36} ${y-66} q18 -10 36 -4 q18 -6 36 4 M${x} ${y-70} v8"/><path d="M${x-28} ${y-68} h20 M${x+8} ${y-68} h20" opacity=".5"/><path d="M${x+20} ${y-64} v10 l3 -2 l3 2 v-10" style="fill:var(--honey)"/>`);
+    case "pedestal": { const t = G.ped ? G.ped(x, y) : null;
+      return sk(`<rect x="${x-30}" y="${y-62}" width="60" height="10" rx="2" style="fill:#F3EEE6"/><rect x="${x-24}" y="${y-52}" width="48" height="44" style="fill:#EAE3D8"/><rect x="${x-30}" y="${y-8}" width="60" height="8" rx="2" style="fill:#F3EEE6"/>`,
+        `<rect x="${x-30}" y="${y-62}" width="60" height="10" rx="2"/><rect x="${x-24}" y="${y-52}" width="48" height="44"/><path d="M${x-14} ${y-50} v40 M${x} ${y-50} v40 M${x+14} ${y-50} v40" opacity=".35"/><rect x="${x-30}" y="${y-8}" width="60" height="8" rx="2"/>`)
+        + (t ? trophySVG(t, 64).replace("<svg ", `<svg x="${x-32}" y="${y-62-72}" class="ptrophy" `) : `<ellipse cx="${x}" cy="${y-64}" rx="16" ry="3" fill="#000" opacity=".06"/>`); }
     case "kindboard": { const n = G.kudos ? G.kudos() : 0, cols = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
       const spots = [[-36, -98], [-8, -102], [20, -97], [-30, -70], [0, -66], [26, -72], [-20, -44], [12, -44]];
       const notes = spots.slice(0, Math.min(8, n)).map(([dx, dy], i) => `<rect x="${x+dx}" y="${y+dy}" width="20" height="18" rx="1" transform="rotate(${(i % 3) - 1} ${x+dx+10} ${y+dy+9})" style="fill:${cols[i % 6]}"/>`).join("");
@@ -368,7 +387,9 @@ export function roomArt(id){
     `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`) +
     `<g>${[["apple","dumpling","fish","toast"],["tulip","carrot","strawberry","sunflower"]].map((row, r) => row.map((n, i) => iconAt(n, 64 + i*30, 62 + r*38, 26)).join("")).join("")}${[["yarn","ball","brush","crown"],["bath","fort","corn","blueberry"]].map((row, r) => row.map((n, i) => iconAt(n, 374 + i*30, 62 + r*38, 26)).join("")).join("")}</g>`;
   st.forEach(s => {
-    h += `<g data-spot="${s.id}" aria-label="${s.name}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${tapeLabel(s.x, s.y + 24, s.name, "var(--card)")}</g>`;
+    // a pedestal's sign names the trophy standing on it (an empty one has no sign)
+    const nm = s.kind === "pedestal" ? ((G.ped && G.ped(s.x, s.y)) || {}).label || "" : s.name;
+    h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? tapeLabel(s.x, s.y + 24, nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)", s.kind === "pedestal" ? 10 : undefined) : ""}</g>`;
   });
   if (id === "kidroom") {
     // the door back to the house on the west wall
@@ -377,6 +398,17 @@ export function roomArt(id){
       ${sk(`<path d="M0 346 L28 358 L28 456 L0 466z" style="fill:#F7D35A"/>`, `<path d="M0 346 L28 358 L28 456 L0 466z"/><circle cx="23" cy="410" r="1.8"/>`)}
       ${tapeLabel(50, 492, "To the house", "var(--card)", 11)}</g>`;
     if (k.sleep) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".34" pointer-events="none"/>`;
+    return h;
+  }
+  if (id === "trophy") {
+    // the archway back into the town hall (east side), and a few pigeons pecking about (tap one and it flaps)
+    h += `<g data-exit="1" aria-label="Back to the town hall"><ellipse class="hov" cx="486" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
+      ${sk(`<path d="M520 346 q-16 -6 -28 8 L492 456 L520 466z" style="fill:#E6E9F5"/>`, `<path d="M520 346 q-16 -6 -28 8 L492 456 L520 466z"/>`)}${tapeLabel(462, 486, "To the town hall", "var(--card)", 11)}</g>`;
+    const pigeon = (x, y, d, flip) => `<g data-pigeon="1" class="pigeon" style="--px:${x}px;--py:${y}px;animation-delay:-${d}s"><g transform="translate(${x} ${y}) scale(${flip ? -1 : 1} 1)"><g class="pbody">
+      <ellipse cx="0" cy="-6" rx="9" ry="6" fill="#A7A9B4" stroke="#3A2E28" stroke-width="1.1"/><path d="M-8 -8 q-6 -1 -9 3 q5 1 9 0z" fill="#8E909C" stroke="#3A2E28" stroke-width="1"/>
+      <g class="phead"><circle cx="8" cy="-12" r="4.2" fill="#8E909C" stroke="#3A2E28" stroke-width="1.1"/><path d="M8.5 -9.5 q2 1 3 -0.5" fill="#7BB37A" stroke="none"/><circle cx="9.4" cy="-13" r=".9" fill="#3A2E28"/><path d="M12 -12 l2.6 .8 -2.6 .6z" fill="#E3A27E"/></g>
+      <path d="M-1 0 v3 M3 0 v3" stroke="#E3A27E" stroke-width="1.3"/></g></g></g>`;
+    h += pigeon(196, 520, 0, false) + pigeon(352, 538, 1.7, true) + pigeon(300, 330, 3.1, false);
     return h;
   }
   if (id === "room") {

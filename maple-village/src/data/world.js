@@ -61,7 +61,8 @@ export const outdoorOf = s => OUTDOOR.includes(s) ? s : INNER[s] ? outdoorOf(INN
 // own door (on the opposite wall), where she walks to leave.
 export const INNER = {
   room: {parent: "home", door: [64, 340], arrive: [456, 400], exit: [486, 410]},
-  kidroom: {parent: "home", door: [456, 340], arrive: [70, 420], exit: [34, 410]}
+  kidroom: {parent: "home", door: [456, 340], arrive: [70, 420], exit: [34, 410]},
+  trophy: {parent: "hall", door: [64, 372], arrive: [456, 400], exit: [486, 410]}
 };
 export const WORK = ["hall","chord","fresh","chico","post","home"];
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
@@ -71,8 +72,8 @@ export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,5
 // the floor at y≈165: their front edge sits at 165 + their height. Tables, sofas and baskets stay out on the floor.
 // station: [id, name, slot, furniture, keyword regex, line, standDy?]  (standDy: where Mel stands, relative to the front edge; default +42)
 export const ROOMS = {
-  hall:  {name:"Town hall", wall:"#E6E9F5", trim:"var(--peri)", pos:{A:[448,262], B:[110,258], C:[420,474], D:[334,266], E:[118,474], F:[362,132]}, stations:[
-    ["kudos","Kind words","F","kindboard",null,"Lovely things people have said about you.",72],
+  hall:  {name:"Town hall", wall:"#E6E9F5", trim:"var(--peri)", pos:{A:[448,262], B:[110,258], C:[420,474], D:[334,266], E:[118,474], R:[40,362]}, stations:[
+    ["trophydoor","Courtyard","R","trophydoor",null,"Out to the courtyard: trophies, kind words, a bench in the sun.",0],
     ["table","Planning table","C","plantable",/plan|strategy|review|ceo|goal|week|month|quarter|budget/,"Your week, month and quarter, from Notion."],
     ["whiteboard","Whiteboard","B","whiteboard",/brainstorm|idea|map|outline|launch|offer|pricing/,"Fresh marker, blank board."],
     ["revenue","Revenue chart","D","chartstand",/invoice|revenue|sales|finance|money|budget|pricing|accounts/,"How the money's flowing, from Chord."],
@@ -133,6 +134,16 @@ export const ROOMS = {
     ["train","Train set","T","trainset",null,"Choo choo!",28],
     ["dino","Dino eggs","D","dinonest",null,"What's inside the eggs?",22],
     ["cars","Toy cars","C","garage",null,"Beep beep!",18]]},
+  // The courtyard, through the archway on the town hall's west wall: a sunny Spanish-style courtyard with a fountain,
+  // a bench, pigeons, the kind words and affirmations boards on the arcade wall, six trophy pedestals and the trophy book
+  trophy: {name:"The courtyard", wall:"#F6EEE2", trim:"#C9774D", noBoard:true, pos:{K:[132,132], F:[388,132], B:[260,262], P:[80,316], Q:[420,316], S:[80,462], T:[420,470], U:[118,606], V:[402,606], N:[260,604], W:[260,452]}, stations:[
+    ["kudos","Kind words","K","kindboard",null,"Lovely things people have said about you.",72],
+    ["affirm","Affirmations","F","affirmboard",null,"Today's affirmations.",72],
+    ["tbook","Trophy book","B","lectern",null,"Every trophy, with when and why.",26],
+    ["fountain","Fountain","W","fountain",null,"Make a wish.",36],
+    ["bench","Bench","N","parkbench",null,"Sit a while.",-14],
+    ["ped0","","P","pedestal",null,"",24], ["ped1","","Q","pedestal",null,"",24], ["ped2","","S","pedestal",null,"",24],
+    ["ped3","","T","pedestal",null,"",24], ["ped4","","U","pedestal",null,"",24], ["ped5","","V","pedestal",null,"",24]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };

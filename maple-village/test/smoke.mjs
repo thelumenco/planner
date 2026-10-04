@@ -712,11 +712,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-spot="desk"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-desk="refresh"]', { timeout: 15000 });
-  await page.waitForSelector("#ctx .calday li", { timeout: 10000 }).catch(() => {});
-  check(await page.locator("#ctx .calday li").count() >= 2, "the home desk shows today's calendar");
   await page.waitForFunction(() => /Dinner on Sunday/.test(document.querySelector("#ctx").textContent), null, { timeout: 10000 }).catch(() => {});
-  check(/Dinner on Sunday/.test(await page.locator("#ctx").textContent()) && await page.evaluate(() => window.__zapier && window.__zapier.params.query.includes("category:primary") && !!window.__zapier.connection_id), "and the personal inbox, through Zapier (Primary only)");
-  check(/freshpages/.test(await page.locator("#ctx").textContent()) && /MUSE audit/.test(await page.locator("#ctx").textContent()), "and the work inbox, all on one page");
+  check(/Dinner on Sunday/.test(await page.locator("#ctx").textContent()) && await page.evaluate(() => window.__zapier && window.__zapier.params.query.includes("category:primary") && !!window.__zapier.connection_id), "the home desk shows the personal inbox, through Zapier (Primary only)");
+  check(!/freshpages/.test(await page.locator("#ctx").textContent()), "the home desk is just the personal inbox");
   await page.click("#pclose"); await page.click("#chatBtn");
   await page.fill("#chatIn", "remind me to get the laundry in in 1 hour"); await page.click("#chatForm button");
   await page.waitForFunction(() => [...document.querySelectorAll("#chatLog .did")].some(d => /Reminder at/.test(d.textContent)), null, { timeout: 10000 });
@@ -807,9 +805,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-place="hall"]').dispatchEvent("click");
   await page.waitForFunction(() => /Town hall/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-spot="trophydoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /courtyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-spot="kudos"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-kd="add"]', { timeout: 15000 });
-  check(true, "the town hall has a Kind words board on the wall");
+  check(true, "the courtyard has a Kind words board on the wall");
   await page.click('#ctx [data-kd="add"]');
   await page.fill("#kText", "Your copy made our launch. Best money we spent all year."); await page.fill("#kFrom", "A client"); await page.click('#kForm button[type="submit"]');
   await page.waitForTimeout(300);
@@ -839,7 +839,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForSelector("#ctx .rcheck li", { timeout: 15000 });
   check(await page.locator("#ctx .rcheck li").count() >= 3, "the noticeboard has a morning routine checklist");
   await page.click("#ctx .rcheck li >> nth=0"); await page.waitForTimeout(200);
-  check(await page.locator("#ctx .rcheck li.tick").count() === 1, "and steps tick off");
+  check(await page.locator("#ctx .rcheck li.on").count() === 1 && await page.locator("#ctx .rcheck .rbox.on").count() === 1 && await page.locator("#ctx .rcheck .tk").count() === 0, "steps start as empty boxes and tick off with one tap");
   await page.click('#ctx [data-rt="sel"]:has-text("Beauty")'); await page.click('#ctx [data-rt="edit"]');
   await page.fill("#rtPaste", "Mon: double cleanse\nTue - hair mask\nWednesday: exfoliate\nThu: sheet mask\nFri. nails\nSun: rest");
   await page.click('#ctx [data-rt="paste"]'); await page.waitForTimeout(150);
@@ -854,6 +854,61 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#undoBtn"); await page.waitForTimeout(200);
   check(await page.locator("#ctx .redit li").count() === n0, "and Undo puts them back");
   await page.screenshot({ path: join(shots, "routines.png") });
+  await page.close();
+}
+{
+  // Trophy room: off the town hall; trophies on pedestals, the trophy book, affirmations, kind words
+  console.log("\ntrophy room");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.goto(url + "?reset=1&seed=1&time=10:30&sunsama=1");
+  await page.waitForTimeout(1500);
+  // patch the save as the next page starts (the old page writes its own copy as it unloads)
+  await page.addInitScript(() => { if (!location.search.includes("patchtq")) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.totalQuests = 30; delete f.trophies;
+    localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
+  await page.goto(url + "?seed=1&time=10:30&sunsama=1&patchtq=1");
+  await page.waitForTimeout(12000);
+  const tr = await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.fox")).trophies || []).map(t => t.id));
+  check(tr.includes("quests-10") && tr.includes("quests-25") && !tr.includes("quests-50"), "trophies are awarded for quest milestones reached");
+  check(tr.some(id => id.startsWith("objw-")), "and for a week with every Sunsama objective done");
+  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-place="hall"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town hall/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(await page.locator('#world [data-spot="trophydoor"]').count() === 1 && await page.locator('#world [data-spot="kudos"]').count() === 0, "the town hall has an archway out to the courtyard (the kind words board moved out there)");
+  await page.locator('#world [data-spot="trophydoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /courtyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(600);
+  check(await page.locator("#world .ptrophy").count() >= 3, "trophies stand on the pedestals");
+  check(await page.locator('#world [data-spot="kudos"]').count() === 1 && await page.locator('#world [data-spot="affirm"]').count() === 1, "with the kind words and affirmations boards on the wall");
+  await page.locator('#world [data-spot="ped0"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-tr="book"]', { timeout: 10000 });
+  const name = await page.locator("#ctx .tcard h2").textContent();
+  await page.click('#ctx [data-tr="book"]'); await page.waitForTimeout(400);
+  await page.locator('#world [data-spot="tbook"]').dispatchEvent("click");
+  await page.waitForSelector("#ctx .tpage", { timeout: 10000 });
+  check((await page.locator("#ctx .tpage h3").first().textContent()) === name && await page.locator("#ctx .tpage svg").count() >= 1, "a trophy can go into the trophy book: a page with a polaroid and the story");
+  await page.click("#pclose"); await page.waitForTimeout(200);
+  await page.locator('#world [data-spot="affirm"]').dispatchEvent("click");
+  await page.waitForSelector("#ctx .taff li", { timeout: 10000 });
+  check(await page.locator("#ctx .taff li").count() === 5, "five affirmations for today");
+  await page.click("#pclose"); await page.waitForTimeout(200);
+  await page.locator('#world [data-spot="bench"]').dispatchEvent("click"); await page.waitForTimeout(2500);
+  check(await page.evaluate(() => document.getElementById("mel").classList.contains("sit")), "Mel can sit on the bench");
+  check(await page.locator("#world [data-pigeon]").count() >= 2 && await page.locator('#world [data-spot="fountain"]').count() === 1, "with a fountain and pigeons pecking about");
+  await page.locator('#world [data-spot="fountain"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-vz="start"]', { timeout: 10000 });
+  check(true, "wishing at the fountain offers the weekly visualisation");
+  await page.click('#ctx [data-vz="start"]'); await page.waitForSelector('#ctx [data-vz="begin"]:not([disabled])', { timeout: 10000 });
+  await page.click('#ctx [data-vz="begin"]');
+  for (let i = 0; i < 6; i++) { await page.waitForSelector("#vzIn", { timeout: 10000 }); await page.fill("#vzIn", i === 5 ? "Spacious" : "Calm and proud. I sent the Voice Pass email."); await page.click('#ctx [data-vz="next"]'); await page.waitForFunction(() => !document.querySelector('#ctx [data-vz="next"][disabled]'), null, { timeout: 10000 }).catch(() => {}); }
+  await page.waitForSelector("#ctx .vsum", { timeout: 15000 }).catch(() => {});
+  check(await page.locator("#ctx .vsum").count() === 1, "six questions, one at a time, then the week written back");
+  await page.click('#ctx [data-vz="save"]');
+  await page.waitForFunction(() => window.__visSaved, null, { timeout: 10000 }).catch(() => {});
+  check(await page.evaluate(() => !!window.__visSaved && window.__visSaved.pages[0].properties["Feeling Word"] && window.__visSaved.parent.data_source_id.startsWith("ba8f40af")), "saved to the Weekly Visualisations database in Notion");
+  check(await page.evaluate(() => (window.__sunsamaTasks || []).length >= 1), "and the actions go to Sunsama");
+  await page.click("#pclose");
+  await page.screenshot({ path: join(shots, "courtyard.png") });
   await page.close();
 }
 await browser.close();

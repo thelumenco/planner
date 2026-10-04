@@ -47,6 +47,7 @@
   // Maple's chat: a tiny fake that turns a few phrases into actions, so the action plumbing can be tested offline
   sample.json = async (prompt) => {
     window.__lastPrompt = String(prompt);
+    if (/Write Mel's weekly visualisation back to her/.test(String(prompt))) return {summary: "Spacious. The week opens in front of you like a held breath let go. You send the Voice Pass email without overthinking it.", theme: "Room to breathe", word: "Spacious", actions: [{title: "Send the Voice Pass email", why: "I sent the Voice Pass email"}]};
     if (/You are Mel's personal stylist/.test(String(prompt))) return {label: "Emerald easy day", dress: "Emerald wrap midi dress", shoes: "Black ballet flats", bag: "Black crossbody", jewellery: "Silver hoops", hair: "up, low bun", why: "Soft, fitted and cool-toned for a relaxed day."};
     const m = /\nMel: ([^\n]*)\nReturn JSON only/.exec(String(prompt)); if (!m) return {};
     const t = m[1].toLowerCase(), acts = [];
@@ -69,6 +70,8 @@
           messages: [{ id, sender, subject, snippet, date: new Date(Date.now() - h*3600e3).toISOString(), labelIds: ["UNREAD", "INBOX"] }] });
         return { content: [], payload: { resultCountEstimate: "2", threads: [t("g1", "Farzana Ali <farzana@example.com>", "MUSE audit: next steps", "Lovely to hear from you, here's what I'm thinking", 2), t("g2", "studio@example.com", "Invoice question", "Quick one about the October invoice", 20)] } };
       }
+      if (server === "Notion" && tool === "notion-create-pages") { window.__visSaved = input; return { content: [], payload: { pages: [{ id: "vis1" }] } }; }
+      if (server === "Sunsama MCP" && tool === "create_task") { (window.__sunsamaTasks = window.__sunsamaTasks || []).push(input); return { content: [], payload: { _id: "t" + window.__sunsamaTasks.length } }; }
       if (server === "Zapier" && tool === "execute_zapier_read_action") {
         window.__zapier = input;
         return { content: [], payload: { results: [{ id: "z1", from: { name: "Aunty May", email: "may@example.com" }, subject: "Dinner on Sunday?", raw: { snippet: "Bring Evan, I made kueh" }, date: new Date(Date.now() - 2*3600e3).toISOString(), message_url: "https://mail.google.com/mail/u/0/#inbox/z1" }] } };
@@ -109,6 +112,7 @@
         return { content: [], payload: { title: t, text: `<page><properties>{"Name":"${t}","Theme":"Stub theme for ${t}"}</properties><content>\n## Objectives\n- **Primary:** (stub plan for ${t}) fill the Visibility Fix\n## Day by day\n**Monday (sales)**\n- Message 12 warm leads (30 min)\n**Tuesday (client)**\n- Write features 1 and 2 (90 min)\n## Waiting on others\nPopcorn, Radhika.\n## Life reflection\n<table header-row="true">\n<tr>\n<td>Area</td>\n<td>Score</td>\n</tr>\n<tr>\n<td>Family</td>\n<td>4</td>\n</tr>\n</table>\n</content></page>` } };
       }
       if (server !== "Sunsama MCP" || tool !== "read_resource") throw { code: "not_in_manifest", message: "not declared" };
+      if (/objectives/.test(String(input.uri || ""))) return { content: [], payload: { objectives: [{ _id: "o1", title: "Chord traction: work the plan daily", completed: true }, { _id: "o2", title: "Introduce myself as a founder", completed: true }] } };
       // the first day asked for is "today"; any later day gets tomorrow's (different) tasks
       const day = String(input.uri || "").slice(-10); stubDay = stubDay || day;
       if (day !== stubDay) {
