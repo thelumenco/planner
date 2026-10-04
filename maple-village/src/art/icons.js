@@ -150,6 +150,14 @@ I.coop = [`<path d="M3 11l9-7 9 7z" ${f(C.rose)}/><rect x="5" y="11" width="14" 
   `<path d="M3 11l9-7 9 7"/><rect x="5" y="11" width="14" height="9"/><rect x="10" y="14" width="4" height="6"/><path d="M14 20l5 2.5"/>`];
 I.dog = [`<ellipse cx="10" cy="15" rx="7" ry="4.5" ${f("#E3B07A")}/><circle cx="17" cy="10" r="4" ${f("#E3B07A")}/><path d="M14.5 7.5c-1.5 0-2.5 2-2 4.5 1.2-.3 2-1.5 2-4.5z" ${f("#A9744A")}/>`,
   `<ellipse cx="10" cy="15" rx="7" ry="4.5"/><circle cx="17" cy="10" r="4"/><path d="M14.5 7.5c-1.5 0-2.5 2-2 4.5 1.2-.3 2-1.5 2-4.5zM3.5 13c-1.5-1-2-2.5-1.5-4M6 19v2.5M13 19v2.5"/><circle cx="18" cy="9.4" r=".7"/><path d="M21 11h.1"/>`];
+// Mel's room and things she wears
+I.mirror = [`<ellipse cx="12" cy="10" rx="6.5" ry="7.5" ${f("#DCE8F4")}/><rect x="5" y="18" width="14" height="3" rx="1" ${f(C.wood)}/>`, `<ellipse cx="12" cy="10" rx="6.5" ry="7.5"/><path d="M12 17.5v1M5 18h14v3H5zM9.5 7.5l3-3" />`];
+I.throw = [`<path d="M4 6h16v13H4z" ${f(C.blush)}/>`, `<path d="M4 6h16v13H4zM8 6v13M12 6v13M16 6v13M4 19l-1 2M8 19l-1 2M12 19l-1 2M16 19l-1 2M20 19l-1 2"/>`];
+I.candle = [`<rect x="9" y="10" width="6" height="11" rx="1.5" ${f(C.paper)}/><path d="M12 9c-2-2.5-1.5-4.5 0-6.5 1.5 2 2 4 0 6.5z" ${f("#F6A23A")}/>`, `<rect x="9" y="10" width="6" height="11" rx="1.5"/><path d="M12 9c-2-2.5-1.5-4.5 0-6.5 1.5 2 2 4 0 6.5zM12 10v-1"/>`];
+I.bow = [`<path d="M12 12L4 7v10zM12 12l8-5v10z" ${f("#8E2C48")}/><circle cx="12" cy="12" r="2.4" ${f("#6E1F36")}/>`, `<path d="M12 12L4 7v10zM12 12l8-5v10z"/><circle cx="12" cy="12" r="2.4"/>`];
+I.scarf = [`<path d="M5 6c4 3 10 3 14 0l-1 4c-4 2-8 2-12 0z" ${f(C.peri2)}/><path d="M13 10l3 10-3-1-2 2 0-11z" ${f(C.peri2)}/>`, `<path d="M5 6c4 3 10 3 14 0l-1 4c-4 2-8 2-12 0zM13 10l3 10-3-1-2 2 0-11z"/>`];
+I.sunhat = [`<ellipse cx="12" cy="15" rx="10" ry="3.5" ${f("#F3DFA6")}/><path d="M7 15c0-7 10-7 10 0z" ${f("#F3DFA6")}/>`, `<ellipse cx="12" cy="15" rx="10" ry="3.5"/><path d="M7 15c0-7 10-7 10 0z"/><path d="M7 13.5h10" stroke-width="2" style="stroke:#8E2C48"/>`];
+I.pyjamas = [`<path d="M6 4h12l2 6-3 1v10H7V11l-3-1z" ${f("#3B4A86")}/>`, `<path d="M6 4h12l2 6-3 1v10H7V11l-3-1zM12 5v16M10 4l2 3 2-3"/><circle cx="12" cy="10" r=".6"/><circle cx="12" cy="14" r=".6"/>`];
 I.base = I.sprout;   // quests outdoors at home base
 export const icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
 export const iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size/2}" y="${y - size/2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;

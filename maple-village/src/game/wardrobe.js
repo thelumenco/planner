@@ -4,6 +4,7 @@
 // and kept for the day in F.outfits.
 import { esc, plain, dayKey } from "../util.js";
 import { outfitDoc } from "./feeds.js";
+import { garment } from "../art/garments.js";
 
 const FIELDS = [["top", "Top"], ["dress", "Dress"], ["bottom", "Bottom"], ["shoes", "Shoes"], ["bag", "Bag"], ["jewellery", "Jewellery"], ["sunglasses", "Sunglasses"], ["layer", "Layer"], ["hair", "Hair"]];
 const clean = (s, n = 140) => plain(String(s || "")).slice(0, n);
@@ -13,7 +14,7 @@ const inventory = () => { const d = outfitDoc(); return d && d.wardrobe && typeo
 
 function card(o, i){
   if (!o) return "";
-  const rows = FIELDS.filter(([k]) => o[k]).map(([k, n]) => `<li><small>${n}</small><span>${esc(clean(o[k]))}</span></li>`).join("");
+  const rows = FIELDS.filter(([k]) => o[k]).map(([k, n]) => `<li><span class="gpic">${garment(k === "layer" ? "layer" : k, o[k])}</span><span><small>${n}</small>${esc(clean(o[k]))}</span></li>`).join("");
   return `<div class="outfit"><p class="olabel">${esc(clean(o.label, 50) || `Option ${i + 1}`)}</p><ul>${rows}</ul>${o.why ? `<p class="owhy">${esc(clean(o.why, 220))}</p>` : ""}</div>`;
 }
 export function wardrobePanel(F, st){
@@ -31,14 +32,21 @@ export function wardrobePanel(F, st){
 }
 
 // One new outfit from the sample capability, using only pieces in the wardrobe list.
-export async function newOutfit(F, sample, ask){
+export async function newOutfit(F, sample, ask, events){
   const d = outfitDoc(), inv = inventory(); if (!inv || !sample) return null;
   const shown = [...((todayDoc() || {}).options || []), ...extras(F)].map(o => FIELDS.map(([k]) => o[k]).filter(Boolean).join(", ")).slice(-8);
   const prompt = `You are Mel's personal stylist. Suggest ONE outfit for today.
-Rules: True/Deep Winter colours (black, pure white, navy, burgundy, forest green, royal blue, emerald, plum, charcoal, cool reds, hot pink, icy lavender; avoid camel, warm browns, orange, yellow, olive, rust, coral, cream). Romantic Kibbe: soft, fitted, draped, waist defined, midi/maxi lengths, rounded toes. One fitted + one relaxed. Always one piece of jewellery. Hair up by default (down only for a V-neck, off shoulder or a special evening). Weekends and parenting days: practical flat shoes, no heels, no low camis. Cream linen blazer only for in-person power meetings. Sunglasses only if she's going out.
+Mel's style profile (from her stylist skill):
+- Colour season True/Deep Winter. Best: true black, pure white, icy white, deep navy, burgundy/wine, deep forest green, royal blue, emerald, plum, charcoal, cool blue-reds, hot pink, icy lavender. Wears silver AND gold. Avoid warm browns, camel, orange, yellow, warm beige, olive, rust, coral near the face (chocolate, mocha, tan work as neutrals away from the face). Neutrals: black, charcoal, navy, pure white.
+- Kibbe Romantic: soft, curved, fitted; fluid fabrics (jersey, silk, satin, chiffon); define the waist (tuck or belt); midi and maxi; soft florals or abstract prints, never geometric; rounded or almond toes; no boxy head-to-toe or oversized.
+- Frameworks: sandwich method (top colour repeated in shoes); one fitted + one relaxed; one area of visual interest; neckline-led jewellery (V-neck pendant, boat neck long lariat, off shoulder choker, cowl layered chains); hair up with high necks, down with open necklines; bag size balances the top.
+- Day rules: hair up by default. Zoom/video calls: textured black boat neck top + long pendant. Weekends and parenting days: sneakers or ballet flats, polo tees with a belt are great, no heels, no low camis or strappy tops on their own. Sundays: parents' place, linen shorts, unless the calendar says otherwise. Cream linen blazer only for in-person power meetings. Heavy aircon: a cardigan. Sunglasses only if she goes out (Tom Ford black for polished, Rubi round for relaxed, warm frames only with cool outfits).
+Dress for the day below: the most important event decides how polished it is; if events differ a lot, note when to change.
 Use ONLY items from this wardrobe list (copy their names). If a piece that would complete the look isn't there, add "(not currently in wardrobe)" after it.
 Wardrobe: ${JSON.stringify(inv).slice(0, 6000)}
-Today: ${d && d.day === dayKey() ? `${clean(d.weather, 60)}; on: ${clean(d.on, 200)}` : dayKey()}
+Today: ${new Date(dayKey() + "T00:00:00Z").toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "long", timeZone: "UTC"})}, Singapore.
+Weather: ${d && d.day === dayKey() && d.weather ? clean(d.weather, 80) : "not checked yet; assume Singapore's usual: hot and humid, maybe an afternoon shower, cold aircon indoors"}.
+Calendar: ${(events || []).length ? events.slice(0, 12).map(e => `${e.allDay ? "all day" : new Date(e.start).toLocaleTimeString("en-GB", {hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore"})} ${clean(e.title, 60)}${e.where ? ` (${clean(e.where, 40)})` : ""}`).join("; ") : d && d.day === dayKey() && d.on ? clean(d.on, 200) : "nothing on the calendar (a home or WFH day)"}.
 Already suggested today (make this one clearly different): ${shown.join(" | ") || "none"}
 Mel's request: ${clean(ask, 120) || "something different"}
 Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "", "shoes": "", "bag": "", "jewellery": "", "sunglasses": "", "layer": "", "hair": "up|down + short note", "why": "one sentence"} (leave fields empty when not used: dress OR top+bottom).`;

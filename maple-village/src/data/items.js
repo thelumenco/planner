@@ -59,7 +59,20 @@ export const DECOR = {
   lamp:        {ico:"lamp",      n:"Reading lamp",     slot:"lamp", val:"on",     price:10},
   big_plant:   {ico:"pot",       n:"Big plant",        slot:"plant",val:"on",     price:8},
   painting:    {ico:"painting",  n:"Painting",         slot:"art",  val:"on",     price:14},
-  fox_bed:     {ico:"bed",       n:"Maple's bed",      slot:"bed",  val:"on",     price:16}
+  fox_bed:     {ico:"bed",       n:"Maple's bed",      slot:"bed",  val:"on",     price:16},
+  // "Me & my room" tab: things for Mel's own room, and things Mel wears (shown on her in the village)
+  r_lights:    {ico:"lantern",   n:"Fairy lights",     slot:"r_lights", val:"on", price:14, tab:"me", where:"room"},
+  r_plant:     {ico:"pot",       n:"Monstera",         slot:"r_plant",  val:"on", price:10, tab:"me", where:"room"},
+  r_rug:       {ico:"rug",       n:"Cloud rug",        slot:"r_rug",    val:"on", price:16, tab:"me", where:"room"},
+  r_art:       {ico:"painting",  n:"Flower print",     slot:"r_art",    val:"on", price:12, tab:"me", where:"room"},
+  r_shelf:     {ico:"storybook", n:"Little bookshelf", slot:"r_shelf",  val:"on", price:22, tab:"me", where:"room"},
+  r_vanity:    {ico:"mirror",    n:"Vanity mirror",    slot:"r_vanity", val:"on", price:30, tab:"me", where:"room"},
+  r_throw:     {ico:"throw",     n:"Knitted throw",    slot:"r_throw",  val:"on", price:12, tab:"me", where:"room"},
+  r_candle:    {ico:"candle",    n:"Calm candle",      slot:"r_candle", val:"on", price:8,  tab:"me", where:"room"},
+  me_bow:      {ico:"bow",       n:"Velvet hair bow",  slot:"me_bow",   val:"on", price:9,  tab:"me", where:"me"},
+  me_scarf:    {ico:"scarf",     n:"Silk neck scarf",  slot:"me_scarf", val:"on", price:12, tab:"me", where:"me"},
+  me_hat:      {ico:"sunhat",    n:"Straw sun hat",    slot:"me_hat",   val:"on", price:15, tab:"me", where:"me"},
+  me_pj:       {ico:"pyjamas",   n:"Silk pyjamas",     slot:"me_pj",    val:"on", price:18, tab:"me", where:"me"}
 };
 
 export const PLOTS = Array.from({length:12}, (_, i) => ({x:70 + (i%3)*140, y:172 + Math.floor(i/3)*104, w:100, h:66}));

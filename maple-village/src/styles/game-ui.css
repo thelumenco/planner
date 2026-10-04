@@ -42,7 +42,7 @@
 .qnote h1{font-size:1.2rem;margin:0 26px 8px 0;line-height:1.25}
 .qnote .lbl{font-size:.6rem;margin:0 0 4px;letter-spacing:.2em}
 .qnote .bujo{gap:3px;margin:0 0 10px;font-size:.9rem;line-height:1.45}
-.qnote .bujo li{grid-template-columns:18px 1fr}
+.qnote .bujo li{padding-left:20px}
 .qnote .checkin{font-size:.95rem;margin:0 0 10px}
 .qnote .ack{font-size:.8rem;margin:0 0 6px}
 .qnote .stickers{margin:-2px 0 8px;gap:5px}
@@ -354,3 +354,25 @@
 .outfit li{display:grid;grid-template-columns:72px 1fr;gap:6px;font-size:.84rem;line-height:1.3}
 .outfit li small{color:#8A8279;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
 .outfit .owhy{margin:6px 0 0;font-size:.8rem;color:#6F675E;font-style:italic}
+/* Mel's room: journal, scratchpad, record player */
+.jform textarea,.scratch{width:100%;box-sizing:border-box;border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:10px 12px;font:inherit;font-size:.95rem;line-height:1.5;resize:vertical;color:#2F2B28}
+.scratch{background:#FBFCFF;border-color:#C9D2EA;font-family:"Klee One",serif;font-weight:600;min-height:260px;background-image:linear-gradient(transparent 27px,#E6EBF7 28px);background-size:100% 28px;line-height:28px}
+.jlist details{border-bottom:1px dashed #E4DDD2;padding:6px 2px}
+.jlist summary{cursor:pointer;font-size:.88rem;color:#4A443E}
+.jlist summary b{font-weight:700;color:#8A8279;margin-right:4px}
+.jlist p{margin:6px 0;font-size:.9rem;line-height:1.5}
+.map .spin{transform-box:fill-box;transform-origin:center;animation:spinr 2.4s linear infinite}
+@keyframes spinr{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.map .note1,.map .note2{animation:floatn 2.6s ease-in-out infinite}.map .note2{animation-delay:-1.3s}
+@keyframes floatn{0%{transform:translateY(4px);opacity:0}30%{opacity:1}100%{transform:translateY(-10px);opacity:0}}
+.map .zz{animation:floatn 3s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.map .spin,.map .note1,.map .note2,.map .zz{animation:none}}
+.outfit li{grid-template-columns:34px 1fr;align-items:center}
+.outfit li small{display:block;padding-top:0}
+.outfit .gpic{display:inline-flex;width:34px;height:34px;align-items:center;justify-content:center;background:#FFFDF6;border-radius:8px;border:1px solid rgba(120,104,84,.12)}
+/* guided breathing: in 4 s, hold 2 s, out 6 s */
+.breathe{position:relative;height:230px;display:grid;place-items:center;margin:8px 0}
+.breathe .ring{position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,#F6EEF4 0 45%,#DCE3F4 70%,#C7D2EE 100%);border:2px solid var(--peri2,#6E7FC8);box-shadow:0 0 0 10px rgba(195,205,238,.35);animation:breathe 12s ease-in-out infinite}
+.breathe .cue{position:relative;margin:0;font-family:"Klee One",serif;font-weight:600;font-size:1.25rem;color:#2F3A6E}
+@keyframes breathe{0%{transform:scale(.5)}33.3%{transform:scale(1)}50%{transform:scale(1)}100%{transform:scale(.5)}}
+@media (prefers-reduced-motion:reduce){.breathe .ring{animation-duration:24s}}

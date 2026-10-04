@@ -80,6 +80,20 @@ const SHELLS = {
     ${sk(`<rect x="60" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/><rect x="390" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/>`, `<rect x="60" y="34" width="70" height="58" rx="30"/><path d="M95 34 v58 M60 66 h70"/><rect x="390" y="34" width="70" height="58" rx="30"/><path d="M425 34 v58 M390 66 h70"/>`)}
     ${skirting}`; },
 
+  // Mel's room: soft carpet, lilac wall with tiny hearts, and whatever she's bought for it in the market
+  room: () => { const d = (artCtx() && artCtx().F().decor) || {};
+    return `<rect width="520" height="640" style="fill:#E9DCE2"/>
+    <g style="fill:#DCCAD3" opacity=".7">${rows(9, r => rows(14, i => `<circle cx="${i*38 + (r % 2)*19 + 10}" cy="${172 + r*52}" r="1.6"/>`))}</g>
+    ${d.r_rug ? `<g filter="url(#wob)" opacity=".9" transform="translate(40 62) scale(.8)"><path d="M170 470 c-20 -30 20 -60 50 -44 c10 -26 60 -30 76 -4 c26 -18 70 0 60 34 c26 10 20 50 -14 52 h-150 c-34 -2 -40 -30 -22 -38z" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1.3"/></g>` : `<g filter="url(#wash)" opacity=".5"><ellipse cx="270" cy="470" rx="130" ry="56" style="fill:var(--blush)"/></g>`}
+    ${wallBase("#EFE3EE", "var(--blush)")}
+    <g style="fill:#E3CCDB" opacity=".8">${rows(6, r => rows(13, i => `<path transform="translate(${i*42 + (r % 2)*21 + 12} ${r*22 + 12}) scale(.7)" d="M0 3 c-4 -5 -9 0 -5 4 l5 5 l5 -5 c4 -4 -1 -9 -5 -4z"/>`))}</g>
+    ${d.r_lights ? `<path d="M10 16 Q130 44 250 18 Q380 46 510 16" fill="none" style="stroke:var(--line)" stroke-width="1.2" filter="url(#wob)"/>${[30, 70, 110, 150, 190, 230, 290, 330, 370, 410, 450, 490].map((x, i) => `<circle class="twinkle" cx="${x}" cy="${(32 + 10*Math.sin(i*1.3)).toFixed(1)}" r="3.6" fill="${["#FFD66E", "#F7A9A9", "#A9D3F7", "#C7E8A9"][i % 4]}" style="animation-delay:-${(i*0.3).toFixed(1)}s"/>`).join("")}` : ""}
+    ${d.r_art ? sk(`<rect x="112" y="34" width="56" height="44" rx="2" style="fill:#FFFDF6"/><circle cx="132" cy="56" r="7" style="fill:var(--rose)"/><circle cx="148" cy="54" r="6" style="fill:var(--peri)"/><path d="M132 63 v10 M148 60 v13" style="stroke:var(--moss2)"/>`, `<rect x="106" y="28" width="68" height="56" rx="2"/><rect x="112" y="34" width="56" height="44" rx="2"/>`) : ""}
+    ${d.r_shelf ? sk(`<rect x="380" y="58" width="100" height="10" style="fill:var(--wood)"/>${["var(--rose)", "var(--peri)", "var(--sage)", "var(--butter)", "var(--peach)"].map((c, i) => `<rect x="${388 + i*12}" y="${36 + (i % 2)*4}" width="10" height="${22 - (i % 2)*4}" style="fill:${c}"/>`).join("")}`, `<rect x="380" y="58" width="100" height="10"/><path d="M386 68 v8 M474 68 v8"/>`) : ""}
+    ${d.r_plant ? plant(366, 300, 1.2) : ""}
+    ${d.r_vanity ? sk(`<rect x="38" y="584" width="70" height="12" rx="2" style="fill:var(--wood)"/><ellipse cx="73" cy="558" rx="20" ry="26" style="fill:#DCE8F4"/>`, `<rect x="38" y="584" width="70" height="12" rx="2"/><path d="M46 596 v16 M100 596 v16"/><ellipse cx="73" cy="558" rx="20" ry="26"/><path d="M64 544 l8 -8" opacity=".6"/>`) : ""}
+    ${skirting}`; },
+
   market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(24, i => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`)}</g>
     <g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--blush)"/></g>

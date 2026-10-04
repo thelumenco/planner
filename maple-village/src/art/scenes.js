@@ -234,6 +234,29 @@ export function furn(kind, x, y){
       `<rect x="${x-56}" y="${y-40}" width="112" height="40" rx="3"/><path d="M${x-56} ${y-46} h112 v6"/><circle cx="${x-24}" cy="${y-52}" r="9"/><path d="M${x+8} ${y-62} h28 v14 h-28z M${x+36} ${y-58} h6"/><path d="M${x} ${y-40} v40" opacity=".5"/><path class="smoke" d="M${x+20} ${y-66} q-3 -5 0 -9 q3 -4 0 -8" opacity=".6"/>`);
     case "laundry": return sk(`<path d="M${x-30} ${y-34} h60 l-6 34 h-48z" style="fill:#E8D3B0"/><path d="M${x-24} ${y-34} q10 -14 22 -4 q10 -12 26 0z" style="fill:var(--sky)"/><path d="M${x-8} ${y-38} q8 -10 18 -2z" style="fill:var(--rose)"/>`,
       `<path d="M${x-30} ${y-34} h60 l-6 34 h-48z"/><path d="M${x-26} ${y-24} h52 M${x-24} ${y-14} h48" opacity=".5"/><path d="M${x-24} ${y-34} q10 -14 22 -4 q10 -12 26 0"/>`);
+    // Mel's room (and its door in the house)
+    case "sidedoor": return sk(`<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:var(--blush)"/><path d="M${x-36} ${y-80} l20 6 v14 l-20 -6z" style="fill:#FFFDF6"/>`,
+      `<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z"/><circle cx="${x-17}" cy="${y-42}" r="1.8"/><path d="M${x-36} ${y-80} l20 6 v14 l-20 -6z"/><path d="M${x-27} ${y-70} c-2 -3 -5 -1 -3 2 l3 3 l3 -2 c2 -3 -1 -5 -3 -3" />`);
+    case "bed": { const sl = G.S && G.S().sleep, d = (G.F().decor || {}), pj = d.me_pj ? "#3B4A86" : "var(--tank)";
+      return sk(`<rect x="${x-78}" y="${y-132}" width="156" height="40" rx="10" style="fill:var(--wood)"/><rect x="${x-74}" y="${y-104}" width="148" height="100" rx="6" style="fill:#FFFDF6"/>
+        <rect x="${x-66}" y="${y-100}" width="58" height="24" rx="9" style="fill:#F6EEF4"/><rect x="${x+8}" y="${y-100}" width="58" height="24" rx="9" style="fill:#F6EEF4"/>
+        <path d="M${x-74} ${y - (sl ? 74 : 60)} h148 v56 a6 6 0 0 1 -6 6 h-136 a6 6 0 0 1 -6 -6z" style="fill:var(--peri)"/>${d.r_throw ? `<path d="M${x+20} ${y-58} h54 v52 h-54z" style="fill:var(--blush)"/>` : ""}
+        ${sl ? `<circle cx="${x-36}" cy="${y-84}" r="11" style="fill:var(--skin)"/><path d="M${x-48} ${y-84} c0 -12 8 -15 13 -15 c8 0 13 5 11 13 c-3 -4 -8 -5 -12 -4 c-4 1 -8 3 -12 6z" style="fill:var(--hair)"/><path d="M${x-50} ${y-76} q14 -6 28 0 v6 h-28z" style="fill:${pj}"/>` : ""}`,
+        `<rect x="${x-78}" y="${y-132}" width="156" height="40" rx="10"/><rect x="${x-74}" y="${y-104}" width="148" height="100" rx="6"/><rect x="${x-66}" y="${y-100}" width="58" height="24" rx="9"/><rect x="${x+8}" y="${y-100}" width="58" height="24" rx="9"/>
+        <path d="M${x-74} ${y - (sl ? 74 : 60)} h148"/>${d.r_throw ? `<path d="M${x+20} ${y-58} h54 v52 h-54z M${x+28} ${y-58} v52 M${x+40} ${y-58} v52 M${x+52} ${y-58} v52 M${x+64} ${y-58} v52" opacity=".7"/>` : ""}${legs(148, 6)}
+        ${sl ? `<path d="M${x-40} ${y-84} q2 1.6 4 0 M${x-33} ${y-84} q2 1.6 4 0"/><text x="${x-14}" y="${y-104}" font-size="11" style="fill:var(--line)" stroke="none" class="zz">z z</text>` : ""}`); }
+    case "curtwindow": { const g = G.F() || {}, night = G.dusk(), shut = g.curtains ? g.curtains === "closed" : (night || !!(G.S && G.S().sleep));
+      const L = shut ? `<path d="M${x-50} ${y-170} h50 v86 h-50z" style="fill:var(--rose)"/><path d="M${x} ${y-170} h50 v86 h-50z" style="fill:var(--rose)"/>` : `<path d="M${x-58} ${y-170} h18 q-6 44 4 86 h-22z" style="fill:var(--rose)"/><path d="M${x+40} ${y-170} h18 v86 h-22 q10 -42 4 -86z" style="fill:var(--rose)"/>`;
+      return sk(`<rect x="${x-48}" y="${y-168}" width="96" height="82" rx="4" style="fill:${night ? "#3E4673" : "var(--sky)"}"/>${night && !shut ? `<circle cx="${x+18}" cy="${y-142}" r="9" style="fill:#FFF3C4"/>` : !shut ? `<ellipse cx="${x-14}" cy="${y-120}" rx="18" ry="7" style="fill:#FFFDF6"/>` : ""}${L}`,
+        `<rect x="${x-48}" y="${y-168}" width="96" height="82" rx="4"/><path d="M${x} ${y-168} v82 M${x-48} ${y-128} h96" opacity="${shut ? 0 : 1}"/><path d="M${x-62} ${y-172} h124" stroke-width="2.4"/>${shut ? `<path d="M${x-40} ${y-160} q4 30 0 70 M${x-20} ${y-164} q-4 34 0 74 M${x+20} ${y-164} q4 34 0 74 M${x+40} ${y-160} q-4 30 0 70" opacity=".5"/>` : `<path d="M${x-50} ${y-150} q4 30 -2 60 M${x+50} ${y-150} q-4 30 2 60" opacity=".5"/>`}`); }
+    case "record": { const on = !!(G.music && G.music());
+      return sk(`<rect x="${x-28}" y="${y-30}" width="56" height="30" rx="3" style="fill:var(--wood)"/><rect x="${x-26}" y="${y-44}" width="52" height="16" rx="3" style="fill:var(--peach)"/><ellipse cx="${x-4}" cy="${y-37}" rx="13" ry="5" style="fill:#2F2B28"/><ellipse cx="${x-4}" cy="${y-37}" rx="4" ry="1.6" style="fill:var(--rose)"/>`,
+        `<rect x="${x-28}" y="${y-30}" width="56" height="30" rx="3"/><rect x="${x-26}" y="${y-44}" width="52" height="16" rx="3"/><ellipse cx="${x-4}" cy="${y-37}" rx="13" ry="5"/><path d="M${x+16} ${y-42} l-6 6"/><path d="M${x-28} ${y-15} h56" opacity=".4"/>${on ? `<path class="note1" d="M${x+20} ${y-58} v-10 l6 -2 v10 M${x+20} ${y-58} m-3 0 a3 2 0 1 0 6 0" /><path class="note2" d="M${x-24} ${y-62} v-9 l5 -1 v9" />` : ""}`); }
+    case "calm": { const c = (G.F().decor || {}).r_candle;
+      return sk(`<ellipse cx="${x-26}" cy="${y-12}" rx="30" ry="13" style="fill:var(--peri)"/><ellipse cx="${x+22}" cy="${y-8}" rx="26" ry="11" style="fill:var(--blush)"/><ellipse cx="${x-6}" cy="${y-30}" rx="22" ry="12" style="fill:var(--butter)"/>${c ? `<rect x="${x+40}" y="${y-34}" width="10" height="16" rx="2" style="fill:#FFFDF6"/><path class="flame" d="M${x+45} ${y-36} q-4 -6 0 -11 q4 5 0 11z" style="fill:#F6A23A"/><circle cx="${x+45}" cy="${y-40}" r="14" fill="#FFB65C" opacity=".2"/>` : ""}`,
+        `<ellipse cx="${x-26}" cy="${y-12}" rx="30" ry="13"/><ellipse cx="${x+22}" cy="${y-8}" rx="26" ry="11"/><ellipse cx="${x-6}" cy="${y-30}" rx="22" ry="12"/><path d="M${x-30} ${y-12} h8 M${x+18} ${y-8} h8" opacity=".5"/>${c ? `<rect x="${x+40}" y="${y-34}" width="10" height="16" rx="2"/>` : ""}`); }
+    case "writedesk": return sk(`<rect x="${x-50}" y="${y-36}" width="100" height="14" rx="3" style="fill:${W2}"/><path d="M${x-26} ${y-44} l22 -4 l22 4 v8 l-22 -3 l-22 3z" style="fill:#FFFDF6"/><path d="M${x+28} ${y-62} h14 l5 14 h-24z" style="fill:var(--butter)"/>`,
+      `<rect x="${x-50}" y="${y-36}" width="100" height="14" rx="3"/>${legs(100, 22)}<path d="M${x-26} ${y-44} l22 -4 l22 4 v8 l-22 -3 l-22 3z M${x-4} ${y-48} v9"/><path d="M${x-20} ${y-41} h10 M${x+2} ${y-41} h12" opacity=".5"/><path d="M${x+28} ${y-62} h14 l5 14 h-24z M${x+35} ${y-48} v12 M${x+30} ${y-36} h10"/><path d="M${x+10} ${y-46} l12 -8" stroke-width="1.8"/>`);
     case "wardrobe": return sk(`<rect x="${x-30}" y="${y-96}" width="60" height="96" rx="3" style="fill:var(--peri)"/><path d="M${x-34} ${y-96} h68 l-4 -8 h-60z" style="fill:var(--peri2)"/><rect x="${x-24}" y="${y-88}" width="22" height="80" rx="2" style="fill:#DCE3F4"/><rect x="${x+2}" y="${y-88}" width="22" height="80" rx="2" style="fill:#DCE3F4"/>`,
       `<rect x="${x-30}" y="${y-96}" width="60" height="96" rx="3"/><path d="M${x-34} ${y-96} h68 l-4 -8 h-60z"/><rect x="${x-24}" y="${y-88}" width="22" height="80" rx="2"/><rect x="${x+2}" y="${y-88}" width="22" height="80" rx="2"/><circle cx="${x-5}" cy="${y-48}" r="1.6"/><circle cx="${x+5}" cy="${y-48}" r="1.6"/><path d="M${x-24} ${y} v4 M${x+24} ${y} v4"/>`);
     case "cupboard": return sk(`<rect x="${x-36}" y="${y-84}" width="72" height="84" rx="3" style="fill:var(--card)"/><rect x="${x+42}" y="${y-30}" width="14" height="30" rx="4" style="fill:var(--sky)"/>`,
@@ -270,14 +293,23 @@ export function furn(kind, x, y){
 export function roomArt(id){
   const r = ROOMS[id], st = stationsOf(id);
   let h = roomShell(id);
-  if (id !== "market") h += `<g data-spot="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="204" rx="40" ry="10" style="fill:var(--butter)"/>
+  if (id !== "market" && !r.noBoard) h += `<g data-spot="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="204" rx="40" ry="10" style="fill:var(--butter)"/>
     ${sk(`<rect x="222" y="40" width="76" height="56" rx="3" style="fill:var(--wood)"/>`, `<rect x="222" y="40" width="76" height="56" rx="3"/>${notesArt(230, 50, G.questsIn(id).filter(t => !G.S().doneIds.includes(t.id)).length)}`)}${tapeLabel(260, 112, "Quests here", "var(--butter)")}</g>`;
-  else h += sk(`<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
+  else if (id === "market") h += sk(`<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
     `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`) +
     `<g>${[["apple","dumpling","fish","toast"],["tulip","carrot","strawberry","sunflower"]].map((row, r) => row.map((n, i) => iconAt(n, 64 + i*30, 62 + r*38, 26)).join("")).join("")}${[["yarn","ball","brush","crown"],["bath","fort","corn","blueberry"]].map((row, r) => row.map((n, i) => iconAt(n, 374 + i*30, 62 + r*38, 26)).join("")).join("")}</g>`;
   st.forEach(s => {
     h += `<g data-spot="${s.id}" aria-label="${s.name}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${tapeLabel(s.x, s.y + 24, s.name, "var(--card)")}</g>`;
   });
+  if (id === "room") {
+    // Maple's bed (she sleeps in it while Mel's in here), the door back to the house on the east wall, and night
+    const sl = G.S && G.S().sleep;
+    h += sk(`<ellipse cx="238" cy="296" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="238" cy="294" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="238" cy="296" rx="30" ry="13"/><ellipse cx="238" cy="294" rx="20" ry="8"/>`);
+    h += `<g data-exit="1" aria-label="Back to the house"><ellipse class="hov" cx="486" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
+      ${sk(`<path d="M520 346 L492 358 L492 456 L520 466z" style="fill:var(--blush)"/>`, `<path d="M520 346 L492 358 L492 456 L520 466z"/><circle cx="497" cy="410" r="1.8"/>`)}${tapeLabel(470, 334, "To the house", "var(--card)", 11)}</g>`;
+    if (sl) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".32" pointer-events="none"/>`;
+    return h;
+  }
   h += `<g data-exit="1" aria-label="Exit"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
     ${sk(`<rect x="214" y="600" width="92" height="26" rx="8" style="fill:${r.trim}"/>`, `<rect x="214" y="600" width="92" height="26" rx="8"/><path d="M222 606 h76 M222 620 h76" stroke-dasharray="3 4" opacity=".6"/>`)}
     <text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none">Exit</text></g>`;

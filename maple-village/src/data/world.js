@@ -55,7 +55,10 @@ export function nextHop(from, to){
   while (q.length) { const s = q.shift(); for (const n of Object.keys(BRIDGES[s] || {})) if (!(n in seen)) { seen[n] = s; if (n === to) { let h = n; while (seen[h] !== from) h = seen[h]; return h; } q.push(n); } }
   return null;
 }
-export const outdoorOf = s => OUTDOOR.includes(s) ? s : (VILLAGE[s] ? VILLAGE[s].scene : "village");
+export const outdoorOf = s => OUTDOOR.includes(s) ? s : INNER[s] ? outdoorOf(INNER[s].parent) : (VILLAGE[s] ? VILLAGE[s].scene : "village");
+// Rooms inside another room: Mel's room is through the west door of the house. door: where she steps into the
+// parent room; arrive: where she steps into the inner room (its own door is on the east wall).
+export const INNER = {room: {parent: "home", door: [64, 340], arrive: [456, 400]}};
 export const WORK = ["hall","chord","fresh","chico","post","home"];
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
 // Each room may place its slots differently via `pos` (falls back to POS). Stations with a null regex are never
@@ -93,16 +96,24 @@ export const ROOMS = {
     ["scales","Stamps & scales","C","scales",/invoice|pay|bill|stripe|account|bank|receipt|expense|price/,"Weigh it, stamp it, send it."],
     ["ledge","Writing ledge","D","desk",/./,"A tidy little ledge for odd jobs."],
     ["pobox","Post box","E","pobox",null,"Your post box: unread mail from your work inbox."]]},
-  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{A:[120,216], B:[414,228], H:[326,250], C:[168,420], W:[52,366], D:[464,452], G:[396,372], E:[436,598], F:[96,596]}, stations:[
+  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{A:[120,216], B:[414,228], H:[326,250], C:[124,450], R:[40,330], D:[464,452], G:[396,372], E:[436,598], F:[96,596]}, stations:[
     ["desk","Home desk","A","desk",/./,"Your own little desk."],
     ["kitchen","Kitchen","B","kitchen",/cook|meal|lunch|dinner|bake|grocer|prep/,"Something smells good."],
     ["sofa","Sofa","C","sofa",/read|rest|journal|meditat|book|nap/,"Soft cushions, deep breaths."],
-    ["wardrobe","Wardrobe","W","wardrobe",null,"Today's outfits are hanging in here.",30],
+    ["mydoor","My room","R","sidedoor",null,"Your room. Just you.",0],
     ["laundry","Laundry","D","laundry",/fold|laundry|clothes|wash|iron/,"Fold, stack, done."],
     ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Hestia's chores live in here."],
     ["fridge","Fridge","H","fridge",null,"The fridge: what we have, and the shopping list."],
     ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12],
     ["office","Darren's desk","G","office",null,"Darren's home office. Shh, he might be on a call."]]},
+  // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
+  room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[130,290], W:[262,206], B:[440,262], E:[62,396], C:[66,500], D:[434,556]}, stations:[
+    ["bed","Bed","A","bed",null,"Your bed. Fluffy pillows, cool sheets."],
+    ["window","Window","W","curtwindow",null,"Curtains open, curtains shut.",20],
+    ["wardrobe","Wardrobe","B","wardrobe",null,"Today's outfits are hanging in here.",30],
+    ["record","Record player","E","record",null,"Pop a record on."],
+    ["nook","Calm corner","C","calm",null,"Cushions, a candle, one slow breath."],
+    ["journal","Writing desk","D","writedesk",null,"Your journal lives in the top drawer."]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };

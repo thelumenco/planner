@@ -1,7 +1,7 @@
 // Game core: state + persistence, quest flow, actions, UI renderers and the world sim.
 import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur, plain } from "../util.js";
 import { icon, progressBar, progressBarV } from "../art/icons.js";
-import { VILLAGE, WORK, ROOMS, OUTDOOR, BRIDGES, ARRIVE, nextHop, outdoorOf, isWeekend, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
+import { VILLAGE, WORK, ROOMS, OUTDOOR, BRIDGES, ARRIVE, INNER, nextHop, outdoorOf, isWeekend, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
 import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco } from "../data/items.js";
 import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn } from "../art/village-extras.js";
 import { villageArt, baseArt, laneArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
@@ -16,6 +16,8 @@ import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, g
 import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
 import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, roomLeft, hungry, hungryCount, KINDS } from "./pets.js";
 import { wardrobePanel, newOutfit } from "./wardrobe.js";
+import { readPlan, PLAN_WORDS } from "./plans.js";
+import { attachMyDocs, journalPanel, wireJournal, scratchPanel, wireScratch } from "./myroom.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 
 /* =================== STATE =================== */
@@ -51,7 +53,7 @@ function migrate(){
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
-setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk()});
+setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music});
 function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
@@ -115,6 +117,7 @@ async function initDb(){
   const uid = await user.id(); if (!uid) return;
   const col = db.collection("data/users/" + uid);
   attachHestiaDb(col.doc("hestia"));
+  attachMyDocs(col, id => { if ((id === "journal" && journalOpen && document.activeElement?.id !== "jText") || (id === "scratch" && scratchOpen && document.activeElement?.id !== "scratchText")) ctx(); });
   attachFeeds(col, id => {
     if (/^health/.test(id) && ["lane", "chord", "chico"].includes(scene)) { drawScene(); ctx(); }
     if (/^content/.test(id) && openView === "cal" && calTab === "content") renderCal();
@@ -187,6 +190,7 @@ const remaining = () => allTasks().filter(t => !S.doneIds.includes(t.id));
 const questsIn = pl => allTasks().filter(t => placeOf(t) === pl);
 function phase(){
   if (S.mode === "break") return "break";   // a break Mel asks for comes first, even mid-clean
+  if (S.mode === "decompress" && S.decompFree) return "decompress";   // decompress from the calm corner, any time
   if (!S.cleanDone) return "clean";
   if (S.mode === "decompress") return "decompress";
   if (remaining().length) return "task";
@@ -203,7 +207,26 @@ const SHED = {
   compost:   {n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster."},
   sprinkler: {n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."}
 };
-let shedOpen = false, runOpen = false, wardOpen = false;
+let shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false;
+// Guided breathing in the calm corner: a ring grows as she breathes in (4 s), holds (2 s) and shrinks as she breathes out (6 s)
+const BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]], CYCLE = 12;
+let breath = null, breathT = null;   // {start, total (ms)}
+function startBreath(min){
+  breath = {start: Date.now(), total: min*M}; clearInterval(breathT); breathT = setInterval(tickBreath, 200); sfx("bowl"); ctx(); tickBreath();
+}
+function stopBreath(done){
+  clearInterval(breathT); breathT = null; const was = breath; breath = null;
+  if (done && was) { sfx("bowl"); gainXp(1); if (!S.breathed) { S.breathed = true; earn(1, "a calm minute"); } speak("Lovely. Notice how you feel now.", 4500); save(); }
+  if (calmOpen) ctx();
+}
+function tickBreath(){
+  if (!breath) return; if (!calmOpen || scene !== "room") { stopBreath(false); return; }
+  const el = Date.now() - breath.start, left = breath.total - el;
+  if (left <= 0) { stopBreath(true); return; }
+  let t = (el/1000) % CYCLE, cue = BREATH[0][1]; for (const [d, c] of BREATH) { if (t < d) { cue = c; break; } t -= d; }
+  const c = $("breathCue"), l = $("breathLeft"); if (c && c.textContent !== cue) c.textContent = cue;
+  if (l) l.textContent = `${Math.floor(left/60000)}:${String(Math.floor(left/1000) % 60).padStart(2, "0")}`;
+}
 const ward = {busy: false, error: "", ask: ""};
 function buyTool(id){
   const t = SHED[id]; if (!t || F.tools[id] || F.coins < t.price) return;
@@ -212,6 +235,13 @@ function buyTool(id){
   if (id === "can") F.plots.forEach((p, i) => { if (p && p.crop && !p.wateredAt) p.wateredAt = Date.now(); });
   save();
 }
+// Mel's bed: a 20-minute nap (wakes with a chime) or lying down until she gets up. Leaving the room wakes her.
+function bedAction(k){
+  if (k === "up") { S.sleep = null; speak("Morning, sleepyhead. Well, sort of.", 3000); }
+  else { S.sleep = {until: k === "nap" ? Date.now() + 20*M : null, at: Date.now()}; speak(k === "nap" ? "Twenty minutes. I'll wake you." : (sgHM() >= 20*60 || sgHM() < 5*60) ? "Goodnight, Mel. Sweet dreams." : "Lie down as long as you like.", 3500); }
+  bedOpen = false; save(true);
+}
+function wakeUp(){ S.sleep = null; sfx("chime"); speak("Rise and shine! Nap done.", 4500); save(true); }
 // The animal run at home base (see pets.js): feed from the backpack, upgrade with coins.
 function feedAnimals(which){
   const list = which === "all" ? F.pets.animals.filter(a => hungry(a, F)) : F.pets.animals.filter(a => a.id === which);
@@ -336,6 +366,7 @@ function timerHTML(label){
 }
 let lastReady = readyCount(), lastDusk = null;
 setInterval(() => {
+  if (S.sleep && S.sleep.until && Date.now() > S.sleep.until) wakeUp();
   if (S.day !== dayKey()) { S = freshToday(); say = null; save(true); speak(defaultLine()); syncSunsama(); return; }
   const rc = readyCount();
   if (rc > lastReady) { speak(rc === 1 ? "Psst… something in the garden is ready!" : `${rc} crops ready in the garden!`, 5000); if (scene === "farm") drawScene(); }
@@ -412,7 +443,10 @@ const A = {
   back(){ S.mode = null; S.timer = null; earn(2, "proper break"); gainXp(1); setSay("Welcome back! Fresh quest coming up."); save(); },
   flow(){ S.mode = null; S.timer = null; setSay("In flow? Ride it! Break after this one."); save(); },
   clench(){ startTimer("clench", .5); setSay("Clench and hold. Breathe through your nose."); save(); },
-  decompressed(){ S.mode = remaining().length ? "break" : null; if (S.mode) startTimer("break", 10); setSay("Decompressed. Now a proper break."); save(); },
+  decompNow(){ if (S.mode !== "decompress") S.modeBefore = S.mode || null; S.mode = "decompress"; S.decompFree = true; S.timer = S.timer && S.timer.kind === "task" ? S.timer : null; setSay("Let's decompress. Clench, breathe, then three quick points."); save(); },
+  journal(){ if (scene === "room") { journalOpen = true; render(); } else walkToPlace("journal"); },
+  decompressed(){ if (S.decompFree) { S.decompFree = false; S.mode = S.modeBefore || null; S.modeBefore = null; setSay("Decompressed. Lovely. Back to it when you're ready."); save(); return; }
+    S.mode = remaining().length ? "break" : null; if (S.mode) startTimer("break", 10); setSay("Decompressed. Now a proper break."); save(); },
   water(ml){ setWater((S.waterMl || 0) + (ml || GLASS)); speak(pick(["Glug glug!", "Hydrated boss!", "Water break, good call."]), 3000); }
 };
 function doNext(id){
@@ -601,7 +635,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, {mod
 let chatLog = (() => { try { return JSON.parse(localStorage.getItem("fox.chat")) || []; } catch { return []; } })(), chatBusy = false;
 const keepChat = () => { chatLog = chatLog.slice(-30); try { localStorage.setItem("fox.chat", JSON.stringify(chatLog)); } catch {} };
 const PLACES = {home: "home", house: "home", fridge: "home:fridge", kitchen: "home:kitchen", cupboard: "home:cupboard", treadmill: "home:treadmill", sofa: "home:sofa",
-  pond: "base:pond", garden: "farm", farm: "farm", shed: "base:shed", swing: "base:swing", letterbox: "base:letterbox", "animal run": "base:run", wardrobe: "home:wardrobe", outfit: "home:wardrobe", run: "base:run", animals: "base:run", chickens: "base:run", rabbits: "base:run", market: "market", well: "village:well",
+  pond: "base:pond", garden: "farm", farm: "farm", shed: "base:shed", swing: "base:swing", letterbox: "base:letterbox", "animal run": "base:run", wardrobe: "room:wardrobe", outfit: "room:wardrobe", "my room": "room", bedroom: "room", bed: "room:bed", journal: "room:journal", scratchpad: "hall:whiteboard", whiteboard: "hall:whiteboard", run: "base:run", animals: "base:run", chickens: "base:run", rabbits: "base:run", market: "market", well: "village:well",
   "town hall": "hall", hall: "hall", chord: "chord", "makers lane": "lane:plot3", lane: "lane:plot3", library: "fresh", "fresh pages": "fresh", chico: "chico", "post office": "post", post: "post", town: "village:board"};
 function walkToPlace(name){
   const k = PLACES[String(name || "").toLowerCase().trim()]; if (!k) return null;
@@ -648,6 +682,10 @@ async function sendChat(text){
   if (!sampleCap) { chatLog.push({role: "user", content: text}, {role: "assistant", content: "I can't reach Claude from this view just now. The buttons all still work!"}); keepChat(); renderChat(); return; }
   chatLog.push({role: "user", content: text}); chatBusy = true; keepChat(); renderChat();
   const history = chatLog.slice(-12, -1).map(m => (m.role === "user" ? "Mel: " : "Maple: ") + m.content).join("\n");
+  // Her Notion plans: this week's always (it shapes the coaching), the month and quarter when she asks about plans
+  const wantAll = PLAN_WORDS.test(text) || PLAN_WORDS.test(chatLog.slice(-3, -1).map(m => m.content).join(" "));
+  const plans = (await Promise.all((wantAll ? ["week", "month", "quarter"] : ["week"]).map(l => readPlan(l).catch(() => null)))).filter(p => p && p.text);
+  const planText = plans.length ? `\nMel's plans from Notion (her own words; answer plan questions from these, never invent what isn't there):\n${plans.map(p => `== ${p.title} ==\n${p.text}`).join("\n\n")}\n` : "";
   try {
     const d = await sampleCap.json(`You are ${F.name}, a tiny fox who lives in Mel's cosy village game and coaches her through her day, in boss-mode style: one thing at a time, tiny first steps, breaks, no guilt. Warm, direct, short sentences. Mel is a Singapore-based founder (a copywriting studio, the Chord and Chico apps) and a parent of a toddler, Evan; Darren lives with them.
 She can ask you anything. Reply in at most 3 short sentences, plain text, no emoji, no markdown.
@@ -661,11 +699,11 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|wardrobe|pond|garden|shed|swing|letterbox|animal run|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
-What's happening in the village right now: ${chatContext()}
+What's happening in the village right now: ${chatContext()}${planText}
 Conversation so far:
 ${history || "(just started)"}
 Mel: ${text}
@@ -806,10 +844,10 @@ function decorClick(id){
   if (!F.decorOwned[id]) {
     if (F.coins < d.price) return;
     F.coins -= d.price; F.decorOwned[id] = true; F.decor[d.slot] = d.val; gainXp(1);
-    flash(`Bought ${d.n.toLowerCase()}`); speak("Ooh! It's waiting for you at home.", 3500);
+    flash(`Bought ${d.n.toLowerCase()}`); speak(d.where === "me" ? (id === "me_pj" ? "Silk pyjamas! You'll wear them in your room." : id === "me_hat" ? "Sun hat on whenever you're outside!" : "Ooh, that suits you.") : d.where === "room" ? "Ooh! It's waiting in your room." : "Ooh! It's waiting for you at home.", 3500);
   } else if (F.decor[d.slot] === d.val) { delete F.decor[d.slot]; speak("Put away for now.", 2500); }
   else { F.decor[d.slot] = d.val; speak("Swapped in. Go and have a look!", 3000); }
-  save(scene === "home");
+  save(true);
 }
 function useItem(id){
   const it = ITEMS[id]; if (!it || !F.inv[id]) return;
@@ -941,13 +979,13 @@ function journal(){
   } else if (ph === "decompress") {
     const clench = S.timer && S.timer.kind === "clench";
     h += `<h1><span class="lbl">right now</span>Decompress</h1>${clench ? timerHTML("clench and hold") : ""}
-      <ul class="bujo"><li class="first"><span><span class="hl">Stomach clench, 30 seconds.</span> Hold, then release.</span></li><li>Tell chat <span class="hl">“call done”</span> and type three quick points. Chat files them.</li><li>Make a hot drink and bring it back.</li></ul>
-      <div class="actions">${clench ? "" : `<button class="btn primary" data-a="clench">Start the 30 seconds</button>`}<button class="btn yes" data-a="decompressed">Done in chat</button></div>`;
+      <ul class="bujo"><li class="first"><span><span class="hl">Stomach clench, 30 seconds.</span> Hold, then release.</span></li>${S.decompFree ? `<li>Three quick points in <span class="hl">your journal</span>, then let it go.</li>` : `<li>Tell chat <span class="hl">“call done”</span> and type three quick points. Chat files them.</li>`}<li>Make a hot drink and bring it back.</li></ul>
+      <div class="actions">${clench ? "" : `<button class="btn primary" data-a="clench">Start the 30 seconds</button>`}${S.decompFree ? `<button class="btn alt" data-a="journal">Open my journal</button><button class="btn yes" data-a="decompressed">All done</button>` : `<button class="btn yes" data-a="decompressed">Done in chat</button>`}</div>`;
   } else if (ph === "recap") {
     const done = allTasks().filter(t => S.doneIds.includes(t.id));
-    h += `<h1><span class="lbl">that's a wrap</span>Work day's shut</h1>
-      <ul class="bujo"><li>× five-minute clean</li>${done.map(t => `<li>× ${esc(t.title)}</li>`).join("")}
-      <li>${S.steps.toLocaleString()} / 5,000 steps</li><li>${S.earned} coins earned today</li>
+    h += `<h1><span class="lbl">that's a wrap</span>The day is done</h1>
+      <ul class="bujo"><li class="tick">Five-minute clean</li>${done.map(t => `<li class="tick">${esc(t.title)}</li>`).join("")}
+      <li${S.steps >= 5000 ? ` class="tick"` : ""}>${S.steps.toLocaleString()} / 5,000 steps</li><li>${S.earned} coins earned today</li>
       <li class="pep">Garden, shop, spoil Maple. Then tell chat <span class="hl">“wind down”</span>.</li></ul>`;
   } else {
     h += `<h1><span class="lbl">ready when you are</span>The boards are empty</h1>
@@ -987,7 +1025,7 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1024,13 +1062,13 @@ function ctx(){
   else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
   else if (newsOpen && scene === "village") h = goodNewsHTML(myWins());
   else if (scene === "market" && !shopClosed) {
-    const tabs = [["seeds","Seeds"],["treats","Treats"],["care","Care"],["family","Family"],["animals","Animals"],["home","Home"],["sell","Sell"]];
+    const tabs = [["seeds","Seeds"],["treats","Treats"],["care","Care"],["family","Family"],["animals","Animals"],["home","Home"],["me","Me & my room"],["sell","Sell"]];
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
       <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-shop="${k}" aria-selected="${shopTab === k}">${n}</button>`).join("")}</div><div class="items shop">`;
-    if (shopTab === "home") {
-      h += Object.keys(DECOR).map(id => { const d = DECOR[id], own = F.decorOwned[id], on = own && F.decor[d.slot] === d.val;
-        return `<button class="item" data-decor="${id}" ${!own && F.coins < d.price ? "disabled" : ""}><span class="e">${icon(d.ico, 34)}</span><span class="n">${esc(d.n)}</span><span class="c">${on ? "in your home" : own ? "tap to use" : `<b>${d.price}</b> ${icon("coin", 13)}`}</span></button>`; }).join("")
-        + `<p class="muted" style="grid-column:1/-1">Bought once, kept forever. They appear inside your house. Tap something you own to swap it in or put it away.</p>`;
+    if (shopTab === "home" || shopTab === "me") {
+      h += Object.keys(DECOR).filter(id => (DECOR[id].tab || "home") === shopTab).map(id => { const d = DECOR[id], own = F.decorOwned[id], on = own && F.decor[d.slot] === d.val;
+        return `<button class="item" data-decor="${id}" ${!own && F.coins < d.price ? "disabled" : ""}><span class="e">${icon(d.ico, 34)}</span><span class="n">${esc(d.n)}</span><span class="c">${on ? (d.where === "me" ? "wearing it" : d.where === "room" ? "in your room" : "in your home") : own ? "tap to use" : `<b>${d.price}</b> ${icon("coin", 13)}`}</span></button>`; }).join("")
+        + `<p class="muted" style="grid-column:1/-1">Bought once, kept forever. ${shopTab === "me" ? "Room things appear in your room; the rest you wear around the village." : "They appear inside your house."} Tap something you own to swap it in or put it away.</p>`;
     } else if (shopTab === "sell") {
       const sellable = Object.keys(F.inv).filter(id => ITEMS[id] && ITEMS[id].sell);
       h += sellable.length ? sellable.map(id => itemBtn(id, `sell <b>+${ITEMS[id].sell}</b> ${icon("coin", 13)}`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("") : `<p class="muted" style="grid-column:1/-1">Nothing to sell yet. Grow something in the garden!</p>`;
@@ -1058,7 +1096,20 @@ function ctx(){
       else if (g < 1) { const left = cr.dur*(1 - g); h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n}, growing. About ${dur(left)} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(g*100).toFixed(0)}%"></i></div>`; }
       else h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n} is ready!</p><div class="actions"><button class="btn yes" data-farm="harvest">Harvest</button></div>`;
     }
-  } else if (wardOpen && scene === "home") {
+  } else if (bedOpen && scene === "room") {
+    h = `<span class="tape gingham" aria-hidden="true"></span><h2>Your bed</h2>` + (S.sleep
+      ? `<p class="sub">${S.sleep.until ? `Napping. Up in about ${Math.max(1, Math.ceil((S.sleep.until - Date.now())/M))} min.` : "Fast asleep. Sweet dreams."}</p><div class="actions"><button class="btn yes" data-bed="up">Get up</button></div>`
+      : `<p class="sub">Fluffy pillows, cool sheets${(F.decor || {}).r_throw ? ", your knitted throw" : ""}.</p><div class="actions"><button class="btn primary" data-bed="nap">Nap for 20 minutes</button><button class="btn alt" data-bed="sleep">${sgHM() >= 20*60 || sgHM() < 5*60 ? "Go to sleep" : "Lie down"}</button></div>`);
+  } else if (calmOpen && scene === "room") {
+    h = `<span class="tape gingham" aria-hidden="true"></span><h2>Calm corner</h2>` + (breath
+      ? `<div class="breathe"><div class="ring" style="animation-delay:-${((Date.now() - breath.start)/1000 % CYCLE).toFixed(2)}s"></div><p class="cue" id="breathCue">Breathe in</p></div><p class="sub" style="text-align:center"><span id="breathLeft"></span> left</p><div class="actions" style="justify-content:center"><button class="btn alt small" data-calm="stop">Stop</button></div>`
+      : `<p class="sub">Cushions, ${(F.decor || {}).r_candle ? "a candle, " : ""}one slow breath.</p><p class="eyebrow">Guided breathing</p><div class="actions">${[1, 3, 5].map(m => `<button class="btn ${m === 3 ? "primary" : "alt"} small" data-calm="${m}">${m} min</button>`).join("")}</div>
+        <p class="eyebrow" style="margin-top:14px">After a call, or any time</p><div class="actions"><button class="btn alt small" data-calm="decompress">Decompress</button></div>`);
+  } else if (journalOpen && scene === "room") {
+    h = journalPanel(S.mode === "decompress" && S.decompFree);
+  } else if (scratchOpen && scene === "hall") {
+    h = scratchPanel();
+  } else if (wardOpen && scene === "room") {
     h = wardrobePanel(F, {sample: !!sampleCap, busy: ward.busy, error: ward.error, ask: ward.ask});
   } else if (runOpen && scene === "base") {
     h = runPanel(F);
@@ -1100,11 +1151,17 @@ function ctx(){
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; ctx(); });
+  c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
+  c.querySelectorAll("[data-calm]").forEach(b => b.onclick = () => { const k = b.dataset.calm;
+    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; A.decompNow(); drawScene(); } else startBreath(+k); });
+  if (breath) tickBreath();
+  if (journalOpen && scene === "room") wireJournal(c, e => { if (e) { sfx("chime"); speak(S.mode === "decompress" && S.decompFree ? "Written down. Now you can let it go." : "Page kept. Lovely.", 3500); } ctx(); });
+  if (scratchOpen && scene === "hall") wireScratch(c);
   const of = c.querySelector("#outfitForm");
   if (of) { const inp = c.querySelector("#outfitAsk"); inp.oninput = () => { ward.ask = inp.value; };
     of.onsubmit = async ev => { ev.preventDefault(); if (ward.busy) return; ward.busy = true; ward.error = ""; ctx();
-      let o = null; try { o = await newOutfit(F, sampleCap, ward.ask); } catch {}
+      let o = null; try { const ev = await todaysEvents(dayKey()).catch(() => ({events: []})); o = await newOutfit(F, sampleCap, ward.ask, ev.events || []); } catch {}
       ward.busy = false; if (o) { ward.ask = ""; save(true); speak(`How about this: ${o.label.toLowerCase()}?`, 4000); } else ward.error = "Hmm, nothing came back. Try again?"; ctx(); }; }
   c.querySelectorAll("[data-feed]").forEach(b => b.onclick = () => feedAnimals(b.dataset.feed));
   c.querySelectorAll("[data-runup]").forEach(b => b.onclick = () => buyRunUpgrade());
@@ -1172,7 +1229,7 @@ function questMark(){
     if (outside() && target.pl === "base") pos = scene === "base" ? (() => { const v = VILLAGE[target.sp]; return v.mark || [v.door[0], v.door[1] - 64]; })() : VILLAGE[BRIDGES[scene][nextHop(scene, "base")]].mark;
     else if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][nextHop(scene, outdoorOf(target.pl))]].mark;
     else if (scene === target.pl) { const s = spotObj(scene, target.sp); pos = [s.x, s.y - 70]; }
-    else pos = [260, 582];
+    else pos = INNER[scene] ? [486, 330] : [260, 582];
   }
   if (!pos) { m.style.display = "none"; return; }
   m.style.display = ""; m.setAttribute("transform", `translate(${pos[0]} ${pos[1]})`);
@@ -1187,11 +1244,17 @@ function drawScene(){
   $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "farm" ? farmArt() : roomArt(scene);
   const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", farm:"The garden"};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-  $("maphint").textContent = scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap anywhere to walk. The bridge at the top goes to the town square." : scene === "lane" ? "Chord and Chico live here. The gate on the left goes back to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+  $("maphint").textContent = scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap anywhere to walk. The bridge at the top goes to the town square." : scene === "lane" ? "Chord and Chico live here. The gate on the left goes back to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+}
+function dressMel(){
+  const d = F.decor || {}, show = (id, on) => { const e = $(id); if (e) e.style.display = on ? "" : "none"; };
+  const pj = !!d.me_pj && scene === "room";
+  show("melBow", !!d.me_bow); show("melHat", !!d.me_hat && outside()); show("melScarf", !!d.me_scarf && !pj); show("melPj", pj);
+  const m = $("mel"); if (m) m.style.visibility = S.sleep && scene === "room" ? "hidden" : "";
 }
 function render(redraw){
   if (S.day !== dayKey()) S = freshToday();
-  creditEarly();
+  creditEarly(); dressMel();
   if (redraw) drawScene();
   const L = level(), next = LEVELS[L+1];
   $("title").firstChild.textContent = `${F.name}'s village`;
@@ -1220,7 +1283,7 @@ function render(redraw){
   $("qBadge").hidden = !rem.length; $("qBadge").textContent = rem.length;
   $("list").innerHTML = all.map(t => { const dn = S.doneIds.includes(t.id);
     const pickable = !dn && t.id !== cur && phase() !== "clean";
-    return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}${t.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : "<span></span>"}</li>`; }).join("")
+    return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? `<i class="tk" aria-label="done"></i>` : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}${t.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : "<span></span>"}</li>`; }).join("")
     + ((S.dropped || []).length ? `<li class="dropped"><small>Dropped today: ${(S.dropped || []).map(id => { const t = ((P && P.tasks) || []).find(x => x.id === id); return t ? `${esc(t.title)} <button class="drop" data-undrop="${esc(id)}">bring back</button>` : ""; }).filter(Boolean).join(" · ")}</small></li>` : "");
   $("list").querySelectorAll("[data-drop]").forEach(el => el.onclick = ev => { ev.stopPropagation(); dropTask(el.dataset.drop); });
   $("list").querySelectorAll("[data-undrop]").forEach(el => el.onclick = ev => { ev.stopPropagation(); undropTask(el.dataset.undrop); });
@@ -1244,7 +1307,8 @@ const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "b
 function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
   setTimeout(() => {
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
+    if (S.sleep && id !== "room") S.sleep = null;
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
@@ -1260,19 +1324,26 @@ function setScene(id, at){
 // route: legs of {scene, x, y, fn}
 function go(target, x, y, fn){
   const legs = [];
-  const cur = scene;
+  let cur = scene;
   if (cur !== target) {
-    const curOut = outdoorOf(cur), tOut = outdoorOf(target);
-    // 1. out of the building, 2. over the bridge if the target is on the other screen, 3. in at the target's door
-    if (!OUTDOOR.includes(cur)) legs.push({scene:cur, x:260, y:606, fn:() => setScene(curOut, VILLAGE[cur].door)});
-    for (let s = curOut, guard = 0; s !== tOut && guard < 6; guard++) {   // one bridge or gate per screen on the way
-      const n = nextHop(s, tOut); if (!n) break; const b = VILLAGE[BRIDGES[s][n]], key = s + ">" + n;
-      legs.push({scene:s, x:b.door[0], y:b.door[1], fn:() => setScene(n, ARRIVE[key])}); s = n;
+    // An inner room (Mel's room) is reached through its parent room: out through its east door first, in through
+    // the parent's west door last.
+    const tIn = INNER[target] ? INNER[target].parent : target;
+    if (INNER[cur] && cur !== tIn) { const I = INNER[cur], from = cur; legs.push({scene:from, x:486, y:410, fn:() => setScene(I.parent, I.door)}); cur = I.parent; }
+    if (cur !== tIn) {
+      const curOut = outdoorOf(cur), tOut = outdoorOf(tIn), c0 = cur;
+      // 1. out of the building, 2. over the bridge if the target is on the other screen, 3. in at the target's door
+      if (!OUTDOOR.includes(c0)) legs.push({scene:c0, x:260, y:606, fn:() => setScene(curOut, VILLAGE[c0].door)});
+      for (let s = curOut, guard = 0; s !== tOut && guard < 6; guard++) {   // one bridge or gate per screen on the way
+        const n = nextHop(s, tOut); if (!n) break; const b = VILLAGE[BRIDGES[s][n]], key = s + ">" + n;
+        legs.push({scene:s, x:b.door[0], y:b.door[1], fn:() => setScene(n, ARRIVE[key])}); s = n;
+      }
+      if (!OUTDOOR.includes(tIn)) { const d = VILLAGE[tIn].door; legs.push({scene:tOut, x:d[0], y:d[1], fn:() => setScene(tIn, tIn === "farm" ? [260, 590] : [260, 596])}); }
     }
-    if (!OUTDOOR.includes(target)) { const d = VILLAGE[target].door; legs.push({scene:tOut, x:d[0], y:d[1], fn:() => setScene(target, target === "farm" ? [260, 590] : [260, 596])}); }
+    if (INNER[target]) { const I = INNER[target]; legs.push({scene:I.parent, x:I.door[0], y:I.door[1], fn:() => setScene(target, I.arrive)}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -1287,6 +1358,12 @@ function walkTo(x, y){
 function arriveSpot(id){
   atSpot = id;
   const ph = phase();
+  if (id === "mydoor") { setScene("room", INNER.room.arrive); return; }
+  if (id === "bed") { bedOpen = true; sfx("paper", true); render(); return; }
+  if (id === "window") { const shut = F.curtains ? F.curtains === "closed" : (isDusk() || !!S.sleep); F.curtains = shut ? "open" : "closed"; sfx("paper", true); speak(shut ? "Curtains open. Hello, sky." : "Curtains closed. Cosy.", 2500); save(true); return; }
+  if (id === "record") { setMusic(!sound.music); speak(sound.music ? "Record's on. Mmm." : "Needle up. Quiet time.", 2500); drawScene(); return; }
+  if (id === "nook") { calmOpen = true; sfx("paper", true); render(); return; }
+  if (id === "journal") { journalOpen = true; sfx("paper", true); render(); return; }
   if (id === "wardrobe") { wardOpen = true; ward.error = ""; sfx("paper", true); speak("Let's see what's hanging in here today.", 3000); render(); return; }
   if (id === "digest") { shelfOpen = true; speak(digestReady() ? (isHere("juniper") ? "Juniper's waving a digest at you!" : "A fresh digest is ready on the shelf.") : "Digests are rationed. Like dessert.", 3500); render(); return; }
   if (id === "stall") { shopClosed = false; render(); return; }
@@ -1302,6 +1379,7 @@ function arriveSpot(id){
     const t = remaining()[0];
     if (placeOf(t) === scene && spotOf(t) === id && !S.arrived[t.id]) { S.arrived[t.id] = true; setSay(`Here at the ${spotObj(scene, id).name.toLowerCase()}. First tiny step…`); save(); return; }
   }
+  if (scene === "hall" && id === "whiteboard") { scratchOpen = true; sfx("paper", true); render(); return; }   // the whiteboard is Mel's scratchpad
   const s = spotObj(scene, id); if (s) speak(s.line, 3500); render();
 }
 function arriveVillageSpot(id){
@@ -1324,6 +1402,7 @@ function arriveVillageSpot(id){
 }
 function toWorld(ev){ const r = $("map").getBoundingClientRect(); return [(ev.clientX - r.left - cam.ox)/cam.s, (ev.clientY - r.top - cam.oy)/cam.s]; }
 svg.addEventListener("click", ev => {
+  if (S.sleep && scene === "room") { S.sleep = null; speak("Up we get!", 2500); save(true); }   // any tap wakes Mel
   const npc = ev.target.closest("[data-npc]");
   if (npc) { tapNpc(npc.dataset.npc); return; }
   const ug = ev.target.closest("[data-ugarden]");
@@ -1340,7 +1419,7 @@ svg.addEventListener("click", ev => {
   }
   const sp = ev.target.closest("[data-spot]");
   if (sp) { const s = spotObj(scene, sp.dataset.spot); go(scene, s.tx, s.ty, () => arriveSpot(s.id)); return; }
-  if (ev.target.closest("[data-exit]")) { go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null); return; }
+  if (ev.target.closest("[data-exit]")) { if (INNER[scene]) { const I = INNER[scene]; go(I.parent, I.door[0] + 30, I.door[1] + 20, null); } else go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null); return; }
   const pt = ev.target.closest("[data-plot]");
   if (pt) { const i = +pt.dataset.plot, p = PLOTS[i]; go("farm", p.x + p.w/2, p.y + p.h + 18, () => { selPlot = i; atSpot = "plot"; ctx(); const s = F.plots[i]; speak(!s || !s.crop ? "Empty plot. What shall we grow?" : !s.wateredAt ? "Thirsty seeds!" : growth(s) >= 1 ? "Ready to pick!" : "Growing nicely.", 3000); }); return; }
   const [x, y] = toWorld(ev);
@@ -1371,9 +1450,19 @@ function nearSpot(){
   const s = list.find(s => Math.hypot(s.tx - mel.x, s.ty - mel.y) < 26); return s ? s.id : null;
 }
 const EVAN_SPOTS = {base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[380,580],[240,560],[420,340]], home:[[150,500],[330,520],[260,340],[200,600],[360,330]]};
+// Evan's destination is evan.tx/ty; outdoors he follows route-finder waypoints to it (round the house, not through it)
+function evanWalk(speed, dt){
+  const key = evan.tx + "," + evan.ty;
+  if (key !== evan.rk) { evan.rk = key; evan.path = outside() ? findPath(scene, [evan.x, evan.y], [evan.tx, evan.ty], bounds()) : [[evan.tx, evan.ty]]; }
+  const p = evan.path && evan.path[0]; if (!p) { evan.moving = false; return true; }
+  const want = [evan.tx, evan.ty]; evan.tx = p[0]; evan.ty = p[1];
+  const r = stepTo(evan, speed, dt); evan.tx = want[0]; evan.ty = want[1];
+  if (r) { evan.path.shift(); if (evan.path.length) { evan.moving = true; return false; } return true; }
+  return false;
+}
 function tickEvan(dt){
   if (!evanHere()) return;
-  if (stepTo(evan, evan.run ? 130 : 70, dt)) {
+  if (evanWalk(evan.run ? 130 : 70, dt)) {
     evan.wait -= dt;
     if (evan.wait <= 0) {
       const r = Math.random(), b = bounds();
@@ -1461,14 +1550,18 @@ function frame(now){
     else if (!route.length) {
       const n = nearSpot();
       if (n) { if (outside()) { const v = VILLAGE[n]; if (v.spot) arriveVillageSpot(n); else go(n, 260, 560, null); } else arriveSpot(n); }
-      else if (!outside() && scene !== "farm" && mel.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
+      else if (!outside() && scene !== "farm" && !INNER[scene] && mel.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
+      else if (INNER[scene] && mel.x > 476 && Math.abs(mel.y - 410) < 56) { const I = INNER[scene]; go(I.parent, I.door[0] + 30, I.door[1] + 20, null); }
       else if (scene === "farm" && mel.y > 592 && Math.abs(mel.x - 260) < 50) go("base", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
     }
   }
   mel.wasMoving = mel.moving;
-  const sleeping = phase() === "break" || Date.now() < mapleNap;
+  const inRoom = scene === "room", MB = [238, 298];
+  if (inRoom) { maple.tx = MB[0]; maple.ty = MB[1]; stepTo(maple, 110, dt); }
+  const sleeping = inRoom ? !maple.moving && Math.hypot(maple.x - MB[0], maple.y - MB[1]) < 6 : (phase() === "break" || Date.now() < mapleNap);
   nodes.maple.classList.toggle("sleep", sleeping);
-  if (!sleeping) { maple.tx = mel.x - mel.dir*24; maple.ty = mel.y + 3; const d = Math.hypot(maple.tx - maple.x, maple.ty - maple.y); stepTo(maple, Math.max(120, d*3.2), dt); if (!maple.moving) maple.dir = mel.dir; }
+  if (inRoom) {}
+  else if (!sleeping) { maple.tx = mel.x - mel.dir*24; maple.ty = mel.y + 3; const d = Math.hypot(maple.tx - maple.x, maple.ty - maple.y); stepTo(maple, Math.max(120, d*3.2), dt); if (!maple.moving) maple.dir = mel.dir; }
   else maple.moving = false;
   tickEvan(dt);
   tickNpcs(dt); updateCam(dt);

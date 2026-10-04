@@ -3,6 +3,7 @@
 import { NPCS, AGENTS } from "../data/npcs.js";
 import { personArt, letterArt } from "../art/people.js";
 import { sgHM, now, H, pick, rnd, clamp, $, plain, esc } from "../util.js";
+import { findPath, blocked } from "./paths.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const ents = {};            // id -> entity (villagers and the active messenger)
@@ -43,6 +44,18 @@ function stepTo(e, speed, dt){
   return false;
 }
 const jitter = ([x, y]) => [x + rnd(-10, 10), y + rnd(-6, 6)];
+// Outdoors everyone goes round buildings, the pond and fences: a target becomes waypoints from the route finder
+// (the same one Mel uses). walk() steps along them and returns true on arrival at the last one.
+function route(e, x, y){
+  const s = api.scene(); e.goal = [x, y];
+  if (outdoors(s)) { const pts = findPath(s, [e.x, e.y], [x, y], api.bounds()); const f = pts.shift(); e.tx = f[0]; e.ty = f[1]; e.path = pts; }
+  else { e.tx = x; e.ty = y; e.path = []; }
+}
+function walk(e, speed, dt){
+  if (!stepTo(e, speed, dt)) return false;
+  if (e.path && e.path.length) { const n = e.path.shift(); e.tx = n[0]; e.ty = n[1]; e.moving = true; return false; }
+  return true;
+}
 
 /* ---------- villagers ---------- */
 function tickVillager(def, dt){
@@ -61,15 +74,16 @@ function tickVillager(def, dt){
     say(e, pick(hellos()), 2600); api.sfx && api.sfx("babble", def.pitch || 1);
   }
   const b = api.bounds();
-  if (stepTo(e, def.kid ? 95 : 48, dt)) {
+  if (walk(e, def.kid ? 95 : 48, dt)) {
     e.wait -= dt;
     if (e.wait <= 0 && slot.wander) {
       let p = jitter(pick(slot.wander));
+      for (let k = 0; k < 6 && outdoors(scene) && blocked(scene, p[0], p[1]); k++) p = jitter(pick(slot.wander));   // never wander into a building
       if (def.id === "pip" && scene === "base" && Math.random() < .35) {   // Pip races Evan to the pond
         p = [340 + rnd(-10, 10), 572]; api.evan.tx = 360 + rnd(-14, 14); api.evan.ty = 578; api.evan.run = true;
         if (Math.random() < .6) { say(e, "Race you, Evan!"); setTimeout(() => api.evanSays("race!"), 600); }
       }
-      e.tx = clamp(p[0], b[0], b[2]); e.ty = clamp(p[1], b[1], b[3]); e.wait = rnd(3, 8);
+      route(e, clamp(p[0], b[0], b[2]), clamp(p[1], b[1], b[3])); e.wait = rnd(3, 8);
     }
   }
   e.node.classList.toggle("run", def.kid && e.moving);
@@ -80,7 +94,7 @@ const hellos = () => { const t = sgHM(); return [t < 720 ? "Morning, Mel!" : t <
 function tickCourier(dt){
   const scene = api.scene(), mel = api.mel;
   if (courier && courier.scene !== scene) { drop(courier.id); courier = null; }
-  if (scene === "home") return;   // only family inside the house; notes wait until Mel steps out
+  if (scene === "home" || scene === "room") return;   // only family inside the house (and nobody in Mel's room); notes wait until Mel steps out
   // the note she's carrying was replaced or read elsewhere (e.g. fresh mail arrived just after the page opened)
   if (courier && courier.state !== "leaving" && !api.unreadMail().some(m => m.id === courier.item.id)) { drop(courier.id); courier = null; }
   if (!courier) {
@@ -95,14 +109,16 @@ function tickCourier(dt){
   const c = courier;
   if (c.state === "coming" || c.state === "waiting") {
     const side = mel.x > 260 ? -1 : 1;
-    c.tx = mel.x + side*44; c.ty = mel.y + 2;
-    const arrived = stepTo(c, 150, dt);
+    // stand beside Mel, on whichever side isn't inside something (the well, a stall)
+    let [gx, gy] = [[side*44, 2], [-side*44, 2], [side*30, 26], [-side*30, 26], [0, 34]].map(([dx, dy]) => [mel.x + dx, mel.y + dy]).find(([x, y]) => !outdoors(scene) || !blocked(scene, x, y)) || [mel.x + side*44, mel.y + 2];
+    if (!c.goal || Math.hypot(c.goal[0] - gx, c.goal[1] - gy) > 18) route(c, gx, gy);   // re-route only when Mel has moved
+    const arrived = walk(c, 150, dt);
     if (arrived && c.state === "coming") {
       c.state = "waiting"; c.dir = -side;
       if (!greeted.has(c.item.id)) { greeted.add(c.item.id); say(c, `${c.item.from === "crier" && c.ag.helloTown ? c.ag.helloTown : c.ag.hello} Tap me for the note.`, 6000); }
     }
   } else if (c.state === "leaving") {
-    if (stepTo(c, 140, dt)) { drop(c.id); courier = null; }
+    if (walk(c, 140, dt)) { drop(c.id); courier = null; }
   }
   c.node.classList.toggle("run", c.moving && c.state !== "leaving");
   c.node.classList.toggle("walk", c.moving);
@@ -111,7 +127,7 @@ export function courierDelivered(itemId){
   if (!courier || courier.item.id !== itemId) return;
   courier.state = "leaving"; courier.node.querySelector(".letter")?.remove();
   say(courier, pick(["Off I go!", "Have a lovely day!", "Bye for now!"]), 2200);
-  const scene = api.scene(); courier.tx = outdoors(scene) ? (courier.x < 260 ? -30 : 550) : 260; courier.ty = outdoors(scene) ? 330 : 650;
+  const scene = api.scene(); route(courier, outdoors(scene) ? (courier.x < 260 ? -30 : 550) : 260, outdoors(scene) ? 330 : 650);
 }
 
 /* ---------- talking ---------- */

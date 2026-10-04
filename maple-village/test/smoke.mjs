@@ -2,7 +2,7 @@
 //   node test/smoke.mjs            (screenshots land in test/shots/)
 import { execSync } from "node:child_process";
 import { createRequire } from "node:module";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -345,6 +345,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#journal").textContent().then(t => /break/i.test(t)), "and a break she asks for starts in the game");
   await page.close();
 }
+// Maple knows Mel's plans: the Notion "Plans" pages for this week, month and quarter go into the chat
+{
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`plans pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&notion=1&time=10:30&date=2026-10-05");
+  await page.waitForTimeout(800);
+  await page.click("#chatBtn");
+  await page.fill("#chatIn", "what's my focus this week?"); await page.click("#chatForm button");
+  await page.waitForFunction(() => /Week of 5 Oct 2026/.test(window.__lastPrompt || ""), null, { timeout: 10000 }).catch(() => {});
+  const pr = await page.evaluate(() => window.__lastPrompt || "");
+  check(/== Week of 5 Oct 2026 ==/.test(pr) && /== October 2026 ==/.test(pr) && /== Q4 2026 ==/.test(pr) && /fill the Visibility Fix/.test(pr), "Maple reads this week's, month's and quarter's plans from Notion when asked");
+  await page.close();
+}
 // Post box: unread work mail at the post office (Gmail connector, faked by the stub)
 {
   console.log("\npost box");
@@ -433,6 +446,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   for (const id of ["chick", "rabbit", "chickfeed", "rabbitfeed"]) { await page.click(`#ctx .item[data-id="${id}"]`); await page.waitForTimeout(150); }
   check(await page.locator('#ctx .item[data-id="chick"]').textContent().then(t => /run is full/.test(t)), "a chick and a bunny fill the little run");
   await page.screenshot({ path: join(shots, "animals-market.png") });
+  await page.click('#ctx [data-shop="me"]');
+  check(await page.locator('#ctx [data-decor="r_lights"]').count() === 1 && await page.locator('#ctx [data-decor="me_bow"]').count() === 1, "the market sells things for Mel and her room");
   await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05");
   await page.waitForTimeout(900);
@@ -501,15 +516,72 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="home"]').dispatchEvent("click");
   await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(400);
+  await page.locator('#world [data-spot="mydoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /My room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(400);
   await page.locator('#world [data-spot="wardrobe"]').dispatchEvent("click");
   await page.waitForSelector("#ctx .outfit", { timeout: 20000 });
   check(await page.locator("#ctx .outfit").count() === 3, "the wardrobe shows the stylist's three outfits");
+  check(await page.locator("#ctx .outfit .garment").count() >= 15, "with a little drawing of each piece");
   await page.fill("#outfitAsk", "something green"); await page.click('#outfitForm button');
   await page.waitForFunction(() => document.querySelectorAll("#ctx .outfit").length === 4, null, { timeout: 10000 });
   check(await page.locator("#ctx .outfit").last().textContent().then(t => /Emerald wrap midi dress/.test(t)), "and a new outfit on request");
   await page.screenshot({ path: join(shots, "wardrobe.png") });
   await page.click("#pclose"); await page.waitForTimeout(200);
   check(await page.locator("#panel").isHidden(), "and closes");
+  // the rest of Mel's room
+  await page.waitForTimeout(2500);
+  check(await page.evaluate(() => document.getElementById("mmaple").classList.contains("sleep")), "Maple curls up in her bed in Mel's room");
+  check(await page.locator("#world .npc").count() === 0, "nobody else comes into Mel's room");
+  await page.locator('#world [data-spot="bed"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-bed="nap"]', { timeout: 15000 });
+  await page.click('#ctx [data-bed="nap"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => getComputedStyle(document.getElementById("mel")).visibility === "hidden") && await page.locator("#world .zz").count() === 1, "a nap puts Mel to bed");
+  await page.locator('#world [data-spot="window"]').dispatchEvent("click"); await page.waitForTimeout(3500);
+  check(await page.evaluate(() => getComputedStyle(document.getElementById("mel")).visibility !== "hidden"), "getting up to the window wakes her");
+  await page.locator('#world [data-spot="journal"]').dispatchEvent("click");
+  await page.waitForSelector("#jText", { timeout: 15000 });
+  await page.fill("#jText", "A lovely quiet afternoon."); await page.click('#jForm button'); await page.waitForTimeout(300);
+  check(await page.locator(".jlist details").count() === 1 && await page.evaluate(() => (devDb.get("journal").entries || []).length === 1), "the journal keeps a page");
+  await page.click("#pclose");
+  await page.locator('#world [data-spot="nook"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-calm="1"]', { timeout: 15000 });
+  await page.click('#ctx [data-calm="1"]'); await page.waitForTimeout(500);
+  check(await page.locator("#ctx .breathe .ring").count() === 1 && /Breathe in/.test(await page.locator("#breathCue").textContent()), "the calm corner has guided breathing with a breathing ring");
+  await page.waitForTimeout(4500);
+  check(/Hold|Breathe out/.test(await page.locator("#breathCue").textContent()), "and talks you through each breath");
+  await page.click('#ctx [data-calm="stop"]'); await page.click('#ctx [data-calm="decompress"]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.today")).mode === "decompress"), "and starts a decompress any time");
+  await page.locator("#world [data-exit]").first().dispatchEvent("click");
+  await page.waitForFunction(() => /^Home/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "the door on the east wall goes back into the house");
+  await page.close();
+}
+// Scratchpad: the town hall whiteboard
+{
+  console.log("\nscratchpad");
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  page.on("pageerror", e => errors.push(`scratchpad pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&nosample=1&time=10:30&date=2026-10-05");
+  await page.waitForTimeout(800);
+  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  // townsfolk walk round buildings, never through them: sample everyone's position for a while
+  { const src = readFileSync(join(root, "src/game/paths.js"), "utf8"), m = /village: (\[[\s\S]*?\]\]),/.exec(src), rects = JSON.parse(m[1]);
+    let bad = 0, seen = 0;
+    for (let i = 0; i < 40; i++) {
+      const pos = await page.evaluate(() => [...document.querySelectorAll("#world .npc")].map(n => (/translate\(([-\d.]+) ([-\d.]+)\)/.exec(n.getAttribute("transform")) || []).slice(1).map(Number)));
+      pos.forEach(([x, y]) => { if (x == null) return; seen++; if (rects.some(r => x > r[0] + 6 && x < r[2] - 6 && y > r[1] + 6 && y < r[3] - 6)) bad++; });
+      await page.waitForTimeout(300);
+    }
+    check(seen > 0 && bad === 0, `townsfolk walk round buildings, not through them (${bad} of ${seen} sightings inside)`); }
+  await page.locator('#world [data-place="hall"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town hall/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(400);
+  await page.locator('#world [data-spot="whiteboard"]').dispatchEvent("click");
+  await page.waitForSelector("#scratchText", { timeout: 15000 });
+  await page.fill("#scratchText", "Call the printer about the flyers"); await page.waitForTimeout(1500);
+  check(await page.evaluate(() => (devDb.get("scratch") || {}).text === "Call the printer about the flyers"), "the whiteboard is a scratchpad that saves as you type");
   await page.close();
 }
 // Sunsama pull: no chat plan, the page fetches today's tasks itself
@@ -521,7 +593,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => /came straight from Sunsama/.test(document.querySelector("#sunsamaLine").textContent), null, { timeout: 15000 });
   const titles = await page.locator("#list .t").allTextContents();
   check(titles.length === 5, `all five Sunsama tasks became quests (${titles.length})`);
-  check(titles.some(t => /× Listen to affirmations/.test(t)), "a task completed in Sunsama shows as done");
+  check(await page.locator("#list li.done .t").allTextContents().then(t => t.some(x => /Listen to affirmations/.test(x))) && await page.locator("#list li.done .tk").count() > 0, "a task completed in Sunsama shows as done, ticked");
   const plan = await page.evaluate(() => devDb.get("plan"));
   check(plan && plan.source === "sunsama" && plan.tasks.find(t => t.id === "s1").notes.includes("- Check GHL"), "notes are cleaned up from Sunsama's HTML");
   check(plan.tasks.find(t => t.id === "s4").minutes === 90 && plan.tasks.find(t => t.id === "s3").treadmill === true, "time estimates and treadmill flags carry over");
@@ -538,7 +610,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(async () => { const day = (await devDb.get("plan")).day, f = JSON.parse(localStorage.getItem("fox.fox")); f.early = {s2: day}; f.updatedAt = Date.now() + 1e7;
     localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
   await page.goto(url + "?sunsama=1&time=07:45"); await page.waitForTimeout(1500);
-  check(await page.locator("#list .t").allTextContents().then(t => t.some(x => /× Draft the Visibility Fix email/.test(x))), "a quest done early is already ticked on its day");
+  check(await page.locator("#list li.done .t").allTextContents().then(t => t.some(x => /Draft the Visibility Fix email/.test(x))), "a quest done early is already ticked on its day");
   await page.click('[data-open="settings"]').catch(() => {}); await page.click("#pclose").catch(() => {});
   await page.click('[data-open="cal"]');
   await page.waitForFunction(() => document.querySelectorAll("#calBody .calday li").length > 1, null, { timeout: 8000 }).catch(() => {});

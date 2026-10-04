@@ -44,6 +44,7 @@
   };
   // Maple's chat: a tiny fake that turns a few phrases into actions, so the action plumbing can be tested offline
   sample.json = async (prompt) => {
+    window.__lastPrompt = String(prompt);
     if (/You are Mel's personal stylist/.test(String(prompt))) return {label: "Emerald easy day", dress: "Emerald wrap midi dress", shoes: "Black ballet flats", bag: "Black crossbody", jewellery: "Silver hoops", hair: "up, low bun", why: "Soft, fitted and cool-toned for a relaxed day."};
     const m = /\nMel: ([^\n]*)\nReturn JSON only/.exec(String(prompt)); if (!m) return {};
     const t = m[1].toLowerCase(), acts = [];
@@ -75,6 +76,14 @@
         ];
         return { content: [], payload: { events } };
       }
+      if (server === "Notion" && tool === "notion-search") {
+        const q = String(input.query || "");
+        return { content: [], payload: { results: [{ id: "plan-" + q.replace(/\W+/g, "-"), title: q, url: "https://app.notion.com/p/x", type: "page" }], type: "ai_search" } };
+      }
+      if (server === "Notion" && tool === "notion-fetch") {
+        const t = String(input.id || "").replace(/^plan-/, "").replace(/-/g, " ");
+        return { content: [], payload: { title: t, text: `<page><content>\n## Objectives\n- Primary: (stub plan for ${t}) fill the Visibility Fix\n</content></page>` } };
+      }
       if (server !== "Sunsama MCP" || tool !== "read_resource") throw { code: "not_in_manifest", message: "not declared" };
       // the first day asked for is "today"; any later day gets tomorrow's (different) tasks
       const day = String(input.uri || "").slice(-10); stubDay = stubDay || day;
@@ -97,7 +106,7 @@
     }
   };
 
-  const caps = { db, mcp: q.get("sunsama") ? mcp : null, user: { id: async () => "me", isOwner: () => true, canEdit: () => true }, sample: q.get("nosample") ? null : sample };
+  const caps = { db, mcp: q.get("sunsama") || q.get("notion") ? mcp : null, user: { id: async () => "me", isOwner: () => true, canEdit: () => true }, sample: q.get("nosample") ? null : sample };
   window.claude = { use: name => new Promise(r => setTimeout(() => r(caps[name] ?? null), 250)) };
 
   if (q.get("seed")) {
