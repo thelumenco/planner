@@ -458,6 +458,60 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#panel").isHidden(), "and closes");
   await page.close();
 }
+// Saving: a browser with no copy of its own (like the Claude app after a refresh) must load the cloud save, never overwrite it
+{
+  console.log("\nsaving");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`saving pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&nosample=1&time=10:30&date=2026-10-05");
+  await page.waitForTimeout(1200);
+  await page.addInitScript(() => { if (sessionStorage.getItem("savetest")) return; sessionStorage.setItem("savetest", "1");
+  const k = Object.keys(localStorage).find(k => /^stub:.*\/fox$/.test(k)); const f = JSON.parse(localStorage.getItem(k));
+  f.coins = 77; f.inv = Object.assign(f.inv || {}, {carrot: 3}); f.updatedAt = Date.now() - 3600e3; localStorage.setItem(k, JSON.stringify(f));
+  Object.keys(localStorage).filter(k => /^fox\./.test(k)).forEach(k => localStorage.removeItem(k)); });
+  await page.goto(url + "?seed=1&nosample=1&sunsama=1&dblag=2000&time=10:30&date=2026-10-05");
+  await page.waitForTimeout(4000);
+  const st = await page.evaluate(() => { const k = Object.keys(localStorage).find(k => /^stub:.*\/fox$/.test(k)); return JSON.parse(localStorage.getItem(k)); });
+  check(st.coins >= 77 && st.inv.carrot === 3, `a fresh browser loads the cloud save instead of overwriting it (coins ${st.coins})`);
+  check(await page.locator("#coins").textContent().then(t => /7\d/.test(t)), "and shows it");
+  // another device saves (this page doesn't hear about it), then this page saves: it must catch up, not overwrite
+  await page.evaluate(() => { const k = Object.keys(localStorage).find(k => /^stub:.*\/fox$/.test(k)); const f = JSON.parse(localStorage.getItem(k));
+    f.coins = 55; f.inv = Object.assign(f.inv || {}, {strawberry: 2}); f.updatedAt = Date.now(); localStorage.setItem(k, JSON.stringify(f)); });
+  await page.click('[data-open="quests"]'); await page.fill("#addTitle", "Water the plants"); await page.click('#addForm button');
+  await page.waitForTimeout(1500);
+  const st2 = await page.evaluate(() => { const k = Object.keys(localStorage).find(k => /^stub:.*\/fox$/.test(k)); return JSON.parse(localStorage.getItem(k)); });
+  check(st2.coins === 55 && st2.inv.strawberry === 2, `a stale page catches up with another device's save instead of overwriting it (coins ${st2.coins})`);
+  await page.close();
+}
+// Wardrobe at home: the stylist's three outfits from the "outfit" doc, plus a new one on request
+{
+  console.log("\nwardrobe");
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  page.on("pageerror", e => errors.push(`wardrobe pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-05");
+  await page.waitForTimeout(700);
+  await page.evaluate(() => {
+    const o = (label, top, bottom, shoes) => ({label, top, bottom, shoes, bag: "Black structured tote", jewellery: "Pearl studs", hair: "up", why: "Polished but easy."});
+    localStorage.setItem("stub:data/users/me/outfit", JSON.stringify({at: Date.now(), day: "2026-10-05", weather: "31C, humid", on: "School drop-off, client call at 3pm",
+      options: [o("Polished", "Black boat neck top", "Navy wide-leg trousers", "Black loafers"), o("Elevated casual", "White fitted tee", "Dark jeans", "White sneakers"), o("Wild card", "Plum silk blouse", "Black midi skirt", "Black ballet flats")],
+      wardrobe: {tops: ["Black boat neck top", "White fitted tee"], dresses: ["Emerald wrap midi dress"], shoes: ["Black ballet flats"], bags: ["Black crossbody"]}}));
+  });
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-05");
+  await page.waitForTimeout(800);
+  await page.locator('#world [data-place="home"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(400);
+  await page.locator('#world [data-spot="wardrobe"]').dispatchEvent("click");
+  await page.waitForSelector("#ctx .outfit", { timeout: 20000 });
+  check(await page.locator("#ctx .outfit").count() === 3, "the wardrobe shows the stylist's three outfits");
+  await page.fill("#outfitAsk", "something green"); await page.click('#outfitForm button');
+  await page.waitForFunction(() => document.querySelectorAll("#ctx .outfit").length === 4, null, { timeout: 10000 });
+  check(await page.locator("#ctx .outfit").last().textContent().then(t => /Emerald wrap midi dress/.test(t)), "and a new outfit on request");
+  await page.screenshot({ path: join(shots, "wardrobe.png") });
+  await page.click("#pclose"); await page.waitForTimeout(200);
+  check(await page.locator("#panel").isHidden(), "and closes");
+  await page.close();
+}
 // Sunsama pull: no chat plan, the page fetches today's tasks itself
 {
   console.log("\nsunsama pull");

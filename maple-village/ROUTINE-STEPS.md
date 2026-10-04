@@ -61,6 +61,18 @@ FINAL STEP: deliver the afternoon edition of the paper to Maple's village. After
 ```
 
 
+## 10. Daily morning briefing again - the wardrobe at home
+
+Paste this in the morning briefing too, after step 1's block. (The briefing's "What to Wear" section already runs your mel-stylist skill; this hangs those outfits in the wardrobe.)
+
+```
+FINAL STEP 2: hang today's outfits in the wardrobe in Maple's village. Use the three "What to Wear" options this briefing just made with the mel-stylist skill (every piece from the Wardrobe Notion doc).
+- Use the ArtifactData tool (load it with ToolSearch "select:ArtifactData" if it's deferred). Page url: https://claude.ai/artifact/REdXbAyK7ybkGJbmohoCM4, collection "data/users/me", doc_id "outfit".
+- First action "get" to read the doc and its version. Then action "set" with the whole doc, if_version = the version you read (omit it only if the doc doesn't exist yet). On a version conflict, read again and retry once. If it fails for any other reason, say so in one line and carry on.
+- Doc: { "at": <current epoch ms>, "day": "YYYY-MM-DD" (today, Singapore), "weather": "<e.g. 31C, humid>", "on": "<today's events in one short line>", "options": [ { "label": "Polished"|"Elevated casual"|"Wild card", "top": "", "bottom": "", "dress": "" (dress OR top+bottom), "layer": "", "shoes": "", "bag": "", "jewellery": "", "sunglasses": "" (only if going out), "hair": "up|down + short note", "why": "one sentence" } x3 ], "wardrobe": <keep the existing "wardrobe" field exactly as it is, unless the Wardrobe Notion doc has changed: then rewrite it as lists of short item names: tops, bottoms, dresses, layers, shoes, bags, jewellery, belts, scarves, sunglasses, cooler_weather> }
+- Plain text, no emoji.
+```
+
 # Reports for the village (bug checks and content calendars)
 
 Paste each block at the end of the matching routine's instructions (wherever that routine lives: the Claude desktop app for tasks on your Mac, or claude.ai Routines for cloud ones). The village only reads these.

@@ -1,6 +1,7 @@
 // Local stand-in for the claude.ai artifact runtime (window.claude.use), dev builds only.
 // db: documents in localStorage under "stub:<path>", live onSnapshot. user: id "me". sample: canned replies.
 // URL options:
+//   ?dblag=ms     delay the first database snapshot (like a slow phone connection)
 //   ?seed=1         write a demo plan, mail and stats for today
 //   ?time=15:30     pretend it's this time in Singapore (NPC routines, nudges)
 //   ?date=2026-11-07  pretend it's this date (festivals, rain, Friday paper); combine with ?time
@@ -28,7 +29,7 @@
     set: async v => write(p, v),
     update: async v => write(p, Object.assign(read(p) || {}, v)),
     delete: async () => write(p, null),
-    onSnapshot(next) { (listeners[p] = listeners[p] || []).push(next); setTimeout(() => next(snap(p, read(p))), 0); return () => { listeners[p] = listeners[p].filter(f => f !== next); }; },
+    onSnapshot(next) { (listeners[p] = listeners[p] || []).push(next); setTimeout(() => next(snap(p, read(p))), +(q.get("dblag") || 0)); return () => { listeners[p] = listeners[p].filter(f => f !== next); }; },
     collection: c => collection(p + "/" + c)
   });
   const collection = p => ({ path: p, doc: id => doc(p + "/" + (id || Math.random().toString(36).slice(2))) });
@@ -43,6 +44,7 @@
   };
   // Maple's chat: a tiny fake that turns a few phrases into actions, so the action plumbing can be tested offline
   sample.json = async (prompt) => {
+    if (/You are Mel's personal stylist/.test(String(prompt))) return {label: "Emerald easy day", dress: "Emerald wrap midi dress", shoes: "Black ballet flats", bag: "Black crossbody", jewellery: "Silver hoops", hair: "up, low bun", why: "Soft, fitted and cool-toned for a relaxed day."};
     const m = /\nMel: ([^\n]*)\nReturn JSON only/.exec(String(prompt)); if (!m) return {};
     const t = m[1].toLowerCase(), acts = [];
     const shop = /add (.+) to (?:the |my )?shopping list/.exec(t); if (shop) acts.push({type: "shopping_add", items: shop[1].split(/,| and /).map(x => ({name: x.trim()})).filter(x => x.name)});

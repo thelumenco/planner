@@ -15,6 +15,7 @@ import { fetchPost, postPanel, postCount } from "./postbox.js";
 import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML } from "./feeds.js";
 import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
 import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, roomLeft, hungry, hungryCount, KINDS } from "./pets.js";
+import { wardrobePanel, newOutfit } from "./wardrobe.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 
 /* =================== STATE =================== */
@@ -59,18 +60,43 @@ let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot
 let qnOpen = false, qnQuietUntil = Date.now() + 5000, qnKey = "", openView = null, shopClosed = false;
 let homeView = null, postOpen = false, healthOpen = false, newsOpen = false, calTab = "today";   // "chores" (the cleaning cupboard) or "fridge" while one is open at home
 
+// Cloud saves wait until the cloud copy has loaded once (synced). Without that, a save made in the first moments after
+// opening (from a blank or stale copy in this browser) would overwrite the real save: phone and laptop each keep their
+// own browser copy, and the Claude app can clear it between visits.
+const loadedAt = {today: S.updatedAt || 0, fox: F.updatedAt || 0}, synced = {today: false, fox: false};
 function persist(which){
   const obj = which === "today" ? S : F;
   obj.updatedAt = Date.now();
   try { localStorage.setItem("fox."+which, JSON.stringify(obj)); } catch {}
-  if (!refs) return;
+  if (!refs || !synced[which]) return;
   clearTimeout(pending[which]); pending[which] = setTimeout(() => push(which), 500);
 }
-async function push(which){
-  if (writing[which]) { pending[which] = setTimeout(() => push(which), 400); return; }
+// seen: updatedAt of the newest cloud copy this page has loaded or written. Before each save the page re-reads the
+// cloud copy: if another device saved since (updates can take up to ~30 s to arrive here, longer for a tab left in the
+// background), this page catches up to that instead of writing its older copy over it.
+const seen = {today: 0, fox: 0};
+async function push(which, direct){
+  if (writing[which]) { pending[which] = setTimeout(() => push(which, direct), 400); return; }
   writing[which] = true;
-  try { await refs[which].set(JSON.parse(JSON.stringify(which === "today" ? S : F))); } catch(e) {}
+  try {
+    if (!direct) {
+      const cur = await refs[which].get(), r = cur.exists ? cur.data() : null;
+      if (r && (r.updatedAt || 0) > seen[which] && !(which === "today" && r.day !== dayKey())) {
+        adopt(which, JSON.parse(JSON.stringify(r))); writing[which] = false;
+        speak("Caught up with your other device. That last bit here didn't save, sorry!", 5000); return;
+      }
+    }
+    const body = JSON.parse(JSON.stringify(which === "today" ? S : F));
+    await refs[which].set(body); seen[which] = Math.max(seen[which], body.updatedAt || 0);
+  } catch(e) {}
   writing[which] = false;
+}
+function adopt(which, remote){
+  if (which === "today") S = Object.assign(freshToday(), remote); else F = Object.assign(freshFox(), remote);
+  seen[which] = Math.max(seen[which], remote.updatedAt || 0);
+  migrate();
+  try { localStorage.setItem("fox."+which, JSON.stringify(which === "today" ? S : F)); } catch {}
+  render(true);
 }
 // A small per-day record for the Friday paper (last 21 days).
 function noteHistory(){
@@ -122,17 +148,18 @@ async function initDb(){
     }
     if (firstPlan) { firstPlan = false; syncSunsama(); }
   }, () => { if (firstPlan) { firstPlan = false; syncSunsama(); } });
+  // A snapshot marked fromCache isn't server-definitive yet: show it, but only start saving after a definitive one.
   const watch = (which) => refs[which].onSnapshot(snap => {
-    const local = which === "today" ? S : F;
-    if (!snap.exists) { persist(which); return; }
+    const local = which === "today" ? S : F, first = !synced[which], cached = !!(snap.metadata && snap.metadata.fromCache);
+    if (!cached) synced[which] = true;
+    if (!snap.exists) { if (!cached) persist(which); return; }
     const remote = JSON.parse(JSON.stringify(snap.data()));
-    if (which === "today" && remote.day !== dayKey()) { if (local.day === dayKey()) persist(which); return; }
-    if ((remote.updatedAt || 0) > (local.updatedAt || 0)) {
-      if (which === "today") S = Object.assign(freshToday(), remote); else F = Object.assign(freshFox(), remote);
-      migrate();
-      try { localStorage.setItem("fox."+which, JSON.stringify(which === "today" ? S : F)); } catch {}
-      render(true);
-    } else if ((remote.updatedAt || 0) < (local.updatedAt || 0)) persist(which);
+    seen[which] = Math.max(seen[which], remote.updatedAt || 0);
+    if (which === "today" && remote.day !== dayKey()) { if (!cached && local.day === dayKey()) persist(which); return; }
+    // First load: the cloud wins unless this browser's copy (as it was when the page opened) is genuinely newer
+    if (first && (remote.updatedAt || 0) < loadedAt[which]) { if (!cached) persist(which); return; }
+    if (first || (remote.updatedAt || 0) > (local.updatedAt || 0)) adopt(which, remote);
+    else if (!cached && (remote.updatedAt || 0) < (local.updatedAt || 0)) persist(which);
   }, () => {});
   watch("today"); watch("fox");
 }
@@ -176,7 +203,8 @@ const SHED = {
   compost:   {n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster."},
   sprinkler: {n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."}
 };
-let shedOpen = false, runOpen = false;
+let shedOpen = false, runOpen = false, wardOpen = false;
+const ward = {busy: false, error: "", ask: ""};
 function buyTool(id){
   const t = SHED[id]; if (!t || F.tools[id] || F.coins < t.price) return;
   F.coins -= t.price; F.tools[id] = true; sfx("chaching"); act("cheer"); flash(`New in the shed: ${t.n.toLowerCase()}`);
@@ -468,8 +496,10 @@ async function syncSunsama(manual){
     const fresh = r.tasks.filter(t => !t.completed && !have.has(t.id));
     S.extra.push(...fresh); sun.added = fresh.length;
     if (!n) speak(fresh.length ? `Added ${fresh.length} new Sunsama task${fresh.length === 1 ? "" : "s"} to the end of the line.` : "Sunsama and the boards match. All set!", 4000);
+    if (n || fresh.length) save(true); else render();
+    return;
   }
-  save(true);
+  if (n) save(true); else render();   // nothing new: no save (a background tab mustn't rewrite an unchanged copy)
 }
 setInterval(() => { if (!document.hidden) syncSunsama(); }, 10*60e3);
 
@@ -524,7 +554,10 @@ function sunsamaLine(){
   el.innerHTML = `${esc(txt)} <button class="next" id="sunBtn" ${sun.busy ? "disabled" : ""}>${src === "chat" || src === "routine" ? "check Sunsama for new tasks" : "refresh from Sunsama"}</button>`;
   $("sunBtn").onclick = () => syncSunsama(true);
 }
-document.addEventListener("visibilitychange", () => { if (!document.hidden) syncSunsama(); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden) syncSunsama(); else flushSaves(); });
+window.addEventListener("pagehide", () => flushSaves());
+// Leaving or hiding the page: send any save that's still waiting out its half-second delay right away
+function flushSaves(){ ["today", "fox"].forEach(w => { if (pending[w] && refs && synced[w]) { clearTimeout(pending[w]); pending[w] = null; push(w, true); } }); }
 
 /* =================== LIBRARY DIGESTS =================== */
 // Rationed: one when an hour has passed since the last, or once a quest has been finished since the last. No stacking.
@@ -568,7 +601,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, {mod
 let chatLog = (() => { try { return JSON.parse(localStorage.getItem("fox.chat")) || []; } catch { return []; } })(), chatBusy = false;
 const keepChat = () => { chatLog = chatLog.slice(-30); try { localStorage.setItem("fox.chat", JSON.stringify(chatLog)); } catch {} };
 const PLACES = {home: "home", house: "home", fridge: "home:fridge", kitchen: "home:kitchen", cupboard: "home:cupboard", treadmill: "home:treadmill", sofa: "home:sofa",
-  pond: "base:pond", garden: "farm", farm: "farm", shed: "base:shed", swing: "base:swing", letterbox: "base:letterbox", "animal run": "base:run", run: "base:run", animals: "base:run", chickens: "base:run", rabbits: "base:run", market: "market", well: "village:well",
+  pond: "base:pond", garden: "farm", farm: "farm", shed: "base:shed", swing: "base:swing", letterbox: "base:letterbox", "animal run": "base:run", wardrobe: "home:wardrobe", outfit: "home:wardrobe", run: "base:run", animals: "base:run", chickens: "base:run", rabbits: "base:run", market: "market", well: "village:well",
   "town hall": "hall", hall: "hall", chord: "chord", "makers lane": "lane:plot3", lane: "lane:plot3", library: "fresh", "fresh pages": "fresh", chico: "chico", "post office": "post", post: "post", town: "village:board"};
 function walkToPlace(name){
   const k = PLACES[String(name || "").toLowerCase().trim()]; if (!k) return null;
@@ -628,7 +661,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|pond|garden|shed|swing|letterbox|animal run|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|wardrobe|pond|garden|shed|swing|letterbox|animal run|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -954,7 +987,7 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1025,6 +1058,8 @@ function ctx(){
       else if (g < 1) { const left = cr.dur*(1 - g); h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n}, growing. About ${dur(left)} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(g*100).toFixed(0)}%"></i></div>`; }
       else h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n} is ready!</p><div class="actions"><button class="btn yes" data-farm="harvest">Harvest</button></div>`;
     }
+  } else if (wardOpen && scene === "home") {
+    h = wardrobePanel(F, {sample: !!sampleCap, busy: ward.busy, error: ward.error, ask: ward.ask});
   } else if (runOpen && scene === "base") {
     h = runPanel(F);
   } else if (shedOpen) {
@@ -1065,7 +1100,12 @@ function ctx(){
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; ctx(); });
+  const of = c.querySelector("#outfitForm");
+  if (of) { const inp = c.querySelector("#outfitAsk"); inp.oninput = () => { ward.ask = inp.value; };
+    of.onsubmit = async ev => { ev.preventDefault(); if (ward.busy) return; ward.busy = true; ward.error = ""; ctx();
+      let o = null; try { o = await newOutfit(F, sampleCap, ward.ask); } catch {}
+      ward.busy = false; if (o) { ward.ask = ""; save(true); speak(`How about this: ${o.label.toLowerCase()}?`, 4000); } else ward.error = "Hmm, nothing came back. Try again?"; ctx(); }; }
   c.querySelectorAll("[data-feed]").forEach(b => b.onclick = () => feedAnimals(b.dataset.feed));
   c.querySelectorAll("[data-runup]").forEach(b => b.onclick = () => buyRunUpgrade());
   c.querySelectorAll("[data-tool]").forEach(b => b.onclick = () => buyTool(b.dataset.tool));
@@ -1204,7 +1244,7 @@ const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "b
 function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
   setTimeout(() => {
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
@@ -1232,7 +1272,7 @@ function go(target, x, y, fn){
     if (!OUTDOOR.includes(target)) { const d = VILLAGE[target].door; legs.push({scene:tOut, x:d[0], y:d[1], fn:() => setScene(target, target === "farm" ? [260, 590] : [260, 596])}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -1247,6 +1287,7 @@ function walkTo(x, y){
 function arriveSpot(id){
   atSpot = id;
   const ph = phase();
+  if (id === "wardrobe") { wardOpen = true; ward.error = ""; sfx("paper", true); speak("Let's see what's hanging in here today.", 3000); render(); return; }
   if (id === "digest") { shelfOpen = true; speak(digestReady() ? (isHere("juniper") ? "Juniper's waving a digest at you!" : "A fresh digest is ready on the shelf.") : "Digests are rationed. Like dessert.", 3500); render(); return; }
   if (id === "stall") { shopClosed = false; render(); return; }
   if (id === "status") { healthOpen = true; sfx("paper"); render(); return; }

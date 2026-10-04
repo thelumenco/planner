@@ -7,7 +7,7 @@ import { esc, plain, dayKey } from "../util.js";
 
 export const APPS = {chord: {name: "Chord", room: "chord"}, chico: {name: "Chico", room: "chico"}};
 export const BRANDS = {chord: {name: "Chord", color: "var(--sage)"}, ambidextrous: {name: "Ambidextrous", color: "var(--peri)"}};
-const DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous", "goodnews"];
+const DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
 const KEY = "fox.feeds";
 let D = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })();
 let onChange = () => {};
@@ -71,6 +71,9 @@ export function contentHTML(){
 export function wireContent(root, rerender){
   root.querySelectorAll("[data-cbrand]").forEach(b => b.onclick = () => { brandFilter = b.dataset.cbrand; rerender(); });
 }
+
+/* ---------- wardrobe: "outfit" doc from the morning stylist routine (see wardrobe.js) ---------- */
+export const outfitDoc = () => { const d = D.outfit; return d && d.at ? d : null; };
 
 /* ---------- good news board (town square): "goodnews" doc from the morning routine + wins the page knows ---------- */
 export function goodNews(){ const d = D.goodnews; return d && d.at ? d : null; }

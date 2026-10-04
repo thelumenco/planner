@@ -42,17 +42,32 @@ let api = null, ref = null, pushT = null, view = {tab: "daily", fridge: "stock",
 let timer = null;   // {endAt, total, pausedLeft, lastMin}
 
 export function initHestia(a){ api = a; tidy(); setInterval(tick, 1000); }
+// Like the fox save: nothing goes to the cloud until the cloud copy has loaded once, and on that first load the cloud
+// wins unless this browser's copy (as it was at open) is newer.
+let synced = false;
+const loadedAt = (() => { try { return (JSON.parse(localStorage.getItem("fox.hestia")) || {}).updatedAt || 0; } catch { return 0; } })();
 export function attachHestiaDb(docRef){
   ref = docRef;
   ref.onSnapshot(snap => {
-    if (!snap.exists) { save(); return; }
+    const first = !synced, cached = !!(snap.metadata && snap.metadata.fromCache); if (!cached) synced = true;
+    if (!snap.exists) { if (!cached) save(); return; }
     const remote = snap.data() || {};
-    if ((remote.updatedAt || 0) > (H.updatedAt || 0)) { H = Object.assign(fresh(), remote); tidy(); local(); api.changed(); }
-    else if ((remote.updatedAt || 0) < (H.updatedAt || 0)) save();
+    seen = Math.max(seen, remote.updatedAt || 0);
+    if (first && (remote.updatedAt || 0) < loadedAt) { if (!cached) save(); return; }
+    if (first || (remote.updatedAt || 0) > (H.updatedAt || 0)) { H = Object.assign(fresh(), remote); tidy(); local(); api.changed(); }
+    else if (!cached && (remote.updatedAt || 0) < (H.updatedAt || 0)) save();
   }, () => {});
 }
 const local = () => { try { localStorage.setItem(KEY, JSON.stringify(H)); } catch {} };
-function save(){ H.updatedAt = Date.now(); local(); if (!ref) return; clearTimeout(pushT); pushT = setTimeout(() => { ref.set(JSON.parse(JSON.stringify(H))).catch(() => {}); }, 500); }
+// Before writing, re-read the cloud copy: if another device saved since this page last saw it, catch up instead.
+let seen = 0;
+function save(){ H.updatedAt = Date.now(); local(); if (!ref || !synced) return; clearTimeout(pushT); pushT = setTimeout(async () => {
+  try {
+    const cur = await ref.get(), r = cur.exists ? cur.data() : null;
+    if (r && (r.updatedAt || 0) > seen) { H = Object.assign(fresh(), JSON.parse(JSON.stringify(r))); seen = r.updatedAt; tidy(); local(); api.changed(); return; }
+    const body = JSON.parse(JSON.stringify(H)); await ref.set(body); seen = Math.max(seen, body.updatedAt || 0);
+  } catch {}
+}, 500); }
 
 /* ---------- dates: daily by village day, weekly by the Sunday-start week, zones by the Monday-start week ---------- */
 const today = () => dayKey();

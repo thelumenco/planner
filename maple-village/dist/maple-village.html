@@ -812,6 +812,14 @@ body.nb-open{overflow:hidden}
 .tmrh{margin:16px 0 4px}
 .hlist.tmr span:not(.hbadge):not(.pl){display:grid;gap:1px;flex:1;min-width:0}
 .hlist.tmr .pl{display:inline-flex;flex:none}
+/* the wardrobe: today's outfits as little cards */
+.outfits{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.outfit{background:#F4EEE3;border:1px solid rgba(120,104,84,.15);border-radius:8px;padding:10px 12px}
+.outfit .olabel{margin:0 0 4px;font-family:"Klee One",serif;font-weight:600;font-size:1rem;color:#2F2B28}
+.outfit ul{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.outfit li{display:grid;grid-template-columns:72px 1fr;gap:6px;font-size:.84rem;line-height:1.3}
+.outfit li small{color:#8A8279;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+.outfit .owhy{margin:6px 0 0;font-size:.8rem;color:#6F675E;font-style:italic}
 </style>
 </head>
 <body>
@@ -1480,14 +1488,14 @@ body.nb-open{overflow:hidden}
   function nextHop(from, to) {
     if (from === to) return null;
     if (BRIDGES[from] && BRIDGES[from][to]) return to;
-    const seen = { [from]: null }, q = [from];
+    const seen3 = { [from]: null }, q = [from];
     while (q.length) {
       const s = q.shift();
-      for (const n of Object.keys(BRIDGES[s] || {})) if (!(n in seen)) {
-        seen[n] = s;
+      for (const n of Object.keys(BRIDGES[s] || {})) if (!(n in seen3)) {
+        seen3[n] = s;
         if (n === to) {
           let h = n;
-          while (seen[h] !== from) h = seen[h];
+          while (seen3[h] !== from) h = seen3[h];
           return h;
         }
         q.push(n);
@@ -1533,10 +1541,11 @@ body.nb-open{overflow:hidden}
       ["ledge", "Writing ledge", "D", "desk", /./, "A tidy little ledge for odd jobs."],
       ["pobox", "Post box", "E", "pobox", null, "Your post box: unread mail from your work inbox."]
     ] },
-    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { A: [120, 216], B: [414, 228], H: [326, 250], C: [96, 410], D: [464, 452], G: [396, 372], E: [436, 598], F: [96, 596] }, stations: [
+    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { A: [120, 216], B: [414, 228], H: [326, 250], C: [168, 420], W: [52, 366], D: [464, 452], G: [396, 372], E: [436, 598], F: [96, 596] }, stations: [
       ["desk", "Home desk", "A", "desk", /./, "Your own little desk."],
       ["kitchen", "Kitchen", "B", "kitchen", /cook|meal|lunch|dinner|bake|grocer|prep/, "Something smells good."],
       ["sofa", "Sofa", "C", "sofa", /read|rest|journal|meditat|book|nap/, "Soft cushions, deep breaths."],
+      ["wardrobe", "Wardrobe", "W", "wardrobe", null, "Today's outfits are hanging in here.", 30],
       ["laundry", "Laundry", "D", "laundry", /fold|laundry|clothes|wash|iron/, "Fold, stack, done."],
       ["cupboard", "Cleaning cupboard", "E", "cupboard", /clean|tidy|wipe|hestia|dust/, "Hestia's chores live in here."],
       ["fridge", "Fridge", "H", "fridge", null, "The fridge: what we have, and the shopping list."],
@@ -2259,6 +2268,11 @@ body.nb-open{overflow:hidden}
         return sk(
           `<path d="M${x - 30} ${y - 34} h60 l-6 34 h-48z" style="fill:#E8D3B0"/><path d="M${x - 24} ${y - 34} q10 -14 22 -4 q10 -12 26 0z" style="fill:var(--sky)"/><path d="M${x - 8} ${y - 38} q8 -10 18 -2z" style="fill:var(--rose)"/>`,
           `<path d="M${x - 30} ${y - 34} h60 l-6 34 h-48z"/><path d="M${x - 26} ${y - 24} h52 M${x - 24} ${y - 14} h48" opacity=".5"/><path d="M${x - 24} ${y - 34} q10 -14 22 -4 q10 -12 26 0"/>`
+        );
+      case "wardrobe":
+        return sk(
+          `<rect x="${x - 30}" y="${y - 96}" width="60" height="96" rx="3" style="fill:var(--peri)"/><path d="M${x - 34} ${y - 96} h68 l-4 -8 h-60z" style="fill:var(--peri2)"/><rect x="${x - 24}" y="${y - 88}" width="22" height="80" rx="2" style="fill:#DCE3F4"/><rect x="${x + 2}" y="${y - 88}" width="22" height="80" rx="2" style="fill:#DCE3F4"/>`,
+          `<rect x="${x - 30}" y="${y - 96}" width="60" height="96" rx="3"/><path d="M${x - 34} ${y - 96} h68 l-4 -8 h-60z"/><rect x="${x - 24}" y="${y - 88}" width="22" height="80" rx="2"/><rect x="${x + 2}" y="${y - 88}" width="22" height="80" rx="2"/><circle cx="${x - 5}" cy="${y - 48}" r="1.6"/><circle cx="${x + 5}" cy="${y - 48}" r="1.6"/><path d="M${x - 24} ${y} v4 M${x + 24} ${y} v4"/>`
         );
       case "cupboard":
         return sk(
@@ -3676,7 +3690,7 @@ Quests finished today: ${S3.doneIds.length}`;
   // src/game/feeds.js
   var APPS = { chord: { name: "Chord", room: "chord" }, chico: { name: "Chico", room: "chico" } };
   var BRANDS = { chord: { name: "Chord", color: "var(--sage)" }, ambidextrous: { name: "Ambidextrous", color: "var(--peri)" } };
-  var DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous", "goodnews"];
+  var DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
   var KEY2 = "fox.feeds";
   var D = (() => {
     try {
@@ -3765,17 +3779,21 @@ Quests finished today: ${S3.doneIds.length}`;
       rerender();
     });
   }
+  var outfitDoc = () => {
+    const d = D.outfit;
+    return d && d.at ? d : null;
+  };
   function goodNews() {
     const d = D.goodnews;
     return d && d.at ? d : null;
   }
   function goodNewsHTML(localWins) {
-    const d = goodNews(), clean = (s) => plain(String(s || "")).slice(0, 220);
+    const d = goodNews(), clean2 = (s) => plain(String(s || "")).slice(0, 220);
     const world = (d && d.world || []).slice(0, 6).filter((x) => x && x.title);
-    const wins = [...localWins || [], ...(d && d.wins || []).map(clean)].filter(Boolean).slice(0, 8);
+    const wins = [...localWins || [], ...(d && d.wins || []).map(clean2)].filter(Boolean).slice(0, 8);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Good news</h2><p class="sub">${d ? `Pinned up ${new Date(d.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short", timeZone: "Asia/Singapore" })}.` : "Fresh every morning."}</p>`;
     h += `<p class="eyebrow">Your wins</p>` + (wins.length ? `<ul class="hlist gnews">${wins.map((w) => `<li><span>${esc(w)}</span></li>`).join("")}</ul>` : `<p class="muted">Your wins show up here as the day goes on.</p>`);
-    h += `<p class="eyebrow">In the world</p>` + (world.length ? `<ul class="hlist gnews world">${world.map((x) => `<li><span>${/^https:\/\//.test(x.link || "") ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(clean(x.title))}</a>` : esc(clean(x.title))}${x.summary ? `<small>${esc(clean(x.summary))}</small>` : ""}${x.source ? `<small class="src">${esc(clean(x.source))}</small>` : ""}</span></li>`).join("")}</ul>` : `<p class="muted">The morning's good news hasn't arrived yet.</p>`);
+    h += `<p class="eyebrow">In the world</p>` + (world.length ? `<ul class="hlist gnews world">${world.map((x) => `<li><span>${/^https:\/\//.test(x.link || "") ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(clean2(x.title))}</a>` : esc(clean2(x.title))}${x.summary ? `<small>${esc(clean2(x.summary))}</small>` : ""}${x.source ? `<small class="src">${esc(clean2(x.source))}</small>` : ""}</span></li>`).join("")}</ul>` : `<p class="muted">The morning's good news hasn't arrived yet.</p>`);
     return h;
   }
 
@@ -3886,20 +3904,35 @@ Quests finished today: ${S3.doneIds.length}`;
     tidy();
     setInterval(tick, 1e3);
   }
+  var synced = false;
+  var loadedAt = (() => {
+    try {
+      return (JSON.parse(localStorage.getItem("fox.hestia")) || {}).updatedAt || 0;
+    } catch {
+      return 0;
+    }
+  })();
   function attachHestiaDb(docRef) {
     ref = docRef;
     ref.onSnapshot((snap) => {
+      const first = !synced, cached = !!(snap.metadata && snap.metadata.fromCache);
+      if (!cached) synced = true;
       if (!snap.exists) {
-        save();
+        if (!cached) save();
         return;
       }
       const remote = snap.data() || {};
-      if ((remote.updatedAt || 0) > (H2.updatedAt || 0)) {
+      seen = Math.max(seen, remote.updatedAt || 0);
+      if (first && (remote.updatedAt || 0) < loadedAt) {
+        if (!cached) save();
+        return;
+      }
+      if (first || (remote.updatedAt || 0) > (H2.updatedAt || 0)) {
         H2 = Object.assign(fresh(), remote);
         tidy();
         local();
         api2.changed();
-      } else if ((remote.updatedAt || 0) < (H2.updatedAt || 0)) save();
+      } else if (!cached && (remote.updatedAt || 0) < (H2.updatedAt || 0)) save();
     }, () => {
     });
   }
@@ -3909,14 +3942,28 @@ Quests finished today: ${S3.doneIds.length}`;
     } catch {
     }
   };
+  var seen = 0;
   function save() {
     H2.updatedAt = Date.now();
     local();
-    if (!ref) return;
+    if (!ref || !synced) return;
     clearTimeout(pushT);
-    pushT = setTimeout(() => {
-      ref.set(JSON.parse(JSON.stringify(H2))).catch(() => {
-      });
+    pushT = setTimeout(async () => {
+      try {
+        const cur = await ref.get(), r = cur.exists ? cur.data() : null;
+        if (r && (r.updatedAt || 0) > seen) {
+          H2 = Object.assign(fresh(), JSON.parse(JSON.stringify(r)));
+          seen = r.updatedAt;
+          tidy();
+          local();
+          api2.changed();
+          return;
+        }
+        const body2 = JSON.parse(JSON.stringify(H2));
+        await ref.set(body2);
+        seen = Math.max(seen, body2.updatedAt || 0);
+      } catch {
+      }
     }, 500);
   }
   var today = () => dayKey();
@@ -4328,6 +4375,62 @@ Quests finished today: ${S3.doneIds.length}`;
       pantry: (H2.pantryItems || []).slice(0, 80).map((i) => i.name + (i.inStock ? "" : " (out)")),
       stores: H2.whereToBuyLocations.map((l) => l.name)
     };
+  }
+
+  // src/game/wardrobe.js
+  var FIELDS = [["top", "Top"], ["dress", "Dress"], ["bottom", "Bottom"], ["shoes", "Shoes"], ["bag", "Bag"], ["jewellery", "Jewellery"], ["sunglasses", "Sunglasses"], ["layer", "Layer"], ["hair", "Hair"]];
+  var clean = (s, n = 140) => plain(String(s || "")).slice(0, n);
+  var todayDoc = () => {
+    const d = outfitDoc();
+    return d && d.day === dayKey() ? d : null;
+  };
+  var extras = (F2) => F2.outfits && F2.outfits.day === dayKey() ? F2.outfits.list || [] : [];
+  var inventory = () => {
+    const d = outfitDoc();
+    return d && d.wardrobe && typeof d.wardrobe === "object" ? d.wardrobe : null;
+  };
+  function card(o, i) {
+    if (!o) return "";
+    const rows2 = FIELDS.filter(([k]) => o[k]).map(([k, n]) => `<li><small>${n}</small><span>${esc(clean(o[k]))}</span></li>`).join("");
+    return `<div class="outfit"><p class="olabel">${esc(clean(o.label, 50) || `Option ${i + 1}`)}</p><ul>${rows2}</ul>${o.why ? `<p class="owhy">${esc(clean(o.why, 220))}</p>` : ""}</div>`;
+  }
+  function wardrobePanel(F2, st) {
+    const d = todayDoc(), more = extras(F2), inv = inventory();
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The wardrobe</h2>`;
+    if (d) h += `<p class="sub">${[d.weather && esc(clean(d.weather, 60)), d.on && esc(clean(d.on, 160))].filter(Boolean).join(" · ") || "Today's picks from your stylist."}</p>`;
+    else h += `<p class="sub">Your stylist hasn't been by yet today. The morning briefing hangs three outfits in here.</p>`;
+    const all = [...(d && d.options || []).slice(0, 3), ...more];
+    if (all.length) h += `<div class="outfits">${all.map(card).join("")}</div>`;
+    h += `<p class="eyebrow" style="margin:14px 0 6px">Want something different?</p>`;
+    if (!inv) h += `<p class="muted">New outfits need your wardrobe list, which comes with the morning drop-off.</p>`;
+    else if (!st.sample) h += `<p class="muted">New outfits need Claude, which isn't reachable from this view just now.</p>`;
+    else h += `<form class="row" id="outfitForm"><label class="sr" for="outfitAsk">What for?</label><input id="outfitAsk" maxlength="120" placeholder="optional: dinner out, school run, more colour..." value="${esc(st.ask || "")}"><button class="btn small" type="submit" ${st.busy ? "disabled" : ""}>${st.busy ? "Picking…" : "New outfit"}</button></form>${st.error ? `<p class="muted">${esc(st.error)}</p>` : ""}`;
+    return h;
+  }
+  async function newOutfit(F2, sample, ask2) {
+    const d = outfitDoc(), inv = inventory();
+    if (!inv || !sample) return null;
+    const shown = [...(todayDoc() || {}).options || [], ...extras(F2)].map((o2) => FIELDS.map(([k]) => o2[k]).filter(Boolean).join(", ")).slice(-8);
+    const prompt = `You are Mel's personal stylist. Suggest ONE outfit for today.
+Rules: True/Deep Winter colours (black, pure white, navy, burgundy, forest green, royal blue, emerald, plum, charcoal, cool reds, hot pink, icy lavender; avoid camel, warm browns, orange, yellow, olive, rust, coral, cream). Romantic Kibbe: soft, fitted, draped, waist defined, midi/maxi lengths, rounded toes. One fitted + one relaxed. Always one piece of jewellery. Hair up by default (down only for a V-neck, off shoulder or a special evening). Weekends and parenting days: practical flat shoes, no heels, no low camis. Cream linen blazer only for in-person power meetings. Sunglasses only if she's going out.
+Use ONLY items from this wardrobe list (copy their names). If a piece that would complete the look isn't there, add "(not currently in wardrobe)" after it.
+Wardrobe: ${JSON.stringify(inv).slice(0, 6e3)}
+Today: ${d && d.day === dayKey() ? `${clean(d.weather, 60)}; on: ${clean(d.on, 200)}` : dayKey()}
+Already suggested today (make this one clearly different): ${shown.join(" | ") || "none"}
+Mel's request: ${clean(ask2, 120) || "something different"}
+Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "", "shoes": "", "bag": "", "jewellery": "", "sunglasses": "", "layer": "", "hair": "up|down + short note", "why": "one sentence"} (leave fields empty when not used: dress OR top+bottom).`;
+    const o = await sample.json(prompt, { modelTier: "quick", cache: false });
+    if (!o || typeof o !== "object") return null;
+    const out = {};
+    FIELDS.forEach(([k]) => {
+      if (o[k]) out[k] = clean(o[k]);
+    });
+    out.label = clean(o.label, 50) || "Fresh pick";
+    if (o.why) out.why = clean(o.why, 220);
+    if (!out.top && !out.dress) return null;
+    if (!F2.outfits || F2.outfits.day !== dayKey()) F2.outfits = { day: dayKey(), list: [] };
+    F2.outfits.list = [...F2.outfits.list, out].slice(-4);
+    return out;
   }
 
   // src/art/people.js
@@ -4753,6 +4856,8 @@ Quests finished today: ${S3.doneIds.length}`;
   var healthOpen = false;
   var newsOpen = false;
   var calTab = "today";
+  var loadedAt2 = { today: S2.updatedAt || 0, fox: F.updatedAt || 0 };
+  var synced2 = { today: false, fox: false };
   function persist(which) {
     const obj = which === "today" ? S2 : F;
     obj.updatedAt = Date.now();
@@ -4760,21 +4865,44 @@ Quests finished today: ${S3.doneIds.length}`;
       localStorage.setItem("fox." + which, JSON.stringify(obj));
     } catch {
     }
-    if (!refs) return;
+    if (!refs || !synced2[which]) return;
     clearTimeout(pending[which]);
     pending[which] = setTimeout(() => push(which), 500);
   }
-  async function push(which) {
+  var seen2 = { today: 0, fox: 0 };
+  async function push(which, direct) {
     if (writing[which]) {
-      pending[which] = setTimeout(() => push(which), 400);
+      pending[which] = setTimeout(() => push(which, direct), 400);
       return;
     }
     writing[which] = true;
     try {
-      await refs[which].set(JSON.parse(JSON.stringify(which === "today" ? S2 : F)));
+      if (!direct) {
+        const cur = await refs[which].get(), r = cur.exists ? cur.data() : null;
+        if (r && (r.updatedAt || 0) > seen2[which] && !(which === "today" && r.day !== dayKey())) {
+          adopt(which, JSON.parse(JSON.stringify(r)));
+          writing[which] = false;
+          speak("Caught up with your other device. That last bit here didn't save, sorry!", 5e3);
+          return;
+        }
+      }
+      const body2 = JSON.parse(JSON.stringify(which === "today" ? S2 : F));
+      await refs[which].set(body2);
+      seen2[which] = Math.max(seen2[which], body2.updatedAt || 0);
     } catch (e) {
     }
     writing[which] = false;
+  }
+  function adopt(which, remote) {
+    if (which === "today") S2 = Object.assign(freshToday(), remote);
+    else F = Object.assign(freshFox(), remote);
+    seen2[which] = Math.max(seen2[which], remote.updatedAt || 0);
+    migrate();
+    try {
+      localStorage.setItem("fox." + which, JSON.stringify(which === "today" ? S2 : F));
+    } catch {
+    }
+    render(true);
   }
   function noteHistory() {
     if (!F.history) return;
@@ -4866,26 +4994,24 @@ Quests finished today: ${S3.doneIds.length}`;
       }
     });
     const watch = (which) => refs[which].onSnapshot((snap) => {
-      const local2 = which === "today" ? S2 : F;
+      const local2 = which === "today" ? S2 : F, first = !synced2[which], cached = !!(snap.metadata && snap.metadata.fromCache);
+      if (!cached) synced2[which] = true;
       if (!snap.exists) {
-        persist(which);
+        if (!cached) persist(which);
         return;
       }
       const remote = JSON.parse(JSON.stringify(snap.data()));
+      seen2[which] = Math.max(seen2[which], remote.updatedAt || 0);
       if (which === "today" && remote.day !== dayKey()) {
-        if (local2.day === dayKey()) persist(which);
+        if (!cached && local2.day === dayKey()) persist(which);
         return;
       }
-      if ((remote.updatedAt || 0) > (local2.updatedAt || 0)) {
-        if (which === "today") S2 = Object.assign(freshToday(), remote);
-        else F = Object.assign(freshFox(), remote);
-        migrate();
-        try {
-          localStorage.setItem("fox." + which, JSON.stringify(which === "today" ? S2 : F));
-        } catch {
-        }
-        render(true);
-      } else if ((remote.updatedAt || 0) < (local2.updatedAt || 0)) persist(which);
+      if (first && (remote.updatedAt || 0) < loadedAt2[which]) {
+        if (!cached) persist(which);
+        return;
+      }
+      if (first || (remote.updatedAt || 0) > (local2.updatedAt || 0)) adopt(which, remote);
+      else if (!cached && (remote.updatedAt || 0) < (local2.updatedAt || 0)) persist(which);
     }, () => {
     });
     watch("today");
@@ -4942,6 +5068,8 @@ Quests finished today: ${S3.doneIds.length}`;
   };
   var shedOpen = false;
   var runOpen = false;
+  var wardOpen = false;
+  var ward = { busy: false, error: "", ask: "" };
   function buyTool(id) {
     const t = SHED[id];
     if (!t || F.tools[id] || F.coins < t.price) return;
@@ -5560,8 +5688,12 @@ Quests finished today: ${S3.doneIds.length}`;
       S2.extra.push(...fresh2);
       sun.added = fresh2.length;
       if (!n) speak(fresh2.length ? `Added ${fresh2.length} new Sunsama task${fresh2.length === 1 ? "" : "s"} to the end of the line.` : "Sunsama and the boards match. All set!", 4e3);
+      if (n || fresh2.length) save2(true);
+      else render();
+      return;
     }
-    save2(true);
+    if (n) save2(true);
+    else render();
   }
   setInterval(() => {
     if (!document.hidden) syncSunsama();
@@ -5631,7 +5763,18 @@ Quests finished today: ${S3.doneIds.length}`;
   }
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) syncSunsama();
+    else flushSaves();
   });
+  window.addEventListener("pagehide", () => flushSaves());
+  function flushSaves() {
+    ["today", "fox"].forEach((w) => {
+      if (pending[w] && refs && synced2[w]) {
+        clearTimeout(pending[w]);
+        pending[w] = null;
+        push(w, true);
+      }
+    });
+  }
   var DIGEST_GAP = 60 * M;
   var digestBusy = false;
   var digestReady = () => Date.now() - (F.digest.lastAt || 0) >= DIGEST_GAP || S2.doneIds.length > (S2.digestMark || 0);
@@ -5656,10 +5799,10 @@ Quests finished today: ${S3.doneIds.length}`;
     if (!sampleCap || digestBusy || !digestReady()) return;
     digestBusy = true;
     ctx();
-    const seen = pastDigests().map((d) => d.title).concat((LIB.items || []).map((d) => d.title)).filter(Boolean).slice(0, 40);
+    const seen3 = pastDigests().map((d) => d.title).concat((LIB.items || []).map((d) => d.title)).filter(Boolean).slice(0, 40);
     try {
       const d = await sampleCap.json(`You are Juniper, the librarian in a cosy village game. Pick ONE real, well-regarded nonfiction book that would help Mel: a Singapore-based founder running a small copywriting and brand studio plus two software products, and a parent of a toddler. Favour practical books on creative business, focus, pricing, writing, product, or calm productivity.
-Don't pick any of these: ${seen.join("; ") || "(none yet)"}.
+Don't pick any of these: ${seen3.join("; ") || "(none yet)"}.
 Return JSON only: {"title": "...", "author": "...", "body": "5 key ideas, one per line, each starting with '- ', each under 25 words", "try": "one small thing to try today, under 20 words"}.
 Only describe ideas the book is genuinely known for; don't invent quotes.`, { modelTier: "quick", cache: false });
       if (!d || !d.title) throw { code: "empty_completion" };
@@ -5703,6 +5846,8 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     swing: "base:swing",
     letterbox: "base:letterbox",
     "animal run": "base:run",
+    wardrobe: "home:wardrobe",
+    outfit: "home:wardrobe",
     run: "base:run",
     animals: "base:run",
     chickens: "base:run",
@@ -5878,7 +6023,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|pond|garden|shed|swing|letterbox|animal run|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|wardrobe|pond|garden|shed|swing|letterbox|animal run|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -6426,6 +6571,7 @@ Then tell chat "wind down" whenever you're ready.`
     shelfOpen = false;
     shedOpen = false;
     runOpen = false;
+    wardOpen = false;
     selPlot = null;
     homeView = null;
     postOpen = false;
@@ -6522,6 +6668,8 @@ Then tell chat "wind down" whenever you're ready.`
           h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n}, growing. About ${dur(left2)} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(g * 100).toFixed(0)}%"></i></div>`;
         } else h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n} is ready!</p><div class="actions"><button class="btn yes" data-farm="harvest">Harvest</button></div>`;
       }
+    } else if (wardOpen && scene === "home") {
+      h = wardrobePanel(F, { sample: !!sampleCap, busy: ward.busy, error: ward.error, ask: ward.ask });
     } else if (runOpen && scene === "base") {
       h = runPanel(F);
     } else if (shedOpen) {
@@ -6581,8 +6729,35 @@ Then tell chat "wind down" whenever you're ready.`
       shelfOpen = false;
       shedOpen = false;
       runOpen = false;
+      wardOpen = false;
       ctx();
     });
+    const of = c.querySelector("#outfitForm");
+    if (of) {
+      const inp = c.querySelector("#outfitAsk");
+      inp.oninput = () => {
+        ward.ask = inp.value;
+      };
+      of.onsubmit = async (ev) => {
+        ev.preventDefault();
+        if (ward.busy) return;
+        ward.busy = true;
+        ward.error = "";
+        ctx();
+        let o = null;
+        try {
+          o = await newOutfit(F, sampleCap, ward.ask);
+        } catch {
+        }
+        ward.busy = false;
+        if (o) {
+          ward.ask = "";
+          save2(true);
+          speak(`How about this: ${o.label.toLowerCase()}?`, 4e3);
+        } else ward.error = "Hmm, nothing came back. Try again?";
+        ctx();
+      };
+    }
     c.querySelectorAll("[data-feed]").forEach((b) => b.onclick = () => feedAnimals(b.dataset.feed));
     c.querySelectorAll("[data-runup]").forEach((b) => b.onclick = () => buyRunUpgrade());
     c.querySelectorAll("[data-tool]").forEach((b) => b.onclick = () => buyTool(b.dataset.tool));
@@ -6807,6 +6982,7 @@ Then tell chat "wind down" whenever you're ready.`
       shopClosed = false;
       shedOpen = false;
       runOpen = false;
+      wardOpen = false;
       homeView = null;
       postOpen = false;
       healthOpen = false;
@@ -6864,6 +7040,7 @@ Then tell chat "wind down" whenever you're ready.`
     shelfOpen = false;
     shedOpen = false;
     runOpen = false;
+    wardOpen = false;
     homeView = null;
     postOpen = false;
     healthOpen = false;
@@ -6889,6 +7066,14 @@ Then tell chat "wind down" whenever you're ready.`
   function arriveSpot(id) {
     atSpot = id;
     const ph = phase();
+    if (id === "wardrobe") {
+      wardOpen = true;
+      ward.error = "";
+      sfx("paper", true);
+      speak("Let's see what's hanging in here today.", 3e3);
+      render();
+      return;
+    }
     if (id === "digest") {
       shelfOpen = true;
       speak(digestReady() ? isHere("juniper") ? "Juniper's waving a digest at you!" : "A fresh digest is ready on the shelf." : "Digests are rationed. Like dessert.", 3500);

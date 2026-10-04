@@ -327,3 +327,13 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Maple nudges once a day on reaching home base if anyone is hungry; Evan sometimes visits the run. Chat can `go` to the "animal run" and `feed_animals`.
 - **Pancake**, the village dog, at the good news board: sits up and wags when fresh news is pinned, naps otherwise.
 - Good news routine (cloud, trig_01LPCGof2eTZu2Q6NwbooC3s) now asks for 5 stories, at least 2 small human-interest ones (animals, kindness, quirky local stories).
+
+## Round 22: saving fix, tomorrow's quests, wardrobe
+- **Saving (bug: a harvest vanished after a refresh).** Two causes fixed in `core.js` (fox/today docs) and `hestia.js`:
+  - Nothing is pushed to the cloud until a definitive (not `fromCache`) snapshot has loaded; on that first load the cloud wins unless this browser's copy, as loaded at open (`loadedAt`), is newer.
+  - Before each push the page `get()`s the doc: if its `updatedAt` is newer than the newest copy this page has seen (`seen`), another device saved since, so the page adopts that instead of overwriting (a stale background tab used to clobber the phone's progress). The 10-minute Sunsama check no longer saves when nothing changed. Pending saves flush on pagehide / hidden.
+  - Tests: "saving" section (fresh browser + slow db via `?dblag=`; stale page vs another device's save). The stale test fails on the old code.
+- **Tomorrow's quests:** "Peek at tomorrow's quests" on the quest list pulls `sunsama://tasks/<tomorrow>`; "do today" adds one to today (`early` = its day). Finishing it records `F.early[id] = day`, so on that day it's already ticked (no second coins). Sunsama itself isn't changed; Maple reminds Mel to tick it there.
+- **Wardrobe** at home (left of the sofa, which moved right to C:[168,420]; wardrobe W:[52,352]). Reads doc `outfit` {day, weather, on, options[3], wardrobe{lists}}. "New outfit" uses `sample` with the style rules and the wardrobe list; extras live in `F.outfits` for the day.
+  - The wardrobe list was seeded once from the Notion Wardrobe doc. Daily outfits come from the Mac morning briefing (ROUTINE-STEPS step 10): cloud routines can't attach connectors for this org, so a cloud stylist routine couldn't read Notion or Calendar.
+- Tap a speech bubble to close it; "coming soon" signs fit their text; market cards are a wrapping flex row (Safari stacked grid cards); animals roam their run.

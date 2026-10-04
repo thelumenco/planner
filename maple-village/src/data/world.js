@@ -93,10 +93,11 @@ export const ROOMS = {
     ["scales","Stamps & scales","C","scales",/invoice|pay|bill|stripe|account|bank|receipt|expense|price/,"Weigh it, stamp it, send it."],
     ["ledge","Writing ledge","D","desk",/./,"A tidy little ledge for odd jobs."],
     ["pobox","Post box","E","pobox",null,"Your post box: unread mail from your work inbox."]]},
-  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{A:[120,216], B:[414,228], H:[326,250], C:[96,410], D:[464,452], G:[396,372], E:[436,598], F:[96,596]}, stations:[
+  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{A:[120,216], B:[414,228], H:[326,250], C:[168,420], W:[52,366], D:[464,452], G:[396,372], E:[436,598], F:[96,596]}, stations:[
     ["desk","Home desk","A","desk",/./,"Your own little desk."],
     ["kitchen","Kitchen","B","kitchen",/cook|meal|lunch|dinner|bake|grocer|prep/,"Something smells good."],
     ["sofa","Sofa","C","sofa",/read|rest|journal|meditat|book|nap/,"Soft cushions, deep breaths."],
+    ["wardrobe","Wardrobe","W","wardrobe",null,"Today's outfits are hanging in here.",30],
     ["laundry","Laundry","D","laundry",/fold|laundry|clothes|wash|iron/,"Fold, stack, done."],
     ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Hestia's chores live in here."],
     ["fridge","Fridge","H","fridge",null,"The fridge: what we have, and the shopping list."],
