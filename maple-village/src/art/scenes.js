@@ -249,6 +249,14 @@ export function furn(kind, x, y){
     case "sidedoor": return sk(`<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:var(--blush)"/><path d="M${x-36} ${y-80} l20 6 v14 l-20 -6z" style="fill:#FFFDF6"/>`,
       `<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z"/><circle cx="${x-17}" cy="${y-42}" r="1.8"/><path d="M${x-36} ${y-80} l20 6 v14 l-20 -6z"/><path d="M${x-27} ${y-70} c-2 -3 -5 -1 -3 2 l3 3 l3 -2 c2 -3 -1 -5 -3 -3" />`);
     // Evan's room (and its door on the east wall of the house)
+    // the town hall's kind-words corkboard, hung on the back wall (x,y = the wall's foot below it)
+    case "kindboard": { const n = G.kudos ? G.kudos() : 0, cols = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
+      const spots = [[-36, -98], [-8, -102], [20, -97], [-30, -70], [0, -66], [26, -72], [-20, -44], [12, -44]];
+      const notes = spots.slice(0, Math.min(8, n)).map(([dx, dy], i) => `<rect x="${x+dx}" y="${y+dy}" width="20" height="18" rx="1" transform="rotate(${(i % 3) - 1} ${x+dx+10} ${y+dy+9})" style="fill:${cols[i % 6]}"/>`).join("");
+      return sk(`<rect x="${x-52}" y="${y-118}" width="104" height="96" rx="4" style="fill:var(--wood)"/><rect x="${x-46}" y="${y-112}" width="92" height="84" rx="2" style="fill:#D9B893"/>${notes}
+        <path d="M${x} ${y-12} c-5 -7 -14 -1 -8 5 l8 8 l8 -8 c6 -6 -3 -12 -8 -5z" style="fill:var(--rose)"/>`,
+        `<rect x="${x-52}" y="${y-118}" width="104" height="96" rx="4"/><rect x="${x-46}" y="${y-112}" width="92" height="84" rx="2"/>${spots.slice(0, Math.min(8, n)).map(([dx, dy]) => `<circle cx="${x+dx+10}" cy="${y+dy+2}" r="1.6"/>`).join("")}
+        <path d="M${x} ${y-12} c-5 -7 -14 -1 -8 5 l8 8 l8 -8 c6 -6 -3 -12 -8 -5z"/>`); }
     case "kiddoor": return sk(`<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z" style="fill:#F7D35A"/><path d="M${x+36} ${y-80} l-20 6 v14 l20 -6z" style="fill:#FFFDF6"/><path d="M${x+21} ${y-62} q2 -9 9 -10 q4 0 3 4 q-2 2 -4 1 l1 5z" style="fill:#7BB37A"/>`,
       `<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z"/><circle cx="${x+17}" cy="${y-42}" r="1.8"/><path d="M${x+36} ${y-80} l-20 6 v14 l20 -6z"/><path d="M${x+21} ${y-62} q2 -9 9 -10 q4 0 3 4 q-2 2 -4 1 l1 5z"/>`);
     case "carbed": { const k = G.kid ? G.kid() : {}, sl = !!k.sleep;

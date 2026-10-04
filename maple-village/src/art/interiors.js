@@ -15,9 +15,9 @@ const SHELLS = {
     <rect x="234" y="150" width="52" height="450" style="fill:var(--rose)" opacity=".45"/><path d="M238 150 V600 M282 150 V600" style="stroke:var(--honey)" stroke-width="2" stroke-dasharray="6 5" opacity=".9"/>
     ${wallBase("#E6E9F5", "var(--peri)")}
     ${sk(`<path d="M44 130 v-70 a24 24 0 0 1 48 0 v70z" style="fill:var(--sky)"/><path d="M428 130 v-70 a24 24 0 0 1 48 0 v70z" style="fill:var(--sky)"/>
-      <path d="M140 20 h26 v54 l-13 -10 l-13 10z" style="fill:var(--peri)"/><path d="M354 20 h26 v54 l-13 -10 l-13 10z" style="fill:var(--peach)"/>`,
+      <path d="M140 20 h26 v54 l-13 -10 l-13 10z" style="fill:var(--peri)"/>`,
       `<path d="M44 130 v-70 a24 24 0 0 1 48 0 v70z M68 36 v94 M44 84 h48"/><path d="M428 130 v-70 a24 24 0 0 1 48 0 v70z M452 36 v94 M428 84 h48"/>
-      <path d="M140 20 h26 v54 l-13 -10 l-13 10z M134 20 h38 M354 20 h26 v54 l-13 -10 l-13 10z M348 20 h38"/><circle cx="153" cy="40" r="5"/><circle cx="367" cy="40" r="5"/>`)}
+      <path d="M140 20 h26 v54 l-13 -10 l-13 10z M134 20 h38"/><circle cx="153" cy="40" r="5"/>`)}
     ${skirting}${plant(70, 600, 1.1)}${plant(474, 610, .9)}`,
 
   // Chord workshop: wide planks with sawdust, a pegboard of tools, a factory window, crates.

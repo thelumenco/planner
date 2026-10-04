@@ -795,6 +795,34 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.screenshot({ path: join(shots, "evan-room-night.png") });
   await page.close();
 }
+{
+  // Kind words: the town hall corkboard for compliments
+  console.log("\nkind words");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.goto(url + "?reset=1&seed=1&time=10:30");
+  await page.waitForTimeout(800);
+  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-place="hall"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town hall/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-spot="kudos"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-kd="add"]', { timeout: 15000 });
+  check(true, "the town hall has a Kind words board on the wall");
+  await page.click('#ctx [data-kd="add"]');
+  await page.fill("#kText", "Your copy made our launch. Best money we spent all year."); await page.fill("#kFrom", "A client"); await page.click('#kForm button[type="submit"]');
+  await page.waitForTimeout(300);
+  check(await page.locator("#ctx .knote").count() === 1 && /A client/.test(await page.locator("#ctx .kboard").textContent()), "a compliment is pinned up with who said it");
+  check(await page.evaluate(() => (devDb.get("kudos").items || []).some(e => /launch/.test(e.text || ""))), "and saved privately, so it follows Mel across devices");
+  await page.click('#ctx [data-kd="random"]'); await page.waitForTimeout(200);
+  check(/Best money/.test(await page.locator("#ctx .ktext").textContent()), "Read me one shows a compliment big");
+  await page.click('#ctx [data-kd="board"]'); await page.click('#ctx [data-kd="del"]'); await page.waitForTimeout(200);
+  check(await page.locator("#ctx .knote").count() === 0, "a note can be taken down");
+  await page.click("#undoBtn"); await page.waitForTimeout(300);
+  check(await page.locator("#ctx .knote").count() === 1, "and Undo puts it back");
+  check(await page.locator('#world [data-spot="kudos"] rect').count() >= 3, "the board on the wall shows its notes");
+  await page.screenshot({ path: join(shots, "kind-words.png") });
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

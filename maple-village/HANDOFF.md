@@ -401,3 +401,9 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Rewards:** Maple's bed no longer shows in the living room. "Maple's cosy bed" (Me & my room tab) upgrades her basket in Mel's room. The big plant moved by the treadmill (172,606), clear of both bedroom doors. The toy truck still goes everywhere with Evan, his room included.
 - **Evan's room:** tapping the door leaves, like every other door; the press-and-hold is gone. Its sign moved below the door, so it no longer sits over Mel. The grown-up buttons are still hidden while inside.
 - Dark mode: the round HUD buttons and the zoom button are cream; `svg.ico` uses the light palette; the quest note and notebook pages redefine the light tokens, so highlighted words stay dark. The collapsed quest tab shows just the task name (no "Walking…").
+
+### Round 32: Kind words
+- **Kind words** (`kudos.js`): a corkboard on the town hall's back wall (station `kudos`, slot F [362,132]; it replaces the right-hand pennant). It's never a quest spot. Mel pins up compliments (text plus an optional "who said it"), reads them as a wall of sticky notes, or taps "Read me one" for a big random one. Notes can be taken down, with Undo.
+- Storage is a private per-user doc "kudos", merged by id like the journal, with a localStorage copy. The board on the wall shows up to eight little notes.
+- Chat action `kudos_add` lets Mel tell Maple a compliment and have it pinned. Places "kind words" and "compliments" walk there.
+- Weekly nudge: walking into the town hall when the board has 3+ notes and hasn't been opened for 7 days, Maple suggests a read (once a day; silenced by quiet mode). `F.kudosSeen` tracks the last visit.

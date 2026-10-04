@@ -1011,6 +1011,21 @@ body.kidmode .scenename span + span{display:none}
 #evan.hug .armL,#evan.hug .armR,#mel.hugging .armL,#mel.hugging .armR{transform-box:fill-box;transform-origin:50% 0;transition:transform .2s}
 #evan.hug .armL{transform:rotate(150deg)}#evan.hug .armR{transform:rotate(-150deg)}
 #mel.hugging .armL{transform:rotate(-40deg)}#mel.hugging .armR{transform:rotate(40deg)}
+
+/* Kind words (town hall corkboard) */
+.kboard{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:14px;padding:14px;border-radius:6px;background:#D9B893;background-image:radial-gradient(rgba(120,90,60,.18) 1px,transparent 1.4px);background-size:7px 7px}
+.knote{position:relative;margin:0;border-radius:2px;box-shadow:0 6px 10px -8px rgba(0,0,0,.55)}
+.knote::before{content:"";position:absolute;top:-5px;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--rose);box-shadow:0 1px 1px rgba(0,0,0,.3)}
+.kopen{display:block;width:100%;text-align:left;border:0;background:none;padding:14px 12px 10px;cursor:pointer;color:#2F2B28}
+.knote blockquote{margin:0;font-family:"Klee One",serif;font-weight:600;font-size:.95rem;line-height:1.4}
+.knote blockquote,.knote figcaption{display:block}
+.knote figcaption::before{content:"— "}
+.knote figcaption{margin-top:6px;font-size:.75rem;color:#6B6259}
+.kdel{position:absolute;top:2px;right:4px;width:24px;height:24px;border:0;border-radius:50%;background:transparent;color:#8A8279;font-size:.95rem;cursor:pointer}
+.kread{margin:8px 0 4px;padding:26px 22px;border-radius:4px;box-shadow:0 10px 18px -12px rgba(0,0,0,.5);transform:rotate(-1deg)}
+.ktext{margin:0;font-family:"Klee One",serif;font-weight:600;font-size:1.35rem;line-height:1.45;color:#2F2B28}
+.kwho{margin:12px 0 0;color:#6B6259;font-size:.9rem}
+.kfrom{width:100%;box-sizing:border-box;margin-top:8px;border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:8px 10px;font:inherit;color:#2F2B28}
 </style>
 </head>
 <body>
@@ -1717,7 +1732,8 @@ body.kidmode .scenename span + span{display:none}
   var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
   var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
   var ROOMS = {
-    hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [448, 262], B: [110, 258], C: [420, 474], D: [334, 266], E: [118, 474] }, stations: [
+    hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [448, 262], B: [110, 258], C: [420, 474], D: [334, 266], E: [118, 474], F: [362, 132] }, stations: [
+      ["kudos", "Kind words", "F", "kindboard", null, "Lovely things people have said about you.", 72],
       ["table", "Planning table", "C", "plantable", /plan|strategy|review|ceo|goal|week|month|quarter|budget/, "Your week, month and quarter, from Notion."],
       ["whiteboard", "Whiteboard", "B", "whiteboard", /brainstorm|idea|map|outline|launch|offer|pricing/, "Fresh marker, blank board."],
       ["revenue", "Revenue chart", "D", "chartstand", /invoice|revenue|sales|finance|money|budget|pricing|accounts/, "How the money's flowing, from Chord."],
@@ -1955,9 +1971,9 @@ body.kidmode .scenename span + span{display:none}
     ${wallBase("#E6E9F5", "var(--peri)")}
     ${sk(
       `<path d="M44 130 v-70 a24 24 0 0 1 48 0 v70z" style="fill:var(--sky)"/><path d="M428 130 v-70 a24 24 0 0 1 48 0 v70z" style="fill:var(--sky)"/>
-      <path d="M140 20 h26 v54 l-13 -10 l-13 10z" style="fill:var(--peri)"/><path d="M354 20 h26 v54 l-13 -10 l-13 10z" style="fill:var(--peach)"/>`,
+      <path d="M140 20 h26 v54 l-13 -10 l-13 10z" style="fill:var(--peri)"/>`,
       `<path d="M44 130 v-70 a24 24 0 0 1 48 0 v70z M68 36 v94 M44 84 h48"/><path d="M428 130 v-70 a24 24 0 0 1 48 0 v70z M452 36 v94 M428 84 h48"/>
-      <path d="M140 20 h26 v54 l-13 -10 l-13 10z M134 20 h38 M354 20 h26 v54 l-13 -10 l-13 10z M348 20 h38"/><circle cx="153" cy="40" r="5"/><circle cx="367" cy="40" r="5"/>`
+      <path d="M140 20 h26 v54 l-13 -10 l-13 10z M134 20 h38"/><circle cx="153" cy="40" r="5"/>`
     )}
     ${skirting}${plant(70, 600, 1.1)}${plant(474, 610, 0.9)}`,
     // Chord workshop: wide planks with sawdust, a pegboard of tools, a factory window, crates.
@@ -2768,6 +2784,18 @@ body.kidmode .scenename span + span{display:none}
           `<path d="M${x - 40} ${y - 108} L${x - 12} ${y - 96} L${x - 12} ${y + 4} L${x - 40} ${y + 14}z"/><circle cx="${x - 17}" cy="${y - 42}" r="1.8"/><path d="M${x - 36} ${y - 80} l20 6 v14 l-20 -6z"/><path d="M${x - 27} ${y - 70} c-2 -3 -5 -1 -3 2 l3 3 l3 -2 c2 -3 -1 -5 -3 -3" />`
         );
       // Evan's room (and its door on the east wall of the house)
+      // the town hall's kind-words corkboard, hung on the back wall (x,y = the wall's foot below it)
+      case "kindboard": {
+        const n = G.kudos ? G.kudos() : 0, cols = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
+        const spots = [[-36, -98], [-8, -102], [20, -97], [-30, -70], [0, -66], [26, -72], [-20, -44], [12, -44]];
+        const notes2 = spots.slice(0, Math.min(8, n)).map(([dx, dy], i) => `<rect x="${x + dx}" y="${y + dy}" width="20" height="18" rx="1" transform="rotate(${i % 3 - 1} ${x + dx + 10} ${y + dy + 9})" style="fill:${cols[i % 6]}"/>`).join("");
+        return sk(
+          `<rect x="${x - 52}" y="${y - 118}" width="104" height="96" rx="4" style="fill:var(--wood)"/><rect x="${x - 46}" y="${y - 112}" width="92" height="84" rx="2" style="fill:#D9B893"/>${notes2}
+        <path d="M${x} ${y - 12} c-5 -7 -14 -1 -8 5 l8 8 l8 -8 c6 -6 -3 -12 -8 -5z" style="fill:var(--rose)"/>`,
+          `<rect x="${x - 52}" y="${y - 118}" width="104" height="96" rx="4"/><rect x="${x - 46}" y="${y - 112}" width="92" height="84" rx="2"/>${spots.slice(0, Math.min(8, n)).map(([dx, dy]) => `<circle cx="${x + dx + 10}" cy="${y + dy + 2}" r="1.6"/>`).join("")}
+        <path d="M${x} ${y - 12} c-5 -7 -14 -1 -8 5 l8 8 l8 -8 c6 -6 -3 -12 -8 -5z"/>`
+        );
+      }
       case "kiddoor":
         return sk(
           `<path d="M${x + 40} ${y - 108} L${x + 12} ${y - 96} L${x + 12} ${y + 4} L${x + 40} ${y + 14}z" style="fill:#F7D35A"/><path d="M${x + 36} ${y - 80} l-20 6 v14 l20 -6z" style="fill:#FFFDF6"/><path d="M${x + 21} ${y - 62} q2 -9 9 -10 q4 0 3 4 q-2 2 -4 1 l1 5z" style="fill:#7BB37A"/>`,
@@ -4012,10 +4040,10 @@ body.kidmode .scenename span + span{display:none}
         closeNotebook();
         return;
       }
-      const keep2 = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
+      const keep3 = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
       page.innerHTML = taskPage(t2);
       if ($("nbAsk")) {
-        $("nbAsk").value = keep2;
+        $("nbAsk").value = keep3;
         if (typing) $("nbAsk").focus();
       }
     } else page.innerHTML = open.kind === "tracker" ? trackerPage(open.which) : open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
@@ -5152,7 +5180,7 @@ Quests finished today: ${S3.doneIds.length}`;
     }
     if (d && d.state && d.state.zones) d = d.state;
     if (!d || !Array.isArray(d.zones) || !Array.isArray(d.dailyTasks)) return "That doesn't look like a Hestia export (no zones or daily tasks).";
-    const keep2 = [
+    const keep3 = [
       "zones",
       "dailyTasks",
       "weeklyTasks",
@@ -5173,7 +5201,7 @@ Quests finished today: ${S3.doneIds.length}`;
       "chimeEnabled",
       "chimeInterval"
     ];
-    keep2.forEach((k) => {
+    keep3.forEach((k) => {
       if (d[k] != null) H2[k] = d[k];
     });
     tidy();
@@ -6082,6 +6110,169 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     };
   }
 
+  // src/game/kudos.js
+  var KEY5 = "fox.kudos";
+  var load3 = () => {
+    try {
+      return Object.assign({ items: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(KEY5)) || {});
+    } catch {
+      return { items: [], updatedAt: 0 };
+    }
+  };
+  var K = load3();
+  var ref3 = null;
+  var chain2 = Promise.resolve();
+  var onChange4 = () => {
+  };
+  var keep2 = () => {
+    try {
+      localStorage.setItem(KEY5, JSON.stringify(K));
+    } catch {
+    }
+  };
+  function merge2(a, b) {
+    const m = /* @__PURE__ */ new Map();
+    [...a.items || [], ...b && b.items || []].forEach((e) => {
+      if (!e || !e.id) return;
+      const o = m.get(e.id);
+      if (!o || (e.at || 0) > (o.at || 0)) m.set(e.id, e);
+    });
+    return { items: [...m.values()].slice(-500), updatedAt: Math.max(a.updatedAt || 0, b && b.updatedAt || 0) };
+  }
+  function attachKudos(col, changed) {
+    onChange4 = changed;
+    ref3 = col.doc("kudos");
+    ref3.onSnapshot((snap) => {
+      if (!snap.exists) {
+        if (K.items.length) push2();
+        return;
+      }
+      K = merge2(K, JSON.parse(JSON.stringify(snap.data() || {})));
+      keep2();
+      onChange4();
+    }, () => {
+    });
+  }
+  function push2() {
+    if (!ref3) return;
+    chain2 = chain2.then(async () => {
+      try {
+        const cur2 = await ref3.get();
+        if (cur2.exists) K = merge2(K, JSON.parse(JSON.stringify(cur2.data() || {})));
+        await ref3.set(JSON.parse(JSON.stringify(K)));
+      } catch {
+      }
+    });
+  }
+  var commit2 = () => {
+    K.updatedAt = Date.now();
+    keep2();
+    push2();
+    onChange4();
+  };
+  var kudos = () => K.items.filter((e) => !e.deleted).sort((a, b) => (b.made || b.at || 0) - (a.made || a.at || 0));
+  var kudosCount = () => kudos().length;
+  function addKudos(text, from) {
+    text = plain(String(text || "")).trim().slice(0, 500);
+    if (!text) return null;
+    const e = { id: "k" + Date.now().toString(36) + Math.floor(Math.random() * 1e3), text, from: plain(String(from || "")).trim().slice(0, 60), at: Date.now(), made: Date.now() };
+    K.items.push(e);
+    commit2();
+    return e;
+  }
+  function removeKudos(id) {
+    const e = K.items.find((x) => x.id === id && !x.deleted);
+    if (!e) return null;
+    const copy = { ...e };
+    K.items = K.items.filter((x) => x.id !== id);
+    K.items.push({ id, deleted: true, at: Date.now() });
+    commit2();
+    return () => {
+      K.items = K.items.filter((x) => x.id !== id);
+      K.items.push({ ...copy, at: Date.now() });
+      commit2();
+    };
+  }
+  var COLS = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
+  var tilt = (id) => {
+    let h = 0;
+    for (const c of id) h = h * 31 + c.charCodeAt(0) | 0;
+    return h;
+  };
+  var when4 = (ms) => new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" });
+  var kv = { mode: "board", pick: null, draft: "", from: "" };
+  function kudosPanel() {
+    const list2 = kudos();
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Kind words</h2>`;
+    if (kv.mode === "add") return h + `<p class="sub">Pin up something nice someone said. Copy it in word for word if you can.</p>
+    <form id="kForm"><label class="sr" for="kText">The compliment</label><textarea id="kText" class="jnote" rows="4" maxlength="500" placeholder="What did they say?">${esc(kv.draft)}</textarea>
+    <label class="sr" for="kFrom">Who said it</label><input id="kFrom" class="kfrom" maxlength="60" placeholder="Who said it (optional)" value="${esc(kv.from)}" autocomplete="off">
+    <div class="actions"><button class="btn primary" type="submit">Pin it up</button><button class="btn alt small" type="button" data-kd="board">Back to the board</button></div></form>`;
+    if (kv.mode === "read") {
+      const e = list2.find((x) => x.id === kv.pick) || list2[0];
+      if (!e) {
+        kv.mode = "board";
+        return kudosPanel();
+      }
+      return h + `<div class="kread" style="background:${COLS[Math.abs(tilt(e.id)) % COLS.length]}"><p class="ktext">“${esc(e.text)}”</p><p class="kwho">${e.from ? "— " + esc(e.from) + ", " : ""}${esc(when4(e.made || e.at))}</p></div>
+      <div class="actions">${list2.length > 1 ? `<button class="btn primary" data-kd="another">Another one</button>` : ""}<button class="btn alt small" data-kd="board">See them all</button></div>`;
+    }
+    h += `<p class="sub">${list2.length ? `${list2.length} kind word${list2.length === 1 ? "" : "s"}, pinned up for whenever you need them.` : "Nothing pinned yet. When someone says something lovely, pin it here."}</p>
+    <div class="actions"><button class="btn primary" data-kd="add">Pin up a compliment</button>${list2.length ? `<button class="btn alt" data-kd="random">Read me one</button>` : ""}</div>`;
+    if (list2.length) h += `<div class="kboard">${list2.map((e) => `<figure class="knote" style="background:${COLS[Math.abs(tilt(e.id)) % COLS.length]};transform:rotate(${Math.abs(tilt(e.id)) % 7 - 3}deg)"><button class="kopen" data-kd="open" data-id="${esc(e.id)}" aria-label="Read this one"><blockquote>${esc(e.text.length > 160 ? e.text.slice(0, 157) + "…" : e.text)}</blockquote>${e.from ? `<figcaption>${esc(e.from)}</figcaption>` : ""}</button><button class="kdel" data-kd="del" data-id="${esc(e.id)}" aria-label="Take this one down">×</button></figure>`).join("")}</div>`;
+    return h;
+  }
+  var rand = (list2, not) => {
+    const pool = list2.length > 1 ? list2.filter((e) => e.id !== not) : list2;
+    return pool[Math.floor(Math.random() * pool.length)];
+  };
+  function wireKudos(root, api4) {
+    const t2 = root.querySelector("#kText"), f2 = root.querySelector("#kFrom");
+    if (t2) {
+      t2.oninput = () => {
+        kv.draft = t2.value;
+      };
+      if (!kv.draft) setTimeout(() => t2.focus(), 60);
+    }
+    if (f2) f2.oninput = () => {
+      kv.from = f2.value;
+    };
+    const form = root.querySelector("#kForm");
+    if (form) form.onsubmit = (ev) => {
+      ev.preventDefault();
+      const e = addKudos(t2.value, f2.value);
+      if (!e) {
+        t2.focus();
+        return;
+      }
+      kv.draft = "";
+      kv.from = "";
+      kv.mode = "board";
+      api4.done(e);
+      api4.rerender();
+    };
+    root.querySelectorAll("[data-kd]").forEach((b) => b.onclick = () => {
+      const k = b.dataset.kd, list2 = kudos();
+      if (k === "add") kv.mode = "add";
+      else if (k === "board") kv.mode = "board";
+      else if (k === "random" || k === "another") {
+        const e = rand(list2, kv.pick);
+        kv.pick = e && e.id;
+        kv.mode = "read";
+      } else if (k === "open") {
+        kv.pick = b.dataset.id;
+        kv.mode = "read";
+      } else if (k === "del") {
+        const r = removeKudos(b.dataset.id);
+        if (r) api4.undoable("Compliment taken down", () => {
+          r();
+          api4.rerender();
+        });
+      }
+      api4.rerender();
+    });
+  }
+
   // src/game/desk.js
   var ZAPIER = "Zapier";
   var ZAP_GMAIL = { selected_api: "GoogleMailV2CLIAPI", action: "message", tool_name: "gmail_find_email", connection_id: "0259b139-2fcc-8b64-a2ef-82ac9a87ed8c" };
@@ -6853,7 +7044,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     updatedAt: 0
   });
   var freshFox = () => ({ name: "Maple", xp: 0, days: 0, streak: 0, lastActive: null, coins: null, inv: null, plots: null, cool: {}, met: {}, gifts: {}, mailRead: {}, digest: { read: {}, lastAt: 0, mine: [] }, updatedAt: 0 });
-  var load3 = (k, f2) => {
+  var load4 = (k, f2) => {
     try {
       const v = JSON.parse(localStorage.getItem(k));
       return v ? Object.assign(f2(), v) : f2();
@@ -6861,12 +7052,12 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       return f2();
     }
   };
-  var S2 = load3("fox.today", freshToday);
-  var F = load3("fox.fox", freshFox);
-  var P = load3("fox.plan", () => ({ day: null, tasks: [] }));
-  var MAIL = load3("fox.mail", () => ({ items: [] }));
-  var ST = load3("fox.stats", () => ({}));
-  var LIB = load3("fox.library", () => ({ items: [] }));
+  var S2 = load4("fox.today", freshToday);
+  var F = load4("fox.fox", freshFox);
+  var P = load4("fox.plan", () => ({ day: null, tasks: [] }));
+  var MAIL = load4("fox.mail", () => ({ items: [] }));
+  var ST = load4("fox.stats", () => ({}));
+  var LIB = load4("fox.library", () => ({ items: [] }));
   var sampleCap = null;
   function migrate() {
     if (S2.day !== dayKey()) S2 = freshToday();
@@ -6904,7 +7095,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), goodNews: () => {
     const g = goodNews();
     return g && F.goodRead !== g.at ? g : null;
-  }, lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk(), music: () => settings.music, jars: () => shelf(), kid: () => ({ sleep: kid.sleep || evanNight() }) });
+  }, lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk(), music: () => settings.music, jars: () => shelf(), kudos: () => kudosCount(), kid: () => ({ sleep: kid.sleep || evanNight() }) });
   function isDusk() {
     const t2 = sgHM();
     return t2 >= 19 * 60 || t2 < 6 * 60;
@@ -6942,12 +7133,12 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     }
     if (!refs || !synced2[which]) return;
     clearTimeout(pending[which]);
-    pending[which] = setTimeout(() => push2(which), 500);
+    pending[which] = setTimeout(() => push3(which), 500);
   }
   var seen2 = { today: 0, fox: 0 };
-  async function push2(which, direct) {
+  async function push3(which, direct) {
     if (writing[which]) {
-      pending[which] = setTimeout(() => push2(which, direct), 400);
+      pending[which] = setTimeout(() => push3(which, direct), 400);
       return;
     }
     writing[which] = true;
@@ -7006,6 +7197,10 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     if (!uid) return;
     const col = db.collection("data/users/" + uid);
     attachHestiaDb(col.doc("hestia"));
+    attachKudos(col, () => {
+      if (scene === "hall") drawScene();
+      if (kudosOpen && !/^(kText|kFrom)$/.test(document.activeElement?.id || "")) ctx();
+    });
     attachJars(col, () => {
       if (scene === "room") drawScene();
       if (jarsOpen && !/^(jNote|jcName)$/.test(document.activeElement?.id || "")) ctx();
@@ -7158,6 +7353,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     compost: { n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster." },
     sprinkler: { n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them." }
   };
+  var kudosOpen = false;
   var deskOpen = false;
   var shedOpen = false;
   var runOpen = false;
@@ -7172,6 +7368,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   var revOpen = false;
   var jarsOpen = false;
   deskOpen = false;
+  kudosOpen = false;
   var jv = { mode: "shelf", blobs: [], note: "" };
   var BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]];
   var CYCLE = 12;
@@ -8206,7 +8403,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       if (pending[w] && refs && synced2[w]) {
         clearTimeout(pending[w]);
         pending[w] = null;
-        push2(w, true);
+        push3(w, true);
       }
     });
   }
@@ -8222,9 +8419,9 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     F.digest.read[d.id] = Date.now();
     F.digest.lastAt = Date.now();
     S2.digestMark = S2.doneIds.length;
-    const keep2 = new Set([...LIB.items || [], ...F.digest.mine || []].map((x) => x && x.id));
+    const keep3 = new Set([...LIB.items || [], ...F.digest.mine || []].map((x) => x && x.id));
     Object.keys(F.digest.read).forEach((id) => {
-      if (!keep2.has(id)) delete F.digest.read[id];
+      if (!keep3.has(id)) delete F.digest.read[id];
     });
     gainXp(1);
     save2();
@@ -8300,6 +8497,8 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     well: "village:well",
     "town hall": "hall",
     hall: "hall",
+    "kind words": "hall:kudos",
+    compliments: "hall:kudos",
     "client table": "hall:clients",
     clients: "hall:clients",
     "planning table": "hall:table",
@@ -8426,6 +8625,10 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
         const r = feedAnimals("all");
         return r ? `Fed ${r} in the run` : null;
       }
+      case "kudos_add": {
+        const e = addKudos(a.text, a.from);
+        return e ? `Pinned to Kind words${e.from ? ` (from ${e.from})` : ""}` : null;
+      }
       case "remind":
         return addReminder(F, a, () => save2()).then((x) => x.line);
     }
@@ -8482,10 +8685,11 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|revenue chart|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|kind words|revenue chart|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
+{"type":"kudos_add","text":"the compliment, in their words","from":"who said it"}  (when she shares something nice someone said about her: pin it to the Kind words board in the town hall)
 {"type":"remind","text":"get the laundry in","minutes":60}  or  {"type":"remind","text":"call mum","at":"18:30","date":"YYYY-MM-DD"}  ("remind me to..."; minutes from now, or a 24-hour Singapore time with an optional date; text is short and starts with a verb; say the time back to her)
 What's happening in the village right now: ${chatContext()}${planText}
 Conversation so far:
@@ -8974,8 +9178,8 @@ Then tell chat "wind down" whenever you're ready.`
     j.innerHTML = h + `<button class="qnx" data-qn="min" aria-label="Fold the note away">–</button>`;
     if (slim) {
       const title = j.querySelector("h1") ? [...j.querySelector("h1").childNodes].filter((n) => !(n.classList && n.classList.contains("lbl"))).map((n) => n.textContent).join("").trim() : "";
-      const when4 = S2.timer ? `<span class="when" data-tleft>${fmt(tLeft())}</span>` : "";
-      j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(title)}</b>${when4}<span class="more">open</span></button>`;
+      const when5 = S2.timer ? `<span class="when" data-tleft>${fmt(tLeft())}</span>` : "";
+      j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(title)}</b>${when5}<span class="more">open</span></button>`;
     }
     j.classList.toggle("intop", !outside());
     j.querySelectorAll("[data-qn]").forEach((el) => el.onclick = (ev) => {
@@ -9050,6 +9254,7 @@ Then tell chat "wind down" whenever you're ready.`
     revOpen = false;
     jarsOpen = false;
     deskOpen = false;
+    kudosOpen = false;
     selPlot = null;
     homeView = null;
     postOpen = false;
@@ -9118,6 +9323,7 @@ Then tell chat "wind down" whenever you're ready.`
     if (kid.open && scene === "kidroom") h = kidPanel(kid.open);
     else if (homeView && scene === "home") h = hestiaPanel(homeView);
     else if (deskOpen && scene === "home") h = deskPanel();
+    else if (kudosOpen && scene === "hall") h = kudosPanel();
     else if (postOpen && scene === "post") h = postPanel();
     else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
     else if (newsOpen && scene === "village") h = goodNewsHTML(myWins());
@@ -9225,6 +9431,14 @@ Then tell chat "wind down" whenever you're ready.`
     } });
     if (homeView && scene === "home") wireHestia(c, homeView);
     if (deskOpen && scene === "home") wireDesk(c, () => ctx());
+    if (kudosOpen && scene === "hall") wireKudos(c, { rerender: () => {
+      ctx();
+      drawScene();
+    }, undoable, done: () => {
+      sfx("chime");
+      hearts(2);
+      speak("Pinned up. That's a keeper.", 3e3);
+    } });
     c.querySelectorAll("[data-postfresh]").forEach((b) => b.onclick = () => {
       fetchPost(true).then(() => {
         ctx();
@@ -9265,6 +9479,7 @@ Then tell chat "wind down" whenever you're ready.`
       revOpen = false;
       jarsOpen = false;
       deskOpen = false;
+      kudosOpen = false;
       ctx();
     });
     c.querySelectorAll("[data-bed]").forEach((b) => b.onclick = () => bedAction(b.dataset.bed));
@@ -9294,6 +9509,7 @@ Then tell chat "wind down" whenever you're ready.`
         revOpen = false;
         jarsOpen = false;
         deskOpen = false;
+        kudosOpen = false;
         A.decompNow();
         drawScene();
       } else startBreath(+k);
@@ -9644,6 +9860,7 @@ Then tell chat "wind down" whenever you're ready.`
       revOpen = false;
       jarsOpen = false;
       deskOpen = false;
+      kudosOpen = false;
       homeView = null;
       postOpen = false;
       healthOpen = false;
@@ -9696,6 +9913,10 @@ Then tell chat "wind down" whenever you're ready.`
         S2.petNudge = true;
         setTimeout(() => speak("The chicks and bunnies are peeping for breakfast. Their run is by the garden.", 4500), 1400);
       }
+      if (id === "hall" && kudosCount() >= 3 && Date.now() - (F.kudosSeen || 0) > 7 * 864e5 && S2.kudosSaid !== dayKey()) {
+        S2.kudosSaid = dayKey();
+        setTimeout(() => speak(`${kudosCount()} kind words on the board up there. Fancy a read?`, 5e3), 1500);
+      }
       if (id === "market") speak(isHere("hana") ? "Welcome to the market! Hana's in. Have a browse." : NPCS.find((n) => n.id === "hana").away, 4500);
     }, 220);
   }
@@ -9747,6 +9968,7 @@ Then tell chat "wind down" whenever you're ready.`
     revOpen = false;
     jarsOpen = false;
     deskOpen = false;
+    kudosOpen = false;
     homeView = null;
     postOpen = false;
     healthOpen = false;
@@ -9893,6 +10115,15 @@ Then tell chat "wind down" whenever you're ready.`
       loadDesk().then(() => {
         if (deskOpen) ctx();
       });
+      return;
+    }
+    if (scene === "hall" && id === "kudos") {
+      kudosOpen = true;
+      kv.mode = "board";
+      F.kudosSeen = Date.now();
+      sfx("paper", true);
+      speak(kudosCount() ? "All the lovely things people have said about you." : "Pin up the nice things people say. Future you will thank you.", 3500);
+      save2();
       return;
     }
     if (scene === "hall" && id === "whiteboard") {

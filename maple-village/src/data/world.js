@@ -71,7 +71,8 @@ export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,5
 // the floor at y≈165: their front edge sits at 165 + their height. Tables, sofas and baskets stay out on the floor.
 // station: [id, name, slot, furniture, keyword regex, line, standDy?]  (standDy: where Mel stands, relative to the front edge; default +42)
 export const ROOMS = {
-  hall:  {name:"Town hall", wall:"#E6E9F5", trim:"var(--peri)", pos:{A:[448,262], B:[110,258], C:[420,474], D:[334,266], E:[118,474]}, stations:[
+  hall:  {name:"Town hall", wall:"#E6E9F5", trim:"var(--peri)", pos:{A:[448,262], B:[110,258], C:[420,474], D:[334,266], E:[118,474], F:[362,132]}, stations:[
+    ["kudos","Kind words","F","kindboard",null,"Lovely things people have said about you.",72],
     ["table","Planning table","C","plantable",/plan|strategy|review|ceo|goal|week|month|quarter|budget/,"Your week, month and quarter, from Notion."],
     ["whiteboard","Whiteboard","B","whiteboard",/brainstorm|idea|map|outline|launch|offer|pricing/,"Fresh marker, blank board."],
     ["revenue","Revenue chart","D","chartstand",/invoice|revenue|sales|finance|money|budget|pricing|accounts/,"How the money's flowing, from Chord."],
