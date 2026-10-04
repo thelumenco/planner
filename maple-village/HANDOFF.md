@@ -251,4 +251,19 @@ Round 7:
 - Friday weekend edition of The Morning Crier, built from a 21-day history the page keeps (quests, steps, water, harvests, coins, villagers chatted with, upgrades, festival coming up).
 - 6pm wind-down: the evening messenger brings a note; "Walk to the pond" floats a lantern per win while Maple reads them out, then hands over to chat's wind-down.
 
-Not done yet: publishing the new build to the live link (needs `sample` added to the capabilities), stage 3 ideas (8.5), collision-aware walking and a camera/zoom for small phones (4.6).
+Round 8:
+- Calendar corner icon: today's events from Mel's three Google calendars (`game/calendar.js`, mcp `list_events`).
+- Settings corner icon: rename Maple, music on/off + volume, sound effects on/off (per device).
+- Sound (`game/audio.js`, all synthesised): an original calm piano loop in F major, paper rustle on notes, Maple purrs, villagers babble hello, cha-ching on a finished quest.
+
+Round 9:
+- Notebook action buttons are smaller (`.nbactions .btn`).
+- Two outdoor screens joined by a river (`OUTDOOR`, `BRIDGES`, `ARRIVE` in `data/world.js`):
+  - **Home base** (`base`, `baseArt()`): the house, the fenced garden (into the farm), the pond (wind-down lanterns, blossom upgrade), Darren's shed, Evan's tree swing, a firepit and a washing line. The day starts here.
+  - **Town square** (`village`): the five work buildings, market, well, quest board and a riverside bench.
+  - Walking anywhere routes out of the building, over the bridge if needed, and in at the door (`go()`). A third screen (e.g. Luna) is one more `OUTDOOR` entry plus a bridge pair.
+- Darren, a new NPC who stays at home base: grey tee, jeans, black hair, a touch taller than Mel. Weekdays he waters the garden (7–8:30), types at his home office desk (8:30–12:30, 13:30–17:30), fixes the house at lunch, tends the farm after work; weekends are mostly outdoors. Slots take `{days, act, dir}`; `act` adds a prop (can, hammer, hoe) or the typing animation and its own lines.
+- Town folk moved: Bo and Theo lunch on the riverside bench, Okada's evening spot is the bench, Auntie Lin feeds the ducks at the home pond at midday, Pip plays with Evan at home base after 3pm.
+- User-count gardens use the stats doc's `label` ("9 studios", "47 families").
+
+Not done yet: stage 3 ideas (8.5), collision-aware walking.

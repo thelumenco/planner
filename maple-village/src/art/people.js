@@ -27,13 +27,17 @@ function extra(kind, look, k){
     case "tie": return `<path d="M0 ${-35*k} l${-1.6*k} ${3*k} l${1.6*k} ${8*k} l${1.6*k} ${-8*k}z" ${S("#C2505F")}/>`;
     case "satchel": return `<path d="M${-7*k} ${-35*k} l${14*k} ${16*k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><rect x="${5*k}" y="${-22*k}" width="${8*k}" height="${7*k}" rx="1.5" ${S("#C9A27E")}/>`;
     case "bell": return `<path d="M${11*k} ${-30*k} l${4*k} ${-6*k}" fill="none"/><path d="M${13*k} ${-37*k} c0 -5 ${6*k} -5 ${6*k} 0 l1 ${3*k} h${-8*k}z" ${S("#F3C969")}/>`;
+    // held in the right hand (hand at about (10k, -21k))
+    case "can": return `<path d="M${13*k} ${-24*k} q${5*k} ${-7*k} ${10*k} 0" fill="none"/><rect x="${11*k}" y="${-24*k}" width="${12*k}" height="${9*k}" rx="2" ${S("#9CC3E0")}/><path d="M${23*k} ${-20*k} l${7*k} ${-6*k}" fill="none" stroke-width="1.6"/><g class="drips"><circle cx="${31*k}" cy="${-21*k}" r="${1*k}" ${S("var(--water)")}/><circle cx="${33*k}" cy="${-15*k}" r="${1*k}" ${S("var(--water)")}/></g>`;
+    case "hammer": return `<g class="tool"><path d="M${10*k} ${-20*k} l${6*k} ${-14*k}" fill="none" stroke-width="2.2" style="stroke:#8A5A3A"/><rect x="${12*k}" y="${-38*k}" width="${10*k}" height="${5*k}" rx="1" transform="rotate(24 ${17*k} ${-35.5*k})" ${S("var(--stone)")}/></g>`;
+    case "hoe": return `<g class="tool"><path d="M${16*k} ${-48*k} l${-4*k} ${46*k}" fill="none" stroke-width="2" style="stroke:#8A5A3A"/><path d="M${12*k} ${-2*k} h${-8*k} l${1*k} ${3*k} h${7*k}z" ${S("var(--stone)")}/></g>`;
     case "lantern": return `<path d="M${12*k} ${-24*k} v${-4*k}" fill="none"/><rect x="${9*k}" y="${-24*k}" width="${7*k}" height="${9*k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5*k}" cy="${-19.5*k}" r="${1.8*k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
   }
   return "";
 }
 
 export function personArt(look, kid){
-  const k = kid ? 0.62 : 1;
+  const k = kid ? 0.62 : look.tall ? 1.1 : 1;
   const legH = 13*k, legY = -15*k, lw = 5*k;
   const shoe = "var(--sock)";
   return `<g class="flip"><g filter="url(#wob)">
@@ -44,7 +48,7 @@ export function personArt(look, kid){
       <g class="armL"><rect x="${-12*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/></g>
       <g class="armR"><rect x="${7.8*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/></g>
       <path d="M${-8.6*k} ${-37*k} q${8.6*k} ${-2.4*k} ${17.2*k} 0 l${1.4*k} ${23*k} h${-20*k}z" ${S(look.top)}/>
-      ${["apron", "tie", "satchel", "bell", "lantern"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" ? hair(look.hairStyle, look.hair, k) : ""}
       <circle cx="0" cy="${-46*k}" r="${10.6*k}" ${S(look.skin)}/>
       ${look.hairStyle === "long" || look.hairStyle === "bob" ? cap(look.hair, -46*k, 10.6*k) : hair(look.hairStyle, look.hair, k)}

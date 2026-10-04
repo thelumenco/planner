@@ -1,21 +1,36 @@
 // Village layout, building interiors (stations) and task -> place/spot matching.
 import { hash } from "../util.js";
 
+// Outdoor screens. "base" is home (house, garden, pond, shed, swing); "village" is the town square with the work
+// buildings. A river joins them: walk onto the bridge to cross. A third screen (say, for Luna) would be one more
+// OUTDOOR entry, a pair of bridge places and a BRIDGES/ARRIVE line.
+export const OUTDOOR = ["base", "village"];
 export const VILLAGE = {
-  hall:   {name:"Town hall", short:"the town hall", emo:"🏛️", door:[260,180], mark:[222,64]},
-  chord:  {name:"Chord workshop", short:"the Chord workshop", emo:"🛠️", door:[85,272], mark:[85,150]},
-  fresh:  {name:"Fresh Pages library", short:"the library", emo:"📚", door:[435,272], mark:[445,160]},
-  chico:  {name:"Chico cottage", short:"Chico cottage", emo:"🏡", door:[85,512], mark:[85,400]},
-  post:   {name:"Post office", short:"the post office", emo:"📮", door:[435,502], mark:[435,386]},
-  home:   {name:"Home", short:"home", emo:"🏠", door:[260,596], mark:[260,476]},
-  market: {name:"Market", short:"the market", emo:"🧺", door:[362,350], mark:[362,290]},
-  farm:   {name:"Garden", short:"the garden", emo:"🌱", door:[182,500], mark:[182,420]},
-  board:  {name:"Quest board", door:[260,338], spot:true, line:"All of today's quests, in one place."},
-  well:   {name:"Well", door:[160,350], spot:true, line:"Fresh water! Glug glug."},
-  pond:   {name:"Pond", door:[338,614], spot:true, line:"The pond. Best break spot in town."}
+  // town square
+  hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[260,180], mark:[222,64]},
+  chord:  {scene:"village", name:"Chord workshop", short:"the Chord workshop", door:[85,272], mark:[85,150]},
+  fresh:  {scene:"village", name:"Fresh Pages library", short:"the library", door:[435,272], mark:[445,160]},
+  chico:  {scene:"village", name:"Chico cottage", short:"Chico cottage", door:[85,512], mark:[85,400]},
+  post:   {scene:"village", name:"Post office", short:"the post office", door:[435,502], mark:[435,386]},
+  market: {scene:"village", name:"Market", short:"the market", door:[362,350], mark:[362,290]},
+  board:  {scene:"village", name:"Quest board", door:[260,338], spot:true, line:"All of today's quests, in one place."},
+  well:   {scene:"village", name:"Well", door:[160,350], spot:true, line:"Fresh water! Glug glug."},
+  bench:  {scene:"village", name:"Riverside bench", door:[334,580], spot:true, line:"A bench by the river. Lunch spot for half the town."},
+  toBase: {scene:"village", name:"Bridge home", door:[260,598], spot:true, bridge:"base", mark:[260,548], line:"Over the bridge and home."},
+  // home base
+  home:   {scene:"base", name:"Home", short:"home", door:[260,308], mark:[260,160]},
+  farm:   {scene:"base", name:"Garden", short:"the garden", door:[108,492], mark:[108,384]},
+  pond:   {scene:"base", name:"Pond", door:[318,560], spot:true, line:"The pond. Best break spot there is."},
+  shed:   {scene:"base", name:"Shed", door:[430,280], spot:true, line:"Darren's shed. Tools, seed packets and one very old radio."},
+  swing:  {scene:"base", name:"Tree swing", door:[112,318], spot:true, line:"Evan's swing. Push, push, wheee!"},
+  toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };
+// bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
+export const BRIDGES = {village:{base:"toBase"}, base:{village:"toTown"}};
+export const ARRIVE = {base:[260,132], village:[260,578]};
+export const outdoorOf = s => OUTDOOR.includes(s) ? s : (VILLAGE[s] ? VILLAGE[s].scene : "village");
 export const WORK = ["hall","chord","fresh","chico","post","home"];
-export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], M:[260,400]};
+export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
 // Each room may place its slots differently via `pos` (falls back to POS). Stations with a null regex are never
 // picked for a quest (the market counter, the library's digest shelf).
 // station: [id, name, slot, furniture, keyword regex, line, standDy?]  (standDy: where Mel stands, relative to the front edge; default +42)
@@ -52,7 +67,8 @@ export const ROOMS = {
     ["sofa","Sofa","C","sofa",/read|rest|journal|meditat|book|nap/,"Soft cushions, deep breaths."],
     ["laundry","Laundry basket","D","laundry",/fold|laundry|clothes|wash|iron/,"Fold, stack, done."],
     ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Wet wipes live here."],
-    ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12]]},
+    ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12],
+    ["office","Darren's desk","G","office",null,"Darren's home office. Shh, he might be on a call."]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };

@@ -336,13 +336,15 @@ body.nb-open{overflow:hidden}
 .nbchat p.assistant{background:#F4EEE3;font-family:"Klee One",serif;font-weight:600;border-bottom-left-radius:4px}
 .nbask input{flex:1;min-width:140px;border:0;border-bottom:1.5px solid var(--peri2);background:transparent;padding:6px 2px;line-height:1.4;color:#2F2B28}
 .nbask input:focus{outline:none;border-bottom-color:#2F3B73}
-.nbactions{display:flex;flex-wrap:wrap;gap:12px 10px;padding:14px 0 26px;border-top:1.5px dashed rgba(154,169,221,.55);background:linear-gradient(180deg,rgba(255,253,247,.85),#FFFDF7)}
+.nbactions{display:flex;flex-wrap:wrap;gap:8px 8px;padding:10px 0 18px;border-top:1.5px dashed rgba(154,169,221,.55);background:linear-gradient(180deg,rgba(255,253,247,.85),#FFFDF7)}
 .nbpage .btn.alt{background:#EAE3D8;color:#2F2B28}
 .nbpage .btn{color:#2F3B73}
+.nbactions .btn{padding:7px 14px;font-size:.86rem}
+.nbactions .btn.primary::before{width:7px;height:7px;margin-right:7px}
 .nbpage a.btn{text-decoration:none;display:inline-block}
 .nbpage .btn.yes{color:#3B3320}
 @media (max-width:520px){.nbpage{padding:26px 16px 0 40px;background-position:0 0,0 14px,0 0;background-image:linear-gradient(90deg,transparent 28px,rgba(239,163,166,.55) 28px,rgba(239,163,166,.55) 29.5px,transparent 29.5px),repeating-linear-gradient(180deg,transparent 0 31px,rgba(154,169,221,.28) 31px 32px),var(--fibre)}
-  .nbactions .btn{padding:11px 22px}}
+  .nbactions .btn{padding:6px 12px;font-size:.82rem}}
 @media (prefers-reduced-motion:reduce){.notebook,.nbpage{animation:none}}
 
 /* floating "Do task" chip on the map when Mel is at the quest's spot */
@@ -414,6 +416,22 @@ body.nb-open{overflow:hidden}
 .map [data-ugarden]{cursor:pointer}
 .bloom{transform-box:fill-box;transform-origin:50% 100%;animation:grow .6s ease-out}
 @media (prefers-reduced-motion:reduce){.bloom{animation:none}}
+/* Darren at work: typing arms, a tapping hammer, a rocking hoe, a dripping can */
+.ch.npc.act-type .armL,.ch.npc.act-type .armR{animation:typeA .22s ease-in-out infinite alternate}
+.ch.npc.act-type .armR{animation-delay:.11s}
+@keyframes typeA{from{transform:rotate(-55deg)}to{transform:rotate(-40deg)}}
+.ch.npc .tool{transform-box:fill-box;transform-origin:0% 100%}
+.ch.npc.act-repair:not(.walk) .tool{animation:tapT .5s ease-in-out infinite alternate}
+.ch.npc.act-repair:not(.walk) .armR{animation:tapA .5s ease-in-out infinite alternate}
+@keyframes tapT{from{transform:rotate(-10deg)}to{transform:rotate(18deg)}}
+@keyframes tapA{from{transform:rotate(-8deg)}to{transform:rotate(10deg)}}
+.ch.npc.act-farm:not(.walk) .tool{animation:tapT 1.1s ease-in-out infinite alternate}
+.ch.npc .drips{animation:drip 1s linear infinite}
+@keyframes drip{from{transform:translateY(-2px);opacity:1}to{transform:translateY(6px);opacity:0}}
+/* Evan's swing sways */
+.map .swing{transform-box:view-box;transform-origin:112px 254px;animation:sway 3s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-type .armL,.ch.npc.act-type .armR,.ch.npc .tool,.ch.npc .drips,.map .swing{animation:none}}
 
 /* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
 :root{--mapw:max(300px,min(660px,calc((100dvh - 300px)*520/640 + 26px)))}
@@ -1227,21 +1245,32 @@ body.nb-open{overflow:hidden}
   }
 
   // src/data/world.js
+  var OUTDOOR = ["base", "village"];
   var VILLAGE = {
-    hall: { name: "Town hall", short: "the town hall", emo: "🏛️", door: [260, 180], mark: [222, 64] },
-    chord: { name: "Chord workshop", short: "the Chord workshop", emo: "🛠️", door: [85, 272], mark: [85, 150] },
-    fresh: { name: "Fresh Pages library", short: "the library", emo: "📚", door: [435, 272], mark: [445, 160] },
-    chico: { name: "Chico cottage", short: "Chico cottage", emo: "🏡", door: [85, 512], mark: [85, 400] },
-    post: { name: "Post office", short: "the post office", emo: "📮", door: [435, 502], mark: [435, 386] },
-    home: { name: "Home", short: "home", emo: "🏠", door: [260, 596], mark: [260, 476] },
-    market: { name: "Market", short: "the market", emo: "🧺", door: [362, 350], mark: [362, 290] },
-    farm: { name: "Garden", short: "the garden", emo: "🌱", door: [182, 500], mark: [182, 420] },
-    board: { name: "Quest board", door: [260, 338], spot: true, line: "All of today's quests, in one place." },
-    well: { name: "Well", door: [160, 350], spot: true, line: "Fresh water! Glug glug." },
-    pond: { name: "Pond", door: [338, 614], spot: true, line: "The pond. Best break spot in town." }
+    // town square
+    hall: { scene: "village", name: "Town hall", short: "the town hall", door: [260, 180], mark: [222, 64] },
+    chord: { scene: "village", name: "Chord workshop", short: "the Chord workshop", door: [85, 272], mark: [85, 150] },
+    fresh: { scene: "village", name: "Fresh Pages library", short: "the library", door: [435, 272], mark: [445, 160] },
+    chico: { scene: "village", name: "Chico cottage", short: "Chico cottage", door: [85, 512], mark: [85, 400] },
+    post: { scene: "village", name: "Post office", short: "the post office", door: [435, 502], mark: [435, 386] },
+    market: { scene: "village", name: "Market", short: "the market", door: [362, 350], mark: [362, 290] },
+    board: { scene: "village", name: "Quest board", door: [260, 338], spot: true, line: "All of today's quests, in one place." },
+    well: { scene: "village", name: "Well", door: [160, 350], spot: true, line: "Fresh water! Glug glug." },
+    bench: { scene: "village", name: "Riverside bench", door: [334, 580], spot: true, line: "A bench by the river. Lunch spot for half the town." },
+    toBase: { scene: "village", name: "Bridge home", door: [260, 598], spot: true, bridge: "base", mark: [260, 548], line: "Over the bridge and home." },
+    // home base
+    home: { scene: "base", name: "Home", short: "home", door: [260, 308], mark: [260, 160] },
+    farm: { scene: "base", name: "Garden", short: "the garden", door: [108, 492], mark: [108, 384] },
+    pond: { scene: "base", name: "Pond", door: [318, 560], spot: true, line: "The pond. Best break spot there is." },
+    shed: { scene: "base", name: "Shed", door: [430, 280], spot: true, line: "Darren's shed. Tools, seed packets and one very old radio." },
+    swing: { scene: "base", name: "Tree swing", door: [112, 318], spot: true, line: "Evan's swing. Push, push, wheee!" },
+    toTown: { scene: "base", name: "Bridge to town", door: [260, 114], spot: true, bridge: "village", mark: [260, 62], line: "Over the river to the town square." }
   };
+  var BRIDGES = { village: { base: "toBase" }, base: { village: "toTown" } };
+  var ARRIVE = { base: [260, 132], village: [260, 578] };
+  var outdoorOf = (s) => OUTDOOR.includes(s) ? s : VILLAGE[s] ? VILLAGE[s].scene : "village";
   var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
-  var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], M: [260, 400] };
+  var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
   var ROOMS = {
     hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [430, 300], B: [96, 300], C: [260, 430], D: [440, 560] }, stations: [
       ["table", "Planning table", "C", "table", /plan|strategy|review|ceo|goal|week|month|quarter|budget/, "Big-picture thinking lives here."],
@@ -1280,7 +1309,8 @@ body.nb-open{overflow:hidden}
       ["sofa", "Sofa", "C", "sofa", /read|rest|journal|meditat|book|nap/, "Soft cushions, deep breaths."],
       ["laundry", "Laundry basket", "D", "laundry", /fold|laundry|clothes|wash|iron/, "Fold, stack, done."],
       ["cupboard", "Cleaning cupboard", "E", "cupboard", /clean|tidy|wipe|hestia|dust/, "Wet wipes live here."],
-      ["treadmill", "Treadmill", "F", "treadmill", /treadmill/, "1.2 and go. Walk and work.", -12]
+      ["treadmill", "Treadmill", "F", "treadmill", /treadmill/, "1.2 and go. Walk and work.", -12],
+      ["office", "Darren's desk", "G", "office", null, "Darren's home office. Shh, he might be on a call."]
     ] },
     market: { name: "Market", wall: "#F8E5E2", trim: "var(--blush)", stations: [
       ["stall", "Shop counter", "M", "shopcounter", null, "Welcome in! Have a browse."]
@@ -1630,18 +1660,12 @@ body.nb-open{overflow:hidden}
     const D = VILLAGE;
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="120" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="420" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="200" cy="560" rx="80" ry="40" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M260 322 L260 ${D.hall.door[1]} M260 322 C200 300 120 290 ${D.chord.door[0]} ${D.chord.door[1]} M260 322 C320 300 400 290 ${D.fresh.door[0]} ${D.fresh.door[1]} M260 322 C200 380 110 430 ${D.chico.door[0]} ${D.chico.door[1]} M260 322 C320 380 410 420 ${D.post.door[0]} ${D.post.door[1]} M260 322 L260 ${D.home.door[1]} M260 470 C300 540 320 590 ${D.pond.door[0]} ${D.pond.door[1]} M220 400 L${D.farm.door[0]} ${D.farm.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M260 322 L260 ${D.hall.door[1]} M260 322 C200 300 120 290 ${D.chord.door[0]} ${D.chord.door[1]} M260 322 C320 300 400 290 ${D.fresh.door[0]} ${D.fresh.door[1]} M260 322 C200 380 110 430 ${D.chico.door[0]} ${D.chico.door[1]} M260 322 C320 380 410 420 ${D.post.door[0]} ${D.post.door[1]} M260 322 L260 ${D.toBase.door[1]} M260 540 C290 560 310 570 ${D.bench.door[0]} ${D.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
-    ${flowers([[30, 262, "#EFA3A6"], [44, 270, "#F3C969"], [150, 206, "#C3CDEE"], [372, 206, "#EFA3A6"], [488, 270, "#F3C969"], [300, 448, "#EFA3A6"], [214, 450, "#C3CDEE"], [160, 600, "#F3C969"], [176, 612, "#EFA3A6"], [470, 540, "#C3CDEE"], [20, 430, "#F3C969"], [505, 380, "#EFA3A6"]])}
-    ${tree(170, 64, 1)}${tree(350, 64, 1)}${tree(26, 96, 1.05)}${tree(494, 96, 1.05)}${tree(24, 350, 0.9)}${tree(498, 330, 0.9)}${tree(190, 622, 0.85)}${tree(504, 520, 0.85)}${tree(24, 610, 0.95)}`;
-    const homeX = { art: `<rect x="290" y="444" width="12" height="22" style="fill:var(--stone)"/>`, lines: `<rect x="290" y="444" width="12" height="22"/><path class="smoke" d="M296 440 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>` };
-    const grown = (G.F().plots || []).filter((p) => p && p.crop).length;
-    const sprouts = Array.from({ length: Math.min(4, grown) }, (_, i) => `<path d="M${160 + i * 12} 470 v-8" style="stroke:var(--moss2)"/><ellipse cx="${157 + i * 12}" cy="${463}" rx="3.5" ry="2" style="fill:var(--moss)"/><ellipse cx="${163 + i * 12}" cy="${461}" rx="3.5" ry="2" style="fill:var(--moss)"/>`).join("");
-    const places = townHall() + chordWorkshop() + library() + chicoCottage() + postOffice() + house("home", 205, 508, 110, 74, "var(--card)", "var(--butter)", "Home", "var(--butter)", homeX) + `<g data-place="farm" aria-label="Garden"><ellipse class="hov" cx="182" cy="478" rx="34" ry="10" style="fill:var(--butter)"/>
-      <g filter="url(#wob)" ${ink}><rect x="150" y="446" width="64" height="30" rx="3" style="fill:#B08A6A"/>${sprouts}
-      <path d="M146 482 v-40 M218 482 v-40 M146 450 h72 M146 470 h72" style="stroke:var(--wood)" stroke-width="2.4"/><path d="M146 442 v42 M161 442 v42 M203 442 v42 M218 442 v42" opacity=".8"/></g>
-      ${tapeLabel(182, 432, "Garden", "var(--sage)")}</g>
-    <g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
+    ${flowers([[30, 262, "#EFA3A6"], [44, 270, "#F3C969"], [150, 206, "#C3CDEE"], [372, 206, "#EFA3A6"], [488, 270, "#F3C969"], [300, 448, "#EFA3A6"], [214, 450, "#C3CDEE"], [470, 540, "#C3CDEE"], [20, 430, "#F3C969"], [505, 380, "#EFA3A6"]])}
+    ${tree(170, 64, 1)}${tree(350, 64, 1)}${tree(26, 96, 1.05)}${tree(494, 96, 1.05)}${tree(24, 350, 0.9)}${tree(498, 330, 0.9)}${tree(504, 520, 0.85)}${tree(190, 470, 0.8)}${tree(330, 470, 0.8)}
+    ${flowers([[170, 540, "#F3C969"], [184, 548, "#EFA3A6"], [206, 520, "#C3CDEE"], [300, 520, "#F3C969"], [400, 560, "#EFA3A6"], [150, 580, "#C3CDEE"]])}`;
+    const places = townHall() + chordWorkshop() + library() + chicoCottage() + postOffice() + `<g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M238 330 v-40 M282 330 v-40"/><rect x="230" y="282" width="60" height="38" rx="3" style="fill:var(--wood)"/>${notesArt(236, 288, G.remaining().length)}</g>
       ${tapeLabel(260, 278, "Quests", "var(--butter)")}</g>
     <g data-place="well" aria-label="Well"><ellipse class="hov" cx="160" cy="342" rx="26" ry="7" style="fill:var(--butter)"/>
@@ -1652,12 +1676,73 @@ body.nb-open{overflow:hidden}
         <path d="M332 306 h60 l-4 10 h-52z" style="fill:var(--card)"/><path d="M340 306 l-2 10 M352 306 l-1 10 M364 306 v10 M376 306 l1 10" style="stroke:var(--rose)" stroke-width="5"/>
         <circle cx="350" cy="317" r="3.2" style="fill:var(--rose)"/><circle cx="362" cy="317" r="3.2" style="fill:var(--butter)"/><circle cx="374" cy="317" r="3.2" style="fill:var(--sage)"/></g>
       ${tapeLabel(362, 360, "Market", "var(--blush)")}</g>
-    <g data-place="pond" aria-label="Pond"><ellipse class="hov" cx="420" cy="592" rx="70" ry="30" style="fill:var(--butter)"/>
-      <g filter="url(#wob)" ${ink}><ellipse cx="430" cy="590" rx="58" ry="25" style="fill:var(--water)"/><path class="ripple" d="M405 586 q8 -4 16 0 M432 598 q8 -4 16 0" opacity=".6"/>
-        <ellipse cx="455" cy="580" rx="7" ry="3.5" style="fill:var(--tree)"/><circle cx="455" cy="577" r="2" style="fill:var(--rose)"/>
-        <rect x="322" y="596" width="34" height="6" rx="2" style="fill:var(--wood)"/><path d="M326 602 v8 M352 602 v8 M322 592 h34" /></g>
-      ${tapeLabel(430, 630, "Pond", "var(--sky)")}</g>`;
-    return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 34, 536, 8, 2, 12) + upgradesArt(G.F().totalQuests || 0) + festivalArt(festivalOn(G.day())) + pondLanterns(G.lanterns());
+    ${townRiver()}`;
+    return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 26, 536, 8, 2, 12) + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
+  }
+  var waterBand = (y1, y2) => `<path d="M0 ${y1 + 4} Q65 ${y1 - 4} 130 ${y1 + 3} T260 ${y1 + 2} T390 ${y1 + 4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2 + 5} 390 ${y2 - 2} T260 ${y2} T130 ${y2 - 3} T0 ${y2 + 2}`}z" style="fill:var(--water)"/>`;
+  function bridge(id, x, y1, y2, label, tapeX, tapeY) {
+    let planks = "";
+    for (let y = y1 + 8; y < y2 - 2; y += 9) planks += `<path d="M${x - 22} ${y} h44"/>`;
+    return `<g data-place="${id}" aria-label="${label}"><ellipse class="hov" cx="${x}" cy="${(y1 + y2) / 2}" rx="40" ry="${(y2 - y1) / 2 + 6}" style="fill:var(--butter)"/>
+    ${sk(
+      `<rect x="${x - 24}" y="${y1}" width="48" height="${y2 - y1}" rx="3" style="fill:var(--wood)"/>`,
+      `<rect x="${x - 24}" y="${y1}" width="48" height="${y2 - y1}" rx="3"/>${planks}<path d="M${x - 28} ${y1 - 4} v${y2 - y1 + 8} M${x + 28} ${y1 - 4} v${y2 - y1 + 8}" stroke-width="2.2"/><path d="M${x - 28} ${y1 + 2} v0 M${x - 28} ${(y1 + y2) / 2} h-2 M${x + 28} ${(y1 + y2) / 2} h2"/>`
+    )}
+    ${tapeLabel(tapeX, tapeY, label, "var(--sky)")}</g>`;
+  }
+  var ripples = (pts) => `<g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".45">${pts.map(([x, y]) => `<path class="ripple" d="M${x} ${y} q8 -4 16 0"/>`).join("")}</g>`;
+  function townRiver() {
+    return `<g filter="url(#wob)">${waterBand(600, 640)}</g>${ripples([[60, 620], [150, 628], [370, 618], [450, 630]])}
+    <g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 604 Q65 596 130 603 T260 602 T390 604 T520 600" fill="none"/></g>
+    ${bridge("toBase", 260, 584, 640, "To home", 410, 624)}
+    <g data-place="bench" aria-label="Riverside bench"><ellipse class="hov" cx="334" cy="572" rx="30" ry="8" style="fill:var(--butter)"/>
+      ${sk(`<rect x="314" y="560" width="40" height="7" rx="2" style="fill:var(--wood)"/><rect x="314" y="548" width="40" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="314" y="560" width="40" height="7" rx="2"/><rect x="314" y="548" width="40" height="6" rx="2"/><path d="M318 554 v6 M350 554 v6 M318 567 v9 M350 567 v9"/>`)}</g>`;
+  }
+  function baseArt() {
+    const D = VILLAGE;
+    const grown = (G.F().plots || []).filter((p) => p && p.crop).length;
+    const sprouts = Array.from({ length: Math.min(6, grown) }, (_, i) => {
+      const x = 58 + i % 3 * 44, y = 430 + Math.floor(i / 3) * 24;
+      return `<path d="M${x} ${y} v-8" style="stroke:var(--moss2)"/><ellipse cx="${x - 3}" cy="${y - 7}" rx="3.5" ry="2" style="fill:var(--moss)"/><ellipse cx="${x + 3}" cy="${y - 9}" rx="3.5" ry="2" style="fill:var(--moss)"/>`;
+    }).join("");
+    const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
+    <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="200" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="400" cy="380" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="160" cy="590" rx="110" ry="40" style="fill:var(--grass2)"/></g>
+    ${tree(40, 30, 0.7)}${tree(150, 26, 0.6)}${tree(380, 28, 0.65)}${tree(480, 30, 0.7)}
+    <g filter="url(#wob)">${waterBand(40, 98)}<path d="M478 94 C470 180 500 300 470 400 C462 430 458 450 452 474" fill="none" style="stroke:var(--water)" stroke-width="14" stroke-linecap="round"/></g>
+    ${ripples([[60, 66], [150, 78], [350, 62], [420, 80]])}
+    <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 44 Q65 36 130 43 T260 42 T390 44 T520 40 M0 100 Q65 104 130 95 T260 98 T390 96 T520 102"/></g>
+    <g filter="url(#wob)"><path d="M260 112 L260 ${D.home.door[1]} M260 326 C200 360 130 420 ${D.farm.door[0]} ${D.farm.door[1]} M260 326 C290 420 300 500 ${D.pond.door[0]} ${D.pond.door[1]} M266 312 C330 300 390 290 ${D.shed.door[0]} ${D.shed.door[1]} M254 318 C200 320 150 320 ${D.swing.door[0]} ${D.swing.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
+      <ellipse cx="260" cy="322" rx="44" ry="20" style="fill:var(--path)"/></g>
+    ${flowers([[30, 140, "#EFA3A6"], [44, 150, "#F3C969"], [200, 140, "#C3CDEE"], [330, 150, "#EFA3A6"], [488, 180, "#F3C969"], [214, 410, "#EFA3A6"], [200, 470, "#C3CDEE"], [160, 600, "#F3C969"], [176, 612, "#EFA3A6"], [300, 620, "#C3CDEE"], [24, 520, "#F3C969"], [372, 600, "#EFA3A6"], [400, 170, "#C3CDEE"]])}
+    ${tree(26, 370, 0.9)}${tree(500, 610, 0.9)}${tree(26, 620, 0.95)}${tree(360, 180, 0.8)}`;
+    const homeX = { art: `<rect x="290" y="156" width="12" height="22" style="fill:var(--stone)"/>`, lines: `<rect x="290" y="156" width="12" height="22"/><path class="smoke" d="M296 152 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>` };
+    const places = bridge("toTown", 260, 30, 110, "To town", 336, 124) + house("home", 205, 220, 110, 74, "var(--card)", "var(--butter)", "Home", "var(--butter)", homeX) + // Darren's repair corner: ladder against the wall, toolbox
+    sk(`<rect x="326" y="282" width="20" height="12" rx="2" style="fill:var(--rose)"/>`, `<path d="M316 296 l12 -62 M326 296 l12 -62 M318 284 h10 M320 272 h10 M323 260 h10 M325 248 h10"/><rect x="326" y="282" width="20" height="12" rx="2"/><path d="M332 282 v-4 h8 v4"/>`) + `<g data-place="shed" aria-label="Shed"><ellipse class="hov" cx="430" cy="272" rx="40" ry="9" style="fill:var(--butter)"/>
+      ${sk(
+      `<path d="M394 222 l36 -24 l40 22 v4 z" style="fill:var(--sage)"/><rect x="398" y="220" width="66" height="50" style="fill:#C9A27E"/><rect x="420" y="236" width="22" height="34" style="fill:var(--wood)"/><rect x="448" y="230" width="12" height="10" style="fill:var(--sky)"/>`,
+      `<path d="M394 222 l36 -24 l40 22"/><rect x="398" y="220" width="66" height="50"/><path d="M398 234 h66 M398 248 h66 M398 262 h66" opacity=".35"/><rect x="420" y="236" width="22" height="34"/><circle cx="438" cy="254" r="1.4"/><rect x="448" y="230" width="12" height="10"/><path d="M404 270 l-6 -12 M406 258 v12" opacity=".8"/>`
+    )}
+      ${tapeLabel(430, 296, "Shed", "var(--sage)")}</g>
+    <g data-place="swing" aria-label="Tree swing"><ellipse class="hov" cx="104" cy="312" rx="34" ry="9" style="fill:var(--butter)"/>
+      ${tree(76, 300, 1.6)}<g filter="url(#wob)" ${ink}><path d="M78 256 Q100 250 130 254" stroke-width="3" style="stroke:var(--wood)"/><path class="swing" d="M104 254 v42 M120 254 v42"/><rect class="swing" x="98" y="295" width="28" height="5" rx="2" style="fill:var(--peach)"/></g>
+      ${tapeLabel(112, 336, "Swing", "var(--peach)", 11)}</g>
+    <g data-place="farm" aria-label="Garden"><ellipse class="hov" cx="108" cy="482" rx="44" ry="10" style="fill:var(--butter)"/>
+      <g filter="url(#wob)" ${ink}><rect x="40" y="406" width="136" height="66" rx="4" style="fill:#B08A6A"/><path d="M48 430 h120 M48 454 h120" opacity=".35"/>${sprouts}
+      <path d="M34 478 V400 H182 V478 M34 478 H94 M122 478 H182" fill="none" style="stroke:var(--wood)" stroke-width="2.6"/>${Array.from({ length: 7 }, (_, i) => `<path d="M${34 + i * 24.6} 396 v10" style="stroke:var(--wood)" stroke-width="2"/>`).join("")}</g>
+      ${tapeLabel(108, 392, "Garden", "var(--sage)")}</g>
+    <g data-place="pond" aria-label="Pond"><ellipse class="hov" cx="390" cy="530" rx="96" ry="46" style="fill:var(--butter)"/>
+      <g filter="url(#wob)" ${ink}><ellipse cx="408" cy="504" rx="72" ry="32" style="fill:var(--water)"/><path class="ripple" d="M380 500 q8 -4 16 0 M414 514 q8 -4 16 0" opacity=".6"/>
+        <ellipse cx="446" cy="492" rx="8" ry="4" style="fill:var(--tree)"/><circle cx="446" cy="489" r="2.2" style="fill:var(--rose)"/><ellipse cx="370" cy="516" rx="6" ry="3" style="fill:var(--tree)"/>
+        <rect x="300" y="546" width="36" height="6" rx="2" style="fill:var(--wood)"/><path d="M304 552 v8 M332 552 v8 M300 542 h36"/></g>
+      ${tapeLabel(430, 554, "Pond", "var(--sky)")}</g>` + // evening firepit + washing line, just for cosiness
+    sk(
+      `<ellipse cx="226" cy="604" rx="20" ry="8" style="fill:var(--stone)"/><path d="M214 602 l24 -6 M214 596 l24 6" style="stroke:var(--wood)" stroke-width="4"/>`,
+      `<ellipse cx="226" cy="604" rx="20" ry="8"/><path class="smoke" d="M226 590 q-4 -6 0 -11 q4 -5 0 -10" opacity=".5"/>`
+    ) + sk(
+      `<path d="M66 552 h16 v18 h-16z" style="fill:var(--sky)"/><path d="M96 554 h14 l3 14 h-20z" style="fill:var(--rose)"/><path d="M126 552 h18 v12 h-18z" style="fill:var(--butter)"/>`,
+      `<path d="M50 590 v-46 M160 590 v-46 M50 548 Q105 556 160 548"/><path d="M66 552 h16 v18 h-16z M96 554 h14 l3 14 h-20z M126 552 h18 v12 h-18z"/>`
+    );
+    return ground + places + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns());
   }
   function notesArt(x, y, n) {
     const c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#C3CDEE", "#DCE8C8"];
@@ -1760,6 +1845,11 @@ body.nb-open{overflow:hidden}
           `<rect x="${x - 24}" y="${y - 74}" width="48" height="74" rx="8" style="fill:var(--sock)"/><rect x="${x - 17}" y="${y - 66}" width="34" height="58" rx="4" style="fill:#6B5A52"/><rect x="${x - 30}" y="${y - 96}" width="60" height="16" rx="4" style="fill:var(--peri)"/><rect x="${x - 14}" y="${y - 93}" width="20" height="9" rx="2" style="fill:#DCE8C8"/>`,
           `<rect x="${x - 24}" y="${y - 74}" width="48" height="74" rx="8"/><path d="M${x - 17} ${y - 56} h34 M${x - 17} ${y - 44} h34 M${x - 17} ${y - 32} h34 M${x - 17} ${y - 20} h34" opacity=".45"/><path d="M${x - 26} ${y - 80} v28 M${x + 26} ${y - 80} v28" stroke-width="2.4"/><rect x="${x - 30}" y="${y - 96}" width="60" height="16" rx="4"/><rect x="${x - 14}" y="${y - 93}" width="20" height="9" rx="2"/><text x="${x - 4}" y="${y - 86}" text-anchor="middle" font-family="Klee One,serif" font-size="7" stroke="none" style="fill:var(--line)">1.2</text>`
         );
+      case "office":
+        return sk(
+          `<rect x="${x - 40}" y="${y - 28}" width="72" height="22" rx="3" style="fill:${W2}"/><path d="M${x - 22} ${y - 30} l4 -18 h26 l-4 18z" style="fill:#DCE3EE"/><rect x="${x - 26}" y="${y - 32}" width="34" height="4" rx="1" style="fill:var(--stone)"/><circle cx="${x + 20}" cy="${y - 34}" r="5" style="fill:var(--peach)"/><rect x="${x + 38}" y="${y - 30}" width="22" height="20" rx="4" style="fill:var(--sage)"/>`,
+          `<rect x="${x - 40}" y="${y - 28}" width="72" height="22" rx="3"/><path d="M${x - 22} ${y - 30} l4 -18 h26 l-4 18z"/><rect x="${x - 26}" y="${y - 32}" width="34" height="4" rx="1"/><circle cx="${x + 20}" cy="${y - 34}" r="5"/><path d="M${x + 16} ${y - 39} q4 -6 8 0" opacity=".6"/><path d="M${x - 34} ${y - 6} v12 M${x + 26} ${y - 6} v12"/><rect x="${x + 38}" y="${y - 30}" width="22" height="20" rx="4"/><path d="M${x + 42} ${y - 10} v14 M${x + 56} ${y - 10} v14"/>`
+        );
       case "bookcase":
         return furn("shelf", x, y) + sk(
           `<path d="M${x + 20} ${y - 104} h30 l-4 8 l4 8 h-30z" style="fill:var(--butter)"/>`,
@@ -1817,7 +1907,7 @@ body.nb-open{overflow:hidden}
     });
     h += `<g data-exit="1" aria-label="Exit"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
     <g filter="url(#wob)" ${ink}><path d="M212 590 v34 M308 590 v34" style="stroke:var(--wood)" stroke-width="4"/></g>
-    <text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none">Back to the village</text></g>`;
+    <text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none">Back outside</text></g>`;
     return h;
   }
   var GARDEN_TIERS = [[0, "daisy"], [100, "tulip"], [250, "sunflower"]];
@@ -1839,7 +1929,7 @@ body.nb-open{overflow:hidden}
     const w = cols * gap, signX = x + w / 2 + (key === "chord" ? 8 : 0), signY = y + rows2 * gap + 10;
     const tree2 = users >= 500 ? `<g filter="url(#wob)" ${ink}><rect x="${x + w - 6}" y="${y + 4}" width="4" height="12" style="fill:var(--wood)"/><circle cx="${x + w - 4}" cy="${y}" r="9" style="fill:#F4C7CF"/><circle cx="${x + w - 10}" cy="${y + 4}" r="6" style="fill:#EFA3A6"/></g>` : "";
     const sparkle = users >= 1e3 ? `<g class="twinkle">${iconAt("sparkle", x - 2, y - 2, 12)}${iconAt("sparkle", x + w + 2, y + rows2 * gap - 4, 11)}</g>` : "";
-    const label = `${users.toLocaleString()} ${key === "chord" ? "creatives" : "families"}`;
+    const label = `${users.toLocaleString()} ${st.label || (key === "chord" ? "studios" : "families")}`;
     return `<g data-ugarden="${key}" aria-label="${label}">${f2}${tree2}${sparkle}
     ${tapeLabel(signX, signY, label, key === "chord" ? "var(--sage)" : "var(--blush)", 10)}</g>`;
   }
@@ -1854,7 +1944,7 @@ body.nb-open{overflow:hidden}
     { at: 60, id: "lights", name: "string lights around the square" },
     { at: 85, id: "fountain", name: "a little fountain" },
     { at: 120, id: "star", name: "a gold star on the town hall flag" },
-    { at: 160, id: "blossom", name: "blossom trees by the pond" }
+    { at: 160, id: "blossom", name: "blossom trees by the pond at home" }
   ];
   var unlocked = (n) => UPGRADES.filter((u) => n >= u.at);
   var nextUpgrade = (n) => UPGRADES.find((u) => n < u.at) || null;
@@ -1868,9 +1958,15 @@ body.nb-open{overflow:hidden}
     return sk(f2, `<path d="M${x1} ${y1} Q${(x1 + x2) / 2} ${mid} ${x2} ${y2}"/>${f2.replace(/ style="[^"]*"/g, "")}`);
   };
   var lamp = (x, y) => sk(`<rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2" style="fill:#F6C26B"/>`, `<path d="M${x} ${y} v-13"/><rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2"/><path d="M${x - 5} ${y} h10"/>`);
-  function upgradesArt(n) {
+  function upgradesArt(n, where) {
     const has = (id) => unlocked(n).some((u) => u.id === id);
     let h = "";
+    if (where === "base") {
+      if (has("blossom")) [[346, 474], [490, 560]].forEach(([x, y]) => {
+        h += `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.4"><rect x="${x - 3}" y="${y - 6}" width="6" height="14" style="fill:var(--wood)"/><circle cx="${x}" cy="${y - 18}" r="14" style="fill:#F4C7CF"/><circle cx="${x - 9}" cy="${y - 10}" r="9" style="fill:#EFA3A6"/><circle cx="${x + 9}" cy="${y - 11}" r="9" style="fill:#F4C7CF"/></g>`;
+      });
+      return h;
+    }
     if (has("bunting")) h += bunting(330, 300, 394, 300, ["var(--rose)", "var(--butter)", "var(--sage)", "var(--peri)"]);
     if (has("lanterns")) [[232, 236], [288, 236], [226, 430], [294, 430], [196, 362], [324, 362]].forEach(([x, y]) => {
       h += lamp(x, y);
@@ -1897,9 +1993,6 @@ body.nb-open{overflow:hidden}
       `<ellipse cx="318" cy="400" rx="20" ry="8"/><path d="M298 400 v4 a20 8 0 0 0 40 0 v-4"/><rect x="315" y="382" width="6" height="14"/><path class="smoke" d="M318 380 q-6 -6 -10 2 M318 380 q6 -6 10 2" opacity=".7"/>`
     );
     if (has("star")) h += iconAt("sparkle", 282, 6, 16);
-    if (has("blossom")) [[362, 556], [500, 610]].forEach(([x, y]) => {
-      h += `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.4"><rect x="${x - 3}" y="${y - 6}" width="6" height="14" style="fill:var(--wood)"/><circle cx="${x}" cy="${y - 18}" r="14" style="fill:#F4C7CF"/><circle cx="${x - 9}" cy="${y - 10}" r="9" style="fill:#EFA3A6"/><circle cx="${x + 9}" cy="${y - 11}" r="9" style="fill:#F4C7CF"/></g>`;
-    });
     return h;
   }
   var FESTIVALS = [
@@ -1938,7 +2031,7 @@ body.nb-open{overflow:hidden}
         return lanternRow(196, 324, 262, ["#F3C969", "#EFA3A6", "#9CC3E0", "#B9D2A6"]) + `<g filter="url(#wob)"><circle cx="470" cy="40" r="16" fill="#FFF3C4" style="stroke:var(--line)" stroke-width="1.2"/></g>`;
       case "deepavali": {
         let d = "";
-        [[236, 236], [284, 236], [222, 420], [298, 420], [200, 352], [320, 352], [250, 610], [270, 610]].forEach(([x, y]) => {
+        [[236, 236], [284, 236], [222, 420], [298, 420], [200, 352], [320, 352], [250, 560], [270, 560]].forEach(([x, y]) => {
           d += `<path d="M${x - 6} ${y} q6 6 12 0z" style="fill:#C9853E"/><path class="twinkle" d="M${x} ${y - 1} q-3 -5 0 -9 q3 4 0 9z" style="fill:#F6A23A"/>`;
         });
         const rang = `<g filter="url(#wob)" opacity=".9">${[26, 18, 10].map((r, i) => `<circle cx="260" cy="356" r="${r}" fill="none" style="stroke:${["#EFA3A6", "#F3C969", "#9AA9DD"][i]}" stroke-width="5"/>`).join("")}<circle cx="260" cy="356" r="4" fill="#EFA3A6"/></g>`;
@@ -1962,7 +2055,7 @@ body.nb-open{overflow:hidden}
   function pondLanterns(n) {
     let h = "";
     for (let i = 0; i < Math.min(n, 9); i++) {
-      const x = 392 + i % 5 * 18 + (i > 4 ? 9 : 0), y = 584 + (i > 4 ? 14 : 0) + i % 2 * 3;
+      const x = 370 + i % 5 * 18 + (i > 4 ? 9 : 0), y = 498 + (i > 4 ? 14 : 0) + i % 2 * 3;
       h += `<g class="floaty" style="animation-delay:${(i * 0.37).toFixed(2)}s">${iconAt("lantern", x, y, 16)}</g>`;
     }
     return h;
@@ -1973,7 +2066,7 @@ body.nb-open{overflow:hidden}
     const [h, m] = s.split(":").map(Number);
     return h * 60 + (m || 0);
   };
-  var slot = (from, to, scene2, where) => Object.assign({ from: hm(from), to: hm(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where });
+  var slot = (from, to, scene2, where, opts) => Object.assign({ from: hm(from), to: hm(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where }, opts || {});
   var NPCS = [
     {
       id: "hana",
@@ -2006,13 +2099,13 @@ body.nb-open{overflow:hidden}
       job: "Retired postmaster, unofficial well-keeper",
       intro: "Okada. Forty years delivering letters. Retired now, but I still can't stop sorting things. Even the pebbles by the well.",
       look: { skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses" },
-      routine: [slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "17:00", "village", [[176, 352], [146, 360], [170, 372]]), slot("17:00", "19:30", "village", [380, 612])],
+      routine: [slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "17:00", "village", [[176, 352], [146, 360], [170, 372]]), slot("17:00", "19:30", "village", [322, 566])],
       lines: [
         "Letters used to come in sacks. Now it's all on your little phone.",
         "The well water is sweeter in the afternoon. Don't ask me why.",
         "I've sorted the pebbles by colour. Then by size. Then by colour again.",
         "A tidy inbox is a tidy mind. Mine is a shoebox.",
-        "Ducks are very punctual, you know. Six o'clock sharp."
+        "The river's high today. Good for the ducks."
       ],
       react: { inbox: "An email quest! Just like the old days. Stamp it and send it.", water: "Good, drink up. Forty years of walking taught me that.", quests3: "Steady work. That's the postmaster's way." }
     },
@@ -2047,7 +2140,7 @@ body.nb-open{overflow:hidden}
       look: { skin: "#E2B590", hair: "#3B2A1E", hairStyle: "short", top: "#E9C46A", bottom: "#4F6B8A", extra: "cap" },
       routine: [
         slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]),
-        slot("12:30", "13:30", "village", [300, 614]),
+        slot("12:30", "13:30", "village", [346, 566]),
         slot("13:30", "18:00", "village", [[150, 300], [380, 300], [300, 450], [210, 420], [440, 560]])
       ],
       lines: [
@@ -2066,12 +2159,13 @@ body.nb-open{overflow:hidden}
       job: "Gardener",
       intro: "Auntie Lin. I have opinions about soil, and they're all correct. Plant something and I'll tell you what you did wrong. Lovingly.",
       look: { skin: "#E9C2A0", hair: "#7C7570", hairStyle: "bun", top: "#9EBE8C", bottom: "#8A6A52", extra: "sunhat" },
-      routine: [slot("6:30", "9:30", "farm", [[45, 250], [475, 400], [250, 560]]), slot("11:30", "14:00", "village", [326, 600]), slot("16:00", "19:00", "farm", [[45, 250], [475, 400], [250, 560]])],
+      routine: [slot("6:30", "9:30", "farm", [[45, 250], [475, 400], [250, 560]]), slot("11:30", "14:00", "base", [360, 556]), slot("16:00", "19:00", "farm", [[45, 250], [475, 400], [250, 560]])],
       lines: [
         "Water in the morning, not at night. The roots know.",
         "Tulips are for beginners. That's a compliment.",
         "Strawberries take a whole day. Patience is a fertiliser.",
         "Your soil is lovely. Mine is better, but yours is lovely.",
+        "I came to feed your ducks. They're practically mine now.",
         "Talk to your plants. They're good listeners."
       ],
       gift: "tulip_seed",
@@ -2085,7 +2179,7 @@ body.nb-open{overflow:hidden}
       intro: "I'm Pip! I'm Evan's best friend and I'm the FASTEST. Watch!",
       kid: true,
       look: { skin: "#D6A27C", hair: "#1F1A17", hairStyle: "spiky", top: "#F28C6A", bottom: "#4C7BB0", extra: "helmet" },
-      routine: [slot("15:00", "18:30", "village", [[230, 330], [300, 330], [260, 380], [360, 560], [400, 600], [200, 400]])],
+      routine: [slot("15:00", "18:30", "base", [[230, 350], [300, 380], [200, 420], [360, 580], [160, 560], [300, 600]])],
       lines: ["Race you to the pond!", "Evan is SO fast. Almost as fast as me.", "Did you know foxes can't ride bikes? I asked Maple.", "I found a snail! His name is Gary."],
       react: {}
     },
@@ -2096,7 +2190,7 @@ body.nb-open{overflow:hidden}
       job: "Town hall clerk",
       intro: "Theo, town clerk. I keep the village records. And, if you have a moment, I have a stamp collection you would not believe.",
       look: { skin: "#F0D0B4", hair: "#6B4A2E", hairStyle: "short", top: "#C3CDEE", bottom: "#3A3A48", extra: "tie" },
-      routine: [slot("9:00", "12:00", "hall", [[200, 320], [330, 320]]), slot("12:00", "13:00", "village", [354, 606]), slot("13:00", "17:00", "hall", [[200, 320], [330, 320]])],
+      routine: [slot("9:00", "12:00", "hall", [[200, 320], [330, 320]]), slot("12:00", "13:00", "village", [330, 572]), slot("13:00", "17:00", "hall", [[200, 320], [330, 320]])],
       lines: [
         "Records say you've been busy. I'm very proud. Officially.",
         "This stamp is from 1962. Look at the little bird!",
@@ -2105,6 +2199,45 @@ body.nb-open{overflow:hidden}
         "I've started a register of Maple's naps. It's long."
       ],
       react: { quests3: "I've stamped three completed quests in the register. Gold stamp!", planning: "A planning quest! My favourite kind of paperwork." }
+    },
+    {
+      id: "darren",
+      pitch: 0.7,
+      name: "Darren",
+      job: "Keeps the home running",
+      intro: "Hey you. I'm on garden duty, roof duty and meeting duty today. Shout if you need anything.",
+      look: { skin: "#E6BC98", hair: "#1A1716", hairStyle: "short", top: "#9A9A9A", bottom: "#4F6B8A", tall: true },
+      // Weekdays: water the garden, work at the home office desk, fix something at lunch, tend the farm after work.
+      // Weekends: mostly outdoors.
+      routine: [
+        slot("7:00", "8:30", "base", [190, 452], { days: "wd", act: "water", dir: -1 }),
+        slot("8:30", "12:30", "home", [342, 336], { days: "wd", act: "type", dir: -1 }),
+        slot("12:30", "13:30", "base", [340, 300], { days: "wd", act: "repair", dir: -1 }),
+        slot("13:30", "17:30", "home", [342, 336], { days: "wd", act: "type", dir: -1 }),
+        slot("17:30", "19:00", "farm", [[90, 250], [430, 400], [250, 520]], { days: "wd", act: "farm" }),
+        slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600], [400, 330]], { days: "wd" }),
+        slot("7:30", "10:30", "farm", [[90, 250], [430, 400], [250, 520]], { days: "we", act: "farm" }),
+        slot("10:30", "12:00", "base", [190, 452], { days: "we", act: "water", dir: -1 }),
+        slot("12:00", "14:30", "base", [340, 300], { days: "we", act: "repair", dir: -1 }),
+        slot("14:30", "17:00", "base", [[230, 360], [330, 590], [160, 540], [400, 330]], { days: "we" }),
+        slot("17:00", "19:00", "farm", [[90, 250], [430, 400], [250, 520]], { days: "we", act: "farm" }),
+        slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600]], { days: "we" })
+      ],
+      lines: [
+        "Coffee's fresh if you want some.",
+        "Evan watered my shoes again. Very thorough.",
+        "Go get 'em. I'll hold the fort.",
+        "The shed radio only gets one station. It's a good station.",
+        "Dinner's sorted, don't worry about it.",
+        "You've got this. One thing at a time."
+      ],
+      actLines: {
+        type: ["*typing* Back-to-back calls. Wave if it's urgent.", "On mute. Hi! *waves*", "Two more emails and I'm free."],
+        water: ["Morning! The tomatoes say hi.", "Watering before it gets hot. Lin's orders."],
+        repair: ["Gutter's nearly fixed. Nearly.", "Hold the ladder? Kidding. Mostly.", "If it squeaks, I fix it."],
+        farm: ["Weeding. It's weirdly relaxing.", "These carrots are going to be enormous."]
+      },
+      react: { harvest: "Nice haul! I'll cook with that.", quests3: "Three done already? Look at you go.", lunch: "Lunch? I'll make toast." }
     }
   ];
   var AGENTS = {
@@ -2899,13 +3032,20 @@ Quests finished today: ${S3.doneIds.length}`;
         return `<path d="M${-7 * k} ${-35 * k} l${14 * k} ${16 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><rect x="${5 * k}" y="${-22 * k}" width="${8 * k}" height="${7 * k}" rx="1.5" ${S("#C9A27E")}/>`;
       case "bell":
         return `<path d="M${11 * k} ${-30 * k} l${4 * k} ${-6 * k}" fill="none"/><path d="M${13 * k} ${-37 * k} c0 -5 ${6 * k} -5 ${6 * k} 0 l1 ${3 * k} h${-8 * k}z" ${S("#F3C969")}/>`;
+      // held in the right hand (hand at about (10k, -21k))
+      case "can":
+        return `<path d="M${13 * k} ${-24 * k} q${5 * k} ${-7 * k} ${10 * k} 0" fill="none"/><rect x="${11 * k}" y="${-24 * k}" width="${12 * k}" height="${9 * k}" rx="2" ${S("#9CC3E0")}/><path d="M${23 * k} ${-20 * k} l${7 * k} ${-6 * k}" fill="none" stroke-width="1.6"/><g class="drips"><circle cx="${31 * k}" cy="${-21 * k}" r="${1 * k}" ${S("var(--water)")}/><circle cx="${33 * k}" cy="${-15 * k}" r="${1 * k}" ${S("var(--water)")}/></g>`;
+      case "hammer":
+        return `<g class="tool"><path d="M${10 * k} ${-20 * k} l${6 * k} ${-14 * k}" fill="none" stroke-width="2.2" style="stroke:#8A5A3A"/><rect x="${12 * k}" y="${-38 * k}" width="${10 * k}" height="${5 * k}" rx="1" transform="rotate(24 ${17 * k} ${-35.5 * k})" ${S("var(--stone)")}/></g>`;
+      case "hoe":
+        return `<g class="tool"><path d="M${16 * k} ${-48 * k} l${-4 * k} ${46 * k}" fill="none" stroke-width="2" style="stroke:#8A5A3A"/><path d="M${12 * k} ${-2 * k} h${-8 * k} l${1 * k} ${3 * k} h${7 * k}z" ${S("var(--stone)")}/></g>`;
       case "lantern":
         return `<path d="M${12 * k} ${-24 * k} v${-4 * k}" fill="none"/><rect x="${9 * k}" y="${-24 * k}" width="${7 * k}" height="${9 * k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5 * k}" cy="${-19.5 * k}" r="${1.8 * k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
     }
     return "";
   }
   function personArt(look, kid) {
-    const k = kid ? 0.62 : 1;
+    const k = kid ? 0.62 : look.tall ? 1.1 : 1;
     const legH = 13 * k, legY = -15 * k, lw = 5 * k;
     const shoe = "var(--sock)";
     return `<g class="flip"><g filter="url(#wob)">
@@ -2916,7 +3056,7 @@ Quests finished today: ${S3.doneIds.length}`;
       <g class="armL"><rect x="${-12 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/></g>
       <g class="armR"><rect x="${7.8 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/></g>
       <path d="M${-8.6 * k} ${-37 * k} q${8.6 * k} ${-2.4 * k} ${17.2 * k} 0 l${1.4 * k} ${23 * k} h${-20 * k}z" ${S(look.top)}/>
-      ${["apron", "tie", "satchel", "bell", "lantern"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" ? hair(look.hairStyle, look.hair, k) : ""}
       <circle cx="0" cy="${-46 * k}" r="${10.6 * k}" ${S(look.skin)}/>
       ${look.hairStyle === "long" || look.hairStyle === "bob" ? cap(look.hair, -46 * k, 10.6 * k) : hair(look.hairStyle, look.hair, k)}
@@ -2943,19 +3083,23 @@ Quests finished today: ${S3.doneIds.length}`;
   function initNpcs(a) {
     api2 = a;
   }
+  var weekend = () => [0, 6].includes(new Date(now() + 8 * H).getUTCDay());
   var slotNow = (def) => {
-    const t = sgHM();
-    return def.routine.find((s) => t >= s.from && t < s.to) || null;
+    const t = sgHM(), we = weekend();
+    return def.routine.find((s) => t >= s.from && t < s.to && (!s.days || s.days === "we" === we)) || null;
   };
+  var PROPS = { water: "can", repair: "hammer", farm: "hoe" };
+  var outdoors = (s) => s === "village" || s === "base";
   var isHere = (id) => {
     const d = NPCS.find((n) => n.id === id), s = d && slotNow(d);
     return !!(s && s.scene === api2.scene());
   };
-  function makeNode(id, look, kid, letter) {
+  function makeNode(id, look, kid, letter, act2) {
     const g = document.createElementNS(NS, "g");
-    g.setAttribute("class", "ch npc");
+    g.setAttribute("class", "ch npc" + (act2 ? " act-" + act2 : ""));
     g.dataset.npc = id;
     g.setAttribute("role", "button");
+    if (act2 && PROPS[act2]) look = Object.assign({}, look, { extra: PROPS[act2] });
     g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "");
     $("actors").appendChild(g);
     return g;
@@ -2993,12 +3137,12 @@ Quests finished today: ${S3.doneIds.length}`;
     if (!e || e.key !== key) {
       if (e) drop(def.id);
       const p = slot2.at || jitter(pick(slot2.wander));
-      e = ents[def.id] = { def, key, kind: "npc", x: p[0], y: p[1], tx: p[0], ty: p[1], dir: Math.random() < 0.5 ? -1 : 1, moving: false, wait: rnd(1, 4), node: makeNode(def.id, def.look, def.kid) };
+      e = ents[def.id] = { def, key, act: slot2.act, kind: "npc", x: p[0], y: p[1], tx: p[0], ty: p[1], dir: slot2.dir || (Math.random() < 0.5 ? -1 : 1), moving: false, wait: rnd(1, 4), node: makeNode(def.id, def.look, def.kid, false, slot2.act) };
     }
     const near = Math.hypot(e.x - api2.mel.x, e.y - api2.mel.y) < 110;
     if (near && !sayer && Date.now() - (e.helloAt || 0) > 4 * 6e4 && Math.random() < dt * 0.08) {
       e.helloAt = Date.now();
-      e.dir = api2.mel.x < e.x ? -1 : 1;
+      if (!e.act) e.dir = api2.mel.x < e.x ? -1 : 1;
       say(e, pick(hellos()), 2600);
       api2.sfx && api2.sfx("babble", def.pitch || 1);
     }
@@ -3007,10 +3151,10 @@ Quests finished today: ${S3.doneIds.length}`;
       e.wait -= dt;
       if (e.wait <= 0 && slot2.wander) {
         let p = jitter(pick(slot2.wander));
-        if (def.id === "pip" && scene2 === "village" && Math.random() < 0.35) {
-          p = [372 + rnd(-10, 10), 618];
+        if (def.id === "pip" && scene2 === "base" && Math.random() < 0.35) {
+          p = [340 + rnd(-10, 10), 572];
           api2.evan.tx = 360 + rnd(-14, 14);
-          api2.evan.ty = 622;
+          api2.evan.ty = 578;
           api2.evan.run = true;
           if (Math.random() < 0.6) {
             say(e, "Race you, Evan!");
@@ -3038,7 +3182,7 @@ Quests finished today: ${S3.doneIds.length}`;
       const item = api2.unreadMail()[0];
       if (!item) return;
       const ag = AGENTS[item.from] || AGENTS.postie;
-      const start = scene2 === "village" ? mel2.x < 260 ? [540, 330] : [-20, 330] : [260, 640];
+      const start = outdoors(scene2) ? mel2.x < 260 ? [540, 330] : [-20, 330] : [260, 640];
       const id = "agent-" + item.id;
       courier = ents[id] = { id, kind: "agent", item, ag, scene: scene2, state: "coming", x: start[0], y: start[1], tx: mel2.x, ty: mel2.y, dir: 1, moving: true, wait: 0, node: makeNode(id, ag.look, false, true) };
     }
@@ -3071,8 +3215,8 @@ Quests finished today: ${S3.doneIds.length}`;
     courier.node.querySelector(".letter")?.remove();
     say(courier, pick(["Off I go!", "Have a lovely day!", "Bye for now!"]), 2200);
     const scene2 = api2.scene();
-    courier.tx = scene2 === "village" ? courier.x < 260 ? -30 : 550 : 260;
-    courier.ty = scene2 === "village" ? 330 : 650;
+    courier.tx = outdoors(scene2) ? courier.x < 260 ? -30 : 550 : 260;
+    courier.ty = outdoors(scene2) ? 330 : 650;
   }
   function say(e, text, ms = 3800) {
     const el = $("npcSay");
@@ -3096,7 +3240,7 @@ Quests finished today: ${S3.doneIds.length}`;
     const def = e.def, F2 = api2.F(), S3 = api2.S();
     F2.met = F2.met || {};
     S3.npcSaid = S3.npcSaid || {};
-    e.dir = api2.mel.x < e.x ? -1 : 1;
+    if (!e.act) e.dir = api2.mel.x < e.x ? -1 : 1;
     api2.chatted && api2.chatted(def.name);
     if (!F2.met[id]) {
       F2.met[id] = true;
@@ -3117,6 +3261,10 @@ Quests finished today: ${S3.doneIds.length}`;
       S3.npcSaid[id + ":" + cond] = true;
       say(e, def.react[cond], 4500);
       api2.save();
+      return;
+    }
+    if (e.act && def.actLines && def.actLines[e.act] && Math.random() < 0.6) {
+      say(e, pick(def.actLines[e.act]));
       return;
     }
     say(e, pick(def.lines));
@@ -3220,7 +3368,7 @@ Quests finished today: ${S3.doneIds.length}`;
   var pending = {};
   var speechT = null;
   var speechLock = 0;
-  var scene = "village";
+  var scene = "base";
   var atSpot = null;
   var boardOpen = false;
   var shelfOpen = false;
@@ -3308,7 +3456,7 @@ Quests finished today: ${S3.doneIds.length}`;
       }
       const grew = ["chord", "chico"].find((k) => ST[k] && before[k] && ST[k].users > before[k].users);
       if (grew) speak(`${grew === "chord" ? "Chord" : "Chico"} grew to ${ST[grew].users.toLocaleString()} users! New flowers 🌼`, 5e3);
-      render(scene === "village");
+      render(outside());
     }, () => {
     });
     let firstPlan = true;
@@ -3645,7 +3793,7 @@ Quests finished today: ${S3.doneIds.length}`;
       goQuest(t);
     },
     pond() {
-      go("village", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => arriveVillageSpot("pond"));
+      go("base", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => arriveVillageSpot("pond"));
     },
     gotWipe() {
       S2.wipe = true;
@@ -3796,7 +3944,7 @@ Quests finished today: ${S3.doneIds.length}`;
         act("cheer");
         speak(`Village upgrade! ${u.name[0].toUpperCase() + u.name.slice(1)}.`, 6e3);
         flash(`Village upgrade: ${u.name}`);
-        if (scene === "village") drawScene();
+        if (outside()) drawScene();
       }, 2400);
     }
   }
@@ -4037,7 +4185,7 @@ Then tell chat "wind down" whenever you're ready.`
     if ((S2.waterMl || 0) >= WATER_GOAL) wins.push("Two litres of water");
     if (S2.harvested) wins.push(`${S2.harvested} harvest${S2.harvested > 1 ? "s" : ""}`);
     if (!wins.length) wins.push("Showing up today");
-    go("village", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => {
+    go("base", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => {
       atSpot = "pond";
       S2.pond = { wins, at: Date.now() };
       save(true);
@@ -4236,7 +4384,7 @@ Then tell chat "wind down" whenever you're ready.`
       const fresh = S2.timer && S2.timer.kind === "break" && S2.timer.total - (S2.timer.endAt - Date.now()) < 6e4;
       h += `<h1><span class="lbl">side quest · rest</span>Ten-minute break</h1>${timerHTML("away from the desk")}
       <ul class="bujo"><li>Treadmill counts. Scrolling at your desk doesn't.</li><li>Check the garden, or sit by the pond.</li><li class="pep">Rest is part of the plan.</li></ul>
-      <div class="actions"><button class="btn yes" data-a="back">I'm back</button>${!(scene === "village" && atSpot === "pond") ? `<button class="btn alt" data-a="pond">Sit by the pond</button>` : ""}${fresh ? `<button class="btn alt" data-a="flow">I'm in flow</button>` : ""}</div>`;
+      <div class="actions"><button class="btn yes" data-a="back">I'm back</button>${!(scene === "base" && atSpot === "pond") ? `<button class="btn alt" data-a="pond">Sit by the pond</button>` : ""}${fresh ? `<button class="btn alt" data-a="flow">I'm in flow</button>` : ""}</div>`;
     } else if (ph === "decompress") {
       const clench = S2.timer && S2.timer.kind === "clench";
       h += `<h1><span class="lbl">right now</span>Decompress</h1>${clench ? timerHTML("clench and hold") : ""}
@@ -4266,7 +4414,7 @@ Then tell chat "wind down" whenever you're ready.`
       const when = S2.timer ? `<span class="when" data-tleft>${fmt(Math.max(0, S2.timer.endAt - Date.now()))}</span>` : "";
       j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(route.length ? "Walking… " + title : title)}</b>${when}<span class="more">open</span></button>`;
     }
-    j.classList.toggle("intop", scene !== "village");
+    j.classList.toggle("intop", !outside());
     j.querySelectorAll("[data-qn]").forEach((el) => el.onclick = (ev) => {
       ev.stopPropagation();
       qnOpen = el.dataset.qn === "open";
@@ -4401,12 +4549,12 @@ Then tell chat "wind down" whenever you're ready.`
       if (past.length) h += `<p class="eyebrow" style="margin:22px 0 6px">Read before</p><ul class="qlist">${past.map((d, i) => `<li><span><b>${esc(d.title)}</b><small>${esc(d.author || "")}</small></span><button class="next" data-dig="past" data-i="${i}">reread</button></li>`).join("")}</ul>`;
       h += `</div><div class="actions"><button class="btn alt small" data-close="1">Close shelf</button></div>`;
     } else if (boardOpen) {
-      const list = scene === "village" ? allTasks() : questsIn(scene), cur = phase() === "task" ? remaining()[0].id : null;
-      h = `<span class="tape gingham" aria-hidden="true"></span><h2>${scene === "village" ? "Town quest board" : esc(ROOMS[scene].name) + " quests"}</h2>
+      const list = outside() ? allTasks() : questsIn(scene), cur = phase() === "task" ? remaining()[0].id : null;
+      h = `<span class="tape gingham" aria-hidden="true"></span><h2>${outside() ? "Town quest board" : esc(ROOMS[scene].name) + " quests"}</h2>
       ${list.length ? `<ul class="qlist">${list.map((t) => {
         const dn = S2.doneIds.includes(t.id), sp = spotObj(placeOf(t), spotOf(t));
-        return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"${!dn && t.id !== cur && phase() !== "clean" ? ` data-next="${esc(t.id)}" role="button"` : ""}><span><b>${esc(t.title)}</b><small>${scene === "village" ? icon(placeOf(t), 16) + " " + esc(VILLAGE[placeOf(t)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : "<span></span>"}</li>`;
-      }).join("")}</ul>` : `<p class="sub">No quests ${scene === "village" ? "today yet" : "in here today"}.</p>`}
+        return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"${!dn && t.id !== cur && phase() !== "clean" ? ` data-next="${esc(t.id)}" role="button"` : ""}><span><b>${esc(t.title)}</b><small>${outside() ? icon(placeOf(t), 16) + " " + esc(VILLAGE[placeOf(t)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : "<span></span>"}</li>`;
+      }).join("")}</ul>` : `<p class="sub">No quests ${outside() ? "today yet" : "in here today"}.</p>`}
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
     }
     c.innerHTML = h;
@@ -4503,11 +4651,11 @@ Then tell chat "wind down" whenever you're ready.`
     }
     let pos = null;
     if (target) {
-      if (scene === "village") pos = VILLAGE[target.pl].mark;
+      if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][outdoorOf(target.pl)]].mark;
       else if (scene === target.pl) {
         const s = spotObj(scene, target.sp);
         pos = [s.x, s.y - 70];
-      } else if (scene !== "village") pos = [260, 582];
+      } else pos = [260, 582];
     }
     if (!pos) {
       m.style.display = "none";
@@ -4517,19 +4665,19 @@ Then tell chat "wind down" whenever you're ready.`
     m.setAttribute("transform", `translate(${pos[0]} ${pos[1]})`);
   }
   function drawScene() {
-    const day = dayKey(), wet = scene === "village" && rainyOn(day), fest = festivalOn(day);
+    const day = dayKey(), wet = outside() && rainyOn(day), fest = festivalOn(day);
     $("rain").hidden = !wet;
     if (scene === "village" && fest && S2.festSaid !== day) {
       S2.festSaid = day;
-      setTimeout(() => speak(`${fest.name} decorations are up in the village!`, 5e3), 1500);
+      setTimeout(() => speak(`${fest.name} decorations are up in the town square!`, 5e3), 1500);
     } else if (wet && S2.rainSaid !== day) {
       S2.rainSaid = day;
       setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500);
     }
-    $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "farm" ? farmArt() : roomArt(scene);
-    const names = { village: "The village", farm: "The garden" };
-    $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${scene !== "village" ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-    $("maphint").textContent = scene === "village" ? "Tap anywhere to walk. Tap a building to go inside." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+    $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "farm" ? farmArt() : roomArt(scene);
+    const names = { village: "Town square", base: "Home base", farm: "The garden" };
+    $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
+    $("maphint").textContent = scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap anywhere to walk. The bridge at the top goes to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
   }
   function render(redraw) {
     if (S2.day !== dayKey()) S2 = freshToday();
@@ -4591,8 +4739,11 @@ Then tell chat "wind down" whenever you're ready.`
   var route = [];
   var keys = /* @__PURE__ */ new Set();
   var svg = $("world");
-  var evanHere = () => scene === "village" || scene === "home";
-  var bounds = () => scene === "village" ? [14, 150, W - 14, HH - 14] : [34, 168, W - 34, 612];
+  var evanHere = () => scene === "base" || scene === "home";
+  function outside() {
+    return OUTDOOR.includes(scene);
+  }
+  var bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : [34, 168, W - 34, 612];
   function setScene(id, at) {
     const w = $("world");
     w.classList.add("fading");
@@ -4611,9 +4762,9 @@ Then tell chat "wind down" whenever you're ready.`
       mel.y = mel.ty = p[1];
       maple.x = maple.tx = p[0] - 22;
       maple.y = maple.ty = p[1] + 2;
-      if (id === "village") {
-        evan.x = evan.tx = 250;
-        evan.y = evan.ty = 380;
+      if (id === "base") {
+        evan.x = evan.tx = 300;
+        evan.y = evan.ty = 360;
       } else if (id === "home") {
         evan.x = evan.tx = 300;
         evan.y = evan.ty = 520;
@@ -4627,12 +4778,17 @@ Then tell chat "wind down" whenever you're ready.`
   }
   function go(target, x, y, fn) {
     const legs = [];
-    let cur = scene;
+    const cur = scene;
     if (cur !== target) {
-      if (cur !== "village") legs.push({ scene: cur, x: 260, y: 606, fn: () => setScene("village", VILLAGE[curDoorKey(cur)].door) });
-      if (target !== "village") {
+      const curOut = outdoorOf(cur), tOut = outdoorOf(target);
+      if (!OUTDOOR.includes(cur)) legs.push({ scene: cur, x: 260, y: 606, fn: () => setScene(curOut, VILLAGE[cur].door) });
+      if (curOut !== tOut) {
+        const b = VILLAGE[BRIDGES[curOut][tOut]];
+        legs.push({ scene: curOut, x: b.door[0], y: b.door[1], fn: () => setScene(tOut, ARRIVE[tOut]) });
+      }
+      if (!OUTDOOR.includes(target)) {
         const d = VILLAGE[target].door;
-        legs.push({ scene: "village", x: d[0], y: d[1], fn: () => setScene(target, target === "farm" ? [260, 590] : [260, 596]) });
+        legs.push({ scene: tOut, x: d[0], y: d[1], fn: () => setScene(target, target === "farm" ? [260, 590] : [260, 596]) });
       }
     }
     legs.push({ scene: target, x, y, fn });
@@ -4643,9 +4799,6 @@ Then tell chat "wind down" whenever you're ready.`
     openView = null;
     nextLeg();
     render();
-  }
-  function curDoorKey(s) {
-    return s;
   }
   function nextLeg() {
     const l = route[0];
@@ -4669,7 +4822,7 @@ Then tell chat "wind down" whenever you're ready.`
       render();
       return;
     }
-    if (id === "board" && scene === "village") {
+    if (id === "board" && outside()) {
       openView = "quests";
       speak("All of today's quests!", 3500);
       render();
@@ -4677,7 +4830,7 @@ Then tell chat "wind down" whenever you're ready.`
     }
     if (id === "board") {
       boardOpen = true;
-      speak(scene === "village" ? "All of today's quests!" : "Here's what needs doing in here.", 3500);
+      speak(outside() ? "All of today's quests!" : "Here's what needs doing in here.", 3500);
       render();
       return;
     }
@@ -4701,6 +4854,27 @@ Then tell chat "wind down" whenever you're ready.`
   }
   function arriveVillageSpot(id) {
     atSpot = id;
+    const v = VILLAGE[id];
+    if (v.bridge) {
+      atSpot = null;
+      setScene(v.bridge, ARRIVE[v.bridge]);
+      return;
+    }
+    if (id === "swing") {
+      evan.tx = 112 + rnd(-4, 4);
+      evan.ty = 302;
+      evan.run = true;
+      evan.wait = 6;
+      setTimeout(() => evanSays(pick(["wheee!", "push me!", "higher!"])), 900);
+      speak(v.line, 3500);
+      render();
+      return;
+    }
+    if (id === "shed" || id === "bench") {
+      speak(v.line, 3800);
+      render();
+      return;
+    }
     if (id === "well") {
       A.water();
       return;
@@ -4727,7 +4901,7 @@ Then tell chat "wind down" whenever you're ready.`
     const ug = ev.target.closest("[data-ugarden]");
     if (ug) {
       const k = ug.dataset.ugarden, st = ST[k] || {};
-      speak(`${(st.users || 0).toLocaleString()} ${k === "chord" ? "creatives use Chord" : "families use Chico"}! One flower for every ${st.per > 0 ? st.per : 10}.`, 4500);
+      speak(`${(st.users || 0).toLocaleString()} ${st.label || (k === "chord" ? "studios" : "families")} use ${k === "chord" ? "Chord" : "Chico"}! One flower for every ${st.per > 0 ? st.per : 10}.`, 4500);
       return;
     }
     const ent = ev.target.closest("[data-ent]");
@@ -4751,9 +4925,9 @@ Then tell chat "wind down" whenever you're ready.`
       return;
     }
     const pl = ev.target.closest("[data-place]");
-    if (pl && scene === "village") {
+    if (pl && outside()) {
       const id = pl.dataset.place, v = VILLAGE[id];
-      if (v.spot) go("village", v.door[0], v.door[1], () => arriveVillageSpot(id));
+      if (v.spot) go(scene, v.door[0], v.door[1], () => arriveVillageSpot(id));
       else go(id, 260, id === "farm" ? 560 : 560, null);
       return;
     }
@@ -4764,7 +4938,7 @@ Then tell chat "wind down" whenever you're ready.`
       return;
     }
     if (ev.target.closest("[data-exit]")) {
-      go("village", VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
+      go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
       return;
     }
     const pt = ev.target.closest("[data-plot]");
@@ -4820,22 +4994,22 @@ Then tell chat "wind down" whenever you're ready.`
     return false;
   }
   function nearSpot() {
-    if (scene === "village") return Object.keys(VILLAGE).find((k) => Math.hypot(VILLAGE[k].door[0] - mel.x, VILLAGE[k].door[1] - mel.y) < 22) || null;
+    if (outside()) return Object.keys(VILLAGE).find((k) => VILLAGE[k].scene === scene && Math.hypot(VILLAGE[k].door[0] - mel.x, VILLAGE[k].door[1] - mel.y) < 22) || null;
     if (scene === "farm") return null;
     const list = [...stationsOf(scene), scene !== "market" ? { id: "board", tx: 260, ty: 200 } : null].filter(Boolean);
     const s = list.find((s2) => Math.hypot(s2.tx - mel.x, s2.ty - mel.y) < 26);
     return s ? s.id : null;
   }
-  var EVAN_SPOTS = { village: [[260, 360], [210, 330], [320, 330], [170, 380], [360, 380], [300, 600], [380, 630], [190, 470], [120, 540], [300, 470]], home: [[150, 500], [330, 520], [260, 340], [200, 600], [360, 330]] };
+  var EVAN_SPOTS = { base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [380, 580], [240, 560], [420, 340]], home: [[150, 500], [330, 520], [260, 340], [200, 600], [360, 330]] };
   function tickEvan(dt) {
     if (!evanHere()) return;
     if (stepTo2(evan, evan.run ? 130 : 70, dt)) {
       evan.wait -= dt;
       if (evan.wait <= 0) {
         const r = Math.random(), b = bounds();
-        if (scene === "village" && phase() === "break" && r < 0.5) {
-          evan.tx = 360 + rnd(-20, 30);
-          evan.ty = 620 + rnd(-6, 8);
+        if (scene === "base" && phase() === "break" && r < 0.5) {
+          evan.tx = 350 + rnd(-20, 30);
+          evan.ty = 560 + rnd(-6, 8);
           evan.run = false;
         } else if (r < 0.3) {
           evan.tx = clamp(mel.x + rnd(-24, 24), b[0], b[2]);
@@ -4963,13 +5137,13 @@ Then tell chat "wind down" whenever you're ready.`
       } else if (!route.length) {
         const n = nearSpot();
         if (n) {
-          if (scene === "village") {
+          if (outside()) {
             const v = VILLAGE[n];
             if (v.spot) arriveVillageSpot(n);
             else go(n, 260, 560, null);
           } else arriveSpot(n);
-        } else if (scene !== "village" && scene !== "farm" && mel.y > 592) go("village", VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
-        else if (scene === "farm" && mel.y > 592 && Math.abs(mel.x - 260) < 50) go("village", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
+        } else if (!outside() && scene !== "farm" && mel.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
+        else if (scene === "farm" && mel.y > 592 && Math.abs(mel.x - 260) < 50) go("base", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
       }
     }
     mel.wasMoving = mel.moving;

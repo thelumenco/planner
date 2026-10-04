@@ -14,7 +14,7 @@ export const UPGRADES = [
   {at: 60,  id: "lights",   name: "string lights around the square"},
   {at: 85,  id: "fountain", name: "a little fountain"},
   {at: 120, id: "star",     name: "a gold star on the town hall flag"},
-  {at: 160, id: "blossom",  name: "blossom trees by the pond"}
+  {at: 160, id: "blossom",  name: "blossom trees by the pond at home"}
 ];
 export const unlocked = n => UPGRADES.filter(u => n >= u.at);
 export const nextUpgrade = n => UPGRADES.find(u => n < u.at) || null;
@@ -30,9 +30,14 @@ const bunting = (x1, y1, x2, y2, cols) => {
 };
 const lamp = (x, y) => sk(`<rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2" style="fill:#F6C26B"/>`, `<path d="M${x} ${y} v-13"/><rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2"/><path d="M${x - 5} ${y} h10"/>`);
 
-export function upgradesArt(n){
+// Every upgrade lives in the town square except the blossom trees, which grow by the pond at home.
+export function upgradesArt(n, where){
   const has = id => unlocked(n).some(u => u.id === id);
   let h = "";
+  if (where === "base") {
+    if (has("blossom")) [[346, 474], [490, 560]].forEach(([x, y]) => { h += `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.4"><rect x="${x - 3}" y="${y - 6}" width="6" height="14" style="fill:var(--wood)"/><circle cx="${x}" cy="${y - 18}" r="14" style="fill:#F4C7CF"/><circle cx="${x - 9}" cy="${y - 10}" r="9" style="fill:#EFA3A6"/><circle cx="${x + 9}" cy="${y - 11}" r="9" style="fill:#F4C7CF"/></g>`; });
+    return h;
+  }
   if (has("bunting")) h += bunting(330, 300, 394, 300, ["var(--rose)", "var(--butter)", "var(--sage)", "var(--peri)"]);
   if (has("lanterns")) [[232, 236], [288, 236], [226, 430], [294, 430], [196, 362], [324, 362]].forEach(([x, y]) => { h += lamp(x, y); });
   if (has("flag")) h += sk(`<path d="M85 140 l18 6 l-18 6z" style="fill:var(--peach)"/>`, `<path d="M85 160 v-22 M85 140 l18 6 l-18 6"/>`);
@@ -44,7 +49,6 @@ export function upgradesArt(n){
   if (has("fountain")) h += sk(`<ellipse cx="318" cy="400" rx="20" ry="8" style="fill:var(--stone)"/><ellipse cx="318" cy="398" rx="14" ry="5" style="fill:var(--water)"/><rect x="315" y="382" width="6" height="14" style="fill:var(--stone)"/>`,
     `<ellipse cx="318" cy="400" rx="20" ry="8"/><path d="M298 400 v4 a20 8 0 0 0 40 0 v-4"/><rect x="315" y="382" width="6" height="14"/><path class="smoke" d="M318 380 q-6 -6 -10 2 M318 380 q6 -6 10 2" opacity=".7"/>`);
   if (has("star")) h += iconAt("sparkle", 282, 6, 16);
-  if (has("blossom")) [[362, 556], [500, 610]].forEach(([x, y]) => { h += `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.4"><rect x="${x - 3}" y="${y - 6}" width="6" height="14" style="fill:var(--wood)"/><circle cx="${x}" cy="${y - 18}" r="14" style="fill:#F4C7CF"/><circle cx="${x - 9}" cy="${y - 10}" r="9" style="fill:#EFA3A6"/><circle cx="${x + 9}" cy="${y - 11}" r="9" style="fill:#F4C7CF"/></g>`; });
   return h;
 }
 
@@ -74,7 +78,7 @@ export function festivalArt(f){
   switch (f.id) {
     case "cny": return lanternRow(196, 324, 262, ["#D9433A", "#E8574C"]) + lanternRow(30, 140, 176, ["#D9433A"]) + lanternRow(380, 490, 176, ["#D9433A"]);
     case "midautumn": return lanternRow(196, 324, 262, ["#F3C969", "#EFA3A6", "#9CC3E0", "#B9D2A6"]) + `<g filter="url(#wob)"><circle cx="470" cy="40" r="16" fill="#FFF3C4" style="stroke:var(--line)" stroke-width="1.2"/></g>`;
-    case "deepavali": { let d = ""; [[236, 236], [284, 236], [222, 420], [298, 420], [200, 352], [320, 352], [250, 610], [270, 610]].forEach(([x, y]) => { d += `<path d="M${x - 6} ${y} q6 6 12 0z" style="fill:#C9853E"/><path class="twinkle" d="M${x} ${y - 1} q-3 -5 0 -9 q3 4 0 9z" style="fill:#F6A23A"/>`; });
+    case "deepavali": { let d = ""; [[236, 236], [284, 236], [222, 420], [298, 420], [200, 352], [320, 352], [250, 560], [270, 560]].forEach(([x, y]) => { d += `<path d="M${x - 6} ${y} q6 6 12 0z" style="fill:#C9853E"/><path class="twinkle" d="M${x} ${y - 1} q-3 -5 0 -9 q3 4 0 9z" style="fill:#F6A23A"/>`; });
       const rang = `<g filter="url(#wob)" opacity=".9">${[26, 18, 10].map((r, i) => `<circle cx="260" cy="356" r="${r}" fill="none" style="stroke:${["#EFA3A6", "#F3C969", "#9AA9DD"][i]}" stroke-width="5"/>`).join("")}<circle cx="260" cy="356" r="4" fill="#EFA3A6"/></g>`;
       return rang + `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width=".9">${d}</g>`; }
     case "christmas": { let b = ""; for (let i = 0; i < 9; i++) { const t = i/8, x = 192 + 136*t, y = 296 - Math.sin(Math.PI*t)*22; b += `<circle class="twinkle" cx="${x.toFixed(1)}" cy="${(y + 3).toFixed(1)}" r="2.4" fill="${["#D9433A", "#F3C969", "#7FA36E"][i % 3]}"/>`; }
@@ -89,7 +93,7 @@ export function festivalArt(f){
 export function pondLanterns(n){
   let h = "";
   for (let i = 0; i < Math.min(n, 9); i++) {
-    const x = 392 + (i % 5)*18 + (i > 4 ? 9 : 0), y = 584 + (i > 4 ? 14 : 0) + (i % 2)*3;
+    const x = 370 + (i % 5)*18 + (i > 4 ? 9 : 0), y = 498 + (i > 4 ? 14 : 0) + (i % 2)*3;   // the pond at home
     h += `<g class="floaty" style="animation-delay:${(i*.37).toFixed(2)}s">${iconAt("lantern", x, y, 16)}</g>`;
   }
   return h;

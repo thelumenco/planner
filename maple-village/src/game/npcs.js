@@ -2,7 +2,7 @@
 // and runs agent messengers who carry unread mail to Mel. Core owns the frame loop and calls tickNpcs / tapNpc.
 import { NPCS, AGENTS } from "../data/npcs.js";
 import { personArt, letterArt } from "../art/people.js";
-import { sgHM, pick, rnd, clamp, $, plain } from "../util.js";
+import { sgHM, now, H, pick, rnd, clamp, $, plain } from "../util.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const ents = {};            // id -> entity (villagers and the active messenger)
@@ -12,12 +12,17 @@ let sayer = null, sayT = null;
 const greeted = new Set();  // messengers say hello once, then just tag along quietly
 
 export function initNpcs(a){ api = a; }
-const slotNow = def => { const t = sgHM(); return def.routine.find(s => t >= s.from && t < s.to) || null; };
+const weekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
+const slotNow = def => { const t = sgHM(), we = weekend();
+  return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we)) || null; };
+const PROPS = {water: "can", repair: "hammer", farm: "hoe"};
+const outdoors = s => s === "village" || s === "base";
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 
-function makeNode(id, look, kid, letter){
+function makeNode(id, look, kid, letter, act){
   const g = document.createElementNS(NS, "g");
-  g.setAttribute("class", "ch npc"); g.dataset.npc = id; g.setAttribute("role", "button");
+  g.setAttribute("class", "ch npc" + (act ? " act-" + act : "")); g.dataset.npc = id; g.setAttribute("role", "button");
+  if (act && PROPS[act]) look = Object.assign({}, look, {extra: PROPS[act]});
   g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "");
   $("actors").appendChild(g);
   return g;
@@ -41,12 +46,12 @@ function tickVillager(def, dt){
   if (!e || e.key !== key) {
     if (e) drop(def.id);
     const p = slot.at || jitter(pick(slot.wander));
-    e = ents[def.id] = {def, key, kind: "npc", x: p[0], y: p[1], tx: p[0], ty: p[1], dir: Math.random() < .5 ? -1 : 1, moving: false, wait: rnd(1, 4), node: makeNode(def.id, def.look, def.kid)};
+    e = ents[def.id] = {def, key, act: slot.act, kind: "npc", x: p[0], y: p[1], tx: p[0], ty: p[1], dir: slot.dir || (Math.random() < .5 ? -1 : 1), moving: false, wait: rnd(1, 4), node: makeNode(def.id, def.look, def.kid, false, slot.act)};
   }
   // Now and then a neighbour near Mel says hello (each at most every few minutes).
   const near = Math.hypot(e.x - api.mel.x, e.y - api.mel.y) < 110;
   if (near && !sayer && Date.now() - (e.helloAt || 0) > 4*60e3 && Math.random() < dt*.08) {
-    e.helloAt = Date.now(); e.dir = api.mel.x < e.x ? -1 : 1;
+    e.helloAt = Date.now(); if (!e.act) e.dir = api.mel.x < e.x ? -1 : 1;
     say(e, pick(hellos()), 2600); api.sfx && api.sfx("babble", def.pitch || 1);
   }
   const b = api.bounds();
@@ -54,8 +59,8 @@ function tickVillager(def, dt){
     e.wait -= dt;
     if (e.wait <= 0 && slot.wander) {
       let p = jitter(pick(slot.wander));
-      if (def.id === "pip" && scene === "village" && Math.random() < .35) {   // Pip races Evan to the pond
-        p = [372 + rnd(-10, 10), 618]; api.evan.tx = 360 + rnd(-14, 14); api.evan.ty = 622; api.evan.run = true;
+      if (def.id === "pip" && scene === "base" && Math.random() < .35) {   // Pip races Evan to the pond
+        p = [340 + rnd(-10, 10), 572]; api.evan.tx = 360 + rnd(-14, 14); api.evan.ty = 578; api.evan.run = true;
         if (Math.random() < .6) { say(e, "Race you, Evan!"); setTimeout(() => api.evanSays("race!"), 600); }
       }
       e.tx = clamp(p[0], b[0], b[2]); e.ty = clamp(p[1], b[1], b[3]); e.wait = rnd(3, 8);
@@ -72,7 +77,7 @@ function tickCourier(dt){
   if (!courier) {
     const item = api.unreadMail()[0]; if (!item) return;
     const ag = AGENTS[item.from] || AGENTS.postie;
-    const start = scene === "village" ? (mel.x < 260 ? [540, 330] : [-20, 330]) : [260, 640];
+    const start = outdoors(scene) ? (mel.x < 260 ? [540, 330] : [-20, 330]) : [260, 640];
     const id = "agent-" + item.id;
     courier = ents[id] = {id, kind: "agent", item, ag, scene, state: "coming", x: start[0], y: start[1], tx: mel.x, ty: mel.y, dir: 1, moving: true, wait: 0, node: makeNode(id, ag.look, false, true)};
   }
@@ -95,7 +100,7 @@ export function courierDelivered(itemId){
   if (!courier || courier.item.id !== itemId) return;
   courier.state = "leaving"; courier.node.querySelector(".letter")?.remove();
   say(courier, pick(["Off I go!", "Have a lovely day!", "Bye for now!"]), 2200);
-  const scene = api.scene(); courier.tx = scene === "village" ? (courier.x < 260 ? -30 : 550) : 260; courier.ty = scene === "village" ? 330 : 650;
+  const scene = api.scene(); courier.tx = outdoors(scene) ? (courier.x < 260 ? -30 : 550) : 260; courier.ty = outdoors(scene) ? 330 : 650;
 }
 
 /* ---------- talking ---------- */
@@ -111,7 +116,7 @@ export function tapNpc(id){
   if (e.kind === "agent") { api.openMail(e.item); return; }
   const def = e.def, F = api.F(), S = api.S();
   F.met = F.met || {}; S.npcSaid = S.npcSaid || {};
-  e.dir = api.mel.x < e.x ? -1 : 1;
+  if (!e.act) e.dir = api.mel.x < e.x ? -1 : 1;
   api.chatted && api.chatted(def.name);
   if (!F.met[id]) {
     F.met[id] = true; say(e, def.intro, 7000);
@@ -121,6 +126,7 @@ export function tapNpc(id){
   const facts = api.facts();
   const cond = Object.keys(def.react || {}).find(k => facts[k] && !S.npcSaid[id + ":" + k]);
   if (cond) { S.npcSaid[id + ":" + cond] = true; say(e, def.react[cond], 4500); api.save(); return; }
+  if (e.act && def.actLines && def.actLines[e.act] && Math.random() < .6) { say(e, pick(def.actLines[e.act])); return; }
   say(e, pick(def.lines));
 }
 

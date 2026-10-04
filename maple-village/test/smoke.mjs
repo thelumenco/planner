@@ -30,6 +30,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(900);
   await page.screenshot({ path: join(shots, `${vp.name}-1-start.png`), fullPage: vp.name === "phone" ? false : true });
   check(await page.locator("#journal.slim").count() === 1, "the quest note starts folded when the village opens");
+  check(await page.locator("#sceneName").textContent().then(t => /Home base/.test(t)), "the day starts at home base");
   await page.click('#journal [data-qn="open"]');
   check(await page.locator("#journal h1").textContent().then(t => /Five-minute clean/.test(t)), "day opens with the five-minute clean");
   const lay = await page.evaluate(() => ({ hud: document.querySelector(".hudbar").getBoundingClientRect().bottom, map: document.querySelector("#map").getBoundingClientRect().top,
@@ -144,10 +145,16 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#pclose");
 
   // Library digest shelf: first read is free, the second is locked until an hour passes or a quest is done
-  await page.locator('#world [data-place="fresh"]').first().dispatchEvent("click").catch(() => {});
   await page.evaluate(() => document.querySelector("#world [data-exit]") && document.querySelector("#world [data-exit]").dispatchEvent(new MouseEvent("click", {bubbles: true})));
-  await page.waitForFunction(() => /village/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForFunction(() => /Town square|Home base/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   if (await page.locator('#journal [data-qn="min"]').count()) await page.click('#journal [data-qn="min"]');
+  if (/Home base/.test(await page.locator("#sceneName").textContent())) {
+    check(await page.locator('#world [data-place="pond"]').count() === 1 && await page.locator('#world [data-place="shed"]').count() === 1, "home base has the pond and the shed");
+    await page.screenshot({ path: join(shots, `${vp.name}-4-base.png`) });
+    await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
+    await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+    check(await page.locator('#world [data-place="pond"]').count() === 0, "the bridge crosses the river to the town square");
+  }
   await page.locator('#world [data-place="fresh"]').first().dispatchEvent("click");
   await page.waitForFunction(() => /library/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 });
   await page.waitForTimeout(400);
@@ -173,6 +180,24 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(500);
   check(await page.locator("#actors [data-npc]").count() > 0, "villagers are out and about");
   await page.screenshot({ path: join(shots, `${vp.name}-5-village.png`) });
+  await page.close();
+}
+// Darren: Monday lunchtime he's fixing the house at home base; mid-morning he's typing at his desk indoors
+{
+  console.log("\ndarren");
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  page.on("pageerror", e => errors.push(`darren pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&nosample=1&time=12:45&date=2026-10-05");
+  await page.waitForTimeout(1200);
+  check(await page.locator('#actors [data-npc="darren"].act-repair').count() === 1, "Darren is repairing the house at lunchtime");
+  await page.screenshot({ path: join(shots, "darren-base.png") });
+  await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05");
+  await page.waitForTimeout(800);
+  await page.locator('#world [data-place="home"]').dispatchEvent("click");
+  await page.waitForFunction(() => document.querySelector("#sceneName").textContent.trim().startsWith("Home") && !/base/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(600);
+  check(await page.locator('#actors [data-npc="darren"].act-type').count() === 1, "Darren is typing at the home office desk on a weekday morning");
+  await page.screenshot({ path: join(shots, "darren-desk.png") });
   await page.close();
 }
 // Sunsama pull: no chat plan, the page fetches today's tasks itself

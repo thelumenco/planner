@@ -1,10 +1,10 @@
 // Game core: state + persistence, quest flow, actions, UI renderers and the world sim.
 import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur, plain } from "../util.js";
 import { icon, progressBar, progressBarV } from "../art/icons.js";
-import { VILLAGE, WORK, ROOMS, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
+import { VILLAGE, WORK, ROOMS, OUTDOOR, BRIDGES, ARRIVE, outdoorOf, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
 import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco } from "../data/items.js";
 import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn } from "../art/village-extras.js";
-import { villageArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
+import { villageArt, baseArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { pullSunsama, SUNSAMA_ERRORS } from "./sunsama.js";
@@ -43,7 +43,7 @@ function migrate(){
 migrate();
 setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), lanterns:() => (S.pond ? S.pond.wins.length : 0)});
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
-let scene = "village", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
+let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
 // In-game UI: the quest note pinned on the map (open, or slim while walking) and the panel over the map.
 // The note starts folded when the village opens; it only pops open on step changes after the first few seconds.
 let qnOpen = false, qnQuietUntil = Date.now() + 5000, qnKey = "", openView = null, shopClosed = false;
@@ -93,7 +93,7 @@ async function initDb(){
     try { localStorage.setItem("fox.stats", JSON.stringify(ST)); } catch {}
     const grew = ["chord", "chico"].find(k => ST[k] && before[k] && ST[k].users > before[k].users);
     if (grew) speak(`${grew === "chord" ? "Chord" : "Chico"} grew to ${ST[grew].users.toLocaleString()} users! New flowers 🌼`, 5000);
-    render(scene === "village");
+    render(outside());
   }, () => {});
   let firstPlan = true;
   refs.plan.onSnapshot(snap => {
@@ -268,7 +268,7 @@ function goQuest(t){
 }
 const A = {
   walk(t){ goQuest(t); },
-  pond(){ go("village", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => arriveVillageSpot("pond")); },
+  pond(){ go("base", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => arriveVillageSpot("pond")); },
   gotWipe(){ S.wipe = true; startTimer("clean", 5); setSay("Nearest, most annoying spot. You pick!"); save(); },
   cleanDone(){ S.cleanDone = true; S.timer = null; earn(3, "five-minute clean"); gainXp(1); S.last = "clean"; act("cheer"); setSay("First tick of the day! Look at that ✨"); save(); },
   firstStep(t){ S.firstStep[t.id] = true; S.arrived[t.id] = true; startTimer("task", t.minutes || 25, t.id); setSay("Hard part's done. Now the rest, on the clock."); save(); },
@@ -324,7 +324,7 @@ function countQuest(){
   const now = unlocked(F.totalQuests);
   if (now.length > before) {
     const u = now[now.length - 1]; F.upgradeLog.push({id: u.id, day: dayKey()});
-    setTimeout(() => { act("cheer"); speak(`Village upgrade! ${u.name[0].toUpperCase() + u.name.slice(1)}.`, 6000); flash(`Village upgrade: ${u.name}`); if (scene === "village") drawScene(); }, 2400);
+    setTimeout(() => { act("cheer"); speak(`Village upgrade! ${u.name[0].toUpperCase() + u.name.slice(1)}.`, 6000); flash(`Village upgrade: ${u.name}`); if (outside()) drawScene(); }, 2400);
   }
 }
 // Progress buttons on the notebook page.
@@ -492,7 +492,7 @@ function windDown(){
   if ((S.waterMl || 0) >= WATER_GOAL) wins.push("Two litres of water");
   if (S.harvested) wins.push(`${S.harvested} harvest${S.harvested > 1 ? "s" : ""}`);
   if (!wins.length) wins.push("Showing up today");
-  go("village", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => {
+  go("base", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => {
     atSpot = "pond"; S.pond = {wins, at: Date.now()}; save(true);
     let i = 0;
     const next = () => {
@@ -615,7 +615,7 @@ function journal(){
     const fresh = S.timer && S.timer.kind === "break" && (S.timer.total - (S.timer.endAt - Date.now())) < 60e3;
     h += `<h1><span class="lbl">side quest · rest</span>Ten-minute break</h1>${timerHTML("away from the desk")}
       <ul class="bujo"><li>Treadmill counts. Scrolling at your desk doesn't.</li><li>Check the garden, or sit by the pond.</li><li class="pep">Rest is part of the plan.</li></ul>
-      <div class="actions"><button class="btn yes" data-a="back">I'm back</button>${!(scene === "village" && atSpot === "pond") ? `<button class="btn alt" data-a="pond">Sit by the pond</button>` : ""}${fresh ? `<button class="btn alt" data-a="flow">I'm in flow</button>` : ""}</div>`;
+      <div class="actions"><button class="btn yes" data-a="back">I'm back</button>${!(scene === "base" && atSpot === "pond") ? `<button class="btn alt" data-a="pond">Sit by the pond</button>` : ""}${fresh ? `<button class="btn alt" data-a="flow">I'm in flow</button>` : ""}</div>`;
   } else if (ph === "decompress") {
     const clench = S.timer && S.timer.kind === "clench";
     h += `<h1><span class="lbl">right now</span>Decompress</h1>${clench ? timerHTML("clench and hold") : ""}
@@ -643,7 +643,7 @@ function journal(){
     const when = S.timer ? `<span class="when" data-tleft>${fmt(Math.max(0, S.timer.endAt - Date.now()))}</span>` : "";
     j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(route.length ? "Walking… " + title : title)}</b>${when}<span class="more">open</span></button>`;
   }
-  j.classList.toggle("intop", scene !== "village");
+  j.classList.toggle("intop", !outside());
   j.querySelectorAll("[data-qn]").forEach(el => el.onclick = ev => { ev.stopPropagation(); qnOpen = el.dataset.qn === "open"; sfx("paper", true); journal(); });
   j.querySelectorAll("[data-a]").forEach(el => el.onclick = () => { const t = remaining()[0]; A[el.dataset.a](t); });
   j.querySelectorAll("[data-say]").forEach(el => el.onclick = () => { const fn = say.buttons[+el.dataset.say][1]; say.buttons = null; fn(); save(); });
@@ -738,11 +738,11 @@ function ctx(){
     if (past.length) h += `<p class="eyebrow" style="margin:22px 0 6px">Read before</p><ul class="qlist">${past.map((d, i) => `<li><span><b>${esc(d.title)}</b><small>${esc(d.author || "")}</small></span><button class="next" data-dig="past" data-i="${i}">reread</button></li>`).join("")}</ul>`;
     h += `</div><div class="actions"><button class="btn alt small" data-close="1">Close shelf</button></div>`;
   } else if (boardOpen) {
-    const list = scene === "village" ? allTasks() : questsIn(scene), cur = phase() === "task" ? remaining()[0].id : null;
-    h = `<span class="tape gingham" aria-hidden="true"></span><h2>${scene === "village" ? "Town quest board" : esc(ROOMS[scene].name) + " quests"}</h2>
+    const list = outside() ? allTasks() : questsIn(scene), cur = phase() === "task" ? remaining()[0].id : null;
+    h = `<span class="tape gingham" aria-hidden="true"></span><h2>${outside() ? "Town quest board" : esc(ROOMS[scene].name) + " quests"}</h2>
       ${list.length ? `<ul class="qlist">${list.map(t => { const dn = S.doneIds.includes(t.id), sp = spotObj(placeOf(t), spotOf(t));
-        return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"${!dn && t.id !== cur && phase() !== "clean" ? ` data-next="${esc(t.id)}" role="button"` : ""}><span><b>${esc(t.title)}</b><small>${scene === "village" ? icon(placeOf(t), 16) + " " + esc(VILLAGE[placeOf(t)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : "<span></span>"}</li>`; }).join("")}</ul>`
-        : `<p class="sub">No quests ${scene === "village" ? "today yet" : "in here today"}.</p>`}
+        return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"${!dn && t.id !== cur && phase() !== "clean" ? ` data-next="${esc(t.id)}" role="button"` : ""}><span><b>${esc(t.title)}</b><small>${outside() ? icon(placeOf(t), 16) + " " + esc(VILLAGE[placeOf(t)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : "<span></span>"}</li>`; }).join("")}</ul>`
+        : `<p class="sub">No quests ${outside() ? "today yet" : "in here today"}.</p>`}
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
   }
   c.innerHTML = h;
@@ -805,22 +805,22 @@ function questMark(){
   if (ph === "task") { const t = remaining()[0]; if (!arrivedFor(t)) target = {pl:placeOf(t), sp:spotOf(t)}; }
   let pos = null;
   if (target) {
-    if (scene === "village") pos = VILLAGE[target.pl].mark;
+    if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][outdoorOf(target.pl)]].mark;
     else if (scene === target.pl) { const s = spotObj(scene, target.sp); pos = [s.x, s.y - 70]; }
-    else if (scene !== "village") pos = [260, 582];
+    else pos = [260, 582];
   }
   if (!pos) { m.style.display = "none"; return; }
   m.style.display = ""; m.setAttribute("transform", `translate(${pos[0]} ${pos[1]})`);
 }
 function drawScene(){
-  const day = dayKey(), wet = scene === "village" && rainyOn(day), fest = festivalOn(day);
+  const day = dayKey(), wet = outside() && rainyOn(day), fest = festivalOn(day);
   $("rain").hidden = !wet;
-  if (scene === "village" && fest && S.festSaid !== day) { S.festSaid = day; setTimeout(() => speak(`${fest.name} decorations are up in the village!`, 5000), 1500); }
+  if (scene === "village" && fest && S.festSaid !== day) { S.festSaid = day; setTimeout(() => speak(`${fest.name} decorations are up in the town square!`, 5000), 1500); }
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
-  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "farm" ? farmArt() : roomArt(scene);
-  const names = {village:"The village", farm:"The garden"};
-  $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${scene !== "village" ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-  $("maphint").textContent = scene === "village" ? "Tap anywhere to walk. Tap a building to go inside." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "farm" ? farmArt() : roomArt(scene);
+  const names = {village:"Town square", base:"Home base", farm:"The garden"};
+  $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
+  $("maphint").textContent = scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap anywhere to walk. The bridge at the top goes to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
 }
 function render(redraw){
   if (S.day !== dayKey()) S = freshToday();
@@ -862,8 +862,9 @@ const maple = {x:mel.x - 24, y:mel.y + 2, tx:mel.x - 24, ty:mel.y + 2, dir:1, mo
 const evan = {x:250, y:360, tx:250, ty:360, dir:1, moving:false, run:false, wait:2};
 let route = [], keys = new Set();
 const svg = $("world");
-const evanHere = () => scene === "village" || scene === "home";
-const bounds = () => scene === "village" ? [14, 150, W - 14, HH - 14] : [34, 168, W - 34, 612];
+const evanHere = () => scene === "base" || scene === "home";
+function outside(){ return OUTDOOR.includes(scene); }
+const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : [34, 168, W - 34, 612];
 
 function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
@@ -871,7 +872,7 @@ function setScene(id, at){
     scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; resetNpcs();
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
-    if (id === "village") { evan.x = evan.tx = 250; evan.y = evan.ty = 380; }
+    if (id === "base") { evan.x = evan.tx = 300; evan.y = evan.ty = 360; }
     else if (id === "home") { evan.x = evan.tx = 300; evan.y = evan.ty = 520; }
     $("evan").style.display = evanHere() ? "" : "none";
     render(true); w.classList.remove("fading");
@@ -882,15 +883,17 @@ function setScene(id, at){
 // route: legs of {scene, x, y, fn}
 function go(target, x, y, fn){
   const legs = [];
-  let cur = scene;
+  const cur = scene;
   if (cur !== target) {
-    if (cur !== "village") legs.push({scene:cur, x:260, y:606, fn:() => setScene("village", VILLAGE[curDoorKey(cur)].door)});
-    if (target !== "village") { const d = VILLAGE[target].door; legs.push({scene:"village", x:d[0], y:d[1], fn:() => setScene(target, target === "farm" ? [260, 590] : [260, 596])}); }
+    const curOut = outdoorOf(cur), tOut = outdoorOf(target);
+    // 1. out of the building, 2. over the bridge if the target is on the other screen, 3. in at the target's door
+    if (!OUTDOOR.includes(cur)) legs.push({scene:cur, x:260, y:606, fn:() => setScene(curOut, VILLAGE[cur].door)});
+    if (curOut !== tOut) { const b = VILLAGE[BRIDGES[curOut][tOut]]; legs.push({scene:curOut, x:b.door[0], y:b.door[1], fn:() => setScene(tOut, ARRIVE[tOut])}); }
+    if (!OUTDOOR.includes(target)) { const d = VILLAGE[target].door; legs.push({scene:tOut, x:d[0], y:d[1], fn:() => setScene(target, target === "farm" ? [260, 590] : [260, 596])}); }
   }
   legs.push({scene:target, x, y, fn});
   route = legs; atSpot = null; boardOpen = false; shelfOpen = false; openView = null; nextLeg(); render();
 }
-function curDoorKey(s){ return s; }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
   const b = bounds(); mel.tx = clamp(l.x, b[0], b[2]); mel.ty = clamp(l.y, b[1], b[3]); mel.force = true;
@@ -900,8 +903,8 @@ function arriveSpot(id){
   const ph = phase();
   if (id === "digest") { shelfOpen = true; speak(digestReady() ? (isHere("juniper") ? "Juniper's waving a digest at you!" : "A fresh digest is ready on the shelf.") : "Digests are rationed. Like dessert.", 3500); render(); return; }
   if (id === "stall") { shopClosed = false; render(); return; }
-  if (id === "board" && scene === "village") { openView = "quests"; speak("All of today's quests!", 3500); render(); return; }
-  if (id === "board") { boardOpen = true; speak(scene === "village" ? "All of today's quests!" : "Here's what needs doing in here.", 3500); render(); return; }
+  if (id === "board" && outside()) { openView = "quests"; speak("All of today's quests!", 3500); render(); return; }
+  if (id === "board") { boardOpen = true; speak(outside() ? "All of today's quests!" : "Here's what needs doing in here.", 3500); render(); return; }
   if (ph === "clean" && scene === "home" && id === "cupboard") { setSay(S.wipe ? "Five minutes. Hard stop, promise." : "Wet wipes live here. Grab one!"); render(); return; }
   if (ph === "task") {
     const t = remaining()[0];
@@ -911,6 +914,10 @@ function arriveSpot(id){
 }
 function arriveVillageSpot(id){
   atSpot = id;
+  const v = VILLAGE[id];
+  if (v.bridge) { atSpot = null; setScene(v.bridge, ARRIVE[v.bridge]); return; }
+  if (id === "swing") { evan.tx = 112 + rnd(-4, 4); evan.ty = 302; evan.run = true; evan.wait = 6; setTimeout(() => evanSays(pick(["wheee!", "push me!", "higher!"])), 900); speak(v.line, 3500); render(); return; }
+  if (id === "shed" || id === "bench") { speak(v.line, 3800); render(); return; }
   if (id === "well") { A.water(); return; }
   if (id === "board") { arriveSpot("board"); return; }
   if (id === "pond") { speak(phase() === "break" ? "Perfect break spot. Breathe." : VILLAGE.pond.line, 4000); render(); }
@@ -920,20 +927,20 @@ svg.addEventListener("click", ev => {
   const npc = ev.target.closest("[data-npc]");
   if (npc) { tapNpc(npc.dataset.npc); return; }
   const ug = ev.target.closest("[data-ugarden]");
-  if (ug) { const k = ug.dataset.ugarden, st = ST[k] || {}; speak(`${(st.users || 0).toLocaleString()} ${k === "chord" ? "creatives use Chord" : "families use Chico"}! One flower for every ${st.per > 0 ? st.per : 10}.`, 4500); return; }
+  if (ug) { const k = ug.dataset.ugarden, st = ST[k] || {}; speak(`${(st.users || 0).toLocaleString()} ${st.label || (k === "chord" ? "studios" : "families")} use ${k === "chord" ? "Chord" : "Chico"}! One flower for every ${st.per > 0 ? st.per : 10}.`, 4500); return; }
   const ent = ev.target.closest("[data-ent]");
   if (ent && ent.dataset.ent === "evan") { evanSays(pick(["Mama!", "hug!", "hehe!", "up up!"])); mprop("heart", evan.x, evan.y - 40); evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; return; }
   if (ent && ent.dataset.ent === "maple") { sfx("purr"); if (Math.random() < .35) { hearts(2); speak("Purr… treats and toys are in your backpack. Tap the bag up top!", 4000); return; } hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please."]), 3000); return; }
   const pl = ev.target.closest("[data-place]");
-  if (pl && scene === "village") {
+  if (pl && outside()) {
     const id = pl.dataset.place, v = VILLAGE[id];
-    if (v.spot) go("village", v.door[0], v.door[1], () => arriveVillageSpot(id));
+    if (v.spot) go(scene, v.door[0], v.door[1], () => arriveVillageSpot(id));
     else go(id, 260, id === "farm" ? 560 : 560, null);
     return;
   }
   const sp = ev.target.closest("[data-spot]");
   if (sp) { const s = spotObj(scene, sp.dataset.spot); go(scene, s.tx, s.ty, () => arriveSpot(s.id)); return; }
-  if (ev.target.closest("[data-exit]")) { go("village", VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null); return; }
+  if (ev.target.closest("[data-exit]")) { go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null); return; }
   const pt = ev.target.closest("[data-plot]");
   if (pt) { const i = +pt.dataset.plot, p = PLOTS[i]; go("farm", p.x + p.w/2, p.y + p.h + 18, () => { selPlot = i; atSpot = "plot"; ctx(); const s = F.plots[i]; speak(!s || !s.crop ? "Empty plot. What shall we grow?" : !s.wateredAt ? "Thirsty seeds!" : growth(s) >= 1 ? "Ready to pick!" : "Growing nicely.", 3000); }); return; }
   const [x, y] = toWorld(ev); route = []; atSpot = null;
@@ -954,19 +961,19 @@ function stepTo(e, speed, dt){
   return false;
 }
 function nearSpot(){
-  if (scene === "village") return Object.keys(VILLAGE).find(k => Math.hypot(VILLAGE[k].door[0] - mel.x, VILLAGE[k].door[1] - mel.y) < 22) || null;
+  if (outside()) return Object.keys(VILLAGE).find(k => VILLAGE[k].scene === scene && Math.hypot(VILLAGE[k].door[0] - mel.x, VILLAGE[k].door[1] - mel.y) < 22) || null;
   if (scene === "farm") return null;
   const list = [...stationsOf(scene), scene !== "market" ? {id:"board", tx:260, ty:200} : null].filter(Boolean);
   const s = list.find(s => Math.hypot(s.tx - mel.x, s.ty - mel.y) < 26); return s ? s.id : null;
 }
-const EVAN_SPOTS = {village:[[260,360],[210,330],[320,330],[170,380],[360,380],[300,600],[380,630],[190,470],[120,540],[300,470]], home:[[150,500],[330,520],[260,340],[200,600],[360,330]]};
+const EVAN_SPOTS = {base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[380,580],[240,560],[420,340]], home:[[150,500],[330,520],[260,340],[200,600],[360,330]]};
 function tickEvan(dt){
   if (!evanHere()) return;
   if (stepTo(evan, evan.run ? 130 : 70, dt)) {
     evan.wait -= dt;
     if (evan.wait <= 0) {
       const r = Math.random(), b = bounds();
-      if (scene === "village" && phase() === "break" && r < .5) { evan.tx = 360 + rnd(-20, 30); evan.ty = 620 + rnd(-6, 8); evan.run = false; }
+      if (scene === "base" && phase() === "break" && r < .5) { evan.tx = 350 + rnd(-20, 30); evan.ty = 560 + rnd(-6, 8); evan.run = false; }
       else if (r < .3) { evan.tx = clamp(mel.x + rnd(-24, 24), b[0], b[2]); evan.ty = clamp(mel.y + rnd(4, 16), b[1], b[3]); evan.run = true; evan.target = "mel"; }
       else if (r < .5) { evan.tx = clamp(maple.x + rnd(-18, 18), b[0], b[2]); evan.ty = clamp(maple.y + rnd(2, 12), b[1], b[3]); evan.run = true; evan.target = "maple"; }
       else { const s = pick(EVAN_SPOTS[scene]); evan.tx = s[0] + rnd(-14, 14); evan.ty = s[1] + rnd(-8, 8); evan.run = Math.random() < .35; evan.target = null; }
@@ -1041,9 +1048,9 @@ function frame(now){
     if (route.length && route[0].scene === scene) { const l = route.shift(); if (l.fn) l.fn(); else { atSpot = null; render(); } if (route.length && route[0].scene === scene) nextLeg(); }
     else if (!route.length) {
       const n = nearSpot();
-      if (n) { if (scene === "village") { const v = VILLAGE[n]; if (v.spot) arriveVillageSpot(n); else go(n, 260, 560, null); } else arriveSpot(n); }
-      else if (scene !== "village" && scene !== "farm" && mel.y > 592) go("village", VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
-      else if (scene === "farm" && mel.y > 592 && Math.abs(mel.x - 260) < 50) go("village", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
+      if (n) { if (outside()) { const v = VILLAGE[n]; if (v.spot) arriveVillageSpot(n); else go(n, 260, 560, null); } else arriveSpot(n); }
+      else if (!outside() && scene !== "farm" && mel.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
+      else if (scene === "farm" && mel.y > 592 && Math.abs(mel.x - 260) < 50) go("base", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
     }
   }
   mel.wasMoving = mel.moving;

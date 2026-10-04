@@ -30,17 +30,17 @@ src/
   index.html          markup shell (styles + script are inlined by build.mjs)
   styles/             base.css (design tokens, cards, washi, village), notebook.css, npcs.css, game-ui.css (map-first layout, quest note, panels)
   util.js             Singapore time, DOM and maths helpers
-  data/world.js       village layout, building interiors, task → place/spot matching
+  data/world.js       the two outdoor screens (home base, town square) and the bridge between them, building interiors, task → place/spot matching
   data/items.js       shop items, crops, plots, friendship levels
   data/npcs.js        villagers (routines, lines, reactions) and agent messengers
-  art/scenes.js       village / interior / garden SVG, furniture, user-count gardens
+  art/scenes.js       home base / town square / interior / garden SVG, river + bridges, furniture, user-count gardens
   art/buildings.js    the five work buildings, each with its own architecture
   art/interiors.js    per-building floors, walls and decor (furniture layout is ROOMS[id].pos)
   art/people.js       villager sprite rig
   art/icons.js        hand-drawn icon set (no emoji in the game)
   game/core.js        state + db sync, quest flow, actions, UI renderers, world sim
   game/sunsama.js     pulls today's Sunsama tasks via the mcp capability and turns them into quests
-  game/npcs.js        villager routines, taps, reactions, mail messengers
+  game/npcs.js        villager routines (weekday/weekend, Darren's activities), taps, reactions, mail messengers
   ui/notebook.js      the Do task notebook overlay and agent notes
 dev/claude-stub.js    local runtime stub (dev builds only)
 legacy/               the single-file build that was live at handoff

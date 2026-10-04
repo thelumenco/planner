@@ -40,21 +40,14 @@ export function villageArt(){
   const D = VILLAGE;
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="120" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="420" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="200" cy="560" rx="80" ry="40" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M260 322 L260 ${D.hall.door[1]} M260 322 C200 300 120 290 ${D.chord.door[0]} ${D.chord.door[1]} M260 322 C320 300 400 290 ${D.fresh.door[0]} ${D.fresh.door[1]} M260 322 C200 380 110 430 ${D.chico.door[0]} ${D.chico.door[1]} M260 322 C320 380 410 420 ${D.post.door[0]} ${D.post.door[1]} M260 322 L260 ${D.home.door[1]} M260 470 C300 540 320 590 ${D.pond.door[0]} ${D.pond.door[1]} M220 400 L${D.farm.door[0]} ${D.farm.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M260 322 L260 ${D.hall.door[1]} M260 322 C200 300 120 290 ${D.chord.door[0]} ${D.chord.door[1]} M260 322 C320 300 400 290 ${D.fresh.door[0]} ${D.fresh.door[1]} M260 322 C200 380 110 430 ${D.chico.door[0]} ${D.chico.door[1]} M260 322 C320 380 410 420 ${D.post.door[0]} ${D.post.door[1]} M260 322 L260 ${D.toBase.door[1]} M260 540 C290 560 310 570 ${D.bench.door[0]} ${D.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
-    ${flowers([[30,262,"#EFA3A6"],[44,270,"#F3C969"],[150,206,"#C3CDEE"],[372,206,"#EFA3A6"],[488,270,"#F3C969"],[300,448,"#EFA3A6"],[214,450,"#C3CDEE"],[160,600,"#F3C969"],[176,612,"#EFA3A6"],[470,540,"#C3CDEE"],[20,430,"#F3C969"],[505,380,"#EFA3A6"]])}
-    ${tree(170,64,1)}${tree(350,64,1)}${tree(26,96,1.05)}${tree(494,96,1.05)}${tree(24,350,.9)}${tree(498,330,.9)}${tree(190,622,.85)}${tree(504,520,.85)}${tree(24,610,.95)}`;
-  const homeX = {art:`<rect x="290" y="444" width="12" height="22" style="fill:var(--stone)"/>`, lines:`<rect x="290" y="444" width="12" height="22"/><path class="smoke" d="M296 440 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>`};
-  const grown = (G.F().plots || []).filter(p => p && p.crop).length;
-  const sprouts = Array.from({length:Math.min(4, grown)}, (_, i) => `<path d="M${160 + i*12} 470 v-8" style="stroke:var(--moss2)"/><ellipse cx="${157 + i*12}" cy="${463}" rx="3.5" ry="2" style="fill:var(--moss)"/><ellipse cx="${163 + i*12}" cy="${461}" rx="3.5" ry="2" style="fill:var(--moss)"/>`).join("");
+    ${flowers([[30,262,"#EFA3A6"],[44,270,"#F3C969"],[150,206,"#C3CDEE"],[372,206,"#EFA3A6"],[488,270,"#F3C969"],[300,448,"#EFA3A6"],[214,450,"#C3CDEE"],[470,540,"#C3CDEE"],[20,430,"#F3C969"],[505,380,"#EFA3A6"]])}
+    ${tree(170,64,1)}${tree(350,64,1)}${tree(26,96,1.05)}${tree(494,96,1.05)}${tree(24,350,.9)}${tree(498,330,.9)}${tree(504,520,.85)}${tree(190,470,.8)}${tree(330,470,.8)}
+    ${flowers([[170,540,"#F3C969"],[184,548,"#EFA3A6"],[206,520,"#C3CDEE"],[300,520,"#F3C969"],[400,560,"#EFA3A6"],[150,580,"#C3CDEE"]])}`;
   const places =
     townHall() + chordWorkshop() + library() + chicoCottage() + postOffice() +
-    house("home", 205, 508, 110, 74, "var(--card)", "var(--butter)", "Home", "var(--butter)", homeX) +
-    `<g data-place="farm" aria-label="Garden"><ellipse class="hov" cx="182" cy="478" rx="34" ry="10" style="fill:var(--butter)"/>
-      <g filter="url(#wob)" ${ink}><rect x="150" y="446" width="64" height="30" rx="3" style="fill:#B08A6A"/>${sprouts}
-      <path d="M146 482 v-40 M218 482 v-40 M146 450 h72 M146 470 h72" style="stroke:var(--wood)" stroke-width="2.4"/><path d="M146 442 v42 M161 442 v42 M203 442 v42 M218 442 v42" opacity=".8"/></g>
-      ${tapeLabel(182, 432, "Garden", "var(--sage)")}</g>
-    <g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
+    `<g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M238 330 v-40 M282 330 v-40"/><rect x="230" y="282" width="60" height="38" rx="3" style="fill:var(--wood)"/>${notesArt(236, 288, G.remaining().length)}</g>
       ${tapeLabel(260, 278, "Quests", "var(--butter)")}</g>
     <g data-place="well" aria-label="Well"><ellipse class="hov" cx="160" cy="342" rx="26" ry="7" style="fill:var(--butter)"/>
@@ -65,13 +58,72 @@ export function villageArt(){
         <path d="M332 306 h60 l-4 10 h-52z" style="fill:var(--card)"/><path d="M340 306 l-2 10 M352 306 l-1 10 M364 306 v10 M376 306 l1 10" style="stroke:var(--rose)" stroke-width="5"/>
         <circle cx="350" cy="317" r="3.2" style="fill:var(--rose)"/><circle cx="362" cy="317" r="3.2" style="fill:var(--butter)"/><circle cx="374" cy="317" r="3.2" style="fill:var(--sage)"/></g>
       ${tapeLabel(362, 360, "Market", "var(--blush)")}</g>
-    <g data-place="pond" aria-label="Pond"><ellipse class="hov" cx="420" cy="592" rx="70" ry="30" style="fill:var(--butter)"/>
-      <g filter="url(#wob)" ${ink}><ellipse cx="430" cy="590" rx="58" ry="25" style="fill:var(--water)"/><path class="ripple" d="M405 586 q8 -4 16 0 M432 598 q8 -4 16 0" opacity=".6"/>
-        <ellipse cx="455" cy="580" rx="7" ry="3.5" style="fill:var(--tree)"/><circle cx="455" cy="577" r="2" style="fill:var(--rose)"/>
-        <rect x="322" y="596" width="34" height="6" rx="2" style="fill:var(--wood)"/><path d="M326 602 v8 M352 602 v8 M322 592 h34" /></g>
-      ${tapeLabel(430, 630, "Pond", "var(--sky)")}</g>`;
-  return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 34, 536, 8, 2, 12)
-    + upgradesArt(G.F().totalQuests || 0) + festivalArt(festivalOn(G.day())) + pondLanterns(G.lanterns());
+    ${townRiver()}`;
+  return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 26, 536, 8, 2, 12)
+    + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
+}
+/* ---------- the river between the two screens ---------- */
+const waterBand = (y1, y2) => `<path d="M0 ${y1+4} Q65 ${y1-4} 130 ${y1+3} T260 ${y1+2} T390 ${y1+4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2+5} 390 ${y2-2} T260 ${y2} T130 ${y2-3} T0 ${y2+2}`}z" style="fill:var(--water)"/>`;
+function bridge(id, x, y1, y2, label, tapeX, tapeY){
+  let planks = ""; for (let y = y1 + 8; y < y2 - 2; y += 9) planks += `<path d="M${x-22} ${y} h44"/>`;
+  return `<g data-place="${id}" aria-label="${label}"><ellipse class="hov" cx="${x}" cy="${(y1 + y2)/2}" rx="40" ry="${(y2 - y1)/2 + 6}" style="fill:var(--butter)"/>
+    ${sk(`<rect x="${x-24}" y="${y1}" width="48" height="${y2 - y1}" rx="3" style="fill:var(--wood)"/>`,
+      `<rect x="${x-24}" y="${y1}" width="48" height="${y2 - y1}" rx="3"/>${planks}<path d="M${x-28} ${y1-4} v${y2 - y1 + 8} M${x+28} ${y1-4} v${y2 - y1 + 8}" stroke-width="2.2"/><path d="M${x-28} ${y1+2} v0 M${x-28} ${(y1+y2)/2} h-2 M${x+28} ${(y1+y2)/2} h2"/>`)}
+    ${tapeLabel(tapeX, tapeY, label, "var(--sky)")}</g>`;
+}
+const ripples = (pts) => `<g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".45">${pts.map(([x, y]) => `<path class="ripple" d="M${x} ${y} q8 -4 16 0"/>`).join("")}</g>`;
+function townRiver(){
+  return `<g filter="url(#wob)">${waterBand(600, 640)}</g>${ripples([[60, 620], [150, 628], [370, 618], [450, 630]])}
+    <g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 604 Q65 596 130 603 T260 602 T390 604 T520 600" fill="none"/></g>
+    ${bridge("toBase", 260, 584, 640, "To home", 410, 624)}
+    <g data-place="bench" aria-label="Riverside bench"><ellipse class="hov" cx="334" cy="572" rx="30" ry="8" style="fill:var(--butter)"/>
+      ${sk(`<rect x="314" y="560" width="40" height="7" rx="2" style="fill:var(--wood)"/><rect x="314" y="548" width="40" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="314" y="560" width="40" height="7" rx="2"/><rect x="314" y="548" width="40" height="6" rx="2"/><path d="M318 554 v6 M350 554 v6 M318 567 v9 M350 567 v9"/>`)}</g>`;
+}
+
+/* ---------- home base: the house, garden, pond, shed and Evan's swing ---------- */
+export function baseArt(){
+  const D = VILLAGE;
+  const grown = (G.F().plots || []).filter(p => p && p.crop).length;
+  const sprouts = Array.from({length:Math.min(6, grown)}, (_, i) => { const x = 58 + (i % 3)*44, y = 430 + Math.floor(i/3)*24;
+    return `<path d="M${x} ${y} v-8" style="stroke:var(--moss2)"/><ellipse cx="${x-3}" cy="${y-7}" rx="3.5" ry="2" style="fill:var(--moss)"/><ellipse cx="${x+3}" cy="${y-9}" rx="3.5" ry="2" style="fill:var(--moss)"/>`; }).join("");
+  const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
+    <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="200" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="400" cy="380" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="160" cy="590" rx="110" ry="40" style="fill:var(--grass2)"/></g>
+    ${tree(40,30,.7)}${tree(150,26,.6)}${tree(380,28,.65)}${tree(480,30,.7)}
+    <g filter="url(#wob)">${waterBand(40, 98)}<path d="M478 94 C470 180 500 300 470 400 C462 430 458 450 452 474" fill="none" style="stroke:var(--water)" stroke-width="14" stroke-linecap="round"/></g>
+    ${ripples([[60, 66], [150, 78], [350, 62], [420, 80]])}
+    <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 44 Q65 36 130 43 T260 42 T390 44 T520 40 M0 100 Q65 104 130 95 T260 98 T390 96 T520 102"/></g>
+    <g filter="url(#wob)"><path d="M260 112 L260 ${D.home.door[1]} M260 326 C200 360 130 420 ${D.farm.door[0]} ${D.farm.door[1]} M260 326 C290 420 300 500 ${D.pond.door[0]} ${D.pond.door[1]} M266 312 C330 300 390 290 ${D.shed.door[0]} ${D.shed.door[1]} M254 318 C200 320 150 320 ${D.swing.door[0]} ${D.swing.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
+      <ellipse cx="260" cy="322" rx="44" ry="20" style="fill:var(--path)"/></g>
+    ${flowers([[30,140,"#EFA3A6"],[44,150,"#F3C969"],[200,140,"#C3CDEE"],[330,150,"#EFA3A6"],[488,180,"#F3C969"],[214,410,"#EFA3A6"],[200,470,"#C3CDEE"],[160,600,"#F3C969"],[176,612,"#EFA3A6"],[300,620,"#C3CDEE"],[24,520,"#F3C969"],[372,600,"#EFA3A6"],[400,170,"#C3CDEE"]])}
+    ${tree(26,370,.9)}${tree(500,610,.9)}${tree(26,620,.95)}${tree(360,180,.8)}`;
+  const homeX = {art:`<rect x="290" y="156" width="12" height="22" style="fill:var(--stone)"/>`, lines:`<rect x="290" y="156" width="12" height="22"/><path class="smoke" d="M296 152 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>`};
+  const places =
+    bridge("toTown", 260, 30, 110, "To town", 336, 124) +
+    house("home", 205, 220, 110, 74, "var(--card)", "var(--butter)", "Home", "var(--butter)", homeX) +
+    // Darren's repair corner: ladder against the wall, toolbox
+    sk(`<rect x="326" y="282" width="20" height="12" rx="2" style="fill:var(--rose)"/>`, `<path d="M316 296 l12 -62 M326 296 l12 -62 M318 284 h10 M320 272 h10 M323 260 h10 M325 248 h10"/><rect x="326" y="282" width="20" height="12" rx="2"/><path d="M332 282 v-4 h8 v4"/>`) +
+    `<g data-place="shed" aria-label="Shed"><ellipse class="hov" cx="430" cy="272" rx="40" ry="9" style="fill:var(--butter)"/>
+      ${sk(`<path d="M394 222 l36 -24 l40 22 v4 z" style="fill:var(--sage)"/><rect x="398" y="220" width="66" height="50" style="fill:#C9A27E"/><rect x="420" y="236" width="22" height="34" style="fill:var(--wood)"/><rect x="448" y="230" width="12" height="10" style="fill:var(--sky)"/>`,
+        `<path d="M394 222 l36 -24 l40 22"/><rect x="398" y="220" width="66" height="50"/><path d="M398 234 h66 M398 248 h66 M398 262 h66" opacity=".35"/><rect x="420" y="236" width="22" height="34"/><circle cx="438" cy="254" r="1.4"/><rect x="448" y="230" width="12" height="10"/><path d="M404 270 l-6 -12 M406 258 v12" opacity=".8"/>`)}
+      ${tapeLabel(430, 296, "Shed", "var(--sage)")}</g>
+    <g data-place="swing" aria-label="Tree swing"><ellipse class="hov" cx="104" cy="312" rx="34" ry="9" style="fill:var(--butter)"/>
+      ${tree(76, 300, 1.6)}<g filter="url(#wob)" ${ink}><path d="M78 256 Q100 250 130 254" stroke-width="3" style="stroke:var(--wood)"/><path class="swing" d="M104 254 v42 M120 254 v42"/><rect class="swing" x="98" y="295" width="28" height="5" rx="2" style="fill:var(--peach)"/></g>
+      ${tapeLabel(112, 336, "Swing", "var(--peach)", 11)}</g>
+    <g data-place="farm" aria-label="Garden"><ellipse class="hov" cx="108" cy="482" rx="44" ry="10" style="fill:var(--butter)"/>
+      <g filter="url(#wob)" ${ink}><rect x="40" y="406" width="136" height="66" rx="4" style="fill:#B08A6A"/><path d="M48 430 h120 M48 454 h120" opacity=".35"/>${sprouts}
+      <path d="M34 478 V400 H182 V478 M34 478 H94 M122 478 H182" fill="none" style="stroke:var(--wood)" stroke-width="2.6"/>${Array.from({length:7}, (_, i) => `<path d="M${34 + i*24.6} 396 v10" style="stroke:var(--wood)" stroke-width="2"/>`).join("")}</g>
+      ${tapeLabel(108, 392, "Garden", "var(--sage)")}</g>
+    <g data-place="pond" aria-label="Pond"><ellipse class="hov" cx="390" cy="530" rx="96" ry="46" style="fill:var(--butter)"/>
+      <g filter="url(#wob)" ${ink}><ellipse cx="408" cy="504" rx="72" ry="32" style="fill:var(--water)"/><path class="ripple" d="M380 500 q8 -4 16 0 M414 514 q8 -4 16 0" opacity=".6"/>
+        <ellipse cx="446" cy="492" rx="8" ry="4" style="fill:var(--tree)"/><circle cx="446" cy="489" r="2.2" style="fill:var(--rose)"/><ellipse cx="370" cy="516" rx="6" ry="3" style="fill:var(--tree)"/>
+        <rect x="300" y="546" width="36" height="6" rx="2" style="fill:var(--wood)"/><path d="M304 552 v8 M332 552 v8 M300 542 h36"/></g>
+      ${tapeLabel(430, 554, "Pond", "var(--sky)")}</g>` +
+    // evening firepit + washing line, just for cosiness
+    sk(`<ellipse cx="226" cy="604" rx="20" ry="8" style="fill:var(--stone)"/><path d="M214 602 l24 -6 M214 596 l24 6" style="stroke:var(--wood)" stroke-width="4"/>`,
+      `<ellipse cx="226" cy="604" rx="20" ry="8"/><path class="smoke" d="M226 590 q-4 -6 0 -11 q4 -5 0 -10" opacity=".5"/>`) +
+    sk(`<path d="M66 552 h16 v18 h-16z" style="fill:var(--sky)"/><path d="M96 554 h14 l3 14 h-20z" style="fill:var(--rose)"/><path d="M126 552 h18 v12 h-18z" style="fill:var(--butter)"/>`,
+      `<path d="M50 590 v-46 M160 590 v-46 M50 548 Q105 556 160 548"/><path d="M66 552 h16 v18 h-16z M96 554 h14 l3 14 h-20z M126 552 h18 v12 h-18z"/>`);
+  return ground + places + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns());
 }
 export function notesArt(x, y, n){
   const c = ["#FFFDF6","#F6E3A1","#F4C7CF","#C3CDEE","#DCE8C8"];
@@ -122,6 +174,8 @@ export function furn(kind, x, y){
       `<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3"/><path d="M${x-36} ${y-30} h28 l-4 -10 h-20z M${x-22} ${y-40} v-10 h-10 h20"/><rect x="${x+10}" y="${y-48}" width="12" height="18" rx="2"/><rect x="${x+28}" y="${y-40}" width="20" height="10"/><path d="M${x-46} ${y-6} v14 M${x+46} ${y-6} v14"/>`);
     case "treadmill": return sk(`<rect x="${x-24}" y="${y-74}" width="48" height="74" rx="8" style="fill:var(--sock)"/><rect x="${x-17}" y="${y-66}" width="34" height="58" rx="4" style="fill:#6B5A52"/><rect x="${x-30}" y="${y-96}" width="60" height="16" rx="4" style="fill:var(--peri)"/><rect x="${x-14}" y="${y-93}" width="20" height="9" rx="2" style="fill:#DCE8C8"/>`,
       `<rect x="${x-24}" y="${y-74}" width="48" height="74" rx="8"/><path d="M${x-17} ${y-56} h34 M${x-17} ${y-44} h34 M${x-17} ${y-32} h34 M${x-17} ${y-20} h34" opacity=".45"/><path d="M${x-26} ${y-80} v28 M${x+26} ${y-80} v28" stroke-width="2.4"/><rect x="${x-30}" y="${y-96}" width="60" height="16" rx="4"/><rect x="${x-14}" y="${y-93}" width="20" height="9" rx="2"/><text x="${x-4}" y="${y-86}" text-anchor="middle" font-family="Klee One,serif" font-size="7" stroke="none" style="fill:var(--line)">1.2</text>`);
+    case "office": return sk(`<rect x="${x-40}" y="${y-28}" width="72" height="22" rx="3" style="fill:${W2}"/><path d="M${x-22} ${y-30} l4 -18 h26 l-4 18z" style="fill:#DCE3EE"/><rect x="${x-26}" y="${y-32}" width="34" height="4" rx="1" style="fill:var(--stone)"/><circle cx="${x+20}" cy="${y-34}" r="5" style="fill:var(--peach)"/><rect x="${x+38}" y="${y-30}" width="22" height="20" rx="4" style="fill:var(--sage)"/>`,
+      `<rect x="${x-40}" y="${y-28}" width="72" height="22" rx="3"/><path d="M${x-22} ${y-30} l4 -18 h26 l-4 18z"/><rect x="${x-26}" y="${y-32}" width="34" height="4" rx="1"/><circle cx="${x+20}" cy="${y-34}" r="5"/><path d="M${x+16} ${y-39} q4 -6 8 0" opacity=".6"/><path d="M${x-34} ${y-6} v12 M${x+26} ${y-6} v12"/><rect x="${x+38}" y="${y-30}" width="22" height="20" rx="4"/><path d="M${x+42} ${y-10} v14 M${x+56} ${y-10} v14"/>`);
     case "bookcase": return furn("shelf", x, y) + sk(`<path d="M${x+20} ${y-104} h30 l-4 8 l4 8 h-30z" style="fill:var(--butter)"/>`,
       `<path d="M${x+20} ${y-104} h30 l-4 8 l4 8 h-30z"/><text x="${x+33}" y="${y-93}" text-anchor="middle" font-family="Klee One,serif" font-size="8" stroke="none" style="fill:var(--line)">new</text>`);
     case "shopcounter": return sk(`<rect x="${x-90}" y="${y-40}" width="180" height="40" rx="4" style="fill:${W2}"/><path d="M${x-96} ${y-118} h192 l-8 18 h-176z" style="fill:var(--card)"/><circle cx="${x-50}" cy="${y-52}" r="10" style="fill:var(--rose)"/><circle cx="${x-24}" cy="${y-52}" r="10" style="fill:var(--butter)"/><circle cx="${x+4}" cy="${y-52}" r="10" style="fill:var(--sage)"/><rect x="${x+30}" y="${y-64}" width="40" height="24" rx="3" style="fill:#FFFDF6"/>`,
@@ -172,7 +226,7 @@ export function farmArt(){
   });
   h += `<g data-exit="1" aria-label="Exit"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
     <g filter="url(#wob)" ${ink}><path d="M212 590 v34 M308 590 v34" style="stroke:var(--wood)" stroke-width="4"/></g>
-    <text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none">Back to the village</text></g>`;
+    <text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none">Back outside</text></g>`;
   return h;
 }
 
@@ -198,7 +252,7 @@ export function userGarden(key, x, y, cols, rows, gap){
   const w = cols*gap, signX = x + w/2 + (key === "chord" ? 8 : 0), signY = y + rows*gap + 10;
   const tree = users >= 500 ? `<g filter="url(#wob)" ${ink}><rect x="${x+w-6}" y="${y+4}" width="4" height="12" style="fill:var(--wood)"/><circle cx="${x+w-4}" cy="${y}" r="9" style="fill:#F4C7CF"/><circle cx="${x+w-10}" cy="${y+4}" r="6" style="fill:#EFA3A6"/></g>` : "";
   const sparkle = users >= 1000 ? `<g class="twinkle">${iconAt("sparkle", x - 2, y - 2, 12)}${iconAt("sparkle", x + w + 2, y + rows*gap - 4, 11)}</g>` : "";
-  const label = `${users.toLocaleString()} ${key === "chord" ? "creatives" : "families"}`;
+  const label = `${users.toLocaleString()} ${st.label || (key === "chord" ? "studios" : "families")}`;
   return `<g data-ugarden="${key}" aria-label="${label}">${f}${tree}${sparkle}
     ${tapeLabel(signX, signY, label, key === "chord" ? "var(--sage)" : "var(--blush)", 10)}</g>`;
 }
