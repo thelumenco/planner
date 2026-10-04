@@ -338,15 +338,23 @@ function defaultLine(){
   if (ph === "recap") return "We did it! Garden? Shopping? Snacks?";
   return "No quests yet. Bring some from chat?";
 }
+// Quiet evening: once today's quests are all done and Mel has wound down (lanterns lit), nobody pipes up on their
+// own. Bubbles only appear in answer to a tap. Settings can turn it off (F.quietEvening === false).
+let lastInput = 0;
+["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { lastInput = Date.now(); }, {capture: true}));
+const hushed = () => F.quietEvening !== false && !!S.pond && S.pond.shown == null && Date.now() - (S.pond.done || 0) > 20e3 && !remaining().length && !(S.timer && !S.timer.fired);
+const unprompted = () => Date.now() - lastInput > 1500;
+const quietNow = () => hushed() && unprompted();
 function speak(text, ms){
   const el = $("speech");
+  if (quietNow()) { if (!el.hidden) el.textContent = plain(text); return; }
   el.hidden = false; el.textContent = plain(text); el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
   clearTimeout(speechT); speechLock = ms ? Date.now() + ms : 0;
   if (ms) speechT = setTimeout(() => { speechLock = 0; el.textContent = plain(say ? say.line : defaultLine()); }, ms);
 }
 function setSay(line, buttons){ say = {line, buttons}; speak(line); }
 let evanT;
-function evanSays(t){ const e = $("evanSay"); e.innerHTML = `<b class="who">Evan</b>${esc(plain(t))}`; e.hidden = false; clearTimeout(evanT); evanT = setTimeout(() => e.hidden = true, 2200); }
+function evanSays(t){ if (quietNow()) return; const e = $("evanSay"); e.innerHTML = `<b class="who">Evan</b>${esc(plain(t))}`; e.hidden = false; clearTimeout(evanT); evanT = setTimeout(() => e.hidden = true, 2200); }
 
 /* =================== PORTRAIT ANIMATION =================== */
 const portrait = $("scene"), props = $("props");
@@ -849,7 +857,7 @@ function windDown(item){
     let i = 0;
     const next = () => {
       if (i < wins.length) { speak(`Lantern ${i + 1}: ${wins[i]}`, 3300); i++; S.pond.shown = i; sfx("chime"); if (scene === "base") drawScene(); setTimeout(next, 3400); }
-      else { delete S.pond.shown; act("cheer"); setSay(fromRoutine ? "That's the day, Mel. Rest well. Tomorrow's first thing is in the note." : "That's the day, Mel. Tell chat “wind down” whenever you're ready."); save(); }
+      else { delete S.pond.shown; S.pond.done = Date.now(); act("cheer"); setSay(fromRoutine ? "That's the day, Mel. Rest well. Tomorrow's first thing is in the note." : "That's the day, Mel. Tell chat “wind down” whenever you're ready."); save(); }
     };
     next();
   });
@@ -1066,7 +1074,7 @@ function showPanel(hasCtx, skin){
   if (p.hidden === !!view) sfx("paper", true);
   p.hidden = !view; $("map").classList.toggle("panel-open", !!view);
   if (view === "cal" && !p.dataset.cal) { p.dataset.cal = "1"; renderCal(); } else if (view !== "cal") delete p.dataset.cal;
-  if (view === "settings") { $("setMusic").checked = sound.music; $("setVol").value = sound.musicVol; $("setSfx").checked = sound.sfx; }
+  if (view === "settings") { $("setMusic").checked = sound.music; $("setVol").value = sound.musicVol; $("setSfx").checked = sound.sfx; $("setQuiet").checked = F.quietEvening !== false; }
   ["ctx", "questsView", "bagView", "mailView", "friendView", "calView", "settingsView", "chatView"].forEach(id => $(id).hidden = id !== (views[view] || view));
   p.className = "panel " + (view === "quests" ? "cork" : view === "ctx" ? skin : "paper");
   document.querySelectorAll("[data-open]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.open === openView)));
@@ -1681,6 +1689,7 @@ $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);
 $("setVol").oninput = e => setMusicVol(+e.target.value);
 $("setTest").onclick = () => { unlockAudio(); setTimeout(() => { alarm(); $("setTestNote").textContent = audioRunning() ? "Sound is on. If you heard nothing, check the volume and the silent switch." : "Your browser is still blocking sound. Tap anywhere on the map, then try again."; }, 120); };
+$("setQuiet").onchange = e => { F.quietEvening = e.target.checked; save(true); };
 $("setSfx").onchange = e => { setSfx(e.target.checked); if (e.target.checked) sfx("coin"); };
 ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { qnQuietUntil = 0; }, {capture: true, once: true}));
 document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; ctx();
@@ -1693,7 +1702,7 @@ initHestia({sfx, alarm, speak, flash, undoable, earn: (n, why) => { earn(n, why)
   refund: (n, why) => { F.coins = Math.max(0, F.coins - n); S.earned = Math.max(0, (S.earned || 0) - n); flash(`-${n} coin: ${why}`); save(); }});
 $("hestiaFile").onchange = e => { const f = e.target.files && e.target.files[0]; if (!f) return; const r = new FileReader();
   r.onload = () => { const msg = importHestia(String(r.result)); $("hestiaNote").textContent = msg; speak(/^Imported/.test(msg) ? "Hestia's lists are in the house now!" : msg, 4500); }; r.readAsText(f); e.target.value = ""; };
-initNpcs({sfx, chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
+initNpcs({sfx, quiet: () => quietNow(), chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();
 render(true);

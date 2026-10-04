@@ -28,7 +28,13 @@ const bunting = (x1, y1, x2, y2, cols) => {
   }
   return sk(f, `<path d="M${x1} ${y1} Q${(x1 + x2)/2} ${mid} ${x2} ${y2}"/>${f.replace(/ style="[^"]*"/g, "")}`);
 };
-const lamp = (x, y) => sk(`<rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2" style="fill:#F6C26B"/>`, `<path d="M${x} ${y} v-13"/><rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2"/><path d="M${x - 5} ${y} h10"/>`);
+// A lamp's warm pool of light: always drawn, shown by CSS in dark mode (and at dusk) so the village feels cosy at night
+export const lampGlow = (x, y, r = 30) => `<g class="lglow" pointer-events="none"><circle cx="${x}" cy="${y}" r="${r}" fill="url(#lampg)"/><circle class="flick" cx="${x}" cy="${y}" r="${(r*.42).toFixed(1)}" fill="#FFE3A3" opacity=".22"/></g>`;
+export const lampDefs = `<defs><radialGradient id="lampg"><stop offset="0" stop-color="#FFD98A" stop-opacity=".55"/><stop offset=".45" stop-color="#FFC66B" stop-opacity=".2"/><stop offset="1" stop-color="#FFC66B" stop-opacity="0"/></radialGradient></defs>`;
+// A tall street lamp: iron post, little roof, glowing glass
+export const streetLamp = (x, y) => lampGlow(x, y - 30, 34) + sk(`<rect x="${x - 5}" y="${y - 36}" width="10" height="12" rx="2" class="lglass" style="fill:#F6C26B"/>`,
+  `<path d="M${x} ${y} v-24 M${x - 4} ${y} h8"/><rect x="${x - 5}" y="${y - 36}" width="10" height="12" rx="2"/><path d="M${x - 7} ${y - 36} l7 -5 l7 5z"/>`);
+const lamp = (x, y) => lampGlow(x, y - 18, 22) + sk(`<rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2" style="fill:#F6C26B"/>`, `<path d="M${x} ${y} v-13"/><rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2"/><path d="M${x - 5} ${y} h10"/>`);
 
 // Upgrades live in the town square, except the blossom trees (by the pond at home) and the Chord flag and Chico arch (Makers' Lane).
 export function upgradesArt(n, where){

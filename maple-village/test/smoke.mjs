@@ -693,6 +693,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#calBody .calday li b").count() >= 2, "the calendar icon shows today's events");
   await page.click('[data-open="settings"]');
   check(await page.locator("#setMusic").count() === 1 && await page.locator("#nameIn").isVisible(), "settings has music, sound and renaming");
+  check(await page.locator("#setQuiet").isChecked(), "quiet evenings are on by default");
+  await page.emulateMedia({ colorScheme: "dark" });
+  check(await page.evaluate(() => { const c = getComputedStyle(document.getElementById("speech")).backgroundColor; return c === "rgb(255, 253, 246)"; }), "speech bubbles stay cream in dark mode");
+  check(await page.evaluate(() => { const l = document.querySelector(".map .lab"); return !l || getComputedStyle(l).fill === "rgb(47, 43, 40)"; }), "place names stay dark ink in dark mode");
+  await page.emulateMedia({ colorScheme: "light" });
   await page.click("#setSfx"); check(!(await page.locator("#setSfx").isChecked()), "sound effects can be muted");
   await page.close();
 }

@@ -7,7 +7,7 @@ import { roomShell } from "./interiors.js";
 import { iconAt } from "./icons.js";
 import { runArt } from "../game/pets.js";
 import { jarArt } from "../game/jars.js";
-import { upgradesArt, festivalArt, festivalOn, pondLanterns } from "./village-extras.js";
+import { upgradesArt, festivalArt, festivalOn, pondLanterns, streetLamp, lampDefs } from "./village-extras.js";
 import { townHall, chordWorkshop, library, chicoCottage, postOffice } from "./buildings.js";
 
 let G = null;
@@ -16,7 +16,8 @@ export const artCtx = () => G;
 
 export function tapeLabel(x, y, text, col, size){
   const w = text.length*(size ? size*.56 : 8.2) + 22;
-  return `<g transform="translate(${x} ${y}) rotate(-2)" pointer-events="none"><path d="M${-w/2} -11 l4 -1.5 l${w-8} 1 l4 -1 l-2 11 l2 11 l-4 1 l${-(w-8)} -1 l-4 1 l2 -11z" style="fill:${col}" opacity=".85"/><text class="lab" x="0" y="5" text-anchor="middle"${size ? ` style="font-size:${size}px"` : ""}>${text}</text></g>`;
+  if (col === "var(--card)") col = "#F6EFE3";   // a cream tape in both themes, so the dark names stay readable
+  return `<g transform="translate(${x} ${y}) rotate(-2)" pointer-events="none"><path d="M${-w/2} -11 l4 -1.5 l${w-8} 1 l4 -1 l-2 11 l2 11 l-4 1 l${-(w-8)} -1 l-4 1 l2 -11z" style="fill:${col}" opacity=".94"/><text class="lab" x="0" y="5" text-anchor="middle"${size ? ` style="font-size:${size}px"` : ""}>${text}</text></g>`;
 }
 export const sk = (art, lines) => `<g filter="url(#marker)">${art}</g><g filter="url(#wob)" fill="none" ${ink}>${lines}</g>`;
 export function house(id, x, y, w, h, wall, roof, label, tapeCol, extra){
@@ -73,7 +74,8 @@ export function villageArt(){
   const L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
   const light = (app, x, y) => { const h = G.health ? G.health(app) : null; if (!h) return "";
     return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`; };
-  return ground + places + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
+  const lamps = [[234, 280], [286, 280], [190, 300], [204, 424], [384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
+  return lampDefs + ground + lamps + places + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
 }
 /* ---------- the river between the two screens ---------- */
 const waterBand = (y1, y2) => `<path d="M0 ${y1+4} Q65 ${y1-4} 130 ${y1+3} T260 ${y1+2} T390 ${y1+4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2+5} 390 ${y2-2} T260 ${y2} T130 ${y2-3} T0 ${y2+2}`}z" style="fill:var(--water)"/>`;
@@ -156,7 +158,7 @@ export function baseArt(){
   const toolArt = (tools.compost ? sk(`<path d="M192 452 h24 l-3 22 h-18z" style="fill:var(--wood)"/><path d="M196 451 c3 -6 13 -6 16 0" style="fill:var(--moss)"/>`, `<path d="M192 452 h24 l-3 22 h-18z M195 460 h18"/>`) : "")
     + (tools.can ? sk(`<rect x="466" y="262" width="14" height="11" rx="2" style="fill:#9CC3E0"/>`, `<rect x="466" y="262" width="14" height="11" rx="2"/><path d="M480 266 l7 -5 M468 262 c0 -5 9 -5 9 0"/>`) : "")
     + (tools.sprinkler ? sk(`<circle cx="108" cy="438" r="4" style="fill:var(--stone)"/>`, `<circle cx="108" cy="438" r="4"/><path d="M108 434 v-4"/><path class="ripple" d="M96 426 q12 -10 24 0" opacity=".7"/>`) : "");
-  return ground + places + runArt(G.F()) + famArt + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
+  return lampDefs + ground + [[192, 380], [328, 380]].map(([x, y]) => streetLamp(x, y)).join("") + places + runArt(G.F()) + famArt + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
 }
 // After 7pm: the light drops, windows glow, the firepit is lit and stars come out over the river.
 function duskArt(){
@@ -198,7 +200,7 @@ export function laneArt(){
     <text x="${x}" y="447" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" textLength="52" lengthAdjust="spacingAndGlyphs" style="fill:var(--line)">coming soon</text>
     ${tapeLabel(x, 552, name, col, 11)}</g>`;
   const plot = plotArt("plot3", 160, "Luna", "var(--peri)") + plotArt("plot4", 362, "Ohayo", "var(--peach)");
-  return ground + gate
+  return lampDefs + ground + gate + [[70, 352], [250, 352], [460, 352], [260, 560]].map(([x, y]) => streetLamp(x, y)).join("")
     + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot
     + light("chord", 200, 196) + light("chico", 433, 206)
     + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12)
@@ -285,11 +287,11 @@ export function furn(kind, x, y){
       `<rect x="${x-36}" y="${y-96}" width="72" height="58" rx="2"/><path d="M${x-30} ${y-44} h60" /><path d="M${x-30} ${y-80} L${x-6} ${y-88} L${x+8} ${y-84} L${x+30} ${y-94}" stroke-dasharray="3 3" opacity=".7"/><path d="M${x-24} ${y-38} L${x-32} ${y} M${x+24} ${y-38} L${x+32} ${y} M${x} ${y-38} v34"/><path d="M${x-40} ${y-97} h80" stroke-width="2.2"/>`);
     case "wardrobe": return sk(`<rect x="${x-30}" y="${y-96}" width="60" height="96" rx="3" style="fill:var(--peri)"/><path d="M${x-34} ${y-96} h68 l-4 -8 h-60z" style="fill:var(--peri2)"/><rect x="${x-24}" y="${y-88}" width="22" height="80" rx="2" style="fill:#DCE3F4"/><rect x="${x+2}" y="${y-88}" width="22" height="80" rx="2" style="fill:#DCE3F4"/>`,
       `<rect x="${x-30}" y="${y-96}" width="60" height="96" rx="3"/><path d="M${x-34} ${y-96} h68 l-4 -8 h-60z"/><rect x="${x-24}" y="${y-88}" width="22" height="80" rx="2"/><rect x="${x+2}" y="${y-88}" width="22" height="80" rx="2"/><circle cx="${x-5}" cy="${y-48}" r="1.6"/><circle cx="${x+5}" cy="${y-48}" r="1.6"/><path d="M${x-24} ${y} v4 M${x+24} ${y} v4"/>`);
-    case "cupboard": return sk(`<rect x="${x-36}" y="${y-84}" width="72" height="84" rx="3" style="fill:var(--card)"/><rect x="${x+42}" y="${y-30}" width="14" height="30" rx="4" style="fill:var(--sky)"/>`,
+    case "cupboard": return sk(`<rect x="${x-36}" y="${y-84}" width="72" height="84" rx="3" style="fill:#F9F7F2"/><rect x="${x+42}" y="${y-30}" width="14" height="30" rx="4" style="fill:var(--sky)"/>`,
       `<rect x="${x-36}" y="${y-84}" width="72" height="84" rx="3"/><path d="M${x} ${y-84} v84"/><circle cx="${x-5}" cy="${y-42}" r="1.8"/><circle cx="${x+5}" cy="${y-42}" r="1.8"/><rect x="${x+42}" y="${y-30}" width="14" height="30" rx="4"/><path d="M${x+46} ${y-30} v-6 h8"/>`);
     case "counter": return sk(`<rect x="${x-58}" y="${y-36}" width="116" height="36" rx="3" style="fill:${W2}"/><rect x="${x-44}" y="${y-52}" width="24" height="16" style="fill:#FFFDF6"/><rect x="${x-14}" y="${y-50}" width="24" height="14" style="fill:var(--butter)"/><rect x="${x+18}" y="${y-54}" width="24" height="18" style="fill:var(--sky)"/>`,
       `<rect x="${x-58}" y="${y-36}" width="116" height="36" rx="3"/><rect x="${x-44}" y="${y-52}" width="24" height="16"/><path d="M${x-44} ${y-52} l12 8 l12 -8"/><rect x="${x-14}" y="${y-50}" width="24" height="14"/><rect x="${x+18}" y="${y-54}" width="24" height="18"/>`);
-    case "cabinet": return sk(`<rect x="${x-30}" y="${y-92}" width="60" height="92" rx="3" style="fill:var(--stone)"/>`,
+    case "cabinet": return sk(`<rect x="${x-30}" y="${y-92}" width="60" height="92" rx="3" style="fill:#C9CFC4"/>`,
       `<rect x="${x-30}" y="${y-92}" width="60" height="92" rx="3"/><path d="M${x-30} ${y-62} h60 M${x-30} ${y-32} h60"/><path d="M${x-8} ${y-78} h16 M${x-8} ${y-48} h16 M${x-8} ${y-18} h16" stroke-width="3"/>`);
     case "scales": return sk(`<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3" style="fill:${W2}"/><path d="M${x-36} ${y-30} h28 l-4 -10 h-20z" style="fill:var(--butter)"/><rect x="${x+10}" y="${y-48}" width="12" height="18" rx="2" style="fill:var(--rose)"/><rect x="${x+28}" y="${y-40}" width="20" height="10" style="fill:#FFFDF6"/>`,
       `<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3"/><path d="M${x-36} ${y-30} h28 l-4 -10 h-20z M${x-22} ${y-40} v-10 h-10 h20"/><rect x="${x+10}" y="${y-48}" width="12" height="18" rx="2"/><rect x="${x+28}" y="${y-40}" width="20" height="10"/><path d="M${x-46} ${y-6} v14 M${x+46} ${y-6} v14"/>`);
@@ -311,7 +313,7 @@ export function furn(kind, x, y){
       `<rect x="${x-40}" y="${y-28}" width="72" height="22" rx="3"/><path d="M${x-22} ${y-30} l4 -18 h26 l-4 18z"/><rect x="${x-26}" y="${y-32}" width="34" height="4" rx="1"/><circle cx="${x+20}" cy="${y-34}" r="5"/><path d="M${x+16} ${y-39} q4 -6 8 0" opacity=".6"/><path d="M${x-34} ${y-6} v12 M${x+26} ${y-6} v12"/><rect x="${x+38}" y="${y-30}" width="22" height="20" rx="4"/><path d="M${x+42} ${y-10} v14 M${x+56} ${y-10} v14"/>`);
     case "bookcase": return furn("shelf", x, y) + sk(`<path d="M${x+20} ${y-104} h30 l-4 8 l4 8 h-30z" style="fill:var(--butter)"/>`,
       `<path d="M${x+20} ${y-104} h30 l-4 8 l4 8 h-30z"/><text x="${x+33}" y="${y-93}" text-anchor="middle" font-family="Klee One,serif" font-size="8" stroke="none" style="fill:var(--line)">new</text>`);
-    case "shopcounter": return sk(`<rect x="${x-90}" y="${y-40}" width="180" height="40" rx="4" style="fill:${W2}"/><path d="M${x-96} ${y-118} h192 l-8 18 h-176z" style="fill:var(--card)"/><circle cx="${x-50}" cy="${y-52}" r="10" style="fill:var(--rose)"/><circle cx="${x-24}" cy="${y-52}" r="10" style="fill:var(--butter)"/><circle cx="${x+4}" cy="${y-52}" r="10" style="fill:var(--sage)"/><rect x="${x+30}" y="${y-64}" width="40" height="24" rx="3" style="fill:#FFFDF6"/>`,
+    case "shopcounter": return sk(`<rect x="${x-90}" y="${y-40}" width="180" height="40" rx="4" style="fill:${W2}"/><path d="M${x-96} ${y-118} h192 l-8 18 h-176z" style="fill:#F9F7F2"/><circle cx="${x-50}" cy="${y-52}" r="10" style="fill:var(--rose)"/><circle cx="${x-24}" cy="${y-52}" r="10" style="fill:var(--butter)"/><circle cx="${x+4}" cy="${y-52}" r="10" style="fill:var(--sage)"/><rect x="${x+30}" y="${y-64}" width="40" height="24" rx="3" style="fill:#FFFDF6"/>`,
       `<rect x="${x-90}" y="${y-40}" width="180" height="40" rx="4"/><path d="M${x-96} ${y-118} h192 l-8 18 h-176z"/><path d="M${x-80} ${y-118} l-3 18 M${x-50} ${y-118} l-2 18 M${x-20} ${y-118} l-1 18 M${x+10} ${y-118} v18 M${x+40} ${y-118} l1 18 M${x+70} ${y-118} l2 18" style="stroke:var(--rose)" stroke-width="6"/><path d="M${x-86} ${y-100} v60 M${x+86} ${y-100} v60"/><rect x="${x+30}" y="${y-64}" width="40" height="24" rx="3"/><text x="${x+50}" y="${y-48}" text-anchor="middle" font-family="Klee One,serif" font-size="11" stroke="none" style="fill:var(--line)">open</text>`);
   }
   return "";

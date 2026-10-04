@@ -373,3 +373,9 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Colours validated with the dataviz script: every pair distinct for normal vision (all-pairs). Blobs are soft (halo, body, faint shade, highlight): no outline and no symbols, per Mel. Names always show on the picker buttons.
 - **Planning table**: Notion tables render as tables (`tableHTML` in planning.js; other tags are dropped), cards can't widen the panel, and the table is now a long desk with a planner and a vase of flowers (`plantable`).
 - Safari/WebKit fixes (the Mac app): finished cork-board notes fade by colour instead of `opacity` (an opacity layer over a rotated note with filtered SVG icons painted over the text), cork-note icons drop their SVG filters, and Pancake plus the bed's "z z" no longer put text inside a filtered group (WebKit painted a copy of the board there). WebKit isn't installed in this container, so these were fixed from the screenshots, not reproduced.
+
+### Round 28: dark mode and quiet evenings
+- Custom feelings wait for a name and a colour (no default colour) and never drop a blob in by themselves. The jar maker says why feelings are greyed out (4 feelings max, or the jar is full).
+- Dark mode: speech bubbles stay cream with dark ink (`.speech` redefines the colour tokens locally). Place-name labels are dark ink on cream or pastel tape. The filing cabinet, cupboard and shop counter use fixed light fills. The `.next` pill buttons (e.g. "reread") use fixed navy text.
+- Street lamps (`streetLamp` in village-extras.js) around the town square, Makers' Lane and home. Their warm glow (`.lglow`, `#lampg` gradient) shows only in dark mode, with a gentle flicker (off under reduced motion).
+- Quiet evenings (Settings, on by default, `F.quietEvening`): once the lantern wind-down has finished and no quests remain, Maple, neighbours, couriers and Evan only speak in answer to a tap (input within 1.5 s).

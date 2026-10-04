@@ -132,6 +132,7 @@ export function courierDelivered(itemId){
 
 /* ---------- talking ---------- */
 function say(e, text, ms = 3800){
+  if (api.quiet && api.quiet()) return;   // quiet evening: neighbours only talk when tapped
   const el = $("npcSay"); sayer = e;
   const who = e.kind === "agent" ? e.ag.name.split(/[ ,]/)[0] : e.def.name;
   el.innerHTML = `<b class="who">${esc(who)}</b>${esc(plain(text))}`; el.hidden = false;
