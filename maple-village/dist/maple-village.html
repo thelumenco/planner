@@ -646,6 +646,30 @@ body.nb-open{overflow:hidden}
 .uplist li.got{color:#2F2B28;font-weight:600}
 .uplist li small{margin-left:auto;font-weight:700;color:#B5ADA2}
 @media (prefers-reduced-motion:reduce){.map .rain,.floaty{animation:none}}
+
+/* round 8: calendar, settings, quest tab clear of the exit, six corner icons */
+.map .qnote.slim.intop{top:var(--ovTop,8px);bottom:auto}
+.calday{list-style:none;padding:0;margin:4px 0 12px;display:grid;gap:2px}
+.calday li{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:start;padding:8px 0;border-bottom:1px dashed #E4DDD2}
+.calday li.past{opacity:.5}
+.calday .when{font-family:"Klee One",serif;font-weight:600;font-size:.95rem;color:#2F3B73}
+.calday .what b{display:block;font-weight:700;line-height:1.3}
+.calday .what i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.calday .what small{display:block;color:#8A8279;font-size:.78rem;line-height:1.35}
+.calday a{color:#8A8279;text-decoration:none;font-weight:700;padding:0 4px}
+.calday li.now{grid-template-columns:1fr;padding:2px 0;border:0}
+.calday li.now span{display:block;border-top:2px solid var(--fox);color:var(--fox2);font-size:.68rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding-top:2px}
+.setrow{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:.95rem;cursor:pointer}
+.setrow input[type=checkbox]{width:20px;height:20px;accent-color:var(--navy)}
+.setrow.slider{justify-content:space-between}
+.setrow.slider input{flex:1;max-width:180px;accent-color:var(--navy)}
+.hudbtns{gap:5px}
+@media (max-width:640px){
+  .scenebar .scenename{display:none}
+  .scenebar .berries{margin-right:auto}
+  .hbtn{width:40px;height:40px}
+}
+@media (max-width:360px){.hbtn{width:36px;height:36px}.hbtn .ico{width:20px;height:20px}}
 </style>
 </head>
 <body>
@@ -683,10 +707,12 @@ body.nb-open{overflow:hidden}
       <p class="scenename" id="sceneName">Village</p>
       <div class="berries" title="Coins"><span data-ico="coin" aria-hidden="true"></span><span id="coins">0</span></div>
       <div class="hudbtns">
+        <button class="hbtn" data-open="cal" aria-label="Today's calendar" title="Today's calendar"><i data-ico="calendar" data-size="24"></i></button>
         <button class="hbtn" data-open="quests" aria-label="Quest board" title="Quest board"><i data-ico="board" data-size="24"></i><span class="badge" id="qBadge" hidden></span></button>
         <button class="hbtn" data-open="bag" aria-label="Backpack" title="Backpack"><i data-ico="bag" data-size="24"></i></button>
         <button class="hbtn" data-open="friend" aria-label="Friendship with Maple" title="Friendship"><i data-ico="heart" data-size="24"></i></button>
         <button class="hbtn" data-open="mail" aria-label="Letters" title="Letters"><i data-ico="letter" data-size="24"></i><span class="badge" id="mailBadge" hidden></span></button>
+        <button class="hbtn" data-open="settings" aria-label="Settings" title="Settings"><i data-ico="gear" data-size="24"></i></button>
       </div>
     </div>
     <div class="map" id="map">
@@ -936,6 +962,18 @@ body.nb-open{overflow:hidden}
         <div class="pview" id="friendView" hidden>
           <h2>Friendship with <span id="friendName">Maple</span></h2>
           <div id="friendBody"></div>
+        </div>
+        <div class="pview" id="calView" hidden>
+          <h2>Today</h2>
+          <div id="calBody"></div>
+        </div>
+        <div class="pview" id="settingsView" hidden>
+          <h2>Settings</h2>
+          <h3 class="ph3">Sound</h3>
+          <label class="setrow"><input type="checkbox" id="setMusic"> <span>Music: a calm piano loop</span></label>
+          <label class="setrow slider"><span>Music volume</span><input type="range" id="setVol" min="0" max="1" step="0.05"></label>
+          <label class="setrow"><input type="checkbox" id="setSfx"> <span>Sound effects: paper, purrs, coins, hellos</span></label>
+          <h3 class="ph3">Your fox</h3>
           <div class="row">
             <label class="sr" for="nameIn">Fox's name</label>
             <input id="nameIn" maxlength="20" placeholder="rename your fox">
@@ -1150,6 +1188,9 @@ body.nb-open{overflow:hidden}
   I.pot = [`<path d="M7 14h10l-1.5 7h-7z" style="fill:#E3A27E"/><path d="M12 14c-4-1-6-5-5-9 3 1 5 4 5 9zM12 14c1-5 3-8 6-9 0 4-2 8-6 9z" style="fill:var(--moss)"/>`, `<path d="M7 14h10l-1.5 7h-7zM12 14c-4-1-6-5-5-9 3 1 5 4 5 9zM12 14c1-5 3-8 6-9 0 4-2 8-6 9z"/>`];
   I.painting = [`<rect x="3.5" y="5" width="17" height="14" rx="1" style="fill:var(--wood)"/><rect x="6" y="7.5" width="12" height="9" style="fill:var(--sky)"/><path d="M6 16.5l4-4 3 3 2-2 3 3z" style="fill:var(--moss)"/>`, `<rect x="3.5" y="5" width="17" height="14" rx="1"/><rect x="6" y="7.5" width="12" height="9"/><path d="M6 16.5l4-4 3 3 2-2 3 3"/><circle cx="15.5" cy="10" r="1.2"/>`];
   I.bed = [`<ellipse cx="12" cy="15" rx="9" ry="5" style="fill:var(--peach)"/><ellipse cx="12" cy="14.5" rx="6" ry="3" style="fill:var(--cream)"/>`, `<ellipse cx="12" cy="15" rx="9" ry="5"/><ellipse cx="12" cy="14.5" rx="6" ry="3"/><path d="M8 9.5c1-1.5 2.5-1.5 3 0M13 9.5c1-1.5 2.5-1.5 3 0" opacity=".5"/>`];
+  I.calendar = [`<rect x="3.5" y="5" width="17" height="15.5" rx="2" style="fill:#FFFDF6"/><path d="M3.5 7c0-1.1.9-2 2-2h13c1.1 0 2 .9 2 2v3h-17z" style="fill:var(--rose)"/>`, `<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M7 13.5h2M11 13.5h2M15 13.5h2M7 17h2M11 17h2" stroke-width="1.6"/>`];
+  I.gear = [`<circle cx="12" cy="12" r="6.5" style="fill:var(--oat)"/><circle cx="12" cy="12" r="2.6" style="fill:#FFFDF6"/>`, `<path d="M12 2.8l1.5 2.4 2.8-.6.6 2.8 2.4 1.5-1.2 2.6 1.2 2.6-2.4 1.5-.6 2.8-2.8-.6L12 21.2l-1.5-2.4-2.8.6-.6-2.8-2.4-1.5 1.2-2.6-1.2-2.6 2.4-1.5.6-2.8 2.8.6z"/><circle cx="12" cy="12" r="2.6"/>`];
+  I.music = [`<circle cx="7" cy="17.5" r="2.8" style="fill:var(--peri)"/><circle cx="17" cy="15.5" r="2.8" style="fill:var(--peri)"/>`, `<circle cx="7" cy="17.5" r="2.8"/><circle cx="17" cy="15.5" r="2.8"/><path d="M9.8 17.5V6l10-2v11.5M9.8 9l10-2"/>`];
   I.farm = I.sprout;
   I.water = I.drop;
   I.well = I.drop;
@@ -1936,6 +1977,7 @@ body.nb-open{overflow:hidden}
   var NPCS = [
     {
       id: "hana",
+      pitch: 1.15,
       name: "Hana",
       job: "Runs the market",
       intro: "Hi love, I'm Hana! I moved here from a little seaside town. The honey toast is mine, and yes, I remember everyone's usual.",
@@ -1959,6 +2001,7 @@ body.nb-open{overflow:hidden}
     },
     {
       id: "okada",
+      pitch: 0.75,
       name: "Mr Okada",
       job: "Retired postmaster, unofficial well-keeper",
       intro: "Okada. Forty years delivering letters. Retired now, but I still can't stop sorting things. Even the pebbles by the well.",
@@ -1975,6 +2018,7 @@ body.nb-open{overflow:hidden}
     },
     {
       id: "juniper",
+      pitch: 1.05,
       name: "Juniper",
       job: "Librarian at the Fresh Pages library",
       intro: "Welcome to the library! I'm Juniper. I love a good semicolon; I also write poetry, but that's a secret. One book recommendation a week, guaranteed.",
@@ -1996,6 +2040,7 @@ body.nb-open{overflow:hidden}
     },
     {
       id: "bo",
+      pitch: 0.8,
       name: "Bo",
       job: "Carpenter at the Chord workshop",
       intro: "Bo! Carpenter. If it creaks, wobbles or falls off, I'm your guy. Built half this village. *hums*",
@@ -2016,6 +2061,7 @@ body.nb-open{overflow:hidden}
     },
     {
       id: "lin",
+      pitch: 0.95,
       name: "Auntie Lin",
       job: "Gardener",
       intro: "Auntie Lin. I have opinions about soil, and they're all correct. Plant something and I'll tell you what you did wrong. Lovingly.",
@@ -2033,6 +2079,7 @@ body.nb-open{overflow:hidden}
     },
     {
       id: "pip",
+      pitch: 1.45,
       name: "Pip",
       job: "Evan's best friend",
       intro: "I'm Pip! I'm Evan's best friend and I'm the FASTEST. Watch!",
@@ -2044,6 +2091,7 @@ body.nb-open{overflow:hidden}
     },
     {
       id: "theo",
+      pitch: 0.9,
       name: "Theo",
       job: "Town hall clerk",
       intro: "Theo, town clerk. I keep the village records. And, if you have a moment, I have a stamp collection you would not believe.",
@@ -2070,6 +2118,273 @@ body.nb-open{overflow:hidden}
     courier: { name: "Basil the garden courier", skill: "sunsama-tidy / client-health-check", look: { skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#9EBE8C", bottom: "#8A6A52", extra: "satchel" }, hello: "A little tidy-up report!" },
     winddown: { name: "Luna the evening messenger", skill: "evening-wind-down", look: { skin: "#EDC6A6", hair: "#2B2320", hairStyle: "long", top: "#9AA9DD", bottom: "#2F3B73", extra: "lantern" }, hello: "Time to close the day. A note for you." }
   };
+
+  // src/game/audio.js
+  var ac = null;
+  var master = null;
+  var musicBus = null;
+  var sfxBus = null;
+  var reverb = null;
+  var pianoWave = null;
+  var KEY = "fox.sound";
+  var settings = (() => {
+    try {
+      return Object.assign({ music: true, musicVol: 0.5, sfx: true }, JSON.parse(localStorage.getItem(KEY)) || {});
+    } catch {
+      return { music: true, musicVol: 0.5, sfx: true };
+    }
+  })();
+  var saveSettings = () => {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(settings));
+    } catch {
+    }
+  };
+  function ensure() {
+    if (ac) return ac;
+    try {
+      ac = new (window.AudioContext || window.webkitAudioContext)();
+    } catch {
+      return null;
+    }
+    master = ac.createGain();
+    master.gain.value = 0.9;
+    master.connect(ac.destination);
+    reverb = ac.createConvolver();
+    const len = Math.floor(ac.sampleRate * 2.6), ir = ac.createBuffer(2, len, ac.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const d = ir.getChannelData(c);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6);
+    }
+    reverb.buffer = ir;
+    const wet = ac.createGain();
+    wet.gain.value = 0.32;
+    reverb.connect(wet).connect(master);
+    musicBus = ac.createGain();
+    musicBus.gain.value = 0;
+    musicBus.connect(master);
+    musicBus.connect(reverb);
+    sfxBus = ac.createGain();
+    sfxBus.gain.value = 0.8;
+    sfxBus.connect(master);
+    sfxBus.connect(reverb);
+    pianoWave = ac.createPeriodicWave(new Float32Array([0, 1, 0.42, 0.18, 0.09, 0.05, 0.02]), new Float32Array(7));
+    return ac;
+  }
+  function unlockAudio() {
+    if (!ensure()) return;
+    if (ac.state === "suspended") ac.resume();
+    if (settings.music) startMusic();
+  }
+  var N = (n) => 440 * Math.pow(2, (n - 69) / 12);
+  var BARS = [
+    [41, 60, 64, 65, 69, 72],
+    [40, 59, 62, 64, 67, 71],
+    [38, 57, 60, 62, 64, 65],
+    [40, 55, 59, 60, 64, 67],
+    [34, 57, 58, 62, 65, 69],
+    [33, 55, 57, 60, 64, 67],
+    [31, 53, 55, 58, 62, 65],
+    [36, 53, 55, 58, 60, 65]
+  ];
+  var BPM = 64;
+  var BEAT = 60 / BPM;
+  var playing = false;
+  var nextTime = 0;
+  var step = 0;
+  var timerId = 0;
+  var loops = 0;
+  var melody = [];
+  function note(freq, t, dur2, vel) {
+    const o = ac.createOscillator(), g = ac.createGain(), f2 = ac.createBiquadFilter();
+    o.setPeriodicWave(pianoWave);
+    o.frequency.value = freq;
+    f2.type = "lowpass";
+    f2.frequency.value = Math.min(4200, 900 + freq * 2.2);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vel, t + 6e-3);
+    g.gain.exponentialRampToValueAtTime(vel * 0.35, t + 0.25);
+    g.gain.exponentialRampToValueAtTime(1e-4, t + dur2);
+    o.connect(f2).connect(g).connect(musicBus);
+    o.start(t);
+    o.stop(t + dur2 + 0.05);
+  }
+  function newMelody() {
+    melody = BARS.map((b, i) => {
+      const top = b.slice(2).map((n) => n + 12);
+      const r = (k) => top[(i * 3 + k + loops) % top.length];
+      return Math.random() < 0.25 ? [] : [[0, r(0)], [2, r(1 + (Math.random() < 0.5 ? 0 : 1))], ...Math.random() < 0.4 ? [[3.5, r(2)]] : []];
+    });
+  }
+  function schedule() {
+    while (nextTime < ac.currentTime + 0.6) {
+      const bar = Math.floor(step / 8) % BARS.length, e = step % 8, t = nextTime, b = BARS[bar];
+      if (bar === 0 && e === 0) {
+        if (step) loops++;
+        newMelody();
+      }
+      if (e === 0) {
+        note(N(b[0]), t, 3.4, 0.16);
+        note(N(b[0] + 12), t, 3, 0.08);
+      }
+      if (e === 4) note(N(b[0] + 7), t, 2.4, 0.09);
+      const arp = [1, 2, 3, 4, 3, 2, 1, 2][e];
+      note(N(b[arp]), t + (Math.random() - 0.5) * 0.012, 2.2, 0.055 + Math.random() * 0.02);
+      (melody[bar] || []).forEach(([beat, n]) => {
+        if (Math.abs(beat * 2 - e) < 0.01) note(N(n), t + 0.01, 2.8, 0.1);
+      });
+      step++;
+      nextTime += BEAT / 2;
+    }
+  }
+  function startMusic() {
+    if (!ensure() || playing || !settings.music) return;
+    playing = true;
+    nextTime = ac.currentTime + 0.15;
+    step = 0;
+    musicBus.gain.cancelScheduledValues(ac.currentTime);
+    musicBus.gain.setTargetAtTime(settings.musicVol * 0.5, ac.currentTime, 1.2);
+    timerId = setInterval(schedule, 120);
+    schedule();
+  }
+  function stopMusic() {
+    if (!ac || !playing) return;
+    playing = false;
+    clearInterval(timerId);
+    musicBus.gain.setTargetAtTime(0, ac.currentTime, 0.4);
+  }
+  function setMusic(on) {
+    settings.music = on;
+    saveSettings();
+    on ? (ensure(), ac.resume(), startMusic()) : stopMusic();
+  }
+  function setMusicVol(v) {
+    settings.musicVol = v;
+    saveSettings();
+    if (ac && playing) musicBus.gain.setTargetAtTime(v * 0.5, ac.currentTime, 0.2);
+  }
+  function setSfx(on) {
+    settings.sfx = on;
+    saveSettings();
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (!ac) return;
+    if (document.hidden) {
+      stopMusic();
+    } else if (settings.music && !playing) startMusic();
+  });
+  function noise(sec) {
+    const b = ac.createBuffer(1, Math.max(1, Math.floor(ac.sampleRate * sec)), ac.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const s = ac.createBufferSource();
+    s.buffer = b;
+    return s;
+  }
+  function bell(freq, t, dur2, vel) {
+    [1, 2.76, 5.4].forEach((m, i) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = "sine";
+      o.frequency.value = freq * m;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vel / (i * 1.8 + 1), t + 4e-3);
+      g.gain.exponentialRampToValueAtTime(1e-4, t + dur2 / (i + 1));
+      o.connect(g).connect(sfxBus);
+      o.start(t);
+      o.stop(t + dur2);
+    });
+  }
+  var FX = {
+    // paper: a handful of tiny filtered crackles
+    paper(t, soft) {
+      for (let i = 0; i < (soft ? 5 : 9); i++) {
+        const s = noise(0.03), f2 = ac.createBiquadFilter(), g = ac.createGain(), at = t + i * (0.018 + Math.random() * 0.03);
+        f2.type = "bandpass";
+        f2.frequency.value = 1800 + Math.random() * 3500;
+        f2.Q.value = 1.4;
+        g.gain.setValueAtTime((soft ? 0.12 : 0.2) * (0.5 + Math.random()), at);
+        g.gain.exponentialRampToValueAtTime(1e-4, at + 0.03 + Math.random() * 0.03);
+        s.connect(f2).connect(g).connect(sfxBus);
+        s.start(at);
+      }
+    },
+    // purr: rumbling low noise, pulsing ~24 times a second, swelling in and out
+    purr(t) {
+      const s = noise(1.8), f2 = ac.createBiquadFilter(), g = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain();
+      f2.type = "lowpass";
+      f2.frequency.value = 260;
+      lfo.frequency.value = 24;
+      lg.gain.value = 0.5;
+      lfo.connect(lg).connect(g.gain);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.55, t + 0.3);
+      g.gain.linearRampToValueAtTime(0.45, t + 1.2);
+      g.gain.linearRampToValueAtTime(0, t + 1.75);
+      s.connect(f2).connect(g).connect(sfxBus);
+      s.start(t);
+      lfo.start(t);
+      lfo.stop(t + 1.8);
+    },
+    // cha-ching: a quick register clunk then two bright bells
+    chaching(t) {
+      const s = noise(0.08), f2 = ac.createBiquadFilter(), g = ac.createGain();
+      f2.type = "highpass";
+      f2.frequency.value = 2500;
+      g.gain.setValueAtTime(0.35, t);
+      g.gain.exponentialRampToValueAtTime(1e-4, t + 0.08);
+      s.connect(f2).connect(g).connect(sfxBus);
+      s.start(t);
+      bell(1568, t + 0.07, 1.1, 0.22);
+      bell(2093, t + 0.17, 1.4, 0.2);
+    },
+    coin(t) {
+      bell(2349, t, 0.7, 0.12);
+    },
+    chime(t) {
+      [660, 880, 1320].forEach((fr, i) => bell(fr, t + i * 0.18, 1.2, 0.16));
+    },
+    // villager "hello": a few soft pitched blips, Animal Crossing style, pitch set per villager
+    babble(t, pitch = 1) {
+      const n = 3 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < n; i++) {
+        const o = ac.createOscillator(), f2 = ac.createBiquadFilter(), g = ac.createGain(), at = t + i * 0.075;
+        o.type = "square";
+        o.frequency.value = 330 * pitch * Math.pow(2, [0, 2, 4, 7, 9][Math.floor(Math.random() * 5)] / 12);
+        f2.type = "lowpass";
+        f2.frequency.value = 1400;
+        g.gain.setValueAtTime(0, at);
+        g.gain.linearRampToValueAtTime(0.07, at + 0.01);
+        g.gain.exponentialRampToValueAtTime(1e-4, at + 0.065);
+        o.connect(f2).connect(g).connect(sfxBus);
+        o.start(at);
+        o.stop(at + 0.08);
+      }
+    },
+    tap(t) {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = "triangle";
+      o.frequency.setValueAtTime(880, t);
+      o.frequency.exponentialRampToValueAtTime(520, t + 0.06);
+      g.gain.setValueAtTime(0.06, t);
+      g.gain.exponentialRampToValueAtTime(1e-4, t + 0.08);
+      o.connect(g).connect(sfxBus);
+      o.start(t);
+      o.stop(t + 0.1);
+    }
+  };
+  function sfx(name, arg) {
+    if (!settings.sfx || !ensure() || ac.state !== "running" || !FX[name]) return;
+    try {
+      FX[name](ac.currentTime + 0.01, arg);
+    } catch {
+    }
+  }
+  function alarm() {
+    if (!ensure() || ac.state !== "running") return;
+    try {
+      FX.chime(ac.currentTime + 0.01);
+    } catch {
+    }
+  }
 
   // src/ui/notebook.js
   var api = null;
@@ -2140,6 +2455,7 @@ body.nb-open{overflow:hidden}
     open = null;
     busy && busy.abort();
     busy = null;
+    sfx("paper");
     const root = $("notebook");
     root.hidden = true;
     document.body.classList.remove("nb-open");
@@ -2148,7 +2464,10 @@ body.nb-open{overflow:hidden}
   }
   function show() {
     const root = $("notebook");
-    if (root.hidden) lastFocus = document.activeElement;
+    if (root.hidden) {
+      lastFocus = document.activeElement;
+      sfx("paper");
+    }
     root.hidden = false;
     document.body.classList.add("nb-open");
     refreshNotebook(true);
@@ -2483,6 +2802,66 @@ Quests finished today: ${S3.doneIds.length}`;
     tool_error: "Sunsama returned an error."
   };
 
+  // src/game/calendar.js
+  var GCAL = "Google Calendar";
+  var CALENDARS = [
+    { id: "primary", name: "Fresh Pages Co", color: "var(--peri2)" },
+    { id: "5ie48aa9lld2tmkqvfrs4t0lqs@group.calendar.google.com", name: "Personal", color: "var(--rose)" },
+    { id: "28c6d66a29b701bf4e58ccb22983ebfc2c4ac34fccb42fd7f0dc5e5239e72665@group.calendar.google.com", name: "The Tans", color: "var(--sage)" }
+  ];
+  var cache = { day: "", at: 0, events: [], error: null };
+  async function todaysEvents(day, fresh) {
+    if (!fresh && cache.day === day && Date.now() - cache.at < 5 * 6e4) return cache;
+    let mcp = null;
+    try {
+      mcp = window.claude && claude.use ? await claude.use("mcp") : null;
+    } catch {
+    }
+    if (!mcp) return cache = { day, at: Date.now(), events: [], error: "unavailable" };
+    const startTime = `${day}T00:00:00+08:00`, end = new Date(Date.parse(startTime) + 864e5).toISOString().replace(".000Z", "Z");
+    const results = await Promise.all(CALENDARS.map(async (c) => {
+      try {
+        const r = await mcp.callTool(GCAL, "list_events", { calendarId: c.id, startTime, endTime: end, orderBy: "startTime", timeZone: "Asia/Singapore", pageSize: 60 }, { cache: { staleTime: fresh ? 0 : 12e4, refresh: !!fresh } });
+        let p = r && r.payload;
+        if (typeof p === "string") {
+          try {
+            p = JSON.parse(p);
+          } catch {
+          }
+        }
+        return { c, events: p && Array.isArray(p.events) ? p.events : [] };
+      } catch (e) {
+        return { c, events: [], error: e && e.code || "upstream_error" };
+      }
+    }));
+    const events = [];
+    results.forEach(({ c, events: evs }) => evs.forEach((ev) => {
+      if (!ev || ev.status === "cancelled" || !ev.start) return;
+      const allDay = !ev.start.dateTime;
+      events.push({
+        id: ev.id,
+        title: ev.summary || "(busy)",
+        allDay,
+        start: allDay ? null : Date.parse(ev.start.dateTime),
+        end: ev.end && ev.end.dateTime ? Date.parse(ev.end.dateTime) : null,
+        where: ev.location || "",
+        link: ev.htmlLink || "",
+        cal: c.name,
+        color: c.color
+      });
+    }));
+    events.sort((a, b) => (a.allDay ? -1 : a.start) - (b.allDay ? -1 : b.start));
+    const failed = results.filter((r) => r.error);
+    return cache = { day, at: Date.now(), events, error: failed.length === results.length ? failed[0].error : null };
+  }
+  var CAL_ERRORS = {
+    unavailable: "Your calendar isn't reachable from this view.",
+    needs_reauth: "Google Calendar needs reconnecting: claude.ai Settings → Connectors.",
+    server_not_connected: "Add the Google Calendar connector in claude.ai Settings → Connectors.",
+    not_in_manifest: "Google Calendar is switched off for this page. Turn it on in the page's Permissions.",
+    server_unavailable: "Google Calendar didn't answer. Try again in a minute."
+  };
+
   // src/art/people.js
   var S = (c) => `style="fill:${c}"`;
   function hair(style, c, k) {
@@ -2616,6 +2995,13 @@ Quests finished today: ${S3.doneIds.length}`;
       const p = slot2.at || jitter(pick(slot2.wander));
       e = ents[def.id] = { def, key, kind: "npc", x: p[0], y: p[1], tx: p[0], ty: p[1], dir: Math.random() < 0.5 ? -1 : 1, moving: false, wait: rnd(1, 4), node: makeNode(def.id, def.look, def.kid) };
     }
+    const near = Math.hypot(e.x - api2.mel.x, e.y - api2.mel.y) < 110;
+    if (near && !sayer && Date.now() - (e.helloAt || 0) > 4 * 6e4 && Math.random() < dt * 0.08) {
+      e.helloAt = Date.now();
+      e.dir = api2.mel.x < e.x ? -1 : 1;
+      say(e, pick(hellos()), 2600);
+      api2.sfx && api2.sfx("babble", def.pitch || 1);
+    }
     const b = api2.bounds();
     if (stepTo(e, def.kid ? 95 : 48, dt)) {
       e.wait -= dt;
@@ -2638,6 +3024,10 @@ Quests finished today: ${S3.doneIds.length}`;
     }
     e.node.classList.toggle("run", def.kid && e.moving);
   }
+  var hellos = () => {
+    const t = sgHM();
+    return [t < 720 ? "Morning, Mel!" : t < 1080 ? "Afternoon, Mel!" : "Evening, Mel!", "Hi!", "Hello there!", "Hiya, Mel!"];
+  };
   function tickCourier(dt) {
     const scene2 = api2.scene(), mel2 = api2.mel;
     if (courier && courier.scene !== scene2) {
@@ -3019,6 +3409,7 @@ Quests finished today: ${S3.doneIds.length}`;
     earnT = setTimeout(() => e.textContent = "", 4e3);
   }
   function earn(n, why) {
+    if (!/quest|Sunsama/.test(why)) sfx("coin");
     F.coins += n;
     S2.earned += n;
     markActive();
@@ -3175,29 +3566,8 @@ Quests finished today: ${S3.doneIds.length}`;
       pose();
     }, d);
   }
-  var ac = null;
-  document.addEventListener("pointerdown", () => {
-    try {
-      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
-    } catch {
-    }
-  }, { once: true });
   function chime() {
-    try {
-      if (!ac) return;
-      [660, 880, 1320].forEach((f2, i) => {
-        const o = ac.createOscillator(), g = ac.createGain();
-        o.type = "sine";
-        o.frequency.value = f2;
-        g.gain.setValueAtTime(0, ac.currentTime + i * 0.18);
-        g.gain.linearRampToValueAtTime(0.14, ac.currentTime + i * 0.18 + 0.02);
-        g.gain.exponentialRampToValueAtTime(1e-4, ac.currentTime + i * 0.18 + 0.9);
-        o.connect(g).connect(ac.destination);
-        o.start(ac.currentTime + i * 0.18);
-        o.stop(ac.currentTime + i * 0.18 + 1);
-      });
-    } catch {
-    }
+    alarm();
     try {
       navigator.vibrate && navigator.vibrate([120, 80, 120]);
     } catch {
@@ -3303,6 +3673,7 @@ Quests finished today: ${S3.doneIds.length}`;
     done(t) {
       S2.doneIds.push(t.id);
       S2.timer = null;
+      sfx("chaching");
       earn(5, "quest complete");
       gainXp(1);
       S2.last = t.title;
@@ -3484,6 +3855,7 @@ Quests finished today: ${S3.doneIds.length}`;
       if (!t || !t.completed || !ids.has(t.id) || S2.doneIds.includes(t.id)) return;
       S2.doneIds.push(t.id);
       got.push(t);
+      if (got.length === 1) sfx("chaching");
       earn(5, "done in Sunsama");
       gainXp(1);
       countQuest();
@@ -3763,6 +4135,7 @@ Then tell chat "wind down" whenever you're ready.`
     }
     addInv(id, -1);
     gainXp(it.xp || 1);
+    sfx("purr");
     act(it.kind === "food" ? "eat" : it.kind === "flower" ? "flower" : it.act, it);
     speak(it.say, 4500);
     save();
@@ -3770,6 +4143,7 @@ Then tell chat "wind down" whenever you're ready.`
   function playFree(kind) {
     const lines = { pet: ["*leans into the pat*", "Happy fox noises!", "More pats please."], hide: ["You found me!"], nap: ["Mmm… cosy…"] };
     if (kind === "pet") {
+      sfx("purr");
       hearts(2);
       speak(pick(lines.pet), 3e3);
       return;
@@ -3892,9 +4266,11 @@ Then tell chat "wind down" whenever you're ready.`
       const when = S2.timer ? `<span class="when" data-tleft>${fmt(Math.max(0, S2.timer.endAt - Date.now()))}</span>` : "";
       j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(route.length ? "Walking… " + title : title)}</b>${when}<span class="more">open</span></button>`;
     }
+    j.classList.toggle("intop", scene !== "village");
     j.querySelectorAll("[data-qn]").forEach((el) => el.onclick = (ev) => {
       ev.stopPropagation();
       qnOpen = el.dataset.qn === "open";
+      sfx("paper", true);
       journal();
     });
     j.querySelectorAll("[data-a]").forEach((el) => el.onclick = () => {
@@ -3917,11 +4293,21 @@ Then tell chat "wind down" whenever you're ready.`
     });
   }
   function showPanel(hasCtx, skin) {
-    const views = { quests: "questsView", bag: "bagView", mail: "mailView", friend: "friendView" };
+    const views = { quests: "questsView", bag: "bagView", mail: "mailView", friend: "friendView", cal: "calView", settings: "settingsView" };
     const view = openView || (hasCtx ? "ctx" : null), p = $("panel");
+    if (p.hidden === !!view) sfx("paper", true);
     p.hidden = !view;
     $("map").classList.toggle("panel-open", !!view);
-    ["ctx", "questsView", "bagView", "mailView", "friendView"].forEach((id) => $(id).hidden = id !== (views[view] || view));
+    if (view === "cal" && !p.dataset.cal) {
+      p.dataset.cal = "1";
+      renderCal();
+    } else if (view !== "cal") delete p.dataset.cal;
+    if (view === "settings") {
+      $("setMusic").checked = settings.music;
+      $("setVol").value = settings.musicVol;
+      $("setSfx").checked = settings.sfx;
+    }
+    ["ctx", "questsView", "bagView", "mailView", "friendView", "calView", "settingsView"].forEach((id) => $(id).hidden = id !== (views[view] || view));
     p.className = "panel " + (view === "quests" ? "cork" : view === "ctx" ? skin : "paper");
     document.querySelectorAll("[data-open]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.open === openView)));
   }
@@ -3936,6 +4322,30 @@ Then tell chat "wind down" whenever you're ready.`
     selPlot = null;
     if (scene === "market") shopClosed = true;
     ctx();
+  }
+  async function renderCal(fresh) {
+    const el = $("calBody");
+    el.innerHTML = `<p class="muted">Opening your calendar…</p>`;
+    const r = await todaysEvents(dayKey(), fresh), nowT = Date.now();
+    const fmtT = (t) => new Date(t).toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore" }).replace(" ", "").toLowerCase();
+    let h = `<p class="sub">${new Date(now() + 8 * H).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })}</p>`;
+    if (r.error && !r.events.length) h += `<p class="muted">${esc(CAL_ERRORS[r.error] || "Couldn't reach your calendar just now.")}</p>`;
+    else if (!r.events.length) h += `<p class="muted">Nothing on the calendar today. A clear runway.</p>`;
+    else {
+      let nowShown = false;
+      h += `<ol class="calday">` + r.events.map((e) => {
+        let mark = "";
+        if (!e.allDay && !nowShown && e.start > nowT) {
+          nowShown = true;
+          mark = `<li class="now"><span>now</span></li>`;
+        }
+        const past = !e.allDay && e.end && e.end < nowT;
+        return mark + `<li class="${past ? "past" : ""}"><span class="when">${e.allDay ? "all day" : fmtT(e.start)}</span><span class="what"><i style="background:${e.color}"></i><b>${esc(plain(e.title) || e.title)}</b>${e.where ? `<small>${esc(e.where.split("\n")[0].slice(0, 60))}</small>` : ""}<small>${esc(e.cal)}${!e.allDay && e.end ? ` · until ${fmtT(e.end)}` : ""}</small></span>${e.link ? `<a href="${esc(e.link)}" target="_blank" rel="noopener noreferrer" aria-label="Open in Google Calendar">↗</a>` : ""}</li>`;
+      }).join("") + (nowShown ? "" : `<li class="now"><span>now</span></li>`) + `</ol>`;
+    }
+    h += `<div class="actions"><button class="btn alt small" id="calRefresh">Refresh</button></div>`;
+    el.innerHTML = h;
+    $("calRefresh").onclick = () => renderCal(true);
   }
   function itemBtn(id, label, disabled, extra2) {
     const it = ITEMS[id];
@@ -4330,6 +4740,12 @@ Then tell chat "wind down" whenever you're ready.`
       return;
     }
     if (ent && ent.dataset.ent === "maple") {
+      sfx("purr");
+      if (Math.random() < 0.35) {
+        hearts(2);
+        speak("Purr… treats and toys are in your backpack. Tap the bag up top!", 4e3);
+        return;
+      }
       hearts(2);
       speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please."]), 3e3);
       return;
@@ -4609,12 +5025,20 @@ Then tell chat "wind down" whenever you're ready.`
     }
   };
   $("pet").onclick = () => {
+    sfx("purr");
     hearts(2);
     speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please.", "You're my favourite human."]), 3e3);
   };
   document.querySelectorAll("[data-ico]").forEach((el) => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
   $("pclose").onclick = closePanel;
   $("zoomBtn").onclick = () => toggleZoom();
+  $("setMusic").onchange = (e) => setMusic(e.target.checked);
+  $("setVol").oninput = (e) => setMusicVol(+e.target.value);
+  $("setSfx").onchange = (e) => {
+    setSfx(e.target.checked);
+    if (e.target.checked) sfx("coin");
+  };
+  document.addEventListener("pointerdown", () => unlockAudio(), { once: true, capture: true });
   ["pointerdown", "keydown"].forEach((t) => document.addEventListener(t, () => {
     qnQuietUntil = 0;
   }, { capture: true, once: true }));
@@ -4648,6 +5072,7 @@ Then tell chat "wind down" whenever you're ready.`
     placeLabel: (t) => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`
   });
   initNpcs({
+    sfx,
     chatted: (n) => {
       if (!S2.chats.includes(n)) {
         S2.chats.push(n);

@@ -8,6 +8,8 @@ import { villageArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { pullSunsama, SUNSAMA_ERRORS } from "./sunsama.js";
+import { unlockAudio, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx } from "./audio.js";
+import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere } from "./npcs.js";
 
 /* =================== STATE =================== */
@@ -152,7 +154,7 @@ function markActive(){
 }
 let earnT;
 function flash(msg){ const e = $("earn"); e.textContent = plain(msg); clearTimeout(earnT); earnT = setTimeout(() => e.textContent = "", 4000); }
-function earn(n, why){ F.coins += n; S.earned += n; markActive(); flash(`+${n} coins: ${why}`); mprop("coin", mel.x, mel.y - 60, 1800); }
+function earn(n, why){ if (!/quest|Sunsama/.test(why)) sfx("coin"); F.coins += n; S.earned += n; markActive(); flash(`+${n} coins: ${why}`); mprop("coin", mel.x, mel.y - 60, 1800); }
 function gainXp(n){
   const before = level(); F.xp += n;
   if (level() > before) { const L = LEVELS[level()]; setTimeout(() => { act("cheer"); speak(`We're ${L.name}s now 💕${L.gift ? " I got " + L.gift + "!" : ""}`, 6000); }, 2600); }
@@ -221,12 +223,9 @@ function act(kind, item){
 }
 
 /* =================== SOUND + TIMERS =================== */
-let ac = null;
-document.addEventListener("pointerdown", () => { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); } catch {} }, {once:true});
+// Timers always chime (an alarm shouldn't be muted with the cosy effects), and buzz where phones allow it.
 function chime(){
-  try { if (!ac) return; [660, 880, 1320].forEach((f, i) => { const o = ac.createOscillator(), g = ac.createGain(); o.type = "sine"; o.frequency.value = f;
-    g.gain.setValueAtTime(0, ac.currentTime + i*.18); g.gain.linearRampToValueAtTime(.14, ac.currentTime + i*.18 + .02); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + i*.18 + .9);
-    o.connect(g).connect(ac.destination); o.start(ac.currentTime + i*.18); o.stop(ac.currentTime + i*.18 + 1); }); } catch {}
+  alarm();
   try { navigator.vibrate && navigator.vibrate([120, 80, 120]); } catch {}
 }
 function startTimer(kind, mins, id){ S.timer = {kind, endAt: Date.now() + mins*M, total: mins*M, id: id || null, fired:false}; }
@@ -274,7 +273,7 @@ const A = {
   cleanDone(){ S.cleanDone = true; S.timer = null; earn(3, "five-minute clean"); gainXp(1); S.last = "clean"; act("cheer"); setSay("First tick of the day! Look at that ✨"); save(); },
   firstStep(t){ S.firstStep[t.id] = true; S.arrived[t.id] = true; startTimer("task", t.minutes || 25, t.id); setSay("Hard part's done. Now the rest, on the clock."); save(); },
   done(t){
-    S.doneIds.push(t.id); S.timer = null; earn(5, "quest complete"); gainXp(1); S.last = t.title; countQuest();
+    S.doneIds.push(t.id); S.timer = null; sfx("chaching"); earn(5, "quest complete"); gainXp(1); S.last = t.title; countQuest();
     let grew = 0; F.plots.forEach(p => { if (p && p.crop && p.wateredAt && growth(p) < 1) { p.bonus = (p.bonus || 0) + QUEST_BOOST; grew++; } });
     if (t.meeting) S.mode = "decompress";
     else if (remaining().length) { S.mode = "break"; startTimer("break", 10); }
@@ -360,7 +359,7 @@ function creditDone(tasks, quiet){
   const ids = new Set(allTasks().map(t => t.id)), cur = phase() === "task" ? remaining()[0] : null, got = [];
   (tasks || []).forEach(t => {
     if (!t || !t.completed || !ids.has(t.id) || S.doneIds.includes(t.id)) return;
-    S.doneIds.push(t.id); got.push(t);
+    S.doneIds.push(t.id); got.push(t); if (got.length === 1) sfx("chaching");
     earn(5, "done in Sunsama"); gainXp(1); countQuest();
     if (cur && cur.id === t.id) { if (S.timer && S.timer.id === t.id) S.timer = null; S.firstStep[t.id] = false; }
   });
@@ -551,12 +550,12 @@ function useItem(id){
     if (!F.cool[id] || Date.now() - F.cool[id] > 20*M) { F.cool[id] = Date.now(); gainXp(1); }
     save(); return;
   }
-  addInv(id, -1); gainXp(it.xp || 1);
+  addInv(id, -1); gainXp(it.xp || 1); sfx("purr");
   act(it.kind === "food" ? "eat" : it.kind === "flower" ? "flower" : it.act, it); speak(it.say, 4500); save();
 }
 function playFree(kind){
   const lines = {pet:["*leans into the pat*", "Happy fox noises!", "More pats please."], hide:["You found me!"], nap:["Mmm… cosy…"]};
-  if (kind === "pet") { hearts(2); speak(pick(lines.pet), 3000); return; }
+  if (kind === "pet") { sfx("purr"); hearts(2); speak(pick(lines.pet), 3000); return; }
   act(kind); speak(pick(lines[kind]), 4500);
   if (!F.cool[kind] || Date.now() - F.cool[kind] > 30*M) { F.cool[kind] = Date.now(); gainXp(1); save(); }
 }
@@ -644,7 +643,8 @@ function journal(){
     const when = S.timer ? `<span class="when" data-tleft>${fmt(Math.max(0, S.timer.endAt - Date.now()))}</span>` : "";
     j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(route.length ? "Walking… " + title : title)}</b>${when}<span class="more">open</span></button>`;
   }
-  j.querySelectorAll("[data-qn]").forEach(el => el.onclick = ev => { ev.stopPropagation(); qnOpen = el.dataset.qn === "open"; journal(); });
+  j.classList.toggle("intop", scene !== "village");
+  j.querySelectorAll("[data-qn]").forEach(el => el.onclick = ev => { ev.stopPropagation(); qnOpen = el.dataset.qn === "open"; sfx("paper", true); journal(); });
   j.querySelectorAll("[data-a]").forEach(el => el.onclick = () => { const t = remaining()[0]; A[el.dataset.a](t); });
   j.querySelectorAll("[data-say]").forEach(el => el.onclick = () => { const fn = say.buttons[+el.dataset.say][1]; say.buttons = null; fn(); save(); });
   j.querySelectorAll("[data-dismiss]").forEach(el => el.onclick = () => { S[el.dataset.dismiss] = true; save(); });
@@ -653,16 +653,39 @@ function journal(){
 // One panel over the map. A HUD view (quests / backpack / letters) takes it when opened; otherwise whatever the
 // current spot offers (shop, room quest board, garden plot, digest shelf).
 function showPanel(hasCtx, skin){
-  const views = {quests:"questsView", bag:"bagView", mail:"mailView", friend:"friendView"};
+  const views = {quests:"questsView", bag:"bagView", mail:"mailView", friend:"friendView", cal:"calView", settings:"settingsView"};
   const view = openView || (hasCtx ? "ctx" : null), p = $("panel");
+  if (p.hidden === !!view) sfx("paper", true);
   p.hidden = !view; $("map").classList.toggle("panel-open", !!view);
-  ["ctx", "questsView", "bagView", "mailView", "friendView"].forEach(id => $(id).hidden = id !== (views[view] || view));
+  if (view === "cal" && !p.dataset.cal) { p.dataset.cal = "1"; renderCal(); } else if (view !== "cal") delete p.dataset.cal;
+  if (view === "settings") { $("setMusic").checked = sound.music; $("setVol").value = sound.musicVol; $("setSfx").checked = sound.sfx; }
+  ["ctx", "questsView", "bagView", "mailView", "friendView", "calView", "settingsView"].forEach(id => $(id).hidden = id !== (views[view] || view));
   p.className = "panel " + (view === "quests" ? "cork" : view === "ctx" ? skin : "paper");
   document.querySelectorAll("[data-open]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.open === openView)));
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
   boardOpen = false; shelfOpen = false; selPlot = null; if (scene === "market") shopClosed = true; ctx();
+}
+// Today's calendar panel (Google Calendar via the mcp capability).
+async function renderCal(fresh){
+  const el = $("calBody"); el.innerHTML = `<p class="muted">Opening your calendar…</p>`;
+  const r = await todaysEvents(dayKey(), fresh), nowT = Date.now();
+  const fmtT = t => new Date(t).toLocaleTimeString("en-GB", {hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore"}).replace(" ", "").toLowerCase();
+  let h = `<p class="sub">${new Date(now() + 8*H).toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "long", timeZone: "UTC"})}</p>`;
+  if (r.error && !r.events.length) h += `<p class="muted">${esc(CAL_ERRORS[r.error] || "Couldn't reach your calendar just now.")}</p>`;
+  else if (!r.events.length) h += `<p class="muted">Nothing on the calendar today. A clear runway.</p>`;
+  else {
+    let nowShown = false;
+    h += `<ol class="calday">` + r.events.map(e => {
+      let mark = "";
+      if (!e.allDay && !nowShown && e.start > nowT) { nowShown = true; mark = `<li class="now"><span>now</span></li>`; }
+      const past = !e.allDay && e.end && e.end < nowT;
+      return mark + `<li class="${past ? "past" : ""}"><span class="when">${e.allDay ? "all day" : fmtT(e.start)}</span><span class="what"><i style="background:${e.color}"></i><b>${esc(plain(e.title) || e.title)}</b>${e.where ? `<small>${esc(e.where.split("\n")[0].slice(0, 60))}</small>` : ""}<small>${esc(e.cal)}${!e.allDay && e.end ? ` · until ${fmtT(e.end)}` : ""}</small></span>${e.link ? `<a href="${esc(e.link)}" target="_blank" rel="noopener noreferrer" aria-label="Open in Google Calendar">↗</a>` : ""}</li>`;
+    }).join("") + (nowShown ? "" : `<li class="now"><span>now</span></li>`) + `</ol>`;
+  }
+  h += `<div class="actions"><button class="btn alt small" id="calRefresh">Refresh</button></div>`;
+  el.innerHTML = h; $("calRefresh").onclick = () => renderCal(true);
 }
 function itemBtn(id, label, disabled, extra){
   const it = ITEMS[id];
@@ -900,7 +923,7 @@ svg.addEventListener("click", ev => {
   if (ug) { const k = ug.dataset.ugarden, st = ST[k] || {}; speak(`${(st.users || 0).toLocaleString()} ${k === "chord" ? "creatives use Chord" : "families use Chico"}! One flower for every ${st.per > 0 ? st.per : 10}.`, 4500); return; }
   const ent = ev.target.closest("[data-ent]");
   if (ent && ent.dataset.ent === "evan") { evanSays(pick(["Mama!", "hug!", "hehe!", "up up!"])); mprop("heart", evan.x, evan.y - 40); evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; return; }
-  if (ent && ent.dataset.ent === "maple") { hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please."]), 3000); return; }
+  if (ent && ent.dataset.ent === "maple") { sfx("purr"); if (Math.random() < .35) { hearts(2); speak("Purr… treats and toys are in your backpack. Tap the bag up top!", 4000); return; } hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please."]), 3000); return; }
   const pl = ev.target.closest("[data-place]");
   if (pl && scene === "village") {
     const id = pl.dataset.place, v = VILLAGE[id];
@@ -1050,18 +1073,22 @@ $("addForm").onsubmit = e => {
   $("addTitle").value = ""; $("addMin").value = ""; save(true);
 };
 $("nameSave").onclick = () => { const v = $("nameIn").value.trim(); if (v) { F.name = v; $("nameIn").value = ""; act("cheer"); speak(`Hi! I'm ${v} now 🦊`, 4000); save(); } };
-$("pet").onclick = () => { hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please.", "You're my favourite human."]), 3000); };
+$("pet").onclick = () => { sfx("purr"); hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please.", "You're my favourite human."]), 3000); };
 
 document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
 $("pclose").onclick = closePanel;
 $("zoomBtn").onclick = () => toggleZoom();
+$("setMusic").onchange = e => setMusic(e.target.checked);
+$("setVol").oninput = e => setMusicVol(+e.target.value);
+$("setSfx").onchange = e => { setSfx(e.target.checked); if (e.target.checked) sfx("coin"); };
+document.addEventListener("pointerdown", () => unlockAudio(), {once: true, capture: true});
 ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { qnQuietUntil = 0; }, {capture: true, once: true}));
 document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; ctx(); });
 initNotebook({windDown, onTread, water:() => ({ml: S.waterMl || 0, goal: WATER_GOAL, glass: GLASS}), steps:() => ({n: S.steps, goal: STEP_GOAL}),
   addWater:ml => A.water(ml), setWater, setSteps, task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
   sayNow:() => say, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),
   placeLabel:t => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`});
-initNpcs({chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
+initNpcs({sfx, chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();
 render(true);

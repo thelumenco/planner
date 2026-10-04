@@ -9,7 +9,7 @@ const slot = (from, to, scene, where) => Object.assign({from: hm(from), to: hm(t
 
 export const NPCS = [
   {
-    id: "hana", name: "Hana", job: "Runs the market",
+    id: "hana", pitch: 1.15, name: "Hana", job: "Runs the market",
     intro: "Hi love, I'm Hana! I moved here from a little seaside town. The honey toast is mine, and yes, I remember everyone's usual.",
     look: {skin: "#F3D2B8", hair: "#5A3A2A", hairStyle: "bun", top: "#EFA3A6", bottom: "#7A6A8C", extra: "apron"},
     routine: [slot("8:00", "12:00", "market", [260, 352]), slot("12:00", "13:00", "market", [[200, 352], [320, 352], [260, 352]]),
@@ -20,7 +20,7 @@ export const NPCS = [
     react: {harvest: "Ooh, homegrown! I'll buy anything you grow, you know.", quests3: "Three quests done already? Have a dumpling, you've earned it.", lunch: "Have you had lunch? Proper lunch?"}
   },
   {
-    id: "okada", name: "Mr Okada", job: "Retired postmaster, unofficial well-keeper",
+    id: "okada", pitch: 0.75, name: "Mr Okada", job: "Retired postmaster, unofficial well-keeper",
     intro: "Okada. Forty years delivering letters. Retired now, but I still can't stop sorting things. Even the pebbles by the well.",
     look: {skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses"},
     routine: [slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "17:00", "village", [[176, 352], [146, 360], [170, 372]]), slot("17:00", "19:30", "village", [380, 612])],
@@ -29,7 +29,7 @@ export const NPCS = [
     react: {inbox: "An email quest! Just like the old days. Stamp it and send it.", water: "Good, drink up. Forty years of walking taught me that.", quests3: "Steady work. That's the postmaster's way."}
   },
   {
-    id: "juniper", name: "Juniper", job: "Librarian at the Fresh Pages library",
+    id: "juniper", pitch: 1.05, name: "Juniper", job: "Librarian at the Fresh Pages library",
     intro: "Welcome to the library! I'm Juniper. I love a good semicolon; I also write poetry, but that's a secret. One book recommendation a week, guaranteed.",
     look: {skin: "#C99A78", hair: "#2B2320", hairStyle: "bob", top: "#B9D2A6", bottom: "#3F4A6B", extra: "glasses"},
     routine: [slot("8:30", "13:00", "fresh", [[160, 300], [330, 300], [240, 330]]), slot("13:00", "15:30", "fresh", [356, 330]),
@@ -39,7 +39,7 @@ export const NPCS = [
     react: {writing: "Ooh, a writing quest. Messy first, lovely later.", quests3: "Three chapters done today. Metaphorically."}
   },
   {
-    id: "bo", name: "Bo", job: "Carpenter at the Chord workshop",
+    id: "bo", pitch: 0.8, name: "Bo", job: "Carpenter at the Chord workshop",
     intro: "Bo! Carpenter. If it creaks, wobbles or falls off, I'm your guy. Built half this village. *hums*",
     look: {skin: "#E2B590", hair: "#3B2A1E", hairStyle: "short", top: "#E9C46A", bottom: "#4F6B8A", extra: "cap"},
     routine: [slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]), slot("12:30", "13:30", "village", [300, 614]),
@@ -49,7 +49,7 @@ export const NPCS = [
     react: {building: "Building something? Tools are out. Go for it.", quests3: "That's three. Nails in straight, every one."}
   },
   {
-    id: "lin", name: "Auntie Lin", job: "Gardener",
+    id: "lin", pitch: 0.95, name: "Auntie Lin", job: "Gardener",
     intro: "Auntie Lin. I have opinions about soil, and they're all correct. Plant something and I'll tell you what you did wrong. Lovingly.",
     look: {skin: "#E9C2A0", hair: "#7C7570", hairStyle: "bun", top: "#9EBE8C", bottom: "#8A6A52", extra: "sunhat"},
     routine: [slot("6:30", "9:30", "farm", [[45, 250], [475, 400], [250, 560]]), slot("11:30", "14:00", "village", [326, 600]), slot("16:00", "19:00", "farm", [[45, 250], [475, 400], [250, 560]])],
@@ -59,7 +59,7 @@ export const NPCS = [
     react: {harvest: "Look at that harvest! Your soil is coming along.", ready: "Something's ready in your garden. Don't leave it sulking!"}
   },
   {
-    id: "pip", name: "Pip", job: "Evan's best friend",
+    id: "pip", pitch: 1.45, name: "Pip", job: "Evan's best friend",
     intro: "I'm Pip! I'm Evan's best friend and I'm the FASTEST. Watch!", kid: true,
     look: {skin: "#D6A27C", hair: "#1F1A17", hairStyle: "spiky", top: "#F28C6A", bottom: "#4C7BB0", extra: "helmet"},
     routine: [slot("15:00", "18:30", "village", [[230, 330], [300, 330], [260, 380], [360, 560], [400, 600], [200, 400]])],
@@ -67,7 +67,7 @@ export const NPCS = [
     react: {}
   },
   {
-    id: "theo", name: "Theo", job: "Town hall clerk",
+    id: "theo", pitch: 0.9, name: "Theo", job: "Town hall clerk",
     intro: "Theo, town clerk. I keep the village records. And, if you have a moment, I have a stamp collection you would not believe.",
     look: {skin: "#F0D0B4", hair: "#6B4A2E", hairStyle: "short", top: "#C3CDEE", bottom: "#3A3A48", extra: "tie"},
     routine: [slot("9:00", "12:00", "hall", [[200, 320], [330, 320]]), slot("12:00", "13:00", "village", [354, 606]), slot("13:00", "17:00", "hall", [[200, 320], [330, 320]])],

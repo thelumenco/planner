@@ -44,10 +44,12 @@
       <p class="scenename" id="sceneName">Village</p>
       <div class="berries" title="Coins"><span data-ico="coin" aria-hidden="true"></span><span id="coins">0</span></div>
       <div class="hudbtns">
+        <button class="hbtn" data-open="cal" aria-label="Today's calendar" title="Today's calendar"><i data-ico="calendar" data-size="24"></i></button>
         <button class="hbtn" data-open="quests" aria-label="Quest board" title="Quest board"><i data-ico="board" data-size="24"></i><span class="badge" id="qBadge" hidden></span></button>
         <button class="hbtn" data-open="bag" aria-label="Backpack" title="Backpack"><i data-ico="bag" data-size="24"></i></button>
         <button class="hbtn" data-open="friend" aria-label="Friendship with Maple" title="Friendship"><i data-ico="heart" data-size="24"></i></button>
         <button class="hbtn" data-open="mail" aria-label="Letters" title="Letters"><i data-ico="letter" data-size="24"></i><span class="badge" id="mailBadge" hidden></span></button>
+        <button class="hbtn" data-open="settings" aria-label="Settings" title="Settings"><i data-ico="gear" data-size="24"></i></button>
       </div>
     </div>
     <div class="map" id="map">
@@ -297,6 +299,18 @@
         <div class="pview" id="friendView" hidden>
           <h2>Friendship with <span id="friendName">Maple</span></h2>
           <div id="friendBody"></div>
+        </div>
+        <div class="pview" id="calView" hidden>
+          <h2>Today</h2>
+          <div id="calBody"></div>
+        </div>
+        <div class="pview" id="settingsView" hidden>
+          <h2>Settings</h2>
+          <h3 class="ph3">Sound</h3>
+          <label class="setrow"><input type="checkbox" id="setMusic"> <span>Music: a calm piano loop</span></label>
+          <label class="setrow slider"><span>Music volume</span><input type="range" id="setVol" min="0" max="1" step="0.05"></label>
+          <label class="setrow"><input type="checkbox" id="setSfx"> <span>Sound effects: paper, purrs, coins, hellos</span></label>
+          <h3 class="ph3">Your fox</h3>
           <div class="row">
             <label class="sr" for="nameIn">Fox's name</label>
             <input id="nameIn" maxlength="20" placeholder="rename your fox">

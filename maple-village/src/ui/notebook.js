@@ -2,6 +2,7 @@
 // quest, an email block for inbox quests, and "talk to the note" via the sample capability. Also shows agent mail.
 import { $, esc, plain } from "../util.js";
 import { icon, progressBar } from "../art/icons.js";
+import { sfx } from "../game/audio.js";
 
 let api = null;        // from core: task(), S(), F(), fs(t), act(kind, t), timerLeft(), sayNow(), sample(), placeLabel(t), markRead(item), agentName(from)
 let open = null;       // {kind:"task", id} | {kind:"mail", item} | {kind:"digest", item} | {kind:"tracker", which}
@@ -41,14 +42,14 @@ export function openDigest(item){ open = {kind: "digest", item}; show(); }
 export function openTracker(which){ open = {kind: "tracker", which}; show(); setTimeout(() => $("nbTrack") && $("nbTrack").focus(), 50); }
 export function closeNotebook(){
   if (!open) return;
-  open = null; busy && busy.abort(); busy = null;
+  open = null; busy && busy.abort(); busy = null; sfx("paper");
   const root = $("notebook"); root.hidden = true; document.body.classList.remove("nb-open");
   api.onClose && api.onClose();
   lastFocus && lastFocus.focus && lastFocus.focus();
 }
 function show(){
   const root = $("notebook");
-  if (root.hidden) lastFocus = document.activeElement;
+  if (root.hidden) { lastFocus = document.activeElement; sfx("paper"); }
   root.hidden = false; document.body.classList.add("nb-open");
   refreshNotebook(true);
 }

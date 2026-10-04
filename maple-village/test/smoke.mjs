@@ -46,7 +46,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(fit, "zooming out shows the whole map");
     await page.click("#zoomBtn"); await page.waitForTimeout(300);
     await page.click('#journal [data-qn="open"]');
-    check(await page.locator(".scenebar .hbtn").count() === 4, "four drawn icons in the corner");
+    check(await page.locator(".scenebar .hbtn").count() === 6, "six drawn icons in the corner (calendar, quests, backpack, friendship, letters, settings)");
     check(!(await page.locator(".hbtn").first().textContent()).match(/\p{Extended_Pictographic}/u), "corner icons are drawn, not emoji");
   } else check(await page.locator("#map .hudbar").count() === 1, "trackers sit on the map");
   check(lay.fits, "the whole game fits on screen without scrolling");
@@ -190,6 +190,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(plan.tasks.find(t => t.id === "s4").minutes === 90 && plan.tasks.find(t => t.id === "s3").treadmill === true, "time estimates and treadmill flags carry over");
   check(plan.tasks.find(t => t.id === "s1").email, "comms tasks become email quests at the post office");
   check(plan.tasks.find(t => t.id === "s3").spot === "treadmill", "treadmill tasks go straight to the treadmill");
+  await page.click('[data-open="cal"]');
+  await page.waitForFunction(() => document.querySelectorAll("#calBody .calday li").length > 1, null, { timeout: 8000 }).catch(() => {});
+  check(await page.locator("#calBody .calday li b").count() >= 2, "the calendar icon shows today's events");
+  await page.click('[data-open="settings"]');
+  check(await page.locator("#setMusic").count() === 1 && await page.locator("#nameIn").isVisible(), "settings has music, sound and renaming");
+  await page.click("#setSfx"); check(!(await page.locator("#setSfx").isChecked()), "sound effects can be muted");
   await page.close();
 }
 await browser.close();

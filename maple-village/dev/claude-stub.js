@@ -48,6 +48,16 @@
   const mcp = {
     callTool: async (server, tool, input) => {
       await new Promise(r => setTimeout(r, 300));
+      if (server === "Google Calendar" && tool === "list_events") {
+        if (input.calendarId !== "primary") return { content: [], payload: { events: [] } };
+        const d = input.startTime.slice(0, 10), at = (h, m) => `${d}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00+08:00`;
+        const events = [
+          { id: "e1", summary: "School drop-off", start: { dateTime: at(9, 0) }, end: { dateTime: at(9, 30) }, status: "confirmed" },
+          { id: "e2", summary: "Call with a client", start: { dateTime: at(15, 0) }, end: { dateTime: at(15, 45) }, location: "Zoom", status: "confirmed", htmlLink: "https://calendar.google.com" },
+          { id: "e3", summary: "Pick up groceries", start: { date: d }, end: { date: d }, status: "confirmed" }
+        ];
+        return { content: [], payload: { events } };
+      }
       if (server !== "Sunsama MCP" || tool !== "read_resource") throw { code: "not_in_manifest", message: "not declared" };
       const tasks = [
         { _id: "s1", title: "Comms catchup", timeEstimate: "15 minutes", sortOrder: 1, isWork: true, completed: false,

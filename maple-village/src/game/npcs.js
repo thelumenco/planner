@@ -43,6 +43,12 @@ function tickVillager(def, dt){
     const p = slot.at || jitter(pick(slot.wander));
     e = ents[def.id] = {def, key, kind: "npc", x: p[0], y: p[1], tx: p[0], ty: p[1], dir: Math.random() < .5 ? -1 : 1, moving: false, wait: rnd(1, 4), node: makeNode(def.id, def.look, def.kid)};
   }
+  // Now and then a neighbour near Mel says hello (each at most every few minutes).
+  const near = Math.hypot(e.x - api.mel.x, e.y - api.mel.y) < 110;
+  if (near && !sayer && Date.now() - (e.helloAt || 0) > 4*60e3 && Math.random() < dt*.08) {
+    e.helloAt = Date.now(); e.dir = api.mel.x < e.x ? -1 : 1;
+    say(e, pick(hellos()), 2600); api.sfx && api.sfx("babble", def.pitch || 1);
+  }
   const b = api.bounds();
   if (stepTo(e, def.kid ? 95 : 48, dt)) {
     e.wait -= dt;
@@ -58,6 +64,7 @@ function tickVillager(def, dt){
   e.node.classList.toggle("run", def.kid && e.moving);
 }
 
+const hellos = () => { const t = sgHM(); return [t < 720 ? "Morning, Mel!" : t < 1080 ? "Afternoon, Mel!" : "Evening, Mel!", "Hi!", "Hello there!", "Hiya, Mel!"]; };
 /* ---------- messengers ---------- */
 function tickCourier(dt){
   const scene = api.scene(), mel = api.mel;
