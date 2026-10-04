@@ -113,7 +113,9 @@ const FX = {
   coin(t){ bell(2349, t, .7, .12); },
   bowl(t){ [220, 550].forEach((f, i) => { const o = ac.createOscillator(), g = ac.createGain(); o.type = "sine"; o.frequency.value = f;
     g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(i ? .05 : .16, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + 3.2); o.connect(g).connect(sfxBus); o.start(t); o.stop(t + 3.3); }); },
-  chime(t){ [660, 880, 1320].forEach((fr, i) => bell(fr, t + i*.18, 1.2, .16)); },
+  // a soft single chime (ticking things off, gifts); timers ending still use the fuller three-note alarm
+  chime(t){ bell(1046, t, 1.4, .055); },
+  alarm(t){ [660, 880, 1320].forEach((fr, i) => bell(fr, t + i*.18, 1.2, .14)); },
   // villager "hello": a few soft pitched blips, Animal Crossing style, pitch set per villager
   babble(t, pitch = 1){ const n = 3 + Math.floor(Math.random()*3);
     for (let i = 0; i < n; i++) { const o = ac.createOscillator(), f = ac.createBiquadFilter(), g = ac.createGain(), at = t + i*.075;
@@ -127,4 +129,4 @@ export function sfx(name, arg){
   if (!settings.sfx || !ensure() || ac.state !== "running" || !FX[name]) return;
   try { FX[name](ac.currentTime + .01, arg); } catch {}
 }
-export function alarm(){ if (!ensure() || ac.state !== "running") return; try { FX.chime(ac.currentTime + .01); } catch {} }
+export function alarm(){ if (!ensure() || ac.state !== "running") return; try { FX.alarm(ac.currentTime + .01); } catch {} }

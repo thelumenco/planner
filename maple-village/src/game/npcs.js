@@ -2,7 +2,7 @@
 // and runs agent messengers who carry unread mail to Mel. Core owns the frame loop and calls tickNpcs / tapNpc.
 import { NPCS, AGENTS } from "../data/npcs.js";
 import { personArt, letterArt } from "../art/people.js";
-import { sgHM, now, H, pick, rnd, clamp, $, plain } from "../util.js";
+import { sgHM, now, H, pick, rnd, clamp, $, plain, esc } from "../util.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const ents = {};            // id -> entity (villagers and the active messenger)
@@ -80,6 +80,7 @@ const hellos = () => { const t = sgHM(); return [t < 720 ? "Morning, Mel!" : t <
 function tickCourier(dt){
   const scene = api.scene(), mel = api.mel;
   if (courier && courier.scene !== scene) { drop(courier.id); courier = null; }
+  if (scene === "home") return;   // only family inside the house; notes wait until Mel steps out
   // the note she's carrying was replaced or read elsewhere (e.g. fresh mail arrived just after the page opened)
   if (courier && courier.state !== "leaving" && !api.unreadMail().some(m => m.id === courier.item.id)) { drop(courier.id); courier = null; }
   if (!courier) {
@@ -116,7 +117,8 @@ export function courierDelivered(itemId){
 /* ---------- talking ---------- */
 function say(e, text, ms = 3800){
   const el = $("npcSay"); sayer = e;
-  el.textContent = plain(e.kind === "agent" ? text : `${e.def.name}: ${text}`); el.hidden = false;
+  const who = e.kind === "agent" ? e.ag.name.split(/[ ,]/)[0] : e.def.name;
+  el.innerHTML = `<b class="who">${esc(who)}</b>${esc(plain(text))}`; el.hidden = false;
   clearTimeout(sayT); sayT = setTimeout(hideSay, ms);
 }
 function hideSay(){ $("npcSay").hidden = true; sayer = null; }

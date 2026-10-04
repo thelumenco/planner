@@ -75,7 +75,7 @@ const SHELLS = {
     ${wallBase("#F8EED8", "var(--butter)")}${d.wall ? wallpaper(d.wall) : ""}
     ${d.art ? sk(`<rect x="152" y="40" width="44" height="36" rx="2" style="fill:var(--wood)"/><rect x="158" y="46" width="32" height="24" style="fill:var(--sky)"/><path d="M158 70 l10 -10 l8 7 l6 -5 l8 8z" style="fill:var(--moss)"/>`, `<rect x="152" y="40" width="44" height="36" rx="2"/><rect x="158" y="46" width="32" height="24"/><path d="M174 30 l-12 10 M174 30 l12 10"/>`) : ""}
     ${d.lamp ? sk(`<path d="M190 368 h24 l6 18 h-36z" style="fill:var(--butter)"/>`, `<path d="M190 368 h24 l6 18 h-36z M202 386 v52 M192 440 h20"/>`) : ""}
-    ${d.plant ? plant(482, 360, 1.3) : ""}
+    ${d.plant ? plant(42, 330, 1.3) : ""}
     ${d.bed ? sk(`<ellipse cx="292" cy="500" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="292" cy="498" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="292" cy="500" rx="30" ry="13"/><ellipse cx="292" cy="498" rx="20" ry="8"/>`) : ""}
     ${sk(`<rect x="60" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/><rect x="390" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/>`, `<rect x="60" y="34" width="70" height="58" rx="30"/><path d="M95 34 v58 M60 66 h70"/><rect x="390" y="34" width="70" height="58" rx="30"/><path d="M425 34 v58 M390 66 h70"/>`)}
     ${skirting}`; },

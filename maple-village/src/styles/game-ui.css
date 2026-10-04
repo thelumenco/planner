@@ -300,3 +300,10 @@
 .map .panel.fridge{background-color:#F7F5F0;border:6px solid #E3DED4;border-radius:18px}
 .map .panel.fridge h2{display:inline-block;background:#FFFDF6;padding:2px 12px;transform:rotate(-1.5deg);box-shadow:0 4px 8px -6px rgba(0,0,0,.4)}
 .map #hmarks .qmark{animation:qbob 2.4s ease-in-out infinite}
+
+/* washing on the line: a gentler sway than the swing */
+.map .washing{transform-box:fill-box;transform-origin:50% 0;animation:washing 3.6s ease-in-out infinite}
+@keyframes washing{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+@media (prefers-reduced-motion:reduce){.map .washing{animation:none}}
+/* who's talking: the name sits above the words */
+.speech .who{display:block;font-family:Mulish,sans-serif;font-size:.68em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--peri2,#6E7FC8);margin-bottom:1px}

@@ -4,7 +4,7 @@ import { sk, tapeLabel } from "./scenes.js";
 
 const wrap = (id, label, tapeCol, cx, baseY, halfW, art, lines) =>
   `<g data-place="${id}" aria-label="${label}"><ellipse class="hov" cx="${cx}" cy="${baseY + 4}" rx="${halfW + 14}" ry="10" style="fill:var(--butter)"/>
-    ${sk(art, lines)}${tapeLabel(cx, baseY + 22, label, tapeCol)}</g>`;
+    ${sk(art, lines)}${tapeLabel(cx, baseY + 20, label, tapeCol, 11.5)}</g>`;
 
 const smoke = (x, y) => `<path class="smoke" d="M${x} ${y} q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>`;
 

@@ -49,33 +49,33 @@ export function villageArt(){
     townHall() + chordWorkshop() + library() + chicoCottage() + postOffice() +
     `<g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M238 330 v-40 M282 330 v-40"/><rect x="230" y="282" width="60" height="38" rx="3" style="fill:var(--wood)"/>${notesArt(236, 288, G.remaining().length)}</g>
-      ${tapeLabel(260, 278, "Quests", "var(--butter)")}</g>
+      ${tapeLabel(260, 280, "Quests", "var(--butter)", 11)}</g>
     <g data-place="well" aria-label="Well"><ellipse class="hov" cx="160" cy="342" rx="26" ry="7" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M146 312 v20 M174 312 v20"/><path d="M140 314 l20 -12 l20 12z" style="fill:var(--peach)"/><ellipse cx="160" cy="334" rx="17" ry="7" style="fill:var(--stone)"/><path d="M143 334 v6 a17 7 0 0 0 34 0 v-6" style="fill:var(--stone)"/><ellipse cx="160" cy="333" rx="11" ry="4" style="fill:var(--water)"/></g>
-      ${tapeLabel(160, 362, "Well", "var(--sky)")}</g>
+      ${tapeLabel(160, 360, "Well", "var(--sky)", 11)}</g>
     <g data-place="market" aria-label="Market"><ellipse class="hov" cx="362" cy="342" rx="32" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M340 306 v30 M384 306 v30"/><rect x="336" y="320" width="52" height="16" style="fill:var(--wood)"/>
         <path d="M332 306 h60 l-4 10 h-52z" style="fill:var(--card)"/><path d="M340 306 l-2 10 M352 306 l-1 10 M364 306 v10 M376 306 l1 10" style="stroke:var(--rose)" stroke-width="5"/>
         <circle cx="350" cy="317" r="3.2" style="fill:var(--rose)"/><circle cx="362" cy="317" r="3.2" style="fill:var(--butter)"/><circle cx="374" cy="317" r="3.2" style="fill:var(--sage)"/></g>
-      ${tapeLabel(362, 360, "Market", "var(--blush)")}</g>
+      ${tapeLabel(362, 358, "Market", "var(--blush)", 11)}</g>
     ${townRiver()}`;
   return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 26, 536, 8, 2, 12)
     + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
 }
 /* ---------- the river between the two screens ---------- */
 const waterBand = (y1, y2) => `<path d="M0 ${y1+4} Q65 ${y1-4} 130 ${y1+3} T260 ${y1+2} T390 ${y1+4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2+5} 390 ${y2-2} T260 ${y2} T130 ${y2-3} T0 ${y2+2}`}z" style="fill:var(--water)"/>`;
-function bridge(id, x, y1, y2, label, tapeX, tapeY){
+function bridge(id, x, y1, y2, label, tapeX, tapeY, size){
   let planks = ""; for (let y = y1 + 8; y < y2 - 2; y += 9) planks += `<path d="M${x-22} ${y} h44"/>`;
   return `<g data-place="${id}" aria-label="${label}"><ellipse class="hov" cx="${x}" cy="${(y1 + y2)/2}" rx="40" ry="${(y2 - y1)/2 + 6}" style="fill:var(--butter)"/>
     ${sk(`<rect x="${x-24}" y="${y1}" width="48" height="${y2 - y1}" rx="3" style="fill:var(--wood)"/>`,
       `<rect x="${x-24}" y="${y1}" width="48" height="${y2 - y1}" rx="3"/>${planks}<path d="M${x-28} ${y1-4} v${y2 - y1 + 8} M${x+28} ${y1-4} v${y2 - y1 + 8}" stroke-width="2.2"/><path d="M${x-28} ${y1+2} v0 M${x-28} ${(y1+y2)/2} h-2 M${x+28} ${(y1+y2)/2} h2"/>`)}
-    ${tapeLabel(tapeX, tapeY, label, "var(--sky)")}</g>`;
+    ${tapeLabel(tapeX, tapeY, label, "var(--sky)", size)}</g>`;
 }
 const ripples = (pts) => `<g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".45">${pts.map(([x, y]) => `<path class="ripple" d="M${x} ${y} q8 -4 16 0"/>`).join("")}</g>`;
 function townRiver(){
   return `<g filter="url(#wob)">${waterBand(600, 640)}</g>${ripples([[60, 620], [150, 628], [370, 618], [450, 630]])}
     <g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 604 Q65 596 130 603 T260 602 T390 604 T520 600" fill="none"/></g>
-    ${bridge("toBase", 260, 584, 640, "To home", 410, 624)}
+    ${bridge("toBase", 260, 584, 640, "To home", 410, 624, 11)}
     <g data-place="bench" aria-label="Riverside bench"><ellipse class="hov" cx="334" cy="572" rx="30" ry="8" style="fill:var(--butter)"/>
       ${sk(`<rect x="314" y="560" width="40" height="7" rx="2" style="fill:var(--wood)"/><rect x="314" y="548" width="40" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="314" y="560" width="40" height="7" rx="2"/><rect x="314" y="548" width="40" height="6" rx="2"/><path d="M318 554 v6 M350 554 v6 M318 567 v9 M350 567 v9"/>`)}</g>`;
 }
@@ -126,8 +126,9 @@ export function baseArt(){
     // evening firepit + washing line, just for cosiness
     sk(`<ellipse cx="276" cy="608" rx="20" ry="8" style="fill:var(--stone)"/><path d="M264 606 l24 -6 M264 600 l24 6" style="stroke:var(--wood)" stroke-width="4"/>`,
       `<ellipse cx="276" cy="608" rx="20" ry="8"/><path class="smoke" d="M276 594 q-4 -6 0 -11 q4 -5 0 -10" opacity=".5"/>`) +
-    sk(`<path d="M378 354 h16 v18 h-16z" style="fill:var(--sky)"/><path d="M406 356 h14 l3 14 h-20z" style="fill:var(--rose)"/><path d="M434 354 h18 v12 h-18z" style="fill:var(--butter)"/>`,
-      `<path d="M362 396 v-46 M466 396 v-46 M362 350 Q414 358 466 350"/><path d="M378 354 h16 v18 h-16z M406 356 h14 l3 14 h-20z M434 354 h18 v12 h-18z"/>`);
+    sk("", `<path d="M362 396 v-46 M466 396 v-46 M362 350 Q414 358 466 350"/>`) +
+    [[`<path d="M378 354 h16 v18 h-16z" style="fill:var(--sky)"/>`, `<path d="M378 354 h16 v18 h-16z"/>`, 0], [`<path d="M406 356 h14 l3 14 h-20z" style="fill:var(--rose)"/>`, `<path d="M406 356 h14 l3 14 h-20z"/>`, .7], [`<path d="M434 354 h18 v12 h-18z" style="fill:var(--butter)"/>`, `<path d="M434 354 h18 v12 h-18z"/>`, 1.4]]
+      .map(([a, l, d]) => `<g class="washing" style="animation-delay:-${d}s">${sk(a, l)}</g>`).join("");
   const fam = (G.F().fam && G.F().fam.owned) || {};
   const famArt = (fam.sandpit ? `<g aria-label="Sandpit">${sk(`<rect x="208" y="512" width="56" height="24" rx="5" style="fill:#F2DDA8"/><path d="M246 506 h8 l-2 8 h-4z" style="fill:var(--rose)"/>`, `<rect x="208" y="512" width="56" height="24" rx="5"/><path d="M212 518 h48" opacity=".5"/><path d="M246 506 h8 l-2 8 h-4z M250 506 v-6"/><path d="M220 528 q5 -5 10 0" opacity=".6"/>`)}</g>` : "")
     + (fam.hammock ? sk(`<path d="M398 600 q32 18 64 0 z" style="fill:var(--peach)"/>`, `<path d="M392 622 v-34 M468 622 v-34 M392 594 l6 6 M468 594 l-6 6"/><path d="M398 600 q32 18 64 0"/><path d="M410 604 l2 -3 M430 608 l1 -4 M450 604 l-2 -3" opacity=".6"/>`) : "");

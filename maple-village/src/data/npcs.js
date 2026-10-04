@@ -86,9 +86,9 @@ export const NPCS = [
     routine: [
       slot("19:30", "21:30", "base", [430, 606], {act: "rest", needs: "hammock"}),   // once Mel buys him the hammock
       slot("7:00", "8:30", "base", [190, 452], {days: "wd", act: "water", dir: -1}),
-      slot("8:30", "12:30", "home", [342, 336], {days: "wd", act: "type", dir: -1}),
+      slot("8:30", "12:30", "home", [446, 374], {days: "wd", act: "type", dir: -1}),
       slot("12:30", "13:30", "base", [340, 300], {days: "wd", act: "repair", dir: -1}),
-      slot("13:30", "17:30", "home", [342, 336], {days: "wd", act: "type", dir: -1}),
+      slot("13:30", "17:30", "home", [446, 374], {days: "wd", act: "type", dir: -1}),
       slot("17:30", "19:00", "farm", [[90, 250], [430, 400], [250, 520]], {days: "wd", act: "farm"}),
       slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600], [400, 330]], {days: "wd"}),
       slot("7:30", "10:30", "farm", [[90, 250], [430, 400], [250, 520]], {days: "we", act: "farm"}),

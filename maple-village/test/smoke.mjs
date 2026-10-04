@@ -265,6 +265,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#bag .item[data-id="icecream"]');
   await page.waitForTimeout(300);
   check(await page.locator("#evanHold path").count() > 0 && await page.locator("#evanSay").textContent().then(t => /ICE CREAM/.test(t)), "Evan gets his ice cream");
+  check(await page.locator("#panel").isHidden() && await page.locator("#evanSay .who").textContent() === "Evan", "the backpack closes so you can see Evan say thank you, with his name on the bubble");
+  await page.click('[data-open="bag"]');
   await page.click('#bag .item[data-id="kopi"]');
   check(await page.locator("#speech").textContent().then(t => /Darren/.test(t)), "Darren's gift waits until you find him");
   await page.goto(url + "?seed=1&nosample=1&time=20:00&date=2026-10-05");

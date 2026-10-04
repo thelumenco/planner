@@ -742,6 +742,13 @@ body.nb-open{overflow:hidden}
 .map .panel.fridge{background-color:#F7F5F0;border:6px solid #E3DED4;border-radius:18px}
 .map .panel.fridge h2{display:inline-block;background:#FFFDF6;padding:2px 12px;transform:rotate(-1.5deg);box-shadow:0 4px 8px -6px rgba(0,0,0,.4)}
 .map #hmarks .qmark{animation:qbob 2.4s ease-in-out infinite}
+
+/* washing on the line: a gentler sway than the swing */
+.map .washing{transform-box:fill-box;transform-origin:50% 0;animation:washing 3.6s ease-in-out infinite}
+@keyframes washing{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+@media (prefers-reduced-motion:reduce){.map .washing{animation:none}}
+/* who's talking: the name sits above the words */
+.speech .who{display:block;font-family:Mulish,sans-serif;font-size:.68em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--peri2,#6E7FC8);margin-bottom:1px}
 </style>
 </head>
 <body>
@@ -1307,6 +1314,7 @@ body.nb-open{overflow:hidden}
   I.headphones = [`<rect x="3.5" y="12" width="4.5" height="7" rx="2" ${f(C.peri)}/><rect x="16" y="12" width="4.5" height="7" rx="2" ${f(C.peri)}/>`, `<path d="M5 13a7 7 0 0 1 14 0"/><rect x="3.5" y="12" width="4.5" height="7" rx="2"/><rect x="16" y="12" width="4.5" height="7" rx="2"/>`];
   I.hammock = [`<path d="M5 10q7 7 14 0z" ${f(C.peach)}/>`, `<path d="M3 20V6M21 20V6M3 9l2 1M21 9l-2 1"/><path d="M5 10q7 7 14 0z"/><path d="M8 12.5l1-1.5M12 14l.5-2M16 12.5l-1-1.5" opacity=".6"/>`];
   I.hearth = [`<path d="M12 3c1 3.5 5.5 5.5 5.5 10.5a5.5 5.5 0 0 1-11 0c0-2.5 1.2-3.8 2.3-5 .3 1.6 1 2.6 2 3 0-3.3.2-5.8 1.2-8.5z" ${f("#F6A23A")}/><path d="M12 13c.6 1.6 2.4 2.4 2.4 4.3a2.4 2.4 0 0 1-4.8 0c0-1.3.9-2.3 2.4-4.3z" ${f("#FFE08A")}/>`, `<path d="M12 3c1 3.5 5.5 5.5 5.5 10.5a5.5 5.5 0 0 1-11 0c0-2.5 1.2-3.8 2.3-5 .3 1.6 1 2.6 2 3 0-3.3.2-5.8 1.2-8.5z"/>`];
+  I.broom = [`<path d="M7 14l-3.5 6.5c2 .8 4.5.6 6.5-.4l1.5-4.4z" ${f(C.butter)}/>`, `<path d="M19.5 3.5L10 15"/><path d="M7 14l-3.5 6.5c2 .8 4.5.6 6.5-.4l1.5-4.4zM8 15.5l-2 4.4M9.8 16.4l-1.3 3.6M7 14l4 1.7"/>`];
   I.fridge = [`<rect x="6" y="2.5" width="12" height="19" rx="2" ${f("#F4F1EA")}/><circle cx="14.5" cy="5.5" r="1.2" ${f(C.rose)}/>`, `<rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M6 9.5h12M8.5 5v2.5M8.5 12v4"/>`];
   I.base = I.sprout;
   var icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
@@ -1396,11 +1404,11 @@ body.nb-open{overflow:hidden}
       ["scales", "Stamps & scales", "C", "scales", /invoice|pay|bill|stripe|account|bank|receipt|expense|price/, "Weigh it, stamp it, send it."],
       ["ledge", "Writing ledge", "D", "desk", /./, "A tidy little ledge for odd jobs."]
     ] },
-    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { A: [120, 216], B: [414, 228], H: [326, 250] }, stations: [
+    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { A: [120, 216], B: [414, 228], H: [326, 250], C: [96, 410], D: [464, 452], G: [396, 372], E: [436, 598], F: [96, 596] }, stations: [
       ["desk", "Home desk", "A", "desk", /./, "Your own little desk."],
       ["kitchen", "Kitchen", "B", "kitchen", /cook|meal|lunch|dinner|bake|grocer|prep/, "Something smells good."],
       ["sofa", "Sofa", "C", "sofa", /read|rest|journal|meditat|book|nap/, "Soft cushions, deep breaths."],
-      ["laundry", "Laundry basket", "D", "laundry", /fold|laundry|clothes|wash|iron/, "Fold, stack, done."],
+      ["laundry", "Laundry", "D", "laundry", /fold|laundry|clothes|wash|iron/, "Fold, stack, done."],
       ["cupboard", "Cleaning cupboard", "E", "cupboard", /clean|tidy|wipe|hestia|dust/, "Hestia's chores live in here."],
       ["fridge", "Fridge", "H", "fridge", null, "The fridge: what we have, and the shopping list."],
       ["treadmill", "Treadmill", "F", "treadmill", /treadmill/, "1.2 and go. Walk and work.", -12],
@@ -1623,7 +1631,7 @@ body.nb-open{overflow:hidden}
     ${wallBase("#F8EED8", "var(--butter)")}${d.wall ? wallpaper(d.wall) : ""}
     ${d.art ? sk(`<rect x="152" y="40" width="44" height="36" rx="2" style="fill:var(--wood)"/><rect x="158" y="46" width="32" height="24" style="fill:var(--sky)"/><path d="M158 70 l10 -10 l8 7 l6 -5 l8 8z" style="fill:var(--moss)"/>`, `<rect x="152" y="40" width="44" height="36" rx="2"/><rect x="158" y="46" width="32" height="24"/><path d="M174 30 l-12 10 M174 30 l12 10"/>`) : ""}
     ${d.lamp ? sk(`<path d="M190 368 h24 l6 18 h-36z" style="fill:var(--butter)"/>`, `<path d="M190 368 h24 l6 18 h-36z M202 386 v52 M192 440 h20"/>`) : ""}
-    ${d.plant ? plant(482, 360, 1.3) : ""}
+    ${d.plant ? plant(42, 330, 1.3) : ""}
     ${d.bed ? sk(`<ellipse cx="292" cy="500" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="292" cy="498" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="292" cy="500" rx="30" ry="13"/><ellipse cx="292" cy="498" rx="20" ry="8"/>`) : ""}
     ${sk(`<rect x="60" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/><rect x="390" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/>`, `<rect x="60" y="34" width="70" height="58" rx="30"/><path d="M95 34 v58 M60 66 h70"/><rect x="390" y="34" width="70" height="58" rx="30"/><path d="M425 34 v58 M390 66 h70"/>`)}
     ${skirting}`;
@@ -1649,7 +1657,7 @@ body.nb-open{overflow:hidden}
 
   // src/art/buildings.js
   var wrap = (id, label, tapeCol, cx, baseY, halfW, art2, lines) => `<g data-place="${id}" aria-label="${label}"><ellipse class="hov" cx="${cx}" cy="${baseY + 4}" rx="${halfW + 14}" ry="10" style="fill:var(--butter)"/>
-    ${sk(art2, lines)}${tapeLabel(cx, baseY + 22, label, tapeCol)}</g>`;
+    ${sk(art2, lines)}${tapeLabel(cx, baseY + 20, label, tapeCol, 11.5)}</g>`;
   var smoke = (x, y) => `<path class="smoke" d="M${x} ${y} q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>`;
   function townHall() {
     const art2 = `<rect x="246" y="34" width="28" height="44" style="fill:var(--card)"/><path d="M240 36 L260 14 L280 36Z" style="fill:var(--peri)"/>
@@ -1784,20 +1792,20 @@ body.nb-open{overflow:hidden}
     ${flowers([[170, 540, "#F3C969"], [184, 548, "#EFA3A6"], [206, 520, "#C3CDEE"], [300, 520, "#F3C969"], [400, 560, "#EFA3A6"], [150, 580, "#C3CDEE"]])}`;
     const places = townHall() + chordWorkshop() + library() + chicoCottage() + postOffice() + `<g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M238 330 v-40 M282 330 v-40"/><rect x="230" y="282" width="60" height="38" rx="3" style="fill:var(--wood)"/>${notesArt(236, 288, G.remaining().length)}</g>
-      ${tapeLabel(260, 278, "Quests", "var(--butter)")}</g>
+      ${tapeLabel(260, 280, "Quests", "var(--butter)", 11)}</g>
     <g data-place="well" aria-label="Well"><ellipse class="hov" cx="160" cy="342" rx="26" ry="7" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M146 312 v20 M174 312 v20"/><path d="M140 314 l20 -12 l20 12z" style="fill:var(--peach)"/><ellipse cx="160" cy="334" rx="17" ry="7" style="fill:var(--stone)"/><path d="M143 334 v6 a17 7 0 0 0 34 0 v-6" style="fill:var(--stone)"/><ellipse cx="160" cy="333" rx="11" ry="4" style="fill:var(--water)"/></g>
-      ${tapeLabel(160, 362, "Well", "var(--sky)")}</g>
+      ${tapeLabel(160, 360, "Well", "var(--sky)", 11)}</g>
     <g data-place="market" aria-label="Market"><ellipse class="hov" cx="362" cy="342" rx="32" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M340 306 v30 M384 306 v30"/><rect x="336" y="320" width="52" height="16" style="fill:var(--wood)"/>
         <path d="M332 306 h60 l-4 10 h-52z" style="fill:var(--card)"/><path d="M340 306 l-2 10 M352 306 l-1 10 M364 306 v10 M376 306 l1 10" style="stroke:var(--rose)" stroke-width="5"/>
         <circle cx="350" cy="317" r="3.2" style="fill:var(--rose)"/><circle cx="362" cy="317" r="3.2" style="fill:var(--butter)"/><circle cx="374" cy="317" r="3.2" style="fill:var(--sage)"/></g>
-      ${tapeLabel(362, 360, "Market", "var(--blush)")}</g>
+      ${tapeLabel(362, 358, "Market", "var(--blush)", 11)}</g>
     ${townRiver()}`;
     return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 26, 536, 8, 2, 12) + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
   }
   var waterBand = (y1, y2) => `<path d="M0 ${y1 + 4} Q65 ${y1 - 4} 130 ${y1 + 3} T260 ${y1 + 2} T390 ${y1 + 4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2 + 5} 390 ${y2 - 2} T260 ${y2} T130 ${y2 - 3} T0 ${y2 + 2}`}z" style="fill:var(--water)"/>`;
-  function bridge(id, x, y1, y2, label, tapeX, tapeY) {
+  function bridge(id, x, y1, y2, label, tapeX, tapeY, size) {
     let planks = "";
     for (let y = y1 + 8; y < y2 - 2; y += 9) planks += `<path d="M${x - 22} ${y} h44"/>`;
     return `<g data-place="${id}" aria-label="${label}"><ellipse class="hov" cx="${x}" cy="${(y1 + y2) / 2}" rx="40" ry="${(y2 - y1) / 2 + 6}" style="fill:var(--butter)"/>
@@ -1805,13 +1813,13 @@ body.nb-open{overflow:hidden}
       `<rect x="${x - 24}" y="${y1}" width="48" height="${y2 - y1}" rx="3" style="fill:var(--wood)"/>`,
       `<rect x="${x - 24}" y="${y1}" width="48" height="${y2 - y1}" rx="3"/>${planks}<path d="M${x - 28} ${y1 - 4} v${y2 - y1 + 8} M${x + 28} ${y1 - 4} v${y2 - y1 + 8}" stroke-width="2.2"/><path d="M${x - 28} ${y1 + 2} v0 M${x - 28} ${(y1 + y2) / 2} h-2 M${x + 28} ${(y1 + y2) / 2} h2"/>`
     )}
-    ${tapeLabel(tapeX, tapeY, label, "var(--sky)")}</g>`;
+    ${tapeLabel(tapeX, tapeY, label, "var(--sky)", size)}</g>`;
   }
   var ripples = (pts) => `<g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".45">${pts.map(([x, y]) => `<path class="ripple" d="M${x} ${y} q8 -4 16 0"/>`).join("")}</g>`;
   function townRiver() {
     return `<g filter="url(#wob)">${waterBand(600, 640)}</g>${ripples([[60, 620], [150, 628], [370, 618], [450, 630]])}
     <g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 604 Q65 596 130 603 T260 602 T390 604 T520 600" fill="none"/></g>
-    ${bridge("toBase", 260, 584, 640, "To home", 410, 624)}
+    ${bridge("toBase", 260, 584, 640, "To home", 410, 624, 11)}
     <g data-place="bench" aria-label="Riverside bench"><ellipse class="hov" cx="334" cy="572" rx="30" ry="8" style="fill:var(--butter)"/>
       ${sk(`<rect x="314" y="560" width="40" height="7" rx="2" style="fill:var(--wood)"/><rect x="314" y="548" width="40" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="314" y="560" width="40" height="7" rx="2"/><rect x="314" y="548" width="40" height="6" rx="2"/><path d="M318 554 v6 M350 554 v6 M318 567 v9 M350 567 v9"/>`)}</g>`;
   }
@@ -1858,10 +1866,7 @@ body.nb-open{overflow:hidden}
     sk(
       `<ellipse cx="276" cy="608" rx="20" ry="8" style="fill:var(--stone)"/><path d="M264 606 l24 -6 M264 600 l24 6" style="stroke:var(--wood)" stroke-width="4"/>`,
       `<ellipse cx="276" cy="608" rx="20" ry="8"/><path class="smoke" d="M276 594 q-4 -6 0 -11 q4 -5 0 -10" opacity=".5"/>`
-    ) + sk(
-      `<path d="M378 354 h16 v18 h-16z" style="fill:var(--sky)"/><path d="M406 356 h14 l3 14 h-20z" style="fill:var(--rose)"/><path d="M434 354 h18 v12 h-18z" style="fill:var(--butter)"/>`,
-      `<path d="M362 396 v-46 M466 396 v-46 M362 350 Q414 358 466 350"/><path d="M378 354 h16 v18 h-16z M406 356 h14 l3 14 h-20z M434 354 h18 v12 h-18z"/>`
-    );
+    ) + sk("", `<path d="M362 396 v-46 M466 396 v-46 M362 350 Q414 358 466 350"/>`) + [[`<path d="M378 354 h16 v18 h-16z" style="fill:var(--sky)"/>`, `<path d="M378 354 h16 v18 h-16z"/>`, 0], [`<path d="M406 356 h14 l3 14 h-20z" style="fill:var(--rose)"/>`, `<path d="M406 356 h14 l3 14 h-20z"/>`, 0.7], [`<path d="M434 354 h18 v12 h-18z" style="fill:var(--butter)"/>`, `<path d="M434 354 h18 v12 h-18z"/>`, 1.4]].map(([a, l, d]) => `<g class="washing" style="animation-delay:-${d}s">${sk(a, l)}</g>`).join("");
     const fam = G.F().fam && G.F().fam.owned || {};
     const famArt = (fam.sandpit ? `<g aria-label="Sandpit">${sk(`<rect x="208" y="512" width="56" height="24" rx="5" style="fill:#F2DDA8"/><path d="M246 506 h8 l-2 8 h-4z" style="fill:var(--rose)"/>`, `<rect x="208" y="512" width="56" height="24" rx="5"/><path d="M212 518 h48" opacity=".5"/><path d="M246 506 h8 l-2 8 h-4z M250 506 v-6"/><path d="M220 528 q5 -5 10 0" opacity=".6"/>`)}</g>` : "") + (fam.hammock ? sk(`<path d="M398 600 q32 18 64 0 z" style="fill:var(--peach)"/>`, `<path d="M392 622 v-34 M468 622 v-34 M392 594 l6 6 M468 594 l-6 6"/><path d="M398 600 q32 18 64 0"/><path d="M410 604 l2 -3 M430 608 l1 -4 M450 604 l-2 -3" opacity=".6"/>`) : "");
     const tools = G.F().tools || {};
@@ -2350,9 +2355,9 @@ body.nb-open{overflow:hidden}
         slot("19:30", "21:30", "base", [430, 606], { act: "rest", needs: "hammock" }),
         // once Mel buys him the hammock
         slot("7:00", "8:30", "base", [190, 452], { days: "wd", act: "water", dir: -1 }),
-        slot("8:30", "12:30", "home", [342, 336], { days: "wd", act: "type", dir: -1 }),
+        slot("8:30", "12:30", "home", [446, 374], { days: "wd", act: "type", dir: -1 }),
         slot("12:30", "13:30", "base", [340, 300], { days: "wd", act: "repair", dir: -1 }),
-        slot("13:30", "17:30", "home", [342, 336], { days: "wd", act: "type", dir: -1 }),
+        slot("13:30", "17:30", "home", [446, 374], { days: "wd", act: "type", dir: -1 }),
         slot("17:30", "19:00", "farm", [[90, 250], [430, 400], [250, 520]], { days: "wd", act: "farm" }),
         slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600], [400, 330]], { days: "wd" }),
         slot("7:30", "10:30", "farm", [[90, 250], [430, 400], [250, 520]], { days: "we", act: "farm" }),
@@ -2651,8 +2656,12 @@ body.nb-open{overflow:hidden}
         o.stop(t + 3.3);
       });
     },
+    // a soft single chime (ticking things off, gifts); timers ending still use the fuller three-note alarm
     chime(t) {
-      [660, 880, 1320].forEach((fr, i) => bell(fr, t + i * 0.18, 1.2, 0.16));
+      bell(1046, t, 1.4, 0.055);
+    },
+    alarm(t) {
+      [660, 880, 1320].forEach((fr, i) => bell(fr, t + i * 0.18, 1.2, 0.14));
     },
     // villager "hello": a few soft pitched blips, Animal Crossing style, pitch set per villager
     babble(t, pitch = 1) {
@@ -2693,7 +2702,7 @@ body.nb-open{overflow:hidden}
   function alarm() {
     if (!ensure() || ac.state !== "running") return;
     try {
-      FX.chime(ac.currentTime + 0.01);
+      FX.alarm(ac.currentTime + 0.01);
     } catch {
     }
   }
@@ -3455,8 +3464,12 @@ Quests finished today: ${S3.doneIds.length}`;
       const w = H2.weeklyLog[weekKey()] = H2.weeklyLog[weekKey()] || {};
       w[id] = on ? today() : false;
     } else H2.zoneLog[`z${H2.currentZoneIndex}_${id}`] = on;
+    const pk = (kind === "weekly" ? "w" + weekKey() : kind === "zone" ? "w" + weekKey() + "z" + H2.currentZoneIndex : today()) + ":" + kind + ":" + id;
+    if (!on && H2.paid[pk]) {
+      delete H2.paid[pk];
+      api2.refund(1, "chore unticked");
+    }
     if (on) {
-      const pk = (kind === "weekly" ? "w" + weekKey() : kind === "zone" ? "w" + weekKey() + "z" + H2.currentZoneIndex : today()) + ":" + kind + ":" + id;
       if (!H2.paid[pk]) {
         H2.paid[pk] = 1;
         api2.earn(1, "home chore");
@@ -3936,6 +3949,7 @@ Quests finished today: ${S3.doneIds.length}`;
       drop(courier.id);
       courier = null;
     }
+    if (scene2 === "home") return;
     if (courier && courier.state !== "leaving" && !api3.unreadMail().some((m) => m.id === courier.item.id)) {
       drop(courier.id);
       courier = null;
@@ -3983,7 +3997,8 @@ Quests finished today: ${S3.doneIds.length}`;
   function say(e, text, ms = 3800) {
     const el = $("npcSay");
     sayer = e;
-    el.textContent = plain(e.kind === "agent" ? text : `${e.def.name}: ${text}`);
+    const who = e.kind === "agent" ? e.ag.name.split(/[ ,]/)[0] : e.def.name;
+    el.innerHTML = `<b class="who">${esc(who)}</b>${esc(plain(text))}`;
     el.hidden = false;
     clearTimeout(sayT);
     sayT = setTimeout(hideSay, ms);
@@ -4422,7 +4437,7 @@ Quests finished today: ${S3.doneIds.length}`;
   var evanT;
   function evanSays(t) {
     const e = $("evanSay");
-    e.textContent = t;
+    e.innerHTML = `<b class="who">Evan</b>${esc(plain(t))}`;
     e.hidden = false;
     clearTimeout(evanT);
     evanT = setTimeout(() => e.hidden = true, 2200);
@@ -5154,6 +5169,13 @@ Then tell chat "wind down" whenever you're ready.`
   function giveGift(id) {
     const it = ITEMS[id];
     if (!it || !F.inv[id]) return;
+    const burst = (x, y) => [0, 250, 500].forEach((d, k) => setTimeout(() => mprop("heart", x + (k - 1) * 14, y - 40 - k * 6, 1800), d));
+    const showMap = () => {
+      if (openView) {
+        openView = null;
+        ctx();
+      }
+    };
     if (it.to === "evan") {
       if (!evanHere()) {
         speak("Evan's at home. Give it to him there!", 3500);
@@ -5165,9 +5187,11 @@ Then tell chat "wind down" whenever you're ready.`
       evan.ty = mel.y + 4;
       evan.run = true;
       evan.wait = 5;
+      showMap();
       evanSays(it.say);
-      mprop("heart", evan.x, evan.y - 40);
+      burst(evan.x, evan.y);
       sfx("chime");
+      flash(`Evan loved the ${it.n.toLowerCase()}!`);
       if (id === "icecream" || id === "storybook") S2.evanHold = { k: id, until: Date.now() + 3 * M };
       if (id === "balloon") S2.evanHold = { k: "balloon", until: 0 };
       if (id === "storybook" && scene === "home") {
@@ -5197,10 +5221,12 @@ Then tell chat "wind down" whenever you're ready.`
       }
       addInv(id, -1);
       const n = ++F.fam.gifts.darren;
+      showMap();
       npcSay("darren", it.say);
       const p = npcPos("darren");
-      if (p) mprop("heart", p.x, p.y - 60);
+      if (p) burst(p.x, p.y - 20);
       sfx("chime");
+      flash(`Darren says thanks for the ${it.n.toLowerCase()}`);
       if (n % 3 === 0) setTimeout(() => {
         npcSay("darren", "Got you something too. Found it in the shed.");
         addInv("strawberry_seed", 1);
@@ -5614,10 +5640,10 @@ Then tell chat "wind down" whenever you're ready.`
     if (!g) return;
     const c = hestiaCounts(), badge = (x, y, n, ico) => `<g transform="translate(${x} ${y})" class="hmark" pointer-events="none"><g class="qmark">${`<circle r="13" fill="#FFF6E2" style="stroke:var(--line)" stroke-width="1.3"/>`}<svg x="-9" y="-10" width="18" height="18" viewBox="0 0 24 24" overflow="visible">${icon(ico, 18).replace(/^<svg[^>]*>|<\/svg>$/g, "")}</svg>${n ? `<circle cx="11" cy="-10" r="7" fill="#E8574C"/><text x="11" y="-6.6" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff" font-family="Mulish,sans-serif">${n}</text>` : ""}</g></g>`;
     let h = "";
-    if (scene === "base" && (c.chores || c.shop)) h = badge(232, 170, c.chores + c.shop, "hearth");
+    if (scene === "base" && (c.chores || c.shop)) h = badge(232, 170, c.chores + c.shop, "broom");
     if (scene === "home") {
       const cb = spotObj("home", "cupboard"), fr = spotObj("home", "fridge");
-      if (c.chores) h += badge(cb.x, cb.y - 100, c.chores, "hearth");
+      if (c.chores) h += badge(cb.x, cb.y - 100, c.chores, "broom");
       if (c.shop) h += badge(fr.x, fr.y - 100, c.shop, "fridge");
     }
     g.innerHTML = h;
@@ -6344,10 +6370,23 @@ Then tell chat "wind down" whenever you're ready.`
     onClose: () => render(),
     placeLabel: (t) => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`
   });
-  initHestia({ sfx, alarm, speak, flash, earn: (n, why) => {
-    earn(n, why);
-    save2();
-  }, changed: () => render() });
+  initHestia({
+    sfx,
+    alarm,
+    speak,
+    flash,
+    earn: (n, why) => {
+      earn(n, why);
+      save2();
+    },
+    changed: () => render(),
+    refund: (n, why) => {
+      F.coins = Math.max(0, F.coins - n);
+      S2.earned = Math.max(0, (S2.earned || 0) - n);
+      flash(`-${n} coin: ${why}`);
+      save2();
+    }
+  });
   $("hestiaFile").onchange = (e) => {
     const f2 = e.target.files && e.target.files[0];
     if (!f2) return;

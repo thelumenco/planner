@@ -212,7 +212,7 @@ function speak(text, ms){
 }
 function setSay(line, buttons){ say = {line, buttons}; speak(line); }
 let evanT;
-function evanSays(t){ const e = $("evanSay"); e.textContent = t; e.hidden = false; clearTimeout(evanT); evanT = setTimeout(() => e.hidden = true, 2200); }
+function evanSays(t){ const e = $("evanSay"); e.innerHTML = `<b class="who">Evan</b>${esc(plain(t))}`; e.hidden = false; clearTimeout(evanT); evanT = setTimeout(() => e.hidden = true, 2200); }
 
 /* =================== PORTRAIT ANIMATION =================== */
 const portrait = $("scene"), props = $("props");
@@ -617,11 +617,13 @@ const DARREN_AT = {base: "outside at home", home: "inside the house", farm: "in 
 let bubbleT = null;
 function giveGift(id){
   const it = ITEMS[id]; if (!it || !F.inv[id]) return;
+  const burst = (x, y) => [0, 250, 500].forEach((d, k) => setTimeout(() => mprop("heart", x + (k - 1)*14, y - 40 - k*6, 1800), d));
+  const showMap = () => { if (openView) { openView = null; ctx(); } };
   if (it.to === "evan") {
     if (!evanHere()) { speak("Evan's at home. Give it to him there!", 3500); return; }
     addInv(id, -1); const n = ++F.fam.gifts.evan;
     evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; evan.wait = 5;
-    evanSays(it.say); mprop("heart", evan.x, evan.y - 40); sfx("chime");
+    showMap(); evanSays(it.say); burst(evan.x, evan.y); sfx("chime"); flash(`Evan loved the ${it.n.toLowerCase()}!`);
     if (id === "icecream" || id === "storybook") S.evanHold = {k: id, until: Date.now() + 3*M};
     if (id === "balloon") S.evanHold = {k: "balloon", until: 0};
     if (id === "storybook" && scene === "home") { const s = spotObj("home", "sofa"); evan.tx = s.tx + 20; evan.ty = s.ty; }
@@ -630,7 +632,7 @@ function giveGift(id){
   } else {
     if (!isHere("darren")) { const w = whereIs("darren"); speak(w ? `Darren's ${DARREN_AT[w] || "around"} right now. Give it to him there!` : "Darren's not around right now.", 4000); return; }
     addInv(id, -1); const n = ++F.fam.gifts.darren;
-    npcSay("darren", it.say); const p = npcPos("darren"); if (p) mprop("heart", p.x, p.y - 60); sfx("chime");
+    showMap(); npcSay("darren", it.say); const p = npcPos("darren"); if (p) burst(p.x, p.y - 20); sfx("chime"); flash(`Darren says thanks for the ${it.n.toLowerCase()}`);
     if (n % 3 === 0) setTimeout(() => { npcSay("darren", "Got you something too. Found it in the shed."); addInv("strawberry_seed", 1); flash("Darren gave you strawberry seeds"); save(); }, 4500);
   }
   gainXp(1); save();
@@ -915,10 +917,10 @@ function hestiaMarks(){
   const g = $("hmarks"); if (!g) return;
   const c = hestiaCounts(), badge = (x, y, n, ico) => `<g transform="translate(${x} ${y})" class="hmark" pointer-events="none"><g class="qmark">${`<circle r="13" fill="#FFF6E2" style="stroke:var(--line)" stroke-width="1.3"/>`}<svg x="-9" y="-10" width="18" height="18" viewBox="0 0 24 24" overflow="visible">${icon(ico, 18).replace(/^<svg[^>]*>|<\/svg>$/g, "")}</svg>${n ? `<circle cx="11" cy="-10" r="7" fill="#E8574C"/><text x="11" y="-6.6" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff" font-family="Mulish,sans-serif">${n}</text>` : ""}</g></g>`;
   let h = "";
-  if (scene === "base" && (c.chores || c.shop)) h = badge(232, 170, c.chores + c.shop, "hearth");
+  if (scene === "base" && (c.chores || c.shop)) h = badge(232, 170, c.chores + c.shop, "broom");
   if (scene === "home") {
     const cb = spotObj("home", "cupboard"), fr = spotObj("home", "fridge");
-    if (c.chores) h += badge(cb.x, cb.y - 100, c.chores, "hearth");
+    if (c.chores) h += badge(cb.x, cb.y - 100, c.chores, "broom");
     if (c.shop) h += badge(fr.x, fr.y - 100, c.shop, "fridge");
   }
   g.innerHTML = h;
@@ -1256,7 +1258,8 @@ initNotebook({windDown, onTread, water:() => ({ml: S.waterMl || 0, goal: WATER_G
   addWater:ml => A.water(ml), setWater, setSteps, task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
   sayNow:() => say, timerBtns, paperName, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),
   placeLabel:t => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`});
-initHestia({sfx, alarm, speak, flash, earn: (n, why) => { earn(n, why); save(); }, changed: () => render()});
+initHestia({sfx, alarm, speak, flash, earn: (n, why) => { earn(n, why); save(); }, changed: () => render(),
+  refund: (n, why) => { F.coins = Math.max(0, F.coins - n); S.earned = Math.max(0, (S.earned || 0) - n); flash(`-${n} coin: ${why}`); save(); }});
 $("hestiaFile").onchange = e => { const f = e.target.files && e.target.files[0]; if (!f) return; const r = new FileReader();
   r.onload = () => { const msg = importHestia(String(r.result)); $("hestiaNote").textContent = msg; speak(/^Imported/.test(msg) ? "Hestia's lists are in the house now!" : msg, 4500); }; r.readAsText(f); e.target.value = ""; };
 initNpcs({sfx, chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,

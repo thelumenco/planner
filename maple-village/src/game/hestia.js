@@ -90,8 +90,9 @@ function setDone(kind, id, on){
   if (kind === "daily") { const d = H.dailyLog[today()] = H.dailyLog[today()] || {daily: {}, zone: {}}; d.daily[id] = on; }
   else if (kind === "weekly") { const w = H.weeklyLog[weekKey()] = H.weeklyLog[weekKey()] || {}; w[id] = on ? today() : false; }
   else H.zoneLog[`z${H.currentZoneIndex}_${id}`] = on;
+  const pk = (kind === "weekly" ? "w" + weekKey() : kind === "zone" ? "w" + weekKey() + "z" + H.currentZoneIndex : today()) + ":" + kind + ":" + id;
+  if (!on && H.paid[pk]) { delete H.paid[pk]; api.refund(1, "chore unticked"); }   // ticked by mistake: the coin goes back
   if (on) {
-    const pk = (kind === "weekly" ? "w" + weekKey() : kind === "zone" ? "w" + weekKey() + "z" + H.currentZoneIndex : today()) + ":" + kind + ":" + id;
     if (!H.paid[pk]) { H.paid[pk] = 1; api.earn(1, "home chore"); }
     if (H.lastActiveDate !== today()) { H.streak = H.lastActiveDate === shift(today(), -1) ? (H.streak || 0) + 1 : 1; H.lastActiveDate = today(); api.speak(`Home streak: ${H.streak} day${H.streak > 1 ? "s" : ""}. The house feels lighter.`, 4000); }
     api.sfx("chime");
