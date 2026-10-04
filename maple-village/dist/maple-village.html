@@ -2671,8 +2671,9 @@ body.nb-open{overflow:hidden}
       if (k === "copy") return copyDraft(b);
       if (k === "sayb") return api.sayButton(+b.dataset.i);
       if (k === "pond") {
+        const it = open && open.item;
         closeNotebook();
-        api.windDown();
+        api.windDown(it);
         return;
       }
       if (open && open.kind !== "task" && k === "thanks") {
@@ -3428,6 +3429,10 @@ Quests finished today: ${S3.doneIds.length}`;
       drop(courier.id);
       courier = null;
     }
+    if (courier && courier.state !== "leaving" && !api2.unreadMail().some((m) => m.id === courier.item.id)) {
+      drop(courier.id);
+      courier = null;
+    }
     if (!courier) {
       const item = api2.unreadMail().find((m) => m.from !== "crier" || scene2 === "village");
       if (!item) return;
@@ -3613,7 +3618,7 @@ Quests finished today: ${S3.doneIds.length}`;
     });
   }
   migrate();
-  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), lanterns: () => S2.pond ? S2.pond.wins.length : 0, dusk: () => isDusk() });
+  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk() });
   function isDusk() {
     const t = sgHM();
     return t >= 19 * 60 || t < 6 * 60;
@@ -4453,7 +4458,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
   var localCache = { key: "", items: [] };
   var dayKeyAt = (ms) => new Date(ms + 6 * H).toISOString().slice(0, 10);
   function localMail() {
-    const day = dayKey(), hm2 = sgHM(), key = `${day}:${Math.floor(hm2 / 10)}:${S2.doneIds.length}:${S2.cleanDone}`;
+    const day = dayKey(), hm2 = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm2 / 10)}:${S2.doneIds.length}:${S2.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}`;
     if (key === localCache.key) return localCache.items;
     const out = [], wd = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
     if (wd === 5 && hm2 >= 900 || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
@@ -4510,27 +4515,35 @@ Then tell chat "wind down" whenever you're ready.`
       sections
     };
   }
-  function windDown() {
-    const wins = [];
-    if (S2.cleanDone) wins.push("Five-minute clean");
-    allTasks().filter((t) => S2.doneIds.includes(t.id)).forEach((t) => wins.push(t.title));
-    if (S2.steps >= STEP_GOAL) wins.push(`${S2.steps.toLocaleString()} steps`);
-    if ((S2.waterMl || 0) >= WATER_GOAL) wins.push("Two litres of water");
-    if (S2.harvested) wins.push(`${S2.harvested} harvest${S2.harvested > 1 ? "s" : ""}`);
+  function windDown(item) {
+    const sec = item && Array.isArray(item.sections) && item.sections.find((x) => x && /win/i.test(x.heading || "") && (x.lines || []).length);
+    const fromRoutine = !!sec;
+    const wins = sec ? sec.lines.map((l) => plain(String(l))).filter(Boolean).slice(0, 9) : [];
+    if (!fromRoutine) {
+      if (S2.cleanDone) wins.push("Five-minute clean");
+      allTasks().filter((t) => S2.doneIds.includes(t.id)).forEach((t) => wins.push(t.title));
+      if (S2.steps >= STEP_GOAL) wins.push(`${S2.steps.toLocaleString()} steps`);
+      if ((S2.waterMl || 0) >= WATER_GOAL) wins.push("Two litres of water");
+      if (S2.harvested) wins.push(`${S2.harvested} harvest${S2.harvested > 1 ? "s" : ""}`);
+    }
     if (!wins.length) wins.push("Showing up today");
     go("base", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => {
       atSpot = "pond";
-      S2.pond = { wins, at: Date.now() };
+      S2.pond = { wins, at: Date.now(), shown: 0 };
       save(true);
       let i = 0;
       const next = () => {
         if (i < wins.length) {
           speak(`Lantern ${i + 1}: ${wins[i]}`, 3300);
           i++;
+          S2.pond.shown = i;
+          sfx("chime");
+          if (scene === "base") drawScene();
           setTimeout(next, 3400);
         } else {
+          delete S2.pond.shown;
           act("cheer");
-          setSay("That's the day, Mel. Tell chat “wind down” whenever you're ready.");
+          setSay(fromRoutine ? "That's the day, Mel. Rest well. Tomorrow's first thing is in the note." : "That's the day, Mel. Tell chat “wind down” whenever you're ready.");
           save();
         }
       };

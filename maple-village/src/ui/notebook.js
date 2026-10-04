@@ -21,7 +21,7 @@ export function initNotebook(a){
     if (k === "ask") return ask();
     if (k === "copy") return copyDraft(b);
     if (k === "sayb") return api.sayButton(+b.dataset.i);
-    if (k === "pond") { closeNotebook(); api.windDown(); return; }
+    if (k === "pond") { const it = open && open.item; closeNotebook(); api.windDown(it); return; }
     if (open && open.kind !== "task" && k === "thanks") { closeNotebook(); return; }
     if (open && open.kind === "tracker") return trackerAct(k, b);
     const t = api.task(); if (!t || !open || open.kind !== "task") return;

@@ -44,7 +44,7 @@ function migrate(){
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
-setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), lanterns:() => (S.pond ? S.pond.wins.length : 0), dusk:() => isDusk()});
+setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk()});
 function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
@@ -496,7 +496,7 @@ const WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday
 let localCache = {key: "", items: []};
 const dayKeyAt = ms => new Date(ms + 6*H).toISOString().slice(0, 10);   // same 2am reset as dayKey()
 function localMail(){
-  const day = dayKey(), hm = sgHM(), key = `${day}:${Math.floor(hm/10)}:${S.doneIds.length}:${S.cleanDone}`;
+  const day = dayKey(), hm = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm/10)}:${S.doneIds.length}:${S.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}`;
   if (key === localCache.key) return localCache.items;
   const out = [], wd = new Date(day + "T00:00:00Z").getUTCDay();
   if ((wd === 5 && hm >= 900) || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
@@ -530,20 +530,26 @@ function weeklyPaper(fri){
     body: q ? "Here's your week in the village, Saturday to Friday. Have a lovely weekend." : "Rest weeks count too. The village will be here on Monday.", sections};
 }
 // 6pm ritual: walk to the pond, one lantern per win, Maple reads them out, then hand over to chat's wind-down.
-function windDown(){
-  const wins = [];
-  if (S.cleanDone) wins.push("Five-minute clean");
-  allTasks().filter(t => S.doneIds.includes(t.id)).forEach(t => wins.push(t.title));
-  if (S.steps >= STEP_GOAL) wins.push(`${S.steps.toLocaleString()} steps`);
-  if ((S.waterMl || 0) >= WATER_GOAL) wins.push("Two litres of water");
-  if (S.harvested) wins.push(`${S.harvested} harvest${S.harvested > 1 ? "s" : ""}`);
+function windDown(item){
+  // The evening routine's note lists the day's wins (from Sunsama, the calendar and so on): one lantern each.
+  // Without one, the page counts what it saw today.
+  const sec = item && Array.isArray(item.sections) && item.sections.find(x => x && /win/i.test(x.heading || "") && (x.lines || []).length);
+  const fromRoutine = !!sec;
+  const wins = sec ? sec.lines.map(l => plain(String(l))).filter(Boolean).slice(0, 9) : [];
+  if (!fromRoutine) {
+    if (S.cleanDone) wins.push("Five-minute clean");
+    allTasks().filter(t => S.doneIds.includes(t.id)).forEach(t => wins.push(t.title));
+    if (S.steps >= STEP_GOAL) wins.push(`${S.steps.toLocaleString()} steps`);
+    if ((S.waterMl || 0) >= WATER_GOAL) wins.push("Two litres of water");
+    if (S.harvested) wins.push(`${S.harvested} harvest${S.harvested > 1 ? "s" : ""}`);
+  }
   if (!wins.length) wins.push("Showing up today");
   go("base", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => {
-    atSpot = "pond"; S.pond = {wins, at: Date.now()}; save(true);
+    atSpot = "pond"; S.pond = {wins, at: Date.now(), shown: 0}; save(true);
     let i = 0;
     const next = () => {
-      if (i < wins.length) { speak(`Lantern ${i + 1}: ${wins[i]}`, 3300); i++; setTimeout(next, 3400); }
-      else { act("cheer"); setSay("That's the day, Mel. Tell chat “wind down” whenever you're ready."); save(); }
+      if (i < wins.length) { speak(`Lantern ${i + 1}: ${wins[i]}`, 3300); i++; S.pond.shown = i; sfx("chime"); if (scene === "base") drawScene(); setTimeout(next, 3400); }
+      else { delete S.pond.shown; act("cheer"); setSay(fromRoutine ? "That's the day, Mel. Rest well. Tomorrow's first thing is in the note." : "That's the day, Mel. Tell chat “wind down” whenever you're ready."); save(); }
     };
     next();
   });

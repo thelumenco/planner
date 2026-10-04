@@ -80,6 +80,8 @@ const hellos = () => { const t = sgHM(); return [t < 720 ? "Morning, Mel!" : t <
 function tickCourier(dt){
   const scene = api.scene(), mel = api.mel;
   if (courier && courier.scene !== scene) { drop(courier.id); courier = null; }
+  // the note she's carrying was replaced or read elsewhere (e.g. fresh mail arrived just after the page opened)
+  if (courier && courier.state !== "leaving" && !api.unreadMail().some(m => m.id === courier.item.id)) { drop(courier.id); courier = null; }
   if (!courier) {
     // The morning paper (from the crier) waits in the letterbox at home; only if Mel heads into town without
     // reading it does Rosa come and find her there. Everyone else delivers wherever Mel is.
