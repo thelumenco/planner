@@ -377,6 +377,132 @@ body.nb-open{overflow:hidden}
 .map [data-ugarden]{cursor:pointer}
 .bloom{transform-box:fill-box;transform-origin:50% 100%;animation:grow .6s ease-out}
 @media (prefers-reduced-motion:reduce){.bloom{animation:none}}
+
+/* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
+:root{--mapw:max(300px,min(660px,calc((100dvh - 300px)*520/640 + 26px)))}
+.wrap{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:none;padding:12px 16px 20px}
+@media (min-width:900px){.wrap{padding:18px 40px 28px}}
+.wrap > *{width:min(100%,var(--mapw))}
+.head{align-items:center}
+.title{font-size:clamp(1.45rem,5.6vw,1.9rem)}
+.title small{display:inline;font-size:.8rem;margin:0 0 0 10px}
+.berries{font-size:1.25rem;padding:0}
+.earn{margin:0;min-height:1.25em;font-size:.85rem;text-align:center;line-height:1.25}
+
+/* trackers strip, above the map */
+.hudbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 14px;background-color:var(--card);background-image:var(--fibre);
+  border:1px solid var(--edge);border-radius:10px;padding:7px 12px;box-shadow:0 8px 18px -16px rgba(80,60,40,.5)}
+.trk{display:flex;align-items:center;gap:6px}
+.trk .lbl{font-size:1rem;line-height:1}
+.hudbar .boxes{gap:3px}
+.hudbar .box{width:17px;height:17px;border-radius:5px}
+.hudbar .box.on::after{font-size:.6rem}
+.hudbar .tnote{font-size:.78rem;color:var(--soft)}
+.hudbar .stepform{flex-basis:100%;gap:10px}
+
+/* scene bar with HUD buttons */
+.mapcard{padding:10px 12px 8px}
+.scenebar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 2px 6px}
+.scenebar .scenename{margin:0;flex:1;min-width:0;font-size:1rem}
+.hudbtns{display:flex;gap:6px}
+.hbtn{position:relative;width:38px;height:38px;border-radius:50%;border:1px solid var(--edge);background:var(--bg);font-size:1.15rem;line-height:1;display:grid;place-items:center;padding:0}
+.hbtn[aria-pressed="true"]{background:var(--peri);border-color:var(--peri2)}
+.hbtn .badge{position:absolute;top:-4px;right:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--fox);color:#fff;font-size:.68rem;font-weight:700;line-height:17px}
+.hbtn .badge[hidden]{display:none}
+.maphint{margin:6px 0 0;font-size:.8rem}
+
+/* quest note pinned on the map */
+.map .qnote{position:absolute;top:8px;left:8px;right:8px;z-index:5;max-height:46%;overflow:auto;overscroll-behavior:contain;
+  background-color:#FFFDF7;background-image:var(--fibre);color:#2F2B28;border-radius:4px;padding:16px 16px 12px;
+  box-shadow:0 2px 3px rgba(60,40,30,.1),0 16px 26px -18px rgba(40,30,20,.55);transform:rotate(-.5deg)}
+.map .qnote::before{content:"";position:absolute;top:-2px;left:50%;width:84px;height:18px;transform:translateX(-50%) rotate(-2deg);opacity:.85;
+  background-color:var(--peri);background-image:radial-gradient(circle,rgba(255,255,255,.85) 1.4px,transparent 1.8px);background-size:8px 8px;
+  clip-path:polygon(2% 10%,9% 0,18% 8%,28% 2%,40% 9%,52% 1%,64% 8%,76% 2%,88% 9%,98% 3%,96% 50%,99% 94%,89% 99%,77% 91%,65% 100%,53% 92%,41% 100%,29% 92%,17% 99%,7% 91%,0 97%,3% 50%)}
+.map .qnote:empty{display:none}
+.qnote h1{font-size:1.2rem;margin:0 26px 8px 0;line-height:1.25}
+.qnote .lbl{font-size:.6rem;margin:0 0 4px;letter-spacing:.2em}
+.qnote .bujo{gap:3px;margin:0 0 10px;font-size:.9rem;line-height:1.45}
+.qnote .bujo li{grid-template-columns:18px 1fr}
+.qnote .checkin{font-size:.95rem;margin:0 0 10px}
+.qnote .ack{font-size:.8rem;margin:0 0 6px}
+.qnote .stickers{margin:-2px 0 8px;gap:5px}
+.qnote .sticker{font-size:.72rem;padding:1px 9px;color:#2F2B28;background:#EFE8DC}
+.qnote .actions{gap:8px}
+.qnote .btn{padding:9px 18px;font-size:.9rem}
+.qnote .btn.alt{background:#EAE3D8;color:#2F2B28}
+.qnote .btn.yes{color:#3B3320}
+.qnote .btn:not(.alt):not(.yes){color:#2F3B73}
+.qnote .timer{margin:0 0 10px;gap:12px}
+.qnote .ring{width:44px;height:44px}
+.qnote .timer .t{font-size:1.45rem}
+.qnote .note{margin:0 0 10px;font-size:.85rem;padding:8px 12px}
+.qnote .saybtns{margin:0 0 10px}
+.qnote .qnx{position:absolute;top:6px;right:8px;width:30px;height:30px;border:0;border-radius:50%;background:transparent;color:#8A8279;font-size:1.2rem;line-height:1}
+.qnote .qnx:hover{background:rgba(0,0,0,.05)}
+.map .qnote.low{top:auto;bottom:8px}
+/* collapsed: one line, tap to open */
+.map .qnote.slim{left:50%;right:auto;max-width:calc(100% - 16px);padding:0;transform:translateX(-50%) rotate(-.5deg);overflow:hidden}
+.map .qnote.slim::before{width:52px;height:12px;top:-3px}
+.qnslim{display:flex;align-items:center;gap:8px;border:0;background:transparent;padding:9px 14px 8px;max-width:100%;text-align:left;color:#2F2B28;font-size:.85rem;line-height:1.3}
+.qnslim b{font-family:"Klee One",serif;font-weight:600;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qnslim .when{color:#2F3B73;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.qnslim .more{color:#8A8279;font-size:.8rem;white-space:nowrap}
+
+/* in-game panels (shop, cork board, garden plot, digest shelf, backpack, letters) */
+.map .panel{position:absolute;inset:8px;z-index:6;overflow:auto;overscroll-behavior:contain;border-radius:6px;padding:20px 16px 16px;
+  background-color:#FFFDF7;background-image:var(--fibre);color:#2F2B28;box-shadow:0 2px 3px rgba(60,40,30,.12),0 24px 40px -24px rgba(40,30,20,.6);animation:pop2 .25s ease}
+.map .panel[hidden]{display:none}
+.pclose{position:sticky;top:-8px;float:right;margin:-10px -6px 0 8px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,253,247,.9);color:#5E5650;font-size:1.05rem;z-index:2}
+.panel h2{font-family:"Klee One",serif;font-weight:600;font-size:1.3rem;line-height:1.2;margin:0 0 6px}
+.panel .ph3{font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;margin:18px 0 0}
+.panel .sub,.panel .muted{color:#8A8279;font-size:.88rem}
+.panel .sub{margin:0 0 12px}
+.panel .item{background:#F4EEE3;border-color:rgba(120,104,84,.15);color:#2F2B28}
+.panel .item .c{color:#8A8279}
+.panel .tabs{background:#F4EEE3;margin-bottom:12px}
+.panel .tabs button[aria-selected="true"]{background:#FFFDF7}
+.panel .btn.alt{background:#EAE3D8;color:#2F2B28}
+.panel .btn:not(.alt):not(.yes){color:#2F3B73}
+.panel .qlist li{border-bottom-color:#E4DDD2}
+.panel .row input{border-bottom-color:#E4DDD2;color:#2F2B28}
+.panel .eyebrow{color:#8A8279}
+.panel .portrait{margin:-8px -6px 6px}
+.panel .items{grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px}
+.panel .item{padding:10px 4px 8px}
+.panel .item .e{font-size:1.5rem}
+.panel .item .n{font-size:.82rem}
+.panel .hearts{margin:8px 0 2px}
+/* shop: striped awning */
+.map .panel.shop{padding-top:40px;background-image:repeating-linear-gradient(90deg,var(--rose) 0 26px,#FFFDF7 26px 52px),var(--fibre);background-size:100% 22px,auto;background-repeat:no-repeat,repeat}
+/* cork board: pinned paper notes */
+.map .panel.cork{background-color:#C9A27E;background-image:radial-gradient(rgba(90,60,30,.25) 1px,transparent 1.5px),radial-gradient(rgba(255,240,210,.25) 1px,transparent 1.5px);background-size:9px 9px,13px 13px;background-position:0 0,4px 6px;
+  border:8px solid #9C7A5C;padding:14px 12px 12px}
+.panel.cork h2{display:inline-block;background:#FFFDF7;padding:4px 14px;transform:rotate(-1.5deg);box-shadow:0 4px 8px -6px rgba(0,0,0,.4);margin:0 0 10px}
+.panel.cork .pclose{background:#FFFDF7}
+.panel.cork .qlist,.panel.cork .pinned{list-style:none;padding:0;margin:0 0 10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.panel.cork .qlist li,.panel.cork .pinned li{position:relative;display:block;background:#FFFDF6;padding:16px 10px 10px;border:0;box-shadow:0 6px 10px -8px rgba(0,0,0,.5);font-size:.85rem;line-height:1.35;transform:rotate(-1.2deg)}
+.panel.cork li:nth-child(3n+2){background:#F6E3A1;transform:rotate(1.4deg)}
+.panel.cork li:nth-child(3n){background:#F4C7CF;transform:rotate(-.4deg)}
+.panel.cork li:nth-child(4n){background:#C3CDEE}
+.panel.cork li::before{content:"";position:absolute;top:4px;left:50%;width:9px;height:9px;margin-left:-4px;border-radius:50%;background:var(--fox2);box-shadow:inset -1px -1px 0 rgba(0,0,0,.25)}
+.panel.cork li.done{opacity:.6;text-decoration:line-through}
+.panel.cork li.cur{outline:2px solid var(--fox2);outline-offset:2px}
+.panel.cork li .pl{display:block;font-size:.95rem}
+.panel.cork li .t,.panel.cork li b{font-weight:700}
+.panel.cork li small{display:block;color:#6F675F;font-size:.75rem;margin-top:2px}
+.panel.cork li .next,.panel.cork li button{margin-top:6px}
+.panel.cork .qlist li.cur b::after{content:""}
+.panel.cork .row,.panel.cork #sunsamaLine{background:#FFFDF7;padding:8px 10px;border-radius:3px;margin:8px 0 0;box-shadow:0 6px 10px -8px rgba(0,0,0,.5)}
+.panel.cork #sunsamaLine{font-size:.8rem;line-height:1.45;color:#5E5650}
+.panel.cork .actions{margin-top:8px}
+.panel.cork .muted{color:#3F352C}
+/* letters */
+.panel .mail li{grid-template-columns:30px 1fr}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .hbtn{background:var(--card)}}
+:root[data-theme="dark"] .hbtn{background:var(--card)}
+.map.panel-open .qnote{visibility:hidden}
+.panel .portrait .scene{max-width:240px;margin:0 auto}
+.earn{height:0;min-height:0;overflow:visible;position:relative;top:2px;z-index:8;pointer-events:none}
 </style>
 </head>
 <body>
@@ -395,16 +521,31 @@ body.nb-open{overflow:hidden}
   </defs>
 </svg>
 <main class="wrap">
-  <section class="left" aria-label="Village">
-    <div class="head">
-      <h1 class="title" id="title">Maple's village<small id="dateLine"></small></h1>
-      <div class="berries" title="Coins">🪙 <span id="coins">0</span></div>
-    </div>
-    <p class="earn" id="earn" aria-live="polite"></p>
-    <div class="card mapcard">
-      <span class="tape dots" aria-hidden="true"></span>
+  <div class="head">
+    <h1 class="title" id="title">Maple's village<small id="dateLine"></small></h1>
+    <div class="berries" title="Coins">🪙 <span id="coins">0</span></div>
+  </div>
+  <div class="hudbar" aria-label="Today's trackers">
+    <div class="trk"><span class="lbl" aria-hidden="true">💧</span><span class="sr">Water</span><div class="boxes" id="waterBoxes"></div></div>
+    <div class="trk"><span class="lbl" aria-hidden="true">👣</span><span class="sr">Steps</span><div class="boxes" id="stepBoxes"></div><span class="tnote" id="stepNote"></span></div>
+    <form class="stepform" id="stepForm">
+      <label class="sr" for="stepIn">Steps showing now</label>
+      <input id="stepIn" type="number" inputmode="numeric" min="0" placeholder="steps showing now">
+      <button class="btn small" type="submit">Save</button>
+    </form>
+  </div>
+  <p class="earn" id="earn" aria-live="polite"></p>
+  <div class="card mapcard">
+    <span class="tape dots" aria-hidden="true"></span>
+    <div class="scenebar">
       <p class="scenename" id="sceneName">Village</p>
-      <div class="map" id="map">
+      <div class="hudbtns">
+        <button class="hbtn" data-open="quests" aria-label="All quests">📋<span class="badge" id="qBadge" hidden></span></button>
+        <button class="hbtn" data-open="bag" aria-label="Backpack and Maple">🎒</button>
+        <button class="hbtn" data-open="mail" aria-label="Letters">✉️<span class="badge" id="mailBadge" hidden></span></button>
+      </div>
+    </div>
+    <div class="map" id="map">
         <svg id="world" viewBox="0 0 520 640" role="application" aria-label="Game map. Tap a place to walk there.">
           <g id="sceneArt"></g>
           <g id="qmarkWrap" style="display:none"><g class="qmark">
@@ -477,33 +618,28 @@ body.nb-open{overflow:hidden}
           
           </g>
         </svg>
-        <div class="mprops" id="mprops"></div>
-        <p class="speech" id="speech" aria-live="polite"></p>
-        <p class="speech small" id="evanSay" hidden></p>
-        <p class="speech small" id="npcSay" hidden aria-live="polite"></p>
-        <button class="btn primary dotask" id="doTask" hidden>Do task</button>
-      </div>
-      <p class="maphint" id="maphint"></p>
-    </div>
-    <section class="card ctx" id="ctx" hidden></section>
-    <div><p class="eyebrow">Today's trackers</p><div class="card trackers">
-      <span class="tape sky" aria-hidden="true"></span>
-      <div class="trow"><span class="lbl">Water</span><div class="boxes" id="waterBoxes"></div></div>
-      <div class="trow"><span class="lbl">Steps</span><div class="boxes" id="stepBoxes"></div><span class="tnote" id="stepNote"></span></div>
-      <form class="stepform" id="stepForm">
-        <label class="sr" for="stepIn">Steps showing now</label>
-        <input id="stepIn" type="number" inputmode="numeric" min="0" placeholder="steps showing now">
-        <button class="btn small" type="submit">Save</button>
-      </form>
-    </div></div>
-  </section>
-
-  <section class="right">
-    <article class="card journal" id="journal" aria-live="polite"></article>
-
-    <div><p class="eyebrow">Backpack</p><section class="card tray" aria-label="Backpack and Maple">
-      <span class="tape stripe" aria-hidden="true"></span>
-      <div class="portrait">
+      <div class="mprops" id="mprops"></div>
+      <p class="speech" id="speech" aria-live="polite"></p>
+      <p class="speech small" id="evanSay" hidden></p>
+      <p class="speech small" id="npcSay" hidden aria-live="polite"></p>
+      <article class="qnote journal" id="journal" aria-live="polite"></article>
+      <section class="panel" id="panel" hidden aria-label="Panel">
+        <button class="pclose" id="pclose" aria-label="Close">✕</button>
+        <div class="pview" id="ctx"></div>
+        <div class="pview" id="questsView" hidden>
+          <h2 id="logSum">All quests</h2>
+          <ul class="pinned" id="list"></ul>
+          <form class="row" id="addForm">
+            <label class="sr" for="addTitle">Quest</label>
+            <input id="addTitle" placeholder="add a quest" required>
+            <label class="sr" for="addMin">Minutes</label>
+            <input id="addMin" type="number" min="5" max="180" placeholder="mins">
+            <button class="btn small" type="submit">Pin it</button>
+          </form>
+          <p class="muted" id="sunsamaLine"></p>
+        </div>
+        <div class="pview" id="bagView" hidden>
+          <div class="portrait">
 <div class="scene" id="scene">
       <svg viewBox="0 0 360 260" role="img" aria-label="A tiny sketched fox on a rug">
         <!-- watercolour washes -->
@@ -640,57 +776,29 @@ body.nb-open{overflow:hidden}
       <div class="props" id="props"></div>
       <button class="pet" id="pet" aria-label="Pet the fox"></button>
     </div>
-
-    
-      
-      </div>
-      <h2>Spoil <span id="trayName">Maple</span></h2>
-      <div class="items" id="bag"></div>
-      <p class="muted" id="bagHint"></p>
-      <p class="eyebrow" style="margin:22px 0 10px">Play for free</p>
-      <div class="actions" id="play"></div>
-    </section></div>
-
-    <section class="card log" id="boardCard">
-      <span class="tape gingham" aria-hidden="true"></span>
-      <details id="logBox">
-        <summary id="logSum">All quests</summary>
-        <p class="key">• to do &nbsp; × done</p>
-        <ul id="list"></ul>
-        <form class="row" id="addForm">
-          <label class="sr" for="addTitle">Quest</label>
-          <input id="addTitle" placeholder="add a quest" required>
-          <label class="sr" for="addMin">Minutes</label>
-          <input id="addMin" type="number" min="5" max="180" placeholder="mins">
-          <button class="btn small" type="submit">Add</button>
-        </form>
-        <p class="muted" id="sunsamaLine"></p>
-        <p class="muted">Anything you add joins the end of the line.</p>
-      </details>
-    </section>
-
-    <section class="card log mail" id="mailCard" hidden>
-      <span class="tape sky" aria-hidden="true"></span>
-      <details id="mailBox">
-        <summary id="mailSum">Letters</summary>
-        <ul id="mailList"></ul>
-        <p class="muted">Notes from your helpers: the briefing, inbox triage, digests and the like. A messenger runs each new one over to you.</p>
-      </details>
-    </section>
-
-    <section class="card log">
-      <span class="tape dots" aria-hidden="true"></span>
-      <details id="friend">
-        <summary id="friendSum">Friendship</summary>
-        <div id="friendBody"></div>
-        <div class="row">
-          <label class="sr" for="nameIn">Fox's name</label>
-          <input id="nameIn" maxlength="20" placeholder="rename your fox">
-          <button class="btn small alt" id="nameSave">Rename</button>
+          </div>
+          <h2>Spoil <span id="trayName">Maple</span></h2>
+          <div class="items" id="bag"></div>
+          <p class="muted" id="bagHint"></p>
+          <p class="eyebrow" style="margin:18px 0 8px">Play for free</p>
+          <div class="actions" id="play"></div>
+          <h3 class="ph3">Friendship</h3>
+          <div id="friendBody"></div>
+          <div class="row">
+            <label class="sr" for="nameIn">Fox's name</label>
+            <input id="nameIn" maxlength="20" placeholder="rename your fox">
+            <button class="btn small alt" id="nameSave">Rename</button>
+          </div>
         </div>
-      </details>
-    </section>
-  </section>
+        <div class="pview" id="mailView" hidden>
+          <h2 id="mailSum">Letters</h2>
+          <ul class="qlist mail" id="mailList"></ul>
+          <p class="muted">Notes from your helpers. A messenger runs each new one over to you.</p>
+        </div>
+      </section>
+    </div>
+    <p class="maphint" id="maphint"></p>
+  </div>
 </main>
 <div class="notebook" id="notebook" hidden role="dialog" aria-modal="true" aria-labelledby="nbTitle"><div class="nbpage" id="nbPage"></div></div>
 
@@ -2111,6 +2219,10 @@ Quests finished today: ${S3.doneIds.length}`;
   var shelfOpen = false;
   var selPlot = null;
   var shopTab = "seeds";
+  var qnOpen = true;
+  var qnKey = "";
+  var openView = null;
+  var shopClosed = false;
   function persist(which) {
     const obj = which === "today" ? S2 : F;
     obj.updatedAt = Date.now();
@@ -2828,9 +2940,13 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
   var agentName = (from) => AGENTS[from] && AGENTS[from].name || from || "the postie";
   function mailCard() {
     const items = (MAIL.items || []).filter((m) => m && m.id).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 20);
-    $("mailCard").hidden = !items.length;
-    if (!items.length) return;
     const unread = items.filter((m) => !F.mailRead[m.id]).length;
+    $("mailBadge").hidden = !unread;
+    $("mailBadge").textContent = unread;
+    if (!items.length) {
+      $("mailList").innerHTML = `<li><span></span><span class="muted">No letters yet.</span></li>`;
+      return;
+    }
     $("mailSum").textContent = unread ? `Letters · ${unread} new` : "Letters";
     $("mailList").innerHTML = items.map((m, i) => `<li class="${F.mailRead[m.id] ? "" : "unread"}"><span class="pl">${F.mailRead[m.id] ? "📄" : "✉️"}</span>
     <button class="open" data-mail="${i}"><span class="t">${esc(m.title || "A note")}</span><br><small>${esc(agentName(m.from))}${m.at ? " · " + new Date(m.at).toLocaleString("en-GB", { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Singapore" }) : ""}</small></button><span></span></li>`).join("");
@@ -2984,7 +3100,24 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
       <ul class="bujo">${sun.busy ? `<li>Fetching today's Sunsama tasks…</li>` : `<li>Start boss mode in chat, or open the village, and today's Sunsama tasks land on the boards.</li>`}<li>Or add one yourself under All quests.</li></ul>`;
     }
     if (say2 && say2.buttons) h = h.replace(/<h1>/, `<div class="actions saybtns">${say2.buttons.map((x, i) => `<button class="btn alt small" data-say="${i}">${esc(x[0])}</button>`).join("")}</div><h1>`);
-    j.innerHTML = h;
+    const key = ph + ":" + (ph === "task" ? remaining()[0].id + (arrivedFor(remaining()[0]) ? ":here" : "") + (S2.firstStep[remaining()[0].id] ? ":go" : "") : (S2.wipe ? "w" : "") + (atClean() ? "c" : ""));
+    if (key !== qnKey) {
+      qnKey = key;
+      qnOpen = true;
+    }
+    const slim = !qnOpen || route.length > 0 && !(say2 && say2.buttons);
+    j.classList.toggle("slim", slim);
+    j.innerHTML = h + `<button class="qnx" data-qn="min" aria-label="Fold the note away">–</button>`;
+    if (slim) {
+      const title = j.querySelector("h1") ? [...j.querySelector("h1").childNodes].filter((n) => !(n.classList && n.classList.contains("lbl"))).map((n) => n.textContent).join("").trim() : "";
+      const when = S2.timer ? `<span class="when" data-tleft>${fmt(Math.max(0, S2.timer.endAt - Date.now()))}</span>` : "";
+      j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">📜 <b>${esc(route.length ? "Walking… " + title : title)}</b>${when}<span class="more">open</span></button>`;
+    }
+    j.querySelectorAll("[data-qn]").forEach((el) => el.onclick = (ev) => {
+      ev.stopPropagation();
+      qnOpen = el.dataset.qn === "open";
+      journal();
+    });
     j.querySelectorAll("[data-a]").forEach((el) => el.onclick = () => {
       const t = remaining()[0];
       A[el.dataset.a](t);
@@ -3004,6 +3137,27 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
       A.water();
     });
   }
+  function showPanel(hasCtx, skin) {
+    const views = { quests: "questsView", bag: "bagView", mail: "mailView" };
+    const view = openView || (hasCtx ? "ctx" : null), p = $("panel");
+    p.hidden = !view;
+    $("map").classList.toggle("panel-open", !!view);
+    ["ctx", "questsView", "bagView", "mailView"].forEach((id) => $(id).hidden = id !== (views[view] || view));
+    p.className = "panel " + (view === "quests" ? "cork" : view === "ctx" ? skin : "paper");
+    document.querySelectorAll("[data-open]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.open === openView)));
+  }
+  function closePanel() {
+    if (openView) {
+      openView = null;
+      ctx();
+      return;
+    }
+    boardOpen = false;
+    shelfOpen = false;
+    selPlot = null;
+    if (scene === "market") shopClosed = true;
+    ctx();
+  }
   function itemBtn(id, label, disabled, extra2) {
     const it = ITEMS[id];
     return `<button class="item" data-id="${id}" ${disabled ? "disabled" : ""}><span class="e">${it.e}</span><span class="n">${esc(it.n)}</span><span class="c">${label}</span>${extra2 || ""}</button>`;
@@ -3011,7 +3165,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
   function ctx() {
     const c = $("ctx");
     let h = "";
-    if (scene === "market") {
+    if (scene === "market" && !shopClosed) {
       const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["care", "Care"], ["sell", "Sell"]];
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have 🪙 ${F.coins}. Seeds and treats go straight into your backpack.</p>
       <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-shop="${k}" aria-selected="${shopTab === k}">${n}</button>`).join("")}</div><div class="items shop">`;
@@ -3061,8 +3215,8 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
       }).join("")}</ul>` : `<p class="sub">No quests ${scene === "village" ? "today yet" : "in here today"}.</p>`}
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
     }
-    c.hidden = !h;
     c.innerHTML = h;
+    showPanel(!!h, scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
     c.querySelectorAll("[data-shop]").forEach((b) => b.onclick = () => {
       shopTab = b.dataset.shop;
       ctx();
@@ -3132,10 +3286,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
   function openSteps(force) {
     const f = $("stepForm");
     f.classList.toggle("open", force === true ? true : !f.classList.contains("open"));
-    if (f.classList.contains("open")) {
-      if (force === true) f.scrollIntoView({ behavior: "smooth", block: "center" });
-      $("stepIn").focus({ preventScroll: force === true });
-    }
+    if (f.classList.contains("open")) $("stepIn").focus({ preventScroll: true });
   }
   function questMark() {
     const ph = phase(), m = $("qmarkWrap");
@@ -3164,7 +3315,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "farm" ? farmArt() : roomArt(scene);
     const names = { village: "The village", farm: "The garden" };
     $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${scene !== "village" ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-    $("maphint").textContent = scene === "village" ? "Tap anywhere to walk. Tap a building to go inside." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? innerWidth >= 900 ? "The shop is open on the right." : "The shop is open below." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+    $("maphint").textContent = scene === "village" ? "Tap anywhere to walk. Tap a building to go inside." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
   }
   function render(redraw) {
     if (S2.day !== dayKey()) S2 = freshToday();
@@ -3188,6 +3339,8 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed 💕"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>`;
     const all = allTasks(), rem = remaining(), cur = phase() === "task" && rem[0] ? rem[0].id : null;
     $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
+    $("qBadge").hidden = !rem.length;
+    $("qBadge").textContent = rem.length;
     $("list").innerHTML = all.map((t) => {
       const dn = S2.doneIds.includes(t.id);
       return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"><span class="pl">${VILLAGE[placeOf(t)].emo}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : String(t.id).startsWith("x") && !dn ? `<button data-rm="${esc(t.id)}" aria-label="Remove">✕</button>` : "<span></span>"}</li>`;
@@ -3223,6 +3376,8 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
       boardOpen = false;
       shelfOpen = false;
       selPlot = null;
+      openView = null;
+      shopClosed = false;
       resetScene();
       const p = at || [260, 596];
       mel.x = mel.tx = p[0];
@@ -3258,6 +3413,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     atSpot = null;
     boardOpen = false;
     shelfOpen = false;
+    openView = null;
     nextLeg();
     render();
   }
@@ -3278,6 +3434,17 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     if (id === "digest") {
       shelfOpen = true;
       speak(digestReady() ? isHere("juniper") ? "Juniper's waving a digest at you!" : "A fresh digest is ready on the shelf." : "Digests are rationed. Like dessert.", 3500);
+      render();
+      return;
+    }
+    if (id === "stall") {
+      shopClosed = false;
+      render();
+      return;
+    }
+    if (id === "board" && scene === "village") {
+      openView = "quests";
+      speak("All of today's quests!", 3500);
       render();
       return;
     }
@@ -3385,6 +3552,10 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     const [x, y] = toWorld(ev);
     route = [];
     atSpot = null;
+    if (qnOpen && phase() !== "clean") {
+      qnOpen = false;
+      journal();
+    }
     const b = bounds();
     mel.tx = clamp(x, b[0], b[2]);
     mel.ty = clamp(y, b[1], b[3]);
@@ -3540,8 +3711,9 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     order.forEach(([n]) => {
       if (g.lastElementChild !== n) g.appendChild(n);
     });
-    const chip = !(phase() === "task" && arrivedFor(remaining()[0]) && !notebookOpen() && !route.length);
-    if ($("doTask").hidden !== chip) $("doTask").hidden = chip;
+    const jn = $("journal"), low = jn.classList.contains("low");
+    if (!low && mel.y < 300) jn.classList.add("low");
+    else if (low && mel.y > 360) jn.classList.remove("low");
     const close = Math.hypot(maple.x - mel.x, maple.y - mel.y) < 60;
     bubbleAt($("speech"), close ? maple.x * 0.35 + mel.x * 0.65 : maple.x, close ? Math.min(maple.y, mel.y) : maple.y, close ? 76 : sleeping ? 18 : 30);
     if (evanHere()) bubbleAt($("evanSay"), evan.x, evan.y, 40);
@@ -3586,18 +3758,11 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     hearts(2);
     speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please.", "You're my favourite human."]), 3e3);
   };
-  var placeCtx = () => {
-    const c = $("ctx");
-    if (innerWidth >= 900) {
-      const r = document.querySelector(".right");
-      if (r.firstElementChild !== c) r.prepend(c);
-    } else {
-      const m = document.querySelector(".mapcard");
-      if (m.nextElementSibling !== c) m.after(c);
-    }
-  };
-  placeCtx();
-  addEventListener("resize", placeCtx);
+  $("pclose").onclick = closePanel;
+  document.querySelectorAll("[data-open]").forEach((b) => b.onclick = () => {
+    openView = openView === b.dataset.open ? null : b.dataset.open;
+    ctx();
+  });
   initNotebook({
     task: () => phase() === "task" ? remaining()[0] : null,
     S: () => S2,
@@ -3635,10 +3800,6 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
       save();
     }
   });
-  $("doTask").onclick = () => {
-    const t = phase() === "task" && remaining()[0];
-    if (t) A.notebook(t);
-  };
   render(true);
   if (F.gift) setTimeout(() => speak("A welcome gift! Seeds are in your backpack 🌷", 5e3), 1200);
   requestAnimationFrame(frame);

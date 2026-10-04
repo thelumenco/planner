@@ -25,16 +25,31 @@
   </defs>
 </svg>
 <main class="wrap">
-  <section class="left" aria-label="Village">
-    <div class="head">
-      <h1 class="title" id="title">Maple's village<small id="dateLine"></small></h1>
-      <div class="berries" title="Coins">🪙 <span id="coins">0</span></div>
-    </div>
-    <p class="earn" id="earn" aria-live="polite"></p>
-    <div class="card mapcard">
-      <span class="tape dots" aria-hidden="true"></span>
+  <div class="head">
+    <h1 class="title" id="title">Maple's village<small id="dateLine"></small></h1>
+    <div class="berries" title="Coins">🪙 <span id="coins">0</span></div>
+  </div>
+  <div class="hudbar" aria-label="Today's trackers">
+    <div class="trk"><span class="lbl" aria-hidden="true">💧</span><span class="sr">Water</span><div class="boxes" id="waterBoxes"></div></div>
+    <div class="trk"><span class="lbl" aria-hidden="true">👣</span><span class="sr">Steps</span><div class="boxes" id="stepBoxes"></div><span class="tnote" id="stepNote"></span></div>
+    <form class="stepform" id="stepForm">
+      <label class="sr" for="stepIn">Steps showing now</label>
+      <input id="stepIn" type="number" inputmode="numeric" min="0" placeholder="steps showing now">
+      <button class="btn small" type="submit">Save</button>
+    </form>
+  </div>
+  <p class="earn" id="earn" aria-live="polite"></p>
+  <div class="card mapcard">
+    <span class="tape dots" aria-hidden="true"></span>
+    <div class="scenebar">
       <p class="scenename" id="sceneName">Village</p>
-      <div class="map" id="map">
+      <div class="hudbtns">
+        <button class="hbtn" data-open="quests" aria-label="All quests">📋<span class="badge" id="qBadge" hidden></span></button>
+        <button class="hbtn" data-open="bag" aria-label="Backpack and Maple">🎒</button>
+        <button class="hbtn" data-open="mail" aria-label="Letters">✉️<span class="badge" id="mailBadge" hidden></span></button>
+      </div>
+    </div>
+    <div class="map" id="map">
         <svg id="world" viewBox="0 0 520 640" role="application" aria-label="Game map. Tap a place to walk there.">
           <g id="sceneArt"></g>
           <g id="qmarkWrap" style="display:none"><g class="qmark">
@@ -107,33 +122,28 @@
           
           </g>
         </svg>
-        <div class="mprops" id="mprops"></div>
-        <p class="speech" id="speech" aria-live="polite"></p>
-        <p class="speech small" id="evanSay" hidden></p>
-        <p class="speech small" id="npcSay" hidden aria-live="polite"></p>
-        <button class="btn primary dotask" id="doTask" hidden>Do task</button>
-      </div>
-      <p class="maphint" id="maphint"></p>
-    </div>
-    <section class="card ctx" id="ctx" hidden></section>
-    <div><p class="eyebrow">Today's trackers</p><div class="card trackers">
-      <span class="tape sky" aria-hidden="true"></span>
-      <div class="trow"><span class="lbl">Water</span><div class="boxes" id="waterBoxes"></div></div>
-      <div class="trow"><span class="lbl">Steps</span><div class="boxes" id="stepBoxes"></div><span class="tnote" id="stepNote"></span></div>
-      <form class="stepform" id="stepForm">
-        <label class="sr" for="stepIn">Steps showing now</label>
-        <input id="stepIn" type="number" inputmode="numeric" min="0" placeholder="steps showing now">
-        <button class="btn small" type="submit">Save</button>
-      </form>
-    </div></div>
-  </section>
-
-  <section class="right">
-    <article class="card journal" id="journal" aria-live="polite"></article>
-
-    <div><p class="eyebrow">Backpack</p><section class="card tray" aria-label="Backpack and Maple">
-      <span class="tape stripe" aria-hidden="true"></span>
-      <div class="portrait">
+      <div class="mprops" id="mprops"></div>
+      <p class="speech" id="speech" aria-live="polite"></p>
+      <p class="speech small" id="evanSay" hidden></p>
+      <p class="speech small" id="npcSay" hidden aria-live="polite"></p>
+      <article class="qnote journal" id="journal" aria-live="polite"></article>
+      <section class="panel" id="panel" hidden aria-label="Panel">
+        <button class="pclose" id="pclose" aria-label="Close">✕</button>
+        <div class="pview" id="ctx"></div>
+        <div class="pview" id="questsView" hidden>
+          <h2 id="logSum">All quests</h2>
+          <ul class="pinned" id="list"></ul>
+          <form class="row" id="addForm">
+            <label class="sr" for="addTitle">Quest</label>
+            <input id="addTitle" placeholder="add a quest" required>
+            <label class="sr" for="addMin">Minutes</label>
+            <input id="addMin" type="number" min="5" max="180" placeholder="mins">
+            <button class="btn small" type="submit">Pin it</button>
+          </form>
+          <p class="muted" id="sunsamaLine"></p>
+        </div>
+        <div class="pview" id="bagView" hidden>
+          <div class="portrait">
 <div class="scene" id="scene">
       <svg viewBox="0 0 360 260" role="img" aria-label="A tiny sketched fox on a rug">
         <!-- watercolour washes -->
@@ -270,57 +280,29 @@
       <div class="props" id="props"></div>
       <button class="pet" id="pet" aria-label="Pet the fox"></button>
     </div>
-
-    
-      
-      </div>
-      <h2>Spoil <span id="trayName">Maple</span></h2>
-      <div class="items" id="bag"></div>
-      <p class="muted" id="bagHint"></p>
-      <p class="eyebrow" style="margin:22px 0 10px">Play for free</p>
-      <div class="actions" id="play"></div>
-    </section></div>
-
-    <section class="card log" id="boardCard">
-      <span class="tape gingham" aria-hidden="true"></span>
-      <details id="logBox">
-        <summary id="logSum">All quests</summary>
-        <p class="key">• to do &nbsp; × done</p>
-        <ul id="list"></ul>
-        <form class="row" id="addForm">
-          <label class="sr" for="addTitle">Quest</label>
-          <input id="addTitle" placeholder="add a quest" required>
-          <label class="sr" for="addMin">Minutes</label>
-          <input id="addMin" type="number" min="5" max="180" placeholder="mins">
-          <button class="btn small" type="submit">Add</button>
-        </form>
-        <p class="muted" id="sunsamaLine"></p>
-        <p class="muted">Anything you add joins the end of the line.</p>
-      </details>
-    </section>
-
-    <section class="card log mail" id="mailCard" hidden>
-      <span class="tape sky" aria-hidden="true"></span>
-      <details id="mailBox">
-        <summary id="mailSum">Letters</summary>
-        <ul id="mailList"></ul>
-        <p class="muted">Notes from your helpers: the briefing, inbox triage, digests and the like. A messenger runs each new one over to you.</p>
-      </details>
-    </section>
-
-    <section class="card log">
-      <span class="tape dots" aria-hidden="true"></span>
-      <details id="friend">
-        <summary id="friendSum">Friendship</summary>
-        <div id="friendBody"></div>
-        <div class="row">
-          <label class="sr" for="nameIn">Fox's name</label>
-          <input id="nameIn" maxlength="20" placeholder="rename your fox">
-          <button class="btn small alt" id="nameSave">Rename</button>
+          </div>
+          <h2>Spoil <span id="trayName">Maple</span></h2>
+          <div class="items" id="bag"></div>
+          <p class="muted" id="bagHint"></p>
+          <p class="eyebrow" style="margin:18px 0 8px">Play for free</p>
+          <div class="actions" id="play"></div>
+          <h3 class="ph3">Friendship</h3>
+          <div id="friendBody"></div>
+          <div class="row">
+            <label class="sr" for="nameIn">Fox's name</label>
+            <input id="nameIn" maxlength="20" placeholder="rename your fox">
+            <button class="btn small alt" id="nameSave">Rename</button>
+          </div>
         </div>
-      </details>
-    </section>
-  </section>
+        <div class="pview" id="mailView" hidden>
+          <h2 id="mailSum">Letters</h2>
+          <ul class="qlist mail" id="mailList"></ul>
+          <p class="muted">Notes from your helpers. A messenger runs each new one over to you.</p>
+        </div>
+      </section>
+    </div>
+    <p class="maphint" id="maphint"></p>
+  </div>
 </main>
 <div class="notebook" id="notebook" hidden role="dialog" aria-modal="true" aria-labelledby="nbTitle"><div class="nbpage" id="nbPage"></div></div>
 <!--DEVSTUB-->

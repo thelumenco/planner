@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 const root = dirname(fileURLToPath(import.meta.url));
 const dev = process.argv.includes("--dev");
 const serve = dev && !process.argv.includes("--once");
-const STYLE_ORDER = ["base.css", "notebook.css", "npcs.css"];
+const STYLE_ORDER = ["base.css", "notebook.css", "npcs.css", "game-ui.css"];
 
 async function build() {
   const js = await esbuild.build({

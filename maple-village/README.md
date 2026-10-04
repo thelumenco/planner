@@ -28,7 +28,7 @@ In the browser console, `devDb.set("plan", {...})` / `devDb.get("today")` read a
 ```
 src/
   index.html          markup shell (styles + script are inlined by build.mjs)
-  styles/             base.css (design tokens, cards, washi, village), notebook.css, npcs.css
+  styles/             base.css (design tokens, cards, washi, village), notebook.css, npcs.css, game-ui.css (map-first layout, quest note, panels)
   util.js             Singapore time, DOM and maths helpers
   data/world.js       village layout, building interiors, task → place/spot matching
   data/items.js       shop items, crops, plots, friendship levels

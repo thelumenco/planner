@@ -35,6 +35,8 @@ migrate();
 setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST});
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "village", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
+// In-game UI: the quest note pinned on the map (open, or slim while walking) and the panel over the map.
+let qnOpen = true, qnKey = "", openView = null, shopClosed = false;
 
 function persist(which){
   const obj = which === "today" ? S : F;
@@ -415,9 +417,9 @@ function markRead(item){
 const agentName = from => (AGENTS[from] && AGENTS[from].name) || from || "the postie";
 function mailCard(){
   const items = (MAIL.items || []).filter(m => m && m.id).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 20);
-  $("mailCard").hidden = !items.length;
-  if (!items.length) return;
   const unread = items.filter(m => !F.mailRead[m.id]).length;
+  $("mailBadge").hidden = !unread; $("mailBadge").textContent = unread;
+  if (!items.length) { $("mailList").innerHTML = `<li><span></span><span class="muted">No letters yet.</span></li>`; return; }
   $("mailSum").textContent = unread ? `Letters · ${unread} new` : "Letters";
   $("mailList").innerHTML = items.map((m, i) => `<li class="${F.mailRead[m.id] ? "" : "unread"}"><span class="pl">${F.mailRead[m.id] ? "📄" : "✉️"}</span>
     <button class="open" data-mail="${i}"><span class="t">${esc(m.title || "A note")}</span><br><small>${esc(agentName(m.from))}${m.at ? " · " + new Date(m.at).toLocaleString("en-GB", {weekday:"short", hour:"numeric", minute:"2-digit", timeZone:"Asia/Singapore"}) : ""}</small></button><span></span></li>`).join("");
@@ -521,11 +523,36 @@ function journal(){
       <ul class="bujo">${sun.busy ? `<li>Fetching today's Sunsama tasks…</li>` : `<li>Start boss mode in chat, or open the village, and today's Sunsama tasks land on the boards.</li>`}<li>Or add one yourself under All quests.</li></ul>`;
   }
   if (say && say.buttons) h = h.replace(/<h1>/, `<div class="actions saybtns">${say.buttons.map((x, i) => `<button class="btn alt small" data-say="${i}">${esc(x[0])}</button>`).join("")}</div><h1>`);
-  j.innerHTML = h;
+  // The note re-opens whenever the quest step changes; it folds to one line while walking or when tapped away.
+  const key = ph + ":" + (ph === "task" ? remaining()[0].id + (arrivedFor(remaining()[0]) ? ":here" : "") + (S.firstStep[remaining()[0].id] ? ":go" : "") : (S.wipe ? "w" : "") + (atClean() ? "c" : ""));
+  if (key !== qnKey) { qnKey = key; qnOpen = true; }
+  const slim = !qnOpen || (route.length > 0 && !(say && say.buttons));
+  j.classList.toggle("slim", slim);
+  j.innerHTML = h + `<button class="qnx" data-qn="min" aria-label="Fold the note away">–</button>`;
+  if (slim) {
+    const title = j.querySelector("h1") ? [...j.querySelector("h1").childNodes].filter(n => !(n.classList && n.classList.contains("lbl"))).map(n => n.textContent).join("").trim() : "";
+    const when = S.timer ? `<span class="when" data-tleft>${fmt(Math.max(0, S.timer.endAt - Date.now()))}</span>` : "";
+    j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">📜 <b>${esc(route.length ? "Walking… " + title : title)}</b>${when}<span class="more">open</span></button>`;
+  }
+  j.querySelectorAll("[data-qn]").forEach(el => el.onclick = ev => { ev.stopPropagation(); qnOpen = el.dataset.qn === "open"; journal(); });
   j.querySelectorAll("[data-a]").forEach(el => el.onclick = () => { const t = remaining()[0]; A[el.dataset.a](t); });
   j.querySelectorAll("[data-say]").forEach(el => el.onclick = () => { const fn = say.buttons[+el.dataset.say][1]; say.buttons = null; fn(); save(); });
   j.querySelectorAll("[data-dismiss]").forEach(el => el.onclick = () => { S[el.dataset.dismiss] = true; save(); });
   j.querySelectorAll("[data-water2]").forEach(el => el.onclick = () => { S.water2 = true; A.water(); });
+}
+// One panel over the map. A HUD view (quests / backpack / letters) takes it when opened; otherwise whatever the
+// current spot offers (shop, room quest board, garden plot, digest shelf).
+function showPanel(hasCtx, skin){
+  const views = {quests:"questsView", bag:"bagView", mail:"mailView"};
+  const view = openView || (hasCtx ? "ctx" : null), p = $("panel");
+  p.hidden = !view; $("map").classList.toggle("panel-open", !!view);
+  ["ctx", "questsView", "bagView", "mailView"].forEach(id => $(id).hidden = id !== (views[view] || view));
+  p.className = "panel " + (view === "quests" ? "cork" : view === "ctx" ? skin : "paper");
+  document.querySelectorAll("[data-open]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.open === openView)));
+}
+function closePanel(){
+  if (openView) { openView = null; ctx(); return; }
+  boardOpen = false; shelfOpen = false; selPlot = null; if (scene === "market") shopClosed = true; ctx();
 }
 function itemBtn(id, label, disabled, extra){
   const it = ITEMS[id];
@@ -533,7 +560,7 @@ function itemBtn(id, label, disabled, extra){
 }
 function ctx(){
   const c = $("ctx"); let h = "";
-  if (scene === "market") {
+  if (scene === "market" && !shopClosed) {
     const tabs = [["seeds","Seeds"],["treats","Treats"],["care","Care"],["sell","Sell"]];
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have 🪙 ${F.coins}. Seeds and treats go straight into your backpack.</p>
       <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-shop="${k}" aria-selected="${shopTab === k}">${n}</button>`).join("")}</div><div class="items shop">`;
@@ -581,7 +608,8 @@ function ctx(){
         : `<p class="sub">No quests ${scene === "village" ? "today yet" : "in here today"}.</p>`}
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
   }
-  c.hidden = !h; c.innerHTML = h;
+  c.innerHTML = h;
+  showPanel(!!h, scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
   c.querySelectorAll("[data-shop]").forEach(b => b.onclick = () => { shopTab = b.dataset.shop; ctx(); });
   c.querySelectorAll(".item[data-id]").forEach(b => b.onclick = () => {
     const id = b.dataset.id;
@@ -619,7 +647,7 @@ function trackers(){
 }
 function openSteps(force){
   const f = $("stepForm"); f.classList.toggle("open", force === true ? true : !f.classList.contains("open"));
-  if (f.classList.contains("open")) { if (force === true) f.scrollIntoView({behavior:"smooth", block:"center"}); $("stepIn").focus({preventScroll: force === true}); }
+  if (f.classList.contains("open")) $("stepIn").focus({preventScroll: true});
 }
 function questMark(){
   const ph = phase(), m = $("qmarkWrap");
@@ -639,7 +667,7 @@ function drawScene(){
   $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "farm" ? farmArt() : roomArt(scene);
   const names = {village:"The village", farm:"The garden"};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${scene !== "village" ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-  $("maphint").textContent = scene === "village" ? "Tap anywhere to walk. Tap a building to go inside." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? (innerWidth >= 900 ? "The shop is open on the right." : "The shop is open below.") : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+  $("maphint").textContent = scene === "village" ? "Tap anywhere to walk. Tap a building to go inside." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
 }
 function render(redraw){
   if (S.day !== dayKey()) S = freshToday();
@@ -663,6 +691,7 @@ function render(redraw){
     <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed 💕"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>`;
   const all = allTasks(), rem = remaining(), cur = (phase() === "task" && rem[0]) ? rem[0].id : null;
   $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
+  $("qBadge").hidden = !rem.length; $("qBadge").textContent = rem.length;
   $("list").innerHTML = all.map(t => { const dn = S.doneIds.includes(t.id);
     return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"><span class="pl">${VILLAGE[placeOf(t)].emo}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : String(t.id).startsWith("x") && !dn ? `<button data-rm="${esc(t.id)}" aria-label="Remove">✕</button>` : "<span></span>"}</li>`; }).join("");
   $("list").querySelectorAll("[data-rm]").forEach(el => el.onclick = () => { S.extra = S.extra.filter(x => x.id !== el.dataset.rm); save(true); });
@@ -681,7 +710,7 @@ const bounds = () => scene === "village" ? [14, 150, W - 14, HH - 14] : [34, 168
 function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
   setTimeout(() => {
-    scene = id; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; resetNpcs();
+    scene = id; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; resetNpcs();
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
     if (id === "village") { evan.x = evan.tx = 250; evan.y = evan.ty = 380; }
@@ -701,7 +730,7 @@ function go(target, x, y, fn){
     if (target !== "village") { const d = VILLAGE[target].door; legs.push({scene:"village", x:d[0], y:d[1], fn:() => setScene(target, target === "farm" ? [260, 590] : [260, 596])}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; openView = null; nextLeg(); render();
 }
 function curDoorKey(s){ return s; }
 function nextLeg(){
@@ -712,6 +741,8 @@ function arriveSpot(id){
   atSpot = id;
   const ph = phase();
   if (id === "digest") { shelfOpen = true; speak(digestReady() ? (isHere("juniper") ? "Juniper's waving a digest at you!" : "A fresh digest is ready on the shelf.") : "Digests are rationed. Like dessert.", 3500); render(); return; }
+  if (id === "stall") { shopClosed = false; render(); return; }
+  if (id === "board" && scene === "village") { openView = "quests"; speak("All of today's quests!", 3500); render(); return; }
   if (id === "board") { boardOpen = true; speak(scene === "village" ? "All of today's quests!" : "Here's what needs doing in here.", 3500); render(); return; }
   if (ph === "clean" && scene === "home" && id === "cupboard") { setSay(S.wipe ? "Five minutes. Hard stop, promise." : "Wet wipes live here. Grab one!"); render(); return; }
   if (ph === "task") {
@@ -748,6 +779,7 @@ svg.addEventListener("click", ev => {
   const pt = ev.target.closest("[data-plot]");
   if (pt) { const i = +pt.dataset.plot, p = PLOTS[i]; go("farm", p.x + p.w/2, p.y + p.h + 18, () => { selPlot = i; atSpot = "plot"; ctx(); const s = F.plots[i]; speak(!s || !s.crop ? "Empty plot. What shall we grow?" : !s.wateredAt ? "Thirsty seeds!" : growth(s) >= 1 ? "Ready to pick!" : "Growing nicely.", 3000); }); return; }
   const [x, y] = toWorld(ev); route = []; atSpot = null;
+  if (qnOpen && phase() !== "clean") { qnOpen = false; journal(); }   // tapping the map to wander folds the note away
   const b = bounds(); mel.tx = clamp(x, b[0], b[2]); mel.ty = clamp(y, b[1], b[3]);
 });
 window.addEventListener("keydown", e => {
@@ -835,8 +867,9 @@ function frame(now){
   nodes.evan.classList.toggle("run", evan.run && evan.moving);
   const order = [[nodes.mel, mel], [nodes.maple, maple], [nodes.evan, evan], ...npcActors()].sort((a, b) => a[1].y - b[1].y);
   const g = $("actors"); order.forEach(([n]) => { if (g.lastElementChild !== n) g.appendChild(n); });
-  const chip = !(phase() === "task" && arrivedFor(remaining()[0]) && !notebookOpen() && !route.length);
-  if ($("doTask").hidden !== chip) $("doTask").hidden = chip;
+  // The quest note docks on the opposite half of the map from Mel, so it never sits on top of her.
+  const jn = $("journal"), low = jn.classList.contains("low");
+  if (!low && mel.y < 300) jn.classList.add("low"); else if (low && mel.y > 360) jn.classList.remove("low");
   const close = Math.hypot(maple.x - mel.x, maple.y - mel.y) < 60;
   bubbleAt($("speech"), close ? (maple.x*0.35 + mel.x*0.65) : maple.x, close ? Math.min(maple.y, mel.y) : maple.y, close ? 76 : (sleeping ? 18 : 30));
   if (evanHere()) bubbleAt($("evanSay"), evan.x, evan.y, 40); else $("evanSay").hidden = true;
@@ -859,14 +892,13 @@ $("addForm").onsubmit = e => {
 $("nameSave").onclick = () => { const v = $("nameIn").value.trim(); if (v) { F.name = v; $("nameIn").value = ""; act("cheer"); speak(`Hi! I'm ${v} now 🦊`, 4000); save(); } };
 $("pet").onclick = () => { hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please.", "You're my favourite human."]), 3000); };
 
-const placeCtx = () => { const c = $("ctx"); if (innerWidth >= 900) { const r = document.querySelector(".right"); if (r.firstElementChild !== c) r.prepend(c); } else { const m = document.querySelector(".mapcard"); if (m.nextElementSibling !== c) m.after(c); } };
-placeCtx(); addEventListener("resize", placeCtx);
+$("pclose").onclick = closePanel;
+document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; ctx(); });
 initNotebook({task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
   sayNow:() => say, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),
   placeLabel:t => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`});
 initNpcs({scene:() => scene, bounds, mel, evan, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()} ${ITEMS[id].e}`); save(); }});
-$("doTask").onclick = () => { const t = phase() === "task" && remaining()[0]; if (t) A.notebook(t); };
 render(true);
 if (F.gift) setTimeout(() => speak("A welcome gift! Seeds are in your backpack 🌷", 5000), 1200);
 requestAnimationFrame(frame);

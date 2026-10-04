@@ -219,4 +219,9 @@ Round 2 (same day):
 - Morning briefing notes from the crier render as *The Morning Crier* village paper (`sections` on mail items).
 - Juniper's digest shelf in the library: book digests from a new `library` doc, one an hour or one per quest done, with a "Read before" list and a Claude-picked fallback when the shelf is empty.
 
+Round 3: everything happens on the map, no scrolling (Mel's principle: if possible, things open inside the game).
+- Trackers sit in a strip above the map. The page is sized so the whole game fits the screen.
+- The quest card is now a washi-taped note pinned on the map. It folds to one line while walking or when tapped away, re-opens when the quest step changes, and docks on the opposite half from Mel.
+- Quest board = a cork board with pinned notes; shop, garden plot, digest shelf, backpack (with Maple) and letters all open as panels over the map. HUD buttons: 📋 quests, 🎒 backpack, ✉️ letters (with counts).
+
 Not done yet: publishing the new build to the live link (needs `sample` added to the capabilities), stage 3 ideas (8.5), collision-aware walking and a camera/zoom for small phones (4.6).

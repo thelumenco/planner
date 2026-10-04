@@ -30,6 +30,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(900);
   await page.screenshot({ path: join(shots, `${vp.name}-1-start.png`), fullPage: vp.name === "phone" ? false : true });
   check(await page.locator("#journal h1").textContent().then(t => /Five-minute clean/.test(t)), "day opens with the five-minute clean");
+  const lay = await page.evaluate(() => ({ hud: document.querySelector(".hudbar").getBoundingClientRect().bottom, map: document.querySelector("#map").getBoundingClientRect().top,
+    fits: document.documentElement.scrollHeight <= innerHeight + 2, note: !!document.querySelector("#map #journal h1") }));
+  check(lay.hud <= lay.map, "trackers sit above the map");
+  check(lay.fits, "the whole game fits on screen without scrolling");
+  check(lay.note, "the quest note is pinned on the map");
 
   // Clean: walk to cupboard, get wipe, done
   await page.click('#journal [data-a="walk"]');
@@ -90,9 +95,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#notebook [data-nb="treadmill"]');
   await page.waitForTimeout(300);
   check(!(await page.locator("#notebook").isVisible()), "choosing the treadmill closes the notebook and walks");
-  await page.waitForFunction(() => !document.querySelector("#doTask").hidden, null, { timeout: 30000 });
+  await page.waitForFunction(() => document.querySelector('#journal [data-a="notebook"]'), null, { timeout: 30000 });
   check(await page.locator("#sceneName").textContent().then(t => /Home/.test(t)), "treadmill quest moved to home");
-  await page.click("#doTask");
+  await page.click('#journal [data-a="notebook"]');
   await page.click('#notebook [data-nb="started"]');
   await page.waitForTimeout(400);
   check(await page.locator("#mel").getAttribute("class").then(c => /walk/.test(c)), "Mel walks in place on the treadmill");
@@ -101,10 +106,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(300);
   check(await page.locator("#journal").textContent().then(t => /Log my steps/.test(t)), "treadmill quest asks for steps");
 
+  // Quest board opens as a cork board on the map
+  await page.click('[data-open="quests"]');
+  await page.waitForTimeout(400);
+  check(await page.locator("#panel.cork #list li").count() > 0, "quest board opens as a cork board in the game");
+  await page.screenshot({ path: join(shots, `${vp.name}-9-cork.png`) });
+  await page.click("#pclose");
+  check(await page.locator("#panel").isHidden(), "closing the board returns to the map");
+
   // Library digest shelf: first read is free, the second is locked until an hour passes or a quest is done
   await page.locator('#world [data-place="fresh"]').first().click({ force: true }).catch(() => {});
   await page.evaluate(() => document.querySelector("#world [data-exit]") && document.querySelector("#world [data-exit]").dispatchEvent(new MouseEvent("click", {bubbles: true})));
   await page.waitForFunction(() => /village/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  if (await page.locator('#journal [data-qn="min"]').count()) await page.click('#journal [data-qn="min"]');
   await page.locator('#world [data-place="fresh"]').first().click({ force: true });
   await page.waitForFunction(() => /library/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 });
   await page.waitForTimeout(400);
@@ -119,7 +133,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#ctx").textContent().then(t => /Next digest in/.test(t)), "the next digest is rationed");
 
   // Morning briefing as a gazette
-  await page.locator("#mailBox summary").click();
+  await page.click('[data-open="mail"]');
   await page.locator('#mailList [data-mail]').last().click();
   await page.waitForTimeout(300);
   check(await page.locator("#notebook .masthead").count() > 0, "morning briefing opens as The Morning Crier");
