@@ -64,7 +64,9 @@ All docs live under `data/users/<uid>/` in the artifact's `db`.
 1. `npm run build`.
 2. Publish `dist/maple-village.html` with capabilities **`{db: {}, user: {}, sample: {}, mcp: {servers: [{server: "Sunsama MCP", tools: ["read_resource"]}]}}`**. Passing capabilities replaces the whole stored set, so list them all. Without `sample`, everything works except "talk to the note" and Juniper's own picks. Without `mcp`, the page doesn't pull Sunsama itself and waits for chat's plan.
 
-Preview (private): https://claude.ai/artifact/FLecX7JuweZ4iMJgujA2ET
+Live village (private, Mel's): https://claude.ai/artifact/REdXbAyK7ybkGJbmohoCM4. Publish with the Artifact tool's `url` set to it. Data lives in the artifact's own database (no Firebase needed). An older test copy is at https://claude.ai/artifact/FLecX7JuweZ4iMJgujA2ET.
+
+**Village quest loader** (Claude Code routine `trig_01EXogUFX8v1c5VvV9UKfgAZ`, daily 7:24am SGT) reads Sunsama and Calendar, writes the plan with first steps and pep talks (`source: "routine"`), and never overwrites a plan chat made that day. It needs the Sunsama and Google Calendar connectors attached to the routine.
 3. Her progress lives in `db`, so it carries over.
 
 ## Open questions for Mel

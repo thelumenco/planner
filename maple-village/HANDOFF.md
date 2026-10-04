@@ -235,4 +235,9 @@ Round 5:
 - Treadmill tasks (title has 🚶 or "treadmill") are assigned straight to the treadmill at home; "walk" tasks keep the offer.
 - Water and steps are thin drawn progress bars. Tapping one opens a small notebook page: water in ml (+glass / +bottle / +big bottle, or type the total; goal 2 L), steps typed from the watch (goal 5,000).
 
+Round 6:
+- Phone camera pans with a GPU transform (no more flicker), folded quest tab moved to the bottom-left corner.
+- Published to the live link (https://claude.ai/artifact/REdXbAyK7ybkGJbmohoCM4) with capabilities db, user, sample, mcp (Sunsama read_resource). Mel's garden and friendship carried over.
+- Routine "Village quest loader" (daily 7:24am SGT) loads the plan from Sunsama + Calendar.
+
 Not done yet: publishing the new build to the live link (needs `sample` added to the capabilities), stage 3 ideas (8.5), collision-aware walking and a camera/zoom for small phones (4.6).
