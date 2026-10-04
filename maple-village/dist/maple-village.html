@@ -318,7 +318,8 @@ details[open] summary::after{content:"–"}
 @keyframes nbfade{from{opacity:0}to{opacity:1}}
 body.nb-open{overflow:hidden}
 .nbpage{position:relative;width:min(680px,100%);max-height:calc(100dvh - 28px);display:flex;flex-direction:column;
-  background-color:#FFFDF7;color:#2F2B28;
+  background-color:#FFFDF7;color:#2F2B28;color-scheme:light;
+  --bg:#F2EEE7;--card:#F9F7F2;--edge:rgba(120,104,84,.13);--ink:#2F2B28;--soft:#8A8279;--faint:#B5ADA2;--navy:#2F3B73;--oat:#EAE3D8;--rule:#E4DDD2;
   background-image:linear-gradient(90deg,transparent 46px,rgba(239,163,166,.55) 46px,rgba(239,163,166,.55) 47.5px,transparent 47.5px),
     repeating-linear-gradient(180deg,transparent 0 31px,rgba(154,169,221,.28) 31px 32px),var(--fibre);
   background-position:0 0,0 14px,0 0;
@@ -524,7 +525,7 @@ body.nb-open{overflow:hidden}
 .maphint{margin:6px 0 0;font-size:.8rem}
 
 /* quest note pinned on the map */
-.map .qnote{position:absolute;top:8px;left:8px;right:8px;z-index:5;max-height:46%;overflow:auto;overscroll-behavior:contain;
+.map .qnote{--bg:#F2EEE7;--card:#F9F7F2;--edge:rgba(120,104,84,.13);--ink:#2F2B28;--soft:#8A8279;--faint:#B5ADA2;--navy:#2F3B73;--oat:#EAE3D8;--rule:#E4DDD2;color-scheme:light;position:absolute;top:8px;left:8px;right:8px;z-index:5;max-height:46%;overflow:auto;overscroll-behavior:contain;
   background-color:#FFFDF7;background-image:var(--fibre);color:#2F2B28;border-radius:4px;padding:16px 16px 12px;
   box-shadow:0 2px 3px rgba(60,40,30,.1),0 16px 26px -18px rgba(40,30,20,.55);transform:rotate(-.5deg)}
 .map .qnote::before{content:"";position:absolute;top:-2px;left:50%;width:84px;height:18px;transform:translateX(-50%) rotate(-2deg);opacity:.85;
@@ -617,8 +618,11 @@ body.nb-open{overflow:hidden}
 .panel.cork .muted{color:#3F352C}
 /* letters */
 .panel .mail li{grid-template-columns:30px 1fr}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .hbtn{background:var(--card)}}
-:root[data-theme="dark"] .hbtn{background:var(--card)}
+/* dark mode: the round buttons stay cream so every icon reads clearly */
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .hbtn,:root:not([data-theme="light"]) .zoombtn{background:#F6EFE3 !important;border-color:rgba(255,255,255,.25)}}
+:root[data-theme="dark"] .hbtn,:root[data-theme="dark"] .zoombtn{background:#F6EFE3 !important;border-color:rgba(255,255,255,.25)}
+/* icons are drawn in the light palette everywhere (their fills used theme tokens that go dark at night) */
+svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;--navy:#2F3B73}
 .map.panel-open .qnote{visibility:hidden}
 .panel .portrait .scene{max-width:240px;margin:0 auto}
 .earn{height:0;min-height:0;overflow:visible;position:relative;top:2px;z-index:8;pointer-events:none}
@@ -8866,7 +8870,7 @@ Then tell chat "wind down" whenever you're ready.`
     if (slim) {
       const title = j.querySelector("h1") ? [...j.querySelector("h1").childNodes].filter((n) => !(n.classList && n.classList.contains("lbl"))).map((n) => n.textContent).join("").trim() : "";
       const when4 = S2.timer ? `<span class="when" data-tleft>${fmt(tLeft())}</span>` : "";
-      j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(route2.length ? "Walking… " + title : title)}</b>${when4}<span class="more">open</span></button>`;
+      j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(title)}</b>${when4}<span class="more">open</span></button>`;
     }
     j.classList.toggle("intop", !outside());
     j.querySelectorAll("[data-qn]").forEach((el) => el.onclick = (ev) => {

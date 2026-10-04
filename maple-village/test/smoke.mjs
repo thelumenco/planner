@@ -700,6 +700,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.emulateMedia({ colorScheme: "dark" });
   check(await page.evaluate(() => { const c = getComputedStyle(document.getElementById("speech")).backgroundColor; return c === "rgb(255, 253, 246)"; }), "speech bubbles stay cream in dark mode");
   check(await page.evaluate(() => { const l = document.querySelector(".map .lab"); return !l || getComputedStyle(l).fill === "rgb(47, 43, 40)"; }), "place names stay dark ink in dark mode");
+  check(await page.evaluate(() => { const q = document.querySelector(".map .qnote"); const h = document.createElement("span"); h.className = "hl"; h.textContent = "x"; q.appendChild(h); const c = getComputedStyle(h).color; h.remove(); return c === "rgb(47, 43, 40)"; }), "highlighted words on the quest note stay dark in dark mode");
+  check(await page.evaluate(() => getComputedStyle(document.querySelector(".hbtn")).backgroundColor === "rgb(246, 239, 227)"), "the round buttons stay cream in dark mode, so the icons show");
   await page.emulateMedia({ colorScheme: "light" });
   await page.click("#setSfx"); check(!(await page.locator("#setSfx").isChecked()), "sound effects can be muted");
   await page.emulateMedia({ colorScheme: "dark" });
