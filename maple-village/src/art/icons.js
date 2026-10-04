@@ -89,6 +89,12 @@ const I = {
 I.zoomOut = [`<circle cx="10.5" cy="10.5" r="6.5" style="fill:#FFFDF6"/>`, `<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3l5 5M7.5 10.5h6"/>`];
 I.zoomIn = [`<circle cx="10.5" cy="10.5" r="6.5" style="fill:#FFFDF6"/>`, `<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3l5 5M7.5 10.5h6M10.5 7.5v6"/>`];
 I.lantern = [`<path d="M8 6h8l2 4v6l-2 4H8l-2-4v-6z" style="fill:#F6C26B"/><circle cx="12" cy="13" r="2.4" style="fill:#FFF3C4"/>`, `<path d="M8 6h8l2 4v6l-2 4H8l-2-4v-6zM10 3.5h4v2.5h-4zM12 20v2M6 10h12M6 16h12"/>`];
+I.wallpaper = [`<rect x="4" y="4" width="11" height="16" rx="1" style="fill:#F4C7CF"/><path d="M15 4c3 0 5 1.5 5 3.5S18 11 15 11z" style="fill:#F9DDE2"/>`, `<rect x="4" y="4" width="11" height="16" rx="1"/><path d="M15 4c3 0 5 1.5 5 3.5S18 11 15 11"/><circle cx="7.5" cy="8" r=".9"/><circle cx="11.5" cy="11" r=".9"/><circle cx="7.5" cy="14" r=".9"/><circle cx="11.5" cy="17" r=".9"/>`];
+I.rug = [`<ellipse cx="12" cy="13" rx="9.5" ry="6" style="fill:var(--peri)"/><ellipse cx="12" cy="13" rx="5.5" ry="3.2" style="fill:var(--butter)"/>`, `<ellipse cx="12" cy="13" rx="9.5" ry="6"/><ellipse cx="12" cy="13" rx="5.5" ry="3.2"/><path d="M2.5 13h-1.5M21.5 13h1.5" stroke-dasharray="1 1"/>`];
+I.lamp = [`<path d="M7 4h10l2 7H5z" style="fill:var(--butter)"/>`, `<path d="M7 4h10l2 7H5zM12 11v8M8 20h8"/><path d="M10 13c.5 1 1.3 1.5 2 1.5" opacity=".5"/>`];
+I.pot = [`<path d="M7 14h10l-1.5 7h-7z" style="fill:#E3A27E"/><path d="M12 14c-4-1-6-5-5-9 3 1 5 4 5 9zM12 14c1-5 3-8 6-9 0 4-2 8-6 9z" style="fill:var(--moss)"/>`, `<path d="M7 14h10l-1.5 7h-7zM12 14c-4-1-6-5-5-9 3 1 5 4 5 9zM12 14c1-5 3-8 6-9 0 4-2 8-6 9z"/>`];
+I.painting = [`<rect x="3.5" y="5" width="17" height="14" rx="1" style="fill:var(--wood)"/><rect x="6" y="7.5" width="12" height="9" style="fill:var(--sky)"/><path d="M6 16.5l4-4 3 3 2-2 3 3z" style="fill:var(--moss)"/>`, `<rect x="3.5" y="5" width="17" height="14" rx="1"/><rect x="6" y="7.5" width="12" height="9"/><path d="M6 16.5l4-4 3 3 2-2 3 3"/><circle cx="15.5" cy="10" r="1.2"/>`];
+I.bed = [`<ellipse cx="12" cy="15" rx="9" ry="5" style="fill:var(--peach)"/><ellipse cx="12" cy="14.5" rx="6" ry="3" style="fill:var(--cream)"/>`, `<ellipse cx="12" cy="15" rx="9" ry="5"/><ellipse cx="12" cy="14.5" rx="6" ry="3"/><path d="M8 9.5c1-1.5 2.5-1.5 3 0M13 9.5c1-1.5 2.5-1.5 3 0" opacity=".5"/>`];
 I.farm = I.sprout;
 I.water = I.drop;
 I.well = I.drop;

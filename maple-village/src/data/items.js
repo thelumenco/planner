@@ -31,6 +31,19 @@ export const ITEMS = {
   strawberry:{e:"🍓", n:"Strawberry", kind:"food", sell:14, xp:2, say:"Strawberries from our garden 🥹"},
   blueberry:{e:"🫐", n:"Blueberries", kind:"food", sell:14, xp:2, say:"Blueberries! My favourite."}
 };
+// Home decor: bought once, shows up inside Mel's house. Items in the same slot swap (one wallpaper, one rug at a time).
+export const DECOR = {
+  wall_dots:   {ico:"wallpaper", n:"Polka wallpaper",  slot:"wall", val:"dots",   price:15},
+  wall_stripe: {ico:"wallpaper", n:"Stripe wallpaper", slot:"wall", val:"stripe", price:15},
+  wall_flower: {ico:"wallpaper", n:"Flower wallpaper", slot:"wall", val:"flower", price:18},
+  rug_round:   {ico:"rug",       n:"Round rug",        slot:"rug",  val:"round",  price:12},
+  rug_stripe:  {ico:"rug",       n:"Striped rug",      slot:"rug",  val:"stripe", price:12},
+  lamp:        {ico:"lamp",      n:"Reading lamp",     slot:"lamp", val:"on",     price:10},
+  big_plant:   {ico:"pot",       n:"Big plant",        slot:"plant",val:"on",     price:8},
+  painting:    {ico:"painting",  n:"Painting",         slot:"art",  val:"on",     price:14},
+  fox_bed:     {ico:"bed",       n:"Maple's bed",      slot:"bed",  val:"on",     price:16}
+};
+
 export const PLOTS = Array.from({length:12}, (_, i) => ({x:70 + (i%3)*140, y:172 + Math.floor(i/3)*104, w:100, h:66}));
 export const QUEST_BOOST = 30*M;
 

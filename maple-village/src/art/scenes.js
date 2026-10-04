@@ -5,10 +5,12 @@ import { VILLAGE, ROOMS, stationsOf } from "../data/world.js";
 import { CROPS, PLOTS } from "../data/items.js";
 import { roomShell } from "./interiors.js";
 import { iconAt } from "./icons.js";
+import { upgradesArt, festivalArt, festivalOn, pondLanterns } from "./village-extras.js";
 import { townHall, chordWorkshop, library, chicoCottage, postOffice } from "./buildings.js";
 
 let G = null;
 export const setArtContext = g => { G = g; };
+export const artCtx = () => G;
 
 export function tapeLabel(x, y, text, col, size){
   const w = text.length*(size ? size*.56 : 8.2) + 22;
@@ -68,7 +70,8 @@ export function villageArt(){
         <ellipse cx="455" cy="580" rx="7" ry="3.5" style="fill:var(--tree)"/><circle cx="455" cy="577" r="2" style="fill:var(--rose)"/>
         <rect x="322" y="596" width="34" height="6" rx="2" style="fill:var(--wood)"/><path d="M326 602 v8 M352 602 v8 M322 592 h34" /></g>
       ${tapeLabel(430, 630, "Pond", "var(--sky)")}</g>`;
-  return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 34, 536, 8, 2, 12);
+  return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 34, 536, 8, 2, 12)
+    + upgradesArt(G.F().totalQuests || 0) + festivalArt(festivalOn(G.day())) + pondLanterns(G.lanterns());
 }
 export function notesArt(x, y, n){
   const c = ["#FFFDF6","#F6E3A1","#F4C7CF","#C3CDEE","#DCE8C8"];

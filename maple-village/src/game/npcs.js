@@ -105,6 +105,7 @@ export function tapNpc(id){
   const def = e.def, F = api.F(), S = api.S();
   F.met = F.met || {}; S.npcSaid = S.npcSaid || {};
   e.dir = api.mel.x < e.x ? -1 : 1;
+  api.chatted && api.chatted(def.name);
   if (!F.met[id]) {
     F.met[id] = true; say(e, def.intro, 7000);
     if (def.gift && !(F.gifts || {})[id]) { F.gifts = Object.assign(F.gifts || {}, {[id]: true}); setTimeout(() => { api.gift(def.gift); say(e, "Here, a free packet of seeds. Plant them by morning.", 4500); }, 7200); }

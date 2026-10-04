@@ -240,4 +240,15 @@ Round 6:
 - Published to the live link (https://claude.ai/artifact/REdXbAyK7ybkGJbmohoCM4) with capabilities db, user, sample, mcp (Sunsama read_resource). Mel's garden and friendship carried over.
 - Routine "Village quest loader" (daily 7:24am SGT) loads the plan from Sunsama + Calendar.
 
+Round 7:
+- Phone: a zoom button toggles between following Mel and seeing the whole map at once (remembered per device).
+- Water and steps are vertical drawn bars in a column on the right of the map.
+- The quest note starts folded when the village opens.
+- Sunsama completions count: tasks ticked off in Sunsama (by Mel or chat) are marked done in the village with coins, checked on open, on tab return and every 10 minutes.
+- Village upgrades (`art/village-extras.js`): nine permanent decorations unlocked by lifetime quests (3, 8, 15, 25, 40, 60, 85, 120, 160). Listed in the friendship panel.
+- Festivals and weather: New Year, Chinese New Year, National Day, Mid-Autumn, Deepavali, Christmas (lunar dates in a table to check yearly), wet-season rain Nov–Jan on roughly a third of days.
+- Home decor: a Home tab at the market (wallpapers, rugs, lamp, plant, painting, Maple's bed) drawn inside the house.
+- Friday weekend edition of The Morning Crier, built from a 21-day history the page keeps (quests, steps, water, harvests, coins, villagers chatted with, upgrades, festival coming up).
+- 6pm wind-down: the evening messenger brings a note; "Walk to the pond" floats a lantern per win while Maple reads them out, then hands over to chat's wind-down.
+
 Not done yet: publishing the new build to the live link (needs `sample` added to the capabilities), stage 3 ideas (8.5), collision-aware walking and a camera/zoom for small phones (4.6).

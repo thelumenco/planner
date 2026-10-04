@@ -2,7 +2,8 @@
 import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur, plain } from "../util.js";
 import { icon, progressBar, progressBarV } from "../art/icons.js";
 import { VILLAGE, WORK, ROOMS, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
-import { CROPS, ITEMS, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco } from "../data/items.js";
+import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco } from "../data/items.js";
+import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn } from "../art/village-extras.js";
 import { villageArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
@@ -31,10 +32,14 @@ function migrate(){
   if (!F.cool) F.cool = {};
   ["met", "gifts", "mailRead"].forEach(k => { if (!F[k]) F[k] = {}; });
   F.digest = Object.assign({read:{}, lastAt:0, mine:[]}, F.digest || {});
+  ["decor", "decorOwned", "history"].forEach(k => { if (!F[k] || typeof F[k] !== "object") F[k] = {}; });
+  if (!Array.isArray(F.upgradeLog)) F.upgradeLog = [];
+  if (!F.totalQuests) F.totalQuests = 0;
+  if (!Array.isArray(S.chats)) S.chats = [];
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
-setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST});
+setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), lanterns:() => (S.pond ? S.pond.wins.length : 0)});
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "village", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
 // In-game UI: the quest note pinned on the map (open, or slim while walking) and the panel over the map.
@@ -54,7 +59,13 @@ async function push(which){
   try { await refs[which].set(JSON.parse(JSON.stringify(which === "today" ? S : F))); } catch(e) {}
   writing[which] = false;
 }
-const save = (redraw) => { persist("today"); persist("fox"); render(redraw); };
+// A small per-day record for the Friday paper (last 21 days).
+function noteHistory(){
+  if (!F.history) return;
+  F.history[S.day] = {q: S.doneIds.length, steps: S.steps || 0, water: S.waterMl || 0, harvest: S.harvested || 0, coins: S.earned || 0, chats: (S.chats || []).slice(0, 12)};
+  Object.keys(F.history).sort().slice(0, -21).forEach(k => delete F.history[k]);
+}
+const save = (redraw) => { noteHistory(); persist("today"); persist("fox"); render(redraw); };
 
 async function initDb(){
   if (!window.claude || !claude.use) return;
@@ -263,7 +274,7 @@ const A = {
   cleanDone(){ S.cleanDone = true; S.timer = null; earn(3, "five-minute clean"); gainXp(1); S.last = "clean"; act("cheer"); setSay("First tick of the day! Look at that ✨"); save(); },
   firstStep(t){ S.firstStep[t.id] = true; S.arrived[t.id] = true; startTimer("task", t.minutes || 25, t.id); setSay("Hard part's done. Now the rest, on the clock."); save(); },
   done(t){
-    S.doneIds.push(t.id); S.timer = null; earn(5, "quest complete"); gainXp(1); S.last = t.title;
+    S.doneIds.push(t.id); S.timer = null; earn(5, "quest complete"); gainXp(1); S.last = t.title; countQuest();
     let grew = 0; F.plots.forEach(p => { if (p && p.crop && p.wateredAt && growth(p) < 1) { p.bonus = (p.bonus || 0) + QUEST_BOOST; grew++; } });
     if (t.meeting) S.mode = "decompress";
     else if (remaining().length) { S.mode = "break"; startTimer("break", 10); }
@@ -307,6 +318,16 @@ function doNext(id){
   if (S.timer && S.timer.kind !== "break") S.timer = null;
   S.order = [id, ...ids.filter(x => x !== id)]; say = null; openView = null; boardOpen = false; speak("New quest picked! Off we go.", 3000); save(true);
 }
+// Every finished quest (here or in Sunsama) counts towards village upgrades, which stay forever.
+function countQuest(){
+  const before = unlocked(F.totalQuests || 0).length;
+  F.totalQuests = (F.totalQuests || 0) + 1;
+  const now = unlocked(F.totalQuests);
+  if (now.length > before) {
+    const u = now[now.length - 1]; F.upgradeLog.push({id: u.id, day: dayKey()});
+    setTimeout(() => { act("cheer"); speak(`Village upgrade! ${u.name[0].toUpperCase() + u.name.slice(1)}.`, 6000); flash(`Village upgrade: ${u.name}`); if (scene === "village") drawScene(); }, 2400);
+  }
+}
 // Progress buttons on the notebook page.
 const HALF = ["Halfway! The downhill bit starts now.", "Halfway there. Look at you go.", "Half done. Sip of water, then onwards."];
 const onTread = t => !!(t && (S.tread[t.id] || isTreadTask(t)));
@@ -334,44 +355,61 @@ function timerLeft(t){
 // Chat's plan wins: a pull only writes the plan when today has none, or when today's came from an earlier pull.
 // With chat's plan in place, "Check Sunsama" just adds tasks the plan doesn't have yet to the end of the line.
 const sun = {busy: false, at: 0, error: null, added: 0};
-function markSunsamaDone(){
-  (P && P.day === dayKey() && Array.isArray(P.tasks) ? P.tasks : []).forEach(t => { if (t && t.completed && !S.doneIds.includes(t.id)) S.doneIds.push(t.id); });
+// Tasks ticked off in Sunsama (by Mel or by chat) count in the village too: marked done, with the usual coins.
+function creditDone(tasks, quiet){
+  const ids = new Set(allTasks().map(t => t.id)), cur = phase() === "task" ? remaining()[0] : null, got = [];
+  (tasks || []).forEach(t => {
+    if (!t || !t.completed || !ids.has(t.id) || S.doneIds.includes(t.id)) return;
+    S.doneIds.push(t.id); got.push(t);
+    earn(5, "done in Sunsama"); gainXp(1); countQuest();
+    if (cur && cur.id === t.id) { if (S.timer && S.timer.id === t.id) S.timer = null; S.firstStep[t.id] = false; }
+  });
+  if (got.length && !quiet) { act("cheer"); speak(got.length === 1 ? `You already did “${got[0].title}” in Sunsama! Counted.` : `${got.length} quests already done in Sunsama! Counted.`, 5000); }
+  return got.length;
 }
+const markSunsamaDone = () => creditDone(P && P.day === dayKey() && Array.isArray(P.tasks) ? P.tasks : [], true);
+// manual: the refresh button. Otherwise it runs on open, when the tab comes back, and every 10 minutes (throttled).
 async function syncSunsama(manual){
-  if (sun.busy) return;
+  if (sun.busy || (!manual && Date.now() - sun.at < 2*60e3)) return;
   const fromPull = !P || P.day !== dayKey() || P.source === "sunsama";
-  if (!manual && !fromPull) return;
   sun.busy = true; sun.error = null; render();
-  const day = dayKey(), r = await pullSunsama(day, {fresh: !!manual});
+  const day = dayKey(), r = await pullSunsama(day, {fresh: true});
   sun.busy = false; sun.at = Date.now();
   if (r.error) { sun.error = r.error === "unavailable" && !manual ? null : r.error; render(); return; }
-  if (fromPull || !P || P.day !== day || P.source === "sunsama") {
+  if (fromPull) {
     if (!r.tasks.length && !(P && P.day === day && P.source === "sunsama")) { sun.added = 0; render(); return; }
     const was = remaining().length;
     P = {day, source: "sunsama", pulledAt: Date.now(), tasks: r.tasks};
     try { localStorage.setItem("fox.plan", JSON.stringify(P)); } catch {}
     if (refs) refs.plan.set(JSON.parse(JSON.stringify(P))).catch(() => {});
-    markSunsamaDone(); save(true);
+    creditDone(r.tasks, !was); save(true);
     if (!was && remaining().length) speak(`${remaining().length} quests from Sunsama on the boards!`, 5000);
-  } else {
+    return;
+  }
+  // Chat's or the morning routine's plan stays; Sunsama only tells us what's been ticked off (and, on request, what's new).
+  const n = creditDone(r.tasks);
+  if (manual) {
     const have = new Set(allTasks().map(t => t.id));
     const fresh = r.tasks.filter(t => !t.completed && !have.has(t.id));
-    S.extra.push(...fresh); sun.added = fresh.length; save(true);
-    speak(fresh.length ? `Added ${fresh.length} new Sunsama task${fresh.length === 1 ? "" : "s"} to the end of the line.` : "Sunsama and the boards match. All set!", 4000);
+    S.extra.push(...fresh); sun.added = fresh.length;
+    if (!n) speak(fresh.length ? `Added ${fresh.length} new Sunsama task${fresh.length === 1 ? "" : "s"} to the end of the line.` : "Sunsama and the boards match. All set!", 4000);
   }
+  save(true);
 }
+setInterval(() => { if (!document.hidden) syncSunsama(); }, 10*60e3);
 function sunsamaLine(){
   const el = $("sunsamaLine"); if (!el) return;
-  const src = P && P.day === dayKey() ? (P.source === "sunsama" ? "sunsama" : "chat") : null;
+  const src = P && P.day === dayKey() ? (P.source === "sunsama" ? "sunsama" : P.source === "routine" ? "routine" : "chat") : null;
   let txt = sun.busy ? "Checking Sunsama…"
     : sun.error ? (SUNSAMA_ERRORS[sun.error] || "Couldn't reach Sunsama just now.")
     : src === "sunsama" ? `Today's quests came straight from Sunsama${P.pulledAt ? " at " + new Date(P.pulledAt).toLocaleTimeString("en-GB", {hour: "numeric", minute: "2-digit", timeZone: "Asia/Singapore"}) : ""}. Chat's boss-mode plan replaces them with first steps and pep talks.`
-    : src === "chat" ? "Today's plan is from chat's boss mode."
+    : src === "routine" ? "Today's plan was loaded this morning, with first steps and pep talks. Anything you tick off in Sunsama counts here too."
+    : src === "chat" ? "Today's plan is from chat's boss mode. Anything you tick off in Sunsama counts here too."
     : "Your Sunsama tasks load here when you open the village.";
-  el.innerHTML = `${esc(txt)} <button class="next" id="sunBtn" ${sun.busy ? "disabled" : ""}>${src === "chat" ? "check Sunsama for new tasks" : "refresh from Sunsama"}</button>`;
+  el.innerHTML = `${esc(txt)} <button class="next" id="sunBtn" ${sun.busy ? "disabled" : ""}>${src === "chat" || src === "routine" ? "check Sunsama for new tasks" : "refresh from Sunsama"}</button>`;
   $("sunBtn").onclick = () => syncSunsama(true);
 }
-document.addEventListener("visibilitychange", () => { if (!document.hidden && (!P || P.day !== dayKey())) syncSunsama(); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden) syncSunsama(); });
 
 /* =================== LIBRARY DIGESTS =================== */
 // Rationed: one when an hour has passed since the last, or once a quest has been finished since the last. No stacking.
@@ -410,7 +448,62 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, {mod
 }
 
 /* =================== MAIL (agent notes) =================== */
-const unreadMail = () => (MAIL.items || []).filter(m => m && m.id && !F.mailRead[m.id] && (!m.at || Date.now() - m.at < 36*H)).sort((a, b) => (a.at || 0) - (b.at || 0));
+// Notes the page writes itself: the Friday "weekend edition" of the paper and the 6pm wind-down at the pond.
+const sgAt = (day, h, m = 0) => Date.UTC(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8, 10), h - 8, m);
+const WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+let localCache = {key: "", items: []};
+function localMail(){
+  const day = dayKey(), hm = sgHM(), key = `${day}:${Math.floor(hm/10)}:${S.doneIds.length}:${S.cleanDone}`;
+  if (key === localCache.key) return localCache.items;
+  const out = [], wd = new Date(day + "T00:00:00Z").getUTCDay();
+  if ((wd === 5 && hm >= 900) || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
+  if (hm >= 1080 && (S.cleanDone || S.doneIds.length)) out.push({id: "wind-" + day, from: "winddown", at: sgAt(day, 18), pond: true,
+    title: "Time to close the day", body: "Meet me at the pond. Each of today's wins gets a lantern on the water.\nThen tell chat \"wind down\" whenever you're ready."});
+  return (localCache = {key, items: out}).items;
+}
+const allMail = () => [...(MAIL.items || []), ...localMail()];
+function weeklyPaper(fri){
+  noteHistory();
+  const days = Array.from({length: 7}, (_, i) => { let d = fri; for (let k = 0; k < 6 - i; k++) d = prevDay(d); return d; });
+  const rows = days.map(d => ({d, ...(F.history[d] || {q: 0, steps: 0, water: 0, harvest: 0, coins: 0, chats: []})}));
+  const sum = k => rows.reduce((a, r) => a + (r[k] || 0), 0);
+  const q = sum("q"), steps = sum("steps"), coins = sum("coins"), harvest = sum("harvest");
+  const best = rows.reduce((a, r) => r.q > a.q ? r : a, {q: 0});
+  const wDays = rows.filter(r => r.water > 0), avgW = wDays.length ? sum("water")/wDays.length/1000 : 0;
+  const walked = rows.filter(r => r.steps >= STEP_GOAL).length;
+  const chats = [...new Set(rows.flatMap(r => r.chats || []))];
+  const ups = (F.upgradeLog || []).filter(u => days.includes(u.day)).map(u => (UPGRADES.find(x => x.id === u.id) || {}).name).filter(Boolean);
+  let soon = null; for (let i = 1, d = fri; i <= 14; i++) { d = new Date(Date.parse(d + "T00:00:00Z") + 864e5).toISOString().slice(0, 10); const f = festivalOn(d); if (f) { soon = f; break; } }
+  const sections = [{heading: "The week in numbers", lines: [`${q} quest${q === 1 ? "" : "s"} finished`, `${coins} coins earned`, `${steps.toLocaleString()} steps${walked ? `, ${walked} day${walked === 1 ? "" : "s"} past 5,000` : ""}`, wDays.length ? `${avgW.toFixed(1)} L of water a day, on average` : "Water not logged this week"]}];
+  if (best.q) sections.push({heading: "Best day", lines: [`${WEEKDAY[new Date(best.d + "T00:00:00Z").getUTCDay()]}: ${best.q} quest${best.q === 1 ? "" : "s"}`]});
+  sections.push({heading: "In the garden", lines: [harvest ? `${harvest} harvest${harvest === 1 ? "" : "s"} brought in` : "Nothing harvested yet. Hana has seeds."]});
+  if (chats.length) sections.push({heading: "Around the village", lines: [`You chatted with ${chats.length > 1 ? chats.slice(0, -1).join(", ") + " and " + chats.slice(-1) : chats[0]}`]});
+  if (ups.length) sections.push({heading: "New in the village", lines: ups.map(n => n[0].toUpperCase() + n.slice(1))});
+  if (soon) sections.push({heading: "Coming up", lines: [`${soon.name} decorations go up soon`]});
+  return {id: "weekly-" + fri, from: "crier", edition: "Weekend edition", at: sgAt(fri, 15),
+    title: q >= 15 ? `${q} quests: a big week in the village` : q ? `${q} quests and a steady week` : "A quiet week in the village",
+    body: q ? "Here's your week in the village, Saturday to Friday. Have a lovely weekend." : "Rest weeks count too. The village will be here on Monday.", sections};
+}
+// 6pm ritual: walk to the pond, one lantern per win, Maple reads them out, then hand over to chat's wind-down.
+function windDown(){
+  const wins = [];
+  if (S.cleanDone) wins.push("Five-minute clean");
+  allTasks().filter(t => S.doneIds.includes(t.id)).forEach(t => wins.push(t.title));
+  if (S.steps >= STEP_GOAL) wins.push(`${S.steps.toLocaleString()} steps`);
+  if ((S.waterMl || 0) >= WATER_GOAL) wins.push("Two litres of water");
+  if (S.harvested) wins.push(`${S.harvested} harvest${S.harvested > 1 ? "s" : ""}`);
+  if (!wins.length) wins.push("Showing up today");
+  go("village", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => {
+    atSpot = "pond"; S.pond = {wins, at: Date.now()}; save(true);
+    let i = 0;
+    const next = () => {
+      if (i < wins.length) { speak(`Lantern ${i + 1}: ${wins[i]}`, 3300); i++; setTimeout(next, 3400); }
+      else { act("cheer"); setSay("That's the day, Mel. Tell chat “wind down” whenever you're ready."); save(); }
+    };
+    next();
+  });
+}
+const unreadMail = () => allMail().filter(m => m && m.id && !F.mailRead[m.id] && (!m.at || Date.now() - m.at < 36*H)).sort((a, b) => (a.at || 0) - (b.at || 0));
 function markRead(item){
   if (!F.mailRead[item.id]) {
     F.mailRead[item.id] = Date.now();
@@ -422,7 +515,7 @@ function markRead(item){
 }
 const agentName = from => (AGENTS[from] && AGENTS[from].name) || from || "the postie";
 function mailCard(){
-  const items = (MAIL.items || []).filter(m => m && m.id).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 20);
+  const items = allMail().filter(m => m && m.id).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 20);
   const unread = items.filter(m => !F.mailRead[m.id]).length;
   $("mailBadge").hidden = !unread; $("mailBadge").textContent = unread;
   if (!items.length) { $("mailList").innerHTML = `<li><span></span><span class="muted">No letters yet.</span></li>`; return; }
@@ -440,6 +533,16 @@ function facts(){
     building: sp === "bench" || (sp === "laptop" && pl !== "post"), planning: sp === "table" || (sp === "kitchen" && pl === "chico")};
 }
 
+function decorClick(id){
+  const d = DECOR[id]; if (!d) return;
+  if (!F.decorOwned[id]) {
+    if (F.coins < d.price) return;
+    F.coins -= d.price; F.decorOwned[id] = true; F.decor[d.slot] = d.val; gainXp(1);
+    flash(`Bought ${d.n.toLowerCase()}`); speak("Ooh! It's waiting for you at home.", 3500);
+  } else if (F.decor[d.slot] === d.val) { delete F.decor[d.slot]; speak("Put away for now.", 2500); }
+  else { F.decor[d.slot] = d.val; speak("Swapped in. Go and have a look!", 3000); }
+  save(scene === "home");
+}
 function useItem(id){
   const it = ITEMS[id]; if (!it || !F.inv[id]) return;
   if (it.kind === "seed") { speak("Seeds go in the garden. Tap a plot there!", 3500); return; }
@@ -568,10 +671,14 @@ function itemBtn(id, label, disabled, extra){
 function ctx(){
   const c = $("ctx"); let h = "";
   if (scene === "market" && !shopClosed) {
-    const tabs = [["seeds","Seeds"],["treats","Treats"],["care","Care"],["sell","Sell"]];
+    const tabs = [["seeds","Seeds"],["treats","Treats"],["care","Care"],["home","Home"],["sell","Sell"]];
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
       <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-shop="${k}" aria-selected="${shopTab === k}">${n}</button>`).join("")}</div><div class="items shop">`;
-    if (shopTab === "sell") {
+    if (shopTab === "home") {
+      h += Object.keys(DECOR).map(id => { const d = DECOR[id], own = F.decorOwned[id], on = own && F.decor[d.slot] === d.val;
+        return `<button class="item" data-decor="${id}" ${!own && F.coins < d.price ? "disabled" : ""}><span class="e">${icon(d.ico, 34)}</span><span class="n">${esc(d.n)}</span><span class="c">${on ? "in your home" : own ? "tap to use" : `<b>${d.price}</b> ${icon("coin", 13)}`}</span></button>`; }).join("")
+        + `<p class="muted" style="grid-column:1/-1">Bought once, kept forever. They appear inside your house. Tap something you own to swap it in or put it away.</p>`;
+    } else if (shopTab === "sell") {
       const sellable = Object.keys(F.inv).filter(id => ITEMS[id] && ITEMS[id].sell);
       h += sellable.length ? sellable.map(id => itemBtn(id, `sell <b>+${ITEMS[id].sell}</b> ${icon("coin", 13)}`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("") : `<p class="muted" style="grid-column:1/-1">Nothing to sell yet. Grow something in the garden!</p>`;
     } else {
@@ -618,6 +725,7 @@ function ctx(){
   c.innerHTML = h;
   showPanel(!!h, scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
   c.querySelectorAll("[data-shop]").forEach(b => b.onclick = () => { shopTab = b.dataset.shop; ctx(); });
+  c.querySelectorAll("[data-decor]").forEach(b => b.onclick = () => decorClick(b.dataset.decor));
   c.querySelectorAll(".item[data-id]").forEach(b => b.onclick = () => {
     const id = b.dataset.id;
     if (scene === "market") { shopTab === "sell" ? sell(id) : buy(id); }
@@ -682,6 +790,10 @@ function questMark(){
   m.style.display = ""; m.setAttribute("transform", `translate(${pos[0]} ${pos[1]})`);
 }
 function drawScene(){
+  const day = dayKey(), wet = scene === "village" && rainyOn(day), fest = festivalOn(day);
+  $("rain").hidden = !wet;
+  if (scene === "village" && fest && S.festSaid !== day) { S.festSaid = day; setTimeout(() => speak(`${fest.name} decorations are up in the village!`, 5000), 1500); }
+  else if (wet && S.rainSaid !== day) { S.rainSaid = day; setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
   $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "farm" ? farmArt() : roomArt(scene);
   const names = {village:"The village", farm:"The garden"};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${scene !== "village" ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
@@ -706,7 +818,10 @@ function render(redraw){
   if (!speechLock) $("speech").textContent = plain(say ? say.line : defaultLine());
   const span = next ? next.xp - LEVELS[L].xp : 1, into = next ? F.xp - LEVELS[L].xp : 1, filled = Math.round(Math.min(1, into/span)*5);
   $("friendBody").innerHTML = `<p class="hearts" aria-label="${filled} of 5 hearts to next level">${Array.from({length: 5}, (_, i) => icon("heart", 22, i < filled ? "" : "faint")).join("")}</p>
-    <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed!"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>`;
+    <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed!"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>
+    <h3 class="ph3">Village upgrades</h3>
+    <p class="muted">${F.totalQuests || 0} quests finished so far. ${(() => { const nx = nextUpgrade(F.totalQuests || 0); return nx ? `Next at ${nx.at}: ${esc(nx.name)}.` : "Every upgrade unlocked!"; })()}</p>
+    <ul class="uplist">${UPGRADES.map(u => `<li class="${(F.totalQuests || 0) >= u.at ? "got" : ""}">${icon((F.totalQuests || 0) >= u.at ? "sparkle" : "clock", 16)} <span>${esc(u.name)}</span> <small>${u.at}</small></li>`).join("")}</ul>`;
   const all = allTasks(), rem = remaining(), cur = (phase() === "task" && rem[0]) ? rem[0].id : null;
   $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
   $("qBadge").hidden = !rem.length; $("qBadge").textContent = rem.length;
@@ -942,11 +1057,11 @@ $("pclose").onclick = closePanel;
 $("zoomBtn").onclick = () => toggleZoom();
 ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { qnQuietUntil = 0; }, {capture: true, once: true}));
 document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; ctx(); });
-initNotebook({onTread, water:() => ({ml: S.waterMl || 0, goal: WATER_GOAL, glass: GLASS}), steps:() => ({n: S.steps, goal: STEP_GOAL}),
+initNotebook({windDown, onTread, water:() => ({ml: S.waterMl || 0, goal: WATER_GOAL, glass: GLASS}), steps:() => ({n: S.steps, goal: STEP_GOAL}),
   addWater:ml => A.water(ml), setWater, setSteps, task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
   sayNow:() => say, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),
   placeLabel:t => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`});
-initNpcs({scene:() => scene, bounds, mel, evan, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
+initNpcs({chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();
 render(true);

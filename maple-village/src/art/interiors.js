@@ -1,6 +1,6 @@
 // Interior shells: each building has its own floor, wall treatment and decor. Furniture positions live in
 // ROOMS[id].pos (data/world.js); decor here stays clear of those and of the walk from the exit to the quest board.
-import { sk } from "./scenes.js";
+import { sk, artCtx } from "./scenes.js";
 
 const rows = (n, f) => Array.from({length: n}, (_, i) => f(i)).join("");
 const wallBase = (wall, trim) => `<rect width="520" height="150" style="fill:${wall}"/><rect y="138" width="520" height="12" style="fill:${trim}" opacity=".9"/>`;
@@ -67,13 +67,18 @@ const SHELLS = {
     ${skirting}
     ${sk(`<rect x="40" y="410" width="44" height="30" style="fill:#D9B893"/><rect x="48" y="384" width="30" height="26" style="fill:#E8D3B0"/>`, `<rect x="40" y="410" width="44" height="30"/><path d="M62 410 v30 M40 425 h44" opacity=".6"/><rect x="48" y="384" width="30" height="26"/><path d="M63 384 v26" opacity=".6"/>`)}`,
 
-  // Home: the original warm planks with a cosy rug.
-  home: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
+  // Home: warm planks, plus whatever Mel has bought at the market's Home tab (wallpaper, rug, lamp, plant, painting, Maple's bed).
+  home: () => { const d = (artCtx() && artCtx().F().decor) || {};
+    return `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(24, i => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`)}</g>
-    <g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--butter)"/></g>
-    ${wallBase("#F8EED8", "var(--butter)")}
+    ${d.rug ? homeRug(d.rug) : `<g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--butter)"/></g>`}
+    ${wallBase("#F8EED8", "var(--butter)")}${d.wall ? wallpaper(d.wall) : ""}
+    ${d.art ? sk(`<rect x="152" y="40" width="44" height="36" rx="2" style="fill:var(--wood)"/><rect x="158" y="46" width="32" height="24" style="fill:var(--sky)"/><path d="M158 70 l10 -10 l8 7 l6 -5 l8 8z" style="fill:var(--moss)"/>`, `<rect x="152" y="40" width="44" height="36" rx="2"/><rect x="158" y="46" width="32" height="24"/><path d="M174 30 l-12 10 M174 30 l12 10"/>`) : ""}
+    ${d.lamp ? sk(`<path d="M190 368 h24 l6 18 h-36z" style="fill:var(--butter)"/>`, `<path d="M190 368 h24 l6 18 h-36z M202 386 v52 M192 440 h20"/>`) : ""}
+    ${d.plant ? plant(482, 360, 1.3) : ""}
+    ${d.bed ? sk(`<ellipse cx="292" cy="500" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="292" cy="498" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="292" cy="500" rx="30" ry="13"/><ellipse cx="292" cy="498" rx="20" ry="8"/>`) : ""}
     ${sk(`<rect x="60" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/><rect x="390" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/>`, `<rect x="60" y="34" width="70" height="58" rx="30"/><path d="M95 34 v58 M60 66 h70"/><rect x="390" y="34" width="70" height="58" rx="30"/><path d="M425 34 v58 M390 66 h70"/>`)}
-    ${skirting}`,
+    ${skirting}`; },
 
   market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(24, i => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`)}</g>
@@ -81,4 +86,13 @@ const SHELLS = {
     ${wallBase("#F8E5E2", "var(--blush)")}${skirting}`
 };
 
+function wallpaper(kind){
+  if (kind === "stripe") return `<g opacity=".55">${rows(26, i => i % 2 ? `<rect x="${i*20}" y="0" width="10" height="138" style="fill:#F1D9A8"/>` : "")}</g>`;
+  if (kind === "flower") return `<g opacity=".7">${rows(5, r => rows(14, i => { const x = i*40 + (r % 2)*20 + 10, y = r*28 + 12; return `<circle cx="${x}" cy="${y}" r="4" fill="#F4C7CF"/><circle cx="${x}" cy="${y}" r="1.6" fill="#F3C969"/>`; }))}</g>`;
+  return `<g style="fill:#EBC9B8" opacity=".75">${rows(8, r => rows(17, i => `<circle cx="${i*32 + (r % 2)*16 + 6}" cy="${r*17 + 8}" r="3"/>`))}</g>`;
+}
+function homeRug(kind){
+  if (kind === "stripe") return sk(`<rect x="170" y="370" width="180" height="96" rx="6" style="fill:var(--sage)"/>${rows(5, i => `<rect x="170" y="${382 + i*18}" width="180" height="7" style="fill:#FFFDF6"/>`)}`, `<rect x="170" y="370" width="180" height="96" rx="6"/><path d="M170 366 v-4 M190 366 v-4 M330 366 v-4 M350 366 v-4" />`);
+  return `<g filter="url(#wob)">${[110, 86, 62, 38].map((rx, i) => `<ellipse cx="260" cy="420" rx="${rx}" ry="${rx*.45}" style="fill:${["var(--peri)", "var(--butter)", "var(--rose)", "var(--peri)"][i]}" opacity=".8"/>`).join("")}<ellipse cx="260" cy="420" rx="110" ry="49.5" fill="none" style="stroke:var(--line)" stroke-width="1.3"/></g>`;
+}
 export const roomShell = id => (SHELLS[id] || SHELLS.home)();

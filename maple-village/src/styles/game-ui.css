@@ -216,3 +216,16 @@
 .map .panel{z-index:7}
 .map .qnote:not(.slim){padding-right:58px}
 .map .qnote:not(.slim) .qnx{right:52px}
+
+/* round 7: rain, pond lanterns, upgrade list */
+.map .rain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.35;
+  background-image:repeating-linear-gradient(105deg,transparent 0 14px,rgba(120,150,190,.55) 14px 15px,transparent 15px 34px);background-size:200px 200px;animation:rainfall .55s linear infinite}
+.map .rain[hidden]{display:none}
+@keyframes rainfall{from{background-position:0 0}to{background-position:-40px 200px}}
+.floaty{animation:floaty 3s ease-in-out infinite;transform-box:fill-box}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.uplist{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:4px;font-size:.88rem}
+.uplist li{display:flex;align-items:center;gap:8px;color:#8A8279}
+.uplist li.got{color:#2F2B28;font-weight:600}
+.uplist li small{margin-left:auto;font-weight:700;color:#B5ADA2}
+@media (prefers-reduced-motion:reduce){.map .rain,.floaty{animation:none}}

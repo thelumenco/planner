@@ -3,16 +3,18 @@
 // URL options:
 //   ?seed=1         write a demo plan, mail and stats for today
 //   ?time=15:30     pretend it's this time in Singapore (NPC routines, nudges)
+//   ?date=2026-11-07  pretend it's this date (festivals, rain, Friday paper); combine with ?time
 //   ?nosample=1     behave as if the sample capability isn't granted
 //   ?reset=1        clear all local game + stub data first
 //   ?sunsama=1      fake Sunsama connector for the page's own Sunsama pull
 (() => {
   const q = new URLSearchParams(location.search);
   if (q.get("reset")) Object.keys(localStorage).filter(k => k.startsWith("stub:") || k.startsWith("fox.")).forEach(k => localStorage.removeItem(k));
-  if (q.get("time")) {
-    const [h, m] = q.get("time").split(":").map(Number);
+  if (q.get("time") || q.get("date")) {
+    const [h, m] = (q.get("time") || "10:00").split(":").map(Number);
     const sg = new Date(Date.now() + 8 * 3600e3);
-    const want = Date.UTC(sg.getUTCFullYear(), sg.getUTCMonth(), sg.getUTCDate(), h, m || 0);
+    const [Y, Mo, D] = q.get("date") ? q.get("date").split("-").map(Number) : [sg.getUTCFullYear(), sg.getUTCMonth() + 1, sg.getUTCDate()];
+    const want = Date.UTC(Y, Mo - 1, D, h, m || 0);
     window.__mapleOffset = want - sg.getTime();
   }
   const listeners = {};

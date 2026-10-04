@@ -614,6 +614,38 @@ body.nb-open{overflow:hidden}
 .map{overflow:hidden}
 .map > svg{transform-origin:0 0;backface-visibility:hidden}
 @media (max-width:640px){.map > svg{position:absolute;left:0;top:0;will-change:transform}}
+
+/* round 7: whole-map zoom, trackers as a vertical column on the right of the map */
+.map > svg{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+.mapcard .map{background:var(--grass)}
+.map .hudbar{position:absolute;z-index:4;right:8px;left:auto;top:var(--ovTop,8px);width:auto;display:flex;flex-direction:column;flex-wrap:nowrap;align-items:center;gap:10px;
+  padding:8px 5px;border-radius:999px;background-color:color-mix(in srgb,var(--card) 90%,transparent);background-image:var(--fibre);border:1px solid var(--edge);box-shadow:0 6px 14px -10px rgba(60,40,30,.5)}
+.map .hudbar .trk{flex:none;flex-direction:column;gap:3px;padding:0;align-items:center;min-width:0}
+.map .hudbar .bar{flex:none;width:12px;height:clamp(64px,13vh,110px);min-width:0}
+.map .hudbar .bar .pbar{width:100%;height:100%}
+.map .hudbar .tnote{min-width:0;text-align:center;font-size:.68rem;font-weight:700;line-height:1}
+.map .hudbar .trk .lbl .ico{width:18px;height:18px}
+.zoombtn{position:absolute;z-index:4;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);width:44px;height:44px;border-radius:50%;border:1px solid var(--edge);
+  background-color:var(--card);background-image:var(--fibre);display:grid;place-items:center;padding:0;box-shadow:0 6px 14px -10px rgba(60,40,30,.5)}
+.zoombtn[hidden]{display:none}
+@media (max-width:640px){.map .hudbar{position:absolute;top:var(--ovTop,96px);right:8px;left:auto}}
+.map .hudbar{z-index:6}
+.map .panel{z-index:7}
+.map .qnote:not(.slim){padding-right:58px}
+.map .qnote:not(.slim) .qnx{right:52px}
+
+/* round 7: rain, pond lanterns, upgrade list */
+.map .rain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.35;
+  background-image:repeating-linear-gradient(105deg,transparent 0 14px,rgba(120,150,190,.55) 14px 15px,transparent 15px 34px);background-size:200px 200px;animation:rainfall .55s linear infinite}
+.map .rain[hidden]{display:none}
+@keyframes rainfall{from{background-position:0 0}to{background-position:-40px 200px}}
+.floaty{animation:floaty 3s ease-in-out infinite;transform-box:fill-box}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.uplist{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:4px;font-size:.88rem}
+.uplist li{display:flex;align-items:center;gap:8px;color:#8A8279}
+.uplist li.got{color:#2F2B28;font-weight:600}
+.uplist li small{margin-left:auto;font-weight:700;color:#B5ADA2}
+@media (prefers-reduced-motion:reduce){.map .rain,.floaty{animation:none}}
 </style>
 </head>
 <body>
@@ -643,10 +675,6 @@ body.nb-open{overflow:hidden}
 <main class="wrap">
   <div class="head">
     <h1 class="title" id="title">Maple's village<small id="dateLine"></small></h1>
-  </div>
-  <div class="hudbar" aria-label="Today's trackers">
-    <button class="trk" data-track="water" aria-label="Water today. Tap to log how much"><span class="lbl" aria-hidden="true" data-ico="drop"></span><span class="bar" id="waterBoxes"></span><span class="tnote" id="waterNote"></span></button>
-    <button class="trk" data-track="steps" aria-label="Steps today. Tap to log your steps"><span class="lbl" aria-hidden="true" data-ico="steps"></span><span class="bar" id="stepBoxes"></span><span class="tnote" id="stepNote"></span></button>
   </div>
   <p class="earn" id="earn" aria-live="polite"></p>
   <div class="card mapcard">
@@ -734,10 +762,16 @@ body.nb-open{overflow:hidden}
           
           </g>
         </svg>
+      <div class="rain" id="rain" hidden aria-hidden="true"></div>
       <div class="mprops" id="mprops"></div>
       <p class="speech" id="speech" aria-live="polite"></p>
       <p class="speech small" id="evanSay" hidden></p>
       <p class="speech small" id="npcSay" hidden aria-live="polite"></p>
+      <div class="hudbar" aria-label="Today's trackers">
+    <button class="trk" data-track="water" aria-label="Water today. Tap to log how much"><span class="lbl" aria-hidden="true" data-ico="drop"></span><span class="bar" id="waterBoxes"></span><span class="tnote" id="waterNote"></span></button>
+    <button class="trk" data-track="steps" aria-label="Steps today. Tap to log your steps"><span class="lbl" aria-hidden="true" data-ico="steps"></span><span class="bar" id="stepBoxes"></span><span class="tnote" id="stepNote"></span></button>
+  </div>
+      <button class="zoombtn" id="zoomBtn" hidden aria-label="Zoom out to see the whole map"></button>
       <article class="qnote journal" id="journal" aria-live="polite"></article>
       <section class="panel" id="panel" hidden aria-label="Panel">
         <button class="pclose" id="pclose" aria-label="Close">✕</button>
@@ -1107,6 +1141,15 @@ body.nb-open{overflow:hidden}
       `<circle cx="8.5" cy="14" r="4.5"/><circle cx="15.5" cy="13" r="4.5"/><circle cx="12" cy="7.5" r="3.8"/><path d="M7.5 13.2l1 1 1-1M14.5 12.2l1 1 1-1M11 6.7l1 1 1-1"/>`
     ]
   };
+  I.zoomOut = [`<circle cx="10.5" cy="10.5" r="6.5" style="fill:#FFFDF6"/>`, `<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3l5 5M7.5 10.5h6"/>`];
+  I.zoomIn = [`<circle cx="10.5" cy="10.5" r="6.5" style="fill:#FFFDF6"/>`, `<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3l5 5M7.5 10.5h6M10.5 7.5v6"/>`];
+  I.lantern = [`<path d="M8 6h8l2 4v6l-2 4H8l-2-4v-6z" style="fill:#F6C26B"/><circle cx="12" cy="13" r="2.4" style="fill:#FFF3C4"/>`, `<path d="M8 6h8l2 4v6l-2 4H8l-2-4v-6zM10 3.5h4v2.5h-4zM12 20v2M6 10h12M6 16h12"/>`];
+  I.wallpaper = [`<rect x="4" y="4" width="11" height="16" rx="1" style="fill:#F4C7CF"/><path d="M15 4c3 0 5 1.5 5 3.5S18 11 15 11z" style="fill:#F9DDE2"/>`, `<rect x="4" y="4" width="11" height="16" rx="1"/><path d="M15 4c3 0 5 1.5 5 3.5S18 11 15 11"/><circle cx="7.5" cy="8" r=".9"/><circle cx="11.5" cy="11" r=".9"/><circle cx="7.5" cy="14" r=".9"/><circle cx="11.5" cy="17" r=".9"/>`];
+  I.rug = [`<ellipse cx="12" cy="13" rx="9.5" ry="6" style="fill:var(--peri)"/><ellipse cx="12" cy="13" rx="5.5" ry="3.2" style="fill:var(--butter)"/>`, `<ellipse cx="12" cy="13" rx="9.5" ry="6"/><ellipse cx="12" cy="13" rx="5.5" ry="3.2"/><path d="M2.5 13h-1.5M21.5 13h1.5" stroke-dasharray="1 1"/>`];
+  I.lamp = [`<path d="M7 4h10l2 7H5z" style="fill:var(--butter)"/>`, `<path d="M7 4h10l2 7H5zM12 11v8M8 20h8"/><path d="M10 13c.5 1 1.3 1.5 2 1.5" opacity=".5"/>`];
+  I.pot = [`<path d="M7 14h10l-1.5 7h-7z" style="fill:#E3A27E"/><path d="M12 14c-4-1-6-5-5-9 3 1 5 4 5 9zM12 14c1-5 3-8 6-9 0 4-2 8-6 9z" style="fill:var(--moss)"/>`, `<path d="M7 14h10l-1.5 7h-7zM12 14c-4-1-6-5-5-9 3 1 5 4 5 9zM12 14c1-5 3-8 6-9 0 4-2 8-6 9z"/>`];
+  I.painting = [`<rect x="3.5" y="5" width="17" height="14" rx="1" style="fill:var(--wood)"/><rect x="6" y="7.5" width="12" height="9" style="fill:var(--sky)"/><path d="M6 16.5l4-4 3 3 2-2 3 3z" style="fill:var(--moss)"/>`, `<rect x="3.5" y="5" width="17" height="14" rx="1"/><rect x="6" y="7.5" width="12" height="9"/><path d="M6 16.5l4-4 3 3 2-2 3 3"/><circle cx="15.5" cy="10" r="1.2"/>`];
+  I.bed = [`<ellipse cx="12" cy="15" rx="9" ry="5" style="fill:var(--peach)"/><ellipse cx="12" cy="14.5" rx="6" ry="3" style="fill:var(--cream)"/>`, `<ellipse cx="12" cy="15" rx="9" ry="5"/><ellipse cx="12" cy="14.5" rx="6" ry="3"/><path d="M8 9.5c1-1.5 2.5-1.5 3 0M13 9.5c1-1.5 2.5-1.5 3 0" opacity=".5"/>`];
   I.farm = I.sprout;
   I.water = I.drop;
   I.well = I.drop;
@@ -1133,6 +1176,13 @@ body.nb-open{overflow:hidden}
     return `<svg class="pbar" viewBox="0 0 120 12" preserveAspectRatio="none" aria-hidden="true" focusable="false">
     <g filter="url(#markerS)">${w > 0.5 ? `<rect x="2.5" y="2.6" width="${w.toFixed(1)}" height="6.8" rx="3.4" style="fill:${color}"/>` : ""}</g>
     <g filter="url(#wobS)" fill="none" stroke="var(--line)" stroke-width="1.1" stroke-linecap="round" vector-effect="non-scaling-stroke"><rect x="1.5" y="2" width="117" height="8" rx="4"/><g opacity=".3">${tk}</g></g></svg>`;
+  }
+  function progressBarV(pct, color, ticks = 0) {
+    const h = Math.max(0, Math.min(1, pct || 0)) * 115;
+    const tk = Array.from({ length: Math.max(0, ticks - 1) }, (_, i) => `<path d="M4 ${(117.5 - 115 * (i + 1) / ticks).toFixed(1)}h4"/>`).join("");
+    return `<svg class="pbar v" viewBox="0 0 12 120" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <g filter="url(#markerS)">${h > 0.5 ? `<rect x="2.6" y="${(117.5 - h).toFixed(1)}" width="6.8" height="${h.toFixed(1)}" rx="3.4" style="fill:${color}"/>` : ""}</g>
+    <g filter="url(#wobS)" fill="none" stroke="var(--line)" stroke-width="1.1" stroke-linecap="round" vector-effect="non-scaling-stroke"><rect x="2" y="1.5" width="8" height="117" rx="4"/><g opacity=".3">${tk}</g></g></svg>`;
   }
 
   // src/data/world.js
@@ -1263,6 +1313,17 @@ body.nb-open{overflow:hidden}
     strawberry: { e: "🍓", n: "Strawberry", kind: "food", sell: 14, xp: 2, say: "Strawberries from our garden 🥹" },
     blueberry: { e: "🫐", n: "Blueberries", kind: "food", sell: 14, xp: 2, say: "Blueberries! My favourite." }
   };
+  var DECOR = {
+    wall_dots: { ico: "wallpaper", n: "Polka wallpaper", slot: "wall", val: "dots", price: 15 },
+    wall_stripe: { ico: "wallpaper", n: "Stripe wallpaper", slot: "wall", val: "stripe", price: 15 },
+    wall_flower: { ico: "wallpaper", n: "Flower wallpaper", slot: "wall", val: "flower", price: 18 },
+    rug_round: { ico: "rug", n: "Round rug", slot: "rug", val: "round", price: 12 },
+    rug_stripe: { ico: "rug", n: "Striped rug", slot: "rug", val: "stripe", price: 12 },
+    lamp: { ico: "lamp", n: "Reading lamp", slot: "lamp", val: "on", price: 10 },
+    big_plant: { ico: "pot", n: "Big plant", slot: "plant", val: "on", price: 8 },
+    painting: { ico: "painting", n: "Painting", slot: "art", val: "on", price: 14 },
+    fox_bed: { ico: "bed", n: "Maple's bed", slot: "bed", val: "on", price: 16 }
+  };
   var PLOTS = Array.from({ length: 12 }, (_, i) => ({ x: 70 + i % 3 * 140, y: 172 + Math.floor(i / 3) * 104, w: 100, h: 66 }));
   var QUEST_BOOST = 30 * M;
   var LEVELS = [
@@ -1365,18 +1426,37 @@ body.nb-open{overflow:hidden}
     )}
     ${skirting}
     ${sk(`<rect x="40" y="410" width="44" height="30" style="fill:#D9B893"/><rect x="48" y="384" width="30" height="26" style="fill:#E8D3B0"/>`, `<rect x="40" y="410" width="44" height="30"/><path d="M62 410 v30 M40 425 h44" opacity=".6"/><rect x="48" y="384" width="30" height="26"/><path d="M63 384 v26" opacity=".6"/>`)}`,
-    // Home: the original warm planks with a cosy rug.
-    home: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
+    // Home: warm planks, plus whatever Mel has bought at the market's Home tab (wallpaper, rug, lamp, plant, painting, Maple's bed).
+    home: () => {
+      const d = artCtx() && artCtx().F().decor || {};
+      return `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, (i) => `<path d="M0 ${170 + i * 40} H520"/>`)}${rows(24, (i) => `<path d="M${(i * 97 + i % 3 * 40) % 520} ${170 + i % 12 * 40} v40"/>`)}</g>
-    <g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--butter)"/></g>
-    ${wallBase("#F8EED8", "var(--butter)")}
+    ${d.rug ? homeRug(d.rug) : `<g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--butter)"/></g>`}
+    ${wallBase("#F8EED8", "var(--butter)")}${d.wall ? wallpaper(d.wall) : ""}
+    ${d.art ? sk(`<rect x="152" y="40" width="44" height="36" rx="2" style="fill:var(--wood)"/><rect x="158" y="46" width="32" height="24" style="fill:var(--sky)"/><path d="M158 70 l10 -10 l8 7 l6 -5 l8 8z" style="fill:var(--moss)"/>`, `<rect x="152" y="40" width="44" height="36" rx="2"/><rect x="158" y="46" width="32" height="24"/><path d="M174 30 l-12 10 M174 30 l12 10"/>`) : ""}
+    ${d.lamp ? sk(`<path d="M190 368 h24 l6 18 h-36z" style="fill:var(--butter)"/>`, `<path d="M190 368 h24 l6 18 h-36z M202 386 v52 M192 440 h20"/>`) : ""}
+    ${d.plant ? plant(482, 360, 1.3) : ""}
+    ${d.bed ? sk(`<ellipse cx="292" cy="500" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="292" cy="498" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="292" cy="500" rx="30" ry="13"/><ellipse cx="292" cy="498" rx="20" ry="8"/>`) : ""}
     ${sk(`<rect x="60" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/><rect x="390" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/>`, `<rect x="60" y="34" width="70" height="58" rx="30"/><path d="M95 34 v58 M60 66 h70"/><rect x="390" y="34" width="70" height="58" rx="30"/><path d="M425 34 v58 M390 66 h70"/>`)}
-    ${skirting}`,
+    ${skirting}`;
+    },
     market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, (i) => `<path d="M0 ${170 + i * 40} H520"/>`)}${rows(24, (i) => `<path d="M${(i * 97 + i % 3 * 40) % 520} ${170 + i % 12 * 40} v40"/>`)}</g>
     <g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--blush)"/></g>
     ${wallBase("#F8E5E2", "var(--blush)")}${skirting}`
   };
+  function wallpaper(kind) {
+    if (kind === "stripe") return `<g opacity=".55">${rows(26, (i) => i % 2 ? `<rect x="${i * 20}" y="0" width="10" height="138" style="fill:#F1D9A8"/>` : "")}</g>`;
+    if (kind === "flower") return `<g opacity=".7">${rows(5, (r) => rows(14, (i) => {
+      const x = i * 40 + r % 2 * 20 + 10, y = r * 28 + 12;
+      return `<circle cx="${x}" cy="${y}" r="4" fill="#F4C7CF"/><circle cx="${x}" cy="${y}" r="1.6" fill="#F3C969"/>`;
+    }))}</g>`;
+    return `<g style="fill:#EBC9B8" opacity=".75">${rows(8, (r) => rows(17, (i) => `<circle cx="${i * 32 + r % 2 * 16 + 6}" cy="${r * 17 + 8}" r="3"/>`))}</g>`;
+  }
+  function homeRug(kind) {
+    if (kind === "stripe") return sk(`<rect x="170" y="370" width="180" height="96" rx="6" style="fill:var(--sage)"/>${rows(5, (i) => `<rect x="170" y="${382 + i * 18}" width="180" height="7" style="fill:#FFFDF6"/>`)}`, `<rect x="170" y="370" width="180" height="96" rx="6"/><path d="M170 366 v-4 M190 366 v-4 M330 366 v-4 M350 366 v-4" />`);
+    return `<g filter="url(#wob)">${[110, 86, 62, 38].map((rx, i) => `<ellipse cx="260" cy="420" rx="${rx}" ry="${rx * 0.45}" style="fill:${["var(--peri)", "var(--butter)", "var(--rose)", "var(--peri)"][i]}" opacity=".8"/>`).join("")}<ellipse cx="260" cy="420" rx="110" ry="49.5" fill="none" style="stroke:var(--line)" stroke-width="1.3"/></g>`;
+  }
   var roomShell = (id) => (SHELLS[id] || SHELLS.home)();
 
   // src/art/buildings.js
@@ -1479,6 +1559,7 @@ body.nb-open{overflow:hidden}
   var setArtContext = (g) => {
     G = g;
   };
+  var artCtx = () => G;
   function tapeLabel(x, y, text, col, size) {
     const w = text.length * (size ? size * 0.56 : 8.2) + 22;
     return `<g transform="translate(${x} ${y}) rotate(-2)" pointer-events="none"><path d="M${-w / 2} -11 l4 -1.5 l${w - 8} 1 l4 -1 l-2 11 l2 11 l-4 1 l${-(w - 8)} -1 l-4 1 l2 -11z" style="fill:${col}" opacity=".85"/><text class="lab" x="0" y="5" text-anchor="middle"${size ? ` style="font-size:${size}px"` : ""}>${text}</text></g>`;
@@ -1535,7 +1616,7 @@ body.nb-open{overflow:hidden}
         <ellipse cx="455" cy="580" rx="7" ry="3.5" style="fill:var(--tree)"/><circle cx="455" cy="577" r="2" style="fill:var(--rose)"/>
         <rect x="322" y="596" width="34" height="6" rx="2" style="fill:var(--wood)"/><path d="M326 602 v8 M352 602 v8 M322 592 h34" /></g>
       ${tapeLabel(430, 630, "Pond", "var(--sky)")}</g>`;
-    return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 34, 536, 8, 2, 12);
+    return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 34, 536, 8, 2, 12) + upgradesArt(G.F().totalQuests || 0) + festivalArt(festivalOn(G.day())) + pondLanterns(G.lanterns());
   }
   function notesArt(x, y, n) {
     const c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#C3CDEE", "#DCE8C8"];
@@ -1722,6 +1803,130 @@ body.nb-open{overflow:hidden}
     ${tapeLabel(signX, signY, label, key === "chord" ? "var(--sage)" : "var(--blush)", 10)}</g>`;
   }
 
+  // src/art/village-extras.js
+  var UPGRADES = [
+    { at: 3, id: "bunting", name: "bunting over the market" },
+    { at: 8, id: "lanterns", name: "lanterns along the main path" },
+    { at: 15, id: "flag", name: "a flag on the Chord workshop" },
+    { at: 25, id: "arch", name: "a flower arch over Chico's door" },
+    { at: 40, id: "bench", name: "a reading bench outside the library" },
+    { at: 60, id: "lights", name: "string lights around the square" },
+    { at: 85, id: "fountain", name: "a little fountain" },
+    { at: 120, id: "star", name: "a gold star on the town hall flag" },
+    { at: 160, id: "blossom", name: "blossom trees by the pond" }
+  ];
+  var unlocked = (n) => UPGRADES.filter((u) => n >= u.at);
+  var nextUpgrade = (n) => UPGRADES.find((u) => n < u.at) || null;
+  var bunting = (x1, y1, x2, y2, cols) => {
+    const n = Math.max(3, Math.round((x2 - x1) / 12)), mid = (y1 + y2) / 2 + 8;
+    let f2 = "";
+    for (let i = 0; i < n; i++) {
+      const t = (i + 0.5) / n, x = x1 + (x2 - x1) * t, y = (1 - t) * (1 - t) * y1 + 2 * (1 - t) * t * mid + t * t * y2;
+      f2 += `<path d="M${x - 4} ${y} l4 8 l4 -8z" style="fill:${cols[i % cols.length]}"/>`;
+    }
+    return sk(f2, `<path d="M${x1} ${y1} Q${(x1 + x2) / 2} ${mid} ${x2} ${y2}"/>${f2.replace(/ style="[^"]*"/g, "")}`);
+  };
+  var lamp = (x, y) => sk(`<rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2" style="fill:#F6C26B"/>`, `<path d="M${x} ${y} v-13"/><rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2"/><path d="M${x - 5} ${y} h10"/>`);
+  function upgradesArt(n) {
+    const has = (id) => unlocked(n).some((u) => u.id === id);
+    let h = "";
+    if (has("bunting")) h += bunting(330, 300, 394, 300, ["var(--rose)", "var(--butter)", "var(--sage)", "var(--peri)"]);
+    if (has("lanterns")) [[232, 236], [288, 236], [226, 430], [294, 430], [196, 362], [324, 362]].forEach(([x, y]) => {
+      h += lamp(x, y);
+    });
+    if (has("flag")) h += sk(`<path d="M85 140 l18 6 l-18 6z" style="fill:var(--peach)"/>`, `<path d="M85 160 v-22 M85 140 l18 6 l-18 6"/>`);
+    if (has("arch")) h += sk(
+      `${[0, 1, 2, 3, 4, 5, 6].map((i) => {
+        const a = Math.PI * (1 - i / 6), x = 85 + Math.cos(a) * 19, y = 486 - Math.sin(a) * 19;
+        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" style="fill:${["var(--rose)", "#FFFDF6", "var(--butter)"][i % 3]}"/>`;
+      }).join("")}`,
+      `<path d="M66 500 v-14 a19 19 0 0 1 38 0 v14"/>`
+    );
+    if (has("bench")) h += sk(`<rect x="456" y="276" width="34" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="456" y="276" width="34" height="6" rx="2"/><path d="M460 282 v8 M486 282 v8 M456 270 h34"/>`);
+    if (has("lights")) {
+      let b = "";
+      for (let i = 0; i < 9; i++) {
+        const t = i / 8, x = 192 + 136 * t, y = 296 - Math.sin(Math.PI * t) * 22;
+        b += `<circle class="twinkle" cx="${x.toFixed(1)}" cy="${(y + 3).toFixed(1)}" r="2.6" fill="${["#FFD66E", "#F7A9A9", "#A9D3A0", "#A9C6E0"][i % 4]}"/>`;
+      }
+      h += `<g filter="url(#wob)"><path d="M192 296 Q260 252 328 296" fill="none" style="stroke:var(--line)" stroke-width="1.2"/></g><g>${b}</g>`;
+    }
+    if (has("fountain")) h += sk(
+      `<ellipse cx="318" cy="400" rx="20" ry="8" style="fill:var(--stone)"/><ellipse cx="318" cy="398" rx="14" ry="5" style="fill:var(--water)"/><rect x="315" y="382" width="6" height="14" style="fill:var(--stone)"/>`,
+      `<ellipse cx="318" cy="400" rx="20" ry="8"/><path d="M298 400 v4 a20 8 0 0 0 40 0 v-4"/><rect x="315" y="382" width="6" height="14"/><path class="smoke" d="M318 380 q-6 -6 -10 2 M318 380 q6 -6 10 2" opacity=".7"/>`
+    );
+    if (has("star")) h += iconAt("sparkle", 282, 6, 16);
+    if (has("blossom")) [[362, 556], [500, 610]].forEach(([x, y]) => {
+      h += `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.4"><rect x="${x - 3}" y="${y - 6}" width="6" height="14" style="fill:var(--wood)"/><circle cx="${x}" cy="${y - 18}" r="14" style="fill:#F4C7CF"/><circle cx="${x - 9}" cy="${y - 10}" r="9" style="fill:#EFA3A6"/><circle cx="${x + 9}" cy="${y - 11}" r="9" style="fill:#F4C7CF"/></g>`;
+    });
+    return h;
+  }
+  var FESTIVALS = [
+    { id: "newyear", name: "New Year", dates: ["2026-12-31", "2027-12-31"], before: 1, after: 1 },
+    { id: "cny", name: "Chinese New Year", dates: ["2027-02-06", "2028-01-26"], before: 10, after: 14 },
+    { id: "national", name: "National Day", dates: ["2026-08-09", "2027-08-09"], before: 8, after: 1 },
+    { id: "midautumn", name: "Mid-Autumn", dates: ["2026-09-25", "2027-09-15"], before: 7, after: 2 },
+    { id: "deepavali", name: "Deepavali", dates: ["2026-11-08", "2027-10-28"], before: 7, after: 2 },
+    { id: "christmas", name: "Christmas", dates: ["2026-12-25", "2027-12-25"], before: 10, after: 1 }
+  ];
+  var dayNum = (k) => Date.parse(k + "T00:00:00Z") / 864e5;
+  function festivalOn(day) {
+    const d = dayNum(day);
+    for (const f2 of FESTIVALS) for (const k of f2.dates) {
+      const x = dayNum(k);
+      if (d >= x - f2.before && d <= x + f2.after) return f2;
+    }
+    return null;
+  }
+  var rainyOn = (day) => [11, 12, 1].includes(+day.slice(5, 7)) && hash(day + "rain") % 100 < 34;
+  function festivalArt(f2) {
+    if (!f2) return "";
+    const lanternRow = (x1, x2, y, cols) => {
+      let s = "";
+      const n = 6;
+      for (let i = 0; i < n; i++) {
+        const x = x1 + (x2 - x1) * i / (n - 1), yy = y + Math.sin(Math.PI * i / (n - 1)) * 10;
+        s += `<path d="M${x} ${yy - 6} v4"/><ellipse cx="${x}" cy="${yy + 4}" rx="5" ry="6.5" style="fill:${cols[i % cols.length]}"/><path d="M${x - 2} ${yy + 10.5} h4"/>`;
+      }
+      return `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M${x1} ${y - 6} Q${(x1 + x2) / 2} ${y + 6} ${x2} ${y - 6}" fill="none"/>${s}</g>`;
+    };
+    switch (f2.id) {
+      case "cny":
+        return lanternRow(196, 324, 262, ["#D9433A", "#E8574C"]) + lanternRow(30, 140, 176, ["#D9433A"]) + lanternRow(380, 490, 176, ["#D9433A"]);
+      case "midautumn":
+        return lanternRow(196, 324, 262, ["#F3C969", "#EFA3A6", "#9CC3E0", "#B9D2A6"]) + `<g filter="url(#wob)"><circle cx="470" cy="40" r="16" fill="#FFF3C4" style="stroke:var(--line)" stroke-width="1.2"/></g>`;
+      case "deepavali": {
+        let d = "";
+        [[236, 236], [284, 236], [222, 420], [298, 420], [200, 352], [320, 352], [250, 610], [270, 610]].forEach(([x, y]) => {
+          d += `<path d="M${x - 6} ${y} q6 6 12 0z" style="fill:#C9853E"/><path class="twinkle" d="M${x} ${y - 1} q-3 -5 0 -9 q3 4 0 9z" style="fill:#F6A23A"/>`;
+        });
+        const rang = `<g filter="url(#wob)" opacity=".9">${[26, 18, 10].map((r, i) => `<circle cx="260" cy="356" r="${r}" fill="none" style="stroke:${["#EFA3A6", "#F3C969", "#9AA9DD"][i]}" stroke-width="5"/>`).join("")}<circle cx="260" cy="356" r="4" fill="#EFA3A6"/></g>`;
+        return rang + `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width=".9">${d}</g>`;
+      }
+      case "christmas": {
+        let b = "";
+        for (let i = 0; i < 9; i++) {
+          const t = i / 8, x = 192 + 136 * t, y = 296 - Math.sin(Math.PI * t) * 22;
+          b += `<circle class="twinkle" cx="${x.toFixed(1)}" cy="${(y + 3).toFixed(1)}" r="2.4" fill="${["#D9433A", "#F3C969", "#7FA36E"][i % 3]}"/>`;
+        }
+        return `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.2"><path d="M192 296 Q260 252 328 296" fill="none"/><path d="M318 410 l14 -34 l14 34z" style="fill:#7FA36E"/><rect x="329" y="410" width="6" height="8" style="fill:var(--wood)"/></g>${iconAt("sparkle", 332, 372, 14)}<g>${b}</g>`;
+      }
+      case "national":
+        return bunting(200, 92, 320, 92, ["#D9433A", "#FFFDF6"]) + bunting(196, 300, 324, 300, ["#D9433A", "#FFFDF6"]);
+      case "newyear":
+        return `<g class="twinkle">${[[120, 60], [400, 70], [260, 240], [60, 380], [470, 420], [180, 560]].map(([x, y]) => iconAt("sparkle", x, y, 18)).join("")}</g>`;
+    }
+    return "";
+  }
+  function pondLanterns(n) {
+    let h = "";
+    for (let i = 0; i < Math.min(n, 9); i++) {
+      const x = 392 + i % 5 * 18 + (i > 4 ? 9 : 0), y = 584 + (i > 4 ? 14 : 0) + i % 2 * 3;
+      h += `<g class="floaty" style="animation-delay:${(i * 0.37).toFixed(2)}s">${iconAt("lantern", x, y, 16)}</g>`;
+    }
+    return h;
+  }
+
   // src/data/npcs.js
   var hm = (s) => {
     const [h, m] = s.split(":").map(Number);
@@ -1884,6 +2089,11 @@ body.nb-open{overflow:hidden}
       if (k === "ask") return ask();
       if (k === "copy") return copyDraft(b);
       if (k === "sayb") return api.sayButton(+b.dataset.i);
+      if (k === "pond") {
+        closeNotebook();
+        api.windDown();
+        return;
+      }
       if (open && open.kind !== "task" && k === "thanks") {
         closeNotebook();
         return;
@@ -2033,7 +2243,7 @@ body.nb-open{overflow:hidden}
     <h2 id="nbTitle">${esc(item.title || "A note for you")}</h2>
     <div class="nbbody">${item.body ? `<div class="nbnotes">${notesHTML(item.body)}</div>` : ""}${sectionsHTML(item.sections)}
     ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Open the full thing ↗</a></div>` : ""}</div>
-    <div class="nbactions"><button class="btn yes" data-nb="thanks">Thanks!</button></div>`;
+    <div class="nbactions">${item.pond ? `<button class="btn primary" data-nb="pond">Walk to the pond</button>` : ""}<button class="btn ${item.pond ? "alt" : "yes"}" data-nb="thanks">${item.pond ? "Later" : "Thanks!"}</button></div>`;
   }
   function newsPage(item) {
     const d = new Date(item.at || Date.now());
@@ -2047,7 +2257,7 @@ body.nb-open{overflow:hidden}
     <header class="nhead">
       <div class="nears"><span>Vol. I · No. ${no}</span><span>Price: one wet wipe</span></div>
       <p class="nmast" id="nbTitle">The Morning Crier</p>
-      <div class="nline"><span>${esc(date)}</span><span>Delivered by ${esc(api.agentName(item.from))}</span></div>
+      <div class="nline"><span>${esc(date)}${item.edition ? " · " + esc(item.edition) : ""}</span><span>Delivered by ${esc(api.agentName(item.from))}</span></div>
     </header>
     <div class="nbbody">
       <h2 class="nheadline">${esc(item.title || "Good morning, village")}</h2>
@@ -2497,6 +2707,7 @@ Quests finished today: ${S3.doneIds.length}`;
     F2.met = F2.met || {};
     S3.npcSaid = S3.npcSaid || {};
     e.dir = api2.mel.x < e.x ? -1 : 1;
+    api2.chatted && api2.chatted(def.name);
     if (!F2.met[id]) {
       F2.met[id] = true;
       say(e, def.intro, 7e3);
@@ -2601,12 +2812,18 @@ Quests finished today: ${S3.doneIds.length}`;
       if (!F[k]) F[k] = {};
     });
     F.digest = Object.assign({ read: {}, lastAt: 0, mine: [] }, F.digest || {});
+    ["decor", "decorOwned", "history"].forEach((k) => {
+      if (!F[k] || typeof F[k] !== "object") F[k] = {};
+    });
+    if (!Array.isArray(F.upgradeLog)) F.upgradeLog = [];
+    if (!F.totalQuests) F.totalQuests = 0;
+    if (!Array.isArray(S2.chats)) S2.chats = [];
     ["halfway", "tread", "npcSaid"].forEach((k) => {
       if (!S2[k]) S2[k] = {};
     });
   }
   migrate();
-  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST });
+  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), lanterns: () => S2.pond ? S2.pond.wins.length : 0 });
   var say2 = null;
   var refs = null;
   var writing = {};
@@ -2619,7 +2836,8 @@ Quests finished today: ${S3.doneIds.length}`;
   var shelfOpen = false;
   var selPlot = null;
   var shopTab = "seeds";
-  var qnOpen = true;
+  var qnOpen = false;
+  var qnQuietUntil = Date.now() + 5e3;
   var qnKey = "";
   var openView = null;
   var shopClosed = false;
@@ -2646,7 +2864,13 @@ Quests finished today: ${S3.doneIds.length}`;
     }
     writing[which] = false;
   }
+  function noteHistory() {
+    if (!F.history) return;
+    F.history[S2.day] = { q: S2.doneIds.length, steps: S2.steps || 0, water: S2.waterMl || 0, harvest: S2.harvested || 0, coins: S2.earned || 0, chats: (S2.chats || []).slice(0, 12) };
+    Object.keys(F.history).sort().slice(0, -21).forEach((k) => delete F.history[k]);
+  }
   var save = (redraw) => {
+    noteHistory();
     persist("today");
     persist("fox");
     render(redraw);
@@ -2874,8 +3098,8 @@ Quests finished today: ${S3.doneIds.length}`;
     const p = document.createElement("div");
     p.className = "mprop";
     p.innerHTML = icon(txt, 18);
-    p.style.left = (x - cam.x) * cam.s + "px";
-    p.style.top = y * cam.s + "px";
+    p.style.left = x * cam.s + cam.ox + "px";
+    p.style.top = y * cam.s + cam.oy + "px";
     $("mprops").appendChild(p);
     setTimeout(() => p.remove(), life || 1900);
   }
@@ -3082,6 +3306,7 @@ Quests finished today: ${S3.doneIds.length}`;
       earn(5, "quest complete");
       gainXp(1);
       S2.last = t.title;
+      countQuest();
       let grew = 0;
       F.plots.forEach((p) => {
         if (p && p.crop && p.wateredAt && growth(p) < 1) {
@@ -3189,6 +3414,21 @@ Quests finished today: ${S3.doneIds.length}`;
     speak("New quest picked! Off we go.", 3e3);
     save(true);
   }
+  function countQuest() {
+    const before = unlocked(F.totalQuests || 0).length;
+    F.totalQuests = (F.totalQuests || 0) + 1;
+    const now2 = unlocked(F.totalQuests);
+    if (now2.length > before) {
+      const u = now2[now2.length - 1];
+      F.upgradeLog.push({ id: u.id, day: dayKey() });
+      setTimeout(() => {
+        act("cheer");
+        speak(`Village upgrade! ${u.name[0].toUpperCase() + u.name.slice(1)}.`, 6e3);
+        flash(`Village upgrade: ${u.name}`);
+        if (scene === "village") drawScene();
+      }, 2400);
+    }
+  }
   var HALF = ["Halfway! The downhill bit starts now.", "Halfway there. Look at you go.", "Half done. Sip of water, then onwards."];
   var onTread = (t) => !!(t && (S2.tread[t.id] || isTreadTask(t)));
   function nbAct(kind, t) {
@@ -3238,19 +3478,34 @@ Quests finished today: ${S3.doneIds.length}`;
     return fmt(Math.max(0, S2.timer.endAt - Date.now()));
   }
   var sun = { busy: false, at: 0, error: null, added: 0 };
-  function markSunsamaDone() {
-    (P && P.day === dayKey() && Array.isArray(P.tasks) ? P.tasks : []).forEach((t) => {
-      if (t && t.completed && !S2.doneIds.includes(t.id)) S2.doneIds.push(t.id);
+  function creditDone(tasks, quiet) {
+    const ids = new Set(allTasks().map((t) => t.id)), cur = phase() === "task" ? remaining()[0] : null, got = [];
+    (tasks || []).forEach((t) => {
+      if (!t || !t.completed || !ids.has(t.id) || S2.doneIds.includes(t.id)) return;
+      S2.doneIds.push(t.id);
+      got.push(t);
+      earn(5, "done in Sunsama");
+      gainXp(1);
+      countQuest();
+      if (cur && cur.id === t.id) {
+        if (S2.timer && S2.timer.id === t.id) S2.timer = null;
+        S2.firstStep[t.id] = false;
+      }
     });
+    if (got.length && !quiet) {
+      act("cheer");
+      speak(got.length === 1 ? `You already did “${got[0].title}” in Sunsama! Counted.` : `${got.length} quests already done in Sunsama! Counted.`, 5e3);
+    }
+    return got.length;
   }
+  var markSunsamaDone = () => creditDone(P && P.day === dayKey() && Array.isArray(P.tasks) ? P.tasks : [], true);
   async function syncSunsama(manual) {
-    if (sun.busy) return;
+    if (sun.busy || !manual && Date.now() - sun.at < 2 * 6e4) return;
     const fromPull = !P || P.day !== dayKey() || P.source === "sunsama";
-    if (!manual && !fromPull) return;
     sun.busy = true;
     sun.error = null;
     render();
-    const day = dayKey(), r = await pullSunsama(day, { fresh: !!manual });
+    const day = dayKey(), r = await pullSunsama(day, { fresh: true });
     sun.busy = false;
     sun.at = Date.now();
     if (r.error) {
@@ -3258,7 +3513,7 @@ Quests finished today: ${S3.doneIds.length}`;
       render();
       return;
     }
-    if (fromPull || !P || P.day !== day || P.source === "sunsama") {
+    if (fromPull) {
       if (!r.tasks.length && !(P && P.day === day && P.source === "sunsama")) {
         sun.added = 0;
         render();
@@ -3272,28 +3527,34 @@ Quests finished today: ${S3.doneIds.length}`;
       }
       if (refs) refs.plan.set(JSON.parse(JSON.stringify(P))).catch(() => {
       });
-      markSunsamaDone();
+      creditDone(r.tasks, !was);
       save(true);
       if (!was && remaining().length) speak(`${remaining().length} quests from Sunsama on the boards!`, 5e3);
-    } else {
+      return;
+    }
+    const n = creditDone(r.tasks);
+    if (manual) {
       const have = new Set(allTasks().map((t) => t.id));
       const fresh = r.tasks.filter((t) => !t.completed && !have.has(t.id));
       S2.extra.push(...fresh);
       sun.added = fresh.length;
-      save(true);
-      speak(fresh.length ? `Added ${fresh.length} new Sunsama task${fresh.length === 1 ? "" : "s"} to the end of the line.` : "Sunsama and the boards match. All set!", 4e3);
+      if (!n) speak(fresh.length ? `Added ${fresh.length} new Sunsama task${fresh.length === 1 ? "" : "s"} to the end of the line.` : "Sunsama and the boards match. All set!", 4e3);
     }
+    save(true);
   }
+  setInterval(() => {
+    if (!document.hidden) syncSunsama();
+  }, 10 * 6e4);
   function sunsamaLine() {
     const el = $("sunsamaLine");
     if (!el) return;
-    const src = P && P.day === dayKey() ? P.source === "sunsama" ? "sunsama" : "chat" : null;
-    let txt = sun.busy ? "Checking Sunsama…" : sun.error ? SUNSAMA_ERRORS[sun.error] || "Couldn't reach Sunsama just now." : src === "sunsama" ? `Today's quests came straight from Sunsama${P.pulledAt ? " at " + new Date(P.pulledAt).toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Singapore" }) : ""}. Chat's boss-mode plan replaces them with first steps and pep talks.` : src === "chat" ? "Today's plan is from chat's boss mode." : "Your Sunsama tasks load here when you open the village.";
-    el.innerHTML = `${esc(txt)} <button class="next" id="sunBtn" ${sun.busy ? "disabled" : ""}>${src === "chat" ? "check Sunsama for new tasks" : "refresh from Sunsama"}</button>`;
+    const src = P && P.day === dayKey() ? P.source === "sunsama" ? "sunsama" : P.source === "routine" ? "routine" : "chat" : null;
+    let txt = sun.busy ? "Checking Sunsama…" : sun.error ? SUNSAMA_ERRORS[sun.error] || "Couldn't reach Sunsama just now." : src === "sunsama" ? `Today's quests came straight from Sunsama${P.pulledAt ? " at " + new Date(P.pulledAt).toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Singapore" }) : ""}. Chat's boss-mode plan replaces them with first steps and pep talks.` : src === "routine" ? "Today's plan was loaded this morning, with first steps and pep talks. Anything you tick off in Sunsama counts here too." : src === "chat" ? "Today's plan is from chat's boss mode. Anything you tick off in Sunsama counts here too." : "Your Sunsama tasks load here when you open the village.";
+    el.innerHTML = `${esc(txt)} <button class="next" id="sunBtn" ${sun.busy ? "disabled" : ""}>${src === "chat" || src === "routine" ? "check Sunsama for new tasks" : "refresh from Sunsama"}</button>`;
     $("sunBtn").onclick = () => syncSunsama(true);
   }
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && (!P || P.day !== dayKey())) syncSunsama();
+    if (!document.hidden) syncSunsama();
   });
   var DIGEST_GAP = 60 * M;
   var digestBusy = false;
@@ -3336,7 +3597,94 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     digestBusy = false;
     ctx();
   }
-  var unreadMail = () => (MAIL.items || []).filter((m) => m && m.id && !F.mailRead[m.id] && (!m.at || Date.now() - m.at < 36 * H)).sort((a, b) => (a.at || 0) - (b.at || 0));
+  var sgAt = (day, h, m = 0) => Date.UTC(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8, 10), h - 8, m);
+  var WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  var localCache = { key: "", items: [] };
+  function localMail() {
+    const day = dayKey(), hm2 = sgHM(), key = `${day}:${Math.floor(hm2 / 10)}:${S2.doneIds.length}:${S2.cleanDone}`;
+    if (key === localCache.key) return localCache.items;
+    const out = [], wd = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+    if (wd === 5 && hm2 >= 900 || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
+    if (hm2 >= 1080 && (S2.cleanDone || S2.doneIds.length)) out.push({
+      id: "wind-" + day,
+      from: "winddown",
+      at: sgAt(day, 18),
+      pond: true,
+      title: "Time to close the day",
+      body: `Meet me at the pond. Each of today's wins gets a lantern on the water.
+Then tell chat "wind down" whenever you're ready.`
+    });
+    return (localCache = { key, items: out }).items;
+  }
+  var allMail = () => [...MAIL.items || [], ...localMail()];
+  function weeklyPaper(fri) {
+    noteHistory();
+    const days = Array.from({ length: 7 }, (_, i) => {
+      let d = fri;
+      for (let k = 0; k < 6 - i; k++) d = prevDay(d);
+      return d;
+    });
+    const rows2 = days.map((d) => ({ d, ...F.history[d] || { q: 0, steps: 0, water: 0, harvest: 0, coins: 0, chats: [] } }));
+    const sum = (k) => rows2.reduce((a, r) => a + (r[k] || 0), 0);
+    const q = sum("q"), steps = sum("steps"), coins = sum("coins"), harvest2 = sum("harvest");
+    const best = rows2.reduce((a, r) => r.q > a.q ? r : a, { q: 0 });
+    const wDays = rows2.filter((r) => r.water > 0), avgW = wDays.length ? sum("water") / wDays.length / 1e3 : 0;
+    const walked = rows2.filter((r) => r.steps >= STEP_GOAL).length;
+    const chats2 = [...new Set(rows2.flatMap((r) => r.chats || []))];
+    const ups = (F.upgradeLog || []).filter((u) => days.includes(u.day)).map((u) => (UPGRADES.find((x) => x.id === u.id) || {}).name).filter(Boolean);
+    let soon = null;
+    for (let i = 1, d = fri; i <= 14; i++) {
+      d = new Date(Date.parse(d + "T00:00:00Z") + 864e5).toISOString().slice(0, 10);
+      const f2 = festivalOn(d);
+      if (f2) {
+        soon = f2;
+        break;
+      }
+    }
+    const sections = [{ heading: "The week in numbers", lines: [`${q} quest${q === 1 ? "" : "s"} finished`, `${coins} coins earned`, `${steps.toLocaleString()} steps${walked ? `, ${walked} day${walked === 1 ? "" : "s"} past 5,000` : ""}`, wDays.length ? `${avgW.toFixed(1)} L of water a day, on average` : "Water not logged this week"] }];
+    if (best.q) sections.push({ heading: "Best day", lines: [`${WEEKDAY[(/* @__PURE__ */ new Date(best.d + "T00:00:00Z")).getUTCDay()]}: ${best.q} quest${best.q === 1 ? "" : "s"}`] });
+    sections.push({ heading: "In the garden", lines: [harvest2 ? `${harvest2} harvest${harvest2 === 1 ? "" : "s"} brought in` : "Nothing harvested yet. Hana has seeds."] });
+    if (chats2.length) sections.push({ heading: "Around the village", lines: [`You chatted with ${chats2.length > 1 ? chats2.slice(0, -1).join(", ") + " and " + chats2.slice(-1) : chats2[0]}`] });
+    if (ups.length) sections.push({ heading: "New in the village", lines: ups.map((n) => n[0].toUpperCase() + n.slice(1)) });
+    if (soon) sections.push({ heading: "Coming up", lines: [`${soon.name} decorations go up soon`] });
+    return {
+      id: "weekly-" + fri,
+      from: "crier",
+      edition: "Weekend edition",
+      at: sgAt(fri, 15),
+      title: q >= 15 ? `${q} quests: a big week in the village` : q ? `${q} quests and a steady week` : "A quiet week in the village",
+      body: q ? "Here's your week in the village, Saturday to Friday. Have a lovely weekend." : "Rest weeks count too. The village will be here on Monday.",
+      sections
+    };
+  }
+  function windDown() {
+    const wins = [];
+    if (S2.cleanDone) wins.push("Five-minute clean");
+    allTasks().filter((t) => S2.doneIds.includes(t.id)).forEach((t) => wins.push(t.title));
+    if (S2.steps >= STEP_GOAL) wins.push(`${S2.steps.toLocaleString()} steps`);
+    if ((S2.waterMl || 0) >= WATER_GOAL) wins.push("Two litres of water");
+    if (S2.harvested) wins.push(`${S2.harvested} harvest${S2.harvested > 1 ? "s" : ""}`);
+    if (!wins.length) wins.push("Showing up today");
+    go("village", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => {
+      atSpot = "pond";
+      S2.pond = { wins, at: Date.now() };
+      save(true);
+      let i = 0;
+      const next = () => {
+        if (i < wins.length) {
+          speak(`Lantern ${i + 1}: ${wins[i]}`, 3300);
+          i++;
+          setTimeout(next, 3400);
+        } else {
+          act("cheer");
+          setSay("That's the day, Mel. Tell chat “wind down” whenever you're ready.");
+          save();
+        }
+      };
+      next();
+    });
+  }
+  var unreadMail = () => allMail().filter((m) => m && m.id && !F.mailRead[m.id] && (!m.at || Date.now() - m.at < 36 * H)).sort((a, b) => (a.at || 0) - (b.at || 0));
   function markRead(item) {
     if (!F.mailRead[item.id]) {
       F.mailRead[item.id] = Date.now();
@@ -3349,7 +3697,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
   }
   var agentName = (from) => AGENTS[from] && AGENTS[from].name || from || "the postie";
   function mailCard() {
-    const items = (MAIL.items || []).filter((m) => m && m.id).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 20);
+    const items = allMail().filter((m) => m && m.id).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 20);
     const unread = items.filter((m) => !F.mailRead[m.id]).length;
     $("mailBadge").hidden = !unread;
     $("mailBadge").textContent = unread;
@@ -3375,6 +3723,26 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
       building: sp === "bench" || sp === "laptop" && pl !== "post",
       planning: sp === "table" || sp === "kitchen" && pl === "chico"
     };
+  }
+  function decorClick(id) {
+    const d = DECOR[id];
+    if (!d) return;
+    if (!F.decorOwned[id]) {
+      if (F.coins < d.price) return;
+      F.coins -= d.price;
+      F.decorOwned[id] = true;
+      F.decor[d.slot] = d.val;
+      gainXp(1);
+      flash(`Bought ${d.n.toLowerCase()}`);
+      speak("Ooh! It's waiting for you at home.", 3500);
+    } else if (F.decor[d.slot] === d.val) {
+      delete F.decor[d.slot];
+      speak("Put away for now.", 2500);
+    } else {
+      F.decor[d.slot] = d.val;
+      speak("Swapped in. Go and have a look!", 3e3);
+    }
+    save(scene === "home");
   }
   function useItem(id) {
     const it = ITEMS[id];
@@ -3514,7 +3882,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     const key = ph + ":" + (ph === "task" ? remaining()[0].id + (arrivedFor(remaining()[0]) ? ":here" : "") + (S2.firstStep[remaining()[0].id] ? ":go" : "") : (S2.wipe ? "w" : "") + (atClean() ? "c" : ""));
     if (key !== qnKey) {
       qnKey = key;
-      qnOpen = true;
+      if (Date.now() > qnQuietUntil) qnOpen = true;
     }
     const slim = !qnOpen || route.length > 0 && !(say2 && say2.buttons);
     j.classList.toggle("slim", slim);
@@ -3577,10 +3945,15 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     const c = $("ctx");
     let h = "";
     if (scene === "market" && !shopClosed) {
-      const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["care", "Care"], ["sell", "Sell"]];
+      const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["care", "Care"], ["home", "Home"], ["sell", "Sell"]];
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
       <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-shop="${k}" aria-selected="${shopTab === k}">${n}</button>`).join("")}</div><div class="items shop">`;
-      if (shopTab === "sell") {
+      if (shopTab === "home") {
+        h += Object.keys(DECOR).map((id) => {
+          const d = DECOR[id], own = F.decorOwned[id], on = own && F.decor[d.slot] === d.val;
+          return `<button class="item" data-decor="${id}" ${!own && F.coins < d.price ? "disabled" : ""}><span class="e">${icon(d.ico, 34)}</span><span class="n">${esc(d.n)}</span><span class="c">${on ? "in your home" : own ? "tap to use" : `<b>${d.price}</b> ${icon("coin", 13)}`}</span></button>`;
+        }).join("") + `<p class="muted" style="grid-column:1/-1">Bought once, kept forever. They appear inside your house. Tap something you own to swap it in or put it away.</p>`;
+      } else if (shopTab === "sell") {
         const sellable = Object.keys(F.inv).filter((id) => ITEMS[id] && ITEMS[id].sell);
         h += sellable.length ? sellable.map((id) => itemBtn(id, `sell <b>+${ITEMS[id].sell}</b> ${icon("coin", 13)}`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("") : `<p class="muted" style="grid-column:1/-1">Nothing to sell yet. Grow something in the garden!</p>`;
       } else {
@@ -3632,6 +4005,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
       shopTab = b.dataset.shop;
       ctx();
     });
+    c.querySelectorAll("[data-decor]").forEach((b) => b.onclick = () => decorClick(b.dataset.decor));
     c.querySelectorAll(".item[data-id]").forEach((b) => b.onclick = () => {
       const id = b.dataset.id;
       if (scene === "market") {
@@ -3675,10 +4049,10 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     $("play").querySelectorAll("[data-play]").forEach((b) => b.onclick = () => playFree(b.dataset.play));
   }
   function trackers() {
-    $("waterBoxes").innerHTML = progressBar((S2.waterMl || 0) / WATER_GOAL, "#9CC3E0", 8);
-    $("stepBoxes").innerHTML = progressBar(S2.steps / STEP_GOAL, "var(--sage)", 5);
-    $("waterNote").textContent = S2.waterMl ? `${(S2.waterMl / 1e3).toFixed(S2.waterMl % 1e3 ? 2 : 0).replace(/0$/, "")} L` : "log";
-    $("stepNote").textContent = S2.steps ? S2.steps.toLocaleString() : "log";
+    $("waterBoxes").innerHTML = progressBarV((S2.waterMl || 0) / WATER_GOAL, "#9CC3E0", 8);
+    $("stepBoxes").innerHTML = progressBarV(S2.steps / STEP_GOAL, "var(--sage)", 5);
+    $("waterNote").textContent = S2.waterMl ? `${+(S2.waterMl / 1e3).toFixed(2)}L` : "0L";
+    $("stepNote").textContent = S2.steps >= 1e3 ? `${+(S2.steps / 1e3).toFixed(1)}k` : String(S2.steps || 0);
   }
   var GLASS = 250;
   var WATER_GOAL = 2e3;
@@ -3733,6 +4107,15 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     m.setAttribute("transform", `translate(${pos[0]} ${pos[1]})`);
   }
   function drawScene() {
+    const day = dayKey(), wet = scene === "village" && rainyOn(day), fest = festivalOn(day);
+    $("rain").hidden = !wet;
+    if (scene === "village" && fest && S2.festSaid !== day) {
+      S2.festSaid = day;
+      setTimeout(() => speak(`${fest.name} decorations are up in the village!`, 5e3), 1500);
+    } else if (wet && S2.rainSaid !== day) {
+      S2.rainSaid = day;
+      setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500);
+    }
     $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "farm" ? farmArt() : roomArt(scene);
     const names = { village: "The village", farm: "The garden" };
     $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${scene !== "village" ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
@@ -3758,7 +4141,13 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     if (!speechLock) $("speech").textContent = plain(say2 ? say2.line : defaultLine());
     const span = next ? next.xp - LEVELS[L].xp : 1, into = next ? F.xp - LEVELS[L].xp : 1, filled = Math.round(Math.min(1, into / span) * 5);
     $("friendBody").innerHTML = `<p class="hearts" aria-label="${filled} of 5 hearts to next level">${Array.from({ length: 5 }, (_, i) => icon("heart", 22, i < filled ? "" : "faint")).join("")}</p>
-    <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed!"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>`;
+    <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed!"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>
+    <h3 class="ph3">Village upgrades</h3>
+    <p class="muted">${F.totalQuests || 0} quests finished so far. ${(() => {
+      const nx = nextUpgrade(F.totalQuests || 0);
+      return nx ? `Next at ${nx.at}: ${esc(nx.name)}.` : "Every upgrade unlocked!";
+    })()}</p>
+    <ul class="uplist">${UPGRADES.map((u) => `<li class="${(F.totalQuests || 0) >= u.at ? "got" : ""}">${icon((F.totalQuests || 0) >= u.at ? "sparkle" : "clock", 16)} <span>${esc(u.name)}</span> <small>${u.at}</small></li>`).join("")}</ul>`;
     const all = allTasks(), rem = remaining(), cur = phase() === "task" && rem[0] ? rem[0].id : null;
     $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
     $("qBadge").hidden = !rem.length;
@@ -3917,7 +4306,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
   }
   function toWorld(ev) {
     const r = $("map").getBoundingClientRect();
-    return [(ev.clientX - r.left) / cam.s + cam.x, (ev.clientY - r.top) / cam.s];
+    return [(ev.clientX - r.left - cam.ox) / cam.s, (ev.clientY - r.top - cam.oy) / cam.s];
   }
   svg.addEventListener("click", (ev) => {
     const npc = ev.target.closest("[data-npc]");
@@ -4062,32 +4451,57 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     n.firstElementChild.setAttribute("transform", `scale(${e.dir} 1)`);
     n.classList.toggle("walk", e.moving);
   }
-  var cam = { x: 0, w: W, s: 1, top: 0, snap: true, key: "" };
+  var cam = { x: 0, s: 1, ox: 0, oy: 0, top: 0, snap: true, key: "", fit: false, canFollow: false };
+  try {
+    cam.fit = localStorage.getItem("fox.zoom") === "out";
+  } catch {
+  }
   function updateCam(dt) {
     const m = $("map"), cw = m.clientWidth, ch = m.clientHeight;
     if (!cw || !ch) return;
-    const a = cw / ch, vw = a < W / HH - 5e-3 ? HH * a : W;
-    const tx = clamp(mel.x - vw / 2, 0, W - vw);
-    cam.x = cam.snap ? tx : cam.x + (tx - cam.x) * Math.min(1, dt * 3.2);
+    cam.canFollow = cw / ch < W / HH - 5e-3;
+    if (cam.canFollow && !cam.fit) {
+      const s = ch / HH, vw = cw / s, tx = clamp(mel.x - vw / 2, 0, W - vw);
+      cam.x = cam.snap ? tx : cam.x + (tx - cam.x) * Math.min(1, dt * 3.2);
+      cam.s = s;
+      cam.ox = -cam.x * s;
+      cam.oy = 0;
+    } else {
+      const s = Math.min(cw / W, (ch - cam.top) / HH);
+      cam.s = s;
+      cam.ox = (cw - W * s) / 2;
+      cam.oy = Math.max(cam.top, (ch - HH * s) / 2);
+      cam.x = 0;
+    }
     cam.snap = false;
-    cam.w = vw;
-    cam.s = vw < W ? ch / HH : cw / W;
-    const px = Math.round(cam.x * cam.s), key = px + "," + cw + "x" + ch + "," + (vw < W);
+    const ox = Math.round(cam.ox), oy = Math.round(cam.oy), key = `${ox},${oy},${cw}x${ch},${cam.s.toFixed(4)}`;
     if (key !== cam.key) {
       cam.key = key;
-      if (vw < W) {
-        svg.style.width = Math.round(W * cam.s) + "px";
-        svg.style.height = Math.round(HH * cam.s) + "px";
-        svg.style.transform = `translate3d(${-px}px,0,0)`;
-      } else {
-        svg.style.width = svg.style.height = svg.style.transform = "";
+      svg.style.width = W * cam.s + "px";
+      svg.style.height = HH * cam.s + "px";
+      svg.style.transform = `translate3d(${ox}px,${oy}px,0)`;
+      const z = $("zoomBtn");
+      if (z) {
+        z.hidden = !cam.canFollow;
+        z.setAttribute("aria-label", cam.fit ? "Zoom in" : "Zoom out to see the whole map");
+        z.innerHTML = icon(cam.fit ? "zoomIn" : "zoomOut", 26);
       }
     }
   }
+  function toggleZoom() {
+    cam.fit = !cam.fit;
+    cam.snap = true;
+    cam.key = "";
+    try {
+      localStorage.setItem("fox.zoom", cam.fit ? "out" : "in");
+    } catch {
+    }
+  }
   function measureHud() {
-    const hb = document.querySelector(".hudbar"), m = $("map");
-    cam.top = getComputedStyle(hb).position === "fixed" ? Math.max(0, hb.getBoundingClientRect().bottom - m.getBoundingClientRect().top + 4) : 0;
+    const sb = document.querySelector(".scenebar"), m = $("map");
+    cam.top = getComputedStyle(sb).position === "fixed" ? Math.max(0, sb.getBoundingClientRect().bottom - m.getBoundingClientRect().top + 4) : 0;
     m.style.setProperty("--ovTop", (cam.top ? cam.top + 4 : 8) + "px");
+    cam.key = "";
   }
   addEventListener("resize", () => {
     cam.snap = true;
@@ -4096,14 +4510,14 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
   function bubbleAt(el, ex, ey, off, forceBelow) {
     if (el.hidden) return;
     const wrap2 = $("map"), cw = wrap2.clientWidth, sc = cam.s;
-    const bw = el.offsetWidth, bh = el.offsetHeight, px = (ex - cam.x) * sc, py = (ey - off) * sc;
+    const bw = el.offsetWidth, bh = el.offsetHeight, px = ex * sc + cam.ox, py = (ey - off) * sc + cam.oy;
     const left = clamp(px, bw / 2 + 2, cw - bw / 2 - 2);
     el.style.left = left + "px";
     el.style.setProperty("--tail", clamp(px - left + bw / 2, 16, bw - 16) + "px");
-    const roomBelow = (ey + 8) * sc + 10 + bh < wrap2.clientHeight + 4;
+    const roomBelow = (ey + 8) * sc + cam.oy + 10 + bh < wrap2.clientHeight + 4;
     const below = forceBelow && roomBelow || py - bh - 10 < cam.top - 6;
     el.classList.toggle("below", below);
-    el.style.top = (below ? (ey + 8) * sc + 10 : py - 10) + "px";
+    el.style.top = (below ? (ey + 8) * sc + cam.oy + 10 : py - 10) + "px";
   }
   var last = performance.now();
   function frame(now2) {
@@ -4200,11 +4614,16 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
   };
   document.querySelectorAll("[data-ico]").forEach((el) => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
   $("pclose").onclick = closePanel;
+  $("zoomBtn").onclick = () => toggleZoom();
+  ["pointerdown", "keydown"].forEach((t) => document.addEventListener(t, () => {
+    qnQuietUntil = 0;
+  }, { capture: true, once: true }));
   document.querySelectorAll("[data-open]").forEach((b) => b.onclick = () => {
     openView = openView === b.dataset.open ? null : b.dataset.open;
     ctx();
   });
   initNotebook({
+    windDown,
     onTread,
     water: () => ({ ml: S2.waterMl || 0, goal: WATER_GOAL, glass: GLASS }),
     steps: () => ({ n: S2.steps, goal: STEP_GOAL }),
@@ -4229,6 +4648,12 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     placeLabel: (t) => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`
   });
   initNpcs({
+    chatted: (n) => {
+      if (!S2.chats.includes(n)) {
+        S2.chats.push(n);
+        save();
+      }
+    },
     scene: () => scene,
     bounds,
     mel,

@@ -20,6 +20,7 @@ export function initNotebook(a){
     if (k === "ask") return ask();
     if (k === "copy") return copyDraft(b);
     if (k === "sayb") return api.sayButton(+b.dataset.i);
+    if (k === "pond") { closeNotebook(); api.windDown(); return; }
     if (open && open.kind !== "task" && k === "thanks") { closeNotebook(); return; }
     if (open && open.kind === "tracker") return trackerAct(k, b);
     const t = api.task(); if (!t || !open || open.kind !== "task") return;
@@ -133,7 +134,7 @@ function mailPage(item){
     <h2 id="nbTitle">${esc(item.title || "A note for you")}</h2>
     <div class="nbbody">${item.body ? `<div class="nbnotes">${notesHTML(item.body)}</div>` : ""}${sectionsHTML(item.sections)}
     ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Open the full thing ↗</a></div>` : ""}</div>
-    <div class="nbactions"><button class="btn yes" data-nb="thanks">Thanks!</button></div>`;
+    <div class="nbactions">${item.pond ? `<button class="btn primary" data-nb="pond">Walk to the pond</button>` : ""}<button class="btn ${item.pond ? "alt" : "yes"}" data-nb="thanks">${item.pond ? "Later" : "Thanks!"}</button></div>`;
 }
 // The morning briefing, printed as the village newspaper. The first section is the front-page story.
 function newsPage(item){
@@ -148,7 +149,7 @@ function newsPage(item){
     <header class="nhead">
       <div class="nears"><span>Vol. I · No. ${no}</span><span>Price: one wet wipe</span></div>
       <p class="nmast" id="nbTitle">The Morning Crier</p>
-      <div class="nline"><span>${esc(date)}</span><span>Delivered by ${esc(api.agentName(item.from))}</span></div>
+      <div class="nline"><span>${esc(date)}${item.edition ? " · " + esc(item.edition) : ""}</span><span>Delivered by ${esc(api.agentName(item.from))}</span></div>
     </header>
     <div class="nbbody">
       <h2 class="nheadline">${esc(item.title || "Good morning, village")}</h2>
