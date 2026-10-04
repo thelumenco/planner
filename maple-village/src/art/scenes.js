@@ -184,9 +184,9 @@ export function laneArt(){
     ${tapeLabel(62, 366, "Town square", "var(--butter)", 11)}</g>`;
   // plots for the next apps: fenced patches of turned earth, each with a little "coming soon" sign
   const plotArt = (id, x, name, col) => `<g data-place="${id}" aria-label="${name}'s plot"><ellipse class="hov" cx="${x}" cy="530" rx="56" ry="11" style="fill:var(--butter)"/>
-    ${sk(`<rect x="${x-50}" y="456" width="100" height="66" rx="4" style="fill:#C9A27E"/><rect x="${x-26}" y="432" width="52" height="22" rx="2" style="fill:#FFFDF6"/>`,
-      `<path d="M${x-54} 526 V452 H${x+54} V526 M${x-54} 526 H${x-12} M${x+12} 526 H${x+54}" fill="none"/><path d="M${x-44} 474 h88 M${x-44} 492 h88 M${x-44} 508 h88" opacity=".35"/><rect x="${x-26}" y="432" width="52" height="22" rx="2"/>`)}
-    <text x="${x}" y="447" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" style="fill:var(--line)">coming soon</text>
+    ${sk(`<rect x="${x-50}" y="456" width="100" height="66" rx="4" style="fill:#C9A27E"/><rect x="${x-32}" y="432" width="64" height="22" rx="2" style="fill:#FFFDF6"/>`,
+      `<path d="M${x-54} 526 V452 H${x+54} V526 M${x-54} 526 H${x-12} M${x+12} 526 H${x+54}" fill="none"/><path d="M${x-44} 474 h88 M${x-44} 492 h88 M${x-44} 508 h88" opacity=".35"/><rect x="${x-32}" y="432" width="64" height="22" rx="2"/>`)}
+    <text x="${x}" y="447" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" textLength="52" lengthAdjust="spacingAndGlyphs" style="fill:var(--line)">coming soon</text>
     ${tapeLabel(x, 552, name, col, 11)}</g>`;
   const plot = plotArt("plot3", 160, "Luna", "var(--peri)") + plotArt("plot4", 362, "Ohayo", "var(--peach)");
   return ground + gate

@@ -233,7 +233,7 @@ function defaultLine(){
 }
 function speak(text, ms){
   const el = $("speech");
-  el.textContent = plain(text); el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
+  el.hidden = false; el.textContent = plain(text); el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
   clearTimeout(speechT); speechLock = ms ? Date.now() + ms : 0;
   if (ms) speechT = setTimeout(() => { speechLock = 0; el.textContent = plain(say ? say.line : defaultLine()); }, ms);
 }
@@ -1412,6 +1412,8 @@ $("pet").onclick = () => { sfx("purr"); hearts(2); speak(pick(["*leans into the 
 
 document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
 $("pclose").onclick = closePanel;
+// Speech bubbles close with a tap (the next thing anyone says brings them back)
+["speech", "npcSay", "evanSay"].forEach(id => $(id).addEventListener("click", ev => { ev.stopPropagation(); $(id).hidden = true; }));
 $("chatForm").onsubmit = e => { e.preventDefault(); const v = $("chatIn").value; $("chatIn").value = ""; sendChat(v); };
 $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);

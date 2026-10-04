@@ -225,6 +225,7 @@ details[open] summary::after{content:"–"}
 @keyframes pop2{0%{scale:.85;opacity:.4}70%{scale:1.03}100%{scale:1;opacity:1}}
 .speech.small{font-size:.85rem;padding:4px 10px 5px;border-radius:12px;max-width:none;white-space:nowrap}
 .speech[hidden]{display:none}
+#speech,#npcSay,#evanSay{pointer-events:auto;cursor:pointer}
 .ch .legL,.ch .legR,.ch .armL,.ch .armR{transform-box:fill-box;transform-origin:50% 0}
 .ch.walk .legL,.ch.walk .armR{animation:swingA .3s ease-in-out infinite alternate}
 .ch.walk .legR,.ch.walk .armL{animation:swingB .3s ease-in-out infinite alternate}

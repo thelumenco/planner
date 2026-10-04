@@ -425,6 +425,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(300);
   check(await page.locator('#world [aria-label="Pancake the village dog"]').count() === 1, "Pancake the dog minds the good news board");
+  await page.evaluate(() => { const e = document.getElementById("speech"); e.hidden = false; e.textContent = "hello"; });
+  await page.locator("#speech").click(); check(await page.locator("#speech").isHidden(), "a tap closes the speech bubble");
   await page.locator('#world [data-place="market"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-shop="animals"]', { timeout: 20000 });
   await page.click('#ctx [data-shop="animals"]');
