@@ -711,13 +711,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="home"]').dispatchEvent("click");
   await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-spot="desk"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-desk="mine"]', { timeout: 15000 });
+  await page.waitForSelector('#ctx [data-desk="refresh"]', { timeout: 15000 });
   await page.waitForSelector("#ctx .calday li", { timeout: 10000 }).catch(() => {});
   check(await page.locator("#ctx .calday li").count() >= 2, "the home desk shows today's calendar");
-  await page.click('#ctx [data-desk="mine"]'); await page.waitForTimeout(300);
+  await page.waitForFunction(() => /Dinner on Sunday/.test(document.querySelector("#ctx").textContent), null, { timeout: 10000 }).catch(() => {});
   check(/Dinner on Sunday/.test(await page.locator("#ctx").textContent()) && await page.evaluate(() => window.__zapier && window.__zapier.params.query.includes("category:primary") && !!window.__zapier.connection_id), "and the personal inbox, through Zapier (Primary only)");
-  await page.click('#ctx [data-desk="work"]'); await page.waitForTimeout(200);
-  check(/freshpages/.test(await page.locator("#ctx").textContent()), "and the work inbox");
+  check(/freshpages/.test(await page.locator("#ctx").textContent()) && /MUSE audit/.test(await page.locator("#ctx").textContent()), "and the work inbox, all on one page");
   await page.click("#pclose"); await page.click("#chatBtn");
   await page.fill("#chatIn", "remind me to get the laundry in in 1 hour"); await page.click("#chatForm button");
   await page.waitForFunction(() => [...document.querySelectorAll("#chatLog .did")].some(d => /Reminder at/.test(d.textContent)), null, { timeout: 10000 });

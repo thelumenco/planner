@@ -154,7 +154,7 @@ button{cursor:pointer}
 .tk{display:inline-block;width:15px;height:15px;margin-right:6px;vertical-align:-2px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3 3.5 Q10 2.6 16.6 3.2 Q17.3 10 16.8 16.7 Q10 17.4 3.3 16.9 Q2.6 10 3 3.5z' fill='%23FFFDF6' stroke='%233b3530' stroke-width='1.4' stroke-linejoin='round'/%3E%3Cpath d='M5.6 10.4 L8.6 13.4 L15.2 5.4' fill='none' stroke='%237FA36E' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
 .bujo li.tick::before{content:"";left:0;top:.2em;width:17px;height:17px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3 3.5 Q10 2.6 16.6 3.2 Q17.3 10 16.8 16.7 Q10 17.4 3.3 16.9 Q2.6 10 3 3.5z' fill='%23FFFDF6' stroke='%233b3530' stroke-width='1.4' stroke-linejoin='round'/%3E%3Cpath d='M5.6 10.4 L8.6 13.4 L15.2 5.4' fill='none' stroke='%237FA36E' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
 .bujo li.pep{font-family:"Klee One",serif;color:var(--soft)}
-.bujo li.pep::before{content:"♡";color:var(--rose)}
+.bujo li.pep{padding-left:30px}.bujo li.pep::before{content:"♡";color:var(--rose);left:2px}
 .bujo li.first::before{content:"→";color:var(--navy)}
 .hl{font-weight:700;background:linear-gradient(100deg,transparent 0,var(--butter) 3%,var(--butter) 96%,transparent 100%) 0 70%/100% 50% no-repeat;padding:0 3px;color:var(--ink)}
 .stickers{margin:-6px 0 18px;display:flex;flex-wrap:wrap;gap:8px}
@@ -1045,6 +1045,11 @@ body.kidmode .scenename span + span{display:none}
 .redit li{display:grid;grid-template-columns:1fr 28px;align-items:center;gap:6px}
 .redit .kdel{position:static}
 .rpaste{margin-top:10px}.rpaste textarea{width:100%;box-sizing:border-box;margin:6px 0;border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:8px 10px;font:inherit;color:#2F2B28}
+
+/* round buttons: icon outlines drawn plain and a touch bolder, so they never fade into the cream button */
+.hbtn .ico > g:last-child,.zoombtn .ico > g:last-child,.chatbtn .ico > g:last-child,.trk .ico > g:last-child{filter:none;stroke-width:1.5}
+.hbtn .ico > g:first-child,.zoombtn .ico > g:first-child{filter:none}
+.deskh{margin:16px 0 6px}.deskh small{letter-spacing:0;text-transform:none;font-weight:400;margin-left:6px}
 </style>
 </head>
 <body>
@@ -2916,7 +2921,7 @@ body.kidmode .scenename span + span{display:none}
       case "writedesk":
         return sk(
           `<rect x="${x - 50}" y="${y - 36}" width="100" height="14" rx="3" style="fill:${W2}"/><path d="M${x - 26} ${y - 44} l22 -4 l22 4 v8 l-22 -3 l-22 3z" style="fill:#FFFDF6"/><path d="M${x + 28} ${y - 62} h14 l5 14 h-24z" style="fill:var(--butter)"/>`,
-          `<rect x="${x - 50}" y="${y - 36}" width="100" height="14" rx="3"/>${legs(100, 22)}<path d="M${x - 26} ${y - 44} l22 -4 l22 4 v8 l-22 -3 l-22 3z M${x - 4} ${y - 48} v9"/><path d="M${x - 20} ${y - 41} h10 M${x + 2} ${y - 41} h12" opacity=".5"/><path d="M${x + 28} ${y - 62} h14 l5 14 h-24z M${x + 35} ${y - 48} v12 M${x + 30} ${y - 36} h10"/><path d="M${x + 10} ${y - 46} l12 -8" stroke-width="1.8"/>`
+          `<rect x="${x - 50}" y="${y - 36}" width="100" height="14" rx="3"/><path d="M${x - 44} ${y - 22} v30 M${x + 44} ${y - 22} v30"/><path d="M${x - 26} ${y - 44} l22 -4 l22 4 v8 l-22 -3 l-22 3z M${x - 4} ${y - 48} v9"/><path d="M${x - 20} ${y - 41} h10 M${x + 2} ${y - 41} h12" opacity=".5"/><path d="M${x + 28} ${y - 62} h14 l5 14 h-24z M${x + 35} ${y - 48} v12 M${x + 30} ${y - 36} h10"/><path d="M${x + 10} ${y - 46} l12 -8" stroke-width="1.8"/>`
         );
       // the planning table: a long wooden desk with an open planner and a little vase of flowers
       case "plantable":
@@ -6577,7 +6582,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   var ZAPIER = "Zapier";
   var ZAP_GMAIL = { selected_api: "GoogleMailV2CLIAPI", action: "message", tool_name: "gmail_find_email", connection_id: "0259b139-2fcc-8b64-a2ef-82ac9a87ed8c" };
   var PERSONAL_QUERY = "in:inbox category:primary is:unread newer_than:3d";
-  var st4 = { tab: "today", cal: null, mine: null, mineErr: null, busy: false };
+  var st4 = { cal: null, mine: null, mineErr: null, busy: false };
   var unwrap4 = (r) => {
     let p = r && r.payload !== void 0 ? r.payload : r;
     if (typeof p === "string") {
@@ -6619,13 +6624,23 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       st4.mineErr = e && e.code || "upstream_error";
     }
   }
-  async function loadDesk(fresh2) {
+  async function loadDesk(fresh2, rerender = () => {
+  }) {
     if (st4.busy) return;
     st4.busy = true;
-    await Promise.all([todaysEvents(dayKey(), fresh2).then((r) => {
-      st4.cal = r;
-    }), fetchPost(fresh2), fetchPersonal(fresh2)]);
+    await Promise.all([
+      todaysEvents(dayKey(), fresh2).then((r) => {
+        st4.cal = r;
+        rerender();
+      }).catch(() => {
+        st4.cal = { events: [], error: "upstream_error" };
+        rerender();
+      }),
+      fetchPost(fresh2).then(rerender).catch(rerender),
+      fetchPersonal(fresh2).then(rerender).catch(rerender)
+    ]);
     st4.busy = false;
+    rerender();
   }
   var ZAP_ERRORS = {
     unavailable: "Your personal inbox isn't reachable from this view.",
@@ -6645,33 +6660,21 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   var fmtT = (t2) => new Date(t2).toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore" }).replace(" ", "").toLowerCase();
   var letters = (list2, empty) => list2.length ? `<ul class="hlist post">${list2.map((t2) => `<li>${t2.url ? `<a href="${esc(t2.url)}" target="_blank" rel="noopener">` : "<span>"}<b>${esc(who2(t2.from))}</b><span>${esc(t2.subject)}</span><small>${esc(t2.snippet)}</small>${t2.url ? "</a>" : "</span>"}${t2.at ? `<small class="when">${ago3(t2.at)}</small>` : ""}</li>`).join("")}</ul>` : `<p class="muted">${empty}</p>`;
   function deskPanel() {
-    const tabs = [["today", "Today"], ["work", "Work inbox"], ["mine", "Personal inbox"]];
-    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Home desk</h2><p class="sub">A quick look at today, without going into town${st4.busy ? " · checking…" : ""}.</p>
-    <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-desk="${k}" aria-selected="${st4.tab === k}">${n}</button>`).join("")}</div>`;
-    if (st4.tab === "today") {
-      const r = st4.cal, now2 = Date.now();
-      if (!r) h += `<p class="muted">Opening your calendar…</p>`;
-      else if (r.error && !r.events.length) h += `<p class="muted">${esc(CAL_ERRORS[r.error] || "Couldn't reach your calendar just now.")}</p>`;
-      else if (!r.events.length) h += `<p class="muted">Nothing on the calendar today.</p>`;
-      else h += `<ol class="calday">${r.events.map((e) => `<li class="${!e.allDay && e.end && e.end < now2 ? "past" : ""}"><span class="when">${e.allDay ? "all day" : fmtT(e.start)}</span><span class="what"><i style="background:${e.color}"></i><b>${esc(plain(e.title) || e.title)}</b><small>${esc(e.cal)}</small></span></li>`).join("")}</ol>`;
-    } else if (st4.tab === "work") {
-      const c = postThreads();
-      h += `<p class="muted">Unread in mel@freshpages.co (Primary).</p>` + (c.error && !c.threads.length ? `<p class="muted">${esc(POST_ERRORS[c.error] || "Couldn't fetch it just now.")}</p>` : letters(c.threads, "Nothing unread. Lovely."));
-    } else {
-      h += `<p class="muted">Unread in baymelody@gmail.com (Primary, last 3 days), through Zapier.</p>` + (st4.mineErr && !st4.mine ? `<p class="muted">${esc(ZAP_ERRORS[st4.mineErr] || "Couldn't fetch it just now.")}</p>` : !st4.mine ? `<p class="muted">Checking…</p>` : letters(st4.mine, "Nothing unread in your personal inbox."));
-    }
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Home desk</h2><p class="sub">Today's calendar and both inboxes, without going into town${st4.busy ? " · checking…" : ""}.</p>`;
+    const r = st4.cal, now2 = Date.now();
+    h += `<p class="eyebrow deskh">Today</p>` + (!r ? `<p class="muted">Opening your calendar…</p>` : r.error && !r.events.length ? `<p class="muted">${esc(CAL_ERRORS[r.error] || "Couldn't reach your calendar just now.")}</p>` : !r.events.length ? `<p class="muted">Nothing on the calendar today.</p>` : `<ol class="calday">${r.events.map((e) => `<li class="${!e.allDay && e.end && e.end < now2 ? "past" : ""}"><span class="when">${e.allDay ? "all day" : fmtT(e.start)}</span><span class="what"><i style="background:${e.color}"></i><b>${esc(plain(e.title) || e.title)}</b><small>${esc(e.cal)}</small></span></li>`).join("")}</ol>`);
+    const c = postThreads();
+    h += `<p class="eyebrow deskh">Work inbox <small>mel@freshpages.co</small></p>` + (c.busy && !c.threads.length && !c.at ? `<p class="muted">Checking…</p>` : c.error && !c.threads.length ? `<p class="muted">${esc(POST_ERRORS[c.error] || "Couldn't fetch it just now.")}</p>` : letters(c.threads, "Nothing unread. Lovely."));
+    h += `<p class="eyebrow deskh">Personal inbox <small>baymelody@gmail.com</small></p>` + (st4.mineErr && !st4.mine ? `<p class="muted">${esc(ZAP_ERRORS[st4.mineErr] || "Couldn't fetch it just now.")}</p>` : !st4.mine ? `<p class="muted">Checking…</p>` : letters(st4.mine, "Nothing unread in your personal inbox."));
     return h + `<div class="actions"><button class="btn alt small" data-desk="refresh">Refresh</button><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function wireDesk(root, rerender) {
     root.querySelectorAll("[data-desk]").forEach((b) => b.onclick = () => {
       const k = b.dataset.desk;
       if (k === "refresh") {
-        loadDesk(true).then(rerender);
+        loadDesk(true, rerender);
         rerender();
-        return;
       }
-      st4.tab = k;
-      rerender();
     });
   }
 
@@ -10448,7 +10451,7 @@ Then tell chat "wind down" whenever you're ready.`
       deskOpen = true;
       sfx("paper", true);
       render();
-      loadDesk().then(() => {
+      loadDesk(false, () => {
         if (deskOpen) ctx();
       });
       return;

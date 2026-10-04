@@ -407,3 +407,14 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - Storage is a private per-user doc "kudos", merged by id like the journal, with a localStorage copy. The board on the wall shows up to eight little notes.
 - Chat action `kudos_add` lets Mel tell Maple a compliment and have it pinned. Places "kind words" and "compliments" walk there.
 - Weekly nudge: walking into the town hall when the board has 3+ notes and hasn't been opened for 7 days, Maple suggests a read (once a day; silenced by quiet mode). `F.kudosSeen` tracks the last visit.
+
+### Round 33: My routines, small fixes
+- **My routines** (`routines.js`): a noticeboard on the back wall of Mel's room (station `routines`, slot N [388,132]). Two kinds of routine:
+  - **Checklist:** ticked daily and fresh every morning. Seeded with a starter "Morning routine" Mel can edit.
+  - **Weekly:** one step per weekday, with today's step as a big tick button and the week listed below. Seeded as an empty "Beauty routine"; Mel's real one isn't in Notion or this repo, so she pastes it in.
+- Editing: rename, switch kind, edit or add steps, remove a step or a whole routine (with Undo). "Paste your whole week" parses lines like "Mon: …" or "Tuesday - …".
+- Storage is a private doc "routines": lists merge by id, newest wins; ticks are kept per day and per item with timestamps.
+- Chat action `routine_set` (name plus days or items). In the morning, Maple mentions today's weekly step or the morning checklist count when Mel walks into her room (once a day; respects quiet mode).
+- The bought "Little bookshelf" in Mel's room moved to the left of the flower print so it doesn't overlap the board.
+- **Home desk:** today's calendar, the work inbox and the personal inbox now sit on one page (no tabs), each filling in as soon as its source answers.
+- The writing desk's legs now meet the desktop. Round-button icons draw their outlines without the wobble filter and slightly bolder (some Android phones dropped them). The heart bullet in the quest note has room before the text.

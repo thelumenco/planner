@@ -1543,7 +1543,7 @@ function arriveSpot(id){
     const t = remaining()[0];
     if (placeOf(t) === scene && spotOf(t) === id && !S.arrived[t.id]) { S.arrived[t.id] = true; setSay(`Here at the ${spotObj(scene, id).name.toLowerCase()}. First tiny step…`); save(); return; }
   }
-  if (scene === "home" && id === "desk") { deskOpen = true; sfx("paper", true); render(); loadDesk().then(() => { if (deskOpen) ctx(); }); return; }   // calendar and both inboxes
+  if (scene === "home" && id === "desk") { deskOpen = true; sfx("paper", true); render(); loadDesk(false, () => { if (deskOpen) ctx(); }); return; }   // calendar and both inboxes
   if (scene === "hall" && id === "kudos") { kudosOpen = true; kv.mode = "board"; F.kudosSeen = Date.now(); sfx("paper", true); speak(kudosCount() ? "All the lovely things people have said about you." : "Pin up the nice things people say. Future you will thank you.", 3500); save(); return; }
   if (scene === "hall" && id === "whiteboard") { scratchOpen = true; sfx("paper", true); render(); return; }   // the whiteboard is Mel's scratchpad
   if (scene === "hall" && id === "revenue") { revOpen = true; sfx("paper", true); render(); loadRevenue().then(() => { if (revOpen) ctx(); }); return; }   // income from Chord
