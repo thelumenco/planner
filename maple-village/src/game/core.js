@@ -1563,11 +1563,11 @@ function arriveVillageSpot(id){
 }
 /* ---------- Evan's room: Evan is the one who moves. Nothing here saves or earns. ---------- */
 function kidTap(ev){
+  if (ev.target.closest("[data-exit]")) { leaveKidRoom(); return; }   // the door always works, even while Evan sleeps
   if (kid.sleep) {
     if (evanNight()) { evanSays("shh… sleeping"); return; }   // bedtime: he stays asleep
     kid.sleep = false; evan.x = evan.tx = 230; evan.y = evan.ty = 340; drawScene(); evanSays(pickSay(["morning!", "awake!", "*yawn*"])); sfx("chime"); return;
   }
-  if (ev.target.closest("[data-exit]")) { leaveKidRoom(); return; }
   const ent = ev.target.closest("[data-ent]");
   if (ent && ent.dataset.ent === "mel") { evan.tx = mel.x + 18; evan.ty = mel.y + 4; evan.run = true; kid.pending = null; evanSays("Mama!"); mprop("heart", mel.x, mel.y - 50); return; }
   if (ent && ent.dataset.ent === "evan" && hug && hug.phase === "ask") { hugBack(); return; }

@@ -10245,6 +10245,10 @@ Then tell chat "wind down" whenever you're ready.`
     }
   }
   function kidTap(ev) {
+    if (ev.target.closest("[data-exit]")) {
+      leaveKidRoom();
+      return;
+    }
     if (kid.sleep) {
       if (evanNight()) {
         evanSays("shh… sleeping");
@@ -10256,10 +10260,6 @@ Then tell chat "wind down" whenever you're ready.`
       drawScene();
       evanSays(pickSay(["morning!", "awake!", "*yawn*"]));
       sfx("chime");
-      return;
-    }
-    if (ev.target.closest("[data-exit]")) {
-      leaveKidRoom();
       return;
     }
     const ent = ev.target.closest("[data-ent]");

@@ -793,6 +793,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator("#world").click({ position: { x: 200, y: 500 } }); await page.waitForTimeout(300);
   check(await page.locator("#world .zz").count() >= 1 && /shh/.test(await page.locator("#evanSay").textContent()), "at night he's asleep in his car bed, and stays asleep");
   await page.screenshot({ path: join(shots, "evan-room-night.png") });
+  await page.locator('#world [data-exit]').dispatchEvent("click");
+  await page.waitForFunction(() => !/Evan's room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 5000 }).catch(() => {});
+  check(!/Evan's room/.test(await page.locator("#sceneName").textContent()), "the door still works while he's asleep");
   await page.close();
 }
 {
