@@ -301,4 +301,9 @@ Round 15 (talk to Maple):
 Round 16 (post box):
 - A post box (pigeonholes, against the back wall) in the post office lists unread Primary mail from the Gmail connector (`game/postbox.js`, `search_threads`, `is:unread in:inbox category:primary`, read-only). The connector is Mel's work inbox. Each row opens the thread in Gmail; "Check again" refreshes. Filled pigeonholes show how many are waiting. Manifest now: Sunsama MCP read_resource, Google Calendar list_events, Gmail search_threads, plus sample, db, user.
 
+Round 17 (reports from other routines, `game/feeds.js`):
+- `health-chord` / `health-chico` docs (written by the nightly bug checks): a standing health sign in the Chord workshop and Chico cottage (three lights, status word; tap for each check and a link to the founder room) and a light on each building in the town square. Older than 36 h is flagged as stale.
+- `content-chord` / `content-ambidextrous` docs (written by the content calendars): the calendar panel has Today and Content tabs; Content lists the next 14 days, both brands or one, view-only.
+- Paste-in steps for those four routines: ROUTINE-STEPS.md sections 6-9.
+
 Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lines; Hestia's custom lists, rhythm notes, equipment/energy filters and reminders weren't carried over.

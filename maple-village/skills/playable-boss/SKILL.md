@@ -84,7 +84,7 @@ Mel has a companion page with a tiny fox called Maple (she may rename it — use
 
 **User-count gardens.** When Mel shares Chord or Chico user numbers (or a connector exposes them), write `doc_id: "stats"` as `{ "chord": { "users": 142 }, "chico": { "users": 58 } }` (optional `"per"`: users per flower, default 10). Flower patches outside each building grow with the count.
 
-**At the end of the day,** read the page's `today` document and fold its finished tasks, the clean and her step total into the wins recap (section 7). Never write to the `today` or `fox` documents. Those belong to the page. Chat owns `plan`, `mail`, `library` and `stats`. The `hestia` doc (home chores and pantry) also belongs to the page.
+**At the end of the day,** read the page's `today` document and fold its finished tasks, the clean and her step total into the wins recap (section 7). Never write to the `today` or `fox` documents. Those belong to the page. Chat owns `plan`, `mail`, `library` and `stats`. The `hestia` doc (home chores and pantry) also belongs to the page. Bug checks write `health-chord` / `health-chico` and content calendars write `content-chord` / `content-ambidextrous` (shapes in ROUTINE-STEPS.md); each run replaces its own doc.
 
 If the Artifact tool or the page's data isn't available on this surface, say so in half a line and run boss mode in chat as usual.
 

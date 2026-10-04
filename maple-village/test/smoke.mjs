@@ -363,6 +363,44 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.screenshot({ path: join(shots, "postbox.png") });
   await page.close();
 }
+// Feeds from other routines: bug-check health signs and the content calendars
+{
+  console.log("\nfeeds");
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  page.on("pageerror", e => errors.push(`feeds pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&nosample=1&time=10:30&date=2026-10-05");
+  await page.waitForTimeout(500);
+  await page.evaluate(() => {
+    const at = Date.now();
+    localStorage.setItem("stub:data/users/me/health-chord", JSON.stringify({app: "chord", at, status: "amber", headline: "211 of 212 tests green",
+      checks: [{name: "Unit tests", state: "pass", detail: "212/212"}, {name: "E2E onboarding", state: "warn", detail: "1 flaky"}, {name: "Errors (24h)", state: "pass", detail: "0 new"}], link: "https://claude.ai/artifact/P5hPqeNgPURfqecbbXMpxd"}));
+    const d = k => { const x = new Date(Date.now() + (window.__mapleOffset || 0) + 8*3600e3 - 2*3600e3); x.setUTCDate(x.getUTCDate() + k); return x.toISOString().slice(0, 10); };
+    localStorage.setItem("stub:data/users/me/content-chord", JSON.stringify({brand: "chord", at, items: [{date: d(0), time: "09:00", channel: "Instagram", title: "3 signs your client portal is costing you", status: "scheduled"}, {date: d(2), channel: "Blog", title: "HoneyBook alternatives outside the US", status: "draft"}]}));
+    localStorage.setItem("stub:data/users/me/content-ambidextrous", JSON.stringify({brand: "ambidextrous", at, items: [{date: d(1), channel: "LinkedIn", title: "What I do and what Claude does", status: "idea"}]}));
+  });
+  await page.goto(url + "?nosample=1&time=10:30&date=2026-10-05");
+  await page.waitForTimeout(700);
+  await page.click('[data-open="cal"]');
+  await page.click('[data-caltab="content"]');
+  check(await page.locator("#calBody .hlist.content li").count() === 3, "the content tab shows both calendars' next two weeks");
+  await page.click('[data-cbrand="chord"]');
+  check(await page.locator("#calBody .hlist.content li").count() === 2, "and can show one brand at a time");
+  await page.screenshot({ path: join(shots, "content-calendar.png") });
+  await page.click("#pclose");
+  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(300);
+  check(await page.locator('#sceneArt circle[fill="#F3B54A"]').count() >= 1, "the Chord building wears an amber light in the town square");
+  await page.locator('#world [data-place="chord"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Chord/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(400);
+  check(await page.locator("#sceneArt").textContent().then(t => /WATCH/.test(t)), "the health sign in the Chord workshop reads the bug check");
+  await page.locator('#world [data-spot="status"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Chord health/.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
+  check(await page.locator("#ctx .hlist.checks li").count() === 3, "tapping the sign shows each check");
+  await page.screenshot({ path: join(shots, "health-sign.png") });
+  await page.close();
+}
 // Sunsama pull: no chat plan, the page fetches today's tasks itself
 {
   console.log("\nsunsama pull");

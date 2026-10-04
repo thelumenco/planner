@@ -329,3 +329,11 @@
 .hlist.post a span{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hlist.post a small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hlist.post .when{flex:none;padding-top:2px}
+/* health signs + content calendar */
+.hstatus{display:flex;align-items:center;gap:8px;margin:2px 0 4px;font-size:1rem}
+.hstatus i,.hlist.checks i,.hlist.content i{width:11px;height:11px;border-radius:50%;flex:none;display:inline-block;box-shadow:0 0 0 1.5px rgba(60,40,30,.25)}
+.hlist.content a{color:#2F3B73;text-decoration:none;font-weight:600}
+.hlist.content span:not(.hbadge){display:grid;gap:1px;flex:1;min-width:0}
+.hbadge.sched{color:#3F5E9A;background:#E3EAF8}
+.cday{margin:12px 0 2px}
+.cfilter button[aria-pressed="true"]{background:var(--peri);color:#2F3B73;border-color:transparent}

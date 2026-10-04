@@ -771,6 +771,14 @@ body.nb-open{overflow:hidden}
 .hlist.post a span{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hlist.post a small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hlist.post .when{flex:none;padding-top:2px}
+/* health signs + content calendar */
+.hstatus{display:flex;align-items:center;gap:8px;margin:2px 0 4px;font-size:1rem}
+.hstatus i,.hlist.checks i,.hlist.content i{width:11px;height:11px;border-radius:50%;flex:none;display:inline-block;box-shadow:0 0 0 1.5px rgba(60,40,30,.25)}
+.hlist.content a{color:#2F3B73;text-decoration:none;font-weight:600}
+.hlist.content span:not(.hbadge){display:grid;gap:1px;flex:1;min-width:0}
+.hbadge.sched{color:#3F5E9A;background:#E3EAF8}
+.cday{margin:12px 0 2px}
+.cfilter button[aria-pressed="true"]{background:var(--peri);color:#2F3B73;border-color:transparent}
 </style>
 </head>
 <body>
@@ -1066,7 +1074,8 @@ body.nb-open{overflow:hidden}
           <div id="friendBody"></div>
         </div>
         <div class="pview" id="calView" hidden>
-          <h2>Today</h2>
+          <h2 id="calTitle">Today</h2>
+          <div class="tabs" role="tablist" id="calTabs"><button role="tab" data-caltab="today" aria-selected="true">Today</button><button role="tab" data-caltab="content" aria-selected="false">Content</button></div>
           <div id="calBody"></div>
         </div>
         <div class="pview" id="chatView" hidden>
@@ -1408,11 +1417,12 @@ body.nb-open{overflow:hidden}
       ["phone", "Phone booth", "D", "phone", /call|meeting|zoom|coffee|interview|podcast|sync/, "Quiet booth for calls."],
       ["shelf", "Bookshelf", "A", "shelf", /read|research|learn|course|study/, "Smart books, cosy spines."]
     ] },
-    chord: { name: "Chord workshop", wall: "#E9F0E2", trim: "var(--sage)", pos: { A: [130, 218], B: [390, 420], C: [420, 262], D: [120, 540] }, stations: [
+    chord: { name: "Chord workshop", wall: "#E9F0E2", trim: "var(--sage)", pos: { A: [130, 218], B: [390, 420], C: [420, 262], D: [120, 540], E: [262, 336] }, stations: [
       ["bench", "Workbench", "A", "bench", /build|code|fix|bug|feature|ship|deploy|test|app|flow/, "Tools out. Let's build."],
       ["press", "Printing press", "B", "press", /post|content|social|marketing|launch|campaign|newsletter|reel/, "Hot off the press."],
       ["wall", "Client wall", "C", "cork", /client|user|customer|support|feedback|onboard|lead/, "Every face here is a creative you're helping."],
-      ["laptop", "Laptop desk", "D", "desk", /./, "The Chord dashboard awaits."]
+      ["laptop", "Laptop desk", "D", "desk", /./, "The Chord dashboard awaits."],
+      ["status", "Health sign", "E", "healthchord", null, "Last night's Chord bug check."]
     ] },
     fresh: { name: "Fresh Pages library", wall: "#F6E8DC", trim: "var(--peach)", pos: { A: [110, 540], B: [410, 540], C: [420, 250], D: [260, 420], E: [100, 262] }, stations: [
       ["desk", "Writing desk", "A", "desk", /write|draft|blog|article|essay|journal/, "Pen, paper, quiet."],
@@ -1421,11 +1431,12 @@ body.nb-open{overflow:hidden}
       ["bigtable", "Client table", "D", "table", /proposal|client|plan|brief|contract|onboard/, "Room for spreading out."],
       ["digest", "Digest shelf", "E", "bookcase", null, "Juniper's shelf of book digests."]
     ] },
-    chico: { name: "Chico cottage", wall: "#F7E3E6", trim: "var(--blush)", pos: { A: [400, 530], B: [420, 262], C: [130, 530], D: [130, 320] }, stations: [
+    chico: { name: "Chico cottage", wall: "#F7E3E6", trim: "var(--blush)", pos: { A: [400, 530], B: [420, 262], C: [130, 530], D: [130, 320], E: [290, 350] }, stations: [
       ["laptop", "Laptop desk", "A", "desk", /build|fix|app|code|feature|bug|test|ship/, "Chico's engine room."],
       ["shelf", "Craft shelf", "B", "craft", /design|brand|content|post|icon|copy/, "Colours, stickers, ideas."],
       ["sofa", "Cosy sofa", "C", "sofa", /user|beta|tester|feedback|call|interview|parent/, "Perfect for chats with parents."],
-      ["kitchen", "Kitchen table", "D", "table", /plan|family|schedule|meal|roadmap/, "Where family plans happen."]
+      ["kitchen", "Kitchen table", "D", "table", /plan|family|schedule|meal|roadmap/, "Where family plans happen."],
+      ["status", "Health sign", "E", "healthchico", null, "Last night's Chico bug check."]
     ] },
     post: { name: "Post office", wall: "#E3EEF5", trim: "var(--sky)", pos: { A: [260, 340], B: [436, 258], C: [400, 530], D: [110, 216], E: [344, 250] }, stations: [
       ["counter", "Sorting counter", "A", "counter", /email|inbox|reply|message|dm|respond/, "Letters in, letters out."],
@@ -1812,10 +1823,10 @@ body.nb-open{overflow:hidden}
   }
   var flowers = (pts) => pts.map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="2.6" style="fill:${c}"/><circle cx="${x}" cy="${y}" r="1" fill="#FFF6D8"/>`).join("");
   function villageArt() {
-    const D = VILLAGE;
+    const D2 = VILLAGE;
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="120" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="420" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="200" cy="560" rx="80" ry="40" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M260 322 L260 ${D.hall.door[1]} M260 322 C200 300 120 290 ${D.chord.door[0]} ${D.chord.door[1]} M260 322 C320 300 400 290 ${D.fresh.door[0]} ${D.fresh.door[1]} M260 322 C200 380 110 430 ${D.chico.door[0]} ${D.chico.door[1]} M260 322 C320 380 410 420 ${D.post.door[0]} ${D.post.door[1]} M260 322 L260 ${D.toBase.door[1]} M260 540 C290 560 310 570 ${D.bench.door[0]} ${D.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M260 322 L260 ${D2.hall.door[1]} M260 322 C200 300 120 290 ${D2.chord.door[0]} ${D2.chord.door[1]} M260 322 C320 300 400 290 ${D2.fresh.door[0]} ${D2.fresh.door[1]} M260 322 C200 380 110 430 ${D2.chico.door[0]} ${D2.chico.door[1]} M260 322 C320 380 410 420 ${D2.post.door[0]} ${D2.post.door[1]} M260 322 L260 ${D2.toBase.door[1]} M260 540 C290 560 310 570 ${D2.bench.door[0]} ${D2.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
     ${flowers([[30, 262, "#EFA3A6"], [44, 270, "#F3C969"], [150, 206, "#C3CDEE"], [372, 206, "#EFA3A6"], [488, 270, "#F3C969"], [300, 448, "#EFA3A6"], [214, 450, "#C3CDEE"], [470, 540, "#C3CDEE"], [20, 430, "#F3C969"], [505, 380, "#EFA3A6"]])}
     ${tree(170, 64, 1)}${tree(350, 64, 1)}${tree(26, 96, 1.05)}${tree(494, 96, 1.05)}${tree(24, 350, 0.9)}${tree(498, 330, 0.9)}${tree(504, 520, 0.85)}${tree(190, 470, 0.8)}${tree(330, 470, 0.8)}
@@ -1832,7 +1843,13 @@ body.nb-open{overflow:hidden}
         <circle cx="350" cy="317" r="3.2" style="fill:var(--rose)"/><circle cx="362" cy="317" r="3.2" style="fill:var(--butter)"/><circle cx="374" cy="317" r="3.2" style="fill:var(--sage)"/></g>
       ${tapeLabel(362, 358, "Market", "var(--blush)", 11)}</g>
     ${townRiver()}`;
-    return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 26, 536, 8, 2, 12) + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
+    const L = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
+    const light = (app, x, y) => {
+      const h = G.health ? G.health(app) : null;
+      if (!h) return "";
+      return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`;
+    };
+    return ground + places + light("chord", 140, 196) + light("chico", 138, 436) + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 26, 536, 8, 2, 12) + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
   }
   var waterBand = (y1, y2) => `<path d="M0 ${y1 + 4} Q65 ${y1 - 4} 130 ${y1 + 3} T260 ${y1 + 2} T390 ${y1 + 4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2 + 5} 390 ${y2 - 2} T260 ${y2} T130 ${y2 - 3} T0 ${y2 + 2}`}z" style="fill:var(--water)"/>`;
   function bridge(id, x, y1, y2, label, tapeX, tapeY, size) {
@@ -1854,7 +1871,7 @@ body.nb-open{overflow:hidden}
       ${sk(`<rect x="314" y="560" width="40" height="7" rx="2" style="fill:var(--wood)"/><rect x="314" y="548" width="40" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="314" y="560" width="40" height="7" rx="2"/><rect x="314" y="548" width="40" height="6" rx="2"/><path d="M318 554 v6 M350 554 v6 M318 567 v9 M350 567 v9"/>`)}</g>`;
   }
   function baseArt() {
-    const D = VILLAGE;
+    const D2 = VILLAGE;
     const grown = (G.F().plots || []).filter((p) => p && p.crop).length;
     const sprouts = Array.from({ length: Math.min(6, grown) }, (_, i) => {
       const x = 58 + i % 3 * 44, y = 430 + Math.floor(i / 3) * 24;
@@ -1866,7 +1883,7 @@ body.nb-open{overflow:hidden}
     <g filter="url(#wob)">${waterBand(40, 98)}<path d="M478 94 C470 180 500 300 470 400 C462 430 458 450 452 474" fill="none" style="stroke:var(--water)" stroke-width="14" stroke-linecap="round"/></g>
     ${ripples([[60, 66], [150, 78], [350, 62], [420, 80]])}
     <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 44 Q65 36 130 43 T260 42 T390 44 T520 40 M0 100 Q65 104 130 95 T260 98 T390 96 T520 102"/></g>
-    <g filter="url(#wob)"><path d="M260 112 L260 ${D.home.door[1]} M260 326 C200 360 130 420 ${D.farm.door[0]} ${D.farm.door[1]} M260 326 C290 420 300 500 ${D.pond.door[0]} ${D.pond.door[1]} M266 312 C330 300 390 290 ${D.shed.door[0]} ${D.shed.door[1]} M254 318 C200 320 150 320 ${D.swing.door[0]} ${D.swing.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M260 112 L260 ${D2.home.door[1]} M260 326 C200 360 130 420 ${D2.farm.door[0]} ${D2.farm.door[1]} M260 326 C290 420 300 500 ${D2.pond.door[0]} ${D2.pond.door[1]} M266 312 C330 300 390 290 ${D2.shed.door[0]} ${D2.shed.door[1]} M254 318 C200 320 150 320 ${D2.swing.door[0]} ${D2.swing.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
       <ellipse cx="260" cy="322" rx="44" ry="20" style="fill:var(--path)"/></g>
     ${flowers([[30, 140, "#EFA3A6"], [44, 150, "#F3C969"], [200, 140, "#C3CDEE"], [330, 150, "#EFA3A6"], [488, 180, "#F3C969"], [214, 410, "#EFA3A6"], [200, 470, "#C3CDEE"], [160, 600, "#F3C969"], [176, 612, "#EFA3A6"], [300, 620, "#C3CDEE"], [24, 520, "#F3C969"], [372, 600, "#EFA3A6"], [400, 170, "#C3CDEE"]])}
     ${tree(26, 370, 0.9)}${tree(500, 610, 0.9)}${tree(26, 620, 0.95)}${tree(360, 180, 0.8)}`;
@@ -2012,6 +2029,16 @@ body.nb-open{overflow:hidden}
           `<rect x="${x - 24}" y="${y - 74}" width="48" height="74" rx="8" style="fill:var(--sock)"/><rect x="${x - 17}" y="${y - 66}" width="34" height="58" rx="4" style="fill:#6B5A52"/><rect x="${x - 30}" y="${y - 96}" width="60" height="16" rx="4" style="fill:var(--peri)"/><rect x="${x - 14}" y="${y - 93}" width="20" height="9" rx="2" style="fill:#DCE8C8"/>`,
           `<rect x="${x - 24}" y="${y - 74}" width="48" height="74" rx="8"/><path d="M${x - 17} ${y - 56} h34 M${x - 17} ${y - 44} h34 M${x - 17} ${y - 32} h34 M${x - 17} ${y - 20} h34" opacity=".45"/><path d="M${x - 26} ${y - 80} v28 M${x + 26} ${y - 80} v28" stroke-width="2.4"/><rect x="${x - 30}" y="${y - 96}" width="60" height="16" rx="4"/><rect x="${x - 14}" y="${y - 93}" width="20" height="9" rx="2"/><text x="${x - 4}" y="${y - 86}" text-anchor="middle" font-family="Klee One,serif" font-size="7" stroke="none" style="fill:var(--line)">1.2</text>`
         );
+      case "healthchord":
+      case "healthchico": {
+        const h = G && G.health ? G.health(kind.slice(6)) : null, L = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
+        const st = h ? h.status : "grey", word = { green: "ALL GOOD", amber: "WATCH", red: "NEEDS YOU", grey: "NO REPORT" }[st];
+        const lights = (h && h.checks.length ? h.checks.slice(0, 3).map((c) => c.state) : [st, st, st]).map((c, i) => `<circle cx="${x - 18 + i * 18}" cy="${y - 62}" r="6" style="fill:${L[c]}"/>`).join("");
+        return sk(
+          `<rect x="${x - 3}" y="${y - 30}" width="6" height="30" style="fill:var(--wood)"/><rect x="${x - 34}" y="${y - 80}" width="68" height="52" rx="5" style="fill:#FFFDF6"/>${lights}`,
+          `<rect x="${x - 34}" y="${y - 80}" width="68" height="52" rx="5"/><path d="M${x - 3} ${y - 28} v28 M${x + 3} ${y - 28} v28 M${x - 12} ${y} h24"/>${lights.replace(/ style="[^"]*"/g, "")}`
+        ) + `<text x="${x}" y="${y - 38}" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="800" font-size="9" letter-spacing=".6" style="fill:${L[st] === L.grey ? "var(--line)" : L[st]}">${word}</text>`;
+      }
       case "pobox": {
         let c = "";
         for (let r = 0; r < 3; r++) for (let i = 0; i < 2; i++) c += `<rect x="${x - 20 + i * 21}" y="${y - 80 + r * 24}" width="19" height="20" rx="1" style="fill:${G && G.postCount && G.postCount() > r * 2 + i ? "#FFFDF6" : "#9C7A5C"}"/>`;
@@ -3386,6 +3413,99 @@ Quests finished today: ${S3.doneIds.length}`;
     return h;
   }
 
+  // src/game/feeds.js
+  var APPS = { chord: { name: "Chord", room: "chord" }, chico: { name: "Chico", room: "chico" } };
+  var BRANDS = { chord: { name: "Chord", color: "var(--sage)" }, ambidextrous: { name: "Ambidextrous", color: "var(--peri)" } };
+  var DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous"];
+  var KEY2 = "fox.feeds";
+  var D = (() => {
+    try {
+      return JSON.parse(localStorage.getItem(KEY2)) || {};
+    } catch {
+      return {};
+    }
+  })();
+  var onChange = () => {
+  };
+  function attachFeeds(col, changed) {
+    onChange = changed;
+    DOCS.forEach((id) => col.doc(id).onSnapshot((snap) => {
+      D[id] = snap.exists ? snap.data() || null : null;
+      try {
+        localStorage.setItem(KEY2, JSON.stringify(D));
+      } catch {
+      }
+      onChange(id);
+    }, () => {
+    }));
+  }
+  var STATE = (s) => /fail|red|error|down/i.test(s || "") ? "red" : /warn|amber|flaky|slow|skip/i.test(s || "") ? "amber" : /pass|ok|green|up|healthy/i.test(s || "") ? "green" : "grey";
+  function health(app) {
+    const d = D["health-" + app];
+    if (!d || !d.at) return null;
+    const checks = (Array.isArray(d.checks) ? d.checks : []).slice(0, 12).map((c) => ({ name: plain(String(c.name || "")).slice(0, 60), state: STATE(c.state), detail: plain(String(c.detail || "")).slice(0, 120) }));
+    const worst = checks.some((c) => c.state === "red") ? "red" : checks.some((c) => c.state === "amber") ? "amber" : "green";
+    const status = d.status ? STATE(d.status) : checks.length ? worst : "grey";
+    return { status, headline: plain(String(d.headline || "")).slice(0, 120), checks, at: +d.at, stale: Date.now() - d.at > 36 * 36e5, link: /^https:\/\//.test(d.link || "") ? d.link : "" };
+  }
+  var LIGHT = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
+  var ago2 = (ms) => {
+    const m = Math.round((Date.now() - ms) / 6e4);
+    return m < 60 ? `${Math.max(1, m)} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago`;
+  };
+  function healthPanel(app) {
+    const a = APPS[app], h = health(app);
+    let s = `<span class="tape stripe" aria-hidden="true"></span><h2>${a.name} health</h2>`;
+    if (!h) return s + `<p class="sub">No report yet. When the ${a.name} nightly bug check runs, its results land here.</p>`;
+    const word = { green: "All good", amber: "Keep an eye on it", red: "Needs you", grey: "Unknown" }[h.status];
+    s += `<p class="hstatus"><i style="background:${LIGHT[h.status]}"></i><b>${word}</b>${h.headline ? ` · ${esc(h.headline)}` : ""}</p>
+    <p class="sub">Checked ${ago2(h.at)}${h.stale ? " (that's a while: did tonight's check run?)" : ""}.</p>`;
+    if (h.checks.length) s += `<ul class="hlist checks">${h.checks.map((c) => `<li><i style="background:${LIGHT[c.state]}"></i><span>${esc(c.name)}${c.detail ? ` <small>${esc(c.detail)}</small>` : ""}</span></li>`).join("")}</ul>`;
+    if (h.link) s += `<div class="actions"><a class="btn small alt" href="${esc(h.link)}" target="_blank" rel="noopener">Open the ${a.name} founder room</a></div>`;
+    return s;
+  }
+  function contentItems() {
+    const out = [];
+    Object.keys(BRANDS).forEach((b) => {
+      const d = D["content-" + b];
+      (d && d.items || []).forEach((it) => {
+        if (!it || !/^\d{4}-\d{2}-\d{2}$/.test(it.date || "")) return;
+        out.push({
+          brand: b,
+          date: it.date,
+          time: /^\d{1,2}:\d{2}$/.test(it.time || "") ? it.time : "",
+          channel: plain(String(it.channel || "")).slice(0, 30),
+          title: plain(String(it.title || "")).slice(0, 140),
+          status: plain(String(it.status || "")).toLowerCase().slice(0, 20),
+          link: /^https:\/\//.test(it.link || "") ? it.link : ""
+        });
+      });
+    });
+    return out.sort((x, y) => (x.date + x.time).localeCompare(y.date + y.time));
+  }
+  var contentUpdated = () => Object.keys(BRANDS).map((b) => D["content-" + b] && D["content-" + b].at).filter(Boolean);
+  var brandFilter = "all";
+  function contentHTML() {
+    const today2 = dayKey(), end = new Date(Date.parse(today2 + "T00:00:00Z") + 14 * 864e5).toISOString().slice(0, 10);
+    const all = contentItems().filter((i) => i.date >= today2 && i.date < end && (brandFilter === "all" || i.brand === brandFilter));
+    let h = `<div class="chips cfilter">${[["all", "Both"], ...Object.entries(BRANDS).map(([k, v]) => [k, v.name])].map(([k, n]) => `<button type="button" data-cbrand="${k}" aria-pressed="${brandFilter === k}">${esc(n)}</button>`).join("")}</div>`;
+    if (!contentUpdated().length) return h + `<p class="muted">No content calendars have reported in yet. Once the Chord and Ambidextrous calendars send their plans, the next two weeks show here.</p>`;
+    if (!all.length) return h + `<p class="muted">Nothing planned in the next two weeks${brandFilter === "all" ? "" : " for " + BRANDS[brandFilter].name}.</p>`;
+    const days = {};
+    all.forEach((i) => (days[i.date] = days[i.date] || []).push(i));
+    h += Object.keys(days).map((d) => {
+      const dt = /* @__PURE__ */ new Date(d + "T00:00:00Z");
+      return `<p class="eyebrow cday">${d === today2 ? "Today" : dt.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" })}</p><ul class="hlist content">${days[d].map((i) => `<li><i style="background:${BRANDS[i.brand].color}" title="${BRANDS[i.brand].name}"></i><span>${i.link ? `<a href="${esc(i.link)}" target="_blank" rel="noopener">${esc(i.title)}</a>` : esc(i.title)}<small>${esc(BRANDS[i.brand].name)}${i.channel ? " · " + esc(i.channel) : ""}${i.time ? " · " + esc(i.time) : ""}</small></span>${i.status ? `<span class="hbadge${/posted|published|done/.test(i.status) ? "" : /sched/.test(i.status) ? " sched" : " now"}">${esc(i.status)}</span>` : ""}</li>`).join("")}</ul>`;
+    }).join("");
+    return h;
+  }
+  function wireContent(root, rerender) {
+    root.querySelectorAll("[data-cbrand]").forEach((b) => b.onclick = () => {
+      brandFilter = b.dataset.cbrand;
+      rerender();
+    });
+  }
+
   // src/game/hestia.js
   var DEFAULT_ZONES = [
     { id: 1, name: "Living Room & Balcony", icon: "living", tasks: [
@@ -3452,7 +3572,7 @@ Quests finished today: ${S3.doneIds.length}`;
   var DEFAULT_CATS = [{ id: "food", name: "Food" }, { id: "household", name: "Household" }, { id: "personal", name: "Personal Care" }];
   var DEFAULT_LOCS = [{ id: "supermarket", name: "Supermarket" }, { id: "online", name: "Online" }, { id: "wetmarket", name: "Wet Market" }, { id: "pharmacy", name: "Pharmacy" }];
   var DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  var KEY2 = "fox.hestia";
+  var KEY3 = "fox.hestia";
   var fresh = () => ({
     zones: DEFAULT_ZONES,
     dailyTasks: DEFAULT_DAILY,
@@ -3477,7 +3597,7 @@ Quests finished today: ${S3.doneIds.length}`;
   });
   var H2 = (() => {
     try {
-      return Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY2)) || {});
+      return Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY3)) || {});
     } catch {
       return fresh();
     }
@@ -3512,7 +3632,7 @@ Quests finished today: ${S3.doneIds.length}`;
   }
   var local = () => {
     try {
-      localStorage.setItem(KEY2, JSON.stringify(H2));
+      localStorage.setItem(KEY3, JSON.stringify(H2));
     } catch {
     }
   };
@@ -4328,7 +4448,7 @@ Quests finished today: ${S3.doneIds.length}`;
     });
   }
   migrate();
-  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk() });
+  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk() });
   function isDusk() {
     const t = sgHM();
     return t >= 19 * 60 || t < 6 * 60;
@@ -4352,6 +4472,8 @@ Quests finished today: ${S3.doneIds.length}`;
   var shopClosed = false;
   var homeView = null;
   var postOpen = false;
+  var healthOpen = false;
+  var calTab = "today";
   function persist(which) {
     const obj = which === "today" ? S2 : F;
     obj.updatedAt = Date.now();
@@ -4402,6 +4524,13 @@ Quests finished today: ${S3.doneIds.length}`;
     if (!uid) return;
     const col = db.collection("data/users/" + uid);
     attachHestiaDb(col.doc("hestia"));
+    attachFeeds(col, (id) => {
+      if (/^health/.test(id) && ["village", "chord", "chico"].includes(scene)) {
+        drawScene();
+        ctx();
+      }
+      if (/^content/.test(id) && openView === "cal" && calTab === "content") renderCal();
+    });
     refs = { today: col.doc("today"), fox: col.doc("fox"), plan: col.doc("plan"), mail: col.doc("mail"), stats: col.doc("stats"), library: col.doc("library") };
     refs.library.onSnapshot((snap) => {
       LIB = snap.exists ? Object.assign({ items: [] }, snap.data()) : { items: [] };
@@ -5871,11 +6000,25 @@ Then tell chat "wind down" whenever you're ready.`
     selPlot = null;
     homeView = null;
     postOpen = false;
+    healthOpen = false;
     if (scene === "market") shopClosed = true;
     ctx();
   }
   async function renderCal(fresh2) {
     const el = $("calBody");
+    document.querySelectorAll("[data-caltab]").forEach((b) => {
+      b.setAttribute("aria-selected", String(b.dataset.caltab === calTab));
+      b.onclick = () => {
+        calTab = b.dataset.caltab;
+        renderCal();
+      };
+    });
+    $("calTitle").textContent = calTab === "content" ? "Content calendar" : "Today";
+    if (calTab === "content") {
+      el.innerHTML = contentHTML();
+      wireContent(el, () => renderCal());
+      return;
+    }
     el.innerHTML = `<p class="muted">Opening your calendar…</p>`;
     const r = await todaysEvents(dayKey(), fresh2), nowT = Date.now();
     const fmtT = (t) => new Date(t).toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore" }).replace(" ", "").toLowerCase();
@@ -5907,6 +6050,7 @@ Then tell chat "wind down" whenever you're ready.`
     let h = "";
     if (homeView && scene === "home") h = hestiaPanel(homeView);
     else if (postOpen && scene === "post") h = postPanel();
+    else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
     else if (scene === "market" && !shopClosed) {
       const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["care", "Care"], ["family", "Family"], ["home", "Home"], ["sell", "Sell"]];
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
@@ -6221,6 +6365,7 @@ Then tell chat "wind down" whenever you're ready.`
       shedOpen = false;
       homeView = null;
       postOpen = false;
+      healthOpen = false;
       resetScene();
       if (id === "post") fetchPost().then(() => {
         if (scene === "post") drawScene();
@@ -6268,6 +6413,7 @@ Then tell chat "wind down" whenever you're ready.`
     shedOpen = false;
     homeView = null;
     postOpen = false;
+    healthOpen = false;
     openView = null;
     nextLeg();
     render();
@@ -6297,6 +6443,12 @@ Then tell chat "wind down" whenever you're ready.`
     }
     if (id === "stall") {
       shopClosed = false;
+      render();
+      return;
+    }
+    if (id === "status") {
+      healthOpen = true;
+      sfx("paper");
       render();
       return;
     }

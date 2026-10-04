@@ -12,6 +12,7 @@ import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, set
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked } from "./paths.js";
 import { fetchPost, postPanel, postCount } from "./postbox.js";
+import { attachFeeds, health, healthPanel, contentHTML, wireContent } from "./feeds.js";
 import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 
@@ -46,14 +47,14 @@ function migrate(){
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
-setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk()});
+setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk()});
 function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
 // In-game UI: the quest note pinned on the map (open, or slim while walking) and the panel over the map.
 // The note starts folded when the village opens; it only pops open on step changes after the first few seconds.
 let qnOpen = false, qnQuietUntil = Date.now() + 5000, qnKey = "", openView = null, shopClosed = false;
-let homeView = null, postOpen = false;   // "chores" (the cleaning cupboard) or "fridge" while one is open at home
+let homeView = null, postOpen = false, healthOpen = false, calTab = "today";   // "chores" (the cleaning cupboard) or "fridge" while one is open at home
 
 function persist(which){
   const obj = which === "today" ? S : F;
@@ -85,6 +86,10 @@ async function initDb(){
   const uid = await user.id(); if (!uid) return;
   const col = db.collection("data/users/" + uid);
   attachHestiaDb(col.doc("hestia"));
+  attachFeeds(col, id => {
+    if (/^health/.test(id) && ["village", "chord", "chico"].includes(scene)) { drawScene(); ctx(); }
+    if (/^content/.test(id) && openView === "cal" && calTab === "content") renderCal();
+  });
   refs = {today: col.doc("today"), fox: col.doc("fox"), plan: col.doc("plan"), mail: col.doc("mail"), stats: col.doc("stats"), library: col.doc("library")};
   refs.library.onSnapshot(snap => {
     LIB = snap.exists ? Object.assign({items:[]}, snap.data()) : {items:[]};
@@ -865,11 +870,15 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
-  boardOpen = false; shelfOpen = false; selPlot = null; homeView = null; postOpen = false; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
-  const el = $("calBody"); el.innerHTML = `<p class="muted">Opening your calendar…</p>`;
+  const el = $("calBody");
+  document.querySelectorAll("[data-caltab]").forEach(b => { b.setAttribute("aria-selected", String(b.dataset.caltab === calTab)); b.onclick = () => { calTab = b.dataset.caltab; renderCal(); }; });
+  $("calTitle").textContent = calTab === "content" ? "Content calendar" : "Today";
+  if (calTab === "content") { el.innerHTML = contentHTML(); wireContent(el, () => renderCal()); return; }
+  el.innerHTML = `<p class="muted">Opening your calendar…</p>`;
   const r = await todaysEvents(dayKey(), fresh), nowT = Date.now();
   const fmtT = t => new Date(t).toLocaleTimeString("en-GB", {hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore"}).replace(" ", "").toLowerCase();
   let h = `<p class="sub">${new Date(now() + 8*H).toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "long", timeZone: "UTC"})}</p>`;
@@ -895,6 +904,7 @@ function ctx(){
   const c = $("ctx"); let h = "";
   if (homeView && scene === "home") h = hestiaPanel(homeView);
   else if (postOpen && scene === "post") h = postPanel();
+  else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
   else if (scene === "market" && !shopClosed) {
     const tabs = [["seeds","Seeds"],["treats","Treats"],["care","Care"],["family","Family"],["home","Home"],["sell","Sell"]];
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
@@ -1101,7 +1111,7 @@ const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "b
 function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
   setTimeout(() => {
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; homeView = null; postOpen = false; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; homeView = null; postOpen = false; healthOpen = false; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
@@ -1125,7 +1135,7 @@ function go(target, x, y, fn){
     if (!OUTDOOR.includes(target)) { const d = VILLAGE[target].door; legs.push({scene:tOut, x:d[0], y:d[1], fn:() => setScene(target, target === "farm" ? [260, 590] : [260, 596])}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; homeView = null; postOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; homeView = null; postOpen = false; healthOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -1142,6 +1152,7 @@ function arriveSpot(id){
   const ph = phase();
   if (id === "digest") { shelfOpen = true; speak(digestReady() ? (isHere("juniper") ? "Juniper's waving a digest at you!" : "A fresh digest is ready on the shelf.") : "Digests are rationed. Like dessert.", 3500); render(); return; }
   if (id === "stall") { shopClosed = false; render(); return; }
+  if (id === "status") { healthOpen = true; sfx("paper"); render(); return; }
   if (id === "pobox") { postOpen = true; sfx("paper"); render(); fetchPost().then(() => { ctx(); drawScene(); }); return; }
   if (id === "board" && outside()) { openView = "quests"; speak("All of today's quests!", 3500); render(); return; }
   if (id === "board") { boardOpen = true; speak(outside() ? "All of today's quests!" : "Here's what needs doing in here.", 3500); render(); return; }

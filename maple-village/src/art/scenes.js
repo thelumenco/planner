@@ -59,7 +59,10 @@ export function villageArt(){
         <circle cx="350" cy="317" r="3.2" style="fill:var(--rose)"/><circle cx="362" cy="317" r="3.2" style="fill:var(--butter)"/><circle cx="374" cy="317" r="3.2" style="fill:var(--sage)"/></g>
       ${tapeLabel(362, 358, "Market", "var(--blush)", 11)}</g>
     ${townRiver()}`;
-  return ground + places + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 26, 536, 8, 2, 12)
+  const L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
+  const light = (app, x, y) => { const h = G.health ? G.health(app) : null; if (!h) return "";
+    return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`; };
+  return ground + places + light("chord", 140, 196) + light("chico", 138, 436) + userGarden("chord", 148, 220, 4, 3, 12) + userGarden("chico", 26, 536, 8, 2, 12)
     + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
 }
 /* ---------- the river between the two screens ---------- */
@@ -196,6 +199,14 @@ export function furn(kind, x, y){
       `<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3"/><path d="M${x-36} ${y-30} h28 l-4 -10 h-20z M${x-22} ${y-40} v-10 h-10 h20"/><rect x="${x+10}" y="${y-48}" width="12" height="18" rx="2"/><rect x="${x+28}" y="${y-40}" width="20" height="10"/><path d="M${x-46} ${y-6} v14 M${x+46} ${y-6} v14"/>`);
     case "treadmill": return sk(`<rect x="${x-24}" y="${y-74}" width="48" height="74" rx="8" style="fill:var(--sock)"/><rect x="${x-17}" y="${y-66}" width="34" height="58" rx="4" style="fill:#6B5A52"/><rect x="${x-30}" y="${y-96}" width="60" height="16" rx="4" style="fill:var(--peri)"/><rect x="${x-14}" y="${y-93}" width="20" height="9" rx="2" style="fill:#DCE8C8"/>`,
       `<rect x="${x-24}" y="${y-74}" width="48" height="74" rx="8"/><path d="M${x-17} ${y-56} h34 M${x-17} ${y-44} h34 M${x-17} ${y-32} h34 M${x-17} ${y-20} h34" opacity=".45"/><path d="M${x-26} ${y-80} v28 M${x+26} ${y-80} v28" stroke-width="2.4"/><rect x="${x-30}" y="${y-96}" width="60" height="16" rx="4"/><rect x="${x-14}" y="${y-93}" width="20" height="9" rx="2"/><text x="${x-4}" y="${y-86}" text-anchor="middle" font-family="Klee One,serif" font-size="7" stroke="none" style="fill:var(--line)">1.2</text>`);
+    case "healthchord": case "healthchico": {
+      // a standing sign: three lights (worst check first) and a big status word from the nightly bug check
+      const h = G && G.health ? G.health(kind.slice(6)) : null, L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
+      const st = h ? h.status : "grey", word = {green: "ALL GOOD", amber: "WATCH", red: "NEEDS YOU", grey: "NO REPORT"}[st];
+      const lights = (h && h.checks.length ? h.checks.slice(0, 3).map(c => c.state) : [st, st, st]).map((c, i) => `<circle cx="${x-18 + i*18}" cy="${y-62}" r="6" style="fill:${L[c]}"/>`).join("");
+      return sk(`<rect x="${x-3}" y="${y-30}" width="6" height="30" style="fill:var(--wood)"/><rect x="${x-34}" y="${y-80}" width="68" height="52" rx="5" style="fill:#FFFDF6"/>${lights}`,
+        `<rect x="${x-34}" y="${y-80}" width="68" height="52" rx="5"/><path d="M${x-3} ${y-28} v28 M${x+3} ${y-28} v28 M${x-12} ${y} h24"/>${lights.replace(/ style="[^"]*"/g, "")}`)
+        + `<text x="${x}" y="${y-38}" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="800" font-size="9" letter-spacing=".6" style="fill:${L[st] === L.grey ? "var(--line)" : L[st]}">${word}</text>`; }
     case "pobox": { let c = ""; for (let r = 0; r < 3; r++) for (let i = 0; i < 2; i++) c += `<rect x="${x-20 + i*21}" y="${y-80 + r*24}" width="19" height="20" rx="1" style="fill:${G && G.postCount && G.postCount() > r*2 + i ? "#FFFDF6" : "#9C7A5C"}"/>`;
       return sk(`<rect x="${x-24}" y="${y-84}" width="48" height="84" rx="3" style="fill:var(--wood)"/>${c}`, `<rect x="${x-24}" y="${y-84}" width="48" height="84" rx="3"/>${c.replace(/ style="[^"]*"/g, "")}`); }
     case "fridge": return sk(`<rect x="${x-20}" y="${y-84}" width="40" height="84" rx="5" style="fill:#F4F1EA"/><rect x="${x-14}" y="${y-74}" width="13" height="16" style="fill:#FFFDF6"/><circle cx="${x+9}" cy="${y-70}" r="3" style="fill:var(--rose)"/><circle cx="${x+3}" cy="${y-46}" r="2.6" style="fill:var(--butter)"/>`,
