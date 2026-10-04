@@ -348,3 +348,10 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Plans** (`plans.js`): Maple's chat reads the Notion "Plans" database (data source `collection://ccad9e3d-…`) through the page's mcp: this week's page every chat, plus this month's and quarter's when the message is about plans. Titles: "Week of 5 Oct 2026", "October 2026", "Q4 2026". Capability adds `Notion: notion-search, notion-fetch`.
 - **Walking**: villagers, messengers and Evan follow route-finder waypoints outdoors (`route()`/`walk()` in npcs.js, `evanWalk()` in core). Wander points inside obstacles are skipped; messengers stand on a clear side of Mel. Test samples NPC positions in the square.
 - Recap: ticked checkboxes instead of ×, "The day is done". The bujo lists no longer use a 2-column grid (highlighted words were landing in the bullet column).
+
+## Round 24: records, undo, frozen snapshots, ducks
+- **Record player** opens a crate of records (`TRACKS` in audio.js): Morning piano, Rainy window, Music box (waltz), Sunday stroll, Night lights, and Rain on the roof (filtered noise + drips). All composed live with Web Audio; the choice is per device (`settings.track`). Volume slider and "Lift the needle".
+- **Chores not ticking (bug)**: the real db hands out frozen snapshot data; Hestia adopted it with a shallow copy, so the next tick threw. Every snapshot is now deep-copied before use, and the dev stub freezes snapshots like the real db so tests catch this. Test: reload with a cloud copy, tick, still ticked.
+- **Undo for every delete** (`undoable(msg, restore)` in core, a bar at the bottom for 7 s): Hestia chores and pantry items, dropping a quest, tearing out a journal page, wiping the scratchpad. Journal entries: the newest change wins on merge, so an undo beats the tear-out marker.
+- Wardrobe keeps only the latest two extra picks; all picks clear each day.
+- Curtains sway from the rod; a duck family swims along the river on home base and the town square every ~2 minutes, under the bridges.

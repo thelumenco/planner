@@ -84,8 +84,15 @@ function bridge(id, x, y1, y2, label, tapeX, tapeY, size){
     ${tapeLabel(tapeX, tapeY, label, "var(--sky)", size)}</g>`;
 }
 const ripples = (pts) => `<g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".45">${pts.map(([x, y]) => `<path class="ripple" d="M${x} ${y} q8 -4 16 0"/>`).join("")}</g>`;
+// A mother duck and her ducklings paddle along the river now and then (CSS "ducks": a long loop, mostly off screen),
+// drawn under the bridge so they swim beneath it. rtl: right to left.
+function ducks(y, rtl, delay){
+  const duck = (x, s, body, kid) => `<g class="dbob" style="animation-delay:-${(x/40).toFixed(2)}s" transform="translate(${x} 0) scale(${s})"><path d="M-14 -2 q14 10 28 0 q4 -8 -2 -10 q-12 -2 -22 2 q-6 2 -4 8z" style="fill:${body}" stroke="var(--line)" stroke-width="1"/><circle cx="10" cy="-14" r="6" style="fill:${kid ? body : "#3E6B4E"}" stroke="var(--line)" stroke-width="1"/><path d="M15 -14 l6 1.5 l-6 1.8z" fill="#F0A33A" stroke="var(--line)" stroke-width=".8"/><circle cx="11.5" cy="-15.5" r="1" fill="var(--line)"/>${kid ? "" : `<path d="M4 -6 q-6 2 -10 0" fill="none" stroke="var(--line)" stroke-width=".8" opacity=".6"/>`}</g>`;
+  const fam = duck(0, 1, "#B89A7A") + duck(-34, .55, "#F6D86B", true) + duck(-56, .55, "#F6D86B", true) + duck(-78, .5, "#F6D86B", true);
+  return `<g class="ducks${rtl ? " rtl" : ""}" style="animation-delay:-${delay}s" pointer-events="none"><g transform="translate(0 ${y})${rtl ? " scale(-1 1)" : ""}">${fam}<path d="M-96 2 q50 6 110 0" fill="none" stroke="#FFFDF6" stroke-width="1.2" opacity=".7"/></g></g>`;
+}
 function townRiver(){
-  return `<g filter="url(#wob)">${waterBand(600, 640)}</g>${ripples([[60, 620], [150, 628], [370, 618], [450, 630]])}
+  return `<g filter="url(#wob)">${waterBand(600, 640)}</g>${ripples([[60, 620], [150, 628], [370, 618], [450, 630]])}${ducks(626, true, 70)}
     <g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 604 Q65 596 130 603 T260 602 T390 604 T520 600" fill="none"/></g>
     ${bridge("toBase", 260, 584, 640, "To home", 410, 624, 11)}
     <g data-place="bench" aria-label="Riverside bench"><ellipse class="hov" cx="334" cy="572" rx="30" ry="8" style="fill:var(--butter)"/>
@@ -102,7 +109,7 @@ export function baseArt(){
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="200" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="400" cy="380" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="160" cy="590" rx="110" ry="40" style="fill:var(--grass2)"/></g>
     ${tree(40,30,.7)}${tree(150,26,.6)}${tree(380,28,.65)}${tree(480,30,.7)}
     <g filter="url(#wob)">${waterBand(40, 98)}<path d="M478 94 C470 180 500 300 470 400 C462 430 458 450 452 474" fill="none" style="stroke:var(--water)" stroke-width="14" stroke-linecap="round"/></g>
-    ${ripples([[60, 66], [150, 78], [350, 62], [420, 80]])}
+    ${ripples([[60, 66], [150, 78], [350, 62], [420, 80]])}${ducks(76, false, 20)}
     <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 44 Q65 36 130 43 T260 42 T390 44 T520 40 M0 100 Q65 104 130 95 T260 98 T390 96 T520 102"/></g>
     <g filter="url(#wob)"><path d="M260 112 L260 ${D.home.door[1]} M260 326 C200 360 130 420 ${D.farm.door[0]} ${D.farm.door[1]} M260 326 C290 420 300 500 ${D.pond.door[0]} ${D.pond.door[1]} M266 312 C330 300 390 290 ${D.shed.door[0]} ${D.shed.door[1]} M254 318 C200 320 150 320 ${D.swing.door[0]} ${D.swing.door[1]} M290 500 C270 552 240 566 ${D.run.door[0]} ${D.run.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
       <ellipse cx="260" cy="322" rx="44" ry="20" style="fill:var(--path)"/></g>
@@ -246,9 +253,15 @@ export function furn(kind, x, y){
         <path d="M${x-74} ${y - (sl ? 74 : 60)} h148"/>${d.r_throw ? `<path d="M${x+20} ${y-58} h54 v52 h-54z M${x+28} ${y-58} v52 M${x+40} ${y-58} v52 M${x+52} ${y-58} v52 M${x+64} ${y-58} v52" opacity=".7"/>` : ""}${legs(148, 6)}
         ${sl ? `<path d="M${x-40} ${y-84} q2 1.6 4 0 M${x-33} ${y-84} q2 1.6 4 0"/><text x="${x-14}" y="${y-104}" font-size="11" style="fill:var(--line)" stroke="none" class="zz">z z</text>` : ""}`); }
     case "curtwindow": { const g = G.F() || {}, night = G.dusk(), shut = g.curtains ? g.curtains === "closed" : (night || !!(G.S && G.S().sleep));
-      const L = shut ? `<path d="M${x-50} ${y-170} h50 v86 h-50z" style="fill:var(--rose)"/><path d="M${x} ${y-170} h50 v86 h-50z" style="fill:var(--rose)"/>` : `<path d="M${x-58} ${y-170} h18 q-6 44 4 86 h-22z" style="fill:var(--rose)"/><path d="M${x+40} ${y-170} h18 v86 h-22 q10 -42 4 -86z" style="fill:var(--rose)"/>`;
-      return sk(`<rect x="${x-48}" y="${y-168}" width="96" height="82" rx="4" style="fill:${night ? "#3E4673" : "var(--sky)"}"/>${night && !shut ? `<circle cx="${x+18}" cy="${y-142}" r="9" style="fill:#FFF3C4"/>` : !shut ? `<ellipse cx="${x-14}" cy="${y-120}" rx="18" ry="7" style="fill:#FFFDF6"/>` : ""}${L}`,
-        `<rect x="${x-48}" y="${y-168}" width="96" height="82" rx="4"/><path d="M${x} ${y-168} v82 M${x-48} ${y-128} h96" opacity="${shut ? 0 : 1}"/><path d="M${x-62} ${y-172} h124" stroke-width="2.4"/>${shut ? `<path d="M${x-40} ${y-160} q4 30 0 70 M${x-20} ${y-164} q-4 34 0 74 M${x+20} ${y-164} q4 34 0 74 M${x+40} ${y-160} q-4 30 0 70" opacity=".5"/>` : `<path d="M${x-50} ${y-150} q4 30 -2 60 M${x+50} ${y-150} q-4 30 2 60" opacity=".5"/>`}`); }
+      // each curtain hangs from the rod and sways a little (CSS "sway"), pivoting at the top
+      const cur = (fill, lines, ox, delay) => `<g class="sway" style="transform-origin:${ox}px ${y-170}px;animation-delay:-${delay}s">${sk(fill, lines)}</g>`;
+      const curtains = shut
+        ? cur(`<path d="M${x-50} ${y-170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x-50} ${y-170} h50 v86 h-50z M${x-40} ${y-160} q4 30 0 70 M${x-20} ${y-164} q-4 34 0 74" opacity=".8"/>`, x - 25, 0)
+          + cur(`<path d="M${x} ${y-170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x} ${y-170} h50 v86 h-50z M${x+20} ${y-164} q4 34 0 74 M${x+40} ${y-160} q-4 30 0 70" opacity=".8"/>`, x + 25, 1.7)
+        : cur(`<path d="M${x-58} ${y-170} h18 q-6 44 4 86 h-22z" style="fill:var(--rose)"/>`, `<path d="M${x-58} ${y-170} h18 q-6 44 4 86 h-22z M${x-50} ${y-150} q4 30 -2 60" opacity=".8"/>`, x - 49, 0)
+          + cur(`<path d="M${x+40} ${y-170} h18 v86 h-22 q10 -42 4 -86z" style="fill:var(--rose)"/>`, `<path d="M${x+40} ${y-170} h18 v86 h-22 q10 -42 4 -86z M${x+50} ${y-150} q-4 30 2 60" opacity=".8"/>`, x + 49, 1.7);
+      return sk(`<rect x="${x-48}" y="${y-168}" width="96" height="82" rx="4" style="fill:${night ? "#3E4673" : "var(--sky)"}"/>${night && !shut ? `<circle cx="${x+18}" cy="${y-142}" r="9" style="fill:#FFF3C4"/>` : !shut ? `<ellipse cx="${x-14}" cy="${y-120}" rx="18" ry="7" style="fill:#FFFDF6"/>` : ""}`,
+        `<rect x="${x-48}" y="${y-168}" width="96" height="82" rx="4"/><path d="M${x} ${y-168} v82 M${x-48} ${y-128} h96" opacity="${shut ? 0 : 1}"/>`) + curtains + sk("", `<path d="M${x-62} ${y-172} h124" stroke-width="2.4"/><circle cx="${x-62}" cy="${y-172}" r="2.4"/><circle cx="${x+62}" cy="${y-172}" r="2.4"/>`); }
     case "record": { const on = !!(G.music && G.music());
       return sk(`<rect x="${x-28}" y="${y-30}" width="56" height="30" rx="3" style="fill:var(--wood)"/><rect x="${x-26}" y="${y-44}" width="52" height="16" rx="3" style="fill:var(--peach)"/><ellipse cx="${x-4}" cy="${y-37}" rx="13" ry="5" style="fill:#2F2B28"/><ellipse cx="${x-4}" cy="${y-37}" rx="4" ry="1.6" style="fill:var(--rose)"/>`,
         `<rect x="${x-28}" y="${y-30}" width="56" height="30" rx="3"/><rect x="${x-26}" y="${y-44}" width="52" height="16" rx="3"/><ellipse cx="${x-4}" cy="${y-37}" rx="13" ry="5"/><path d="M${x+16} ${y-42} l-6 6"/><path d="M${x-28} ${y-15} h56" opacity=".4"/>${on ? `<path class="note1" d="M${x+20} ${y-58} v-10 l6 -2 v10 M${x+20} ${y-58} m-3 0 a3 2 0 1 0 6 0" /><path class="note2" d="M${x-24} ${y-62} v-9 l5 -1 v9" />` : ""}`); }

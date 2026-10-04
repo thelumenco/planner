@@ -41,15 +41,34 @@ GESTURES.forEach(t => document.addEventListener(t, onGesture, true));
 
 /* ---------- music ---------- */
 const N = n => 440*Math.pow(2, (n - 69)/12);               // MIDI note -> Hz
-// Eight bars in F major: Fmaj7, Em7, Dm9, Cmaj7/E, Bbmaj7, Am7, Gm7, C7sus4. [bass, chord tones...]
-const BARS = [[41, 60, 64, 65, 69, 72], [40, 59, 62, 64, 67, 71], [38, 57, 60, 62, 64, 65], [40, 55, 59, 60, 64, 67],
-  [34, 57, 58, 62, 65, 69], [33, 55, 57, 60, 64, 67], [31, 53, 55, 58, 62, 65], [36, 53, 55, 58, 60, 65]];
-const BPM = 64, BEAT = 60/BPM;
-let playing = false, nextTime = 0, step = 0, timerId = 0, loops = 0, melody = [];
+// The records on Mel's record player: each is a little piece composed here, played live. bars: [bass, chord tones...]
+// steps = eighth notes per bar (6 for the waltz), arp = which chord tone each eighth plays, tone = the instrument.
+export const TRACKS = {
+  piano: {name: "Morning piano", mood: "Soft and hopeful", bpm: 64, steps: 8, tone: "piano", col: "var(--butter)",
+    bars: [[41, 60, 64, 65, 69, 72], [40, 59, 62, 64, 67, 71], [38, 57, 60, 62, 64, 65], [40, 55, 59, 60, 64, 67], [34, 57, 58, 62, 65, 69], [33, 55, 57, 60, 64, 67], [31, 53, 55, 58, 62, 65], [36, 53, 55, 58, 60, 65]],
+    arp: [1, 2, 3, 4, 3, 2, 1, 2], arpVel: .055, mel: .75},
+  rainy: {name: "Rainy window", mood: "Slow, a little wistful", bpm: 54, steps: 8, tone: "rhodes", col: "var(--sky)",
+    bars: [[38, 57, 60, 64, 65, 69], [34, 57, 62, 65, 69, 72], [31, 58, 62, 65, 67, 70], [33, 55, 61, 64, 67, 69]],
+    arp: [1, 3, 2, 4, 1, 3, 2, 5], arpVel: .045, mel: .5},
+  musicbox: {name: "Music box", mood: "Tinkly, a gentle waltz", bpm: 88, steps: 6, tone: "bell", col: "var(--blush)",
+    bars: [[48, 64, 67, 72, 76, 79], [45, 64, 69, 72, 76, 81], [41, 65, 69, 72, 77, 81], [43, 62, 67, 71, 74, 79]],
+    arp: [1, 3, 5, 3, 4, 2], arpVel: .05, mel: .6, up: 12},
+  stroll: {name: "Sunday stroll", mood: "Bright and bouncy", bpm: 84, steps: 8, tone: "piano", col: "var(--sage)",
+    bars: [[43, 59, 62, 67, 71, 74], [40, 59, 64, 67, 71, 76], [36, 60, 64, 67, 72, 76], [38, 57, 62, 66, 69, 74]],
+    arp: [1, 3, 2, 3, 4, 3, 2, 3], arpVel: .06, mel: .85, bounce: true},
+  night: {name: "Night lights", mood: "A hushed lullaby", bpm: 50, steps: 8, tone: "bell", col: "var(--peri)",
+    bars: [[44, 60, 63, 68, 72, 75], [41, 60, 65, 68, 72, 77], [37, 61, 65, 68, 73, 77], [39, 58, 63, 67, 70, 75]],
+    arp: [1, 2, 3, 4, 5, 4, 3, 2], arpVel: .035, mel: .4},
+  rain: {name: "Rain on the roof", mood: "Just rain, no music", rain: true, col: "#9CB4C9"}
+};
+const cur = () => TRACKS[settings.track] || TRACKS.piano;
+let BEAT = 60/64, BARS = TRACKS.piano.bars;
+let playing = false, nextTime = 0, step = 0, timerId = 0, loops = 0, melody = [], rainSrc = null, bellWave = null, rhodesWave = null;
 
 function note(freq, t, dur, vel){
-  const o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter();
-  o.setPeriodicWave(pianoWave); o.frequency.value = freq;
+  const o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter(), tone = cur().tone;
+  if (!bellWave) { bellWave = ac.createPeriodicWave(new Float32Array([0, 1, 0, .35, 0, .12, 0, .05]), new Float32Array(8)); rhodesWave = ac.createPeriodicWave(new Float32Array([0, 1, .25, .12, .02]), new Float32Array(5)); }
+  o.setPeriodicWave(tone === "bell" ? bellWave : tone === "rhodes" ? rhodesWave : pianoWave); o.frequency.value = freq;
   f.type = "lowpass"; f.frequency.value = Math.min(4200, 900 + freq*2.2);
   g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel, t + .006);
   g.gain.exponentialRampToValueAtTime(vel*.35, t + .25); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
@@ -61,29 +80,49 @@ function newMelody(){
     return Math.random() < .25 ? [] : [[0, r(0)], [2, r(1 + (Math.random() < .5 ? 0 : 1))], ...(Math.random() < .4 ? [[3.5, r(2)]] : [])]; });
 }
 function schedule(){
+  const T = cur(), S8 = T.steps || 8, up = T.up || 0;
   while (nextTime < ac.currentTime + .6) {
-    const bar = Math.floor(step/8) % BARS.length, e = step % 8, t = nextTime, b = BARS[bar];
-    if (bar === 0 && e === 0) { if (step) loops++; newMelody(); }
+    const bar = Math.floor(step/S8) % BARS.length, e = step % S8, t = nextTime, b = BARS[bar];
+    if (bar === 0 && e === 0) { if (step) loops++; newMelody(); if (Math.random() > T.mel) melody = melody.map(() => []); }
     if (e === 0) { note(N(b[0]), t, 3.4, .16); note(N(b[0] + 12), t, 3, .08); }       // bass + octave
-    if (e === 4) note(N(b[0] + 7), t, 2.4, .09);                                        // fifth on beat 3
-    const arp = [1, 2, 3, 4, 3, 2, 1, 2][e];                                            // rolling eighths
-    note(N(b[arp]), t + (Math.random() - .5)*.012, 2.2, .055 + Math.random()*.02);
-    (melody[bar] || []).forEach(([beat, n]) => { if (Math.abs(beat*2 - e) < .01) note(N(n), t + .01, 2.8, .1); });
+    if (S8 === 8 && e === 4) note(N(b[0] + 7), t, 2.4, .09);                            // fifth on beat 3
+    if (T.bounce && (e === 2 || e === 6)) note(N(b[0] + 12), t, .6, .07);              // a skip in the step
+    if (S8 === 6 && (e === 2 || e === 4)) note(N(b[1]), t, 1.2, .05);                  // waltz: oom-pah-pah
+    const arp = (T.arp || [1, 2, 3, 4, 3, 2, 1, 2])[e];
+    note(N(b[Math.min(arp, b.length - 1)] + up), t + (Math.random() - .5)*.012, 2.2, (T.arpVel || .055) + Math.random()*.02);
+    (melody[bar] || []).forEach(([beat, n]) => { if (Math.abs(beat*2 - e) < .01) note(N(n + up), t + .01, 2.8, .1); });
     step++; nextTime += BEAT/2;
   }
 }
+// "Rain on the roof": looping filtered noise with the odd drip
+function startRain(){
+  const len = ac.sampleRate*3, buf = ac.createBuffer(2, len, ac.sampleRate);
+  for (let c = 0; c < 2; c++) { const d = buf.getChannelData(c); let last = 0; for (let i = 0; i < len; i++) { last = (last + .04*(Math.random()*2 - 1))/1.04; d[i] = last*3.2 + (Math.random() < .0004 ? (Math.random() - .5)*.8 : 0); } }
+  const src = ac.createBufferSource(), f = ac.createBiquadFilter(); src.buffer = buf; src.loop = true; f.type = "lowpass"; f.frequency.value = 1400;
+  src.connect(f).connect(musicBus); src.start(); rainSrc = src;
+  timerId = setInterval(() => { if (Math.random() < .35) note(N(84 + Math.floor(Math.random()*8)), ac.currentTime + Math.random()*.5, .5, .015); }, 700);
+}
 export function startMusic(){
   if (!ensure() || playing || !settings.music) return;
-  playing = true; nextTime = ac.currentTime + .15; step = 0;
+  const T = cur(); BEAT = 60/(T.bpm || 64); BARS = T.bars || TRACKS.piano.bars;
+  playing = true; nextTime = ac.currentTime + .15; step = 0; loops = 0;
   musicBus.gain.cancelScheduledValues(ac.currentTime);
-  musicBus.gain.setTargetAtTime(settings.musicVol*.5, ac.currentTime, 1.2);
+  musicBus.gain.setTargetAtTime(settings.musicVol*(T.rain ? .9 : .5), ac.currentTime, 1.2);
+  if (T.rain) { startRain(); return; }
   timerId = setInterval(schedule, 120); schedule();
 }
 export function stopMusic(){
   if (!ac || !playing) return;
   playing = false; clearInterval(timerId);
+  if (rainSrc) { const r = rainSrc; rainSrc = null; setTimeout(() => { try { r.stop(); } catch {} }, 900); }
   musicBus.gain.setTargetAtTime(0, ac.currentTime, .4);
 }
+// Put a different record on (starts playing it, turning music on if it was off)
+export function setTrack(id){
+  if (!TRACKS[id]) return; const was = playing; settings.track = id; settings.music = true; saveSettings();
+  if (was) { stopMusic(); setTimeout(() => startMusic(), 450); } else unlockAudio();
+}
+export const currentTrack = () => settings.track && TRACKS[settings.track] ? settings.track : "piano";
 export function setMusic(on){ settings.music = on; saveSettings(); on ? unlockAudio() : stopMusic(); }
 export function setMusicVol(v){ settings.musicVol = v; saveSettings(); if (ac && playing) musicBus.gain.setTargetAtTime(v*.5, ac.currentTime, .2); }
 export function setSfx(on){ settings.sfx = on; saveSettings(); }

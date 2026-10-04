@@ -294,9 +294,25 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
   await page.waitForFunction(() => /cleaning cupboard/i.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
   check(/cleaning cupboard/i.test(await page.locator("#ctx h2").textContent()), "the cleaning cupboard opens Hestia's chores");
-  await page.locator('#ctx [data-hdone^="daily:"]').first().check();
+  await page.locator('#ctx [data-hdone^="daily:"]').first().click();   // one tap (ticked chores move to the bottom)
   await page.waitForTimeout(300);
   check(/\+1 coins: home chore/.test(await page.locator("#earn").textContent()), "ticking a chore earns a coin");
+  // after a reload the cloud copy loads (frozen, like the real database): ticking must still stick, and a delete can be undone
+  await page.waitForTimeout(1200);
+  await page.goto(url + "?seed=1&nosample=1&time=19:30&date=2026-10-05"); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="home"]').dispatchEvent("click");
+  await page.waitForFunction(() => /^Home/.test(document.querySelector("#sceneName").textContent.trim()) && !/base/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(400);
+  await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
+  await page.waitForFunction(() => /cleaning cupboard/i.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
+  const box = page.locator('#ctx [data-hdone^="daily:"]:not(:checked)').first(), boxId = await box.getAttribute("data-hdone");
+  await box.click(); await page.waitForTimeout(1500);
+  check(await page.locator(`#ctx [data-hdone="${boxId}"]`).isChecked(), "a ticked chore stays ticked after the cloud copy loads");
+  const n0 = await page.locator('#ctx [data-hdel^="daily:"]').count();
+  await page.locator('#ctx [data-hdel^="daily:"]').first().click(); await page.waitForTimeout(200);
+  check(await page.locator('#ctx [data-hdel^="daily:"]').count() === n0 - 1 && await page.locator("#undoBar").isVisible(), "removing a chore offers Undo");
+  await page.click("#undoBtn"); await page.waitForTimeout(200);
+  check(await page.locator('#ctx [data-hdel^="daily:"]').count() === n0, "and Undo puts it back");
   await page.click('#ctx [data-htab="zone"]');
   check(await page.locator("#ctx .hzone").textContent().then(t => /Living Room/.test(t)), "this week's zone is on its own tab");
   await page.click('#ctx [data-htimer="10"]');
@@ -539,6 +555,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => getComputedStyle(document.getElementById("mel")).visibility === "hidden") && await page.locator("#world .zz").count() === 1, "a nap puts Mel to bed");
   await page.locator('#world [data-spot="window"]').dispatchEvent("click"); await page.waitForTimeout(3500);
   check(await page.evaluate(() => getComputedStyle(document.getElementById("mel")).visibility !== "hidden"), "getting up to the window wakes her");
+  await page.locator('#world [data-spot="record"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-track="rainy"]', { timeout: 15000 });
+  check(await page.locator("#ctx .record").count() >= 5, "the record player has a crate of records");
+  await page.click('#ctx [data-track="rainy"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.sound")).track === "rainy") && await page.locator("#ctx .record.on").textContent().then(t => /Rainy window/.test(t)), "and puts on the one you pick");
+  await page.click("#pclose");
   await page.locator('#world [data-spot="journal"]').dispatchEvent("click");
   await page.waitForSelector("#jText", { timeout: 15000 });
   await page.fill("#jText", "A lovely quiet afternoon."); await page.click('#jForm button'); await page.waitForTimeout(300);

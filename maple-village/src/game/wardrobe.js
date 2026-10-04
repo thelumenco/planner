@@ -55,6 +55,6 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
   const out = {}; FIELDS.forEach(([k]) => { if (o[k]) out[k] = clean(o[k]); }); out.label = clean(o.label, 50) || "Fresh pick"; if (o.why) out.why = clean(o.why, 220);
   if (!out.top && !out.dress) return null;
   if (!F.outfits || F.outfits.day !== dayKey()) F.outfits = {day: dayKey(), list: []};
-  F.outfits.list = [...F.outfits.list, out].slice(-4);
+  F.outfits.list = [...F.outfits.list, out].slice(-2);   // keep the wardrobe tidy: the latest two extra picks
   return out;
 }

@@ -467,6 +467,17 @@ body.nb-open{overflow:hidden}
 @keyframes roamR{0%,8%{transform:translateX(0) scaleX(1)}40%,52%{transform:translateX(var(--dx)) scaleX(1)}54%{transform:translateX(var(--dx)) scaleX(-1)}86%,88%{transform:translateX(0) scaleX(-1)}90%,100%{transform:translateX(0) scaleX(1)}}
 @keyframes roamL{0%,8%{transform:translateX(0) scaleX(-1)}40%,52%{transform:translateX(var(--dx)) scaleX(-1)}54%{transform:translateX(var(--dx)) scaleX(1)}86%,88%{transform:translateX(0) scaleX(1)}90%,100%{transform:translateX(0) scaleX(-1)}}
 @media (prefers-reduced-motion:reduce){.map .roam{animation:none}}
+/* curtains sway from the rod */
+.map .sway{transform-box:view-box;animation:csway 5.5s ease-in-out infinite}
+@keyframes csway{0%,100%{transform:rotate(-1.4deg)}50%{transform:rotate(1.4deg)}}
+/* ducks: a long loop, on screen for the first third (about 45 s), then off for the rest */
+.map .ducks{animation:duckL 140s linear infinite}
+.map .ducks.rtl{animation-name:duckR}
+@keyframes duckL{0%{transform:translateX(-140px)}32%{transform:translateX(660px)}100%{transform:translateX(660px)}}
+@keyframes duckR{0%{transform:translateX(660px)}32%{transform:translateX(-140px)}100%{transform:translateX(-140px)}}
+.map .dbob{animation:dbob 1.6s ease-in-out infinite}
+@keyframes dbob{0%,100%{translate:0 0}50%{translate:0 -1.5px}}
+@media (prefers-reduced-motion:reduce){.map .sway,.map .ducks,.map .dbob{animation:none}.map .ducks{display:none}}
 
 /* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
 :root{--mapw:max(300px,min(980px,calc((100dvh - 196px)*520/640 + 26px)))}
@@ -846,6 +857,17 @@ body.nb-open{overflow:hidden}
 .breathe .cue{position:relative;margin:0;font-family:"Klee One",serif;font-weight:600;font-size:1.25rem;color:#2F3A6E}
 @keyframes breathe{0%{transform:scale(.5)}33.3%{transform:scale(1)}50%{transform:scale(1)}100%{transform:scale(.5)}}
 @media (prefers-reduced-motion:reduce){.breathe .ring{animation-duration:24s}}
+/* record player: a crate of records */
+.records{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.record{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;border:1px solid rgba(120,104,84,.15);border-radius:8px;background:#F4EEE3;color:#2F2B28;text-align:center;cursor:pointer}
+.record .n{font-weight:700;font-size:.85rem}.record .c{font-size:.74rem;color:#8A8279}
+.record.on{border-color:var(--peri2,#6E7FC8);background:#EEF1FA}.record.on svg{animation:spinr 3.2s linear infinite}
+.recrow{align-items:center;gap:10px;margin-top:12px}.recrow input[type=range]{flex:1;max-width:220px}
+@media (prefers-reduced-motion:reduce){.record.on svg{animation:none}}
+/* undo bar after a delete */
+.undobar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:14px;background:#2F2B28;color:#FFFDF6;border-radius:999px;padding:9px 10px 9px 18px;font-size:.9rem;box-shadow:0 10px 24px -12px rgba(0,0,0,.5);max-width:calc(100% - 32px)}
+.undobar[hidden]{display:none}
+.undobar button{background:var(--butter);color:#2F2B28;border:0;border-radius:999px;padding:5px 14px;font-weight:800;cursor:pointer}
 </style>
 </head>
 <body>
@@ -877,6 +899,7 @@ body.nb-open{overflow:hidden}
     <h1 class="title" id="title">Maple's village<small id="dateLine"></small></h1>
   </div>
   <p class="earn" id="earn" aria-live="polite"></p>
+  <div class="undobar" id="undoBar" role="status" hidden><span id="undoMsg"></span><button type="button" id="undoBtn">Undo</button></div>
   <div class="card mapcard">
     <div class="scenebar">
       <p class="scenename" id="sceneName">Village</p>
@@ -2170,8 +2193,13 @@ body.nb-open{overflow:hidden}
     ${tapeLabel(tapeX, tapeY, label2, "var(--sky)", size)}</g>`;
   }
   var ripples = (pts) => `<g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".45">${pts.map(([x, y]) => `<path class="ripple" d="M${x} ${y} q8 -4 16 0"/>`).join("")}</g>`;
+  function ducks(y, rtl, delay) {
+    const duck = (x, s, body2, kid) => `<g class="dbob" style="animation-delay:-${(x / 40).toFixed(2)}s" transform="translate(${x} 0) scale(${s})"><path d="M-14 -2 q14 10 28 0 q4 -8 -2 -10 q-12 -2 -22 2 q-6 2 -4 8z" style="fill:${body2}" stroke="var(--line)" stroke-width="1"/><circle cx="10" cy="-14" r="6" style="fill:${kid ? body2 : "#3E6B4E"}" stroke="var(--line)" stroke-width="1"/><path d="M15 -14 l6 1.5 l-6 1.8z" fill="#F0A33A" stroke="var(--line)" stroke-width=".8"/><circle cx="11.5" cy="-15.5" r="1" fill="var(--line)"/>${kid ? "" : `<path d="M4 -6 q-6 2 -10 0" fill="none" stroke="var(--line)" stroke-width=".8" opacity=".6"/>`}</g>`;
+    const fam = duck(0, 1, "#B89A7A") + duck(-34, 0.55, "#F6D86B", true) + duck(-56, 0.55, "#F6D86B", true) + duck(-78, 0.5, "#F6D86B", true);
+    return `<g class="ducks${rtl ? " rtl" : ""}" style="animation-delay:-${delay}s" pointer-events="none"><g transform="translate(0 ${y})${rtl ? " scale(-1 1)" : ""}">${fam}<path d="M-96 2 q50 6 110 0" fill="none" stroke="#FFFDF6" stroke-width="1.2" opacity=".7"/></g></g>`;
+  }
   function townRiver() {
-    return `<g filter="url(#wob)">${waterBand(600, 640)}</g>${ripples([[60, 620], [150, 628], [370, 618], [450, 630]])}
+    return `<g filter="url(#wob)">${waterBand(600, 640)}</g>${ripples([[60, 620], [150, 628], [370, 618], [450, 630]])}${ducks(626, true, 70)}
     <g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 604 Q65 596 130 603 T260 602 T390 604 T520 600" fill="none"/></g>
     ${bridge("toBase", 260, 584, 640, "To home", 410, 624, 11)}
     <g data-place="bench" aria-label="Riverside bench"><ellipse class="hov" cx="334" cy="572" rx="30" ry="8" style="fill:var(--butter)"/>
@@ -2188,7 +2216,7 @@ body.nb-open{overflow:hidden}
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="200" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="400" cy="380" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="160" cy="590" rx="110" ry="40" style="fill:var(--grass2)"/></g>
     ${tree(40, 30, 0.7)}${tree(150, 26, 0.6)}${tree(380, 28, 0.65)}${tree(480, 30, 0.7)}
     <g filter="url(#wob)">${waterBand(40, 98)}<path d="M478 94 C470 180 500 300 470 400 C462 430 458 450 452 474" fill="none" style="stroke:var(--water)" stroke-width="14" stroke-linecap="round"/></g>
-    ${ripples([[60, 66], [150, 78], [350, 62], [420, 80]])}
+    ${ripples([[60, 66], [150, 78], [350, 62], [420, 80]])}${ducks(76, false, 20)}
     <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 44 Q65 36 130 43 T260 42 T390 44 T520 40 M0 100 Q65 104 130 95 T260 98 T390 96 T520 102"/></g>
     <g filter="url(#wob)"><path d="M260 112 L260 ${D2.home.door[1]} M260 326 C200 360 130 420 ${D2.farm.door[0]} ${D2.farm.door[1]} M260 326 C290 420 300 500 ${D2.pond.door[0]} ${D2.pond.door[1]} M266 312 C330 300 390 290 ${D2.shed.door[0]} ${D2.shed.door[1]} M254 318 C200 320 150 320 ${D2.swing.door[0]} ${D2.swing.door[1]} M290 500 C270 552 240 566 ${D2.run.door[0]} ${D2.run.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
       <ellipse cx="260" cy="322" rx="44" ry="20" style="fill:var(--path)"/></g>
@@ -2364,11 +2392,12 @@ body.nb-open{overflow:hidden}
       }
       case "curtwindow": {
         const g = G.F() || {}, night = G.dusk(), shut = g.curtains ? g.curtains === "closed" : night || !!(G.S && G.S().sleep);
-        const L = shut ? `<path d="M${x - 50} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/><path d="M${x} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>` : `<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z" style="fill:var(--rose)"/><path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z" style="fill:var(--rose)"/>`;
+        const cur2 = (fill, lines, ox, delay) => `<g class="sway" style="transform-origin:${ox}px ${y - 170}px;animation-delay:-${delay}s">${sk(fill, lines)}</g>`;
+        const curtains = shut ? cur2(`<path d="M${x - 50} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x - 50} ${y - 170} h50 v86 h-50z M${x - 40} ${y - 160} q4 30 0 70 M${x - 20} ${y - 164} q-4 34 0 74" opacity=".8"/>`, x - 25, 0) + cur2(`<path d="M${x} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x} ${y - 170} h50 v86 h-50z M${x + 20} ${y - 164} q4 34 0 74 M${x + 40} ${y - 160} q-4 30 0 70" opacity=".8"/>`, x + 25, 1.7) : cur2(`<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z" style="fill:var(--rose)"/>`, `<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z M${x - 50} ${y - 150} q4 30 -2 60" opacity=".8"/>`, x - 49, 0) + cur2(`<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z" style="fill:var(--rose)"/>`, `<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z M${x + 50} ${y - 150} q-4 30 2 60" opacity=".8"/>`, x + 49, 1.7);
         return sk(
-          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4" style="fill:${night ? "#3E4673" : "var(--sky)"}"/>${night && !shut ? `<circle cx="${x + 18}" cy="${y - 142}" r="9" style="fill:#FFF3C4"/>` : !shut ? `<ellipse cx="${x - 14}" cy="${y - 120}" rx="18" ry="7" style="fill:#FFFDF6"/>` : ""}${L}`,
-          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4"/><path d="M${x} ${y - 168} v82 M${x - 48} ${y - 128} h96" opacity="${shut ? 0 : 1}"/><path d="M${x - 62} ${y - 172} h124" stroke-width="2.4"/>${shut ? `<path d="M${x - 40} ${y - 160} q4 30 0 70 M${x - 20} ${y - 164} q-4 34 0 74 M${x + 20} ${y - 164} q4 34 0 74 M${x + 40} ${y - 160} q-4 30 0 70" opacity=".5"/>` : `<path d="M${x - 50} ${y - 150} q4 30 -2 60 M${x + 50} ${y - 150} q-4 30 2 60" opacity=".5"/>`}`
-        );
+          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4" style="fill:${night ? "#3E4673" : "var(--sky)"}"/>${night && !shut ? `<circle cx="${x + 18}" cy="${y - 142}" r="9" style="fill:#FFF3C4"/>` : !shut ? `<ellipse cx="${x - 14}" cy="${y - 120}" rx="18" ry="7" style="fill:#FFFDF6"/>` : ""}`,
+          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4"/><path d="M${x} ${y - 168} v82 M${x - 48} ${y - 128} h96" opacity="${shut ? 0 : 1}"/>`
+        ) + curtains + sk("", `<path d="M${x - 62} ${y - 172} h124" stroke-width="2.4"/><circle cx="${x - 62}" cy="${y - 172}" r="2.4"/><circle cx="${x + 62}" cy="${y - 172}" r="2.4"/>`);
       }
       case "record": {
         const on = !!(G.music && G.music());
@@ -2940,27 +2969,90 @@ body.nb-open{overflow:hidden}
   }
   GESTURES.forEach((t) => document.addEventListener(t, onGesture, true));
   var N = (n) => 440 * Math.pow(2, (n - 69) / 12);
-  var BARS = [
-    [41, 60, 64, 65, 69, 72],
-    [40, 59, 62, 64, 67, 71],
-    [38, 57, 60, 62, 64, 65],
-    [40, 55, 59, 60, 64, 67],
-    [34, 57, 58, 62, 65, 69],
-    [33, 55, 57, 60, 64, 67],
-    [31, 53, 55, 58, 62, 65],
-    [36, 53, 55, 58, 60, 65]
-  ];
-  var BPM = 64;
-  var BEAT = 60 / BPM;
+  var TRACKS = {
+    piano: {
+      name: "Morning piano",
+      mood: "Soft and hopeful",
+      bpm: 64,
+      steps: 8,
+      tone: "piano",
+      col: "var(--butter)",
+      bars: [[41, 60, 64, 65, 69, 72], [40, 59, 62, 64, 67, 71], [38, 57, 60, 62, 64, 65], [40, 55, 59, 60, 64, 67], [34, 57, 58, 62, 65, 69], [33, 55, 57, 60, 64, 67], [31, 53, 55, 58, 62, 65], [36, 53, 55, 58, 60, 65]],
+      arp: [1, 2, 3, 4, 3, 2, 1, 2],
+      arpVel: 0.055,
+      mel: 0.75
+    },
+    rainy: {
+      name: "Rainy window",
+      mood: "Slow, a little wistful",
+      bpm: 54,
+      steps: 8,
+      tone: "rhodes",
+      col: "var(--sky)",
+      bars: [[38, 57, 60, 64, 65, 69], [34, 57, 62, 65, 69, 72], [31, 58, 62, 65, 67, 70], [33, 55, 61, 64, 67, 69]],
+      arp: [1, 3, 2, 4, 1, 3, 2, 5],
+      arpVel: 0.045,
+      mel: 0.5
+    },
+    musicbox: {
+      name: "Music box",
+      mood: "Tinkly, a gentle waltz",
+      bpm: 88,
+      steps: 6,
+      tone: "bell",
+      col: "var(--blush)",
+      bars: [[48, 64, 67, 72, 76, 79], [45, 64, 69, 72, 76, 81], [41, 65, 69, 72, 77, 81], [43, 62, 67, 71, 74, 79]],
+      arp: [1, 3, 5, 3, 4, 2],
+      arpVel: 0.05,
+      mel: 0.6,
+      up: 12
+    },
+    stroll: {
+      name: "Sunday stroll",
+      mood: "Bright and bouncy",
+      bpm: 84,
+      steps: 8,
+      tone: "piano",
+      col: "var(--sage)",
+      bars: [[43, 59, 62, 67, 71, 74], [40, 59, 64, 67, 71, 76], [36, 60, 64, 67, 72, 76], [38, 57, 62, 66, 69, 74]],
+      arp: [1, 3, 2, 3, 4, 3, 2, 3],
+      arpVel: 0.06,
+      mel: 0.85,
+      bounce: true
+    },
+    night: {
+      name: "Night lights",
+      mood: "A hushed lullaby",
+      bpm: 50,
+      steps: 8,
+      tone: "bell",
+      col: "var(--peri)",
+      bars: [[44, 60, 63, 68, 72, 75], [41, 60, 65, 68, 72, 77], [37, 61, 65, 68, 73, 77], [39, 58, 63, 67, 70, 75]],
+      arp: [1, 2, 3, 4, 5, 4, 3, 2],
+      arpVel: 0.035,
+      mel: 0.4
+    },
+    rain: { name: "Rain on the roof", mood: "Just rain, no music", rain: true, col: "#9CB4C9" }
+  };
+  var cur = () => TRACKS[settings.track] || TRACKS.piano;
+  var BEAT = 60 / 64;
+  var BARS = TRACKS.piano.bars;
   var playing = false;
   var nextTime = 0;
   var step = 0;
   var timerId = 0;
   var loops = 0;
   var melody = [];
+  var rainSrc = null;
+  var bellWave = null;
+  var rhodesWave = null;
   function note(freq, t, dur2, vel) {
-    const o = ac.createOscillator(), g = ac.createGain(), f2 = ac.createBiquadFilter();
-    o.setPeriodicWave(pianoWave);
+    const o = ac.createOscillator(), g = ac.createGain(), f2 = ac.createBiquadFilter(), tone = cur().tone;
+    if (!bellWave) {
+      bellWave = ac.createPeriodicWave(new Float32Array([0, 1, 0, 0.35, 0, 0.12, 0, 0.05]), new Float32Array(8));
+      rhodesWave = ac.createPeriodicWave(new Float32Array([0, 1, 0.25, 0.12, 0.02]), new Float32Array(5));
+    }
+    o.setPeriodicWave(tone === "bell" ? bellWave : tone === "rhodes" ? rhodesWave : pianoWave);
     o.frequency.value = freq;
     f2.type = "lowpass";
     f2.frequency.value = Math.min(4200, 900 + freq * 2.2);
@@ -2980,33 +3072,67 @@ body.nb-open{overflow:hidden}
     });
   }
   function schedule() {
+    const T = cur(), S8 = T.steps || 8, up = T.up || 0;
     while (nextTime < ac.currentTime + 0.6) {
-      const bar = Math.floor(step / 8) % BARS.length, e = step % 8, t = nextTime, b = BARS[bar];
+      const bar = Math.floor(step / S8) % BARS.length, e = step % S8, t = nextTime, b = BARS[bar];
       if (bar === 0 && e === 0) {
         if (step) loops++;
         newMelody();
+        if (Math.random() > T.mel) melody = melody.map(() => []);
       }
       if (e === 0) {
         note(N(b[0]), t, 3.4, 0.16);
         note(N(b[0] + 12), t, 3, 0.08);
       }
-      if (e === 4) note(N(b[0] + 7), t, 2.4, 0.09);
-      const arp = [1, 2, 3, 4, 3, 2, 1, 2][e];
-      note(N(b[arp]), t + (Math.random() - 0.5) * 0.012, 2.2, 0.055 + Math.random() * 0.02);
+      if (S8 === 8 && e === 4) note(N(b[0] + 7), t, 2.4, 0.09);
+      if (T.bounce && (e === 2 || e === 6)) note(N(b[0] + 12), t, 0.6, 0.07);
+      if (S8 === 6 && (e === 2 || e === 4)) note(N(b[1]), t, 1.2, 0.05);
+      const arp = (T.arp || [1, 2, 3, 4, 3, 2, 1, 2])[e];
+      note(N(b[Math.min(arp, b.length - 1)] + up), t + (Math.random() - 0.5) * 0.012, 2.2, (T.arpVel || 0.055) + Math.random() * 0.02);
       (melody[bar] || []).forEach(([beat, n]) => {
-        if (Math.abs(beat * 2 - e) < 0.01) note(N(n), t + 0.01, 2.8, 0.1);
+        if (Math.abs(beat * 2 - e) < 0.01) note(N(n + up), t + 0.01, 2.8, 0.1);
       });
       step++;
       nextTime += BEAT / 2;
     }
   }
+  function startRain() {
+    const len = ac.sampleRate * 3, buf = ac.createBuffer(2, len, ac.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const d = buf.getChannelData(c);
+      let last2 = 0;
+      for (let i = 0; i < len; i++) {
+        last2 = (last2 + 0.04 * (Math.random() * 2 - 1)) / 1.04;
+        d[i] = last2 * 3.2 + (Math.random() < 4e-4 ? (Math.random() - 0.5) * 0.8 : 0);
+      }
+    }
+    const src = ac.createBufferSource(), f2 = ac.createBiquadFilter();
+    src.buffer = buf;
+    src.loop = true;
+    f2.type = "lowpass";
+    f2.frequency.value = 1400;
+    src.connect(f2).connect(musicBus);
+    src.start();
+    rainSrc = src;
+    timerId = setInterval(() => {
+      if (Math.random() < 0.35) note(N(84 + Math.floor(Math.random() * 8)), ac.currentTime + Math.random() * 0.5, 0.5, 0.015);
+    }, 700);
+  }
   function startMusic() {
     if (!ensure() || playing || !settings.music) return;
+    const T = cur();
+    BEAT = 60 / (T.bpm || 64);
+    BARS = T.bars || TRACKS.piano.bars;
     playing = true;
     nextTime = ac.currentTime + 0.15;
     step = 0;
+    loops = 0;
     musicBus.gain.cancelScheduledValues(ac.currentTime);
-    musicBus.gain.setTargetAtTime(settings.musicVol * 0.5, ac.currentTime, 1.2);
+    musicBus.gain.setTargetAtTime(settings.musicVol * (T.rain ? 0.9 : 0.5), ac.currentTime, 1.2);
+    if (T.rain) {
+      startRain();
+      return;
+    }
     timerId = setInterval(schedule, 120);
     schedule();
   }
@@ -3014,8 +3140,30 @@ body.nb-open{overflow:hidden}
     if (!ac || !playing) return;
     playing = false;
     clearInterval(timerId);
+    if (rainSrc) {
+      const r = rainSrc;
+      rainSrc = null;
+      setTimeout(() => {
+        try {
+          r.stop();
+        } catch {
+        }
+      }, 900);
+    }
     musicBus.gain.setTargetAtTime(0, ac.currentTime, 0.4);
   }
+  function setTrack(id) {
+    if (!TRACKS[id]) return;
+    const was = playing;
+    settings.track = id;
+    settings.music = true;
+    saveSettings();
+    if (was) {
+      stopMusic();
+      setTimeout(() => startMusic(), 450);
+    } else unlockAudio();
+  }
+  var currentTrack = () => settings.track && TRACKS[settings.track] ? settings.track : "piano";
   function setMusic(on) {
     settings.music = on;
     saveSettings();
@@ -3707,28 +3855,28 @@ Quests finished today: ${S3.doneIds.length}`;
     });
     let best = null, bestCost = Infinity;
     while (open2.size) {
-      let cur = null, cf = Infinity;
+      let cur2 = null, cf = Infinity;
       for (const i of open2) {
         const f2 = g.get(i) + dist(pts[i], to);
         if (f2 < cf) {
           cf = f2;
-          cur = i;
+          cur2 = i;
         }
       }
       if (cf >= bestCost) break;
-      open2.delete(cur);
-      if (ends.has(cur)) {
-        const c = g.get(cur) + ends.get(cur);
+      open2.delete(cur2);
+      if (ends.has(cur2)) {
+        const c = g.get(cur2) + ends.get(cur2);
         if (c < bestCost) {
           bestCost = c;
-          best = cur;
+          best = cur2;
         }
       }
-      for (const j of nb[cur]) {
-        const c = g.get(cur) + dist(pts[cur], pts[j]);
+      for (const j of nb[cur2]) {
+        const c = g.get(cur2) + dist(pts[cur2], pts[j]);
         if (c < (g.get(j) ?? Infinity)) {
           g.set(j, c);
-          prev.set(j, cur);
+          prev.set(j, cur2);
           open2.add(j);
         }
       }
@@ -4049,7 +4197,7 @@ Quests finished today: ${S3.doneIds.length}`;
         if (!cached) save();
         return;
       }
-      const remote = snap.data() || {};
+      const remote = JSON.parse(JSON.stringify(snap.data() || {}));
       seen = Math.max(seen, remote.updatedAt || 0);
       if (first && (remote.updatedAt || 0) < loadedAt) {
         if (!cached) save();
@@ -4078,7 +4226,7 @@ Quests finished today: ${S3.doneIds.length}`;
     clearTimeout(pushT);
     pushT = setTimeout(async () => {
       try {
-        const cur = await ref.get(), r = cur.exists ? cur.data() : null;
+        const cur2 = await ref.get(), r = cur2.exists ? cur2.data() : null;
         if (r && (r.updatedAt || 0) > seen) {
           H2 = Object.assign(fresh(), JSON.parse(JSON.stringify(r)));
           seen = r.updatedAt;
@@ -4275,9 +4423,17 @@ Quests finished today: ${S3.doneIds.length}`;
     on("[data-hdel]", "click", (el) => {
       const [k, id] = el.dataset.hdel.split(":");
       const key = k === "daily" ? "dailyTasks" : "weeklyTasks";
+      const i = H2[key].findIndex((t) => t.id === id);
+      if (i < 0) return;
+      const gone = H2[key][i];
       H2[key] = H2[key].filter((t) => t.id !== id);
       save();
       api2.changed();
+      api2.undoable(`Removed “${gone.text}”`, () => {
+        if (!H2[key].some((t) => t.id === id)) H2[key].splice(Math.min(i, H2[key].length), 0, gone);
+        save();
+        api2.changed();
+      });
     });
     on("form[data-hadd]", "submit", (el, e) => {
       e.preventDefault();
@@ -4339,11 +4495,19 @@ Quests finished today: ${S3.doneIds.length}`;
       api2.changed();
     });
     on("[data-hitemdel]", "click", (el) => {
-      const id = el.dataset.hitemdel;
-      H2.pantryItems = H2.pantryItems.filter((i) => String(i.id) !== id);
+      const id = el.dataset.hitemdel, i = H2.pantryItems.findIndex((x) => String(x.id) === id);
+      if (i < 0) return;
+      const gone = H2.pantryItems[i], onList = (H2.shoppingList || []).find((s) => String(s.id) === id);
+      H2.pantryItems = H2.pantryItems.filter((x) => String(x.id) !== id);
       H2.shoppingList = (H2.shoppingList || []).filter((s) => String(s.id) !== id);
       save();
       api2.changed();
+      api2.undoable(`Removed ${gone.name}`, () => {
+        if (!H2.pantryItems.some((x) => String(x.id) === id)) H2.pantryItems.splice(Math.min(i, H2.pantryItems.length), 0, gone);
+        if (onList && !H2.shoppingList.some((s) => String(s.id) === id)) H2.shoppingList.push(onList);
+        save();
+        api2.changed();
+      });
     });
     on("[data-hbuy]", "change", (el) => {
       const it = H2.pantryItems.find((i) => String(i.id) === el.dataset.hbuy);
@@ -4655,7 +4819,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     if (o.why) out.why = clean(o.why, 220);
     if (!out.top && !out.dress) return null;
     if (!F2.outfits || F2.outfits.day !== dayKey()) F2.outfits = { day: dayKey(), list: [] };
-    F2.outfits.list = [...F2.outfits.list, out].slice(-4);
+    F2.outfits.list = [...F2.outfits.list, out].slice(-2);
     return out;
   }
 
@@ -4750,7 +4914,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     [...a.entries || [], ...b && b.entries || []].forEach((e) => {
       if (!e || !e.id) return;
       const o = m.get(e.id);
-      if (!o || e.deleted || (e.at || 0) > (o.at || 0) && !o.deleted) m.set(e.id, e);
+      if (!o || (e.at || 0) > (o.at || 0)) m.set(e.id, e);
     });
     return { entries: [...m.values()].sort((x, y) => (y.at || 0) - (x.at || 0)).slice(0, 400), updatedAt: Math.max(a.updatedAt || 0, b && b.updatedAt || 0) };
   }
@@ -4763,7 +4927,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
         if (J.entries.length) pushJ();
         return;
       }
-      J = mergeJ(J, snap.data() || {});
+      J = mergeJ(J, JSON.parse(JSON.stringify(snap.data() || {})));
       keepJ();
       onChange2("journal");
     }, () => {
@@ -4786,8 +4950,8 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     if (!jref) return;
     jChain = jChain.then(async () => {
       try {
-        const cur = await jref.get();
-        if (cur.exists) J = mergeJ(J, cur.data() || {});
+        const cur2 = await jref.get();
+        if (cur2.exists) J = mergeJ(J, cur2.data() || {});
         await jref.set(JSON.parse(JSON.stringify(J)));
       } catch {
       }
@@ -4840,7 +5004,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     if (list.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list.map((e) => `<details><summary><b>${when(e)}</b> ${esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary><p>${esc(e.text).replace(/\n/g, "<br>")}</p><button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
     return h;
   }
-  function wireJournal(root, done) {
+  function wireJournal(root, undoable2, done) {
     const ta = root.querySelector("#jText");
     if (!ta) return;
     ta.oninput = () => {
@@ -4856,13 +5020,16 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     };
     root.querySelectorAll("[data-jdel]").forEach((b) => b.onclick = (ev) => {
       ev.preventDefault();
-      if (b.dataset.sure) {
-        delEntry(b.dataset.jdel);
+      const id = b.dataset.jdel, e = J.entries.find((x) => x.id === id);
+      if (!e) return;
+      delEntry(id);
+      done(null);
+      undoable2("Page torn out", () => {
+        J = { entries: J.entries.map((x) => x.id === id ? Object.assign({}, e, { at: Date.now() }) : x), updatedAt: Date.now() };
+        keepJ();
+        pushJ();
         done(null);
-      } else {
-        b.dataset.sure = "1";
-        b.textContent = "tap again to tear out";
-      }
+      });
     });
   }
   function scratchPanel() {
@@ -4871,7 +5038,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     <label class="sr" for="scratchText">Scratchpad</label><textarea id="scratchText" class="scratch" rows="12" maxlength="20000" placeholder="Ideas, numbers, a to-do, a thought for later...">${esc(SC.text)}</textarea>
     <div class="actions"><span class="muted" id="scratchSaved">${ago3 == null ? "" : ago3 < 1 ? "Saved just now" : `Saved ${ago3} min ago`}</span><button class="btn alt small" data-scratch="clear">Wipe the board</button></div>`;
   }
-  function wireScratch(root) {
+  function wireScratch(root, undoable2, rerender) {
     const ta = root.querySelector("#scratchText");
     if (!ta) return;
     const save3 = () => {
@@ -4884,15 +5051,16 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     ta.oninput = save3;
     const b = root.querySelector('[data-scratch="clear"]');
     b.onclick = () => {
-      if (!b.dataset.sure) {
-        b.dataset.sure = "1";
-        b.textContent = "Tap again to wipe";
-        return;
-      }
+      const was = ta.value;
+      if (!was) return;
       ta.value = "";
       save3();
-      delete b.dataset.sure;
-      b.textContent = "Wipe the board";
+      undoable2("Board wiped", () => {
+        SC = { text: was, updatedAt: Date.now() };
+        keepS();
+        pushS();
+        rerender();
+      });
     };
   }
 
@@ -5366,7 +5534,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     writing[which] = true;
     try {
       if (!direct) {
-        const cur = await refs[which].get(), r = cur.exists ? cur.data() : null;
+        const cur2 = await refs[which].get(), r = cur2.exists ? cur2.data() : null;
         if (r && (r.updatedAt || 0) > seen2[which] && !(which === "today" && r.day !== dayKey())) {
           adopt(which, JSON.parse(JSON.stringify(r)));
           writing[which] = false;
@@ -5432,7 +5600,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     });
     refs = { today: col.doc("today"), fox: col.doc("fox"), plan: col.doc("plan"), mail: col.doc("mail"), stats: col.doc("stats"), library: col.doc("library") };
     refs.library.onSnapshot((snap) => {
-      LIB = snap.exists ? Object.assign({ items: [] }, snap.data()) : { items: [] };
+      LIB = snap.exists ? Object.assign({ items: [] }, JSON.parse(JSON.stringify(snap.data()))) : { items: [] };
       try {
         localStorage.setItem("fox.library", JSON.stringify(LIB));
       } catch {
@@ -5441,7 +5609,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     }, () => {
     });
     refs.mail.onSnapshot((snap) => {
-      MAIL = snap.exists ? Object.assign({ items: [] }, snap.data()) : { items: [] };
+      MAIL = snap.exists ? Object.assign({ items: [] }, JSON.parse(JSON.stringify(snap.data()))) : { items: [] };
       try {
         localStorage.setItem("fox.mail", JSON.stringify(MAIL));
       } catch {
@@ -5451,7 +5619,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     });
     refs.stats.onSnapshot((snap) => {
       const before = ST;
-      ST = snap.exists ? snap.data() || {} : {};
+      ST = snap.exists ? JSON.parse(JSON.stringify(snap.data() || {})) : {};
       try {
         localStorage.setItem("fox.stats", JSON.stringify(ST));
       } catch {
@@ -5465,7 +5633,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     refs.plan.onSnapshot((snap) => {
       if (snap.exists) {
         const was = remaining().length;
-        P = snap.data();
+        P = JSON.parse(JSON.stringify(snap.data()));
         try {
           localStorage.setItem("fox.plan", JSON.stringify(P));
         } catch {
@@ -5531,6 +5699,15 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     sfx("paper", true);
     setSay(`Dropped “${t.title}” for today. One less thing.`);
     if (!quiet) save2(true);
+    if (!quiet) {
+      const ex = String(id).startsWith("x") ? t : null;
+      undoable(`Dropped “${t.title}”`, () => {
+        if (ex) S2.extra.push(ex);
+        else S2.dropped = (S2.dropped || []).filter((x) => x !== id);
+        setSay("Back on the board.");
+        save2(true);
+      });
+    }
   }
   function undropTask(id) {
     S2.dropped = (S2.dropped || []).filter((x) => x !== id);
@@ -5565,6 +5742,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
   var journalOpen = false;
   var scratchOpen = false;
   var calmOpen = false;
+  var recOpen = false;
   var BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]];
   var CYCLE = 12;
   var breath = null;
@@ -5700,6 +5878,28 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     F.xp += 5;
     F.lastActive = k;
   }
+  var undoT = null;
+  var undoFn = null;
+  function undoable(msg, restore) {
+    undoFn = restore;
+    $("undoMsg").textContent = plain(msg);
+    $("undoBar").hidden = false;
+    clearTimeout(undoT);
+    undoT = setTimeout(() => {
+      $("undoBar").hidden = true;
+      undoFn = null;
+    }, 7e3);
+  }
+  $("undoBtn").onclick = () => {
+    const f2 = undoFn;
+    undoFn = null;
+    clearTimeout(undoT);
+    $("undoBar").hidden = true;
+    if (f2) {
+      f2();
+      sfx("paper", true);
+    }
+  };
   var earnT;
   function flash(msg) {
     const e = $("earn");
@@ -6213,7 +6413,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
   }
   var sun = { busy: false, at: 0, error: null, added: 0 };
   function creditDone(tasks, quiet) {
-    const ids = new Set(allTasks().map((t) => t.id)), cur = phase() === "task" ? remaining()[0] : null, got = [];
+    const ids = new Set(allTasks().map((t) => t.id)), cur2 = phase() === "task" ? remaining()[0] : null, got = [];
     (tasks || []).forEach((t) => {
       if (!t || !t.completed || !ids.has(t.id) || S2.doneIds.includes(t.id)) return;
       S2.doneIds.push(t.id);
@@ -6224,7 +6424,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
       earn(5, "done in Sunsama");
       gainXp(1);
       countQuest();
-      if (cur && cur.id === t.id) {
+      if (cur2 && cur2.id === t.id) {
         if (S2.timer && S2.timer.id === t.id) S2.timer = null;
         S2.firstStep[t.id] = false;
       }
@@ -6574,12 +6774,12 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     return null;
   }
   function chatContext() {
-    const rem = remaining(), cur = phase() === "task" ? rem[0] : null, h = hestiaSummary();
+    const rem = remaining(), cur2 = phase() === "task" ? rem[0] : null, h = hestiaSummary();
     return JSON.stringify({
       time: `${String(Math.floor(sgHM() / 60)).padStart(2, "0")}:${String(sgHM() % 60).padStart(2, "0")} Singapore, ${WEEKDAY[(/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).getUTCDay()]}`,
       where: scene,
       phase: phase(),
-      currentQuest: cur ? cur.title : null,
+      currentQuest: cur2 ? cur2.title : null,
       questsLeft: rem.map((t) => t.title).slice(0, 15),
       questsDone: S2.doneIds.length,
       timer: S2.timer ? { kind: S2.timer.kind, minutesLeft: Math.round(tLeft() / M) } : null,
@@ -7177,6 +7377,7 @@ Then tell chat "wind down" whenever you're ready.`
     journalOpen = false;
     scratchOpen = false;
     calmOpen = false;
+    recOpen = false;
     selPlot = null;
     homeView = null;
     postOpen = false;
@@ -7275,6 +7476,11 @@ Then tell chat "wind down" whenever you're ready.`
       }
     } else if (bedOpen && scene === "room") {
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>Your bed</h2>` + (S2.sleep ? `<p class="sub">${S2.sleep.until ? `Napping. Up in about ${Math.max(1, Math.ceil((S2.sleep.until - Date.now()) / M))} min.` : "Fast asleep. Sweet dreams."}</p><div class="actions"><button class="btn yes" data-bed="up">Get up</button></div>` : `<p class="sub">Fluffy pillows, cool sheets${(F.decor || {}).r_throw ? ", your knitted throw" : ""}.</p><div class="actions"><button class="btn primary" data-bed="nap">Nap for 20 minutes</button><button class="btn alt" data-bed="sleep">${sgHM() >= 20 * 60 || sgHM() < 5 * 60 ? "Go to sleep" : "Lie down"}</button></div>`);
+    } else if (recOpen && scene === "room") {
+      const on = settings.music, ct = currentTrack();
+      h = `<span class="tape gingham" aria-hidden="true"></span><h2>Record player</h2><p class="sub">${on ? `Playing: ${esc(TRACKS[ct].name)}.` : "Pick a record to put on."}</p>
+      <div class="records">${Object.entries(TRACKS).map(([id, t]) => `<button class="record${on && id === ct ? " on" : ""}" data-track="${id}"><svg viewBox="0 0 40 40" width="46" height="46" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#2F2B28"/><circle cx="20" cy="20" r="13" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="9" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="6.5" style="fill:${t.col}"/><circle cx="20" cy="20" r="1.4" fill="#FFFDF6"/></svg><span class="n">${esc(t.name)}</span><span class="c">${on && id === ct ? "playing now" : esc(t.mood)}</span></button>`).join("")}</div>
+      <div class="actions recrow"><label for="recVol" class="muted">Volume</label><input id="recVol" type="range" min="0" max="1" step="0.05" value="${settings.musicVol}">${on ? `<button class="btn alt small" data-rec="stop">Lift the needle</button>` : ""}</div>`;
     } else if (calmOpen && scene === "room") {
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>Calm corner</h2>` + (breath ? `<div class="breathe"><div class="ring" style="animation-delay:-${((Date.now() - breath.start) / 1e3 % CYCLE).toFixed(2)}s"></div><p class="cue" id="breathCue">Breathe in</p></div><p class="sub" style="text-align:center"><span id="breathLeft"></span> left</p><div class="actions" style="justify-content:center"><button class="btn alt small" data-calm="stop">Stop</button></div>` : `<p class="sub">Cushions, ${(F.decor || {}).r_candle ? "a candle, " : ""}one slow breath.</p><p class="eyebrow">Guided breathing</p><div class="actions">${[1, 3, 5].map((m) => `<button class="btn ${m === 3 ? "primary" : "alt"} small" data-calm="${m}">${m} min</button>`).join("")}</div>
         <p class="eyebrow" style="margin-top:14px">After a call, or any time</p><div class="actions"><button class="btn alt small" data-calm="decompress">Decompress</button></div>`);
@@ -7304,11 +7510,11 @@ Then tell chat "wind down" whenever you're ready.`
       if (past.length) h += `<p class="eyebrow" style="margin:22px 0 6px">Read before</p><ul class="qlist">${past.map((d, i) => `<li><span><b>${esc(d.title)}</b><small>${esc(d.author || "")}</small></span><button class="next" data-dig="past" data-i="${i}">reread</button></li>`).join("")}</ul>`;
       h += `</div><div class="actions"><button class="btn alt small" data-close="1">Close shelf</button></div>`;
     } else if (boardOpen) {
-      const list = outside() ? allTasks() : questsIn(scene), cur = phase() === "task" ? remaining()[0].id : null;
+      const list = outside() ? allTasks() : questsIn(scene), cur2 = phase() === "task" ? remaining()[0].id : null;
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>${outside() ? "Town quest board" : esc(ROOMS[scene].name) + " quests"}</h2>
       ${list.length ? `<ul class="qlist">${list.map((t) => {
         const dn = S2.doneIds.includes(t.id), sp = spotObj(placeOf(t), spotOf(t));
-        return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"${!dn && t.id !== cur && phase() !== "clean" ? ` data-next="${esc(t.id)}" role="button"` : ""}><span><b>${esc(t.title)}</b><small>${outside() ? icon(placeOf(t), 16) + " " + esc(VILLAGE[placeOf(t)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : "<span></span>"}</li>`;
+        return `<li class="${dn ? "done" : ""}${t.id === cur2 ? " cur" : ""}"${!dn && t.id !== cur2 && phase() !== "clean" ? ` data-next="${esc(t.id)}" role="button"` : ""}><span><b>${esc(t.title)}</b><small>${outside() ? icon(placeOf(t), 16) + " " + esc(VILLAGE[placeOf(t)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t.id !== cur2 && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : "<span></span>"}</li>`;
       }).join("")}</ul>` : `<p class="sub">No quests ${outside() ? "today yet" : "in here today"}.</p>`}
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
     }
@@ -7348,27 +7554,43 @@ Then tell chat "wind down" whenever you're ready.`
       journalOpen = false;
       scratchOpen = false;
       calmOpen = false;
+      recOpen = false;
       ctx();
     });
     c.querySelectorAll("[data-bed]").forEach((b) => b.onclick = () => bedAction(b.dataset.bed));
+    c.querySelectorAll("[data-track]").forEach((b) => b.onclick = () => {
+      setTrack(b.dataset.track);
+      speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500);
+      ctx();
+      drawScene();
+    });
+    c.querySelectorAll('[data-rec="stop"]').forEach((b) => b.onclick = () => {
+      setMusic(false);
+      speak("Needle up. Quiet time.", 2500);
+      ctx();
+      drawScene();
+    });
+    const rv = c.querySelector("#recVol");
+    if (rv) rv.oninput = () => setMusicVol(+rv.value);
     c.querySelectorAll("[data-calm]").forEach((b) => b.onclick = () => {
       const k = b.dataset.calm;
       if (k === "stop") stopBreath(false);
       else if (k === "decompress") {
         calmOpen = false;
+        recOpen = false;
         A.decompNow();
         drawScene();
       } else startBreath(+k);
     });
     if (breath) tickBreath();
-    if (journalOpen && scene === "room") wireJournal(c, (e) => {
+    if (journalOpen && scene === "room") wireJournal(c, undoable, (e) => {
       if (e) {
         sfx("chime");
         speak(S2.mode === "decompress" && S2.decompFree ? "Written down. Now you can let it go." : "Page kept. Lovely.", 3500);
       }
       ctx();
     });
-    if (scratchOpen && scene === "hall") wireScratch(c);
+    if (scratchOpen && scene === "hall") wireScratch(c, undoable, () => ctx());
     const of = c.querySelector("#outfitForm");
     if (of) {
       const inp = c.querySelector("#outfitAsk");
@@ -7567,14 +7789,14 @@ Then tell chat "wind down" whenever you're ready.`
     <ul class="uplist">${UPGRADES.map((u) => `<li class="${(F.totalQuests || 0) >= u.at ? "got" : ""}">${icon((F.totalQuests || 0) >= u.at ? "sparkle" : "clock", 16)} <span>${esc(u.name)}</span> <small>${u.at}</small></li>`).join("")}</ul>`;
     $("friendBody").insertAdjacentHTML("beforeend", `<h3 class="ph3">Family</h3><p class="muted">${icon("heart", 14)} Gifts for Evan: ${F.fam.gifts.evan} · for Darren: ${F.fam.gifts.darren}. Every third gift, they give you something back. Treats and keepsakes are in the market's Family tab.</p>`);
     renderEvanHold();
-    const all = allTasks(), rem = remaining(), cur = phase() === "task" && rem[0] ? rem[0].id : null;
+    const all = allTasks(), rem = remaining(), cur2 = phase() === "task" && rem[0] ? rem[0].id : null;
     $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
     $("qBadge").hidden = !rem.length;
     $("qBadge").textContent = rem.length;
     $("list").innerHTML = all.map((t) => {
       const dn = S2.doneIds.includes(t.id);
-      const pickable = !dn && t.id !== cur && phase() !== "clean";
-      return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? `<i class="tk" aria-label="done"></i>` : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}${t.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : "<span></span>"}</li>`;
+      const pickable = !dn && t.id !== cur2 && phase() !== "clean";
+      return `<li class="${dn ? "done" : ""}${t.id === cur2 ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? `<i class="tk" aria-label="done"></i>` : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur2 ? " · doing now" : ""}${t.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : "<span></span>"}</li>`;
     }).join("") + ((S2.dropped || []).length ? `<li class="dropped"><small>Dropped today: ${(S2.dropped || []).map((id) => {
       const t = (P && P.tasks || []).find((x) => x.id === id);
       return t ? `${esc(t.title)} <button class="drop" data-undrop="${esc(id)}">bring back</button>` : "";
@@ -7640,6 +7862,7 @@ Then tell chat "wind down" whenever you're ready.`
       journalOpen = false;
       scratchOpen = false;
       calmOpen = false;
+      recOpen = false;
       homeView = null;
       postOpen = false;
       healthOpen = false;
@@ -7674,16 +7897,16 @@ Then tell chat "wind down" whenever you're ready.`
   }
   function go(target, x, y, fn) {
     const legs = [];
-    let cur = scene;
-    if (cur !== target) {
+    let cur2 = scene;
+    if (cur2 !== target) {
       const tIn = INNER[target] ? INNER[target].parent : target;
-      if (INNER[cur] && cur !== tIn) {
-        const I2 = INNER[cur], from = cur;
+      if (INNER[cur2] && cur2 !== tIn) {
+        const I2 = INNER[cur2], from = cur2;
         legs.push({ scene: from, x: 486, y: 410, fn: () => setScene(I2.parent, I2.door) });
-        cur = I2.parent;
+        cur2 = I2.parent;
       }
-      if (cur !== tIn) {
-        const curOut = outdoorOf(cur), tOut = outdoorOf(tIn), c0 = cur;
+      if (cur2 !== tIn) {
+        const curOut = outdoorOf(cur2), tOut = outdoorOf(tIn), c0 = cur2;
         if (!OUTDOOR.includes(c0)) legs.push({ scene: c0, x: 260, y: 606, fn: () => setScene(curOut, VILLAGE[c0].door) });
         for (let s = curOut, guard = 0; s !== tOut && guard < 6; guard++) {
           const n = nextHop(s, tOut);
@@ -7714,6 +7937,7 @@ Then tell chat "wind down" whenever you're ready.`
     journalOpen = false;
     scratchOpen = false;
     calmOpen = false;
+    recOpen = false;
     homeView = null;
     postOpen = false;
     healthOpen = false;
@@ -7758,9 +7982,9 @@ Then tell chat "wind down" whenever you're ready.`
       return;
     }
     if (id === "record") {
-      setMusic(!settings.music);
-      speak(settings.music ? "Record's on. Mmm." : "Needle up. Quiet time.", 2500);
-      drawScene();
+      recOpen = true;
+      sfx("paper", true);
+      render();
       return;
     }
     if (id === "nook") {
@@ -8410,6 +8634,7 @@ Then tell chat "wind down" whenever you're ready.`
     alarm,
     speak,
     flash,
+    undoable,
     earn: (n, why) => {
       earn(n, why);
       save2();

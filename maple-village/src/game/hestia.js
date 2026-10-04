@@ -51,7 +51,7 @@ export function attachHestiaDb(docRef){
   ref.onSnapshot(snap => {
     const first = !synced, cached = !!(snap.metadata && snap.metadata.fromCache); if (!cached) synced = true;
     if (!snap.exists) { if (!cached) save(); return; }
-    const remote = snap.data() || {};
+    const remote = JSON.parse(JSON.stringify(snap.data() || {}));   // snapshots are frozen: work on a copy
     seen = Math.max(seen, remote.updatedAt || 0);
     if (first && (remote.updatedAt || 0) < loadedAt) { if (!cached) save(); return; }
     if (first || (remote.updatedAt || 0) > (H.updatedAt || 0)) { H = Object.assign(fresh(), remote); tidy(); local(); api.changed(); }
@@ -207,7 +207,10 @@ export function wireHestia(root, which){
   const on = (sel, ev, fn) => root.querySelectorAll(sel).forEach(el => el.addEventListener(ev, e => { e.stopPropagation(); fn(el, e); }));
   on("[data-htab]", "click", el => { view.tab = el.dataset.htab; api.changed(); });
   on("[data-hdone]", "change", el => { const [k, id] = el.dataset.hdone.split(":"); setDone(k, k === "zone" ? +id : id, el.checked); });
-  on("[data-hdel]", "click", el => { const [k, id] = el.dataset.hdel.split(":"); const key = k === "daily" ? "dailyTasks" : "weeklyTasks"; H[key] = H[key].filter(t => t.id !== id); save(); api.changed(); });
+  on("[data-hdel]", "click", el => { const [k, id] = el.dataset.hdel.split(":"); const key = k === "daily" ? "dailyTasks" : "weeklyTasks";
+    const i = H[key].findIndex(t => t.id === id); if (i < 0) return; const gone = H[key][i];
+    H[key] = H[key].filter(t => t.id !== id); save(); api.changed();
+    api.undoable(`Removed “${gone.text}”`, () => { if (!H[key].some(t => t.id === id)) H[key].splice(Math.min(i, H[key].length), 0, gone); save(); api.changed(); }); });
   on("form[data-hadd]", "submit", (el, e) => { e.preventDefault(); const v = el.t.value.trim(); if (!v) return; const k = el.dataset.hadd;
     (k === "daily" ? H.dailyTasks : H.weeklyTasks).push(k === "daily" ? {id: "d" + Date.now(), text: v, effort: 1, timeOfDay: null} : {id: "w" + Date.now(), text: v, effort: 1, weekday: null}); save(); api.changed(); });
   on("[data-hnextzone]", "click", () => { H.currentZoneIndex = (H.currentZoneIndex + 1) % H.zones.length; H.zoneLog = {}; H.weekStartDate = mondayKey(); api.speak(`This week's zone: ${zone().name}.`, 3500); save(); api.changed(); });
@@ -221,7 +224,10 @@ export function wireHestia(root, which){
   on("[data-hfr]", "click", el => { view.fridge = el.dataset.hfr; api.changed(); });
   on("[data-hstock]", "change", el => { const it = H.pantryItems.find(i => String(i.id) === el.dataset.hstock); if (!it) return; it.inStock = el.checked;
     H.shoppingList = (H.shoppingList || []).filter(s => s.id !== it.id); if (!it.inStock) { H.shoppingList.push({id: it.id, purchased: false}); api.flash(`${it.name} is on the shopping list`); } save(); api.changed(); });
-  on("[data-hitemdel]", "click", el => { const id = el.dataset.hitemdel; H.pantryItems = H.pantryItems.filter(i => String(i.id) !== id); H.shoppingList = (H.shoppingList || []).filter(s => String(s.id) !== id); save(); api.changed(); });
+  on("[data-hitemdel]", "click", el => { const id = el.dataset.hitemdel, i = H.pantryItems.findIndex(x => String(x.id) === id); if (i < 0) return;
+    const gone = H.pantryItems[i], onList = (H.shoppingList || []).find(s => String(s.id) === id);
+    H.pantryItems = H.pantryItems.filter(x => String(x.id) !== id); H.shoppingList = (H.shoppingList || []).filter(s => String(s.id) !== id); save(); api.changed();
+    api.undoable(`Removed ${gone.name}`, () => { if (!H.pantryItems.some(x => String(x.id) === id)) H.pantryItems.splice(Math.min(i, H.pantryItems.length), 0, gone); if (onList && !H.shoppingList.some(s => String(s.id) === id)) H.shoppingList.push(onList); save(); api.changed(); }); });
   on("[data-hbuy]", "change", el => { const it = H.pantryItems.find(i => String(i.id) === el.dataset.hbuy); if (!it) return; it.inStock = true; H.shoppingList = H.shoppingList.filter(s => s.id !== it.id); api.sfx("coin"); api.flash(`Got ${it.name.toLowerCase()}!`); save(); api.changed(); });
   on("[data-hloc]", "change", el => { view.loc = el.value; api.changed(); });
   on("[data-hcopy]", "click", () => { const shop = (H.shoppingList || []).map(s => H.pantryItems.find(i => i.id === s.id)).filter(Boolean).filter(i => view.loc === "all" || (Array.isArray(i.whereToBuy) ? i.whereToBuy : [i.whereToBuy]).includes(view.loc));

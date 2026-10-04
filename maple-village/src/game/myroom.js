@@ -10,15 +10,16 @@ let jref = null, sref = null, onChange = () => {}, jChain = Promise.resolve(), s
 const keepJ = () => { try { localStorage.setItem(JKEY, JSON.stringify(J)); } catch {} };
 const keepS = () => { try { localStorage.setItem(SKEY, JSON.stringify(SC)); } catch {} };
 
-// Entries merge by id across devices; a deleted entry stays as a {id, deleted} marker so it doesn't come back.
+// Entries merge by id across devices; a deleted entry stays as a {id, deleted, at} marker so it doesn't come back
+// (an undo writes the entry back with a newer `at`).
 function mergeJ(a, b){
   const m = new Map();
-  [...(a.entries || []), ...((b && b.entries) || [])].forEach(e => { if (!e || !e.id) return; const o = m.get(e.id); if (!o || e.deleted || (e.at || 0) > (o.at || 0) && !o.deleted) m.set(e.id, e); });
+  [...(a.entries || []), ...((b && b.entries) || [])].forEach(e => { if (!e || !e.id) return; const o = m.get(e.id); if (!o || (e.at || 0) > (o.at || 0)) m.set(e.id, e); });   // newest change wins: a tear-out, or an undo of one
   return {entries: [...m.values()].sort((x, y) => (y.at || 0) - (x.at || 0)).slice(0, 400), updatedAt: Math.max(a.updatedAt || 0, (b && b.updatedAt) || 0)};
 }
 export function attachMyDocs(col, changed){
   onChange = changed; jref = col.doc("journal"); sref = col.doc("scratch");
-  jref.onSnapshot(snap => { if (!snap.exists) { if (J.entries.length) pushJ(); return; } J = mergeJ(J, snap.data() || {}); keepJ(); onChange("journal"); }, () => {});
+  jref.onSnapshot(snap => { if (!snap.exists) { if (J.entries.length) pushJ(); return; } J = mergeJ(J, JSON.parse(JSON.stringify(snap.data() || {}))); keepJ(); onChange("journal"); }, () => {});
   sref.onSnapshot(snap => {
     if (!snap.exists) { if (SC.text) pushS(); return; }
     const r = snap.data() || {};
@@ -52,11 +53,12 @@ export function journalPanel(decompress){
   if (list.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list.map(e => `<details><summary><b>${when(e)}</b> ${esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary><p>${esc(e.text).replace(/\n/g, "<br>")}</p><button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
   return h;
 }
-export function wireJournal(root, done){
+export function wireJournal(root, undoable, done){
   const ta = root.querySelector("#jText"); if (!ta) return;
   ta.oninput = () => { draft = ta.value; };
   root.querySelector("#jForm").onsubmit = ev => { ev.preventDefault(); const e = addEntry(ta.value); if (e) { draft = ""; done(e); } };
-  root.querySelectorAll("[data-jdel]").forEach(b => b.onclick = ev => { ev.preventDefault(); if (b.dataset.sure) { delEntry(b.dataset.jdel); done(null); } else { b.dataset.sure = "1"; b.textContent = "tap again to tear out"; } });
+  root.querySelectorAll("[data-jdel]").forEach(b => b.onclick = ev => { ev.preventDefault(); const id = b.dataset.jdel, e = J.entries.find(x => x.id === id); if (!e) return;
+    delEntry(id); done(null); undoable("Page torn out", () => { J = {entries: J.entries.map(x => x.id === id ? Object.assign({}, e, {at: Date.now()}) : x), updatedAt: Date.now()}; keepJ(); pushJ(); done(null); }); });
 }
 export const journalCount = () => live().length;
 
@@ -67,11 +69,11 @@ export function scratchPanel(){
     <label class="sr" for="scratchText">Scratchpad</label><textarea id="scratchText" class="scratch" rows="12" maxlength="20000" placeholder="Ideas, numbers, a to-do, a thought for later...">${esc(SC.text)}</textarea>
     <div class="actions"><span class="muted" id="scratchSaved">${ago == null ? "" : ago < 1 ? "Saved just now" : `Saved ${ago} min ago`}</span><button class="btn alt small" data-scratch="clear">Wipe the board</button></div>`;
 }
-export function wireScratch(root){
+export function wireScratch(root, undoable, rerender){
   const ta = root.querySelector("#scratchText"); if (!ta) return;
   const save = () => { SC = {text: ta.value.slice(0, 20000), updatedAt: Date.now()}; keepS(); pushS(); const s = root.querySelector("#scratchSaved"); if (s) s.textContent = "Saved just now"; };
   ta.oninput = save;
   const b = root.querySelector('[data-scratch="clear"]');
-  b.onclick = () => { if (!b.dataset.sure) { b.dataset.sure = "1"; b.textContent = "Tap again to wipe"; return; } ta.value = ""; save(); delete b.dataset.sure; b.textContent = "Wipe the board"; };
+  b.onclick = () => { const was = ta.value; if (!was) return; ta.value = ""; save(); undoable("Board wiped", () => { SC = {text: was, updatedAt: Date.now()}; keepS(); pushS(); rerender(); }); };
 }
 export const scratchText = () => SC.text;

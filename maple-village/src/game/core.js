@@ -8,7 +8,7 @@ import { villageArt, baseArt, laneArt, roomArt, farmArt, setArtContext } from ".
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { pullSunsama, SUNSAMA_ERRORS } from "./sunsama.js";
-import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx } from "./audio.js";
+import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx, TRACKS, setTrack, currentTrack } from "./audio.js";
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked } from "./paths.js";
 import { fetchPost, postPanel, postCount } from "./postbox.js";
@@ -125,17 +125,17 @@ async function initDb(){
   });
   refs = {today: col.doc("today"), fox: col.doc("fox"), plan: col.doc("plan"), mail: col.doc("mail"), stats: col.doc("stats"), library: col.doc("library")};
   refs.library.onSnapshot(snap => {
-    LIB = snap.exists ? Object.assign({items:[]}, snap.data()) : {items:[]};
+    LIB = snap.exists ? Object.assign({items:[]}, JSON.parse(JSON.stringify(snap.data()))) : {items:[]};
     try { localStorage.setItem("fox.library", JSON.stringify(LIB)); } catch {}
     if (shelfOpen) ctx();
   }, () => {});
   refs.mail.onSnapshot(snap => {
-    MAIL = snap.exists ? Object.assign({items:[]}, snap.data()) : {items:[]};
+    MAIL = snap.exists ? Object.assign({items:[]}, JSON.parse(JSON.stringify(snap.data()))) : {items:[]};
     try { localStorage.setItem("fox.mail", JSON.stringify(MAIL)); } catch {}
     render();
   }, () => {});
   refs.stats.onSnapshot(snap => {
-    const before = ST; ST = snap.exists ? snap.data() || {} : {};
+    const before = ST; ST = snap.exists ? JSON.parse(JSON.stringify(snap.data() || {})) : {};
     try { localStorage.setItem("fox.stats", JSON.stringify(ST)); } catch {}
     const grew = ["chord", "chico"].find(k => ST[k] && before[k] && ST[k].users > before[k].users);
     if (grew) speak(`${grew === "chord" ? "Chord" : "Chico"} grew to ${ST[grew].users.toLocaleString()} users! New flowers 🌼`, 5000);
@@ -145,7 +145,7 @@ async function initDb(){
   refs.plan.onSnapshot(snap => {
     if (snap.exists) {
       const was = remaining().length;
-      P = snap.data(); try { localStorage.setItem("fox.plan", JSON.stringify(P)); } catch {}
+      P = JSON.parse(JSON.stringify(snap.data())); try { localStorage.setItem("fox.plan", JSON.stringify(P)); } catch {}
       markSunsamaDone(); render(true);
       if (!was && remaining().length) speak("New quests on the boards!", 5000);
     }
@@ -184,6 +184,7 @@ function dropTask(id, quiet){
   if (S.timer && S.timer.id === id) S.timer = null;
   S.firstStep[id] = false; sfx("paper", true);
   setSay(`Dropped “${t.title}” for today. One less thing.`); if (!quiet) save(true);
+  if (!quiet) { const ex = String(id).startsWith("x") ? t : null; undoable(`Dropped “${t.title}”`, () => { if (ex) S.extra.push(ex); else S.dropped = (S.dropped || []).filter(x => x !== id); setSay("Back on the board."); save(true); }); }
 }
 function undropTask(id){ S.dropped = (S.dropped || []).filter(x => x !== id); setSay("Back on the board."); save(true); }
 const remaining = () => allTasks().filter(t => !S.doneIds.includes(t.id));
@@ -207,7 +208,7 @@ const SHED = {
   compost:   {n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster."},
   sprinkler: {n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."}
 };
-let shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false;
+let shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false;
 // Guided breathing in the calm corner: a ring grows as she breathes in (4 s), holds (2 s) and shrinks as she breathes out (6 s)
 const BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]], CYCLE = 12;
 let breath = null, breathT = null;   // {start, total (ms)}
@@ -269,6 +270,13 @@ function markActive(){
   F.streak = F.lastActive === prevDay(k) ? (F.streak || 0) + 1 : 1;
   F.days = (F.days || 0) + 1; F.xp += 5; F.lastActive = k;
 }
+// Every delete can be undone for a few seconds: undoable("Removed X", () => put it back)
+let undoT = null, undoFn = null;
+function undoable(msg, restore){
+  undoFn = restore; $("undoMsg").textContent = plain(msg); $("undoBar").hidden = false;
+  clearTimeout(undoT); undoT = setTimeout(() => { $("undoBar").hidden = true; undoFn = null; }, 7000);
+}
+$("undoBtn").onclick = () => { const f = undoFn; undoFn = null; clearTimeout(undoT); $("undoBar").hidden = true; if (f) { f(); sfx("paper", true); } };
 let earnT;
 function flash(msg){ const e = $("earn"); e.textContent = plain(msg); clearTimeout(earnT); earnT = setTimeout(() => e.textContent = "", 4000); }
 function earn(n, why){ if (!/quest|Sunsama/.test(why)) sfx("coin"); F.coins += n; S.earned += n; markActive(); flash(`+${n} coins: ${why}`); mprop("coin", mel.x, mel.y - 60, 1800); }
@@ -1025,7 +1033,7 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1100,6 +1108,11 @@ function ctx(){
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>Your bed</h2>` + (S.sleep
       ? `<p class="sub">${S.sleep.until ? `Napping. Up in about ${Math.max(1, Math.ceil((S.sleep.until - Date.now())/M))} min.` : "Fast asleep. Sweet dreams."}</p><div class="actions"><button class="btn yes" data-bed="up">Get up</button></div>`
       : `<p class="sub">Fluffy pillows, cool sheets${(F.decor || {}).r_throw ? ", your knitted throw" : ""}.</p><div class="actions"><button class="btn primary" data-bed="nap">Nap for 20 minutes</button><button class="btn alt" data-bed="sleep">${sgHM() >= 20*60 || sgHM() < 5*60 ? "Go to sleep" : "Lie down"}</button></div>`);
+  } else if (recOpen && scene === "room") {
+    const on = sound.music, ct = currentTrack();
+    h = `<span class="tape gingham" aria-hidden="true"></span><h2>Record player</h2><p class="sub">${on ? `Playing: ${esc(TRACKS[ct].name)}.` : "Pick a record to put on."}</p>
+      <div class="records">${Object.entries(TRACKS).map(([id, t]) => `<button class="record${on && id === ct ? " on" : ""}" data-track="${id}"><svg viewBox="0 0 40 40" width="46" height="46" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#2F2B28"/><circle cx="20" cy="20" r="13" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="9" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="6.5" style="fill:${t.col}"/><circle cx="20" cy="20" r="1.4" fill="#FFFDF6"/></svg><span class="n">${esc(t.name)}</span><span class="c">${on && id === ct ? "playing now" : esc(t.mood)}</span></button>`).join("")}</div>
+      <div class="actions recrow"><label for="recVol" class="muted">Volume</label><input id="recVol" type="range" min="0" max="1" step="0.05" value="${sound.musicVol}">${on ? `<button class="btn alt small" data-rec="stop">Lift the needle</button>` : ""}</div>`;
   } else if (calmOpen && scene === "room") {
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>Calm corner</h2>` + (breath
       ? `<div class="breathe"><div class="ring" style="animation-delay:-${((Date.now() - breath.start)/1000 % CYCLE).toFixed(2)}s"></div><p class="cue" id="breathCue">Breathe in</p></div><p class="sub" style="text-align:center"><span id="breathLeft"></span> left</p><div class="actions" style="justify-content:center"><button class="btn alt small" data-calm="stop">Stop</button></div>`
@@ -1151,13 +1164,16 @@ function ctx(){
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
+  c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
+  c.querySelectorAll('[data-rec="stop"]').forEach(b => b.onclick = () => { setMusic(false); speak("Needle up. Quiet time.", 2500); ctx(); drawScene(); });
+  const rv = c.querySelector("#recVol"); if (rv) rv.oninput = () => setMusicVol(+rv.value);
   c.querySelectorAll("[data-calm]").forEach(b => b.onclick = () => { const k = b.dataset.calm;
-    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; A.decompNow(); drawScene(); } else startBreath(+k); });
+    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; recOpen = false; A.decompNow(); drawScene(); } else startBreath(+k); });
   if (breath) tickBreath();
-  if (journalOpen && scene === "room") wireJournal(c, e => { if (e) { sfx("chime"); speak(S.mode === "decompress" && S.decompFree ? "Written down. Now you can let it go." : "Page kept. Lovely.", 3500); } ctx(); });
-  if (scratchOpen && scene === "hall") wireScratch(c);
+  if (journalOpen && scene === "room") wireJournal(c, undoable, e => { if (e) { sfx("chime"); speak(S.mode === "decompress" && S.decompFree ? "Written down. Now you can let it go." : "Page kept. Lovely.", 3500); } ctx(); });
+  if (scratchOpen && scene === "hall") wireScratch(c, undoable, () => ctx());
   const of = c.querySelector("#outfitForm");
   if (of) { const inp = c.querySelector("#outfitAsk"); inp.oninput = () => { ward.ask = inp.value; };
     of.onsubmit = async ev => { ev.preventDefault(); if (ward.busy) return; ward.busy = true; ward.error = ""; ctx();
@@ -1308,7 +1324,7 @@ function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
@@ -1343,7 +1359,7 @@ function go(target, x, y, fn){
     if (INNER[target]) { const I = INNER[target]; legs.push({scene:I.parent, x:I.door[0], y:I.door[1], fn:() => setScene(target, I.arrive)}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -1361,7 +1377,7 @@ function arriveSpot(id){
   if (id === "mydoor") { setScene("room", INNER.room.arrive); return; }
   if (id === "bed") { bedOpen = true; sfx("paper", true); render(); return; }
   if (id === "window") { const shut = F.curtains ? F.curtains === "closed" : (isDusk() || !!S.sleep); F.curtains = shut ? "open" : "closed"; sfx("paper", true); speak(shut ? "Curtains open. Hello, sky." : "Curtains closed. Cosy.", 2500); save(true); return; }
-  if (id === "record") { setMusic(!sound.music); speak(sound.music ? "Record's on. Mmm." : "Needle up. Quiet time.", 2500); drawScene(); return; }
+  if (id === "record") { recOpen = true; sfx("paper", true); render(); return; }
   if (id === "nook") { calmOpen = true; sfx("paper", true); render(); return; }
   if (id === "journal") { journalOpen = true; sfx("paper", true); render(); return; }
   if (id === "wardrobe") { wardOpen = true; ward.error = ""; sfx("paper", true); speak("Let's see what's hanging in here today.", 3000); render(); return; }
@@ -1606,7 +1622,7 @@ initNotebook({windDown, onTread, water:() => ({ml: S.waterMl || 0, goal: WATER_G
   addWater:ml => A.water(ml), setWater, setSteps, task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
   sayNow:() => say, timerBtns, paperName, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),
   placeLabel:t => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`});
-initHestia({sfx, alarm, speak, flash, earn: (n, why) => { earn(n, why); save(); }, changed: () => render(),
+initHestia({sfx, alarm, speak, flash, undoable, earn: (n, why) => { earn(n, why); save(); }, changed: () => render(),
   refund: (n, why) => { F.coins = Math.max(0, F.coins - n); S.earned = Math.max(0, (S.earned || 0) - n); flash(`-${n} coin: ${why}`); save(); }});
 $("hestiaFile").onchange = e => { const f = e.target.files && e.target.files[0]; if (!f) return; const r = new FileReader();
   r.onload = () => { const msg = importHestia(String(r.result)); $("hestiaNote").textContent = msg; speak(/^Imported/.test(msg) ? "Hestia's lists are in the house now!" : msg, 4500); }; r.readAsText(f); e.target.value = ""; };

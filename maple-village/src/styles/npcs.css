@@ -44,3 +44,14 @@
 @keyframes roamR{0%,8%{transform:translateX(0) scaleX(1)}40%,52%{transform:translateX(var(--dx)) scaleX(1)}54%{transform:translateX(var(--dx)) scaleX(-1)}86%,88%{transform:translateX(0) scaleX(-1)}90%,100%{transform:translateX(0) scaleX(1)}}
 @keyframes roamL{0%,8%{transform:translateX(0) scaleX(-1)}40%,52%{transform:translateX(var(--dx)) scaleX(-1)}54%{transform:translateX(var(--dx)) scaleX(1)}86%,88%{transform:translateX(0) scaleX(1)}90%,100%{transform:translateX(0) scaleX(-1)}}
 @media (prefers-reduced-motion:reduce){.map .roam{animation:none}}
+/* curtains sway from the rod */
+.map .sway{transform-box:view-box;animation:csway 5.5s ease-in-out infinite}
+@keyframes csway{0%,100%{transform:rotate(-1.4deg)}50%{transform:rotate(1.4deg)}}
+/* ducks: a long loop, on screen for the first third (about 45 s), then off for the rest */
+.map .ducks{animation:duckL 140s linear infinite}
+.map .ducks.rtl{animation-name:duckR}
+@keyframes duckL{0%{transform:translateX(-140px)}32%{transform:translateX(660px)}100%{transform:translateX(660px)}}
+@keyframes duckR{0%{transform:translateX(660px)}32%{transform:translateX(-140px)}100%{transform:translateX(-140px)}}
+.map .dbob{animation:dbob 1.6s ease-in-out infinite}
+@keyframes dbob{0%,100%{translate:0 0}50%{translate:0 -1.5px}}
+@media (prefers-reduced-motion:reduce){.map .sway,.map .ducks,.map .dbob{animation:none}.map .ducks{display:none}}

@@ -19,8 +19,10 @@
     window.__mapleOffset = want - sg.getTime();
   }
   const listeners = {};
+  // the real db hands out frozen snapshots; freeze here too so code that edits one in place fails in tests
+  const deepFreeze = o => { if (o && typeof o === "object") { Object.values(o).forEach(deepFreeze); Object.freeze(o); } return o; };
   const read = p => { try { return JSON.parse(localStorage.getItem("stub:" + p)); } catch { return null; } };
-  const snap = (p, v) => ({ id: p.split("/").pop(), exists: v != null, data: () => v == null ? undefined : JSON.parse(JSON.stringify(v)), metadata: { fromCache: false, hasPendingWrites: false } });
+  const snap = (p, v) => ({ id: p.split("/").pop(), exists: v != null, data: () => v == null ? undefined : deepFreeze(JSON.parse(JSON.stringify(v))), metadata: { fromCache: false, hasPendingWrites: false } });
   const emit = p => (listeners[p] || []).forEach(fn => setTimeout(() => fn(snap(p, read(p))), 0));
   const write = (p, v) => { v == null ? localStorage.removeItem("stub:" + p) : localStorage.setItem("stub:" + p, JSON.stringify(v)); emit(p); };
   const doc = p => ({

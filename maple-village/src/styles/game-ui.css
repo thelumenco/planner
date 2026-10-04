@@ -376,3 +376,14 @@
 .breathe .cue{position:relative;margin:0;font-family:"Klee One",serif;font-weight:600;font-size:1.25rem;color:#2F3A6E}
 @keyframes breathe{0%{transform:scale(.5)}33.3%{transform:scale(1)}50%{transform:scale(1)}100%{transform:scale(.5)}}
 @media (prefers-reduced-motion:reduce){.breathe .ring{animation-duration:24s}}
+/* record player: a crate of records */
+.records{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.record{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;border:1px solid rgba(120,104,84,.15);border-radius:8px;background:#F4EEE3;color:#2F2B28;text-align:center;cursor:pointer}
+.record .n{font-weight:700;font-size:.85rem}.record .c{font-size:.74rem;color:#8A8279}
+.record.on{border-color:var(--peri2,#6E7FC8);background:#EEF1FA}.record.on svg{animation:spinr 3.2s linear infinite}
+.recrow{align-items:center;gap:10px;margin-top:12px}.recrow input[type=range]{flex:1;max-width:220px}
+@media (prefers-reduced-motion:reduce){.record.on svg{animation:none}}
+/* undo bar after a delete */
+.undobar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:14px;background:#2F2B28;color:#FFFDF6;border-radius:999px;padding:9px 10px 9px 18px;font-size:.9rem;box-shadow:0 10px 24px -12px rgba(0,0,0,.5);max-width:calc(100% - 32px)}
+.undobar[hidden]{display:none}
+.undobar button{background:var(--butter);color:#2F2B28;border:0;border-radius:999px;padding:5px 14px;font-weight:800;cursor:pointer}
