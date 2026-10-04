@@ -105,7 +105,11 @@
 .panel.cork li:nth-child(3n){background:#F4C7CF;transform:rotate(-.4deg)}
 .panel.cork li:nth-child(4n){background:#C3CDEE}
 .panel.cork li::before{content:"";position:absolute;top:4px;left:50%;width:9px;height:9px;margin-left:-4px;border-radius:50%;background:var(--fox2);box-shadow:inset -1px -1px 0 rgba(0,0,0,.25)}
-.panel.cork li.done{opacity:.6;text-decoration:line-through}
+/* finished notes fade by colour, not opacity: Safari paints an opacity layer over a tilted note with filtered icons wrongly */
+.panel.cork li.done{color:rgba(47,43,40,.55);text-decoration:line-through}
+.panel.cork li.done small{color:rgba(111,103,95,.6)}
+.panel.cork li.done .pl,.panel.cork li.done .tk{opacity:.6}
+.panel.cork li .ico g[filter]{filter:none}
 .panel.cork li.cur{outline:2px solid var(--fox2);outline-offset:2px}
 .panel.cork li .pl{display:block;font-size:.95rem}
 .panel.cork li .t,.panel.cork li b{font-weight:700}
