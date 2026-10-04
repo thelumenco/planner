@@ -54,6 +54,7 @@
     <div class="map" id="map">
         <svg id="world" viewBox="0 0 520 640" role="application" aria-label="Game map. Tap a place to walk there.">
           <g id="sceneArt"></g>
+          <g id="hmarks"></g>
           <g id="qmarkWrap" style="display:none"><g class="qmark">
             <path d="M-11 -30 h22 a4 4 0 0 1 4 4 v18 a4 4 0 0 1 -4 4 h-7 l-4 6 l-4 -6 h-7 a4 4 0 0 1 -4 -4 v-18 a4 4 0 0 1 4 -4z" style="fill:var(--butter);stroke:var(--line)" stroke-width="1.5" filter="url(#wob)"/>
             <text x="0" y="-11" text-anchor="middle" style="fill:var(--navy)" font-family="Klee One,serif" font-weight="600" font-size="19">!</text>
@@ -310,6 +311,8 @@
           <label class="setrow slider"><span>Music volume</span><input type="range" id="setVol" min="0" max="1" step="0.05"></label>
           <label class="setrow"><input type="checkbox" id="setSfx"> <span>Sound effects: paper, purrs, coins, hellos</span></label>
           <div class="setrow"><button class="btn small alt" id="setTest" type="button">Play a test sound</button><span class="muted" id="setTestNote">No sound? Turn the volume up and switch off silent mode.</span></div>
+          <h3 class="ph3">Hestia (home)</h3>
+          <div class="setrow"><label class="btn small alt" for="hestiaFile">Import from Hestia</label><input type="file" id="hestiaFile" accept=".json,application/json" hidden><span class="muted" id="hestiaNote">In Hestia: Settings, Export. Then pick that file here: your chores, zones and pantry come across.</span></div>
           <h3 class="ph3">Your newspaper</h3>
           <div class="row">
             <label class="sr" for="paperNameIn">Newspaper name</label>

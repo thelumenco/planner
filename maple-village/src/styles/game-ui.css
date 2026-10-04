@@ -278,3 +278,25 @@
 /* "not today" on a quest: small, quiet, not a big red delete */
 .pinned .drop,.pinned button.drop{border:0;background:none;padding:0 2px;margin-left:4px;font:inherit;font-size:.72rem;color:var(--soft);text-decoration:underline dotted;cursor:pointer}
 .pinned li.dropped{grid-column:1/-1;opacity:.8;transform:none}
+/* Hestia at home: chores in the cleaning cupboard, the fridge */
+.hlist{list-style:none;margin:6px 0 12px;padding:0}
+.hlist li{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px dashed #E4DDD2;font-size:.92rem}
+.hlist li label{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
+.hlist li input[type=checkbox]{width:18px;height:18px;accent-color:#7FA36E;flex:none}
+.hlist li.done span,.hlist li.out > label span{color:#A39B90;text-decoration:line-through}
+.hlist li.out > label span{text-decoration:none}
+.hlist small{color:#8A8279;font-size:.78rem}
+.hlist .hzone{display:block;border-bottom:0;padding-top:2px}
+.hbadge{font-size:.7rem;font-weight:700;color:#8A8279;background:#F4EEE3;border-radius:999px;padding:2px 8px;flex:none}
+.hbadge.now{color:#B5562E;background:#FBE3D6}
+.heff{font-size:.55rem;letter-spacing:1px;color:#C9853E;flex:none}.heff i{font-style:normal;color:#E4DDD2}
+.hx{border:0;background:none;color:#B9B0A4;font-size:.85rem;padding:2px 4px;cursor:pointer;flex:none}
+.hadd{gap:6px;flex-wrap:wrap}.hadd input{flex:1 1 140px}.hadd select{max-width:46%;font:inherit;font-size:.85rem;background:transparent;border:0;border-bottom:1.5px solid #E4DDD2}
+.htimer{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:4px 0 8px;font-size:.9rem;color:#5E5A55}
+.htimer > span{display:inline-flex;align-items:center;gap:6px;margin-right:auto}
+.htimer.on b{font-family:"Klee One",serif;font-size:1.8rem;color:#2F3B73;font-variant-numeric:tabular-nums}
+.htimer.on small{margin-right:auto;color:#8A8279}
+.hcard{font-size:1.5rem;margin:6px 0 14px}
+.map .panel.fridge{background-color:#F7F5F0;border:6px solid #E3DED4;border-radius:18px}
+.map .panel.fridge h2{display:inline-block;background:#FFFDF6;padding:2px 12px;transform:rotate(-1.5deg);box-shadow:0 4px 8px -6px rgba(0,0,0,.4)}
+.map #hmarks .qmark{animation:qbob 2.4s ease-in-out infinite}

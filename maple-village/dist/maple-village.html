@@ -720,6 +720,28 @@ body.nb-open{overflow:hidden}
 /* "not today" on a quest: small, quiet, not a big red delete */
 .pinned .drop,.pinned button.drop{border:0;background:none;padding:0 2px;margin-left:4px;font:inherit;font-size:.72rem;color:var(--soft);text-decoration:underline dotted;cursor:pointer}
 .pinned li.dropped{grid-column:1/-1;opacity:.8;transform:none}
+/* Hestia at home: chores in the cleaning cupboard, the fridge */
+.hlist{list-style:none;margin:6px 0 12px;padding:0}
+.hlist li{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px dashed #E4DDD2;font-size:.92rem}
+.hlist li label{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
+.hlist li input[type=checkbox]{width:18px;height:18px;accent-color:#7FA36E;flex:none}
+.hlist li.done span,.hlist li.out > label span{color:#A39B90;text-decoration:line-through}
+.hlist li.out > label span{text-decoration:none}
+.hlist small{color:#8A8279;font-size:.78rem}
+.hlist .hzone{display:block;border-bottom:0;padding-top:2px}
+.hbadge{font-size:.7rem;font-weight:700;color:#8A8279;background:#F4EEE3;border-radius:999px;padding:2px 8px;flex:none}
+.hbadge.now{color:#B5562E;background:#FBE3D6}
+.heff{font-size:.55rem;letter-spacing:1px;color:#C9853E;flex:none}.heff i{font-style:normal;color:#E4DDD2}
+.hx{border:0;background:none;color:#B9B0A4;font-size:.85rem;padding:2px 4px;cursor:pointer;flex:none}
+.hadd{gap:6px;flex-wrap:wrap}.hadd input{flex:1 1 140px}.hadd select{max-width:46%;font:inherit;font-size:.85rem;background:transparent;border:0;border-bottom:1.5px solid #E4DDD2}
+.htimer{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:4px 0 8px;font-size:.9rem;color:#5E5A55}
+.htimer > span{display:inline-flex;align-items:center;gap:6px;margin-right:auto}
+.htimer.on b{font-family:"Klee One",serif;font-size:1.8rem;color:#2F3B73;font-variant-numeric:tabular-nums}
+.htimer.on small{margin-right:auto;color:#8A8279}
+.hcard{font-size:1.5rem;margin:6px 0 14px}
+.map .panel.fridge{background-color:#F7F5F0;border:6px solid #E3DED4;border-radius:18px}
+.map .panel.fridge h2{display:inline-block;background:#FFFDF6;padding:2px 12px;transform:rotate(-1.5deg);box-shadow:0 4px 8px -6px rgba(0,0,0,.4)}
+.map #hmarks .qmark{animation:qbob 2.4s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -767,6 +789,7 @@ body.nb-open{overflow:hidden}
     <div class="map" id="map">
         <svg id="world" viewBox="0 0 520 640" role="application" aria-label="Game map. Tap a place to walk there.">
           <g id="sceneArt"></g>
+          <g id="hmarks"></g>
           <g id="qmarkWrap" style="display:none"><g class="qmark">
             <path d="M-11 -30 h22 a4 4 0 0 1 4 4 v18 a4 4 0 0 1 -4 4 h-7 l-4 6 l-4 -6 h-7 a4 4 0 0 1 -4 -4 v-18 a4 4 0 0 1 4 -4z" style="fill:var(--butter);stroke:var(--line)" stroke-width="1.5" filter="url(#wob)"/>
             <text x="0" y="-11" text-anchor="middle" style="fill:var(--navy)" font-family="Klee One,serif" font-weight="600" font-size="19">!</text>
@@ -1023,6 +1046,8 @@ body.nb-open{overflow:hidden}
           <label class="setrow slider"><span>Music volume</span><input type="range" id="setVol" min="0" max="1" step="0.05"></label>
           <label class="setrow"><input type="checkbox" id="setSfx"> <span>Sound effects: paper, purrs, coins, hellos</span></label>
           <div class="setrow"><button class="btn small alt" id="setTest" type="button">Play a test sound</button><span class="muted" id="setTestNote">No sound? Turn the volume up and switch off silent mode.</span></div>
+          <h3 class="ph3">Hestia (home)</h3>
+          <div class="setrow"><label class="btn small alt" for="hestiaFile">Import from Hestia</label><input type="file" id="hestiaFile" accept=".json,application/json" hidden><span class="muted" id="hestiaNote">In Hestia: Settings, Export. Then pick that file here: your chores, zones and pantry come across.</span></div>
           <h3 class="ph3">Your newspaper</h3>
           <div class="row">
             <label class="sr" for="paperNameIn">Newspaper name</label>
@@ -1281,6 +1306,8 @@ body.nb-open{overflow:hidden}
   I.truck = [`<rect x="3" y="9" width="10" height="7" rx="1" ${f(C.butter)}/><path d="M13 11h4l3 3v2h-7z" ${f(C.rose)}/>`, `<rect x="3" y="9" width="10" height="7" rx="1"/><path d="M13 11h4l3 3v2h-7zM15 11v3h4"/><circle cx="7" cy="17.5" r="2"/><circle cx="16.5" cy="17.5" r="2"/>`];
   I.headphones = [`<rect x="3.5" y="12" width="4.5" height="7" rx="2" ${f(C.peri)}/><rect x="16" y="12" width="4.5" height="7" rx="2" ${f(C.peri)}/>`, `<path d="M5 13a7 7 0 0 1 14 0"/><rect x="3.5" y="12" width="4.5" height="7" rx="2"/><rect x="16" y="12" width="4.5" height="7" rx="2"/>`];
   I.hammock = [`<path d="M5 10q7 7 14 0z" ${f(C.peach)}/>`, `<path d="M3 20V6M21 20V6M3 9l2 1M21 9l-2 1"/><path d="M5 10q7 7 14 0z"/><path d="M8 12.5l1-1.5M12 14l.5-2M16 12.5l-1-1.5" opacity=".6"/>`];
+  I.hearth = [`<path d="M12 3c1 3.5 5.5 5.5 5.5 10.5a5.5 5.5 0 0 1-11 0c0-2.5 1.2-3.8 2.3-5 .3 1.6 1 2.6 2 3 0-3.3.2-5.8 1.2-8.5z" ${f("#F6A23A")}/><path d="M12 13c.6 1.6 2.4 2.4 2.4 4.3a2.4 2.4 0 0 1-4.8 0c0-1.3.9-2.3 2.4-4.3z" ${f("#FFE08A")}/>`, `<path d="M12 3c1 3.5 5.5 5.5 5.5 10.5a5.5 5.5 0 0 1-11 0c0-2.5 1.2-3.8 2.3-5 .3 1.6 1 2.6 2 3 0-3.3.2-5.8 1.2-8.5z"/>`];
+  I.fridge = [`<rect x="6" y="2.5" width="12" height="19" rx="2" ${f("#F4F1EA")}/><circle cx="14.5" cy="5.5" r="1.2" ${f(C.rose)}/>`, `<rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M6 9.5h12M8.5 5v2.5M8.5 12v4"/>`];
   I.base = I.sprout;
   var icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
   var iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;
@@ -1369,12 +1396,13 @@ body.nb-open{overflow:hidden}
       ["scales", "Stamps & scales", "C", "scales", /invoice|pay|bill|stripe|account|bank|receipt|expense|price/, "Weigh it, stamp it, send it."],
       ["ledge", "Writing ledge", "D", "desk", /./, "A tidy little ledge for odd jobs."]
     ] },
-    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { A: [120, 216], B: [400, 228] }, stations: [
+    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { A: [120, 216], B: [414, 228], H: [326, 250] }, stations: [
       ["desk", "Home desk", "A", "desk", /./, "Your own little desk."],
       ["kitchen", "Kitchen", "B", "kitchen", /cook|meal|lunch|dinner|bake|grocer|prep/, "Something smells good."],
       ["sofa", "Sofa", "C", "sofa", /read|rest|journal|meditat|book|nap/, "Soft cushions, deep breaths."],
       ["laundry", "Laundry basket", "D", "laundry", /fold|laundry|clothes|wash|iron/, "Fold, stack, done."],
-      ["cupboard", "Cleaning cupboard", "E", "cupboard", /clean|tidy|wipe|hestia|dust/, "Wet wipes live here."],
+      ["cupboard", "Cleaning cupboard", "E", "cupboard", /clean|tidy|wipe|hestia|dust/, "Hestia's chores live in here."],
+      ["fridge", "Fridge", "H", "fridge", null, "The fridge: what we have, and the shopping list."],
       ["treadmill", "Treadmill", "F", "treadmill", /treadmill/, "1.2 and go. Walk and work.", -12],
       ["office", "Darren's desk", "G", "office", null, "Darren's home office. Shh, he might be on a call."]
     ] },
@@ -1949,6 +1977,11 @@ body.nb-open{overflow:hidden}
           `<rect x="${x - 24}" y="${y - 74}" width="48" height="74" rx="8" style="fill:var(--sock)"/><rect x="${x - 17}" y="${y - 66}" width="34" height="58" rx="4" style="fill:#6B5A52"/><rect x="${x - 30}" y="${y - 96}" width="60" height="16" rx="4" style="fill:var(--peri)"/><rect x="${x - 14}" y="${y - 93}" width="20" height="9" rx="2" style="fill:#DCE8C8"/>`,
           `<rect x="${x - 24}" y="${y - 74}" width="48" height="74" rx="8"/><path d="M${x - 17} ${y - 56} h34 M${x - 17} ${y - 44} h34 M${x - 17} ${y - 32} h34 M${x - 17} ${y - 20} h34" opacity=".45"/><path d="M${x - 26} ${y - 80} v28 M${x + 26} ${y - 80} v28" stroke-width="2.4"/><rect x="${x - 30}" y="${y - 96}" width="60" height="16" rx="4"/><rect x="${x - 14}" y="${y - 93}" width="20" height="9" rx="2"/><text x="${x - 4}" y="${y - 86}" text-anchor="middle" font-family="Klee One,serif" font-size="7" stroke="none" style="fill:var(--line)">1.2</text>`
         );
+      case "fridge":
+        return sk(
+          `<rect x="${x - 20}" y="${y - 84}" width="40" height="84" rx="5" style="fill:#F4F1EA"/><rect x="${x - 14}" y="${y - 74}" width="13" height="16" style="fill:#FFFDF6"/><circle cx="${x + 9}" cy="${y - 70}" r="3" style="fill:var(--rose)"/><circle cx="${x + 3}" cy="${y - 46}" r="2.6" style="fill:var(--butter)"/>`,
+          `<rect x="${x - 20}" y="${y - 84}" width="40" height="84" rx="5"/><path d="M${x - 20} ${y - 54} h40"/><path d="M${x + 14} ${y - 76} v12 M${x + 14} ${y - 46} v14" stroke-width="2"/><rect x="${x - 14}" y="${y - 74}" width="13" height="16"/><path d="M${x - 12} ${y - 69} h9 M${x - 12} ${y - 64} h7" opacity=".6"/>`
+        );
       case "office":
         return sk(
           `<rect x="${x - 40}" y="${y - 28}" width="72" height="22" rx="3" style="fill:${W2}"/><path d="M${x - 22} ${y - 30} l4 -18 h26 l-4 18z" style="fill:#DCE3EE"/><rect x="${x - 26}" y="${y - 32}" width="34" height="4" rx="1" style="fill:var(--stone)"/><circle cx="${x + 20}" cy="${y - 34}" r="5" style="fill:var(--peach)"/><rect x="${x + 38}" y="${y - 30}" width="22" height="20" rx="4" style="fill:var(--sage)"/>`,
@@ -1975,7 +2008,7 @@ body.nb-open{overflow:hidden}
     else h += sk(
       `<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
       `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`
-    ) + `<g>${[["apple", "dumpling", "fish", "toast"], ["tulip", "carrot", "strawberry", "sunflower"]].map((row, r2) => row.map((n, i) => iconAt(n, 64 + i * 30, 62 + r2 * 38, 26)).join("")).join("")}${[["yarn", "ball", "brush", "crown"], ["bath", "fort", "corn", "blueberry"]].map((row, r2) => row.map((n, i) => iconAt(n, 374 + i * 30, 62 + r2 * 38, 26)).join("")).join("")}</g>`;
+    ) + `<g>${[["apple", "dumpling", "fish", "toast"], ["tulip", "carrot", "strawberry", "sunflower"]].map((row2, r2) => row2.map((n, i) => iconAt(n, 64 + i * 30, 62 + r2 * 38, 26)).join("")).join("")}${[["yarn", "ball", "brush", "crown"], ["bath", "fort", "corn", "blueberry"]].map((row2, r2) => row2.map((n, i) => iconAt(n, 374 + i * 30, 62 + r2 * 38, 26)).join("")).join("")}</g>`;
     st.forEach((s) => {
       h += `<g data-spot="${s.id}" aria-label="${s.name}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${tapeLabel(s.x, s.y + 24, s.name, "var(--card)")}</g>`;
     });
@@ -2605,6 +2638,19 @@ body.nb-open{overflow:hidden}
     coin(t) {
       bell(2349, t, 0.7, 0.12);
     },
+    bowl(t) {
+      [220, 550].forEach((f2, i) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = "sine";
+        o.frequency.value = f2;
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(i ? 0.05 : 0.16, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(1e-4, t + 3.2);
+        o.connect(g).connect(sfxBus);
+        o.start(t);
+        o.stop(t + 3.3);
+      });
+    },
     chime(t) {
       [660, 880, 1320].forEach((fr, i) => bell(fr, t + i * 0.18, 1.2, 0.16));
     },
@@ -2739,7 +2785,7 @@ body.nb-open{overflow:hidden}
     document.body.classList.add("nb-open");
     refreshNotebook(true);
   }
-  function refreshNotebook(focus) {
+  function refreshNotebook(focus2) {
     if (!open) return;
     const page = $("nbPage");
     if (open.kind === "task") {
@@ -2758,7 +2804,7 @@ body.nb-open{overflow:hidden}
     page.className = "nbpage" + (open.kind === "mail" && open.item.from === "crier" ? " news" : open.kind === "tracker" ? " mini" : "");
     const log = page.querySelector(".nbchat");
     if (log) log.scrollTop = log.scrollHeight;
-    if (focus) (page.querySelector("[data-nb]:not([data-nb=close])") || page.querySelector("[data-nb]"))?.focus({ preventScroll: true });
+    if (focus2) (page.querySelector("[data-nb]:not([data-nb=close])") || page.querySelector("[data-nb]"))?.focus({ preventScroll: true });
   }
   var linkify = (s) => esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)]/g, (u) => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u.replace(/^https?:\/\//, "").slice(0, 48)}${u.length > 56 ? "…" : ""} ↗</a>`);
   function notesHTML(text) {
@@ -2783,13 +2829,13 @@ body.nb-open{overflow:hidden}
     return out + (list ? "</ul>" : "");
   }
   function taskPage(t) {
-    const S3 = api.S(), fs = api.fs(t), left = api.timerLeft(t), say3 = api.sayNow();
+    const S3 = api.S(), fs = api.fs(t), left2 = api.timerLeft(t), say3 = api.sayNow();
     const tread = api.onTread(t);
     const em = t.email || null;
     let h = `<button class="nbx" data-nb="close" aria-label="Close notebook">✕</button>
     <p class="nbmeta">${esc(api.placeLabel(t))}${t.at ? ` · at ${esc(t.at)}` : ""}</p>
     <h2 id="nbTitle">${esc(t.title)}</h2>`;
-    if (left != null) h += `<p class="nbtimer"><span data-tleft>${left}</span> <small>${S3.timer && S3.timer.pausedLeft != null ? "paused" : tread ? "walking at 1.2" : "left on the time box"}</small>${api.timerBtns ? api.timerBtns() : ""}</p>`;
+    if (left2 != null) h += `<p class="nbtimer"><span data-tleft>${left2}</span> <small>${S3.timer && S3.timer.pausedLeft != null ? "paused" : tread ? "walking at 1.2" : "left on the time box"}</small>${api.timerBtns ? api.timerBtns() : ""}</p>`;
     h += `<div class="nbbody">`;
     h += `<p class="nbfirst"><span class="hl">First step:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}${fs ? " <b>✓</b>" : ""}</p>`;
     if (t.notes) h += `<div class="nbnotes">${notesHTML(t.notes)}</div>`;
@@ -2920,14 +2966,14 @@ body.nb-open{overflow:hidden}
     input.value = "";
     busy = new AbortController();
     refreshNotebook();
-    const S3 = api.S(), left = api.timerLeft(t);
+    const S3 = api.S(), left2 = api.timerLeft(t);
     const brief = `You are Maple, a tiny fox who coaches Mel through her work day inside a cosy village game. Warm, direct, short sentences, never guilt, no lectures.
 Reply in at most 3 short sentences and end with exactly one tiny physical next action. Plain text, no markdown, at most one emoji.
 If the task involves pricing, remind her to price on the value delivered, not on what the buyer can afford.
 Never claim to have done anything outside this conversation (you can't send emails, tick tasks or set timers).
 Quest: ${t.title}
 First step: ${t.firstStep || "(none given)"}
-Time box: ${t.minutes || 25} minutes${left ? `, ${left} left` : ""}${api.fs(t) ? ", first step done" : ", not started yet"}
+Time box: ${t.minutes || 25} minutes${left2 ? `, ${left2} left` : ""}${api.fs(t) ? ", first step done" : ", not started yet"}
 Notes: ${t.notes || "(none)"}${t.email ? `
 Email: ${JSON.stringify(t.email)}` : ""}
 Quests finished today: ${S3.doneIds.length}`;
@@ -3077,8 +3123,8 @@ Quests finished today: ${S3.doneIds.length}`;
     { id: "28c6d66a29b701bf4e58ccb22983ebfc2c4ac34fccb42fd7f0dc5e5239e72665@group.calendar.google.com", name: "The Tans", color: "var(--sage)" }
   ];
   var cache = { day: "", at: 0, events: [], error: null };
-  async function todaysEvents(day, fresh) {
-    if (!fresh && cache.day === day && Date.now() - cache.at < 5 * 6e4) return cache;
+  async function todaysEvents(day, fresh2) {
+    if (!fresh2 && cache.day === day && Date.now() - cache.at < 5 * 6e4) return cache;
     let mcp = null;
     try {
       mcp = window.claude && claude.use ? await claude.use("mcp") : null;
@@ -3088,7 +3134,7 @@ Quests finished today: ${S3.doneIds.length}`;
     const startTime = `${day}T00:00:00+08:00`, end = new Date(Date.parse(startTime) + 864e5).toISOString().replace(".000Z", "Z");
     const results = await Promise.all(CALENDARS.map(async (c) => {
       try {
-        const r = await mcp.callTool(GCAL, "list_events", { calendarId: c.id, startTime, endTime: end, orderBy: "startTime", timeZone: "Asia/Singapore", pageSize: 60 }, { cache: { staleTime: fresh ? 0 : 12e4, refresh: !!fresh } });
+        const r = await mcp.callTool(GCAL, "list_events", { calendarId: c.id, startTime, endTime: end, orderBy: "startTime", timeZone: "Asia/Singapore", pageSize: 60 }, { cache: { staleTime: fresh2 ? 0 : 12e4, refresh: !!fresh2 } });
         let p = r && r.payload;
         if (typeof p === "string") {
           try {
@@ -3229,6 +3275,467 @@ Quests finished today: ${S3.doneIds.length}`;
     return out;
   }
 
+  // src/game/hestia.js
+  var DEFAULT_ZONES = [
+    { id: 1, name: "Living Room & Balcony", icon: "living", tasks: [
+      { text: "Wipe TV console and surfaces", effort: 1 },
+      { text: "Vacuum/mop floor", effort: 2 },
+      { text: "Clean window grilles", effort: 3 },
+      { text: "Dust ceiling fan", effort: 2 },
+      { text: "Wipe down sofa", effort: 2 },
+      { text: "Tidy balcony plants", effort: 1 },
+      { text: "Clean balcony floor", effort: 2 }
+    ] },
+    { id: 2, name: "Kitchen", icon: "kitchen", tasks: [
+      { text: "Deep clean stove & hood", effort: 3 },
+      { text: "Wipe down cabinets", effort: 2 },
+      { text: "Clean inside fridge", effort: 3 },
+      { text: "Scrub sink thoroughly", effort: 2 },
+      { text: "Wipe appliances", effort: 1 },
+      { text: "Clean floor & drain", effort: 2 },
+      { text: "Organize dry goods", effort: 1 }
+    ] },
+    { id: 3, name: "Master Bedroom", icon: "master", tasks: [
+      { text: "Change bed linens", effort: 2 },
+      { text: "Vacuum mattress", effort: 2 },
+      { text: "Clean wardrobe surfaces", effort: 1 },
+      { text: "Wipe window sills", effort: 1 },
+      { text: "Dust bedside tables", effort: 1 },
+      { text: "Organize dresser", effort: 2 },
+      { text: "Mop floor under bed", effort: 3 }
+    ] },
+    { id: 4, name: "Common Bedroom", icon: "bedroom", tasks: [
+      { text: "Change bed linens", effort: 2 },
+      { text: "Vacuum under furniture", effort: 2 },
+      { text: "Wipe desk & shelves", effort: 1 },
+      { text: "Organize storage", effort: 2 },
+      { text: "Clean window grilles", effort: 2 },
+      { text: "Dust surfaces", effort: 1 },
+      { text: "Mop floor", effort: 2 }
+    ] },
+    { id: 5, name: "Bathrooms", icon: "bathroom", tasks: [
+      { text: "Scrub toilet bowl", effort: 2 },
+      { text: "Clean shower area", effort: 2 },
+      { text: "Wipe mirror & basin", effort: 1 },
+      { text: "Descale taps & showerhead", effort: 3 },
+      { text: "Clean floor & drain", effort: 2 },
+      { text: "Wash bathroom mats", effort: 2 },
+      { text: "Wipe cabinet surfaces", effort: 1 }
+    ] }
+  ];
+  var DEFAULT_DAILY = [
+    { id: "d1", text: "Clear dining table", effort: 1, timeOfDay: null },
+    { id: "d2", text: "Wipe dining table", effort: 1, timeOfDay: "evening" },
+    { id: "d3", text: "Wipe high chair", effort: 1, timeOfDay: "evening" },
+    { id: "d4", text: "Pick up toys", effort: 2, timeOfDay: "evening" },
+    { id: "d5", text: "Prep bag for next day", effort: 2, timeOfDay: "evening" },
+    { id: "d6", text: "Load laundry", effort: 1, timeOfDay: "morning" }
+  ];
+  var DEFAULT_WEEKLY = [
+    { id: "w1", text: "Change bed linens", effort: 2 },
+    { id: "w2", text: "Clean mirrors", effort: 1 },
+    { id: "w3", text: "Vacuum floors", effort: 2 },
+    { id: "w4", text: "Mop floors", effort: 2 },
+    { id: "w5", text: "Empty all trash bins", effort: 1 }
+  ];
+  var DEFAULT_CATS = [{ id: "food", name: "Food" }, { id: "household", name: "Household" }, { id: "personal", name: "Personal Care" }];
+  var DEFAULT_LOCS = [{ id: "supermarket", name: "Supermarket" }, { id: "online", name: "Online" }, { id: "wetmarket", name: "Wet Market" }, { id: "pharmacy", name: "Pharmacy" }];
+  var DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var KEY2 = "fox.hestia";
+  var fresh = () => ({
+    zones: DEFAULT_ZONES,
+    dailyTasks: DEFAULT_DAILY,
+    weeklyTasks: DEFAULT_WEEKLY,
+    currentZoneIndex: 0,
+    weekStartDate: null,
+    dailyLog: {},
+    weeklyLog: {},
+    zoneLog: {},
+    lastWeekKey: null,
+    streak: 0,
+    lastActiveDate: null,
+    cleaningMinutes: {},
+    paid: {},
+    pantryItems: [],
+    shoppingList: [],
+    pantryCategories: DEFAULT_CATS,
+    whereToBuyLocations: DEFAULT_LOCS,
+    timerMinutes: 20,
+    chimeEnabled: true,
+    chimeInterval: 5
+  });
+  var H2 = (() => {
+    try {
+      return Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY2)) || {});
+    } catch {
+      return fresh();
+    }
+  })();
+  var api2 = null;
+  var ref = null;
+  var pushT = null;
+  var view = { tab: "daily", fridge: "stock", loc: "all" };
+  var focus = null;
+  var timer = null;
+  function initHestia(a) {
+    api2 = a;
+    tidy();
+    setInterval(tick, 1e3);
+  }
+  function attachHestiaDb(docRef) {
+    ref = docRef;
+    ref.onSnapshot((snap) => {
+      if (!snap.exists) {
+        save();
+        return;
+      }
+      const remote = snap.data() || {};
+      if ((remote.updatedAt || 0) > (H2.updatedAt || 0)) {
+        H2 = Object.assign(fresh(), remote);
+        tidy();
+        local();
+        api2.changed();
+      } else if ((remote.updatedAt || 0) < (H2.updatedAt || 0)) save();
+    }, () => {
+    });
+  }
+  var local = () => {
+    try {
+      localStorage.setItem(KEY2, JSON.stringify(H2));
+    } catch {
+    }
+  };
+  function save() {
+    H2.updatedAt = Date.now();
+    local();
+    if (!ref) return;
+    clearTimeout(pushT);
+    pushT = setTimeout(() => {
+      ref.set(JSON.parse(JSON.stringify(H2))).catch(() => {
+      });
+    }, 500);
+  }
+  var today = () => dayKey();
+  var dow = () => (/* @__PURE__ */ new Date(today() + "T00:00:00Z")).getUTCDay();
+  var shift = (k, d) => new Date(Date.parse(k + "T00:00:00Z") + d * 864e5).toISOString().slice(0, 10);
+  var weekKey = () => shift(today(), -dow());
+  var mondayKey = () => shift(today(), -((dow() + 6) % 7));
+  function tidy() {
+    if (!Array.isArray(H2.zones) || !H2.zones.length) H2.zones = DEFAULT_ZONES;
+    if (!H2.pantryCategories || !H2.pantryCategories.length) H2.pantryCategories = DEFAULT_CATS;
+    if (!H2.whereToBuyLocations || !H2.whereToBuyLocations.length) H2.whereToBuyLocations = DEFAULT_LOCS;
+    ["dailyLog", "weeklyLog", "zoneLog", "cleaningMinutes", "paid"].forEach((k) => {
+      if (!H2[k] || typeof H2[k] !== "object") H2[k] = {};
+    });
+    if (H2.lastWeekKey !== weekKey()) {
+      H2.weeklyLog = {};
+      H2.lastWeekKey = weekKey();
+    }
+    if (!H2.weekStartDate) H2.weekStartDate = mondayKey();
+    H2.currentZoneIndex = Math.min(H2.currentZoneIndex || 0, H2.zones.length - 1);
+    Object.keys(H2.dailyLog).sort().slice(0, -45).forEach((k) => delete H2.dailyLog[k]);
+    Object.keys(H2.paid).filter((k) => !k.startsWith(today()) && !k.startsWith("w" + weekKey())).forEach((k) => delete H2.paid[k]);
+  }
+  var zone = () => H2.zones[H2.currentZoneIndex] || H2.zones[0];
+  var dayDone = (id) => !!((H2.dailyLog[today()] || {}).daily || {})[id];
+  var weekDone = (id) => !!(H2.weeklyLog[weekKey()] || {})[id];
+  var zoneDone = (i) => !!H2.zoneLog[`z${H2.currentZoneIndex}_${i}`];
+  function hestiaCounts() {
+    tidy();
+    const daily = (H2.dailyTasks || []).filter((t) => !dayDone(t.id)).length;
+    const weeklyToday = (H2.weeklyTasks || []).filter((t) => t.weekday === dow() && !weekDone(t.id)).length;
+    const shop = (H2.shoppingList || []).filter((s) => !s.purchased).length;
+    return { chores: daily + weeklyToday, shop, zoneLeft: (zone().tasks || []).filter((_, i) => !zoneDone(i)).length };
+  }
+  function setDone(kind, id, on) {
+    if (kind === "daily") {
+      const d = H2.dailyLog[today()] = H2.dailyLog[today()] || { daily: {}, zone: {} };
+      d.daily[id] = on;
+    } else if (kind === "weekly") {
+      const w = H2.weeklyLog[weekKey()] = H2.weeklyLog[weekKey()] || {};
+      w[id] = on ? today() : false;
+    } else H2.zoneLog[`z${H2.currentZoneIndex}_${id}`] = on;
+    if (on) {
+      const pk = (kind === "weekly" ? "w" + weekKey() : kind === "zone" ? "w" + weekKey() + "z" + H2.currentZoneIndex : today()) + ":" + kind + ":" + id;
+      if (!H2.paid[pk]) {
+        H2.paid[pk] = 1;
+        api2.earn(1, "home chore");
+      }
+      if (H2.lastActiveDate !== today()) {
+        H2.streak = H2.lastActiveDate === shift(today(), -1) ? (H2.streak || 0) + 1 : 1;
+        H2.lastActiveDate = today();
+        api2.speak(`Home streak: ${H2.streak} day${H2.streak > 1 ? "s" : ""}. The house feels lighter.`, 4e3);
+      }
+      api2.sfx("chime");
+    }
+    save();
+    api2.changed();
+  }
+  var left = () => !timer ? 0 : timer.pausedLeft != null ? timer.pausedLeft : Math.max(0, timer.endAt - Date.now());
+  var mmss = (ms) => `${Math.floor(ms / 6e4)}:${String(Math.floor(ms / 1e3) % 60).padStart(2, "0")}`;
+  function startTimer(min) {
+    H2.timerMinutes = min;
+    timer = { endAt: Date.now() + min * 6e4, total: min * 6e4, pausedLeft: null, lastMin: min };
+    api2.speak(`${min} minutes of tidying. Go gently.`, 3500);
+    save();
+    api2.changed();
+  }
+  function tick() {
+    if (!timer || timer.pausedLeft != null) return;
+    const l = left(), m = Math.ceil(l / 6e4);
+    if (m < timer.lastMin) {
+      timer.lastMin = m;
+      H2.cleaningMinutes[today()] = (H2.cleaningMinutes[today()] || 0) + 1;
+      save();
+      const elapsed = Math.round((timer.total - l) / 6e4);
+      if (H2.chimeEnabled && l > 0 && elapsed % (H2.chimeInterval || 5) === 0) api2.sfx("bowl");
+    }
+    document.querySelectorAll("[data-htleft]").forEach((e) => e.textContent = mmss(l));
+    if (!l) {
+      timer = null;
+      api2.alarm();
+      api2.speak("Time's up! Amazing work. Put the cloth down.", 5e3);
+      api2.changed();
+    }
+  }
+  function dealCards() {
+    const cards = [];
+    (H2.dailyTasks || []).forEach((t) => {
+      if (!dayDone(t.id)) cards.push({ kind: "daily", id: t.id, text: t.text, group: "Daily" });
+    });
+    (H2.weeklyTasks || []).forEach((t) => {
+      if (!weekDone(t.id)) cards.push({ kind: "weekly", id: t.id, text: t.text, group: "Weekly" });
+    });
+    (zone().tasks || []).forEach((t, i) => {
+      if (!zoneDone(i)) cards.push({ kind: "zone", id: i, text: t.text, group: zone().name });
+    });
+    return cards;
+  }
+  var effort = (n) => `<span class="heff" title="${["", "Low", "Medium", "High"][n || 1]} effort">${"●".repeat(n || 1)}<i>${"●".repeat(3 - (n || 1))}</i></span>`;
+  function row(kind, id, t, done, badge) {
+    return `<li class="${done ? "done" : ""}"><label><input type="checkbox" data-hdone="${kind}:${id}" ${done ? "checked" : ""}><span>${esc(t.text)}</span></label>${badge || ""}${effort(t.effort)}${kind !== "zone" ? `<button class="hx" data-hdel="${kind}:${id}" aria-label="Remove this chore">✕</button>` : ""}</li>`;
+  }
+  function timerBlock() {
+    if (!timer) return `<div class="htimer"><span>${icon("clock", 18)} Tidy timer</span>${[10, 20, 30].map((m) => `<button class="btn small ${m === H2.timerMinutes ? "primary" : "alt"}" data-htimer="${m}">${m} min</button>`).join("")}</div>`;
+    return `<div class="htimer on"><b data-htleft>${mmss(left())}</b><small>${timer.pausedLeft != null ? "paused" : "time to tidy"}</small>
+    <button class="tbtn" data-htctl="${timer.pausedLeft != null ? "play" : "pause"}" aria-label="${timer.pausedLeft != null ? "Resume" : "Pause"}">${icon(timer.pausedLeft != null ? "play" : "pause", 18)}</button>
+    <button class="tbtn" data-htctl="stop" aria-label="Stop the timer">${icon("reset", 18)}</button></div>`;
+  }
+  function hestiaPanel(which) {
+    tidy();
+    if (which === "fridge") return fridgePanel();
+    if (focus) return focusPanel();
+    const tabs = [["daily", "Daily"], ["weekly", "Weekly"], ["zone", "This week's zone"]];
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The cleaning cupboard</h2>
+    <p class="sub">Hestia's chores. ${H2.streak ? `Home streak: ${H2.streak} day${H2.streak > 1 ? "s" : ""}. ` : ""}${H2.cleaningMinutes[today()] ? `${H2.cleaningMinutes[today()]} minutes tidied today.` : "A little every day keeps the house kind to you."}</p>
+    ${timerBlock()}<div class="actions"><button class="btn small yes" data-hfocus="1">One at a time</button></div>
+    <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-htab="${k}" aria-selected="${view.tab === k}">${n}</button>`).join("")}</div><ul class="hlist">`;
+    if (view.tab === "daily") {
+      const order = (t) => (dayDone(t.id) ? 10 : 0) + (t.timeOfDay === "morning" ? 0 : t.timeOfDay === "evening" ? 2 : 1);
+      h += [...H2.dailyTasks || []].sort((a, b) => order(a) - order(b)).map((t) => row("daily", t.id, t, dayDone(t.id), t.timeOfDay ? `<span class="hbadge">${t.timeOfDay}</span>` : "")).join("");
+    } else if (view.tab === "weekly") {
+      const order = (t) => (weekDone(t.id) ? 10 : 0) + (t.weekday === dow() ? 0 : 1);
+      h += [...H2.weeklyTasks || []].sort((a, b) => order(a) - order(b)).map((t) => row("weekly", t.id, t, weekDone(t.id), t.weekday != null ? `<span class="hbadge${t.weekday === dow() ? " now" : ""}">${t.weekday === dow() ? "today" : DAYS[t.weekday]}</span>` : "")).join("");
+    } else {
+      const z = zone(), n = (z.tasks || []).length, d = (z.tasks || []).filter((_, i) => zoneDone(i)).length;
+      h += `<li class="hzone"><b>${esc(z.name)}</b> <small>week ${H2.currentZoneIndex + 1} of ${H2.zones.length} · ${d}/${n} done</small></li>` + (z.tasks || []).map((t, i) => row("zone", i, t, zoneDone(i))).join("");
+    }
+    h += `</ul>${view.tab !== "zone" ? `<form class="row hadd" data-hadd="${view.tab}"><input name="t" maxlength="80" placeholder="add a ${view.tab} chore"><button class="btn small alt">Add</button></form>` : `<div class="actions"><button class="btn small alt" data-hnextzone="1">Move on to ${esc(H2.zones[(H2.currentZoneIndex + 1) % H2.zones.length].name)}</button></div>`}`;
+    return h;
+  }
+  function focusPanel() {
+    const c = focus.cards[focus.i];
+    if (!c) {
+      focus = null;
+      return `<span class="tape gingham" aria-hidden="true"></span><h2>All done</h2><p class="sub">Every chore on today's list is ticked or skipped. That's the house sorted.</p>${timerBlock()}<div class="actions"><button class="btn small alt" data-hback="1">Back to the cupboard</button></div>`;
+    }
+    return `<span class="tape gingham" aria-hidden="true"></span><p class="eyebrow">${esc(c.group)} · ${focus.i + 1} of ${focus.cards.length}</p><h2 class="hcard">${esc(c.text)}</h2>
+    ${timerBlock()}<div class="actions"><button class="btn yes" data-hcard="done">Done</button><button class="btn alt" data-hcard="skip">Skip</button><button class="btn alt small" data-hback="1">Exit</button></div>`;
+  }
+  function fridgePanel() {
+    const cats = H2.pantryCategories, locs = H2.whereToBuyLocations, items = H2.pantryItems || [];
+    const shop = (H2.shoppingList || []).filter((s) => !s.purchased).map((s) => items.find((i) => i.id === s.id)).filter(Boolean);
+    const locName = (id) => (locs.find((l) => l.id === id) || {}).name || "";
+    const wh = (it) => Array.isArray(it.whereToBuy) ? it.whereToBuy : it.whereToBuy ? [it.whereToBuy] : [];
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The fridge</h2>
+    <div class="tabs" role="tablist"><button role="tab" data-hfr="stock" aria-selected="${view.fridge === "stock"}">What we have</button><button role="tab" data-hfr="shop" aria-selected="${view.fridge === "shop"}">Shopping list${shop.length ? ` (${shop.length})` : ""}</button></div>`;
+    if (view.fridge === "stock") {
+      h += items.length ? cats.map((c) => {
+        const list = items.filter((i) => i.category === c.id);
+        if (!list.length) return "";
+        return `<p class="eyebrow">${esc(c.name)} · ${list.filter((i) => i.inStock).length}/${list.length}</p><ul class="hlist">${list.map((i) => `<li class="${i.inStock ? "" : "out"}"><label><input type="checkbox" data-hstock="${i.id}" ${i.inStock ? "checked" : ""}><span>${esc(i.name)}${i.notes ? ` <small>${esc(i.notes)}</small>` : ""}</span></label>${i.inStock ? "" : `<span class="hbadge now">to buy</span>`}<button class="hx" data-hitemdel="${i.id}" aria-label="Remove ${esc(i.name)}">✕</button></li>`).join("")}</ul>`;
+      }).join("") : `<p class="muted">The fridge is empty. Add what you keep at home, or import your Hestia lists in Settings.</p>`;
+      h += `<p class="muted">Untick something when it runs out: it goes on the shopping list.</p>`;
+    } else {
+      const shown = view.loc === "all" ? shop : shop.filter((i) => wh(i).includes(view.loc));
+      h += `<div class="row"><select data-hloc>${[["all", "Everywhere"], ...locs.map((l) => [l.id, l.name])].map(([v, n]) => `<option value="${v}" ${view.loc === v ? "selected" : ""}>${esc(n)}</option>`).join("")}</select><button class="btn small alt" data-hcopy="1">Copy list</button></div>`;
+      h += shown.length ? `<ul class="hlist">${shown.map((i) => `<li><label><input type="checkbox" data-hbuy="${i.id}"><span>${esc(i.name)} <small>${esc(wh(i).map(locName).join(", "))}</small></span></label></li>`).join("")}</ul>` : `<p class="muted">Nothing to buy${view.loc === "all" ? "" : " there"}. Untick things in "What we have" when they run out.</p>`;
+    }
+    h += `<form class="row hadd" data-hitem="${view.fridge}"><input name="t" maxlength="60" placeholder="${view.fridge === "shop" ? "add to the shopping list" : "add something we keep"}">
+    <select name="c">${cats.map((c) => `<option value="${c.id}">${esc(c.name)}</option>`).join("")}</select>
+    <select name="w">${locs.map((l) => `<option value="${l.id}">${esc(l.name)}</option>`).join("")}</select><button class="btn small alt">Add</button></form>`;
+    return h;
+  }
+  function wireHestia(root, which) {
+    const on = (sel, ev, fn) => root.querySelectorAll(sel).forEach((el) => el.addEventListener(ev, (e) => {
+      e.stopPropagation();
+      fn(el, e);
+    }));
+    on("[data-htab]", "click", (el) => {
+      view.tab = el.dataset.htab;
+      api2.changed();
+    });
+    on("[data-hdone]", "change", (el) => {
+      const [k, id] = el.dataset.hdone.split(":");
+      setDone(k, k === "zone" ? +id : id, el.checked);
+    });
+    on("[data-hdel]", "click", (el) => {
+      const [k, id] = el.dataset.hdel.split(":");
+      const key = k === "daily" ? "dailyTasks" : "weeklyTasks";
+      H2[key] = H2[key].filter((t) => t.id !== id);
+      save();
+      api2.changed();
+    });
+    on("form[data-hadd]", "submit", (el, e) => {
+      e.preventDefault();
+      const v = el.t.value.trim();
+      if (!v) return;
+      const k = el.dataset.hadd;
+      (k === "daily" ? H2.dailyTasks : H2.weeklyTasks).push(k === "daily" ? { id: "d" + Date.now(), text: v, effort: 1, timeOfDay: null } : { id: "w" + Date.now(), text: v, effort: 1, weekday: null });
+      save();
+      api2.changed();
+    });
+    on("[data-hnextzone]", "click", () => {
+      H2.currentZoneIndex = (H2.currentZoneIndex + 1) % H2.zones.length;
+      H2.zoneLog = {};
+      H2.weekStartDate = mondayKey();
+      api2.speak(`This week's zone: ${zone().name}.`, 3500);
+      save();
+      api2.changed();
+    });
+    on("[data-htimer]", "click", (el) => startTimer(+el.dataset.htimer));
+    on("[data-htctl]", "click", (el) => {
+      const k = el.dataset.htctl;
+      if (k === "pause" && timer) timer.pausedLeft = left();
+      else if (k === "play" && timer) {
+        timer.endAt = Date.now() + timer.pausedLeft;
+        timer.pausedLeft = null;
+      } else timer = null;
+      api2.changed();
+    });
+    on("[data-hfocus]", "click", () => {
+      focus = { cards: dealCards(), i: 0 };
+      if (!timer) startTimer(H2.timerMinutes || 20);
+      api2.changed();
+    });
+    on("[data-hcard]", "click", (el) => {
+      const c = focus && focus.cards[focus.i];
+      if (!c) return;
+      if (el.dataset.hcard === "done") setDone(c.kind, c.id, true);
+      focus.i++;
+      api2.changed();
+    });
+    on("[data-hback]", "click", () => {
+      focus = null;
+      api2.changed();
+    });
+    on("[data-hfr]", "click", (el) => {
+      view.fridge = el.dataset.hfr;
+      api2.changed();
+    });
+    on("[data-hstock]", "change", (el) => {
+      const it = H2.pantryItems.find((i) => String(i.id) === el.dataset.hstock);
+      if (!it) return;
+      it.inStock = el.checked;
+      H2.shoppingList = (H2.shoppingList || []).filter((s) => s.id !== it.id);
+      if (!it.inStock) {
+        H2.shoppingList.push({ id: it.id, purchased: false });
+        api2.flash(`${it.name} is on the shopping list`);
+      }
+      save();
+      api2.changed();
+    });
+    on("[data-hitemdel]", "click", (el) => {
+      const id = el.dataset.hitemdel;
+      H2.pantryItems = H2.pantryItems.filter((i) => String(i.id) !== id);
+      H2.shoppingList = (H2.shoppingList || []).filter((s) => String(s.id) !== id);
+      save();
+      api2.changed();
+    });
+    on("[data-hbuy]", "change", (el) => {
+      const it = H2.pantryItems.find((i) => String(i.id) === el.dataset.hbuy);
+      if (!it) return;
+      it.inStock = true;
+      H2.shoppingList = H2.shoppingList.filter((s) => s.id !== it.id);
+      api2.sfx("coin");
+      api2.flash(`Got ${it.name.toLowerCase()}!`);
+      save();
+      api2.changed();
+    });
+    on("[data-hloc]", "change", (el) => {
+      view.loc = el.value;
+      api2.changed();
+    });
+    on("[data-hcopy]", "click", () => {
+      const shop = (H2.shoppingList || []).map((s) => H2.pantryItems.find((i) => i.id === s.id)).filter(Boolean).filter((i) => view.loc === "all" || (Array.isArray(i.whereToBuy) ? i.whereToBuy : [i.whereToBuy]).includes(view.loc));
+      const text = "Shopping list\n" + shop.map((i) => "- " + i.name).join("\n");
+      try {
+        navigator.clipboard.writeText(text).then(() => api2.flash("Shopping list copied"));
+      } catch {
+        api2.flash("Couldn't copy here");
+      }
+    });
+    on("form[data-hitem]", "submit", (el, e) => {
+      e.preventDefault();
+      const v = el.t.value.trim();
+      if (!v) return;
+      const toShop = el.dataset.hitem === "shop";
+      const it = { id: Date.now(), name: v, category: el.c.value, whereToBuy: [el.w.value], notes: "", inStock: !toShop };
+      H2.pantryItems.push(it);
+      if (toShop) H2.shoppingList.push({ id: it.id, purchased: false });
+      save();
+      api2.changed();
+    });
+  }
+  function importHestia(text) {
+    let d;
+    try {
+      d = JSON.parse(text);
+    } catch {
+      return "That file isn't a Hestia export (not JSON).";
+    }
+    if (d && d.state && d.state.zones) d = d.state;
+    if (!d || !Array.isArray(d.zones) || !Array.isArray(d.dailyTasks)) return "That doesn't look like a Hestia export (no zones or daily tasks).";
+    const keep = [
+      "zones",
+      "dailyTasks",
+      "weeklyTasks",
+      "currentZoneIndex",
+      "weekStartDate",
+      "dailyLog",
+      "weeklyLog",
+      "zoneLog",
+      "lastWeekKey",
+      "streak",
+      "lastActiveDate",
+      "cleaningMinutes",
+      "pantryItems",
+      "shoppingList",
+      "pantryCategories",
+      "whereToBuyLocations",
+      "timerMinutes",
+      "chimeEnabled",
+      "chimeInterval"
+    ];
+    keep.forEach((k) => {
+      if (d[k] != null) H2[k] = d[k];
+    });
+    tidy();
+    save();
+    api2.changed();
+    return `Imported: ${H2.dailyTasks.length} daily, ${(H2.weeklyTasks || []).length} weekly, ${H2.zones.length} zones, ${(H2.pantryItems || []).length} pantry items.`;
+  }
+
   // src/art/people.js
   var S = (c) => `style="fill:${c}"`;
   function hair(style, c, k) {
@@ -3310,18 +3817,18 @@ Quests finished today: ${S3.doneIds.length}`;
   // src/game/npcs.js
   var NS = "http://www.w3.org/2000/svg";
   var ents = {};
-  var api2 = null;
+  var api3 = null;
   var courier = null;
   var sayer = null;
   var sayT = null;
   var greeted = /* @__PURE__ */ new Set();
   function initNpcs(a) {
-    api2 = a;
+    api3 = a;
   }
   var weekend = () => [0, 6].includes(new Date(now() + 8 * H).getUTCDay());
   var slotNow = (def) => {
     const t = sgHM(), we = weekend();
-    const owned = api2 && api2.F().fam && api2.F().fam.owned || {};
+    const owned = api3 && api3.F().fam && api3.F().fam.owned || {};
     return def.routine.find((s) => t >= s.from && t < s.to && (!s.days || s.days === "we" === we) && (!s.needs || owned[s.needs])) || null;
   };
   var whereIs = (id) => {
@@ -3332,16 +3839,16 @@ Quests finished today: ${S3.doneIds.length}`;
   function npcSay(id, text) {
     const e = ents[id];
     if (!e) return false;
-    e.dir = api2.mel.x < e.x ? -1 : 1;
+    e.dir = api3.mel.x < e.x ? -1 : 1;
     say(e, text, 4500);
-    api2.sfx && api2.sfx("babble", e.def.pitch || 1);
+    api3.sfx && api3.sfx("babble", e.def.pitch || 1);
     return true;
   }
   var PROPS = { water: "can", repair: "hammer", farm: "hoe" };
   var outdoors = (s) => s === "village" || s === "base";
   var isHere = (id) => {
     const d = NPCS.find((n) => n.id === id), s = d && slotNow(d);
-    return !!(s && s.scene === api2.scene());
+    return !!(s && s.scene === api3.scene());
   };
   function makeNode(id, look, kid, letter, act2) {
     const g = document.createElementNS(NS, "g");
@@ -3349,7 +3856,7 @@ Quests finished today: ${S3.doneIds.length}`;
     g.dataset.npc = id;
     g.setAttribute("role", "button");
     if (act2 && PROPS[act2]) look = Object.assign({}, look, { extra: PROPS[act2] });
-    const owned = api2.F().fam && api2.F().fam.owned || {};
+    const owned = api3.F().fam && api3.F().fam.owned || {};
     if (id === "darren" && act2 === "type" && owned.headphones) look = Object.assign({}, look, { headphones: true });
     g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "");
     $("actors").appendChild(g);
@@ -3379,7 +3886,7 @@ Quests finished today: ${S3.doneIds.length}`;
   }
   var jitter = ([x, y]) => [x + rnd(-10, 10), y + rnd(-6, 6)];
   function tickVillager(def, dt) {
-    const scene2 = api2.scene(), slot2 = slotNow(def), key = slot2 ? `${slot2.scene}:${slot2.from}` : null;
+    const scene2 = api3.scene(), slot2 = slotNow(def), key = slot2 ? `${slot2.scene}:${slot2.from}` : null;
     let e = ents[def.id];
     if (!slot2 || slot2.scene !== scene2) {
       if (e) drop(def.id);
@@ -3390,26 +3897,26 @@ Quests finished today: ${S3.doneIds.length}`;
       const p = slot2.at || jitter(pick(slot2.wander));
       e = ents[def.id] = { def, key, act: slot2.act, kind: "npc", x: p[0], y: p[1], tx: p[0], ty: p[1], dir: slot2.dir || (Math.random() < 0.5 ? -1 : 1), moving: false, wait: rnd(1, 4), node: makeNode(def.id, def.look, def.kid, false, slot2.act) };
     }
-    const near = Math.hypot(e.x - api2.mel.x, e.y - api2.mel.y) < 110;
+    const near = Math.hypot(e.x - api3.mel.x, e.y - api3.mel.y) < 110;
     if (near && !sayer && Date.now() - (e.helloAt || 0) > 4 * 6e4 && Math.random() < dt * 0.08) {
       e.helloAt = Date.now();
-      if (!e.act) e.dir = api2.mel.x < e.x ? -1 : 1;
+      if (!e.act) e.dir = api3.mel.x < e.x ? -1 : 1;
       say(e, pick(hellos()), 2600);
-      api2.sfx && api2.sfx("babble", def.pitch || 1);
+      api3.sfx && api3.sfx("babble", def.pitch || 1);
     }
-    const b = api2.bounds();
+    const b = api3.bounds();
     if (stepTo(e, def.kid ? 95 : 48, dt)) {
       e.wait -= dt;
       if (e.wait <= 0 && slot2.wander) {
         let p = jitter(pick(slot2.wander));
         if (def.id === "pip" && scene2 === "base" && Math.random() < 0.35) {
           p = [340 + rnd(-10, 10), 572];
-          api2.evan.tx = 360 + rnd(-14, 14);
-          api2.evan.ty = 578;
-          api2.evan.run = true;
+          api3.evan.tx = 360 + rnd(-14, 14);
+          api3.evan.ty = 578;
+          api3.evan.run = true;
           if (Math.random() < 0.6) {
             say(e, "Race you, Evan!");
-            setTimeout(() => api2.evanSays("race!"), 600);
+            setTimeout(() => api3.evanSays("race!"), 600);
           }
         }
         e.tx = clamp(p[0], b[0], b[2]);
@@ -3424,17 +3931,17 @@ Quests finished today: ${S3.doneIds.length}`;
     return [t < 720 ? "Morning, Mel!" : t < 1080 ? "Afternoon, Mel!" : "Evening, Mel!", "Hi!", "Hello there!", "Hiya, Mel!"];
   };
   function tickCourier(dt) {
-    const scene2 = api2.scene(), mel2 = api2.mel;
+    const scene2 = api3.scene(), mel2 = api3.mel;
     if (courier && courier.scene !== scene2) {
       drop(courier.id);
       courier = null;
     }
-    if (courier && courier.state !== "leaving" && !api2.unreadMail().some((m) => m.id === courier.item.id)) {
+    if (courier && courier.state !== "leaving" && !api3.unreadMail().some((m) => m.id === courier.item.id)) {
       drop(courier.id);
       courier = null;
     }
     if (!courier) {
-      const item = api2.unreadMail().find((m) => m.from !== "crier" || scene2 === "village");
+      const item = api3.unreadMail().find((m) => m.from !== "crier" || scene2 === "village");
       if (!item) return;
       const ag = AGENTS[item.from] || AGENTS.postie;
       const start = outdoors(scene2) ? mel2.x < 260 ? [540, 330] : [-20, 330] : [260, 640];
@@ -3469,7 +3976,7 @@ Quests finished today: ${S3.doneIds.length}`;
     courier.state = "leaving";
     courier.node.querySelector(".letter")?.remove();
     say(courier, pick(["Off I go!", "Have a lovely day!", "Bye for now!"]), 2200);
-    const scene2 = api2.scene();
+    const scene2 = api3.scene();
     courier.tx = outdoors(scene2) ? courier.x < 260 ? -30 : 550 : 260;
     courier.ty = outdoors(scene2) ? 330 : 650;
   }
@@ -3489,33 +3996,33 @@ Quests finished today: ${S3.doneIds.length}`;
     const e = ents[id];
     if (!e) return;
     if (e.kind === "agent") {
-      api2.openMail(e.item);
+      api3.openMail(e.item);
       return;
     }
-    const def = e.def, F2 = api2.F(), S3 = api2.S();
+    const def = e.def, F2 = api3.F(), S3 = api3.S();
     F2.met = F2.met || {};
     S3.npcSaid = S3.npcSaid || {};
-    if (!e.act) e.dir = api2.mel.x < e.x ? -1 : 1;
-    api2.chatted && api2.chatted(def.name);
+    if (!e.act) e.dir = api3.mel.x < e.x ? -1 : 1;
+    api3.chatted && api3.chatted(def.name);
     if (!F2.met[id]) {
       F2.met[id] = true;
       say(e, def.intro, 7e3);
       if (def.gift && !(F2.gifts || {})[id]) {
         F2.gifts = Object.assign(F2.gifts || {}, { [id]: true });
         setTimeout(() => {
-          api2.gift(def.gift);
+          api3.gift(def.gift);
           say(e, "Here, a free packet of seeds. Plant them by morning.", 4500);
         }, 7200);
       }
-      api2.save();
+      api3.save();
       return;
     }
-    const facts2 = api2.facts();
+    const facts2 = api3.facts();
     const cond = Object.keys(def.react || {}).find((k) => facts2[k] && !S3.npcSaid[id + ":" + k]);
     if (cond) {
       S3.npcSaid[id + ":" + cond] = true;
       say(e, def.react[cond], 4500);
-      api2.save();
+      api3.save();
       return;
     }
     if (e.act && def.actLines && def.actLines[e.act] && Math.random() < 0.6) {
@@ -3533,7 +4040,7 @@ Quests finished today: ${S3.doneIds.length}`;
       if (e.kind === "npc") e.node.classList.toggle("walk", e.moving);
     });
     const el = $("npcSay");
-    if (sayer && !el.hidden) api2.bubble(el, sayer.x, sayer.y, sayer.kind === "npc" && sayer.def.kid ? 44 : 70, Math.hypot(sayer.x - api2.mel.x, sayer.y - api2.mel.y) < 90);
+    if (sayer && !el.hidden) api3.bubble(el, sayer.x, sayer.y, sayer.kind === "npc" && sayer.def.kid ? 44 : 70, Math.hypot(sayer.x - api3.mel.x, sayer.y - api3.mel.y) < 90);
   }
   var npcActors = () => Object.values(ents).map((e) => [e.node, e]);
   function resetScene() {
@@ -3640,6 +4147,7 @@ Quests finished today: ${S3.doneIds.length}`;
   var qnKey = "";
   var openView = null;
   var shopClosed = false;
+  var homeView = null;
   function persist(which) {
     const obj = which === "today" ? S2 : F;
     obj.updatedAt = Date.now();
@@ -3668,7 +4176,7 @@ Quests finished today: ${S3.doneIds.length}`;
     F.history[S2.day] = { q: S2.doneIds.length, steps: S2.steps || 0, water: S2.waterMl || 0, harvest: S2.harvested || 0, coins: S2.earned || 0, chats: (S2.chats || []).slice(0, 12) };
     Object.keys(F.history).sort().slice(0, -21).forEach((k) => delete F.history[k]);
   }
-  var save = (redraw) => {
+  var save2 = (redraw) => {
     noteHistory();
     persist("today");
     persist("fox");
@@ -3689,6 +4197,7 @@ Quests finished today: ${S3.doneIds.length}`;
     const uid = await user.id();
     if (!uid) return;
     const col = db.collection("data/users/" + uid);
+    attachHestiaDb(col.doc("hestia"));
     refs = { today: col.doc("today"), fox: col.doc("fox"), plan: col.doc("plan"), mail: col.doc("mail"), stats: col.doc("stats"), library: col.doc("library") };
     refs.library.onSnapshot((snap) => {
       LIB = snap.exists ? Object.assign({ items: [] }, snap.data()) : { items: [] };
@@ -3744,17 +4253,17 @@ Quests finished today: ${S3.doneIds.length}`;
       }
     });
     const watch = (which) => refs[which].onSnapshot((snap) => {
-      const local = which === "today" ? S2 : F;
+      const local2 = which === "today" ? S2 : F;
       if (!snap.exists) {
         persist(which);
         return;
       }
       const remote = JSON.parse(JSON.stringify(snap.data()));
       if (which === "today" && remote.day !== dayKey()) {
-        if (local.day === dayKey()) persist(which);
+        if (local2.day === dayKey()) persist(which);
         return;
       }
-      if ((remote.updatedAt || 0) > (local.updatedAt || 0)) {
+      if ((remote.updatedAt || 0) > (local2.updatedAt || 0)) {
         if (which === "today") S2 = Object.assign(freshToday(), remote);
         else F = Object.assign(freshFox(), remote);
         migrate();
@@ -3763,7 +4272,7 @@ Quests finished today: ${S3.doneIds.length}`;
         } catch {
         }
         render(true);
-      } else if ((remote.updatedAt || 0) < (local.updatedAt || 0)) persist(which);
+      } else if ((remote.updatedAt || 0) < (local2.updatedAt || 0)) persist(which);
     }, () => {
     });
     watch("today");
@@ -3791,12 +4300,12 @@ Quests finished today: ${S3.doneIds.length}`;
     S2.firstStep[id] = false;
     sfx("paper", true);
     setSay(`Dropped “${t.title}” for today. One less thing.`);
-    if (!quiet) save(true);
+    if (!quiet) save2(true);
   }
   function undropTask(id) {
     S2.dropped = (S2.dropped || []).filter((x) => x !== id);
     setSay("Back on the board.");
-    save(true);
+    save2(true);
   }
   var remaining = () => allTasks().filter((t) => !S2.doneIds.includes(t.id));
   var questsIn = (pl) => allTasks().filter((t) => placeOf(t) === pl);
@@ -3831,7 +4340,7 @@ Quests finished today: ${S3.doneIds.length}`;
     if (id === "can") F.plots.forEach((p, i) => {
       if (p && p.crop && !p.wateredAt) p.wateredAt = Date.now();
     });
-    save();
+    save2();
   }
   var readyCount = () => F.plots.filter((p) => p && p.crop && growth(p) >= 1).length;
   var level = () => {
@@ -4021,7 +4530,7 @@ Quests finished today: ${S3.doneIds.length}`;
     } catch {
     }
   }
-  function startTimer(kind, mins, id) {
+  function startTimer2(kind, mins, id) {
     S2.timer = { kind, endAt: Date.now() + mins * M, total: mins * M, id: id || null, fired: false };
   }
   var tLeft = () => !S2.timer ? 0 : S2.timer.pausedLeft != null ? S2.timer.pausedLeft : Math.max(0, S2.timer.endAt - Date.now());
@@ -4042,7 +4551,7 @@ Quests finished today: ${S3.doneIds.length}`;
       setSay("Fresh start on the clock.");
     }
     sfx("tap");
-    save();
+    save2();
   }
   var timerBtns = () => S2.timer ? `<span class="tctl"><button class="tbtn" data-tctl="${S2.timer.pausedLeft != null ? "play" : "pause"}" aria-label="${S2.timer.pausedLeft != null ? "Resume the timer" : "Pause the timer"}">${icon(S2.timer.pausedLeft != null ? "play" : "pause", 18)}</button><button class="tbtn" data-tctl="reset" aria-label="Restart the timer">${icon("reset", 18)}</button></span>` : "";
   document.addEventListener("click", (ev) => {
@@ -4052,12 +4561,12 @@ Quests finished today: ${S3.doneIds.length}`;
       timerCtl(b.dataset.tctl);
     }
   }, true);
-  var fmt = (left) => left ? `${Math.floor(left / M)}:${String(Math.floor(left / 1e3) % 60).padStart(2, "0")}` : "time!";
+  var fmt = (left2) => left2 ? `${Math.floor(left2 / M)}:${String(Math.floor(left2 / 1e3) % 60).padStart(2, "0")}` : "time!";
   function timerHTML(label) {
     if (!S2.timer) return "";
-    const left = tLeft(), C2 = 2 * Math.PI * 28;
-    return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C2}" stroke-dashoffset="${C2 * (1 - left / S2.timer.total)}"/></svg>
-    <div><span class="t" id="tLeft">${fmt(left)}</span><small>${S2.timer.pausedLeft != null ? "paused" : esc(label)}</small></div>${timerBtns()}</div>`;
+    const left2 = tLeft(), C2 = 2 * Math.PI * 28;
+    return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C2}" stroke-dashoffset="${C2 * (1 - left2 / S2.timer.total)}"/></svg>
+    <div><span class="t" id="tLeft">${fmt(left2)}</span><small>${S2.timer.pausedLeft != null ? "paused" : esc(label)}</small></div>${timerBtns()}</div>`;
   }
   var lastReady = readyCount();
   var lastDusk = null;
@@ -4065,7 +4574,7 @@ Quests finished today: ${S3.doneIds.length}`;
     if (S2.day !== dayKey()) {
       S2 = freshToday();
       say2 = null;
-      save(true);
+      save2(true);
       speak(defaultLine());
       syncSunsama();
       return;
@@ -4085,12 +4594,12 @@ Quests finished today: ${S3.doneIds.length}`;
     lastDusk = isDusk();
     if (shelfOpen && Math.floor(Date.now() / 1e3) % 20 === 0) ctx();
     if (!S2.timer) return;
-    const left = tLeft();
+    const left2 = tLeft();
     const t = $("tLeft"), r = $("ringFg");
-    if (t) t.textContent = fmt(left);
-    document.querySelectorAll("[data-tleft]").forEach((el) => el.textContent = fmt(left));
-    if (r) r.style.strokeDashoffset = 2 * Math.PI * 28 * (1 - left / S2.timer.total);
-    if (!left && !S2.timer.fired) {
+    if (t) t.textContent = fmt(left2);
+    document.querySelectorAll("[data-tleft]").forEach((el) => el.textContent = fmt(left2));
+    if (r) r.style.strokeDashoffset = 2 * Math.PI * 28 * (1 - left2 / S2.timer.total);
+    if (!left2 && !S2.timer.fired) {
       S2.timer.fired = true;
       timerDone(S2.timer.kind);
     }
@@ -4100,7 +4609,7 @@ Quests finished today: ${S3.doneIds.length}`;
     act(kind === "break" ? "cheer" : "nudge");
     if (kind === "clean") setSay("Five minutes! Wipe down. That's your first tick.");
     if (kind === "task") setSay("Time box is up. Done? Or five more?", [["5 more minutes", () => {
-      startTimer("task", 5, S2.timer.id);
+      startTimer2("task", 5, S2.timer.id);
       setSay("Five more. You've got this.");
     }]]);
     if (kind === "deal") setSay("Five minutes done 🎉 Stop or keep rolling. Both count.");
@@ -4109,7 +4618,7 @@ Quests finished today: ${S3.doneIds.length}`;
       S2.timer = null;
       setSay("Release. Now three quick points in chat, then a hot drink.");
     }
-    save();
+    save2();
   }
   function goQuest(t) {
     if (phase() === "clean") {
@@ -4129,9 +4638,9 @@ Quests finished today: ${S3.doneIds.length}`;
     },
     gotWipe() {
       S2.wipe = true;
-      startTimer("clean", 5);
+      startTimer2("clean", 5);
       setSay("Nearest, most annoying spot. You pick!");
-      save();
+      save2();
     },
     cleanDone() {
       S2.cleanDone = true;
@@ -4141,14 +4650,14 @@ Quests finished today: ${S3.doneIds.length}`;
       S2.last = "clean";
       act("cheer");
       setSay("First tick of the day! Look at that ✨");
-      save();
+      save2();
     },
     firstStep(t) {
       S2.firstStep[t.id] = true;
       S2.arrived[t.id] = true;
-      startTimer("task", t.minutes || 25, t.id);
+      startTimer2("task", t.minutes || 25, t.id);
       setSay("Hard part's done. Now the rest, on the clock.");
-      save();
+      save2();
     },
     done(t) {
       S2.doneIds.push(t.id);
@@ -4168,13 +4677,13 @@ Quests finished today: ${S3.doneIds.length}`;
       if (t.meeting) S2.mode = "decompress";
       else if (remaining().length) {
         S2.mode = "break";
-        startTimer("break", 10);
+        startTimer2("break", 10);
       }
       act("cheer");
       if (evanHere()) evanSays(pick(["yaaay!", "Mama did it!", "hooray!"]));
       if (onTread(t)) setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : "") + " Steps showing?", [["Log my steps", () => openSteps(true)]]);
       else setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : ""));
-      save(true);
+      save2(true);
     },
     notebook(t) {
       openTask(t);
@@ -4185,7 +4694,7 @@ Quests finished today: ${S3.doneIds.length}`;
       S2.tweaks[t.id] = Object.assign({}, S2.tweaks[t.id], { place: "home", spot: "treadmill" });
       closeNotebook();
       setSay("Treadmill it is! 1.2 and go. I'll walk with you.");
-      save(true);
+      save2(true);
       goQuest(allTasks().find((x) => x.id === t.id));
     },
     proc(t) {
@@ -4216,17 +4725,17 @@ Quests finished today: ${S3.doneIds.length}`;
       } else {
         setSay("Totally normal. Smaller: just open it. Nothing else.", [
           ["5-minute deal", () => {
-            startTimer("deal", 5, t.id);
+            startTimer2("deal", 5, t.id);
             setSay("Five minutes, then you're allowed to stop.");
           }],
           ["Wet-wipe reset", () => {
-            startTimer("deal", 5, t.id);
+            startTimer2("deal", 5, t.id);
             setSay("Wipe something for five. Then back to me.");
           }],
           ["Check the basics", () => setSay("Water? Snack? Too hot? Tired? Fix that first.")]
         ]);
       }
-      save();
+      save2();
     },
     back() {
       S2.mode = null;
@@ -4234,24 +4743,24 @@ Quests finished today: ${S3.doneIds.length}`;
       earn(2, "proper break");
       gainXp(1);
       setSay("Welcome back! Fresh quest coming up.");
-      save();
+      save2();
     },
     flow() {
       S2.mode = null;
       S2.timer = null;
       setSay("In flow? Ride it! Break after this one.");
-      save();
+      save2();
     },
     clench() {
-      startTimer("clench", 0.5);
+      startTimer2("clench", 0.5);
       setSay("Clench and hold. Breathe through your nose.");
-      save();
+      save2();
     },
     decompressed() {
       S2.mode = remaining().length ? "break" : null;
-      if (S2.mode) startTimer("break", 10);
+      if (S2.mode) startTimer2("break", 10);
       setSay("Decompressed. Now a proper break.");
-      save();
+      save2();
     },
     water(ml) {
       setWater((S2.waterMl || 0) + (ml || GLASS));
@@ -4266,7 +4775,7 @@ Quests finished today: ${S3.doneIds.length}`;
     openView = null;
     boardOpen = false;
     speak("New quest picked! Off we go.", 3e3);
-    save(true);
+    save2(true);
   }
   function countQuest() {
     const before = unlocked(F.totalQuests || 0).length;
@@ -4294,7 +4803,7 @@ Quests finished today: ${S3.doneIds.length}`;
       S2.halfway[t.id] = true;
       act("cheer");
       setSay(pick(HALF));
-      save();
+      save2();
       return;
     }
     if (kind === "stuck") {
@@ -4307,9 +4816,9 @@ Quests finished today: ${S3.doneIds.length}`;
         if (tm.pausedLeft != null) tm.pausedLeft += 10 * M;
         tm.endAt += 10 * M;
         tm.total += 10 * M;
-      } else startTimer("task", 10, t.id);
+      } else startTimer2("task", 10, t.id);
       setSay("Ten more minutes on the clock. Take them, no guilt.");
-      save();
+      save2();
       return;
     }
     if (kind === "treadmill") {
@@ -4326,7 +4835,7 @@ Quests finished today: ${S3.doneIds.length}`;
     const fn = say2.buttons[i][1];
     say2.buttons = null;
     fn();
-    save();
+    save2();
   }
   function timerLeft(t) {
     if (!S2.timer || S2.timer.id !== t.id || S2.timer.kind !== "task" && S2.timer.kind !== "deal") return null;
@@ -4384,19 +4893,19 @@ Quests finished today: ${S3.doneIds.length}`;
       if (refs) refs.plan.set(JSON.parse(JSON.stringify(P))).catch(() => {
       });
       creditDone(r.tasks, !was);
-      save(true);
+      save2(true);
       if (!was && remaining().length) speak(`${remaining().length} quests from Sunsama on the boards!`, 5e3);
       return;
     }
     const n = creditDone(r.tasks);
     if (manual) {
       const have = new Set(allTasks().map((t) => t.id));
-      const fresh = r.tasks.filter((t) => !t.completed && !have.has(t.id));
-      S2.extra.push(...fresh);
-      sun.added = fresh.length;
-      if (!n) speak(fresh.length ? `Added ${fresh.length} new Sunsama task${fresh.length === 1 ? "" : "s"} to the end of the line.` : "Sunsama and the boards match. All set!", 4e3);
+      const fresh2 = r.tasks.filter((t) => !t.completed && !have.has(t.id));
+      S2.extra.push(...fresh2);
+      sun.added = fresh2.length;
+      if (!n) speak(fresh2.length ? `Added ${fresh2.length} new Sunsama task${fresh2.length === 1 ? "" : "s"} to the end of the line.` : "Sunsama and the boards match. All set!", 4e3);
     }
-    save(true);
+    save2(true);
   }
   setInterval(() => {
     if (!document.hidden) syncSunsama();
@@ -4429,7 +4938,7 @@ Quests finished today: ${S3.doneIds.length}`;
       if (!keep.has(id)) delete F.digest.read[id];
     });
     gainXp(1);
-    save();
+    save2();
     openDigest(d);
   }
   async function askJuniper() {
@@ -4530,7 +5039,7 @@ Then tell chat "wind down" whenever you're ready.`
     go("base", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => {
       atSpot = "pond";
       S2.pond = { wins, at: Date.now(), shown: 0 };
-      save(true);
+      save2(true);
       let i = 0;
       const next = () => {
         if (i < wins.length) {
@@ -4544,7 +5053,7 @@ Then tell chat "wind down" whenever you're ready.`
           delete S2.pond.shown;
           act("cheer");
           setSay(fromRoutine ? "That's the day, Mel. Rest well. Tomorrow's first thing is in the note." : "That's the day, Mel. Tell chat “wind down” whenever you're ready.");
-          save();
+          save2();
         }
       };
       next();
@@ -4559,7 +5068,7 @@ Then tell chat "wind down" whenever you're ready.`
       const ids = Object.keys(F.mailRead).sort((a, b) => F.mailRead[b] - F.mailRead[a]);
       ids.slice(150).forEach((id) => delete F.mailRead[id]);
       gainXp(1);
-      save();
+      save2();
     }
     courierDelivered(item.id);
   }
@@ -4610,7 +5119,7 @@ Then tell chat "wind down" whenever you're ready.`
       F.decor[d.slot] = d.val;
       speak("Swapped in. Go and have a look!", 3e3);
     }
-    save(scene === "home");
+    save2(scene === "home");
   }
   function useItem(id) {
     const it = ITEMS[id];
@@ -4630,7 +5139,7 @@ Then tell chat "wind down" whenever you're ready.`
         F.cool[id] = Date.now();
         gainXp(1);
       }
-      save();
+      save2();
       return;
     }
     addInv(id, -1);
@@ -4638,7 +5147,7 @@ Then tell chat "wind down" whenever you're ready.`
     sfx("purr");
     act(it.kind === "food" ? "eat" : it.kind === "flower" ? "flower" : it.act, it);
     speak(it.say, 4500);
-    save();
+    save2();
   }
   var DARREN_AT = { base: "outside at home", home: "inside the house", farm: "in the garden" };
   var bubbleT = null;
@@ -4678,7 +5187,7 @@ Then tell chat "wind down" whenever you're ready.`
         evanSays("for you, Mama!");
         addInv("tulip", 1);
         flash("Evan picked you a tulip");
-        save();
+        save2();
       }, 4e3);
     } else {
       if (!isHere("darren")) {
@@ -4696,11 +5205,11 @@ Then tell chat "wind down" whenever you're ready.`
         npcSay("darren", "Got you something too. Found it in the shed.");
         addInv("strawberry_seed", 1);
         flash("Darren gave you strawberry seeds");
-        save();
+        save2();
       }, 4500);
     }
     gainXp(1);
-    save();
+    save2();
   }
   var holdKey = "";
   function renderEvanHold() {
@@ -4735,7 +5244,7 @@ Then tell chat "wind down" whenever you're ready.`
     if (!F.cool[kind] || Date.now() - F.cool[kind] > 30 * M) {
       F.cool[kind] = Date.now();
       gainXp(1);
-      save();
+      save2();
     }
   }
   function buy(id) {
@@ -4749,7 +5258,7 @@ Then tell chat "wind down" whenever you're ready.`
       flash(`${it.n} delivered home`);
       speak(it.say, 5e3);
       resetScene();
-      save(true);
+      save2(true);
       return;
     }
     if (it.kind === "tool" && F.inv[id]) return;
@@ -4757,7 +5266,7 @@ Then tell chat "wind down" whenever you're ready.`
     addInv(id, 1);
     flash(`Bought ${it.n.toLowerCase()}`);
     speak(pick(["Ooh, good choice!", "Into the backpack it goes.", "Lovely pick!"]), 2500);
-    save();
+    save2();
   }
   function sell(id) {
     const it = ITEMS[id];
@@ -4766,7 +5275,7 @@ Then tell chat "wind down" whenever you're ready.`
     F.coins += it.sell;
     flash(`Sold ${it.n.toLowerCase()} +${it.sell} coins`);
     speak("Fresh from the garden, sold!", 2500);
-    save();
+    save2();
   }
   function plant2(i, seedId) {
     const it = ITEMS[seedId];
@@ -4775,7 +5284,7 @@ Then tell chat "wind down" whenever you're ready.`
     F.gift = false;
     F.plots[i] = { crop: it.crop, plantedAt: Date.now(), wateredAt: F.tools.sprinkler ? Date.now() : null, bonus: 0 };
     speak(F.tools.sprinkler ? `${CROPS[it.crop].n} planted, and the sprinkler's on it!` : `${CROPS[it.crop].n} planted! Now give it some water.`, 3500);
-    save(true);
+    save2(true);
   }
   function waterPlot(i) {
     const p = F.plots[i];
@@ -4786,7 +5295,7 @@ Then tell chat "wind down" whenever you're ready.`
       mprop("drop", PLOTS[j].x + 50, PLOTS[j].y + 10);
     });
     speak(all.length > 1 ? `Big can! ${all.length} plots watered at once.` : "Watered! Growing starts now. Finished quests speed it up.", 4e3);
-    save(true);
+    save2(true);
   }
   function harvest(i) {
     const p = F.plots[i];
@@ -4798,7 +5307,7 @@ Then tell chat "wind down" whenever you're ready.`
     mprop(CROPS[p.crop].ico, PLOTS[i].x + 50, PLOTS[i].y + 20, 1900);
     act("cheer");
     speak(`Harvested a ${CROPS[p.crop].n.toLowerCase()}! It's in your backpack.`, 4e3);
-    save(true);
+    save2(true);
   }
   function notes() {
     const hm2 = sgHM();
@@ -4829,10 +5338,10 @@ Then tell chat "wind down" whenever you're ready.`
       <div class="actions">${!at ? `<button class="btn primary" data-a="walk">Walk to the ${esc(sp.name.toLowerCase())}</button>` : fs ? `<button class="btn yes" data-a="done">Quest done</button><button class="btn alt" data-a="notebook">Open the notebook</button>` : `<button class="btn primary" data-a="notebook">Do task</button><button class="btn alt" data-a="firstStep">First step done</button>`}
         <button class="btn alt" data-a="proc">I'm procrastinating</button></div>`;
     } else if (ph === "break") {
-      const fresh = S2.timer && S2.timer.kind === "break" && S2.timer.total - tLeft() < 6e4;
+      const fresh2 = S2.timer && S2.timer.kind === "break" && S2.timer.total - tLeft() < 6e4;
       h += `<h1><span class="lbl">side quest · rest</span>Ten-minute break</h1>${timerHTML("away from the desk")}
       <ul class="bujo"><li>Treadmill counts. Scrolling at your desk doesn't.</li><li>Check the garden, or sit by the pond.</li><li class="pep">Rest is part of the plan.</li></ul>
-      <div class="actions"><button class="btn yes" data-a="back">I'm back</button>${!(scene === "base" && atSpot === "pond") ? `<button class="btn alt" data-a="pond">Sit by the pond</button>` : ""}${fresh ? `<button class="btn alt" data-a="flow">I'm in flow</button>` : ""}</div>`;
+      <div class="actions"><button class="btn yes" data-a="back">I'm back</button>${!(scene === "base" && atSpot === "pond") ? `<button class="btn alt" data-a="pond">Sit by the pond</button>` : ""}${fresh2 ? `<button class="btn alt" data-a="flow">I'm in flow</button>` : ""}</div>`;
     } else if (ph === "decompress") {
       const clench = S2.timer && S2.timer.kind === "clench";
       h += `<h1><span class="lbl">right now</span>Decompress</h1>${clench ? timerHTML("clench and hold") : ""}
@@ -4877,11 +5386,11 @@ Then tell chat "wind down" whenever you're ready.`
       const fn = say2.buttons[+el.dataset.say][1];
       say2.buttons = null;
       fn();
-      save();
+      save2();
     });
     j.querySelectorAll("[data-dismiss]").forEach((el) => el.onclick = () => {
       S2[el.dataset.dismiss] = true;
-      save();
+      save2();
     });
     j.querySelectorAll("[data-water2]").forEach((el) => el.onclick = () => {
       S2.water2 = true;
@@ -4890,21 +5399,21 @@ Then tell chat "wind down" whenever you're ready.`
   }
   function showPanel(hasCtx, skin) {
     const views = { quests: "questsView", bag: "bagView", mail: "mailView", friend: "friendView", cal: "calView", settings: "settingsView" };
-    const view = openView || (hasCtx ? "ctx" : null), p = $("panel");
-    if (p.hidden === !!view) sfx("paper", true);
-    p.hidden = !view;
-    $("map").classList.toggle("panel-open", !!view);
-    if (view === "cal" && !p.dataset.cal) {
+    const view2 = openView || (hasCtx ? "ctx" : null), p = $("panel");
+    if (p.hidden === !!view2) sfx("paper", true);
+    p.hidden = !view2;
+    $("map").classList.toggle("panel-open", !!view2);
+    if (view2 === "cal" && !p.dataset.cal) {
       p.dataset.cal = "1";
       renderCal();
-    } else if (view !== "cal") delete p.dataset.cal;
-    if (view === "settings") {
+    } else if (view2 !== "cal") delete p.dataset.cal;
+    if (view2 === "settings") {
       $("setMusic").checked = settings.music;
       $("setVol").value = settings.musicVol;
       $("setSfx").checked = settings.sfx;
     }
-    ["ctx", "questsView", "bagView", "mailView", "friendView", "calView", "settingsView"].forEach((id) => $(id).hidden = id !== (views[view] || view));
-    p.className = "panel " + (view === "quests" ? "cork" : view === "ctx" ? skin : "paper");
+    ["ctx", "questsView", "bagView", "mailView", "friendView", "calView", "settingsView"].forEach((id) => $(id).hidden = id !== (views[view2] || view2));
+    p.className = "panel " + (view2 === "quests" ? "cork" : view2 === "ctx" ? skin : "paper");
     document.querySelectorAll("[data-open]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.open === openView)));
   }
   function closePanel() {
@@ -4916,13 +5425,14 @@ Then tell chat "wind down" whenever you're ready.`
     boardOpen = false;
     shelfOpen = false;
     selPlot = null;
+    homeView = null;
     if (scene === "market") shopClosed = true;
     ctx();
   }
-  async function renderCal(fresh) {
+  async function renderCal(fresh2) {
     const el = $("calBody");
     el.innerHTML = `<p class="muted">Opening your calendar…</p>`;
-    const r = await todaysEvents(dayKey(), fresh), nowT = Date.now();
+    const r = await todaysEvents(dayKey(), fresh2), nowT = Date.now();
     const fmtT = (t) => new Date(t).toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore" }).replace(" ", "").toLowerCase();
     let h = `<p class="sub">${new Date(now() + 8 * H).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })}</p>`;
     if (r.error && !r.events.length) h += `<p class="muted">${esc(CAL_ERRORS[r.error] || "Couldn't reach your calendar just now.")}</p>`;
@@ -4950,7 +5460,8 @@ Then tell chat "wind down" whenever you're ready.`
   function ctx() {
     const c = $("ctx");
     let h = "";
-    if (scene === "market" && !shopClosed) {
+    if (homeView && scene === "home") h = hestiaPanel(homeView);
+    else if (scene === "market" && !shopClosed) {
       const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["care", "Care"], ["family", "Family"], ["home", "Home"], ["sell", "Sell"]];
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
       <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-shop="${k}" aria-selected="${shopTab === k}">${n}</button>`).join("")}</div><div class="items shop">`;
@@ -4981,8 +5492,8 @@ Then tell chat "wind down" whenever you're ready.`
         const g = growth(p), cr = CROPS[p.crop];
         if (!p.wateredAt) h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n} seeds, waiting for water.</p><div class="actions"><button class="btn primary" data-farm="water">Water it</button></div>`;
         else if (g < 1) {
-          const left = cr.dur * (1 - g);
-          h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n}, growing. About ${dur(left)} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(g * 100).toFixed(0)}%"></i></div>`;
+          const left2 = cr.dur * (1 - g);
+          h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n}, growing. About ${dur(left2)} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(g * 100).toFixed(0)}%"></i></div>`;
         } else h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n} is ready!</p><div class="actions"><button class="btn yes" data-farm="harvest">Harvest</button></div>`;
       }
     } else if (shedOpen) {
@@ -5012,7 +5523,8 @@ Then tell chat "wind down" whenever you're ready.`
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
     }
     c.innerHTML = h;
-    showPanel(!!h, scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
+    if (homeView && scene === "home") wireHestia(c, homeView);
+    showPanel(!!h, homeView === "fridge" && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
     c.querySelectorAll("[data-shop]").forEach((b) => b.onclick = () => {
       shopTab = b.dataset.shop;
       ctx();
@@ -5080,7 +5592,7 @@ Then tell chat "wind down" whenever you're ready.`
       S2.waterPaid = owed;
     }
     S2.water = glasses;
-    save();
+    save2();
   }
   function setSteps(v) {
     v = Math.max(0, Math.round(v) || 0);
@@ -5092,10 +5604,23 @@ Then tell chat "wind down" whenever you're ready.`
     }
     speak(v >= STEP_GOAL ? `${v.toLocaleString()}! 5,000 smashed!` : `${v.toLocaleString()}. ${(STEP_GOAL - v).toLocaleString()} to go!`, 5e3);
     act(v >= STEP_GOAL ? "cheer" : "nudge");
-    save();
+    save2();
   }
   function openSteps() {
     openTracker("steps");
+  }
+  function hestiaMarks() {
+    const g = $("hmarks");
+    if (!g) return;
+    const c = hestiaCounts(), badge = (x, y, n, ico) => `<g transform="translate(${x} ${y})" class="hmark" pointer-events="none"><g class="qmark">${`<circle r="13" fill="#FFF6E2" style="stroke:var(--line)" stroke-width="1.3"/>`}<svg x="-9" y="-10" width="18" height="18" viewBox="0 0 24 24" overflow="visible">${icon(ico, 18).replace(/^<svg[^>]*>|<\/svg>$/g, "")}</svg>${n ? `<circle cx="11" cy="-10" r="7" fill="#E8574C"/><text x="11" y="-6.6" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff" font-family="Mulish,sans-serif">${n}</text>` : ""}</g></g>`;
+    let h = "";
+    if (scene === "base" && (c.chores || c.shop)) h = badge(232, 170, c.chores + c.shop, "hearth");
+    if (scene === "home") {
+      const cb = spotObj("home", "cupboard"), fr = spotObj("home", "fridge");
+      if (c.chores) h += badge(cb.x, cb.y - 100, c.chores, "hearth");
+      if (c.shop) h += badge(fr.x, fr.y - 100, c.shop, "fridge");
+    }
+    g.innerHTML = h;
   }
   function questMark() {
     const ph = phase(), m = $("qmarkWrap");
@@ -5130,6 +5655,10 @@ Then tell chat "wind down" whenever you're ready.`
     if (scene === "village" && fest && S2.festSaid !== day) {
       S2.festSaid = day;
       setTimeout(() => speak(`${fest.name} decorations are up in the town square!`, 5e3), 1500);
+    } else if (scene === "base" && S2.hestiaSaid !== day && hestiaCounts().chores) {
+      S2.hestiaSaid = day;
+      const n = hestiaCounts().chores;
+      setTimeout(() => speak(`${n} home chore${n > 1 ? "s" : ""} waiting in the cleaning cupboard. No rush.`, 5e3), 2600);
     } else if (scene === "base" && isWeekend() && S2.weekendSaid !== day) {
       S2.weekendSaid = day;
       setTimeout(() => speak("Weekend! Home things happen here at home. Any work quests still wait in town.", 5500), 2200);
@@ -5203,6 +5732,7 @@ Then tell chat "wind down" whenever you're ready.`
       S2.paperSaid = paper.id;
       setTimeout(() => speak(`${paperName()} is in the letterbox!`, 4500), 1800);
     }
+    hestiaMarks();
     questMark();
     journal();
     ctx();
@@ -5236,6 +5766,7 @@ Then tell chat "wind down" whenever you're ready.`
       openView = null;
       shopClosed = false;
       shedOpen = false;
+      homeView = null;
       resetScene();
       const p = at || [260, 596];
       mel.x = mel.tx = p[0];
@@ -5278,6 +5809,7 @@ Then tell chat "wind down" whenever you're ready.`
     boardOpen = false;
     shelfOpen = false;
     shedOpen = false;
+    homeView = null;
     openView = null;
     nextLeg();
     render();
@@ -5322,8 +5854,14 @@ Then tell chat "wind down" whenever you're ready.`
       render();
       return;
     }
-    if (ph === "clean" && scene === "home" && id === "cupboard") {
-      setSay(S2.wipe ? "Five minutes. Hard stop, promise." : "Wet wipes live here. Grab one!");
+    if (ph === "clean" && scene === "home" && id === "cupboard" && !S2.wipe) {
+      setSay("Wet wipes live here. Grab one!");
+      render();
+      return;
+    }
+    if (scene === "home" && (id === "cupboard" || id === "fridge") && !(ph === "task" && placeOf(remaining()[0]) === "home" && spotOf(remaining()[0]) === id && !S2.arrived[remaining()[0].id])) {
+      homeView = id === "fridge" ? "fridge" : "chores";
+      sfx(id === "fridge" ? "tap" : "paper");
       render();
       return;
     }
@@ -5332,7 +5870,7 @@ Then tell chat "wind down" whenever you're ready.`
       if (placeOf(t) === scene && spotOf(t) === id && !S2.arrived[t.id]) {
         S2.arrived[t.id] = true;
         setSay(`Here at the ${spotObj(scene, id).name.toLowerCase()}. First tiny step…`);
-        save();
+        save2();
         return;
       }
     }
@@ -5353,7 +5891,7 @@ Then tell chat "wind down" whenever you're ready.`
       if (placeOf(t) === "base" && spotOf(t) === id && !S2.arrived[t.id]) {
         S2.arrived[t.id] = true;
         setSay(`Here at the ${v.name.toLowerCase()}. First tiny step…`);
-        save();
+        save2();
         return;
       }
     }
@@ -5629,9 +6167,9 @@ Then tell chat "wind down" whenever you're ready.`
     if (el.hidden) return;
     const wrap2 = $("map"), cw = wrap2.clientWidth, sc = cam.s;
     const bw = el.offsetWidth, bh = el.offsetHeight, px = ex * sc + cam.ox, py = (ey - off) * sc + cam.oy;
-    const left = clamp(px, bw / 2 + 2, cw - bw / 2 - 2);
-    el.style.left = left + "px";
-    el.style.setProperty("--tail", clamp(px - left + bw / 2, 16, bw - 16) + "px");
+    const left2 = clamp(px, bw / 2 + 2, cw - bw / 2 - 2);
+    el.style.left = left2 + "px";
+    el.style.setProperty("--tail", clamp(px - left2 + bw / 2, 16, bw - 16) + "px");
     const roomBelow = (ey + 8) * sc + cam.oy + 10 + bh < wrap2.clientHeight + 4;
     const below = forceBelow && roomBelow || py - bh - 10 < cam.top - 6;
     el.classList.toggle("below", below);
@@ -5729,7 +6267,7 @@ Then tell chat "wind down" whenever you're ready.`
     S2.extra.push({ id: "x" + Date.now().toString(36), title, minutes: Math.min(180, Math.max(5, parseInt($("addMin").value, 10) || 25)) });
     $("addTitle").value = "";
     $("addMin").value = "";
-    save(true);
+    save2(true);
   };
   $("paperSave").onclick = () => {
     const v = $("paperNameIn").value.trim();
@@ -5738,7 +6276,7 @@ Then tell chat "wind down" whenever you're ready.`
     $("paperNameIn").placeholder = paperName();
     sfx("paper");
     speak(v ? `Hot off the press: ${v}!` : "Back to The Morning Crier.", 4e3);
-    save();
+    save2();
   };
   $("paperNameIn").placeholder = paperName();
   $("nameSave").onclick = () => {
@@ -5748,7 +6286,7 @@ Then tell chat "wind down" whenever you're ready.`
       $("nameIn").value = "";
       act("cheer");
       speak(`Hi! I'm ${v} now 🦊`, 4e3);
-      save();
+      save2();
     }
   };
   $("pet").onclick = () => {
@@ -5806,12 +6344,28 @@ Then tell chat "wind down" whenever you're ready.`
     onClose: () => render(),
     placeLabel: (t) => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`
   });
+  initHestia({ sfx, alarm, speak, flash, earn: (n, why) => {
+    earn(n, why);
+    save2();
+  }, changed: () => render() });
+  $("hestiaFile").onchange = (e) => {
+    const f2 = e.target.files && e.target.files[0];
+    if (!f2) return;
+    const r = new FileReader();
+    r.onload = () => {
+      const msg = importHestia(String(r.result));
+      $("hestiaNote").textContent = msg;
+      speak(/^Imported/.test(msg) ? "Hestia's lists are in the house now!" : msg, 4500);
+    };
+    r.readAsText(f2);
+    e.target.value = "";
+  };
   initNpcs({
     sfx,
     chatted: (n) => {
       if (!S2.chats.includes(n)) {
         S2.chats.push(n);
-        save();
+        save2();
       }
     },
     scene: () => scene,
@@ -5820,7 +6374,7 @@ Then tell chat "wind down" whenever you're ready.`
     evan,
     F: () => F,
     S: () => S2,
-    save: () => save(),
+    save: () => save2(),
     facts,
     bubble: bubbleAt,
     evanSays,
@@ -5829,7 +6383,7 @@ Then tell chat "wind down" whenever you're ready.`
     gift: (id) => {
       addInv(id, 1);
       flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`);
-      save();
+      save2();
     }
   });
   measureHud();

@@ -11,6 +11,7 @@ import { pullSunsama, SUNSAMA_ERRORS } from "./sunsama.js";
 import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx } from "./audio.js";
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked } from "./paths.js";
+import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia } from "./hestia.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 
 /* =================== STATE =================== */
@@ -51,6 +52,7 @@ let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot
 // In-game UI: the quest note pinned on the map (open, or slim while walking) and the panel over the map.
 // The note starts folded when the village opens; it only pops open on step changes after the first few seconds.
 let qnOpen = false, qnQuietUntil = Date.now() + 5000, qnKey = "", openView = null, shopClosed = false;
+let homeView = null;   // "chores" (the cleaning cupboard) or "fridge" while one is open at home
 
 function persist(which){
   const obj = which === "today" ? S : F;
@@ -81,6 +83,7 @@ async function initDb(){
   if (!db || !user) return;
   const uid = await user.id(); if (!uid) return;
   const col = db.collection("data/users/" + uid);
+  attachHestiaDb(col.doc("hestia"));
   refs = {today: col.doc("today"), fox: col.doc("fox"), plan: col.doc("plan"), mail: col.doc("mail"), stats: col.doc("stats"), library: col.doc("library")};
   refs.library.onSnapshot(snap => {
     LIB = snap.exists ? Object.assign({items:[]}, snap.data()) : {items:[]};
@@ -766,7 +769,7 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
-  boardOpen = false; shelfOpen = false; selPlot = null; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; selPlot = null; homeView = null; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -794,7 +797,8 @@ function itemBtn(id, label, disabled, extra){
 }
 function ctx(){
   const c = $("ctx"); let h = "";
-  if (scene === "market" && !shopClosed) {
+  if (homeView && scene === "home") h = hestiaPanel(homeView);
+  else if (scene === "market" && !shopClosed) {
     const tabs = [["seeds","Seeds"],["treats","Treats"],["care","Care"],["family","Family"],["home","Home"],["sell","Sell"]];
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
       <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-shop="${k}" aria-selected="${shopTab === k}">${n}</button>`).join("")}</div><div class="items shop">`;
@@ -853,7 +857,8 @@ function ctx(){
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
   }
   c.innerHTML = h;
-  showPanel(!!h, scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
+  if (homeView && scene === "home") wireHestia(c, homeView);
+  showPanel(!!h, homeView === "fridge" && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
   c.querySelectorAll("[data-shop]").forEach(b => b.onclick = () => { shopTab = b.dataset.shop; ctx(); });
   c.querySelectorAll("[data-decor]").forEach(b => b.onclick = () => decorClick(b.dataset.decor));
   c.querySelectorAll(".item[data-id]").forEach(b => b.onclick = () => {
@@ -906,6 +911,18 @@ function setSteps(v){
   act(v >= STEP_GOAL ? "cheer" : "nudge"); save();
 }
 function openSteps(){ openTracker("steps"); }
+function hestiaMarks(){
+  const g = $("hmarks"); if (!g) return;
+  const c = hestiaCounts(), badge = (x, y, n, ico) => `<g transform="translate(${x} ${y})" class="hmark" pointer-events="none"><g class="qmark">${`<circle r="13" fill="#FFF6E2" style="stroke:var(--line)" stroke-width="1.3"/>`}<svg x="-9" y="-10" width="18" height="18" viewBox="0 0 24 24" overflow="visible">${icon(ico, 18).replace(/^<svg[^>]*>|<\/svg>$/g, "")}</svg>${n ? `<circle cx="11" cy="-10" r="7" fill="#E8574C"/><text x="11" y="-6.6" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff" font-family="Mulish,sans-serif">${n}</text>` : ""}</g></g>`;
+  let h = "";
+  if (scene === "base" && (c.chores || c.shop)) h = badge(232, 170, c.chores + c.shop, "hearth");
+  if (scene === "home") {
+    const cb = spotObj("home", "cupboard"), fr = spotObj("home", "fridge");
+    if (c.chores) h += badge(cb.x, cb.y - 100, c.chores, "hearth");
+    if (c.shop) h += badge(fr.x, fr.y - 100, c.shop, "fridge");
+  }
+  g.innerHTML = h;
+}
 function questMark(){
   const ph = phase(), m = $("qmarkWrap");
   let target = null;
@@ -925,6 +942,7 @@ function drawScene(){
   const day = dayKey(), wet = outside() && rainyOn(day), fest = festivalOn(day);
   $("rain").hidden = !wet;
   if (scene === "village" && fest && S.festSaid !== day) { S.festSaid = day; setTimeout(() => speak(`${fest.name} decorations are up in the town square!`, 5000), 1500); }
+  else if (scene === "base" && S.hestiaSaid !== day && hestiaCounts().chores) { S.hestiaSaid = day; const n = hestiaCounts().chores; setTimeout(() => speak(`${n} home chore${n > 1 ? "s" : ""} waiting in the cleaning cupboard. No rush.`, 5000), 2600); }
   else if (scene === "base" && isWeekend() && S.weekendSaid !== day) { S.weekendSaid = day; setTimeout(() => speak("Weekend! Home things happen here at home. Any work quests still wait in town.", 5500), 2200); }
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
   $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "farm" ? farmArt() : roomArt(scene);
@@ -970,7 +988,7 @@ function render(redraw){
   $("list").querySelectorAll("[data-pick]").forEach(el => el.onclick = () => doNext(el.dataset.pick));
   const pin = $("paperIn"), paper = paperWaiting(); if (pin) pin.style.display = paper ? "" : "none";
   if (scene === "base" && paper && S.paperSaid !== paper.id) { S.paperSaid = paper.id; setTimeout(() => speak(`${paperName()} is in the letterbox!`, 4500), 1800); }
-  questMark(); journal(); ctx(); bag(); trackers(); mailCard(); sunsamaLine(); refreshNotebook();
+  hestiaMarks(); questMark(); journal(); ctx(); bag(); trackers(); mailCard(); sunsamaLine(); refreshNotebook();
 }
 /* =================== WORLD SIM =================== */
 const mel = {x:VILLAGE.home.door[0], y:VILLAGE.home.door[1], tx:VILLAGE.home.door[0], ty:VILLAGE.home.door[1], dir:1, moving:false};
@@ -985,7 +1003,7 @@ const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "b
 function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
   setTimeout(() => {
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; homeView = null; resetNpcs();
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
     if (id === "base") { evan.x = evan.tx = 300; evan.y = evan.ty = 360; }
@@ -1008,7 +1026,7 @@ function go(target, x, y, fn){
     if (!OUTDOOR.includes(target)) { const d = VILLAGE[target].door; legs.push({scene:tOut, x:d[0], y:d[1], fn:() => setScene(target, target === "farm" ? [260, 590] : [260, 596])}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; homeView = null; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -1027,7 +1045,10 @@ function arriveSpot(id){
   if (id === "stall") { shopClosed = false; render(); return; }
   if (id === "board" && outside()) { openView = "quests"; speak("All of today's quests!", 3500); render(); return; }
   if (id === "board") { boardOpen = true; speak(outside() ? "All of today's quests!" : "Here's what needs doing in here.", 3500); render(); return; }
-  if (ph === "clean" && scene === "home" && id === "cupboard") { setSay(S.wipe ? "Five minutes. Hard stop, promise." : "Wet wipes live here. Grab one!"); render(); return; }
+  if (ph === "clean" && scene === "home" && id === "cupboard" && !S.wipe) { setSay("Wet wipes live here. Grab one!"); render(); return; }
+  // Hestia: the cupboard holds the chores, the fridge the pantry and shopping list (not quests)
+  if (scene === "home" && (id === "cupboard" || id === "fridge") && !(ph === "task" && placeOf(remaining()[0]) === "home" && spotOf(remaining()[0]) === id && !S.arrived[remaining()[0].id])) {
+    homeView = id === "fridge" ? "fridge" : "chores"; sfx(id === "fridge" ? "tap" : "paper"); render(); return; }
   if (ph === "task") {
     const t = remaining()[0];
     if (placeOf(t) === scene && spotOf(t) === id && !S.arrived[t.id]) { S.arrived[t.id] = true; setSay(`Here at the ${spotObj(scene, id).name.toLowerCase()}. First tiny step…`); save(); return; }
@@ -1235,6 +1256,9 @@ initNotebook({windDown, onTread, water:() => ({ml: S.waterMl || 0, goal: WATER_G
   addWater:ml => A.water(ml), setWater, setSteps, task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
   sayNow:() => say, timerBtns, paperName, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),
   placeLabel:t => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`});
+initHestia({sfx, alarm, speak, flash, earn: (n, why) => { earn(n, why); save(); }, changed: () => render()});
+$("hestiaFile").onchange = e => { const f = e.target.files && e.target.files[0]; if (!f) return; const r = new FileReader();
+  r.onload = () => { const msg = importHestia(String(r.result)); $("hestiaNote").textContent = msg; speak(/^Imported/.test(msg) ? "Hestia's lists are in the house now!" : msg, 4500); }; r.readAsText(f); e.target.value = ""; };
 initNpcs({sfx, chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();

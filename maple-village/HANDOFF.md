@@ -286,4 +286,12 @@ Round 13 (routines → village):
 - Cloud routines now post to the village as their last step: Daily evening wind down (from "winddown", 5:30pm; the page skips its own 6pm note that day and the note offers the pond walk), Daily Book Digest (Juniper's shelf, `library` doc), Daily Sunsama tidy (from "courier").
 - Mac-bound tasks (Daily morning briefing, both inbox triages, GeBIZ scout) need the step pasted in the Claude desktop app: see ROUTINE-STEPS.md.
 
-Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lines.
+Round 14 (Hestia at home, `game/hestia.js`):
+- Mel's household app (Hestia, codename mise) rebuilt in the house, same data shape so a Hestia export imports straight in (Settings > Import from Hestia). Stored in the per-user `hestia` doc; chat and routines don't write it.
+- The cleaning cupboard opens the chores: Daily (with morning/evening tags), Weekly (weekday badges, Sunday-start week), This week's zone (5 default zones, "Move on to …" rotates and clears ticks), add/remove chores, a tidy timer (10/20/30 min, singing-bowl chime every 5 minutes, minutes logged) and "One at a time" focus cards (Done/Skip). Each chore pays 1 coin once per period; a home streak counts active days.
+- The fridge (new, by the kitchen) holds the pantry: what we have by category, untick when it runs out to put it on the shopping list, shopping list filtered by where to buy, copy list, add items.
+- Not quests. A hearth badge sits on the house at home base (chores due today + shopping), and on the cupboard and fridge inside. During the morning clean the first cupboard visit is still the wet wipe.
+- Furniture: tall pieces stand against the back wall in every building.
+- Other: drop a quest "not today" (and bring it back), newspaper name in Settings, forgiving taps on villagers, lanterns per routine win.
+
+Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lines; Hestia's custom lists, rhythm notes, equipment/energy filters and reminders weren't carried over.

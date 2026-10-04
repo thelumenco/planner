@@ -273,6 +273,54 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.screenshot({ path: join(shots, "family-evening.png") });
   await page.close();
 }
+// Hestia at home: chores in the cleaning cupboard, pantry in the fridge, import from a Hestia export
+{
+  console.log("\nhestia");
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  page.on("pageerror", e => errors.push(`hestia pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&nosample=1&time=19:30&date=2026-10-05");
+  await page.waitForTimeout(800);
+  check(await page.locator("#hmarks .hmark").count() === 1, "a hearth badge on the house shows home chores waiting");
+  await page.locator('#world [data-place="home"]').dispatchEvent("click");
+  await page.waitForFunction(() => /^Home/.test(document.querySelector("#sceneName").textContent.trim()) && !/base/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(400);
+  // the first visit is the five-minute clean (grab a wet wipe); after that the cupboard opens Hestia's chores
+  await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
+  await page.waitForTimeout(3000);
+  if (!(await page.locator('#journal [data-a="gotWipe"]').count())) await page.click('#journal [data-qn="open"]').catch(() => {});
+  await page.click('#journal [data-a="gotWipe"]');
+  await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
+  await page.waitForFunction(() => /cleaning cupboard/i.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
+  check(/cleaning cupboard/i.test(await page.locator("#ctx h2").textContent()), "the cleaning cupboard opens Hestia's chores");
+  await page.locator('#ctx [data-hdone^="daily:"]').first().check();
+  await page.waitForTimeout(300);
+  check(/\+1 coins: home chore/.test(await page.locator("#earn").textContent()), "ticking a chore earns a coin");
+  await page.click('#ctx [data-htab="zone"]');
+  check(await page.locator("#ctx .hzone").textContent().then(t => /Living Room/.test(t)), "this week's zone is on its own tab");
+  await page.click('#ctx [data-htimer="10"]');
+  check(await page.locator("#ctx [data-htleft]").count() === 1, "the tidy timer runs from the cupboard");
+  await page.locator('#world [data-spot="fridge"]').dispatchEvent("click");
+  await page.waitForFunction(() => /fridge/i.test(document.querySelector("#ctx h2") && document.querySelector("#ctx h2").textContent), null, { timeout: 15000 });
+  await page.fill('#ctx form[data-hitem] input[name="t"]', "Oat milk");
+  await page.click('#ctx form[data-hitem] button');
+  await page.locator('#ctx [data-hstock]').first().uncheck();
+  await page.click('#ctx [data-hfr="shop"]');
+  check(await page.locator("#ctx [data-hbuy]").count() === 1, "running out puts it on the shopping list in the fridge");
+  await page.screenshot({ path: join(shots, "hestia-fridge.png") });
+  await page.click("#pclose");
+  // import a Hestia export
+  const exp = { zones: [{ id: 9, name: "Kitchen", icon: "kitchen", tasks: [{ text: "Wipe counters", effort: 1 }] }], dailyTasks: [{ id: "d1", text: "Feed the cat", effort: 1, timeOfDay: "morning" }],
+    weeklyTasks: [{ id: "w1", text: "Bins out", effort: 1, weekday: 1 }], pantryItems: [{ id: 1, name: "Rice", category: "food", whereToBuy: "supermarket", inStock: false }], shoppingList: [{ id: 1, purchased: false }] };
+  await page.click('[data-open="settings"]');
+  await page.setInputFiles("#hestiaFile", { name: "mise-en-place-backup.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(exp)) });
+  await page.waitForTimeout(400);
+  check(await page.locator("#hestiaNote").textContent().then(t => /Imported: 1 daily, 1 weekly, 1 zones, 1 pantry/.test(t)), "a Hestia export imports chores, zones and pantry");
+  await page.click("#pclose");
+  await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: join(shots, "hestia-cupboard.png") });
+  await page.close();
+}
 // Sunsama pull: no chat plan, the page fetches today's tasks itself
 {
   console.log("\nsunsama pull");

@@ -111,6 +111,8 @@ const FX = {
     g.gain.setValueAtTime(.35, t); g.gain.exponentialRampToValueAtTime(.0001, t + .08); s.connect(f).connect(g).connect(sfxBus); s.start(t);
     bell(1568, t + .07, 1.1, .22); bell(2093, t + .17, 1.4, .2); },
   coin(t){ bell(2349, t, .7, .12); },
+  bowl(t){ [220, 550].forEach((f, i) => { const o = ac.createOscillator(), g = ac.createGain(); o.type = "sine"; o.frequency.value = f;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(i ? .05 : .16, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + 3.2); o.connect(g).connect(sfxBus); o.start(t); o.stop(t + 3.3); }); },
   chime(t){ [660, 880, 1320].forEach((fr, i) => bell(fr, t + i*.18, 1.2, .16)); },
   // villager "hello": a few soft pitched blips, Animal Crossing style, pitch set per villager
   babble(t, pitch = 1){ const n = 3 + Math.floor(Math.random()*3);

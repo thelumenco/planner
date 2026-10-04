@@ -75,12 +75,13 @@ export const ROOMS = {
     ["cabinet","Filing cabinet","B","cabinet",/admin|file|doc|contract|tax|form|organi/,"A place for everything."],
     ["scales","Stamps & scales","C","scales",/invoice|pay|bill|stripe|account|bank|receipt|expense|price/,"Weigh it, stamp it, send it."],
     ["ledge","Writing ledge","D","desk",/./,"A tidy little ledge for odd jobs."]]},
-  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{A:[120,216], B:[400,228]}, stations:[
+  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{A:[120,216], B:[414,228], H:[326,250]}, stations:[
     ["desk","Home desk","A","desk",/./,"Your own little desk."],
     ["kitchen","Kitchen","B","kitchen",/cook|meal|lunch|dinner|bake|grocer|prep/,"Something smells good."],
     ["sofa","Sofa","C","sofa",/read|rest|journal|meditat|book|nap/,"Soft cushions, deep breaths."],
     ["laundry","Laundry basket","D","laundry",/fold|laundry|clothes|wash|iron/,"Fold, stack, done."],
-    ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Wet wipes live here."],
+    ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Hestia's chores live in here."],
+    ["fridge","Fridge","H","fridge",null,"The fridge: what we have, and the shopping list."],
     ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12],
     ["office","Darren's desk","G","office",null,"Darren's home office. Shh, he might be on a call."]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
