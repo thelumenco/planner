@@ -149,7 +149,7 @@ function newsPage(item){
   return `<button class="nbx" data-nb="close" aria-label="Close the paper">✕</button>
     <header class="nhead">
       <div class="nears"><span>Vol. I · No. ${no}</span><span>Price: one wet wipe</span></div>
-      <p class="nmast" id="nbTitle">The Morning Crier</p>
+      <p class="nmast" id="nbTitle">${esc(api.paperName())}</p>
       <div class="nline"><span>${esc(date)}${item.edition ? " · " + esc(item.edition) : ""}</span><span>Delivered by ${esc(api.agentName(item.from))}</span></div>
     </header>
     <div class="nbbody">

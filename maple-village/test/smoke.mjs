@@ -199,10 +199,14 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(1200);
   check(await page.locator('#actors [data-npc="darren"].act-repair').count() === 1, "Darren is repairing the house at lunchtime");
   await page.screenshot({ path: join(shots, "darren-base.png") });
+  await page.click('[data-open="settings"]');
+  await page.fill("#paperNameIn", "The Maple Gazette");
+  await page.click("#paperSave");
+  await page.click("#pclose");
   check(await page.locator("#paperIn").isVisible(), "the morning paper is sticking out of the letterbox at home");
   await page.locator('#world [data-place="letterbox"]').dispatchEvent("click");
   await page.waitForSelector("#nbPage.news .nmast", { timeout: 15000 });
-  check(true, "tapping the letterbox opens The Morning Crier");
+  check(await page.locator("#nbTitle").textContent() === "The Maple Gazette", "tapping the letterbox opens the paper, under the name chosen in Settings");
   await page.click('#notebook [data-nb="thanks"]');
   await page.waitForTimeout(300);
   check(await page.locator("#paperIn").isHidden(), "once read, the letterbox is empty");

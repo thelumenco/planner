@@ -22,7 +22,7 @@ export const VILLAGE = {
   farm:   {scene:"base", name:"Garden", short:"the garden", door:[108,492], mark:[108,384]},
   pond:   {scene:"base", name:"Pond", door:[318,560], spot:true, line:"The pond. Best break spot there is."},
   shed:   {scene:"base", name:"Shed", door:[430,280], spot:true, line:"Darren's shed. Tools, seed packets and one very old radio."},
-  letterbox:{scene:"base", name:"Letterbox", door:[184,326], spot:true, line:"The letterbox. The Morning Crier lands here."},
+  letterbox:{scene:"base", name:"Letterbox", door:[184,326], spot:true, line:"The letterbox. The morning paper lands here."},
   swing:  {scene:"base", name:"Tree swing", door:[112,318], spot:true, line:"Evan's swing. Push, push, wheee!"},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };

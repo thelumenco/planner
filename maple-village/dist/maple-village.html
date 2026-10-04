@@ -1021,6 +1021,12 @@ body.nb-open{overflow:hidden}
           <label class="setrow slider"><span>Music volume</span><input type="range" id="setVol" min="0" max="1" step="0.05"></label>
           <label class="setrow"><input type="checkbox" id="setSfx"> <span>Sound effects: paper, purrs, coins, hellos</span></label>
           <div class="setrow"><button class="btn small alt" id="setTest" type="button">Play a test sound</button><span class="muted" id="setTestNote">No sound? Turn the volume up and switch off silent mode.</span></div>
+          <h3 class="ph3">Your newspaper</h3>
+          <div class="row">
+            <label class="sr" for="paperNameIn">Newspaper name</label>
+            <input id="paperNameIn" maxlength="32" placeholder="The Morning Crier">
+            <button class="btn small alt" id="paperSave">Rename</button>
+          </div>
           <h3 class="ph3">Your fox</h3>
           <div class="row">
             <label class="sr" for="nameIn">Fox's name</label>
@@ -1311,7 +1317,7 @@ body.nb-open{overflow:hidden}
     farm: { scene: "base", name: "Garden", short: "the garden", door: [108, 492], mark: [108, 384] },
     pond: { scene: "base", name: "Pond", door: [318, 560], spot: true, line: "The pond. Best break spot there is." },
     shed: { scene: "base", name: "Shed", door: [430, 280], spot: true, line: "Darren's shed. Tools, seed packets and one very old radio." },
-    letterbox: { scene: "base", name: "Letterbox", door: [184, 326], spot: true, line: "The letterbox. The Morning Crier lands here." },
+    letterbox: { scene: "base", name: "Letterbox", door: [184, 326], spot: true, line: "The letterbox. The morning paper lands here." },
     swing: { scene: "base", name: "Tree swing", door: [112, 318], spot: true, line: "Evan's swing. Push, push, wheee!" },
     toTown: { scene: "base", name: "Bridge to town", door: [260, 114], spot: true, bridge: "village", mark: [260, 62], line: "Over the river to the town square." }
   };
@@ -2833,7 +2839,7 @@ body.nb-open{overflow:hidden}
     return `<button class="nbx" data-nb="close" aria-label="Close the paper">✕</button>
     <header class="nhead">
       <div class="nears"><span>Vol. I · No. ${no}</span><span>Price: one wet wipe</span></div>
-      <p class="nmast" id="nbTitle">The Morning Crier</p>
+      <p class="nmast" id="nbTitle">${esc(api.paperName())}</p>
       <div class="nline"><span>${esc(date)}${item.edition ? " · " + esc(item.edition) : ""}</span><span>Delivered by ${esc(api.agentName(item.from))}</span></div>
     </header>
     <div class="nbbody">
@@ -4508,6 +4514,7 @@ Then tell chat "wind down" whenever you're ready.`
     });
   }
   var unreadMail = () => allMail().filter((m) => m && m.id && !F.mailRead[m.id] && (!m.at || Date.now() - m.at < 36 * H)).sort((a, b) => (a.at || 0) - (b.at || 0));
+  var paperName = () => (F.paperName || "").trim() || "The Morning Crier";
   var paperWaiting = () => unreadMail().find((m) => m.from === "crier");
   function markRead(item) {
     if (!F.mailRead[item.id]) {
@@ -5104,6 +5111,7 @@ Then tell chat "wind down" whenever you're ready.`
     const L = level(), next = LEVELS[L + 1];
     $("title").firstChild.textContent = `${F.name}'s village`;
     $("trayName").textContent = F.name;
+    if (document.activeElement !== $("paperNameIn")) $("paperNameIn").placeholder = paperName();
     $("friendName").textContent = F.name;
     const d = new Date(now() + 6 * H);
     $("dateLine").textContent = d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }) + (F.streak >= 2 && F.lastActive === dayKey() ? ` · ${F.streak} cosy days in a row` : "");
@@ -5149,7 +5157,7 @@ Then tell chat "wind down" whenever you're ready.`
     if (pin) pin.style.display = paper ? "" : "none";
     if (scene === "base" && paper && S2.paperSaid !== paper.id) {
       S2.paperSaid = paper.id;
-      setTimeout(() => speak("The Morning Crier is in the letterbox!", 4500), 1800);
+      setTimeout(() => speak(`${paperName()} is in the letterbox!`, 4500), 1800);
     }
     questMark();
     journal();
@@ -5320,7 +5328,7 @@ Then tell chat "wind down" whenever you're ready.`
       if (p) {
         sfx("paper");
         openMail(p);
-      } else speak("Nothing in the letterbox. The Morning Crier comes each morning.", 3800);
+      } else speak(`Nothing in the letterbox. ${paperName()} comes each morning.`, 3800);
       render();
       return;
     }
@@ -5674,6 +5682,16 @@ Then tell chat "wind down" whenever you're ready.`
     $("addMin").value = "";
     save(true);
   };
+  $("paperSave").onclick = () => {
+    const v = $("paperNameIn").value.trim();
+    F.paperName = v;
+    $("paperNameIn").value = "";
+    $("paperNameIn").placeholder = paperName();
+    sfx("paper");
+    speak(v ? `Hot off the press: ${v}!` : "Back to The Morning Crier.", 4e3);
+    save();
+  };
+  $("paperNameIn").placeholder = paperName();
   $("nameSave").onclick = () => {
     const v = $("nameIn").value.trim();
     if (v) {
@@ -5728,6 +5746,7 @@ Then tell chat "wind down" whenever you're ready.`
     timerLeft,
     sayNow: () => say2,
     timerBtns,
+    paperName,
     sample: () => sampleCap,
     sampleDenied: () => {
       sampleCap = null;
