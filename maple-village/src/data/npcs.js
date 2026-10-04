@@ -84,6 +84,7 @@ export const NPCS = [
     // Weekdays: water the garden, work at the home office desk, fix something at lunch, tend the farm after work.
     // Weekends: mostly outdoors.
     routine: [
+      slot("19:30", "21:30", "base", [430, 606], {act: "rest", needs: "hammock"}),   // once Mel buys him the hammock
       slot("7:00", "8:30", "base", [190, 452], {days: "wd", act: "water", dir: -1}),
       slot("8:30", "12:30", "home", [342, 336], {days: "wd", act: "type", dir: -1}),
       slot("12:30", "13:30", "base", [340, 300], {days: "wd", act: "repair", dir: -1}),
@@ -102,7 +103,8 @@ export const NPCS = [
       type: ["*typing* Back-to-back calls. Wave if it's urgent.", "On mute. Hi! *waves*", "Two more emails and I'm free."],
       water: ["Morning! The tomatoes say hi.", "Watering before it gets hot. Lin's orders."],
       repair: ["Gutter's nearly fixed. Nearly.", "Hold the ladder? Kidding. Mostly.", "If it squeaks, I fix it."],
-      farm: ["Weeding. It's weirdly relaxing.", "These carrots are going to be enormous."]
+      farm: ["Weeding. It's weirdly relaxing.", "These carrots are going to be enormous."],
+      rest: ["Best present ever. Don't wake me for anything less than dinner.", "*sways* Five more minutes.", "The stars are out. Come look."]
     },
     react: {harvest: "Nice haul! I'll cook with that.", quests3: "Three done already? Look at you go.", lunch: "Lunch? I'll make toast."}
   }

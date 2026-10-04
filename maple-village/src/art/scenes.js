@@ -96,7 +96,8 @@ export function baseArt(){
       <ellipse cx="260" cy="322" rx="44" ry="20" style="fill:var(--path)"/></g>
     ${flowers([[30,140,"#EFA3A6"],[44,150,"#F3C969"],[200,140,"#C3CDEE"],[330,150,"#EFA3A6"],[488,180,"#F3C969"],[214,410,"#EFA3A6"],[200,470,"#C3CDEE"],[160,600,"#F3C969"],[176,612,"#EFA3A6"],[300,620,"#C3CDEE"],[24,520,"#F3C969"],[372,600,"#EFA3A6"],[400,170,"#C3CDEE"]])}
     ${tree(26,370,.9)}${tree(500,610,.9)}${tree(26,620,.95)}${tree(360,180,.8)}`;
-  const homeX = {art:`<rect x="290" y="156" width="12" height="22" style="fill:var(--stone)"/>`, lines:`<rect x="290" y="156" width="12" height="22"/><path class="smoke" d="M296 152 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>`};
+  // chimney stands on the right-hand roof slope (roof line runs y≈196 at x=290 to y≈204 at x=302)
+  const homeX = {art:`<path d="M290 168 h12 v36 l-12 -8.6z" style="fill:var(--stone)"/>`, lines:`<path d="M290 196 v-28 h12 v36"/><path d="M288 168 h16"/><path class="smoke" d="M296 164 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>`};
   const places =
     bridge("toTown", 260, 30, 110, "To town", 336, 124) +
     house("home", 205, 220, 110, 74, "var(--card)", "var(--butter)", "Home", "var(--butter)", homeX) +
@@ -125,13 +126,16 @@ export function baseArt(){
     // evening firepit + washing line, just for cosiness
     sk(`<ellipse cx="276" cy="608" rx="20" ry="8" style="fill:var(--stone)"/><path d="M264 606 l24 -6 M264 600 l24 6" style="stroke:var(--wood)" stroke-width="4"/>`,
       `<ellipse cx="276" cy="608" rx="20" ry="8"/><path class="smoke" d="M276 594 q-4 -6 0 -11 q4 -5 0 -10" opacity=".5"/>`) +
-    sk(`<path d="M66 552 h16 v18 h-16z" style="fill:var(--sky)"/><path d="M96 554 h14 l3 14 h-20z" style="fill:var(--rose)"/><path d="M126 552 h18 v12 h-18z" style="fill:var(--butter)"/>`,
-      `<path d="M50 590 v-46 M160 590 v-46 M50 548 Q105 556 160 548"/><path d="M66 552 h16 v18 h-16z M96 554 h14 l3 14 h-20z M126 552 h18 v12 h-18z"/>`);
+    sk(`<path d="M378 354 h16 v18 h-16z" style="fill:var(--sky)"/><path d="M406 356 h14 l3 14 h-20z" style="fill:var(--rose)"/><path d="M434 354 h18 v12 h-18z" style="fill:var(--butter)"/>`,
+      `<path d="M362 396 v-46 M466 396 v-46 M362 350 Q414 358 466 350"/><path d="M378 354 h16 v18 h-16z M406 356 h14 l3 14 h-20z M434 354 h18 v12 h-18z"/>`);
+  const fam = (G.F().fam && G.F().fam.owned) || {};
+  const famArt = (fam.sandpit ? `<g aria-label="Sandpit">${sk(`<rect x="208" y="512" width="56" height="24" rx="5" style="fill:#F2DDA8"/><path d="M246 506 h8 l-2 8 h-4z" style="fill:var(--rose)"/>`, `<rect x="208" y="512" width="56" height="24" rx="5"/><path d="M212 518 h48" opacity=".5"/><path d="M246 506 h8 l-2 8 h-4z M250 506 v-6"/><path d="M220 528 q5 -5 10 0" opacity=".6"/>`)}</g>` : "")
+    + (fam.hammock ? sk(`<path d="M398 600 q32 18 64 0 z" style="fill:var(--peach)"/>`, `<path d="M392 622 v-34 M468 622 v-34 M392 594 l6 6 M468 594 l-6 6"/><path d="M398 600 q32 18 64 0"/><path d="M410 604 l2 -3 M430 608 l1 -4 M450 604 l-2 -3" opacity=".6"/>`) : "");
   const tools = G.F().tools || {};
   const toolArt = (tools.compost ? sk(`<path d="M192 452 h24 l-3 22 h-18z" style="fill:var(--wood)"/><path d="M196 451 c3 -6 13 -6 16 0" style="fill:var(--moss)"/>`, `<path d="M192 452 h24 l-3 22 h-18z M195 460 h18"/>`) : "")
     + (tools.can ? sk(`<rect x="466" y="262" width="14" height="11" rx="2" style="fill:#9CC3E0"/>`, `<rect x="466" y="262" width="14" height="11" rx="2"/><path d="M480 266 l7 -5 M468 262 c0 -5 9 -5 9 0"/>`) : "")
     + (tools.sprinkler ? sk(`<circle cx="108" cy="438" r="4" style="fill:var(--stone)"/>`, `<circle cx="108" cy="438" r="4"/><path d="M108 434 v-4"/><path class="ripple" d="M96 426 q12 -10 24 0" opacity=".7"/>`) : "");
-  return ground + places + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
+  return ground + places + famArt + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
 }
 // After 7pm: the light drops, windows glow, the firepit is lit and stars come out over the river.
 function duskArt(){

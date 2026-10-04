@@ -22,3 +22,6 @@
 .map .swing{transform-box:view-box;transform-origin:112px 254px;animation:sway 3s ease-in-out infinite}
 @keyframes sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-type .armL,.ch.npc.act-type .armR,.ch.npc .tool,.ch.npc .drips,.map .swing{animation:none}}
+/* Darren resting in the hammock */
+.ch.npc.act-rest .flip > g{transform:translate(-20px,-6px) rotate(-84deg)}
+.ch.npc.act-rest .bob{animation:cbob 2.6s ease-in-out infinite alternate}

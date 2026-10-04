@@ -11,7 +11,7 @@ import { pullSunsama, SUNSAMA_ERRORS } from "./sunsama.js";
 import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx } from "./audio.js";
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked } from "./paths.js";
-import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere } from "./npcs.js";
+import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
@@ -32,6 +32,7 @@ function migrate(){
   if (F.coins == null) F.coins = S.berries || 0;
   if (!F.inv) { F.inv = {tulip_seed:2, carrot_seed:1}; F.gift = true; }
   if (!F.tools) F.tools = {};
+  if (!F.fam) F.fam = {owned: {}, gifts: {evan: 0, darren: 0}};
   if (!Array.isArray(F.plots) || F.plots.length !== 12) F.plots = Array.from({length:12}, () => null);
   if (!F.cool) F.cool = {};
   ["met", "gifts", "mailRead"].forEach(k => { if (!F[k]) F[k] = {}; });
@@ -272,6 +273,7 @@ setInterval(() => {
   lastReady = rc;
   if (scene === "farm" && Math.random() < .2) { drawScene(); if (selPlot != null) ctx(); }
   if (scene === "base" && isDusk() !== lastDusk) drawScene();
+  renderEvanHold();
   lastDusk = isDusk();
   if (shelfOpen && Math.floor(Date.now()/1000) % 20 === 0) ctx();   // keep "next digest in N min" fresh
   if (!S.timer) return;
@@ -576,6 +578,7 @@ function decorClick(id){
 function useItem(id){
   const it = ITEMS[id]; if (!it || !F.inv[id]) return;
   if (it.kind === "seed") { speak("Seeds go in the garden. Tap a plot there!", 3500); return; }
+  if (it.kind === "gift") { giveGift(id); return; }
   if (it.kind === "tool") {
     act(it.act, it); speak(it.say, 4000);
     if (!F.cool[id] || Date.now() - F.cool[id] > 20*M) { F.cool[id] = Date.now(); gainXp(1); }
@@ -583,6 +586,43 @@ function useItem(id){
   }
   addInv(id, -1); gainXp(it.xp || 1); sfx("purr");
   act(it.kind === "food" ? "eat" : it.kind === "flower" ? "flower" : it.act, it); speak(it.say, 4500); save();
+}
+// Gifts for the family. Evan is wherever home is (home base or inside); Darren follows his routine.
+const DARREN_AT = {base: "outside at home", home: "inside the house", farm: "in the garden"};
+let bubbleT = null;
+function giveGift(id){
+  const it = ITEMS[id]; if (!it || !F.inv[id]) return;
+  if (it.to === "evan") {
+    if (!evanHere()) { speak("Evan's at home. Give it to him there!", 3500); return; }
+    addInv(id, -1); const n = ++F.fam.gifts.evan;
+    evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; evan.wait = 5;
+    evanSays(it.say); mprop("heart", evan.x, evan.y - 40); sfx("chime");
+    if (id === "icecream" || id === "storybook") S.evanHold = {k: id, until: Date.now() + 3*M};
+    if (id === "balloon") S.evanHold = {k: "balloon", until: 0};
+    if (id === "storybook" && scene === "home") { const s = spotObj("home", "sofa"); evan.tx = s.tx + 20; evan.ty = s.ty; }
+    if (id === "wand") { clearInterval(bubbleT); let k = 0; bubbleT = setInterval(() => { if (++k > 16 || !evanHere()) return clearInterval(bubbleT); mprop("bubbles", evan.x + rnd(-14, 14), evan.y - 34); }, 1200); }
+    if (n % 3 === 0) setTimeout(() => { evanSays("for you, Mama!"); addInv("tulip", 1); flash("Evan picked you a tulip"); save(); }, 4000);
+  } else {
+    if (!isHere("darren")) { const w = whereIs("darren"); speak(w ? `Darren's ${DARREN_AT[w] || "around"} right now. Give it to him there!` : "Darren's not around right now.", 4000); return; }
+    addInv(id, -1); const n = ++F.fam.gifts.darren;
+    npcSay("darren", it.say); const p = npcPos("darren"); if (p) mprop("heart", p.x, p.y - 60); sfx("chime");
+    if (n % 3 === 0) setTimeout(() => { npcSay("darren", "Got you something too. Found it in the shed."); addInv("strawberry_seed", 1); flash("Darren gave you strawberry seeds"); save(); }, 4500);
+  }
+  gainXp(1); save();
+}
+// What Evan is holding: a gift from today, or his toy truck.
+let holdKey = "";
+function renderEvanHold(){
+  const h = S.evanHold, k = h && (h.until === 0 || Date.now() < h.until) ? h.k : F.fam.owned.truck ? "truck" : "";
+  if (k === holdKey) return; holdKey = k;
+  let el = $("evanHold");
+  if (!el) { const bob = document.querySelector("#evan .bob"); if (!bob) return; el = document.createElementNS("http://www.w3.org/2000/svg", "g"); el.id = "evanHold"; bob.appendChild(el); }
+  el.innerHTML = {
+    balloon: `<path d="M7.4 -11 C10 -22 9 -30 12 -40" fill="none" stroke-width=".8"/><ellipse cx="12" cy="-47" rx="5.2" ry="6.4" fill="#E8574C"/><path d="M11 -40.6 h2 l-1 1.4z" fill="#E8574C"/>`,
+    icecream: `<path d="M5.6 -14 h4.4 l-2.2 7z" fill="#E8C48E"/><circle cx="7.8" cy="-15.5" r="2.6" fill="#F4C7CF"/>`,
+    storybook: `<rect x="5" y="-17" width="8" height="6" rx="1" fill="#B9D2A6"/><path d="M9 -17 v6" fill="none" stroke-width=".6"/>`,
+    truck: `<rect x="7" y="-6.5" width="7" height="4" rx=".8" fill="#F3C969"/><path d="M14 -5.5 h2.5 l1.5 1.8 v1.2 h-4z" fill="#EFA3A6"/><circle cx="9" cy="-1.8" r="1.3" fill="#5E5A55"/><circle cx="15.5" cy="-1.8" r="1.3" fill="#5E5A55"/>`
+  }[k] || "";
 }
 function playFree(kind){
   const lines = {pet:["*leans into the pat*", "Happy fox noises!", "More pats please."], hide:["You found me!"], nap:["Mmm… cosy…"]};
@@ -592,6 +632,11 @@ function playFree(kind){
 }
 function buy(id){
   const it = ITEMS[id]; if (!it || F.coins < it.price || (it.need && S.earned < it.need)) return;
+  if (it.kind === "keep") {
+    if (F.fam.owned[id]) return;
+    F.coins -= it.price; F.fam.owned[id] = true; sfx("chaching"); flash(`${it.n} delivered home`); speak(it.say, 5000);
+    resetNpcs(); save(true); return;
+  }
   if (it.kind === "tool" && F.inv[id]) return;
   F.coins -= it.price; addInv(id, 1); flash(`Bought ${it.n.toLowerCase()}`); speak(pick(["Ooh, good choice!", "Into the backpack it goes.", "Lovely pick!"]), 2500); save();
 }
@@ -728,7 +773,7 @@ function itemBtn(id, label, disabled, extra){
 function ctx(){
   const c = $("ctx"); let h = "";
   if (scene === "market" && !shopClosed) {
-    const tabs = [["seeds","Seeds"],["treats","Treats"],["care","Care"],["home","Home"],["sell","Sell"]];
+    const tabs = [["seeds","Seeds"],["treats","Treats"],["care","Care"],["family","Family"],["home","Home"],["sell","Sell"]];
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
       <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-shop="${k}" aria-selected="${shopTab === k}">${n}</button>`).join("")}</div><div class="items shop">`;
     if (shopTab === "home") {
@@ -740,10 +785,11 @@ function ctx(){
       h += sellable.length ? sellable.map(id => itemBtn(id, `sell <b>+${ITEMS[id].sell}</b> ${icon("coin", 13)}`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("") : `<p class="muted" style="grid-column:1/-1">Nothing to sell yet. Grow something in the garden!</p>`;
     } else {
       h += Object.keys(ITEMS).filter(id => ITEMS[id].tab === shopTab).map(id => {
-        const it = ITEMS[id], locked = it.need && S.earned < it.need, owned = it.kind === "tool" && F.inv[id];
-        const extra = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)}` : "";
-        return itemBtn(id, locked ? `earn ${it.need} today` : owned ? "owned" : `<b>${it.price}</b> ${icon("coin", 13)}${extra}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
+        const it = ITEMS[id], locked = it.need && S.earned < it.need, owned = it.kind === "keep" ? F.fam.owned[id] : it.kind === "tool" && F.inv[id];
+        const extra = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)}` : it.to ? ` · ${it.to === "evan" ? "Evan" : "Darren"}` : "";
+        return itemBtn(id, locked ? `earn ${it.need} today` : owned ? (it.kind === "keep" ? "at home" : "owned") : `<b>${it.price}</b> ${icon("coin", 13)}${extra}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
       }).join("");
+      if (shopTab === "family") h += `<p class="muted" style="grid-column:1/-1">Little treats go in your backpack: give them in person from there. Keepsakes go straight home and stay forever.</p>`;
     }
     h += `</div>`;
   } else if (scene === "farm" && selPlot != null) {
@@ -806,10 +852,10 @@ function ctx(){
 }
 function bag(){
   const ids = Object.keys(F.inv).filter(id => ITEMS[id] && F.inv[id] > 0);
-  const order = ["food","flower","use","tool","seed"];
+  const order = ["gift","food","flower","use","tool","seed"];
   ids.sort((a, b) => order.indexOf(ITEMS[a].kind) - order.indexOf(ITEMS[b].kind));
   $("bag").innerHTML = ids.map(id => { const it = ITEMS[id];
-    const lbl = it.kind === "seed" ? "plant in garden" : it.kind === "tool" ? "use" : it.kind === "food" ? "feed" : it.kind === "flower" ? "give" : "use";
+    const lbl = it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${it.to === "evan" ? "Evan" : "Darren"}` : it.kind === "tool" ? "use" : it.kind === "food" ? "feed" : it.kind === "flower" ? "give" : "use";
     return itemBtn(id, lbl, it.kind === "seed", it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`); }).join("");
   $("bag").querySelectorAll(".item").forEach(b => b.onclick = () => useItem(b.dataset.id));
   $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome gift of seeds is in here. Plant them in the garden." : "";
@@ -887,6 +933,8 @@ function render(redraw){
     <h3 class="ph3">Village upgrades</h3>
     <p class="muted">${F.totalQuests || 0} quests finished so far. ${(() => { const nx = nextUpgrade(F.totalQuests || 0); return nx ? `Next at ${nx.at}: ${esc(nx.name)}.` : "Every upgrade unlocked!"; })()}</p>
     <ul class="uplist">${UPGRADES.map(u => `<li class="${(F.totalQuests || 0) >= u.at ? "got" : ""}">${icon((F.totalQuests || 0) >= u.at ? "sparkle" : "clock", 16)} <span>${esc(u.name)}</span> <small>${u.at}</small></li>`).join("")}</ul>`;
+  $("friendBody").insertAdjacentHTML("beforeend", `<h3 class="ph3">Family</h3><p class="muted">${icon("heart", 14)} Gifts for Evan: ${F.fam.gifts.evan} · for Darren: ${F.fam.gifts.darren}. Every third gift, they give you something back. Treats and keepsakes are in the market's Family tab.</p>`);
+  renderEvanHold();
   const all = allTasks(), rem = remaining(), cur = (phase() === "task" && rem[0]) ? rem[0].id : null;
   $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
   $("qBadge").hidden = !rem.length; $("qBadge").textContent = rem.length;
@@ -1031,6 +1079,7 @@ function tickEvan(dt){
       if (scene === "base" && phase() === "break" && r < .5) { evan.tx = 350 + rnd(-20, 30); evan.ty = 560 + rnd(-6, 8); evan.run = false; }
       else if (r < .3) { evan.tx = clamp(mel.x + rnd(-24, 24), b[0], b[2]); evan.ty = clamp(mel.y + rnd(4, 16), b[1], b[3]); evan.run = true; evan.target = "mel"; }
       else if (r < .5) { evan.tx = clamp(maple.x + rnd(-18, 18), b[0], b[2]); evan.ty = clamp(maple.y + rnd(2, 12), b[1], b[3]); evan.run = true; evan.target = "maple"; }
+      else if (scene === "base" && F.fam.owned.sandpit && r < .75) { evan.tx = 236 + rnd(-10, 10); evan.ty = 530 + rnd(-3, 3); evan.run = true; evan.target = null; if (Math.random() < .4) setTimeout(() => evanSays(pick(["dig dig!", "sandcastle!", "look Mama!"])), 1500); }
       else { const s = pick(EVAN_SPOTS[scene]); evan.tx = s[0] + rnd(-14, 14); evan.ty = s[1] + rnd(-8, 8); evan.run = Math.random() < .35; evan.target = null; }
       evan.wait = rnd(2.5, 6);
     } else if (evan.target && evan.wait > 1.9 && evan.wait < 2.0 + dt) {
@@ -1079,6 +1128,8 @@ function measureHud(){
   cam.key = "";
 }
 addEventListener("resize", () => { cam.snap = true; measureHud(); });
+// overflow:hidden boxes can still be scrolled by focus or scrollIntoView; keep the map pinned
+$("map").addEventListener("scroll", () => { const m = $("map"); if (m.scrollLeft || m.scrollTop) { m.scrollLeft = 0; m.scrollTop = 0; } });
 function bubbleAt(el, ex, ey, off, forceBelow){
   if (el.hidden) return;
   const wrap = $("map"), cw = wrap.clientWidth, sc = cam.s;

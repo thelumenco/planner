@@ -223,6 +223,43 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.screenshot({ path: join(shots, "darren-desk.png") });
   await page.close();
 }
+// Family gifts: buy keepsakes and treats at the market, give them in person at home
+{
+  console.log("\nfamily gifts");
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  page.on("pageerror", e => errors.push(`family pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&nosample=1&time=10:00&date=2026-10-05");
+  await page.waitForTimeout(600);
+  await page.waitForTimeout(900);
+  await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); f.coins = 400; f.updatedAt = Date.now() + 1e6;
+    localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
+  await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05");
+  await page.waitForTimeout(700);
+  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(300);
+  await page.locator('#world [data-place="market"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-shop="family"]', { timeout: 20000 });
+  await page.click('#ctx [data-shop="family"]');
+  for (const id of ["sandpit", "truck", "headphones", "hammock", "icecream", "kopi"]) { await page.click(`#ctx .item[data-id="${id}"]`); await page.waitForTimeout(150); }
+  check(await page.locator('#ctx .item[data-id="hammock"]').textContent().then(t => /at home/.test(t)), "keepsakes are bought once and go home");
+  await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05");
+  await page.waitForTimeout(800);
+  check(await page.locator("#evanHold rect").count() > 0, "Evan carries his toy truck");
+  check(await page.locator("#sceneArt").innerHTML().then(h => /Sandpit/.test(h)), "the sandpit is at home base");
+  await page.click('[data-open="bag"]');
+  await page.click('#bag .item[data-id="icecream"]');
+  await page.waitForTimeout(300);
+  check(await page.locator("#evanHold path").count() > 0 && await page.locator("#evanSay").textContent().then(t => /ICE CREAM/.test(t)), "Evan gets his ice cream");
+  await page.click('#bag .item[data-id="kopi"]');
+  check(await page.locator("#speech").textContent().then(t => /Darren/.test(t)), "Darren's gift waits until you find him");
+  await page.goto(url + "?seed=1&nosample=1&time=20:00&date=2026-10-05");
+  await page.waitForTimeout(1000);
+  check(await page.locator('#actors [data-npc="darren"].act-rest').count() === 1, "Darren rests in his hammock in the evening");
+  await page.screenshot({ path: join(shots, "family-evening.png") });
+  await page.close();
+}
 // Sunsama pull: no chat plan, the page fetches today's tasks itself
 {
   console.log("\nsunsama pull");

@@ -286,6 +286,10 @@ details[open] summary::after{content:"–"}
 .item .cnt{position:absolute;top:6px;right:8px;font-size:.75rem;font-weight:700;color:var(--soft)}
 .item{position:relative}
 .ready{animation:tw 1.6s ease-in-out infinite}
+/* Safari lays out <button> grid containers badly (contents spill out and cards overlap): use a flex column */
+.item{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;height:auto;min-width:0}
+.item .n,.item .c,.item .d{display:block;max-width:100%;overflow-wrap:anywhere}
+.items{grid-auto-rows:auto;align-items:stretch}
 
 /* ---------- "Do task" notebook overlay ---------- */
 .notebook{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));
@@ -432,6 +436,9 @@ body.nb-open{overflow:hidden}
 .map .swing{transform-box:view-box;transform-origin:112px 254px;animation:sway 3s ease-in-out infinite}
 @keyframes sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-type .armL,.ch.npc.act-type .armR,.ch.npc .tool,.ch.npc .drips,.map .swing{animation:none}}
+/* Darren resting in the hammock */
+.ch.npc.act-rest .flip > g{transform:translate(-20px,-6px) rotate(-84deg)}
+.ch.npc.act-rest .bob{animation:cbob 2.6s ease-in-out infinite alternate}
 
 /* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
 :root{--mapw:max(300px,min(660px,calc((100dvh - 300px)*520/640 + 26px)))}
@@ -705,6 +712,11 @@ body.nb-open{overflow:hidden}
 @keyframes glow{from{opacity:.75}to{opacity:1}}
 @keyframes flame{from{transform:scaleY(.85) rotate(-3deg)}to{transform:scaleY(1.1) rotate(3deg)}}
 @media (prefers-reduced-motion:reduce){.map .glow,.map .flame{animation:none}}
+/* six market tabs: wrap inside the panel; the map itself must never scroll sideways */
+.panel .tabs{display:flex;flex-wrap:wrap;max-width:100%;gap:4px}
+.panel .tabs button{flex:1 1 auto;min-width:0;padding-left:8px;padding-right:8px}
+.panel{max-width:100%;box-sizing:border-box;overflow-x:hidden}
+.map{overflow:clip}
 </style>
 </head>
 <body>
@@ -1250,6 +1262,17 @@ body.nb-open{overflow:hidden}
   I.wateringCan = [`<rect x="4" y="9" width="11" height="10" rx="2" ${f(C.water)}/>`, `<rect x="4" y="9" width="11" height="10" rx="2"/><path d="M15 12l5-4M19 6.5l2 2.5M6 9c0-3 7-3 7 0"/><circle cx="21" cy="11" r=".6"/><circle cx="20" cy="13.5" r=".6"/>`];
   I.compost = [`<path d="M5 9h14l-1.5 11h-11z" ${f(C.wood)}/><path d="M8 8c1-2 2-3 4-3s3 1 4 3" ${f(C.moss)}/>`, `<path d="M5 9h14l-1.5 11h-11zM4 9h16M8 13h8M8.5 16.5h7"/><path d="M8 8c1-2 2-3 4-3s3 1 4 3"/>`];
   I.sprinkler = [`<circle cx="12" cy="17" r="3" ${f(C.stone)}/>`, `<circle cx="12" cy="17" r="3"/><path d="M12 14v-3M12 21h0M5 9c2-3 4-4 7-4s5 1 7 4M8 10.5c1-1.5 2.5-2 4-2s3 .5 4 2"/><circle cx="5" cy="12" r=".7"/><circle cx="19" cy="12" r=".7"/><circle cx="8" cy="13" r=".7"/><circle cx="16" cy="13" r=".7"/>`];
+  I.icecream = [`<path d="M8.5 11h7L12 21z" ${f("#E8C48E")}/><circle cx="12" cy="8.5" r="4" ${f(C.blush)}/><circle cx="9.5" cy="10" r="2.4" ${f(C.paper)}/>`, `<path d="M8.5 11h7L12 21zM10 13.5l3.6 3M14 13.5l-3.4 3"/><path d="M8.2 10.6A4 4 0 1 1 15.8 10.6"/><circle cx="9.5" cy="10" r="2.4"/>`];
+  I.balloon = [`<ellipse cx="12" cy="9" rx="5.5" ry="6.5" ${f("#E8574C")}/>`, `<ellipse cx="12" cy="9" rx="5.5" ry="6.5"/><path d="M11 15.5h2l-1 1.5zM12 17c-1 1.5 1 2.5 0 5"/><path d="M9.5 6.5c.5-1.2 1.4-1.8 2.4-2" opacity=".6"/>`];
+  I.wand = [`<circle cx="15" cy="7" r="4" ${f("#D8ECF6")}/><circle cx="7" cy="6" r="2" ${f("#D8ECF6")}/>`, `<circle cx="15" cy="7" r="4"/><circle cx="15" cy="7" r="2.2"/><path d="M12.5 10l-6 10"/><circle cx="7" cy="6" r="2"/><circle cx="19.5" cy="14" r="1.3"/>`];
+  I.storybook = [`<path d="M3.5 6c3-1.5 5.5-1.5 8.5 0v13c-3-1.5-5.5-1.5-8.5 0z" ${f(C.sage)}/><path d="M12 6c3-1.5 5.5-1.5 8.5 0v13c-3-1.5-5.5-1.5-8.5 0z" ${f(C.butter)}/>`, `<path d="M3.5 6c3-1.5 5.5-1.5 8.5 0v13c-3-1.5-5.5-1.5-8.5 0zM12 6c3-1.5 5.5-1.5 8.5 0v13c-3-1.5-5.5-1.5-8.5 0z"/><circle cx="16.3" cy="10" r="1.6"/><path d="M6 10h3.5M6 13h3"/>`];
+  I.kopi = [`<path d="M5 9h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" ${f(C.paper)}/><path d="M6 11h9v1H6z" ${f("#8A5A3A")}/>`, `<path d="M5 9h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 11h1.5a2.5 2.5 0 0 1 0 5H16"/><path class="smoke" d="M9 6.5q-1-1.5 0-3M12.5 6.5q-1-1.5 0-3" opacity=".7"/>`];
+  I.kaya = I.toast;
+  I.currypuff = [`<path d="M3.5 16c0-5 4-9 8.5-9s8.5 4 8.5 9z" ${f("#E8B36A")}/>`, `<path d="M3.5 16c0-5 4-9 8.5-9s8.5 4 8.5 9zM3.5 16h17"/><path d="M6 14l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5"/>`];
+  I.sandpit = [`<rect x="3" y="12" width="18" height="8" rx="2" ${f("#F2DDA8")}/><path d="M14 9h4l-1 4h-2z" ${f(C.rose)}/>`, `<rect x="3" y="12" width="18" height="8" rx="2"/><path d="M3 14h18" opacity=".6"/><path d="M14 9h4l-1 4h-2zM16 9V5.5"/><path d="M6 17q2-2 4 0" opacity=".6"/>`];
+  I.truck = [`<rect x="3" y="9" width="10" height="7" rx="1" ${f(C.butter)}/><path d="M13 11h4l3 3v2h-7z" ${f(C.rose)}/>`, `<rect x="3" y="9" width="10" height="7" rx="1"/><path d="M13 11h4l3 3v2h-7zM15 11v3h4"/><circle cx="7" cy="17.5" r="2"/><circle cx="16.5" cy="17.5" r="2"/>`];
+  I.headphones = [`<rect x="3.5" y="12" width="4.5" height="7" rx="2" ${f(C.peri)}/><rect x="16" y="12" width="4.5" height="7" rx="2" ${f(C.peri)}/>`, `<path d="M5 13a7 7 0 0 1 14 0"/><rect x="3.5" y="12" width="4.5" height="7" rx="2"/><rect x="16" y="12" width="4.5" height="7" rx="2"/>`];
+  I.hammock = [`<path d="M5 10q7 7 14 0z" ${f(C.peach)}/>`, `<path d="M3 20V6M21 20V6M3 9l2 1M21 9l-2 1"/><path d="M5 10q7 7 14 0z"/><path d="M8 12.5l1-1.5M12 14l.5-2M16 12.5l-1-1.5" opacity=".6"/>`];
   I.base = I.sprout;
   var icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
   var iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;
@@ -1423,6 +1446,18 @@ body.nb-open{overflow:hidden}
     bath: { e: "🛁", n: "Bubble bath", kind: "use", act: "bath", price: 5, tab: "care", say: "Bubbles! Squeaky clean." },
     crown: { e: "🌸", n: "Flower crown", kind: "use", act: "crown", price: 7, tab: "care", say: "Do I look regal? I feel regal." },
     fort: { e: "⛺", n: "Fort kit", kind: "use", act: "fort", price: 20, need: 30, xp: 4, tab: "care", say: "Best. Fort. Ever." },
+    // Family tab: little gifts go in the backpack and are handed over in person; keepsakes stay at home forever.
+    icecream: { n: "Ice cream", kind: "gift", to: "evan", price: 6, tab: "family", say: "ICE CREAM!! *happy dance*" },
+    balloon: { n: "Red balloon", kind: "gift", to: "evan", price: 5, tab: "family", say: "Balloooon! Mine!" },
+    wand: { n: "Bubble wand", kind: "gift", to: "evan", price: 8, tab: "family", say: "Bubbles! Pop pop pop!" },
+    storybook: { n: "Storybook", kind: "gift", to: "evan", price: 10, tab: "family", say: "Read it! Again! Again!" },
+    kopi: { n: "Kopi", kind: "gift", to: "darren", price: 5, tab: "family", say: "Kopi! You're the best." },
+    kaya: { n: "Kaya toast", kind: "gift", to: "darren", price: 7, tab: "family", say: "Kaya toast? Okay, now it's a good day." },
+    currypuff: { n: "Curry puff", kind: "gift", to: "darren", price: 6, tab: "family", say: "Still warm! Want half?" },
+    sandpit: { n: "Sandpit", kind: "keep", to: "evan", price: 60, tab: "family", say: "A sandpit at home! Evan's already digging." },
+    truck: { n: "Toy truck", kind: "keep", to: "evan", price: 35, tab: "family", say: "Vroom vroom! Evan won't put it down." },
+    headphones: { n: "Headphones", kind: "keep", to: "darren", price: 45, tab: "family", say: "Noise-cancelling! Darren's calls just got calmer." },
+    hammock: { n: "Hammock", kind: "keep", to: "darren", price: 90, tab: "family", say: "A hammock by the pond. Darren's evenings are sorted." },
     tulip: { e: "🌷", n: "Tulip", kind: "flower", sell: 4, say: "For me? I'll tuck it behind my ear." },
     sunflower: { e: "🌻", n: "Sunflower", kind: "flower", sell: 5, say: "So sunny! Thank you." },
     carrot: { e: "🥕", n: "Carrot", kind: "food", sell: 6, say: "Homegrown crunch!" },
@@ -1761,7 +1796,7 @@ body.nb-open{overflow:hidden}
       <ellipse cx="260" cy="322" rx="44" ry="20" style="fill:var(--path)"/></g>
     ${flowers([[30, 140, "#EFA3A6"], [44, 150, "#F3C969"], [200, 140, "#C3CDEE"], [330, 150, "#EFA3A6"], [488, 180, "#F3C969"], [214, 410, "#EFA3A6"], [200, 470, "#C3CDEE"], [160, 600, "#F3C969"], [176, 612, "#EFA3A6"], [300, 620, "#C3CDEE"], [24, 520, "#F3C969"], [372, 600, "#EFA3A6"], [400, 170, "#C3CDEE"]])}
     ${tree(26, 370, 0.9)}${tree(500, 610, 0.9)}${tree(26, 620, 0.95)}${tree(360, 180, 0.8)}`;
-    const homeX = { art: `<rect x="290" y="156" width="12" height="22" style="fill:var(--stone)"/>`, lines: `<rect x="290" y="156" width="12" height="22"/><path class="smoke" d="M296 152 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>` };
+    const homeX = { art: `<path d="M290 168 h12 v36 l-12 -8.6z" style="fill:var(--stone)"/>`, lines: `<path d="M290 196 v-28 h12 v36"/><path d="M288 168 h16"/><path class="smoke" d="M296 164 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>` };
     const places = bridge("toTown", 260, 30, 110, "To town", 336, 124) + house("home", 205, 220, 110, 74, "var(--card)", "var(--butter)", "Home", "var(--butter)", homeX) + // Darren's repair corner: ladder against the wall, toolbox
     sk(`<rect x="326" y="282" width="20" height="12" rx="2" style="fill:var(--rose)"/>`, `<path d="M316 296 l12 -62 M326 296 l12 -62 M318 284 h10 M320 272 h10 M323 260 h10 M325 248 h10"/><rect x="326" y="282" width="20" height="12" rx="2"/><path d="M332 282 v-4 h8 v4"/>`) + // letterbox: the morning paper sticks out of it until it's read (#paperIn is toggled by core's render)
     `<g data-place="letterbox" aria-label="Letterbox"><ellipse class="hov" cx="182" cy="314" rx="20" ry="6" style="fill:var(--butter)"/>
@@ -1788,12 +1823,14 @@ body.nb-open{overflow:hidden}
       `<ellipse cx="276" cy="608" rx="20" ry="8" style="fill:var(--stone)"/><path d="M264 606 l24 -6 M264 600 l24 6" style="stroke:var(--wood)" stroke-width="4"/>`,
       `<ellipse cx="276" cy="608" rx="20" ry="8"/><path class="smoke" d="M276 594 q-4 -6 0 -11 q4 -5 0 -10" opacity=".5"/>`
     ) + sk(
-      `<path d="M66 552 h16 v18 h-16z" style="fill:var(--sky)"/><path d="M96 554 h14 l3 14 h-20z" style="fill:var(--rose)"/><path d="M126 552 h18 v12 h-18z" style="fill:var(--butter)"/>`,
-      `<path d="M50 590 v-46 M160 590 v-46 M50 548 Q105 556 160 548"/><path d="M66 552 h16 v18 h-16z M96 554 h14 l3 14 h-20z M126 552 h18 v12 h-18z"/>`
+      `<path d="M378 354 h16 v18 h-16z" style="fill:var(--sky)"/><path d="M406 356 h14 l3 14 h-20z" style="fill:var(--rose)"/><path d="M434 354 h18 v12 h-18z" style="fill:var(--butter)"/>`,
+      `<path d="M362 396 v-46 M466 396 v-46 M362 350 Q414 358 466 350"/><path d="M378 354 h16 v18 h-16z M406 356 h14 l3 14 h-20z M434 354 h18 v12 h-18z"/>`
     );
+    const fam = G.F().fam && G.F().fam.owned || {};
+    const famArt = (fam.sandpit ? `<g aria-label="Sandpit">${sk(`<rect x="208" y="512" width="56" height="24" rx="5" style="fill:#F2DDA8"/><path d="M246 506 h8 l-2 8 h-4z" style="fill:var(--rose)"/>`, `<rect x="208" y="512" width="56" height="24" rx="5"/><path d="M212 518 h48" opacity=".5"/><path d="M246 506 h8 l-2 8 h-4z M250 506 v-6"/><path d="M220 528 q5 -5 10 0" opacity=".6"/>`)}</g>` : "") + (fam.hammock ? sk(`<path d="M398 600 q32 18 64 0 z" style="fill:var(--peach)"/>`, `<path d="M392 622 v-34 M468 622 v-34 M392 594 l6 6 M468 594 l-6 6"/><path d="M398 600 q32 18 64 0"/><path d="M410 604 l2 -3 M430 608 l1 -4 M450 604 l-2 -3" opacity=".6"/>`) : "");
     const tools = G.F().tools || {};
     const toolArt = (tools.compost ? sk(`<path d="M192 452 h24 l-3 22 h-18z" style="fill:var(--wood)"/><path d="M196 451 c3 -6 13 -6 16 0" style="fill:var(--moss)"/>`, `<path d="M192 452 h24 l-3 22 h-18z M195 460 h18"/>`) : "") + (tools.can ? sk(`<rect x="466" y="262" width="14" height="11" rx="2" style="fill:#9CC3E0"/>`, `<rect x="466" y="262" width="14" height="11" rx="2"/><path d="M480 266 l7 -5 M468 262 c0 -5 9 -5 9 0"/>`) : "") + (tools.sprinkler ? sk(`<circle cx="108" cy="438" r="4" style="fill:var(--stone)"/>`, `<circle cx="108" cy="438" r="4"/><path d="M108 434 v-4"/><path class="ripple" d="M96 426 q12 -10 24 0" opacity=".7"/>`) : "");
-    return ground + places + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
+    return ground + places + famArt + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
   }
   function duskArt() {
     const win = (x, y, w, h) => `<rect class="glow" x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="#FFD98A"/><rect x="${x - 8}" y="${y - 8}" width="${w + 16}" height="${h + 16}" rx="10" fill="#FFD98A" opacity=".18"/>`;
@@ -2269,6 +2306,8 @@ body.nb-open{overflow:hidden}
       // Weekdays: water the garden, work at the home office desk, fix something at lunch, tend the farm after work.
       // Weekends: mostly outdoors.
       routine: [
+        slot("19:30", "21:30", "base", [430, 606], { act: "rest", needs: "hammock" }),
+        // once Mel buys him the hammock
         slot("7:00", "8:30", "base", [190, 452], { days: "wd", act: "water", dir: -1 }),
         slot("8:30", "12:30", "home", [342, 336], { days: "wd", act: "type", dir: -1 }),
         slot("12:30", "13:30", "base", [340, 300], { days: "wd", act: "repair", dir: -1 }),
@@ -2294,7 +2333,8 @@ body.nb-open{overflow:hidden}
         type: ["*typing* Back-to-back calls. Wave if it's urgent.", "On mute. Hi! *waves*", "Two more emails and I'm free."],
         water: ["Morning! The tomatoes say hi.", "Watering before it gets hot. Lin's orders."],
         repair: ["Gutter's nearly fixed. Nearly.", "Hold the ladder? Kidding. Mostly.", "If it squeaks, I fix it."],
-        farm: ["Weeding. It's weirdly relaxing.", "These carrots are going to be enormous."]
+        farm: ["Weeding. It's weirdly relaxing.", "These carrots are going to be enormous."],
+        rest: ["Best present ever. Don't wake me for anything less than dinner.", "*sways* Five more minutes.", "The stars are out. Come look."]
       },
       react: { harvest: "Nice haul! I'll cook with that.", quests3: "Three done already? Look at you go.", lunch: "Lunch? I'll make toast." }
     }
@@ -3251,6 +3291,7 @@ Quests finished today: ${S3.doneIds.length}`;
       <ellipse cx="${6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
       <path d="M${-1.6 * k} ${-40.4 * k} q${1.6 * k} ${1.4 * k} ${3.2 * k} 0" fill="none" stroke-width="1"/>
       ${["glasses", "cap", "sunhat", "helmet"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${look.headphones ? `<path d="M${-11 * k} ${-46 * k} a${11 * k} ${12 * k} 0 0 1 ${22 * k} 0" fill="none" stroke-width="1.8" style="stroke:var(--peri2)"/><rect x="${-13.5 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/><rect x="${9 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/>` : ""}
     </g>
   </g></g>`;
   }
@@ -3271,8 +3312,22 @@ Quests finished today: ${S3.doneIds.length}`;
   var weekend = () => [0, 6].includes(new Date(now() + 8 * H).getUTCDay());
   var slotNow = (def) => {
     const t = sgHM(), we = weekend();
-    return def.routine.find((s) => t >= s.from && t < s.to && (!s.days || s.days === "we" === we)) || null;
+    const owned = api2 && api2.F().fam && api2.F().fam.owned || {};
+    return def.routine.find((s) => t >= s.from && t < s.to && (!s.days || s.days === "we" === we) && (!s.needs || owned[s.needs])) || null;
   };
+  var whereIs = (id) => {
+    const d = NPCS.find((n) => n.id === id), s = d && slotNow(d);
+    return s ? s.scene : null;
+  };
+  var npcPos = (id) => ents[id] ? { x: ents[id].x, y: ents[id].y } : null;
+  function npcSay(id, text) {
+    const e = ents[id];
+    if (!e) return false;
+    e.dir = api2.mel.x < e.x ? -1 : 1;
+    say(e, text, 4500);
+    api2.sfx && api2.sfx("babble", e.def.pitch || 1);
+    return true;
+  }
   var PROPS = { water: "can", repair: "hammer", farm: "hoe" };
   var outdoors = (s) => s === "village" || s === "base";
   var isHere = (id) => {
@@ -3285,6 +3340,8 @@ Quests finished today: ${S3.doneIds.length}`;
     g.dataset.npc = id;
     g.setAttribute("role", "button");
     if (act2 && PROPS[act2]) look = Object.assign({}, look, { extra: PROPS[act2] });
+    const owned = api2.F().fam && api2.F().fam.owned || {};
+    if (id === "darren" && act2 === "type" && owned.headphones) look = Object.assign({}, look, { headphones: true });
     g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "");
     $("actors").appendChild(g);
     return g;
@@ -3530,6 +3587,7 @@ Quests finished today: ${S3.doneIds.length}`;
       F.gift = true;
     }
     if (!F.tools) F.tools = {};
+    if (!F.fam) F.fam = { owned: {}, gifts: { evan: 0, darren: 0 } };
     if (!Array.isArray(F.plots) || F.plots.length !== 12) F.plots = Array.from({ length: 12 }, () => null);
     if (!F.cool) F.cool = {};
     ["met", "gifts", "mailRead"].forEach((k) => {
@@ -3991,6 +4049,7 @@ Quests finished today: ${S3.doneIds.length}`;
       if (selPlot != null) ctx();
     }
     if (scene === "base" && isDusk() !== lastDusk) drawScene();
+    renderEvanHold();
     lastDusk = isDusk();
     if (shelfOpen && Math.floor(Date.now() / 1e3) % 20 === 0) ctx();
     if (!S2.timer) return;
@@ -4514,6 +4573,10 @@ Then tell chat "wind down" whenever you're ready.`
       speak("Seeds go in the garden. Tap a plot there!", 3500);
       return;
     }
+    if (it.kind === "gift") {
+      giveGift(id);
+      return;
+    }
     if (it.kind === "tool") {
       act(it.act, it);
       speak(it.say, 4e3);
@@ -4530,6 +4593,88 @@ Then tell chat "wind down" whenever you're ready.`
     act(it.kind === "food" ? "eat" : it.kind === "flower" ? "flower" : it.act, it);
     speak(it.say, 4500);
     save();
+  }
+  var DARREN_AT = { base: "outside at home", home: "inside the house", farm: "in the garden" };
+  var bubbleT = null;
+  function giveGift(id) {
+    const it = ITEMS[id];
+    if (!it || !F.inv[id]) return;
+    if (it.to === "evan") {
+      if (!evanHere()) {
+        speak("Evan's at home. Give it to him there!", 3500);
+        return;
+      }
+      addInv(id, -1);
+      const n = ++F.fam.gifts.evan;
+      evan.tx = mel.x + 16;
+      evan.ty = mel.y + 4;
+      evan.run = true;
+      evan.wait = 5;
+      evanSays(it.say);
+      mprop("heart", evan.x, evan.y - 40);
+      sfx("chime");
+      if (id === "icecream" || id === "storybook") S2.evanHold = { k: id, until: Date.now() + 3 * M };
+      if (id === "balloon") S2.evanHold = { k: "balloon", until: 0 };
+      if (id === "storybook" && scene === "home") {
+        const s = spotObj("home", "sofa");
+        evan.tx = s.tx + 20;
+        evan.ty = s.ty;
+      }
+      if (id === "wand") {
+        clearInterval(bubbleT);
+        let k = 0;
+        bubbleT = setInterval(() => {
+          if (++k > 16 || !evanHere()) return clearInterval(bubbleT);
+          mprop("bubbles", evan.x + rnd(-14, 14), evan.y - 34);
+        }, 1200);
+      }
+      if (n % 3 === 0) setTimeout(() => {
+        evanSays("for you, Mama!");
+        addInv("tulip", 1);
+        flash("Evan picked you a tulip");
+        save();
+      }, 4e3);
+    } else {
+      if (!isHere("darren")) {
+        const w = whereIs("darren");
+        speak(w ? `Darren's ${DARREN_AT[w] || "around"} right now. Give it to him there!` : "Darren's not around right now.", 4e3);
+        return;
+      }
+      addInv(id, -1);
+      const n = ++F.fam.gifts.darren;
+      npcSay("darren", it.say);
+      const p = npcPos("darren");
+      if (p) mprop("heart", p.x, p.y - 60);
+      sfx("chime");
+      if (n % 3 === 0) setTimeout(() => {
+        npcSay("darren", "Got you something too. Found it in the shed.");
+        addInv("strawberry_seed", 1);
+        flash("Darren gave you strawberry seeds");
+        save();
+      }, 4500);
+    }
+    gainXp(1);
+    save();
+  }
+  var holdKey = "";
+  function renderEvanHold() {
+    const h = S2.evanHold, k = h && (h.until === 0 || Date.now() < h.until) ? h.k : F.fam.owned.truck ? "truck" : "";
+    if (k === holdKey) return;
+    holdKey = k;
+    let el = $("evanHold");
+    if (!el) {
+      const bob = document.querySelector("#evan .bob");
+      if (!bob) return;
+      el = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      el.id = "evanHold";
+      bob.appendChild(el);
+    }
+    el.innerHTML = {
+      balloon: `<path d="M7.4 -11 C10 -22 9 -30 12 -40" fill="none" stroke-width=".8"/><ellipse cx="12" cy="-47" rx="5.2" ry="6.4" fill="#E8574C"/><path d="M11 -40.6 h2 l-1 1.4z" fill="#E8574C"/>`,
+      icecream: `<path d="M5.6 -14 h4.4 l-2.2 7z" fill="#E8C48E"/><circle cx="7.8" cy="-15.5" r="2.6" fill="#F4C7CF"/>`,
+      storybook: `<rect x="5" y="-17" width="8" height="6" rx="1" fill="#B9D2A6"/><path d="M9 -17 v6" fill="none" stroke-width=".6"/>`,
+      truck: `<rect x="7" y="-6.5" width="7" height="4" rx=".8" fill="#F3C969"/><path d="M14 -5.5 h2.5 l1.5 1.8 v1.2 h-4z" fill="#EFA3A6"/><circle cx="9" cy="-1.8" r="1.3" fill="#5E5A55"/><circle cx="15.5" cy="-1.8" r="1.3" fill="#5E5A55"/>`
+    }[k] || "";
   }
   function playFree(kind) {
     const lines = { pet: ["*leans into the pat*", "Happy fox noises!", "More pats please."], hide: ["You found me!"], nap: ["Mmm… cosy…"] };
@@ -4550,6 +4695,17 @@ Then tell chat "wind down" whenever you're ready.`
   function buy(id) {
     const it = ITEMS[id];
     if (!it || F.coins < it.price || it.need && S2.earned < it.need) return;
+    if (it.kind === "keep") {
+      if (F.fam.owned[id]) return;
+      F.coins -= it.price;
+      F.fam.owned[id] = true;
+      sfx("chaching");
+      flash(`${it.n} delivered home`);
+      speak(it.say, 5e3);
+      resetScene();
+      save(true);
+      return;
+    }
     if (it.kind === "tool" && F.inv[id]) return;
     F.coins -= it.price;
     addInv(id, 1);
@@ -4749,7 +4905,7 @@ Then tell chat "wind down" whenever you're ready.`
     const c = $("ctx");
     let h = "";
     if (scene === "market" && !shopClosed) {
-      const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["care", "Care"], ["home", "Home"], ["sell", "Sell"]];
+      const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["care", "Care"], ["family", "Family"], ["home", "Home"], ["sell", "Sell"]];
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
       <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-shop="${k}" aria-selected="${shopTab === k}">${n}</button>`).join("")}</div><div class="items shop">`;
       if (shopTab === "home") {
@@ -4762,10 +4918,11 @@ Then tell chat "wind down" whenever you're ready.`
         h += sellable.length ? sellable.map((id) => itemBtn(id, `sell <b>+${ITEMS[id].sell}</b> ${icon("coin", 13)}`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("") : `<p class="muted" style="grid-column:1/-1">Nothing to sell yet. Grow something in the garden!</p>`;
       } else {
         h += Object.keys(ITEMS).filter((id) => ITEMS[id].tab === shopTab).map((id) => {
-          const it = ITEMS[id], locked = it.need && S2.earned < it.need, owned = it.kind === "tool" && F.inv[id];
-          const extra2 = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)}` : "";
-          return itemBtn(id, locked ? `earn ${it.need} today` : owned ? "owned" : `<b>${it.price}</b> ${icon("coin", 13)}${extra2}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
+          const it = ITEMS[id], locked = it.need && S2.earned < it.need, owned = it.kind === "keep" ? F.fam.owned[id] : it.kind === "tool" && F.inv[id];
+          const extra2 = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)}` : it.to ? ` · ${it.to === "evan" ? "Evan" : "Darren"}` : "";
+          return itemBtn(id, locked ? `earn ${it.need} today` : owned ? it.kind === "keep" ? "at home" : "owned" : `<b>${it.price}</b> ${icon("coin", 13)}${extra2}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
         }).join("");
+        if (shopTab === "family") h += `<p class="muted" style="grid-column:1/-1">Little treats go in your backpack: give them in person from there. Keepsakes go straight home and stay forever.</p>`;
       }
       h += `</div>`;
     } else if (scene === "farm" && selPlot != null) {
@@ -4847,11 +5004,11 @@ Then tell chat "wind down" whenever you're ready.`
   }
   function bag() {
     const ids = Object.keys(F.inv).filter((id) => ITEMS[id] && F.inv[id] > 0);
-    const order = ["food", "flower", "use", "tool", "seed"];
+    const order = ["gift", "food", "flower", "use", "tool", "seed"];
     ids.sort((a, b) => order.indexOf(ITEMS[a].kind) - order.indexOf(ITEMS[b].kind));
     $("bag").innerHTML = ids.map((id) => {
       const it = ITEMS[id];
-      const lbl = it.kind === "seed" ? "plant in garden" : it.kind === "tool" ? "use" : it.kind === "food" ? "feed" : it.kind === "flower" ? "give" : "use";
+      const lbl = it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${it.to === "evan" ? "Evan" : "Darren"}` : it.kind === "tool" ? "use" : it.kind === "food" ? "feed" : it.kind === "flower" ? "give" : "use";
       return itemBtn(id, lbl, it.kind === "seed", it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`);
     }).join("");
     $("bag").querySelectorAll(".item").forEach((b) => b.onclick = () => useItem(b.dataset.id));
@@ -4966,6 +5123,8 @@ Then tell chat "wind down" whenever you're ready.`
       return nx ? `Next at ${nx.at}: ${esc(nx.name)}.` : "Every upgrade unlocked!";
     })()}</p>
     <ul class="uplist">${UPGRADES.map((u) => `<li class="${(F.totalQuests || 0) >= u.at ? "got" : ""}">${icon((F.totalQuests || 0) >= u.at ? "sparkle" : "clock", 16)} <span>${esc(u.name)}</span> <small>${u.at}</small></li>`).join("")}</ul>`;
+    $("friendBody").insertAdjacentHTML("beforeend", `<h3 class="ph3">Family</h3><p class="muted">${icon("heart", 14)} Gifts for Evan: ${F.fam.gifts.evan} · for Darren: ${F.fam.gifts.darren}. Every third gift, they give you something back. Treats and keepsakes are in the market's Family tab.</p>`);
+    renderEvanHold();
     const all = allTasks(), rem = remaining(), cur = phase() === "task" && rem[0] ? rem[0].id : null;
     $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
     $("qBadge").hidden = !rem.length;
@@ -5318,6 +5477,12 @@ Then tell chat "wind down" whenever you're ready.`
           evan.ty = clamp(maple.y + rnd(2, 12), b[1], b[3]);
           evan.run = true;
           evan.target = "maple";
+        } else if (scene === "base" && F.fam.owned.sandpit && r < 0.75) {
+          evan.tx = 236 + rnd(-10, 10);
+          evan.ty = 530 + rnd(-3, 3);
+          evan.run = true;
+          evan.target = null;
+          if (Math.random() < 0.4) setTimeout(() => evanSays(pick(["dig dig!", "sandcastle!", "look Mama!"])), 1500);
         } else {
           const s = pick(EVAN_SPOTS[scene]);
           evan.tx = s[0] + rnd(-14, 14);
@@ -5393,6 +5558,13 @@ Then tell chat "wind down" whenever you're ready.`
   addEventListener("resize", () => {
     cam.snap = true;
     measureHud();
+  });
+  $("map").addEventListener("scroll", () => {
+    const m = $("map");
+    if (m.scrollLeft || m.scrollTop) {
+      m.scrollLeft = 0;
+      m.scrollTop = 0;
+    }
   });
   function bubbleAt(el, ex, ey, off, forceBelow) {
     if (el.hidden) return;

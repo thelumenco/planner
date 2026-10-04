@@ -278,4 +278,8 @@ Round 11:
 - Evening at home base, 7pm to 6am: the light drops (multiply tint), windows and the shed glow, the firepit is lit, stars over the river.
 - Walking around things outdoors (`game/paths.js`): blocked rectangles per outdoor scene, A* over a 24px grid, route pulled tight. Arrow keys slide along walls.
 
+Round 12:
+- Family tab at the market. Little gifts (ice cream, red balloon, bubble wand, storybook for Evan; kopi, kaya toast, curry puff for Darren) go in the backpack and are handed over in person: Evan whenever he's around, Darren wherever his routine has him (the page says where). Every third gift they give something back (a tulip from Evan, strawberry seeds from Darren). Keepsakes, bought once: a sandpit at home base (Evan plays in it), a toy truck Evan carries, headphones Darren wears at his desk, a hammock by the pond where Darren rests 7:30-9:30pm. State in `F.fam = {owned, gifts}`; what Evan holds is drawn into his sprite (`#evanHold`).
+- Fixes: the chimney sits on the roof; the washing line moved out from under the folded quest tab; market cards use a flex column (Safari overlapped grid buttons); the tab row wraps and the map can no longer be scrolled sideways by a tap.
+
 Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lines.
