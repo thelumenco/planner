@@ -57,7 +57,7 @@ export function journalPanel(decompress){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>My journal</h2>
     <p class="sub">${decompress ? "Three quick points from that call or moment. Then let it go." : esc(journalPrompt())}</p>
     <form id="jForm" class="jform"><label class="sr" for="jText">Journal entry</label><textarea id="jText" rows="6" maxlength="8000" placeholder="${decompress ? "1.\n2.\n3." : "Write anything..."}">${esc(draft)}</textarea>
-    <div class="actions"><button class="btn primary small" type="submit">Keep this page</button></div></form>`;
+    <div class="actions"><button class="btn primary small" type="submit">Keep this page</button><button class="btn alt small" type="button" data-letters="1">Write a letter</button></div></form>`;
   if (list.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list.map(e => `<details${e.kind === "jar" ? " open" : ""}><summary><b>${when(e)}</b> ${e.kind === "jar" ? "A jar of " + esc(e.jar.label) : esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary>${e.kind === "jar" ? `<div class="polaroid"><div class="pphoto">${jarSVG(e.jar, 74)}</div><p class="pcap">${esc(new Date(e.jar.at).toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore"}))}</p></div>${e.jar.blobs && e.text !== e.jar.label ? `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>` : ""}` : `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>`}<button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
   return h;
 }

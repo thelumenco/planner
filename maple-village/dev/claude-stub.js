@@ -134,7 +134,8 @@
     }
   };
 
-  const caps = { db, mcp: q.get("sunsama") || q.get("notion") || q.get("chord") ? mcp : null, user: { id: async () => "me", isOwner: () => true, canEdit: () => true }, sample: q.get("nosample") ? null : sample };
+  const downloads = { save: async ({ filename, data }) => { window.__download = { filename, size: String(data).length }; return { status: "saved" }; } };
+  const caps = { downloads, db, mcp: q.get("sunsama") || q.get("notion") || q.get("chord") ? mcp : null, user: { id: async () => "me", isOwner: () => true, canEdit: () => true }, sample: q.get("nosample") ? null : sample };
   window.claude = { use: name => new Promise(r => setTimeout(() => r(caps[name] ?? null), 250)) };
 
   if (q.get("seed")) {

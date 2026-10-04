@@ -33,6 +33,11 @@
     </filter>
   </defs>
 </svg>
+<div class="bedlock" id="bedLock" hidden role="dialog" aria-modal="true" aria-labelledby="bedLockT">
+  <div class="bedsky" aria-hidden="true"><span class="bmoon"></span><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="bedcard"><p class="bzz" aria-hidden="true">z z z</p><h2 id="bedLockT">Bedtime</h2><p>You're tucked in. Everything in the village waits until <b>6am</b>, and so does everything else.</p>
+    <p class="muted" id="bedLockLeft"></p><button class="btn alt small" id="bedUp" type="button">I really need to get up</button></div>
+</div>
 <main class="wrap">
   <div class="head">
     <h1 class="title" id="title">Maple's village<small id="dateLine"></small></h1>
@@ -327,7 +332,11 @@
           <label class="setrow"><input type="checkbox" id="setSfx"> <span>Sound effects: paper, purrs, coins, hellos</span></label>
           <div class="setrow"><button class="btn small alt" id="setTest" type="button">Play a test sound</button><span class="muted" id="setTestNote">No sound? Turn the volume up and switch off silent mode.</span></div>
           <h3 class="ph3">Quiet</h3>
+          <label class="setrow"><input type="checkbox" id="setBed"> <span>Stay in bed from 11:45pm to 6am (Maple nudges you at 11)</span></label>
           <label class="setrow"><input type="checkbox" id="setQuiet"> <span>Peace and quiet: when there are no active quests, nobody talks unless you tap them</span></label>
+          <h3 class="ph3">Your game is safe</h3>
+          <p class="muted">Everything is saved privately to your claude.ai account (not your phone), so it follows you to any device. A backup file is extra peace of mind.</p>
+          <div class="setrow"><button class="btn small alt" id="setBackup" type="button">Download a backup</button><span class="muted" id="setBackupNote"></span></div>
           <h3 class="ph3">Hestia (home)</h3>
           <div class="setrow"><label class="btn small alt" for="hestiaFile">Import from Hestia</label><input type="file" id="hestiaFile" accept=".json,application/json" hidden><span class="muted" id="hestiaNote">In Hestia: Settings, Export. Then pick that file here: your chores, zones and pantry come across.</span></div>
           <h3 class="ph3">Your newspaper</h3>

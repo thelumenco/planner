@@ -8,10 +8,12 @@ import { esc, plain, dayKey } from "../util.js";
 const KEY = "fox.routines";
 export const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const DAY_NAMES = {mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday"};
+// Mel's beauty week (from her)
+const BEAUTY = {mon: "Pore extraction", tue: "Retinol", wed: "Hair mask", thu: "Nail care", fri: "Pore pad or lactic acid", sat: "Body scrub", sun: "Air shot micro-needling + face mask"};
 const uid = p => p + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36);
 const seed = () => ({lists: [
   {id: "morning", name: "Morning routine", kind: "checklist", at: 1, items: ["Big glass of water", "Make the bed", "Wash face and skincare", "Get dressed (peek at the wardrobe)", "Vitamins"].map((t, i) => ({id: "m" + i, text: t}))},
-  {id: "beauty", name: "Beauty routine", kind: "weekly", at: 1, days: {}}
+  {id: "beauty", name: "Beauty routine", kind: "weekly", at: 1, days: BEAUTY}
 ], ticks: {}, updatedAt: 0});
 const load = () => { try { const r = JSON.parse(localStorage.getItem(KEY)); return r && Array.isArray(r.lists) ? Object.assign({ticks: {}}, r) : seed(); } catch { return seed(); } };
 let R = load(), ref = null, chain = Promise.resolve(), onChange = () => {};
@@ -22,11 +24,18 @@ function merge(a, b){
   const ticks = {}, days = [...new Set([...Object.keys(a.ticks || {}), ...Object.keys(b.ticks || {})])].sort().slice(-14);
   days.forEach(d => { const x = (a.ticks || {})[d] || {}, y = (b.ticks || {})[d] || {}; ticks[d] = {};
     new Set([...Object.keys(x), ...Object.keys(y)]).forEach(k => { const p = x[k], q = y[k]; ticks[d][k] = !p ? q : !q ? p : (q.at || 0) > (p.at || 0) ? q : p; }); });
-  return {lists: [...m.values()], ticks, updatedAt: Math.max(a.updatedAt || 0, b.updatedAt || 0)};
+  return {lists: [...m.values()], ticks, updatedAt: Math.max(a.updatedAt || 0, b.updatedAt || 0), beautyFilled: !!(a.beautyFilled || b.beautyFilled)};
 }
 export function attachRoutines(col, changed){
   onChange = changed; ref = col.doc("routines");
-  ref.onSnapshot(snap => { if (!snap.exists) { push(); return; } R = merge(R, JSON.parse(JSON.stringify(snap.data() || {}))); keep(); onChange(); }, () => {});
+  ref.onSnapshot(snap => { if (!snap.exists) { push(); return; } R = merge(R, JSON.parse(JSON.stringify(snap.data() || {}))); keep(); fillBeauty(); onChange(); }, () => {});
+}
+// one time: the board was first seeded with an empty beauty routine; fill in Mel's week (never over her own edits)
+function fillBeauty(){
+  if (R.beautyFilled) return; const b = R.lists.find(l => l.id === "beauty" && !l.deleted);
+  R.beautyFilled = true;
+  if (b && b.kind === "weekly" && !Object.keys(b.days || {}).length) { b.days = {...BEAUTY}; b.at = Date.now(); }
+  commit();
 }
 function push(){ if (!ref) return; chain = chain.then(async () => { try { const cur = await ref.get(); if (cur.exists) R = merge(R, JSON.parse(JSON.stringify(cur.data() || {}))); await ref.set(JSON.parse(JSON.stringify(R))); } catch {} }); }
 const commit = () => { R.updatedAt = Date.now(); keep(); push(); onChange(); };

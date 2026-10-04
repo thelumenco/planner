@@ -301,3 +301,17 @@ details[open] summary::after{content:"–"}
 @keyframes flick{0%,100%{opacity:.22}45%{opacity:.3}55%{opacity:.18}}
 .map .lglow .flick{animation:flick 3.2s ease-in-out infinite}
 @media (prefers-reduced-motion: reduce){.map .lglow .flick{animation:none}}
+
+/* Bedtime: a night-sky screen over everything from 11:45pm to 6am */
+.bedlock{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:24px;background:linear-gradient(#1C2147,#2B2F55 60%,#3A3466)}
+.bedlock[hidden]{display:none}
+.bedsky{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.bedsky .bmoon{position:absolute;top:12%;right:16%;width:64px;height:64px;border-radius:50%;background:#FFF3C4;box-shadow:-14px 6px 0 0 #2B2F55 inset}
+.bedsky i{position:absolute;width:3px;height:3px;border-radius:50%;background:#FFF9E0;animation:twk 3s ease-in-out infinite}
+.bedsky i:nth-child(2){top:18%;left:14%}.bedsky i:nth-child(3){top:30%;left:72%;animation-delay:-1s}.bedsky i:nth-child(4){top:62%;left:22%;animation-delay:-2s}
+.bedsky i:nth-child(5){top:76%;left:80%;animation-delay:-.5s}.bedsky i:nth-child(6){top:44%;left:40%;animation-delay:-1.5s}.bedsky i:nth-child(7){top:12%;left:52%;animation-delay:-2.4s}.bedsky i:nth-child(8){top:86%;left:46%;animation-delay:-.8s}
+@keyframes twk{50%{opacity:.25}}
+.bedcard{position:relative;max-width:340px;text-align:center;background:#FFFDF6;color:#2F2B28;border-radius:14px;padding:24px 22px;box-shadow:0 20px 40px -20px rgba(0,0,0,.6);--ink:#2F2B28;--soft:#8A8279}
+.bedcard h2{font-family:"Klee One",serif;font-weight:600;font-size:1.8rem;margin:0 0 8px}
+.bedcard .bzz{font-family:"Klee One",serif;color:#8A8279;margin:0;letter-spacing:.3em}
+body.bedlocked{overflow:hidden}

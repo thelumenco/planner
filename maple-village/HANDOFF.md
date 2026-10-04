@@ -444,3 +444,16 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - The manifest adds Notion `notion-create-pages` and Sunsama `create_task`.
 - **Home desk:** the personal inbox only. **Routines:** one box per step that starts empty (no doubled tick), and more space above the buttons.
 - **Emotion jars:** blobs are flat, slightly lumpy shapes in one colour (no shine, shade or outline), and the jar and lid are hand-drawn with wobbly lines.
+
+### Round 35: beauty week, bedtime, letters, backups
+- **Beauty routine:** Mel's week (Mon pore extraction … Sun air shot micro-needling + face mask) is the seed, plus a one-time `fillBeauty()` that fills the existing empty "beauty" list (never over edits; flag `beautyFilled`).
+- **Bedtime** (`bedtimeTick` in the 1 s loop):
+  - Maple chivvies at 11:00 and 11:30pm (`F.bedSaid`).
+  - From 11:45pm to 6am a full-screen night overlay (`#bedLock`) blocks every tap and key.
+  - "I really need to get up" skips just that night (`F.bedSkip` = night key).
+  - Settings "Stay in bed" (`F.bedLock`, on by default) switches it off for good.
+- **Letters** (`letters.js`; private doc "letters"), from the writing desk ("Write a letter" in the journal):
+  - **Dear Universe:** Claude writes a warm reply (anything is possible; right place, right time; obstacles removed; things always work out). It arrives 15–45 minutes later as post. Pen-pal context comes from the last three exchanges; replies pending without Claude are written later.
+  - **Dear future me:** sealed until the chosen date.
+  - Arrivals are announced by Maple and read from the home letterbox (letters before the paper) or the desk. Any letter can be saved to the journal.
+- **Backup:** Settings "Download a backup" saves every `fox.*` local copy as one JSON file (the `downloads` capability). The game's real home is the per-user db on claude.ai; this is a spare copy.

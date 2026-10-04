@@ -311,6 +311,20 @@ details[open] summary::after{content:"–"}
 .map .lglow .flick{animation:flick 3.2s ease-in-out infinite}
 @media (prefers-reduced-motion: reduce){.map .lglow .flick{animation:none}}
 
+/* Bedtime: a night-sky screen over everything from 11:45pm to 6am */
+.bedlock{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:24px;background:linear-gradient(#1C2147,#2B2F55 60%,#3A3466)}
+.bedlock[hidden]{display:none}
+.bedsky{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.bedsky .bmoon{position:absolute;top:12%;right:16%;width:64px;height:64px;border-radius:50%;background:#FFF3C4;box-shadow:-14px 6px 0 0 #2B2F55 inset}
+.bedsky i{position:absolute;width:3px;height:3px;border-radius:50%;background:#FFF9E0;animation:twk 3s ease-in-out infinite}
+.bedsky i:nth-child(2){top:18%;left:14%}.bedsky i:nth-child(3){top:30%;left:72%;animation-delay:-1s}.bedsky i:nth-child(4){top:62%;left:22%;animation-delay:-2s}
+.bedsky i:nth-child(5){top:76%;left:80%;animation-delay:-.5s}.bedsky i:nth-child(6){top:44%;left:40%;animation-delay:-1.5s}.bedsky i:nth-child(7){top:12%;left:52%;animation-delay:-2.4s}.bedsky i:nth-child(8){top:86%;left:46%;animation-delay:-.8s}
+@keyframes twk{50%{opacity:.25}}
+.bedcard{position:relative;max-width:340px;text-align:center;background:#FFFDF6;color:#2F2B28;border-radius:14px;padding:24px 22px;box-shadow:0 20px 40px -20px rgba(0,0,0,.6);--ink:#2F2B28;--soft:#8A8279}
+.bedcard h2{font-family:"Klee One",serif;font-weight:600;font-size:1.8rem;margin:0 0 8px}
+.bedcard .bzz{font-family:"Klee One",serif;color:#8A8279;margin:0;letter-spacing:.3em}
+body.bedlocked{overflow:hidden}
+
 /* ---------- "Do task" notebook overlay ---------- */
 .notebook{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));
   background:rgba(47,43,40,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:nbfade .2s ease}
@@ -1080,6 +1094,16 @@ body.kidmode .scenename span + span{display:none}
 .pigeon.flap .pbody{animation:pflap 1.6s ease-in-out}
 @keyframes pflap{0%{transform:translate(0,0)}35%{transform:translate(20px,-60px)}60%{transform:translate(34px,-70px)}100%{transform:translate(0,0)}}
 @media (prefers-reduced-motion:reduce){.pigeon,.pigeon .phead{animation:none}}
+
+/* letters */
+.lpaper{background:#FFFDF6 repeating-linear-gradient(transparent 0 27px,rgba(120,104,84,.14) 27px 28px);line-height:28px;font-family:"Klee One",serif;font-weight:600;font-size:1rem}
+.lletter{padding:14px 16px;border-radius:6px;margin:6px 0 10px;font-family:"Klee One",serif;font-weight:600;line-height:1.55}
+.lletter p{margin:0 0 8px}.lletter.mine{background:#FFF8EC}.lletter.uni{background:linear-gradient(#EEF0FB,#F7F1FB);box-shadow:0 8px 16px -12px rgba(43,47,85,.4)}
+.ldate{align-items:center;gap:10px;margin-top:8px}.ldate input{border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:6px 8px;font:inherit;color:#2F2B28}
+.vmenu{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.vq p{font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;line-height:1.5}
+.vreflect{font-style:italic;color:#6B6259;margin:0 0 6px}
+.vsum p{font-family:"Klee One",serif;font-weight:600;line-height:1.6;margin:0 0 10px}
 </style>
 </head>
 <body>
@@ -1106,6 +1130,11 @@ body.kidmode .scenename span + span{display:none}
     </filter>
   </defs>
 </svg>
+<div class="bedlock" id="bedLock" hidden role="dialog" aria-modal="true" aria-labelledby="bedLockT">
+  <div class="bedsky" aria-hidden="true"><span class="bmoon"></span><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="bedcard"><p class="bzz" aria-hidden="true">z z z</p><h2 id="bedLockT">Bedtime</h2><p>You're tucked in. Everything in the village waits until <b>6am</b>, and so does everything else.</p>
+    <p class="muted" id="bedLockLeft"></p><button class="btn alt small" id="bedUp" type="button">I really need to get up</button></div>
+</div>
 <main class="wrap">
   <div class="head">
     <h1 class="title" id="title">Maple's village<small id="dateLine"></small></h1>
@@ -1400,7 +1429,11 @@ body.kidmode .scenename span + span{display:none}
           <label class="setrow"><input type="checkbox" id="setSfx"> <span>Sound effects: paper, purrs, coins, hellos</span></label>
           <div class="setrow"><button class="btn small alt" id="setTest" type="button">Play a test sound</button><span class="muted" id="setTestNote">No sound? Turn the volume up and switch off silent mode.</span></div>
           <h3 class="ph3">Quiet</h3>
+          <label class="setrow"><input type="checkbox" id="setBed"> <span>Stay in bed from 11:45pm to 6am (Maple nudges you at 11)</span></label>
           <label class="setrow"><input type="checkbox" id="setQuiet"> <span>Peace and quiet: when there are no active quests, nobody talks unless you tap them</span></label>
+          <h3 class="ph3">Your game is safe</h3>
+          <p class="muted">Everything is saved privately to your claude.ai account (not your phone), so it follows you to any device. A backup file is extra peace of mind.</p>
+          <div class="setrow"><button class="btn small alt" id="setBackup" type="button">Download a backup</button><span class="muted" id="setBackupNote"></span></div>
           <h3 class="ph3">Hestia (home)</h3>
           <div class="setrow"><label class="btn small alt" for="hestiaFile">Import from Hestia</label><input type="file" id="hestiaFile" accept=".json,application/json" hidden><span class="muted" id="hestiaNote">In Hestia: Settings, Export. Then pick that file here: your chores, zones and pantry come across.</span></div>
           <h3 class="ph3">Your newspaper</h3>
@@ -2269,7 +2302,7 @@ body.kidmode .scenename span + span{display:none}
     return h;
   }
   function runArt(F2) {
-    const P2 = ensurePets(F2), lv = P2.run, big = lv >= 1;
+    const P2 = ensurePets(F2), lv2 = P2.run, big = lv2 >= 1;
     const [x0, y0, x1, y1] = big ? [40, 508, 182, 590] : [92, 524, 182, 588];
     const posts = [];
     for (let x = x0; x <= x1; x += 16) posts.push(`M${x} ${y0 - 6} v8 M${x} ${y1 - 6} v8`);
@@ -2278,14 +2311,14 @@ body.kidmode .scenename span + span{display:none}
       `<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" rx="3" style="fill:#EADFB8" opacity=".55"/>`,
       `<path d="M${x0} ${y0} H${x1} V${y1 - 26} M${x1} ${y1 - 6} V${y1} H${x0} Z" fill="none" style="stroke:var(--wood)" stroke-width="2.4"/><path d="${posts.join(" ")}" style="stroke:var(--wood)" stroke-width="2"/>`
     );
-    const crate = lv < 2 ? sk(`<rect x="${x0 + 6}" y="${y0 + 6}" width="26" height="18" style="fill:#C9A27E"/>`, `<rect x="${x0 + 6}" y="${y0 + 6}" width="26" height="18"/><path d="M${x0 + 6} ${y0 + 15} h26" opacity=".4"/><path d="M${x0 + 12} ${y0 + 24} v-10 h14 v10" style="fill:var(--line)" opacity=".25"/>`) : "";
-    const coop = lv >= 2 ? sk(
+    const crate = lv2 < 2 ? sk(`<rect x="${x0 + 6}" y="${y0 + 6}" width="26" height="18" style="fill:#C9A27E"/>`, `<rect x="${x0 + 6}" y="${y0 + 6}" width="26" height="18"/><path d="M${x0 + 6} ${y0 + 15} h26" opacity=".4"/><path d="M${x0 + 12} ${y0 + 24} v-10 h14 v10" style="fill:var(--line)" opacity=".25"/>`) : "";
+    const coop = lv2 >= 2 ? sk(
       `<path d="M44 498 l18 -14 l18 14z" style="fill:var(--rose)"/><rect x="46" y="498" width="32" height="24" style="fill:var(--butter)"/><rect x="56" y="508" width="11" height="14" style="fill:var(--wood)"/><path d="M67 522 l14 12 h4 l-14 -12z" style="fill:var(--wood)"/>
       <rect x="120" y="512" width="34" height="18" rx="2" style="fill:#C9A27E"/><path d="M118 513 h38 l-4 -7 h-30z" style="fill:var(--sage)"/>`,
       `<path d="M44 498 l18 -14 l18 14"/><rect x="46" y="498" width="32" height="24"/><rect x="56" y="508" width="11" height="14"/><path d="M67 522 l14 12 h4 l-14 -12z M71 526 l2 -1 M76 530 l2 -1"/>
       <rect x="120" y="512" width="34" height="18" rx="2"/><path d="M118 513 h38 l-4 -7 h-30z"/><path d="M126 516 v11 M132 516 v11 M138 516 v11" opacity=".55"/>`
     ) : "";
-    const meadow = lv >= 3 ? `<g pointer-events="none">${[[54, 542], [96, 532], [120, 578], [70, 580], [150, 548], [110, 556]].map(([x, y]) => `<g fill="var(--moss)" opacity=".8"><circle cx="${x - 2}" cy="${y}" r="2.4"/><circle cx="${x + 2}" cy="${y}" r="2.4"/><circle cx="${x}" cy="${y - 3}" r="2.4"/></g>`).join("")}</g>` + sk(`<rect x="124" y="580" width="30" height="7" rx="2" style="fill:var(--wood)"/><rect x="127" y="580" width="24" height="3" style="fill:#9CC3E0"/>`, `<rect x="124" y="580" width="30" height="7" rx="2"/>`) : "";
+    const meadow = lv2 >= 3 ? `<g pointer-events="none">${[[54, 542], [96, 532], [120, 578], [70, 580], [150, 548], [110, 556]].map(([x, y]) => `<g fill="var(--moss)" opacity=".8"><circle cx="${x - 2}" cy="${y}" r="2.4"/><circle cx="${x + 2}" cy="${y}" r="2.4"/><circle cx="${x}" cy="${y - 3}" r="2.4"/></g>`).join("")}</g>` + sk(`<rect x="124" y="580" width="30" height="7" rx="2" style="fill:var(--wood)"/><rect x="127" y="580" width="24" height="3" style="fill:#9CC3E0"/>`, `<rect x="124" y="580" width="30" height="7" rx="2"/>`) : "";
     const fed = P2.animals.length && !hungryCount(F2);
     const bowl = sk(`<path d="M${x1 - 24} ${y1 - 12} h14 l-2 6 h-10z" style="fill:var(--sky)"/>${fed ? `<ellipse cx="${x1 - 17}" cy="${y1 - 12}" rx="6" ry="2" style="fill:var(--honey)"/>` : ""}`, `<path d="M${x1 - 24} ${y1 - 12} h14 l-2 6 h-10z"/>`);
     const cols = big ? 4 : 2, gx = big ? 32 : 36, ox = big ? 60 : 118;
@@ -2661,17 +2694,17 @@ body.kidmode .scenename span + span{display:none}
     return "";
   }
   function trophySVG(t2, size = 64) {
-    const L = LOOKS[t2.fam] || LOOKS.quests, c = L.col;
+    const L2 = LOOKS[t2.fam] || LOOKS.quests, c = L2.col;
     let top = "";
-    if (L.shape === "cup") top = `<path d="M16 10 h32 v6 q0 20 -16 22 q-16 -2 -16 -22z" fill="${c}" ${sw}/><path d="M16 14 q-9 0 -8 8 q1 7 10 7 M48 14 q9 0 8 8 q-1 7 -10 7" fill="none" ${sw}/><rect x="28" y="38" width="8" height="8" fill="${c}" ${sw}/><path d="M20 12 q2 14 8 20" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".55"/>${emblem(L.emblem, 32, 22)}`;
-    else if (L.shape === "star") top = `<path d="M32 4 l7 14 15 2 -11 10 3 15 -14 -8 -14 8 3 -15 -11 -10 15 -2z" fill="${c}" ${sw}/><rect x="29" y="40" width="6" height="6" fill="${c}" ${sw}/>${emblem(L.emblem, 32, 24)}`;
-    else if (L.shape === "medal") top = `<path d="M22 4 l8 18 M42 4 l-8 18" stroke="${c}" stroke-width="7" stroke-linecap="round"/><path d="M22 4 l8 18 M42 4 l-8 18" fill="none" stroke="${INK2}" stroke-width="1" opacity=".5"/><circle cx="32" cy="32" r="13" fill="${c}" ${sw}/><circle cx="32" cy="32" r="9.5" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity=".6"/>${emblem(L.emblem, 32, 32)}`;
-    else if (L.shape === "rosette") top = `<path d="M26 34 l-6 14 5 -2 3 5 4 -14 M38 34 l6 14 -5 -2 -3 5 -4 -14" fill="${c}" ${sw}/>${Array.from({ length: 12 }, (_, i) => {
+    if (L2.shape === "cup") top = `<path d="M16 10 h32 v6 q0 20 -16 22 q-16 -2 -16 -22z" fill="${c}" ${sw}/><path d="M16 14 q-9 0 -8 8 q1 7 10 7 M48 14 q9 0 8 8 q-1 7 -10 7" fill="none" ${sw}/><rect x="28" y="38" width="8" height="8" fill="${c}" ${sw}/><path d="M20 12 q2 14 8 20" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".55"/>${emblem(L2.emblem, 32, 22)}`;
+    else if (L2.shape === "star") top = `<path d="M32 4 l7 14 15 2 -11 10 3 15 -14 -8 -14 8 3 -15 -11 -10 15 -2z" fill="${c}" ${sw}/><rect x="29" y="40" width="6" height="6" fill="${c}" ${sw}/>${emblem(L2.emblem, 32, 24)}`;
+    else if (L2.shape === "medal") top = `<path d="M22 4 l8 18 M42 4 l-8 18" stroke="${c}" stroke-width="7" stroke-linecap="round"/><path d="M22 4 l8 18 M42 4 l-8 18" fill="none" stroke="${INK2}" stroke-width="1" opacity=".5"/><circle cx="32" cy="32" r="13" fill="${c}" ${sw}/><circle cx="32" cy="32" r="9.5" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity=".6"/>${emblem(L2.emblem, 32, 32)}`;
+    else if (L2.shape === "rosette") top = `<path d="M26 34 l-6 14 5 -2 3 5 4 -14 M38 34 l6 14 -5 -2 -3 5 -4 -14" fill="${c}" ${sw}/>${Array.from({ length: 12 }, (_, i) => {
       const a = i * Math.PI / 6;
       return `<circle cx="${(32 + Math.cos(a) * 12).toFixed(1)}" cy="${(24 + Math.sin(a) * 12).toFixed(1)}" r="5" fill="${c}" ${sw}/>`;
-    }).join("")}<circle cx="32" cy="24" r="10" fill="#FFFDF6" ${sw}/><circle cx="32" cy="24" r="7" fill="${c}"/>${emblem(L.emblem, 32, 24)}`;
-    else if (L.shape === "plaque") top = `<path d="M14 8 h36 v18 q0 16 -18 20 q-18 -4 -18 -20z" fill="${c}" ${sw}/><path d="M18 12 h28 v14 q0 12 -14 15 q-14 -3 -14 -15z" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity=".6"/>${emblem(L.emblem, 32, 24)}`;
-    else top = `<ellipse cx="32" cy="42" rx="16" ry="4" fill="${c}" ${sw}/><rect x="16" y="30" width="32" height="12" fill="${c}" ${sw}/><ellipse cx="32" cy="30" rx="16" ry="4" fill="${c}" ${sw}/><rect x="20" y="18" width="24" height="12" fill="${c}" ${sw}/><ellipse cx="32" cy="18" rx="12" ry="3.5" fill="${c}" ${sw}/><path d="M22 12 l4 -7 6 6 6 -6 4 7z" fill="${c}" ${sw}/>${emblem(L.emblem, 32, 25)}`;
+    }).join("")}<circle cx="32" cy="24" r="10" fill="#FFFDF6" ${sw}/><circle cx="32" cy="24" r="7" fill="${c}"/>${emblem(L2.emblem, 32, 24)}`;
+    else if (L2.shape === "plaque") top = `<path d="M14 8 h36 v18 q0 16 -18 20 q-18 -4 -18 -20z" fill="${c}" ${sw}/><path d="M18 12 h28 v14 q0 12 -14 15 q-14 -3 -14 -15z" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity=".6"/>${emblem(L2.emblem, 32, 24)}`;
+    else top = `<ellipse cx="32" cy="42" rx="16" ry="4" fill="${c}" ${sw}/><rect x="16" y="30" width="32" height="12" fill="${c}" ${sw}/><ellipse cx="32" cy="30" rx="16" ry="4" fill="${c}" ${sw}/><rect x="20" y="18" width="24" height="12" fill="${c}" ${sw}/><ellipse cx="32" cy="18" rx="12" ry="3.5" fill="${c}" ${sw}/><path d="M22 12 l4 -7 6 6 6 -6 4 7z" fill="${c}" ${sw}/>${emblem(L2.emblem, 32, 25)}`;
     const label2 = esc(String(t2.short || t2.n || "")).slice(0, 6);
     return `<svg viewBox="0 0 64 72" width="${size}" height="${size * 72 / 64}" aria-hidden="true">${top}<path d="M18 46 h28 l3 10 h-34z" fill="#8B5E3C" ${sw}/><rect x="12" y="56" width="40" height="12" rx="2" fill="#6B4630" ${sw}/><rect x="20" y="58.5" width="24" height="7" rx="1" fill="#E8D3A8"/><text x="32" y="64.2" text-anchor="middle" font-family="Mulish, sans-serif" font-weight="800" font-size="${label2.length > 4 ? 4.6 : 5.6}" fill="${INK2}">${label2}</text></svg>`;
   }
@@ -2930,11 +2963,11 @@ body.kidmode .scenename span + span{display:none}
     )}
       ${G.goodNews && G.goodNews() ? `<g class="twinkle">${iconAt("sparkle", 252, 398, 14)}</g>` : ""}${dogArt(270, 450, !!(G.goodNews && G.goodNews()))}${tapeLabel(222, 470, "Good news", "var(--butter)", 11)}</g></g>
     ${townRiver()}`;
-    const L = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
+    const L2 = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
     const light = (app, x, y) => {
       const h = G.health ? G.health(app) : null;
       if (!h) return "";
-      return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`;
+      return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L2[h.status]}"/></g>`;
     };
     const lamps = [[204, 424], [384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
     return lampDefs + ground + lamps + places + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
@@ -3026,11 +3059,11 @@ body.kidmode .scenename span + span{display:none}
     return `<g transform="translate(${x} ${y})" aria-label="Pancake the village dog"><g ${I2}>` + (awake ? `<path class="wag" d="M-9 -6 q-9 -4 -8 -14" fill="none"/><ellipse cx="-2" cy="-7" rx="9" ry="7" fill="${fur}"/><path d="M-6 0 v-4 M3 0 v-5" /><ellipse cx="5" cy="-17" rx="6.5" ry="6" fill="${fur}"/><ellipse cx="10" cy="-15" rx="3" ry="2.2" fill="#F2D3AE"/><circle cx="12.4" cy="-15.6" r="1.1" fill="var(--line)" stroke="none"/><path d="M1 -22 q-5 2 -3 9 q4 -2 3 -9z" fill="${ear}"/><circle cx="6.5" cy="-18.5" r=".9" fill="var(--line)" stroke="none"/><path d="M-3 -2 q6 3 11 -1" style="stroke:var(--rose)" stroke-width="2.2"/>` : `<path d="M-14 -3 q-4 -6 2 -9" fill="none"/><ellipse cx="0" cy="-5" rx="13" ry="6" fill="${fur}"/><ellipse cx="10" cy="-6" rx="6" ry="4.6" fill="${fur}"/><path d="M5 -10 q-4 1 -3 6 q3 -1 3 -6z" fill="${ear}"/><path d="M10 -7 q1.5 1 3 0" fill="none"/><path d="M15 -19 h4 l-4 5 h4 M21 -25 h3 l-3 4 h3" fill="none" stroke-width="1" opacity=".6"/>`) + `</g></g>`;
   }
   function laneArt() {
-    const L = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
+    const L2 = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
     const light = (app, x, y) => {
       const h = G.health ? G.health(app) : null;
       if (!h) return "";
-      return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`;
+      return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L2[h.status]}"/></g>`;
     };
     const D3 = VILLAGE;
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
@@ -3343,13 +3376,13 @@ body.kidmode .scenename span + span{display:none}
         );
       case "healthchord":
       case "healthchico": {
-        const h = G && G.health ? G.health(kind.slice(6)) : null, L = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
+        const h = G && G.health ? G.health(kind.slice(6)) : null, L2 = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
         const st6 = h ? h.status : "grey", word = { green: "ALL GOOD", amber: "WATCH", red: "NEEDS YOU", grey: "NO REPORT" }[st6];
-        const lights = (h && h.checks.length ? h.checks.slice(0, 3).map((c) => c.state) : [st6, st6, st6]).map((c, i) => `<circle cx="${x - 18 + i * 18}" cy="${y - 62}" r="6" style="fill:${L[c]}"/>`).join("");
+        const lights = (h && h.checks.length ? h.checks.slice(0, 3).map((c) => c.state) : [st6, st6, st6]).map((c, i) => `<circle cx="${x - 18 + i * 18}" cy="${y - 62}" r="6" style="fill:${L2[c]}"/>`).join("");
         return sk(
           `<rect x="${x - 3}" y="${y - 30}" width="6" height="30" style="fill:var(--wood)"/><rect x="${x - 34}" y="${y - 80}" width="68" height="52" rx="5" style="fill:#FFFDF6"/>${lights}`,
           `<rect x="${x - 34}" y="${y - 80}" width="68" height="52" rx="5"/><path d="M${x - 3} ${y - 28} v28 M${x + 3} ${y - 28} v28 M${x - 12} ${y} h24"/>${lights.replace(/ style="[^"]*"/g, "")}`
-        ) + `<text x="${x}" y="${y - 38}" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="800" font-size="9" letter-spacing=".6" style="fill:${L[st6] === L.grey ? "var(--line)" : L[st6]}">${word}</text>`;
+        ) + `<text x="${x}" y="${y - 38}" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="800" font-size="9" letter-spacing=".6" style="fill:${L2[st6] === L2.grey ? "var(--line)" : L2[st6]}">${word}</text>`;
       }
       case "pobox": {
         let c = "";
@@ -4446,10 +4479,10 @@ body.kidmode .scenename span + span{display:none}
         closeNotebook();
         return;
       }
-      const keep4 = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
+      const keep5 = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
       page.innerHTML = taskPage(t2);
       if ($("nbAsk")) {
-        $("nbAsk").value = keep4;
+        $("nbAsk").value = keep5;
         if (typing) $("nbAsk").focus();
       }
     } else page.innerHTML = open.kind === "tracker" ? trackerPage(open.which) : open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
@@ -4554,10 +4587,10 @@ body.kidmode .scenename span + span{display:none}
   }
   function trackerPage(which) {
     if (which === "water") {
-      const w = api.water(), L = (ml) => (ml / 1e3).toLocaleString("en-GB", { maximumFractionDigits: 2 });
+      const w = api.water(), L2 = (ml) => (ml / 1e3).toLocaleString("en-GB", { maximumFractionDigits: 2 });
       return `<button class="nbx" data-nb="close" aria-label="Close">✕</button>
       <p class="nbmeta">${icon("drop", 16)} today's water</p>
-      <h2 id="nbTitle">${L(w.ml)} L <small class="nbby">of ${L(w.goal)} L</small></h2>
+      <h2 id="nbTitle">${L2(w.ml)} L <small class="nbby">of ${L2(w.goal)} L</small></h2>
       <div class="trbar">${progressBar(w.ml / w.goal, "#9CC3E0", 8)}</div>
       <div class="nbbody">
         <p class="nblbl">Add</p>
@@ -5585,7 +5618,7 @@ Quests finished today: ${S3.doneIds.length}`;
     }
     if (d && d.state && d.state.zones) d = d.state;
     if (!d || !Array.isArray(d.zones) || !Array.isArray(d.dailyTasks)) return "That doesn't look like a Hestia export (no zones or daily tasks).";
-    const keep4 = [
+    const keep5 = [
       "zones",
       "dailyTasks",
       "weeklyTasks",
@@ -5606,7 +5639,7 @@ Quests finished today: ${S3.doneIds.length}`;
       "chimeEnabled",
       "chimeInterval"
     ];
-    keep4.forEach((k) => {
+    keep5.forEach((k) => {
       if (d[k] != null) H2[k] = d[k];
     });
     tidy();
@@ -6266,16 +6299,16 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   var mlabel = (k) => (/* @__PURE__ */ new Date(k + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
   function chart(d, target) {
     const ms = Object.keys(d.byMonth), vals = ms.map((k) => d.byMonth[k]), max = Math.max(1, target || 0, ...vals) * 1.15;
-    const W2 = 320, H3 = 150, L = 8, B = 128, T = 14, bw = 36, gap = (W2 - L * 2 - bw * 6) / 5, y = (v) => B - (B - T) * v / max;
+    const W2 = 320, H3 = 150, L2 = 8, B = 128, T = 14, bw = 36, gap = (W2 - L2 * 2 - bw * 6) / 5, y = (v) => B - (B - T) * v / max;
     const bars = ms.map((k, i) => {
-      const x = L + i * (bw + gap), v = vals[i], top = y(v), h = Math.max(0, B - top), cur2 = i === ms.length - 1;
+      const x = L2 + i * (bw + gap), v = vals[i], top = y(v), h = Math.max(0, B - top), cur2 = i === ms.length - 1;
       const r = Math.min(4, h);
       const path = h > 0 ? `M${x} ${B} V${top + r} Q${x} ${top} ${x + r} ${top} H${x + bw - r} Q${x + bw} ${top} ${x + bw} ${top + r} V${B}z` : "";
       return `<g class="rbar${cur2 ? " cur" : ""}" tabindex="0" aria-label="${mlabel(k)}: ${money(v, d.currency)}"><title>${mlabel(k)} ${k.slice(0, 4)}: ${money(v, d.currency)}</title><rect x="${x - gap / 2}" y="${T}" width="${bw + gap}" height="${B - T}" fill="transparent"/>${path ? `<path d="${path}" fill="#4E9A4A" opacity="${cur2 ? 1 : 0.55}"/>` : ""}
       ${cur2 || v === Math.max(...vals) && v > 0 ? `<text x="${x + bw / 2}" y="${top - 4}" text-anchor="middle" class="rval">${money(v, d.currency)}</text>` : ""}<text x="${x + bw / 2}" y="${B + 14}" text-anchor="middle" class="rax">${mlabel(k)}</text></g>`;
     }).join("");
-    const tl = target ? `<path d="M${L} ${y(target)} H${W2 - L}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W2 - L}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money(target, d.currency)}</text>` : "";
-    return `<svg class="rchart" viewBox="0 0 ${W2} ${H3}" role="img" aria-label="Paid income by month, last six months"><path d="M${L} ${B} H${W2 - L}" stroke="#D8CFC2" stroke-width="1"/>${bars}${tl}</svg>`;
+    const tl = target ? `<path d="M${L2} ${y(target)} H${W2 - L2}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W2 - L2}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money(target, d.currency)}</text>` : "";
+    return `<svg class="rchart" viewBox="0 0 ${W2} ${H3}" role="img" aria-label="Paid income by month, last six months"><path d="M${L2} ${B} H${W2 - L2}" stroke="#D8CFC2" stroke-width="1"/>${bars}${tl}</svg>`;
   }
   var revenueNow = () => {
     if (!st3.data) return null;
@@ -6457,7 +6490,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>My journal</h2>
     <p class="sub">${decompress ? "Three quick points from that call or moment. Then let it go." : esc(journalPrompt())}</p>
     <form id="jForm" class="jform"><label class="sr" for="jText">Journal entry</label><textarea id="jText" rows="6" maxlength="8000" placeholder="${decompress ? "1.\n2.\n3." : "Write anything..."}">${esc(draft)}</textarea>
-    <div class="actions"><button class="btn primary small" type="submit">Keep this page</button></div></form>`;
+    <div class="actions"><button class="btn primary small" type="submit">Keep this page</button><button class="btn alt small" type="button" data-letters="1">Write a letter</button></div></form>`;
     if (list2.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list2.map((e) => `<details${e.kind === "jar" ? " open" : ""}><summary><b>${when4(e)}</b> ${e.kind === "jar" ? "A jar of " + esc(e.jar.label) : esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary>${e.kind === "jar" ? `<div class="polaroid"><div class="pphoto">${jarSVG(e.jar, 74)}</div><p class="pcap">${esc(new Date(e.jar.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" }))}</p></div>${e.jar.blobs && e.text !== e.jar.label ? `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>` : ""}` : `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>`}<button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
     return h;
   }
@@ -6520,6 +6553,240 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
         rerender();
       });
     };
+  }
+
+  // src/game/letters.js
+  var KEY5 = "fox.letters";
+  var load3 = () => {
+    try {
+      return Object.assign({ items: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(KEY5)) || {});
+    } catch {
+      return { items: [], updatedAt: 0 };
+    }
+  };
+  var L = load3();
+  var ref3 = null;
+  var chain2 = Promise.resolve();
+  var onChange4 = () => {
+  };
+  var keep2 = () => {
+    try {
+      localStorage.setItem(KEY5, JSON.stringify(L));
+    } catch {
+    }
+  };
+  function merge2(a, b) {
+    const m = /* @__PURE__ */ new Map();
+    [...a.items || [], ...b && b.items || []].forEach((e) => {
+      if (!e || !e.id) return;
+      const o = m.get(e.id);
+      if (!o || (e.u || 0) > (o.u || 0)) m.set(e.id, e);
+    });
+    return { items: [...m.values()].sort((x, y) => x.at - y.at).slice(-300), updatedAt: Math.max(a.updatedAt || 0, b && b.updatedAt || 0) };
+  }
+  function attachLetters(col, changed) {
+    onChange4 = changed;
+    ref3 = col.doc("letters");
+    ref3.onSnapshot((snap) => {
+      if (!snap.exists) {
+        if (L.items.length) push2();
+        return;
+      }
+      L = merge2(L, JSON.parse(JSON.stringify(snap.data() || {})));
+      keep2();
+      onChange4();
+    }, () => {
+    });
+  }
+  function push2() {
+    if (!ref3) return;
+    chain2 = chain2.then(async () => {
+      try {
+        const cur2 = await ref3.get();
+        if (cur2.exists) L = merge2(L, JSON.parse(JSON.stringify(cur2.data() || {})));
+        await ref3.set(JSON.parse(JSON.stringify(L)));
+      } catch {
+      }
+    });
+  }
+  var commit2 = () => {
+    L.updatedAt = Date.now();
+    keep2();
+    push2();
+    onChange4();
+  };
+  var touch = (e) => {
+    e.u = Date.now();
+    commit2();
+  };
+  var universe = () => L.items.filter((e) => e.kind === "universe");
+  var future = () => L.items.filter((e) => e.kind === "future");
+  var arrived = () => [...universe().filter((e) => e.reply && e.reply.due <= Date.now() && !e.reply.read), ...future().filter((e) => e.deliver <= dayKey() && !e.read)];
+  function announce() {
+    const out = arrived().filter((e) => !(e.kind === "universe" ? e.reply.told : e.told));
+    out.forEach((e) => {
+      if (e.kind === "universe") e.reply.told = true;
+      else e.told = true;
+      e.u = Date.now();
+    });
+    if (out.length) commit2();
+    return out;
+  }
+  var UNIVERSE = `You are the Universe, writing back to Mel, your pen pal. You are never seen, but you always write back. You are warm, encouraging and loving, and you always tell her that anything is possible. When she is afraid or worried, you tell her she is in the right place at the right time, and that you are removing obstacles, preventing disasters and opening doors for her, even when it doesn't look like it. Things are always working out for her. Answer what she actually wrote, specifically and tenderly, in 120 to 200 words. Begin "Dear Mel," and sign off "Always, the Universe". Plain letter prose: no emoji, no headings, no lists. Never mention being an AI.`;
+  var replying = false;
+  async function writeReplies(sample) {
+    if (replying || !sample) return;
+    const waiting = universe().filter((e) => !e.reply);
+    if (!waiting.length) return;
+    replying = true;
+    for (const e of waiting) {
+      const before = universe().filter((x) => x.at < e.at && x.reply).slice(-3).map((x) => `Mel wrote: ${x.text.slice(0, 600)}
+You replied: ${x.reply.text.slice(0, 600)}`).join("\n\n");
+      try {
+        const r = await sample(`${UNIVERSE}${before ? `
+
+Your letters so far (most recent last):
+${before}` : ""}
+
+Her new letter:
+${e.text}`, { modelTier: "default", cache: false });
+        const text = plain(String(r && r.text || "")).trim();
+        if (text) {
+          e.reply = { text: text.slice(0, 3e3), due: Date.now() + (15 + Math.random() * 30) * 6e4 };
+          touch(e);
+        }
+      } catch (err) {
+        if (err && err.code === "not_granted") break;
+      }
+    }
+    replying = false;
+  }
+  var lv = { mode: "home", id: null, draft: "", date: "" };
+  var longDate = (d) => (/* @__PURE__ */ new Date(d + "T00:00:00Z")).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+  var shortWhen = (ms) => new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" });
+  var inMonths = (n) => {
+    const d = /* @__PURE__ */ new Date(dayKey() + "T00:00:00Z");
+    d.setUTCMonth(d.getUTCMonth() + n);
+    return d.toISOString().slice(0, 10);
+  };
+  var tomorrow = () => new Date(Date.parse(dayKey() + "T00:00:00Z") + 864e5).toISOString().slice(0, 10);
+  var para = (t2) => esc(t2).split(/\n+/).map((p) => `<p>${p}</p>`).join("");
+  function lettersPanel(canReply) {
+    let h = `<span class="tape sky" aria-hidden="true"></span>`;
+    if (lv.mode === "universe") return h + `<h2>Dear Universe,</h2><p class="sub">Write whatever's on your heart. The universe always writes back${canReply ? "" : " (once Claude is reachable from this view)"}.</p>
+    <label class="sr" for="ltText">Your letter</label><textarea id="ltText" class="jnote lpaper" rows="8" maxlength="4000" placeholder="Dear Universe,">${esc(lv.draft)}</textarea>
+    <div class="actions"><button class="btn primary" data-lt="senduni">Post it</button><button class="btn alt small" data-lt="home">Back</button></div>`;
+    if (lv.mode === "future") return h + `<h2>Dear future me,</h2><p class="sub">Sealed until the day you choose, then it comes to your letterbox.</p>
+    <label class="sr" for="ltText">Your letter</label><textarea id="ltText" class="jnote lpaper" rows="8" maxlength="4000" placeholder="Dear future me,">${esc(lv.draft)}</textarea>
+    <div class="row ldate"><label for="ltDate">Deliver on</label><input id="ltDate" type="date" min="${tomorrow()}" value="${esc(lv.date || inMonths(3))}"></div>
+    <div class="actions"><button class="btn primary" data-lt="sendfut">Seal it</button><button class="btn alt small" data-lt="home">Back</button></div>`;
+    if (lv.mode === "read") {
+      const e = L.items.find((x) => x.id === lv.id);
+      if (!e) {
+        lv.mode = "home";
+        return lettersPanel(canReply);
+      }
+      if (e.kind === "universe") {
+        const r = e.reply && e.reply.due <= Date.now() ? e.reply : null;
+        return h + `<h2>Your letter, ${esc(shortWhen(e.at))}</h2><div class="lletter mine">${para(e.text)}</div>
+        ${r ? `<p class="eyebrow">The universe wrote back</p><div class="lletter uni">${para(r.text)}</div>` : `<p class="muted">On its way. The universe takes its time, but it always writes back.</p>`}
+        <div class="actions">${r ? `<button class="btn primary small" data-lt="universe">Write back</button>` : ""}<button class="btn alt small" data-lt="journal" data-id="${esc(e.id)}" ${e.journaled ? "disabled" : ""}>${e.journaled ? "In your journal" : "Save to my journal"}</button><button class="btn alt small" data-lt="home">Back</button></div>`;
+      }
+      const open2 = e.deliver <= dayKey();
+      return h + `<h2>${open2 ? `From you, ${esc(shortWhen(e.at))}` : "A sealed letter"}</h2>${open2 ? `<div class="lletter mine">${para(e.text)}</div>` : `<p class="muted">Sealed until ${esc(longDate(e.deliver))}. No peeking.</p>`}
+      <div class="actions">${open2 ? `<button class="btn alt small" data-lt="journal" data-id="${esc(e.id)}" ${e.journaled ? "disabled" : ""}>${e.journaled ? "In your journal" : "Save to my journal"}</button>` : ""}<button class="btn alt small" data-lt="home">Back</button></div>`;
+    }
+    const u = universe(), f2 = future(), now2 = Date.now(), news = arrived();
+    h += `<h2>Letters</h2><p class="sub">Write to the universe, or to the you of later on.</p>
+    <div class="vmenu"><button class="btn primary" data-lt="universe">Dear Universe…</button><button class="btn alt" data-lt="future">Dear future me…</button></div>`;
+    if (news.length) h += `<p class="eyebrow" style="margin-top:14px">Arrived</p><ul class="hlist lnew">${news.map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${e.kind === "universe" ? "A letter from the universe" : "A letter from your past self"}</b><small>${e.kind === "universe" ? "in reply to " + esc(shortWhen(e.at)) : "written " + esc(shortWhen(e.at))}</small></span><span class="hbadge now">new</span></li>`).join("")}</ul>`;
+    if (u.length) h += `<p class="eyebrow" style="margin-top:14px">Pen pals with the universe</p><ul class="hlist">${u.slice().reverse().slice(0, 12).map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${esc(e.text.split("\n")[0].slice(0, 60))}</b><small>${esc(shortWhen(e.at))} · ${e.reply && e.reply.due <= now2 ? "answered" : "on its way"}</small></span></li>`).join("")}</ul>`;
+    if (f2.length) h += `<p class="eyebrow" style="margin-top:14px">To future me</p><ul class="hlist">${f2.slice().reverse().map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${e.deliver <= dayKey() ? esc(e.text.split("\n")[0].slice(0, 60)) : "Sealed"}</b><small>written ${esc(shortWhen(e.at))} · ${e.deliver <= dayKey() ? "arrived " : "arrives "}${esc(longDate(e.deliver))}</small></span></li>`).join("")}</ul>`;
+    return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function wireLetters(root, api4) {
+    const ta = root.querySelector("#ltText"), dt = root.querySelector("#ltDate");
+    if (ta) {
+      ta.oninput = () => {
+        lv.draft = ta.value;
+      };
+      setTimeout(() => ta.focus(), 60);
+    }
+    if (dt) dt.onchange = () => {
+      lv.date = dt.value;
+    };
+    root.querySelectorAll("[data-lt]").forEach((b) => {
+      const go2 = () => {
+        const k = b.dataset.lt, id = b.dataset.id;
+        if (k === "home") lv.mode = "home";
+        else if (k === "universe" || k === "future") {
+          lv.mode = k;
+          lv.draft = "";
+        } else if (k === "open") {
+          lv.mode = "read";
+          lv.id = id;
+          const e = L.items.find((x) => x.id === id);
+          if (e && e.kind === "universe" && e.reply && e.reply.due <= Date.now() && !e.reply.read) {
+            e.reply.read = true;
+            touch(e);
+          }
+          if (e && e.kind === "future" && e.deliver <= dayKey() && !e.read) {
+            e.read = true;
+            touch(e);
+          }
+        } else if (k === "senduni") {
+          const text = plain(lv.draft).trim();
+          if (!text) {
+            if (ta) ta.focus();
+            return;
+          }
+          const e = { id: "l" + Date.now().toString(36), kind: "universe", text: text.slice(0, 4e3), at: Date.now(), u: Date.now() };
+          L.items.push(e);
+          commit2();
+          lv.draft = "";
+          lv.mode = "home";
+          api4.sent("universe");
+          writeReplies(api4.sample);
+        } else if (k === "sendfut") {
+          const text = plain(lv.draft).trim(), d = dt && dt.value || inMonths(3);
+          if (!text) {
+            if (ta) ta.focus();
+            return;
+          }
+          const e = { id: "l" + Date.now().toString(36), kind: "future", text: text.slice(0, 4e3), at: Date.now(), deliver: d < tomorrow() ? tomorrow() : d, u: Date.now() };
+          L.items.push(e);
+          commit2();
+          lv.draft = "";
+          lv.date = "";
+          lv.mode = "home";
+          api4.sent("future", e.deliver);
+        } else if (k === "journal") {
+          const e = L.items.find((x) => x.id === id);
+          if (!e || e.journaled) return;
+          const text = e.kind === "universe" ? `Dear Universe,
+
+${e.text}${e.reply && e.reply.due <= Date.now() ? `
+
+— The universe wrote back —
+
+${e.reply.text}` : ""}` : `A letter to future me (written ${shortWhen(e.at)})
+
+${e.text}`;
+          if (api4.toJournal(text)) {
+            e.journaled = true;
+            touch(e);
+          }
+        }
+        api4.rerender();
+      };
+      b.onclick = go2;
+      if (b.getAttribute("role") === "button") b.onkeydown = (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault();
+          go2();
+        }
+      };
+    });
   }
 
   // src/game/vision.js
@@ -6789,34 +7056,35 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
 
   // src/game/routines.js
-  var KEY5 = "fox.routines";
+  var KEY6 = "fox.routines";
   var DAYS2 = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
   var DAY_NAMES = { mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday" };
+  var BEAUTY = { mon: "Pore extraction", tue: "Retinol", wed: "Hair mask", thu: "Nail care", fri: "Pore pad or lactic acid", sat: "Body scrub", sun: "Air shot micro-needling + face mask" };
   var uid = (p) => p + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
   var seed = () => ({ lists: [
     { id: "morning", name: "Morning routine", kind: "checklist", at: 1, items: ["Big glass of water", "Make the bed", "Wash face and skincare", "Get dressed (peek at the wardrobe)", "Vitamins"].map((t2, i) => ({ id: "m" + i, text: t2 })) },
-    { id: "beauty", name: "Beauty routine", kind: "weekly", at: 1, days: {} }
+    { id: "beauty", name: "Beauty routine", kind: "weekly", at: 1, days: BEAUTY }
   ], ticks: {}, updatedAt: 0 });
-  var load3 = () => {
+  var load4 = () => {
     try {
-      const r = JSON.parse(localStorage.getItem(KEY5));
+      const r = JSON.parse(localStorage.getItem(KEY6));
       return r && Array.isArray(r.lists) ? Object.assign({ ticks: {} }, r) : seed();
     } catch {
       return seed();
     }
   };
-  var R = load3();
-  var ref3 = null;
-  var chain2 = Promise.resolve();
-  var onChange4 = () => {
+  var R = load4();
+  var ref4 = null;
+  var chain3 = Promise.resolve();
+  var onChange5 = () => {
   };
-  var keep2 = () => {
+  var keep3 = () => {
     try {
-      localStorage.setItem(KEY5, JSON.stringify(R));
+      localStorage.setItem(KEY6, JSON.stringify(R));
     } catch {
     }
   };
-  function merge2(a, b) {
+  function merge3(a, b) {
     if (!b) return a;
     const m = /* @__PURE__ */ new Map();
     [...a.lists || [], ...b.lists || []].forEach((l) => {
@@ -6833,38 +7101,49 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         ticks[d][k] = !p ? q : !q ? p : (q.at || 0) > (p.at || 0) ? q : p;
       });
     });
-    return { lists: [...m.values()], ticks, updatedAt: Math.max(a.updatedAt || 0, b.updatedAt || 0) };
+    return { lists: [...m.values()], ticks, updatedAt: Math.max(a.updatedAt || 0, b.updatedAt || 0), beautyFilled: !!(a.beautyFilled || b.beautyFilled) };
   }
   function attachRoutines(col, changed) {
-    onChange4 = changed;
-    ref3 = col.doc("routines");
-    ref3.onSnapshot((snap) => {
+    onChange5 = changed;
+    ref4 = col.doc("routines");
+    ref4.onSnapshot((snap) => {
       if (!snap.exists) {
-        push2();
+        push3();
         return;
       }
-      R = merge2(R, JSON.parse(JSON.stringify(snap.data() || {})));
-      keep2();
-      onChange4();
+      R = merge3(R, JSON.parse(JSON.stringify(snap.data() || {})));
+      keep3();
+      fillBeauty();
+      onChange5();
     }, () => {
     });
   }
-  function push2() {
-    if (!ref3) return;
-    chain2 = chain2.then(async () => {
+  function fillBeauty() {
+    if (R.beautyFilled) return;
+    const b = R.lists.find((l) => l.id === "beauty" && !l.deleted);
+    R.beautyFilled = true;
+    if (b && b.kind === "weekly" && !Object.keys(b.days || {}).length) {
+      b.days = { ...BEAUTY };
+      b.at = Date.now();
+    }
+    commit3();
+  }
+  function push3() {
+    if (!ref4) return;
+    chain3 = chain3.then(async () => {
       try {
-        const cur2 = await ref3.get();
-        if (cur2.exists) R = merge2(R, JSON.parse(JSON.stringify(cur2.data() || {})));
-        await ref3.set(JSON.parse(JSON.stringify(R)));
+        const cur2 = await ref4.get();
+        if (cur2.exists) R = merge3(R, JSON.parse(JSON.stringify(cur2.data() || {})));
+        await ref4.set(JSON.parse(JSON.stringify(R)));
       } catch {
       }
     });
   }
-  var commit2 = () => {
+  var commit3 = () => {
     R.updatedAt = Date.now();
-    keep2();
-    push2();
-    onChange4();
+    keep3();
+    push3();
+    onChange5();
   };
   var lists = () => R.lists.filter((l) => !l.deleted).sort((a, b) => (a.kind === "checklist" ? 0 : 1) - (b.kind === "checklist" ? 0 : 1) || (a.made || 0) - (b.made || 0));
   var listById = (id) => R.lists.find((l) => l.id === id && !l.deleted);
@@ -6878,11 +7157,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     R.ticks = R.ticks || {};
     R.ticks[d] = R.ticks[d] || {};
     R.ticks[d][listId + ":" + itemId] = { on, at: Date.now() };
-    commit2();
+    commit3();
   }
-  var touch = (l) => {
+  var touch2 = (l) => {
     l.at = Date.now();
-    commit2();
+    commit3();
   };
   function todaysSteps() {
     const k = todayKey();
@@ -6911,7 +7190,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     l.kind = kind;
     if (kind === "weekly") l.days = Object.assign({}, l.days || {}, days || {});
     else if (items) l.items = items.map((t2) => ({ id: uid("i"), text: t2 }));
-    touch(l);
+    touch2(l);
     return l;
   }
   var rv = { sel: null, edit: false, paste: "" };
@@ -6961,7 +7240,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         const it = l.items.find((x) => x.id === i.dataset.item), v = plain(i.value).trim().slice(0, 120);
         if (it && v) it.text = v;
       });
-      touch(l);
+      touch2(l);
     };
     if (form) {
       form.onsubmit = (ev) => {
@@ -6975,7 +7254,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         l.kind = r.value;
         l.items = l.items || [];
         l.days = l.days || {};
-        touch(l);
+        touch2(l);
         api4.rerender();
       });
       const nw = form.querySelector("#rtNew");
@@ -7000,7 +7279,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         } else if (k === "new") {
           const n = { id: uid("r"), name: "New routine", kind: "checklist", made: Date.now(), at: Date.now(), items: [], days: {} };
           R.lists.push(n);
-          commit2();
+          commit3();
           rv.sel = n.id;
           rv.edit = true;
         } else if (k === "edit") rv.edit = true;
@@ -7017,16 +7296,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
           const v = plain(root.querySelector("#rtNew").value).trim().slice(0, 120);
           if (!v) return;
           l.items.push({ id: uid("i"), text: v });
-          touch(l);
+          touch2(l);
         } else if (k === "delitem") {
           saveForm();
           const idx = l.items.findIndex((x) => x.id === id);
           if (idx < 0) return;
           const [gone] = l.items.splice(idx, 1);
-          touch(l);
+          touch2(l);
           api4.undoable("Step removed", () => {
             l.items.splice(Math.min(idx, l.items.length), 0, gone);
-            touch(l);
+            touch2(l);
             api4.rerender();
           });
         } else if (k === "paste") {
@@ -7035,17 +7314,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
           saveForm();
           l.days = Object.assign({}, l.days || {}, wk);
           rv.paste = "";
-          touch(l);
+          touch2(l);
         } else if (k === "dellist") {
           const copy = JSON.parse(JSON.stringify(l));
           l.deleted = true;
-          touch(l);
+          touch2(l);
           rv.edit = false;
           rv.sel = null;
           api4.undoable(`Removed “${copy.name}”`, () => {
             const x = R.lists.find((y) => y.id === copy.id);
             Object.assign(x, copy, { deleted: false, at: Date.now() });
-            commit2();
+            commit3();
             rv.sel = copy.id;
             api4.rerender();
           });
@@ -7063,26 +7342,26 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
 
   // src/game/kudos.js
-  var KEY6 = "fox.kudos";
-  var load4 = () => {
+  var KEY7 = "fox.kudos";
+  var load5 = () => {
     try {
-      return Object.assign({ items: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(KEY6)) || {});
+      return Object.assign({ items: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(KEY7)) || {});
     } catch {
       return { items: [], updatedAt: 0 };
     }
   };
-  var K = load4();
-  var ref4 = null;
-  var chain3 = Promise.resolve();
-  var onChange5 = () => {
+  var K = load5();
+  var ref5 = null;
+  var chain4 = Promise.resolve();
+  var onChange6 = () => {
   };
-  var keep3 = () => {
+  var keep4 = () => {
     try {
-      localStorage.setItem(KEY6, JSON.stringify(K));
+      localStorage.setItem(KEY7, JSON.stringify(K));
     } catch {
     }
   };
-  function merge3(a, b) {
+  function merge4(a, b) {
     const m = /* @__PURE__ */ new Map();
     [...a.items || [], ...b && b.items || []].forEach((e) => {
       if (!e || !e.id) return;
@@ -7092,35 +7371,35 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return { items: [...m.values()].slice(-500), updatedAt: Math.max(a.updatedAt || 0, b && b.updatedAt || 0) };
   }
   function attachKudos(col, changed) {
-    onChange5 = changed;
-    ref4 = col.doc("kudos");
-    ref4.onSnapshot((snap) => {
+    onChange6 = changed;
+    ref5 = col.doc("kudos");
+    ref5.onSnapshot((snap) => {
       if (!snap.exists) {
-        if (K.items.length) push3();
+        if (K.items.length) push4();
         return;
       }
-      K = merge3(K, JSON.parse(JSON.stringify(snap.data() || {})));
-      keep3();
-      onChange5();
+      K = merge4(K, JSON.parse(JSON.stringify(snap.data() || {})));
+      keep4();
+      onChange6();
     }, () => {
     });
   }
-  function push3() {
-    if (!ref4) return;
-    chain3 = chain3.then(async () => {
+  function push4() {
+    if (!ref5) return;
+    chain4 = chain4.then(async () => {
       try {
-        const cur2 = await ref4.get();
-        if (cur2.exists) K = merge3(K, JSON.parse(JSON.stringify(cur2.data() || {})));
-        await ref4.set(JSON.parse(JSON.stringify(K)));
+        const cur2 = await ref5.get();
+        if (cur2.exists) K = merge4(K, JSON.parse(JSON.stringify(cur2.data() || {})));
+        await ref5.set(JSON.parse(JSON.stringify(K)));
       } catch {
       }
     });
   }
-  var commit3 = () => {
+  var commit4 = () => {
     K.updatedAt = Date.now();
-    keep3();
-    push3();
-    onChange5();
+    keep4();
+    push4();
+    onChange6();
   };
   var kudos = () => K.items.filter((e) => !e.deleted).sort((a, b) => (b.made || b.at || 0) - (a.made || a.at || 0));
   var kudosCount = () => kudos().length;
@@ -7129,7 +7408,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!text) return null;
     const e = { id: "k" + Date.now().toString(36) + Math.floor(Math.random() * 1e3), text, from: plain(String(from || "")).trim().slice(0, 60), at: Date.now(), made: Date.now() };
     K.items.push(e);
-    commit3();
+    commit4();
     return e;
   }
   function removeKudos(id) {
@@ -7138,11 +7417,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const copy = { ...e };
     K.items = K.items.filter((x) => x.id !== id);
     K.items.push({ id, deleted: true, at: Date.now() });
-    commit3();
+    commit4();
     return () => {
       K.items = K.items.filter((x) => x.id !== id);
       K.items.push({ ...copy, at: Date.now() });
-      commit3();
+      commit4();
     };
   }
   var COLS = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
@@ -7853,8 +8132,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       const side = mel2.x > 260 ? -1 : 1;
       let [gx, gy] = [[side * 44, 2], [-side * 44, 2], [side * 30, 26], [-side * 30, 26], [0, 34]].map(([dx, dy]) => [mel2.x + dx, mel2.y + dy]).find(([x, y]) => !outdoors(scene2) || !blocked(scene2, x, y)) || [mel2.x + side * 44, mel2.y + 2];
       if (!c.goal || Math.hypot(c.goal[0] - gx, c.goal[1] - gy) > 18) route(c, gx, gy);
-      const arrived = walk(c, 150, dt);
-      if (arrived && c.state === "coming") {
+      const arrived2 = walk(c, 150, dt);
+      if (arrived2 && c.state === "coming") {
         c.state = "waiting";
         c.dir = -side;
         if (!greeted.has(c.item.id)) {
@@ -7980,7 +8259,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     updatedAt: 0
   });
   var freshFox = () => ({ name: "Maple", xp: 0, days: 0, streak: 0, lastActive: null, coins: null, inv: null, plots: null, cool: {}, met: {}, gifts: {}, mailRead: {}, digest: { read: {}, lastAt: 0, mine: [] }, updatedAt: 0 });
-  var load5 = (k, f2) => {
+  var load6 = (k, f2) => {
     try {
       const v = JSON.parse(localStorage.getItem(k));
       return v ? Object.assign(f2(), v) : f2();
@@ -7988,12 +8267,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       return f2();
     }
   };
-  var S2 = load5("fox.today", freshToday);
-  var F = load5("fox.fox", freshFox);
-  var P = load5("fox.plan", () => ({ day: null, tasks: [] }));
-  var MAIL = load5("fox.mail", () => ({ items: [] }));
-  var ST = load5("fox.stats", () => ({}));
-  var LIB = load5("fox.library", () => ({ items: [] }));
+  var S2 = load6("fox.today", freshToday);
+  var F = load6("fox.fox", freshFox);
+  var P = load6("fox.plan", () => ({ day: null, tasks: [] }));
+  var MAIL = load6("fox.mail", () => ({ items: [] }));
+  var ST = load6("fox.stats", () => ({}));
+  var LIB = load6("fox.library", () => ({ items: [] }));
   var sampleCap = null;
   function migrate() {
     if (S2.day !== dayKey()) S2 = freshToday();
@@ -8073,12 +8352,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     if (!refs || !synced2[which]) return;
     clearTimeout(pending[which]);
-    pending[which] = setTimeout(() => push4(which), 500);
+    pending[which] = setTimeout(() => push5(which), 500);
   }
   var seen2 = { today: 0, fox: 0 };
-  async function push4(which, direct) {
+  async function push5(which, direct) {
     if (writing[which]) {
-      pending[which] = setTimeout(() => push4(which, direct), 400);
+      pending[which] = setTimeout(() => push5(which, direct), 400);
       return;
     }
     writing[which] = true;
@@ -8137,6 +8416,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!uid2) return;
     const col = db.collection("data/users/" + uid2);
     attachHestiaDb(col.doc("hestia"));
+    attachLetters(col, () => {
+      if (lettersOpen && !/^(ltText|ltDate)$/.test(document.activeElement?.id || "")) ctx();
+    });
+    setTimeout(() => writeReplies(sampleCap), 6e3);
     attachRoutines(col, () => {
       if (routOpen && !/^(rtName|rtNew|rtPaste)$/.test(document.activeElement?.id || "") && !document.activeElement?.dataset?.day && !document.activeElement?.dataset?.item) ctx();
     });
@@ -8296,6 +8579,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     compost: { n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster." },
     sprinkler: { n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them." }
   };
+  var lettersOpen = false;
   var trophyView = null;
   var routOpen = false;
   var kudosOpen = false;
@@ -8316,6 +8600,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   kudosOpen = false;
   routOpen = false;
   trophyView = null;
+  lettersOpen = false;
   var jv = { mode: "shelf", blobs: [], note: "" };
   var BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]];
   var CYCLE = 12;
@@ -8612,10 +8897,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const before = level();
     F.xp += n;
     if (level() > before) {
-      const L = LEVELS[level()];
+      const L2 = LEVELS[level()];
       setTimeout(() => {
         act("cheer");
-        speak(`We're ${L.name}s now 💕${L.gift ? " I got " + L.gift + "!" : ""}`, 6e3);
+        speak(`We're ${L2.name}s now 💕${L2.gift ? " I got " + L2.gift + "!" : ""}`, 6e3);
       }, 2600);
     }
   }
@@ -8888,6 +9173,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   setInterval(() => {
     if (S2.sleep && S2.sleep.until && Date.now() > S2.sleep.until) wakeUp();
     if (hushed() && !$("speech").hidden && Date.now() > speechLock && Date.now() - speechAt > 6e3) $("speech").hidden = true;
+    bedtimeTick();
     $("evan").style.display = evanHere() ? "" : "none";
     if (scene === "kidroom" && evanNight() && !kid.sleep) {
       kid.sleep = true;
@@ -9350,7 +9636,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       if (pending[w] && refs && synced2[w]) {
         clearTimeout(pending[w]);
         pending[w] = null;
-        push4(w, true);
+        push5(w, true);
       }
     });
   }
@@ -9366,9 +9652,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     F.digest.read[d.id] = Date.now();
     F.digest.lastAt = Date.now();
     S2.digestMark = S2.doneIds.length;
-    const keep4 = new Set([...LIB.items || [], ...F.digest.mine || []].map((x) => x && x.id));
+    const keep5 = new Set([...LIB.items || [], ...F.digest.mine || []].map((x) => x && x.id));
     Object.keys(F.digest.read).forEach((id) => {
-      if (!keep4.has(id)) delete F.digest.read[id];
+      if (!keep5.has(id)) delete F.digest.read[id];
     });
     gainXp(1);
     save2();
@@ -10183,6 +10469,7 @@ Then tell chat "wind down" whenever you're ready.`
       $("setVol").value = settings.musicVol;
       $("setSfx").checked = settings.sfx;
       $("setQuiet").checked = F.quietEvening !== false;
+      $("setBed").checked = F.bedLock !== false;
     }
     ["ctx", "questsView", "bagView", "mailView", "friendView", "calView", "settingsView", "chatView"].forEach((id) => $(id).hidden = id !== (views[view2] || view2));
     p.className = "panel " + (view2 === "quests" ? "cork" : view2 === "ctx" ? skin : "paper");
@@ -10218,6 +10505,7 @@ Then tell chat "wind down" whenever you're ready.`
     kudosOpen = false;
     routOpen = false;
     trophyView = null;
+    lettersOpen = false;
     selPlot = null;
     homeView = null;
     postOpen = false;
@@ -10289,6 +10577,7 @@ Then tell chat "wind down" whenever you're ready.`
     else if (kudosOpen && scene === "trophy") h = kudosPanel();
     else if (trophyView && scene === "trophy") h = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : trophyView === "affirm" ? affirmPanel(F.affirm, affirmBusy, !!sampleCap) : trophyView === "fountain" ? fountainPanel(!!sampleCap) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
     else if (routOpen && scene === "room") h = routinesPanel();
+    else if (lettersOpen && (scene === "room" || scene === "base")) h = lettersPanel(!!sampleCap);
     else if (postOpen && scene === "post") h = postPanel();
     else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
     else if (newsOpen && scene === "village") h = goodNewsHTML(myWins());
@@ -10396,6 +10685,29 @@ Then tell chat "wind down" whenever you're ready.`
     } });
     if (homeView && scene === "home") wireHestia(c, homeView);
     if (deskOpen && scene === "home") wireDesk(c, () => ctx());
+    c.querySelectorAll("[data-letters]").forEach((b) => b.onclick = () => {
+      journalOpen = false;
+      lettersOpen = true;
+      lv.mode = "home";
+      sfx("paper", true);
+      ctx();
+    });
+    if (lettersOpen && (scene === "room" || scene === "base")) wireLetters(c, {
+      rerender: () => ctx(),
+      sample: sampleCap,
+      toJournal: (t2) => {
+        const e = addEntry(t2, "letter");
+        if (e) {
+          sfx("chime");
+          flash("Saved to your journal");
+        }
+        return !!e;
+      },
+      sent: (k, d) => {
+        sfx("paper");
+        speak(k === "universe" ? "Posted. The universe always writes back. Keep an eye on the letterbox." : `Sealed. It'll arrive in your letterbox on ${(/* @__PURE__ */ new Date(d + "T00:00:00Z")).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}.`, 5e3);
+      }
+    });
     if (routOpen && scene === "room") wireRoutines(c, { rerender: () => ctx(), undoable, done: () => {
       sfx("coin");
       mprop("sparkle", mel.x, mel.y - 60);
@@ -10406,6 +10718,7 @@ Then tell chat "wind down" whenever you're ready.`
         drawScene();
       }, close: () => {
         trophyView = null;
+        lettersOpen = false;
         ctx();
         drawScene();
       } });
@@ -10414,6 +10727,7 @@ Then tell chat "wind down" whenever you're ready.`
         rerender: () => ctx(),
         coin: () => {
           trophyView = null;
+          lettersOpen = false;
           ctx();
           sfx("coin");
           mprop("sparkle", 260 + rnd(-20, 20), 400);
@@ -10480,6 +10794,7 @@ Then tell chat "wind down" whenever you're ready.`
       kudosOpen = false;
       routOpen = false;
       trophyView = null;
+      lettersOpen = false;
       ctx();
     });
     c.querySelectorAll("[data-bed]").forEach((b) => b.onclick = () => bedAction(b.dataset.bed));
@@ -10512,6 +10827,7 @@ Then tell chat "wind down" whenever you're ready.`
         kudosOpen = false;
         routOpen = false;
         trophyView = null;
+        lettersOpen = false;
         A.decompNow();
         drawScene();
       } else startBreath(+k);
@@ -10752,7 +11068,7 @@ Then tell chat "wind down" whenever you're ready.`
     creditEarly();
     dressMel();
     if (redraw) drawScene();
-    const L = level(), next = LEVELS[L + 1];
+    const L2 = level(), next = LEVELS[L2 + 1];
     $("title").firstChild.textContent = `${F.name}'s village`;
     $("trayName").textContent = F.name;
     if (document.activeElement !== $("paperNameIn")) $("paperNameIn").placeholder = paperName();
@@ -10761,16 +11077,16 @@ Then tell chat "wind down" whenever you're ready.`
     $("dateLine").textContent = d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }) + (F.streak >= 2 && F.lastActive === dayKey() ? ` · ${F.streak} cosy days in a row` : "");
     $("coins").textContent = F.coins;
     document.title = `${F.name}'s village`;
-    $("scarf").style.display = L >= 1 ? "" : "none";
-    $("plant").style.display = L >= 2 ? "" : "none";
-    $("lights").style.display = L >= 3 ? "" : "none";
-    $("bunting").style.display = L >= 4 ? "" : "none";
+    $("scarf").style.display = L2 >= 1 ? "" : "none";
+    $("plant").style.display = L2 >= 2 ? "" : "none";
+    $("lights").style.display = L2 >= 3 ? "" : "none";
+    $("bunting").style.display = L2 >= 4 ? "" : "none";
     $("crown").style.display = S2.crown ? "" : "none";
     pose();
     if (!speechLock) $("speech").textContent = plain(say2 ? say2.line : defaultLine());
-    const span = next ? next.xp - LEVELS[L].xp : 1, into = next ? F.xp - LEVELS[L].xp : 1, filled = Math.round(Math.min(1, into / span) * 5);
+    const span = next ? next.xp - LEVELS[L2].xp : 1, into = next ? F.xp - LEVELS[L2].xp : 1, filled = Math.round(Math.min(1, into / span) * 5);
     $("friendBody").innerHTML = `<p class="hearts" aria-label="${filled} of 5 hearts to next level">${Array.from({ length: 5 }, (_, i) => icon("heart", 22, i < filled ? "" : "faint")).join("")}</p>
-    <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed!"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>
+    <p class="muted">${esc(F.name)} is your ${LEVELS[L2].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed!"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>
     <h3 class="ph3">Village upgrades</h3>
     <p class="muted">${F.totalQuests || 0} quests finished so far. ${(() => {
       const nx = nextUpgrade(F.totalQuests || 0);
@@ -10865,6 +11181,7 @@ Then tell chat "wind down" whenever you're ready.`
       kudosOpen = false;
       routOpen = false;
       trophyView = null;
+      lettersOpen = false;
       homeView = null;
       postOpen = false;
       healthOpen = false;
@@ -10992,6 +11309,7 @@ Then tell chat "wind down" whenever you're ready.`
     kudosOpen = false;
     routOpen = false;
     trophyView = null;
+    lettersOpen = false;
     homeView = null;
     postOpen = false;
     healthOpen = false;
@@ -11265,6 +11583,14 @@ Then tell chat "wind down" whenever you're ready.`
       render();
       return;
     }
+    if (id === "letterbox" && arrived().length) {
+      lettersOpen = true;
+      lv.mode = "home";
+      sfx("paper");
+      speak("Post! Letters for you.", 3e3);
+      render();
+      return;
+    }
     if (id === "letterbox") {
       const p = paperWaiting();
       if (p) {
@@ -11314,6 +11640,90 @@ Then tell chat "wind down" whenever you're ready.`
       render();
     }
   }
+  var nightKey = () => {
+    const m = sgHM();
+    return m < 6 * 60 ? prevDay(dayKey()) : dayKey();
+  };
+  var bedNow = () => {
+    const m = sgHM();
+    return m >= 23 * 60 + 45 || m < 6 * 60;
+  };
+  function bedtimeTick() {
+    const m = sgHM(), nk = nightKey();
+    if (F.bedLock !== false && m >= 23 * 60 && m < 23 * 60 + 45) {
+      if (F.bedSaid !== nk + ":1") {
+        F.bedSaid = nk + ":1";
+        sfx("chime");
+        speak("It's 11. Time to start winding down: teeth, skincare, phone on charge. Bed by quarter to twelve.", 9e3, true);
+      } else if (m >= 23 * 60 + 30 && F.bedSaid === nk + ":1") {
+        F.bedSaid = nk + ":2";
+        sfx("chime");
+        speak("Fifteen minutes till bed. Off you pop. The village will keep.", 8e3, true);
+      }
+    }
+    const lock = F.bedLock !== false && bedNow() && F.bedSkip !== nk, el = $("bedLock");
+    if (el.hidden === lock) {
+      el.hidden = !lock;
+      document.body.classList.toggle("bedlocked", lock);
+      if (lock) {
+        route2 = [];
+        keys.clear();
+        openView = null;
+        closePanel();
+        if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+      }
+    }
+    if (lock) {
+      const left2 = (6 * 60 - m + 24 * 60) % (24 * 60);
+      $("bedLockLeft").textContent = `Good morning in ${Math.floor(left2 / 60)}h ${left2 % 60}m.`;
+    }
+  }
+  $("bedUp").onclick = () => {
+    if (!confirm("Get up just for tonight? Stay in bed comes back on tomorrow night.")) return;
+    F.bedSkip = nightKey();
+    save2();
+    bedtimeTick();
+    speak("Okay, just this once. Be gentle with yourself.", 5e3, true);
+  };
+  $("setBackup").onclick = async () => {
+    const data = {};
+    Object.keys(localStorage).filter((k) => k.startsWith("fox.")).forEach((k) => {
+      try {
+        data[k] = JSON.parse(localStorage.getItem(k));
+      } catch {
+        data[k] = localStorage.getItem(k);
+      }
+    });
+    const file = JSON.stringify({ game: "Maple's village", exportedAt: (/* @__PURE__ */ new Date()).toISOString(), data }, null, 1), name = `maples-village-backup-${dayKey()}.json`;
+    let dl = null;
+    try {
+      dl = await claude.use("downloads");
+    } catch {
+    }
+    if (!dl) {
+      $("setBackupNote").textContent = "Downloads aren't available in this view. Try the Claude app or claude.ai in a browser.";
+      return;
+    }
+    try {
+      await dl.save({ filename: name, data: file });
+      $("setBackupNote").textContent = `Saved ${name}. Keep it somewhere safe, like your Google Drive.`;
+      F.backupAt = Date.now();
+      save2();
+    } catch (e) {
+      $("setBackupNote").textContent = e && e.code === "declined" ? "No worries, nothing saved." : "Couldn't save the backup just now.";
+    }
+  };
+  $("setBed").onchange = (e) => {
+    F.bedLock = e.target.checked;
+    save2();
+    bedtimeTick();
+  };
+  ["keydown", "click", "pointerdown"].forEach((t2) => document.addEventListener(t2, (ev) => {
+    if (document.body.classList.contains("bedlocked") && !ev.target.closest("#bedLock")) {
+      ev.stopPropagation();
+      ev.preventDefault();
+    }
+  }, { capture: true }));
   function trophyCtx() {
     const r = revenueNow();
     return { F, ST, levels: LEVELS, levelIndex: level(), kudos: kudosCount(), journal: journalCount(), revenue: r && F.revTarget ? { ...r, target: Number(F.revTarget) } : null };
@@ -11394,6 +11804,14 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     affirmBusy = false;
     if (trophyView === "affirm") ctx();
   }
+  setInterval(() => {
+    const n = announce();
+    if (n.length) {
+      sfx("chime");
+      speak(n.some((e) => e.kind === "universe") ? "A letter from the universe has arrived. It's in your letterbox at home." : "A letter from your past self just arrived in your letterbox.", 6e3);
+    }
+    if (Math.random() < 0.2) writeReplies(sampleCap);
+  }, 3e4);
   setInterval(checkTrophies, 3e4);
   setTimeout(checkTrophies, 4e3);
   setTimeout(fetchObjectives, 9e3);
@@ -11834,13 +12252,13 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
       mel.tx = nx;
       mel.ty = ny;
     }
-    const arrived = stepTo2(mel, keys.size ? 190 : 220, dt);
-    if (arrived && !keys.size && mel.path && mel.path.length) {
+    const arrived2 = stepTo2(mel, keys.size ? 190 : 220, dt);
+    if (arrived2 && !keys.size && mel.path && mel.path.length) {
       const n = mel.path.shift();
       mel.tx = n[0];
       mel.ty = n[1];
       mel.moving = true;
-    } else if (arrived && !keys.size && (mel.wasMoving || mel.force)) {
+    } else if (arrived2 && !keys.size && (mel.wasMoving || mel.force)) {
       mel.force = false;
       if (route2.length && route2[0].scene === scene) {
         const l = route2.shift();

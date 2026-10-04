@@ -841,6 +841,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#ctx .rcheck li >> nth=0"); await page.waitForTimeout(200);
   check(await page.locator("#ctx .rcheck li.on").count() === 1 && await page.locator("#ctx .rcheck .rbox.on").count() === 1 && await page.locator("#ctx .rcheck .tk").count() === 0, "steps start as empty boxes and tick off with one tap");
   await page.click('#ctx [data-rt="sel"]:has-text("Beauty")'); await page.click('#ctx [data-rt="edit"]');
+  check(await page.locator('#ctx [data-day="sun"]').inputValue() === "Air shot micro-needling + face mask", "Mel's beauty week is already on the board");
+  await page.click("#ctx .rpaste summary");
   await page.fill("#rtPaste", "Mon: double cleanse\nTue - hair mask\nWednesday: exfoliate\nThu: sheet mask\nFri. nails\nSun: rest");
   await page.click('#ctx [data-rt="paste"]'); await page.waitForTimeout(150);
   check(await page.locator('#ctx [data-day="wed"]').inputValue() === "exfoliate", "a pasted week fills in the days");
@@ -909,6 +911,43 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => (window.__sunsamaTasks || []).length >= 1), "and the actions go to Sunsama");
   await page.click("#pclose");
   await page.screenshot({ path: join(shots, "courtyard.png") });
+  await page.close();
+}
+{
+  // Letters (writing desk), bedtime, backup
+  console.log("\nletters, bedtime, backup");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("dialog", d => d.accept());
+  await page.goto(url + "?reset=1&seed=1&time=10:30");
+  await page.waitForTimeout(800);
+  await page.locator('#world [data-place="home"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-spot="mydoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /My room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-spot="journal"]').dispatchEvent("click");
+  await page.waitForSelector("#ctx [data-letters]", { timeout: 15000 });
+  await page.click("#ctx [data-letters]"); await page.click('#ctx [data-lt="universe"]');
+  await page.fill("#ltText", "Dear Universe, I'm nervous about the Chord launch."); await page.click('#ctx [data-lt="senduni"]');
+  await page.waitForFunction(() => (JSON.parse(localStorage.getItem("fox.letters") || "{}").items || []).some(e => e.reply && e.reply.text), null, { timeout: 15000 }).catch(() => {});
+  check(await page.evaluate(() => { const e = (JSON.parse(localStorage.getItem("fox.letters")).items || [])[0]; return !!(e && e.reply && e.reply.text && e.reply.due > Date.now()); }), "a letter to the universe gets a reply, arriving a little later like post");
+  await page.click('#ctx [data-lt="future"]'); await page.fill("#ltText", "Hi future me. Hope Evan still loves trains."); await page.fill("#ltDate", "2027-10-04"); await page.click('#ctx [data-lt="sendfut"]');
+  check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.letters")).items || []).some(e => e.kind === "future" && e.deliver === "2027-10-04")), "a letter to future me is sealed until the chosen date");
+  await page.click('#ctx [data-lt="open"] >> nth=0'); await page.waitForTimeout(150);
+  check(/Sealed until/.test(await page.locator("#ctx").textContent()) || /On its way|wrote back/.test(await page.locator("#ctx").textContent()), "letters can be opened from the list");
+  await page.click("#pclose");
+  await page.click('[data-open="settings"]'); await page.click("#setBackup"); await page.waitForTimeout(300);
+  check(await page.evaluate(() => window.__download && /maples-village-backup-.*\.json/.test(window.__download.filename) && window.__download.size > 200), "Settings can download a backup of the whole game");
+  check(await page.locator("#setBed").isChecked(), "Stay in bed is on by default");
+  await page.click("#pclose");
+  await page.addInitScript(() => { window.__said = []; new MutationObserver(() => { const t = document.getElementById("speech"); if (t) window.__said.push(t.textContent); }).observe(document, {subtree: true, childList: true, characterData: true}); });
+  await page.goto(url + "?seed=1&time=23:02"); await page.waitForTimeout(3000);
+  check(await page.evaluate(() => (window.__said || []).some(t => /It's 11/.test(t))), "at 11pm Maple chivvies Mel to bed");
+  await page.goto(url + "?seed=1&time=23:50"); await page.waitForTimeout(2500);
+  check(!(await page.locator("#bedLock").isHidden()) && await page.evaluate(() => document.body.classList.contains("bedlocked")), "from 11:45pm the village rests: everything waits until 6am");
+  await page.locator("#chatBtn").dispatchEvent("click").catch(() => {}); await page.waitForTimeout(200);
+  check(await page.locator("#panel").isHidden(), "and nothing can be actioned");
+  await page.click("#bedUp"); await page.waitForTimeout(1500);
+  check(await page.locator("#bedLock").isHidden(), "unless Mel really needs to get up (just for tonight)");
   await page.close();
 }
 await browser.close();
