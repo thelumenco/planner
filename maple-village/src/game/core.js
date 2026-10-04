@@ -20,6 +20,8 @@ import { readPlan, PLAN_WORDS } from "./plans.js";
 import { loadClients, clientsPanel, askClients } from "./clients.js";
 import { loadPlans, planningPanel, askPlans } from "./planning.js";
 import { loadRevenue, revenuePanel, wireRevenue } from "./revenue.js";
+import { attachJars, jarsPanel, makeJar, emptyJar, jarById, addCustom, palette as jarPalette, shelf as jarShelf, MAX_BLOBS, MAX_KINDS } from "./jars.js";
+import { addJarEntry, removeEntry } from "./myroom.js";
 import { attachMyDocs, journalPanel, wireJournal, scratchPanel, wireScratch } from "./myroom.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 
@@ -56,7 +58,7 @@ function migrate(){
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
-setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music});
+setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf()});
 function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
@@ -120,6 +122,7 @@ async function initDb(){
   const uid = await user.id(); if (!uid) return;
   const col = db.collection("data/users/" + uid);
   attachHestiaDb(col.doc("hestia"));
+  attachJars(col, () => { if (scene === "room") drawScene(); if (jarsOpen && !/^(jNote|jcName)$/.test(document.activeElement?.id || "")) ctx(); });
   attachMyDocs(col, id => { if ((id === "journal" && journalOpen && document.activeElement?.id !== "jText") || (id === "scratch" && scratchOpen && document.activeElement?.id !== "scratchText")) ctx(); });
   attachFeeds(col, id => {
     if (/^health/.test(id) && ["lane", "chord", "chico"].includes(scene)) { drawScene(); ctx(); }
@@ -211,7 +214,8 @@ const SHED = {
   compost:   {n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster."},
   sprinkler: {n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."}
 };
-let shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false, clientsOpen = false, planOpen = false, revOpen = false;
+let shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false, clientsOpen = false, planOpen = false, revOpen = false, jarsOpen = false;
+let jv = {mode: "shelf", blobs: [], note: ""};   // the emotion shelf panel: shelf, make (picker) or jar (one jar)
 // Guided breathing in the calm corner: a ring grows as she breathes in (4 s), holds (2 s) and shrinks as she breathes out (6 s)
 const BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]], CYCLE = 12;
 let breath = null, breathT = null;   // {start, total (ms)}
@@ -238,6 +242,32 @@ function buyTool(id){
   speak(isHere("darren") ? `Darren's setting up the ${t.n.toLowerCase()} for you!` : `The ${t.n.toLowerCase()} is ready in the garden.`, 4500);
   if (id === "can") F.plots.forEach((p, i) => { if (p && p.crop && !p.wateredAt) p.wateredAt = Date.now(); });
   save();
+}
+// The emotion shelf: make a jar (up to 10 blobs from up to 4 feelings, a short note), open one, empty it or send it to
+// the journal as a polaroid. No coins: feelings aren't a task. Maple notices, but never reads the note.
+function wireJars(c){
+  const note = c.querySelector("#jNote"); if (note) note.oninput = () => { jv.note = note.value; };
+  c.querySelectorAll("[data-emo]").forEach(b => b.onclick = () => { const id = b.dataset.emo, kinds = new Set(jv.blobs);
+    if (jv.blobs.length >= MAX_BLOBS || (!kinds.has(id) && kinds.size >= MAX_KINDS)) return; jv.blobs.push(id); sfx("tap"); ctx(); });
+  c.querySelectorAll("[data-jarid]").forEach(b => b.onclick = () => { jv = {mode: "jar", id: b.dataset.jarid, blobs: [], note: ""}; sfx("paper", true); ctx(); });
+  c.querySelectorAll("[data-sw]").forEach(b => b.onclick = () => { const n = c.querySelector("#jcName"); jv.customName = n ? n.value : ""; jv.customColor = b.dataset.sw; ctx(); });
+  const cf = c.querySelector("#jcForm"); if (cf) cf.onsubmit = ev => { ev.preventDefault(); const e = addCustom(c.querySelector("#jcName").value, jv.customColor); if (e) { jv.adding = false; jv.customName = ""; if (new Set(jv.blobs).size < MAX_KINDS && jv.blobs.length < MAX_BLOBS) jv.blobs.push(e.id); } ctx(); };
+  c.querySelectorAll("[data-jar]").forEach(b => b.onclick = () => {
+    const k = b.dataset.jar, id = b.dataset.id;
+    if (k === "make") { jv = {mode: "make", blobs: [], note: ""}; }
+    else if (k === "shelf") { jv = {mode: "shelf", blobs: [], note: ""}; }
+    else if (k === "unblob") { jv.blobs.pop(); }
+    else if (k === "custom") { jv.adding = !jv.adding; }
+    else if (k === "place") { const j = makeJar(jv.blobs, jv.note); if (!j) return; sfx("chime");
+      const heavy = j.blobs.filter(x => ["anger", "sad", "fear", "anxious", "tired"].includes(x)).length >= Math.ceil(j.blobs.length/2);
+      speak(heavy ? "That's a big feeling. I'm here." : j.blobs.filter(x => ["joy", "love", "proud", "calm"].includes(x)).length > j.blobs.length/2 ? "A happy one. I love that for you." : "Kept safe on the shelf.", 4500);
+      jv = {mode: "shelf", blobs: [], note: ""}; drawScene(); }
+    else if (k === "empty") { const restore = emptyJar(id); if (restore) { undoable("Jar emptied", () => { restore(); drawScene(); ctx(); }); jv = {mode: "shelf", blobs: [], note: ""}; drawScene(); } }
+    else if (k === "send") { const j = jarById(id); if (!j) return; addJarEntry(j); const restore = emptyJar(id); sfx("paper");
+      speak("Tucked into your journal, with a little photo of the jar.", 4000);
+      undoable("Sent to your journal", () => { if (restore) restore(); removeEntry("p" + id); drawScene(); ctx(); }); jv = {mode: "shelf", blobs: [], note: ""}; drawScene(); }
+    ctx();
+  });
 }
 // Mel's bed: a 20-minute nap (wakes with a chime) or lying down until she gets up. Leaving the room wakes her.
 function bedAction(k){
@@ -646,7 +676,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, {mod
 let chatLog = (() => { try { return JSON.parse(localStorage.getItem("fox.chat")) || []; } catch { return []; } })(), chatBusy = false;
 const keepChat = () => { chatLog = chatLog.slice(-30); try { localStorage.setItem("fox.chat", JSON.stringify(chatLog)); } catch {} };
 const PLACES = {home: "home", house: "home", fridge: "home:fridge", kitchen: "home:kitchen", cupboard: "home:cupboard", treadmill: "home:treadmill", sofa: "home:sofa",
-  pond: "base:pond", garden: "farm", farm: "farm", shed: "base:shed", swing: "base:swing", letterbox: "base:letterbox", "animal run": "base:run", wardrobe: "room:wardrobe", outfit: "room:wardrobe", "my room": "room", bedroom: "room", bed: "room:bed", journal: "room:journal", scratchpad: "hall:whiteboard", whiteboard: "hall:whiteboard", run: "base:run", animals: "base:run", chickens: "base:run", rabbits: "base:run", market: "market", well: "village:well",
+  pond: "base:pond", garden: "farm", farm: "farm", shed: "base:shed", swing: "base:swing", letterbox: "base:letterbox", "animal run": "base:run", wardrobe: "room:wardrobe", outfit: "room:wardrobe", "my room": "room", bedroom: "room", bed: "room:bed", journal: "room:journal", jars: "room:jars", "emotion shelf": "room:jars", "emotion jar": "room:jars", scratchpad: "hall:whiteboard", whiteboard: "hall:whiteboard", run: "base:run", animals: "base:run", chickens: "base:run", rabbits: "base:run", market: "market", well: "village:well",
   "town hall": "hall", hall: "hall", "client table": "hall:clients", clients: "hall:clients", "planning table": "hall:table", plans: "hall:table", revenue: "hall:revenue", "revenue chart": "hall:revenue", chord: "chord", "makers lane": "lane:plot3", lane: "lane:plot3", library: "fresh", "fresh pages": "fresh", chico: "chico", "post office": "post", post: "post", town: "village:board"};
 function walkToPlace(name){
   const k = PLACES[String(name || "").toLowerCase().trim()]; if (!k) return null;
@@ -710,7 +740,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|revenue chart|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|revenue chart|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -1036,7 +1066,7 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1111,6 +1141,8 @@ function ctx(){
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>Your bed</h2>` + (S.sleep
       ? `<p class="sub">${S.sleep.until ? `Napping. Up in about ${Math.max(1, Math.ceil((S.sleep.until - Date.now())/M))} min.` : "Fast asleep. Sweet dreams."}</p><div class="actions"><button class="btn yes" data-bed="up">Get up</button></div>`
       : `<p class="sub">Fluffy pillows, cool sheets${(F.decor || {}).r_throw ? ", your knitted throw" : ""}.</p><div class="actions"><button class="btn primary" data-bed="nap">Nap for 20 minutes</button><button class="btn alt" data-bed="sleep">${sgHM() >= 20*60 || sgHM() < 5*60 ? "Go to sleep" : "Lie down"}</button></div>`);
+  } else if (jarsOpen && scene === "room") {
+    h = jarsPanel(jv);
   } else if (recOpen && scene === "room") {
     const on = sound.music, ct = currentTrack();
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>Record player</h2><p class="sub">${on ? `Playing: ${esc(TRACKS[ct].name)}.` : "Pick a record to put on."}</p>
@@ -1173,13 +1205,14 @@ function ctx(){
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
+  if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
   c.querySelectorAll('[data-rec="stop"]').forEach(b => b.onclick = () => { setMusic(false); speak("Needle up. Quiet time.", 2500); ctx(); drawScene(); });
   const rv = c.querySelector("#recVol"); if (rv) rv.oninput = () => setMusicVol(+rv.value);
   c.querySelectorAll("[data-calm]").forEach(b => b.onclick = () => { const k = b.dataset.calm;
-    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; A.decompNow(); drawScene(); } else startBreath(+k); });
+    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; A.decompNow(); drawScene(); } else startBreath(+k); });
   if (breath) tickBreath();
   if (journalOpen && scene === "room") wireJournal(c, undoable, e => { if (e) { sfx("chime"); speak(S.mode === "decompress" && S.decompFree ? "Written down. Now you can let it go." : "Page kept. Lovely.", 3500); } ctx(); });
   if (scratchOpen && scene === "hall") wireScratch(c, undoable, () => ctx());
@@ -1347,7 +1380,7 @@ function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
@@ -1382,7 +1415,7 @@ function go(target, x, y, fn){
     if (INNER[target]) { const I = INNER[target]; legs.push({scene:I.parent, x:I.door[0], y:I.door[1], fn:() => setScene(target, I.arrive)}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -1402,6 +1435,7 @@ function arriveSpot(id){
   if (id === "window") { const shut = F.curtains ? F.curtains === "closed" : (isDusk() || !!S.sleep); F.curtains = shut ? "open" : "closed"; sfx("paper", true); speak(shut ? "Curtains open. Hello, sky." : "Curtains closed. Cosy.", 2500); save(true); return; }
   if (id === "record") { recOpen = true; sfx("paper", true); render(); return; }
   if (id === "nook") { calmOpen = true; sfx("paper", true); render(); return; }
+  if (id === "jars") { jarsOpen = true; jv = {mode: "shelf", blobs: [], note: ""}; sfx("paper", true); render(); return; }
   if (id === "journal") { journalOpen = true; sfx("paper", true); render(); return; }
   if (id === "wardrobe") { wardOpen = true; ward.error = ""; sfx("paper", true); speak("Let's see what's hanging in here today.", 3000); render(); return; }
   if (id === "digest") { shelfOpen = true; speak(digestReady() ? (isHere("juniper") ? "Juniper's waving a digest at you!" : "A fresh digest is ready on the shelf.") : "Digests are rationed. Like dessert.", 3500); render(); return; }

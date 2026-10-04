@@ -2,6 +2,7 @@
 // Each is its own private doc in the per-user collection ("journal", "scratch"), separate from the game save so
 // typing never races the save. A browser copy in localStorage keeps them when the db isn't reachable.
 import { esc, plain, dayKey } from "../util.js";
+import { jarSVG, jarLabel } from "./jars.js";
 
 const JKEY = "fox.journal", SKEY = "fox.scratch";
 const load = (k, f) => { try { return Object.assign(f(), JSON.parse(localStorage.getItem(k)) || {}); } catch { return f(); } };
@@ -42,6 +43,13 @@ export function addEntry(text, kind){
   const e = {id: "j" + Date.now().toString(36), at: Date.now(), day: dayKey(), text, kind: kind || "page"};
   J = {entries: [e, ...J.entries].slice(0, 400), updatedAt: Date.now()}; keepJ(); pushJ(); return e;
 }
+// A jar sent from the emotion shelf: a polaroid of the jar (redrawn from its blobs and colours) plus its note
+export function addJarEntry(jar){
+  const label = jarLabel(jar), e = {id: "p" + jar.id, at: Date.now(), day: dayKey(), kind: "jar", text: jar.note || label,
+    jar: {id: jar.id, at: jar.at, blobs: jar.blobs, colors: jar.colors, label}};
+  J = {entries: [e, ...J.entries.filter(x => x.id !== e.id)].slice(0, 400), updatedAt: Date.now()}; keepJ(); pushJ(); return e;
+}
+export function removeEntry(id){ delEntry(id); }
 function delEntry(id){ J = {entries: J.entries.map(e => e.id === id ? {id, deleted: true, at: Date.now()} : e), updatedAt: Date.now()}; keepJ(); pushJ(); }
 const when = e => new Date(e.at).toLocaleDateString("en-GB", {weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Singapore"});
 export function journalPanel(decompress){
@@ -50,7 +58,7 @@ export function journalPanel(decompress){
     <p class="sub">${decompress ? "Three quick points from that call or moment. Then let it go." : esc(journalPrompt())}</p>
     <form id="jForm" class="jform"><label class="sr" for="jText">Journal entry</label><textarea id="jText" rows="6" maxlength="8000" placeholder="${decompress ? "1.\n2.\n3." : "Write anything..."}">${esc(draft)}</textarea>
     <div class="actions"><button class="btn primary small" type="submit">Keep this page</button></div></form>`;
-  if (list.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list.map(e => `<details><summary><b>${when(e)}</b> ${esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary><p>${esc(e.text).replace(/\n/g, "<br>")}</p><button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
+  if (list.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list.map(e => `<details${e.kind === "jar" ? " open" : ""}><summary><b>${when(e)}</b> ${e.kind === "jar" ? "A jar of " + esc(e.jar.label) : esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary>${e.kind === "jar" ? `<div class="polaroid"><div class="pphoto">${jarSVG(e.jar, 74)}</div><p class="pcap">${esc(new Date(e.jar.at).toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore"}))}</p></div>${e.jar.blobs && e.text !== e.jar.label ? `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>` : ""}` : `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>`}<button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
   return h;
 }
 export function wireJournal(root, undoable, done){

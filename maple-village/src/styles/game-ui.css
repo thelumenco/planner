@@ -421,3 +421,37 @@
 .rtable table{border-collapse:collapse;font-size:.84rem;margin:6px 0}.rtable td,.rtable th{padding:3px 12px 3px 0;text-align:left}
 .panel details.rtable > summary{font-family:Mulish,sans-serif;font-size:.8rem;font-weight:700;color:var(--peri2,#6E7FC8);cursor:pointer;list-style:revert;padding:0;margin:0}
 .panel details.rtable > summary::after{content:none}
+/* emotion jars */
+.jshelf{background:#F1E4CF;border-radius:10px;padding:10px 8px 0;margin:6px 0 10px;border:1px solid rgba(120,104,84,.18)}
+.jrow{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;justify-items:center;align-items:end;min-height:84px}
+.jplank{height:9px;background:#C9A27E;border-radius:3px;margin:0 -2px 10px;box-shadow:0 2px 0 rgba(120,104,84,.25)}
+.jslot{background:none;border:0;padding:0 0 2px;display:grid;justify-items:center;cursor:pointer;color:#6F675E}
+.jslot small{font-size:.66rem;line-height:1.2}.jslot.empty{cursor:default}
+.jslot:hover .jarsvg,.jslot:focus .jarsvg{transform:translateY(-3px)}.jarsvg{transition:transform .15s;overflow:visible}
+.jarmake{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+@media (max-width:480px){.jarmake{grid-template-columns:1fr;justify-items:center}}
+.jarbig{display:grid;justify-items:center;gap:2px;text-align:center}.jarbig .muted{font-size:.78rem;max-width:150px}
+.emos{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px}
+.emo{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border:1px solid rgba(120,104,84,.15);border-radius:8px;background:#FBF8F2;font-size:.76rem;color:#2F2B28;cursor:pointer}
+.emo:disabled{opacity:.35;cursor:not-allowed}.emo.add .plus{font-size:1.3rem;line-height:26px;color:#8A8279}
+.jcustom{align-items:center}.jcustom input{max-width:160px}
+.swatches{display:flex;gap:5px;flex-wrap:wrap}.sw{width:22px;height:22px;border-radius:50%;border:2px solid #FFFDF6;box-shadow:0 0 0 1px rgba(47,43,40,.3);cursor:pointer}.sw.on{box-shadow:0 0 0 2px #2F2B28}
+.jnote{width:100%;box-sizing:border-box;margin-top:10px;border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:8px 10px;font:inherit;font-size:.9rem;resize:vertical}
+.jardetail{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}
+.jnotecard{background:#FFFDF6;border:1px solid rgba(120,104,84,.15);border-radius:8px;padding:10px 12px;font-family:"Klee One",serif;font-weight:600;line-height:1.5;margin:6px 0}
+.map .blobdrop,.jarbig .blobdrop{animation:blobdrop .45s cubic-bezier(.3,1.4,.6,1)}
+@keyframes blobdrop{from{transform:translateY(-34px);opacity:.3}to{transform:none;opacity:1}}
+/* journal polaroid */
+.polaroid{display:inline-block;background:#FFFDF6;padding:8px 8px 4px;margin:8px 0;border:1px solid rgba(120,104,84,.2);box-shadow:0 6px 14px -8px rgba(47,43,40,.5);transform:rotate(-2deg)}
+.pphoto{background:linear-gradient(#EAF1F6,#F6EEF4);width:110px;height:118px;display:grid;place-items:center}
+.pcap{margin:4px 0 0;font-family:"Klee One",serif;font-weight:600;font-size:.86rem;text-align:center;color:#4A443E}
+@media (prefers-reduced-motion:reduce){.blobdrop{animation:none}}
+/* planning cards never widen the panel; Notion tables wrap */
+.pcards{grid-template-columns:minmax(0,1fr)}
+.pcard{min-width:0;overflow-wrap:anywhere}
+.ptable{overflow-x:auto;margin:6px 0}
+.ptable table{border-collapse:collapse;width:100%;font-size:.82rem;line-height:1.4}
+.ptable th,.ptable td{border-bottom:1px dashed #E4DDD2;padding:4px 6px 4px 0;text-align:left;vertical-align:top}
+.ptable th{font-weight:800;color:#5A534C}
+.emos{width:100%}
+@media (max-width:480px){.jarmake{grid-template-columns:1fr}.jarmake .emos{grid-template-columns:repeat(4,1fr)}}

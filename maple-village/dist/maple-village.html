@@ -902,6 +902,40 @@ body.nb-open{overflow:hidden}
 .rtable table{border-collapse:collapse;font-size:.84rem;margin:6px 0}.rtable td,.rtable th{padding:3px 12px 3px 0;text-align:left}
 .panel details.rtable > summary{font-family:Mulish,sans-serif;font-size:.8rem;font-weight:700;color:var(--peri2,#6E7FC8);cursor:pointer;list-style:revert;padding:0;margin:0}
 .panel details.rtable > summary::after{content:none}
+/* emotion jars */
+.jshelf{background:#F1E4CF;border-radius:10px;padding:10px 8px 0;margin:6px 0 10px;border:1px solid rgba(120,104,84,.18)}
+.jrow{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;justify-items:center;align-items:end;min-height:84px}
+.jplank{height:9px;background:#C9A27E;border-radius:3px;margin:0 -2px 10px;box-shadow:0 2px 0 rgba(120,104,84,.25)}
+.jslot{background:none;border:0;padding:0 0 2px;display:grid;justify-items:center;cursor:pointer;color:#6F675E}
+.jslot small{font-size:.66rem;line-height:1.2}.jslot.empty{cursor:default}
+.jslot:hover .jarsvg,.jslot:focus .jarsvg{transform:translateY(-3px)}.jarsvg{transition:transform .15s;overflow:visible}
+.jarmake{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+@media (max-width:480px){.jarmake{grid-template-columns:1fr;justify-items:center}}
+.jarbig{display:grid;justify-items:center;gap:2px;text-align:center}.jarbig .muted{font-size:.78rem;max-width:150px}
+.emos{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px}
+.emo{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border:1px solid rgba(120,104,84,.15);border-radius:8px;background:#FBF8F2;font-size:.76rem;color:#2F2B28;cursor:pointer}
+.emo:disabled{opacity:.35;cursor:not-allowed}.emo.add .plus{font-size:1.3rem;line-height:26px;color:#8A8279}
+.jcustom{align-items:center}.jcustom input{max-width:160px}
+.swatches{display:flex;gap:5px;flex-wrap:wrap}.sw{width:22px;height:22px;border-radius:50%;border:2px solid #FFFDF6;box-shadow:0 0 0 1px rgba(47,43,40,.3);cursor:pointer}.sw.on{box-shadow:0 0 0 2px #2F2B28}
+.jnote{width:100%;box-sizing:border-box;margin-top:10px;border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:8px 10px;font:inherit;font-size:.9rem;resize:vertical}
+.jardetail{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}
+.jnotecard{background:#FFFDF6;border:1px solid rgba(120,104,84,.15);border-radius:8px;padding:10px 12px;font-family:"Klee One",serif;font-weight:600;line-height:1.5;margin:6px 0}
+.map .blobdrop,.jarbig .blobdrop{animation:blobdrop .45s cubic-bezier(.3,1.4,.6,1)}
+@keyframes blobdrop{from{transform:translateY(-34px);opacity:.3}to{transform:none;opacity:1}}
+/* journal polaroid */
+.polaroid{display:inline-block;background:#FFFDF6;padding:8px 8px 4px;margin:8px 0;border:1px solid rgba(120,104,84,.2);box-shadow:0 6px 14px -8px rgba(47,43,40,.5);transform:rotate(-2deg)}
+.pphoto{background:linear-gradient(#EAF1F6,#F6EEF4);width:110px;height:118px;display:grid;place-items:center}
+.pcap{margin:4px 0 0;font-family:"Klee One",serif;font-weight:600;font-size:.86rem;text-align:center;color:#4A443E}
+@media (prefers-reduced-motion:reduce){.blobdrop{animation:none}}
+/* planning cards never widen the panel; Notion tables wrap */
+.pcards{grid-template-columns:minmax(0,1fr)}
+.pcard{min-width:0;overflow-wrap:anywhere}
+.ptable{overflow-x:auto;margin:6px 0}
+.ptable table{border-collapse:collapse;width:100%;font-size:.82rem;line-height:1.4}
+.ptable th,.ptable td{border-bottom:1px dashed #E4DDD2;padding:4px 6px 4px 0;text-align:left;vertical-align:top}
+.ptable th{font-weight:800;color:#5A534C}
+.emos{width:100%}
+@media (max-width:480px){.jarmake{grid-template-columns:1fr}.jarmake .emos{grid-template-columns:repeat(4,1fr)}}
 </style>
 </head>
 <body>
@@ -1603,7 +1637,7 @@ body.nb-open{overflow:hidden}
   var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
   var ROOMS = {
     hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [448, 262], B: [110, 258], C: [420, 474], D: [334, 266], E: [118, 474] }, stations: [
-      ["table", "Planning table", "C", "table", /plan|strategy|review|ceo|goal|week|month|quarter|budget/, "Your week, month and quarter, from Notion."],
+      ["table", "Planning table", "C", "plantable", /plan|strategy|review|ceo|goal|week|month|quarter|budget/, "Your week, month and quarter, from Notion."],
       ["whiteboard", "Whiteboard", "B", "whiteboard", /brainstorm|idea|map|outline|launch|offer|pricing/, "Fresh marker, blank board."],
       ["revenue", "Revenue chart", "D", "chartstand", /invoice|revenue|sales|finance|money|budget|pricing|accounts/, "How the money's flowing, from Chord."],
       ["shelf", "Bookshelf", "A", "shelf", /read|research|learn|course|study/, "Smart books, cosy spines."],
@@ -1648,13 +1682,14 @@ body.nb-open{overflow:hidden}
       ["office", "Darren's desk", "G", "office", null, "Darren's home office. Shh, he might be on a call."]
     ] },
     // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
-    room: { name: "My room", wall: "#EFE3EE", trim: "var(--blush)", noBoard: true, pos: { A: [130, 290], W: [262, 206], B: [440, 262], E: [62, 396], C: [66, 500], D: [434, 556] }, stations: [
+    room: { name: "My room", wall: "#EFE3EE", trim: "var(--blush)", noBoard: true, pos: { A: [130, 290], W: [262, 206], B: [440, 262], E: [62, 396], C: [66, 500], D: [434, 556], J: [260, 594] }, stations: [
       ["bed", "Bed", "A", "bed", null, "Your bed. Fluffy pillows, cool sheets."],
       ["window", "Window", "W", "curtwindow", null, "Curtains open, curtains shut.", 20],
       ["wardrobe", "Wardrobe", "B", "wardrobe", null, "Today's outfits are hanging in here.", 30],
       ["record", "Record player", "E", "record", null, "Pop a record on."],
       ["nook", "Calm corner", "C", "calm", null, "Cushions, a candle, one slow breath."],
-      ["journal", "Writing desk", "D", "writedesk", null, "Your journal lives in the top drawer."]
+      ["journal", "Writing desk", "D", "writedesk", null, "Your journal lives in the top drawer."],
+      ["jars", "Emotion shelf", "J", "jarshelf", null, "Feelings, kept safe in jars.", -78]
     ] },
     market: { name: "Market", wall: "#F8E5E2", trim: "var(--blush)", stations: [
       ["stall", "Shop counter", "M", "shopcounter", null, "Welcome in! Have a browse."]
@@ -2048,6 +2083,227 @@ body.nb-open{overflow:hidden}
     return `<g transform="scale(${s})" ${INK}><ellipse cx="0" cy="-6" rx="10" ry="7" fill="${c}"/><circle cx="-10" cy="-8" r="2.6" fill="#FFFDF6"/><circle cx="8" cy="-11" r="5.2" fill="${c}"/><ellipse cx="6" cy="-20" rx="1.8" ry="5.5" fill="${c}" transform="rotate(${sad ? -40 : -10} 6 -16)"/><ellipse cx="10" cy="-20" rx="1.8" ry="5.5" fill="${c}" transform="rotate(${sad ? 30 : 12} 10 -16)"/><circle cx="10" cy="-12" r=".9" fill="var(--line)" stroke="none"/><circle cx="13" cy="-10" r=".9" fill="var(--rose)" stroke="none"/></g>`;
   }
 
+  // src/game/jars.js
+  var EMOTIONS = [
+    { id: "joy", name: "Joy", color: "#f7cf1d", mark: "sun" },
+    { id: "sad", name: "Sadness", color: "#2a78d6", mark: "drop" },
+    { id: "anger", name: "Anger", color: "#c42b3a", mark: "zig" },
+    { id: "fear", name: "Fear", color: "#4a3aa7", mark: "wave" },
+    { id: "disgust", name: "Disgust", color: "#008300", mark: "squig" },
+    { id: "calm", name: "Calm", color: "#1baf7a", mark: "line" },
+    { id: "love", name: "Love", color: "#f08fb4", mark: "heart" },
+    { id: "anxious", name: "Anxious", color: "#ea6a1f", mark: "dots" },
+    { id: "tired", name: "Tired", color: "#8a8a93", mark: "z" },
+    { id: "proud", name: "Proud", color: "#7a4a1e", mark: "star" }
+  ];
+  var CUSTOM_COLOURS = ["#0e6b73", "#7d2d6b", "#7fb8e8", "#a6c832", "#e0a46b", "#3b3b44", "#c9a3e8", "#5c8a3a"];
+  var MAX_BLOBS = 10;
+  var MAX_KINDS = 4;
+  var SLOTS = 10;
+  var KEY = "fox.jars";
+  var load = () => {
+    try {
+      return Object.assign({ jars: [], custom: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(KEY)) || {});
+    } catch {
+      return { jars: [], custom: [], updatedAt: 0 };
+    }
+  };
+  var D = load();
+  var ref = null;
+  var chain = Promise.resolve();
+  var onChange = () => {
+  };
+  var keep = () => {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(D));
+    } catch {
+    }
+  };
+  function merge(a, b) {
+    const by = (xs, ys) => {
+      const m = /* @__PURE__ */ new Map();
+      [...xs || [], ...ys || []].forEach((e) => {
+        if (!e || !e.id) return;
+        const o = m.get(e.id);
+        if (!o || (e.at || 0) > (o.at || 0)) m.set(e.id, e);
+      });
+      return [...m.values()];
+    };
+    return { jars: by(a.jars, b && b.jars).slice(-60), custom: by(a.custom, b && b.custom).slice(-24), updatedAt: Math.max(a.updatedAt || 0, b && b.updatedAt || 0) };
+  }
+  function attachJars(col, changed) {
+    onChange = changed;
+    ref = col.doc("jars");
+    ref.onSnapshot((snap) => {
+      if (!snap.exists) {
+        if (D.jars.length || D.custom.length) push();
+        return;
+      }
+      D = merge(D, JSON.parse(JSON.stringify(snap.data() || {})));
+      keep();
+      onChange();
+    }, () => {
+    });
+  }
+  function push() {
+    if (!ref) return;
+    chain = chain.then(async () => {
+      try {
+        const cur2 = await ref.get();
+        if (cur2.exists) D = merge(D, JSON.parse(JSON.stringify(cur2.data() || {})));
+        await ref.set(JSON.parse(JSON.stringify(D)));
+      } catch {
+      }
+    });
+  }
+  var commit = () => {
+    D.updatedAt = Date.now();
+    keep();
+    push();
+    onChange();
+  };
+  var palette = () => [...EMOTIONS, ...D.custom.filter((c) => !c.deleted).map((c) => ({ id: c.id, name: c.name, color: c.color, mark: "dot", custom: true }))];
+  var emo = (id) => palette().find((e) => e.id === id) || { id, name: "Feeling", color: "#B9B0A4", mark: "dot" };
+  var shelf = () => {
+    const s = Array(SLOTS).fill(null);
+    D.jars.filter((j) => !j.deleted && j.slot != null).forEach((j) => {
+      if (j.slot >= 0 && j.slot < SLOTS && !s[j.slot]) s[j.slot] = j;
+    });
+    return s;
+  };
+  var jarById = (id) => D.jars.find((j) => j.id === id && !j.deleted) || null;
+  var freeSlot = () => shelf().findIndex((x) => !x);
+  function addCustom(name, color) {
+    name = plain(String(name || "")).trim().slice(0, 20);
+    if (!name) return null;
+    const c = { id: "c" + Date.now().toString(36), name: name[0].toUpperCase() + name.slice(1), color: CUSTOM_COLOURS.includes(color) ? color : CUSTOM_COLOURS[0], at: Date.now() };
+    D.custom.push(c);
+    commit();
+    return c;
+  }
+  function makeJar(blobs, note2) {
+    const slot2 = freeSlot();
+    if (slot2 < 0 || !blobs.length) return null;
+    const j = {
+      id: "j" + Date.now().toString(36),
+      at: Date.now(),
+      slot: slot2,
+      blobs: blobs.slice(0, MAX_BLOBS),
+      note: plain(String(note2 || "")).trim().slice(0, 280),
+      colors: Object.fromEntries([...new Set(blobs)].map((id) => {
+        const e = emo(id);
+        return [id, { name: e.name, color: e.color, mark: e.mark }];
+      }))
+    };
+    D.jars.push(j);
+    commit();
+    return j;
+  }
+  function emptyJar(id) {
+    const j = jarById(id);
+    if (!j) return null;
+    D.jars = D.jars.map((x) => x.id === id ? { id, at: Date.now(), deleted: true } : x);
+    commit();
+    return () => {
+      if (shelf()[j.slot]) {
+        const s = freeSlot();
+        if (s < 0) return;
+        j.slot = s;
+      }
+      D.jars = D.jars.map((x) => x.id === id ? Object.assign({}, j, { at: Date.now() }) : x);
+      commit();
+    };
+  }
+  var rnd2 = (seed, i) => {
+    let h = 2166136261;
+    for (const ch of seed + ":" + i) {
+      h ^= ch.charCodeAt(0);
+      h = Math.imul(h, 16777619);
+    }
+    return (h >>> 0) % 1e3 / 1e3;
+  };
+  function markPath(m, x, y, r) {
+    const s = r * 0.42, ink2 = `fill="none" stroke="rgba(255,255,255,.92)" stroke-width="${(r * 0.16).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"`;
+    switch (m) {
+      case "sun":
+        return `<circle cx="${x}" cy="${y}" r="${(s * 0.55).toFixed(2)}" ${ink2}/>`;
+      case "drop":
+        return `<path d="M${x} ${y - s} q${s * 0.9} ${s * 1.1} 0 ${s * 1.9} q${-s * 0.9} ${-s * 0.8} 0 ${-s * 1.9}z" ${ink2}/>`;
+      case "zig":
+        return `<path d="M${x - s} ${y} l${s * 0.5} ${-s * 0.6} l${s * 0.5} ${s * 1.2} l${s * 0.5} ${-s * 1.2} l${s * 0.5} ${s * 0.6}" ${ink2}/>`;
+      case "wave":
+        return `<path d="M${x - s} ${y} q${s * 0.5} ${-s * 0.8} ${s} 0 q${s * 0.5} ${s * 0.8} ${s} 0" ${ink2}/>`;
+      case "squig":
+        return `<path d="M${x - s * 0.8} ${y - s * 0.5} l${s * 1.6} ${s} M${x + s * 0.8} ${y - s * 0.5} l${-s * 1.6} ${s}" ${ink2}/>`;
+      case "line":
+        return `<path d="M${x - s} ${y} h${s * 2}" ${ink2}/>`;
+      case "heart":
+        return `<path d="M${x} ${y + s * 0.7} c${-s * 1.4} ${-s * 0.9} ${-s * 0.9} ${-s * 1.9} 0 ${-s * 1.1} c${s * 0.9} ${-s * 0.8} ${s * 1.4} ${s * 0.2} 0 ${s * 1.1}z" ${ink2}/>`;
+      case "dots":
+        return `<g fill="rgba(255,255,255,.92)"><circle cx="${x - s * 0.6}" cy="${y}" r="${(r * 0.1).toFixed(2)}"/><circle cx="${x}" cy="${y}" r="${(r * 0.1).toFixed(2)}"/><circle cx="${x + s * 0.6}" cy="${y}" r="${(r * 0.1).toFixed(2)}"/></g>`;
+      case "z":
+        return `<path d="M${x - s * 0.6} ${y - s * 0.6} h${s * 1.2} l${-s * 1.2} ${s * 1.2} h${s * 1.2}" ${ink2}/>`;
+      case "star":
+        return `<path d="M${x} ${y - s} l${s * 0.3} ${s * 0.7} l${s * 0.7} ${s * 0.05} l${-s * 0.55} ${s * 0.45} l${s * 0.2} ${s * 0.75} l${-s * 0.65} ${-s * 0.4} l${-s * 0.65} ${s * 0.4} l${s * 0.2} ${-s * 0.75} l${-s * 0.55} ${-s * 0.45} l${s * 0.7} ${-s * 0.05}z" ${ink2}/>`;
+      default:
+        return `<circle cx="${x}" cy="${y}" r="${(r * 0.12).toFixed(2)}" fill="rgba(255,255,255,.92)"/>`;
+    }
+  }
+  function jarArt(jar, opts = {}) {
+    const blobs = jar && jar.blobs || [], col = (id) => jar && jar.colors && jar.colors[id] || emo(id), seed = jar && jar.id || "new";
+    const pos = [];
+    for (let i = 0, row2 = 0, k = 0; i < blobs.length; i++) {
+      const per = row2 % 2 ? 2 : 3;
+      pos.push([14 + (k + (row2 % 2 ? 0.5 : 0)) * 16 + (rnd2(seed, i) - 0.5) * 3, 68 - row2 * 12.5 + (rnd2(seed, i + 50) - 0.5) * 2]);
+      if (++k >= per) {
+        k = 0;
+        row2++;
+      }
+    }
+    const b = blobs.map((id, i) => {
+      const c = col(id), [x, y] = pos[i], r = 7.6 + rnd2(seed, i + 9) * 0.9;
+      return `<g class="${opts.anim && i === blobs.length - 1 ? "blobdrop" : ""}"><ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${(r * 1.12).toFixed(2)}" ry="${r.toFixed(2)}" fill="${c.color}" stroke="rgba(47,43,40,.55)" stroke-width=".8"/><ellipse cx="${(x - r * 0.4).toFixed(1)}" cy="${(y - r * 0.45).toFixed(1)}" rx="${(r * 0.35).toFixed(2)}" ry="${(r * 0.22).toFixed(2)}" fill="rgba(255,255,255,.45)"/>${markPath(c.mark, x, y + 0.5, r)}</g>`;
+    }).join("");
+    const glow = blobs.length ? `<ellipse cx="30" cy="62" rx="24" ry="20" fill="${col(blobs[blobs.length - 1]).color}" opacity=".12"/>` : "";
+    return `<g class="jar">${glow}<path d="M8 20 q-3 4 -3 10 v40 q0 7 7 7 h36 q7 0 7 -7 v-40 q0 -6 -3 -10z" fill="rgba(220,235,245,.45)" stroke="var(--line, #3b3530)" stroke-width="1.4"/>${b}
+    <path d="M10 24 v40" stroke="rgba(255,255,255,.75)" stroke-width="2.4" stroke-linecap="round"/><rect x="10" y="12" width="40" height="9" rx="2.5" fill="#C9A27E" stroke="var(--line, #3b3530)" stroke-width="1.3"/><path d="M14 16.5 h32" stroke="rgba(47,43,40,.25)" stroke-width="1"/></g>`;
+  }
+  var jarSVG = (jar, size = 60, opts) => `<svg class="jarsvg" viewBox="0 0 60 80" width="${size}" height="${Math.round(size * 4 / 3)}" aria-hidden="true">${jarArt(jar, opts)}</svg>`;
+  var jarLabel = (j) => [...new Set(j.blobs)].map((id) => {
+    const n = j.blobs.filter((x) => x === id).length, e = j.colors && j.colors[id] || emo(id);
+    return `${e.name}${n > 1 ? " ×" + n : ""}`;
+  }).join(", ");
+  var when = (at) => new Date(at).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Singapore" });
+  function jarsPanel(v) {
+    const s = shelf(), full = freeSlot() < 0;
+    if (v.mode === "make") {
+      const kinds = [...new Set(v.blobs)], pal = palette();
+      return `<span class="tape gingham" aria-hidden="true"></span><h2>Make a jar</h2><p class="sub">Tap a feeling to drop a blob in. Up to ${MAX_BLOBS} blobs, from up to ${MAX_KINDS} feelings.</p>
+      <div class="jarmake"><div class="jarbig">${jarSVG({ id: "new", blobs: v.blobs }, 120, { anim: true })}<p class="muted">${v.blobs.length}/${MAX_BLOBS} ${v.blobs.length ? "· " + esc(jarLabel({ blobs: v.blobs })) : ""}</p>${v.blobs.length ? `<button class="btn alt small" data-jar="unblob">Undo last blob</button>` : ""}</div>
+      <div class="emos">${pal.map((e) => {
+        const off = v.blobs.length >= MAX_BLOBS || !kinds.includes(e.id) && kinds.length >= MAX_KINDS;
+        return `<button class="emo" data-emo="${esc(e.id)}" ${off ? "disabled" : ""}><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><ellipse cx="12" cy="12" rx="10" ry="9" fill="${e.color}" stroke="rgba(47,43,40,.55)" stroke-width=".8"/>${markPath(e.mark, 12, 12.5, 9)}</svg><span>${esc(e.name)}</span></button>`;
+      }).join("")}
+        <button class="emo add" data-jar="custom"><span class="plus">+</span><span>Your own</span></button></div></div>
+      ${v.adding ? `<form class="row jcustom" id="jcForm"><label class="sr" for="jcName">Feeling name</label><input id="jcName" maxlength="20" placeholder="e.g. Overwhelmed" value="${esc(v.customName || "")}"><div class="swatches">${CUSTOM_COLOURS.map((c) => `<button type="button" class="sw${(v.customColor || CUSTOM_COLOURS[0]) === c ? " on" : ""}" data-sw="${c}" style="background:${c}" aria-label="colour ${c}"></button>`).join("")}</div><button class="btn small" type="submit">Add</button></form>` : ""}
+      <label class="sr" for="jNote">A short note</label><textarea id="jNote" class="jnote" rows="2" maxlength="280" placeholder="A short note, if you like: what happened, what you need...">${esc(v.note || "")}</textarea>
+      <div class="actions"><button class="btn primary" data-jar="place" ${v.blobs.length && !full ? "" : "disabled"}>Put it on the shelf</button><button class="btn alt small" data-jar="shelf">Back to the shelf</button></div>
+      ${full ? `<p class="muted">The shelf's full. Empty a jar or send one to your journal first.</p>` : ""}`;
+    }
+    if (v.mode === "jar") {
+      const j = jarById(v.id);
+      if (!j) return jarsPanel({ mode: "shelf" });
+      return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(when(j.at))}</h2>
+      <div class="jardetail">${jarSVG(j, 110)}<div><p class="sub">${esc(jarLabel(j))}</p>${j.note ? `<p class="jnotecard">${esc(j.note)}</p>` : `<p class="muted">No note in this one.</p>`}</div></div>
+      <div class="actions"><button class="btn primary small" data-jar="send" data-id="${esc(j.id)}">Send to my journal</button><button class="btn alt small" data-jar="empty" data-id="${esc(j.id)}">Empty this jar</button><button class="btn alt small" data-jar="shelf">Back to the shelf</button></div>`;
+    }
+    const row2 = (r) => `<div class="jrow">${s.slice(r * 5, r * 5 + 5).map((j, i) => j ? `<button class="jslot" data-jarid="${esc(j.id)}" aria-label="Jar from ${esc(when(j.at))}: ${esc(jarLabel(j))}">${jarSVG(j, 52)}<small>${esc(new Date(j.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Asia/Singapore" }))}</small></button>` : `<span class="jslot empty" aria-hidden="true"><svg viewBox="0 0 60 80" width="52" height="69"><ellipse cx="30" cy="74" rx="18" ry="3" fill="rgba(120,104,84,.15)"/></svg><small>&nbsp;</small></span>`).join("")}</div>`;
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>Emotion shelf</h2><p class="sub">${s.filter(Boolean).length ? "Tap a jar to read its note." : "Feelings, kept safe in jars. Make your first one."}</p>
+    <div class="jshelf">${row2(0)}<div class="jplank"></div>${row2(1)}<div class="jplank"></div></div>
+    <div class="actions"><button class="btn primary" data-jar="make">${full ? "Make a jar (shelf full)" : "Make a jar"}</button></div>
+    ${full ? `<p class="muted">The shelf's full. Tap a jar to empty it or send it to your journal, then make a new one.</p>` : ""}`;
+  }
+
   // src/art/buildings.js
   var wrap = (id, label2, tapeCol, cx, baseY, halfW, art2, lines) => `<g data-place="${id}" aria-label="${label2}"><ellipse class="hov" cx="${cx}" cy="${baseY + 4}" rx="${halfW + 14}" ry="10" style="fill:var(--butter)"/>
     ${sk(art2, lines)}${tapeLabel(cx, baseY + 20, label2, tapeCol, 11.5)}</g>`;
@@ -2175,10 +2431,10 @@ body.nb-open{overflow:hidden}
   }
   var flowers = (pts) => pts.map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="2.6" style="fill:${c}"/><circle cx="${x}" cy="${y}" r="1" fill="#FFF6D8"/>`).join("");
   function villageArt() {
-    const D2 = VILLAGE;
+    const D3 = VILLAGE;
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="120" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="420" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="200" cy="560" rx="80" ry="40" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M260 322 L260 ${D2.hall.door[1]} M260 322 C200 300 120 290 ${D2.fresh.door[0]} ${D2.fresh.door[1]} M260 322 C200 380 120 430 ${D2.news.door[0]} ${D2.news.door[1]} M260 322 C320 380 410 420 ${D2.post.door[0]} ${D2.post.door[1]} M290 316 C350 290 400 250 ${D2.toLane.door[0]} ${D2.toLane.door[1]} M260 322 L260 ${D2.toBase.door[1]} M260 540 C290 560 310 570 ${D2.bench.door[0]} ${D2.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M260 322 L260 ${D3.hall.door[1]} M260 322 C200 300 120 290 ${D3.fresh.door[0]} ${D3.fresh.door[1]} M260 322 C200 380 120 430 ${D3.news.door[0]} ${D3.news.door[1]} M260 322 C320 380 410 420 ${D3.post.door[0]} ${D3.post.door[1]} M290 316 C350 290 400 250 ${D3.toLane.door[0]} ${D3.toLane.door[1]} M260 322 L260 ${D3.toBase.door[1]} M260 540 C290 560 310 570 ${D3.bench.door[0]} ${D3.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
     ${flowers([[30, 262, "#EFA3A6"], [44, 270, "#F3C969"], [150, 206, "#C3CDEE"], [372, 206, "#EFA3A6"], [488, 270, "#F3C969"], [300, 448, "#EFA3A6"], [214, 450, "#C3CDEE"], [470, 540, "#C3CDEE"], [20, 430, "#F3C969"], [505, 380, "#EFA3A6"]])}
     ${tree(170, 64, 1)}${tree(350, 64, 1)}${tree(26, 96, 1.05)}${tree(494, 96, 1.05)}${tree(24, 350, 0.9)}${tree(498, 330, 0.9)}${tree(504, 520, 0.85)}${tree(190, 470, 0.8)}${tree(330, 470, 0.8)}
@@ -2240,7 +2496,7 @@ body.nb-open{overflow:hidden}
       ${sk(`<rect x="314" y="560" width="40" height="7" rx="2" style="fill:var(--wood)"/><rect x="314" y="548" width="40" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="314" y="560" width="40" height="7" rx="2"/><rect x="314" y="548" width="40" height="6" rx="2"/><path d="M318 554 v6 M350 554 v6 M318 567 v9 M350 567 v9"/>`)}</g>`;
   }
   function baseArt() {
-    const D2 = VILLAGE;
+    const D3 = VILLAGE;
     const grown = (G.F().plots || []).filter((p) => p && p.crop).length;
     const sprouts = Array.from({ length: Math.min(6, grown) }, (_, i) => {
       const x = 58 + i % 3 * 44, y = 430 + Math.floor(i / 3) * 24;
@@ -2252,7 +2508,7 @@ body.nb-open{overflow:hidden}
     <g filter="url(#wob)">${waterBand(40, 98)}<path d="M478 94 C470 180 500 300 470 400 C462 430 458 450 452 474" fill="none" style="stroke:var(--water)" stroke-width="14" stroke-linecap="round"/></g>
     ${ripples([[60, 66], [150, 78], [350, 62], [420, 80]])}${ducks(76, false, 20)}
     <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 44 Q65 36 130 43 T260 42 T390 44 T520 40 M0 100 Q65 104 130 95 T260 98 T390 96 T520 102"/></g>
-    <g filter="url(#wob)"><path d="M260 112 L260 ${D2.home.door[1]} M260 326 C200 360 130 420 ${D2.farm.door[0]} ${D2.farm.door[1]} M260 326 C290 420 300 500 ${D2.pond.door[0]} ${D2.pond.door[1]} M266 312 C330 300 390 290 ${D2.shed.door[0]} ${D2.shed.door[1]} M254 318 C200 320 150 320 ${D2.swing.door[0]} ${D2.swing.door[1]} M290 500 C270 552 240 566 ${D2.run.door[0]} ${D2.run.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M260 112 L260 ${D3.home.door[1]} M260 326 C200 360 130 420 ${D3.farm.door[0]} ${D3.farm.door[1]} M260 326 C290 420 300 500 ${D3.pond.door[0]} ${D3.pond.door[1]} M266 312 C330 300 390 290 ${D3.shed.door[0]} ${D3.shed.door[1]} M254 318 C200 320 150 320 ${D3.swing.door[0]} ${D3.swing.door[1]} M290 500 C270 552 240 566 ${D3.run.door[0]} ${D3.run.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
       <ellipse cx="260" cy="322" rx="44" ry="20" style="fill:var(--path)"/></g>
     ${flowers([[30, 140, "#EFA3A6"], [44, 150, "#F3C969"], [200, 140, "#C3CDEE"], [330, 150, "#EFA3A6"], [488, 180, "#F3C969"], [214, 410, "#EFA3A6"], [200, 470, "#C3CDEE"], [160, 600, "#F3C969"], [176, 612, "#EFA3A6"], [300, 620, "#C3CDEE"], [24, 520, "#F3C969"], [372, 600, "#EFA3A6"], [400, 170, "#C3CDEE"]])}
     ${tree(26, 370, 0.9)}${tree(500, 610, 0.9)}${tree(26, 620, 0.95)}${tree(360, 180, 0.8)}`;
@@ -2308,10 +2564,10 @@ body.nb-open{overflow:hidden}
       if (!h) return "";
       return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`;
     };
-    const D2 = VILLAGE;
+    const D3 = VILLAGE;
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D2.chico.door[0]} ${D2.chico.door[1]} M150 336 L${D2.chord.door[0]} ${D2.chord.door[1]} M262 344 L262 420 M262 420 C230 470 190 500 ${D2.plot3.door[0]} ${D2.plot3.door[1]} M262 420 C300 470 340 500 ${D2.plot4.door[0]} ${D2.plot4.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D3.chico.door[0]} ${D3.chico.door[1]} M150 336 L${D3.chord.door[0]} ${D3.chord.door[1]} M262 344 L262 420 M262 420 C230 470 190 500 ${D3.plot3.door[0]} ${D3.plot3.door[1]} M262 420 C300 470 340 500 ${D3.plot4.door[0]} ${D3.plot4.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[40, 200, "#EFA3A6"], [60, 214, "#F3C969"], [480, 330, "#C3CDEE"], [300, 420, "#EFA3A6"], [200, 600, "#F3C969"], [90, 560, "#C3CDEE"], [460, 600, "#EFA3A6"], [330, 250, "#F3C969"]])}
     ${tree(30, 120, 1)}${tree(250, 80, 0.9)}${tree(490, 110, 1)}${tree(40, 620, 0.95)}${tree(490, 620, 0.9)}${tree(470, 430, 0.85)}${tree(60, 440, 0.9)}`;
     const gate = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
@@ -2452,6 +2708,25 @@ body.nb-open{overflow:hidden}
           `<rect x="${x - 50}" y="${y - 36}" width="100" height="14" rx="3" style="fill:${W2}"/><path d="M${x - 26} ${y - 44} l22 -4 l22 4 v8 l-22 -3 l-22 3z" style="fill:#FFFDF6"/><path d="M${x + 28} ${y - 62} h14 l5 14 h-24z" style="fill:var(--butter)"/>`,
           `<rect x="${x - 50}" y="${y - 36}" width="100" height="14" rx="3"/>${legs(100, 22)}<path d="M${x - 26} ${y - 44} l22 -4 l22 4 v8 l-22 -3 l-22 3z M${x - 4} ${y - 48} v9"/><path d="M${x - 20} ${y - 41} h10 M${x + 2} ${y - 41} h12" opacity=".5"/><path d="M${x + 28} ${y - 62} h14 l5 14 h-24z M${x + 35} ${y - 48} v12 M${x + 30} ${y - 36} h10"/><path d="M${x + 10} ${y - 46} l12 -8" stroke-width="1.8"/>`
         );
+      // the planning table: a long wooden desk with an open planner and a little vase of flowers
+      case "plantable":
+        return sk(
+          `<rect x="${x - 62}" y="${y - 34}" width="124" height="26" rx="4" style="fill:#C9A27E"/><path d="M${x - 40} ${y - 44} l26 -4 l26 4 v9 l-26 -3 l-26 3z" style="fill:#FFFDF6"/><path d="M${x + 30} ${y - 44} q-6 -2 -5 -10 q1 -8 9 -8 q8 0 9 8 q1 8 -5 10z" style="fill:var(--sky)"/>
+        <circle cx="${x + 30}" cy="${y - 72}" r="6" style="fill:var(--rose)"/><circle cx="${x + 40}" cy="${y - 66}" r="5" style="fill:var(--butter)"/><circle cx="${x + 22}" cy="${y - 65}" r="5" style="fill:var(--peri)"/><circle cx="${x + 30}" cy="${y - 72}" r="2" style="fill:var(--honey)"/>`,
+          `<rect x="${x - 62}" y="${y - 34}" width="124" height="26" rx="4"/><path d="M${x - 56} ${y - 8} v14 M${x + 56} ${y - 8} v14 M${x - 56} ${y - 21} h112" opacity=".4"/><path d="M${x - 40} ${y - 44} l26 -4 l26 4 v9 l-26 -3 l-26 3z M${x - 14} ${y - 48} v9 M${x - 34} ${y - 42} h14 M${x - 8} ${y - 42} h14" />
+        <path d="M${x + 30} ${y - 44} q-6 -2 -5 -10 q1 -8 9 -8 q8 0 9 8 q1 8 -5 10z"/><path d="M${x + 30} ${y - 62} v-4 M${x + 32} ${y - 62} q4 -2 7 -3 M${x + 28} ${y - 62} q-3 -1 -5 -2" style="stroke:var(--moss2)"/><circle cx="${x + 30}" cy="${y - 72}" r="6"/><circle cx="${x + 40}" cy="${y - 66}" r="5"/><circle cx="${x + 22}" cy="${y - 65}" r="5"/>`
+        );
+      case "jarshelf": {
+        const js = G.jars && G.jars() || [], W3 = 176, x0 = x - W3 / 2;
+        const mini = (j, i) => {
+          const cx = x0 + 16 + i % 5 * 36, top = y - (i < 5 ? 66 : 32) - 22;
+          return j ? `<svg x="${cx - 11}" y="${top}" width="22" height="29" viewBox="0 0 60 80">${jarArt(j)}</svg>` : "";
+        };
+        return sk(
+          `<rect x="${x0}" y="${y - 70}" width="${W3}" height="70" rx="3" style="fill:#E2CBA8"/><rect x="${x0}" y="${y - 38}" width="${W3}" height="6" style="fill:var(--wood)"/><rect x="${x0}" y="${y - 6}" width="${W3}" height="6" style="fill:var(--wood)"/>`,
+          `<rect x="${x0}" y="${y - 70}" width="${W3}" height="70" rx="3"/><path d="M${x0} ${y - 38} h${W3} M${x0} ${y - 32} h${W3} M${x0} ${y - 6} h${W3}"/>`
+        ) + `<g pointer-events="none">${js.map(mini).join("")}</g>`;
+      }
       case "chartstand":
         return sk(
           `<rect x="${x - 36}" y="${y - 96}" width="72" height="58" rx="2" style="fill:#FFFDF6"/><rect x="${x - 26}" y="${y - 60}" width="10" height="16" style="fill:#7FB069"/><rect x="${x - 12}" y="${y - 70}" width="10" height="26" style="fill:#7FB069"/><rect x="${x + 2}" y="${y - 66}" width="10" height="22" style="fill:#7FB069"/><rect x="${x + 16}" y="${y - 84}" width="10" height="40" style="fill:#4E9A4A"/>`,
@@ -2935,17 +3210,17 @@ body.nb-open{overflow:hidden}
   var sfxBus = null;
   var reverb = null;
   var pianoWave = null;
-  var KEY = "fox.sound";
+  var KEY2 = "fox.sound";
   var settings = (() => {
     try {
-      return Object.assign({ music: true, musicVol: 0.5, sfx: true }, JSON.parse(localStorage.getItem(KEY)) || {});
+      return Object.assign({ music: true, musicVol: 0.5, sfx: true }, JSON.parse(localStorage.getItem(KEY2)) || {});
     } catch {
       return { music: true, musicVol: 0.5, sfx: true };
     }
   })();
   var saveSettings = () => {
     try {
-      localStorage.setItem(KEY, JSON.stringify(settings));
+      localStorage.setItem(KEY2, JSON.stringify(settings));
     } catch {
     }
   };
@@ -3453,10 +3728,10 @@ body.nb-open{overflow:hidden}
         closeNotebook();
         return;
       }
-      const keep = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
+      const keep2 = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
       page.innerHTML = taskPage(t2);
       if ($("nbAsk")) {
-        $("nbAsk").value = keep;
+        $("nbAsk").value = keep2;
         if (typing) $("nbAsk").focus();
       }
     } else page.innerHTML = open.kind === "tracker" ? trackerPage(open.which) : open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
@@ -4006,31 +4281,31 @@ Quests finished today: ${S3.doneIds.length}`;
   var APPS = { chord: { name: "Chord", room: "chord" }, chico: { name: "Chico", room: "chico" } };
   var BRANDS = { chord: { name: "Chord", color: "var(--sage)" }, ambidextrous: { name: "Ambidextrous", color: "var(--peri)" } };
   var DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
-  var KEY2 = "fox.feeds";
-  var D = (() => {
+  var KEY3 = "fox.feeds";
+  var D2 = (() => {
     try {
-      return JSON.parse(localStorage.getItem(KEY2)) || {};
+      return JSON.parse(localStorage.getItem(KEY3)) || {};
     } catch {
       return {};
     }
   })();
-  var onChange = () => {
+  var onChange2 = () => {
   };
   function attachFeeds(col, changed) {
-    onChange = changed;
+    onChange2 = changed;
     DOCS.forEach((id) => col.doc(id).onSnapshot((snap) => {
-      D[id] = snap.exists ? snap.data() || null : null;
+      D2[id] = snap.exists ? snap.data() || null : null;
       try {
-        localStorage.setItem(KEY2, JSON.stringify(D));
+        localStorage.setItem(KEY3, JSON.stringify(D2));
       } catch {
       }
-      onChange(id);
+      onChange2(id);
     }, () => {
     }));
   }
   var STATE = (s) => /fail|red|error|down/i.test(s || "") ? "red" : /warn|amber|flaky|slow|skip/i.test(s || "") ? "amber" : /pass|ok|green|up|healthy/i.test(s || "") ? "green" : "grey";
   function health(app) {
-    const d = D["health-" + app];
+    const d = D2["health-" + app];
     if (!d || !d.at) return null;
     const checks = (Array.isArray(d.checks) ? d.checks : []).slice(0, 12).map((c) => ({ name: plain(String(c.name || "")).slice(0, 60), state: STATE(c.state), detail: plain(String(c.detail || "")).slice(0, 120) }));
     const worst = checks.some((c) => c.state === "red") ? "red" : checks.some((c) => c.state === "amber") ? "amber" : "green";
@@ -4056,7 +4331,7 @@ Quests finished today: ${S3.doneIds.length}`;
   function contentItems() {
     const out = [];
     Object.keys(BRANDS).forEach((b) => {
-      const d = D["content-" + b];
+      const d = D2["content-" + b];
       (d && d.items || []).forEach((it) => {
         if (!it || !/^\d{4}-\d{2}-\d{2}$/.test(it.date || "")) return;
         out.push({
@@ -4072,7 +4347,7 @@ Quests finished today: ${S3.doneIds.length}`;
     });
     return out.sort((x, y) => (x.date + x.time).localeCompare(y.date + y.time));
   }
-  var contentUpdated = () => Object.keys(BRANDS).map((b) => D["content-" + b] && D["content-" + b].at).filter(Boolean);
+  var contentUpdated = () => Object.keys(BRANDS).map((b) => D2["content-" + b] && D2["content-" + b].at).filter(Boolean);
   var brandFilter = "all";
   function contentHTML() {
     const today2 = dayKey(), end = new Date(Date.parse(today2 + "T00:00:00Z") + 14 * 864e5).toISOString().slice(0, 10);
@@ -4095,11 +4370,11 @@ Quests finished today: ${S3.doneIds.length}`;
     });
   }
   var outfitDoc = () => {
-    const d = D.outfit;
+    const d = D2.outfit;
     return d && d.at ? d : null;
   };
   function goodNews() {
-    const d = D.goodnews;
+    const d = D2.goodnews;
     return d && d.at ? d : null;
   }
   function goodNewsHTML(localWins) {
@@ -4178,7 +4453,7 @@ Quests finished today: ${S3.doneIds.length}`;
   var DEFAULT_CATS = [{ id: "food", name: "Food" }, { id: "household", name: "Household" }, { id: "personal", name: "Personal Care" }];
   var DEFAULT_LOCS = [{ id: "supermarket", name: "Supermarket" }, { id: "online", name: "Online" }, { id: "wetmarket", name: "Wet Market" }, { id: "pharmacy", name: "Pharmacy" }];
   var DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  var KEY3 = "fox.hestia";
+  var KEY4 = "fox.hestia";
   var fresh = () => ({
     zones: DEFAULT_ZONES,
     dailyTasks: DEFAULT_DAILY,
@@ -4203,13 +4478,13 @@ Quests finished today: ${S3.doneIds.length}`;
   });
   var H2 = (() => {
     try {
-      return Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY3)) || {});
+      return Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY4)) || {});
     } catch {
       return fresh();
     }
   })();
   var api2 = null;
-  var ref = null;
+  var ref2 = null;
   var pushT = null;
   var view = { tab: "daily", fridge: "stock", loc: "all" };
   var focus = null;
@@ -4228,8 +4503,8 @@ Quests finished today: ${S3.doneIds.length}`;
     }
   })();
   function attachHestiaDb(docRef) {
-    ref = docRef;
-    ref.onSnapshot((snap) => {
+    ref2 = docRef;
+    ref2.onSnapshot((snap) => {
       const first = !synced, cached = !!(snap.metadata && snap.metadata.fromCache);
       if (!cached) synced = true;
       if (!snap.exists) {
@@ -4253,7 +4528,7 @@ Quests finished today: ${S3.doneIds.length}`;
   }
   var local = () => {
     try {
-      localStorage.setItem(KEY3, JSON.stringify(H2));
+      localStorage.setItem(KEY4, JSON.stringify(H2));
     } catch {
     }
   };
@@ -4261,11 +4536,11 @@ Quests finished today: ${S3.doneIds.length}`;
   function save() {
     H2.updatedAt = Date.now();
     local();
-    if (!ref || !synced) return;
+    if (!ref2 || !synced) return;
     clearTimeout(pushT);
     pushT = setTimeout(async () => {
       try {
-        const cur2 = await ref.get(), r = cur2.exists ? cur2.data() : null;
+        const cur2 = await ref2.get(), r = cur2.exists ? cur2.data() : null;
         if (r && (r.updatedAt || 0) > seen) {
           H2 = Object.assign(fresh(), JSON.parse(JSON.stringify(r)));
           seen = r.updatedAt;
@@ -4275,7 +4550,7 @@ Quests finished today: ${S3.doneIds.length}`;
           return;
         }
         const body2 = JSON.parse(JSON.stringify(H2));
-        await ref.set(body2);
+        await ref2.set(body2);
         seen = Math.max(seen, body2.updatedAt || 0);
       } catch {
       }
@@ -4592,7 +4867,7 @@ Quests finished today: ${S3.doneIds.length}`;
     }
     if (d && d.state && d.state.zones) d = d.state;
     if (!d || !Array.isArray(d.zones) || !Array.isArray(d.dailyTasks)) return "That doesn't look like a Hestia export (no zones or daily tasks).";
-    const keep = [
+    const keep2 = [
       "zones",
       "dailyTasks",
       "weeklyTasks",
@@ -4613,7 +4888,7 @@ Quests finished today: ${S3.doneIds.length}`;
       "chimeEnabled",
       "chimeInterval"
     ];
-    keep.forEach((k) => {
+    keep2.forEach((k) => {
       if (d[k] != null) H2[k] = d[k];
     });
     tidy();
@@ -4978,7 +5253,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     st.busy = false;
   }
   var t = (s, n = 90) => esc(plain(String(s ?? "")).slice(0, n));
-  var when = (d) => {
+  var when2 = (d) => {
     if (!d) return "";
     const x = /* @__PURE__ */ new Date(d + "T00:00:00Z");
     return isNaN(x) ? t(d, 20) : x.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
@@ -4996,7 +5271,7 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     const ps = st.snap.projects;
     h += `<p class="eyebrow">Active projects</p>` + (ps.length ? `<ul class="hlist clprojects">${ps.slice(0, 20).map((p) => {
       const pct = p.tasks_total ? Math.round(100 * p.tasks_done / p.tasks_total) : 0;
-      return `<li><span><b>${t(p.name, 70)}</b><small>${t(p.client, 40)}${p.category ? " · " + t(p.category, 20) : ""}${p.due ? " · due " + when(p.due) : ""}${p.key_date ? ` · ${t(p.key_date_label || "key date", 20)} ${when(p.key_date)}` : ""}</small>
+      return `<li><span><b>${t(p.name, 70)}</b><small>${t(p.client, 40)}${p.category ? " · " + t(p.category, 20) : ""}${p.due ? " · due " + when2(p.due) : ""}${p.key_date ? ` · ${t(p.key_date_label || "key date", 20)} ${when2(p.key_date)}` : ""}</small>
       ${p.tasks_total ? `<span class="clbar"><i style="width:${pct}%"></i></span><small>${p.tasks_done}/${p.tasks_total} tasks</small>` : ""}</span></li>`;
     }).join("")}</ul>` : `<p class="muted">No active projects right now.</p>`);
     const att = st.snap.attention;
@@ -5072,10 +5347,31 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     not_in_manifest: "Notion is switched off for this page. Turn it on in the page's Permissions."
   };
   var inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\\([$*_~`])/g, "$1");
+  function tableHTML(src) {
+    const head = /header-row="true"/.test(src), rows2 = [...src.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)].map((r) => [...r[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((c) => inline(c[1].replace(/<[^>]+>/g, "").trim())));
+    if (!rows2.length) return "";
+    return `<div class="ptable"><table>${rows2.map((r, i) => `<tr>${r.map((c) => i === 0 && head ? `<th>${c}</th>` : `<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`;
+  }
   function md(text) {
     let h = "", list = false;
-    String(text || "").split("\n").forEach((l) => {
-      const line = l.trim();
+    const tables = [];
+    text = String(text || "").replace(/<table[\s\S]*?<\/table>/g, (m) => {
+      tables.push(tableHTML(m));
+      return `
+\0T${tables.length - 1}
+`;
+    });
+    text.split("\n").forEach((l) => {
+      const tm = /^\u0000T(\d+)$/.exec(l.trim());
+      if (tm) {
+        if (list) {
+          h += "</ul>";
+          list = false;
+        }
+        h += tables[+tm[1]] || "";
+        return;
+      }
+      const line = l.trim().replace(/<\/?[a-z][^>]*>/gi, "").trim();
       if (!line || line === "---") {
         if (list) {
           h += "</ul>";
@@ -5302,18 +5598,18 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   // src/game/myroom.js
   var JKEY = "fox.journal";
   var SKEY = "fox.scratch";
-  var load = (k, f2) => {
+  var load2 = (k, f2) => {
     try {
       return Object.assign(f2(), JSON.parse(localStorage.getItem(k)) || {});
     } catch {
       return f2();
     }
   };
-  var J = load(JKEY, () => ({ entries: [], updatedAt: 0 }));
-  var SC = load(SKEY, () => ({ text: "", updatedAt: 0 }));
+  var J = load2(JKEY, () => ({ entries: [], updatedAt: 0 }));
+  var SC = load2(SKEY, () => ({ text: "", updatedAt: 0 }));
   var jref = null;
   var sref = null;
-  var onChange2 = () => {
+  var onChange3 = () => {
   };
   var jChain = Promise.resolve();
   var sT = null;
@@ -5339,7 +5635,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     return { entries: [...m.values()].sort((x, y) => (y.at || 0) - (x.at || 0)).slice(0, 400), updatedAt: Math.max(a.updatedAt || 0, b && b.updatedAt || 0) };
   }
   function attachMyDocs(col, changed) {
-    onChange2 = changed;
+    onChange3 = changed;
     jref = col.doc("journal");
     sref = col.doc("scratch");
     jref.onSnapshot((snap) => {
@@ -5349,7 +5645,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       }
       J = mergeJ(J, JSON.parse(JSON.stringify(snap.data() || {})));
       keepJ();
-      onChange2("journal");
+      onChange3("journal");
     }, () => {
     });
     sref.onSnapshot((snap) => {
@@ -5361,7 +5657,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       if ((r.updatedAt || 0) > (SC.updatedAt || 0)) {
         SC = { text: String(r.text || "").slice(0, 2e4), updatedAt: r.updatedAt };
         keepS();
-        onChange2("scratch");
+        onChange3("scratch");
       }
     }, () => {
     });
@@ -5409,19 +5705,36 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     pushJ();
     return e;
   }
+  function addJarEntry(jar) {
+    const label2 = jarLabel(jar), e = {
+      id: "p" + jar.id,
+      at: Date.now(),
+      day: dayKey(),
+      kind: "jar",
+      text: jar.note || label2,
+      jar: { id: jar.id, at: jar.at, blobs: jar.blobs, colors: jar.colors, label: label2 }
+    };
+    J = { entries: [e, ...J.entries.filter((x) => x.id !== e.id)].slice(0, 400), updatedAt: Date.now() };
+    keepJ();
+    pushJ();
+    return e;
+  }
+  function removeEntry(id) {
+    delEntry(id);
+  }
   function delEntry(id) {
     J = { entries: J.entries.map((e) => e.id === id ? { id, deleted: true, at: Date.now() } : e), updatedAt: Date.now() };
     keepJ();
     pushJ();
   }
-  var when2 = (e) => new Date(e.at).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Singapore" });
+  var when3 = (e) => new Date(e.at).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Singapore" });
   function journalPanel(decompress) {
     const list = live().slice(0, 12);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>My journal</h2>
     <p class="sub">${decompress ? "Three quick points from that call or moment. Then let it go." : esc(journalPrompt())}</p>
     <form id="jForm" class="jform"><label class="sr" for="jText">Journal entry</label><textarea id="jText" rows="6" maxlength="8000" placeholder="${decompress ? "1.\n2.\n3." : "Write anything..."}">${esc(draft)}</textarea>
     <div class="actions"><button class="btn primary small" type="submit">Keep this page</button></div></form>`;
-    if (list.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list.map((e) => `<details><summary><b>${when2(e)}</b> ${esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary><p>${esc(e.text).replace(/\n/g, "<br>")}</p><button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
+    if (list.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list.map((e) => `<details${e.kind === "jar" ? " open" : ""}><summary><b>${when3(e)}</b> ${e.kind === "jar" ? "A jar of " + esc(e.jar.label) : esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary>${e.kind === "jar" ? `<div class="polaroid"><div class="pphoto">${jarSVG(e.jar, 74)}</div><p class="pcap">${esc(new Date(e.jar.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" }))}</p></div>${e.jar.blobs && e.text !== e.jar.label ? `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>` : ""}` : `<p>${esc(e.text).replace(/\n/g, "<br>")}</p>`}<button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
     return h;
   }
   function wireJournal(root, undoable2, done) {
@@ -5854,7 +6167,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     updatedAt: 0
   });
   var freshFox = () => ({ name: "Maple", xp: 0, days: 0, streak: 0, lastActive: null, coins: null, inv: null, plots: null, cool: {}, met: {}, gifts: {}, mailRead: {}, digest: { read: {}, lastAt: 0, mine: [] }, updatedAt: 0 });
-  var load2 = (k, f2) => {
+  var load3 = (k, f2) => {
     try {
       const v = JSON.parse(localStorage.getItem(k));
       return v ? Object.assign(f2(), v) : f2();
@@ -5862,12 +6175,12 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       return f2();
     }
   };
-  var S2 = load2("fox.today", freshToday);
-  var F = load2("fox.fox", freshFox);
-  var P = load2("fox.plan", () => ({ day: null, tasks: [] }));
-  var MAIL = load2("fox.mail", () => ({ items: [] }));
-  var ST = load2("fox.stats", () => ({}));
-  var LIB = load2("fox.library", () => ({ items: [] }));
+  var S2 = load3("fox.today", freshToday);
+  var F = load3("fox.fox", freshFox);
+  var P = load3("fox.plan", () => ({ day: null, tasks: [] }));
+  var MAIL = load3("fox.mail", () => ({ items: [] }));
+  var ST = load3("fox.stats", () => ({}));
+  var LIB = load3("fox.library", () => ({ items: [] }));
   var sampleCap = null;
   function migrate() {
     if (S2.day !== dayKey()) S2 = freshToday();
@@ -5905,7 +6218,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), goodNews: () => {
     const g = goodNews();
     return g && F.goodRead !== g.at ? g : null;
-  }, lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk(), music: () => settings.music });
+  }, lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk(), music: () => settings.music, jars: () => shelf() });
   function isDusk() {
     const t2 = sgHM();
     return t2 >= 19 * 60 || t2 < 6 * 60;
@@ -5943,12 +6256,12 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     }
     if (!refs || !synced2[which]) return;
     clearTimeout(pending[which]);
-    pending[which] = setTimeout(() => push(which), 500);
+    pending[which] = setTimeout(() => push2(which), 500);
   }
   var seen2 = { today: 0, fox: 0 };
-  async function push(which, direct) {
+  async function push2(which, direct) {
     if (writing[which]) {
-      pending[which] = setTimeout(() => push(which, direct), 400);
+      pending[which] = setTimeout(() => push2(which, direct), 400);
       return;
     }
     writing[which] = true;
@@ -6007,6 +6320,10 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     if (!uid) return;
     const col = db.collection("data/users/" + uid);
     attachHestiaDb(col.doc("hestia"));
+    attachJars(col, () => {
+      if (scene === "room") drawScene();
+      if (jarsOpen && !/^(jNote|jcName)$/.test(document.activeElement?.id || "")) ctx();
+    });
     attachMyDocs(col, (id) => {
       if (id === "journal" && journalOpen && document.activeElement?.id !== "jText" || id === "scratch" && scratchOpen && document.activeElement?.id !== "scratchText") ctx();
     });
@@ -6166,6 +6483,8 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   var clientsOpen = false;
   var planOpen = false;
   var revOpen = false;
+  var jarsOpen = false;
+  var jv = { mode: "shelf", blobs: [], note: "" };
   var BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]];
   var CYCLE = 12;
   var breath = null;
@@ -6232,6 +6551,88 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       if (p && p.crop && !p.wateredAt) p.wateredAt = Date.now();
     });
     save2();
+  }
+  function wireJars(c) {
+    const note2 = c.querySelector("#jNote");
+    if (note2) note2.oninput = () => {
+      jv.note = note2.value;
+    };
+    c.querySelectorAll("[data-emo]").forEach((b) => b.onclick = () => {
+      const id = b.dataset.emo, kinds = new Set(jv.blobs);
+      if (jv.blobs.length >= MAX_BLOBS || !kinds.has(id) && kinds.size >= MAX_KINDS) return;
+      jv.blobs.push(id);
+      sfx("tap");
+      ctx();
+    });
+    c.querySelectorAll("[data-jarid]").forEach((b) => b.onclick = () => {
+      jv = { mode: "jar", id: b.dataset.jarid, blobs: [], note: "" };
+      sfx("paper", true);
+      ctx();
+    });
+    c.querySelectorAll("[data-sw]").forEach((b) => b.onclick = () => {
+      const n = c.querySelector("#jcName");
+      jv.customName = n ? n.value : "";
+      jv.customColor = b.dataset.sw;
+      ctx();
+    });
+    const cf = c.querySelector("#jcForm");
+    if (cf) cf.onsubmit = (ev) => {
+      ev.preventDefault();
+      const e = addCustom(c.querySelector("#jcName").value, jv.customColor);
+      if (e) {
+        jv.adding = false;
+        jv.customName = "";
+        if (new Set(jv.blobs).size < MAX_KINDS && jv.blobs.length < MAX_BLOBS) jv.blobs.push(e.id);
+      }
+      ctx();
+    };
+    c.querySelectorAll("[data-jar]").forEach((b) => b.onclick = () => {
+      const k = b.dataset.jar, id = b.dataset.id;
+      if (k === "make") {
+        jv = { mode: "make", blobs: [], note: "" };
+      } else if (k === "shelf") {
+        jv = { mode: "shelf", blobs: [], note: "" };
+      } else if (k === "unblob") {
+        jv.blobs.pop();
+      } else if (k === "custom") {
+        jv.adding = !jv.adding;
+      } else if (k === "place") {
+        const j = makeJar(jv.blobs, jv.note);
+        if (!j) return;
+        sfx("chime");
+        const heavy = j.blobs.filter((x) => ["anger", "sad", "fear", "anxious", "tired"].includes(x)).length >= Math.ceil(j.blobs.length / 2);
+        speak(heavy ? "That's a big feeling. I'm here." : j.blobs.filter((x) => ["joy", "love", "proud", "calm"].includes(x)).length > j.blobs.length / 2 ? "A happy one. I love that for you." : "Kept safe on the shelf.", 4500);
+        jv = { mode: "shelf", blobs: [], note: "" };
+        drawScene();
+      } else if (k === "empty") {
+        const restore = emptyJar(id);
+        if (restore) {
+          undoable("Jar emptied", () => {
+            restore();
+            drawScene();
+            ctx();
+          });
+          jv = { mode: "shelf", blobs: [], note: "" };
+          drawScene();
+        }
+      } else if (k === "send") {
+        const j = jarById(id);
+        if (!j) return;
+        addJarEntry(j);
+        const restore = emptyJar(id);
+        sfx("paper");
+        speak("Tucked into your journal, with a little photo of the jar.", 4e3);
+        undoable("Sent to your journal", () => {
+          if (restore) restore();
+          removeEntry("p" + id);
+          drawScene();
+          ctx();
+        });
+        jv = { mode: "shelf", blobs: [], note: "" };
+        drawScene();
+      }
+      ctx();
+    });
   }
   function bedAction(k) {
     if (k === "up") {
@@ -6985,7 +7386,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       if (pending[w] && refs && synced2[w]) {
         clearTimeout(pending[w]);
         pending[w] = null;
-        push(w, true);
+        push2(w, true);
       }
     });
   }
@@ -7001,9 +7402,9 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     F.digest.read[d.id] = Date.now();
     F.digest.lastAt = Date.now();
     S2.digestMark = S2.doneIds.length;
-    const keep = new Set([...LIB.items || [], ...F.digest.mine || []].map((x) => x && x.id));
+    const keep2 = new Set([...LIB.items || [], ...F.digest.mine || []].map((x) => x && x.id));
     Object.keys(F.digest.read).forEach((id) => {
-      if (!keep.has(id)) delete F.digest.read[id];
+      if (!keep2.has(id)) delete F.digest.read[id];
     });
     gainXp(1);
     save2();
@@ -7066,6 +7467,9 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     bedroom: "room",
     bed: "room:bed",
     journal: "room:journal",
+    jars: "room:jars",
+    "emotion shelf": "room:jars",
+    "emotion jar": "room:jars",
     scratchpad: "hall:whiteboard",
     whiteboard: "hall:whiteboard",
     run: "base:run",
@@ -7256,7 +7660,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|revenue chart|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|revenue chart|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -7746,8 +8150,8 @@ Then tell chat "wind down" whenever you're ready.`
     j.innerHTML = h + `<button class="qnx" data-qn="min" aria-label="Fold the note away">–</button>`;
     if (slim) {
       const title = j.querySelector("h1") ? [...j.querySelector("h1").childNodes].filter((n) => !(n.classList && n.classList.contains("lbl"))).map((n) => n.textContent).join("").trim() : "";
-      const when3 = S2.timer ? `<span class="when" data-tleft>${fmt(tLeft())}</span>` : "";
-      j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(route2.length ? "Walking… " + title : title)}</b>${when3}<span class="more">open</span></button>`;
+      const when4 = S2.timer ? `<span class="when" data-tleft>${fmt(tLeft())}</span>` : "";
+      j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(route2.length ? "Walking… " + title : title)}</b>${when4}<span class="more">open</span></button>`;
     }
     j.classList.toggle("intop", !outside());
     j.querySelectorAll("[data-qn]").forEach((el) => el.onclick = (ev) => {
@@ -7813,6 +8217,7 @@ Then tell chat "wind down" whenever you're ready.`
     clientsOpen = false;
     planOpen = false;
     revOpen = false;
+    jarsOpen = false;
     selPlot = null;
     homeView = null;
     postOpen = false;
@@ -7911,6 +8316,8 @@ Then tell chat "wind down" whenever you're ready.`
       }
     } else if (bedOpen && scene === "room") {
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>Your bed</h2>` + (S2.sleep ? `<p class="sub">${S2.sleep.until ? `Napping. Up in about ${Math.max(1, Math.ceil((S2.sleep.until - Date.now()) / M))} min.` : "Fast asleep. Sweet dreams."}</p><div class="actions"><button class="btn yes" data-bed="up">Get up</button></div>` : `<p class="sub">Fluffy pillows, cool sheets${(F.decor || {}).r_throw ? ", your knitted throw" : ""}.</p><div class="actions"><button class="btn primary" data-bed="nap">Nap for 20 minutes</button><button class="btn alt" data-bed="sleep">${sgHM() >= 20 * 60 || sgHM() < 5 * 60 ? "Go to sleep" : "Lie down"}</button></div>`);
+    } else if (jarsOpen && scene === "room") {
+      h = jarsPanel(jv);
     } else if (recOpen && scene === "room") {
       const on = settings.music, ct = currentTrack();
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>Record player</h2><p class="sub">${on ? `Playing: ${esc(TRACKS[ct].name)}.` : "Pick a record to put on."}</p>
@@ -7999,9 +8406,11 @@ Then tell chat "wind down" whenever you're ready.`
       clientsOpen = false;
       planOpen = false;
       revOpen = false;
+      jarsOpen = false;
       ctx();
     });
     c.querySelectorAll("[data-bed]").forEach((b) => b.onclick = () => bedAction(b.dataset.bed));
+    if (jarsOpen && scene === "room") wireJars(c);
     c.querySelectorAll("[data-track]").forEach((b) => b.onclick = () => {
       setTrack(b.dataset.track);
       speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500);
@@ -8025,6 +8434,7 @@ Then tell chat "wind down" whenever you're ready.`
         clientsOpen = false;
         planOpen = false;
         revOpen = false;
+        jarsOpen = false;
         A.decompNow();
         drawScene();
       } else startBreath(+k);
@@ -8368,6 +8778,7 @@ Then tell chat "wind down" whenever you're ready.`
       clientsOpen = false;
       planOpen = false;
       revOpen = false;
+      jarsOpen = false;
       homeView = null;
       postOpen = false;
       healthOpen = false;
@@ -8446,6 +8857,7 @@ Then tell chat "wind down" whenever you're ready.`
     clientsOpen = false;
     planOpen = false;
     revOpen = false;
+    jarsOpen = false;
     homeView = null;
     postOpen = false;
     healthOpen = false;
@@ -8497,6 +8909,13 @@ Then tell chat "wind down" whenever you're ready.`
     }
     if (id === "nook") {
       calmOpen = true;
+      sfx("paper", true);
+      render();
+      return;
+    }
+    if (id === "jars") {
+      jarsOpen = true;
+      jv = { mode: "shelf", blobs: [], note: "" };
       sfx("paper", true);
       render();
       return;

@@ -15,10 +15,19 @@ const PLAN_ERRORS = {unavailable: "Notion isn't reachable from this view.", "not
 
 // A tiny renderer for the plan pages' Markdown: ## headings, - bullets, **bold**, plain lines. Escaped first.
 const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\\([$*_~`])/g, "$1");
+// Notion tables come through as <table><tr><td>…</td></tr></table>: drawn as a real table; other tags are dropped.
+function tableHTML(src){
+  const head = /header-row="true"/.test(src), rows = [...src.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)].map(r => [...r[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map(c => inline(c[1].replace(/<[^>]+>/g, "").trim())));
+  if (!rows.length) return "";
+  return `<div class="ptable"><table>${rows.map((r, i) => `<tr>${r.map(c => i === 0 && head ? `<th>${c}</th>` : `<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`;
+}
 function md(text){
   let h = "", list = false;
-  String(text || "").split("\n").forEach(l => {
-    const line = l.trim(); if (!line || line === "---") { if (list) { h += "</ul>"; list = false; } return; }
+  const tables = [];
+  text = String(text || "").replace(/<table[\s\S]*?<\/table>/g, m => { tables.push(tableHTML(m)); return `\n\u0000T${tables.length - 1}\n`; });
+  text.split("\n").forEach(l => {
+    const tm = /^\u0000T(\d+)$/.exec(l.trim()); if (tm) { if (list) { h += "</ul>"; list = false; } h += tables[+tm[1]] || ""; return; }
+    const line = l.trim().replace(/<\/?[a-z][^>]*>/gi, "").trim(); if (!line || line === "---") { if (list) { h += "</ul>"; list = false; } return; }
     if (/^#{1,4} /.test(line)) { if (list) { h += "</ul>"; list = false; } h += `<p class="pmh">${inline(line.replace(/^#+ /, ""))}</p>`; return; }
     if (/^[-*] /.test(line)) { if (!list) { h += `<ul class="pml">`; list = true; } h += `<li>${inline(line.slice(2))}</li>`; return; }
     if (list) { h += "</ul>"; list = false; }

@@ -97,7 +97,7 @@
       }
       if (server === "Notion" && tool === "notion-fetch") {
         const t = String(input.id || "").replace(/^plan-/, "").replace(/-/g, " ");
-        return { content: [], payload: { title: t, text: `<page><properties>{"Name":"${t}","Theme":"Stub theme for ${t}"}</properties><content>\n## Objectives\n- **Primary:** (stub plan for ${t}) fill the Visibility Fix\n## Day by day\n**Monday (sales)**\n- Message 12 warm leads (30 min)\n**Tuesday (client)**\n- Write features 1 and 2 (90 min)\n## Waiting on others\nPopcorn, Radhika.\n</content></page>` } };
+        return { content: [], payload: { title: t, text: `<page><properties>{"Name":"${t}","Theme":"Stub theme for ${t}"}</properties><content>\n## Objectives\n- **Primary:** (stub plan for ${t}) fill the Visibility Fix\n## Day by day\n**Monday (sales)**\n- Message 12 warm leads (30 min)\n**Tuesday (client)**\n- Write features 1 and 2 (90 min)\n## Waiting on others\nPopcorn, Radhika.\n## Life reflection\n<table header-row="true">\n<tr>\n<td>Area</td>\n<td>Score</td>\n</tr>\n<tr>\n<td>Family</td>\n<td>4</td>\n</tr>\n</table>\n</content></page>` } };
       }
       if (server !== "Sunsama MCP" || tool !== "read_resource") throw { code: "not_in_manifest", message: "not declared" };
       // the first day asked for is "today"; any later day gets tomorrow's (different) tasks

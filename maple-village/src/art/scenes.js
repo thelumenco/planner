@@ -6,6 +6,7 @@ import { CROPS, PLOTS } from "../data/items.js";
 import { roomShell } from "./interiors.js";
 import { iconAt } from "./icons.js";
 import { runArt } from "../game/pets.js";
+import { jarArt } from "../game/jars.js";
 import { upgradesArt, festivalArt, festivalOn, pondLanterns } from "./village-extras.js";
 import { townHall, chordWorkshop, library, chicoCottage, postOffice } from "./buildings.js";
 
@@ -270,6 +271,15 @@ export function furn(kind, x, y){
         `<ellipse cx="${x-26}" cy="${y-12}" rx="30" ry="13"/><ellipse cx="${x+22}" cy="${y-8}" rx="26" ry="11"/><ellipse cx="${x-6}" cy="${y-30}" rx="22" ry="12"/><path d="M${x-30} ${y-12} h8 M${x+18} ${y-8} h8" opacity=".5"/>${c ? `<rect x="${x+40}" y="${y-34}" width="10" height="16" rx="2"/>` : ""}`); }
     case "writedesk": return sk(`<rect x="${x-50}" y="${y-36}" width="100" height="14" rx="3" style="fill:${W2}"/><path d="M${x-26} ${y-44} l22 -4 l22 4 v8 l-22 -3 l-22 3z" style="fill:#FFFDF6"/><path d="M${x+28} ${y-62} h14 l5 14 h-24z" style="fill:var(--butter)"/>`,
       `<rect x="${x-50}" y="${y-36}" width="100" height="14" rx="3"/>${legs(100, 22)}<path d="M${x-26} ${y-44} l22 -4 l22 4 v8 l-22 -3 l-22 3z M${x-4} ${y-48} v9"/><path d="M${x-20} ${y-41} h10 M${x+2} ${y-41} h12" opacity=".5"/><path d="M${x+28} ${y-62} h14 l5 14 h-24z M${x+35} ${y-48} v12 M${x+30} ${y-36} h10"/><path d="M${x+10} ${y-46} l12 -8" stroke-width="1.8"/>`);
+    // the planning table: a long wooden desk with an open planner and a little vase of flowers
+    case "plantable": return sk(`<rect x="${x-62}" y="${y-34}" width="124" height="26" rx="4" style="fill:#C9A27E"/><path d="M${x-40} ${y-44} l26 -4 l26 4 v9 l-26 -3 l-26 3z" style="fill:#FFFDF6"/><path d="M${x+30} ${y-44} q-6 -2 -5 -10 q1 -8 9 -8 q8 0 9 8 q1 8 -5 10z" style="fill:var(--sky)"/>
+        <circle cx="${x+30}" cy="${y-72}" r="6" style="fill:var(--rose)"/><circle cx="${x+40}" cy="${y-66}" r="5" style="fill:var(--butter)"/><circle cx="${x+22}" cy="${y-65}" r="5" style="fill:var(--peri)"/><circle cx="${x+30}" cy="${y-72}" r="2" style="fill:var(--honey)"/>`,
+      `<rect x="${x-62}" y="${y-34}" width="124" height="26" rx="4"/><path d="M${x-56} ${y-8} v14 M${x+56} ${y-8} v14 M${x-56} ${y-21} h112" opacity=".4"/><path d="M${x-40} ${y-44} l26 -4 l26 4 v9 l-26 -3 l-26 3z M${x-14} ${y-48} v9 M${x-34} ${y-42} h14 M${x-8} ${y-42} h14" />
+        <path d="M${x+30} ${y-44} q-6 -2 -5 -10 q1 -8 9 -8 q8 0 9 8 q1 8 -5 10z"/><path d="M${x+30} ${y-62} v-4 M${x+32} ${y-62} q4 -2 7 -3 M${x+28} ${y-62} q-3 -1 -5 -2" style="stroke:var(--moss2)"/><circle cx="${x+30}" cy="${y-72}" r="6"/><circle cx="${x+40}" cy="${y-66}" r="5"/><circle cx="${x+22}" cy="${y-65}" r="5"/>`);
+    case "jarshelf": { const js = (G.jars && G.jars()) || [], W = 176, x0 = x - W/2;
+      const mini = (j, i) => { const cx = x0 + 16 + (i % 5)*36, top = y - (i < 5 ? 66 : 32) - 22; return j ? `<svg x="${cx - 11}" y="${top}" width="22" height="29" viewBox="0 0 60 80">${jarArt(j)}</svg>` : ""; };
+      return sk(`<rect x="${x0}" y="${y-70}" width="${W}" height="70" rx="3" style="fill:#E2CBA8"/><rect x="${x0}" y="${y-38}" width="${W}" height="6" style="fill:var(--wood)"/><rect x="${x0}" y="${y-6}" width="${W}" height="6" style="fill:var(--wood)"/>`,
+        `<rect x="${x0}" y="${y-70}" width="${W}" height="70" rx="3"/><path d="M${x0} ${y-38} h${W} M${x0} ${y-32} h${W} M${x0} ${y-6} h${W}"/>`) + `<g pointer-events="none">${js.map(mini).join("")}</g>`; }
     case "chartstand": return sk(`<rect x="${x-36}" y="${y-96}" width="72" height="58" rx="2" style="fill:#FFFDF6"/><rect x="${x-26}" y="${y-60}" width="10" height="16" style="fill:#7FB069"/><rect x="${x-12}" y="${y-70}" width="10" height="26" style="fill:#7FB069"/><rect x="${x+2}" y="${y-66}" width="10" height="22" style="fill:#7FB069"/><rect x="${x+16}" y="${y-84}" width="10" height="40" style="fill:#4E9A4A"/>`,
       `<rect x="${x-36}" y="${y-96}" width="72" height="58" rx="2"/><path d="M${x-30} ${y-44} h60" /><path d="M${x-30} ${y-80} L${x-6} ${y-88} L${x+8} ${y-84} L${x+30} ${y-94}" stroke-dasharray="3 3" opacity=".7"/><path d="M${x-24} ${y-38} L${x-32} ${y} M${x+24} ${y-38} L${x+32} ${y} M${x} ${y-38} v34"/><path d="M${x-40} ${y-97} h80" stroke-width="2.2"/>`);
     case "wardrobe": return sk(`<rect x="${x-30}" y="${y-96}" width="60" height="96" rx="3" style="fill:var(--peri)"/><path d="M${x-34} ${y-96} h68 l-4 -8 h-60z" style="fill:var(--peri2)"/><rect x="${x-24}" y="${y-88}" width="22" height="80" rx="2" style="fill:#DCE3F4"/><rect x="${x+2}" y="${y-88}" width="22" height="80" rx="2" style="fill:#DCE3F4"/>`,

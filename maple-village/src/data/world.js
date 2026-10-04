@@ -68,7 +68,7 @@ export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,5
 // station: [id, name, slot, furniture, keyword regex, line, standDy?]  (standDy: where Mel stands, relative to the front edge; default +42)
 export const ROOMS = {
   hall:  {name:"Town hall", wall:"#E6E9F5", trim:"var(--peri)", pos:{A:[448,262], B:[110,258], C:[420,474], D:[334,266], E:[118,474]}, stations:[
-    ["table","Planning table","C","table",/plan|strategy|review|ceo|goal|week|month|quarter|budget/,"Your week, month and quarter, from Notion."],
+    ["table","Planning table","C","plantable",/plan|strategy|review|ceo|goal|week|month|quarter|budget/,"Your week, month and quarter, from Notion."],
     ["whiteboard","Whiteboard","B","whiteboard",/brainstorm|idea|map|outline|launch|offer|pricing/,"Fresh marker, blank board."],
     ["revenue","Revenue chart","D","chartstand",/invoice|revenue|sales|finance|money|budget|pricing|accounts/,"How the money's flowing, from Chord."],
     ["shelf","Bookshelf","A","shelf",/read|research|learn|course|study/,"Smart books, cosy spines."],
@@ -107,13 +107,14 @@ export const ROOMS = {
     ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12],
     ["office","Darren's desk","G","office",null,"Darren's home office. Shh, he might be on a call."]]},
   // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
-  room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[130,290], W:[262,206], B:[440,262], E:[62,396], C:[66,500], D:[434,556]}, stations:[
+  room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[130,290], W:[262,206], B:[440,262], E:[62,396], C:[66,500], D:[434,556], J:[260,594]}, stations:[
     ["bed","Bed","A","bed",null,"Your bed. Fluffy pillows, cool sheets."],
     ["window","Window","W","curtwindow",null,"Curtains open, curtains shut.",20],
     ["wardrobe","Wardrobe","B","wardrobe",null,"Today's outfits are hanging in here.",30],
     ["record","Record player","E","record",null,"Pop a record on."],
     ["nook","Calm corner","C","calm",null,"Cushions, a candle, one slow breath."],
-    ["journal","Writing desk","D","writedesk",null,"Your journal lives in the top drawer."]]},
+    ["journal","Writing desk","D","writedesk",null,"Your journal lives in the top drawer."],
+    ["jars","Emotion shelf","J","jarshelf",null,"Feelings, kept safe in jars.",-78]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };
