@@ -385,3 +385,13 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Quiet mode is wider:** whenever no quests are active (not only after wind-down), nobody speaks unprompted and Maple's bubble tucks away after 6 s. The exceptions are the lantern show, a running timer and decompress. The Settings label is "Peace and quiet".
 - Panels redefine the light-theme colour tokens and `color-scheme: light`, so typed text and inputs stay dark ink in dark mode.
 - Pond lanterns glow in dark mode. The street lamps by the quest board were removed (too many there).
+
+### Round 30: Evan's room, bedtime, hugs
+- **Evan's room** (`kidroom`, an `INNER` room of home whose door is on the east wall; `INNER` entries now carry `exit` for their own door). Its door is the `kiddoor` station at home slot K [480,330]. To make room, Darren's desk moved to G [436,448] and the laundry to D [350,556].
+- Inside, Evan is the one who moves: `kidTap` in core.js; Mel waits by the door; Maple stays outside (hidden; `speak()` is silent in there). The camera follows Evan. `body.kidmode` hides the HUD, chat, notebook, trackers, zoom and undo bar.
+- Leaving takes a press-and-hold of 1.3 s on the west door (`.kidexit` with a ring). A plain tap only shows a hint.
+- Stations: car bed (sleep; a tap wakes him), snack cupboard (milk, juice, apple chips, watermelon, goldfish crackers, all free; Evan munches with a snack bubble), and four toddler games in `kid.js`: dino eggs, train, cars and balloons, each with big targets and no reading or losing.
+- Nothing in there saves or earns: kid state is memory-only. `ctx()` skips re-rendering a game in progress so background refreshes don't restart it.
+- New sound effects in audio.js: pop, crack, roar, whistle, choo, vroom, honk, crunch, slurp, yay.
+- **Bedtime:** 8pm to 7am (`evanNight()`), Evan isn't at home base or in the house; in his room he's asleep in the car bed and a tap gets "shh… sleeping".
+- **Hugs:** every 4–8 minutes (the first after 1–2.5) Evan runs to Mel with his arms up ("hug?"). Tapping him means `hugBack()` (Mel's arms, hearts, a `#melSay` bubble); after 6 s without a tap Mel gives a little "aww". `?hugsoon` makes the first hug come in 3 s, for tests.

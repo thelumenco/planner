@@ -248,6 +248,36 @@ export function furn(kind, x, y){
     // Mel's room (and its door in the house)
     case "sidedoor": return sk(`<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:var(--blush)"/><path d="M${x-36} ${y-80} l20 6 v14 l-20 -6z" style="fill:#FFFDF6"/>`,
       `<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z"/><circle cx="${x-17}" cy="${y-42}" r="1.8"/><path d="M${x-36} ${y-80} l20 6 v14 l-20 -6z"/><path d="M${x-27} ${y-70} c-2 -3 -5 -1 -3 2 l3 3 l3 -2 c2 -3 -1 -5 -3 -3" />`);
+    // Evan's room (and its door on the east wall of the house)
+    case "kiddoor": return sk(`<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z" style="fill:#F7D35A"/><path d="M${x+36} ${y-80} l-20 6 v14 l20 -6z" style="fill:#FFFDF6"/><path d="M${x+21} ${y-62} q2 -9 9 -10 q4 0 3 4 q-2 2 -4 1 l1 5z" style="fill:#7BB37A"/>`,
+      `<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z"/><circle cx="${x+17}" cy="${y-42}" r="1.8"/><path d="M${x+36} ${y-80} l-20 6 v14 l20 -6z"/><path d="M${x+21} ${y-62} q2 -9 9 -10 q4 0 3 4 q-2 2 -4 1 l1 5z"/>`);
+    case "carbed": { const k = G.kid ? G.kid() : {}, sl = !!k.sleep;
+      return sk(`<rect x="${x-62}" y="${y-92}" width="118" height="22" rx="8" style="fill:#FFFDF6"/><ellipse cx="${x-44}" cy="${y-90}" rx="18" ry="9" style="fill:#DCEBF6"/>
+        <path d="M${x-80} ${y-14} V${y-66} q0 -8 8 -8 H${x+28} l20 -22 h16 q8 0 8 8 V${y-14}z" style="fill:#E86A5C"/><path d="M${x+50} ${y-92} h12 v18 h-28z" style="fill:#DCEBF6"/>
+        <rect x="${x-72}" y="${y-48}" width="96" height="10" rx="5" style="fill:#FFFDF6"/>${sl ? `<path d="M${x-62} ${y-78} h86 v12 h-86z" style="fill:#7FB8E8"/><circle cx="${x-46}" cy="${y-92}" r="9" style="fill:var(--skin)"/><path d="M${x-55} ${y-94} q2 -9 10 -9 q7 0 8 7 q-5 -3 -10 -1z" style="fill:var(--hair)"/>` : ""}
+        <circle cx="${x-50}" cy="${y-12}" r="15" style="fill:#3B3B44"/><circle cx="${x+42}" cy="${y-12}" r="15" style="fill:#3B3B44"/><circle cx="${x-50}" cy="${y-12}" r="5" style="fill:#D9D9D9"/><circle cx="${x+42}" cy="${y-12}" r="5" style="fill:#D9D9D9"/><circle cx="${x+74}" cy="${y-52}" r="5" style="fill:#FFE38A"/>`,
+        `<rect x="${x-62}" y="${y-92}" width="118" height="22" rx="8"/><path d="M${x-80} ${y-14} V${y-66} q0 -8 8 -8 H${x+28} l20 -22 h16 q8 0 8 8 V${y-14}z"/><path d="M${x+50} ${y-92} h12 v18 h-28z"/><rect x="${x-72}" y="${y-48}" width="96" height="10" rx="5"/>
+        ${sl ? `<path d="M${x-62} ${y-78} h86 v12 h-86z"/><path d="M${x-50} ${y-92} q2 1.6 4 0 M${x-43} ${y-92} q2 1.6 4 0"/>` : ""}<circle cx="${x-50}" cy="${y-12}" r="15"/><circle cx="${x+42}" cy="${y-12}" r="15"/>`)
+        + (sl ? `<text x="${x-20}" y="${y-108}" font-size="12" fill="#3b3530" class="zz" pointer-events="none">z z z</text>` : ""); }
+    case "snacks": return sk(`<rect x="${x-38}" y="${y-96}" width="76" height="96" rx="5" style="fill:#F7C6A3"/><rect x="${x-32}" y="${y-88}" width="31" height="80" rx="3" style="fill:#FBD9BD"/><rect x="${x+1}" y="${y-88}" width="31" height="80" rx="3" style="fill:#FBD9BD"/>
+        <circle cx="${x-16}" cy="${y-62}" r="9" style="fill:#F26D6D"/><path d="M${x-16} ${y-71} q3 -5 7 -4" style="stroke:#5C8A3A" stroke-width="2" fill="none"/><path d="M${x+9} ${y-74} h14 l3 6 v20 h-20 v-20z" style="fill:#FFFDF6"/><path d="M${x+6} ${y-68} h20" style="stroke:#7FB8E8" stroke-width="3"/>`,
+      `<rect x="${x-38}" y="${y-96}" width="76" height="96" rx="5"/><rect x="${x-32}" y="${y-88}" width="31" height="80" rx="3"/><rect x="${x+1}" y="${y-88}" width="31" height="80" rx="3"/><circle cx="${x-6}" cy="${y-30}" r="2.2"/><circle cx="${x+6}" cy="${y-30}" r="2.2"/><circle cx="${x-16}" cy="${y-62}" r="9"/><path d="M${x+9} ${y-74} h14 l3 6 v20 h-20 v-20z"/>`);
+    case "balloons": return `<g class="floaty">${sk(`<path d="M${x-22} ${y-58} q-6 -40 -18 -60 M${x} ${y-36} q2 -50 6 -78 M${x+22} ${y-58} q8 -30 24 -54" fill="none"/><ellipse cx="${x-40}" cy="${y-130}" rx="16" ry="19" style="fill:#F26D6D"/><ellipse cx="${x+6}" cy="${y-136}" rx="16" ry="19" style="fill:#7FB8E8"/><ellipse cx="${x+46}" cy="${y-124}" rx="16" ry="19" style="fill:#F7C548"/>`,
+        `<path d="M${x-22} ${y-36} q-6 -50 -18 -75 M${x} ${y-36} q2 -50 6 -81 M${x+22} ${y-36} q8 -40 24 -69"/><ellipse cx="${x-40}" cy="${y-130}" rx="16" ry="19"/><ellipse cx="${x+6}" cy="${y-136}" rx="16" ry="19"/><ellipse cx="${x+46}" cy="${y-124}" rx="16" ry="19"/>`)}</g>`
+      + sk(`<rect x="${x-44}" y="${y-38}" width="88" height="38" rx="4" style="fill:#7BB37A"/><path d="M${x} ${y-30} l4 8 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z" style="fill:#F7C548"/>`,
+        `<rect x="${x-44}" y="${y-38}" width="88" height="38" rx="4"/><path d="M${x-44} ${y-28} h88"/><path d="M${x} ${y-30} l4 8 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z"/>`);
+    case "trainset": { let sl = ""; for (let i = 0; i < 18; i++) { const a = i/18*Math.PI*2, cx = x + Math.cos(a)*92, cy = y - 34 + Math.sin(a)*34; sl += `<path d="M${(cx - Math.sin(a)*6).toFixed(1)} ${(cy + Math.cos(a)*6*.4).toFixed(1)} l${(Math.sin(a)*12).toFixed(1)} ${(-Math.cos(a)*12*.4).toFixed(1)}" opacity=".7"/>`; }
+      return sk(`<ellipse cx="${x}" cy="${y-34}" rx="92" ry="34" fill="none" style="stroke:#B98B5E" stroke-width="7"/>
+        <rect x="${x-34}" y="${y-14}" width="24" height="16" rx="3" style="fill:#7FB8E8"/><rect x="${x-6}" y="${y-14}" width="24" height="16" rx="3" style="fill:#F7C548"/><path d="M${x+22} ${y+2} v-18 h12 v-8 h8 v8 h6 q6 0 6 6 v12z" style="fill:#E86A5C"/>`,
+        `${sl}<rect x="${x-34}" y="${y-14}" width="24" height="16" rx="3"/><rect x="${x-6}" y="${y-14}" width="24" height="16" rx="3"/><path d="M${x+22} ${y+2} v-18 h12 v-8 h8 v8 h6 q6 0 6 6 v12z"/><circle cx="${x-26}" cy="${y+3}" r="3.4"/><circle cx="${x+10}" cy="${y+3}" r="3.4"/><circle cx="${x+30}" cy="${y+3}" r="4"/><circle cx="${x+46}" cy="${y+3}" r="4"/>`); }
+    case "dinonest": return sk(`<ellipse cx="${x-14}" cy="${y-10}" rx="40" ry="13" style="fill:#C9A27E"/><ellipse cx="${x-28}" cy="${y-22}" rx="9" ry="12" style="fill:#FFF6E2"/><ellipse cx="${x-12}" cy="${y-24}" rx="9" ry="12" style="fill:#FFF6E2"/><ellipse cx="${x+4}" cy="${y-21}" rx="9" ry="12" style="fill:#FFF6E2"/>
+        <path d="M${x+20} ${y} q-4 -28 12 -34 q2 -22 16 -20 q10 2 8 12 q-2 6 -10 6 q4 12 2 36z" style="fill:#7BB37A"/><path d="M${x+28} ${y-36} l-4 -6 l6 1 l1 -6 l5 4" style="fill:#F7C548"/><circle cx="${x-12}" cy="${y-26}" r="2.2" style="fill:#F2A65A"/><circle cx="${x-28}" cy="${y-20}" r="2" style="fill:#A8CF8E"/>`,
+      `<ellipse cx="${x-14}" cy="${y-10}" rx="40" ry="13"/><path d="M${x-48} ${y-12} l6 -4 M${x-36} ${y-4} l5 -6 M${x+12} ${y-6} l6 -4" opacity=".6"/><ellipse cx="${x-28}" cy="${y-22}" rx="9" ry="12"/><ellipse cx="${x-12}" cy="${y-24}" rx="9" ry="12"/><ellipse cx="${x+4}" cy="${y-21}" rx="9" ry="12"/>
+        <path d="M${x+20} ${y} q-4 -28 12 -34 q2 -22 16 -20 q10 2 8 12 q-2 6 -10 6 q4 12 2 36z"/><circle cx="${x+50}" cy="${y-46}" r="1.6"/>`);
+    case "garage": return sk(`<path d="M${x-40} ${y-14} v-38 l40 -22 l40 22 v38z" style="fill:#9BC1E6"/><path d="M${x-22} ${y-14} v-26 h44 v26z" style="fill:#4A5568"/><path d="M${x-46} ${y-52} l46 -26 l46 26" style="fill:none"/>
+        <path d="M${x-58} ${y+6} v-8 q0 -3 3 -3 h7 l5 -6 h12 q3 0 4 3 l4 6 q4 0 4 4 v4z" style="fill:#E86A5C"/><path d="M${x+20} ${y+8} v-8 q0 -3 3 -3 h7 l5 -6 h12 q3 0 4 3 l4 6 q4 0 4 4 v4z" style="fill:#F7C548"/>`,
+      `<path d="M${x-40} ${y-14} v-38 l40 -22 l40 22 v38z"/><path d="M${x-22} ${y-14} v-26 h44 v26z M${x-22} ${y-32} h44 M${x-22} ${y-24} h44"/><path d="M${x-58} ${y+6} v-8 q0 -3 3 -3 h7 l5 -6 h12 q3 0 4 3 l4 6 q4 0 4 4 v4z"/><circle cx="${x-50}" cy="${y+7}" r="3.4"/><circle cx="${x-32}" cy="${y+7}" r="3.4"/>
+        <path d="M${x+20} ${y+8} v-8 q0 -3 3 -3 h7 l5 -6 h12 q3 0 4 3 l4 6 q4 0 4 4 v4z"/><circle cx="${x+28}" cy="${y+9}" r="3.4"/><circle cx="${x+46}" cy="${y+9}" r="3.4"/>`);
     case "bed": { const sl = G.S && G.S().sleep, d = (G.F().decor || {}), pj = d.me_pj ? "#3B4A86" : "var(--tank)";
       return sk(`<rect x="${x-78}" y="${y-132}" width="156" height="40" rx="10" style="fill:var(--wood)"/><rect x="${x-74}" y="${y-104}" width="148" height="100" rx="6" style="fill:#FFFDF6"/>
         <rect x="${x-66}" y="${y-100}" width="58" height="24" rx="9" style="fill:#F6EEF4"/><rect x="${x+8}" y="${y-100}" width="58" height="24" rx="9" style="fill:#F6EEF4"/>
@@ -329,6 +359,15 @@ export function roomArt(id){
   st.forEach(s => {
     h += `<g data-spot="${s.id}" aria-label="${s.name}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${tapeLabel(s.x, s.y + 24, s.name, "var(--card)")}</g>`;
   });
+  if (id === "kidroom") {
+    // the door back to the house on the west wall: grown-ups press and hold it (toddler taps don't leave)
+    const k = G.kid ? G.kid() : {};
+    h += `<g data-exit="1" class="kidexit" aria-label="Back to the house (press and hold)"><ellipse class="hov" cx="34" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
+      ${sk(`<path d="M0 346 L28 358 L28 456 L0 466z" style="fill:#F7D35A"/>`, `<path d="M0 346 L28 358 L28 456 L0 466z"/><circle cx="23" cy="410" r="1.8"/>`)}
+      <circle class="holdring" cx="44" cy="406" r="15" fill="rgba(255,253,246,.85)" stroke="#7BB37A" stroke-width="4" stroke-dasharray="94.3" stroke-dashoffset="94.3" transform="rotate(-90 44 406)"/>${tapeLabel(64, 334, "Grown-ups: hold", "var(--card)", 10)}</g>`;
+    if (k.sleep) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".34" pointer-events="none"/>`;
+    return h;
+  }
   if (id === "room") {
     // Maple's bed (she sleeps in it while Mel's in here), the door back to the house on the east wall, and night
     const sl = G.S && G.S().sleep;

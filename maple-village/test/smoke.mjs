@@ -719,6 +719,70 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#pclose");
   await page.close();
 }
+{
+  // Evan's room: Evan leads, Mel waits by the door, the toddler plays, and nothing in Mel's game changes
+  console.log("\nevan's room");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.goto(url + "?reset=1&seed=1&time=10:30");
+  await page.waitForTimeout(800);
+  await page.locator('#world [data-place="home"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(await page.locator('#world [data-spot="kiddoor"]').count() === 1, "the house has a door to Evan's room on the right");
+  const before = await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")), t = JSON.parse(localStorage.getItem("fox.today")); return JSON.stringify({c: f.coins, x: f.xp, done: t.doneIds, e: t.earned}); });
+  await page.locator('#world [data-spot="kiddoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Evan's room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(1500);
+  check(await page.evaluate(() => document.body.classList.contains("kidmode")) && await page.locator("#chatBtn").isHidden() && await page.locator(".hudbtns").isHidden(), "inside, the grown-up buttons are tucked away");
+  check(await page.evaluate(() => getComputedStyle(document.getElementById("mmaple")).display === "none"), "Maple stays outside");
+  const melAt = await page.evaluate(() => document.getElementById("mel").getAttribute("transform"));
+  await page.locator('#world [data-spot="snacks"]').dispatchEvent("click");
+  await page.waitForSelector("#ctx [data-snack]", { timeout: 10000 });
+  check(await page.evaluate(() => document.getElementById("mel").getAttribute("transform")) === melAt, "Evan walks to the snack cupboard while Mel waits by the door");
+  check(await page.locator("#ctx [data-snack]").count() === 5, "the snack cupboard has milk, juice, apple chips, watermelon and goldfish crackers");
+  await page.click('#ctx [data-snack="fish"]'); await page.waitForTimeout(300);
+  check(await page.locator("#panel").isHidden() && /fish|crunch/i.test(await page.locator("#evanSay").textContent()), "picking one, Evan munches it");
+  await page.locator('#world [data-spot="dino"]').dispatchEvent("click");
+  await page.waitForSelector("#kgame .kegg", { timeout: 10000 });
+  for (let i = 0; i < 4; i++) { await page.click(`[data-egg="${i}"]`); await page.click(`[data-egg="${i}"]`); }
+  check(await page.locator("#kgame .kpop").count() === 4, "the dino egg game: tap tap, a baby dinosaur hatches");
+  await page.click('[data-kid="done"]');
+  await page.locator('#world [data-spot="train"]').dispatchEvent("click");
+  await page.waitForSelector("#kgame .ktrain", { timeout: 10000 });
+  await page.click("#kgame"); await page.waitForTimeout(3300);
+  check(await page.locator("#kgame .ktrain svg").count() === 3, "the train game: off it goes, back with another carriage");
+  await page.click('[data-kid="done"]');
+  await page.locator('#world [data-spot="kbed"]').dispatchEvent("click");
+  await page.waitForFunction(() => document.getElementById("evan").style.visibility === "hidden", null, { timeout: 10000 });
+  check(await page.locator("#world .zz").count() >= 1, "Evan can sleep in his car bed");
+  await page.locator("#world").click({ position: { x: 200, y: 500 } }); await page.waitForTimeout(400);
+  check(await page.evaluate(() => document.getElementById("evan").style.visibility !== "hidden"), "and a tap wakes him");
+  await page.locator('#world [data-exit]').dispatchEvent("click"); await page.waitForTimeout(500);
+  check(/Evan's room/.test(await page.locator("#sceneName").textContent()), "a tap on the door doesn't leave (little fingers)");
+  await page.locator('#world [data-exit]').dispatchEvent("pointerdown"); await page.waitForTimeout(1700);
+  await page.waitForFunction(() => !/Evan's room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 5000 }).catch(() => {});
+  check(!/Evan's room/.test(await page.locator("#sceneName").textContent()) && !(await page.evaluate(() => document.body.classList.contains("kidmode"))), "a grown-up's press-and-hold goes back to the house");
+  const after = await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")), t = JSON.parse(localStorage.getItem("fox.today")); return JSON.stringify({c: f.coins, x: f.xp, done: t.doneIds, e: t.earned}); });
+  check(before === after, "nothing in Evan's room changes Mel's game (coins, XP, quests)");
+  // hugs: Evan runs over with his arms up; a tap on him and Mel hugs back
+  await page.goto(url + "?seed=1&time=10:30&hugsoon=1");
+  await page.waitForFunction(() => document.getElementById("evan").classList.contains("hug"), null, { timeout: 25000 }).catch(() => {});
+  check(await page.evaluate(() => document.getElementById("evan").classList.contains("hug")), "now and then Evan comes over for a hug");
+  await page.locator("#evan").dispatchEvent("click"); await page.waitForTimeout(300);
+  check(await page.evaluate(() => document.getElementById("mel").classList.contains("hugging")) && !(await page.locator("#melSay").isHidden()), "tap him and Mel hugs him back");
+  // bedtime: 8pm to 7am Evan is asleep in his room
+  await page.goto(url + "?seed=1&time=21:00");
+  await page.waitForTimeout(800);
+  check(await page.evaluate(() => getComputedStyle(document.getElementById("evan")).display === "none"), "after 8pm Evan isn't out playing");
+  await page.locator('#world [data-place="home"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-spot="kiddoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Evan's room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(800);
+  await page.locator("#world").click({ position: { x: 200, y: 500 } }); await page.waitForTimeout(300);
+  check(await page.locator("#world .zz").count() >= 1 && /shh/.test(await page.locator("#evanSay").textContent()), "at night he's asleep in his car bed, and stays asleep");
+  await page.screenshot({ path: join(shots, "evan-room-night.png") });
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

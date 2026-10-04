@@ -56,9 +56,13 @@ export function nextHop(from, to){
   return null;
 }
 export const outdoorOf = s => OUTDOOR.includes(s) ? s : INNER[s] ? outdoorOf(INNER[s].parent) : (VILLAGE[s] ? VILLAGE[s].scene : "village");
-// Rooms inside another room: Mel's room is through the west door of the house. door: where she steps into the
-// parent room; arrive: where she steps into the inner room (its own door is on the east wall).
-export const INNER = {room: {parent: "home", door: [64, 340], arrive: [456, 400]}};
+// Rooms inside another room: Mel's room is through the west door of the house, Evan's through the east door.
+// door: where Mel steps into the parent room; arrive: where she steps into the inner room; exit: the inner room's
+// own door (on the opposite wall), where she walks to leave.
+export const INNER = {
+  room: {parent: "home", door: [64, 340], arrive: [456, 400], exit: [486, 410]},
+  kidroom: {parent: "home", door: [456, 340], arrive: [70, 420], exit: [34, 410]}
+};
 export const WORK = ["hall","chord","fresh","chico","post","home"];
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
 // Each room may place its slots differently via `pos` (falls back to POS). Stations with a null regex are never
@@ -96,11 +100,14 @@ export const ROOMS = {
     ["scales","Stamps & scales","C","scales",/invoice|pay|bill|stripe|account|bank|receipt|expense|price/,"Weigh it, stamp it, send it."],
     ["ledge","Writing ledge","D","desk",/./,"A tidy little ledge for odd jobs."],
     ["pobox","Post box","E","pobox",null,"Your post box: unread mail from your work inbox."]]},
-  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{A:[120,216], B:[414,228], H:[326,250], C:[124,450], R:[40,330], D:[464,452], G:[396,372], E:[436,598], F:[96,596]}, stations:[
+  // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
+  // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
+  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{A:[120,216], B:[414,228], H:[326,250], C:[124,450], R:[40,330], K:[480,330], D:[350,556], G:[436,448], E:[448,598], F:[96,596]}, stations:[
     ["desk","Home desk","A","desk",/./,"Your own little desk."],
     ["kitchen","Kitchen","B","kitchen",/cook|meal|lunch|dinner|bake|grocer|prep/,"Something smells good."],
     ["sofa","Sofa","C","sofa",/read|rest|journal|meditat|book|nap/,"Soft cushions, deep breaths."],
     ["mydoor","My room","R","sidedoor",null,"Your room. Just you.",0],
+    ["kiddoor","Evan's room","K","kiddoor",null,"Evan's room. Dinosaurs welcome.",0],
     ["laundry","Laundry","D","laundry",/fold|laundry|clothes|wash|iron/,"Fold, stack, done."],
     ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Hestia's chores live in here."],
     ["fridge","Fridge","H","fridge",null,"The fridge: what we have, and the shopping list."],
@@ -115,6 +122,15 @@ export const ROOMS = {
     ["nook","Calm corner","C","calm",null,"Cushions, a candle, one slow breath."],
     ["journal","Writing desk","D","writedesk",null,"Your journal lives in the top drawer."],
     ["jars","Emotion shelf","J","jarshelf",null,"Feelings, kept safe in jars.",-78]]},
+  // Evan's room, through the east door of the house: a toddler-safe play space. Evan taps around; nothing in here
+  // touches the rest of the game (no coins, no saves). Mel waits by the door; Maple stays outside.
+  kidroom: {name:"Evan's room", wall:"#F9E08A", trim:"#7BB37A", noBoard:true, pos:{A:[160,290], B:[430,262], T:[290,470], D:[420,560], C:[120,586], E:[310,250]}, stations:[
+    ["kbed","Car bed","A","carbed",null,"Vroom vroom, time for bed."],
+    ["snacks","Snack cupboard","B","snacks",null,"Snacks! What would you like?",30],
+    ["balloons","Balloons","E","balloons",null,"Pop pop pop!",20],
+    ["train","Train set","T","trainset",null,"Choo choo!",28],
+    ["dino","Dino eggs","D","dinonest",null,"What's inside the eggs?",22],
+    ["cars","Toy cars","C","garage",null,"Beep beep!",18]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };

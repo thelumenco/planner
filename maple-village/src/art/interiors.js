@@ -94,6 +94,19 @@ const SHELLS = {
     ${d.r_vanity ? sk(`<rect x="38" y="584" width="70" height="12" rx="2" style="fill:var(--wood)"/><ellipse cx="73" cy="558" rx="20" ry="26" style="fill:#DCE8F4"/>`, `<rect x="38" y="584" width="70" height="12" rx="2"/><path d="M46 596 v16 M100 596 v16"/><ellipse cx="73" cy="558" rx="20" ry="26"/><path d="M64 544 l8 -8" opacity=".6"/>`) : ""}
     ${skirting}`; },
 
+  // Evan's room: a sunny yellow wall of little dinosaurs, a soft mint carpet, a road play mat, bunting and a train picture
+  kidroom: () => { const dino = (x, y, c, f) => `<path transform="translate(${x} ${y}) scale(${f ? -.9 : .9} .9)" d="M-12 6 q-2 -10 6 -12 q2 -8 9 -7 q5 1 4 6 q-1 3 -5 3 q2 5 1 10 h-4 v-3 h-5 v3z M-12 6 q-6 -2 -9 -6 q5 1 9 0" style="fill:${c}"/>`;
+    return `<rect width="520" height="640" style="fill:#DDEBD5"/>
+    <g style="fill:#CFE0C4" opacity=".8">${rows(9, r => rows(14, i => `<circle cx="${i*38 + (r % 2)*19 + 10}" cy="${178 + r*52}" r="1.8"/>`))}</g>
+    ${sk(`<rect x="168" y="540" width="190" height="78" rx="14" style="fill:#B9CFA8"/><rect x="184" y="554" width="158" height="50" rx="22" fill="none" style="stroke:#6B7280" stroke-width="12"/>`,
+      `<rect x="168" y="540" width="190" height="78" rx="14"/><rect x="184" y="554" width="158" height="50" rx="22" fill="none" stroke-dasharray="6 6" style="stroke:#FFFDF6" stroke-width="1.6"/>`)}
+    ${wallBase("#F9E08A", "#7BB37A")}
+    <g opacity=".75">${rows(5, r => rows(12, i => dino(i*44 + (r % 2)*22 + 16, r*27 + 18, ["#A8CF8E", "#F2A65A", "#7FB8E8"][(i + r) % 3], (i + r) % 2)))}</g>
+    <g>${rows(13, i => `<path d="M${i*40 + 4} 10 l14 22 l14 -22z" style="fill:${["#F26D6D", "#7FB8E8", "#7BB37A", "#F7F2E4"][i % 4]}" opacity=".9"/>`)}</g><path d="M0 10 Q260 18 520 10" fill="none" style="stroke:var(--line)" stroke-width="1.2" filter="url(#wob)"/>
+    ${sk(`<rect x="404" y="52" width="80" height="58" rx="3" style="fill:#FFFDF6"/><path d="M414 94 h60" style="stroke:#B98B5E" stroke-width="3"/><path d="M420 92 v-14 h10 v-6 h6 v6 h6 q4 0 4 4 v10z" style="fill:#E86A5C"/><rect x="450" y="80" width="18" height="12" rx="2" style="fill:#7FB8E8"/>`,
+      `<rect x="398" y="46" width="92" height="70" rx="3"/><rect x="404" y="52" width="80" height="58" rx="3"/><path d="M420 92 v-14 h10 v-6 h6 v6 h6 q4 0 4 4 v10z"/><rect x="450" y="80" width="18" height="12" rx="2"/>`)}
+    ${skirting}`; },
+
   market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(24, i => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`)}</g>
     <g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--blush)"/></g>

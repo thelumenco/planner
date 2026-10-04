@@ -23,6 +23,7 @@ import { loadRevenue, revenuePanel, wireRevenue } from "./revenue.js";
 import { attachJars, jarsPanel, makeJar, emptyJar, jarById, addCustom, palette as jarPalette, shelf as jarShelf, MAX_BLOBS, MAX_KINDS } from "./jars.js";
 import { addJarEntry, removeEntry } from "./myroom.js";
 import { attachMyDocs, journalPanel, wireJournal, scratchPanel, wireScratch } from "./myroom.js";
+import { kid, kidPanel, wireKid, stopKidGame, SNACKS, snackPic, EVAN_TAPS, pickSay } from "./kid.js";
 import { addReminder, cancelReminder, upcoming as upcomingReminders, dueNow, fmtWhen } from "./reminders.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 
@@ -59,7 +60,7 @@ function migrate(){
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
-setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf()});
+setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf(), kid: () => ({sleep: kid.sleep || evanNight()})});
 function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
@@ -350,6 +351,7 @@ const unprompted = () => Date.now() - lastInput > 1500;
 const quietNow = () => hushed() && unprompted();
 function speak(text, ms, force){
   const el = $("speech");
+  if (scene === "kidroom") return;   // Maple waits outside Evan's room
   if (!force && quietNow()) { if (!el.hidden) el.textContent = plain(text); return; }
   el.hidden = false; speechAt = Date.now(); el.textContent = plain(text); el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
   clearTimeout(speechT); speechLock = ms ? Date.now() + ms : 0;
@@ -357,7 +359,30 @@ function speak(text, ms, force){
 }
 function setSay(line, buttons){ say = {line, buttons}; speak(line); }
 let evanT;
-function evanSays(t){ if (quietNow()) return; const e = $("evanSay"); e.innerHTML = `<b class="who">Evan</b>${esc(plain(t))}`; e.hidden = false; clearTimeout(evanT); evanT = setTimeout(() => e.hidden = true, 2200); }
+// Hugs: every few minutes Evan runs over with his arms up. Tap him and Mel hugs him back; otherwise she still
+// gives him a little "aww". Pure fun: nothing is saved or earned.
+let hug = null, hugAt = Date.now() + (/[?&]hugsoon/.test(location.search) ? 3 : 60 + Math.random()*90)*1000, melT;   // ?hugsoon: tests
+function melSays(t){ const e = $("melSay"); e.innerHTML = `<b class="who">Mel</b>${esc(plain(t))}`; e.hidden = false; clearTimeout(melT); melT = setTimeout(() => e.hidden = true, 2800); }
+function hugTick(){
+  if (!hug) {
+    const busy = !$("panel").hidden || kid.sleep || kid.open || route.length || mel.moving || (scene === "base" && atSpot === "swing");
+    if (Date.now() > hugAt && evanHere() && !busy) { hug = {phase: "run", t: Date.now()}; evan.tx = mel.x + (mel.dir > 0 ? 16 : -16); evan.ty = mel.y + 4; evan.run = true; evan.path = null; evan.rk = ""; kid.pending = null; evanSays("Mama!"); }
+    return false;
+  }
+  if (!evanHere() || Date.now() - hug.t > 20000) { endHug(); return false; }
+  if (hug.phase === "run") { evan.tx = mel.x + (mel.dir > 0 ? 16 : -16); evan.ty = mel.y + 4;
+    if (Math.hypot(evan.x - evan.tx, evan.y - evan.ty) < 6) { hug.phase = "ask"; hug.t = Date.now(); evan.dir = evan.x < mel.x ? 1 : -1; nodes.evan.classList.add("hug"); evanSays("hug?"); mprop("heart", evan.x, evan.y - 36); } }
+  else if (hug.phase === "ask" && Date.now() - hug.t > 6000) { mel.dir = evan.x < mel.x ? -1 : 1; mprop("heart", mel.x, mel.y - 56); melSays(pickSay(["Aww, hi baby.", "Hello, you.", "Mwah!"])); endHug(); }
+  return true;   // Evan's busy hugging: no wandering off
+}
+function hugBack(){
+  mel.dir = evan.x < mel.x ? -1 : 1; nodes.mel.classList.add("hugging"); nodes.evan.classList.add("hug");
+  [0, 250, 500].forEach(d => setTimeout(() => mprop("heart", (mel.x + evan.x)/2 + rnd(-10, 10), mel.y - 50, 1900), d));
+  sfx("chime"); melSays(pickSay(["Love you, little one!", "Biggest hug!", "Squeeze!", "My favourite boy."])); setTimeout(() => evanSays(pickSay(["hehe!", "love you Mama!", "again!"])), 900);
+  setTimeout(() => nodes.mel.classList.remove("hugging"), 1800); endHug(1800);
+}
+function endHug(ms){ hug = null; hugAt = Date.now() + (240 + Math.random()*240)*1000; setTimeout(() => nodes.evan.classList.remove("hug"), ms || 0); }
+function evanSays(t){ if (scene !== "kidroom" && quietNow()) return; const e = $("evanSay"); e.innerHTML = `<b class="who">Evan</b>${esc(plain(t))}`; e.hidden = false; clearTimeout(evanT); evanT = setTimeout(() => e.hidden = true, 2200); }
 
 /* =================== PORTRAIT ANIMATION =================== */
 const portrait = $("scene"), props = $("props");
@@ -427,6 +452,8 @@ let lastReady = readyCount(), lastDusk = null;
 setInterval(() => {
   if (S.sleep && S.sleep.until && Date.now() > S.sleep.until) wakeUp();
   if (hushed() && !$("speech").hidden && Date.now() > speechLock && Date.now() - speechAt > 6000) $("speech").hidden = true;   // tuck Maple's bubble away
+  $("evan").style.display = evanHere() ? "" : "none";
+  if (scene === "kidroom" && evanNight() && !kid.sleep) { kid.sleep = true; kid.open = null; stopKidGame(); ctx(); drawScene(); }
   const due = dueNow(F); if (due.length) { chime(); act("nudge"); speak(`Reminder: ${due.map(r => r.text).join(", and ")}.`, 9000, true); save(); }
   if (S.day !== dayKey()) { S = freshToday(); say = null; save(true); speak(defaultLine()); syncSunsama(); return; }
   const rc = readyCount();
@@ -1088,6 +1115,7 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
+  if (kid.open) { kid.open = null; stopKidGame(); ctx(); return; }
   boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
@@ -1126,7 +1154,11 @@ function itemBtn(id, label, disabled, extra){
 }
 function ctx(){
   const c = $("ctx"); let h = "";
-  if (homeView && scene === "home") h = hestiaPanel(homeView);
+  // a game in progress isn't redrawn by background refreshes (it would restart under Evan's fingers)
+  if (kid.open && scene === "kidroom" && c.dataset.kid === kid.open && !$("panel").hidden && !openView) return;
+  c.dataset.kid = kid.open && scene === "kidroom" ? kid.open : "";
+  if (kid.open && scene === "kidroom") h = kidPanel(kid.open);
+  else if (homeView && scene === "home") h = hestiaPanel(homeView);
   else if (postOpen && scene === "post") h = postPanel();
   else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
   else if (newsOpen && scene === "village") h = goodNewsHTML(myWins());
@@ -1221,6 +1253,7 @@ function ctx(){
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
   }
   c.innerHTML = h;
+  if (kid.open && scene === "kidroom") wireKid(c, kid.open, {eat: id => { kid.open = null; ctx(); kidEat(id); }, close: () => { kid.open = null; stopKidGame(); ctx(); }});
   if (homeView && scene === "home") wireHestia(c, homeView);
   c.querySelectorAll("[data-postfresh]").forEach(b => b.onclick = () => { fetchPost(true).then(() => { ctx(); drawScene(); }); ctx(); });
   showPanel(!!h, homeView === "fridge" && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
@@ -1329,9 +1362,9 @@ function questMark(){
     if (outside() && target.pl === "base") pos = scene === "base" ? (() => { const v = VILLAGE[target.sp]; return v.mark || [v.door[0], v.door[1] - 64]; })() : VILLAGE[BRIDGES[scene][nextHop(scene, "base")]].mark;
     else if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][nextHop(scene, outdoorOf(target.pl))]].mark;
     else if (scene === target.pl) { const s = spotObj(scene, target.sp); pos = [s.x, s.y - 70]; }
-    else pos = INNER[scene] ? [486, 330] : [260, 582];
+    else pos = INNER[scene] ? [INNER[scene].exit[0], 330] : [260, 582];
   }
-  if (!pos) { m.style.display = "none"; return; }
+  if (!pos || scene === "kidroom") { m.style.display = "none"; return; }
   m.style.display = ""; m.setAttribute("transform", `translate(${pos[0]} ${pos[1]})`);
 }
 function drawScene(){
@@ -1354,6 +1387,7 @@ function dressMel(){
 }
 function render(redraw){
   if (S.day !== dayKey()) S = freshToday();
+  $("evan").style.display = evanHere() ? "" : "none";
   creditEarly(); dressMel();
   if (redraw) drawScene();
   const L = level(), next = LEVELS[L+1];
@@ -1400,12 +1434,14 @@ const maple = {x:mel.x - 24, y:mel.y + 2, tx:mel.x - 24, ty:mel.y + 2, dir:1, mo
 const evan = {x:250, y:360, tx:250, ty:360, dir:1, moving:false, run:false, wait:2};
 let route = [], keys = new Set();
 const svg = $("world");
-const evanHere = () => scene === "base" || scene === "home";
+// Evan's bedtime: 8pm to 7am he's asleep in his car bed, so he isn't out at home base or in the house
+const evanNight = () => { const m = sgHM(); return m >= 20*60 || m < 7*60; };
+const evanHere = () => scene === "kidroom" || ((scene === "base" || scene === "home") && !evanNight());
 function outside(){ return OUTDOOR.includes(scene); }
 const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : scene === "lane" ? [14, 140, W - 14, HH - 14] : [34, 168, W - 34, 612];
 
 function setScene(id, at){
-  const w = $("world"); w.classList.add("fading");
+  const w = $("world"), from = scene; w.classList.add("fading");
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
     scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
@@ -1413,7 +1449,15 @@ function setScene(id, at){
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
     if (id === "base") { evan.x = evan.tx = 300; evan.y = evan.ty = 360; }
+    else if (id === "home" && from === "kidroom") { evan.x = evan.tx = p[0] - 24; evan.y = evan.ty = p[1] + 6; evan.run = false; evan.wait = 3; }
     else if (id === "home") { evan.x = evan.tx = 300; evan.y = evan.ty = 520; }
+    // Evan's room: he runs in ahead, Mel waits just inside the door, Maple stays out in the house
+    kid.open = null; kid.pending = null; stopKidGame();
+    if (id === "kidroom") { kid.sleep = evanNight(); mel.dir = 1; evan.x = p[0] + 30; evan.y = p[1] + 8; evan.tx = kid.sleep ? 170 : 200; evan.ty = kid.sleep ? 340 : 440; evan.run = true; evan.path = null; evan.rk = "";
+      if (!kid.sleep) setTimeout(() => evanSays(pickSay(["my room!", "yay!", "play!"])), 700); }
+    else kid.sleep = false;
+    document.body.classList.toggle("kidmode", id === "kidroom");
+    $("mmaple").style.display = id === "kidroom" ? "none" : ""; if (id === "kidroom") $("speech").hidden = true;
     $("evan").style.display = evanHere() ? "" : "none";
     render(true); w.classList.remove("fading");
     if (route.length) nextLeg();
@@ -1429,7 +1473,7 @@ function go(target, x, y, fn){
     // An inner room (Mel's room) is reached through its parent room: out through its east door first, in through
     // the parent's west door last.
     const tIn = INNER[target] ? INNER[target].parent : target;
-    if (INNER[cur] && cur !== tIn) { const I = INNER[cur], from = cur; legs.push({scene:from, x:486, y:410, fn:() => setScene(I.parent, I.door)}); cur = I.parent; }
+    if (INNER[cur] && cur !== tIn) { const I = INNER[cur], from = cur; legs.push({scene:from, x:I.exit[0], y:I.exit[1], fn:() => setScene(I.parent, I.door)}); cur = I.parent; }
     if (cur !== tIn) {
       const curOut = outdoorOf(cur), tOut = outdoorOf(tIn), c0 = cur;
       // 1. out of the building, 2. over the bridge if the target is on the other screen, 3. in at the target's door
@@ -1459,6 +1503,7 @@ function arriveSpot(id){
   atSpot = id;
   const ph = phase();
   if (id === "mydoor") { setScene("room", INNER.room.arrive); return; }
+  if (id === "kiddoor") { setScene("kidroom", INNER.kidroom.arrive); return; }
   if (id === "bed") { bedOpen = true; sfx("paper", true); render(); return; }
   if (id === "window") { const shut = F.curtains ? F.curtains === "closed" : (isDusk() || !!S.sleep); F.curtains = shut ? "open" : "closed"; sfx("paper", true); speak(shut ? "Curtains open. Hello, sky." : "Curtains closed. Cosy.", 2500); save(true); return; }
   if (id === "record") { recOpen = true; sfx("paper", true); render(); return; }
@@ -1504,14 +1549,51 @@ function arriveVillageSpot(id){
   if (id === "board") { arriveSpot("board"); return; }
   if (id === "pond") { speak(phase() === "break" ? "Perfect break spot. Breathe." : VILLAGE.pond.line, 4000); render(); }
 }
+/* ---------- Evan's room: Evan is the one who moves. Nothing here saves or earns. ---------- */
+function kidTap(ev){
+  if (kid.sleep) {
+    if (evanNight()) { evanSays("shh… sleeping"); return; }   // bedtime: he stays asleep
+    kid.sleep = false; evan.x = evan.tx = 230; evan.y = evan.ty = 340; drawScene(); evanSays(pickSay(["morning!", "awake!", "*yawn*"])); sfx("chime"); return;
+  }
+  if (ev.target.closest("[data-exit]")) { if (!kidHeld) flash("Grown-ups: press and hold the door to go back to the house."); kidHeld = false; return; }
+  const ent = ev.target.closest("[data-ent]");
+  if (ent && ent.dataset.ent === "mel") { evan.tx = mel.x + 18; evan.ty = mel.y + 4; evan.run = true; kid.pending = null; evanSays("Mama!"); mprop("heart", mel.x, mel.y - 50); return; }
+  if (ent && ent.dataset.ent === "evan" && hug && hug.phase === "ask") { hugBack(); return; }
+  if (ent && ent.dataset.ent === "evan") { evanSays(pickSay(EVAN_TAPS)); mprop("heart", evan.x, evan.y - 36); sfx("tap"); return; }
+  const sp = ev.target.closest("[data-spot]");
+  if (sp) { const s = spotObj(scene, sp.dataset.spot); if (!s) return; evan.tx = s.tx; evan.ty = s.ty; evan.run = true; kid.pending = s.id; sfx("tap"); return; }
+  const [x, y] = toWorld(ev), b = bounds(); evan.tx = clamp(x, b[0] + 30, b[2]); evan.ty = clamp(y, b[1] + 20, b[3]); evan.run = Math.random() < .5; kid.pending = null;
+}
+function kidAction(id){
+  if (id === "kbed") { kid.sleep = true; drawScene(); evanSays("night night"); sfx("bowl"); return; }
+  if (id === "snacks" || ["dino", "train", "cars", "balloons"].includes(id)) { kid.open = id; sfx("paper", true); ctx(); return; }
+}
+function kidEat(id){
+  const sn = SNACKS[id]; if (!sn) return;
+  const p = document.createElement("div"); p.className = "mprop kprop"; p.innerHTML = snackPic(id, 40);
+  p.style.left = (evan.x*cam.s + cam.ox) + "px"; p.style.top = ((evan.y - 52)*cam.s + cam.oy) + "px"; $("mprops").appendChild(p); setTimeout(() => p.remove(), 2600);
+  sfx(sn.fx); setTimeout(() => sfx(sn.fx), 700); evanSays(pickSay(sn.say));
+  nodes.evan.classList.remove("hop"); void nodes.evan.getBBox(); nodes.evan.classList.add("hop"); setTimeout(() => nodes.evan.classList.remove("hop"), 700);
+}
+// Leaving Evan's room takes a grown-up's press-and-hold on the door (taps from little fingers don't count)
+let kidHold = null, kidHeld = false;
+svg.addEventListener("pointerdown", ev => {
+  if (scene !== "kidroom") return; const ex = ev.target.closest("[data-exit]"); if (!ex) return;
+  ex.classList.add("holding"); clearTimeout(kidHold);
+  kidHold = setTimeout(() => { kidHeld = true; ex.classList.remove("holding"); leaveKidRoom(); }, 1300);
+});
+["pointerup", "pointercancel", "pointerleave"].forEach(t => svg.addEventListener(t, () => { if (scene !== "kidroom") return; clearTimeout(kidHold); document.querySelectorAll(".kidexit.holding").forEach(e => e.classList.remove("holding")); }));
+function leaveKidRoom(){ kid.open = null; stopKidGame(); kid.sleep = false; const I = INNER.kidroom; setScene("home", [I.door[0] - 10, I.door[1] + 24]); }
 function toWorld(ev){ const r = $("map").getBoundingClientRect(); return [(ev.clientX - r.left - cam.ox)/cam.s, (ev.clientY - r.top - cam.oy)/cam.s]; }
 svg.addEventListener("click", ev => {
+  if (scene === "kidroom") { kidTap(ev); return; }
   if (S.sleep && scene === "room") { S.sleep = null; speak("Up we get!", 2500); save(true); }   // any tap wakes Mel
   const npc = ev.target.closest("[data-npc]");
   if (npc) { tapNpc(npc.dataset.npc); return; }
   const ug = ev.target.closest("[data-ugarden]");
   if (ug) { const k = ug.dataset.ugarden, st = ST[k] || {}; speak(`${(st.users || 0).toLocaleString()} ${st.label || (k === "chord" ? "studios" : "families")} use ${k === "chord" ? "Chord" : "Chico"}! One flower for every ${st.per > 0 ? st.per : 10}.`, 4500); return; }
   const ent = ev.target.closest("[data-ent]");
+  if (ent && ent.dataset.ent === "evan" && hug && hug.phase === "ask") { hugBack(); return; }
   if (ent && ent.dataset.ent === "evan") { evanSays(pick(["Mama!", "hug!", "hehe!", "up up!"])); mprop("heart", evan.x, evan.y - 40); evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; return; }
   if (ent && ent.dataset.ent === "maple") { sfx("purr"); if (Math.random() < .35) { hearts(2); speak("Purr… treats and toys are in your backpack. Tap the bag up top!", 4000); return; } hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please."]), 3000); return; }
   const pl = ev.target.closest("[data-place]");
@@ -1522,7 +1604,9 @@ svg.addEventListener("click", ev => {
     return;
   }
   const sp = ev.target.closest("[data-spot]");
-  if (sp) { const s = spotObj(scene, sp.dataset.spot); go(scene, s.tx, s.ty, () => arriveSpot(s.id)); return; }
+  if (sp) { const s = spotObj(scene, sp.dataset.spot); go(scene, s.tx, s.ty, () => arriveSpot(s.id));
+    if (s.id === "kiddoor" && evanHere()) { evan.tx = s.tx - 20; evan.ty = s.ty + 6; evan.run = true; evan.wait = 9; evanSays("my room!"); }   // Evan leads the way
+    return; }
   if (ev.target.closest("[data-exit]")) { if (INNER[scene]) { const I = INNER[scene]; go(I.parent, I.door[0] + 30, I.door[1] + 20, null); } else go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null); return; }
   const pt = ev.target.closest("[data-plot]");
   if (pt) { const i = +pt.dataset.plot, p = PLOTS[i]; go("farm", p.x + p.w/2, p.y + p.h + 18, () => { selPlot = i; atSpot = "plot"; ctx(); const s = F.plots[i]; speak(!s || !s.crop ? "Empty plot. What shall we grow?" : !s.wateredAt ? "Thirsty seeds!" : growth(s) >= 1 ? "Ready to pick!" : "Growing nicely.", 3000); }); return; }
@@ -1535,7 +1619,7 @@ svg.addEventListener("click", ev => {
   walkTo(x, y);
 });
 window.addEventListener("keydown", e => {
-  if (e.target.closest("input") || notebookOpen()) return;
+  if (e.target.closest("input") || notebookOpen() || scene === "kidroom") return;
   const k = {ArrowUp:"u", ArrowDown:"d", ArrowLeft:"l", ArrowRight:"r", w:"u", s:"d", a:"l", d:"r"}[e.key];
   if (k) { keys.add(k); route = []; atSpot = null; if (e.key.startsWith("Arrow")) e.preventDefault(); }
 });
@@ -1566,6 +1650,8 @@ function evanWalk(speed, dt){
 }
 function tickEvan(dt){
   if (!evanHere()) return;
+  if (hugTick()) { evanWalk(140, dt); return; }
+  if (scene === "kidroom") { if (kid.sleep) return; if (evanWalk(evan.run ? 140 : 95, dt) && kid.pending) { const id = kid.pending; kid.pending = null; kidAction(id); } return; }
   if (evanWalk(evan.run ? 130 : 70, dt)) {
     evan.wait -= dt;
     if (evan.wait <= 0) {
@@ -1600,7 +1686,8 @@ function updateCam(dt){
   const m = $("map"), cw = m.clientWidth, ch = m.clientHeight; if (!cw || !ch) return;
   cam.canFollow = cw/ch < W/HH - .005;
   if (cam.canFollow && !cam.fit) {
-    const s = ch/HH, vw = cw/s, tx = clamp(mel.x - vw/2, 0, W - vw);
+    const fx = scene === "kidroom" ? evan.x : mel.x;   // in Evan's room the camera follows Evan
+    const s = ch/HH, vw = cw/s, tx = clamp(fx - vw/2, 0, W - vw);
     cam.x = cam.snap ? tx : cam.x + (tx - cam.x)*Math.min(1, dt*3.2);
     cam.s = s; cam.ox = -cam.x*s; cam.oy = 0;
   } else {
@@ -1655,7 +1742,7 @@ function frame(now){
       const n = nearSpot();
       if (n) { if (outside()) { const v = VILLAGE[n]; if (v.spot) arriveVillageSpot(n); else go(n, 260, 560, null); } else arriveSpot(n); }
       else if (!outside() && scene !== "farm" && !INNER[scene] && mel.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
-      else if (INNER[scene] && mel.x > 476 && Math.abs(mel.y - 410) < 56) { const I = INNER[scene]; go(I.parent, I.door[0] + 30, I.door[1] + 20, null); }
+      else if (INNER[scene] && scene !== "kidroom" && Math.abs(mel.x - INNER[scene].exit[0]) < 12 && Math.abs(mel.y - INNER[scene].exit[1]) < 56) { const I = INNER[scene]; go(I.parent, I.door[0] + 30, I.door[1] + 20, null); }
       else if (scene === "farm" && mel.y > 592 && Math.abs(mel.x - 260) < 50) go("base", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
     }
   }
@@ -1664,12 +1751,13 @@ function frame(now){
   if (inRoom) { maple.tx = MB[0]; maple.ty = MB[1]; stepTo(maple, 110, dt); }
   const sleeping = inRoom ? !maple.moving && Math.hypot(maple.x - MB[0], maple.y - MB[1]) < 6 : (phase() === "break" || Date.now() < mapleNap);
   nodes.maple.classList.toggle("sleep", sleeping);
-  if (inRoom) {}
+  if (inRoom || scene === "kidroom") {}
   else if (!sleeping) { maple.tx = mel.x - mel.dir*24; maple.ty = mel.y + 3; const d = Math.hypot(maple.tx - maple.x, maple.ty - maple.y); stepTo(maple, Math.max(120, d*3.2), dt); if (!maple.moving) maple.dir = mel.dir; }
   else maple.moving = false;
   tickEvan(dt);
   tickNpcs(dt); updateCam(dt);
   placeNode(nodes.mel, mel); placeNode(nodes.maple, maple); placeNode(nodes.evan, evan);
+  nodes.evan.style.visibility = scene === "kidroom" && kid.sleep ? "hidden" : "";
   // On the treadmill with the time box running: Mel walks in place.
   if (scene === "home" && atSpot === "treadmill" && !route.length && S.timer && S.timer.kind === "task" && Math.abs(mel.x - mel.tx) < 2) { nodes.mel.classList.add("walk"); mel.dir = 1; }
   nodes.evan.classList.toggle("run", evan.run && evan.moving);
@@ -1678,6 +1766,7 @@ function frame(now){
   const close = Math.hypot(maple.x - mel.x, maple.y - mel.y) < 60;
   bubbleAt($("speech"), close ? (maple.x*0.35 + mel.x*0.65) : maple.x, close ? Math.min(maple.y, mel.y) : maple.y, close ? 76 : (sleeping ? 18 : 30));
   if (evanHere()) bubbleAt($("evanSay"), evan.x, evan.y, 40); else $("evanSay").hidden = true;
+  bubbleAt($("melSay"), mel.x, mel.y, 70);
   requestAnimationFrame(frame);
 }
 
@@ -1696,7 +1785,7 @@ $("pet").onclick = () => { sfx("purr"); hearts(2); speak(pick(["*leans into the 
 document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
 $("pclose").onclick = closePanel;
 // Speech bubbles close with a tap (the next thing anyone says brings them back)
-["speech", "npcSay", "evanSay"].forEach(id => $(id).addEventListener("click", ev => { ev.stopPropagation(); $(id).hidden = true; }));
+["speech", "npcSay", "evanSay", "melSay"].forEach(id => $(id).addEventListener("click", ev => { ev.stopPropagation(); $(id).hidden = true; }));
 $("chatForm").onsubmit = e => { e.preventDefault(); const v = $("chatIn").value; $("chatIn").value = ""; sendChat(v); };
 $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);
