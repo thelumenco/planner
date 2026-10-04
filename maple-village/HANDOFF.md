@@ -361,3 +361,9 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - `clients.js`: a live snapshot from Mel's Chord connector through the page's mcp (studio_overview, list_projects active, needs_attention; 5-minute connector cache, Refresh forces fresh): counts, active projects with progress, attention items, next booking. Nothing from Chord is stored in the db.
 - Chat about clients: `sample` with the snapshot in the prompt and page tools (when the view supports them) that call Chord get_project, list_upcoming and list_clients. The chat log lives in the page view only.
 - Capability adds `Chord: studio_overview, list_projects, needs_attention, get_project, list_upcoming, list_clients` (all read-only). The dev stub fakes Chord with `?chord=1`.
+
+## Round 26: planning table, revenue chart
+- **Planning table** moved to the right wall of the town hall (C:[420,474]). `planning.js`: three cards from the Notion Plans pages (this week, month, quarter, via plans.js, now also returning theme/period/url). The week card shows its objectives open, today's slice of "Day by day" pulled out, and the rest folded. A planning chat sees all three plans plus today's quests and calendar. Fridays show a CEO-debrief nudge.
+- **Revenue chart** replaces the phone booth (`revenue` station, chart on an easel). `revenue.js`: Chord `list_invoices` (paid, grouped by paid month, last six months; "Internal" excluded; unpaid list), `list_retainers` (monthly_total). Hero number for this month against `F.revTarget` (Mel sets it), a single-series bar chart (validated #4E9A4A, rounded data ends, target as a dashed line, hover titles, a "See the numbers" table), what's still owed.
+- Calls and meetings no longer have a booth; they fall back to another spot in the hall. Skill spot list updated (`revenue`).
+- Capability adds Chord `list_invoices`, `list_retainers`.

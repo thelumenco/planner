@@ -18,6 +18,8 @@ import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, roomLeft, hungry,
 import { wardrobePanel, newOutfit } from "./wardrobe.js";
 import { readPlan, PLAN_WORDS } from "./plans.js";
 import { loadClients, clientsPanel, askClients } from "./clients.js";
+import { loadPlans, planningPanel, askPlans } from "./planning.js";
+import { loadRevenue, revenuePanel, wireRevenue } from "./revenue.js";
 import { attachMyDocs, journalPanel, wireJournal, scratchPanel, wireScratch } from "./myroom.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 
@@ -209,7 +211,7 @@ const SHED = {
   compost:   {n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster."},
   sprinkler: {n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."}
 };
-let shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false, clientsOpen = false;
+let shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false, clientsOpen = false, planOpen = false, revOpen = false;
 // Guided breathing in the calm corner: a ring grows as she breathes in (4 s), holds (2 s) and shrinks as she breathes out (6 s)
 const BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]], CYCLE = 12;
 let breath = null, breathT = null;   // {start, total (ms)}
@@ -645,7 +647,7 @@ let chatLog = (() => { try { return JSON.parse(localStorage.getItem("fox.chat"))
 const keepChat = () => { chatLog = chatLog.slice(-30); try { localStorage.setItem("fox.chat", JSON.stringify(chatLog)); } catch {} };
 const PLACES = {home: "home", house: "home", fridge: "home:fridge", kitchen: "home:kitchen", cupboard: "home:cupboard", treadmill: "home:treadmill", sofa: "home:sofa",
   pond: "base:pond", garden: "farm", farm: "farm", shed: "base:shed", swing: "base:swing", letterbox: "base:letterbox", "animal run": "base:run", wardrobe: "room:wardrobe", outfit: "room:wardrobe", "my room": "room", bedroom: "room", bed: "room:bed", journal: "room:journal", scratchpad: "hall:whiteboard", whiteboard: "hall:whiteboard", run: "base:run", animals: "base:run", chickens: "base:run", rabbits: "base:run", market: "market", well: "village:well",
-  "town hall": "hall", hall: "hall", "client table": "hall:clients", clients: "hall:clients", chord: "chord", "makers lane": "lane:plot3", lane: "lane:plot3", library: "fresh", "fresh pages": "fresh", chico: "chico", "post office": "post", post: "post", town: "village:board"};
+  "town hall": "hall", hall: "hall", "client table": "hall:clients", clients: "hall:clients", "planning table": "hall:table", plans: "hall:table", revenue: "hall:revenue", "revenue chart": "hall:revenue", chord: "chord", "makers lane": "lane:plot3", lane: "lane:plot3", library: "fresh", "fresh pages": "fresh", chico: "chico", "post office": "post", post: "post", town: "village:board"};
 function walkToPlace(name){
   const k = PLACES[String(name || "").toLowerCase().trim()]; if (!k) return null;
   const [pl, sp] = k.split(":");
@@ -708,7 +710,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|revenue chart|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -1034,7 +1036,7 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1121,6 +1123,10 @@ function ctx(){
         <p class="eyebrow" style="margin-top:14px">After a call, or any time</p><div class="actions"><button class="btn alt small" data-calm="decompress">Decompress</button></div>`);
   } else if (journalOpen && scene === "room") {
     h = journalPanel(S.mode === "decompress" && S.decompFree);
+  } else if (revOpen && scene === "hall") {
+    h = revenuePanel(F);
+  } else if (planOpen && scene === "hall") {
+    h = planningPanel(sampleCap);
   } else if (clientsOpen && scene === "hall") {
     h = clientsPanel(!!sampleCap);
   } else if (scratchOpen && scene === "hall") {
@@ -1167,16 +1173,25 @@ function ctx(){
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
   c.querySelectorAll('[data-rec="stop"]').forEach(b => b.onclick = () => { setMusic(false); speak("Needle up. Quiet time.", 2500); ctx(); drawScene(); });
   const rv = c.querySelector("#recVol"); if (rv) rv.oninput = () => setMusicVol(+rv.value);
   c.querySelectorAll("[data-calm]").forEach(b => b.onclick = () => { const k = b.dataset.calm;
-    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; recOpen = false; clientsOpen = false; A.decompNow(); drawScene(); } else startBreath(+k); });
+    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; A.decompNow(); drawScene(); } else startBreath(+k); });
   if (breath) tickBreath();
   if (journalOpen && scene === "room") wireJournal(c, undoable, e => { if (e) { sfx("chime"); speak(S.mode === "decompress" && S.decompFree ? "Written down. Now you can let it go." : "Page kept. Lovely.", 3500); } ctx(); });
   if (scratchOpen && scene === "hall") wireScratch(c, undoable, () => ctx());
+  if (revOpen && scene === "hall") wireRevenue(c, F, () => save(), () => { if (revOpen) ctx(); });
+  if (planOpen && scene === "hall") {
+    c.querySelectorAll('[data-pl="refresh"]').forEach(b => b.onclick = () => { loadPlans().then(() => { if (planOpen) ctx(); }); ctx(); });
+    const pf = c.querySelector("#plForm"), pc = c.querySelector("#plChat"); if (pc) pc.scrollTop = pc.scrollHeight;
+    if (pf) { const inp = pf.querySelector("#plIn"); pf.onsubmit = async ev => { ev.preventDefault(); const v = inp.value; inp.value = "";
+      const ev2 = await todaysEvents(dayKey()).catch(() => ({events: []}));
+      const pctx = {quests: allTasks().map(t => ({title: t.title, done: S.doneIds.includes(t.id)})), events: (ev2.events || []).slice(0, 12).map(e => ({title: e.title, time: e.allDay ? "all day" : new Date(e.start).toLocaleTimeString("en-GB", {hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore"})}))};
+      askPlans(sampleCap, v, pctx, () => { if (planOpen) { ctx(); const i = $("plIn"); if (i) i.focus(); } }); }; }
+  }
   if (clientsOpen && scene === "hall") {
     c.querySelectorAll('[data-cl="refresh"]').forEach(b => b.onclick = () => { loadClients(true).then(() => { if (clientsOpen) ctx(); }); ctx(); });
     const cf = c.querySelector("#clForm"), cl = c.querySelector("#clChat"); if (cl) cl.scrollTop = cl.scrollHeight;
@@ -1332,7 +1347,7 @@ function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
@@ -1367,7 +1382,7 @@ function go(target, x, y, fn){
     if (INNER[target]) { const I = INNER[target]; legs.push({scene:I.parent, x:I.door[0], y:I.door[1], fn:() => setScene(target, I.arrive)}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -1404,6 +1419,8 @@ function arriveSpot(id){
     if (placeOf(t) === scene && spotOf(t) === id && !S.arrived[t.id]) { S.arrived[t.id] = true; setSay(`Here at the ${spotObj(scene, id).name.toLowerCase()}. First tiny step…`); save(); return; }
   }
   if (scene === "hall" && id === "whiteboard") { scratchOpen = true; sfx("paper", true); render(); return; }   // the whiteboard is Mel's scratchpad
+  if (scene === "hall" && id === "revenue") { revOpen = true; sfx("paper", true); render(); loadRevenue().then(() => { if (revOpen) ctx(); }); return; }   // income from Chord
+  if (scene === "hall" && id === "table") { planOpen = true; sfx("paper", true); render(); loadPlans().then(() => { if (planOpen) ctx(); }); return; }   // Notion plans
   if (scene === "hall" && id === "clients") { clientsOpen = true; sfx("paper", true); render(); loadClients().then(() => { if (clientsOpen) ctx(); }); return; }   // live from Chord
   const s = spotObj(scene, id); if (s) speak(s.line, 3500); render();
 }

@@ -879,6 +879,29 @@ body.nb-open{overflow:hidden}
 .clchat p{margin:0;padding:7px 10px;border-radius:10px;font-size:.88rem;line-height:1.45;max-width:90%;white-space:pre-wrap}
 .clchat .me{justify-self:end;background:#E3EAF8}.clchat .fox{justify-self:start;background:#FFFDF6;border:1px solid rgba(120,104,84,.12)}
 .clatt li > span{display:grid;gap:2px}
+/* planning table: three plan cards */
+.pcards{display:grid;gap:10px}
+.pcard{background:#FBF8F2;border:1px solid rgba(120,104,84,.15);border-radius:10px;padding:10px 12px}
+.pcard.pweek{background:#FFFDF6;border-color:var(--peri2,#6E7FC8)}
+.plabel{margin:0;font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#8A8279}
+.ptitle{margin:2px 0 2px;font-family:"Klee One",serif;font-weight:600;font-size:1.05rem;color:#2F2B28}
+.plink{font-family:Mulish,sans-serif;font-size:.72rem;font-weight:700;color:var(--peri2,#6E7FC8);margin-left:6px}
+.ptheme{margin:0 0 6px;font-size:.84rem;color:#5A534C;font-style:italic}
+.pmh{margin:8px 0 2px;font-size:.78rem;font-weight:800;color:#5A534C}
+.pml{margin:2px 0 4px;padding-left:18px;font-size:.86rem;line-height:1.45}.pml li{margin:1px 0}
+.pmp{margin:3px 0;font-size:.86rem;line-height:1.45}
+.pcard details{margin-top:6px;font-size:.86rem}.pcard summary{cursor:pointer;color:var(--peri2,#6E7FC8);font-weight:700;font-size:.8rem}
+.pfri{background:#FFF3D6;border-radius:8px;padding:8px 10px;font-size:.86rem;margin:6px 0 10px}
+/* revenue chart */
+.rhero{margin:4px 0 6px}.rbig{margin:0;font-family:"Klee One",serif;font-weight:600;font-size:2rem;color:#2F2B28;line-height:1.1}
+.rprog{max-width:none;height:8px;margin:6px 0}
+.rtarget{margin-top:6px}.rtarget input{max-width:120px}
+.rchart{width:100%;max-width:520px;height:auto;display:block;margin:8px 0}
+.rchart .rax{font-size:9px;fill:#8A8279;font-family:Mulish,sans-serif}.rchart .rval{font-size:9.5px;fill:#2F2B28;font-weight:700;font-family:Mulish,sans-serif}
+.rchart .rbar:hover path,.rchart .rbar:focus path{opacity:1}.rchart .rbar{outline:none}
+.rtable table{border-collapse:collapse;font-size:.84rem;margin:6px 0}.rtable td,.rtable th{padding:3px 12px 3px 0;text-align:left}
+.panel details.rtable > summary{font-family:Mulish,sans-serif;font-size:.8rem;font-weight:700;color:var(--peri2,#6E7FC8);cursor:pointer;list-style:revert;padding:0;margin:0}
+.panel details.rtable > summary::after{content:none}
 </style>
 </head>
 <body>
@@ -1579,10 +1602,10 @@ body.nb-open{overflow:hidden}
   var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
   var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
   var ROOMS = {
-    hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [448, 262], B: [110, 258], C: [260, 430], D: [334, 266], E: [118, 474] }, stations: [
-      ["table", "Planning table", "C", "table", /plan|strategy|review|ceo|goal|week|month|quarter|budget/, "Big-picture thinking lives here."],
+    hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [448, 262], B: [110, 258], C: [420, 474], D: [334, 266], E: [118, 474] }, stations: [
+      ["table", "Planning table", "C", "table", /plan|strategy|review|ceo|goal|week|month|quarter|budget/, "Your week, month and quarter, from Notion."],
       ["whiteboard", "Whiteboard", "B", "whiteboard", /brainstorm|idea|map|outline|launch|offer|pricing/, "Fresh marker, blank board."],
-      ["phone", "Phone booth", "D", "phone", /call|meeting|zoom|coffee|interview|podcast|sync/, "Quiet booth for calls."],
+      ["revenue", "Revenue chart", "D", "chartstand", /invoice|revenue|sales|finance|money|budget|pricing|accounts/, "How the money's flowing, from Chord."],
       ["shelf", "Bookshelf", "A", "shelf", /read|research|learn|course|study/, "Smart books, cosy spines."],
       ["clients", "Client table", "E", "table", /proposal|client|brief|contract|onboard/, "Your client projects, live from Chord."]
     ] },
@@ -1671,13 +1694,13 @@ body.nb-open{overflow:hidden}
       const s2 = (t2.title + " " + (t2.channel || "")).toLowerCase();
       return t2.spot && BASE_SPOTS.some(([id]) => id === t2.spot) ? t2.spot : baseSpotFor(s2) || "pond";
     }
-    const pl = placeOf(t2), st2 = stationsOf(pl).filter((s2) => (s2.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t2.title)) && s2.id !== "treadmill" && s2.re);
+    const pl = placeOf(t2), st4 = stationsOf(pl).filter((s2) => (s2.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t2.title)) && s2.id !== "treadmill" && s2.re);
     if (isTreadTask(t2)) return "treadmill";
-    if (t2.spot && st2.find((s2) => s2.id === t2.spot)) return t2.spot;
+    if (t2.spot && st4.find((s2) => s2.id === t2.spot)) return t2.spot;
     const s = t2.title.toLowerCase();
-    const hit = st2.find((x) => x.re && x.re.source !== "." && x.re.test(s));
+    const hit = st4.find((x) => x.re && x.re.source !== "." && x.re.test(s));
     if (hit) return hit.id;
-    const fallback = st2.filter((x) => x.id !== "cupboard" && x.re);
+    const fallback = st4.filter((x) => x.id !== "cupboard" && x.re);
     const dflt = fallback.find((x) => x.re && x.re.source === ".");
     return dflt ? dflt.id : fallback[hash(t2.id) % fallback.length].id;
   }
@@ -1806,7 +1829,7 @@ body.nb-open{overflow:hidden}
       `<path d="M44 130 v-70 a24 24 0 0 1 48 0 v70z M68 36 v94 M44 84 h48"/><path d="M428 130 v-70 a24 24 0 0 1 48 0 v70z M452 36 v94 M428 84 h48"/>
       <path d="M140 20 h26 v54 l-13 -10 l-13 10z M134 20 h38 M354 20 h26 v54 l-13 -10 l-13 10z M348 20 h38"/><circle cx="153" cy="40" r="5"/><circle cx="367" cy="40" r="5"/>`
     )}
-    ${skirting}${plant(70, 600, 1.1)}${plant(470, 400, 0.9)}`,
+    ${skirting}${plant(70, 600, 1.1)}${plant(474, 610, 0.9)}`,
     // Chord workshop: wide planks with sawdust, a pegboard of tools, a factory window, crates.
     chord: () => `<rect width="520" height="640" style="fill:#E2CDAA"/>
     <g opacity=".5" style="stroke:#C9AE86" stroke-width="1.2">${rows(9, (i) => `<path d="M${i * 60 + 20} 150 V640"/>`)}${rows(18, (i) => `<path d="M${i * 67 % 520 + 20} ${170 + i % 9 * 52} h-18"/>`)}</g>
@@ -2429,6 +2452,11 @@ body.nb-open{overflow:hidden}
           `<rect x="${x - 50}" y="${y - 36}" width="100" height="14" rx="3" style="fill:${W2}"/><path d="M${x - 26} ${y - 44} l22 -4 l22 4 v8 l-22 -3 l-22 3z" style="fill:#FFFDF6"/><path d="M${x + 28} ${y - 62} h14 l5 14 h-24z" style="fill:var(--butter)"/>`,
           `<rect x="${x - 50}" y="${y - 36}" width="100" height="14" rx="3"/>${legs(100, 22)}<path d="M${x - 26} ${y - 44} l22 -4 l22 4 v8 l-22 -3 l-22 3z M${x - 4} ${y - 48} v9"/><path d="M${x - 20} ${y - 41} h10 M${x + 2} ${y - 41} h12" opacity=".5"/><path d="M${x + 28} ${y - 62} h14 l5 14 h-24z M${x + 35} ${y - 48} v12 M${x + 30} ${y - 36} h10"/><path d="M${x + 10} ${y - 46} l12 -8" stroke-width="1.8"/>`
         );
+      case "chartstand":
+        return sk(
+          `<rect x="${x - 36}" y="${y - 96}" width="72" height="58" rx="2" style="fill:#FFFDF6"/><rect x="${x - 26}" y="${y - 60}" width="10" height="16" style="fill:#7FB069"/><rect x="${x - 12}" y="${y - 70}" width="10" height="26" style="fill:#7FB069"/><rect x="${x + 2}" y="${y - 66}" width="10" height="22" style="fill:#7FB069"/><rect x="${x + 16}" y="${y - 84}" width="10" height="40" style="fill:#4E9A4A"/>`,
+          `<rect x="${x - 36}" y="${y - 96}" width="72" height="58" rx="2"/><path d="M${x - 30} ${y - 44} h60" /><path d="M${x - 30} ${y - 80} L${x - 6} ${y - 88} L${x + 8} ${y - 84} L${x + 30} ${y - 94}" stroke-dasharray="3 3" opacity=".7"/><path d="M${x - 24} ${y - 38} L${x - 32} ${y} M${x + 24} ${y - 38} L${x + 32} ${y} M${x} ${y - 38} v34"/><path d="M${x - 40} ${y - 97} h80" stroke-width="2.2"/>`
+        );
       case "wardrobe":
         return sk(
           `<rect x="${x - 30}" y="${y - 96}" width="60" height="96" rx="3" style="fill:var(--peri)"/><path d="M${x - 34} ${y - 96} h68 l-4 -8 h-60z" style="fill:var(--peri2)"/><rect x="${x - 24}" y="${y - 88}" width="22" height="80" rx="2" style="fill:#DCE3F4"/><rect x="${x + 2}" y="${y - 88}" width="22" height="80" rx="2" style="fill:#DCE3F4"/>`,
@@ -2462,12 +2490,12 @@ body.nb-open{overflow:hidden}
       case "healthchord":
       case "healthchico": {
         const h = G && G.health ? G.health(kind.slice(6)) : null, L = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
-        const st2 = h ? h.status : "grey", word = { green: "ALL GOOD", amber: "WATCH", red: "NEEDS YOU", grey: "NO REPORT" }[st2];
-        const lights = (h && h.checks.length ? h.checks.slice(0, 3).map((c) => c.state) : [st2, st2, st2]).map((c, i) => `<circle cx="${x - 18 + i * 18}" cy="${y - 62}" r="6" style="fill:${L[c]}"/>`).join("");
+        const st4 = h ? h.status : "grey", word = { green: "ALL GOOD", amber: "WATCH", red: "NEEDS YOU", grey: "NO REPORT" }[st4];
+        const lights = (h && h.checks.length ? h.checks.slice(0, 3).map((c) => c.state) : [st4, st4, st4]).map((c, i) => `<circle cx="${x - 18 + i * 18}" cy="${y - 62}" r="6" style="fill:${L[c]}"/>`).join("");
         return sk(
           `<rect x="${x - 3}" y="${y - 30}" width="6" height="30" style="fill:var(--wood)"/><rect x="${x - 34}" y="${y - 80}" width="68" height="52" rx="5" style="fill:#FFFDF6"/>${lights}`,
           `<rect x="${x - 34}" y="${y - 80}" width="68" height="52" rx="5"/><path d="M${x - 3} ${y - 28} v28 M${x + 3} ${y - 28} v28 M${x - 12} ${y} h24"/>${lights.replace(/ style="[^"]*"/g, "")}`
-        ) + `<text x="${x}" y="${y - 38}" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="800" font-size="9" letter-spacing=".6" style="fill:${L[st2] === L.grey ? "var(--line)" : L[st2]}">${word}</text>`;
+        ) + `<text x="${x}" y="${y - 38}" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="800" font-size="9" letter-spacing=".6" style="fill:${L[st4] === L.grey ? "var(--line)" : L[st4]}">${word}</text>`;
       }
       case "pobox": {
         let c = "";
@@ -2498,7 +2526,7 @@ body.nb-open{overflow:hidden}
     return "";
   }
   function roomArt(id) {
-    const r = ROOMS[id], st2 = stationsOf(id);
+    const r = ROOMS[id], st4 = stationsOf(id);
     let h = roomShell(id);
     if (id !== "market" && !r.noBoard) h += `<g data-spot="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="204" rx="40" ry="10" style="fill:var(--butter)"/>
     ${sk(`<rect x="222" y="40" width="76" height="56" rx="3" style="fill:var(--wood)"/>`, `<rect x="222" y="40" width="76" height="56" rx="3"/>${notesArt(230, 50, G.questsIn(id).filter((t2) => !G.S().doneIds.includes(t2.id)).length)}`)}${tapeLabel(260, 112, "Quests here", "var(--butter)")}</g>`;
@@ -2506,7 +2534,7 @@ body.nb-open{overflow:hidden}
       `<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
       `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`
     ) + `<g>${[["apple", "dumpling", "fish", "toast"], ["tulip", "carrot", "strawberry", "sunflower"]].map((row2, r2) => row2.map((n, i) => iconAt(n, 64 + i * 30, 62 + r2 * 38, 26)).join("")).join("")}${[["yarn", "ball", "brush", "crown"], ["bath", "fort", "corn", "blueberry"]].map((row2, r2) => row2.map((n, i) => iconAt(n, 374 + i * 30, 62 + r2 * 38, 26)).join("")).join("")}</g>`;
-    st2.forEach((s) => {
+    st4.forEach((s) => {
       h += `<g data-spot="${s.id}" aria-label="${s.name}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${tapeLabel(s.x, s.y + 24, s.name, "var(--card)")}</g>`;
     });
     if (id === "room") {
@@ -2554,9 +2582,9 @@ body.nb-open{overflow:hidden}
   }
   var GARDEN_TIERS = [[0, "daisy"], [100, "tulip"], [250, "sunflower"]];
   function userGarden(key, x, y, cols, rows2, gap) {
-    const st2 = (G.stats() || {})[key];
-    if (!st2 || !(st2.users >= 0)) return "";
-    const per = st2.per > 0 ? st2.per : 10, users = Math.floor(st2.users), n = Math.min(cols * rows2, Math.ceil(users / per));
+    const st4 = (G.stats() || {})[key];
+    if (!st4 || !(st4.users >= 0)) return "";
+    const per = st4.per > 0 ? st4.per : 10, users = Math.floor(st4.users), n = Math.min(cols * rows2, Math.ceil(users / per));
     const tier = GARDEN_TIERS.reduce((t2, [min, k]) => users >= min ? k : t2, "daisy");
     const cols4 = key === "chord" ? ["#F3C969", "#FFFDF6", "#C3CDEE"] : ["#EFA3A6", "#F4C7CF", "#FFFDF6"];
     let f2 = "";
@@ -2571,7 +2599,7 @@ body.nb-open{overflow:hidden}
     const w = cols * gap, signX = x + w / 2 + (key === "chord" ? 8 : 0), signY = y + rows2 * gap + 10;
     const tree2 = users >= 500 ? `<g filter="url(#wob)" ${ink}><rect x="${x + w - 6}" y="${y + 4}" width="4" height="12" style="fill:var(--wood)"/><circle cx="${x + w - 4}" cy="${y}" r="9" style="fill:#F4C7CF"/><circle cx="${x + w - 10}" cy="${y + 4}" r="6" style="fill:#EFA3A6"/></g>` : "";
     const sparkle = users >= 1e3 ? `<g class="twinkle">${iconAt("sparkle", x - 2, y - 2, 12)}${iconAt("sparkle", x + w + 2, y + rows2 * gap - 4, 11)}</g>` : "";
-    const label2 = `${users.toLocaleString()} ${st2.label || (key === "chord" ? "studios" : "families")}`;
+    const label2 = `${users.toLocaleString()} ${st4.label || (key === "chord" ? "studios" : "families")}`;
     return `<g data-ugarden="${key}" aria-label="${label2}">${f2}${tree2}${sparkle}
     ${tapeLabel(signX, signY, label2, key === "chord" ? "var(--sage)" : "var(--blush)", 10)}</g>`;
   }
@@ -3547,14 +3575,14 @@ body.nb-open{overflow:hidden}
       </div>
       <div class="nbactions"><button class="btn yes" data-nb="thanks">Done</button></div>`;
     }
-    const st2 = api.steps();
+    const st4 = api.steps();
     return `<button class="nbx" data-nb="close" aria-label="Close">✕</button>
     <p class="nbmeta">${icon("steps", 16)} today's steps</p>
-    <h2 id="nbTitle">${st2.n.toLocaleString()} <small class="nbby">of ${st2.goal.toLocaleString()}</small></h2>
-    <div class="trbar">${progressBar(st2.n / st2.goal, "var(--sage)", 5)}</div>
+    <h2 id="nbTitle">${st4.n.toLocaleString()} <small class="nbby">of ${st4.goal.toLocaleString()}</small></h2>
+    <div class="trbar">${progressBar(st4.n / st4.goal, "var(--sage)", 5)}</div>
     <div class="nbbody">
       <p class="nblbl">Steps showing now</p>
-      <div class="nbrow nbask"><label class="sr" for="nbTrack">Steps showing now</label><input id="nbTrack" type="number" inputmode="numeric" min="0" placeholder="${st2.n || 2e3}"><button class="btn primary small" data-nb="sset">Save</button></div>
+      <div class="nbrow nbask"><label class="sr" for="nbTrack">Steps showing now</label><input id="nbTrack" type="number" inputmode="numeric" min="0" placeholder="${st4.n || 2e3}"><button class="btn primary small" data-nb="sset">Save</button></div>
       <p class="nbhint">Type the total from your watch or the treadmill. Every 1,000 earns 2 coins.</p>
     </div>
     <div class="nbactions"><button class="btn yes" data-nb="thanks">Done</button></div>`;
@@ -4788,7 +4816,7 @@ Quests finished today: ${S3.doneIds.length}`;
     const rows2 = FIELDS.filter(([k]) => o[k]).map(([k, n]) => `<li><span class="gpic">${garment(k === "layer" ? "layer" : k, o[k])}</span><span><small>${n}</small>${esc(clean(o[k]))}</span></li>`).join("");
     return `<div class="outfit"><p class="olabel">${esc(clean(o.label, 50) || `Option ${i + 1}`)}</p><ul>${rows2}</ul>${o.why ? `<p class="owhy">${esc(clean(o.why, 220))}</p>` : ""}</div>`;
   }
-  function wardrobePanel(F2, st2) {
+  function wardrobePanel(F2, st4) {
     const d = todayDoc(), more = extras(F2), inv = inventory();
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The wardrobe</h2>`;
     if (d) h += `<p class="sub">${[d.weather && esc(clean(d.weather, 60)), d.on && esc(clean(d.on, 160))].filter(Boolean).join(" · ") || "Today's picks from your stylist."}</p>`;
@@ -4797,8 +4825,8 @@ Quests finished today: ${S3.doneIds.length}`;
     if (all.length) h += `<div class="outfits">${all.map(card).join("")}</div>`;
     h += `<p class="eyebrow" style="margin:14px 0 6px">Want something different?</p>`;
     if (!inv) h += `<p class="muted">New outfits need your wardrobe list, which comes with the morning drop-off.</p>`;
-    else if (!st2.sample) h += `<p class="muted">New outfits need Claude, which isn't reachable from this view just now.</p>`;
-    else h += `<form class="row" id="outfitForm"><label class="sr" for="outfitAsk">What for?</label><input id="outfitAsk" maxlength="120" placeholder="optional: dinner out, school run, more colour..." value="${esc(st2.ask || "")}"><button class="btn small" type="submit" ${st2.busy ? "disabled" : ""}>${st2.busy ? "Picking…" : "New outfit"}</button></form>${st2.error ? `<p class="muted">${esc(st2.error)}</p>` : ""}`;
+    else if (!st4.sample) h += `<p class="muted">New outfits need Claude, which isn't reachable from this view just now.</p>`;
+    else h += `<form class="row" id="outfitForm"><label class="sr" for="outfitAsk">What for?</label><input id="outfitAsk" maxlength="120" placeholder="optional: dinner out, school run, more colour..." value="${esc(st4.ask || "")}"><button class="btn small" type="submit" ${st4.busy ? "disabled" : ""}>${st4.busy ? "Picking…" : "New outfit"}</button></form>${st4.error ? `<p class="muted">${esc(st4.error)}</p>` : ""}`;
     return h;
   }
   async function newOutfit(F2, sample, ask2, events) {
@@ -4883,7 +4911,13 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
       const hit = list.find((x) => x && String(x.title || "").trim() === title) || null;
       if (!hit) return { level: level2, title, error: "not found" };
       const page = unwrap(await mcp.callTool(NOTION, "notion-fetch", { id: hit.id || hit.url }, { cache: cache3, signal }));
-      return { level: level2, title, text: pageText(page).slice(0, 5e3) };
+      const raw = typeof page === "string" ? page : page && (page.text || "") || "", pm = /<properties>\s*(\{[\s\S]*?\})\s*<\/properties>/.exec(raw);
+      let props2 = {};
+      try {
+        props2 = pm ? JSON.parse(pm[1]) : {};
+      } catch {
+      }
+      return { level: level2, title, text: pageText(page).slice(0, 5e3), theme: String(props2.Theme || "").slice(0, 160), start: props2["date:Period Start:start"] || "", end: props2["date:Period End:start"] || "", url: /^https:\/\//.test(props2.url || "") ? props2.url : hit.url && /^https:\/\//.test(hit.url) ? hit.url : "" };
     } catch (e) {
       return { level: level2, title, error: e && e.code || "upstream_error" };
     }
@@ -5018,6 +5052,251 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     st.log.push({ role: "assistant", content: reply.slice(0, 2e3) || "Hmm, nothing came back. Try again?" });
     st.chatBusy = false;
     rerender();
+  }
+
+  // src/game/planning.js
+  var st2 = { plans: null, busy: false, at: 0, log: [], chatBusy: false };
+  async function loadPlans() {
+    if (st2.busy) return;
+    st2.busy = true;
+    const out = await Promise.all(["week", "month", "quarter"].map((l) => readPlan(l).catch(() => ({ level: l, error: "upstream_error" }))));
+    st2.plans = out;
+    st2.at = Date.now();
+    st2.busy = false;
+  }
+  var PLAN_ERRORS = {
+    unavailable: "Notion isn't reachable from this view.",
+    "not found": "No page for this one in your Plans yet.",
+    needs_reauth: "Notion needs reconnecting: claude.ai Settings → Connectors.",
+    server_not_connected: "Add the Notion connector in claude.ai Settings → Connectors.",
+    not_in_manifest: "Notion is switched off for this page. Turn it on in the page's Permissions."
+  };
+  var inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\\([$*_~`])/g, "$1");
+  function md(text) {
+    let h = "", list = false;
+    String(text || "").split("\n").forEach((l) => {
+      const line = l.trim();
+      if (!line || line === "---") {
+        if (list) {
+          h += "</ul>";
+          list = false;
+        }
+        return;
+      }
+      if (/^#{1,4} /.test(line)) {
+        if (list) {
+          h += "</ul>";
+          list = false;
+        }
+        h += `<p class="pmh">${inline(line.replace(/^#+ /, ""))}</p>`;
+        return;
+      }
+      if (/^[-*] /.test(line)) {
+        if (!list) {
+          h += `<ul class="pml">`;
+          list = true;
+        }
+        h += `<li>${inline(line.slice(2))}</li>`;
+        return;
+      }
+      if (list) {
+        h += "</ul>";
+        list = false;
+      }
+      h += `<p class="pmp">${inline(line)}</p>`;
+    });
+    return h + (list ? "</ul>" : "");
+  }
+  function sections(text) {
+    const out = [];
+    let cur2 = { title: "", body: [] };
+    String(text || "").split("\n").forEach((l) => {
+      const m = /^#{1,3} (.+)/.exec(l.trim());
+      if (m) {
+        if (cur2.title || cur2.body.join("").trim()) out.push(cur2);
+        cur2 = { title: m[1].trim(), body: [] };
+      } else cur2.body.push(l);
+    });
+    if (cur2.title || cur2.body.join("").trim()) out.push(cur2);
+    return out.map((s) => ({ title: s.title, body: s.body.join("\n").trim() }));
+  }
+  var WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  function weekCard(p) {
+    const secs = sections(p.text), today2 = WD[(/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).getUTCDay()];
+    let h = "";
+    secs.forEach((s) => {
+      if (/day by day/i.test(s.title)) {
+        const days = s.body.split(/\n(?=\*\*)/), mine = days.find((d) => new RegExp("^\\*\\*" + today2, "i").test(d.trim()));
+        if (mine) {
+          const [head, ...rest] = mine.trim().split("\n");
+          h += `<p class="pmh">Today · ${inline(head.replace(/\*\*/g, ""))}</p>${md(rest.join("\n"))}`;
+        }
+        h += `<details><summary>The whole week</summary>${md(s.body)}</details>`;
+      } else if (/objective|focus|theme/i.test(s.title) || !s.title) h += (s.title ? `<p class="pmh">${inline(s.title)}</p>` : "") + md(s.body);
+      else h += `<details><summary>${inline(s.title)}</summary>${md(s.body)}</details>`;
+    });
+    return h;
+  }
+  function card2(p, label2, cls) {
+    let h = `<div class="pcard ${cls}"><p class="plabel">${label2}</p><p class="ptitle">${esc(p.title || "")}${p.url ? ` <a href="${esc(p.url)}" target="_blank" rel="noopener" class="plink">open in Notion</a>` : ""}</p>`;
+    if (p.error) return h + `<p class="muted">${esc(PLAN_ERRORS[p.error] || "Couldn't read this one just now.")}</p></div>`;
+    if (p.theme) h += `<p class="ptheme">${esc(p.theme)}</p>`;
+    if (cls === "pweek") h += weekCard(p);
+    else {
+      const secs = sections(p.text), first = secs[0];
+      h += first ? (first.title ? `<p class="pmh">${inline(first.title)}</p>` : "") + md(first.body) : "";
+      if (secs.length > 1) h += `<details><summary>More</summary>${secs.slice(1).map((s) => `<p class="pmh">${inline(s.title)}</p>${md(s.body)}`).join("")}</details>`;
+    }
+    return h + `</div>`;
+  }
+  function planningPanel(sample) {
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Planning table</h2>`;
+    const fri = (/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).getUTCDay() === 5;
+    if (!st2.plans) return h + `<p class="sub">${st2.busy ? "Laying your plans out…" : "Your week, month and quarter from Notion."}</p>`;
+    h += `<p class="sub">From your Notion Plans${st2.busy ? " · refreshing…" : ""}.</p>`;
+    if (fri) h += `<p class="pfri">It's Friday: a good day for your CEO debrief. Ask chat for it, or start here with "how did this week go?".</p>`;
+    const [w, m, q] = st2.plans;
+    h += `<div class="pcards">${card2(w, "This week", "pweek")}${card2(m, "This month", "pmonth")}${card2(q, "This quarter", "pquarter")}</div>
+    <div class="actions"><button class="btn alt small" data-pl="refresh">Refresh</button></div>`;
+    h += `<p class="eyebrow" style="margin-top:12px">Plan with me</p>`;
+    if (!sample) return h + `<p class="muted">The planning chat needs Claude, which isn't reachable from this view just now.</p>`;
+    return h + `<div class="clchat" id="plChat">${st2.log.length ? st2.log.map((x) => `<p class="${x.role === "user" ? "me" : "fox"}">${esc(x.content)}</p>`).join("") : `<p class="fox">Ask me about your plans: am I on track for October? What should I drop this week? Help me plan next week.</p>`}${st2.chatBusy ? `<p class="fox">Thinking it through…</p>` : ""}</div>
+    <form class="row" id="plForm"><label class="sr" for="plIn">Ask about your plans</label><input id="plIn" maxlength="500" placeholder="e.g. am I on track this week?" autocomplete="off"><button class="btn small" type="submit" ${st2.chatBusy ? "disabled" : ""}>Ask</button></form>`;
+  }
+  async function askPlans(sample, text, ctx2, rerender) {
+    text = String(text || "").trim();
+    if (!text || st2.chatBusy || !sample) return;
+    st2.log.push({ role: "user", content: text });
+    st2.chatBusy = true;
+    rerender();
+    const plans = (st2.plans || []).filter((p) => p && p.text).map((p) => `== ${p.title}${p.theme ? ` (theme: ${p.theme})` : ""} ==
+${p.text}`).join("\n\n");
+    const history = st2.log.slice(-10, -1).map((x) => (x.role === "user" ? "Mel: " : "You: ") + x.content).join("\n");
+    const prompt = `You are Mel's planning partner at the planning table in her village game. She runs Fresh Pages Co / Ambidextrous (copywriting, AI training) plus her apps Chord and Chico, and parents Evan (2-3). Coach in her boss-mode style: honest, kind, specific, one clear next step, protect rest and family time, no guilt. Answer in at most 6 short sentences or a short list. Plain text, no emoji, no markdown headings. Base everything on her plans and today's data below; if they don't say, say so rather than inventing.
+Today: ${(/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })}.
+Her plans (Notion):
+${plans || "(couldn't read the plans just now)"}
+Today's quests: ${JSON.stringify(ctx2.quests || []).slice(0, 4e3)}
+Today's calendar: ${JSON.stringify(ctx2.events || []).slice(0, 2e3)}
+${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
+    let reply = "";
+    try {
+      const r = await sample(prompt, { modelTier: "default", cache: false });
+      reply = plain(String(r && r.text || "")).trim();
+    } catch (e) {
+      reply = e && e.code === "rate_limited" ? "Let's pause a moment. Ask again in a minute?" : "I couldn't think that through just now. Try again?";
+    }
+    st2.log.push({ role: "assistant", content: reply.slice(0, 2400) || "Hmm, nothing came back. Try again?" });
+    st2.chatBusy = false;
+    rerender();
+  }
+
+  // src/game/revenue.js
+  var unwrap3 = (r) => {
+    let p = r && r.payload !== void 0 ? r.payload : r;
+    if (typeof p === "string") {
+      try {
+        p = JSON.parse(p);
+      } catch {
+      }
+    }
+    if (p && Array.isArray(p.content) && p.content[0] && typeof p.content[0].text === "string") {
+      try {
+        return JSON.parse(p.content[0].text);
+      } catch {
+      }
+    }
+    return p;
+  };
+  async function call2(tool, input, fresh2) {
+    let mcp = null;
+    try {
+      mcp = window.claude && claude.use ? await claude.use("mcp") : null;
+    } catch {
+    }
+    if (!mcp) throw { code: "unavailable" };
+    return unwrap3(await mcp.callTool(CHORD, tool, input, { cache: { staleTime: fresh2 ? 0 : 10 * 6e4, refresh: !!fresh2 } }));
+  }
+  var st3 = { data: null, busy: false, error: null, editing: false };
+  var monthKey = (d) => String(d || "").slice(0, 7);
+  function months() {
+    const [y, m] = dayKey().split("-").map(Number);
+    return Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(Date.UTC(y, m - 1 - (5 - i), 1));
+      return d.toISOString().slice(0, 7);
+    });
+  }
+  var real = (inv) => inv && !/^internal$/i.test(String(inv.client || "").trim());
+  async function loadRevenue(fresh2) {
+    if (st3.busy) return;
+    st3.busy = true;
+    st3.error = null;
+    try {
+      const ms = months(), from = ms[0] + "-01";
+      const early = new Date(Date.parse(from + "T00:00:00Z") - 40 * 864e5).toISOString().slice(0, 10);
+      const [paid, unpaid, ret] = await Promise.all([call2("list_invoices", { status: "paid", from: early, limit: 200 }, fresh2), call2("list_invoices", { status: "unpaid", limit: 100 }, fresh2), call2("list_retainers", { running_only: true }, fresh2).catch(() => null)]);
+      const byMonth = Object.fromEntries(ms.map((k) => [k, 0]));
+      (paid && paid.invoices || []).filter(real).forEach((i) => {
+        const k = monthKey(i.paid || i.issued);
+        if (k in byMonth) byMonth[k] += Number(i.total) || 0;
+      });
+      const owed = (unpaid && unpaid.invoices || []).filter(real).sort((a, b) => String(a.due || "").localeCompare(String(b.due || "")));
+      const rets = ret && (ret.retainers || ret.items) || [];
+      st3.data = { currency: paid && paid.currency || "$", byMonth, owed, retainers: rets.filter((r) => r.running !== false), retTotal: ret && ret.monthly_total, at: Date.now() };
+    } catch (e) {
+      st3.error = e && e.code || "server_unavailable";
+    }
+    st3.busy = false;
+  }
+  var money = (n, c) => `${c}${Math.round(Number(n) || 0).toLocaleString()}`;
+  var mlabel = (k) => (/* @__PURE__ */ new Date(k + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
+  function chart(d, target) {
+    const ms = Object.keys(d.byMonth), vals = ms.map((k) => d.byMonth[k]), max = Math.max(1, target || 0, ...vals) * 1.15;
+    const W2 = 320, H3 = 150, L = 8, B = 128, T = 14, bw = 36, gap = (W2 - L * 2 - bw * 6) / 5, y = (v) => B - (B - T) * v / max;
+    const bars = ms.map((k, i) => {
+      const x = L + i * (bw + gap), v = vals[i], top = y(v), h = Math.max(0, B - top), cur2 = i === ms.length - 1;
+      const r = Math.min(4, h);
+      const path = h > 0 ? `M${x} ${B} V${top + r} Q${x} ${top} ${x + r} ${top} H${x + bw - r} Q${x + bw} ${top} ${x + bw} ${top + r} V${B}z` : "";
+      return `<g class="rbar${cur2 ? " cur" : ""}" tabindex="0" aria-label="${mlabel(k)}: ${money(v, d.currency)}"><title>${mlabel(k)} ${k.slice(0, 4)}: ${money(v, d.currency)}</title><rect x="${x - gap / 2}" y="${T}" width="${bw + gap}" height="${B - T}" fill="transparent"/>${path ? `<path d="${path}" fill="#4E9A4A" opacity="${cur2 ? 1 : 0.55}"/>` : ""}
+      ${cur2 || v === Math.max(...vals) && v > 0 ? `<text x="${x + bw / 2}" y="${top - 4}" text-anchor="middle" class="rval">${money(v, d.currency)}</text>` : ""}<text x="${x + bw / 2}" y="${B + 14}" text-anchor="middle" class="rax">${mlabel(k)}</text></g>`;
+    }).join("");
+    const tl = target ? `<path d="M${L} ${y(target)} H${W2 - L}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W2 - L}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money(target, d.currency)}</text>` : "";
+    return `<svg class="rchart" viewBox="0 0 ${W2} ${H3}" role="img" aria-label="Paid income by month, last six months"><path d="M${L} ${B} H${W2 - L}" stroke="#D8CFC2" stroke-width="1"/>${bars}${tl}</svg>`;
+  }
+  function revenuePanel(F2) {
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Revenue</h2>`;
+    if (!st3.data) return h + (st3.error ? `<p class="sub">${esc(CLIENT_ERRORS[st3.error] || "Couldn't reach Chord just now.")}</p><div class="actions"><button class="btn alt small" data-rv="refresh">Try again</button></div>` : `<p class="sub">Counting it up from Chord…</p>`);
+    const d = st3.data, c = d.currency, ms = Object.keys(d.byMonth), now2 = d.byMonth[ms[ms.length - 1]], target = Number(F2.revTarget) || 0;
+    const pct = target ? Math.min(100, Math.round(100 * now2 / target)) : 0, retTotal = Number(d.retTotal) || d.retainers.reduce((s, r) => s + (Number(r.monthly_amount) || 0), 0);
+    h += `<p class="sub">Studio income from Chord: paid invoices, by the month they were paid${st3.busy ? " · refreshing…" : ""}.</p>
+    <div class="rhero"><p class="rbig">${money(now2, c)}</p><p class="muted">${esc((/* @__PURE__ */ new Date(ms[ms.length - 1] + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" }))} so far${target ? ` · ${pct}% of your ${money(target, c)} target` : ""}</p>
+      ${target ? `<span class="clbar rprog"><i style="width:${pct}%"></i></span>` : ""}
+      ${st3.editing || !target ? `<form class="row rtarget" id="rvForm"><label for="rvIn" class="muted">Monthly target</label><input id="rvIn" type="number" min="0" step="50" inputmode="numeric" value="${target || ""}" placeholder="e.g. 6000"><button class="btn small" type="submit">Set</button></form>` : `<button class="btn alt small" data-rv="edit">Change target</button>`}</div>
+    ${chart(d, target)}
+    <details class="rtable"><summary>See the numbers</summary><table><thead><tr><th>Month</th><th>Paid</th></tr></thead><tbody>${ms.map((k) => `<tr><td>${mlabel(k)} ${k.slice(0, 4)}</td><td>${money(d.byMonth[k], c)}</td></tr>`).join("")}</tbody></table></details>`;
+    if (retTotal || d.retainers.length) h += `<p class="muted">${d.retainers.length} retainer${d.retainers.length === 1 ? "" : "s"} running${retTotal ? `: ${money(retTotal, c)} a month` : ""}.</p>`;
+    const owedTotal = d.owed.reduce((s, i) => s + (Number(i.total) || 0), 0);
+    h += `<p class="eyebrow">Still owed${d.owed.length ? ` · ${money(owedTotal, c)}` : ""}</p>` + (d.owed.length ? `<ul class="hlist clatt">${d.owed.slice(0, 8).map((i) => `<li><span><b>${esc(plain(String(i.client || "")).slice(0, 40))}</b> ${money(i.total, c)}<small>${esc(String(i.number || ""))}${i.due ? " · due " + esc(String(i.due)) : ""}</small></span>${i.overdue ? `<span class="hbadge now">overdue</span>` : ""}</li>`).join("")}</ul>` : `<p class="muted">Nothing outstanding. Every invoice is paid.</p>`);
+    return h + `<div class="actions"><button class="btn alt small" data-rv="refresh">Refresh</button></div>`;
+  }
+  function wireRevenue(root, F2, save3, rerender) {
+    root.querySelectorAll('[data-rv="refresh"]').forEach((b) => b.onclick = () => {
+      loadRevenue(true).then(rerender);
+      rerender();
+    });
+    root.querySelectorAll('[data-rv="edit"]').forEach((b) => b.onclick = () => {
+      st3.editing = true;
+      rerender();
+    });
+    const f2 = root.querySelector("#rvForm");
+    if (f2) f2.onsubmit = (ev) => {
+      ev.preventDefault();
+      const v = Math.max(0, Math.round(Number(root.querySelector("#rvIn").value) || 0));
+      F2.revTarget = v || null;
+      st3.editing = false;
+      save3();
+      rerender();
+    };
   }
 
   // src/game/myroom.js
@@ -5885,6 +6164,8 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   var calmOpen = false;
   var recOpen = false;
   var clientsOpen = false;
+  var planOpen = false;
+  var revOpen = false;
   var BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]];
   var CYCLE = 12;
   var breath = null;
@@ -6797,6 +7078,10 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     hall: "hall",
     "client table": "hall:clients",
     clients: "hall:clients",
+    "planning table": "hall:table",
+    plans: "hall:table",
+    revenue: "hall:revenue",
+    "revenue chart": "hall:revenue",
     chord: "chord",
     "makers lane": "lane:plot3",
     lane: "lane:plot3",
@@ -6971,7 +7256,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|revenue chart|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -7068,12 +7353,12 @@ Then tell chat "wind down" whenever you're ready.`
         break;
       }
     }
-    const sections = [{ heading: "The week in numbers", lines: [`${q} quest${q === 1 ? "" : "s"} finished`, `${coins} coins earned`, `${steps.toLocaleString()} steps${walked ? `, ${walked} day${walked === 1 ? "" : "s"} past 5,000` : ""}`, wDays.length ? `${avgW.toFixed(1)} L of water a day, on average` : "Water not logged this week"] }];
-    if (best.q) sections.push({ heading: "Best day", lines: [`${WEEKDAY[(/* @__PURE__ */ new Date(best.d + "T00:00:00Z")).getUTCDay()]}: ${best.q} quest${best.q === 1 ? "" : "s"}`] });
-    sections.push({ heading: "In the garden", lines: [harvest2 ? `${harvest2} harvest${harvest2 === 1 ? "" : "s"} brought in` : "Nothing harvested yet. Hana has seeds."] });
-    if (chats2.length) sections.push({ heading: "Around the village", lines: [`You chatted with ${chats2.length > 1 ? chats2.slice(0, -1).join(", ") + " and " + chats2.slice(-1) : chats2[0]}`] });
-    if (ups.length) sections.push({ heading: "New in the village", lines: ups.map((n) => n[0].toUpperCase() + n.slice(1)) });
-    if (soon) sections.push({ heading: "Coming up", lines: [`${soon.name} decorations go up soon`] });
+    const sections2 = [{ heading: "The week in numbers", lines: [`${q} quest${q === 1 ? "" : "s"} finished`, `${coins} coins earned`, `${steps.toLocaleString()} steps${walked ? `, ${walked} day${walked === 1 ? "" : "s"} past 5,000` : ""}`, wDays.length ? `${avgW.toFixed(1)} L of water a day, on average` : "Water not logged this week"] }];
+    if (best.q) sections2.push({ heading: "Best day", lines: [`${WEEKDAY[(/* @__PURE__ */ new Date(best.d + "T00:00:00Z")).getUTCDay()]}: ${best.q} quest${best.q === 1 ? "" : "s"}`] });
+    sections2.push({ heading: "In the garden", lines: [harvest2 ? `${harvest2} harvest${harvest2 === 1 ? "" : "s"} brought in` : "Nothing harvested yet. Hana has seeds."] });
+    if (chats2.length) sections2.push({ heading: "Around the village", lines: [`You chatted with ${chats2.length > 1 ? chats2.slice(0, -1).join(", ") + " and " + chats2.slice(-1) : chats2[0]}`] });
+    if (ups.length) sections2.push({ heading: "New in the village", lines: ups.map((n) => n[0].toUpperCase() + n.slice(1)) });
+    if (soon) sections2.push({ heading: "Coming up", lines: [`${soon.name} decorations go up soon`] });
     return {
       id: "weekly-" + fri,
       from: "crier",
@@ -7081,7 +7366,7 @@ Then tell chat "wind down" whenever you're ready.`
       at: sgAt(fri, 15),
       title: q >= 15 ? `${q} quests: a big week in the village` : q ? `${q} quests and a steady week` : "A quiet week in the village",
       body: q ? "Here's your week in the village, Saturday to Friday. Have a lovely weekend." : "Rest weeks count too. The village will be here on Monday.",
-      sections
+      sections: sections2
     };
   }
   function windDown(item) {
@@ -7526,6 +7811,8 @@ Then tell chat "wind down" whenever you're ready.`
     calmOpen = false;
     recOpen = false;
     clientsOpen = false;
+    planOpen = false;
+    revOpen = false;
     selPlot = null;
     homeView = null;
     postOpen = false;
@@ -7634,6 +7921,10 @@ Then tell chat "wind down" whenever you're ready.`
         <p class="eyebrow" style="margin-top:14px">After a call, or any time</p><div class="actions"><button class="btn alt small" data-calm="decompress">Decompress</button></div>`);
     } else if (journalOpen && scene === "room") {
       h = journalPanel(S2.mode === "decompress" && S2.decompFree);
+    } else if (revOpen && scene === "hall") {
+      h = revenuePanel(F);
+    } else if (planOpen && scene === "hall") {
+      h = planningPanel(sampleCap);
     } else if (clientsOpen && scene === "hall") {
       h = clientsPanel(!!sampleCap);
     } else if (scratchOpen && scene === "hall") {
@@ -7706,6 +7997,8 @@ Then tell chat "wind down" whenever you're ready.`
       calmOpen = false;
       recOpen = false;
       clientsOpen = false;
+      planOpen = false;
+      revOpen = false;
       ctx();
     });
     c.querySelectorAll("[data-bed]").forEach((b) => b.onclick = () => bedAction(b.dataset.bed));
@@ -7730,6 +8023,8 @@ Then tell chat "wind down" whenever you're ready.`
         calmOpen = false;
         recOpen = false;
         clientsOpen = false;
+        planOpen = false;
+        revOpen = false;
         A.decompNow();
         drawScene();
       } else startBreath(+k);
@@ -7743,6 +8038,36 @@ Then tell chat "wind down" whenever you're ready.`
       ctx();
     });
     if (scratchOpen && scene === "hall") wireScratch(c, undoable, () => ctx());
+    if (revOpen && scene === "hall") wireRevenue(c, F, () => save2(), () => {
+      if (revOpen) ctx();
+    });
+    if (planOpen && scene === "hall") {
+      c.querySelectorAll('[data-pl="refresh"]').forEach((b) => b.onclick = () => {
+        loadPlans().then(() => {
+          if (planOpen) ctx();
+        });
+        ctx();
+      });
+      const pf = c.querySelector("#plForm"), pc = c.querySelector("#plChat");
+      if (pc) pc.scrollTop = pc.scrollHeight;
+      if (pf) {
+        const inp = pf.querySelector("#plIn");
+        pf.onsubmit = async (ev) => {
+          ev.preventDefault();
+          const v = inp.value;
+          inp.value = "";
+          const ev2 = await todaysEvents(dayKey()).catch(() => ({ events: [] }));
+          const pctx = { quests: allTasks().map((t2) => ({ title: t2.title, done: S2.doneIds.includes(t2.id) })), events: (ev2.events || []).slice(0, 12).map((e) => ({ title: e.title, time: e.allDay ? "all day" : new Date(e.start).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore" }) })) };
+          askPlans(sampleCap, v, pctx, () => {
+            if (planOpen) {
+              ctx();
+              const i = $("plIn");
+              if (i) i.focus();
+            }
+          });
+        };
+      }
+    }
     if (clientsOpen && scene === "hall") {
       c.querySelectorAll('[data-cl="refresh"]').forEach((b) => b.onclick = () => {
         loadClients(true).then(() => {
@@ -8041,6 +8366,8 @@ Then tell chat "wind down" whenever you're ready.`
       calmOpen = false;
       recOpen = false;
       clientsOpen = false;
+      planOpen = false;
+      revOpen = false;
       homeView = null;
       postOpen = false;
       healthOpen = false;
@@ -8117,6 +8444,8 @@ Then tell chat "wind down" whenever you're ready.`
     calmOpen = false;
     recOpen = false;
     clientsOpen = false;
+    planOpen = false;
+    revOpen = false;
     homeView = null;
     postOpen = false;
     healthOpen = false;
@@ -8251,6 +8580,24 @@ Then tell chat "wind down" whenever you're ready.`
       render();
       return;
     }
+    if (scene === "hall" && id === "revenue") {
+      revOpen = true;
+      sfx("paper", true);
+      render();
+      loadRevenue().then(() => {
+        if (revOpen) ctx();
+      });
+      return;
+    }
+    if (scene === "hall" && id === "table") {
+      planOpen = true;
+      sfx("paper", true);
+      render();
+      loadPlans().then(() => {
+        if (planOpen) ctx();
+      });
+      return;
+    }
     if (scene === "hall" && id === "clients") {
       clientsOpen = true;
       sfx("paper", true);
@@ -8362,8 +8709,8 @@ Then tell chat "wind down" whenever you're ready.`
     }
     const ug = ev.target.closest("[data-ugarden]");
     if (ug) {
-      const k = ug.dataset.ugarden, st2 = ST[k] || {};
-      speak(`${(st2.users || 0).toLocaleString()} ${st2.label || (k === "chord" ? "studios" : "families")} use ${k === "chord" ? "Chord" : "Chico"}! One flower for every ${st2.per > 0 ? st2.per : 10}.`, 4500);
+      const k = ug.dataset.ugarden, st4 = ST[k] || {};
+      speak(`${(st4.users || 0).toLocaleString()} ${st4.label || (k === "chord" ? "studios" : "families")} use ${k === "chord" ? "Chord" : "Chico"}! One flower for every ${st4.per > 0 ? st4.per : 10}.`, 4500);
       return;
     }
     const ent = ev.target.closest("[data-ent]");

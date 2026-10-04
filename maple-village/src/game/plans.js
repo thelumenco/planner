@@ -33,7 +33,9 @@ export async function readPlan(level, opts = {}){
     const hit = list.find(x => x && String(x.title || "").trim() === title) || null;
     if (!hit) return {level, title, error: "not found"};
     const page = unwrap(await mcp.callTool(NOTION, "notion-fetch", {id: hit.id || hit.url}, {cache, signal}));
-    return {level, title, text: pageText(page).slice(0, 5000)};
+    const raw = typeof page === "string" ? page : (page && (page.text || "")) || "", pm = /<properties>\s*(\{[\s\S]*?\})\s*<\/properties>/.exec(raw);
+    let props = {}; try { props = pm ? JSON.parse(pm[1]) : {}; } catch {}
+    return {level, title, text: pageText(page).slice(0, 5000), theme: String(props.Theme || "").slice(0, 160), start: props["date:Period Start:start"] || "", end: props["date:Period End:start"] || "", url: /^https:\/\//.test(props.url || "") ? props.url : (hit.url && /^https:\/\//.test(hit.url) ? hit.url : "")};
   } catch (e) { return {level, title, error: (e && e.code) || "upstream_error"}; }
 }
 export const PLAN_WORDS = /\b(plan|plans|planned|quarter|q[1-4]|month|monthly|week|weekly|goal|goals|objective|priorit|focus|theme|revenue|target|on track|this week|next week)\b/i;

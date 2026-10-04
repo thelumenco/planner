@@ -67,10 +67,10 @@ export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,5
 // the floor at y≈165: their front edge sits at 165 + their height. Tables, sofas and baskets stay out on the floor.
 // station: [id, name, slot, furniture, keyword regex, line, standDy?]  (standDy: where Mel stands, relative to the front edge; default +42)
 export const ROOMS = {
-  hall:  {name:"Town hall", wall:"#E6E9F5", trim:"var(--peri)", pos:{A:[448,262], B:[110,258], C:[260,430], D:[334,266], E:[118,474]}, stations:[
-    ["table","Planning table","C","table",/plan|strategy|review|ceo|goal|week|month|quarter|budget/,"Big-picture thinking lives here."],
+  hall:  {name:"Town hall", wall:"#E6E9F5", trim:"var(--peri)", pos:{A:[448,262], B:[110,258], C:[420,474], D:[334,266], E:[118,474]}, stations:[
+    ["table","Planning table","C","table",/plan|strategy|review|ceo|goal|week|month|quarter|budget/,"Your week, month and quarter, from Notion."],
     ["whiteboard","Whiteboard","B","whiteboard",/brainstorm|idea|map|outline|launch|offer|pricing/,"Fresh marker, blank board."],
-    ["phone","Phone booth","D","phone",/call|meeting|zoom|coffee|interview|podcast|sync/,"Quiet booth for calls."],
+    ["revenue","Revenue chart","D","chartstand",/invoice|revenue|sales|finance|money|budget|pricing|accounts/,"How the money's flowing, from Chord."],
     ["shelf","Bookshelf","A","shelf",/read|research|learn|course|study/,"Smart books, cosy spines."],
     ["clients","Client table","E","table",/proposal|client|brief|contract|onboard/,"Your client projects, live from Chord."]]},
   chord: {name:"Chord workshop", wall:"#E9F0E2", trim:"var(--sage)", pos:{A:[130,218], B:[390,420], C:[420,262], D:[120,540], E:[262,336]}, stations:[

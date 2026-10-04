@@ -82,7 +82,12 @@
         const P = { studio_overview: { studio: "Test Studio", currency: "$", projects_active: 2, tasks_overdue: 1, tasks_waiting_on_clients: 2, client_comments_open: 1, proposals_awaiting_reply: 1, leads_open: 2, retainers_running: 3, retainer_income_per_month: 450, next_bookings: [{ meeting: "Coffee Chat", with: "A. Client", starts: "Wed, 21 Oct 2026, 14:30" }] },
           list_projects: { count: 2, projects: [{ id: "p1", name: "Website copy", client: "Sample Co", category: "Copy", due: "2026-10-16", tasks_done: 3, tasks_total: 8 }, { id: "p2", name: "Claude Setup", client: "Test Client", key_date: "2026-10-07", key_date_label: "Key date", tasks_done: 0, tasks_total: 6 }] },
           needs_attention: { count: 1, items: [{ title: "New enquiry from a florist", action: "Reply and book a call" }] },
-          get_project: { id: "p1", stages: [] }, list_upcoming: { items: [] }, list_clients: { clients: [] } };
+          get_project: { id: "p1", stages: [] }, list_upcoming: { items: [] }, list_clients: { clients: [] },
+          list_retainers: { month: "2026-10", currency: "$", count: 2, monthly_total: 600, retainers: [{ name: "Lead gen", client: "Sample Farm", monthly_amount: 500, running: true }, { name: "MUSE", client: "Test Studio", monthly_amount: 100, running: true }] } };
+        if (tool === "list_invoices") {
+          const paid = [["2026-08-04", 1680, "Sample Co"], ["2026-08-03", 2140, "Internal"], ["2026-09-12", 900, "Popcorn Test"], ["2026-10-02", 1350, "Sample Co"]].map(([d, t, c], i) => ({ id: "i" + i, number: "INV-" + i, client: c, status: "paid", total: t, issued: d, paid: d }));
+          return { content: [], payload: input.status === "paid" ? { status: "paid", currency: "$", invoices: paid } : { status: "unpaid", currency: "$", invoices: [{ id: "u1", number: "INV-9", client: "Late Co", status: "sent", overdue: true, total: 1800, due: "2026-10-01" }] } };
+        }
         if (!P[tool]) throw { code: "not_in_manifest", message: "not declared" };
         return { content: [], payload: P[tool] };
       }
@@ -92,7 +97,7 @@
       }
       if (server === "Notion" && tool === "notion-fetch") {
         const t = String(input.id || "").replace(/^plan-/, "").replace(/-/g, " ");
-        return { content: [], payload: { title: t, text: `<page><content>\n## Objectives\n- Primary: (stub plan for ${t}) fill the Visibility Fix\n</content></page>` } };
+        return { content: [], payload: { title: t, text: `<page><properties>{"Name":"${t}","Theme":"Stub theme for ${t}"}</properties><content>\n## Objectives\n- **Primary:** (stub plan for ${t}) fill the Visibility Fix\n## Day by day\n**Monday (sales)**\n- Message 12 warm leads (30 min)\n**Tuesday (client)**\n- Write features 1 and 2 (90 min)\n## Waiting on others\nPopcorn, Radhika.\n</content></page>` } };
       }
       if (server !== "Sunsama MCP" || tool !== "read_resource") throw { code: "not_in_manifest", message: "not declared" };
       // the first day asked for is "today"; any later day gets tomorrow's (different) tasks

@@ -398,3 +398,26 @@
 .clchat p{margin:0;padding:7px 10px;border-radius:10px;font-size:.88rem;line-height:1.45;max-width:90%;white-space:pre-wrap}
 .clchat .me{justify-self:end;background:#E3EAF8}.clchat .fox{justify-self:start;background:#FFFDF6;border:1px solid rgba(120,104,84,.12)}
 .clatt li > span{display:grid;gap:2px}
+/* planning table: three plan cards */
+.pcards{display:grid;gap:10px}
+.pcard{background:#FBF8F2;border:1px solid rgba(120,104,84,.15);border-radius:10px;padding:10px 12px}
+.pcard.pweek{background:#FFFDF6;border-color:var(--peri2,#6E7FC8)}
+.plabel{margin:0;font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#8A8279}
+.ptitle{margin:2px 0 2px;font-family:"Klee One",serif;font-weight:600;font-size:1.05rem;color:#2F2B28}
+.plink{font-family:Mulish,sans-serif;font-size:.72rem;font-weight:700;color:var(--peri2,#6E7FC8);margin-left:6px}
+.ptheme{margin:0 0 6px;font-size:.84rem;color:#5A534C;font-style:italic}
+.pmh{margin:8px 0 2px;font-size:.78rem;font-weight:800;color:#5A534C}
+.pml{margin:2px 0 4px;padding-left:18px;font-size:.86rem;line-height:1.45}.pml li{margin:1px 0}
+.pmp{margin:3px 0;font-size:.86rem;line-height:1.45}
+.pcard details{margin-top:6px;font-size:.86rem}.pcard summary{cursor:pointer;color:var(--peri2,#6E7FC8);font-weight:700;font-size:.8rem}
+.pfri{background:#FFF3D6;border-radius:8px;padding:8px 10px;font-size:.86rem;margin:6px 0 10px}
+/* revenue chart */
+.rhero{margin:4px 0 6px}.rbig{margin:0;font-family:"Klee One",serif;font-weight:600;font-size:2rem;color:#2F2B28;line-height:1.1}
+.rprog{max-width:none;height:8px;margin:6px 0}
+.rtarget{margin-top:6px}.rtarget input{max-width:120px}
+.rchart{width:100%;max-width:520px;height:auto;display:block;margin:8px 0}
+.rchart .rax{font-size:9px;fill:#8A8279;font-family:Mulish,sans-serif}.rchart .rval{font-size:9.5px;fill:#2F2B28;font-weight:700;font-family:Mulish,sans-serif}
+.rchart .rbar:hover path,.rchart .rbar:focus path{opacity:1}.rchart .rbar{outline:none}
+.rtable table{border-collapse:collapse;font-size:.84rem;margin:6px 0}.rtable td,.rtable th{padding:3px 12px 3px 0;text-align:left}
+.panel details.rtable > summary{font-family:Mulish,sans-serif;font-size:.8rem;font-weight:700;color:var(--peri2,#6E7FC8);cursor:pointer;list-style:revert;padding:0;margin:0}
+.panel details.rtable > summary::after{content:none}
