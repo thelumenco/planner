@@ -248,16 +248,23 @@ function buyTool(id){
 function wireJars(c){
   const note = c.querySelector("#jNote"); if (note) note.oninput = () => { jv.note = note.value; };
   c.querySelectorAll("[data-emo]").forEach(b => b.onclick = () => { const id = b.dataset.emo, kinds = new Set(jv.blobs);
-    if (jv.blobs.length >= MAX_BLOBS || (!kinds.has(id) && kinds.size >= MAX_KINDS)) return; jv.blobs.push(id); sfx("tap"); ctx(); });
+    if (jv.blobs.length >= MAX_BLOBS || (!kinds.has(id) && kinds.size >= MAX_KINDS)) return; jv.blobs.push(id); jv.added = ""; sfx("tap"); ctx(); });
   c.querySelectorAll("[data-jarid]").forEach(b => b.onclick = () => { jv = {mode: "jar", id: b.dataset.jarid, blobs: [], note: ""}; sfx("paper", true); ctx(); });
-  c.querySelectorAll("[data-sw]").forEach(b => b.onclick = () => { const n = c.querySelector("#jcName"); jv.customName = n ? n.value : ""; jv.customColor = b.dataset.sw; ctx(); });
-  const cf = c.querySelector("#jcForm"); if (cf) cf.onsubmit = ev => { ev.preventDefault(); const e = addCustom(c.querySelector("#jcName").value, jv.customColor); if (e) { jv.adding = false; jv.customName = ""; if (new Set(jv.blobs).size < MAX_KINDS && jv.blobs.length < MAX_BLOBS) jv.blobs.push(e.id); } ctx(); };
+  const jn = c.querySelector("#jcName"); if (jn) jn.oninput = () => { jv.customName = jn.value; jv.customWarn = ""; };
+  if (jn) jn.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); const f = c.querySelector("#jcForm"); if (f) f.requestSubmit ? f.requestSubmit() : f.onsubmit(e); } };
+  c.querySelectorAll("[data-sw]").forEach(b => b.onclick = () => { if (jn) jv.customName = jn.value; jv.customColor = b.dataset.sw; jv.customWarn = ""; ctx(); });
+  // Adding a feeling never drops a blob in: it joins the picker, and Mel taps it like any other
+  const cf = c.querySelector("#jcForm"); if (cf) cf.onsubmit = ev => { ev.preventDefault(); if (jn) jv.customName = jn.value;
+    const name = String(jv.customName || "").trim();
+    if (!name) { jv.customWarn = "Give it a name first."; ctx(); const n = c.querySelector("#jcName"); if (n) n.focus(); return; }
+    if (!jv.customColor) { if (jn) jn.blur(); jv.customWarn = "Now pick a colour for it."; ctx(); return; }
+    const e = addCustom(name, jv.customColor); if (e) { jv.adding = false; jv.customName = ""; jv.customColor = ""; jv.customWarn = ""; jv.added = e.name; sfx("tap"); } ctx(); };
   c.querySelectorAll("[data-jar]").forEach(b => b.onclick = () => {
     const k = b.dataset.jar, id = b.dataset.id;
     if (k === "make") { jv = {mode: "make", blobs: [], note: ""}; }
     else if (k === "shelf") { jv = {mode: "shelf", blobs: [], note: ""}; }
     else if (k === "unblob") { jv.blobs.pop(); }
-    else if (k === "custom") { jv.adding = !jv.adding; }
+    else if (k === "custom") { jv.adding = !jv.adding; jv.customWarn = ""; jv.added = ""; if (jv.adding) setTimeout(() => { const f = c.querySelector("#jcForm"); if (f) f.scrollIntoView({block: "nearest", behavior: "smooth"}); }, 30); }
     else if (k === "place") { const j = makeJar(jv.blobs, jv.note); if (!j) return; sfx("chime");
       const heavy = j.blobs.filter(x => ["anger", "sad", "fear", "anxious", "tired"].includes(x)).length >= Math.ceil(j.blobs.length/2);
       speak(heavy ? "That's a big feeling. I'm here." : j.blobs.filter(x => ["joy", "love", "proud", "calm"].includes(x)).length > j.blobs.length/2 ? "A happy one. I love that for you." : "Kept safe on the shelf.", 4500);
