@@ -826,6 +826,37 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.screenshot({ path: join(shots, "kind-words.png") });
   await page.close();
 }
+{
+  // My routines: the noticeboard in Mel's room
+  console.log("\nmy routines");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.goto(url + "?reset=1&seed=1&time=08:30&date=2026-10-07");
+  await page.waitForTimeout(800);
+  await page.locator('#world [data-place="home"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-spot="mydoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /My room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-spot="routines"]').dispatchEvent("click");
+  await page.waitForSelector("#ctx .rcheck li", { timeout: 15000 });
+  check(await page.locator("#ctx .rcheck li").count() >= 3, "the noticeboard has a morning routine checklist");
+  await page.click("#ctx .rcheck li >> nth=0"); await page.waitForTimeout(200);
+  check(await page.locator("#ctx .rcheck li.tick").count() === 1, "and steps tick off");
+  await page.click('#ctx [data-rt="sel"]:has-text("Beauty")'); await page.click('#ctx [data-rt="edit"]');
+  await page.fill("#rtPaste", "Mon: double cleanse\nTue - hair mask\nWednesday: exfoliate\nThu: sheet mask\nFri. nails\nSun: rest");
+  await page.click('#ctx [data-rt="paste"]'); await page.waitForTimeout(150);
+  check(await page.locator('#ctx [data-day="wed"]').inputValue() === "exfoliate", "a pasted week fills in the days");
+  await page.click('#rtForm button[type="submit"]'); await page.waitForTimeout(150);
+  check(/exfoliate/.test(await page.locator("#ctx .rtoday").textContent()), "and today's step (a Wednesday) is up top");
+  await page.click("#ctx .rtoday"); await page.waitForTimeout(150);
+  check(await page.locator("#ctx .rtoday.done").count() === 1 && await page.evaluate(() => (devDb.get("routines").lists || []).some(l => l.days && l.days.wed === "exfoliate")), "it ticks off, and the routine is saved privately");
+  await page.click('#ctx [data-rt="sel"]:has-text("Morning")'); await page.click('#ctx [data-rt="edit"]');
+  const n0 = await page.locator("#ctx .redit li").count(); await page.click('#ctx [data-rt="delitem"] >> nth=0'); await page.waitForTimeout(150);
+  check(await page.locator("#ctx .redit li").count() === n0 - 1, "steps can be removed");
+  await page.click("#undoBtn"); await page.waitForTimeout(200);
+  check(await page.locator("#ctx .redit li").count() === n0, "and Undo puts them back");
+  await page.screenshot({ path: join(shots, "routines.png") });
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

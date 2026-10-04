@@ -1026,6 +1026,25 @@ body.kidmode .scenename span + span{display:none}
 .ktext{margin:0;font-family:"Klee One",serif;font-weight:600;font-size:1.35rem;line-height:1.45;color:#2F2B28}
 .kwho{margin:12px 0 0;color:#6B6259;font-size:.9rem}
 .kfrom{width:100%;box-sizing:border-box;margin-top:8px;border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:8px 10px;font:inherit;color:#2F2B28}
+
+/* My routines (noticeboard in Mel's room) */
+.rtabs{flex-wrap:wrap}
+.rtoday{display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin:4px 0 12px;padding:14px 14px;border:1.5px solid rgba(120,104,84,.25);border-radius:12px;background:#FFF8EC;font-family:"Klee One",serif;font-weight:600;font-size:1.2rem;color:#2F2B28;cursor:pointer}
+.rtoday.done span:last-child{text-decoration:line-through;opacity:.6}
+.rtoday.done .tk::after{content:"";position:absolute;left:4px;top:1px;width:5px;height:9px;border:solid #2F2B28;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.rweek{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.rweek li{display:grid;grid-template-columns:44px 1fr;gap:8px;padding:6px 8px;border-radius:8px;font-size:.92rem}
+.rweek li.now{background:#FFF3B8}
+.rweek li b{font-family:"Klee One",serif}
+.rcheck li{cursor:pointer}
+.rtedit input:not([type=radio]){width:100%;box-sizing:border-box;border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:7px 10px;font:inherit;color:#2F2B28}
+.rkind{display:grid;gap:4px;margin:10px 0;font-size:.9rem}
+.rday{display:grid;grid-template-columns:44px 1fr;align-items:center;gap:8px;margin:5px 0}
+.rday span{font-family:"Klee One",serif;font-weight:600}
+.redit{list-style:none;margin:8px 0;padding:0;display:grid;gap:6px}
+.redit li{display:grid;grid-template-columns:1fr 28px;align-items:center;gap:6px}
+.redit .kdel{position:static}
+.rpaste{margin-top:10px}.rpaste textarea{width:100%;box-sizing:border-box;margin:6px 0;border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:8px 10px;font:inherit;color:#2F2B28}
 </style>
 </head>
 <body>
@@ -1782,7 +1801,8 @@ body.kidmode .scenename span + span{display:none}
       ["office", "Darren's desk", "G", "office", null, "Darren's home office. Shh, he might be on a call."]
     ] },
     // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
-    room: { name: "My room", wall: "#EFE3EE", trim: "var(--blush)", noBoard: true, pos: { A: [130, 290], W: [262, 206], B: [440, 262], E: [62, 396], C: [66, 500], D: [434, 556], J: [260, 594] }, stations: [
+    room: { name: "My room", wall: "#EFE3EE", trim: "var(--blush)", noBoard: true, pos: { A: [130, 290], W: [262, 206], B: [440, 262], E: [62, 396], C: [66, 500], D: [434, 556], J: [260, 594], N: [388, 132] }, stations: [
+      ["routines", "My routines", "N", "routineboard", null, "Your routines, pinned up.", 74],
       ["bed", "Bed", "A", "bed", null, "Your bed. Fluffy pillows, cool sheets."],
       ["window", "Window", "W", "curtwindow", null, "Curtains open, curtains shut.", 20],
       ["wardrobe", "Wardrobe", "B", "wardrobe", null, "Today's outfits are hanging in here.", 30],
@@ -2053,7 +2073,7 @@ body.kidmode .scenename span + span{display:none}
     <g style="fill:#E3CCDB" opacity=".8">${rows(6, (r) => rows(13, (i) => `<path transform="translate(${i * 42 + r % 2 * 21 + 12} ${r * 22 + 12}) scale(.7)" d="M0 3 c-4 -5 -9 0 -5 4 l5 5 l5 -5 c4 -4 -1 -9 -5 -4z"/>`))}</g>
     ${d.r_lights ? `<path d="M10 16 Q130 44 250 18 Q380 46 510 16" fill="none" style="stroke:var(--line)" stroke-width="1.2" filter="url(#wob)"/>${[30, 70, 110, 150, 190, 230, 290, 330, 370, 410, 450, 490].map((x, i) => `<circle class="twinkle" cx="${x}" cy="${(32 + 10 * Math.sin(i * 1.3)).toFixed(1)}" r="3.6" fill="${["#FFD66E", "#F7A9A9", "#A9D3F7", "#C7E8A9"][i % 4]}" style="animation-delay:-${(i * 0.3).toFixed(1)}s"/>`).join("")}` : ""}
     ${d.r_art ? sk(`<rect x="112" y="34" width="56" height="44" rx="2" style="fill:#FFFDF6"/><circle cx="132" cy="56" r="7" style="fill:var(--rose)"/><circle cx="148" cy="54" r="6" style="fill:var(--peri)"/><path d="M132 63 v10 M148 60 v13" style="stroke:var(--moss2)"/>`, `<rect x="106" y="28" width="68" height="56" rx="2"/><rect x="112" y="34" width="56" height="44" rx="2"/>`) : ""}
-    ${d.r_shelf ? sk(`<rect x="380" y="58" width="100" height="10" style="fill:var(--wood)"/>${["var(--rose)", "var(--peri)", "var(--sage)", "var(--butter)", "var(--peach)"].map((c, i) => `<rect x="${388 + i * 12}" y="${36 + i % 2 * 4}" width="10" height="${22 - i % 2 * 4}" style="fill:${c}"/>`).join("")}`, `<rect x="380" y="58" width="100" height="10"/><path d="M386 68 v8 M474 68 v8"/>`) : ""}
+    ${d.r_shelf ? sk(`<rect x="8" y="58" width="90" height="10" style="fill:var(--wood)"/>${["var(--rose)", "var(--peri)", "var(--sage)", "var(--butter)", "var(--peach)"].map((c, i) => `<rect x="${16 + i * 12}" y="${36 + i % 2 * 4}" width="10" height="${22 - i % 2 * 4}" style="fill:${c}"/>`).join("")}`, `<rect x="8" y="58" width="90" height="10"/><path d="M14 68 v8 M92 68 v8"/>`) : ""}
     ${d.r_plant ? plant(366, 300, 1.2) : ""}
     ${d.r_vanity ? sk(`<rect x="38" y="584" width="70" height="12" rx="2" style="fill:var(--wood)"/><ellipse cx="73" cy="558" rx="20" ry="26" style="fill:#DCE8F4"/>`, `<rect x="38" y="584" width="70" height="12" rx="2"/><path d="M46 596 v16 M100 596 v16"/><ellipse cx="73" cy="558" rx="20" ry="26"/><path d="M64 544 l8 -8" opacity=".6"/>`) : ""}
     ${skirting}`;
@@ -2162,8 +2182,8 @@ body.kidmode .scenename span + span{display:none}
     return nx;
   }
   function runPanel(F2) {
-    const P2 = ensurePets(F2), R = runOf(F2), nx = RUNS[P2.run + 1];
-    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The animal run</h2><p class="sub">${esc(R.n)} · ${P2.animals.length} of ${R.cap} · you have ${icon("coin", 16)} ${F2.coins}</p>`;
+    const P2 = ensurePets(F2), R2 = runOf(F2), nx = RUNS[P2.run + 1];
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The animal run</h2><p class="sub">${esc(R2.n)} · ${P2.animals.length} of ${R2.cap} · you have ${icon("coin", 16)} ${F2.coins}</p>`;
     if (!P2.animals.length) h += `<p class="muted">It's quiet in here. Chicks and bunnies are in the market's Animals tab, with their food.</p>`;
     else {
       h += `<ul class="hlist pets">${P2.animals.map((a) => {
@@ -2343,9 +2363,9 @@ body.kidmode .scenename span + span{display:none}
       commit();
     };
   }
-  var rnd2 = (seed, i) => {
+  var rnd2 = (seed2, i) => {
     let h = 2166136261;
-    for (const ch of seed + ":" + i) {
+    for (const ch of seed2 + ":" + i) {
       h ^= ch.charCodeAt(0);
       h = Math.imul(h, 16777619);
     }
@@ -2353,18 +2373,18 @@ body.kidmode .scenename span + span{display:none}
   };
   var softBlob = (x, y, r, color, sq = 1.12) => `<g><ellipse cx="${x.toFixed(1)}" cy="${(y + r * 0.15).toFixed(1)}" rx="${(r * sq + 0.8).toFixed(2)}" ry="${(r + 0.8).toFixed(2)}" fill="${color}" opacity=".35"/><ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${(r * sq).toFixed(2)}" ry="${r.toFixed(2)}" fill="${color}" opacity=".92"/><ellipse cx="${x.toFixed(1)}" cy="${(y + r * 0.45).toFixed(1)}" rx="${(r * sq * 0.8).toFixed(2)}" ry="${(r * 0.45).toFixed(2)}" fill="rgba(47,43,40,.10)"/><ellipse cx="${(x - r * 0.35).toFixed(1)}" cy="${(y - r * 0.4).toFixed(1)}" rx="${(r * 0.42).toFixed(2)}" ry="${(r * 0.26).toFixed(2)}" fill="rgba(255,255,255,.55)"/></g>`;
   function jarArt(jar, opts = {}) {
-    const blobs = jar && jar.blobs || [], col = (id) => jar && jar.colors && jar.colors[id] || emo(id), seed = jar && jar.id || "new";
+    const blobs = jar && jar.blobs || [], col = (id) => jar && jar.colors && jar.colors[id] || emo(id), seed2 = jar && jar.id || "new";
     const pos = [];
     for (let i = 0, row2 = 0, k = 0; i < blobs.length; i++) {
       const per = row2 % 2 ? 2 : 3;
-      pos.push([14 + (k + (row2 % 2 ? 0.5 : 0)) * 16 + (rnd2(seed, i) - 0.5) * 3, 68 - row2 * 12.5 + (rnd2(seed, i + 50) - 0.5) * 2]);
+      pos.push([14 + (k + (row2 % 2 ? 0.5 : 0)) * 16 + (rnd2(seed2, i) - 0.5) * 3, 68 - row2 * 12.5 + (rnd2(seed2, i + 50) - 0.5) * 2]);
       if (++k >= per) {
         k = 0;
         row2++;
       }
     }
     const b = blobs.map((id, i) => {
-      const c = col(id), [x, y] = pos[i], r = 7.6 + rnd2(seed, i + 9) * 0.9;
+      const c = col(id), [x, y] = pos[i], r = 7.6 + rnd2(seed2, i + 9) * 0.9;
       return `<g class="${opts.anim && i === blobs.length - 1 ? "blobdrop" : ""}">${softBlob(x, y, r, c.color)}</g>`;
     }).join("");
     const glow = blobs.length ? `<ellipse cx="30" cy="62" rx="24" ry="20" fill="${col(blobs[blobs.length - 1]).color}" opacity=".12"/>` : "";
@@ -2785,6 +2805,12 @@ body.kidmode .scenename span + span{display:none}
         );
       // Evan's room (and its door on the east wall of the house)
       // the town hall's kind-words corkboard, hung on the back wall (x,y = the wall's foot below it)
+      // Mel's routines noticeboard (her room's back wall): pinned lists, one ticked
+      case "routineboard":
+        return sk(
+          `<rect x="${x - 46}" y="${y - 116}" width="92" height="92" rx="4" style="fill:#FFFDF6"/><rect x="${x - 38}" y="${y - 104}" width="36" height="44" rx="1" transform="rotate(-3 ${x - 20} ${y - 82})" style="fill:#D6E8F7"/><rect x="${x + 2}" y="${y - 102}" width="36" height="48" rx="1" transform="rotate(2 ${x + 20} ${y - 78})" style="fill:#FAD4DC"/><rect x="${x - 24}" y="${y - 56}" width="48" height="26" rx="1" style="fill:#FFF3B8"/>`,
+          `<rect x="${x - 46}" y="${y - 116}" width="92" height="92" rx="4"/><path d="M${x - 32} ${y - 92} h22 M${x - 32} ${y - 84} h18 M${x - 32} ${y - 76} h22 M${x + 8} ${y - 90} h22 M${x + 8} ${y - 82} h18 M${x + 8} ${y - 74} h22 M${x + 8} ${y - 66} h14 M${x - 16} ${y - 46} h30 M${x - 16} ${y - 38} h22" opacity=".55"/><path d="M${x - 36} ${y - 93} l2 2 l4 -4"/><circle cx="${x - 20}" cy="${y - 104}" r="2" style="fill:var(--rose)"/><circle cx="${x + 20}" cy="${y - 102}" r="2" style="fill:var(--peri2)"/><circle cx="${x}" cy="${y - 56}" r="2" style="fill:var(--honey)"/>`
+        );
       case "kindboard": {
         const n = G.kudos ? G.kudos() : 0, cols = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
         const spots = [[-36, -98], [-8, -102], [20, -97], [-30, -70], [0, -66], [26, -72], [-20, -44], [12, -44]];
@@ -4040,10 +4066,10 @@ body.kidmode .scenename span + span{display:none}
         closeNotebook();
         return;
       }
-      const keep3 = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
+      const keep4 = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
       page.innerHTML = taskPage(t2);
       if ($("nbAsk")) {
-        $("nbAsk").value = keep3;
+        $("nbAsk").value = keep4;
         if (typing) $("nbAsk").focus();
       }
     } else page.innerHTML = open.kind === "tracker" ? trackerPage(open.which) : open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
@@ -5180,7 +5206,7 @@ Quests finished today: ${S3.doneIds.length}`;
     }
     if (d && d.state && d.state.zones) d = d.state;
     if (!d || !Array.isArray(d.zones) || !Array.isArray(d.dailyTasks)) return "That doesn't look like a Hestia export (no zones or daily tasks).";
-    const keep3 = [
+    const keep4 = [
       "zones",
       "dailyTasks",
       "weeklyTasks",
@@ -5201,7 +5227,7 @@ Quests finished today: ${S3.doneIds.length}`;
       "chimeEnabled",
       "chimeInterval"
     ];
-    keep3.forEach((k) => {
+    keep4.forEach((k) => {
       if (d[k] != null) H2[k] = d[k];
     });
     tidy();
@@ -6110,44 +6136,62 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     };
   }
 
-  // src/game/kudos.js
-  var KEY5 = "fox.kudos";
+  // src/game/routines.js
+  var KEY5 = "fox.routines";
+  var DAYS2 = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+  var DAY_NAMES = { mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday" };
+  var uid = (p) => p + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
+  var seed = () => ({ lists: [
+    { id: "morning", name: "Morning routine", kind: "checklist", at: 1, items: ["Big glass of water", "Make the bed", "Wash face and skincare", "Get dressed (peek at the wardrobe)", "Vitamins"].map((t2, i) => ({ id: "m" + i, text: t2 })) },
+    { id: "beauty", name: "Beauty routine", kind: "weekly", at: 1, days: {} }
+  ], ticks: {}, updatedAt: 0 });
   var load3 = () => {
     try {
-      return Object.assign({ items: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(KEY5)) || {});
+      const r = JSON.parse(localStorage.getItem(KEY5));
+      return r && Array.isArray(r.lists) ? Object.assign({ ticks: {} }, r) : seed();
     } catch {
-      return { items: [], updatedAt: 0 };
+      return seed();
     }
   };
-  var K = load3();
+  var R = load3();
   var ref3 = null;
   var chain2 = Promise.resolve();
   var onChange4 = () => {
   };
   var keep2 = () => {
     try {
-      localStorage.setItem(KEY5, JSON.stringify(K));
+      localStorage.setItem(KEY5, JSON.stringify(R));
     } catch {
     }
   };
   function merge2(a, b) {
+    if (!b) return a;
     const m = /* @__PURE__ */ new Map();
-    [...a.items || [], ...b && b.items || []].forEach((e) => {
-      if (!e || !e.id) return;
-      const o = m.get(e.id);
-      if (!o || (e.at || 0) > (o.at || 0)) m.set(e.id, e);
+    [...a.lists || [], ...b.lists || []].forEach((l) => {
+      if (!l || !l.id) return;
+      const o = m.get(l.id);
+      if (!o || (l.at || 0) > (o.at || 0)) m.set(l.id, l);
     });
-    return { items: [...m.values()].slice(-500), updatedAt: Math.max(a.updatedAt || 0, b && b.updatedAt || 0) };
+    const ticks = {}, days = [.../* @__PURE__ */ new Set([...Object.keys(a.ticks || {}), ...Object.keys(b.ticks || {})])].sort().slice(-14);
+    days.forEach((d) => {
+      const x = (a.ticks || {})[d] || {}, y = (b.ticks || {})[d] || {};
+      ticks[d] = {};
+      (/* @__PURE__ */ new Set([...Object.keys(x), ...Object.keys(y)])).forEach((k) => {
+        const p = x[k], q = y[k];
+        ticks[d][k] = !p ? q : !q ? p : (q.at || 0) > (p.at || 0) ? q : p;
+      });
+    });
+    return { lists: [...m.values()], ticks, updatedAt: Math.max(a.updatedAt || 0, b.updatedAt || 0) };
   }
-  function attachKudos(col, changed) {
+  function attachRoutines(col, changed) {
     onChange4 = changed;
-    ref3 = col.doc("kudos");
+    ref3 = col.doc("routines");
     ref3.onSnapshot((snap) => {
       if (!snap.exists) {
-        if (K.items.length) push2();
+        push2();
         return;
       }
-      K = merge2(K, JSON.parse(JSON.stringify(snap.data() || {})));
+      R = merge2(R, JSON.parse(JSON.stringify(snap.data() || {})));
       keep2();
       onChange4();
     }, () => {
@@ -6158,17 +6202,273 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     chain2 = chain2.then(async () => {
       try {
         const cur2 = await ref3.get();
-        if (cur2.exists) K = merge2(K, JSON.parse(JSON.stringify(cur2.data() || {})));
-        await ref3.set(JSON.parse(JSON.stringify(K)));
+        if (cur2.exists) R = merge2(R, JSON.parse(JSON.stringify(cur2.data() || {})));
+        await ref3.set(JSON.parse(JSON.stringify(R)));
       } catch {
       }
     });
   }
   var commit2 = () => {
-    K.updatedAt = Date.now();
+    R.updatedAt = Date.now();
     keep2();
     push2();
     onChange4();
+  };
+  var lists = () => R.lists.filter((l) => !l.deleted).sort((a, b) => (a.kind === "checklist" ? 0 : 1) - (b.kind === "checklist" ? 0 : 1) || (a.made || 0) - (b.made || 0));
+  var listById = (id) => R.lists.find((l) => l.id === id && !l.deleted);
+  var todayKey = () => DAYS2[((/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).getUTCDay() + 6) % 7];
+  var tickOf = (listId, itemId, day = dayKey()) => {
+    const t2 = ((R.ticks || {})[day] || {})[listId + ":" + itemId];
+    return !!(t2 && t2.on);
+  };
+  function setTick(listId, itemId, on) {
+    const d = dayKey();
+    R.ticks = R.ticks || {};
+    R.ticks[d] = R.ticks[d] || {};
+    R.ticks[d][listId + ":" + itemId] = { on, at: Date.now() };
+    commit2();
+  }
+  var touch = (l) => {
+    l.at = Date.now();
+    commit2();
+  };
+  function todaysSteps() {
+    const k = todayKey();
+    return lists().filter((l) => l.kind === "weekly" && l.days && l.days[k]).map((l) => ({ name: l.name, text: l.days[k], done: tickOf(l.id, k) }));
+  }
+  var checklistLeft = () => lists().filter((l) => l.kind === "checklist").reduce((n, l) => n + l.items.filter((i) => !tickOf(l.id, i.id)).length, 0);
+  function parseWeek(text) {
+    const out = {};
+    String(text || "").split(/\n|;/).forEach((line) => {
+      const m = /^\s*(mon|tue|wed|thu|fri|sat|sun)[a-z]*\.?\s*[:\-–—.)]?\s*(.+)$/i.exec(line.trim());
+      if (m && m[2].trim()) out[m[1].toLowerCase()] = plain(m[2]).trim().slice(0, 160);
+    });
+    return out;
+  }
+  function setRoutine(a) {
+    const name = plain(String(a && a.name || "")).trim().slice(0, 40);
+    if (!name) return null;
+    const days = a.days && typeof a.days === "object" ? Object.fromEntries(DAYS2.filter((d) => a.days[d]).map((d) => [d, plain(String(a.days[d])).trim().slice(0, 160)])) : null;
+    const items = Array.isArray(a.items) ? a.items.map((t2) => plain(String(t2)).trim().slice(0, 120)).filter(Boolean).slice(0, 20) : null;
+    const kind = days && Object.keys(days).length ? "weekly" : items && items.length ? "checklist" : a.kind === "weekly" ? "weekly" : "checklist";
+    let l = lists().find((x) => x.name.toLowerCase() === name.toLowerCase());
+    if (!l) {
+      l = { id: uid("r"), name, kind, made: Date.now(), at: Date.now(), items: [], days: {} };
+      R.lists.push(l);
+    }
+    l.kind = kind;
+    if (kind === "weekly") l.days = Object.assign({}, l.days || {}, days || {});
+    else if (items) l.items = items.map((t2) => ({ id: uid("i"), text: t2 }));
+    touch(l);
+    return l;
+  }
+  var rv = { sel: null, edit: false, paste: "" };
+  function routinesPanel() {
+    const all = lists();
+    if (!all.length) rv.sel = null;
+    else if (!all.find((l2) => l2.id === rv.sel)) rv.sel = all[0].id;
+    const l = all.find((x) => x.id === rv.sel), tk = todayKey();
+    let h = `<span class="tape dots" aria-hidden="true"></span><h2>My routines</h2>
+    <div class="tabs rtabs" role="tablist">${all.map((x) => `<button role="tab" data-rt="sel" data-id="${esc(x.id)}" aria-selected="${x.id === rv.sel}">${esc(x.name)}</button>`).join("")}<button data-rt="new" aria-label="New routine">+ New</button></div>`;
+    if (!l) return h + `<p class="sub">No routines yet. Add one with + New.</p>`;
+    if (rv.edit) {
+      h += `<form id="rtForm" class="rtedit"><label class="muted" for="rtName">Name</label><input id="rtName" maxlength="40" value="${esc(l.name)}">
+      <div class="rkind"><label><input type="radio" name="rtKind" value="checklist" ${l.kind === "checklist" ? "checked" : ""}> A checklist, every day</label><label><input type="radio" name="rtKind" value="weekly" ${l.kind === "weekly" ? "checked" : ""}> One step each weekday</label></div>`;
+      if (l.kind === "weekly") h += DAYS2.map((d) => `<label class="rday"><span>${DAY_NAMES[d].slice(0, 3)}</span><input data-day="${d}" maxlength="160" value="${esc((l.days || {})[d] || "")}" placeholder="Nothing on ${DAY_NAMES[d]}"></label>`).join("") + `<details class="rpaste"${Object.keys(l.days || {}).length ? "" : " open"}><summary>Paste your whole week</summary><textarea id="rtPaste" rows="5" placeholder="Mon: double cleanse&#10;Tue: hair mask&#10;Wed: exfoliate…">${esc(rv.paste)}</textarea><button type="button" class="btn alt small" data-rt="paste">Fill in the days</button></details>`;
+      else h += `<ul class="redit">${l.items.map((i) => `<li><input data-item="${esc(i.id)}" maxlength="120" value="${esc(i.text)}"><button type="button" class="kdel" data-rt="delitem" data-id="${esc(i.id)}" aria-label="Remove this step">×</button></li>`).join("")}</ul>
+      <div class="row"><label class="sr" for="rtNew">New step</label><input id="rtNew" maxlength="120" placeholder="Add a step" autocomplete="off"><button type="button" class="btn small" data-rt="additem">Add</button></div>`;
+      return h + `<div class="actions"><button class="btn primary" type="submit">Done</button><button type="button" class="btn alt small" data-rt="dellist">Remove this routine</button></div></form>`;
+    }
+    if (l.kind === "weekly") {
+      const step2 = (l.days || {})[tk], done = tickOf(l.id, tk);
+      h += step2 ? `<p class="eyebrow">Today · ${DAY_NAMES[tk]}</p><button class="rtoday${done ? " done" : ""}" data-rt="tickday"><span class="tk" aria-hidden="true"></span><span>${esc(step2)}</span></button>` : `<p class="sub">${Object.keys(l.days || {}).length ? `Nothing on ${DAY_NAMES[tk]}. A rest day.` : "No steps yet. Tap Edit and paste your week in."}</p>`;
+      h += `<ul class="rweek">${DAYS2.map((d) => `<li class="${d === tk ? "now" : ""}"><b>${DAY_NAMES[d].slice(0, 3)}</b><span>${esc((l.days || {})[d] || "—")}</span></li>`).join("")}</ul>`;
+    } else {
+      const left2 = l.items.filter((i) => !tickOf(l.id, i.id)).length;
+      h += `<p class="sub">${l.items.length ? left2 ? `${left2} to go today.` : "All done today. Lovely start." : "No steps yet. Tap Edit to add some."} Fresh every morning.</p>
+      <ul class="bujo rcheck">${l.items.map((i) => {
+        const on = tickOf(l.id, i.id);
+        return `<li class="${on ? "tick" : ""}" data-rt="tick" data-id="${esc(i.id)}" role="checkbox" aria-checked="${on}" tabindex="0"><span class="tk" aria-hidden="true"></span><span>${esc(i.text)}</span></li>`;
+      }).join("")}</ul>`;
+    }
+    return h + `<div class="actions"><button class="btn alt small" data-rt="edit">Edit</button><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function wireRoutines(root, api4) {
+    const l = listById(rv.sel), form = root.querySelector("#rtForm");
+    const saveForm = () => {
+      if (!l || !form) return;
+      const n = plain(form.querySelector("#rtName").value).trim();
+      if (n) l.name = n.slice(0, 40);
+      form.querySelectorAll("[data-day]").forEach((i) => {
+        const v = plain(i.value).trim().slice(0, 160);
+        l.days = l.days || {};
+        if (v) l.days[i.dataset.day] = v;
+        else delete l.days[i.dataset.day];
+      });
+      form.querySelectorAll("[data-item]").forEach((i) => {
+        const it = l.items.find((x) => x.id === i.dataset.item), v = plain(i.value).trim().slice(0, 120);
+        if (it && v) it.text = v;
+      });
+      touch(l);
+    };
+    if (form) {
+      form.onsubmit = (ev) => {
+        ev.preventDefault();
+        saveForm();
+        rv.edit = false;
+        api4.rerender();
+      };
+      form.querySelectorAll('[name="rtKind"]').forEach((r) => r.onchange = () => {
+        saveForm();
+        l.kind = r.value;
+        l.items = l.items || [];
+        l.days = l.days || {};
+        touch(l);
+        api4.rerender();
+      });
+      const nw = form.querySelector("#rtNew");
+      if (nw) nw.onkeydown = (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          form.querySelector('[data-rt="additem"]').click();
+        }
+      };
+      const pt = form.querySelector("#rtPaste");
+      if (pt) pt.oninput = () => {
+        rv.paste = pt.value;
+      };
+    }
+    root.querySelectorAll("[data-rt]").forEach((b) => {
+      const go2 = () => {
+        const k = b.dataset.rt, id = b.dataset.id;
+        if (k === "sel") {
+          if (rv.edit) saveForm();
+          rv.sel = id;
+          rv.edit = false;
+        } else if (k === "new") {
+          const n = { id: uid("r"), name: "New routine", kind: "checklist", made: Date.now(), at: Date.now(), items: [], days: {} };
+          R.lists.push(n);
+          commit2();
+          rv.sel = n.id;
+          rv.edit = true;
+        } else if (k === "edit") rv.edit = true;
+        else if (k === "tick") {
+          const on = !tickOf(l.id, id);
+          setTick(l.id, id, on);
+          if (on) api4.done();
+        } else if (k === "tickday") {
+          const tk = todayKey(), on = !tickOf(l.id, tk);
+          setTick(l.id, tk, on);
+          if (on) api4.done();
+        } else if (k === "additem") {
+          saveForm();
+          const v = plain(root.querySelector("#rtNew").value).trim().slice(0, 120);
+          if (!v) return;
+          l.items.push({ id: uid("i"), text: v });
+          touch(l);
+        } else if (k === "delitem") {
+          saveForm();
+          const idx = l.items.findIndex((x) => x.id === id);
+          if (idx < 0) return;
+          const [gone] = l.items.splice(idx, 1);
+          touch(l);
+          api4.undoable("Step removed", () => {
+            l.items.splice(Math.min(idx, l.items.length), 0, gone);
+            touch(l);
+            api4.rerender();
+          });
+        } else if (k === "paste") {
+          const wk = parseWeek(root.querySelector("#rtPaste").value);
+          if (!Object.keys(wk).length) return;
+          saveForm();
+          l.days = Object.assign({}, l.days || {}, wk);
+          rv.paste = "";
+          touch(l);
+        } else if (k === "dellist") {
+          const copy = JSON.parse(JSON.stringify(l));
+          l.deleted = true;
+          touch(l);
+          rv.edit = false;
+          rv.sel = null;
+          api4.undoable(`Removed “${copy.name}”`, () => {
+            const x = R.lists.find((y) => y.id === copy.id);
+            Object.assign(x, copy, { deleted: false, at: Date.now() });
+            commit2();
+            rv.sel = copy.id;
+            api4.rerender();
+          });
+        }
+        api4.rerender();
+      };
+      b.onclick = go2;
+      if (b.getAttribute("role") === "checkbox") b.onkeydown = (e) => {
+        if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+          go2();
+        }
+      };
+    });
+  }
+
+  // src/game/kudos.js
+  var KEY6 = "fox.kudos";
+  var load4 = () => {
+    try {
+      return Object.assign({ items: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(KEY6)) || {});
+    } catch {
+      return { items: [], updatedAt: 0 };
+    }
+  };
+  var K = load4();
+  var ref4 = null;
+  var chain3 = Promise.resolve();
+  var onChange5 = () => {
+  };
+  var keep3 = () => {
+    try {
+      localStorage.setItem(KEY6, JSON.stringify(K));
+    } catch {
+    }
+  };
+  function merge3(a, b) {
+    const m = /* @__PURE__ */ new Map();
+    [...a.items || [], ...b && b.items || []].forEach((e) => {
+      if (!e || !e.id) return;
+      const o = m.get(e.id);
+      if (!o || (e.at || 0) > (o.at || 0)) m.set(e.id, e);
+    });
+    return { items: [...m.values()].slice(-500), updatedAt: Math.max(a.updatedAt || 0, b && b.updatedAt || 0) };
+  }
+  function attachKudos(col, changed) {
+    onChange5 = changed;
+    ref4 = col.doc("kudos");
+    ref4.onSnapshot((snap) => {
+      if (!snap.exists) {
+        if (K.items.length) push3();
+        return;
+      }
+      K = merge3(K, JSON.parse(JSON.stringify(snap.data() || {})));
+      keep3();
+      onChange5();
+    }, () => {
+    });
+  }
+  function push3() {
+    if (!ref4) return;
+    chain3 = chain3.then(async () => {
+      try {
+        const cur2 = await ref4.get();
+        if (cur2.exists) K = merge3(K, JSON.parse(JSON.stringify(cur2.data() || {})));
+        await ref4.set(JSON.parse(JSON.stringify(K)));
+      } catch {
+      }
+    });
+  }
+  var commit3 = () => {
+    K.updatedAt = Date.now();
+    keep3();
+    push3();
+    onChange5();
   };
   var kudos = () => K.items.filter((e) => !e.deleted).sort((a, b) => (b.made || b.at || 0) - (a.made || a.at || 0));
   var kudosCount = () => kudos().length;
@@ -6177,7 +6477,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     if (!text) return null;
     const e = { id: "k" + Date.now().toString(36) + Math.floor(Math.random() * 1e3), text, from: plain(String(from || "")).trim().slice(0, 60), at: Date.now(), made: Date.now() };
     K.items.push(e);
-    commit2();
+    commit3();
     return e;
   }
   function removeKudos(id) {
@@ -6186,11 +6486,11 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     const copy = { ...e };
     K.items = K.items.filter((x) => x.id !== id);
     K.items.push({ id, deleted: true, at: Date.now() });
-    commit2();
+    commit3();
     return () => {
       K.items = K.items.filter((x) => x.id !== id);
       K.items.push({ ...copy, at: Date.now() });
-      commit2();
+      commit3();
     };
   }
   var COLS = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
@@ -7044,7 +7344,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     updatedAt: 0
   });
   var freshFox = () => ({ name: "Maple", xp: 0, days: 0, streak: 0, lastActive: null, coins: null, inv: null, plots: null, cool: {}, met: {}, gifts: {}, mailRead: {}, digest: { read: {}, lastAt: 0, mine: [] }, updatedAt: 0 });
-  var load4 = (k, f2) => {
+  var load5 = (k, f2) => {
     try {
       const v = JSON.parse(localStorage.getItem(k));
       return v ? Object.assign(f2(), v) : f2();
@@ -7052,12 +7352,12 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       return f2();
     }
   };
-  var S2 = load4("fox.today", freshToday);
-  var F = load4("fox.fox", freshFox);
-  var P = load4("fox.plan", () => ({ day: null, tasks: [] }));
-  var MAIL = load4("fox.mail", () => ({ items: [] }));
-  var ST = load4("fox.stats", () => ({}));
-  var LIB = load4("fox.library", () => ({ items: [] }));
+  var S2 = load5("fox.today", freshToday);
+  var F = load5("fox.fox", freshFox);
+  var P = load5("fox.plan", () => ({ day: null, tasks: [] }));
+  var MAIL = load5("fox.mail", () => ({ items: [] }));
+  var ST = load5("fox.stats", () => ({}));
+  var LIB = load5("fox.library", () => ({ items: [] }));
   var sampleCap = null;
   function migrate() {
     if (S2.day !== dayKey()) S2 = freshToday();
@@ -7133,12 +7433,12 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     }
     if (!refs || !synced2[which]) return;
     clearTimeout(pending[which]);
-    pending[which] = setTimeout(() => push3(which), 500);
+    pending[which] = setTimeout(() => push4(which), 500);
   }
   var seen2 = { today: 0, fox: 0 };
-  async function push3(which, direct) {
+  async function push4(which, direct) {
     if (writing[which]) {
-      pending[which] = setTimeout(() => push3(which, direct), 400);
+      pending[which] = setTimeout(() => push4(which, direct), 400);
       return;
     }
     writing[which] = true;
@@ -7193,10 +7493,13 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     });
     const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
     if (!db || !user) return;
-    const uid = await user.id();
-    if (!uid) return;
-    const col = db.collection("data/users/" + uid);
+    const uid2 = await user.id();
+    if (!uid2) return;
+    const col = db.collection("data/users/" + uid2);
     attachHestiaDb(col.doc("hestia"));
+    attachRoutines(col, () => {
+      if (routOpen && !/^(rtName|rtNew|rtPaste)$/.test(document.activeElement?.id || "") && !document.activeElement?.dataset?.day && !document.activeElement?.dataset?.item) ctx();
+    });
     attachKudos(col, () => {
       if (scene === "hall") drawScene();
       if (kudosOpen && !/^(kText|kFrom)$/.test(document.activeElement?.id || "")) ctx();
@@ -7353,6 +7656,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     compost: { n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster." },
     sprinkler: { n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them." }
   };
+  var routOpen = false;
   var kudosOpen = false;
   var deskOpen = false;
   var shedOpen = false;
@@ -7369,6 +7673,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   var jarsOpen = false;
   deskOpen = false;
   kudosOpen = false;
+  routOpen = false;
   var jv = { mode: "shelf", blobs: [], note: "" };
   var BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]];
   var CYCLE = 12;
@@ -8403,7 +8708,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       if (pending[w] && refs && synced2[w]) {
         clearTimeout(pending[w]);
         pending[w] = null;
-        push3(w, true);
+        push4(w, true);
       }
     });
   }
@@ -8419,9 +8724,9 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     F.digest.read[d.id] = Date.now();
     F.digest.lastAt = Date.now();
     S2.digestMark = S2.doneIds.length;
-    const keep3 = new Set([...LIB.items || [], ...F.digest.mine || []].map((x) => x && x.id));
+    const keep4 = new Set([...LIB.items || [], ...F.digest.mine || []].map((x) => x && x.id));
     Object.keys(F.digest.read).forEach((id) => {
-      if (!keep3.has(id)) delete F.digest.read[id];
+      if (!keep4.has(id)) delete F.digest.read[id];
     });
     gainXp(1);
     save2();
@@ -8498,6 +8803,8 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     "town hall": "hall",
     hall: "hall",
     "kind words": "hall:kudos",
+    routines: "room:routines",
+    "routine board": "room:routines",
     compliments: "hall:kudos",
     "client table": "hall:clients",
     clients: "hall:clients",
@@ -8625,6 +8932,10 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
         const r = feedAnimals("all");
         return r ? `Fed ${r} in the run` : null;
       }
+      case "routine_set": {
+        const l = setRoutine(a);
+        return l ? `${l.name} is on your routines board` : null;
+      }
       case "kudos_add": {
         const e = addKudos(a.text, a.from);
         return e ? `Pinned to Kind words${e.from ? ` (from ${e.from})` : ""}` : null;
@@ -8685,10 +8996,11 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|kind words|revenue chart|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
+{"type":"routine_set","name":"Beauty routine","days":{"mon":"...","tue":"..."}}  or  {"type":"routine_set","name":"Morning routine","items":["...","..."]}  (save a routine to the noticeboard in her room: days = one step per weekday, items = a daily checklist; replaces that routine's steps)
 {"type":"kudos_add","text":"the compliment, in their words","from":"who said it"}  (when she shares something nice someone said about her: pin it to the Kind words board in the town hall)
 {"type":"remind","text":"get the laundry in","minutes":60}  or  {"type":"remind","text":"call mum","at":"18:30","date":"YYYY-MM-DD"}  ("remind me to..."; minutes from now, or a 24-hour Singapore time with an optional date; text is short and starts with a verb; say the time back to her)
 What's happening in the village right now: ${chatContext()}${planText}
@@ -9255,6 +9567,7 @@ Then tell chat "wind down" whenever you're ready.`
     jarsOpen = false;
     deskOpen = false;
     kudosOpen = false;
+    routOpen = false;
     selPlot = null;
     homeView = null;
     postOpen = false;
@@ -9324,6 +9637,7 @@ Then tell chat "wind down" whenever you're ready.`
     else if (homeView && scene === "home") h = hestiaPanel(homeView);
     else if (deskOpen && scene === "home") h = deskPanel();
     else if (kudosOpen && scene === "hall") h = kudosPanel();
+    else if (routOpen && scene === "room") h = routinesPanel();
     else if (postOpen && scene === "post") h = postPanel();
     else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
     else if (newsOpen && scene === "village") h = goodNewsHTML(myWins());
@@ -9431,6 +9745,10 @@ Then tell chat "wind down" whenever you're ready.`
     } });
     if (homeView && scene === "home") wireHestia(c, homeView);
     if (deskOpen && scene === "home") wireDesk(c, () => ctx());
+    if (routOpen && scene === "room") wireRoutines(c, { rerender: () => ctx(), undoable, done: () => {
+      sfx("coin");
+      mprop("sparkle", mel.x, mel.y - 60);
+    } });
     if (kudosOpen && scene === "hall") wireKudos(c, { rerender: () => {
       ctx();
       drawScene();
@@ -9480,6 +9798,7 @@ Then tell chat "wind down" whenever you're ready.`
       jarsOpen = false;
       deskOpen = false;
       kudosOpen = false;
+      routOpen = false;
       ctx();
     });
     c.querySelectorAll("[data-bed]").forEach((b) => b.onclick = () => bedAction(b.dataset.bed));
@@ -9496,8 +9815,8 @@ Then tell chat "wind down" whenever you're ready.`
       ctx();
       drawScene();
     });
-    const rv = c.querySelector("#recVol");
-    if (rv) rv.oninput = () => setMusicVol(+rv.value);
+    const rv2 = c.querySelector("#recVol");
+    if (rv2) rv2.oninput = () => setMusicVol(+rv2.value);
     c.querySelectorAll("[data-calm]").forEach((b) => b.onclick = () => {
       const k = b.dataset.calm;
       if (k === "stop") stopBreath(false);
@@ -9510,6 +9829,7 @@ Then tell chat "wind down" whenever you're ready.`
         jarsOpen = false;
         deskOpen = false;
         kudosOpen = false;
+        routOpen = false;
         A.decompNow();
         drawScene();
       } else startBreath(+k);
@@ -9861,6 +10181,7 @@ Then tell chat "wind down" whenever you're ready.`
       jarsOpen = false;
       deskOpen = false;
       kudosOpen = false;
+      routOpen = false;
       homeView = null;
       postOpen = false;
       healthOpen = false;
@@ -9912,6 +10233,13 @@ Then tell chat "wind down" whenever you're ready.`
       if (id === "base" && hungryCount(F) && !S2.petNudge) {
         S2.petNudge = true;
         setTimeout(() => speak("The chicks and bunnies are peeping for breakfast. Their run is by the garden.", 4500), 1400);
+      }
+      if (id === "room" && S2.routSaid !== dayKey() && sgHM() < 12 * 60) {
+        const st6 = todaysSteps().filter((x) => !x.done), left2 = checklistLeft();
+        if (st6.length || left2) {
+          S2.routSaid = dayKey();
+          setTimeout(() => speak(st6.length ? `${st6[0].name}, today: ${st6[0].text}.` : `${left2} morning routine step${left2 > 1 ? "s" : ""} on the board.`, 5e3), 1500);
+        }
       }
       if (id === "hall" && kudosCount() >= 3 && Date.now() - (F.kudosSeen || 0) > 7 * 864e5 && S2.kudosSaid !== dayKey()) {
         S2.kudosSaid = dayKey();
@@ -9969,6 +10297,7 @@ Then tell chat "wind down" whenever you're ready.`
     jarsOpen = false;
     deskOpen = false;
     kudosOpen = false;
+    routOpen = false;
     homeView = null;
     postOpen = false;
     healthOpen = false;
@@ -10000,6 +10329,13 @@ Then tell chat "wind down" whenever you're ready.`
     }
     if (id === "kiddoor") {
       setScene("kidroom", INNER.kidroom.arrive);
+      return;
+    }
+    if (id === "routines") {
+      routOpen = true;
+      rv.edit = false;
+      sfx("paper", true);
+      render();
       return;
     }
     if (id === "bed") {
