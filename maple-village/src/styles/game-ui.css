@@ -263,3 +263,10 @@
 .tbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--edge);background-color:var(--card);background-image:var(--fibre);display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 4px 10px -8px rgba(60,40,30,.5)}
 .tbtn:active{transform:translateY(1px)}
 .nbtimer .tctl{font-size:1rem}
+.item .d{font-size:.72rem;color:var(--soft);line-height:1.3;text-align:center}
+/* evening at home base */
+.map .glow{animation:glow 2.8s ease-in-out infinite alternate}
+.map .flame{transform-box:fill-box;transform-origin:50% 100%;animation:flame .5s ease-in-out infinite alternate}
+@keyframes glow{from{opacity:.75}to{opacity:1}}
+@keyframes flame{from{transform:scaleY(.85) rotate(-3deg)}to{transform:scaleY(1.1) rotate(3deg)}}
+@media (prefers-reduced-motion:reduce){.map .glow,.map .flame{animation:none}}

@@ -40,6 +40,7 @@ src/
   art/icons.js        hand-drawn icon set (no emoji in the game)
   game/core.js        state + db sync, quest flow, actions, UI renderers, world sim
   game/sunsama.js     pulls today's Sunsama tasks via the mcp capability and turns them into quests
+  game/paths.js       walking around buildings and the pond outdoors (A* on a coarse grid)
   game/npcs.js        villager routines (weekday/weekend, Darren's activities), taps, reactions, mail messengers
   ui/notebook.js      the Do task notebook overlay and agent notes
 dev/claude-stub.js    local runtime stub (dev builds only)

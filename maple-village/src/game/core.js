@@ -1,7 +1,7 @@
 // Game core: state + persistence, quest flow, actions, UI renderers and the world sim.
 import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur, plain } from "../util.js";
 import { icon, progressBar, progressBarV } from "../art/icons.js";
-import { VILLAGE, WORK, ROOMS, OUTDOOR, BRIDGES, ARRIVE, outdoorOf, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
+import { VILLAGE, WORK, ROOMS, OUTDOOR, BRIDGES, ARRIVE, outdoorOf, isWeekend, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
 import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco } from "../data/items.js";
 import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn } from "../art/village-extras.js";
 import { villageArt, baseArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
@@ -10,6 +10,7 @@ import { initNotebook, openTask, openMail, openDigest, openTracker, closeNoteboo
 import { pullSunsama, SUNSAMA_ERRORS } from "./sunsama.js";
 import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx } from "./audio.js";
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
+import { findPath, blocked } from "./paths.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere } from "./npcs.js";
 
 /* =================== STATE =================== */
@@ -30,6 +31,7 @@ function migrate(){
   if (S.waterMl == null) { S.waterMl = (S.water || 0)*250; S.waterPaid = Math.min(4, S.water || 0); }
   if (F.coins == null) F.coins = S.berries || 0;
   if (!F.inv) { F.inv = {tulip_seed:2, carrot_seed:1}; F.gift = true; }
+  if (!F.tools) F.tools = {};
   if (!Array.isArray(F.plots) || F.plots.length !== 12) F.plots = Array.from({length:12}, () => null);
   if (!F.cool) F.cool = {};
   ["met", "gifts", "mailRead"].forEach(k => { if (!F[k]) F[k] = {}; });
@@ -41,7 +43,8 @@ function migrate(){
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
-setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), lanterns:() => (S.pond ? S.pond.wins.length : 0)});
+setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), lanterns:() => (S.pond ? S.pond.wins.length : 0), dusk:() => isDusk()});
+function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
 // In-game UI: the quest note pinned on the map (open, or slim while walking) and the panel over the map.
@@ -142,7 +145,21 @@ const arrivedFor = t => S.arrived[t.id] || (scene === placeOf(t) && atSpot === s
 const atClean = () => S.wipe || (scene === "home" && atSpot === "cupboard");
 
 /* =================== FARM =================== */
-function growth(p){ if (!p || !p.crop || !p.wateredAt) return 0; return clamp((Date.now() - p.wateredAt + (p.bonus || 0)) / CROPS[p.crop].dur, 0, 1); }
+function growth(p){ if (!p || !p.crop || !p.wateredAt) return 0; return clamp((Date.now() - p.wateredAt + (p.bonus || 0)) / (CROPS[p.crop].dur / ((F.tools || {}).compost ? 1.25 : 1)), 0, 1); }
+// Darren's shed: garden tools bought once with coins, kept forever.
+const SHED = {
+  can:       {n: "Big watering can", price: 30, ico: "wateringCan", what: "Waters every thirsty plot in one go."},
+  compost:   {n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster."},
+  sprinkler: {n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."}
+};
+let shedOpen = false;
+function buyTool(id){
+  const t = SHED[id]; if (!t || F.tools[id] || F.coins < t.price) return;
+  F.coins -= t.price; F.tools[id] = true; sfx("chaching"); act("cheer"); flash(`New in the shed: ${t.n.toLowerCase()}`);
+  speak(isHere("darren") ? `Darren's setting up the ${t.n.toLowerCase()} for you!` : `The ${t.n.toLowerCase()} is ready in the garden.`, 4500);
+  if (id === "can") F.plots.forEach((p, i) => { if (p && p.crop && !p.wateredAt) p.wateredAt = Date.now(); });
+  save();
+}
 const readyCount = () => F.plots.filter(p => p && p.crop && growth(p) >= 1).length;
 
 /* =================== PROGRESS =================== */
@@ -247,13 +264,15 @@ function timerHTML(label){
   return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-left/S.timer.total)}"/></svg>
     <div><span class="t" id="tLeft">${fmt(left)}</span><small>${S.timer.pausedLeft != null ? "paused" : esc(label)}</small></div>${timerBtns()}</div>`;
 }
-let lastReady = readyCount();
+let lastReady = readyCount(), lastDusk = null;
 setInterval(() => {
   if (S.day !== dayKey()) { S = freshToday(); say = null; save(true); speak(defaultLine()); syncSunsama(); return; }
   const rc = readyCount();
   if (rc > lastReady) { speak(rc === 1 ? "Psst… something in the garden is ready!" : `${rc} crops ready in the garden!`, 5000); if (scene === "farm") drawScene(); }
   lastReady = rc;
   if (scene === "farm" && Math.random() < .2) { drawScene(); if (selPlot != null) ctx(); }
+  if (scene === "base" && isDusk() !== lastDusk) drawScene();
+  lastDusk = isDusk();
   if (shelfOpen && Math.floor(Date.now()/1000) % 20 === 0) ctx();   // keep "next digest in N min" fresh
   if (!S.timer) return;
   const left = tLeft();
@@ -275,7 +294,7 @@ function timerDone(kind){
 /* =================== ACTIONS =================== */
 function goQuest(t){
   if (phase() === "clean") { const c = spotObj("home", "cupboard"); go("home", c.tx, c.ty, () => arriveSpot("cupboard")); return; }
-  const pl = placeOf(t), sp = spotObj(pl, spotOf(t)); go(pl, sp.tx, sp.ty, () => arriveSpot(sp.id));
+  const pl = placeOf(t), sp = spotObj(pl, spotOf(t)); go(pl, sp.tx, sp.ty, () => pl === "base" ? arriveVillageSpot(sp.id) : arriveSpot(sp.id));
 }
 const A = {
   walk(t){ goQuest(t); },
@@ -582,10 +601,13 @@ function sell(id){
 }
 function plant(i, seedId){
   const it = ITEMS[seedId]; if (!it || !F.inv[seedId] || (F.plots[i] && F.plots[i].crop)) return;
-  addInv(seedId, -1); F.gift = false; F.plots[i] = {crop:it.crop, plantedAt:Date.now(), wateredAt:null, bonus:0};
-  speak(`${CROPS[it.crop].n} planted! Now give it some water.`, 3500); save(true);
+  addInv(seedId, -1); F.gift = false; F.plots[i] = {crop:it.crop, plantedAt:Date.now(), wateredAt: F.tools.sprinkler ? Date.now() : null, bonus:0};
+  speak(F.tools.sprinkler ? `${CROPS[it.crop].n} planted, and the sprinkler's on it!` : `${CROPS[it.crop].n} planted! Now give it some water.`, 3500); save(true);
 }
-function waterPlot(i){ const p = F.plots[i]; if (!p || !p.crop || p.wateredAt) return; p.wateredAt = Date.now(); mprop("drop", PLOTS[i].x + 50, PLOTS[i].y + 10); speak("Watered! Growing starts now. Finished quests speed it up.", 4000); save(true); }
+function waterPlot(i){ const p = F.plots[i]; if (!p || !p.crop || p.wateredAt) return;
+  const all = F.tools.can ? F.plots.map((q, j) => q && q.crop && !q.wateredAt ? j : -1).filter(j => j >= 0) : [i];
+  all.forEach(j => { F.plots[j].wateredAt = Date.now(); mprop("drop", PLOTS[j].x + 50, PLOTS[j].y + 10); });
+  speak(all.length > 1 ? `Big can! ${all.length} plots watered at once.` : "Watered! Growing starts now. Finished quests speed it up.", 4000); save(true); }
 function harvest(i){
   const p = F.plots[i]; if (!p || !p.crop || growth(p) < 1) return;
   addInv(p.crop, 1); F.plots[i] = null; gainXp(1); S.harvested = (S.harvested || 0) + 1; mprop(CROPS[p.crop].ico, PLOTS[i].x + 50, PLOTS[i].y + 20, 1900); act("cheer");
@@ -737,6 +759,11 @@ function ctx(){
       else if (g < 1) { const left = cr.dur*(1 - g); h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n}, growing. About ${dur(left)} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(g*100).toFixed(0)}%"></i></div>`; }
       else h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n} is ready!</p><div class="actions"><button class="btn yes" data-farm="harvest">Harvest</button></div>`;
     }
+  } else if (shedOpen) {
+    h = `<span class="tape stripe" aria-hidden="true"></span><h2>Darren's shed</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Tools for the garden, bought once and kept forever.${isHere("darren") ? " Darren's around to set them up." : ""}</p><div class="items shop">`
+      + Object.keys(SHED).map(id => { const t = SHED[id], own = F.tools[id];
+        return `<button class="item" data-tool="${id}" ${own || F.coins < t.price ? "disabled" : ""}><span class="e">${icon(t.ico, 34)}</span><span class="n">${esc(t.n)}</span><span class="c">${own ? "in use" : `<b>${t.price}</b> ${icon("coin", 13)}`}</span><span class="d">${esc(t.what)}</span></button>`; }).join("")
+      + `</div><div class="actions"><button class="btn alt small" data-close="1">Close the shed</button></div>`;
   } else if (shelfOpen) {
     const ready = digestReady(), next = nextDigest(), past = pastDigests();
     const wait = Math.max(1, Math.ceil(((F.digest.lastAt || 0) + DIGEST_GAP - Date.now())/M));
@@ -768,7 +795,8 @@ function ctx(){
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; ctx(); });
+  c.querySelectorAll("[data-tool]").forEach(b => b.onclick = () => buyTool(b.dataset.tool));
   c.querySelectorAll("[data-dig]").forEach(b => b.onclick = () => {
     const k = b.dataset.dig;
     if (k === "next") { const d = nextDigest(); if (d && digestReady()) readDigest(d); }
@@ -817,7 +845,8 @@ function questMark(){
   if (ph === "task") { const t = remaining()[0]; if (!arrivedFor(t)) target = {pl:placeOf(t), sp:spotOf(t)}; }
   let pos = null;
   if (target) {
-    if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][outdoorOf(target.pl)]].mark;
+    if (outside() && target.pl === "base") pos = scene === "base" ? (() => { const v = VILLAGE[target.sp]; return v.mark || [v.door[0], v.door[1] - 64]; })() : VILLAGE[BRIDGES[scene].base].mark;
+    else if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][outdoorOf(target.pl)]].mark;
     else if (scene === target.pl) { const s = spotObj(scene, target.sp); pos = [s.x, s.y - 70]; }
     else pos = [260, 582];
   }
@@ -828,6 +857,7 @@ function drawScene(){
   const day = dayKey(), wet = outside() && rainyOn(day), fest = festivalOn(day);
   $("rain").hidden = !wet;
   if (scene === "village" && fest && S.festSaid !== day) { S.festSaid = day; setTimeout(() => speak(`${fest.name} decorations are up in the town square!`, 5000), 1500); }
+  else if (scene === "base" && isWeekend() && S.weekendSaid !== day) { S.weekendSaid = day; setTimeout(() => speak("Weekend! Home things happen here at home. Any work quests still wait in town.", 5500), 2200); }
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
   $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "farm" ? farmArt() : roomArt(scene);
   const names = {village:"Town square", base:"Home base", farm:"The garden"};
@@ -883,9 +913,9 @@ const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "b
 function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
   setTimeout(() => {
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; resetNpcs();
     const p = at || [260, 596];
-    mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
+    mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
     if (id === "base") { evan.x = evan.tx = 300; evan.y = evan.ty = 360; }
     else if (id === "home") { evan.x = evan.tx = 300; evan.y = evan.ty = 520; }
     $("evan").style.display = evanHere() ? "" : "none";
@@ -906,11 +936,17 @@ function go(target, x, y, fn){
     if (!OUTDOOR.includes(target)) { const d = VILLAGE[target].door; legs.push({scene:tOut, x:d[0], y:d[1], fn:() => setScene(target, target === "farm" ? [260, 590] : [260, 596])}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
-  const b = bounds(); mel.tx = clamp(l.x, b[0], b[2]); mel.ty = clamp(l.y, b[1], b[3]); mel.force = true;
+  walkTo(l.x, l.y); mel.force = true;
+}
+// Outdoors Mel walks round buildings and the pond (paths.js); indoors she goes straight.
+function walkTo(x, y){
+  const b = bounds(), to = [clamp(x, b[0], b[2]), clamp(y, b[1], b[3])];
+  const pts = outside() ? findPath(scene, [mel.x, mel.y], to, b) : [to];
+  const first = pts.shift(); mel.tx = first[0]; mel.ty = first[1]; mel.path = pts;
 }
 function arriveSpot(id){
   atSpot = id;
@@ -930,9 +966,13 @@ function arriveVillageSpot(id){
   atSpot = id;
   const v = VILLAGE[id];
   if (v.bridge) { atSpot = null; setScene(v.bridge, ARRIVE[v.bridge]); return; }
+  // an outdoor quest at home base (Evan outing at the swing, garden jobs at the shed, a walk by the pond)
+  if (scene === "base" && phase() === "task") { const t = remaining()[0];
+    if (placeOf(t) === "base" && spotOf(t) === id && !S.arrived[t.id]) { S.arrived[t.id] = true; setSay(`Here at the ${v.name.toLowerCase()}. First tiny step…`); save(); return; } }
   if (id === "swing") { evan.tx = 112 + rnd(-4, 4); evan.ty = 302; evan.run = true; evan.wait = 6; setTimeout(() => evanSays(pick(["wheee!", "push me!", "higher!"])), 900); speak(v.line, 3500); render(); return; }
   if (id === "letterbox") { const p = paperWaiting(); if (p) { sfx("paper"); openMail(p); } else speak("Nothing in the letterbox. The Morning Crier comes each morning.", 3800); render(); return; }
-  if (id === "shed" || id === "bench") { speak(v.line, 3800); render(); return; }
+  if (id === "shed") { shedOpen = true; speak(v.line, 3800); render(); return; }
+  if (id === "bench") { speak(v.line, 3800); render(); return; }
   if (id === "well") { A.water(); return; }
   if (id === "board") { arriveSpot("board"); return; }
   if (id === "pond") { speak(phase() === "break" ? "Perfect break spot. Breathe." : VILLAGE.pond.line, 4000); render(); }
@@ -960,7 +1000,7 @@ svg.addEventListener("click", ev => {
   if (pt) { const i = +pt.dataset.plot, p = PLOTS[i]; go("farm", p.x + p.w/2, p.y + p.h + 18, () => { selPlot = i; atSpot = "plot"; ctx(); const s = F.plots[i]; speak(!s || !s.crop ? "Empty plot. What shall we grow?" : !s.wateredAt ? "Thirsty seeds!" : growth(s) >= 1 ? "Ready to pick!" : "Growing nicely.", 3000); }); return; }
   const [x, y] = toWorld(ev); route = []; atSpot = null;
   if (qnOpen && phase() !== "clean") { qnOpen = false; journal(); }   // tapping the map to wander folds the note away
-  const b = bounds(); mel.tx = clamp(x, b[0], b[2]); mel.ty = clamp(y, b[1], b[3]);
+  walkTo(x, y);
 });
 window.addEventListener("keydown", e => {
   if (e.target.closest("input") || notebookOpen()) return;
@@ -1055,10 +1095,14 @@ function frame(now){
   if (keys.size) {
     const v = 190*dt, b = bounds(); let dx = 0, dy = 0;
     if (keys.has("l")) dx -= v; if (keys.has("r")) dx += v; if (keys.has("u")) dy -= v; if (keys.has("d")) dy += v;
-    mel.tx = clamp(mel.x + dx, b[0], b[2]); mel.ty = clamp(mel.y + dy, b[1], b[3]);
+    mel.path = [];
+    let nx = clamp(mel.x + dx, b[0], b[2]), ny = clamp(mel.y + dy, b[1], b[3]);
+    if (outside() && blocked(scene, nx, ny)) { if (!blocked(scene, nx, mel.y)) ny = mel.y; else if (!blocked(scene, mel.x, ny)) nx = mel.x; else { nx = mel.x; ny = mel.y; } }
+    mel.tx = nx; mel.ty = ny;
   }
   const arrived = stepTo(mel, keys.size ? 190 : 220, dt);
-  if (arrived && !keys.size && (mel.wasMoving || mel.force)) {
+  if (arrived && !keys.size && mel.path && mel.path.length) { const n = mel.path.shift(); mel.tx = n[0]; mel.ty = n[1]; mel.moving = true; }
+  else if (arrived && !keys.size && (mel.wasMoving || mel.force)) {
     mel.force = false;
     if (route.length && route[0].scene === scene) { const l = route.shift(); if (l.fn) l.fn(); else { atSpot = null; render(); } if (route.length && route[0].scene === scene) nextLeg(); }
     else if (!route.length) {

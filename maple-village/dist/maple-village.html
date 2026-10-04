@@ -698,6 +698,13 @@ body.nb-open{overflow:hidden}
 .tbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--edge);background-color:var(--card);background-image:var(--fibre);display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 4px 10px -8px rgba(60,40,30,.5)}
 .tbtn:active{transform:translateY(1px)}
 .nbtimer .tctl{font-size:1rem}
+.item .d{font-size:.72rem;color:var(--soft);line-height:1.3;text-align:center}
+/* evening at home base */
+.map .glow{animation:glow 2.8s ease-in-out infinite alternate}
+.map .flame{transform-box:fill-box;transform-origin:50% 100%;animation:flame .5s ease-in-out infinite alternate}
+@keyframes glow{from{opacity:.75}to{opacity:1}}
+@keyframes flame{from{transform:scaleY(.85) rotate(-3deg)}to{transform:scaleY(1.1) rotate(3deg)}}
+@media (prefers-reduced-motion:reduce){.map .glow,.map .flame{animation:none}}
 </style>
 </head>
 <body>
@@ -1240,6 +1247,10 @@ body.nb-open{overflow:hidden}
     const [a, l] = art(name);
     return `<g filter="url(#markerS)">${a}</g><g filter="url(#wobS)" fill="none" stroke="var(--line)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">${l}</g>`;
   };
+  I.wateringCan = [`<rect x="4" y="9" width="11" height="10" rx="2" ${f(C.water)}/>`, `<rect x="4" y="9" width="11" height="10" rx="2"/><path d="M15 12l5-4M19 6.5l2 2.5M6 9c0-3 7-3 7 0"/><circle cx="21" cy="11" r=".6"/><circle cx="20" cy="13.5" r=".6"/>`];
+  I.compost = [`<path d="M5 9h14l-1.5 11h-11z" ${f(C.wood)}/><path d="M8 8c1-2 2-3 4-3s3 1 4 3" ${f(C.moss)}/>`, `<path d="M5 9h14l-1.5 11h-11zM4 9h16M8 13h8M8.5 16.5h7"/><path d="M8 8c1-2 2-3 4-3s3 1 4 3"/>`];
+  I.sprinkler = [`<circle cx="12" cy="17" r="3" ${f(C.stone)}/>`, `<circle cx="12" cy="17" r="3"/><path d="M12 14v-3M12 21h0M5 9c2-3 4-4 7-4s5 1 7 4M8 10.5c1-1.5 2.5-2 4-2s3 .5 4 2"/><circle cx="5" cy="12" r=".7"/><circle cx="19" cy="12" r=".7"/><circle cx="8" cy="13" r=".7"/><circle cx="16" cy="13" r=".7"/>`];
+  I.base = I.sprout;
   var icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
   var iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;
   var ICON_NAMES = Object.keys(I);
@@ -1281,6 +1292,15 @@ body.nb-open{overflow:hidden}
     swing: { scene: "base", name: "Tree swing", door: [112, 318], spot: true, line: "Evan's swing. Push, push, wheee!" },
     toTown: { scene: "base", name: "Bridge to town", door: [260, 114], spot: true, bridge: "village", mark: [260, 62], line: "Over the river to the town square." }
   };
+  VILLAGE.base = { scene: "(quests)", name: "Home base", short: "home base" };
+  var BASE_SPOTS = [
+    ["swing", /playground|\bpark\b|outing|\bzoo\b|museum|play ?date|play with evan|evan'?s? (activity|class|outing|playtime|swim)|family day|toddler (class|activity)/],
+    ["shed", /garden|plant|weed|prune|repair|diy|gutter|leak|recycl|declutter the|fix (the |a )?(tap|door|shelf|light|sink|toilet|bike|fan)|bike\b|wash the car/],
+    ["pond", /stroll|fresh air|picnic|sit outside|sunshine|walk outside|evening walk|nature walk/]
+  ];
+  var WORK_HINT = /chord|chico|ambidextrous|fresh pages|client|muse|proposal|invoice|copy|newsletter|launch|website|brand|audit|meeting|call with|zoom/;
+  var isWeekend = () => [0, 6].includes(new Date(now() + 8 * H).getUTCDay());
+  var baseSpotFor = (s) => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
   var BRIDGES = { village: { base: "toBase" }, base: { village: "toTown" } };
   var ARRIVE = { base: [260, 132], village: [260, 578] };
   var outdoorOf = (s) => OUTDOOR.includes(s) ? s : VILLAGE[s] ? VILLAGE[s].scene : "village";
@@ -1339,21 +1359,32 @@ body.nb-open{overflow:hidden}
       return { id, name, kind, re, line, x: p[0], y: p[1], tx: p[0], ty: p[1] + (dy ?? 42) };
     });
   }
-  var spotObj = (scene2, id) => id === "board" ? { id: "board", name: "Quest board", tx: 260, ty: 200, line: "This building's quests." } : stationsOf(scene2).find((s) => s.id === id);
+  var spotObj = (scene2, id) => scene2 === "base" ? baseSpot(id) : id === "board" ? { id: "board", name: "Quest board", tx: 260, ty: 200, line: "This building's quests." } : stationsOf(scene2).find((s) => s.id === id);
   var isTreadTask = (t) => !!t && (t.spot === "treadmill" || /🚶|treadmill/i.test(t.title || ""));
   function placeOf(t) {
     if (isTreadTask(t)) return "home";
+    if (t.place === "base") return "base";
     if (t.place && WORK.includes(t.place)) return t.place;
     const s = (t.title + " " + (t.channel || "")).toLowerCase();
+    if (!WORK_HINT.test(s) && !t.meeting && baseSpotFor(s)) return "base";
     if (/chord/.test(s)) return "chord";
     if (/chico/.test(s)) return "chico";
     if (/ambidextrous|town hall/.test(s)) return "hall";
     if (t.meeting) return "hall";
     if (/clean|fold|laundry|cook|chore|grocer|wash|tidy|evan|hestia|skincare|gym|workout/.test(s)) return "home";
     if (/copy|write|blog|caption|proposal|audit|muse|fresh pages|newsletter|website|brand/.test(s)) return "fresh";
+    if (isWeekend() && !WORK_HINT.test(s) && !/email|inbox|reply|admin|tax|bank/.test(s)) return "home";
     return "post";
   }
+  function baseSpot(id) {
+    const v = VILLAGE[id];
+    return v ? { id, name: v.name, tx: v.door[0], ty: v.door[1], x: v.door[0], y: v.door[1], line: v.line } : null;
+  }
   function spotOf(t) {
+    if (placeOf(t) === "base") {
+      const s2 = (t.title + " " + (t.channel || "")).toLowerCase();
+      return t.spot && BASE_SPOTS.some(([id]) => id === t.spot) ? t.spot : baseSpotFor(s2) || "pond";
+    }
     const pl = placeOf(t), st = stationsOf(pl).filter((s2) => (s2.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title)) && s2.id !== "treadmill" && s2.re);
     if (isTreadTask(t)) return "treadmill";
     if (t.spot && st.find((s2) => s2.id === t.spot)) return t.spot;
@@ -1754,13 +1785,23 @@ body.nb-open{overflow:hidden}
         <rect x="300" y="546" width="36" height="6" rx="2" style="fill:var(--wood)"/><path d="M304 552 v8 M332 552 v8 M300 542 h36"/></g>
       ${tapeLabel(430, 554, "Pond", "var(--sky)")}</g>` + // evening firepit + washing line, just for cosiness
     sk(
-      `<ellipse cx="226" cy="604" rx="20" ry="8" style="fill:var(--stone)"/><path d="M214 602 l24 -6 M214 596 l24 6" style="stroke:var(--wood)" stroke-width="4"/>`,
-      `<ellipse cx="226" cy="604" rx="20" ry="8"/><path class="smoke" d="M226 590 q-4 -6 0 -11 q4 -5 0 -10" opacity=".5"/>`
+      `<ellipse cx="276" cy="608" rx="20" ry="8" style="fill:var(--stone)"/><path d="M264 606 l24 -6 M264 600 l24 6" style="stroke:var(--wood)" stroke-width="4"/>`,
+      `<ellipse cx="276" cy="608" rx="20" ry="8"/><path class="smoke" d="M276 594 q-4 -6 0 -11 q4 -5 0 -10" opacity=".5"/>`
     ) + sk(
       `<path d="M66 552 h16 v18 h-16z" style="fill:var(--sky)"/><path d="M96 554 h14 l3 14 h-20z" style="fill:var(--rose)"/><path d="M126 552 h18 v12 h-18z" style="fill:var(--butter)"/>`,
       `<path d="M50 590 v-46 M160 590 v-46 M50 548 Q105 556 160 548"/><path d="M66 552 h16 v18 h-16z M96 554 h14 l3 14 h-20z M126 552 h18 v12 h-18z"/>`
     );
-    return ground + places + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns());
+    const tools = G.F().tools || {};
+    const toolArt = (tools.compost ? sk(`<path d="M192 452 h24 l-3 22 h-18z" style="fill:var(--wood)"/><path d="M196 451 c3 -6 13 -6 16 0" style="fill:var(--moss)"/>`, `<path d="M192 452 h24 l-3 22 h-18z M195 460 h18"/>`) : "") + (tools.can ? sk(`<rect x="466" y="262" width="14" height="11" rx="2" style="fill:#9CC3E0"/>`, `<rect x="466" y="262" width="14" height="11" rx="2"/><path d="M480 266 l7 -5 M468 262 c0 -5 9 -5 9 0"/>`) : "") + (tools.sprinkler ? sk(`<circle cx="108" cy="438" r="4" style="fill:var(--stone)"/>`, `<circle cx="108" cy="438" r="4"/><path d="M108 434 v-4"/><path class="ripple" d="M96 426 q12 -10 24 0" opacity=".7"/>`) : "");
+    return ground + places + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
+  }
+  function duskArt() {
+    const win = (x, y, w, h) => `<rect class="glow" x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="#FFD98A"/><rect x="${x - 8}" y="${y - 8}" width="${w + 16}" height="${h + 16}" rx="10" fill="#FFD98A" opacity=".18"/>`;
+    const stars = [[30, 14], [96, 22], [176, 10], [330, 18], [420, 12], [500, 22], [250, 8]].map(([x, y]) => `<circle class="twinkle" cx="${x}" cy="${y}" r="1.6" fill="#FFF3C4"/>`).join("");
+    return `<rect class="dusk" width="520" height="640" fill="#A3A9DC" style="mix-blend-mode:multiply" pointer-events="none"/>
+    <g pointer-events="none">${stars}${win(217, 234, 20, 18)}${win(283, 234, 20, 18)}${win(448, 230, 12, 10)}
+      <circle cx="276" cy="602" r="36" fill="#FFB65C" opacity=".28"/>
+      <g filter="url(#wob)"><path class="flame" d="M268 604 q-2 -12 8 -20 q-1 8 6 10 q2 6 -2 10z" fill="#F6A23A" style="stroke:var(--line)" stroke-width="1"/><path class="flame" d="M274 604 q0 -7 4 -10 q1 6 3 7 q0 3 -2 3z" fill="#FFE08A"/></g></g>`;
   }
   function notesArt(x, y, n) {
     const c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#C3CDEE", "#DCE8C8"];
@@ -3039,6 +3080,106 @@ Quests finished today: ${S3.doneIds.length}`;
     server_unavailable: "Google Calendar didn't answer. Try again in a minute."
   };
 
+  // src/game/paths.js
+  var OBST = {
+    village: [
+      [190, 40, 330, 172],
+      [25, 150, 145, 254],
+      [377, 150, 493, 254],
+      [27, 390, 143, 494],
+      [377, 380, 493, 484],
+      [334, 304, 390, 336],
+      [142, 304, 178, 340],
+      [230, 284, 290, 326],
+      [314, 548, 354, 568]
+    ],
+    base: [
+      [198, 176, 322, 294],
+      [314, 232, 348, 294],
+      [394, 198, 470, 272],
+      [50, 262, 98, 306],
+      [32, 396, 184, 480],
+      [336, 472, 480, 536],
+      [300, 540, 336, 554]
+    ]
+  };
+  var PAD = 5;
+  var STEP = 24;
+  var inside = (x, y, r, p) => x > r[0] - p && x < r[2] + p && y > r[1] - p && y < r[3] + p;
+  var blocked = (scene2, x, y) => (OBST[scene2] || []).some((r) => inside(x, y, r, 0));
+  function clear(obs, a, b) {
+    const skip = obs.filter((r) => inside(a[0], a[1], r, PAD) || inside(b[0], b[1], r, PAD));
+    const d = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.ceil(d / 5));
+    for (let i = 1; i < n; i++) {
+      const t = i / n, x = a[0] + (b[0] - a[0]) * t, y = a[1] + (b[1] - a[1]) * t;
+      for (const r of obs) if (!skip.includes(r) && inside(x, y, r, PAD)) return false;
+    }
+    return true;
+  }
+  var grids = {};
+  function grid(scene2, b) {
+    const key = scene2 + b.join(",");
+    if (grids[key]) return grids[key];
+    const obs = OBST[scene2], pts = [];
+    for (let y = b[1]; y <= b[3]; y += STEP) for (let x = b[0]; x <= b[2]; x += STEP) if (!obs.some((r) => inside(x, y, r, PAD + 2))) pts.push([x, y]);
+    const nb = pts.map((p, i) => pts.map((q, j) => j !== i && Math.abs(q[0] - p[0]) <= STEP && Math.abs(q[1] - p[1]) <= STEP && clear(obs, p, q) ? j : -1).filter((j) => j >= 0));
+    return grids[key] = { pts, nb };
+  }
+  function findPath(scene2, from, to, bounds2) {
+    const obs = OBST[scene2];
+    if (!obs || clear(obs, from, to)) return [to];
+    const { pts, nb } = grid(scene2, bounds2), dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+    const near = (p) => pts.map((q, i) => [i, dist(p, q)]).filter(([, d]) => d < STEP * 3).sort((a, b) => a[1] - b[1]).filter(([i]) => clear(obs, p, pts[i])).slice(0, 6);
+    const starts = near(from), ends = new Map(near(to).map(([i, d]) => [i, d]));
+    if (!starts.length || !ends.size) return [to];
+    const g = /* @__PURE__ */ new Map(), prev = /* @__PURE__ */ new Map(), open2 = /* @__PURE__ */ new Set();
+    starts.forEach(([i, d]) => {
+      g.set(i, d);
+      open2.add(i);
+    });
+    let best = null, bestCost = Infinity;
+    while (open2.size) {
+      let cur = null, cf = Infinity;
+      for (const i of open2) {
+        const f2 = g.get(i) + dist(pts[i], to);
+        if (f2 < cf) {
+          cf = f2;
+          cur = i;
+        }
+      }
+      if (cf >= bestCost) break;
+      open2.delete(cur);
+      if (ends.has(cur)) {
+        const c = g.get(cur) + ends.get(cur);
+        if (c < bestCost) {
+          bestCost = c;
+          best = cur;
+        }
+      }
+      for (const j of nb[cur]) {
+        const c = g.get(cur) + dist(pts[cur], pts[j]);
+        if (c < (g.get(j) ?? Infinity)) {
+          g.set(j, c);
+          prev.set(j, cur);
+          open2.add(j);
+        }
+      }
+    }
+    if (best == null) return [to];
+    const raw = [to];
+    for (let i = best; i != null; i = prev.get(i)) raw.unshift(pts[i]);
+    const out = [];
+    let at = from, k = 0;
+    while (k < raw.length) {
+      let j = raw.length - 1;
+      while (j > k && !clear(obs, at, raw[j])) j--;
+      out.push(raw[j]);
+      at = raw[j];
+      k = j + 1;
+    }
+    return out;
+  }
+
   // src/art/people.js
   var S = (c) => `style="fill:${c}"`;
   function hair(style, c, k) {
@@ -3388,6 +3529,7 @@ Quests finished today: ${S3.doneIds.length}`;
       F.inv = { tulip_seed: 2, carrot_seed: 1 };
       F.gift = true;
     }
+    if (!F.tools) F.tools = {};
     if (!Array.isArray(F.plots) || F.plots.length !== 12) F.plots = Array.from({ length: 12 }, () => null);
     if (!F.cool) F.cool = {};
     ["met", "gifts", "mailRead"].forEach((k) => {
@@ -3405,7 +3547,11 @@ Quests finished today: ${S3.doneIds.length}`;
     });
   }
   migrate();
-  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), lanterns: () => S2.pond ? S2.pond.wins.length : 0 });
+  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), lanterns: () => S2.pond ? S2.pond.wins.length : 0, dusk: () => isDusk() });
+  function isDusk() {
+    const t = sgHM();
+    return t >= 19 * 60 || t < 6 * 60;
+  }
   var say2 = null;
   var refs = null;
   var writing = {};
@@ -3575,7 +3721,27 @@ Quests finished today: ${S3.doneIds.length}`;
   var atClean = () => S2.wipe || scene === "home" && atSpot === "cupboard";
   function growth(p) {
     if (!p || !p.crop || !p.wateredAt) return 0;
-    return clamp((Date.now() - p.wateredAt + (p.bonus || 0)) / CROPS[p.crop].dur, 0, 1);
+    return clamp((Date.now() - p.wateredAt + (p.bonus || 0)) / (CROPS[p.crop].dur / ((F.tools || {}).compost ? 1.25 : 1)), 0, 1);
+  }
+  var SHED = {
+    can: { n: "Big watering can", price: 30, ico: "wateringCan", what: "Waters every thirsty plot in one go." },
+    compost: { n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster." },
+    sprinkler: { n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them." }
+  };
+  var shedOpen = false;
+  function buyTool(id) {
+    const t = SHED[id];
+    if (!t || F.tools[id] || F.coins < t.price) return;
+    F.coins -= t.price;
+    F.tools[id] = true;
+    sfx("chaching");
+    act("cheer");
+    flash(`New in the shed: ${t.n.toLowerCase()}`);
+    speak(isHere("darren") ? `Darren's setting up the ${t.n.toLowerCase()} for you!` : `The ${t.n.toLowerCase()} is ready in the garden.`, 4500);
+    if (id === "can") F.plots.forEach((p, i) => {
+      if (p && p.crop && !p.wateredAt) p.wateredAt = Date.now();
+    });
+    save();
   }
   var readyCount = () => F.plots.filter((p) => p && p.crop && growth(p) >= 1).length;
   var level = () => {
@@ -3804,6 +3970,7 @@ Quests finished today: ${S3.doneIds.length}`;
     <div><span class="t" id="tLeft">${fmt(left)}</span><small>${S2.timer.pausedLeft != null ? "paused" : esc(label)}</small></div>${timerBtns()}</div>`;
   }
   var lastReady = readyCount();
+  var lastDusk = null;
   setInterval(() => {
     if (S2.day !== dayKey()) {
       S2 = freshToday();
@@ -3823,6 +3990,8 @@ Quests finished today: ${S3.doneIds.length}`;
       drawScene();
       if (selPlot != null) ctx();
     }
+    if (scene === "base" && isDusk() !== lastDusk) drawScene();
+    lastDusk = isDusk();
     if (shelfOpen && Math.floor(Date.now() / 1e3) % 20 === 0) ctx();
     if (!S2.timer) return;
     const left = tLeft();
@@ -3858,7 +4027,7 @@ Quests finished today: ${S3.doneIds.length}`;
       return;
     }
     const pl = placeOf(t), sp = spotObj(pl, spotOf(t));
-    go(pl, sp.tx, sp.ty, () => arriveSpot(sp.id));
+    go(pl, sp.tx, sp.ty, () => pl === "base" ? arriveVillageSpot(sp.id) : arriveSpot(sp.id));
   }
   var A = {
     walk(t) {
@@ -4402,16 +4571,19 @@ Then tell chat "wind down" whenever you're ready.`
     if (!it || !F.inv[seedId] || F.plots[i] && F.plots[i].crop) return;
     addInv(seedId, -1);
     F.gift = false;
-    F.plots[i] = { crop: it.crop, plantedAt: Date.now(), wateredAt: null, bonus: 0 };
-    speak(`${CROPS[it.crop].n} planted! Now give it some water.`, 3500);
+    F.plots[i] = { crop: it.crop, plantedAt: Date.now(), wateredAt: F.tools.sprinkler ? Date.now() : null, bonus: 0 };
+    speak(F.tools.sprinkler ? `${CROPS[it.crop].n} planted, and the sprinkler's on it!` : `${CROPS[it.crop].n} planted! Now give it some water.`, 3500);
     save(true);
   }
   function waterPlot(i) {
     const p = F.plots[i];
     if (!p || !p.crop || p.wateredAt) return;
-    p.wateredAt = Date.now();
-    mprop("drop", PLOTS[i].x + 50, PLOTS[i].y + 10);
-    speak("Watered! Growing starts now. Finished quests speed it up.", 4e3);
+    const all = F.tools.can ? F.plots.map((q, j) => q && q.crop && !q.wateredAt ? j : -1).filter((j) => j >= 0) : [i];
+    all.forEach((j) => {
+      F.plots[j].wateredAt = Date.now();
+      mprop("drop", PLOTS[j].x + 50, PLOTS[j].y + 10);
+    });
+    speak(all.length > 1 ? `Big can! ${all.length} plots watered at once.` : "Watered! Growing starts now. Finished quests speed it up.", 4e3);
     save(true);
   }
   function harvest(i) {
@@ -4610,6 +4782,11 @@ Then tell chat "wind down" whenever you're ready.`
           h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n}, growing. About ${dur(left)} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(g * 100).toFixed(0)}%"></i></div>`;
         } else h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n} is ready!</p><div class="actions"><button class="btn yes" data-farm="harvest">Harvest</button></div>`;
       }
+    } else if (shedOpen) {
+      h = `<span class="tape stripe" aria-hidden="true"></span><h2>Darren's shed</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Tools for the garden, bought once and kept forever.${isHere("darren") ? " Darren's around to set them up." : ""}</p><div class="items shop">` + Object.keys(SHED).map((id) => {
+        const t = SHED[id], own = F.tools[id];
+        return `<button class="item" data-tool="${id}" ${own || F.coins < t.price ? "disabled" : ""}><span class="e">${icon(t.ico, 34)}</span><span class="n">${esc(t.n)}</span><span class="c">${own ? "in use" : `<b>${t.price}</b> ${icon("coin", 13)}`}</span><span class="d">${esc(t.what)}</span></button>`;
+      }).join("") + `</div><div class="actions"><button class="btn alt small" data-close="1">Close the shed</button></div>`;
     } else if (shelfOpen) {
       const ready = digestReady(), next = nextDigest(), past = pastDigests();
       const wait = Math.max(1, Math.ceil(((F.digest.lastAt || 0) + DIGEST_GAP - Date.now()) / M));
@@ -4652,8 +4829,10 @@ Then tell chat "wind down" whenever you're ready.`
     c.querySelectorAll("[data-close]").forEach((b) => b.onclick = () => {
       boardOpen = false;
       shelfOpen = false;
+      shedOpen = false;
       ctx();
     });
+    c.querySelectorAll("[data-tool]").forEach((b) => b.onclick = () => buyTool(b.dataset.tool));
     c.querySelectorAll("[data-dig]").forEach((b) => b.onclick = () => {
       const k = b.dataset.dig;
       if (k === "next") {
@@ -4725,7 +4904,11 @@ Then tell chat "wind down" whenever you're ready.`
     }
     let pos = null;
     if (target) {
-      if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][outdoorOf(target.pl)]].mark;
+      if (outside() && target.pl === "base") pos = scene === "base" ? (() => {
+        const v = VILLAGE[target.sp];
+        return v.mark || [v.door[0], v.door[1] - 64];
+      })() : VILLAGE[BRIDGES[scene].base].mark;
+      else if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][outdoorOf(target.pl)]].mark;
       else if (scene === target.pl) {
         const s = spotObj(scene, target.sp);
         pos = [s.x, s.y - 70];
@@ -4744,6 +4927,9 @@ Then tell chat "wind down" whenever you're ready.`
     if (scene === "village" && fest && S2.festSaid !== day) {
       S2.festSaid = day;
       setTimeout(() => speak(`${fest.name} decorations are up in the town square!`, 5e3), 1500);
+    } else if (scene === "base" && isWeekend() && S2.weekendSaid !== day) {
+      S2.weekendSaid = day;
+      setTimeout(() => speak("Weekend! Home things happen here at home. Any work quests still wait in town.", 5500), 2200);
     } else if (wet && S2.rainSaid !== day) {
       S2.rainSaid = day;
       setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500);
@@ -4836,10 +5022,12 @@ Then tell chat "wind down" whenever you're ready.`
       selPlot = null;
       openView = null;
       shopClosed = false;
+      shedOpen = false;
       resetScene();
       const p = at || [260, 596];
       mel.x = mel.tx = p[0];
       mel.y = mel.ty = p[1];
+      mel.path = [];
       maple.x = maple.tx = p[0] - 22;
       maple.y = maple.ty = p[1] + 2;
       if (id === "base") {
@@ -4876,6 +5064,7 @@ Then tell chat "wind down" whenever you're ready.`
     atSpot = null;
     boardOpen = false;
     shelfOpen = false;
+    shedOpen = false;
     openView = null;
     nextLeg();
     render();
@@ -4883,10 +5072,16 @@ Then tell chat "wind down" whenever you're ready.`
   function nextLeg() {
     const l = route[0];
     if (!l || l.scene !== scene) return;
-    const b = bounds();
-    mel.tx = clamp(l.x, b[0], b[2]);
-    mel.ty = clamp(l.y, b[1], b[3]);
+    walkTo(l.x, l.y);
     mel.force = true;
+  }
+  function walkTo(x, y) {
+    const b = bounds(), to = [clamp(x, b[0], b[2]), clamp(y, b[1], b[3])];
+    const pts = outside() ? findPath(scene, [mel.x, mel.y], to, b) : [to];
+    const first = pts.shift();
+    mel.tx = first[0];
+    mel.ty = first[1];
+    mel.path = pts;
   }
   function arriveSpot(id) {
     atSpot = id;
@@ -4940,6 +5135,15 @@ Then tell chat "wind down" whenever you're ready.`
       setScene(v.bridge, ARRIVE[v.bridge]);
       return;
     }
+    if (scene === "base" && phase() === "task") {
+      const t = remaining()[0];
+      if (placeOf(t) === "base" && spotOf(t) === id && !S2.arrived[t.id]) {
+        S2.arrived[t.id] = true;
+        setSay(`Here at the ${v.name.toLowerCase()}. First tiny step…`);
+        save();
+        return;
+      }
+    }
     if (id === "swing") {
       evan.tx = 112 + rnd(-4, 4);
       evan.ty = 302;
@@ -4959,7 +5163,13 @@ Then tell chat "wind down" whenever you're ready.`
       render();
       return;
     }
-    if (id === "shed" || id === "bench") {
+    if (id === "shed") {
+      shedOpen = true;
+      speak(v.line, 3800);
+      render();
+      return;
+    }
+    if (id === "bench") {
       speak(v.line, 3800);
       render();
       return;
@@ -5049,9 +5259,7 @@ Then tell chat "wind down" whenever you're ready.`
       qnOpen = false;
       journal();
     }
-    const b = bounds();
-    mel.tx = clamp(x, b[0], b[2]);
-    mel.ty = clamp(y, b[1], b[3]);
+    walkTo(x, y);
   });
   window.addEventListener("keydown", (e) => {
     if (e.target.closest("input") || notebookOpen()) return;
@@ -5209,11 +5417,26 @@ Then tell chat "wind down" whenever you're ready.`
       if (keys.has("r")) dx += v;
       if (keys.has("u")) dy -= v;
       if (keys.has("d")) dy += v;
-      mel.tx = clamp(mel.x + dx, b[0], b[2]);
-      mel.ty = clamp(mel.y + dy, b[1], b[3]);
+      mel.path = [];
+      let nx = clamp(mel.x + dx, b[0], b[2]), ny = clamp(mel.y + dy, b[1], b[3]);
+      if (outside() && blocked(scene, nx, ny)) {
+        if (!blocked(scene, nx, mel.y)) ny = mel.y;
+        else if (!blocked(scene, mel.x, ny)) nx = mel.x;
+        else {
+          nx = mel.x;
+          ny = mel.y;
+        }
+      }
+      mel.tx = nx;
+      mel.ty = ny;
     }
     const arrived = stepTo2(mel, keys.size ? 190 : 220, dt);
-    if (arrived && !keys.size && (mel.wasMoving || mel.force)) {
+    if (arrived && !keys.size && mel.path && mel.path.length) {
+      const n = mel.path.shift();
+      mel.tx = n[0];
+      mel.ty = n[1];
+      mel.moving = true;
+    } else if (arrived && !keys.size && (mel.wasMoving || mel.force)) {
       mel.force = false;
       if (route.length && route[0].scene === scene) {
         const l = route.shift();

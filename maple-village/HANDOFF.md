@@ -272,4 +272,10 @@ Round 10:
 - Slimmer tracker column on the map.
 - The Morning Crier is delivered to a letterbox at home base (a paper and a raised flag show while it's unread; tap to read). If Mel walks into town without reading it, Rosa the crier finds her there. Other messengers deliver wherever Mel is.
 
-Not done yet: stage 3 ideas (8.5), collision-aware walking.
+Round 11:
+- Weekend mode and outdoor quests (`data/world.js`): personal outdoor tasks become quests at home base spots, any day: Evan outings and playdates at the swing, garden and repair jobs at the shed, walks and fresh air by the pond (`BASE_SPOTS`, place `"base"`, or set `place: "base", spot: "swing|shed|pond"` in the plan). On Saturdays and Sundays anything without a work hint goes home instead of the post office. Work tasks keep their town buildings on weekends; the town stays open.
+- Darren's shed sells garden tools, bought once: big watering can (waters every thirsty plot at once), compost bin (crops grow 25% faster), sprinkler (new seeds water themselves). Stored in `F.tools`; owned tools appear at home base.
+- Evening at home base, 7pm to 6am: the light drops (multiply tint), windows and the shed glow, the firepit is lit, stars over the river.
+- Walking around things outdoors (`game/paths.js`): blocked rectangles per outdoor scene, A* over a 24px grid, route pulled tight. Arrow keys slide along walls.
+
+Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lines.

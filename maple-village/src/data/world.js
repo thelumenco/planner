@@ -1,5 +1,5 @@
 // Village layout, building interiors (stations) and task -> place/spot matching.
-import { hash } from "../util.js";
+import { hash, now, H } from "../util.js";
 
 // Outdoor screens. "base" is home (house, garden, pond, shed, swing); "village" is the town square with the work
 // buildings. A river joins them: walk onto the bridge to cross. A third screen (say, for Luna) would be one more
@@ -26,6 +26,17 @@ export const VILLAGE = {
   swing:  {scene:"base", name:"Tree swing", door:[112,318], spot:true, line:"Evan's swing. Push, push, wheee!"},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };
+// Quests can also happen outdoors at home base: "base" is a quest place whose spots are the base's own places.
+VILLAGE.base = {scene:"(quests)", name:"Home base", short:"home base"};
+export const BASE_SPOTS = [
+  ["swing", /playground|\bpark\b|outing|\bzoo\b|museum|play ?date|play with evan|evan'?s? (activity|class|outing|playtime|swim)|family day|toddler (class|activity)/],
+  ["shed",  /garden|plant|weed|prune|repair|diy|gutter|leak|recycl|declutter the|fix (the |a )?(tap|door|shelf|light|sink|toilet|bike|fan)|bike\b|wash the car/],
+  ["pond",  /stroll|fresh air|picnic|sit outside|sunshine|walk outside|evening walk|nature walk/]
+];
+const WORK_HINT = /chord|chico|ambidextrous|fresh pages|client|muse|proposal|invoice|copy|newsletter|launch|website|brand|audit|meeting|call with|zoom/;
+// Saturday or Sunday in Singapore
+export const isWeekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
+const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
 export const BRIDGES = {village:{base:"toBase"}, base:{village:"toTown"}};
 export const ARRIVE = {base:[260,132], village:[260,578]};
@@ -80,24 +91,32 @@ export function stationsOf(scene){
   return r.stations.map(([id, name, slot, kind, re, line, dy]) => { const p = (r.pos && r.pos[slot]) || POS[slot];
     return {id, name, kind, re, line, x:p[0], y:p[1], tx:p[0], ty:p[1] + (dy ?? 42)}; });
 }
-export const spotObj = (scene, id) => id === "board" ? {id:"board", name:"Quest board", tx:260, ty:200, line:"This building's quests."} : stationsOf(scene).find(s => s.id === id);
+export const spotObj = (scene, id) => scene === "base" ? baseSpot(id) : id === "board" ? {id:"board", name:"Quest board", tx:260, ty:200, line:"This building's quests."} : stationsOf(scene).find(s => s.id === id);
 
 // Tasks that ARE treadmill tasks (a "🚶" or "treadmill" in the title, or chat sent spot "treadmill") always happen on
 // the treadmill at home. Tasks that are only treadmill-able (treadmill: true) get it as an offer instead.
 export const isTreadTask = t => !!t && (t.spot === "treadmill" || /🚶|treadmill/i.test(t.title || ""));
 export function placeOf(t){
   if (isTreadTask(t)) return "home";
+  if (t.place === "base") return "base";
   if (t.place && WORK.includes(t.place)) return t.place;
   const s = (t.title + " " + (t.channel || "")).toLowerCase();
+  // Personal things that belong outdoors (Evan outings, garden, repairs, a walk) happen at home base, any day.
+  if (!WORK_HINT.test(s) && !t.meeting && baseSpotFor(s)) return "base";
   if (/chord/.test(s)) return "chord";
   if (/chico/.test(s)) return "chico";
   if (/ambidextrous|town hall/.test(s)) return "hall";
   if (t.meeting) return "hall";
   if (/clean|fold|laundry|cook|chore|grocer|wash|tidy|evan|hestia|skincare|gym|workout/.test(s)) return "home";
   if (/copy|write|blog|caption|proposal|audit|muse|fresh pages|newsletter|website|brand/.test(s)) return "fresh";
+  // Weekends: anything without a work hint is personal, so it happens at home instead of the post office.
+  if (isWeekend() && !WORK_HINT.test(s) && !/email|inbox|reply|admin|tax|bank/.test(s)) return "home";
   return "post";
 }
+function baseSpot(id){ const v = VILLAGE[id]; return v ? {id, name: v.name, tx: v.door[0], ty: v.door[1], x: v.door[0], y: v.door[1], line: v.line} : null; }
 export function spotOf(t){
+  if (placeOf(t) === "base") { const s = (t.title + " " + (t.channel || "")).toLowerCase();
+    return (t.spot && BASE_SPOTS.some(([id]) => id === t.spot)) ? t.spot : baseSpotFor(s) || "pond"; }
   // The cupboard and treadmill are only picked on purpose (the clean, or "Do it on the treadmill").
   const pl = placeOf(t), st = stationsOf(pl).filter(s => (s.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title)) && s.id !== "treadmill" && s.re);
   if (isTreadTask(t)) return "treadmill";

@@ -206,6 +206,14 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#notebook [data-nb="thanks"]');
   await page.waitForTimeout(300);
   check(await page.locator("#paperIn").isHidden(), "once read, the letterbox is empty");
+  await page.locator('#world [data-place="shed"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Darren's shed/.test(document.querySelector("#ctx").textContent), null, { timeout: 15000 });
+  check(await page.locator("#ctx [data-tool]").count() === 3, "the shed sells three garden tools");
+  await page.click('#ctx [data-close]');
+  await page.goto(url + "?seed=1&nosample=1&time=20:15&date=2026-10-05");
+  await page.waitForTimeout(900);
+  check(await page.locator('#sceneArt rect.dusk').count() === 1 && await page.locator("#sceneArt .flame").count() > 0, "after 7pm home base glows: lit windows and the firepit");
+  await page.screenshot({ path: join(shots, "base-evening.png") });
   await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05");
   await page.waitForTimeout(800);
   await page.locator('#world [data-place="home"]').dispatchEvent("click");
