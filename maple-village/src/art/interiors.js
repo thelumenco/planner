@@ -65,7 +65,7 @@ const SHELLS = {
       `<rect x="24" y="18" width="176" height="112" rx="3"/>${rows(4, r => rows(6, c => `<rect x="${32 + c*28}" y="${26 + r*26}" width="22" height="20"/>`))}
       <circle cx="372" cy="56" r="24"/><path d="M372 56 v-14 M372 56 l10 6"/><rect x="418" y="30" width="70" height="88" rx="2"/><rect x="430" y="44" width="46" height="40" stroke-dasharray="2 2"/><path d="M432 96 h42 M432 106 h30" opacity=".6"/>`)}
     ${skirting}
-    ${sk(`<rect x="40" y="410" width="44" height="30" style="fill:#D9B893"/><rect x="48" y="384" width="30" height="26" style="fill:#E8D3B0"/>`, `<rect x="40" y="410" width="44" height="30"/><path d="M62 410 v30 M40 425 h44" opacity=".6"/><rect x="48" y="384" width="30" height="26"/><path d="M63 384 v26" opacity=".6"/>`)}`,
+    ${sk(`<rect x="416" y="340" width="44" height="30" style="fill:#D9B893"/><rect x="424" y="314" width="30" height="26" style="fill:#E8D3B0"/>`, `<rect x="416" y="340" width="44" height="30"/><path d="M438 340 v30 M416 355 h44" opacity=".6"/><rect x="424" y="314" width="30" height="26"/><path d="M439 314 v26" opacity=".6"/>`)}`,
 
   // Home: warm planks, plus whatever Mel has bought at the market's Home tab (wallpaper, rug, lamp, plant, painting, Maple's bed).
   home: () => { const d = (artCtx() && artCtx().F().decor) || {};

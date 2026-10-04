@@ -304,6 +304,6 @@ Round 16 (post box):
 Round 17 (reports from other routines, `game/feeds.js`):
 - `health-chord` / `health-chico` docs (written by the nightly bug checks): a standing health sign in the Chord workshop and Chico cottage (three lights, status word; tap for each check and a link to the founder room) and a light on each building in the town square. Older than 36 h is flagged as stale.
 - `content-chord` / `content-ambidextrous` docs (written by the content calendars): the calendar panel has Today and Content tabs; Content lists the next 14 days, both brands or one, view-only.
-- Paste-in steps for those four routines: ROUTINE-STEPS.md sections 6-9.
+- Paste-in steps for those four routines: ROUTINE-STEPS.md sections 6-9. Those routines aren't reachable from Claude Code (likely local desktop tasks), so a cloud routine "Village feeds" (trig_01FNvkV73ExnoXTpVsTYT6Bv, 7:05am SGT daily) reads the Chord Founder Room / Chico Founder Desk (embedded `health-data` JSON) and the content planner artifacts, and writes the four docs (plus stats user counts).
 
 Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lines; Hestia's custom lists, rhythm notes, equipment/energy filters and reminders weren't carried over.

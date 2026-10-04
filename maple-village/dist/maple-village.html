@@ -1438,12 +1438,12 @@ body.nb-open{overflow:hidden}
       ["kitchen", "Kitchen table", "D", "table", /plan|family|schedule|meal|roadmap/, "Where family plans happen."],
       ["status", "Health sign", "E", "healthchico", null, "Last night's Chico bug check."]
     ] },
-    post: { name: "Post office", wall: "#E3EEF5", trim: "var(--sky)", pos: { A: [260, 340], B: [436, 258], C: [400, 530], D: [110, 216], E: [344, 250] }, stations: [
+    post: { name: "Post office", wall: "#E3EEF5", trim: "var(--sky)", pos: { A: [260, 340], B: [436, 258], C: [400, 530], D: [110, 216], E: [72, 440] }, stations: [
       ["counter", "Sorting counter", "A", "counter", /email|inbox|reply|message|dm|respond/, "Letters in, letters out."],
       ["cabinet", "Filing cabinet", "B", "cabinet", /admin|file|doc|contract|tax|form|organi/, "A place for everything."],
       ["scales", "Stamps & scales", "C", "scales", /invoice|pay|bill|stripe|account|bank|receipt|expense|price/, "Weigh it, stamp it, send it."],
       ["ledge", "Writing ledge", "D", "desk", /./, "A tidy little ledge for odd jobs."],
-      ["pobox", "Your post box", "E", "pobox", null, "Your post box: unread mail from your work inbox."]
+      ["pobox", "Post box", "E", "pobox", null, "Your post box: unread mail from your work inbox."]
     ] },
     home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { A: [120, 216], B: [414, 228], H: [326, 250], C: [96, 410], D: [464, 452], G: [396, 372], E: [436, 598], F: [96, 596] }, stations: [
       ["desk", "Home desk", "A", "desk", /./, "Your own little desk."],
@@ -1662,7 +1662,7 @@ body.nb-open{overflow:hidden}
       <circle cx="372" cy="56" r="24"/><path d="M372 56 v-14 M372 56 l10 6"/><rect x="418" y="30" width="70" height="88" rx="2"/><rect x="430" y="44" width="46" height="40" stroke-dasharray="2 2"/><path d="M432 96 h42 M432 106 h30" opacity=".6"/>`
     )}
     ${skirting}
-    ${sk(`<rect x="40" y="410" width="44" height="30" style="fill:#D9B893"/><rect x="48" y="384" width="30" height="26" style="fill:#E8D3B0"/>`, `<rect x="40" y="410" width="44" height="30"/><path d="M62 410 v30 M40 425 h44" opacity=".6"/><rect x="48" y="384" width="30" height="26"/><path d="M63 384 v26" opacity=".6"/>`)}`,
+    ${sk(`<rect x="416" y="340" width="44" height="30" style="fill:#D9B893"/><rect x="424" y="314" width="30" height="26" style="fill:#E8D3B0"/>`, `<rect x="416" y="340" width="44" height="30"/><path d="M438 340 v30 M416 355 h44" opacity=".6"/><rect x="424" y="314" width="30" height="26"/><path d="M439 314 v26" opacity=".6"/>`)}`,
     // Home: warm planks, plus whatever Mel has bought at the market's Home tab (wallpaper, rug, lamp, plant, painting, Maple's bed).
     home: () => {
       const d = artCtx() && artCtx().F().decor || {};
