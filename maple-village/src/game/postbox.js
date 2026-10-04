@@ -23,6 +23,7 @@ export async function fetchPost(fresh){
   return cache;
 }
 export const postCount = () => cache.threads.length;
+export const postThreads = () => cache;
 const ago = ms => { const m = Math.round((Date.now() - ms)/60000); return m < 60 ? `${Math.max(1, m)}m` : m < 1440 ? `${Math.round(m/60)}h` : `${Math.round(m/1440)}d`; };
 const who = s => { const m = /^(.*?)\s*<.*>$/.exec(s); const n = m ? m[1] : s; return n.includes("@") ? n.split("@")[0].replace(/[._]/g, " ") : n; };
 export const POST_ERRORS = {

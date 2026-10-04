@@ -23,6 +23,7 @@ import { loadRevenue, revenuePanel, wireRevenue } from "./revenue.js";
 import { attachJars, jarsPanel, makeJar, emptyJar, jarById, addCustom, palette as jarPalette, shelf as jarShelf, MAX_BLOBS, MAX_KINDS } from "./jars.js";
 import { addJarEntry, removeEntry } from "./myroom.js";
 import { attachMyDocs, journalPanel, wireJournal, scratchPanel, wireScratch } from "./myroom.js";
+import { loadDesk, deskPanel, wireDesk } from "./desk.js";
 import { kid, kidPanel, wireKid, stopKidGame, SNACKS, snackPic, EVAN_TAPS, pickSay } from "./kid.js";
 import { addReminder, cancelReminder, upcoming as upcomingReminders, dueNow, fmtWhen } from "./reminders.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
@@ -216,7 +217,7 @@ const SHED = {
   compost:   {n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster."},
   sprinkler: {n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."}
 };
-let shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false, clientsOpen = false, planOpen = false, revOpen = false, jarsOpen = false;
+let deskOpen = false, shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false, clientsOpen = false, planOpen = false, revOpen = false, jarsOpen = false; deskOpen = false;
 let jv = {mode: "shelf", blobs: [], note: ""};   // the emotion shelf panel: shelf, make (picker) or jar (one jar)
 // Guided breathing in the calm corner: a ring grows as she breathes in (4 s), holds (2 s) and shrinks as she breathes out (6 s)
 const BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]], CYCLE = 12;
@@ -1116,7 +1117,7 @@ function showPanel(hasCtx, skin){
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
   if (kid.open) { kid.open = null; stopKidGame(); ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1159,6 +1160,7 @@ function ctx(){
   c.dataset.kid = kid.open && scene === "kidroom" ? kid.open : "";
   if (kid.open && scene === "kidroom") h = kidPanel(kid.open);
   else if (homeView && scene === "home") h = hestiaPanel(homeView);
+  else if (deskOpen && scene === "home") h = deskPanel();
   else if (postOpen && scene === "post") h = postPanel();
   else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
   else if (newsOpen && scene === "village") h = goodNewsHTML(myWins());
@@ -1255,6 +1257,7 @@ function ctx(){
   c.innerHTML = h;
   if (kid.open && scene === "kidroom") wireKid(c, kid.open, {eat: id => { kid.open = null; ctx(); kidEat(id); }, close: () => { kid.open = null; stopKidGame(); ctx(); }});
   if (homeView && scene === "home") wireHestia(c, homeView);
+  if (deskOpen && scene === "home") wireDesk(c, () => ctx());
   c.querySelectorAll("[data-postfresh]").forEach(b => b.onclick = () => { fetchPost(true).then(() => { ctx(); drawScene(); }); ctx(); });
   showPanel(!!h, homeView === "fridge" && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
   c.querySelectorAll("[data-shop]").forEach(b => b.onclick = () => { shopTab = b.dataset.shop; ctx(); });
@@ -1266,14 +1269,14 @@ function ctx(){
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
   c.querySelectorAll('[data-rec="stop"]').forEach(b => b.onclick = () => { setMusic(false); speak("Needle up. Quiet time.", 2500); ctx(); drawScene(); });
   const rv = c.querySelector("#recVol"); if (rv) rv.oninput = () => setMusicVol(+rv.value);
   c.querySelectorAll("[data-calm]").forEach(b => b.onclick = () => { const k = b.dataset.calm;
-    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; A.decompNow(); drawScene(); } else startBreath(+k); });
+    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; A.decompNow(); drawScene(); } else startBreath(+k); });
   if (breath) tickBreath();
   if (journalOpen && scene === "room") wireJournal(c, undoable, e => { if (e) { sfx("chime"); speak(S.mode === "decompress" && S.decompFree ? "Written down. Now you can let it go." : "Page kept. Lovely.", 3500); } ctx(); });
   if (scratchOpen && scene === "hall") wireScratch(c, undoable, () => ctx());
@@ -1444,7 +1447,7 @@ function setScene(id, at){
   const w = $("world"), from = scene; w.classList.add("fading");
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
@@ -1487,7 +1490,7 @@ function go(target, x, y, fn){
     if (INNER[target]) { const I = INNER[target]; legs.push({scene:I.parent, x:I.door[0], y:I.door[1], fn:() => setScene(target, I.arrive)}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -1525,6 +1528,7 @@ function arriveSpot(id){
     const t = remaining()[0];
     if (placeOf(t) === scene && spotOf(t) === id && !S.arrived[t.id]) { S.arrived[t.id] = true; setSay(`Here at the ${spotObj(scene, id).name.toLowerCase()}. First tiny step…`); save(); return; }
   }
+  if (scene === "home" && id === "desk") { deskOpen = true; sfx("paper", true); render(); loadDesk().then(() => { if (deskOpen) ctx(); }); return; }   // calendar and both inboxes
   if (scene === "hall" && id === "whiteboard") { scratchOpen = true; sfx("paper", true); render(); return; }   // the whiteboard is Mel's scratchpad
   if (scene === "hall" && id === "revenue") { revOpen = true; sfx("paper", true); render(); loadRevenue().then(() => { if (revOpen) ctx(); }); return; }   // income from Chord
   if (scene === "hall" && id === "table") { planOpen = true; sfx("paper", true); render(); loadPlans().then(() => { if (planOpen) ctx(); }); return; }   // Notion plans
@@ -1555,7 +1559,7 @@ function kidTap(ev){
     if (evanNight()) { evanSays("shh… sleeping"); return; }   // bedtime: he stays asleep
     kid.sleep = false; evan.x = evan.tx = 230; evan.y = evan.ty = 340; drawScene(); evanSays(pickSay(["morning!", "awake!", "*yawn*"])); sfx("chime"); return;
   }
-  if (ev.target.closest("[data-exit]")) { if (!kidHeld) flash("Grown-ups: press and hold the door to go back to the house."); kidHeld = false; return; }
+  if (ev.target.closest("[data-exit]")) { leaveKidRoom(); return; }
   const ent = ev.target.closest("[data-ent]");
   if (ent && ent.dataset.ent === "mel") { evan.tx = mel.x + 18; evan.ty = mel.y + 4; evan.run = true; kid.pending = null; evanSays("Mama!"); mprop("heart", mel.x, mel.y - 50); return; }
   if (ent && ent.dataset.ent === "evan" && hug && hug.phase === "ask") { hugBack(); return; }
@@ -1575,15 +1579,7 @@ function kidEat(id){
   sfx(sn.fx); setTimeout(() => sfx(sn.fx), 700); evanSays(pickSay(sn.say));
   nodes.evan.classList.remove("hop"); void nodes.evan.getBBox(); nodes.evan.classList.add("hop"); setTimeout(() => nodes.evan.classList.remove("hop"), 700);
 }
-// Leaving Evan's room takes a grown-up's press-and-hold on the door (taps from little fingers don't count)
-let kidHold = null, kidHeld = false;
-svg.addEventListener("pointerdown", ev => {
-  if (scene !== "kidroom") return; const ex = ev.target.closest("[data-exit]"); if (!ex) return;
-  ex.classList.add("holding"); clearTimeout(kidHold);
-  kidHold = setTimeout(() => { kidHeld = true; ex.classList.remove("holding"); leaveKidRoom(); }, 1300);
-});
-["pointerup", "pointercancel", "pointerleave"].forEach(t => svg.addEventListener(t, () => { if (scene !== "kidroom") return; clearTimeout(kidHold); document.querySelectorAll(".kidexit.holding").forEach(e => e.classList.remove("holding")); }));
-function leaveKidRoom(){ kid.open = null; stopKidGame(); kid.sleep = false; const I = INNER.kidroom; setScene("home", [I.door[0] - 10, I.door[1] + 24]); }
+function leaveKidRoom(){ if (scene !== "kidroom") return; kid.open = null; stopKidGame(); kid.sleep = false; const I = INNER.kidroom; setScene("home", [I.door[0] - 10, I.door[1] + 24]); }
 function toWorld(ev){ const r = $("map").getBoundingClientRect(); return [(ev.clientX - r.left - cam.ox)/cam.s, (ev.clientY - r.top - cam.oy)/cam.s]; }
 svg.addEventListener("click", ev => {
   if (scene === "kidroom") { kidTap(ev); return; }

@@ -59,7 +59,7 @@ export const DECOR = {
   lamp:        {ico:"lamp",      n:"Reading lamp",     slot:"lamp", val:"on",     price:10},
   big_plant:   {ico:"pot",       n:"Big plant",        slot:"plant",val:"on",     price:8},
   painting:    {ico:"painting",  n:"Painting",         slot:"art",  val:"on",     price:14},
-  fox_bed:     {ico:"bed",       n:"Maple's bed",      slot:"bed",  val:"on",     price:16},
+  fox_bed:     {ico:"bed",       n:"Maple's cosy bed", slot:"bed",  val:"on",     price:16, tab:"me", where:"room"},   // upgrades her basket in Mel's room
   // "Me & my room" tab: things for Mel's own room, and things Mel wears (shown on her in the village)
   r_lights:    {ico:"lantern",   n:"Fairy lights",     slot:"r_lights", val:"on", price:14, tab:"me", where:"room"},
   r_plant:     {ico:"pot",       n:"Monstera",         slot:"r_plant",  val:"on", price:10, tab:"me", where:"room"},

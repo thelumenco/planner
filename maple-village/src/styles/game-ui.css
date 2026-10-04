@@ -475,8 +475,6 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 body.kidmode .hudbtns, body.kidmode .berries, body.kidmode .hudbar, body.kidmode #chatBtn, body.kidmode #journal,
 body.kidmode #zoomBtn, body.kidmode #undoBar, body.kidmode #earn:empty{display:none !important}
 body.kidmode .scenename span + span{display:none}
-.kidexit .holdring{opacity:0;transition:opacity .15s}
-.kidexit.holding .holdring{opacity:1;stroke-dashoffset:0;transition:stroke-dashoffset 1.3s linear,opacity .15s}
 #evan.hop > .flip > g{animation:khop .35s ease-in-out 2}
 @keyframes khop{50%{transform:translateY(-8px)}}
 .kprop{width:auto;height:auto;transform:translate(-50%,-100%);animation:kprop 2.6s ease forwards}

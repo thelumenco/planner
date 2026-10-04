@@ -360,18 +360,20 @@ export function roomArt(id){
     h += `<g data-spot="${s.id}" aria-label="${s.name}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${tapeLabel(s.x, s.y + 24, s.name, "var(--card)")}</g>`;
   });
   if (id === "kidroom") {
-    // the door back to the house on the west wall: grown-ups press and hold it (toddler taps don't leave)
+    // the door back to the house on the west wall
     const k = G.kid ? G.kid() : {};
-    h += `<g data-exit="1" class="kidexit" aria-label="Back to the house (press and hold)"><ellipse class="hov" cx="34" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
+    h += `<g data-exit="1" class="kidexit" aria-label="Back to the house"><ellipse class="hov" cx="34" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
       ${sk(`<path d="M0 346 L28 358 L28 456 L0 466z" style="fill:#F7D35A"/>`, `<path d="M0 346 L28 358 L28 456 L0 466z"/><circle cx="23" cy="410" r="1.8"/>`)}
-      <circle class="holdring" cx="44" cy="406" r="15" fill="rgba(255,253,246,.85)" stroke="#7BB37A" stroke-width="4" stroke-dasharray="94.3" stroke-dashoffset="94.3" transform="rotate(-90 44 406)"/>${tapeLabel(64, 334, "Grown-ups: hold", "var(--card)", 10)}</g>`;
+      ${tapeLabel(50, 492, "To the house", "var(--card)", 11)}</g>`;
     if (k.sleep) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".34" pointer-events="none"/>`;
     return h;
   }
   if (id === "room") {
     // Maple's bed (she sleeps in it while Mel's in here), the door back to the house on the east wall, and night
     const sl = G.S && G.S().sleep;
-    h += sk(`<ellipse cx="238" cy="296" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="238" cy="294" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="238" cy="296" rx="30" ry="13"/><ellipse cx="238" cy="294" rx="20" ry="8"/>`);
+    const cosy = !!(G.F().decor || {}).bed;   // the market's "Maple's cosy bed" upgrades her basket: plush rim, cushion and a heart
+    h += cosy ? sk(`<ellipse cx="238" cy="296" rx="36" ry="16" style="fill:var(--rose)"/><ellipse cx="238" cy="293" rx="25" ry="10" style="fill:#FFFDF6"/><ellipse cx="226" cy="290" rx="9" ry="5" style="fill:var(--peri)"/><path d="M258 278 c-3 -4 -8 0 -5 3 l5 4 l5 -4 c3 -3 -2 -7 -5 -3z" style="fill:var(--rose)"/>`, `<ellipse cx="238" cy="296" rx="36" ry="16"/><ellipse cx="238" cy="293" rx="25" ry="10"/><ellipse cx="226" cy="290" rx="9" ry="5"/>`)
+      : sk(`<ellipse cx="238" cy="296" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="238" cy="294" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="238" cy="296" rx="30" ry="13"/><ellipse cx="238" cy="294" rx="20" ry="8"/>`);
     h += `<g data-exit="1" aria-label="Back to the house"><ellipse class="hov" cx="486" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
       ${sk(`<path d="M520 346 L492 358 L492 456 L520 466z" style="fill:var(--blush)"/>`, `<path d="M520 346 L492 358 L492 456 L520 466z"/><circle cx="497" cy="410" r="1.8"/>`)}${tapeLabel(470, 334, "To the house", "var(--card)", 11)}</g>`;
     if (sl) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".32" pointer-events="none"/>`;

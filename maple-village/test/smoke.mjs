@@ -707,6 +707,17 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.emulateMedia({ colorScheme: "dark" });
   check(await page.evaluate(() => { const i = document.getElementById("nameIn"); return !i || getComputedStyle(i).color === "rgb(47, 43, 40)"; }), "typed text in panels stays dark ink in dark mode");
   await page.emulateMedia({ colorScheme: "light" });
+  await page.click("#pclose");
+  await page.locator('#world [data-place="home"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-spot="desk"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-desk="mine"]', { timeout: 15000 });
+  await page.waitForSelector("#ctx .calday li", { timeout: 10000 }).catch(() => {});
+  check(await page.locator("#ctx .calday li").count() >= 2, "the home desk shows today's calendar");
+  await page.click('#ctx [data-desk="mine"]'); await page.waitForTimeout(300);
+  check(/Dinner on Sunday/.test(await page.locator("#ctx").textContent()) && await page.evaluate(() => window.__zapier && window.__zapier.params.query.includes("category:primary") && !!window.__zapier.connection_id), "and the personal inbox, through Zapier (Primary only)");
+  await page.click('#ctx [data-desk="work"]'); await page.waitForTimeout(200);
+  check(/freshpages/.test(await page.locator("#ctx").textContent()), "and the work inbox");
   await page.click("#pclose"); await page.click("#chatBtn");
   await page.fill("#chatIn", "remind me to get the laundry in in 1 hour"); await page.click("#chatForm button");
   await page.waitForFunction(() => [...document.querySelectorAll("#chatLog .did")].some(d => /Reminder at/.test(d.textContent)), null, { timeout: 10000 });
@@ -758,11 +769,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#world .zz").count() >= 1, "Evan can sleep in his car bed");
   await page.locator("#world").click({ position: { x: 200, y: 500 } }); await page.waitForTimeout(400);
   check(await page.evaluate(() => document.getElementById("evan").style.visibility !== "hidden"), "and a tap wakes him");
-  await page.locator('#world [data-exit]').dispatchEvent("click"); await page.waitForTimeout(500);
-  check(/Evan's room/.test(await page.locator("#sceneName").textContent()), "a tap on the door doesn't leave (little fingers)");
-  await page.locator('#world [data-exit]').dispatchEvent("pointerdown"); await page.waitForTimeout(1700);
+  check(await page.evaluate(() => { const l = [...document.querySelectorAll("#world text.lab")].find(t => /To the house/.test(t.textContent)); return !!l && /translate\(50 492\)/.test(l.parentNode.getAttribute("transform")); }), "the door's sign sits below the door, clear of Mel");
+  await page.locator('#world [data-exit]').dispatchEvent("click");
   await page.waitForFunction(() => !/Evan's room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 5000 }).catch(() => {});
-  check(!/Evan's room/.test(await page.locator("#sceneName").textContent()) && !(await page.evaluate(() => document.body.classList.contains("kidmode"))), "a grown-up's press-and-hold goes back to the house");
+  check(!/Evan's room/.test(await page.locator("#sceneName").textContent()) && !(await page.evaluate(() => document.body.classList.contains("kidmode"))), "tapping the door goes back to the house");
   const after = await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")), t = JSON.parse(localStorage.getItem("fox.today")); return JSON.stringify({c: f.coins, x: f.xp, done: t.doneIds, e: t.earned}); });
   check(before === after, "nothing in Evan's room changes Mel's game (coins, XP, quests)");
   // hugs: Evan runs over with his arms up; a tap on him and Mel hugs back

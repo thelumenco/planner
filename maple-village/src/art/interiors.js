@@ -67,7 +67,8 @@ const SHELLS = {
     ${skirting}
     ${sk(`<rect x="416" y="340" width="44" height="30" style="fill:#D9B893"/><rect x="424" y="314" width="30" height="26" style="fill:#E8D3B0"/>`, `<rect x="416" y="340" width="44" height="30"/><path d="M438 340 v30 M416 355 h44" opacity=".6"/><rect x="424" y="314" width="30" height="26"/><path d="M439 314 v26" opacity=".6"/>`)}`,
 
-  // Home: warm planks, plus whatever Mel has bought at the market's Home tab (wallpaper, rug, lamp, plant, painting, Maple's bed).
+  // Home: warm planks, plus whatever Mel has bought at the market's Home tab (wallpaper, rug, lamp, plant, painting).
+// Maple's cosy bed lives in Mel's room now; Evan's toys in his. The plant sits by the treadmill, clear of both doors.
   home: () => { const d = (artCtx() && artCtx().F().decor) || {};
     return `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(24, i => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`)}</g>
@@ -75,8 +76,7 @@ const SHELLS = {
     ${wallBase("#F8EED8", "var(--butter)")}${d.wall ? wallpaper(d.wall) : ""}
     ${d.art ? sk(`<rect x="152" y="40" width="44" height="36" rx="2" style="fill:var(--wood)"/><rect x="158" y="46" width="32" height="24" style="fill:var(--sky)"/><path d="M158 70 l10 -10 l8 7 l6 -5 l8 8z" style="fill:var(--moss)"/>`, `<rect x="152" y="40" width="44" height="36" rx="2"/><rect x="158" y="46" width="32" height="24"/><path d="M174 30 l-12 10 M174 30 l12 10"/>`) : ""}
     ${d.lamp ? sk(`<path d="M190 368 h24 l6 18 h-36z" style="fill:var(--butter)"/>`, `<path d="M190 368 h24 l6 18 h-36z M202 386 v52 M192 440 h20"/>`) : ""}
-    ${d.plant ? plant(42, 330, 1.3) : ""}
-    ${d.bed ? sk(`<ellipse cx="292" cy="500" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="292" cy="498" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="292" cy="500" rx="30" ry="13"/><ellipse cx="292" cy="498" rx="20" ry="8"/>`) : ""}
+    ${d.plant ? plant(172, 606, 1.2) : ""}
     ${sk(`<rect x="60" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/><rect x="390" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/>`, `<rect x="60" y="34" width="70" height="58" rx="30"/><path d="M95 34 v58 M60 66 h70"/><rect x="390" y="34" width="70" height="58" rx="30"/><path d="M425 34 v58 M390 66 h70"/>`)}
     ${skirting}`; },
 
