@@ -2820,7 +2820,7 @@ body.nb-open{overflow:hidden}
     <h2 id="nbTitle">${esc(item.title || "A note for you")}</h2>
     <div class="nbbody">${item.body ? `<div class="nbnotes">${notesHTML(item.body)}</div>` : ""}${sectionsHTML(item.sections)}
     ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Open the full thing ↗</a></div>` : ""}</div>
-    <div class="nbactions">${item.pond ? `<button class="btn primary" data-nb="pond">Walk to the pond</button>` : ""}<button class="btn ${item.pond ? "alt" : "yes"}" data-nb="thanks">${item.pond ? "Later" : "Thanks!"}</button></div>`;
+    <div class="nbactions">${(item.pond = item.pond || item.from === "winddown") ? `<button class="btn primary" data-nb="pond">Walk to the pond</button>` : ""}<button class="btn ${item.pond ? "alt" : "yes"}" data-nb="thanks">${item.pond ? "Later" : "Thanks!"}</button></div>`;
   }
   function newsPage(item) {
     const d = new Date(item.at || Date.now());
@@ -4421,12 +4421,14 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
   var sgAt = (day, h, m = 0) => Date.UTC(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8, 10), h - 8, m);
   var WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   var localCache = { key: "", items: [] };
+  var dayKeyAt = (ms) => new Date(ms + 6 * H).toISOString().slice(0, 10);
   function localMail() {
     const day = dayKey(), hm2 = sgHM(), key = `${day}:${Math.floor(hm2 / 10)}:${S2.doneIds.length}:${S2.cleanDone}`;
     if (key === localCache.key) return localCache.items;
     const out = [], wd = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
     if (wd === 5 && hm2 >= 900 || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
-    if (hm2 >= 1080 && (S2.cleanDone || S2.doneIds.length)) out.push({
+    const routineWind = (MAIL.items || []).some((m) => m && m.from === "winddown" && m.at && dayKeyAt(m.at) === day);
+    if (hm2 >= 1080 && !routineWind && (S2.cleanDone || S2.doneIds.length)) out.push({
       id: "wind-" + day,
       from: "winddown",
       at: sgAt(day, 18),

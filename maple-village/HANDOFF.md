@@ -282,4 +282,8 @@ Round 12:
 - Family tab at the market. Little gifts (ice cream, red balloon, bubble wand, storybook for Evan; kopi, kaya toast, curry puff for Darren) go in the backpack and are handed over in person: Evan whenever he's around, Darren wherever his routine has him (the page says where). Every third gift they give something back (a tulip from Evan, strawberry seeds from Darren). Keepsakes, bought once: a sandpit at home base (Evan plays in it), a toy truck Evan carries, headphones Darren wears at his desk, a hammock by the pond where Darren rests 7:30-9:30pm. State in `F.fam = {owned, gifts}`; what Evan holds is drawn into his sprite (`#evanHold`).
 - Fixes: the chimney sits on the roof; the washing line moved out from under the folded quest tab; market cards use a flex column (Safari overlapped grid buttons); the tab row wraps and the map can no longer be scrolled sideways by a tap.
 
+Round 13 (routines → village):
+- Cloud routines now post to the village as their last step: Daily evening wind down (from "winddown", 5:30pm; the page skips its own 6pm note that day and the note offers the pond walk), Daily Book Digest (Juniper's shelf, `library` doc), Daily Sunsama tidy (from "courier").
+- Mac-bound tasks (Daily morning briefing, both inbox triages, GeBIZ scout) need the step pasted in the Claude desktop app: see ROUTINE-STEPS.md.
+
 Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lines.
