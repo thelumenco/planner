@@ -1,6 +1,7 @@
 // "Do task" notebook overlay: a big washi-taped notebook page with the quest's notes, progress buttons that drive the
 // quest, an email block for inbox quests, and "talk to the note" via the sample capability. Also shows agent mail.
-import { $, esc } from "../util.js";
+import { $, esc, plain } from "../util.js";
+import { icon } from "../art/icons.js";
 
 let api = null;        // from core: task(), S(), F(), fs(t), act(kind, t), timerLeft(), sayNow(), sample(), placeLabel(t), markRead(item), agentName(from)
 let open = null;       // {kind:"task", id} | {kind:"mail", item} | {kind:"digest", item}
@@ -59,6 +60,7 @@ export function refreshNotebook(focus){
     page.innerHTML = taskPage(t);
     if ($("nbAsk")) { $("nbAsk").value = keep; if (typing) $("nbAsk").focus(); }
   } else page.innerHTML = open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
+  page.className = "nbpage" + (open.kind === "mail" && open.item.from === "crier" ? " news" : "");
   const log = page.querySelector(".nbchat"); if (log) log.scrollTop = log.scrollHeight;
   if (focus) (page.querySelector("[data-nb]:not([data-nb=close])") || page.querySelector("[data-nb]"))?.focus({preventScroll: true});
 }
@@ -82,7 +84,7 @@ function taskPage(t){
   const tread = S.tread && S.tread[t.id];
   const em = t.email || null;
   let h = `<button class="nbx" data-nb="close" aria-label="Close notebook">✕</button>
-    <p class="nbmeta">${esc(api.placeLabel(t))}${t.at ? ` · ⏰ ${esc(t.at)}` : ""}</p>
+    <p class="nbmeta">${esc(api.placeLabel(t))}${t.at ? ` · at ${esc(t.at)}` : ""}</p>
     <h2 id="nbTitle">${esc(t.title)}</h2>`;
   if (left != null) h += `<p class="nbtimer"><span data-tleft>${left}</span> <small>${tread ? "walking at 1.2" : "left on the time box"}</small></p>`;
   h += `<div class="nbbody">`;
@@ -98,11 +100,11 @@ function taskPage(t){
       <p class="nbhint">Sending stays with you in Gmail. Tell chat if you'd like the draft changed.</p></div>`;
   }
   if (t.pep) h += `<p class="nbpep">♡ ${esc(t.pep)}</p>`;
-  if (say && say.line) h += `<div class="nbsay"><p><span aria-hidden="true">🦊</span> ${esc(say.line)}</p>${say.buttons ? `<div class="nbrow">${say.buttons.map((b, i) => `<button class="btn alt small" data-nb="sayb" data-i="${i}">${esc(b[0])}</button>`).join("")}</div>` : ""}</div>`;
+  if (say && say.line) h += `<div class="nbsay"><p>${icon("fox", 22)} ${esc(plain(say.line))}</p>${say.buttons ? `<div class="nbrow">${say.buttons.map((b, i) => `<button class="btn alt small" data-nb="sayb" data-i="${i}">${esc(b[0])}</button>`).join("")}</div>` : ""}</div>`;
   const chat = chats[t.id] || [];
   if (api.sample() !== null || chat.length) {
     h += `<div class="nbtalk"><p class="nblbl">Talk to the note</p>
-      ${chat.length ? `<div class="nbchat" aria-live="polite">${chat.map(m => `<p class="${m.role}">${m.role === "user" ? "" : "🦊 "}${esc(m.content)}</p>`).join("")}</div>` : ""}
+      ${chat.length ? `<div class="nbchat" aria-live="polite">${chat.map(m => `<p class="${m.role}">${m.role === "user" ? "" : icon("fox", 18) + " "}${esc(m.content)}</p>`).join("")}</div>` : ""}
       ${api.sample() ? `<div class="nbrow nbask"><label class="sr" for="nbAsk">Ask about this quest</label><input id="nbAsk" placeholder="${chat.length ? "reply…" : "stuck? ask anything about this quest"}" autocomplete="off" ${busy ? "disabled" : ""}>
       <button class="btn small" data-nb="ask" ${busy ? "disabled" : ""}>${busy ? "…" : "Ask"}</button></div>` : `<p class="nbhint">Talking to the note isn't available here.</p>`}</div>`;
   }
@@ -110,7 +112,7 @@ function taskPage(t){
     ${!fs ? `<button class="btn primary" data-nb="started">Started</button>` : `<button class="btn alt" data-nb="halfway">Halfway</button>`}
     <button class="btn alt" data-nb="stuck">Stuck</button>
     ${fs ? `<button class="btn alt" data-nb="more">Need more time</button>` : ""}
-    ${t.treadmill && !tread ? `<button class="btn alt" data-nb="treadmill">🚶 Do it on the treadmill</button>` : ""}
+    ${t.treadmill && !tread ? `<button class="btn alt" data-nb="treadmill">${icon("walker", 18)} Do it on the treadmill</button>` : ""}
     ${fs ? `<button class="btn yes" data-nb="done">Done</button>` : ""}
   </div>`;
   return h;
@@ -122,17 +124,37 @@ const sectionsHTML = secs => (Array.isArray(secs) ? secs : []).filter(x => x && 
   `<section class="nbsec">${x.heading ? `<h3>${esc(x.heading)}</h3>` : ""}<ul>${(x.lines || []).map(l => `<li>${linkify(l)}</li>`).join("")}</ul></section>`).join("");
 const timeOf = at => at ? new Date(at).toLocaleTimeString("en-GB", {hour: "numeric", minute: "2-digit", timeZone: "Asia/Singapore"}) : "";
 function mailPage(item){
-  const crier = item.from === "crier";
-  const head = crier
-    ? `<div class="gazette"><p class="masthead">The Morning Crier</p><p class="gzline">${new Date(item.at || Date.now()).toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Singapore"})} · ${esc(api.agentName(item.from))}</p></div>
-       <h2 id="nbTitle" class="gzhead">${esc(item.title || "Good morning")}</h2>`
-    : `<p class="nbmeta">a note from ${esc(api.agentName(item.from))}${item.at ? ` · ${timeOf(item.at)}` : ""}</p>
-       <h2 id="nbTitle">${esc(item.title || "A note for you")}</h2>`;
-  return `<button class="nbx" data-nb="close" aria-label="Close note">✕</button>${head}
-    <div class="nbbody">${item.body ? `<div class="nbnotes${crier ? " gzlede" : ""}">${notesHTML(item.body)}</div>` : ""}
-    <div class="${crier ? "gzcols" : ""}">${sectionsHTML(item.sections)}</div>
+  if (item.from === "crier") return newsPage(item);
+  return `<button class="nbx" data-nb="close" aria-label="Close note">✕</button>
+    <p class="nbmeta">a note from ${esc(api.agentName(item.from))}${item.at ? ` · ${timeOf(item.at)}` : ""}</p>
+    <h2 id="nbTitle">${esc(item.title || "A note for you")}</h2>
+    <div class="nbbody">${item.body ? `<div class="nbnotes">${notesHTML(item.body)}</div>` : ""}${sectionsHTML(item.sections)}
     ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Open the full thing ↗</a></div>` : ""}</div>
-    <div class="nbactions"><button class="btn yes" data-nb="thanks">${crier ? "Let's go" : "Thanks!"}</button></div>`;
+    <div class="nbactions"><button class="btn yes" data-nb="thanks">Thanks!</button></div>`;
+}
+// The morning briefing, printed as the village newspaper. The first section is the front-page story.
+function newsPage(item){
+  const d = new Date(item.at || Date.now());
+  const sg = new Date(d.getTime() + 8*3600e3);
+  const no = Math.floor((sg - Date.UTC(sg.getUTCFullYear(), 0, 0)) / 864e5);
+  const date = d.toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Singapore"});
+  const secs = (Array.isArray(item.sections) ? item.sections : []).filter(x => x && (x.heading || (x.lines || []).length));
+  const lead = secs[0], rest = secs.slice(1);
+  const story = x => `<section class="nsec"><h3>${esc(x.heading || "")}</h3><ul>${(x.lines || []).map(l => `<li>${linkify(l)}</li>`).join("")}</ul></section>`;
+  return `<button class="nbx" data-nb="close" aria-label="Close the paper">✕</button>
+    <header class="nhead">
+      <div class="nears"><span>Vol. I · No. ${no}</span><span>Price: one wet wipe</span></div>
+      <p class="nmast" id="nbTitle">The Morning Crier</p>
+      <div class="nline"><span>${esc(date)}</span><span>Delivered by ${esc(api.agentName(item.from))}</span></div>
+    </header>
+    <div class="nbbody">
+      <h2 class="nheadline">${esc(item.title || "Good morning, village")}</h2>
+      ${item.body ? `<div class="nlede">${notesHTML(item.body)}</div>` : ""}
+      ${lead ? `<div class="nfront">${story(lead)}</div>` : ""}
+      ${rest.length ? `<div class="ncols">${rest.map(story).join("")}</div>` : ""}
+      ${safeUrl(item.link) ? `<p class="nmore"><a href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Full briefing ↗</a></p>` : ""}
+    </div>
+    <div class="nbactions"><button class="btn yes" data-nb="thanks">Fold the paper, let's go</button></div>`;
 }
 function digestPage(item){
   return `<button class="nbx" data-nb="close" aria-label="Close digest">✕</button>
@@ -166,7 +188,7 @@ Quests finished today: ${S.doneIds.length}`;
   const turns = log.slice(0, -1).map((m, i) => i === 0 ? {role: "user", content: brief + "\n\nMel says: " + m.content} : m);
   try {
     const res = await sample(turns, {signal: busy.signal, cache: false, modelTier: "quick",
-      onText: ({text}) => { log[log.length - 1].content = text; const el = document.querySelector(".nbchat p:last-child"); if (el) el.textContent = "🦊 " + text; }});
+      onText: ({text}) => { log[log.length - 1].content = text; const el = document.querySelector(".nbchat p:last-child"); if (el) el.innerHTML = icon("fox", 18) + " " + esc(text); }});
     log[log.length - 1].content = res.text.trim() || "Hmm, I lost my words. Try again?";
   } catch (e) {
     const msg = {not_granted: "No worries, we'll keep it to buttons. Talking needs your OK first.", rate_limited: "I need a little breather. Try again in a minute.", cancelled: null}[e && e.code];

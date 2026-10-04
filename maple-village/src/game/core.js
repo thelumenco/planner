@@ -1,7 +1,8 @@
 // Game core: state + persistence, quest flow, actions, UI renderers and the world sim.
-import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur } from "../util.js";
+import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur, plain } from "../util.js";
+import { icon } from "../art/icons.js";
 import { VILLAGE, WORK, ROOMS, stationsOf, spotObj, placeOf, spotOf } from "../data/world.js";
-import { CROPS, ITEMS, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY } from "../data/items.js";
+import { CROPS, ITEMS, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco } from "../data/items.js";
 import { villageArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
@@ -137,8 +138,8 @@ function markActive(){
   F.days = (F.days || 0) + 1; F.xp += 5; F.lastActive = k;
 }
 let earnT;
-function flash(msg){ const e = $("earn"); e.textContent = msg; clearTimeout(earnT); earnT = setTimeout(() => e.textContent = "", 4000); }
-function earn(n, why){ F.coins += n; S.earned += n; markActive(); flash(`+${n} 🪙 ${why}`); mprop("🪙", mel.x, mel.y - 60, 1800); }
+function flash(msg){ const e = $("earn"); e.textContent = plain(msg); clearTimeout(earnT); earnT = setTimeout(() => e.textContent = "", 4000); }
+function earn(n, why){ F.coins += n; S.earned += n; markActive(); flash(`+${n} coins: ${why}`); mprop("coin", mel.x, mel.y - 60, 1800); }
 function gainXp(n){
   const before = level(); F.xp += n;
   if (level() > before) { const L = LEVELS[level()]; setTimeout(() => { act("cheer"); speak(`We're ${L.name}s now 💕${L.gift ? " I got " + L.gift + "!" : ""}`, 6000); }, 2600); }
@@ -159,9 +160,9 @@ function defaultLine(){
 }
 function speak(text, ms){
   const el = $("speech");
-  el.textContent = text; el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
+  el.textContent = plain(text); el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
   clearTimeout(speechT); speechLock = ms ? Date.now() + ms : 0;
-  if (ms) speechT = setTimeout(() => { speechLock = 0; el.textContent = say ? say.line : defaultLine(); }, ms);
+  if (ms) speechT = setTimeout(() => { speechLock = 0; el.textContent = plain(say ? say.line : defaultLine()); }, ms);
 }
 function setSay(line, buttons){ say = {line, buttons}; speak(line); }
 let evanT;
@@ -171,15 +172,15 @@ function evanSays(t){ const e = $("evanSay"); e.textContent = t; e.hidden = fals
 const portrait = $("scene"), props = $("props");
 let animT = null, mapleNap = 0;
 function prop(txt, cls, x, y, life){
-  const p = document.createElement("div"); p.className = "prop " + cls; p.textContent = txt;
+  const p = document.createElement("div"); p.className = "prop " + cls; p.innerHTML = icon(txt, cls === "p-fort" ? 96 : 30);
   if (x != null) { p.style.left = x + "%"; p.style.top = y + "%"; }
   props.appendChild(p); setTimeout(() => p.remove(), life || 3000);
 }
 function mprop(txt, x, y, life){
-  const p = document.createElement("div"); p.className = "mprop"; p.textContent = txt; p.style.left = (x/W*100) + "%"; p.style.top = (y/HH*100) + "%";
+  const p = document.createElement("div"); p.className = "mprop"; p.innerHTML = icon(txt, 18); p.style.left = ((x - cam.x)*cam.s) + "px"; p.style.top = (y*cam.s) + "px";
   $("mprops").appendChild(p); setTimeout(() => p.remove(), life || 1900);
 }
-function hearts(n){ for (let i = 0; i < n; i++) setTimeout(() => { prop("💕", "p-heart", 58 + Math.random()*16, 48 + Math.random()*10, 1900); mprop("💕", maple.x + rnd(-8, 8), maple.y - 30, 1900); }, i*240); }
+function hearts(n){ for (let i = 0; i < n; i++) setTimeout(() => { prop("heart", "p-heart", 58 + Math.random()*16, 48 + Math.random()*10, 1900); mprop("heart", maple.x + rnd(-8, 8), maple.y - 30, 1900); }, i*240); }
 function pose(){ portrait.classList.toggle("sleeping", phase() === "break" || portrait.dataset.nap === "1"); }
 function act(kind, item){
   clearTimeout(animT);
@@ -189,18 +190,18 @@ function act(kind, item){
   if (cls) portrait.classList.add(cls);
   const mm = $("mmaple"); mm.classList.remove("hop"); void mm.getBBox();
   if (kind !== "nudge" && kind !== "nap") mm.classList.add("hop");
-  if (item) mprop(item.e, maple.x, maple.y - 34, 1900);
+  if (item) mprop(item.ico, maple.x, maple.y - 34, 1900);
   let d = 3200;
-  if (kind === "eat") { prop(item.e, "p-food", null, null, 2300); setTimeout(() => hearts(3), 1800); }
-  if (kind === "flower") { prop(item.e, "p-food", null, null, 2300); setTimeout(() => hearts(4), 1600); }
-  if (kind === "brush") { prop("🪮", "p-brush", null, null, 2900); setTimeout(() => prop("✨", "p-heart", 72, 66, 1900), 900); setTimeout(() => prop("✨", "p-heart", 58, 72, 1900), 1600); }
-  if (kind === "bath") { for (let i = 0; i < 9; i++) setTimeout(() => prop("🫧", "p-bubble", 54 + Math.random()*24, 84, 2700), i*220); }
-  if (kind === "ball") { prop("⚽", "p-ball", null, null, 1800); setTimeout(() => hearts(2), 1500); }
-  if (kind === "yarn") prop("🧶", "p-yarn", null, null, 3300);
-  if (kind === "hide") { d = 4300; prop("👀", "p-peek", 65, 84, 4300); setTimeout(() => hearts(3), 3900); }
+  if (kind === "eat") { prop(item.ico, "p-food", null, null, 2300); setTimeout(() => hearts(3), 1800); }
+  if (kind === "flower") { prop(item.ico, "p-food", null, null, 2300); setTimeout(() => hearts(4), 1600); }
+  if (kind === "brush") { prop("brush", "p-brush", null, null, 2900); setTimeout(() => prop("sparkle", "p-heart", 72, 66, 1900), 900); setTimeout(() => prop("sparkle", "p-heart", 58, 72, 1900), 1600); }
+  if (kind === "bath") { for (let i = 0; i < 9; i++) setTimeout(() => prop("bubbles", "p-bubble", 54 + Math.random()*24, 84, 2700), i*220); }
+  if (kind === "ball") { prop("ball", "p-ball", null, null, 1800); setTimeout(() => hearts(2), 1500); }
+  if (kind === "yarn") prop("yarn", "p-yarn", null, null, 3300);
+  if (kind === "hide") { d = 4300; prop("eyes", "p-peek", 65, 84, 4300); setTimeout(() => hearts(3), 3900); }
   if (kind === "nap") { d = 7000; portrait.dataset.nap = "1"; mapleNap = Date.now() + 7000; [0, 800, 1600, 2400].forEach(t => setTimeout(() => prop("z", "p-z", 52, 56, 4800), t)); }
   if (kind === "crown") { S.crown = true; hearts(3); }
-  if (kind === "fort") { d = 5000; prop("⛺", "p-fort", 65, 70, 5000); setTimeout(() => hearts(4), 3000); }
+  if (kind === "fort") { d = 5000; prop("fort", "p-fort", 65, 70, 5000); setTimeout(() => hearts(4), 3000); }
   if (kind === "cheer") hearts(3);
   pose();
   animT = setTimeout(() => { [...portrait.classList].filter(c => c.startsWith("fox-")).forEach(c => portrait.classList.remove(c)); portrait.dataset.nap = "0"; mm.classList.remove("hop"); pose(); }, d);
@@ -245,6 +246,7 @@ function timerDone(kind){
   if (kind === "task") setSay("Time box is up. Done? Or five more?", [["5 more minutes", () => { startTimer("task", 5, S.timer.id); setSay("Five more. You've got this."); }]]);
   if (kind === "deal") setSay("Five minutes done 🎉 Stop or keep rolling. Both count.");
   if (kind === "break") setSay("Break's up! Come back when you're ready.");
+  if (kind === "clench") { S.timer = null; setSay("Release. Now three quick points in chat, then a hot drink."); }
   save();
 }
 /* =================== ACTIONS =================== */
@@ -294,13 +296,14 @@ const A = {
   },
   back(){ S.mode = null; S.timer = null; earn(2, "proper break"); gainXp(1); setSay("Welcome back! Fresh quest coming up."); save(); },
   flow(){ S.mode = null; S.timer = null; setSay("In flow? Ride it! Break after this one."); save(); },
+  clench(){ startTimer("clench", .5); setSay("Clench and hold. Breathe through your nose."); save(); },
   decompressed(){ S.mode = remaining().length ? "break" : null; if (S.mode) startTimer("break", 10); setSay("Decompressed. Now a proper break."); save(); },
   water(){ S.water += 1; if (S.water <= 4) earn(1, "water"); speak(pick(["Glug glug 💧", "Hydrated boss!", "Water break, good call."]), 3000); save(); }
 };
 function doNext(id){
   const ids = allTasks().map(x => x.id);
   if (S.timer && S.timer.kind !== "break") S.timer = null;
-  S.order = [id, ...ids.filter(x => x !== id)]; say = null; speak("New quest picked! Off we go.", 3000); save(true);
+  S.order = [id, ...ids.filter(x => x !== id)]; say = null; openView = null; boardOpen = false; speak("New quest picked! Off we go.", 3000); save(true);
 }
 // Progress buttons on the notebook page.
 const HALF = ["Halfway! The downhill bit starts now.", "Halfway there. Look at you go.", "Half done. Sip of water, then onwards."];
@@ -421,7 +424,7 @@ function mailCard(){
   $("mailBadge").hidden = !unread; $("mailBadge").textContent = unread;
   if (!items.length) { $("mailList").innerHTML = `<li><span></span><span class="muted">No letters yet.</span></li>`; return; }
   $("mailSum").textContent = unread ? `Letters · ${unread} new` : "Letters";
-  $("mailList").innerHTML = items.map((m, i) => `<li class="${F.mailRead[m.id] ? "" : "unread"}"><span class="pl">${F.mailRead[m.id] ? "📄" : "✉️"}</span>
+  $("mailList").innerHTML = items.map((m, i) => `<li class="${F.mailRead[m.id] ? "" : "unread"}"><span class="pl">${icon(F.mailRead[m.id] ? "letterOpen" : "letter", 22)}</span>
     <button class="open" data-mail="${i}"><span class="t">${esc(m.title || "A note")}</span><br><small>${esc(agentName(m.from))}${m.at ? " · " + new Date(m.at).toLocaleString("en-GB", {weekday:"short", hour:"numeric", minute:"2-digit", timeZone:"Asia/Singapore"}) : ""}</small></button><span></span></li>`).join("");
   $("mailList").querySelectorAll("[data-mail]").forEach(b => b.onclick = () => openMail(items[+b.dataset.mail]));
 }
@@ -454,29 +457,29 @@ function playFree(kind){
 function buy(id){
   const it = ITEMS[id]; if (!it || F.coins < it.price || (it.need && S.earned < it.need)) return;
   if (it.kind === "tool" && F.inv[id]) return;
-  F.coins -= it.price; addInv(id, 1); flash(`Bought ${it.n.toLowerCase()} ${it.e}`); speak(pick(["Ooh, good choice!", "Into the backpack it goes.", "Lovely pick!"]), 2500); save();
+  F.coins -= it.price; addInv(id, 1); flash(`Bought ${it.n.toLowerCase()}`); speak(pick(["Ooh, good choice!", "Into the backpack it goes.", "Lovely pick!"]), 2500); save();
 }
 function sell(id){
   const it = ITEMS[id]; if (!it || !it.sell || !F.inv[id]) return;
-  addInv(id, -1); F.coins += it.sell; flash(`Sold ${it.n.toLowerCase()} +${it.sell} 🪙`); speak("Fresh from the garden, sold!", 2500); save();
+  addInv(id, -1); F.coins += it.sell; flash(`Sold ${it.n.toLowerCase()} +${it.sell} coins`); speak("Fresh from the garden, sold!", 2500); save();
 }
 function plant(i, seedId){
   const it = ITEMS[seedId]; if (!it || !F.inv[seedId] || (F.plots[i] && F.plots[i].crop)) return;
   addInv(seedId, -1); F.gift = false; F.plots[i] = {crop:it.crop, plantedAt:Date.now(), wateredAt:null, bonus:0};
   speak(`${CROPS[it.crop].n} planted! Now give it some water.`, 3500); save(true);
 }
-function waterPlot(i){ const p = F.plots[i]; if (!p || !p.crop || p.wateredAt) return; p.wateredAt = Date.now(); mprop("💧", PLOTS[i].x + 50, PLOTS[i].y + 10); speak("Watered! Growing starts now. Finished quests speed it up.", 4000); save(true); }
+function waterPlot(i){ const p = F.plots[i]; if (!p || !p.crop || p.wateredAt) return; p.wateredAt = Date.now(); mprop("drop", PLOTS[i].x + 50, PLOTS[i].y + 10); speak("Watered! Growing starts now. Finished quests speed it up.", 4000); save(true); }
 function harvest(i){
   const p = F.plots[i]; if (!p || !p.crop || growth(p) < 1) return;
-  addInv(p.crop, 1); F.plots[i] = null; gainXp(1); S.harvested = (S.harvested || 0) + 1; mprop(CROPS[p.crop].e, PLOTS[i].x + 50, PLOTS[i].y + 20, 1900); act("cheer");
+  addInv(p.crop, 1); F.plots[i] = null; gainXp(1); S.harvested = (S.harvested || 0) + 1; mprop(CROPS[p.crop].ico, PLOTS[i].x + 50, PLOTS[i].y + 20, 1900); act("cheer");
   speak(`Harvested a ${CROPS[p.crop].n.toLowerCase()}! It's in your backpack.`, 4000); save(true);
 }
 
 /* =================== UI =================== */
 function notes(){
   const hm = sgHM(); let out = "";
-  if (!S.lunch && hm >= 645 && hm <= 690 && S.cleanDone) out += `<p class="note">🍲 Start cooking or order lunch now, so it's on its way. <button data-dismiss="lunch">got it</button></p>`;
-  if (!S.water2 && hm >= 780 && hm <= 870 && S.cleanDone) out += `<p class="note">💧 Top up your water bottle, or visit the well. <button data-water2>topped up</button></p>`;
+  if (!S.lunch && hm >= 645 && hm <= 690 && S.cleanDone) out += `<p class="note">${icon("bowl", 20)} Start cooking or order lunch now, so it's on its way. <button data-dismiss="lunch">got it</button></p>`;
+  if (!S.water2 && hm >= 780 && hm <= 870 && S.cleanDone) out += `<p class="note">${icon("drop", 20)} Top up your water bottle, or visit the well. <button data-water2>topped up</button></p>`;
   return out;
 }
 function journal(){
@@ -494,8 +497,8 @@ function journal(){
     const t = remaining()[0], fs = S.firstStep[t.id], pl = placeOf(t), sp = spotObj(pl, spotOf(t)), at = arrivedFor(t);
     h += `${S.last ? `<p class="ack">✓ ${esc(S.last === "clean" ? "clean done" : S.last)}</p>` : ""}
       <h1><span class="lbl">quest · ${esc(VILLAGE[pl].name)} · ${esc(sp.name)}</span>${esc(t.title)}</h1>
-      ${(t.at || t.treadmill || t.chat || t.notes || t.email) ? `<p class="stickers">${t.at ? `<span class="sticker">⏰ ${esc(t.at)}</span>` : ""}${t.treadmill ? `<span class="sticker">🚶 ${S.tread[t.id] ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t.notes ? `<span class="sticker">📝 notes</span>` : ""}${t.email ? `<span class="sticker">✉️ email</span>` : ""}${t.chat ? `<span class="sticker">💬 happens in chat</span>` : ""}</p>` : ""}
-      ${fs ? timerHTML(`${t.minutes || 25}-minute time box`) : ""}
+      ${(t.at || t.treadmill || t.chat || t.notes || t.email) ? `<p class="stickers">${t.at ? `<span class="sticker">${icon("clock", 14)} ${esc(t.at)}</span>` : ""}${t.treadmill ? `<span class="sticker">${icon("walker", 14)} ${S.tread[t.id] ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t.notes ? `<span class="sticker">${icon("note", 14)} notes</span>` : ""}${t.email ? `<span class="sticker">${icon("letter", 14)} email</span>` : ""}${t.chat ? `<span class="sticker">${icon("chat", 14)} happens in chat</span>` : ""}</p>` : ""}
+      ${(fs || (S.timer && S.timer.id === t.id)) ? timerHTML(S.timer && S.timer.kind === "deal" ? "five-minute deal, then you may stop" : `${t.minutes || 25}-minute time box`) : `<p class="stickers"><span class="sticker">${icon("clock", 14)} ${t.minutes || 25}-minute time box once you start</span></p>`}
       <ul class="bujo">${fs ? `<li>Keep going. One thing at a time.</li>` : `<li class="first"><span><span class="hl">First step only:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}</span></li><li>Then ${t.minutes || 25} minutes on the rest.</li>`}
         <li class="pep">${esc(t.pep || PEP[t.title.length % PEP.length])}</li></ul>
       ${at ? `<p class="checkin">${fs ? "Tap done when it's done." : "Tap when the first step's done."}</p>` : ""}
@@ -509,9 +512,10 @@ function journal(){
       <ul class="bujo"><li>Treadmill counts. Scrolling at your desk doesn't.</li><li>Check the garden, or sit by the pond.</li><li class="pep">Rest is part of the plan.</li></ul>
       <div class="actions"><button class="btn yes" data-a="back">I'm back</button>${!(scene === "village" && atSpot === "pond") ? `<button class="btn alt" data-a="pond">Sit by the pond</button>` : ""}${fresh ? `<button class="btn alt" data-a="flow">I'm in flow</button>` : ""}</div>`;
   } else if (ph === "decompress") {
-    h += `<h1><span class="lbl">right now</span>Decompress in chat</h1>
-      <ul class="bujo"><li>Tell chat <span class="hl">“call done”</span>.</li><li>Stomach clench, three quick points, hot drink. Chat files the rest.</li></ul>
-      <div class="actions"><button class="btn yes" data-a="decompressed">Done in chat</button></div>`;
+    const clench = S.timer && S.timer.kind === "clench";
+    h += `<h1><span class="lbl">right now</span>Decompress</h1>${clench ? timerHTML("clench and hold") : ""}
+      <ul class="bujo"><li class="first"><span><span class="hl">Stomach clench, 30 seconds.</span> Hold, then release.</span></li><li>Tell chat <span class="hl">“call done”</span> and type three quick points. Chat files them.</li><li>Make a hot drink and bring it back.</li></ul>
+      <div class="actions">${clench ? "" : `<button class="btn primary" data-a="clench">Start the 30 seconds</button>`}<button class="btn yes" data-a="decompressed">Done in chat</button></div>`;
   } else if (ph === "recap") {
     const done = allTasks().filter(t => S.doneIds.includes(t.id));
     h += `<h1><span class="lbl">that's a wrap</span>Work day's shut</h1>
@@ -532,7 +536,7 @@ function journal(){
   if (slim) {
     const title = j.querySelector("h1") ? [...j.querySelector("h1").childNodes].filter(n => !(n.classList && n.classList.contains("lbl"))).map(n => n.textContent).join("").trim() : "";
     const when = S.timer ? `<span class="when" data-tleft>${fmt(Math.max(0, S.timer.endAt - Date.now()))}</span>` : "";
-    j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">📜 <b>${esc(route.length ? "Walking… " + title : title)}</b>${when}<span class="more">open</span></button>`;
+    j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${esc(route.length ? "Walking… " + title : title)}</b>${when}<span class="more">open</span></button>`;
   }
   j.querySelectorAll("[data-qn]").forEach(el => el.onclick = ev => { ev.stopPropagation(); qnOpen = el.dataset.qn === "open"; journal(); });
   j.querySelectorAll("[data-a]").forEach(el => el.onclick = () => { const t = remaining()[0]; A[el.dataset.a](t); });
@@ -543,10 +547,10 @@ function journal(){
 // One panel over the map. A HUD view (quests / backpack / letters) takes it when opened; otherwise whatever the
 // current spot offers (shop, room quest board, garden plot, digest shelf).
 function showPanel(hasCtx, skin){
-  const views = {quests:"questsView", bag:"bagView", mail:"mailView"};
+  const views = {quests:"questsView", bag:"bagView", mail:"mailView", friend:"friendView"};
   const view = openView || (hasCtx ? "ctx" : null), p = $("panel");
   p.hidden = !view; $("map").classList.toggle("panel-open", !!view);
-  ["ctx", "questsView", "bagView", "mailView"].forEach(id => $(id).hidden = id !== (views[view] || view));
+  ["ctx", "questsView", "bagView", "mailView", "friendView"].forEach(id => $(id).hidden = id !== (views[view] || view));
   p.className = "panel " + (view === "quests" ? "cork" : view === "ctx" ? skin : "paper");
   document.querySelectorAll("[data-open]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.open === openView)));
 }
@@ -556,22 +560,22 @@ function closePanel(){
 }
 function itemBtn(id, label, disabled, extra){
   const it = ITEMS[id];
-  return `<button class="item" data-id="${id}" ${disabled ? "disabled" : ""}><span class="e">${it.e}</span><span class="n">${esc(it.n)}</span><span class="c">${label}</span>${extra || ""}</button>`;
+  return `<button class="item" data-id="${id}" ${disabled ? "disabled" : ""}><span class="e">${icon(it.ico, 34)}</span><span class="n">${esc(it.n)}</span><span class="c">${label}</span>${extra || ""}</button>`;
 }
 function ctx(){
   const c = $("ctx"); let h = "";
   if (scene === "market" && !shopClosed) {
     const tabs = [["seeds","Seeds"],["treats","Treats"],["care","Care"],["sell","Sell"]];
-    h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have 🪙 ${F.coins}. Seeds and treats go straight into your backpack.</p>
+    h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
       <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-shop="${k}" aria-selected="${shopTab === k}">${n}</button>`).join("")}</div><div class="items shop">`;
     if (shopTab === "sell") {
       const sellable = Object.keys(F.inv).filter(id => ITEMS[id] && ITEMS[id].sell);
-      h += sellable.length ? sellable.map(id => itemBtn(id, `sell <b>+${ITEMS[id].sell}</b> 🪙`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("") : `<p class="muted" style="grid-column:1/-1">Nothing to sell yet. Grow something in the garden!</p>`;
+      h += sellable.length ? sellable.map(id => itemBtn(id, `sell <b>+${ITEMS[id].sell}</b> ${icon("coin", 13)}`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("") : `<p class="muted" style="grid-column:1/-1">Nothing to sell yet. Grow something in the garden!</p>`;
     } else {
       h += Object.keys(ITEMS).filter(id => ITEMS[id].tab === shopTab).map(id => {
         const it = ITEMS[id], locked = it.need && S.earned < it.need, owned = it.kind === "tool" && F.inv[id];
         const extra = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)}` : "";
-        return itemBtn(id, locked ? `earn ${it.need} today` : owned ? "owned" : `<b>${it.price}</b> 🪙${extra}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
+        return itemBtn(id, locked ? `earn ${it.need} today` : owned ? "owned" : `<b>${it.price}</b> ${icon("coin", 13)}${extra}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
       }).join("");
     }
     h += `</div>`;
@@ -584,9 +588,9 @@ function ctx(){
         : `<p class="sub">No seeds in your backpack. The market sells them.</p>`;
     } else {
       const g = growth(p), cr = CROPS[p.crop];
-      if (!p.wateredAt) h += `<p class="sub">${cr.e} ${cr.n} seeds, waiting for water.</p><div class="actions"><button class="btn primary" data-farm="water">Water it</button></div>`;
-      else if (g < 1) { const left = cr.dur*(1 - g); h += `<p class="sub">${cr.e} ${cr.n}, growing. About ${dur(left)} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(g*100).toFixed(0)}%"></i></div>`; }
-      else h += `<p class="sub">${cr.e} ${cr.n} is ready!</p><div class="actions"><button class="btn yes" data-farm="harvest">Harvest</button></div>`;
+      if (!p.wateredAt) h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n} seeds, waiting for water.</p><div class="actions"><button class="btn primary" data-farm="water">Water it</button></div>`;
+      else if (g < 1) { const left = cr.dur*(1 - g); h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n}, growing. About ${dur(left)} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(g*100).toFixed(0)}%"></i></div>`; }
+      else h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n} is ready!</p><div class="actions"><button class="btn yes" data-farm="harvest">Harvest</button></div>`;
     }
   } else if (shelfOpen) {
     const ready = digestReady(), next = nextDigest(), past = pastDigests();
@@ -604,7 +608,7 @@ function ctx(){
     const list = scene === "village" ? allTasks() : questsIn(scene), cur = phase() === "task" ? remaining()[0].id : null;
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>${scene === "village" ? "Town quest board" : esc(ROOMS[scene].name) + " quests"}</h2>
       ${list.length ? `<ul class="qlist">${list.map(t => { const dn = S.doneIds.includes(t.id), sp = spotObj(placeOf(t), spotOf(t));
-        return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"><span><b>${esc(t.title)}</b><small>${scene === "village" ? VILLAGE[placeOf(t)].emo + " " + esc(VILLAGE[placeOf(t)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : "<span></span>"}</li>`; }).join("")}</ul>`
+        return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"${!dn && t.id !== cur && phase() !== "clean" ? ` data-next="${esc(t.id)}" role="button"` : ""}><span><b>${esc(t.title)}</b><small>${scene === "village" ? icon(placeOf(t), 16) + " " + esc(VILLAGE[placeOf(t)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : "<span></span>"}</li>`; }).join("")}</ul>`
         : `<p class="sub">No quests ${scene === "village" ? "today yet" : "in here today"}.</p>`}
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
   }
@@ -617,7 +621,7 @@ function ctx(){
     else if (scene === "farm") plant(selPlot, id);
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
-  c.querySelectorAll("[data-next]").forEach(b => b.onclick = () => doNext(b.dataset.next));
+  c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
   c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; ctx(); });
   c.querySelectorAll("[data-dig]").forEach(b => b.onclick = () => {
     const k = b.dataset.dig;
@@ -634,7 +638,7 @@ function bag(){
     const lbl = it.kind === "seed" ? "plant in garden" : it.kind === "tool" ? "use" : it.kind === "food" ? "feed" : it.kind === "flower" ? "give" : "use";
     return itemBtn(id, lbl, it.kind === "seed", it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`); }).join("");
   $("bag").querySelectorAll(".item").forEach(b => b.onclick = () => useItem(b.dataset.id));
-  $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome gift of seeds is in here 🌷 Plant them in the garden." : "";
+  $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome gift of seeds is in here. Plant them in the garden." : "";
   $("play").innerHTML = [["pet","Pet"],["hide","Hide-and-seek"],["nap","Nap together"]].map(([k, n]) => `<button class="btn alt small" data-play="${k}">${n}</button>`).join("");
   $("play").querySelectorAll("[data-play]").forEach(b => b.onclick = () => playFree(b.dataset.play));
 }
@@ -643,10 +647,11 @@ function trackers(){
   for (let i = 0; i < 8; i++) { const b = document.createElement("button"); b.className = "box" + (i < S.water ? " on" : ""); b.setAttribute("aria-label", `Water bottle ${i+1}`); b.onclick = () => { if (i >= S.water) A.water(); }; w.appendChild(b); }
   const s = $("stepBoxes"); s.innerHTML = "";
   for (let i = 0; i < 5; i++) { const b = document.createElement("button"); b.className = "box step" + (i < Math.floor(S.steps/1000) ? " on" : ""); b.setAttribute("aria-label", "Update steps"); b.onclick = openSteps; s.appendChild(b); }
-  $("stepNote").textContent = S.steps ? S.steps.toLocaleString() : "tap to log";
+  $("stepNote").textContent = S.steps ? S.steps.toLocaleString() : "log";
 }
 function openSteps(force){
   const f = $("stepForm"); f.classList.toggle("open", force === true ? true : !f.classList.contains("open"));
+  measureHud();
   if (f.classList.contains("open")) $("stepIn").focus({preventScroll: true});
 }
 function questMark(){
@@ -674,7 +679,7 @@ function render(redraw){
   if (redraw) drawScene();
   const L = level(), next = LEVELS[L+1];
   $("title").firstChild.textContent = `${F.name}'s village`;
-  $("trayName").textContent = F.name;
+  $("trayName").textContent = F.name; $("friendName").textContent = F.name;
   const d = new Date(now() + 6*H);
   $("dateLine").textContent = d.toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long", timeZone:"UTC"}) + (F.streak >= 2 && F.lastActive === dayKey() ? ` · ${F.streak} cosy days in a row` : "");
   $("coins").textContent = F.coins;
@@ -685,17 +690,19 @@ function render(redraw){
   $("bunting").style.display = L >= 4 ? "" : "none";
   $("crown").style.display = S.crown ? "" : "none";
   pose();
-  if (!speechLock) $("speech").textContent = say ? say.line : defaultLine();
+  if (!speechLock) $("speech").textContent = plain(say ? say.line : defaultLine());
   const span = next ? next.xp - LEVELS[L].xp : 1, into = next ? F.xp - LEVELS[L].xp : 1, filled = Math.round(Math.min(1, into/span)*5);
-  $("friendBody").innerHTML = `<p class="hearts" aria-label="${filled} of 5 hearts to next level">${"♥".repeat(filled)}${"♡".repeat(5 - filled)}</p>
-    <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed 💕"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>`;
+  $("friendBody").innerHTML = `<p class="hearts" aria-label="${filled} of 5 hearts to next level">${Array.from({length: 5}, (_, i) => icon("heart", 22, i < filled ? "" : "faint")).join("")}</p>
+    <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed!"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>`;
   const all = allTasks(), rem = remaining(), cur = (phase() === "task" && rem[0]) ? rem[0].id : null;
   $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
   $("qBadge").hidden = !rem.length; $("qBadge").textContent = rem.length;
   $("list").innerHTML = all.map(t => { const dn = S.doneIds.includes(t.id);
-    return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"><span class="pl">${VILLAGE[placeOf(t)].emo}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : String(t.id).startsWith("x") && !dn ? `<button data-rm="${esc(t.id)}" aria-label="Remove">✕</button>` : "<span></span>"}</li>`; }).join("");
+    const pickable = !dn && t.id !== cur && phase() !== "clean";
+    return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : String(t.id).startsWith("x") && !dn ? `<button data-rm="${esc(t.id)}" aria-label="Remove">✕</button>` : "<span></span>"}</li>`; }).join("");
   $("list").querySelectorAll("[data-rm]").forEach(el => el.onclick = () => { S.extra = S.extra.filter(x => x.id !== el.dataset.rm); save(true); });
-  $("list").querySelectorAll("[data-next]").forEach(el => el.onclick = () => doNext(el.dataset.next));
+  $("list").querySelectorAll("[data-next]").forEach(el => el.onclick = ev => { ev.stopPropagation(); doNext(el.dataset.next); });
+  $("list").querySelectorAll("[data-pick]").forEach(el => el.onclick = () => doNext(el.dataset.pick));
   questMark(); journal(); ctx(); bag(); trackers(); mailCard(); sunsamaLine(); refreshNotebook();
 }
 /* =================== WORLD SIM =================== */
@@ -710,7 +717,7 @@ const bounds = () => scene === "village" ? [14, 150, W - 14, HH - 14] : [34, 168
 function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
   setTimeout(() => {
-    scene = id; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; resetNpcs();
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
     if (id === "village") { evan.x = evan.tx = 250; evan.y = evan.ty = 380; }
@@ -764,7 +771,7 @@ svg.addEventListener("click", ev => {
   const ug = ev.target.closest("[data-ugarden]");
   if (ug) { const k = ug.dataset.ugarden, st = ST[k] || {}; speak(`${(st.users || 0).toLocaleString()} ${k === "chord" ? "creatives use Chord" : "families use Chico"}! One flower for every ${st.per > 0 ? st.per : 10}.`, 4500); return; }
   const ent = ev.target.closest("[data-ent]");
-  if (ent && ent.dataset.ent === "evan") { evanSays(pick(["Mama!", "hug!", "hehe!", "up up!"])); mprop("💛", evan.x, evan.y - 40); evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; return; }
+  if (ent && ent.dataset.ent === "evan") { evanSays(pick(["Mama!", "hug!", "hehe!", "up up!"])); mprop("heart", evan.x, evan.y - 40); evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; return; }
   if (ent && ent.dataset.ent === "maple") { hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please."]), 3000); return; }
   const pl = ev.target.closest("[data-place]");
   if (pl && scene === "village") {
@@ -825,14 +832,32 @@ function placeNode(n, e){
   n.firstElementChild.setAttribute("transform", `scale(${e.dir} 1)`);
   n.classList.toggle("walk", e.moving);
 }
+// Camera: when the map box is narrower than the 520x640 scene (phone, full screen), show the full height and pan
+// left/right to follow Mel. Overlays (bubbles, floating icons) convert scene coords with cam.
+const cam = {x: 0, w: W, s: 1, top: 0, snap: true, key: ""};
+function updateCam(dt){
+  const m = $("map"), cw = m.clientWidth, ch = m.clientHeight; if (!cw || !ch) return;
+  const a = cw/ch, vw = a < W/HH - .005 ? HH*a : W;
+  const tx = clamp(mel.x - vw/2, 0, W - vw);
+  cam.x = cam.snap ? tx : cam.x + (tx - cam.x)*Math.min(1, dt*3.2); cam.snap = false;
+  cam.w = vw; cam.s = vw < W ? ch/HH : cw/W;
+  const key = cam.x.toFixed(1) + "," + vw.toFixed(1);
+  if (key !== cam.key) { cam.key = key; svg.setAttribute("viewBox", `${cam.x.toFixed(1)} 0 ${vw.toFixed(1)} ${HH}`); }
+}
+function measureHud(){
+  const hb = document.querySelector(".hudbar"), m = $("map");
+  cam.top = getComputedStyle(hb).position === "fixed" ? Math.max(0, hb.getBoundingClientRect().bottom - m.getBoundingClientRect().top + 4) : 0;
+  m.style.setProperty("--ovTop", (cam.top ? cam.top + 4 : 8) + "px");
+}
+addEventListener("resize", () => { cam.snap = true; measureHud(); });
 function bubbleAt(el, ex, ey, off, forceBelow){
   if (el.hidden) return;
-  const wrap = $("map"), cw = wrap.clientWidth, sc = cw / W;
-  const bw = el.offsetWidth, bh = el.offsetHeight, px = ex*sc, py = (ey - off)*sc;
+  const wrap = $("map"), cw = wrap.clientWidth, sc = cam.s;
+  const bw = el.offsetWidth, bh = el.offsetHeight, px = (ex - cam.x)*sc, py = (ey - off)*sc;
   const left = clamp(px, bw/2 + 2, cw - bw/2 - 2);
   el.style.left = left + "px"; el.style.setProperty("--tail", clamp(px - left + bw/2, 16, bw - 16) + "px");
   const roomBelow = (ey + 8)*sc + 10 + bh < wrap.clientHeight + 4;
-  const below = (forceBelow && roomBelow) || py - bh - 10 < -6; el.classList.toggle("below", below);
+  const below = (forceBelow && roomBelow) || py - bh - 10 < cam.top - 6; el.classList.toggle("below", below);
   el.style.top = (below ? (ey + 8)*sc + 10 : py - 10) + "px";
 }
 let last = performance.now();
@@ -860,7 +885,7 @@ function frame(now){
   if (!sleeping) { maple.tx = mel.x - mel.dir*24; maple.ty = mel.y + 3; const d = Math.hypot(maple.tx - maple.x, maple.ty - maple.y); stepTo(maple, Math.max(120, d*3.2), dt); if (!maple.moving) maple.dir = mel.dir; }
   else maple.moving = false;
   tickEvan(dt);
-  tickNpcs(dt);
+  tickNpcs(dt); updateCam(dt);
   placeNode(nodes.mel, mel); placeNode(nodes.maple, maple); placeNode(nodes.evan, evan);
   // On the treadmill with the time box running: Mel walks in place.
   if (scene === "home" && atSpot === "treadmill" && !route.length && S.timer && S.timer.kind === "task" && Math.abs(mel.x - mel.tx) < 2) { nodes.mel.classList.add("walk"); mel.dir = 1; }
@@ -882,7 +907,7 @@ $("stepForm").onsubmit = e => {
   S.steps = v; const ms = Math.floor(v/1000);
   if (ms > S.stepMs) { earn(2*(ms - S.stepMs), "steps"); S.stepMs = ms; }
   speak(v >= 5000 ? `${v.toLocaleString()}! 5,000 smashed 🎉` : `${v.toLocaleString()}. ${(5000 - v).toLocaleString()} to go!`, 5000);
-  $("stepIn").value = ""; $("stepForm").classList.remove("open"); act(v >= 5000 ? "cheer" : "nudge"); save();
+  $("stepIn").value = ""; $("stepForm").classList.remove("open"); measureHud(); act(v >= 5000 ? "cheer" : "nudge"); save();
 };
 $("addForm").onsubmit = e => {
   e.preventDefault(); const title = $("addTitle").value.trim(); if (!title) return;
@@ -892,13 +917,15 @@ $("addForm").onsubmit = e => {
 $("nameSave").onclick = () => { const v = $("nameIn").value.trim(); if (v) { F.name = v; $("nameIn").value = ""; act("cheer"); speak(`Hi! I'm ${v} now 🦊`, 4000); save(); } };
 $("pet").onclick = () => { hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please.", "You're my favourite human."]), 3000); };
 
+document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
 $("pclose").onclick = closePanel;
 document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; ctx(); });
 initNotebook({task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
   sayNow:() => say, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),
   placeLabel:t => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`});
 initNpcs({scene:() => scene, bounds, mel, evan, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
-  openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()} ${ITEMS[id].e}`); save(); }});
+  openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
+measureHud();
 render(true);
 if (F.gift) setTimeout(() => speak("A welcome gift! Seeds are in your backpack 🌷", 5000), 1200);
 requestAnimationFrame(frame);

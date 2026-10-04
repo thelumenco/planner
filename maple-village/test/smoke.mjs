@@ -32,7 +32,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#journal h1").textContent().then(t => /Five-minute clean/.test(t)), "day opens with the five-minute clean");
   const lay = await page.evaluate(() => ({ hud: document.querySelector(".hudbar").getBoundingClientRect().bottom, map: document.querySelector("#map").getBoundingClientRect().top,
     fits: document.documentElement.scrollHeight <= innerHeight + 2, note: !!document.querySelector("#map #journal h1") }));
-  check(lay.hud <= lay.map, "trackers sit above the map");
+  if (vp.name === "phone") {
+    const full = await page.evaluate(() => { const r = document.querySelector("#map").getBoundingClientRect(), h = document.querySelector(".hudbar").getBoundingClientRect(); return {h: r.height, w: r.width, hudTop: h.top}; });
+    check(full.h >= 840 && full.w >= 388, "on the phone the map fills the whole screen");
+    check(full.hudTop < 80, "trackers float at the top of the screen");
+    check(await page.locator(".scenebar .hbtn").count() === 4, "four drawn icons in the corner");
+    check(!(await page.locator(".hbtn").first().textContent()).match(/\p{Extended_Pictographic}/u), "corner icons are drawn, not emoji");
+  } else check(lay.hud <= lay.map, "trackers sit above the map");
   check(lay.fits, "the whole game fits on screen without scrolling");
   check(lay.note, "the quest note is pinned on the map");
 
@@ -113,16 +119,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.screenshot({ path: join(shots, `${vp.name}-9-cork.png`) });
   await page.click("#pclose");
   check(await page.locator("#panel").isHidden(), "closing the board returns to the map");
+  await page.click('[data-open="friend"]');
+  check(await page.locator("#friendView .hearts .ico").count() === 5, "friendship has its own corner icon and drawn hearts");
+  await page.click("#pclose");
 
   // Library digest shelf: first read is free, the second is locked until an hour passes or a quest is done
-  await page.locator('#world [data-place="fresh"]').first().click({ force: true }).catch(() => {});
+  await page.locator('#world [data-place="fresh"]').first().dispatchEvent("click").catch(() => {});
   await page.evaluate(() => document.querySelector("#world [data-exit]") && document.querySelector("#world [data-exit]").dispatchEvent(new MouseEvent("click", {bubbles: true})));
   await page.waitForFunction(() => /village/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   if (await page.locator('#journal [data-qn="min"]').count()) await page.click('#journal [data-qn="min"]');
-  await page.locator('#world [data-place="fresh"]').first().click({ force: true });
+  await page.locator('#world [data-place="fresh"]').first().dispatchEvent("click");
   await page.waitForFunction(() => /library/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 });
   await page.waitForTimeout(400);
-  await page.locator('#world [data-spot="digest"]').click({ force: true });
+  await page.locator('#world [data-spot="digest"]').dispatchEvent("click");
   await page.waitForFunction(() => document.querySelector('#ctx [data-dig="next"]'), null, { timeout: 20000 });
   await page.click('#ctx [data-dig="next"]');
   await page.waitForTimeout(300);
@@ -136,7 +145,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('[data-open="mail"]');
   await page.locator('#mailList [data-mail]').last().click();
   await page.waitForTimeout(300);
-  check(await page.locator("#notebook .masthead").count() > 0, "morning briefing opens as The Morning Crier");
+  check(await page.locator("#nbPage.news .nmast").count() > 0, "morning briefing opens as The Morning Crier newspaper");
   await page.screenshot({ path: join(shots, `${vp.name}-8-briefing.png`) });
   await page.click('#notebook [data-nb="thanks"]');
 

@@ -123,3 +123,64 @@
 .map.panel-open .qnote{visibility:hidden}
 .panel .portrait .scene{max-width:240px;margin:0 auto}
 .earn{height:0;min-height:0;overflow:visible;position:relative;top:2px;z-index:8;pointer-events:none}
+
+/* ---------- round 4: drawn icons, full-size note, friendship, pickable quests ---------- */
+.ico{display:inline-block;vertical-align:-.28em;flex:none;overflow:visible}
+.berries{display:flex;align-items:center;gap:4px;font-size:1.1rem}
+.berries .ico{width:22px;height:22px}
+.hbtn i{display:grid;place-items:center;font-style:normal}
+.trk .lbl .ico{width:20px;height:20px}
+.hearts{display:flex;gap:4px}
+.hearts .ico.faint{opacity:.25;filter:grayscale(1)}
+.item .e{line-height:1;display:grid;place-items:center;min-height:36px}
+.prop .ico,.mprop .ico{display:block}
+.note .ico{vertical-align:-.35em;margin-right:2px}
+/* the open note fills the map; folded it's a tab */
+.map .qnote:not(.slim){inset:8px;top:var(--ovTop,8px);max-height:none;transform:none;padding:24px 22px 18px}
+.map .qnote:not(.slim) h1{font-size:clamp(1.5rem,5.5vw,1.9rem);margin:0 34px 14px 0}
+.map .qnote:not(.slim) .lbl{font-size:.68rem}
+.map .qnote:not(.slim) .bujo{font-size:1.02rem;gap:8px;line-height:1.55;margin-bottom:16px}
+.map .qnote:not(.slim) .timer{margin:0 0 16px}
+.map .qnote:not(.slim) .ring{width:62px;height:62px}
+.map .qnote:not(.slim) .timer .t{font-size:2rem}
+.map .qnote:not(.slim) .btn{padding:12px 24px;font-size:1rem}
+.map .qnote:not(.slim) .checkin{font-size:1.1rem}
+.map .qnote.slim{top:var(--ovTop,8px)}
+.map .qnote.slim.low{top:auto;bottom:8px}
+.map .qnote.low:not(.slim){top:var(--ovTop,8px);bottom:8px}
+.map .panel{top:var(--ovTop,8px)}
+.panel.cork .pinned li.pick,.panel.cork .qlist li[data-next]{cursor:pointer}
+.panel.cork .pinned li.pick:hover{transform:rotate(0) translateY(-2px)}
+.panel.cork li small{display:block}
+
+/* ---------- phone: the map is the whole screen, HUD floats on top ---------- */
+@media (max-width:640px){
+  html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+  :root{padding:0;--ovTop:calc(env(safe-area-inset-top,0px) + 96px)}
+  .wrap{padding:0;gap:0;height:100dvh;display:block}
+  .wrap > *{width:auto}
+  .head{display:none}
+  .mapcard{position:fixed;inset:0;padding:0;border:0;border-radius:0;box-shadow:none;background:var(--grass)}
+  .mapcard > .tape,.maphint{display:none}
+  .map{position:absolute;inset:0;aspect-ratio:auto}
+  .map > svg{border-radius:0}
+  .scenebar{position:fixed;z-index:20;top:calc(env(safe-area-inset-top,0px) + 8px);left:8px;right:8px;margin:0;gap:6px}
+  .scenebar .scenename,.scenebar .berries{flex:none;background-color:var(--card);background-image:var(--fibre);border:1px solid var(--edge);border-radius:999px;padding:5px 12px;font-size:.92rem;line-height:1.3;box-shadow:0 6px 14px -10px rgba(60,40,30,.5)}
+  .scenebar .scenename{max-width:36vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+  .scenebar .scenename span + span{display:none}
+  .scenebar .berries{padding:4px 10px;margin-right:auto;font-size:1rem}
+  .hbtn{width:38px;height:38px;background-color:var(--card);box-shadow:0 6px 14px -10px rgba(60,40,30,.5)}
+  .hudbar{position:fixed;z-index:20;top:calc(env(safe-area-inset-top,0px) + 54px);left:8px;right:8px;flex-wrap:wrap;padding:4px 10px;background-color:color-mix(in srgb,var(--card) 92%,transparent)}
+  .hudbar .box{width:16px;height:16px}
+  .earn{position:fixed;z-index:21;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 92px)}
+}
+@media (max-width:640px){
+  .hudbar{flex-wrap:nowrap;gap:8px;justify-content:space-between}
+  .hudbar .stepform.open{flex-basis:100%}
+  .hudbar:has(.stepform.open){flex-wrap:wrap}
+  .hudbar .boxes{gap:2px}
+  .hudbar .box{width:14px;height:14px;border-radius:4px}
+  .trk{gap:4px}
+  .trk .lbl .ico{width:18px;height:18px}
+  .hudbar .tnote{font-size:.72rem;white-space:nowrap}
+}

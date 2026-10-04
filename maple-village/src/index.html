@@ -6,7 +6,7 @@
 <title>Maple's village</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Mulish:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Mulish:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@700;900&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 <style>/*STYLES*/</style>
 </head>
 <body>
@@ -22,16 +22,24 @@
       <feMerge><feMergeNode in="d"/><feMergeNode in="streaks"/></feMerge>
     </filter>
     <filter id="wash" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="7"/><feDisplacementMap in="SourceGraphic" scale="18"/><feGaussianBlur stdDeviation="1.2"/></filter>
+    <filter id="wobS" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.25" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale=".7"/></filter>
+    <filter id="markerS" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.2" numOctaves="2" seed="9" result="w"/>
+      <feDisplacementMap in="SourceGraphic" in2="w" scale=".9" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency="2.4 .3" numOctaves="2" seed="2" result="g"/>
+      <feColorMatrix in="g" type="matrix" values="0 0 0 0 .35  0 0 0 0 .16  0 0 0 0 .06  0 0 0 1.1 -.5" result="ga"/>
+      <feComposite in="ga" in2="d" operator="in" result="streaks"/>
+      <feMerge><feMergeNode in="d"/><feMergeNode in="streaks"/></feMerge>
+    </filter>
   </defs>
 </svg>
 <main class="wrap">
   <div class="head">
     <h1 class="title" id="title">Maple's village<small id="dateLine"></small></h1>
-    <div class="berries" title="Coins">🪙 <span id="coins">0</span></div>
   </div>
   <div class="hudbar" aria-label="Today's trackers">
-    <div class="trk"><span class="lbl" aria-hidden="true">💧</span><span class="sr">Water</span><div class="boxes" id="waterBoxes"></div></div>
-    <div class="trk"><span class="lbl" aria-hidden="true">👣</span><span class="sr">Steps</span><div class="boxes" id="stepBoxes"></div><span class="tnote" id="stepNote"></span></div>
+    <div class="trk"><span class="lbl" aria-hidden="true" data-ico="drop"></span><span class="sr">Water</span><div class="boxes" id="waterBoxes"></div></div>
+    <div class="trk"><span class="lbl" aria-hidden="true" data-ico="steps"></span><span class="sr">Steps</span><div class="boxes" id="stepBoxes"></div><span class="tnote" id="stepNote"></span></div>
     <form class="stepform" id="stepForm">
       <label class="sr" for="stepIn">Steps showing now</label>
       <input id="stepIn" type="number" inputmode="numeric" min="0" placeholder="steps showing now">
@@ -43,10 +51,12 @@
     <span class="tape dots" aria-hidden="true"></span>
     <div class="scenebar">
       <p class="scenename" id="sceneName">Village</p>
+      <div class="berries" title="Coins"><span data-ico="coin" aria-hidden="true"></span><span id="coins">0</span></div>
       <div class="hudbtns">
-        <button class="hbtn" data-open="quests" aria-label="All quests">📋<span class="badge" id="qBadge" hidden></span></button>
-        <button class="hbtn" data-open="bag" aria-label="Backpack and Maple">🎒</button>
-        <button class="hbtn" data-open="mail" aria-label="Letters">✉️<span class="badge" id="mailBadge" hidden></span></button>
+        <button class="hbtn" data-open="quests" aria-label="Quest board" title="Quest board"><i data-ico="board" data-size="24"></i><span class="badge" id="qBadge" hidden></span></button>
+        <button class="hbtn" data-open="bag" aria-label="Backpack" title="Backpack"><i data-ico="bag" data-size="24"></i></button>
+        <button class="hbtn" data-open="friend" aria-label="Friendship with Maple" title="Friendship"><i data-ico="heart" data-size="24"></i></button>
+        <button class="hbtn" data-open="mail" aria-label="Letters" title="Letters"><i data-ico="letter" data-size="24"></i><span class="badge" id="mailBadge" hidden></span></button>
       </div>
     </div>
     <div class="map" id="map">
@@ -286,7 +296,9 @@
           <p class="muted" id="bagHint"></p>
           <p class="eyebrow" style="margin:18px 0 8px">Play for free</p>
           <div class="actions" id="play"></div>
-          <h3 class="ph3">Friendship</h3>
+        </div>
+        <div class="pview" id="friendView" hidden>
+          <h2>Friendship with <span id="friendName">Maple</span></h2>
           <div id="friendBody"></div>
           <div class="row">
             <label class="sr" for="nameIn">Fox's name</label>

@@ -2,7 +2,7 @@
 // and runs agent messengers who carry unread mail to Mel. Core owns the frame loop and calls tickNpcs / tapNpc.
 import { NPCS, AGENTS } from "../data/npcs.js";
 import { personArt, letterArt } from "../art/people.js";
-import { sgHM, pick, rnd, clamp, $ } from "../util.js";
+import { sgHM, pick, rnd, clamp, $, plain } from "../util.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const ents = {};            // id -> entity (villagers and the active messenger)
@@ -94,7 +94,7 @@ export function courierDelivered(itemId){
 /* ---------- talking ---------- */
 function say(e, text, ms = 3800){
   const el = $("npcSay"); sayer = e;
-  el.textContent = e.kind === "agent" ? text : `${e.def.name}: ${text}`; el.hidden = false;
+  el.textContent = plain(e.kind === "agent" ? text : `${e.def.name}: ${text}`); el.hidden = false;
   clearTimeout(sayT); sayT = setTimeout(hideSay, ms);
 }
 function hideSay(){ $("npcSay").hidden = true; sayer = null; }

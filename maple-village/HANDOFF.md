@@ -224,4 +224,11 @@ Round 3: everything happens on the map, no scrolling (Mel's principle: if possib
 - The quest card is now a washi-taped note pinned on the map. It folds to one line while walking or when tapped away, re-opens when the quest step changes, and docks on the opposite half from Mel.
 - Quest board = a cork board with pinned notes; shop, garden plot, digest shelf, backpack (with Maple) and letters all open as panels over the map. HUD buttons: 📋 quests, 🎒 backpack, ✉️ letters (with counts).
 
+Round 4:
+- No emoji anywhere: a hand-drawn icon set (`art/icons.js`, ink + marker like the map) for the corner icons, trackers, coins, shop and backpack items, seed packets, place markers, stickers, floating hearts/coins and the garden. Game speech strips any stray emoji (`plain()`); Mel's own Sunsama text is left alone.
+- Phone: the map fills the screen; scene name, coins and four corner icons (quest board, backpack, friendship, letters) float top-right, trackers in a strip under them. A camera pans left/right to follow Mel.
+- The open quest note fills the map (Mel's choice). Timers show for the clean, the time box, the 5-minute deal, breaks, and a new 30-second clench in the decompress note.
+- Any quest can be picked any time: tap its note on the cork board ("do this now"). Boss mode still hands out one at a time.
+- The morning briefing prints as *The Morning Crier*: masthead, volume line, headline, lede, a front-page story and two columns.
+
 Not done yet: publishing the new build to the live link (needs `sample` added to the capabilities), stage 3 ideas (8.5), collision-aware walking and a camera/zoom for small phones (4.6).

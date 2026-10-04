@@ -79,3 +79,32 @@ body.nb-open{overflow:hidden}
 .nbby{display:block;font-family:Mulish,sans-serif;font-weight:600;font-size:.9rem;color:#8A8279;margin-top:2px;letter-spacing:0}
 .shelf .status{margin:0 0 16px}
 .shelf .status b{color:var(--navy)}
+
+/* ---------- The Morning Crier: newsprint, not notebook ---------- */
+.nbpage.news{background:#F2EEE4;background-image:var(--fibre);color:#1F1C1A;transform:none;border-radius:1px;padding:22px 24px 0;clip-path:none;
+  box-shadow:0 1px 0 #E2DCCF,0 2px 0 #F7F4EC,0 3px 0 #DDD6C8,0 30px 60px -30px rgba(40,30,20,.55);animation:nbunfold .35s ease}
+@keyframes nbunfold{from{transform:scaleY(.6) translateY(30px);opacity:.3}to{transform:none}}
+.nbpage.news::before,.nbpage.news::after{display:none}
+.nbpage.news .nbx{color:#5E5650}
+.nhead{text-align:center;margin:0 30px 0;border-bottom:4px double #1F1C1A;padding-bottom:6px}
+.nears{display:flex;justify-content:space-between;gap:10px;font:600 .66rem/1.4 Mulish,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4A433D;border-bottom:1px solid #1F1C1A;padding-bottom:4px}
+.nmast{font-family:"UnifrakturMaguntia","Old English Text MT",Georgia,serif;font-size:clamp(2.1rem,9vw,3.4rem);line-height:1.05;margin:8px 0 4px;letter-spacing:.01em}
+.nline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font:italic 400 .8rem/1.4 Lora,Georgia,serif;border-top:1px solid #1F1C1A;padding-top:4px}
+.nbpage.news .nbbody{line-height:1.5;font-family:Lora,Georgia,serif;font-size:.98rem;padding-top:10px}
+.nheadline{font-family:"Playfair Display",Georgia,serif;font-weight:900;font-size:clamp(1.5rem,6vw,2.2rem);line-height:1.08;margin:6px 0 10px;text-align:center;letter-spacing:-.01em}
+.nlede{font-style:italic;text-align:center;margin:0 auto 12px;max-width:34em;color:#3A332E}
+.nlede p{margin:0}
+.nfront{border-top:1px solid #1F1C1A;border-bottom:1px solid #1F1C1A;padding:8px 0;margin:0 0 12px}
+.nfront h3{font-size:1.25rem}
+.nfront li{font-size:1.05rem}
+.ncols{columns:2 12em;column-gap:22px;column-rule:1px solid #B9B0A2}
+.nsec{break-inside:avoid;margin:0 0 12px}
+.nsec h3{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:1.02rem;margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #1F1C1A;padding-bottom:2px}
+.nsec ul{margin:0;padding:0;list-style:none}
+.nsec li{padding:2px 0 2px 12px;position:relative}
+.nsec li::before{content:"";position:absolute;left:0;top:.72em;width:5px;height:5px;background:#1F1C1A;transform:rotate(45deg)}
+.nsec a,.nmore a{color:#1F1C1A;text-decoration:underline}
+.nmore{text-align:center;font-style:italic}
+.nbpage.news .nbactions{background:transparent;border-top:4px double #1F1C1A;justify-content:center}
+.nbpage.news .btn.yes{background:#1F1C1A;color:#F2EEE4}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .nbpage.news{filter:brightness(.92)}}

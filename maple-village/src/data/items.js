@@ -43,3 +43,8 @@ export const LEVELS = [
 export const PEP = ["You don't have to feel ready. You just have to open it.", "Small and steady still counts. This is how the week moves.",
   "You've done harder things than this before lunch.", "Start messy. Tidy later. That's allowed.", "I'll be right here. Go on."];
 export const YAY = ["Quest complete! ✨", "Look at you go!", "Done! Happy fox wiggle.", "Quest done. Proud of you, properly."];
+
+// Hand-drawn icon name for an item (see art/icons.js): seeds draw as a seed packet of their crop.
+export const itemIco = id => ITEMS[id] && ITEMS[id].kind === "seed" ? "seed:" + ITEMS[id].crop : id;
+Object.keys(ITEMS).forEach(id => { ITEMS[id].ico = itemIco(id); });
+Object.keys(CROPS).forEach(id => { CROPS[id].ico = id; });

@@ -37,6 +37,7 @@ src/
   art/buildings.js    the five work buildings, each with its own architecture
   art/interiors.js    per-building floors, walls and decor (furniture layout is ROOMS[id].pos)
   art/people.js       villager sprite rig
+  art/icons.js        hand-drawn icon set (no emoji in the game)
   game/core.js        state + db sync, quest flow, actions, UI renderers, world sim
   game/sunsama.js     pulls today's Sunsama tasks via the mcp capability and turns them into quests
   game/npcs.js        villager routines, taps, reactions, mail messengers

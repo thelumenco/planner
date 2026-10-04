@@ -4,6 +4,7 @@ import { ink } from "../util.js";
 import { VILLAGE, ROOMS, stationsOf } from "../data/world.js";
 import { CROPS, PLOTS } from "../data/items.js";
 import { roomShell } from "./interiors.js";
+import { iconAt } from "./icons.js";
 import { townHall, chordWorkshop, library, chicoCottage, postOffice } from "./buildings.js";
 
 let G = null;
@@ -132,7 +133,7 @@ export function roomArt(id){
     ${sk(`<rect x="222" y="40" width="76" height="56" rx="3" style="fill:var(--wood)"/>`, `<rect x="222" y="40" width="76" height="56" rx="3"/>${notesArt(230, 50, G.questsIn(id).filter(t => !G.S().doneIds.includes(t.id)).length)}`)}${tapeLabel(260, 112, "Quests here", "var(--butter)")}</g>`;
   else h += sk(`<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
     `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`) +
-    `<g font-size="18">${["🍎","🥟","🐟","🍯"].map((e, i) => `<text x="${54 + i*30}" y="72">${e}</text>`).join("")}${["🌷","🥕","🍓","🌻"].map((e, i) => `<text x="${54 + i*30}" y="110">${e}</text>`).join("")}${["🧶","⚽","🪮","🌸"].map((e, i) => `<text x="${364 + i*30}" y="72">${e}</text>`).join("")}${["🛁","⛺","🌽","🫐"].map((e, i) => `<text x="${364 + i*30}" y="110">${e}</text>`).join("")}</g>`;
+    `<g>${[["apple","dumpling","fish","toast"],["tulip","carrot","strawberry","sunflower"]].map((row, r) => row.map((n, i) => iconAt(n, 64 + i*30, 62 + r*38, 26)).join("")).join("")}${[["yarn","ball","brush","crown"],["bath","fort","corn","blueberry"]].map((row, r) => row.map((n, i) => iconAt(n, 374 + i*30, 62 + r*38, 26)).join("")).join("")}</g>`;
   st.forEach(s => {
     h += `<g data-spot="${s.id}" aria-label="${s.name}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${tapeLabel(s.x, s.y + 24, s.name, "var(--card)")}</g>`;
   });
@@ -161,8 +162,8 @@ export function farmArt(){
       else if (g < .34) h += `<path d="M${cx} ${cy} v-10" style="stroke:var(--moss2)"/><ellipse cx="${cx-5}" cy="${cy-10}" rx="5" ry="3" style="fill:var(--moss)"/><ellipse cx="${cx+5}" cy="${cy-12}" rx="5" ry="3" style="fill:var(--moss)"/>`;
       else if (g < 1) h += `<path d="M${cx} ${cy} v-22" style="stroke:var(--moss2)"/><ellipse cx="${cx-9}" cy="${cy-14}" rx="9" ry="4.5" style="fill:var(--moss)"/><ellipse cx="${cx+9}" cy="${cy-18}" rx="9" ry="4.5" style="fill:var(--moss)"/><ellipse cx="${cx-6}" cy="${cy-26}" rx="6" ry="3.5" style="fill:var(--tree)"/>`;
       h += `</g>`;
-      if (wet && g >= 1) h += `<text class="ready" x="${cx}" y="${cy}" text-anchor="middle" font-size="28">${CROPS[s.crop].e}</text><text x="${cx+30}" y="${cy-24}" font-size="14">✨</text>`;
-      if (!wet) h += `<text x="${p.x + p.w - 14}" y="${p.y + 18}" font-size="13">💧</text>`;
+      if (wet && g >= 1) h += `<g class="ready">${iconAt(s.crop, cx, cy - 10, 34)}</g>${iconAt("sparkle", cx + 30, cy - 28, 16)}`;
+      if (!wet) h += `${iconAt("drop", p.x + p.w - 12, p.y + 12, 15)}`;
     } else h += `</g>`;
     h += `</g>`;
   });
@@ -193,7 +194,7 @@ export function userGarden(key, x, y, cols, rows, gap){
   }
   const w = cols*gap, signX = x + w/2 + (key === "chord" ? 8 : 0), signY = y + rows*gap + 10;
   const tree = users >= 500 ? `<g filter="url(#wob)" ${ink}><rect x="${x+w-6}" y="${y+4}" width="4" height="12" style="fill:var(--wood)"/><circle cx="${x+w-4}" cy="${y}" r="9" style="fill:#F4C7CF"/><circle cx="${x+w-10}" cy="${y+4}" r="6" style="fill:#EFA3A6"/></g>` : "";
-  const sparkle = users >= 1000 ? `<text x="${x-4}" y="${y+2}" font-size="11" class="twinkle">✨</text><text x="${x+w}" y="${y+rows*gap}" font-size="10" class="twinkle">✨</text>` : "";
+  const sparkle = users >= 1000 ? `<g class="twinkle">${iconAt("sparkle", x - 2, y - 2, 12)}${iconAt("sparkle", x + w + 2, y + rows*gap - 4, 11)}</g>` : "";
   const label = `${users.toLocaleString()} ${key === "chord" ? "creatives" : "families"}`;
   return `<g data-ugarden="${key}" aria-label="${label}">${f}${tree}${sparkle}
     ${tapeLabel(signX, signY, label, key === "chord" ? "var(--sage)" : "var(--blush)", 10)}</g>`;

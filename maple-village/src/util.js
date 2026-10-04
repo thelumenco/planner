@@ -13,3 +13,5 @@ export const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export const hash = s => { let h = 0; for (const c of String(s)) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 export const dur = ms => { const m = Math.ceil(ms/M); return m >= 60 ? `${Math.floor(m/60)}h ${m%60 ? (m%60) + "m" : ""}`.trim() : `${m}m`; };
 export const ink = 'style="stroke:var(--line)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"';
+// Game copy is drawn, not emoji'd: strip pictographs from anything the game says (user data is left alone).
+export const plain = s => String(s ?? "").replace(/[\p{Extended_Pictographic}\u{1F3FB}-\u{1F3FF}\uFE0F\u200D]/gu, "").replace(/ {2,}/g, " ").replace(/ ([!?.,])/g, "$1").trim();
