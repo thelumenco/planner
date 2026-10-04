@@ -86,6 +86,9 @@ const I = {
   blueberry: [`<circle cx="8.5" cy="14" r="4.5" ${f(C.peri2)}/><circle cx="15.5" cy="13" r="4.5" ${f(C.peri)}/><circle cx="12" cy="7.5" r="3.8" ${f(C.peri2)}/>`,
     `<circle cx="8.5" cy="14" r="4.5"/><circle cx="15.5" cy="13" r="4.5"/><circle cx="12" cy="7.5" r="3.8"/><path d="M7.5 13.2l1 1 1-1M14.5 12.2l1 1 1-1M11 6.7l1 1 1-1"/>`]
 };
+I.zoomOut = [`<circle cx="10.5" cy="10.5" r="6.5" style="fill:#FFFDF6"/>`, `<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3l5 5M7.5 10.5h6"/>`];
+I.zoomIn = [`<circle cx="10.5" cy="10.5" r="6.5" style="fill:#FFFDF6"/>`, `<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.3 15.3l5 5M7.5 10.5h6M10.5 7.5v6"/>`];
+I.lantern = [`<path d="M8 6h8l2 4v6l-2 4H8l-2-4v-6z" style="fill:#F6C26B"/><circle cx="12" cy="13" r="2.4" style="fill:#FFF3C4"/>`, `<path d="M8 6h8l2 4v6l-2 4H8l-2-4v-6zM10 3.5h4v2.5h-4zM12 20v2M6 10h12M6 16h12"/>`];
 I.farm = I.sprout;
 I.water = I.drop;
 I.well = I.drop;
@@ -111,4 +114,13 @@ export function progressBar(pct, color, ticks = 0){
   return `<svg class="pbar" viewBox="0 0 120 12" preserveAspectRatio="none" aria-hidden="true" focusable="false">
     <g filter="url(#markerS)">${w > .5 ? `<rect x="2.5" y="2.6" width="${w.toFixed(1)}" height="6.8" rx="3.4" style="fill:${color}"/>` : ""}</g>
     <g filter="url(#wobS)" fill="none" stroke="var(--line)" stroke-width="1.1" stroke-linecap="round" vector-effect="non-scaling-stroke"><rect x="1.5" y="2" width="117" height="8" rx="4"/><g opacity=".3">${tk}</g></g></svg>`;
+}
+
+// Vertical version for the tracker column on the right of the map; fills from the bottom.
+export function progressBarV(pct, color, ticks = 0){
+  const h = Math.max(0, Math.min(1, pct || 0))*115;
+  const tk = Array.from({length: Math.max(0, ticks - 1)}, (_, i) => `<path d="M4 ${(117.5 - 115*(i + 1)/ticks).toFixed(1)}h4"/>`).join("");
+  return `<svg class="pbar v" viewBox="0 0 12 120" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <g filter="url(#markerS)">${h > .5 ? `<rect x="2.6" y="${(117.5 - h).toFixed(1)}" width="6.8" height="${h.toFixed(1)}" rx="3.4" style="fill:${color}"/>` : ""}</g>
+    <g filter="url(#wobS)" fill="none" stroke="var(--line)" stroke-width="1.1" stroke-linecap="round" vector-effect="non-scaling-stroke"><rect x="2" y="1.5" width="8" height="117" rx="4"/><g opacity=".3">${tk}</g></g></svg>`;
 }

@@ -1,6 +1,6 @@
 // Game core: state + persistence, quest flow, actions, UI renderers and the world sim.
 import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur, plain } from "../util.js";
-import { icon, progressBar } from "../art/icons.js";
+import { icon, progressBar, progressBarV } from "../art/icons.js";
 import { VILLAGE, WORK, ROOMS, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
 import { CROPS, ITEMS, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco } from "../data/items.js";
 import { villageArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
@@ -38,7 +38,8 @@ setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl =>
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "village", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
 // In-game UI: the quest note pinned on the map (open, or slim while walking) and the panel over the map.
-let qnOpen = true, qnKey = "", openView = null, shopClosed = false;
+// The note starts folded when the village opens; it only pops open on step changes after the first few seconds.
+let qnOpen = false, qnQuietUntil = Date.now() + 5000, qnKey = "", openView = null, shopClosed = false;
 
 function persist(which){
   const obj = which === "today" ? S : F;
@@ -178,7 +179,7 @@ function prop(txt, cls, x, y, life){
   props.appendChild(p); setTimeout(() => p.remove(), life || 3000);
 }
 function mprop(txt, x, y, life){
-  const p = document.createElement("div"); p.className = "mprop"; p.innerHTML = icon(txt, 18); p.style.left = ((x - cam.x)*cam.s) + "px"; p.style.top = (y*cam.s) + "px";
+  const p = document.createElement("div"); p.className = "mprop"; p.innerHTML = icon(txt, 18); p.style.left = (x*cam.s + cam.ox) + "px"; p.style.top = (y*cam.s + cam.oy) + "px";
   $("mprops").appendChild(p); setTimeout(() => p.remove(), life || 1900);
 }
 function hearts(n){ for (let i = 0; i < n; i++) setTimeout(() => { prop("heart", "p-heart", 58 + Math.random()*16, 48 + Math.random()*10, 1900); mprop("heart", maple.x + rnd(-8, 8), maple.y - 30, 1900); }, i*240); }
@@ -531,7 +532,7 @@ function journal(){
   if (say && say.buttons) h = h.replace(/<h1>/, `<div class="actions saybtns">${say.buttons.map((x, i) => `<button class="btn alt small" data-say="${i}">${esc(x[0])}</button>`).join("")}</div><h1>`);
   // The note re-opens whenever the quest step changes; it folds to one line while walking or when tapped away.
   const key = ph + ":" + (ph === "task" ? remaining()[0].id + (arrivedFor(remaining()[0]) ? ":here" : "") + (S.firstStep[remaining()[0].id] ? ":go" : "") : (S.wipe ? "w" : "") + (atClean() ? "c" : ""));
-  if (key !== qnKey) { qnKey = key; qnOpen = true; }
+  if (key !== qnKey) { qnKey = key; if (Date.now() > qnQuietUntil) qnOpen = true; }
   const slim = !qnOpen || (route.length > 0 && !(say && say.buttons));
   j.classList.toggle("slim", slim);
   j.innerHTML = h + `<button class="qnx" data-qn="min" aria-label="Fold the note away">–</button>`;
@@ -645,10 +646,10 @@ function bag(){
   $("play").querySelectorAll("[data-play]").forEach(b => b.onclick = () => playFree(b.dataset.play));
 }
 function trackers(){
-  $("waterBoxes").innerHTML = progressBar((S.waterMl || 0)/WATER_GOAL, "#9CC3E0", 8);
-  $("stepBoxes").innerHTML = progressBar(S.steps/STEP_GOAL, "var(--sage)", 5);
-  $("waterNote").textContent = S.waterMl ? `${(S.waterMl/1000).toFixed(S.waterMl % 1000 ? 2 : 0).replace(/0$/, "")} L` : "log";
-  $("stepNote").textContent = S.steps ? S.steps.toLocaleString() : "log";
+  $("waterBoxes").innerHTML = progressBarV((S.waterMl || 0)/WATER_GOAL, "#9CC3E0", 8);
+  $("stepBoxes").innerHTML = progressBarV(S.steps/STEP_GOAL, "var(--sage)", 5);
+  $("waterNote").textContent = S.waterMl ? `${+(S.waterMl/1000).toFixed(2)}L` : "0L";
+  $("stepNote").textContent = S.steps >= 1000 ? `${+(S.steps/1000).toFixed(1)}k` : String(S.steps || 0);
 }
 // Water is kept in ml (goal 2 litres). `water` stays as a glass count (250 ml) because chat reads it.
 // Every glass up to a litre earns a coin; every 1,000 steps earns 2.
@@ -776,7 +777,7 @@ function arriveVillageSpot(id){
   if (id === "board") { arriveSpot("board"); return; }
   if (id === "pond") { speak(phase() === "break" ? "Perfect break spot. Breathe." : VILLAGE.pond.line, 4000); render(); }
 }
-function toWorld(ev){ const r = $("map").getBoundingClientRect(); return [(ev.clientX - r.left)/cam.s + cam.x, (ev.clientY - r.top)/cam.s]; }
+function toWorld(ev){ const r = $("map").getBoundingClientRect(); return [(ev.clientX - r.left - cam.ox)/cam.s, (ev.clientY - r.top - cam.oy)/cam.s]; }
 svg.addEventListener("click", ev => {
   const npc = ev.target.closest("[data-npc]");
   if (npc) { tapNpc(npc.dataset.npc); return; }
@@ -846,37 +847,47 @@ function placeNode(n, e){
 }
 // Camera: when the map box is narrower than the 520x640 scene (phone, full screen), show the full height and pan
 // left/right to follow Mel. Overlays (bubbles, floating icons) convert scene coords with cam.
-const cam = {x: 0, w: W, s: 1, top: 0, snap: true, key: ""};
+// Camera. Screen = scene * cam.s + (cam.ox, cam.oy). On a phone (map box narrower than the 520x640 scene) the camera
+// follows Mel at full height; "zoomed out" (cam.fit) shows the whole map at once. Panning slides the already-drawn
+// SVG with a GPU transform: re-filtering the hand-drawn scene every frame made phones flicker and drop outlines.
+const cam = {x: 0, s: 1, ox: 0, oy: 0, top: 0, snap: true, key: "", fit: false, canFollow: false};
+try { cam.fit = localStorage.getItem("fox.zoom") === "out"; } catch {}
 function updateCam(dt){
   const m = $("map"), cw = m.clientWidth, ch = m.clientHeight; if (!cw || !ch) return;
-  const a = cw/ch, vw = a < W/HH - .005 ? HH*a : W;
-  const tx = clamp(mel.x - vw/2, 0, W - vw);
-  cam.x = cam.snap ? tx : cam.x + (tx - cam.x)*Math.min(1, dt*3.2); cam.snap = false;
-  cam.w = vw; cam.s = vw < W ? ch/HH : cw/W;
-  // Pan by sliding the already-drawn SVG (GPU transform) rather than changing its viewBox: re-filtering the whole
-  // hand-drawn scene every frame made phones flicker and drop outlines.
-  const px = Math.round(cam.x*cam.s), key = px + "," + cw + "x" + ch + "," + (vw < W);
+  cam.canFollow = cw/ch < W/HH - .005;
+  if (cam.canFollow && !cam.fit) {
+    const s = ch/HH, vw = cw/s, tx = clamp(mel.x - vw/2, 0, W - vw);
+    cam.x = cam.snap ? tx : cam.x + (tx - cam.x)*Math.min(1, dt*3.2);
+    cam.s = s; cam.ox = -cam.x*s; cam.oy = 0;
+  } else {
+    const s = Math.min(cw/W, (ch - cam.top)/HH);
+    cam.s = s; cam.ox = (cw - W*s)/2; cam.oy = Math.max(cam.top, (ch - HH*s)/2); cam.x = 0;
+  }
+  cam.snap = false;
+  const ox = Math.round(cam.ox), oy = Math.round(cam.oy), key = `${ox},${oy},${cw}x${ch},${cam.s.toFixed(4)}`;
   if (key !== cam.key) {
     cam.key = key;
-    if (vw < W) { svg.style.width = Math.round(W*cam.s) + "px"; svg.style.height = Math.round(HH*cam.s) + "px"; svg.style.transform = `translate3d(${-px}px,0,0)`; }
-    else { svg.style.width = svg.style.height = svg.style.transform = ""; }
+    svg.style.width = (W*cam.s) + "px"; svg.style.height = (HH*cam.s) + "px"; svg.style.transform = `translate3d(${ox}px,${oy}px,0)`;
+    const z = $("zoomBtn"); if (z) { z.hidden = !cam.canFollow; z.setAttribute("aria-label", cam.fit ? "Zoom in" : "Zoom out to see the whole map"); z.innerHTML = icon(cam.fit ? "zoomIn" : "zoomOut", 26); }
   }
 }
+function toggleZoom(){ cam.fit = !cam.fit; cam.snap = true; cam.key = ""; try { localStorage.setItem("fox.zoom", cam.fit ? "out" : "in"); } catch {} }
 function measureHud(){
-  const hb = document.querySelector(".hudbar"), m = $("map");
-  cam.top = getComputedStyle(hb).position === "fixed" ? Math.max(0, hb.getBoundingClientRect().bottom - m.getBoundingClientRect().top + 4) : 0;
+  const sb = document.querySelector(".scenebar"), m = $("map");
+  cam.top = getComputedStyle(sb).position === "fixed" ? Math.max(0, sb.getBoundingClientRect().bottom - m.getBoundingClientRect().top + 4) : 0;
   m.style.setProperty("--ovTop", (cam.top ? cam.top + 4 : 8) + "px");
+  cam.key = "";
 }
 addEventListener("resize", () => { cam.snap = true; measureHud(); });
 function bubbleAt(el, ex, ey, off, forceBelow){
   if (el.hidden) return;
   const wrap = $("map"), cw = wrap.clientWidth, sc = cam.s;
-  const bw = el.offsetWidth, bh = el.offsetHeight, px = (ex - cam.x)*sc, py = (ey - off)*sc;
+  const bw = el.offsetWidth, bh = el.offsetHeight, px = ex*sc + cam.ox, py = (ey - off)*sc + cam.oy;
   const left = clamp(px, bw/2 + 2, cw - bw/2 - 2);
   el.style.left = left + "px"; el.style.setProperty("--tail", clamp(px - left + bw/2, 16, bw - 16) + "px");
-  const roomBelow = (ey + 8)*sc + 10 + bh < wrap.clientHeight + 4;
+  const roomBelow = (ey + 8)*sc + cam.oy + 10 + bh < wrap.clientHeight + 4;
   const below = (forceBelow && roomBelow) || py - bh - 10 < cam.top - 6; el.classList.toggle("below", below);
-  el.style.top = (below ? (ey + 8)*sc + 10 : py - 10) + "px";
+  el.style.top = (below ? (ey + 8)*sc + cam.oy + 10 : py - 10) + "px";
 }
 let last = performance.now();
 function frame(now){
@@ -928,6 +939,8 @@ $("pet").onclick = () => { hearts(2); speak(pick(["*leans into the pat*", "Happy
 
 document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
 $("pclose").onclick = closePanel;
+$("zoomBtn").onclick = () => toggleZoom();
+["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { qnQuietUntil = 0; }, {capture: true, once: true}));
 document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; ctx(); });
 initNotebook({onTread, water:() => ({ml: S.waterMl || 0, goal: WATER_GOAL, glass: GLASS}), steps:() => ({n: S.steps, goal: STEP_GOAL}),
   addWater:ml => A.water(ml), setWater, setSteps, task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,

@@ -29,16 +29,26 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?reset=1&seed=1&time=10:15");
   await page.waitForTimeout(900);
   await page.screenshot({ path: join(shots, `${vp.name}-1-start.png`), fullPage: vp.name === "phone" ? false : true });
+  check(await page.locator("#journal.slim").count() === 1, "the quest note starts folded when the village opens");
+  await page.click('#journal [data-qn="open"]');
   check(await page.locator("#journal h1").textContent().then(t => /Five-minute clean/.test(t)), "day opens with the five-minute clean");
   const lay = await page.evaluate(() => ({ hud: document.querySelector(".hudbar").getBoundingClientRect().bottom, map: document.querySelector("#map").getBoundingClientRect().top,
     fits: document.documentElement.scrollHeight <= innerHeight + 2, note: !!document.querySelector("#map #journal h1") }));
   if (vp.name === "phone") {
     const full = await page.evaluate(() => { const r = document.querySelector("#map").getBoundingClientRect(), h = document.querySelector(".hudbar").getBoundingClientRect(); return {h: r.height, w: r.width, hudTop: h.top}; });
     check(full.h >= 840 && full.w >= 388, "on the phone the map fills the whole screen");
-    check(full.hudTop < 80, "trackers float at the top of the screen");
+    const trk = await page.evaluate(() => { const r = document.querySelector(".hudbar").getBoundingClientRect(); return {right: innerWidth - r.right, tall: r.height > r.width}; });
+    check(trk.right < 20 && trk.tall, "trackers are a vertical column on the right");
+    check(await page.locator("#zoomBtn").isVisible(), "there's a zoom button on the phone");
+    await page.click('#journal [data-qn="min"]');
+    await page.click("#zoomBtn"); await page.waitForTimeout(300);
+    const fit = await page.evaluate(() => { const r = document.querySelector("#world").getBoundingClientRect(); return r.width <= innerWidth + 1 && r.left >= -1; });
+    check(fit, "zooming out shows the whole map");
+    await page.click("#zoomBtn"); await page.waitForTimeout(300);
+    await page.click('#journal [data-qn="open"]');
     check(await page.locator(".scenebar .hbtn").count() === 4, "four drawn icons in the corner");
     check(!(await page.locator(".hbtn").first().textContent()).match(/\p{Extended_Pictographic}/u), "corner icons are drawn, not emoji");
-  } else check(lay.hud <= lay.map, "trackers sit above the map");
+  } else check(await page.locator("#map .hudbar").count() === 1, "trackers sit on the map");
   check(lay.fits, "the whole game fits on screen without scrolling");
   check(lay.note, "the quest note is pinned on the map");
   check(await page.locator(".hudbar .pbar").count() === 2, "water and steps are drawn progress bars");
@@ -47,10 +57,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#notebook [data-nb="w"] >> nth=1');
   check(await page.locator("#nbTitle").textContent().then(t => /0[.,]75 L/.test(t)), "water note adds a glass and a bottle (750 ml)");
   await page.fill("#nbTrack", "1000"); await page.click('#notebook [data-nb="wset"]');
-  check(await page.locator("#waterNote").textContent().then(t => /^1 L/.test(t)), "water total can be typed in");
+  check(await page.locator("#waterNote").textContent().then(t => /^1L/.test(t)), "water total can be typed in");
   await page.click('[data-track="steps"]');
   await page.fill("#nbTrack", "2500"); await page.click('#notebook [data-nb="sset"]');
-  check(await page.locator("#stepNote").textContent().then(t => /2,500/.test(t)), "steps can be typed in from the steps note");
+  check(await page.locator("#stepNote").textContent().then(t => /2.5k/.test(t)), "steps can be typed in from the steps note");
 
   // Clean: walk to cupboard, get wipe, done
   await page.click('#journal [data-a="walk"]');
