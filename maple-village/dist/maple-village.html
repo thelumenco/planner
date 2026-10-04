@@ -1856,7 +1856,7 @@ body.nb-open{overflow:hidden}
   }
   function runArt(F2) {
     const P2 = ensurePets(F2), lv = P2.run, big = lv >= 1;
-    const [x0, y0, x1, y1] = big ? [40, 508, 182, 590] : [62, 524, 152, 588];
+    const [x0, y0, x1, y1] = big ? [40, 508, 182, 590] : [92, 524, 182, 588];
     const posts = [];
     for (let x = x0; x <= x1; x += 16) posts.push(`M${x} ${y0 - 6} v8 M${x} ${y1 - 6} v8`);
     for (let y = y0; y <= y1; y += 18) posts.push(`M${x0} ${y - 4} v8 M${x1} ${y - 4} v8`);
@@ -1874,12 +1874,12 @@ body.nb-open{overflow:hidden}
     const meadow = lv >= 3 ? `<g pointer-events="none">${[[54, 542], [96, 532], [120, 578], [70, 580], [150, 548], [110, 556]].map(([x, y]) => `<g fill="var(--moss)" opacity=".8"><circle cx="${x - 2}" cy="${y}" r="2.4"/><circle cx="${x + 2}" cy="${y}" r="2.4"/><circle cx="${x}" cy="${y - 3}" r="2.4"/></g>`).join("")}</g>` + sk(`<rect x="124" y="580" width="30" height="7" rx="2" style="fill:var(--wood)"/><rect x="127" y="580" width="24" height="3" style="fill:#9CC3E0"/>`, `<rect x="124" y="580" width="30" height="7" rx="2"/>`) : "";
     const fed = P2.animals.length && !hungryCount(F2);
     const bowl = sk(`<path d="M${x1 - 24} ${y1 - 12} h14 l-2 6 h-10z" style="fill:var(--sky)"/>${fed ? `<ellipse cx="${x1 - 17}" cy="${y1 - 12}" rx="6" ry="2" style="fill:var(--honey)"/>` : ""}`, `<path d="M${x1 - 24} ${y1 - 12} h14 l-2 6 h-10z"/>`);
-    const cols = big ? 4 : 2, gx = big ? 32 : 36, ox = big ? 60 : 86;
+    const cols = big ? 4 : 2, gx = big ? 32 : 36, ox = big ? 60 : 118;
     const animals = P2.animals.map((a, i) => {
       const x = ox + i % cols * gx + (i % 2 ? 6 : 0), y = (big ? 546 : 556) + Math.floor(i / cols) * 24 + i % 3 * 3, flip = i % 2 ? -1 : 1;
       return `<g transform="translate(${x} ${y}) scale(${flip} 1)"><g class="${a.kind === "chick" ? "peck" : "hop"}" style="animation-delay:-${(i * 0.7).toFixed(1)}s">${animalArt(a, hungry(a, F2))}</g></g>`;
     }).join("");
-    return `<g data-place="run" aria-label="Animal run"><ellipse class="hov" cx="${(x0 + x1) / 2}" cy="${y1}" rx="${(x1 - x0) / 2 + 8}" ry="10" style="fill:var(--butter)"/>${fence}${meadow}${crate}${coop}${bowl}${animals}${tapeLabel(204, 500, "Animal run", "var(--peach)", 11)}</g>`;
+    return `<g data-place="run" aria-label="Animal run"><ellipse class="hov" cx="${(x0 + x1) / 2}" cy="${y1}" rx="${(x1 - x0) / 2 + 8}" ry="10" style="fill:var(--butter)"/>${fence}${meadow}${crate}${coop}${bowl}${animals}${tapeLabel(big ? 204 : 137, big ? 500 : 508, "Animal run", "var(--peach)", 11)}</g>`;
   }
   var INK = `style="stroke:var(--line)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"`;
   function animalArt(a, sad) {
@@ -6343,6 +6343,8 @@ Then tell chat "wind down" whenever you're ready.`
     }
     boardOpen = false;
     shelfOpen = false;
+    shedOpen = false;
+    runOpen = false;
     selPlot = null;
     homeView = null;
     postOpen = false;

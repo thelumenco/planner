@@ -444,6 +444,16 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(300);
   check(await page.locator("#ctx .sub").textContent().then(t => /Bigger run/.test(t)), "the run can be upgraded with coins");
   await page.screenshot({ path: join(shots, "animals-run.png") });
+  await page.click("#pclose"); await page.waitForTimeout(300);
+  check(await page.locator("#panel").isHidden(), "the close button shuts the run");
+  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-place="market"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-shop="animals"]', { timeout: 20000 });
+  await page.click('#ctx [data-shop="animals"]'); await page.click('#ctx [data-shop="seeds"]');
+  check(await page.locator('#ctx [data-shop="seeds"]').getAttribute("aria-selected") === "true", "and the market's Animals tab switches back to the others");
+  await page.click("#pclose"); await page.waitForTimeout(300);
+  check(await page.locator("#panel").isHidden(), "and closes");
   await page.close();
 }
 // Sunsama pull: no chat plan, the page fetches today's tasks itself
