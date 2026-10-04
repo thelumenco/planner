@@ -54,6 +54,7 @@
   sample.limits = async () => ({ maxPromptBytes: 100000 });
 
   // ?sunsama=1: a fake Sunsama connector (same response shape as sunsama://tasks/<day>, invented tasks)
+  let stubDay = null;
   const mcp = {
     callTool: async (server, tool, input) => {
       await new Promise(r => setTimeout(r, 300));
@@ -73,6 +74,13 @@
         return { content: [], payload: { events } };
       }
       if (server !== "Sunsama MCP" || tool !== "read_resource") throw { code: "not_in_manifest", message: "not declared" };
+      // the first day asked for is "today"; any later day gets tomorrow's (different) tasks
+      const day = String(input.uri || "").slice(-10); stubDay = stubDay || day;
+      if (day !== stubDay) {
+        const tasks = [{ _id: "n1", title: "Plan the Chord newsletter", channel: "Chord", timeEstimate: "30 minutes", sortOrder: 1, completed: false, notes: "", subtasks: [] },
+          { _id: "n2", title: "Book Evan's swim class", channel: "Personal", isPersonal: true, timeEstimate: "10 minutes", sortOrder: 2, completed: false, notes: "", subtasks: [] }];
+        return { content: [{ type: "text", text: JSON.stringify({ tasks }) }], payload: { tasks } };
+      }
       const tasks = [
         { _id: "s1", title: "Comms catchup", timeEstimate: "15 minutes", sortOrder: 1, isWork: true, completed: false,
           notes: '<ul data-type="taskList"><li data-type="taskItem"><label><input type="checkbox"></label><div><p>Check GHL</p></div></li><li data-type="taskItem"><label><input type="checkbox"></label><div><p>Check emails</p></div></li></ul>', subtasks: [] },

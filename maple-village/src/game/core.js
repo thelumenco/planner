@@ -38,6 +38,7 @@ function migrate(){
   if (!F.tools) F.tools = {};
   if (!F.fam) F.fam = {owned: {}, gifts: {evan: 0, darren: 0}};
   ensurePets(F);
+  if (!F.early || typeof F.early !== "object") F.early = {};
   if (!Array.isArray(F.plots) || F.plots.length !== 12) F.plots = Array.from({length:12}, () => null);
   if (!F.cool) F.cool = {};
   ["met", "gifts", "mailRead"].forEach(k => { if (!F[k]) F[k] = {}; });
@@ -346,6 +347,7 @@ const A = {
   firstStep(t){ S.firstStep[t.id] = true; S.arrived[t.id] = true; startTimer("task", t.minutes || 25, t.id); setSay("Hard part's done. Now the rest, on the clock."); save(); },
   done(t){
     S.doneIds.push(t.id); S.timer = null; sfx("chaching"); earn(5, "quest complete"); gainXp(1); S.last = t.title; countQuest();
+    if (t.early) { F.early[t.id] = t.early; setTimeout(() => speak("Done a day early! Tick it off in Sunsama too, and it'll already be done on tomorrow's board.", 6000), 4200); }
     let grew = 0; F.plots.forEach(p => { if (p && p.crop && p.wateredAt && growth(p) < 1) { p.bonus = (p.bonus || 0) + QUEST_BOOST; grew++; } });
     if (t.meeting) S.mode = "decompress";
     else if (remaining().length) { S.mode = "break"; startTimer("break", 10); }
@@ -433,6 +435,7 @@ function creditDone(tasks, quiet){
   (tasks || []).forEach(t => {
     if (!t || !t.completed || !ids.has(t.id) || S.doneIds.includes(t.id)) return;
     S.doneIds.push(t.id); got.push(t); if (got.length === 1) sfx("chaching");
+    const q = allTasks().find(x => x.id === t.id); if (q && q.early) F.early[t.id] = q.early;
     earn(5, "done in Sunsama"); gainXp(1); countQuest();
     if (cur && cur.id === t.id) { if (S.timer && S.timer.id === t.id) S.timer = null; S.firstStep[t.id] = false; }
   });
@@ -469,6 +472,46 @@ async function syncSunsama(manual){
   save(true);
 }
 setInterval(() => { if (!document.hidden) syncSunsama(); }, 10*60e3);
+
+/* =================== TOMORROW =================== */
+// Peek at tomorrow's Sunsama tasks from the quest list and pull any into today. A quest finished early is remembered
+// in F.early (id -> the day it was planned for), so when that day's plan arrives it's already ticked, with no second
+// lot of coins. Sunsama itself isn't changed: Maple reminds Mel to tick it there too.
+const tmr = {list: null, busy: false, error: null, day: null};
+const tomorrowKey = () => new Date(Date.parse(dayKey() + "T00:00:00Z") + 864e5).toISOString().slice(0, 10);
+async function peekTomorrow(){
+  const day = tomorrowKey(); tmr.busy = true; tmr.error = null; tmr.day = day; renderTomorrow();
+  const r = await pullSunsama(day, {fresh: true});
+  tmr.busy = false; if (r.error) tmr.error = r.error; else tmr.list = r.tasks.filter(t => !t.completed);
+  renderTomorrow();
+}
+function doEarly(id){
+  const t = (tmr.list || []).find(x => x.id === id); if (!t || allTasks().some(x => x.id === id)) return;
+  S.extra.push(Object.assign({}, t, {early: tmr.day})); sfx("paper", true);
+  setSay(`“${t.title}” is on today's board now. Future you says thanks.`); save(true);
+}
+function creditEarly(){
+  const k = dayKey(); Object.keys(F.early || {}).forEach(id => { if (F.early[id] < k) delete F.early[id]; });
+  allTasks().forEach(t => { if (F.early[t.id] === k && !S.doneIds.includes(t.id)) S.doneIds.push(t.id); });
+}
+function renderTomorrow(){
+  const el = $("tomorrow"); if (!el) return;
+  if (tmr.day && tmr.day !== tomorrowKey()) { tmr.list = null; tmr.day = null; }
+  const label = new Date(tomorrowKey() + "T00:00:00Z").toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "short", timeZone: "UTC"});
+  let h = `<p class="eyebrow tmrh">Tomorrow · ${esc(label)}</p>`;
+  if (tmr.busy) h += `<p class="muted">Asking Sunsama…</p>`;
+  else if (tmr.error) h += `<p class="muted">${esc(SUNSAMA_ERRORS[tmr.error] || "Couldn't reach Sunsama just now.")} <button class="drop" data-tmr="peek">try again</button></p>`;
+  else if (!tmr.list) h += `<button class="btn small alt" data-tmr="peek">Peek at tomorrow's quests</button>`;
+  else if (!tmr.list.length) h += `<p class="muted">Nothing planned in Sunsama for tomorrow yet.</p>`;
+  else {
+    const today = new Set(allTasks().map(t => t.id));
+    h += `<ul class="hlist tmr">${tmr.list.map(t => { const early = F.early[t.id] === tmr.day, on = today.has(t.id);
+      return `<li><span class="pl">${icon(placeOf(t), 18)}</span><span><b>${esc(t.title)}</b><small>${t.minutes || 25} min</small></span>${early ? `<span class="hbadge">done early</span>` : on ? `<span class="hbadge sched">on today's board</span>` : `<button class="next" data-early="${esc(t.id)}">do today</button>`}</li>`; }).join("")}</ul>`;
+  }
+  el.innerHTML = h;
+  el.querySelectorAll("[data-tmr]").forEach(b => b.onclick = () => peekTomorrow());
+  el.querySelectorAll("[data-early]").forEach(b => b.onclick = () => doEarly(b.dataset.early));
+}
 function sunsamaLine(){
   const el = $("sunsamaLine"); if (!el) return;
   const src = P && P.day === dayKey() ? (P.source === "sunsama" ? "sunsama" : P.source === "routine" ? "routine" : "chat") : null;
@@ -1108,6 +1151,7 @@ function drawScene(){
 }
 function render(redraw){
   if (S.day !== dayKey()) S = freshToday();
+  creditEarly();
   if (redraw) drawScene();
   const L = level(), next = LEVELS[L+1];
   $("title").firstChild.textContent = `${F.name}'s village`;
@@ -1136,12 +1180,13 @@ function render(redraw){
   $("qBadge").hidden = !rem.length; $("qBadge").textContent = rem.length;
   $("list").innerHTML = all.map(t => { const dn = S.doneIds.includes(t.id);
     const pickable = !dn && t.id !== cur && phase() !== "clean";
-    return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : "<span></span>"}</li>`; }).join("")
+    return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}${t.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : "<span></span>"}</li>`; }).join("")
     + ((S.dropped || []).length ? `<li class="dropped"><small>Dropped today: ${(S.dropped || []).map(id => { const t = ((P && P.tasks) || []).find(x => x.id === id); return t ? `${esc(t.title)} <button class="drop" data-undrop="${esc(id)}">bring back</button>` : ""; }).filter(Boolean).join(" · ")}</small></li>` : "");
   $("list").querySelectorAll("[data-drop]").forEach(el => el.onclick = ev => { ev.stopPropagation(); dropTask(el.dataset.drop); });
   $("list").querySelectorAll("[data-undrop]").forEach(el => el.onclick = ev => { ev.stopPropagation(); undropTask(el.dataset.undrop); });
   $("list").querySelectorAll("[data-next]").forEach(el => el.onclick = ev => { ev.stopPropagation(); doNext(el.dataset.next); });
   $("list").querySelectorAll("[data-pick]").forEach(el => el.onclick = () => doNext(el.dataset.pick));
+  renderTomorrow();
   const pin = $("paperIn"), paper = paperWaiting(); if (pin) pin.style.display = paper ? "" : "none";
   if (scene === "base" && paper && S.paperSaid !== paper.id) { S.paperSaid = paper.id; setTimeout(() => speak(`${paperName()} is in the letterbox!`, 4500), 1800); }
   hestiaMarks(); questMark(); journal(); ctx(); bag(); trackers(); mailCard(); sunsamaLine(); refreshNotebook();

@@ -342,3 +342,7 @@
 .hlist.gnews a{color:#2F3B73;font-weight:600;text-decoration:none}
 .hlist.gnews .src{font-style:italic}
 .hlist.gnews:not(.world) li::before{content:"";width:8px;height:8px;border-radius:50%;background:#F3C969;flex:none;box-shadow:0 0 0 1.5px rgba(60,40,30,.2)}
+/* tomorrow's quests, peeked from the quest list */
+.tmrh{margin:16px 0 4px}
+.hlist.tmr span:not(.hbadge):not(.pl){display:grid;gap:1px;flex:1;min-width:0}
+.hlist.tmr .pl{display:inline-flex;flex:none}
