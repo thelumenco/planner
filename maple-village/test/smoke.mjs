@@ -210,6 +210,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#notebook [data-nb="thanks"]');
   await page.waitForTimeout(300);
   check(await page.locator("#paperIn").isHidden(), "once read, the letterbox is empty");
+  await page.click('[data-open="quests"]');
+  const before = await page.locator("#list li:not(.dropped)").count();
+  await page.locator("#list [data-drop]").last().click();
+  await page.waitForTimeout(200);
+  check(await page.locator("#list li:not(.dropped)").count() === before - 1 && await page.locator("#list li.dropped").count() === 1, "a quest that's no longer needed can be dropped for today");
+  await page.locator("#list [data-undrop]").click();
+  await page.waitForTimeout(200);
+  check(await page.locator("#list li:not(.dropped)").count() === before, "and brought back");
+  await page.click("#pclose");
   await page.locator('#world [data-place="shed"]').dispatchEvent("click");
   await page.waitForFunction(() => /Darren's shed/.test(document.querySelector("#ctx").textContent), null, { timeout: 15000 });
   check(await page.locator("#ctx [data-tool]").count() === 3, "the shed sells three garden tools");

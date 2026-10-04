@@ -1,5 +1,5 @@
 /* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
-:root{--mapw:max(300px,min(660px,calc((100dvh - 300px)*520/640 + 26px)))}
+:root{--mapw:max(300px,min(980px,calc((100dvh - 196px)*520/640 + 26px)))}
 .wrap{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:none;padding:12px 16px 20px}
 @media (min-width:900px){.wrap{padding:18px 40px 28px}}
 .wrap > *{width:min(100%,var(--mapw))}
@@ -275,3 +275,6 @@
 .panel .tabs button{flex:1 1 auto;min-width:0;padding-left:8px;padding-right:8px}
 .panel{max-width:100%;box-sizing:border-box;overflow-x:hidden}
 .map{overflow:clip}
+/* "not today" on a quest: small, quiet, not a big red delete */
+.pinned .drop,.pinned button.drop{border:0;background:none;padding:0 2px;margin-left:4px;font:inherit;font-size:.72rem;color:var(--soft);text-decoration:underline dotted;cursor:pointer}
+.pinned li.dropped{grid-column:1/-1;opacity:.8;transform:none}

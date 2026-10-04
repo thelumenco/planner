@@ -441,7 +441,7 @@ body.nb-open{overflow:hidden}
 .ch.npc.act-rest .bob{animation:cbob 2.6s ease-in-out infinite alternate}
 
 /* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
-:root{--mapw:max(300px,min(660px,calc((100dvh - 300px)*520/640 + 26px)))}
+:root{--mapw:max(300px,min(980px,calc((100dvh - 196px)*520/640 + 26px)))}
 .wrap{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:none;padding:12px 16px 20px}
 @media (min-width:900px){.wrap{padding:18px 40px 28px}}
 .wrap > *{width:min(100%,var(--mapw))}
@@ -717,6 +717,9 @@ body.nb-open{overflow:hidden}
 .panel .tabs button{flex:1 1 auto;min-width:0;padding-left:8px;padding-right:8px}
 .panel{max-width:100%;box-sizing:border-box;overflow-x:hidden}
 .map{overflow:clip}
+/* "not today" on a quest: small, quiet, not a big red delete */
+.pinned .drop,.pinned button.drop{border:0;background:none;padding:0 2px;margin-left:4px;font:inherit;font-size:.72rem;color:var(--soft);text-decoration:underline dotted;cursor:pointer}
+.pinned li.dropped{grid-column:1/-1;opacity:.8;transform:none}
 </style>
 </head>
 <body>
@@ -749,7 +752,6 @@ body.nb-open{overflow:hidden}
   </div>
   <p class="earn" id="earn" aria-live="polite"></p>
   <div class="card mapcard">
-    <span class="tape dots" aria-hidden="true"></span>
     <div class="scenebar">
       <p class="scenename" id="sceneName">Village</p>
       <div class="berries" title="Coins"><span data-ico="coin" aria-hidden="true"></span><span id="coins">0</span></div>
@@ -3764,13 +3766,32 @@ Quests finished today: ${S3.doneIds.length}`;
   }
   function allTasks() {
     const base = P && P.day === dayKey() && Array.isArray(P.tasks) ? P.tasks : [];
-    const list = [...base, ...S2.extra].filter((t) => t && t.id && t.title).map((t) => Object.assign({}, t, S2.tweaks[t.id] || {}));
+    const list = [...base, ...S2.extra].filter((t) => t && t.id && t.title && !(S2.dropped || []).includes(t.id)).map((t) => Object.assign({}, t, S2.tweaks[t.id] || {}));
     const ids = list.map((t) => t.id);
     const order = S2.order.filter((id) => ids.includes(id));
     ids.forEach((id) => {
       if (!order.includes(id)) order.push(id);
     });
     return order.map((id) => list.find((t) => t.id === id));
+  }
+  function dropTask(id, quiet) {
+    const t = allTasks().find((x) => x.id === id);
+    if (!t) return;
+    if (String(id).startsWith("x")) S2.extra = S2.extra.filter((x) => x.id !== id);
+    else {
+      S2.dropped = S2.dropped || [];
+      S2.dropped.push(id);
+    }
+    if (S2.timer && S2.timer.id === id) S2.timer = null;
+    S2.firstStep[id] = false;
+    sfx("paper", true);
+    setSay(`Dropped “${t.title}” for today. One less thing.`);
+    if (!quiet) save(true);
+  }
+  function undropTask(id) {
+    S2.dropped = (S2.dropped || []).filter((x) => x !== id);
+    setSay("Back on the board.");
+    save(true);
   }
   var remaining = () => allTasks().filter((t) => !S2.doneIds.includes(t.id));
   var questsIn = (pl) => allTasks().filter((t) => placeOf(t) === pl);
@@ -4174,6 +4195,9 @@ Quests finished today: ${S3.doneIds.length}`;
             S2.stalls[t.id] = 0;
             S2.timer = null;
             setSay("Shrunk it! Ten minutes, then you can stop.");
+          }],
+          ["Not needed any more", () => {
+            dropTask(t.id, true);
           }],
           ["I don't want to", () => {
             const ids = allTasks().map((x) => x.id);
@@ -5142,11 +5166,18 @@ Then tell chat "wind down" whenever you're ready.`
     $("list").innerHTML = all.map((t) => {
       const dn = S2.doneIds.includes(t.id);
       const pickable = !dn && t.id !== cur && phase() !== "clean";
-      return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : String(t.id).startsWith("x") && !dn ? `<button data-rm="${esc(t.id)}" aria-label="Remove">✕</button>` : "<span></span>"}</li>`;
-    }).join("");
-    $("list").querySelectorAll("[data-rm]").forEach((el) => el.onclick = () => {
-      S2.extra = S2.extra.filter((x) => x.id !== el.dataset.rm);
-      save(true);
+      return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : "<span></span>"}</li>`;
+    }).join("") + ((S2.dropped || []).length ? `<li class="dropped"><small>Dropped today: ${(S2.dropped || []).map((id) => {
+      const t = (P && P.tasks || []).find((x) => x.id === id);
+      return t ? `${esc(t.title)} <button class="drop" data-undrop="${esc(id)}">bring back</button>` : "";
+    }).filter(Boolean).join(" · ")}</small></li>` : "");
+    $("list").querySelectorAll("[data-drop]").forEach((el) => el.onclick = (ev) => {
+      ev.stopPropagation();
+      dropTask(el.dataset.drop);
+    });
+    $("list").querySelectorAll("[data-undrop]").forEach((el) => el.onclick = (ev) => {
+      ev.stopPropagation();
+      undropTask(el.dataset.undrop);
     });
     $("list").querySelectorAll("[data-next]").forEach((el) => el.onclick = (ev) => {
       ev.stopPropagation();

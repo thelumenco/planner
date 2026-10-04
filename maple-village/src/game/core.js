@@ -127,12 +127,22 @@ async function initDb(){
 /* =================== QUESTS =================== */
 function allTasks(){
   const base = (P && P.day === dayKey() && Array.isArray(P.tasks)) ? P.tasks : [];
-  const list = [...base, ...S.extra].filter(t => t && t.id && t.title).map(t => Object.assign({}, t, S.tweaks[t.id] || {}));
+  const list = [...base, ...S.extra].filter(t => t && t.id && t.title && !(S.dropped || []).includes(t.id)).map(t => Object.assign({}, t, S.tweaks[t.id] || {}));
   const ids = list.map(t => t.id);
   const order = S.order.filter(id => ids.includes(id));
   ids.forEach(id => { if (!order.includes(id)) order.push(id); });
   return order.map(id => list.find(t => t.id === id));
 }
+// "Not today": a quest that no longer applies leaves today's boards (no coins, no guilt). Sunsama itself is untouched.
+function dropTask(id, quiet){
+  const t = allTasks().find(x => x.id === id); if (!t) return;
+  if (String(id).startsWith("x")) S.extra = S.extra.filter(x => x.id !== id);
+  else { S.dropped = S.dropped || []; S.dropped.push(id); }
+  if (S.timer && S.timer.id === id) S.timer = null;
+  S.firstStep[id] = false; sfx("paper", true);
+  setSay(`Dropped “${t.title}” for today. One less thing.`); if (!quiet) save(true);
+}
+function undropTask(id){ S.dropped = (S.dropped || []).filter(x => x !== id); setSay("Back on the board."); save(true); }
 const remaining = () => allTasks().filter(t => !S.doneIds.includes(t.id));
 const questsIn = pl => allTasks().filter(t => placeOf(t) === pl);
 function phase(){
@@ -327,6 +337,7 @@ const A = {
       setSay("No shame. What's going on with this one?", [
         ["It's unclear", () => setSay("Tell chat “boss, this one's unclear”. We'll untangle it.")],
         ["It's too big", () => { S.tweaks[t.id] = {firstStep:"do just ten minutes of it. Messy is fine.", minutes:10}; S.firstStep[t.id] = false; S.stalls[t.id] = 0; S.timer = null; setSay("Shrunk it! Ten minutes, then you can stop."); }],
+        ["Not needed any more", () => { dropTask(t.id, true); }],
         ["I don't want to", () => { const ids = allTasks().map(x => x.id); S.order = ids.filter(id => id !== t.id).concat(t.id); S.stalls[t.id] = 0; S.firstStep[t.id] = false; S.timer = null; setSay("Fair. Moved it to the end. Here's another."); }]
       ]);
     } else {
@@ -945,8 +956,10 @@ function render(redraw){
   $("qBadge").hidden = !rem.length; $("qBadge").textContent = rem.length;
   $("list").innerHTML = all.map(t => { const dn = S.doneIds.includes(t.id);
     const pickable = !dn && t.id !== cur && phase() !== "clean";
-    return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : String(t.id).startsWith("x") && !dn ? `<button data-rm="${esc(t.id)}" aria-label="Remove">✕</button>` : "<span></span>"}</li>`; }).join("");
-  $("list").querySelectorAll("[data-rm]").forEach(el => el.onclick = () => { S.extra = S.extra.filter(x => x.id !== el.dataset.rm); save(true); });
+    return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? "× " : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : "<span></span>"}</li>`; }).join("")
+    + ((S.dropped || []).length ? `<li class="dropped"><small>Dropped today: ${(S.dropped || []).map(id => { const t = ((P && P.tasks) || []).find(x => x.id === id); return t ? `${esc(t.title)} <button class="drop" data-undrop="${esc(id)}">bring back</button>` : ""; }).filter(Boolean).join(" · ")}</small></li>` : "");
+  $("list").querySelectorAll("[data-drop]").forEach(el => el.onclick = ev => { ev.stopPropagation(); dropTask(el.dataset.drop); });
+  $("list").querySelectorAll("[data-undrop]").forEach(el => el.onclick = ev => { ev.stopPropagation(); undropTask(el.dataset.undrop); });
   $("list").querySelectorAll("[data-next]").forEach(el => el.onclick = ev => { ev.stopPropagation(); doNext(el.dataset.next); });
   $("list").querySelectorAll("[data-pick]").forEach(el => el.onclick = () => doNext(el.dataset.pick));
   const pin = $("paperIn"), paper = paperWaiting(); if (pin) pin.style.display = paper ? "" : "none";
