@@ -47,7 +47,7 @@ export function upgradesArt(n, where){
   }
   if (has("bunting")) h += bunting(330, 300, 394, 300, ["var(--rose)", "var(--butter)", "var(--sage)", "var(--peri)"]);
   if (has("lanterns")) [[232, 236], [288, 236], [226, 430], [294, 430], [196, 362], [324, 362]].forEach(([x, y]) => { h += lamp(x, y); });
-  if (has("bench")) h += sk(`<rect x="456" y="276" width="34" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="456" y="276" width="34" height="6" rx="2"/><path d="M460 282 v8 M486 282 v8 M456 270 h34"/>`);
+  if (has("bench")) h += sk(`<rect x="106" y="276" width="34" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="106" y="276" width="34" height="6" rx="2"/><path d="M110 282 v8 M136 282 v8 M106 270 h34"/>`);
   if (has("lights")) { let b = ""; for (let i = 0; i < 9; i++) { const t = i/8, x = 192 + 136*t, y = 296 - Math.sin(Math.PI*t)*22; b += `<circle class="twinkle" cx="${x.toFixed(1)}" cy="${(y + 3).toFixed(1)}" r="2.6" fill="${["#FFD66E", "#F7A9A9", "#A9D3A0", "#A9C6E0"][i % 4]}"/>`; }
     h += `<g filter="url(#wob)"><path d="M192 296 Q260 252 328 296" fill="none" style="stroke:var(--line)" stroke-width="1.2"/></g><g>${b}</g>`; }
   if (has("fountain")) h += sk(`<ellipse cx="318" cy="400" rx="20" ry="8" style="fill:var(--stone)"/><ellipse cx="318" cy="398" rx="14" ry="5" style="fill:var(--water)"/><rect x="315" y="382" width="6" height="14" style="fill:var(--stone)"/>`,

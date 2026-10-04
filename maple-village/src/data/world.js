@@ -9,15 +9,15 @@ export const VILLAGE = {
   // town square
   hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[260,180], mark:[222,64]},
   chord:  {scene:"lane", name:"Chord workshop", short:"the Chord workshop", door:[145,272], mark:[145,150]},
-  fresh:  {scene:"village", name:"Fresh Pages library", short:"the library", door:[435,272], mark:[445,160]},
+  fresh:  {scene:"village", name:"Fresh Pages library", short:"the library", door:[85,272], mark:[95,160]},
   chico:  {scene:"lane", name:"Chico cottage", short:"Chico cottage", door:[380,282], mark:[380,170]},
   post:   {scene:"village", name:"Post office", short:"the post office", door:[435,502], mark:[435,386]},
   market: {scene:"village", name:"Market", short:"the market", door:[362,350], mark:[362,290]},
   board:  {scene:"village", name:"Quest board", door:[260,338], spot:true, line:"All of today's quests, in one place."},
   well:   {scene:"village", name:"Well", door:[160,350], spot:true, line:"Fresh water! Glug glug."},
-  news:   {scene:"village", name:"Good news board", door:[222,456], spot:true, line:"The good news board. Fresh every morning."},
+  news:   {scene:"village", name:"Good news board", door:[90,488], spot:true, line:"The good news board. Fresh every morning."},
   bench:  {scene:"village", name:"Riverside bench", door:[334,580], spot:true, line:"A bench by the river. Lunch spot for half the town."},
-  toLane: {scene:"village", name:"Gate to Makers' Lane", door:[500,330], spot:true, bridge:"lane", mark:[486,282], line:"Through the gate to Makers' Lane: Chord and Chico."},
+  toLane: {scene:"village", name:"Gate to Makers' Lane", door:[444,218], spot:true, bridge:"lane", mark:[430,170], line:"Through the gate to Makers' Lane: Chord and Chico."},
   // Makers' Lane: the apps (Chord, Chico, and a plot waiting for the next one)
   toTownE:{scene:"lane", name:"Gate to the town square", door:[20,330], spot:true, bridge:"village", mark:[34,282], line:"Back to the town square."},
   plot3:  {scene:"lane", name:"Luna's plot", door:[160,540], spot:true, line:"Luna's plot. Waiting for its building."},
@@ -46,7 +46,7 @@ const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || n
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
 export const BRIDGES = {village:{base:"toBase", lane:"toLane"}, base:{village:"toTown"}, lane:{village:"toTownE"}};
 // where Mel steps off, by "from>to"
-export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[474,330]};
+export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238]};
 // the next outdoor screen on the way from one to another (screens form a little chain: base - village - lane)
 export function nextHop(from, to){
   if (from === to) return null; if (BRIDGES[from] && BRIDGES[from][to]) return to;

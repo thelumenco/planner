@@ -313,3 +313,8 @@ Round 19 (Makers' Lane, a third screen):
 - `lane` joins OUTDOOR: Chord workshop and Chico cottage moved off the town square to Makers' Lane (through a gate on the town's east edge), with their flower gardens, health lights, the Chord flag and Chico arch upgrades, and two fenced "coming soon" plots for the next apps (Luna, Ohayo). Screens chain base - village - lane; `nextHop()` routes through as many bridges/gates as needed, and `ARRIVE` is keyed "from>to". The town square keeps the hall, library, post office, market, well, boards and the bridge home.
 
 Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lines; Hestia's custom lists, rhythm notes, equipment/energy filters and reminders weren't carried over.
+
+## Round 20: town square rebalance
+- With Chord and Chico gone to Makers' Lane, the square leaned right. Fresh Pages library moved to the west (door [85,272]), the good news board to the south-west (door [90,488]), and the bench upgrade follows the library.
+- The Makers' Lane gate moved up to the north-east (door [444,218]; arrival from the lane at [426,238]). It stays clear of the phone's right-edge trackers.
+- Note: `node build.mjs --dev` starts a server and never exits; use `--dev --once` for a one-off build.
