@@ -15,6 +15,7 @@ export const VILLAGE = {
   market: {scene:"village", name:"Market", short:"the market", door:[362,350], mark:[362,290]},
   board:  {scene:"village", name:"Quest board", door:[260,338], spot:true, line:"All of today's quests, in one place."},
   well:   {scene:"village", name:"Well", door:[160,350], spot:true, line:"Fresh water! Glug glug."},
+  news:   {scene:"village", name:"Good news board", door:[222,456], spot:true, line:"The good news board. Fresh every morning."},
   bench:  {scene:"village", name:"Riverside bench", door:[334,580], spot:true, line:"A bench by the river. Lunch spot for half the town."},
   toBase: {scene:"village", name:"Bridge home", door:[260,598], spot:true, bridge:"base", mark:[260,548], line:"Over the bridge and home."},
   // home base

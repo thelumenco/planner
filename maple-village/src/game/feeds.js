@@ -7,7 +7,7 @@ import { esc, plain, dayKey } from "../util.js";
 
 export const APPS = {chord: {name: "Chord", room: "chord"}, chico: {name: "Chico", room: "chico"}};
 export const BRANDS = {chord: {name: "Chord", color: "var(--sage)"}, ambidextrous: {name: "Ambidextrous", color: "var(--peri)"}};
-const DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous"];
+const DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous", "goodnews"];
 const KEY = "fox.feeds";
 let D = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })();
 let onChange = () => {};
@@ -70,4 +70,17 @@ export function contentHTML(){
 }
 export function wireContent(root, rerender){
   root.querySelectorAll("[data-cbrand]").forEach(b => b.onclick = () => { brandFilter = b.dataset.cbrand; rerender(); });
+}
+
+/* ---------- good news board (town square): "goodnews" doc from the morning routine + wins the page knows ---------- */
+export function goodNews(){ const d = D.goodnews; return d && d.at ? d : null; }
+export function goodNewsHTML(localWins){
+  const d = goodNews(), clean = s => plain(String(s || "")).slice(0, 220);
+  const world = ((d && d.world) || []).slice(0, 6).filter(x => x && x.title);
+  const wins = [...(localWins || []), ...(((d && d.wins) || []).map(clean))].filter(Boolean).slice(0, 8);
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Good news</h2><p class="sub">${d ? `Pinned up ${new Date(d.at).toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "short", timeZone: "Asia/Singapore"})}.` : "Fresh every morning."}</p>`;
+  h += `<p class="eyebrow">Your wins</p>` + (wins.length ? `<ul class="hlist gnews">${wins.map(w => `<li><span>${esc(w)}</span></li>`).join("")}</ul>` : `<p class="muted">Your wins show up here as the day goes on.</p>`);
+  h += `<p class="eyebrow">In the world</p>` + (world.length ? `<ul class="hlist gnews world">${world.map(x => `<li><span>${/^https:\/\//.test(x.link || "") ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(clean(x.title))}</a>` : esc(clean(x.title))}${x.summary ? `<small>${esc(clean(x.summary))}</small>` : ""}${x.source ? `<small class="src">${esc(clean(x.source))}</small>` : ""}</span></li>`).join("")}</ul>`
+    : `<p class="muted">The morning's good news hasn't arrived yet.</p>`);
+  return h;
 }

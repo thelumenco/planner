@@ -306,4 +306,7 @@ Round 17 (reports from other routines, `game/feeds.js`):
 - `content-chord` / `content-ambidextrous` docs (written by the content calendars): the calendar panel has Today and Content tabs; Content lists the next 14 days, both brands or one, view-only.
 - Paste-in steps for those four routines: ROUTINE-STEPS.md sections 6-9. Those routines aren't reachable from Claude Code (likely local desktop tasks), so a cloud routine "Village feeds" (trig_01FNvkV73ExnoXTpVsTYT6Bv, 7:05am SGT daily) reads the Chord Founder Room / Chico Founder Desk (embedded `health-data` JSON) and the content planner artifacts, and writes the four docs (plus stats user counts).
 
+Round 18 (good news):
+- A Good News board in the town square (sparkles when there's a fresh pin-up). Tap for "Your wins" (the page's own: quests today and yesterday, streak, harvests, green health checks, user counts, plus the routine's) and "In the world" (3-5 real uplifting stories with links). Routine "Village good news (daily)" (trig_01LPCGof2eTZu2Q6NwbooC3s, 7:12am SGT) searches the web and reads the founder pages, then writes the `goodnews` doc.
+
 Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lines; Hestia's custom lists, rhythm notes, equipment/energy filters and reminders weren't carried over.

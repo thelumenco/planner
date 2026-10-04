@@ -12,7 +12,7 @@ import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, set
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked } from "./paths.js";
 import { fetchPost, postPanel, postCount } from "./postbox.js";
-import { attachFeeds, health, healthPanel, contentHTML, wireContent } from "./feeds.js";
+import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML } from "./feeds.js";
 import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 
@@ -47,14 +47,14 @@ function migrate(){
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
-setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk()});
+setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk()});
 function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
 // In-game UI: the quest note pinned on the map (open, or slim while walking) and the panel over the map.
 // The note starts folded when the village opens; it only pops open on step changes after the first few seconds.
 let qnOpen = false, qnQuietUntil = Date.now() + 5000, qnKey = "", openView = null, shopClosed = false;
-let homeView = null, postOpen = false, healthOpen = false, calTab = "today";   // "chores" (the cleaning cupboard) or "fridge" while one is open at home
+let homeView = null, postOpen = false, healthOpen = false, newsOpen = false, calTab = "today";   // "chores" (the cleaning cupboard) or "fridge" while one is open at home
 
 function persist(which){
   const obj = which === "today" ? S : F;
@@ -89,6 +89,7 @@ async function initDb(){
   attachFeeds(col, id => {
     if (/^health/.test(id) && ["village", "chord", "chico"].includes(scene)) { drawScene(); ctx(); }
     if (/^content/.test(id) && openView === "cal" && calTab === "content") renderCal();
+    if (id === "goodnews" && scene === "village") drawScene();
   });
   refs = {today: col.doc("today"), fox: col.doc("fox"), plan: col.doc("plan"), mail: col.doc("mail"), stats: col.doc("stats"), library: col.doc("library")};
   refs.library.onSnapshot(snap => {
@@ -591,6 +592,19 @@ function renderChat(){
   $("chatChips").querySelectorAll("[data-chip]").forEach(b => b.onclick = () => sendChat(b.dataset.chip));
 }
 
+// Wins the page itself knows about, for the good news board (the morning routine adds more).
+function myWins(){
+  const w = [], y = F.history && F.history[prevDay(dayKey())];
+  if (S.doneIds.length) w.push(`${S.doneIds.length} quest${S.doneIds.length > 1 ? "s" : ""} done today`);
+  if (y && y.q) w.push(`${y.q} quest${y.q > 1 ? "s" : ""} finished yesterday`);
+  if (F.streak >= 2) w.push(`${F.streak} cosy days in a row with ${F.name}`);
+  if (S.harvested) w.push(`${S.harvested} harvest${S.harvested > 1 ? "s" : ""} from the garden today`);
+  ["chord", "chico"].forEach(a => { const h = health(a); if (h && h.status === "green") w.push(`${a === "chord" ? "Chord" : "Chico"}: all checks green last night`); });
+  if (ST.chord && ST.chord.users) w.push(`Chord is home to ${ST.chord.users} ${ST.chord.label || "studios"}`);
+  if (ST.chico && ST.chico.users) w.push(`${ST.chico.users} ${ST.chico.label || "families"} use Chico`);
+  return w;
+}
+
 /* =================== MAIL (agent notes) =================== */
 // Notes the page writes itself: the Friday "weekend edition" of the paper and the 6pm wind-down at the pond.
 const sgAt = (day, h, m = 0) => Date.UTC(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8, 10), h - 8, m);
@@ -870,7 +884,7 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
-  boardOpen = false; shelfOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -905,6 +919,7 @@ function ctx(){
   if (homeView && scene === "home") h = hestiaPanel(homeView);
   else if (postOpen && scene === "post") h = postPanel();
   else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
+  else if (newsOpen && scene === "village") h = goodNewsHTML(myWins());
   else if (scene === "market" && !shopClosed) {
     const tabs = [["seeds","Seeds"],["treats","Treats"],["care","Care"],["family","Family"],["home","Home"],["sell","Sell"]];
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
@@ -1111,7 +1126,7 @@ const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "b
 function setScene(id, at){
   const w = $("world"); w.classList.add("fading");
   setTimeout(() => {
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; homeView = null; postOpen = false; healthOpen = false; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
@@ -1135,7 +1150,7 @@ function go(target, x, y, fn){
     if (!OUTDOOR.includes(target)) { const d = VILLAGE[target].door; legs.push({scene:tOut, x:d[0], y:d[1], fn:() => setScene(target, target === "farm" ? [260, 590] : [260, 596])}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; homeView = null; postOpen = false; healthOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -1175,6 +1190,7 @@ function arriveVillageSpot(id){
     if (placeOf(t) === "base" && spotOf(t) === id && !S.arrived[t.id]) { S.arrived[t.id] = true; setSay(`Here at the ${v.name.toLowerCase()}. First tiny step…`); save(); return; } }
   if (id === "swing") { evan.tx = 112 + rnd(-4, 4); evan.ty = 302; evan.run = true; evan.wait = 6; setTimeout(() => evanSays(pick(["wheee!", "push me!", "higher!"])), 900); speak(v.line, 3500); render(); return; }
   if (id === "letterbox") { const p = paperWaiting(); if (p) { sfx("paper"); openMail(p); } else speak(`Nothing in the letterbox. ${paperName()} comes each morning.`, 3800); render(); return; }
+  if (id === "news") { newsOpen = true; const g = goodNews(); if (g) F.goodRead = g.at; sfx("paper"); save(true); return; }
   if (id === "shed") { shedOpen = true; speak(v.line, 3800); render(); return; }
   if (id === "bench") { speak(v.line, 3800); render(); return; }
   if (id === "well") { A.water(); return; }

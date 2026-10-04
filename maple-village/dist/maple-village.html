@@ -779,6 +779,11 @@ body.nb-open{overflow:hidden}
 .hbadge.sched{color:#3F5E9A;background:#E3EAF8}
 .cday{margin:12px 0 2px}
 .cfilter button[aria-pressed="true"]{background:var(--peri);color:#2F3B73;border-color:transparent}
+/* good news board */
+.hlist.gnews span{display:grid;gap:2px}
+.hlist.gnews a{color:#2F3B73;font-weight:600;text-decoration:none}
+.hlist.gnews .src{font-style:italic}
+.hlist.gnews:not(.world) li::before{content:"";width:8px;height:8px;border-radius:50%;background:#F3C969;flex:none;box-shadow:0 0 0 1.5px rgba(60,40,30,.2)}
 </style>
 </head>
 <body>
@@ -1385,6 +1390,7 @@ body.nb-open{overflow:hidden}
     market: { scene: "village", name: "Market", short: "the market", door: [362, 350], mark: [362, 290] },
     board: { scene: "village", name: "Quest board", door: [260, 338], spot: true, line: "All of today's quests, in one place." },
     well: { scene: "village", name: "Well", door: [160, 350], spot: true, line: "Fresh water! Glug glug." },
+    news: { scene: "village", name: "Good news board", door: [222, 456], spot: true, line: "The good news board. Fresh every morning." },
     bench: { scene: "village", name: "Riverside bench", door: [334, 580], spot: true, line: "A bench by the river. Lunch spot for half the town." },
     toBase: { scene: "village", name: "Bridge home", door: [260, 598], spot: true, bridge: "base", mark: [260, 548], line: "Over the bridge and home." },
     // home base
@@ -1842,6 +1848,12 @@ body.nb-open{overflow:hidden}
         <path d="M332 306 h60 l-4 10 h-52z" style="fill:var(--card)"/><path d="M340 306 l-2 10 M352 306 l-1 10 M364 306 v10 M376 306 l1 10" style="stroke:var(--rose)" stroke-width="5"/>
         <circle cx="350" cy="317" r="3.2" style="fill:var(--rose)"/><circle cx="362" cy="317" r="3.2" style="fill:var(--butter)"/><circle cx="374" cy="317" r="3.2" style="fill:var(--sage)"/></g>
       ${tapeLabel(362, 358, "Market", "var(--blush)", 11)}</g>
+    <g data-place="news" aria-label="Good news board"><ellipse class="hov" cx="222" cy="450" rx="34" ry="8" style="fill:var(--butter)"/>
+      ${sk(
+      `<rect x="194" y="402" width="56" height="36" rx="3" style="fill:#F6E3A1"/><rect x="200" y="408" width="14" height="12" style="fill:#FFFDF6"/><rect x="218" y="410" width="12" height="14" style="fill:#F4C7CF"/><rect x="233" y="407" width="12" height="11" style="fill:#DCE8C8"/>`,
+      `<path d="M202 438 v12 M242 438 v12"/><rect x="194" y="402" width="56" height="36" rx="3"/><rect x="200" y="408" width="14" height="12"/><rect x="218" y="410" width="12" height="14"/><rect x="233" y="407" width="12" height="11"/><path d="M194 402 q28 -10 56 0" opacity=".6"/>`
+    )}
+      ${G.goodNews && G.goodNews() ? `<g class="twinkle">${iconAt("sparkle", 252, 398, 14)}</g>` : ""}${tapeLabel(222, 470, "Good news", "var(--butter)", 11)}</g>
     ${townRiver()}`;
     const L = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
     const light = (app, x, y) => {
@@ -3257,7 +3269,8 @@ Quests finished today: ${S3.doneIds.length}`;
       [334, 304, 390, 336],
       [142, 304, 178, 340],
       [230, 284, 290, 326],
-      [314, 548, 354, 568]
+      [314, 548, 354, 568],
+      [194, 404, 250, 444]
     ],
     base: [
       [198, 176, 322, 294],
@@ -3416,7 +3429,7 @@ Quests finished today: ${S3.doneIds.length}`;
   // src/game/feeds.js
   var APPS = { chord: { name: "Chord", room: "chord" }, chico: { name: "Chico", room: "chico" } };
   var BRANDS = { chord: { name: "Chord", color: "var(--sage)" }, ambidextrous: { name: "Ambidextrous", color: "var(--peri)" } };
-  var DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous"];
+  var DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous", "goodnews"];
   var KEY2 = "fox.feeds";
   var D = (() => {
     try {
@@ -3504,6 +3517,19 @@ Quests finished today: ${S3.doneIds.length}`;
       brandFilter = b.dataset.cbrand;
       rerender();
     });
+  }
+  function goodNews() {
+    const d = D.goodnews;
+    return d && d.at ? d : null;
+  }
+  function goodNewsHTML(localWins) {
+    const d = goodNews(), clean = (s) => plain(String(s || "")).slice(0, 220);
+    const world = (d && d.world || []).slice(0, 6).filter((x) => x && x.title);
+    const wins = [...localWins || [], ...(d && d.wins || []).map(clean)].filter(Boolean).slice(0, 8);
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Good news</h2><p class="sub">${d ? `Pinned up ${new Date(d.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short", timeZone: "Asia/Singapore" })}.` : "Fresh every morning."}</p>`;
+    h += `<p class="eyebrow">Your wins</p>` + (wins.length ? `<ul class="hlist gnews">${wins.map((w) => `<li><span>${esc(w)}</span></li>`).join("")}</ul>` : `<p class="muted">Your wins show up here as the day goes on.</p>`);
+    h += `<p class="eyebrow">In the world</p>` + (world.length ? `<ul class="hlist gnews world">${world.map((x) => `<li><span>${/^https:\/\//.test(x.link || "") ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(clean(x.title))}</a>` : esc(clean(x.title))}${x.summary ? `<small>${esc(clean(x.summary))}</small>` : ""}${x.source ? `<small class="src">${esc(clean(x.source))}</small>` : ""}</span></li>`).join("")}</ul>` : `<p class="muted">The morning's good news hasn't arrived yet.</p>`);
+    return h;
   }
 
   // src/game/hestia.js
@@ -4448,7 +4474,10 @@ Quests finished today: ${S3.doneIds.length}`;
     });
   }
   migrate();
-  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk() });
+  setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), goodNews: () => {
+    const g = goodNews();
+    return g && F.goodRead !== g.at ? g : null;
+  }, lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk() });
   function isDusk() {
     const t = sgHM();
     return t >= 19 * 60 || t < 6 * 60;
@@ -4473,6 +4502,7 @@ Quests finished today: ${S3.doneIds.length}`;
   var homeView = null;
   var postOpen = false;
   var healthOpen = false;
+  var newsOpen = false;
   var calTab = "today";
   function persist(which) {
     const obj = which === "today" ? S2 : F;
@@ -4530,6 +4560,7 @@ Quests finished today: ${S3.doneIds.length}`;
         ctx();
       }
       if (/^content/.test(id) && openView === "cal" && calTab === "content") renderCal();
+      if (id === "goodnews" && scene === "village") drawScene();
     });
     refs = { today: col.doc("today"), fox: col.doc("fox"), plan: col.doc("plan"), mail: col.doc("mail"), stats: col.doc("stats"), library: col.doc("library") };
     refs.library.onSnapshot((snap) => {
@@ -5524,6 +5555,20 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
     $("chatChips").innerHTML = ["What's next?", "I need a break", "Add milk to the shopping list", "I did the dishes"].map((c) => `<button type="button" data-chip="${esc(c)}">${esc(c)}</button>`).join("");
     $("chatChips").querySelectorAll("[data-chip]").forEach((b) => b.onclick = () => sendChat(b.dataset.chip));
   }
+  function myWins() {
+    const w = [], y = F.history && F.history[prevDay(dayKey())];
+    if (S2.doneIds.length) w.push(`${S2.doneIds.length} quest${S2.doneIds.length > 1 ? "s" : ""} done today`);
+    if (y && y.q) w.push(`${y.q} quest${y.q > 1 ? "s" : ""} finished yesterday`);
+    if (F.streak >= 2) w.push(`${F.streak} cosy days in a row with ${F.name}`);
+    if (S2.harvested) w.push(`${S2.harvested} harvest${S2.harvested > 1 ? "s" : ""} from the garden today`);
+    ["chord", "chico"].forEach((a) => {
+      const h = health(a);
+      if (h && h.status === "green") w.push(`${a === "chord" ? "Chord" : "Chico"}: all checks green last night`);
+    });
+    if (ST.chord && ST.chord.users) w.push(`Chord is home to ${ST.chord.users} ${ST.chord.label || "studios"}`);
+    if (ST.chico && ST.chico.users) w.push(`${ST.chico.users} ${ST.chico.label || "families"} use Chico`);
+    return w;
+  }
   var sgAt = (day, h, m = 0) => Date.UTC(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8, 10), h - 8, m);
   var WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   var localCache = { key: "", items: [] };
@@ -6001,6 +6046,7 @@ Then tell chat "wind down" whenever you're ready.`
     homeView = null;
     postOpen = false;
     healthOpen = false;
+    newsOpen = false;
     if (scene === "market") shopClosed = true;
     ctx();
   }
@@ -6051,6 +6097,7 @@ Then tell chat "wind down" whenever you're ready.`
     if (homeView && scene === "home") h = hestiaPanel(homeView);
     else if (postOpen && scene === "post") h = postPanel();
     else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
+    else if (newsOpen && scene === "village") h = goodNewsHTML(myWins());
     else if (scene === "market" && !shopClosed) {
       const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["care", "Care"], ["family", "Family"], ["home", "Home"], ["sell", "Sell"]];
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
@@ -6366,6 +6413,7 @@ Then tell chat "wind down" whenever you're ready.`
       homeView = null;
       postOpen = false;
       healthOpen = false;
+      newsOpen = false;
       resetScene();
       if (id === "post") fetchPost().then(() => {
         if (scene === "post") drawScene();
@@ -6414,6 +6462,7 @@ Then tell chat "wind down" whenever you're ready.`
     homeView = null;
     postOpen = false;
     healthOpen = false;
+    newsOpen = false;
     openView = null;
     nextLeg();
     render();
@@ -6532,6 +6581,14 @@ Then tell chat "wind down" whenever you're ready.`
         openMail(p);
       } else speak(`Nothing in the letterbox. ${paperName()} comes each morning.`, 3800);
       render();
+      return;
+    }
+    if (id === "news") {
+      newsOpen = true;
+      const g = goodNews();
+      if (g) F.goodRead = g.at;
+      sfx("paper");
+      save2(true);
       return;
     }
     if (id === "shed") {

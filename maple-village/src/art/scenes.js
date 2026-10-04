@@ -58,6 +58,10 @@ export function villageArt(){
         <path d="M332 306 h60 l-4 10 h-52z" style="fill:var(--card)"/><path d="M340 306 l-2 10 M352 306 l-1 10 M364 306 v10 M376 306 l1 10" style="stroke:var(--rose)" stroke-width="5"/>
         <circle cx="350" cy="317" r="3.2" style="fill:var(--rose)"/><circle cx="362" cy="317" r="3.2" style="fill:var(--butter)"/><circle cx="374" cy="317" r="3.2" style="fill:var(--sage)"/></g>
       ${tapeLabel(362, 358, "Market", "var(--blush)", 11)}</g>
+    <g data-place="news" aria-label="Good news board"><ellipse class="hov" cx="222" cy="450" rx="34" ry="8" style="fill:var(--butter)"/>
+      ${sk(`<rect x="194" y="402" width="56" height="36" rx="3" style="fill:#F6E3A1"/><rect x="200" y="408" width="14" height="12" style="fill:#FFFDF6"/><rect x="218" y="410" width="12" height="14" style="fill:#F4C7CF"/><rect x="233" y="407" width="12" height="11" style="fill:#DCE8C8"/>`,
+        `<path d="M202 438 v12 M242 438 v12"/><rect x="194" y="402" width="56" height="36" rx="3"/><rect x="200" y="408" width="14" height="12"/><rect x="218" y="410" width="12" height="14"/><rect x="233" y="407" width="12" height="11"/><path d="M194 402 q28 -10 56 0" opacity=".6"/>`)}
+      ${G.goodNews && G.goodNews() ? `<g class="twinkle">${iconAt("sparkle", 252, 398, 14)}</g>` : ""}${tapeLabel(222, 470, "Good news", "var(--butter)", 11)}</g>
     ${townRiver()}`;
   const L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
   const light = (app, x, y) => { const h = G.health ? G.health(app) : null; if (!h) return "";
