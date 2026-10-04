@@ -2,8 +2,8 @@
 // the shelf (two rows of five). A jar can be emptied, or its memory sent to the journal as a polaroid + note.
 // Private doc "jars" in the per-user collection: {jars:[{id, at, slot, blobs:[emotionId...], note} | {id, at, deleted}],
 // custom:[{id, name, color, at}], updatedAt}. Jars merge by id across devices (newest change wins, like the journal).
-// Colours: validated so every pair is distinct for normal vision; each emotion also has its own little symbol and its
-// name is always shown, so a colour is never the only clue.
+// Colours: validated so every pair is distinct for normal vision; names always show beside them. Blobs are soft:
+// no outline and no symbol (Mel asked for soft blobs).
 import { esc, plain } from "../util.js";
 
 export const EMOTIONS = [
@@ -56,28 +56,14 @@ export function emptyJar(id){
 /* ---------- drawing ---------- */
 // Blob positions inside the jar: stacked from the bottom in rows of 3/4, a little jitter from the jar id
 const rnd = (seed, i) => { let h = 2166136261; for (const ch of seed + ":" + i) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000)/1000; };
-function markPath(m, x, y, r){
-  const s = r*.42, ink = `fill="none" stroke="rgba(255,255,255,.92)" stroke-width="${(r*.16).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"`;
-  switch (m){
-    case "sun": return `<circle cx="${x}" cy="${y}" r="${(s*.55).toFixed(2)}" ${ink}/>`;
-    case "drop": return `<path d="M${x} ${y - s} q${s*.9} ${s*1.1} 0 ${s*1.9} q${-s*.9} ${-s*.8} 0 ${-s*1.9}z" ${ink}/>`;
-    case "zig": return `<path d="M${x - s} ${y} l${s*.5} ${-s*.6} l${s*.5} ${s*1.2} l${s*.5} ${-s*1.2} l${s*.5} ${s*.6}" ${ink}/>`;
-    case "wave": return `<path d="M${x - s} ${y} q${s*.5} ${-s*.8} ${s} 0 q${s*.5} ${s*.8} ${s} 0" ${ink}/>`;
-    case "squig": return `<path d="M${x - s*.8} ${y - s*.5} l${s*1.6} ${s} M${x + s*.8} ${y - s*.5} l${-s*1.6} ${s}" ${ink}/>`;
-    case "line": return `<path d="M${x - s} ${y} h${s*2}" ${ink}/>`;
-    case "heart": return `<path d="M${x} ${y + s*.7} c${-s*1.4} ${-s*.9} ${-s*.9} ${-s*1.9} 0 ${-s*1.1} c${s*.9} ${-s*.8} ${s*1.4} ${s*.2} 0 ${s*1.1}z" ${ink}/>`;
-    case "dots": return `<g fill="rgba(255,255,255,.92)"><circle cx="${x - s*.6}" cy="${y}" r="${(r*.1).toFixed(2)}"/><circle cx="${x}" cy="${y}" r="${(r*.1).toFixed(2)}"/><circle cx="${x + s*.6}" cy="${y}" r="${(r*.1).toFixed(2)}"/></g>`;
-    case "z": return `<path d="M${x - s*.6} ${y - s*.6} h${s*1.2} l${-s*1.2} ${s*1.2} h${s*1.2}" ${ink}/>`;
-    case "star": return `<path d="M${x} ${y - s} l${s*.3} ${s*.7} l${s*.7} ${s*.05} l${-s*.55} ${s*.45} l${s*.2} ${s*.75} l${-s*.65} ${-s*.4} l${-s*.65} ${s*.4} l${s*.2} ${-s*.75} l${-s*.55} ${-s*.45} l${s*.7} ${-s*.05}z" ${ink}/>`;
-    default: return `<circle cx="${x}" cy="${y}" r="${(r*.12).toFixed(2)}" fill="rgba(255,255,255,.92)"/>`;
-  }
-}
+// A soft blob: no outline, no symbol. A lighter centre, a gentle shade at the bottom and a small highlight.
+const softBlob = (x, y, r, color, sq = 1.12) => `<g><ellipse cx="${x.toFixed(1)}" cy="${(y + r*.15).toFixed(1)}" rx="${(r*sq + .8).toFixed(2)}" ry="${(r + .8).toFixed(2)}" fill="${color}" opacity=".35"/><ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${(r*sq).toFixed(2)}" ry="${r.toFixed(2)}" fill="${color}" opacity=".92"/><ellipse cx="${x.toFixed(1)}" cy="${(y + r*.45).toFixed(1)}" rx="${(r*sq*.8).toFixed(2)}" ry="${(r*.45).toFixed(2)}" fill="rgba(47,43,40,.10)"/><ellipse cx="${(x - r*.35).toFixed(1)}" cy="${(y - r*.4).toFixed(1)}" rx="${(r*.42).toFixed(2)}" ry="${(r*.26).toFixed(2)}" fill="rgba(255,255,255,.55)"/></g>`;
 // A jar in a 60 x 80 box: glass, cork lid, blobs. `col(id)` gives {color, mark} for an emotion id.
 export function jarArt(jar, opts = {}){
   const blobs = (jar && jar.blobs) || [], col = id => (jar && jar.colors && jar.colors[id]) || emo(id), seed = (jar && jar.id) || "new";
   // rows of 3 and 2, nested like real blobs settling: ten blobs fill the jar to the shoulder
   const pos = []; for (let i = 0, row = 0, k = 0; i < blobs.length; i++) { const per = row % 2 ? 2 : 3; pos.push([14 + (k + (row % 2 ? .5 : 0))*16 + (rnd(seed, i) - .5)*3, 68 - row*12.5 + (rnd(seed, i + 50) - .5)*2]); if (++k >= per) { k = 0; row++; } }
-  const b = blobs.map((id, i) => { const c = col(id), [x, y] = pos[i], r = 7.6 + rnd(seed, i + 9)*.9; return `<g class="${opts.anim && i === blobs.length - 1 ? "blobdrop" : ""}"><ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${(r*1.12).toFixed(2)}" ry="${r.toFixed(2)}" fill="${c.color}" stroke="rgba(47,43,40,.55)" stroke-width=".8"/><ellipse cx="${(x - r*.4).toFixed(1)}" cy="${(y - r*.45).toFixed(1)}" rx="${(r*.35).toFixed(2)}" ry="${(r*.22).toFixed(2)}" fill="rgba(255,255,255,.45)"/>${markPath(c.mark, x, y + .5, r)}</g>`; }).join("");
+  const b = blobs.map((id, i) => { const c = col(id), [x, y] = pos[i], r = 7.6 + rnd(seed, i + 9)*.9; return `<g class="${opts.anim && i === blobs.length - 1 ? "blobdrop" : ""}">${softBlob(x, y, r, c.color)}</g>`; }).join("");
   const glow = blobs.length ? `<ellipse cx="30" cy="62" rx="24" ry="20" fill="${col(blobs[blobs.length - 1]).color}" opacity=".12"/>` : "";
   return `<g class="jar">${glow}<path d="M8 20 q-3 4 -3 10 v40 q0 7 7 7 h36 q7 0 7 -7 v-40 q0 -6 -3 -10z" fill="rgba(220,235,245,.45)" stroke="var(--line, #3b3530)" stroke-width="1.4"/>${b}
     <path d="M10 24 v40" stroke="rgba(255,255,255,.75)" stroke-width="2.4" stroke-linecap="round"/><rect x="10" y="12" width="40" height="9" rx="2.5" fill="#C9A27E" stroke="var(--line, #3b3530)" stroke-width="1.3"/><path d="M14 16.5 h32" stroke="rgba(47,43,40,.25)" stroke-width="1"/></g>`;
@@ -95,7 +81,7 @@ export function jarsPanel(v){
     return `<span class="tape gingham" aria-hidden="true"></span><h2>Make a jar</h2><p class="sub">Tap a feeling to drop a blob in. Up to ${MAX_BLOBS} blobs, from up to ${MAX_KINDS} feelings.</p>
       <div class="jarmake"><div class="jarbig">${jarSVG({id: "new", blobs: v.blobs}, 120, {anim: true})}<p class="muted">${v.blobs.length}/${MAX_BLOBS} ${v.blobs.length ? "· " + esc(jarLabel({blobs: v.blobs})) : ""}</p>${v.blobs.length ? `<button class="btn alt small" data-jar="unblob">Undo last blob</button>` : ""}</div>
       <div class="emos">${pal.map(e => { const off = v.blobs.length >= MAX_BLOBS || (!kinds.includes(e.id) && kinds.length >= MAX_KINDS);
-        return `<button class="emo" data-emo="${esc(e.id)}" ${off ? "disabled" : ""}><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><ellipse cx="12" cy="12" rx="10" ry="9" fill="${e.color}" stroke="rgba(47,43,40,.55)" stroke-width=".8"/>${markPath(e.mark, 12, 12.5, 9)}</svg><span>${esc(e.name)}</span></button>`; }).join("")}
+        return `<button class="emo" data-emo="${esc(e.id)}" ${off ? "disabled" : ""}><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">${softBlob(12, 12, 8.6, e.color, 1.08)}</svg><span>${esc(e.name)}</span></button>`; }).join("")}
         <button class="emo add" data-jar="custom"><span class="plus">+</span><span>Your own</span></button></div></div>
       ${v.adding ? `<form class="row jcustom" id="jcForm"><label class="sr" for="jcName">Feeling name</label><input id="jcName" maxlength="20" placeholder="e.g. Overwhelmed" value="${esc(v.customName || "")}"><div class="swatches">${CUSTOM_COLOURS.map(c => `<button type="button" class="sw${(v.customColor || CUSTOM_COLOURS[0]) === c ? " on" : ""}" data-sw="${c}" style="background:${c}" aria-label="colour ${c}"></button>`).join("")}</div><button class="btn small" type="submit">Add</button></form>` : ""}
       <label class="sr" for="jNote">A short note</label><textarea id="jNote" class="jnote" rows="2" maxlength="280" placeholder="A short note, if you like: what happened, what you need...">${esc(v.note || "")}</textarea>

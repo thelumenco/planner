@@ -2226,33 +2226,7 @@ body.nb-open{overflow:hidden}
     }
     return (h >>> 0) % 1e3 / 1e3;
   };
-  function markPath(m, x, y, r) {
-    const s = r * 0.42, ink2 = `fill="none" stroke="rgba(255,255,255,.92)" stroke-width="${(r * 0.16).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"`;
-    switch (m) {
-      case "sun":
-        return `<circle cx="${x}" cy="${y}" r="${(s * 0.55).toFixed(2)}" ${ink2}/>`;
-      case "drop":
-        return `<path d="M${x} ${y - s} q${s * 0.9} ${s * 1.1} 0 ${s * 1.9} q${-s * 0.9} ${-s * 0.8} 0 ${-s * 1.9}z" ${ink2}/>`;
-      case "zig":
-        return `<path d="M${x - s} ${y} l${s * 0.5} ${-s * 0.6} l${s * 0.5} ${s * 1.2} l${s * 0.5} ${-s * 1.2} l${s * 0.5} ${s * 0.6}" ${ink2}/>`;
-      case "wave":
-        return `<path d="M${x - s} ${y} q${s * 0.5} ${-s * 0.8} ${s} 0 q${s * 0.5} ${s * 0.8} ${s} 0" ${ink2}/>`;
-      case "squig":
-        return `<path d="M${x - s * 0.8} ${y - s * 0.5} l${s * 1.6} ${s} M${x + s * 0.8} ${y - s * 0.5} l${-s * 1.6} ${s}" ${ink2}/>`;
-      case "line":
-        return `<path d="M${x - s} ${y} h${s * 2}" ${ink2}/>`;
-      case "heart":
-        return `<path d="M${x} ${y + s * 0.7} c${-s * 1.4} ${-s * 0.9} ${-s * 0.9} ${-s * 1.9} 0 ${-s * 1.1} c${s * 0.9} ${-s * 0.8} ${s * 1.4} ${s * 0.2} 0 ${s * 1.1}z" ${ink2}/>`;
-      case "dots":
-        return `<g fill="rgba(255,255,255,.92)"><circle cx="${x - s * 0.6}" cy="${y}" r="${(r * 0.1).toFixed(2)}"/><circle cx="${x}" cy="${y}" r="${(r * 0.1).toFixed(2)}"/><circle cx="${x + s * 0.6}" cy="${y}" r="${(r * 0.1).toFixed(2)}"/></g>`;
-      case "z":
-        return `<path d="M${x - s * 0.6} ${y - s * 0.6} h${s * 1.2} l${-s * 1.2} ${s * 1.2} h${s * 1.2}" ${ink2}/>`;
-      case "star":
-        return `<path d="M${x} ${y - s} l${s * 0.3} ${s * 0.7} l${s * 0.7} ${s * 0.05} l${-s * 0.55} ${s * 0.45} l${s * 0.2} ${s * 0.75} l${-s * 0.65} ${-s * 0.4} l${-s * 0.65} ${s * 0.4} l${s * 0.2} ${-s * 0.75} l${-s * 0.55} ${-s * 0.45} l${s * 0.7} ${-s * 0.05}z" ${ink2}/>`;
-      default:
-        return `<circle cx="${x}" cy="${y}" r="${(r * 0.12).toFixed(2)}" fill="rgba(255,255,255,.92)"/>`;
-    }
-  }
+  var softBlob = (x, y, r, color, sq = 1.12) => `<g><ellipse cx="${x.toFixed(1)}" cy="${(y + r * 0.15).toFixed(1)}" rx="${(r * sq + 0.8).toFixed(2)}" ry="${(r + 0.8).toFixed(2)}" fill="${color}" opacity=".35"/><ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${(r * sq).toFixed(2)}" ry="${r.toFixed(2)}" fill="${color}" opacity=".92"/><ellipse cx="${x.toFixed(1)}" cy="${(y + r * 0.45).toFixed(1)}" rx="${(r * sq * 0.8).toFixed(2)}" ry="${(r * 0.45).toFixed(2)}" fill="rgba(47,43,40,.10)"/><ellipse cx="${(x - r * 0.35).toFixed(1)}" cy="${(y - r * 0.4).toFixed(1)}" rx="${(r * 0.42).toFixed(2)}" ry="${(r * 0.26).toFixed(2)}" fill="rgba(255,255,255,.55)"/></g>`;
   function jarArt(jar, opts = {}) {
     const blobs = jar && jar.blobs || [], col = (id) => jar && jar.colors && jar.colors[id] || emo(id), seed = jar && jar.id || "new";
     const pos = [];
@@ -2266,7 +2240,7 @@ body.nb-open{overflow:hidden}
     }
     const b = blobs.map((id, i) => {
       const c = col(id), [x, y] = pos[i], r = 7.6 + rnd2(seed, i + 9) * 0.9;
-      return `<g class="${opts.anim && i === blobs.length - 1 ? "blobdrop" : ""}"><ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${(r * 1.12).toFixed(2)}" ry="${r.toFixed(2)}" fill="${c.color}" stroke="rgba(47,43,40,.55)" stroke-width=".8"/><ellipse cx="${(x - r * 0.4).toFixed(1)}" cy="${(y - r * 0.45).toFixed(1)}" rx="${(r * 0.35).toFixed(2)}" ry="${(r * 0.22).toFixed(2)}" fill="rgba(255,255,255,.45)"/>${markPath(c.mark, x, y + 0.5, r)}</g>`;
+      return `<g class="${opts.anim && i === blobs.length - 1 ? "blobdrop" : ""}">${softBlob(x, y, r, c.color)}</g>`;
     }).join("");
     const glow = blobs.length ? `<ellipse cx="30" cy="62" rx="24" ry="20" fill="${col(blobs[blobs.length - 1]).color}" opacity=".12"/>` : "";
     return `<g class="jar">${glow}<path d="M8 20 q-3 4 -3 10 v40 q0 7 7 7 h36 q7 0 7 -7 v-40 q0 -6 -3 -10z" fill="rgba(220,235,245,.45)" stroke="var(--line, #3b3530)" stroke-width="1.4"/>${b}
@@ -2286,7 +2260,7 @@ body.nb-open{overflow:hidden}
       <div class="jarmake"><div class="jarbig">${jarSVG({ id: "new", blobs: v.blobs }, 120, { anim: true })}<p class="muted">${v.blobs.length}/${MAX_BLOBS} ${v.blobs.length ? "· " + esc(jarLabel({ blobs: v.blobs })) : ""}</p>${v.blobs.length ? `<button class="btn alt small" data-jar="unblob">Undo last blob</button>` : ""}</div>
       <div class="emos">${pal.map((e) => {
         const off = v.blobs.length >= MAX_BLOBS || !kinds.includes(e.id) && kinds.length >= MAX_KINDS;
-        return `<button class="emo" data-emo="${esc(e.id)}" ${off ? "disabled" : ""}><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><ellipse cx="12" cy="12" rx="10" ry="9" fill="${e.color}" stroke="rgba(47,43,40,.55)" stroke-width=".8"/>${markPath(e.mark, 12, 12.5, 9)}</svg><span>${esc(e.name)}</span></button>`;
+        return `<button class="emo" data-emo="${esc(e.id)}" ${off ? "disabled" : ""}><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">${softBlob(12, 12, 8.6, e.color, 1.08)}</svg><span>${esc(e.name)}</span></button>`;
       }).join("")}
         <button class="emo add" data-jar="custom"><span class="plus">+</span><span>Your own</span></button></div></div>
       ${v.adding ? `<form class="row jcustom" id="jcForm"><label class="sr" for="jcName">Feeling name</label><input id="jcName" maxlength="20" placeholder="e.g. Overwhelmed" value="${esc(v.customName || "")}"><div class="swatches">${CUSTOM_COLOURS.map((c) => `<button type="button" class="sw${(v.customColor || CUSTOM_COLOURS[0]) === c ? " on" : ""}" data-sw="${c}" style="background:${c}" aria-label="colour ${c}"></button>`).join("")}</div><button class="btn small" type="submit">Add</button></form>` : ""}
