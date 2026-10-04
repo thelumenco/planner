@@ -5466,6 +5466,11 @@ Then tell chat "wind down" whenever you're ready.`
       return;
     }
     const [x, y] = toWorld(ev);
+    const near = npcActors().map(([n, e]) => [n, Math.hypot(e.x - x, e.y - 30 - y)]).filter(([, d]) => d < 34).sort((a, b) => a[1] - b[1])[0];
+    if (near) {
+      tapNpc(near[0].dataset.npc);
+      return;
+    }
     route = [];
     atSpot = null;
     if (qnOpen && phase() !== "clean") {

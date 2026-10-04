@@ -1070,7 +1070,11 @@ svg.addEventListener("click", ev => {
   if (ev.target.closest("[data-exit]")) { go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null); return; }
   const pt = ev.target.closest("[data-plot]");
   if (pt) { const i = +pt.dataset.plot, p = PLOTS[i]; go("farm", p.x + p.w/2, p.y + p.h + 18, () => { selPlot = i; atSpot = "plot"; ctx(); const s = F.plots[i]; speak(!s || !s.crop ? "Empty plot. What shall we grow?" : !s.wateredAt ? "Thirsty seeds!" : growth(s) >= 1 ? "Ready to pick!" : "Growing nicely.", 3000); }); return; }
-  const [x, y] = toWorld(ev); route = []; atSpot = null;
+  const [x, y] = toWorld(ev);
+  // Fingers miss small people: a tap close to a villager or messenger counts as tapping them.
+  const near = npcActors().map(([n, e]) => [n, Math.hypot(e.x - x, (e.y - 30) - y)]).filter(([, d]) => d < 34).sort((a, b) => a[1] - b[1])[0];
+  if (near) { tapNpc(near[0].dataset.npc); return; }
+  route = []; atSpot = null;
   if (qnOpen && phase() !== "clean") { qnOpen = false; journal(); }   // tapping the map to wander folds the note away
   walkTo(x, y);
 });
