@@ -1395,7 +1395,8 @@ body.nb-open{overflow:hidden}
     toLane: { scene: "village", name: "Gate to Makers' Lane", door: [500, 330], spot: true, bridge: "lane", mark: [486, 282], line: "Through the gate to Makers' Lane: Chord and Chico." },
     // Makers' Lane: the apps (Chord, Chico, and a plot waiting for the next one)
     toTownE: { scene: "lane", name: "Gate to the town square", door: [20, 330], spot: true, bridge: "village", mark: [34, 282], line: "Back to the town square." },
-    plot3: { scene: "lane", name: "Empty plot", door: [262, 540], spot: true, line: "A plot for the next app. Luna, maybe?" },
+    plot3: { scene: "lane", name: "Luna's plot", door: [160, 540], spot: true, line: "Luna's plot. Waiting for its building." },
+    plot4: { scene: "lane", name: "Ohayo's plot", door: [362, 540], spot: true, line: "Ohayo's plot. Waiting for its building." },
     toBase: { scene: "village", name: "Bridge home", door: [260, 598], spot: true, bridge: "base", mark: [260, 548], line: "Over the bridge and home." },
     // home base
     home: { scene: "base", name: "Home", short: "home", door: [260, 308], mark: [260, 160] },
@@ -1978,7 +1979,7 @@ body.nb-open{overflow:hidden}
     const D2 = VILLAGE;
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D2.chico.door[0]} ${D2.chico.door[1]} M150 336 L${D2.chord.door[0]} ${D2.chord.door[1]} M262 344 L${D2.plot3.door[0]} ${D2.plot3.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D2.chico.door[0]} ${D2.chico.door[1]} M150 336 L${D2.chord.door[0]} ${D2.chord.door[1]} M262 344 L262 420 M262 420 C230 470 190 500 ${D2.plot3.door[0]} ${D2.plot3.door[1]} M262 420 C300 470 340 500 ${D2.plot4.door[0]} ${D2.plot4.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[40, 200, "#EFA3A6"], [60, 214, "#F3C969"], [480, 330, "#C3CDEE"], [300, 420, "#EFA3A6"], [200, 600, "#F3C969"], [90, 560, "#C3CDEE"], [460, 600, "#EFA3A6"], [330, 250, "#F3C969"]])}
     ${tree(30, 120, 1)}${tree(250, 80, 0.9)}${tree(490, 110, 1)}${tree(40, 620, 0.95)}${tree(490, 620, 0.9)}${tree(470, 430, 0.85)}${tree(60, 440, 0.9)}`;
     const gate = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
@@ -1987,13 +1988,14 @@ body.nb-open{overflow:hidden}
       `<rect x="6" y="292" width="6" height="56"/><rect x="30" y="292" width="6" height="56"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`
     )}
     ${tapeLabel(62, 366, "Town square", "var(--butter)", 11)}</g>`;
-    const plot = `<g data-place="plot3" aria-label="Empty plot"><ellipse class="hov" cx="262" cy="530" rx="70" ry="12" style="fill:var(--butter)"/>
+    const plotArt = (id, x, name, col) => `<g data-place="${id}" aria-label="${name}'s plot"><ellipse class="hov" cx="${x}" cy="530" rx="56" ry="11" style="fill:var(--butter)"/>
     ${sk(
-      `<rect x="200" y="452" width="124" height="70" rx="4" style="fill:#C9A27E"/><rect x="236" y="430" width="52" height="22" rx="2" style="fill:#FFFDF6"/>`,
-      `<path d="M196 526 V448 H328 V526 M196 526 H250 M274 526 H328" fill="none"/><path d="M206 470 h112 M206 490 h112 M206 508 h112" opacity=".35"/><rect x="236" y="430" width="52" height="22" rx="2"/><path d="M262 452 v-0"/>`
+      `<rect x="${x - 50}" y="456" width="100" height="66" rx="4" style="fill:#C9A27E"/><rect x="${x - 26}" y="432" width="52" height="22" rx="2" style="fill:#FFFDF6"/>`,
+      `<path d="M${x - 54} 526 V452 H${x + 54} V526 M${x - 54} 526 H${x - 12} M${x + 12} 526 H${x + 54}" fill="none"/><path d="M${x - 44} 474 h88 M${x - 44} 492 h88 M${x - 44} 508 h88" opacity=".35"/><rect x="${x - 26}" y="432" width="52" height="22" rx="2"/>`
     )}
-    <text x="262" y="445" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" style="fill:var(--line)">coming soon</text>
-    ${tapeLabel(262, 552, "Next app", "var(--peach)", 11)}</g>`;
+    <text x="${x}" y="447" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" style="fill:var(--line)">coming soon</text>
+    ${tapeLabel(x, 552, name, col, 11)}</g>`;
+    const plot = plotArt("plot3", 160, "Luna", "var(--peri)") + plotArt("plot4", 362, "Ohayo", "var(--peach)");
     return ground + gate + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot + light("chord", 200, 196) + light("chico", 433, 206) + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12) + upgradesArt(G.F().totalQuests || 0, "lane");
   }
   function notesArt(x, y, n) {
@@ -3329,7 +3331,7 @@ Quests finished today: ${S3.doneIds.length}`;
       [314, 548, 354, 568],
       [194, 404, 250, 444]
     ],
-    lane: [[85, 150, 205, 254], [322, 160, 438, 264], [196, 448, 328, 526], [234, 428, 290, 452]],
+    lane: [[85, 150, 205, 254], [322, 160, 438, 264], [106, 450, 214, 526], [308, 450, 416, 526]],
     base: [
       [198, 176, 322, 294],
       [314, 232, 348, 294],
@@ -6618,7 +6620,7 @@ Then tell chat "wind down" whenever you're ready.`
       setScene(v.bridge, ARRIVE[scene + ">" + v.bridge]);
       return;
     }
-    if (id === "plot3") {
+    if (id === "plot3" || id === "plot4") {
       speak(v.line, 4e3);
       render();
       return;

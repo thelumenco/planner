@@ -20,7 +20,8 @@ export const VILLAGE = {
   toLane: {scene:"village", name:"Gate to Makers' Lane", door:[500,330], spot:true, bridge:"lane", mark:[486,282], line:"Through the gate to Makers' Lane: Chord and Chico."},
   // Makers' Lane: the apps (Chord, Chico, and a plot waiting for the next one)
   toTownE:{scene:"lane", name:"Gate to the town square", door:[20,330], spot:true, bridge:"village", mark:[34,282], line:"Back to the town square."},
-  plot3:  {scene:"lane", name:"Empty plot", door:[262,540], spot:true, line:"A plot for the next app. Luna, maybe?"},
+  plot3:  {scene:"lane", name:"Luna's plot", door:[160,540], spot:true, line:"Luna's plot. Waiting for its building."},
+  plot4:  {scene:"lane", name:"Ohayo's plot", door:[362,540], spot:true, line:"Ohayo's plot. Waiting for its building."},
   toBase: {scene:"village", name:"Bridge home", door:[260,598], spot:true, bridge:"base", mark:[260,548], line:"Over the bridge and home."},
   // home base
   home:   {scene:"base", name:"Home", short:"home", door:[260,308], mark:[260,160]},

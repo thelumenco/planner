@@ -166,19 +166,20 @@ export function laneArt(){
   const D = VILLAGE;
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D.chico.door[0]} ${D.chico.door[1]} M150 336 L${D.chord.door[0]} ${D.chord.door[1]} M262 344 L${D.plot3.door[0]} ${D.plot3.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D.chico.door[0]} ${D.chico.door[1]} M150 336 L${D.chord.door[0]} ${D.chord.door[1]} M262 344 L262 420 M262 420 C230 470 190 500 ${D.plot3.door[0]} ${D.plot3.door[1]} M262 420 C300 470 340 500 ${D.plot4.door[0]} ${D.plot4.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[40,200,"#EFA3A6"],[60,214,"#F3C969"],[480,330,"#C3CDEE"],[300,420,"#EFA3A6"],[200,600,"#F3C969"],[90,560,"#C3CDEE"],[460,600,"#EFA3A6"],[330,250,"#F3C969"]])}
     ${tree(30,120,1)}${tree(250,80,.9)}${tree(490,110,1)}${tree(40,620,.95)}${tree(490,620,.9)}${tree(470,430,.85)}${tree(60,440,.9)}`;
   const gate = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
     ${sk(`<rect x="6" y="292" width="6" height="56" style="fill:var(--wood)"/><rect x="30" y="292" width="6" height="56" style="fill:var(--wood)"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
       `<rect x="6" y="292" width="6" height="56"/><rect x="30" y="292" width="6" height="56"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`)}
     ${tapeLabel(62, 366, "Town square", "var(--butter)", 11)}</g>`;
-  // the next app's plot: a fenced patch of turned earth and a little sign
-  const plot = `<g data-place="plot3" aria-label="Empty plot"><ellipse class="hov" cx="262" cy="530" rx="70" ry="12" style="fill:var(--butter)"/>
-    ${sk(`<rect x="200" y="452" width="124" height="70" rx="4" style="fill:#C9A27E"/><rect x="236" y="430" width="52" height="22" rx="2" style="fill:#FFFDF6"/>`,
-      `<path d="M196 526 V448 H328 V526 M196 526 H250 M274 526 H328" fill="none"/><path d="M206 470 h112 M206 490 h112 M206 508 h112" opacity=".35"/><rect x="236" y="430" width="52" height="22" rx="2"/><path d="M262 452 v-0"/>`)}
-    <text x="262" y="445" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" style="fill:var(--line)">coming soon</text>
-    ${tapeLabel(262, 552, "Next app", "var(--peach)", 11)}</g>`;
+  // plots for the next apps: fenced patches of turned earth, each with a little "coming soon" sign
+  const plotArt = (id, x, name, col) => `<g data-place="${id}" aria-label="${name}'s plot"><ellipse class="hov" cx="${x}" cy="530" rx="56" ry="11" style="fill:var(--butter)"/>
+    ${sk(`<rect x="${x-50}" y="456" width="100" height="66" rx="4" style="fill:#C9A27E"/><rect x="${x-26}" y="432" width="52" height="22" rx="2" style="fill:#FFFDF6"/>`,
+      `<path d="M${x-54} 526 V452 H${x+54} V526 M${x-54} 526 H${x-12} M${x+12} 526 H${x+54}" fill="none"/><path d="M${x-44} 474 h88 M${x-44} 492 h88 M${x-44} 508 h88" opacity=".35"/><rect x="${x-26}" y="432" width="52" height="22" rx="2"/>`)}
+    <text x="${x}" y="447" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" style="fill:var(--line)">coming soon</text>
+    ${tapeLabel(x, 552, name, col, 11)}</g>`;
+  const plot = plotArt("plot3", 160, "Luna", "var(--peri)") + plotArt("plot4", 362, "Ohayo", "var(--peach)");
   return ground + gate
     + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot
     + light("chord", 200, 196) + light("chico", 433, 206)

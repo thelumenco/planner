@@ -1188,7 +1188,7 @@ function arriveVillageSpot(id){
   atSpot = id;
   const v = VILLAGE[id];
   if (v.bridge) { atSpot = null; setScene(v.bridge, ARRIVE[scene + ">" + v.bridge]); return; }
-  if (id === "plot3") { speak(v.line, 4000); render(); return; }
+  if (id === "plot3" || id === "plot4") { speak(v.line, 4000); render(); return; }
   // an outdoor quest at home base (Evan outing at the swing, garden jobs at the shed, a walk by the pond)
   if (scene === "base" && phase() === "task") { const t = remaining()[0];
     if (placeOf(t) === "base" && spotOf(t) === id && !S.arrived[t.id]) { S.arrived[t.id] = true; setSay(`Here at the ${v.name.toLowerCase()}. First tiny step…`); save(); return; } }
