@@ -30,12 +30,14 @@ export function toQuest(t){
   if (t.completed) q.completed = true;
   if (notes) q.notes = notes.slice(0, 4000);
   if (/^personal$/i.test(q.channel) || t.isPersonal) q.place = "home";
-  if (/🚶|treadmill|\bwalk\b/i.test(t.title)) q.treadmill = true;
+
   const gmail = /https:\/\/mail\.google\.com\/[^\s"<]+/.exec(decode(t.notes || ""));
   if (gmail || /\b(email|inbox|reply|comms)\b/i.test(t.title)) {
     q.place = "post"; q.spot = "counter";
     q.email = {subject: t.title.replace(/^\[[^\]]*\]\s*/, ""), link: gmail ? gmail[0] : "https://mail.google.com/mail/u/0/#inbox"};
   }
+  if (/🚶|treadmill/i.test(t.title)) { q.treadmill = true; q.place = "home"; q.spot = "treadmill"; delete q.email; }  // a treadmill task: straight to the treadmill
+  else if (/\bwalk\b/i.test(t.title)) q.treadmill = true;                                                              // walkable: offered
   return q;
 }
 

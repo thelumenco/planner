@@ -41,6 +41,16 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   } else check(lay.hud <= lay.map, "trackers sit above the map");
   check(lay.fits, "the whole game fits on screen without scrolling");
   check(lay.note, "the quest note is pinned on the map");
+  check(await page.locator(".hudbar .pbar").count() === 2, "water and steps are drawn progress bars");
+  await page.click('[data-track="water"]');
+  await page.click('#notebook [data-nb="w"]');
+  await page.click('#notebook [data-nb="w"] >> nth=1');
+  check(await page.locator("#nbTitle").textContent().then(t => /0[.,]75 L/.test(t)), "water note adds a glass and a bottle (750 ml)");
+  await page.fill("#nbTrack", "1000"); await page.click('#notebook [data-nb="wset"]');
+  check(await page.locator("#waterNote").textContent().then(t => /^1 L/.test(t)), "water total can be typed in");
+  await page.click('[data-track="steps"]');
+  await page.fill("#nbTrack", "2500"); await page.click('#notebook [data-nb="sset"]');
+  check(await page.locator("#stepNote").textContent().then(t => /2,500/.test(t)), "steps can be typed in from the steps note");
 
   // Clean: walk to cupboard, get wipe, done
   await page.click('#journal [data-a="walk"]');
@@ -169,6 +179,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(plan && plan.source === "sunsama" && plan.tasks.find(t => t.id === "s1").notes.includes("- Check GHL"), "notes are cleaned up from Sunsama's HTML");
   check(plan.tasks.find(t => t.id === "s4").minutes === 90 && plan.tasks.find(t => t.id === "s3").treadmill === true, "time estimates and treadmill flags carry over");
   check(plan.tasks.find(t => t.id === "s1").email, "comms tasks become email quests at the post office");
+  check(plan.tasks.find(t => t.id === "s3").spot === "treadmill", "treadmill tasks go straight to the treadmill");
   await page.close();
 }
 await browser.close();

@@ -103,3 +103,12 @@ const body = name => { const [a, l] = art(name); return `<g filter="url(#markerS
 export const icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
 export const iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size/2}" y="${y - size/2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;
 export const ICON_NAMES = Object.keys(I);
+
+// A thin hand-drawn progress bar (trackers). ticks: number of segments marked along it.
+export function progressBar(pct, color, ticks = 0){
+  const w = Math.max(0, Math.min(1, pct || 0))*115;
+  const tk = Array.from({length: Math.max(0, ticks - 1)}, (_, i) => `<path d="M${(2.5 + 115*(i + 1)/ticks).toFixed(1)} 4v4"/>`).join("");
+  return `<svg class="pbar" viewBox="0 0 120 12" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <g filter="url(#markerS)">${w > .5 ? `<rect x="2.5" y="2.6" width="${w.toFixed(1)}" height="6.8" rx="3.4" style="fill:${color}"/>` : ""}</g>
+    <g filter="url(#wobS)" fill="none" stroke="var(--line)" stroke-width="1.1" stroke-linecap="round" vector-effect="non-scaling-stroke"><rect x="1.5" y="2" width="117" height="8" rx="4"/><g opacity=".3">${tk}</g></g></svg>`;
+}

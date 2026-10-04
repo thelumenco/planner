@@ -65,7 +65,11 @@ export function stationsOf(scene){
 }
 export const spotObj = (scene, id) => id === "board" ? {id:"board", name:"Quest board", tx:260, ty:200, line:"This building's quests."} : stationsOf(scene).find(s => s.id === id);
 
+// Tasks that ARE treadmill tasks (a "🚶" or "treadmill" in the title, or chat sent spot "treadmill") always happen on
+// the treadmill at home. Tasks that are only treadmill-able (treadmill: true) get it as an offer instead.
+export const isTreadTask = t => !!t && (t.spot === "treadmill" || /🚶|treadmill/i.test(t.title || ""));
 export function placeOf(t){
+  if (isTreadTask(t)) return "home";
   if (t.place && WORK.includes(t.place)) return t.place;
   const s = (t.title + " " + (t.channel || "")).toLowerCase();
   if (/chord/.test(s)) return "chord";
@@ -79,7 +83,7 @@ export function placeOf(t){
 export function spotOf(t){
   // The cupboard and treadmill are only picked on purpose (the clean, or "Do it on the treadmill").
   const pl = placeOf(t), st = stationsOf(pl).filter(s => (s.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title)) && s.id !== "treadmill" && s.re);
-  if (t.spot === "treadmill" && pl === "home") return "treadmill";
+  if (isTreadTask(t)) return "treadmill";
   if (t.spot && st.find(s => s.id === t.spot)) return t.spot;
   const s = t.title.toLowerCase();
   const hit = st.find(x => x.re && x.re.source !== "." && x.re.test(s));

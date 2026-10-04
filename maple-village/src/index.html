@@ -38,13 +38,8 @@
     <h1 class="title" id="title">Maple's village<small id="dateLine"></small></h1>
   </div>
   <div class="hudbar" aria-label="Today's trackers">
-    <div class="trk"><span class="lbl" aria-hidden="true" data-ico="drop"></span><span class="sr">Water</span><div class="boxes" id="waterBoxes"></div></div>
-    <div class="trk"><span class="lbl" aria-hidden="true" data-ico="steps"></span><span class="sr">Steps</span><div class="boxes" id="stepBoxes"></div><span class="tnote" id="stepNote"></span></div>
-    <form class="stepform" id="stepForm">
-      <label class="sr" for="stepIn">Steps showing now</label>
-      <input id="stepIn" type="number" inputmode="numeric" min="0" placeholder="steps showing now">
-      <button class="btn small" type="submit">Save</button>
-    </form>
+    <button class="trk" data-track="water" aria-label="Water today. Tap to log how much"><span class="lbl" aria-hidden="true" data-ico="drop"></span><span class="bar" id="waterBoxes"></span><span class="tnote" id="waterNote"></span></button>
+    <button class="trk" data-track="steps" aria-label="Steps today. Tap to log your steps"><span class="lbl" aria-hidden="true" data-ico="steps"></span><span class="bar" id="stepBoxes"></span><span class="tnote" id="stepNote"></span></button>
   </div>
   <p class="earn" id="earn" aria-live="polite"></p>
   <div class="card mapcard">

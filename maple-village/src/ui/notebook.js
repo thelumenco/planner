@@ -1,10 +1,10 @@
 // "Do task" notebook overlay: a big washi-taped notebook page with the quest's notes, progress buttons that drive the
 // quest, an email block for inbox quests, and "talk to the note" via the sample capability. Also shows agent mail.
 import { $, esc, plain } from "../util.js";
-import { icon } from "../art/icons.js";
+import { icon, progressBar } from "../art/icons.js";
 
 let api = null;        // from core: task(), S(), F(), fs(t), act(kind, t), timerLeft(), sayNow(), sample(), placeLabel(t), markRead(item), agentName(from)
-let open = null;       // {kind:"task", id} | {kind:"mail", item} | {kind:"digest", item}
+let open = null;       // {kind:"task", id} | {kind:"mail", item} | {kind:"digest", item} | {kind:"tracker", which}
 const chats = {};      // task id -> [{role, content}]  (memory only)
 let busy = null;       // AbortController while Claude is answering
 let lastFocus = null;
@@ -21,12 +21,14 @@ export function initNotebook(a){
     if (k === "copy") return copyDraft(b);
     if (k === "sayb") return api.sayButton(+b.dataset.i);
     if (open && open.kind !== "task" && k === "thanks") { closeNotebook(); return; }
+    if (open && open.kind === "tracker") return trackerAct(k, b);
     const t = api.task(); if (!t || !open || open.kind !== "task") return;
     api.act(k, t);
   });
   root.addEventListener("keydown", ev => {
     if (ev.key === "Escape") closeNotebook();
     if (ev.key === "Enter" && ev.target.id === "nbAsk" && !ev.shiftKey) { ev.preventDefault(); ask(); }
+    if (ev.key === "Enter" && ev.target.id === "nbTrack") { ev.preventDefault(); trackerAct(open.which === "water" ? "wset" : "sset"); }
     if (ev.key === "Tab") trap(ev);
   });
 }
@@ -35,6 +37,7 @@ export const notebookOpen = () => !!open;
 export function openTask(t){ open = {kind: "task", id: t.id}; show(); }
 export function openMail(item){ open = {kind: "mail", item}; api.markRead(item); show(); }
 export function openDigest(item){ open = {kind: "digest", item}; show(); }
+export function openTracker(which){ open = {kind: "tracker", which}; show(); setTimeout(() => $("nbTrack") && $("nbTrack").focus(), 50); }
 export function closeNotebook(){
   if (!open) return;
   open = null; busy && busy.abort(); busy = null;
@@ -59,8 +62,8 @@ export function refreshNotebook(focus){
     const keep = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
     page.innerHTML = taskPage(t);
     if ($("nbAsk")) { $("nbAsk").value = keep; if (typing) $("nbAsk").focus(); }
-  } else page.innerHTML = open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
-  page.className = "nbpage" + (open.kind === "mail" && open.item.from === "crier" ? " news" : "");
+  } else page.innerHTML = open.kind === "tracker" ? trackerPage(open.which) : open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
+  page.className = "nbpage" + (open.kind === "mail" && open.item.from === "crier" ? " news" : open.kind === "tracker" ? " mini" : "");
   const log = page.querySelector(".nbchat"); if (log) log.scrollTop = log.scrollHeight;
   if (focus) (page.querySelector("[data-nb]:not([data-nb=close])") || page.querySelector("[data-nb]"))?.focus({preventScroll: true});
 }
@@ -81,7 +84,7 @@ function notesHTML(text){
 
 function taskPage(t){
   const S = api.S(), fs = api.fs(t), left = api.timerLeft(t), say = api.sayNow();
-  const tread = S.tread && S.tread[t.id];
+  const tread = api.onTread(t);
   const em = t.email || null;
   let h = `<button class="nbx" data-nb="close" aria-label="Close notebook">✕</button>
     <p class="nbmeta">${esc(api.placeLabel(t))}${t.at ? ` · at ${esc(t.at)}` : ""}</p>
@@ -155,6 +158,41 @@ function newsPage(item){
       ${safeUrl(item.link) ? `<p class="nmore"><a href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Full briefing ↗</a></p>` : ""}
     </div>
     <div class="nbactions"><button class="btn yes" data-nb="thanks">Fold the paper, let's go</button></div>`;
+}
+// Water / steps: a small notebook page to key in how much.
+function trackerPage(which){
+  if (which === "water") {
+    const w = api.water(), L = ml => (ml/1000).toLocaleString("en-GB", {maximumFractionDigits: 2});
+    return `<button class="nbx" data-nb="close" aria-label="Close">✕</button>
+      <p class="nbmeta">${icon("drop", 16)} today's water</p>
+      <h2 id="nbTitle">${L(w.ml)} L <small class="nbby">of ${L(w.goal)} L</small></h2>
+      <div class="trbar">${progressBar(w.ml/w.goal, "#9CC3E0", 8)}</div>
+      <div class="nbbody">
+        <p class="nblbl">Add</p>
+        <div class="nbrow">${[[w.glass, "a glass"], [500, "a bottle"], [750, "a big bottle"]].map(([ml, n]) => `<button class="btn alt small" data-nb="w" data-ml="${ml}">+ ${n} <small>${ml} ml</small></button>`).join("")}</div>
+        <p class="nblbl">Or set today's total</p>
+        <div class="nbrow nbask"><label class="sr" for="nbTrack">Total water today in ml</label><input id="nbTrack" type="number" inputmode="numeric" min="0" step="50" placeholder="${w.ml || 1000} ml"><button class="btn small" data-nb="wset">Save</button></div>
+        <p class="nbhint">Every 250 ml, up to a litre, earns a coin. The well in the village adds a glass too.</p>
+      </div>
+      <div class="nbactions"><button class="btn yes" data-nb="thanks">Done</button></div>`;
+  }
+  const st = api.steps();
+  return `<button class="nbx" data-nb="close" aria-label="Close">✕</button>
+    <p class="nbmeta">${icon("steps", 16)} today's steps</p>
+    <h2 id="nbTitle">${st.n.toLocaleString()} <small class="nbby">of ${st.goal.toLocaleString()}</small></h2>
+    <div class="trbar">${progressBar(st.n/st.goal, "var(--sage)", 5)}</div>
+    <div class="nbbody">
+      <p class="nblbl">Steps showing now</p>
+      <div class="nbrow nbask"><label class="sr" for="nbTrack">Steps showing now</label><input id="nbTrack" type="number" inputmode="numeric" min="0" placeholder="${st.n || 2000}"><button class="btn primary small" data-nb="sset">Save</button></div>
+      <p class="nbhint">Type the total from your watch or the treadmill. Every 1,000 earns 2 coins.</p>
+    </div>
+    <div class="nbactions"><button class="btn yes" data-nb="thanks">Done</button></div>`;
+}
+function trackerAct(k, b){
+  const v = $("nbTrack") ? parseInt($("nbTrack").value, 10) : NaN;
+  if (k === "w") { api.addWater(+b.dataset.ml); refreshNotebook(); return; }
+  if (k === "wset") { if (v >= 0) api.setWater(v); closeNotebook(); return; }
+  if (k === "sset") { if (v >= 0) api.setSteps(v); closeNotebook(); return; }
 }
 function digestPage(item){
   return `<button class="nbx" data-nb="close" aria-label="Close digest">✕</button>

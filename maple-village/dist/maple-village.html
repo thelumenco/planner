@@ -398,6 +398,14 @@ body.nb-open{overflow:hidden}
 .nbpage.news .btn.yes{background:#1F1C1A;color:#F2EEE4}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .nbpage.news{filter:brightness(.92)}}
 
+/* water / steps mini page */
+.nbpage.mini{width:min(440px,100%)}
+.nbpage.mini h2{margin-bottom:6px}
+.trbar{height:18px;margin:0 6px 6px 0}
+.trbar .pbar{width:100%;height:100%}
+.nbpage.mini .btn small{font-weight:600;opacity:.65;margin-left:4px}
+.nbpage.mini .nbask input{max-width:180px}
+
 /* ---------- villagers + messengers ---------- */
 .map .npc{cursor:pointer}
 #npcSay{z-index:4;white-space:normal;max-width:min(64%,260px);width:max-content}
@@ -593,6 +601,13 @@ body.nb-open{overflow:hidden}
   .trk .lbl .ico{width:18px;height:18px}
   .hudbar .tnote{font-size:.72rem;white-space:nowrap}
 }
+
+/* trackers as thin drawn bars; tap to log */
+.hudbar .trk{border:0;background:transparent;padding:2px 0;flex:1;min-width:0;cursor:pointer;color:inherit}
+.hudbar .bar{flex:1;min-width:46px;height:12px;display:block}
+.hudbar .bar .pbar{width:100%;height:100%;display:block}
+.hudbar .tnote{min-width:2.4em;text-align:right}
+.hudbar .trk:hover .bar{filter:saturate(1.2)}
 </style>
 </head>
 <body>
@@ -624,13 +639,8 @@ body.nb-open{overflow:hidden}
     <h1 class="title" id="title">Maple's village<small id="dateLine"></small></h1>
   </div>
   <div class="hudbar" aria-label="Today's trackers">
-    <div class="trk"><span class="lbl" aria-hidden="true" data-ico="drop"></span><span class="sr">Water</span><div class="boxes" id="waterBoxes"></div></div>
-    <div class="trk"><span class="lbl" aria-hidden="true" data-ico="steps"></span><span class="sr">Steps</span><div class="boxes" id="stepBoxes"></div><span class="tnote" id="stepNote"></span></div>
-    <form class="stepform" id="stepForm">
-      <label class="sr" for="stepIn">Steps showing now</label>
-      <input id="stepIn" type="number" inputmode="numeric" min="0" placeholder="steps showing now">
-      <button class="btn small" type="submit">Save</button>
-    </form>
+    <button class="trk" data-track="water" aria-label="Water today. Tap to log how much"><span class="lbl" aria-hidden="true" data-ico="drop"></span><span class="bar" id="waterBoxes"></span><span class="tnote" id="waterNote"></span></button>
+    <button class="trk" data-track="steps" aria-label="Steps today. Tap to log your steps"><span class="lbl" aria-hidden="true" data-ico="steps"></span><span class="bar" id="stepBoxes"></span><span class="tnote" id="stepNote"></span></button>
   </div>
   <p class="earn" id="earn" aria-live="polite"></p>
   <div class="card mapcard">
@@ -1111,6 +1121,13 @@ body.nb-open{overflow:hidden}
   var icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
   var iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;
   var ICON_NAMES = Object.keys(I);
+  function progressBar(pct, color, ticks = 0) {
+    const w = Math.max(0, Math.min(1, pct || 0)) * 115;
+    const tk = Array.from({ length: Math.max(0, ticks - 1) }, (_, i) => `<path d="M${(2.5 + 115 * (i + 1) / ticks).toFixed(1)} 4v4"/>`).join("");
+    return `<svg class="pbar" viewBox="0 0 120 12" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <g filter="url(#markerS)">${w > 0.5 ? `<rect x="2.5" y="2.6" width="${w.toFixed(1)}" height="6.8" rx="3.4" style="fill:${color}"/>` : ""}</g>
+    <g filter="url(#wobS)" fill="none" stroke="var(--line)" stroke-width="1.1" stroke-linecap="round" vector-effect="non-scaling-stroke"><rect x="1.5" y="2" width="117" height="8" rx="4"/><g opacity=".3">${tk}</g></g></svg>`;
+  }
 
   // src/data/world.js
   var VILLAGE = {
@@ -1181,7 +1198,9 @@ body.nb-open{overflow:hidden}
     });
   }
   var spotObj = (scene2, id) => id === "board" ? { id: "board", name: "Quest board", tx: 260, ty: 200, line: "This building's quests." } : stationsOf(scene2).find((s) => s.id === id);
+  var isTreadTask = (t) => !!t && (t.spot === "treadmill" || /🚶|treadmill/i.test(t.title || ""));
   function placeOf(t) {
+    if (isTreadTask(t)) return "home";
     if (t.place && WORK.includes(t.place)) return t.place;
     const s = (t.title + " " + (t.channel || "")).toLowerCase();
     if (/chord/.test(s)) return "chord";
@@ -1194,7 +1213,7 @@ body.nb-open{overflow:hidden}
   }
   function spotOf(t) {
     const pl = placeOf(t), st = stationsOf(pl).filter((s2) => (s2.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title)) && s2.id !== "treadmill" && s2.re);
-    if (t.spot === "treadmill" && pl === "home") return "treadmill";
+    if (isTreadTask(t)) return "treadmill";
     if (t.spot && st.find((s2) => s2.id === t.spot)) return t.spot;
     const s = t.title.toLowerCase();
     const hit = st.find((x) => x.re && x.re.source !== "." && x.re.test(s));
@@ -1863,6 +1882,7 @@ body.nb-open{overflow:hidden}
         closeNotebook();
         return;
       }
+      if (open && open.kind === "tracker") return trackerAct(k, b);
       const t = api.task();
       if (!t || !open || open.kind !== "task") return;
       api.act(k, t);
@@ -1872,6 +1892,10 @@ body.nb-open{overflow:hidden}
       if (ev.key === "Enter" && ev.target.id === "nbAsk" && !ev.shiftKey) {
         ev.preventDefault();
         ask();
+      }
+      if (ev.key === "Enter" && ev.target.id === "nbTrack") {
+        ev.preventDefault();
+        trackerAct(open.which === "water" ? "wset" : "sset");
       }
       if (ev.key === "Tab") trap(ev);
     });
@@ -1889,6 +1913,11 @@ body.nb-open{overflow:hidden}
   function openDigest(item) {
     open = { kind: "digest", item };
     show();
+  }
+  function openTracker(which) {
+    open = { kind: "tracker", which };
+    show();
+    setTimeout(() => $("nbTrack") && $("nbTrack").focus(), 50);
   }
   function closeNotebook() {
     if (!open) return;
@@ -1923,8 +1952,8 @@ body.nb-open{overflow:hidden}
         $("nbAsk").value = keep;
         if (typing) $("nbAsk").focus();
       }
-    } else page.innerHTML = open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
-    page.className = "nbpage" + (open.kind === "mail" && open.item.from === "crier" ? " news" : "");
+    } else page.innerHTML = open.kind === "tracker" ? trackerPage(open.which) : open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
+    page.className = "nbpage" + (open.kind === "mail" && open.item.from === "crier" ? " news" : open.kind === "tracker" ? " mini" : "");
     const log = page.querySelector(".nbchat");
     if (log) log.scrollTop = log.scrollHeight;
     if (focus) (page.querySelector("[data-nb]:not([data-nb=close])") || page.querySelector("[data-nb]"))?.focus({ preventScroll: true });
@@ -1953,7 +1982,7 @@ body.nb-open{overflow:hidden}
   }
   function taskPage(t) {
     const S3 = api.S(), fs = api.fs(t), left = api.timerLeft(t), say3 = api.sayNow();
-    const tread = S3.tread && S3.tread[t.id];
+    const tread = api.onTread(t);
     const em = t.email || null;
     let h = `<button class="nbx" data-nb="close" aria-label="Close notebook">✕</button>
     <p class="nbmeta">${esc(api.placeLabel(t))}${t.at ? ` · at ${esc(t.at)}` : ""}</p>
@@ -2022,6 +2051,52 @@ body.nb-open{overflow:hidden}
       ${safeUrl(item.link) ? `<p class="nmore"><a href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Full briefing ↗</a></p>` : ""}
     </div>
     <div class="nbactions"><button class="btn yes" data-nb="thanks">Fold the paper, let's go</button></div>`;
+  }
+  function trackerPage(which) {
+    if (which === "water") {
+      const w = api.water(), L = (ml) => (ml / 1e3).toLocaleString("en-GB", { maximumFractionDigits: 2 });
+      return `<button class="nbx" data-nb="close" aria-label="Close">✕</button>
+      <p class="nbmeta">${icon("drop", 16)} today's water</p>
+      <h2 id="nbTitle">${L(w.ml)} L <small class="nbby">of ${L(w.goal)} L</small></h2>
+      <div class="trbar">${progressBar(w.ml / w.goal, "#9CC3E0", 8)}</div>
+      <div class="nbbody">
+        <p class="nblbl">Add</p>
+        <div class="nbrow">${[[w.glass, "a glass"], [500, "a bottle"], [750, "a big bottle"]].map(([ml, n]) => `<button class="btn alt small" data-nb="w" data-ml="${ml}">+ ${n} <small>${ml} ml</small></button>`).join("")}</div>
+        <p class="nblbl">Or set today's total</p>
+        <div class="nbrow nbask"><label class="sr" for="nbTrack">Total water today in ml</label><input id="nbTrack" type="number" inputmode="numeric" min="0" step="50" placeholder="${w.ml || 1e3} ml"><button class="btn small" data-nb="wset">Save</button></div>
+        <p class="nbhint">Every 250 ml, up to a litre, earns a coin. The well in the village adds a glass too.</p>
+      </div>
+      <div class="nbactions"><button class="btn yes" data-nb="thanks">Done</button></div>`;
+    }
+    const st = api.steps();
+    return `<button class="nbx" data-nb="close" aria-label="Close">✕</button>
+    <p class="nbmeta">${icon("steps", 16)} today's steps</p>
+    <h2 id="nbTitle">${st.n.toLocaleString()} <small class="nbby">of ${st.goal.toLocaleString()}</small></h2>
+    <div class="trbar">${progressBar(st.n / st.goal, "var(--sage)", 5)}</div>
+    <div class="nbbody">
+      <p class="nblbl">Steps showing now</p>
+      <div class="nbrow nbask"><label class="sr" for="nbTrack">Steps showing now</label><input id="nbTrack" type="number" inputmode="numeric" min="0" placeholder="${st.n || 2e3}"><button class="btn primary small" data-nb="sset">Save</button></div>
+      <p class="nbhint">Type the total from your watch or the treadmill. Every 1,000 earns 2 coins.</p>
+    </div>
+    <div class="nbactions"><button class="btn yes" data-nb="thanks">Done</button></div>`;
+  }
+  function trackerAct(k, b) {
+    const v = $("nbTrack") ? parseInt($("nbTrack").value, 10) : NaN;
+    if (k === "w") {
+      api.addWater(+b.dataset.ml);
+      refreshNotebook();
+      return;
+    }
+    if (k === "wset") {
+      if (v >= 0) api.setWater(v);
+      closeNotebook();
+      return;
+    }
+    if (k === "sset") {
+      if (v >= 0) api.setSteps(v);
+      closeNotebook();
+      return;
+    }
   }
   function digestPage(item) {
     return `<button class="nbx" data-nb="close" aria-label="Close digest">✕</button>
@@ -2135,13 +2210,18 @@ Quests finished today: ${S3.doneIds.length}`;
     if (t.completed) q.completed = true;
     if (notes2) q.notes = notes2.slice(0, 4e3);
     if (/^personal$/i.test(q.channel) || t.isPersonal) q.place = "home";
-    if (/🚶|treadmill|\bwalk\b/i.test(t.title)) q.treadmill = true;
     const gmail = /https:\/\/mail\.google\.com\/[^\s"<]+/.exec(decode(t.notes || ""));
     if (gmail || /\b(email|inbox|reply|comms)\b/i.test(t.title)) {
       q.place = "post";
       q.spot = "counter";
       q.email = { subject: t.title.replace(/^\[[^\]]*\]\s*/, ""), link: gmail ? gmail[0] : "https://mail.google.com/mail/u/0/#inbox" };
     }
+    if (/🚶|treadmill/i.test(t.title)) {
+      q.treadmill = true;
+      q.place = "home";
+      q.spot = "treadmill";
+      delete q.email;
+    } else if (/\bwalk\b/i.test(t.title)) q.treadmill = true;
     return q;
   }
   function questsFrom(payload) {
@@ -2500,6 +2580,10 @@ Quests finished today: ${S3.doneIds.length}`;
   function migrate() {
     if (S2.day !== dayKey()) S2 = freshToday();
     if (!S2.arrived) S2.arrived = {};
+    if (S2.waterMl == null) {
+      S2.waterMl = (S2.water || 0) * 250;
+      S2.waterPaid = Math.min(4, S2.water || 0);
+    }
     if (F.coins == null) F.coins = S2.berries || 0;
     if (!F.inv) {
       F.inv = { tulip_seed: 2, carrot_seed: 1 };
@@ -3006,7 +3090,7 @@ Quests finished today: ${S3.doneIds.length}`;
       }
       act("cheer");
       if (evanHere()) evanSays(pick(["yaaay!", "Mama did it!", "hooray!"]));
-      if (S2.tread[t.id]) setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : "") + " Steps showing?", [["Log my steps", () => openSteps(true)]]);
+      if (onTread(t)) setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : "") + " Steps showing?", [["Log my steps", () => openSteps(true)]]);
       else setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : ""));
       save(true);
     },
@@ -3084,11 +3168,9 @@ Quests finished today: ${S3.doneIds.length}`;
       setSay("Decompressed. Now a proper break.");
       save();
     },
-    water() {
-      S2.water += 1;
-      if (S2.water <= 4) earn(1, "water");
-      speak(pick(["Glug glug 💧", "Hydrated boss!", "Water break, good call."]), 3e3);
-      save();
+    water(ml) {
+      setWater((S2.waterMl || 0) + (ml || GLASS));
+      speak(pick(["Glug glug!", "Hydrated boss!", "Water break, good call."]), 3e3);
     }
   };
   function doNext(id) {
@@ -3102,6 +3184,7 @@ Quests finished today: ${S3.doneIds.length}`;
     save(true);
   }
   var HALF = ["Halfway! The downhill bit starts now.", "Halfway there. Look at you go.", "Half done. Sip of water, then onwards."];
+  var onTread = (t) => !!(t && (S2.tread[t.id] || isTreadTask(t)));
   function nbAct(kind, t) {
     if (kind === "started") {
       if (!S2.firstStep[t.id]) A.firstStep(t);
@@ -3394,7 +3477,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
       const t = remaining()[0], fs = S2.firstStep[t.id], pl = placeOf(t), sp = spotObj(pl, spotOf(t)), at = arrivedFor(t);
       h += `${S2.last ? `<p class="ack">✓ ${esc(S2.last === "clean" ? "clean done" : S2.last)}</p>` : ""}
       <h1><span class="lbl">quest · ${esc(VILLAGE[pl].name)} · ${esc(sp.name)}</span>${esc(t.title)}</h1>
-      ${t.at || t.treadmill || t.chat || t.notes || t.email ? `<p class="stickers">${t.at ? `<span class="sticker">${icon("clock", 14)} ${esc(t.at)}</span>` : ""}${t.treadmill ? `<span class="sticker">${icon("walker", 14)} ${S2.tread[t.id] ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t.notes ? `<span class="sticker">${icon("note", 14)} notes</span>` : ""}${t.email ? `<span class="sticker">${icon("letter", 14)} email</span>` : ""}${t.chat ? `<span class="sticker">${icon("chat", 14)} happens in chat</span>` : ""}</p>` : ""}
+      ${t.at || t.treadmill || isTreadTask(t) || t.chat || t.notes || t.email ? `<p class="stickers">${t.at ? `<span class="sticker">${icon("clock", 14)} ${esc(t.at)}</span>` : ""}${t.treadmill || isTreadTask(t) ? `<span class="sticker">${icon("walker", 14)} ${onTread(t) ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t.notes ? `<span class="sticker">${icon("note", 14)} notes</span>` : ""}${t.email ? `<span class="sticker">${icon("letter", 14)} email</span>` : ""}${t.chat ? `<span class="sticker">${icon("chat", 14)} happens in chat</span>` : ""}</p>` : ""}
       ${fs || S2.timer && S2.timer.id === t.id ? timerHTML(S2.timer && S2.timer.kind === "deal" ? "five-minute deal, then you may stop" : `${t.minutes || 25}-minute time box`) : `<p class="stickers"><span class="sticker">${icon("clock", 14)} ${t.minutes || 25}-minute time box once you start</span></p>`}
       <ul class="bujo">${fs ? `<li>Keep going. One thing at a time.</li>` : `<li class="first"><span><span class="hl">First step only:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}</span></li><li>Then ${t.minutes || 25} minutes on the rest.</li>`}
         <li class="pep">${esc(t.pep || PEP[t.title.length % PEP.length])}</li></ul>
@@ -3586,33 +3669,39 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     $("play").querySelectorAll("[data-play]").forEach((b) => b.onclick = () => playFree(b.dataset.play));
   }
   function trackers() {
-    const w = $("waterBoxes");
-    w.innerHTML = "";
-    for (let i = 0; i < 8; i++) {
-      const b = document.createElement("button");
-      b.className = "box" + (i < S2.water ? " on" : "");
-      b.setAttribute("aria-label", `Water bottle ${i + 1}`);
-      b.onclick = () => {
-        if (i >= S2.water) A.water();
-      };
-      w.appendChild(b);
-    }
-    const s = $("stepBoxes");
-    s.innerHTML = "";
-    for (let i = 0; i < 5; i++) {
-      const b = document.createElement("button");
-      b.className = "box step" + (i < Math.floor(S2.steps / 1e3) ? " on" : "");
-      b.setAttribute("aria-label", "Update steps");
-      b.onclick = openSteps;
-      s.appendChild(b);
-    }
+    $("waterBoxes").innerHTML = progressBar((S2.waterMl || 0) / WATER_GOAL, "#9CC3E0", 8);
+    $("stepBoxes").innerHTML = progressBar(S2.steps / STEP_GOAL, "var(--sage)", 5);
+    $("waterNote").textContent = S2.waterMl ? `${(S2.waterMl / 1e3).toFixed(S2.waterMl % 1e3 ? 2 : 0).replace(/0$/, "")} L` : "log";
     $("stepNote").textContent = S2.steps ? S2.steps.toLocaleString() : "log";
   }
-  function openSteps(force) {
-    const f2 = $("stepForm");
-    f2.classList.toggle("open", force === true ? true : !f2.classList.contains("open"));
-    measureHud();
-    if (f2.classList.contains("open")) $("stepIn").focus({ preventScroll: true });
+  var GLASS = 250;
+  var WATER_GOAL = 2e3;
+  var STEP_GOAL = 5e3;
+  function setWater(ml) {
+    ml = clamp(Math.round(ml), 0, 6e3);
+    S2.waterMl = ml;
+    const glasses = Math.floor(ml / GLASS), paid = Math.min(4, S2.waterPaid || 0), owed = Math.min(4, glasses);
+    if (owed > paid) {
+      earn(owed - paid, "water");
+      S2.waterPaid = owed;
+    }
+    S2.water = glasses;
+    save();
+  }
+  function setSteps(v) {
+    v = Math.max(0, Math.round(v) || 0);
+    S2.steps = v;
+    const ms = Math.floor(v / 1e3);
+    if (ms > S2.stepMs) {
+      earn(2 * (ms - S2.stepMs), "steps");
+      S2.stepMs = ms;
+    }
+    speak(v >= STEP_GOAL ? `${v.toLocaleString()}! 5,000 smashed!` : `${v.toLocaleString()}. ${(STEP_GOAL - v).toLocaleString()} to go!`, 5e3);
+    act(v >= STEP_GOAL ? "cheer" : "nudge");
+    save();
+  }
+  function openSteps() {
+    openTracker("steps");
   }
   function questMark() {
     const ph = phase(), m = $("qmarkWrap");
@@ -4079,22 +4168,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     else $("evanSay").hidden = true;
     requestAnimationFrame(frame);
   }
-  $("stepForm").onsubmit = (e) => {
-    e.preventDefault();
-    const v = Math.max(0, parseInt($("stepIn").value, 10) || 0);
-    S2.steps = v;
-    const ms = Math.floor(v / 1e3);
-    if (ms > S2.stepMs) {
-      earn(2 * (ms - S2.stepMs), "steps");
-      S2.stepMs = ms;
-    }
-    speak(v >= 5e3 ? `${v.toLocaleString()}! 5,000 smashed 🎉` : `${v.toLocaleString()}. ${(5e3 - v).toLocaleString()} to go!`, 5e3);
-    $("stepIn").value = "";
-    $("stepForm").classList.remove("open");
-    measureHud();
-    act(v >= 5e3 ? "cheer" : "nudge");
-    save();
-  };
+  document.querySelectorAll("[data-track]").forEach((b) => b.onclick = () => openTracker(b.dataset.track));
   $("addForm").onsubmit = (e) => {
     e.preventDefault();
     const title = $("addTitle").value.trim();
@@ -4125,6 +4199,12 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     ctx();
   });
   initNotebook({
+    onTread,
+    water: () => ({ ml: S2.waterMl || 0, goal: WATER_GOAL, glass: GLASS }),
+    steps: () => ({ n: S2.steps, goal: STEP_GOAL }),
+    addWater: (ml) => A.water(ml),
+    setWater,
+    setSteps,
     task: () => phase() === "task" ? remaining()[0] : null,
     S: () => S2,
     F: () => F,

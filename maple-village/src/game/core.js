@@ -1,11 +1,11 @@
 // Game core: state + persistence, quest flow, actions, UI renderers and the world sim.
 import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur, plain } from "../util.js";
-import { icon } from "../art/icons.js";
-import { VILLAGE, WORK, ROOMS, stationsOf, spotObj, placeOf, spotOf } from "../data/world.js";
+import { icon, progressBar } from "../art/icons.js";
+import { VILLAGE, WORK, ROOMS, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
 import { CROPS, ITEMS, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco } from "../data/items.js";
 import { villageArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
-import { initNotebook, openTask, openMail, openDigest, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
+import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { pullSunsama, SUNSAMA_ERRORS } from "./sunsama.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere } from "./npcs.js";
 
@@ -24,6 +24,7 @@ let sampleCap = null;   // the sample capability once granted to this view, else
 function migrate(){
   if (S.day !== dayKey()) S = freshToday();
   if (!S.arrived) S.arrived = {};
+  if (S.waterMl == null) { S.waterMl = (S.water || 0)*250; S.waterPaid = Math.min(4, S.water || 0); }
   if (F.coins == null) F.coins = S.berries || 0;
   if (!F.inv) { F.inv = {tulip_seed:2, carrot_seed:1}; F.gift = true; }
   if (!Array.isArray(F.plots) || F.plots.length !== 12) F.plots = Array.from({length:12}, () => null);
@@ -266,7 +267,7 @@ const A = {
     if (t.meeting) S.mode = "decompress";
     else if (remaining().length) { S.mode = "break"; startTimer("break", 10); }
     act("cheer"); if (evanHere()) evanSays(pick(["yaaay!", "Mama did it!", "hooray!"]));
-    if (S.tread[t.id]) setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : "") + " Steps showing?", [["Log my steps", () => openSteps(true)]]);
+    if (onTread(t)) setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : "") + " Steps showing?", [["Log my steps", () => openSteps(true)]]);
     else setSay(pick(YAY) + (grew ? " The garden grew a little 🌱" : ""));
     save(true);
   },
@@ -298,7 +299,7 @@ const A = {
   flow(){ S.mode = null; S.timer = null; setSay("In flow? Ride it! Break after this one."); save(); },
   clench(){ startTimer("clench", .5); setSay("Clench and hold. Breathe through your nose."); save(); },
   decompressed(){ S.mode = remaining().length ? "break" : null; if (S.mode) startTimer("break", 10); setSay("Decompressed. Now a proper break."); save(); },
-  water(){ S.water += 1; if (S.water <= 4) earn(1, "water"); speak(pick(["Glug glug 💧", "Hydrated boss!", "Water break, good call."]), 3000); save(); }
+  water(ml){ setWater((S.waterMl || 0) + (ml || GLASS)); speak(pick(["Glug glug!", "Hydrated boss!", "Water break, good call."]), 3000); }
 };
 function doNext(id){
   const ids = allTasks().map(x => x.id);
@@ -307,6 +308,7 @@ function doNext(id){
 }
 // Progress buttons on the notebook page.
 const HALF = ["Halfway! The downhill bit starts now.", "Halfway there. Look at you go.", "Half done. Sip of water, then onwards."];
+const onTread = t => !!(t && (S.tread[t.id] || isTreadTask(t)));
 function nbAct(kind, t){
   if (kind === "started") { if (!S.firstStep[t.id]) A.firstStep(t); return; }
   if (kind === "halfway") { S.halfway[t.id] = true; act("cheer"); setSay(pick(HALF)); save(); return; }
@@ -497,7 +499,7 @@ function journal(){
     const t = remaining()[0], fs = S.firstStep[t.id], pl = placeOf(t), sp = spotObj(pl, spotOf(t)), at = arrivedFor(t);
     h += `${S.last ? `<p class="ack">✓ ${esc(S.last === "clean" ? "clean done" : S.last)}</p>` : ""}
       <h1><span class="lbl">quest · ${esc(VILLAGE[pl].name)} · ${esc(sp.name)}</span>${esc(t.title)}</h1>
-      ${(t.at || t.treadmill || t.chat || t.notes || t.email) ? `<p class="stickers">${t.at ? `<span class="sticker">${icon("clock", 14)} ${esc(t.at)}</span>` : ""}${t.treadmill ? `<span class="sticker">${icon("walker", 14)} ${S.tread[t.id] ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t.notes ? `<span class="sticker">${icon("note", 14)} notes</span>` : ""}${t.email ? `<span class="sticker">${icon("letter", 14)} email</span>` : ""}${t.chat ? `<span class="sticker">${icon("chat", 14)} happens in chat</span>` : ""}</p>` : ""}
+      ${(t.at || t.treadmill || isTreadTask(t) || t.chat || t.notes || t.email) ? `<p class="stickers">${t.at ? `<span class="sticker">${icon("clock", 14)} ${esc(t.at)}</span>` : ""}${(t.treadmill || isTreadTask(t)) ? `<span class="sticker">${icon("walker", 14)} ${onTread(t) ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t.notes ? `<span class="sticker">${icon("note", 14)} notes</span>` : ""}${t.email ? `<span class="sticker">${icon("letter", 14)} email</span>` : ""}${t.chat ? `<span class="sticker">${icon("chat", 14)} happens in chat</span>` : ""}</p>` : ""}
       ${(fs || (S.timer && S.timer.id === t.id)) ? timerHTML(S.timer && S.timer.kind === "deal" ? "five-minute deal, then you may stop" : `${t.minutes || 25}-minute time box`) : `<p class="stickers"><span class="sticker">${icon("clock", 14)} ${t.minutes || 25}-minute time box once you start</span></p>`}
       <ul class="bujo">${fs ? `<li>Keep going. One thing at a time.</li>` : `<li class="first"><span><span class="hl">First step only:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}</span></li><li>Then ${t.minutes || 25} minutes on the rest.</li>`}
         <li class="pep">${esc(t.pep || PEP[t.title.length % PEP.length])}</li></ul>
@@ -643,17 +645,27 @@ function bag(){
   $("play").querySelectorAll("[data-play]").forEach(b => b.onclick = () => playFree(b.dataset.play));
 }
 function trackers(){
-  const w = $("waterBoxes"); w.innerHTML = "";
-  for (let i = 0; i < 8; i++) { const b = document.createElement("button"); b.className = "box" + (i < S.water ? " on" : ""); b.setAttribute("aria-label", `Water bottle ${i+1}`); b.onclick = () => { if (i >= S.water) A.water(); }; w.appendChild(b); }
-  const s = $("stepBoxes"); s.innerHTML = "";
-  for (let i = 0; i < 5; i++) { const b = document.createElement("button"); b.className = "box step" + (i < Math.floor(S.steps/1000) ? " on" : ""); b.setAttribute("aria-label", "Update steps"); b.onclick = openSteps; s.appendChild(b); }
+  $("waterBoxes").innerHTML = progressBar((S.waterMl || 0)/WATER_GOAL, "#9CC3E0", 8);
+  $("stepBoxes").innerHTML = progressBar(S.steps/STEP_GOAL, "var(--sage)", 5);
+  $("waterNote").textContent = S.waterMl ? `${(S.waterMl/1000).toFixed(S.waterMl % 1000 ? 2 : 0).replace(/0$/, "")} L` : "log";
   $("stepNote").textContent = S.steps ? S.steps.toLocaleString() : "log";
 }
-function openSteps(force){
-  const f = $("stepForm"); f.classList.toggle("open", force === true ? true : !f.classList.contains("open"));
-  measureHud();
-  if (f.classList.contains("open")) $("stepIn").focus({preventScroll: true});
+// Water is kept in ml (goal 2 litres). `water` stays as a glass count (250 ml) because chat reads it.
+// Every glass up to a litre earns a coin; every 1,000 steps earns 2.
+const GLASS = 250, WATER_GOAL = 2000, STEP_GOAL = 5000;
+function setWater(ml){
+  ml = clamp(Math.round(ml), 0, 6000); S.waterMl = ml;
+  const glasses = Math.floor(ml/GLASS), paid = Math.min(4, S.waterPaid || 0), owed = Math.min(4, glasses);
+  if (owed > paid) { earn(owed - paid, "water"); S.waterPaid = owed; }
+  S.water = glasses; save();
 }
+function setSteps(v){
+  v = Math.max(0, Math.round(v) || 0); S.steps = v; const ms = Math.floor(v/1000);
+  if (ms > S.stepMs) { earn(2*(ms - S.stepMs), "steps"); S.stepMs = ms; }
+  speak(v >= STEP_GOAL ? `${v.toLocaleString()}! 5,000 smashed!` : `${v.toLocaleString()}. ${(STEP_GOAL - v).toLocaleString()} to go!`, 5000);
+  act(v >= STEP_GOAL ? "cheer" : "nudge"); save();
+}
+function openSteps(){ openTracker("steps"); }
 function questMark(){
   const ph = phase(), m = $("qmarkWrap");
   let target = null;
@@ -902,13 +914,7 @@ function frame(now){
 }
 
 /* =================== WIRING =================== */
-$("stepForm").onsubmit = e => {
-  e.preventDefault(); const v = Math.max(0, parseInt($("stepIn").value, 10) || 0);
-  S.steps = v; const ms = Math.floor(v/1000);
-  if (ms > S.stepMs) { earn(2*(ms - S.stepMs), "steps"); S.stepMs = ms; }
-  speak(v >= 5000 ? `${v.toLocaleString()}! 5,000 smashed 🎉` : `${v.toLocaleString()}. ${(5000 - v).toLocaleString()} to go!`, 5000);
-  $("stepIn").value = ""; $("stepForm").classList.remove("open"); measureHud(); act(v >= 5000 ? "cheer" : "nudge"); save();
-};
+document.querySelectorAll("[data-track]").forEach(b => b.onclick = () => openTracker(b.dataset.track));
 $("addForm").onsubmit = e => {
   e.preventDefault(); const title = $("addTitle").value.trim(); if (!title) return;
   S.extra.push({id:"x" + Date.now().toString(36), title, minutes: Math.min(180, Math.max(5, parseInt($("addMin").value, 10) || 25))});
@@ -920,7 +926,8 @@ $("pet").onclick = () => { hearts(2); speak(pick(["*leans into the pat*", "Happy
 document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
 $("pclose").onclick = closePanel;
 document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; ctx(); });
-initNotebook({task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
+initNotebook({onTread, water:() => ({ml: S.waterMl || 0, goal: WATER_GOAL, glass: GLASS}), steps:() => ({n: S.steps, goal: STEP_GOAL}),
+  addWater:ml => A.water(ml), setWater, setSteps, task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
   sayNow:() => say, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),
   placeLabel:t => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`});
 initNpcs({scene:() => scene, bounds, mel, evan, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,

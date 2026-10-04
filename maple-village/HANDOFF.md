@@ -231,4 +231,8 @@ Round 4:
 - Any quest can be picked any time: tap its note on the cork board ("do this now"). Boss mode still hands out one at a time.
 - The morning briefing prints as *The Morning Crier*: masthead, volume line, headline, lede, a front-page story and two columns.
 
+Round 5:
+- Treadmill tasks (title has 🚶 or "treadmill") are assigned straight to the treadmill at home; "walk" tasks keep the offer.
+- Water and steps are thin drawn progress bars. Tapping one opens a small notebook page: water in ml (+glass / +bottle / +big bottle, or type the total; goal 2 L), steps typed from the watch (goal 5,000).
+
 Not done yet: publishing the new build to the live link (needs `sample` added to the capabilities), stage 3 ideas (8.5), collision-aware walking and a camera/zoom for small phones (4.6).
