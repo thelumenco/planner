@@ -131,6 +131,15 @@ const SHELLS = {
     <g style="fill:var(--honey)" opacity=".8">${[117, 212, 307, 402].map(x => `<circle cx="${x}" cy="40" r="5"/>`).join("")}</g>
     ${sk(`<path d="M232 8 h56 l-6 14 h-44z" style="fill:var(--honey)"/>`, `<path d="M232 8 h56 l-6 14 h-44z"/><path d="M248 15 h24" opacity=".5"/>`)}${plant(30, 610, 1.1)}${plant(490, 610, 1)}`,
 
+  // The kitchen: checked tiles, a sage dado, open shelves with pots, a herb rail and a window over the garden
+  kitchen: () => `<rect width="520" height="640" style="fill:#E9E2D4"/>
+    <g opacity=".5">${rows(12, r => rows(13, c => (r + c) % 2 ? `<rect x="${c*40}" y="${150 + r*42}" width="40" height="42" style="fill:#D7E3CC"/>` : ""))}</g>
+    ${wallBase("#F2EBDD", "#7FA36E")}${skirting}
+    ${sk(`<rect x="196" y="34" width="128" height="80" rx="4" style="fill:#CFE0EE"/><ellipse cx="236" cy="72" rx="20" ry="8" style="fill:#FFFDF6"/>`, `<rect x="196" y="34" width="128" height="80" rx="4"/><path d="M260 34 v80 M196 74 h128"/>`)}
+    ${sk(`<rect x="20" y="40" width="130" height="6" style="fill:#8B5E3C"/><path d="M34 46 v14 h18 v-14z M70 46 v18 h22 v-18z M110 46 v12 h16 v-12z" style="fill:#C46A4A"/>`, `<rect x="20" y="40" width="130" height="6"/><path d="M34 46 v14 h18 v-14z M70 46 v18 h22 v-18z M110 46 v12 h16 v-12z"/>`)}
+    ${sk(`<path d="M360 40 h130" /><path d="M376 40 q-6 18 0 26 q6 -8 0 -26z M408 40 q-6 18 0 26 q6 -8 0 -26z M440 40 q-6 18 0 26 q6 -8 0 -26z M472 40 q-6 18 0 26 q6 -8 0 -26z" style="fill:#7FA35A"/>`, `<path d="M360 40 h130"/><path d="M376 40 q-6 18 0 26 q6 -8 0 -26z M408 40 q-6 18 0 26 q6 -8 0 -26z M440 40 q-6 18 0 26 q6 -8 0 -26z M472 40 q-6 18 0 26 q6 -8 0 -26z"/>`)}
+    ${plant(490, 610, .9)}`,
+
   // The wine shop: terracotta tiles, warm plaster, a wine rack behind the counter, the chalk menu, hanging lamps
   wineshop: () => `<rect width="520" height="640" style="fill:#D9A58A"/>
     <g opacity=".45" style="stroke:#B97F62" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(26, i => `<path d="M${(i % 13)*40 + (Math.floor(i/13) % 2)*20} ${170 + (i % 12)*40} v40"/>`)}</g>

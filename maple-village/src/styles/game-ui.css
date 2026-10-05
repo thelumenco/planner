@@ -697,3 +697,25 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
 .panel .items.dishes{margin-bottom:14px}
 .panel .items.dishes .item .c small{display:block;color:#8A8279;font-weight:500}
 .panel .ph3 + .eyebrow{margin-top:6px}
+.item .tokit{display:inline-block;margin-top:4px;padding:1px 8px;border-radius:999px;background:#E3EEDA;color:#3F5A3A;font-size:.68rem;font-weight:800;cursor:pointer}
+.item .tokit:hover{background:#D3E4C6}
+/* the kitchen: larder goods, recipe cards for the tapas of the day */
+.kdishes{display:grid;gap:10px;margin:8px 0 12px}
+.kdish{display:flex;gap:12px;align-items:center;width:100%;box-sizing:border-box;text-align:left;padding:10px 12px;border:1px solid rgba(120,104,84,.18);border-radius:12px;background:#FFFDF7;font:inherit;color:#2F2B28;cursor:pointer}
+.kdish.ok{border-color:#9CC27E;background:#F4F9EF}
+.kdish.chosen{cursor:default;margin:8px 0}
+.kdish > svg{flex:none}
+.kdish > span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.kdish b{font-size:.98rem}
+.kdish small{color:#8A8279;font-size:.8rem}
+.kneeds{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:4px}
+.kneed{display:inline-flex;align-items:center;gap:4px;font-size:.8rem;color:#B5674F}
+.kneed.ok{color:#5E7A4E}
+.kneed small{color:#8A8279}
+.kgoods{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin:8px 0 12px}
+.kgood{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border:1px solid rgba(120,104,84,.18);border-radius:10px;background:#FFFDF7;text-align:center;font:inherit;color:#2F2B28}
+.kgood b{font-size:1rem}
+.kgood small{font-size:.72rem;color:#8A8279;line-height:1.25}
+.kbtn{cursor:pointer}
+.kbtn em{font-style:normal;font-size:.68rem;font-weight:800;color:#3F5A3A;background:#E3EEDA;border-radius:999px;padding:1px 8px;margin-top:3px}
+.ktapas{margin-bottom:6px}

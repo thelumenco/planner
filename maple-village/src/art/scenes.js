@@ -292,6 +292,24 @@ export function furn(kind, x, y){
         <path d="M${x-40} ${y-42} l38 -6 l38 6 v12 l-38 -4 l-38 4z" style="fill:#FFFDF6"/><rect x="${x-34}" y="${y-46}" width="14" height="12" transform="rotate(-6 ${x-27} ${y-40})" style="fill:#C3CDEE"/>
         <rect x="${x-16}" y="${y-48}" width="12" height="10" transform="rotate(4 ${x-10} ${y-43})" style="fill:#F4C7CF"/><rect x="${x+8}" y="${y-46}" width="22" height="5" style="fill:#F3C969"/><path d="M${x+28} ${y-36} l6 -10 l4 2 l-6 10z" style="fill:var(--rose)"/>`,
       `<rect x="${x-48}" y="${y-30}" width="96" height="22" rx="3"/><path d="M${x-42} ${y-8} v14 M${x+42} ${y-8} v14"/><path d="M${x-40} ${y-42} l38 -6 l38 6 v12 l-38 -4 l-38 4z M${x-2} ${y-48} v12"/><path d="M${x+8} ${y-37} h18 M${x+8} ${y-33} h14" opacity=".55"/>`);
+    // the kitchen (behind the wine shop): its door on the shop's east wall, the oven, larder, stove and cheese press
+    case "kitchendoor": return sk(`<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z" style="fill:#9CC27E"/><path d="M${x+36} ${y-80} l-20 6 v14 l20 -6z" style="fill:#FFFDF6"/>`,
+      `<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z"/><circle cx="${x+17}" cy="${y-42}" r="1.8"/><path d="M${x+36} ${y-80} l-20 6 v14 l20 -6z"/><path d="M${x+20} ${y-70} h10 M${x+22} ${y-66} h7" opacity=".6"/>`);
+    case "oven": { const k = G.kitchen ? G.kitchen() : {}, on = !!(k.oven), ready = on && k.oven.start + k.oven.dur <= Date.now();
+      return sk(`<path d="M${x-40} ${y} v-62 q0 -34 40 -34 q40 0 40 34 v62z" style="fill:#D9A58A"/><path d="M${x-20} ${y-10} v-26 q0 -16 20 -16 q20 0 20 16 v26z" style="fill:${on ? "#F6A23A" : "#3E3530"}"/><rect x="${x-46}" y="${y-8}" width="92" height="8" rx="2" style="fill:#B97F62"/>`,
+        `<path d="M${x-40} ${y} v-62 q0 -34 40 -34 q40 0 40 34 v62z"/><path d="M${x-20} ${y-10} v-26 q0 -16 20 -16 q20 0 20 16 v26z"/><path d="M${x-30} ${y-70} q30 -16 60 0" opacity=".4"/><rect x="${x-46}" y="${y-8}" width="92" height="8" rx="2"/>`)
+        + (on ? `<path class="smoke" d="M${x} ${y-98} q-4 -6 0 -11 q4 -5 0 -10" fill="none" stroke="#8A8279" stroke-width="1.4" opacity=".6"/>` : "")
+        + (ready ? `<g class="twinkle" pointer-events="none"><path d="M${x+30} ${y-90} l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" stroke="#3b3530" stroke-width="1"/></g>` : ""); }
+    case "larder": { const n = G.kitchen ? Object.values((G.kitchen().larder) || {}).reduce((a, b) => a + b, 0) : 0, cols = ["#E86A5C", "#F3C969", "#9CC27E", "#D9A066", "#FFFDF6", "#7FA35A"];
+      let jars = ""; for (let i = 0; i < Math.min(12, n); i++) jars += `<rect x="${x-34 + (i % 4)*18}" y="${y-84 + Math.floor(i/4)*26}" width="12" height="14" rx="3" style="fill:${cols[i % 6]}"/>`;
+      return sk(`<rect x="${x-44}" y="${y-100}" width="88" height="100" rx="3" style="fill:#C9A27E"/><rect x="${x-38}" y="${y-94}" width="76" height="80" style="fill:#F4E6D6"/>${jars}`,
+        `<rect x="${x-44}" y="${y-100}" width="88" height="100" rx="3"/><rect x="${x-38}" y="${y-94}" width="76" height="80"/><path d="M${x-38} ${y-68} h76 M${x-38} ${y-42} h76"/><path d="M${x-44} ${y-8} h88"/>`); }
+    case "stove": return sk(`<rect x="${x-58}" y="${y-38}" width="116" height="38" rx="3" style="fill:#EDE6DA"/><rect x="${x-60}" y="${y-44}" width="120" height="8" rx="2" style="fill:#7B5A42"/><ellipse cx="${x-30}" cy="${y-48}" rx="18" ry="5" style="fill:#3E3530"/><path d="M${x+8} ${y-58} h36 v10 h-36z" style="fill:#B9C6CF"/><rect x="${x-50}" y="${y-30}" width="44" height="24" rx="2" style="fill:#D9D2C6"/>`,
+      `<rect x="${x-58}" y="${y-38}" width="116" height="38" rx="3"/><rect x="${x-60}" y="${y-44}" width="120" height="8" rx="2"/><ellipse cx="${x-30}" cy="${y-48}" rx="18" ry="5"/><path d="M${x-48} ${y-48} h-8 M${x+8} ${y-58} h36 v10 h-36z M${x+44} ${y-54} h8"/><rect x="${x-50}" y="${y-30}" width="44" height="24" rx="2"/><circle cx="${x+20}" cy="${y-20}" r="3"/><circle cx="${x+36}" cy="${y-20}" r="3"/>`)
+      + `<path class="smoke" d="M${x-30} ${y-56} q-4 -6 0 -11 q4 -5 0 -10" fill="none" stroke="#8A8279" stroke-width="1.3" opacity=".5"/>`;
+    case "cheesepress": { const k = G.kitchen ? G.kitchen() : {}, on = !!(k.press);
+      return sk(`<rect x="${x-36}" y="${y-26}" width="72" height="26" rx="3" style="fill:#8B5E3C"/><rect x="${x-6}" y="${y-86}" width="12" height="60" style="fill:#7B5A42"/><rect x="${x-26}" y="${y-60}" width="52" height="10" rx="2" style="fill:#8B5E3C"/>${on ? `<ellipse cx="${x}" cy="${y-34}" rx="20" ry="8" style="fill:#F6E3A1"/>` : ""}`,
+        `<rect x="${x-36}" y="${y-26}" width="72" height="26" rx="3"/><rect x="${x-6}" y="${y-86}" width="12" height="60"/><rect x="${x-26}" y="${y-60}" width="52" height="10" rx="2"/><path d="M${x-16} ${y-90} h32"/>${on ? `<ellipse cx="${x}" cy="${y-34}" rx="20" ry="8"/>` : ""}`); }
     // the wine shop: wine racks, the counter (front drawn over people, see foreArt), the honesty box, tasting tables
     case "wineshelf": { const n = G.vine ? Math.min(18, G.vineStock()) : 0; let b = "";
       for (let r = 0; r < 3; r++) for (let i = 0; i < 6; i++) { const k = r*6 + i; b += k < n ? `<rect x="${x-36 + i*12.5}" y="${y-86 + r*28}" width="7" height="20" rx="2.5" style="fill:${k % 3 === 1 ? "#9DBF8A" : "#5B2338"}"/>` : ""; }
@@ -432,6 +450,10 @@ export function roomArt(id){
   else if (id === "market") h += sk(`<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
     `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`) +
     `<g>${[["apple","dumpling","fish","toast"],["tulip","carrot","strawberry","sunflower"]].map((row, r) => row.map((n, i) => iconAt(n, 64 + i*30, 62 + r*38, 26)).join("")).join("")}${[["yarn","ball","brush","crown"],["bath","fort","corn","blueberry"]].map((row, r) => row.map((n, i) => iconAt(n, 374 + i*30, 62 + r*38, 26)).join("")).join("")}</g>`;
+  // the wine shop's chalkboard names today's tapas, once it's chosen
+  if (id === "wineshop" && G.tapas && G.tapas()) { const words = G.tapas().split(" "), lines = [];
+    words.forEach(w => { const l = lines[lines.length - 1]; if (l && (l + " " + w).length <= 11) lines[lines.length - 1] = l + " " + w; else lines.push(w); });
+    h += `<g pointer-events="none"><rect x="434" y="50" width="62" height="72" rx="2" fill="#3E4A43"/><text x="465" y="64" text-anchor="middle" font-family="Klee One,serif" font-size="9" fill="#F3C969">Tapas today</text>${lines.slice(0, 4).map((l, i) => `<text x="465" y="${80 + i*12}" text-anchor="middle" font-family="Klee One,serif" font-size="9" fill="#F6EFE3">${l.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text>`).join("")}</g>`; }
   st.forEach(s => {
     // a pedestal's sign names the trophy standing on it (an empty one has no sign)
     const nm = s.kind === "pedestal" ? ((G.ped && G.ped(s.x, s.y)) || {}).label || "" : s.kind === "vaultjar" ? (() => { const j = G.vault && G.vault(s.x); return j ? j.label : "Empty"; })() : s.name;

@@ -16,7 +16,9 @@ export const KINDS = {
   chick: {n: "Chick", grown: "Hen", food: ["chickfeed"], foodName: "chick feed",
     names: ["Nugget", "Pip", "Sunny", "Butterbean", "Popcorn", "Peaches", "Marigold", "Custard", "Tofu", "Kaya"]},
   rabbit: {n: "Bunny", grown: "Rabbit", food: ["rabbitfeed", "carrot"], foodName: "rabbit pellets or a carrot",
-    names: ["Clover", "Mochi", "Hazel", "Pudding", "Bun Bun", "Oreo", "Waffle", "Toffee", "Pebble", "Cinnamon"]}
+    names: ["Clover", "Mochi", "Hazel", "Pudding", "Bun Bun", "Oreo", "Waffle", "Toffee", "Pebble", "Cinnamon"]},
+  goat: {n: "Kid", grown: "Goat", food: ["goatfeed", "carrot"], foodName: "goat feed or a carrot",
+    names: ["Biscuit", "Daisy", "Pepper", "Clementine", "Bramble", "Nutmeg", "Honey", "Rosie", "Juniper", "Ollie"]}
 };
 const GROW = 3;
 const BUNNY_COLS = ["#B9A38C", "#E9DCCB", "#FFFDF6", "#9C8C80"];
@@ -52,7 +54,8 @@ export function feedOne(F, a, inv, addInv){
   addInv(food, -1); a.fedDay = dayKey(); a.feeds = (a.feeds || 0) + 1;
   const grew = !wasGrown && isGrown(a), egg = wasGrown && a.kind === "chick";
   if (egg) addInv("egg", 1);
-  return {ok: true, grew, egg, food};
+  const milk = wasGrown && a.kind === "goat"; if (milk) addInv("milk", 1);   // a grown goat gives a bottle of milk when fed
+  return {ok: true, grew, egg, milk, food};
 }
 export function upgradeRun(F){
   const P = ensurePets(F), nx = RUNS[P.run + 1]; if (!nx || F.coins < nx.price) return null;
@@ -66,7 +69,7 @@ export function runPanel(F){
   if (!P.animals.length) h += `<p class="muted">It's quiet in here. Chicks and bunnies are in the market's Animals tab, with their food.</p>`;
   else {
     h += `<ul class="hlist pets">${P.animals.map(a => { const hu = hungry(a, F), left = Math.max(0, GROW - (a.feeds || 0));
-      return `<li><span class="pico">${icon(a.kind === "chick" ? (isGrown(a) ? "hen" : "chick") : "rabbit", 30)}</span><span><b>${esc(a.name)}</b><small>${label(a)} · ${hu ? "hungry" : "fed and happy"}${left ? ` · ${left} more ${left === 1 ? "meal" : "meals"} to grow up` : a.kind === "chick" ? " · lays an egg when fed" : ""}</small></span>${hu ? `<button class="next" data-feed="${a.id}">feed</button>` : `<span class="hbadge">full</span>`}</li>`; }).join("")}</ul>`;
+      return `<li><span class="pico">${icon(a.kind === "chick" ? (isGrown(a) ? "hen" : "chick") : a.kind === "goat" ? "goat" : "rabbit", 30)}</span><span><b>${esc(a.name)}</b><small>${label(a)} · ${hu ? "hungry" : "fed and happy"}${left ? ` · ${left} more ${left === 1 ? "meal" : "meals"} to grow up` : a.kind === "chick" ? " · lays an egg when fed" : ""}</small></span>${hu ? `<button class="next" data-feed="${a.id}">feed</button>` : `<span class="hbadge">full</span>`}</li>`; }).join("")}</ul>`;
     if (hungryCount(F) > 1) h += `<div class="actions"><button class="btn primary small" data-feed="all">Feed everyone</button></div>`;
   }
   h += `<p class="eyebrow" style="margin:12px 0 6px">Make the run nicer</p>`;
@@ -106,6 +109,10 @@ export function animalArt(a, sad){
   if (a.kind === "chick") return g
     ? `<g ${INK}><path d="M-9 0 q-4 -9 2 -12" fill="#FFFDF6"/><ellipse cx="0" cy="-5" rx="9" ry="7" fill="#FFFDF6"/><circle cx="7" cy="-12" r="4.5" fill="#FFFDF6"/><path d="M5 -17 q1 -3 3 -1 q1 -3 3 0" fill="var(--rose)"/><path d="M11 -12 l3 1 l-3 1.5z" fill="var(--honey)"/><path d="M-2 2 v4 M3 2 v4" style="stroke:var(--honey)"/><circle cx="8" cy="-13" r=".9" fill="var(--line)" stroke="none"/></g>`
     : `<g ${INK}><circle cx="0" cy="-5" r="5.5" fill="var(--butter)"/><circle cx="4" cy="-10" r="3.6" fill="var(--butter)"/><path d="M7.4 -10 l2.4 .8 l-2.4 1.2z" fill="var(--honey)"/><path d="M-1 0 v3 M2 0 v3" style="stroke:var(--honey)"/><circle cx="4.8" cy="-10.8" r=".8" fill="var(--line)" stroke="none"/>${sad ? `<path d="M-6 -16 q2 -2 4 0" opacity=".6"/>` : ""}</g>`;
+  if (a.kind === "goat") { const s = g ? 1.05 : .75;
+    return `<g transform="scale(${s})" ${INK}><ellipse cx="0" cy="-9" rx="12" ry="7" fill="#F4EEE3"/><path d="M-8 -4 v8 M-3 -3 v7 M4 -3 v7 M9 -4 v8" fill="none"/><path d="M-12 -11 q-4 -3 -3 -7" fill="none"/>
+      <path d="M8 -12 q2 -9 9 -8 q4 1 3 6 q-2 5 -8 5z" fill="#F4EEE3"/><path d="M12 -19 q-2 -6 -6 -6 M16 -19 q2 -6 6 -7" fill="none" stroke-width="1.6"/><path d="M8 -15 q-5 0 -5 3 q3 1 6 -1" fill="#C9B79C"/>
+      <circle cx="16" cy="-14" r="1" fill="var(--line)" stroke="none"/><path d="M19 -9 q1 4 -2 6" fill="none"/>${sad ? `<path d="M22 -24 q1 -3 3 -1" fill="none"/>` : ""}</g>`; }
   const c = BUNNY_COLS[a.col || 0], s = g ? 1 : .72;
   return `<g transform="scale(${s})" ${INK}><ellipse cx="0" cy="-6" rx="10" ry="7" fill="${c}"/><circle cx="-10" cy="-8" r="2.6" fill="#FFFDF6"/><circle cx="8" cy="-11" r="5.2" fill="${c}"/><ellipse cx="6" cy="-20" rx="1.8" ry="5.5" fill="${c}" transform="rotate(${sad ? -40 : -10} 6 -16)"/><ellipse cx="10" cy="-20" rx="1.8" ry="5.5" fill="${c}" transform="rotate(${sad ? 30 : 12} 10 -16)"/><circle cx="10" cy="-12" r=".9" fill="var(--line)" stroke="none"/><circle cx="13" cy="-10" r=".9" fill="var(--rose)" stroke="none"/></g>`;
 }

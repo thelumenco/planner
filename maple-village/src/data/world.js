@@ -40,6 +40,7 @@ export const VILLAGE = {
   vinestall:{scene:"vineyard", name:"Vineyard stall", door:[90,452], spot:true, line:"Cuttings, trellises and barrels."},
   pswing: {scene:"vineyard", name:"Swings", door:[110,594], spot:true, line:"The swings. Wheee!"},
   pslide: {scene:"vineyard", name:"Slide", door:[262,592], spot:true, line:"The slide. Down you go!"},
+  olive:  {scene:"vineyard", name:"Olive tree", door:[250,262], spot:true, line:"The olive tree. Olives every few hours, once it's planted."},
   pseesaw:{scene:"vineyard", name:"Seesaw", door:[410,600], spot:true, line:"The seesaw. Up, down, up, down."},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };
@@ -72,7 +73,9 @@ export const outdoorOf = s => OUTDOOR.includes(s) ? s : INNER[s] ? outdoorOf(INN
 export const INNER = {
   room: {parent: "home", door: [64, 340], arrive: [456, 400], exit: [486, 410]},
   kidroom: {parent: "home", door: [456, 340], arrive: [70, 420], exit: [34, 410]},
-  trophy: {parent: "hall", door: [64, 372], arrive: [456, 400], exit: [486, 410]}
+  trophy: {parent: "hall", door: [64, 372], arrive: [456, 400], exit: [486, 410]},
+  // the wine shop's kitchen, through the door on its east wall; its own way out is the mat at the bottom
+  kitchen: {parent: "wineshop", door: [462, 390], arrive: [260, 560], exit: [260, 606]}
 };
 export const WORK = ["hall","chord","fresh","chico","post","home"];
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
@@ -162,11 +165,19 @@ export const ROOMS = {
     ["counter","Counter","C","bankcounter",null,"Opal's counter. Your passbook's here.",30]]},
   // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
   // and the tasting room's little tables
-  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,262], C:[330,318], H:[96,440], T:[340,520]}, stations:[
+  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,262], C:[330,318], H:[96,440], T:[340,520], K:[480,390]}, stations:[
+    ["kdoor","Kitchen","K","kitchendoor",null,"Into the kitchen.",0],
     ["wshelf","Wine shelves","S","wineshelf",null,"Your wines, waiting for customers.",30],
     ["wcounter","Counter","C","winecounter",null,"Behind the counter. Customers come more often while you serve.",-34],
     ["hbox","Honesty box","H","honestybox",null,"The honesty box.",30],
     ["tasting","Tasting room","T","cafetables",null,"The tasting room.",34]]},
+  // The kitchen behind the wine shop: oven (bread from flour), larder (ingredients sent from the backpack), cheese
+  // press (goat's milk into cheese) and the stove, where the small plates and the tapas of the day are cooked
+  kitchen: {name:"The kitchen", wall:"#F2EBDD", trim:"#7FA36E", noBoard:true, pos:{O:[110,262], L:[410,262], P:[262,470], C:[110,500]}, stations:[
+    ["oven","Oven","O","oven",null,"The bread oven. Flour in, loaves out.",30],
+    ["larder","Larder","L","larder",null,"The larder. Everything you've sent to the kitchen.",30],
+    ["stove","Stove","P","stove",null,"The stove. Small plates and today's tapas.",30],
+    ["press","Cheese press","C","cheesepress",null,"The cheese press. Goat's milk in, cheese out.",30]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };

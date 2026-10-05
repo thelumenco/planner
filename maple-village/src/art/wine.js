@@ -89,17 +89,37 @@ export function bottleArt(type, h, tilt){
 export const glassArt = (type, h = 34) => { const wine = {red: "#7A1F3D", rose: "#E98AA0", white: "#E8D57A", sparkling: "#F3E7B0"}[type] || "#7A1F3D";
   return `<svg class="vybottle" viewBox="0 0 24 40" width="${Math.round(h*.6)}" height="${h}" aria-hidden="true"><path d="M5 4 h14 q1 14 -7 17 q-8 -3 -7 -17z" fill="#F4F8FA" ${INK}/><path d="M5.6 10 h12.8 q-.6 10 -6.4 11 q-5.8 -1 -6.4 -11z" fill="${wine}"/>${type === "sparkling" ? `<circle cx="10" cy="15" r=".9" fill="#FFFDF6"/><circle cx="13" cy="13" r=".7" fill="#FFFDF6"/>` : ""}<path d="M12 21 v13 M6 36 h12" fill="none" ${INK}/></svg>`; };
 
+// The olive tree: state "none" (an empty spot), "growing" or "ripe" (black olives among the silver leaves)
+export function oliveTree(x, y, sc, state){
+  const leaves = [[-22, -50], [-8, -62], [10, -60], [24, -48], [-14, -38], [14, -36], [0, -48]].map(([dx, dy], i) => `<ellipse cx="${x + dx*sc}" cy="${y + dy*sc}" rx="${14*sc}" ry="${9*sc}" fill="${i % 2 ? "#A7B89A" : "#8FA47E"}" ${INK}/>`).join("");
+  const fruit = state === "ripe" ? [[-16, -44], [-4, -54], [8, -46], [18, -40], [-8, -34], [4, -38], [14, -54]].map(([dx, dy]) => `<ellipse cx="${x + dx*sc}" cy="${y + dy*sc}" rx="${2.6*sc}" ry="${2*sc}" fill="#3B3045" stroke="#3b3530" stroke-width=".8"/>`).join("")
+    : state === "growing" ? [[-12, -44], [6, -50], [16, -42]].map(([dx, dy]) => `<ellipse cx="${x + dx*sc}" cy="${y + dy*sc}" rx="${2*sc}" ry="${1.6*sc}" fill="#9CB86A" stroke="#3b3530" stroke-width=".7"/>`).join("") : "";
+  return `<path d="M${x - 3*sc} ${y} C${x - 6*sc} ${y - 14*sc} ${x + 4*sc} ${y - 20*sc} ${x} ${y - 32*sc} M${x + 3*sc} ${y} C${x + 8*sc} ${y - 12*sc} ${x - 2*sc} ${y - 22*sc} ${x + 6*sc} ${y - 34*sc}" fill="none" stroke="#7A5638" stroke-width="${4*sc}" stroke-linecap="round"/>${leaves}${fruit}`;
+}
+export function oliveArt(state, w = 150){
+  const inner = `<rect x="2" y="2" width="146" height="126" rx="14" fill="#EEF4E6"/><path d="M2 108 Q60 100 148 108 V114 a14 14 0 0 1 -14 14 H16 a14 14 0 0 1 -14 -14z" fill="#B08A6A"/>`
+    + (state === "none" ? `<ellipse cx="75" cy="108" rx="22" ry="6" fill="#9C7A5C" ${INK}/><text x="75" y="70" text-anchor="middle" font-family="Klee One,serif" font-size="12" fill="#8A8279">a spot for an olive tree</text>` : oliveTree(75, 110, 1.35, state))
+    + (state === "ripe" ? `<g class="twinkle"><path d="M122 30 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" ${INK} stroke-width="1"/></g>` : "");
+  return `<svg class="vypic" viewBox="0 0 150 130" width="${w}" height="${Math.round(w*130/150)}" aria-hidden="true">${inner}</svg>`;
+}
 // stall icons
 export function stallIcon(id, off){
   const w = (inner) => `<svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><g${off ? ' opacity=".4"' : ""}>${inner}</g></svg>`;
   if (id === "cut_red" || id === "cut_white") { const c = id === "cut_red" ? "#6B2A55" : "#C9D66A";
     return w(`<path d="M24 46 V22" stroke="#7A5638" stroke-width="3" stroke-linecap="round"/>${leaf(16, 16, .9, -25, "#86B26A")}${leaf(32, 14, .8, 25, "#9CC27E")}${bunch(24, 24, c, 2.8, 9)}`); }
+  if (id === "olive") return w(oliveTree(24, 46, .62, "ripe"));
   if (id === "trellis") return w(`<path d="M8 44 V8 M40 44 V8" stroke="#8B5E3C" stroke-width="3.4" stroke-linecap="round"/><path d="M8 16 H40 M8 28 H40" fill="none" stroke="#3b3530" stroke-width="1.2"/>${leaf(20, 20, .7, -15, "#86B26A")}${leaf(30, 30, .6, 20, "#9CC27E")}`);
   return w(`<path d="M8 24 C8 12 14 8 24 8 C34 8 40 12 40 24 C40 36 34 40 24 40 C14 40 8 36 8 24Z" fill="#B07B52" ${INK}/><path d="M14 9 C11 18 11 30 14 39 M34 9 C37 18 37 30 34 39" fill="none" stroke="#4A3A30" stroke-width="2.2"/><path d="M24 8 V40" stroke="#8A5A3A" stroke-width="1" opacity=".7"/>`);
 }
 
 // Small plates for the tasting room: each dish on a cream plate (or in a bowl), `s` pixels; `off` fades it
+const TAPAS_COL = {patatas: ["#E86A5C", "#F3C969"], tortilla: ["#F3C969", "#E3B04B"], pancon: ["#D9A066", "#E8574C"], pimientos: ["#D9433A", "#7FA35A"], fritters: ["#E3B04B", "#F6E3A1"],
+  carrots: ["#F08A3C", "#7FA35A"], crema: ["#F6E3C6", "#C3A0D8"], tostas: ["#D9A066", "#F6A23A"], rellenos: ["#C9433A", "#F3C969"]};
 export function dishArt(id, s = 44, off){
+  // the tapas of the day come in a little terracotta cazuela
+  if (String(id).startsWith("tapas:")) { const [a, b] = TAPAS_COL[id.slice(6)] || ["#E86A5C", "#F3C969"];
+    return `<svg class="vybottle" viewBox="0 0 48 44" width="${s}" height="${Math.round(s*44/48)}" aria-hidden="true"><g${off ? ' opacity=".4"' : ""}><ellipse cx="24" cy="27" rx="20" ry="10" fill="#C46A4A" ${INK}/><ellipse cx="24" cy="24" rx="16" ry="7" fill="${a}" ${INK} stroke-width="1"/>
+      ${[[17, 23], [24, 21], [31, 23], [21, 26], [28, 26]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${b}" stroke="#3b3530" stroke-width=".8"/>`).join("")}<path d="M4 25 q-2 -3 1 -4 M44 25 q2 -3 -1 -4" fill="none" ${INK}/><path d="M30 14 l6 -7" stroke="#8B5E3C" stroke-width="1.6" stroke-linecap="round"/></g></svg>`; }
   const plate = `<ellipse cx="24" cy="30" rx="21" ry="11" fill="#FFFDF6" ${INK}/><ellipse cx="24" cy="29" rx="14" ry="6.5" fill="none" stroke="#E4DDD2" stroke-width="1.2"/>`;
   const F = {
     cheese: plate + `<path d="M12 28 l14 -10 l3 9z" fill="#F3C969" ${INK}/><circle cx="20" cy="25" r="1.4" fill="#E3B04B"/><rect x="30" y="22" width="6" height="6" rx="1" fill="#F6E3A1" ${INK} stroke-width="1"/><rect x="33" y="27" width="6" height="5" rx="1" fill="#FFF3C4" ${INK} stroke-width="1"/><circle cx="16" cy="32" r="2.4" fill="#6B2A55" ${INK} stroke-width=".8"/><circle cx="19.5" cy="33" r="2.4" fill="#6B2A55" ${INK} stroke-width=".8"/>`,

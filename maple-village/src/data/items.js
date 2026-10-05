@@ -4,7 +4,8 @@ import { H, M } from "../util.js";
 export const CROPS = {
   tulip:{n:"Tulip", e:"🌷", dur:1*H}, sunflower:{n:"Sunflower", e:"🌻", dur:1*H},
   carrot:{n:"Carrot", e:"🥕", dur:4*H}, corn:{n:"Corn", e:"🌽", dur:4*H},
-  strawberry:{n:"Strawberry", e:"🍓", dur:24*H}, blueberry:{n:"Blueberry", e:"🫐", dur:24*H}
+  strawberry:{n:"Strawberry", e:"🍓", dur:24*H}, blueberry:{n:"Blueberry", e:"🫐", dur:24*H},
+  tomato:{n:"Tomato", dur:6*H}, potato:{n:"Potato", dur:8*H}, pepper:{n:"Pepper", dur:6*H}
 };
 export const ITEMS = {
   tulip_seed:{e:"🌷", n:"Tulip seeds", kind:"seed", price:2, crop:"tulip", tab:"seeds"},
@@ -13,6 +14,13 @@ export const ITEMS = {
   corn_seed:{e:"🌽", n:"Corn seeds", kind:"seed", price:4, crop:"corn", tab:"seeds"},
   strawberry_seed:{e:"🍓", n:"Strawberry seeds", kind:"seed", price:6, crop:"strawberry", tab:"seeds"},
   blueberry_seed:{e:"🫐", n:"Blueberry seeds", kind:"seed", price:6, crop:"blueberry", tab:"seeds"},
+  tomato_seed:{n:"Tomato seeds", kind:"seed", price:4, crop:"tomato", tab:"seeds"},
+  potato_seed:{n:"Seed potatoes", kind:"seed", price:4, crop:"potato", tab:"seeds"},
+  pepper_seed:{n:"Pepper seeds", kind:"seed", price:5, crop:"pepper", tab:"seeds"},
+  // Hana's deli shelf: ingredients for the wine shop's kitchen (send them there from the backpack)
+  flour:{n:"Bag of flour", kind:"ingredient", price:3, tab:"deli", what:"bakes two loaves in the kitchen oven"},
+  cheese:{n:"Cheese", kind:"ingredient", price:9, tab:"deli", what:"for cheese boards and tostas"},
+  olives:{n:"Jar of olives", kind:"ingredient", price:5, tab:"deli", what:"a bowl of olives, or with carrots", sell:3},
   apple:{e:"🍎", n:"Apple", kind:"food", price:2, tab:"treats", say:"Crunchy! Thank you 🍎"},
   dumpling:{e:"🥟", n:"Dumpling", kind:"food", price:4, tab:"treats", say:"A dumpling?! Best boss ever."},
   fish:{e:"🐟", n:"Fish", kind:"food", price:6, tab:"treats", say:"Fishy feast. Mmm."},
@@ -41,13 +49,19 @@ export const ITEMS = {
   rabbit:{n:"Bunny", kind:"pet", pet:"rabbit", price:18, tab:"animals", say:"A baby bunny! Look at those ears."},
   chickfeed:{n:"Chick feed", kind:"feed", price:2, tab:"animals", what:"one meal for a chick or hen"},
   rabbitfeed:{n:"Rabbit pellets", kind:"feed", price:2, tab:"animals", what:"one meal for a bunny"},
+  goat:{n:"Goat kid", kind:"pet", pet:"goat", price:30, tab:"animals", say:"A little goat! She's already nibbling my sleeve."},
+  goatfeed:{n:"Goat feed", kind:"feed", price:2, tab:"animals", what:"one meal for a goat"},
+  milk:{n:"Goat's milk", kind:"ingredient", sell:6, what:"two make a cheese in the kitchen press"},
   egg:{n:"Fresh egg", kind:"food", sell:5, say:"A fresh egg from our hens! Breakfast sorted."},
   tulip:{e:"🌷", n:"Tulip", kind:"flower", sell:4, say:"For me? I'll tuck it behind my ear."},
   sunflower:{e:"🌻", n:"Sunflower", kind:"flower", sell:5, say:"So sunny! Thank you."},
   carrot:{e:"🥕", n:"Carrot", kind:"food", sell:6, say:"Homegrown crunch!"},
   corn:{e:"🌽", n:"Corn", kind:"food", sell:8, say:"Sweet corn! Nom."},
   strawberry:{e:"🍓", n:"Strawberry", kind:"food", sell:14, xp:2, say:"Strawberries from our garden 🥹"},
-  blueberry:{e:"🫐", n:"Blueberries", kind:"food", sell:14, xp:2, say:"Blueberries! My favourite."}
+  blueberry:{e:"🫐", n:"Blueberries", kind:"food", sell:14, xp:2, say:"Blueberries! My favourite."},
+  tomato:{n:"Tomato", kind:"food", sell:7, say:"A sun-warm tomato. Mmm."},
+  potato:{n:"Potato", kind:"food", sell:6, say:"A potato? Raw? Brave. Okay."},
+  pepper:{n:"Pepper", kind:"food", sell:7, say:"Crunchy pepper! Spicy? No. Phew."}
 };
 // Home decor: bought once, shows up inside Mel's house. Items in the same slot swap (one wallpaper, one rug at a time).
 export const DECOR = {

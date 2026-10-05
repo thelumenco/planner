@@ -1020,9 +1020,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   console.log("\nweekly review and tasting room");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`review pageerror: ${e.message}`));
-  await page.addInitScript(() => { const q = location.search; if (!/rvpatch|menupatch|platepatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+  await page.addInitScript(() => { const q = location.search; if (!/rvpatch|menupatch|platepatch|dinnerpatch|goatpatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     if (q.includes("rvpatch")) f.history = Object.assign(f.history || {}, {"2026-10-05": {q: 4, steps: 6200, water: 1500, harvest: 2, coins: 30}, "2026-10-07": {q: 6, steps: 7400, water: 2000, harvest: 1, coins: 44}});
-    if (q.includes("menupatch")) { f.coins = 40; f.inv = Object.assign(f.inv || {}, {carrot: 2}); }
+    if (q.includes("menupatch")) { f.coins = 40; f.inv = Object.assign(f.inv || {}, {potato: 2}); }
+    if (q.includes("menupatch")) { f.inv = Object.assign(f.inv || {}, {flour: 1, egg: 2, olives: 1}); }
+    if (q.includes("dinnerpatch")) { f.vine.tapas.day = "2026-01-01"; }
+    if (q.includes("goatpatch")) { f.coins = 60; f.pets = f.pets || {run: 0, animals: [], next: 1}; f.pets.animals = [{id: "g1", kind: "goat", name: "Biscuit", born: Date.now(), feeds: 3, fedDay: null, col: 0}]; f.inv = Object.assign(f.inv || {}, {goatfeed: 1}); }
     if (q.includes("platepatch")) { f.vine = f.vine || {}; f.vine.shelf = [{id: "w9", name: "Test Red", type: "red", n: 40, price: 24, open: 0}]; f.vine.menu = {cheese: 40}; f.vine.lastTick = Date.now() - 600*60e3; }
     localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
   await page.goto(url + "?reset=1&seed=1&date=2026-10-09&time=16:00"); await page.waitForTimeout(800);
@@ -1041,15 +1044,53 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const o = window.__weeklyObj || []; return o.length === 2 && o.every(x => x.weekStartDay === "2026-10-12") && o[0].title === "Fill the Visibility Fix cohort"; }), "next week's priorities go to Sunsama as next week's weekly objectives");
   await page.waitForTimeout(400);
   check(await page.evaluate(c0 => { const f = JSON.parse(localStorage.getItem("fox.fox")); return !!(f.reviews && f.reviews["2026-10-05"]) && f.coins === c0 + 15; }, c0), "the review is kept, with 15 coins for doing it");
-  // the tasting room: small plates from the kitchen (coins) and the garden (backpack)
+  // the kitchen behind the wine shop: ingredients from the backpack, the oven, the stove and the tapas of the day
   await page.goto(url + "?seed=1&time=18:00&menupatch=1"); await page.waitForTimeout(1200);
+  await page.click('[data-open="bag"]'); await page.waitForTimeout(300);
+  check(await page.locator('#bag [data-kit="potato"]').count() === 1, "garden crops in the backpack can be sent to the kitchen");
+  await page.click('#bag [data-kit="potato"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.kitchen.larder.potato === 2 && !f.inv.potato; }), "and arrive in the larder");
+  await page.keyboard.press("Escape");
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(700);
-  await page.locator('#world [data-spot="tasting"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-vymenu="carrotcake"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-vymenu]').count() === 10, "the tasting room offers dishes from the kitchen, the garden and Hana's market");
-  await page.click('#ctx [data-vymenu="carrotcake"]'); await page.waitForTimeout(200); await page.click('#ctx [data-vymenu="bread"]'); await page.waitForTimeout(300);
-  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.menu.carrotcake === 4 && f.vine.menu.bread === 4 && !f.inv.carrot && f.coins === 34; }), "carrot cake is cooked from garden carrots, bread is bought with coins");
-  check(await page.locator("#ctx .wlist .wpic svg").count() >= 2, "dishes on the menu show as plates");
+  await page.locator('#world [data-spot="kdoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /kitchen/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 15000 });
+  check(await page.locator('#world [data-spot="oven"], #world [data-spot="larder"], #world [data-spot="stove"], #world [data-spot="press"]').count() === 4, "a door in the wine shop leads to the kitchen: oven, larder, stove and cheese press");
+  await page.locator('#world [data-spot="larder"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="sendall"]', { timeout: 15000 });
+  await page.click('#ctx [data-k="sendall"]'); await page.waitForTimeout(300); await page.click('#ctx [data-close]');
+  await page.locator('#world [data-spot="oven"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="bake"]', { timeout: 15000 });
+  await page.click('#ctx [data-k="bake"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => { const k = JSON.parse(localStorage.getItem("fox.fox")).kitchen; return !!k.oven && !k.larder.flour; }), "flour goes in the oven to bake");
+  await page.click('#ctx [data-close]');
+  await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="tapas"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 9, "the stove offers nine garden tapas to choose from");
+  await page.click('#ctx [data-k="tapas"][data-id="tortilla"]'); await page.waitForTimeout(200); await page.click('#ctx [data-k="cooktapas"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapas.id === "tortilla" && f.vine.tapas.plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
+  await page.click('#ctx [data-k="dish"][data-dish="olives"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.menu.olives === 4), "small plates are cooked at the stove too");
+  await page.click('#ctx [data-close]');
+  await page.locator('#world [data-exit]').dispatchEvent("click");
+  await page.waitForFunction(() => /wine shop/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 15000 });
+  check(/Tortilla/.test(await page.locator("#sceneArt").textContent()), "the shop's chalkboard names today's tapas");
+  // the next day: leftovers went to the staff, who left something in the larder
+  await page.goto(url + "?seed=1&time=18:00&dinnerpatch=1"); await page.waitForTimeout(4200);
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.staffNote && f.vine.staffNote.plates === 6 && f.vine.tapas.plates === 0 && f.kitchen.larder.olives >= 1; }), "leftover tapas go to the staff for dinner, and they leave thanks in the larder");
+  // Hana's deli shelf and the goat
+  await page.evaluate(() => window.__mapleScene("market")); await page.waitForTimeout(800);
+  await page.locator('#world [data-spot="stall"]').dispatchEvent("click").catch(() => {}); await page.waitForTimeout(600);
+  await page.click('#ctx [data-shop="deli"]').catch(() => {}); await page.waitForTimeout(300);
+  check(await page.locator('#ctx .item[data-id="flour"], #ctx .item[data-id="cheese"], #ctx .item[data-id="olives"]').count() === 3, "Hana's market has a deli shelf: flour, cheese, olives");
+  await page.click('#ctx [data-shop="animals"]'); await page.waitForTimeout(300);
+  check(await page.locator('#ctx .item[data-id="goat"]').count() === 1, "and goats in the Animals tab");
+  // a grown goat gives milk when fed; the olive tree is bought at the vineyard stall
+  await page.goto(url + "?seed=1&time=18:00&goatpatch=1"); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(700);
+  await page.locator('#world [data-place="run"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-feed]', { timeout: 15000 }); await page.click('#ctx [data-feed]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).inv.milk === 1), "a grown goat gives a bottle of milk when fed");
+  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(700);
+  await page.locator('#world [data-place="vinestall"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vybuy="olive"]', { timeout: 15000 });
+  await page.click('#ctx [data-vybuy="olive"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => !!JSON.parse(localStorage.getItem("fox.fox")).vine.olive), "an olive tree can be bought and planted by the path");
   await page.goto(url + "?seed=1&time=21:00&platepatch=1"); await page.waitForTimeout(4200);
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.plates > 0), "villagers order small plates with their wine");
   await page.close();

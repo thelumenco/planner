@@ -533,3 +533,20 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - From the garden, out of `F.inv` crops: carrot cake, grilled corn, berry tart.
   - From Hana's market, out of `F.inv` treats: dumplings, honey toast, fish, apple slices.
 - `v.menu[id]` counts the plates. Food on the menu adds 25% footfall, 60% of glasses sell with a plate, and now and then someone comes in just for a bite. `v.plates` and `today.plates` count them. The chalkboard reads "and small plates".
+
+### Round 46: the kitchen, tapas of the day, where ingredients come from
+- **Kitchen** (INNER room `kitchen`, parent `wineshop`; door station `kdoor` on the shop's east wall K [480,390]; its way out is the bottom mat). Logic is in `src/game/kitchen.js`; state is `F.kitchen = {larder, oven, press}`.
+  - **Larder:** shows its stock, and can bring kitchen goods in from the backpack (one at a time or everything).
+  - **Oven:** 1 flour makes 2 loaves in 1 hour.
+  - **Cheese press:** 2 milk make 1 cheese in 3 hours.
+  - **Stove:** small plates (`DISHES`: bread, olives, cheese board, dumplings, honey toast, fish, apples, each from larder ingredients) go to `v.menu`. The **tapas of the day** (`TAPAS`, nine garden dishes, 6 plates a batch) is chosen once a day; it can be changed until the first batch is cooked. It's stored as `v.tapas = {day, id, plates, cooked}`.
+  - The wine shop's chalkboard names today's tapas (drawn in `roomArt`).
+- **Sales:** tapas sell first (65% of plates), only on their own game day, and bring 1.4× footfall. At closing (10pm), or on the next tick after the day turns over, `staffDinner` gives leftovers to Marco, Ines and Celeste. They leave olives, eggs and flour in the larder, and Maple says so (`v.staffNote`).
+- **Backpack:** kitchen goods show a "to the kitchen" chip. Items of the new kind `ingredient` (flour, cheese, olives, milk) go to the kitchen when tapped; food can still be fed to Maple. `toKitchen` sends all of one item.
+- **Ingredients:**
+  - New crops tomato (6h), potato (8h) and pepper (6h), with seeds at the market.
+  - Hana's new **Deli** tab: flour 3, cheese 9, olives 5.
+  - A **goat** (Animals tab, 30; eats goat feed or a carrot) gives a bottle of milk when fed once grown.
+  - The **olive tree** (vineyard stall, 30; planted by the path at [250,262]) gives 2 jars of olives every 8 hours.
+  - Eggs come from hens, as before.
+- Kitchen dish buttons use `data-dish`, not `data-id`: core's market handler claims every `.item[data-id]` in the panel.

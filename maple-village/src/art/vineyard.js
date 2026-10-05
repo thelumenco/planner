@@ -4,6 +4,7 @@ import { ink } from "../util.js";
 import { sk, tapeLabel, tree, flowers, artCtx } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
 import { growth, barrelLeft, shelfStock, STYLES } from "../game/vineyard.js";
+import { oliveTree } from "./wine.js";
 
 export const VINE_ROWS = [370, 420, 470], VINE_XS = [262, 340, 418];
 export const vineSpot = (r, i) => ({x: VINE_XS[i], y: VINE_ROWS[r] + 16});
@@ -99,7 +100,11 @@ export function vineyardArt(){
     ${tapeLabel(66, 344, "Home", "var(--butter)", 11)}</g>`;
   const sign = sk(`<rect x="124" y="340" width="52" height="16" rx="2" style="fill:#FFFDF6"/>`, `<rect x="124" y="340" width="52" height="16" rx="2"/><path d="M150 356 v14"/>`)
     + `<text x="150" y="351.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9.5" style="fill:var(--line)" pointer-events="none">the vines</text>`;
-  return lampDefs + ground + gate + [[204, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("")
+  // the olive tree by the path (an empty, marked spot until one's bought at the stall)
+  const ol = v.olive, ripe = ol && Date.now() - (ol.pickedAt || ol.planted) >= 8*3600e3;
+  const olive = `<g data-place="olive" aria-label="Olive tree"><ellipse class="hov" cx="250" cy="258" rx="34" ry="9" style="fill:var(--butter)"/>${ol ? `<g filter="url(#wob)">${oliveTree(250, 254, 1, ripe ? "ripe" : "growing")}</g>` + (ripe ? `<g class="twinkle" pointer-events="none"><path d="M276 196 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" stroke="#3b3530" stroke-width="1"/></g>` : "")
+    : sk(`<ellipse cx="250" cy="252" rx="16" ry="5" style="fill:#9C7A5C"/>`, `<ellipse cx="250" cy="252" rx="16" ry="5"/><path d="M262 252 v-18 M256 236 h14 v8 h-14z"/>`)}${tapeLabel(250, 276, "Olive tree", "var(--sage)", 10)}</g>`;
+  return lampDefs + ground + gate + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive
     + shedArt(v) + shopArt(v) + stallArt() + sign + v.rows.map((row, r) => rowArt(row, r)).join("") + playArt();
 }
 // the home-base end: a footbridge over the stream and a vine-wrapped gate (tap to go to the vineyard)
