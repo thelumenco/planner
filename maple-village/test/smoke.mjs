@@ -780,7 +780,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#world .zz").count() >= 1, "Evan can sleep in his car bed");
   await page.locator("#world").click({ position: { x: 200, y: 500 } }); await page.waitForTimeout(400);
   check(await page.evaluate(() => document.getElementById("evan").style.visibility !== "hidden"), "and a tap wakes him");
-  check(await page.evaluate(() => { const l = [...document.querySelectorAll("#world text.lab")].find(t => /To the house/.test(t.textContent)); return !!l && /translate\(50 492\)/.test(l.parentNode.getAttribute("transform")); }), "the door's sign sits below the door, clear of Mel");
+  check(await page.evaluate(() => { const l = [...document.querySelectorAll("#world text.lab")].find(t => /To the house/.test(t.textContent)); const m = l && /translate\(([\d.]+) ([\d.]+)\)/.exec(l.parentNode.getAttribute("transform")); return !!m && +m[1] < 90 && +m[2] > 470; }), "the door's sign sits below the door, clear of Mel");
   await page.locator('#world [data-exit]').dispatchEvent("click");
   await page.waitForFunction(() => !/Evan's room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 5000 }).catch(() => {});
   check(!/Evan's room/.test(await page.locator("#sceneName").textContent()) && !(await page.evaluate(() => document.body.classList.contains("kidmode"))), "tapping the door goes back to the house");

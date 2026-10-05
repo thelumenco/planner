@@ -80,7 +80,7 @@ function tickVillager(def, dt){
       let p = jitter(pick(slot.wander));
       for (let k = 0; k < 6 && outdoors(scene) && blocked(scene, p[0], p[1]); k++) p = jitter(pick(slot.wander));   // never wander into a building
       if (def.id === "pip" && scene === "base" && Math.random() < .35) {   // Pip races Evan to the pond
-        p = [340 + rnd(-10, 10), 572]; api.evan.tx = 360 + rnd(-14, 14); api.evan.ty = 578; api.evan.run = true;
+        p = [330 + rnd(-10, 10), 520]; api.evan.tx = 350 + rnd(-14, 14); api.evan.ty = 516; api.evan.run = true;
         if (Math.random() < .6) { say(e, "Race you, Evan!"); setTimeout(() => api.evanSays("race!"), 600); }
       }
       route(e, clamp(p[0], b[0], b[2]), clamp(p[1], b[1], b[3])); e.wait = rnd(3, 8);

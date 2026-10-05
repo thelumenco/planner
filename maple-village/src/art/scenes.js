@@ -21,6 +21,7 @@ export const artCtx = () => G;
 
 export function tapeLabel(x, y, text, col, size){
   const w = text.length*(size ? size*.56 : 8.2) + 22;
+  x = Math.max(w/2 + 8, Math.min(520 - w/2 - 8, x));   // never off the edge of the map
   if (col === "var(--card)") col = "#F6EFE3";   // a cream tape in both themes, so the dark names stay readable
   return `<g transform="translate(${x} ${y}) rotate(-2)" pointer-events="none"><path d="M${-w/2} -11 l4 -1.5 l${w-8} 1 l4 -1 l-2 11 l2 11 l-4 1 l${-(w-8)} -1 l-4 1 l2 -11z" style="fill:${col}" opacity=".94"/><text class="lab" x="0" y="5" text-anchor="middle"${size ? ` style="font-size:${size}px"` : ""}>${text}</text></g>`;
 }
@@ -116,7 +117,7 @@ export function baseArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="200" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="400" cy="380" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="160" cy="590" rx="110" ry="40" style="fill:var(--grass2)"/></g>
     ${tree(40,30,.7)}${tree(150,26,.6)}${tree(380,28,.65)}${tree(480,30,.7)}
-    <g filter="url(#wob)">${waterBand(40, 98)}<path d="M478 94 C470 180 500 300 470 400 C462 430 458 450 452 474" fill="none" style="stroke:var(--water)" stroke-width="14" stroke-linecap="round"/></g>
+    <g filter="url(#wob)">${waterBand(40, 98)}<path d="M478 94 C470 180 500 300 474 420 C464 470 468 510 452 540" fill="none" style="stroke:var(--water)" stroke-width="14" stroke-linecap="round"/></g>
     ${ripples([[60, 66], [150, 78], [350, 62], [420, 80]])}${ducks(76, false, 20)}
     <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 44 Q65 36 130 43 T260 42 T390 44 T520 40 M0 100 Q65 104 130 95 T260 98 T390 96 T520 102"/></g>
     <g filter="url(#wob)"><path d="M260 112 L260 ${D.home.door[1]} M260 326 C200 360 130 420 ${D.farm.door[0]} ${D.farm.door[1]} M260 326 C290 420 300 500 ${D.pond.door[0]} ${D.pond.door[1]} M266 312 C330 300 390 290 ${D.shed.door[0]} ${D.shed.door[1]} M254 318 C200 320 150 320 ${D.swing.door[0]} ${D.swing.door[1]} M290 500 C270 552 240 566 ${D.run.door[0]} ${D.run.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
@@ -145,11 +146,11 @@ export function baseArt(){
       <g filter="url(#wob)" ${ink}><rect x="40" y="406" width="136" height="66" rx="4" style="fill:#B08A6A"/><path d="M48 430 h120 M48 454 h120" opacity=".35"/>${sprouts}
       <path d="M34 478 V400 H182 V478 M34 478 H94 M122 478 H182" fill="none" style="stroke:var(--wood)" stroke-width="2.6"/>${Array.from({length:7}, (_, i) => `<path d="M${34 + i*24.6} 396 v10" style="stroke:var(--wood)" stroke-width="2"/>`).join("")}</g>
       ${tapeLabel(108, 392, "Garden", "var(--sage)")}</g>
-    <g data-place="pond" aria-label="Pond"><ellipse class="hov" cx="390" cy="530" rx="96" ry="46" style="fill:var(--butter)"/>
-      <g filter="url(#wob)" ${ink}><ellipse cx="408" cy="504" rx="72" ry="32" style="fill:var(--water)"/><path class="ripple" d="M380 500 q8 -4 16 0 M414 514 q8 -4 16 0" opacity=".6"/>
-        <ellipse cx="446" cy="492" rx="8" ry="4" style="fill:var(--tree)"/><circle cx="446" cy="489" r="2.2" style="fill:var(--rose)"/><ellipse cx="370" cy="516" rx="6" ry="3" style="fill:var(--tree)"/>
+    <g data-place="pond" aria-label="Pond"><ellipse class="hov" cx="390" cy="584" rx="96" ry="46" style="fill:var(--butter)"/>
+      <g filter="url(#wob)" ${ink}><ellipse cx="408" cy="566" rx="72" ry="32" style="fill:var(--water)"/><path class="ripple" d="M380 562 q8 -4 16 0 M414 576 q8 -4 16 0" opacity=".6"/>
+        <ellipse cx="446" cy="554" rx="8" ry="4" style="fill:var(--tree)"/><circle cx="446" cy="551" r="2.2" style="fill:var(--rose)"/><ellipse cx="370" cy="578" rx="6" ry="3" style="fill:var(--tree)"/>
         <rect x="300" y="546" width="36" height="6" rx="2" style="fill:var(--wood)"/><path d="M304 552 v8 M332 552 v8 M300 542 h36"/></g>
-      ${tapeLabel(430, 554, "Pond", "var(--sky)")}</g>` +
+      ${tapeLabel(408, 622, "Pond", "var(--sky)")}</g>` +
     // evening firepit + washing line, just for cosiness
     sk(`<ellipse cx="276" cy="608" rx="20" ry="8" style="fill:var(--stone)"/><path d="M264 606 l24 -6 M264 600 l24 6" style="stroke:var(--wood)" stroke-width="4"/>`,
       `<ellipse cx="276" cy="608" rx="20" ry="8"/><path class="smoke" d="M276 594 q-4 -6 0 -11 q4 -5 0 -10" opacity=".5"/>`) +
@@ -273,9 +274,9 @@ export function furn(kind, x, y){
         <path d="M${x-36} ${y-66} q18 -10 36 -4 q18 -6 36 4 l-2 8 q-17 -8 -34 -2 q-17 -6 -34 2z" style="fill:#FFFDF6"/><path d="M${x-38} ${y-62} q19 -6 38 -1 q19 -5 38 1 l0 4 q-19 -6 -38 -1 q-19 -5 -38 1z" style="fill:#8E2C48"/>`,
       `<path d="M${x-30} ${y-62} h60 l-8 18 h-44z"/><path d="M${x-8} ${y-44} h16 v38 h-16z"/><path d="M${x-26} ${y-6} h52 v6 h-52z"/><path d="M${x-36} ${y-66} q18 -10 36 -4 q18 -6 36 4 M${x} ${y-70} v8"/><path d="M${x-28} ${y-68} h20 M${x+8} ${y-68} h20" opacity=".5"/><path d="M${x+20} ${y-64} v10 l3 -2 l3 2 v-10" style="fill:var(--honey)"/>`);
     case "pedestal": { const t = G.ped ? G.ped(x, y) : null;
-      return sk(`<rect x="${x-30}" y="${y-62}" width="60" height="10" rx="2" style="fill:#F3EEE6"/><rect x="${x-24}" y="${y-52}" width="48" height="44" style="fill:#EAE3D8"/><rect x="${x-30}" y="${y-8}" width="60" height="8" rx="2" style="fill:#F3EEE6"/>`,
-        `<rect x="${x-30}" y="${y-62}" width="60" height="10" rx="2"/><rect x="${x-24}" y="${y-52}" width="48" height="44"/><path d="M${x-14} ${y-50} v40 M${x} ${y-50} v40 M${x+14} ${y-50} v40" opacity=".35"/><rect x="${x-30}" y="${y-8}" width="60" height="8" rx="2"/>`)
-        + (t ? trophySVG(t, 64).replace("<svg ", `<svg x="${x-32}" y="${y-62-72}" class="ptrophy" `) : `<ellipse cx="${x}" cy="${y-64}" rx="16" ry="3" fill="#000" opacity=".06"/>`); }
+      return sk(`<rect x="${x-28}" y="${y-48}" width="56" height="9" rx="2" style="fill:#F3EEE6"/><rect x="${x-22}" y="${y-39}" width="44" height="32" style="fill:#EAE3D8"/><rect x="${x-28}" y="${y-7}" width="56" height="7" rx="2" style="fill:#F3EEE6"/>`,
+        `<rect x="${x-28}" y="${y-48}" width="56" height="9" rx="2"/><rect x="${x-22}" y="${y-39}" width="44" height="32"/><path d="M${x-12} ${y-37} v28 M${x} ${y-37} v28 M${x+12} ${y-37} v28" opacity=".35"/><rect x="${x-28}" y="${y-7}" width="56" height="7" rx="2"/>`)
+        + (t ? trophySVG(t, 56).replace("<svg ", `<svg x="${x-28}" y="${y-48-63}" class="ptrophy" `) : `<ellipse cx="${x}" cy="${y-50}" rx="15" ry="3" fill="#000" opacity=".06"/>`); }
     // the bank: a tall glass vault jar (savings), and Opal's counter
     case "vaultjar": { const j = G.vault ? G.vault(x) : null;
       if (!j) return `<g opacity=".75">${sk(`<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" style="fill:rgba(220,235,245,.35)"/>`, `<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" stroke-dasharray="5 5"/><path d="M${x} ${y-152} v20 M${x-10} ${y-142} h20" stroke-width="2"/>`)}</g>`;
@@ -423,21 +424,21 @@ export function roomArt(id){
   st.forEach(s => {
     // a pedestal's sign names the trophy standing on it (an empty one has no sign)
     const nm = s.kind === "pedestal" ? ((G.ped && G.ped(s.x, s.y)) || {}).label || "" : s.kind === "vaultjar" ? (() => { const j = G.vault && G.vault(s.x); return j ? j.label : "Empty"; })() : s.name;
-    h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? (s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm.length > 10 ? nm.slice(0, 9) + "…" : nm, "var(--card)", 9.5) : tapeLabel(s.x, s.y + 24, nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)", s.kind === "pedestal" ? 10 : undefined)) : ""}</g>`;
+    h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? (s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm.length > 10 ? nm.slice(0, 9) + "…" : nm, "var(--card)", 9.5) : (s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm.length > 15 ? nm.slice(0, 14).trim() + "…" : nm, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)"))) : ""}</g>`;
   });
   if (id === "kidroom") {
     // the door back to the house on the west wall
     const k = G.kid ? G.kid() : {};
     h += `<g data-exit="1" class="kidexit" aria-label="Back to the house"><ellipse class="hov" cx="34" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
       ${sk(`<path d="M0 346 L28 358 L28 456 L0 466z" style="fill:#F7D35A"/>`, `<path d="M0 346 L28 358 L28 456 L0 466z"/><circle cx="23" cy="410" r="1.8"/>`)}
-      ${tapeLabel(50, 492, "To the house", "var(--card)", 11)}</g>`;
+      ${tapeLabel(50, 488, "To the house", "var(--card)", 11)}</g>`;
     if (k.sleep) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".34" pointer-events="none"/>`;
     return h;
   }
   if (id === "trophy") {
     // the archway back into the town hall (east side), and a few pigeons pecking about (tap one and it flaps)
     h += `<g data-exit="1" aria-label="Back to the town hall"><ellipse class="hov" cx="486" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
-      ${sk(`<path d="M520 346 q-16 -6 -28 8 L492 456 L520 466z" style="fill:#E6E9F5"/>`, `<path d="M520 346 q-16 -6 -28 8 L492 456 L520 466z"/>`)}${tapeLabel(462, 486, "To the town hall", "var(--card)", 11)}</g>`;
+      ${sk(`<path d="M520 346 q-16 -6 -28 8 L492 456 L520 466z" style="fill:#E6E9F5"/>`, `<path d="M520 346 q-16 -6 -28 8 L492 456 L520 466z"/>`)}${tapeLabel(474, 514, "Town hall", "var(--card)", 10)}</g>`;
     const pigeon = (x, y, d, flip) => `<g data-pigeon="1" class="pigeon" style="--px:${x}px;--py:${y}px;animation-delay:-${d}s"><g transform="translate(${x} ${y}) scale(${flip ? -1 : 1} 1)"><g class="pbody">
       <ellipse cx="0" cy="-6" rx="9" ry="6" fill="#A7A9B4" stroke="#3A2E28" stroke-width="1.1"/><path d="M-8 -8 q-6 -1 -9 3 q5 1 9 0z" fill="#8E909C" stroke="#3A2E28" stroke-width="1"/>
       <g class="phead"><circle cx="8" cy="-12" r="4.2" fill="#8E909C" stroke="#3A2E28" stroke-width="1.1"/><path d="M8.5 -9.5 q2 1 3 -0.5" fill="#7BB37A" stroke="none"/><circle cx="9.4" cy="-13" r=".9" fill="#3A2E28"/><path d="M12 -12 l2.6 .8 -2.6 .6z" fill="#E3A27E"/></g>
@@ -452,7 +453,7 @@ export function roomArt(id){
     h += cosy ? sk(`<ellipse cx="238" cy="296" rx="36" ry="16" style="fill:var(--rose)"/><ellipse cx="238" cy="293" rx="25" ry="10" style="fill:#FFFDF6"/><ellipse cx="226" cy="290" rx="9" ry="5" style="fill:var(--peri)"/><path d="M258 278 c-3 -4 -8 0 -5 3 l5 4 l5 -4 c3 -3 -2 -7 -5 -3z" style="fill:var(--rose)"/>`, `<ellipse cx="238" cy="296" rx="36" ry="16"/><ellipse cx="238" cy="293" rx="25" ry="10"/><ellipse cx="226" cy="290" rx="9" ry="5"/>`)
       : sk(`<ellipse cx="238" cy="296" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="238" cy="294" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="238" cy="296" rx="30" ry="13"/><ellipse cx="238" cy="294" rx="20" ry="8"/>`);
     h += `<g data-exit="1" aria-label="Back to the house"><ellipse class="hov" cx="486" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
-      ${sk(`<path d="M520 346 L492 358 L492 456 L520 466z" style="fill:var(--blush)"/>`, `<path d="M520 346 L492 358 L492 456 L520 466z"/><circle cx="497" cy="410" r="1.8"/>`)}${tapeLabel(470, 334, "To the house", "var(--card)", 11)}</g>`;
+      ${sk(`<path d="M520 346 L492 358 L492 456 L520 466z" style="fill:var(--blush)"/>`, `<path d="M520 346 L492 358 L492 456 L520 466z"/><circle cx="497" cy="410" r="1.8"/>`)}${tapeLabel(470, 324, "To the house", "var(--card)", 11)}</g>`;
     if (sl) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".32" pointer-events="none"/>`;
     return h;
   }
@@ -511,7 +512,7 @@ export function userGarden(key, x, y, cols, rows, gap){
     else f += `<circle cx="${cx}" cy="${cy-11}" r="4.2" fill="#F3C969" stroke="var(--line)" stroke-width=".6"/><circle cx="${cx}" cy="${cy-11}" r="1.8" fill="#8A5A3A"/>`;
     f += `</g>`;
   }
-  const w = cols*gap, signX = x + w/2 + (key === "chord" ? 8 : 0), signY = y + rows*gap + 10;
+  const w = cols*gap, signX = x + w/2 + (key === "chord" ? 26 : 0), signY = y + rows*gap + 10;
   const tree = users >= 500 ? `<g filter="url(#wob)" ${ink}><rect x="${x+w-6}" y="${y+4}" width="4" height="12" style="fill:var(--wood)"/><circle cx="${x+w-4}" cy="${y}" r="9" style="fill:#F4C7CF"/><circle cx="${x+w-10}" cy="${y+4}" r="6" style="fill:#EFA3A6"/></g>` : "";
   const sparkle = users >= 1000 ? `<g class="twinkle">${iconAt("sparkle", x - 2, y - 2, 12)}${iconAt("sparkle", x + w + 2, y + rows*gap - 4, 11)}</g>` : "";
   const label = `${users.toLocaleString()} ${st.label || (key === "chord" ? "studios" : "families")}`;

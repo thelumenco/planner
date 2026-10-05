@@ -1,4 +1,5 @@
 // Local stand-in for the claude.ai artifact runtime (window.claude.use), dev builds only.
+window.__mapleDevStub = true;   // dev only: lets test scripts jump between scenes
 // db: documents in localStorage under "stub:<path>", live onSnapshot. user: id "me". sample: canned replies.
 // URL options:
 //   ?dblag=ms     delay the first database snapshot (like a slow phone connection)

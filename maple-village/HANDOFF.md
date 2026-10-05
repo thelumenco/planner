@@ -492,3 +492,9 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Workers:** Marco (8–6, lunch in the tasting room) and Ines (9–1, 2–5:30) work the vines. While either is on shift, thirsty vines get watered (picking stays Mel's). Celeste minds the shop counter (11–3, 3:30–9:30); while she's on, footfall doubles and her takings go in the honesty box.
 - **Evening tastings:** Theo, Opal, Bo, Juniper, Okada (weekdays) and Hana (weekends) sit in the tasting room in the evenings.
 - Places "vineyard", "vines", "barrels", "wine shop", "honesty box", "tasting room" and "playground" walk there.
+
+### Round 41: label spacing, the pond moves down, playground swings
+- `test/labels.mjs` (dev build) visits every scene through the dev-only `window.__mapleScene` hook. The stub sets `window.__mapleDevStub`; the real game has no hook. It reports washi labels closer than 14 to another label, closer than 8 to another drawing, or off the map edge. `tapeLabel` now clamps itself inside the map, and door labels sit 34 below the door's foot.
+- Spacing moves: hall revenue chart D→[316,266]; Chord press B→[370,446]; home fridge H→[318,250]; Mel's wardrobe B→[350,306]; Evan's balloons E→[292,250], cars C→[110,592]; courtyard pedestals are shorter (trophies 56), labels shortened to 14 characters at size 9, and placed at P/S/U x 124, Q/T/V x 396 (rows 296/448/600). Its exit label "Town hall" sits below the archway.
+- Home base: the pond moved down 62 (centre [408,566], obstacle [336,534,480,598], lanterns follow), the stream now feeds it lower, and the vineyard footbridge/gate moved to [490,470], well clear of the washing line.
+- The playground swings each swing from their own hook (`.pswing`, per-seat transform-origin) instead of the tree swing's pivot.

@@ -32,7 +32,7 @@ export const VILLAGE = {
   letterbox:{scene:"base", name:"Letterbox", door:[184,326], spot:true, line:"The letterbox. The morning paper lands here."},
   run:    {scene:"base", name:"Animal run", door:[198,566], spot:true, line:"The animal run. Clucks, cheeps and little hops."},
   swing:  {scene:"base", name:"Tree swing", door:[112,318], spot:true, line:"Evan's swing. Push, push, wheee!"},
-  toVine: {scene:"base", name:"Gate to the vineyard", door:[490,404], spot:true, bridge:"vineyard", mark:[494,350], line:"Over the footbridge to the vineyard."},
+  toVine: {scene:"base", name:"Gate to the vineyard", door:[490,470], spot:true, bridge:"vineyard", mark:[494,416], line:"Over the footbridge to the vineyard."},
   // the vineyard, east of home: vines, the barrel shed, the stall, the wine shop and a playground
   toBaseV:{scene:"vineyard", name:"Gate home", door:[22,300], spot:true, bridge:"base", mark:[30,250], line:"Back over the footbridge, home."},
   wineshop:{scene:"vineyard", name:"Wine shop", short:"the wine shop", door:[390,222], mark:[390,96]},
@@ -57,7 +57,7 @@ const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || n
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
 export const BRIDGES = {village:{base:"toBase", lane:"toLane"}, base:{village:"toTown", vineyard:"toVine"}, lane:{village:"toTownE"}, vineyard:{base:"toBaseV"}};
 // where Mel steps off, by "from>to"
-export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,404]};
+export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470]};
 // the next outdoor screen on the way from one to another (screens form a little chain: base - village - lane)
 export function nextHop(from, to){
   if (from === to) return null; if (BRIDGES[from] && BRIDGES[from][to]) return to;
@@ -82,14 +82,14 @@ export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,5
 // the floor at y≈165: their front edge sits at 165 + their height. Tables, sofas and baskets stay out on the floor.
 // station: [id, name, slot, furniture, keyword regex, line, standDy?]  (standDy: where Mel stands, relative to the front edge; default +42)
 export const ROOMS = {
-  hall:  {name:"Town hall", wall:"#E6E9F5", trim:"var(--peri)", pos:{A:[448,262], B:[110,258], C:[420,474], D:[334,266], E:[118,474], R:[40,362]}, stations:[
+  hall:  {name:"Town hall", wall:"#E6E9F5", trim:"var(--peri)", pos:{A:[448,262], B:[110,258], C:[420,474], D:[316,266], E:[118,474], R:[40,362]}, stations:[
     ["trophydoor","Courtyard","R","trophydoor",null,"Out to the courtyard: trophies, kind words, a bench in the sun.",0],
     ["table","Planning table","C","plantable",/plan|strategy|review|ceo|goal|week|month|quarter|budget/,"Your week, month and quarter, from Notion."],
     ["whiteboard","Whiteboard","B","whiteboard",/brainstorm|idea|map|outline|launch|offer|pricing/,"Fresh marker, blank board."],
     ["revenue","Revenue chart","D","chartstand",/invoice|revenue|sales|finance|money|budget|pricing|accounts/,"How the money's flowing, from Chord."],
     ["shelf","Bookshelf","A","shelf",/read|research|learn|course|study/,"Smart books, cosy spines."],
     ["clients","Client table","E","table",/proposal|client|brief|contract|onboard/,"Your client projects, live from Chord."]]},
-  chord: {name:"Chord workshop", wall:"#E9F0E2", trim:"var(--sage)", pos:{A:[130,218], B:[390,420], C:[420,262], D:[120,540], E:[262,336]}, stations:[
+  chord: {name:"Chord workshop", wall:"#E9F0E2", trim:"var(--sage)", pos:{A:[130,218], B:[370,446], C:[420,262], D:[120,540], E:[262,336]}, stations:[
     ["bench","Workbench","A","bench",/build|code|fix|bug|feature|ship|deploy|test|app|flow/,"Tools out. Let's build."],
     ["press","Printing press","B","press",/post|content|social|marketing|launch|campaign|newsletter|reel/,"Hot off the press."],
     ["wall","Client wall","C","cork",/client|user|customer|support|feedback|onboard|lead/,"Every face here is a creative you're helping."],
@@ -114,7 +114,7 @@ export const ROOMS = {
     ["pobox","Post box","E","pobox",null,"Your post box: unread mail from your work inbox."]]},
   // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
   // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
-  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{A:[120,216], B:[414,228], H:[326,250], C:[124,450], R:[40,330], K:[480,330], D:[350,556], G:[436,448], E:[448,598], F:[96,596]}, stations:[
+  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{A:[120,216], B:[414,228], H:[318,250], C:[124,450], R:[40,330], K:[480,330], D:[350,556], G:[436,448], E:[448,598], F:[96,596]}, stations:[
     ["desk","Home desk","A","desk",/./,"Your own little desk."],
     ["kitchen","Kitchen","B","kitchen",/cook|meal|lunch|dinner|bake|grocer|prep/,"Something smells good."],
     ["sofa","Sofa","C","sofa",/read|rest|journal|meditat|book|nap/,"Soft cushions, deep breaths."],
@@ -126,7 +126,7 @@ export const ROOMS = {
     ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12],
     ["office","Darren's desk","G","office",null,"Darren's home office. Shh, he might be on a call."]]},
   // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
-  room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[130,290], W:[262,206], B:[440,262], E:[62,396], C:[66,500], D:[434,556], J:[260,594], N:[388,132]}, stations:[
+  room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[130,290], W:[262,206], B:[350,306], E:[62,396], C:[66,500], D:[434,556], J:[260,594], N:[388,132]}, stations:[
     ["routines","My routines","N","routineboard",null,"Your routines, pinned up.",74],
     ["bed","Bed","A","bed",null,"Your bed. Fluffy pillows, cool sheets."],
     ["window","Window","W","curtwindow",null,"Curtains open, curtains shut.",20],
@@ -137,7 +137,7 @@ export const ROOMS = {
     ["jars","Emotion shelf","J","jarshelf",null,"Feelings, kept safe in jars.",-78]]},
   // Evan's room, through the east door of the house: a toddler-safe play space. Evan taps around; nothing in here
   // touches the rest of the game (no coins, no saves). Mel waits by the door; Maple stays outside.
-  kidroom: {name:"Evan's room", wall:"#F9E08A", trim:"#7BB37A", noBoard:true, pos:{A:[160,290], B:[430,262], T:[290,470], D:[420,560], C:[120,586], E:[310,250]}, stations:[
+  kidroom: {name:"Evan's room", wall:"#F9E08A", trim:"#7BB37A", noBoard:true, pos:{A:[160,290], B:[430,262], T:[290,470], D:[420,560], C:[110,592], E:[292,250]}, stations:[
     ["kbed","Car bed","A","carbed",null,"Vroom vroom, time for bed."],
     ["snacks","Snack cupboard","B","snacks",null,"Snacks! What would you like?",30],
     ["balloons","Balloons","E","balloons",null,"Pop pop pop!",20],
@@ -146,7 +146,7 @@ export const ROOMS = {
     ["cars","Toy cars","C","garage",null,"Beep beep!",18]]},
   // The courtyard, through the archway on the town hall's west wall: a sunny Spanish-style courtyard with a fountain,
   // a bench, pigeons, the kind words and affirmations boards on the arcade wall, six trophy pedestals and the trophy book
-  trophy: {name:"The courtyard", wall:"#F6EEE2", trim:"#C9774D", noBoard:true, pos:{K:[132,132], F:[388,132], B:[260,262], P:[80,316], Q:[420,316], S:[80,462], T:[420,470], U:[118,606], V:[402,606], N:[260,604], W:[260,452]}, stations:[
+  trophy: {name:"The courtyard", wall:"#F6EEE2", trim:"#C9774D", noBoard:true, pos:{K:[132,132], F:[388,132], B:[260,262], P:[124,296], Q:[396,296], S:[124,448], T:[396,448], U:[124,600], V:[396,600], N:[260,596], W:[260,452]}, stations:[
     ["kudos","Kind words","K","kindboard",null,"Lovely things people have said about you.",72],
     ["affirm","Affirmations","F","affirmboard",null,"Today's affirmations.",72],
     ["tbook","Trophy book","B","lectern",null,"Every trophy, with when and why.",26],

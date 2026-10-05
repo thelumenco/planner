@@ -41,7 +41,7 @@ export function upgradesArt(n, where){
   const has = id => unlocked(n).some(u => u.id === id);
   let h = "";
   if (where === "base") {
-    if (has("blossom")) [[346, 474], [490, 560]].forEach(([x, y]) => { h += `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.4"><rect x="${x - 3}" y="${y - 6}" width="6" height="14" style="fill:var(--wood)"/><circle cx="${x}" cy="${y - 18}" r="14" style="fill:#F4C7CF"/><circle cx="${x - 9}" cy="${y - 10}" r="9" style="fill:#EFA3A6"/><circle cx="${x + 9}" cy="${y - 11}" r="9" style="fill:#F4C7CF"/></g>`; });
+    if (has("blossom")) [[330, 500], [500, 512]].forEach(([x, y]) => { h += `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.4"><rect x="${x - 3}" y="${y - 6}" width="6" height="14" style="fill:var(--wood)"/><circle cx="${x}" cy="${y - 18}" r="14" style="fill:#F4C7CF"/><circle cx="${x - 9}" cy="${y - 10}" r="9" style="fill:#EFA3A6"/><circle cx="${x + 9}" cy="${y - 11}" r="9" style="fill:#F4C7CF"/></g>`; });
     return h;
   }
   if (where === "lane") {
@@ -103,7 +103,7 @@ export function festivalArt(f){
 export function pondLanterns(n){
   let h = "";
   for (let i = 0; i < Math.min(n, 9); i++) {
-    const x = 370 + (i % 5)*18 + (i > 4 ? 9 : 0), y = 498 + (i > 4 ? 14 : 0) + (i % 2)*3;   // the pond at home
+    const x = 370 + (i % 5)*18 + (i > 4 ? 9 : 0), y = 560 + (i > 4 ? 14 : 0) + (i % 2)*3;   // the pond at home
     h += `<g class="floaty" style="animation-delay:${(i*.37).toFixed(2)}s">${lampGlow(x, y, 20)}${iconAt("lantern", x, y, 16)}</g>`;
   }
   return h;

@@ -66,9 +66,11 @@ function stallArt(){
     ${tapeLabel(90, 472, "Stall", "var(--sage)", 11)}</g>`;
 }
 function playArt(){
+  // each seat swings from its own hook on the top bar (pivot set per seat; .map .pswing in npcs.css)
+  const seat = (x, col, d) => `<g class="pswing" style="transform-origin:${x + 6}px 527px;animation-delay:${d}s">${sk(`<rect x="${x - 2}" y="574" width="16" height="4" rx="2" style="fill:${col}"/>`, `<path d="M${x} 527 v47 M${x + 12} 527 v47"/><rect x="${x - 2}" y="574" width="16" height="4" rx="2"/>`)}</g>`;
   const swing = `<g data-place="pswing" aria-label="Swings"><ellipse class="hov" cx="110" cy="592" rx="40" ry="9" style="fill:var(--butter)"/>
-    ${sk(`<rect class="swing" x="90" y="574" width="16" height="4" rx="2" style="fill:var(--rose)"/><rect class="swing" x="116" y="574" width="16" height="4" rx="2" style="fill:var(--sky)"/>`,
-      `<path d="M76 590 l10 -64 l10 64 M124 590 l10 -64 l10 64 M86 526 h48" stroke-width="2.2" style="stroke:#C46A4A"/><path class="swing" d="M92 527 v47 M104 527 v47"/><path class="swing" d="M118 527 v47 M130 527 v47"/><rect class="swing" x="90" y="574" width="16" height="4" rx="2"/><rect class="swing" x="116" y="574" width="16" height="4" rx="2"/>`)}
+    ${sk("", `<path d="M76 590 l10 -64 l10 64 M124 590 l10 -64 l10 64 M86 526 h48" stroke-width="2.2" style="stroke:#C46A4A"/>`)}
+    ${seat(92, "var(--rose)", 0)}${seat(116, "var(--sky)", -1.4)}
     ${tapeLabel(110, 618, "Swings", "var(--peach)", 10)}</g>`;
   const slide = `<g data-place="pslide" aria-label="Slide"><ellipse class="hov" cx="262" cy="590" rx="46" ry="9" style="fill:var(--butter)"/>
     ${sk(`<path d="M252 586 L262 532 L286 532 Q300 560 322 586 h-12 Q292 566 280 544 h-14 l-8 42z" style="fill:#F3C969"/><rect x="258" y="526" width="30" height="8" rx="2" style="fill:#7FB8E8"/>`,
@@ -94,17 +96,17 @@ export function vineyardArt(){
   const gate = `<g data-place="toBaseV" aria-label="Gate home"><ellipse class="hov" cx="24" cy="300" rx="26" ry="30" style="fill:var(--butter)"/>
     ${sk(`<rect x="0" y="290" width="40" height="22" rx="2" style="fill:var(--wood)"/><rect x="42" y="262" width="6" height="52" style="fill:var(--wood)"/><path d="M38 266 q12 -14 20 0" style="fill:var(--moss)"/>`,
       `<rect x="0" y="290" width="40" height="22" rx="2"/><path d="M8 290 v22 M16 290 v22 M24 290 v22 M32 290 v22" opacity=".6"/><rect x="42" y="262" width="6" height="52"/>`)}
-    ${tapeLabel(62, 336, "Home", "var(--butter)", 11)}</g>`;
+    ${tapeLabel(66, 344, "Home", "var(--butter)", 11)}</g>`;
   const sign = sk(`<rect x="124" y="340" width="52" height="16" rx="2" style="fill:#FFFDF6"/>`, `<rect x="124" y="340" width="52" height="16" rx="2"/><path d="M150 356 v14"/>`)
     + `<text x="150" y="351.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9.5" style="fill:var(--line)" pointer-events="none">the vines</text>`;
-  return lampDefs + ground + gate + [[160, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("")
+  return lampDefs + ground + gate + [[204, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("")
     + shedArt(v) + shopArt(v) + stallArt() + sign + v.rows.map((row, r) => rowArt(row, r)).join("") + playArt();
 }
 // the home-base end: a footbridge over the stream and a vine-wrapped gate (tap to go to the vineyard)
 export function vineGate(){
-  return `<g filter="url(#wob)"><path d="M280 330 C330 420 420 410 486 404" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
-    <g data-place="toVine" aria-label="Gate to the vineyard"><ellipse class="hov" cx="484" cy="404" rx="34" ry="22" style="fill:var(--butter)"/>
-    ${sk(`<rect x="450" y="394" width="40" height="20" rx="2" style="fill:var(--wood)"/><rect x="494" y="366" width="6" height="50" style="fill:var(--wood)"/><path d="M490 370 q10 -12 22 -2" style="fill:var(--moss)"/><circle cx="504" cy="378" r="3" style="fill:#6B2A55"/><circle cx="499" cy="381" r="3" style="fill:#6B2A55"/>`,
-      `<rect x="450" y="394" width="40" height="20" rx="2"/><path d="M458 394 v20 M466 394 v20 M474 394 v20 M482 394 v20" opacity=".6"/><rect x="494" y="366" width="6" height="50"/>`)}
-    ${tapeLabel(470, 436, "Vineyard", "#E8B4C0", 11)}</g>`;
+  return `<g filter="url(#wob)"><path d="M290 332 C320 450 420 476 486 470" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
+    <g data-place="toVine" aria-label="Gate to the vineyard"><ellipse class="hov" cx="484" cy="470" rx="34" ry="22" style="fill:var(--butter)"/>
+    ${sk(`<rect x="450" y="460" width="40" height="20" rx="2" style="fill:var(--wood)"/><rect x="494" y="432" width="6" height="50" style="fill:var(--wood)"/><path d="M490 436 q10 -12 22 -2" style="fill:var(--moss)"/><circle cx="504" cy="444" r="3" style="fill:#6B2A55"/><circle cx="499" cy="447" r="3" style="fill:#6B2A55"/>`,
+      `<rect x="450" y="460" width="40" height="20" rx="2"/><path d="M458 460 v20 M466 460 v20 M474 460 v20 M482 460 v20" opacity=".6"/><rect x="494" y="432" width="6" height="50"/>`)}
+    ${tapeLabel(470, 504, "Vineyard", "#E8B4C0", 11)}</g>`;
 }

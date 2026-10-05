@@ -64,7 +64,7 @@ export const NPCS = [
     id: "pip", pitch: 1.45, name: "Pip", job: "Evan's best friend",
     intro: "I'm Pip! I'm Evan's best friend and I'm the FASTEST. Watch!", kid: true,
     look: {skin: "#D6A27C", hair: "#1F1A17", hairStyle: "spiky", top: "#F28C6A", bottom: "#4C7BB0", extra: "helmet"},
-    routine: [slot("16:30", "17:30", "vineyard", [[110, 604], [262, 600], [410, 608], [200, 586], [330, 590]]), slot("15:00", "18:30", "base", [[230, 350], [300, 380], [200, 420], [360, 580], [160, 560], [300, 600]])],
+    routine: [slot("16:30", "17:30", "vineyard", [[110, 604], [262, 600], [410, 608], [200, 586], [330, 590]]), slot("15:00", "18:30", "base", [[230, 350], [300, 380], [200, 420], [360, 516], [160, 560], [300, 600]])],
     lines: ["Race you to the pond!", "Evan is SO fast. Almost as fast as me.", "Did you know foxes can't ride bikes? I asked Maple.", "I found a snail! His name is Gary."],
     react: {}
   },
@@ -104,7 +104,7 @@ export const NPCS = [
       slot("7:30", "10:30", "farm", [[90, 250], [430, 400], [250, 520]], {days: "we", act: "farm"}),
       slot("10:30", "12:00", "base", [190, 452], {days: "we", act: "water", dir: -1}),
       slot("12:00", "14:30", "base", [340, 300], {days: "we", act: "repair", dir: -1}),
-      slot("14:30", "17:00", "base", [[230, 360], [330, 590], [160, 540], [400, 330]], {days: "we"}),
+      slot("14:30", "17:00", "base", [[230, 360], [310, 612], [160, 540], [400, 330]], {days: "we"}),
       slot("17:00", "19:00", "farm", [[90, 250], [430, 400], [250, 520]], {days: "we", act: "farm"}),
       slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600]], {days: "we"})],
     lines: ["Coffee's fresh if you want some.", "Evan watered my shoes again. Very thorough.", "Go get 'em. I'll hold the fort.",
