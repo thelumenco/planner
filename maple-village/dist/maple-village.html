@@ -4200,13 +4200,17 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     const famArt = (fam.sandpit ? `<g aria-label="Sandpit">${sk(`<rect x="208" y="512" width="56" height="24" rx="5" style="fill:#F2DDA8"/><path d="M246 506 h8 l-2 8 h-4z" style="fill:var(--rose)"/>`, `<rect x="208" y="512" width="56" height="24" rx="5"/><path d="M212 518 h48" opacity=".5"/><path d="M246 506 h8 l-2 8 h-4z M250 506 v-6"/><path d="M220 528 q5 -5 10 0" opacity=".6"/>`)}</g>` : "") + (fam.hammock ? sk(`<path d="M398 600 q32 18 64 0 z" style="fill:var(--peach)"/>`, `<path d="M392 622 v-34 M468 622 v-34 M392 594 l6 6 M468 594 l-6 6"/><path d="M398 600 q32 18 64 0"/><path d="M410 604 l2 -3 M430 608 l1 -4 M450 604 l-2 -3" opacity=".6"/>`) : "");
     const tools = G.F().tools || {};
     const toolArt = (tools.compost ? sk(`<path d="M192 452 h24 l-3 22 h-18z" style="fill:var(--wood)"/><path d="M196 451 c3 -6 13 -6 16 0" style="fill:var(--moss)"/>`, `<path d="M192 452 h24 l-3 22 h-18z M195 460 h18"/>`) : "") + (tools.can ? sk(`<rect x="466" y="262" width="14" height="11" rx="2" style="fill:#9CC3E0"/>`, `<rect x="466" y="262" width="14" height="11" rx="2"/><path d="M480 266 l7 -5 M468 262 c0 -5 9 -5 9 0"/>`) : "") + (tools.sprinkler ? sk(`<circle cx="108" cy="438" r="4" style="fill:var(--stone)"/>`, `<circle cx="108" cy="438" r="4"/><path d="M108 434 v-4"/><path class="ripple" d="M96 426 q12 -10 24 0" opacity=".7"/>`) : "");
-    return lampDefs + ground + [[192, 380], [328, 380]].map(([x, y]) => streetLamp(x, y)).join("") + places + runArt(G.F()) + famArt + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
+    return lampDefs + ground + BASE_LAMPS.map(([x, y]) => streetLamp(x, y)).join("") + places + runArt(G.F()) + famArt + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
   }
+  var BASE_LAMPS = [[192, 380], [328, 380]];
+  var litLamp = (x, y) => `<circle cx="${x}" cy="${y - 6}" r="40" fill="url(#lampn)"/><circle class="flick" cx="${x}" cy="${y - 30}" r="16" fill="#FFE3A3" opacity=".45"/>
+  <rect x="${x - 5}" y="${y - 36}" width="10" height="12" rx="2" fill="#FFE9A8" stroke="#3b3530" stroke-width="1.2"/><rect x="${x - 2.5}" y="${y - 33}" width="5" height="6" rx="1" fill="#FFFBEA"/>`;
   function duskArt() {
     const win = (x, y, w, h) => `<rect class="glow" x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="#FFD98A"/><rect x="${x - 8}" y="${y - 8}" width="${w + 16}" height="${h + 16}" rx="10" fill="#FFD98A" opacity=".18"/>`;
     const stars = [[30, 14], [96, 22], [176, 10], [330, 18], [420, 12], [500, 22], [250, 8]].map(([x, y]) => `<circle class="twinkle" cx="${x}" cy="${y}" r="1.6" fill="#FFF3C4"/>`).join("");
     return `<rect class="dusk" width="520" height="640" fill="#A3A9DC" style="mix-blend-mode:multiply" pointer-events="none"/>
-    <g pointer-events="none">${stars}${win(217, 234, 20, 18)}${win(283, 234, 20, 18)}${win(448, 230, 12, 10)}
+    <defs><radialGradient id="lampn"><stop offset="0" stop-color="#FFD98A" stop-opacity=".7"/><stop offset=".5" stop-color="#FFC66B" stop-opacity=".28"/><stop offset="1" stop-color="#FFC66B" stop-opacity="0"/></radialGradient></defs>
+    <g pointer-events="none">${BASE_LAMPS.map(([x, y]) => litLamp(x, y)).join("")}${stars}${win(217, 234, 20, 18)}${win(283, 234, 20, 18)}${win(448, 230, 12, 10)}
       <circle cx="276" cy="602" r="36" fill="#FFB65C" opacity=".28"/>
       <g filter="url(#wob)"><path class="flame" d="M268 604 q-2 -12 8 -20 q-1 8 6 10 q2 6 -2 10z" fill="#F6A23A" style="stroke:var(--line)" stroke-width="1"/><path class="flame" d="M274 604 q0 -7 4 -10 q1 6 3 7 q0 3 -2 3z" fill="#FFE08A"/></g></g>`;
   }
