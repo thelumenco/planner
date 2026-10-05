@@ -86,14 +86,15 @@ export function vineyardArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="60" rx="260" ry="60" style="fill:var(--grass2)"/><ellipse cx="340" cy="420" rx="160" ry="80" style="fill:var(--grass2)"/></g>
     <g filter="url(#wob)" fill="none" opacity=".45" style="stroke:var(--moss2)" stroke-width="3" stroke-dasharray="2 7">${[24, 44, 64].map(y => `<path d="M190 ${y} Q300 ${y - 8} 510 ${y + 4}"/>`).join("")}</g>
-    <g filter="url(#wob)"><path d="M0 0 V640" style="stroke:var(--water)" stroke-width="14"/></g>
+    <g filter="url(#wob)"><path d="M14 0 C6 110 26 210 16 300 C8 390 28 500 14 640" fill="none" style="stroke:var(--water)" stroke-width="16"/><path d="M8 0 C0 110 20 210 10 300 C2 390 22 500 8 640 M22 0 C14 110 34 210 24 300 C16 390 36 500 22 640" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".5"/></g>
+    <path class="ripple" d="M10 150 q4 -3 8 0 M14 460 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>
     <g filter="url(#wob)"><path d="M24 300 H486 M112 300 V238 M390 300 V222 M186 300 C186 400 190 480 210 548" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[30,140,"#EFA3A6"],[200,140,"#F3C969"],[480,250,"#C3CDEE"],[490,330,"#EFA3A6"],[150,350,"#F3C969"],[40,520,"#C3CDEE"],[480,520,"#F3C969"],[300,250,"#EFA3A6"]])}
     ${tree(250,130,.9)}${tree(495,150,.9)}${tree(26,620,.8)}${tree(500,620,.85)}${tree(40,380,.8)}`;
   const gate = `<g data-place="toBaseV" aria-label="Gate home"><ellipse class="hov" cx="24" cy="300" rx="26" ry="30" style="fill:var(--butter)"/>
-    ${sk(`<rect x="-6" y="290" width="28" height="22" rx="2" style="fill:var(--wood)"/><rect x="26" y="262" width="6" height="52" style="fill:var(--wood)"/><path d="M22 266 q12 -14 20 0" style="fill:var(--moss)"/>`,
-      `<rect x="-6" y="290" width="28" height="22" rx="2"/><path d="M0 290 v22 M8 290 v22 M16 290 v22" opacity=".6"/><rect x="26" y="262" width="6" height="52"/>`)}
-    ${tapeLabel(54, 336, "Home", "var(--butter)", 11)}</g>`;
+    ${sk(`<rect x="0" y="290" width="40" height="22" rx="2" style="fill:var(--wood)"/><rect x="42" y="262" width="6" height="52" style="fill:var(--wood)"/><path d="M38 266 q12 -14 20 0" style="fill:var(--moss)"/>`,
+      `<rect x="0" y="290" width="40" height="22" rx="2"/><path d="M8 290 v22 M16 290 v22 M24 290 v22 M32 290 v22" opacity=".6"/><rect x="42" y="262" width="6" height="52"/>`)}
+    ${tapeLabel(62, 336, "Home", "var(--butter)", 11)}</g>`;
   const sign = sk(`<rect x="124" y="340" width="52" height="16" rx="2" style="fill:#FFFDF6"/>`, `<rect x="124" y="340" width="52" height="16" rx="2"/><path d="M150 356 v14"/>`)
     + `<text x="150" y="351.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9.5" style="fill:var(--line)" pointer-events="none">the vines</text>`;
   return lampDefs + ground + gate + [[160, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("")
