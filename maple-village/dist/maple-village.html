@@ -1195,6 +1195,11 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
 .panel h2 + .wlist{margin-top:12px}
 .panel .wlist + .eyebrow{margin-top:18px}
 .panel .wlist ~ .muted + .actions{margin-top:14px}
+/* unaffordable/unavailable items: greyed with colours, not opacity (Android Chrome can drop parts of a
+   semi-transparent button when the panel redraws, leaving blank bands) */
+.panel .item:disabled{opacity:1;background:#F3EFE8;border-color:rgba(120,104,84,.1)}
+.panel .item:disabled .n,.panel .item:disabled .c,.panel .item:disabled .c b,.panel .item:disabled .d{color:#B5ADA2}
+.panel .item:disabled .e svg{filter:none}
 </style>
 </head>
 <body>
@@ -3396,8 +3401,8 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     const wine = { red: "#7A1F3D", rose: "#E98AA0", white: "#E8D57A", sparkling: "#F3E7B0" }[type] || "#7A1F3D";
     return `<svg class="vybottle" viewBox="0 0 24 40" width="${Math.round(h * 0.6)}" height="${h}" aria-hidden="true"><path d="M5 4 h14 q1 14 -7 17 q-8 -3 -7 -17z" fill="#F4F8FA" ${INK3}/><path d="M5.6 10 h12.8 q-.6 10 -6.4 11 q-5.8 -1 -6.4 -11z" fill="${wine}"/>${type === "sparkling" ? `<circle cx="10" cy="15" r=".9" fill="#FFFDF6"/><circle cx="13" cy="13" r=".7" fill="#FFFDF6"/>` : ""}<path d="M12 21 v13 M6 36 h12" fill="none" ${INK3}/></svg>`;
   };
-  function stallIcon(id) {
-    const w = (inner) => `<svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true">${inner}</svg>`;
+  function stallIcon(id, off) {
+    const w = (inner) => `<svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><g${off ? ' opacity=".4"' : ""}>${inner}</g></svg>`;
     if (id === "cut_red" || id === "cut_white") {
       const c = id === "cut_red" ? "#6B2A55" : "#C9D66A";
       return w(`<path d="M24 46 V22" stroke="#7A5638" stroke-width="3" stroke-linecap="round"/>${leaf(16, 16, 0.9, -25, "#86B26A")}${leaf(32, 14, 0.8, 25, "#9CC27E")}${bunch(24, 24, c, 2.8, 9)}`);
@@ -3616,7 +3621,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F2.coins} coins. Cuttings: ${v.cuttings.red} red, ${v.cuttings.white} white. Grapes: ${v.grapes.red} red, ${v.grapes.white} white bunches.</p>
     <div class="items shop">${Object.keys(SHOP).map((id) => {
       const it = SHOP[id], off = F2.coins < it.price || id === "trellis" && v.rows.every((r) => r.trellis) || id === "barrel" && v.barrels.length >= 3;
-      return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id)}</span><span class="n">${esc(it.n)}</span><span class="c"><b>${it.price}</b> coins</span></button>`;
+      return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c"><b>${it.price}</b> coins</span></button>`;
     }).join("")}</div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }

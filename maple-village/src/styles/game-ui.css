@@ -661,3 +661,8 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
 .panel h2 + .wlist{margin-top:12px}
 .panel .wlist + .eyebrow{margin-top:18px}
 .panel .wlist ~ .muted + .actions{margin-top:14px}
+/* unaffordable/unavailable items: greyed with colours, not opacity (Android Chrome can drop parts of a
+   semi-transparent button when the panel redraws, leaving blank bands) */
+.panel .item:disabled{opacity:1;background:#F3EFE8;border-color:rgba(120,104,84,.1)}
+.panel .item:disabled .n,.panel .item:disabled .c,.panel .item:disabled .c b,.panel .item:disabled .d{color:#B5ADA2}
+.panel .item:disabled .e svg{filter:none}

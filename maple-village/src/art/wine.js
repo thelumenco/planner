@@ -90,8 +90,8 @@ export const glassArt = (type, h = 34) => { const wine = {red: "#7A1F3D", rose: 
   return `<svg class="vybottle" viewBox="0 0 24 40" width="${Math.round(h*.6)}" height="${h}" aria-hidden="true"><path d="M5 4 h14 q1 14 -7 17 q-8 -3 -7 -17z" fill="#F4F8FA" ${INK}/><path d="M5.6 10 h12.8 q-.6 10 -6.4 11 q-5.8 -1 -6.4 -11z" fill="${wine}"/>${type === "sparkling" ? `<circle cx="10" cy="15" r=".9" fill="#FFFDF6"/><circle cx="13" cy="13" r=".7" fill="#FFFDF6"/>` : ""}<path d="M12 21 v13 M6 36 h12" fill="none" ${INK}/></svg>`; };
 
 // stall icons
-export function stallIcon(id){
-  const w = (inner) => `<svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true">${inner}</svg>`;
+export function stallIcon(id, off){
+  const w = (inner) => `<svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><g${off ? ' opacity=".4"' : ""}>${inner}</g></svg>`;
   if (id === "cut_red" || id === "cut_white") { const c = id === "cut_red" ? "#6B2A55" : "#C9D66A";
     return w(`<path d="M24 46 V22" stroke="#7A5638" stroke-width="3" stroke-linecap="round"/>${leaf(16, 16, .9, -25, "#86B26A")}${leaf(32, 14, .8, 25, "#9CC27E")}${bunch(24, 24, c, 2.8, 9)}`); }
   if (id === "trellis") return w(`<path d="M8 44 V8 M40 44 V8" stroke="#8B5E3C" stroke-width="3.4" stroke-linecap="round"/><path d="M8 16 H40 M8 28 H40" fill="none" stroke="#3b3530" stroke-width="1.2"/>${leaf(20, 20, .7, -15, "#86B26A")}${leaf(30, 30, .6, 20, "#9CC27E")}`);

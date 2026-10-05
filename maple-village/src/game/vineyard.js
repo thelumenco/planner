@@ -123,7 +123,7 @@ export function stallPanel(F){
   const v = vineState(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F.coins} coins. Cuttings: ${v.cuttings.red} red, ${v.cuttings.white} white. Grapes: ${v.grapes.red} red, ${v.grapes.white} white bunches.</p>
     <div class="items shop">${Object.keys(SHOP).map(id => { const it = SHOP[id], off = F.coins < it.price || (id === "trellis" && v.rows.every(r => r.trellis)) || (id === "barrel" && v.barrels.length >= 3);
-      return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id)}</span><span class="n">${esc(it.n)}</span><span class="c"><b>${it.price}</b> coins</span></button>`; }).join("")}</div>
+      return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c"><b>${it.price}</b> coins</span></button>`; }).join("")}</div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export const vy = {name: {}};
