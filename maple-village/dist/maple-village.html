@@ -1158,9 +1158,7 @@ body.kidmode .scenename span + span{display:none}
 /* level everything: buttons, notes and headings sit straight (the torn tape edges stay) */
 .btn,.btn:active,.btn.yes,.btn.alt,.note,.map .qnote,.map .qnote.slim,.panel.cork h2,.map .panel.fridge h2{transform:none}
 .btn:active{transform:translateY(1px)}
-.map .qnote.slim{transform:translateX(-50%)}
 .btn{clip-path:polygon(1% 6%,5% 0,95% 0,99% 6%,100% 50%,99% 94%,95% 100%,5% 100%,1% 94%,0 50%)}
-@media (max-width:640px){.map .qnote.slim,.map .qnote.slim.low{transform:none}}
 /* coin/trophy flashes float as a pill above everything, and drop to the bottom while a panel is open */
 .earn:not(:empty){position:fixed;left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100% - 32px);height:auto;min-height:0;box-sizing:border-box;
   top:calc(env(safe-area-inset-top,0px) + 100px);bottom:auto;z-index:40;padding:6px 16px;border-radius:999px;background:#FFFDF7;color:#B8562F;

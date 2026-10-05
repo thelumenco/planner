@@ -51,6 +51,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(!(await page.locator(".hbtn").first().textContent()).match(/\p{Extended_Pictographic}/u), "corner icons are drawn, not emoji");
   } else check(await page.locator("#map .hudbar").count() === 1, "trackers sit on the map");
   check(lay.fits, "the whole game fits on screen without scrolling");
+  check(await page.evaluate(() => { const n = document.querySelector("#journal.slim"), m = document.querySelector("#map"); if (!n) return true; const a = n.getBoundingClientRect(), b = m.getBoundingClientRect(); return a.left >= b.left && a.right <= b.right; }), "the folded quest note sits fully inside the map");
   check(lay.note, "the quest note is pinned on the map");
   check(await page.locator(".hudbar .pbar").count() === 2, "water and steps are drawn progress bars");
   await page.click('[data-track="water"]');
