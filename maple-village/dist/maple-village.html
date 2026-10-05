@@ -1104,6 +1104,13 @@ body.kidmode .scenename span + span{display:none}
 .vq p{font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;line-height:1.5}
 .vreflect{font-style:italic;color:#6B6259;margin:0 0 6px}
 .vsum p{font-family:"Klee One",serif;font-weight:600;line-height:1.6;margin:0 0 10px}
+
+/* Hestia: last done */
+.hlist li.hlast{display:grid;grid-template-columns:1fr auto;gap:6px 8px;align-items:center}
+.hlast small{display:block}
+.hlastctl{grid-column:1 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.hlastctl input[type=date],.hlastctl select,.hadd select{border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:4px 6px;font:inherit;font-size:.82rem;color:#2F2B28}
+.hlastctl .hx{margin-left:auto}
 </style>
 </head>
 <body>
@@ -5218,6 +5225,8 @@ Quests finished today: ${S3.doneIds.length}`;
   var DEFAULT_CATS = [{ id: "food", name: "Food" }, { id: "household", name: "Household" }, { id: "personal", name: "Personal Care" }];
   var DEFAULT_LOCS = [{ id: "supermarket", name: "Supermarket" }, { id: "online", name: "Online" }, { id: "wetmarket", name: "Wet Market" }, { id: "pharmacy", name: "Pharmacy" }];
   var DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var DEFAULT_LAST = [{ id: "l1", name: "Aircon servicing", last: null, every: 90 }, { id: "l2", name: "Change our sheets", last: null, every: 7 }, { id: "l3", name: "Evan's sheets", last: null, every: 7 }];
+  var EVERY = [[0, "no reminder"], [7, "every week"], [14, "every 2 weeks"], [30, "every month"], [90, "every 3 months"], [180, "every 6 months"], [365, "every year"]];
   var KEY4 = "fox.hestia";
   var fresh = () => ({
     zones: DEFAULT_ZONES,
@@ -5233,6 +5242,7 @@ Quests finished today: ${S3.doneIds.length}`;
     lastActiveDate: null,
     cleaningMinutes: {},
     paid: {},
+    lastDone: DEFAULT_LAST,
     pantryItems: [],
     shoppingList: [],
     pantryCategories: DEFAULT_CATS,
@@ -5435,7 +5445,7 @@ Quests finished today: ${S3.doneIds.length}`;
     tidy();
     if (which === "fridge") return fridgePanel();
     if (focus) return focusPanel();
-    const tabs = [["daily", "Daily"], ["weekly", "Weekly"], ["zone", "This week's zone"]];
+    const tabs = [["daily", "Daily"], ["weekly", "Weekly"], ["zone", "This week's zone"], ["last", "Last done"]];
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The cleaning cupboard</h2>
     <p class="sub">Hestia's chores. ${H2.streak ? `Home streak: ${H2.streak} day${H2.streak > 1 ? "s" : ""}. ` : ""}${H2.cleaningMinutes[today()] ? `${H2.cleaningMinutes[today()]} minutes tidied today.` : "A little every day keeps the house kind to you."}</p>
     ${timerBlock()}<div class="actions"><button class="btn small yes" data-hfocus="1">One at a time</button></div>
@@ -5446,10 +5456,21 @@ Quests finished today: ${S3.doneIds.length}`;
     } else if (view.tab === "weekly") {
       const order = (t2) => (weekDone(t2.id) ? 10 : 0) + (t2.weekday === dow() ? 0 : 1);
       h += [...H2.weeklyTasks || []].sort((a, b) => order(a) - order(b)).map((t2) => row("weekly", t2.id, t2, weekDone(t2.id), t2.weekday != null ? `<span class="hbadge${t2.weekday === dow() ? " now" : ""}">${t2.weekday === dow() ? "today" : DAYS[t2.weekday]}</span>` : "")).join("");
+    } else if (view.tab === "last") {
+      const items = [...H2.lastDone || []].sort((a, b) => (dueIn(a) ?? 9999) - (dueIn(b) ?? 9999));
+      h += items.map((it) => {
+        const d = dueIn(it), ago4 = it.last ? daysAgo(it.last) : null;
+        return `<li class="hlast"><span><b>${esc(it.name)}</b><small>${it.last ? `last done ${esc(niceDay(it.last))} · ${ago4 === 0 ? "today" : ago4 === 1 ? "yesterday" : ago4 + " days ago"}` : "not logged yet"}</small></span>
+        ${d != null ? `<span class="hbadge${d <= 0 ? " now" : ""}">${d < 0 ? `overdue ${-d}d` : d === 0 ? "due today" : `due in ${d}d`}</span>` : ""}
+        <span class="hlastctl"><button class="btn small primary" data-hlastnow="${esc(it.id)}">Done today</button><label class="sr" for="hl-${esc(it.id)}">Last done on</label><input type="date" id="hl-${esc(it.id)}" data-hlastdate="${esc(it.id)}" max="${today()}" value="${esc(it.last || "")}">
+        <select data-hlastevery="${esc(it.id)}" aria-label="How often">${EVERY.map(([v, n]) => `<option value="${v}"${(it.every || 0) === v ? " selected" : ""}>${n}</option>`).join("")}</select>
+        <button class="hx" data-hlastdel="${esc(it.id)}" aria-label="Remove ${esc(it.name)}">✕</button></span></li>`;
+      }).join("");
     } else {
       const z = zone(), n = (z.tasks || []).length, d = (z.tasks || []).filter((_, i) => zoneDone(i)).length;
       h += `<li class="hzone"><b>${esc(z.name)}</b> <small>week ${H2.currentZoneIndex + 1} of ${H2.zones.length} · ${d}/${n} done</small></li>` + (z.tasks || []).map((t2, i) => row("zone", i, t2, zoneDone(i))).join("");
     }
+    if (view.tab === "last") return h + `</ul><form class="row hadd" data-hlastadd="1"><input name="t" maxlength="60" placeholder="add something, e.g. clean the fridge"><select name="e" aria-label="How often">${EVERY.map(([v, n]) => `<option value="${v}">${n}</option>`).join("")}</select><button class="btn small alt">Add</button></form>`;
     h += `</ul>${view.tab !== "zone" ? `<form class="row hadd" data-hadd="${view.tab}"><input name="t" maxlength="80" placeholder="add a ${view.tab} chore"><button class="btn small alt">Add</button></form>` : `<div class="actions"><button class="btn small alt" data-hnextzone="1">Move on to ${esc(H2.zones[(H2.currentZoneIndex + 1) % H2.zones.length].name)}</button></div>`}`;
     return h;
   }
@@ -5486,11 +5507,72 @@ Quests finished today: ${S3.doneIds.length}`;
     <select name="w">${locs.map((l) => `<option value="${l.id}">${esc(l.name)}</option>`).join("")}</select><button class="btn small alt">Add</button></form>`;
     return h;
   }
+  var daysAgo = (d) => Math.round((Date.parse(today() + "T00:00:00Z") - Date.parse(d + "T00:00:00Z")) / 864e5);
+  var dueIn = (it) => it.every > 0 ? it.last ? it.every - daysAgo(it.last) : 0 : null;
+  var niceDay = (d) => (/* @__PURE__ */ new Date(d + "T00:00:00Z")).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: daysAgo(d) > 300 ? "numeric" : void 0, timeZone: "UTC" });
+  function chatLastDone(what, date) {
+    const n = String(what || "").trim().toLowerCase();
+    if (!n) return null;
+    const d = /^\d{4}-\d{2}-\d{2}$/.test(date || "") && date <= today() ? date : today();
+    H2.lastDone = H2.lastDone || [];
+    let it = H2.lastDone.find((x) => x.name.toLowerCase() === n) || H2.lastDone.find((x) => x.name.toLowerCase().includes(n) || n.includes(x.name.toLowerCase()));
+    if (!it) {
+      it = { id: "l" + Date.now(), name: String(what).trim().slice(0, 60).replace(/^./, (c) => c.toUpperCase()), last: d, every: 0 };
+      H2.lastDone.push(it);
+    } else it.last = d;
+    save();
+    api2 && api2.changed();
+    return it.name;
+  }
   function wireHestia(root, which) {
     const on = (sel, ev, fn) => root.querySelectorAll(sel).forEach((el) => el.addEventListener(ev, (e) => {
       e.stopPropagation();
       fn(el, e);
     }));
+    const lastOf = (id) => (H2.lastDone || []).find((x) => x.id === id);
+    on("[data-hlastnow]", "click", (el) => {
+      const it = lastOf(el.dataset.hlastnow);
+      if (!it) return;
+      it.last = today();
+      api2.sfx("coin");
+      api2.flash(`${it.name}: done today`);
+      save();
+      api2.changed();
+    });
+    on("[data-hlastdate]", "change", (el) => {
+      const it = lastOf(el.dataset.hlastdate);
+      if (!it || !el.value) return;
+      it.last = el.value > today() ? today() : el.value;
+      save();
+      api2.changed();
+    });
+    on("[data-hlastevery]", "change", (el) => {
+      const it = lastOf(el.dataset.hlastevery);
+      if (!it) return;
+      it.every = +el.value || 0;
+      save();
+      api2.changed();
+    });
+    on("[data-hlastdel]", "click", (el) => {
+      const i = (H2.lastDone || []).findIndex((x) => x.id === el.dataset.hlastdel);
+      if (i < 0) return;
+      const [gone] = H2.lastDone.splice(i, 1);
+      save();
+      api2.changed();
+      api2.undoable(`Removed “${gone.name}”`, () => {
+        if (!H2.lastDone.some((x) => x.id === gone.id)) H2.lastDone.splice(Math.min(i, H2.lastDone.length), 0, gone);
+        save();
+        api2.changed();
+      });
+    });
+    on("form[data-hlastadd]", "submit", (el, e) => {
+      e.preventDefault();
+      const v = el.t.value.trim();
+      if (!v) return;
+      (H2.lastDone = H2.lastDone || []).push({ id: "l" + Date.now(), name: v.slice(0, 60), last: null, every: +el.e.value || 0 });
+      save();
+      api2.changed();
+    });
     on("[data-htab]", "click", (el) => {
       view.tab = el.dataset.htab;
       api2.changed();
@@ -9906,6 +9988,10 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
         const l = setRoutine(a);
         return l ? `${l.name} is on your routines board` : null;
       }
+      case "last_done": {
+        const n = chatLastDone(a.what, a.date);
+        return n ? `Logged: ${n}, ${a.date && a.date !== dayKey() ? a.date : "today"}` : null;
+      }
       case "kudos_add": {
         const e = addKudos(a.text, a.from);
         return e ? `Pinned to Kind words${e.from ? ` (from ${e.from})` : ""}` : null;
@@ -9971,6 +10057,7 @@ Available actions (use only these):
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
 {"type":"routine_set","name":"Beauty routine","days":{"mon":"...","tue":"..."}}  or  {"type":"routine_set","name":"Morning routine","items":["...","..."]}  (save a routine to the noticeboard in her room: days = one step per weekday, items = a daily checklist; replaces that routine's steps)
+{"type":"last_done","what":"Evan's sheets","date":"YYYY-MM-DD"}  (log when an every-so-often household job was last done: aircon servicing, sheets, etc.; date optional, defaults to today)
 {"type":"kudos_add","text":"the compliment, in their words","from":"who said it"}  (when she shares something nice someone said about her: pin it to the Kind words board in the town hall)
 {"type":"remind","text":"get the laundry in","minutes":60}  or  {"type":"remind","text":"call mum","at":"18:30","date":"YYYY-MM-DD"}  ("remind me to..."; minutes from now, or a 24-hour Singapore time with an optional date; text is short and starts with a verb; say the time back to her)
 What's happening in the village right now: ${chatContext()}${planText}

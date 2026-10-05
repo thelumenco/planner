@@ -465,3 +465,7 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 
 ### Round 37: routine bonuses
 - Every routine on the board earns coins (`routineCoins` in core.js): +1 per checklist step and +5 for finishing a routine for the day (a weekly routine's one step counts as finishing it). Each pays once a day (`S.rCoins`), so untick and re-tick earns nothing extra. A workout routine on the board earns the same way.
+
+### Round 38: Hestia "Last done"
+- A fourth tab in the cleaning cupboard. Each item: `H.lastDone [{id, name, last, every}]`, seeded with aircon servicing (90 days), our sheets (7) and Evan's sheets (7). "Done today", a date picker for any past date, and how often (none, weekly … yearly) with due and overdue badges. Add and remove items (Undo).
+- Saved in the hestia doc. Chat action `last_done` {what, date?} logs a job (and adds it if it's new).

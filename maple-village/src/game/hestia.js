@@ -32,11 +32,14 @@ const DEFAULT_WEEKLY = [
 const DEFAULT_CATS = [{id: "food", name: "Food"}, {id: "household", name: "Household"}, {id: "personal", name: "Personal Care"}];
 const DEFAULT_LOCS = [{id: "supermarket", name: "Supermarket"}, {id: "online", name: "Online"}, {id: "wetmarket", name: "Wet Market"}, {id: "pharmacy", name: "Pharmacy"}];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+// "Last done": things that happen every so often (aircon servicing, sheets). every = days between, 0 = no reminder.
+const DEFAULT_LAST = [{id: "l1", name: "Aircon servicing", last: null, every: 90}, {id: "l2", name: "Change our sheets", last: null, every: 7}, {id: "l3", name: "Evan's sheets", last: null, every: 7}];
+const EVERY = [[0, "no reminder"], [7, "every week"], [14, "every 2 weeks"], [30, "every month"], [90, "every 3 months"], [180, "every 6 months"], [365, "every year"]];
 const KEY = "fox.hestia";
 
 const fresh = () => ({zones: DEFAULT_ZONES, dailyTasks: DEFAULT_DAILY, weeklyTasks: DEFAULT_WEEKLY, currentZoneIndex: 0, weekStartDate: null,
   dailyLog: {}, weeklyLog: {}, zoneLog: {}, lastWeekKey: null, streak: 0, lastActiveDate: null, cleaningMinutes: {}, paid: {},
-  pantryItems: [], shoppingList: [], pantryCategories: DEFAULT_CATS, whereToBuyLocations: DEFAULT_LOCS, timerMinutes: 20, chimeEnabled: true, chimeInterval: 5});
+  lastDone: DEFAULT_LAST, pantryItems: [], shoppingList: [], pantryCategories: DEFAULT_CATS, whereToBuyLocations: DEFAULT_LOCS, timerMinutes: 20, chimeEnabled: true, chimeInterval: 5});
 let H = (() => { try { return Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY)) || {}); } catch { return fresh(); } })();
 let api = null, ref = null, pushT = null, view = {tab: "daily", fridge: "stock", loc: "all"}, focus = null;
 let timer = null;   // {endAt, total, pausedLeft, lastMin}
@@ -153,7 +156,7 @@ export function hestiaPanel(which){
   tidy();
   if (which === "fridge") return fridgePanel();
   if (focus) return focusPanel();
-  const tabs = [["daily", "Daily"], ["weekly", "Weekly"], ["zone", "This week's zone"]];
+  const tabs = [["daily", "Daily"], ["weekly", "Weekly"], ["zone", "This week's zone"], ["last", "Last done"]];
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The cleaning cupboard</h2>
     <p class="sub">Hestia's chores. ${H.streak ? `Home streak: ${H.streak} day${H.streak > 1 ? "s" : ""}. ` : ""}${H.cleaningMinutes[today()] ? `${H.cleaningMinutes[today()]} minutes tidied today.` : "A little every day keeps the house kind to you."}</p>
     ${timerBlock()}<div class="actions"><button class="btn small yes" data-hfocus="1">One at a time</button></div>
@@ -164,11 +167,20 @@ export function hestiaPanel(which){
   } else if (view.tab === "weekly") {
     const order = t => (weekDone(t.id) ? 10 : 0) + (t.weekday === dow() ? 0 : 1);
     h += [...(H.weeklyTasks || [])].sort((a, b) => order(a) - order(b)).map(t => row("weekly", t.id, t, weekDone(t.id), t.weekday != null ? `<span class="hbadge${t.weekday === dow() ? " now" : ""}">${t.weekday === dow() ? "today" : DAYS[t.weekday]}</span>` : "")).join("");
+  } else if (view.tab === "last") {
+    const items = [...(H.lastDone || [])].sort((a, b) => (dueIn(a) ?? 9999) - (dueIn(b) ?? 9999));
+    h += items.map(it => { const d = dueIn(it), ago = it.last ? daysAgo(it.last) : null;
+      return `<li class="hlast"><span><b>${esc(it.name)}</b><small>${it.last ? `last done ${esc(niceDay(it.last))} · ${ago === 0 ? "today" : ago === 1 ? "yesterday" : ago + " days ago"}` : "not logged yet"}</small></span>
+        ${d != null ? `<span class="hbadge${d <= 0 ? " now" : ""}">${d < 0 ? `overdue ${-d}d` : d === 0 ? "due today" : `due in ${d}d`}</span>` : ""}
+        <span class="hlastctl"><button class="btn small primary" data-hlastnow="${esc(it.id)}">Done today</button><label class="sr" for="hl-${esc(it.id)}">Last done on</label><input type="date" id="hl-${esc(it.id)}" data-hlastdate="${esc(it.id)}" max="${today()}" value="${esc(it.last || "")}">
+        <select data-hlastevery="${esc(it.id)}" aria-label="How often">${EVERY.map(([v, n]) => `<option value="${v}"${(it.every || 0) === v ? " selected" : ""}>${n}</option>`).join("")}</select>
+        <button class="hx" data-hlastdel="${esc(it.id)}" aria-label="Remove ${esc(it.name)}">✕</button></span></li>`; }).join("");
   } else {
     const z = zone(), n = (z.tasks || []).length, d = (z.tasks || []).filter((_, i) => zoneDone(i)).length;
     h += `<li class="hzone"><b>${esc(z.name)}</b> <small>week ${H.currentZoneIndex + 1} of ${H.zones.length} · ${d}/${n} done</small></li>`
       + (z.tasks || []).map((t, i) => row("zone", i, t, zoneDone(i))).join("");
   }
+  if (view.tab === "last") return h + `</ul><form class="row hadd" data-hlastadd="1"><input name="t" maxlength="60" placeholder="add something, e.g. clean the fridge"><select name="e" aria-label="How often">${EVERY.map(([v, n]) => `<option value="${v}">${n}</option>`).join("")}</select><button class="btn small alt">Add</button></form>`;
   h += `</ul>${view.tab !== "zone" ? `<form class="row hadd" data-hadd="${view.tab}"><input name="t" maxlength="80" placeholder="add a ${view.tab} chore"><button class="btn small alt">Add</button></form>`
     : `<div class="actions"><button class="btn small alt" data-hnextzone="1">Move on to ${esc(H.zones[(H.currentZoneIndex + 1) % H.zones.length].name)}</button></div>`}`;
   return h;
@@ -203,8 +215,28 @@ function fridgePanel(){
   return h;
 }
 
+const daysAgo = d => Math.round((Date.parse(today() + "T00:00:00Z") - Date.parse(d + "T00:00:00Z"))/864e5);
+const dueIn = it => it.every > 0 ? (it.last ? it.every - daysAgo(it.last) : 0) : null;
+const niceDay = d => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", {day: "numeric", month: "short", year: daysAgo(d) > 300 ? "numeric" : undefined, timeZone: "UTC"});
+export const lastDueCount = () => (H.lastDone || []).filter(it => { const d = dueIn(it); return d != null && d <= 0 && it.last; }).length;
+// chat: "I changed Evan's sheets" -> logs it (adds it if it's new). Returns the item name.
+export function chatLastDone(what, date){
+  const n = String(what || "").trim().toLowerCase(); if (!n) return null; const d = /^\d{4}-\d{2}-\d{2}$/.test(date || "") && date <= today() ? date : today();
+  H.lastDone = H.lastDone || [];
+  let it = H.lastDone.find(x => x.name.toLowerCase() === n) || H.lastDone.find(x => x.name.toLowerCase().includes(n) || n.includes(x.name.toLowerCase()));
+  if (!it) { it = {id: "l" + Date.now(), name: String(what).trim().slice(0, 60).replace(/^./, c => c.toUpperCase()), last: d, every: 0}; H.lastDone.push(it); } else it.last = d;
+  save(); api && api.changed(); return it.name;
+}
 export function wireHestia(root, which){
   const on = (sel, ev, fn) => root.querySelectorAll(sel).forEach(el => el.addEventListener(ev, e => { e.stopPropagation(); fn(el, e); }));
+  // last done
+  const lastOf = id => (H.lastDone || []).find(x => x.id === id);
+  on("[data-hlastnow]", "click", el => { const it = lastOf(el.dataset.hlastnow); if (!it) return; it.last = today(); api.sfx("coin"); api.flash(`${it.name}: done today`); save(); api.changed(); });
+  on("[data-hlastdate]", "change", el => { const it = lastOf(el.dataset.hlastdate); if (!it || !el.value) return; it.last = el.value > today() ? today() : el.value; save(); api.changed(); });
+  on("[data-hlastevery]", "change", el => { const it = lastOf(el.dataset.hlastevery); if (!it) return; it.every = +el.value || 0; save(); api.changed(); });
+  on("[data-hlastdel]", "click", el => { const i = (H.lastDone || []).findIndex(x => x.id === el.dataset.hlastdel); if (i < 0) return; const [gone] = H.lastDone.splice(i, 1); save(); api.changed();
+    api.undoable(`Removed “${gone.name}”`, () => { if (!H.lastDone.some(x => x.id === gone.id)) H.lastDone.splice(Math.min(i, H.lastDone.length), 0, gone); save(); api.changed(); }); });
+  on("form[data-hlastadd]", "submit", (el, e) => { e.preventDefault(); const v = el.t.value.trim(); if (!v) return; (H.lastDone = H.lastDone || []).push({id: "l" + Date.now(), name: v.slice(0, 60), last: null, every: +el.e.value || 0}); save(); api.changed(); });
   on("[data-htab]", "click", el => { view.tab = el.dataset.htab; api.changed(); });
   on("[data-hdone]", "change", el => { const [k, id] = el.dataset.hdone.split(":"); setDone(k, k === "zone" ? +id : id, el.checked); });
   on("[data-hdel]", "click", el => { const [k, id] = el.dataset.hdel.split(":"); const key = k === "daily" ? "dailyTasks" : "weeklyTasks";

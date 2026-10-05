@@ -13,7 +13,7 @@ import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked } from "./paths.js";
 import { fetchPost, postPanel, postCount } from "./postbox.js";
 import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML } from "./feeds.js";
-import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
+import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia, chatLastDone, lastDueCount, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
 import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, roomLeft, hungry, hungryCount, KINDS } from "./pets.js";
 import { wardrobePanel, newOutfit } from "./wardrobe.js";
 import { readPlan, PLAN_WORDS } from "./plans.js";
@@ -785,6 +785,7 @@ function runChatAction(a){
     case "pet": hearts(3); sfx("purr"); return null;
     case "feed_animals": { const r = feedAnimals("all"); return r ? `Fed ${r} in the run` : null; }
     case "routine_set": { const l = setRoutine(a); return l ? `${l.name} is on your routines board` : null; }
+    case "last_done": { const n = chatLastDone(a.what, a.date); return n ? `Logged: ${n}, ${a.date && a.date !== dayKey() ? a.date : "today"}` : null; }
     case "kudos_add": { const e = addKudos(a.text, a.from); return e ? `Pinned to Kind words${e.from ? ` (from ${e.from})` : ""}` : null; }
     case "remind": return addReminder(F, a, () => save()).then(x => x.line);
   }
@@ -824,6 +825,7 @@ Available actions (use only these):
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
 {"type":"routine_set","name":"Beauty routine","days":{"mon":"...","tue":"..."}}  or  {"type":"routine_set","name":"Morning routine","items":["...","..."]}  (save a routine to the noticeboard in her room: days = one step per weekday, items = a daily checklist; replaces that routine's steps)
+{"type":"last_done","what":"Evan's sheets","date":"YYYY-MM-DD"}  (log when an every-so-often household job was last done: aircon servicing, sheets, etc.; date optional, defaults to today)
 {"type":"kudos_add","text":"the compliment, in their words","from":"who said it"}  (when she shares something nice someone said about her: pin it to the Kind words board in the town hall)
 {"type":"remind","text":"get the laundry in","minutes":60}  or  {"type":"remind","text":"call mum","at":"18:30","date":"YYYY-MM-DD"}  ("remind me to..."; minutes from now, or a 24-hour Singapore time with an optional date; text is short and starts with a verb; say the time back to her)
 What's happening in the village right now: ${chatContext()}${planText}

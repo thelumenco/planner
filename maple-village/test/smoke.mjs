@@ -970,6 +970,30 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#bedLock").isHidden(), "unless Mel really needs to get up (just for tonight)");
   await page.close();
 }
+{
+  // Hestia "Last done": every-so-often household jobs
+  console.log("\nlast done");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.goto(url + "?reset=1&seed=1&time=10:30");
+  await page.waitForTimeout(800);
+  // the five-minute clean has the cupboard first thing; get it done
+  if (await page.locator('#journal [data-qn="open"]').count()) await page.click('#journal [data-qn="open"]');
+  await page.click('#journal [data-a="walk"]');
+  await page.waitForFunction(() => document.querySelector('#journal [data-a="gotWipe"]'), null, { timeout: 15000 });
+  await page.click('#journal [data-a="gotWipe"]'); await page.click('#journal [data-a="cleanDone"]'); await page.waitForTimeout(300);
+  await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-htab="last"]', { timeout: 15000 });
+  await page.click('#ctx [data-htab="last"]');
+  check(/Aircon servicing/.test(await page.locator("#ctx").textContent()) && /Evan's sheets/.test(await page.locator("#ctx").textContent()), "the cleaning cupboard has a Last done tab (aircon, sheets)");
+  await page.click('#ctx [data-hlastnow="l3"]'); await page.waitForTimeout(200);
+  check(/today/.test(await page.locator('#ctx li.hlast:has-text("Evan\'s sheets")').textContent()), "Done today logs it");
+  await page.fill('#ctx [data-hlastdate="l1"]', "2026-06-01"); await page.locator('#ctx [data-hlastdate="l1"]').dispatchEvent("change"); await page.waitForTimeout(200);
+  check(/overdue/.test(await page.locator('#ctx li.hlast:has-text("Aircon")').textContent()), "a past date can be keyed in, and it shows when it's overdue");
+  await page.fill('#ctx form[data-hlastadd] input[name="t"]', "Clean the fridge"); await page.click('#ctx form[data-hlastadd] button');
+  check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.hestia")).lastDone || []).some(x => x.name === "Clean the fridge")), "new things can be added, and they're saved with the home data");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

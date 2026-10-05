@@ -597,3 +597,10 @@ body.kidmode .scenename span + span{display:none}
 .vq p{font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;line-height:1.5}
 .vreflect{font-style:italic;color:#6B6259;margin:0 0 6px}
 .vsum p{font-family:"Klee One",serif;font-weight:600;line-height:1.6;margin:0 0 10px}
+
+/* Hestia: last done */
+.hlist li.hlast{display:grid;grid-template-columns:1fr auto;gap:6px 8px;align-items:center}
+.hlast small{display:block}
+.hlastctl{grid-column:1 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.hlastctl input[type=date],.hlastctl select,.hadd select{border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:4px 6px;font:inherit;font-size:.82rem;color:#2F2B28}
+.hlastctl .hx{margin-left:auto}
