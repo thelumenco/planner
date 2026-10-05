@@ -23,6 +23,8 @@ const touch = e => { e.u = Date.now(); commit(); };
 
 const universe = () => L.items.filter(e => e.kind === "universe");
 const future = () => L.items.filter(e => e.kind === "future");
+// for the weekly review: letters written since a moment -> {universe, future}
+export const writtenSince = ms => ({universe: universe().filter(e => e.at >= ms).length, future: future().filter(e => e.at >= ms).length});
 // letters that have arrived and haven't been opened: universe replies past their time, future letters on/after their day
 export const arrived = () => [...universe().filter(e => e.reply && e.reply.due <= Date.now() && !e.reply.read), ...future().filter(e => e.deliver <= dayKey() && !e.read)];
 // mark newly arrived letters as announced; returns them (Maple says so)

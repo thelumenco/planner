@@ -287,6 +287,11 @@ export function furn(kind, x, y){
     case "vaultjar": { const j = G.vault ? G.vault(x) : null;
       if (!j) return `<g opacity=".75">${sk(`<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" style="fill:rgba(220,235,245,.35)"/>`, `<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" stroke-dasharray="5 5"/><path d="M${x} ${y-152} v20 M${x-10} ${y-142} h20" stroke-width="2"/>`)}</g>`;
       return `<svg x="${x-34}" y="${y-300}" width="80" height="300" overflow="visible" class="${vaultFull(j) ? "vfull" : ""}">${vaultArt(j, 68, 300, {id: "f" + j.slot, sparkle: vaultFull(j), markers: false})}</svg>`; }
+    // the town hall's weekly review desk: a small table with an open scrapbook, photos and washi tape
+    case "scrapbook": return sk(`<rect x="${x-48}" y="${y-30}" width="96" height="22" rx="3" style="fill:var(--wood)"/>
+        <path d="M${x-40} ${y-42} l38 -6 l38 6 v12 l-38 -4 l-38 4z" style="fill:#FFFDF6"/><rect x="${x-34}" y="${y-46}" width="14" height="12" transform="rotate(-6 ${x-27} ${y-40})" style="fill:#C3CDEE"/>
+        <rect x="${x-16}" y="${y-48}" width="12" height="10" transform="rotate(4 ${x-10} ${y-43})" style="fill:#F4C7CF"/><rect x="${x+8}" y="${y-46}" width="22" height="5" style="fill:#F3C969"/><path d="M${x+28} ${y-36} l6 -10 l4 2 l-6 10z" style="fill:var(--rose)"/>`,
+      `<rect x="${x-48}" y="${y-30}" width="96" height="22" rx="3"/><path d="M${x-42} ${y-8} v14 M${x+42} ${y-8} v14"/><path d="M${x-40} ${y-42} l38 -6 l38 6 v12 l-38 -4 l-38 4z M${x-2} ${y-48} v12"/><path d="M${x+8} ${y-37} h18 M${x+8} ${y-33} h14" opacity=".55"/>`);
     // the wine shop: wine racks, the counter (front drawn over people, see foreArt), the honesty box, tasting tables
     case "wineshelf": { const n = G.vine ? Math.min(18, G.vineStock()) : 0; let b = "";
       for (let r = 0; r < 3; r++) for (let i = 0; i < 6; i++) { const k = r*6 + i; b += k < n ? `<rect x="${x-36 + i*12.5}" y="${y-86 + r*28}" width="7" height="20" rx="2.5" style="fill:${k % 3 === 1 ? "#9DBF8A" : "#5B2338"}"/>` : ""; }

@@ -50,6 +50,17 @@ const touch = l => { l.at = Date.now(); commit(); };
 export function todaysSteps(){ const k = todayKey(); return lists().filter(l => l.kind === "weekly" && l.days && l.days[k]).map(l => ({name: l.name, text: l.days[k], done: tickOf(l.id, k)})); }
 export const checklistLeft = () => lists().filter(l => l.kind === "checklist").reduce((n, l) => n + l.items.filter(i => !tickOf(l.id, i.id)).length, 0);
 
+// For the weekly review: per routine, which of the given days were kept. Checklists count a day when every item
+// was ticked; weekly routines count the days that had a step and it was ticked. -> [{name, kind, days: [true|false|null]}]
+// (null: nothing due that day, or the day hasn't come yet)
+export function weekRoutines(dayKeys){
+  const today = dayKey();
+  return lists().map(l => ({name: l.name, kind: l.kind, days: dayKeys.map(d => {
+    if (d > today) return null;
+    if (l.kind === "checklist") return l.items.length ? l.items.every(i => tickOf(l.id, i.id, d)) : null;
+    const k = DAYS[(new Date(d + "T00:00:00Z").getUTCDay() + 6) % 7];
+    return l.days && l.days[k] ? tickOf(l.id, k, d) : null; })}));
+}
 // "Mon: exfoliate" / "Monday - hair mask" / "Tues. sheet mask" lines -> {mon: "...", ...}
 export function parseWeek(text){
   const out = {}; String(text || "").split(/\n|;/).forEach(line => {

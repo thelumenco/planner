@@ -516,3 +516,20 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - `bottleArt(type, h)`: a shouldered red, a pink rosé, a slim white flute, and sparkling with gold foil.
   - `glassArt` and `stallIcon`.
 - Barrels sit in cards (picture on the left, stacking on narrow phones). Wines on the shelves, in the cellar and in the tasting room are spaced cards with their bottle or glass. Stall items have icons.
+
+### Round 45: weekly review, tasting room menu
+- **Weekly review** (`src/game/review.js`): a scrapbook desk in the town hall (station `review`, W [268,420], furniture `scrapbook`). The page covers the week Monday to Sunday:
+  - quests per day as bars, with the best day and coins
+  - routines kept as day dots (`weekRoutines` in routines.js)
+  - trophies earned this week
+  - savings added per vault, and any vaults filled
+  - journal pages (`journalSince`) and letters (`writtenSince`)
+  - steps, water and harvests from `F.history`
+  - this week's Sunsama objectives with ticks (`read_resource sunsama://objectives/{day}`)
+  - next week's three priorities, sent to Sunsama with `create_weekly_objective` {title, weekStartDay: next Monday} (added to the manifest)
+- The review is kept in `F.reviews[weekStart] = {at, priorities, sent[]}` and pays 15 coins the first time each week. Past weeks fold out. From Friday 2pm and over the weekend, Maple mentions it once a day until it's done. Places "weekly review", "review" and "scrapbook" walk there.
+- **Tasting room menu** (`DISHES` in vineyard.js, `dishArt` in wine.js): ten small plates, stocked in batches.
+  - From the kitchen, for coins: cheese board, bread, olives.
+  - From the garden, out of `F.inv` crops: carrot cake, grilled corn, berry tart.
+  - From Hana's market, out of `F.inv` treats: dumplings, honey toast, fish, apple slices.
+- `v.menu[id]` counts the plates. Food on the menu adds 25% footfall, 60% of glasses sell with a plate, and now and then someone comes in just for a bite. `v.plates` and `today.plates` count them. The chalkboard reads "and small plates".

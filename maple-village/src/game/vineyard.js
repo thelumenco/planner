@@ -5,7 +5,7 @@
 // (F.vine). Times are real time, so things grow and ferment while Mel is away.
 import { esc, plain, H, now } from "../util.js";
 import { NPCS } from "../data/npcs.js";
-import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon } from "../art/wine.js";
+import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt } from "../art/wine.js";
 
 export const GROW = 6*H;                                     // a watered vine ripens in 6 hours
 export const STYLES = {red: {n: "Red", grape: "red", dur: 4*H, price: 24, col: "#7A1F3D"}, rose: {n: "Rosé", grape: "red", dur: 2*H, price: 20, col: "#E98AA0"},
@@ -13,12 +13,36 @@ export const STYLES = {red: {n: "Red", grape: "red", dur: 4*H, price: 24, col: "
 export const SHOP = {cut_red: {n: "Red grape vine", price: 10, say: "A red grape cutting. Plant it on a trellis."}, cut_white: {n: "White grape vine", price: 10, say: "A white grape cutting. Plant it on a trellis."},
   trellis: {n: "Trellis (one row)", price: 25, say: "A new trellis row, ready for three vines."}, barrel: {n: "Oak barrel", price: 40, say: "Another barrel for the cellar."}};
 const BUNCHES = 3, PER_BATCH = 3, BOTTLES = 6, GLASSES = 5;
+// The tasting room's small plates. Each batch makes a few plates. Three ways to stock them: buy from the kitchen
+// with coins, cook from what you've grown in the garden, or bring treats from Hana's market (both from the backpack).
+// Food on the menu brings more people in, and most glasses sell with a plate.
+export const DISHES = {
+  cheese: {n: "Cheese board", from: "kitchen", cost: 12, plates: 4, price: 7},
+  bread: {n: "Warm bread and butter", from: "kitchen", cost: 6, plates: 4, price: 3},
+  olives: {n: "Bowl of olives", from: "kitchen", cost: 8, plates: 4, price: 4},
+  carrotcake: {n: "Carrot cake", from: "garden", need: {carrot: 2}, plates: 4, price: 6},
+  corn: {n: "Grilled corn", from: "garden", need: {corn: 2}, plates: 4, price: 5},
+  berrytart: {n: "Berry tart", from: "garden", need: {strawberry: 1, blueberry: 1}, plates: 4, price: 9},
+  dumplings: {n: "Dumplings", from: "market", need: {dumpling: 2}, plates: 4, price: 6},
+  honeytoast: {n: "Honey toast soldiers", from: "market", need: {toast: 1}, plates: 3, price: 7},
+  fish: {n: "Grilled fish", from: "market", need: {fish: 1}, plates: 3, price: 8},
+  apples: {n: "Apple slices", from: "market", need: {apple: 2}, plates: 4, price: 3}};
+const NEED_NAMES = {carrot: ["carrot", "carrots"], corn: ["corn cob", "corn cobs"], strawberry: ["strawberry", "strawberries"], blueberry: ["blueberry", "blueberries"],
+  dumpling: ["dumpling", "dumplings"], toast: ["honey toast", "honey toasts"], fish: ["fish", "fish"], apple: ["apple", "apples"]};
+const needText = need => Object.entries(need).map(([k, n]) => `${n} ${NEED_NAMES[k][n === 1 ? 0 : 1]}`).join(" + ");
+const canMake = (F, d) => d.cost ? F.coins >= d.cost : Object.entries(d.need).every(([k, n]) => ((F.inv || {})[k] || 0) >= n);
+export function addDish(F, id){
+  const v = vineState(F), d = DISHES[id]; if (!d || !canMake(F, d)) return null;
+  if (d.cost) F.coins -= d.cost; else Object.entries(d.need).forEach(([k, n]) => { F.inv[k] -= n; if (F.inv[k] <= 0) delete F.inv[k]; });
+  v.menu[id] = (v.menu[id] || 0) + d.plates; return `${d.plates} plates of ${d.n.toLowerCase()} on the menu.`;
+}
+export const platesLeft = v => Object.values(v.menu || {}).reduce((a, n) => a + n, 0);
 export function vineState(F){
   F.vine = F.vine || {};
   const v = F.vine;
   v.rows = v.rows || [0, 1, 2].map(i => ({trellis: i === 0, vines: [null, null, null]}));
   v.cuttings = v.cuttings || {red: 1, white: 1}; v.grapes = v.grapes || {red: 0, white: 0};
-  v.barrels = v.barrels || [null]; v.cellar = v.cellar || []; v.shelf = v.shelf || []; v.box = v.box || 0; v.sold = v.sold || 0; v.glasses = v.glasses || 0;
+  v.barrels = v.barrels || [null]; v.cellar = v.cellar || []; v.shelf = v.shelf || []; v.box = v.box || 0; v.sold = v.sold || 0; v.glasses = v.glasses || 0; v.menu = v.menu || {}; v.plates = v.plates || 0;
   v.lastTick = v.lastTick || Date.now(); v.today = v.today || {day: "", bottles: 0, glasses: 0, coins: 0};
   return v;
 }
@@ -83,25 +107,30 @@ export function sellTick(F, opts = {}){
   const v = vineState(F), t = Date.now(), mins = Math.min(720, Math.floor((t - v.lastTick)/60000)); if (mins < 1) return null;
   if (t - v.lastTick > 720*60000) v.lastTick = t - 720*60000;
   v.lastTick += mins*60000;
-  const out = {bottles: 0, glasses: 0, coins: 0, toBox: !opts.serving, watered: 0, mins};
+  const out = {bottles: 0, glasses: 0, plates: 0, coins: 0, toBox: !opts.serving, watered: 0, mins};
   let w = null; const off = now() - t;   // the game clock (equal to real time outside tests)
   for (let k = mins; k > 0; k--) {
     const at = t - k*60000, d = new Date(at + off + 8*H), hm = d.getUTCHours()*60 + d.getUTCMinutes(), we = [0, 6].includes(d.getUTCDay());
     if (!w || k % 10 === 0 || k === 1) w = whoAt(at + off);
     if (w.workers) v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && !vn.wateredAt) { vn.wateredAt = at; out.watered++; } }));
     if (hm < 10*60 || hm >= 22*60) continue;
-    const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); if (!onShelf.length && !open) continue;
-    const f = footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1);
+    const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); if (!onShelf.length && !open && !platesLeft(v)) continue;
+    const food = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]);
+    const f = footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (food.length ? 1.25 : 1);
+    const plate = () => { const live = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]); if (!live.length) return; const id = live[Math.floor(Math.random()*live.length)];
+      v.menu[id]--; if (!v.menu[id]) delete v.menu[id]; out.plates++; out.coins += DISHES[id].price; };
     if (onShelf.length && Math.random() < .006*f) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; s.n--; out.bottles++; out.coins += s.price; }
     if (Math.random() < .005*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
-      const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); } }
+      const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); if (Math.random() < .6) plate(); } }
+    if (Math.random() < .002*f) plate();   // someone pops in just for a bite
   }
   v.shelf = v.shelf.filter(s => s.n > 0 || s.open > 0);
   if (!out.coins && !out.watered) return null;
+  v.plates += out.plates;
   if (opts.serving) F.coins += out.coins; else v.box += out.coins;
   v.sold += out.bottles; v.glasses += out.glasses;
-  const day = new Date(t + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, coins: 0};
-  v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
+  const day = new Date(t + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
+  v.today.plates = (v.today.plates || 0) + out.plates; v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
   return out;
 }
 
@@ -153,16 +182,24 @@ export function shelfPanel(F){
 export function counterPanel(F, serving, staff){
   const v = vineState(F), t = v.today;
   return `<span class="tape gingham" aria-hidden="true"></span><h2>Behind the counter</h2><p class="sub">${serving ? "You're serving: customers come in more often while you're here, and pay you straight away." : "Step behind the counter to serve."} Evenings and weekends are busiest.${staff ? " Celeste's on shift too, so it's a little busier than usual (her takings go in the honesty box)." : ""}</p>
-    <p>Today: <b>${t.bottles}</b> bottle${t.bottles === 1 ? "" : "s"} and <b>${t.glasses}</b> glass${t.glasses === 1 ? "" : "es"} sold, <b>${t.coins}</b> coins. On the shelves: ${shelfStock(v)} bottles.</p>
+    <p>Today: <b>${t.bottles}</b> bottle${t.bottles === 1 ? "" : "s"} and <b>${t.glasses}</b> glass${t.glasses === 1 ? "" : "es"} and <b>${t.plates || 0}</b> plate${t.plates === 1 ? "" : "s"} sold, <b>${t.coins}</b> coins. On the shelves: ${shelfStock(v)} bottles.</p>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export function boxPanel(F){ const v = vineState(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The honesty box</h2><p class="sub">${v.box ? `${v.box} coins inside, left by customers while you were away.` : "Empty for now. Villagers drop coins in when they buy."}</p>
     <div class="actions">${v.box ? `<button class="btn primary" data-vy="collect">Collect ${v.box} coins</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`; }
-export function cafePanel(F, guests){ const v = vineState(F), open = v.shelf.filter(s => s.n > 0 || s.open > 0);
+export function cafePanel(F, guests){ const v = vineState(F), open = v.shelf.filter(s => s.n > 0 || s.open > 0), menu = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]);
+  const inv = F.inv || {}, have = d => d.cost ? `${d.cost} coins` : `${needText(d.need)} <small>(you have ${Object.keys(d.need).map(k => `${inv[k] || 0}`).join(" + ")})</small>`;
+  const group = (from, title, hint) => `<p class="eyebrow">${title}</p><p class="muted dishhint">${hint}</p><div class="items shop dishes">${Object.keys(DISHES).filter(id => DISHES[id].from === from).map(id => { const d = DISHES[id], ok = canMake(F, d);
+    return `<button class="item" data-vymenu="${id}" ${ok ? "" : "disabled"}><span class="e">${dishArt(id, 44, !ok)}</span><span class="n">${esc(d.n)}</span><span class="c">${have(d)}</span><span class="d">${d.plates} plates · ${d.price} coins each</span></button>`; }).join("")}</div>`;
   return `<span class="tape stripe" aria-hidden="true"></span><h2>The tasting room</h2><p class="sub">${guests.length ? `${guests.join(" and ")} ${guests.length > 1 ? "are" : "is"} in for a tasting.` : "Quiet for now. Villagers drop in for a glass, mostly in the evenings and at weekends."}</p>
+    <p class="eyebrow">On the menu</p>${menu.length ? `<ul class="hlist wlist">${menu.map(id => `<li><span class="wpic">${dishArt(id, 46)}</span><span class="wtxt"><b>${esc(DISHES[id].n)}</b><small>${v.menu[id]} plate${v.menu[id] === 1 ? "" : "s"} left · ${DISHES[id].price} coins each</small></span></li>`).join("")}</ul>` : `<p class="muted">No small plates yet. Add some below: food brings more people in, and most glasses sell with a plate.</p>`}
     <p class="eyebrow">By the glass</p>${open.length ? `<ul class="hlist wlist">${open.map(s => `<li><span class="wpic">${glassArt(s.type, 40)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${STYLES[s.type].n} · ${Math.max(1, Math.round(s.price/4))} coins a glass</small></span></li>`).join("")}</ul>` : `<p class="muted">Stock the shelves and your wines are poured here too.</p>`}
-    <p class="muted">Glasses poured so far: ${v.glasses}. The food menu is still being dreamt up.</p>
+    <h3 class="ph3">Add to the menu</h3>
+    ${group("kitchen", "From the kitchen", "Bought with coins.")}
+    ${group("garden", "From your garden", "Cooked from what you've grown and picked.")}
+    ${group("market", "From Hana's market", "Treats from the market's Treats tab, out of your backpack.")}
+    <p class="muted">Served so far: ${v.glasses} glass${v.glasses === 1 ? "" : "es"} and ${v.plates} plate${v.plates === 1 ? "" : "s"}.</p>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`; }
 // api: {save, rerender, say(line), sfx, r, i}
 export function wireVine(root, F, api){
@@ -179,6 +216,7 @@ export function wireVine(root, F, api){
     if (line) api.say(line); api.save(); api.rerender();
   });
   root.querySelectorAll("[data-vybuy]").forEach(b => b.onclick = () => { const line = buy(F, b.dataset.vybuy); if (line) { api.sfx("coin"); api.say(line); api.save(); api.rerender(); } });
+  root.querySelectorAll("[data-vymenu]").forEach(b => b.onclick = () => { const line = addDish(F, b.dataset.vymenu); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vystock]").forEach(b => b.onclick = () => { const line = stock(F, b.dataset.vystock); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyprice]").forEach(inp => inp.onchange = () => { setPrice(F, inp.dataset.vyprice, +inp.value); api.save(); });
 }

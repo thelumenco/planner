@@ -139,7 +139,7 @@ const SHELLS = {
     ${sk(`<rect x="262" y="40" width="140" height="96" rx="3" style="fill:#8B5E3C"/>${rows(15, i => `<circle cx="${280 + (i % 5)*26}" cy="${60 + Math.floor(i/5)*28}" r="7" style="fill:${i % 4 === 1 ? "#9DBF8A" : "#5B2338"}"/>`)}`,
       `<rect x="262" y="40" width="140" height="96" rx="3"/><path d="M262 74 h140 M262 102 h140" opacity=".6"/>`)}
     ${sk(`<rect x="430" y="46" width="70" height="80" rx="3" style="fill:#3E4A43"/>`, `<rect x="430" y="46" width="70" height="80" rx="3"/>`)}
-    <g font-family="Klee One,serif" font-weight="600" fill="#F6EFE3" text-anchor="middle" pointer-events="none"><text x="465" y="66" font-size="10">Tonight</text><text x="465" y="84" font-size="8">by the glass</text><text x="465" y="98" font-size="8">and nibbles</text><text x="465" y="112" font-size="8">(coming soon)</text></g>
+    <g font-family="Klee One,serif" font-weight="600" fill="#F6EFE3" text-anchor="middle" pointer-events="none"><text x="465" y="66" font-size="10">Tonight</text><text x="465" y="84" font-size="8">by the glass</text><text x="465" y="98" font-size="8">and small</text><text x="465" y="112" font-size="8">plates</text></g>
     ${sk("", `<path d="M150 0 v40 M200 0 v24"/>`)}
     ${sk(`<path d="M138 40 h24 l-4 10 h-16z M188 24 h24 l-4 10 h-16z" style="fill:#F3C969"/>`, `<path d="M138 40 h24 l-4 10 h-16z M188 24 h24 l-4 10 h-16z"/>`)}
     ${plant(30, 610, 1.1)}${plant(490, 610, 1)}`,

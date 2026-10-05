@@ -1016,6 +1016,45 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // The weekly review in the town hall, and the tasting room's small plates
+  console.log("\nweekly review and tasting room");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`review pageerror: ${e.message}`));
+  await page.addInitScript(() => { const q = location.search; if (!/rvpatch|menupatch|platepatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    if (q.includes("rvpatch")) f.history = Object.assign(f.history || {}, {"2026-10-05": {q: 4, steps: 6200, water: 1500, harvest: 2, coins: 30}, "2026-10-07": {q: 6, steps: 7400, water: 2000, harvest: 1, coins: 44}});
+    if (q.includes("menupatch")) { f.coins = 40; f.inv = Object.assign(f.inv || {}, {carrot: 2}); }
+    if (q.includes("platepatch")) { f.vine = f.vine || {}; f.vine.shelf = [{id: "w9", name: "Test Red", type: "red", n: 40, price: 24, open: 0}]; f.vine.menu = {cheese: 40}; f.vine.lastTick = Date.now() - 600*60e3; }
+    localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
+  await page.goto(url + "?reset=1&seed=1&date=2026-10-09&time=16:00"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&sunsama=1&date=2026-10-09&time=16:00&rvpatch=1"); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__mapleScene("hall")); await page.waitForTimeout(700);
+  check(await page.locator('#world [data-spot="review"]').count() === 1, "the town hall has a weekly review desk");
+  await page.locator('#world [data-spot="review"]').dispatchEvent("click");
+  await page.waitForSelector("#ctx .rvcard", { timeout: 15000 });
+  check(/10 quests done/.test(await page.locator("#ctx .rvcard h3").first().textContent()) && await page.locator("#ctx .rvcard").count() >= 7, "the scrapbook gathers the week: quests, routines, trophies, savings, words, body and garden");
+  await page.waitForFunction(() => document.querySelectorAll("#ctx .rvobj li").length >= 2, null, { timeout: 8000 }).catch(() => {});
+  check(await page.locator("#ctx .rvobj li.done").count() === 2, "this week's Sunsama objectives show with their ticks");
+  const c0 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
+  await page.fill("#rvP0", "Fill the Visibility Fix cohort"); await page.fill("#rvP1", "Ship the Chord onboarding fixes");
+  await page.click('#ctx [data-rv="send"]');
+  await page.waitForFunction(() => (window.__weeklyObj || []).length >= 2, null, { timeout: 8000 }).catch(() => {});
+  check(await page.evaluate(() => { const o = window.__weeklyObj || []; return o.length === 2 && o.every(x => x.weekStartDay === "2026-10-12") && o[0].title === "Fill the Visibility Fix cohort"; }), "next week's priorities go to Sunsama as next week's weekly objectives");
+  await page.waitForTimeout(400);
+  check(await page.evaluate(c0 => { const f = JSON.parse(localStorage.getItem("fox.fox")); return !!(f.reviews && f.reviews["2026-10-05"]) && f.coins === c0 + 15; }, c0), "the review is kept, with 15 coins for doing it");
+  // the tasting room: small plates from the kitchen (coins) and the garden (backpack)
+  await page.goto(url + "?seed=1&time=18:00&menupatch=1"); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(700);
+  await page.locator('#world [data-spot="tasting"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-vymenu="carrotcake"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-vymenu]').count() === 10, "the tasting room offers dishes from the kitchen, the garden and Hana's market");
+  await page.click('#ctx [data-vymenu="carrotcake"]'); await page.waitForTimeout(200); await page.click('#ctx [data-vymenu="bread"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.menu.carrotcake === 4 && f.vine.menu.bread === 4 && !f.inv.carrot && f.coins === 34; }), "carrot cake is cooked from garden carrots, bread is bought with coins");
+  check(await page.locator("#ctx .wlist .wpic svg").count() >= 2, "dishes on the menu show as plates");
+  await page.goto(url + "?seed=1&time=21:00&platepatch=1"); await page.waitForTimeout(4200);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.plates > 0), "villagers order small plates with their wine");
+  await page.close();
+}
+{
   // The vineyard: grow grapes, ferment and bottle wine, sell it in the wine shop; workers water, an assistant serves
   console.log("\nthe vineyard");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

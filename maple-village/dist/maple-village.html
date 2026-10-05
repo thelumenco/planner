@@ -1200,6 +1200,37 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
 .panel .item:disabled{opacity:1;background:#F3EFE8;border-color:rgba(120,104,84,.1)}
 .panel .item:disabled .n,.panel .item:disabled .c,.panel .item:disabled .c b,.panel .item:disabled .d{color:#B5ADA2}
 .panel .item:disabled .e svg{filter:none}
+/* weekly review scrapbook */
+.rvgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin:12px 0 14px}
+.rvcard{position:relative;padding:18px 14px 12px;border:1px solid rgba(120,104,84,.18);border-radius:12px;background:#FFFDF7;box-shadow:0 6px 14px -12px rgba(47,43,40,.45)}
+.rvcard.wide,.rvnext{margin:0 0 14px}
+.rvcard h3{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-family:"Klee One",serif;font-weight:600;font-size:1.08rem;color:#2F2B28}
+.rvtape{position:absolute;top:-7px;left:50%;width:64px;height:14px;transform:translateX(-50%);opacity:.85;background:#F6E3A1}
+.rvtape.peach{background:#F7D3BE}.rvtape.sky{background:#CFE0EE}.rvtape.sage{background:#D6E6C8}.rvtape.blush{background:#F4C7CF}.rvtape.butter{background:#F6E3A1}
+.rvbars{display:block;max-width:100%;height:auto}
+.rvnote{font-size:.86rem;color:#8A8279;margin:6px 0 0!important;line-height:1.45}
+.rvrow{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;padding:5px 0;border-bottom:1px dashed rgba(154,169,221,.4)}
+.rvrow:last-child{border-bottom:0}
+.rvrow b{color:#2F2B28}.rvrow small{color:#8A8279}
+.rvdots{display:flex;gap:4px;width:100%;margin-top:2px}
+.rvdots i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:.62rem;font-weight:800;color:#8A8279;background:#F1ECE4}
+.rvdots i.on{background:#8FB07B;color:#FFFDF6}.rvdots i.off{background:#FFFDF7;border:1.4px solid #E3B7A6;color:#C9876F}
+.rvtroph{display:flex;flex-wrap:wrap;gap:8px}
+.rvtroph figure{margin:0;width:70px;text-align:center}.rvtroph figcaption{font-size:.68rem;line-height:1.25;color:#5E5650}
+.rvobj{list-style:none;margin:0;padding:0}
+.rvobj li{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px dashed rgba(154,169,221,.4)}
+.rvobj li.done{color:#8A8279;text-decoration:line-through}
+.rvtick{flex:none;position:relative;width:18px;height:18px;margin-top:2px;border:1.6px solid #2F3B73;border-radius:5px;background:#FFFDF7}
+.rvobj li.done .rvtick{background:#8FB07B;border-color:#8FB07B}
+.rvobj li.done .rvtick::after{content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid #FFFDF7;border-width:0 2.2px 2.2px 0;transform:rotate(45deg)}
+.rvprio{margin:10px 0 6px;padding-left:22px;display:grid;gap:8px}
+.rvprio li{padding-left:4px}
+.rvprio input{width:100%;box-sizing:border-box;padding:9px 10px;border:1.4px solid rgba(120,104,84,.3);border-radius:8px;background:#FFFFFF;font:inherit}
+.rvok{display:inline-block;margin-top:4px;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#5E7A4E}
+.panel .dishhint{margin:-2px 0 8px!important;font-size:.8rem}
+.panel .items.dishes{margin-bottom:14px}
+.panel .items.dishes .item .c small{display:block;color:#8A8279;font-weight:500}
+.panel .ph3 + .eyebrow{margin-top:6px}
 </style>
 </head>
 <body>
@@ -1927,7 +1958,8 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
   var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
   var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
   var ROOMS = {
-    hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [448, 262], B: [110, 258], C: [420, 474], D: [316, 266], E: [118, 474], R: [40, 362] }, stations: [
+    hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [448, 262], B: [110, 258], C: [420, 474], D: [316, 266], E: [118, 474], R: [40, 362], W: [268, 420] }, stations: [
+      ["review", "Weekly review", "W", "scrapbook", null, "Your week in the village, in a scrapbook.", 30],
       ["trophydoor", "Courtyard", "R", "trophydoor", null, "Out to the courtyard: trophies, kind words, a bench in the sun.", 0],
       ["table", "Planning table", "C", "plantable", /plan|strategy|review|ceo|goal|week|month|quarter|budget/, "Your week, month and quarter, from Notion."],
       ["whiteboard", "Whiteboard", "B", "whiteboard", /brainstorm|idea|map|outline|launch|offer|pricing/, "Fresh marker, blank board."],
@@ -2343,7 +2375,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
       `<rect x="262" y="40" width="140" height="96" rx="3"/><path d="M262 74 h140 M262 102 h140" opacity=".6"/>`
     )}
     ${sk(`<rect x="430" y="46" width="70" height="80" rx="3" style="fill:#3E4A43"/>`, `<rect x="430" y="46" width="70" height="80" rx="3"/>`)}
-    <g font-family="Klee One,serif" font-weight="600" fill="#F6EFE3" text-anchor="middle" pointer-events="none"><text x="465" y="66" font-size="10">Tonight</text><text x="465" y="84" font-size="8">by the glass</text><text x="465" y="98" font-size="8">and nibbles</text><text x="465" y="112" font-size="8">(coming soon)</text></g>
+    <g font-family="Klee One,serif" font-weight="600" fill="#F6EFE3" text-anchor="middle" pointer-events="none"><text x="465" y="66" font-size="10">Tonight</text><text x="465" y="84" font-size="8">by the glass</text><text x="465" y="98" font-size="8">and small</text><text x="465" y="112" font-size="8">plates</text></g>
     ${sk("", `<path d="M150 0 v40 M200 0 v24"/>`)}
     ${sk(`<path d="M138 40 h24 l-4 10 h-16z M188 24 h24 l-4 10 h-16z" style="fill:#F3C969"/>`, `<path d="M138 40 h24 l-4 10 h-16z M188 24 h24 l-4 10 h-16z"/>`)}
     ${plant(30, 610, 1.1)}${plant(490, 610, 1)}`,
@@ -3410,6 +3442,22 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     if (id === "trellis") return w(`<path d="M8 44 V8 M40 44 V8" stroke="#8B5E3C" stroke-width="3.4" stroke-linecap="round"/><path d="M8 16 H40 M8 28 H40" fill="none" stroke="#3b3530" stroke-width="1.2"/>${leaf(20, 20, 0.7, -15, "#86B26A")}${leaf(30, 30, 0.6, 20, "#9CC27E")}`);
     return w(`<path d="M8 24 C8 12 14 8 24 8 C34 8 40 12 40 24 C40 36 34 40 24 40 C14 40 8 36 8 24Z" fill="#B07B52" ${INK3}/><path d="M14 9 C11 18 11 30 14 39 M34 9 C37 18 37 30 34 39" fill="none" stroke="#4A3A30" stroke-width="2.2"/><path d="M24 8 V40" stroke="#8A5A3A" stroke-width="1" opacity=".7"/>`);
   }
+  function dishArt(id, s = 44, off) {
+    const plate = `<ellipse cx="24" cy="30" rx="21" ry="11" fill="#FFFDF6" ${INK3}/><ellipse cx="24" cy="29" rx="14" ry="6.5" fill="none" stroke="#E4DDD2" stroke-width="1.2"/>`;
+    const F2 = {
+      cheese: plate + `<path d="M12 28 l14 -10 l3 9z" fill="#F3C969" ${INK3}/><circle cx="20" cy="25" r="1.4" fill="#E3B04B"/><rect x="30" y="22" width="6" height="6" rx="1" fill="#F6E3A1" ${INK3} stroke-width="1"/><rect x="33" y="27" width="6" height="5" rx="1" fill="#FFF3C4" ${INK3} stroke-width="1"/><circle cx="16" cy="32" r="2.4" fill="#6B2A55" ${INK3} stroke-width=".8"/><circle cx="19.5" cy="33" r="2.4" fill="#6B2A55" ${INK3} stroke-width=".8"/>`,
+      bread: plate + `<path d="M11 28 q0 -9 13 -9 q13 0 13 9 v2 h-26z" fill="#D9A066" ${INK3}/><path d="M17 22 l2 5 M23 20 l1 6 M29 21 l-1 5" stroke="#9C6B3E" stroke-width="1.2"/><rect x="31" y="29" width="7" height="4" rx="1" fill="#FFF3C4" ${INK3} stroke-width="1"/>`,
+      olives: `<path d="M7 24 h34 q-2 13 -17 13 q-15 0 -17 -13z" fill="#E7EFF2" ${INK3}/>` + [[16, 22], [22, 20], [28, 22], [19, 26], [26, 26], [32, 25]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3.2" ry="2.4" fill="#7FA35A" ${INK3} stroke-width=".9"/>`).join("") + `<path d="M36 18 l6 -8" stroke="#8B5E3C" stroke-width="1.6" stroke-linecap="round"/>`,
+      carrotcake: plate + `<path d="M13 30 l12 -12 l11 8 v5 l-12 3z" fill="#E3A36A" ${INK3}/><path d="M13 30 l12 -12 l11 8 l-12 4z" fill="#FFF3E6" ${INK3}/><path d="M22 21 l-2 -4 M24 20 l1 -4" stroke="#7FA35A" stroke-width="1.4" stroke-linecap="round"/><path d="M21 22 l5 0 l-2.5 4z" fill="#F08A3C" stroke="#3b3530" stroke-width=".8"/>`,
+      corn: plate + `<path d="M10 30 q14 -14 28 -6 q-4 9 -28 6z" fill="#F3C969" ${INK3}/><path d="M16 26 l2 4 M22 24 l2 5 M28 23 l1.5 5 M33 24 l1 4" stroke="#B5813A" stroke-width="1.2"/><path d="M36 22 q6 -2 7 4" fill="none" stroke="#7FA35A" stroke-width="1.6"/>`,
+      berrytart: plate + `<ellipse cx="24" cy="26" rx="14" ry="7" fill="#E3B47A" ${INK3}/><ellipse cx="24" cy="25" rx="10.5" ry="4.8" fill="#F6E3C6"/>` + [[18, 24, "#D9485F"], [22, 23, "#3F6FD1"], [26, 24, "#D9485F"], [30, 25, "#3F6FD1"], [21, 27, "#3F6FD1"], [27, 27, "#D9485F"]].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="2" fill="${c}" stroke="#3b3530" stroke-width=".7"/>`).join(""),
+      dumplings: plate + [[15, 27], [24, 24], [33, 27]].map(([x, y]) => `<path d="M${x - 6} ${y + 2} q6 -9 12 0 q-6 3 -12 0z" fill="#F4EEE3" ${INK3}/><path d="M${x - 3} ${y - 1} l1 2 M${x} ${y - 2} v2 M${x + 3} ${y - 1} l-1 2" stroke="#8A8279" stroke-width=".9"/>`).join(""),
+      honeytoast: plate + [[14, 21], [22, 19], [30, 21]].map(([x, y]) => `<rect x="${x}" y="${y}" width="6" height="12" rx="1.5" fill="#D9A066" ${INK3} stroke-width="1"/><rect x="${x + 1}" y="${y + 1}" width="4" height="4" rx="1" fill="#F3C969"/>`).join("") + `<path d="M36 22 q4 1 3 6" fill="none" stroke="#E3A33A" stroke-width="2"/>`,
+      fish: plate + `<path d="M11 27 q9 -9 20 0 q-11 9 -20 0z" fill="#B9C6CF" ${INK3}/><path d="M31 27 l6 -5 v10z" fill="#B9C6CF" ${INK3}/><circle cx="15" cy="26" r="1" fill="#3b3530"/><path d="M19 23 l3 8 M24 23 l3 8" stroke="#6B5E52" stroke-width="1.1"/><path d="M35 33 q3 -2 5 0" fill="none" stroke="#7FA35A" stroke-width="1.4"/>`,
+      apples: plate + [[15, 27, "#D9485F"], [22, 25, "#9CC27E"], [29, 27, "#D9485F"], [35, 26, "#9CC27E"]].map(([x, y, c]) => `<path d="M${x - 4} ${y} q4 -7 8 0 q-4 3 -8 0z" fill="#FFF3DD" stroke="${c}" stroke-width="2"/>`).join("")
+    };
+    return `<svg class="vybottle" viewBox="0 0 48 44" width="${s}" height="${Math.round(s * 44 / 48)}" aria-hidden="true"><g${off ? ' opacity=".4"' : ""}>${F2[id] || plate}</g></svg>`;
+  }
 
   // src/game/vineyard.js
   var GROW2 = 6 * H;
@@ -3429,6 +3477,42 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
   var PER_BATCH = 3;
   var BOTTLES = 6;
   var GLASSES = 5;
+  var DISHES = {
+    cheese: { n: "Cheese board", from: "kitchen", cost: 12, plates: 4, price: 7 },
+    bread: { n: "Warm bread and butter", from: "kitchen", cost: 6, plates: 4, price: 3 },
+    olives: { n: "Bowl of olives", from: "kitchen", cost: 8, plates: 4, price: 4 },
+    carrotcake: { n: "Carrot cake", from: "garden", need: { carrot: 2 }, plates: 4, price: 6 },
+    corn: { n: "Grilled corn", from: "garden", need: { corn: 2 }, plates: 4, price: 5 },
+    berrytart: { n: "Berry tart", from: "garden", need: { strawberry: 1, blueberry: 1 }, plates: 4, price: 9 },
+    dumplings: { n: "Dumplings", from: "market", need: { dumpling: 2 }, plates: 4, price: 6 },
+    honeytoast: { n: "Honey toast soldiers", from: "market", need: { toast: 1 }, plates: 3, price: 7 },
+    fish: { n: "Grilled fish", from: "market", need: { fish: 1 }, plates: 3, price: 8 },
+    apples: { n: "Apple slices", from: "market", need: { apple: 2 }, plates: 4, price: 3 }
+  };
+  var NEED_NAMES = {
+    carrot: ["carrot", "carrots"],
+    corn: ["corn cob", "corn cobs"],
+    strawberry: ["strawberry", "strawberries"],
+    blueberry: ["blueberry", "blueberries"],
+    dumpling: ["dumpling", "dumplings"],
+    toast: ["honey toast", "honey toasts"],
+    fish: ["fish", "fish"],
+    apple: ["apple", "apples"]
+  };
+  var needText = (need) => Object.entries(need).map(([k, n]) => `${n} ${NEED_NAMES[k][n === 1 ? 0 : 1]}`).join(" + ");
+  var canMake = (F2, d) => d.cost ? F2.coins >= d.cost : Object.entries(d.need).every(([k, n]) => ((F2.inv || {})[k] || 0) >= n);
+  function addDish(F2, id) {
+    const v = vineState(F2), d = DISHES[id];
+    if (!d || !canMake(F2, d)) return null;
+    if (d.cost) F2.coins -= d.cost;
+    else Object.entries(d.need).forEach(([k, n]) => {
+      F2.inv[k] -= n;
+      if (F2.inv[k] <= 0) delete F2.inv[k];
+    });
+    v.menu[id] = (v.menu[id] || 0) + d.plates;
+    return `${d.plates} plates of ${d.n.toLowerCase()} on the menu.`;
+  }
+  var platesLeft = (v) => Object.values(v.menu || {}).reduce((a, n) => a + n, 0);
   function vineState(F2) {
     F2.vine = F2.vine || {};
     const v = F2.vine;
@@ -3441,6 +3525,8 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     v.box = v.box || 0;
     v.sold = v.sold || 0;
     v.glasses = v.glasses || 0;
+    v.menu = v.menu || {};
+    v.plates = v.plates || 0;
     v.lastTick = v.lastTick || Date.now();
     v.today = v.today || { day: "", bottles: 0, glasses: 0, coins: 0 };
     return v;
@@ -3552,7 +3638,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     if (mins < 1) return null;
     if (t2 - v.lastTick > 720 * 6e4) v.lastTick = t2 - 720 * 6e4;
     v.lastTick += mins * 6e4;
-    const out = { bottles: 0, glasses: 0, coins: 0, toBox: !opts.serving, watered: 0, mins };
+    const out = { bottles: 0, glasses: 0, plates: 0, coins: 0, toBox: !opts.serving, watered: 0, mins };
     let w = null;
     const off = now() - t2;
     for (let k = mins; k > 0; k--) {
@@ -3566,8 +3652,18 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
       }));
       if (hm2 < 10 * 60 || hm2 >= 22 * 60) continue;
       const onShelf = v.shelf.filter((s) => s.n > 0), open2 = v.shelf.find((s) => s.open > 0);
-      if (!onShelf.length && !open2) continue;
-      const f2 = footfall(hm2, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1);
+      if (!onShelf.length && !open2 && !platesLeft(v)) continue;
+      const food = Object.keys(v.menu).filter((id) => v.menu[id] > 0 && DISHES[id]);
+      const f2 = footfall(hm2, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (food.length ? 1.25 : 1);
+      const plate = () => {
+        const live2 = Object.keys(v.menu).filter((id2) => v.menu[id2] > 0 && DISHES[id2]);
+        if (!live2.length) return;
+        const id = live2[Math.floor(Math.random() * live2.length)];
+        v.menu[id]--;
+        if (!v.menu[id]) delete v.menu[id];
+        out.plates++;
+        out.coins += DISHES[id].price;
+      };
       if (onShelf.length && Math.random() < 6e-3 * f2) {
         const s = onShelf[Math.floor(Math.random() * onShelf.length)];
         s.n--;
@@ -3584,17 +3680,21 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
           s.open--;
           out.glasses++;
           out.coins += Math.max(1, Math.round(s.price / 4));
+          if (Math.random() < 0.6) plate();
         }
       }
+      if (Math.random() < 2e-3 * f2) plate();
     }
     v.shelf = v.shelf.filter((s) => s.n > 0 || s.open > 0);
     if (!out.coins && !out.watered) return null;
+    v.plates += out.plates;
     if (opts.serving) F2.coins += out.coins;
     else v.box += out.coins;
     v.sold += out.bottles;
     v.glasses += out.glasses;
     const day = new Date(t2 + 8 * H).toISOString().slice(0, 10);
-    if (v.today.day !== day) v.today = { day, bottles: 0, glasses: 0, coins: 0 };
+    if (v.today.day !== day) v.today = { day, bottles: 0, glasses: 0, plates: 0, coins: 0 };
+    v.today.plates = (v.today.plates || 0) + out.plates;
     v.today.bottles += out.bottles;
     v.today.glasses += out.glasses;
     v.today.coins += out.coins;
@@ -3657,7 +3757,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
   function counterPanel(F2, serving2, staff) {
     const v = vineState(F2), t2 = v.today;
     return `<span class="tape gingham" aria-hidden="true"></span><h2>Behind the counter</h2><p class="sub">${serving2 ? "You're serving: customers come in more often while you're here, and pay you straight away." : "Step behind the counter to serve."} Evenings and weekends are busiest.${staff ? " Celeste's on shift too, so it's a little busier than usual (her takings go in the honesty box)." : ""}</p>
-    <p>Today: <b>${t2.bottles}</b> bottle${t2.bottles === 1 ? "" : "s"} and <b>${t2.glasses}</b> glass${t2.glasses === 1 ? "" : "es"} sold, <b>${t2.coins}</b> coins. On the shelves: ${shelfStock(v)} bottles.</p>
+    <p>Today: <b>${t2.bottles}</b> bottle${t2.bottles === 1 ? "" : "s"} and <b>${t2.glasses}</b> glass${t2.glasses === 1 ? "" : "es"} and <b>${t2.plates || 0}</b> plate${t2.plates === 1 ? "" : "s"} sold, <b>${t2.coins}</b> coins. On the shelves: ${shelfStock(v)} bottles.</p>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function boxPanel(F2) {
@@ -3666,10 +3766,20 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     <div class="actions">${v.box ? `<button class="btn primary" data-vy="collect">Collect ${v.box} coins</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function cafePanel(F2, guests) {
-    const v = vineState(F2), open2 = v.shelf.filter((s) => s.n > 0 || s.open > 0);
+    const v = vineState(F2), open2 = v.shelf.filter((s) => s.n > 0 || s.open > 0), menu = Object.keys(v.menu).filter((id) => v.menu[id] > 0 && DISHES[id]);
+    const inv = F2.inv || {}, have = (d) => d.cost ? `${d.cost} coins` : `${needText(d.need)} <small>(you have ${Object.keys(d.need).map((k) => `${inv[k] || 0}`).join(" + ")})</small>`;
+    const group = (from, title, hint) => `<p class="eyebrow">${title}</p><p class="muted dishhint">${hint}</p><div class="items shop dishes">${Object.keys(DISHES).filter((id) => DISHES[id].from === from).map((id) => {
+      const d = DISHES[id], ok = canMake(F2, d);
+      return `<button class="item" data-vymenu="${id}" ${ok ? "" : "disabled"}><span class="e">${dishArt(id, 44, !ok)}</span><span class="n">${esc(d.n)}</span><span class="c">${have(d)}</span><span class="d">${d.plates} plates · ${d.price} coins each</span></button>`;
+    }).join("")}</div>`;
     return `<span class="tape stripe" aria-hidden="true"></span><h2>The tasting room</h2><p class="sub">${guests.length ? `${guests.join(" and ")} ${guests.length > 1 ? "are" : "is"} in for a tasting.` : "Quiet for now. Villagers drop in for a glass, mostly in the evenings and at weekends."}</p>
+    <p class="eyebrow">On the menu</p>${menu.length ? `<ul class="hlist wlist">${menu.map((id) => `<li><span class="wpic">${dishArt(id, 46)}</span><span class="wtxt"><b>${esc(DISHES[id].n)}</b><small>${v.menu[id]} plate${v.menu[id] === 1 ? "" : "s"} left · ${DISHES[id].price} coins each</small></span></li>`).join("")}</ul>` : `<p class="muted">No small plates yet. Add some below: food brings more people in, and most glasses sell with a plate.</p>`}
     <p class="eyebrow">By the glass</p>${open2.length ? `<ul class="hlist wlist">${open2.map((s) => `<li><span class="wpic">${glassArt(s.type, 40)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${STYLES[s.type].n} · ${Math.max(1, Math.round(s.price / 4))} coins a glass</small></span></li>`).join("")}</ul>` : `<p class="muted">Stock the shelves and your wines are poured here too.</p>`}
-    <p class="muted">Glasses poured so far: ${v.glasses}. The food menu is still being dreamt up.</p>
+    <h3 class="ph3">Add to the menu</h3>
+    ${group("kitchen", "From the kitchen", "Bought with coins.")}
+    ${group("garden", "From your garden", "Cooked from what you've grown and picked.")}
+    ${group("market", "From Hana's market", "Treats from the market's Treats tab, out of your backpack.")}
+    <p class="muted">Served so far: ${v.glasses} glass${v.glasses === 1 ? "" : "es"} and ${v.plates} plate${v.plates === 1 ? "" : "s"}.</p>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function wireVine(root, F2, api4) {
@@ -3711,6 +3821,15 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
       const line = buy(F2, b.dataset.vybuy);
       if (line) {
         api4.sfx("coin");
+        api4.say(line);
+        api4.save();
+        api4.rerender();
+      }
+    });
+    root.querySelectorAll("[data-vymenu]").forEach((b) => b.onclick = () => {
+      const line = addDish(F2, b.dataset.vymenu);
+      if (line) {
+        api4.sfx("paper");
         api4.say(line);
         api4.save();
         api4.rerender();
@@ -4189,8 +4308,8 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
   }
   var sk = (art2, lines) => `<g filter="url(#marker)">${art2}</g><g filter="url(#wob)" fill="none" ${ink}>${lines}</g>`;
   function house(id, x, y, w, h, wall, roof, label2, tapeCol, extra2) {
-    const rx = x - 9, rw = w + 18, apex = y - h * 0.62;
-    const roofP = `M${rx} ${y} L${x + w / 2} ${apex} L${rx + rw} ${y}Z`;
+    const rx = x - 9, rw2 = w + 18, apex = y - h * 0.62;
+    const roofP = `M${rx} ${y} L${x + w / 2} ${apex} L${rx + rw2} ${y}Z`;
     const dx = x + w / 2 - 11, dy = y + h - 30;
     const art2 = `<path d="${roofP}" style="fill:${roof}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:${wall}"/>
     <rect x="${dx}" y="${dy}" width="22" height="30" rx="10" style="fill:var(--wood)"/>
@@ -4337,8 +4456,8 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
       <g filter="url(#wob)"><path class="flame" d="M268 604 q-2 -12 8 -20 q-1 8 6 10 q2 6 -2 10z" fill="#F6A23A" style="stroke:var(--line)" stroke-width="1"/><path class="flame" d="M274 604 q0 -7 4 -10 q1 6 3 7 q0 3 -2 3z" fill="#FFE08A"/></g></g>`;
   }
   function dogArt(x, y, awake) {
-    const fur = "#E3B07A", ear = "#A9744A", I2 = `style="stroke:var(--line)" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"`;
-    return `<g transform="translate(${x} ${y})" aria-label="Pancake the village dog"><g ${I2}>` + (awake ? `<path class="wag" d="M-9 -6 q-9 -4 -8 -14" fill="none"/><ellipse cx="-2" cy="-7" rx="9" ry="7" fill="${fur}"/><path d="M-6 0 v-4 M3 0 v-5" /><ellipse cx="5" cy="-17" rx="6.5" ry="6" fill="${fur}"/><ellipse cx="10" cy="-15" rx="3" ry="2.2" fill="#F2D3AE"/><circle cx="12.4" cy="-15.6" r="1.1" fill="var(--line)" stroke="none"/><path d="M1 -22 q-5 2 -3 9 q4 -2 3 -9z" fill="${ear}"/><circle cx="6.5" cy="-18.5" r=".9" fill="var(--line)" stroke="none"/><path d="M-3 -2 q6 3 11 -1" style="stroke:var(--rose)" stroke-width="2.2"/>` : `<path d="M-14 -3 q-4 -6 2 -9" fill="none"/><ellipse cx="0" cy="-5" rx="13" ry="6" fill="${fur}"/><ellipse cx="10" cy="-6" rx="6" ry="4.6" fill="${fur}"/><path d="M5 -10 q-4 1 -3 6 q3 -1 3 -6z" fill="${ear}"/><path d="M10 -7 q1.5 1 3 0" fill="none"/><path d="M15 -19 h4 l-4 5 h4 M21 -25 h3 l-3 4 h3" fill="none" stroke-width="1" opacity=".6"/>`) + `</g></g>`;
+    const fur = "#E3B07A", ear = "#A9744A", I22 = `style="stroke:var(--line)" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"`;
+    return `<g transform="translate(${x} ${y})" aria-label="Pancake the village dog"><g ${I22}>` + (awake ? `<path class="wag" d="M-9 -6 q-9 -4 -8 -14" fill="none"/><ellipse cx="-2" cy="-7" rx="9" ry="7" fill="${fur}"/><path d="M-6 0 v-4 M3 0 v-5" /><ellipse cx="5" cy="-17" rx="6.5" ry="6" fill="${fur}"/><ellipse cx="10" cy="-15" rx="3" ry="2.2" fill="#F2D3AE"/><circle cx="12.4" cy="-15.6" r="1.1" fill="var(--line)" stroke="none"/><path d="M1 -22 q-5 2 -3 9 q4 -2 3 -9z" fill="${ear}"/><circle cx="6.5" cy="-18.5" r=".9" fill="var(--line)" stroke="none"/><path d="M-3 -2 q6 3 11 -1" style="stroke:var(--rose)" stroke-width="2.2"/>` : `<path d="M-14 -3 q-4 -6 2 -9" fill="none"/><ellipse cx="0" cy="-5" rx="13" ry="6" fill="${fur}"/><ellipse cx="10" cy="-6" rx="6" ry="4.6" fill="${fur}"/><path d="M5 -10 q-4 1 -3 6 q3 -1 3 -6z" fill="${ear}"/><path d="M10 -7 q1.5 1 3 0" fill="none"/><path d="M15 -19 h4 l-4 5 h4 M21 -25 h3 l-3 4 h3" fill="none" stroke-width="1" opacity=".6"/>`) + `</g></g>`;
   }
   function laneArt() {
     const L2 = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
@@ -4501,6 +4620,14 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
         if (!j) return `<g opacity=".75">${sk(`<rect x="${x - 26}" y="${y - 282}" width="52" height="280" rx="12" style="fill:rgba(220,235,245,.35)"/>`, `<rect x="${x - 26}" y="${y - 282}" width="52" height="280" rx="12" stroke-dasharray="5 5"/><path d="M${x} ${y - 152} v20 M${x - 10} ${y - 142} h20" stroke-width="2"/>`)}</g>`;
         return `<svg x="${x - 34}" y="${y - 300}" width="80" height="300" overflow="visible" class="${isFull(j) ? "vfull" : ""}">${jarArt2(j, 68, 300, { id: "f" + j.slot, sparkle: isFull(j), markers: false })}</svg>`;
       }
+      // the town hall's weekly review desk: a small table with an open scrapbook, photos and washi tape
+      case "scrapbook":
+        return sk(
+          `<rect x="${x - 48}" y="${y - 30}" width="96" height="22" rx="3" style="fill:var(--wood)"/>
+        <path d="M${x - 40} ${y - 42} l38 -6 l38 6 v12 l-38 -4 l-38 4z" style="fill:#FFFDF6"/><rect x="${x - 34}" y="${y - 46}" width="14" height="12" transform="rotate(-6 ${x - 27} ${y - 40})" style="fill:#C3CDEE"/>
+        <rect x="${x - 16}" y="${y - 48}" width="12" height="10" transform="rotate(4 ${x - 10} ${y - 43})" style="fill:#F4C7CF"/><rect x="${x + 8}" y="${y - 46}" width="22" height="5" style="fill:#F3C969"/><path d="M${x + 28} ${y - 36} l6 -10 l4 2 l-6 10z" style="fill:var(--rose)"/>`,
+          `<rect x="${x - 48}" y="${y - 30}" width="96" height="22" rx="3"/><path d="M${x - 42} ${y - 8} v14 M${x + 42} ${y - 8} v14"/><path d="M${x - 40} ${y - 42} l38 -6 l38 6 v12 l-38 -4 l-38 4z M${x - 2} ${y - 48} v12"/><path d="M${x + 8} ${y - 37} h18 M${x + 8} ${y - 33} h14" opacity=".55"/>`
+        );
       // the wine shop: wine racks, the counter (front drawn over people, see foreArt), the honesty box, tasting tables
       case "wineshelf": {
         const n = G.vine ? Math.min(18, G.vineStock()) : 0;
@@ -6027,42 +6154,42 @@ Quests finished today: ${S3.doneIds.length}`;
     return list2.filter((t2) => t2 && t2._id && t2.title && !t2.deleted && !t2.isArchived && !t2.isBacklogged).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map(toQuest);
   }
   async function subtaskInSunsama(taskId, subtaskId, done) {
-    let mcp3 = null;
+    let mcp4 = null;
     try {
-      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp3 || !taskId || !subtaskId) return false;
+    if (!mcp4 || !taskId || !subtaskId) return false;
     try {
-      await mcp3.callTool(SUNSAMA, done ? "mark_subtask_as_completed" : "mark_subtask_as_incomplete", { taskId, subtaskId });
+      await mcp4.callTool(SUNSAMA, done ? "mark_subtask_as_completed" : "mark_subtask_as_incomplete", { taskId, subtaskId });
       return true;
     } catch (e) {
       return false;
     }
   }
   async function completeInSunsama(taskId, day) {
-    let mcp3 = null;
+    let mcp4 = null;
     try {
-      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp3 || !taskId) return false;
+    if (!mcp4 || !taskId) return false;
     try {
-      await mcp3.callTool(SUNSAMA, "mark_task_as_completed", { taskId, finishedDay: day });
+      await mcp4.callTool(SUNSAMA, "mark_task_as_completed", { taskId, finishedDay: day });
       return true;
     } catch (e) {
       return false;
     }
   }
   async function pullSunsama(day, opts = {}) {
-    let mcp3 = null;
+    let mcp4 = null;
     try {
-      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp3) return { error: "unavailable" };
+    if (!mcp4) return { error: "unavailable" };
     try {
-      const res = await mcp3.callTool(SUNSAMA, "read_resource", { uri: `sunsama://tasks/${day}` }, { cache: { staleTime: opts.fresh ? 0 : 6e4, refresh: !!opts.fresh } });
+      const res = await mcp4.callTool(SUNSAMA, "read_resource", { uri: `sunsama://tasks/${day}` }, { cache: { staleTime: opts.fresh ? 0 : 6e4, refresh: !!opts.fresh } });
       let p = res && res.payload;
       if (typeof p === "string") {
         try {
@@ -6103,16 +6230,16 @@ Quests finished today: ${S3.doneIds.length}`;
   var cache = { day: "", at: 0, events: [], error: null };
   async function todaysEvents(day, fresh2) {
     if (!fresh2 && cache.day === day && Date.now() - cache.at < 5 * 6e4) return cache;
-    let mcp3 = null;
+    let mcp4 = null;
     try {
-      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp3) return cache = { day, at: Date.now(), events: [], error: "unavailable" };
+    if (!mcp4) return cache = { day, at: Date.now(), events: [], error: "unavailable" };
     const startTime = `${day}T00:00:00+08:00`, end = new Date(Date.parse(startTime) + 864e5).toISOString().replace(".000Z", "Z");
     const results = await Promise.all(CALENDARS.map(async (c) => {
       try {
-        const r = await mcp3.callTool(GCAL, "list_events", { calendarId: c.id, startTime, endTime: end, orderBy: "startTime", timeZone: "Asia/Singapore", pageSize: 60 }, { cache: { staleTime: fresh2 ? 0 : 12e4, refresh: !!fresh2 } });
+        const r = await mcp4.callTool(GCAL, "list_events", { calendarId: c.id, startTime, endTime: end, orderBy: "startTime", timeZone: "Asia/Singapore", pageSize: 60 }, { cache: { staleTime: fresh2 ? 0 : 12e4, refresh: !!fresh2 } });
         let p = r && r.payload;
         if (typeof p === "string") {
           try {
@@ -6261,15 +6388,15 @@ Quests finished today: ${S3.doneIds.length}`;
   var cache2 = { at: 0, threads: [], error: null, busy: false };
   async function fetchPost(fresh2) {
     if (cache2.busy || !fresh2 && Date.now() - cache2.at < 2 * 6e4) return cache2;
-    let mcp3 = null;
+    let mcp4 = null;
     try {
-      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp3) return cache2 = { at: Date.now(), threads: [], error: "unavailable", busy: false };
+    if (!mcp4) return cache2 = { at: Date.now(), threads: [], error: "unavailable", busy: false };
     cache2.busy = true;
     try {
-      const r = await mcp3.callTool(GMAIL, "search_threads", { query: "is:unread in:inbox category:primary", pageSize: 15, view: "THREAD_VIEW_MINIMAL" }, { cache: { staleTime: fresh2 ? 0 : 6e4, refresh: !!fresh2 } });
+      const r = await mcp4.callTool(GMAIL, "search_threads", { query: "is:unread in:inbox category:primary", pageSize: 15, view: "THREAD_VIEW_MINIMAL" }, { cache: { staleTime: fresh2 ? 0 : 6e4, refresh: !!fresh2 } });
       let p = r && r.payload;
       if (typeof p === "string") {
         try {
@@ -7294,19 +7421,19 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
   async function readPlan(level2, opts = {}) {
     const title = planTitles()[level2];
     if (!title) return { level: level2, error: "unknown level" };
-    let mcp3 = null;
+    let mcp4 = null;
     try {
-      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp3) return { level: level2, title, error: "unavailable" };
+    if (!mcp4) return { level: level2, title, error: "unavailable" };
     const cache3 = { staleTime: 30 * 6e4 }, signal = opts.signal;
     try {
-      const s = unwrap(await mcp3.callTool(NOTION, "notion-search", { query: title, data_source_url: PLANS_DS, page_size: 5 }, { cache: cache3, signal }));
+      const s = unwrap(await mcp4.callTool(NOTION, "notion-search", { query: title, data_source_url: PLANS_DS, page_size: 5 }, { cache: cache3, signal }));
       const list2 = s && Array.isArray(s.results) ? s.results : [];
       const hit = list2.find((x) => x && String(x.title || "").trim() === title) || null;
       if (!hit) return { level: level2, title, error: "not found" };
-      const page = unwrap(await mcp3.callTool(NOTION, "notion-fetch", { id: hit.id || hit.url }, { cache: cache3, signal }));
+      const page = unwrap(await mcp4.callTool(NOTION, "notion-fetch", { id: hit.id || hit.url }, { cache: cache3, signal }));
       const raw = typeof page === "string" ? page : page && (page.text || "") || "", pm = /<properties>\s*(\{[\s\S]*?\})\s*<\/properties>/.exec(raw);
       let props2 = {};
       try {
@@ -7347,9 +7474,9 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     }
   }
   async function call(tool, input, fresh2) {
-    const mcp3 = await mcpUse();
-    if (!mcp3) throw { code: "unavailable" };
-    return unwrap2(await mcp3.callTool(CHORD, tool, input || {}, { cache: { staleTime: fresh2 ? 0 : 5 * 6e4, refresh: !!fresh2 } }));
+    const mcp4 = await mcpUse();
+    if (!mcp4) throw { code: "unavailable" };
+    return unwrap2(await mcp4.callTool(CHORD, tool, input || {}, { cache: { staleTime: fresh2 ? 0 : 5 * 6e4, refresh: !!fresh2 } }));
   }
   var CLIENT_ERRORS = {
     unavailable: "Chord isn't reachable from this view.",
@@ -7626,13 +7753,13 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     return p;
   };
   async function call2(tool, input, fresh2) {
-    let mcp3 = null;
+    let mcp4 = null;
     try {
-      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp3) throw { code: "unavailable" };
-    return unwrap3(await mcp3.callTool(CHORD, tool, input, { cache: { staleTime: fresh2 ? 0 : 10 * 6e4, refresh: !!fresh2 } }));
+    if (!mcp4) throw { code: "unavailable" };
+    return unwrap3(await mcp4.callTool(CHORD, tool, input, { cache: { staleTime: fresh2 ? 0 : 10 * 6e4, refresh: !!fresh2 } }));
   }
   var st3 = { data: null, busy: false, error: null, editing: false };
   var monthKey = (d) => String(d || "").slice(0, 7);
@@ -7670,7 +7797,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   function chart(d, target) {
     const ms = Object.keys(d.byMonth), vals = ms.map((k) => d.byMonth[k]), max = Math.max(1, target || 0, ...vals) * 1.15;
     const W2 = 320, H3 = 150, L2 = 8, B = 128, T = 14, bw = 36, gap = (W2 - L2 * 2 - bw * 6) / 5, y = (v) => B - (B - T) * v / max;
-    const bars = ms.map((k, i) => {
+    const bars2 = ms.map((k, i) => {
       const x = L2 + i * (bw + gap), v = vals[i], top = y(v), h = Math.max(0, B - top), cur2 = i === ms.length - 1;
       const r = Math.min(4, h);
       const path = h > 0 ? `M${x} ${B} V${top + r} Q${x} ${top} ${x + r} ${top} H${x + bw - r} Q${x + bw} ${top} ${x + bw} ${top + r} V${B}z` : "";
@@ -7678,7 +7805,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       ${cur2 || v === Math.max(...vals) && v > 0 ? `<text x="${x + bw / 2}" y="${top - 4}" text-anchor="middle" class="rval">${money2(v, d.currency)}</text>` : ""}<text x="${x + bw / 2}" y="${B + 14}" text-anchor="middle" class="rax">${mlabel(k)}</text></g>`;
     }).join("");
     const tl = target ? `<path d="M${L2} ${y(target)} H${W2 - L2}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W2 - L2}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money2(target, d.currency)}</text>` : "";
-    return `<svg class="rchart" viewBox="0 0 ${W2} ${H3}" role="img" aria-label="Paid income by month, last six months"><path d="M${L2} ${B} H${W2 - L2}" stroke="#D8CFC2" stroke-width="1"/>${bars}${tl}</svg>`;
+    return `<svg class="rchart" viewBox="0 0 ${W2} ${H3}" role="img" aria-label="Paid income by month, last six months"><path d="M${L2} ${B} H${W2 - L2}" stroke="#D8CFC2" stroke-width="1"/>${bars2}${tl}</svg>`;
   }
   var revenueNow = () => {
     if (!st3.data) return null;
@@ -7893,6 +8020,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     });
   }
   var journalCount = () => live().length;
+  var journalSince = (ms) => live().filter((e) => e.at >= ms).length;
   function scratchPanel() {
     const ago4 = SC.updatedAt ? Math.round((Date.now() - SC.updatedAt) / 6e4) : null;
     return `<span class="tape stripe" aria-hidden="true"></span><h2>Scratchpad</h2><p class="sub">Jot anything down. It saves as you type, and it's only yours.</p>
@@ -7923,6 +8051,172 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
         rerender();
       });
     };
+  }
+
+  // src/game/review.js
+  var WD2 = ["M", "T", "W", "T", "F", "S", "S"];
+  var weekStart = (d = dayKey()) => {
+    const t2 = /* @__PURE__ */ new Date(d + "T00:00:00Z");
+    return new Date(t2.getTime() - (t2.getUTCDay() + 6) % 7 * 864e5).toISOString().slice(0, 10);
+  };
+  var weekDays = (ws) => Array.from({ length: 7 }, (_, i) => new Date(Date.parse(ws + "T00:00:00Z") + i * 864e5).toISOString().slice(0, 10));
+  var nextMonday = (d = dayKey()) => new Date(Date.parse(weekStart(d) + "T00:00:00Z") + 7 * 864e5).toISOString().slice(0, 10);
+  var sgMidnight = (d) => Date.parse(d + "T00:00:00+08:00");
+  var fmtDay = (d) => (/* @__PURE__ */ new Date(d + "T00:00:00Z")).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+  var rw = { obj: null, objErr: false, objFor: "", sending: false, draft: null, showPast: false };
+  var mcp = async () => {
+    try {
+      return window.claude && claude.use ? await claude.use("mcp") : null;
+    } catch {
+      return null;
+    }
+  };
+  async function loadObjectives(day = dayKey()) {
+    if (rw.objFor === day && rw.obj) return;
+    const m = await mcp();
+    if (!m) {
+      rw.objErr = true;
+      rw.noMcp = true;
+      return;
+    }
+    try {
+      const r = await m.callTool(SUNSAMA, "read_resource", { uri: `sunsama://objectives/${day}` }, { cache: { staleTime: 5 * 6e4 } });
+      let p = r && r.payload;
+      if (typeof p === "string") {
+        try {
+          p = JSON.parse(p);
+        } catch {
+        }
+      }
+      if (p && Array.isArray(p.contents) && p.contents[0] && p.contents[0].text) {
+        try {
+          p = JSON.parse(p.contents[0].text);
+        } catch {
+        }
+      }
+      rw.obj = (p && Array.isArray(p.objectives) ? p.objectives : []).filter((o) => o && o.title).map((o) => ({ title: plain(String(o.title)).slice(0, 120), done: !!o.completed }));
+      rw.objFor = day;
+      rw.objErr = false;
+    } catch {
+      rw.objErr = true;
+    }
+  }
+  async function createObjective(title, weekStartDay) {
+    const m = await mcp();
+    if (!m) return false;
+    try {
+      await m.callTool(SUNSAMA, "create_weekly_objective", { title, weekStartDay });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  function gather(c) {
+    const ws = weekStart(c.today), days = weekDays(ws), since = sgMidnight(ws);
+    const rows2 = days.map((d) => d > c.today ? null : Object.assign({ q: 0, steps: 0, water: 0, harvest: 0, coins: 0 }, c.history(d) || {}));
+    const past = rows2.filter(Boolean), sum = (k) => past.reduce((a, r) => a + (r[k] || 0), 0);
+    const best = past.reduce((a, r, i) => r.q > a.q ? { q: r.q, d: days[i] } : a, { q: 0, d: null });
+    const jars = c.jars().map((j) => ({ label: j.label, cur: j.cur || "$", added: (j.log || []).filter((e) => e.at >= since && e.amt > 0 && !e.emptied).reduce((a, e) => a + e.amt, 0), filled: !!(j.fullAt && j.fullAt >= since) }));
+    return {
+      ws,
+      days,
+      rows: rows2,
+      today: c.today,
+      quests: sum("q"),
+      best,
+      coins: sum("coins"),
+      steps: sum("steps"),
+      harvest: sum("harvest"),
+      walked: past.filter((r) => r.steps >= 5e3).length,
+      water: past.filter((r) => r.water > 0).length ? sum("water") / past.filter((r) => r.water > 0).length : 0,
+      routines: c.routines(days),
+      trophies: (c.F.trophies || []).filter((t2) => t2.at >= since).sort((a, b) => a.at - b.at),
+      jars: jars.filter((j) => j.added || j.filled),
+      letters: c.letters(since),
+      journal: c.journal(since)
+    };
+  }
+  var card3 = (title, icon2, body2, tape) => `<section class="rvcard"><span class="rvtape ${tape || ""}" aria-hidden="true"></span><h3>${icon2}${esc(title)}</h3>${body2}</section>`;
+  var ico = (path) => `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" class="rvico"><g fill="none" stroke="#3b3530" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${path}</g></svg>`;
+  var I2 = {
+    quests: ico(`<rect x="5" y="3" width="14" height="18" rx="2" fill="#F6E3A1"/><path d="M8 9 l2 2 l4 -4 M8 15 h8"/>`),
+    routine: ico(`<rect x="4" y="4" width="16" height="16" rx="3" fill="#D6E8F7"/><path d="M8 9 h8 M8 13 h8 M8 17 h5"/>`),
+    trophy: ico(`<path d="M8 4 h8 v5 a4 4 0 0 1 -8 0z" fill="#F3C969"/><path d="M8 6 h-3 a3 3 0 0 0 3 4 M16 6 h3 a3 3 0 0 1 -3 4 M12 13 v4 M8 20 h8"/>`),
+    jar: ico(`<path d="M7 7 h10 v11 a2 2 0 0 1 -2 2 h-6 a2 2 0 0 1 -2 -2z" fill="#E3F0F5"/><rect x="6" y="4" width="12" height="3" rx="1" fill="#C9A227"/><path d="M10 14 l2 -2 l2 2 l-2 2z" fill="#D9485F"/>`),
+    letter: ico(`<rect x="3" y="6" width="18" height="13" rx="2" fill="#FFFDF6"/><path d="M3 7 l9 6 l9 -6"/>`),
+    garden: ico(`<path d="M12 21 V11" /><path d="M12 13 q-6 0 -6 -6 q6 0 6 6z M12 11 q6 0 6 -6 q-6 0 -6 6z" fill="#9CC27E"/>`),
+    body: ico(`<circle cx="12" cy="5" r="2.4" fill="#F4C7CF"/><path d="M12 8 v7 M8 11 h8 M12 15 l-3 6 M12 15 l3 6"/>`),
+    goal: ico(`<circle cx="12" cy="12" r="8" fill="#FBE3D2"/><circle cx="12" cy="12" r="4.5" fill="#FFFDF6"/><circle cx="12" cy="12" r="1.6" fill="#D9485F"/>`),
+    star: ico(`<path d="M12 3 l2.6 5.6 6 .7 -4.5 4.1 1.2 6 -5.3 -3 -5.3 3 1.2 -6 -4.5 -4.1 6 -.7z" fill="#F6E3A1"/>`)
+  };
+  function bars(w) {
+    const max = Math.max(3, ...w.rows.map((r) => r ? r.q : 0));
+    return `<svg class="rvbars" viewBox="0 0 196 70" width="196" height="70" aria-hidden="true">${w.rows.map((r, i) => {
+      const x = 8 + i * 27, hgt = r ? Math.max(r.q ? 6 : 2, 46 * r.q / max) : 2, today2 = w.days[i] === w.today;
+      return `<rect x="${x}" y="${50 - hgt}" width="18" height="${hgt}" rx="3" fill="${!r ? "#EAE3D8" : today2 ? "#F3C969" : "#9AA9DD"}" stroke="${r ? "#3b3530" : "none"}" stroke-width="1.2"/>${r && r.q ? `<text x="${x + 9}" y="${44 - hgt}" text-anchor="middle" font-size="10" font-weight="700" fill="#2F2B28">${r.q}</text>` : ""}<text x="${x + 9}" y="64" text-anchor="middle" font-size="10" font-weight="${today2 ? 800 : 600}" fill="${today2 ? "#2F2B28" : "#8A8279"}">${WD2[i]}</text>`;
+    }).join("")}</svg>`;
+  }
+  var dots = (days) => `<span class="rvdots">${days.map((d, i) => `<i class="${d === true ? "on" : d === false ? "off" : "na"}" title="${WD2[i]}">${WD2[i]}</i>`).join("")}</span>`;
+  function reviewPanel(F2, c) {
+    const w = gather(c), rev = (F2.reviews || {})[w.ws], nm = nextMonday(c.today), fri = (/* @__PURE__ */ new Date(c.today + "T00:00:00Z")).getUTCDay() === 5;
+    if (!rw.draft || rw.draft.ws !== w.ws) rw.draft = { ws: w.ws, p: rev ? rev.priorities.slice() : ["", "", ""] };
+    let h = `<span class="tape dots" aria-hidden="true"></span><h2>Your week in the village</h2>
+    <p class="sub">${fmtDay(w.days[0])} to ${fmtDay(w.days[6])}${fri ? ". Happy Friday! Here's everything you did." : ". The week so far."}</p><div class="rvgrid">`;
+    h += card3(`${w.quests} quest${w.quests === 1 ? "" : "s"} done`, I2.quests, `${bars(w)}<p class="rvnote">${w.best.q ? `Best day: ${(/* @__PURE__ */ new Date(w.best.d + "T00:00:00Z")).toLocaleDateString("en-GB", { weekday: "long", timeZone: "UTC" })}, with ${w.best.q}.` : "The week's just getting going."} ${w.coins} coins earned.</p>`, "peach");
+    const rt = w.routines.filter((r) => r.days.some((d) => d !== null));
+    h += card3("Routines kept", I2.routine, rt.length ? rt.map((r) => {
+      const due = r.days.filter((d) => d !== null).length, kept = r.days.filter((d) => d === true).length;
+      return `<div class="rvrow"><b>${esc(r.name)}</b><small>${kept} of ${due} day${due === 1 ? "" : "s"}</small>${dots(r.days)}</div>`;
+    }).join("") : `<p class="rvnote">No routines due yet this week. They live on the noticeboard in your room.</p>`, "sky");
+    h += card3(w.trophies.length ? `${w.trophies.length} new troph${w.trophies.length === 1 ? "y" : "ies"}` : "Trophies", I2.trophy, w.trophies.length ? `<div class="rvtroph">${w.trophies.slice(0, 6).map((t2) => `<figure>${c.trophySVG(t2, 46)}<figcaption>${esc(t2.label)}</figcaption></figure>`).join("")}</div>` : `<p class="rvnote">None new this week. The next one's closer than you think.</p>`, "butter");
+    h += card3("Savings", I2.jar, w.jars.length ? w.jars.map((j) => `<div class="rvrow"><b>${esc(j.label)}</b><small>${j.added ? `+${esc(j.cur)}${j.added.toLocaleString("en-GB")}` : ""}${j.filled ? " · filled to the top!" : ""}</small></div>`).join("") : `<p class="rvnote">No jewels added this week. Opal's always in.</p>`, "sage");
+    h += card3("Words", I2.letter, `<div class="rvrow"><b>${w.journal}</b><small>journal page${w.journal === 1 ? "" : "s"}</small></div><div class="rvrow"><b>${w.letters.universe}</b><small>letter${w.letters.universe === 1 ? "" : "s"} to the universe</small></div><div class="rvrow"><b>${w.letters.future}</b><small>letter${w.letters.future === 1 ? "" : "s"} to future you</small></div>`, "blush");
+    h += card3("Body and garden", I2.body, `<div class="rvrow"><b>${w.steps.toLocaleString("en-GB")}</b><small>steps${w.walked ? `, ${w.walked} day${w.walked === 1 ? "" : "s"} over 5,000` : ""}</small></div><div class="rvrow"><b>${w.water ? (w.water / 1e3).toFixed(1) + "L" : "-"}</b><small>water a day, on average</small></div><div class="rvrow"><b>${w.harvest}</b><small>harvest${w.harvest === 1 ? "" : "s"} from the garden</small></div>`, "peach");
+    const ob = rw.objFor === c.today ? rw.obj : null;
+    h += `</div>` + card3("This week's objectives", I2.goal, !c.canSend ? `<p class="rvnote">Connect Sunsama to see your weekly objectives here.</p>` : rw.objErr && !ob ? `<p class="rvnote">Couldn't reach Sunsama just now.</p>` : !ob ? `<p class="rvnote">Fetching them from Sunsama…</p>` : !ob.length ? `<p class="rvnote">No weekly objectives set in Sunsama this week.</p>` : `<ul class="rvobj">${ob.map((o) => `<li class="${o.done ? "done" : ""}"><span class="rvtick" aria-hidden="true"></span>${esc(o.title)}</li>`).join("")}</ul><p class="rvnote">${ob.filter((o) => o.done).length} of ${ob.length} done${ob.every((o) => o.done) ? ". Every one! That's a rosette in the courtyard." : "."}</p>`, "sky wide");
+    const sent = rev && rev.sent && rev.sent.some(Boolean);
+    h += `<section class="rvcard rvnext"><span class="rvtape butter" aria-hidden="true"></span><h3>${I2.star}Next week's three priorities</h3>
+    <p class="rvnote">Week of ${fmtDay(nm)}. ${c.canSend ? "They go to Sunsama as next week's weekly objectives." : "Saved here (Sunsama isn't connected)."}</p>
+    <ol class="rvprio">${[0, 1, 2].map((i) => {
+      const ok = rev && rev.sent && rev.sent[i];
+      return `<li><label class="sr" for="rvP${i}">Priority ${i + 1}</label><input id="rvP${i}" class="rvp" data-i="${i}" maxlength="120" placeholder="${["The one that matters most", "Then this", "And this"][i]}" value="${esc(rw.draft.p[i] || "")}" ${ok ? "disabled" : ""}>${ok ? `<span class="rvok" title="In Sunsama">in Sunsama</span>` : ""}</li>`;
+    }).join("")}</ol>
+    <div class="actions"><button class="btn primary" data-rv="send" ${rw.sending ? "disabled" : ""}>${rw.sending ? "Sending…" : sent ? rev.sent.every((x, i) => x || !rev.priorities[i]) ? "Update the review" : "Try the rest again" : c.canSend ? "Send to Sunsama and finish" : "Finish the review"}</button></div>
+    ${rev ? `<p class="rvnote">Reviewed ${new Date(rev.at).toLocaleDateString("en-GB", { weekday: "long", timeZone: "Asia/Singapore" })}. Well done.</p>` : ""}</section>`;
+    const past = Object.keys(F2.reviews || {}).filter((k) => k !== w.ws).sort().reverse().slice(0, 8);
+    if (past.length) h += `<button class="subdonebtn" data-rv="past" aria-expanded="${rw.showPast}">Past weeks (${past.length}) ${rw.showPast ? "▴" : "▾"}</button>${rw.showPast ? `<ul class="hlist wlist">${past.map((k) => `<li><span class="wtxt"><b>Week of ${fmtDay(k)}</b><small>${F2.reviews[k].priorities.filter(Boolean).map(esc).join(" · ") || "no priorities set"}</small></span></li>`).join("")}</ul>` : ""}`;
+    return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function wireReview(root, F2, api4) {
+    root.querySelectorAll(".rvp").forEach((inp) => inp.oninput = () => {
+      rw.draft.p[+inp.dataset.i] = inp.value;
+    });
+    root.querySelectorAll("[data-rv]").forEach((b) => b.onclick = async () => {
+      if (b.dataset.rv === "past") {
+        rw.showPast = !rw.showPast;
+        api4.rerender();
+        return;
+      }
+      const ws = weekStart(api4.today), nm = nextMonday(api4.today), pr = rw.draft.p.map((x) => plain(String(x || "")).trim().slice(0, 120));
+      if (!pr.some(Boolean)) {
+        api4.say("Pop in at least one priority for next week first.");
+        return;
+      }
+      F2.reviews = F2.reviews || {};
+      const first = !F2.reviews[ws], rev = F2.reviews[ws] = Object.assign({ sent: [] }, F2.reviews[ws] || {}, { priorities: pr, at: (F2.reviews[ws] || {}).at || now() });
+      if (api4.canSend) {
+        rw.sending = true;
+        api4.rerender();
+        for (let i = 0; i < 3; i++) if (pr[i] && !rev.sent[i]) rev.sent[i] = await createObjective(pr[i], nm);
+        rw.sending = false;
+      }
+      if (first) api4.coins(15);
+      api4.sfx("chime");
+      api4.save();
+      const bad = api4.canSend && pr.some((p, i) => p && !rev.sent[i]);
+      api4.say(bad ? "Saved. Some didn't reach Sunsama, so tap again in a bit." : first ? `Week reviewed! ${api4.canSend ? "Next week's priorities are in Sunsama. " : ""}Plus 15 coins. Rest well.` : "Review updated.");
+      api4.rerender();
+    });
   }
 
   // src/game/letters.js
@@ -7991,6 +8285,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   };
   var universe = () => L.items.filter((e) => e.kind === "universe");
   var future = () => L.items.filter((e) => e.kind === "future");
+  var writtenSince = (ms) => ({ universe: universe().filter((e) => e.at >= ms).length, future: future().filter((e) => e.at >= ms).length });
   var arrived = () => [...universe().filter((e) => e.reply && e.reply.due <= Date.now() && !e.reply.read), ...future().filter((e) => e.deliver <= dayKey() && !e.read)];
   function announce() {
     const out = arrived().filter((e) => !(e.kind === "universe" ? e.reply.told : e.told));
@@ -8187,7 +8482,7 @@ ${e.text}`;
     }
     return p;
   };
-  async function mcp() {
+  async function mcp2() {
     try {
       return window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
@@ -8202,7 +8497,7 @@ ${e.text}`;
   };
   var nice = (d) => (/* @__PURE__ */ new Date(d + "T00:00:00Z")).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   async function lastVision() {
-    const m = await mcp();
+    const m = await mcp2();
     if (!m) return null;
     try {
       const s = unwrap4(await m.callTool(NOTION, "notion-search", { query: "Week of", data_source_url: "collection://" + VIS_DS, page_size: 5 }, { cache: { staleTime: 30 * 6e4 } }));
@@ -8225,7 +8520,7 @@ ${e.text}`;
     return null;
   }
   async function cyclePhase() {
-    const m = await mcp(), tans = CALENDARS.find((c) => c.name === "The Tans");
+    const m = await mcp2(), tans = CALENDARS.find((c) => c.name === "The Tans");
     if (!m || !tans) return "";
     try {
       const end = (/* @__PURE__ */ new Date()).toISOString().replace(/\.\d+Z$/, "Z"), start = new Date(Date.now() - 45 * 864e5).toISOString().replace(/\.\d+Z$/, "Z");
@@ -8371,7 +8666,7 @@ Return JSON only: {"summary": "...", "theme": "...", "word": "...", "actions": [
           vz.busy = true;
           vz.error = "";
           api4.rerender();
-          const m = await mcp();
+          const m = await mcp2();
           if (!m) {
             vz.busy = false;
             vz.error = "Notion and Sunsama aren't reachable from this view. Your visualisation is kept here.";
@@ -8538,6 +8833,15 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return lists().filter((l) => l.kind === "weekly" && l.days && l.days[k]).map((l) => ({ name: l.name, text: l.days[k], done: tickOf(l.id, k) }));
   }
   var checklistLeft = () => lists().filter((l) => l.kind === "checklist").reduce((n, l) => n + l.items.filter((i) => !tickOf(l.id, i.id)).length, 0);
+  function weekRoutines(dayKeys) {
+    const today2 = dayKey();
+    return lists().map((l) => ({ name: l.name, kind: l.kind, days: dayKeys.map((d) => {
+      if (d > today2) return null;
+      if (l.kind === "checklist") return l.items.length ? l.items.every((i) => tickOf(l.id, i.id, d)) : null;
+      const k = DAYS2[((/* @__PURE__ */ new Date(d + "T00:00:00Z")).getUTCDay() + 6) % 7];
+      return l.days && l.days[k] ? tickOf(l.id, k, d) : null;
+    }) }));
+  }
   function parseWeek(text) {
     const out = {};
     String(text || "").split(/\n|;/).forEach((line) => {
@@ -8896,17 +9200,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return p;
   };
   async function fetchPersonal(fresh2) {
-    let mcp3 = null;
+    let mcp4 = null;
     try {
-      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp3) {
+    if (!mcp4) {
       st4.mineErr = "unavailable";
       return;
     }
     try {
-      const p = unwrap5(await mcp3.callTool(ZAPIER, "execute_zapier_read_action", { ...ZAP_GMAIL, params: { query: PERSONAL_QUERY } }, { cache: { staleTime: fresh2 ? 0 : 5 * 6e4, refresh: !!fresh2 } }));
+      const p = unwrap5(await mcp4.callTool(ZAPIER, "execute_zapier_read_action", { ...ZAP_GMAIL, params: { query: PERSONAL_QUERY } }, { cache: { staleTime: fresh2 ? 0 : 5 * 6e4, refresh: !!fresh2 } }));
       const list2 = p && Array.isArray(p.results) ? p.results : [];
       st4.mine = list2.slice(0, 12).map((m) => ({
         from: plain(String(m.from && (m.from.name || m.from.email) || "")).slice(0, 40),
@@ -9172,7 +9476,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!a.date && t2 <= Date.now() + 3e4) t2 += 864e5;
     return t2 > Date.now() && t2 < Date.now() + 366 * 864e5 ? t2 : null;
   }
-  async function mcp2() {
+  async function mcp3() {
     try {
       return window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
@@ -9197,7 +9501,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return typeof id === "string" ? id : null;
   }
   async function createEvent(text, at) {
-    const m = await mcp2();
+    const m = await mcp3();
     if (!m) throw { code: "unavailable" };
     const r = await m.callTool(GCAL, "create_event", {
       calendarId: CAL.id,
@@ -9233,7 +9537,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!r) return null;
     r.cancelled = true;
     save3();
-    const m = await mcp2();
+    const m = await mcp3();
     if (m && r.eventId) {
       try {
         await m.callTool(GCAL, "delete_event", { calendarId: r.cal || CAL.id, eventId: r.eventId, notificationLevel: "NONE" });
@@ -9956,6 +10260,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     compost: { n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster." },
     sprinkler: { n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them." }
   };
+  var reviewOpen = false;
   var vyView = null;
   var vyAt = null;
   var vaultView = null;
@@ -9983,6 +10288,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   lettersOpen = false;
   vaultView = null;
   vyView = null;
+  reviewOpen = false;
   var jv = { mode: "shelf", blobs: [], note: "" };
   var BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]];
   var CYCLE = 12;
@@ -10557,6 +10863,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (hushed() && !$("speech").hidden && Date.now() > speechLock && Date.now() - speechAt > 6e3) $("speech").hidden = true;
     bedtimeTick();
     vineTick();
+    reviewNudge();
     $("evan").style.display = evanHere() ? "" : "none";
     if (scene === "kidroom" && evanNight() && !kid.sleep) {
       kid.sleep = true;
@@ -11189,6 +11496,10 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     rabbits: "base:run",
     market: "market",
     well: "village:well",
+    "weekly review": "hall:review",
+    review: "hall:review",
+    scrapbook: "hall:review",
+    "week review": "hall:review",
     vineyard: "vineyard:barrels",
     vines: "vineyard:vinestall",
     "barrel shed": "vineyard:barrels",
@@ -11415,7 +11726,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"vineyard|barrels|wine shop|honesty box|tasting room|playground|home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"weekly review|vineyard|barrels|wine shop|honesty box|tasting room|playground|home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -11999,6 +12310,7 @@ Then tell chat "wind down" whenever you're ready.`
     lettersOpen = false;
     vaultView = null;
     vyView = null;
+    reviewOpen = false;
     selPlot = null;
     homeView = null;
     postOpen = false;
@@ -12070,6 +12382,7 @@ Then tell chat "wind down" whenever you're ready.`
     else if (homeView && scene === "home") h = hestiaPanel(homeView);
     else if (deskOpen && scene === "home") h = deskPanel();
     else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
+    else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
     else if (vyView && (scene === "vineyard" || scene === "wineshop")) h = vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F) : vyView === "shelf" ? shelfPanel(F) : vyView === "counter" ? counterPanel(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter((n) => n.id !== "celeste" && isHere(n.id)).map((n) => n.name));
     else if (kudosOpen && scene === "trophy") h = kudosPanel();
     else if (trophyView && scene === "trophy") h = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : trophyView === "affirm" ? affirmPanel(F.affirm, affirmBusy, !!sampleCap) : trophyView === "fountain" ? fountainPanel(!!sampleCap) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
@@ -12182,6 +12495,11 @@ Then tell chat "wind down" whenever you're ready.`
     } });
     if (homeView && scene === "home") wireHestia(c, homeView);
     if (deskOpen && scene === "home") wireDesk(c, () => ctx());
+    if (reviewOpen && scene === "hall") wireReview(c, F, { save: () => save2(), rerender: () => ctx(), say: (l) => speak(l, 5e3, true), sfx, canSend: !rw.noMcp, today: dayKey(), coins: (n) => {
+      F.coins += n;
+      S2.earned = (S2.earned || 0) + n;
+      flash(`+${n} coins: weekly review`);
+    } });
     if (vyView && (scene === "vineyard" || scene === "wineshop")) wireVine(c, F, { save: () => save2(true), rerender: () => {
       ctx();
       drawScene();
@@ -12208,6 +12526,7 @@ Then tell chat "wind down" whenever you're ready.`
       }, undoable, sfx, close: () => {
         vaultView = null;
         vyView = null;
+        reviewOpen = false;
         ctx();
         drawScene();
       }, poured: vaultPoured });
@@ -12245,6 +12564,7 @@ Then tell chat "wind down" whenever you're ready.`
         lettersOpen = false;
         vaultView = null;
         vyView = null;
+        reviewOpen = false;
         ctx();
         drawScene();
       } });
@@ -12256,6 +12576,7 @@ Then tell chat "wind down" whenever you're ready.`
           lettersOpen = false;
           vaultView = null;
           vyView = null;
+          reviewOpen = false;
           ctx();
           sfx("coin");
           mprop("sparkle", 260 + rnd(-20, 20), 400);
@@ -12325,6 +12646,7 @@ Then tell chat "wind down" whenever you're ready.`
       lettersOpen = false;
       vaultView = null;
       vyView = null;
+      reviewOpen = false;
       ctx();
     });
     c.querySelectorAll("[data-bed]").forEach((b) => b.onclick = () => bedAction(b.dataset.bed));
@@ -12360,6 +12682,7 @@ Then tell chat "wind down" whenever you're ready.`
         lettersOpen = false;
         vaultView = null;
         vyView = null;
+        reviewOpen = false;
         A.decompNow();
         drawScene();
       } else startBreath(+k);
@@ -12522,7 +12845,7 @@ Then tell chat "wind down" whenever you're ready.`
   function hestiaMarks() {
     const g = $("hmarks");
     if (!g) return;
-    const c = hestiaCounts(), badge = (x, y, n, ico) => `<g transform="translate(${x} ${y})" class="hmark" pointer-events="none"><g class="qmark">${`<circle r="13" fill="#FFF6E2" style="stroke:var(--line)" stroke-width="1.3"/>`}<svg x="-9" y="-10" width="18" height="18" viewBox="0 0 24 24" overflow="visible">${icon(ico, 18).replace(/^<svg[^>]*>|<\/svg>$/g, "")}</svg>${n ? `<circle cx="11" cy="-10" r="7" fill="#E8574C"/><text x="11" y="-6.6" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff" font-family="Mulish,sans-serif">${n}</text>` : ""}</g></g>`;
+    const c = hestiaCounts(), badge = (x, y, n, ico2) => `<g transform="translate(${x} ${y})" class="hmark" pointer-events="none"><g class="qmark">${`<circle r="13" fill="#FFF6E2" style="stroke:var(--line)" stroke-width="1.3"/>`}<svg x="-9" y="-10" width="18" height="18" viewBox="0 0 24 24" overflow="visible">${icon(ico2, 18).replace(/^<svg[^>]*>|<\/svg>$/g, "")}</svg>${n ? `<circle cx="11" cy="-10" r="7" fill="#E8574C"/><text x="11" y="-6.6" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff" font-family="Mulish,sans-serif">${n}</text>` : ""}</g></g>`;
     let h = "";
     if (scene === "base" && (c.chores || c.shop)) h = badge(232, 170, c.chores + c.shop, "broom");
     if (scene === "home") {
@@ -12717,6 +13040,7 @@ Then tell chat "wind down" whenever you're ready.`
       lettersOpen = false;
       vaultView = null;
       vyView = null;
+      reviewOpen = false;
       homeView = null;
       postOpen = false;
       healthOpen = false;
@@ -12804,9 +13128,9 @@ Then tell chat "wind down" whenever you're ready.`
     if (cur2 !== target) {
       const tIn = INNER[target] ? INNER[target].parent : target;
       if (INNER[cur2] && cur2 !== tIn) {
-        const I2 = INNER[cur2], from = cur2;
-        legs.push({ scene: from, x: I2.exit[0], y: I2.exit[1], fn: () => setScene(I2.parent, I2.door) });
-        cur2 = I2.parent;
+        const I3 = INNER[cur2], from = cur2;
+        legs.push({ scene: from, x: I3.exit[0], y: I3.exit[1], fn: () => setScene(I3.parent, I3.door) });
+        cur2 = I3.parent;
       }
       if (cur2 !== tIn) {
         const curOut = outdoorOf(cur2), tOut = outdoorOf(tIn), c0 = cur2;
@@ -12824,8 +13148,8 @@ Then tell chat "wind down" whenever you're ready.`
         }
       }
       if (INNER[target]) {
-        const I2 = INNER[target];
-        legs.push({ scene: I2.parent, x: I2.door[0], y: I2.door[1], fn: () => setScene(target, I2.arrive) });
+        const I3 = INNER[target];
+        legs.push({ scene: I3.parent, x: I3.door[0], y: I3.door[1], fn: () => setScene(target, I3.arrive) });
       }
     }
     legs.push({ scene: target, x, y, fn });
@@ -12852,6 +13176,7 @@ Then tell chat "wind down" whenever you're ready.`
     lettersOpen = false;
     vaultView = null;
     vyView = null;
+    reviewOpen = false;
     homeView = null;
     postOpen = false;
     healthOpen = false;
@@ -13086,6 +13411,15 @@ Then tell chat "wind down" whenever you're ready.`
       save2();
       return;
     }
+    if (scene === "hall" && id === "review") {
+      reviewOpen = true;
+      sfx("paper", true);
+      render();
+      loadObjectives(dayKey()).then(() => {
+        if (reviewOpen) ctx();
+      });
+      return;
+    }
     if (scene === "hall" && id === "whiteboard") {
       scratchOpen = true;
       sfx("paper", true);
@@ -13227,6 +13561,17 @@ Then tell chat "wind down" whenever you're ready.`
       speak(phase() === "break" ? "Perfect break spot. Breathe." : VILLAGE.pond.line, 4e3);
       render();
     }
+  }
+  function reviewCtx() {
+    noteHistory();
+    return { F, today: dayKey(), history: (d) => F.history[d], routines: weekRoutines, jars: allJars, letters: writtenSince, journal: journalSince, trophySVG, canSend: !rw.noMcp };
+  }
+  function reviewNudge() {
+    const d = (/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).getUTCDay(), hm2 = sgHM();
+    if (!(d === 5 && hm2 >= 14 * 60 || d === 6 || d === 0) || (F.reviews || {})[weekStart()] || S2.reviewSaid || quietNow()) return;
+    S2.reviewSaid = true;
+    speak("Your week in the village is ready: a scrapbook at the town hall. Ten minutes, then next week's three priorities.", 7e3);
+    save2();
   }
   var serving = () => scene === "wineshop" && atSpot === "wcounter";
   function vineTick() {
@@ -13391,12 +13736,12 @@ Then tell chat "wind down" whenever you're ready.`
   async function fetchObjectives() {
     if (Date.now() - objAt < 20 * 6e4) return;
     objAt = Date.now();
-    let mcp3 = null;
+    let mcp4 = null;
     try {
-      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp3) return;
+    if (!mcp4) return;
     const monday = (d) => {
       const t2 = /* @__PURE__ */ new Date(d + "T00:00:00Z");
       return new Date(t2.getTime() - (t2.getUTCDay() + 6) % 7 * 864e5).toISOString().slice(0, 10);
@@ -13404,7 +13749,7 @@ Then tell chat "wind down" whenever you're ready.`
     const days = [dayKey(), new Date(Date.parse(dayKey() + "T00:00:00Z") - 7 * 864e5).toISOString().slice(0, 10)];
     for (const d of days) {
       try {
-        const r = await mcp3.callTool(SUNSAMA, "read_resource", { uri: `sunsama://objectives/${d}` }, { cache: { staleTime: 10 * 6e4 } });
+        const r = await mcp4.callTool(SUNSAMA, "read_resource", { uri: `sunsama://objectives/${d}` }, { cache: { staleTime: 10 * 6e4 } });
         let p = r && r.payload;
         if (typeof p === "string") {
           try {
@@ -13555,8 +13900,8 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     kid.open = null;
     stopKidGame();
     kid.sleep = false;
-    const I2 = INNER.kidroom;
-    setScene("home", [I2.door[0] - 10, I2.door[1] + 24]);
+    const I3 = INNER.kidroom;
+    setScene("home", [I3.door[0] - 10, I3.door[1] + 24]);
   }
   function toWorld(ev) {
     const r = $("map").getBoundingClientRect();
@@ -13650,8 +13995,8 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     }
     if (ev.target.closest("[data-exit]")) {
       if (INNER[scene]) {
-        const I2 = INNER[scene];
-        go(I2.parent, I2.door[0] + 30, I2.door[1] + 20, null);
+        const I3 = INNER[scene];
+        go(I3.parent, I3.door[0] + 30, I3.door[1] + 20, null);
       } else go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
       return;
     }
@@ -13937,8 +14282,8 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
           } else arriveSpot(n);
         } else if (!outside() && scene !== "farm" && !INNER[scene] && mel.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
         else if (INNER[scene] && scene !== "kidroom" && Math.abs(mel.x - INNER[scene].exit[0]) < 12 && Math.abs(mel.y - INNER[scene].exit[1]) < 56) {
-          const I2 = INNER[scene];
-          go(I2.parent, I2.door[0] + 30, I2.door[1] + 20, null);
+          const I3 = INNER[scene];
+          go(I3.parent, I3.door[0] + 30, I3.door[1] + 20, null);
         } else if (scene === "farm" && mel.y > 592 && Math.abs(mel.x - 260) < 50) go("base", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
       }
     }

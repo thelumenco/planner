@@ -69,6 +69,7 @@ export function wireJournal(root, undoable, done){
     delEntry(id); done(null); undoable("Page torn out", () => { J = {entries: J.entries.map(x => x.id === id ? Object.assign({}, e, {at: Date.now()}) : x), updatedAt: Date.now()}; keepJ(); pushJ(); done(null); }); });
 }
 export const journalCount = () => live().length;
+export const journalSince = ms => live().filter(e => e.at >= ms).length;   // pages written since a moment (weekly review)
 
 /* ---------- scratchpad (town hall whiteboard) ---------- */
 export function scratchPanel(){
