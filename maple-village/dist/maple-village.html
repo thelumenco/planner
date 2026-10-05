@@ -4761,6 +4761,20 @@ Quests finished today: ${S3.doneIds.length}`;
     const list2 = payload && Array.isArray(payload.tasks) ? payload.tasks : Array.isArray(payload) ? payload : [];
     return list2.filter((t2) => t2 && t2._id && t2.title && !t2.deleted && !t2.isArchived && !t2.isBacklogged).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map(toQuest);
   }
+  async function completeInSunsama(taskId, day) {
+    let mcp3 = null;
+    try {
+      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
+    } catch {
+    }
+    if (!mcp3 || !taskId) return false;
+    try {
+      await mcp3.callTool(SUNSAMA, "mark_task_as_completed", { taskId, finishedDay: day });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
   async function pullSunsama(day, opts = {}) {
     let mcp3 = null;
     try {
@@ -9285,9 +9299,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       gainXp(1);
       S2.last = t2.title;
       countQuest();
+      if (t2.source === "sunsama" && !t2.completed) tickSunsama(t2.id);
       if (t2.early) {
         F.early[t2.id] = t2.early;
-        setTimeout(() => speak("Done a day early! Tick it off in Sunsama too, and it'll already be done on tomorrow's board.", 6e3), 4200);
+        setTimeout(() => speak("Done a day early! It's ticked off in Sunsama, and it'll already be done on tomorrow's board.", 6e3), 4200);
       }
       let grew = 0;
       F.plots.forEach((p) => {
@@ -9414,6 +9429,27 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       speak(pick(["Glug glug!", "Hydrated boss!", "Water break, good call."]), 3e3);
     }
   };
+  function tickSunsama(id, day = dayKey()) {
+    F.sunsamaTodo = (F.sunsamaTodo || []).filter((x) => x.id !== id).concat({ id, day });
+    save2();
+    flushSunsama();
+  }
+  var sunFlushing = false;
+  async function flushSunsama() {
+    if (sunFlushing || !(F.sunsamaTodo || []).length) return;
+    sunFlushing = true;
+    for (const x of F.sunsamaTodo.slice()) {
+      if (await completeInSunsama(x.id, x.day)) F.sunsamaTodo = F.sunsamaTodo.filter((y) => y.id !== x.id);
+      else if (Date.now() - (x.warned || 0) > 30 * 6e4) {
+        x.warned = Date.now();
+        flash("Couldn't tick that off in Sunsama just now. I'll keep trying.");
+      }
+    }
+    sunFlushing = false;
+    save2();
+  }
+  setInterval(flushSunsama, 3 * 6e4);
+  setTimeout(flushSunsama, 7e3);
   function doNext(id) {
     const ids = allTasks().map((x) => x.id);
     if (S2.timer && S2.timer.kind !== "break") S2.timer = null;

@@ -457,3 +457,8 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - **Dear future me:** sealed until the chosen date.
   - Arrivals are announced by Maple and read from the home letterbox (letters before the paper) or the desk. Any letter can be saved to the journal.
 - **Backup:** Settings "Download a backup" saves every `fox.*` local copy as one JSON file (the `downloads` capability). The game's real home is the per-user db on claude.ai; this is a spare copy.
+
+### Round 36: quests tick off in Sunsama
+- Finishing a quest that came from Sunsama (`t.source === "sunsama"`, not already completed there) calls Sunsama `mark_task_as_completed` with `{taskId, finishedDay: today}`. Early quests pulled from tomorrow are marked done on the day Mel did them.
+- Anything that fails waits in `F.sunsamaTodo` and is retried every 3 minutes (a quiet flash at most every 30 minutes). Quests Mel adds in the game ("x…" ids) stay game-only.
+- The manifest adds Sunsama `mark_task_as_completed`.

@@ -7,7 +7,7 @@ import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn } from "../art/vil
 import { villageArt, baseArt, laneArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
-import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA } from "./sunsama.js";
+import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA, completeInSunsama } from "./sunsama.js";
 import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx, TRACKS, setTrack, currentTrack } from "./audio.js";
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked } from "./paths.js";
@@ -506,7 +506,8 @@ const A = {
   firstStep(t){ S.firstStep[t.id] = true; S.arrived[t.id] = true; startTimer("task", t.minutes || 25, t.id); setSay("Hard part's done. Now the rest, on the clock."); save(); },
   done(t){
     S.doneIds.push(t.id); S.timer = null; sfx("chaching"); earn(5, "quest complete"); gainXp(1); S.last = t.title; countQuest();
-    if (t.early) { F.early[t.id] = t.early; setTimeout(() => speak("Done a day early! Tick it off in Sunsama too, and it'll already be done on tomorrow's board.", 6000), 4200); }
+    if (t.source === "sunsama" && !t.completed) tickSunsama(t.id);
+    if (t.early) { F.early[t.id] = t.early; setTimeout(() => speak("Done a day early! It's ticked off in Sunsama, and it'll already be done on tomorrow's board.", 6000), 4200); }
     let grew = 0; F.plots.forEach(p => { if (p && p.crop && p.wateredAt && growth(p) < 1) { p.bonus = (p.bonus || 0) + QUEST_BOOST; grew++; } });
     if (t.meeting) { S.mode = "decompress"; S.decompFor = t.title; }
     else if (remaining().length) { S.mode = "break"; startTimer("break", 10); }
@@ -549,6 +550,22 @@ const A = {
     S.decompFor = null; S.mode = remaining().length ? "break" : null; if (S.mode) startTimer("break", 10); setSay("Decompressed. Now a proper break."); save(); },
   water(ml){ setWater((S.waterMl || 0) + (ml || GLASS)); speak(pick(["Glug glug!", "Hydrated boss!", "Water break, good call."]), 3000); }
 };
+// Sunsama sync back: a quest finished here is ticked off there. Anything that couldn't get through waits in
+// F.sunsamaTodo and is retried every few minutes (and on the next Sunsama pull).
+function tickSunsama(id, day = dayKey()){
+  F.sunsamaTodo = (F.sunsamaTodo || []).filter(x => x.id !== id).concat({id, day}); save();
+  flushSunsama();
+}
+let sunFlushing = false;
+async function flushSunsama(){
+  if (sunFlushing || !(F.sunsamaTodo || []).length) return; sunFlushing = true;
+  for (const x of F.sunsamaTodo.slice()) {
+    if (await completeInSunsama(x.id, x.day)) F.sunsamaTodo = F.sunsamaTodo.filter(y => y.id !== x.id);
+    else if (Date.now() - (x.warned || 0) > 30*60e3) { x.warned = Date.now(); flash("Couldn't tick that off in Sunsama just now. I'll keep trying."); }
+  }
+  sunFlushing = false; save();
+}
+setInterval(flushSunsama, 3*60e3); setTimeout(flushSunsama, 7000);
 function doNext(id){
   const ids = allTasks().map(x => x.id);
   if (S.timer && S.timer.kind !== "break") S.timer = null;

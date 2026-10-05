@@ -690,6 +690,20 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
   await page.goto(url + "?sunsama=1&time=07:45"); await page.waitForTimeout(1500);
   check(await page.locator("#list li.done .t").allTextContents().then(t => t.some(x => /Draft the Visibility Fix email/.test(x))), "a quest done early is already ticked on its day");
+  // finishing a Sunsama quest here ticks it off in Sunsama
+  await page.click("#pclose").catch(() => {});
+  const openNote = async () => { if (await page.locator('#journal [data-qn="open"]').count()) await page.click('#journal [data-qn="open"]'); };
+  await openNote(); await page.click('#journal [data-a="walk"]').catch(() => {});
+  await page.waitForFunction(() => document.querySelector('#journal [data-a="gotWipe"]'), null, { timeout: 15000 }).catch(() => {});
+  await page.click('#journal [data-a="gotWipe"]').catch(() => {}); await page.click('#journal [data-a="cleanDone"]').catch(() => {}); await page.waitForTimeout(300);
+  await openNote(); await page.click('#journal [data-a="walk"]');
+  await page.waitForFunction(() => document.querySelector('#journal [data-a="notebook"]'), null, { timeout: 20000 });
+  await page.click('#journal [data-a="notebook"]'); await page.waitForTimeout(300);
+  if (await page.locator('#notebook [data-nb="started"]').count()) { await page.click('#notebook [data-nb="started"]'); await page.waitForTimeout(300); }
+  await page.click('#notebook [data-nb="done"]');
+  await page.waitForFunction(() => (window.__sunsamaDone || []).length, null, { timeout: 8000 }).catch(() => {});
+  check(await page.evaluate(() => { const d = (window.__sunsamaDone || [])[0]; return !!d && /^s\d$/.test(d.taskId) && /^\d{4}-\d{2}-\d{2}$/.test(d.finishedDay); }), "finishing a Sunsama quest ticks it off in Sunsama too");
+  await page.goto(url + "?sunsama=1&time=07:45"); await page.waitForTimeout(1500);
   await page.click('[data-open="settings"]').catch(() => {}); await page.click("#pclose").catch(() => {});
   await page.click('[data-open="cal"]');
   await page.waitForFunction(() => document.querySelectorAll("#calBody .calday li").length > 1, null, { timeout: 8000 }).catch(() => {});

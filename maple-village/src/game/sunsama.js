@@ -48,6 +48,12 @@ export function questsFrom(payload){
     .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map(toQuest);
 }
 
+// Finishing a quest ticks the task off in Sunsama (finishedDay = the day Mel did it). Resolves true/false.
+export async function completeInSunsama(taskId, day){
+  let mcp = null; try { mcp = window.claude && claude.use ? await claude.use("mcp") : null; } catch {}
+  if (!mcp || !taskId) return false;
+  try { await mcp.callTool(SUNSAMA, "mark_task_as_completed", {taskId, finishedDay: day}); return true; } catch (e) { return false; }
+}
 // Returns {tasks} on success, or {error: code, message} so the UI can say exactly what to fix.
 export async function pullSunsama(day, opts = {}){
   let mcp = null;

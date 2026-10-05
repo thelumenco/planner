@@ -71,6 +71,7 @@
         return { content: [], payload: { resultCountEstimate: "2", threads: [t("g1", "Farzana Ali <farzana@example.com>", "MUSE audit: next steps", "Lovely to hear from you, here's what I'm thinking", 2), t("g2", "studio@example.com", "Invoice question", "Quick one about the October invoice", 20)] } };
       }
       if (server === "Notion" && tool === "notion-create-pages") { window.__visSaved = input; return { content: [], payload: { pages: [{ id: "vis1" }] } }; }
+      if (server === "Sunsama MCP" && tool === "mark_task_as_completed") { (window.__sunsamaDone = window.__sunsamaDone || []).push(input); return { content: [], payload: { success: true } }; }
       if (server === "Sunsama MCP" && tool === "create_task") { (window.__sunsamaTasks = window.__sunsamaTasks || []).push(input); return { content: [], payload: { _id: "t" + window.__sunsamaTasks.length } }; }
       if (server === "Zapier" && tool === "execute_zapier_read_action") {
         window.__zapier = input;
