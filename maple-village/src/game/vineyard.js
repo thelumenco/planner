@@ -25,9 +25,18 @@ export function vineState(F){
   v.rows = v.rows || [0, 1, 2].map(i => ({trellis: i === 0, vines: [null, null, null]}));
   v.cuttings = v.cuttings || {red: 1, white: 1}; v.grapes = v.grapes || {red: 0, white: 0};
   v.barrels = v.barrels || [null]; v.cellar = v.cellar || []; v.shelf = v.shelf || []; v.box = v.box || 0; v.sold = v.sold || 0; v.glasses = v.glasses || 0; v.menu = v.menu || {}; v.plates = v.plates || 0;
+  v.help = Object.assign({cook: true, pick: true, barrels: true, stock: true, fetch: false}, v.help || {}); v.names = v.names || {};
   v.lastTick = v.lastTick || Date.now(); v.today = v.today || {day: "", bottles: 0, glasses: 0, coins: 0};
   return v;
 }
+// Mel can rename both (in the staff card at the shop counter); these are the names everything shows
+export const vineyardName = F => (F.vine && F.vine.names && F.vine.names.vineyard) || "The vineyard";
+export const shopName = F => (F.vine && F.vine.names && F.vine.names.shop) || "The wine shop";
+export function rename(F, which, name){ const v = vineState(F), n = plain(String(name || "")).trim().slice(0, 28); if (n) v.names[which] = n; else delete v.names[which]; }
+// The staff: what each of them takes off Mel's hands (each can be switched off in the staff card)
+export const HELP = [["pick", "Marco and Ines pick ripe grapes", "and water the vines again, as before"], ["barrels", "Marco fills empty barrels", "red grapes become red wine, white grapes white; you still name and bottle them"],
+  ["stock", "Celeste stocks the shelves", "bottles go from the cellar to the shop when she's on"], ["cook", "Pilar runs the kitchen", "oven, cheese press, the tapas of the day and small plates, from what's in the larder"],
+  ["fetch", "Pilar takes kitchen goods from my backpack", "crops, eggs, milk, flour, cheese and olives go straight to the larder (Maple keeps her treats)"]];
 // Finishing a quest moves the vineyard and kitchen on too: ripening vines, fermenting barrels, the oven and the
 // cheese press each jump ahead by `ms` (the garden gets the same boost in core).
 export function questBoost(F, ms){
@@ -103,12 +112,18 @@ export function sellTick(F, opts = {}){
   const v = vineState(F), t = Date.now(), mins = Math.min(720, Math.floor((t - v.lastTick)/60000)); if (mins < 1) return null;
   if (t - v.lastTick > 720*60000) v.lastTick = t - 720*60000;
   v.lastTick += mins*60000;
-  const out = {bottles: 0, glasses: 0, plates: 0, coins: 0, toBox: !opts.serving, watered: 0, mins};
+  const out = {bottles: 0, glasses: 0, plates: 0, coins: 0, toBox: !opts.serving, watered: 0, picked: 0, filled: 0, stocked: 0, mins};
   let w = null; const off = now() - t;   // the game clock (equal to real time outside tests)
   for (let k = mins; k > 0; k--) {
     const at = t - k*60000, d = new Date(at + off + 8*H), hm = d.getUTCHours()*60 + d.getUTCMinutes(), we = [0, 6].includes(d.getUTCDay());
     if (!w || k % 10 === 0 || k === 1) w = whoAt(at + off);
-    if (w.workers) v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && !vn.wateredAt) { vn.wateredAt = at; out.watered++; } }));
+    if (w.workers) {
+      if (v.help.pick) v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && vn.wateredAt && at - vn.wateredAt >= GROW) { const n = BUNCHES + (opts.harvest ? 1 : 0); v.grapes[vn.v] += n; vn.wateredAt = null; out.picked += n; } }));
+      v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && !vn.wateredAt) { vn.wateredAt = at; out.watered++; } }));
+      if (v.help.barrels) v.barrels.forEach((b, i) => { if (b) return; const st = v.grapes.red >= PER_BATCH ? "red" : v.grapes.white >= PER_BATCH ? "white" : null;
+        if (st) { v.grapes[st] -= PER_BATCH; v.barrels[i] = {style: st, start: at, dur: STYLES[st].dur, stage: 1}; out.filled++; } });
+    }
+    if (w.staff && v.help.stock && v.cellar.length) { out.stocked += v.cellar.reduce((n, c) => n + c.n, 0); v.cellar.slice().forEach(c => stock(F, c.id)); }
     if (hm < 10*60 || hm >= 22*60) continue;
     const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); if (!onShelf.length && !open && !platesLeft(v)) continue;
     const food = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]), tap = v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === new Date(at + off + 6*H).toISOString().slice(0, 10);
@@ -123,11 +138,12 @@ export function sellTick(F, opts = {}){
     if (Math.random() < .0006*f) plate();   // someone pops in just for a bite
   }
   v.shelf = v.shelf.filter(s => s.n > 0 || s.open > 0);
-  if (!out.coins && !out.watered) return null;
+  if (!out.coins && !out.watered && !out.picked && !out.filled && !out.stocked) return null;
   v.plates += out.plates;
   if (opts.serving) F.coins += out.coins; else v.box += out.coins;
   v.sold += out.bottles; v.glasses += out.glasses;
   const day = new Date(t + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
+  ["picked", "filled", "stocked"].forEach(x => { v.today[x] = (v.today[x] || 0) + out[x]; });
   v.today.plates = (v.today.plates || 0) + out.plates; v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
   return out;
 }
@@ -181,6 +197,10 @@ export function counterPanel(F, serving, staff){
   const v = vineState(F), t = v.today;
   return `<span class="tape gingham" aria-hidden="true"></span><h2>Behind the counter</h2><p class="sub">${serving ? "You're serving: customers come in more often while you're here, and pay you straight away." : "Step behind the counter to serve."} Evenings and weekends are busiest.${staff ? " Celeste's on shift too, so it's a little busier than usual (her takings go in the honesty box)." : ""}</p>
     <p>Today: <b>${t.bottles}</b> bottle${t.bottles === 1 ? "" : "s"} and <b>${t.glasses}</b> glass${t.glasses === 1 ? "" : "es"} and <b>${t.plates || 0}</b> plate${t.plates === 1 ? "" : "s"} sold, <b>${t.coins}</b> coins. On the shelves: ${shelfStock(v)} bottles.</p>
+    <h3 class="ph3">Your staff</h3><p class="sub">They do the everyday jobs so you can do the fun ones. Untick anything you'd rather do yourself.</p>
+    <div class="vhelp">${HELP.map(([id, n, d]) => `<label class="vhelpi"><input type="checkbox" data-vyhelp="${id}" ${v.help[id] ? "checked" : ""}><span><b>${esc(n)}</b><small>${esc(d)}</small></span></label>`).join("")}</div>
+    ${t.picked || t.filled || t.stocked ? `<p class="muted">Today the staff picked ${t.picked || 0} bunch${t.picked === 1 ? "" : "es"}, filled ${t.filled || 0} barrel${t.filled === 1 ? "" : "s"} and stocked ${t.stocked || 0} bottle${t.stocked === 1 ? "" : "s"}.</p>` : ""}
+    <h3 class="ph3">Names</h3><div class="vnames"><label>Vineyard<input id="vyNameV" maxlength="28" placeholder="The vineyard" value="${esc(v.names.vineyard || "")}"></label><label>Wine shop<input id="vyNameS" maxlength="28" placeholder="The wine shop" value="${esc(v.names.shop || "")}"></label><button class="btn primary small" data-vy="names">Save names</button></div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export function boxPanel(F){ const v = vineState(F);
@@ -216,10 +236,12 @@ export function wireVine(root, F, api){
     else if (k === "second") line = secondFerment(F, i);
     else if (k === "bottle") { line = bottle(F, i, vy.name[i]); if (line) { vy.name[i] = ""; api.sfx("chime"); } }
     else if (k === "olives") { line = pickOlives(F); if (line) api.sfx("coin"); }
+    else if (k === "names") { rename(F, "vineyard", (root.querySelector("#vyNameV") || {}).value); rename(F, "shop", (root.querySelector("#vyNameS") || {}).value); line = `${vineyardName(F)} and ${shopName(F)}. Lovely names!`; api.sfx("chime"); }
     else if (k === "collect") { const n = collect(F); if (n) { api.sfx("chaching"); line = `${n} coins from the honesty box. Thank you, neighbours!`; } }
     if (line) api.say(line); api.save(); api.rerender();
   });
   root.querySelectorAll("[data-vybuy]").forEach(b => b.onclick = () => { const line = buy(F, b.dataset.vybuy); if (line) { api.sfx("coin"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vystock]").forEach(b => b.onclick = () => { const line = stock(F, b.dataset.vystock); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
+  root.querySelectorAll("[data-vyhelp]").forEach(inp => inp.onchange = () => { vineState(F).help[inp.dataset.vyhelp] = inp.checked; api.save(); });
   root.querySelectorAll("[data-vyprice]").forEach(inp => inp.onchange = () => { setPrice(F, inp.dataset.vyprice, +inp.value); api.save(); });
 }

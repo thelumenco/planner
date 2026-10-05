@@ -1276,6 +1276,16 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
 :root[data-theme="dark"] body.season-spring{--tree2:#9C6E7A}
 :root[data-theme="dark"] body.season-autumn{--tree:#9A6B3A;--tree2:#8A4E38}
 :root[data-theme="dark"] body.season-winter{--tree:#6E847A;--tree2:#5A7068}
+/* the staff card at the wine shop counter: a tick per helper, then the two names */
+#ctx .vhelp{display:flex;flex-direction:column;gap:8px;margin:6px 0 10px}
+#ctx .vhelpi{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;text-align:left}
+#ctx .vhelpi input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:#8E2C48}
+#ctx .vhelpi span{display:flex;flex-direction:column;gap:2px;line-height:1.3}
+#ctx .vhelpi small{opacity:.75;font-size:.82rem}
+#ctx .vnames{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end;margin:6px 0 10px}
+#ctx .vnames label{display:flex;flex-direction:column;gap:3px;font-size:.85rem;flex:1 1 150px}
+#ctx .vnames input{font:inherit;font-size:1rem;padding:7px 9px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:inherit}
+#ctx .klog{margin:0 0 10px;padding-left:18px;font-size:.88rem;line-height:1.4;opacity:.85}
 </style>
 </head>
 <body>
@@ -3426,13 +3436,14 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       },
       react: { harvest: "Nice haul! I'll cook with that.", quests3: "Three done already? Look at you go.", lunch: "Lunch? I'll make toast." }
     },
-    // The vineyard's workers: while they're on shift, thirsty vines get watered (Mel still does the picking)
+    // The vineyard's workers: while they're on shift they water, pick ripe grapes and fill empty barrels (each can be
+    // switched off in the staff card at the shop counter)
     {
       id: "marco",
       pitch: 0.8,
       name: "Marco",
       job: "Keeps the vineyard",
-      intro: "Marco. I look after the vines. You pick, I water, the grapes do the rest. Forty summers of this and I still talk to them.",
+      intro: "Marco. I look after the vines. I water, Ines and I pick, the barrels get filled, and you name the wine. Forty summers of this and I still talk to them.",
       look: { skin: "#C99470", hair: "#4A4038", hairStyle: "short", top: "#9DB88A", bottom: "#6B5444" },
       routine: [
         slot("8:00", "12:00", "vineyard", [[262, 390], [340, 440], [418, 490], [300, 392], [380, 442]], { act: "water" }),
@@ -3440,7 +3451,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
         slot("13:00", "18:00", "vineyard", [[262, 390], [340, 440], [418, 490], [230, 470], [450, 400]], { act: "farm" })
       ],
       lines: ["Talk to them nicely. Vines listen.", "Water in the morning, pick in the afternoon.", "The red ones are show-offs. The white ones are shy.", "A good barrel takes its time. So do I."],
-      actLines: { water: ["Watering the thirsty ones. You pick the ripe ones.", "A drink for every vine."], farm: ["Tying up the shoots.", "Checking every bunch. Looking good."] },
+      actLines: { water: ["Watering the thirsty ones.", "A drink for every vine.", "Ripe ones go straight to the barrels."], farm: ["Tying up the shoots.", "Checking every bunch. Looking good."] },
       away: "Marco's gone home. The vines can wait till morning.",
       react: { harvest: "Lovely bunches! Into the barrel with them.", quests3: "Hard work. Like a good harvest." }
     },
@@ -3456,7 +3467,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
         slot("14:00", "17:30", "vineyard", [[262, 490], [340, 390], [418, 440], [190, 430]], { act: "water" })
       ],
       lines: ["The rosé grapes are my favourite. Don't tell the others.", "Sun's out, vines are happy.", "Every trellis in this row, I tied myself.", "Smell that? That's next year's wine."],
-      actLines: { water: ["Just watering. Picking's yours!", "Hydrated vines, happy vines."], farm: ["Tidying the trellis.", "Pruning a little. Shh, it doesn't hurt."] },
+      actLines: { water: ["Just watering. We'll pick the ripe ones.", "Hydrated vines, happy vines."], farm: ["Tidying the trellis.", "Pruning a little. Shh, it doesn't hurt."] },
       away: "Ines is off for the day."
     },
     // The wine shop's assistant: while she's behind the counter, more customers come in (coins go in the honesty box)
@@ -3470,6 +3481,23 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       routine: [slot("11:00", "15:00", "wineshop", [372, 286]), slot("15:00", "15:30", "vineyard", [[300, 260], [440, 270], [360, 300]]), slot("15:30", "21:30", "wineshop", [372, 286])],
       lines: ["The honesty box is very honest today.", "Someone asked who makes these. I said a very busy lady.", "Evenings are the best. Everyone wants a glass.", "If the shelves are full, I'm happy."],
       away: "Celeste's not on. The honesty box minds the shop."
+    },
+    // The wine shop's cook: on her shifts she runs the kitchen from whatever's in the larder (see cookTick)
+    {
+      id: "pilar",
+      pitch: 0.95,
+      name: "Pilar",
+      job: "Cooks in the wine shop kitchen",
+      intro: "Pilar! I cook. You keep the larder full, I keep the oven warm, the cheese pressing and the tapas coming. Deal?",
+      look: { skin: "#C68E68", hair: "#3A2A22", hairStyle: "bun", top: "#F6EFE3", bottom: "#4A5568", extra: "apron" },
+      routine: [
+        slot("10:00", "14:30", "kitchen", [[150, 320], [380, 320], [262, 520], [150, 540]], { act: "cook" }),
+        slot("14:30", "16:00", "wineshop", [453, 512], { act: "sit" }),
+        slot("16:00", "21:30", "kitchen", [[150, 320], [380, 320], [262, 520], [150, 540]], { act: "cook" })
+      ],
+      lines: ["Full larder, happy cook.", "Taste this. No, really, taste it.", "The oven's my favourite colleague.", "Bring me tomatoes and I'll bring you bravas."],
+      actLines: { cook: ["Stirring, tasting, stirring.", "Bread's in. Don't open the door!", "The cheese is coming along nicely.", "If the larder's empty, I just tidy. Hint, hint."] },
+      away: "Pilar's gone home. The kitchen's all yours."
     }
   ];
   var AGENTS = {
@@ -3771,6 +3799,50 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     return v.staffNote;
   }
   var staffLine = (n) => `Leftover ${n.dish.toLowerCase()} (${n.plates} plate${n.plates === 1 ? "" : "s"}) went to Marco, Ines and Celeste for dinner. They left ${Object.entries(n.gifts).map(([id, c]) => `${c} ${nm(id, c)}`).join(", ")} in the larder to say thanks.`;
+  var cookLog = (k, line) => {
+    k.log = [line, ...k.log || []].slice(0, 4);
+  };
+  function cookTick(F2, today2) {
+    const k = kitchenState(F2), v = vineState(F2), help = v.help || {}, done = [];
+    if (help.cook === false) return done;
+    if (help.fetch) {
+      const moved = backpackGoods(F2).map((x) => [x, sendToKitchen(F2, x)]).filter(([, n]) => n);
+      if (moved.length) done.push(`brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")} from your backpack`);
+    }
+    if (k.oven && !left(k.oven)) {
+      takeLoaves(F2);
+      done.push("took two loaves out of the oven");
+    }
+    if (k.press && !left(k.press)) {
+      takeCheese(F2);
+      done.push("unwrapped a new cheese");
+    }
+    if (!k.press && pressCheese(F2)) done.push("started a cheese in the press");
+    if (!k.oven && (k.larder.loaf || 0) < 3 && bake(F2)) done.push("put bread in the oven");
+    let t2 = tapasToday(F2, today2);
+    if (!t2) {
+      const best = Object.keys(TAPAS).filter((id) => inSeason(id, seasonOf(today2)) && has(k, TAPAS[id].need)).sort((a, b) => TAPAS[b].price - TAPAS[a].price)[0];
+      if (best) {
+        chooseTapas(F2, best, today2);
+        t2 = tapasToday(F2, today2);
+        done.push(`chose ${TAPAS[best].n.toLowerCase()} for the tapas of the day`);
+      }
+    }
+    if (t2 && t2.plates < 2 && cookTapas(F2, today2)) done.push(`cooked ${TAPAS_PLATES} plates of ${TAPAS[t2.id].n.toLowerCase()}`);
+    const keep6 = t2 ? TAPAS[t2.id].need : {};
+    for (const id of Object.keys(DISHES)) {
+      const d = DISHES[id];
+      if ((v.menu[id] || 0) >= 2) continue;
+      const spare = Object.entries(d.need).every(([g, n]) => (k.larder[g] || 0) - (keep6[g] || 0) >= n);
+      if (spare && cookDish(F2, id)) done.push(`made ${d.n.toLowerCase()}`);
+    }
+    if (done.length) {
+      k.cookAt = Date.now();
+      cookLog(k, done.join(", "));
+    }
+    return done;
+  }
+  var cookLine = (done) => `Pilar ${done.length > 1 ? done.slice(0, -1).join(", ") + " and " + done[done.length - 1] : done[0]}.`;
   var pic = (id, s = 34) => icon(id, s);
   var larderGrid = (k) => {
     const ids = Object.keys(k.larder).filter((id) => k.larder[id] > 0);
@@ -3801,6 +3873,8 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   function stovePanel(F2, today2) {
     const k = kitchenState(F2), t2 = tapasToday(F2, today2), T = t2 && TAPAS[t2.id];
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The stove</h2>`;
+    const v = vineState(F2), on = !v.help || v.help.cook !== false;
+    h += `<p class="sub kcook">${on ? `Pilar runs the kitchen on her shifts (10am to 2:30pm, 4 to 9:30pm). You can still cook anything yourself.` : `Pilar's off for now. Turn her back on in the staff card at the shop counter.`}</p>${on && k.log && k.log.length ? `<ul class="klog">${k.log.map((l) => `<li>${esc(l[0].toUpperCase() + l.slice(1))}.</li>`).join("")}</ul>` : ""}`;
     h += `<section class="ktapas"><h3 class="ph3">Tapas of the day</h3>`;
     if (t2) h += `<div class="kdish chosen">${dishArt("tapas:" + t2.id, 52)}<span><b>${esc(T.n)}</b><small>${t2.plates} plate${t2.plates === 1 ? "" : "s"} on the menu · ${T.price} coins each · needs ${needText(T.need)}</small><span class="kneeds">${needList(k, T.need)}</span></span></div>
       <div class="actions"><button class="btn primary" data-k="cooktapas" ${has(k, T.need) ? "" : "disabled"}>Cook a batch (${TAPAS_PLATES} plates)</button>${!t2.cooked ? `<button class="btn alt small" data-k="untapas">Pick a different dish</button>` : ""}</div>
@@ -3884,10 +3958,26 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     v.glasses = v.glasses || 0;
     v.menu = v.menu || {};
     v.plates = v.plates || 0;
+    v.help = Object.assign({ cook: true, pick: true, barrels: true, stock: true, fetch: false }, v.help || {});
+    v.names = v.names || {};
     v.lastTick = v.lastTick || Date.now();
     v.today = v.today || { day: "", bottles: 0, glasses: 0, coins: 0 };
     return v;
   }
+  var vineyardName = (F2) => F2.vine && F2.vine.names && F2.vine.names.vineyard || "The vineyard";
+  var shopName = (F2) => F2.vine && F2.vine.names && F2.vine.names.shop || "The wine shop";
+  function rename(F2, which, name) {
+    const v = vineState(F2), n = plain(String(name || "")).trim().slice(0, 28);
+    if (n) v.names[which] = n;
+    else delete v.names[which];
+  }
+  var HELP = [
+    ["pick", "Marco and Ines pick ripe grapes", "and water the vines again, as before"],
+    ["barrels", "Marco fills empty barrels", "red grapes become red wine, white grapes white; you still name and bottle them"],
+    ["stock", "Celeste stocks the shelves", "bottles go from the cellar to the shop when she's on"],
+    ["cook", "Pilar runs the kitchen", "oven, cheese press, the tapas of the day and small plates, from what's in the larder"],
+    ["fetch", "Pilar takes kitchen goods from my backpack", "crops, eggs, milk, flour, cheese and olives go straight to the larder (Maple keeps her treats)"]
+  ];
   function questBoost(F2, ms) {
     const v = vineState(F2);
     let n = 0;
@@ -4027,18 +4117,41 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     if (mins < 1) return null;
     if (t2 - v.lastTick > 720 * 6e4) v.lastTick = t2 - 720 * 6e4;
     v.lastTick += mins * 6e4;
-    const out = { bottles: 0, glasses: 0, plates: 0, coins: 0, toBox: !opts.serving, watered: 0, mins };
+    const out = { bottles: 0, glasses: 0, plates: 0, coins: 0, toBox: !opts.serving, watered: 0, picked: 0, filled: 0, stocked: 0, mins };
     let w = null;
     const off = now() - t2;
     for (let k = mins; k > 0; k--) {
       const at = t2 - k * 6e4, d = new Date(at + off + 8 * H), hm2 = d.getUTCHours() * 60 + d.getUTCMinutes(), we = [0, 6].includes(d.getUTCDay());
       if (!w || k % 10 === 0 || k === 1) w = whoAt(at + off);
-      if (w.workers) v.rows.forEach((row2) => row2.trellis && row2.vines.forEach((vn) => {
-        if (vn && !vn.wateredAt) {
-          vn.wateredAt = at;
-          out.watered++;
-        }
-      }));
+      if (w.workers) {
+        if (v.help.pick) v.rows.forEach((row2) => row2.trellis && row2.vines.forEach((vn) => {
+          if (vn && vn.wateredAt && at - vn.wateredAt >= GROW2) {
+            const n = BUNCHES + (opts.harvest ? 1 : 0);
+            v.grapes[vn.v] += n;
+            vn.wateredAt = null;
+            out.picked += n;
+          }
+        }));
+        v.rows.forEach((row2) => row2.trellis && row2.vines.forEach((vn) => {
+          if (vn && !vn.wateredAt) {
+            vn.wateredAt = at;
+            out.watered++;
+          }
+        }));
+        if (v.help.barrels) v.barrels.forEach((b, i) => {
+          if (b) return;
+          const st6 = v.grapes.red >= PER_BATCH ? "red" : v.grapes.white >= PER_BATCH ? "white" : null;
+          if (st6) {
+            v.grapes[st6] -= PER_BATCH;
+            v.barrels[i] = { style: st6, start: at, dur: STYLES[st6].dur, stage: 1 };
+            out.filled++;
+          }
+        });
+      }
+      if (w.staff && v.help.stock && v.cellar.length) {
+        out.stocked += v.cellar.reduce((n, c) => n + c.n, 0);
+        v.cellar.slice().forEach((c) => stock(F2, c.id));
+      }
       if (hm2 < 10 * 60 || hm2 >= 22 * 60) continue;
       const onShelf = v.shelf.filter((s) => s.n > 0), open2 = v.shelf.find((s) => s.open > 0);
       if (!onShelf.length && !open2 && !platesLeft(v)) continue;
@@ -4083,7 +4196,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       if (Math.random() < 6e-4 * f2) plate();
     }
     v.shelf = v.shelf.filter((s) => s.n > 0 || s.open > 0);
-    if (!out.coins && !out.watered) return null;
+    if (!out.coins && !out.watered && !out.picked && !out.filled && !out.stocked) return null;
     v.plates += out.plates;
     if (opts.serving) F2.coins += out.coins;
     else v.box += out.coins;
@@ -4091,6 +4204,9 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     v.glasses += out.glasses;
     const day = new Date(t2 + 8 * H).toISOString().slice(0, 10);
     if (v.today.day !== day) v.today = { day, bottles: 0, glasses: 0, plates: 0, coins: 0 };
+    ["picked", "filled", "stocked"].forEach((x) => {
+      v.today[x] = (v.today[x] || 0) + out[x];
+    });
     v.today.plates = (v.today.plates || 0) + out.plates;
     v.today.bottles += out.bottles;
     v.today.glasses += out.glasses;
@@ -4155,6 +4271,10 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     const v = vineState(F2), t2 = v.today;
     return `<span class="tape gingham" aria-hidden="true"></span><h2>Behind the counter</h2><p class="sub">${serving2 ? "You're serving: customers come in more often while you're here, and pay you straight away." : "Step behind the counter to serve."} Evenings and weekends are busiest.${staff ? " Celeste's on shift too, so it's a little busier than usual (her takings go in the honesty box)." : ""}</p>
     <p>Today: <b>${t2.bottles}</b> bottle${t2.bottles === 1 ? "" : "s"} and <b>${t2.glasses}</b> glass${t2.glasses === 1 ? "" : "es"} and <b>${t2.plates || 0}</b> plate${t2.plates === 1 ? "" : "s"} sold, <b>${t2.coins}</b> coins. On the shelves: ${shelfStock(v)} bottles.</p>
+    <h3 class="ph3">Your staff</h3><p class="sub">They do the everyday jobs so you can do the fun ones. Untick anything you'd rather do yourself.</p>
+    <div class="vhelp">${HELP.map(([id, n, d]) => `<label class="vhelpi"><input type="checkbox" data-vyhelp="${id}" ${v.help[id] ? "checked" : ""}><span><b>${esc(n)}</b><small>${esc(d)}</small></span></label>`).join("")}</div>
+    ${t2.picked || t2.filled || t2.stocked ? `<p class="muted">Today the staff picked ${t2.picked || 0} bunch${t2.picked === 1 ? "" : "es"}, filled ${t2.filled || 0} barrel${t2.filled === 1 ? "" : "s"} and stocked ${t2.stocked || 0} bottle${t2.stocked === 1 ? "" : "s"}.</p>` : ""}
+    <h3 class="ph3">Names</h3><div class="vnames"><label>Vineyard<input id="vyNameV" maxlength="28" placeholder="The vineyard" value="${esc(v.names.vineyard || "")}"></label><label>Wine shop<input id="vyNameS" maxlength="28" placeholder="The wine shop" value="${esc(v.names.shop || "")}"></label><button class="btn primary small" data-vy="names">Save names</button></div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function boxPanel(F2) {
@@ -4215,6 +4335,11 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       } else if (k === "olives") {
         line = pickOlives(F2);
         if (line) api4.sfx("coin");
+      } else if (k === "names") {
+        rename(F2, "vineyard", (root.querySelector("#vyNameV") || {}).value);
+        rename(F2, "shop", (root.querySelector("#vyNameS") || {}).value);
+        line = `${vineyardName(F2)} and ${shopName(F2)}. Lovely names!`;
+        api4.sfx("chime");
       } else if (k === "collect") {
         const n = collect(F2);
         if (n) {
@@ -4244,6 +4369,10 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
         api4.rerender();
       }
     });
+    root.querySelectorAll("[data-vyhelp]").forEach((inp) => inp.onchange = () => {
+      vineState(F2).help[inp.dataset.vyhelp] = inp.checked;
+      api4.save();
+    });
     root.querySelectorAll("[data-vyprice]").forEach((inp) => inp.onchange = () => {
       setPrice(F2, inp.dataset.vyprice, +inp.value);
       api4.save();
@@ -4251,6 +4380,10 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   }
 
   // src/art/vineyard.js
+  var tag = (n) => {
+    const t2 = n.replace(/^the\s+/i, ""), c = t2[0].toUpperCase() + t2.slice(1);
+    return esc(c.length > 16 ? c.slice(0, 15) + "…" : c);
+  };
   var VINE_ROWS = [370, 420, 470];
   var VINE_XS = [262, 340, 418];
   var vineSpot = (r, i) => ({ x: VINE_XS[i], y: VINE_ROWS[r] + 16 });
@@ -4298,7 +4431,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   }
   function shopArt(v) {
     const n = Math.min(8, shelfStock(v)), bottles = Array.from({ length: n }, (_, i) => `<rect x="${338 + i * 5.5}" y="${170 - i % 2 * 2}" width="4" height="12" rx="1.5" style="fill:${i % 3 === 1 ? "#9DBF8A" : "#5B2338"}"/>`).join("");
-    return `<g data-place="wineshop" aria-label="Wine shop"><ellipse class="hov" cx="390" cy="218" rx="86" ry="11" style="fill:var(--butter)"/>
+    return `<g data-place="wineshop" aria-label="${esc(shopName(artCtx().F()))}"><ellipse class="hov" cx="390" cy="218" rx="86" ry="11" style="fill:var(--butter)"/>
     ${sk(
       `<rect x="318" y="118" width="144" height="96" style="fill:#F1E2C6"/><path d="M306 120 L340 78 H440 L474 120z" style="fill:#C46A4A"/>
       <path d="M326 150 h50 l-4 12 h-42z M404 150 h50 l-4 12 h-42z" style="fill:#8E2C48"/><rect x="332" y="162" width="46" height="26" style="fill:#DCE8F0"/>${bottles}<rect x="410" y="162" width="38" height="26" style="fill:#DCE8F0"/>
@@ -4310,7 +4443,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       <path d="M376 214 v-40 a14 14 0 0 1 28 0 v40z"/><circle cx="398" cy="196" r="1.4"/><rect x="368" y="92" width="44" height="18" rx="3"/><circle cx="430" cy="206" r="9"/><path d="M430 195 v2"/>`
     )}
     <g filter="url(#wob)" style="stroke:var(--line)" stroke-width=".8">${grapes(390, 97, "#6B2A55", 0.7)}</g><path d="M390 92 q4 -4 8 -2" fill="none" style="stroke:var(--moss2)" stroke-width="1.4"/>
-    ${tapeLabel(390, 240, "Wine shop", "#E8B4C0", 11.5)}</g>`;
+    ${tapeLabel(390, 240, tag(shopName(artCtx().F())), "#E8B4C0", 11.5)}</g>`;
   }
   function stallArt() {
     return `<g data-place="vinestall" aria-label="Vineyard stall"><ellipse class="hov" cx="90" cy="446" rx="44" ry="9" style="fill:var(--butter)"/>
@@ -4373,7 +4506,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       `<rect x="450" y="460" width="40" height="20" rx="2" style="fill:var(--wood)"/><rect x="494" y="432" width="6" height="50" style="fill:var(--wood)"/><path d="M490 436 q10 -12 22 -2" style="fill:var(--moss)"/><circle cx="504" cy="444" r="3" style="fill:#6B2A55"/><circle cx="499" cy="447" r="3" style="fill:#6B2A55"/>`,
       `<rect x="450" y="460" width="40" height="20" rx="2"/><path d="M458 460 v20 M466 460 v20 M474 460 v20 M482 460 v20" opacity=".6"/><rect x="494" y="432" width="6" height="50"/>`
     )}
-    ${tapeLabel(470, 504, "Vineyard", "#E8B4C0", 11)}</g>`;
+    ${tapeLabel(470, 504, tag(vineyardName(artCtx().F())), "#E8B4C0", 11)}</g>`;
   }
 
   // src/game/bank.js
@@ -6545,12 +6678,12 @@ Quests finished today: ${S3.doneIds.length}`;
     if (html && /</.test(html)) {
       const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
       for (const el of doc.body.firstChild.children) {
-        const tag = el.tagName.toLowerCase();
-        if (tag === "hr") {
+        const tag2 = el.tagName.toLowerCase();
+        if (tag2 === "hr") {
           cur2 = null;
           continue;
         }
-        if ((tag === "ul" || tag === "ol") && el.getAttribute("data-type") === "taskList") {
+        if ((tag2 === "ul" || tag2 === "ol") && el.getAttribute("data-type") === "taskList") {
           for (const li of el.querySelectorAll(":scope > li")) {
             const t3 = txt(li);
             if (t3) subs.push({ title: t3, done: li.getAttribute("data-checked") === "true", info: [], local: true });
@@ -6558,7 +6691,7 @@ Quests finished today: ${S3.doneIds.length}`;
           cur2 = null;
           continue;
         }
-        if (tag === "ul" || tag === "ol") {
+        if (tag2 === "ul" || tag2 === "ol") {
           const items = [...el.querySelectorAll(":scope > li")].map(txt).filter(Boolean);
           if (cur2) cur2.info.push(...items);
           else out.push(...items.map((i) => "- " + i));
@@ -13408,10 +13541,37 @@ Then tell chat "wind down" whenever you're ready.`
       setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500);
     }
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
+    tableKey = "";
     $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "farm" ? farmArt() : roomArt(scene);
-    const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: "The vineyard", farm: "The garden" };
+    const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: vineyardName(F), farm: "The garden", wineshop: shopName(F) };
     $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
     $("maphint").textContent = scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. The gate on the left goes home." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. The gate on the left goes back to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+  }
+  var tableKey = "";
+  function drawTableware() {
+    if (scene !== "wineshop") return;
+    const v = vineState(F), sh = v.shelf.find((s) => s.open > 0) || v.shelf.find((s) => s.n > 0), t2 = tapasToday(F, dayKey());
+    const dishes = [...t2 && t2.plates > 0 ? ["tapas:" + t2.id] : [], ...Object.keys(v.menu).filter((id) => v.menu[id] > 0)];
+    const seats = npcActors().map(([, e]) => e).filter((e) => e.kind === "npc" && e.act === "sit" && !e.moving);
+    const key = seats.map((e) => e.def.id + Math.round(e.x)).join() + "|" + (sh ? sh.type : "") + "|" + dishes.join();
+    if (key === tableKey && $("tableware")) return;
+    tableKey = key;
+    const T = ROOMS.wineshop.pos.T, tables = [[T[0] - 70, T[1]], [T[0] + 70, T[1] - 6]];
+    let h = "";
+    seats.forEach((e, n) => {
+      const [tx, ty] = tables.reduce((a, b) => Math.abs(b[0] - e.x) < Math.abs(a[0] - e.x) ? b : a), side = e.x < tx ? -1 : 1;
+      const dish = dishes.length ? dishes[(e.def.id.charCodeAt(0) + n) % dishes.length] : null;
+      if (dish) h += `<g transform="translate(${tx + side * 13 - 11} ${ty - 36})">${dishArt(dish, 22)}</g>`;
+      if (sh) h += `<g transform="translate(${tx + side * 26 - 4} ${ty - 44})">${glassArt(sh.type, 14)}</g>`;
+    });
+    let g = $("tableware");
+    if (!g) {
+      g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      g.id = "tableware";
+      g.setAttribute("pointer-events", "none");
+      $("sceneArt").appendChild(g);
+    }
+    g.innerHTML = h;
   }
   function dressMel() {
     const d = F.decor || {}, show2 = (id, on) => {
@@ -14101,7 +14261,14 @@ Then tell chat "wind down" whenever you're ready.`
   }
   var serving = () => scene === "wineshop" && atSpot === "wcounter";
   function vineTick() {
-    const out = sellTick(F, { serving: serving() });
+    const out = sellTick(F, { serving: serving(), harvest: (festivalOn(dayKey()) || {}).id === "harvest" });
+    if (whereIs("pilar") === "kitchen") {
+      const done = cookTick(F, dayKey());
+      if (done.length) {
+        save2();
+        if (scene === "kitchen" && !quietNow() && $("panel").hidden) speak(cookLine(done), 5500);
+      }
+    }
     const note2 = staffDinner(F, dayKey(), sgHM());
     if (note2) {
       save2();
@@ -14853,6 +15020,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     tickEvan(dt);
     tickNpcs(dt);
     updateCam(dt);
+    drawTableware();
     placeNode(nodes.mel, mel);
     placeNode(nodes.maple, maple);
     placeNode(nodes.evan, evan);

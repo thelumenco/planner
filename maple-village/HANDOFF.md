@@ -570,3 +570,20 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Every `TAPAS` dish has seasons. The stove lists in-season dishes only (`inSeason`); there are 13 tapas in all.
   - `body.season-*` changes the tree colours (and the grass in light mode).
 - **Grape harvest festival** (`FESTIVALS` id `harvest`, early October, `vineyard: true`): bunting in the vineyard, a Maple line, and +1 bunch on every harvest.
+
+### Round 48: staff take over the chores, renaming, tableware
+- **Staff** (`v.help`; each can be switched off in the staff card at the shop counter, "Your staff" in `counterPanel`). Defaults are all on except `fetch`.
+  - `pick`: Marco and Ines pick ripe vines while on shift (inside `sellTick`; the harvest-festival bonus comes through as `opts.harvest`). They still water.
+  - `barrels`: Marco fills empty barrels. Red grapes make red wine, white grapes make white. Rosé and sparkling are only made when Mel fills a barrel herself. Mel still names and bottles every wine.
+  - `stock`: Celeste moves the cellar onto the shelves while she's in the shop.
+  - `cook`: **Pilar** (new NPC; in the kitchen 10am–2:30pm and 4–9:30pm, on a break in the tasting room between). `cookTick` in kitchen.js runs from `vineTick` while she's in the kitchen. She:
+    - takes out loaves and cheese, and restarts the press and oven (bread while there are fewer than 3 loaves),
+    - picks the dearest in-season tapas the larder can make (if Mel hasn't picked one),
+    - cooks another batch when fewer than 2 plates are left,
+    - tops small plates up to 2+, keeping back enough for one more batch of tapas.
+
+    Her last 4 notes (`k.log`) show in the stove card. Maple reads her line out only when Mel is in the kitchen.
+  - `fetch`: Pilar moves kitchen goods from the backpack into the larder.
+  - The day's tallies are in `v.today.picked`, `filled` and `stocked`.
+- **Names:** `v.names = {vineyard, shop}`, set in the same card (`rename`). `vineyardName(F)` and `shopName(F)` feed the scene names and the map tape labels. The labels drop "The" and are cut at 16 characters (`tag` in art/vineyard.js).
+- **Tableware:** `drawTableware()` runs in the frame loop, in the wine shop only. Each seated villager (`act: "sit"`) gets a glass of the open wine and a plate (tapas first, otherwise a small plate from the menu) on the nearest table. They're drawn in `#tableware` inside `#sceneArt`, and redrawn only when the key changes.

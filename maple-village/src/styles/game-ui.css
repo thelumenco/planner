@@ -742,3 +742,13 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
 :root[data-theme="dark"] body.season-spring{--tree2:#9C6E7A}
 :root[data-theme="dark"] body.season-autumn{--tree:#9A6B3A;--tree2:#8A4E38}
 :root[data-theme="dark"] body.season-winter{--tree:#6E847A;--tree2:#5A7068}
+/* the staff card at the wine shop counter: a tick per helper, then the two names */
+#ctx .vhelp{display:flex;flex-direction:column;gap:8px;margin:6px 0 10px}
+#ctx .vhelpi{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;text-align:left}
+#ctx .vhelpi input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:#8E2C48}
+#ctx .vhelpi span{display:flex;flex-direction:column;gap:2px;line-height:1.3}
+#ctx .vhelpi small{opacity:.75;font-size:.82rem}
+#ctx .vnames{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end;margin:6px 0 10px}
+#ctx .vnames label{display:flex;flex-direction:column;gap:3px;font-size:.85rem;flex:1 1 150px}
+#ctx .vnames input{font:inherit;font-size:1rem;padding:7px 9px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:inherit}
+#ctx .klog{margin:0 0 10px;padding-left:18px;font-size:.88rem;line-height:1.4;opacity:.85}

@@ -1,11 +1,13 @@
 // The vineyard screen (east of home base, over the footbridge): vine rows on trellises, the barrel shed, the stall,
 // the wine shop and a little playground. Reads live vine state through the art context (G.vine()).
-import { ink } from "../util.js";
+import { ink, esc } from "../util.js";
 import { sk, tapeLabel, tree, flowers, artCtx } from "./scenes.js";
 import { streetLamp, lampDefs, bunting, festivalOn } from "./village-extras.js";
-import { growth, barrelLeft, shelfStock, STYLES } from "../game/vineyard.js";
+import { growth, barrelLeft, shelfStock, STYLES, vineyardName, shopName } from "../game/vineyard.js";
 import { oliveTree } from "./wine.js";
 
+// a name on a tape label: "The" dropped, kept short enough to sit on the map
+const tag = n => { const t = n.replace(/^the\s+/i, ""), c = t[0].toUpperCase() + t.slice(1); return esc(c.length > 16 ? c.slice(0, 15) + "…" : c); };
 export const VINE_ROWS = [370, 420, 470], VINE_XS = [262, 340, 418];
 export const vineSpot = (r, i) => ({x: VINE_XS[i], y: VINE_ROWS[r] + 16});
 
@@ -47,7 +49,7 @@ function shedArt(v){
 }
 function shopArt(v){
   const n = Math.min(8, shelfStock(v)), bottles = Array.from({length: n}, (_, i) => `<rect x="${338 + i*5.5}" y="${170 - (i % 2)*2}" width="4" height="12" rx="1.5" style="fill:${i % 3 === 1 ? "#9DBF8A" : "#5B2338"}"/>`).join("");
-  return `<g data-place="wineshop" aria-label="Wine shop"><ellipse class="hov" cx="390" cy="218" rx="86" ry="11" style="fill:var(--butter)"/>
+  return `<g data-place="wineshop" aria-label="${esc(shopName(artCtx().F()))}"><ellipse class="hov" cx="390" cy="218" rx="86" ry="11" style="fill:var(--butter)"/>
     ${sk(`<rect x="318" y="118" width="144" height="96" style="fill:#F1E2C6"/><path d="M306 120 L340 78 H440 L474 120z" style="fill:#C46A4A"/>
       <path d="M326 150 h50 l-4 12 h-42z M404 150 h50 l-4 12 h-42z" style="fill:#8E2C48"/><rect x="332" y="162" width="46" height="26" style="fill:#DCE8F0"/>${bottles}<rect x="410" y="162" width="38" height="26" style="fill:#DCE8F0"/>
       <path d="M376 214 v-40 a14 14 0 0 1 28 0 v40z" style="fill:#7B4A36"/><rect x="368" y="92" width="44" height="18" rx="3" style="fill:#FFFDF6"/>
@@ -57,7 +59,7 @@ function shopArt(v){
       <rect x="332" y="162" width="46" height="26"/><rect x="410" y="162" width="38" height="26"/><path d="M429 162 v26" opacity=".6"/>
       <path d="M376 214 v-40 a14 14 0 0 1 28 0 v40z"/><circle cx="398" cy="196" r="1.4"/><rect x="368" y="92" width="44" height="18" rx="3"/><circle cx="430" cy="206" r="9"/><path d="M430 195 v2"/>`)}
     <g filter="url(#wob)" style="stroke:var(--line)" stroke-width=".8">${grapes(390, 97, "#6B2A55", .7)}</g><path d="M390 92 q4 -4 8 -2" fill="none" style="stroke:var(--moss2)" stroke-width="1.4"/>
-    ${tapeLabel(390, 240, "Wine shop", "#E8B4C0", 11.5)}</g>`;
+    ${tapeLabel(390, 240, tag(shopName(artCtx().F())), "#E8B4C0", 11.5)}</g>`;
 }
 function stallArt(){
   return `<g data-place="vinestall" aria-label="Vineyard stall"><ellipse class="hov" cx="90" cy="446" rx="44" ry="9" style="fill:var(--butter)"/>
@@ -118,5 +120,5 @@ export function vineGate(){
     <g data-place="toVine" aria-label="Gate to the vineyard"><ellipse class="hov" cx="484" cy="470" rx="34" ry="22" style="fill:var(--butter)"/>
     ${sk(`<rect x="450" y="460" width="40" height="20" rx="2" style="fill:var(--wood)"/><rect x="494" y="432" width="6" height="50" style="fill:var(--wood)"/><path d="M490 436 q10 -12 22 -2" style="fill:var(--moss)"/><circle cx="504" cy="444" r="3" style="fill:#6B2A55"/><circle cx="499" cy="447" r="3" style="fill:#6B2A55"/>`,
       `<rect x="450" y="460" width="40" height="20" rx="2"/><path d="M458 460 v20 M466 460 v20 M474 460 v20 M482 460 v20" opacity=".6"/><rect x="494" y="432" width="6" height="50"/>`)}
-    ${tapeLabel(470, 504, "Vineyard", "#E8B4C0", 11)}</g>`;
+    ${tapeLabel(470, 504, tag(vineyardName(artCtx().F())), "#E8B4C0", 11)}</g>`;
 }

@@ -1025,6 +1025,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     if (q.includes("rvpatch")) f.history = Object.assign(f.history || {}, {"2026-10-05": {q: 4, steps: 6200, water: 1500, harvest: 2, coins: 30}, "2026-10-07": {q: 6, steps: 7400, water: 2000, harvest: 1, coins: 44}});
     if (q.includes("menupatch")) { f.coins = 40; f.inv = Object.assign(f.inv || {}, {potato: 2}); }
     if (q.includes("menupatch")) { f.inv = Object.assign(f.inv || {}, {flour: 1, egg: 2, olives: 1}); }
+    if (q.includes("menupatch")) { f.vine = f.vine || {}; f.vine.help = Object.assign(f.vine.help || {}, {cook: false}); }   // Mel cooks herself here (Pilar has her own test)
     if (q.includes("dinnerpatch")) { f.vine.tapas.day = "2026-01-01"; }
     if (q.includes("goatpatch")) { f.coins = 200; f.pets = f.pets || {run: 0, animals: [], next: 1}; f.pets.animals = [{id: "g1", kind: "goat", name: "Biscuit", born: Date.now(), feeds: 3, fedDay: null, col: 0}]; f.inv = Object.assign(f.inv || {}, {goatfeed: 1}); }
     if (q.includes("platepatch")) { f.vine = f.vine || {}; f.vine.shelf = [{id: "w9", name: "Test Red", type: "red", n: 40, price: 24, open: 0}]; f.vine.menu = {cheese: 40}; f.vine.lastTick = Date.now() - 600*60e3; }
@@ -1150,6 +1151,52 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=21:00&sold=1"); await page.waitForTimeout(4200);
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.box > 0), "villagers buy wine while Mel's away and pay into the honesty box");
   await page.screenshot({ path: join(shots, "vineyard.png") });
+  await page.close();
+}
+{
+  // Staff: Marco and Ines pick and fill barrels, Celeste stocks the shelves, Pilar runs the kitchen; renaming; diners' tables
+  console.log("\nstaff, names and the tasting room tables");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`staff pageerror: ${e.message}`));
+  await page.addInitScript(() => { const q = location.search; if (!/staffpatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    const H = 3600e3, t = Date.now(); f.vine = f.vine || {}; f.vine.rows = [0, 1, 2].map(i => ({trellis: i === 0, vines: [null, null, null]}));
+    f.vine.rows[0].vines[0] = {v: "red", planted: t - 20*H, wateredAt: t - 9*H}; f.vine.grapes = {red: 0, white: 0}; f.vine.barrels = [null];
+    f.vine.cellar = [{id: "wc1", name: "Cellar White", type: "white", n: 6}]; f.vine.shelf = [{id: "ws1", name: "Evan's Blush", type: "rose", n: 6, price: 15, open: 2}];
+    f.vine.lastTick = t - 3*60e3; f.vine.menu = {}; f.vine.tapas = null;
+    f.kitchen = {larder: {flour: 2, milk: 2, potato: 4, egg: 4, olives: 2, loaf: 1}, oven: null, press: null};
+    localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
+  await page.goto(url + "?reset=1&seed=1&time=11:10&date=2026-10-05"); await page.waitForTimeout(900);
+  await page.goto(url + "?seed=1&time=11:10&date=2026-10-05&staffpatch=1"); await page.waitForTimeout(2500);
+  const st = await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return {v: f.vine, k: f.kitchen}; });
+  check(st.v.rows[0].vines[0].wateredAt && Date.now() - st.v.rows[0].vines[0].wateredAt < 3600e3 && st.v.barrels[0] && st.v.barrels[0].style === "red", "Marco and Ines pick the ripe vine, water it again and fill the empty barrel with red");
+  check(!st.v.cellar.length && st.v.shelf.some(s => s.name === "Cellar White" && s.n === 6), "Celeste stocks the cellar's wine on the shelves");
+  check(!!st.k.oven && !!st.k.press, "Pilar puts bread in the oven and milk in the cheese press");
+  check(st.v.tapas && st.v.tapas.id === "tortilla" && st.v.tapas.plates === 6, "she picks the dearest tapas the larder can make (tortilla) and cooks a batch");
+  check(st.v.menu.bread > 0 && st.v.menu.olives > 0, "and cooks small plates from what's left");
+  await page.evaluate(() => window.__mapleScene("kitchen")); await page.waitForTimeout(800);
+  check(await page.locator('#actors [data-npc="pilar"]').count() === 1, "Pilar is in the kitchen on her shift");
+  await page.locator('#world [data-spot="stove"]').dispatchEvent("click");
+  await page.waitForSelector("#ctx .klog li", { timeout: 15000 });
+  check(/oven|press|tortilla/i.test(await page.locator("#ctx .klog").textContent()), "the stove card lists what she's done");
+  await page.screenshot({ path: join(shots, "kitchen-pilar.png") });
+  await page.click('#ctx [data-close]');
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(700);
+  await page.locator('#world [data-spot="wcounter"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-vyhelp="cook"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-vyhelp]').count() === 5 && await page.locator('#ctx [data-vyhelp="fetch"]').isChecked() === false, "the staff card at the counter has a tick for each helper (fetching from the backpack is off to start)");
+  await page.locator('#ctx [data-vyhelp="cook"]').uncheck();
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.help.cook === false), "unticking Pilar sends her home");
+  await page.fill("#vyNameV", "Bay Hill Vines"); await page.fill("#vyNameS", "Mel & Maple's Cellar"); await page.click('#ctx [data-vy="names"]'); await page.waitForTimeout(300);
+  check(/Mel &amp; Maple|Mel & Maple/.test(await page.locator("#sceneName").textContent()), "the wine shop can be renamed");
+  await page.screenshot({ path: join(shots, "staff-card.png") });
+  await page.click('#ctx [data-close]');
+  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(700);
+  check(/Bay Hill Vines/.test(await page.locator("#sceneName").textContent()) && /Mel &amp; Maple|Mel & Maple/.test(await page.locator("#sceneArt").innerHTML()), "and the vineyard too, with the new names on the map");
+  await page.goto(url + "?seed=1&time=19:45&date=2026-10-05"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
+  const seated = await page.locator('#actors .act-sit').count();
+  check(seated > 0 && await page.locator("#tableware svg").count() >= seated, "diners in the tasting room have wine and food on their tables");
+  await page.screenshot({ path: join(shots, "tasting-tables.png") });
   await page.close();
 }
 {

@@ -118,16 +118,17 @@ export const NPCS = [
     },
     react: {harvest: "Nice haul! I'll cook with that.", quests3: "Three done already? Look at you go.", lunch: "Lunch? I'll make toast."}
   },
-  // The vineyard's workers: while they're on shift, thirsty vines get watered (Mel still does the picking)
+  // The vineyard's workers: while they're on shift they water, pick ripe grapes and fill empty barrels (each can be
+// switched off in the staff card at the shop counter)
   {
     id: "marco", pitch: 0.8, name: "Marco", job: "Keeps the vineyard",
-    intro: "Marco. I look after the vines. You pick, I water, the grapes do the rest. Forty summers of this and I still talk to them.",
+    intro: "Marco. I look after the vines. I water, Ines and I pick, the barrels get filled, and you name the wine. Forty summers of this and I still talk to them.",
     look: {skin: "#C99470", hair: "#4A4038", hairStyle: "short", top: "#9DB88A", bottom: "#6B5444"},
     routine: [slot("8:00", "12:00", "vineyard", [[262, 390], [340, 440], [418, 490], [300, 392], [380, 442]], {act: "water"}),
       slot("12:00", "13:00", "wineshop", [227, 518], {act: "sit"}),
       slot("13:00", "18:00", "vineyard", [[262, 390], [340, 440], [418, 490], [230, 470], [450, 400]], {act: "farm"})],
     lines: ["Talk to them nicely. Vines listen.", "Water in the morning, pick in the afternoon.", "The red ones are show-offs. The white ones are shy.", "A good barrel takes its time. So do I."],
-    actLines: {water: ["Watering the thirsty ones. You pick the ripe ones.", "A drink for every vine."], farm: ["Tying up the shoots.", "Checking every bunch. Looking good."]},
+    actLines: {water: ["Watering the thirsty ones.", "A drink for every vine.", "Ripe ones go straight to the barrels."], farm: ["Tying up the shoots.", "Checking every bunch. Looking good."]},
     away: "Marco's gone home. The vines can wait till morning.",
     react: {harvest: "Lovely bunches! Into the barrel with them.", quests3: "Hard work. Like a good harvest."}
   },
@@ -138,7 +139,7 @@ export const NPCS = [
     routine: [slot("9:00", "13:00", "vineyard", [[262, 440], [340, 490], [418, 390], [230, 420], [450, 470]], {act: "farm"}),
       slot("14:00", "17:30", "vineyard", [[262, 490], [340, 390], [418, 440], [190, 430]], {act: "water"})],
     lines: ["The rosé grapes are my favourite. Don't tell the others.", "Sun's out, vines are happy.", "Every trellis in this row, I tied myself.", "Smell that? That's next year's wine."],
-    actLines: {water: ["Just watering. Picking's yours!", "Hydrated vines, happy vines."], farm: ["Tidying the trellis.", "Pruning a little. Shh, it doesn't hurt."]},
+    actLines: {water: ["Just watering. We'll pick the ripe ones.", "Hydrated vines, happy vines."], farm: ["Tidying the trellis.", "Pruning a little. Shh, it doesn't hurt."]},
     away: "Ines is off for the day."
   },
   // The wine shop's assistant: while she's behind the counter, more customers come in (coins go in the honesty box)
@@ -149,6 +150,17 @@ export const NPCS = [
     routine: [slot("11:00", "15:00", "wineshop", [372, 286]), slot("15:00", "15:30", "vineyard", [[300, 260], [440, 270], [360, 300]]), slot("15:30", "21:30", "wineshop", [372, 286])],
     lines: ["The honesty box is very honest today.", "Someone asked who makes these. I said a very busy lady.", "Evenings are the best. Everyone wants a glass.", "If the shelves are full, I'm happy."],
     away: "Celeste's not on. The honesty box minds the shop."
+  },
+  // The wine shop's cook: on her shifts she runs the kitchen from whatever's in the larder (see cookTick)
+  {
+    id: "pilar", pitch: 0.95, name: "Pilar", job: "Cooks in the wine shop kitchen",
+    intro: "Pilar! I cook. You keep the larder full, I keep the oven warm, the cheese pressing and the tapas coming. Deal?",
+    look: {skin: "#C68E68", hair: "#3A2A22", hairStyle: "bun", top: "#F6EFE3", bottom: "#4A5568", extra: "apron"},
+    routine: [slot("10:00", "14:30", "kitchen", [[150, 320], [380, 320], [262, 520], [150, 540]], {act: "cook"}), slot("14:30", "16:00", "wineshop", [453, 512], {act: "sit"}),
+      slot("16:00", "21:30", "kitchen", [[150, 320], [380, 320], [262, 520], [150, 540]], {act: "cook"})],
+    lines: ["Full larder, happy cook.", "Taste this. No, really, taste it.", "The oven's my favourite colleague.", "Bring me tomatoes and I'll bring you bravas."],
+    actLines: {cook: ["Stirring, tasting, stirring.", "Bread's in. Don't open the door!", "The cheese is coming along nicely.", "If the larder's empty, I just tidy. Hint, hint."]},
+    away: "Pilar's gone home. The kitchen's all yours."
   }
 ];
 

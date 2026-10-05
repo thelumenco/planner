@@ -6,9 +6,9 @@ import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco, sea
 import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn } from "../art/village-extras.js";
 import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, setArtContext } from "../art/scenes.js";
 import { vineSpot } from "../art/vineyard.js";
-import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, TAPAS } from "./kitchen.js";
+import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, TAPAS, cookTick, cookLine } from "./kitchen.js";
 import { questBoost } from "./vineyard.js";
-import { vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, counterPanel, boxPanel, cafePanel, olivePanel, wireVine, shelfStock } from "./vineyard.js";
+import { vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, counterPanel, boxPanel, cafePanel, olivePanel, wireVine, shelfStock, vineyardName, shopName } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA, completeInSunsama, subtaskInSunsama } from "./sunsama.js";
@@ -38,6 +38,7 @@ import { loadDesk, deskPanel, wireDesk } from "./desk.js";
 import { kid, kidPanel, wireKid, stopKidGame, SNACKS, snackPic, EVAN_TAPS, pickSay } from "./kid.js";
 import { addReminder, cancelReminder, upcoming as upcomingReminders, dueNow, fmtWhen } from "./reminders.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
+import { dishArt, glassArt } from "../art/wine.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
@@ -1505,10 +1506,30 @@ function drawScene(){
   else if (scene === "base" && isWeekend() && S.weekendSaid !== day) { S.weekendSaid = day; setTimeout(() => speak("Weekend! Home things happen here at home. Any work quests still wait in town.", 5500), 2200); }
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
+  tableKey = "";
   $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "farm" ? farmArt() : roomArt(scene);
-  const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:"The vineyard", farm:"The garden"};
+  const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F)};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
   $("maphint").textContent = scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. The gate on the left goes home." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. The gate on the left goes back to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+}
+// The tasting room's tables: each villager sitting down gets a glass of whatever's open and a plate from the menu
+// (the tapas of the day first). Redrawn only when who's sitting, or what's on offer, changes.
+let tableKey = "";
+function drawTableware(){
+  if (scene !== "wineshop") return;
+  const v = vineState(F), sh = v.shelf.find(s => s.open > 0) || v.shelf.find(s => s.n > 0), t = tapasToday(F, dayKey());
+  const dishes = [...(t && t.plates > 0 ? ["tapas:" + t.id] : []), ...Object.keys(v.menu).filter(id => v.menu[id] > 0)];
+  const seats = npcActors().map(([, e]) => e).filter(e => e.kind === "npc" && e.act === "sit" && !e.moving);
+  const key = seats.map(e => e.def.id + Math.round(e.x)).join() + "|" + (sh ? sh.type : "") + "|" + dishes.join();
+  if (key === tableKey && $("tableware")) return; tableKey = key;
+  const T = ROOMS.wineshop.pos.T, tables = [[T[0] - 70, T[1]], [T[0] + 70, T[1] - 6]];
+  let h = "";
+  seats.forEach((e, n) => { const [tx, ty] = tables.reduce((a, b) => Math.abs(b[0] - e.x) < Math.abs(a[0] - e.x) ? b : a), side = e.x < tx ? -1 : 1;
+    const dish = dishes.length ? dishes[(e.def.id.charCodeAt(0) + n) % dishes.length] : null;
+    if (dish) h += `<g transform="translate(${tx + side*13 - 11} ${ty - 36})">${dishArt(dish, 22)}</g>`;
+    if (sh) h += `<g transform="translate(${tx + side*26 - 4} ${ty - 44})">${glassArt(sh.type, 14)}</g>`; });
+  let g = $("tableware"); if (!g) { g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.id = "tableware"; g.setAttribute("pointer-events", "none"); $("sceneArt").appendChild(g); }
+  g.innerHTML = h;
 }
 function dressMel(){
   const d = F.decor || {}, show = (id, on) => { const e = $(id); if (e) e.style.display = on ? "" : "none"; };
@@ -1723,7 +1744,9 @@ function reviewNudge(){
 const serving = () => scene === "wineshop" && atSpot === "wcounter";
 // Every minute (and on load): customers buy from the shelves, the vineyard hands water thirsty vines.
 function vineTick(){
-  const out = sellTick(F, {serving: serving()});
+  const out = sellTick(F, {serving: serving(), harvest: (festivalOn(dayKey()) || {}).id === "harvest"});
+  // Pilar runs the kitchen on her shifts (tells Mel what she's done only while Mel's in there with her)
+  if (whereIs("pilar") === "kitchen") { const done = cookTick(F, dayKey()); if (done.length) { save(); if (scene === "kitchen" && !quietNow() && $("panel").hidden) speak(cookLine(done), 5500); } }
   // at closing, leftover tapas of the day go to the staff for dinner
   const note = staffDinner(F, dayKey(), sgHM());
   if (note) { save(); if (!quietNow()) setTimeout(() => speak(staffLine(note), 7000), out && out.mins >= 30 ? 9000 : 1500); }
@@ -2052,7 +2075,7 @@ function frame(now){
   else if (!sleeping) { maple.tx = mel.x - mel.dir*24; maple.ty = mel.y + 3; const d = Math.hypot(maple.tx - maple.x, maple.ty - maple.y); stepTo(maple, Math.max(120, d*3.2), dt); if (!maple.moving) maple.dir = mel.dir; }
   else maple.moving = false;
   tickEvan(dt);
-  tickNpcs(dt); updateCam(dt);
+  tickNpcs(dt); updateCam(dt); drawTableware();
   placeNode(nodes.mel, mel); placeNode(nodes.maple, maple); placeNode(nodes.evan, evan);
   nodes.evan.style.visibility = scene === "kidroom" && kid.sleep ? "hidden" : "";
   // On the treadmill with the time box running: Mel walks in place.

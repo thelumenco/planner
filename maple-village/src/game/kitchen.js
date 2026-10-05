@@ -87,6 +87,34 @@ export function staffDinner(F, today, hm){
 }
 export const staffLine = n => `Leftover ${n.dish.toLowerCase()} (${n.plates} plate${n.plates === 1 ? "" : "s"}) went to Marco, Ines and Celeste for dinner. They left ${Object.entries(n.gifts).map(([id, c]) => `${c} ${nm(id, c)}`).join(", ")} in the larder to say thanks.`;
 
+/* ---------- Pilar, the cook ---------- */
+// While she's on shift (and Mel hasn't sent her home in the staff card at the shop counter) Pilar runs the kitchen:
+// takes out finished loaves and cheese, keeps the oven and press going, picks a tapas of the day if Mel hasn't
+// (the dearest one the larder can make), cooks more when the last plates are going, and keeps small plates topped
+// up with whatever's left. She never touches the backpack unless Mel ticks "fetch". -> list of things done
+export const COOK = "pilar";
+const cookLog = (k, line) => { k.log = [line, ...(k.log || [])].slice(0, 4); };
+export function cookTick(F, today){
+  const k = kitchenState(F), v = vineState(F), help = v.help || {}, done = [];
+  if (help.cook === false) return done;
+  if (help.fetch) { const moved = backpackGoods(F).map(x => [x, sendToKitchen(F, x)]).filter(([, n]) => n); if (moved.length) done.push(`brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")} from your backpack`); }
+  if (k.oven && !left(k.oven)) { takeLoaves(F); done.push("took two loaves out of the oven"); }
+  if (k.press && !left(k.press)) { takeCheese(F); done.push("unwrapped a new cheese"); }
+  if (!k.press && pressCheese(F)) done.push("started a cheese in the press");
+  if (!k.oven && (k.larder.loaf || 0) < 3 && bake(F)) done.push("put bread in the oven");
+  let t = tapasToday(F, today);
+  if (!t) { const best = Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today)) && has(k, TAPAS[id].need)).sort((a, b) => TAPAS[b].price - TAPAS[a].price)[0];
+    if (best) { chooseTapas(F, best, today); t = tapasToday(F, today); done.push(`chose ${TAPAS[best].n.toLowerCase()} for the tapas of the day`); } }
+  if (t && t.plates < 2 && cookTapas(F, today)) done.push(`cooked ${TAPAS_PLATES} plates of ${TAPAS[t.id].n.toLowerCase()}`);
+  // small plates from what's left, keeping back one more batch of the tapas
+  const keep = t ? TAPAS[t.id].need : {};
+  for (const id of Object.keys(DISHES)) { const d = DISHES[id]; if ((v.menu[id] || 0) >= 2) continue;
+    const spare = Object.entries(d.need).every(([g, n]) => (k.larder[g] || 0) - (keep[g] || 0) >= n); if (spare && cookDish(F, id)) done.push(`made ${d.n.toLowerCase()}`); }
+  if (done.length) { k.cookAt = Date.now(); cookLog(k, done.join(", ")); }
+  return done;
+}
+export const cookLine = done => `Pilar ${done.length > 1 ? done.slice(0, -1).join(", ") + " and " + done[done.length - 1] : done[0]}.`;
+
 /* ---------- panels ---------- */
 const pic = (id, s = 34) => icon(id, s);
 const larderGrid = k => { const ids = Object.keys(k.larder).filter(id => k.larder[id] > 0);
@@ -116,6 +144,8 @@ export function pressPanel(F){
 export function stovePanel(F, today){
   const k = kitchenState(F), t = tapasToday(F, today), T = t && TAPAS[t.id];
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The stove</h2>`;
+  const v = vineState(F), on = !v.help || v.help.cook !== false;
+  h += `<p class="sub kcook">${on ? `Pilar runs the kitchen on her shifts (10am to 2:30pm, 4 to 9:30pm). You can still cook anything yourself.` : `Pilar's off for now. Turn her back on in the staff card at the shop counter.`}</p>${on && k.log && k.log.length ? `<ul class="klog">${k.log.map(l => `<li>${esc(l[0].toUpperCase() + l.slice(1))}.</li>`).join("")}</ul>` : ""}`;
   h += `<section class="ktapas"><h3 class="ph3">Tapas of the day</h3>`;
   if (t) h += `<div class="kdish chosen">${dishArt("tapas:" + t.id, 52)}<span><b>${esc(T.n)}</b><small>${t.plates} plate${t.plates === 1 ? "" : "s"} on the menu · ${T.price} coins each · needs ${needText(T.need)}</small><span class="kneeds">${needList(k, T.need)}</span></span></div>
       <div class="actions"><button class="btn primary" data-k="cooktapas" ${has(k, T.need) ? "" : "disabled"}>Cook a batch (${TAPAS_PLATES} plates)</button>${!t.cooked ? `<button class="btn alt small" data-k="untapas">Pick a different dish</button>` : ""}</div>
