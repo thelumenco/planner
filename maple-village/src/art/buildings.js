@@ -107,3 +107,20 @@ export function postOffice(){
     <rect x="494" y="456" width="12" height="13" rx="3"/><path d="M497 461 h6"/><path d="M500 469 v17"/>`;
   return wrap("post", "Post office", "var(--sky)", 435, 490, 58, art, lines);
 }
+
+// The bank: a small classical front (pediment, two columns, steps), a gold coin over the door, sage roof.
+export function bankBuilding(){
+  const art = `<rect x="332" y="104" width="96" height="58" style="fill:#F4EEDF"/>
+    <path d="M324 104 L380 66 L436 104z" style="fill:var(--sage)"/><rect x="326" y="100" width="108" height="8" style="fill:#E7DCC2"/>
+    <circle cx="380" cy="88" r="9" style="fill:var(--honey)"/>
+    <rect x="340" y="110" width="10" height="50" style="fill:#FFFDF6"/><rect x="410" y="110" width="10" height="50" style="fill:#FFFDF6"/>
+    <path d="M368 162 v-30 a12 12 0 0 1 24 0 v30z" style="fill:var(--wood)"/>
+    <rect x="356" y="116" width="10" height="14" style="fill:var(--sky)"/><rect x="394" y="116" width="10" height="14" style="fill:var(--sky)"/>
+    <rect x="328" y="162" width="104" height="5" style="fill:#E7DCC2"/>`;
+  const lines = `<rect x="332" y="104" width="96" height="58"/><path d="M324 104 L380 66 L436 104z"/><rect x="326" y="100" width="108" height="8"/>
+    <circle cx="380" cy="88" r="9"/><path d="M380 83 v10 M383 85 q-3 -2 -6 0 q-1 2 3 3 q4 1 3 3 q-3 2 -6 0" stroke-width="1.1"/>
+    <rect x="340" y="110" width="10" height="50"/><path d="M343 112 v46 M347 112 v46" opacity=".4"/><rect x="410" y="110" width="10" height="50"/><path d="M413 112 v46 M417 112 v46" opacity=".4"/>
+    <path d="M368 162 v-30 a12 12 0 0 1 24 0 v30z"/><circle cx="387" cy="148" r="1.3"/>
+    <rect x="356" y="116" width="10" height="14"/><rect x="394" y="116" width="10" height="14"/><rect x="328" y="162" width="104" height="5"/>`;
+  return wrap("bank", "Bank", "var(--honey)", 380, 168, 56, art, lines);
+}

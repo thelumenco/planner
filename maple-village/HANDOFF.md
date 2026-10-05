@@ -469,3 +469,12 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 ### Round 38: Hestia "Last done"
 - A fourth tab in the cleaning cupboard. Each item: `H.lastDone [{id, name, last, every}]`, seeded with aircon servicing (90 days), our sheets (7) and Evan's sheets (7). "Done today", a date picker for any past date, and how often (none, weekly … yearly) with due and overdue badges. Add and remove items (Undo).
 - Saved in the hestia doc. Chat action `last_done` {what, date?} logs a job (and adds it if it's new).
+
+### Round 39: the bank, and a re-laid town square
+- **Square:** the town hall moved to about 11 o'clock (`translate(-90 0)`, door [170,180]); the **bank** is at about 1 o'clock (door [380,178]). The library moved down to 9 o'clock (`translate(-350 96)`, door [85,368]) and the well to [196,414]. Paths, obstacles (paths.js) and NPC wander points were updated to match.
+- **The bank** (scene `bank`; `bank.js`, private doc "vaults", merged by jar id, local copy):
+  - Five tall glass vault jars along the back wall in arched niches, each a savings goal with a label, goal, markers every N, jewel colour (8 jewels) and amount.
+  - Tap a jar: set it up or change it, add savings (jewels pour in, the level rises, the brass cap drops: sounds `jewels` and `cap`), take some out, empty it (Undo) or remove the vault (Undo). History is listed.
+  - A full jar sparkles; Maple announces it, and a trophy is earned each time a jar fills.
+  - Opal the banker (9–5:30, lunch 12:30–1:30) stands at the counter, which shows every vault at a glance with a total.
+  - Chat action `save` {vault, amount}. Places "bank", "vaults" and "savings" walk there.

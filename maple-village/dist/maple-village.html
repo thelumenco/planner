@@ -1111,6 +1111,23 @@ body.kidmode .scenename span + span{display:none}
 .hlastctl{grid-column:1 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .hlastctl input[type=date],.hlastctl select,.hadd select{border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:4px 6px;font:inherit;font-size:.82rem;color:#2F2B28}
 .hlastctl .hx{margin-left:auto}
+
+/* the bank */
+.vbig{position:relative;display:flex;justify-content:center;margin:4px 0 8px}
+.vpour{position:absolute;left:50%;top:-10px;width:160px;height:300px;margin-left:-80px;pointer-events:none;overflow:visible}
+.vdrop{position:absolute;top:0;animation:vfall .9s cubic-bezier(.4,.1,.8,.6) both}
+@keyframes vfall{0%{transform:translateY(-40px) rotate(0);opacity:0}15%{opacity:1}100%{transform:translateY(220px) rotate(220deg);opacity:0}}
+.vcap{transition:transform .4s ease}.vcap.lift{transform:translateY(-40px) rotate(-8deg)}
+.vcap.drop{animation:vcapdrop .5s ease-out}@keyframes vcapdrop{0%{transform:translateY(-40px)}70%{transform:translateY(2px)}100%{transform:translateY(0)}}
+.vspark{animation:vspark 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes vspark{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}
+.vadd{align-items:center;gap:8px}.vadd input{flex:1;min-width:0;border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:8px 10px;font:inherit;color:#2F2B28}.vcur{font-weight:700}
+.vform input,.vform select{width:100%;box-sizing:border-box;border:1px solid rgba(120,104,84,.25);border-radius:8px;background:#FFFDF6;padding:7px 10px;font:inherit;color:#2F2B28}
+.vrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.vswatch{display:flex;flex-wrap:wrap;gap:6px}.vsw{width:38px;height:38px;border-radius:10px;border:1.5px solid rgba(120,104,84,.25);background:#FFFDF6;display:grid;place-items:center;cursor:pointer}.vsw.on{border-color:#2F2B28;box-shadow:0 0 0 2px #F6E3A1}
+.vlog ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:3px;font-size:.88rem}.vlog li{display:flex;justify-content:space-between}
+.vlist li{display:grid;grid-template-columns:1fr 90px auto;align-items:center;gap:8px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.vdrop,.vspark,.vcap.drop{animation:none}}
 </style>
 </head>
 <body>
@@ -1763,14 +1780,15 @@ body.kidmode .scenename span + span{display:none}
   var OUTDOOR = ["base", "village", "lane"];
   var VILLAGE = {
     // town square
-    hall: { scene: "village", name: "Town hall", short: "the town hall", door: [260, 180], mark: [222, 64] },
+    hall: { scene: "village", name: "Town hall", short: "the town hall", door: [170, 180], mark: [132, 64] },
+    bank: { scene: "village", name: "Bank", short: "the bank", door: [380, 178], mark: [380, 46] },
     chord: { scene: "lane", name: "Chord workshop", short: "the Chord workshop", door: [145, 272], mark: [145, 150] },
-    fresh: { scene: "village", name: "Fresh Pages library", short: "the library", door: [85, 272], mark: [95, 160] },
+    fresh: { scene: "village", name: "Fresh Pages library", short: "the library", door: [85, 368], mark: [95, 256] },
     chico: { scene: "lane", name: "Chico cottage", short: "Chico cottage", door: [380, 282], mark: [380, 170] },
     post: { scene: "village", name: "Post office", short: "the post office", door: [435, 502], mark: [435, 386] },
     market: { scene: "village", name: "Market", short: "the market", door: [362, 350], mark: [362, 290] },
     board: { scene: "village", name: "Quest board", door: [260, 338], spot: true, line: "All of today's quests, in one place." },
-    well: { scene: "village", name: "Well", door: [160, 350], spot: true, line: "Fresh water! Glug glug." },
+    well: { scene: "village", name: "Well", door: [196, 414], spot: true, line: "Fresh water! Glug glug." },
     news: { scene: "village", name: "Good news board", door: [90, 488], spot: true, line: "The good news board. Fresh every morning." },
     bench: { scene: "village", name: "Riverside bench", door: [334, 580], spot: true, line: "A bench by the river. Lunch spot for half the town." },
     toLane: { scene: "village", name: "Gate to Makers' Lane", door: [444, 218], spot: true, bridge: "lane", mark: [430, 170], line: "Through the gate to Makers' Lane: Chord and Chico." },
@@ -1911,6 +1929,15 @@ body.kidmode .scenename span + span{display:none}
       ["ped3", "", "T", "pedestal", null, "", 24],
       ["ped4", "", "U", "pedestal", null, "", 24],
       ["ped5", "", "V", "pedestal", null, "", 24]
+    ] },
+    // The bank: five vault jars (savings goals) along the back wall, Opal's counter in front
+    bank: { name: "The bank", wall: "#EEF1E6", trim: "var(--honey)", noBoard: true, pos: { V0: [70, 330], V1: [165, 330], V2: [260, 330], V3: [355, 330], V4: [450, 330], C: [260, 528] }, stations: [
+      ["vault0", "", "V0", "vaultjar", null, "", 40],
+      ["vault1", "", "V1", "vaultjar", null, "", 40],
+      ["vault2", "", "V2", "vaultjar", null, "", 40],
+      ["vault3", "", "V3", "vaultjar", null, "", 40],
+      ["vault4", "", "V4", "vaultjar", null, "", 40],
+      ["counter", "Counter", "C", "bankcounter", null, "Opal's counter. Your passbook's here.", 30]
     ] },
     market: { name: "Market", wall: "#F8E5E2", trim: "var(--blush)", stations: [
       ["stall", "Shop counter", "M", "shopcounter", null, "Welcome in! Have a browse."]
@@ -2208,6 +2235,13 @@ body.kidmode .scenename span + span{display:none}
     <g style="fill:#F3C969">${rows(4, (i) => `<circle cx="${28 + i * 6}" cy="${200 + i * 20}" r="3"/><circle cx="${484 + i * 5}" cy="${206 + i * 18}" r="3"/>`)}</g>
     <g style="fill:#7FA36E">${[201, 319].map((x) => `<circle cx="${x}" cy="552" r="11"/><circle cx="${x - 7}" cy="546" r="7"/><circle cx="${x + 7}" cy="545" r="7"/>`).join("")}</g>`;
     },
+    // The bank (five vaults): cream and sage marble floor, a calm sage wall with brass trim and an arched vault niche behind each jar
+    bank: () => `<rect width="520" height="640" style="fill:#EFE9DA"/>
+    <g opacity=".5">${rows(12, (r) => rows(13, (c) => (r + c) % 2 ? `<rect x="${c * 40}" y="${150 + r * 42}" width="40" height="42" style="fill:#DCE5D2"/>` : ""))}</g>
+    <rect width="520" height="340" style="fill:#EEF1E6"/><rect y="330" width="520" height="10" style="fill:var(--honey)" opacity=".85"/>
+    <g filter="url(#wob)">${[70, 165, 260, 355, 450].map((x) => `<path d="M${x - 36} 334 V60 a36 36 0 0 1 72 0 V334" style="fill:#E2E8D8;stroke:var(--line)" stroke-width="1.3"/>`).join("")}</g>
+    <g style="fill:var(--honey)" opacity=".8">${[117, 212, 307, 402].map((x) => `<circle cx="${x}" cy="40" r="5"/>`).join("")}</g>
+    ${sk(`<path d="M232 8 h56 l-6 14 h-44z" style="fill:var(--honey)"/>`, `<path d="M232 8 h56 l-6 14 h-44z"/><path d="M248 15 h24" opacity=".5"/>`)}${plant(30, 610, 1.1)}${plant(490, 610, 1)}`,
     market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, (i) => `<path d="M0 ${170 + i * 40} H520"/>`)}${rows(24, (i) => `<path d="M${(i * 97 + i % 3 * 40) % 520} ${170 + i % 12 * 40} v40"/>`)}</g>
     <g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--blush)"/></g>
@@ -2581,6 +2615,7 @@ body.kidmode .scenename span + span{display:none}
     maple: { shape: "plaque", col: "#EE8B3A", emblem: "fox" },
     kind: { shape: "plaque", col: "#F4A0B5", emblem: "heart" },
     harvest: { shape: "cup", col: "#7BB37A", emblem: "sprout" },
+    vault: { shape: "coins", col: "#C9A227", emblem: "star" },
     journal: { shape: "star", col: "#C9A3E8", emblem: "book" },
     ...Object.fromEntries(Object.entries(APPS).map(([k, a]) => [k, { shape: "cup", col: a.col, emblem: a.emblem }]))
   };
@@ -2622,6 +2657,9 @@ body.kidmode .scenename span + span{display:none}
     TH.streak.filter((t2) => sS >= t2).forEach((t2) => add("steps", "steps-" + t2, t2, `${t2} days of 5,000 steps in a row`, `5,000 steps or more, ${t2} days running.`, t2 + "d"));
     (c.levels || []).forEach((l, i) => {
       if (i > 0 && i <= c.levelIndex) add("maple", "maple-" + i, i, `Maple: ${l.name}`, `Maple's friendship reached "${l.name}".`, "Lv" + i);
+    });
+    (c.vaults || []).forEach((v) => {
+      for (let k = 1; k <= (v.fills || 0); k++) add("vault", `vault-${v.id}-${k}`, k, `Filled the ${v.label} vault${k > 1 ? ` (${k}x)` : ""}`, `The ${v.label} savings jar filled to the top with jewels.`, k > 1 ? k + "x" : "Full");
     });
     TH.kind.filter((t2) => c.kudos >= t2).forEach((t2) => add("kind", "kind-" + t2, t2, `${t2} kind words pinned`, `${t2} compliments pinned to the Kind words board.`, String(t2)));
     TH.harvest.filter((t2) => (c.F.harvestTotal || 0) >= t2).forEach((t2) => add("harvest", "harvest-" + t2, t2, `${t2} harvests`, `${t2} crops picked from the garden.`, String(t2)));
@@ -2904,6 +2942,343 @@ body.kidmode .scenename span + span{display:none}
     <rect x="494" y="456" width="12" height="13" rx="3"/><path d="M497 461 h6"/><path d="M500 469 v17"/>`;
     return wrap("post", "Post office", "var(--sky)", 435, 490, 58, art2, lines);
   }
+  function bankBuilding() {
+    const art2 = `<rect x="332" y="104" width="96" height="58" style="fill:#F4EEDF"/>
+    <path d="M324 104 L380 66 L436 104z" style="fill:var(--sage)"/><rect x="326" y="100" width="108" height="8" style="fill:#E7DCC2"/>
+    <circle cx="380" cy="88" r="9" style="fill:var(--honey)"/>
+    <rect x="340" y="110" width="10" height="50" style="fill:#FFFDF6"/><rect x="410" y="110" width="10" height="50" style="fill:#FFFDF6"/>
+    <path d="M368 162 v-30 a12 12 0 0 1 24 0 v30z" style="fill:var(--wood)"/>
+    <rect x="356" y="116" width="10" height="14" style="fill:var(--sky)"/><rect x="394" y="116" width="10" height="14" style="fill:var(--sky)"/>
+    <rect x="328" y="162" width="104" height="5" style="fill:#E7DCC2"/>`;
+    const lines = `<rect x="332" y="104" width="96" height="58"/><path d="M324 104 L380 66 L436 104z"/><rect x="326" y="100" width="108" height="8"/>
+    <circle cx="380" cy="88" r="9"/><path d="M380 83 v10 M383 85 q-3 -2 -6 0 q-1 2 3 3 q4 1 3 3 q-3 2 -6 0" stroke-width="1.1"/>
+    <rect x="340" y="110" width="10" height="50"/><path d="M343 112 v46 M347 112 v46" opacity=".4"/><rect x="410" y="110" width="10" height="50"/><path d="M413 112 v46 M417 112 v46" opacity=".4"/>
+    <path d="M368 162 v-30 a12 12 0 0 1 24 0 v30z"/><circle cx="387" cy="148" r="1.3"/>
+    <rect x="356" y="116" width="10" height="14"/><rect x="394" y="116" width="10" height="14"/><rect x="328" y="162" width="104" height="5"/>`;
+    return wrap("bank", "Bank", "var(--honey)", 380, 168, 56, art2, lines);
+  }
+
+  // src/game/bank.js
+  var JEWELS = [
+    ["ruby", "Ruby", "#D9485F"],
+    ["sapphire", "Sapphire", "#3F6FD1"],
+    ["emerald", "Emerald", "#2E9E6B"],
+    ["amethyst", "Amethyst", "#9363C8"],
+    ["topaz", "Topaz", "#F2A33A"],
+    ["rose", "Rose quartz", "#F29BB8"],
+    ["citrine", "Citrine", "#F2CF3A"],
+    ["diamond", "Diamond", "#BFE3F2"]
+  ];
+  var colOf = (k) => (JEWELS.find((j) => j[0] === k) || JEWELS[0])[2];
+  var KEY2 = "fox.vaults";
+  var load2 = () => {
+    try {
+      return Object.assign({ jars: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(KEY2)) || {});
+    } catch {
+      return { jars: [], updatedAt: 0 };
+    }
+  };
+  var V = load2();
+  var ref2 = null;
+  var chain2 = Promise.resolve();
+  var onChange2 = () => {
+  };
+  var keep2 = () => {
+    try {
+      localStorage.setItem(KEY2, JSON.stringify(V));
+    } catch {
+    }
+  };
+  function merge2(a, b) {
+    const m = /* @__PURE__ */ new Map();
+    [...a.jars || [], ...b && b.jars || []].forEach((j) => {
+      if (!j || !j.id) return;
+      const o = m.get(j.id);
+      if (!o || (j.u || 0) > (o.u || 0)) m.set(j.id, j);
+    });
+    return { jars: [...m.values()], updatedAt: Math.max(a.updatedAt || 0, b && b.updatedAt || 0) };
+  }
+  function attachVaults(col, changed) {
+    onChange2 = changed;
+    ref2 = col.doc("vaults");
+    ref2.onSnapshot((snap) => {
+      if (!snap.exists) {
+        if (V.jars.length) push2();
+        return;
+      }
+      V = merge2(V, JSON.parse(JSON.stringify(snap.data() || {})));
+      keep2();
+      onChange2();
+    }, () => {
+    });
+  }
+  function push2() {
+    if (!ref2) return;
+    chain2 = chain2.then(async () => {
+      try {
+        const cur2 = await ref2.get();
+        if (cur2.exists) V = merge2(V, JSON.parse(JSON.stringify(cur2.data() || {})));
+        await ref2.set(JSON.parse(JSON.stringify(V)));
+      } catch {
+      }
+    });
+  }
+  var touch = (j) => {
+    j.u = Date.now();
+    V.updatedAt = Date.now();
+    keep2();
+    push2();
+    onChange2();
+  };
+  var jarAt = (slot2) => V.jars.find((j) => j.slot === slot2 && !j.deleted) || null;
+  var allJars = () => V.jars.filter((j) => !j.deleted).sort((a, b) => a.slot - b.slot);
+  var fillOf = (j) => j && j.goal > 0 ? Math.max(0, Math.min(1, (j.amount || 0) / j.goal)) : 0;
+  var isFull = (j) => !!j && j.goal > 0 && (j.amount || 0) >= j.goal;
+  var money = (n, cur2 = "$") => `${cur2}${Math.round(Number(n) || 0).toLocaleString("en-GB")}`;
+  function setupJar(slot2, f2) {
+    let j = jarAt(slot2);
+    if (!j) {
+      j = { id: "v" + Date.now().toString(36), slot: slot2, amount: 0, log: [], fills: 0 };
+      V.jars.push(j);
+    }
+    j.label = plain(String(f2.label || "Savings")).trim().slice(0, 24) || "Savings";
+    j.goal = Math.max(1, Math.round(Number(f2.goal) || 0));
+    j.step = Math.max(1, Math.round(Number(f2.step) || 100));
+    j.color = JEWELS.some((x) => x[0] === f2.color) ? f2.color : "ruby";
+    j.cur = String(f2.cur || "$").slice(0, 3);
+    j.deleted = false;
+    touch(j);
+    return j;
+  }
+  function deposit(slot2, amt) {
+    const j = jarAt(slot2);
+    if (!j) return null;
+    amt = Math.round(Number(amt) || 0);
+    if (!amt) return { jar: j, nowFull: false };
+    const was = isFull(j);
+    j.amount = Math.max(0, (j.amount || 0) + amt);
+    j.log = [...j.log || [], { at: Date.now(), amt }].slice(-60);
+    const nowFull = !was && isFull(j);
+    if (nowFull) {
+      j.fills = (j.fills || 0) + 1;
+      j.fullAt = Date.now();
+    }
+    touch(j);
+    return { jar: j, nowFull };
+  }
+  function emptyJar2(slot2) {
+    const j = jarAt(slot2);
+    if (!j) return null;
+    const before = { amount: j.amount, log: j.log };
+    j.amount = 0;
+    j.log = [...j.log || [], { at: Date.now(), amt: -before.amount, emptied: true }].slice(-60);
+    touch(j);
+    return () => {
+      j.amount = before.amount;
+      j.log = before.log;
+      touch(j);
+    };
+  }
+  function removeJar(slot2) {
+    const j = jarAt(slot2);
+    if (!j) return null;
+    const copy = JSON.parse(JSON.stringify(j));
+    j.deleted = true;
+    touch(j);
+    return () => {
+      Object.assign(j, copy, { deleted: false });
+      touch(j);
+    };
+  }
+  var fullCounts = () => allJars().map((j) => ({ id: j.id, label: j.label, fills: j.fills || 0 }));
+  var jarByLabel = (q) => {
+    const n = String(q || "").toLowerCase().trim();
+    return allJars().find((j) => j.label.toLowerCase() === n) || allJars().find((j) => n && (j.label.toLowerCase().includes(n) || n.includes(j.label.toLowerCase()))) || null;
+  };
+  var rnd3 = (seed2, i) => {
+    let h = 2166136261;
+    for (const ch of seed2 + ":" + i) {
+      h ^= ch.charCodeAt(0);
+      h = Math.imul(h, 16777619);
+    }
+    return (h >>> 0) % 1e3 / 1e3;
+  };
+  var shade = (hex, f2) => {
+    const n = parseInt(hex.slice(1), 16), c = [n >> 16, n >> 8 & 255, n & 255].map((v) => Math.round(f2 > 0 ? v + (255 - v) * f2 : v * (1 + f2)));
+    return "#" + c.map((v) => v.toString(16).padStart(2, "0")).join("");
+  };
+  var gem = (x, y, s, c, seed2, i) => {
+    const k = rnd3(seed2, i) < 0.5, lt = shade(c, 0.28), dk = shade(c, -0.18);
+    return k ? `<path d="M${x - s} ${y} l${s * 0.5} ${-s * 0.7} h${s} l${s * 0.5} ${s * 0.7} l${-s} ${s * 0.9}z" fill="${c}"/><path d="M${x - s} ${y} h${s * 2} l${-s} ${s * 0.9}z" fill="${dk}"/><path d="M${x - s * 0.5} ${y - s * 0.7} h${s} l${-s * 0.5} ${s * 0.7}z" fill="${lt}"/>` : `<path d="M${x} ${y - s} l${s * 0.8} ${s} l${-s * 0.8} ${s * 0.8} l${-s * 0.8} ${-s * 0.8}z" fill="${c}"/><path d="M${x} ${y - s} l${s * 0.8} ${s} h${-s * 0.8}z" fill="${lt}"/><path d="M${x - s * 0.8} ${y} h${s * 0.8} v${s * 0.8}z" fill="${dk}"/>`;
+  };
+  function jarArt2(j, w, h, opts = {}) {
+    const c = colOf(j && j.color), f2 = opts.fill != null ? opts.fill : fillOf(j), seed2 = j && j.id || "new";
+    const L2 = w * 0.1, R2 = w * 0.9, T = h * 0.09, B = h * 0.97, inner = [L2 + 3, R2 - 3], topY = T + 10, fillTop = B - 6 - (B - 6 - topY) * f2;
+    const body2 = `M${L2 + 2} ${T + 6} q-3 ${h * 0.04} -2.4 ${h * 0.1} q1 ${(B - T) * 0.38} -.4 ${(B - T) * 0.78} q.4 ${h * 0.05} ${w * 0.08} ${h * 0.06} q${(R2 - L2) * 0.42} 1.2 ${(R2 - L2) * 0.84 - w * 0.16} -.2 q${w * 0.07} -.6 ${w * 0.07} ${-h * 0.06} q-.9 ${-(B - T) * 0.4} .3 ${-(B - T) * 0.8} q.2 ${-h * 0.06} -2.4 ${-h * 0.09}z`;
+    let gems = "";
+    const s = Math.max(4, w * 0.075), rowH = s * 1.35, cols = Math.max(3, Math.floor((inner[1] - inner[0]) / (s * 1.9)));
+    for (let r = 0, y = B - 8; y > fillTop + s * 0.3; r++, y -= rowH) for (let i = 0; i < cols; i++) {
+      const x = inner[0] + s + (i + r % 2 * 0.5) * ((inner[1] - inner[0] - s * 2) / (cols - 0.5)) + (rnd3(seed2, r * 31 + i) - 0.5) * s * 0.5;
+      if (x > inner[1] - s * 0.6) continue;
+      const tone = [c, shade(c, 0.15), shade(c, -0.1)][Math.floor(rnd3(seed2, r * 7 + i * 3) * 3)];
+      gems += gem(x, y + (rnd3(seed2, r * 13 + i) - 0.5) * s * 0.4, s, tone, seed2, r * 17 + i);
+    }
+    let marks = "";
+    if (opts.markers !== false && j && j.goal > 0 && j.step > 0) {
+      const n = Math.floor(j.goal / j.step), every = Math.max(1, Math.ceil(n / (h > 200 ? 12 : 6)));
+      for (let k = 1; k <= n; k++) {
+        if (k % every && k !== n) continue;
+        const y = B - 6 - (B - 6 - topY) * (k * j.step / j.goal);
+        marks += `<path d="M${R2 - 2} ${y.toFixed(1)} h${-w * 0.12}" stroke="#3b3530" stroke-width="1" opacity=".55"/>${h > 160 ? `<text x="${R2 + 2}" y="${(y + 3).toFixed(1)}" font-size="${Math.max(7, w * 0.11)}" font-family="Mulish, sans-serif" font-weight="700" fill="#5E5650">${esc(money(k * j.step, j.cur))}</text>` : ""}`;
+      }
+    }
+    const cap2 = opts.cap === false ? "" : `<g class="vcap"><path d="M${L2 + 1} ${T - 2} q${(R2 - L2) / 2 - 1} -4 ${R2 - L2 - 2} 0 l.6 ${h * 0.06} q${-(R2 - L2) / 2} 3 ${-(R2 - L2) + 1} 0z" fill="#C9A227" stroke="#3b3530" stroke-width="1.3" stroke-linejoin="round"/><path d="M${L2 + 4} ${T + h * 0.025} h${R2 - L2 - 8}" stroke="#8B6B12" stroke-width="1" opacity=".6"/></g>`;
+    const clip = `vclip-${esc(opts.id || seed2)}`;
+    return `<defs><clipPath id="${clip}"><path d="${body2}"/></clipPath></defs>
+    <path d="${body2}" fill="rgba(220,235,245,.4)" stroke="#3b3530" stroke-width="1.5" stroke-linejoin="round"/>
+    <g clip-path="url(#${clip})"><g class="vgems">${gems}</g></g>${marks}
+    <path d="M${L2 + 7} ${T + 16} q-1 ${(B - T) * 0.4} .4 ${(B - T) * 0.72}" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2.2" stroke-linecap="round"/>${cap2}
+    ${opts.sparkle ? [[0.3, 0.2], [0.7, 0.35], [0.45, 0.6], [0.8, 0.75], [0.2, 0.85]].map(([fx, fy], i) => `<path class="vspark" style="animation-delay:-${(i * 0.4).toFixed(1)}s" d="M${(L2 + (R2 - L2) * fx).toFixed(1)} ${(T + (B - T) * fy - 5).toFixed(1)} l1.6 3.4 3.4 1.6 -3.4 1.6 -1.6 3.4 -1.6 -3.4 -3.4 -1.6 3.4 -1.6z" fill="#FFF6C2" stroke="#C9A227" stroke-width=".8"/>`).join("") : ""}`;
+  }
+  var bv = { mode: "jar", slot: 0, amt: "", form: null, pouring: false };
+  function vaultPanel() {
+    const j = jarAt(bv.slot), h = `<span class="tape gingham" aria-hidden="true"></span>`;
+    if (!j || bv.mode === "setup") {
+      const f2 = bv.form || { label: j ? j.label : "", goal: j ? j.goal : "", step: j ? j.step : 100, color: j ? j.color : JEWELS[bv.slot % JEWELS.length][0], cur: j ? j.cur : "$" };
+      return h + `<h2>${j ? "Change this vault" : "Set up vault " + (bv.slot + 1)}</h2><p class="sub">A savings goal, kept as jewels.</p>
+      <form id="vForm" class="vform"><label class="muted" for="vLabel">Label</label><input id="vLabel" maxlength="24" placeholder="e.g. Japan trip" value="${esc(f2.label)}">
+      <div class="vrow"><span><label class="muted" for="vGoal">Goal</label><input id="vGoal" type="number" inputmode="numeric" min="1" step="1" placeholder="2000" value="${esc(String(f2.goal))}"></span>
+      <span><label class="muted" for="vStep">Markers every</label><select id="vStep">${[10, 20, 50, 100, 200, 500, 1e3].map((v) => `<option value="${v}"${+f2.step === v ? " selected" : ""}>${v}</option>`).join("")}</select></span></div>
+      <p class="muted" style="margin:8px 0 4px">Jewels</p><div class="vswatch" role="radiogroup" aria-label="Jewel colour">${JEWELS.map(([k, n, c]) => `<button type="button" class="vsw${f2.color === k ? " on" : ""}" data-vcol="${k}" role="radio" aria-checked="${f2.color === k}" aria-label="${n}" title="${n}"><svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true">${gem(10, 9, 7, c, k, 1)}</svg></button>`).join("")}</div>
+      <div class="actions"><button class="btn primary" type="submit">${j ? "Save" : "Set it up"}</button><button class="btn alt small" type="button" data-vb="${j ? "back" : "close"}">${j ? "Back" : "Not now"}</button>${j ? `<button class="btn alt small" type="button" data-vb="remove">Remove this vault</button>` : ""}</div></form>`;
+    }
+    const full = isFull(j);
+    return h + `<h2>${esc(j.label)}</h2><p class="sub">${esc(money(j.amount, j.cur))} of ${esc(money(j.goal, j.cur))}${full ? " · full!" : ` · ${esc(money(Math.max(0, j.goal - j.amount), j.cur))} to go`}</p>
+    <div class="vbig${bv.pouring ? " pouring" : ""}${full ? " full" : ""}" id="vBig"><svg viewBox="0 0 160 300" width="160" height="300" aria-hidden="true">${jarArt2(j, 120, 290, { id: "big", sparkle: full, cap: !bv.pouring })}</svg><div class="vpour" id="vPour"></div></div>
+    <form id="vAdd" class="row vadd"><label class="sr" for="vAmt">Amount to add</label><span class="vcur">${esc(j.cur)}</span><input id="vAmt" type="number" inputmode="decimal" step="1" placeholder="Amount" value="${esc(bv.amt)}"><button class="btn primary" type="submit" ${bv.pouring ? "disabled" : ""}>Add jewels</button></form>
+    <div class="actions"><button class="btn alt small" data-vb="out">Take some out</button><button class="btn alt small" data-vb="setup">Change</button><button class="btn alt small" data-vb="empty" ${j.amount ? "" : "disabled"}>Empty the jar</button><button class="btn alt small" data-close="1">Back to the vault</button></div>
+    ${(j.log || []).length ? `<details class="vlog"><summary>History</summary><ul>${j.log.slice().reverse().slice(0, 12).map((x) => `<li><span>${new Date(x.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Asia/Singapore" })}</span><b>${x.emptied ? "emptied" : (x.amt > 0 ? "+" : "") + esc(money(x.amt, j.cur))}</b></li>`).join("")}</ul></details>` : ""}`;
+  }
+  function bankOverview(bankerHere) {
+    const js = allJars(), total = js.reduce((s, j) => s + (j.amount || 0), 0);
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>The bank</h2><p class="sub">${bankerHere ? "Opal slides your passbook across the counter." : "Opal's passbook is on the counter."} Every vault at a glance.</p>
+    ${js.length ? `<ul class="hlist vlist">${js.map((j) => `<li data-vopen="${j.slot}" role="button" tabindex="0"><span><b>${esc(j.label)}</b><small>${esc(money(j.amount, j.cur))} of ${esc(money(j.goal, j.cur))}</small></span><span class="clbar"><i style="width:${Math.round(fillOf(j) * 100)}%;background:${colOf(j.color)}"></i></span>${isFull(j) ? `<span class="hbadge now">full</span>` : ""}</li>`).join("")}</ul>
+      <p class="muted">Saved across every vault: <b>${esc(money(total, js[0] && js[0].cur || "$"))}</b></p>` : `<p class="muted">No vaults set up yet. Tap any empty jar along the back wall to start one.</p>`}
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function wireVault(root, api4) {
+    root.querySelectorAll("[data-vcol]").forEach((b) => b.onclick = () => {
+      bv.form = readForm(root);
+      bv.form.color = b.dataset.vcol;
+      api4.rerender();
+    });
+    const form = root.querySelector("#vForm");
+    if (form) form.onsubmit = (ev) => {
+      ev.preventDefault();
+      const f2 = readForm(root);
+      if (!(Number(f2.goal) > 0)) {
+        root.querySelector("#vGoal").focus();
+        return;
+      }
+      setupJar(bv.slot, f2);
+      bv.form = null;
+      bv.mode = "jar";
+      api4.sfx("chime");
+      api4.rerender();
+    };
+    const amt = root.querySelector("#vAmt");
+    if (amt) amt.oninput = () => {
+      bv.amt = amt.value;
+    };
+    const add = root.querySelector("#vAdd");
+    if (add) add.onsubmit = (ev) => {
+      ev.preventDefault();
+      const n = Math.round(Number(amt.value) || 0);
+      if (!n || bv.pouring) {
+        amt.focus();
+        return;
+      }
+      pour(root, n, api4);
+    };
+    root.querySelectorAll("[data-vb]").forEach((b) => b.onclick = () => {
+      const k = b.dataset.vb;
+      if (k === "setup") {
+        bv.mode = "setup";
+        bv.form = null;
+      } else if (k === "back") {
+        bv.mode = "jar";
+        bv.form = null;
+      } else if (k === "out") {
+        const n = Math.round(Number(prompt("How much are you taking out?") || 0));
+        if (n > 0) {
+          deposit(bv.slot, -n);
+          api4.sfx("paper");
+        }
+      } else if (k === "empty") {
+        const r = emptyJar2(bv.slot);
+        if (r) {
+          api4.sfx("pop");
+          api4.undoable("Jar emptied", () => {
+            r();
+            api4.rerender();
+          });
+        }
+      } else if (k === "remove") {
+        const r = removeJar(bv.slot);
+        bv.mode = "jar";
+        if (r) api4.undoable("Vault removed", () => {
+          r();
+          api4.rerender();
+        });
+        return api4.close();
+      } else if (k === "close") return api4.close();
+      api4.rerender();
+    });
+  }
+  var readForm = (root) => ({ label: root.querySelector("#vLabel").value, goal: root.querySelector("#vGoal").value, step: root.querySelector("#vStep").value, color: bv.form && bv.form.color || (root.querySelector(".vsw.on") || {}).dataset?.vcol || "ruby", cur: (jarAt(bv.slot) || {}).cur || "$" });
+  function pour(root, n, api4) {
+    const j = jarAt(bv.slot);
+    if (!j) return;
+    bv.pouring = true;
+    bv.amt = "";
+    const big = root.querySelector("#vBig"), from = fillOf(j), res = deposit(bv.slot, n), to = fillOf(res.jar), c = colOf(j.color);
+    big.classList.add("pouring");
+    const svg2 = big.querySelector("svg");
+    const capEl = svg2.querySelector(".vcap");
+    if (capEl) capEl.classList.add("lift");
+    const drops = Math.min(24, 6 + Math.round(Math.abs(n) / Math.max(1, j.step) * 3)), box = big.querySelector("#vPour");
+    for (let i = 0; i < drops; i++) {
+      const d = document.createElement("span");
+      d.className = "vdrop";
+      d.style.left = 44 + Math.random() * 52 + "px";
+      d.style.animationDelay = (i * 0.07).toFixed(2) + "s";
+      d.innerHTML = `<svg viewBox="0 0 20 20" width="14" height="14">${gem(10, 9, 7, [c, shade(c, 0.15), shade(c, -0.1)][i % 3], j.id, i)}</svg>`;
+      box.appendChild(d);
+    }
+    api4.sfx("jewels");
+    const steps = 18;
+    let k = 0;
+    const grow = setInterval(() => {
+      k++;
+      const f2 = from + (to - from) * (k / steps);
+      svg2.innerHTML = jarArt2(res.jar, 120, 290, { id: "big", fill: f2, cap: false });
+      if (k >= steps) {
+        clearInterval(grow);
+        setTimeout(() => {
+          svg2.innerHTML = jarArt2(res.jar, 120, 290, { id: "big", sparkle: isFull(res.jar) });
+          const cp = svg2.querySelector(".vcap");
+          if (cp) cp.classList.add("drop");
+          api4.sfx("cap");
+          setTimeout(() => {
+            bv.pouring = false;
+            box.innerHTML = "";
+            api4.poured(res.jar, res.nowFull);
+            api4.rerender();
+          }, 650);
+        }, 250);
+      }
+    }, 70);
+  }
 
   // src/art/scenes.js
   var G = null;
@@ -2941,12 +3316,12 @@ body.kidmode .scenename span + span{display:none}
     const D3 = VILLAGE;
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="120" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="420" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="200" cy="560" rx="80" ry="40" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M260 322 L260 ${D3.hall.door[1]} M260 322 C200 300 120 290 ${D3.fresh.door[0]} ${D3.fresh.door[1]} M260 322 C200 380 120 430 ${D3.news.door[0]} ${D3.news.door[1]} M260 322 C320 380 410 420 ${D3.post.door[0]} ${D3.post.door[1]} M290 316 C350 290 400 250 ${D3.toLane.door[0]} ${D3.toLane.door[1]} M260 322 L260 ${D3.toBase.door[1]} M260 540 C290 560 310 570 ${D3.bench.door[0]} ${D3.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M250 300 C226 250 ${D3.hall.door[0]} 236 ${D3.hall.door[0]} ${D3.hall.door[1]} M276 298 C300 250 ${D3.bank.door[0]} 232 ${D3.bank.door[0]} ${D3.bank.door[1]} M220 320 C180 330 120 350 ${D3.fresh.door[0]} ${D3.fresh.door[1]} M260 322 C200 380 120 430 ${D3.news.door[0]} ${D3.news.door[1]} M260 322 C320 380 410 420 ${D3.post.door[0]} ${D3.post.door[1]} M290 316 C350 290 400 250 ${D3.toLane.door[0]} ${D3.toLane.door[1]} M260 322 L260 ${D3.toBase.door[1]} M260 540 C290 560 310 570 ${D3.bench.door[0]} ${D3.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
-    ${flowers([[30, 262, "#EFA3A6"], [44, 270, "#F3C969"], [150, 206, "#C3CDEE"], [372, 206, "#EFA3A6"], [488, 270, "#F3C969"], [300, 448, "#EFA3A6"], [214, 450, "#C3CDEE"], [470, 540, "#C3CDEE"], [20, 430, "#F3C969"], [505, 380, "#EFA3A6"]])}
-    ${tree(170, 64, 1)}${tree(350, 64, 1)}${tree(26, 96, 1.05)}${tree(494, 96, 1.05)}${tree(24, 350, 0.9)}${tree(498, 330, 0.9)}${tree(504, 520, 0.85)}${tree(190, 470, 0.8)}${tree(330, 470, 0.8)}
+    ${flowers([[30, 262, "#EFA3A6"], [44, 270, "#F3C969"], [60, 214, "#C3CDEE"], [300, 214, "#EFA3A6"], [488, 270, "#F3C969"], [300, 448, "#EFA3A6"], [214, 450, "#C3CDEE"], [470, 540, "#C3CDEE"], [20, 430, "#F3C969"], [505, 380, "#EFA3A6"]])}
+    ${tree(26, 96, 1.05)}${tree(262, 84, 0.85)}${tree(494, 96, 1.05)}${tree(24, 350, 0.9)}${tree(498, 330, 0.9)}${tree(504, 520, 0.85)}${tree(190, 470, 0.8)}${tree(330, 470, 0.8)}
     ${flowers([[170, 540, "#F3C969"], [184, 548, "#EFA3A6"], [206, 520, "#C3CDEE"], [300, 520, "#F3C969"], [400, 560, "#EFA3A6"], [150, 580, "#C3CDEE"]])}`;
-    const places = townHall() + `<g transform="translate(-350 0)">${library()}</g>` + postOffice() + // east gate to Makers' Lane (Chord and Chico live there now)
+    const places = `<g transform="translate(-90 0)">${townHall()}</g>` + bankBuilding() + `<g transform="translate(-350 96)">${library()}</g>` + postOffice() + // east gate to Makers' Lane (Chord and Chico live there now)
     `<g data-place="toLane" aria-label="Gate to Makers' Lane" transform="translate(-56 -112)"><ellipse class="hov" cx="496" cy="330" rx="26" ry="30" style="fill:var(--butter)"/>
       ${sk(
       `<rect x="484" y="292" width="6" height="56" style="fill:var(--wood)"/><rect x="508" y="292" width="6" height="56" style="fill:var(--wood)"/><path d="M480 296 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
@@ -2955,9 +3330,9 @@ body.kidmode .scenename span + span{display:none}
       ${tapeLabel(458, 366, "Makers' Lane", "var(--sage)", 11)}</g><g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M238 330 v-40 M282 330 v-40"/><rect x="230" y="282" width="60" height="38" rx="3" style="fill:var(--wood)"/>${notesArt(236, 288, G.remaining().length)}</g>
       ${tapeLabel(260, 280, "Quests", "var(--butter)", 11)}</g>
-    <g data-place="well" aria-label="Well"><ellipse class="hov" cx="160" cy="342" rx="26" ry="7" style="fill:var(--butter)"/>
+    <g transform="translate(36 64)"><g data-place="well" aria-label="Well"><ellipse class="hov" cx="160" cy="342" rx="26" ry="7" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M146 312 v20 M174 312 v20"/><path d="M140 314 l20 -12 l20 12z" style="fill:var(--peach)"/><ellipse cx="160" cy="334" rx="17" ry="7" style="fill:var(--stone)"/><path d="M143 334 v6 a17 7 0 0 0 34 0 v-6" style="fill:var(--stone)"/><ellipse cx="160" cy="333" rx="11" ry="4" style="fill:var(--water)"/></g>
-      ${tapeLabel(160, 360, "Well", "var(--sky)", 11)}</g>
+      ${tapeLabel(160, 360, "Well", "var(--sky)", 11)}</g></g>
     <g data-place="market" aria-label="Market"><ellipse class="hov" cx="362" cy="342" rx="32" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M340 306 v30 M384 306 v30"/><rect x="336" y="320" width="52" height="16" style="fill:var(--wood)"/>
         <path d="M332 306 h60 l-4 10 h-52z" style="fill:var(--card)"/><path d="M340 306 l-2 10 M352 306 l-1 10 M364 306 v10 M376 306 l1 10" style="stroke:var(--rose)" stroke-width="5"/>
@@ -2976,7 +3351,7 @@ body.kidmode .scenename span + span{display:none}
       if (!h) return "";
       return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L2[h.status]}"/></g>`;
     };
-    const lamps = [[204, 424], [384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
+    const lamps = [[384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
     return lampDefs + ground + lamps + places + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
   }
   var waterBand = (y1, y2) => `<path d="M0 ${y1 + 4} Q65 ${y1 - 4} 130 ${y1 + 3} T260 ${y1 + 2} T390 ${y1 + 4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2 + 5} 390 ${y2 - 2} T260 ${y2} T130 ${y2 - 3} T0 ${y2 + 2}`}z" style="fill:var(--water)"/>`;
@@ -3220,6 +3595,17 @@ body.kidmode .scenename span + span{display:none}
           `<rect x="${x - 30}" y="${y - 62}" width="60" height="10" rx="2"/><rect x="${x - 24}" y="${y - 52}" width="48" height="44"/><path d="M${x - 14} ${y - 50} v40 M${x} ${y - 50} v40 M${x + 14} ${y - 50} v40" opacity=".35"/><rect x="${x - 30}" y="${y - 8}" width="60" height="8" rx="2"/>`
         ) + (t2 ? trophySVG(t2, 64).replace("<svg ", `<svg x="${x - 32}" y="${y - 62 - 72}" class="ptrophy" `) : `<ellipse cx="${x}" cy="${y - 64}" rx="16" ry="3" fill="#000" opacity=".06"/>`);
       }
+      // the bank: a tall glass vault jar (savings), and Opal's counter
+      case "vaultjar": {
+        const j = G.vault ? G.vault(x) : null;
+        if (!j) return `<g opacity=".75">${sk(`<rect x="${x - 26}" y="${y - 282}" width="52" height="280" rx="12" style="fill:rgba(220,235,245,.35)"/>`, `<rect x="${x - 26}" y="${y - 282}" width="52" height="280" rx="12" stroke-dasharray="5 5"/><path d="M${x} ${y - 152} v20 M${x - 10} ${y - 142} h20" stroke-width="2"/>`)}</g>`;
+        return `<svg x="${x - 34}" y="${y - 300}" width="80" height="300" overflow="visible" class="${isFull(j) ? "vfull" : ""}">${jarArt2(j, 68, 300, { id: "f" + j.slot, sparkle: isFull(j), markers: false })}</svg>`;
+      }
+      case "bankcounter":
+        return sk(
+          `<rect x="${x - 90}" y="${y - 44}" width="180" height="44" rx="4" style="fill:var(--wood)"/><rect x="${x - 94}" y="${y - 50}" width="188" height="8" rx="2" style="fill:#E7DCC2"/><rect x="${x - 40}" y="${y - 110}" width="80" height="60" rx="4" style="fill:rgba(255,253,246,.5)"/><circle cx="${x + 64}" cy="${y - 56}" r="6" style="fill:var(--honey)"/><rect x="${x - 70}" y="${y - 60}" width="26" height="10" rx="1" style="fill:#8E2C48"/>`,
+          `<rect x="${x - 90}" y="${y - 44}" width="180" height="44" rx="4"/><rect x="${x - 94}" y="${y - 50}" width="188" height="8" rx="2"/><rect x="${x - 40}" y="${y - 110}" width="80" height="60" rx="4"/>${[-24, -8, 8, 24].map((d) => `<path d="M${x + d} ${y - 110} v60"/>`).join("")}<path d="M${x - 40} ${y - 80} h80" opacity=".5"/><circle cx="${x + 64}" cy="${y - 56}" r="6"/><path d="M${x + 64} ${y - 62} v-3"/><rect x="${x - 70}" y="${y - 60}" width="26" height="10" rx="1"/><path d="M${x - 84} ${y - 22} h168" opacity=".4"/>`
+        );
       case "kindboard": {
         const n = G.kudos ? G.kudos() : 0, cols = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
         const spots = [[-36, -98], [-8, -102], [20, -97], [-30, -70], [0, -66], [26, -72], [-20, -44], [12, -44]];
@@ -3429,8 +3815,11 @@ body.kidmode .scenename span + span{display:none}
       `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`
     ) + `<g>${[["apple", "dumpling", "fish", "toast"], ["tulip", "carrot", "strawberry", "sunflower"]].map((row2, r2) => row2.map((n, i) => iconAt(n, 64 + i * 30, 62 + r2 * 38, 26)).join("")).join("")}${[["yarn", "ball", "brush", "crown"], ["bath", "fort", "corn", "blueberry"]].map((row2, r2) => row2.map((n, i) => iconAt(n, 374 + i * 30, 62 + r2 * 38, 26)).join("")).join("")}</g>`;
     st6.forEach((s) => {
-      const nm = s.kind === "pedestal" ? (G.ped && G.ped(s.x, s.y) || {}).label || "" : s.name;
-      h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? tapeLabel(s.x, s.y + 24, nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)", s.kind === "pedestal" ? 10 : void 0) : ""}</g>`;
+      const nm = s.kind === "pedestal" ? (G.ped && G.ped(s.x, s.y) || {}).label || "" : s.kind === "vaultjar" ? (() => {
+        const j = G.vault && G.vault(s.x);
+        return j ? j.label : "Empty";
+      })() : s.name;
+      h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm.length > 10 ? nm.slice(0, 9) + "…" : nm, "var(--card)", 9.5) : tapeLabel(s.x, s.y + 24, nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)", s.kind === "pedestal" ? 10 : void 0) : ""}</g>`;
     });
     if (id === "kidroom") {
       const k = G.kid ? G.kid() : {};
@@ -3692,7 +4081,7 @@ body.kidmode .scenename span + span{display:none}
       job: "Retired postmaster, unofficial well-keeper",
       intro: "Okada. Forty years delivering letters. Retired now, but I still can't stop sorting things. Even the pebbles by the well.",
       look: { skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses" },
-      routine: [slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[176, 352], [146, 360], [170, 372]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[176, 352], [146, 360], [170, 372]]), slot("17:00", "19:30", "village", [322, 566])],
+      routine: [slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("17:00", "19:30", "village", [322, 566])],
       lines: [
         "Letters used to come in sacks. Now it's all on your little phone.",
         "The well water is sweeter in the afternoon. Don't ask me why.",
@@ -3734,7 +4123,7 @@ body.kidmode .scenename span + span{display:none}
       routine: [
         slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]),
         slot("12:30", "13:30", "village", [346, 566]),
-        slot("13:30", "18:00", "village", [[150, 300], [380, 300], [300, 450], [210, 420], [440, 560]])
+        slot("13:30", "18:00", "village", [[170, 300], [400, 280], [300, 450], [150, 520], [440, 560]])
       ],
       lines: [
         "*hums a tune* Fixed the market's wobbly leg this morning.",
@@ -3775,6 +4164,24 @@ body.kidmode .scenename span + span{display:none}
       routine: [slot("15:00", "18:30", "base", [[230, 350], [300, 380], [200, 420], [360, 580], [160, 560], [300, 600]])],
       lines: ["Race you to the pond!", "Evan is SO fast. Almost as fast as me.", "Did you know foxes can't ride bikes? I asked Maple.", "I found a snail! His name is Gary."],
       react: {}
+    },
+    {
+      id: "opal",
+      pitch: 1,
+      name: "Opal",
+      job: "The banker",
+      intro: "Welcome to the bank! I'm Opal. Six vaults, all yours. Every little deposit is a jewel in the jar, and yes, I polish them.",
+      look: { skin: "#E8C3A2", hair: "#2E2622", hairStyle: "bun", top: "#7FA88A", bottom: "#3F4A3A", extra: "glasses" },
+      routine: [slot("9:00", "12:30", "bank", [260, 470]), slot("12:30", "13:30", "village", [[300, 214], [262, 230]]), slot("13:30", "17:30", "bank", [260, 470])],
+      lines: [
+        "Every jewel counts. Even the little ones. Especially the little ones.",
+        "Pay yourself first, then the rest. That's the banker's secret.",
+        "I polished the sapphires this morning. Don't tell the rubies.",
+        "Slow and steady fills a jar. Promise.",
+        "A full jar is the prettiest thing in this town."
+      ],
+      away: "Opal's on her lunch break. The vaults are always open to you.",
+      react: { quests3: "Three quests done! That's a jewel's worth of effort." }
     },
     {
       id: "theo",
@@ -3855,17 +4262,17 @@ body.kidmode .scenename span + span{display:none}
   var sfxBus = null;
   var reverb = null;
   var pianoWave = null;
-  var KEY2 = "fox.sound";
+  var KEY3 = "fox.sound";
   var settings = (() => {
     try {
-      return Object.assign({ music: true, musicVol: 0.5, sfx: true }, JSON.parse(localStorage.getItem(KEY2)) || {});
+      return Object.assign({ music: true, musicVol: 0.5, sfx: true }, JSON.parse(localStorage.getItem(KEY3)) || {});
     } catch {
       return { music: true, musicVol: 0.5, sfx: true };
     }
   })();
   var saveSettings = () => {
     try {
-      localStorage.setItem(KEY2, JSON.stringify(settings));
+      localStorage.setItem(KEY3, JSON.stringify(settings));
     } catch {
     }
   };
@@ -4360,6 +4767,19 @@ body.kidmode .scenename span + span{display:none}
       o.start(t2);
       o.stop(t2 + 0.42);
     },
+    jewels(t2) {
+      for (let i = 0; i < 16; i++) bell(1800 + Math.random() * 1600, t2 + i * 0.06 + Math.random() * 0.03, 0.35, 0.025);
+    },
+    cap(t2) {
+      const s = noise(0.06), f2 = ac.createBiquadFilter(), g = ac.createGain();
+      f2.type = "lowpass";
+      f2.frequency.value = 700;
+      g.gain.setValueAtTime(0.4, t2);
+      g.gain.exponentialRampToValueAtTime(1e-4, t2 + 0.09);
+      s.connect(f2).connect(g).connect(sfxBus);
+      s.start(t2);
+      bell(1320, t2 + 0.05, 0.5, 0.03);
+    },
     yay(t2) {
       [523, 659, 784, 1046].forEach((fr, i) => bell(fr, t2 + i * 0.09, 0.7, 0.06));
     },
@@ -4486,10 +4906,10 @@ body.kidmode .scenename span + span{display:none}
         closeNotebook();
         return;
       }
-      const keep5 = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
+      const keep6 = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
       page.innerHTML = taskPage(t2);
       if ($("nbAsk")) {
-        $("nbAsk").value = keep5;
+        $("nbAsk").value = keep6;
         if (typing) $("nbAsk").focus();
       }
     } else page.innerHTML = open.kind === "tracker" ? trackerPage(open.which) : open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
@@ -4884,11 +5304,12 @@ Quests finished today: ${S3.doneIds.length}`;
   // src/game/paths.js
   var OBST = {
     village: [
-      [190, 40, 330, 172],
-      [27, 150, 143, 254],
+      [100, 40, 240, 172],
+      [322, 64, 438, 168],
+      [27, 246, 143, 350],
       [377, 380, 493, 484],
       [334, 304, 390, 336],
-      [142, 304, 178, 340],
+      [178, 368, 214, 404],
       [230, 284, 290, 326],
       [314, 548, 354, 568],
       [62, 436, 118, 476]
@@ -5053,25 +5474,25 @@ Quests finished today: ${S3.doneIds.length}`;
   var APPS2 = { chord: { name: "Chord", room: "chord" }, chico: { name: "Chico", room: "chico" } };
   var BRANDS = { chord: { name: "Chord", color: "var(--sage)" }, ambidextrous: { name: "Ambidextrous", color: "var(--peri)" } };
   var DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
-  var KEY3 = "fox.feeds";
+  var KEY4 = "fox.feeds";
   var D2 = (() => {
     try {
-      return JSON.parse(localStorage.getItem(KEY3)) || {};
+      return JSON.parse(localStorage.getItem(KEY4)) || {};
     } catch {
       return {};
     }
   })();
-  var onChange2 = () => {
+  var onChange3 = () => {
   };
   function attachFeeds(col, changed) {
-    onChange2 = changed;
+    onChange3 = changed;
     DOCS.forEach((id) => col.doc(id).onSnapshot((snap) => {
       D2[id] = snap.exists ? snap.data() || null : null;
       try {
-        localStorage.setItem(KEY3, JSON.stringify(D2));
+        localStorage.setItem(KEY4, JSON.stringify(D2));
       } catch {
       }
-      onChange2(id);
+      onChange3(id);
     }, () => {
     }));
   }
@@ -5227,7 +5648,7 @@ Quests finished today: ${S3.doneIds.length}`;
   var DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   var DEFAULT_LAST = [{ id: "l1", name: "Aircon servicing", last: null, every: 90 }, { id: "l2", name: "Change our sheets", last: null, every: 7 }, { id: "l3", name: "Evan's sheets", last: null, every: 7 }];
   var EVERY = [[0, "no reminder"], [7, "every week"], [14, "every 2 weeks"], [30, "every month"], [90, "every 3 months"], [180, "every 6 months"], [365, "every year"]];
-  var KEY4 = "fox.hestia";
+  var KEY5 = "fox.hestia";
   var fresh = () => ({
     zones: DEFAULT_ZONES,
     dailyTasks: DEFAULT_DAILY,
@@ -5253,13 +5674,13 @@ Quests finished today: ${S3.doneIds.length}`;
   });
   var H2 = (() => {
     try {
-      return Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY4)) || {});
+      return Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY5)) || {});
     } catch {
       return fresh();
     }
   })();
   var api2 = null;
-  var ref2 = null;
+  var ref3 = null;
   var pushT = null;
   var view = { tab: "daily", fridge: "stock", loc: "all" };
   var focus = null;
@@ -5278,8 +5699,8 @@ Quests finished today: ${S3.doneIds.length}`;
     }
   })();
   function attachHestiaDb(docRef) {
-    ref2 = docRef;
-    ref2.onSnapshot((snap) => {
+    ref3 = docRef;
+    ref3.onSnapshot((snap) => {
       const first = !synced, cached = !!(snap.metadata && snap.metadata.fromCache);
       if (!cached) synced = true;
       if (!snap.exists) {
@@ -5303,7 +5724,7 @@ Quests finished today: ${S3.doneIds.length}`;
   }
   var local = () => {
     try {
-      localStorage.setItem(KEY4, JSON.stringify(H2));
+      localStorage.setItem(KEY5, JSON.stringify(H2));
     } catch {
     }
   };
@@ -5311,11 +5732,11 @@ Quests finished today: ${S3.doneIds.length}`;
   function save() {
     H2.updatedAt = Date.now();
     local();
-    if (!ref2 || !synced) return;
+    if (!ref3 || !synced) return;
     clearTimeout(pushT);
     pushT = setTimeout(async () => {
       try {
-        const cur2 = await ref2.get(), r = cur2.exists ? cur2.data() : null;
+        const cur2 = await ref3.get(), r = cur2.exists ? cur2.data() : null;
         if (r && (r.updatedAt || 0) > seen) {
           H2 = Object.assign(fresh(), JSON.parse(JSON.stringify(r)));
           seen = r.updatedAt;
@@ -5325,7 +5746,7 @@ Quests finished today: ${S3.doneIds.length}`;
           return;
         }
         const body2 = JSON.parse(JSON.stringify(H2));
-        await ref2.set(body2);
+        await ref3.set(body2);
         seen = Math.max(seen, body2.updatedAt || 0);
       } catch {
       }
@@ -5714,7 +6135,7 @@ Quests finished today: ${S3.doneIds.length}`;
     }
     if (d && d.state && d.state.zones) d = d.state;
     if (!d || !Array.isArray(d.zones) || !Array.isArray(d.dailyTasks)) return "That doesn't look like a Hestia export (no zones or daily tasks).";
-    const keep5 = [
+    const keep6 = [
       "zones",
       "dailyTasks",
       "weeklyTasks",
@@ -5735,7 +6156,7 @@ Quests finished today: ${S3.doneIds.length}`;
       "chimeEnabled",
       "chimeInterval"
     ];
-    keep5.forEach((k) => {
+    keep6.forEach((k) => {
       if (d[k] != null) H2[k] = d[k];
     });
     tidy();
@@ -5955,7 +6376,7 @@ Quests finished today: ${S3.doneIds.length}`;
     const d = outfitDoc(), inv = inventory();
     if (!inv || !sample) return null;
     const shown = [...(todayDoc() || {}).options || [], ...extras(F2)].map((o2) => FIELDS.map(([k]) => o2[k]).filter(Boolean).join(", ")).slice(-8);
-    const prompt = `You are Mel's personal stylist. Suggest ONE outfit for today.
+    const prompt2 = `You are Mel's personal stylist. Suggest ONE outfit for today.
 Mel's style profile (from her stylist skill):
 - Colour season True/Deep Winter. Best: true black, pure white, icy white, deep navy, burgundy/wine, deep forest green, royal blue, emerald, plum, charcoal, cool blue-reds, hot pink, icy lavender. Wears silver AND gold. Avoid warm browns, camel, orange, yellow, warm beige, olive, rust, coral near the face (chocolate, mocha, tan work as neutrals away from the face). Neutrals: black, charcoal, navy, pure white.
 - Kibbe Romantic: soft, curved, fitted; fluid fabrics (jersey, silk, satin, chiffon); define the waist (tuck or belt); midi and maxi; soft florals or abstract prints, never geometric; rounded or almond toes; no boxy head-to-toe or oversized.
@@ -5970,7 +6391,7 @@ Calendar: ${(events || []).length ? events.slice(0, 12).map((e) => `${e.allDay ?
 Already suggested today (make this one clearly different): ${shown.join(" | ") || "none"}
 Mel's request: ${clean(ask2, 120) || "something different"}
 Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "", "shoes": "", "bag": "", "jewellery": "", "sunglasses": "", "layer": "", "hair": "up|down + short note", "why": "one sentence"} (leave fields empty when not used: dress OR top+bottom).`;
-    const o = await sample.json(prompt, { modelTier: "quick", cache: false });
+    const o = await sample.json(prompt2, { modelTier: "quick", cache: false });
     if (!o || typeof o !== "object") return null;
     const out = {};
     FIELDS.forEach(([k]) => {
@@ -6160,13 +6581,13 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     rerender();
     const snap = JSON.stringify({ overview: st.snap && st.snap.overview, projects: st.snap && st.snap.projects, needs_attention: st.snap && st.snap.attention }).slice(0, 4e4);
     const history = st.log.slice(-10, -1).map((m) => (m.role === "user" ? "Mel: " : "You: ") + m.content).join("\n");
-    const prompt = `You are the client desk in Mel's village game: a calm, practical assistant who knows her studio (she runs Fresh Pages Co / Ambidextrous, a copywriting and AI studio in Singapore). Answer in at most 5 short sentences or a short list, plain text, no emoji, no markdown headings. Be specific: names, dates, what's waiting on whom. Only state what the data shows; if it doesn't say, say so. You can't change anything in Chord.
+    const prompt2 = `You are the client desk in Mel's village game: a calm, practical assistant who knows her studio (she runs Fresh Pages Co / Ambidextrous, a copywriting and AI studio in Singapore). Answer in at most 5 short sentences or a short list, plain text, no emoji, no markdown headings. Be specific: names, dates, what's waiting on whom. Only state what the data shows; if it doesn't say, say so. You can't change anything in Chord.
 Snapshot from Chord (today): ${snap}
 ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     let reply = "";
     try {
       const lim = sample.limits ? await sample.limits().catch(() => null) : null;
-      const r = lim && lim.tools ? await sample(prompt, { tools: TOOLS, modelTier: "default" }) : await sample(prompt, { modelTier: "default", cache: false });
+      const r = lim && lim.tools ? await sample(prompt2, { tools: TOOLS, modelTier: "default" }) : await sample(prompt2, { modelTier: "default", cache: false });
       reply = plain(String(r && r.text || "")).trim();
     } catch (e) {
       reply = e && e.code === "rate_limited" ? "I need a breather. Ask again in a minute?" : "I couldn't get to the files just now. Try again?";
@@ -6315,7 +6736,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     const plans = (st2.plans || []).filter((p) => p && p.text).map((p) => `== ${p.title}${p.theme ? ` (theme: ${p.theme})` : ""} ==
 ${p.text}`).join("\n\n");
     const history = st2.log.slice(-10, -1).map((x) => (x.role === "user" ? "Mel: " : "You: ") + x.content).join("\n");
-    const prompt = `You are Mel's planning partner at the planning table in her village game. She runs Fresh Pages Co / Ambidextrous (copywriting, AI training) plus her apps Chord and Chico, and parents Evan (2-3). Coach in her boss-mode style: honest, kind, specific, one clear next step, protect rest and family time, no guilt. Answer in at most 6 short sentences or a short list. Plain text, no emoji, no markdown headings. Base everything on her plans and today's data below; if they don't say, say so rather than inventing.
+    const prompt2 = `You are Mel's planning partner at the planning table in her village game. She runs Fresh Pages Co / Ambidextrous (copywriting, AI training) plus her apps Chord and Chico, and parents Evan (2-3). Coach in her boss-mode style: honest, kind, specific, one clear next step, protect rest and family time, no guilt. Answer in at most 6 short sentences or a short list. Plain text, no emoji, no markdown headings. Base everything on her plans and today's data below; if they don't say, say so rather than inventing.
 Today: ${(/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })}.
 Her plans (Notion):
 ${plans || "(couldn't read the plans just now)"}
@@ -6324,7 +6745,7 @@ Today's calendar: ${JSON.stringify(ctx2.events || []).slice(0, 2e3)}
 ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     let reply = "";
     try {
-      const r = await sample(prompt, { modelTier: "default", cache: false });
+      const r = await sample(prompt2, { modelTier: "default", cache: false });
       reply = plain(String(r && r.text || "")).trim();
     } catch (e) {
       reply = e && e.code === "rate_limited" ? "Let's pause a moment. Ask again in a minute?" : "I couldn't think that through just now. Try again?";
@@ -6391,7 +6812,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     }
     st3.busy = false;
   }
-  var money = (n, c) => `${c}${Math.round(Number(n) || 0).toLocaleString()}`;
+  var money2 = (n, c) => `${c}${Math.round(Number(n) || 0).toLocaleString()}`;
   var mlabel = (k) => (/* @__PURE__ */ new Date(k + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
   function chart(d, target) {
     const ms = Object.keys(d.byMonth), vals = ms.map((k) => d.byMonth[k]), max = Math.max(1, target || 0, ...vals) * 1.15;
@@ -6400,10 +6821,10 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       const x = L2 + i * (bw + gap), v = vals[i], top = y(v), h = Math.max(0, B - top), cur2 = i === ms.length - 1;
       const r = Math.min(4, h);
       const path = h > 0 ? `M${x} ${B} V${top + r} Q${x} ${top} ${x + r} ${top} H${x + bw - r} Q${x + bw} ${top} ${x + bw} ${top + r} V${B}z` : "";
-      return `<g class="rbar${cur2 ? " cur" : ""}" tabindex="0" aria-label="${mlabel(k)}: ${money(v, d.currency)}"><title>${mlabel(k)} ${k.slice(0, 4)}: ${money(v, d.currency)}</title><rect x="${x - gap / 2}" y="${T}" width="${bw + gap}" height="${B - T}" fill="transparent"/>${path ? `<path d="${path}" fill="#4E9A4A" opacity="${cur2 ? 1 : 0.55}"/>` : ""}
-      ${cur2 || v === Math.max(...vals) && v > 0 ? `<text x="${x + bw / 2}" y="${top - 4}" text-anchor="middle" class="rval">${money(v, d.currency)}</text>` : ""}<text x="${x + bw / 2}" y="${B + 14}" text-anchor="middle" class="rax">${mlabel(k)}</text></g>`;
+      return `<g class="rbar${cur2 ? " cur" : ""}" tabindex="0" aria-label="${mlabel(k)}: ${money2(v, d.currency)}"><title>${mlabel(k)} ${k.slice(0, 4)}: ${money2(v, d.currency)}</title><rect x="${x - gap / 2}" y="${T}" width="${bw + gap}" height="${B - T}" fill="transparent"/>${path ? `<path d="${path}" fill="#4E9A4A" opacity="${cur2 ? 1 : 0.55}"/>` : ""}
+      ${cur2 || v === Math.max(...vals) && v > 0 ? `<text x="${x + bw / 2}" y="${top - 4}" text-anchor="middle" class="rval">${money2(v, d.currency)}</text>` : ""}<text x="${x + bw / 2}" y="${B + 14}" text-anchor="middle" class="rax">${mlabel(k)}</text></g>`;
     }).join("");
-    const tl = target ? `<path d="M${L2} ${y(target)} H${W2 - L2}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W2 - L2}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money(target, d.currency)}</text>` : "";
+    const tl = target ? `<path d="M${L2} ${y(target)} H${W2 - L2}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W2 - L2}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money2(target, d.currency)}</text>` : "";
     return `<svg class="rchart" viewBox="0 0 ${W2} ${H3}" role="img" aria-label="Paid income by month, last six months"><path d="M${L2} ${B} H${W2 - L2}" stroke="#D8CFC2" stroke-width="1"/>${bars}${tl}</svg>`;
   }
   var revenueNow = () => {
@@ -6418,14 +6839,14 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     const d = st3.data, c = d.currency, ms = Object.keys(d.byMonth), now2 = d.byMonth[ms[ms.length - 1]], target = Number(F2.revTarget) || 0;
     const pct = target ? Math.min(100, Math.round(100 * now2 / target)) : 0, retTotal = Number(d.retTotal) || d.retainers.reduce((s, r) => s + (Number(r.monthly_amount) || 0), 0);
     h += `<p class="sub">Studio income from Chord: paid invoices, by the month they were paid${st3.busy ? " · refreshing…" : ""}.</p>
-    <div class="rhero"><p class="rbig">${money(now2, c)}</p><p class="muted">${esc((/* @__PURE__ */ new Date(ms[ms.length - 1] + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" }))} so far${target ? ` · ${pct}% of your ${money(target, c)} target` : ""}</p>
+    <div class="rhero"><p class="rbig">${money2(now2, c)}</p><p class="muted">${esc((/* @__PURE__ */ new Date(ms[ms.length - 1] + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" }))} so far${target ? ` · ${pct}% of your ${money2(target, c)} target` : ""}</p>
       ${target ? `<span class="clbar rprog"><i style="width:${pct}%"></i></span>` : ""}
       ${st3.editing || !target ? `<form class="row rtarget" id="rvForm"><label for="rvIn" class="muted">Monthly target</label><input id="rvIn" type="number" min="0" step="50" inputmode="numeric" value="${target || ""}" placeholder="e.g. 6000"><button class="btn small" type="submit">Set</button></form>` : `<button class="btn alt small" data-rv="edit">Change target</button>`}</div>
     ${chart(d, target)}
-    <details class="rtable"><summary>See the numbers</summary><table><thead><tr><th>Month</th><th>Paid</th></tr></thead><tbody>${ms.map((k) => `<tr><td>${mlabel(k)} ${k.slice(0, 4)}</td><td>${money(d.byMonth[k], c)}</td></tr>`).join("")}</tbody></table></details>`;
-    if (retTotal || d.retainers.length) h += `<p class="muted">${d.retainers.length} retainer${d.retainers.length === 1 ? "" : "s"} running${retTotal ? `: ${money(retTotal, c)} a month` : ""}.</p>`;
+    <details class="rtable"><summary>See the numbers</summary><table><thead><tr><th>Month</th><th>Paid</th></tr></thead><tbody>${ms.map((k) => `<tr><td>${mlabel(k)} ${k.slice(0, 4)}</td><td>${money2(d.byMonth[k], c)}</td></tr>`).join("")}</tbody></table></details>`;
+    if (retTotal || d.retainers.length) h += `<p class="muted">${d.retainers.length} retainer${d.retainers.length === 1 ? "" : "s"} running${retTotal ? `: ${money2(retTotal, c)} a month` : ""}.</p>`;
     const owedTotal = d.owed.reduce((s, i) => s + (Number(i.total) || 0), 0);
-    h += `<p class="eyebrow">Still owed${d.owed.length ? ` · ${money(owedTotal, c)}` : ""}</p>` + (d.owed.length ? `<ul class="hlist clatt">${d.owed.slice(0, 8).map((i) => `<li><span><b>${esc(plain(String(i.client || "")).slice(0, 40))}</b> ${money(i.total, c)}<small>${esc(String(i.number || ""))}${i.due ? " · due " + esc(String(i.due)) : ""}</small></span>${i.overdue ? `<span class="hbadge now">overdue</span>` : ""}</li>`).join("")}</ul>` : `<p class="muted">Nothing outstanding. Every invoice is paid.</p>`);
+    h += `<p class="eyebrow">Still owed${d.owed.length ? ` · ${money2(owedTotal, c)}` : ""}</p>` + (d.owed.length ? `<ul class="hlist clatt">${d.owed.slice(0, 8).map((i) => `<li><span><b>${esc(plain(String(i.client || "")).slice(0, 40))}</b> ${money2(i.total, c)}<small>${esc(String(i.number || ""))}${i.due ? " · due " + esc(String(i.due)) : ""}</small></span>${i.overdue ? `<span class="hbadge now">overdue</span>` : ""}</li>`).join("")}</ul>` : `<p class="muted">Nothing outstanding. Every invoice is paid.</p>`);
     return h + `<div class="actions"><button class="btn alt small" data-rv="refresh">Refresh</button></div>`;
   }
   function wireRevenue(root, F2, save3, rerender) {
@@ -6451,18 +6872,18 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   // src/game/myroom.js
   var JKEY = "fox.journal";
   var SKEY = "fox.scratch";
-  var load2 = (k, f2) => {
+  var load3 = (k, f2) => {
     try {
       return Object.assign(f2(), JSON.parse(localStorage.getItem(k)) || {});
     } catch {
       return f2();
     }
   };
-  var J = load2(JKEY, () => ({ entries: [], updatedAt: 0 }));
-  var SC = load2(SKEY, () => ({ text: "", updatedAt: 0 }));
+  var J = load3(JKEY, () => ({ entries: [], updatedAt: 0 }));
+  var SC = load3(SKEY, () => ({ text: "", updatedAt: 0 }));
   var jref = null;
   var sref = null;
-  var onChange3 = () => {
+  var onChange4 = () => {
   };
   var jChain = Promise.resolve();
   var sT = null;
@@ -6488,7 +6909,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     return { entries: [...m.values()].sort((x, y) => (y.at || 0) - (x.at || 0)).slice(0, 400), updatedAt: Math.max(a.updatedAt || 0, b && b.updatedAt || 0) };
   }
   function attachMyDocs(col, changed) {
-    onChange3 = changed;
+    onChange4 = changed;
     jref = col.doc("journal");
     sref = col.doc("scratch");
     jref.onSnapshot((snap) => {
@@ -6498,7 +6919,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       }
       J = mergeJ(J, JSON.parse(JSON.stringify(snap.data() || {})));
       keepJ();
-      onChange3("journal");
+      onChange4("journal");
     }, () => {
     });
     sref.onSnapshot((snap) => {
@@ -6510,7 +6931,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       if ((r.updatedAt || 0) > (SC.updatedAt || 0)) {
         SC = { text: String(r.text || "").slice(0, 2e4), updatedAt: r.updatedAt };
         keepS();
-        onChange3("scratch");
+        onChange4("scratch");
       }
     }, () => {
     });
@@ -6652,26 +7073,26 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   }
 
   // src/game/letters.js
-  var KEY5 = "fox.letters";
-  var load3 = () => {
+  var KEY6 = "fox.letters";
+  var load4 = () => {
     try {
-      return Object.assign({ items: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(KEY5)) || {});
+      return Object.assign({ items: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(KEY6)) || {});
     } catch {
       return { items: [], updatedAt: 0 };
     }
   };
-  var L = load3();
-  var ref3 = null;
-  var chain2 = Promise.resolve();
-  var onChange4 = () => {
+  var L = load4();
+  var ref4 = null;
+  var chain3 = Promise.resolve();
+  var onChange5 = () => {
   };
-  var keep2 = () => {
+  var keep3 = () => {
     try {
-      localStorage.setItem(KEY5, JSON.stringify(L));
+      localStorage.setItem(KEY6, JSON.stringify(L));
     } catch {
     }
   };
-  function merge2(a, b) {
+  function merge3(a, b) {
     const m = /* @__PURE__ */ new Map();
     [...a.items || [], ...b && b.items || []].forEach((e) => {
       if (!e || !e.id) return;
@@ -6681,37 +7102,37 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     return { items: [...m.values()].sort((x, y) => x.at - y.at).slice(-300), updatedAt: Math.max(a.updatedAt || 0, b && b.updatedAt || 0) };
   }
   function attachLetters(col, changed) {
-    onChange4 = changed;
-    ref3 = col.doc("letters");
-    ref3.onSnapshot((snap) => {
+    onChange5 = changed;
+    ref4 = col.doc("letters");
+    ref4.onSnapshot((snap) => {
       if (!snap.exists) {
-        if (L.items.length) push2();
+        if (L.items.length) push3();
         return;
       }
-      L = merge2(L, JSON.parse(JSON.stringify(snap.data() || {})));
-      keep2();
-      onChange4();
+      L = merge3(L, JSON.parse(JSON.stringify(snap.data() || {})));
+      keep3();
+      onChange5();
     }, () => {
     });
   }
-  function push2() {
-    if (!ref3) return;
-    chain2 = chain2.then(async () => {
+  function push3() {
+    if (!ref4) return;
+    chain3 = chain3.then(async () => {
       try {
-        const cur2 = await ref3.get();
-        if (cur2.exists) L = merge2(L, JSON.parse(JSON.stringify(cur2.data() || {})));
-        await ref3.set(JSON.parse(JSON.stringify(L)));
+        const cur2 = await ref4.get();
+        if (cur2.exists) L = merge3(L, JSON.parse(JSON.stringify(cur2.data() || {})));
+        await ref4.set(JSON.parse(JSON.stringify(L)));
       } catch {
       }
     });
   }
   var commit2 = () => {
     L.updatedAt = Date.now();
-    keep2();
-    push2();
-    onChange4();
+    keep3();
+    push3();
+    onChange5();
   };
-  var touch = (e) => {
+  var touch2 = (e) => {
     e.u = Date.now();
     commit2();
   };
@@ -6749,7 +7170,7 @@ ${e.text}`, { modelTier: "default", cache: false });
         const text = plain(String(r && r.text || "")).trim();
         if (text) {
           e.reply = { text: text.slice(0, 3e3), due: Date.now() + (15 + Math.random() * 30) * 6e4 };
-          touch(e);
+          touch2(e);
         }
       } catch (err) {
         if (err && err.code === "not_granted") break;
@@ -6824,11 +7245,11 @@ ${e.text}`, { modelTier: "default", cache: false });
           const e = L.items.find((x) => x.id === id);
           if (e && e.kind === "universe" && e.reply && e.reply.due <= Date.now() && !e.reply.read) {
             e.reply.read = true;
-            touch(e);
+            touch2(e);
           }
           if (e && e.kind === "future" && e.deliver <= dayKey() && !e.read) {
             e.read = true;
-            touch(e);
+            touch2(e);
           }
         } else if (k === "senduni") {
           const text = plain(lv.draft).trim();
@@ -6870,7 +7291,7 @@ ${e.reply.text}` : ""}` : `A letter to future me (written ${shortWhen(e.at)})
 ${e.text}`;
           if (api4.toJournal(text)) {
             e.journaled = true;
-            touch(e);
+            touch2(e);
           }
         }
         api4.rerender();
@@ -7152,7 +7573,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
 
   // src/game/routines.js
-  var KEY6 = "fox.routines";
+  var KEY7 = "fox.routines";
   var DAYS2 = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
   var DAY_NAMES = { mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday" };
   var BEAUTY = { mon: "Pore extraction", tue: "Retinol", wed: "Hair mask", thu: "Nail care", fri: "Pore pad or lactic acid", sat: "Body scrub", sun: "Air shot micro-needling + face mask" };
@@ -7161,26 +7582,26 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     { id: "morning", name: "Morning routine", kind: "checklist", at: 1, items: ["Big glass of water", "Make the bed", "Wash face and skincare", "Get dressed (peek at the wardrobe)", "Vitamins"].map((t2, i) => ({ id: "m" + i, text: t2 })) },
     { id: "beauty", name: "Beauty routine", kind: "weekly", at: 1, days: BEAUTY }
   ], ticks: {}, updatedAt: 0 });
-  var load4 = () => {
+  var load5 = () => {
     try {
-      const r = JSON.parse(localStorage.getItem(KEY6));
+      const r = JSON.parse(localStorage.getItem(KEY7));
       return r && Array.isArray(r.lists) ? Object.assign({ ticks: {} }, r) : seed();
     } catch {
       return seed();
     }
   };
-  var R = load4();
-  var ref4 = null;
-  var chain3 = Promise.resolve();
-  var onChange5 = () => {
+  var R = load5();
+  var ref5 = null;
+  var chain4 = Promise.resolve();
+  var onChange6 = () => {
   };
-  var keep3 = () => {
+  var keep4 = () => {
     try {
-      localStorage.setItem(KEY6, JSON.stringify(R));
+      localStorage.setItem(KEY7, JSON.stringify(R));
     } catch {
     }
   };
-  function merge3(a, b) {
+  function merge4(a, b) {
     if (!b) return a;
     const m = /* @__PURE__ */ new Map();
     [...a.lists || [], ...b.lists || []].forEach((l) => {
@@ -7200,17 +7621,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return { lists: [...m.values()], ticks, updatedAt: Math.max(a.updatedAt || 0, b.updatedAt || 0), beautyFilled: !!(a.beautyFilled || b.beautyFilled) };
   }
   function attachRoutines(col, changed) {
-    onChange5 = changed;
-    ref4 = col.doc("routines");
-    ref4.onSnapshot((snap) => {
+    onChange6 = changed;
+    ref5 = col.doc("routines");
+    ref5.onSnapshot((snap) => {
       if (!snap.exists) {
-        push3();
+        push4();
         return;
       }
-      R = merge3(R, JSON.parse(JSON.stringify(snap.data() || {})));
-      keep3();
+      R = merge4(R, JSON.parse(JSON.stringify(snap.data() || {})));
+      keep4();
       fillBeauty();
-      onChange5();
+      onChange6();
     }, () => {
     });
   }
@@ -7224,22 +7645,22 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     commit3();
   }
-  function push3() {
-    if (!ref4) return;
-    chain3 = chain3.then(async () => {
+  function push4() {
+    if (!ref5) return;
+    chain4 = chain4.then(async () => {
       try {
-        const cur2 = await ref4.get();
-        if (cur2.exists) R = merge3(R, JSON.parse(JSON.stringify(cur2.data() || {})));
-        await ref4.set(JSON.parse(JSON.stringify(R)));
+        const cur2 = await ref5.get();
+        if (cur2.exists) R = merge4(R, JSON.parse(JSON.stringify(cur2.data() || {})));
+        await ref5.set(JSON.parse(JSON.stringify(R)));
       } catch {
       }
     });
   }
   var commit3 = () => {
     R.updatedAt = Date.now();
-    keep3();
-    push3();
-    onChange5();
+    keep4();
+    push4();
+    onChange6();
   };
   var lists = () => R.lists.filter((l) => !l.deleted).sort((a, b) => (a.kind === "checklist" ? 0 : 1) - (b.kind === "checklist" ? 0 : 1) || (a.made || 0) - (b.made || 0));
   var listById = (id) => R.lists.find((l) => l.id === id && !l.deleted);
@@ -7255,7 +7676,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     R.ticks[d][listId + ":" + itemId] = { on, at: Date.now() };
     commit3();
   }
-  var touch2 = (l) => {
+  var touch3 = (l) => {
     l.at = Date.now();
     commit3();
   };
@@ -7286,7 +7707,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     l.kind = kind;
     if (kind === "weekly") l.days = Object.assign({}, l.days || {}, days || {});
     else if (items) l.items = items.map((t2) => ({ id: uid("i"), text: t2 }));
-    touch2(l);
+    touch3(l);
     return l;
   }
   var rv = { sel: null, edit: false, paste: "" };
@@ -7336,7 +7757,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         const it = l.items.find((x) => x.id === i.dataset.item), v = plain(i.value).trim().slice(0, 120);
         if (it && v) it.text = v;
       });
-      touch2(l);
+      touch3(l);
     };
     if (form) {
       form.onsubmit = (ev) => {
@@ -7350,7 +7771,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         l.kind = r.value;
         l.items = l.items || [];
         l.days = l.days || {};
-        touch2(l);
+        touch3(l);
         api4.rerender();
       });
       const nw = form.querySelector("#rtNew");
@@ -7392,16 +7813,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
           const v = plain(root.querySelector("#rtNew").value).trim().slice(0, 120);
           if (!v) return;
           l.items.push({ id: uid("i"), text: v });
-          touch2(l);
+          touch3(l);
         } else if (k === "delitem") {
           saveForm();
           const idx = l.items.findIndex((x) => x.id === id);
           if (idx < 0) return;
           const [gone] = l.items.splice(idx, 1);
-          touch2(l);
+          touch3(l);
           api4.undoable("Step removed", () => {
             l.items.splice(Math.min(idx, l.items.length), 0, gone);
-            touch2(l);
+            touch3(l);
             api4.rerender();
           });
         } else if (k === "paste") {
@@ -7410,11 +7831,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
           saveForm();
           l.days = Object.assign({}, l.days || {}, wk);
           rv.paste = "";
-          touch2(l);
+          touch3(l);
         } else if (k === "dellist") {
           const copy = JSON.parse(JSON.stringify(l));
           l.deleted = true;
-          touch2(l);
+          touch3(l);
           rv.edit = false;
           rv.sel = null;
           api4.undoable(`Removed “${copy.name}”`, () => {
@@ -7438,26 +7859,26 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
 
   // src/game/kudos.js
-  var KEY7 = "fox.kudos";
-  var load5 = () => {
+  var KEY8 = "fox.kudos";
+  var load6 = () => {
     try {
-      return Object.assign({ items: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(KEY7)) || {});
+      return Object.assign({ items: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(KEY8)) || {});
     } catch {
       return { items: [], updatedAt: 0 };
     }
   };
-  var K = load5();
-  var ref5 = null;
-  var chain4 = Promise.resolve();
-  var onChange6 = () => {
+  var K = load6();
+  var ref6 = null;
+  var chain5 = Promise.resolve();
+  var onChange7 = () => {
   };
-  var keep4 = () => {
+  var keep5 = () => {
     try {
-      localStorage.setItem(KEY7, JSON.stringify(K));
+      localStorage.setItem(KEY8, JSON.stringify(K));
     } catch {
     }
   };
-  function merge4(a, b) {
+  function merge5(a, b) {
     const m = /* @__PURE__ */ new Map();
     [...a.items || [], ...b && b.items || []].forEach((e) => {
       if (!e || !e.id) return;
@@ -7467,35 +7888,35 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return { items: [...m.values()].slice(-500), updatedAt: Math.max(a.updatedAt || 0, b && b.updatedAt || 0) };
   }
   function attachKudos(col, changed) {
-    onChange6 = changed;
-    ref5 = col.doc("kudos");
-    ref5.onSnapshot((snap) => {
+    onChange7 = changed;
+    ref6 = col.doc("kudos");
+    ref6.onSnapshot((snap) => {
       if (!snap.exists) {
-        if (K.items.length) push4();
+        if (K.items.length) push5();
         return;
       }
-      K = merge4(K, JSON.parse(JSON.stringify(snap.data() || {})));
-      keep4();
-      onChange6();
+      K = merge5(K, JSON.parse(JSON.stringify(snap.data() || {})));
+      keep5();
+      onChange7();
     }, () => {
     });
   }
-  function push4() {
-    if (!ref5) return;
-    chain4 = chain4.then(async () => {
+  function push5() {
+    if (!ref6) return;
+    chain5 = chain5.then(async () => {
       try {
-        const cur2 = await ref5.get();
-        if (cur2.exists) K = merge4(K, JSON.parse(JSON.stringify(cur2.data() || {})));
-        await ref5.set(JSON.parse(JSON.stringify(K)));
+        const cur2 = await ref6.get();
+        if (cur2.exists) K = merge5(K, JSON.parse(JSON.stringify(cur2.data() || {})));
+        await ref6.set(JSON.parse(JSON.stringify(K)));
       } catch {
       }
     });
   }
   var commit4 = () => {
     K.updatedAt = Date.now();
-    keep4();
-    push4();
-    onChange6();
+    keep5();
+    push5();
+    onChange7();
   };
   var kudos = () => K.items.filter((e) => !e.deleted).sort((a, b) => (b.made || b.at || 0) - (a.made || a.at || 0));
   var kudosCount = () => kudos().length;
@@ -8355,7 +8776,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     updatedAt: 0
   });
   var freshFox = () => ({ name: "Maple", xp: 0, days: 0, streak: 0, lastActive: null, coins: null, inv: null, plots: null, cool: {}, met: {}, gifts: {}, mailRead: {}, digest: { read: {}, lastAt: 0, mine: [] }, updatedAt: 0 });
-  var load6 = (k, f2) => {
+  var load7 = (k, f2) => {
     try {
       const v = JSON.parse(localStorage.getItem(k));
       return v ? Object.assign(f2(), v) : f2();
@@ -8363,12 +8784,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       return f2();
     }
   };
-  var S2 = load6("fox.today", freshToday);
-  var F = load6("fox.fox", freshFox);
-  var P = load6("fox.plan", () => ({ day: null, tasks: [] }));
-  var MAIL = load6("fox.mail", () => ({ items: [] }));
-  var ST = load6("fox.stats", () => ({}));
-  var LIB = load6("fox.library", () => ({ items: [] }));
+  var S2 = load7("fox.today", freshToday);
+  var F = load7("fox.fox", freshFox);
+  var P = load7("fox.plan", () => ({ day: null, tasks: [] }));
+  var MAIL = load7("fox.mail", () => ({ items: [] }));
+  var ST = load7("fox.stats", () => ({}));
+  var LIB = load7("fox.library", () => ({ items: [] }));
   var sampleCap = null;
   function migrate() {
     if (S2.day !== dayKey()) S2 = freshToday();
@@ -8407,7 +8828,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   setArtContext({ F: () => F, S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), goodNews: () => {
     const g = goodNews();
     return g && F.goodRead !== g.at ? g : null;
-  }, lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk(), music: () => settings.music, jars: () => shelf(), kudos: () => kudosCount(), ped: (x, y) => {
+  }, lanterns: () => S2.pond ? S2.pond.shown ?? S2.pond.wins.length : 0, dusk: () => isDusk(), music: () => settings.music, jars: () => shelf(), kudos: () => kudosCount(), vault: (x) => {
+    const i = [70, 165, 260, 355, 450].indexOf(x);
+    return i < 0 ? null : jarAt(i);
+  }, ped: (x, y) => {
     const i = stationsOf("trophy").filter((s) => s.kind === "pedestal").findIndex((s) => s.x === x && s.y === y);
     return i < 0 ? null : onPedestals(F)[i] || null;
   }, kid: () => ({ sleep: kid.sleep || evanNight() }) });
@@ -8448,12 +8872,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     if (!refs || !synced2[which]) return;
     clearTimeout(pending[which]);
-    pending[which] = setTimeout(() => push5(which), 500);
+    pending[which] = setTimeout(() => push6(which), 500);
   }
   var seen2 = { today: 0, fox: 0 };
-  async function push5(which, direct) {
+  async function push6(which, direct) {
     if (writing[which]) {
-      pending[which] = setTimeout(() => push5(which, direct), 400);
+      pending[which] = setTimeout(() => push6(which, direct), 400);
       return;
     }
     writing[which] = true;
@@ -8512,6 +8936,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!uid2) return;
     const col = db.collection("data/users/" + uid2);
     attachHestiaDb(col.doc("hestia"));
+    attachVaults(col, () => {
+      if (scene === "bank") drawScene();
+      if (vaultView && !bv.pouring && !/^(vLabel|vGoal|vAmt)$/.test(document.activeElement?.id || "")) ctx();
+    });
     attachLetters(col, () => {
       if (lettersOpen && !/^(ltText|ltDate)$/.test(document.activeElement?.id || "")) ctx();
     });
@@ -8675,6 +9103,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     compost: { n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster." },
     sprinkler: { n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them." }
   };
+  var vaultView = null;
   var lettersOpen = false;
   var trophyView = null;
   var routOpen = false;
@@ -8697,6 +9126,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   routOpen = false;
   trophyView = null;
   lettersOpen = false;
+  vaultView = null;
   var jv = { mode: "shelf", blobs: [], note: "" };
   var BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]];
   var CYCLE = 12;
@@ -9754,7 +10184,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       if (pending[w] && refs && synced2[w]) {
         clearTimeout(pending[w]);
         pending[w] = null;
-        push5(w, true);
+        push6(w, true);
       }
     });
   }
@@ -9770,9 +10200,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     F.digest.read[d.id] = Date.now();
     F.digest.lastAt = Date.now();
     S2.digestMark = S2.doneIds.length;
-    const keep5 = new Set([...LIB.items || [], ...F.digest.mine || []].map((x) => x && x.id));
+    const keep6 = new Set([...LIB.items || [], ...F.digest.mine || []].map((x) => x && x.id));
     Object.keys(F.digest.read).forEach((id) => {
-      if (!keep5.has(id)) delete F.digest.read[id];
+      if (!keep6.has(id)) delete F.digest.read[id];
     });
     gainXp(1);
     save2();
@@ -9848,6 +10278,9 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     well: "village:well",
     "town hall": "hall",
     hall: "hall",
+    bank: "bank",
+    vaults: "bank",
+    savings: "bank",
     "kind words": "trophy:kudos",
     "trophy room": "trophy",
     courtyard: "trophy",
@@ -9992,6 +10425,15 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
         const n = chatLastDone(a.what, a.date);
         return n ? `Logged: ${n}, ${a.date && a.date !== dayKey() ? a.date : "today"}` : null;
       }
+      case "save": {
+        const j = jarByLabel(a.vault);
+        const n = Math.round(Number(a.amount) || 0);
+        if (!j || !n) return null;
+        const r = deposit(j.slot, n);
+        if (r && r.nowFull) vaultPoured(r.jar, true);
+        drawScene();
+        return `${n > 0 ? "+" : ""}${money(n, j.cur)} in the ${j.label} vault (${money(r.jar.amount, j.cur)} of ${money(j.goal, j.cur)})`;
+      }
       case "kudos_add": {
         const e = addKudos(a.text, a.from);
         return e ? `Pinned to Kind words${e.from ? ` (from ${e.from})` : ""}` : null;
@@ -10052,12 +10494,13 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
 {"type":"routine_set","name":"Beauty routine","days":{"mon":"...","tue":"..."}}  or  {"type":"routine_set","name":"Morning routine","items":["...","..."]}  (save a routine to the noticeboard in her room: days = one step per weekday, items = a daily checklist; replaces that routine's steps)
 {"type":"last_done","what":"Evan's sheets","date":"YYYY-MM-DD"}  (log when an every-so-often household job was last done: aircon servicing, sheets, etc.; date optional, defaults to today)
+{"type":"save","vault":"Japan trip","amount":200}  (add savings to one of her bank vaults by its label; a negative amount takes some out)
 {"type":"kudos_add","text":"the compliment, in their words","from":"who said it"}  (when she shares something nice someone said about her: pin it to the Kind words board in the town hall)
 {"type":"remind","text":"get the laundry in","minutes":60}  or  {"type":"remind","text":"call mum","at":"18:30","date":"YYYY-MM-DD"}  ("remind me to..."; minutes from now, or a 24-hour Singapore time with an optional date; text is short and starts with a verb; say the time back to her)
 What's happening in the village right now: ${chatContext()}${planText}
@@ -10629,6 +11072,7 @@ Then tell chat "wind down" whenever you're ready.`
     routOpen = false;
     trophyView = null;
     lettersOpen = false;
+    vaultView = null;
     selPlot = null;
     homeView = null;
     postOpen = false;
@@ -10693,10 +11137,12 @@ Then tell chat "wind down" whenever you're ready.`
     const c = $("ctx");
     let h = "";
     if (kid.open && scene === "kidroom" && c.dataset.kid === kid.open && !$("panel").hidden && !openView) return;
+    if (vaultView && bv.pouring && !$("panel").hidden && !openView) return;
     c.dataset.kid = kid.open && scene === "kidroom" ? kid.open : "";
     if (kid.open && scene === "kidroom") h = kidPanel(kid.open);
     else if (homeView && scene === "home") h = hestiaPanel(homeView);
     else if (deskOpen && scene === "home") h = deskPanel();
+    else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
     else if (kudosOpen && scene === "trophy") h = kudosPanel();
     else if (trophyView && scene === "trophy") h = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : trophyView === "affirm" ? affirmPanel(F.affirm, affirmBusy, !!sampleCap) : trophyView === "fountain" ? fountainPanel(!!sampleCap) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
     else if (routOpen && scene === "room") h = routinesPanel();
@@ -10808,6 +11254,31 @@ Then tell chat "wind down" whenever you're ready.`
     } });
     if (homeView && scene === "home") wireHestia(c, homeView);
     if (deskOpen && scene === "home") wireDesk(c, () => ctx());
+    if (vaultView && scene === "bank") {
+      c.querySelectorAll("[data-vopen]").forEach((el) => {
+        const go2 = () => {
+          bv.slot = +el.dataset.vopen;
+          bv.mode = "jar";
+          vaultView = "jar";
+          ctx();
+        };
+        el.onclick = go2;
+        el.onkeydown = (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            go2();
+          }
+        };
+      });
+      if (vaultView === "jar") wireVault(c, { rerender: () => {
+        ctx();
+        drawScene();
+      }, undoable, sfx, close: () => {
+        vaultView = null;
+        ctx();
+        drawScene();
+      }, poured: vaultPoured });
+    }
     c.querySelectorAll("[data-letters]").forEach((b) => b.onclick = () => {
       journalOpen = false;
       lettersOpen = true;
@@ -10839,6 +11310,7 @@ Then tell chat "wind down" whenever you're ready.`
       }, close: () => {
         trophyView = null;
         lettersOpen = false;
+        vaultView = null;
         ctx();
         drawScene();
       } });
@@ -10848,6 +11320,7 @@ Then tell chat "wind down" whenever you're ready.`
         coin: () => {
           trophyView = null;
           lettersOpen = false;
+          vaultView = null;
           ctx();
           sfx("coin");
           mprop("sparkle", 260 + rnd(-20, 20), 400);
@@ -10915,6 +11388,7 @@ Then tell chat "wind down" whenever you're ready.`
       routOpen = false;
       trophyView = null;
       lettersOpen = false;
+      vaultView = null;
       ctx();
     });
     c.querySelectorAll("[data-bed]").forEach((b) => b.onclick = () => bedAction(b.dataset.bed));
@@ -10948,6 +11422,7 @@ Then tell chat "wind down" whenever you're ready.`
         routOpen = false;
         trophyView = null;
         lettersOpen = false;
+        vaultView = null;
         A.decompNow();
         drawScene();
       } else startBreath(+k);
@@ -11302,6 +11777,7 @@ Then tell chat "wind down" whenever you're ready.`
       routOpen = false;
       trophyView = null;
       lettersOpen = false;
+      vaultView = null;
       homeView = null;
       postOpen = false;
       healthOpen = false;
@@ -11430,6 +11906,7 @@ Then tell chat "wind down" whenever you're ready.`
     routOpen = false;
     trophyView = null;
     lettersOpen = false;
+    vaultView = null;
     homeView = null;
     postOpen = false;
     healthOpen = false;
@@ -11583,6 +12060,23 @@ Then tell chat "wind down" whenever you're ready.`
       loadDesk(false, () => {
         if (deskOpen) ctx();
       });
+      return;
+    }
+    if (scene === "bank" && /^vault\d$/.test(id)) {
+      bv.slot = +id.slice(5);
+      bv.mode = jarAt(bv.slot) ? "jar" : "setup";
+      bv.form = null;
+      bv.amt = "";
+      vaultView = "jar";
+      sfx("paper", true);
+      render();
+      return;
+    }
+    if (scene === "bank" && id === "counter") {
+      vaultView = "overview";
+      sfx("paper", true);
+      if (!npcSay("opal", pick(["Here's your passbook. Every vault at a glance.", "Lovely to see you! Shall we check on your jars?", "Your jewels are all accounted for."]))) speak("Opal's passbook is on the counter.", 3e3);
+      render();
       return;
     }
     if (id === "trophydoor") {
@@ -11760,6 +12254,14 @@ Then tell chat "wind down" whenever you're ready.`
       render();
     }
   }
+  function vaultPoured(j, nowFull) {
+    if (nowFull) {
+      sfx("yay");
+      flash(`${j.label} is full!`);
+      speak(`Your ${j.label} vault is full! Look at it sparkle. That's ${money(j.amount, j.cur)} saved.`, 7e3, true);
+      setTimeout(checkTrophies, 500);
+    } else speak(pick(["Capped and back in the vault.", "Clink clink. Back in the vault it goes.", "Another handful of jewels. Lovely."]), 3e3);
+  }
   var ROUTINE_STEP = 1;
   var ROUTINE_DONE = 5;
   function routineCoins(r) {
@@ -11867,7 +12369,7 @@ Then tell chat "wind down" whenever you're ready.`
   }, { capture: true }));
   function trophyCtx() {
     const r = revenueNow();
-    return { F, ST, levels: LEVELS, levelIndex: level(), kudos: kudosCount(), journal: journalCount(), revenue: r && F.revTarget ? { ...r, target: Number(F.revTarget) } : null };
+    return { F, ST, levels: LEVELS, levelIndex: level(), kudos: kudosCount(), journal: journalCount(), vaults: fullCounts(), revenue: r && F.revTarget ? { ...r, target: Number(F.revTarget) } : null };
   }
   function checkTrophies() {
     const { fresh: fresh2, first, moved } = award(F, reached(trophyCtx()));

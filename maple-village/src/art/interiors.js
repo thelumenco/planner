@@ -123,6 +123,14 @@ const SHELLS = {
     <g style="fill:#F3C969">${rows(4, i => `<circle cx="${28 + i*6}" cy="${200 + i*20}" r="3"/><circle cx="${484 + i*5}" cy="${206 + i*18}" r="3"/>`)}</g>
     <g style="fill:#7FA36E">${[201, 319].map(x => `<circle cx="${x}" cy="552" r="11"/><circle cx="${x - 7}" cy="546" r="7"/><circle cx="${x + 7}" cy="545" r="7"/>`).join("")}</g>`; },
 
+  // The bank (five vaults): cream and sage marble floor, a calm sage wall with brass trim and an arched vault niche behind each jar
+  bank: () => `<rect width="520" height="640" style="fill:#EFE9DA"/>
+    <g opacity=".5">${rows(12, r => rows(13, c => (r + c) % 2 ? `<rect x="${c*40}" y="${150 + r*42}" width="40" height="42" style="fill:#DCE5D2"/>` : ""))}</g>
+    <rect width="520" height="340" style="fill:#EEF1E6"/><rect y="330" width="520" height="10" style="fill:var(--honey)" opacity=".85"/>
+    <g filter="url(#wob)">${[70, 165, 260, 355, 450].map(x => `<path d="M${x-36} 334 V60 a36 36 0 0 1 72 0 V334" style="fill:#E2E8D8;stroke:var(--line)" stroke-width="1.3"/>`).join("")}</g>
+    <g style="fill:var(--honey)" opacity=".8">${[117, 212, 307, 402].map(x => `<circle cx="${x}" cy="40" r="5"/>`).join("")}</g>
+    ${sk(`<path d="M232 8 h56 l-6 14 h-44z" style="fill:var(--honey)"/>`, `<path d="M232 8 h56 l-6 14 h-44z"/><path d="M248 15 h24" opacity=".5"/>`)}${plant(30, 610, 1.1)}${plant(490, 610, 1)}`,
+
   market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(24, i => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`)}</g>
     <g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--blush)"/></g>

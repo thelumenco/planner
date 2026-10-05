@@ -25,7 +25,7 @@ export const NPCS = [
     id: "okada", pitch: 0.75, name: "Mr Okada", job: "Retired postmaster, unofficial well-keeper",
     intro: "Okada. Forty years delivering letters. Retired now, but I still can't stop sorting things. Even the pebbles by the well.",
     look: {skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses"},
-    routine: [slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[176, 352], [146, 360], [170, 372]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[176, 352], [146, 360], [170, 372]]), slot("17:00", "19:30", "village", [322, 566])],
+    routine: [slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("17:00", "19:30", "village", [322, 566])],
     lines: ["Letters used to come in sacks. Now it's all on your little phone.", "The well water is sweeter in the afternoon. Don't ask me why.", "I've sorted the pebbles by colour. Then by size. Then by colour again.",
       "A tidy inbox is a tidy mind. Mine is a shoebox.", "The river's high today. Good for the ducks."],
     react: {inbox: "An email quest! Just like the old days. Stamp it and send it.", water: "Good, drink up. Forty years of walking taught me that.", quests3: "Steady work. That's the postmaster's way."}
@@ -45,7 +45,7 @@ export const NPCS = [
     intro: "Bo! Carpenter. If it creaks, wobbles or falls off, I'm your guy. Built half this village. *hums*",
     look: {skin: "#E2B590", hair: "#3B2A1E", hairStyle: "short", top: "#E9C46A", bottom: "#4F6B8A", extra: "cap"},
     routine: [slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]), slot("12:30", "13:30", "village", [346, 566]),
-      slot("13:30", "18:00", "village", [[150, 300], [380, 300], [300, 450], [210, 420], [440, 560]])],
+      slot("13:30", "18:00", "village", [[170, 300], [400, 280], [300, 450], [150, 520], [440, 560]])],
     lines: ["*hums a tune* Fixed the market's wobbly leg this morning.", "Measure twice, cut once. Or just cut and laugh.", "The workshop smells like sawdust and big ideas.",
       "Shipping is just building, but braver.", "Need a shelf? I always need a shelf."],
     react: {building: "Building something? Tools are out. Go for it.", quests3: "That's three. Nails in straight, every one."}
@@ -67,6 +67,16 @@ export const NPCS = [
     routine: [slot("15:00", "18:30", "base", [[230, 350], [300, 380], [200, 420], [360, 580], [160, 560], [300, 600]])],
     lines: ["Race you to the pond!", "Evan is SO fast. Almost as fast as me.", "Did you know foxes can't ride bikes? I asked Maple.", "I found a snail! His name is Gary."],
     react: {}
+  },
+  {
+    id: "opal", pitch: 1.0, name: "Opal", job: "The banker",
+    intro: "Welcome to the bank! I'm Opal. Six vaults, all yours. Every little deposit is a jewel in the jar, and yes, I polish them.",
+    look: {skin: "#E8C3A2", hair: "#2E2622", hairStyle: "bun", top: "#7FA88A", bottom: "#3F4A3A", extra: "glasses"},
+    routine: [slot("9:00", "12:30", "bank", [260, 470]), slot("12:30", "13:30", "village", [[300, 214], [262, 230]]), slot("13:30", "17:30", "bank", [260, 470])],
+    lines: ["Every jewel counts. Even the little ones. Especially the little ones.", "Pay yourself first, then the rest. That's the banker's secret.", "I polished the sapphires this morning. Don't tell the rubies.",
+      "Slow and steady fills a jar. Promise.", "A full jar is the prettiest thing in this town."],
+    away: "Opal's on her lunch break. The vaults are always open to you.",
+    react: {quests3: "Three quests done! That's a jewel's worth of effort."}
   },
   {
     id: "theo", pitch: 0.9, name: "Theo", job: "Town hall clerk",

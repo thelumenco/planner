@@ -994,6 +994,35 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.hestia")).lastDone || []).some(x => x.name === "Clean the fridge")), "new things can be added, and they're saved with the home data");
   await page.close();
 }
+{
+  // The bank: six vault jars of jewels for savings goals
+  console.log("\nthe bank");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.goto(url + "?reset=1&seed=1&time=10:30");
+  await page.waitForTimeout(800);
+  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(await page.locator('#world [data-place="bank"]').count() === 1, "the town square has a bank");
+  await page.locator('#world [data-place="bank"]').dispatchEvent("click");
+  await page.waitForFunction(() => /bank/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(await page.locator('#world [data-spot^="vault"]').count() === 5, "with five vaults along the back wall");
+  await page.locator('#world [data-spot="vault0"]').dispatchEvent("click");
+  await page.waitForSelector("#vForm", { timeout: 15000 });
+  await page.fill("#vLabel", "Japan trip"); await page.fill("#vGoal", "1000"); await page.selectOption("#vStep", "100"); await page.click('#ctx [data-vcol="emerald"]'); await page.click('#vForm button[type="submit"]');
+  await page.waitForSelector("#vAdd", { timeout: 5000 });
+  await page.fill("#vAmt", "400"); await page.click("#vAdd button");
+  check(await page.locator("#ctx .vdrop").count() > 3, "adding savings pours jewels in");
+  await page.waitForFunction(() => !document.querySelector("#ctx .vdrop"), null, { timeout: 8000 }).catch(() => {});
+  check(/\$400 of \$1,000/.test(await page.locator("#ctx .sub").textContent()) && await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.vaults")).jars || []).some(j => j.label === "Japan trip" && j.amount === 400 && j.color === "emerald")), "then the jar is capped, and the savings are kept privately");
+  await page.fill("#vAmt", "600"); await page.click("#vAdd button");
+  await page.waitForFunction(() => !document.querySelector("#ctx .vdrop"), null, { timeout: 8000 }).catch(() => {}); await page.waitForTimeout(600);
+  check(await page.locator("#ctx .vspark").count() > 0 && /full/.test(await page.locator("#ctx .sub").textContent()), "a full jar sparkles");
+  await page.click('#ctx [data-vb="empty"]'); await page.waitForTimeout(200);
+  check(/\$0 of/.test(await page.locator("#ctx .sub").textContent()), "and can be emptied any time");
+  await page.click("#undoBtn"); await page.waitForTimeout(200);
+  check(/full/.test(await page.locator("#ctx .sub").textContent()), "with Undo");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

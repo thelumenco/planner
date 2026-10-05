@@ -15,7 +15,7 @@ export const LOOKS = {
   objweek: {shape: "rosette", col: "#5B8FD6", emblem: "check"}, objcount: {shape: "medal", col: "#5B8FD6", emblem: "flag"},
   water: {shape: "medal", col: "#7FB8E8", emblem: "drop"}, steps: {shape: "medal", col: "#F2A65A", emblem: "shoe"},
   maple: {shape: "plaque", col: "#EE8B3A", emblem: "fox"}, kind: {shape: "plaque", col: "#F4A0B5", emblem: "heart"},
-  harvest: {shape: "cup", col: "#7BB37A", emblem: "sprout"}, journal: {shape: "star", col: "#C9A3E8", emblem: "book"},
+  harvest: {shape: "cup", col: "#7BB37A", emblem: "sprout"}, vault: {shape: "coins", col: "#C9A227", emblem: "star"}, journal: {shape: "star", col: "#C9A3E8", emblem: "book"},
   ...Object.fromEntries(Object.entries(APPS).map(([k, a]) => [k, {shape: "cup", col: a.col, emblem: a.emblem}]))
 };
 const TH = {quests: [10, 25, 50, 100, 250, 500, 1000, 2500], app: [20, 50, 100, 250, 500, 1000, 2500, 5000, 10000], objcount: [5, 10, 25, 50, 100],
@@ -39,6 +39,7 @@ export function reached(c){
   TH.streak.filter(t => wS >= t).forEach(t => add("water", "water-" + t, t, `${t} days of 2L water in a row`, `Two litres of water, ${t} days running.`, t + "d"));
   TH.streak.filter(t => sS >= t).forEach(t => add("steps", "steps-" + t, t, `${t} days of 5,000 steps in a row`, `5,000 steps or more, ${t} days running.`, t + "d"));
   (c.levels || []).forEach((l, i) => { if (i > 0 && i <= c.levelIndex) add("maple", "maple-" + i, i, `Maple: ${l.name}`, `Maple's friendship reached "${l.name}".`, "Lv" + i); });
+  (c.vaults || []).forEach(v => { for (let k = 1; k <= (v.fills || 0); k++) add("vault", `vault-${v.id}-${k}`, k, `Filled the ${v.label} vault${k > 1 ? ` (${k}x)` : ""}`, `The ${v.label} savings jar filled to the top with jewels.`, k > 1 ? k + "x" : "Full"); });
   TH.kind.filter(t => c.kudos >= t).forEach(t => add("kind", "kind-" + t, t, `${t} kind words pinned`, `${t} compliments pinned to the Kind words board.`, String(t)));
   TH.harvest.filter(t => (c.F.harvestTotal || 0) >= t).forEach(t => add("harvest", "harvest-" + t, t, `${t} harvests`, `${t} crops picked from the garden.`, String(t)));
   TH.journal.filter(t => c.journal >= t).forEach(t => add("journal", "journal-" + t, t, `${t} journal pages`, `${t} pages written in your journal.`, String(t)));

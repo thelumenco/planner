@@ -9,6 +9,8 @@ import { runArt } from "../game/pets.js";
 import { jarArt } from "../game/jars.js";
 import { upgradesArt, festivalArt, festivalOn, pondLanterns, streetLamp, lampDefs } from "./village-extras.js";
 import { trophySVG } from "../game/trophies.js";
+import { bankBuilding } from "./buildings.js";
+import { jarArt as vaultArt, isFull as vaultFull } from "../game/bank.js";
 import { townHall, chordWorkshop, library, chicoCottage, postOffice } from "./buildings.js";
 
 let G = null;
@@ -44,13 +46,13 @@ export function villageArt(){
   const D = VILLAGE;
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="120" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="420" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="200" cy="560" rx="80" ry="40" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M260 322 L260 ${D.hall.door[1]} M260 322 C200 300 120 290 ${D.fresh.door[0]} ${D.fresh.door[1]} M260 322 C200 380 120 430 ${D.news.door[0]} ${D.news.door[1]} M260 322 C320 380 410 420 ${D.post.door[0]} ${D.post.door[1]} M290 316 C350 290 400 250 ${D.toLane.door[0]} ${D.toLane.door[1]} M260 322 L260 ${D.toBase.door[1]} M260 540 C290 560 310 570 ${D.bench.door[0]} ${D.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M250 300 C226 250 ${D.hall.door[0]} 236 ${D.hall.door[0]} ${D.hall.door[1]} M276 298 C300 250 ${D.bank.door[0]} 232 ${D.bank.door[0]} ${D.bank.door[1]} M220 320 C180 330 120 350 ${D.fresh.door[0]} ${D.fresh.door[1]} M260 322 C200 380 120 430 ${D.news.door[0]} ${D.news.door[1]} M260 322 C320 380 410 420 ${D.post.door[0]} ${D.post.door[1]} M290 316 C350 290 400 250 ${D.toLane.door[0]} ${D.toLane.door[1]} M260 322 L260 ${D.toBase.door[1]} M260 540 C290 560 310 570 ${D.bench.door[0]} ${D.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
-    ${flowers([[30,262,"#EFA3A6"],[44,270,"#F3C969"],[150,206,"#C3CDEE"],[372,206,"#EFA3A6"],[488,270,"#F3C969"],[300,448,"#EFA3A6"],[214,450,"#C3CDEE"],[470,540,"#C3CDEE"],[20,430,"#F3C969"],[505,380,"#EFA3A6"]])}
-    ${tree(170,64,1)}${tree(350,64,1)}${tree(26,96,1.05)}${tree(494,96,1.05)}${tree(24,350,.9)}${tree(498,330,.9)}${tree(504,520,.85)}${tree(190,470,.8)}${tree(330,470,.8)}
+    ${flowers([[30,262,"#EFA3A6"],[44,270,"#F3C969"],[60,214,"#C3CDEE"],[300,214,"#EFA3A6"],[488,270,"#F3C969"],[300,448,"#EFA3A6"],[214,450,"#C3CDEE"],[470,540,"#C3CDEE"],[20,430,"#F3C969"],[505,380,"#EFA3A6"]])}
+    ${tree(26,96,1.05)}${tree(262,84,.85)}${tree(494,96,1.05)}${tree(24,350,.9)}${tree(498,330,.9)}${tree(504,520,.85)}${tree(190,470,.8)}${tree(330,470,.8)}
     ${flowers([[170,540,"#F3C969"],[184,548,"#EFA3A6"],[206,520,"#C3CDEE"],[300,520,"#F3C969"],[400,560,"#EFA3A6"],[150,580,"#C3CDEE"]])}`;
   const places =
-    townHall() + `<g transform="translate(-350 0)">${library()}</g>` + postOffice() +
+    `<g transform="translate(-90 0)">${townHall()}</g>` + bankBuilding() + `<g transform="translate(-350 96)">${library()}</g>` + postOffice() +
     // east gate to Makers' Lane (Chord and Chico live there now)
     `<g data-place="toLane" aria-label="Gate to Makers' Lane" transform="translate(-56 -112)"><ellipse class="hov" cx="496" cy="330" rx="26" ry="30" style="fill:var(--butter)"/>
       ${sk(`<rect x="484" y="292" width="6" height="56" style="fill:var(--wood)"/><rect x="508" y="292" width="6" height="56" style="fill:var(--wood)"/><path d="M480 296 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
@@ -59,9 +61,9 @@ export function villageArt(){
     `<g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M238 330 v-40 M282 330 v-40"/><rect x="230" y="282" width="60" height="38" rx="3" style="fill:var(--wood)"/>${notesArt(236, 288, G.remaining().length)}</g>
       ${tapeLabel(260, 280, "Quests", "var(--butter)", 11)}</g>
-    <g data-place="well" aria-label="Well"><ellipse class="hov" cx="160" cy="342" rx="26" ry="7" style="fill:var(--butter)"/>
+    <g transform="translate(36 64)"><g data-place="well" aria-label="Well"><ellipse class="hov" cx="160" cy="342" rx="26" ry="7" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M146 312 v20 M174 312 v20"/><path d="M140 314 l20 -12 l20 12z" style="fill:var(--peach)"/><ellipse cx="160" cy="334" rx="17" ry="7" style="fill:var(--stone)"/><path d="M143 334 v6 a17 7 0 0 0 34 0 v-6" style="fill:var(--stone)"/><ellipse cx="160" cy="333" rx="11" ry="4" style="fill:var(--water)"/></g>
-      ${tapeLabel(160, 360, "Well", "var(--sky)", 11)}</g>
+      ${tapeLabel(160, 360, "Well", "var(--sky)", 11)}</g></g>
     <g data-place="market" aria-label="Market"><ellipse class="hov" cx="362" cy="342" rx="32" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M340 306 v30 M384 306 v30"/><rect x="336" y="320" width="52" height="16" style="fill:var(--wood)"/>
         <path d="M332 306 h60 l-4 10 h-52z" style="fill:var(--card)"/><path d="M340 306 l-2 10 M352 306 l-1 10 M364 306 v10 M376 306 l1 10" style="stroke:var(--rose)" stroke-width="5"/>
@@ -75,7 +77,7 @@ export function villageArt(){
   const L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
   const light = (app, x, y) => { const h = G.health ? G.health(app) : null; if (!h) return "";
     return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`; };
-  const lamps = [[204, 424], [384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
+  const lamps = [[384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
   return lampDefs + ground + lamps + places + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
 }
 /* ---------- the river between the two screens ---------- */
@@ -272,6 +274,12 @@ export function furn(kind, x, y){
       return sk(`<rect x="${x-30}" y="${y-62}" width="60" height="10" rx="2" style="fill:#F3EEE6"/><rect x="${x-24}" y="${y-52}" width="48" height="44" style="fill:#EAE3D8"/><rect x="${x-30}" y="${y-8}" width="60" height="8" rx="2" style="fill:#F3EEE6"/>`,
         `<rect x="${x-30}" y="${y-62}" width="60" height="10" rx="2"/><rect x="${x-24}" y="${y-52}" width="48" height="44"/><path d="M${x-14} ${y-50} v40 M${x} ${y-50} v40 M${x+14} ${y-50} v40" opacity=".35"/><rect x="${x-30}" y="${y-8}" width="60" height="8" rx="2"/>`)
         + (t ? trophySVG(t, 64).replace("<svg ", `<svg x="${x-32}" y="${y-62-72}" class="ptrophy" `) : `<ellipse cx="${x}" cy="${y-64}" rx="16" ry="3" fill="#000" opacity=".06"/>`); }
+    // the bank: a tall glass vault jar (savings), and Opal's counter
+    case "vaultjar": { const j = G.vault ? G.vault(x) : null;
+      if (!j) return `<g opacity=".75">${sk(`<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" style="fill:rgba(220,235,245,.35)"/>`, `<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" stroke-dasharray="5 5"/><path d="M${x} ${y-152} v20 M${x-10} ${y-142} h20" stroke-width="2"/>`)}</g>`;
+      return `<svg x="${x-34}" y="${y-300}" width="80" height="300" overflow="visible" class="${vaultFull(j) ? "vfull" : ""}">${vaultArt(j, 68, 300, {id: "f" + j.slot, sparkle: vaultFull(j), markers: false})}</svg>`; }
+    case "bankcounter": return sk(`<rect x="${x-90}" y="${y-44}" width="180" height="44" rx="4" style="fill:var(--wood)"/><rect x="${x-94}" y="${y-50}" width="188" height="8" rx="2" style="fill:#E7DCC2"/><rect x="${x-40}" y="${y-110}" width="80" height="60" rx="4" style="fill:rgba(255,253,246,.5)"/><circle cx="${x+64}" cy="${y-56}" r="6" style="fill:var(--honey)"/><rect x="${x-70}" y="${y-60}" width="26" height="10" rx="1" style="fill:#8E2C48"/>`,
+      `<rect x="${x-90}" y="${y-44}" width="180" height="44" rx="4"/><rect x="${x-94}" y="${y-50}" width="188" height="8" rx="2"/><rect x="${x-40}" y="${y-110}" width="80" height="60" rx="4"/>${[-24, -8, 8, 24].map(d => `<path d="M${x+d} ${y-110} v60"/>`).join("")}<path d="M${x-40} ${y-80} h80" opacity=".5"/><circle cx="${x+64}" cy="${y-56}" r="6"/><path d="M${x+64} ${y-62} v-3"/><rect x="${x-70}" y="${y-60}" width="26" height="10" rx="1"/><path d="M${x-84} ${y-22} h168" opacity=".4"/>`);
     case "kindboard": { const n = G.kudos ? G.kudos() : 0, cols = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
       const spots = [[-36, -98], [-8, -102], [20, -97], [-30, -70], [0, -66], [26, -72], [-20, -44], [12, -44]];
       const notes = spots.slice(0, Math.min(8, n)).map(([dx, dy], i) => `<rect x="${x+dx}" y="${y+dy}" width="20" height="18" rx="1" transform="rotate(${(i % 3) - 1} ${x+dx+10} ${y+dy+9})" style="fill:${cols[i % 6]}"/>`).join("");
@@ -388,8 +396,8 @@ export function roomArt(id){
     `<g>${[["apple","dumpling","fish","toast"],["tulip","carrot","strawberry","sunflower"]].map((row, r) => row.map((n, i) => iconAt(n, 64 + i*30, 62 + r*38, 26)).join("")).join("")}${[["yarn","ball","brush","crown"],["bath","fort","corn","blueberry"]].map((row, r) => row.map((n, i) => iconAt(n, 374 + i*30, 62 + r*38, 26)).join("")).join("")}</g>`;
   st.forEach(s => {
     // a pedestal's sign names the trophy standing on it (an empty one has no sign)
-    const nm = s.kind === "pedestal" ? ((G.ped && G.ped(s.x, s.y)) || {}).label || "" : s.name;
-    h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? tapeLabel(s.x, s.y + 24, nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)", s.kind === "pedestal" ? 10 : undefined) : ""}</g>`;
+    const nm = s.kind === "pedestal" ? ((G.ped && G.ped(s.x, s.y)) || {}).label || "" : s.kind === "vaultjar" ? (() => { const j = G.vault && G.vault(s.x); return j ? j.label : "Empty"; })() : s.name;
+    h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? (s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm.length > 10 ? nm.slice(0, 9) + "…" : nm, "var(--card)", 9.5) : tapeLabel(s.x, s.y + 24, nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)", s.kind === "pedestal" ? 10 : undefined)) : ""}</g>`;
   });
   if (id === "kidroom") {
     // the door back to the house on the west wall

@@ -7,14 +7,15 @@ import { hash, now, H } from "../util.js";
 export const OUTDOOR = ["base", "village", "lane"];
 export const VILLAGE = {
   // town square
-  hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[260,180], mark:[222,64]},
+  hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[170,180], mark:[132,64]},
+  bank:   {scene:"village", name:"Bank", short:"the bank", door:[380,178], mark:[380,46]},
   chord:  {scene:"lane", name:"Chord workshop", short:"the Chord workshop", door:[145,272], mark:[145,150]},
-  fresh:  {scene:"village", name:"Fresh Pages library", short:"the library", door:[85,272], mark:[95,160]},
+  fresh:  {scene:"village", name:"Fresh Pages library", short:"the library", door:[85,368], mark:[95,256]},
   chico:  {scene:"lane", name:"Chico cottage", short:"Chico cottage", door:[380,282], mark:[380,170]},
   post:   {scene:"village", name:"Post office", short:"the post office", door:[435,502], mark:[435,386]},
   market: {scene:"village", name:"Market", short:"the market", door:[362,350], mark:[362,290]},
   board:  {scene:"village", name:"Quest board", door:[260,338], spot:true, line:"All of today's quests, in one place."},
-  well:   {scene:"village", name:"Well", door:[160,350], spot:true, line:"Fresh water! Glug glug."},
+  well:   {scene:"village", name:"Well", door:[196,414], spot:true, line:"Fresh water! Glug glug."},
   news:   {scene:"village", name:"Good news board", door:[90,488], spot:true, line:"The good news board. Fresh every morning."},
   bench:  {scene:"village", name:"Riverside bench", door:[334,580], spot:true, line:"A bench by the river. Lunch spot for half the town."},
   toLane: {scene:"village", name:"Gate to Makers' Lane", door:[444,218], spot:true, bridge:"lane", mark:[430,170], line:"Through the gate to Makers' Lane: Chord and Chico."},
@@ -144,6 +145,11 @@ export const ROOMS = {
     ["bench","Bench","N","parkbench",null,"Sit a while.",-14],
     ["ped0","","P","pedestal",null,"",24], ["ped1","","Q","pedestal",null,"",24], ["ped2","","S","pedestal",null,"",24],
     ["ped3","","T","pedestal",null,"",24], ["ped4","","U","pedestal",null,"",24], ["ped5","","V","pedestal",null,"",24]]},
+  // The bank: five vault jars (savings goals) along the back wall, Opal's counter in front
+  bank: {name:"The bank", wall:"#EEF1E6", trim:"var(--honey)", noBoard:true, pos:{V0:[70,330], V1:[165,330], V2:[260,330], V3:[355,330], V4:[450,330], C:[260,528]}, stations:[
+    ["vault0","","V0","vaultjar",null,"",40], ["vault1","","V1","vaultjar",null,"",40], ["vault2","","V2","vaultjar",null,"",40],
+    ["vault3","","V3","vaultjar",null,"",40], ["vault4","","V4","vaultjar",null,"",40],
+    ["counter","Counter","C","bankcounter",null,"Opal's counter. Your passbook's here.",30]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };
