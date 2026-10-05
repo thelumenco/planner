@@ -508,3 +508,11 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - Bed A→[262,300], centred under the window. Wardrobe B→[72,262], in the top-left corner against the wall. Routines board N→[406,132].
 - Maple's basket follows the bed: `MAPLE_BED` (world.js) = bed + [110, 6], used by both the room art and core's sleep spot.
 - The window's label sits on the wall to its left (the headboard is below it), and "To the house" is at y 296.
+
+### Round 44: vineyard pictures
+- `src/art/wine.js` holds hand-drawn panel pictures:
+  - `vineCloseup(vn, growth, trellis)`: no trellis, an empty spot, a thirsty vine (drooping leaves and water drops), flowers, then green bunches that swell and ripen to purple or gold with a sparkle.
+  - `barrelPic(phase, col, label)`: empty, fermenting (an airlock with rising bubbles), ready for bubbles, bubbles (bottles resting), ready (sparkle), with a chalk plaque naming the style. `stageStrip` shows the steps with the current one marked.
+  - `bottleArt(type, h)`: a shouldered red, a pink rosé, a slim white flute, and sparkling with gold foil.
+  - `glassArt` and `stallIcon`.
+- Barrels sit in cards (picture on the left, stacking on narrow phones). Wines on the shelves, in the cellar and in the tasting room are spaced cards with their bottle or glass. Stall items have icons.
