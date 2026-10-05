@@ -25,6 +25,9 @@ export function initNotebook(a){
     if (open && open.kind !== "task" && k === "thanks") { closeNotebook(); return; }
     if (open && open.kind === "tracker") return trackerAct(k, b);
     const t = api.task(); if (!t || !open || open.kind !== "task") return;
+    if (k === "sub") { const x = api.subs(t).list.find(y => y.key === b.dataset.k); if (x) api.subTick(t, x.key, !x.done); return; }
+    if (k === "subopen") { const key = b.dataset.k; subOpen.has(key) ? subOpen.delete(key) : subOpen.add(key); refreshNotebook(); return; }
+    if (k === "subdone") { doneOpen = !doneOpen; refreshNotebook(); return; }
     api.act(k, t);
   });
   root.addEventListener("keydown", ev => {
@@ -62,8 +65,13 @@ export function refreshNotebook(focus){
     const t = api.task();
     if (!t || t.id !== open.id) { closeNotebook(); return; }
     const keep = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
+    // keep the scroll position and the focused checkbox across redraws (ticking a subtask redraws the page)
+    const body = page.querySelector(".nbbody"), top = body ? body.scrollTop : 0, fk = document.activeElement && document.activeElement.closest && document.activeElement.closest("[data-k]");
+    const fsel = fk ? `[data-nb="${fk.dataset.nb}"][data-k="${CSS.escape(fk.dataset.k)}"]` : null;
     page.innerHTML = taskPage(t);
     if ($("nbAsk")) { $("nbAsk").value = keep; if (typing) $("nbAsk").focus(); }
+    const nb = page.querySelector(".nbbody"); if (nb && !focus) nb.scrollTop = top;
+    if (fsel && !focus) page.querySelector(fsel)?.focus({preventScroll: true});
   } else page.innerHTML = open.kind === "tracker" ? trackerPage(open.which) : open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
   page.className = "nbpage" + (open.kind === "mail" && open.item.from === "crier" ? " news" : open.kind === "tracker" ? " mini" : "");
   const log = page.querySelector(".nbchat"); if (log) log.scrollTop = log.scrollHeight;
@@ -71,7 +79,14 @@ export function refreshNotebook(focus){
 }
 
 /* ---------- pages ---------- */
-const linkify = s => esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)]/g, u => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u.replace(/^https?:\/\//, "").slice(0, 48)}${u.length > 56 ? "…" : ""} ↗</a>`);
+// Links show as small named chips ("Doc ↗", "Gmail ↗") instead of long raw addresses. A line that is just
+// "Label: https://…" becomes one chip named after its label.
+const chipName = u => /mail\.google\./.test(u) ? "Gmail" : /docs\.google\./.test(u) ? "Google Doc" : /claude\.ai\//.test(u) ? "Open" : u.replace(/^https?:\/\/(www\.)?/, "").split(/[/?#]/)[0];
+const chip = (u, name) => `<a class="lchip" href="${u}" target="_blank" rel="noopener noreferrer">${esc(name)} ↗</a>`;
+const URL_RE = /https?:\/\/[^\s<]+[^\s<.,;:!?)]/g;
+const linkify = s => { const m = /^\s*([A-Za-z][\w '’-]{0,30}):\s*(https?:\/\/\S+)\s*$/.exec(s);
+  if (m) return chip(esc(m[2]), m[1]);
+  return esc(s).replace(URL_RE, u => chip(u, chipName(u.replace(/&amp;/g, "&")))); };
 function notesHTML(text){
   const lines = String(text || "").split(/\r?\n/);
   let out = "", list = false;
@@ -84,6 +99,21 @@ function notesHTML(text){
   return out + (list ? "</ul>" : "");
 }
 
+// Subtasks: a checklist with a progress bar. The next one to do is marked "up next" and opened to show its details
+// (tap any other to open it); done ones fold away under "Done".
+const subOpen = new Set(); let subFor = null, doneOpen = false;
+function subsHTML(t, list){
+  const todo = list.filter(x => !x.done), done = list.filter(x => x.done), next = todo[0];
+  if (subFor !== t.id) { subFor = t.id; subOpen.clear(); doneOpen = false; if (next) subOpen.add(next.key); }
+  const row = x => { const op = subOpen.has(x.key), has = x.info && x.info.length, nm = `${esc(x.title)}${x.est ? ` <small>${esc(x.est)}</small>` : ""}${x === next ? ` <em>up next</em>` : ""}`;
+    return `<li class="sub${x.done ? " done" : ""}${x === next ? " upnext" : ""}"><button class="subtick" data-nb="sub" data-k="${esc(x.key)}" role="checkbox" aria-checked="${x.done}" aria-label="${esc(x.title)}"></button>
+      <div class="subtxt">${has ? `<button class="subname" data-nb="subopen" data-k="${esc(x.key)}" aria-expanded="${op}">${nm}</button>` : `<span class="subname">${nm}</span>`}
+      ${has && op ? `<ul class="subinfo">${x.info.map(l => `<li>${linkify(l)}</li>`).join("")}</ul>` : ""}</div></li>`; };
+  return `<div class="nbsubs"><p class="nblbl">Subtasks <span class="subcount">${done.length} of ${list.length} done</span></p>
+    <span class="subbar" aria-hidden="true"><i style="width:${Math.round(100*done.length/list.length)}%"></i></span>
+    ${todo.length ? `<ul class="sublist">${todo.map(row).join("")}</ul>` : `<p class="suball">All ticked off. Lovely work.</p>`}
+    ${done.length ? `<button class="subdonebtn" data-nb="subdone" aria-expanded="${doneOpen || !todo.length}">Done (${done.length}) ${doneOpen || !todo.length ? "▴" : "▾"}</button>${doneOpen || !todo.length ? `<ul class="sublist">${done.map(row).join("")}</ul>` : ""}` : ""}</div>`;
+}
 function taskPage(t){
   const S = api.S(), fs = api.fs(t), left = api.timerLeft(t), say = api.sayNow();
   const tread = api.onTread(t);
@@ -94,8 +124,10 @@ function taskPage(t){
   if (left != null) h += `<p class="nbtimer"><span data-tleft>${left}</span> <small>${S.timer && S.timer.pausedLeft != null ? "paused" : tread ? "walking at 1.2" : "left on the time box"}</small>${api.timerBtns ? api.timerBtns() : ""}</p>`;
   h += `<div class="nbbody">`;
   h += `<p class="nbfirst"><span class="hl">First step:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}${fs ? " <b>✓</b>" : ""}</p>`;
-  if (t.notes) h += `<div class="nbnotes">${notesHTML(t.notes)}</div>`;
-  else h += `<p class="nbnone">No notes from Sunsama on this one. Ask chat to add some, or talk it through below.</p>`;
+  const sv = api.subs ? api.subs(t) : {list: [], notes: t.notes || ""};
+  if (sv.list.length) h += subsHTML(t, sv.list);
+  if (sv.notes) h += `${sv.list.length ? `<p class="nblbl">Notes</p>` : ""}<div class="nbnotes">${notesHTML(sv.notes)}</div>`;
+  else if (!sv.list.length) h += `<p class="nbnone">No notes from Sunsama on this one. Ask chat to add some, or talk it through below.</p>`;
   if (em) {
     h += `<div class="nbmail"><p class="nblbl">Email</p>
       ${em.who ? `<p><b>To / from:</b> ${esc(em.who)}</p>` : ""}${em.subject ? `<p><b>Subject:</b> ${esc(em.subject)}</p>` : ""}
@@ -223,7 +255,7 @@ Never claim to have done anything outside this conversation (you can't send emai
 Quest: ${t.title}
 First step: ${t.firstStep || "(none given)"}
 Time box: ${t.minutes || 25} minutes${left ? `, ${left} left` : ""}${api.fs(t) ? ", first step done" : ", not started yet"}
-Notes: ${t.notes || "(none)"}${t.email ? `\nEmail: ${JSON.stringify(t.email)}` : ""}
+Notes: ${(api.subs ? api.subs(t).notes : t.notes) || "(none)"}${api.subs && api.subs(t).list.length ? `\nSubtasks: ${api.subs(t).list.map(x => (x.done ? "[done] " : "[ ] ") + x.title).join("; ")}` : ""}${t.email ? `\nEmail: ${JSON.stringify(t.email)}` : ""}
 Quests finished today: ${S.doneIds.length}`;
   const turns = log.slice(0, -1).map((m, i) => i === 0 ? {role: "user", content: brief + "\n\nMel says: " + m.content} : m);
   try {

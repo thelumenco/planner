@@ -21,14 +21,49 @@ export function minutesOf(est){
   return n > 0 ? Math.min(180, n) : 25;
 }
 
+// Subtasks: Sunsama's own subtasks, plus any checklist ("task list") in the notes. Notes often describe each
+// subtask under a bold heading with bullets beneath (that's how the planning skills write them); those details are
+// lifted out and kept with their subtask, so the notebook can show a tidy checklist instead of one long wall of text.
+// -> {subs: [{id?, title, done, est?, info: [lines]}], notes: what's left, as plain text lines}
+const norm = s => String(s || "").toLowerCase().replace(/&amp;/g, "&").replace(/[^a-z0-9]+/g, "");
+const sameTitle = (a, b) => { a = norm(a); b = norm(b); return !!a && !!b && (a === b || (Math.min(a.length, b.length) >= 8 && (a.startsWith(b) || b.startsWith(a)))); };
+const shortEst = e => { const m = minutesOf(e); return e ? (m >= 60 ? `${Math.floor(m/60)}h${m % 60 ? ` ${m % 60}m` : ""}` : `${m}m`) : ""; };
+export function splitNotes(html, subtasks){
+  const subs = (subtasks || []).filter(x => x && x.title).map(x => ({id: x._id, title: decode(x.title).trim(), done: !!x.completed, est: shortEst(x.timeEstimate), info: []}));
+  const out = []; let cur = null;   // cur: the subtask whose details we're collecting
+  const txt = el => decode(el.textContent || "").replace(/\s+/g, " ").trim();
+  if (html && /</.test(html)) {
+    const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
+    for (const el of doc.body.firstChild.children) {
+      const tag = el.tagName.toLowerCase();
+      if (tag === "hr") { cur = null; continue; }
+      if ((tag === "ul" || tag === "ol") && el.getAttribute("data-type") === "taskList") {
+        for (const li of el.querySelectorAll(':scope > li')) { const t = txt(li); if (t) subs.push({title: t, done: li.getAttribute("data-checked") === "true", info: [], local: true}); }
+        cur = null; continue;
+      }
+      if (tag === "ul" || tag === "ol") {
+        const items = [...el.querySelectorAll(":scope > li")].map(txt).filter(Boolean);
+        if (cur) cur.info.push(...items); else out.push(...items.map(i => "- " + i));
+        continue;
+      }
+      const t = txt(el); if (!t) continue;
+      const strong = el.firstElementChild && /^(strong|b)$/i.test(el.firstElementChild.tagName) && el.textContent.trim().startsWith(el.firstElementChild.textContent.trim()) ? txt(el.firstElementChild) : "";
+      const hit = strong && subs.find(x => !x.local && (sameTitle(x.title, strong) || sameTitle(x.title.replace(/^\[[^\]]*\]\s*/, ""), strong.replace(/^\[[^\]]*\]\s*/, ""))));
+      if (hit) { if (out.length && out[out.length - 1] && out[out.length - 1].head) out.pop();   // a heading over subtasks only
+        cur = hit; const rest = t.slice(strong.length).trim(); if (rest) hit.info.push(rest); continue; }
+      cur = null; out.push(strong && strong === t && /:$/.test(t) ? {head: t} : t);
+    }
+  } else if (html) out.push(...htmlToText(html).split("\n"));
+  const kept = out.filter((l, i) => !(l && l.head) || (i + 1 < out.length && !(out[i + 1] && out[i + 1].head))).map(l => l && l.head ? l.head : l);
+  return {subs, notes: kept.join("\n")};
+}
 // One Sunsama task -> one quest. Ids stay the Sunsama _id, so progress survives re-pulls and chat rewrites.
 export function toQuest(t){
-  let notes = htmlToText(t.notes);
-  const subs = (t.subtasks || []).filter(s => s && s.title);
-  if (subs.length) notes = (notes ? notes + "\n" : "") + "Subtasks:\n" + subs.map(s => `- ${s.completed ? "✓ " : ""}${s.title}`).join("\n");
+  const sp = splitNotes(t.notes, t.subtasks), notes = sp.notes;
   const q = {id: t._id, title: t.title.trim(), minutes: minutesOf(t.timeEstimate), channel: t.channel || t.category || "", source: "sunsama"};
   if (t.completed) q.completed = true;
   if (notes) q.notes = notes.slice(0, 4000);
+  if (sp.subs.length) q.subtasks = sp.subs.slice(0, 40).map(x => Object.assign(x, {info: x.info.slice(0, 12).map(l => l.slice(0, 400))}));
   if (/^personal$/i.test(q.channel) || t.isPersonal) q.place = "home";
 
   const gmail = /https:\/\/mail\.google\.com\/[^\s"<]+/.exec(decode(t.notes || ""));
@@ -49,6 +84,12 @@ export function questsFrom(payload){
 }
 
 // Finishing a quest ticks the task off in Sunsama (finishedDay = the day Mel did it). Resolves true/false.
+// Tick (or untick) one subtask in Sunsama. -> true when Sunsama accepted it
+export async function subtaskInSunsama(taskId, subtaskId, done){
+  let mcp = null; try { mcp = window.claude && claude.use ? await claude.use("mcp") : null; } catch {}
+  if (!mcp || !taskId || !subtaskId) return false;
+  try { await mcp.callTool(SUNSAMA, done ? "mark_subtask_as_completed" : "mark_subtask_as_incomplete", {taskId, subtaskId}); return true; } catch (e) { return false; }
+}
 export async function completeInSunsama(taskId, day){
   let mcp = null; try { mcp = window.claude && claude.use ? await claude.use("mcp") : null; } catch {}
   if (!mcp || !taskId) return false;

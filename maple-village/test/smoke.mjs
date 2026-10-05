@@ -674,7 +674,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(titles.length === 5, `all five Sunsama tasks became quests (${titles.length})`);
   check(await page.locator("#list li.done .t").allTextContents().then(t => t.some(x => /Listen to affirmations/.test(x))) && await page.locator("#list li.done .tk").count() > 0, "a task completed in Sunsama shows as done, ticked");
   const plan = await page.evaluate(() => devDb.get("plan"));
-  check(plan && plan.source === "sunsama" && plan.tasks.find(t => t.id === "s1").notes.includes("- Check GHL"), "notes are cleaned up from Sunsama's HTML");
+  check(plan && plan.source === "sunsama" && (plan.tasks.find(t => t.id === "s1").subtasks || []).map(x => x.title).join("|") === "Check GHL|Check emails", "a checklist in Sunsama's notes becomes subtasks");
+  const s3 = plan.tasks.find(t => t.id === "s3"), sx = (s3.subtasks || []).find(x => x.id === "x"), sy = (s3.subtasks || []).find(x => x.id === "y");
+  check(sx && sy && sx.info.join(" ").includes("Rule of 3") && sy.done && sy.info.some(l => /^Planner: https/.test(l)) && sy.est === "30m", "each subtask keeps its own details from the notes");
+  check(/Walk-friendly/.test(s3.notes) && /Also on this walk/.test(s3.notes) && !/one by one/.test(s3.notes), "and the rest of the notes stay as notes, without the duplicated details");
   check(plan.tasks.find(t => t.id === "s4").minutes === 90 && plan.tasks.find(t => t.id === "s3").treadmill === true, "time estimates and treadmill flags carry over");
   check(plan.tasks.find(t => t.id === "s1").email, "comms tasks become email quests at the post office");
   check(plan.tasks.find(t => t.id === "s3").spot === "treadmill", "treadmill tasks go straight to the treadmill");
@@ -703,6 +706,22 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#notebook [data-nb="done"]');
   await page.waitForFunction(() => (window.__sunsamaDone || []).length, null, { timeout: 8000 }).catch(() => {});
   check(await page.evaluate(() => { const d = (window.__sunsamaDone || [])[0]; return !!d && /^s\d$/.test(d.taskId) && /^\d{4}-\d{2}-\d{2}$/.test(d.finishedDay); }), "finishing a Sunsama quest ticks it off in Sunsama too");
+  // the next quest is the treadmill batch: its subtasks are a checklist in the notebook, and ticks reach Sunsama
+  await page.waitForTimeout(400); await openNote(); await page.click('#journal [data-a="back"]', {timeout: 3000}).catch(() => {});   // the break after a quest
+  await page.waitForTimeout(400); await openNote(); await page.click('#journal [data-a="walk"]', {timeout: 5000}).catch(() => {});
+  await page.waitForFunction(() => document.querySelector('#journal [data-a="notebook"]'), null, { timeout: 20000 }).catch(() => {});
+  check(await page.locator("#journal li.subnext").textContent().then(t => /Up next: Post on LinkedIn/.test(t) && /1 of 2 subtasks done/.test(t)).catch(() => false), "the quest note shows the next subtask and progress");
+  await page.click('#journal [data-a="notebook"]'); await page.waitForTimeout(300);
+  check(await page.locator("#notebook .sublist .sub").count() === 1 && await page.locator("#notebook .sub.upnext .subinfo li").count() === 1 && /1 of 2 done/.test(await page.locator("#notebook .subcount").textContent()), "the notebook lists subtasks to do, the next one open with its details");
+  await page.click('#notebook [data-nb="subdone"]');
+  check(await page.locator('#notebook .sub.done .lchip').count() === 0 && await page.locator("#notebook .sub.done").count() === 1, "done subtasks fold away under Done");
+  await page.click('#notebook .sub.done [data-nb="subopen"]');
+  check(await page.locator('#notebook .sub.done a.lchip').textContent().then(t => /Planner/.test(t)), "links show as small named chips");
+  await page.click('#notebook .sub.upnext [data-nb="sub"]');
+  await page.waitForFunction(() => (window.__subTicks || []).length, null, { timeout: 8000 }).catch(() => {});
+  check(await page.evaluate(() => { const x = (window.__subTicks || [])[0]; return !!x && x.tool === "mark_subtask_as_completed" && x.input.taskId === "s3" && x.input.subtaskId === "x"; }), "ticking a subtask ticks it in Sunsama too");
+  check(/2 of 2 done/.test(await page.locator("#notebook .subcount").textContent()) && await page.locator("#notebook .suball").count() === 1, "and the checklist shows everything done");
+  await page.click('#notebook [data-nb="close"]').catch(() => {});
   await page.goto(url + "?sunsama=1&time=07:45"); await page.waitForTimeout(1500);
   await page.click('[data-open="settings"]').catch(() => {}); await page.click("#pclose").catch(() => {});
   await page.click('[data-open="cal"]');

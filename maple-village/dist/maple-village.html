@@ -447,6 +447,32 @@ body.nb-open{overflow:hidden}
 .nbpage.mini .btn small{font-weight:600;opacity:.65;margin-left:4px}
 .nbpage.mini .nbask input{max-width:180px}
 
+/* subtasks: a tidy checklist with a progress bar, details tucked under each one */
+.nbsubs{margin:4px 0 12px}
+.nbsubs .nblbl{display:flex;align-items:baseline;gap:8px}
+.subcount{letter-spacing:0;text-transform:none;font-size:.85rem;font-weight:700;color:#2F3B73}
+.subbar{display:block;height:6px;border-radius:3px;background:rgba(154,169,221,.25);margin:0 0 6px;overflow:hidden}
+.subbar i{display:block;height:100%;border-radius:3px;background:#8FB07B;transition:width .3s}
+.sublist{list-style:none;margin:0;padding:0;line-height:1.45}
+.sub{display:grid;grid-template-columns:30px 1fr;gap:6px;align-items:start;padding:9px 6px;border-bottom:1px dashed rgba(154,169,221,.45)}
+.sub.upnext{background:rgba(246,227,161,.32);border-radius:6px;border-bottom-color:transparent}
+.subtick{position:relative;width:22px;height:22px;margin-top:1px;border:1.6px solid #2F3B73;border-radius:6px;background:#FFFDF7;padding:0;cursor:pointer}
+.sub.done .subtick{background:#8FB07B;border-color:#8FB07B}
+.sub.done .subtick::after{content:"";position:absolute;left:6px;top:2px;width:6px;height:11px;border:solid #FFFDF7;border-width:0 2.4px 2.4px 0;transform:rotate(45deg)}
+.subname{display:block;width:100%;text-align:left;font:inherit;font-size:1rem;font-weight:600;color:#2F2B28;background:none;border:0;padding:0;cursor:default}
+button.subname{cursor:pointer}
+button.subname::after{content:"▾";margin-left:6px;font-size:.75rem;color:#8A8279}
+button.subname[aria-expanded="true"]::after{content:"▴"}
+.subname small{font-weight:500;color:#8A8279;margin-left:4px}
+.subname em{font-style:normal;font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;background:var(--butter);color:#3B3320;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:2px;white-space:nowrap}
+.sub.done .subname{color:#8A8279;font-weight:500;text-decoration:line-through;text-decoration-color:rgba(138,130,121,.6)}
+.subinfo{margin:6px 0 2px;padding-left:18px;font-size:.92rem;line-height:1.5;color:#4A443E}
+.subinfo li{margin:4px 0;font-weight:400;overflow-wrap:anywhere}
+.subdonebtn{display:inline-block;margin-top:8px;background:none;border:0;padding:4px 0;font:inherit;font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#8A8279;cursor:pointer}
+.suball{font-family:"Klee One",serif;color:#5E7A4E;margin:6px 0!important}
+.nbbody a.lchip{display:inline-block;padding:0 10px;margin:1px 2px;border-radius:999px;background:#E6E9F5;color:#2F3B73;font-size:.82rem;font-weight:700;line-height:1.75;text-decoration:none;white-space:nowrap;word-break:normal;vertical-align:1px}
+.nbbody a.lchip:hover{background:#D9DEF2}
+
 /* ---------- villagers + messengers ---------- */
 .map .npc{cursor:pointer}
 #npcSay{z-index:4;white-space:normal;max-width:min(64%,260px);width:max-content}
@@ -1140,6 +1166,7 @@ body.kidmode .scenename span + span{display:none}
   top:calc(env(safe-area-inset-top,0px) + 100px);bottom:auto;z-index:40;padding:6px 16px;border-radius:999px;background:#FFFDF7;color:#B8562F;
   box-shadow:0 8px 20px -10px rgba(40,30,20,.55);border:1px solid rgba(120,104,84,.18);text-align:center}
 body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 18px)}
+.bujo li.subnext small{display:block;font-size:.8rem;color:var(--soft);margin-top:2px}
 </style>
 </head>
 <body>
@@ -5418,6 +5445,22 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
       if (open && open.kind === "tracker") return trackerAct(k, b);
       const t2 = api.task();
       if (!t2 || !open || open.kind !== "task") return;
+      if (k === "sub") {
+        const x = api.subs(t2).list.find((y) => y.key === b.dataset.k);
+        if (x) api.subTick(t2, x.key, !x.done);
+        return;
+      }
+      if (k === "subopen") {
+        const key = b.dataset.k;
+        subOpen.has(key) ? subOpen.delete(key) : subOpen.add(key);
+        refreshNotebook();
+        return;
+      }
+      if (k === "subdone") {
+        doneOpen = !doneOpen;
+        refreshNotebook();
+        return;
+      }
       api.act(k, t2);
     });
     root.addEventListener("keydown", (ev) => {
@@ -5484,18 +5527,30 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
         return;
       }
       const keep6 = $("nbAsk") ? $("nbAsk").value : "", typing = document.activeElement && document.activeElement.id === "nbAsk";
+      const body2 = page.querySelector(".nbbody"), top = body2 ? body2.scrollTop : 0, fk = document.activeElement && document.activeElement.closest && document.activeElement.closest("[data-k]");
+      const fsel = fk ? `[data-nb="${fk.dataset.nb}"][data-k="${CSS.escape(fk.dataset.k)}"]` : null;
       page.innerHTML = taskPage(t2);
       if ($("nbAsk")) {
         $("nbAsk").value = keep6;
         if (typing) $("nbAsk").focus();
       }
+      const nb = page.querySelector(".nbbody");
+      if (nb && !focus2) nb.scrollTop = top;
+      if (fsel && !focus2) page.querySelector(fsel)?.focus({ preventScroll: true });
     } else page.innerHTML = open.kind === "tracker" ? trackerPage(open.which) : open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
     page.className = "nbpage" + (open.kind === "mail" && open.item.from === "crier" ? " news" : open.kind === "tracker" ? " mini" : "");
     const log = page.querySelector(".nbchat");
     if (log) log.scrollTop = log.scrollHeight;
     if (focus2) (page.querySelector("[data-nb]:not([data-nb=close])") || page.querySelector("[data-nb]"))?.focus({ preventScroll: true });
   }
-  var linkify = (s) => esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)]/g, (u) => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u.replace(/^https?:\/\//, "").slice(0, 48)}${u.length > 56 ? "…" : ""} ↗</a>`);
+  var chipName = (u) => /mail\.google\./.test(u) ? "Gmail" : /docs\.google\./.test(u) ? "Google Doc" : /claude\.ai\//.test(u) ? "Open" : u.replace(/^https?:\/\/(www\.)?/, "").split(/[/?#]/)[0];
+  var chip = (u, name) => `<a class="lchip" href="${u}" target="_blank" rel="noopener noreferrer">${esc(name)} ↗</a>`;
+  var URL_RE = /https?:\/\/[^\s<]+[^\s<.,;:!?)]/g;
+  var linkify = (s) => {
+    const m = /^\s*([A-Za-z][\w '’-]{0,30}):\s*(https?:\/\/\S+)\s*$/.exec(s);
+    if (m) return chip(esc(m[2]), m[1]);
+    return esc(s).replace(URL_RE, (u) => chip(u, chipName(u.replace(/&amp;/g, "&"))));
+  };
   function notesHTML(text) {
     const lines = String(text || "").split(/\r?\n/);
     let out = "", list2 = false;
@@ -5517,6 +5572,28 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     }
     return out + (list2 ? "</ul>" : "");
   }
+  var subOpen = /* @__PURE__ */ new Set();
+  var subFor = null;
+  var doneOpen = false;
+  function subsHTML(t2, list2) {
+    const todo = list2.filter((x) => !x.done), done = list2.filter((x) => x.done), next = todo[0];
+    if (subFor !== t2.id) {
+      subFor = t2.id;
+      subOpen.clear();
+      doneOpen = false;
+      if (next) subOpen.add(next.key);
+    }
+    const row2 = (x) => {
+      const op = subOpen.has(x.key), has = x.info && x.info.length, nm = `${esc(x.title)}${x.est ? ` <small>${esc(x.est)}</small>` : ""}${x === next ? ` <em>up next</em>` : ""}`;
+      return `<li class="sub${x.done ? " done" : ""}${x === next ? " upnext" : ""}"><button class="subtick" data-nb="sub" data-k="${esc(x.key)}" role="checkbox" aria-checked="${x.done}" aria-label="${esc(x.title)}"></button>
+      <div class="subtxt">${has ? `<button class="subname" data-nb="subopen" data-k="${esc(x.key)}" aria-expanded="${op}">${nm}</button>` : `<span class="subname">${nm}</span>`}
+      ${has && op ? `<ul class="subinfo">${x.info.map((l) => `<li>${linkify(l)}</li>`).join("")}</ul>` : ""}</div></li>`;
+    };
+    return `<div class="nbsubs"><p class="nblbl">Subtasks <span class="subcount">${done.length} of ${list2.length} done</span></p>
+    <span class="subbar" aria-hidden="true"><i style="width:${Math.round(100 * done.length / list2.length)}%"></i></span>
+    ${todo.length ? `<ul class="sublist">${todo.map(row2).join("")}</ul>` : `<p class="suball">All ticked off. Lovely work.</p>`}
+    ${done.length ? `<button class="subdonebtn" data-nb="subdone" aria-expanded="${doneOpen || !todo.length}">Done (${done.length}) ${doneOpen || !todo.length ? "▴" : "▾"}</button>${doneOpen || !todo.length ? `<ul class="sublist">${done.map(row2).join("")}</ul>` : ""}` : ""}</div>`;
+  }
   function taskPage(t2) {
     const S3 = api.S(), fs = api.fs(t2), left2 = api.timerLeft(t2), say3 = api.sayNow();
     const tread = api.onTread(t2);
@@ -5527,8 +5604,10 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     if (left2 != null) h += `<p class="nbtimer"><span data-tleft>${left2}</span> <small>${S3.timer && S3.timer.pausedLeft != null ? "paused" : tread ? "walking at 1.2" : "left on the time box"}</small>${api.timerBtns ? api.timerBtns() : ""}</p>`;
     h += `<div class="nbbody">`;
     h += `<p class="nbfirst"><span class="hl">First step:</span> ${esc(t2.firstStep || "open whatever you need for it. Just open it.")}${fs ? " <b>✓</b>" : ""}</p>`;
-    if (t2.notes) h += `<div class="nbnotes">${notesHTML(t2.notes)}</div>`;
-    else h += `<p class="nbnone">No notes from Sunsama on this one. Ask chat to add some, or talk it through below.</p>`;
+    const sv = api.subs ? api.subs(t2) : { list: [], notes: t2.notes || "" };
+    if (sv.list.length) h += subsHTML(t2, sv.list);
+    if (sv.notes) h += `${sv.list.length ? `<p class="nblbl">Notes</p>` : ""}<div class="nbnotes">${notesHTML(sv.notes)}</div>`;
+    else if (!sv.list.length) h += `<p class="nbnone">No notes from Sunsama on this one. Ask chat to add some, or talk it through below.</p>`;
     if (em) {
       h += `<div class="nbmail"><p class="nblbl">Email</p>
       ${em.who ? `<p><b>To / from:</b> ${esc(em.who)}</p>` : ""}${em.subject ? `<p><b>Subject:</b> ${esc(em.subject)}</p>` : ""}
@@ -5663,7 +5742,8 @@ Never claim to have done anything outside this conversation (you can't send emai
 Quest: ${t2.title}
 First step: ${t2.firstStep || "(none given)"}
 Time box: ${t2.minutes || 25} minutes${left2 ? `, ${left2} left` : ""}${api.fs(t2) ? ", first step done" : ", not started yet"}
-Notes: ${t2.notes || "(none)"}${t2.email ? `
+Notes: ${(api.subs ? api.subs(t2).notes : t2.notes) || "(none)"}${api.subs && api.subs(t2).list.length ? `
+Subtasks: ${api.subs(t2).list.map((x) => (x.done ? "[done] " : "[ ] ") + x.title).join("; ")}` : ""}${t2.email ? `
 Email: ${JSON.stringify(t2.email)}` : ""}
 Quests finished today: ${S3.doneIds.length}`;
     const turns = log.slice(0, -1).map((m, i) => i === 0 ? { role: "user", content: brief + "\n\nMel says: " + m.content } : m);
@@ -5739,13 +5819,67 @@ Quests finished today: ${S3.doneIds.length}`;
     const n = (h ? +h[1] * 60 : 0) + (m ? +m[1] : 0);
     return n > 0 ? Math.min(180, n) : 25;
   }
+  var norm = (s) => String(s || "").toLowerCase().replace(/&amp;/g, "&").replace(/[^a-z0-9]+/g, "");
+  var sameTitle = (a, b) => {
+    a = norm(a);
+    b = norm(b);
+    return !!a && !!b && (a === b || Math.min(a.length, b.length) >= 8 && (a.startsWith(b) || b.startsWith(a)));
+  };
+  var shortEst = (e) => {
+    const m = minutesOf(e);
+    return e ? m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m % 60}m` : ""}` : `${m}m` : "";
+  };
+  function splitNotes(html, subtasks) {
+    const subs = (subtasks || []).filter((x) => x && x.title).map((x) => ({ id: x._id, title: decode(x.title).trim(), done: !!x.completed, est: shortEst(x.timeEstimate), info: [] }));
+    const out = [];
+    let cur2 = null;
+    const txt = (el) => decode(el.textContent || "").replace(/\s+/g, " ").trim();
+    if (html && /</.test(html)) {
+      const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
+      for (const el of doc.body.firstChild.children) {
+        const tag = el.tagName.toLowerCase();
+        if (tag === "hr") {
+          cur2 = null;
+          continue;
+        }
+        if ((tag === "ul" || tag === "ol") && el.getAttribute("data-type") === "taskList") {
+          for (const li of el.querySelectorAll(":scope > li")) {
+            const t3 = txt(li);
+            if (t3) subs.push({ title: t3, done: li.getAttribute("data-checked") === "true", info: [], local: true });
+          }
+          cur2 = null;
+          continue;
+        }
+        if (tag === "ul" || tag === "ol") {
+          const items = [...el.querySelectorAll(":scope > li")].map(txt).filter(Boolean);
+          if (cur2) cur2.info.push(...items);
+          else out.push(...items.map((i) => "- " + i));
+          continue;
+        }
+        const t2 = txt(el);
+        if (!t2) continue;
+        const strong = el.firstElementChild && /^(strong|b)$/i.test(el.firstElementChild.tagName) && el.textContent.trim().startsWith(el.firstElementChild.textContent.trim()) ? txt(el.firstElementChild) : "";
+        const hit = strong && subs.find((x) => !x.local && (sameTitle(x.title, strong) || sameTitle(x.title.replace(/^\[[^\]]*\]\s*/, ""), strong.replace(/^\[[^\]]*\]\s*/, ""))));
+        if (hit) {
+          if (out.length && out[out.length - 1] && out[out.length - 1].head) out.pop();
+          cur2 = hit;
+          const rest = t2.slice(strong.length).trim();
+          if (rest) hit.info.push(rest);
+          continue;
+        }
+        cur2 = null;
+        out.push(strong && strong === t2 && /:$/.test(t2) ? { head: t2 } : t2);
+      }
+    } else if (html) out.push(...htmlToText(html).split("\n"));
+    const kept = out.filter((l, i) => !(l && l.head) || i + 1 < out.length && !(out[i + 1] && out[i + 1].head)).map((l) => l && l.head ? l.head : l);
+    return { subs, notes: kept.join("\n") };
+  }
   function toQuest(t2) {
-    let notes2 = htmlToText(t2.notes);
-    const subs = (t2.subtasks || []).filter((s) => s && s.title);
-    if (subs.length) notes2 = (notes2 ? notes2 + "\n" : "") + "Subtasks:\n" + subs.map((s) => `- ${s.completed ? "✓ " : ""}${s.title}`).join("\n");
+    const sp = splitNotes(t2.notes, t2.subtasks), notes2 = sp.notes;
     const q = { id: t2._id, title: t2.title.trim(), minutes: minutesOf(t2.timeEstimate), channel: t2.channel || t2.category || "", source: "sunsama" };
     if (t2.completed) q.completed = true;
     if (notes2) q.notes = notes2.slice(0, 4e3);
+    if (sp.subs.length) q.subtasks = sp.subs.slice(0, 40).map((x) => Object.assign(x, { info: x.info.slice(0, 12).map((l) => l.slice(0, 400)) }));
     if (/^personal$/i.test(q.channel) || t2.isPersonal) q.place = "home";
     const gmail = /https:\/\/mail\.google\.com\/[^\s"<]+/.exec(decode(t2.notes || ""));
     if (gmail || /\b(email|inbox|reply|comms)\b/i.test(t2.title)) {
@@ -5764,6 +5898,20 @@ Quests finished today: ${S3.doneIds.length}`;
   function questsFrom(payload) {
     const list2 = payload && Array.isArray(payload.tasks) ? payload.tasks : Array.isArray(payload) ? payload : [];
     return list2.filter((t2) => t2 && t2._id && t2.title && !t2.deleted && !t2.isArchived && !t2.isBacklogged).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map(toQuest);
+  }
+  async function subtaskInSunsama(taskId, subtaskId, done) {
+    let mcp3 = null;
+    try {
+      mcp3 = window.claude && claude.use ? await claude.use("mcp") : null;
+    } catch {
+    }
+    if (!mcp3 || !taskId || !subtaskId) return false;
+    try {
+      await mcp3.callTool(SUNSAMA, done ? "mark_subtask_as_completed" : "mark_subtask_as_incomplete", { taskId, subtaskId });
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
   async function completeInSunsama(taskId, day) {
     let mcp3 = null;
@@ -6742,17 +6890,17 @@ Quests finished today: ${S3.doneIds.length}`;
     api2.changed();
     return `Imported: ${H2.dailyTasks.length} daily, ${(H2.weeklyTasks || []).length} weekly, ${H2.zones.length} zones, ${(H2.pantryItems || []).length} pantry items.`;
   }
-  var norm = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  var norm2 = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
   var findItem = (name) => {
-    const n = norm(name);
-    return (H2.pantryItems || []).find((i) => norm(i.name) === n) || (H2.pantryItems || []).find((i) => norm(i.name).includes(n) || n.includes(norm(i.name)));
+    const n = norm2(name);
+    return (H2.pantryItems || []).find((i) => norm2(i.name) === n) || (H2.pantryItems || []).find((i) => norm2(i.name).includes(n) || n.includes(norm2(i.name)));
   };
   function chatAddShopping(items) {
     const done = [];
     (items || []).slice(0, 20).forEach((x) => {
       const name = String(x && x.name || x || "").trim().slice(0, 60);
       if (!name) return;
-      const loc = H2.whereToBuyLocations.find((l) => norm(l.name) === norm(x && x.where) || l.id === (x && x.where));
+      const loc = H2.whereToBuyLocations.find((l) => norm2(l.name) === norm2(x && x.where) || l.id === (x && x.where));
       let it = findItem(name);
       if (!it) {
         it = { id: Date.now() + done.length, name: name[0].toUpperCase() + name.slice(1), category: (H2.pantryCategories[0] || {}).id || "food", whereToBuy: [loc ? loc.id : (H2.whereToBuyLocations[0] || {}).id], notes: "", inStock: false };
@@ -6793,7 +6941,7 @@ Quests finished today: ${S3.doneIds.length}`;
     return text;
   }
   function chatTickChore(text) {
-    const n = norm(text), m = (t2) => norm(t2.text).includes(n) || n.includes(norm(t2.text));
+    const n = norm2(text), m = (t2) => norm2(t2.text).includes(n) || n.includes(norm2(t2.text));
     const d = (H2.dailyTasks || []).find((t2) => m(t2) && !dayDone(t2.id));
     if (d) {
       setDone("daily", d.id, true);
@@ -7110,9 +7258,9 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     if (st.error && !st.snap) return h + `<p class="sub">${esc(CLIENT_ERRORS[st.error] || "Couldn't reach Chord just now.")}</p><div class="actions"><button class="btn alt small" data-cl="refresh">Try again</button></div>`;
     if (!st.snap) return h + `<p class="sub">Your client projects, live from Chord.</p><div class="actions"><button class="btn primary small" data-cl="refresh">Open the files</button></div>`;
     const o = st.snap.overview, cur2 = o.currency || "$";
-    const chip = (n, label2, warn) => `<span class="clchip${warn && n ? " warn" : ""}"><b>${Number(n) || 0}</b> ${label2}</span>`;
+    const chip2 = (n, label2, warn) => `<span class="clchip${warn && n ? " warn" : ""}"><b>${Number(n) || 0}</b> ${label2}</span>`;
     h += `<p class="sub">${t(o.studio || "Your studio", 40)} · today in Chord${st.busy ? " · refreshing…" : ""}</p>
-    <div class="clchips">${chip(o.projects_active, "active projects")}${chip(o.tasks_overdue, "overdue tasks", true)}${chip(o.tasks_waiting_on_clients, "waiting on clients")}${chip(o.client_comments_open, "client comments", true)}${chip(o.proposals_awaiting_reply, "proposals out")}${chip(o.leads_open, "open leads")}</div>
+    <div class="clchips">${chip2(o.projects_active, "active projects")}${chip2(o.tasks_overdue, "overdue tasks", true)}${chip2(o.tasks_waiting_on_clients, "waiting on clients")}${chip2(o.client_comments_open, "client comments", true)}${chip2(o.proposals_awaiting_reply, "proposals out")}${chip2(o.leads_open, "open leads")}</div>
     <p class="muted clmoney">${o.retainers_running ? `${o.retainers_running} retainers · ${cur2}${Number(o.retainer_income_per_month || 0).toLocaleString()}/month` : ""}${o.money_overdue ? ` · <b>${cur2}${Number(o.money_overdue).toLocaleString()} overdue</b>` : o.money_owed ? ` · ${cur2}${Number(o.money_owed).toLocaleString()} owed` : ""}</p>`;
     const ps = st.snap.projects;
     h += `<p class="eyebrow">Active projects</p>` + (ps.length ? `<ul class="hlist clprojects">${ps.slice(0, 20).map((p) => {
@@ -10544,6 +10692,62 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   setInterval(flushSunsama, 3 * 6e4);
   setTimeout(flushSunsama, 7e3);
+  var subKey = (x) => x.id || "t:" + norm3(x.title);
+  var norm3 = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  function subView(t2) {
+    if (!t2) return { list: [], notes: "" };
+    let list2 = t2.subtasks || [], notes2 = t2.notes || "";
+    if (!t2.subtasks && /(^|\n)Subtasks:\n/.test(notes2)) {
+      const [before, after] = notes2.split(/(?:^|\n)Subtasks:\n/);
+      const rest = [];
+      list2 = [];
+      after.split("\n").forEach((l) => {
+        const m = /^\s*-\s*(✓\s*)?(.+)/.exec(l);
+        if (m) list2.push({ title: m[2].trim(), done: !!m[1], info: [] });
+        else rest.push(l);
+      });
+      notes2 = [before, ...rest].join("\n").trim();
+    }
+    const st6 = ((F.subDone || {})[t2.id] || {}).s || {};
+    return { list: list2.map((x) => {
+      const key = subKey(x);
+      return Object.assign({}, x, { key, done: key in st6 ? st6[key] : !!x.done });
+    }), notes: notes2 };
+  }
+  function subTick(t2, key, done) {
+    const x = subView(t2).list.find((y) => y.key === key);
+    if (!x) return;
+    F.subDone = F.subDone || {};
+    for (const k of Object.keys(F.subDone)) if (Date.now() - F.subDone[k].at > 21 * 864e5) delete F.subDone[k];
+    const rec = F.subDone[t2.id] = F.subDone[t2.id] || { s: {} };
+    rec.at = Date.now();
+    rec.s[key] = done;
+    if (x.id && t2.source === "sunsama") {
+      F.subTodo = (F.subTodo || []).filter((y) => !(y.task === t2.id && y.sub === x.id)).concat({ task: t2.id, sub: x.id, done });
+      flushSubs();
+    }
+    sfx(done ? "tap" : "paper", true);
+    const left2 = subView(t2).list.filter((y) => !y.done).length;
+    if (done && !left2) speak("Every subtask ticked! Tap Done when you're ready.", 4500, true);
+    save2();
+    refreshNotebook();
+  }
+  var subFlushing = false;
+  async function flushSubs() {
+    if (subFlushing || !(F.subTodo || []).length) return;
+    subFlushing = true;
+    for (const x of F.subTodo.slice()) {
+      if (await subtaskInSunsama(x.task, x.sub, x.done)) F.subTodo = F.subTodo.filter((y) => y !== x);
+      else if (Date.now() - (x.warned || 0) > 30 * 6e4) {
+        x.warned = Date.now();
+        flash("Couldn't tick that subtask in Sunsama just now. I'll keep trying.");
+      }
+    }
+    subFlushing = false;
+    save2();
+  }
+  setInterval(flushSubs, 3 * 6e4);
+  setTimeout(flushSubs, 8e3);
   function doNext(id) {
     const ids = allTasks().map((x) => x.id);
     if (S2.timer && S2.timer.kind !== "break") S2.timer = null;
@@ -11546,6 +11750,10 @@ Then tell chat "wind down" whenever you're ready.`
       ${t2.at || t2.treadmill || isTreadTask(t2) || t2.chat || t2.notes || t2.email ? `<p class="stickers">${t2.at ? `<span class="sticker">${icon("clock", 14)} ${esc(t2.at)}</span>` : ""}${t2.treadmill || isTreadTask(t2) ? `<span class="sticker">${icon("walker", 14)} ${onTread(t2) ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t2.notes ? `<span class="sticker">${icon("note", 14)} notes</span>` : ""}${t2.email ? `<span class="sticker">${icon("letter", 14)} email</span>` : ""}${t2.chat ? `<span class="sticker">${icon("chat", 14)} happens in chat</span>` : ""}</p>` : ""}
       ${fs || S2.timer && S2.timer.id === t2.id ? timerHTML(S2.timer && S2.timer.kind === "deal" ? "five-minute deal, then you may stop" : `${t2.minutes || 25}-minute time box`) : `<p class="stickers"><span class="sticker">${icon("clock", 14)} ${t2.minutes || 25}-minute time box once you start</span></p>`}
       <ul class="bujo">${fs ? `<li>Keep going. One thing at a time.</li>` : `<li class="first"><span><span class="hl">First step only:</span> ${esc(t2.firstStep || "open whatever you need for it. Just open it.")}</span></li><li>Then ${t2.minutes || 25} minutes on the rest.</li>`}
+        ${(() => {
+        const sl = subView(t2).list, nx = sl.find((x) => !x.done);
+        return sl.length ? `<li class="subnext">${nx ? `<span class="hl">Up next:</span> ${esc(nx.title)}` : "Every subtask ticked."} <small>${sl.filter((x) => x.done).length} of ${sl.length} subtasks done${nx ? " · tick them off in the notebook" : ""}</small></li>` : "";
+      })()}
         <li class="pep">${esc(t2.pep || PEP[t2.title.length % PEP.length])}</li></ul>
       ${at ? `<p class="checkin">${fs ? "Tap done when it's done." : "Tap when the first step's done."}</p>` : ""}
       <div class="actions">${!at ? `<button class="btn primary" data-a="walk">Walk to the ${esc(sp.name.toLowerCase())}</button>` : fs ? `<button class="btn yes" data-a="done">Quest done</button><button class="btn alt" data-a="notebook">Open the notebook</button>` : `<button class="btn primary" data-a="notebook">Do task</button><button class="btn alt" data-a="firstStep">First step done</button>`}
@@ -13731,6 +13939,8 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
   initNotebook({
     windDown,
     onTread,
+    subs: subView,
+    subTick,
     water: () => ({ ml: S2.waterMl || 0, goal: WATER_GOAL, glass: GLASS }),
     steps: () => ({ n: S2.steps, goal: STEP_GOAL }),
     addWater: (ml) => A.water(ml),

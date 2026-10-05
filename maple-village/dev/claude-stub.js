@@ -72,6 +72,7 @@ window.__mapleDevStub = true;   // dev only: lets test scripts jump between scen
         return { content: [], payload: { resultCountEstimate: "2", threads: [t("g1", "Farzana Ali <farzana@example.com>", "MUSE audit: next steps", "Lovely to hear from you, here's what I'm thinking", 2), t("g2", "studio@example.com", "Invoice question", "Quick one about the October invoice", 20)] } };
       }
       if (server === "Notion" && tool === "notion-create-pages") { window.__visSaved = input; return { content: [], payload: { pages: [{ id: "vis1" }] } }; }
+      if (server === "Sunsama MCP" && /^mark_subtask_as_/.test(tool)) { (window.__subTicks = window.__subTicks || []).push({tool, input}); return { content: [], payload: { success: true } }; }
       if (server === "Sunsama MCP" && tool === "mark_task_as_completed") { (window.__sunsamaDone = window.__sunsamaDone || []).push(input); return { content: [], payload: { success: true } }; }
       if (server === "Sunsama MCP" && tool === "create_task") { (window.__sunsamaTasks = window.__sunsamaTasks || []).push(input); return { content: [], payload: { _id: "t" + window.__sunsamaTasks.length } }; }
       if (server === "Zapier" && tool === "execute_zapier_read_action") {
@@ -128,7 +129,8 @@ window.__mapleDevStub = true;   // dev only: lets test scripts jump between scen
         { _id: "s2", title: "Draft the Visibility Fix email", channel: "Ambidextrous", timeEstimate: "45 minutes", sortOrder: 2, completed: false,
           notes: "<p>From the October plan: email the list &amp;amp; post in one community.</p>", subtasks: [] },
         { _id: "s3", title: "🚶 Treadmill batch", channel: "Ambidextrous", timeEstimate: "50 minutes", sortOrder: 3, completed: false,
-          notes: "<p>Walk-friendly tasks.</p>", subtasks: [{ _id: "x", title: "Post on LinkedIn", completed: false }] },
+          notes: "<p>Walk-friendly tasks. Tick off subtasks as you go.</p><p><strong>Post on LinkedIn</strong></p><ul><li><p>One of your Rule of 3 for next week.</p></li></ul><hr><p><strong>Message 12 warm leads</strong> (by Fri)</p><ul><li><p>Message them one by one, not as a broadcast.</p></li><li><p>Planner: https://example.com/planner</p></li></ul><hr><p><strong>Also on this walk:</strong> Comms catchup, right after this one.</p>",
+          subtasks: [{ _id: "x", title: "Post on LinkedIn", completed: false, timeEstimate: "10 minutes" }, { _id: "y", title: "Message 12 warm leads", completed: true, timeEstimate: "30 minutes" }] },
         { _id: "s4", title: "Submit to F6S", channel: "Chord", timeEstimate: "1 hour 30 minutes", sortOrder: 4, completed: false, notes: "", subtasks: [] },
         { _id: "s5", title: "Listen to affirmations", channel: "Personal", isPersonal: true, timeEstimate: "5 minutes", sortOrder: 5, completed: true, notes: "<p></p>", subtasks: [] }
       ];

@@ -9,7 +9,7 @@ import { vineSpot } from "../art/vineyard.js";
 import { vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, counterPanel, boxPanel, cafePanel, wireVine, shelfStock } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
-import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA, completeInSunsama } from "./sunsama.js";
+import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA, completeInSunsama, subtaskInSunsama } from "./sunsama.js";
 import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx, TRACKS, setTrack, currentTrack } from "./audio.js";
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked } from "./paths.js";
@@ -570,6 +570,44 @@ async function flushSunsama(){
   sunFlushing = false; save();
 }
 setInterval(flushSunsama, 3*60e3); setTimeout(flushSunsama, 7000);
+/* ---------- Subtasks ---------- */
+// A quest's subtasks (from Sunsama, or a checklist in its notes). Ticks live in F.subDone[taskId] = {at, s: {key: done}}
+// and win over what Sunsama last said; ticks on real Sunsama subtasks are queued in F.subTodo and retried until
+// Sunsama takes them. Older plans kept subtasks as a "Subtasks:" list in the notes text: that's read too.
+const subKey = x => x.id || "t:" + norm(x.title);
+const norm = s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+function subView(t){
+  if (!t) return {list: [], notes: ""};
+  let list = t.subtasks || [], notes = t.notes || "";
+  if (!t.subtasks && /(^|\n)Subtasks:\n/.test(notes)) {
+    const [before, after] = notes.split(/(?:^|\n)Subtasks:\n/); const rest = [];
+    list = []; after.split("\n").forEach(l => { const m = /^\s*-\s*(✓\s*)?(.+)/.exec(l); if (m) list.push({title: m[2].trim(), done: !!m[1], info: []}); else rest.push(l); });
+    notes = [before, ...rest].join("\n").trim();
+  }
+  const st = ((F.subDone || {})[t.id] || {}).s || {};
+  return {list: list.map(x => { const key = subKey(x); return Object.assign({}, x, {key, done: key in st ? st[key] : !!x.done}); }), notes};
+}
+function subTick(t, key, done){
+  const x = subView(t).list.find(y => y.key === key); if (!x) return;
+  F.subDone = F.subDone || {};
+  for (const k of Object.keys(F.subDone)) if (Date.now() - F.subDone[k].at > 21*864e5) delete F.subDone[k];   // forget old quests
+  const rec = F.subDone[t.id] = F.subDone[t.id] || {s: {}}; rec.at = Date.now(); rec.s[key] = done;
+  if (x.id && t.source === "sunsama") { F.subTodo = (F.subTodo || []).filter(y => !(y.task === t.id && y.sub === x.id)).concat({task: t.id, sub: x.id, done}); flushSubs(); }
+  sfx(done ? "tap" : "paper", true);
+  const left = subView(t).list.filter(y => !y.done).length;
+  if (done && !left) speak("Every subtask ticked! Tap Done when you're ready.", 4500, true);
+  save(); refreshNotebook();
+}
+let subFlushing = false;
+async function flushSubs(){
+  if (subFlushing || !(F.subTodo || []).length) return; subFlushing = true;
+  for (const x of F.subTodo.slice()) {
+    if (await subtaskInSunsama(x.task, x.sub, x.done)) F.subTodo = F.subTodo.filter(y => y !== x);
+    else if (Date.now() - (x.warned || 0) > 30*60e3) { x.warned = Date.now(); flash("Couldn't tick that subtask in Sunsama just now. I'll keep trying."); }
+  }
+  subFlushing = false; save();
+}
+setInterval(flushSubs, 3*60e3); setTimeout(flushSubs, 8000);
 function doNext(id){
   const ids = allTasks().map(x => x.id);
   if (S.timer && S.timer.kind !== "break") S.timer = null;
@@ -1097,6 +1135,7 @@ function journal(){
       ${(t.at || t.treadmill || isTreadTask(t) || t.chat || t.notes || t.email) ? `<p class="stickers">${t.at ? `<span class="sticker">${icon("clock", 14)} ${esc(t.at)}</span>` : ""}${(t.treadmill || isTreadTask(t)) ? `<span class="sticker">${icon("walker", 14)} ${onTread(t) ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t.notes ? `<span class="sticker">${icon("note", 14)} notes</span>` : ""}${t.email ? `<span class="sticker">${icon("letter", 14)} email</span>` : ""}${t.chat ? `<span class="sticker">${icon("chat", 14)} happens in chat</span>` : ""}</p>` : ""}
       ${(fs || (S.timer && S.timer.id === t.id)) ? timerHTML(S.timer && S.timer.kind === "deal" ? "five-minute deal, then you may stop" : `${t.minutes || 25}-minute time box`) : `<p class="stickers"><span class="sticker">${icon("clock", 14)} ${t.minutes || 25}-minute time box once you start</span></p>`}
       <ul class="bujo">${fs ? `<li>Keep going. One thing at a time.</li>` : `<li class="first"><span><span class="hl">First step only:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}</span></li><li>Then ${t.minutes || 25} minutes on the rest.</li>`}
+        ${(() => { const sl = subView(t).list, nx = sl.find(x => !x.done); return sl.length ? `<li class="subnext">${nx ? `<span class="hl">Up next:</span> ${esc(nx.title)}` : "Every subtask ticked."} <small>${sl.filter(x => x.done).length} of ${sl.length} subtasks done${nx ? " · tick them off in the notebook" : ""}</small></li>` : ""; })()}
         <li class="pep">${esc(t.pep || PEP[t.title.length % PEP.length])}</li></ul>
       ${at ? `<p class="checkin">${fs ? "Tap done when it's done." : "Tap when the first step's done."}</p>` : ""}
       <div class="actions">${!at ? `<button class="btn primary" data-a="walk">Walk to the ${esc(sp.name.toLowerCase())}</button>`
@@ -2004,7 +2043,7 @@ $("setSfx").onchange = e => { setSfx(e.target.checked); if (e.target.checked) sf
 ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { qnQuietUntil = 0; }, {capture: true, once: true}));
 document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; ctx();
   if (openView === "chat") { renderChat(); setTimeout(() => $("chatIn").focus(), 60); } });
-initNotebook({windDown, onTread, water:() => ({ml: S.waterMl || 0, goal: WATER_GOAL, glass: GLASS}), steps:() => ({n: S.steps, goal: STEP_GOAL}),
+initNotebook({windDown, onTread, subs: subView, subTick, water:() => ({ml: S.waterMl || 0, goal: WATER_GOAL, glass: GLASS}), steps:() => ({n: S.steps, goal: STEP_GOAL}),
   addWater:ml => A.water(ml), setWater, setSteps, task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
   sayNow:() => say, timerBtns, paperName, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),
   placeLabel:t => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`});
