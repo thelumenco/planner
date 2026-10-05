@@ -479,3 +479,16 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Opal the banker (9–5:30, lunch 12:30–1:30) stands at the counter, which shows every vault at a glance with a total.
   - Chat action `save` {vault, amount}. Places "bank", "vaults" and "savings" walk there.
 - A foreground layer (`#fore`, after `#actors` in the world SVG; `foreArt(scene)` in scenes.js) draws things characters stand behind. The bank counter's front panel and brass arch live there, so Opal (now at [260,500]) stands behind the counter instead of on top of it.
+
+### Round 40: the vineyard, the wine shop, workers, level buttons
+- **Level UI:** buttons, notes and panel headings no longer tilt (`transform:none` overrides at the end of game-ui.css); the torn-tape button edge is now symmetric. The `#earn` flash is a pill toast above everything (z-index 40). While a panel is open it drops to the bottom of the screen, so it never covers a panel title.
+- **The vineyard** (outdoor scene `vineyard`, east of home base over a footbridge; art in `src/art/vineyard.js`, logic in `src/game/vineyard.js`, state in the game save `F.vine`):
+  - Three trellis rows of three vines (row 1 starts trellised). Tap a vine (`data-vine="r-i"`) to plant a red or white cutting, water it, and pick it when ripe: 6 hours, 3 bunches, and the vine fruits again after another watering.
+  - The stall sells cuttings (10), trellises (25) and barrels (40, up to 3).
+  - The barrel shed: 3 bunches make a barrel. Red takes 4h, rosé 2h, white 3h; sparkling takes 3h plus a 2h second fermentation. Name the wine when you bottle it (6 bottles into the cellar).
+  - A playground (swings, slide, seesaw): tapping one sends Evan to play there (he comes along in the daytime). Pip plays there from 4:30 to 5:30pm.
+- **The wine shop** (room `wineshop`): stock the shelves from the cellar and set prices. The honesty box collects customers' coins. Standing at the counter means Mel is serving: footfall ×3 and coins go straight to her (counter front drawn in `foreArt`). The tasting room pours glasses at a quarter of the bottle price; the chalkboard says nibbles are coming soon, since the food menu is still to be decided with Mel.
+- **Customers:** `sellTick` runs every minute and on load, catching up to 12 hours. The shop is open 10am–10pm; evenings count ×2, lunch ×1.3 and weekends ×1.5. Each villager whose routine puts them in the shop or vineyard adds 40%. Busyness is read from the routines minute by minute (`whoAt`), on the game clock.
+- **Workers:** Marco (8–6, lunch in the tasting room) and Ines (9–1, 2–5:30) work the vines. While either is on shift, thirsty vines get watered (picking stays Mel's). Celeste minds the shop counter (11–3, 3:30–9:30); while she's on, footfall doubles and her takings go in the honesty box.
+- **Evening tastings:** Theo, Opal, Bo, Juniper, Okada (weekdays) and Hana (weekends) sit in the tasting room in the evenings.
+- Places "vineyard", "vines", "barrels", "wine shop", "honesty box", "tasting room" and "playground" walk there.

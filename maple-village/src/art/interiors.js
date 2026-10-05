@@ -131,6 +131,19 @@ const SHELLS = {
     <g style="fill:var(--honey)" opacity=".8">${[117, 212, 307, 402].map(x => `<circle cx="${x}" cy="40" r="5"/>`).join("")}</g>
     ${sk(`<path d="M232 8 h56 l-6 14 h-44z" style="fill:var(--honey)"/>`, `<path d="M232 8 h56 l-6 14 h-44z"/><path d="M248 15 h24" opacity=".5"/>`)}${plant(30, 610, 1.1)}${plant(490, 610, 1)}`,
 
+  // The wine shop: terracotta tiles, warm plaster, a wine rack behind the counter, the chalk menu, hanging lamps
+  wineshop: () => `<rect width="520" height="640" style="fill:#D9A58A"/>
+    <g opacity=".45" style="stroke:#B97F62" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(26, i => `<path d="M${(i % 13)*40 + (Math.floor(i/13) % 2)*20} ${170 + (i % 12)*40} v40"/>`)}</g>
+    <g filter="url(#wash)" opacity=".5"><ellipse cx="300" cy="470" rx="170" ry="80" style="fill:#E9BFA6"/></g>
+    ${wallBase("#F4E6D6", "#8E2C48")}${skirting}
+    ${sk(`<rect x="262" y="40" width="140" height="96" rx="3" style="fill:#8B5E3C"/>${rows(15, i => `<circle cx="${280 + (i % 5)*26}" cy="${60 + Math.floor(i/5)*28}" r="7" style="fill:${i % 4 === 1 ? "#9DBF8A" : "#5B2338"}"/>`)}`,
+      `<rect x="262" y="40" width="140" height="96" rx="3"/><path d="M262 74 h140 M262 102 h140" opacity=".6"/>`)}
+    ${sk(`<rect x="430" y="46" width="70" height="80" rx="3" style="fill:#3E4A43"/>`, `<rect x="430" y="46" width="70" height="80" rx="3"/>`)}
+    <g font-family="Klee One,serif" font-weight="600" fill="#F6EFE3" text-anchor="middle" pointer-events="none"><text x="465" y="66" font-size="10">Tonight</text><text x="465" y="84" font-size="8">by the glass</text><text x="465" y="98" font-size="8">and nibbles</text><text x="465" y="112" font-size="8">(coming soon)</text></g>
+    ${sk("", `<path d="M150 0 v40 M200 0 v24"/>`)}
+    ${sk(`<path d="M138 40 h24 l-4 10 h-16z M188 24 h24 l-4 10 h-16z" style="fill:#F3C969"/>`, `<path d="M138 40 h24 l-4 10 h-16z M188 24 h24 l-4 10 h-16z"/>`)}
+    ${plant(30, 610, 1.1)}${plant(490, 610, 1)}`,
+
   market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(24, i => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`)}</g>
     <g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--blush)"/></g>

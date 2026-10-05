@@ -4,7 +4,9 @@ import { icon, progressBar, progressBarV } from "../art/icons.js";
 import { VILLAGE, WORK, ROOMS, OUTDOOR, BRIDGES, ARRIVE, INNER, nextHop, outdoorOf, isWeekend, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
 import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco } from "../data/items.js";
 import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn } from "../art/village-extras.js";
-import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, setArtContext } from "../art/scenes.js";
+import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, setArtContext } from "../art/scenes.js";
+import { vineSpot } from "../art/vineyard.js";
+import { vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, counterPanel, boxPanel, cafePanel, wireVine, shelfStock } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA, completeInSunsama } from "./sunsama.js";
@@ -68,7 +70,7 @@ function migrate(){
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
-setArtContext({F:() => F, S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf(), kudos: () => kudosCount(), vault: x => { const i = [70, 165, 260, 355, 450].indexOf(x); return i < 0 ? null : jarAt(i); }, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, kid: () => ({sleep: kid.sleep || evanNight()})});
+setArtContext({F:() => F, vine: () => vineState(F), vineStock: () => shelfStock(vineState(F)), S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf(), kudos: () => kudosCount(), vault: x => { const i = [70, 165, 260, 355, 450].indexOf(x); return i < 0 ? null : jarAt(i); }, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, kid: () => ({sleep: kid.sleep || evanNight()})});
 function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
@@ -229,7 +231,7 @@ const SHED = {
   compost:   {n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster."},
   sprinkler: {n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."}
 };
-let vaultView = null, lettersOpen = false, trophyView = null, routOpen = false, kudosOpen = false, deskOpen = false, shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false, clientsOpen = false, planOpen = false, revOpen = false, jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null;
+let vyView = null, vyAt = null, vaultView = null, lettersOpen = false, trophyView = null, routOpen = false, kudosOpen = false, deskOpen = false, shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false, clientsOpen = false, planOpen = false, revOpen = false, jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null;
 let jv = {mode: "shelf", blobs: [], note: ""};   // the emotion shelf panel: shelf, make (picker) or jar (one jar)
 // Guided breathing in the calm corner: a ring grows as she breathes in (4 s), holds (2 s) and shrinks as she breathes out (6 s)
 const BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]], CYCLE = 12;
@@ -465,7 +467,7 @@ let lastReady = readyCount(), lastDusk = null;
 setInterval(() => {
   if (S.sleep && S.sleep.until && Date.now() > S.sleep.until) wakeUp();
   if (hushed() && !$("speech").hidden && Date.now() > speechLock && Date.now() - speechAt > 6000) $("speech").hidden = true;   // tuck Maple's bubble away
-  bedtimeTick();
+  bedtimeTick(); vineTick();
   $("evan").style.display = evanHere() ? "" : "none";
   if (scene === "kidroom" && evanNight() && !kid.sleep) { kid.sleep = true; kid.open = null; stopKidGame(); ctx(); drawScene(); }
   const due = dueNow(F); if (due.length) { chime(); act("nudge"); speak(`Reminder: ${due.map(r => r.text).join(", and ")}.`, 9000, true); save(); }
@@ -755,11 +757,12 @@ let chatLog = (() => { try { return JSON.parse(localStorage.getItem("fox.chat"))
 const keepChat = () => { chatLog = chatLog.slice(-30); try { localStorage.setItem("fox.chat", JSON.stringify(chatLog)); } catch {} };
 const PLACES = {home: "home", house: "home", fridge: "home:fridge", kitchen: "home:kitchen", cupboard: "home:cupboard", treadmill: "home:treadmill", sofa: "home:sofa",
   pond: "base:pond", garden: "farm", farm: "farm", shed: "base:shed", swing: "base:swing", letterbox: "base:letterbox", "animal run": "base:run", wardrobe: "room:wardrobe", outfit: "room:wardrobe", "my room": "room", bedroom: "room", bed: "room:bed", journal: "room:journal", jars: "room:jars", "emotion shelf": "room:jars", "emotion jar": "room:jars", scratchpad: "hall:whiteboard", whiteboard: "hall:whiteboard", run: "base:run", animals: "base:run", chickens: "base:run", rabbits: "base:run", market: "market", well: "village:well",
+  vineyard: "vineyard:barrels", vines: "vineyard:vinestall", "barrel shed": "vineyard:barrels", barrels: "vineyard:barrels", "wine shop": "wineshop", "honesty box": "wineshop:hbox", "tasting room": "wineshop:tasting", playground: "vineyard:pslide",
   "town hall": "hall", hall: "hall", bank: "bank", vaults: "bank", savings: "bank", "kind words": "trophy:kudos", "trophy room": "trophy", courtyard: "trophy", fountain: "trophy:fountain", trophies: "trophy", "trophy book": "trophy:tbook", affirmations: "trophy:affirm", routines: "room:routines", "routine board": "room:routines", compliments: "trophy:kudos", "client table": "hall:clients", clients: "hall:clients", "planning table": "hall:table", plans: "hall:table", revenue: "hall:revenue", "revenue chart": "hall:revenue", chord: "chord", "makers lane": "lane:plot3", lane: "lane:plot3", library: "fresh", "fresh pages": "fresh", chico: "chico", "post office": "post", post: "post", town: "village:board"};
 function walkToPlace(name){
   const k = PLACES[String(name || "").toLowerCase().trim()]; if (!k) return null;
   const [pl, sp] = k.split(":");
-  if (pl === "base" || pl === "village" || pl === "lane") { const v = VILLAGE[sp]; go(pl, v.door[0], v.door[1], () => arriveVillageSpot(sp)); }
+  if (pl === "base" || pl === "village" || pl === "lane" || pl === "vineyard") { const v = VILLAGE[sp]; go(pl, v.door[0], v.door[1], () => arriveVillageSpot(sp)); }
   else if (sp) { const s = spotObj(pl, sp); go(pl, s.tx, s.ty, () => arriveSpot(sp)); }
   else go(pl, 260, pl === "farm" ? 560 : 560, null);
   return name;
@@ -823,7 +826,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"vineyard|barrels|wine shop|honesty box|tasting room|playground|home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -1155,7 +1158,7 @@ function showPanel(hasCtx, skin){
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
   if (kid.open) { kid.open = null; stopKidGame(); ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1165,6 +1168,7 @@ async function renderCal(fresh){
   if (calTab === "content") { el.innerHTML = contentHTML(); wireContent(el, () => renderCal()); return; }
   el.innerHTML = `<p class="muted">Opening your calendar…</p>`;
   const r = await todaysEvents(dayKey(), fresh), nowT = Date.now();
+  if (calTab === "content") return;   // switched tabs while today's events were loading
   const fmtT = t => new Date(t).toLocaleTimeString("en-GB", {hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Singapore"}).replace(" ", "").toLowerCase();
   let h = `<p class="sub">${new Date(now() + 8*H).toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "long", timeZone: "UTC"})}</p>`;
   if (r.error && !r.events.length) h += `<p class="muted">${esc(CAL_ERRORS[r.error] || "Couldn't reach your calendar just now.")}</p>`;
@@ -1201,6 +1205,8 @@ function ctx(){
   else if (homeView && scene === "home") h = hestiaPanel(homeView);
   else if (deskOpen && scene === "home") h = deskPanel();
   else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
+  else if (vyView && (scene === "vineyard" || scene === "wineshop")) h = vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F)
+    : vyView === "shelf" ? shelfPanel(F) : vyView === "counter" ? counterPanel(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter(n => n.id !== "celeste" && isHere(n.id)).map(n => n.name));
   else if (kudosOpen && scene === "trophy") h = kudosPanel();
   else if (trophyView && scene === "trophy") h = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : trophyView === "affirm" ? affirmPanel(F.affirm, affirmBusy, !!sampleCap) : trophyView === "fountain" ? fountainPanel(!!sampleCap) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
   else if (routOpen && scene === "room") h = routinesPanel();
@@ -1302,17 +1308,18 @@ function ctx(){
   if (kid.open && scene === "kidroom") wireKid(c, kid.open, {eat: id => { kid.open = null; ctx(); kidEat(id); }, close: () => { kid.open = null; stopKidGame(); ctx(); }});
   if (homeView && scene === "home") wireHestia(c, homeView);
   if (deskOpen && scene === "home") wireDesk(c, () => ctx());
+  if (vyView && (scene === "vineyard" || scene === "wineshop")) wireVine(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, r: vyAt && vyAt.r, i: vyAt && vyAt.i});
   if (vaultView && scene === "bank") {
     c.querySelectorAll("[data-vopen]").forEach(el => { const go = () => { bv.slot = +el.dataset.vopen; bv.mode = "jar"; vaultView = "jar"; ctx(); }; el.onclick = go; el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } }; });
-    if (vaultView === "jar") wireVault(c, {rerender: () => { ctx(); drawScene(); }, undoable, sfx, close: () => { vaultView = null; ctx(); drawScene(); }, poured: vaultPoured});
+    if (vaultView === "jar") wireVault(c, {rerender: () => { ctx(); drawScene(); }, undoable, sfx, close: () => { vaultView = null; vyView = null; ctx(); drawScene(); }, poured: vaultPoured});
   }
   c.querySelectorAll("[data-letters]").forEach(b => b.onclick = () => { journalOpen = false; lettersOpen = true; lv.mode = "home"; sfx("paper", true); ctx(); });
   if (lettersOpen && (scene === "room" || scene === "base")) wireLetters(c, {rerender: () => ctx(), sample: sampleCap, toJournal: t => { const e = addEntry(t, "letter"); if (e) { sfx("chime"); flash("Saved to your journal"); } return !!e; },
     sent: (k, d) => { sfx("paper"); speak(k === "universe" ? "Posted. The universe always writes back. Keep an eye on the letterbox." : `Sealed. It'll arrive in your letterbox on ${new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", {day: "numeric", month: "long", year: "numeric", timeZone: "UTC"})}.`, 5000); }});
   if (routOpen && scene === "room") wireRoutines(c, {rerender: () => ctx(), undoable, done: routineCoins});
-  if (trophyView && scene === "trophy") { wireTrophies(c, F, {save: () => save(true), undoable, rerender: () => { ctx(); drawScene(); }, close: () => { trophyView = null; lettersOpen = false; vaultView = null; ctx(); drawScene(); }});
+  if (trophyView && scene === "trophy") { wireTrophies(c, F, {save: () => save(true), undoable, rerender: () => { ctx(); drawScene(); }, close: () => { trophyView = null; lettersOpen = false; vaultView = null; vyView = null; ctx(); drawScene(); }});
     if (trophyView === "fountain") wireFountain(c, {sample: sampleCap, rerender: () => ctx(),
-      coin: () => { trophyView = null; lettersOpen = false; vaultView = null; ctx(); sfx("coin"); mprop("sparkle", 260 + rnd(-20, 20), 400); speak(pick(["Plink. Wish made. I won't ask.", "A coin in the fountain. Something good's coming.", "Make it a big one."]), 3500); },
+      coin: () => { trophyView = null; lettersOpen = false; vaultView = null; vyView = null; ctx(); sfx("coin"); mprop("sparkle", 260 + rnd(-20, 20), 400); speak(pick(["Plink. Wish made. I won't ask.", "A coin in the fountain. Something good's coming.", "Make it a big one."]), 3500); },
       keep: v => { F.vision = v; save(); }});
     if (trophyView === "affirm") { F.affirm = F.affirm || {}; wireAffirm(c, F.affirm, (F.affirm.day === dayKey() && F.affirm.items && F.affirm.items.length) ? F.affirm.items : dailyAffirmations(), {save: () => save(), undoable, rerender: () => ctx(), fresh: freshAffirmations}); } }
   if (kudosOpen && scene === "trophy") wireKudos(c, {rerender: () => { ctx(); drawScene(); }, undoable, done: () => { sfx("chime"); hearts(2); speak("Pinned up. That's a keeper.", 3000); }});
@@ -1327,14 +1334,14 @@ function ctx(){
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
   c.querySelectorAll('[data-rec="stop"]').forEach(b => b.onclick = () => { setMusic(false); speak("Needle up. Quiet time.", 2500); ctx(); drawScene(); });
   const rv = c.querySelector("#recVol"); if (rv) rv.oninput = () => setMusicVol(+rv.value);
   c.querySelectorAll("[data-calm]").forEach(b => b.onclick = () => { const k = b.dataset.calm;
-    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; A.decompNow(); drawScene(); } else startBreath(+k); });
+    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; A.decompNow(); drawScene(); } else startBreath(+k); });
   if (breath) tickBreath();
   if (journalOpen && scene === "room") wireJournal(c, undoable, e => { if (e) { sfx("chime"); speak(S.mode === "decompress" && S.decompFree ? "Written down. Now you can let it go." : "Page kept. Lovely.", 3500); } ctx(); });
   if (scratchOpen && scene === "hall") wireScratch(c, undoable, () => ctx());
@@ -1436,10 +1443,10 @@ function drawScene(){
   else if (scene === "base" && isWeekend() && S.weekendSaid !== day) { S.weekendSaid = day; setTimeout(() => speak("Weekend! Home things happen here at home. Any work quests still wait in town.", 5500), 2200); }
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
-  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "farm" ? farmArt() : roomArt(scene);
-  const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", farm:"The garden"};
+  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "farm" ? farmArt() : roomArt(scene);
+  const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:"The vineyard", farm:"The garden"};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-  $("maphint").textContent = scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap anywhere to walk. The bridge at the top goes to the town square." : scene === "lane" ? "Chord and Chico live here. The gate on the left goes back to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+  $("maphint").textContent = scene === "vineyard" ? "Tap a vine to plant, water or pick. The gate on the left goes home." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. The gate on the left goes back to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
 }
 function dressMel(){
   const d = F.decor || {}, show = (id, on) => { const e = $(id); if (e) e.style.display = on ? "" : "none"; };
@@ -1498,19 +1505,20 @@ let route = [], keys = new Set();
 const svg = $("world");
 // Evan's bedtime: 8pm to 7am he's asleep in his car bed, so he isn't out at home base or in the house
 const evanNight = () => { const m = sgHM(); return m >= 20*60 || m < 7*60; };
-const evanHere = () => scene === "kidroom" || ((scene === "base" || scene === "home") && !evanNight());
+const evanHere = () => scene === "kidroom" || ((scene === "base" || scene === "home" || scene === "vineyard") && !evanNight());
 function outside(){ return OUTDOOR.includes(scene); }
-const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : scene === "lane" ? [14, 140, W - 14, HH - 14] : [34, 168, W - 34, 612];
+const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : (scene === "lane" || scene === "vineyard") ? [14, 140, W - 14, HH - 14] : [34, 168, W - 34, 612];
 
 function setScene(id, at){
   const w = $("world"), from = scene; w.classList.add("fading");
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
     if (id === "base") { evan.x = evan.tx = 300; evan.y = evan.ty = 360; }
+    else if (id === "vineyard") { evan.x = evan.tx = p[0] + 26; evan.y = evan.ty = p[1] + 10; evan.run = false; evan.wait = 2; }
     else if (id === "home" && from === "kidroom") { evan.x = evan.tx = p[0] - 24; evan.y = evan.ty = p[1] + 6; evan.run = false; evan.wait = 3; }
     else if (id === "home") { evan.x = evan.tx = 300; evan.y = evan.ty = 520; }
     // Evan's room: he runs in ahead, Mel waits just inside the door, Maple stays out in the house
@@ -1553,7 +1561,7 @@ function go(target, x, y, fn){
     if (INNER[target]) { const I = INNER[target]; legs.push({scene:I.parent, x:I.door[0], y:I.door[1], fn:() => setScene(target, I.arrive)}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -1596,6 +1604,9 @@ function arriveSpot(id){
   if (scene === "bank" && /^vault\d$/.test(id)) { bv.slot = +id.slice(5); bv.mode = jarAt(bv.slot) ? "jar" : "setup"; bv.form = null; bv.amt = ""; vaultView = "jar"; sfx("paper", true); render(); return; }
   if (scene === "bank" && id === "counter") { vaultView = "overview"; sfx("paper", true); if (!npcSay("opal", pick(["Here's your passbook. Every vault at a glance.", "Lovely to see you! Shall we check on your jars?", "Your jewels are all accounted for."]))) speak("Opal's passbook is on the counter.", 3000); render(); return; }
   if (id === "trophydoor") { setScene("trophy", INNER.trophy.arrive); return; }
+  if (scene === "wineshop") { vyView = {wshelf: "shelf", wcounter: "counter", hbox: "box", tasting: "tasting"}[id] || null;
+    if (vyView) { sfx("paper", true); if (id === "wcounter") { vineTick(); speak(pick(["Behind the counter. Customers come in more often while you serve.", "Apron on. Who's first?", "Open for business!"]), 3500); if (isHere("celeste")) setTimeout(() => npcSay("celeste", pick(["Two of us! Let's see how busy we get.", "You pour, I'll chat."])), 1200); }
+      render(); return; } }
   if (scene === "trophy" && id === "bench") { mel.sitting = true; nodes.mel.classList.add("sit"); mel.dir = 1; sfx("paper", true); speak(pick(["Ahh. Sun on your face. Stay as long as you like.", "A little sit. The fountain's doing all the talking.", "Nowhere to be for a minute."]), 4000); render(); return; }
   if (scene === "trophy" && id === "fountain") { if (vz.step === "done") vz.step = "menu"; trophyView = "fountain"; sfx("paper", true); render(); return; }
   if (scene === "trophy" && id === "tbook") { trophyView = "book"; sfx("paper", true); render(); return; }
@@ -1613,6 +1624,9 @@ function arriveVillageSpot(id){
   const v = VILLAGE[id];
   if (v.bridge) { atSpot = null; setScene(v.bridge, ARRIVE[scene + ">" + v.bridge]); return; }
   if (id === "plot3" || id === "plot4") { speak(v.line, 4000); render(); return; }
+  if (id === "barrels") { vyView = "barrels"; sfx("paper", true); render(); return; }
+  if (id === "vinestall") { vyView = "stall"; sfx("paper", true); render(); return; }
+  if (id === "pswing" || id === "pslide" || id === "pseesaw") { playground(id); return; }
   // an outdoor quest at home base (Evan outing at the swing, garden jobs at the shed, a walk by the pond)
   if (scene === "base" && phase() === "task") { const t = remaining()[0];
     if (placeOf(t) === "base" && spotOf(t) === id && !S.arrived[t.id]) { S.arrived[t.id] = true; setSay(`Here at the ${v.name.toLowerCase()}. First tiny step…`); save(); return; } }
@@ -1627,6 +1641,27 @@ function arriveVillageSpot(id){
   if (id === "board") { arriveSpot("board"); return; }
   if (id === "pond") { speak(phase() === "break" ? "Perfect break spot. Breathe." : VILLAGE.pond.line, 4000); render(); }
 }
+/* ---------- The vineyard ---------- */
+// Mel's serving while she's standing at the wine shop counter
+const serving = () => scene === "wineshop" && atSpot === "wcounter";
+// Every minute (and on load): customers buy from the shelves, the vineyard hands water thirsty vines.
+function vineTick(){
+  const out = sellTick(F, {serving: serving()}); if (!out) return;
+  const typing = !!(document.activeElement && document.activeElement.closest && document.activeElement.closest(".vyname, [data-vyprice]"));
+  if (out.coins && serving()) { sfx("coin"); flash(`+${out.coins} coins from the wine shop`); }
+  else if (out.mins >= 30 && out.coins) setTimeout(() => speak(`While you were away, villagers bought ${out.bottles ? `${out.bottles} bottle${out.bottles > 1 ? "s" : ""}` : ""}${out.bottles && out.glasses ? " and " : ""}${out.glasses ? `${out.glasses} glass${out.glasses > 1 ? "es" : ""}` : ""} of your wine. ${vineState(F).box} coins are waiting in the honesty box.`, 6500), 2500);
+  if (typing) persist("fox"); else save(scene === "vineyard" || scene === "wineshop");
+}
+// The playground: Evan runs over to play (Pip too, if he's here)
+function playground(id){
+  const v = VILLAGE[id];
+  if (!evanHere()) { speak(v.line, 3500); render(); return; }
+  evan.tx = v.door[0] + rnd(-6, 6); evan.ty = v.door[1] - 6; evan.run = true; evan.wait = 8;
+  setTimeout(() => evanSays(pick(id === "pswing" ? ["wheee!", "push me!", "higher!"] : id === "pslide" ? ["again!", "whoosh!", "down!"] : ["up!", "down!", "bumpy!"])), 900);
+  if (isHere("pip")) setTimeout(() => npcSay("pip", pick(["Evan! Over here!", "My turn, then your turn!", "Race you to the slide!"])), 1800);
+  speak(v.line, 3500); render();
+}
+setTimeout(vineTick, 3000);
 /* ---------- The bank ---------- */
 function vaultPoured(j, nowFull){
   if (nowFull) { sfx("yay"); flash(`${j.label} is full!`); speak(`Your ${j.label} vault is full! Look at it sparkle. That's ${vaultMoney(j.amount, j.cur)} saved.`, 7000, true); setTimeout(checkTrophies, 500); }
@@ -1763,6 +1798,9 @@ svg.addEventListener("click", ev => {
   if (ent && ent.dataset.ent === "evan" && hug && hug.phase === "ask") { hugBack(); return; }
   if (ent && ent.dataset.ent === "evan") { evanSays(pick(["Mama!", "hug!", "hehe!", "up up!"])); mprop("heart", evan.x, evan.y - 40); evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; return; }
   if (ent && ent.dataset.ent === "maple") { sfx("purr"); if (Math.random() < .35) { hearts(2); speak("Purr… treats and toys are in your backpack. Tap the bag up top!", 4000); return; } hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please."]), 3000); return; }
+  const vt = ev.target.closest("[data-vine]");
+  if (vt && scene === "vineyard") { const [r, i] = vt.dataset.vine.split("-").map(Number), p = vineSpot(r, i);
+    go("vineyard", p.x, p.y, () => { atSpot = "vine"; vyAt = {r, i}; vyView = "vine"; sfx("paper", true); render(); }); return; }
   const pl = ev.target.closest("[data-place]");
   if (pl && outside()) {
     const id = pl.dataset.place, v = VILLAGE[id];
@@ -1804,7 +1842,7 @@ function nearSpot(){
   const list = [...stationsOf(scene), scene !== "market" ? {id:"board", tx:260, ty:200} : null].filter(Boolean);
   const s = list.find(s => Math.hypot(s.tx - mel.x, s.ty - mel.y) < 26); return s ? s.id : null;
 }
-const EVAN_SPOTS = {base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[380,580],[240,560],[420,340]], home:[[150,500],[330,520],[260,340],[200,600],[360,330]]};
+const EVAN_SPOTS = {vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[380,580],[240,560],[420,340]], home:[[150,500],[330,520],[260,340],[200,600],[360,330]]};
 // Evan's destination is evan.tx/ty; outdoors he follows route-finder waypoints to it (round the house, not through it)
 function evanWalk(speed, dt){
   const key = evan.tx + "," + evan.ty;

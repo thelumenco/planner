@@ -21,7 +21,7 @@ export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && s
 export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
 export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
 const PROPS = {water: "can", repair: "hammer", farm: "hoe"};
-const outdoors = s => s === "village" || s === "base" || s === "lane";
+const outdoors = s => s === "village" || s === "base" || s === "lane" || s === "vineyard";
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 
 function makeNode(id, look, kid, letter, act){

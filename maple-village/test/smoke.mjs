@@ -995,6 +995,61 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // The vineyard: grow grapes, ferment and bottle wine, sell it in the wine shop; workers water, an assistant serves
+  console.log("\nthe vineyard");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`vineyard pageerror: ${e.message}`));
+  // patch the save as the next page starts (local copy and the stub db copy; the old page writes its own as it unloads)
+  await page.addInitScript(() => { const q = location.search; if (!/ripen|sold/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f || !f.vine) return;
+    if (q.includes("ripen")) { f.vine.rows[0].vines.forEach(v => { if (v) v.wateredAt = Date.now() - 7*3600e3; }); (f.vine.barrels || []).forEach(b => { if (b) b.start = Date.now() - 6*3600e3; }); }
+    if (q.includes("sold")) { f.vine.lastTick = Date.now() - 600*60e3; if (f.vine.shelf[0]) f.vine.shelf[0].n = 60; }
+    localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
+  await page.goto(url + "?reset=1&seed=1&time=17:00");
+  await page.waitForTimeout(800);
+  check(await page.locator('#world [data-place="toVine"]').count() === 1, "home base has a gate to the vineyard");
+  await page.locator('#world [data-place="toVine"]').dispatchEvent("click");
+  await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(600);
+  check(await page.locator('#world [data-place="wineshop"]').count() === 1 && await page.locator('#world [data-place="pslide"]').count() === 1, "with a wine shop and a playground");
+  check(await page.locator('#actors [data-npc="marco"], #actors [data-npc="ines"]').count() >= 1, "vineyard workers are out among the vines");
+  check(await page.locator('#actors [data-npc="pip"]').count() === 1, "and Pip is at the playground after school");
+  await page.locator('#world [data-vine="0-0"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-vy="plant"]', { timeout: 15000 });
+  await page.click('#ctx [data-vy="plant"][data-k="red"]');
+  await page.waitForSelector('#ctx [data-vy="water"]', { timeout: 5000 }); await page.click('#ctx [data-vy="water"]');
+  check(await page.evaluate(() => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return v.rows[0].vines[0] && v.rows[0].vines[0].v === "red" && !!v.rows[0].vines[0].wateredAt; }), "a red vine is planted on the trellis and watered");
+  await page.goto(url + "?seed=1&time=17:10&ripen=1"); await page.waitForTimeout(800);
+  await page.locator('#world [data-place="toVine"]').dispatchEvent("click");
+  await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-vine="0-0"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-vy="harvest"]', { timeout: 15000 }); await page.click('#ctx [data-vy="harvest"]');
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.grapes.red === 3), "ripe grapes are picked: three bunches");
+  await page.click('#ctx [data-close]');
+  await page.locator('#world [data-place="barrels"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-vy="fill"][data-k="rose"]:not([disabled])', { timeout: 15000 }); await page.click('#ctx [data-vy="fill"][data-k="rose"]');
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.barrels[0].style === "rose"), "and go into a barrel to ferment as a rosé");
+  await page.goto(url + "?seed=1&time=17:20&ripen=1"); await page.waitForTimeout(800);
+  await page.locator('#world [data-place="toVine"]').dispatchEvent("click");
+  await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-place="barrels"]').dispatchEvent("click");
+  await page.waitForSelector('#vyName0', { timeout: 15000 }); await page.fill('#vyName0', "Evan's Blush"); await page.click('#ctx [data-vy="bottle"]');
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.cellar.some(c => c.name === "Evan's Blush" && c.n === 6)), "a ready barrel is named and bottled: six bottles in the cellar");
+  await page.click('#ctx [data-close]');
+  await page.locator('#world [data-place="wineshop"]').dispatchEvent("click");
+  await page.waitForFunction(() => /wine shop/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(500);
+  check(await page.locator('#actors [data-npc="celeste"]').count() === 1, "Celeste is behind the wine shop counter");
+  await page.locator('#world [data-spot="wshelf"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-vystock]', { timeout: 15000 }); await page.click('#ctx [data-vystock]');
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.shelf.some(s => s.name === "Evan's Blush" && s.n === 6)), "the bottles are stocked on the shop shelves");
+  await page.click('#ctx [data-close]');
+  // customers while Mel's away: back-date the last tick, sales land in the honesty box
+  await page.goto(url + "?seed=1&time=21:00&sold=1"); await page.waitForTimeout(4200);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.box > 0), "villagers buy wine while Mel's away and pay into the honesty box");
+  await page.screenshot({ path: join(shots, "vineyard.png") });
+  await page.close();
+}
+{
   // The bank: six vault jars of jewels for savings goals
   console.log("\nthe bank");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

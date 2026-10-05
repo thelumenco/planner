@@ -4,7 +4,7 @@ import { hash, now, H } from "../util.js";
 // Outdoor screens. "base" is home (house, garden, pond, shed, swing); "village" is the town square with the work
 // buildings. A river joins them: walk onto the bridge to cross. A third screen (say, for Luna) would be one more
 // OUTDOOR entry, a pair of bridge places and a BRIDGES/ARRIVE line.
-export const OUTDOOR = ["base", "village", "lane"];
+export const OUTDOOR = ["base", "village", "lane", "vineyard"];
 export const VILLAGE = {
   // town square
   hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[170,180], mark:[132,64]},
@@ -32,6 +32,15 @@ export const VILLAGE = {
   letterbox:{scene:"base", name:"Letterbox", door:[184,326], spot:true, line:"The letterbox. The morning paper lands here."},
   run:    {scene:"base", name:"Animal run", door:[198,566], spot:true, line:"The animal run. Clucks, cheeps and little hops."},
   swing:  {scene:"base", name:"Tree swing", door:[112,318], spot:true, line:"Evan's swing. Push, push, wheee!"},
+  toVine: {scene:"base", name:"Gate to the vineyard", door:[490,404], spot:true, bridge:"vineyard", mark:[494,350], line:"Over the footbridge to the vineyard."},
+  // the vineyard, east of home: vines, the barrel shed, the stall, the wine shop and a playground
+  toBaseV:{scene:"vineyard", name:"Gate home", door:[22,300], spot:true, bridge:"base", mark:[30,250], line:"Back over the footbridge, home."},
+  wineshop:{scene:"vineyard", name:"Wine shop", short:"the wine shop", door:[390,222], mark:[390,96]},
+  barrels:{scene:"vineyard", name:"Barrel shed", door:[112,238], spot:true, mark:[112,130], line:"The barrel shed. Grapes go in, wine comes out. Eventually."},
+  vinestall:{scene:"vineyard", name:"Vineyard stall", door:[90,452], spot:true, line:"Cuttings, trellises and barrels."},
+  pswing: {scene:"vineyard", name:"Swings", door:[110,594], spot:true, line:"The swings. Wheee!"},
+  pslide: {scene:"vineyard", name:"Slide", door:[262,592], spot:true, line:"The slide. Down you go!"},
+  pseesaw:{scene:"vineyard", name:"Seesaw", door:[410,600], spot:true, line:"The seesaw. Up, down, up, down."},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };
 // Quests can also happen outdoors at home base: "base" is a quest place whose spots are the base's own places.
@@ -46,9 +55,9 @@ const WORK_HINT = /chord|chico|ambidextrous|fresh pages|client|muse|proposal|inv
 export const isWeekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
 const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
-export const BRIDGES = {village:{base:"toBase", lane:"toLane"}, base:{village:"toTown"}, lane:{village:"toTownE"}};
+export const BRIDGES = {village:{base:"toBase", lane:"toLane"}, base:{village:"toTown", vineyard:"toVine"}, lane:{village:"toTownE"}, vineyard:{base:"toBaseV"}};
 // where Mel steps off, by "from>to"
-export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238]};
+export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,404]};
 // the next outdoor screen on the way from one to another (screens form a little chain: base - village - lane)
 export function nextHop(from, to){
   if (from === to) return null; if (BRIDGES[from] && BRIDGES[from][to]) return to;
@@ -150,6 +159,13 @@ export const ROOMS = {
     ["vault0","","V0","vaultjar",null,"",40], ["vault1","","V1","vaultjar",null,"",40], ["vault2","","V2","vaultjar",null,"",40],
     ["vault3","","V3","vaultjar",null,"",40], ["vault4","","V4","vaultjar",null,"",40],
     ["counter","Counter","C","bankcounter",null,"Opal's counter. Your passbook's here.",30]]},
+  // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
+  // and the tasting room's little tables
+  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,262], C:[330,318], H:[96,440], T:[340,520]}, stations:[
+    ["wshelf","Wine shelves","S","wineshelf",null,"Your wines, waiting for customers.",30],
+    ["wcounter","Counter","C","winecounter",null,"Behind the counter. Customers come more often while you serve.",-34],
+    ["hbox","Honesty box","H","honestybox",null,"The honesty box.",30],
+    ["tasting","Tasting room","T","cafetables",null,"The tasting room.",34]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };

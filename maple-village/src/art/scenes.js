@@ -10,6 +10,8 @@ import { jarArt } from "../game/jars.js";
 import { upgradesArt, festivalArt, festivalOn, pondLanterns, streetLamp, lampDefs } from "./village-extras.js";
 import { trophySVG } from "../game/trophies.js";
 import { bankBuilding } from "./buildings.js";
+import { vineGate } from "./vineyard.js";
+export { vineyardArt } from "./vineyard.js";
 import { jarArt as vaultArt, isFull as vaultFull } from "../game/bank.js";
 import { townHall, chordWorkshop, library, chicoCottage, postOffice } from "./buildings.js";
 
@@ -124,7 +126,7 @@ export function baseArt(){
   // chimney stands on the right-hand roof slope (roof line runs y≈196 at x=290 to y≈204 at x=302)
   const homeX = {art:`<path d="M290 168 h12 v36 l-12 -8.6z" style="fill:var(--stone)"/>`, lines:`<path d="M290 196 v-28 h12 v36"/><path d="M288 168 h16"/><path class="smoke" d="M296 164 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>`};
   const places =
-    bridge("toTown", 260, 30, 110, "To town", 336, 124) +
+    bridge("toTown", 260, 30, 110, "To town", 336, 124) + vineGate() +
     house("home", 205, 220, 110, 74, "var(--card)", "var(--butter)", "Home", "var(--butter)", homeX) +
     // Darren's repair corner: ladder against the wall, toolbox
     sk(`<rect x="326" y="282" width="20" height="12" rx="2" style="fill:var(--rose)"/>`, `<path d="M316 296 l12 -62 M326 296 l12 -62 M318 284 h10 M320 272 h10 M323 260 h10 M325 248 h10"/><rect x="326" y="282" width="20" height="12" rx="2"/><path d="M332 282 v-4 h8 v4"/>`) +
@@ -278,6 +280,20 @@ export function furn(kind, x, y){
     case "vaultjar": { const j = G.vault ? G.vault(x) : null;
       if (!j) return `<g opacity=".75">${sk(`<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" style="fill:rgba(220,235,245,.35)"/>`, `<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" stroke-dasharray="5 5"/><path d="M${x} ${y-152} v20 M${x-10} ${y-142} h20" stroke-width="2"/>`)}</g>`;
       return `<svg x="${x-34}" y="${y-300}" width="80" height="300" overflow="visible" class="${vaultFull(j) ? "vfull" : ""}">${vaultArt(j, 68, 300, {id: "f" + j.slot, sparkle: vaultFull(j), markers: false})}</svg>`; }
+    // the wine shop: wine racks, the counter (front drawn over people, see foreArt), the honesty box, tasting tables
+    case "wineshelf": { const n = G.vine ? Math.min(18, G.vineStock()) : 0; let b = "";
+      for (let r = 0; r < 3; r++) for (let i = 0; i < 6; i++) { const k = r*6 + i; b += k < n ? `<rect x="${x-36 + i*12.5}" y="${y-86 + r*28}" width="7" height="20" rx="2.5" style="fill:${k % 3 === 1 ? "#9DBF8A" : "#5B2338"}"/>` : ""; }
+      return sk(`<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3" style="fill:#8B5E3C"/>${b}`, `<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3"/><path d="M${x-44} ${y-68} h88 M${x-44} ${y-40} h88 M${x-44} ${y-12} h88"/>`); }
+    case "winecounter": return `<rect x="${x-92}" y="${y-48}" width="184" height="48" fill="transparent"/>`;
+    case "honestybox": { const n = G.vine ? G.vine().box : 0;
+      return sk(`<rect x="${x-8}" y="${y-40}" width="16" height="40" style="fill:var(--wood)"/><rect x="${x-20}" y="${y-62}" width="40" height="24" rx="3" style="fill:#C46A4A"/><rect x="${x-10}" y="${y-60}" width="20" height="3" rx="1" style="fill:#3a2e28"/>`,
+        `<rect x="${x-8}" y="${y-40}" width="16" height="40"/><rect x="${x-20}" y="${y-62}" width="40" height="24" rx="3"/><path d="M${x-14} ${y} h28"/>`)
+        + `<text x="${x}" y="${y-45}" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="7.5" fill="#FFFDF6" pointer-events="none">honesty</text>`
+        + (n ? `<g class="twinkle" pointer-events="none"><circle cx="${x+18}" cy="${y-66}" r="5" fill="#F3C969" stroke="#3a2e28" stroke-width=".8"/></g>` : ""); }
+    case "cafetables": { const table = (tx, ty) => sk(`<ellipse cx="${tx}" cy="${ty-26}" rx="30" ry="12" style="fill:#FFFDF6"/><path d="M${tx-4} ${ty-40} h8 l-1 12 h-6z" style="fill:#5B2338"/><circle cx="${tx+14}" cy="${ty-28}" r="3" style="fill:#E8D57A"/>`,
+        `<ellipse cx="${tx}" cy="${ty-26}" rx="30" ry="12"/><path d="M${tx} ${ty-14} v14 M${tx-10} ${ty} h20"/><path d="M${tx-4} ${ty-40} h8 l-1 12 h-6z"/>`)
+        + sk(`<rect x="${tx-50}" y="${ty-22}" width="14" height="6" rx="2" style="fill:var(--wood)"/><rect x="${tx+36}" y="${ty-22}" width="14" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="${tx-50}" y="${ty-22}" width="14" height="6" rx="2"/><path d="M${tx-48} ${ty-16} v12 M${tx-38} ${ty-16} v12 M${tx-50} ${ty-22} v-16"/><rect x="${tx+36}" y="${ty-22}" width="14" height="6" rx="2"/><path d="M${tx+38} ${ty-16} v12 M${tx+48} ${ty-16} v12 M${tx+50} ${ty-22} v-16"/>`);
+      return table(x - 70, y) + table(x + 70, y - 6); }
     // the counter's front panel is drawn over the characters (foreArt), so Opal stands behind it
     case "bankcounter": return `<rect x="${x-92}" y="${y-48}" width="184" height="48" fill="transparent"/>`;
     case "kindboard": { const n = G.kudos ? G.kudos() : 0, cols = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
@@ -388,6 +404,9 @@ export function furn(kind, x, y){
 }
 // Things drawn over the characters, so people can stand behind them (the bank counter)
 export function foreArt(id){
+  if (id === "wineshop") { const s = stationsOf("wineshop").find(t => t.kind === "winecounter"); const x = s.x, y = s.y;
+    return sk(`<rect x="${x-90}" y="${y-44}" width="180" height="44" rx="4" style="fill:#8B5E3C"/><rect x="${x-94}" y="${y-50}" width="188" height="8" rx="2" style="fill:#5B2338"/><path d="M${x-60} ${y-66} h8 l-1 14 h-6z" style="fill:#5B2338"/><path d="M${x-42} ${y-62} q5 0 5 6 q0 4 -5 4 q-5 0 -5 -4 q0 -6 5 -6z" style="fill:#F6E3C6"/><rect x="${x+50}" y="${y-62}" width="24" height="12" rx="2" style="fill:#F3C969"/>`,
+      `<rect x="${x-90}" y="${y-44}" width="180" height="44" rx="4"/><rect x="${x-94}" y="${y-50}" width="188" height="8" rx="2"/><path d="M${x-90} ${y-22} h180" opacity=".35"/><path d="M${x-60} ${y-66} h8 l-1 14 h-6z M${x-56} ${y-66} v-6"/><path d="M${x-42} ${y-52} v4 M${x-46} ${y-48} h8"/><rect x="${x+50}" y="${y-62}" width="24" height="12" rx="2"/>`); }
   if (id !== "bank") return "";
   const s = stationsOf("bank").find(t => t.kind === "bankcounter"); if (!s) return ""; const x = s.x, y = s.y;
   return sk(`<rect x="${x-90}" y="${y-44}" width="180" height="44" rx="4" style="fill:var(--wood)"/><rect x="${x-94}" y="${y-50}" width="188" height="8" rx="2" style="fill:#E7DCC2"/><circle cx="${x+64}" cy="${y-56}" r="6" style="fill:var(--honey)"/><rect x="${x-70}" y="${y-60}" width="26" height="10" rx="1" style="fill:#8E2C48"/>`,

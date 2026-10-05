@@ -14,7 +14,7 @@ export const NPCS = [
     id: "hana", pitch: 1.15, name: "Hana", job: "Runs the market",
     intro: "Hi love, I'm Hana! I moved here from a little seaside town. The honey toast is mine, and yes, I remember everyone's usual.",
     look: {skin: "#F3D2B8", hair: "#5A3A2A", hairStyle: "bun", top: "#EFA3A6", bottom: "#7A6A8C", extra: "apron"},
-    routine: [slot("8:00", "12:00", "market", [260, 352]), slot("12:00", "13:00", "market", [[200, 352], [320, 352], [260, 352]]),
+    routine: [slot("19:30", "21:00", "wineshop", [227, 518], {act: "sit", days: "we"}), slot("8:00", "12:00", "market", [260, 352]), slot("12:00", "13:00", "market", [[200, 352], [320, 352], [260, 352]]),
       slot("13:00", "15:00", "market", [260, 352]), slot("15:00", "15:40", "village", [[362, 372], [392, 360], [340, 380]]), slot("15:40", "19:00", "market", [260, 352])],
     lines: ["Fresh dumplings today. Don't tell Maple, she'll want three.", "You look like a honey toast kind of person today.", "Lunch rush is wild. Everyone wants toast at once!",
       "Remember to eat something proper, not just snacks.", "The strawberries sell out first. Every time."],
@@ -25,7 +25,7 @@ export const NPCS = [
     id: "okada", pitch: 0.75, name: "Mr Okada", job: "Retired postmaster, unofficial well-keeper",
     intro: "Okada. Forty years delivering letters. Retired now, but I still can't stop sorting things. Even the pebbles by the well.",
     look: {skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses"},
-    routine: [slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("17:00", "19:30", "village", [322, 566])],
+    routine: [slot("19:30", "21:00", "wineshop", [313, 518], {act: "sit", days: "wd"}), slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("17:00", "19:30", "village", [322, 566])],
     lines: ["Letters used to come in sacks. Now it's all on your little phone.", "The well water is sweeter in the afternoon. Don't ask me why.", "I've sorted the pebbles by colour. Then by size. Then by colour again.",
       "A tidy inbox is a tidy mind. Mine is a shoebox.", "The river's high today. Good for the ducks."],
     react: {inbox: "An email quest! Just like the old days. Stamp it and send it.", water: "Good, drink up. Forty years of walking taught me that.", quests3: "Steady work. That's the postmaster's way."}
@@ -34,7 +34,7 @@ export const NPCS = [
     id: "juniper", pitch: 1.05, name: "Juniper", job: "Librarian at the Fresh Pages library",
     intro: "Welcome to the library! I'm Juniper. I love a good semicolon; I also write poetry, but that's a secret. One book recommendation a week, guaranteed.",
     look: {skin: "#C99A78", hair: "#2B2320", hairStyle: "bob", top: "#B9D2A6", bottom: "#3F4A6B", extra: "glasses"},
-    routine: [slot("8:30", "13:00", "fresh", [[160, 300], [330, 300], [240, 330]]), slot("13:00", "15:30", "fresh", [356, 330]),
+    routine: [slot("18:30", "20:00", "wineshop", [453, 512], {act: "sit"}), slot("8:30", "13:00", "fresh", [[160, 300], [330, 300], [240, 330]]), slot("13:00", "15:30", "fresh", [356, 330]),
       slot("15:30", "16:00", "trophy", [292, 590], {act: "sit"}), slot("16:00", "18:00", "fresh", [[90, 330], [180, 330], [140, 312]])],
     lines: ["This week's pick: anything with a map in the front.", "A semicolon is a pause that believes in you.", "Shh… the nook is in reading hour. Join me?",
       "Every first draft is allowed to be terrible. That's the rule.", "I shelve by feeling, not by alphabet. Don't tell anyone."],
@@ -44,7 +44,7 @@ export const NPCS = [
     id: "bo", pitch: 0.8, name: "Bo", job: "Carpenter at the Chord workshop",
     intro: "Bo! Carpenter. If it creaks, wobbles or falls off, I'm your guy. Built half this village. *hums*",
     look: {skin: "#E2B590", hair: "#3B2A1E", hairStyle: "short", top: "#E9C46A", bottom: "#4F6B8A", extra: "cap"},
-    routine: [slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]), slot("12:30", "13:30", "village", [346, 566]),
+    routine: [slot("18:30", "20:00", "wineshop", [227, 518], {act: "sit"}), slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]), slot("12:30", "13:30", "village", [346, 566]),
       slot("13:30", "18:00", "village", [[170, 300], [400, 280], [300, 450], [150, 520], [440, 560]])],
     lines: ["*hums a tune* Fixed the market's wobbly leg this morning.", "Measure twice, cut once. Or just cut and laugh.", "The workshop smells like sawdust and big ideas.",
       "Shipping is just building, but braver.", "Need a shelf? I always need a shelf."],
@@ -64,15 +64,15 @@ export const NPCS = [
     id: "pip", pitch: 1.45, name: "Pip", job: "Evan's best friend",
     intro: "I'm Pip! I'm Evan's best friend and I'm the FASTEST. Watch!", kid: true,
     look: {skin: "#D6A27C", hair: "#1F1A17", hairStyle: "spiky", top: "#F28C6A", bottom: "#4C7BB0", extra: "helmet"},
-    routine: [slot("15:00", "18:30", "base", [[230, 350], [300, 380], [200, 420], [360, 580], [160, 560], [300, 600]])],
+    routine: [slot("16:30", "17:30", "vineyard", [[110, 604], [262, 600], [410, 608], [200, 586], [330, 590]]), slot("15:00", "18:30", "base", [[230, 350], [300, 380], [200, 420], [360, 580], [160, 560], [300, 600]])],
     lines: ["Race you to the pond!", "Evan is SO fast. Almost as fast as me.", "Did you know foxes can't ride bikes? I asked Maple.", "I found a snail! His name is Gary."],
     react: {}
   },
   {
     id: "opal", pitch: 1.0, name: "Opal", job: "The banker",
-    intro: "Welcome to the bank! I'm Opal. Six vaults, all yours. Every little deposit is a jewel in the jar, and yes, I polish them.",
+    intro: "Welcome to the bank! I'm Opal. Five vaults, all yours. Every little deposit is a jewel in the jar, and yes, I polish them.",
     look: {skin: "#E8C3A2", hair: "#2E2622", hairStyle: "bun", top: "#7FA88A", bottom: "#3F4A3A", extra: "glasses"},
-    routine: [slot("9:00", "12:30", "bank", [260, 500]), slot("12:30", "13:30", "village", [[300, 214], [262, 230]]), slot("13:30", "17:30", "bank", [260, 500])],
+    routine: [slot("18:00", "19:30", "wineshop", [367, 512], {act: "sit"}), slot("9:00", "12:30", "bank", [260, 500]), slot("12:30", "13:30", "village", [[300, 214], [262, 230]]), slot("13:30", "17:30", "bank", [260, 500])],
     lines: ["Every jewel counts. Even the little ones. Especially the little ones.", "Pay yourself first, then the rest. That's the banker's secret.", "I polished the sapphires this morning. Don't tell the rubies.",
       "Slow and steady fills a jar. Promise.", "A full jar is the prettiest thing in this town."],
     away: "Opal's on her lunch break. The vaults are always open to you.",
@@ -82,7 +82,7 @@ export const NPCS = [
     id: "theo", pitch: 0.9, name: "Theo", job: "Town hall clerk",
     intro: "Theo, town clerk. I keep the village records. And, if you have a moment, I have a stamp collection you would not believe.",
     look: {skin: "#F0D0B4", hair: "#6B4A2E", hairStyle: "short", top: "#C3CDEE", bottom: "#3A3A48", extra: "tie"},
-    routine: [slot("9:00", "12:00", "hall", [[200, 320], [330, 320]]), slot("12:00", "13:00", "trophy", [228, 590], {act: "sit"}), slot("13:00", "17:00", "hall", [[200, 320], [330, 320]])],
+    routine: [slot("17:30", "19:00", "wineshop", [313, 518], {act: "sit"}), slot("9:00", "12:00", "hall", [[200, 320], [330, 320]]), slot("12:00", "13:00", "trophy", [228, 590], {act: "sit"}), slot("13:00", "17:00", "hall", [[200, 320], [330, 320]])],
     lines: ["Records say you've been busy. I'm very proud. Officially.", "This stamp is from 1962. Look at the little bird!", "Everything filed, everything stamped. Bliss.",
       "The quest board is the most important document in town.", "I've started a register of Maple's naps. It's long."],
     react: {quests3: "I've stamped three completed quests in the register. Gold stamp!", planning: "A planning quest! My favourite kind of paperwork."}
@@ -117,6 +117,38 @@ export const NPCS = [
       rest: ["Best present ever. Don't wake me for anything less than dinner.", "*sways* Five more minutes.", "The stars are out. Come look."]
     },
     react: {harvest: "Nice haul! I'll cook with that.", quests3: "Three done already? Look at you go.", lunch: "Lunch? I'll make toast."}
+  },
+  // The vineyard's workers: while they're on shift, thirsty vines get watered (Mel still does the picking)
+  {
+    id: "marco", pitch: 0.8, name: "Marco", job: "Keeps the vineyard",
+    intro: "Marco. I look after the vines. You pick, I water, the grapes do the rest. Forty summers of this and I still talk to them.",
+    look: {skin: "#C99470", hair: "#4A4038", hairStyle: "short", top: "#9DB88A", bottom: "#6B5444"},
+    routine: [slot("8:00", "12:00", "vineyard", [[262, 390], [340, 440], [418, 490], [300, 392], [380, 442]], {act: "water"}),
+      slot("12:00", "13:00", "wineshop", [227, 518], {act: "sit"}),
+      slot("13:00", "18:00", "vineyard", [[262, 390], [340, 440], [418, 490], [230, 470], [450, 400]], {act: "farm"})],
+    lines: ["Talk to them nicely. Vines listen.", "Water in the morning, pick in the afternoon.", "The red ones are show-offs. The white ones are shy.", "A good barrel takes its time. So do I."],
+    actLines: {water: ["Watering the thirsty ones. You pick the ripe ones.", "A drink for every vine."], farm: ["Tying up the shoots.", "Checking every bunch. Looking good."]},
+    away: "Marco's gone home. The vines can wait till morning.",
+    react: {harvest: "Lovely bunches! Into the barrel with them.", quests3: "Hard work. Like a good harvest."}
+  },
+  {
+    id: "ines", pitch: 1.2, name: "Ines", job: "Vineyard hand",
+    intro: "Hi! I'm Ines. Summers here, winters dreaming about here. I'm in charge of the trellises, and of telling Marco to take a break.",
+    look: {skin: "#E8B996", hair: "#7A3B22", hairStyle: "long", top: "#F3C969", bottom: "#5E6E8C"},
+    routine: [slot("9:00", "13:00", "vineyard", [[262, 440], [340, 490], [418, 390], [230, 420], [450, 470]], {act: "farm"}),
+      slot("14:00", "17:30", "vineyard", [[262, 490], [340, 390], [418, 440], [190, 430]], {act: "water"})],
+    lines: ["The rosé grapes are my favourite. Don't tell the others.", "Sun's out, vines are happy.", "Every trellis in this row, I tied myself.", "Smell that? That's next year's wine."],
+    actLines: {water: ["Just watering. Picking's yours!", "Hydrated vines, happy vines."], farm: ["Tidying the trellis.", "Pruning a little. Shh, it doesn't hurt."]},
+    away: "Ines is off for the day."
+  },
+  // The wine shop's assistant: while she's behind the counter, more customers come in (coins go in the honesty box)
+  {
+    id: "celeste", pitch: 1.05, name: "Celeste", job: "Runs the wine shop counter",
+    intro: "Bienvenue! I'm Celeste. I mind the counter, pour the tastings and write the chalkboard. Your wines sell themselves, honestly. I just smile.",
+    look: {skin: "#B9835F", hair: "#231C19", hairStyle: "bun", top: "#8E2C48", bottom: "#2F2B28", extra: "apron"},
+    routine: [slot("11:00", "15:00", "wineshop", [372, 286]), slot("15:00", "15:30", "vineyard", [[300, 260], [440, 270], [360, 300]]), slot("15:30", "21:30", "wineshop", [372, 286])],
+    lines: ["The honesty box is very honest today.", "Someone asked who makes these. I said a very busy lady.", "Evenings are the best. Everyone wants a glass.", "If the shelves are full, I'm happy."],
+    away: "Celeste's not on. The honesty box minds the shop."
   }
 ];
 

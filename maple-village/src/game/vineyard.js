@@ -1,0 +1,182 @@
+// The vineyard (east of home): grow grapes on trellised vines, ferment them in barrels (set it and walk away),
+// bottle and name the wines, stock the wine shop's shelves. Villagers buy now and then and leave coins in the
+// honesty box; standing behind the counter brings more customers. How busy it gets follows the village's routines
+// (evenings and weekends are busiest; villagers dropping in for a tasting add more). State lives in the game save
+// (F.vine). Times are real time, so things grow and ferment while Mel is away.
+import { esc, plain, H, now } from "../util.js";
+import { NPCS } from "../data/npcs.js";
+
+export const GROW = 6*H;                                     // a watered vine ripens in 6 hours
+export const STYLES = {red: {n: "Red", grape: "red", dur: 4*H, price: 24, col: "#7A1F3D"}, rose: {n: "Rosé", grape: "red", dur: 2*H, price: 20, col: "#E98AA0"},
+  white: {n: "White", grape: "white", dur: 3*H, price: 22, col: "#E8D57A"}, sparkling: {n: "Sparkling", grape: "white", dur: 3*H, dur2: 2*H, price: 34, col: "#F3E7B0"}};
+export const SHOP = {cut_red: {n: "Red grape vine", price: 10, say: "A red grape cutting. Plant it on a trellis."}, cut_white: {n: "White grape vine", price: 10, say: "A white grape cutting. Plant it on a trellis."},
+  trellis: {n: "Trellis (one row)", price: 25, say: "A new trellis row, ready for three vines."}, barrel: {n: "Oak barrel", price: 40, say: "Another barrel for the cellar."}};
+const BUNCHES = 3, PER_BATCH = 3, BOTTLES = 6, GLASSES = 5;
+export function vineState(F){
+  F.vine = F.vine || {};
+  const v = F.vine;
+  v.rows = v.rows || [0, 1, 2].map(i => ({trellis: i === 0, vines: [null, null, null]}));
+  v.cuttings = v.cuttings || {red: 1, white: 1}; v.grapes = v.grapes || {red: 0, white: 0};
+  v.barrels = v.barrels || [null]; v.cellar = v.cellar || []; v.shelf = v.shelf || []; v.box = v.box || 0; v.sold = v.sold || 0; v.glasses = v.glasses || 0;
+  v.lastTick = v.lastTick || Date.now(); v.today = v.today || {day: "", bottles: 0, glasses: 0, coins: 0};
+  return v;
+}
+export const growth = vn => vn && vn.wateredAt ? Math.min(1, (Date.now() - vn.wateredAt)/GROW) : 0;
+export const barrelLeft = b => b ? Math.max(0, b.start + b.dur - Date.now()) : 0;
+export const shelfStock = v => v.shelf.reduce((n, s) => n + s.n, 0);
+
+/* ---------- actions (return a line for Maple, or null) ---------- */
+export function buy(F, id){
+  const v = vineState(F), it = SHOP[id]; if (!it || F.coins < it.price) return null;
+  if (id === "trellis") { const r = v.rows.find(x => !x.trellis); if (!r) return "Every row has a trellis already."; r.trellis = true; }
+  else if (id === "barrel") { if (v.barrels.length >= 3) return "The cellar's full: three barrels is the most it holds."; v.barrels.push(null); }
+  else v.cuttings[id === "cut_red" ? "red" : "white"]++;
+  F.coins -= it.price; return it.say;
+}
+export function plantVine(F, r, i, kind){
+  const v = vineState(F), row = v.rows[r]; if (!row || !row.trellis || row.vines[i] || !(v.cuttings[kind] > 0)) return null;
+  v.cuttings[kind]--; row.vines[i] = {v: kind, planted: Date.now(), wateredAt: null}; return `A ${kind} vine, planted. Give it some water.`;
+}
+export function waterVines(F, r){ const v = vineState(F), row = v.rows[r]; let n = 0; (row ? row.vines : []).forEach(vn => { if (vn && !vn.wateredAt) { vn.wateredAt = Date.now(); n++; } }); return n ? `Watered ${n} vine${n > 1 ? "s" : ""}. Ripe in about six hours.` : null; }
+export function harvestVine(F, r, i){
+  const v = vineState(F), vn = v.rows[r] && v.rows[r].vines[i]; if (!vn || growth(vn) < 1) return null;
+  v.grapes[vn.v] += BUNCHES; vn.wateredAt = null; return `${BUNCHES} bunches of ${vn.v} grapes! Water the vine again and it'll fruit again.`;
+}
+export function fillBarrel(F, slot, style){
+  const v = vineState(F), st = STYLES[style]; if (!st || v.barrels[slot] || v.grapes[st.grape] < PER_BATCH) return null;
+  v.grapes[st.grape] -= PER_BATCH; v.barrels[slot] = {style, start: Date.now(), dur: st.dur, stage: 1};
+  return `Into the barrel. It'll be ready in about ${Math.round(st.dur/H)} hours. Off you go, it doesn't need you.`;
+}
+export function secondFerment(F, slot){ const v = vineState(F), b = v.barrels[slot]; if (!b || b.style !== "sparkling" || b.stage !== 1 || barrelLeft(b)) return null; b.stage = 2; b.start = Date.now(); b.dur = STYLES.sparkling.dur2; return "Second fermentation for the bubbles. Two more hours."; }
+export function bottle(F, slot, name){
+  const v = vineState(F), b = v.barrels[slot]; if (!b || barrelLeft(b) || (b.style === "sparkling" && b.stage !== 2)) return null;
+  const nm = plain(String(name || "")).trim().slice(0, 30) || `Maple's ${STYLES[b.style].n}`;
+  v.cellar.push({id: "w" + Date.now().toString(36), name: nm, type: b.style, n: BOTTLES}); v.barrels[slot] = null;
+  return `${BOTTLES} bottles of ${nm}, into the cellar. Stock them on the shop shelves.`;
+}
+export function stock(F, id){ const v = vineState(F), c = v.cellar.find(x => x.id === id); if (!c) return null;
+  const s = v.shelf.find(x => x.id === id); if (s) s.n += c.n; else v.shelf.push({id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES[c.type].price, open: 0});
+  v.cellar = v.cellar.filter(x => x.id !== id); return `${c.name} is on the shelves.`; }
+export function setPrice(F, id, p){ const s = vineState(F).shelf.find(x => x.id === id); if (s) s.price = Math.max(1, Math.min(999, Math.round(p) || 1)); }
+export function collect(F){ const v = vineState(F), n = v.box; if (!n) return 0; F.coins += n; v.box = 0; return n; }
+
+/* ---------- the shop's customers, and the workers ---------- */
+// Who's where at a given moment, from the villagers' routines: the shop assistant on shift, villagers in for a
+// tasting, the vineyard hands at work.
+const WORKERS = ["marco", "ines"], STAFF = "celeste";
+function whoAt(at){
+  const d = new Date(at + 8*H), hm = d.getUTCHours()*60 + d.getUTCMinutes(), we = [0, 6].includes(d.getUTCDay());
+  const out = {staff: false, visitors: 0, workers: false};
+  for (const n of NPCS) { const s = n.routine.find(x => hm >= x.from && hm < x.to && (!x.days || (x.days === "we") === we)); if (!s) continue;
+    if (n.id === STAFF) out.staff = out.staff || s.scene === "wineshop";
+    else if (WORKERS.includes(n.id) && s.scene === "vineyard") out.workers = true;
+    else if (s.scene === "wineshop" || s.scene === "vineyard") out.visitors++; }
+  return out;
+}
+// busier in the evening and at weekends, and with villagers about; open 10am to 10pm
+function footfall(hm, weekend, visitors){ return (hm >= 17*60 && hm < 21*60 ? 2 : hm >= 12*60 && hm < 14*60 ? 1.3 : 1) * (weekend ? 1.5 : 1) * (1 + .4*visitors); }
+// Simulates the minutes since the last tick (up to 12 hours): customers buying (into the honesty box, or straight
+// to Mel while she's serving behind the counter), and the vineyard hands watering thirsty vines while on shift.
+// -> {bottles, glasses, coins, toBox, watered, mins} or null when nothing happened
+export function sellTick(F, opts = {}){
+  const v = vineState(F), t = Date.now(), mins = Math.min(720, Math.floor((t - v.lastTick)/60000)); if (mins < 1) return null;
+  if (t - v.lastTick > 720*60000) v.lastTick = t - 720*60000;
+  v.lastTick += mins*60000;
+  const out = {bottles: 0, glasses: 0, coins: 0, toBox: !opts.serving, watered: 0, mins};
+  let w = null; const off = now() - t;   // the game clock (equal to real time outside tests)
+  for (let k = mins; k > 0; k--) {
+    const at = t - k*60000, d = new Date(at + off + 8*H), hm = d.getUTCHours()*60 + d.getUTCMinutes(), we = [0, 6].includes(d.getUTCDay());
+    if (!w || k % 10 === 0 || k === 1) w = whoAt(at + off);
+    if (w.workers) v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && !vn.wateredAt) { vn.wateredAt = at; out.watered++; } }));
+    if (hm < 10*60 || hm >= 22*60) continue;
+    const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); if (!onShelf.length && !open) continue;
+    const f = footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1);
+    if (onShelf.length && Math.random() < .006*f) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; s.n--; out.bottles++; out.coins += s.price; }
+    if (Math.random() < .005*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
+      const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); } }
+  }
+  v.shelf = v.shelf.filter(s => s.n > 0 || s.open > 0);
+  if (!out.coins && !out.watered) return null;
+  if (opts.serving) F.coins += out.coins; else v.box += out.coins;
+  v.sold += out.bottles; v.glasses += out.glasses;
+  const day = new Date(t + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, coins: 0};
+  v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
+  return out;
+}
+
+/* ---------- panels ---------- */
+const hrs = ms => { const m = Math.ceil(ms/60000); return m >= 60 ? `${Math.floor(m/60)}h ${m % 60}m` : `${m}m`; };
+const bottleSVG = (type, s = 26) => { const c = STYLES[type].col;
+  return `<svg viewBox="0 0 20 40" width="${s/2}" height="${s}" aria-hidden="true"><path d="M8 2 h4 v9 q4 3 4 8 v18 a2 2 0 0 1 -2 2 h-8 a2 2 0 0 1 -2 -2 v-18 q0 -5 4 -8z" fill="${type === "white" || type === "sparkling" ? "#9DBF8A" : "#3F5A3A"}" stroke="#3a2e28" stroke-width="1.2"/><rect x="4.5" y="20" width="11" height="9" rx="1" fill="#FFFDF6" stroke="#3a2e28" stroke-width=".8"/><rect x="6" y="22" width="8" height="5" fill="${c}"/>${type === "sparkling" ? `<path d="M8 2 h4 v4 h-4z" fill="#C9A227"/>` : ""}</svg>`; };
+export function vinePanel(F, r, i){
+  const v = vineState(F), row = v.rows[r], vn = row && row.vines[i];
+  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Vine ${r + 1}.${i + 1}</h2>`;
+  if (!row.trellis) return h + `<p class="sub">This row needs a trellis before vines can climb it. The vineyard stall sells them.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  if (!vn) return h + `<p class="sub">An empty spot on the trellis. What shall we plant?</p><div class="actions">${["red", "white"].map(k => `<button class="btn ${v.cuttings[k] ? "primary" : "alt"} small" data-vy="plant" data-k="${k}" ${v.cuttings[k] ? "" : "disabled"}>${k === "red" ? "Red" : "White"} vine (${v.cuttings[k]})</button>`).join("")}<button class="btn alt small" data-close="1">Close</button></div>${!v.cuttings.red && !v.cuttings.white ? `<p class="muted">No cuttings left: the stall has more.</p>` : ""}`;
+  const g = growth(vn);
+  return h + `<p class="sub">A ${vn.v} grape vine. ${!vn.wateredAt ? "Thirsty! Water it and it starts fruiting." : g >= 1 ? "Heavy with ripe grapes!" : `Ripening: ready in about ${hrs(GROW*(1 - g))}.`}</p>
+    ${vn.wateredAt ? `<span class="clbar"><i style="width:${Math.round(g*100)}%"></i></span>` : ""}
+    <div class="actions">${!vn.wateredAt ? `<button class="btn primary small" data-vy="water">Water the row</button>` : g >= 1 ? `<button class="btn primary small" data-vy="harvest">Pick the grapes</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
+}
+export function stallPanel(F){
+  const v = vineState(F);
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F.coins} coins. Cuttings: ${v.cuttings.red} red, ${v.cuttings.white} white. Grapes: ${v.grapes.red} red, ${v.grapes.white} white bunches.</p>
+    <div class="items shop">${Object.keys(SHOP).map(id => { const it = SHOP[id], off = F.coins < it.price || (id === "trellis" && v.rows.every(r => r.trellis)) || (id === "barrel" && v.barrels.length >= 3);
+      return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="n">${esc(it.n)}</span><span class="c"><b>${it.price}</b> coins</span></button>`; }).join("")}</div>
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
+export const vy = {name: {}};
+export function barrelPanel(F){
+  const v = vineState(F);
+  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles. Grapes: ${v.grapes.red} red, ${v.grapes.white} white.</p><div class="vbarrels">`;
+  v.barrels.forEach((b, i) => {
+    h += `<div class="vbarrel"><b>Barrel ${i + 1}</b>`;
+    if (!b) h += `<p class="muted">Empty.</p><div class="vbtns">${Object.keys(STYLES).map(k => { const st = STYLES[k], ok = v.grapes[st.grape] >= PER_BATCH; return `<button class="btn small ${ok ? "alt" : "alt"}" data-vy="fill" data-i="${i}" data-k="${k}" ${ok ? "" : "disabled"}>${st.n}</button>`; }).join("")}</div>`;
+    else { const left = barrelLeft(b), st = STYLES[b.style];
+      if (left) h += `<p>${st.n}${b.style === "sparkling" ? (b.stage === 1 ? ", first fermentation" : ", getting its bubbles") : ""}: ready in ${hrs(left)}.</p><span class="clbar"><i style="width:${Math.round(100*(1 - left/b.dur))}%"></i></span>`;
+      else if (b.style === "sparkling" && b.stage === 1) h += `<p>First fermentation done. Now the bubbles.</p><button class="btn primary small" data-vy="second" data-i="${i}">Start the second fermentation</button>`;
+      else h += `<p>${st.n} is ready to bottle!</p><label class="sr" for="vyName${i}">Name this wine</label><input id="vyName${i}" class="vyname" maxlength="30" placeholder="Name it, e.g. Evan's Red" value="${esc(vy.name[i] || "")}"><button class="btn primary small" data-vy="bottle" data-i="${i}">Bottle it</button>`; }
+    h += `</div>`;
+  });
+  h += `</div>${v.cellar.length ? `<p class="eyebrow">In the cellar</p><ul class="hlist">${v.cellar.map(c => `<li><span>${bottleSVG(c.type)} <b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottles</small></span></li>`).join("")}</ul><p class="muted">Take them to the wine shop to stock the shelves.</p>` : ""}`;
+  return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
+export function shelfPanel(F){
+  const v = vineState(F);
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>The wine shelves</h2>
+    ${v.shelf.length ? `<ul class="hlist wshelf">${v.shelf.map(s => `<li><span>${bottleSVG(s.type)} <b>${esc(s.name)}</b><small>${STYLES[s.type].n} · ${s.n} on the shelf${s.open ? ` · a bottle open for tasting` : ""}</small></span><label class="wprice"><span class="sr">Price</span><input type="number" min="1" max="999" data-vyprice="${esc(s.id)}" value="${s.price}"> coins</label></li>`).join("")}</ul>` : `<p class="sub">The shelves are bare.</p>`}
+    ${v.cellar.length ? `<p class="eyebrow">From the cellar</p><ul class="hlist">${v.cellar.map(c => `<li><span>${bottleSVG(c.type)} <b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottles</small></span><button class="btn small primary" data-vystock="${esc(c.id)}">Stock it</button></li>`).join("")}</ul>` : `<p class="muted">Bottled wines wait in the cellar until you stock them here.</p>`}
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
+export function counterPanel(F, serving, staff){
+  const v = vineState(F), t = v.today;
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>Behind the counter</h2><p class="sub">${serving ? "You're serving: customers come in more often while you're here, and pay you straight away." : "Step behind the counter to serve."} Evenings and weekends are busiest.${staff ? " Celeste's on shift too, so it's a little busier than usual (her takings go in the honesty box)." : ""}</p>
+    <p>Today: <b>${t.bottles}</b> bottle${t.bottles === 1 ? "" : "s"} and <b>${t.glasses}</b> glass${t.glasses === 1 ? "" : "es"} sold, <b>${t.coins}</b> coins. On the shelves: ${shelfStock(v)} bottles.</p>
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
+export function boxPanel(F){ const v = vineState(F);
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>The honesty box</h2><p class="sub">${v.box ? `${v.box} coins inside, left by customers while you were away.` : "Empty for now. Villagers drop coins in when they buy."}</p>
+    <div class="actions">${v.box ? `<button class="btn primary" data-vy="collect">Collect ${v.box} coins</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`; }
+export function cafePanel(F, guests){ const v = vineState(F), open = v.shelf.filter(s => s.n > 0 || s.open > 0);
+  return `<span class="tape stripe" aria-hidden="true"></span><h2>The tasting room</h2><p class="sub">${guests.length ? `${guests.join(" and ")} ${guests.length > 1 ? "are" : "is"} in for a tasting.` : "Quiet for now. Villagers drop in for a glass, mostly in the evenings and at weekends."}</p>
+    <p class="eyebrow">By the glass</p>${open.length ? `<ul class="hlist">${open.map(s => `<li><span>${bottleSVG(s.type)} <b>${esc(s.name)}</b><small>${STYLES[s.type].n} · ${Math.max(1, Math.round(s.price/4))} coins a glass</small></span></li>`).join("")}</ul>` : `<p class="muted">Stock the shelves and your wines are poured here too.</p>`}
+    <p class="muted">Glasses poured so far: ${v.glasses}. The food menu is still being dreamt up.</p>
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`; }
+// api: {save, rerender, say(line), sfx, r, i}
+export function wireVine(root, F, api){
+  root.querySelectorAll(".vyname").forEach(inp => inp.oninput = () => { vy.name[+inp.id.slice(6)] = inp.value; });
+  root.querySelectorAll("[data-vy]").forEach(b => b.onclick = () => {
+    const k = b.dataset.vy, i = +b.dataset.i; let line = null;
+    if (k === "plant") line = plantVine(F, api.r, api.i, b.dataset.k);
+    else if (k === "water") { line = waterVines(F, api.r); if (line) api.sfx("tap"); }
+    else if (k === "harvest") { line = harvestVine(F, api.r, api.i); if (line) api.sfx("coin"); }
+    else if (k === "fill") { line = fillBarrel(F, i, b.dataset.k); if (line) api.sfx("paper"); }
+    else if (k === "second") line = secondFerment(F, i);
+    else if (k === "bottle") { line = bottle(F, i, vy.name[i]); if (line) { vy.name[i] = ""; api.sfx("chime"); } }
+    else if (k === "collect") { const n = collect(F); if (n) { api.sfx("chaching"); line = `${n} coins from the honesty box. Thank you, neighbours!`; } }
+    if (line) api.say(line); api.save(); api.rerender();
+  });
+  root.querySelectorAll("[data-vybuy]").forEach(b => b.onclick = () => { const line = buy(F, b.dataset.vybuy); if (line) { api.sfx("coin"); api.say(line); api.save(); api.rerender(); } });
+  root.querySelectorAll("[data-vystock]").forEach(b => b.onclick = () => { const line = stock(F, b.dataset.vystock); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
+  root.querySelectorAll("[data-vyprice]").forEach(inp => inp.onchange = () => { setPrice(F, inp.dataset.vyprice, +inp.value); api.save(); });
+}
