@@ -126,7 +126,7 @@ export const ROOMS = {
     ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12],
     ["office","Darren's desk","G","office",null,"Darren's home office. Shh, he might be on a call."]]},
   // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
-  room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[130,290], W:[262,206], B:[350,306], E:[62,396], C:[66,500], D:[434,556], J:[260,594], N:[388,132]}, stations:[
+  room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[262,300], W:[262,206], B:[72,262], E:[62,396], C:[66,500], D:[434,556], J:[260,594], N:[406,132]}, stations:[
     ["routines","My routines","N","routineboard",null,"Your routines, pinned up.",74],
     ["bed","Bed","A","bed",null,"Your bed. Fluffy pillows, cool sheets."],
     ["window","Window","W","curtwindow",null,"Curtains open, curtains shut.",20],
@@ -169,6 +169,8 @@ export const ROOMS = {
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };
+// Maple's basket sits beside Mel's bed, wherever the bed is
+export const MAPLE_BED = [ROOMS.room.pos.A[0] + 110, ROOMS.room.pos.A[1] + 6];
 // board spot in every work room
 export const BOARD = {id:"board", name:"Quest board", x:260, y:200, mark:[260,60]};
 export function stationsOf(scene){

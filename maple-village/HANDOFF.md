@@ -503,3 +503,8 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - `splitNotes(html, subtasks)` (sunsama.js) turns a Sunsama task's notes into structured subtasks: Sunsama subtasks, plus any checklist (`data-type="taskList"`) in the notes. A bold-led paragraph whose text matches a subtask's title (ignoring "[Inbox]"-style prefixes) starts that subtask's details, and the bullets under it go with it. Headings sitting over subtask sections only are dropped; everything else stays as plain notes. Quests now carry `subtasks: [{id?, title, done, est, info[]}]`; the old "Subtasks:" text list in notes is still read for plans saved earlier.
 - Ticks: `F.subDone[taskId] = {at, s: {key: done}}` (forgotten after 21 days) wins over Sunsama's last word. Ticks on real Sunsama subtasks are queued in `F.subTodo` and sent with `mark_subtask_as_completed` / `mark_subtask_as_incomplete` (added to the manifest), retried every 3 minutes like quest completions.
 - The notebook shows a progress bar and a checklist. The next one is marked "up next" and opened to its details; the others open on tap, and done ones fold under "Done". Links render as named chips ("Doc ↗", "Gmail ↗", "Open ↗"), and "Label: url" lines become a chip named after the label. The quest note shows "Up next: …" with the count.
+
+### Round 43: Mel's room rearranged
+- Bed A→[262,300], centred under the window. Wardrobe B→[72,262], in the top-left corner against the wall. Routines board N→[406,132].
+- Maple's basket follows the bed: `MAPLE_BED` (world.js) = bed + [110, 6], used by both the room art and core's sleep spot.
+- The window's label sits on the wall to its left (the headboard is below it), and "To the house" is at y 296.

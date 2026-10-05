@@ -1943,7 +1943,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
       ["office", "Darren's desk", "G", "office", null, "Darren's home office. Shh, he might be on a call."]
     ] },
     // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
-    room: { name: "My room", wall: "#EFE3EE", trim: "var(--blush)", noBoard: true, pos: { A: [130, 290], W: [262, 206], B: [350, 306], E: [62, 396], C: [66, 500], D: [434, 556], J: [260, 594], N: [388, 132] }, stations: [
+    room: { name: "My room", wall: "#EFE3EE", trim: "var(--blush)", noBoard: true, pos: { A: [262, 300], W: [262, 206], B: [72, 262], E: [62, 396], C: [66, 500], D: [434, 556], J: [260, 594], N: [406, 132] }, stations: [
       ["routines", "My routines", "N", "routineboard", null, "Your routines, pinned up.", 74],
       ["bed", "Bed", "A", "bed", null, "Your bed. Fluffy pillows, cool sheets."],
       ["window", "Window", "W", "curtwindow", null, "Curtains open, curtains shut.", 20],
@@ -1999,6 +1999,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
       ["stall", "Shop counter", "M", "shopcounter", null, "Welcome in! Have a browse."]
     ] }
   };
+  var MAPLE_BED = [ROOMS.room.pos.A[0] + 110, ROOMS.room.pos.A[1] + 6];
   function stationsOf(scene2) {
     const r = ROOMS[scene2];
     if (!r) return [];
@@ -4639,7 +4640,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
         const j = G.vault && G.vault(s.x);
         return j ? j.label : "Empty";
       })() : s.name;
-      h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm.length > 10 ? nm.slice(0, 9) + "…" : nm, "var(--card)", 9.5) : s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm.length > 15 ? nm.slice(0, 14).trim() + "…" : nm, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)") : ""}</g>`;
+      h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm, "var(--card)") : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm.length > 10 ? nm.slice(0, 9) + "…" : nm, "var(--card)", 9.5) : s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm.length > 15 ? nm.slice(0, 14).trim() + "…" : nm, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)") : ""}</g>`;
     });
     if (id === "kidroom") {
       const k = G.kid ? G.kid() : {};
@@ -4662,9 +4663,10 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     if (id === "room") {
       const sl = G.S && G.S().sleep;
       const cosy = !!(G.F().decor || {}).bed;
-      h += cosy ? sk(`<ellipse cx="238" cy="296" rx="36" ry="16" style="fill:var(--rose)"/><ellipse cx="238" cy="293" rx="25" ry="10" style="fill:#FFFDF6"/><ellipse cx="226" cy="290" rx="9" ry="5" style="fill:var(--peri)"/><path d="M258 278 c-3 -4 -8 0 -5 3 l5 4 l5 -4 c3 -3 -2 -7 -5 -3z" style="fill:var(--rose)"/>`, `<ellipse cx="238" cy="296" rx="36" ry="16"/><ellipse cx="238" cy="293" rx="25" ry="10"/><ellipse cx="226" cy="290" rx="9" ry="5"/>`) : sk(`<ellipse cx="238" cy="296" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="238" cy="294" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="238" cy="296" rx="30" ry="13"/><ellipse cx="238" cy="294" rx="20" ry="8"/>`);
+      const [mx, my] = MAPLE_BED;
+      h += cosy ? sk(`<ellipse cx="${mx}" cy="${my}" rx="36" ry="16" style="fill:var(--rose)"/><ellipse cx="${mx}" cy="${my + -3}" rx="25" ry="10" style="fill:#FFFDF6"/><ellipse cx="${mx - 12}" cy="${my + -6}" rx="9" ry="5" style="fill:var(--peri)"/><path d="M${mx + 20} ${my - 18} c-3 -4 -8 0 -5 3 l5 4 l5 -4 c3 -3 -2 -7 -5 -3z" style="fill:var(--rose)"/>`, `<ellipse cx="${mx}" cy="${my}" rx="36" ry="16"/><ellipse cx="${mx}" cy="${my + -3}" rx="25" ry="10"/><ellipse cx="${mx - 12}" cy="${my + -6}" rx="9" ry="5"/>`) : sk(`<ellipse cx="${mx}" cy="${my}" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="${mx}" cy="${my + -2}" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="${mx}" cy="${my}" rx="30" ry="13"/><ellipse cx="${mx}" cy="${my + -2}" rx="20" ry="8"/>`);
       h += `<g data-exit="1" aria-label="Back to the house"><ellipse class="hov" cx="486" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
-      ${sk(`<path d="M520 346 L492 358 L492 456 L520 466z" style="fill:var(--blush)"/>`, `<path d="M520 346 L492 358 L492 456 L520 466z"/><circle cx="497" cy="410" r="1.8"/>`)}${tapeLabel(470, 324, "To the house", "var(--card)", 11)}</g>`;
+      ${sk(`<path d="M520 346 L492 358 L492 456 L520 466z" style="fill:var(--blush)"/>`, `<path d="M520 346 L492 358 L492 456 L520 466z"/><circle cx="497" cy="410" r="1.8"/>`)}${tapeLabel(470, 296, "To the house", "var(--card)", 11)}</g>`;
       if (sl) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".32" pointer-events="none"/>`;
       return h;
     }
@@ -13824,7 +13826,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
       nodes.mel.classList.remove("sit");
     }
     mel.wasMoving = mel.moving;
-    const inRoom = scene === "room", MB = [238, 298];
+    const inRoom = scene === "room", MB = [MAPLE_BED[0], MAPLE_BED[1] + 2];
     if (inRoom) {
       maple.tx = MB[0];
       maple.ty = MB[1];

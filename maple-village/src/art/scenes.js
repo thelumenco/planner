@@ -1,7 +1,7 @@
 // SVG scene builders: village, interiors, garden. Generated strings, hand-drawn look via #wob / #marker / #wash.
 // Scene builders read live game state through the `G` context set by core (setArtContext).
 import { ink } from "../util.js";
-import { VILLAGE, ROOMS, stationsOf } from "../data/world.js";
+import { VILLAGE, ROOMS, stationsOf, MAPLE_BED } from "../data/world.js";
 import { CROPS, PLOTS } from "../data/items.js";
 import { roomShell } from "./interiors.js";
 import { iconAt } from "./icons.js";
@@ -430,7 +430,7 @@ export function roomArt(id){
   st.forEach(s => {
     // a pedestal's sign names the trophy standing on it (an empty one has no sign)
     const nm = s.kind === "pedestal" ? ((G.ped && G.ped(s.x, s.y)) || {}).label || "" : s.kind === "vaultjar" ? (() => { const j = G.vault && G.vault(s.x); return j ? j.label : "Empty"; })() : s.name;
-    h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? (s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm.length > 10 ? nm.slice(0, 9) + "…" : nm, "var(--card)", 9.5) : (s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm.length > 15 ? nm.slice(0, 14).trim() + "…" : nm, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)"))) : ""}</g>`;
+    h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? (s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm, "var(--card)") : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm.length > 10 ? nm.slice(0, 9) + "…" : nm, "var(--card)", 9.5) : (s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm.length > 15 ? nm.slice(0, 14).trim() + "…" : nm, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)"))) : ""}</g>`;
   });
   if (id === "kidroom") {
     // the door back to the house on the west wall
@@ -456,10 +456,11 @@ export function roomArt(id){
     // Maple's bed (she sleeps in it while Mel's in here), the door back to the house on the east wall, and night
     const sl = G.S && G.S().sleep;
     const cosy = !!(G.F().decor || {}).bed;   // the market's "Maple's cosy bed" upgrades her basket: plush rim, cushion and a heart
-    h += cosy ? sk(`<ellipse cx="238" cy="296" rx="36" ry="16" style="fill:var(--rose)"/><ellipse cx="238" cy="293" rx="25" ry="10" style="fill:#FFFDF6"/><ellipse cx="226" cy="290" rx="9" ry="5" style="fill:var(--peri)"/><path d="M258 278 c-3 -4 -8 0 -5 3 l5 4 l5 -4 c3 -3 -2 -7 -5 -3z" style="fill:var(--rose)"/>`, `<ellipse cx="238" cy="296" rx="36" ry="16"/><ellipse cx="238" cy="293" rx="25" ry="10"/><ellipse cx="226" cy="290" rx="9" ry="5"/>`)
-      : sk(`<ellipse cx="238" cy="296" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="238" cy="294" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="238" cy="296" rx="30" ry="13"/><ellipse cx="238" cy="294" rx="20" ry="8"/>`);
+    const [mx, my] = MAPLE_BED;
+    h += cosy ? sk(`<ellipse cx="${mx}" cy="${my}" rx="36" ry="16" style="fill:var(--rose)"/><ellipse cx="${mx}" cy="${my + -3}" rx="25" ry="10" style="fill:#FFFDF6"/><ellipse cx="${mx - 12}" cy="${my + -6}" rx="9" ry="5" style="fill:var(--peri)"/><path d="M${mx + 20} ${my - 18} c-3 -4 -8 0 -5 3 l5 4 l5 -4 c3 -3 -2 -7 -5 -3z" style="fill:var(--rose)"/>`, `<ellipse cx="${mx}" cy="${my}" rx="36" ry="16"/><ellipse cx="${mx}" cy="${my + -3}" rx="25" ry="10"/><ellipse cx="${mx - 12}" cy="${my + -6}" rx="9" ry="5"/>`)
+      : sk(`<ellipse cx="${mx}" cy="${my}" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="${mx}" cy="${my + -2}" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="${mx}" cy="${my}" rx="30" ry="13"/><ellipse cx="${mx}" cy="${my + -2}" rx="20" ry="8"/>`);
     h += `<g data-exit="1" aria-label="Back to the house"><ellipse class="hov" cx="486" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
-      ${sk(`<path d="M520 346 L492 358 L492 456 L520 466z" style="fill:var(--blush)"/>`, `<path d="M520 346 L492 358 L492 456 L520 466z"/><circle cx="497" cy="410" r="1.8"/>`)}${tapeLabel(470, 324, "To the house", "var(--card)", 11)}</g>`;
+      ${sk(`<path d="M520 346 L492 358 L492 456 L520 466z" style="fill:var(--blush)"/>`, `<path d="M520 346 L492 358 L492 456 L520 466z"/><circle cx="497" cy="410" r="1.8"/>`)}${tapeLabel(470, 296, "To the house", "var(--card)", 11)}</g>`;
     if (sl) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".32" pointer-events="none"/>`;
     return h;
   }
