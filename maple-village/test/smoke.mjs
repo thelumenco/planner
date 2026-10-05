@@ -981,8 +981,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#setBed").isChecked(), "Stay in bed is on by default");
   await page.click("#pclose");
   await page.addInitScript(() => { window.__said = []; new MutationObserver(() => { const t = document.getElementById("speech"); if (t) window.__said.push(t.textContent); }).observe(document, {subtree: true, childList: true, characterData: true}); });
-  await page.goto(url + "?seed=1&time=23:02"); await page.waitForTimeout(3000);
-  check(await page.evaluate(() => (window.__said || []).some(t => /It's 11/.test(t))), "at 11pm Maple chivvies Mel to bed");
+  await page.goto(url + "?seed=1&time=23:02"); await page.waitForTimeout(14000);
+  check(await page.evaluate(() => (window.__said || []).some(t => /Time to start winding down/.test(t))), "from 11pm Maple offers a calm wind-down line");
+  check(await page.evaluate(() => new Set((window.__said || []).filter(t => /winding down|Teeth, then skincare|Phone on charge/.test(t))).size <= 1), "and only one every half a minute or so, with no nagging");
   await page.goto(url + "?seed=1&time=23:50"); await page.waitForTimeout(2500);
   check(!(await page.locator("#bedLock").isHidden()) && await page.evaluate(() => document.body.classList.contains("bedlocked")), "from 11:45pm the village rests: everything waits until 6am");
   await page.locator("#chatBtn").dispatchEvent("click").catch(() => {}); await page.waitForTimeout(200);

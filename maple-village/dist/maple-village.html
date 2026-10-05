@@ -14067,17 +14067,6 @@ Then tell chat "wind down" whenever you're ready.`
   };
   function bedtimeTick() {
     const m = sgHM(), nk = nightKey();
-    if (F.bedLock !== false && m >= 23 * 60 && m < 23 * 60 + 45) {
-      if (F.bedSaid !== nk + ":1") {
-        F.bedSaid = nk + ":1";
-        sfx("chime");
-        speak("It's 11. Time to start winding down: teeth, skincare, phone on charge. Bed by quarter to twelve.", 9e3, true);
-      } else if (m >= 23 * 60 + 30 && F.bedSaid === nk + ":1") {
-        F.bedSaid = nk + ":2";
-        sfx("chime");
-        speak("Fifteen minutes till bed. Off you pop. The village will keep.", 8e3, true);
-      }
-    }
     const lock = F.bedLock !== false && bedNow() && F.bedSkip !== nk, el = $("bedLock");
     if (el.hidden === lock) {
       el.hidden = !lock;
@@ -14095,6 +14084,28 @@ Then tell chat "wind down" whenever you're ready.`
       $("bedLockLeft").textContent = `Good morning in ${Math.floor(left3 / 60)}h ${left3 % 60}m.`;
     }
   }
+  var WIND = [
+    "Time to start winding down.",
+    "Teeth, then skincare. No rush.",
+    "Phone on charge, across the room.",
+    "Dim the lights a little.",
+    "Let the last thing go. It'll keep till morning.",
+    "A glass of water by the bed.",
+    "Slow breath in. Slower breath out.",
+    "The village is tucking in too.",
+    "Nothing else needs you tonight.",
+    "Pyjamas on. Soft and cosy."
+  ];
+  var windAt = 0;
+  var windI = 0;
+  setInterval(() => {
+    const m = sgHM();
+    if (F.bedLock === false || m < 23 * 60 || m >= 23 * 60 + 45 || document.hidden) return;
+    if (Date.now() - windAt < 28e3 || openView || !$("panel").hidden || document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    windAt = Date.now();
+    const left3 = 23 * 60 + 45 - m;
+    speak(left3 <= 15 ? `${left3} minute${left3 === 1 ? "" : "s"} till bed. ${WIND[windI++ % WIND.length]}` : WIND[windI++ % WIND.length], 6e3, true);
+  }, 5e3);
   $("bedUp").onclick = () => {
     if (!confirm("Get up just for tonight? Stay in bed comes back on tomorrow night.")) return;
     F.bedSkip = nightKey();

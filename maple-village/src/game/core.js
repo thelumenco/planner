@@ -1762,10 +1762,6 @@ const nightKey = () => { const m = sgHM(); return m < 6*60 ? prevDay(dayKey()) :
 const bedNow = () => { const m = sgHM(); return m >= 23*60 + 45 || m < 6*60; };
 function bedtimeTick(){
   const m = sgHM(), nk = nightKey();
-  if (F.bedLock !== false && m >= 23*60 && m < 23*60 + 45) {
-    if (F.bedSaid !== nk + ":1") { F.bedSaid = nk + ":1"; sfx("chime"); speak("It's 11. Time to start winding down: teeth, skincare, phone on charge. Bed by quarter to twelve.", 9000, true); }
-    else if (m >= 23*60 + 30 && F.bedSaid === nk + ":1") { F.bedSaid = nk + ":2"; sfx("chime"); speak("Fifteen minutes till bed. Off you pop. The village will keep.", 8000, true); }
-  }
   const lock = F.bedLock !== false && bedNow() && F.bedSkip !== nk, el = $("bedLock");
   if (el.hidden === lock) {
     el.hidden = !lock; document.body.classList.toggle("bedlocked", lock);
@@ -1773,6 +1769,18 @@ function bedtimeTick(){
   }
   if (lock) { const left = ((6*60 - m + 24*60) % (24*60)); $("bedLockLeft").textContent = `Good morning in ${Math.floor(left/60)}h ${left % 60}m.`; }
 }
+// Wind-down, 11pm to bedtime (11:45): a short, calm line about every 30 seconds. No chime, it fades on its own,
+// and it waits while Mel's typing or has a panel open.
+const WIND = ["Time to start winding down.", "Teeth, then skincare. No rush.", "Phone on charge, across the room.", "Dim the lights a little.",
+  "Let the last thing go. It'll keep till morning.", "A glass of water by the bed.", "Slow breath in. Slower breath out.", "The village is tucking in too.",
+  "Nothing else needs you tonight.", "Pyjamas on. Soft and cosy."];
+let windAt = 0, windI = 0;
+setInterval(() => {
+  const m = sgHM(); if (F.bedLock === false || m < 23*60 || m >= 23*60 + 45 || document.hidden) return;
+  if (Date.now() - windAt < 28e3 || openView || !$("panel").hidden || (document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName))) return;
+  windAt = Date.now(); const left = 23*60 + 45 - m;
+  speak(left <= 15 ? `${left} minute${left === 1 ? "" : "s"} till bed. ${WIND[windI++ % WIND.length]}` : WIND[windI++ % WIND.length], 6000, true);
+}, 5000);
 $("bedUp").onclick = () => { if (!confirm("Get up just for tonight? Stay in bed comes back on tomorrow night.")) return; F.bedSkip = nightKey(); save(); bedtimeTick(); speak("Okay, just this once. Be gentle with yourself.", 5000, true); };
 // Backup: every part of the game this browser holds (the save, journal, jars, kind words, routines, letters, home) in one file
 $("setBackup").onclick = async () => {
