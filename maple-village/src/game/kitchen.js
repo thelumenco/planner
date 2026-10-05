@@ -11,12 +11,14 @@ import { esc, H } from "../util.js";
 import { vineState } from "./vineyard.js";
 import { dishArt } from "../art/wine.js";
 import { icon } from "../art/icons.js";
+import { seasonOf, SEASONS } from "../data/items.js";
 
 export const GOODS = {
   carrot: ["carrot", "carrots"], corn: ["corn cob", "corn cobs"], strawberry: ["strawberry", "strawberries"], blueberry: ["blueberry", "blueberries"],
   tomato: ["tomato", "tomatoes"], potato: ["potato", "potatoes"], pepper: ["pepper", "peppers"], egg: ["egg", "eggs"], milk: ["milk", "milk"],
   flour: ["bag of flour", "bags of flour"], cheese: ["cheese", "cheeses"], olives: ["jar of olives", "jars of olives"], loaf: ["loaf", "loaves"],
-  apple: ["apple", "apples"], dumpling: ["dumpling", "dumplings"], fish: ["fish", "fish"], toast: ["honey toast", "honey toasts"]};
+  apple: ["apple", "apples"], dumpling: ["dumpling", "dumplings"], fish: ["fish", "fish"], toast: ["honey toast", "honey toasts"],
+  pea: ["handful of peas", "handfuls of peas"], pumpkin: ["pumpkin", "pumpkins"], leek: ["leek", "leeks"]};
 export const isGood = id => id in GOODS && id !== "loaf";   // loaves are only ever baked in the oven
 const nm = (id, n) => GOODS[id] ? GOODS[id][n === 1 ? 0 : 1] : id;
 export const needText = need => Object.entries(need).map(([k, n]) => `${n} ${nm(k, n)}`).join(" + ");
@@ -32,15 +34,20 @@ export const DISHES = {
   apples: {n: "Apple slices", need: {apple: 2}, plates: 4, price: 3}};
 // the tapas of the day: garden dishes, one chosen each day, 6 plates a batch
 export const TAPAS = {
-  patatas: {n: "Patatas bravas", need: {potato: 2, tomato: 1}, price: 10, col: "#E86A5C"},
-  tortilla: {n: "Tortilla española", need: {potato: 2, egg: 2}, price: 11, col: "#F3C969"},
-  pancon: {n: "Pan con tomate", need: {loaf: 1, tomato: 2}, price: 8, col: "#E8574C"},
-  pimientos: {n: "Pimientos asados", need: {pepper: 3}, price: 9, col: "#D9433A"},
-  fritters: {n: "Corn fritters", need: {corn: 2, egg: 1}, price: 9, col: "#E3B04B"},
-  carrots: {n: "Carrots with olives", need: {carrot: 2, olives: 1}, price: 8, col: "#F08A3C"},
-  crema: {n: "Berry crema", need: {strawberry: 1, blueberry: 1, milk: 1}, price: 10, col: "#C3A0D8"},
-  tostas: {n: "Tomato and cheese tostas", need: {loaf: 1, tomato: 1, cheese: 1}, price: 12, col: "#F6A23A"},
-  rellenos: {n: "Stuffed peppers", need: {pepper: 2, cheese: 1}, price: 12, col: "#C9433A"}};
+  patatas: {n: "Patatas bravas", need: {potato: 2, tomato: 1}, price: 8, seasons: ["autumn"]},
+  tortilla: {n: "Tortilla española", need: {potato: 2, egg: 2}, price: 9, seasons: ["spring", "autumn", "winter"]},
+  pancon: {n: "Pan con tomate", need: {loaf: 1, tomato: 2}, price: 7, seasons: ["summer", "autumn"]},
+  pimientos: {n: "Pimientos asados", need: {pepper: 3}, price: 7, seasons: ["summer"]},
+  fritters: {n: "Corn fritters", need: {corn: 2, egg: 1}, price: 7, seasons: ["summer", "autumn"]},
+  carrots: {n: "Carrots with olives", need: {carrot: 2, olives: 1}, price: 6, seasons: ["spring", "autumn", "winter"]},
+  crema: {n: "Strawberry crema", need: {strawberry: 2, milk: 1}, price: 9, seasons: ["spring"]},
+  tostas: {n: "Tomato and cheese tostas", need: {loaf: 1, tomato: 1, cheese: 1}, price: 10, seasons: ["summer", "autumn"]},
+  rellenos: {n: "Stuffed peppers", need: {pepper: 2, cheese: 1}, price: 10, seasons: ["summer"]},
+  guisantes: {n: "Peas with mint and cheese", need: {pea: 2, cheese: 1}, price: 8, seasons: ["spring"]},
+  croquetas: {n: "Pumpkin croquetas", need: {pumpkin: 1, egg: 1, loaf: 1}, price: 10, seasons: ["autumn", "winter"]},
+  calabaza: {n: "Roast pumpkin with olives", need: {pumpkin: 1, olives: 1}, price: 8, seasons: ["autumn", "winter"]},
+  puerros: {n: "Leek and potato soup cups", need: {leek: 2, potato: 1}, price: 8, seasons: ["winter"]}};
+export const inSeason = (id, season) => !TAPAS[id].seasons || TAPAS[id].seasons.includes(season);
 export const TAPAS_PLATES = 6;
 const OVEN = 1*H, PRESS = 3*H;
 
@@ -67,7 +74,7 @@ export function takeCheese(F){ const k = kitchenState(F); if (!k.press || left(k
 export function cookDish(F, id){ const k = kitchenState(F), d = DISHES[id], v = vineState(F); if (!d || !has(k, d.need)) return null; use(k, d.need); v.menu[id] = (v.menu[id] || 0) + d.plates; return `${d.plates} plates of ${d.n.toLowerCase()}, out to the tasting room.`; }
 export const tapasToday = (F, today) => { const v = vineState(F); return v.tapas && v.tapas.day === today ? v.tapas : null; };
 // choose today's tapas (can change it until a batch is cooked)
-export function chooseTapas(F, id, today){ const v = vineState(F), t = tapasToday(F, today); if (!TAPAS[id] || (t && t.cooked)) return null; v.tapas = {day: today, id, plates: 0, cooked: 0}; return `Today's tapas: ${TAPAS[id].n}. It's on the chalkboard.`; }
+export function chooseTapas(F, id, today){ const v = vineState(F), t = tapasToday(F, today); if (!TAPAS[id] || !inSeason(id, seasonOf(today)) || (t && t.cooked)) return null; v.tapas = {day: today, id, plates: 0, cooked: 0}; return `Today's tapas: ${TAPAS[id].n}. It's on the chalkboard.`; }
 export function cookTapas(F, today){ const k = kitchenState(F), t = tapasToday(F, today); if (!t || !has(k, TAPAS[t.id].need)) return null; use(k, TAPAS[t.id].need); t.plates += TAPAS_PLATES; t.cooked++; return `${TAPAS_PLATES} plates of ${TAPAS[t.id].n.toLowerCase()}! Out they go.`; }
 // At closing (or the next day), leftover tapas feed the staff, who leave something for the larder. -> note or null
 const THANKS = [["olives", "Marco"], ["egg", "Ines"], ["flour", "Celeste"]];
@@ -113,7 +120,7 @@ export function stovePanel(F, today){
   if (t) h += `<div class="kdish chosen">${dishArt("tapas:" + t.id, 52)}<span><b>${esc(T.n)}</b><small>${t.plates} plate${t.plates === 1 ? "" : "s"} on the menu · ${T.price} coins each · needs ${needText(T.need)}</small><span class="kneeds">${needList(k, T.need)}</span></span></div>
       <div class="actions"><button class="btn primary" data-k="cooktapas" ${has(k, T.need) ? "" : "disabled"}>Cook a batch (${TAPAS_PLATES} plates)</button>${!t.cooked ? `<button class="btn alt small" data-k="untapas">Pick a different dish</button>` : ""}</div>
       <p class="muted">Leftovers at closing time (10pm) go to the staff for dinner.</p>`;
-  else h += `<p class="sub">Pick today's dish. It goes on the chalkboard, sells for more than the small plates and brings extra people in.</p><div class="kdishes">${Object.keys(TAPAS).map(id => { const d = TAPAS[id], ok = has(k, d.need);
+  else h += `<p class="sub">Pick today's dish. It goes on the chalkboard, sells for more than the small plates and brings extra people in. <b>${SEASONS[seasonOf(today)].n}</b> menu: ${SEASONS[seasonOf(today)].line.toLowerCase()}.</p><div class="kdishes">${Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today))).map(id => { const d = TAPAS[id], ok = has(k, d.need);
       return `<button class="kdish ${ok ? "ok" : ""}" data-k="tapas" data-id="${id}">${dishArt("tapas:" + id, 46)}<span><b>${esc(d.n)}</b><small>${d.price} coins a plate</small><span class="kneeds">${needList(k, d.need)}</span></span></button>`; }).join("")}</div>`;
   h += `</section><h3 class="ph3">Small plates</h3><div class="items shop dishes">${Object.keys(DISHES).map(id => { const d = DISHES[id], ok = has(k, d.need);
     return `<button class="item" data-k="dish" data-dish="${id}" ${ok ? "" : "disabled"}><span class="e">${dishArt(id, 44, !ok)}</span><span class="n">${esc(d.n)}</span><span class="c">${esc(needText(d.need))}</span><span class="d">${d.plates} plates · ${d.price} coins each</span></button>`; }).join("")}</div>`;

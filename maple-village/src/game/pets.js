@@ -8,9 +8,9 @@ import { sk, tapeLabel } from "../art/scenes.js";
 
 export const RUNS = [
   {n: "Little run", cap: 2, price: 0, what: "A small pen with a crate to sleep in. Room for two."},
-  {n: "Bigger run", cap: 4, price: 35, what: "Darren moves the fence out. Room for four."},
-  {n: "Coop and hutch", cap: 6, price: 70, what: "A proper coop with a ramp, and a hutch for the bunnies. Room for six."},
-  {n: "Clover meadow", cap: 8, price: 120, what: "Clover to nibble and a water trough. Room for eight, and a meal lasts two days."}
+  {n: "Bigger run", cap: 4, price: 80, what: "Darren moves the fence out. Room for four."},
+  {n: "Coop and hutch", cap: 6, price: 180, what: "A proper coop with a ramp, and a hutch for the bunnies. Room for six."},
+  {n: "Clover meadow", cap: 8, price: 350, what: "Clover to nibble and a water trough. Room for eight, and a meal lasts two days."}
 ];
 export const KINDS = {
   chick: {n: "Chick", grown: "Hen", food: ["chickfeed"], foodName: "chick feed",

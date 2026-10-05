@@ -158,13 +158,16 @@ export function baseArt(){
     [[`<path d="M378 354 h16 v18 h-16z" style="fill:var(--sky)"/>`, `<path d="M378 354 h16 v18 h-16z"/>`, 0], [`<path d="M406 356 h14 l3 14 h-20z" style="fill:var(--rose)"/>`, `<path d="M406 356 h14 l3 14 h-20z"/>`, .7], [`<path d="M434 354 h18 v12 h-18z" style="fill:var(--butter)"/>`, `<path d="M434 354 h18 v12 h-18z"/>`, 1.4]]
       .map(([a, l, d]) => `<g class="washing" style="animation-delay:-${d}s">${sk(a, l)}</g>`).join("");
   const fam = (G.F().fam && G.F().fam.owned) || {};
+  // Evan's treehouse (a family keepsake): a little hut up in the swing tree, with a ladder and a flag
+  const treehouse = fam.treehouse ? `<g aria-label="Evan's treehouse">${sk(`<rect x="56" y="244" width="44" height="6" rx="1" style="fill:var(--wood)"/><path d="M60 244 v-20 h36 v20z" style="fill:#F3C969"/><path d="M56 224 l22 -14 l22 14z" style="fill:#C46A4A"/><rect x="72" y="230" width="10" height="14" style="fill:#7B5A42"/><path d="M98 210 l10 3 l-10 3z" style="fill:var(--rose)"/>`,
+    `<rect x="56" y="244" width="44" height="6" rx="1"/><path d="M60 244 v-20 h36 v20z M56 224 l22 -14 l22 14z"/><rect x="72" y="230" width="10" height="14"/><path d="M98 216 v-10 M98 210 l10 3 l-10 3z"/><path d="M62 250 l-4 48 M70 250 l-4 48 M61 262 h8 M60 274 h8 M59 286 h8"/>`)}</g>` : "";
   const famArt = (fam.sandpit ? `<g aria-label="Sandpit">${sk(`<rect x="208" y="512" width="56" height="24" rx="5" style="fill:#F2DDA8"/><path d="M246 506 h8 l-2 8 h-4z" style="fill:var(--rose)"/>`, `<rect x="208" y="512" width="56" height="24" rx="5"/><path d="M212 518 h48" opacity=".5"/><path d="M246 506 h8 l-2 8 h-4z M250 506 v-6"/><path d="M220 528 q5 -5 10 0" opacity=".6"/>`)}</g>` : "")
     + (fam.hammock ? sk(`<path d="M398 600 q32 18 64 0 z" style="fill:var(--peach)"/>`, `<path d="M392 622 v-34 M468 622 v-34 M392 594 l6 6 M468 594 l-6 6"/><path d="M398 600 q32 18 64 0"/><path d="M410 604 l2 -3 M430 608 l1 -4 M450 604 l-2 -3" opacity=".6"/>`) : "");
   const tools = G.F().tools || {};
   const toolArt = (tools.compost ? sk(`<path d="M192 452 h24 l-3 22 h-18z" style="fill:var(--wood)"/><path d="M196 451 c3 -6 13 -6 16 0" style="fill:var(--moss)"/>`, `<path d="M192 452 h24 l-3 22 h-18z M195 460 h18"/>`) : "")
     + (tools.can ? sk(`<rect x="466" y="262" width="14" height="11" rx="2" style="fill:#9CC3E0"/>`, `<rect x="466" y="262" width="14" height="11" rx="2"/><path d="M480 266 l7 -5 M468 262 c0 -5 9 -5 9 0"/>`) : "")
     + (tools.sprinkler ? sk(`<circle cx="108" cy="438" r="4" style="fill:var(--stone)"/>`, `<circle cx="108" cy="438" r="4"/><path d="M108 434 v-4"/><path class="ripple" d="M96 426 q12 -10 24 0" opacity=".7"/>`) : "");
-  return lampDefs + ground + BASE_LAMPS.map(([x, y]) => streetLamp(x, y)).join("") + places + runArt(G.F()) + famArt + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
+  return lampDefs + ground + BASE_LAMPS.map(([x, y]) => streetLamp(x, y)).join("") + places + runArt(G.F()) + famArt + treehouse + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
 }
 const BASE_LAMPS = [[192, 380], [328, 380]];
 // A street lamp lit at night, drawn above the dusk wash so it really shines: a warm pool on the ground, a halo

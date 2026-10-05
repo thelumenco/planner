@@ -2,7 +2,7 @@
 // the wine shop and a little playground. Reads live vine state through the art context (G.vine()).
 import { ink } from "../util.js";
 import { sk, tapeLabel, tree, flowers, artCtx } from "./scenes.js";
-import { streetLamp, lampDefs } from "./village-extras.js";
+import { streetLamp, lampDefs, bunting, festivalOn } from "./village-extras.js";
 import { growth, barrelLeft, shelfStock, STYLES } from "../game/vineyard.js";
 import { oliveTree } from "./wine.js";
 
@@ -105,7 +105,12 @@ export function vineyardArt(){
   const olive = `<g data-place="olive" aria-label="Olive tree"><ellipse class="hov" cx="250" cy="258" rx="34" ry="9" style="fill:var(--butter)"/>${ol ? `<g filter="url(#wob)">${oliveTree(250, 254, 1, ripe ? "ripe" : "growing")}</g>` + (ripe ? `<g class="twinkle" pointer-events="none"><path d="M276 196 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" stroke="#3b3530" stroke-width="1"/></g>` : "")
     : sk(`<ellipse cx="250" cy="252" rx="16" ry="5" style="fill:#9C7A5C"/>`, `<ellipse cx="250" cy="252" rx="16" ry="5"/><path d="M262 252 v-18 M256 236 h14 v8 h-14z"/>`)}${tapeLabel(250, 276, "Olive tree", "var(--sage)", 10)}</g>`;
   return lampDefs + ground + gate + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive
-    + shedArt(v) + shopArt(v) + stallArt() + sign + v.rows.map((row, r) => rowArt(row, r)).join("") + playArt();
+    + shedArt(v) + shopArt(v) + stallArt() + sign + v.rows.map((row, r) => rowArt(row, r)).join("") + playArt()
+    // the shop terrace (bought at the stall): a vine-covered pergola and two little tables beside the shop
+    + (v.terrace ? sk(`<path d="M466 132 h48 l-4 -10 h-40z" style="fill:#9CC27E"/><ellipse cx="478" cy="196" rx="11" ry="4" style="fill:#FFFDF6"/><ellipse cx="502" cy="206" rx="11" ry="4" style="fill:#FFFDF6"/><circle cx="474" cy="128" r="2.4" style="fill:#6B2A55"/><circle cx="500" cy="128" r="2.4" style="fill:#6B2A55"/>`,
+        `<path d="M466 132 h48 l-4 -10 h-40z M470 132 v80 M510 132 v80"/><ellipse cx="478" cy="196" rx="11" ry="4"/><path d="M478 200 v12 M502 210 v10"/><ellipse cx="502" cy="206" rx="11" ry="4"/>`) : "")
+    // harvest week: bunting strung over the vines
+    + ((festivalOn(G.day()) || {}).id === "harvest" ? bunting(214, 318, 466, 318, ["#8E2C48", "#F3C969", "#9CC27E"]) + bunting(214, 498, 466, 498, ["#F3C969", "#8E2C48", "#F6E3C6"]) : "");
 }
 // the home-base end: a footbridge over the stream and a vine-wrapped gate (tap to go to the vineyard)
 export function vineGate(){

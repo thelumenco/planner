@@ -5,18 +5,22 @@ export const CROPS = {
   tulip:{n:"Tulip", e:"🌷", dur:1*H}, sunflower:{n:"Sunflower", e:"🌻", dur:1*H},
   carrot:{n:"Carrot", e:"🥕", dur:4*H}, corn:{n:"Corn", e:"🌽", dur:4*H},
   strawberry:{n:"Strawberry", e:"🍓", dur:24*H}, blueberry:{n:"Blueberry", e:"🫐", dur:24*H},
-  tomato:{n:"Tomato", dur:6*H}, potato:{n:"Potato", dur:8*H}, pepper:{n:"Pepper", dur:6*H}
+  tomato:{n:"Tomato", dur:6*H}, potato:{n:"Potato", dur:8*H}, pepper:{n:"Pepper", dur:6*H},
+  pea:{n:"Peas", dur:4*H}, pumpkin:{n:"Pumpkin", dur:24*H}, leek:{n:"Leek", dur:8*H}
 };
 export const ITEMS = {
-  tulip_seed:{e:"🌷", n:"Tulip seeds", kind:"seed", price:2, crop:"tulip", tab:"seeds"},
-  sunflower_seed:{e:"🌻", n:"Sunflower seeds", kind:"seed", price:3, crop:"sunflower", tab:"seeds"},
-  carrot_seed:{e:"🥕", n:"Carrot seeds", kind:"seed", price:3, crop:"carrot", tab:"seeds"},
-  corn_seed:{e:"🌽", n:"Corn seeds", kind:"seed", price:4, crop:"corn", tab:"seeds"},
-  strawberry_seed:{e:"🍓", n:"Strawberry seeds", kind:"seed", price:6, crop:"strawberry", tab:"seeds"},
-  blueberry_seed:{e:"🫐", n:"Blueberry seeds", kind:"seed", price:6, crop:"blueberry", tab:"seeds"},
-  tomato_seed:{n:"Tomato seeds", kind:"seed", price:4, crop:"tomato", tab:"seeds"},
-  potato_seed:{n:"Seed potatoes", kind:"seed", price:4, crop:"potato", tab:"seeds"},
-  pepper_seed:{n:"Pepper seeds", kind:"seed", price:5, crop:"pepper", tab:"seeds"},
+  tulip_seed:{e:"🌷", n:"Tulip seeds", kind:"seed", price:2, crop:"tulip", tab:"seeds", seasons:["spring"]},
+  sunflower_seed:{e:"🌻", n:"Sunflower seeds", kind:"seed", price:3, crop:"sunflower", tab:"seeds", seasons:["summer"]},
+  carrot_seed:{e:"🥕", n:"Carrot seeds", kind:"seed", price:3, crop:"carrot", tab:"seeds", seasons:["spring","autumn","winter"]},
+  corn_seed:{e:"🌽", n:"Corn seeds", kind:"seed", price:4, crop:"corn", tab:"seeds", seasons:["summer","autumn"]},
+  strawberry_seed:{e:"🍓", n:"Strawberry seeds", kind:"seed", price:6, crop:"strawberry", tab:"seeds", seasons:["spring"]},
+  blueberry_seed:{e:"🫐", n:"Blueberry seeds", kind:"seed", price:6, crop:"blueberry", tab:"seeds", seasons:["summer"]},
+  tomato_seed:{n:"Tomato seeds", kind:"seed", price:4, crop:"tomato", tab:"seeds", seasons:["summer","autumn"]},
+  potato_seed:{n:"Seed potatoes", kind:"seed", price:4, crop:"potato", tab:"seeds", seasons:["spring","autumn","winter"]},
+  pea_seed:{n:"Pea seeds", kind:"seed", price:3, crop:"pea", tab:"seeds", seasons:["spring"]},
+  pumpkin_seed:{n:"Pumpkin seeds", kind:"seed", price:6, crop:"pumpkin", tab:"seeds", seasons:["autumn","winter"]},
+  leek_seed:{n:"Leek seedlings", kind:"seed", price:4, crop:"leek", tab:"seeds", seasons:["winter"]},
+  pepper_seed:{n:"Pepper seeds", kind:"seed", price:5, crop:"pepper", tab:"seeds", seasons:["summer"]},
   // Hana's deli shelf: ingredients for the wine shop's kitchen (send them there from the backpack)
   flour:{n:"Bag of flour", kind:"ingredient", price:3, tab:"deli", what:"bakes two loaves in the kitchen oven"},
   cheese:{n:"Cheese", kind:"ingredient", price:9, tab:"deli", what:"for cheese boards and tostas"},
@@ -40,16 +44,17 @@ export const ITEMS = {
   kopi:{n:"Kopi", kind:"gift", to:"darren", price:5, tab:"family", say:"Kopi! You're the best."},
   kaya:{n:"Kaya toast", kind:"gift", to:"darren", price:7, tab:"family", say:"Kaya toast? Okay, now it's a good day."},
   currypuff:{n:"Curry puff", kind:"gift", to:"darren", price:6, tab:"family", say:"Still warm! Want half?"},
-  sandpit:{n:"Sandpit", kind:"keep", to:"evan", price:60, tab:"family", say:"A sandpit at home! Evan's already digging."},
-  truck:{n:"Toy truck", kind:"keep", to:"evan", price:35, tab:"family", say:"Vroom vroom! Evan won't put it down."},
-  headphones:{n:"Headphones", kind:"keep", to:"darren", price:45, tab:"family", say:"Noise-cancelling! Darren's calls just got calmer."},
-  hammock:{n:"Hammock", kind:"keep", to:"darren", price:90, tab:"family", say:"A hammock by the pond. Darren's evenings are sorted."},
+  sandpit:{n:"Sandpit", kind:"keep", to:"evan", price:150, tab:"family", say:"A sandpit at home! Evan's already digging."},
+  truck:{n:"Toy truck", kind:"keep", to:"evan", price:80, tab:"family", say:"Vroom vroom! Evan won't put it down."},
+  headphones:{n:"Headphones", kind:"keep", to:"darren", price:120, tab:"family", say:"Noise-cancelling! Darren's calls just got calmer."},
+  treehouse:{n:"Evan's treehouse", kind:"keep", to:"evan", price:800, tab:"family", say:"A treehouse in the swing tree! Evan's already up the ladder."},
+  hammock:{n:"Hammock", kind:"keep", to:"darren", price:250, tab:"family", say:"A hammock by the pond. Darren's evenings are sorted."},
   // Animals tab: chicks and bunnies live in the run at home base; their food goes in the backpack.
-  chick:{n:"Chick", kind:"pet", pet:"chick", price:12, tab:"animals", say:"A fluffy little chick! Cheep cheep."},
-  rabbit:{n:"Bunny", kind:"pet", pet:"rabbit", price:18, tab:"animals", say:"A baby bunny! Look at those ears."},
+  chick:{n:"Chick", kind:"pet", pet:"chick", price:25, tab:"animals", say:"A fluffy little chick! Cheep cheep."},
+  rabbit:{n:"Bunny", kind:"pet", pet:"rabbit", price:35, tab:"animals", say:"A baby bunny! Look at those ears."},
   chickfeed:{n:"Chick feed", kind:"feed", price:2, tab:"animals", what:"one meal for a chick or hen"},
   rabbitfeed:{n:"Rabbit pellets", kind:"feed", price:2, tab:"animals", what:"one meal for a bunny"},
-  goat:{n:"Goat kid", kind:"pet", pet:"goat", price:30, tab:"animals", say:"A little goat! She's already nibbling my sleeve."},
+  goat:{n:"Goat kid", kind:"pet", pet:"goat", price:150, tab:"animals", say:"A little goat! She's already nibbling my sleeve."},
   goatfeed:{n:"Goat feed", kind:"feed", price:2, tab:"animals", what:"one meal for a goat"},
   milk:{n:"Goat's milk", kind:"ingredient", sell:6, what:"two make a cheese in the kitchen press"},
   egg:{n:"Fresh egg", kind:"food", sell:5, say:"A fresh egg from our hens! Breakfast sorted."},
@@ -61,35 +66,43 @@ export const ITEMS = {
   blueberry:{e:"🫐", n:"Blueberries", kind:"food", sell:14, xp:2, say:"Blueberries! My favourite."},
   tomato:{n:"Tomato", kind:"food", sell:7, say:"A sun-warm tomato. Mmm."},
   potato:{n:"Potato", kind:"food", sell:6, say:"A potato? Raw? Brave. Okay."},
-  pepper:{n:"Pepper", kind:"food", sell:7, say:"Crunchy pepper! Spicy? No. Phew."}
+  pepper:{n:"Pepper", kind:"food", sell:7, say:"Crunchy pepper! Spicy? No. Phew."},
+  pea:{n:"Peas", kind:"food", sell:5, say:"Pop, pop, pop. Fresh peas!"},
+  pumpkin:{n:"Pumpkin", kind:"food", sell:16, xp:2, say:"A whole pumpkin? I'll just... sit on it."},
+  leek:{n:"Leek", kind:"food", sell:7, say:"A leek. Very tall. Very serious."}
 };
 // Home decor: bought once, shows up inside Mel's house. Items in the same slot swap (one wallpaper, one rug at a time).
 export const DECOR = {
-  wall_dots:   {ico:"wallpaper", n:"Polka wallpaper",  slot:"wall", val:"dots",   price:15},
-  wall_stripe: {ico:"wallpaper", n:"Stripe wallpaper", slot:"wall", val:"stripe", price:15},
-  wall_flower: {ico:"wallpaper", n:"Flower wallpaper", slot:"wall", val:"flower", price:18},
-  rug_round:   {ico:"rug",       n:"Round rug",        slot:"rug",  val:"round",  price:12},
-  rug_stripe:  {ico:"rug",       n:"Striped rug",      slot:"rug",  val:"stripe", price:12},
-  lamp:        {ico:"lamp",      n:"Reading lamp",     slot:"lamp", val:"on",     price:10},
-  big_plant:   {ico:"pot",       n:"Big plant",        slot:"plant",val:"on",     price:8},
-  painting:    {ico:"painting",  n:"Painting",         slot:"art",  val:"on",     price:14},
-  fox_bed:     {ico:"bed",       n:"Maple's cosy bed", slot:"bed",  val:"on",     price:16, tab:"me", where:"room"},   // upgrades her basket in Mel's room
+  wall_dots:   {ico:"wallpaper", n:"Polka wallpaper",  slot:"wall", val:"dots",   price:20},
+  wall_stripe: {ico:"wallpaper", n:"Stripe wallpaper", slot:"wall", val:"stripe", price:20},
+  wall_flower: {ico:"wallpaper", n:"Flower wallpaper", slot:"wall", val:"flower", price:25},
+  rug_round:   {ico:"rug",       n:"Round rug",        slot:"rug",  val:"round",  price:20},
+  rug_stripe:  {ico:"rug",       n:"Striped rug",      slot:"rug",  val:"stripe", price:20},
+  lamp:        {ico:"lamp",      n:"Reading lamp",     slot:"lamp", val:"on",     price:15},
+  big_plant:   {ico:"pot",       n:"Big plant",        slot:"plant",val:"on",     price:10},
+  painting:    {ico:"painting",  n:"Painting",         slot:"art",  val:"on",     price:20},
+  fox_bed:     {ico:"bed",       n:"Maple's cosy bed", slot:"bed",  val:"on",     price:25, tab:"me", where:"room"},   // upgrades her basket in Mel's room
   // "Me & my room" tab: things for Mel's own room, and things Mel wears (shown on her in the village)
-  r_lights:    {ico:"lantern",   n:"Fairy lights",     slot:"r_lights", val:"on", price:14, tab:"me", where:"room"},
-  r_plant:     {ico:"pot",       n:"Monstera",         slot:"r_plant",  val:"on", price:10, tab:"me", where:"room"},
-  r_rug:       {ico:"rug",       n:"Cloud rug",        slot:"r_rug",    val:"on", price:16, tab:"me", where:"room"},
-  r_art:       {ico:"painting",  n:"Flower print",     slot:"r_art",    val:"on", price:12, tab:"me", where:"room"},
-  r_shelf:     {ico:"storybook", n:"Little bookshelf", slot:"r_shelf",  val:"on", price:22, tab:"me", where:"room"},
-  r_vanity:    {ico:"mirror",    n:"Vanity mirror",    slot:"r_vanity", val:"on", price:30, tab:"me", where:"room"},
-  r_throw:     {ico:"throw",     n:"Knitted throw",    slot:"r_throw",  val:"on", price:12, tab:"me", where:"room"},
-  r_candle:    {ico:"candle",    n:"Calm candle",      slot:"r_candle", val:"on", price:8,  tab:"me", where:"room"},
-  me_bow:      {ico:"bow",       n:"Velvet hair bow",  slot:"me_bow",   val:"on", price:9,  tab:"me", where:"me"},
-  me_scarf:    {ico:"scarf",     n:"Silk neck scarf",  slot:"me_scarf", val:"on", price:12, tab:"me", where:"me"},
-  me_hat:      {ico:"sunhat",    n:"Straw sun hat",    slot:"me_hat",   val:"on", price:15, tab:"me", where:"me"},
-  me_pj:       {ico:"pyjamas",   n:"Silk pyjamas",     slot:"me_pj",    val:"on", price:18, tab:"me", where:"me"}
+  r_lights:    {ico:"lantern",   n:"Fairy lights",     slot:"r_lights", val:"on", price:20, tab:"me", where:"room"},
+  r_plant:     {ico:"pot",       n:"Monstera",         slot:"r_plant",  val:"on", price:15, tab:"me", where:"room"},
+  r_rug:       {ico:"rug",       n:"Cloud rug",        slot:"r_rug",    val:"on", price:25, tab:"me", where:"room"},
+  r_art:       {ico:"painting",  n:"Flower print",     slot:"r_art",    val:"on", price:20, tab:"me", where:"room"},
+  r_shelf:     {ico:"storybook", n:"Little bookshelf", slot:"r_shelf",  val:"on", price:35, tab:"me", where:"room"},
+  r_vanity:    {ico:"mirror",    n:"Vanity mirror",    slot:"r_vanity", val:"on", price:45, tab:"me", where:"room"},
+  r_throw:     {ico:"throw",     n:"Knitted throw",    slot:"r_throw",  val:"on", price:20, tab:"me", where:"room"},
+  r_candle:    {ico:"candle",    n:"Calm candle",      slot:"r_candle", val:"on", price:10,  tab:"me", where:"room"},
+  me_bow:      {ico:"bow",       n:"Velvet hair bow",  slot:"me_bow",   val:"on", price:15,  tab:"me", where:"me"},
+  me_scarf:    {ico:"scarf",     n:"Silk neck scarf",  slot:"me_scarf", val:"on", price:20, tab:"me", where:"me"},
+  me_hat:      {ico:"sunhat",    n:"Straw sun hat",    slot:"me_hat",   val:"on", price:20, tab:"me", where:"me"},
+  me_pj:       {ico:"pyjamas",   n:"Silk pyjamas",     slot:"me_pj",    val:"on", price:25, tab:"me", where:"me"}
 };
 
 export const PLOTS = Array.from({length:12}, (_, i) => ({x:70 + (i%3)*140, y:172 + Math.floor(i/3)*104, w:100, h:66}));
+// Storybook seasons by the real (Singapore) calendar: spring Mar-May, summer Jun-Aug, autumn Sep-Nov, winter Dec-Feb.
+// Hana's seeds rotate with them (anything already bought or planted carries on), and so do the tapas of the day.
+export const SEASONS = {spring: {n: "Spring", line: "Blossom and fresh greens"}, summer: {n: "Summer", line: "Sun-ripe and juicy"},
+  autumn: {n: "Autumn", line: "Harvest time"}, winter: {n: "Winter", line: "Cosy roots and soups"}};
+export const seasonOf = day => { const m = +String(day).slice(5, 7); return m >= 3 && m <= 5 ? "spring" : m >= 6 && m <= 8 ? "summer" : m >= 9 && m <= 11 ? "autumn" : "winter"; };
 export const QUEST_BOOST = 30*M;
 
 export const LEVELS = [

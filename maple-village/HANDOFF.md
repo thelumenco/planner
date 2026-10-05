@@ -550,3 +550,23 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - The **olive tree** (vineyard stall, 30; planted by the path at [250,262]) gives 2 jars of olives every 8 hours.
   - Eggs come from hens, as before.
 - Kitchen dish buttons use `data-dish`, not `data-id`: core's market handler claims every `.item[data-id]` in the panel.
+
+### Round 47: gentler economy, storybook seasons
+- **Target:** about 80 coins a day from real life (quests ~33, breaks, steps, routines, chores; plus 15 for the Friday review). Once set up, the vineyard and kitchen earn about as much again. With 6–7 tasks a day, buying everything takes about 5–6 weeks; the full price list adds up to about 4,700–5,000.
+- **Vineyard** (`vineyard.js`):
+  - `GROW` is 8h.
+  - `STYLES`: red 10h/18, rosé 6h/15, white 8h/16, sparkling 8h+5h/26.
+  - `SHOP`: cuttings 20, olive tree 150, trellis 80, barrel 150 × barrels owned (`shopPrice`), terrace 600 (`v.terrace`, ×1.3 footfall, pergola art).
+  - Sale rates per minute × footfall: bottle .0012, glass .001, plate alone .0006.
+- **Quest boost:** `questBoost(F, QUEST_BOOST)` runs when a quest is done. It moves the clock forward on growing vines, fermenting barrels, the oven and the cheese press, so finishing tasks makes the vineyard faster.
+- **Price ladder:**
+  - Tools: can 60, compost 150, sprinkler 300.
+  - Runs: 80, 180, 350.
+  - Animals: chick 25, rabbit 35, goat 150.
+  - Keepsakes: sandpit 150, truck 80, headphones 120, hammock 250, Evan's treehouse 800 (drawn at home base).
+  - Decor: ×1.5.
+- **Seasons** (`SEASONS`, `seasonOf(day)` in items.js): spring Mar–May, summer Jun–Aug, autumn Sep–Nov, winter Dec–Feb.
+  - Seeds carry `seasons`, and the market only sells what's in season. New crops: pea (4h, spring), pumpkin (24h, autumn), leek (8h, winter).
+  - Every `TAPAS` dish has seasons. The stove lists in-season dishes only (`inSeason`); there are 13 tapas in all.
+  - `body.season-*` changes the tree colours (and the grass in light mode).
+- **Grape harvest festival** (`FESTIVALS` id `harvest`, early October, `vineyard: true`): bunting in the vineyard, a Maple line, and +1 bunch on every harvest.

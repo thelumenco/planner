@@ -19,7 +19,7 @@ export const UPGRADES = [
 export const unlocked = n => UPGRADES.filter(u => n >= u.at);
 export const nextUpgrade = n => UPGRADES.find(u => n < u.at) || null;
 
-const bunting = (x1, y1, x2, y2, cols) => {
+export const bunting = (x1, y1, x2, y2, cols) => {
   const n = Math.max(3, Math.round((x2 - x1)/12)), mid = (y1 + y2)/2 + 8;
   let f = "";
   for (let i = 0; i < n; i++) {
@@ -69,7 +69,9 @@ const FESTIVALS = [
   {id: "national",  name: "National Day",       dates: ["2026-08-09", "2027-08-09"], before: 8, after: 1},
   {id: "midautumn", name: "Mid-Autumn",         dates: ["2026-09-25", "2027-09-15"], before: 7, after: 2},
   {id: "deepavali", name: "Deepavali",          dates: ["2026-11-08", "2027-10-28"], before: 7, after: 2},
-  {id: "christmas", name: "Christmas",          dates: ["2026-12-25", "2027-12-25"], before: 10, after: 1}
+  {id: "christmas", name: "Christmas",          dates: ["2026-12-25", "2027-12-25"], before: 10, after: 1},
+  // the vineyard's own: autumn's grape harvest (bunting over the vines, every bunch picked is a big one)
+  {id: "harvest",   name: "The grape harvest",  dates: ["2026-10-04", "2027-10-03"], before: 2, after: 8, vineyard: true}
 ];
 const dayNum = k => Date.parse(k + "T00:00:00Z")/864e5;
 export function festivalOn(day){

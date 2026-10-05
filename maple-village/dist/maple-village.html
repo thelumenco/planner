@@ -1253,6 +1253,29 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
 .kbtn{cursor:pointer}
 .kbtn em{font-style:normal;font-size:.68rem;font-weight:800;color:#3F5A3A;background:#E3EEDA;border-radius:999px;padding:1px 8px;margin-top:3px}
 .ktapas{margin-bottom:6px}
+/* storybook seasons: the village's trees (both themes) and grass (light theme) shift with the real months (body.season-*) */
+body.season-spring{--tree:#B7D39A;--tree2:#F2BFCB}
+body.season-summer{--tree:#8FB57B;--tree2:#6E9A5C}
+body.season-autumn{--tree:#E3A35B;--tree2:#C9774D}
+body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) body.season-spring{--grass:#E3EED7}
+  :root:not([data-theme="dark"]) body.season-summer{--grass:#DDEBCB;--grass2:#CCDFB7}
+  :root:not([data-theme="dark"]) body.season-autumn{--grass:#E8E7CF;--grass2:#DCD6B4}
+  :root:not([data-theme="dark"]) body.season-winter{--grass:#E5ECE6;--grass2:#D5E0DA}
+}
+:root[data-theme="light"] body.season-spring{--grass:#E3EED7}
+:root[data-theme="light"] body.season-summer{--grass:#DDEBCB;--grass2:#CCDFB7}
+:root[data-theme="light"] body.season-autumn{--grass:#E8E7CF;--grass2:#DCD6B4}
+:root[data-theme="light"] body.season-winter{--grass:#E5ECE6;--grass2:#D5E0DA}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) body.season-spring{--tree2:#9C6E7A}
+  :root:not([data-theme="light"]) body.season-autumn{--tree:#9A6B3A;--tree2:#8A4E38}
+  :root:not([data-theme="light"]) body.season-winter{--tree:#6E847A;--tree2:#5A7068}
+}
+:root[data-theme="dark"] body.season-spring{--tree2:#9C6E7A}
+:root[data-theme="dark"] body.season-autumn{--tree:#9A6B3A;--tree2:#8A4E38}
+:root[data-theme="dark"] body.season-winter{--tree:#6E847A;--tree2:#5A7068}
 </style>
 </head>
 <body>
@@ -1870,6 +1893,9 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
   I.tomato = [`<circle cx="12" cy="14" r="7" ${f("#E8574C")}/><path d="M9 7.5l3 1.5l3-1.5l-1 2.5l2.5 .5l-4.5 1l-4.5-1l2.5-.5z" ${f(C.moss)}/>`, `<circle cx="12" cy="14" r="7"/><path d="M9 7.5l3 1.5l3-1.5l-1 2.5l2.5 .5l-4.5 1l-4.5-1l2.5-.5z M12 9V6"/><path d="M8.5 13a3.5 3.5 0 0 1 2-2.5" opacity=".6"/>`];
   I.potato = [`<path d="M5 13c0-4 3.5-7 8-7s6 3 6 6.5-3 6.5-7.5 6.5S5 17 5 13z" ${f("#C9A27E")}/>`, `<path d="M5 13c0-4 3.5-7 8-7s6 3 6 6.5-3 6.5-7.5 6.5S5 17 5 13z"/><circle cx="10" cy="11" r=".7"/><circle cx="14.5" cy="14" r=".7"/><circle cx="11" cy="16" r=".7"/>`];
   I.pepper = [`<path d="M8 8c3-1.5 9-1 9.5 3S14 20 10 20.5 5 17 5.5 13 6 9 8 8z" ${f("#D9433A")}/><path d="M11 7.5c0-2 1-3.5 3-4" ${f("none")}/>`, `<path d="M8 8c3-1.5 9-1 9.5 3S14 20 10 20.5 5 17 5.5 13 6 9 8 8z"/><path d="M11 7.5c0-2 1-3.5 3-4"/><path d="M8 12c0 2 .5 4 1.5 5.5" opacity=".6"/>`];
+  I.pea = [`<path d="M4 15c3-6 12-9 16-7c-1 5-9 10-16 7z" ${f(C.moss)}/><circle cx="9" cy="13" r="1.8" ${f("#B9D88A")}/><circle cx="12.5" cy="11.5" r="1.8" ${f("#B9D88A")}/><circle cx="16" cy="10.2" r="1.8" ${f("#B9D88A")}/>`, `<path d="M4 15c3-6 12-9 16-7c-1 5-9 10-16 7z"/><path d="M20 8c1-1.5 1-3 0-4.5"/>`];
+  I.pumpkin = [`<path d="M12 7c5 0 9 3 9 7s-4 7-9 7-9-3-9-7 4-7 9-7z" ${f("#F08A3C")}/><path d="M11 7c0-2 1-3.5 3-4" ${f("none")}/>`, `<path d="M12 7c5 0 9 3 9 7s-4 7-9 7-9-3-9-7 4-7 9-7z"/><path d="M12 7c-2.5 3-2.5 11 0 14M12 7c2.5 3 2.5 11 0 14M7.5 8.5c-2 3-2 8 0 11M16.5 8.5c2 3 2 8 0 11" opacity=".55"/><path d="M11 7c0-2 1-3.5 3-4"/>`];
+  I.leek = [`<path d="M10 21V11h4v10z" ${f("#F4EEE3")}/><path d="M10 11C8 7 6 4 4 2c3 1 6 4 7 7M14 11c2-4 4-7 6-9c-3 1-6 4-7 7M12 10V3" ${f("#7FA35A")}/>`, `<path d="M10 21V11h4v10z"/><path d="M10 11C8 7 6 4 4 2c3 1 6 4 7 7M14 11c2-4 4-7 6-9c-3 1-6 4-7 7M12 10V3"/><path d="M10 21h4" />`];
   I.flour = [`<path d="M6 8h12l1.5 12h-15z" ${f("#F4EEE3")}/><path d="M7 8l1-3h8l1 3z" ${f("#E8D3A6")}/><path d="M9 13.5l3 3 3-3" ${f("none")}/>`, `<path d="M6 8h12l1.5 12h-15z M7 8l1-3h8l1 3"/><path d="M9.5 12.5q2.5-2.5 5 0" opacity=".7"/><path d="M12 12v5" opacity=".7"/>`];
   I.cheese = [`<path d="M3 15l10-8l8 5v6H3z" ${f("#F3C969")}/><path d="M3 15h18" ${f("none")}/>`, `<path d="M3 15l10-8l8 5v6H3z M3 15h18"/><circle cx="8" cy="17.5" r="1"/><circle cx="15" cy="17" r="1.2"/><circle cx="13" cy="12.5" r=".9"/>`];
   I.olives = [`<path d="M7 7h10v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z" ${f("#E3F0F5")}/><rect x="6.5" y="4" width="11" height="3" rx="1" ${f(C.moss2)}/><ellipse cx="10" cy="15" rx="2" ry="1.6" ${f("#7FA35A")}/><ellipse cx="14" cy="13" rx="2" ry="1.6" ${f("#7FA35A")}/><ellipse cx="12.5" cy="17.5" rx="2" ry="1.6" ${f("#5E7A4E")}/>`, `<path d="M7 7h10v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z"/><rect x="6.5" y="4" width="11" height="3" rx="1"/>`];
@@ -2165,18 +2191,24 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     blueberry: { n: "Blueberry", e: "🫐", dur: 24 * H },
     tomato: { n: "Tomato", dur: 6 * H },
     potato: { n: "Potato", dur: 8 * H },
-    pepper: { n: "Pepper", dur: 6 * H }
+    pepper: { n: "Pepper", dur: 6 * H },
+    pea: { n: "Peas", dur: 4 * H },
+    pumpkin: { n: "Pumpkin", dur: 24 * H },
+    leek: { n: "Leek", dur: 8 * H }
   };
   var ITEMS = {
-    tulip_seed: { e: "🌷", n: "Tulip seeds", kind: "seed", price: 2, crop: "tulip", tab: "seeds" },
-    sunflower_seed: { e: "🌻", n: "Sunflower seeds", kind: "seed", price: 3, crop: "sunflower", tab: "seeds" },
-    carrot_seed: { e: "🥕", n: "Carrot seeds", kind: "seed", price: 3, crop: "carrot", tab: "seeds" },
-    corn_seed: { e: "🌽", n: "Corn seeds", kind: "seed", price: 4, crop: "corn", tab: "seeds" },
-    strawberry_seed: { e: "🍓", n: "Strawberry seeds", kind: "seed", price: 6, crop: "strawberry", tab: "seeds" },
-    blueberry_seed: { e: "🫐", n: "Blueberry seeds", kind: "seed", price: 6, crop: "blueberry", tab: "seeds" },
-    tomato_seed: { n: "Tomato seeds", kind: "seed", price: 4, crop: "tomato", tab: "seeds" },
-    potato_seed: { n: "Seed potatoes", kind: "seed", price: 4, crop: "potato", tab: "seeds" },
-    pepper_seed: { n: "Pepper seeds", kind: "seed", price: 5, crop: "pepper", tab: "seeds" },
+    tulip_seed: { e: "🌷", n: "Tulip seeds", kind: "seed", price: 2, crop: "tulip", tab: "seeds", seasons: ["spring"] },
+    sunflower_seed: { e: "🌻", n: "Sunflower seeds", kind: "seed", price: 3, crop: "sunflower", tab: "seeds", seasons: ["summer"] },
+    carrot_seed: { e: "🥕", n: "Carrot seeds", kind: "seed", price: 3, crop: "carrot", tab: "seeds", seasons: ["spring", "autumn", "winter"] },
+    corn_seed: { e: "🌽", n: "Corn seeds", kind: "seed", price: 4, crop: "corn", tab: "seeds", seasons: ["summer", "autumn"] },
+    strawberry_seed: { e: "🍓", n: "Strawberry seeds", kind: "seed", price: 6, crop: "strawberry", tab: "seeds", seasons: ["spring"] },
+    blueberry_seed: { e: "🫐", n: "Blueberry seeds", kind: "seed", price: 6, crop: "blueberry", tab: "seeds", seasons: ["summer"] },
+    tomato_seed: { n: "Tomato seeds", kind: "seed", price: 4, crop: "tomato", tab: "seeds", seasons: ["summer", "autumn"] },
+    potato_seed: { n: "Seed potatoes", kind: "seed", price: 4, crop: "potato", tab: "seeds", seasons: ["spring", "autumn", "winter"] },
+    pea_seed: { n: "Pea seeds", kind: "seed", price: 3, crop: "pea", tab: "seeds", seasons: ["spring"] },
+    pumpkin_seed: { n: "Pumpkin seeds", kind: "seed", price: 6, crop: "pumpkin", tab: "seeds", seasons: ["autumn", "winter"] },
+    leek_seed: { n: "Leek seedlings", kind: "seed", price: 4, crop: "leek", tab: "seeds", seasons: ["winter"] },
+    pepper_seed: { n: "Pepper seeds", kind: "seed", price: 5, crop: "pepper", tab: "seeds", seasons: ["summer"] },
     // Hana's deli shelf: ingredients for the wine shop's kitchen (send them there from the backpack)
     flour: { n: "Bag of flour", kind: "ingredient", price: 3, tab: "deli", what: "bakes two loaves in the kitchen oven" },
     cheese: { n: "Cheese", kind: "ingredient", price: 9, tab: "deli", what: "for cheese boards and tostas" },
@@ -2200,16 +2232,17 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     kopi: { n: "Kopi", kind: "gift", to: "darren", price: 5, tab: "family", say: "Kopi! You're the best." },
     kaya: { n: "Kaya toast", kind: "gift", to: "darren", price: 7, tab: "family", say: "Kaya toast? Okay, now it's a good day." },
     currypuff: { n: "Curry puff", kind: "gift", to: "darren", price: 6, tab: "family", say: "Still warm! Want half?" },
-    sandpit: { n: "Sandpit", kind: "keep", to: "evan", price: 60, tab: "family", say: "A sandpit at home! Evan's already digging." },
-    truck: { n: "Toy truck", kind: "keep", to: "evan", price: 35, tab: "family", say: "Vroom vroom! Evan won't put it down." },
-    headphones: { n: "Headphones", kind: "keep", to: "darren", price: 45, tab: "family", say: "Noise-cancelling! Darren's calls just got calmer." },
-    hammock: { n: "Hammock", kind: "keep", to: "darren", price: 90, tab: "family", say: "A hammock by the pond. Darren's evenings are sorted." },
+    sandpit: { n: "Sandpit", kind: "keep", to: "evan", price: 150, tab: "family", say: "A sandpit at home! Evan's already digging." },
+    truck: { n: "Toy truck", kind: "keep", to: "evan", price: 80, tab: "family", say: "Vroom vroom! Evan won't put it down." },
+    headphones: { n: "Headphones", kind: "keep", to: "darren", price: 120, tab: "family", say: "Noise-cancelling! Darren's calls just got calmer." },
+    treehouse: { n: "Evan's treehouse", kind: "keep", to: "evan", price: 800, tab: "family", say: "A treehouse in the swing tree! Evan's already up the ladder." },
+    hammock: { n: "Hammock", kind: "keep", to: "darren", price: 250, tab: "family", say: "A hammock by the pond. Darren's evenings are sorted." },
     // Animals tab: chicks and bunnies live in the run at home base; their food goes in the backpack.
-    chick: { n: "Chick", kind: "pet", pet: "chick", price: 12, tab: "animals", say: "A fluffy little chick! Cheep cheep." },
-    rabbit: { n: "Bunny", kind: "pet", pet: "rabbit", price: 18, tab: "animals", say: "A baby bunny! Look at those ears." },
+    chick: { n: "Chick", kind: "pet", pet: "chick", price: 25, tab: "animals", say: "A fluffy little chick! Cheep cheep." },
+    rabbit: { n: "Bunny", kind: "pet", pet: "rabbit", price: 35, tab: "animals", say: "A baby bunny! Look at those ears." },
     chickfeed: { n: "Chick feed", kind: "feed", price: 2, tab: "animals", what: "one meal for a chick or hen" },
     rabbitfeed: { n: "Rabbit pellets", kind: "feed", price: 2, tab: "animals", what: "one meal for a bunny" },
-    goat: { n: "Goat kid", kind: "pet", pet: "goat", price: 30, tab: "animals", say: "A little goat! She's already nibbling my sleeve." },
+    goat: { n: "Goat kid", kind: "pet", pet: "goat", price: 150, tab: "animals", say: "A little goat! She's already nibbling my sleeve." },
     goatfeed: { n: "Goat feed", kind: "feed", price: 2, tab: "animals", what: "one meal for a goat" },
     milk: { n: "Goat's milk", kind: "ingredient", sell: 6, what: "two make a cheese in the kitchen press" },
     egg: { n: "Fresh egg", kind: "food", sell: 5, say: "A fresh egg from our hens! Breakfast sorted." },
@@ -2221,34 +2254,47 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     blueberry: { e: "🫐", n: "Blueberries", kind: "food", sell: 14, xp: 2, say: "Blueberries! My favourite." },
     tomato: { n: "Tomato", kind: "food", sell: 7, say: "A sun-warm tomato. Mmm." },
     potato: { n: "Potato", kind: "food", sell: 6, say: "A potato? Raw? Brave. Okay." },
-    pepper: { n: "Pepper", kind: "food", sell: 7, say: "Crunchy pepper! Spicy? No. Phew." }
+    pepper: { n: "Pepper", kind: "food", sell: 7, say: "Crunchy pepper! Spicy? No. Phew." },
+    pea: { n: "Peas", kind: "food", sell: 5, say: "Pop, pop, pop. Fresh peas!" },
+    pumpkin: { n: "Pumpkin", kind: "food", sell: 16, xp: 2, say: "A whole pumpkin? I'll just... sit on it." },
+    leek: { n: "Leek", kind: "food", sell: 7, say: "A leek. Very tall. Very serious." }
   };
   var DECOR = {
-    wall_dots: { ico: "wallpaper", n: "Polka wallpaper", slot: "wall", val: "dots", price: 15 },
-    wall_stripe: { ico: "wallpaper", n: "Stripe wallpaper", slot: "wall", val: "stripe", price: 15 },
-    wall_flower: { ico: "wallpaper", n: "Flower wallpaper", slot: "wall", val: "flower", price: 18 },
-    rug_round: { ico: "rug", n: "Round rug", slot: "rug", val: "round", price: 12 },
-    rug_stripe: { ico: "rug", n: "Striped rug", slot: "rug", val: "stripe", price: 12 },
-    lamp: { ico: "lamp", n: "Reading lamp", slot: "lamp", val: "on", price: 10 },
-    big_plant: { ico: "pot", n: "Big plant", slot: "plant", val: "on", price: 8 },
-    painting: { ico: "painting", n: "Painting", slot: "art", val: "on", price: 14 },
-    fox_bed: { ico: "bed", n: "Maple's cosy bed", slot: "bed", val: "on", price: 16, tab: "me", where: "room" },
+    wall_dots: { ico: "wallpaper", n: "Polka wallpaper", slot: "wall", val: "dots", price: 20 },
+    wall_stripe: { ico: "wallpaper", n: "Stripe wallpaper", slot: "wall", val: "stripe", price: 20 },
+    wall_flower: { ico: "wallpaper", n: "Flower wallpaper", slot: "wall", val: "flower", price: 25 },
+    rug_round: { ico: "rug", n: "Round rug", slot: "rug", val: "round", price: 20 },
+    rug_stripe: { ico: "rug", n: "Striped rug", slot: "rug", val: "stripe", price: 20 },
+    lamp: { ico: "lamp", n: "Reading lamp", slot: "lamp", val: "on", price: 15 },
+    big_plant: { ico: "pot", n: "Big plant", slot: "plant", val: "on", price: 10 },
+    painting: { ico: "painting", n: "Painting", slot: "art", val: "on", price: 20 },
+    fox_bed: { ico: "bed", n: "Maple's cosy bed", slot: "bed", val: "on", price: 25, tab: "me", where: "room" },
     // upgrades her basket in Mel's room
     // "Me & my room" tab: things for Mel's own room, and things Mel wears (shown on her in the village)
-    r_lights: { ico: "lantern", n: "Fairy lights", slot: "r_lights", val: "on", price: 14, tab: "me", where: "room" },
-    r_plant: { ico: "pot", n: "Monstera", slot: "r_plant", val: "on", price: 10, tab: "me", where: "room" },
-    r_rug: { ico: "rug", n: "Cloud rug", slot: "r_rug", val: "on", price: 16, tab: "me", where: "room" },
-    r_art: { ico: "painting", n: "Flower print", slot: "r_art", val: "on", price: 12, tab: "me", where: "room" },
-    r_shelf: { ico: "storybook", n: "Little bookshelf", slot: "r_shelf", val: "on", price: 22, tab: "me", where: "room" },
-    r_vanity: { ico: "mirror", n: "Vanity mirror", slot: "r_vanity", val: "on", price: 30, tab: "me", where: "room" },
-    r_throw: { ico: "throw", n: "Knitted throw", slot: "r_throw", val: "on", price: 12, tab: "me", where: "room" },
-    r_candle: { ico: "candle", n: "Calm candle", slot: "r_candle", val: "on", price: 8, tab: "me", where: "room" },
-    me_bow: { ico: "bow", n: "Velvet hair bow", slot: "me_bow", val: "on", price: 9, tab: "me", where: "me" },
-    me_scarf: { ico: "scarf", n: "Silk neck scarf", slot: "me_scarf", val: "on", price: 12, tab: "me", where: "me" },
-    me_hat: { ico: "sunhat", n: "Straw sun hat", slot: "me_hat", val: "on", price: 15, tab: "me", where: "me" },
-    me_pj: { ico: "pyjamas", n: "Silk pyjamas", slot: "me_pj", val: "on", price: 18, tab: "me", where: "me" }
+    r_lights: { ico: "lantern", n: "Fairy lights", slot: "r_lights", val: "on", price: 20, tab: "me", where: "room" },
+    r_plant: { ico: "pot", n: "Monstera", slot: "r_plant", val: "on", price: 15, tab: "me", where: "room" },
+    r_rug: { ico: "rug", n: "Cloud rug", slot: "r_rug", val: "on", price: 25, tab: "me", where: "room" },
+    r_art: { ico: "painting", n: "Flower print", slot: "r_art", val: "on", price: 20, tab: "me", where: "room" },
+    r_shelf: { ico: "storybook", n: "Little bookshelf", slot: "r_shelf", val: "on", price: 35, tab: "me", where: "room" },
+    r_vanity: { ico: "mirror", n: "Vanity mirror", slot: "r_vanity", val: "on", price: 45, tab: "me", where: "room" },
+    r_throw: { ico: "throw", n: "Knitted throw", slot: "r_throw", val: "on", price: 20, tab: "me", where: "room" },
+    r_candle: { ico: "candle", n: "Calm candle", slot: "r_candle", val: "on", price: 10, tab: "me", where: "room" },
+    me_bow: { ico: "bow", n: "Velvet hair bow", slot: "me_bow", val: "on", price: 15, tab: "me", where: "me" },
+    me_scarf: { ico: "scarf", n: "Silk neck scarf", slot: "me_scarf", val: "on", price: 20, tab: "me", where: "me" },
+    me_hat: { ico: "sunhat", n: "Straw sun hat", slot: "me_hat", val: "on", price: 20, tab: "me", where: "me" },
+    me_pj: { ico: "pyjamas", n: "Silk pyjamas", slot: "me_pj", val: "on", price: 25, tab: "me", where: "me" }
   };
   var PLOTS = Array.from({ length: 12 }, (_, i) => ({ x: 70 + i % 3 * 140, y: 172 + Math.floor(i / 3) * 104, w: 100, h: 66 }));
+  var SEASONS = {
+    spring: { n: "Spring", line: "Blossom and fresh greens" },
+    summer: { n: "Summer", line: "Sun-ripe and juicy" },
+    autumn: { n: "Autumn", line: "Harvest time" },
+    winter: { n: "Winter", line: "Cosy roots and soups" }
+  };
+  var seasonOf = (day) => {
+    const m = +String(day).slice(5, 7);
+    return m >= 3 && m <= 5 ? "spring" : m >= 6 && m <= 8 ? "summer" : m >= 9 && m <= 11 ? "autumn" : "winter";
+  };
   var QUEST_BOOST = 30 * M;
   var LEVELS = [
     { xp: 0, name: "new friend" },
@@ -2469,9 +2515,9 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
   // src/game/pets.js
   var RUNS = [
     { n: "Little run", cap: 2, price: 0, what: "A small pen with a crate to sleep in. Room for two." },
-    { n: "Bigger run", cap: 4, price: 35, what: "Darren moves the fence out. Room for four." },
-    { n: "Coop and hutch", cap: 6, price: 70, what: "A proper coop with a ramp, and a hutch for the bunnies. Room for six." },
-    { n: "Clover meadow", cap: 8, price: 120, what: "Clover to nibble and a water trough. Room for eight, and a meal lasts two days." }
+    { n: "Bigger run", cap: 4, price: 80, what: "Darren moves the fence out. Room for four." },
+    { n: "Coop and hutch", cap: 6, price: 180, what: "A proper coop with a ramp, and a hutch for the bunnies. Room for six." },
+    { n: "Clover meadow", cap: 8, price: 350, what: "Clover to nibble and a water trough. Room for eight, and a meal lasts two days." }
   ];
   var KINDS = {
     chick: {
@@ -3532,6 +3578,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
       return w(`<path d="M24 46 V22" stroke="#7A5638" stroke-width="3" stroke-linecap="round"/>${leaf(16, 16, 0.9, -25, "#86B26A")}${leaf(32, 14, 0.8, 25, "#9CC27E")}${bunch(24, 24, c, 2.8, 9)}`);
     }
     if (id === "olive") return w(oliveTree(24, 46, 0.62, "ripe"));
+    if (id === "terrace") return w(`<path d="M6 16 h36 l-3 -8 h-30z" fill="#9CC27E" ${INK3}/><path d="M9 16 v26 M39 16 v26" stroke="#8B5E3C" stroke-width="2.4"/><ellipse cx="24" cy="32" rx="9" ry="3.5" fill="#FFFDF6" ${INK3}/><path d="M24 35 v8 M19 43 h10" ${INK3}/><circle cx="14" cy="12" r="2" fill="#6B2A55"/><circle cx="32" cy="12" r="2" fill="#6B2A55"/>`);
     if (id === "trellis") return w(`<path d="M8 44 V8 M40 44 V8" stroke="#8B5E3C" stroke-width="3.4" stroke-linecap="round"/><path d="M8 16 H40 M8 28 H40" fill="none" stroke="#3b3530" stroke-width="1.2"/>${leaf(20, 20, 0.7, -15, "#86B26A")}${leaf(30, 30, 0.6, 20, "#9CC27E")}`);
     return w(`<path d="M8 24 C8 12 14 8 24 8 C34 8 40 12 40 24 C40 36 34 40 24 40 C14 40 8 36 8 24Z" fill="#B07B52" ${INK3}/><path d="M14 9 C11 18 11 30 14 39 M34 9 C37 18 37 30 34 39" fill="none" stroke="#4A3A30" stroke-width="2.2"/><path d="M24 8 V40" stroke="#8A5A3A" stroke-width="1" opacity=".7"/>`);
   }
@@ -3542,9 +3589,13 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     pimientos: ["#D9433A", "#7FA35A"],
     fritters: ["#E3B04B", "#F6E3A1"],
     carrots: ["#F08A3C", "#7FA35A"],
-    crema: ["#F6E3C6", "#C3A0D8"],
+    crema: ["#F6E3C6", "#E8574C"],
     tostas: ["#D9A066", "#F6A23A"],
-    rellenos: ["#C9433A", "#F3C969"]
+    rellenos: ["#C9433A", "#F3C969"],
+    guisantes: ["#B9D88A", "#7FA35A"],
+    croquetas: ["#E3B04B", "#F08A3C"],
+    calabaza: ["#F08A3C", "#3B3045"],
+    puerros: ["#E7EFD8", "#9CC27E"]
   };
   function dishArt(id, s = 44, off) {
     if (String(id).startsWith("tapas:")) {
@@ -3586,7 +3637,10 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     apple: ["apple", "apples"],
     dumpling: ["dumpling", "dumplings"],
     fish: ["fish", "fish"],
-    toast: ["honey toast", "honey toasts"]
+    toast: ["honey toast", "honey toasts"],
+    pea: ["handful of peas", "handfuls of peas"],
+    pumpkin: ["pumpkin", "pumpkins"],
+    leek: ["leek", "leeks"]
   };
   var isGood = (id) => id in GOODS && id !== "loaf";
   var nm = (id, n) => GOODS[id] ? GOODS[id][n === 1 ? 0 : 1] : id;
@@ -3601,16 +3655,21 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     apples: { n: "Apple slices", need: { apple: 2 }, plates: 4, price: 3 }
   };
   var TAPAS = {
-    patatas: { n: "Patatas bravas", need: { potato: 2, tomato: 1 }, price: 10, col: "#E86A5C" },
-    tortilla: { n: "Tortilla española", need: { potato: 2, egg: 2 }, price: 11, col: "#F3C969" },
-    pancon: { n: "Pan con tomate", need: { loaf: 1, tomato: 2 }, price: 8, col: "#E8574C" },
-    pimientos: { n: "Pimientos asados", need: { pepper: 3 }, price: 9, col: "#D9433A" },
-    fritters: { n: "Corn fritters", need: { corn: 2, egg: 1 }, price: 9, col: "#E3B04B" },
-    carrots: { n: "Carrots with olives", need: { carrot: 2, olives: 1 }, price: 8, col: "#F08A3C" },
-    crema: { n: "Berry crema", need: { strawberry: 1, blueberry: 1, milk: 1 }, price: 10, col: "#C3A0D8" },
-    tostas: { n: "Tomato and cheese tostas", need: { loaf: 1, tomato: 1, cheese: 1 }, price: 12, col: "#F6A23A" },
-    rellenos: { n: "Stuffed peppers", need: { pepper: 2, cheese: 1 }, price: 12, col: "#C9433A" }
+    patatas: { n: "Patatas bravas", need: { potato: 2, tomato: 1 }, price: 8, seasons: ["autumn"] },
+    tortilla: { n: "Tortilla española", need: { potato: 2, egg: 2 }, price: 9, seasons: ["spring", "autumn", "winter"] },
+    pancon: { n: "Pan con tomate", need: { loaf: 1, tomato: 2 }, price: 7, seasons: ["summer", "autumn"] },
+    pimientos: { n: "Pimientos asados", need: { pepper: 3 }, price: 7, seasons: ["summer"] },
+    fritters: { n: "Corn fritters", need: { corn: 2, egg: 1 }, price: 7, seasons: ["summer", "autumn"] },
+    carrots: { n: "Carrots with olives", need: { carrot: 2, olives: 1 }, price: 6, seasons: ["spring", "autumn", "winter"] },
+    crema: { n: "Strawberry crema", need: { strawberry: 2, milk: 1 }, price: 9, seasons: ["spring"] },
+    tostas: { n: "Tomato and cheese tostas", need: { loaf: 1, tomato: 1, cheese: 1 }, price: 10, seasons: ["summer", "autumn"] },
+    rellenos: { n: "Stuffed peppers", need: { pepper: 2, cheese: 1 }, price: 10, seasons: ["summer"] },
+    guisantes: { n: "Peas with mint and cheese", need: { pea: 2, cheese: 1 }, price: 8, seasons: ["spring"] },
+    croquetas: { n: "Pumpkin croquetas", need: { pumpkin: 1, egg: 1, loaf: 1 }, price: 10, seasons: ["autumn", "winter"] },
+    calabaza: { n: "Roast pumpkin with olives", need: { pumpkin: 1, olives: 1 }, price: 8, seasons: ["autumn", "winter"] },
+    puerros: { n: "Leek and potato soup cups", need: { leek: 2, potato: 1 }, price: 8, seasons: ["winter"] }
   };
+  var inSeason = (id, season) => !TAPAS[id].seasons || TAPAS[id].seasons.includes(season);
   var TAPAS_PLATES = 6;
   var OVEN = 1 * H;
   var PRESS = 3 * H;
@@ -3685,7 +3744,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
   };
   function chooseTapas(F2, id, today2) {
     const v = vineState(F2), t2 = tapasToday(F2, today2);
-    if (!TAPAS[id] || t2 && t2.cooked) return null;
+    if (!TAPAS[id] || !inSeason(id, seasonOf(today2)) || t2 && t2.cooked) return null;
     v.tapas = { day: today2, id, plates: 0, cooked: 0 };
     return `Today's tapas: ${TAPAS[id].n}. It's on the chalkboard.`;
   }
@@ -3746,7 +3805,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     if (t2) h += `<div class="kdish chosen">${dishArt("tapas:" + t2.id, 52)}<span><b>${esc(T.n)}</b><small>${t2.plates} plate${t2.plates === 1 ? "" : "s"} on the menu · ${T.price} coins each · needs ${needText(T.need)}</small><span class="kneeds">${needList(k, T.need)}</span></span></div>
       <div class="actions"><button class="btn primary" data-k="cooktapas" ${has(k, T.need) ? "" : "disabled"}>Cook a batch (${TAPAS_PLATES} plates)</button>${!t2.cooked ? `<button class="btn alt small" data-k="untapas">Pick a different dish</button>` : ""}</div>
       <p class="muted">Leftovers at closing time (10pm) go to the staff for dinner.</p>`;
-    else h += `<p class="sub">Pick today's dish. It goes on the chalkboard, sells for more than the small plates and brings extra people in.</p><div class="kdishes">${Object.keys(TAPAS).map((id) => {
+    else h += `<p class="sub">Pick today's dish. It goes on the chalkboard, sells for more than the small plates and brings extra people in. <b>${SEASONS[seasonOf(today2)].n}</b> menu: ${SEASONS[seasonOf(today2)].line.toLowerCase()}.</p><div class="kdishes">${Object.keys(TAPAS).filter((id) => inSeason(id, seasonOf(today2))).map((id) => {
       const d = TAPAS[id], ok = has(k, d.need);
       return `<button class="kdish ${ok ? "ok" : ""}" data-k="tapas" data-id="${id}">${dishArt("tapas:" + id, 46)}<span><b>${esc(d.n)}</b><small>${d.price} coins a plate</small><span class="kneeds">${needList(k, d.need)}</span></span></button>`;
     }).join("")}</div>`;
@@ -3789,19 +3848,20 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
   }
 
   // src/game/vineyard.js
-  var GROW2 = 6 * H;
+  var GROW2 = 8 * H;
   var STYLES = {
-    red: { n: "Red", grape: "red", dur: 4 * H, price: 24, col: "#7A1F3D" },
-    rose: { n: "Rosé", grape: "red", dur: 2 * H, price: 20, col: "#E98AA0" },
-    white: { n: "White", grape: "white", dur: 3 * H, price: 22, col: "#E8D57A" },
-    sparkling: { n: "Sparkling", grape: "white", dur: 3 * H, dur2: 2 * H, price: 34, col: "#F3E7B0" }
+    red: { n: "Red", grape: "red", dur: 10 * H, price: 18, col: "#7A1F3D" },
+    rose: { n: "Rosé", grape: "red", dur: 6 * H, price: 15, col: "#E98AA0" },
+    white: { n: "White", grape: "white", dur: 8 * H, price: 16, col: "#E8D57A" },
+    sparkling: { n: "Sparkling", grape: "white", dur: 8 * H, dur2: 5 * H, price: 26, col: "#F3E7B0" }
   };
   var SHOP = {
-    cut_red: { n: "Red grape vine", price: 10, say: "A red grape cutting. Plant it on a trellis." },
-    cut_white: { n: "White grape vine", price: 10, say: "A white grape cutting. Plant it on a trellis." },
-    olive: { n: "Olive tree", price: 30, say: "An olive tree, planted by the path. Olives in about eight hours." },
-    trellis: { n: "Trellis (one row)", price: 25, say: "A new trellis row, ready for three vines." },
-    barrel: { n: "Oak barrel", price: 40, say: "Another barrel for the cellar." }
+    cut_red: { n: "Red grape vine", price: 20, say: "A red grape cutting. Plant it on a trellis." },
+    cut_white: { n: "White grape vine", price: 20, say: "A white grape cutting. Plant it on a trellis." },
+    olive: { n: "Olive tree", price: 150, say: "An olive tree, planted by the path. Olives in about eight hours." },
+    trellis: { n: "Trellis (one row)", price: 80, say: "A new trellis row, ready for three vines." },
+    barrel: { n: "Oak barrel", price: 150, say: "Another barrel for the cellar." },
+    terrace: { n: "Shop terrace", price: 600, say: "Tables and a vine-covered pergola outside the wine shop. More people stop for a glass." }
   };
   var BUNCHES = 3;
   var PER_BATCH = 3;
@@ -3828,13 +3888,41 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     v.today = v.today || { day: "", bottles: 0, glasses: 0, coins: 0 };
     return v;
   }
+  function questBoost(F2, ms) {
+    const v = vineState(F2);
+    let n = 0;
+    v.rows.forEach((row2) => row2.vines.forEach((vn) => {
+      if (vn && vn.wateredAt && growth(vn) < 1) {
+        vn.wateredAt -= ms;
+        n++;
+      }
+    }));
+    v.barrels.forEach((b) => {
+      if (b && barrelLeft(b)) {
+        b.start -= ms;
+        n++;
+      }
+    });
+    const k = F2.kitchen || {};
+    [k.oven, k.press].forEach((t2) => {
+      if (t2 && t2.start + t2.dur > Date.now()) {
+        t2.start -= ms;
+        n++;
+      }
+    });
+    return n;
+  }
   var growth = (vn) => vn && vn.wateredAt ? Math.min(1, (Date.now() - vn.wateredAt) / GROW2) : 0;
   var barrelLeft = (b) => b ? Math.max(0, b.start + b.dur - Date.now()) : 0;
   var shelfStock = (v) => v.shelf.reduce((n, s) => n + s.n, 0);
+  var shopPrice = (v, id) => id === "barrel" ? 150 * Math.max(1, v.barrels.length) : SHOP[id].price;
   function buy(F2, id) {
-    const v = vineState(F2), it = SHOP[id];
-    if (!it || F2.coins < it.price) return null;
-    if (id === "olive") {
+    const v = vineState(F2), it = SHOP[id], price = it ? shopPrice(v, id) : 0;
+    if (!it || F2.coins < price) return null;
+    if (id === "terrace") {
+      if (v.terrace) return "The terrace is already out front.";
+      v.terrace = true;
+    } else if (id === "olive") {
       if (v.olive) return "You've an olive tree already. One's plenty.";
       v.olive = { planted: Date.now(), pickedAt: 0 };
     } else if (id === "trellis") {
@@ -3845,7 +3933,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
       if (v.barrels.length >= 3) return "The cellar's full: three barrels is the most it holds.";
       v.barrels.push(null);
     } else v.cuttings[id === "cut_red" ? "red" : "white"]++;
-    F2.coins -= it.price;
+    F2.coins -= price;
     return it.say;
   }
   function plantVine(F2, r, i, kind) {
@@ -3866,12 +3954,13 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     });
     return n ? `Watered ${n} vine${n > 1 ? "s" : ""}. Ripe in about six hours.` : null;
   }
-  function harvestVine(F2, r, i) {
+  function harvestVine(F2, r, i, opts = {}) {
     const v = vineState(F2), vn = v.rows[r] && v.rows[r].vines[i];
     if (!vn || growth(vn) < 1) return null;
-    v.grapes[vn.v] += BUNCHES;
+    const n = BUNCHES + (opts.harvest ? 1 : 0);
+    v.grapes[vn.v] += n;
     vn.wateredAt = null;
-    return `${BUNCHES} bunches of ${vn.v} grapes! Water the vine again and it'll fruit again.`;
+    return `${n} bunches of ${vn.v} grapes!${opts.harvest ? " Harvest week!" : ""} Water the vine again and it'll fruit again.`;
   }
   function fillBarrel(F2, slot2, style) {
     const v = vineState(F2), st6 = STYLES[style];
@@ -3954,7 +4043,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
       const onShelf = v.shelf.filter((s) => s.n > 0), open2 = v.shelf.find((s) => s.open > 0);
       if (!onShelf.length && !open2 && !platesLeft(v)) continue;
       const food = Object.keys(v.menu).filter((id) => v.menu[id] > 0 && DISHES[id]), tap = v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === new Date(at + off + 6 * H).toISOString().slice(0, 10);
-      const f2 = footfall(hm2, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1);
+      const f2 = footfall(hm2, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1);
       const gameDay = new Date(at + off + 6 * H).toISOString().slice(0, 10);
       const plate = () => {
         if (v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === gameDay && Math.random() < 0.65) {
@@ -3972,13 +4061,13 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
         out.plates++;
         out.coins += DISHES[id].price;
       };
-      if (onShelf.length && Math.random() < 6e-3 * f2) {
+      if (onShelf.length && Math.random() < 12e-4 * f2) {
         const s = onShelf[Math.floor(Math.random() * onShelf.length)];
         s.n--;
         out.bottles++;
         out.coins += s.price;
       }
-      if (Math.random() < 5e-3 * f2) {
+      if (Math.random() < 1e-3 * f2) {
         const s = v.shelf.find((x) => x.open > 0) || v.shelf.find((x) => x.n > 0);
         if (s) {
           if (!s.open) {
@@ -3991,7 +4080,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
           if (Math.random() < 0.6) plate();
         }
       }
-      if (Math.random() < 2e-3 * f2) plate();
+      if (Math.random() < 6e-4 * f2) plate();
     }
     v.shelf = v.shelf.filter((s) => s.n > 0 || s.open > 0);
     if (!out.coins && !out.watered) return null;
@@ -4028,8 +4117,8 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     const v = vineState(F2);
     return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F2.coins} coins. Cuttings: ${v.cuttings.red} red, ${v.cuttings.white} white. Grapes: ${v.grapes.red} red, ${v.grapes.white} white bunches.</p>
     <div class="items shop">${Object.keys(SHOP).map((id) => {
-      const it = SHOP[id], off = F2.coins < it.price || id === "trellis" && v.rows.every((r) => r.trellis) || id === "barrel" && v.barrels.length >= 3 || id === "olive" && !!v.olive;
-      return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c"><b>${it.price}</b> coins</span></button>`;
+      const it = SHOP[id], price = shopPrice(v, id), have = id === "trellis" && v.rows.every((r) => r.trellis) || id === "barrel" && v.barrels.length >= 3 || id === "olive" && !!v.olive || id === "terrace" && !!v.terrace, off = have || F2.coins < price;
+      return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c">${have ? "owned" : `<b>${price}</b> coins`}</span>${id === "terrace" ? `<span class="d">a third more customers</span>` : ""}</button>`;
     }).join("")}</div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -4111,7 +4200,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
         line = waterVines(F2, api4.r);
         if (line) api4.sfx("tap");
       } else if (k === "harvest") {
-        line = harvestVine(F2, api4.r, api4.i);
+        line = harvestVine(F2, api4.r, api4.i, { harvest: api4.harvest });
         if (line) api4.sfx("coin");
       } else if (k === "fill") {
         line = fillBarrel(F2, i, b.dataset.k);
@@ -4272,7 +4361,10 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     const sign = sk(`<rect x="124" y="340" width="52" height="16" rx="2" style="fill:#FFFDF6"/>`, `<rect x="124" y="340" width="52" height="16" rx="2"/><path d="M150 356 v14"/>`) + `<text x="150" y="351.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9.5" style="fill:var(--line)" pointer-events="none">the vines</text>`;
     const ol = v.olive, ripe = ol && Date.now() - (ol.pickedAt || ol.planted) >= 8 * 36e5;
     const olive = `<g data-place="olive" aria-label="Olive tree"><ellipse class="hov" cx="250" cy="258" rx="34" ry="9" style="fill:var(--butter)"/>${ol ? `<g filter="url(#wob)">${oliveTree(250, 254, 1, ripe ? "ripe" : "growing")}</g>` + (ripe ? `<g class="twinkle" pointer-events="none"><path d="M276 196 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" stroke="#3b3530" stroke-width="1"/></g>` : "") : sk(`<ellipse cx="250" cy="252" rx="16" ry="5" style="fill:#9C7A5C"/>`, `<ellipse cx="250" cy="252" rx="16" ry="5"/><path d="M262 252 v-18 M256 236 h14 v8 h-14z"/>`)}${tapeLabel(250, 276, "Olive tree", "var(--sage)", 10)}</g>`;
-    return lampDefs + ground + gate + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive + shedArt(v) + shopArt(v) + stallArt() + sign + v.rows.map((row2, r) => rowArt(row2, r)).join("") + playArt();
+    return lampDefs + ground + gate + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive + shedArt(v) + shopArt(v) + stallArt() + sign + v.rows.map((row2, r) => rowArt(row2, r)).join("") + playArt() + (v.terrace ? sk(
+      `<path d="M466 132 h48 l-4 -10 h-40z" style="fill:#9CC27E"/><ellipse cx="478" cy="196" rx="11" ry="4" style="fill:#FFFDF6"/><ellipse cx="502" cy="206" rx="11" ry="4" style="fill:#FFFDF6"/><circle cx="474" cy="128" r="2.4" style="fill:#6B2A55"/><circle cx="500" cy="128" r="2.4" style="fill:#6B2A55"/>`,
+      `<path d="M466 132 h48 l-4 -10 h-40z M470 132 v80 M510 132 v80"/><ellipse cx="478" cy="196" rx="11" ry="4"/><path d="M478 200 v12 M502 210 v10"/><ellipse cx="502" cy="206" rx="11" ry="4"/>`
+    ) : "") + ((festivalOn(G2.day()) || {}).id === "harvest" ? bunting(214, 318, 466, 318, ["#8E2C48", "#F3C969", "#9CC27E"]) + bunting(214, 498, 466, 498, ["#F3C969", "#8E2C48", "#F6E3C6"]) : "");
   }
   function vineGate() {
     return `<g filter="url(#wob)"><path d="M290 332 C320 450 420 476 486 470" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
@@ -4751,10 +4843,14 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
       `<ellipse cx="276" cy="608" rx="20" ry="8"/><path class="smoke" d="M276 594 q-4 -6 0 -11 q4 -5 0 -10" opacity=".5"/>`
     ) + sk("", `<path d="M362 396 v-46 M466 396 v-46 M362 350 Q414 358 466 350"/>`) + [[`<path d="M378 354 h16 v18 h-16z" style="fill:var(--sky)"/>`, `<path d="M378 354 h16 v18 h-16z"/>`, 0], [`<path d="M406 356 h14 l3 14 h-20z" style="fill:var(--rose)"/>`, `<path d="M406 356 h14 l3 14 h-20z"/>`, 0.7], [`<path d="M434 354 h18 v12 h-18z" style="fill:var(--butter)"/>`, `<path d="M434 354 h18 v12 h-18z"/>`, 1.4]].map(([a, l, d]) => `<g class="washing" style="animation-delay:-${d}s">${sk(a, l)}</g>`).join("");
     const fam = G.F().fam && G.F().fam.owned || {};
+    const treehouse = fam.treehouse ? `<g aria-label="Evan's treehouse">${sk(
+      `<rect x="56" y="244" width="44" height="6" rx="1" style="fill:var(--wood)"/><path d="M60 244 v-20 h36 v20z" style="fill:#F3C969"/><path d="M56 224 l22 -14 l22 14z" style="fill:#C46A4A"/><rect x="72" y="230" width="10" height="14" style="fill:#7B5A42"/><path d="M98 210 l10 3 l-10 3z" style="fill:var(--rose)"/>`,
+      `<rect x="56" y="244" width="44" height="6" rx="1"/><path d="M60 244 v-20 h36 v20z M56 224 l22 -14 l22 14z"/><rect x="72" y="230" width="10" height="14"/><path d="M98 216 v-10 M98 210 l10 3 l-10 3z"/><path d="M62 250 l-4 48 M70 250 l-4 48 M61 262 h8 M60 274 h8 M59 286 h8"/>`
+    )}</g>` : "";
     const famArt = (fam.sandpit ? `<g aria-label="Sandpit">${sk(`<rect x="208" y="512" width="56" height="24" rx="5" style="fill:#F2DDA8"/><path d="M246 506 h8 l-2 8 h-4z" style="fill:var(--rose)"/>`, `<rect x="208" y="512" width="56" height="24" rx="5"/><path d="M212 518 h48" opacity=".5"/><path d="M246 506 h8 l-2 8 h-4z M250 506 v-6"/><path d="M220 528 q5 -5 10 0" opacity=".6"/>`)}</g>` : "") + (fam.hammock ? sk(`<path d="M398 600 q32 18 64 0 z" style="fill:var(--peach)"/>`, `<path d="M392 622 v-34 M468 622 v-34 M392 594 l6 6 M468 594 l-6 6"/><path d="M398 600 q32 18 64 0"/><path d="M410 604 l2 -3 M430 608 l1 -4 M450 604 l-2 -3" opacity=".6"/>`) : "");
     const tools = G.F().tools || {};
     const toolArt = (tools.compost ? sk(`<path d="M192 452 h24 l-3 22 h-18z" style="fill:var(--wood)"/><path d="M196 451 c3 -6 13 -6 16 0" style="fill:var(--moss)"/>`, `<path d="M192 452 h24 l-3 22 h-18z M195 460 h18"/>`) : "") + (tools.can ? sk(`<rect x="466" y="262" width="14" height="11" rx="2" style="fill:#9CC3E0"/>`, `<rect x="466" y="262" width="14" height="11" rx="2"/><path d="M480 266 l7 -5 M468 262 c0 -5 9 -5 9 0"/>`) : "") + (tools.sprinkler ? sk(`<circle cx="108" cy="438" r="4" style="fill:var(--stone)"/>`, `<circle cx="108" cy="438" r="4"/><path d="M108 434 v-4"/><path class="ripple" d="M96 426 q12 -10 24 0" opacity=".7"/>`) : "");
-    return lampDefs + ground + BASE_LAMPS.map(([x, y]) => streetLamp(x, y)).join("") + places + runArt(G.F()) + famArt + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
+    return lampDefs + ground + BASE_LAMPS.map(([x, y]) => streetLamp(x, y)).join("") + places + runArt(G.F()) + famArt + treehouse + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
   }
   var BASE_LAMPS = [[192, 380], [328, 380]];
   var litLamp = (x, y) => `<circle cx="${x}" cy="${y - 6}" r="40" fill="url(#lampn)"/><circle class="flick" cx="${x}" cy="${y - 30}" r="16" fill="#FFE3A3" opacity=".45"/>
@@ -5409,7 +5505,9 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
     { id: "national", name: "National Day", dates: ["2026-08-09", "2027-08-09"], before: 8, after: 1 },
     { id: "midautumn", name: "Mid-Autumn", dates: ["2026-09-25", "2027-09-15"], before: 7, after: 2 },
     { id: "deepavali", name: "Deepavali", dates: ["2026-11-08", "2027-10-28"], before: 7, after: 2 },
-    { id: "christmas", name: "Christmas", dates: ["2026-12-25", "2027-12-25"], before: 10, after: 1 }
+    { id: "christmas", name: "Christmas", dates: ["2026-12-25", "2027-12-25"], before: 10, after: 1 },
+    // the vineyard's own: autumn's grape harvest (bunting over the vines, every bunch picked is a big one)
+    { id: "harvest", name: "The grape harvest", dates: ["2026-10-04", "2027-10-03"], before: 2, after: 8, vineyard: true }
   ];
   var dayNum = (k) => Date.parse(k + "T00:00:00Z") / 864e5;
   function festivalOn(day) {
@@ -10615,9 +10713,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return clamp((Date.now() - p.wateredAt + (p.bonus || 0)) / (CROPS[p.crop].dur / ((F.tools || {}).compost ? 1.25 : 1)), 0, 1);
   }
   var SHED = {
-    can: { n: "Big watering can", price: 30, ico: "wateringCan", what: "Waters every thirsty plot in one go." },
-    compost: { n: "Compost bin", price: 60, ico: "compost", what: "Everything grows a quarter faster." },
-    sprinkler: { n: "Sprinkler", price: 90, ico: "sprinkler", what: "New seeds water themselves the moment you plant them." }
+    can: { n: "Big watering can", price: 60, ico: "wateringCan", what: "Waters every thirsty plot in one go." },
+    compost: { n: "Compost bin", price: 150, ico: "compost", what: "Everything grows a quarter faster." },
+    sprinkler: { n: "Sprinkler", price: 300, ico: "sprinkler", what: "New seeds water themselves the moment you plant them." }
   };
   var kView = null;
   var reviewOpen = false;
@@ -11349,6 +11447,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
           grew++;
         }
       });
+      grew += questBoost(F, QUEST_BOOST);
       if (t2.meeting) {
         S2.mode = "decompress";
         S2.decompFor = t2.title;
@@ -12787,7 +12886,9 @@ Then tell chat "wind down" whenever you're ready.`
         const sellable = Object.keys(F.inv).filter((id) => ITEMS[id] && ITEMS[id].sell);
         h += sellable.length ? sellable.map((id) => itemBtn(id, `sell <b>+${ITEMS[id].sell}</b> ${icon("coin", 13)}`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("") : `<p class="muted" style="grid-column:1/-1">Nothing to sell yet. Grow something in the garden!</p>`;
       } else {
-        h += Object.keys(ITEMS).filter((id) => ITEMS[id].tab === shopTab).map((id) => {
+        const season = seasonOf(dayKey());
+        if (shopTab === "seeds") h += `<p class="muted" style="grid-column:1/-1">${SEASONS[season].n} seeds: ${SEASONS[season].line.toLowerCase()}. New ones arrive each season, and anything you've already bought or planted keeps growing.</p>`;
+        h += Object.keys(ITEMS).filter((id) => ITEMS[id].tab === shopTab && (!ITEMS[id].seasons || ITEMS[id].seasons.includes(season))).map((id) => {
           const it = ITEMS[id], locked = it.need && S2.earned < it.need, owned = it.kind === "keep" ? F.fam.owned[id] : it.kind === "tool" && F.inv[id];
           const extra2 = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)}` : it.to ? ` · ${it.to === "evan" ? "Evan" : "Darren"}` : "";
           if (it.kind === "pet") {
@@ -12888,7 +12989,7 @@ Then tell chat "wind down" whenever you're ready.`
       ctx();
       drawScene();
     }, say: (l) => speak(l, 4500), sfx, today: dayKey() });
-    if (vyView && (scene === "vineyard" || scene === "wineshop")) wireVine(c, F, { save: () => save2(true), rerender: () => {
+    if (vyView && (scene === "vineyard" || scene === "wineshop")) wireVine(c, F, { harvest: (festivalOn(dayKey()) || {}).id === "harvest", save: () => save2(true), rerender: () => {
       ctx();
       drawScene();
     }, say: (l) => speak(l, 4500), sfx, r: vyAt && vyAt.r, i: vyAt && vyAt.i });
@@ -13285,9 +13386,14 @@ Then tell chat "wind down" whenever you're ready.`
     m.setAttribute("transform", `translate(${pos[0]} ${pos[1]})`);
   }
   function drawScene() {
+    const ssn = seasonOf(dayKey());
+    ["spring", "summer", "autumn", "winter"].forEach((k) => document.body.classList.toggle("season-" + k, k === ssn));
     const day = dayKey(), wet = outside() && rainyOn(day), fest = festivalOn(day);
     $("rain").hidden = !wet;
-    if (scene === "village" && fest && S2.festSaid !== day) {
+    if (scene === "vineyard" && fest && fest.id === "harvest" && S2.harvestSaid !== day) {
+      S2.harvestSaid = day;
+      setTimeout(() => speak("It's the grape harvest! Bunting's up, and every vine gives an extra bunch this week.", 6e3), 1500);
+    } else if (scene === "village" && fest && !fest.vineyard && S2.festSaid !== day) {
       S2.festSaid = day;
       setTimeout(() => speak(`${fest.name} decorations are up in the town square!`, 5e3), 1500);
     } else if (scene === "base" && S2.hestiaSaid !== day && hestiaCounts().chores) {

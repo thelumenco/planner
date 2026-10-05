@@ -8,11 +8,12 @@ import { NPCS } from "../data/npcs.js";
 import { DISHES, TAPAS } from "./kitchen.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
 
-export const GROW = 6*H;                                     // a watered vine ripens in 6 hours
-export const STYLES = {red: {n: "Red", grape: "red", dur: 4*H, price: 24, col: "#7A1F3D"}, rose: {n: "Rosé", grape: "red", dur: 2*H, price: 20, col: "#E98AA0"},
-  white: {n: "White", grape: "white", dur: 3*H, price: 22, col: "#E8D57A"}, sparkling: {n: "Sparkling", grape: "white", dur: 3*H, dur2: 2*H, price: 34, col: "#F3E7B0"}};
-export const SHOP = {cut_red: {n: "Red grape vine", price: 10, say: "A red grape cutting. Plant it on a trellis."}, cut_white: {n: "White grape vine", price: 10, say: "A white grape cutting. Plant it on a trellis."},
-  olive: {n: "Olive tree", price: 30, say: "An olive tree, planted by the path. Olives in about eight hours."}, trellis: {n: "Trellis (one row)", price: 25, say: "A new trellis row, ready for three vines."}, barrel: {n: "Oak barrel", price: 40, say: "Another barrel for the cellar."}};
+export const GROW = 8*H;                                     // a watered vine ripens in 8 hours
+// Fermenting is a once-a-day rhythm: fill a barrel one evening, bottle it the next day (finishing quests speeds it up).
+export const STYLES = {red: {n: "Red", grape: "red", dur: 10*H, price: 18, col: "#7A1F3D"}, rose: {n: "Rosé", grape: "red", dur: 6*H, price: 15, col: "#E98AA0"},
+  white: {n: "White", grape: "white", dur: 8*H, price: 16, col: "#E8D57A"}, sparkling: {n: "Sparkling", grape: "white", dur: 8*H, dur2: 5*H, price: 26, col: "#F3E7B0"}};
+export const SHOP = {cut_red: {n: "Red grape vine", price: 20, say: "A red grape cutting. Plant it on a trellis."}, cut_white: {n: "White grape vine", price: 20, say: "A white grape cutting. Plant it on a trellis."},
+  olive: {n: "Olive tree", price: 150, say: "An olive tree, planted by the path. Olives in about eight hours."}, trellis: {n: "Trellis (one row)", price: 80, say: "A new trellis row, ready for three vines."}, barrel: {n: "Oak barrel", price: 150, say: "Another barrel for the cellar."}, terrace: {n: "Shop terrace", price: 600, say: "Tables and a vine-covered pergola outside the wine shop. More people stop for a glass."}};
 const BUNCHES = 3, PER_BATCH = 3, BOTTLES = 6, GLASSES = 5;
 export const platesLeft = v => Object.values(v.menu || {}).reduce((a, n) => a + n, 0) + (v.tapas ? v.tapas.plates || 0 : 0);
 // the olive tree (bought at the stall, planted by the path): ripe every 8 hours, two jars of olives a picking
@@ -27,27 +28,40 @@ export function vineState(F){
   v.lastTick = v.lastTick || Date.now(); v.today = v.today || {day: "", bottles: 0, glasses: 0, coins: 0};
   return v;
 }
+// Finishing a quest moves the vineyard and kitchen on too: ripening vines, fermenting barrels, the oven and the
+// cheese press each jump ahead by `ms` (the garden gets the same boost in core).
+export function questBoost(F, ms){
+  const v = vineState(F); let n = 0;
+  v.rows.forEach(row => row.vines.forEach(vn => { if (vn && vn.wateredAt && growth(vn) < 1) { vn.wateredAt -= ms; n++; } }));
+  v.barrels.forEach(b => { if (b && barrelLeft(b)) { b.start -= ms; n++; } });
+  const k = F.kitchen || {}; [k.oven, k.press].forEach(t => { if (t && t.start + t.dur > Date.now()) { t.start -= ms; n++; } });
+  return n;
+}
 export const growth = vn => vn && vn.wateredAt ? Math.min(1, (Date.now() - vn.wateredAt)/GROW) : 0;
 export const barrelLeft = b => b ? Math.max(0, b.start + b.dur - Date.now()) : 0;
 export const shelfStock = v => v.shelf.reduce((n, s) => n + s.n, 0);
 
 /* ---------- actions (return a line for Maple, or null) ---------- */
+// the second barrel costs 150, the third 300
+export const shopPrice = (v, id) => id === "barrel" ? 150*Math.max(1, v.barrels.length) : SHOP[id].price;
 export function buy(F, id){
-  const v = vineState(F), it = SHOP[id]; if (!it || F.coins < it.price) return null;
-  if (id === "olive") { if (v.olive) return "You've an olive tree already. One's plenty."; v.olive = {planted: Date.now(), pickedAt: 0}; }
+  const v = vineState(F), it = SHOP[id], price = it ? shopPrice(v, id) : 0; if (!it || F.coins < price) return null;
+  if (id === "terrace") { if (v.terrace) return "The terrace is already out front."; v.terrace = true; }
+  else if (id === "olive") { if (v.olive) return "You've an olive tree already. One's plenty."; v.olive = {planted: Date.now(), pickedAt: 0}; }
   else if (id === "trellis") { const r = v.rows.find(x => !x.trellis); if (!r) return "Every row has a trellis already."; r.trellis = true; }
   else if (id === "barrel") { if (v.barrels.length >= 3) return "The cellar's full: three barrels is the most it holds."; v.barrels.push(null); }
   else v.cuttings[id === "cut_red" ? "red" : "white"]++;
-  F.coins -= it.price; return it.say;
+  F.coins -= price; return it.say;
 }
 export function plantVine(F, r, i, kind){
   const v = vineState(F), row = v.rows[r]; if (!row || !row.trellis || row.vines[i] || !(v.cuttings[kind] > 0)) return null;
   v.cuttings[kind]--; row.vines[i] = {v: kind, planted: Date.now(), wateredAt: null}; return `A ${kind} vine, planted. Give it some water.`;
 }
 export function waterVines(F, r){ const v = vineState(F), row = v.rows[r]; let n = 0; (row ? row.vines : []).forEach(vn => { if (vn && !vn.wateredAt) { vn.wateredAt = Date.now(); n++; } }); return n ? `Watered ${n} vine${n > 1 ? "s" : ""}. Ripe in about six hours.` : null; }
-export function harvestVine(F, r, i){
+export function harvestVine(F, r, i, opts = {}){
   const v = vineState(F), vn = v.rows[r] && v.rows[r].vines[i]; if (!vn || growth(vn) < 1) return null;
-  v.grapes[vn.v] += BUNCHES; vn.wateredAt = null; return `${BUNCHES} bunches of ${vn.v} grapes! Water the vine again and it'll fruit again.`;
+  const n = BUNCHES + (opts.harvest ? 1 : 0);   // the autumn grape harvest: an extra bunch from every vine
+  v.grapes[vn.v] += n; vn.wateredAt = null; return `${n} bunches of ${vn.v} grapes!${opts.harvest ? " Harvest week!" : ""} Water the vine again and it'll fruit again.`;
 }
 export function fillBarrel(F, slot, style){
   const v = vineState(F), st = STYLES[style]; if (!st || v.barrels[slot] || v.grapes[st.grape] < PER_BATCH) return null;
@@ -98,15 +112,15 @@ export function sellTick(F, opts = {}){
     if (hm < 10*60 || hm >= 22*60) continue;
     const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); if (!onShelf.length && !open && !platesLeft(v)) continue;
     const food = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]), tap = v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === new Date(at + off + 6*H).toISOString().slice(0, 10);
-    const f = footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1);
+    const f = footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1);
     const gameDay = new Date(at + off + 6*H).toISOString().slice(0, 10);   // the game's day (it turns over at 2am)
     const plate = () => { if (v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === gameDay && Math.random() < .65) { v.tapas.plates--; out.plates++; out.tapas = (out.tapas || 0) + 1; out.coins += TAPAS[v.tapas.id].price; return; }
       const live = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]); if (!live.length) return; const id = live[Math.floor(Math.random()*live.length)];
       v.menu[id]--; if (!v.menu[id]) delete v.menu[id]; out.plates++; out.coins += DISHES[id].price; };
-    if (onShelf.length && Math.random() < .006*f) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; s.n--; out.bottles++; out.coins += s.price; }
-    if (Math.random() < .005*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
+    if (onShelf.length && Math.random() < .0012*f) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; s.n--; out.bottles++; out.coins += s.price; }
+    if (Math.random() < .001*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
       const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); if (Math.random() < .6) plate(); } }
-    if (Math.random() < .002*f) plate();   // someone pops in just for a bite
+    if (Math.random() < .0006*f) plate();   // someone pops in just for a bite
   }
   v.shelf = v.shelf.filter(s => s.n > 0 || s.open > 0);
   if (!out.coins && !out.watered) return null;
@@ -135,8 +149,8 @@ export function vinePanel(F, r, i){
 export function stallPanel(F){
   const v = vineState(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F.coins} coins. Cuttings: ${v.cuttings.red} red, ${v.cuttings.white} white. Grapes: ${v.grapes.red} red, ${v.grapes.white} white bunches.</p>
-    <div class="items shop">${Object.keys(SHOP).map(id => { const it = SHOP[id], off = F.coins < it.price || (id === "trellis" && v.rows.every(r => r.trellis)) || (id === "barrel" && v.barrels.length >= 3) || (id === "olive" && !!v.olive);
-      return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c"><b>${it.price}</b> coins</span></button>`; }).join("")}</div>
+    <div class="items shop">${Object.keys(SHOP).map(id => { const it = SHOP[id], price = shopPrice(v, id), have = (id === "trellis" && v.rows.every(r => r.trellis)) || (id === "barrel" && v.barrels.length >= 3) || (id === "olive" && !!v.olive) || (id === "terrace" && !!v.terrace), off = have || F.coins < price;
+      return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c">${have ? "owned" : `<b>${price}</b> coins`}</span>${id === "terrace" ? `<span class="d">a third more customers</span>` : ""}</button>`; }).join("")}</div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export const vy = {name: {}};
@@ -197,7 +211,7 @@ export function wireVine(root, F, api){
     const k = b.dataset.vy, i = +b.dataset.i; let line = null;
     if (k === "plant") line = plantVine(F, api.r, api.i, b.dataset.k);
     else if (k === "water") { line = waterVines(F, api.r); if (line) api.sfx("tap"); }
-    else if (k === "harvest") { line = harvestVine(F, api.r, api.i); if (line) api.sfx("coin"); }
+    else if (k === "harvest") { line = harvestVine(F, api.r, api.i, {harvest: api.harvest}); if (line) api.sfx("coin"); }
     else if (k === "fill") { line = fillBarrel(F, i, b.dataset.k); if (line) api.sfx("paper"); }
     else if (k === "second") line = secondFerment(F, i);
     else if (k === "bottle") { line = bottle(F, i, vy.name[i]); if (line) { vy.name[i] = ""; api.sfx("chime"); } }
