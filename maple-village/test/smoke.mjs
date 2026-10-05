@@ -854,6 +854,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#ctx .rcheck li").count() >= 3, "the noticeboard has a morning routine checklist");
   await page.click("#ctx .rcheck li >> nth=0"); await page.waitForTimeout(200);
   check(await page.locator("#ctx .rcheck li.on").count() === 1 && await page.locator("#ctx .rcheck .rbox.on").count() === 1 && await page.locator("#ctx .rcheck .tk").count() === 0, "steps start as empty boxes and tick off with one tap");
+  const coins0 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
+  const steps = await page.locator("#ctx .rcheck li").count();
+  for (let i = 1; i < steps; i++) { await page.click(`#ctx .rcheck li >> nth=${i}`); await page.waitForTimeout(120); }
+  await page.click("#ctx .rcheck li >> nth=0"); await page.click("#ctx .rcheck li >> nth=0"); await page.waitForTimeout(200);
+  const coins1 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
+  check(coins1 - coins0 === (steps - 1) + 5, `each routine step earns a coin and finishing the routine earns a 5-coin bonus, once a day (+${coins1 - coins0})`);
   await page.click('#ctx [data-rt="sel"]:has-text("Beauty")'); await page.click('#ctx [data-rt="edit"]');
   check(await page.locator('#ctx [data-day="sun"]').inputValue() === "Air shot micro-needling + face mask", "Mel's beauty week is already on the board");
   await page.click("#ctx .rpaste summary");

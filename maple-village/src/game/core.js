@@ -1297,7 +1297,7 @@ function ctx(){
   c.querySelectorAll("[data-letters]").forEach(b => b.onclick = () => { journalOpen = false; lettersOpen = true; lv.mode = "home"; sfx("paper", true); ctx(); });
   if (lettersOpen && (scene === "room" || scene === "base")) wireLetters(c, {rerender: () => ctx(), sample: sampleCap, toJournal: t => { const e = addEntry(t, "letter"); if (e) { sfx("chime"); flash("Saved to your journal"); } return !!e; },
     sent: (k, d) => { sfx("paper"); speak(k === "universe" ? "Posted. The universe always writes back. Keep an eye on the letterbox." : `Sealed. It'll arrive in your letterbox on ${new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", {day: "numeric", month: "long", year: "numeric", timeZone: "UTC"})}.`, 5000); }});
-  if (routOpen && scene === "room") wireRoutines(c, {rerender: () => ctx(), undoable, done: () => { sfx("coin"); mprop("sparkle", mel.x, mel.y - 60); }});
+  if (routOpen && scene === "room") wireRoutines(c, {rerender: () => ctx(), undoable, done: routineCoins});
   if (trophyView && scene === "trophy") { wireTrophies(c, F, {save: () => save(true), undoable, rerender: () => { ctx(); drawScene(); }, close: () => { trophyView = null; lettersOpen = false; ctx(); drawScene(); }});
     if (trophyView === "fountain") wireFountain(c, {sample: sampleCap, rerender: () => ctx(),
       coin: () => { trophyView = null; lettersOpen = false; ctx(); sfx("coin"); mprop("sparkle", 260 + rnd(-20, 20), 400); speak(pick(["Plink. Wish made. I won't ask.", "A coin in the fountain. Something good's coming.", "Make it a big one."]), 3500); },
@@ -1612,6 +1612,18 @@ function arriveVillageSpot(id){
   if (id === "board") { arriveSpot("board"); return; }
   if (id === "pond") { speak(phase() === "break" ? "Perfect break spot. Breathe." : VILLAGE.pond.line, 4000); render(); }
 }
+/* ---------- Routine bonuses: 1 coin a checklist step, 5 for finishing a routine (a weekly one's step counts as
+   finishing it). Each pays once a day: unticking and re-ticking earns nothing more. ---------- */
+const ROUTINE_STEP = 1, ROUTINE_DONE = 5;
+function routineCoins(r){
+  S.rCoins = S.rCoins || {}; let n = 0;
+  if (!r.weekly && !S.rCoins[r.list + ":" + r.item]) { S.rCoins[r.list + ":" + r.item] = true; n += ROUTINE_STEP; }
+  if (r.complete && !S.rCoins[r.list + ":done"]) { S.rCoins[r.list + ":done"] = true; n += ROUTINE_DONE;
+    act("cheer"); setTimeout(() => speak(`${r.name}, done for today! Bonus coins.`, 4000, true), 300); }
+  if (n) { earn(n, r.complete ? `${r.name} done` : "routine step"); gainXp(r.complete ? 1 : 0); save(); }
+  else mprop("sparkle", mel.x, mel.y - 60);
+}
+
 /* ---------- Bedtime: Maple chivvies at 11 and 11:30; from 11:45pm to 6am the village rests ---------- */
 const nightKey = () => { const m = sgHM(); return m < 6*60 ? prevDay(dayKey()) : dayKey(); };
 const bedNow = () => { const m = sgHM(); return m >= 23*60 + 45 || m < 6*60; };

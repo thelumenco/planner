@@ -462,3 +462,6 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - Finishing a quest that came from Sunsama (`t.source === "sunsama"`, not already completed there) calls Sunsama `mark_task_as_completed` with `{taskId, finishedDay: today}`. Early quests pulled from tomorrow are marked done on the day Mel did them.
 - Anything that fails waits in `F.sunsamaTodo` and is retried every 3 minutes (a quiet flash at most every 30 minutes). Quests Mel adds in the game ("x…" ids) stay game-only.
 - The manifest adds Sunsama `mark_task_as_completed`.
+
+### Round 37: routine bonuses
+- Every routine on the board earns coins (`routineCoins` in core.js): +1 per checklist step and +5 for finishing a routine for the day (a weekly routine's one step counts as finishing it). Each pays once a day (`S.rCoins`), so untick and re-tick earns nothing extra. A workout routine on the board earns the same way.

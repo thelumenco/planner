@@ -115,8 +115,8 @@ export function wireRoutines(root, api){
     if (k === "sel") { if (rv.edit) saveForm(); rv.sel = id; rv.edit = false; }
     else if (k === "new") { const n = {id: uid("r"), name: "New routine", kind: "checklist", made: Date.now(), at: Date.now(), items: [], days: {}}; R.lists.push(n); commit(); rv.sel = n.id; rv.edit = true; }
     else if (k === "edit") rv.edit = true;
-    else if (k === "tick") { const on = !tickOf(l.id, id); setTick(l.id, id, on); if (on) api.done(); }
-    else if (k === "tickday") { const tk = todayKey(), on = !tickOf(l.id, tk); setTick(l.id, tk, on); if (on) api.done(); }
+    else if (k === "tick") { const on = !tickOf(l.id, id); setTick(l.id, id, on); if (on) api.done({list: l.id, item: id, name: l.name, complete: l.items.every(i => tickOf(l.id, i.id))}); }
+    else if (k === "tickday") { const tk = todayKey(), on = !tickOf(l.id, tk); setTick(l.id, tk, on); if (on) api.done({list: l.id, item: tk, name: l.name, complete: true, weekly: true}); }
     else if (k === "additem") { saveForm(); const v = plain(root.querySelector("#rtNew").value).trim().slice(0, 120); if (!v) return; l.items.push({id: uid("i"), text: v}); touch(l); }
     else if (k === "delitem") { saveForm(); const idx = l.items.findIndex(x => x.id === id); if (idx < 0) return; const [gone] = l.items.splice(idx, 1); touch(l);
       api.undoable("Step removed", () => { l.items.splice(Math.min(idx, l.items.length), 0, gone); touch(l); api.rerender(); }); }

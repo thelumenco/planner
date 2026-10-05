@@ -7300,11 +7300,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         else if (k === "tick") {
           const on = !tickOf(l.id, id);
           setTick(l.id, id, on);
-          if (on) api4.done();
+          if (on) api4.done({ list: l.id, item: id, name: l.name, complete: l.items.every((i) => tickOf(l.id, i.id)) });
         } else if (k === "tickday") {
           const tk = todayKey(), on = !tickOf(l.id, tk);
           setTick(l.id, tk, on);
-          if (on) api4.done();
+          if (on) api4.done({ list: l.id, item: tk, name: l.name, complete: true, weekly: true });
         } else if (k === "additem") {
           saveForm();
           const v = plain(root.querySelector("#rtNew").value).trim().slice(0, 120);
@@ -10744,10 +10744,7 @@ Then tell chat "wind down" whenever you're ready.`
         speak(k === "universe" ? "Posted. The universe always writes back. Keep an eye on the letterbox." : `Sealed. It'll arrive in your letterbox on ${(/* @__PURE__ */ new Date(d + "T00:00:00Z")).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}.`, 5e3);
       }
     });
-    if (routOpen && scene === "room") wireRoutines(c, { rerender: () => ctx(), undoable, done: () => {
-      sfx("coin");
-      mprop("sparkle", mel.x, mel.y - 60);
-    } });
+    if (routOpen && scene === "room") wireRoutines(c, { rerender: () => ctx(), undoable, done: routineCoins });
     if (trophyView && scene === "trophy") {
       wireTrophies(c, F, { save: () => save2(true), undoable, rerender: () => {
         ctx();
@@ -11675,6 +11672,27 @@ Then tell chat "wind down" whenever you're ready.`
       speak(phase() === "break" ? "Perfect break spot. Breathe." : VILLAGE.pond.line, 4e3);
       render();
     }
+  }
+  var ROUTINE_STEP = 1;
+  var ROUTINE_DONE = 5;
+  function routineCoins(r) {
+    S2.rCoins = S2.rCoins || {};
+    let n = 0;
+    if (!r.weekly && !S2.rCoins[r.list + ":" + r.item]) {
+      S2.rCoins[r.list + ":" + r.item] = true;
+      n += ROUTINE_STEP;
+    }
+    if (r.complete && !S2.rCoins[r.list + ":done"]) {
+      S2.rCoins[r.list + ":done"] = true;
+      n += ROUTINE_DONE;
+      act("cheer");
+      setTimeout(() => speak(`${r.name}, done for today! Bonus coins.`, 4e3, true), 300);
+    }
+    if (n) {
+      earn(n, r.complete ? `${r.name} done` : "routine step");
+      gainXp(r.complete ? 1 : 0);
+      save2();
+    } else mprop("sparkle", mel.x, mel.y - 60);
   }
   var nightKey = () => {
     const m = sgHM();
