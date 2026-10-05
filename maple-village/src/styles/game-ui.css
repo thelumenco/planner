@@ -610,7 +610,7 @@ body.kidmode .scenename span + span{display:none}
 .vpour{position:absolute;left:50%;top:-10px;width:160px;height:300px;margin-left:-80px;pointer-events:none;overflow:visible}
 .vdrop{position:absolute;top:0;animation:vfall .9s cubic-bezier(.4,.1,.8,.6) both}
 @keyframes vfall{0%{transform:translateY(-40px) rotate(0);opacity:0}15%{opacity:1}100%{transform:translateY(220px) rotate(220deg);opacity:0}}
-.vcap{transition:transform .4s ease}.vcap.lift{transform:translateY(-40px) rotate(-8deg)}
+.vcap{transition:transform .4s ease;transform-box:fill-box;transform-origin:50% 50%}.vcap.lift{transform:translateY(-40px) rotate(-8deg)}
 .vcap.drop{animation:vcapdrop .5s ease-out}@keyframes vcapdrop{0%{transform:translateY(-40px)}70%{transform:translateY(2px)}100%{transform:translateY(0)}}
 .vspark{animation:vspark 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 @keyframes vspark{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}
@@ -633,3 +633,4 @@ body.kidmode .scenename span + span{display:none}
   box-shadow:0 8px 20px -10px rgba(40,30,20,.55);border:1px solid rgba(120,104,84,.18);text-align:center}
 body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 18px)}
 .bujo li.subnext small{display:block;font-size:.8rem;color:var(--soft);margin-top:2px}
+.panel .clbar + .actions{margin-top:14px}

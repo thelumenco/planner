@@ -1035,6 +1035,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-vine="0-0"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-vy="plant"]', { timeout: 15000 });
   await page.click('#ctx [data-vy="plant"][data-k="red"]');
+  check(await page.evaluate(() => { const e = document.querySelector("#ctx .sub"); return !!e && getComputedStyle(e).display === "block" && e.getBoundingClientRect().height < 80; }), "panel text flows normally (the notebook's checklist styles stay in the notebook)");
   await page.waitForSelector('#ctx [data-vy="water"]', { timeout: 5000 }); await page.click('#ctx [data-vy="water"]');
   check(await page.evaluate(() => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return v.rows[0].vines[0] && v.rows[0].vines[0].v === "red" && !!v.rows[0].vines[0].wateredAt; }), "a red vine is planted on the trellis and watered");
   await page.goto(url + "?seed=1&time=17:10&ripen=1"); await page.waitForTimeout(800);

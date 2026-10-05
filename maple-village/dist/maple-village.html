@@ -454,18 +454,18 @@ body.nb-open{overflow:hidden}
 .subbar{display:block;height:6px;border-radius:3px;background:rgba(154,169,221,.25);margin:0 0 6px;overflow:hidden}
 .subbar i{display:block;height:100%;border-radius:3px;background:#8FB07B;transition:width .3s}
 .sublist{list-style:none;margin:0;padding:0;line-height:1.45}
-.sub{display:grid;grid-template-columns:30px 1fr;gap:6px;align-items:start;padding:9px 6px;border-bottom:1px dashed rgba(154,169,221,.45)}
-.sub.upnext{background:rgba(246,227,161,.32);border-radius:6px;border-bottom-color:transparent}
+.sublist > .sub{display:grid;grid-template-columns:30px 1fr;gap:6px;align-items:start;padding:9px 6px;border-bottom:1px dashed rgba(154,169,221,.45)}
+.sublist > .sub.upnext{background:rgba(246,227,161,.32);border-radius:6px;border-bottom-color:transparent}
 .subtick{position:relative;width:22px;height:22px;margin-top:1px;border:1.6px solid #2F3B73;border-radius:6px;background:#FFFDF7;padding:0;cursor:pointer}
-.sub.done .subtick{background:#8FB07B;border-color:#8FB07B}
-.sub.done .subtick::after{content:"";position:absolute;left:6px;top:2px;width:6px;height:11px;border:solid #FFFDF7;border-width:0 2.4px 2.4px 0;transform:rotate(45deg)}
+.sublist > .sub.done .subtick{background:#8FB07B;border-color:#8FB07B}
+.sublist > .sub.done .subtick::after{content:"";position:absolute;left:6px;top:2px;width:6px;height:11px;border:solid #FFFDF7;border-width:0 2.4px 2.4px 0;transform:rotate(45deg)}
 .subname{display:block;width:100%;text-align:left;font:inherit;font-size:1rem;font-weight:600;color:#2F2B28;background:none;border:0;padding:0;cursor:default}
 button.subname{cursor:pointer}
 button.subname::after{content:"▾";margin-left:6px;font-size:.75rem;color:#8A8279}
 button.subname[aria-expanded="true"]::after{content:"▴"}
 .subname small{font-weight:500;color:#8A8279;margin-left:4px}
 .subname em{font-style:normal;font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;background:var(--butter);color:#3B3320;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:2px;white-space:nowrap}
-.sub.done .subname{color:#8A8279;font-weight:500;text-decoration:line-through;text-decoration-color:rgba(138,130,121,.6)}
+.sublist > .sub.done .subname{color:#8A8279;font-weight:500;text-decoration:line-through;text-decoration-color:rgba(138,130,121,.6)}
 .subinfo{margin:6px 0 2px;padding-left:18px;font-size:.92rem;line-height:1.5;color:#4A443E}
 .subinfo li{margin:4px 0;font-weight:400;overflow-wrap:anywhere}
 .subdonebtn{display:inline-block;margin-top:8px;background:none;border:0;padding:4px 0;font:inherit;font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#8A8279;cursor:pointer}
@@ -1144,7 +1144,7 @@ body.kidmode .scenename span + span{display:none}
 .vpour{position:absolute;left:50%;top:-10px;width:160px;height:300px;margin-left:-80px;pointer-events:none;overflow:visible}
 .vdrop{position:absolute;top:0;animation:vfall .9s cubic-bezier(.4,.1,.8,.6) both}
 @keyframes vfall{0%{transform:translateY(-40px) rotate(0);opacity:0}15%{opacity:1}100%{transform:translateY(220px) rotate(220deg);opacity:0}}
-.vcap{transition:transform .4s ease}.vcap.lift{transform:translateY(-40px) rotate(-8deg)}
+.vcap{transition:transform .4s ease;transform-box:fill-box;transform-origin:50% 50%}.vcap.lift{transform:translateY(-40px) rotate(-8deg)}
 .vcap.drop{animation:vcapdrop .5s ease-out}@keyframes vcapdrop{0%{transform:translateY(-40px)}70%{transform:translateY(2px)}100%{transform:translateY(0)}}
 .vspark{animation:vspark 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 @keyframes vspark{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}
@@ -1167,6 +1167,7 @@ body.kidmode .scenename span + span{display:none}
   box-shadow:0 8px 20px -10px rgba(40,30,20,.55);border:1px solid rgba(120,104,84,.18);text-align:center}
 body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 18px)}
 .bujo li.subnext small{display:block;font-size:.8rem;color:var(--soft);margin-top:2px}
+.panel .clbar + .actions{margin-top:14px}
 </style>
 </head>
 <body>
@@ -3905,7 +3906,8 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
         marks += `<path d="M${R2 - 2} ${y.toFixed(1)} h${-w * 0.12}" stroke="#3b3530" stroke-width="1" opacity=".55"/>${h > 160 ? `<text x="${R2 + 2}" y="${(y + 3).toFixed(1)}" font-size="${Math.max(7, w * 0.11)}" font-family="Mulish, sans-serif" font-weight="700" fill="#5E5650">${esc(money(k * j.step, j.cur))}</text>` : ""}`;
       }
     }
-    const cap2 = opts.cap === false ? "" : `<g class="vcap"><path d="M${L2 + 1} ${T - 2} q${(R2 - L2) / 2 - 1} -4 ${R2 - L2 - 2} 0 l.6 ${h * 0.06} q${-(R2 - L2) / 2} 3 ${-(R2 - L2) + 1} 0z" fill="#C9A227" stroke="#3b3530" stroke-width="1.3" stroke-linejoin="round"/><path d="M${L2 + 4} ${T + h * 0.025} h${R2 - L2 - 8}" stroke="#8B6B12" stroke-width="1" opacity=".6"/></g>`;
+    const bodyR = L2 + 2 + (R2 - L2) * 0.84 - w * 0.01, cL = L2 - 1, cW = bodyR + 1 - cL;
+    const cap2 = opts.cap === false ? "" : `<g class="vcap"><path d="M${cL} ${T - 2} q${cW / 2} -4 ${cW} 0 l.6 ${h * 0.06} q${-cW / 2 - 0.6} 3 ${-cW - 0.6} 0z" fill="#C9A227" stroke="#3b3530" stroke-width="1.3" stroke-linejoin="round"/><path d="M${cL + 3} ${T + h * 0.025} h${cW - 6}" stroke="#8B6B12" stroke-width="1" opacity=".6"/></g>`;
     const clip = `vclip-${esc(opts.id || seed2)}`;
     return `<defs><clipPath id="${clip}"><path d="${body2}"/></clipPath></defs>
     <path d="${body2}" fill="rgba(220,235,245,.4)" stroke="#3b3530" stroke-width="1.5" stroke-linejoin="round"/>

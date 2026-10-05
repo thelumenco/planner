@@ -74,7 +74,9 @@ export function jarArt(j, w, h, opts = {}){
   if (opts.markers !== false && j && j.goal > 0 && j.step > 0) { const n = Math.floor(j.goal/j.step), every = Math.max(1, Math.ceil(n/(h > 200 ? 12 : 6)));
     for (let k = 1; k <= n; k++) { if (k % every && k !== n) continue; const y = B - 6 - (B - 6 - topY)*(k*j.step/j.goal);
       marks += `<path d="M${R - 2} ${y.toFixed(1)} h${-w*.12}" stroke="#3b3530" stroke-width="1" opacity=".55"/>${h > 160 ? `<text x="${R + 2}" y="${(y + 3).toFixed(1)}" font-size="${Math.max(7, w*.11)}" font-family="Mulish, sans-serif" font-weight="700" fill="#5E5650">${esc(money(k*j.step, j.cur))}</text>` : ""}`; } }
-  const cap = opts.cap === false ? "" : `<g class="vcap"><path d="M${L + 1} ${T - 2} q${(R - L)/2 - 1} -4 ${R - L - 2} 0 l.6 ${h*.06} q${-(R - L)/2} 3 ${-(R - L) + 1} 0z" fill="#C9A227" stroke="#3b3530" stroke-width="1.3" stroke-linejoin="round"/><path d="M${L + 4} ${T + h*.025} h${R - L - 8}" stroke="#8B6B12" stroke-width="1" opacity=".6"/></g>`;
+  // the cap sits centred on the glass: the body's right edge is at L + 2 + .84(R - L) - .01w (see `body`)
+  const bodyR = L + 2 + (R - L)*.84 - w*.01, cL = L - 1, cW = bodyR + 1 - cL;
+  const cap = opts.cap === false ? "" : `<g class="vcap"><path d="M${cL} ${T - 2} q${cW/2} -4 ${cW} 0 l.6 ${h*.06} q${-cW/2 - .6} 3 ${-cW - .6} 0z" fill="#C9A227" stroke="#3b3530" stroke-width="1.3" stroke-linejoin="round"/><path d="M${cL + 3} ${T + h*.025} h${cW - 6}" stroke="#8B6B12" stroke-width="1" opacity=".6"/></g>`;
   const clip = `vclip-${esc(opts.id || seed)}`;
   return `<defs><clipPath id="${clip}"><path d="${body}"/></clipPath></defs>
     <path d="${body}" fill="rgba(220,235,245,.4)" stroke="#3b3530" stroke-width="1.5" stroke-linejoin="round"/>
