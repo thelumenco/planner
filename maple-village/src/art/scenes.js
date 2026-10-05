@@ -278,8 +278,8 @@ export function furn(kind, x, y){
     case "vaultjar": { const j = G.vault ? G.vault(x) : null;
       if (!j) return `<g opacity=".75">${sk(`<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" style="fill:rgba(220,235,245,.35)"/>`, `<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" stroke-dasharray="5 5"/><path d="M${x} ${y-152} v20 M${x-10} ${y-142} h20" stroke-width="2"/>`)}</g>`;
       return `<svg x="${x-34}" y="${y-300}" width="80" height="300" overflow="visible" class="${vaultFull(j) ? "vfull" : ""}">${vaultArt(j, 68, 300, {id: "f" + j.slot, sparkle: vaultFull(j), markers: false})}</svg>`; }
-    case "bankcounter": return sk(`<rect x="${x-90}" y="${y-44}" width="180" height="44" rx="4" style="fill:var(--wood)"/><rect x="${x-94}" y="${y-50}" width="188" height="8" rx="2" style="fill:#E7DCC2"/><rect x="${x-40}" y="${y-110}" width="80" height="60" rx="4" style="fill:rgba(255,253,246,.5)"/><circle cx="${x+64}" cy="${y-56}" r="6" style="fill:var(--honey)"/><rect x="${x-70}" y="${y-60}" width="26" height="10" rx="1" style="fill:#8E2C48"/>`,
-      `<rect x="${x-90}" y="${y-44}" width="180" height="44" rx="4"/><rect x="${x-94}" y="${y-50}" width="188" height="8" rx="2"/><rect x="${x-40}" y="${y-110}" width="80" height="60" rx="4"/>${[-24, -8, 8, 24].map(d => `<path d="M${x+d} ${y-110} v60"/>`).join("")}<path d="M${x-40} ${y-80} h80" opacity=".5"/><circle cx="${x+64}" cy="${y-56}" r="6"/><path d="M${x+64} ${y-62} v-3"/><rect x="${x-70}" y="${y-60}" width="26" height="10" rx="1"/><path d="M${x-84} ${y-22} h168" opacity=".4"/>`);
+    // the counter's front panel is drawn over the characters (foreArt), so Opal stands behind it
+    case "bankcounter": return `<rect x="${x-92}" y="${y-48}" width="184" height="48" fill="transparent"/>`;
     case "kindboard": { const n = G.kudos ? G.kudos() : 0, cols = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
       const spots = [[-36, -98], [-8, -102], [20, -97], [-30, -70], [0, -66], [26, -72], [-20, -44], [12, -44]];
       const notes = spots.slice(0, Math.min(8, n)).map(([dx, dy], i) => `<rect x="${x+dx}" y="${y+dy}" width="20" height="18" rx="1" transform="rotate(${(i % 3) - 1} ${x+dx+10} ${y+dy+9})" style="fill:${cols[i % 6]}"/>`).join("");
@@ -385,6 +385,13 @@ export function furn(kind, x, y){
       `<rect x="${x-90}" y="${y-40}" width="180" height="40" rx="4"/><path d="M${x-96} ${y-118} h192 l-8 18 h-176z"/><path d="M${x-80} ${y-118} l-3 18 M${x-50} ${y-118} l-2 18 M${x-20} ${y-118} l-1 18 M${x+10} ${y-118} v18 M${x+40} ${y-118} l1 18 M${x+70} ${y-118} l2 18" style="stroke:var(--rose)" stroke-width="6"/><path d="M${x-86} ${y-100} v60 M${x+86} ${y-100} v60"/><rect x="${x+30}" y="${y-64}" width="40" height="24" rx="3"/><text x="${x+50}" y="${y-48}" text-anchor="middle" font-family="Klee One,serif" font-size="11" stroke="none" style="fill:var(--line)">open</text>`);
   }
   return "";
+}
+// Things drawn over the characters, so people can stand behind them (the bank counter)
+export function foreArt(id){
+  if (id !== "bank") return "";
+  const s = stationsOf("bank").find(t => t.kind === "bankcounter"); if (!s) return ""; const x = s.x, y = s.y;
+  return sk(`<rect x="${x-90}" y="${y-44}" width="180" height="44" rx="4" style="fill:var(--wood)"/><rect x="${x-94}" y="${y-50}" width="188" height="8" rx="2" style="fill:#E7DCC2"/><circle cx="${x+64}" cy="${y-56}" r="6" style="fill:var(--honey)"/><rect x="${x-70}" y="${y-60}" width="26" height="10" rx="1" style="fill:#8E2C48"/>`,
+    `<rect x="${x-90}" y="${y-44}" width="180" height="44" rx="4"/><rect x="${x-94}" y="${y-50}" width="188" height="8" rx="2"/><path d="M${x-44} ${y-50} v-62 q44 -16 88 0 v62" fill="none" style="stroke:var(--honey)" stroke-width="3"/><path d="M${x-44} ${y-50} v-62 q44 -16 88 0 v62" fill="none"/><circle cx="${x+64}" cy="${y-56}" r="6"/><path d="M${x+64} ${y-62} v-3"/><rect x="${x-70}" y="${y-60}" width="26" height="10" rx="1"/><path d="M${x-84} ${y-22} h168" opacity=".4"/>`);
 }
 export function roomArt(id){
   const r = ROOMS[id], st = stationsOf(id);

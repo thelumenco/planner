@@ -1255,6 +1255,7 @@ body.kidmode .scenename span + span{display:none}
             </g></g></g>
           
           </g>
+          <g id="fore" pointer-events="none"></g>
         </svg>
       <div class="rain" id="rain" hidden aria-hidden="true"></div>
       <div class="mprops" id="mprops"></div>
@@ -3601,11 +3602,9 @@ body.kidmode .scenename span + span{display:none}
         if (!j) return `<g opacity=".75">${sk(`<rect x="${x - 26}" y="${y - 282}" width="52" height="280" rx="12" style="fill:rgba(220,235,245,.35)"/>`, `<rect x="${x - 26}" y="${y - 282}" width="52" height="280" rx="12" stroke-dasharray="5 5"/><path d="M${x} ${y - 152} v20 M${x - 10} ${y - 142} h20" stroke-width="2"/>`)}</g>`;
         return `<svg x="${x - 34}" y="${y - 300}" width="80" height="300" overflow="visible" class="${isFull(j) ? "vfull" : ""}">${jarArt2(j, 68, 300, { id: "f" + j.slot, sparkle: isFull(j), markers: false })}</svg>`;
       }
+      // the counter's front panel is drawn over the characters (foreArt), so Opal stands behind it
       case "bankcounter":
-        return sk(
-          `<rect x="${x - 90}" y="${y - 44}" width="180" height="44" rx="4" style="fill:var(--wood)"/><rect x="${x - 94}" y="${y - 50}" width="188" height="8" rx="2" style="fill:#E7DCC2"/><rect x="${x - 40}" y="${y - 110}" width="80" height="60" rx="4" style="fill:rgba(255,253,246,.5)"/><circle cx="${x + 64}" cy="${y - 56}" r="6" style="fill:var(--honey)"/><rect x="${x - 70}" y="${y - 60}" width="26" height="10" rx="1" style="fill:#8E2C48"/>`,
-          `<rect x="${x - 90}" y="${y - 44}" width="180" height="44" rx="4"/><rect x="${x - 94}" y="${y - 50}" width="188" height="8" rx="2"/><rect x="${x - 40}" y="${y - 110}" width="80" height="60" rx="4"/>${[-24, -8, 8, 24].map((d) => `<path d="M${x + d} ${y - 110} v60"/>`).join("")}<path d="M${x - 40} ${y - 80} h80" opacity=".5"/><circle cx="${x + 64}" cy="${y - 56}" r="6"/><path d="M${x + 64} ${y - 62} v-3"/><rect x="${x - 70}" y="${y - 60}" width="26" height="10" rx="1"/><path d="M${x - 84} ${y - 22} h168" opacity=".4"/>`
-        );
+        return `<rect x="${x - 92}" y="${y - 48}" width="184" height="48" fill="transparent"/>`;
       case "kindboard": {
         const n = G.kudos ? G.kudos() : 0, cols = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];
         const spots = [[-36, -98], [-8, -102], [20, -97], [-30, -70], [0, -66], [26, -72], [-20, -44], [12, -44]];
@@ -3804,6 +3803,16 @@ body.kidmode .scenename span + span{display:none}
         );
     }
     return "";
+  }
+  function foreArt(id) {
+    if (id !== "bank") return "";
+    const s = stationsOf("bank").find((t2) => t2.kind === "bankcounter");
+    if (!s) return "";
+    const x = s.x, y = s.y;
+    return sk(
+      `<rect x="${x - 90}" y="${y - 44}" width="180" height="44" rx="4" style="fill:var(--wood)"/><rect x="${x - 94}" y="${y - 50}" width="188" height="8" rx="2" style="fill:#E7DCC2"/><circle cx="${x + 64}" cy="${y - 56}" r="6" style="fill:var(--honey)"/><rect x="${x - 70}" y="${y - 60}" width="26" height="10" rx="1" style="fill:#8E2C48"/>`,
+      `<rect x="${x - 90}" y="${y - 44}" width="180" height="44" rx="4"/><rect x="${x - 94}" y="${y - 50}" width="188" height="8" rx="2"/><path d="M${x - 44} ${y - 50} v-62 q44 -16 88 0 v62" fill="none" style="stroke:var(--honey)" stroke-width="3"/><path d="M${x - 44} ${y - 50} v-62 q44 -16 88 0 v62" fill="none"/><circle cx="${x + 64}" cy="${y - 56}" r="6"/><path d="M${x + 64} ${y - 62} v-3"/><rect x="${x - 70}" y="${y - 60}" width="26" height="10" rx="1"/><path d="M${x - 84} ${y - 22} h168" opacity=".4"/>`
+    );
   }
   function roomArt(id) {
     const r = ROOMS[id], st6 = stationsOf(id);
@@ -4172,7 +4181,7 @@ body.kidmode .scenename span + span{display:none}
       job: "The banker",
       intro: "Welcome to the bank! I'm Opal. Six vaults, all yours. Every little deposit is a jewel in the jar, and yes, I polish them.",
       look: { skin: "#E8C3A2", hair: "#2E2622", hairStyle: "bun", top: "#7FA88A", bottom: "#3F4A3A", extra: "glasses" },
-      routine: [slot("9:00", "12:30", "bank", [260, 470]), slot("12:30", "13:30", "village", [[300, 214], [262, 230]]), slot("13:30", "17:30", "bank", [260, 470])],
+      routine: [slot("9:00", "12:30", "bank", [260, 500]), slot("12:30", "13:30", "village", [[300, 214], [262, 230]]), slot("13:30", "17:30", "bank", [260, 500])],
       lines: [
         "Every jewel counts. Even the little ones. Especially the little ones.",
         "Pay yourself first, then the rest. That's the banker's secret.",
@@ -11639,6 +11648,7 @@ Then tell chat "wind down" whenever you're ready.`
       S2.rainSaid = day;
       setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500);
     }
+    $("fore").innerHTML = outside() ? "" : foreArt(scene);
     $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "farm" ? farmArt() : roomArt(scene);
     const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", farm: "The garden" };
     $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;

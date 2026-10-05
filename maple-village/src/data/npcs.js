@@ -72,7 +72,7 @@ export const NPCS = [
     id: "opal", pitch: 1.0, name: "Opal", job: "The banker",
     intro: "Welcome to the bank! I'm Opal. Six vaults, all yours. Every little deposit is a jewel in the jar, and yes, I polish them.",
     look: {skin: "#E8C3A2", hair: "#2E2622", hairStyle: "bun", top: "#7FA88A", bottom: "#3F4A3A", extra: "glasses"},
-    routine: [slot("9:00", "12:30", "bank", [260, 470]), slot("12:30", "13:30", "village", [[300, 214], [262, 230]]), slot("13:30", "17:30", "bank", [260, 470])],
+    routine: [slot("9:00", "12:30", "bank", [260, 500]), slot("12:30", "13:30", "village", [[300, 214], [262, 230]]), slot("13:30", "17:30", "bank", [260, 500])],
     lines: ["Every jewel counts. Even the little ones. Especially the little ones.", "Pay yourself first, then the rest. That's the banker's secret.", "I polished the sapphires this morning. Don't tell the rubies.",
       "Slow and steady fills a jar. Promise.", "A full jar is the prettiest thing in this town."],
     away: "Opal's on her lunch break. The vaults are always open to you.",

@@ -478,3 +478,4 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - A full jar sparkles; Maple announces it, and a trophy is earned each time a jar fills.
   - Opal the banker (9–5:30, lunch 12:30–1:30) stands at the counter, which shows every vault at a glance with a total.
   - Chat action `save` {vault, amount}. Places "bank", "vaults" and "savings" walk there.
+- A foreground layer (`#fore`, after `#actors` in the world SVG; `foreArt(scene)` in scenes.js) draws things characters stand behind. The bank counter's front panel and brass arch live there, so Opal (now at [260,500]) stands behind the counter instead of on top of it.
