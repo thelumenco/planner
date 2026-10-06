@@ -317,4 +317,5 @@ details[open] summary::after{content:"–"}
 .bedcard{position:relative;max-width:340px;text-align:center;background:#FFFDF6;color:#2F2B28;border-radius:14px;padding:24px 22px;box-shadow:0 20px 40px -20px rgba(0,0,0,.6);--ink:#2F2B28;--soft:#8A8279}
 .bedcard h2{font-family:"Klee One",serif;font-weight:600;font-size:1.8rem;margin:0 0 8px}
 .bedcard .bzz{font-family:"Klee One",serif;color:#8A8279;margin:0;letter-spacing:.3em}
+.bedcard #bedUp{color:#FFFDF6;background:#3B3550;border-color:#3B3550;margin-top:6px}
 body.bedlocked{overflow:hidden}
