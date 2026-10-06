@@ -196,7 +196,6 @@ const SHELLS = {
       `<rect x="40" y="30" width="180" height="90" rx="3"/>`)}
     ${sk(`<rect x="250" y="20" width="230" height="118" rx="3" style="fill:#B9C3CC"/>${rows(8, i => `<rect x="250" y="${24 + i*14}" width="230" height="3" style="fill:#9AA6B1"/>`)}`, `<rect x="250" y="20" width="230" height="118" rx="3"/>`)}
     ${sk(`<rect x="200" y="6" width="120" height="6" rx="3" style="fill:#FFFDF6"/>`, `<rect x="200" y="6" width="120" height="6" rx="3"/>`)}
-    ${sk(`<path d="M0 316 L28 328 L28 428 L0 440z" style="fill:#F8EED8"/>`, `<path d="M0 316 L28 328 L28 428 L0 440z"/><circle cx="23" cy="384" r="1.8"/>`)}
     ${plant(490, 610, .8)}`,
   // the home office: soft green walls, a big window, a pinboard, the way back into the living room on the east wall
   office: () => `<rect width="520" height="640" style="fill:#D9C3A0"/>
@@ -204,7 +203,6 @@ const SHELLS = {
     ${wallBase("#EEF1E6", "var(--sage)")}${skirting}
     ${sk(`<rect x="200" y="28" width="128" height="86" rx="4" style="fill:#CFE0EE"/><circle cx="236" cy="96" r="16" style="fill:#9EBE8C"/>`, `<rect x="200" y="28" width="128" height="86" rx="4"/><path d="M264 28 v86 M200 70 h128"/>`)}
     ${sk(`<rect x="372" y="34" width="110" height="74" rx="3" style="fill:#D9B48A"/><rect x="384" y="44" width="26" height="22" style="fill:#FFF3B8"/><rect x="420" y="48" width="28" height="20" style="fill:#F4C7CF"/><rect x="398" y="74" width="30" height="22" style="fill:#C3CDEE"/>`, `<rect x="372" y="34" width="110" height="74" rx="3"/>`)}
-    ${sk(`<path d="M520 316 L492 328 L492 428 L520 440z" style="fill:#F8EED8"/>`, `<path d="M520 316 L492 328 L492 428 L520 440z"/><circle cx="497" cy="384" r="1.8"/>`)}
     ${plant(30, 610, .9)}${plant(300, 610, .8)}`,
   // the cellar door: stone walls, an arched brick ceiling line, warm lamps, and the way back on the east wall
   cellar: () => `<rect width="520" height="640" style="fill:#B98E6A"/>

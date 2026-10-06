@@ -576,6 +576,11 @@ export function roomArt(id){
     if (sl) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".32" pointer-events="none"/>`;
     return h;
   }
+  // the home office and the garage: their doors (not a mat) lead back into the living room
+  if (id === "office" || id === "garage") { const e = id === "office", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx = e ? 486 : 34;
+    h += `<g data-exit="1" aria-label="Back to the living room"><ellipse class="hov" cx="${hx}" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>
+      ${sk(`<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z" style="fill:#F8EED8"/>`, `<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z"/><circle cx="${e ? 497 : 23}" cy="384" r="1.8"/>`)}${tapeLabel(e ? 456 : 64, 296, "Living room", "var(--card)", 11)}</g>`;
+    return h; }
   h += `<g data-exit="1" aria-label="Exit"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
     ${sk(`<rect x="214" y="600" width="92" height="26" rx="8" style="fill:${r.trim}"/>`, `<rect x="214" y="600" width="92" height="26" rx="8"/><path d="M222 606 h76 M222 620 h76" stroke-dasharray="3 4" opacity=".6"/>`)}
     <text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none">Exit</text></g>`;

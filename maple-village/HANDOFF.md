@@ -885,3 +885,23 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - Rooms off another room can also be left by the Exit mat at the bottom (as well as their side door).
 - **The car** is a cream convertible (`GOALS.car`, 3,500, no garage needed; the scooter is 800). While driving, Maple rides in the back, and Evan does too when he's with Mel and awake (`#mel.withEvan`).
   - Their own sprites are hidden while the car moves (`mel.wasDriving`, `mel.carEvan`), and they hop out beside her when she stops.
+
+### Round 66: the monthly wine club at the cellar door
+- `wineClubOn` / `wineClubNow` / `clubMembers` / `clubSlot` in tours.js: the first Friday of every month, 6 to 9pm, once the cellar door is built. Eight members are picked each month from `CLUB_POOL` (regulars, the orchard and vineyard hands, Mum, Dad, Marcus and Angelina) and wander the cellar (`CLUB_WALK`).
+  - npcs.js gates the overlay on `cellarBuilt()`. It comes after dinner and date night in `slotAt`.
+- **Sales** (`sellTick`): club minutes sell bottles at .04 and glasses at .03 off the shop's shelves.
+  - With Mel in the cellar (`opts.club`), that's ×1.5 on the live minute, and the coins go to her; otherwise they go to the honesty box.
+  - Roughly 7 bottles and 5 glasses a club, if the shelves are stocked.
+- **Hosting:** tapping the tasting bar during the club (3 xp once a club) has a couple of members chime in.
+- Notices: a reminder from noon on club day, and a welcome line when walking into the cellar during it.
+- Who's where shows "the wine club at the cellar door" and a notice line.
+
+### Round 67: wear today's outfit, door exits for the office and garage, a roomier undo toast
+- **Wearing an outfit:** each wardrobe card has "Wear this", which opens a checklist of its pieces, all ticked. "Put it on" stores `F.wear` ({day, label, and the ticked fields}, kept for the day).
+  - `applyWear` (core.js, called from `dressMel`) uses `colourOf` (garments.js, now exported).
+  - The top and bottom recolour `--tank` and `--denim` on `#mel`.
+  - A dress (`#oDress`), layer (`#oLayer` plus `.osleeve`), shoes (`.oshoe`), bag (`#oBag`), earrings (`#oEar`, gold, silver or pearl) and sunglasses (`#oShades`, outdoors only) are overlays added to Mel's sprite in index.html.
+  - Hair "down" shows `#oHairDown` and hides the ponytail (`#mel.hairdown`). Pyjamas in her room hide the outfit.
+  - "Back to my usual clothes" clears it. `outfitsToday(F)` lists the stylist's three plus any extras.
+- **Office and garage:** no Exit mat; their doors (office: east wall, garage: west wall, labelled "Living room") are the `data-exit` way back, like Mel's room.
+- **Undo toast:** rounded rectangle (22px corners), more padding, `width: max-content` up to 460px, the message wraps inside, and it sits 96px up so it clears the quest note.

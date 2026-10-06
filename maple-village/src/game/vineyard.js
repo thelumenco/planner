@@ -6,7 +6,7 @@
 import { esc, plain, H, now } from "../util.js";
 import { NPCS } from "../data/npcs.js";
 import { ITEMS } from "../data/items.js";
-import { eventNow } from "./tours.js";
+import { eventNow, wineClubNow } from "./tours.js";
 import { icon } from "../art/icons.js";
 import { DISHES, TAPAS } from "./kitchen.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
@@ -129,7 +129,7 @@ export function serveGuest(F, opts = {}){
   const b = opts.tourist && Math.random() < .5 && (v.shelf.find(x => x.id === s.id && x.n > 0) || v.shelf.find(x => x.n > 0));
   if (b) { b.n--; out.bottle = b.name; out.coins += b.price; v.sold++; out.bottles = 1; }
   v.shelf = v.shelf.filter(x => x.n > 0 || x.open > 0);
-  if (opts.serving || opts.stall) F.coins += out.coins; else v.box += out.coins;
+  if (opts.serving || opts.stall || opts.club) F.coins += out.coins; else v.box += out.coins;
   v.glasses++; v.plates += out.plates;
   const day = new Date(Date.now() + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
   v.today.glasses++; v.today.plates = (v.today.plates || 0) + out.plates; v.today.coins += out.coins; v.today.bottles += out.bottles || 0;
@@ -157,6 +157,11 @@ export function sellTick(F, opts = {}){
     if (ev && ev.wine) { const st = opts.stall && k === 1 ? 3 : 1, stock = v.shelf.filter(x => x.n > 0);
       if (stock.length && Math.random() < .012*st) { const b = stock[Math.floor(Math.random()*stock.length)]; b.n--; out.bottles++; out.coins += b.price; out.market = (out.market || 0) + 1; }
       if (Math.random() < .008*st) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.market = (out.market || 0) + 1; } } }
+    // the monthly wine club in the cellar door (first Friday, 6 to 9pm): members buy bottles and glasses off the same
+    // shelves; with Mel there hosting they buy half as much again, and pay her
+    if (F.goals && F.goals.cellar && wineClubNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm)) { const hst = opts.club && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
+      if (stock.length && Math.random() < .04*hst) { const b = stock[Math.floor(Math.random()*stock.length)]; b.n--; out.bottles++; out.coins += b.price; out.club = (out.club || 0) + 1; }
+      if (Math.random() < .03*hst) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.club = (out.club || 0) + 1; } } }
     if (hm < 10*60 || hm >= 22*60) continue;
     const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); const crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0);
     if (!onShelf.length && !open && !platesLeft(v) && !crate.length) continue;

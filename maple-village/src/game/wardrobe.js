@@ -12,18 +12,27 @@ export const todayDoc = () => { const d = outfitDoc(); return d && d.day === day
 const extras = F => F.outfits && F.outfits.day === dayKey() ? F.outfits.list || [] : [];
 const inventory = () => { const d = outfitDoc(); return d && d.wardrobe && typeof d.wardrobe === "object" ? d.wardrobe : null; };
 
+// every outfit hanging in the wardrobe today: the stylist's three, then any new ones asked for
+export const outfitsToday = F => [...((todayDoc() || {}).options || []).slice(0, 3), ...extras(F)];
+const FIELD_NAME = Object.fromEntries(FIELDS);
 function card(o, i){
   if (!o) return "";
   const rows = FIELDS.filter(([k]) => o[k]).map(([k, n]) => `<li><span class="gpic">${garment(k === "layer" ? "layer" : k, o[k])}</span><span><small>${n}</small>${esc(clean(o[k]))}</span></li>`).join("");
-  return `<div class="outfit"><p class="olabel">${esc(clean(o.label, 50) || `Option ${i + 1}`)}</p><ul>${rows}</ul>${o.why ? `<p class="owhy">${esc(clean(o.why, 220))}</p>` : ""}</div>`;
+  return `<div class="outfit"><p class="olabel">${esc(clean(o.label, 50) || `Option ${i + 1}`)}</p><ul>${rows}</ul>${o.why ? `<p class="owhy">${esc(clean(o.why, 220))}</p>` : ""}<div class="actions"><button class="btn small primary" data-wear="${i}">Wear this</button></div></div>`;
 }
 export function wardrobePanel(F, st){
   const d = todayDoc(), more = extras(F), inv = inventory();
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The wardrobe</h2>`;
   if (d) h += `<p class="sub">${[d.weather && esc(clean(d.weather, 60)), d.on && esc(clean(d.on, 160))].filter(Boolean).join(" · ") || "Today's picks from your stylist."}</p>`;
   else h += `<p class="sub">Your stylist hasn't been by yet today. The morning briefing hangs three outfits in here.</p>`;
-  const all = [...((d && d.options) || []).slice(0, 3), ...more];
-  if (all.length) h += `<div class="outfits">${all.map(card).join("")}</div>`;
+  const all = outfitsToday(F), w = F.wear && F.wear.day === dayKey() ? F.wear : null;
+  if (w) h += `<p class="muted">Wearing today: <b>${esc(w.label || "your outfit")}</b>. <button class="btn small alt" data-wearoff="1">Back to my usual clothes</button></p>`;
+  // putting one on: tick off what to wear (everything to start with), then confirm
+  const pick = st.pick != null ? all[st.pick] : null;
+  if (pick) { const fs = FIELDS.filter(([k]) => pick[k]);
+    h += `<div class="outfit wearpick"><p class="olabel">Put on ${esc(clean(pick.label, 50) || "this outfit")}</p><p class="muted">Untick anything you're skipping.</p><ul>${fs.map(([k, n]) => `<li><label><input type="checkbox" data-wearf="${k}" checked> <span class="gpic">${garment(k === "layer" ? "layer" : k, pick[k])}</span><span><small>${n}</small>${esc(clean(pick[k]))}</span></label></li>`).join("")}</ul>
+      <div class="actions"><button class="btn primary" data-wearok="${st.pick}">Put it on</button><button class="btn alt small" data-wearback="1">Back</button></div></div>`; }
+  else if (all.length) h += `<div class="outfits">${all.map(card).join("")}</div>`;
   h += `<p class="eyebrow" style="margin:14px 0 6px">Want something different?</p>`;
   if (!inv) h += `<p class="muted">New outfits need your wardrobe list, which comes with the morning drop-off.</p>`;
   else if (!st.sample) h += `<p class="muted">New outfits need Claude, which isn't reachable from this view just now.</p>`;

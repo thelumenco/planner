@@ -262,3 +262,16 @@ export function dateSlot(id, day, hm){
   if ((id !== "marcus" && id !== "angelina") || !DATE_DAYS.includes(dow(day)) || hm < DATE_FROM || hm >= DATE_TO) return null;
   return {from: DATE_FROM, to: DATE_TO, scene: "wineshop", at: id === "marcus" ? SEAT.c : SEAT.d, act: "sit", dir: id === "marcus" ? 1 : -1, date: true};
 }
+
+// The wine club (once the cellar door is built): the first Friday of every month, 6 to 9pm, eight members gather in
+// the cellar door to taste and buy. They're picked each month from the regulars and the family.
+export const CLUB_FROM = 18*60, CLUB_TO = 21*60;
+const CLUB_POOL = ["hana", "okada", "juniper", "bo", "lin", "opal", "theo", "mum", "dad", "marcus", "angelina", "farid", "mei", "marco"];
+const CLUB_WALK = [[200, 360], [300, 380], [380, 430], [250, 460], [420, 340], [170, 430], [330, 560], [200, 560]];
+export const wineClubOn = day => { const d = new Date(day + "T00:00:00Z"); return d.getUTCDay() === 5 && d.getUTCDate() <= 7; };
+export const wineClubNow = (day, hm) => wineClubOn(day) && hm >= CLUB_FROM && hm < CLUB_TO;
+export const clubMembers = day => wineClubOn(day) ? groupFor(day + ":club", 8, [], CLUB_POOL) : [];
+export function clubSlot(id, day, hm){
+  if (!wineClubNow(day, hm) || !clubMembers(day).includes(id)) return null;
+  return {from: CLUB_FROM, to: CLUB_TO, scene: "cellar", wander: CLUB_WALK, club: true};
+}

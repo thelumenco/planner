@@ -958,7 +958,9 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 .recrow{align-items:center;gap:10px;margin-top:12px}.recrow input[type=range]{flex:1;max-width:220px}
 @media (prefers-reduced-motion:reduce){.record.on svg{animation:none}}
 /* undo bar after a delete */
-.undobar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:14px;background:#2F2B28;color:#FFFDF6;border-radius:999px;padding:9px 10px 9px 18px;font-size:.9rem;box-shadow:0 10px 24px -12px rgba(0,0,0,.5);max-width:calc(100% - 32px)}
+.undobar{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:14px;background:#2F2B28;color:#FFFDF6;border-radius:22px;padding:12px 12px 12px 20px;font-size:.9rem;line-height:1.35;box-shadow:0 10px 24px -12px rgba(0,0,0,.5);width:max-content;max-width:min(calc(100% - 32px), 460px);box-sizing:border-box}
+.undobar #undoMsg{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
+.undobar button{flex:none}
 .undobar[hidden]{display:none}
 .undobar button{background:var(--butter);color:#2F2B28;border:0;border-radius:999px;padding:5px 14px;font-weight:800;cursor:pointer}
 /* client table */
@@ -1338,6 +1340,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 /* big goals: how much is saved towards one */
 .goalbar{height:12px;border-radius:999px;background:rgba(60,40,30,.12);overflow:hidden;margin:10px 0 4px;border:1.2px solid var(--line)}
 .goalbar span{display:block;height:100%;background:var(--honey);border-radius:999px}
+#mel.hairdown .pony{display:none}
+
+/* the wardrobe: ticking off what to wear */
+.wearpick ul li label{display:flex;align-items:center;gap:8px;width:100%;cursor:pointer}
+.wearpick input[type=checkbox]{width:18px;height:18px;accent-color:var(--sage)}
+.wearpick ul li{display:block}
+.wearpick ul li label > span:last-child{flex:1;min-width:0}
 </style>
 </head>
 <body>
@@ -1400,14 +1409,19 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 <g class="ch" id="mel" data-ent="mel"><g class="flip"><g filter="url(#wob)">
               <ellipse cx="0" cy="0" rx="11" ry="3.5" fill="rgba(60,40,30,.18)"/>
               <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
-                <g class="legL"><rect x="-6.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="-3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/></g>
-                <g class="legR"><rect x="1.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/></g>
+                <g class="legL"><rect x="-6.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="-3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><ellipse class="oshoe" cx="-3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
+                <g class="legR"><rect x="1.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><ellipse class="oshoe" cx="3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
                 <path d="M-8.6 -23 h17.2 l1 9.5 h-8 l-1.6 -3 l-1.6 3 h-8z" style="fill:var(--denim)"/>
-                <g class="armL"><rect x="-12" y="-34" width="4.2" height="13.5" rx="2.1" style="fill:var(--skin)"/></g>
-                <g class="armR"><rect x="7.8" y="-34" width="4.2" height="13.5" rx="2.1" style="fill:var(--skin)"/></g>
+                <g class="armL"><rect x="-12" y="-34" width="4.2" height="13.5" rx="2.1" style="fill:var(--skin)"/><rect class="osleeve" x="-12" y="-34" width="4.2" height="10.5" rx="2.1" style="display:none"/></g>
+                <g class="armR"><rect x="7.8" y="-34" width="4.2" height="13.5" rx="2.1" style="fill:var(--skin)"/><rect class="osleeve" x="7.8" y="-34" width="4.2" height="10.5" rx="2.1" style="display:none"/></g>
                 <rect x="-2.2" y="-40" width="4.4" height="6" style="fill:var(--skin)" stroke="none"/>
                 <path d="M-8.2 -36 q8.2 3.5 16.4 0 l0.8 13.6 h-18z" style="fill:var(--tank)"/>
                 <path d="M-5.4 -36 v-3 M5.4 -36 v-3" fill="none"/>
+                <!-- today's outfit from the wardrobe (core.js applyWear): a dress, a layer, a bag -->
+                <path id="oDress" d="M-8.2 -36 q8.2 3.5 16.4 0 l1.2 12 l3.6 18 h-25.6 l3.6 -18z" style="display:none"/>
+                <path id="oLayer" d="M-8.6 -36.2 l3.4 1.4 l-.4 23 h-3.8z M8.6 -36.2 l-3.4 1.4 l.4 23 h3.8z" style="display:none"/>
+                <g id="oBag" style="display:none"><path d="M-5 -35.5 L9.5 -21" fill="none" stroke-width="1"/><rect x="7" y="-22.5" width="7.5" height="6.5" rx="1.6"/></g>
+                <path id="oHairDown" d="M-11.2 -46 c-1 -12 5 -16 11.2 -16 c7 0 12.2 4 11 16 l1.2 15 l-5 0 l-1 -13 c-4 -2 -11.4 -2 -15.4 -5 l-1 18 l-5 0z" style="fill:var(--hair);display:none"/>
                 <g class="pony"><path d="M4 -57 c9 -7 17 0 14 9 c-2 6 -7 9 -5.5 15 c-5 -3 -9.5 -10 -6.5 -16 c-3.5 2.5 -6 1 -5 -3z" style="fill:var(--hair)"/></g>
                 <circle cx="0" cy="-46" r="10.6" style="fill:var(--skin)"/>
                 <path d="M-10.8 -45 c-1.5 -10 4.5 -15.5 11 -15.5 c7 0 12.6 5 10.8 14 c-2.6 -4.5 -6 -6 -9.2 -5 l1 -3 c-3 3.2 -7.2 4.2 -11 3.2 c-1.2 1.8 -2 4 -2.6 6.3z" style="fill:var(--hair)"/>
@@ -1418,6 +1432,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
                 <ellipse cx="-6.4" cy="-40.6" rx="2" ry="1.2" style="fill:var(--rose)" opacity=".75" stroke="none"/>
                 <ellipse cx="6.4" cy="-40.6" rx="2" ry="1.2" style="fill:var(--rose)" opacity=".75" stroke="none"/>
                 <path d="M-1.6 -40.4 q1.6 1.4 3.2 0" fill="none" stroke-width="1"/>
+                <g id="oEar" style="display:none" stroke-width=".8"><circle cx="-10.6" cy="-41.6" r="1.4"/><circle cx="10.6" cy="-41.6" r="1.4"/></g>
+                <g id="oShades" style="display:none"><rect x="-8.2" y="-46.6" width="6.6" height="4.6" rx="1.8" style="fill:#2F2B28"/><rect x="1.6" y="-46.6" width="6.6" height="4.6" rx="1.8" style="fill:#2F2B28"/><path d="M-1.6 -44.6 h3.2" fill="none"/></g>
                 <g id="melPj" style="display:none"><path d="M-8.2 -36 q8.2 3.5 16.4 0 l0.8 13.6 h-18z" style="fill:#3B4A86"/><path d="M-8.6 -23 h17.2 l1 9.5 h-8 l-1.6 -3 l-1.6 3 h-8z" style="fill:#3B4A86"/><path d="M0 -34.4 v11 M-7.6 -24 h15.2" fill="none" style="stroke:#FFFDF6" stroke-width=".9"/></g>
                 <g id="melScarf" style="display:none"><path d="M-6 -37.5 q6 3 12 0 l-1 2.6 q-5 2 -10 0z" style="fill:var(--navy,#2E3A70)"/><path d="M3 -35.5 l3 6 l-3 -1 l-1 3 l-1.6 -6z" style="fill:var(--navy,#2E3A70)"/></g>
                 <g id="melBow" style="display:none"><path d="M4.6 -57.5 l-5.4 -3.6 v7.2z M4.6 -57.5 l5.4 -3.6 v7.2z" style="fill:#8E2C48"/><circle cx="4.6" cy="-57.5" r="1.7" style="fill:#6E1F36"/></g>
@@ -2381,7 +2397,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     // the cellar door (a big goal): Mel's wine wall, the tasting bar, barrel racks, a high table
     cellar: { name: "The cellar door", wall: "#E9DCCB", trim: "#6B3A2A", noBoard: true, pos: { W: [130, 262], B: [340, 262], R: [140, 500], T: [360, 500] }, stations: [
       ["winewall", "Wine wall", "W", "winewall", null, "A bottle of every wine you've made. It's getting full.", 36],
-      ["flight", "Tasting bar", "B", "tastebar", null, "The tasting bar. Pour yourself a flight.", 34],
+      ["flight", "Tasting bar", "B", "tastebar", null, "The tasting bar. Pour yourself a flight (and on the first Friday of the month, host the wine club).", 34],
       ["racks", "Barrel racks", "R", "barrelrack", null, "Barrels resting, quietly getting better.", 30],
       ["ctable", "High table", "T", "table", null, "A high table for tastings. Visitors linger here.", 40]
     ] },
@@ -2927,7 +2943,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     )}
     ${sk(`<rect x="250" y="20" width="230" height="118" rx="3" style="fill:#B9C3CC"/>${rows(8, (i) => `<rect x="250" y="${24 + i * 14}" width="230" height="3" style="fill:#9AA6B1"/>`)}`, `<rect x="250" y="20" width="230" height="118" rx="3"/>`)}
     ${sk(`<rect x="200" y="6" width="120" height="6" rx="3" style="fill:#FFFDF6"/>`, `<rect x="200" y="6" width="120" height="6" rx="3"/>`)}
-    ${sk(`<path d="M0 316 L28 328 L28 428 L0 440z" style="fill:#F8EED8"/>`, `<path d="M0 316 L28 328 L28 428 L0 440z"/><circle cx="23" cy="384" r="1.8"/>`)}
     ${plant(490, 610, 0.8)}`,
     // the home office: soft green walls, a big window, a pinboard, the way back into the living room on the east wall
     office: () => `<rect width="520" height="640" style="fill:#D9C3A0"/>
@@ -2935,7 +2950,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ${wallBase("#EEF1E6", "var(--sage)")}${skirting}
     ${sk(`<rect x="200" y="28" width="128" height="86" rx="4" style="fill:#CFE0EE"/><circle cx="236" cy="96" r="16" style="fill:#9EBE8C"/>`, `<rect x="200" y="28" width="128" height="86" rx="4"/><path d="M264 28 v86 M200 70 h128"/>`)}
     ${sk(`<rect x="372" y="34" width="110" height="74" rx="3" style="fill:#D9B48A"/><rect x="384" y="44" width="26" height="22" style="fill:#FFF3B8"/><rect x="420" y="48" width="28" height="20" style="fill:#F4C7CF"/><rect x="398" y="74" width="30" height="22" style="fill:#C3CDEE"/>`, `<rect x="372" y="34" width="110" height="74" rx="3"/>`)}
-    ${sk(`<path d="M520 316 L492 328 L492 428 L520 440z" style="fill:#F8EED8"/>`, `<path d="M520 316 L492 328 L492 428 L520 440z"/><circle cx="497" cy="384" r="1.8"/>`)}
     ${plant(30, 610, 0.9)}${plant(300, 610, 0.8)}`,
     // the cellar door: stone walls, an arched brick ceiling line, warm lamps, and the way back on the east wall
     cellar: () => `<rect width="520" height="640" style="fill:#B98E6A"/>
@@ -4609,6 +4623,20 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (id !== "marcus" && id !== "angelina" || !DATE_DAYS.includes(dow(day)) || hm2 < DATE_FROM || hm2 >= DATE_TO) return null;
     return { from: DATE_FROM, to: DATE_TO, scene: "wineshop", at: id === "marcus" ? SEAT.c : SEAT.d, act: "sit", dir: id === "marcus" ? 1 : -1, date: true };
   }
+  var CLUB_FROM = 18 * 60;
+  var CLUB_TO = 21 * 60;
+  var CLUB_POOL = ["hana", "okada", "juniper", "bo", "lin", "opal", "theo", "mum", "dad", "marcus", "angelina", "farid", "mei", "marco"];
+  var CLUB_WALK = [[200, 360], [300, 380], [380, 430], [250, 460], [420, 340], [170, 430], [330, 560], [200, 560]];
+  var wineClubOn = (day) => {
+    const d = /* @__PURE__ */ new Date(day + "T00:00:00Z");
+    return d.getUTCDay() === 5 && d.getUTCDate() <= 7;
+  };
+  var wineClubNow = (day, hm2) => wineClubOn(day) && hm2 >= CLUB_FROM && hm2 < CLUB_TO;
+  var clubMembers = (day) => wineClubOn(day) ? groupFor(day + ":club", 8, [], CLUB_POOL) : [];
+  function clubSlot(id, day, hm2) {
+    if (!wineClubNow(day, hm2) || !clubMembers(day).includes(id)) return null;
+    return { from: CLUB_FROM, to: CLUB_TO, scene: "cellar", wander: CLUB_WALK, club: true };
+  }
 
   // src/art/wine.js
   var INK3 = `stroke="#3b3530" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"`;
@@ -5248,7 +5276,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       out.bottles = 1;
     }
     v.shelf = v.shelf.filter((x) => x.n > 0 || x.open > 0);
-    if (opts.serving || opts.stall) F2.coins += out.coins;
+    if (opts.serving || opts.stall || opts.club) F2.coins += out.coins;
     else v.box += out.coins;
     v.glasses++;
     v.plates += out.plates;
@@ -5321,6 +5349,29 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
             out.glasses++;
             out.coins += Math.max(1, Math.round(g.price / 4));
             out.market = (out.market || 0) + 1;
+          }
+        }
+      }
+      if (F2.goals && F2.goals.cellar && wineClubNow(new Date(at + off + 6 * H).toISOString().slice(0, 10), hm2)) {
+        const hst = opts.club && k === 1 ? 1.5 : 1, stock2 = v.shelf.filter((x) => x.n > 0);
+        if (stock2.length && Math.random() < 0.04 * hst) {
+          const b = stock2[Math.floor(Math.random() * stock2.length)];
+          b.n--;
+          out.bottles++;
+          out.coins += b.price;
+          out.club = (out.club || 0) + 1;
+        }
+        if (Math.random() < 0.03 * hst) {
+          const g = v.shelf.find((x) => x.open > 0) || v.shelf.find((x) => x.n > 0);
+          if (g) {
+            if (!g.open) {
+              g.n--;
+              g.open = GLASSES;
+            }
+            g.open--;
+            out.glasses++;
+            out.coins += Math.max(1, Math.round(g.price / 4));
+            out.club = (out.club || 0) + 1;
           }
         }
       }
@@ -7369,6 +7420,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ${sk(`<path d="M520 346 L492 358 L492 456 L520 466z" style="fill:var(--blush)"/>`, `<path d="M520 346 L492 358 L492 456 L520 466z"/><circle cx="497" cy="410" r="1.8"/>`)}${tapeLabel(470, 296, "To the house", "var(--card)", 11)}</g>`;
       h += potsIn("room");
       if (sl) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".32" pointer-events="none"/>`;
+      return h;
+    }
+    if (id === "office" || id === "garage") {
+      const e = id === "office", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx = e ? 486 : 34;
+      h += `<g data-exit="1" aria-label="Back to the living room"><ellipse class="hov" cx="${hx}" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>
+      ${sk(`<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z" style="fill:#F8EED8"/>`, `<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z"/><circle cx="${e ? 497 : 23}" cy="384" r="1.8"/>`)}${tapeLabel(e ? 456 : 64, 296, "Living room", "var(--card)", 11)}</g>`;
       return h;
     }
     h += `<g data-exit="1" aria-label="Exit"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
@@ -9795,18 +9852,26 @@ Quests finished today: ${S3.doneIds.length}`;
     const d = outfitDoc();
     return d && d.wardrobe && typeof d.wardrobe === "object" ? d.wardrobe : null;
   };
+  var outfitsToday = (F2) => [...((todayDoc() || {}).options || []).slice(0, 3), ...extras(F2)];
+  var FIELD_NAME = Object.fromEntries(FIELDS);
   function card(o, i) {
     if (!o) return "";
     const rows2 = FIELDS.filter(([k]) => o[k]).map(([k, n]) => `<li><span class="gpic">${garment(k === "layer" ? "layer" : k, o[k])}</span><span><small>${n}</small>${esc(clean(o[k]))}</span></li>`).join("");
-    return `<div class="outfit"><p class="olabel">${esc(clean(o.label, 50) || `Option ${i + 1}`)}</p><ul>${rows2}</ul>${o.why ? `<p class="owhy">${esc(clean(o.why, 220))}</p>` : ""}</div>`;
+    return `<div class="outfit"><p class="olabel">${esc(clean(o.label, 50) || `Option ${i + 1}`)}</p><ul>${rows2}</ul>${o.why ? `<p class="owhy">${esc(clean(o.why, 220))}</p>` : ""}<div class="actions"><button class="btn small primary" data-wear="${i}">Wear this</button></div></div>`;
   }
   function wardrobePanel(F2, st6) {
     const d = todayDoc(), more = extras(F2), inv = inventory();
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The wardrobe</h2>`;
     if (d) h += `<p class="sub">${[d.weather && esc(clean(d.weather, 60)), d.on && esc(clean(d.on, 160))].filter(Boolean).join(" · ") || "Today's picks from your stylist."}</p>`;
     else h += `<p class="sub">Your stylist hasn't been by yet today. The morning briefing hangs three outfits in here.</p>`;
-    const all = [...(d && d.options || []).slice(0, 3), ...more];
-    if (all.length) h += `<div class="outfits">${all.map(card).join("")}</div>`;
+    const all = outfitsToday(F2), w = F2.wear && F2.wear.day === dayKey() ? F2.wear : null;
+    if (w) h += `<p class="muted">Wearing today: <b>${esc(w.label || "your outfit")}</b>. <button class="btn small alt" data-wearoff="1">Back to my usual clothes</button></p>`;
+    const pick3 = st6.pick != null ? all[st6.pick] : null;
+    if (pick3) {
+      const fs = FIELDS.filter(([k]) => pick3[k]);
+      h += `<div class="outfit wearpick"><p class="olabel">Put on ${esc(clean(pick3.label, 50) || "this outfit")}</p><p class="muted">Untick anything you're skipping.</p><ul>${fs.map(([k, n]) => `<li><label><input type="checkbox" data-wearf="${k}" checked> <span class="gpic">${garment(k === "layer" ? "layer" : k, pick3[k])}</span><span><small>${n}</small>${esc(clean(pick3[k]))}</span></label></li>`).join("")}</ul>
+      <div class="actions"><button class="btn primary" data-wearok="${st6.pick}">Put it on</button><button class="btn alt small" data-wearback="1">Back</button></div></div>`;
+    } else if (all.length) h += `<div class="outfits">${all.map(card).join("")}</div>`;
     h += `<p class="eyebrow" style="margin:14px 0 6px">Want something different?</p>`;
     if (!inv) h += `<p class="muted">New outfits need your wardrobe list, which comes with the morning drop-off.</p>`;
     else if (!st6.sample) h += `<p class="muted">New outfits need Claude, which isn't reachable from this view just now.</p>`;
@@ -12148,8 +12213,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var routineNow = (def) => routineAt(def, dayKey(), sgHM());
   function slotAt(def, day, t2, live2) {
-    return live2 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || eventSlot(def.id, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || routineAt(def, day, t2);
+    return live2 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || eventSlot(def.id, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || routineAt(def, day, t2);
   }
+  var cellarBuilt = () => !!(api3 && api3.F().goals && api3.F().goals.cellar);
   var slotNow = (def) => slotAt(def, dayKey(), sgHM(), true);
   var whereIs = (id) => {
     const d = NPCS.find((n) => n.id === id), s = d && slotNow(d);
@@ -12415,10 +12481,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!def) return [];
     const out = [];
     for (let t2 = 6 * 60; t2 < 23 * 60; t2 += 15) {
-      const s = slotAt(def, day, t2), key = s ? `${s.scene}|${s.act || ""}|${s.dinner ? 1 : ""}` : "";
+      const s = slotAt(def, day, t2), key = s ? `${s.scene}|${s.act || ""}|${s.dinner ? 1 : ""}|${s.club ? 1 : ""}` : "";
       const last2 = out[out.length - 1];
       if (last2 && last2.key === key) last2.to = t2 + 15;
-      else out.push({ key, from: t2, to: t2 + 15, scene: s && s.scene, act: s && s.act, dinner: !!(s && s.dinner) });
+      else out.push({ key, from: t2, to: t2 + 15, scene: s && s.scene, act: s && s.act, dinner: !!(s && s.dinner), club: !!(s && s.club) });
     }
     return schedCache[ck] = out.filter((x) => x.scene);
   }
@@ -12507,7 +12573,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     scooter: { n: "Scooter", price: 800, where: "garage", line: "A little electric scooter. Zips you from screen to screen about half again as fast as walking." },
     car: { n: "Cream convertible", price: 3500, where: "garage", line: "A cream convertible, roof down. Room for you, Maple and Evan, and more than twice as fast as walking." },
     boat: { n: "Dolphin cruise boat", price: 2e3, where: "shore", line: "A little cruise boat moored at the end of the jetty. Take the family out to see the dolphins up close." },
-    cellar: { n: "Cellar door", price: 2500, where: "wineshop", line: "A cellar door extension off the wine shop: barrel racks, a tasting bar and a wall of every wine you've made. Visitors love a cellar door." }
+    cellar: { n: "Cellar door", price: 2500, where: "wineshop", line: "A cellar door extension off the wine shop: barrel racks, a tasting bar and a wall of every wine you've made. Visitors love a cellar door, and once a month it hosts the wine club." }
   };
   var owns = (F2, k) => !!(F2.goals && F2.goals[k]);
   var ride = (F2) => {
@@ -15469,7 +15535,7 @@ ${SIGNOFF[t2.who] || ""}`;
     } else if (scratchOpen && scene === "hall") {
       h = scratchPanel();
     } else if (wardOpen && scene === "room") {
-      h = wardrobePanel(F, { sample: !!sampleCap, busy: ward.busy, error: ward.error, ask: ward.ask });
+      h = wardrobePanel(F, { sample: !!sampleCap, busy: ward.busy, error: ward.error, ask: ward.ask, pick: ward.pick });
     } else if (runOpen && scene === "base") {
       h = runPanel(F);
     } else if (shedOpen) {
@@ -15840,6 +15906,37 @@ ${SIGNOFF[t2.who] || ""}`;
         };
       }
     }
+    c.querySelectorAll("[data-wear]").forEach((b) => b.onclick = () => {
+      ward.pick = +b.dataset.wear;
+      sfx("paper", true);
+      ctx();
+    });
+    c.querySelectorAll("[data-wearback]").forEach((b) => b.onclick = () => {
+      ward.pick = null;
+      ctx();
+    });
+    c.querySelectorAll("[data-wearoff]").forEach((b) => b.onclick = () => {
+      delete F.wear;
+      save2();
+      render();
+      speak("Back in your usual. Comfy.", 3e3);
+    });
+    c.querySelectorAll("[data-wearok]").forEach((b) => b.onclick = () => {
+      const o = outfitsToday(F)[+b.dataset.wearok];
+      if (!o) return;
+      const w = { day: dayKey(), label: o.label || "Today's outfit" };
+      c.querySelectorAll("[data-wearf]").forEach((x) => {
+        if (x.checked) w[x.dataset.wearf] = o[x.dataset.wearf];
+      });
+      F.wear = w;
+      ward.pick = null;
+      sfx("chime");
+      act("cheer");
+      save2();
+      render();
+      mprop("sparkle", mel.x, mel.y - 60, 1600);
+      speak(pick([`${w.label}. You look wonderful.`, "Oh, that works. Ready for the day.", "Very you. Let's go."]), 4e3);
+    });
     const of = c.querySelector("#outfitForm");
     if (of) {
       const inp = c.querySelector("#outfitAsk");
@@ -16088,6 +16185,34 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     g.innerHTML = h;
   }
+  var wearToday = () => F.wear && F.wear.day === dayKey() ? F.wear : null;
+  function applyWear(pj) {
+    const m = $("mel");
+    if (!m) return;
+    const w = pj ? null : wearToday(), c = (f2, fb) => colourOf(w[f2], fb);
+    const fill = (el, col) => {
+      el.style.display = col ? "" : "none";
+      if (col) el.style.fill = col;
+    };
+    if (w && w.top && !w.dress) m.style.setProperty("--tank", c("top", "#FFFDF6"));
+    else m.style.removeProperty("--tank");
+    if (w && w.bottom && !w.dress) m.style.setProperty("--denim", c("bottom", "#2F2B28"));
+    else m.style.removeProperty("--denim");
+    fill($("oDress"), w && w.dress ? c("dress", "#2E3A70") : null);
+    fill($("oLayer"), w && w.layer ? c("layer", "#6B6B72") : null);
+    m.querySelectorAll(".osleeve").forEach((e) => fill(e, w && w.layer ? c("layer", "#6B6B72") : null));
+    m.querySelectorAll(".oshoe").forEach((e) => fill(e, w && w.shoes ? c("shoes", "#2F2B28") : null));
+    const bag2 = $("oBag");
+    bag2.style.display = w && w.bag ? "" : "none";
+    if (w && w.bag) bag2.querySelector("rect").style.fill = c("bag", "#2F2B28");
+    const ear = $("oEar");
+    ear.style.display = w && w.jewellery ? "" : "none";
+    if (w && w.jewellery) ear.querySelectorAll("circle").forEach((e) => e.style.fill = /silver|platinum|white gold/i.test(w.jewellery) ? "#BFC3CA" : /pearl/i.test(w.jewellery) ? "#F6F1E8" : "#D9A93A");
+    $("oShades").style.display = w && w.sunglasses && outside() ? "" : "none";
+    const down = !!(w && w.hair && /down/i.test(w.hair));
+    $("oHairDown").style.display = down ? "" : "none";
+    m.classList.toggle("hairdown", down);
+  }
   function dressMel() {
     const d = F.decor || {}, show2 = (id, on) => {
       const e = $(id);
@@ -16098,6 +16223,7 @@ ${SIGNOFF[t2.who] || ""}`;
     show2("melHat", !!d.me_hat && outside());
     show2("melScarf", !!d.me_scarf && !pj);
     show2("melPj", pj);
+    applyWear(pj);
     const m = $("mel");
     if (m) m.style.visibility = S2.sleep && scene === "room" || cruisingNow() ? "hidden" : "";
   }
@@ -16312,6 +16438,14 @@ ${SIGNOFF[t2.who] || ""}`;
         setTimeout(() => speak(onPedestals(F).length ? "The courtyard. Look at all this. You did that." : "The courtyard. Your first trophy goes on a pedestal.", 4e3), 900);
       }
       if (id === "orchard" || id === "flowers") orchardArrive(id);
+      {
+        const m = sgHM();
+        if (owns(F, "cellar") && wineClubOn(dayKey()) && m >= 12 * 60 && m < 21 * 60 && S2.clubSaid !== dayKey() && id !== "cellar") {
+          S2.clubSaid = dayKey();
+          setTimeout(() => speak(m < 18 * 60 ? "Wine club tonight at the cellar door, 6pm! Eight members are coming to taste and buy." : "The wine club's on at the cellar door right now! Pop in and host.", 6e3), 2800);
+        }
+      }
+      if (id === "cellar" && wineClubNow(dayKey(), sgHM())) setTimeout(() => speak("The wine club's here! Glasses clinking, everyone talking at once. Tap the tasting bar to host.", 5e3), 1200);
       if (id === "marcus" && evanHere()) setTimeout(() => {
         evanSays(pick(["Uncle Marcus! Can I play Mario?", "Can we watch Spiderman? Pleeease?", "Game! Game! Can I play the game?"]));
         if (isHere("marcus")) setTimeout(() => npcSay("marcus", "Ha! Ask your mum, little man. Zeh? One level?"), 2200);
@@ -16463,6 +16597,20 @@ ${SIGNOFF[t2.who] || ""}`;
       render();
       return;
     }
+    if (scene === "cellar" && id === "flight" && owns(F, "cellar") && wineClubNow(dayKey(), sgHM())) {
+      const first = S2.clubHost !== dayKey();
+      if (first) {
+        S2.clubHost = dayKey();
+        gainXp(3);
+        act("cheer");
+        save2();
+      }
+      const here = clubMembers(dayKey()).filter(isHere);
+      here.slice(0, 2).forEach((n, k) => setTimeout(() => npcSay(n, pick(["Ooh, what are we tasting first?", "Is this the new red? Pour me a big one.", "I'll take two bottles of that. No, three.", "Best club in the village, this.", "Cheers to the winemaker!"])), 900 + k * 1800));
+      speak(first ? "You're hosting the wine club! Pouring tastings, telling the story of each bottle. Everyone buys more when the winemaker's here." : "Another round for the club. The bottles are flying off the shelves.", 5500);
+      render();
+      return;
+    }
     if (scene === "cellar" && id === "flight") {
       const first = S2.flightDay !== dayKey();
       if (first) {
@@ -16531,6 +16679,7 @@ ${SIGNOFF[t2.who] || ""}`;
     if (id === "wardrobe") {
       wardOpen = true;
       ward.error = "";
+      ward.pick = null;
       sfx("paper", true);
       speak("Let's see what's hanging in here today.", 3e3);
       render();
@@ -16952,7 +17101,7 @@ ${SIGNOFF[t2.who] || ""}`;
     save2(scene === "orchard" || scene === "flowers");
   }
   function vineTick() {
-    const out = sellTick(F, { serving: scene === "wineshop" && serving(), stall: scene === "field" && serving(), harvest: (festivalOn(dayKey()) || {}).id === "harvest" });
+    const out = sellTick(F, { serving: scene === "wineshop" && serving(), stall: scene === "field" && serving(), club: scene === "cellar" && wineClubNow(dayKey(), sgHM()), harvest: (festivalOn(dayKey()) || {}).id === "harvest" });
     if (whereIs("pilar") === "kitchen") {
       const done = cookTick(F, dayKey());
       if (done.length) {
@@ -16970,6 +17119,9 @@ ${SIGNOFF[t2.who] || ""}`;
     if (out.coins && serving()) {
       sfx("coin");
       flash(`+${out.coins} coins from the wine shop`);
+    } else if (out.coins && out.club && scene === "cellar") {
+      sfx("coin");
+      flash(`+${out.coins} coins: the wine club`);
     } else if (out.mins >= 30 && out.coins) setTimeout(() => speak(`While you were away, villagers bought ${out.bottles ? `${out.bottles} bottle${out.bottles > 1 ? "s" : ""}` : ""}${out.bottles && out.glasses ? " and " : ""}${out.glasses ? `${out.glasses} glass${out.glasses > 1 ? "es" : ""}` : ""} of your wine. ${vineState(F).box} coins are waiting in the honesty box.`, 6500), 2500);
     if (typing) persist("fox");
     else save2(scene === "vineyard" || scene === "wineshop");
@@ -17170,14 +17322,15 @@ ${SIGNOFF[t2.who] || ""}`;
     const row2 = (n) => {
       const sch = daySchedule(n.id, day), cur2 = sch.find((x) => t2 >= x.from && t2 < x.to);
       const cls = classOn(day), word = (a) => a === "lead" && cls ? `leading ${cls.kind}` : a === "exercise" && cls && n.id !== "mum" ? `${cls.kind} with Mum` : ACT_WORD[a];
-      const what = (x) => x.dinner ? `family dinner at ${HOST_NAME[x.scene] || placeName(x.scene)}` : `${placeName(x.scene)}${x.act && word(x.act) ? ` (${word(x.act)})` : ""}`;
+      const what = (x) => x.club ? "the wine club at the cellar door" : x.dinner ? `family dinner at ${HOST_NAME[x.scene] || placeName(x.scene)}` : `${placeName(x.scene)}${x.act && word(x.act) ? ` (${word(x.act)})` : ""}`;
       return `<details class="whowhere"><summary><b>${esc(n.name)}</b> <small class="muted">${cur2 ? `now: ${esc(what(cur2))}` : "not about just now"}</small></summary>
       <ul>${sch.map((x) => `<li class="${x === cur2 ? "now" : ""}"><span>${hhmm(x.from)}–${hhmm(x.to)}</span> ${esc(what(x))}</li>`).join("") || "<li>Not in the village today.</li>"}</ul></details>`;
     };
     const fam = WHO_FAMILY.map((id) => NPCS.find((n) => n.id === id)).filter(Boolean);
     const town = NPCS.filter((n) => !WHO_FAMILY.includes(n.id) && !n.tourist && !n.kid);
     const dn = dinnerOn(day);
-    return `<h3 class="ph3">Who's where today</h3>${dn ? `<p class="muted">Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30.</p>` : ""}<p class="eyebrow">Family</p>${fam.map(row2).join("")}<p class="eyebrow" style="margin-top:10px">Around the village</p>${town.map(row2).join("")}`;
+    const club = owns(F, "cellar") && wineClubOn(day);
+    return `<h3 class="ph3">Who's where today</h3>${dn ? `<p class="muted">Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30.</p>` : ""}${club ? `<p class="muted">Wine club tonight at the cellar door, 6 to 9pm.</p>` : ""}<p class="eyebrow">Family</p>${fam.map(row2).join("")}<p class="eyebrow" style="margin-top:10px">Around the village</p>${town.map(row2).join("")}`;
   }
   var SURPRISES = [["dino", "a little dinosaur"], ["plane", "a toy aeroplane"], ["robot", "a wind-up robot"]];
   var banterAt = Date.now() + 2e4;

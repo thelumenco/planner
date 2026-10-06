@@ -1589,6 +1589,35 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-goal="boat"]'); await page.waitForTimeout(400);
   await page.locator('#world [data-place="boat"]').dispatchEvent("click"); await page.waitForTimeout(4000);
   check(await page.locator("#world .cruising").count() === 1 && await page.evaluate(() => getComputedStyle(document.getElementById("mel")).visibility === "hidden"), "the dolphin cruise boat: everyone aboard and off up the coast");
+  // the monthly wine club in the cellar door: the first Friday of the month, 6 to 9pm
+  await page.addInitScript(() => { if (!/clubpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.vine = f.vine || {}; f.vine.shelf = [{id: "c1", name: "Club Red", type: "red", n: 40, price: 18, open: 0}]; f.vine.lastTick = Date.now() - 100*60e3; f.vine.box = 0;
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?seed=1&time=19:40&date=2026-11-06&clubpatch=1"); await page.waitForTimeout(2500);
+  check(await gf().then(f => f.vine.shelf[0].n < 40 && f.vine.box > 0), "the wine club buys bottles and glasses off the shop's shelves");
+  await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(1500);
+  check(await page.locator("#actors .npc").count() >= 6, "the wine club gathers in the cellar door");
+  await page.locator('#world [data-spot="flight"]').dispatchEvent("click"); await page.waitForTimeout(2500);
+  check(/hosting the wine club/.test(await page.locator("#speech").textContent()), "Mel hosts the club at the tasting bar");
+  await page.close();
+}
+{
+  // Wearing an outfit from the wardrobe: choose one, untick what you're skipping, put it on (Mel's sprite changes)
+  console.log("\nwearing an outfit");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`wear pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/wearpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.outfits = {day: "2026-10-06", list: [{label: "Tropical Wrapped Elegance", dress: "Green botanical wrap dress", shoes: "Gold round-toe ballet flats", bag: "Black YSL structured bag", jewellery: "Gold orchid statement drops", layer: "Charcoal slouchy cardigan (aircon)", hair: "down + soft waves"}]};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-06"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-06&wearpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(800);
+  await page.locator('#world [data-spot="wardrobe"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-wear="0"]', { timeout: 15000 });
+  await page.click('#ctx [data-wear="0"]'); await page.waitForTimeout(300);
+  check(await page.locator("#ctx [data-wearf]:checked").count() === 6, "choosing an outfit lists each piece, all ticked");
+  await page.uncheck('#ctx [data-wearf="layer"]'); await page.click('#ctx [data-wearok="0"]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => { const w = JSON.parse(localStorage.getItem("fox.fox")).wear; return w && w.dress && !w.layer; }), "unticked pieces are left off");
+  check(await page.evaluate(() => { const d = document.getElementById("oDress"), l = document.getElementById("oLayer"); return getComputedStyle(d).display !== "none" && getComputedStyle(l).display === "none" && document.getElementById("mel").classList.contains("hairdown"); }), "Mel's character puts it on: the dress, hair down, no cardigan");
   await page.close();
 }
 {

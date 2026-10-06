@@ -262,7 +262,7 @@ export const ROOMS = {
   // the cellar door (a big goal): Mel's wine wall, the tasting bar, barrel racks, a high table
   cellar: {name:"The cellar door", wall:"#E9DCCB", trim:"#6B3A2A", noBoard:true, pos:{W:[130,262], B:[340,262], R:[140,500], T:[360,500]}, stations:[
     ["winewall","Wine wall","W","winewall",null,"A bottle of every wine you've made. It's getting full.",36],
-    ["flight","Tasting bar","B","tastebar",null,"The tasting bar. Pour yourself a flight.",34],
+    ["flight","Tasting bar","B","tastebar",null,"The tasting bar. Pour yourself a flight (and on the first Friday of the month, host the wine club).",34],
     ["racks","Barrel racks","R","barrelrack",null,"Barrels resting, quietly getting better.",30],
     ["ctable","High table","T","table",null,"A high table for tastings. Visitors linger here.",40]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[

@@ -6,7 +6,7 @@ const COLOURS = [
   [/teal|peacock/, "#2A7C80"], [/emerald/, "#1F7A5A"], [/forest|racing|dark green|deep green/, "#2F5D44"], [/mint/, "#BFE3D0"], [/olive/, "#7A7A40"], [/green|botanical/, "#4E8A5E"],
   [/wine|burgundy|aubergine|plum/, "#6E2440"], [/crimson|red|raspberry|rose red/, "#B3263A"], [/hot pink|pink|blush/, "#F0B3C3"], [/lavender|lilac/, "#CDBEE8"],
   [/chocolate|brown/, "#5A3A2A"], [/mocha|taupe/, "#8E7462"], [/tan|cognac|camel|straw|bronze/, "#C08A5A"], [/gold/, "#D9A93A"], [/silver|platinum/, "#BFC3CA"]];
-const colourOf = (name, fallback) => { const n = String(name || "").toLowerCase(); const hit = COLOURS.find(([re]) => re.test(n)); return hit ? hit[1] : fallback; };
+export const colourOf = (name, fallback) => { const n = String(name || "").toLowerCase(); const hit = COLOURS.find(([re]) => re.test(n)); return hit ? hit[1] : fallback; };
 
 // [fill, lines] in a 24 x 24 box
 function shape(field, n, c){

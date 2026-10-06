@@ -19,7 +19,8 @@ import { fetchPost, postPanel, postCount } from "./postbox.js";
 import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML } from "./feeds.js";
 import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia, chatLastDone, lastDueCount, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
 import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, roomLeft, hungry, hungryCount, KINDS } from "./pets.js";
-import { wardrobePanel, newOutfit } from "./wardrobe.js";
+import { wardrobePanel, newOutfit, outfitsToday } from "./wardrobe.js";
+import { colourOf } from "../art/garments.js";
 import { readPlan, PLAN_WORDS } from "./plans.js";
 import { loadClients, clientsPanel, askClients } from "./clients.js";
 import { loadPlans, planningPanel, askPlans } from "./planning.js";
@@ -45,7 +46,7 @@ import { GOALS, owns, buyGoal, goalPanel, garagePanel, ride, rideSpeed } from ".
 import { diningTable } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
-import { tourNow, eventNow, stallAt, STALL_SPOTS, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime } from "./tours.js";
+import { tourNow, eventNow, stallAt, STALL_SPOTS, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
@@ -1496,7 +1497,7 @@ function ctx(){
   } else if (scratchOpen && scene === "hall") {
     h = scratchPanel();
   } else if (wardOpen && scene === "room") {
-    h = wardrobePanel(F, {sample: !!sampleCap, busy: ward.busy, error: ward.error, ask: ward.ask});
+    h = wardrobePanel(F, {sample: !!sampleCap, busy: ward.busy, error: ward.error, ask: ward.ask, pick: ward.pick});
   } else if (runOpen && scene === "base") {
     h = runPanel(F);
   } else if (shedOpen) {
@@ -1588,6 +1589,14 @@ function ctx(){
     const cf = c.querySelector("#clForm"), cl = c.querySelector("#clChat"); if (cl) cl.scrollTop = cl.scrollHeight;
     if (cf) { const inp = cf.querySelector("#clIn"); cf.onsubmit = ev => { ev.preventDefault(); const v = inp.value; inp.value = ""; askClients(sampleCap, v, () => { if (clientsOpen) { ctx(); const i = $("clIn"); if (i) i.focus(); } }); }; }
   }
+  // wearing an outfit: choose one, untick anything you're skipping, put it on (kept for the day: applyWear)
+  c.querySelectorAll("[data-wear]").forEach(b => b.onclick = () => { ward.pick = +b.dataset.wear; sfx("paper", true); ctx(); });
+  c.querySelectorAll("[data-wearback]").forEach(b => b.onclick = () => { ward.pick = null; ctx(); });
+  c.querySelectorAll("[data-wearoff]").forEach(b => b.onclick = () => { delete F.wear; save(); render(); speak("Back in your usual. Comfy.", 3000); });
+  c.querySelectorAll("[data-wearok]").forEach(b => b.onclick = () => { const o = outfitsToday(F)[+b.dataset.wearok]; if (!o) return;
+    const w = {day: dayKey(), label: o.label || "Today's outfit"}; c.querySelectorAll("[data-wearf]").forEach(x => { if (x.checked) w[x.dataset.wearf] = o[x.dataset.wearf]; });
+    F.wear = w; ward.pick = null; sfx("chime"); act("cheer"); save(); render(); mprop("sparkle", mel.x, mel.y - 60, 1600);
+    speak(pick([`${w.label}. You look wonderful.`, "Oh, that works. Ready for the day.", "Very you. Let's go."]), 4000); });
   const of = c.querySelector("#outfitForm");
   if (of) { const inp = c.querySelector("#outfitAsk"); inp.oninput = () => { ward.ask = inp.value; };
     of.onsubmit = async ev => { ev.preventDefault(); if (ward.busy) return; ward.busy = true; ward.error = ""; ctx();
@@ -1724,10 +1733,30 @@ function drawTableware(){
   let g = $("tableware"); if (!g) { g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.id = "tableware"; g.setAttribute("pointer-events", "none"); $("sceneArt").appendChild(g); }
   g.innerHTML = h;
 }
+// Today's outfit from the wardrobe (F.wear, kept for the day): colours come from the item names (garments.js colourOf).
+// The top and bottom recolour Mel's own; a dress, layer, shoes, bag, earrings, sunglasses (outdoors only) and hair worn
+// down are drawn over her. Pyjamas in her room win.
+const wearToday = () => F.wear && F.wear.day === dayKey() ? F.wear : null;
+function applyWear(pj){
+  const m = $("mel"); if (!m) return; const w = pj ? null : wearToday(), c = (f, fb) => colourOf(w[f], fb);
+  const fill = (el, col) => { el.style.display = col ? "" : "none"; if (col) el.style.fill = col; };
+  if (w && w.top && !w.dress) m.style.setProperty("--tank", c("top", "#FFFDF6")); else m.style.removeProperty("--tank");
+  if (w && w.bottom && !w.dress) m.style.setProperty("--denim", c("bottom", "#2F2B28")); else m.style.removeProperty("--denim");
+  fill($("oDress"), w && w.dress ? c("dress", "#2E3A70") : null);
+  fill($("oLayer"), w && w.layer ? c("layer", "#6B6B72") : null);
+  m.querySelectorAll(".osleeve").forEach(e => fill(e, w && w.layer ? c("layer", "#6B6B72") : null));
+  m.querySelectorAll(".oshoe").forEach(e => fill(e, w && w.shoes ? c("shoes", "#2F2B28") : null));
+  const bag = $("oBag"); bag.style.display = w && w.bag ? "" : "none"; if (w && w.bag) bag.querySelector("rect").style.fill = c("bag", "#2F2B28");
+  const ear = $("oEar"); ear.style.display = w && w.jewellery ? "" : "none";
+  if (w && w.jewellery) ear.querySelectorAll("circle").forEach(e => e.style.fill = /silver|platinum|white gold/i.test(w.jewellery) ? "#BFC3CA" : /pearl/i.test(w.jewellery) ? "#F6F1E8" : "#D9A93A");
+  $("oShades").style.display = w && w.sunglasses && outside() ? "" : "none";
+  const down = !!(w && w.hair && /down/i.test(w.hair)); $("oHairDown").style.display = down ? "" : "none"; m.classList.toggle("hairdown", down);
+}
 function dressMel(){
   const d = F.decor || {}, show = (id, on) => { const e = $(id); if (e) e.style.display = on ? "" : "none"; };
   const pj = !!d.me_pj && scene === "room";
   show("melBow", !!d.me_bow); show("melHat", !!d.me_hat && outside()); show("melScarf", !!d.me_scarf && !pj); show("melPj", pj);
+  applyWear(pj);
   const m = $("mel"); if (m) m.style.visibility = (S.sleep && scene === "room") || cruisingNow() ? "hidden" : "";
 }
 function render(redraw){
@@ -1816,6 +1845,9 @@ function setScene(id, at){
     else if (id === "hall" && kudosCount() >= 3 && Date.now() - (F.kudosSeen || 0) > 7*864e5 && S.kudosSaid !== dayKey()) { S.kudosSaid = dayKey(); setTimeout(() => speak(`${kudosCount()} kind words out in the courtyard. Fancy a read?`, 5000), 1500); }
     if (id === "trophy") { fetchObjectives(); if (F.revTarget) loadRevenue().then(checkTrophies); setTimeout(() => speak(onPedestals(F).length ? "The courtyard. Look at all this. You did that." : "The courtyard. Your first trophy goes on a pedestal.", 4000), 900); }
     if (id === "orchard" || id === "flowers") orchardArrive(id);
+    { const m = sgHM(); if (owns(F, "cellar") && wineClubOn(dayKey()) && m >= 12*60 && m < 21*60 && S.clubSaid !== dayKey() && id !== "cellar") { S.clubSaid = dayKey();
+      setTimeout(() => speak(m < 18*60 ? "Wine club tonight at the cellar door, 6pm! Eight members are coming to taste and buy." : "The wine club's on at the cellar door right now! Pop in and host.", 6000), 2800); } }
+    if (id === "cellar" && wineClubNow(dayKey(), sgHM())) setTimeout(() => speak("The wine club's here! Glasses clinking, everyone talking at once. Tap the tasting bar to host.", 5000), 1200);
     if (id === "marcus" && evanHere()) setTimeout(() => { evanSays(pick(["Uncle Marcus! Can I play Mario?", "Can we watch Spiderman? Pleeease?", "Game! Game! Can I play the game?"])); if (isHere("marcus")) setTimeout(() => npcSay("marcus", "Ha! Ask your mum, little man. Zeh? One level?"), 2200); }, 1500);
     if (id === "wineshop" && isHere("marcus") && isHere("angelina") && sgHM() >= 19*60 + 30 && S.dateSaid !== dayKey()) { S.dateSaid = dayKey(); setTimeout(() => speak("Marcus and Angelina are on a date night at the middle table. Act natural.", 5000), 1600); }
     { const dn = dinnerOn(dayKey()), m = sgHM(); if (dn && m >= 17*60 + 30 && m < dn.to && S.dinnerSaid !== dayKey()) { S.dinnerSaid = dayKey();
@@ -1870,6 +1902,11 @@ function arriveSpot(id){
   if (id === "officedoor") { setScene("office", INNER.office.arrive); return; }
   if (id === "cdoor") { if (owns(F, "cellar")) setScene("cellar", INNER.cellar.arrive); else { goalView = "cellar"; sfx("paper", true); render(); } return; }
   if (scene === "garage" && (id === "scooter" || id === "car")) { goalView = owns(F, id) ? "garagepick" : id; sfx("paper", true); render(); return; }
+  if (scene === "cellar" && id === "flight" && owns(F, "cellar") && wineClubNow(dayKey(), sgHM())) {   // hosting the wine club
+    const first = S.clubHost !== dayKey(); if (first) { S.clubHost = dayKey(); gainXp(3); act("cheer"); save(); }
+    const here = clubMembers(dayKey()).filter(isHere);
+    here.slice(0, 2).forEach((n, k) => setTimeout(() => npcSay(n, pick(["Ooh, what are we tasting first?", "Is this the new red? Pour me a big one.", "I'll take two bottles of that. No, three.", "Best club in the village, this.", "Cheers to the winemaker!"])), 900 + k*1800));
+    speak(first ? "You're hosting the wine club! Pouring tastings, telling the story of each bottle. Everyone buys more when the winemaker's here." : "Another round for the club. The bottles are flying off the shelves.", 5500); render(); return; }
   if (scene === "cellar" && id === "flight") { const first = S.flightDay !== dayKey(); if (first) { S.flightDay = dayKey(); gainXp(2); save(); }
     speak(first ? "A tasting flight: a splash of each of your wines, lined up on the bar. Honestly? They're good." : "Another little pour. Just to be sure.", 4500); render(); return; }
   if (scene === "marcus" && id === "games") { marcusGames(); return; }
@@ -1881,7 +1918,7 @@ function arriveSpot(id){
   if (id === "nook") { calmOpen = true; sfx("paper", true); render(); return; }
   if (id === "jars") { jarsOpen = true; jv = {mode: "shelf", blobs: [], note: ""}; sfx("paper", true); render(); return; }
   if (id === "journal") { journalOpen = true; sfx("paper", true); render(); return; }
-  if (id === "wardrobe") { wardOpen = true; ward.error = ""; sfx("paper", true); speak("Let's see what's hanging in here today.", 3000); render(); return; }
+  if (id === "wardrobe") { wardOpen = true; ward.error = ""; ward.pick = null; sfx("paper", true); speak("Let's see what's hanging in here today.", 3000); render(); return; }
   if (id === "digest") { shelfOpen = true; speak(digestReady() ? (isHere("juniper") ? "Juniper's waving a digest at you!" : "A fresh digest is ready on the shelf.") : "Digests are rationed. Like dessert.", 3500); render(); return; }
   if (id === "stall") { shopClosed = false; render(); return; }
   if (id === "status") { healthOpen = true; sfx("paper"); render(); return; }
@@ -1980,7 +2017,7 @@ function orchardTick(){
   save(scene === "orchard" || scene === "flowers");
 }
 function vineTick(){
-  const out = sellTick(F, {serving: scene === "wineshop" && serving(), stall: scene === "field" && serving(), harvest: (festivalOn(dayKey()) || {}).id === "harvest"});
+  const out = sellTick(F, {serving: scene === "wineshop" && serving(), stall: scene === "field" && serving(), club: scene === "cellar" && wineClubNow(dayKey(), sgHM()), harvest: (festivalOn(dayKey()) || {}).id === "harvest"});
   // Pilar runs the kitchen on her shifts (tells Mel what she's done only while Mel's in there with her)
   if (whereIs("pilar") === "kitchen") { const done = cookTick(F, dayKey()); if (done.length) { save(); if (scene === "kitchen" && !quietNow() && $("panel").hidden) speak(cookLine(done), 5500); } }
   // at closing, leftover tapas of the day go to the staff for dinner
@@ -1989,6 +2026,7 @@ function vineTick(){
   if (!out) return;
   const typing = !!(document.activeElement && document.activeElement.closest && document.activeElement.closest(".vyname, [data-vyprice]"));
   if (out.coins && serving()) { sfx("coin"); flash(`+${out.coins} coins from the wine shop`); }
+  else if (out.coins && out.club && scene === "cellar") { sfx("coin"); flash(`+${out.coins} coins: the wine club`); }
   else if (out.mins >= 30 && out.coins) setTimeout(() => speak(`While you were away, villagers bought ${out.bottles ? `${out.bottles} bottle${out.bottles > 1 ? "s" : ""}` : ""}${out.bottles && out.glasses ? " and " : ""}${out.glasses ? `${out.glasses} glass${out.glasses > 1 ? "es" : ""}` : ""} of your wine. ${vineState(F).box} coins are waiting in the honesty box.`, 6500), 2500);
   if (typing) persist("fox"); else save(scene === "vineyard" || scene === "wineshop");
 }
@@ -2073,13 +2111,14 @@ function whosWhereHTML(){
   const day = dayKey(), t = sgHM(), hhmm = m => fmtTime(m);
   const row = n => { const sch = daySchedule(n.id, day), cur = sch.find(x => t >= x.from && t < x.to);
     const cls = classOn(day), word = a => a === "lead" && cls ? `leading ${cls.kind}` : a === "exercise" && cls && n.id !== "mum" ? `${cls.kind} with Mum` : ACT_WORD[a];
-    const what = x => x.dinner ? `family dinner at ${HOST_NAME[x.scene] || placeName(x.scene)}` : `${placeName(x.scene)}${x.act && word(x.act) ? ` (${word(x.act)})` : ""}`;
+    const what = x => x.club ? "the wine club at the cellar door" : x.dinner ? `family dinner at ${HOST_NAME[x.scene] || placeName(x.scene)}` : `${placeName(x.scene)}${x.act && word(x.act) ? ` (${word(x.act)})` : ""}`;
     return `<details class="whowhere"><summary><b>${esc(n.name)}</b> <small class="muted">${cur ? `now: ${esc(what(cur))}` : "not about just now"}</small></summary>
       <ul>${sch.map(x => `<li class="${x === cur ? "now" : ""}"><span>${hhmm(x.from)}–${hhmm(x.to)}</span> ${esc(what(x))}</li>`).join("") || "<li>Not in the village today.</li>"}</ul></details>`; };
   const fam = WHO_FAMILY.map(id => NPCS.find(n => n.id === id)).filter(Boolean);
   const town = NPCS.filter(n => !WHO_FAMILY.includes(n.id) && !n.tourist && !n.kid);
   const dn = dinnerOn(day);
-  return `<h3 class="ph3">Who's where today</h3>${dn ? `<p class="muted">Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30.</p>` : ""}<p class="eyebrow">Family</p>${fam.map(row).join("")}<p class="eyebrow" style="margin-top:10px">Around the village</p>${town.map(row).join("")}`;
+  const club = owns(F, "cellar") && wineClubOn(day);
+  return `<h3 class="ph3">Who's where today</h3>${dn ? `<p class="muted">Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30.</p>` : ""}${club ? `<p class="muted">Wine club tonight at the cellar door, 6 to 9pm.</p>` : ""}<p class="eyebrow">Family</p>${fam.map(row).join("")}<p class="eyebrow" style="margin-top:10px">Around the village</p>${town.map(row).join("")}`;
 }
 // Ah Gong and Ah Ma (Mel's dad and mum) with Evan: every minute or two when they're on the same screen, a little
 // exchange (Ah Gong: "Ah Gong loves who the most?"; Evan's cheeky with them), and once a day a surprise toy for him
