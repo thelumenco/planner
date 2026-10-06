@@ -39,10 +39,10 @@ import { kid, kidPanel, wireKid, stopKidGame, SNACKS, snackPic, EVAN_TAPS, pickS
 import { addReminder, cancelReminder, upcoming as upcomingReminders, dueNow, fmtWhen } from "./reminders.js";
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 import { dishArt, glassArt } from "../art/wine.js";
-import { fieldArt } from "../art/field.js";
+import { fieldArt, stallFront } from "../art/field.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
-import { tourNow, eventNow, stallAt } from "./tours.js";
+import { tourNow, eventNow, stallAt, STALL_SPOTS, keeperAway } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
@@ -1642,6 +1642,15 @@ function drawScene(){
 // the day in S.served by who's sitting and which visit it is, so nobody orders twice in one sitting. Pilar, on her
 // break, just has a cup of something. Redrawn only when the orders change.
 let tableKey = "";
+// Market days: each stall's table is also a prop sorted among the people, so a keeper behind it is hidden from the waist down
+let frontKey = "", fronts = [];
+function stallFronts(){
+  const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null, key = ev ? dayKey() + ev.kind : "";
+  if (key !== frontKey) { fronts.forEach(([n]) => n.remove()); fronts = []; frontKey = key;
+    if (ev) fronts = ev.stalls.map(st => { const [x, y] = STALL_SPOTS[st.at], g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      g.setAttribute("class", "sfront"); g.setAttribute("pointer-events", "none"); g.innerHTML = stallFront(st.at, x, y, st); return [g, {y: y - 1}]; }); }
+  return fronts;
+}
 function drawTableware(){
   if (scene !== "wineshop") return;
   S.served = S.served || {};
@@ -1853,7 +1862,8 @@ function arriveVillageSpot(id){
   if (/^mstall\d$/.test(id)) { const st = stallAt(dayKey(), sgHM(), +id.slice(-1)); if (!st) { speak(eventNow(dayKey(), sgHM()) ? "Nobody's set up a stall there today." : "The stalls are packed away till the next market.", 3500); render(); return; }
     fieldView = id; orTab = null; sfx("paper", true); if (st.kind === "wine") { vineTick(); speak("Behind the stall. Shoppers stop by more while you serve.", 3500); }
     else if (st.kind === "orchard") { orchardTick(); if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma brought plenty.", "Everybody wants Ma Ma's fruit today.", "For you, free. For them, they pay!"])); }
-    else if (isHere(st.id)) npcSay(st.id, st.line); render(); return; }
+    else if (isHere(st.id) && !keeperAway(st, dayKey(), sgHM())) npcSay(st.id, st.line);
+    else speak("Nobody's minding this one just now. It's an honesty tin: pop your coins in.", 3500); render(); return; }
   if (id === "lake" || id === "picnic" || id === "pitch") { fieldSpot(id); return; }
   // an outdoor quest at home base (Evan outing at the swing, garden jobs at the shed, a walk by the pond)
   if (scene === "base" && phase() === "task") { const t = remaining()[0];
@@ -1912,7 +1922,8 @@ const stallPrice = id => ITEMS[id].price || (ITEMS[id].sell || 2) + 2;
 function marketStallPanel(st){
   const ev = eventNow(dayKey(), sgHM()); if (!ev) return "";
   const who = (NPCS.find(n => n.id === st.id) || {name: "Someone"}).name;
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(st.n)}</h2><p class="sub">${esc(who)}'s stall at the ${esc(ev.name.toLowerCase())}. "${esc(st.line)}"</p>`;
+  const away = keeperAway(st, dayKey(), sgHM());
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(st.n)}</h2><p class="sub">${esc(who)}'s stall at the ${esc(ev.name.toLowerCase())}. ${away ? `${esc(who)}'s off wandering the market, so it's on the honesty tin: take what you like and pop the coins in.` : `"${esc(st.line)}"`}</p>`;
   const items = stallItems(st);
   if (items.length) h += `<div class="items shop">${items.map(id => itemBtn(id, `<b>${stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < stallPrice(id), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.${st.produce ? " Handy when the garden's between harvests: it all goes to the kitchen or to Maple." : ""}</p>`;
   if (st.act) h += `<div class="actions"><button class="btn primary" data-fair="${st.act}" ${evanHere() ? "" : "disabled"}>${st.act === "kite" ? "Get Evan a kite (3 coins)" : "Face paint for Evan (3 coins)"}</button></div>${evanHere() ? "" : `<p class="muted">Bring Evan along for this one.</p>`}`;
@@ -2280,7 +2291,7 @@ function frame(now){
   // On the treadmill with the time box running: Mel walks in place.
   if (scene === "home" && atSpot === "treadmill" && !route.length && S.timer && S.timer.kind === "task" && Math.abs(mel.x - mel.tx) < 2) { nodes.mel.classList.add("walk"); mel.dir = 1; }
   nodes.evan.classList.toggle("run", evan.run && evan.moving);
-  const order = [[nodes.mel, mel], [nodes.maple, maple], [nodes.evan, evan], ...npcActors()].sort((a, b) => a[1].y - b[1].y);
+  const order = [[nodes.mel, mel], [nodes.maple, maple], [nodes.evan, evan], ...npcActors(), ...stallFronts()].sort((a, b) => a[1].y - b[1].y);
   const g = $("actors"); order.forEach(([n]) => { if (g.lastElementChild !== n) g.appendChild(n); });
   const close = Math.hypot(maple.x - mel.x, maple.y - mel.y) < 60;
   bubbleAt($("speech"), close ? (maple.x*0.35 + mel.x*0.65) : maple.x, close ? Math.min(maple.y, mel.y) : maple.y, close ? 76 : (sleeping ? 18 : 30));

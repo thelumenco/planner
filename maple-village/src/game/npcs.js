@@ -67,9 +67,12 @@ function tickVillager(def, dt){
   let e = ents[def.id];
   if (!slot || slot.scene !== scene) { if (e) drop(def.id); return; }
   if (!e || e.key !== key) {
+    // glide: a new slot in the same scene is walked to (market keepers moving about their stall), not popped into
+    const was = slot.glide && e && e.key && e.key.split(":")[0] === slot.scene ? [e.x, e.y] : null;
     if (e) drop(def.id);
-    const p = slot.at || jitter(pick(slot.wander));
-    e = ents[def.id] = {def, key, act: slot.act, kind: "npc", x: p[0], y: p[1], tx: p[0], ty: p[1], dir: slot.dir || (Math.random() < .5 ? -1 : 1), moving: false, wait: rnd(1, 4), node: makeNode(def.id, Object.assign({}, def.look, slot.look || {}, outdoors(scene) ? {} : {hat: null}), def.kid, false, slot.act)};   // hats come off indoors
+    const p = slot.at || jitter(pick(slot.wander)), s0 = was || p;
+    e = ents[def.id] = {def, key, act: slot.act, kind: "npc", x: s0[0], y: s0[1], tx: s0[0], ty: s0[1], dir: slot.dir || (Math.random() < .5 ? -1 : 1), moving: false, wait: rnd(1, 4), node: makeNode(def.id, Object.assign({}, def.look, slot.look || {}, outdoors(scene) ? {} : {hat: null}), def.kid, false, slot.act)};   // hats come off indoors
+    if (was) { e.tx = p[0]; e.ty = p[1]; e.path = []; }   // straight across the open field (stalls sit above the walkable area)
   }
   // Now and then a neighbour near Mel says hello (each at most every few minutes).
   const near = Math.hypot(e.x - api.mel.x, e.y - api.mel.y) < 110;

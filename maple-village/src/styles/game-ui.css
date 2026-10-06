@@ -578,8 +578,8 @@ body.kidmode .scenename span + span{display:none}
 @media (max-width:420px){.tpage{grid-template-columns:96px 1fr}}
 
 /* the courtyard: sitting on the bench, pigeons pecking (and flapping off when tapped) */
-#mel.sit .legL,#mel.sit .legR,.npc.act-sit .legL,.npc.act-sit .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
-#mel.sit > .flip > g,.npc.act-sit > g{transform:translateY(7px)}
+#mel.sit .legL,#mel.sit .legR,.npc.act-sit:not(.walk) .legL,.npc.act-sit:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
+#mel.sit > .flip > g,.npc.act-sit:not(.walk) > g{transform:translateY(7px)}
 .pigeon .phead{transform-box:fill-box;transform-origin:20% 90%;animation:peck 2.4s ease-in-out infinite;animation-delay:inherit}
 .pigeon{animation:pstroll 9s ease-in-out infinite}
 @keyframes peck{0%,55%,100%{transform:rotate(0)}65%,75%{transform:rotate(38deg) translate(1px,3px)}70%{transform:rotate(30deg) translate(1px,2px)}}

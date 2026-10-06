@@ -172,10 +172,29 @@ export const stallAt = (day, hm, i) => { const e = eventNow(day, hm); return e ?
 // settle on the picnic blankets afterwards with what they bought. The keepers stand by their stalls.
 const FIELD_WALK = [[60, 172], [140, 178], [220, 172], [300, 178], [380, 174], [450, 182], [120, 196]], FIELD_PLAY = [[150, 470], [200, 500], [90, 600], [240, 590], [60, 430]];
 const PICNICKERS = [[106, 468], [138, 464], [198, 486], [230, 482]];
+// Stall keepers don't stand still all morning: every half hour each picks something to do. Behind the table, out
+// in front, sitting on the crate, over chatting to shoppers on the path, or off wandering the market (the stall
+// runs on an honesty tin while they're away). The first half hour everyone's setting up behind their stall.
+const POSES = ["behind", "behind", "front", "sit", "chat", "wander"], POSE_LEN = 30;
+export function keeperPose(st, day, hm){
+  const e = eventOn(day); if (!e || hm < e.from || hm >= e.to) return null;
+  const k = Math.floor((hm - e.from)/POSE_LEN);
+  return {k, pose: k === 0 ? "behind" : POSES[hash(day + ":" + st.id + ":" + k) % POSES.length], from: e.from + k*POSE_LEN, to: Math.min(e.to, e.from + (k + 1)*POSE_LEN)};
+}
+// the keeper's away from the stall (it's an honesty tin while they're gone)
+export const keeperAway = (st, day, hm) => { const p = keeperPose(st, day, hm); return !!p && (p.pose === "chat" || p.pose === "wander"); };
+function keeperSlot(st, e, day, hm){
+  const {k, pose, from, to} = keeperPose(st, day, hm), [x, y] = STALL_SPOTS[st.at], base = {from, to, scene: "field", glide: true};
+  if (pose === "behind") return {...base, at: [x + 3, y - 9]};
+  if (pose === "front") return {...base, at: [x + 9, y + 9]};
+  if (pose === "sit") return {...base, at: [x - 17, y + 7], act: "sit", dir: 1};
+  if (pose === "chat") { const side = k % 2 ? 1 : -1; return {...base, at: [Math.max(30, Math.min(490, x + side*30)), y + 48], dir: -side}; }
+  return {...base, wander: FIELD_WALK};
+}
 export function eventSlot(id, day, hm){
   const e = eventOn(day); if (!e || hm < e.from || hm >= e.to) return null;
   const st = e.stalls.find(s => s.id === id);
-  if (st) return {from: e.from, to: e.to, scene: "field", at: [STALL_SPOTS[st.at][0] + 8, STALL_SPOTS[st.at][1] - 2]};
+  if (st) return keeperSlot(st, e, day, hm);
   const mid = e.from + Math.round((e.to - e.from)/2), wave = hm < mid ? 0 : 1, half = Math.round((wave ? e.to - mid : mid - e.from)/2), start = wave ? mid : e.from;
   const crowd = groupFor(day + "ev" + wave, 4, ["pip", ...e.stalls.map(s => s.id), ...toursOn(day).flatMap(t => [t.guide, ...t.group])], [...VISITORS, ...TOURISTS, "sam", "priya"]);
   const k = crowd.indexOf(id);

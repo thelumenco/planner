@@ -1112,8 +1112,8 @@ body.kidmode .scenename span + span{display:none}
 @media (max-width:420px){.tpage{grid-template-columns:96px 1fr}}
 
 /* the courtyard: sitting on the bench, pigeons pecking (and flapping off when tapped) */
-#mel.sit .legL,#mel.sit .legR,.npc.act-sit .legL,.npc.act-sit .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
-#mel.sit > .flip > g,.npc.act-sit > g{transform:translateY(7px)}
+#mel.sit .legL,#mel.sit .legR,.npc.act-sit:not(.walk) .legL,.npc.act-sit:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
+#mel.sit > .flip > g,.npc.act-sit:not(.walk) > g{transform:translateY(7px)}
 .pigeon .phead{transform-box:fill-box;transform-origin:20% 90%;animation:peck 2.4s ease-in-out infinite;animation-delay:inherit}
 .pigeon{animation:pstroll 9s ease-in-out infinite}
 @keyframes peck{0%,55%,100%{transform:rotate(0)}65%,75%{transform:rotate(38deg) translate(1px,3px)}70%{transform:rotate(30deg) translate(1px,2px)}}
@@ -2901,7 +2901,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       `<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" rx="3" style="fill:#EADFB8" opacity=".55"/>`,
       `<path d="M${x0} ${y0} H${x1} V${y1 - 26} M${x1} ${y1 - 6} V${y1} H${x0} Z" fill="none" style="stroke:var(--wood)" stroke-width="2.4"/><path d="${posts.join(" ")}" style="stroke:var(--wood)" stroke-width="2"/>`
     );
-    const crate = lv2 < 2 ? sk(`<rect x="${x0 + 6}" y="${y0 + 6}" width="26" height="18" style="fill:#C9A27E"/>`, `<rect x="${x0 + 6}" y="${y0 + 6}" width="26" height="18"/><path d="M${x0 + 6} ${y0 + 15} h26" opacity=".4"/><path d="M${x0 + 12} ${y0 + 24} v-10 h14 v10" style="fill:var(--line)" opacity=".25"/>`) : "";
+    const crate2 = lv2 < 2 ? sk(`<rect x="${x0 + 6}" y="${y0 + 6}" width="26" height="18" style="fill:#C9A27E"/>`, `<rect x="${x0 + 6}" y="${y0 + 6}" width="26" height="18"/><path d="M${x0 + 6} ${y0 + 15} h26" opacity=".4"/><path d="M${x0 + 12} ${y0 + 24} v-10 h14 v10" style="fill:var(--line)" opacity=".25"/>`) : "";
     const coop = lv2 >= 2 ? sk(
       `<path d="M44 498 l18 -14 l18 14z" style="fill:var(--rose)"/><rect x="46" y="498" width="32" height="24" style="fill:var(--butter)"/><rect x="56" y="508" width="11" height="14" style="fill:var(--wood)"/><path d="M67 522 l14 12 h4 l-14 -12z" style="fill:var(--wood)"/>
       <rect x="120" y="512" width="34" height="18" rx="2" style="fill:#C9A27E"/><path d="M118 513 h38 l-4 -7 h-30z" style="fill:var(--sage)"/>`,
@@ -2917,7 +2917,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       const right = col < cols / 2, dx = (big ? 20 : 16) + i % 3 * 3, secs = 9 + i * 1.7 % 6;
       return `<g transform="translate(${x} ${y})"><g class="roam ${right ? "rr" : "rl"}" style="--dx:${right ? dx : -dx}px;animation-duration:${secs.toFixed(1)}s;animation-delay:-${(i * 2.3).toFixed(1)}s"><g class="${a.kind === "chick" ? "peck" : "hop"}" style="animation-delay:-${(i * 0.7).toFixed(1)}s">${animalArt(a, hungry(a, F2))}</g></g></g>`;
     }).join("");
-    return `<g data-place="run" aria-label="Animal run"><ellipse class="hov" cx="${(x0 + x1) / 2}" cy="${y1}" rx="${(x1 - x0) / 2 + 8}" ry="10" style="fill:var(--butter)"/>${fence}${meadow}${crate}${coop}${bowl}${animals}${tapeLabel(big ? 204 : 137, big ? 500 : 508, "Animal run", "var(--peach)", 11)}</g>`;
+    return `<g data-place="run" aria-label="Animal run"><ellipse class="hov" cx="${(x0 + x1) / 2}" cy="${y1}" rx="${(x1 - x0) / 2 + 8}" ry="10" style="fill:var(--butter)"/>${fence}${meadow}${crate2}${coop}${bowl}${animals}${tapeLabel(big ? 204 : 137, big ? 500 : 508, "Animal run", "var(--peach)", 11)}</g>`;
   }
   var INK = `style="stroke:var(--line)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"`;
   function animalArt(a, sad) {
@@ -4155,11 +4155,34 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   var FIELD_WALK = [[60, 172], [140, 178], [220, 172], [300, 178], [380, 174], [450, 182], [120, 196]];
   var FIELD_PLAY = [[150, 470], [200, 500], [90, 600], [240, 590], [60, 430]];
   var PICNICKERS = [[106, 468], [138, 464], [198, 486], [230, 482]];
+  var POSES = ["behind", "behind", "front", "sit", "chat", "wander"];
+  var POSE_LEN = 30;
+  function keeperPose(st6, day, hm2) {
+    const e = eventOn(day);
+    if (!e || hm2 < e.from || hm2 >= e.to) return null;
+    const k = Math.floor((hm2 - e.from) / POSE_LEN);
+    return { k, pose: k === 0 ? "behind" : POSES[hash(day + ":" + st6.id + ":" + k) % POSES.length], from: e.from + k * POSE_LEN, to: Math.min(e.to, e.from + (k + 1) * POSE_LEN) };
+  }
+  var keeperAway = (st6, day, hm2) => {
+    const p = keeperPose(st6, day, hm2);
+    return !!p && (p.pose === "chat" || p.pose === "wander");
+  };
+  function keeperSlot(st6, e, day, hm2) {
+    const { k, pose: pose2, from, to } = keeperPose(st6, day, hm2), [x, y] = STALL_SPOTS[st6.at], base = { from, to, scene: "field", glide: true };
+    if (pose2 === "behind") return { ...base, at: [x + 3, y - 9] };
+    if (pose2 === "front") return { ...base, at: [x + 9, y + 9] };
+    if (pose2 === "sit") return { ...base, at: [x - 17, y + 7], act: "sit", dir: 1 };
+    if (pose2 === "chat") {
+      const side = k % 2 ? 1 : -1;
+      return { ...base, at: [Math.max(30, Math.min(490, x + side * 30)), y + 48], dir: -side };
+    }
+    return { ...base, wander: FIELD_WALK };
+  }
   function eventSlot(id, day, hm2) {
     const e = eventOn(day);
     if (!e || hm2 < e.from || hm2 >= e.to) return null;
     const st6 = e.stalls.find((s) => s.id === id);
-    if (st6) return { from: e.from, to: e.to, scene: "field", at: [STALL_SPOTS[st6.at][0] + 8, STALL_SPOTS[st6.at][1] - 2] };
+    if (st6) return keeperSlot(st6, e, day, hm2);
     const mid = e.from + Math.round((e.to - e.from) / 2), wave = hm2 < mid ? 0 : 1, half = Math.round((wave ? e.to - mid : mid - e.from) / 2), start = wave ? mid : e.from;
     const crowd = groupFor(day + "ev" + wave, 4, ["pip", ...e.stalls.map((s) => s.id), ...toursOn(day).flatMap((t2) => [t2.guide, ...t2.group])], [...VISITORS, ...TOURISTS, "sam", "priya"]);
     const k = crowd.indexOf(id);
@@ -4884,8 +4907,8 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       }
       if (hm2 < 10 * 60 || hm2 >= 22 * 60) continue;
       const onShelf = v.shelf.filter((s) => s.n > 0), open2 = v.shelf.find((s) => s.open > 0);
-      const crate = Object.keys(v.fruit).filter((id) => v.fruit[id] > 0);
-      if (!onShelf.length && !open2 && !platesLeft(v) && !crate.length) continue;
+      const crate2 = Object.keys(v.fruit).filter((id) => v.fruit[id] > 0);
+      if (!onShelf.length && !open2 && !platesLeft(v) && !crate2.length) continue;
       const food = Object.keys(v.menu).filter((id) => v.menu[id] > 0 && DISHES[id]), tap = v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === new Date(at + off + 6 * H).toISOString().slice(0, 10);
       const f2 = footfall(hm2, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1);
       const gameDay = new Date(at + off + 6 * H).toISOString().slice(0, 10);
@@ -4910,8 +4933,8 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
         }
       }
       if (Math.random() < 1e-3 * f2) plate();
-      if (crate.length && Math.random() < 18e-4 * f2) {
-        const id = crate[Math.floor(Math.random() * crate.length)];
+      if (crate2.length && Math.random() < 18e-4 * f2) {
+        const id = crate2[Math.floor(Math.random() * crate2.length)];
         v.fruit[id]--;
         if (!v.fruit[id]) delete v.fruit[id];
         out.fruit = (out.fruit || 0) + 1;
@@ -4991,9 +5014,9 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     return `${n} ${ITEMS[id].n.toLowerCase()}${n > 1 && !/s$/.test(ITEMS[id].n) ? "s" : ""} into the fruit crate.`;
   }
   var fruitCrate = (F2) => {
-    const v = vineState(F2), crate = Object.keys(v.fruit).filter((id) => v.fruit[id] > 0), bag2 = Object.keys(F2.inv || {}).filter((id) => F2.inv[id] > 0 && ITEMS[id] && ITEMS[id].fruit);
-    if (!crate.length && !bag2.length) return "";
-    return `<p class="eyebrow">Fruit crate</p>${crate.length ? `<ul class="hlist wlist">${crate.map((id) => `<li><span class="wpic">${icon(id, 36)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${v.fruit[id]} in the crate · ${ITEMS[id].sell || 3} coins each</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty. Fruit from Ma Ma's orchard sells here too.</p>`}
+    const v = vineState(F2), crate2 = Object.keys(v.fruit).filter((id) => v.fruit[id] > 0), bag2 = Object.keys(F2.inv || {}).filter((id) => F2.inv[id] > 0 && ITEMS[id] && ITEMS[id].fruit);
+    if (!crate2.length && !bag2.length) return "";
+    return `<p class="eyebrow">Fruit crate</p>${crate2.length ? `<ul class="hlist wlist">${crate2.map((id) => `<li><span class="wpic">${icon(id, 36)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${v.fruit[id]} in the crate · ${ITEMS[id].sell || 3} coins each</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty. Fruit from Ma Ma's orchard sells here too.</p>`}
     ${bag2.length ? `<div class="vbtns">${bag2.map((id) => `<button class="btn small alt" data-vyfruit="${id}">${icon(id, 18)} Add ${F2.inv[id]} ${esc(ITEMS[id].n.toLowerCase())}</button>`).join("")}</div>` : ""}`;
   };
   function shelfPanel(F2) {
@@ -5454,19 +5477,24 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       <path d="M16 -26 l5 1.5 l-5 1.5z" style="fill:#F08A3C"/><circle cx="14" cy="-25.5" r=".8" style="fill:var(--line)"/>
     </g></g></g>`;
   var ripples = (pts) => pts.map(([x, y]) => `<path class="ripple" d="M${x} ${y} q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>`).join("");
-  var stall = (i, x, y, s) => s.kind === "wine" ? wineStall(i, x, y) : `<g data-place="mstall${i}" aria-label="${s.n} stall"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="28" ry="8" style="fill:var(--butter)"/>
+  var goods = (i, x, y, s) => s.kind === "wine" ? [-16, -7, 2, 11].map((dx, k) => `<path d="M${x + dx} ${y - 24} h5 l-.5 -9 h-4z" style="fill:${k % 2 ? "#E98AA0" : "#5B2338"}"/>`).join("") : [[-14, -26], [-5, -27], [4, -26], [13, -27]].map(([dx, dy], k) => `<circle cx="${x + dx}" cy="${y + dy}" r="3.2" style="fill:${(s.kind === "orchard" ? ["#D9433A", "#E8566C", "#F3C969", "#C9A3E0"] : ["#E8566C", "#F3C969", "#9CC27E", "#C98A4A"])[(k + i) % 4]}"/>`).join("");
+  var table = (i, x, y, s) => {
+    const w = s.kind === "wine" ? 24 : 23;
+    return sk(`<rect x="${x - w}" y="${y - 22}" width="${w * 2}" height="22" rx="2" style="fill:${s.kind === "wine" ? "#8B5E3C" : "#C9A27E"}"/>${goods(i, x, y, s)}`, `<rect x="${x - w}" y="${y - 22}" width="${w * 2}" height="22" rx="2"/>`);
+  };
+  var stallFront = (i, x, y, s) => `<g pointer-events="none">${table(i, x, y, s)}</g>`;
+  var crate = (x, y) => sk(`<rect x="${x - 7}" y="${y - 7}" width="14" height="8" rx="1" style="fill:#B98A5A"/>`, `<rect x="${x - 7}" y="${y - 7}" width="14" height="8" rx="1"/><path d="M${x - 7} ${y - 3} h14"/>`);
+  var stall = (i, x, y, s) => {
+    const wine = s.kind === "wine", hw = wine ? 29 : 28, col = wine ? "#8E2C48" : s.col;
+    return `<g data-place="mstall${i}" aria-label="${wine ? "The wine shop's market stall" : s.n + " stall"}"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="${hw}" ry="8" style="fill:var(--butter)"/>
+  ${crate(x - 17, y + 6)}
   ${sk(
-    `<rect x="${x - 23}" y="${y - 22}" width="46" height="22" rx="2" style="fill:#C9A27E"/><path d="M${x - 28} ${y - 40} h56 l-4 12 h-48z" style="fill:${s.col}"/>${[0, 1, 2].map((k) => `<path d="M${x - 22 + k * 16} ${y - 40} l-2 12 h6 l2 -12z" style="fill:#FFFDF6"/>`).join("")}
-    ${[[-14, -26], [-5, -27], [4, -26], [13, -27]].map(([dx, dy], k) => `<circle cx="${x + dx}" cy="${y + dy}" r="3.2" style="fill:${(s.kind === "orchard" ? ["#D9433A", "#E8566C", "#F3C969", "#C9A3E0"] : ["#E8566C", "#F3C969", "#9CC27E", "#C98A4A"])[(k + i) % 4]}"/>`).join("")}`,
-    `<rect x="${x - 23}" y="${y - 22}" width="46" height="22" rx="2"/><path d="M${x - 28} ${y - 40} h56 l-4 12 h-48z M${x - 25} ${y - 28} v6 M${x + 25} ${y - 28} v6"/>`
-  )}
-  ${tapeLabel(x, y + (i % 2 ? 30 : 16), s.short, "var(--card)", 9)}</g>`;
-  var wineStall = (i, x, y) => `<g data-place="mstall${i}" aria-label="The wine shop's market stall"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="29" ry="8" style="fill:var(--butter)"/>
-  ${sk(
-    `<rect x="${x - 24}" y="${y - 22}" width="48" height="22" rx="2" style="fill:#8B5E3C"/><path d="M${x - 29} ${y - 40} h58 l-4 12 h-50z" style="fill:#8E2C48"/>${[-16, -7, 2, 11].map((dx, k) => `<path d="M${x + dx} ${y - 24} h5 l-.5 -9 h-4z" style="fill:${k % 2 ? "#E98AA0" : "#5B2338"}"/>`).join("")}`,
-    `<rect x="${x - 24}" y="${y - 22}" width="48" height="22" rx="2"/><path d="M${x - 29} ${y - 40} h58 l-4 12 h-50z M${x - 26} ${y - 28} v6 M${x + 26} ${y - 28} v6"/>`
-  )}
-  ${tapeLabel(x, y + (i % 2 ? 30 : 16), "Our wines", "#E8B4C0", 9)}</g>`;
+      `<path d="M${x - hw} ${y - 40} h${hw * 2} l-4 12 h-${hw * 2 - 8}z" style="fill:${col}"/>${wine ? "" : [0, 1, 2].map((k) => `<path d="M${x - 22 + k * 16} ${y - 40} l-2 12 h6 l2 -12z" style="fill:#FFFDF6"/>`).join("")}`,
+      `<path d="M${x - hw} ${y - 40} h${hw * 2} l-4 12 h-${hw * 2 - 8}z M${x - hw + 3} ${y - 28} v6 M${x + hw - 3} ${y - 28} v6"/>`
+    )}
+  ${table(i, x, y, s)}
+  ${tapeLabel(x, y + (i % 2 ? 30 : 16), wine ? "Our wines" : s.short, wine ? "#E8B4C0" : "var(--card)", 9)}</g>`;
+  };
   var blanket2 = () => `<g pointer-events="none">${sk(`<path d="M176 474 l50 -5 l7 22 l-50 5z" style="fill:#7FB8E8"/>${[0, 1].map((k) => `<path d="M${186 + k * 18} ${473 - k * 2} l7 22" style="stroke:#FFFDF6" stroke-width="4"/>`).join("")}`, `<path d="M176 474 l50 -5 l7 22 l-50 5z"/>`)}</g>`;
   var kites = `<g pointer-events="none">${[[150, 110, "#E8566C"], [260, 86, "#7FB8E8"], [360, 120, "#F3C969"]].map(([x, y, c], k) => `<g><animateTransform attributeName="transform" type="translate" values="0 0; ${6 - k * 4} -8; 0 0" dur="${5 + k}s" repeatCount="indefinite"/>
   <g ${W2}><path d="M${x} ${y - 14} l10 14 l-10 14 l-10 -14z" style="fill:${c}"/><path d="M${x} ${y + 14} q6 30 -10 60 q-10 30 4 60" fill="none" stroke-width="1"/></g></g>`).join("")}</g>`;
@@ -6534,11 +6562,11 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
         ) + `<text x="${x}" y="${y - 45}" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="7.5" fill="#FFFDF6" pointer-events="none">honesty</text>` + (n ? `<g class="twinkle" pointer-events="none"><circle cx="${x + 18}" cy="${y - 66}" r="5" fill="#F3C969" stroke="#3a2e28" stroke-width=".8"/></g>` : "");
       }
       case "cafetables": {
-        const table = (tx, ty) => sk(
+        const table2 = (tx, ty) => sk(
           `<ellipse cx="${tx}" cy="${ty - 26}" rx="30" ry="12" style="fill:#FFFDF6"/><path d="M${tx - 4} ${ty - 40} h8 l-1 12 h-6z" style="fill:#5B2338"/><circle cx="${tx + 14}" cy="${ty - 28}" r="3" style="fill:#E8D57A"/>`,
           `<ellipse cx="${tx}" cy="${ty - 26}" rx="30" ry="12"/><path d="M${tx} ${ty - 14} v14 M${tx - 10} ${ty} h20"/><path d="M${tx - 4} ${ty - 40} h8 l-1 12 h-6z"/>`
         ) + sk(`<rect x="${tx - 50}" y="${ty - 22}" width="14" height="6" rx="2" style="fill:var(--wood)"/><rect x="${tx + 36}" y="${ty - 22}" width="14" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="${tx - 50}" y="${ty - 22}" width="14" height="6" rx="2"/><path d="M${tx - 48} ${ty - 16} v12 M${tx - 38} ${ty - 16} v12 M${tx - 50} ${ty - 22} v-16"/><rect x="${tx + 36}" y="${ty - 22}" width="14" height="6" rx="2"/><path d="M${tx + 38} ${ty - 16} v12 M${tx + 48} ${ty - 16} v12 M${tx + 50} ${ty - 22} v-16"/>`);
-        return table(x - 210, y + 2) + table(x - 70, y) + table(x + 70, y - 6);
+        return table2(x - 210, y + 2) + table2(x - 70, y) + table2(x + 70, y - 6);
       }
       // the counter's front panel is drawn over the characters (foreArt), so Opal stands behind it
       case "bankcounter":
@@ -11663,9 +11691,15 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       return;
     }
     if (!e || e.key !== key) {
+      const was = slot2.glide && e && e.key && e.key.split(":")[0] === slot2.scene ? [e.x, e.y] : null;
       if (e) drop(def.id);
-      const p = slot2.at || jitter(pick(slot2.wander));
-      e = ents[def.id] = { def, key, act: slot2.act, kind: "npc", x: p[0], y: p[1], tx: p[0], ty: p[1], dir: slot2.dir || (Math.random() < 0.5 ? -1 : 1), moving: false, wait: rnd(1, 4), node: makeNode(def.id, Object.assign({}, def.look, slot2.look || {}, outdoors(scene2) ? {} : { hat: null }), def.kid, false, slot2.act) };
+      const p = slot2.at || jitter(pick(slot2.wander)), s0 = was || p;
+      e = ents[def.id] = { def, key, act: slot2.act, kind: "npc", x: s0[0], y: s0[1], tx: s0[0], ty: s0[1], dir: slot2.dir || (Math.random() < 0.5 ? -1 : 1), moving: false, wait: rnd(1, 4), node: makeNode(def.id, Object.assign({}, def.look, slot2.look || {}, outdoors(scene2) ? {} : { hat: null }), def.kid, false, slot2.act) };
+      if (was) {
+        e.tx = p[0];
+        e.ty = p[1];
+        e.path = [];
+      }
     }
     const near = Math.hypot(e.x - api3.mel.x, e.y - api3.mel.y) < 110;
     if (near && !sayer && Date.now() - (e.helloAt || 0) > 4 * 6e4 && Math.random() < dt * 0.08) {
@@ -15154,6 +15188,24 @@ Then tell chat "wind down" whenever you're ready.`
     $("maphint").textContent = scene === "field" ? "Feed the swans, picnic, or kick a ball about with Evan. Paths: town (east), orchard (south)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
   }
   var tableKey = "";
+  var frontKey = "";
+  var fronts = [];
+  function stallFronts() {
+    const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null, key = ev ? dayKey() + ev.kind : "";
+    if (key !== frontKey) {
+      fronts.forEach(([n]) => n.remove());
+      fronts = [];
+      frontKey = key;
+      if (ev) fronts = ev.stalls.map((st6) => {
+        const [x, y] = STALL_SPOTS[st6.at], g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("class", "sfront");
+        g.setAttribute("pointer-events", "none");
+        g.innerHTML = stallFront(st6.at, x, y, st6);
+        return [g, { y: y - 1 }];
+      });
+    }
+    return fronts;
+  }
   function drawTableware() {
     if (scene !== "wineshop") return;
     S2.served = S2.served || {};
@@ -15840,7 +15892,8 @@ Then tell chat "wind down" whenever you're ready.`
       } else if (st6.kind === "orchard") {
         orchardTick();
         if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma brought plenty.", "Everybody wants Ma Ma's fruit today.", "For you, free. For them, they pay!"]));
-      } else if (isHere(st6.id)) npcSay(st6.id, st6.line);
+      } else if (isHere(st6.id) && !keeperAway(st6, dayKey(), sgHM())) npcSay(st6.id, st6.line);
+      else speak("Nobody's minding this one just now. It's an honesty tin: pop your coins in.", 3500);
       render();
       return;
     }
@@ -15978,7 +16031,8 @@ Then tell chat "wind down" whenever you're ready.`
     const ev = eventNow(dayKey(), sgHM());
     if (!ev) return "";
     const who3 = (NPCS.find((n) => n.id === st6.id) || { name: "Someone" }).name;
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(st6.n)}</h2><p class="sub">${esc(who3)}'s stall at the ${esc(ev.name.toLowerCase())}. "${esc(st6.line)}"</p>`;
+    const away = keeperAway(st6, dayKey(), sgHM());
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(st6.n)}</h2><p class="sub">${esc(who3)}'s stall at the ${esc(ev.name.toLowerCase())}. ${away ? `${esc(who3)}'s off wandering the market, so it's on the honesty tin: take what you like and pop the coins in.` : `"${esc(st6.line)}"`}</p>`;
     const items = stallItems(st6);
     if (items.length) h += `<div class="items shop">${items.map((id) => itemBtn(id, `<b>${stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < stallPrice(id), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.${st6.produce ? " Handy when the garden's between harvests: it all goes to the kitchen or to Maple." : ""}</p>`;
     if (st6.act) h += `<div class="actions"><button class="btn primary" data-fair="${st6.act}" ${evanHere() ? "" : "disabled"}>${st6.act === "kite" ? "Get Evan a kite (3 coins)" : "Face paint for Evan (3 coins)"}</button></div>${evanHere() ? "" : `<p class="muted">Bring Evan along for this one.</p>`}`;
@@ -16828,7 +16882,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
       mel.dir = 1;
     }
     nodes.evan.classList.toggle("run", evan.run && evan.moving);
-    const order = [[nodes.mel, mel], [nodes.maple, maple], [nodes.evan, evan], ...npcActors()].sort((a, b) => a[1].y - b[1].y);
+    const order = [[nodes.mel, mel], [nodes.maple, maple], [nodes.evan, evan], ...npcActors(), ...stallFronts()].sort((a, b) => a[1].y - b[1].y);
     const g = $("actors");
     order.forEach(([n]) => {
       if (g.lastElementChild !== n) g.appendChild(n);

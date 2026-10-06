@@ -1400,6 +1400,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")).orch; return o.stock.apple + o.stock["stem:rose"] < 80 && o.tin > 0; }), "Ma Ma's market stall sells fruit and flowers off the farm shop's own shelves, into her tin");
   check(await page.locator('#world [data-place^="mstall"]').count() === 8 && await page.locator('#actors [data-npc="ines"]').count() === 1 && await page.locator('#actors [data-npc="mama"]').count() === 1, "the Sunday farmers market: eight stalls along the top, our wine stall with Ines and Ma Ma's fruit and flowers");
   check(await page.locator('#world [data-place="mstall0"]').evaluate(g => g.getBBox().y < 170), "the market stalls stand along the top of the field");
+  check(await page.locator("#actors .sfront").count() === 8, "each stall's table is drawn among the people, so a keeper can stand behind it");
+  { const { keeperPose, MARKET } = await import(pathToFileURL(join(root, "src/game/tours.js")).href);
+    const poses = new Set(MARKET.flatMap(st => [510, 540, 570, 600, 630, 660, 690, 720, 750].map(hm => keeperPose(st, "2026-10-11", hm).pose)));
+    check(["behind", "front", "sit", "chat", "wander"].every(p => poses.has(p)) && MARKET.every(st => keeperPose(st, "2026-10-11", 485).pose === "behind"), "keepers set up behind their stalls, then move about: in front, sitting, chatting, off wandering (honesty tin)"); }
   await page.locator('#world [data-place="mstall0"]').dispatchEvent("click");
   await page.waitForSelector('#ctx .item[data-id="cheese"]', { timeout: 15000 }); await page.click('#ctx .item[data-id="cheese"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.fox")).inv.cheese || 0) >= 1), "stall goods can be bought (cheese, for the kitchen)");

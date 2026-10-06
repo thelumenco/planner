@@ -776,3 +776,11 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Skipped when the tap already offered its own undo (`undoMark`) or the coins went out as a chore refund (flash starting "-").
 - **Roundabout moved** into the playground between the swings and the slide (`pround` door [188,598]; the art is the old drawing inside `translate(-282 82)`, label above it). It used to sit where the harvest bunting crosses.
 - **The "mosquito" fix:** the roundabout's spokes used `animateTransform type="scale"` around the SVG origin, so the mirroring swept them across the whole vineyard. They now scale inside a `translate(470 498)` group, so they turn in place.
+
+### Round 60: market keepers move about
+- `keeperPose(st, day, hm)` in tours.js: every 30 minutes each keeper picks behind / behind / front / sit / chat / wander (seeded by day, keeper and half-hour). The first half hour everyone is behind their stall setting up.
+  - `keeperSlot` turns the pose into a slot (`glide: true`). The places are: behind at [x+3, y-9]; in front at [x+9, y+9]; sitting on the crate at [x-17, y+7]; chatting on the path beside the next stall at [x±30, y+48]; wandering `FIELD_WALK`.
+  - `keeperAway` is true for chat and wander. The stall panel and the tap line then say it's on the honesty tin.
+- `glide` slots (npcs.js): when a new slot in the same scene starts, the NPC walks there in a straight line instead of popping into place.
+- **Stall tables as depth-sorted props:** `stallFront` (art/field.js) draws the table and goods. core.js `stallFronts()` adds them to the `#actors` ordering at y = table bottom − 1 (with `pointer-events: none`), so anyone standing behind a table shows from the waist up. The `.sfront` nodes are removed when leaving the field or when the event ends.
+- `.npc.act-sit` styling now only applies when the NPC isn't walking (`:not(.walk)`).
