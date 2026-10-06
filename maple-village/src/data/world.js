@@ -4,7 +4,7 @@ import { hash, now, H } from "../util.js";
 // Outdoor screens. "base" is home (house, garden, pond, shed, swing); "village" is the town square with the work
 // buildings. A river joins them: walk onto the bridge to cross. A third screen (say, for Luna) would be one more
 // OUTDOOR entry, a pair of bridge places and a BRIDGES/ARRIVE line.
-export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field"];
+export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore"];
 export const VILLAGE = {
   // town square
   hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[170,180], mark:[132,64]},
@@ -70,6 +70,17 @@ export const VILLAGE = {
   mstall6:{scene:"field", name:"Stall", door:[396,164], spot:true, line:"A market stall."},
   mstall7:{scene:"field", name:"Stall", door:[456,164], spot:true, line:"A market stall."},
   pitch:  {scene:"field", name:"Football pitch", door:[150,600], spot:true, line:"The football pitch. Kids play here after school."},
+  // the foreshore, west of the field and north of the flower farm: the sea along its west side (dolphins, paddleboarders),
+  // a boardwalk, a jetty with the paddleboard rack, and two family houses
+  toShoreF:{scene:"field", name:"Gate to the foreshore", door:[22,300], spot:true, bridge:"shore", mark:[30,246], line:"West through the gate to the foreshore."},
+  toShoreFl:{scene:"flowers", name:"Gate to the foreshore", door:[52,152], spot:true, bridge:"shore", mark:[52,96], line:"Up through the arch to the foreshore."},
+  toFieldS:{scene:"shore", name:"Gate to the field", door:[498,300], spot:true, bridge:"field", mark:[490,246], line:"East through the gate to the field and the lake."},
+  toFlowersS:{scene:"shore", name:"Gate to the flower farm", door:[250,622], spot:true, bridge:"flowers", mark:[290,560], line:"Down the boardwalk to Ma Ma's flower farm."},
+  mumdad: {scene:"shore", name:"Mum and Dad's", short:"Mum and Dad's house", door:[360,226], mark:[360,110]},
+  marcus: {scene:"shore", name:"Marcus and Angelina's", short:"Marcus and Angelina's house", door:[400,470], mark:[400,354]},
+  suprack:{scene:"shore", name:"Paddleboards", door:[216,488], spot:true, line:"The paddleboard rack by the jetty. Fancy a paddle?"},
+  dolphins:{scene:"shore", name:"Boardwalk bench", door:[214,262], spot:true, line:"A bench looking out to sea. Dolphins come by most mornings."},
+  exlawn: {scene:"field", name:"Exercise lawn", door:[452,430], spot:true, line:"The exercise lawn. Mum's class is here most mornings at 8."},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };
 // Quests can also happen outdoors at home base: "base" is a quest place whose spots are the base's own places.
@@ -84,9 +95,9 @@ const WORK_HINT = /chord|chico|ambidextrous|fresh pages|client|muse|proposal|inv
 export const isWeekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
 const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
-export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN"}, flowers:{orchard:"toOrchardF"}};
+export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl"}, shore:{field:"toFieldS", flowers:"toFlowersS"}};
 // where Mel steps off, by "from>to"
-export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184]};
+export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184], "field>shore":[470,304], "shore>field":[56,300], "flowers>shore":[250,590], "shore>flowers":[56,190]};
 // the next outdoor screen on the way from one to another (screens form a little chain: base - village - lane)
 export function nextHop(from, to){
   if (from === to) return null; if (BRIDGES[from] && BRIDGES[from][to]) return to;
@@ -213,6 +224,20 @@ export const ROOMS = {
     ["tv","TV","T","tv",null,"Her dramas. Nobody touches the remote.",30],
     ["kitchenette","Kitchenette","K","kitchenette",null,"The kettle's always warm in here.",30],
     ["tea","Tea table","C","teatable",null,"Tea and cake with Ma Ma.",34]]},
+  // Mum and Dad's house on the foreshore: Dad's piano, double bass and easel, Mum's exercise mat, the kitchen table
+  mumdad: {name:"Mum and Dad's", wall:"#EAF2F5", trim:"#3E6B8C", noBoard:true, pos:{P:[112,250], B:[232,262], E:[420,330], Y:[124,500], T:[396,500]}, stations:[
+    ["piano","Piano","P","piano",null,"Dad's piano. He's been working on the same song all week.",42],
+    ["bass","Double bass","B","doublebass",null,"Dad's double bass. Taller than Evan. Much taller.",38],
+    ["easel","Easel","E","easel",null,"Dad's sketches: the jetty, the dolphins, and Evan (twice).",34],
+    ["mat","Mum's mat","Y","yogamat",null,"Mum's mat. Pilates, Zumba, Piloxing: she does them all.",26],
+    ["dtable","Kitchen table","T","table",null,"There's always food on Mum's table. Take some home.",40]]},
+  // Marcus and Angelina's: the games corner, Angelina's study desk and psychology books, the sofa
+  marcus: {name:"Marcus and Angelina's", wall:"#F3ECF7", trim:"#8E5B9A", noBoard:true, pos:{G:[132,262], K:[272,261], D:[404,262], S:[154,470], T:[400,500]}, stations:[
+    ["games","Games corner","G","gamingtv",null,"Marcus's games. He says he's 'nearly finished' this one. He's been nearly finished for a month.",36],
+    ["books","Bookshelf","K","psychshelf",null,"Angelina's psychology books, all with sticky notes.",36],
+    ["study","Angelina's desk","D","studydesk",null,"Angelina's study desk. Highlighters in every colour.",36],
+    ["msofa","Sofa","S","sofa",null,"The comfiest sofa on the foreshore.",30],
+    ["mtable","Table","T","table",null,"Marcus and Angelina's table. Wedding magazines at one end, bank papers at the other.",40]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };

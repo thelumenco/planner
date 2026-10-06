@@ -784,3 +784,31 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - `glide` slots (npcs.js): when a new slot in the same scene starts, the NPC walks there in a straight line instead of popping into place.
 - **Stall tables as depth-sorted props:** `stallFront` (art/field.js) draws the table and goods. core.js `stallFronts()` adds them to the `#actors` ordering at y = table bottom − 1 (with `pointer-events: none`), so anyone standing behind a table shows from the waist up. The `.sfront` nodes are removed when leaving the field or when the event ends.
 - `.npc.act-sit` styling now only applies when the NPC isn't walking (`:not(.walk)`).
+
+### Round 61: the foreshore, Mel's family, Mum's exercise class, family paddling
+- **The foreshore** (`shore`, art/shore.js), modelled on the Mandurah foreshore. It sits west of the field and north of the flower farm.
+  - The sea takes the west third, with three dolphins surfacing on SMIL loops and a far-off paddleboarder.
+  - Then a strip of sand with the **Dolphin bench** (`dolphins`: Mel sits; mornings, once a day, dolphins and a little xp) and the jetty with the **paddleboard rack** (`suprack`).
+  - The boardwalk, Norfolk pines, two lamps, and two houses: **Mum and Dad's** (`mumdad`) and **Marcus and Angelina's** (`marcus`).
+  - Gates: `toFieldS` (east) ↔ the field's `toShoreF` (west), and `toFlowersS` (south) ↔ the flower farm's `toShoreFl` (top left; the hedge has a gap there).
+  - Bounds keep Mel off the water (x ≥ 186). OBST covers the houses and the rack.
+- **Interiors:** `ROOMS.mumdad` has the piano, double bass, easel, Mum's mat and the kitchen table. `ROOMS.marcus` has the games corner, the psychology bookshelf, Angelina's desk, the sofa and a table. New furniture kinds are in scenes.js; the shells are in interiors.js.
+- **New NPCs** (data/npcs.js):
+  - **Mum** (bob with a fringe: hairStyle `bobfringe`): morning walk on the foreshore, then she leads the class at 8. After that she volunteers (the library Mon/Wed, the town hall Fri) or waters at the orchard (Tue/Thu). Flower farm in the early afternoon, town in the late afternoon, her mat at home.
+  - **Dad** (black specs, T-shirt and berms): sketching on the sand at 7, piano, town, the orchard (Mon/Wed/Fri) or bass, the easel, a walk on the foreshore, and music in the evening.
+  - **Marcus** (tall, silver specs): banker at the village bank Mon/Wed/Fri (`BANKER` look, covering Opal's lunch at the main counter). "At work in the city" Tue/Thu. Gaming on the sofa (act `game`) in the evenings. On weekends: the orchard, town, then paddleboarding 4–5pm.
+  - **Angelina** (`dress` look): studies at the library on weekday mornings and at her desk in the afternoons. Waters with Mei, walks the foreshore, paddleboards with Marcus at weekends.
+  - `SHORE_WALK`/`SEA` are point lists. Slots with `free: true` move straight with no clamping (paddleboarders on the water, at speed 22).
+- **Mum's exercise class** (`classOn`/`classSlot` in tours.js): 8–9am Monday to Saturday on the field's **exercise lawn** (`exlawn`, east of the river). Pilates Mon/Wed, Zumba Tue/Thu, Piloxing Fri/Sat.
+  - Mum leads (act `lead`) with 3 villagers from `CLASS_POOL` (act `exercise`).
+  - Tapping the lawn during class puts Mel on the spare mat with the `#mel.exercise` animation; once a day it gives +2 coins and 2 xp. Outside class times it tells you the timetable.
+- **Out-of-towners paddleboard** (`shoreSlot`): two on weekend mornings (9 to 12), one on weekday mornings (7 to 8:30).
+- **Family paddle** (`familyPaddle`/`endPaddle` in core.js, module state `sup`):
+  - Mel (and Evan, if he's here) take boards out for 60 seconds. A `.supboard` is injected under their `.bob` and shown by the `.sup` class.
+  - Any of Mum, Dad, Marcus or Angelina whose routine has them on the foreshore paddle out too (`supSlot` in npcs.js, via `api.sup()`).
+  - Maple waits by the rack and couriers wait at the water's edge. A dolphin moment comes at 20 seconds.
+  - Tapping the shore ends it early. A finished paddle gives 2 xp once a day. Not at night or in the rain.
+- **Darren** paddleboards off the foreshore on Sunday afternoons (3 to 4:30).
+- **Gifts:** `"family"` now also covers Mum, Dad, Marcus and Angelina (`FOLKS`). Soaps, scrub and candles suit Mum and Angelina too; beers suit Dad and Marcus too; honey has a line for each of them.
+- people.js: `look.board` draws a board and paddle; `look.dress` draws a dress (the legs show below it); hairStyle `bobfringe` adds a straight-cut fringe.
+- CSS (npcs.css): paddleboarders bob and hide their shadow; `exercise`/`lead` raise and lower their arms; `game` sits with busy thumbs.

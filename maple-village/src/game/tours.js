@@ -202,3 +202,27 @@ export function eventSlot(id, day, hm){
   if (k >= 0 || id === "pip") return {from: start, to: wave ? e.to : mid, scene: "field", wander: id === "pip" ? FIELD_PLAY : FIELD_WALK};
   return null;
 }
+
+// Mum's exercise class on the exercise lawn at the field (east of the river), 8 to 9am Monday to Saturday: Pilates on
+// Mondays and Wednesdays, Zumba on Tuesdays and Thursdays, Piloxing on Fridays and Saturdays. Three villagers join
+// her each morning (Mel can join too: tap the lawn). Not on market Sundays.
+export const CLASS_FROM = 8*60, CLASS_TO = 9*60, LAWN = [452, 404];
+const CLASS_KIND = {1: "Pilates", 2: "Zumba", 3: "Pilates", 4: "Zumba", 5: "Piloxing", 6: "Piloxing"};
+const MATS = [[418, 444], [456, 452], [494, 444], [436, 480]];
+const CLASS_POOL = ["lin", "okada", "juniper", "hana", "opal", "bo", "angelina", "priya"];
+export const classOn = day => CLASS_KIND[dow(day)] ? {kind: CLASS_KIND[dow(day)], from: CLASS_FROM, to: CLASS_TO,
+  who: groupFor(day + ":class", 3, [], CLASS_POOL)} : null;
+export function classSlot(id, day, hm){
+  const c = classOn(day); if (!c || hm < c.from || hm >= c.to) return null;
+  if (id === "mum") return {from: c.from, to: c.to, scene: "field", at: LAWN, act: "lead", dir: -1};
+  const k = c.who.indexOf(id); return k >= 0 ? {from: c.from, to: c.to, scene: "field", at: MATS[k], act: "exercise", dir: k % 2 ? -1 : 1} : null;
+}
+
+// Out-of-towners paddleboarding off the foreshore: two on weekend mornings (9 to noon), one early on weekdays (7 to 8:30)
+const SUP_SEA = [[60, 190], [104, 250], [70, 330], [112, 400], [64, 560], [118, 610]];
+export function shoreSlot(id, day, hm){
+  if (!TOURISTS.includes(id)) return null;
+  const we = [0, 6].includes(dow(day)), from = we ? 9*60 : 7*60, to = we ? 12*60 : 8*60 + 30; if (hm < from || hm >= to) return null;
+  const e = eventOn(day), busy = [...(e ? e.stalls.map(s => s.id) : []), ...toursOn(day).flatMap(t => t.group)];
+  return groupFor(day + ":sup", we ? 2 : 1, busy, TOURISTS).includes(id) ? {from, to, scene: "shore", wander: SUP_SEA, act: "sup", free: true} : null;
+}

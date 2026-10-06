@@ -65,13 +65,13 @@ export function potsIn(scene){
 }
 
 /* ---------- the screens ---------- */
-const archGate = (id, x, y, label, lx, ly, col, aria) => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="26" ry="22" style="fill:var(--butter)"/>
+export const archGate = (id, x, y, label, lx, ly, col, aria) => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="26" ry="22" style="fill:var(--butter)"/>
     ${sk(`<rect x="${x-18}" y="${y-30}" width="6" height="40" style="fill:var(--wood)"/><rect x="${x+12}" y="${y-30}" width="6" height="40" style="fill:var(--wood)"/><path d="M${x-22} ${y-26} q22 -16 44 0 v6 q-22 -14 -44 0z" style="fill:#9CC27E"/><circle cx="${x-10}" cy="${y-24}" r="2.2" style="fill:#E8566C"/><circle cx="${x+9}" cy="${y-25}" r="2.2" style="fill:#F3C969"/>`,
       `<rect x="${x-18}" y="${y-30}" width="6" height="40"/><rect x="${x+12}" y="${y-30}" width="6" height="40"/><path d="M${x-22} ${y-26} q22 -16 44 0 v6 q-22 -14 -44 0z"/>`)}
     ${tapeLabel(lx, ly, label, col, 11)}</g>`;
 // a hedge along the top; gap: [from, to] x range left open (the orchard's path up to the field)
 const hedgeRow = gap => `<g ${W}>${Array.from({length: 14}, (_, i) => i*40 + 10).filter(x => !gap || x < gap[0] || x > gap[1]).map((x, k) => `<ellipse cx="${x}" cy="${118 + (Math.round((x - 10)/40) % 2)*4}" rx="26" ry="18" style="fill:var(--tree2)"/>`).join("")}</g>`;
-const hedge = hedgeRow();
+const hedge = hedgeRow([16, 96]);   // a gap at the top left: the arch up to the foreshore
 
 export function orchardArt(){
   const o = orchState(artCtx().F()), today = artCtx().day();
@@ -109,7 +109,7 @@ export function flowerFarmArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="440" rx="230" ry="140" style="fill:var(--grass2)"/></g>
     ${tree(40, 50, .8)}${tree(170, 44, .7)}${tree(330, 50, .75)}${tree(480, 44, .8)}${hedge}
-    <g filter="url(#wob)"><path d="M60 285 H520 M160 285 V600 M260 285 V600 M360 285 V600" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M60 285 H520 M160 285 V600 M260 285 V600 M360 285 V600 M60 285 C60 230 52 200 52 150" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
     ${flowers([[30, 200, "#EFA3A6"], [44, 214, "#F3C969"], [30, 600, "#C3CDEE"], [490, 600, "#EFA3A6"], [480, 400, "#F3C969"], [40, 420, "#C3CDEE"]])}
     <g ${W}><rect x="20" y="470" width="44" height="8" rx="2" style="fill:var(--wood)"/><path d="M24 478 v14 M60 478 v14 M20 470 v-14 h44 v14" fill="none"/>
       <path d="M470 236 q8 -10 16 0 v12 h-16z" style="fill:var(--peri)"/><path d="M486 240 q8 -4 10 -10" fill="none"/></g>`;
@@ -118,6 +118,7 @@ export function flowerFarmArt(){
   const beds = BED_ROWS.map((y, r) => FLOWER_XS.map((x, c) => { const i = r*4 + c, p = o.beds[i], st = stateOf("bed", p, today);
     return `<g data-bed="${i}" aria-label="Flower bed ${i + 1}"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="36" ry="10" style="fill:var(--butter)"/><g transform="translate(${x} ${y})" ${W}>${bedBody(p && p.k, st.stage, st.g)}</g></g>`; }).join("")).join("");
   return lampDefs + ground + archGate("toOrchardF", 500, 285, "Orchard", 466, 316, "var(--sage)", "Gate to the orchard")
+    + archGate("toShoreFl", 52, 144, "Foreshore", 112, 176, "var(--sky)", "Gate to the foreshore")
     + tapeLabel(260, 168, "Ma Ma's flower farm", "var(--blush)", 12) + bushes + beds;
 }
 // home base: the gate at the top left, along the path to the orchard

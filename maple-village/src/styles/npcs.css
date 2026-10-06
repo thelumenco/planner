@@ -56,3 +56,22 @@
 .map .dbob{animation:dbob 1.6s ease-in-out infinite}
 @keyframes dbob{0%,100%{translate:0 0}50%{translate:0 -1.5px}}
 @media (prefers-reduced-motion:reduce){.map .sway,.map .ducks,.map .dbob{animation:none}.map .ducks{display:none}}
+/* the foreshore: paddleboarders bob on the water (board drawn under the feet; Mel and Evan get theirs from core.js) */
+.supboard{display:none}
+.ch.sup .supboard{display:inline}
+.ch.sup .legL,.ch.sup .legR,.ch.sup .armL,.ch.sup .armR,.npc.act-sup .legL,.npc.act-sup .legR,.npc.act-sup .armL,.npc.act-sup .armR{animation:none !important}
+.ch.sup > .flip > g > ellipse:first-child,.npc.act-sup > .flip > g > ellipse:first-child{display:none}
+.ch.sup .bob,.npc.act-sup .bob{animation:supbob 2.4s ease-in-out infinite alternate}
+@keyframes supbob{from{transform:translateY(-.5px) rotate(-1deg)}to{transform:translateY(1.5px) rotate(1deg)}}
+/* exercise: Mum leading her class on the exercise lawn, the class (and Mel) following along */
+.ch.npc.act-exercise:not(.walk) .armL,.ch.npc.act-lead:not(.walk) .armL,#mel.exercise .armL{animation:exL .7s ease-in-out infinite alternate}
+.ch.npc.act-exercise:not(.walk) .armR,.ch.npc.act-lead:not(.walk) .armR,#mel.exercise .armR{animation:exR .7s ease-in-out infinite alternate}
+.ch.npc.act-exercise:not(.walk) .bob,.ch.npc.act-lead:not(.walk) .bob,#mel.exercise .bob{animation:exB .7s ease-in-out infinite alternate}
+@keyframes exL{from{transform:rotate(20deg)}to{transform:rotate(155deg)}}
+@keyframes exR{from{transform:rotate(-20deg)}to{transform:rotate(-155deg)}}
+@keyframes exB{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+/* gaming on the sofa: sitting, thumbs going */
+.npc.act-game:not(.walk) .legL,.npc.act-game:not(.walk) .legR{transform:scaleY(.4)}
+.npc.act-game:not(.walk) > g{transform:translateY(7px)}
+.ch.npc.act-game:not(.walk) .armL,.ch.npc.act-game:not(.walk) .armR{animation:typeA .3s ease-in-out infinite alternate}
+@media (prefers-reduced-motion:reduce){.ch.sup .bob,.npc.act-sup .bob,.ch.npc.act-exercise .armL,.ch.npc.act-exercise .armR,.ch.npc.act-lead .armL,.ch.npc.act-lead .armR,#mel.exercise .armL,#mel.exercise .armR,.ch.npc.act-exercise .bob,.ch.npc.act-lead .bob,#mel.exercise .bob,.ch.npc.act-game .armL,.ch.npc.act-game .armR{animation:none}}

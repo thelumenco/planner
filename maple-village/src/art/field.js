@@ -5,6 +5,7 @@ import { ink, sgHM } from "../util.js";
 import { eventNow, STALL_SPOTS } from "../game/tours.js";
 import { sk, tapeLabel, tree, flowers, artCtx } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
+import { archGate } from "./orchard.js";
 
 const W = `filter="url(#wob)" ${ink}`;
 // a swan gliding slowly back and forth (dx: how far it drifts, dur: seconds per lap)
@@ -44,13 +45,13 @@ export function fieldArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="160" cy="520" rx="170" ry="90" style="fill:var(--grass2)"/><ellipse cx="460" cy="460" rx="90" ry="140" style="fill:var(--grass2)"/></g>
     ${tree(40, 60, .9)}${tree(140, 46, .75)}${tree(300, 52, .8)}${tree(420, 40, .9)}${tree(490, 120, .8)}${tree(460, 330, .85)}${tree(470, 560, .9)}${tree(30, 600, .8)}
-    <g filter="url(#wob)"><path d="M260 640 V392 M260 392 C150 392 54 384 54 300 C54 222 130 192 240 188 H520" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M260 640 V392 M260 392 C150 392 54 384 54 300 C54 222 130 192 240 188 H520 M54 300 H20" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
     <g filter="url(#wob)"><path d="M322 304 C372 340 386 380 368 450 C352 520 372 580 380 640" fill="none" style="stroke:var(--water)" stroke-width="18" stroke-linecap="round"/>
       <ellipse cx="210" cy="280" rx="132" ry="62" style="fill:var(--water)"/></g>
     <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1.1" opacity=".55"><ellipse cx="210" cy="280" rx="132" ry="62"/><path d="M313 302 C363 338 377 380 359 450 C343 520 363 580 371 640 M331 306 C381 342 395 380 377 450 C361 520 381 580 389 640"/></g>
     ${ripples([[150, 262], [250, 300], [180, 316], [368, 470], [372, 590]])}
     <g ${W}>${[[86, 250], [92, 312], [330, 262]].map(([x, y]) => `<path d="M${x} ${y} v-14 M${x + 4} ${y} v-18 M${x + 8} ${y} v-12" fill="none" style="stroke:var(--moss2)"/><ellipse cx="${x + 4}" cy="${y - 19}" rx="1.6" ry="4" style="fill:#8C5A3C"/>`).join("")}</g>
-    ${flowers([[30, 440, "#EFA3A6"], [44, 452, "#F3C969"], [440, 230, "#C3CDEE"], [480, 260, "#EFA3A6"], [430, 420, "#F3C969"], [300, 620, "#EFA3A6"], [200, 470, "#C3CDEE"]])}`;
+    ${flowers([[30, 440, "#EFA3A6"], [44, 452, "#F3C969"], [440, 230, "#C3CDEE"], [480, 260, "#EFA3A6"], [300, 620, "#EFA3A6"], [200, 470, "#C3CDEE"]])}`;
   const swans = swan(170, 272, 60, 26, false) + swan(250, 292, -50, 31, true);
   const lake = `<g data-place="lake" aria-label="The lake and the swans"><ellipse class="hov" cx="220" cy="372" rx="60" ry="10" style="fill:var(--butter)"/>
     ${sk(`<rect x="196" y="356" width="48" height="8" rx="2" style="fill:var(--wood)"/>`, `<rect x="196" y="356" width="48" height="8" rx="2"/><path d="M200 364 v10 M240 364 v10 M196 356 v-12 h48 v12"/>`)}
@@ -63,6 +64,11 @@ export function fieldArt(){
     <g ${W} fill="none" opacity=".75"><rect x="66" y="530" width="168" height="56" rx="4" style="stroke:#FFFDF6" stroke-width="2.4"/><path d="M150 530 v56" style="stroke:#FFFDF6" stroke-width="2"/><circle cx="150" cy="558" r="10" style="stroke:#FFFDF6" stroke-width="2"/></g>
     ${sk(`<circle cx="176" cy="566" r="5" style="fill:#FFFDF6"/>`, `<path d="M62 544 v28 h-10 v-28z M238 544 v28 h10 v-28z"/><circle cx="176" cy="566" r="5"/><path d="M174 563 l3 2 l-1 3" opacity=".6"/>`)}
     ${tapeLabel(150, 612, "Football pitch", "var(--butter)", 11)}</g>`;
+  // the exercise lawn east of the river: Mum's class most mornings (mats out, a little speaker)
+  const lawn = `<g data-place="exlawn" aria-label="Exercise lawn"><ellipse class="hov" cx="456" cy="452" rx="52" ry="30" style="fill:var(--butter)"/>
+    ${sk(`${[[418, 444, "#E8566C"], [456, 452, "#7FB8E8"], [494, 444, "#C9A3E0"], [436, 480, "#9CC27E"]].map(([x, y, c]) => `<path d="M${x - 16} ${y + 3} l5 -10 h22 l-5 10z" style="fill:${c}"/>`).join("")}<rect x="476" y="392" width="14" height="18" rx="3" style="fill:#2F2B28"/>`,
+      `${[[418, 444], [456, 452], [494, 444], [436, 480]].map(([x, y]) => `<path d="M${x - 16} ${y + 3} l5 -10 h22 l-5 10z"/>`).join("")}<rect x="476" y="392" width="14" height="18" rx="3"/><circle cx="483" cy="403" r="4"/>`)}
+    ${tapeLabel(452, 502, "Exercise lawn", "var(--blush)", 10)}</g>`;
   const toTown = `<g data-place="toTownF" aria-label="Path to the town square"><ellipse class="hov" cx="500" cy="192" rx="24" ry="22" style="fill:var(--butter)"/>
     ${sk(`<rect x="484" y="160" width="6" height="40" style="fill:var(--wood)"/><rect x="508" y="160" width="6" height="40" style="fill:var(--wood)"/><path d="M480 164 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
       `<rect x="484" y="160" width="6" height="40"/><rect x="508" y="160" width="6" height="40"/><path d="M480 164 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`)}
@@ -75,7 +81,8 @@ export function fieldArt(){
   const ev = eventNow(artCtx().day(), sgHM());
   const event = ev ? bunting + ev.stalls.map(s => stall(s.at, STALL_SPOTS[s.at][0], STALL_SPOTS[s.at][1], s)).join("") + blanket2() + (ev.kind === "fair" ? kites : "")
     + tapeLabel(260, 30, ev.name, "var(--butter)", 12) : "";
-  return lampDefs + ground + swans + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + toTown + toOrchard + event;
+  return lampDefs + ground + swans + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + lawn + toTown + toOrchard + event
+    + archGate("toShoreF", 20, 292, "Foreshore", 52, 332, "var(--sky)", "Gate to the foreshore");
 }
 // The river's stretch through the top right of Ma Ma's orchard (from the lake, on east to home)
 export const orchardRiver = `<g filter="url(#wob)"><path d="M380 0 C400 40 450 66 520 70" fill="none" style="stroke:var(--water)" stroke-width="18" stroke-linecap="round"/>

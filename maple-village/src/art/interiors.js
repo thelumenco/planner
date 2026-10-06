@@ -168,6 +168,25 @@ const SHELLS = {
     ${sk(`<path d="M138 40 h24 l-4 10 h-16z M188 24 h24 l-4 10 h-16z" style="fill:#F3C969"/>`, `<path d="M138 40 h24 l-4 10 h-16z M188 24 h24 l-4 10 h-16z"/>`)}
     ${plant(30, 610, 1.1)}${plant(490, 610, 1)}`,
 
+  // Mum and Dad's on the foreshore: pale timber, a big window onto the sea, Dad's framed sketches and a music stand
+  mumdad: () => `<rect width="520" height="640" style="fill:#D8C3A0"/>
+    <g opacity=".4" style="stroke:#B9A27E" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}${rows(30, i => `<path d="M${(i*83) % 520} ${170 + (i % 13)*36} v36"/>`)}</g>
+    ${wallBase("#EAF2F5", "#3E6B8C")}${skirting}
+    ${sk(`<rect x="300" y="26" width="170" height="92" rx="4" style="fill:#BFE0EE"/><path d="M300 86 q42 -10 85 0 t85 0 v32 h-170z" style="fill:#7FB8E8"/><path d="M402 78 q8 -12 16 -4 q-6 2 -8 8z" style="fill:#5E7A94"/>`, `<rect x="300" y="26" width="170" height="92" rx="4"/><path d="M385 26 v92"/><path d="M300 86 q42 -10 85 0 t85 0" opacity=".6"/>`)}
+    ${sk(`<rect x="30" y="34" width="40" height="32" rx="2" style="fill:#FFFDF6"/><rect x="84" y="28" width="34" height="44" rx="2" style="fill:#FFFDF6"/><rect x="200" y="40" width="44" height="34" rx="2" style="fill:#FFFDF6"/>`,
+      `<rect x="30" y="34" width="40" height="32" rx="2"/><path d="M36 58 q8 -14 16 -4 q6 -10 12 2" opacity=".7"/><rect x="84" y="28" width="34" height="44" rx="2"/><circle cx="101" cy="44" r="7" opacity=".7"/><path d="M92 64 q9 -8 18 0" opacity=".7"/><rect x="200" y="40" width="44" height="34" rx="2"/><path d="M206 66 l10 -14 l8 8 l8 -12 l8 18" opacity=".7"/>`)}
+    <g filter="url(#wob)">${[96, 70, 44].map((rx, i) => `<ellipse cx="300" cy="420" rx="${rx}" ry="${rx*.42}" style="fill:${["#BFE0EE", "#FFFDF6", "#E8B4C0"][i]}" opacity=".75"/>`).join("")}</g>
+    ${plant(490, 610, 1)}${plant(24, 610, .85)}`,
+  // Marcus and Angelina's: soft lilac walls, a gallery wall (their engagement photo), fairy lights, a plant shelf
+  marcus: () => `<rect width="520" height="640" style="fill:#CDB59A"/>
+    <g opacity=".4" style="stroke:#AE9578" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}${rows(30, i => `<path d="M${(i*59) % 520} ${170 + (i % 13)*36} v36"/>`)}</g>
+    ${wallBase("#F3ECF7", "#8E5B9A")}${skirting}
+    <g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1" fill="none"><path d="M10 18 Q130 34 260 18 T510 18"/></g>
+    ${rows(16, i => `<circle cx="${20 + i*31}" cy="${22 + Math.sin(i/2)*5}" r="2.6" style="fill:${["#F3C969", "#F2A0B8", "#C9E6F2"][i % 3]}"/>`)}
+    ${sk(`<rect x="214" y="44" width="54" height="40" rx="2" style="fill:#FFFDF6"/><rect x="278" y="50" width="30" height="30" rx="2" style="fill:#FFFDF6"/><rect x="318" y="44" width="36" height="44" rx="2" style="fill:#FFFDF6"/><circle cx="234" cy="64" r="6" style="fill:#F0D0B4"/><circle cx="248" cy="64" r="6" style="fill:#E6BC98"/>`,
+      `<rect x="214" y="44" width="54" height="40" rx="2"/><path d="M226 80 q8 -8 16 0 M240 80 q8 -8 16 0" opacity=".7"/><rect x="278" y="50" width="30" height="30" rx="2"/><path d="M284 74 l8 -12 l8 12" opacity=".7"/><rect x="318" y="44" width="36" height="44" rx="2"/><path d="M326 80 q10 -20 20 0" opacity=".7"/>`)}
+    <g filter="url(#wob)">${[96, 70].map((rx, i) => `<ellipse cx="160" cy="430" rx="${rx}" ry="${rx*.42}" style="fill:${["#C9A3E0", "#F6E3A1"][i]}" opacity=".7"/>`).join("")}</g>
+    ${plant(490, 610, 1.1)}${plant(30, 610, .9)}`,
   market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(24, i => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`)}</g>
     <g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--blush)"/></g>

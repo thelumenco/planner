@@ -3,7 +3,8 @@
 import { NPCS, AGENTS } from "../data/npcs.js";
 import { personArt, letterArt } from "../art/people.js";
 import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
-import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot } from "./tours.js";
+import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot } from "./tours.js";
+import { SEA } from "../data/npcs.js";
 import { findPath, blocked } from "./paths.js";
 
 const NS = "http://www.w3.org/2000/svg";
@@ -17,21 +18,31 @@ export function initNpcs(a){ api = a; }
 const weekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
 const dowNow = () => new Date(now() + 8*H).getUTCDay();
 // Orchard tours and drop-in visits (tours.js) win over the usual routine while they're on
+// A family paddle (Mel at the paddleboard rack): any of the family who are on the foreshore come out on boards too
+const SUP_FAMILY = ["mum", "dad", "marcus", "angelina"];
+function supSlot(def){
+  const sup = api && api.sup && api.sup(); if (!sup || !SUP_FAMILY.includes(def.id)) return null;
+  const base = routineNow(def); if (!base || base.scene !== "shore") return null;
+  return {from: sup.from, to: sup.from + 999, scene: "shore", wander: SEA, act: "sup", free: true, glide: true};
+}
+const routineNow = def => { const t = sgHM(), we = weekend(), dw = dowNow(), owned = (api && api.F().fam && api.F().fam.owned) || {};
+  return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 const slotNow = def => { const t = sgHM(), we = weekend(), dw = dowNow();
-  const special = eventSlot(def.id, dayKey(), t) || tourSlot(def.id, dayKey(), t) || familySlot(def.id, dayKey(), t) || visitSlot(def.id, dayKey(), t) || fieldSlot(def.id, dayKey(), t) || tastingSlot(def.id, dayKey(), t); if (special) return special;
+  const special = supSlot(def) || eventSlot(def.id, dayKey(), t) || tourSlot(def.id, dayKey(), t) || classSlot(def.id, dayKey(), t) || familySlot(def.id, dayKey(), t) || visitSlot(def.id, dayKey(), t) || fieldSlot(def.id, dayKey(), t) || tastingSlot(def.id, dayKey(), t) || shoreSlot(def.id, dayKey(), t); if (special) return special;
   const owned = (api && api.F().fam && api.F().fam.owned) || {};
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };
 export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
 export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
 const PROPS = {water: "can", repair: "hammer", farm: "hoe"};
-const outdoors = s => s === "village" || s === "base" || s === "lane" || s === "vineyard" || s === "orchard" || s === "flowers" || s === "field";
+const outdoors = s => s === "village" || s === "base" || s === "lane" || s === "vineyard" || s === "orchard" || s === "flowers" || s === "field" || s === "shore";
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 
 function makeNode(id, look, kid, letter, act){
   const g = document.createElementNS(NS, "g");
   g.setAttribute("class", "ch npc" + (act ? " act-" + act : "")); g.dataset.npc = id; g.setAttribute("role", "button");
   if (act && PROPS[act]) look = Object.assign({}, look, {extra: PROPS[act]});
+  if (act === "sup") look = Object.assign({}, look, {board: true, hat: null});
   const owned = (api.F().fam && api.F().fam.owned) || {};
   if (id === "darren" && act === "type" && owned.headphones) look = Object.assign({}, look, {headphones: true});
   g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "");
@@ -81,7 +92,7 @@ function tickVillager(def, dt){
     say(e, pick(hellos()), 2600); api.sfx && api.sfx("babble", def.pitch || 1);
   }
   const b = api.bounds();
-  if (walk(e, def.kid ? 95 : 48, dt)) {
+  if (walk(e, def.kid ? 95 : slot.free ? 22 : 48, dt)) {
     e.wait -= dt;
     if (e.wait <= 0 && slot.wander) {
       let p = jitter(pick(slot.wander));
@@ -90,7 +101,9 @@ function tickVillager(def, dt){
         p = [330 + rnd(-10, 10), 520]; api.evan.tx = 350 + rnd(-14, 14); api.evan.ty = 516; api.evan.run = true;
         if (Math.random() < .6) { say(e, "Race you, Evan!"); setTimeout(() => api.evanSays("race!"), 600); }
       }
-      route(e, clamp(p[0], b[0], b[2]), clamp(p[1], b[1], b[3])); e.wait = rnd(3, 8);
+      if (slot.free) { e.tx = p[0]; e.ty = p[1]; e.path = []; }   // paddleboarders drift straight across the water
+      else route(e, clamp(p[0], b[0], b[2]), clamp(p[1], b[1], b[3]));
+      e.wait = rnd(3, 8);
     }
   }
   e.node.classList.toggle("run", def.kid && e.moving);
@@ -118,6 +131,7 @@ function tickCourier(dt){
     const side = mel.x > 260 ? -1 : 1;
     // stand beside Mel, on whichever side isn't inside something (the well, a stall)
     let [gx, gy] = [[side*44, 2], [-side*44, 2], [side*30, 26], [-side*30, 26], [0, 34]].map(([dx, dy]) => [mel.x + dx, mel.y + dy]).find(([x, y]) => !outdoors(scene) || !blocked(scene, x, y)) || [mel.x + side*44, mel.y + 2];
+    if (scene === "shore") gx = Math.max(gx, 196);   // Mel's out paddling: wait at the water's edge
     if (!c.goal || Math.hypot(c.goal[0] - gx, c.goal[1] - gy) > 18) route(c, gx, gy);   // re-route only when Mel has moved
     const arrived = walk(c, 150, dt);
     if (arrived && c.state === "coming") {
