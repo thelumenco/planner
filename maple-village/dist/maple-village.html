@@ -161,6 +161,9 @@ button{cursor:pointer}
 .sticker{font-size:.82rem;font-weight:600;background:var(--oat);border-radius:999px;padding:3px 12px;color:var(--ink)}
 .checkin{font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;margin:0 0 20px}
 .actions{display:flex;flex-wrap:wrap;gap:14px 12px}
+/* a little room above every row of buttons in a panel, so their outline (focus/tap highlight) never touches the line above */
+.panel .actions{margin-top:12px}
+.panel .actions:first-child{margin-top:0}
 .btn{position:relative;border:0;padding:12px 30px;background:var(--peri);color:var(--navy);font-weight:700;font-size:1rem;line-height:1.2;transform:rotate(-.6deg);
   clip-path:polygon(1.5% 10%,6% 0,96% 3%,99.5% 0,97% 46%,100% 92%,94% 100%,4% 97%,0 100%,2.5% 52%);transition:filter .15s,transform .1s}
 .btn:hover{filter:saturate(1.15) brightness(.98)}
@@ -1341,6 +1344,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .goalbar{height:12px;border-radius:999px;background:rgba(60,40,30,.12);overflow:hidden;margin:10px 0 4px;border:1.2px solid var(--line)}
 .goalbar span{display:block;height:100%;background:var(--honey);border-radius:999px}
 #mel.hairdown .pony{display:none}
+#mel.restyled .usual{display:none}
 
 /* the wardrobe: ticking off what to wear */
 .wearpick ul li label{display:flex;align-items:center;gap:8px;width:100%;cursor:pointer}
@@ -1425,8 +1429,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
                 <g class="pony"><path d="M4 -57 c9 -7 17 0 14 9 c-2 6 -7 9 -5.5 15 c-5 -3 -9.5 -10 -6.5 -16 c-3.5 2.5 -6 1 -5 -3z" style="fill:var(--hair)"/></g>
                 <circle cx="0" cy="-46" r="10.6" style="fill:var(--skin)"/>
                 <path d="M-10.8 -45 c-1.5 -10 4.5 -15.5 11 -15.5 c7 0 12.6 5 10.8 14 c-2.6 -4.5 -6 -6 -9.2 -5 l1 -3 c-3 3.2 -7.2 4.2 -11 3.2 c-1.2 1.8 -2 4 -2.6 6.3z" style="fill:var(--hair)"/>
-                <path d="M-3 -60 q-2 -4 1 -6 M2 -60 q2 -4 5 -4" fill="none" style="stroke:var(--hair)" stroke-width="1.4"/>
-                <circle cx="4.6" cy="-57.5" r="2.3" style="fill:var(--peri2)"/>
+                <path class="usual" d="M-3 -60 q-2 -4 1 -6 M2 -60 q2 -4 5 -4" fill="none" style="stroke:var(--hair)" stroke-width="1.4"/>
+                <circle class="usual" cx="4.6" cy="-57.5" r="2.3" style="fill:var(--peri2)"/>
                 <ellipse cx="-3.7" cy="-44" rx="1.3" ry="1.7" style="fill:var(--sock)" stroke="none"/>
                 <ellipse cx="3.7" cy="-44" rx="1.3" ry="1.7" style="fill:var(--sock)" stroke="none"/>
                 <ellipse cx="-6.4" cy="-40.6" rx="2" ry="1.2" style="fill:var(--rose)" opacity=".75" stroke="none"/>
@@ -2362,15 +2366,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["press", "Cheese press", "C", "cheesepress", null, "The cheese press. Goat's milk in, cheese out.", 30]
     ] },
     // Ma Ma's cottage in the orchard: one cosy room with her bed, the TV, a little kitchenette and the tea table
-    cottage: { name: "Ma Ma's cottage", wall: "#F6E7D7", trim: "#C2505F", noBoard: true, pos: { B: [110, 262], T: [420, 250], K: [276, 262], C: [110, 560], X: [320, 470] }, stations: [
-      ["mbed", "Ma Ma's bed", "B", "grannybed", null, "Ma Ma's bed, the crocheted blanket folded just so.", 30],
+    cottage: { name: "Ma Ma's cottage", wall: "#F6E7D7", trim: "#C2505F", noBoard: true, pos: { R: [40, 330], T: [420, 250], K: [276, 262], C: [110, 560], X: [320, 470] }, stations: [
+      ["bedroom", "Bedroom", "R", "bedroomdoor", null, "Ma Ma and Gong Gong's room. Her bed has the crocheted blanket, folded just so.", 0],
       ["tv", "TV", "T", "tv", null, "Her dramas. Nobody touches the remote.", 30],
       ["kitchenette", "Kitchenette", "K", "kitchenette", null, "The kettle's always warm in here.", 30],
       ["tea", "Tea table", "C", "teatable", null, "Tea and cake with Ma Ma.", 34],
       ["dine", "Dining table", "X", "dining", null, "Ma Ma's big table. She cooks for twenty, every time.", 44]
     ] },
     // Mum and Dad's house on the foreshore: Dad's piano, double bass and easel, Mum's exercise mat, the kitchen table
-    mumdad: { name: "Mum and Dad's", wall: "#EAF2F5", trim: "#3E6B8C", noBoard: true, pos: { P: [112, 250], B: [232, 262], E: [420, 330], Y: [110, 392], X: [270, 500] }, stations: [
+    mumdad: { name: "Mum and Dad's", wall: "#EAF2F5", trim: "#3E6B8C", noBoard: true, pos: { P: [112, 250], B: [232, 262], E: [420, 330], Y: [110, 392], X: [270, 500], R: [480, 330] }, stations: [
+      ["bedroom", "Bedroom", "R", "bedroomdoor", null, "Mum and Dad's room.", 0],
       ["piano", "Piano", "P", "piano", null, "Dad's piano. He's been working on the same song all week.", 42],
       ["bass", "Double bass", "B", "doublebass", null, "Dad's double bass. Taller than Evan. Much taller.", 38],
       ["easel", "Easel", "E", "easel", null, "Dad's sketches: the jetty, the dolphins, and Evan (twice).", 34],
@@ -2378,7 +2383,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["dine", "Dining table", "X", "dining", null, "The family table. There's always food on it. Take some home.", 44]
     ] },
     // Marcus and Angelina's: the games corner, Angelina's study desk and psychology books, the sofa
-    marcus: { name: "Marcus and Angelina's", wall: "#F3ECF7", trim: "#8E5B9A", noBoard: true, pos: { G: [110, 262], K: [452, 261], D: [320, 262], S: [110, 420], X: [340, 470] }, stations: [
+    marcus: { name: "Marcus and Angelina's", wall: "#F3ECF7", trim: "#8E5B9A", noBoard: true, pos: { G: [110, 262], K: [452, 261], D: [320, 262], S: [110, 420], X: [340, 470], R: [480, 370] }, stations: [
+      ["bedroom", "Bedroom", "R", "bedroomdoor", null, "Marcus and Angelina's room.", 0],
       ["games", "Games corner", "G", "gamingtv", null, "Marcus's games. He says he's 'nearly finished' this one. He's been nearly finished for a month.", 36],
       ["books", "Bookshelf", "K", "psychshelf", null, "Angelina's psychology books, all with sticky notes.", 36],
       ["study", "Angelina's desk", "D", "studydesk", null, "Angelina's study desk. Highlighters in every colour.", 36],
@@ -3986,7 +3992,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         slot("13:00", "15:00", "cottage", [[300, 330], [200, 360], [470, 530]]),
         slot("15:00", "16:00", "cottage", [154, 564], { act: "sit" }),
         slot("16:00", "18:00", "flowers", [[160, 380], [260, 470], [360, 300], [310, 300]], { act: "farm" }),
-        slot("18:00", "21:30", "cottage", [398, 352], { act: "sit" })
+        slot("18:00", "22:50", "cottage", [398, 352], { act: "sit" }),
+        slot("22:50", "23:00", "cottage", [66, 352])
       ],
       lines: [
         "I love you, ah girl.",
@@ -4029,7 +4036,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         slot("15:00", "16:00", "cottage", [66, 564], { act: "sit" }),
         slot("16:00", "17:00", "cottage", [458, 358], { act: "sit" }),
         slot("17:00", "18:00", "orchard", [[160, 330], [260, 420], [360, 510]], { act: "water" }),
-        slot("18:00", "22:00", "cottage", [458, 358], { act: "sit" })
+        slot("18:00", "22:50", "cottage", [458, 358], { act: "sit" }),
+        slot("22:50", "23:00", "cottage", [86, 360])
       ],
       lines: [
         "Have you eaten? Ma Ma made too much again.",
@@ -4188,7 +4196,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         slot("13:00", "15:00", "flowers", [[160, 300], [260, 380], [360, 470]], { dow: [1, 2, 3, 4, 5], act: "farm" }),
         slot("15:00", "17:00", "village", [[220, 430], [290, 450], [260, 520], [330, 400]], { dow: [1, 2, 3, 4, 5, 6] }),
         slot("17:00", "18:00", "mumdad", [104, 404], { act: "exercise" }),
-        slot("18:00", "22:00", "mumdad", [270, 476], { act: "sit" })
+        slot("18:00", "22:50", "mumdad", [270, 476], { act: "sit" }),
+        slot("22:50", "23:00", "mumdad", [454, 352])
       ],
       lines: [
         "I'm going for my Pilates! Back in an hour.",
@@ -4231,8 +4240,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         slot("13:30", "15:30", "mumdad", [262, 300], { act: "type" }),
         slot("15:30", "17:30", "mumdad", [446, 362], { act: "type", dir: -1 }),
         slot("17:30", "19:00", "shore", SHORE_WALK),
-        slot("19:00", "22:00", "mumdad", [112, 292], { act: "type", dow: [0, 2, 4, 6] }),
-        slot("19:00", "22:00", "mumdad", [262, 300], { act: "type" })
+        slot("19:00", "22:50", "mumdad", [112, 292], { act: "type", dow: [0, 2, 4, 6] }),
+        slot("19:00", "22:50", "mumdad", [262, 300], { act: "type" }),
+        slot("22:50", "23:00", "mumdad", [434, 360])
       ],
       lines: [
         "Hi darling, love you, have a good day.",
@@ -4268,7 +4278,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         slot("12:30", "13:30", "bank", [260, 500], { dow: [1, 3, 5], look: BANKER }),
         slot("9:00", "17:30", "bank", [404, 500], { dow: [1, 3, 5], look: BANKER }),
         slot("17:30", "19:00", "shore", SHORE_WALK, { days: "wd" }),
-        slot("19:00", "23:00", "marcus", [90, 428], { act: "game" }),
+        slot("19:00", "22:50", "marcus", [90, 428], { act: "game" }),
+        slot("22:50", "23:00", "marcus", [454, 392]),
         slot("9:00", "11:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 500]], { days: "we", act: "farm" }),
         slot("11:00", "13:00", "village", [[220, 430], [290, 450], [260, 520]], { days: "we" }),
         slot("13:00", "16:00", "marcus", [90, 428], { act: "game", days: "we" }),
@@ -4311,7 +4322,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         slot("13:00", "16:00", "marcus", [322, 302], { days: "we", act: "type" }),
         slot("16:00", "17:00", "shore", SEA, { days: "we", act: "sup", free: true }),
         slot("17:00", "19:00", "shore", SHORE_WALK, { days: "we" }),
-        slot("19:00", "22:30", "marcus", [132, 428], { act: "sit" })
+        slot("19:00", "22:50", "marcus", [132, 428], { act: "sit" }),
+        slot("22:50", "23:00", "marcus", [434, 400])
       ],
       lines: [
         "Did you know naming a feeling makes it smaller? It's true. I read it last night.",
@@ -6965,6 +6977,15 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
           `<path d="M${x + 40} ${y - 108} L${x + 12} ${y - 96} L${x + 12} ${y + 4} L${x + 40} ${y + 14}z" style="fill:#8FA3B8"/><path d="M${x + 36} ${y - 80} l-20 6 v10 l20 -6z" style="fill:#CFE0EE"/>`,
           `<path d="M${x + 40} ${y - 108} L${x + 12} ${y - 96} L${x + 12} ${y + 4} L${x + 40} ${y + 14}z"/><circle cx="${x + 17}" cy="${y - 42}" r="1.8"/><path d="M${x + 36} ${y - 80} l-20 6 v10 l20 -6z"/>`
         );
+      // a bedroom door (the family's houses): on the west or east wall depending on where it stands, with a little
+      // heart sign; from 11pm to the morning a "shh" sign hangs on it
+      case "bedroomdoor": {
+        const left3 = x < 260, d = left3 ? `M${x - 40} ${y - 108} L${x - 12} ${y - 96} L${x - 12} ${y + 4} L${x - 40} ${y + 14}z` : `M${x + 40} ${y - 108} L${x + 12} ${y - 96} L${x + 12} ${y + 4} L${x + 40} ${y + 14}z`, sx = left3 ? x - 26 : x + 26, m = new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8 * 36e5).getUTCHours(), night = m >= 23 || m < 6;
+        return sk(
+          `<path d="${d}" style="fill:#E8B4C0"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2" style="fill:#FFFDF6"/>` : `<path d="M${sx} ${y - 58} c-4 -6 -10 -2 -6 3 l6 5 l6 -5 c4 -5 -2 -9 -6 -3z" style="fill:#E8566C"/>`}`,
+          `<path d="${d}"/><circle cx="${left3 ? x - 17 : x + 17}" cy="${y - 42}" r="1.8"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2"/><path d="M${sx - 6} ${y - 64} h12" opacity=".6"/>` : ""}`
+        );
+      }
       // the home office door on the living room's west wall, below Mel's
       case "officedoor":
         return sk(
@@ -16212,6 +16233,7 @@ ${SIGNOFF[t2.who] || ""}`;
     const down = !!(w && w.hair && /down/i.test(w.hair));
     $("oHairDown").style.display = down ? "" : "none";
     m.classList.toggle("hairdown", down);
+    m.classList.toggle("restyled", !!(w && (w.hair || w.dress || w.top)));
   }
   function dressMel() {
     const d = F.decor || {}, show2 = (id, on) => {
@@ -16572,6 +16594,12 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     if (id === "dine") {
       sitForDinner();
+      return;
+    }
+    if (id === "bedroom") {
+      const m = sgHM(), who3 = { cottage: "Ma Ma and Gong Gong", mumdad: "Mum and Dad", marcus: "Marcus and Angelina" }[scene] || "They";
+      speak(m >= 23 * 60 || m < 6 * 60 + 30 ? `Shh. ${who3} are fast asleep. See them in the morning.` : `${who3}'s bedroom. Private! The door stays shut.`, 4e3);
+      render();
       return;
     }
     if (id === "gdoor") {
