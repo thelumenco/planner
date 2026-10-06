@@ -812,3 +812,26 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Gifts:** `"family"` now also covers Mum, Dad, Marcus and Angelina (`FOLKS`). Soaps, scrub and candles suit Mum and Angelina too; beers suit Dad and Marcus too; honey has a line for each of them.
 - people.js: `look.board` draws a board and paddle; `look.dress` draws a dress (the legs show below it); hairStyle `bobfringe` adds a straight-cut fringe.
 - CSS (npcs.css): paddleboarders bob and hide their shadow; `exercise`/`lead` raise and lower their arms; `game` sits with busy thumbs.
+
+### Round 62: gift chooser and thank-you notes, who's where, family dinners, more people out and about
+- **Gift chooser:** tapping a gift in the backpack opens `giftPickHTML`, listing everyone the gift suits (`giftWho`), each marked "here" or "send it".
+  - Someone here gets it in person (`giveGift(id, chosen)`).
+  - Anyone else gets it sent round (`giveTo`): an entry goes in `F.thanks` ({who, item, at: now + 10 min}).
+  - Once due, `thanksMail()` adds "Thank you from X" notes to `localMail`. Penny delivers them; `thankNote` builds the text from the gift's `says` line and the person's sign-off.
+- **Who's where today** (friendship view, `whosWhereHTML`): family first, then the village. Each person's day comes from `daySchedule(id, day)` in npcs.js (quarter-hour sampling of `slotAt`, cached per day).
+  - npcs.js now has `slotAt(def, day, t, live)`. `slotNow` is the live case and adds the family paddle.
+- **Family dinners** (tours.js `dinnerOn`/`dinnerNow`/`dinnerSlot`/`dinnerSeat`): Wednesdays and Sundays, 6:30 to 8pm. The host goes round home → Mum and Dad's → the cottage → Marcus and Angelina's (`DINNER_HOSTS`, by week).
+  - Seats: Ma Ma, Gong Gong, Mum, Dad and Angelina along the back; Darren, Marcus, Evan and Mel along the front.
+  - Every house has a `dining` station (`DINING` positions). The table is also a depth-sorted prop (`diningTable` in scenes.js, via `stallFronts`), so those along the back show from the waist up.
+  - Furniture moved to make room:
+    - Mel's home: the dining table replaced the sofa (it takes the sofa's reading/rest quests; Evan's storybook spot moved to it).
+    - The cottage: the kitchenette now stands against the back wall and the tea table is bottom left.
+    - Mum and Dad's: the kitchen table became the dining table and Mum's mat moved up.
+    - Marcus and Angelina's: re-laid out as a games-and-sofa corner on the left, Angelina's desk and bookshelf as a study nook at the back right, and the dining table in the middle right.
+    - The rugs moved to match.
+  - Evan sits at his seat on dinner nights (`evanAtDinner`, `#evan.sit`). Tapping the table sits Mel down (2.5 seconds; 3 xp once a night). A reminder plays from 5:30pm, and chat "family dinner" walks there.
+- **Out and about:**
+  - Mum: Thursday afternoon at the vineyard.
+  - Dad: Sunday morning at the market, Tuesday late morning in the lane, Saturday afternoon at the vineyard, Wednesday sketching by the lake.
+  - Marcus and Angelina: the Sunday market, Friday evening at the vineyard, the lane (Saturday / Wednesday).
+  - Villagers in Makers' Lane (`LANE`): Mr Okada (Mon/Wed/Fri 2pm), Bo (Tue/Thu lunch), Juniper (weekdays 3:30pm).

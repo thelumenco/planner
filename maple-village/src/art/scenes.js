@@ -240,6 +240,13 @@ export function notesArt(x, y, n){
 }
 
 /* ---------- furniture (x,y = centre of the front edge) ---------- */
+// the family dining table's top, apron, legs and place settings (x = centre, y = front edge on the floor)
+export const diningTable = (x, y) => sk(`<rect x="${x - 150}" y="${y - 40}" width="300" height="28" rx="4" style="fill:#D9B48A"/><rect x="${x - 150}" y="${y - 14}" width="300" height="8" rx="2" style="fill:#B98A5A"/>
+    <path d="M${x - 40} ${y - 36} h80 l-4 20 h-72z" style="fill:#FFFDF6" opacity=".85"/>
+    ${[0, 1, 2, 3, 4].map(b => `<ellipse cx="${x - 120 + b*60}" cy="${y - 33}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("")}${[0, 1, 2, 3].map(f => `<ellipse cx="${x - 90 + f*60}" cy="${y - 19}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("")}
+    <ellipse cx="${x}" cy="${y - 27}" rx="16" ry="6" style="fill:#F3C969"/><circle cx="${x - 8}" cy="${y - 29}" r="3" style="fill:#E8566C"/><circle cx="${x + 6}" cy="${y - 28}" r="3" style="fill:#9CC27E"/><rect x="${x + 44}" y="${y - 36}" width="6" height="12" rx="2" style="fill:#8FB3E8"/><rect x="${x - 52}" y="${y - 34}" width="6" height="10" rx="2" style="fill:#F2A0B8"/>`,
+  `<rect x="${x - 150}" y="${y - 40}" width="300" height="28" rx="4"/><rect x="${x - 150}" y="${y - 14}" width="300" height="8" rx="2"/><path d="M${x - 140} ${y - 6} v6 M${x + 140} ${y - 6} v6"/>
+    ${[0, 1, 2, 3, 4].map(b => `<ellipse cx="${x - 120 + b*60}" cy="${y - 33}" rx="9" ry="3.6"/>`).join("")}${[0, 1, 2, 3].map(f => `<ellipse cx="${x - 90 + f*60}" cy="${y - 19}" rx="9" ry="3.6"/>`).join("")}<ellipse cx="${x}" cy="${y - 27}" rx="16" ry="6"/>`);
 export function furn(kind, x, y){
   const W2 = "var(--wood)";
   const legs = (w, h) => `<path d="M${x-w/2+6} ${y} v${h} M${x+w/2-6} ${y} v${h}"/>`;
@@ -295,6 +302,12 @@ export function furn(kind, x, y){
       return sk(`<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3" style="fill:#EADCF0"/>${b}`, `<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3"/><path d="M${x-44} ${y-68} h88 M${x-44} ${y-40} h88 M${x-44} ${y-12} h88"/>`); }
     case "studydesk": return sk(`<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3" style="fill:#FFFDF6"/><rect x="${x-20}" y="${y-50}" width="38" height="22" rx="2" style="fill:#DCE3EE"/><rect x="${x-46}" y="${y-44}" width="20" height="14" rx="1" style="fill:#C9A3E0"/><rect x="${x-44}" y="${y-50}" width="18" height="6" rx="1" style="fill:#8FB3E8"/><rect x="${x+24}" y="${y-38}" width="18" height="8" rx="1" style="fill:#F2A0B8"/><path d="M${x+26} ${y-46} l4 -6 l3 1 l-4 6z" style="fill:#F3D34A"/>`,
       `<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3"/><rect x="${x-20}" y="${y-50}" width="38" height="22" rx="2"/><rect x="${x-46}" y="${y-44}" width="20" height="14" rx="1"/><rect x="${x-44}" y="${y-50}" width="18" height="6" rx="1"/><rect x="${x+24}" y="${y-38}" width="18" height="8" rx="1"/><path d="M${x-46} ${y-6} v14 M${x+46} ${y-6} v14"/>`);
+    // the big family dining table (seats nine: five along the back, four along the front), with its chairs; the
+    // table itself is also drawn among the people (diningTable, core.js) so those sitting behind it show waist up
+    case "dining": { const back = [0, 1, 2, 3, 4].map(b => x - 120 + b*60), front = [0, 1, 2, 3].map(f => x - 90 + f*60);
+      return sk(`${back.map(cx => `<rect x="${cx - 10}" y="${y - 66}" width="20" height="26" rx="4" style="fill:#B98A5A"/>`).join("")}${front.map(cx => `<rect x="${cx - 10}" y="${y + 4}" width="20" height="12" rx="3" style="fill:#B98A5A"/>`).join("")}`,
+        `${back.map(cx => `<rect x="${cx - 10}" y="${y - 66}" width="20" height="26" rx="4"/><path d="M${cx - 6} ${y - 58} h12" opacity=".5"/>`).join("")}${front.map(cx => `<rect x="${cx - 10}" y="${y + 4}" width="20" height="12" rx="3"/><path d="M${cx - 8} ${y + 16} v8 M${cx + 8} ${y + 16} v8"/>`).join("")}`)
+        + diningTable(x, y); }
     case "sofa": return sk(`<rect x="${x-56}" y="${y-44}" width="112" height="28" rx="12" style="fill:var(--sage)"/><rect x="${x-60}" y="${y-24}" width="120" height="24" rx="10" style="fill:var(--sage)"/><rect x="${x-40}" y="${y-38}" width="24" height="18" rx="6" style="fill:var(--butter)"/><rect x="${x+16}" y="${y-38}" width="24" height="18" rx="6" style="fill:var(--rose)"/>`,
       `<rect x="${x-56}" y="${y-44}" width="112" height="28" rx="12"/><rect x="${x-60}" y="${y-24}" width="120" height="24" rx="10"/><rect x="${x-40}" y="${y-38}" width="24" height="18" rx="6"/><rect x="${x+16}" y="${y-38}" width="24" height="18" rx="6"/>`);
     case "kitchen": return sk(`<rect x="${x-56}" y="${y-40}" width="112" height="40" rx="3" style="fill:var(--card)"/><rect x="${x-56}" y="${y-46}" width="112" height="8" style="fill:${W2}"/><circle cx="${x-24}" cy="${y-52}" r="9" style="fill:var(--stone)"/><path d="M${x+8} ${y-62} h28 v14 h-28z" style="fill:var(--rose)"/>`,

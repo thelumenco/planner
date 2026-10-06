@@ -1131,8 +1131,8 @@ body.kidmode .scenename span + span{display:none}
 @media (max-width:420px){.tpage{grid-template-columns:96px 1fr}}
 
 /* the courtyard: sitting on the bench, pigeons pecking (and flapping off when tapped) */
-#mel.sit .legL,#mel.sit .legR,.npc.act-sit:not(.walk) .legL,.npc.act-sit:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
-#mel.sit > .flip > g,.npc.act-sit:not(.walk) > g{transform:translateY(7px)}
+#mel.sit .legL,#mel.sit .legR,#evan.sit .legL,#evan.sit .legR,.npc.act-sit:not(.walk) .legL,.npc.act-sit:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
+#mel.sit > .flip > g,#evan.sit > .flip > g,.npc.act-sit:not(.walk) > g{transform:translateY(7px)}
 .pigeon .phead{transform-box:fill-box;transform-origin:20% 90%;animation:peck 2.4s ease-in-out infinite;animation-delay:inherit}
 .pigeon{animation:pstroll 9s ease-in-out infinite}
 @keyframes peck{0%,55%,100%{transform:rotate(0)}65%,75%{transform:rotate(38deg) translate(1px,3px)}70%{transform:rotate(30deg) translate(1px,2px)}}
@@ -1312,6 +1312,18 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
 #ctx .orspot{width:100%;font:inherit;color:inherit}
 /* the wine shop's chalkboard menu */
 #ctx .wlist.chalk .mprice{flex:none;font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;color:#8E2C48}
+/* who's where today (friendship view) */
+details.whowhere{border-bottom:1px dashed rgba(60,40,30,.18);padding:5px 2px}
+details.whowhere summary{cursor:pointer;list-style:none}
+details.whowhere summary::-webkit-details-marker{display:none}
+details.whowhere ul{margin:6px 0 4px;padding-left:14px;font-size:.88rem}
+details.whowhere li span{display:inline-block;min-width:104px;color:var(--muted, #7a6f66)}
+details.whowhere li.now{font-weight:700}
+/* the gift chooser in the backpack */
+.giftpick{background:var(--card, #FFFDF6);border:1.5px dashed var(--line);border-radius:12px;padding:10px 12px;margin-bottom:6px}
+.giftpick .actions{flex-wrap:wrap;gap:6px}
+.giftpick small{opacity:.75;font-weight:400}
+details.whowhere summary b{font-size:1rem;margin-right:6px}
 </style>
 </head>
 <body>
@@ -2231,17 +2243,17 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     ] },
     // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
     // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
-    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { A: [120, 216], B: [414, 228], H: [318, 250], C: [124, 450], R: [40, 330], K: [480, 330], D: [350, 556], G: [436, 448], E: [448, 598], F: [96, 596] }, stations: [
+    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { X: [190, 452], A: [120, 216], B: [414, 228], H: [318, 250], C: [124, 450], R: [40, 330], K: [480, 330], D: [350, 556], G: [436, 448], E: [448, 598], F: [96, 596] }, stations: [
       ["desk", "Home desk", "A", "desk", /./, "Your own little desk."],
       ["kitchen", "Kitchen", "B", "kitchen", /cook|meal|lunch|dinner|bake|grocer|prep/, "Something smells good."],
-      ["sofa", "Sofa", "C", "sofa", /read|rest|journal|meditat|book|nap/, "Soft cushions, deep breaths."],
       ["mydoor", "My room", "R", "sidedoor", null, "Your room. Just you.", 0],
       ["kiddoor", "Evan's room", "K", "kiddoor", null, "Evan's room. Dinosaurs welcome.", 0],
       ["laundry", "Laundry", "D", "laundry", /fold|laundry|clothes|wash|iron/, "Fold, stack, done."],
       ["cupboard", "Cleaning cupboard", "E", "cupboard", /clean|tidy|wipe|hestia|dust/, "Hestia's chores live in here."],
       ["fridge", "Fridge", "H", "fridge", null, "The fridge: what we have, and the shopping list."],
       ["treadmill", "Treadmill", "F", "treadmill", /treadmill/, "1.2 and go. Walk and work.", -12],
-      ["office", "Darren's desk", "G", "office", null, "Darren's home office. Shh, he might be on a call."]
+      ["office", "Darren's desk", "G", "office", null, "Darren's home office. Shh, he might be on a call."],
+      ["dine", "Dining table", "X", "dining", /read|rest|journal|meditat|book|nap/, "The big family table. Room for all nine of us, or a book and a cup of tea.", 44]
     ] },
     // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
     room: { name: "My room", wall: "#EFE3EE", trim: "var(--blush)", noBoard: true, pos: { A: [262, 300], W: [262, 206], B: [72, 262], E: [62, 396], C: [66, 500], D: [434, 556], J: [260, 594], N: [406, 132] }, stations: [
@@ -2307,27 +2319,28 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       ["press", "Cheese press", "C", "cheesepress", null, "The cheese press. Goat's milk in, cheese out.", 30]
     ] },
     // Ma Ma's cottage in the orchard: one cosy room with her bed, the TV, a little kitchenette and the tea table
-    cottage: { name: "Ma Ma's cottage", wall: "#F6E7D7", trim: "#C2505F", noBoard: true, pos: { B: [110, 262], T: [420, 250], K: [404, 470], C: [200, 470] }, stations: [
+    cottage: { name: "Ma Ma's cottage", wall: "#F6E7D7", trim: "#C2505F", noBoard: true, pos: { B: [110, 262], T: [420, 250], K: [276, 262], C: [110, 560], X: [320, 470] }, stations: [
       ["mbed", "Ma Ma's bed", "B", "grannybed", null, "Ma Ma's bed, the crocheted blanket folded just so.", 30],
       ["tv", "TV", "T", "tv", null, "Her dramas. Nobody touches the remote.", 30],
       ["kitchenette", "Kitchenette", "K", "kitchenette", null, "The kettle's always warm in here.", 30],
-      ["tea", "Tea table", "C", "teatable", null, "Tea and cake with Ma Ma.", 34]
+      ["tea", "Tea table", "C", "teatable", null, "Tea and cake with Ma Ma.", 34],
+      ["dine", "Dining table", "X", "dining", null, "Ma Ma's big table. She cooks for twenty, every time.", 44]
     ] },
     // Mum and Dad's house on the foreshore: Dad's piano, double bass and easel, Mum's exercise mat, the kitchen table
-    mumdad: { name: "Mum and Dad's", wall: "#EAF2F5", trim: "#3E6B8C", noBoard: true, pos: { P: [112, 250], B: [232, 262], E: [420, 330], Y: [124, 500], T: [396, 500] }, stations: [
+    mumdad: { name: "Mum and Dad's", wall: "#EAF2F5", trim: "#3E6B8C", noBoard: true, pos: { P: [112, 250], B: [232, 262], E: [420, 330], Y: [110, 392], X: [270, 500] }, stations: [
       ["piano", "Piano", "P", "piano", null, "Dad's piano. He's been working on the same song all week.", 42],
       ["bass", "Double bass", "B", "doublebass", null, "Dad's double bass. Taller than Evan. Much taller.", 38],
       ["easel", "Easel", "E", "easel", null, "Dad's sketches: the jetty, the dolphins, and Evan (twice).", 34],
       ["mat", "Mum's mat", "Y", "yogamat", null, "Mum's mat. Pilates, Zumba, Piloxing: she does them all.", 26],
-      ["dtable", "Kitchen table", "T", "table", null, "There's always food on Mum's table. Take some home.", 40]
+      ["dine", "Dining table", "X", "dining", null, "The family table. There's always food on it. Take some home.", 44]
     ] },
     // Marcus and Angelina's: the games corner, Angelina's study desk and psychology books, the sofa
-    marcus: { name: "Marcus and Angelina's", wall: "#F3ECF7", trim: "#8E5B9A", noBoard: true, pos: { G: [132, 262], K: [272, 261], D: [404, 262], S: [154, 470], T: [400, 500] }, stations: [
+    marcus: { name: "Marcus and Angelina's", wall: "#F3ECF7", trim: "#8E5B9A", noBoard: true, pos: { G: [110, 262], K: [452, 261], D: [320, 262], S: [110, 420], X: [340, 470] }, stations: [
       ["games", "Games corner", "G", "gamingtv", null, "Marcus's games. He says he's 'nearly finished' this one. He's been nearly finished for a month.", 36],
       ["books", "Bookshelf", "K", "psychshelf", null, "Angelina's psychology books, all with sticky notes.", 36],
       ["study", "Angelina's desk", "D", "studydesk", null, "Angelina's study desk. Highlighters in every colour.", 36],
       ["msofa", "Sofa", "S", "sofa", null, "The comfiest sofa on the foreshore.", 30],
-      ["mtable", "Table", "T", "table", null, "Marcus and Angelina's table. Wedding magazines at one end, bank papers at the other.", 40]
+      ["dine", "Dining table", "X", "dining", null, "Their dining table. Wedding magazines at one end, bank papers at the other.", 44]
     ] },
     market: { name: "Market", wall: "#F8E5E2", trim: "var(--blush)", stations: [
       ["stall", "Shop counter", "M", "shopcounter", null, "Welcome in! Have a browse."]
@@ -2814,7 +2827,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       `<rect x="378" y="320" width="116" height="26" rx="10" style="fill:#9CC27E"/><rect x="372" y="338" width="128" height="22" rx="8" style="fill:#8DB86B"/><rect x="392" y="326" width="22" height="14" rx="5" style="fill:#F3C969"/>`,
       `<rect x="378" y="320" width="116" height="26" rx="10"/><rect x="372" y="338" width="128" height="22" rx="8"/><rect x="392" y="326" width="22" height="14" rx="5"/><path d="M436 340 v20" opacity=".4"/>`
     )}
-    <g filter="url(#wob)">${[86, 62, 40].map((rx, i) => `<ellipse cx="200" cy="470" rx="${rx}" ry="${rx * 0.42}" style="fill:${["#E8B4C0", "#F6E3A1", "#9CC27E"][i]}" opacity=".8"/>`).join("")}</g>
+    <g filter="url(#wob)">${[86, 62, 40].map((rx, i) => `<ellipse cx="110" cy="560" rx="${rx}" ry="${rx * 0.42}" style="fill:${["#E8B4C0", "#F6E3A1", "#9CC27E"][i]}" opacity=".8"/>`).join("")}</g>
     ${plant(30, 610, 1)}${plant(490, 610, 0.9)}`,
     // The wine shop: terracotta tiles, warm plaster, a wine rack behind the counter, the chalk menu, hanging lamps
     wineshop: () => `<rect width="520" height="640" style="fill:#D9A58A"/>
@@ -2851,7 +2864,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       `<rect x="214" y="44" width="54" height="40" rx="2" style="fill:#FFFDF6"/><rect x="278" y="50" width="30" height="30" rx="2" style="fill:#FFFDF6"/><rect x="318" y="44" width="36" height="44" rx="2" style="fill:#FFFDF6"/><circle cx="234" cy="64" r="6" style="fill:#F0D0B4"/><circle cx="248" cy="64" r="6" style="fill:#E6BC98"/>`,
       `<rect x="214" y="44" width="54" height="40" rx="2"/><path d="M226 80 q8 -8 16 0 M240 80 q8 -8 16 0" opacity=".7"/><rect x="278" y="50" width="30" height="30" rx="2"/><path d="M284 74 l8 -12 l8 12" opacity=".7"/><rect x="318" y="44" width="36" height="44" rx="2"/><path d="M326 80 q10 -20 20 0" opacity=".7"/>`
     )}
-    <g filter="url(#wob)">${[96, 70].map((rx, i) => `<ellipse cx="160" cy="430" rx="${rx}" ry="${rx * 0.42}" style="fill:${["#C9A3E0", "#F6E3A1"][i]}" opacity=".7"/>`).join("")}</g>
+    <g filter="url(#wob)">${[96, 70].map((rx, i) => `<ellipse cx="110" cy="412" rx="${rx}" ry="${rx * 0.42}" style="fill:${["#C9A3E0", "#F6E3A1"][i]}" opacity=".7"/>`).join("")}</g>
     ${plant(490, 610, 1.1)}${plant(30, 610, 0.9)}`,
     market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, (i) => `<path d="M0 ${170 + i * 40} H520"/>`)}${rows(24, (i) => `<path d="M${(i * 97 + i % 3 * 40) % 520} ${170 + i % 12 * 40} v40"/>`)}</g>
@@ -3600,6 +3613,9 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   var SHORE_WALK = [[226, 180], [240, 300], [300, 312], [430, 300], [236, 420], [226, 560], [300, 580]];
   var SEA = [[60, 190], [104, 250], [70, 330], [112, 400], [64, 560], [118, 610]];
   var BANKER = { top: "#DCE7F2", bottom: "#2F3A4A", extra: "tie" };
+  var LANE = [[262, 320], [200, 390], [320, 400], [262, 470], [110, 360], [420, 380]];
+  var MARKET_WALK = [[120, 200], [220, 196], [320, 200], [420, 200], [130, 470]];
+  var VINE_WALK = [[262, 390], [340, 440], [300, 300], [200, 560], [418, 490]];
   var slot = (from, to, scene2, where, opts) => Object.assign({ from: hm(from), to: hm(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where }, opts || {});
   var NPCS = [
     {
@@ -3634,7 +3650,15 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       job: "Retired postmaster, unofficial well-keeper",
       intro: "Okada. Forty years delivering letters. Retired now, but I still can't stop sorting things. Even the pebbles by the well.",
       look: { skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses" },
-      routine: [slot("19:30", "21:00", "wineshop", [313, 518], { act: "sit", days: "wd" }), slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("17:00", "19:30", "village", [322, 566])],
+      routine: [
+        slot("14:00", "15:00", "lane", LANE, { dow: [1, 3, 5] }),
+        slot("19:30", "21:00", "wineshop", [313, 518], { act: "sit", days: "wd" }),
+        slot("7:30", "12:00", "village", [455, 512]),
+        slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]),
+        slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]),
+        slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]),
+        slot("17:00", "19:30", "village", [322, 566])
+      ],
       lines: [
         "Letters used to come in sacks. Now it's all on your little phone.",
         "The well water is sweeter in the afternoon. Don't ask me why.",
@@ -3652,6 +3676,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       intro: "Welcome to the library! I'm Juniper. I love a good semicolon; I also write poetry, but that's a secret. One book recommendation a week, guaranteed.",
       look: { skin: "#C99A78", hair: "#2B2320", hairStyle: "bob", top: "#B9D2A6", bottom: "#3F4A6B", extra: "glasses" },
       routine: [
+        slot("15:30", "16:30", "lane", LANE, { dow: [1, 2, 3, 4, 5] }),
         slot("18:30", "20:00", "wineshop", [453, 512], { act: "sit" }),
         slot("8:30", "13:00", "fresh", [[160, 300], [330, 300], [240, 330]]),
         slot("13:00", "15:30", "fresh", [356, 330]),
@@ -3675,6 +3700,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       intro: "Bo! Carpenter. If it creaks, wobbles or falls off, I'm your guy. Built half this village. *hums*",
       look: { skin: "#E2B590", hair: "#3B2A1E", hairStyle: "short", top: "#E9C46A", bottom: "#4F6B8A", extra: "cap" },
       routine: [
+        slot("12:30", "13:30", "lane", LANE, { dow: [2, 4] }),
         slot("18:30", "20:00", "wineshop", [227, 518], { act: "sit" }),
         slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]),
         slot("12:30", "13:30", "village", [346, 566]),
@@ -3863,8 +3889,8 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
         slot("16:00", "17:30", "vineyard", [[262, 390], [340, 440], [300, 300]], { dow: [2, 4] }),
         slot("7:00", "11:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 500], [310, 330]], { act: "water" }),
         slot("11:00", "13:00", "flowers", [[160, 300], [260, 380], [360, 470], [210, 300]], { act: "water" }),
-        slot("13:00", "15:00", "cottage", [[300, 420], [380, 420], [340, 330]]),
-        slot("15:00", "16:00", "cottage", [244, 474], { act: "sit" }),
+        slot("13:00", "15:00", "cottage", [[300, 330], [200, 360], [470, 530]]),
+        slot("15:00", "16:00", "cottage", [154, 564], { act: "sit" }),
         slot("16:00", "18:00", "flowers", [[160, 380], [260, 470], [360, 300], [310, 300]], { act: "farm" }),
         slot("18:00", "21:30", "cottage", [398, 352], { act: "sit" })
       ],
@@ -3906,7 +3932,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
         slot("11:30", "13:00", "cottage", [458, 358], { act: "sit" }),
         slot("13:00", "14:00", "flowers", [[160, 330], [260, 420], [360, 510]], { act: "water" }),
         slot("14:00", "15:00", "cottage", [458, 358], { act: "sit" }),
-        slot("15:00", "16:00", "cottage", [156, 474], { act: "sit" }),
+        slot("15:00", "16:00", "cottage", [66, 564], { act: "sit" }),
         slot("16:00", "17:00", "cottage", [458, 358], { act: "sit" }),
         slot("17:00", "18:00", "orchard", [[160, 330], [260, 420], [360, 510]], { act: "water" }),
         slot("18:00", "22:00", "cottage", [458, 358], { act: "sit" })
@@ -4055,6 +4081,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       intro: "Hello darling! Can't stop long, I'm going for my Pilates. Have you eaten? There's food at home, take some!",
       look: { skin: "#E8C3A2", hair: "#1E1A18", hairStyle: "bobfringe", top: "#E8566C", bottom: "#2F2B28" },
       routine: [
+        slot("15:00", "16:30", "vineyard", VINE_WALK, { dow: [4] }),
         slot("15:00", "17:00", "base", [[230, 360], [300, 590], [160, 520]], { dow: [0] }),
         slot("8:00", "13:00", "field", [[120, 200], [220, 196], [320, 200], [130, 470]], { dow: [0] }),
         slot("6:45", "7:45", "shore", SHORE_WALK),
@@ -4062,11 +4089,11 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
         slot("9:00", "11:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 500]], { dow: [2, 4], act: "water" }),
         slot("9:00", "11:00", "hall", [[200, 320], [330, 320]], { dow: [5] }),
         slot("9:30", "11:30", "village", [[200, 420], [300, 440], [250, 520]], { dow: [6] }),
-        slot("11:00", "13:00", "mumdad", [372, 520], { act: "sit" }),
+        slot("11:00", "13:00", "mumdad", [270, 476], { act: "sit" }),
         slot("13:00", "15:00", "flowers", [[160, 300], [260, 380], [360, 470]], { dow: [1, 2, 3, 4, 5], act: "farm" }),
         slot("15:00", "17:00", "village", [[220, 430], [290, 450], [260, 520], [330, 400]], { dow: [1, 2, 3, 4, 5, 6] }),
-        slot("17:00", "18:00", "mumdad", [124, 512], { act: "exercise" }),
-        slot("18:00", "22:00", "mumdad", [372, 520], { act: "sit" })
+        slot("17:00", "18:00", "mumdad", [104, 404], { act: "exercise" }),
+        slot("18:00", "22:00", "mumdad", [270, 476], { act: "sit" })
       ],
       lines: [
         "I'm going for my Pilates! Back in an hour.",
@@ -4095,11 +4122,15 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       intro: "Ah, there she is! Come, listen to this. I've been working on it all week. Then you can see my drawing of the jetty.",
       look: { skin: "#E6BC98", hair: "#141110", hairStyle: "short", top: "#5B7DB1", bottom: "#8C8F7A", shorts: true, specs: "#141110" },
       routine: [
+        slot("9:00", "11:00", "field", MARKET_WALK, { dow: [0] }),
+        slot("11:00", "12:30", "lane", LANE, { dow: [2] }),
+        slot("15:00", "16:30", "vineyard", VINE_WALK, { dow: [6] }),
+        slot("17:30", "18:30", "field", [170, 384], { dow: [3], act: "type" }),
         slot("15:00", "17:00", "base", [[250, 360], [320, 590], [180, 520]], { dow: [0] }),
         slot("7:00", "9:00", "shore", [212, 372], { act: "type", dir: -1 }),
         slot("9:00", "11:00", "mumdad", [112, 292], { act: "type" }),
         slot("11:00", "12:30", "village", [[230, 420], [300, 470], [190, 520], [340, 420]]),
-        slot("12:30", "13:30", "mumdad", [420, 520], { act: "sit" }),
+        slot("12:30", "13:30", "mumdad", [330, 476], { act: "sit" }),
         slot("13:30", "15:30", "orchard", [[160, 420], [260, 510], [360, 420], [210, 330]], { dow: [1, 3, 5], act: "farm" }),
         slot("13:30", "15:30", "mumdad", [262, 300], { act: "type" }),
         slot("15:30", "17:30", "mumdad", [446, 362], { act: "type", dir: -1 }),
@@ -4131,14 +4162,17 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       intro: "Sis! Want a game later? I'll go easy on you. Probably.",
       look: { skin: "#E6BC98", hair: "#1A1716", hairStyle: "short", top: "#3E4A5C", bottom: "#2F3A4A", specs: "#C0C4CC", tall: true },
       routine: [
+        slot("10:00", "12:00", "field", MARKET_WALK, { dow: [0] }),
+        slot("17:30", "19:00", "vineyard", VINE_WALK, { dow: [5] }),
+        slot("13:00", "14:00", "lane", LANE, { dow: [6] }),
         slot("8:30", "9:00", "shore", SHORE_WALK, { days: "wd" }),
         slot("12:30", "13:30", "bank", [260, 500], { dow: [1, 3, 5], look: BANKER }),
         slot("9:00", "17:30", "bank", [404, 500], { dow: [1, 3, 5], look: BANKER }),
         slot("17:30", "19:00", "shore", SHORE_WALK, { days: "wd" }),
-        slot("19:00", "23:00", "marcus", [132, 476], { act: "game" }),
+        slot("19:00", "23:00", "marcus", [90, 428], { act: "game" }),
         slot("9:00", "11:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 500]], { days: "we", act: "farm" }),
         slot("11:00", "13:00", "village", [[220, 430], [290, 450], [260, 520]], { days: "we" }),
-        slot("13:00", "16:00", "marcus", [132, 476], { act: "game", days: "we" }),
+        slot("13:00", "16:00", "marcus", [90, 428], { act: "game", days: "we" }),
         slot("16:00", "17:00", "shore", SEA, { days: "we", act: "sup", free: true }),
         slot("17:00", "19:00", "shore", SHORE_WALK, { days: "we" })
       ],
@@ -4163,17 +4197,20 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       intro: "Hi Mel! Sorry, I'm in exam mode. Ask me anything about attachment theory. Actually don't.",
       look: { skin: "#F0D0B4", hair: "#3A2A22", hairStyle: "long", top: "#C9A3E0", bottom: "#F0D0B4", dress: "#C9A3E0" },
       routine: [
+        slot("10:00", "12:00", "field", MARKET_WALK, { dow: [0] }),
+        slot("17:30", "19:00", "vineyard", VINE_WALK, { dow: [5] }),
+        slot("12:00", "13:00", "lane", LANE, { dow: [3] }),
         slot("9:00", "12:00", "fresh", [420, 300], { days: "wd", act: "type" }),
         slot("12:00", "13:00", "village", [[220, 430], [290, 450], [260, 520]], { days: "wd" }),
-        slot("13:00", "16:30", "marcus", [402, 302], { days: "wd", act: "type" }),
+        slot("13:00", "16:30", "marcus", [322, 302], { days: "wd", act: "type" }),
         slot("16:30", "17:30", "flowers", [[160, 300], [260, 380], [360, 470]], { days: "wd", act: "water" }),
         slot("17:30", "19:00", "shore", SHORE_WALK, { days: "wd" }),
         slot("9:00", "11:00", "flowers", [[160, 300], [260, 380], [360, 470]], { days: "we", act: "water" }),
         slot("11:00", "13:00", "village", [[220, 430], [290, 450], [260, 520]], { days: "we" }),
-        slot("13:00", "16:00", "marcus", [402, 302], { days: "we", act: "type" }),
+        slot("13:00", "16:00", "marcus", [322, 302], { days: "we", act: "type" }),
         slot("16:00", "17:00", "shore", SEA, { days: "we", act: "sup", free: true }),
         slot("17:00", "19:00", "shore", SHORE_WALK, { days: "we" }),
-        slot("19:00", "22:30", "marcus", [176, 476], { act: "sit" })
+        slot("19:00", "22:30", "marcus", [132, 428], { act: "sit" })
       ],
       lines: [
         "Did you know naming a feeling makes it smaller? It's true. I read it last night.",
@@ -4444,6 +4481,37 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     if (hm2 < from || hm2 >= to) return null;
     const e = eventOn(day), busy2 = [...e ? e.stalls.map((s) => s.id) : [], ...toursOn(day).flatMap((t2) => t2.group)];
     return groupFor(day + ":sup", we ? 2 : 1, busy2, TOURISTS).includes(id) ? { from, to, scene: "shore", wander: SUP_SEA, act: "sup", free: true } : null;
+  }
+  var DINNER_FROM = 18 * 60 + 30;
+  var DINNER_TO = 20 * 60;
+  var DINNER_HOSTS = ["home", "mumdad", "cottage", "marcus"];
+  var HOST_NAME = { home: "your place", mumdad: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", marcus: "Marcus and Angelina's" };
+  var DINING = { home: { cx: 190, fy: 452 }, mumdad: { cx: 270, fy: 500 }, cottage: { cx: 320, fy: 470 }, marcus: { cx: 340, fy: 470 } };
+  var BACK = ["mama", "gonggong", "mum", "dad", "angelina"];
+  var FRONT = ["darren", "marcus", "evan", "mel"];
+  function dinnerSeat(host, who3) {
+    const t2 = DINING[host];
+    if (!t2) return null;
+    const b = BACK.indexOf(who3), f2 = FRONT.indexOf(who3);
+    if (b >= 0) return [t2.cx - 120 + b * 60, t2.fy - 24];
+    if (f2 >= 0) return [t2.cx - 90 + f2 * 60, t2.fy + 18];
+    return null;
+  }
+  function dinnerOn(day) {
+    const d = dow(day);
+    if (d !== 3 && d !== 0) return null;
+    const week = Math.floor(Date.parse(day + "T00:00:00Z") / (7 * 864e5));
+    return { host: DINNER_HOSTS[(week * 2 + (d === 0 ? 1 : 0)) % 4], from: DINNER_FROM, to: DINNER_TO };
+  }
+  var dinnerNow = (day, hm2) => {
+    const d = dinnerOn(day);
+    return d && hm2 >= d.from && hm2 < d.to ? d : null;
+  };
+  function dinnerSlot(id, day, hm2) {
+    if (!BACK.includes(id) && !FRONT.includes(id)) return null;
+    const d = dinnerNow(day, hm2);
+    if (!d) return null;
+    return { from: d.from, to: d.to, scene: d.host, at: dinnerSeat(d.host, id), act: "sit", dir: BACK.includes(id) ? 1 : -1, dinner: true };
   }
 
   // src/art/wine.js
@@ -5044,8 +5112,8 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     }
     return out;
   }
-  function footfall(hm2, weekend2, visitors) {
-    return (hm2 >= 17 * 60 && hm2 < 21 * 60 ? 2 : hm2 >= 12 * 60 && hm2 < 14 * 60 ? 1.3 : 1) * (weekend2 ? 1.5 : 1) * (1 + 0.4 * visitors);
+  function footfall(hm2, weekend, visitors) {
+    return (hm2 >= 17 * 60 && hm2 < 21 * 60 ? 2 : hm2 >= 12 * 60 && hm2 < 14 * 60 ? 1.3 : 1) * (weekend ? 1.5 : 1) * (1 + 0.4 * visitors);
   }
   function servePlate(v, gameDay, out) {
     if (v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === gameDay && Math.random() < 0.65) {
@@ -6607,6 +6675,14 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     const c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#C3CDEE", "#DCE8C8"];
     return Array.from({ length: Math.min(5, n) }, (_, i) => `<rect x="${x + i * 10}" y="${y + i % 2 * 6}" width="12" height="14" transform="rotate(${i % 2 ? 6 : -5} ${x + 6 + i * 10} ${y + 7})" style="fill:${c[i]}"/>`).join("");
   }
+  var diningTable = (x, y) => sk(
+    `<rect x="${x - 150}" y="${y - 40}" width="300" height="28" rx="4" style="fill:#D9B48A"/><rect x="${x - 150}" y="${y - 14}" width="300" height="8" rx="2" style="fill:#B98A5A"/>
+    <path d="M${x - 40} ${y - 36} h80 l-4 20 h-72z" style="fill:#FFFDF6" opacity=".85"/>
+    ${[0, 1, 2, 3, 4].map((b) => `<ellipse cx="${x - 120 + b * 60}" cy="${y - 33}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("")}${[0, 1, 2, 3].map((f2) => `<ellipse cx="${x - 90 + f2 * 60}" cy="${y - 19}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("")}
+    <ellipse cx="${x}" cy="${y - 27}" rx="16" ry="6" style="fill:#F3C969"/><circle cx="${x - 8}" cy="${y - 29}" r="3" style="fill:#E8566C"/><circle cx="${x + 6}" cy="${y - 28}" r="3" style="fill:#9CC27E"/><rect x="${x + 44}" y="${y - 36}" width="6" height="12" rx="2" style="fill:#8FB3E8"/><rect x="${x - 52}" y="${y - 34}" width="6" height="10" rx="2" style="fill:#F2A0B8"/>`,
+    `<rect x="${x - 150}" y="${y - 40}" width="300" height="28" rx="4"/><rect x="${x - 150}" y="${y - 14}" width="300" height="8" rx="2"/><path d="M${x - 140} ${y - 6} v6 M${x + 140} ${y - 6} v6"/>
+    ${[0, 1, 2, 3, 4].map((b) => `<ellipse cx="${x - 120 + b * 60}" cy="${y - 33}" rx="9" ry="3.6"/>`).join("")}${[0, 1, 2, 3].map((f2) => `<ellipse cx="${x - 90 + f2 * 60}" cy="${y - 19}" rx="9" ry="3.6"/>`).join("")}<ellipse cx="${x}" cy="${y - 27}" rx="16" ry="6"/>`
+  );
   function furn(kind, x, y) {
     const W22 = "var(--wood)";
     const legs = (w, h) => `<path d="M${x - w / 2 + 6} ${y} v${h} M${x + w / 2 - 6} ${y} v${h}"/>`;
@@ -6725,6 +6801,15 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
           `<rect x="${x - 52}" y="${y - 30}" width="104" height="24" rx="3" style="fill:#FFFDF6"/><rect x="${x - 20}" y="${y - 50}" width="38" height="22" rx="2" style="fill:#DCE3EE"/><rect x="${x - 46}" y="${y - 44}" width="20" height="14" rx="1" style="fill:#C9A3E0"/><rect x="${x - 44}" y="${y - 50}" width="18" height="6" rx="1" style="fill:#8FB3E8"/><rect x="${x + 24}" y="${y - 38}" width="18" height="8" rx="1" style="fill:#F2A0B8"/><path d="M${x + 26} ${y - 46} l4 -6 l3 1 l-4 6z" style="fill:#F3D34A"/>`,
           `<rect x="${x - 52}" y="${y - 30}" width="104" height="24" rx="3"/><rect x="${x - 20}" y="${y - 50}" width="38" height="22" rx="2"/><rect x="${x - 46}" y="${y - 44}" width="20" height="14" rx="1"/><rect x="${x - 44}" y="${y - 50}" width="18" height="6" rx="1"/><rect x="${x + 24}" y="${y - 38}" width="18" height="8" rx="1"/><path d="M${x - 46} ${y - 6} v14 M${x + 46} ${y - 6} v14"/>`
         );
+      // the big family dining table (seats nine: five along the back, four along the front), with its chairs; the
+      // table itself is also drawn among the people (diningTable, core.js) so those sitting behind it show waist up
+      case "dining": {
+        const back = [0, 1, 2, 3, 4].map((b) => x - 120 + b * 60), front = [0, 1, 2, 3].map((f2) => x - 90 + f2 * 60);
+        return sk(
+          `${back.map((cx) => `<rect x="${cx - 10}" y="${y - 66}" width="20" height="26" rx="4" style="fill:#B98A5A"/>`).join("")}${front.map((cx) => `<rect x="${cx - 10}" y="${y + 4}" width="20" height="12" rx="3" style="fill:#B98A5A"/>`).join("")}`,
+          `${back.map((cx) => `<rect x="${cx - 10}" y="${y - 66}" width="20" height="26" rx="4"/><path d="M${cx - 6} ${y - 58} h12" opacity=".5"/>`).join("")}${front.map((cx) => `<rect x="${cx - 10}" y="${y + 4}" width="20" height="12" rx="3"/><path d="M${cx - 8} ${y + 16} v8 M${cx + 8} ${y + 16} v8"/>`).join("")}`
+        ) + diningTable(x, y);
+      }
       case "sofa":
         return sk(
           `<rect x="${x - 56}" y="${y - 44}" width="112" height="28" rx="12" style="fill:var(--sage)"/><rect x="${x - 60}" y="${y - 24}" width="120" height="24" rx="10" style="fill:var(--sage)"/><rect x="${x - 40}" y="${y - 38}" width="24" height="18" rx="6" style="fill:var(--butter)"/><rect x="${x + 16}" y="${y - 38}" width="24" height="18" rx="6" style="fill:var(--rose)"/>`,
@@ -11903,8 +11988,6 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function initNpcs(a) {
     api3 = a;
   }
-  var weekend = () => [0, 6].includes(new Date(now() + 8 * H).getUTCDay());
-  var dowNow = () => new Date(now() + 8 * H).getUTCDay();
   var SUP_FAMILY = ["mum", "dad", "marcus", "angelina"];
   function supSlot(def) {
     const sup2 = api3 && api3.sup && api3.sup();
@@ -11913,17 +11996,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!base || base.scene !== "shore") return null;
     return { from: sup2.from, to: sup2.from + 999, scene: "shore", wander: SEA, act: "sup", free: true, glide: true };
   }
-  var routineNow = (def) => {
-    const t2 = sgHM(), we = weekend(), dw = dowNow(), owned = api3 && api3.F().fam && api3.F().fam.owned || {};
+  var dowOf = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+  var routineAt = (def, day, t2) => {
+    const dw = dowOf(day), we = dw === 0 || dw === 6, owned = api3 && api3.F().fam && api3.F().fam.owned || {};
     return def.routine.find((s) => t2 >= s.from && t2 < s.to && (!s.days || s.days === "we" === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null;
   };
-  var slotNow = (def) => {
-    const t2 = sgHM(), we = weekend(), dw = dowNow();
-    const special = supSlot(def) || eventSlot(def.id, dayKey(), t2) || tourSlot(def.id, dayKey(), t2) || classSlot(def.id, dayKey(), t2) || familySlot(def.id, dayKey(), t2) || visitSlot(def.id, dayKey(), t2) || fieldSlot(def.id, dayKey(), t2) || tastingSlot(def.id, dayKey(), t2) || shoreSlot(def.id, dayKey(), t2);
-    if (special) return special;
-    const owned = api3 && api3.F().fam && api3.F().fam.owned || {};
-    return def.routine.find((s) => t2 >= s.from && t2 < s.to && (!s.days || s.days === "we" === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null;
-  };
+  var routineNow = (def) => routineAt(def, dayKey(), sgHM());
+  function slotAt(def, day, t2, live2) {
+    return live2 && supSlot(def) || dinnerSlot(def.id, day, t2) || eventSlot(def.id, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || routineAt(def, day, t2);
+  }
+  var slotNow = (def) => slotAt(def, dayKey(), sgHM(), true);
   var whereIs = (id) => {
     const d = NPCS.find((n) => n.id === id), s = d && slotNow(d);
     return s ? s.scene : null;
@@ -12179,6 +12261,21 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function resetScene() {
     Object.keys(ents).forEach(drop);
     courier = null;
+  }
+  var schedCache = {};
+  function daySchedule(id, day) {
+    const ck = id + "|" + day;
+    if (schedCache[ck]) return schedCache[ck];
+    const def = NPCS.find((n) => n.id === id);
+    if (!def) return [];
+    const out = [];
+    for (let t2 = 6 * 60; t2 < 23 * 60; t2 += 15) {
+      const s = slotAt(def, day, t2), key = s ? `${s.scene}|${s.act || ""}|${s.dinner ? 1 : ""}` : "";
+      const last2 = out[out.length - 1];
+      if (last2 && last2.key === key) last2.to = t2 + 15;
+      else out.push({ key, from: t2, to: t2 + 15, scene: s && s.scene, act: s && s.act, dinner: !!(s && s.dinner) });
+    }
+    return schedCache[ck] = out.filter((x) => x.scene);
   }
 
   // src/art/shore.js
@@ -14024,6 +14121,11 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     town: "village:board"
   };
   function walkToPlace(name) {
+    if (/dinner|dining table/.test(String(name || "").toLowerCase())) {
+      const d = dinnerOn(dayKey()), host = d ? d.host : "home", st6 = spotObj(host, "dine");
+      go(host, st6.tx, st6.ty, () => arriveSpot("dine"));
+      return name;
+    }
     const k = PLACES[String(name || "").toLowerCase().trim()];
     if (!k) return null;
     const [pl, sp] = k.split(":");
@@ -14210,7 +14312,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"foreshore|dolphin bench|paddleboards|mum's house|marcus's house|exercise lawn|field|lake|picnic|football|orchard|farm shop|tour sign|flower farm|ma ma's cottage|wine shop kitchen|larder|olive tree|weekly review|vineyard|barrels|wine shop|honesty box|tasting room|playground|home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"family dinner|foreshore|dolphin bench|paddleboards|mum's house|marcus's house|exercise lawn|field|lake|picnic|football|orchard|farm shop|tour sign|flower farm|ma ma's cottage|wine shop kitchen|larder|olive tree|weekly review|vineyard|barrels|wine shop|honesty box|tasting room|playground|home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -14271,7 +14373,7 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
   var localCache = { key: "", items: [] };
   var dayKeyAt = (ms) => new Date(ms + 6 * H).toISOString().slice(0, 10);
   function localMail() {
-    const day = dayKey(), hm2 = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm2 / 10)}:${S2.doneIds.length}:${S2.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}`;
+    const day = dayKey(), hm2 = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm2 / 10)}:${S2.doneIds.length}:${S2.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}:${thanksMail().length}`;
     if (key === localCache.key) return localCache.items;
     const out = [], wd = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
     if (wd === 5 && hm2 >= 900 || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
@@ -14285,6 +14387,7 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
       body: `Meet me at the pond. Each of today's wins gets a lantern on the water.
 Then tell chat "wind down" whenever you're ready.`
     });
+    out.push(...thanksMail());
     return (localCache = { key, items: out }).items;
   }
   var allMail = () => [...MAIL.items || [], ...localMail()];
@@ -14434,7 +14537,8 @@ Then tell chat "wind down" whenever you're ready.`
       return;
     }
     if (it.kind === "gift") {
-      giveGift(id);
+      giftPick = giftPick === id ? null : id;
+      bag();
       return;
     }
     if (it.kind === "bouquet") {
@@ -14569,7 +14673,47 @@ Then tell chat "wind down" whenever you're ready.`
   var FOLKS = ["mum", "dad", "marcus", "angelina"];
   var giftWho = (to) => to === "family" ? ["evan", "darren", "mama", "gonggong", ...FOLKS] : to === "grands" ? ["mama", "gonggong"] : Array.isArray(to) ? to : [to];
   var giftNames = (to) => to === "grands" ? "Ma Ma or Gong Gong" : to === "family" ? "the family" : giftWho(to).map((g) => GIFT_NAME[g]).join(giftWho(to).length > 2 ? ", " : " or ").replace(/, ([^,]*)$/, " or $1");
-  function giveGift(id) {
+  var giftPos = (w) => w === "evan" ? evanHere() ? evan : null : w === "darren" ? isHere("darren") ? npcPos("darren") : null : npcPos(w);
+  var giftPick = null;
+  function giftPickHTML(id) {
+    const it = ITEMS[id];
+    if (!it || !F.inv[id]) return "";
+    return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${giftWho(it.to).map((w) => `<button class="btn small ${giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(GIFT_NAME[w])}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}<button class="btn small alt" data-giveto="">Cancel</button></div>
+    <p class="muted">Anyone who isn't here gets it sent round, and their thank-you note comes to your mailbox.</p></div>`;
+  }
+  function giveTo(id, w) {
+    giftPick = null;
+    const it = ITEMS[id];
+    if (!w || !it || !F.inv[id]) {
+      bag();
+      return;
+    }
+    if (giftPos(w)) {
+      giveGift(id, w);
+      bag();
+      return;
+    }
+    addInv(id, -1);
+    F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1;
+    gainXp(1);
+    F.thanks = [...F.thanks || [], { id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10 * M }].slice(-30);
+    sfx("chime");
+    flash(`Sent to ${GIFT_NAME[w]}`);
+    speak(`Wrapped up and sent to ${GIFT_NAME[w]}. Watch your mailbox for a thank-you note.`, 4500);
+    save2();
+    bag();
+  }
+  var SIGNOFF = { mum: "Love, Mum xx", dad: "Love, Dad", mama: "Love you, ah girl. Ma Ma", gonggong: "Gong Gong", marcus: "Cheers sis, Marcus", angelina: "Love, Angelina", darren: "Love you. D", evan: "Love, Evan (Darren held the pencil)" };
+  function thankNote(t2) {
+    const it = ITEMS[t2.item] || { n: "present", say: "" }, line = it.says && it.says[t2.who] || it.say || "";
+    return `${t2.who === "evan" ? "Dear Mama" : "Dear Mel"},
+
+Thank you for the ${it.n.toLowerCase()}! ${line}
+
+${SIGNOFF[t2.who] || ""}`;
+  }
+  var thanksMail = () => (F.thanks || []).filter((t2) => t2.at <= Date.now()).map((t2) => ({ id: t2.id, from: "postie", at: t2.at, title: `Thank you from ${GIFT_NAME[t2.who] || "someone"}`, body: thankNote(t2) }));
+  function giveGift(id, chosen) {
     const it = ITEMS[id];
     if (!it || !F.inv[id]) return;
     const burst = (x, y) => [0, 250, 500].forEach((d, k) => setTimeout(() => mprop("heart", x + (k - 1) * 14, y - 40 - k * 6, 1800), d));
@@ -14579,7 +14723,7 @@ Then tell chat "wind down" whenever you're ready.`
         ctx();
       }
     };
-    const who3 = giftWho(it.to);
+    const who3 = chosen ? [chosen] : giftWho(it.to);
     let to = it.to, g = null;
     if (who3.length > 1 && it.to !== "grands") {
       const here = who3.map((w) => [w, w === "evan" ? evanHere() ? evan : null : w === "darren" ? isHere("darren") ? npcPos("darren") : null : npcPos(w)]).filter(([, p]) => p).sort((a, b) => Math.hypot(a[1].x - mel.x, a[1].y - mel.y) - Math.hypot(b[1].x - mel.x, b[1].y - mel.y))[0];
@@ -14630,7 +14774,7 @@ Then tell chat "wind down" whenever you're ready.`
       if (id === "icecream" || id === "storybook") S2.evanHold = { k: id, until: Date.now() + 3 * M };
       if (id === "balloon") S2.evanHold = { k: "balloon", until: 0 };
       if (id === "storybook" && scene === "home") {
-        const s = spotObj("home", "sofa");
+        const s = spotObj("home", "dine");
         evan.tx = s.tx + 20;
         evan.ty = s.ty;
       }
@@ -15501,6 +15645,12 @@ Then tell chat "wind down" whenever you're ready.`
       const kit = isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
       return itemBtn(id, lbl, it.kind === "seed", (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit);
     }).join("");
+    if (giftPick && F.inv[giftPick]) $("bag").insertAdjacentHTML("afterbegin", giftPickHTML(giftPick));
+    else giftPick = null;
+    $("bag").querySelectorAll("[data-giveto]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      giveTo(giftPick, b.dataset.giveto);
+    });
     $("bag").querySelectorAll(".item").forEach((b) => b.onclick = (ev) => {
       const k = ev.target.closest("[data-kit]");
       if (k) {
@@ -15622,11 +15772,18 @@ Then tell chat "wind down" whenever you're ready.`
   var frontKey = "";
   var fronts = [];
   function stallFronts() {
-    const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null, key = ev ? dayKey() + ev.kind : "";
+    const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null, dine = DINING[scene], key = ev ? dayKey() + ev.kind : dine ? "dine:" + scene : "";
     if (key !== frontKey) {
       fronts.forEach(([n]) => n.remove());
       fronts = [];
       frontKey = key;
+      if (dine) {
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("class", "sfront");
+        g.setAttribute("pointer-events", "none");
+        g.innerHTML = diningTable(dine.cx, dine.fy);
+        fronts = [[g, { y: dine.fy - 1 }]];
+      }
       if (ev) fronts = ev.stalls.map((st6) => {
         const [x, y] = STALL_SPOTS[st6.at], g = document.createElementNS("http://www.w3.org/2000/svg", "g");
         g.setAttribute("class", "sfront");
@@ -15720,6 +15877,7 @@ Then tell chat "wind down" whenever you're ready.`
       return nx ? `Next at ${nx.at}: ${esc(nx.name)}.` : "Every upgrade unlocked!";
     })()}</p>
     <ul class="uplist">${UPGRADES.map((u) => `<li class="${(F.totalQuests || 0) >= u.at ? "got" : ""}">${icon((F.totalQuests || 0) >= u.at ? "sparkle" : "clock", 16)} <span>${esc(u.name)}</span> <small>${u.at}</small></li>`).join("")}</ul>`;
+    $("friendBody").insertAdjacentHTML("beforeend", whosWhereHTML());
     $("friendBody").insertAdjacentHTML("beforeend", `<h3 class="ph3">Family</h3><p class="muted">${icon("heart", 14)} Gifts for Evan: ${F.fam.gifts.evan} · for Darren: ${F.fam.gifts.darren}. Every third gift, they give you something back. Treats and keepsakes are in the market's Family tab.</p>`);
     renderEvanHold();
     const all = allTasks(), rem = remaining(), cur2 = phase() === "task" && rem[0] ? rem[0].id : null;
@@ -15774,7 +15932,11 @@ Then tell chat "wind down" whenever you're ready.`
     const m = sgHM();
     return m >= 20 * 60 || m < 7 * 60;
   };
-  var evanHere = () => scene === "kidroom" || (scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore") && !evanNight();
+  var evanHere = () => scene === "kidroom" || (scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore") && !evanNight() || evanAtDinner();
+  var evanAtDinner = () => {
+    const d = dinnerNow(dayKey(), sgHM());
+    return !!d && scene === d.host;
+  };
   function outside() {
     return OUTDOOR.includes(scene);
   }
@@ -15894,6 +16056,13 @@ Then tell chat "wind down" whenever you're ready.`
         setTimeout(() => speak(onPedestals(F).length ? "The courtyard. Look at all this. You did that." : "The courtyard. Your first trophy goes on a pedestal.", 4e3), 900);
       }
       if (id === "orchard" || id === "flowers") orchardArrive(id);
+      {
+        const dn = dinnerOn(dayKey()), m = sgHM();
+        if (dn && m >= 17 * 60 + 30 && m < dn.to && S2.dinnerSaid !== dayKey()) {
+          S2.dinnerSaid = dayKey();
+          setTimeout(() => speak(m < dn.from ? `Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30! Tap the table when you get there.` : `Family dinner's on at ${HOST_NAME[dn.host]}! Everyone's at the table.`, 6e3), 2600);
+        }
+      }
       if (id === "shore" && S2.shoreSaid !== dayKey()) {
         S2.shoreSaid = dayKey();
         const fam = ["mum", "dad", "marcus", "angelina"].filter(isHere).map((n) => NPCS.find((d) => d.id === n).name);
@@ -16000,6 +16169,10 @@ Then tell chat "wind down" whenever you're ready.`
       orView = "tea";
       sfx("paper", true);
       render();
+      return;
+    }
+    if (id === "dine") {
+      sitForDinner();
       return;
     }
     if (id === "kiddoor") {
@@ -16597,6 +16770,77 @@ Then tell chat "wind down" whenever you're ready.`
       save2();
     }
   }
+  var PLACE_NAME = {
+    base: "outside at home",
+    home: "your house",
+    farm: "the garden",
+    village: "the town square",
+    lane: "Makers' Lane",
+    vineyard: "the vineyard",
+    orchard: "the orchard",
+    flowers: "the flower farm",
+    field: "the field",
+    shore: "the foreshore",
+    kitchen: "the wine shop kitchen"
+  };
+  var ACT_WORD = {
+    water: "watering",
+    farm: "gardening",
+    sit: "sitting down",
+    game: "gaming",
+    sup: "paddleboarding",
+    guide: "leading a tour",
+    lead: "leading the class",
+    exercise: "exercise class",
+    cook: "cooking",
+    rest: "in the hammock",
+    repair: "fixing things",
+    type: "busy",
+    play: "playing"
+  };
+  var placeName = (sc) => PLACE_NAME[sc] || ROOMS[sc] && ROOMS[sc].name || sc;
+  var WHO_FAMILY = ["darren", "mama", "gonggong", "mum", "dad", "marcus", "angelina"];
+  function whosWhereHTML() {
+    const day = dayKey(), t2 = sgHM(), hhmm = (m) => fmtTime(m);
+    const row2 = (n) => {
+      const sch = daySchedule(n.id, day), cur2 = sch.find((x) => t2 >= x.from && t2 < x.to);
+      const cls = classOn(day), word = (a) => a === "lead" && cls ? `leading ${cls.kind}` : a === "exercise" && cls && n.id !== "mum" ? `${cls.kind} with Mum` : ACT_WORD[a];
+      const what = (x) => x.dinner ? `family dinner at ${HOST_NAME[x.scene] || placeName(x.scene)}` : `${placeName(x.scene)}${x.act && word(x.act) ? ` (${word(x.act)})` : ""}`;
+      return `<details class="whowhere"><summary><b>${esc(n.name)}</b> <small class="muted">${cur2 ? `now: ${esc(what(cur2))}` : "not about just now"}</small></summary>
+      <ul>${sch.map((x) => `<li class="${x === cur2 ? "now" : ""}"><span>${hhmm(x.from)}–${hhmm(x.to)}</span> ${esc(what(x))}</li>`).join("") || "<li>Not in the village today.</li>"}</ul></details>`;
+    };
+    const fam = WHO_FAMILY.map((id) => NPCS.find((n) => n.id === id)).filter(Boolean);
+    const town = NPCS.filter((n) => !WHO_FAMILY.includes(n.id) && !n.tourist && !n.kid);
+    const dn = dinnerOn(day);
+    return `<h3 class="ph3">Who's where today</h3>${dn ? `<p class="muted">Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30.</p>` : ""}<p class="eyebrow">Family</p>${fam.map(row2).join("")}<p class="eyebrow" style="margin-top:10px">Around the village</p>${town.map(row2).join("")}`;
+  }
+  function sitForDinner() {
+    const d = dinnerNow(dayKey(), sgHM()), next = dinnerOn(dayKey());
+    if (!d || d.host !== scene) {
+      speak(d ? `Dinner's at ${HOST_NAME[d.host]} tonight. Everyone's there already!` : next && sgHM() < next.from ? `Family dinner tonight at ${HOST_NAME[next.host]}, 6:30.` : "The family table. Dinners are on Wednesdays and Sundays, at a different house each time.", 4500);
+      render();
+      return;
+    }
+    const seat = dinnerSeat(scene, "mel");
+    mel.tx = seat[0];
+    mel.ty = seat[1];
+    mel.path = [];
+    setTimeout(() => {
+      mel.sitting = true;
+      nodes.mel.classList.add("sit");
+      mel.dir = -1;
+    }, 700);
+    if (S2.dinnerDay !== dayKey()) {
+      S2.dinnerDay = dayKey();
+      gainXp(3);
+      [0, 250, 500, 750].forEach((t2, k) => setTimeout(() => mprop("heart", seat[0] - 120 + k * 70, seat[1] - 70, 1800), t2));
+      save2();
+    }
+    const who3 = ["mama", "mum", "gonggong", "dad"].find(isHere);
+    if (who3) setTimeout(() => npcSay(who3, pick(who3 === "mama" ? ["Eat, eat! Ma Ma made too much again.", "Come, sit next to Ma Ma."] : who3 === "mum" ? ["Have more! You're too thin.", "Everyone's here. This is the best."] : who3 === "gonggong" ? ["Have you eaten? Now you have.", "Pass the soup, pass the soup."] : ["Who wants to hear what I played today?", "Evan, eat your vegetables. For Grandpa."])), 1200);
+    speak("Family dinner. Everyone round one table, all talking at once. The best.", 4500);
+    render();
+  }
   var melEx = null;
   function joinClass() {
     const c = classOn(dayKey()), m = sgHM();
@@ -17185,7 +17429,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     const s = list2.find((s2) => Math.hypot(s2.tx - mel.x, s2.ty - mel.y) < 26);
     return s ? s.id : null;
   }
-  var EVAN_SPOTS = { shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[150, 500], [330, 520], [260, 340], [200, 600], [360, 330]] };
+  var EVAN_SPOTS = { shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[380, 520], [260, 330], [200, 600], [360, 330], [300, 300]] };
   function evanWalk(speed, dt) {
     const key = evan.tx + "," + evan.ty;
     if (key !== evan.rk) {
@@ -17215,6 +17459,17 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
   }
   function tickEvan(dt) {
     if (!evanHere()) return;
+    if (evanAtDinner() && !route2.length) {
+      const st6 = dinnerSeat(scene, "evan");
+      evan.tx = st6[0];
+      evan.ty = st6[1];
+      evan.run = false;
+      evan.wait = 9;
+      evanWalk(90, dt);
+      nodes.evan.classList.toggle("sit", !evan.moving);
+      return;
+    }
+    nodes.evan.classList.remove("sit");
     if (hugTick()) {
       evanWalk(140, dt);
       return;
@@ -17417,7 +17672,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     }
     if (melEx && (scene !== "field" || Math.hypot(mel.tx - melEx[0], mel.ty - melEx[1]) > 4 || !classOn(dayKey()) || sgHM() >= classOn(dayKey()).to)) melEx = null;
     nodes.mel.classList.toggle("exercise", !!melEx && !mel.moving);
-    if (mel.sitting && (mel.moving || scene !== "trophy" && scene !== "field" && scene !== "shore")) {
+    if (mel.sitting && (mel.moving || scene !== "trophy" && scene !== "field" && scene !== "shore" && !DINING[scene])) {
       mel.sitting = false;
       nodes.mel.classList.remove("sit");
     }

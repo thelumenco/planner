@@ -152,7 +152,7 @@ const SHELLS = {
     ${sk(`<rect x="420" y="34" width="56" height="70" rx="2" style="fill:#FFFDF6"/><rect x="420" y="34" width="56" height="16" style="fill:#C2505F"/>`, `<rect x="420" y="34" width="56" height="70" rx="2"/><path d="M420 50 h56"/>${rows(4, r => `<path d="M428 ${62 + r*10} h40" opacity=".35"/>`)}`)}
     ${sk(`<rect x="378" y="320" width="116" height="26" rx="10" style="fill:#9CC27E"/><rect x="372" y="338" width="128" height="22" rx="8" style="fill:#8DB86B"/><rect x="392" y="326" width="22" height="14" rx="5" style="fill:#F3C969"/>`,
       `<rect x="378" y="320" width="116" height="26" rx="10"/><rect x="372" y="338" width="128" height="22" rx="8"/><rect x="392" y="326" width="22" height="14" rx="5"/><path d="M436 340 v20" opacity=".4"/>`)}
-    <g filter="url(#wob)">${[86, 62, 40].map((rx, i) => `<ellipse cx="200" cy="470" rx="${rx}" ry="${rx*.42}" style="fill:${["#E8B4C0", "#F6E3A1", "#9CC27E"][i]}" opacity=".8"/>`).join("")}</g>
+    <g filter="url(#wob)">${[86, 62, 40].map((rx, i) => `<ellipse cx="110" cy="560" rx="${rx}" ry="${rx*.42}" style="fill:${["#E8B4C0", "#F6E3A1", "#9CC27E"][i]}" opacity=".8"/>`).join("")}</g>
     ${plant(30, 610, 1)}${plant(490, 610, .9)}`,
 
   // The wine shop: terracotta tiles, warm plaster, a wine rack behind the counter, the chalk menu, hanging lamps
@@ -185,7 +185,7 @@ const SHELLS = {
     ${rows(16, i => `<circle cx="${20 + i*31}" cy="${22 + Math.sin(i/2)*5}" r="2.6" style="fill:${["#F3C969", "#F2A0B8", "#C9E6F2"][i % 3]}"/>`)}
     ${sk(`<rect x="214" y="44" width="54" height="40" rx="2" style="fill:#FFFDF6"/><rect x="278" y="50" width="30" height="30" rx="2" style="fill:#FFFDF6"/><rect x="318" y="44" width="36" height="44" rx="2" style="fill:#FFFDF6"/><circle cx="234" cy="64" r="6" style="fill:#F0D0B4"/><circle cx="248" cy="64" r="6" style="fill:#E6BC98"/>`,
       `<rect x="214" y="44" width="54" height="40" rx="2"/><path d="M226 80 q8 -8 16 0 M240 80 q8 -8 16 0" opacity=".7"/><rect x="278" y="50" width="30" height="30" rx="2"/><path d="M284 74 l8 -12 l8 12" opacity=".7"/><rect x="318" y="44" width="36" height="44" rx="2"/><path d="M326 80 q10 -20 20 0" opacity=".7"/>`)}
-    <g filter="url(#wob)">${[96, 70].map((rx, i) => `<ellipse cx="160" cy="430" rx="${rx}" ry="${rx*.42}" style="fill:${["#C9A3E0", "#F6E3A1"][i]}" opacity=".7"/>`).join("")}</g>
+    <g filter="url(#wob)">${[96, 70].map((rx, i) => `<ellipse cx="110" cy="412" rx="${rx}" ry="${rx*.42}" style="fill:${["#C9A3E0", "#F6E3A1"][i]}" opacity=".7"/>`).join("")}</g>
     ${plant(490, 610, 1.1)}${plant(30, 610, .9)}`,
   market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(24, i => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`)}</g>

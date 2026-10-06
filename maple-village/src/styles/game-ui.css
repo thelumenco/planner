@@ -578,8 +578,8 @@ body.kidmode .scenename span + span{display:none}
 @media (max-width:420px){.tpage{grid-template-columns:96px 1fr}}
 
 /* the courtyard: sitting on the bench, pigeons pecking (and flapping off when tapped) */
-#mel.sit .legL,#mel.sit .legR,.npc.act-sit:not(.walk) .legL,.npc.act-sit:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
-#mel.sit > .flip > g,.npc.act-sit:not(.walk) > g{transform:translateY(7px)}
+#mel.sit .legL,#mel.sit .legR,#evan.sit .legL,#evan.sit .legR,.npc.act-sit:not(.walk) .legL,.npc.act-sit:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
+#mel.sit > .flip > g,#evan.sit > .flip > g,.npc.act-sit:not(.walk) > g{transform:translateY(7px)}
 .pigeon .phead{transform-box:fill-box;transform-origin:20% 90%;animation:peck 2.4s ease-in-out infinite;animation-delay:inherit}
 .pigeon{animation:pstroll 9s ease-in-out infinite}
 @keyframes peck{0%,55%,100%{transform:rotate(0)}65%,75%{transform:rotate(38deg) translate(1px,3px)}70%{transform:rotate(30deg) translate(1px,2px)}}
@@ -759,3 +759,15 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
 #ctx .orspot{width:100%;font:inherit;color:inherit}
 /* the wine shop's chalkboard menu */
 #ctx .wlist.chalk .mprice{flex:none;font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;color:#8E2C48}
+/* who's where today (friendship view) */
+details.whowhere{border-bottom:1px dashed rgba(60,40,30,.18);padding:5px 2px}
+details.whowhere summary{cursor:pointer;list-style:none}
+details.whowhere summary::-webkit-details-marker{display:none}
+details.whowhere ul{margin:6px 0 4px;padding-left:14px;font-size:.88rem}
+details.whowhere li span{display:inline-block;min-width:104px;color:var(--muted, #7a6f66)}
+details.whowhere li.now{font-weight:700}
+/* the gift chooser in the backpack */
+.giftpick{background:var(--card, #FFFDF6);border:1.5px dashed var(--line);border-radius:12px;padding:10px 12px;margin-bottom:6px}
+.giftpick .actions{flex-wrap:wrap;gap:6px}
+.giftpick small{opacity:.75;font-weight:400}
+details.whowhere summary b{font-size:1rem;margin-right:6px}

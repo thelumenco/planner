@@ -157,17 +157,17 @@ export const ROOMS = {
     ["pobox","Post box","E","pobox",null,"Your post box: unread mail from your work inbox."]]},
   // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
   // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
-  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{A:[120,216], B:[414,228], H:[318,250], C:[124,450], R:[40,330], K:[480,330], D:[350,556], G:[436,448], E:[448,598], F:[96,596]}, stations:[
+  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{X:[190,452], A:[120,216], B:[414,228], H:[318,250], C:[124,450], R:[40,330], K:[480,330], D:[350,556], G:[436,448], E:[448,598], F:[96,596]}, stations:[
     ["desk","Home desk","A","desk",/./,"Your own little desk."],
     ["kitchen","Kitchen","B","kitchen",/cook|meal|lunch|dinner|bake|grocer|prep/,"Something smells good."],
-    ["sofa","Sofa","C","sofa",/read|rest|journal|meditat|book|nap/,"Soft cushions, deep breaths."],
     ["mydoor","My room","R","sidedoor",null,"Your room. Just you.",0],
     ["kiddoor","Evan's room","K","kiddoor",null,"Evan's room. Dinosaurs welcome.",0],
     ["laundry","Laundry","D","laundry",/fold|laundry|clothes|wash|iron/,"Fold, stack, done."],
     ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Hestia's chores live in here."],
     ["fridge","Fridge","H","fridge",null,"The fridge: what we have, and the shopping list."],
     ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12],
-    ["office","Darren's desk","G","office",null,"Darren's home office. Shh, he might be on a call."]]},
+    ["office","Darren's desk","G","office",null,"Darren's home office. Shh, he might be on a call."],
+    ["dine","Dining table","X","dining",/read|rest|journal|meditat|book|nap/,"The big family table. Room for all nine of us, or a book and a cup of tea.",44]]},
   // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
   room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[262,300], W:[262,206], B:[72,262], E:[62,396], C:[66,500], D:[434,556], J:[260,594], N:[406,132]}, stations:[
     ["routines","My routines","N","routineboard",null,"Your routines, pinned up.",74],
@@ -219,25 +219,26 @@ export const ROOMS = {
     ["stove","Stove","P","stove",null,"The stove. Small plates and today's tapas.",30],
     ["press","Cheese press","C","cheesepress",null,"The cheese press. Goat's milk in, cheese out.",30]]},
   // Ma Ma's cottage in the orchard: one cosy room with her bed, the TV, a little kitchenette and the tea table
-  cottage: {name:"Ma Ma's cottage", wall:"#F6E7D7", trim:"#C2505F", noBoard:true, pos:{B:[110,262], T:[420,250], K:[404,470], C:[200,470]}, stations:[
+  cottage: {name:"Ma Ma's cottage", wall:"#F6E7D7", trim:"#C2505F", noBoard:true, pos:{B:[110,262], T:[420,250], K:[276,262], C:[110,560], X:[320,470]}, stations:[
     ["mbed","Ma Ma's bed","B","grannybed",null,"Ma Ma's bed, the crocheted blanket folded just so.",30],
     ["tv","TV","T","tv",null,"Her dramas. Nobody touches the remote.",30],
     ["kitchenette","Kitchenette","K","kitchenette",null,"The kettle's always warm in here.",30],
-    ["tea","Tea table","C","teatable",null,"Tea and cake with Ma Ma.",34]]},
+    ["tea","Tea table","C","teatable",null,"Tea and cake with Ma Ma.",34],
+    ["dine","Dining table","X","dining",null,"Ma Ma's big table. She cooks for twenty, every time.",44]]},
   // Mum and Dad's house on the foreshore: Dad's piano, double bass and easel, Mum's exercise mat, the kitchen table
-  mumdad: {name:"Mum and Dad's", wall:"#EAF2F5", trim:"#3E6B8C", noBoard:true, pos:{P:[112,250], B:[232,262], E:[420,330], Y:[124,500], T:[396,500]}, stations:[
+  mumdad: {name:"Mum and Dad's", wall:"#EAF2F5", trim:"#3E6B8C", noBoard:true, pos:{P:[112,250], B:[232,262], E:[420,330], Y:[110,392], X:[270,500]}, stations:[
     ["piano","Piano","P","piano",null,"Dad's piano. He's been working on the same song all week.",42],
     ["bass","Double bass","B","doublebass",null,"Dad's double bass. Taller than Evan. Much taller.",38],
     ["easel","Easel","E","easel",null,"Dad's sketches: the jetty, the dolphins, and Evan (twice).",34],
     ["mat","Mum's mat","Y","yogamat",null,"Mum's mat. Pilates, Zumba, Piloxing: she does them all.",26],
-    ["dtable","Kitchen table","T","table",null,"There's always food on Mum's table. Take some home.",40]]},
+    ["dine","Dining table","X","dining",null,"The family table. There's always food on it. Take some home.",44]]},
   // Marcus and Angelina's: the games corner, Angelina's study desk and psychology books, the sofa
-  marcus: {name:"Marcus and Angelina's", wall:"#F3ECF7", trim:"#8E5B9A", noBoard:true, pos:{G:[132,262], K:[272,261], D:[404,262], S:[154,470], T:[400,500]}, stations:[
+  marcus: {name:"Marcus and Angelina's", wall:"#F3ECF7", trim:"#8E5B9A", noBoard:true, pos:{G:[110,262], K:[452,261], D:[320,262], S:[110,420], X:[340,470]}, stations:[
     ["games","Games corner","G","gamingtv",null,"Marcus's games. He says he's 'nearly finished' this one. He's been nearly finished for a month.",36],
     ["books","Bookshelf","K","psychshelf",null,"Angelina's psychology books, all with sticky notes.",36],
     ["study","Angelina's desk","D","studydesk",null,"Angelina's study desk. Highlighters in every colour.",36],
     ["msofa","Sofa","S","sofa",null,"The comfiest sofa on the foreshore.",30],
-    ["mtable","Table","T","table",null,"Marcus and Angelina's table. Wedding magazines at one end, bank papers at the other.",40]]},
+    ["dine","Dining table","X","dining",null,"Their dining table. Wedding magazines at one end, bank papers at the other.",44]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };

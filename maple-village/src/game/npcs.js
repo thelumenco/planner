@@ -3,7 +3,7 @@
 import { NPCS, AGENTS } from "../data/npcs.js";
 import { personArt, letterArt } from "../art/people.js";
 import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
-import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot } from "./tours.js";
+import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dinnerSlot } from "./tours.js";
 import { SEA } from "../data/npcs.js";
 import { findPath, blocked } from "./paths.js";
 
@@ -25,12 +25,17 @@ function supSlot(def){
   const base = routineNow(def); if (!base || base.scene !== "shore") return null;
   return {from: sup.from, to: sup.from + 999, scene: "shore", wander: SEA, act: "sup", free: true, glide: true};
 }
-const routineNow = def => { const t = sgHM(), we = weekend(), dw = dowNow(), owned = (api && api.F().fam && api.F().fam.owned) || {};
+// Where someone is on a given day at a given time (Singapore minutes): the special happenings first (a family paddle,
+// dinner, the market, a tour, Mum's class, visits, tastings), then their own routine. slotNow is right now.
+const dowOf = day => new Date(day + "T00:00:00Z").getUTCDay();
+const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw === 6, owned = (api && api.F().fam && api.F().fam.owned) || {};
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
-const slotNow = def => { const t = sgHM(), we = weekend(), dw = dowNow();
-  const special = supSlot(def) || eventSlot(def.id, dayKey(), t) || tourSlot(def.id, dayKey(), t) || classSlot(def.id, dayKey(), t) || familySlot(def.id, dayKey(), t) || visitSlot(def.id, dayKey(), t) || fieldSlot(def.id, dayKey(), t) || tastingSlot(def.id, dayKey(), t) || shoreSlot(def.id, dayKey(), t); if (special) return special;
-  const owned = (api && api.F().fam && api.F().fam.owned) || {};
-  return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
+const routineNow = def => routineAt(def, dayKey(), sgHM());
+export function slotAt(def, day, t, live){
+  return (live && supSlot(def)) || dinnerSlot(def.id, day, t) || eventSlot(def.id, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
+    || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || shoreSlot(def.id, day, t) || routineAt(def, day, t);
+}
+const slotNow = def => slotAt(def, dayKey(), sgHM(), true);
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };
 export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
 export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
@@ -195,3 +200,17 @@ export function tickNpcs(dt){
 }
 export const npcActors = () => Object.values(ents).map(e => [e.node, e]);
 export function resetScene(){ Object.keys(ents).forEach(drop); courier = null; }
+
+// Someone's whole day as a list of stretches: {from, to, scene, act, dinner} (6am to 11pm, in quarter hours)
+const schedCache = {};
+export function daySchedule(id, day){
+  const ck = id + "|" + day; if (schedCache[ck]) return schedCache[ck];
+  const def = NPCS.find(n => n.id === id); if (!def) return [];
+  const out = [];
+  for (let t = 6*60; t < 23*60; t += 15) {
+    const s = slotAt(def, day, t), key = s ? `${s.scene}|${s.act || ""}|${s.dinner ? 1 : ""}` : "";
+    const last = out[out.length - 1];
+    if (last && last.key === key) last.to = t + 15; else out.push({key, from: t, to: t + 15, scene: s && s.scene, act: s && s.act, dinner: !!(s && s.dinner)});
+  }
+  return (schedCache[ck] = out.filter(x => x.scene));
+}

@@ -264,16 +264,23 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#evanHold rect").count() > 0, "Evan carries his toy truck");
   check(await page.locator("#sceneArt").innerHTML().then(h => /Sandpit/.test(h)), "the sandpit is at home base");
   await page.click('[data-open="bag"]');
-  await page.click('#bag .item[data-id="icecream"]');
+  await page.click('#bag .item[data-id="icecream"]'); await page.click('#bag [data-giveto="evan"]');
   await page.waitForTimeout(300);
   check(await page.locator("#evanHold path").count() > 0 && await page.locator("#evanSay").textContent().then(t => /ICE CREAM/.test(t)), "Evan gets his ice cream");
   check(await page.locator("#panel").isHidden() && await page.locator("#evanSay .who").textContent() === "Evan", "the backpack closes so you can see Evan say thank you, with his name on the bubble");
   await page.click('[data-open="bag"]');
   await page.click('#bag .item[data-id="kopi"]');
-  check(await page.locator("#speech").textContent().then(t => /Darren/.test(t)), "Darren's gift waits until you find him");
-  await page.goto(url + "?seed=1&nosample=1&time=20:00&date=2026-10-05");
+  check(await page.locator('#bag [data-giveto="darren"]').textContent().then(t => /send it/.test(t)), "tapping a gift opens a chooser: who it suits, and whether they're here or it gets sent");
+  await page.click('#bag [data-giveto="darren"]'); await page.waitForTimeout(300);
+  check(await page.locator("#speech").textContent().then(t => /sent to Darren/.test(t)) && await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).thanks.length === 1), "a gift for someone who isn't here is sent round, with a thank-you note to follow");
+  await page.addInitScript(() => { if (!/thankspatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f || !f.thanks) return;
+    f.thanks.forEach(t => { t.at = Date.now() - 60e3; }); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?seed=1&nosample=1&time=20:00&date=2026-10-05&thankspatch=1");
   await page.waitForTimeout(1000);
   check(await page.locator('#actors [data-npc="darren"].act-rest').count() === 1, "Darren rests in his hammock in the evening");
+  await page.click('[data-open="mail"]'); await page.waitForTimeout(300);
+  check(/Thank you from Darren/.test(await page.locator("#mailView").textContent()), "Darren's thank-you note arrives in the mailbox");
+  await page.click('[data-open="mail"]').catch(() => {});
   await page.screenshot({ path: join(shots, "family-evening.png") });
   await page.close();
 }
@@ -1371,8 +1378,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#ctx .item[data-id="mooncake"]').count() === 1 && await page.locator('#ctx .item[data-id="birdsnest"]').count() === 1, "Hana sells nyonya kueh, bird's nest, chicken essence, and mooncakes in autumn");
   await page.click('#ctx .item[data-id="ondeh"]'); await page.waitForTimeout(200);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1000);
-  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="ondeh"]'); await page.waitForTimeout(400);
-  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return !f.inv.ondeh && ((f.fam.gifts.mama || 0) + (f.fam.gifts.gonggong || 0)) === 1; }), "the ondeh-ondeh goes to whichever grandparent is nearest");
+  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="ondeh"]'); await page.click('#bag [data-giveto].primary'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return !f.inv.ondeh && ((f.fam.gifts.mama || 0) + (f.fam.gifts.gonggong || 0)) === 1; }), "the ondeh-ondeh goes to Ma Ma or Gong Gong (whoever's here)");
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-07"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(600);
   await page.locator('#world [data-place="toFieldO"]').dispatchEvent("click");
@@ -1430,8 +1437,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await mfox().then(f => !f.inv.honey && f.coins === m0), "undo puts the coins back and the honey back on the stall");
   await page.click('#ctx .item[data-id="honey"]'); await page.waitForTimeout(300); await page.click('#ctx [data-close]');
   const g0 = await mfox().then(f => Object.values(f.fam.gifts).reduce((a, b) => a + b, 0));
-  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="honey"]'); await page.waitForTimeout(400);
-  check(await mfox().then(f => !f.inv.honey && Object.values(f.fam.gifts).reduce((a, b) => a + b, 0) === g0 + 1), "market honey can be given to whoever in the family is nearest");
+  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="honey"]'); await page.click('#bag [data-giveto].primary'); await page.waitForTimeout(400);
+  check(await mfox().then(f => !f.inv.honey && Object.values(f.fam.gifts).reduce((a, b) => a + b, 0) === g0 + 1), "market honey can be given to anyone in the family who's here");
   await page.click('[data-open="bag"]').catch(() => {});
   for (const [st, id] of [["mstall5", "soap_lav"], ["mstall6", "stout"]]) { await page.locator(`#world [data-place="${st}"]`).dispatchEvent("click"); await page.waitForSelector(`#ctx .item[data-id="${id}"]`, { timeout: 15000 }); await page.click('#ctx [data-close]'); }
   check(true, "Grace's handmade soap stall and Ben's craft beer stall");
@@ -1458,8 +1465,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#world [data-place="mumdad"]').count() === 1 && await page.locator('#world [data-place="marcus"]').count() === 1 && await page.locator('#world [data-place="suprack"]').count() === 1
     && await page.locator('#world [data-place="toFieldS"]').count() === 1 && await page.locator('#world [data-place="toFlowersS"]').count() === 1, "the foreshore: Mum and Dad's house, Marcus and Angelina's, the paddleboards, gates to the field and the flower farm");
   check(await ids().then(a => a.includes("mum") && a.includes("dad")), "early on a Tuesday Mum's out for her walk and Dad's sketching on the sand");
-  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="paleale"]'); await page.waitForTimeout(400);
-  check(await ffox().then(f => !f.inv.paleale && f.fam.gifts.dad === 1), "a craft pale ale from the market goes to Dad (the nearest one it suits)");
+  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="paleale"]'); await page.click('#bag [data-giveto="dad"]'); await page.waitForTimeout(400);
+  check(await ffox().then(f => !f.inv.paleale && f.fam.gifts.dad === 1), "a craft pale ale from the market can go to Dad");
   await page.click('[data-open="bag"]').catch(() => {});
   await page.locator('#world [data-place="suprack"]').dispatchEvent("click"); await page.waitForTimeout(4000);
   check(await page.locator("#mel.sup").count() === 1 && await page.locator('#actors [data-npc="mum"].act-sup, #actors [data-npc="dad"].act-sup').count() === 2, "a family paddle: Mel takes a board out and Mum and Dad paddle out too");
@@ -1483,6 +1490,39 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#actors [data-npc="mum"].act-lead').count() === 1 && await page.locator("#actors .act-exercise").count() === 3, "Mum leads her class on the exercise lawn at 8, three villagers joining in");
   const c0 = (await ffox()).coins; await page.locator('#world [data-place="exlawn"]').dispatchEvent("click"); await page.waitForTimeout(8500);
   check(await page.locator("#mel.exercise").count() === 1 && (await ffox()).coins === c0 + 2, "Mel can join Mum's class (a couple of coins, once a day)");
+  await page.close();
+}
+{
+  // Family dinners (Wednesdays and Sundays, rotating round the four houses), who's where today, and the family and
+  // villagers out and about: the vineyard, the Sunday market, Makers' Lane
+  console.log("\nfamily dinners and who's where");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`dinner pageerror: ${e.message}`));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  const fam = ["darren", "mama", "gonggong", "mum", "dad", "marcus", "angelina"];
+  await page.goto(url + "?reset=1&seed=1&time=19:00&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("cottage")); await page.waitForTimeout(2500);
+  check(await ids().then(a => fam.every(f => a.includes(f))) && await page.locator("#actors .sfront").count() === 1, "Wednesday family dinner at Ma Ma and Gong Gong's: all seven round the big table (drawn in front of those along the back)");
+  await page.locator('#world [data-spot="dine"]').dispatchEvent("click"); await page.waitForTimeout(2500);
+  check(await page.locator("#mel.sit").count() === 1 && await page.locator("#evan.sit").count() === 1, "Mel takes her seat at the table, and Evan's in his");
+  for (const h of ["home", "mumdad", "marcus"]) { await page.evaluate(h => window.__mapleScene(h), h); await page.waitForTimeout(500);
+    check(await page.locator('#world [data-spot="dine"]').count() === 1, `there's a family dining table at ${h}`); }
+  await page.goto(url + "?seed=1&time=19:00&date=2026-10-11"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("mumdad")); await page.waitForTimeout(2500);
+  check(await ids().then(a => fam.every(f => a.includes(f))), "Sunday's dinner is at Mum and Dad's (the host goes round the four houses)");
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.click('[data-open="friend"]'); await page.waitForTimeout(400);
+  check(await page.locator("details.whowhere").count() >= 18 && /Family dinner tonight at Ma Ma and Gong Gong's/.test(await page.locator("#friendBody").textContent()), "who's where today: everyone's day, family first, and tonight's dinner");
+  await page.click('[data-open="friend"]').catch(() => {});
+  await page.goto(url + "?seed=1&time=14:30&date=2026-10-05"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(1200);
+  check(await ids().then(a => a.includes("okada")), "villagers wander Makers' Lane too (Mr Okada, Monday afternoon)");
+  await page.goto(url + "?seed=1&time=18:00&date=2026-10-09"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1200);
+  check(await ids().then(a => a.includes("marcus") && a.includes("angelina")), "Marcus and Angelina come to the vineyard on Friday evenings");
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-11"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
+  check(await ids().then(a => ["mum", "dad", "marcus", "angelina"].every(f => a.includes(f))), "the whole family's at the Sunday farmers market");
   await page.close();
 }
 {

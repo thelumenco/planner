@@ -226,3 +226,31 @@ export function shoreSlot(id, day, hm){
   const e = eventOn(day), busy = [...(e ? e.stalls.map(s => s.id) : []), ...toursOn(day).flatMap(t => t.group)];
   return groupFor(day + ":sup", we ? 2 : 1, busy, TOURISTS).includes(id) ? {from, to, scene: "shore", wander: SUP_SEA, act: "sup", free: true} : null;
 }
+
+// Family dinners: Wednesdays and Sundays, 6:30 to 8pm, at one of the four family houses in turn (Mel's home, Ma Ma's
+// cottage, Mum and Dad's, Marcus and Angelina's). Everyone sits round the big dining table: five along the back
+// (Ma Ma, Gong Gong, Mum, Dad, Angelina), four along the front (Darren, Marcus, Evan, Mel).
+export const DINNER_FROM = 18*60 + 30, DINNER_TO = 20*60;
+export const DINNER_HOSTS = ["home", "mumdad", "cottage", "marcus"];
+export const HOST_NAME = {home: "your place", mumdad: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", marcus: "Marcus and Angelina's"};
+// where each house's dining table stands: cx = centre, fy = the front edge of the table on the floor
+export const DINING = {home: {cx: 190, fy: 452}, mumdad: {cx: 270, fy: 500}, cottage: {cx: 320, fy: 470}, marcus: {cx: 340, fy: 470}};
+const BACK = ["mama", "gonggong", "mum", "dad", "angelina"], FRONT = ["darren", "marcus", "evan", "mel"];
+export function dinnerSeat(host, who){
+  const t = DINING[host]; if (!t) return null;
+  const b = BACK.indexOf(who), f = FRONT.indexOf(who);
+  if (b >= 0) return [t.cx - 120 + b*60, t.fy - 24];
+  if (f >= 0) return [t.cx - 90 + f*60, t.fy + 18];
+  return null;
+}
+export function dinnerOn(day){
+  const d = dow(day); if (d !== 3 && d !== 0) return null;
+  const week = Math.floor(Date.parse(day + "T00:00:00Z")/(7*864e5));
+  return {host: DINNER_HOSTS[(week*2 + (d === 0 ? 1 : 0)) % 4], from: DINNER_FROM, to: DINNER_TO};
+}
+export const dinnerNow = (day, hm) => { const d = dinnerOn(day); return d && hm >= d.from && hm < d.to ? d : null; };
+export function dinnerSlot(id, day, hm){
+  if (!BACK.includes(id) && !FRONT.includes(id)) return null;
+  const d = dinnerNow(day, hm); if (!d) return null;
+  return {from: d.from, to: d.to, scene: d.host, at: dinnerSeat(d.host, id), act: "sit", dir: BACK.includes(id) ? 1 : -1, dinner: true};
+}
