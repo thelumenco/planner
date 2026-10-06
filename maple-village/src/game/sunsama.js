@@ -62,6 +62,7 @@ export function toQuest(t){
   const sp = splitNotes(t.notes, t.subtasks), notes = sp.notes;
   const q = {id: t._id, title: t.title.trim(), minutes: minutesOf(t.timeEstimate), channel: t.channel || t.category || "", source: "sunsama"};
   if (t.completed) q.completed = true;
+  if (t.scheduledDate) q.day = String(t.scheduledDate).slice(0, 10);
   if (notes) q.notes = notes.slice(0, 4000);
   if (sp.subs.length) q.subtasks = sp.subs.slice(0, 40).map(x => Object.assign(x, {info: x.info.slice(0, 12).map(l => l.slice(0, 400))}));
   if (/^personal$/i.test(q.channel) || t.isPersonal) q.place = "home";
@@ -106,7 +107,10 @@ export async function pullSunsama(day, opts = {}){
     if (typeof p === "string") { try { p = JSON.parse(p); } catch {} }
     // Some MCP resource readers wrap the resource as {contents:[{text}]}
     if (p && Array.isArray(p.contents) && p.contents[0] && p.contents[0].text) { try { p = JSON.parse(p.contents[0].text); } catch {} }
-    return {tasks: questsFrom(p)};
+    // Sunsama lists a task on any day it was worked on, so a later day's task Mel started early shows up here too:
+    // those come back separately (ahead), not as today's quests
+    const all = questsFrom(p);
+    return {tasks: all.filter(q => !q.day || q.day <= day), ahead: all.filter(q => q.day && q.day > day)};
   } catch (e) {
     return {error: (e && e.code) || "upstream_error", message: e && e.message, retryable: !!(e && e.retryable), retryAfterMs: e && e.retryAfterMs};
   }

@@ -2238,7 +2238,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     ] },
     // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
     // and the tasting room's little tables
-    wineshop: { name: "The wine shop", wall: "#F4E6D6", trim: "#8E2C48", noBoard: true, pos: { S: [92, 262], C: [330, 318], H: [96, 440], T: [340, 520], K: [480, 390], M: [465, 128] }, stations: [
+    wineshop: { name: "The wine shop", wall: "#F4E6D6", trim: "#8E2C48", noBoard: true, pos: { S: [92, 238], C: [330, 318], H: [206, 318], T: [340, 520], K: [480, 390], M: [465, 128] }, stations: [
       ["menu", "Menu", "M", "chalkmenu", null, "The chalkboard: today's menu.", 44],
       ["kdoor", "Kitchen", "K", "kitchendoor", null, "Into the kitchen.", 0],
       ["wshelf", "Wine shelves", "S", "wineshelf", null, "Your wines, waiting for customers.", 30],
@@ -3781,6 +3781,30 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       actLines: { guide: ["These beds bloom again every day or so. Isn't that lovely?", "That one's my favourite. Don't tell the others.", "Bouquets at the farm shop, if anyone's feeling romantic."], water: ["Gentle on the petals.", "Morning water, happy flowers."], farm: ["Deadheading. Snip, snip.", "Cutting a few for the shop."] },
       away: "Mei's finished for the day."
     },
+    // Out-of-towners: day trippers who only ever turn up at the wine shop (tastings, a bottle to take home) and Ma Ma's
+    // orchard (farm tours, fruit and flowers from the farm shop). No routine of their own: tours.js says when they come.
+    ...[
+      ["aiko", "Aiko", { skin: "#F0D2B6", hair: "#2B2320", hairStyle: "bob", top: "#F6A23A", bottom: "#3F4A6B", hat: "sunhat" }, "Visiting from the city"],
+      ["ben", "Ben", { skin: "#E8C4A0", hair: "#B5562E", hairStyle: "short", top: "#6E9FD6", bottom: "#5E5A55", extra: "satchel" }, "Here on a cycling holiday"],
+      ["clara", "Clara", { skin: "#F2D3BC", hair: "#D9B46A", hairStyle: "long", top: "#E8566C", bottom: "#2F3B73" }, "On a weekend away"],
+      ["dev", "Dev", { skin: "#A8754F", hair: "#1F1A17", hairStyle: "short", top: "#F3E7B0", bottom: "#4A5568", hat: "cap" }, "Food blogger, just passing through"],
+      ["elena", "Elena", { skin: "#D9A882", hair: "#5A3A2A", hairStyle: "bun", top: "#9C8CD9", bottom: "#3E4A43", extra: "satchel" }, "Wine lover on a tasting trip"],
+      ["felix", "Felix", { skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#7FB069", bottom: "#8A6A52", extra: "glasses" }, "Retired, touring the countryside"],
+      ["grace", "Grace", { skin: "#C99A78", hair: "#2A211D", hairStyle: "long", top: "#F4C7CF", bottom: "#5E6E8C", hat: "sunhat" }, "Visiting her sister for the week"],
+      ["hiro", "Hiro", { skin: "#EAC4A4", hair: "#231C19", hairStyle: "spiky", top: "#3E6B8C", bottom: "#2F2B28", extra: "satchel" }, "Here for the farm tours"]
+    ].map(([id, name, look, job]) => ({
+      id,
+      pitch: 0.9 + id.charCodeAt(0) % 5 * 0.08,
+      name,
+      job,
+      tourist: true,
+      look,
+      routine: [],
+      intro: `Hi! I'm ${name}. ${job}. What a lovely place this is!`,
+      lines: ["First time here. It's gorgeous!", "We came for the wine and stayed for the view.", "Is it always this peaceful?", "I'm taking some of this home, for sure.", "Do you live here? Lucky you.", "My friends are going to be so jealous."],
+      actLines: { sit: ["This rosé is lovely. Who makes it?", "Cheers! To holidays.", "I'm buying a bottle before I go."] },
+      away: `${name}'s gone back to town.`
+    })),
     // The wine shop's cook: on her shifts she runs the kitchen from whatever's in the larder (see cookTick)
     {
       id: "pilar",
@@ -4440,6 +4464,14 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     }
     s.open--;
     if (Math.random() < 0.6) servePlate(v, opts.today, out);
+    const b = opts.tourist && Math.random() < 0.5 && (v.shelf.find((x) => x.id === s.id && x.n > 0) || v.shelf.find((x) => x.n > 0));
+    if (b) {
+      b.n--;
+      out.bottle = b.name;
+      out.coins += b.price;
+      v.sold++;
+      out.bottles = 1;
+    }
     v.shelf = v.shelf.filter((x) => x.n > 0 || x.open > 0);
     if (opts.serving) F2.coins += out.coins;
     else v.box += out.coins;
@@ -4450,6 +4482,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     v.today.glasses++;
     v.today.plates = (v.today.plates || 0) + out.plates;
     v.today.coins += out.coins;
+    v.today.bottles += out.bottles || 0;
     return out;
   }
   function sellTick(F2, opts = {}) {
@@ -4752,10 +4785,11 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   var DARREN_DAYS = [2, 4];
   var GUIDES = ["mama", "gonggong", "farid", "mei"];
   var VISITORS = ["hana", "okada", "juniper", "bo", "lin", "pip", "opal", "theo"];
+  var TOURISTS = ["aiko", "ben", "clara", "dev", "elena", "felix", "grace", "hiro"];
   var dow = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
   var fmtTime = (m) => `${Math.floor(m / 60) > 12 ? Math.floor(m / 60) - 12 : Math.floor(m / 60)}${m % 60 ? ":" + String(m % 60).padStart(2, "0") : ""}${m >= 12 * 60 ? "pm" : "am"}`;
-  function groupFor(seed2, n, skip = []) {
-    const pool = VISITORS.filter((v) => !skip.includes(v)), out = [];
+  function groupFor(seed2, n, skip = [], from = VISITORS) {
+    const pool = from.filter((v) => !skip.includes(v)), out = [];
     for (let k = 0; out.length < n && k < 40; k++) {
       const v = pool[hash(seed2 + ":" + k) % pool.length];
       if (!out.includes(v)) out.push(v);
@@ -4765,10 +4799,10 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   function toursOn(day) {
     const d = dow(day), out = [];
     if (d === 0 || d === 6) WEEKEND.forEach(([from, to], i) => {
-      const guide = GUIDES[(hash(day) + i) % GUIDES.length];
-      out.push({ i, from, to, guide, group: groupFor(day + ":" + i, 3 + hash(day + "n" + i) % 2) });
+      const guide = GUIDES[(hash(day) + i) % GUIDES.length], t2 = 1 + hash(day + "t" + i) % 2;
+      out.push({ i, from, to, guide, group: [...groupFor(day + ":" + i, 3 + hash(day + "n" + i) % 2 - t2), ...groupFor(day + ":t" + i, t2, [], TOURISTS)] });
     });
-    else if (DARREN_DAYS.includes(d)) out.push({ i: 0, from: DARREN[0], to: DARREN[1], guide: "darren", group: groupFor(day + ":d", 3) });
+    else if (DARREN_DAYS.includes(d)) out.push({ i: 0, from: DARREN[0], to: DARREN[1], guide: "darren", group: [...groupFor(day + ":d", 2), ...groupFor(day + ":dt", 1, [], TOURISTS)] });
     return out;
   }
   var SPOTS = { orchard: [[300, 418], [336, 432], [316, 448], [352, 414], [372, 444]], flowers: [[300, 376], [336, 392], [318, 410], [356, 380], [376, 404]] };
@@ -4781,13 +4815,20 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     return null;
   }
   function visitsOn(day) {
-    const d = dow(day), busy2 = toursOn(day).flatMap((t2) => [t2.guide, ...t2.group]), pick3 = (seed2) => groupFor(day + seed2, 1, busy2)[0];
-    return d === 0 || d === 6 ? [{ id: pick3("v1"), scene: "flowers", from: 12 * 60 + 30, to: 13 * 60 + 30 }] : [{ id: pick3("v1"), scene: "orchard", from: 12 * 60 + 15, to: 13 * 60 }, { id: pick3("v2"), scene: "flowers", from: 17 * 60 + 15, to: 18 * 60 }];
+    const d = dow(day), busy2 = toursOn(day).flatMap((t4) => [t4.guide, ...t4.group]), pick3 = (seed2) => groupFor(day + seed2, 1, busy2)[0];
+    const tbusy = toursOn(day).flatMap((t4) => t4.group), [t1, t2, t3] = groupFor(day + "tv", 3, tbusy, TOURISTS);
+    const tourists = [
+      { id: t1, scene: "orchard", from: 10 * 60 + 30, to: 11 * 60 + 30, wander: SHOPSIDE },
+      { id: t2, scene: "orchard", from: 10 * 60 + 45, to: 11 * 60 + 45, wander: SHOPSIDE },
+      { id: t3, scene: "flowers", from: 14 * 60 + 30, to: 15 * 60 + 30 }
+    ];
+    return (d === 0 || d === 6 ? [{ id: pick3("v1"), scene: "flowers", from: 12 * 60 + 30, to: 13 * 60 + 30 }] : [{ id: pick3("v1"), scene: "orchard", from: 12 * 60 + 15, to: 13 * 60 }, { id: pick3("v2"), scene: "flowers", from: 17 * 60 + 15, to: 18 * 60 }]).concat(tourists);
   }
+  var SHOPSIDE = [[390, 290], [430, 296], [460, 300], [400, 318]];
   var WANDER = { orchard: [[160, 330], [260, 420], [360, 330], [310, 510], [210, 500]], flowers: [[160, 300], [260, 380], [360, 470], [310, 300], [210, 470]] };
   function visitSlot(id, day, hm2) {
     const v = visitsOn(day).find((x) => x.id === id && hm2 >= x.from && hm2 < x.to);
-    return v ? { from: v.from, to: v.to, scene: v.scene, wander: WANDER[v.scene] } : null;
+    return v ? { from: v.from, to: v.to, scene: v.scene, wander: v.wander || WANDER[v.scene] } : null;
   }
   var tourNow = (day, hm2) => toursOn(day).find((t2) => hm2 >= t2.from && hm2 < t2.to) || null;
   var PICNIC = [[106, 468], [138, 464]];
@@ -4812,6 +4853,34 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   function fieldSlot(id, day, hm2) {
     const v = fieldVisits(day).find((x) => x.id === id && hm2 >= x.from && hm2 < x.to);
     return v ? Object.assign({ from: v.from, to: v.to, scene: "field" }, v.at ? { at: v.at } : { wander: v.wander }, v.act ? { act: v.act } : {}) : null;
+  }
+  var SEAT = { a: [87, 518], b: [173, 518], c: [227, 518], d: [313, 518], e: [367, 512], f: [453, 512] };
+  var TASTINGS = [
+    { id: "lin", from: 14 * 60, to: 15 * 60 + 30, at: SEAT.c },
+    { id: "okada", from: 15 * 60, to: 16 * 60, at: SEAT.e, days: "wd" },
+    { id: "juniper", from: 15 * 60, to: 16 * 60 + 30, at: SEAT.e, days: "we" },
+    { id: "hana", from: 15 * 60 + 30, to: 16 * 60 + 30, at: SEAT.d, dow: [1, 3, 5] },
+    { id: "bo", from: 14 * 60, to: 15 * 60, at: SEAT.d, days: "we" },
+    { id: "mama", from: 16 * 60 + 30, to: 17 * 60 + 30, at: SEAT.a, dow: [6] },
+    { id: "gonggong", from: 16 * 60 + 30, to: 17 * 60 + 30, at: SEAT.b, dow: [6] },
+    // after work: the vineyard hands first, then the orchard's farmhands
+    { id: "ines", from: 17 * 60 + 30, to: 18 * 60 + 30, at: SEAT.a },
+    { id: "marco", from: 18 * 60, to: 19 * 60, at: SEAT.b },
+    { id: "farid", from: 18 * 60 + 45, to: 20 * 60 + 15, at: SEAT.a },
+    { id: "mei", from: 19 * 60, to: 20 * 60 + 30, at: SEAT.b },
+    { id: "darren", from: 20 * 60, to: 21 * 60 + 30, at: SEAT.e, dow: [5] }
+  ];
+  var TOURIST_SEATS = [[13 * 60, 14 * 60, [SEAT.a, SEAT.b]], [16 * 60, 17 * 60, [SEAT.c, SEAT.f]], [20 * 60 + 30, 21 * 60 + 45, [SEAT.b, SEAT.f]]];
+  var WEEKEND_SEATS = [11 * 60, 12 * 60, [SEAT.d, SEAT.e]];
+  function touristTastings(day) {
+    const d = dow(day), busy2 = toursOn(day).flatMap((t2) => t2.group), out = [];
+    [...TOURIST_SEATS, ...d === 0 || d === 6 ? [WEEKEND_SEATS] : []].forEach(([from, to, seats], k) => groupFor(day + "tt" + k, 2, busy2, TOURISTS).forEach((id, j) => out.push({ id, from, to, at: seats[j] })));
+    return out;
+  }
+  function tastingSlot(id, day, hm2) {
+    const d = dow(day), we = d === 0 || d === 6;
+    const v = [...TASTINGS, ...touristTastings(day)].find((x) => x.id === id && hm2 >= x.from && hm2 < x.to && (!x.days || x.days === "we" === we) && (!x.dow || x.dow.includes(d)));
+    return v ? { from: v.from, to: v.to, scene: "wineshop", at: v.at, act: "sit" } : null;
   }
 
   // src/game/orchard.js
@@ -4902,7 +4971,16 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       o.toursPaid.done.push(tr.i);
       any = true;
       if (shown >= 3) {
-        const fee = TOUR_FEE * tr.group.length;
+        let fee = TOUR_FEE * tr.group.length;
+        tr.group.filter((g) => TOURISTS.includes(g)).forEach(() => {
+          const ids = Object.keys(o.stock).filter((x) => o.stock[x] > 0);
+          if (!ids.length) return;
+          const id = ids[Math.floor(Math.random() * ids.length)];
+          o.stock[id]--;
+          if (!o.stock[id]) delete o.stock[id];
+          fee += id.startsWith("stem:") ? STEM_PRICE * BOUQUET_STEMS : ITEMS[id] && ITEMS[id].sell || 3;
+          o.today.sold = (o.today.sold || 0) + 1;
+        });
         o.tin += fee;
         out.tours = (out.tours || []).concat({ guide: tr.guide, n: tr.group.length, fee });
         if (o.today.day !== today2) o.today = { day: today2, sold: 0, coins: 0 };
@@ -5189,12 +5267,13 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     `<rect x="${x - 18}" y="${y - 30}" width="6" height="40"/><rect x="${x + 12}" y="${y - 30}" width="6" height="40"/><path d="M${x - 22} ${y - 26} q22 -16 44 0 v6 q-22 -14 -44 0z"/>`
   )}
     ${tapeLabel(lx, ly, label2, col, 11)}</g>`;
-  var hedge = `<g ${W3}>${Array.from({ length: 14 }, (_, i) => `<ellipse cx="${i * 40 + 10}" cy="${118 + i % 2 * 4}" rx="26" ry="18" style="fill:var(--tree2)"/>`).join("")}</g>`;
+  var hedgeRow = (gap) => `<g ${W3}>${Array.from({ length: 14 }, (_, i) => i * 40 + 10).filter((x) => !gap || x < gap[0] || x > gap[1]).map((x, k) => `<ellipse cx="${x}" cy="${118 + Math.round((x - 10) / 40) % 2 * 4}" rx="26" ry="18" style="fill:var(--tree2)"/>`).join("")}</g>`;
+  var hedge = hedgeRow();
   function orchardArt() {
     const o = orchState(artCtx().F()), today2 = artCtx().day();
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="470" rx="230" ry="130" style="fill:var(--grass2)"/><ellipse cx="400" cy="60" rx="140" ry="50" style="fill:var(--grass2)"/></g>
-    ${tree(40, 50, 0.8)}${tree(160, 40, 0.7)}${tree(300, 46, 0.75)}${orchardRiver}${hedge}
+    ${tree(40, 50, 0.8)}${tree(160, 40, 0.7)}${tree(300, 46, 0.75)}${orchardRiver}${hedgeRow([200, 300])}
     <g filter="url(#wob)"><path d="M260 150 V270 M0 270 H520 M132 270 V236 M415 270 V252 M160 270 V610 M260 270 V610 M360 270 V610" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
     ${flowers([[200, 150, "#EFA3A6"], [230, 160, "#F3C969"], [300, 150, "#C3CDEE"], [30, 600, "#EFA3A6"], [490, 600, "#F3C969"], [470, 330, "#C3CDEE"]])}`;
     const cottage = house(
@@ -6142,7 +6221,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
           `<ellipse cx="${tx}" cy="${ty - 26}" rx="30" ry="12" style="fill:#FFFDF6"/><path d="M${tx - 4} ${ty - 40} h8 l-1 12 h-6z" style="fill:#5B2338"/><circle cx="${tx + 14}" cy="${ty - 28}" r="3" style="fill:#E8D57A"/>`,
           `<ellipse cx="${tx}" cy="${ty - 26}" rx="30" ry="12"/><path d="M${tx} ${ty - 14} v14 M${tx - 10} ${ty} h20"/><path d="M${tx - 4} ${ty - 40} h8 l-1 12 h-6z"/>`
         ) + sk(`<rect x="${tx - 50}" y="${ty - 22}" width="14" height="6" rx="2" style="fill:var(--wood)"/><rect x="${tx + 36}" y="${ty - 22}" width="14" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="${tx - 50}" y="${ty - 22}" width="14" height="6" rx="2"/><path d="M${tx - 48} ${ty - 16} v12 M${tx - 38} ${ty - 16} v12 M${tx - 50} ${ty - 22} v-16"/><rect x="${tx + 36}" y="${ty - 22}" width="14" height="6" rx="2"/><path d="M${tx + 38} ${ty - 16} v12 M${tx + 48} ${ty - 16} v12 M${tx + 50} ${ty - 22} v-16"/>`);
-        return table(x - 70, y) + table(x + 70, y - 6);
+        return table(x - 210, y + 2) + table(x - 70, y) + table(x + 70, y - 6);
       }
       // the counter's front panel is drawn over the characters (foreArt), so Opal stands behind it
       case "bankcounter":
@@ -7634,6 +7713,7 @@ Quests finished today: ${S3.doneIds.length}`;
     const sp = splitNotes(t2.notes, t2.subtasks), notes2 = sp.notes;
     const q = { id: t2._id, title: t2.title.trim(), minutes: minutesOf(t2.timeEstimate), channel: t2.channel || t2.category || "", source: "sunsama" };
     if (t2.completed) q.completed = true;
+    if (t2.scheduledDate) q.day = String(t2.scheduledDate).slice(0, 10);
     if (notes2) q.notes = notes2.slice(0, 4e3);
     if (sp.subs.length) q.subtasks = sp.subs.slice(0, 40).map((x) => Object.assign(x, { info: x.info.slice(0, 12).map((l) => l.slice(0, 400)) }));
     if (/^personal$/i.test(q.channel) || t2.isPersonal) q.place = "home";
@@ -7705,7 +7785,8 @@ Quests finished today: ${S3.doneIds.length}`;
         } catch {
         }
       }
-      return { tasks: questsFrom(p) };
+      const all = questsFrom(p);
+      return { tasks: all.filter((q) => !q.day || q.day <= day), ahead: all.filter((q) => q.day && q.day > day) };
     } catch (e) {
       return { error: e && e.code || "upstream_error", message: e && e.message, retryable: !!(e && e.retryable), retryAfterMs: e && e.retryAfterMs };
     }
@@ -11172,7 +11253,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var dowNow = () => new Date(now() + 8 * H).getUTCDay();
   var slotNow = (def) => {
     const t2 = sgHM(), we = weekend(), dw = dowNow();
-    const special = tourSlot(def.id, dayKey(), t2) || visitSlot(def.id, dayKey(), t2) || fieldSlot(def.id, dayKey(), t2);
+    const special = tourSlot(def.id, dayKey(), t2) || visitSlot(def.id, dayKey(), t2) || fieldSlot(def.id, dayKey(), t2) || tastingSlot(def.id, dayKey(), t2);
     if (special) return special;
     const owned = api3 && api3.F().fam && api3.F().fam.owned || {};
     return def.routine.find((s) => t2 >= s.from && t2 < s.to && (!s.days || s.days === "we" === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null;
@@ -12693,23 +12774,61 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       F.subTodo = (F.subTodo || []).filter((y) => !(y.task === t2.id && y.sub === x.id)).concat({ task: t2.id, sub: x.id, done });
       flushSubs();
     }
-    rec.paid = rec.paid || {};
-    if (done && !rec.paid[key]) {
-      rec.paid[key] = true;
-      if (isTreadTask(t2)) {
-        sfx("chaching");
-        earn(5, "batch quest done");
-        gainXp(1);
-        F.plots.forEach((p) => {
-          if (p && p.crop && p.wateredAt && growth2(p) < 1) p.bonus = (p.bonus || 0) + QUEST_BOOST;
-        });
-        questBoost(F, QUEST_BOOST);
-      } else earn(1, "subtask");
+    const paid = done ? paySub(t2, key) : 0;
+    if (paid) {
+      if (paid > 1) sfx("chaching");
+      earn(paid, paid > 1 ? "batch quest done" : "subtask");
     } else sfx(done ? "tap" : "paper", true);
     const left3 = subView(t2).list.filter((y) => !y.done).length;
     if (done && !left3) speak("Every subtask ticked! Tap Done when you're ready.", 4500, true);
     save2();
     refreshNotebook();
+  }
+  function paySub(t2, key) {
+    F.subDone = F.subDone || {};
+    const rec = F.subDone[t2.id] = F.subDone[t2.id] || { s: {}, at: Date.now() };
+    rec.paid = rec.paid || {};
+    if (rec.paid[key]) return 0;
+    rec.paid[key] = true;
+    if (!isTreadTask(t2)) return 1;
+    gainXp(1);
+    F.plots.forEach((p) => {
+      if (p && p.crop && p.wateredAt && growth2(p) < 1) p.bonus = (p.bonus || 0) + QUEST_BOOST;
+    });
+    questBoost(F, QUEST_BOOST);
+    return 5;
+  }
+  function paySunsamaSubs(list2) {
+    const first = !F.subBaseline;
+    let coins = 0;
+    (list2 || []).forEach((t2) => (t2.subtasks || []).forEach((x) => {
+      if (!x.done) return;
+      const key = subKey(x);
+      if (first) {
+        F.subDone = F.subDone || {};
+        const rec = F.subDone[t2.id] = F.subDone[t2.id] || { s: {}, at: Date.now() };
+        (rec.paid = rec.paid || {})[key] = true;
+      } else coins += paySub(t2, key);
+    }));
+    F.subBaseline = true;
+    if (coins) {
+      sfx("chaching");
+      earn(coins, "ticked in Sunsama");
+    }
+    return coins;
+  }
+  function creditAhead(list2) {
+    let n = 0;
+    (list2 || []).forEach((t2) => {
+      if (!t2.completed || F.early[t2.id]) return;
+      F.early[t2.id] = t2.day;
+      earn(5, "done early in Sunsama");
+      gainXp(1);
+      countQuest();
+      n++;
+    });
+    if (n) setTimeout(() => speak(n === 1 ? "You ticked one of tomorrow's quests off early in Sunsama. Coins now, and it's already done when tomorrow comes!" : `${n} of tomorrow's quests done early in Sunsama! Coins now.`, 5500), 1200);
+    return n;
   }
   var subFlushing = false;
   async function flushSubs() {
@@ -12806,6 +12925,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const ids = new Set(allTasks().map((t2) => t2.id)), cur2 = phase() === "task" ? remaining()[0] : null, got = [];
     (tasks || []).forEach((t2) => {
       if (!t2 || !t2.completed || !ids.has(t2.id) || S2.doneIds.includes(t2.id)) return;
+      if (F.early[t2.id]) {
+        S2.doneIds.push(t2.id);
+        return;
+      }
       S2.doneIds.push(t2.id);
       got.push(t2);
       if (got.length === 1) sfx("chaching");
@@ -12840,6 +12963,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       render();
       return;
     }
+    const extraPay = creditAhead(r.ahead) + paySunsamaSubs([...r.tasks, ...r.ahead || []]);
+    if (extraPay) save2(true);
     if (fromPull) {
       if (!r.tasks.length && !(P && P.day === day && P.source === "sunsama")) {
         sun.added = 0;
@@ -14658,7 +14783,7 @@ Then tell chat "wind down" whenever you're ready.`
     seats.forEach((e) => {
       const k = `${e.def.id}:${e.key}`;
       if (k in S2.served || e.def.id === "pilar") return;
-      const out = serveGuest(F, { serving: serving(), today: dayKey() });
+      const out = serveGuest(F, { serving: serving(), today: dayKey(), tourist: !!e.def.tourist });
       S2.served[k] = out ? { wine: out.wine, dish: out.dish || null } : {};
       if (out) {
         save2();
@@ -14667,13 +14792,14 @@ Then tell chat "wind down" whenever you're ready.`
           flash(`+${out.coins} coins: ${e.def.name} ordered ${out.dish ? "a glass and a plate" : "a glass"}`);
         }
         if (out.opened) setTimeout(() => npcSay(e.def.id, `Ooh, you've opened the ${out.name}! A glass of that, please.`), 600);
+        else if (out.bottle) setTimeout(() => npcSay(e.def.id, `I'll take a bottle of the ${out.bottle} home too. It's for my mum. Mostly.`), 900);
       }
     });
     const orders = seats.map((e) => [e, S2.served[`${e.def.id}:${e.key}`] || {}]);
     const key = orders.map(([e, o]) => `${e.def.id}${Math.round(e.x)}${o.wine || ""}${o.dish || ""}`).join();
     if (key === tableKey && $("tableware")) return;
     tableKey = key;
-    const T = ROOMS.wineshop.pos.T, tables = [[T[0] - 70, T[1]], [T[0] + 70, T[1] - 6]];
+    const T = ROOMS.wineshop.pos.T, tables = [[T[0] - 210, T[1] + 2], [T[0] - 70, T[1]], [T[0] + 70, T[1] - 6]];
     let h = "";
     orders.forEach(([e, o]) => {
       const [tx, ty] = tables.reduce((a, b) => Math.abs(b[0] - e.x) < Math.abs(a[0] - e.x) ? b : a), side = e.x < tx ? -1 : 1;

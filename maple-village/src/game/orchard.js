@@ -12,7 +12,7 @@ import { TREES, FLOWERS, TREE_GROW, TREE_FIRST, TREE_AGAIN, BED_GROW, BED_AGAIN,
   BOUQUET_STEMS, POT_STEMS, STEM_PRICE, BOUQUET_PRICE, POT_PRICE, POT_SPOTS } from "../data/orchard.js";
 import { icon } from "../art/icons.js";
 import { treePic, flowerPic } from "../art/orchard.js";
-import { toursOn, TOUR_FEE, fmtTime } from "./tours.js";
+import { toursOn, TOUR_FEE, fmtTime, TOURISTS } from "./tours.js";
 import { NPCS } from "../data/npcs.js";
 
 export function orchState(F){
@@ -77,7 +77,12 @@ export function orchTick(F, today){
   const shown = [...o.trees, ...o.beds, ...o.bushes].filter(Boolean).length, nowM = hm(t);
   if (!o.toursPaid || o.toursPaid.day !== today) o.toursPaid = {day: today, done: []};
   for (const tr of toursOn(today)) if (tr.to <= nowM && !o.toursPaid.done.includes(tr.i)) { o.toursPaid.done.push(tr.i); any = true;
-    if (shown >= 3) { const fee = TOUR_FEE*tr.group.length; o.tin += fee; out.tours = (out.tours || []).concat({guide: tr.guide, n: tr.group.length, fee});
+    if (shown >= 3) { let fee = TOUR_FEE*tr.group.length;
+      // the out-of-towners each buy something from the farm shop on their way out (if there's anything on the shelf)
+      tr.group.filter(g => TOURISTS.includes(g)).forEach(() => { const ids = Object.keys(o.stock).filter(x => o.stock[x] > 0); if (!ids.length) return;
+        const id = ids[Math.floor(Math.random()*ids.length)]; o.stock[id]--; if (!o.stock[id]) delete o.stock[id];
+        fee += id.startsWith("stem:") ? STEM_PRICE*BOUQUET_STEMS : (ITEMS[id] && ITEMS[id].sell) || 3; o.today.sold = (o.today.sold || 0) + 1; });
+      o.tin += fee; out.tours = (out.tours || []).concat({guide: tr.guide, n: tr.group.length, fee});
       if (o.today.day !== today) o.today = {day: today, sold: 0, coins: 0}; o.today.coins += fee; o.today.tours = (o.today.tours || 0) + 1; } }
   if (out.coins) { o.tin += out.coins; if (o.today.day !== today) o.today = {day: today, sold: 0, coins: 0}; o.today.sold += out.sold; o.today.coins += out.coins; any = true; }
   return any ? out : null;

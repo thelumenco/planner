@@ -695,3 +695,38 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - More seasonal gifts for the grandparents: bak kwa 10 and pineapple tarts 8 (spring), rice dumplings (`bakchang`) 6 (summer), Christmas log cake 14 (winter). The market's dumpling stays a treat for Maple.
 - Pip's weekday football in the field is 3:30–4:30pm, so his playground slot at the vineyard (4:30) still happens.
 - **Chalkboard menu:** the wine shop's chalkboard is a station (`menu`, kind `chalkmenu`: a transparent hit area over the board painted in interiors.js). It opens `menuPanel` (vineyard.js), which lists only what's available now, with prices: today's tapas, small plates, wines by the glass and by the bottle, and the orchard fruit crate.
+- **More tasting-room regulars** (`TASTINGS` and `tastingSlot` in tours.js, last in `slotNow`'s overlay chain):
+  - Afternoons: Auntie Lin daily, Okada (weekdays), Juniper and Bo (weekends), Hana (Mon/Wed/Fri), and Ma Ma and Gong Gong at 4:30pm on Saturdays.
+  - After work: Ines 5:30, Marco 6:00, Farid 6:45, Mei 7:00.
+  - Darren on Friday nights at 8pm.
+  - The tasting room now has a third table (`cafetables` draws three; `drawTableware` knows them). Seats never double up in time.
+  - The honesty box moved up (H [96,420]) to clear the new table's label.
+- **More tasting-room regulars** (`TASTINGS` and `tastingSlot` in tours.js, last in `slotNow`'s overlay chain):
+  - Afternoons: Auntie Lin daily, Okada (weekdays), Juniper and Bo (weekends), Hana (Mon/Wed/Fri), and Ma Ma and Gong Gong at 4:30pm on Saturdays.
+  - After work: Ines 5:30, Marco 6:00, and the orchard's farmhands Farid 6:45 and Mei 7:00.
+  - Darren on Friday nights at 8pm.
+  - The tasting room now has a third table (`cafetables` draws three; `drawTableware` knows them). Seats never double up in time.
+- **Out-of-towners** (NPCs with `tourist: true` and an empty routine: Aiko, Ben, Clara, Dev, Elena, Felix, Grace, Hiro; `TOURISTS` in tours.js). They only ever appear at the wine shop and the orchards:
+  - Tour groups are now a couple of villagers plus 1–2 tourists. Each tourist on a finished tour buys one thing from the farm shop stock (a bouquet's worth for stems), paid into the tin.
+  - They browse by the farm shop 10:30–11:45am and visit the flower beds 2:30–3:30pm.
+  - They take tasting seats in the regulars' gaps: a pair at 1pm, 4pm and 8:30pm, and 11am at weekends (`touristTastings`). Half the time they also buy a bottle to take home (`serveGuest` with `tourist`).
+- **Wine shop layout:** the wine shelves stand against the back wall (S [92,238]) and the honesty box is beside the counter (H [206,318]).
+
+### Round 56: tasting regulars and out-of-towners; Sunsama early ticks
+- **More tasting-room regulars** (`TASTINGS` and `tastingSlot` in tours.js, last in `slotNow`'s overlay chain):
+  - Afternoons: Auntie Lin daily, Okada (weekdays), Juniper and Bo (weekends), Hana (Mon/Wed/Fri), and Ma Ma and Gong Gong at 4:30pm on Saturdays.
+  - After work: Ines 5:30, Marco 6:00, and the orchard's farmhands Farid 6:45 and Mei 7:00.
+  - Darren on Friday nights at 8pm.
+  - The tasting room has a third table (`cafetables` draws three; `drawTableware` knows them). Seats never double up in time.
+- **Out-of-towners** (NPCs with `tourist: true` and an empty routine: Aiko, Ben, Clara, Dev, Elena, Felix, Grace, Hiro; `TOURISTS` in tours.js). They only ever appear at the wine shop and the orchards:
+  - Tour groups are now a couple of villagers plus 1–2 tourists. Each tourist on a finished tour buys one thing from the farm shop stock (a bouquet's worth for stems), paid into the tin.
+  - They browse by the farm shop 10:30–11:45am and visit the flower beds 2:30–3:30pm.
+  - They take tasting seats in the regulars' gaps: a pair at 1pm, 4pm and 8:30pm, and 11am at weekends (`touristTastings`). Half the time they also buy a bottle to take home (`serveGuest` with `tourist`).
+- **Wine shop layout:** the wine shelves stand against the back wall (S [92,238]), the honesty box is beside the counter (H [206,318]), and the chalkboard is the `menu` station.
+- **Orchard hedge:** `hedgeRow(gap)` leaves the path to the field open behind the arch (x 200–300).
+- **Sunsama early ticks.** Sunsama lists a task on any day it's worked on, so a later day's task Mel started early came back in today's pull and opened as a quest.
+  - Each quest now keeps `day` (Sunsama's `scheduledDate`). `pullSunsama` returns `{tasks}` for that day and earlier, and `{ahead}` for tasks scheduled later. Only `tasks` reach the boards.
+  - `creditAhead`: an ahead task that's completed pays 5 coins, 1 xp and a quest count once, and records `F.early[id] = its day`. On that day `creditDone` marks it done without paying again.
+  - `paySunsamaSubs`: subtasks ticked in Sunsama, on today's tasks and ahead tasks, pay like village ticks via the shared `paySub` (5 in a treadmill batch, else 1). They're recorded in `F.subDone[task].paid`.
+  - The first run only records what's already ticked (`F.subBaseline`), so nothing pays retroactively.
+  - The stub's `?ahead=1` adds such a task, for the test.

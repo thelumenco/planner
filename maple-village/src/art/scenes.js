@@ -351,7 +351,7 @@ export function furn(kind, x, y){
     case "cafetables": { const table = (tx, ty) => sk(`<ellipse cx="${tx}" cy="${ty-26}" rx="30" ry="12" style="fill:#FFFDF6"/><path d="M${tx-4} ${ty-40} h8 l-1 12 h-6z" style="fill:#5B2338"/><circle cx="${tx+14}" cy="${ty-28}" r="3" style="fill:#E8D57A"/>`,
         `<ellipse cx="${tx}" cy="${ty-26}" rx="30" ry="12"/><path d="M${tx} ${ty-14} v14 M${tx-10} ${ty} h20"/><path d="M${tx-4} ${ty-40} h8 l-1 12 h-6z"/>`)
         + sk(`<rect x="${tx-50}" y="${ty-22}" width="14" height="6" rx="2" style="fill:var(--wood)"/><rect x="${tx+36}" y="${ty-22}" width="14" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="${tx-50}" y="${ty-22}" width="14" height="6" rx="2"/><path d="M${tx-48} ${ty-16} v12 M${tx-38} ${ty-16} v12 M${tx-50} ${ty-22} v-16"/><rect x="${tx+36}" y="${ty-22}" width="14" height="6" rx="2"/><path d="M${tx+38} ${ty-16} v12 M${tx+48} ${ty-16} v12 M${tx+50} ${ty-22} v-16"/>`);
-      return table(x - 70, y) + table(x + 70, y - 6); }
+      return table(x - 210, y + 2) + table(x - 70, y) + table(x + 70, y - 6); }
     // the counter's front panel is drawn over the characters (foreArt), so Opal stands behind it
     case "bankcounter": return `<rect x="${x-92}" y="${y-48}" width="184" height="48" fill="transparent"/>`;
     case "kindboard": { const n = G.kudos ? G.kudos() : 0, cols = ["#FFF3B8", "#FAD4DC", "#D6E8F7", "#DCEFD2", "#F7DCC4", "#E6DAF5"];

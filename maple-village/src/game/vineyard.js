@@ -124,11 +124,14 @@ export function serveGuest(F, opts = {}){
   const out = {glasses: 1, plates: 0, coins: Math.max(1, Math.round(s.price/4)), wine: s.type, name: s.name, opened: !s.open};
   if (!s.open) { s.n--; s.open = GLASSES; } s.open--;
   if (Math.random() < .6) servePlate(v, opts.today, out);
+  // out-of-towners often take a bottle home as a souvenir
+  const b = opts.tourist && Math.random() < .5 && (v.shelf.find(x => x.id === s.id && x.n > 0) || v.shelf.find(x => x.n > 0));
+  if (b) { b.n--; out.bottle = b.name; out.coins += b.price; v.sold++; out.bottles = 1; }
   v.shelf = v.shelf.filter(x => x.n > 0 || x.open > 0);
   if (opts.serving) F.coins += out.coins; else v.box += out.coins;
   v.glasses++; v.plates += out.plates;
   const day = new Date(Date.now() + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
-  v.today.glasses++; v.today.plates = (v.today.plates || 0) + out.plates; v.today.coins += out.coins;
+  v.today.glasses++; v.today.plates = (v.today.plates || 0) + out.plates; v.today.coins += out.coins; v.today.bottles += out.bottles || 0;
   return out;
 }
 export function sellTick(F, opts = {}){

@@ -69,13 +69,15 @@ const archGate = (id, x, y, label, lx, ly, col, aria) => `<g data-place="${id}" 
     ${sk(`<rect x="${x-18}" y="${y-30}" width="6" height="40" style="fill:var(--wood)"/><rect x="${x+12}" y="${y-30}" width="6" height="40" style="fill:var(--wood)"/><path d="M${x-22} ${y-26} q22 -16 44 0 v6 q-22 -14 -44 0z" style="fill:#9CC27E"/><circle cx="${x-10}" cy="${y-24}" r="2.2" style="fill:#E8566C"/><circle cx="${x+9}" cy="${y-25}" r="2.2" style="fill:#F3C969"/>`,
       `<rect x="${x-18}" y="${y-30}" width="6" height="40"/><rect x="${x+12}" y="${y-30}" width="6" height="40"/><path d="M${x-22} ${y-26} q22 -16 44 0 v6 q-22 -14 -44 0z"/>`)}
     ${tapeLabel(lx, ly, label, col, 11)}</g>`;
-const hedge = `<g ${W}>${Array.from({length: 14}, (_, i) => `<ellipse cx="${i*40 + 10}" cy="${118 + (i % 2)*4}" rx="26" ry="18" style="fill:var(--tree2)"/>`).join("")}</g>`;
+// a hedge along the top; gap: [from, to] x range left open (the orchard's path up to the field)
+const hedgeRow = gap => `<g ${W}>${Array.from({length: 14}, (_, i) => i*40 + 10).filter(x => !gap || x < gap[0] || x > gap[1]).map((x, k) => `<ellipse cx="${x}" cy="${118 + (Math.round((x - 10)/40) % 2)*4}" rx="26" ry="18" style="fill:var(--tree2)"/>`).join("")}</g>`;
+const hedge = hedgeRow();
 
 export function orchardArt(){
   const o = orchState(artCtx().F()), today = artCtx().day();
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="470" rx="230" ry="130" style="fill:var(--grass2)"/><ellipse cx="400" cy="60" rx="140" ry="50" style="fill:var(--grass2)"/></g>
-    ${tree(40, 50, .8)}${tree(160, 40, .7)}${tree(300, 46, .75)}${orchardRiver}${hedge}
+    ${tree(40, 50, .8)}${tree(160, 40, .7)}${tree(300, 46, .75)}${orchardRiver}${hedgeRow([200, 300])}
     <g filter="url(#wob)"><path d="M260 150 V270 M0 270 H520 M132 270 V236 M415 270 V252 M160 270 V610 M260 270 V610 M360 270 V610" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
     ${flowers([[200, 150, "#EFA3A6"], [230, 160, "#F3C969"], [300, 150, "#C3CDEE"], [30, 600, "#EFA3A6"], [490, 600, "#F3C969"], [470, 330, "#C3CDEE"]])}`;
   const cottage = house("cottage", 74, 152, 116, 72, "#FFF6E8", "#C2505F", "Ma Ma's cottage", "var(--blush)",

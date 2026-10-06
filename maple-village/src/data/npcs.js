@@ -227,6 +227,21 @@ export const NPCS = [
     actLines: {guide: ["These beds bloom again every day or so. Isn't that lovely?", "That one's my favourite. Don't tell the others.", "Bouquets at the farm shop, if anyone's feeling romantic."], water: ["Gentle on the petals.", "Morning water, happy flowers."], farm: ["Deadheading. Snip, snip.", "Cutting a few for the shop."]},
     away: "Mei's finished for the day."
   },
+  // Out-of-towners: day trippers who only ever turn up at the wine shop (tastings, a bottle to take home) and Ma Ma's
+  // orchard (farm tours, fruit and flowers from the farm shop). No routine of their own: tours.js says when they come.
+  ...[["aiko", "Aiko", {skin: "#F0D2B6", hair: "#2B2320", hairStyle: "bob", top: "#F6A23A", bottom: "#3F4A6B", hat: "sunhat"}, "Visiting from the city"],
+    ["ben", "Ben", {skin: "#E8C4A0", hair: "#B5562E", hairStyle: "short", top: "#6E9FD6", bottom: "#5E5A55", extra: "satchel"}, "Here on a cycling holiday"],
+    ["clara", "Clara", {skin: "#F2D3BC", hair: "#D9B46A", hairStyle: "long", top: "#E8566C", bottom: "#2F3B73"}, "On a weekend away"],
+    ["dev", "Dev", {skin: "#A8754F", hair: "#1F1A17", hairStyle: "short", top: "#F3E7B0", bottom: "#4A5568", hat: "cap"}, "Food blogger, just passing through"],
+    ["elena", "Elena", {skin: "#D9A882", hair: "#5A3A2A", hairStyle: "bun", top: "#9C8CD9", bottom: "#3E4A43", extra: "satchel"}, "Wine lover on a tasting trip"],
+    ["felix", "Felix", {skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#7FB069", bottom: "#8A6A52", extra: "glasses"}, "Retired, touring the countryside"],
+    ["grace", "Grace", {skin: "#C99A78", hair: "#2A211D", hairStyle: "long", top: "#F4C7CF", bottom: "#5E6E8C", hat: "sunhat"}, "Visiting her sister for the week"],
+    ["hiro", "Hiro", {skin: "#EAC4A4", hair: "#231C19", hairStyle: "spiky", top: "#3E6B8C", bottom: "#2F2B28", extra: "satchel"}, "Here for the farm tours"]
+  ].map(([id, name, look, job]) => ({id, pitch: .9 + (id.charCodeAt(0) % 5)*.08, name, job, tourist: true, look, routine: [],
+    intro: `Hi! I'm ${name}. ${job}. What a lovely place this is!`,
+    lines: ["First time here. It's gorgeous!", "We came for the wine and stayed for the view.", "Is it always this peaceful?", "I'm taking some of this home, for sure.", "Do you live here? Lucky you.", "My friends are going to be so jealous."],
+    actLines: {sit: ["This rosé is lovely. Who makes it?", "Cheers! To holidays.", "I'm buying a bottle before I go."]},
+    away: `${name}'s gone back to town.`})),
   // The wine shop's cook: on her shifts she runs the kitchen from whatever's in the larder (see cookTick)
   {
     id: "pilar", pitch: 0.95, name: "Pilar", job: "Cooks in the wine shop kitchen",

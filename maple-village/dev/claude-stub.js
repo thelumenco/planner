@@ -135,6 +135,8 @@ window.__mapleDevStub = true;   // dev only: lets test scripts jump between scen
         { _id: "s4", title: "Submit to F6S", channel: "Chord", timeEstimate: "1 hour 30 minutes", sortOrder: 4, completed: false, notes: "", subtasks: [] },
         { _id: "s5", title: "Listen to affirmations", channel: "Personal", isPersonal: true, timeEstimate: "5 minutes", sortOrder: 5, completed: true, notes: "<p></p>", subtasks: [] }
       ];
+      // ?ahead=1: a later day's task Mel worked on (and ticked off) early shows up in today's list, as Sunsama does
+      if (q.get("ahead")) tasks.push({ _id: "a1", title: "🚶 Treadmill batch", channel: "Ambidextrous", timeEstimate: "30 minutes", sortOrder: 6, completed: true, scheduledDate: "2099-12-31", notes: "", subtasks: [{ _id: "ax", title: "Send the invoice", completed: true }] });
       return { content: [{ type: "text", text: JSON.stringify({ tasks }) }], payload: { tasks } };
     }
   };

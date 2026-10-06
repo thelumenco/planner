@@ -602,16 +602,40 @@ function subTick(t, key, done){
   for (const k of Object.keys(F.subDone)) if (Date.now() - F.subDone[k].at > 21*864e5) delete F.subDone[k];   // forget old quests
   const rec = F.subDone[t.id] = F.subDone[t.id] || {s: {}}; rec.at = Date.now(); rec.s[key] = done;
   if (x.id && t.source === "sunsama") { F.subTodo = (F.subTodo || []).filter(y => !(y.task === t.id && y.sub === x.id)).concat({task: t.id, sub: x.id, done}); flushSubs(); }
-  // Subtasks pay the first time they're ticked (rec.paid remembers, so untick and re-tick doesn't pay twice). In a
-  // treadmill batch each subtask was a task of its own, so it pays like one: 5 coins and the growing boost.
-  rec.paid = rec.paid || {};
-  if (done && !rec.paid[key]) { rec.paid[key] = true;
-    if (isTreadTask(t)) { sfx("chaching"); earn(5, "batch quest done"); gainXp(1); F.plots.forEach(p => { if (p && p.crop && p.wateredAt && growth(p) < 1) p.bonus = (p.bonus || 0) + QUEST_BOOST; }); questBoost(F, QUEST_BOOST); }
-    else earn(1, "subtask"); }
+  const paid = done ? paySub(t, key) : 0;
+  if (paid) { if (paid > 1) sfx("chaching"); earn(paid, paid > 1 ? "batch quest done" : "subtask"); }
   else sfx(done ? "tap" : "paper", true);
   const left = subView(t).list.filter(y => !y.done).length;
   if (done && !left) speak("Every subtask ticked! Tap Done when you're ready.", 4500, true);
   save(); refreshNotebook();
+}
+// Subtasks pay the first time they're ticked, in the village or in Sunsama (F.subDone[task].paid remembers, so unticking
+// and re-ticking doesn't pay twice). In a treadmill batch each subtask was a task of its own, so it pays like one: 5 coins,
+// 1 xp and the growing boost; any other subtask pays 1. -> coins owed (the caller pays them), 0 if already paid
+function paySub(t, key){
+  F.subDone = F.subDone || {}; const rec = F.subDone[t.id] = F.subDone[t.id] || {s: {}, at: Date.now()}; rec.paid = rec.paid || {};
+  if (rec.paid[key]) return 0; rec.paid[key] = true;
+  if (!isTreadTask(t)) return 1;
+  gainXp(1); F.plots.forEach(p => { if (p && p.crop && p.wateredAt && growth(p) < 1) p.bonus = (p.bonus || 0) + QUEST_BOOST; }); questBoost(F, QUEST_BOOST);
+  return 5;
+}
+// Subtasks ticked over in Sunsama (today's tasks, and later days' tasks started early) pay too. The first time this
+// runs, whatever's already ticked is just noted, so nothing done before pays twice. -> coins paid
+function paySunsamaSubs(list){
+  const first = !F.subBaseline; let coins = 0;
+  (list || []).forEach(t => (t.subtasks || []).forEach(x => { if (!x.done) return; const key = subKey(x);
+    if (first) { F.subDone = F.subDone || {}; const rec = F.subDone[t.id] = F.subDone[t.id] || {s: {}, at: Date.now()}; (rec.paid = rec.paid || {})[key] = true; }
+    else coins += paySub(t, key); }));
+  F.subBaseline = true;
+  if (coins) { sfx("chaching"); earn(coins, "ticked in Sunsama"); }
+  return coins;
+}
+// A later day's task ticked off early in Sunsama: 5 coins now, and it's already done when its day comes (F.early)
+function creditAhead(list){
+  let n = 0;
+  (list || []).forEach(t => { if (!t.completed || F.early[t.id]) return; F.early[t.id] = t.day; earn(5, "done early in Sunsama"); gainXp(1); countQuest(); n++; });
+  if (n) setTimeout(() => speak(n === 1 ? "You ticked one of tomorrow's quests off early in Sunsama. Coins now, and it's already done when tomorrow comes!" : `${n} of tomorrow's quests done early in Sunsama! Coins now.`, 5500), 1200);
+  return n;
 }
 let subFlushing = false;
 async function flushSubs(){
@@ -670,6 +694,7 @@ function creditDone(tasks, quiet){
   const ids = new Set(allTasks().map(t => t.id)), cur = phase() === "task" ? remaining()[0] : null, got = [];
   (tasks || []).forEach(t => {
     if (!t || !t.completed || !ids.has(t.id) || S.doneIds.includes(t.id)) return;
+    if (F.early[t.id]) { S.doneIds.push(t.id); return; }   // done early (paid back then)
     S.doneIds.push(t.id); got.push(t); if (got.length === 1) sfx("chaching");
     const q = allTasks().find(x => x.id === t.id); if (q && q.early) F.early[t.id] = q.early;
     earn(5, "done in Sunsama"); gainXp(1); countQuest();
@@ -687,6 +712,8 @@ async function syncSunsama(manual){
   const day = dayKey(), r = await pullSunsama(day, {fresh: true});
   sun.busy = false; sun.at = Date.now();
   if (r.error) { sun.error = r.error === "unavailable" && !manual ? null : r.error; render(); return; }
+  const extraPay = creditAhead(r.ahead) + paySunsamaSubs([...r.tasks, ...(r.ahead || [])]);
+  if (extraPay) save(true);
   if (fromPull) {
     if (!r.tasks.length && !(P && P.day === day && P.source === "sunsama")) { sun.added = 0; render(); return; }
     const was = remaining().length;
@@ -1587,13 +1614,14 @@ function drawTableware(){
   S.served = S.served || {};
   const seats = npcActors().map(([, e]) => e).filter(e => e.kind === "npc" && e.act === "sit" && !e.moving);
   seats.forEach(e => { const k = `${e.def.id}:${e.key}`; if (k in S.served || e.def.id === "pilar") return;
-    const out = serveGuest(F, {serving: serving(), today: dayKey()}); S.served[k] = out ? {wine: out.wine, dish: out.dish || null} : {};
+    const out = serveGuest(F, {serving: serving(), today: dayKey(), tourist: !!e.def.tourist}); S.served[k] = out ? {wine: out.wine, dish: out.dish || null} : {};
     if (out) { save(); if (serving()) { sfx("coin"); flash(`+${out.coins} coins: ${e.def.name} ordered ${out.dish ? "a glass and a plate" : "a glass"}`); }
-      if (out.opened) setTimeout(() => npcSay(e.def.id, `Ooh, you've opened the ${out.name}! A glass of that, please.`), 600); } });
+      if (out.opened) setTimeout(() => npcSay(e.def.id, `Ooh, you've opened the ${out.name}! A glass of that, please.`), 600);
+      else if (out.bottle) setTimeout(() => npcSay(e.def.id, `I'll take a bottle of the ${out.bottle} home too. It's for my mum. Mostly.`), 900); } });
   const orders = seats.map(e => [e, S.served[`${e.def.id}:${e.key}`] || {}]);
   const key = orders.map(([e, o]) => `${e.def.id}${Math.round(e.x)}${o.wine || ""}${o.dish || ""}`).join();
   if (key === tableKey && $("tableware")) return; tableKey = key;
-  const T = ROOMS.wineshop.pos.T, tables = [[T[0] - 70, T[1]], [T[0] + 70, T[1] - 6]];
+  const T = ROOMS.wineshop.pos.T, tables = [[T[0] - 210, T[1] + 2], [T[0] - 70, T[1]], [T[0] + 70, T[1] - 6]];
   let h = "";
   orders.forEach(([e, o]) => { const [tx, ty] = tables.reduce((a, b) => Math.abs(b[0] - e.x) < Math.abs(a[0] - e.x) ? b : a), side = e.x < tx ? -1 : 1;
     if (o.dish) h += `<g transform="translate(${tx + side*13 - 11} ${ty - 36})">${dishArt(o.dish, 22)}</g>`;
