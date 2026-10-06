@@ -21,6 +21,7 @@ export const VILLAGE = {
   toLane: {scene:"village", name:"Gate to Makers' Lane", door:[444,218], spot:true, bridge:"lane", mark:[430,170], line:"Through the gate to Makers' Lane: Chord and Chico."},
   // Makers' Lane: the apps (Chord, Chico, and a plot waiting for the next one)
   toTownE:{scene:"lane", name:"Gate to the town square", door:[20,330], spot:true, bridge:"village", mark:[34,282], line:"Back to the town square."},
+  toVineL:{scene:"lane", name:"Path to the vineyard", door:[262,622], spot:true, bridge:"vineyard", mark:[300,586], line:"Down the lane to the vineyard."},
   plot3:  {scene:"lane", name:"Luna's plot", door:[160,540], spot:true, line:"Luna's plot. Waiting for its building."},
   plot4:  {scene:"lane", name:"Ohayo's plot", door:[362,540], spot:true, line:"Ohayo's plot. Waiting for its building."},
   toBase: {scene:"village", name:"Bridge home", door:[260,598], spot:true, bridge:"base", mark:[260,548], line:"Over the bridge and home."},
@@ -35,6 +36,7 @@ export const VILLAGE = {
   toVine: {scene:"base", name:"Gate to the vineyard", door:[490,470], spot:true, bridge:"vineyard", mark:[494,416], line:"Over the footbridge to the vineyard."},
   // the vineyard, east of home: vines, the barrel shed, the stall, the wine shop and a playground
   toBaseV:{scene:"vineyard", name:"Gate home", door:[22,300], spot:true, bridge:"base", mark:[30,250], line:"Back over the footbridge, home."},
+  toLaneV:{scene:"vineyard", name:"Path to Makers' Lane", door:[290,16], spot:true, bridge:"lane", mark:[330,40], line:"Up the path to Makers' Lane."},
   wineshop:{scene:"vineyard", name:"Wine shop", short:"the wine shop", door:[390,222], mark:[390,96]},
   barrels:{scene:"vineyard", name:"Barrel shed", door:[112,238], spot:true, mark:[112,130], line:"The barrel shed. Grapes go in, wine comes out. Eventually."},
   vinestall:{scene:"vineyard", name:"Vineyard stall", door:[90,452], spot:true, line:"Cuttings, trellises and barrels."},
@@ -56,9 +58,9 @@ const WORK_HINT = /chord|chico|ambidextrous|fresh pages|client|muse|proposal|inv
 export const isWeekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
 const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
-export const BRIDGES = {village:{base:"toBase", lane:"toLane"}, base:{village:"toTown", vineyard:"toVine"}, lane:{village:"toTownE"}, vineyard:{base:"toBaseV"}};
+export const BRIDGES = {village:{base:"toBase", lane:"toLane"}, base:{village:"toTown", vineyard:"toVine"}, lane:{village:"toTownE", vineyard:"toVineL"}, vineyard:{base:"toBaseV", lane:"toLaneV"}};
 // where Mel steps off, by "from>to"
-export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470]};
+export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586]};
 // the next outdoor screen on the way from one to another (screens form a little chain: base - village - lane)
 export function nextHop(from, to){
   if (from === to) return null; if (BRIDGES[from] && BRIDGES[from][to]) return to;

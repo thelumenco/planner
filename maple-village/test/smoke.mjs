@@ -1200,6 +1200,21 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // A path joins Makers' Lane and the vineyard directly (lane at the bottom, vineyard at the top)
+  console.log("\nlane to vineyard path");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`lanepath pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:30"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(600);
+  await page.locator('#world [data-place="toVineL"]').dispatchEvent("click");
+  await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(await page.locator('#world [data-place="toLaneV"]').count() === 1, "the path at the bottom of Makers' Lane leads down to the vineyard");
+  await page.locator('#world [data-place="toLaneV"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Makers/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "and back up again");
+  await page.close();
+}
+{
   // The bank: six vault jars of jewels for savings goals
   console.log("\nthe bank");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

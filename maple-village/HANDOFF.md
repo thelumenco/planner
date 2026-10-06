@@ -587,3 +587,8 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - The day's tallies are in `v.today.picked`, `filled` and `stocked`.
 - **Names:** `v.names = {vineyard, shop}`, set in the same card (`rename`). `vineyardName(F)` and `shopName(F)` feed the scene names and the map tape labels. The labels drop "The" and are cut at 16 characters (`tag` in art/vineyard.js).
 - **Tableware:** `drawTableware()` runs in the frame loop, in the wine shop only. Each seated villager (`act: "sit"`) gets a glass of the open wine and a plate (tapas first, otherwise a small plate from the menu) on the nearest table. They're drawn in `#tableware` inside `#sceneArt`, and redrawn only when the key changes.
+
+### Round 49: path from Makers' Lane to the vineyard
+- The lane's centre path now runs down to the bottom edge. It ends at a vine arch, `toVineL` (door [262,622]). The lamp that stood on the path moved to [222,572].
+- The vineyard has a path down from the top edge at x 290 to the main path, starting at a matching arch, `toLaneV` (door [290,16], label "Makers' Lane").
+- New `BRIDGES` entries `lane.vineyard` and `vineyard.lane`, and new arrival points `lane>vineyard` [290,72] and `vineyard>lane` [262,586]. `nextHop` routes through them automatically.

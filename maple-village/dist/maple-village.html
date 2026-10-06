@@ -1966,6 +1966,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     toLane: { scene: "village", name: "Gate to Makers' Lane", door: [444, 218], spot: true, bridge: "lane", mark: [430, 170], line: "Through the gate to Makers' Lane: Chord and Chico." },
     // Makers' Lane: the apps (Chord, Chico, and a plot waiting for the next one)
     toTownE: { scene: "lane", name: "Gate to the town square", door: [20, 330], spot: true, bridge: "village", mark: [34, 282], line: "Back to the town square." },
+    toVineL: { scene: "lane", name: "Path to the vineyard", door: [262, 622], spot: true, bridge: "vineyard", mark: [300, 586], line: "Down the lane to the vineyard." },
     plot3: { scene: "lane", name: "Luna's plot", door: [160, 540], spot: true, line: "Luna's plot. Waiting for its building." },
     plot4: { scene: "lane", name: "Ohayo's plot", door: [362, 540], spot: true, line: "Ohayo's plot. Waiting for its building." },
     toBase: { scene: "village", name: "Bridge home", door: [260, 598], spot: true, bridge: "base", mark: [260, 548], line: "Over the bridge and home." },
@@ -1980,6 +1981,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     toVine: { scene: "base", name: "Gate to the vineyard", door: [490, 470], spot: true, bridge: "vineyard", mark: [494, 416], line: "Over the footbridge to the vineyard." },
     // the vineyard, east of home: vines, the barrel shed, the stall, the wine shop and a playground
     toBaseV: { scene: "vineyard", name: "Gate home", door: [22, 300], spot: true, bridge: "base", mark: [30, 250], line: "Back over the footbridge, home." },
+    toLaneV: { scene: "vineyard", name: "Path to Makers' Lane", door: [290, 16], spot: true, bridge: "lane", mark: [330, 40], line: "Up the path to Makers' Lane." },
     wineshop: { scene: "vineyard", name: "Wine shop", short: "the wine shop", door: [390, 222], mark: [390, 96] },
     barrels: { scene: "vineyard", name: "Barrel shed", door: [112, 238], spot: true, mark: [112, 130], line: "The barrel shed. Grapes go in, wine comes out. Eventually." },
     vinestall: { scene: "vineyard", name: "Vineyard stall", door: [90, 452], spot: true, line: "Cuttings, trellises and barrels." },
@@ -1998,8 +2000,8 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   var WORK_HINT = /chord|chico|ambidextrous|fresh pages|client|muse|proposal|invoice|copy|newsletter|launch|website|brand|audit|meeting|call with|zoom/;
   var isWeekend = () => [0, 6].includes(new Date(now() + 8 * H).getUTCDay());
   var baseSpotFor = (s) => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
-  var BRIDGES = { village: { base: "toBase", lane: "toLane" }, base: { village: "toTown", vineyard: "toVine" }, lane: { village: "toTownE" }, vineyard: { base: "toBaseV" } };
-  var ARRIVE = { "village>base": [260, 132], "base>village": [260, 578], "village>lane": [48, 330], "lane>village": [426, 238], "base>vineyard": [52, 300], "vineyard>base": [462, 470] };
+  var BRIDGES = { village: { base: "toBase", lane: "toLane" }, base: { village: "toTown", vineyard: "toVine" }, lane: { village: "toTownE", vineyard: "toVineL" }, vineyard: { base: "toBaseV", lane: "toLaneV" } };
+  var ARRIVE = { "village>base": [260, 132], "base>village": [260, 578], "village>lane": [48, 330], "lane>village": [426, 238], "base>vineyard": [52, 300], "vineyard>base": [462, 470], "lane>vineyard": [290, 72], "vineyard>lane": [262, 586] };
   function nextHop(from, to) {
     if (from === to) return null;
     if (BRIDGES[from] && BRIDGES[from][to]) return to;
@@ -4482,7 +4484,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     <g filter="url(#wob)" fill="none" opacity=".45" style="stroke:var(--moss2)" stroke-width="3" stroke-dasharray="2 7">${[24, 44, 64].map((y) => `<path d="M190 ${y} Q300 ${y - 8} 510 ${y + 4}"/>`).join("")}</g>
     <g filter="url(#wob)"><path d="M14 0 C6 110 26 210 16 300 C8 390 28 500 14 640" fill="none" style="stroke:var(--water)" stroke-width="16"/><path d="M8 0 C0 110 20 210 10 300 C2 390 22 500 8 640 M22 0 C14 110 34 210 24 300 C16 390 36 500 22 640" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".5"/></g>
     <path class="ripple" d="M10 150 q4 -3 8 0 M14 460 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>
-    <g filter="url(#wob)"><path d="M24 300 H486 M112 300 V238 M390 300 V222 M186 300 C186 400 190 480 210 548" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M24 300 H486 M112 300 V238 M390 300 V222 M186 300 C186 400 190 480 210 548 M290 0 C296 100 284 200 296 300" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[30, 140, "#EFA3A6"], [200, 140, "#F3C969"], [480, 250, "#C3CDEE"], [490, 330, "#EFA3A6"], [150, 350, "#F3C969"], [40, 520, "#C3CDEE"], [480, 520, "#F3C969"], [300, 250, "#EFA3A6"]])}
     ${tree(250, 130, 0.9)}${tree(495, 150, 0.9)}${tree(26, 620, 0.8)}${tree(500, 620, 0.85)}${tree(40, 380, 0.8)}`;
     const gate = `<g data-place="toBaseV" aria-label="Gate home"><ellipse class="hov" cx="24" cy="300" rx="26" ry="30" style="fill:var(--butter)"/>
@@ -4491,10 +4493,16 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       `<rect x="0" y="290" width="40" height="22" rx="2"/><path d="M8 290 v22 M16 290 v22 M24 290 v22 M32 290 v22" opacity=".6"/><rect x="42" y="262" width="6" height="52"/>`
     )}
     ${tapeLabel(66, 344, "Home", "var(--butter)", 11)}</g>`;
+    const lgate = `<g data-place="toLaneV" aria-label="Path to Makers' Lane"><ellipse class="hov" cx="290" cy="22" rx="30" ry="14" style="fill:var(--butter)"/>
+    ${sk(
+      `<rect x="268" y="0" width="6" height="40" style="fill:var(--wood)"/><rect x="306" y="0" width="6" height="40" style="fill:var(--wood)"/><path d="M264 6 q26 -14 52 0 v6 q-26 -12 -52 0z" style="fill:#9CC27E"/>`,
+      `<rect x="268" y="0" width="6" height="40"/><rect x="306" y="0" width="6" height="40"/><path d="M264 6 q26 -14 52 0 v6 q-26 -12 -52 0z"/>`
+    )}
+    ${tapeLabel(290, 58, "Makers' Lane", "var(--peri)", 11)}</g>`;
     const sign = sk(`<rect x="124" y="340" width="52" height="16" rx="2" style="fill:#FFFDF6"/>`, `<rect x="124" y="340" width="52" height="16" rx="2"/><path d="M150 356 v14"/>`) + `<text x="150" y="351.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9.5" style="fill:var(--line)" pointer-events="none">the vines</text>`;
     const ol = v.olive, ripe = ol && Date.now() - (ol.pickedAt || ol.planted) >= 8 * 36e5;
     const olive = `<g data-place="olive" aria-label="Olive tree"><ellipse class="hov" cx="250" cy="258" rx="34" ry="9" style="fill:var(--butter)"/>${ol ? `<g filter="url(#wob)">${oliveTree(250, 254, 1, ripe ? "ripe" : "growing")}</g>` + (ripe ? `<g class="twinkle" pointer-events="none"><path d="M276 196 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" stroke="#3b3530" stroke-width="1"/></g>` : "") : sk(`<ellipse cx="250" cy="252" rx="16" ry="5" style="fill:#9C7A5C"/>`, `<ellipse cx="250" cy="252" rx="16" ry="5"/><path d="M262 252 v-18 M256 236 h14 v8 h-14z"/>`)}${tapeLabel(250, 276, "Olive tree", "var(--sage)", 10)}</g>`;
-    return lampDefs + ground + gate + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive + shedArt(v) + shopArt(v) + stallArt() + sign + v.rows.map((row2, r) => rowArt(row2, r)).join("") + playArt() + (v.terrace ? sk(
+    return lampDefs + ground + gate + lgate + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive + shedArt(v) + shopArt(v) + stallArt() + sign + v.rows.map((row2, r) => rowArt(row2, r)).join("") + playArt() + (v.terrace ? sk(
       `<path d="M466 132 h48 l-4 -10 h-40z" style="fill:#9CC27E"/><ellipse cx="478" cy="196" rx="11" ry="4" style="fill:#FFFDF6"/><ellipse cx="502" cy="206" rx="11" ry="4" style="fill:#FFFDF6"/><circle cx="474" cy="128" r="2.4" style="fill:#6B2A55"/><circle cx="500" cy="128" r="2.4" style="fill:#6B2A55"/>`,
       `<path d="M466 132 h48 l-4 -10 h-40z M470 132 v80 M510 132 v80"/><ellipse cx="478" cy="196" rx="11" ry="4"/><path d="M478 200 v12 M502 210 v10"/><ellipse cx="502" cy="206" rx="11" ry="4"/>`
     ) : "") + ((festivalOn(G2.day()) || {}).id === "harvest" ? bunting(214, 318, 466, 318, ["#8E2C48", "#F3C969", "#9CC27E"]) + bunting(214, 498, 466, 498, ["#F3C969", "#8E2C48", "#F6E3C6"]) : "");
@@ -5011,7 +5019,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     const D3 = VILLAGE;
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D3.chico.door[0]} ${D3.chico.door[1]} M150 336 L${D3.chord.door[0]} ${D3.chord.door[1]} M262 344 L262 420 M262 420 C230 470 190 500 ${D3.plot3.door[0]} ${D3.plot3.door[1]} M262 420 C300 470 340 500 ${D3.plot4.door[0]} ${D3.plot4.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D3.chico.door[0]} ${D3.chico.door[1]} M150 336 L${D3.chord.door[0]} ${D3.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D3.plot3.door[0]} ${D3.plot3.door[1]} M262 420 C300 470 340 500 ${D3.plot4.door[0]} ${D3.plot4.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[40, 200, "#EFA3A6"], [60, 214, "#F3C969"], [480, 330, "#C3CDEE"], [300, 420, "#EFA3A6"], [200, 600, "#F3C969"], [90, 560, "#C3CDEE"], [460, 600, "#EFA3A6"], [330, 250, "#F3C969"]])}
     ${tree(30, 120, 1)}${tree(250, 80, 0.9)}${tree(490, 110, 1)}${tree(40, 620, 0.95)}${tree(490, 620, 0.9)}${tree(470, 430, 0.85)}${tree(60, 440, 0.9)}`;
     const gate = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
@@ -5020,6 +5028,12 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       `<rect x="6" y="292" width="6" height="56"/><rect x="30" y="292" width="6" height="56"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`
     )}
     ${tapeLabel(62, 366, "Town square", "var(--butter)", 11)}</g>`;
+    const vgate = `<g data-place="toVineL" aria-label="Path to the vineyard"><ellipse class="hov" cx="262" cy="618" rx="30" ry="14" style="fill:var(--butter)"/>
+    ${sk(
+      `<rect x="240" y="588" width="6" height="48" style="fill:var(--wood)"/><rect x="278" y="588" width="6" height="48" style="fill:var(--wood)"/><path d="M236 592 q26 -16 52 0 v6 q-26 -14 -52 0z" style="fill:#9CC27E"/><circle cx="248" cy="596" r="2.2" style="fill:#6B2A55"/><circle cx="276" cy="596" r="2.2" style="fill:#6B2A55"/>`,
+      `<rect x="240" y="588" width="6" height="48"/><rect x="278" y="588" width="6" height="48"/><path d="M236 592 q26 -16 52 0 v6 q-26 -14 -52 0z"/>`
+    )}
+    ${tapeLabel(330, 612, "Vineyard", "#E8B4C0", 11)}</g>`;
     const plotArt = (id, x, name, col) => `<g data-place="${id}" aria-label="${name}'s plot"><ellipse class="hov" cx="${x}" cy="530" rx="56" ry="11" style="fill:var(--butter)"/>
     ${sk(
       `<rect x="${x - 50}" y="456" width="100" height="66" rx="4" style="fill:#C9A27E"/><rect x="${x - 32}" y="432" width="64" height="22" rx="2" style="fill:#FFFDF6"/>`,
@@ -5028,7 +5042,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     <text x="${x}" y="447" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" textLength="52" lengthAdjust="spacingAndGlyphs" style="fill:var(--line)">coming soon</text>
     ${tapeLabel(x, 552, name, col, 11)}</g>`;
     const plot = plotArt("plot3", 160, "Luna", "var(--peri)") + plotArt("plot4", 362, "Ohayo", "var(--peach)");
-    return lampDefs + ground + gate + [[70, 352], [250, 352], [460, 352], [260, 560]].map(([x, y]) => streetLamp(x, y)).join("") + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot + light("chord", 200, 196) + light("chico", 433, 206) + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12) + upgradesArt(G.F().totalQuests || 0, "lane");
+    return lampDefs + ground + gate + vgate + [[70, 352], [250, 352], [460, 352], [222, 572]].map(([x, y]) => streetLamp(x, y)).join("") + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot + light("chord", 200, 196) + light("chico", 433, 206) + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12) + upgradesArt(G.F().totalQuests || 0, "lane");
   }
   function notesArt(x, y, n) {
     const c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#C3CDEE", "#DCE8C8"];
@@ -13545,7 +13559,7 @@ Then tell chat "wind down" whenever you're ready.`
     $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "farm" ? farmArt() : roomArt(scene);
     const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: vineyardName(F), farm: "The garden", wineshop: shopName(F) };
     $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-    $("maphint").textContent = scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. The gate on the left goes home." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. The gate on the left goes back to the town square." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+    $("maphint").textContent = scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
   }
   var tableKey = "";
   function drawTableware() {

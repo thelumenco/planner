@@ -201,13 +201,18 @@ export function laneArt(){
   const D = VILLAGE;
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D.chico.door[0]} ${D.chico.door[1]} M150 336 L${D.chord.door[0]} ${D.chord.door[1]} M262 344 L262 420 M262 420 C230 470 190 500 ${D.plot3.door[0]} ${D.plot3.door[1]} M262 420 C300 470 340 500 ${D.plot4.door[0]} ${D.plot4.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D.chico.door[0]} ${D.chico.door[1]} M150 336 L${D.chord.door[0]} ${D.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D.plot3.door[0]} ${D.plot3.door[1]} M262 420 C300 470 340 500 ${D.plot4.door[0]} ${D.plot4.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[40,200,"#EFA3A6"],[60,214,"#F3C969"],[480,330,"#C3CDEE"],[300,420,"#EFA3A6"],[200,600,"#F3C969"],[90,560,"#C3CDEE"],[460,600,"#EFA3A6"],[330,250,"#F3C969"]])}
     ${tree(30,120,1)}${tree(250,80,.9)}${tree(490,110,1)}${tree(40,620,.95)}${tree(490,620,.9)}${tree(470,430,.85)}${tree(60,440,.9)}`;
   const gate = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
     ${sk(`<rect x="6" y="292" width="6" height="56" style="fill:var(--wood)"/><rect x="30" y="292" width="6" height="56" style="fill:var(--wood)"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
       `<rect x="6" y="292" width="6" height="56"/><rect x="30" y="292" width="6" height="56"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`)}
     ${tapeLabel(62, 366, "Town square", "var(--butter)", 11)}</g>`;
+  // the path south, down to the vineyard: a little arch over it at the bottom edge
+  const vgate = `<g data-place="toVineL" aria-label="Path to the vineyard"><ellipse class="hov" cx="262" cy="618" rx="30" ry="14" style="fill:var(--butter)"/>
+    ${sk(`<rect x="240" y="588" width="6" height="48" style="fill:var(--wood)"/><rect x="278" y="588" width="6" height="48" style="fill:var(--wood)"/><path d="M236 592 q26 -16 52 0 v6 q-26 -14 -52 0z" style="fill:#9CC27E"/><circle cx="248" cy="596" r="2.2" style="fill:#6B2A55"/><circle cx="276" cy="596" r="2.2" style="fill:#6B2A55"/>`,
+      `<rect x="240" y="588" width="6" height="48"/><rect x="278" y="588" width="6" height="48"/><path d="M236 592 q26 -16 52 0 v6 q-26 -14 -52 0z"/>`)}
+    ${tapeLabel(330, 612, "Vineyard", "#E8B4C0", 11)}</g>`;
   // plots for the next apps: fenced patches of turned earth, each with a little "coming soon" sign
   const plotArt = (id, x, name, col) => `<g data-place="${id}" aria-label="${name}'s plot"><ellipse class="hov" cx="${x}" cy="530" rx="56" ry="11" style="fill:var(--butter)"/>
     ${sk(`<rect x="${x-50}" y="456" width="100" height="66" rx="4" style="fill:#C9A27E"/><rect x="${x-32}" y="432" width="64" height="22" rx="2" style="fill:#FFFDF6"/>`,
@@ -215,7 +220,7 @@ export function laneArt(){
     <text x="${x}" y="447" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" textLength="52" lengthAdjust="spacingAndGlyphs" style="fill:var(--line)">coming soon</text>
     ${tapeLabel(x, 552, name, col, 11)}</g>`;
   const plot = plotArt("plot3", 160, "Luna", "var(--peri)") + plotArt("plot4", 362, "Ohayo", "var(--peach)");
-  return lampDefs + ground + gate + [[70, 352], [250, 352], [460, 352], [260, 560]].map(([x, y]) => streetLamp(x, y)).join("")
+  return lampDefs + ground + gate + vgate + [[70, 352], [250, 352], [460, 352], [222, 572]].map(([x, y]) => streetLamp(x, y)).join("")
     + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot
     + light("chord", 200, 196) + light("chico", 433, 206)
     + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12)
