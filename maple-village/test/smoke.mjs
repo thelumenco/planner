@@ -1634,6 +1634,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   for (const [h, two] of Object.entries(pairs)) { await page.evaluate(h => window.__mapleScene(h), h); await page.waitForTimeout(1500);
     check(await page.locator('#world [data-spot="bedroom"]').count() === 1 && await ids().then(a => two.every(f => a.includes(f))), `${h} has a bedroom door, and ${two.join(" and ")} are at it just before 11pm`); }
   check(await page.evaluate(() => { window.__mapleScene("cottage"); return true; }) && await page.locator('#world [data-spot="mbed"]').count() === 0, "Ma Ma's bed is out of the cottage's main room");
+  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(1500);
+  check(await ids().then(a => a.includes("darren")), "Darren winds down on the sofa before bed");
   await page.goto(url + "?seed=1&time=23:30&date=2026-10-13"); await page.waitForTimeout(800);
   for (const [h, two] of Object.entries(pairs)) { await page.evaluate(h => window.__mapleScene(h), h); await page.waitForTimeout(1200);
     check(await ids().then(a => !two.some(f => a.includes(f))), `after 11pm ${two.join(" and ")} are behind the bedroom door`); }

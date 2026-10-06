@@ -120,7 +120,8 @@ export const NPCS = [
       slot("12:00", "14:30", "base", [340, 300], {days: "we", act: "repair", dir: -1}),
       slot("14:30", "17:00", "base", [[230, 360], [310, 612], [160, 540], [400, 330]], {days: "we"}),
       slot("17:00", "19:00", "farm", [[90, 250], [430, 400], [250, 520]], {days: "we", act: "farm"}),
-      slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600]], {days: "we"})],
+      slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600]], {days: "we"}),
+      slot("22:00", "23:00", "home", [150, 262], {act: "sit"})],   // winds down on the sofa, then bed by 11 (drawn in Mel's bed: darrenAsleep)
     lines: ["Coffee's fresh if you want some.", "Evan watered my shoes again. Very thorough.", "Go get 'em. I'll hold the fort.",
       "The shed radio only gets one station. It's a good station.", "Dinner's sorted, don't worry about it.", "You've got this. One thing at a time."],
     actLines: {guide: ["Welcome to the farm tour! I'll be your guide. My qualifications: enthusiasm.", "Mel planted this one. I watered it. Once.", "And these are flowers. Moving on."], 
