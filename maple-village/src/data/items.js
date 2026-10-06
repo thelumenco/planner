@@ -1,5 +1,6 @@
 // Shop items, crops, garden plots and friendship levels.
 import { H, M } from "../util.js";
+import { TREES, FLOWERS } from "./orchard.js";
 
 export const CROPS = {
   tulip:{n:"Tulip", e:"🌷", dur:1*H}, sunflower:{n:"Sunflower", e:"🌻", dur:1*H},
@@ -115,6 +116,15 @@ export const PEP = ["You don't have to feel ready. You just have to open it.", "
   "You've done harder things than this before lunch.", "Start messy. Tidy later. That's allowed.", "I'll be right here. Go on."];
 export const YAY = ["Quest complete! ✨", "Look at you go!", "Done! Happy fox wiggle.", "Quest done. Proud of you, properly."];
 
+// From the orchard and flower farm: fruit (food Maple can eat, or stock for the wine shop's fruit crate), bouquets
+// (give one to anybody in the village) and potted flowers (set one in a pot spot: home, the wine shop, your room).
+const capi = s => s[0].toUpperCase() + s.slice(1);
+const FRUIT_SAY = {cherry: "Cherries! I'll save you the stones.", lemon: "A lemon? *sniff* *sneeze* Fresh!", peach: "Fuzzy and sweet. Ma Ma grew this!", mango: "Mango! Sticky chin, happy fox.",
+  apple: "Crunchy! Thank you", pear: "A juicy pear. Drip, drip.", fig: "A fig! Fancy.", orange: "Peel it for me? Please?", persimmon: "Persimmon! Like eating a little sunset."};
+Object.values(TREES).forEach(t => { const it = ITEMS[t.fruit] = ITEMS[t.fruit] || {n: capi(t.fn[0]), kind: "food", say: FRUIT_SAY[t.fruit] || "Fruit from Ma Ma's orchard!"}; it.fruit = true; it.sell = it.sell || t.sell; });
+Object.keys(FLOWERS).forEach(id => { const f = FLOWERS[id];
+  ITEMS["bq_" + id] = {n: `Bouquet of ${f.n.toLowerCase()}`, kind: "bouquet", flower: id};
+  ITEMS["pot_" + id] = {n: `Potted ${f.n.toLowerCase()}`, kind: "pot", flower: id}; });
 // Hand-drawn icon name for an item (see art/icons.js): seeds draw as a seed packet of their crop.
 export const itemIco = id => ITEMS[id] && ITEMS[id].kind === "seed" ? "seed:" + ITEMS[id].crop : id;
 Object.keys(ITEMS).forEach(id => { ITEMS[id].ico = itemIco(id); });

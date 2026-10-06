@@ -1,3 +1,4 @@
+import { TREES, FLOWERS } from "../data/orchard.js";
 // Hand-drawn icon set (ink outline + marker fill, same look as the map). No emoji anywhere in the game.
 //   icon(name, size)        -> inline <svg> for HTML (buttons, panels, notes)
 //   iconAt(name, x, y, s)   -> nested <svg> centred at x,y for use inside the world SVG
@@ -173,6 +174,25 @@ I.scarf = [`<path d="M5 6c4 3 10 3 14 0l-1 4c-4 2-8 2-12 0z" ${f(C.peri2)}/><pat
 I.sunhat = [`<ellipse cx="12" cy="15" rx="10" ry="3.5" ${f("#F3DFA6")}/><path d="M7 15c0-7 10-7 10 0z" ${f("#F3DFA6")}/>`, `<ellipse cx="12" cy="15" rx="10" ry="3.5"/><path d="M7 15c0-7 10-7 10 0z"/><path d="M7 13.5h10" stroke-width="2" style="stroke:#8E2C48"/>`];
 I.pyjamas = [`<path d="M6 4h12l2 6-3 1v10H7V11l-3-1z" ${f("#3B4A86")}/>`, `<path d="M6 4h12l2 6-3 1v10H7V11l-3-1zM12 5v16M10 4l2 3 2-3"/><circle cx="12" cy="10" r=".6"/><circle cx="12" cy="14" r=".6"/>`];
 I.base = I.sprout;   // quests outdoors at home base
+// Orchard fruit, and the flower farm's bouquets and potted flowers, drawn from their colours (data/orchard.js)
+{
+  const leaf = `<path d="M12.3 7c.5-2 2-3 4-3-.5 2-2 3-4 3z" ${f(C.moss)}/>`, leafL = `<path d="M12.3 7c.5-2 2-3 4-3-.5 2-2 3-4 3z"/>`;
+  const round = (col) => [`<circle cx="12" cy="13.5" r="6.8" ${f(col)}/>${leaf}`, `<circle cx="12" cy="13.5" r="6.8"/><path d="M12 7v-1.5"/>${leafL}<path d="M8.6 11.5c.4-1 1.2-1.8 2.2-2.1" opacity=".6"/>`];
+  const shapes = {
+    cherry: (c) => [`<circle cx="8" cy="16" r="4" ${f(c)}/><circle cx="16" cy="16.5" r="4" ${f(c)}/><path d="M13 4c2 0 4 1 4.5 2.5-1.5.5-3.5 0-4.5-2.5z" ${f(C.moss)}/>`, `<circle cx="8" cy="16" r="4"/><circle cx="16" cy="16.5" r="4"/><path d="M8 12c1-4 3-7 5-8M16 12.5c-.5-4-1.5-6.5-3-8.5M13 4c2 0 4 1 4.5 2.5-1.5.5-3.5 0-4.5-2.5z"/>`],
+    lemon: (c) => [`<ellipse cx="12" cy="13" rx="8" ry="5.6" ${f(c)}/>`, `<ellipse cx="12" cy="13" rx="8" ry="5.6"/><path d="M4 13l-1.5-.6M20 13l1.5-.6M8 11c.8-.8 1.8-1.2 3-1.3" opacity=".6"/>`],
+    mango: (c) => [`<path d="M6 15c0-6 5-9 9-8s4 6 1 10-10 4-10-2z" ${f(c)}/><path d="M14.5 7c1-1.5 2.5-2.3 4-2.2-.8 1.5-2.3 2.3-4 2.2z" ${f(C.moss)}/>`, `<path d="M6 15c0-6 5-9 9-8s4 6 1 10-10 4-10-2zM14.5 7c1-1.5 2.5-2.3 4-2.2-.8 1.5-2.3 2.3-4 2.2z"/>`],
+    pear: (c) => [`<path d="M12 6c-2 0-2.5 3-3.5 5-1.5 2.5-3 4-3 6.5C5.5 20 8.5 21 12 21s6.5-1 6.5-3.5c0-2.5-1.5-4-3-6.5C14.5 9 14 6 12 6z" ${f(c)}/>${leaf}`, `<path d="M12 6c-2 0-2.5 3-3.5 5-1.5 2.5-3 4-3 6.5C5.5 20 8.5 21 12 21s6.5-1 6.5-3.5c0-2.5-1.5-4-3-6.5C14.5 9 14 6 12 6zM12 6V4.5"/>${leafL}`],
+    fig: (c) => [`<path d="M12 5c-1 2-6 5-6 10a6 6 0 0 0 12 0c0-5-5-8-6-10z" ${f(c)}/>`, `<path d="M12 5c-1 2-6 5-6 10a6 6 0 0 0 12 0c0-5-5-8-6-10zM12 5V3.5"/><path d="M10 17c1 .6 2.4.6 3.4 0" opacity=".6"/>`]
+  };
+  Object.values(TREES).forEach(t => { if (I[t.fruit]) return; I[t.fruit] = (shapes[t.fruit] || round)(t.col); });
+  Object.keys(FLOWERS).forEach(id => { const c = FLOWERS[id].col;
+    const head = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" ${f(c)}/><circle cx="${x}" cy="${y}" r="${r*.38}" ${f(C.butter)}/>`, headL = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}"/>`;
+    I["bq_" + id] = [`<path d="M8 13l4 9 4-9z" ${f("#F4EEE3")}/>${head(8.5, 8.5, 3)}${head(15.5, 8.5, 3)}${head(12, 5.5, 3)}<path d="M9.5 15.5h5" stroke-width="2" style="stroke:var(--rose)"/>`,
+      `<path d="M8 13l4 9 4-9z"/>${headL(8.5, 8.5, 3)}${headL(15.5, 8.5, 3)}${headL(12, 5.5, 3)}<path d="M10 11.5l2 2.5 2-2.5"/>`];
+    I["pot_" + id] = [`<path d="M7 14h10l-1.5 7h-7z" ${f("#C46A4A")}/><path d="M9.5 13.5c0-2 1-3.5 2.5-4.5M14.5 13.5c0-2-1-3.5-2.5-4.5" ${f("none")}/>${head(8.5, 9.5, 2.6)}${head(15.5, 9.5, 2.6)}${head(12, 6, 2.8)}`,
+      `<path d="M7 14h10l-1.5 7h-7zM6.5 14h11"/>${headL(8.5, 9.5, 2.6)}${headL(15.5, 9.5, 2.6)}${headL(12, 6, 2.8)}<path d="M12 9v5"/>`]; });
+}
 export const icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
 export const iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size/2}" y="${y - size/2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;
 export const ICON_NAMES = Object.keys(I);

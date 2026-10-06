@@ -6,7 +6,9 @@
 // `react` lines fire once a day when their condition is true (see npcs.js REACTIONS).
 
 const hm = s => { const [h, m] = s.split(":").map(Number); return h*60 + (m || 0); };
-// opts: {days: "wd" | "we" (weekdays / weekends only), act: what they're doing (Darren's props + lines), dir: facing}
+// opts: {look: clothes for this slot (over the usual look), dow: [0-6] (only on those days, 0 = Sunday), days: "wd" | "we" (weekdays / weekends only), act: what they're doing (Darren's props + lines), dir: facing}
+// Gong Gong's going-out clothes: a pressed shirt and long trousers (no berms)
+const OUT = {top: "#DCE7F2", bottom: "#4A4F5C", shorts: false};
 const slot = (from, to, scene, where, opts) => Object.assign({from: hm(from), to: hm(to), scene}, Array.isArray(where[0]) ? {wander: where} : {at: where}, opts || {});
 
 export const NPCS = [
@@ -150,6 +152,56 @@ export const NPCS = [
     routine: [slot("11:00", "15:00", "wineshop", [372, 286]), slot("15:00", "15:30", "vineyard", [[300, 260], [440, 270], [360, 300]]), slot("15:30", "21:30", "wineshop", [372, 286])],
     lines: ["The honesty box is very honest today.", "Someone asked who makes these. I said a very busy lady.", "Evenings are the best. Everyone wants a glass.", "If the shelves are full, I'm happy."],
     away: "Celeste's not on. The honesty box minds the shop."
+  },
+  // Ma Ma, Mel's grandma: she tends the orchard and the flower farm (watering, picking), has tea in her cottage in
+  // the afternoon, and now and then pops up in town (Saturdays), at the vineyard (Tuesdays and Thursdays) and at
+  // Mel's home (Sundays). Specific days come first: the first slot that matches wins.
+  {
+    id: "mama", pitch: 0.9, name: "Ma Ma", job: "Grandma, keeper of the orchard",
+    intro: "Ah girl! Come, come. Have you eaten? I've cut some fruit for you. I love you, you know that?",
+    look: {skin: "#D9A57E", hair: "#1E1A18", hairStyle: "curly", top: "#3E6B8C", bottom: "#7A4A2E", batik: "#F3D9A0", hat: "sunhat"},
+    routine: [slot("9:30", "11:30", "village", [[200, 420], [300, 440], [250, 520]], {dow: [6]}),
+      slot("15:00", "17:00", "base", [[230, 360], [300, 590], [160, 520]], {dow: [0]}),
+      slot("16:00", "17:30", "vineyard", [[262, 390], [340, 440], [300, 300]], {dow: [2, 4]}),
+      slot("7:00", "11:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 500], [310, 330]], {act: "water"}),
+      slot("11:00", "13:00", "flowers", [[160, 300], [260, 380], [360, 470], [210, 300]], {act: "water"}),
+      slot("13:00", "15:00", "cottage", [[300, 420], [380, 420], [340, 330]]),
+      slot("15:00", "16:00", "cottage", [244, 474], {act: "sit"}),
+      slot("16:00", "18:00", "flowers", [[160, 380], [260, 470], [360, 300], [310, 300]], {act: "farm"}),
+      slot("18:00", "21:30", "cottage", [398, 352], {act: "sit"})],
+    lines: ["I love you, ah girl.", "Have you eaten? Come, I cut fruit for you.", "Don't work so hard. Rest a little.", "Eat more. You're too thin.",
+      "Bring Evan to see the flowers, ok?", "Wear a jacket. The office aircon is very cold.", "You're doing very well. Ma Ma is proud of you.", "Drink some water. And not only coffee."],
+    actLines: {water: ["Watering, watering. The trees are thirsty today.", "Plants are like children. Talk to them nicely.", "The fruit is coming along. Patience."],
+      farm: ["The flowers grow better when you sing to them.", "Look at this one. So pretty, like you.", "Cutting some for the shop. Want some?"]},
+    away: "Ma Ma's resting. She'll be out in the garden in the morning.",
+    react: {harvest: "So clever! You grow things like Ma Ma.", quests3: "Three already? Don't forget to eat lunch.", lunch: "Lunch time! Eat properly, ok?"}
+  },
+  // Gong Gong, Mel's grandpa: lives with Ma Ma in the cottage. At home he's in his white singlet and berms, watching
+  // TV or helping in the orchard and flower farm; going out (town on Mondays and Saturdays, the vineyard on Wednesdays,
+  // Mel's home at the weekend) he puts on a pressed shirt and long trousers.
+  {
+    id: "gonggong", pitch: 0.75, name: "Gong Gong", job: "Grandpa, Ma Ma's helper in the orchard",
+    intro: "Ah, my girl is here. Sit, sit. Gong Gong is just watching the news. Have you eaten?",
+    look: {skin: "#F2D6BD", hair: "#D9D4CC", hairStyle: "short", top: "#FFFFFF", bottom: "#8C8F7A", shorts: true, specs: "#C9A23A", tall: true},
+    routine: [slot("10:00", "12:00", "village", [[230, 420], [300, 470], [190, 520]], {dow: [1], look: OUT}),
+      slot("9:30", "11:30", "village", [[220, 430], [290, 450], [260, 520]], {dow: [6], look: OUT}),
+      slot("15:00", "17:00", "vineyard", [[300, 300], [380, 300], [262, 440]], {dow: [3], look: OUT}),
+      slot("15:00", "17:00", "base", [[250, 360], [320, 590], [180, 520]], {dow: [0, 6], look: OUT}),
+      slot("7:30", "9:00", "cottage", [458, 358], {act: "sit"}),
+      slot("9:00", "11:30", "orchard", [[160, 420], [260, 510], [360, 420], [210, 330]], {act: "farm"}),
+      slot("11:30", "13:00", "cottage", [458, 358], {act: "sit"}),
+      slot("13:00", "14:00", "flowers", [[160, 330], [260, 420], [360, 510]], {act: "water"}),
+      slot("14:00", "15:00", "cottage", [458, 358], {act: "sit"}),
+      slot("15:00", "16:00", "cottage", [156, 474], {act: "sit"}),
+      slot("16:00", "17:00", "cottage", [458, 358], {act: "sit"}),
+      slot("17:00", "18:00", "orchard", [[160, 330], [260, 420], [360, 510]], {act: "water"}),
+      slot("18:00", "22:00", "cottage", [458, 358], {act: "sit"})],
+    lines: ["Have you eaten? Ma Ma made too much again.", "Work is important, but rest is also important.", "Come, sit with Gong Gong. The news is on.", "Your Ma Ma's flowers are the best in the village. Don't tell her I said.",
+      "Slowly, slowly. No need to rush.", "Gong Gong is very proud of you.", "Bring Evan next time, ok? I want to see how tall he is."],
+    actLines: {farm: ["Loosening the soil for Ma Ma. She's the boss here.", "These trees will give good fruit. Patience."], water: ["Gong Gong waters, Ma Ma checks. Teamwork.", "A little water, a little sun. Same as people."],
+      sit: ["Shh, the drama is at the good part.", "Ma Ma says I watch too much TV. She's watching also."]},
+    away: "Gong Gong's having his afternoon nap.",
+    react: {harvest: "Wah, so much! You grow like Ma Ma.", quests3: "Three already? Clever girl.", lunch: "Lunchtime. Don't skip, ok?"}
   },
   // The wine shop's cook: on her shifts she runs the kitchen from whatever's in the larder (see cookTick)
   {

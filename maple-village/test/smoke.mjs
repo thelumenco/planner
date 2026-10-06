@@ -1237,6 +1237,62 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // Ma Ma's orchard and flower farm: plant, Ma Ma picks, the farm shop, bouquets and pots, the fruit crate, tea and cake
+  console.log("\nMa Ma's orchard");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`orchard pageerror: ${e.message}`));
+  await page.addInitScript(() => { const q = location.search; if (!/orchpatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 300; f.orch = f.orch || {}; f.orch.stock = {apple: 3, "stem:mum": 5}; f.orch.tin = 9;
+    localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-07&orchpatch=1"); await page.waitForTimeout(1000);
+  check(await page.locator('#world [data-place="toOrchard"]').count() === 1, "home has a gate at the top left to Ma Ma's orchard");
+  await page.locator('#world [data-place="toOrchard"]').dispatchEvent("click");
+  await page.waitForFunction(() => /orchard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(800);
+  check((await fox()).coins === 309, "Ma Ma hands over the farm shop's takings when you arrive");
+  check(await page.locator('#actors [data-npc="mama"]').count() === 1 && await page.locator('#world [data-place="cottage"]').count() === 1 && await page.locator('#world [data-tree]').count() === 12, "Ma Ma is out among the twelve tree spots, by her cottage");
+  check(await page.locator('#actors [data-npc="gonggong"]').count() === 1, "Gong Gong is helping in the orchard this morning");
+  await page.locator('#world [data-tree="0"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-or="plant"][data-k="apple"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-or="plant"][data-k="peach"]').count() === 0, "only this season's saplings are on offer");
+  await page.click('#ctx [data-or="plant"][data-k="apple"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.orch.trees[0] && f.orch.trees[0].k === "apple" && f.coins === 284), "an apple sapling is bought and planted");
+  await page.click('#ctx [data-close]');
+  await page.locator('#world [data-place="farmshop"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-or="take"][data-k="apple"]', { timeout: 15000 });
+  await page.click('#ctx [data-or="take"][data-k="apple"]'); await page.waitForTimeout(200);
+  check(await fox().then(f => f.inv.apple >= 1 && f.orch.stock.apple === 2), "fruit Ma Ma picked can be taken from the farm shop");
+  await page.click('#ctx [data-or="tab"][data-k="flowers"]'); await page.waitForTimeout(200);
+  await page.click('#ctx [data-or="make"][data-kind="bouquet"][data-k="mum"]'); await page.waitForTimeout(200);
+  await page.click('#ctx [data-or="make"][data-kind="pot"][data-k="mum"]'); await page.waitForTimeout(200);
+  check(await fox().then(f => f.inv.bq_mum === 1 && f.inv.pot_mum === 1 && !f.orch.stock["stem:mum"]), "stems become a bouquet (3) and a potted flower (2)");
+  await page.click('#ctx [data-close]');
+  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="pot_mum"]');
+  await page.waitForSelector('#ctx [data-or="place"][data-k="window"]', { timeout: 10000 });
+  await page.click('#ctx [data-or="place"][data-k="window"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.pots.window === "mum" && !f.inv.pot_mum), "a potted flower goes in the window box at home");
+  await page.locator('#world [data-place="toFlowers"]').dispatchEvent("click");
+  await page.waitForFunction(() => /flower farm/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(await page.locator('#world [data-bed]').count() === 12 && await page.locator('#world [data-bush]').count() === 4, "the flower farm has twelve beds and four bushes");
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(700);
+  await page.locator('#world [data-spot="wshelf"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-vyfruit="apple"]', { timeout: 15000 }); await page.click('#ctx [data-vyfruit="apple"]'); await page.waitForTimeout(200);
+  check(await fox().then(f => f.vine.fruit.apple >= 1 && !f.inv.apple), "fruit goes into the wine shop's fruit crate to sell");
+  await page.goto(url + "?seed=1&time=15:30&date=2026-10-07"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("cottage")); await page.waitForTimeout(900);
+  check(await page.locator('#actors [data-npc="mama"]').count() === 1, "Ma Ma's home in her cottage at teatime");
+  const c0 = (await fox()).coins;
+  await page.locator('#world [data-spot="tea"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-or="tea"]', { timeout: 15000 }); await page.click('#ctx [data-or="tea"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.coins === c0 + 3 && f.orch.tea === "2026-10-07"), "tea and cake with Ma Ma, once a day");
+  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="bq_mum"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.bouquets && f.bouquets.mama === 1 && !f.inv.bq_mum), "a bouquet can be given to Ma Ma (or anyone nearby)");
+  await page.screenshot({ path: join(shots, "cottage.png") });
+  await page.close();
+}
+{
   // The bank: six vault jars of jewels for savings goals
   console.log("\nthe bank");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

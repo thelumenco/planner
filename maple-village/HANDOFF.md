@@ -604,3 +604,43 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - A grown hen (`kind: "chick"`, grown) eats breakfast (before noon), lunch (till 5pm) and dinner (after 5pm). `a.fedMeal` records which meal she last had, and she lays an egg after each one, so up to 3 a day at 3 bags of chick feed.
 - The clover meadow's "a meal lasts two days" rule doesn't apply to hens: they still come to every meal.
 - Chicks, bunnies and goats still eat once a day (otherwise a chick would grow up in a day).
+
+### Round 52: Ma Ma's orchard and flower farm
+- **Screens.** Two new outdoor screens, `orchard` and `flowers` (in `OUTDOOR`), plus an interior `cottage` (in `ROOMS`).
+  - Home's top-left arch `toOrchard` leads to the orchard. The orchard has a gate home (`toBaseO`, east) and an arch to the flower farm (`toFlowers`, west). The flower farm's way back is `toOrchardF`.
+  - The new `ARRIVE` entries are `base>orchard`, `orchard>base`, `orchard>flowers` and `flowers>orchard`.
+  - Obstacles are in `paths.js`.
+  - Art is in `src/art/orchard.js`: `orchardArt`, `flowerFarmArt`, `orchardGate` for home, `potsIn(scene)`, and `treePic`/`flowerPic` for the cards. The cottage shell is in interiors.js, and its furniture (`grannybed`, `tv`, `kitchenette`, `teatable`) is in `furn`.
+- **Catalogue** (`src/data/orchard.js`):
+  - 9 fruit trees, 8 bed flowers and 5 bushes, each with its seasons.
+  - Trees take 24h to grow, then their first fruit 12h later, then fruit daily.
+  - Beds take 12h to grow and rebloom after 16h; bushes take 24h and rebloom after 24h.
+  - Spots: 12 trees in 3 rows of 4, 12 beds and 4 bushes.
+- **Logic** (`src/game/orchard.js`). State is `F.orch = {trees, beds, bushes, stock, tin, lastTick, today, tea}`, and placed pots are in `F.pots`.
+  - `stateOf` gives a spot's stage: empty, growing, budding, ripe, or faded once out of season.
+  - `plant` buys and plants in one go, on an empty or faded spot.
+  - `orchTick` runs every second from core's `orchardTick`. Ma Ma picks anything ripe from 7am to 7pm into `stock` (fruit ids, and `stem:<flower>`).
+  - Villagers buy from the stock from 9am to 6pm at about 0.0016 a minute (×1.5 at weekends), and the coins go in `tin`.
+  - `orchardArrive` hands over the tin and has Ma Ma say hello. Between 3 and 4pm she invites Mel in for tea.
+  - The farm shop card has Fruit and Flowers tabs. Fruit can be taken one or all at a time. A bouquet takes 3 stems and a pot 2. When the shop's out, a fruit costs its sell price + 1, a bouquet 8 and a pot 10.
+  - Items are generated in items.js:
+    - fruit is `kind: "food"` with `fruit: true` (the apple is the market's apple),
+    - bouquets are `bq_<flower>` (`kind: "bouquet"`),
+    - pots are `pot_<flower>` (`kind: "pot"`).
+
+    Their icons are made from the catalogue colours in icons.js.
+  - Bouquets: `giveBouquet` gives to the nearest villager within 170px (or Evan), and Ma Ma has her own lines. Counts are kept in `F.bouquets`.
+  - Pots: the `potPanel` card places one in the window box or hanging basket at home, the pot outside the wine shop, or the vase in Mel's room (`POT_SPOTS`).
+  - Tea: `haveTea` works once a day while Ma Ma's in the cottage, for 3 coins and 1 xp.
+- **Wine shop fruit crate:** `v.fruit`. `stockFruit` moves all of one fruit from the backpack into it, the crate shows in `shelfPanel`, and `sellTick` sells fruit at its `sell` price.
+- **Ma Ma** (NPC `mama`):
+  - Looks: curly black hair (`hairStyle: "curly"`), a batik top and trousers (`look.batik` is the motif colour), and a sun hat (`look.hat`, drawn over any prop).
+  - Weekday routine: the orchard 7–11am (watering), the flower farm 11am–1pm, her cottage 1–4pm (tea at 3), the flower farm 4–6pm, then the cottage with the TV.
+  - She's also in town 9:30–11:30 on Saturdays, at the vineyard 4–5:30pm on Tuesdays and Thursdays, and at Mel's home 3–5pm on Sundays.
+  - Routine slots now take `dow: [0-6]` (`slotNow` in npcs.js and `whoAt` in vineyard.js).
+- **Gong Gong** (NPC `gonggong`, Mel's grandpa):
+  - Looks: `tall`, fair, short grey hair, round gold glasses (`look.specs` is the frame colour, drawn on top of any prop).
+  - At home he wears a white singlet and berms (`look.shorts` draws short trousers over bare legs). Going out, the slot `look: OUT` swaps in a pale shirt and long trousers. Any routine slot can now override clothes with `look`.
+  - Routine: TV on the cottage sofa, the orchard 9–11:30am and 5–6pm, the flower farm 1–2pm, and tea at 3 on the other side of the table.
+  - He goes to town on Mondays and Saturdays, the vineyard on Wednesdays, and Mel's home at the weekend.
+- Villagers' hats come off indoors (`makeNode` drops `look.hat` when the scene isn't outdoors). The cottage has a two-seat sofa in front of the TV, where the grandparents sit in the evening.

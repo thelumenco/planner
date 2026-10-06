@@ -5,6 +5,8 @@
 // (F.vine). Times are real time, so things grow and ferment while Mel is away.
 import { esc, plain, H, now } from "../util.js";
 import { NPCS } from "../data/npcs.js";
+import { ITEMS } from "../data/items.js";
+import { icon } from "../art/icons.js";
 import { DISHES, TAPAS } from "./kitchen.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
 
@@ -24,7 +26,7 @@ export function vineState(F){
   const v = F.vine;
   v.rows = v.rows || [0, 1, 2].map(i => ({trellis: i === 0, vines: [null, null, null]}));
   v.cuttings = v.cuttings || {red: 1, white: 1}; v.grapes = v.grapes || {red: 0, white: 0};
-  v.barrels = v.barrels || [null]; v.cellar = v.cellar || []; v.shelf = v.shelf || []; v.box = v.box || 0; v.sold = v.sold || 0; v.glasses = v.glasses || 0; v.menu = v.menu || {}; v.plates = v.plates || 0;
+  v.barrels = v.barrels || [null]; v.cellar = v.cellar || []; v.shelf = v.shelf || []; v.box = v.box || 0; v.sold = v.sold || 0; v.glasses = v.glasses || 0; v.menu = v.menu || {}; v.plates = v.plates || 0; v.fruit = v.fruit || {};
   v.help = Object.assign({cook: true, pick: true, barrels: true, stock: true, fetch: false}, v.help || {}); v.names = v.names || {};
   v.lastTick = v.lastTick || Date.now(); v.today = v.today || {day: "", bottles: 0, glasses: 0, coins: 0};
   return v;
@@ -95,9 +97,9 @@ export function collect(F){ const v = vineState(F), n = v.box; if (!n) return 0;
 // tasting, the vineyard hands at work.
 const WORKERS = ["marco", "ines"], STAFF = "celeste";
 function whoAt(at){
-  const d = new Date(at + 8*H), hm = d.getUTCHours()*60 + d.getUTCMinutes(), we = [0, 6].includes(d.getUTCDay());
+  const d = new Date(at + 8*H), hm = d.getUTCHours()*60 + d.getUTCMinutes(), we = [0, 6].includes(d.getUTCDay()), dw = d.getUTCDay();
   const out = {staff: false, visitors: 0, workers: false};
-  for (const n of NPCS) { const s = n.routine.find(x => hm >= x.from && hm < x.to && (!x.days || (x.days === "we") === we)); if (!s) continue;
+  for (const n of NPCS) { const s = n.routine.find(x => hm >= x.from && hm < x.to && (!x.days || (x.days === "we") === we) && (!x.dow || x.dow.includes(dw))); if (!s) continue;
     if (n.id === STAFF) out.staff = out.staff || s.scene === "wineshop";
     else if (WORKERS.includes(n.id) && s.scene === "vineyard") out.workers = true;
     else if (s.scene === "wineshop" || s.scene === "vineyard") out.visitors++; }
@@ -125,7 +127,8 @@ export function sellTick(F, opts = {}){
     }
     if (w.staff && v.help.stock && v.cellar.length) { out.stocked += v.cellar.reduce((n, c) => n + c.n, 0); v.cellar.slice().forEach(c => stock(F, c.id)); }
     if (hm < 10*60 || hm >= 22*60) continue;
-    const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); if (!onShelf.length && !open && !platesLeft(v)) continue;
+    const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); const crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0);
+    if (!onShelf.length && !open && !platesLeft(v) && !crate.length) continue;
     const food = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]), tap = v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === new Date(at + off + 6*H).toISOString().slice(0, 10);
     const f = footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1);
     const gameDay = new Date(at + off + 6*H).toISOString().slice(0, 10);   // the game's day (it turns over at 2am)
@@ -136,6 +139,7 @@ export function sellTick(F, opts = {}){
     if (Math.random() < .001*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
       const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); if (Math.random() < .6) plate(); } }
     if (Math.random() < .0006*f) plate();   // someone pops in just for a bite
+    if (crate.length && Math.random() < .0012*f) { const id = crate[Math.floor(Math.random()*crate.length)]; v.fruit[id]--; if (!v.fruit[id]) delete v.fruit[id]; out.fruit = (out.fruit || 0) + 1; out.coins += (ITEMS[id] && ITEMS[id].sell) || 3; }   // fruit from Ma Ma's orchard
   }
   v.shelf = v.shelf.filter(s => s.n > 0 || s.open > 0);
   if (!out.coins && !out.watered && !out.picked && !out.filled && !out.stocked) return null;
@@ -186,10 +190,18 @@ export function barrelPanel(F){
   h += `</div>${v.cellar.length ? `<p class="eyebrow">In the cellar</p><ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottles</small></span></li>`).join("")}</ul><p class="muted">Take them to the wine shop to stock the shelves.</p>` : ""}`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
+// Fruit from the orchard goes in a crate by the shelves (all of one kind from the backpack at a time)
+export function stockFruit(F, id){ const v = vineState(F), n = (F.inv || {})[id] || 0; if (!n || !ITEMS[id] || !ITEMS[id].fruit) return null;
+  delete F.inv[id]; v.fruit[id] = (v.fruit[id] || 0) + n; return `${n} ${ITEMS[id].n.toLowerCase()}${n > 1 && !/s$/.test(ITEMS[id].n) ? "s" : ""} into the fruit crate.`; }
+const fruitCrate = F => { const v = vineState(F), crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0), bag = Object.keys(F.inv || {}).filter(id => F.inv[id] > 0 && ITEMS[id] && ITEMS[id].fruit);
+  if (!crate.length && !bag.length) return "";
+  return `<p class="eyebrow">Fruit crate</p>${crate.length ? `<ul class="hlist wlist">${crate.map(id => `<li><span class="wpic">${icon(id, 36)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${v.fruit[id]} in the crate · ${ITEMS[id].sell || 3} coins each</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty. Fruit from Ma Ma's orchard sells here too.</p>`}
+    ${bag.length ? `<div class="vbtns">${bag.map(id => `<button class="btn small alt" data-vyfruit="${id}">${icon(id, 18)} Add ${F.inv[id]} ${esc(ITEMS[id].n.toLowerCase())}</button>`).join("")}</div>` : ""}`; };
 export function shelfPanel(F){
   const v = vineState(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The wine shelves</h2>
     ${v.shelf.length ? `<ul class="hlist wlist wshelf">${v.shelf.map(s => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${STYLES[s.type].n} · ${s.n} on the shelf${s.open ? ` · a bottle open for tasting` : ""}</small></span><label class="wprice"><span class="sr">Price</span><input type="number" min="1" max="999" data-vyprice="${esc(s.id)}" value="${s.price}"> coins</label></li>`).join("")}</ul>` : `<p class="sub">The shelves are bare.</p>`}
+    ${fruitCrate(F)}
     ${v.cellar.length ? `<p class="eyebrow">From the cellar</p><ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottles</small></span><button class="btn small primary" data-vystock="${esc(c.id)}">Stock it</button></li>`).join("")}</ul>` : `<p class="muted">Bottled wines wait in the cellar until you stock them here.</p>`}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
@@ -241,6 +253,7 @@ export function wireVine(root, F, api){
     if (line) api.say(line); api.save(); api.rerender();
   });
   root.querySelectorAll("[data-vybuy]").forEach(b => b.onclick = () => { const line = buy(F, b.dataset.vybuy); if (line) { api.sfx("coin"); api.say(line); api.save(); api.rerender(); } });
+  root.querySelectorAll("[data-vyfruit]").forEach(b => b.onclick = () => { const line = stockFruit(F, b.dataset.vyfruit); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vystock]").forEach(b => b.onclick = () => { const line = stock(F, b.dataset.vystock); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyhelp]").forEach(inp => inp.onchange = () => { vineState(F).help[inp.dataset.vyhelp] = inp.checked; api.save(); });
   root.querySelectorAll("[data-vyprice]").forEach(inp => inp.onchange = () => { setPrice(F, inp.dataset.vyprice, +inp.value); api.save(); });

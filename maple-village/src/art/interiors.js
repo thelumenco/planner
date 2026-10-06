@@ -140,6 +140,21 @@ const SHELLS = {
     ${sk(`<path d="M360 40 h130" /><path d="M376 40 q-6 18 0 26 q6 -8 0 -26z M408 40 q-6 18 0 26 q6 -8 0 -26z M440 40 q-6 18 0 26 q6 -8 0 -26z M472 40 q-6 18 0 26 q6 -8 0 -26z" style="fill:#7FA35A"/>`, `<path d="M360 40 h130"/><path d="M376 40 q-6 18 0 26 q6 -8 0 -26z M408 40 q-6 18 0 26 q6 -8 0 -26z M440 40 q-6 18 0 26 q6 -8 0 -26z M472 40 q-6 18 0 26 q6 -8 0 -26z"/>`)}
     ${plant(490, 610, .9)}`,
 
+  // Ma Ma's cottage: warm wooden boards, flowery wallpaper, a window onto the orchard with lace curtains, family
+  // photos on the wall (Mel, Evan), a wall calendar, a crocheted rug by the tea table
+  cottage: () => `<rect width="520" height="640" style="fill:#C9A27E"/>
+    <g opacity=".4" style="stroke:#A7825F" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}${rows(30, i => `<path d="M${(i*71) % 520} ${170 + (i % 13)*36} v36"/>`)}</g>
+    <rect width="520" height="150" style="fill:#F6E7D7"/>${wallpaper("flower")}<rect y="138" width="520" height="12" style="fill:#C2505F" opacity=".9"/>${skirting}
+    ${sk(`<rect x="200" y="30" width="120" height="84" rx="4" style="fill:#CFE0EE"/><circle cx="236" cy="96" r="14" style="fill:#9CC27E"/><circle cx="286" cy="92" r="16" style="fill:#7FA35A"/><circle cx="290" cy="86" r="2.6" style="fill:#D9433A"/><circle cx="230" cy="92" r="2.4" style="fill:#F08A3C"/>
+      <path d="M196 30 h20 q-6 40 2 84 h-22z M324 30 h-20 q6 40 -2 84 h22z" style="fill:#FFFDF6"/>`, `<rect x="200" y="30" width="120" height="84" rx="4"/><path d="M260 30 v84 M200 72 h120"/><path d="M196 30 h20 q-6 40 2 84 h-22z M324 30 h-20 q6 40 -2 84 h22z" opacity=".7"/>`)}
+    ${sk(`<rect x="40" y="40" width="34" height="42" rx="2" style="fill:#FFFDF6"/><circle cx="57" cy="56" r="7" style="fill:#E8B4C0"/><rect x="88" y="48" width="30" height="34" rx="2" style="fill:#FFFDF6"/><circle cx="103" cy="62" r="6" style="fill:#F3C969"/>`,
+      `<rect x="40" y="40" width="34" height="42" rx="2"/><rect x="44" y="44" width="26" height="34"/><rect x="88" y="48" width="30" height="34" rx="2"/><rect x="92" y="52" width="22" height="26"/>`)}
+    ${sk(`<rect x="420" y="34" width="56" height="70" rx="2" style="fill:#FFFDF6"/><rect x="420" y="34" width="56" height="16" style="fill:#C2505F"/>`, `<rect x="420" y="34" width="56" height="70" rx="2"/><path d="M420 50 h56"/>${rows(4, r => `<path d="M428 ${62 + r*10} h40" opacity=".35"/>`)}`)}
+    ${sk(`<rect x="378" y="320" width="116" height="26" rx="10" style="fill:#9CC27E"/><rect x="372" y="338" width="128" height="22" rx="8" style="fill:#8DB86B"/><rect x="392" y="326" width="22" height="14" rx="5" style="fill:#F3C969"/>`,
+      `<rect x="378" y="320" width="116" height="26" rx="10"/><rect x="372" y="338" width="128" height="22" rx="8"/><rect x="392" y="326" width="22" height="14" rx="5"/><path d="M436 340 v20" opacity=".4"/>`)}
+    <g filter="url(#wob)">${[86, 62, 40].map((rx, i) => `<ellipse cx="200" cy="470" rx="${rx}" ry="${rx*.42}" style="fill:${["#E8B4C0", "#F6E3A1", "#9CC27E"][i]}" opacity=".8"/>`).join("")}</g>
+    ${plant(30, 610, 1)}${plant(490, 610, .9)}`,
+
   // The wine shop: terracotta tiles, warm plaster, a wine rack behind the counter, the chalk menu, hanging lamps
   wineshop: () => `<rect width="520" height="640" style="fill:#D9A58A"/>
     <g opacity=".45" style="stroke:#B97F62" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(26, i => `<path d="M${(i % 13)*40 + (Math.floor(i/13) % 2)*20} ${170 + (i % 12)*40} v40"/>`)}</g>

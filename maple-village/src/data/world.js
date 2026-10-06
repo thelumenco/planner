@@ -4,7 +4,7 @@ import { hash, now, H } from "../util.js";
 // Outdoor screens. "base" is home (house, garden, pond, shed, swing); "village" is the town square with the work
 // buildings. A river joins them: walk onto the bridge to cross. A third screen (say, for Luna) would be one more
 // OUTDOOR entry, a pair of bridge places and a BRIDGES/ARRIVE line.
-export const OUTDOOR = ["base", "village", "lane", "vineyard"];
+export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers"];
 export const VILLAGE = {
   // town square
   hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[170,180], mark:[132,64]},
@@ -44,6 +44,13 @@ export const VILLAGE = {
   pslide: {scene:"vineyard", name:"Slide", door:[262,592], spot:true, line:"The slide. Down you go!"},
   olive:  {scene:"vineyard", name:"Olive tree", door:[250,262], spot:true, line:"The olive tree. Olives every few hours, once it's planted."},
   pseesaw:{scene:"vineyard", name:"Seesaw", door:[410,600], spot:true, line:"The seesaw. Up, down, up, down."},
+  toOrchard:{scene:"base", name:"Gate to Ma Ma's orchard", door:[26,180], spot:true, bridge:"orchard", mark:[40,120], line:"Along the path to Ma Ma's orchard."},
+  // Ma Ma's orchard, west of home: fruit trees, the farm shop and her cottage; her flower farm is further west
+  toBaseO:{scene:"orchard", name:"Gate home", door:[498,278], spot:true, bridge:"base", mark:[490,226], line:"Back along the path, home."},
+  toFlowers:{scene:"orchard", name:"Gate to the flower farm", door:[22,278], spot:true, bridge:"flowers", mark:[30,226], line:"Through the arch to the flower farm."},
+  cottage:{scene:"orchard", name:"Ma Ma's cottage", short:"Ma Ma's cottage", door:[132,228], mark:[132,96]},
+  farmshop:{scene:"orchard", name:"Farm shop", door:[415,254], spot:true, mark:[415,140], line:"Ma Ma's farm shop. Fruit and flowers, picked this morning."},
+  toOrchardF:{scene:"flowers", name:"Gate to the orchard", door:[498,293], spot:true, bridge:"orchard", mark:[490,240], line:"Back through the arch to the orchard."},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };
 // Quests can also happen outdoors at home base: "base" is a quest place whose spots are the base's own places.
@@ -58,9 +65,9 @@ const WORK_HINT = /chord|chico|ambidextrous|fresh pages|client|muse|proposal|inv
 export const isWeekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
 const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
-export const BRIDGES = {village:{base:"toBase", lane:"toLane"}, base:{village:"toTown", vineyard:"toVine"}, lane:{village:"toTownE", vineyard:"toVineL"}, vineyard:{base:"toBaseV", lane:"toLaneV"}};
+export const BRIDGES = {village:{base:"toBase", lane:"toLane"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers"}, flowers:{orchard:"toOrchardF"}};
 // where Mel steps off, by "from>to"
-export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586]};
+export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278]};
 // the next outdoor screen on the way from one to another (screens form a little chain: base - village - lane)
 export function nextHop(from, to){
   if (from === to) return null; if (BRIDGES[from] && BRIDGES[from][to]) return to;
@@ -180,6 +187,12 @@ export const ROOMS = {
     ["larder","Larder","L","larder",null,"The larder. Everything you've sent to the kitchen.",30],
     ["stove","Stove","P","stove",null,"The stove. Small plates and today's tapas.",30],
     ["press","Cheese press","C","cheesepress",null,"The cheese press. Goat's milk in, cheese out.",30]]},
+  // Ma Ma's cottage in the orchard: one cosy room with her bed, the TV, a little kitchenette and the tea table
+  cottage: {name:"Ma Ma's cottage", wall:"#F6E7D7", trim:"#C2505F", noBoard:true, pos:{B:[110,262], T:[420,250], K:[404,470], C:[200,470]}, stations:[
+    ["mbed","Ma Ma's bed","B","grannybed",null,"Ma Ma's bed, the crocheted blanket folded just so.",30],
+    ["tv","TV","T","tv",null,"Her dramas. Nobody touches the remote.",30],
+    ["kitchenette","Kitchenette","K","kitchenette",null,"The kettle's always warm in here.",30],
+    ["tea","Tea table","C","teatable",null,"Tea and cake with Ma Ma.",34]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };

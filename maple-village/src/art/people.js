@@ -11,6 +11,8 @@ function hair(style, c, k){
     case "bob": return `<path d="M${-r-1.2} ${y+1} c-1 -12 5 -16 ${r+1} -16 c7 0 ${r+2} 4 ${r+1.6} 16 l0 ${7*k} l${-4*k} 0 l0 ${-8*k} c-4 -1 -12 -1 -16 -3 l0 ${11*k} l${-4*k} 0z" ${S(c)}/>`;
     case "long": return `<path d="M${-r-1} ${y} c-1 -12 5 -16 ${r+1} -16 c7 0 ${r+2} 4 ${r+1} 16 l1 ${18*k} l${-5*k} 0 l-1 ${-16*k} c-4 -2 -11 -2 -15 -5 l-1 ${21*k} l${-5*k} 0z" ${S(c)}/>`;
     case "spiky": return `<path d="M${-r} ${y-1} l-1 -6 l4 2 l1 -6 l4 4 l3 -6 l3 6 l4 -4 l1 6 l4 -2 l-1 6 c-4 -3 -16 -3 -22 0z" ${S(c)}/>`;
+    // short curls: a cap with little round curls all over the top
+    case "curly": return cap(c, y, r) + [[-9, -3], [-6.5, -8.5], [-1.5, -11], [3.5, -10.5], [8, -7], [10, -2], [-10.4, 2], [10.4, 2]].map(([dx, dy]) => `<circle cx="${dx*k}" cy="${y + dy*k}" r="${3.3*k}" ${S(c)}/>`).join("");
     default: return cap(c, y, r);
   }
 }
@@ -36,6 +38,13 @@ function extra(kind, look, k){
   return "";
 }
 
+// Batik: a little repeating motif (flowers of dots, tiny leaves) over the top and trousers. col: the motif colour.
+function batik(col, k){
+  const flower = (x, y) => `<circle cx="${x*k}" cy="${y*k}" r="${1.5*k}" style="fill:${col}" stroke="none"/>` + [[0, -2.6], [2.5, 0], [0, 2.6], [-2.5, 0]].map(([dx, dy]) => `<circle cx="${(x + dx)*k}" cy="${(y + dy)*k}" r="${.8*k}" style="fill:${col}" stroke="none"/>`).join("");
+  const leaf = (x, y) => `<path d="M${x*k} ${y*k} q${1.6*k} ${-1.6*k} ${3.2*k} 0 q${-1.6*k} ${1.6*k} ${-3.2*k} 0z" style="fill:${col}" stroke="none"/>`;
+  return `<g opacity=".85" pointer-events="none">${flower(-4, -31)}${flower(4.5, -25)}${flower(-3.5, -19)}${leaf(1, -33)}${leaf(-7, -25)}${leaf(4, -18)}
+    <path d="M${-5.6*k} ${-12*k} h${3*k} M${-5.6*k} ${-8*k} h${3*k} M${2*k} ${-11*k} h${3*k} M${2*k} ${-6*k} h${3*k}" stroke-width="${1.1*k}" style="stroke:${col}"/></g>`;
+}
 export function personArt(look, kid){
   const k = kid ? 0.62 : look.tall ? 1.1 : 1;
   const legH = 13*k, legY = -15*k, lw = 5*k;
@@ -43,11 +52,12 @@ export function personArt(look, kid){
   return `<g class="flip"><g filter="url(#wob)">
     <ellipse cx="0" cy="0" rx="${11*k}" ry="${3.5*k}" fill="rgba(60,40,30,.18)"/>
     <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
-      <g class="legL"><rect x="${-6.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.bottom)}/><ellipse cx="${-3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
-      <g class="legR"><rect x="${1.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.bottom)}/><ellipse cx="${3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
+      <g class="legL"><rect x="${-6.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
+      <g class="legR"><rect x="${1.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${.8*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
       <g class="armL"><rect x="${-12*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/></g>
       <g class="armR"><rect x="${7.8*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/></g>
       <path d="M${-8.6*k} ${-37*k} q${8.6*k} ${-2.4*k} ${17.2*k} 0 l${1.4*k} ${23*k} h${-20*k}z" ${S(look.top)}/>
+      ${look.batik ? batik(look.batik, k) : ""}
       ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" ? hair(look.hairStyle, look.hair, k) : ""}
       <circle cx="0" cy="${-46*k}" r="${10.6*k}" ${S(look.skin)}/>
@@ -58,6 +68,8 @@ export function personArt(look, kid){
       <ellipse cx="${6.4*k}" cy="${-40.6*k}" rx="${2*k}" ry="${1.2*k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
       <path d="M${-1.6*k} ${-40.4*k} q${1.6*k} ${1.4*k} ${3.2*k} 0" fill="none" stroke-width="1"/>
       ${["glasses", "cap", "sunhat", "helmet"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${look.hat ? extra(look.hat, look, k) : ""}
+      ${look.specs ? `<g fill="none" stroke-width="1" style="stroke:${look.specs}"><circle cx="${-3.8*k}" cy="${-44*k}" r="${2.8*k}"/><circle cx="${3.8*k}" cy="${-44*k}" r="${2.8*k}"/><path d="M${-1*k} ${-44*k} h${2*k}"/></g>` : ""}
       ${look.headphones ? `<path d="M${-11*k} ${-46*k} a${11*k} ${12*k} 0 0 1 ${22*k} 0" fill="none" stroke-width="1.8" style="stroke:var(--peri2)"/><rect x="${-13.5*k}" y="${-49*k}" width="${4.5*k}" height="${7*k}" rx="2" style="fill:var(--peri)"/><rect x="${9*k}" y="${-49*k}" width="${4.5*k}" height="${7*k}" rx="2" style="fill:var(--peri)"/>` : ""}
     </g>
   </g></g>`;

@@ -14,14 +14,15 @@ const greeted = new Set();  // messengers say hello once, then just tag along qu
 
 export function initNpcs(a){ api = a; }
 const weekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
-const slotNow = def => { const t = sgHM(), we = weekend();
+const dowNow = () => new Date(now() + 8*H).getUTCDay();
+const slotNow = def => { const t = sgHM(), we = weekend(), dw = dowNow();
   const owned = (api && api.F().fam && api.F().fam.owned) || {};
-  return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.needs || owned[s.needs])) || null; };
+  return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };
 export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
 export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
 const PROPS = {water: "can", repair: "hammer", farm: "hoe"};
-const outdoors = s => s === "village" || s === "base" || s === "lane" || s === "vineyard";
+const outdoors = s => s === "village" || s === "base" || s === "lane" || s === "vineyard" || s === "orchard" || s === "flowers";
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 
 function makeNode(id, look, kid, letter, act){
@@ -65,7 +66,7 @@ function tickVillager(def, dt){
   if (!e || e.key !== key) {
     if (e) drop(def.id);
     const p = slot.at || jitter(pick(slot.wander));
-    e = ents[def.id] = {def, key, act: slot.act, kind: "npc", x: p[0], y: p[1], tx: p[0], ty: p[1], dir: slot.dir || (Math.random() < .5 ? -1 : 1), moving: false, wait: rnd(1, 4), node: makeNode(def.id, def.look, def.kid, false, slot.act)};
+    e = ents[def.id] = {def, key, act: slot.act, kind: "npc", x: p[0], y: p[1], tx: p[0], ty: p[1], dir: slot.dir || (Math.random() < .5 ? -1 : 1), moving: false, wait: rnd(1, 4), node: makeNode(def.id, Object.assign({}, def.look, slot.look || {}, outdoors(scene) ? {} : {hat: null}), def.kid, false, slot.act)};   // hats come off indoors
   }
   // Now and then a neighbour near Mel says hello (each at most every few minutes).
   const near = Math.hypot(e.x - api.mel.x, e.y - api.mel.y) < 110;
