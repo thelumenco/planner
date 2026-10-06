@@ -719,8 +719,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#notebook .sub.done .lchip').count() === 0 && await page.locator("#notebook .sub.done").count() === 1, "done subtasks fold away under Done");
   await page.click('#notebook .sub.done [data-nb="subopen"]');
   check(await page.locator('#notebook .sub.done a.lchip').textContent().then(t => /Planner/.test(t)), "links show as small named chips");
+  const subC0 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
   await page.click('#notebook .sub.upnext [data-nb="sub"]');
   await page.waitForFunction(() => (window.__subTicks || []).length, null, { timeout: 8000 }).catch(() => {});
+  check(await page.evaluate(c => JSON.parse(localStorage.getItem("fox.fox")).coins === c + 5, subC0), "a subtask in a treadmill batch pays like a quest (5 coins)");
   check(await page.evaluate(() => { const x = (window.__subTicks || [])[0]; return !!x && x.tool === "mark_subtask_as_completed" && x.input.taskId === "s3" && x.input.subtaskId === "x"; }), "ticking a subtask ticks it in Sunsama too");
   check(/2 of 2 done/.test(await page.locator("#notebook .subcount").textContent()) && await page.locator("#notebook .suball").count() === 1, "and the checklist shows everything done");
   await page.click('#notebook [data-nb="close"]').catch(() => {});
@@ -1212,6 +1214,26 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="toLaneV"]').dispatchEvent("click");
   await page.waitForFunction(() => /Makers/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(true, "and back up again");
+  await page.close();
+}
+{
+  // A grown hen eats breakfast, lunch and dinner, with an egg after each meal
+  console.log("\nhens: three meals, three eggs");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`hen pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/henpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    const d = "2026-10-07";
+    f.pets = {run: 0, next: 2, animals: [{id: "h1", kind: "chick", name: "Kaya", born: Date.now(), feeds: 5, fedDay: d, fedMeal: 0, col: 0}]}; f.inv = Object.assign(f.inv || {}, {chickfeed: 3}); delete f.inv.egg;
+    localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
+  await page.goto(url + "?reset=1&seed=1&time=18:00&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=18:00&date=2026-10-07&henpatch=1"); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(700);
+  await page.locator('#world [data-place="run"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-feed]', { timeout: 15000 });
+  check(/hungry/.test(await page.locator("#ctx .pets").textContent()), "a hen fed at breakfast is hungry again by dinner");
+  await page.click('#ctx [data-feed]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).inv.egg === 1), "and lays an egg after her dinner");
+  check(/fed and happy/.test(await page.locator("#ctx .pets").textContent()), "then she's full until the next meal");
   await page.close();
 }
 {

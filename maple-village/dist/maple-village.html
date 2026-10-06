@@ -2565,8 +2565,14 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   var roomLeft = (F2) => runOf(F2).cap - ensurePets(F2).animals.length;
   var isGrown = (a) => (a.feeds || 0) >= GROW;
   var label = (a) => isGrown(a) ? KINDS[a.kind].grown : KINDS[a.kind].n;
-  var fedToday = (a) => a.fedDay === dayKey();
-  var hungry = (a, F2) => !(fedToday(a) || ensurePets(F2).run >= 3 && a.fedDay === prevDay(dayKey()));
+  var MEALS = ["breakfast", "lunch", "dinner"];
+  var mealNow = () => {
+    const m = sgHM();
+    return m < 12 * 60 ? 0 : m < 17 * 60 ? 1 : 2;
+  };
+  var henMeals = (a) => a.kind === "chick" && isGrown(a);
+  var fedToday = (a) => henMeals(a) ? a.fedDay === dayKey() && a.fedMeal === mealNow() : a.fedDay === dayKey();
+  var hungry = (a, F2) => !(fedToday(a) || !henMeals(a) && ensurePets(F2).run >= 3 && a.fedDay === prevDay(dayKey()));
   var hungryCount = (F2) => ensurePets(F2).animals.filter((a) => hungry(a, F2)).length;
   function addAnimal(F2, kind) {
     const P2 = ensurePets(F2);
@@ -2579,12 +2585,13 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   }
   function feedOne(F2, a, inv, addInv2) {
     if (!a) return { ok: false };
-    if (fedToday(a)) return { ok: false, msg: `${a.name} is full for today.` };
+    if (fedToday(a)) return { ok: false, msg: henMeals(a) ? `${a.name} has had her ${MEALS[mealNow()]}. ${mealNow() < 2 ? `Next meal: ${MEALS[mealNow() + 1]}.` : "She's done for today."}` : `${a.name} is full for today.` };
     const food = KINDS[a.kind].food.find((id) => inv[id] > 0);
     if (!food) return { ok: false, msg: `No ${KINDS[a.kind].foodName} in your backpack. The market sells it.` };
     const wasGrown = isGrown(a);
     addInv2(food, -1);
     a.fedDay = dayKey();
+    a.fedMeal = mealNow();
     a.feeds = (a.feeds || 0) + 1;
     const grew = !wasGrown && isGrown(a), egg2 = wasGrown && a.kind === "chick";
     if (egg2) addInv2("egg", 1);
@@ -11768,7 +11775,19 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       F.subTodo = (F.subTodo || []).filter((y) => !(y.task === t2.id && y.sub === x.id)).concat({ task: t2.id, sub: x.id, done });
       flushSubs();
     }
-    sfx(done ? "tap" : "paper", true);
+    rec.paid = rec.paid || {};
+    if (done && !rec.paid[key]) {
+      rec.paid[key] = true;
+      if (isTreadTask(t2)) {
+        sfx("chaching");
+        earn(5, "batch quest done");
+        gainXp(1);
+        F.plots.forEach((p) => {
+          if (p && p.crop && p.wateredAt && growth2(p) < 1) p.bonus = (p.bonus || 0) + QUEST_BOOST;
+        });
+        questBoost(F, QUEST_BOOST);
+      } else earn(1, "subtask");
+    } else sfx(done ? "tap" : "paper", true);
     const left3 = subView(t2).list.filter((y) => !y.done).length;
     if (done && !left3) speak("Every subtask ticked! Tap Done when you're ready.", 4500, true);
     save2();
@@ -13044,7 +13063,7 @@ Then tell chat "wind down" whenever you're ready.`
           }
           return itemBtn(id, locked ? `earn ${it.need} today` : owned ? it.kind === "keep" ? "at home" : "owned" : `<b>${it.price}</b> ${icon("coin", 13)}${extra2}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
         }).join("");
-        if (shopTab === "animals") h += `<p class="muted" style="grid-column:1/-1">Chicks, bunnies and goats go straight to the run at home (${F.pets.animals.length} of ${["2", "4", "6", "8"][F.pets.run]} there now). Each eats once a day: a bag of feed is one meal, and bunnies love a garden carrot too. Upgrade the run from the run itself.</p>`;
+        if (shopTab === "animals") h += `<p class="muted" style="grid-column:1/-1">Chicks, bunnies and goats go straight to the run at home (${F.pets.animals.length} of ${["2", "4", "6", "8"][F.pets.run]} there now). Each eats once a day (grown hens come for breakfast, lunch and dinner, with an egg each time): a bag of feed is one meal, and bunnies love a garden carrot too. Upgrade the run from the run itself.</p>`;
         if (shopTab === "deli") h += `<p class="muted" style="grid-column:1/-1">For the wine shop's kitchen: flour bakes into loaves in the oven, cheese and olives go on boards and in tapas. They go in your backpack: send them to the kitchen from there.</p>`;
         if (shopTab === "family") h += `<p class="muted" style="grid-column:1/-1">Little treats go in your backpack: give them in person from there. Keepsakes go straight home and stay forever.</p>`;
       }

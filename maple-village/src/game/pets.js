@@ -1,8 +1,9 @@
 // Little animals at home base: chicks and bunnies bought at the market, living in the run beside the garden.
 // Each animal eats once a day (chick feed, rabbit pellets, or a garden carrot for the bunnies). After three
-// days of meals a chick grows into a hen and a bunny into a rabbit; a fed hen lays an egg in the backpack.
+// days of meals a chick grows into a hen and a bunny into a rabbit. A grown hen eats three meals a day (breakfast
+// before noon, lunch till 5pm, dinner after) and lays an egg in the backpack after each one.
 // Nobody ever gets ill or leaves: a hungry animal just looks a little sorry for itself until it's fed.
-import { dayKey, prevDay, esc } from "../util.js";
+import { dayKey, prevDay, esc, sgHM } from "../util.js";
 import { icon } from "../art/icons.js";
 import { sk, tapeLabel } from "../art/scenes.js";
 
@@ -32,9 +33,13 @@ export const runOf = F => RUNS[ensurePets(F).run] || RUNS[0];
 export const roomLeft = F => runOf(F).cap - ensurePets(F).animals.length;
 export const isGrown = a => (a.feeds || 0) >= GROW;
 export const label = a => isGrown(a) ? KINDS[a.kind].grown : KINDS[a.kind].n;
-export const fedToday = a => a.fedDay === dayKey();
-// with the clover meadow, yesterday's meal still counts
-export const hungry = (a, F) => !(fedToday(a) || (ensurePets(F).run >= 3 && a.fedDay === prevDay(dayKey())));
+// a grown hen's meals: 0 breakfast, 1 lunch, 2 dinner
+export const MEALS = ["breakfast", "lunch", "dinner"];
+const mealNow = () => { const m = sgHM(); return m < 12*60 ? 0 : m < 17*60 ? 1 : 2; };
+const henMeals = a => a.kind === "chick" && isGrown(a);
+export const fedToday = a => henMeals(a) ? a.fedDay === dayKey() && a.fedMeal === mealNow() : a.fedDay === dayKey();
+// with the clover meadow, yesterday's meal still counts (hens still come for every meal: that's where the eggs come from)
+export const hungry = (a, F) => !(fedToday(a) || (!henMeals(a) && ensurePets(F).run >= 3 && a.fedDay === prevDay(dayKey())));
 export const hungryCount = F => ensurePets(F).animals.filter(a => hungry(a, F)).length;
 
 export function addAnimal(F, kind){
@@ -47,11 +52,11 @@ export function addAnimal(F, kind){
 // Feed one animal from the backpack. Returns {ok, msg, egg, grew} and never throws.
 export function feedOne(F, a, inv, addInv){
   if (!a) return {ok: false};
-  if (fedToday(a)) return {ok: false, msg: `${a.name} is full for today.`};
+  if (fedToday(a)) return {ok: false, msg: henMeals(a) ? `${a.name} has had her ${MEALS[mealNow()]}. ${mealNow() < 2 ? `Next meal: ${MEALS[mealNow() + 1]}.` : "She's done for today."}` : `${a.name} is full for today.`};
   const food = KINDS[a.kind].food.find(id => inv[id] > 0);
   if (!food) return {ok: false, msg: `No ${KINDS[a.kind].foodName} in your backpack. The market sells it.`};
   const wasGrown = isGrown(a);
-  addInv(food, -1); a.fedDay = dayKey(); a.feeds = (a.feeds || 0) + 1;
+  addInv(food, -1); a.fedDay = dayKey(); a.fedMeal = mealNow(); a.feeds = (a.feeds || 0) + 1;
   const grew = !wasGrown && isGrown(a), egg = wasGrown && a.kind === "chick";
   if (egg) addInv("egg", 1);
   const milk = wasGrown && a.kind === "goat"; if (milk) addInv("milk", 1);   // a grown goat gives a bottle of milk when fed

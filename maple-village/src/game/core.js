@@ -598,7 +598,13 @@ function subTick(t, key, done){
   for (const k of Object.keys(F.subDone)) if (Date.now() - F.subDone[k].at > 21*864e5) delete F.subDone[k];   // forget old quests
   const rec = F.subDone[t.id] = F.subDone[t.id] || {s: {}}; rec.at = Date.now(); rec.s[key] = done;
   if (x.id && t.source === "sunsama") { F.subTodo = (F.subTodo || []).filter(y => !(y.task === t.id && y.sub === x.id)).concat({task: t.id, sub: x.id, done}); flushSubs(); }
-  sfx(done ? "tap" : "paper", true);
+  // Subtasks pay the first time they're ticked (rec.paid remembers, so untick and re-tick doesn't pay twice). In a
+  // treadmill batch each subtask was a task of its own, so it pays like one: 5 coins and the growing boost.
+  rec.paid = rec.paid || {};
+  if (done && !rec.paid[key]) { rec.paid[key] = true;
+    if (isTreadTask(t)) { sfx("chaching"); earn(5, "batch quest done"); gainXp(1); F.plots.forEach(p => { if (p && p.crop && p.wateredAt && growth(p) < 1) p.bonus = (p.bonus || 0) + QUEST_BOOST; }); questBoost(F, QUEST_BOOST); }
+    else earn(1, "subtask"); }
+  else sfx(done ? "tap" : "paper", true);
   const left = subView(t).list.filter(y => !y.done).length;
   if (done && !left) speak("Every subtask ticked! Tap Done when you're ready.", 4500, true);
   save(); refreshNotebook();
@@ -1288,7 +1294,7 @@ function ctx(){
         if (it.kind === "pet") { const full = roomLeft(F) <= 0; return itemBtn(id, full ? "the run is full" : `<b>${it.price}</b> ${icon("coin", 13)}`, full || F.coins < it.price); }
         return itemBtn(id, locked ? `earn ${it.need} today` : owned ? (it.kind === "keep" ? "at home" : "owned") : `<b>${it.price}</b> ${icon("coin", 13)}${extra}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
       }).join("");
-      if (shopTab === "animals") h += `<p class="muted" style="grid-column:1/-1">Chicks, bunnies and goats go straight to the run at home (${F.pets.animals.length} of ${["2", "4", "6", "8"][F.pets.run]} there now). Each eats once a day: a bag of feed is one meal, and bunnies love a garden carrot too. Upgrade the run from the run itself.</p>`;
+      if (shopTab === "animals") h += `<p class="muted" style="grid-column:1/-1">Chicks, bunnies and goats go straight to the run at home (${F.pets.animals.length} of ${["2", "4", "6", "8"][F.pets.run]} there now). Each eats once a day (grown hens come for breakfast, lunch and dinner, with an egg each time): a bag of feed is one meal, and bunnies love a garden carrot too. Upgrade the run from the run itself.</p>`;
       if (shopTab === "deli") h += `<p class="muted" style="grid-column:1/-1">For the wine shop's kitchen: flour bakes into loaves in the oven, cheese and olives go on boards and in tapas. They go in your backpack: send them to the kitchen from there.</p>`;
       if (shopTab === "family") h += `<p class="muted" style="grid-column:1/-1">Little treats go in your backpack: give them in person from there. Keepsakes go straight home and stay forever.</p>`;
     }

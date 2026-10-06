@@ -592,3 +592,15 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - The lane's centre path now runs down to the bottom edge. It ends at a vine arch, `toVineL` (door [262,622]). The lamp that stood on the path moved to [222,572].
 - The vineyard has a path down from the top edge at x 290 to the main path, starting at a matching arch, `toLaneV` (door [290,16], label "Makers' Lane").
 - New `BRIDGES` entries `lane.vineyard` and `vineyard.lane`, and new arrival points `lane>vineyard` [290,72] and `vineyard>lane` [262,586]. `nextHop` routes through them automatically.
+
+### Round 50: subtasks pay
+- `subTick` pays the first time a subtask is ticked in the village. `F.subDone[taskId].paid[key]` records it, so unticking and re-ticking doesn't pay again.
+  - Inside a treadmill batch (`isTreadTask`), each subtask used to be a task of its own, so it pays like a quest: 5 coins, 1 xp and the growing boost. It doesn't count towards the quest totals.
+  - Any other subtask pays 1 coin.
+  - The parent quest still pays its usual 5 when it's marked Done.
+- Subtasks ticked directly in Sunsama don't pay. Only ticks made in the village do.
+
+### Round 51: hens eat three meals
+- A grown hen (`kind: "chick"`, grown) eats breakfast (before noon), lunch (till 5pm) and dinner (after 5pm). `a.fedMeal` records which meal she last had, and she lays an egg after each one, so up to 3 a day at 3 bags of chick feed.
+- The clover meadow's "a meal lasts two days" rule doesn't apply to hens: they still come to every meal.
+- Chicks, bunnies and goats still eat once a day (otherwise a chick would grow up in a day).
