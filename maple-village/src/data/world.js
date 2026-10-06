@@ -43,7 +43,7 @@ export const VILLAGE = {
   pswing: {scene:"vineyard", name:"Swings", door:[110,594], spot:true, line:"The swings. Wheee!"},
   pslide: {scene:"vineyard", name:"Slide", door:[262,592], spot:true, line:"The slide. Down you go!"},
   olive:  {scene:"vineyard", name:"Olive tree", door:[250,262], spot:true, line:"The olive tree. Olives every few hours, once it's planted."},
-  pround: {scene:"vineyard", name:"Roundabout", door:[470,516], spot:true, line:"The roundabout. Round and round and round!"},
+  pround: {scene:"vineyard", name:"Roundabout", door:[188,598], spot:true, line:"The roundabout. Round and round and round!"},
   pseesaw:{scene:"vineyard", name:"Seesaw", door:[410,600], spot:true, line:"The seesaw. Up, down, up, down."},
   toOrchard:{scene:"base", name:"Gate to Ma Ma's orchard", door:[26,180], spot:true, bridge:"orchard", mark:[40,120], line:"Along the path to Ma Ma's orchard."},
   // Ma Ma's orchard, west of home: fruit trees, the farm shop and her cottage; her flower farm is further west
@@ -61,12 +61,14 @@ export const VILLAGE = {
   lake:   {scene:"field", name:"The lake", door:[220,378], spot:true, line:"The lake. Two swans, very dignified."},
   picnic: {scene:"field", name:"Picnic spot", door:[140,484], spot:true, line:"A blanket and a basket. Perfect for lunch outside."},
   // market and fair days: the stalls (who's behind each one comes from tours.js) and the wine shop's own stall
-  mstall0:{scene:"field", name:"Stall", door:[56,160], spot:true, line:"A market stall."},
-  mstall1:{scene:"field", name:"Stall", door:[132,160], spot:true, line:"A market stall."},
-  mstall2:{scene:"field", name:"Stall", door:[208,160], spot:true, line:"A market stall."},
-  mstall3:{scene:"field", name:"Stall", door:[284,160], spot:true, line:"A market stall."},
-  mstall4:{scene:"field", name:"Stall", door:[360,160], spot:true, line:"A market stall."},
-  mstall5:{scene:"field", name:"Stall", door:[436,160], spot:true, line:"A market stall."},
+  mstall0:{scene:"field", name:"Stall", door:[36,164], spot:true, line:"A market stall."},
+  mstall1:{scene:"field", name:"Stall", door:[96,164], spot:true, line:"A market stall."},
+  mstall2:{scene:"field", name:"Stall", door:[156,164], spot:true, line:"A market stall."},
+  mstall3:{scene:"field", name:"Stall", door:[216,164], spot:true, line:"A market stall."},
+  mstall4:{scene:"field", name:"Stall", door:[276,164], spot:true, line:"A market stall."},
+  mstall5:{scene:"field", name:"Stall", door:[336,164], spot:true, line:"A market stall."},
+  mstall6:{scene:"field", name:"Stall", door:[396,164], spot:true, line:"A market stall."},
+  mstall7:{scene:"field", name:"Stall", door:[456,164], spot:true, line:"A market stall."},
   pitch:  {scene:"field", name:"Football pitch", door:[150,600], spot:true, line:"The football pitch. Kids play here after school."},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };

@@ -338,12 +338,27 @@ function markActive(){
 // Every delete can be undone for a few seconds: undoable("Removed X", () => put it back)
 let undoT = null, undoFn = null;
 function undoable(msg, restore){
-  undoFn = restore; $("undoMsg").textContent = plain(msg); $("undoBar").hidden = false;
+  undoMark++; undoFn = restore; $("undoMsg").textContent = plain(msg); $("undoBar").hidden = false;
   clearTimeout(undoT); undoT = setTimeout(() => { $("undoBar").hidden = true; undoFn = null; }, 7000);
 }
+// Anything bought by mistake can be undone: every tap remembers the save as it was, and if the tap spent coins
+// (a shop, a stall, the shed, decor, seedlings, the vineyard shop...) the undo bar offers to put it all back.
+// A tap that already offered its own undo, or a coin taken back for an unticked chore, is left alone.
+let undoMark = 0, lastFlash = "";
+document.addEventListener("click", e => {
+  if (!F || e.target.closest && e.target.closest("#undoBar")) return;
+  const c0 = F.coins, snap = JSON.stringify(F), m0 = undoMark, F0 = F; lastFlash = "";
+  setTimeout(() => {
+    if (F !== F0 || F.coins >= c0 || undoMark !== m0 || /^-/.test(lastFlash)) return;
+    const spent = c0 - F.coins, what = lastFlash;
+    undoable(`${what ? what.replace(/[.!]$/, "") + " · " : "Spent "}${spent} coin${spent === 1 ? "" : "s"}`, () => {
+      const was = JSON.parse(snap); Object.keys(F).forEach(k => delete F[k]); Object.assign(F, was);
+      flash(`Undone: ${spent} coin${spent === 1 ? "" : "s"} back`); resetNpcs(); save(true); ctx(); drawScene(); render(); });
+  }, 0);
+}, true);
 $("undoBtn").onclick = () => { const f = undoFn; undoFn = null; clearTimeout(undoT); $("undoBar").hidden = true; if (f) { f(); sfx("paper", true); } };
 let earnT;
-function flash(msg){ const e = $("earn"); e.textContent = plain(msg); clearTimeout(earnT); earnT = setTimeout(() => e.textContent = "", 4000); }
+function flash(msg){ lastFlash = msg; const e = $("earn"); e.textContent = plain(msg); clearTimeout(earnT); earnT = setTimeout(() => e.textContent = "", 4000); }
 function earn(n, why){ if (!/quest|Sunsama/.test(why)) sfx("coin"); F.coins += n; S.earned += n; markActive(); flash(`+${n} coins: ${why}`); mprop("coin", mel.x, mel.y - 60, 1800); }
 function gainXp(n){
   const before = level(); F.xp += n;
@@ -1128,30 +1143,45 @@ function toKitchen(id){
 // Gifts for the family. Evan is wherever home is (home base or inside); Darren follows his routine.
 const DARREN_AT = {base: "outside at home", home: "inside the house", farm: "in the garden"};
 let bubbleT = null;
+// Who a gift suits: one of the family, Ma Ma and Gong Gong ("grands"), anyone in the family ("family"), or a list
+const GIFT_NAME = {evan: "Evan", darren: "Darren", mama: "Ma Ma", gonggong: "Gong Gong"};
+const giftWho = to => to === "family" ? ["evan", "darren", "mama", "gonggong"] : to === "grands" ? ["mama", "gonggong"] : Array.isArray(to) ? to : [to];
+const giftNames = to => to === "grands" ? "Ma Ma or Gong Gong" : to === "family" ? "the family" : giftWho(to).map(g => GIFT_NAME[g]).join(giftWho(to).length > 2 ? ", " : " or ").replace(/, ([^,]*)$/, " or $1");
 function giveGift(id){
   const it = ITEMS[id]; if (!it || !F.inv[id]) return;
   const burst = (x, y) => [0, 250, 500].forEach((d, k) => setTimeout(() => mprop("heart", x + (k - 1)*14, y - 40 - k*6, 1800), d));
   const showMap = () => { if (openView) { openView = null; ctx(); } };
-  if (it.to === "evan") {
+  const who = giftWho(it.to);
+  // more than one person it'd suit: hand it to whichever of them is nearest
+  let to = it.to, g = null;
+  if (who.length > 1 && it.to !== "grands") {
+    const here = who.map(w => [w, w === "evan" ? (evanHere() ? evan : null) : w === "darren" ? (isHere("darren") ? npcPos("darren") : null) : npcPos(w)]).filter(([, p]) => p)
+      .sort((a, b) => Math.hypot(a[1].x - mel.x, a[1].y - mel.y) - Math.hypot(b[1].x - mel.x, b[1].y - mel.y))[0];
+    if (!here) { speak(`That's a present for ${giftNames(it.to)}. Give it to ${who.length > 2 ? "one of them" : "either of them"} in person!`, 4500); return; }
+    to = here[0] === "mama" || here[0] === "gonggong" ? "grands" : here[0]; g = to === "grands" ? here[0] : null;
+  } else if (who.length === 1 && (who[0] === "mama" || who[0] === "gonggong")) { to = "grands"; g = who[0]; }
+  else if (who.length === 1) to = who[0];
+  const say = w => (it.says && it.says[w]) || it.say;
+  if (to === "evan") {
     if (!evanHere()) { speak("Evan's at home. Give it to him there!", 3500); return; }
     addInv(id, -1); const n = ++F.fam.gifts.evan;
     evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; evan.wait = 5;
-    showMap(); evanSays(it.say); burst(evan.x, evan.y); sfx("chime"); flash(`Evan loved the ${it.n.toLowerCase()}!`);
+    showMap(); evanSays(say("evan")); burst(evan.x, evan.y); sfx("chime"); flash(`Evan loved the ${it.n.toLowerCase()}!`);
     if (id === "icecream" || id === "storybook") S.evanHold = {k: id, until: Date.now() + 3*M};
     if (id === "balloon") S.evanHold = {k: "balloon", until: 0};
     if (id === "storybook" && scene === "home") { const s = spotObj("home", "sofa"); evan.tx = s.tx + 20; evan.ty = s.ty; }
     if (id === "wand") { clearInterval(bubbleT); let k = 0; bubbleT = setInterval(() => { if (++k > 16 || !evanHere()) return clearInterval(bubbleT); mprop("bubbles", evan.x + rnd(-14, 14), evan.y - 34); }, 1200); }
     if (n % 3 === 0) setTimeout(() => { evanSays("for you, Mama!"); addInv("tulip", 1); flash("Evan picked you a tulip"); save(); }, 4000);
-  } else if (it.to === "grands") {
+  } else if (to === "grands") {
     // whichever grandparent is nearest (both live in the cottage in the orchard)
-    const here = ["mama", "gonggong"].map(g => [g, npcPos(g)]).filter(([, p]) => p).sort((a, b) => Math.hypot(a[1].x - mel.x, a[1].y - mel.y) - Math.hypot(b[1].x - mel.x, b[1].y - mel.y))[0];
+    const here = (g ? [g] : ["mama", "gonggong"]).map(g => [g, npcPos(g)]).filter(([, p]) => p).sort((a, b) => Math.hypot(a[1].x - mel.x, a[1].y - mel.y) - Math.hypot(b[1].x - mel.x, b[1].y - mel.y))[0];
     if (!here) { const w = whereIs("mama"); speak(`Ma Ma and Gong Gong aren't here. ${w === "cottage" ? "They're home in the cottage" : w ? "Ma Ma's out at the " + ({orchard: "orchard", flowers: "flower farm", village: "town square", vineyard: "vineyard", base: "house", field: "field"}[w] || w) : "Try the orchard"}. Give it to them in person!`, 4500); return; }
-    const [g, p] = here; addInv(id, -1); F.fam.gifts[g] = (F.fam.gifts[g] || 0) + 1;
-    showMap(); npcSay(g, it.say + (g === "mama" ? " I love you." : "")); burst(p.x, p.y - 20); sfx("chime"); flash(`${g === "mama" ? "Ma Ma" : "Gong Gong"} loved the ${it.n.toLowerCase()}`);
+    const [gp, p] = here; addInv(id, -1); F.fam.gifts[gp] = (F.fam.gifts[gp] || 0) + 1;
+    showMap(); npcSay(gp, say(gp) + (gp === "mama" ? " I love you." : "")); burst(p.x, p.y - 20); sfx("chime"); flash(`${gp === "mama" ? "Ma Ma" : "Gong Gong"} loved the ${it.n.toLowerCase()}`);
   } else {
     if (!isHere("darren")) { const w = whereIs("darren"); speak(w ? `Darren's ${DARREN_AT[w] || "around"} right now. Give it to him there!` : "Darren's not around right now.", 4000); return; }
     addInv(id, -1); const n = ++F.fam.gifts.darren;
-    showMap(); npcSay("darren", it.say); const p = npcPos("darren"); if (p) burst(p.x, p.y - 20); sfx("chime"); flash(`Darren says thanks for the ${it.n.toLowerCase()}`);
+    showMap(); npcSay("darren", say("darren")); const p = npcPos("darren"); if (p) burst(p.x, p.y - 20); sfx("chime"); flash(`Darren says thanks for the ${it.n.toLowerCase()}`);
     if (n % 3 === 0) setTimeout(() => { npcSay("darren", "Got you something too. Found it in the shed."); addInv("strawberry_seed", 1); flash("Darren gave you strawberry seeds"); save(); }, 4500);
   }
   gainXp(1); save();
@@ -1176,8 +1206,8 @@ function playFree(kind){
   act(kind); speak(pick(lines[kind]), 4500);
   if (!F.cool[kind] || Date.now() - F.cool[kind] > 30*M) { F.cool[kind] = Date.now(); gainXp(1); save(); }
 }
-function buy(id){
-  const it = ITEMS[id]; if (!it || F.coins < it.price || (it.need && S.earned < it.need)) return;
+function buy(id, price){
+  const it = ITEMS[id]; if (!it) return; price = price || it.price; if (!price || F.coins < price || (it.need && S.earned < it.need)) return;
   if (it.kind === "keep") {
     if (F.fam.owned[id]) return;
     F.coins -= it.price; F.fam.owned[id] = true; sfx("chaching"); flash(`${it.n} delivered home`); speak(it.say, 5000);
@@ -1188,7 +1218,7 @@ function buy(id){
     F.coins -= it.price; sfx("chaching"); flash(`${a.name} the ${KINDS[it.pet].n.toLowerCase()} is in the run at home`); speak(`${it.say} I'll call it ${a.name}.`, 5000); save(true); return;
   }
   if (it.kind === "tool" && F.inv[id]) return;
-  F.coins -= it.price; addInv(id, 1); flash(`Bought ${it.n.toLowerCase()}`); speak(pick(["Ooh, good choice!", "Into the backpack it goes.", "Lovely pick!"]), 2500); save();
+  F.coins -= price; addInv(id, 1); flash(`Bought ${it.n.toLowerCase()}`); speak(pick(["Ooh, good choice!", "Into the backpack it goes.", "Lovely pick!"]), 2500); save();
 }
 function sell(id){
   const it = ITEMS[id]; if (!it || !it.sell || !F.inv[id]) return;
@@ -1375,7 +1405,7 @@ function ctx(){
       if (shopTab === "seeds") h += `<p class="muted" style="grid-column:1/-1">${SEASONS[season].n} seeds: ${SEASONS[season].line.toLowerCase()}. New ones arrive each season, and anything you've already bought or planted keeps growing.</p>`;
       h += Object.keys(ITEMS).filter(id => ITEMS[id].tab === shopTab && (!ITEMS[id].seasons || ITEMS[id].seasons.includes(season))).map(id => {
         const it = ITEMS[id], locked = it.need && S.earned < it.need, owned = it.kind === "keep" ? F.fam.owned[id] : it.kind === "tool" && F.inv[id];
-        const extra = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)} · ${CROPS[it.crop].yield || 1} a harvest` : it.to ? ` · ${it.to === "evan" ? "Evan" : it.to === "grands" ? "Ma Ma and Gong Gong" : "Darren"}` : "";
+        const extra = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)} · ${CROPS[it.crop].yield || 1} a harvest` : it.to ? ` · for ${giftNames(it.to)}` : "";
         if (it.kind === "pet") { const full = roomLeft(F) <= 0; return itemBtn(id, full ? "the run is full" : `<b>${it.price}</b> ${icon("coin", 13)}`, full || F.coins < it.price); }
         return itemBtn(id, locked ? `earn ${it.need} today` : owned ? (it.kind === "keep" ? "at home" : "owned") : `<b>${it.price}</b> ${icon("coin", 13)}${extra}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
       }).join("");
@@ -1482,7 +1512,7 @@ function ctx(){
   c.querySelectorAll(".item[data-id]").forEach(b => b.onclick = () => {
     const id = b.dataset.id;
     if (scene === "market") { shopTab === "sell" ? sell(id) : buy(id); }
-    else if (scene === "field" && fieldView) { buy(id); ctx(); }   // a market or fair stall
+    else if (scene === "field" && fieldView) { buy(id, stallPrice(id)); ctx(); }   // a market or fair stall
     else if (scene === "farm") plant(selPlot, id);
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
@@ -1533,7 +1563,7 @@ function bag(){
   const order = ["gift","food","ingredient","feed","flower","use","tool","seed"];
   ids.sort((a, b) => order.indexOf(ITEMS[a].kind) - order.indexOf(ITEMS[b].kind));
   $("bag").innerHTML = ids.map(id => { const it = ITEMS[id];
-    const lbl = it.kind === "bouquet" ? "give to someone" : it.kind === "pot" ? "place it" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${it.to === "evan" ? "Evan" : it.to === "grands" ? "Ma Ma or Gong Gong" : "Darren"}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed Maple" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
+    const lbl = it.kind === "bouquet" ? "give to someone" : it.kind === "pot" ? "place it" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${giftNames(it.to)}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed Maple" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
     // kitchen ingredients can go to the wine shop's larder instead (food can still be fed to Maple)
     const kit = isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
     return itemBtn(id, lbl, it.kind === "seed", (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit); }).join("");
@@ -1876,11 +1906,15 @@ function vineTick(){
   if (typing) persist("fox"); else save(scene === "vineyard" || scene === "wineshop");
 }
 // A stall at the market or fair: what it sells (bought like at Hana's), or an activity for Evan (a kite, face paint)
+// what a stall has out: the produce stall's vegetables and berries follow the season (the same as the seed packets at Hana's)
+const stallItems = st => !st.produce ? st.items : Object.keys(CROPS).filter(c => !["tulip", "sunflower"].includes(c) && ITEMS[c] && Object.values(ITEMS).some(it => it.crop === c && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
+const stallPrice = id => ITEMS[id].price || (ITEMS[id].sell || 2) + 2;
 function marketStallPanel(st){
   const ev = eventNow(dayKey(), sgHM()); if (!ev) return "";
   const who = (NPCS.find(n => n.id === st.id) || {name: "Someone"}).name;
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(st.n)}</h2><p class="sub">${esc(who)}'s stall at the ${esc(ev.name.toLowerCase())}. "${esc(st.line)}"</p>`;
-  if (st.items.length) h += `<div class="items shop">${st.items.map(id => itemBtn(id, `<b>${ITEMS[id].price}</b> ${icon("coin", 13)}`, F.coins < ITEMS[id].price, F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.</p>`;
+  const items = stallItems(st);
+  if (items.length) h += `<div class="items shop">${items.map(id => itemBtn(id, `<b>${stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < stallPrice(id), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.${st.produce ? " Handy when the garden's between harvests: it all goes to the kitchen or to Maple." : ""}</p>`;
   if (st.act) h += `<div class="actions"><button class="btn primary" data-fair="${st.act}" ${evanHere() ? "" : "disabled"}>${st.act === "kite" ? "Get Evan a kite (3 coins)" : "Face paint for Evan (3 coins)"}</button></div>${evanHere() ? "" : `<p class="muted">Bring Evan along for this one.</p>`}`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }

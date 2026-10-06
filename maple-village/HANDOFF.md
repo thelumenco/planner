@@ -748,9 +748,31 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Shoppers come in two waves of 4 (villagers, spare out-of-towners, Sam and Priya; never anyone on a tour). They browse along the stalls, then in the second half of each wave two of them sit on the picnic blankets (`PICNICKERS`). Pip runs about.
   - Stall keepers are never picked for tours or tasting seats that day; Ma Ma doesn't guide Sunday tours.
 - **Wine stall:** it sells from the shop's own `v.shelf` (stock is shared). In `sellTick` the market adds bottle .012 and glass .008 per minute while it's open. Standing at the stall (`serving()` covers the field stall on market days) triples that and pays Mel directly (`opts.stall`). `stallMarketPanel` lists the shelf.
-- **Ma Ma's market stall** shares the farm shop's `o.stock`: `shopPanel(F, today, tab, true)` is the market mode (Fruit and Flowers tabs only, no Plant tab), still free for Mel. While the market's on, `orchTick` sells from the stock at .008 a minute into Ma Ma's tin (the farm shop's own 9–6 rate is replaced during those hours).
+- **Ma Ma's market stall** shares the farm shop's `o.stock`: `shopPanel(F, today, tab, true)` is the market mode (Fruit and Flowers tabs only, no Plant tab), still free for Mel. While the market's on, `orchTick` sells from the stock at .02 a minute (about six things a morning) into Ma Ma's tin (the farm shop's own 9–6 rate is replaced during those hours).
 
 ### Round 58: the market moves up top, Ma Ma's market stall, the tour sign
 - See Round 57 for the stall row along the top of the field (`STALL_SPOTS`, `stallAt`), picnickers and Ma Ma's market stall.
 - **Tour sign** in the orchard (`toursign`, by the path up to the field): `tourBoard(F, today, hm)` in orchard.js lists today's tours (time, guide, who's signed up with visitors marked, the fee, "on now"/"done"), or the next day with tours if today has none left. Chat can go there ("tour sign", "tours").
 - The field arch label moved to (318, 178) and the right-hand lamp to x 334 to make room.
+
+### Round 59: market specials, eight stalls, undo for every purchase
+- **Eight market stalls** along the top (`STALL_SPOTS`, 60 apart, narrower stalls, labels staggered high/low; keepers stand in front of their table):
+  - 0 Cheese (Elena)
+  - 1 Honey (Felix): honey, honeycomb, beeswax candle, honey toast
+  - 2 Produce (Clara): `produce: true`, the vegetables and berries whose seeds are in season, priced at sell + 2 (`stallItems`, `stallPrice` in core.js; `buy(id, price)` takes a price)
+  - 3 Our wines (Ines)
+  - 4 Ma Ma's
+  - 5 Soap (Grace): lavender soap, rose and oat soap, little duck soap, sugar scrub, flower crowns
+  - 6 Craft beer (Ben): pale ale, stout
+  - 7 Bakery (Dev)
+  - The fair's four stalls moved to places 2–5.
+- **Market specials** are `tab: "market"` items, so they're never on Hana's shelves. They're gifts:
+  - `to` can be `"family"` (Evan, Darren, Ma Ma or Gong Gong), `"grands"`, one person, or a list. `giveGift` hands the gift to whichever suitable person is nearest.
+  - `says: {evan, darren, mama, gonggong}` gives each person their own line.
+  - `giftNames(to)` writes "for Darren or Gong Gong" and so on in the shop, the stall and the backpack.
+- **Undo for purchases, game-wide:**
+  - A capture-phase click listener snapshots `F` (as JSON) before every tap. If the tap spent coins, `undoable` offers to restore the snapshot in place, so module references to `F` stay valid.
+  - The bar shows the last `flash` text and the coins spent.
+  - Skipped when the tap already offered its own undo (`undoMark`) or the coins went out as a chore refund (flash starting "-").
+- **Roundabout moved** into the playground between the swings and the slide (`pround` door [188,598]; the art is the old drawing inside `translate(-282 82)`, label above it). It used to sit where the harvest bunting crosses.
+- **The "mosquito" fix:** the roundabout's spokes used `animateTransform type="scale"` around the SVG origin, so the mirroring swept them across the whole vineyard. They now scale inside a `translate(470 498)` group, so they turn in place.

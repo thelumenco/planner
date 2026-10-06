@@ -123,7 +123,7 @@ export function tastingSlot(id, day, hm){
 // Tourist families at the vineyard playground: the kids run between the swings, slide, seesaw and roundabout while a
 // parent watches. One family on weekday afternoons; at weekends the playground is busy morning and afternoon.
 export const FAMILIES = [{parent: "sam", kids: ["lily", "max"]}, {parent: "priya", kids: ["noah"]}, {parent: "jonah", kids: ["zara", "ollie"]}, {parent: "mia", kids: ["ava"]}];
-const PLAY = [[110, 604], [262, 600], [410, 608], [200, 586], [330, 590], [470, 560], [150, 600]], WATCH = [[180, 556], [346, 560], [60, 560], [420, 548]];
+const PLAY = [[110, 604], [262, 600], [410, 608], [188, 584], [330, 590], [470, 590], [150, 600]], WATCH = [[180, 556], [346, 560], [60, 560], [420, 548]];
 export function familyVisits(day){
   const d = dow(day), we = d === 0 || d === 6, h = hash(day), fam = k => FAMILIES[(h + k) % FAMILIES.length], out = [];
   const add = (f, from, to, scene = "vineyard") => { out.push({id: f.parent, from, to, scene, wander: scene === "vineyard" ? WATCH : FIELD_WALK});
@@ -145,17 +145,20 @@ export function familySlot(id, day, hm){
 // above the path. Out-of-towners run most of them; at the Sunday market the wine shop has a stall (Ines minds it, selling
 // from the shop's own shelves) and so does Ma Ma (fruit and flowers from the orchard's farm shop stock).
 // at: which of the six stall places along the top it stands in
-export const STALL_SPOTS = [[56, 128], [132, 128], [208, 128], [284, 128], [360, 128], [436, 128]];
+export const STALL_SPOTS = [[36, 128], [96, 128], [156, 128], [216, 128], [276, 128], [336, 128], [396, 128], [456, 128]];
+// produce: the stall sells whatever vegetables and berries are in season (core.js works out which)
 export const MARKET = [{id: "elena", at: 0, short: "Cheese", n: "Cheese and olives", items: ["cheese", "olives"], col: "#F3C969", line: "Aged on a farm up the hill. Try a slice!"},
-  {id: "felix", at: 1, short: "Honey", n: "Honey and jam", items: ["toast"], col: "#E3A23A", line: "Wildflower honey, from my own bees."},
-  {id: "ines", at: 2, kind: "wine", short: "Our wines", n: "Our wine stall", items: [], col: "#8E2C48", line: "Tastings and bottles, straight from the shop's shelves."},
-  {id: "mama", at: 3, kind: "orchard", short: "Ma Ma's", n: "Ma Ma's fruit and flowers", items: [], col: "#9CC27E", line: "Fresh from the orchard this morning. Come, take some!"},
-  {id: "grace", at: 4, short: "Flowers", n: "Flowers and plants", items: ["crown"], col: "#E8566C", line: "Fresh cut this morning! Flower crowns for the little ones."},
-  {id: "dev", at: 5, short: "Bakery", n: "Bakery", items: ["kaya", "currypuff", "flour"], col: "#C98A4A", line: "Still warm! Kaya buns and curry puffs."}];
-export const FAIR = [{id: "hiro", at: 1, short: "Kites", n: "Kites", items: [], act: "kite", col: "#7FB8E8", line: "Pick a kite, any kite. They all fly!"},
-  {id: "aiko", at: 2, short: "Faces", n: "Face painting", items: [], act: "face", col: "#C9A3E0", line: "Butterflies, tigers, dinosaurs. You choose!"},
-  {id: "ben", at: 3, short: "Lemonade", n: "Lemonade", items: ["apple"], col: "#F3D34A", line: "Fresh lemonade, and apples for the road."},
-  {id: "clara", at: 4, short: "Snacks", n: "Snacks", items: ["dumpling", "ondeh"], col: "#F2A0B8", line: "Dumplings and ondeh-ondeh, made this morning."}];
+  {id: "felix", at: 1, short: "Honey", n: "Honey and bee things", items: ["honey", "honeycomb", "beecandle", "toast"], col: "#E3A23A", line: "Wildflower honey, from my own bees. The candles are pure beeswax."},
+  {id: "clara", at: 2, short: "Produce", n: "Fresh produce", items: [], produce: true, col: "#9CC27E", line: "Picked yesterday, whatever's in season. Have a look!"},
+  {id: "ines", at: 3, kind: "wine", short: "Our wines", n: "Our wine stall", items: [], col: "#8E2C48", line: "Tastings and bottles, straight from the shop's shelves."},
+  {id: "mama", at: 4, kind: "orchard", short: "Ma Ma's", n: "Ma Ma's fruit and flowers", items: [], col: "#E8566C", line: "Fresh from the orchard this morning. Come, take some!"},
+  {id: "grace", at: 5, short: "Soap", n: "Handmade soap", items: ["soap_lav", "soap_rose", "soap_duck", "scrub", "crown"], col: "#C9A3E0", line: "All made by hand, in small batches. Smell the lavender!"},
+  {id: "ben", at: 6, short: "Craft beer", n: "Craft beer", items: ["paleale", "stout"], col: "#D9A441", line: "Brewed in my shed. Well, the shed's quite big."},
+  {id: "dev", at: 7, short: "Bakery", n: "Bakery", items: ["kaya", "currypuff", "flour"], col: "#C98A4A", line: "Still warm! Kaya buns and curry puffs."}];
+export const FAIR = [{id: "hiro", at: 2, short: "Kites", n: "Kites", items: [], act: "kite", col: "#7FB8E8", line: "Pick a kite, any kite. They all fly!"},
+  {id: "aiko", at: 3, short: "Faces", n: "Face painting", items: [], act: "face", col: "#C9A3E0", line: "Butterflies, tigers, dinosaurs. You choose!"},
+  {id: "ben", at: 4, short: "Lemonade", n: "Lemonade", items: ["apple"], col: "#F3D34A", line: "Fresh lemonade, and apples for the road."},
+  {id: "clara", at: 5, short: "Snacks", n: "Snacks", items: ["dumpling", "ondeh"], col: "#F2A0B8", line: "Dumplings and ondeh-ondeh, made this morning."}];
 function lastSaturday(day){ const dt = new Date(day + "T00:00:00Z"); if (dt.getUTCDay() !== 6) return false; const n = new Date(dt.getTime() + 7*864e5); return n.getUTCMonth() !== dt.getUTCMonth(); }
 export function eventOn(day){
   if (dow(day) === 0) return {kind: "market", name: "Sunday farmers market", from: 8*60, to: 13*60, stalls: MARKET, wine: true};
@@ -167,12 +170,12 @@ export const eventNow = (day, hm) => { const e = eventOn(day); return e && hm >=
 export const stallAt = (day, hm, i) => { const e = eventNow(day, hm); return e ? e.stalls.find(s => s.at === i) || null : null; };
 // shoppers at the event: villagers drifting between the stalls along the top in two waves; in each wave two of them
 // settle on the picnic blankets afterwards with what they bought. The keepers stand by their stalls.
-const FIELD_WALK = [[80, 172], [170, 178], [250, 172], [330, 178], [410, 174], [470, 186], [120, 196]], FIELD_PLAY = [[150, 470], [200, 500], [90, 600], [240, 590], [60, 430]];
+const FIELD_WALK = [[60, 172], [140, 178], [220, 172], [300, 178], [380, 174], [450, 182], [120, 196]], FIELD_PLAY = [[150, 470], [200, 500], [90, 600], [240, 590], [60, 430]];
 const PICNICKERS = [[106, 468], [138, 464], [198, 486], [230, 482]];
 export function eventSlot(id, day, hm){
   const e = eventOn(day); if (!e || hm < e.from || hm >= e.to) return null;
   const st = e.stalls.find(s => s.id === id);
-  if (st) return {from: e.from, to: e.to, scene: "field", at: [STALL_SPOTS[st.at][0] + 28, STALL_SPOTS[st.at][1] + 4]};
+  if (st) return {from: e.from, to: e.to, scene: "field", at: [STALL_SPOTS[st.at][0] + 8, STALL_SPOTS[st.at][1] - 2]};
   const mid = e.from + Math.round((e.to - e.from)/2), wave = hm < mid ? 0 : 1, half = Math.round((wave ? e.to - mid : mid - e.from)/2), start = wave ? mid : e.from;
   const crowd = groupFor(day + "ev" + wave, 4, ["pip", ...e.stalls.map(s => s.id), ...toursOn(day).flatMap(t => [t.guide, ...t.group])], [...VISITORS, ...TOURISTS, "sam", "priya"]);
   const k = crowd.indexOf(id);

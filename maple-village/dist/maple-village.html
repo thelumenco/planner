@@ -1993,6 +1993,17 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   I.angku = [`<path d="M4 13c0-4 4-7 8-7s8 3 8 7-4 6-8 6-8-2-8-6z" ${f("#E8434E")}/><path d="M4 18h16" ${f("none")}/>`, `<path d="M4 13c0-4 4-7 8-7s8 3 8 7-4 6-8 6-8-2-8-6z"/><path d="M8 12q4-3 8 0M9 15q3 2 6 0" opacity=".6"/><path d="M3 19.5h18"/>`];
   I.mooncake = [`<circle cx="12" cy="12.5" r="8" ${f("#C98A4A")}/><circle cx="12" cy="12.5" r="5" ${f("#E3B06A")}/>`, `<circle cx="12" cy="12.5" r="8"/><circle cx="12" cy="12.5" r="5"/><path d="M12 9.5v6M9 12.5h6M10 10.5l4 4M14 10.5l-4 4" opacity=".55"/>`];
   I.birdsnest = [`<path d="M6 9h12v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z" ${f("#F6EFE3")}/><rect x="5" y="5" width="14" height="4" rx="1.5" ${f("#C2505F")}/>`, `<path d="M6 9h12v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><rect x="5" y="5" width="14" height="4" rx="1.5"/><path d="M9 14q3 2 6 0" opacity=".6"/>`];
+  I.honey = [`<path d="M7 8h10v10a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3z" ${f(C.honey)}/><rect x="6.5" y="4.5" width="11" height="3.5" rx="1" ${f("#E8D3A6")}/><rect x="8.5" y="11.5" width="7" height="5" rx="1" ${f(C.paper)}/>`, `<path d="M7 8h10v10a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3z"/><rect x="6.5" y="4.5" width="11" height="3.5" rx="1"/><rect x="8.5" y="11.5" width="7" height="5" rx="1"/><path d="M10 14h4" opacity=".6"/>`];
+  I.honeycomb = [`<path d="M3 8h18v10H3z" ${f("#F3C33A")}/>`, `<path d="M3 8h18v10H3z"/><path d="M6 10.5l2 -1.2 2 1.2v2.4l-2 1.2-2-1.2zM10 10.5l2-1.2 2 1.2v2.4l-2 1.2-2-1.2zM14 10.5l2-1.2 2 1.2v2.4l-2 1.2-2-1.2zM8 13.9v2.4l2 1.2 2-1.2v-2.4M12 16.3l2 1.2 2-1.2v-2.4"/><path d="M17 18c0 1.5 .5 2.5 1 3" opacity=".7"/>`];
+  I.beecandle = [`<rect x="8.5" y="9" width="7" height="12" rx="1" ${f("#F3D98A")}/><path d="M12 3.5c1.6 1.8 2 3 2 4a2 2 0 0 1-4 0c0-1 .4-2.2 2-4z" ${f("#F08A3C")}/>`, `<rect x="8.5" y="9" width="7" height="12" rx="1"/><path d="M12 3.5c1.6 1.8 2 3 2 4a2 2 0 0 1-4 0c0-1 .4-2.2 2-4zM12 9.5v-1M8.5 12.5h7M8.5 16h7" /><path d="M10 12.5v3.5M13 12.5v3.5M11.5 16v5" opacity=".5"/>`];
+  var soap = (c) => [`<rect x="3.5" y="8" width="17" height="10" rx="3" ${f(c)}/><path d="M7 4.5q1.5 -1.5 3 0M15 3.5q1.5 -1.5 3 0" ${f("none")}/>`, `<rect x="3.5" y="8" width="17" height="10" rx="3"/><path d="M7 13h10" opacity=".6"/><circle cx="8" cy="5" r="1.4"/><circle cx="16.5" cy="4.2" r="1"/>`];
+  I.soap_lav = soap("#C9A3E0");
+  I.soap_rose = soap("#F2A0B8");
+  I.soap_duck = [`<path d="M5 14c0-3 2.5-4.5 5-4.5h1c-1-1-1.5-2-1.5-3a3 3 0 0 1 6 0c0 1-.5 2-1 2.5 2.5 .5 5 2 5 5 0 3.5-3 5.5-7 5.5S5 17.5 5 14z" ${f("#F3D34A")}/><path d="M15.5 6.5l3 .6-3 1z" ${f("#F08A3C")}/>`, `<path d="M5 14c0-3 2.5-4.5 5-4.5h1c-1-1-1.5-2-1.5-3a3 3 0 0 1 6 0c0 1-.5 2-1 2.5 2.5 .5 5 2 5 5 0 3.5-3 5.5-7 5.5S5 17.5 5 14z"/><circle cx="13.5" cy="6.2" r=".8"/><path d="M15.5 6.5l3 .6-3 1zM9 14q3 2 6 0" />`];
+  I.scrub = [`<path d="M5 10h14v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z" ${f("#FFF6E8")}/><rect x="4.5" y="6.5" width="15" height="3.5" rx="1" ${f("#9CC27E")}/><circle cx="9" cy="15" r="1" ${f(C.rose)}/><circle cx="13" cy="17" r="1" ${f(C.rose)}/><circle cx="15" cy="13.5" r="1" ${f(C.rose)}/>`, `<path d="M5 10h14v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z"/><rect x="4.5" y="6.5" width="15" height="3.5" rx="1"/>`];
+  var beer = (c) => [`<path d="M9.5 9.5V6.5h5v3c1.5 1 2 2 2 3.5V20a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7c0-1.5.5-2.5 2-3.5z" ${f(c)}/><rect x="10" y="3" width="4" height="3.5" rx=".8" ${f(C.honey)}/><rect x="8" y="13" width="8" height="5" rx="1" ${f(C.paper)}/>`, `<path d="M9.5 9.5V6.5h5v3c1.5 1 2 2 2 3.5V20a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7c0-1.5.5-2.5 2-3.5z"/><rect x="10" y="3" width="4" height="3.5" rx=".8"/><rect x="8" y="13" width="8" height="5" rx="1"/><path d="M10 15.5h4" opacity=".6"/>`];
+  I.paleale = beer("#D9A441");
+  I.stout = beer("#4A3226");
   I.essence = [`<path d="M9 7h6v3c2 1 2.5 3 2.5 5v4a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2v-4c0-2 .5-4 2.5-5z" ${f("#8C4A2E")}/><rect x="8.5" y="4" width="7" height="3" rx="1" ${f("#F3C969")}/><rect x="7.5" y="13" width="9" height="5" ${f("#F3C969")}/>`, `<path d="M9 7h6v3c2 1 2.5 3 2.5 5v4a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2v-4c0-2 .5-4 2.5-5z"/><rect x="8.5" y="4" width="7" height="3" rx="1"/><rect x="7.5" y="13" width="9" height="5"/>`];
   I.bakkwa = [`<rect x="4" y="7" width="16" height="11" rx="2" ${f("#A8432E")}/><path d="M6 9.5c3 1 6-1 9 0s3 1 3 1" ${f("none")}/>`, `<rect x="4" y="7" width="16" height="11" rx="2"/><path d="M6 10c3 1.2 6-1 9 0M6 14c3 1.2 6-1 9 0" opacity=".5"/>`];
   I.pineappletarts = [`<circle cx="8" cy="14" r="4.2" ${f("#E9C27A")}/><circle cx="16" cy="14" r="4.2" ${f("#E9C27A")}/><circle cx="12" cy="8.5" r="4.2" ${f("#E9C27A")}/>${[[8, 13], [16, 13], [12, 7.5]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.8" ${f("#E3A23A")}/>`).join("")}`, `<circle cx="8" cy="14" r="4.2"/><circle cx="16" cy="14" r="4.2"/><circle cx="12" cy="8.5" r="4.2"/>`];
@@ -2083,7 +2094,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     pswing: { scene: "vineyard", name: "Swings", door: [110, 594], spot: true, line: "The swings. Wheee!" },
     pslide: { scene: "vineyard", name: "Slide", door: [262, 592], spot: true, line: "The slide. Down you go!" },
     olive: { scene: "vineyard", name: "Olive tree", door: [250, 262], spot: true, line: "The olive tree. Olives every few hours, once it's planted." },
-    pround: { scene: "vineyard", name: "Roundabout", door: [470, 516], spot: true, line: "The roundabout. Round and round and round!" },
+    pround: { scene: "vineyard", name: "Roundabout", door: [188, 598], spot: true, line: "The roundabout. Round and round and round!" },
     pseesaw: { scene: "vineyard", name: "Seesaw", door: [410, 600], spot: true, line: "The seesaw. Up, down, up, down." },
     toOrchard: { scene: "base", name: "Gate to Ma Ma's orchard", door: [26, 180], spot: true, bridge: "orchard", mark: [40, 120], line: "Along the path to Ma Ma's orchard." },
     // Ma Ma's orchard, west of home: fruit trees, the farm shop and her cottage; her flower farm is further west
@@ -2101,12 +2112,14 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     lake: { scene: "field", name: "The lake", door: [220, 378], spot: true, line: "The lake. Two swans, very dignified." },
     picnic: { scene: "field", name: "Picnic spot", door: [140, 484], spot: true, line: "A blanket and a basket. Perfect for lunch outside." },
     // market and fair days: the stalls (who's behind each one comes from tours.js) and the wine shop's own stall
-    mstall0: { scene: "field", name: "Stall", door: [56, 160], spot: true, line: "A market stall." },
-    mstall1: { scene: "field", name: "Stall", door: [132, 160], spot: true, line: "A market stall." },
-    mstall2: { scene: "field", name: "Stall", door: [208, 160], spot: true, line: "A market stall." },
-    mstall3: { scene: "field", name: "Stall", door: [284, 160], spot: true, line: "A market stall." },
-    mstall4: { scene: "field", name: "Stall", door: [360, 160], spot: true, line: "A market stall." },
-    mstall5: { scene: "field", name: "Stall", door: [436, 160], spot: true, line: "A market stall." },
+    mstall0: { scene: "field", name: "Stall", door: [36, 164], spot: true, line: "A market stall." },
+    mstall1: { scene: "field", name: "Stall", door: [96, 164], spot: true, line: "A market stall." },
+    mstall2: { scene: "field", name: "Stall", door: [156, 164], spot: true, line: "A market stall." },
+    mstall3: { scene: "field", name: "Stall", door: [216, 164], spot: true, line: "A market stall." },
+    mstall4: { scene: "field", name: "Stall", door: [276, 164], spot: true, line: "A market stall." },
+    mstall5: { scene: "field", name: "Stall", door: [336, 164], spot: true, line: "A market stall." },
+    mstall6: { scene: "field", name: "Stall", door: [396, 164], spot: true, line: "A market stall." },
+    mstall7: { scene: "field", name: "Stall", door: [456, 164], spot: true, line: "A market stall." },
     pitch: { scene: "field", name: "Football pitch", door: [150, 600], spot: true, line: "The football pitch. Kids play here after school." },
     toTown: { scene: "base", name: "Bridge to town", door: [260, 114], spot: true, bridge: "village", mark: [260, 62], line: "Over the river to the town square." }
   };
@@ -2385,6 +2398,82 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     bakchang: { n: "Rice dumplings", kind: "gift", to: "grands", price: 6, tab: "family", seasons: ["summer"], say: "Bak chang! Like the ones my mother used to wrap." },
     logcake: { n: "Christmas log cake", kind: "gift", to: "grands", price: 14, tab: "family", seasons: ["winter"], say: "A log cake! So festive. Come, cut a big slice for Evan." },
     essence: { n: "Chicken essence", kind: "gift", to: "grands", price: 10, tab: "family", say: "Chicken essence! One every morning, then strong like an ox." },
+    // Sunday farmers market specials (tab "market": only sold at the market stalls, never at Hana's). Gifts for the family:
+    // to "family" goes to whichever of Evan, Darren, Ma Ma and Gong Gong is nearest; a list names who it suits.
+    // says: what each one says (falls back to say)
+    honey: {
+      n: "Jar of wildflower honey",
+      kind: "gift",
+      to: "family",
+      price: 8,
+      tab: "market",
+      say: "Wildflower honey! Straight from the bees.",
+      says: { evan: "Honey! Like Pooh bear! Can I lick the spoon?", darren: "Proper honey. That's going in my tea.", mama: "Honey! Good for the throat. Ma Ma will make honey lemon.", gonggong: "Raw honey? Wah, this one is the real thing." }
+    },
+    honeycomb: {
+      n: "Honeycomb",
+      kind: "gift",
+      to: "family",
+      price: 10,
+      tab: "market",
+      say: "A whole piece of honeycomb! You chew the wax.",
+      says: { evan: "It's all sticky and hexagons! Bees made this?", darren: "Honeycomb on toast tomorrow. Sorted.", mama: "Honeycomb! When Ma Ma was small this was such a treat.", gonggong: "Honeycomb! Chew chew, then spit out the wax. Like last time." }
+    },
+    beecandle: {
+      n: "Beeswax candle",
+      kind: "gift",
+      to: ["darren", "mama", "gonggong"],
+      price: 9,
+      tab: "market",
+      say: "A beeswax candle. It smells like honey when it burns.",
+      says: { darren: "Smells like honey. Nice for the evenings.", mama: "So pretty! Ma Ma will light it at dinner.", gonggong: "Beeswax? Burns long, this one. Good quality." }
+    },
+    soap_lav: {
+      n: "Lavender soap",
+      kind: "gift",
+      to: ["darren", "mama", "gonggong"],
+      price: 6,
+      tab: "market",
+      say: "Handmade lavender soap. It smells like a garden.",
+      says: { darren: "Lavender. Very relaxing. I'll take the hint.", mama: "Smell! So fragrant. Too nice to use!", gonggong: "Soap? Ah, it smells nice. Put in the bathroom." }
+    },
+    soap_rose: {
+      n: "Rose and oat soap",
+      kind: "gift",
+      to: ["darren", "mama", "gonggong"],
+      price: 6,
+      tab: "market",
+      say: "Rose and oat soap, made by hand.",
+      says: { mama: "Rose! Ma Ma's favourite. You remember.", darren: "Rose and oat? Fancy. Thank you.", gonggong: "Rose? For Ma Ma, I think. I'll give it to her." }
+    },
+    soap_duck: { n: "Little duck soap", kind: "gift", to: "evan", price: 5, tab: "market", say: "A DUCK soap! Bath time! Quack quack!" },
+    scrub: {
+      n: "Sugar scrub",
+      kind: "gift",
+      to: ["darren", "mama"],
+      price: 9,
+      tab: "market",
+      say: "A sugar scrub, all handmade.",
+      says: { mama: "Scrub for the hands! After gardening, so good.", darren: "Sugar scrub? I'll try it. Don't tell anyone." }
+    },
+    paleale: {
+      n: "Craft pale ale",
+      kind: "gift",
+      to: ["darren", "gonggong"],
+      price: 8,
+      tab: "market",
+      say: "A craft pale ale. Brewed just up the road.",
+      says: { darren: "Ooh, a local pale ale. That's my Sunday arvo sorted.", gonggong: "Beer! Cold one, later. Don't tell Ma Ma." }
+    },
+    stout: {
+      n: "Craft stout",
+      kind: "gift",
+      to: ["darren", "gonggong"],
+      price: 9,
+      tab: "market",
+      say: "A dark craft stout, small batch.",
+      says: { darren: "A stout! Rich and dark. I'm saving this for the weekend.", gonggong: "Black beer! Like Guinness last time. Very good." }
+    },
     sandpit: { n: "Sandpit", kind: "keep", to: "evan", price: 150, tab: "family", say: "A sandpit at home! Evan's already digging." },
     truck: { n: "Toy truck", kind: "keep", to: "evan", price: 80, tab: "family", say: "Vroom vroom! Evan won't put it down." },
     headphones: { n: "Headphones", kind: "keep", to: "darren", price: 120, tab: "family", say: "Noise-cancelling! Darren's calls just got calmer." },
@@ -3998,7 +4087,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     return v ? { from: v.from, to: v.to, scene: "wineshop", at: v.at, act: "sit" } : null;
   }
   var FAMILIES = [{ parent: "sam", kids: ["lily", "max"] }, { parent: "priya", kids: ["noah"] }, { parent: "jonah", kids: ["zara", "ollie"] }, { parent: "mia", kids: ["ava"] }];
-  var PLAY = [[110, 604], [262, 600], [410, 608], [200, 586], [330, 590], [470, 560], [150, 600]];
+  var PLAY = [[110, 604], [262, 600], [410, 608], [188, 584], [330, 590], [470, 590], [150, 600]];
   var WATCH = [[180, 556], [346, 560], [60, 560], [420, 548]];
   function familyVisits(day) {
     const d = dow(day), we = d === 0 || d === 6, h = hash(day), fam = (k) => FAMILIES[(h + k) % FAMILIES.length], out = [];
@@ -4027,20 +4116,22 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     const v = familyVisits(day).find((x) => x.id === id && hm2 >= x.from && hm2 < x.to);
     return v ? { from: v.from, to: v.to, scene: v.scene, wander: v.wander } : null;
   }
-  var STALL_SPOTS = [[56, 128], [132, 128], [208, 128], [284, 128], [360, 128], [436, 128]];
+  var STALL_SPOTS = [[36, 128], [96, 128], [156, 128], [216, 128], [276, 128], [336, 128], [396, 128], [456, 128]];
   var MARKET = [
     { id: "elena", at: 0, short: "Cheese", n: "Cheese and olives", items: ["cheese", "olives"], col: "#F3C969", line: "Aged on a farm up the hill. Try a slice!" },
-    { id: "felix", at: 1, short: "Honey", n: "Honey and jam", items: ["toast"], col: "#E3A23A", line: "Wildflower honey, from my own bees." },
-    { id: "ines", at: 2, kind: "wine", short: "Our wines", n: "Our wine stall", items: [], col: "#8E2C48", line: "Tastings and bottles, straight from the shop's shelves." },
-    { id: "mama", at: 3, kind: "orchard", short: "Ma Ma's", n: "Ma Ma's fruit and flowers", items: [], col: "#9CC27E", line: "Fresh from the orchard this morning. Come, take some!" },
-    { id: "grace", at: 4, short: "Flowers", n: "Flowers and plants", items: ["crown"], col: "#E8566C", line: "Fresh cut this morning! Flower crowns for the little ones." },
-    { id: "dev", at: 5, short: "Bakery", n: "Bakery", items: ["kaya", "currypuff", "flour"], col: "#C98A4A", line: "Still warm! Kaya buns and curry puffs." }
+    { id: "felix", at: 1, short: "Honey", n: "Honey and bee things", items: ["honey", "honeycomb", "beecandle", "toast"], col: "#E3A23A", line: "Wildflower honey, from my own bees. The candles are pure beeswax." },
+    { id: "clara", at: 2, short: "Produce", n: "Fresh produce", items: [], produce: true, col: "#9CC27E", line: "Picked yesterday, whatever's in season. Have a look!" },
+    { id: "ines", at: 3, kind: "wine", short: "Our wines", n: "Our wine stall", items: [], col: "#8E2C48", line: "Tastings and bottles, straight from the shop's shelves." },
+    { id: "mama", at: 4, kind: "orchard", short: "Ma Ma's", n: "Ma Ma's fruit and flowers", items: [], col: "#E8566C", line: "Fresh from the orchard this morning. Come, take some!" },
+    { id: "grace", at: 5, short: "Soap", n: "Handmade soap", items: ["soap_lav", "soap_rose", "soap_duck", "scrub", "crown"], col: "#C9A3E0", line: "All made by hand, in small batches. Smell the lavender!" },
+    { id: "ben", at: 6, short: "Craft beer", n: "Craft beer", items: ["paleale", "stout"], col: "#D9A441", line: "Brewed in my shed. Well, the shed's quite big." },
+    { id: "dev", at: 7, short: "Bakery", n: "Bakery", items: ["kaya", "currypuff", "flour"], col: "#C98A4A", line: "Still warm! Kaya buns and curry puffs." }
   ];
   var FAIR = [
-    { id: "hiro", at: 1, short: "Kites", n: "Kites", items: [], act: "kite", col: "#7FB8E8", line: "Pick a kite, any kite. They all fly!" },
-    { id: "aiko", at: 2, short: "Faces", n: "Face painting", items: [], act: "face", col: "#C9A3E0", line: "Butterflies, tigers, dinosaurs. You choose!" },
-    { id: "ben", at: 3, short: "Lemonade", n: "Lemonade", items: ["apple"], col: "#F3D34A", line: "Fresh lemonade, and apples for the road." },
-    { id: "clara", at: 4, short: "Snacks", n: "Snacks", items: ["dumpling", "ondeh"], col: "#F2A0B8", line: "Dumplings and ondeh-ondeh, made this morning." }
+    { id: "hiro", at: 2, short: "Kites", n: "Kites", items: [], act: "kite", col: "#7FB8E8", line: "Pick a kite, any kite. They all fly!" },
+    { id: "aiko", at: 3, short: "Faces", n: "Face painting", items: [], act: "face", col: "#C9A3E0", line: "Butterflies, tigers, dinosaurs. You choose!" },
+    { id: "ben", at: 4, short: "Lemonade", n: "Lemonade", items: ["apple"], col: "#F3D34A", line: "Fresh lemonade, and apples for the road." },
+    { id: "clara", at: 5, short: "Snacks", n: "Snacks", items: ["dumpling", "ondeh"], col: "#F2A0B8", line: "Dumplings and ondeh-ondeh, made this morning." }
   ];
   function lastSaturday(day) {
     const dt = /* @__PURE__ */ new Date(day + "T00:00:00Z");
@@ -4061,14 +4152,14 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     const e = eventNow(day, hm2);
     return e ? e.stalls.find((s) => s.at === i) || null : null;
   };
-  var FIELD_WALK = [[80, 172], [170, 178], [250, 172], [330, 178], [410, 174], [470, 186], [120, 196]];
+  var FIELD_WALK = [[60, 172], [140, 178], [220, 172], [300, 178], [380, 174], [450, 182], [120, 196]];
   var FIELD_PLAY = [[150, 470], [200, 500], [90, 600], [240, 590], [60, 430]];
   var PICNICKERS = [[106, 468], [138, 464], [198, 486], [230, 482]];
   function eventSlot(id, day, hm2) {
     const e = eventOn(day);
     if (!e || hm2 < e.from || hm2 >= e.to) return null;
     const st6 = e.stalls.find((s) => s.id === id);
-    if (st6) return { from: e.from, to: e.to, scene: "field", at: [STALL_SPOTS[st6.at][0] + 28, STALL_SPOTS[st6.at][1] + 4] };
+    if (st6) return { from: e.from, to: e.to, scene: "field", at: [STALL_SPOTS[st6.at][0] + 8, STALL_SPOTS[st6.at][1] - 2] };
     const mid = e.from + Math.round((e.to - e.from) / 2), wave = hm2 < mid ? 0 : 1, half = Math.round((wave ? e.to - mid : mid - e.from) / 2), start = wave ? mid : e.from;
     const crowd = groupFor(day + "ev" + wave, 4, ["pip", ...e.stalls.map((s) => s.id), ...toursOn(day).flatMap((t2) => [t2.guide, ...t2.group])], [...VISITORS, ...TOURISTS, "sam", "priya"]);
     const k = crowd.indexOf(id);
@@ -5125,7 +5216,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
         if (!(mkt && mkt.kind === "market") && (m < 9 * 60 || m >= 18 * 60)) continue;
         const ids = Object.keys(o.stock).filter((x) => o.stock[x] > 0);
         if (!ids.length) break;
-        if (Math.random() < (mkt && mkt.kind === "market" ? 8e-3 : 16e-4 * (we ? 1.5 : 1))) {
+        if (Math.random() < (mkt && mkt.kind === "market" ? 0.02 : 16e-4 * (we ? 1.5 : 1))) {
           const id = ids[Math.floor(Math.random() * ids.length)];
           o.stock[id]--;
           if (!o.stock[id]) delete o.stock[id];
@@ -5363,19 +5454,19 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       <path d="M16 -26 l5 1.5 l-5 1.5z" style="fill:#F08A3C"/><circle cx="14" cy="-25.5" r=".8" style="fill:var(--line)"/>
     </g></g></g>`;
   var ripples = (pts) => pts.map(([x, y]) => `<path class="ripple" d="M${x} ${y} q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>`).join("");
-  var stall = (i, x, y, s) => s.kind === "wine" ? wineStall(i, x, y) : `<g data-place="mstall${i}" aria-label="${s.n} stall"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="34" ry="9" style="fill:var(--butter)"/>
+  var stall = (i, x, y, s) => s.kind === "wine" ? wineStall(i, x, y) : `<g data-place="mstall${i}" aria-label="${s.n} stall"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="28" ry="8" style="fill:var(--butter)"/>
   ${sk(
-    `<rect x="${x - 28}" y="${y - 22}" width="56" height="22" rx="2" style="fill:#C9A27E"/><path d="M${x - 34} ${y - 40} h68 l-4 12 h-60z" style="fill:${s.col}"/>${[0, 1, 2].map((k) => `<path d="M${x - 26 + k * 20} ${y - 40} l-2 12 h8 l2 -12z" style="fill:#FFFDF6"/>`).join("")}
-    ${[[-16, -26], [-6, -27], [4, -26], [14, -27]].map(([dx, dy], k) => `<circle cx="${x + dx}" cy="${y + dy}" r="3.4" style="fill:${(s.kind === "orchard" ? ["#D9433A", "#E8566C", "#F3C969", "#C9A3E0"] : ["#E8566C", "#F3C969", "#9CC27E", "#C98A4A"])[(k + i) % 4]}"/>`).join("")}`,
-    `<rect x="${x - 28}" y="${y - 22}" width="56" height="22" rx="2"/><path d="M${x - 34} ${y - 40} h68 l-4 12 h-60z M${x - 30} ${y - 28} v6 M${x + 30} ${y - 28} v6"/>`
+    `<rect x="${x - 23}" y="${y - 22}" width="46" height="22" rx="2" style="fill:#C9A27E"/><path d="M${x - 28} ${y - 40} h56 l-4 12 h-48z" style="fill:${s.col}"/>${[0, 1, 2].map((k) => `<path d="M${x - 22 + k * 16} ${y - 40} l-2 12 h6 l2 -12z" style="fill:#FFFDF6"/>`).join("")}
+    ${[[-14, -26], [-5, -27], [4, -26], [13, -27]].map(([dx, dy], k) => `<circle cx="${x + dx}" cy="${y + dy}" r="3.2" style="fill:${(s.kind === "orchard" ? ["#D9433A", "#E8566C", "#F3C969", "#C9A3E0"] : ["#E8566C", "#F3C969", "#9CC27E", "#C98A4A"])[(k + i) % 4]}"/>`).join("")}`,
+    `<rect x="${x - 23}" y="${y - 22}" width="46" height="22" rx="2"/><path d="M${x - 28} ${y - 40} h56 l-4 12 h-48z M${x - 25} ${y - 28} v6 M${x + 25} ${y - 28} v6"/>`
   )}
-  ${tapeLabel(x, y + 18, s.short, "var(--card)", 10)}</g>`;
-  var wineStall = (i, x, y) => `<g data-place="mstall${i}" aria-label="The wine shop's market stall"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="36" ry="9" style="fill:var(--butter)"/>
+  ${tapeLabel(x, y + (i % 2 ? 30 : 16), s.short, "var(--card)", 9)}</g>`;
+  var wineStall = (i, x, y) => `<g data-place="mstall${i}" aria-label="The wine shop's market stall"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="29" ry="8" style="fill:var(--butter)"/>
   ${sk(
-    `<rect x="${x - 30}" y="${y - 22}" width="60" height="22" rx="2" style="fill:#8B5E3C"/><path d="M${x - 36} ${y - 40} h72 l-4 12 h-64z" style="fill:#8E2C48"/>${[-18, -8, 2, 12].map((dx, k) => `<path d="M${x + dx} ${y - 24} h5 l-.5 -9 h-4z" style="fill:${k % 2 ? "#E98AA0" : "#5B2338"}"/>`).join("")}`,
-    `<rect x="${x - 30}" y="${y - 22}" width="60" height="22" rx="2"/><path d="M${x - 36} ${y - 40} h72 l-4 12 h-64z M${x - 32} ${y - 28} v6 M${x + 32} ${y - 28} v6"/>`
+    `<rect x="${x - 24}" y="${y - 22}" width="48" height="22" rx="2" style="fill:#8B5E3C"/><path d="M${x - 29} ${y - 40} h58 l-4 12 h-50z" style="fill:#8E2C48"/>${[-16, -7, 2, 11].map((dx, k) => `<path d="M${x + dx} ${y - 24} h5 l-.5 -9 h-4z" style="fill:${k % 2 ? "#E98AA0" : "#5B2338"}"/>`).join("")}`,
+    `<rect x="${x - 24}" y="${y - 22}" width="48" height="22" rx="2"/><path d="M${x - 29} ${y - 40} h58 l-4 12 h-50z M${x - 26} ${y - 28} v6 M${x + 26} ${y - 28} v6"/>`
   )}
-  ${tapeLabel(x, y + 18, "Our wines", "#E8B4C0", 10)}</g>`;
+  ${tapeLabel(x, y + (i % 2 ? 30 : 16), "Our wines", "#E8B4C0", 9)}</g>`;
   var blanket2 = () => `<g pointer-events="none">${sk(`<path d="M176 474 l50 -5 l7 22 l-50 5z" style="fill:#7FB8E8"/>${[0, 1].map((k) => `<path d="M${186 + k * 18} ${473 - k * 2} l7 22" style="stroke:#FFFDF6" stroke-width="4"/>`).join("")}`, `<path d="M176 474 l50 -5 l7 22 l-50 5z"/>`)}</g>`;
   var kites = `<g pointer-events="none">${[[150, 110, "#E8566C"], [260, 86, "#7FB8E8"], [360, 120, "#F3C969"]].map(([x, y, c], k) => `<g><animateTransform attributeName="transform" type="translate" values="0 0; ${6 - k * 4} -8; 0 0" dur="${5 + k}s" repeatCount="indefinite"/>
   <g ${W2}><path d="M${x} ${y - 14} l10 14 l-10 14 l-10 -14z" style="fill:${c}"/><path d="M${x} ${y + 14} q6 30 -10 60 q-10 30 4 60" fill="none" stroke-width="1"/></g></g>`).join("")}</g>`;
@@ -5644,10 +5735,10 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     )}</g>
     ${sk(`<path d="M402 592 l8 -16 l8 16z" style="fill:#C46A4A"/>`, `<path d="M402 592 l8 -16 l8 16z"/>`)}
     ${tapeLabel(410, 620, "Seesaw", "var(--sky)", 10)}</g>`;
-    const round = `<g data-place="pround" aria-label="Roundabout"><ellipse class="hov" cx="470" cy="508" rx="34" ry="9" style="fill:var(--butter)"/>
+    const round = `<g data-place="pround" aria-label="Roundabout"><g transform="translate(-282 82)"><ellipse class="hov" cx="470" cy="508" rx="34" ry="9" style="fill:var(--butter)"/>
     ${sk(`<ellipse cx="470" cy="502" rx="28" ry="9" style="fill:#E8566C"/><ellipse cx="470" cy="498" rx="28" ry="9" style="fill:#F3C969"/>`, `<ellipse cx="470" cy="502" rx="28" ry="9"/><ellipse cx="470" cy="498" rx="28" ry="9"/><path d="M470 498 v-16 M458 488 h24"/>`)}
-    <g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.6" fill="none"><path d="M470 498 l20 -3 M470 498 l-20 -3 M470 498 l8 6 M470 498 l-8 6"><animateTransform attributeName="transform" type="scale" values="1 1; -1 1; 1 1" dur="6s" repeatCount="indefinite" additive="sum"/></path></g>
-    ${tapeLabel(474, 536, "Roundabout", "var(--peri)", 10)}</g>`;
+    <g transform="translate(470 498)"><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.6" fill="none"><path d="M0 0 l20 -3 M0 0 l-20 -3 M0 0 l8 6 M0 0 l-8 6"><animateTransform attributeName="transform" type="scale" values="1 1; -1 1; 1 1" dur="6s" repeatCount="indefinite"/></path></g></g>
+    ${tapeLabel(472, 462, "Roundabout", "var(--peri)", 10)}</g></g>`;
     return `<g filter="url(#wob)"><ellipse cx="262" cy="584" rx="236" ry="48" style="fill:#EAD9B0"/></g>` + swing + slide + seesaw + round;
   }
   function vineyardArt() {
@@ -12387,6 +12478,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var undoT = null;
   var undoFn = null;
   function undoable(msg, restore) {
+    undoMark++;
     undoFn = restore;
     $("undoMsg").textContent = plain(msg);
     $("undoBar").hidden = false;
@@ -12396,6 +12488,28 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       undoFn = null;
     }, 7e3);
   }
+  var undoMark = 0;
+  var lastFlash = "";
+  document.addEventListener("click", (e) => {
+    if (!F || e.target.closest && e.target.closest("#undoBar")) return;
+    const c0 = F.coins, snap = JSON.stringify(F), m0 = undoMark, F0 = F;
+    lastFlash = "";
+    setTimeout(() => {
+      if (F !== F0 || F.coins >= c0 || undoMark !== m0 || /^-/.test(lastFlash)) return;
+      const spent = c0 - F.coins, what = lastFlash;
+      undoable(`${what ? what.replace(/[.!]$/, "") + " · " : "Spent "}${spent} coin${spent === 1 ? "" : "s"}`, () => {
+        const was = JSON.parse(snap);
+        Object.keys(F).forEach((k) => delete F[k]);
+        Object.assign(F, was);
+        flash(`Undone: ${spent} coin${spent === 1 ? "" : "s"} back`);
+        resetScene();
+        save2(true);
+        ctx();
+        drawScene();
+        render();
+      });
+    }, 0);
+  }, true);
   $("undoBtn").onclick = () => {
     const f2 = undoFn;
     undoFn = null;
@@ -12408,6 +12522,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var earnT;
   function flash(msg) {
+    lastFlash = msg;
     const e = $("earn");
     e.textContent = plain(msg);
     clearTimeout(earnT);
@@ -14003,6 +14118,9 @@ Then tell chat "wind down" whenever you're ready.`
   }
   var DARREN_AT = { base: "outside at home", home: "inside the house", farm: "in the garden" };
   var bubbleT = null;
+  var GIFT_NAME = { evan: "Evan", darren: "Darren", mama: "Ma Ma", gonggong: "Gong Gong" };
+  var giftWho = (to) => to === "family" ? ["evan", "darren", "mama", "gonggong"] : to === "grands" ? ["mama", "gonggong"] : Array.isArray(to) ? to : [to];
+  var giftNames = (to) => to === "grands" ? "Ma Ma or Gong Gong" : to === "family" ? "the family" : giftWho(to).map((g) => GIFT_NAME[g]).join(giftWho(to).length > 2 ? ", " : " or ").replace(/, ([^,]*)$/, " or $1");
   function giveGift(id) {
     const it = ITEMS[id];
     if (!it || !F.inv[id]) return;
@@ -14013,7 +14131,22 @@ Then tell chat "wind down" whenever you're ready.`
         ctx();
       }
     };
-    if (it.to === "evan") {
+    const who3 = giftWho(it.to);
+    let to = it.to, g = null;
+    if (who3.length > 1 && it.to !== "grands") {
+      const here = who3.map((w) => [w, w === "evan" ? evanHere() ? evan : null : w === "darren" ? isHere("darren") ? npcPos("darren") : null : npcPos(w)]).filter(([, p]) => p).sort((a, b) => Math.hypot(a[1].x - mel.x, a[1].y - mel.y) - Math.hypot(b[1].x - mel.x, b[1].y - mel.y))[0];
+      if (!here) {
+        speak(`That's a present for ${giftNames(it.to)}. Give it to ${who3.length > 2 ? "one of them" : "either of them"} in person!`, 4500);
+        return;
+      }
+      to = here[0] === "mama" || here[0] === "gonggong" ? "grands" : here[0];
+      g = to === "grands" ? here[0] : null;
+    } else if (who3.length === 1 && (who3[0] === "mama" || who3[0] === "gonggong")) {
+      to = "grands";
+      g = who3[0];
+    } else if (who3.length === 1) to = who3[0];
+    const say3 = (w) => it.says && it.says[w] || it.say;
+    if (to === "evan") {
       if (!evanHere()) {
         speak("Evan's at home. Give it to him there!", 3500);
         return;
@@ -14025,7 +14158,7 @@ Then tell chat "wind down" whenever you're ready.`
       evan.run = true;
       evan.wait = 5;
       showMap();
-      evanSays(it.say);
+      evanSays(say3("evan"));
       burst(evan.x, evan.y);
       sfx("chime");
       flash(`Evan loved the ${it.n.toLowerCase()}!`);
@@ -14050,21 +14183,21 @@ Then tell chat "wind down" whenever you're ready.`
         flash("Evan picked you a tulip");
         save2();
       }, 4e3);
-    } else if (it.to === "grands") {
-      const here = ["mama", "gonggong"].map((g2) => [g2, npcPos(g2)]).filter(([, p2]) => p2).sort((a, b) => Math.hypot(a[1].x - mel.x, a[1].y - mel.y) - Math.hypot(b[1].x - mel.x, b[1].y - mel.y))[0];
+    } else if (to === "grands") {
+      const here = (g ? [g] : ["mama", "gonggong"]).map((g2) => [g2, npcPos(g2)]).filter(([, p2]) => p2).sort((a, b) => Math.hypot(a[1].x - mel.x, a[1].y - mel.y) - Math.hypot(b[1].x - mel.x, b[1].y - mel.y))[0];
       if (!here) {
         const w = whereIs("mama");
         speak(`Ma Ma and Gong Gong aren't here. ${w === "cottage" ? "They're home in the cottage" : w ? "Ma Ma's out at the " + ({ orchard: "orchard", flowers: "flower farm", village: "town square", vineyard: "vineyard", base: "house", field: "field" }[w] || w) : "Try the orchard"}. Give it to them in person!`, 4500);
         return;
       }
-      const [g, p] = here;
+      const [gp, p] = here;
       addInv(id, -1);
-      F.fam.gifts[g] = (F.fam.gifts[g] || 0) + 1;
+      F.fam.gifts[gp] = (F.fam.gifts[gp] || 0) + 1;
       showMap();
-      npcSay(g, it.say + (g === "mama" ? " I love you." : ""));
+      npcSay(gp, say3(gp) + (gp === "mama" ? " I love you." : ""));
       burst(p.x, p.y - 20);
       sfx("chime");
-      flash(`${g === "mama" ? "Ma Ma" : "Gong Gong"} loved the ${it.n.toLowerCase()}`);
+      flash(`${gp === "mama" ? "Ma Ma" : "Gong Gong"} loved the ${it.n.toLowerCase()}`);
     } else {
       if (!isHere("darren")) {
         const w = whereIs("darren");
@@ -14074,7 +14207,7 @@ Then tell chat "wind down" whenever you're ready.`
       addInv(id, -1);
       const n = ++F.fam.gifts.darren;
       showMap();
-      npcSay("darren", it.say);
+      npcSay("darren", say3("darren"));
       const p = npcPos("darren");
       if (p) burst(p.x, p.y - 20);
       sfx("chime");
@@ -14125,9 +14258,11 @@ Then tell chat "wind down" whenever you're ready.`
       save2();
     }
   }
-  function buy2(id) {
+  function buy2(id, price) {
     const it = ITEMS[id];
-    if (!it || F.coins < it.price || it.need && S2.earned < it.need) return;
+    if (!it) return;
+    price = price || it.price;
+    if (!price || F.coins < price || it.need && S2.earned < it.need) return;
     if (it.kind === "keep") {
       if (F.fam.owned[id]) return;
       F.coins -= it.price;
@@ -14153,7 +14288,7 @@ Then tell chat "wind down" whenever you're ready.`
       return;
     }
     if (it.kind === "tool" && F.inv[id]) return;
-    F.coins -= it.price;
+    F.coins -= price;
     addInv(id, 1);
     flash(`Bought ${it.n.toLowerCase()}`);
     speak(pick(["Ooh, good choice!", "Into the backpack it goes.", "Lovely pick!"]), 2500);
@@ -14456,7 +14591,7 @@ Then tell chat "wind down" whenever you're ready.`
         if (shopTab === "seeds") h += `<p class="muted" style="grid-column:1/-1">${SEASONS[season].n} seeds: ${SEASONS[season].line.toLowerCase()}. New ones arrive each season, and anything you've already bought or planted keeps growing.</p>`;
         h += Object.keys(ITEMS).filter((id) => ITEMS[id].tab === shopTab && (!ITEMS[id].seasons || ITEMS[id].seasons.includes(season))).map((id) => {
           const it = ITEMS[id], locked = it.need && S2.earned < it.need, owned = it.kind === "keep" ? F.fam.owned[id] : it.kind === "tool" && F.inv[id];
-          const extra2 = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)} · ${CROPS[it.crop].yield || 1} a harvest` : it.to ? ` · ${it.to === "evan" ? "Evan" : it.to === "grands" ? "Ma Ma and Gong Gong" : "Darren"}` : "";
+          const extra2 = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)} · ${CROPS[it.crop].yield || 1} a harvest` : it.to ? ` · for ${giftNames(it.to)}` : "";
           if (it.kind === "pet") {
             const full = roomLeft(F) <= 0;
             return itemBtn(id, full ? "the run is full" : `<b>${it.price}</b> ${icon("coin", 13)}`, full || F.coins < it.price);
@@ -14706,7 +14841,7 @@ Then tell chat "wind down" whenever you're ready.`
       if (scene === "market") {
         shopTab === "sell" ? sell(id) : buy2(id);
       } else if (scene === "field" && fieldView) {
-        buy2(id);
+        buy2(id, stallPrice(id));
         ctx();
       } else if (scene === "farm") plant3(selPlot, id);
     });
@@ -14897,7 +15032,7 @@ Then tell chat "wind down" whenever you're ready.`
     ids.sort((a, b) => order.indexOf(ITEMS[a].kind) - order.indexOf(ITEMS[b].kind));
     $("bag").innerHTML = ids.map((id) => {
       const it = ITEMS[id];
-      const lbl = it.kind === "bouquet" ? "give to someone" : it.kind === "pot" ? "place it" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${it.to === "evan" ? "Evan" : it.to === "grands" ? "Ma Ma or Gong Gong" : "Darren"}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed Maple" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
+      const lbl = it.kind === "bouquet" ? "give to someone" : it.kind === "pot" ? "place it" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${giftNames(it.to)}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed Maple" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
       const kit = isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
       return itemBtn(id, lbl, it.kind === "seed", (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit);
     }).join("");
@@ -15837,12 +15972,15 @@ Then tell chat "wind down" whenever you're ready.`
     if (typing) persist("fox");
     else save2(scene === "vineyard" || scene === "wineshop");
   }
+  var stallItems = (st6) => !st6.produce ? st6.items : Object.keys(CROPS).filter((c) => !["tulip", "sunflower"].includes(c) && ITEMS[c] && Object.values(ITEMS).some((it) => it.crop === c && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
+  var stallPrice = (id) => ITEMS[id].price || (ITEMS[id].sell || 2) + 2;
   function marketStallPanel(st6) {
     const ev = eventNow(dayKey(), sgHM());
     if (!ev) return "";
     const who3 = (NPCS.find((n) => n.id === st6.id) || { name: "Someone" }).name;
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(st6.n)}</h2><p class="sub">${esc(who3)}'s stall at the ${esc(ev.name.toLowerCase())}. "${esc(st6.line)}"</p>`;
-    if (st6.items.length) h += `<div class="items shop">${st6.items.map((id) => itemBtn(id, `<b>${ITEMS[id].price}</b> ${icon("coin", 13)}`, F.coins < ITEMS[id].price, F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.</p>`;
+    const items = stallItems(st6);
+    if (items.length) h += `<div class="items shop">${items.map((id) => itemBtn(id, `<b>${stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < stallPrice(id), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.${st6.produce ? " Handy when the garden's between harvests: it all goes to the kitchen or to Maple." : ""}</p>`;
     if (st6.act) h += `<div class="actions"><button class="btn primary" data-fair="${st6.act}" ${evanHere() ? "" : "disabled"}>${st6.act === "kite" ? "Get Evan a kite (3 coins)" : "Face paint for Evan (3 coins)"}</button></div>${evanHere() ? "" : `<p class="muted">Bring Evan along for this one.</p>`}`;
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }

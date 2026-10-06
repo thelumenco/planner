@@ -18,15 +18,15 @@ const swan = (x, y, dx, dur, flip) => `<g pointer-events="none"><g>
 const ripples = pts => pts.map(([x, y]) => `<path class="ripple" d="M${x} ${y} q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>`).join("");
 
 // a market stall: striped awning in its colour, a table of goods
-const stall = (i, x, y, s) => s.kind === "wine" ? wineStall(i, x, y) : `<g data-place="mstall${i}" aria-label="${s.n} stall"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="34" ry="9" style="fill:var(--butter)"/>
-  ${sk(`<rect x="${x-28}" y="${y-22}" width="56" height="22" rx="2" style="fill:#C9A27E"/><path d="M${x-34} ${y-40} h68 l-4 12 h-60z" style="fill:${s.col}"/>${[0, 1, 2].map(k => `<path d="M${x-26 + k*20} ${y-40} l-2 12 h8 l2 -12z" style="fill:#FFFDF6"/>`).join("")}
-    ${[[-16, -26], [-6, -27], [4, -26], [14, -27]].map(([dx, dy], k) => `<circle cx="${x + dx}" cy="${y + dy}" r="3.4" style="fill:${(s.kind === "orchard" ? ["#D9433A", "#E8566C", "#F3C969", "#C9A3E0"] : ["#E8566C", "#F3C969", "#9CC27E", "#C98A4A"])[(k + i) % 4]}"/>`).join("")}`,
-    `<rect x="${x-28}" y="${y-22}" width="56" height="22" rx="2"/><path d="M${x-34} ${y-40} h68 l-4 12 h-60z M${x-30} ${y-28} v6 M${x+30} ${y-28} v6"/>`)}
-  ${tapeLabel(x, y + 18, s.short, "var(--card)", 10)}</g>`;
-const wineStall = (i, x, y) => `<g data-place="mstall${i}" aria-label="The wine shop's market stall"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="36" ry="9" style="fill:var(--butter)"/>
-  ${sk(`<rect x="${x-30}" y="${y-22}" width="60" height="22" rx="2" style="fill:#8B5E3C"/><path d="M${x-36} ${y-40} h72 l-4 12 h-64z" style="fill:#8E2C48"/>${[-18, -8, 2, 12].map((dx, k) => `<path d="M${x + dx} ${y-24} h5 l-.5 -9 h-4z" style="fill:${k % 2 ? "#E98AA0" : "#5B2338"}"/>`).join("")}`,
-    `<rect x="${x-30}" y="${y-22}" width="60" height="22" rx="2"/><path d="M${x-36} ${y-40} h72 l-4 12 h-64z M${x-32} ${y-28} v6 M${x+32} ${y-28} v6"/>`)}
-  ${tapeLabel(x, y + 18, "Our wines", "#E8B4C0", 10)}</g>`;
+const stall = (i, x, y, s) => s.kind === "wine" ? wineStall(i, x, y) : `<g data-place="mstall${i}" aria-label="${s.n} stall"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="28" ry="8" style="fill:var(--butter)"/>
+  ${sk(`<rect x="${x-23}" y="${y-22}" width="46" height="22" rx="2" style="fill:#C9A27E"/><path d="M${x-28} ${y-40} h56 l-4 12 h-48z" style="fill:${s.col}"/>${[0, 1, 2].map(k => `<path d="M${x-22 + k*16} ${y-40} l-2 12 h6 l2 -12z" style="fill:#FFFDF6"/>`).join("")}
+    ${[[-14, -26], [-5, -27], [4, -26], [13, -27]].map(([dx, dy], k) => `<circle cx="${x + dx}" cy="${y + dy}" r="3.2" style="fill:${(s.kind === "orchard" ? ["#D9433A", "#E8566C", "#F3C969", "#C9A3E0"] : ["#E8566C", "#F3C969", "#9CC27E", "#C98A4A"])[(k + i) % 4]}"/>`).join("")}`,
+    `<rect x="${x-23}" y="${y-22}" width="46" height="22" rx="2"/><path d="M${x-28} ${y-40} h56 l-4 12 h-48z M${x-25} ${y-28} v6 M${x+25} ${y-28} v6"/>`)}
+  ${tapeLabel(x, y + (i % 2 ? 30 : 16), s.short, "var(--card)", 9)}</g>`;
+const wineStall = (i, x, y) => `<g data-place="mstall${i}" aria-label="The wine shop's market stall"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="29" ry="8" style="fill:var(--butter)"/>
+  ${sk(`<rect x="${x-24}" y="${y-22}" width="48" height="22" rx="2" style="fill:#8B5E3C"/><path d="M${x-29} ${y-40} h58 l-4 12 h-50z" style="fill:#8E2C48"/>${[-16, -7, 2, 11].map((dx, k) => `<path d="M${x + dx} ${y-24} h5 l-.5 -9 h-4z" style="fill:${k % 2 ? "#E98AA0" : "#5B2338"}"/>`).join("")}`,
+    `<rect x="${x-24}" y="${y-22}" width="48" height="22" rx="2"/><path d="M${x-29} ${y-40} h58 l-4 12 h-50z M${x-26} ${y-28} v6 M${x+26} ${y-28} v6"/>`)}
+  ${tapeLabel(x, y + (i % 2 ? 30 : 16), "Our wines", "#E8B4C0", 9)}</g>`;
 // a second picnic blanket on market and fair days, for shoppers enjoying what they bought
 const blanket2 = () => `<g pointer-events="none">${sk(`<path d="M176 474 l50 -5 l7 22 l-50 5z" style="fill:#7FB8E8"/>${[0, 1].map(k => `<path d="M${186 + k*18} ${473 - k*2} l7 22" style="stroke:#FFFDF6" stroke-width="4"/>`).join("")}`, `<path d="M176 474 l50 -5 l7 22 l-50 5z"/>`)}</g>`;
 // the fair's kites, bobbing over the lake
