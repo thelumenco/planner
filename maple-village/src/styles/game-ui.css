@@ -777,6 +777,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .goalbar{height:12px;border-radius:999px;background:rgba(60,40,30,.12);overflow:hidden;margin:10px 0 4px;border:1.2px solid var(--line)}
 .goalbar span{display:block;height:100%;background:var(--honey);border-radius:999px}
 #mel.hairdown .pony{display:none}
+#mel.restyled .usual{display:none}
 
 /* the wardrobe: ticking off what to wear */
 .wearpick ul li label{display:flex;align-items:center;gap:8px;width:100%;cursor:pointer}

@@ -1751,6 +1751,7 @@ function applyWear(pj){
   if (w && w.jewellery) ear.querySelectorAll("circle").forEach(e => e.style.fill = /silver|platinum|white gold/i.test(w.jewellery) ? "#BFC3CA" : /pearl/i.test(w.jewellery) ? "#F6F1E8" : "#D9A93A");
   $("oShades").style.display = w && w.sunglasses && outside() ? "" : "none";
   const down = !!(w && w.hair && /down/i.test(w.hair)); $("oHairDown").style.display = down ? "" : "none"; m.classList.toggle("hairdown", down);
+  m.classList.toggle("restyled", !!(w && (w.hair || w.dress || w.top))); // the blue hair tie and sprigs belong to the usual look only
 }
 function dressMel(){
   const d = F.decor || {}, show = (id, on) => { const e = $(id); if (e) e.style.display = on ? "" : "none"; };
@@ -1898,6 +1899,8 @@ function arriveSpot(id){
   if (id === "mydoor") { setScene("room", INNER.room.arrive); return; }
   if (scene === "cottage" && id === "tea") { orView = "tea"; sfx("paper", true); render(); return; }
   if (id === "dine") { sitForDinner(); return; }
+  if (id === "bedroom") { const m = sgHM(), who = {cottage: "Ma Ma and Gong Gong", mumdad: "Mum and Dad", marcus: "Marcus and Angelina"}[scene] || "They";
+    speak(m >= 23*60 || m < 6*60 + 30 ? `Shh. ${who} are fast asleep. See them in the morning.` : `${who}'s bedroom. Private! The door stays shut.`, 4000); render(); return; }
   if (id === "gdoor") { setScene("garage", INNER.garage.arrive); return; }
   if (id === "officedoor") { setScene("office", INNER.office.arrive); return; }
   if (id === "cdoor") { if (owns(F, "cellar")) setScene("cellar", INNER.cellar.arrive); else { goalView = "cellar"; sfx("paper", true); render(); } return; }

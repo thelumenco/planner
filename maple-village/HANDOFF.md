@@ -905,3 +905,11 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - "Back to my usual clothes" clears it. `outfitsToday(F)` lists the stylist's three plus any extras.
 - **Office and garage:** no Exit mat; their doors (office: east wall, garage: west wall, labelled "Living room") are the `data-exit` way back, like Mel's room.
 - **Undo toast:** rounded rectangle (22px corners), more padding, `width: max-content` up to 460px, the message wraps inside, and it sits 96px up so it clears the quest note.
+
+### Round 68: bedroom doors in the family houses, the usual-look hair tie, button-row spacing
+- **Bedroom doors:** a `bedroom` station (furniture kind `bedroomdoor`, scenes.js) in the cottage (west wall, R:[40,330]; it replaces Ma Ma's bed `mbed`), Mum and Dad's (east, R:[480,330]) and Marcus's (east, R:[480,370]).
+  - The door is pink with a heart sign, which turns into a "shh" sign from 11pm to 6am.
+  - Evening routines (data/npcs.js) now run to 22:50. From 22:50 to 23:00 the couple stand at their bedroom door. From 23:00 they have no slot, so they're absent until their morning routine.
+  - Tapping the door (core.js) says they're fast asleep at night (11pm to 6:30am), otherwise that it's private.
+- **Hair tie:** the blue hair tie and the two sprigs on Mel's sprite carry `class="usual"`. `applyWear` sets `#mel.restyled` whenever a worn outfit has a hair, dress or top piece, and `#mel.restyled .usual` hides them.
+- **Buttons:** `.panel .actions{margin-top:12px}` (0 when first child), so focus and highlight rings no longer touch the line above.

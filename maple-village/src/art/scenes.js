@@ -313,6 +313,12 @@ export function furn(kind, x, y){
     // the garage door on the living room's east wall, below Evan's
     case "garagedoor": return sk(`<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z" style="fill:#8FA3B8"/><path d="M${x+36} ${y-80} l-20 6 v10 l20 -6z" style="fill:#CFE0EE"/>`,
       `<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z"/><circle cx="${x+17}" cy="${y-42}" r="1.8"/><path d="M${x+36} ${y-80} l-20 6 v10 l20 -6z"/>`);
+    // a bedroom door (the family's houses): on the west or east wall depending on where it stands, with a little
+    // heart sign; from 11pm to the morning a "shh" sign hangs on it
+    case "bedroomdoor": { const left = x < 260, d = left ? `M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z` : `M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z`,
+        sx = left ? x - 26 : x + 26, m = (new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8*3600e3)).getUTCHours(), night = m >= 23 || m < 6;
+      return sk(`<path d="${d}" style="fill:#E8B4C0"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2" style="fill:#FFFDF6"/>` : `<path d="M${sx} ${y - 58} c-4 -6 -10 -2 -6 3 l6 5 l6 -5 c4 -5 -2 -9 -6 -3z" style="fill:#E8566C"/>`}`,
+        `<path d="${d}"/><circle cx="${left ? x - 17 : x + 17}" cy="${y - 42}" r="1.8"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2"/><path d="M${sx - 6} ${y - 64} h12" opacity=".6"/>` : ""}`); }
     // the home office door on the living room's west wall, below Mel's
     case "officedoor": return sk(`<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:#9CC27E"/><path d="M${x-36} ${y-80} l20 6 v12 l-20 -6z" style="fill:#FFFDF6"/>`,
       `<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z"/><circle cx="${x-17}" cy="${y-42}" r="1.8"/><path d="M${x-36} ${y-80} l20 6 v12 l-20 -6z"/><path d="M${x-32} ${y-74} h10" opacity=".6"/>`);

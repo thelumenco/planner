@@ -152,6 +152,9 @@ button{cursor:pointer}
 .sticker{font-size:.82rem;font-weight:600;background:var(--oat);border-radius:999px;padding:3px 12px;color:var(--ink)}
 .checkin{font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;margin:0 0 20px}
 .actions{display:flex;flex-wrap:wrap;gap:14px 12px}
+/* a little room above every row of buttons in a panel, so their outline (focus/tap highlight) never touches the line above */
+.panel .actions{margin-top:12px}
+.panel .actions:first-child{margin-top:0}
 .btn{position:relative;border:0;padding:12px 30px;background:var(--peri);color:var(--navy);font-weight:700;font-size:1rem;line-height:1.2;transform:rotate(-.6deg);
   clip-path:polygon(1.5% 10%,6% 0,96% 3%,99.5% 0,97% 46%,100% 92%,94% 100%,4% 97%,0 100%,2.5% 52%);transition:filter .15s,transform .1s}
 .btn:hover{filter:saturate(1.15) brightness(.98)}

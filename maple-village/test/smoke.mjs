@@ -1612,12 +1612,33 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-06"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-06&wearpatch=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(800);
+  const tie = () => page.evaluate(() => [...document.querySelectorAll("#mel .usual")].every(e => getComputedStyle(e).display !== "none"));
   await page.locator('#world [data-spot="wardrobe"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-wear="0"]', { timeout: 15000 });
+  check(await tie(), "in her usual outfit Mel has the blue hair tie and the sprigs");
   await page.click('#ctx [data-wear="0"]'); await page.waitForTimeout(300);
   check(await page.locator("#ctx [data-wearf]:checked").count() === 6, "choosing an outfit lists each piece, all ticked");
   await page.uncheck('#ctx [data-wearf="layer"]'); await page.click('#ctx [data-wearok="0"]'); await page.waitForTimeout(400);
   check(await page.evaluate(() => { const w = JSON.parse(localStorage.getItem("fox.fox")).wear; return w && w.dress && !w.layer; }), "unticked pieces are left off");
   check(await page.evaluate(() => { const d = document.getElementById("oDress"), l = document.getElementById("oLayer"); return getComputedStyle(d).display !== "none" && getComputedStyle(l).display === "none" && document.getElementById("mel").classList.contains("hairdown"); }), "Mel's character puts it on: the dress, hair down, no cardigan");
+  check(!(await page.evaluate(() => [...document.querySelectorAll("#mel .usual")].some(e => getComputedStyle(e).display !== "none"))), "and the blue hair tie and sprigs come off (they're for the usual look only)");
+  await page.close();
+}
+{
+  // Bedroom doors: Ma Ma and Gong Gong, Mum and Dad, Marcus and Angelina head to bed at 10:50pm and are gone after 11
+  console.log("\nbedroom doors");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`bedroom pageerror: ${e.message}`));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  const pairs = {cottage: ["mama", "gonggong"], mumdad: ["mum", "dad"], marcus: ["marcus", "angelina"]};
+  await page.goto(url + "?reset=1&seed=1&time=22:55&date=2026-10-13"); await page.waitForTimeout(800);
+  for (const [h, two] of Object.entries(pairs)) { await page.evaluate(h => window.__mapleScene(h), h); await page.waitForTimeout(1500);
+    check(await page.locator('#world [data-spot="bedroom"]').count() === 1 && await ids().then(a => two.every(f => a.includes(f))), `${h} has a bedroom door, and ${two.join(" and ")} are at it just before 11pm`); }
+  check(await page.evaluate(() => { window.__mapleScene("cottage"); return true; }) && await page.locator('#world [data-spot="mbed"]').count() === 0, "Ma Ma's bed is out of the cottage's main room");
+  await page.goto(url + "?seed=1&time=23:30&date=2026-10-13"); await page.waitForTimeout(800);
+  for (const [h, two] of Object.entries(pairs)) { await page.evaluate(h => window.__mapleScene(h), h); await page.waitForTimeout(1200);
+    check(await ids().then(a => !two.some(f => a.includes(f))), `after 11pm ${two.join(" and ")} are behind the bedroom door`); }
+  await page.locator('#world [data-spot="bedroom"]').dispatchEvent("click"); await page.waitForFunction(() => /asleep/.test(document.querySelector("#speech").textContent), null, { timeout: 15000 }).catch(() => {});
+  check(/fast asleep/.test(await page.locator("#speech").textContent()), "knocking at night: they're fast asleep");
   await page.close();
 }
 {
