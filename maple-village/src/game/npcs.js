@@ -2,7 +2,8 @@
 // and runs agent messengers who carry unread mail to Mel. Core owns the frame loop and calls tickNpcs / tapNpc.
 import { NPCS, AGENTS } from "../data/npcs.js";
 import { personArt, letterArt } from "../art/people.js";
-import { sgHM, now, H, pick, rnd, clamp, $, plain, esc } from "../util.js";
+import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
+import { tourSlot, visitSlot } from "./tours.js";
 import { findPath, blocked } from "./paths.js";
 
 const NS = "http://www.w3.org/2000/svg";
@@ -15,7 +16,9 @@ const greeted = new Set();  // messengers say hello once, then just tag along qu
 export function initNpcs(a){ api = a; }
 const weekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
 const dowNow = () => new Date(now() + 8*H).getUTCDay();
+// Orchard tours and drop-in visits (tours.js) win over the usual routine while they're on
 const slotNow = def => { const t = sgHM(), we = weekend(), dw = dowNow();
+  const special = tourSlot(def.id, dayKey(), t) || visitSlot(def.id, dayKey(), t); if (special) return special;
   const owned = (api && api.F().fam && api.F().fam.owned) || {};
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };

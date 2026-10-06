@@ -657,3 +657,15 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - The money goes to the honesty box, or straight to Mel when she's serving.
 - `S.served["<npc>:<slot key>"]` records the order, so each sitting orders once. The tableware shows exactly what each guest ordered. Pilar's break doesn't count as a customer.
 - Away from the shop, sales are still the background chance in `sellTick`.
+
+### Round 54: orchard workers, visitors and tours; Penny; writing tasks
+- **Tours** (`src/game/tours.js`, worked out from the date so every screen agrees):
+  - Weekends: four tours at 10:00, 11:30, 2pm and 4pm, 45 minutes each. The guide rotates through Ma Ma, Gong Gong, Farid and Mei, and the group is 3–4 villagers picked from `VISITORS`.
+  - Darren leads one at 5:45pm on Tuesdays and Thursdays.
+  - The group spends the first half among the trees and the second half at the flower beds.
+  - `tourSlot` and `visitSlot` override `slotNow` in npcs.js. The guide's act is `guide`, with `actLines.guide` for each guide.
+  - Drop-ins (`visitsOn`): on weekdays one villager visits the orchard at lunch and one the flower farm after work; at weekends one visits the flower farm at lunch.
+- **Fees:** `TOUR_FEE` is 4 a person. `orchTick` pays each finished tour into `o.tin` once at least 3 things are planted, records it in `o.toursPaid` and counts it in `o.today.tours`. The farm shop shows today's tours (`tourLine`). Arriving mid-tour gets a line from Maple, and a tour finishing while Mel's there is announced.
+- **Workers:** `farid` works the orchard and `mei` the flower farm, 8am–5:30pm daily with lunch on site.
+- **Penny fix:** a tap on a speech bubble also reaches the person under it (`elementFromPoint` after hiding the bubble), so a bubble no longer blocks a messenger.
+- **Writing tasks:** `isWriting(t)` in world.js. Any writing (write, draft, blog, newsletter, copy, caption, script, outline, journal…) goes to Fresh Pages → writing desk, ahead of business keywords and planned places. Only treadmill batches and home-base outings come first.

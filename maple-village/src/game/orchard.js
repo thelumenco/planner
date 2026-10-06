@@ -12,6 +12,8 @@ import { TREES, FLOWERS, TREE_GROW, TREE_FIRST, TREE_AGAIN, BED_GROW, BED_AGAIN,
   BOUQUET_STEMS, POT_STEMS, STEM_PRICE, BOUQUET_PRICE, POT_PRICE, POT_SPOTS } from "../data/orchard.js";
 import { icon } from "../art/icons.js";
 import { treePic, flowerPic } from "../art/orchard.js";
+import { toursOn, TOUR_FEE, fmtTime } from "./tours.js";
+import { NPCS } from "../data/npcs.js";
 
 export function orchState(F){
   F.orch = F.orch || {}; const o = F.orch;
@@ -71,6 +73,12 @@ export function orchTick(F, today){
         const price = id.startsWith("stem:") ? STEM_PRICE : (ITEMS[id] && ITEMS[id].sell) || 3; out.sold++; out.coins += price; }
     }
   }
+  // tours that finished today pay into the tin, once there's something to show (three or more things planted)
+  const shown = [...o.trees, ...o.beds, ...o.bushes].filter(Boolean).length, nowM = hm(t);
+  if (!o.toursPaid || o.toursPaid.day !== today) o.toursPaid = {day: today, done: []};
+  for (const tr of toursOn(today)) if (tr.to <= nowM && !o.toursPaid.done.includes(tr.i)) { o.toursPaid.done.push(tr.i); any = true;
+    if (shown >= 3) { const fee = TOUR_FEE*tr.group.length; o.tin += fee; out.tours = (out.tours || []).concat({guide: tr.guide, n: tr.group.length, fee});
+      if (o.today.day !== today) o.today = {day: today, sold: 0, coins: 0}; o.today.coins += fee; o.today.tours = (o.today.tours || 0) + 1; } }
   if (out.coins) { o.tin += out.coins; if (o.today.day !== today) o.today = {day: today, sold: 0, coins: 0}; o.today.sold += out.sold; o.today.coins += out.coins; any = true; }
   return any ? out : null;
 }
@@ -130,6 +138,7 @@ export function shopPanel(F, today, tab){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Ma Ma's farm shop</h2>`;
   h += `<p class="sub">${tab === "plant" ? `Saplings, bushes and seedlings for ${SEASONS[season].n.toLowerCase()}. Pick one and Ma Ma plants it in the next free spot (or tap a spot in the orchard or flower farm).`
     : `What Ma Ma picks from your trees and flowers goes on these shelves: free for you to take. Villagers buy the rest while it's open (9am to 6pm).${o.today.day === today && o.today.sold ? ` Today she's sold ${o.today.sold} thing${o.today.sold === 1 ? "" : "s"}.` : ""}`}</p>`;
+  h += tourLine(o, today);
   h += `<div class="tabs" role="tablist">${[["plant", "Plant"], ["fruit", "Fruit"], ["flowers", "Flowers"]].map(([k, n]) => `<button role="tab" data-or="tab" data-k="${k}" aria-selected="${tab === k}">${n}</button>`).join("")}</div>`;
   if (tab === "plant") {
     for (const where of ["tree", "bush", "bed"]) {
@@ -154,6 +163,14 @@ export function shopPanel(F, today, tab){
     h += `<p class="muted">A bouquet takes ${BOUQUET_STEMS} stems, a pot ${POT_STEMS}. Give bouquets to anyone in the village; set pots at home, outside the wine shop, or in your room (tap them in your backpack).</p>`;
   }
   return h + `<div class="actions">${close}</div>`;
+}
+// Today's tours (and what they've brought in), or when the next ones are
+const nm = id => (NPCS.find(n => n.id === id) || {name: id}).name;
+function tourLine(o, today){
+  const tours = toursOn(today), shown = [...o.trees, ...o.beds, ...o.bushes].filter(Boolean).length;
+  const paid = o.today.day === today && o.today.tours ? ` ${o.today.tours} done so far today.` : "";
+  if (!tours.length) return `<p class="muted ortour">Farm tours: weekends at 10am, 11:30, 2pm and 4pm, and Darren's on Tuesday and Thursday evenings. ${TOUR_FEE} coins a person, paid into Ma Ma's tin.</p>`;
+  return `<p class="muted ortour">Tours today: ${tours.map(t => `${fmtTime(t.from)} with ${nm(t.guide)}`).join(", ")}. ${TOUR_FEE} coins a person.${paid}${shown < 3 ? " (Plant a few more things first: nobody pays to see bare ground.)" : ""}</p>`;
 }
 // Plant from the farm shop: the first empty (or faded) spot of that kind. -> line or null
 export function plantAny(F, where, id, today){

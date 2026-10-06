@@ -210,9 +210,12 @@ export const spotObj = (scene, id) => scene === "base" ? baseSpot(id) : id === "
 // Tasks that ARE treadmill tasks (a "🚶" or "treadmill" in the title, or chat sent spot "treadmill") always happen on
 // the treadmill at home. Tasks that are only treadmill-able (treadmill: true) get it as an offer instead.
 export const isTreadTask = t => !!t && (t.spot === "treadmill" || /🚶|treadmill/i.test(t.title || ""));
+// Writing of any kind (for any business) happens at the Fresh Pages library's writing desk (Mel's call)
+export const isWriting = t => !!t && /\b(write|writing|rewrite|draft|drafting|blog|article|essay|newsletter|copywrit\w*|copy|caption|script|outline|headline|journal|post copy)\b/i.test(t.title || "");
 export function placeOf(t){
   if (isTreadTask(t)) return "home";
   if (t.place === "base") return "base";
+  if (isWriting(t)) return "fresh";
   if (t.place && WORK.includes(t.place)) return t.place;
   const s = (t.title + " " + (t.channel || "")).toLowerCase();
   // Personal things that belong outdoors (Evan outings, garden, repairs, a walk) happen at home base, any day.
@@ -234,6 +237,7 @@ export function spotOf(t){
   // The cupboard and treadmill are only picked on purpose (the clean, or "Do it on the treadmill").
   const pl = placeOf(t), st = stationsOf(pl).filter(s => (s.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title)) && s.id !== "treadmill" && s.re);
   if (isTreadTask(t)) return "treadmill";
+  if (pl === "fresh" && isWriting(t)) return "desk";
   if (t.spot && st.find(s => s.id === t.spot)) return t.spot;
   const s = t.title.toLowerCase();
   const hit = st.find(x => x.re && x.re.source !== "." && x.re.test(s));

@@ -111,7 +111,7 @@ export const NPCS = [
       slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600]], {days: "we"})],
     lines: ["Coffee's fresh if you want some.", "Evan watered my shoes again. Very thorough.", "Go get 'em. I'll hold the fort.",
       "The shed radio only gets one station. It's a good station.", "Dinner's sorted, don't worry about it.", "You've got this. One thing at a time."],
-    actLines: {
+    actLines: {guide: ["Welcome to the farm tour! I'll be your guide. My qualifications: enthusiasm.", "Mel planted this one. I watered it. Once.", "And these are flowers. Moving on."], 
       type: ["*typing* Back-to-back calls. Wave if it's urgent.", "On mute. Hi! *waves*", "Two more emails and I'm free."],
       water: ["Morning! The tomatoes say hi.", "Watering before it gets hot. Lin's orders."],
       repair: ["Gutter's nearly fixed. Nearly.", "Hold the ladder? Kidding. Mostly.", "If it squeaks, I fix it."],
@@ -171,7 +171,7 @@ export const NPCS = [
       slot("18:00", "21:30", "cottage", [398, 352], {act: "sit"})],
     lines: ["I love you, ah girl.", "Have you eaten? Come, I cut fruit for you.", "Don't work so hard. Rest a little.", "Eat more. You're too thin.",
       "Bring Evan to see the flowers, ok?", "Wear a jacket. The office aircon is very cold.", "You're doing very well. Ma Ma is proud of you.", "Drink some water. And not only coffee."],
-    actLines: {water: ["Watering, watering. The trees are thirsty today.", "Plants are like children. Talk to them nicely.", "The fruit is coming along. Patience."],
+    actLines: {guide: ["And this is my apple tree. Planted it with my granddaughter!", "Smell this rose. Go on, smell.", "This way, this way. Mind the mud."], water: ["Watering, watering. The trees are thirsty today.", "Plants are like children. Talk to them nicely.", "The fruit is coming along. Patience."],
       farm: ["The flowers grow better when you sing to them.", "Look at this one. So pretty, like you.", "Cutting some for the shop. Want some?"]},
     away: "Ma Ma's resting. She'll be out in the garden in the morning.",
     react: {harvest: "So clever! You grow things like Ma Ma.", quests3: "Three already? Don't forget to eat lunch.", lunch: "Lunch time! Eat properly, ok?"}
@@ -198,10 +198,34 @@ export const NPCS = [
       slot("18:00", "22:00", "cottage", [458, 358], {act: "sit"})],
     lines: ["Have you eaten? Ma Ma made too much again.", "Work is important, but rest is also important.", "Come, sit with Gong Gong. The news is on.", "Your Ma Ma's flowers are the best in the village. Don't tell her I said.",
       "Slowly, slowly. No need to rush.", "Gong Gong is very proud of you.", "Bring Evan next time, ok? I want to see how tall he is."],
-    actLines: {farm: ["Loosening the soil for Ma Ma. She's the boss here.", "These trees will give good fruit. Patience."], water: ["Gong Gong waters, Ma Ma checks. Teamwork.", "A little water, a little sun. Same as people."],
+    actLines: {guide: ["This tree here is older than my eldest grandson. Almost.", "Ma Ma does the flowers, I do the talking.", "Any questions? No? Good, I don't know the answers."], farm: ["Loosening the soil for Ma Ma. She's the boss here.", "These trees will give good fruit. Patience."], water: ["Gong Gong waters, Ma Ma checks. Teamwork.", "A little water, a little sun. Same as people."],
       sit: ["Shh, the drama is at the good part.", "Ma Ma says I watch too much TV. She's watching also."]},
     away: "Gong Gong's having his afternoon nap.",
     react: {harvest: "Wah, so much! You grow like Ma Ma.", quests3: "Three already? Clever girl.", lunch: "Lunchtime. Don't skip, ok?"}
+  },
+  // The orchard's two workers: Farid looks after the fruit trees, Mei the flower farm (both help Ma Ma, and take turns
+  // leading the weekend tours)
+  {
+    id: "farid", pitch: 0.85, name: "Farid", job: "Works the fruit orchard",
+    intro: "Farid! I prune, I fertilise, I carry Ma Ma's ladders. She says I talk to the trees too much. She's one to talk.",
+    look: {skin: "#B07A55", hair: "#2A211D", hairStyle: "short", top: "#7FA35A", bottom: "#5E5A55", hat: "cap"},
+    routine: [slot("8:00", "12:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 510], [310, 330]], {act: "farm"}),
+      slot("12:00", "13:00", "orchard", [470, 330], {act: "sit"}),
+      slot("13:00", "17:30", "orchard", [[160, 420], [260, 510], [360, 330], [410, 420]], {act: "water"})],
+    lines: ["Ma Ma's the boss. I just carry things.", "The apples are looking good this week.", "Want to help? Kidding. Ma Ma would never let you lift anything.", "Best office in the village, this."],
+    actLines: {guide: ["Over here we've got the fruit trees. Ma Ma's pride and joy.", "You can taste one at the farm shop after!", "Step around the hose, please. Everyone always forgets the hose."], farm: ["Pruning the old branches. More fruit next time.", "Mulch. Very glamorous."], water: ["Deep water, twice a week. Ma Ma's rule.", "These trees drink more than I do."]},
+    away: "Farid's gone home for the day."
+  },
+  {
+    id: "mei", pitch: 1.2, name: "Mei", job: "Works the flower farm",
+    intro: "Hi, I'm Mei! I look after the flower beds. Ma Ma taught me everything, including how to sing to the roses. Don't laugh.",
+    look: {skin: "#EAC4A4", hair: "#2B2320", hairStyle: "bob", top: "#F4C7CF", bottom: "#5E6E8C", hat: "sunhat"},
+    routine: [slot("8:00", "12:00", "flowers", [[160, 300], [260, 380], [360, 470], [210, 470], [310, 300]], {act: "water"}),
+      slot("12:00", "13:00", "flowers", [44, 486], {act: "sit"}),
+      slot("13:00", "17:30", "flowers", [[160, 380], [260, 470], [360, 300], [410, 380]], {act: "farm"})],
+    lines: ["The dahlias are showing off today.", "Ma Ma says flowers know when you're happy.", "Bouquet for someone special? Just say.", "I could do this forever."],
+    actLines: {guide: ["These beds bloom again every day or so. Isn't that lovely?", "That one's my favourite. Don't tell the others.", "Bouquets at the farm shop, if anyone's feeling romantic."], water: ["Gentle on the petals.", "Morning water, happy flowers."], farm: ["Deadheading. Snip, snip.", "Cutting a few for the shop."]},
+    away: "Mei's finished for the day."
   },
   // The wine shop's cook: on her shifts she runs the kitchen from whatever's in the larder (see cookTick)
   {

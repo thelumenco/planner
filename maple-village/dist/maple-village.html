@@ -2255,9 +2255,11 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   }
   var spotObj = (scene2, id) => scene2 === "base" ? baseSpot(id) : id === "board" ? { id: "board", name: "Quest board", tx: 260, ty: 200, line: "This building's quests." } : stationsOf(scene2).find((s) => s.id === id);
   var isTreadTask = (t2) => !!t2 && (t2.spot === "treadmill" || /🚶|treadmill/i.test(t2.title || ""));
+  var isWriting = (t2) => !!t2 && /\b(write|writing|rewrite|draft|drafting|blog|article|essay|newsletter|copywrit\w*|copy|caption|script|outline|headline|journal|post copy)\b/i.test(t2.title || "");
   function placeOf(t2) {
     if (isTreadTask(t2)) return "home";
     if (t2.place === "base") return "base";
+    if (isWriting(t2)) return "fresh";
     if (t2.place && WORK.includes(t2.place)) return t2.place;
     const s = (t2.title + " " + (t2.channel || "")).toLowerCase();
     if (!WORK_HINT.test(s) && !t2.meeting && baseSpotFor(s)) return "base";
@@ -2281,6 +2283,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     }
     const pl = placeOf(t2), st6 = stationsOf(pl).filter((s2) => (s2.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t2.title)) && s2.id !== "treadmill" && s2.re);
     if (isTreadTask(t2)) return "treadmill";
+    if (pl === "fresh" && isWriting(t2)) return "desk";
     if (t2.spot && st6.find((s2) => s2.id === t2.spot)) return t2.spot;
     const s = t2.title.toLowerCase();
     const hit = st6.find((x) => x.re && x.re.source !== "." && x.re.test(s));
@@ -3575,6 +3578,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
         "You've got this. One thing at a time."
       ],
       actLines: {
+        guide: ["Welcome to the farm tour! I'll be your guide. My qualifications: enthusiasm.", "Mel planted this one. I watered it. Once.", "And these are flowers. Moving on."],
         type: ["*typing* Back-to-back calls. Wave if it's urgent.", "On mute. Hi! *waves*", "Two more emails and I'm free."],
         water: ["Morning! The tomatoes say hi.", "Watering before it gets hot. Lin's orders."],
         repair: ["Gutter's nearly fixed. Nearly.", "Hold the ladder? Kidding. Mostly.", "If it squeaks, I fix it."],
@@ -3661,6 +3665,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
         "Drink some water. And not only coffee."
       ],
       actLines: {
+        guide: ["And this is my apple tree. Planted it with my granddaughter!", "Smell this rose. Go on, smell.", "This way, this way. Mind the mud."],
         water: ["Watering, watering. The trees are thirsty today.", "Plants are like children. Talk to them nicely.", "The fruit is coming along. Patience."],
         farm: ["The flowers grow better when you sing to them.", "Look at this one. So pretty, like you.", "Cutting some for the shop. Want some?"]
       },
@@ -3702,12 +3707,47 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
         "Bring Evan next time, ok? I want to see how tall he is."
       ],
       actLines: {
+        guide: ["This tree here is older than my eldest grandson. Almost.", "Ma Ma does the flowers, I do the talking.", "Any questions? No? Good, I don't know the answers."],
         farm: ["Loosening the soil for Ma Ma. She's the boss here.", "These trees will give good fruit. Patience."],
         water: ["Gong Gong waters, Ma Ma checks. Teamwork.", "A little water, a little sun. Same as people."],
         sit: ["Shh, the drama is at the good part.", "Ma Ma says I watch too much TV. She's watching also."]
       },
       away: "Gong Gong's having his afternoon nap.",
       react: { harvest: "Wah, so much! You grow like Ma Ma.", quests3: "Three already? Clever girl.", lunch: "Lunchtime. Don't skip, ok?" }
+    },
+    // The orchard's two workers: Farid looks after the fruit trees, Mei the flower farm (both help Ma Ma, and take turns
+    // leading the weekend tours)
+    {
+      id: "farid",
+      pitch: 0.85,
+      name: "Farid",
+      job: "Works the fruit orchard",
+      intro: "Farid! I prune, I fertilise, I carry Ma Ma's ladders. She says I talk to the trees too much. She's one to talk.",
+      look: { skin: "#B07A55", hair: "#2A211D", hairStyle: "short", top: "#7FA35A", bottom: "#5E5A55", hat: "cap" },
+      routine: [
+        slot("8:00", "12:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 510], [310, 330]], { act: "farm" }),
+        slot("12:00", "13:00", "orchard", [470, 330], { act: "sit" }),
+        slot("13:00", "17:30", "orchard", [[160, 420], [260, 510], [360, 330], [410, 420]], { act: "water" })
+      ],
+      lines: ["Ma Ma's the boss. I just carry things.", "The apples are looking good this week.", "Want to help? Kidding. Ma Ma would never let you lift anything.", "Best office in the village, this."],
+      actLines: { guide: ["Over here we've got the fruit trees. Ma Ma's pride and joy.", "You can taste one at the farm shop after!", "Step around the hose, please. Everyone always forgets the hose."], farm: ["Pruning the old branches. More fruit next time.", "Mulch. Very glamorous."], water: ["Deep water, twice a week. Ma Ma's rule.", "These trees drink more than I do."] },
+      away: "Farid's gone home for the day."
+    },
+    {
+      id: "mei",
+      pitch: 1.2,
+      name: "Mei",
+      job: "Works the flower farm",
+      intro: "Hi, I'm Mei! I look after the flower beds. Ma Ma taught me everything, including how to sing to the roses. Don't laugh.",
+      look: { skin: "#EAC4A4", hair: "#2B2320", hairStyle: "bob", top: "#F4C7CF", bottom: "#5E6E8C", hat: "sunhat" },
+      routine: [
+        slot("8:00", "12:00", "flowers", [[160, 300], [260, 380], [360, 470], [210, 470], [310, 300]], { act: "water" }),
+        slot("12:00", "13:00", "flowers", [44, 486], { act: "sit" }),
+        slot("13:00", "17:30", "flowers", [[160, 380], [260, 470], [360, 300], [410, 380]], { act: "farm" })
+      ],
+      lines: ["The dahlias are showing off today.", "Ma Ma says flowers know when you're happy.", "Bouquet for someone special? Just say.", "I could do this forever."],
+      actLines: { guide: ["These beds bloom again every day or so. Isn't that lovely?", "That one's my favourite. Don't tell the others.", "Bouquets at the farm shop, if anyone's feeling romantic."], water: ["Gentle on the petals.", "Morning water, happy flowers."], farm: ["Deadheading. Snip, snip.", "Cutting a few for the shop."] },
+      away: "Mei's finished for the day."
     },
     // The wine shop's cook: on her shifts she runs the kitchen from whatever's in the larder (see cookTick)
     {
@@ -4298,10 +4338,10 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   function bottle(F2, slot2, name) {
     const v = vineState(F2), b = v.barrels[slot2];
     if (!b || barrelLeft(b) || b.style === "sparkling" && b.stage !== 2) return null;
-    const nm2 = plain(String(name || "")).trim().slice(0, 30) || `Maple's ${STYLES[b.style].n}`;
-    v.cellar.push({ id: "w" + Date.now().toString(36), name: nm2, type: b.style, n: BOTTLES });
+    const nm3 = plain(String(name || "")).trim().slice(0, 30) || `Maple's ${STYLES[b.style].n}`;
+    v.cellar.push({ id: "w" + Date.now().toString(36), name: nm3, type: b.style, n: BOTTLES });
     v.barrels[slot2] = null;
-    return `${BOTTLES} bottles of ${nm2}, into the cellar. Stock them on the shop shelves.`;
+    return `${BOTTLES} bottles of ${nm3}, into the cellar. Stock them on the shop shelves.`;
   }
   function stock(F2, id) {
     const v = vineState(F2), c = v.cellar.find((x) => x.id === id);
@@ -4663,6 +4703,52 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     });
   }
 
+  // src/game/tours.js
+  var TOUR_FEE = 4;
+  var WEEKEND = [[10 * 60, 10 * 60 + 45], [11 * 60 + 30, 12 * 60 + 15], [14 * 60, 14 * 60 + 45], [16 * 60, 16 * 60 + 45]];
+  var DARREN = [17 * 60 + 45, 18 * 60 + 30];
+  var DARREN_DAYS = [2, 4];
+  var GUIDES = ["mama", "gonggong", "farid", "mei"];
+  var VISITORS = ["hana", "okada", "juniper", "bo", "lin", "pip", "opal", "theo"];
+  var dow = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+  var fmtTime = (m) => `${Math.floor(m / 60) > 12 ? Math.floor(m / 60) - 12 : Math.floor(m / 60)}${m % 60 ? ":" + String(m % 60).padStart(2, "0") : ""}${m >= 12 * 60 ? "pm" : "am"}`;
+  function groupFor(seed2, n, skip = []) {
+    const pool = VISITORS.filter((v) => !skip.includes(v)), out = [];
+    for (let k = 0; out.length < n && k < 40; k++) {
+      const v = pool[hash(seed2 + ":" + k) % pool.length];
+      if (!out.includes(v)) out.push(v);
+    }
+    return out;
+  }
+  function toursOn(day) {
+    const d = dow(day), out = [];
+    if (d === 0 || d === 6) WEEKEND.forEach(([from, to], i) => {
+      const guide = GUIDES[(hash(day) + i) % GUIDES.length];
+      out.push({ i, from, to, guide, group: groupFor(day + ":" + i, 3 + hash(day + "n" + i) % 2) });
+    });
+    else if (DARREN_DAYS.includes(d)) out.push({ i: 0, from: DARREN[0], to: DARREN[1], guide: "darren", group: groupFor(day + ":d", 3) });
+    return out;
+  }
+  var SPOTS = { orchard: [[300, 418], [336, 432], [316, 448], [352, 414], [372, 444]], flowers: [[300, 376], [336, 392], [318, 410], [356, 380], [376, 404]] };
+  function tourSlot(id, day, hm2) {
+    for (const t2 of toursOn(day)) {
+      if (hm2 < t2.from || hm2 >= t2.to || t2.guide !== id && !t2.group.includes(id)) continue;
+      const mid = t2.from + Math.round((t2.to - t2.from) * 0.55), first = hm2 < mid, scene2 = first ? "orchard" : "flowers";
+      return { from: first ? t2.from : mid, to: first ? mid : t2.to, scene: scene2, wander: SPOTS[scene2], act: t2.guide === id ? "guide" : null, tour: t2 };
+    }
+    return null;
+  }
+  function visitsOn(day) {
+    const d = dow(day), busy2 = toursOn(day).flatMap((t2) => [t2.guide, ...t2.group]), pick3 = (seed2) => groupFor(day + seed2, 1, busy2)[0];
+    return d === 0 || d === 6 ? [{ id: pick3("v1"), scene: "flowers", from: 12 * 60 + 30, to: 13 * 60 + 30 }] : [{ id: pick3("v1"), scene: "orchard", from: 12 * 60 + 15, to: 13 * 60 }, { id: pick3("v2"), scene: "flowers", from: 17 * 60 + 15, to: 18 * 60 }];
+  }
+  var WANDER = { orchard: [[160, 330], [260, 420], [360, 330], [310, 510], [210, 500]], flowers: [[160, 300], [260, 380], [360, 470], [310, 300], [210, 470]] };
+  function visitSlot(id, day, hm2) {
+    const v = visitsOn(day).find((x) => x.id === id && hm2 >= x.from && hm2 < x.to);
+    return v ? { from: v.from, to: v.to, scene: v.scene, wander: WANDER[v.scene] } : null;
+  }
+  var tourNow = (day, hm2) => toursOn(day).find((t2) => hm2 >= t2.from && hm2 < t2.to) || null;
+
   // src/game/orchard.js
   function orchState(F2) {
     F2.orch = F2.orch || {};
@@ -4677,7 +4763,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     F2.pots = F2.pots || {};
     return o;
   }
-  var SPOTS = { tree: "trees", bed: "beds", bush: "bushes" };
+  var SPOTS2 = { tree: "trees", bed: "beds", bush: "bushes" };
   var cat = (where) => where === "tree" ? TREES : FLOWERS;
   var timing = (where) => where === "tree" ? [TREE_GROW, TREE_FIRST, TREE_AGAIN] : where === "bed" ? [BED_GROW, 0, BED_AGAIN] : [BUSH_GROW, 0, BUSH_AGAIN];
   var hrs3 = (ms) => {
@@ -4699,7 +4785,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     return { stage: "ripe", g: 1, left: 0 };
   }
   function plant2(F2, where, i, id, today2) {
-    const o = orchState(F2), list2 = o[SPOTS[where]], C2 = cat(where)[id];
+    const o = orchState(F2), list2 = o[SPOTS2[where]], C2 = cat(where)[id];
     if (!C2 || !list2 || i < 0 || i >= list2.length || !C2.seasons.includes(seasonOf(today2))) return null;
     if (where !== "tree" && !!C2.bush !== (where === "bush")) return null;
     const st6 = stateOf(where, list2[i], today2);
@@ -4717,7 +4803,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     };
     const out = { picked: {}, sold: 0, coins: 0 };
     let any = false;
-    if (hm2(t2) >= 7 * 60 && hm2(t2) < 19 * 60) for (const where of ["tree", "bed", "bush"]) o[SPOTS[where]].forEach((p) => {
+    if (hm2(t2) >= 7 * 60 && hm2(t2) < 19 * 60) for (const where of ["tree", "bed", "bush"]) o[SPOTS2[where]].forEach((p) => {
       if (stateOf(where, p, today2).stage !== "ripe") return;
       const C2 = cat(where)[p.k], id = where === "tree" ? C2.fruit : "stem:" + p.k, n = where === "tree" ? C2.yield : where === "bed" ? BED_YIELD : BUSH_YIELD;
       o.stock[id] = (o.stock[id] || 0) + n;
@@ -4743,6 +4829,20 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
           out.sold++;
           out.coins += price;
         }
+      }
+    }
+    const shown = [...o.trees, ...o.beds, ...o.bushes].filter(Boolean).length, nowM = hm2(t2);
+    if (!o.toursPaid || o.toursPaid.day !== today2) o.toursPaid = { day: today2, done: [] };
+    for (const tr of toursOn(today2)) if (tr.to <= nowM && !o.toursPaid.done.includes(tr.i)) {
+      o.toursPaid.done.push(tr.i);
+      any = true;
+      if (shown >= 3) {
+        const fee = TOUR_FEE * tr.group.length;
+        o.tin += fee;
+        out.tours = (out.tours || []).concat({ guide: tr.guide, n: tr.group.length, fee });
+        if (o.today.day !== today2) o.today = { day: today2, sold: 0, coins: 0 };
+        o.today.coins += fee;
+        o.today.tours = (o.today.tours || 0) + 1;
       }
     }
     if (out.coins) {
@@ -4794,7 +4894,7 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   }
   var close = `<button class="btn alt small" data-close="1">Close</button>`;
   function spotPanel(F2, where, i, today2) {
-    const o = orchState(F2), p = o[SPOTS[where]][i], st6 = stateOf(where, p, today2), season = seasonOf(today2);
+    const o = orchState(F2), p = o[SPOTS2[where]][i], st6 = stateOf(where, p, today2), season = seasonOf(today2);
     const title = where === "tree" ? `Tree ${i + 1}` : where === "bush" ? `Bush ${i + 1}` : `Flower bed ${i + 1}`;
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>${title}</h2>`;
     const pic3 = p ? where === "tree" ? treePic(p.k, st6.stage, 120) : flowerPic(p.k, st6.stage, where === "bush", 120) : "";
@@ -4820,10 +4920,11 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     tab = tab || (anyPlanted ? "fruit" : "plant");
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Ma Ma's farm shop</h2>`;
     h += `<p class="sub">${tab === "plant" ? `Saplings, bushes and seedlings for ${SEASONS[season].n.toLowerCase()}. Pick one and Ma Ma plants it in the next free spot (or tap a spot in the orchard or flower farm).` : `What Ma Ma picks from your trees and flowers goes on these shelves: free for you to take. Villagers buy the rest while it's open (9am to 6pm).${o.today.day === today2 && o.today.sold ? ` Today she's sold ${o.today.sold} thing${o.today.sold === 1 ? "" : "s"}.` : ""}`}</p>`;
+    h += tourLine(o, today2);
     h += `<div class="tabs" role="tablist">${[["plant", "Plant"], ["fruit", "Fruit"], ["flowers", "Flowers"]].map(([k, n]) => `<button role="tab" data-or="tab" data-k="${k}" aria-selected="${tab === k}">${n}</button>`).join("")}</div>`;
     if (tab === "plant") {
       for (const where of ["tree", "bush", "bed"]) {
-        const free = o[SPOTS[where]].filter((p) => {
+        const free = o[SPOTS2[where]].filter((p) => {
           const st6 = stateOf(where, p, today2).stage;
           return st6 === "empty" || st6 === "faded";
         }).length;
@@ -4850,8 +4951,15 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     }
     return h + `<div class="actions">${close}</div>`;
   }
+  var nm2 = (id) => (NPCS.find((n) => n.id === id) || { name: id }).name;
+  function tourLine(o, today2) {
+    const tours = toursOn(today2), shown = [...o.trees, ...o.beds, ...o.bushes].filter(Boolean).length;
+    const paid = o.today.day === today2 && o.today.tours ? ` ${o.today.tours} done so far today.` : "";
+    if (!tours.length) return `<p class="muted ortour">Farm tours: weekends at 10am, 11:30, 2pm and 4pm, and Darren's on Tuesday and Thursday evenings. ${TOUR_FEE} coins a person, paid into Ma Ma's tin.</p>`;
+    return `<p class="muted ortour">Tours today: ${tours.map((t2) => `${fmtTime(t2.from)} with ${nm2(t2.guide)}`).join(", ")}. ${TOUR_FEE} coins a person.${paid}${shown < 3 ? " (Plant a few more things first: nobody pays to see bare ground.)" : ""}</p>`;
+  }
   function plantAny(F2, where, id, today2) {
-    const o = orchState(F2), i = o[SPOTS[where]].findIndex((p) => {
+    const o = orchState(F2), i = o[SPOTS2[where]].findIndex((p) => {
       const st6 = stateOf(where, p, today2).stage;
       return st6 === "empty" || st6 === "faded";
     });
@@ -6148,11 +6256,11 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       h += `<g pointer-events="none"><rect x="434" y="50" width="62" height="72" rx="2" fill="#3E4A43"/><text x="465" y="64" text-anchor="middle" font-family="Klee One,serif" font-size="9" fill="#F3C969">Tapas today</text>${lines.slice(0, 4).map((l, i) => `<text x="465" y="${80 + i * 12}" text-anchor="middle" font-family="Klee One,serif" font-size="9" fill="#F6EFE3">${l.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text>`).join("")}</g>`;
     }
     st6.forEach((s) => {
-      const nm2 = s.kind === "pedestal" ? (G.ped && G.ped(s.x, s.y) || {}).label || "" : s.kind === "vaultjar" ? (() => {
+      const nm3 = s.kind === "pedestal" ? (G.ped && G.ped(s.x, s.y) || {}).label || "" : s.kind === "vaultjar" ? (() => {
         const j = G.vault && G.vault(s.x);
         return j ? j.label : "Empty";
       })() : s.name;
-      h += `<g data-spot="${s.id}" aria-label="${s.name || (nm2 ? "Trophy: " + nm2 : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm2 ? s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm2, "var(--card)") : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm2.length > 10 ? nm2.slice(0, 9) + "…" : nm2, "var(--card)", 9.5) : s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm2.length > 15 ? nm2.slice(0, 14).trim() + "…" : nm2, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm2.length > 24 ? nm2.slice(0, 23) + "…" : nm2, "var(--card)") : ""}</g>`;
+      h += `<g data-spot="${s.id}" aria-label="${s.name || (nm3 ? "Trophy: " + nm3 : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm3 ? s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm3, "var(--card)") : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm3.length > 10 ? nm3.slice(0, 9) + "…" : nm3, "var(--card)", 9.5) : s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm3.length > 15 ? nm3.slice(0, 14).trim() + "…" : nm3, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm3.length > 24 ? nm3.slice(0, 23) + "…" : nm3, "var(--card)") : ""}</g>`;
     });
     if (id === "kidroom") {
       const k = G.kid ? G.kid() : {};
@@ -7105,9 +7213,9 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       if (next) subOpen.add(next.key);
     }
     const row2 = (x) => {
-      const op = subOpen.has(x.key), has2 = x.info && x.info.length, nm2 = `${esc(x.title)}${x.est ? ` <small>${esc(x.est)}</small>` : ""}${x === next ? ` <em>up next</em>` : ""}`;
+      const op = subOpen.has(x.key), has2 = x.info && x.info.length, nm3 = `${esc(x.title)}${x.est ? ` <small>${esc(x.est)}</small>` : ""}${x === next ? ` <em>up next</em>` : ""}`;
       return `<li class="sub${x.done ? " done" : ""}${x === next ? " upnext" : ""}"><button class="subtick" data-nb="sub" data-k="${esc(x.key)}" role="checkbox" aria-checked="${x.done}" aria-label="${esc(x.title)}"></button>
-      <div class="subtxt">${has2 ? `<button class="subname" data-nb="subopen" data-k="${esc(x.key)}" aria-expanded="${op}">${nm2}</button>` : `<span class="subname">${nm2}</span>`}
+      <div class="subtxt">${has2 ? `<button class="subname" data-nb="subopen" data-k="${esc(x.key)}" aria-expanded="${op}">${nm3}</button>` : `<span class="subname">${nm3}</span>`}
       ${has2 && op ? `<ul class="subinfo">${x.info.map((l) => `<li>${linkify(l)}</li>`).join("")}</ul>` : ""}</div></li>`;
     };
     return `<div class="nbsubs"><p class="nblbl">Subtasks <span class="subcount">${done.length} of ${list2.length} done</span></p>
@@ -8002,10 +8110,10 @@ Quests finished today: ${S3.doneIds.length}`;
     }, 500);
   }
   var today = () => dayKey();
-  var dow = () => (/* @__PURE__ */ new Date(today() + "T00:00:00Z")).getUTCDay();
+  var dow2 = () => (/* @__PURE__ */ new Date(today() + "T00:00:00Z")).getUTCDay();
   var shift = (k, d) => new Date(Date.parse(k + "T00:00:00Z") + d * 864e5).toISOString().slice(0, 10);
-  var weekKey = () => shift(today(), -dow());
-  var mondayKey = () => shift(today(), -((dow() + 6) % 7));
+  var weekKey = () => shift(today(), -dow2());
+  var mondayKey = () => shift(today(), -((dow2() + 6) % 7));
   function tidy() {
     if (!Array.isArray(H2.zones) || !H2.zones.length) H2.zones = DEFAULT_ZONES;
     if (!H2.pantryCategories || !H2.pantryCategories.length) H2.pantryCategories = DEFAULT_CATS;
@@ -8029,7 +8137,7 @@ Quests finished today: ${S3.doneIds.length}`;
   function hestiaCounts() {
     tidy();
     const daily = (H2.dailyTasks || []).filter((t2) => !dayDone(t2.id)).length;
-    const weeklyToday = (H2.weeklyTasks || []).filter((t2) => t2.weekday === dow() && !weekDone(t2.id)).length;
+    const weeklyToday = (H2.weeklyTasks || []).filter((t2) => t2.weekday === dow2() && !weekDone(t2.id)).length;
     const shop = (H2.shoppingList || []).filter((s) => !s.purchased).length;
     return { chores: daily + weeklyToday, shop, zoneLeft: (zone().tasks || []).filter((_, i) => !zoneDone(i)).length };
   }
@@ -8124,8 +8232,8 @@ Quests finished today: ${S3.doneIds.length}`;
       const order = (t2) => (dayDone(t2.id) ? 10 : 0) + (t2.timeOfDay === "morning" ? 0 : t2.timeOfDay === "evening" ? 2 : 1);
       h += [...H2.dailyTasks || []].sort((a, b) => order(a) - order(b)).map((t2) => row("daily", t2.id, t2, dayDone(t2.id), t2.timeOfDay ? `<span class="hbadge">${t2.timeOfDay}</span>` : "")).join("");
     } else if (view.tab === "weekly") {
-      const order = (t2) => (weekDone(t2.id) ? 10 : 0) + (t2.weekday === dow() ? 0 : 1);
-      h += [...H2.weeklyTasks || []].sort((a, b) => order(a) - order(b)).map((t2) => row("weekly", t2.id, t2, weekDone(t2.id), t2.weekday != null ? `<span class="hbadge${t2.weekday === dow() ? " now" : ""}">${t2.weekday === dow() ? "today" : DAYS[t2.weekday]}</span>` : "")).join("");
+      const order = (t2) => (weekDone(t2.id) ? 10 : 0) + (t2.weekday === dow2() ? 0 : 1);
+      h += [...H2.weeklyTasks || []].sort((a, b) => order(a) - order(b)).map((t2) => row("weekly", t2.id, t2, weekDone(t2.id), t2.weekday != null ? `<span class="hbadge${t2.weekday === dow2() ? " now" : ""}">${t2.weekday === dow2() ? "today" : DAYS[t2.weekday]}</span>` : "")).join("");
     } else if (view.tab === "last") {
       const items = [...H2.lastDone || []].sort((a, b) => (dueIn(a) ?? 9999) - (dueIn(b) ?? 9999));
       h += items.map((it) => {
@@ -8490,7 +8598,7 @@ Quests finished today: ${S3.doneIds.length}`;
     tidy();
     const shop = (H2.shoppingList || []).map((s) => (H2.pantryItems.find((i) => i.id === s.id) || {}).name).filter(Boolean);
     return {
-      choresDueToday: [...(H2.dailyTasks || []).filter((t2) => !dayDone(t2.id)).map((t2) => t2.text), ...(H2.weeklyTasks || []).filter((t2) => t2.weekday === dow() && !weekDone(t2.id)).map((t2) => t2.text)],
+      choresDueToday: [...(H2.dailyTasks || []).filter((t2) => !dayDone(t2.id)).map((t2) => t2.text), ...(H2.weeklyTasks || []).filter((t2) => t2.weekday === dow2() && !weekDone(t2.id)).map((t2) => t2.text)],
       weeklyLeft: (H2.weeklyTasks || []).filter((t2) => !weekDone(t2.id)).map((t2) => t2.text),
       zone: zone().name,
       zoneLeft: (zone().tasks || []).filter((_, i) => !zoneDone(i)).map((t2) => t2.text),
@@ -9427,7 +9535,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   }
   var dots = (days) => `<span class="rvdots">${days.map((d, i) => `<i class="${d === true ? "on" : d === false ? "off" : "na"}" title="${WD2[i]}">${WD2[i]}</i>`).join("")}</span>`;
   function reviewPanel(F2, c) {
-    const w = gather(c), rev = (F2.reviews || {})[w.ws], nm2 = nextMonday(c.today), fri = (/* @__PURE__ */ new Date(c.today + "T00:00:00Z")).getUTCDay() === 5;
+    const w = gather(c), rev = (F2.reviews || {})[w.ws], nm3 = nextMonday(c.today), fri = (/* @__PURE__ */ new Date(c.today + "T00:00:00Z")).getUTCDay() === 5;
     if (!rw.draft || rw.draft.ws !== w.ws) rw.draft = { ws: w.ws, p: rev ? rev.priorities.slice() : ["", "", ""] };
     let h = `<span class="tape dots" aria-hidden="true"></span><h2>Your week in the village</h2>
     <p class="sub">${fmtDay(w.days[0])} to ${fmtDay(w.days[6])}${fri ? ". Happy Friday! Here's everything you did." : ". The week so far."}</p><div class="rvgrid">`;
@@ -9445,7 +9553,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     h += `</div>` + card3("This week's objectives", I2.goal, !c.canSend ? `<p class="rvnote">Connect Sunsama to see your weekly objectives here.</p>` : rw.objErr && !ob ? `<p class="rvnote">Couldn't reach Sunsama just now.</p>` : !ob ? `<p class="rvnote">Fetching them from Sunsama…</p>` : !ob.length ? `<p class="rvnote">No weekly objectives set in Sunsama this week.</p>` : `<ul class="rvobj">${ob.map((o) => `<li class="${o.done ? "done" : ""}"><span class="rvtick" aria-hidden="true"></span>${esc(o.title)}</li>`).join("")}</ul><p class="rvnote">${ob.filter((o) => o.done).length} of ${ob.length} done${ob.every((o) => o.done) ? ". Every one! That's a rosette in the courtyard." : "."}</p>`, "sky wide");
     const sent = rev && rev.sent && rev.sent.some(Boolean);
     h += `<section class="rvcard rvnext"><span class="rvtape butter" aria-hidden="true"></span><h3>${I2.star}Next week's three priorities</h3>
-    <p class="rvnote">Week of ${fmtDay(nm2)}. ${c.canSend ? "They go to Sunsama as next week's weekly objectives." : "Saved here (Sunsama isn't connected)."}</p>
+    <p class="rvnote">Week of ${fmtDay(nm3)}. ${c.canSend ? "They go to Sunsama as next week's weekly objectives." : "Saved here (Sunsama isn't connected)."}</p>
     <ol class="rvprio">${[0, 1, 2].map((i) => {
       const ok = rev && rev.sent && rev.sent[i];
       return `<li><label class="sr" for="rvP${i}">Priority ${i + 1}</label><input id="rvP${i}" class="rvp" data-i="${i}" maxlength="120" placeholder="${["The one that matters most", "Then this", "And this"][i]}" value="${esc(rw.draft.p[i] || "")}" ${ok ? "disabled" : ""}>${ok ? `<span class="rvok" title="In Sunsama">in Sunsama</span>` : ""}</li>`;
@@ -9466,7 +9574,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
         api4.rerender();
         return;
       }
-      const ws = weekStart(api4.today), nm2 = nextMonday(api4.today), pr = rw.draft.p.map((x) => plain(String(x || "")).trim().slice(0, 120));
+      const ws = weekStart(api4.today), nm3 = nextMonday(api4.today), pr = rw.draft.p.map((x) => plain(String(x || "")).trim().slice(0, 120));
       if (!pr.some(Boolean)) {
         api4.say("Pop in at least one priority for next week first.");
         return;
@@ -9476,7 +9584,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       if (api4.canSend) {
         rw.sending = true;
         api4.rerender();
-        for (let i = 0; i < 3; i++) if (pr[i] && !rev.sent[i]) rev.sent[i] = await createObjective(pr[i], nm2);
+        for (let i = 0; i < 3; i++) if (pr[i] && !rev.sent[i]) rev.sent[i] = await createObjective(pr[i], nm3);
         rw.sending = false;
       }
       if (first) api4.coins(15);
@@ -9761,8 +9869,8 @@ ${e.text}`;
   var SG = 8 * 36e5;
   var iso = (ms) => new Date(ms).toISOString().slice(0, 10);
   var comingMonday = () => {
-    const t2 = Date.parse(dayKey() + "T00:00:00Z"), dow2 = new Date(t2).getUTCDay();
-    return iso(t2 + ((8 - dow2) % 7 || 7) * 864e5);
+    const t2 = Date.parse(dayKey() + "T00:00:00Z"), dow3 = new Date(t2).getUTCDay();
+    return iso(t2 + ((8 - dow3) % 7 || 7) * 864e5);
   };
   var nice = (d) => (/* @__PURE__ */ new Date(d + "T00:00:00Z")).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   async function lastVision() {
@@ -10936,6 +11044,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var dowNow = () => new Date(now() + 8 * H).getUTCDay();
   var slotNow = (def) => {
     const t2 = sgHM(), we = weekend(), dw = dowNow();
+    const special = tourSlot(def.id, dayKey(), t2) || visitSlot(def.id, dayKey(), t2);
+    if (special) return special;
     const owned = api3 && api3.F().fam && api3.F().fam.owned || {};
     return def.routine.find((s) => t2 >= s.from && t2 < s.to && (!s.days || s.days === "we" === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null;
   };
@@ -13329,6 +13439,12 @@ Then tell chat "wind down" whenever you're ready.`
     const faded = [...o.trees.map((p) => stateOf("tree", p, today2)), ...o.beds.map((p) => stateOf("bed", p, today2)), ...o.bushes.map((p) => stateOf("bush", p, today2))].filter((x) => x.stage === "faded").length;
     const tea = whereIs("mama") === "cottage" && sgHM() >= 15 * 60 && sgHM() < 16 * 60 && o.tea !== today2 && S2.teaAsk !== today2;
     const line = tea ? (S2.teaAsk = today2, `Ma Ma's waving from her cottage door: "Come, come! Tea and cake!"`) : n ? `Ma Ma presses ${n} coins into your hand. "I sold some at the shop today. For you."` : empty && id === "orchard" ? `So much empty ground! Ma Ma says: "Plant some trees, I'll take care of them."` : faded ? `${faded} spot${faded === 1 ? "'s" : "s have"} had their season. Ma Ma's saving the ground for something new.` : null;
+    const tr = tourNow(today2, sgHM());
+    if (tr && !line) {
+      const who3 = [tr.guide, ...tr.group].map((x) => (NPCS.find((n2) => n2.id === x) || { name: x }).name);
+      setTimeout(() => speak(`A farm tour's on! ${who3[0]} is showing ${who3.slice(1, -1).join(", ")} and ${who3[who3.length - 1]} around.`, 5500), 1200);
+      return;
+    }
     const quote = /"(.+)"$/.exec(line || "");
     if (line) setTimeout(() => {
       if (here && quote && !tea && !n) npcSay("mama", quote[1]);
@@ -15130,7 +15246,10 @@ Then tell chat "wind down" whenever you're ready.`
   function orchardTick() {
     const out = orchTick(F, dayKey());
     if (!out) return;
-    const picked = Object.keys(out.picked).length;
+    const picked = Object.keys(out.picked).length, here = scene === "orchard" || scene === "flowers";
+    (out.tours || []).forEach((tr) => {
+      if (here && !quietNow()) setTimeout(() => speak(`Tour finished! ${tr.n} visitors paid ${tr.fee} coins into Ma Ma's tin.`, 4500), 800);
+    });
     if (picked && (scene === "orchard" || scene === "flowers")) {
       drawScene();
       if (isHere("mama") && !quietNow()) npcSay("mama", pick(["Picked these for the shop. So sweet this year.", "Look, so many! Ma Ma's back is aching, but worth it.", "Fresh from the tree. Take some home for Evan."]));
@@ -15972,6 +16091,8 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
   ["speech", "npcSay", "evanSay", "melSay"].forEach((id) => $(id).addEventListener("click", (ev) => {
     ev.stopPropagation();
     $(id).hidden = true;
+    const under = document.elementFromPoint(ev.clientX, ev.clientY), who3 = under && under.closest("#actors [data-npc], #actors [data-ent]");
+    if (who3) who3.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: ev.clientX, clientY: ev.clientY }));
   }));
   $("chatForm").onsubmit = (e) => {
     e.preventDefault();

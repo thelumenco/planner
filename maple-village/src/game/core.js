@@ -41,6 +41,7 @@ import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courier
 import { dishArt, glassArt } from "../art/wine.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
+import { tourNow } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
@@ -1063,6 +1064,9 @@ function orchardArrive(id){
     : n ? `Ma Ma presses ${n} coins into your hand. "I sold some at the shop today. For you."`
     : empty && id === "orchard" ? "So much empty ground! Ma Ma says: \"Plant some trees, I'll take care of them.\""
     : faded ? `${faded} spot${faded === 1 ? "'s" : "s have"} had their season. Ma Ma's saving the ground for something new.` : null;
+  const tr = tourNow(today, sgHM());
+  if (tr && !line) { const who = [tr.guide, ...tr.group].map(x => (NPCS.find(n => n.id === x) || {name: x}).name);
+    setTimeout(() => speak(`A farm tour's on! ${who[0]} is showing ${who.slice(1, -1).join(", ")} and ${who[who.length - 1]} around.`, 5500), 1200); return; }
   const quote = /"(.+)"$/.exec(line || "");
   if (line) setTimeout(() => { if (here && quote && !tea && !n) npcSay("mama", quote[1]); else speak(line, 5500); }, 1200);
 }
@@ -1806,7 +1810,8 @@ const serving = () => scene === "wineshop" && atSpot === "wcounter";
 // Ma Ma picks what's ripe and the farm shop sells; if Mel's watching, the trees and beds redraw
 function orchardTick(){
   const out = orchTick(F, dayKey()); if (!out) return;
-  const picked = Object.keys(out.picked).length;
+  const picked = Object.keys(out.picked).length, here = scene === "orchard" || scene === "flowers";
+  (out.tours || []).forEach(tr => { if (here && !quietNow()) setTimeout(() => speak(`Tour finished! ${tr.n} visitors paid ${tr.fee} coins into Ma Ma's tin.`, 4500), 800); });
   if (picked && (scene === "orchard" || scene === "flowers")) { drawScene(); if (isHere("mama") && !quietNow()) npcSay("mama", pick(["Picked these for the shop. So sweet this year.", "Look, so many! Ma Ma's back is aching, but worth it.", "Fresh from the tree. Take some home for Evan."])); }
   save(scene === "orchard" || scene === "flowers");
 }
@@ -2177,7 +2182,11 @@ $("pet").onclick = () => { sfx("purr"); hearts(2); speak(pick(["*leans into the 
 document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
 $("pclose").onclick = closePanel;
 // Speech bubbles close with a tap (the next thing anyone says brings them back)
-["speech", "npcSay", "evanSay", "melSay"].forEach(id => $(id).addEventListener("click", ev => { ev.stopPropagation(); $(id).hidden = true; }));
+// Tapping a speech bubble closes it, and if someone's standing under it (Penny with the post, a villager), the tap
+// reaches them too: a bubble shouldn't make the person beneath it untappable.
+["speech", "npcSay", "evanSay", "melSay"].forEach(id => $(id).addEventListener("click", ev => { ev.stopPropagation(); $(id).hidden = true;
+  const under = document.elementFromPoint(ev.clientX, ev.clientY), who = under && under.closest("#actors [data-npc], #actors [data-ent]");
+  if (who) who.dispatchEvent(new MouseEvent("click", {bubbles: true, clientX: ev.clientX, clientY: ev.clientY})); }));
 $("chatForm").onsubmit = e => { e.preventDefault(); const v = $("chatIn").value; $("chatIn").value = ""; sendChat(v); };
 $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);

@@ -1298,6 +1298,34 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // Orchard workers, visitors and weekend tours (paid into Ma Ma's tin); Darren's weekday tours
+  console.log("\norchard tours");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`tours pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/tourpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    const t = Date.now(); f.orch = {trees: [{k: "apple", at: t, next: t + 9e7}, {k: "pear", at: t, next: t + 9e7}, null, null, null, null, null, null, null, null, null, null],
+      beds: [{k: "mum", at: t, next: t + 9e7}, null, null, null, null, null, null, null, null, null, null, null], bushes: [null, null, null, null], stock: {}, tin: 0, lastTick: t};
+    localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
+  await page.goto(url + "?reset=1&seed=1&time=10:20&date=2026-10-10"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:20&date=2026-10-10&tourpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(1200);
+  const ids = await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  check(ids.filter(x => ["hana", "okada", "juniper", "bo", "lin", "pip", "opal", "theo"].includes(x)).length >= 3 && ids.some(x => ["mama", "gonggong", "farid", "mei"].includes(x)), "a Saturday morning tour: a guide and a small group of villagers in the orchard");
+  check(await page.locator('#actors [data-npc="farid"]').count() + await page.locator('#actors .act-guide').count() >= 1, "Farid works the orchard (or is leading the tour)");
+  await page.locator('#world [data-place="farmshop"]').dispatchEvent("click"); await page.waitForSelector("#ctx .ortour", { timeout: 15000 });
+  check(/10am with .*11:30.*2pm.*4pm/.test(await page.locator("#ctx .ortour").textContent()), "the farm shop lists today's four tours and their guides");
+  await page.goto(url + "?seed=1&time=11:05&date=2026-10-10"); await page.waitForTimeout(2500);
+  check(await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")).orch; return o.tin >= 12 && o.tin % 4 === 0 && o.toursPaid.done.includes(0); }), "when a tour finishes, its visitors pay 4 coins each into Ma Ma's tin");
+  await page.goto(url + "?seed=1&time=18:00&date=2026-10-08"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(1200);
+  check(await page.locator('#actors [data-npc="darren"].act-guide').count() === 1, "on Thursday evenings Darren leads a farm tour");
+  await page.evaluate(() => window.__mapleScene("flowers")); await page.waitForTimeout(400);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-08"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("flowers")); await page.waitForTimeout(1200);
+  check(await page.locator('#actors [data-npc="mei"]').count() === 1, "Mei looks after the flower farm");
+  await page.close();
+}
+{
   // The bank: six vault jars of jewels for savings goals
   console.log("\nthe bank");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
