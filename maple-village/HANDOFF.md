@@ -692,4 +692,5 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Garden yields:** each crop now gives several per harvest (`CROPS[*].yield`: tulip 2, sunflower 2, carrot 3, corn 3, tomato 3, pepper 3, leek 3, pea 4, potato 4, strawberry 5, blueberry 5, pumpkin 2), and seed cards show it.
   - Per-piece sale prices dropped (corn 4, carrot 3, potato 2, strawberry 4, pumpkin 10…), so a whole harvest sells for only about 1.3–1.5× what one piece used to. The real gain is ingredients for the kitchen.
   - `CROPS[*].ns` is the plural, for Maple's harvest line.
+- More seasonal gifts for the grandparents: bak kwa 10 and pineapple tarts 8 (spring), rice dumplings (`bakchang`) 6 (summer), Christmas log cake 14 (winter). The market's dumpling stays a treat for Maple.
 - Pip's weekday football in the field is 3:30–4:30pm, so his playground slot at the vineyard (4:30) still happens.
