@@ -326,6 +326,7 @@ details[open] summary::after{content:"–"}
 .bedcard{position:relative;max-width:340px;text-align:center;background:#FFFDF6;color:#2F2B28;border-radius:14px;padding:24px 22px;box-shadow:0 20px 40px -20px rgba(0,0,0,.6);--ink:#2F2B28;--soft:#8A8279}
 .bedcard h2{font-family:"Klee One",serif;font-weight:600;font-size:1.8rem;margin:0 0 8px}
 .bedcard .bzz{font-family:"Klee One",serif;color:#8A8279;margin:0;letter-spacing:.3em}
+.bedcard #bedUp{color:#FFFDF6;background:#3B3550;border-color:#3B3550;margin-top:6px}
 body.bedlocked{overflow:hidden}
 
 /* ---------- "Do task" notebook overlay ---------- */
@@ -1379,7 +1380,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 </svg>
 <div class="bedlock" id="bedLock" hidden role="dialog" aria-modal="true" aria-labelledby="bedLockT">
   <div class="bedsky" aria-hidden="true"><span class="bmoon"></span><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-  <div class="bedcard"><p class="bzz" aria-hidden="true">z z z</p><h2 id="bedLockT">Bedtime</h2><p>You're tucked in. Everything in the village waits until <b>6am</b>, and so does everything else.</p>
+  <div class="bedcard"><p class="bzz" aria-hidden="true">z z z</p><h2 id="bedLockT">Bedtime</h2><p>You're tucked in. Everything in the village waits until <b>6am</b>, and this is your protected rest.</p>
     <p class="muted" id="bedLockLeft"></p><button class="btn alt small" id="bedUp" type="button">I really need to get up</button></div>
 </div>
 <main class="wrap">
@@ -3906,8 +3907,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         slot("12:00", "14:30", "base", [340, 300], { days: "we", act: "repair", dir: -1 }),
         slot("14:30", "17:00", "base", [[230, 360], [310, 612], [160, 540], [400, 330]], { days: "we" }),
         slot("17:00", "19:00", "farm", [[90, 250], [430, 400], [250, 520]], { days: "we", act: "farm" }),
-        slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600]], { days: "we" })
+        slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600]], { days: "we" }),
+        slot("22:00", "23:00", "home", [150, 262], { act: "sit" })
       ],
+      // winds down on the sofa, then bed by 11 (drawn in Mel's bed: darrenAsleep)
       lines: [
         "Coffee's fresh if you want some.",
         "Evan watered my shoes again. Very thorough.",
