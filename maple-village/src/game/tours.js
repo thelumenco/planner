@@ -234,7 +234,7 @@ export const DINNER_FROM = 18*60 + 30, DINNER_TO = 20*60;
 export const DINNER_HOSTS = ["home", "mumdad", "cottage", "marcus"];
 export const HOST_NAME = {home: "your place", mumdad: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", marcus: "Marcus and Angelina's"};
 // where each house's dining table stands: cx = centre, fy = the front edge of the table on the floor
-export const DINING = {home: {cx: 150, fy: 244}, mumdad: {cx: 270, fy: 500}, cottage: {cx: 320, fy: 470}, marcus: {cx: 340, fy: 470}};
+export const DINING = {home: {cx: 260, fy: 452}, mumdad: {cx: 270, fy: 500}, cottage: {cx: 320, fy: 470}, marcus: {cx: 340, fy: 470}};
 const BACK = ["mama", "gonggong", "mum", "dad", "angelina"], FRONT = ["darren", "marcus", "evan", "mel"];
 export function dinnerSeat(host, who){
   const t = DINING[host]; if (!t) return null;

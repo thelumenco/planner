@@ -870,3 +870,18 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Cellar door:** the `cdoor` station on the wine shop's west wall (dashed with a sign until built). `INNER.cellar` has its way back on the east wall.
   - `ROOMS.cellar` has the wine wall, the tasting bar (`flight`: 2 xp once a day), barrel racks and a high table.
   - It adds ×1.15 to the wine shop's footfall in `sellTick`.
+
+### Round 65: the home office and garage off the living room, a cream convertible
+- **Living room** (`ROOMS.home`): the family dining table in the middle (`DINING.home` 260,452), the sofa (back in, with the reading and rest quests), and the fridge and kitchen along the back.
+  - Four doors: Mel's room and the **home office** (`officedoor`, left wall, lower) on the left; Evan's room and the **garage** (`gdoor`, right wall, lower) on the right.
+- **Home office** (`ROOMS.office`, `INNER.office`): Mel's desk (`desk`, the `/./` home-quest default and the calendar and inbox desk), Darren's desk (Darren types there on weekdays at 430,258), a bookshelf, and the treadmill.
+- **Garage** (`ROOMS.garage`, `INNER.garage`): now part of the house from the start (the garage goal was dropped, since the cleaning cupboard lives there).
+  - It holds the workbench, the cleaning cupboard (the daily clean and Hestia's chores), storage, the laundry corner, and the car and scooter bays.
+- **Quests:** home quests can land in the office or garage. `basePlace` is the old placeOf; `spotOf` picks from all three rooms' stations; `placeOf` returns the room the chosen station is in. `questsIn("home")` counts all three.
+  - `placeInfo(pl)` labels rooms that aren't village buildings.
+  - `questMark` points at the door of a room off the current room.
+  - `PLACES` sends cupboard and laundry to the garage, and desk and treadmill to the office.
+  - Couriers don't come into the office or garage either.
+- Rooms off another room can also be left by the Exit mat at the bottom (as well as their side door).
+- **The car** is a cream convertible (`GOALS.car`, 3,500, no garage needed; the scooter is 800). While driving, Maple rides in the back, and Evan does too when he's with Mel and awake (`#mel.withEvan`).
+  - Their own sprites are hidden while the car moves (`mel.wasDriving`, `mel.carEvan`), and they hop out beside her when she stops.

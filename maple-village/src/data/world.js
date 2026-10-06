@@ -117,7 +117,8 @@ export const INNER = {
   // the wine shop's kitchen, through the door on its east wall; its own way out is the mat at the bottom
   kitchen: {parent: "wineshop", door: [462, 390], arrive: [260, 560], exit: [260, 606]},
   // big goals: the garage through the back door of the house, the cellar door through the wine shop's west wall
-  garage: {parent: "home", door: [366, 192], arrive: [260, 560], exit: [260, 606]},
+  garage: {parent: "home", door: [456, 512], arrive: [70, 450], exit: [34, 440]},
+  office: {parent: "home", door: [64, 512], arrive: [450, 450], exit: [486, 440]},
   cellar: {parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430]}
 };
 export const WORK = ["hall","chord","fresh","chico","post","home"];
@@ -161,18 +162,23 @@ export const ROOMS = {
     ["pobox","Post box","E","pobox",null,"Your post box: unread mail from your work inbox."]]},
   // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
   // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
-  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{X:[150,244], A:[130,452], B:[452,228], H:[318,250], Q:[366,170], C:[124,450], R:[40,330], K:[480,330], D:[350,516], G:[436,448], E:[448,598], F:[96,596]}, stations:[
-    ["desk","Home desk","A","desk",/./,"Your own little desk."],
+  // the living room: the family dining table in the middle, the sofa, kitchen and fridge along the back, and four doors:
+  // Mel's room (left, top), the home office (left, below it), Evan's room (right, top), the garage (right, below it)
+  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{X:[260,452], C:[130,250], B:[436,228], H:[334,250], R:[40,330], K:[480,330], O:[40,512], Q:[480,512]}, stations:[
     ["kitchen","Kitchen","B","kitchen",/cook|meal|lunch|dinner|bake|grocer|prep/,"Something smells good."],
+    ["sofa","Sofa","C","sofa",/read|rest|journal|meditat|book|nap/,"Soft cushions, deep breaths."],
     ["mydoor","My room","R","sidedoor",null,"Your room. Just you.",0],
     ["kiddoor","Evan's room","K","kiddoor",null,"Evan's room. Dinosaurs welcome.",0],
-    ["laundry","Laundry","D","laundry",/fold|laundry|clothes|wash|iron/,"Fold, stack, done."],
-    ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Hestia's chores live in here."],
+    ["officedoor","Home office","O","officedoor",null,"The home office: your desk, Darren's desk and the treadmill.",0],
+    ["gdoor","Garage","Q","garagedoor",null,"Through to the garage.",0],
     ["fridge","Fridge","H","fridge",null,"The fridge: what we have, and the shopping list."],
-    ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12],
-    ["office","Darren's desk","G","office",null,"Darren's home office. Shh, he might be on a call."],
-    ["gdoor","Garage","Q","garagedoor",null,"The door at the back of the house, through to the garage.",20],
-    ["dine","Dining table","X","dining",/read|rest|journal|meditat|book|nap/,"The big family table. Room for all nine of us, or a book and a cup of tea.",44]]},
+    ["dine","Dining table","X","dining",null,"The big family table. Room for all nine of us.",44]]},
+  // the home office, through the lower door on the living room's west wall: Mel's desk, Darren's desk, the treadmill
+  office: {name:"Home office", wall:"#EEF1E6", trim:"var(--sage)", noBoard:true, pos:{A:[140,262], K:[300,261], G:[420,330], F:[120,540]}, stations:[
+    ["desk","Home desk","A","desk",/./,"Your own little desk."],
+    ["obooks","Bookshelf","K","bookcase",null,"Files, notebooks, and Darren's one surviving plant.",34],
+    ["office","Darren's desk","G","office",null,"Darren's side of the office. Shh, he might be on a call."],
+    ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12]]},
   // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
   room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[262,300], W:[262,206], B:[72,262], E:[62,396], C:[66,500], D:[434,556], J:[260,594], N:[406,132]}, stations:[
     ["routines","My routines","N","routineboard",null,"Your routines, pinned up.",74],
@@ -246,9 +252,11 @@ export const ROOMS = {
     ["msofa","Sofa","S","sofa",null,"The comfiest sofa on the foreshore.",30],
     ["dine","Dining table","X","dining",null,"Their dining table. Wedding magazines at one end, bank papers at the other.",44]]},
   // the garage (a big goal): Darren's workbench, storage, the scooter and the car once they're bought
-  garage: {name:"The garage", wall:"#E3E6EA", trim:"#8FA3B8", noBoard:true, pos:{W:[130,250], K:[420,261], S:[120,470], C:[330,480]}, stations:[
+  garage: {name:"The garage", wall:"#E3E6EA", trim:"#8FA3B8", noBoard:true, pos:{W:[130,250], E:[300,262], K:[436,261], C:[310,480], D:[120,566], S:[440,566]}, stations:[
     ["gbench","Workbench","W","bench",null,"Darren's tools, all hung up on the wall. Mostly.",34],
+    ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Hestia's chores live in here."],
     ["gshelf","Storage","K","shelf",null,"Boxes labelled 'Christmas', 'Evan's baby clothes' and 'misc'.",34],
+    ["laundry","Laundry corner","D","laundry",/fold|laundry|clothes|wash|iron/,"Fold, stack, done."],
     ["scooter","Scooter","S","scooterbay",null,"The scooter's spot.",30],
     ["car","Car","C","carbay",null,"The car's spot.",30]]},
   // the cellar door (a big goal): Mel's wine wall, the tasting bar, barrel racks, a high table
@@ -276,7 +284,13 @@ export const spotObj = (scene, id) => scene === "base" ? baseSpot(id) : id === "
 export const isTreadTask = t => !!t && (t.spot === "treadmill" || /🚶|treadmill/i.test(t.title || ""));
 // Writing of any kind (for any business) happens at the Fresh Pages library's writing desk (Mel's call)
 export const isWriting = t => !!t && /\b(write|writing|rewrite|draft|drafting|blog|article|essay|newsletter|copywrit\w*|copy|caption|script|outline|headline|journal|post copy)\b/i.test(t.title || "");
-export function placeOf(t){
+// Home quests can land at stations in the home office or the garage (rooms off the living room): spotOf picks from
+// all three, and placeOf says which room that station is actually in.
+const HOME_ROOMS = ["home", "office", "garage"];
+const homeStations = () => HOME_ROOMS.flatMap(r => stationsOf(r));
+const roomOfStation = id => HOME_ROOMS.find(r => ROOMS[r] && ROOMS[r].stations.some(st => st[0] === id)) || "home";
+export function placeOf(t){ const p = basePlace(t); return p === "home" ? roomOfStation(spotOf(t)) : p; }
+function basePlace(t){
   if (isTreadTask(t)) return "home";
   if (t.place === "base") return "base";
   if (isWriting(t)) return "fresh";
@@ -296,10 +310,10 @@ export function placeOf(t){
 }
 function baseSpot(id){ const v = VILLAGE[id]; return v ? {id, name: v.name, tx: v.door[0], ty: v.door[1], x: v.door[0], y: v.door[1], line: v.line} : null; }
 export function spotOf(t){
-  if (placeOf(t) === "base") { const s = (t.title + " " + (t.channel || "")).toLowerCase();
+  if (basePlace(t) === "base") { const s = (t.title + " " + (t.channel || "")).toLowerCase();
     return (t.spot && BASE_SPOTS.some(([id]) => id === t.spot)) ? t.spot : baseSpotFor(s) || "pond"; }
   // The cupboard and treadmill are only picked on purpose (the clean, or "Do it on the treadmill").
-  const pl = placeOf(t), st = stationsOf(pl).filter(s => (s.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title)) && s.id !== "treadmill" && s.re);
+  const pl = basePlace(t), st = (pl === "home" ? homeStations() : stationsOf(pl)).filter(s => (s.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title)) && s.id !== "treadmill" && s.re);
   if (isTreadTask(t)) return "treadmill";
   if (pl === "fresh" && isWriting(t)) return "desk";
   if (t.spot && st.find(s => s.id === t.spot)) return t.spot;

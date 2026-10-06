@@ -222,7 +222,9 @@ function dropTask(id, quiet){
 }
 function undropTask(id){ S.dropped = (S.dropped || []).filter(x => x !== id); setSay("Back on the board."); save(true); }
 const remaining = () => allTasks().filter(t => !S.doneIds.includes(t.id));
-const questsIn = pl => allTasks().filter(t => placeOf(t) === pl);
+// a quest's place for labels: a village building, or a room off one (the home office, the garage)
+const placeInfo = pl => VILLAGE[pl] || (ROOMS[pl] ? {name: ROOMS[pl].name, short: ROOMS[pl].name.toLowerCase().replace(/^the /, "the ")} : {name: pl, short: pl});
+const questsIn = pl => allTasks().filter(t => placeOf(t) === pl || (pl === "home" && (placeOf(t) === "office" || placeOf(t) === "garage")));
 function phase(){
   if (S.mode === "break") return "break";   // a break Mel asks for comes first, even mid-clean
   if (S.mode === "decompress" && S.decompFree) return "decompress";   // decompress from the calm corner, any time
@@ -232,7 +234,7 @@ function phase(){
   return S.doneIds.length ? "recap" : "empty";
 }
 const arrivedFor = t => S.arrived[t.id] || (scene === placeOf(t) && atSpot === spotOf(t));
-const atClean = () => S.wipe || (scene === "home" && atSpot === "cupboard");
+const atClean = () => S.wipe || (scene === "garage" && atSpot === "cupboard");
 
 /* =================== FARM =================== */
 function growth(p){ if (!p || !p.crop || !p.wateredAt) return 0; return clamp((Date.now() - p.wateredAt + (p.bonus || 0)) / (CROPS[p.crop].dur / ((F.tools || {}).compost ? 1.25 : 1)), 0, 1); }
@@ -376,7 +378,7 @@ function defaultLine(){
   if (scene === "market") return "Shop's open! Have a browse.";
   if (scene === "farm") return readyCount() ? "Something's ready to harvest!" : "Tap a plot to plant or water.";
   if (ph === "clean") return atClean() ? (S.wipe ? "Five minutes. Hard stop, promise." : (sgHM() < 720 ? "Morning! Wet wipe first?" : "Hi! Wet wipe first?")) : "To the cleaning cupboard at home!";
-  if (ph === "task") { const t = remaining()[0]; return arrivedFor(t) ? (S.firstStep[t.id] ? "You're doing it. I'm watching the clock." : "We're here. Just the first tiny step.") : `Next quest: the ${spotObj(placeOf(t), spotOf(t)).name.toLowerCase()} at ${VILLAGE[placeOf(t)].short}.`; }
+  if (ph === "task") { const t = remaining()[0]; return arrivedFor(t) ? (S.firstStep[t.id] ? "You're doing it. I'm watching the clock." : "We're here. Just the first tiny step.") : `Next quest: the ${spotObj(placeOf(t), spotOf(t)).name.toLowerCase()} at ${placeInfo(placeOf(t)).short}.`; }
   if (ph === "break") return "Zzz… break time. Wander, or rest.";
   if (ph === "decompress") return S.decompFree ? "Clench, breathe, then three quick points in your journal." : `${S.decompFor ? `“${S.decompFor}” is done. ` : ""}Clench, breathe, then jot three quick points.`;
   if (ph === "recap") return "We did it! Garden? Shopping? Snacks?";
@@ -526,7 +528,7 @@ function timerDone(kind){
 }
 /* =================== ACTIONS =================== */
 function goQuest(t){
-  if (phase() === "clean") { const c = spotObj("home", "cupboard"); go("home", c.tx, c.ty, () => arriveSpot("cupboard")); return; }
+  if (phase() === "clean") { const c = spotObj("garage", "cupboard"); go("garage", c.tx, c.ty, () => arriveSpot("cupboard")); return; }
   const pl = placeOf(t), sp = spotObj(pl, spotOf(t)); go(pl, sp.tx, sp.ty, () => pl === "base" ? arriveVillageSpot(sp.id) : arriveSpot(sp.id));
 }
 const A = {
@@ -790,7 +792,7 @@ function renderTomorrow(){
   else {
     const today = new Set(allTasks().map(t => t.id));
     h += `<ul class="hlist tmr">${tmr.list.map(t => { const early = F.early[t.id] === tmr.day, on = today.has(t.id);
-      return `<li><span class="pl">${icon(placeOf(t), 18)}</span><span><b>${esc(t.title)}</b><small>${t.minutes || 25} min</small></span>${early ? `<span class="hbadge">done early</span>` : on ? `<span class="hbadge sched">on today's board</span>` : `<button class="next" data-early="${esc(t.id)}">do today</button>`}</li>`; }).join("")}</ul>`;
+      return `<li><span class="pl">${icon(placeOf(t) === "office" || placeOf(t) === "garage" ? "home" : placeOf(t), 18)}</span><span><b>${esc(t.title)}</b><small>${t.minutes || 25} min</small></span>${early ? `<span class="hbadge">done early</span>` : on ? `<span class="hbadge sched">on today's board</span>` : `<button class="next" data-early="${esc(t.id)}">do today</button>`}</li>`; }).join("")}</ul>`;
   }
   el.innerHTML = h;
   el.querySelectorAll("[data-tmr]").forEach(b => b.onclick = () => peekTomorrow());
@@ -854,7 +856,7 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, {mod
 // actions that run straight away (shopping list, chores, breaks, timers, quests, water, steps, walking somewhere).
 let chatLog = (() => { try { return JSON.parse(localStorage.getItem("fox.chat")) || []; } catch { return []; } })(), chatBusy = false;
 const keepChat = () => { chatLog = chatLog.slice(-30); try { localStorage.setItem("fox.chat", JSON.stringify(chatLog)); } catch {} };
-const PLACES = {home: "home", house: "home", fridge: "home:fridge", kitchen: "home:kitchen", cupboard: "home:cupboard", treadmill: "home:treadmill", sofa: "home:sofa",
+const PLACES = {home: "home", house: "home", fridge: "home:fridge", kitchen: "home:kitchen", cupboard: "garage:cupboard", "cleaning cupboard": "garage:cupboard", laundry: "garage:laundry", garage: "garage", treadmill: "office:treadmill", "home office": "office", office: "office", desk: "office:desk", "home desk": "office:desk", "darren's desk": "office:office", sofa: "home:sofa",
   pond: "base:pond", garden: "farm", farm: "farm", shed: "base:shed", swing: "base:swing", letterbox: "base:letterbox", "animal run": "base:run", wardrobe: "room:wardrobe", outfit: "room:wardrobe", "my room": "room", bedroom: "room", bed: "room:bed", journal: "room:journal", jars: "room:jars", "emotion shelf": "room:jars", "emotion jar": "room:jars", scratchpad: "hall:whiteboard", whiteboard: "hall:whiteboard", run: "base:run", animals: "base:run", chickens: "base:run", rabbits: "base:run", market: "market", well: "village:well",
   "wine shop kitchen": "kitchen", "shop kitchen": "kitchen", larder: "kitchen:larder", oven: "kitchen:oven", stove: "kitchen:stove", "cheese press": "kitchen:press", "olive tree": "vineyard:olive", olives: "vineyard:olive",
   "weekly review": "hall:review", review: "hall:review", scrapbook: "hall:review", "week review": "hall:review",
@@ -1300,7 +1302,7 @@ function journal(){
   } else if (ph === "task") {
     const t = remaining()[0], fs = S.firstStep[t.id], pl = placeOf(t), sp = spotObj(pl, spotOf(t)), at = arrivedFor(t);
     h += `${S.last ? `<p class="ack">✓ ${esc(S.last === "clean" ? "clean done" : S.last)}</p>` : ""}
-      <h1><span class="lbl">quest · ${esc(VILLAGE[pl].name)} · ${esc(sp.name)}</span>${esc(t.title)}</h1>
+      <h1><span class="lbl">quest · ${esc(placeInfo(pl).name)} · ${esc(sp.name)}</span>${esc(t.title)}</h1>
       ${(t.at || t.treadmill || isTreadTask(t) || t.chat || t.notes || t.email) ? `<p class="stickers">${t.at ? `<span class="sticker">${icon("clock", 14)} ${esc(t.at)}</span>` : ""}${(t.treadmill || isTreadTask(t)) ? `<span class="sticker">${icon("walker", 14)} ${onTread(t) ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t.notes ? `<span class="sticker">${icon("note", 14)} notes</span>` : ""}${t.email ? `<span class="sticker">${icon("letter", 14)} email</span>` : ""}${t.chat ? `<span class="sticker">${icon("chat", 14)} happens in chat</span>` : ""}</p>` : ""}
       ${(fs || (S.timer && S.timer.id === t.id)) ? timerHTML(S.timer && S.timer.kind === "deal" ? "five-minute deal, then you may stop" : `${t.minutes || 25}-minute time box`) : `<p class="stickers"><span class="sticker">${icon("clock", 14)} ${t.minutes || 25}-minute time box once you start</span></p>`}
       <ul class="bujo">${fs ? `<li>Keep going. One thing at a time.</li>` : `<li class="first"><span><span class="hl">First step only:</span> ${esc(t.firstStep || "open whatever you need for it. Just open it.")}</span></li><li>Then ${t.minutes || 25} minutes on the rest.</li>`}
@@ -1410,8 +1412,8 @@ function ctx(){
   if (vaultView && bv.pouring && !$("panel").hidden && !openView) return;   // never interrupt jewels mid-pour
   c.dataset.kid = kid.open && scene === "kidroom" ? kid.open : "";
   if (kid.open && scene === "kidroom") h = kidPanel(kid.open);
-  else if (homeView && scene === "home") h = hestiaPanel(homeView);
-  else if (deskOpen && scene === "home") h = deskPanel();
+  else if (homeView && (scene === "home" || scene === "garage")) h = hestiaPanel(homeView);
+  else if (deskOpen && scene === "office") h = deskPanel();
   else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
   else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalPanel(F, goalView);
@@ -1518,14 +1520,14 @@ function ctx(){
     const list = outside() ? allTasks() : questsIn(scene), cur = phase() === "task" ? remaining()[0].id : null;
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>${outside() ? "Town quest board" : esc(ROOMS[scene].name) + " quests"}</h2>
       ${list.length ? `<ul class="qlist">${list.map(t => { const dn = S.doneIds.includes(t.id), sp = spotObj(placeOf(t), spotOf(t));
-        return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"${!dn && t.id !== cur && phase() !== "clean" ? ` data-next="${esc(t.id)}" role="button"` : ""}><span><b>${esc(t.title)}</b><small>${outside() ? icon(placeOf(t), 16) + " " + esc(VILLAGE[placeOf(t)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : "<span></span>"}</li>`; }).join("")}</ul>`
+        return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}"${!dn && t.id !== cur && phase() !== "clean" ? ` data-next="${esc(t.id)}" role="button"` : ""}><span><b>${esc(t.title)}</b><small>${outside() ? icon(placeOf(t), 16) + " " + esc(placeInfo(placeOf(t)).name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t.id !== cur && phase() !== "clean" ? `<button class="next" data-next="${esc(t.id)}">do next</button>` : "<span></span>"}</li>`; }).join("")}</ul>`
         : `<p class="sub">No quests ${outside() ? "today yet" : "in here today"}.</p>`}
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
   }
   c.innerHTML = h;
   if (kid.open && scene === "kidroom") wireKid(c, kid.open, {eat: id => { kid.open = null; ctx(); kidEat(id); }, close: () => { kid.open = null; stopKidGame(); ctx(); }});
-  if (homeView && scene === "home") wireHestia(c, homeView);
-  if (deskOpen && scene === "home") wireDesk(c, () => ctx());
+  if (homeView && (scene === "home" || scene === "garage")) wireHestia(c, homeView);
+  if (deskOpen && scene === "office") wireDesk(c, () => ctx());
   if (reviewOpen && scene === "hall") wireReview(c, F, {save: () => save(), rerender: () => ctx(), say: l => speak(l, 5000, true), sfx, canSend: !rvw.noMcp, today: dayKey(), coins: n => { F.coins += n; S.earned = (S.earned || 0) + n; flash(`+${n} coins: weekly review`); }});
   if (kView && scene === "kitchen") wireKitchen(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, today: dayKey()});
   c.querySelectorAll("[data-goal]").forEach(b => b.onclick = () => { const line = buyGoal(F, b.dataset.goal); if (!line) return; sfx("chaching"); act("cheer"); flash(`${GOALS[b.dataset.goal].n}: yours!`); gainXp(5);
@@ -1645,21 +1647,25 @@ function hestiaMarks(){
   let h = "";
   if (scene === "base" && (c.chores || c.shop)) h = badge(232, 170, c.chores + c.shop, "broom");
   if (scene === "home") {
-    const cb = spotObj("home", "cupboard"), fr = spotObj("home", "fridge");
-    if (c.chores) h += badge(cb.x, cb.y - 100, c.chores, "broom");
+    const gd = spotObj("home", "gdoor"), fr = spotObj("home", "fridge");
+    if (c.chores) h += badge(gd.x + 26, gd.y - 120, c.chores, "broom");   // the chores are in the cupboard, in the garage
     if (c.shop) h += badge(fr.x, fr.y - 100, c.shop, "fridge");
   }
+  if (scene === "garage" && c.chores) { const cb = spotObj("garage", "cupboard"); h += badge(cb.x, cb.y - 100, c.chores, "broom"); }
   g.innerHTML = h;
 }
 function questMark(){
   const ph = phase(), m = $("qmarkWrap");
   let target = null;
-  if (ph === "clean" && !atClean()) target = {pl:"home", sp:"cupboard"};
+  if (ph === "clean" && !atClean()) target = {pl:"garage", sp:"cupboard"};
   if (ph === "task") { const t = remaining()[0]; if (!arrivedFor(t)) target = {pl:placeOf(t), sp:spotOf(t)}; }
   let pos = null;
   if (target) {
-    if (outside() && target.pl === "base") pos = scene === "base" ? (() => { const v = VILLAGE[target.sp]; return v.mark || [v.door[0], v.door[1] - 64]; })() : VILLAGE[BRIDGES[scene][nextHop(scene, "base")]].mark;
-    else if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][nextHop(scene, outdoorOf(target.pl))]].mark;
+    // a room off another room (the garage, the home office): outdoors aim for its building; in the parent room, its door
+    const inner = INNER[target.pl], bld = inner ? inner.parent : target.pl, DOOR = {garage: "gdoor", office: "officedoor", room: "mydoor", kidroom: "kiddoor", kitchen: "kdoor", cellar: "cdoor"};
+    if (inner && scene === bld && DOOR[target.pl]) { const d = spotObj(scene, DOOR[target.pl]); pos = [d.x + (d.x > 260 ? 26 : -26), d.y - 120]; }
+    else if (outside() && bld === "base") pos = scene === "base" ? (() => { const v = VILLAGE[target.sp]; return v.mark || [v.door[0], v.door[1] - 64]; })() : VILLAGE[BRIDGES[scene][nextHop(scene, "base")]].mark;
+    else if (outside()) pos = VILLAGE[bld].scene === scene ? VILLAGE[bld].mark : VILLAGE[BRIDGES[scene][nextHop(scene, outdoorOf(bld))]].mark;
     else if (scene === target.pl) { const s = spotObj(scene, target.sp); pos = [s.x, s.y - 70]; }
     else pos = INNER[scene] ? [INNER[scene].exit[0], 330] : [260, 582];
   }
@@ -1757,7 +1763,7 @@ function render(redraw){
   $("qBadge").hidden = !rem.length; $("qBadge").textContent = rem.length;
   $("list").innerHTML = all.map(t => { const dn = S.doneIds.includes(t.id);
     const pickable = !dn && t.id !== cur && phase() !== "clean";
-    return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? `<i class="tk" aria-label="done"></i>` : ""}${esc(t.title)}</span><small>${esc(VILLAGE[placeOf(t)].name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}${t.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : "<span></span>"}</li>`; }).join("")
+    return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? `<i class="tk" aria-label="done"></i>` : ""}${esc(t.title)}</span><small>${esc(placeInfo(placeOf(t)).name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}${t.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : "<span></span>"}</li>`; }).join("")
     + ((S.dropped || []).length ? `<li class="dropped"><small>Dropped today: ${(S.dropped || []).map(id => { const t = ((P && P.tasks) || []).find(x => x.id === id); return t ? `${esc(t.title)} <button class="drop" data-undrop="${esc(id)}">bring back</button>` : ""; }).filter(Boolean).join(" · ")}</small></li>` : "");
   $("list").querySelectorAll("[data-drop]").forEach(el => el.onclick = ev => { ev.stopPropagation(); dropTask(el.dataset.drop); });
   $("list").querySelectorAll("[data-undrop]").forEach(el => el.onclick = ev => { ev.stopPropagation(); undropTask(el.dataset.undrop); });
@@ -1860,7 +1866,8 @@ function arriveSpot(id){
   if (id === "mydoor") { setScene("room", INNER.room.arrive); return; }
   if (scene === "cottage" && id === "tea") { orView = "tea"; sfx("paper", true); render(); return; }
   if (id === "dine") { sitForDinner(); return; }
-  if (id === "gdoor") { if (owns(F, "garage")) setScene("garage", INNER.garage.arrive); else { goalView = "garage"; sfx("paper", true); render(); } return; }
+  if (id === "gdoor") { setScene("garage", INNER.garage.arrive); return; }
+  if (id === "officedoor") { setScene("office", INNER.office.arrive); return; }
   if (id === "cdoor") { if (owns(F, "cellar")) setScene("cellar", INNER.cellar.arrive); else { goalView = "cellar"; sfx("paper", true); render(); } return; }
   if (scene === "garage" && (id === "scooter" || id === "car")) { goalView = owns(F, id) ? "garagepick" : id; sfx("paper", true); render(); return; }
   if (scene === "cellar" && id === "flight") { const first = S.flightDay !== dayKey(); if (first) { S.flightDay = dayKey(); gainXp(2); save(); }
@@ -1881,15 +1888,15 @@ function arriveSpot(id){
   if (id === "pobox") { postOpen = true; sfx("paper"); render(); fetchPost().then(() => { ctx(); drawScene(); }); return; }
   if (id === "board" && outside()) { openView = "quests"; speak("All of today's quests!", 3500); render(); return; }
   if (id === "board") { boardOpen = true; speak(outside() ? "All of today's quests!" : "Here's what needs doing in here.", 3500); render(); return; }
-  if (ph === "clean" && scene === "home" && id === "cupboard" && !S.wipe) { setSay("Wet wipes live here. Grab one!"); render(); return; }
+  if (ph === "clean" && scene === "garage" && id === "cupboard" && !S.wipe) { setSay("Wet wipes live here. Grab one!"); render(); return; }
   // Hestia: the cupboard holds the chores, the fridge the pantry and shopping list (not quests)
-  if (scene === "home" && (id === "cupboard" || id === "fridge") && !(ph === "task" && placeOf(remaining()[0]) === "home" && spotOf(remaining()[0]) === id && !S.arrived[remaining()[0].id])) {
+  if ((scene === "home" || scene === "garage") && (id === "cupboard" || id === "fridge") && !(ph === "task" && placeOf(remaining()[0]) === scene && spotOf(remaining()[0]) === id && !S.arrived[remaining()[0].id])) {
     homeView = id === "fridge" ? "fridge" : "chores"; sfx(id === "fridge" ? "tap" : "paper"); render(); return; }
   if (ph === "task") {
     const t = remaining()[0];
     if (placeOf(t) === scene && spotOf(t) === id && !S.arrived[t.id]) { S.arrived[t.id] = true; setSay(`Here at the ${spotObj(scene, id).name.toLowerCase()}. First tiny step…`); save(); return; }
   }
-  if (scene === "home" && id === "desk") { deskOpen = true; sfx("paper", true); render(); loadDesk(false, () => { if (deskOpen) ctx(); }); return; }   // calendar and both inboxes
+  if (scene === "office" && id === "desk") { deskOpen = true; sfx("paper", true); render(); loadDesk(false, () => { if (deskOpen) ctx(); }); return; }   // calendar and both inboxes
   if (scene === "bank" && /^vault\d$/.test(id)) { bv.slot = +id.slice(5); bv.mode = jarAt(bv.slot) ? "jar" : "setup"; bv.form = null; bv.amt = ""; vaultView = "jar"; sfx("paper", true); render(); return; }
   if (scene === "bank" && id === "counter") { vaultView = "overview"; sfx("paper", true); if (!npcSay("opal", pick(["Here's your passbook. Every vault at a glance.", "Lovely to see you! Shall we check on your jars?", "Your jewels are all accounted for."]))) speak("Opal's passbook is on the counter.", 3000); render(); return; }
   if (id === "trophydoor") { setScene("trophy", INNER.trophy.arrive); return; }
@@ -2013,7 +2020,11 @@ const SUP_BOARD = k => `<g class="supboard"><ellipse cx="0" cy="${-1*k}" rx="${2
 // Mel's scooter (under her feet) and car (round her, her head above the roof line), shown while she's on the move outdoors
 { const b = document.querySelector("#mel .bob"); if (b) {
   b.insertAdjacentHTML("beforebegin", `<g class="rideScoot" style="stroke:var(--line)" stroke-width="1"><rect x="-15" y="-3" width="30" height="3.4" rx="1.6" style="fill:#7FB8E8"/><circle cx="-12" cy="1" r="2.6" style="fill:#2F2B28"/><circle cx="12" cy="1" r="2.6" style="fill:#2F2B28"/><path d="M12 -3 l3 -26 M10 -29 h9" fill="none" stroke-width="2"/></g>`);
-  b.insertAdjacentHTML("afterend", `<g class="rideCar" style="stroke:var(--line)" stroke-width="1.1"><path d="M-26 -4 v-14 q0 -4 4 -5 l8 -2 q4 -9 12 -9 h8 q8 0 11 9 l7 2 q4 1 4 5 v14z" style="fill:#E8566C"/><path d="M-10 -25 q3 -6 9 -6 h4 v7z M5 -31 h2 q6 0 9 7 h-11z" style="fill:#CFE0EE"/><circle cx="-14" cy="-3" r="5" style="fill:#2F2B28"/><circle cx="15" cy="-3" r="5" style="fill:#2F2B28"/><circle cx="23" cy="-15" r="1.6" style="fill:#F3C969"/></g>`); } }
+  // the cream convertible, roof down: Mel at the wheel, Maple in the back, Evan beside her when he's along (and awake)
+  b.insertAdjacentHTML("afterend", `<g class="rideCar" style="stroke:var(--line)" stroke-width="1.1"><g class="carEvan"><circle cx="-21" cy="-26" r="5" style="fill:var(--skin)"/><path d="M-26 -27 q5 -8 10 -1" style="fill:#2A211D"/><circle cx="-22.5" cy="-25.5" r=".7" style="fill:#2F2B28" stroke="none"/></g>
+    <path d="M-38 -22 l3 -8 l4 5z M-32 -23 l3 -7 l3 6z" style="fill:var(--fox)"/><ellipse cx="-32" cy="-19" rx="6" ry="4.6" style="fill:var(--fox)"/><path d="M-37 -17.5 q5 3 10 0" style="fill:#FFFDF6"/><circle cx="-34" cy="-20" r=".7" style="fill:#2F2B28" stroke="none"/>
+    <path d="M-40 -4 v-12 q0 -4 4 -5 h56 l8 4 q4 2 4 6 v7z" style="fill:#F3E7C9"/><path d="M-38 -14 h58" opacity=".5"/><path d="M14 -21 l4 -9" style="stroke:#9CC3E0" stroke-width="2.2"/>
+    <circle cx="-26" cy="-3" r="5" style="fill:#2F2B28"/><circle cx="16" cy="-3" r="5" style="fill:#2F2B28"/><circle cx="-26" cy="-3" r="2" style="fill:#CFC8BE"/><circle cx="16" cy="-3" r="2" style="fill:#CFC8BE"/><circle cx="29" cy="-11" r="1.6" style="fill:#F3C969"/></g>`); } }
 function familyPaddle(){
   if (sup) return;
   const m = sgHM(); if (m >= 19*60 || m < 6*60) { speak("Too dark for paddling now. The boards will be here in the morning.", 3500); render(); return; }
@@ -2356,7 +2367,7 @@ function nearSpot(){
   const list = [...stationsOf(scene), scene !== "market" ? {id:"board", tx:260, ty:200} : null].filter(Boolean);
   const s = list.find(s => Math.hypot(s.tx - mel.x, s.ty - mel.y) < 26); return s ? s.id : null;
 }
-const EVAN_SPOTS = {mumdad:[[300,560],[200,380],[420,420],[150,560],[460,560]], marcus:[[230,560],[120,500],[460,560],[250,340],[300,600]], cottage:[[200,560],[440,540],[300,340]], shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[380,520],[260,330],[200,600],[360,330],[300,300]]};
+const EVAN_SPOTS = {mumdad:[[300,560],[200,380],[420,420],[150,560],[460,560]], marcus:[[230,560],[120,500],[460,560],[250,340],[300,600]], cottage:[[200,560],[440,540],[300,340]], shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[150,340],[260,330],[380,330],[200,580],[330,590]]};
 // Evan's destination is evan.tx/ty; outdoors he follows route-finder waypoints to it (round the house, not through it)
 function evanWalk(speed, dt){
   const key = evan.tx + "," + evan.ty;
@@ -2463,12 +2474,16 @@ function frame(now){
       const n = nearSpot();
       if (n) { if (outside()) { const v = VILLAGE[n]; if (v.spot) arriveVillageSpot(n); else go(n, 260, 560, null); } else arriveSpot(n); }
       else if (!outside() && scene !== "farm" && !INNER[scene] && mel.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
-      else if (INNER[scene] && scene !== "kidroom" && Math.abs(mel.x - INNER[scene].exit[0]) < 12 && Math.abs(mel.y - INNER[scene].exit[1]) < 56) { const I = INNER[scene]; go(I.parent, I.door[0] + 30, I.door[1] + 20, null); }
+      else if (INNER[scene] && scene !== "kidroom" && ((Math.abs(mel.x - INNER[scene].exit[0]) < 12 && Math.abs(mel.y - INNER[scene].exit[1]) < 56) || (mel.y > 592 && Math.abs(mel.x - 260) < 60))) { const I = INNER[scene]; go(I.parent, I.door[0] + 30, I.door[1] + 20, null); }
       else if (scene === "farm" && mel.y > 592 && Math.abs(mel.x - 260) < 50) go("base", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
     }
   }
   if (S.cruise && (scene !== "shore" || Date.now() > S.cruise.until)) endCruise();
-  { const rd = outside() ? ride(F) : "walk"; nodes.mel.classList.toggle("scoot", rd === "scooter" && mel.moving && !sup); nodes.mel.classList.toggle("drive", rd === "car" && mel.moving && !sup); }
+  { const rd = outside() ? ride(F) : "walk", drive = rd === "car" && mel.moving && !sup, withEvan = drive && evanHere() && !evanNight();
+    nodes.mel.classList.toggle("scoot", rd === "scooter" && mel.moving && !sup); nodes.mel.classList.toggle("drive", drive); nodes.mel.classList.toggle("withEvan", withEvan);
+    // Maple and Evan ride along in the convertible, and hop out beside Mel when she stops
+    if (drive) { mel.carEvan = withEvan; } else if (mel.wasDriving) { maple.x = maple.tx = mel.x - mel.dir*22; maple.y = maple.ty = mel.y + 3; if (mel.carEvan) { evan.x = evan.tx = mel.x + 18; evan.y = evan.ty = mel.y + 6; evan.path = [[evan.x, evan.y]]; evan.rk = evan.tx + "," + evan.ty; } mel.carEvan = false; }
+    mel.wasDriving = drive; }
   if (sup) { if (scene !== "shore" || Date.now() > sup.until) endPaddle(true); else if (!sup.out && mel.x < 160) sup.out = true; else if (sup.out && mel.tx > 170) endPaddle(false); }
   if (melEx && (scene !== "field" || Math.hypot(mel.tx - melEx[0], mel.ty - melEx[1]) > 4 || !classOn(dayKey()) || sgHM() >= classOn(dayKey()).to)) melEx = null;
   nodes.mel.classList.toggle("exercise", !!melEx && !mel.moving);
@@ -2485,10 +2500,10 @@ function frame(now){
   tickEvan(dt);
   tickNpcs(dt); updateCam(dt); drawTableware();
   placeNode(nodes.mel, mel); placeNode(nodes.maple, maple); placeNode(nodes.evan, evan);
-  nodes.evan.style.visibility = (scene === "kidroom" && kid.sleep) || cruisingNow() ? "hidden" : "";
-  nodes.maple.style.visibility = cruisingNow() ? "hidden" : "";
+  nodes.evan.style.visibility = (scene === "kidroom" && kid.sleep) || cruisingNow() || (mel.wasDriving && mel.carEvan) ? "hidden" : "";
+  nodes.maple.style.visibility = cruisingNow() || mel.wasDriving ? "hidden" : "";
   // On the treadmill with the time box running: Mel walks in place.
-  if (scene === "home" && atSpot === "treadmill" && !route.length && S.timer && S.timer.kind === "task" && Math.abs(mel.x - mel.tx) < 2) { nodes.mel.classList.add("walk"); mel.dir = 1; }
+  if (scene === "office" && atSpot === "treadmill" && !route.length && S.timer && S.timer.kind === "task" && Math.abs(mel.x - mel.tx) < 2) { nodes.mel.classList.add("walk"); mel.dir = 1; }
   nodes.evan.classList.toggle("run", evan.run && evan.moving);
   const order = [[nodes.mel, mel], [nodes.maple, maple], [nodes.evan, evan], ...npcActors(), ...stallFronts()].sort((a, b) => a[1].y - b[1].y);
   const g = $("actors"); order.forEach(([n]) => { if (g.lastElementChild !== n) g.appendChild(n); });
@@ -2532,7 +2547,7 @@ document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openVi
 initNotebook({windDown, onTread, subs: subView, subTick, water:() => ({ml: S.waterMl || 0, goal: WATER_GOAL, glass: GLASS}), steps:() => ({n: S.steps, goal: STEP_GOAL}),
   addWater:ml => A.water(ml), setWater, setSteps, task:() => phase() === "task" ? remaining()[0] : null, S:() => S, F:() => F, fs:t => !!S.firstStep[t.id], act:nbAct, timerLeft,
   sayNow:() => say, timerBtns, paperName, sample:() => sampleCap, sampleDenied:() => { sampleCap = null; }, sayButton, markRead, agentName, onClose:() => render(),
-  placeLabel:t => `${VILLAGE[placeOf(t)].name} · ${spotObj(placeOf(t), spotOf(t)).name}`});
+  placeLabel:t => `${(VILLAGE[placeOf(t)] || ROOMS[placeOf(t)]).name} · ${spotObj(placeOf(t), spotOf(t)).name}`});
 initHestia({sfx, alarm, speak, flash, undoable, earn: (n, why) => { earn(n, why); save(); }, changed: () => render(),
   refund: (n, why) => { F.coins = Math.max(0, F.coins - n); S.earned = Math.max(0, (S.earned || 0) - n); flash(`-${n} coin: ${why}`); save(); }});
 $("hestiaFile").onchange = e => { const f = e.target.files && e.target.files[0]; if (!f) return; const r = new FileReader();

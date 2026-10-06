@@ -155,7 +155,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#pclose");
 
   // Library digest shelf: first read is free, the second is locked until an hour passes or a quest is done
-  await page.evaluate(() => document.querySelector("#world [data-exit]") && document.querySelector("#world [data-exit]").dispatchEvent(new MouseEvent("click", {bubbles: true})));
+  // out of the home office (a room off the living room), then out of the house
+  for (let k = 0; k < 2 && !/Town square|Home base/.test(await page.locator("#sceneName").textContent()); k++) {
+    await page.evaluate(() => document.querySelector("#world [data-exit]") && document.querySelector("#world [data-exit]").dispatchEvent(new MouseEvent("click", {bubbles: true})));
+    await page.waitForFunction(() => /Town square|Home base|^Home/.test(document.querySelector("#sceneName").textContent.trim()) && !/office/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(400); }
   await page.waitForFunction(() => /Town square|Home base/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   if (await page.locator('#journal [data-qn="min"]').count()) await page.click('#journal [data-qn="min"]');
   if (/Home base/.test(await page.locator("#sceneName").textContent())) {
@@ -234,7 +237,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="home"]').dispatchEvent("click");
   await page.waitForFunction(() => document.querySelector("#sceneName").textContent.trim().startsWith("Home") && !/base/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(600);
-  check(await page.locator('#actors [data-npc="darren"].act-type').count() === 1, "Darren is typing at the home office desk on a weekday morning");
+  await page.locator('#world [data-spot="officedoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /office/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(600);
+  check(await page.locator('#actors [data-npc="darren"].act-type').count() === 1, "Darren is typing at his desk in the home office on a weekday morning");
   await page.screenshot({ path: join(shots, "darren-desk.png") });
   await page.close();
 }
@@ -295,6 +300,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="home"]').dispatchEvent("click");
   await page.waitForFunction(() => /^Home/.test(document.querySelector("#sceneName").textContent.trim()) && !/base/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(400);
+  await page.locator('#world [data-spot="gdoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /garage/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(400);
   // the first visit is the five-minute clean (grab a wet wipe); after that the cupboard opens Hestia's chores
   await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
   await page.waitForTimeout(3000);
@@ -312,6 +320,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="home"]').dispatchEvent("click");
   await page.waitForFunction(() => /^Home/.test(document.querySelector("#sceneName").textContent.trim()) && !/base/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(400);
+  await page.locator('#world [data-spot="gdoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /garage/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(400);
   await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
   await page.waitForFunction(() => /cleaning cupboard/i.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
   const box = page.locator('#ctx [data-hdone^="daily:"]:not(:checked)').first(), boxId = await box.getAttribute("data-hdone");
@@ -326,6 +336,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#ctx .hzone").textContent().then(t => /Living Room/.test(t)), "this week's zone is on its own tab");
   await page.click('#ctx [data-htimer="10"]');
   check(await page.locator("#ctx [data-htleft]").count() === 1, "the tidy timer runs from the cupboard");
+  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(800);   // the fridge is back in the living room
   await page.locator('#world [data-spot="fridge"]').dispatchEvent("click");
   await page.waitForFunction(() => /fridge/i.test(document.querySelector("#ctx h2") && document.querySelector("#ctx h2").textContent), null, { timeout: 15000 });
   await page.fill('#ctx form[data-hitem] input[name="t"]', "Oat milk");
@@ -343,6 +354,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(400);
   check(await page.locator("#hestiaNote").textContent().then(t => /Imported: 1 daily, 1 weekly, 1 zones, 1 pantry/.test(t)), "a Hestia export imports chores, zones and pantry");
   await page.click("#pclose");
+  await page.evaluate(() => window.__mapleScene("garage")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
   await page.waitForTimeout(500);
   await page.screenshot({ path: join(shots, "hestia-cupboard.png") });
@@ -759,6 +771,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#pclose");
   await page.locator('#world [data-place="home"]').dispatchEvent("click");
   await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-spot="officedoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /office/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-spot="desk"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-desk="refresh"]', { timeout: 15000 });
   await page.waitForFunction(() => /Dinner on Sunday/.test(document.querySelector("#ctx").textContent), null, { timeout: 10000 }).catch(() => {});
@@ -1017,7 +1031,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#journal [data-a="walk"]');
   await page.waitForFunction(() => document.querySelector('#journal [data-a="gotWipe"]'), null, { timeout: 15000 });
   await page.click('#journal [data-a="gotWipe"]'); await page.click('#journal [data-a="cleanDone"]'); await page.waitForTimeout(300);
-  await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForFunction(() => /garage/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-htab="last"]', { timeout: 15000 });
   await page.click('#ctx [data-htab="last"]');
@@ -1550,20 +1564,21 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-06"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-06&richpatch=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(800);
-  await page.locator('#world [data-spot="gdoor"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="garage"]', { timeout: 15000 });
-  check(/1200/.test(await page.locator("#ctx").textContent()), "a door at the back of the house: build the garage for 1,200 coins");
-  await page.click('#ctx [data-goal="garage"]'); await page.waitForTimeout(400);
-  check(await gf().then(f => f.goals.garage && f.coins === 9300), "the garage gets built");
+  check(await page.locator('#world [data-spot="officedoor"]').count() === 1 && await page.locator('#world [data-spot="gdoor"]').count() === 1 && await page.locator('#world [data-spot="desk"]').count() === 0, "the living room has doors to the home office (left) and the garage (right); the desks have moved out");
+  await page.locator('#world [data-spot="officedoor"]').dispatchEvent("click"); await page.waitForTimeout(2500);
+  check(await page.locator('#world [data-spot="desk"], #world [data-spot="office"], #world [data-spot="treadmill"]').count() === 3, "the home office: Mel's desk, Darren's desk and the treadmill");
+  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="gdoor"]').dispatchEvent("click"); await page.waitForTimeout(2500);
-  check(await page.locator('#world [data-spot="car"]').count() === 1, "through the back door into the garage");
+  check(await page.locator('#world [data-spot="laundry"]').count() === 1 && await page.locator('#world [data-spot="cupboard"]').count() === 1, "the garage holds the laundry corner and the cleaning cupboard");
+  check(await page.locator('#world [data-spot="car"]').count() === 1, "through the garage door: room for a scooter and a car");
   await page.locator('#world [data-spot="scooter"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="scooter"]', { timeout: 15000 });
   await page.click('#ctx [data-goal="scooter"]'); await page.waitForTimeout(400);
   check(await gf().then(f => f.goals.scooter && f.ride === "scooter"), "a scooter, kept in the garage");
   await page.click('#ctx [data-goal="car"]'); await page.waitForTimeout(400);
-  check(await gf().then(f => f.goals.car && f.ride === "car" && f.coins === 10500 - 1200 - 800 - 3500), "and a car");
+  check(await gf().then(f => f.goals.car && f.ride === "car" && f.coins === 10500 - 800 - 3500), "and a cream convertible");
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(600);
   await page.locator('#world [data-place="toVine"]').dispatchEvent("click"); await page.waitForTimeout(250);
-  check(await page.locator("#mel.drive").count() === 1, "outdoors Mel drives the car between places");
+  check(await page.locator("#mel.drive").count() === 1 && await page.locator("#mel.withEvan").count() === 1, "outdoors Mel drives the convertible between places, with Evan and Maple aboard");
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="cdoor"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="cellar"]', { timeout: 15000 });
   await page.click('#ctx [data-goal="cellar"]'); await page.waitForTimeout(400);

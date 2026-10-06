@@ -560,6 +560,7 @@ button.subname[aria-expanded="true"]::after{content:"▴"}
 #mel.scoot .rideScoot,#mel.drive .rideCar{display:inline}
 #mel.scoot .legL,#mel.scoot .legR,#mel.scoot .armL,#mel.scoot .armR{animation:none !important}
 #mel.drive .legL,#mel.drive .legR{visibility:hidden}
+#mel .carEvan{display:none}#mel.withEvan .carEvan{display:inline}
 
 /* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
 :root{--mapw:max(300px,min(980px,calc((100dvh - 196px)*520/640 + 26px)))}
@@ -2216,7 +2217,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     // the wine shop's kitchen, through the door on its east wall; its own way out is the mat at the bottom
     kitchen: { parent: "wineshop", door: [462, 390], arrive: [260, 560], exit: [260, 606] },
     // big goals: the garage through the back door of the house, the cellar door through the wine shop's west wall
-    garage: { parent: "home", door: [366, 192], arrive: [260, 560], exit: [260, 606] },
+    garage: { parent: "home", door: [456, 512], arrive: [70, 450], exit: [34, 440] },
+    office: { parent: "home", door: [64, 512], arrive: [450, 450], exit: [486, 440] },
     cellar: { parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430] }
   };
   var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
@@ -2260,18 +2262,24 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ] },
     // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
     // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
-    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { X: [150, 244], A: [130, 452], B: [452, 228], H: [318, 250], Q: [366, 170], C: [124, 450], R: [40, 330], K: [480, 330], D: [350, 516], G: [436, 448], E: [448, 598], F: [96, 596] }, stations: [
-      ["desk", "Home desk", "A", "desk", /./, "Your own little desk."],
+    // the living room: the family dining table in the middle, the sofa, kitchen and fridge along the back, and four doors:
+    // Mel's room (left, top), the home office (left, below it), Evan's room (right, top), the garage (right, below it)
+    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { X: [260, 452], C: [130, 250], B: [436, 228], H: [334, 250], R: [40, 330], K: [480, 330], O: [40, 512], Q: [480, 512] }, stations: [
       ["kitchen", "Kitchen", "B", "kitchen", /cook|meal|lunch|dinner|bake|grocer|prep/, "Something smells good."],
+      ["sofa", "Sofa", "C", "sofa", /read|rest|journal|meditat|book|nap/, "Soft cushions, deep breaths."],
       ["mydoor", "My room", "R", "sidedoor", null, "Your room. Just you.", 0],
       ["kiddoor", "Evan's room", "K", "kiddoor", null, "Evan's room. Dinosaurs welcome.", 0],
-      ["laundry", "Laundry", "D", "laundry", /fold|laundry|clothes|wash|iron/, "Fold, stack, done."],
-      ["cupboard", "Cleaning cupboard", "E", "cupboard", /clean|tidy|wipe|hestia|dust/, "Hestia's chores live in here."],
+      ["officedoor", "Home office", "O", "officedoor", null, "The home office: your desk, Darren's desk and the treadmill.", 0],
+      ["gdoor", "Garage", "Q", "garagedoor", null, "Through to the garage.", 0],
       ["fridge", "Fridge", "H", "fridge", null, "The fridge: what we have, and the shopping list."],
-      ["treadmill", "Treadmill", "F", "treadmill", /treadmill/, "1.2 and go. Walk and work.", -12],
-      ["office", "Darren's desk", "G", "office", null, "Darren's home office. Shh, he might be on a call."],
-      ["gdoor", "Garage", "Q", "garagedoor", null, "The door at the back of the house, through to the garage.", 20],
-      ["dine", "Dining table", "X", "dining", /read|rest|journal|meditat|book|nap/, "The big family table. Room for all nine of us, or a book and a cup of tea.", 44]
+      ["dine", "Dining table", "X", "dining", null, "The big family table. Room for all nine of us.", 44]
+    ] },
+    // the home office, through the lower door on the living room's west wall: Mel's desk, Darren's desk, the treadmill
+    office: { name: "Home office", wall: "#EEF1E6", trim: "var(--sage)", noBoard: true, pos: { A: [140, 262], K: [300, 261], G: [420, 330], F: [120, 540] }, stations: [
+      ["desk", "Home desk", "A", "desk", /./, "Your own little desk."],
+      ["obooks", "Bookshelf", "K", "bookcase", null, "Files, notebooks, and Darren's one surviving plant.", 34],
+      ["office", "Darren's desk", "G", "office", null, "Darren's side of the office. Shh, he might be on a call."],
+      ["treadmill", "Treadmill", "F", "treadmill", /treadmill/, "1.2 and go. Walk and work.", -12]
     ] },
     // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
     room: { name: "My room", wall: "#EFE3EE", trim: "var(--blush)", noBoard: true, pos: { A: [262, 300], W: [262, 206], B: [72, 262], E: [62, 396], C: [66, 500], D: [434, 556], J: [260, 594], N: [406, 132] }, stations: [
@@ -2362,9 +2370,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["dine", "Dining table", "X", "dining", null, "Their dining table. Wedding magazines at one end, bank papers at the other.", 44]
     ] },
     // the garage (a big goal): Darren's workbench, storage, the scooter and the car once they're bought
-    garage: { name: "The garage", wall: "#E3E6EA", trim: "#8FA3B8", noBoard: true, pos: { W: [130, 250], K: [420, 261], S: [120, 470], C: [330, 480] }, stations: [
+    garage: { name: "The garage", wall: "#E3E6EA", trim: "#8FA3B8", noBoard: true, pos: { W: [130, 250], E: [300, 262], K: [436, 261], C: [310, 480], D: [120, 566], S: [440, 566] }, stations: [
       ["gbench", "Workbench", "W", "bench", null, "Darren's tools, all hung up on the wall. Mostly.", 34],
+      ["cupboard", "Cleaning cupboard", "E", "cupboard", /clean|tidy|wipe|hestia|dust/, "Hestia's chores live in here."],
       ["gshelf", "Storage", "K", "shelf", null, "Boxes labelled 'Christmas', 'Evan's baby clothes' and 'misc'.", 34],
+      ["laundry", "Laundry corner", "D", "laundry", /fold|laundry|clothes|wash|iron/, "Fold, stack, done."],
       ["scooter", "Scooter", "S", "scooterbay", null, "The scooter's spot.", 30],
       ["car", "Car", "C", "carbay", null, "The car's spot.", 30]
     ] },
@@ -2391,7 +2401,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var spotObj = (scene2, id) => scene2 === "base" ? baseSpot(id) : id === "board" ? { id: "board", name: "Quest board", tx: 260, ty: 200, line: "This building's quests." } : stationsOf(scene2).find((s) => s.id === id);
   var isTreadTask = (t2) => !!t2 && (t2.spot === "treadmill" || /🚶|treadmill/i.test(t2.title || ""));
   var isWriting = (t2) => !!t2 && /\b(write|writing|rewrite|draft|drafting|blog|article|essay|newsletter|copywrit\w*|copy|caption|script|outline|headline|journal|post copy)\b/i.test(t2.title || "");
+  var HOME_ROOMS = ["home", "office", "garage"];
+  var homeStations = () => HOME_ROOMS.flatMap((r) => stationsOf(r));
+  var roomOfStation = (id) => HOME_ROOMS.find((r) => ROOMS[r] && ROOMS[r].stations.some((st6) => st6[0] === id)) || "home";
   function placeOf(t2) {
+    const p = basePlace(t2);
+    return p === "home" ? roomOfStation(spotOf(t2)) : p;
+  }
+  function basePlace(t2) {
     if (isTreadTask(t2)) return "home";
     if (t2.place === "base") return "base";
     if (isWriting(t2)) return "fresh";
@@ -2412,11 +2429,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return v ? { id, name: v.name, tx: v.door[0], ty: v.door[1], x: v.door[0], y: v.door[1], line: v.line } : null;
   }
   function spotOf(t2) {
-    if (placeOf(t2) === "base") {
+    if (basePlace(t2) === "base") {
       const s2 = (t2.title + " " + (t2.channel || "")).toLowerCase();
       return t2.spot && BASE_SPOTS.some(([id]) => id === t2.spot) ? t2.spot : baseSpotFor(s2) || "pond";
     }
-    const pl = placeOf(t2), st6 = stationsOf(pl).filter((s2) => (s2.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t2.title)) && s2.id !== "treadmill" && s2.re);
+    const pl = basePlace(t2), st6 = (pl === "home" ? homeStations() : stationsOf(pl)).filter((s2) => (s2.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t2.title)) && s2.id !== "treadmill" && s2.re);
     if (isTreadTask(t2)) return "treadmill";
     if (pl === "fresh" && isWriting(t2)) return "desk";
     if (t2.spot && st6.find((s2) => s2.id === t2.spot)) return t2.spot;
@@ -2910,7 +2927,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     )}
     ${sk(`<rect x="250" y="20" width="230" height="118" rx="3" style="fill:#B9C3CC"/>${rows(8, (i) => `<rect x="250" y="${24 + i * 14}" width="230" height="3" style="fill:#9AA6B1"/>`)}`, `<rect x="250" y="20" width="230" height="118" rx="3"/>`)}
     ${sk(`<rect x="200" y="6" width="120" height="6" rx="3" style="fill:#FFFDF6"/>`, `<rect x="200" y="6" width="120" height="6" rx="3"/>`)}
-    ${plant(30, 610, 0.8)}`,
+    ${sk(`<path d="M0 316 L28 328 L28 428 L0 440z" style="fill:#F8EED8"/>`, `<path d="M0 316 L28 328 L28 428 L0 440z"/><circle cx="23" cy="384" r="1.8"/>`)}
+    ${plant(490, 610, 0.8)}`,
+    // the home office: soft green walls, a big window, a pinboard, the way back into the living room on the east wall
+    office: () => `<rect width="520" height="640" style="fill:#D9C3A0"/>
+    <g opacity=".4" style="stroke:#B9A27E" stroke-width="1.2">${rows(13, (i) => `<path d="M0 ${170 + i * 36} H520"/>`)}${rows(30, (i) => `<path d="M${i * 67 % 520} ${170 + i % 13 * 36} v36"/>`)}</g>
+    ${wallBase("#EEF1E6", "var(--sage)")}${skirting}
+    ${sk(`<rect x="200" y="28" width="128" height="86" rx="4" style="fill:#CFE0EE"/><circle cx="236" cy="96" r="16" style="fill:#9EBE8C"/>`, `<rect x="200" y="28" width="128" height="86" rx="4"/><path d="M264 28 v86 M200 70 h128"/>`)}
+    ${sk(`<rect x="372" y="34" width="110" height="74" rx="3" style="fill:#D9B48A"/><rect x="384" y="44" width="26" height="22" style="fill:#FFF3B8"/><rect x="420" y="48" width="28" height="20" style="fill:#F4C7CF"/><rect x="398" y="74" width="30" height="22" style="fill:#C3CDEE"/>`, `<rect x="372" y="34" width="110" height="74" rx="3"/>`)}
+    ${sk(`<path d="M520 316 L492 328 L492 428 L520 440z" style="fill:#F8EED8"/>`, `<path d="M520 316 L492 328 L492 428 L520 440z"/><circle cx="497" cy="384" r="1.8"/>`)}
+    ${plant(30, 610, 0.9)}${plant(300, 610, 0.8)}`,
     // the cellar door: stone walls, an arched brick ceiling line, warm lamps, and the way back on the east wall
     cellar: () => `<rect width="520" height="640" style="fill:#B98E6A"/>
     <g opacity=".45" style="stroke:#8E6A4A" stroke-width="1.2">${rows(12, (i) => `<path d="M0 ${170 + i * 40} H520"/>`)}${rows(26, (i) => `<path d="M${i % 13 * 40 + Math.floor(i / 13) % 2 * 20} ${170 + i % 12 * 40} v40"/>`)}</g>
@@ -3850,9 +3876,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         slot("15:00", "16:30", "shore", SEA, { dow: [0], act: "sup", free: true }),
         // Sunday afternoons: paddleboarding off the foreshore
         slot("7:00", "8:30", "base", [190, 452], { days: "wd", act: "water", dir: -1 }),
-        slot("8:30", "12:30", "home", [446, 374], { days: "wd", act: "type", dir: -1 }),
+        slot("8:30", "12:30", "office", [430, 258], { days: "wd", act: "type", dir: -1 }),
         slot("12:30", "13:30", "base", [340, 300], { days: "wd", act: "repair", dir: -1 }),
-        slot("13:30", "17:30", "home", [446, 374], { days: "wd", act: "type", dir: -1 }),
+        slot("13:30", "17:30", "office", [430, 258], { days: "wd", act: "type", dir: -1 }),
         slot("17:30", "19:00", "farm", [[90, 250], [430, 400], [250, 520]], { days: "wd", act: "farm" }),
         slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600], [400, 330]], { days: "wd" }),
         slot("7:30", "10:30", "farm", [[90, 250], [430, 400], [250, 520]], { days: "we", act: "farm" }),
@@ -4549,7 +4575,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var DINNER_TO = 20 * 60;
   var DINNER_HOSTS = ["home", "mumdad", "cottage", "marcus"];
   var HOST_NAME = { home: "your place", mumdad: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", marcus: "Marcus and Angelina's" };
-  var DINING = { home: { cx: 150, fy: 244 }, mumdad: { cx: 270, fy: 500 }, cottage: { cx: 320, fy: 470 }, marcus: { cx: 340, fy: 470 } };
+  var DINING = { home: { cx: 260, fy: 452 }, mumdad: { cx: 270, fy: 500 }, cottage: { cx: 320, fy: 470 }, marcus: { cx: 340, fy: 470 } };
   var BACK = ["mama", "gonggong", "mum", "dad", "angelina"];
   var FRONT = ["darren", "marcus", "evan", "mel"];
   function dinnerSeat(host, who3) {
@@ -6882,13 +6908,18 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       }
       // big goals (game/goals.js): the garage's door at the back of the house (boarded up with a sign until it's built),
       // the scooter and car bays in the garage, the cellar door off the wine shop, and the cellar's furniture
-      case "garagedoor": {
-        const built = !!(G.F().goals || {}).garage;
-        return built ? sk(`<rect x="${x - 24}" y="${y - 96}" width="48" height="92" rx="3" style="fill:#8FA3B8"/><rect x="${x - 16}" y="${y - 86}" width="32" height="18" rx="2" style="fill:#CFE0EE"/>`, `<rect x="${x - 24}" y="${y - 96}" width="48" height="92" rx="3"/><rect x="${x - 16}" y="${y - 86}" width="32" height="18" rx="2"/><circle cx="${x + 15}" cy="${y - 46}" r="2"/><path d="M${x - 24} ${y - 40} h48 M${x - 24} ${y - 24} h48" opacity=".35"/>`) : sk(
-          `<rect x="${x - 26}" y="${y - 90}" width="52" height="16" rx="2" transform="rotate(-6 ${x} ${y - 82})" style="fill:#C9A27E"/><rect x="${x - 26}" y="${y - 54}" width="52" height="16" rx="2" transform="rotate(5 ${x} ${y - 46})" style="fill:#C9A27E"/><rect x="${x - 18}" y="${y - 72}" width="36" height="16" rx="2" style="fill:#FFFDF6"/>`,
-          `<rect x="${x - 24}" y="${y - 96}" width="48" height="92" rx="3" stroke-dasharray="4 4"/><rect x="${x - 18}" y="${y - 72}" width="36" height="16" rx="2"/><path d="M${x - 12} ${y - 64} h24" opacity=".6"/>`
+      // the garage door on the living room's east wall, below Evan's
+      case "garagedoor":
+        return sk(
+          `<path d="M${x + 40} ${y - 108} L${x + 12} ${y - 96} L${x + 12} ${y + 4} L${x + 40} ${y + 14}z" style="fill:#8FA3B8"/><path d="M${x + 36} ${y - 80} l-20 6 v10 l20 -6z" style="fill:#CFE0EE"/>`,
+          `<path d="M${x + 40} ${y - 108} L${x + 12} ${y - 96} L${x + 12} ${y + 4} L${x + 40} ${y + 14}z"/><circle cx="${x + 17}" cy="${y - 42}" r="1.8"/><path d="M${x + 36} ${y - 80} l-20 6 v10 l20 -6z"/>`
         );
-      }
+      // the home office door on the living room's west wall, below Mel's
+      case "officedoor":
+        return sk(
+          `<path d="M${x - 40} ${y - 108} L${x - 12} ${y - 96} L${x - 12} ${y + 4} L${x - 40} ${y + 14}z" style="fill:#9CC27E"/><path d="M${x - 36} ${y - 80} l20 6 v12 l-20 -6z" style="fill:#FFFDF6"/>`,
+          `<path d="M${x - 40} ${y - 108} L${x - 12} ${y - 96} L${x - 12} ${y + 4} L${x - 40} ${y + 14}z"/><circle cx="${x - 17}" cy="${y - 42}" r="1.8"/><path d="M${x - 36} ${y - 80} l20 6 v12 l-20 -6z"/><path d="M${x - 32} ${y - 74} h10" opacity=".6"/>`
+        );
       case "cellardoor": {
         const built = !!(G.F().goals || {}).cellar;
         return sk(
@@ -6900,11 +6931,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         const own = !!(G.F().goals || {}).scooter;
         return own ? sk(`<rect x="${x - 30}" y="${y - 12}" width="60" height="6" rx="3" style="fill:#7FB8E8"/><circle cx="${x - 24}" cy="${y - 4}" r="6" style="fill:#2F2B28"/><circle cx="${x + 24}" cy="${y - 4}" r="6" style="fill:#2F2B28"/><path d="M${x + 22} ${y - 10} l6 -44" style="stroke:#7FB8E8" stroke-width="4"/><path d="M${x + 18} ${y - 56} h18" style="stroke:#2F2B28" stroke-width="4"/>`, `<rect x="${x - 30}" y="${y - 12}" width="60" height="6" rx="3"/><circle cx="${x - 24}" cy="${y - 4}" r="6"/><circle cx="${x + 24}" cy="${y - 4}" r="6"/>`) : sk("", `<rect x="${x - 40}" y="${y - 40}" width="80" height="40" rx="6" stroke-dasharray="5 5" opacity=".6"/><path d="M${x - 14} ${y - 18} h28" opacity=".5"/>`);
       }
+      // the cream convertible, roof down (a big goal), or its empty bay
       case "carbay": {
         const own = !!(G.F().goals || {}).car;
         return own ? sk(
-          `<path d="M${x - 70} ${y - 14} v-24 q0 -10 10 -12 l24 -4 q12 -22 34 -22 h20 q20 0 30 22 l18 6 q8 2 8 12 v22z" style="fill:#E8566C"/><path d="M${x - 30} ${y - 54} q10 -16 26 -16 h14 v18z M${x + 14} ${y - 70} h4 q14 0 22 18 h-26z" style="fill:#CFE0EE"/><circle cx="${x - 40}" cy="${y - 12}" r="12" style="fill:#2F2B28"/><circle cx="${x + 44}" cy="${y - 12}" r="12" style="fill:#2F2B28"/><circle cx="${x - 40}" cy="${y - 12}" r="5" style="fill:#CFC8BE"/><circle cx="${x + 44}" cy="${y - 12}" r="5" style="fill:#CFC8BE"/>`,
-          `<path d="M${x - 70} ${y - 14} v-24 q0 -10 10 -12 l24 -4 q12 -22 34 -22 h20 q20 0 30 22 l18 6 q8 2 8 12 v22z"/><path d="M${x - 30} ${y - 54} q10 -16 26 -16 h14 v18z M${x + 14} ${y - 70} h4 q14 0 22 18 h-26z"/><circle cx="${x - 40}" cy="${y - 12}" r="12"/><circle cx="${x + 44}" cy="${y - 12}" r="12"/>`
+          `<path d="M${x - 78} ${y - 14} v-30 q0 -8 8 -10 h110 l26 10 q12 4 12 14 v16z" style="fill:#F3E7C9"/><path d="M${x - 50} ${y - 54} q0 -14 14 -14 h10 v14z M${x - 6} ${y - 54} q0 -12 12 -12 h8 v12z" style="fill:#C46A4A"/><path d="M${x + 34} ${y - 54} l10 -20" style="stroke:#9CC3E0" stroke-width="4"/>
+          <circle cx="${x - 46}" cy="${y - 12}" r="13" style="fill:#2F2B28"/><circle cx="${x + 46}" cy="${y - 12}" r="13" style="fill:#2F2B28"/><circle cx="${x - 46}" cy="${y - 12}" r="5" style="fill:#CFC8BE"/><circle cx="${x + 46}" cy="${y - 12}" r="5" style="fill:#CFC8BE"/><circle cx="${x + 72}" cy="${y - 30}" r="4" style="fill:#F3C969"/>`,
+          `<path d="M${x - 78} ${y - 14} v-30 q0 -8 8 -10 h110 l26 10 q12 4 12 14 v16z"/><path d="M${x - 50} ${y - 54} q0 -14 14 -14 h10 v14z M${x - 6} ${y - 54} q0 -12 12 -12 h8 v12z"/><path d="M${x - 74} ${y - 34} h138" opacity=".4"/><circle cx="${x - 46}" cy="${y - 12}" r="13"/><circle cx="${x + 46}" cy="${y - 12}" r="13"/>`
         ) : sk("", `<rect x="${x - 86}" y="${y - 70}" width="172" height="70" rx="8" stroke-dasharray="6 6" opacity=".6"/><path d="M${x - 40} ${y - 35} h80" opacity=".4"/>`);
       }
       case "tastebar":
@@ -12260,7 +12293,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       drop(courier.id);
       courier = null;
     }
-    if (scene2 === "home" || scene2 === "room" || scene2 === "kidroom") return;
+    if (scene2 === "home" || scene2 === "room" || scene2 === "kidroom" || scene2 === "office" || scene2 === "garage") return;
     if (courier && courier.state !== "leaving" && !api3.unreadMail().some((m) => m.id === courier.item.id)) {
       drop(courier.id);
       courier = null;
@@ -12471,9 +12504,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
 
   // src/game/goals.js
   var GOALS = {
-    garage: { n: "Garage", price: 1200, where: "home", line: "A garage off the back of the house, with a door from the living room. Somewhere to keep a scooter, and one day a car." },
-    scooter: { n: "Scooter", price: 800, needs: "garage", where: "garage", line: "A little electric scooter. Zips you from screen to screen about half again as fast as walking." },
-    car: { n: "Car", price: 3500, needs: "garage", where: "garage", line: "A small car, parked in the garage. Gets you round the village more than twice as fast as walking." },
+    scooter: { n: "Scooter", price: 800, where: "garage", line: "A little electric scooter. Zips you from screen to screen about half again as fast as walking." },
+    car: { n: "Cream convertible", price: 3500, where: "garage", line: "A cream convertible, roof down. Room for you, Maple and Evan, and more than twice as fast as walking." },
     boat: { n: "Dolphin cruise boat", price: 2e3, where: "shore", line: "A little cruise boat moored at the end of the jetty. Take the family out to see the dolphins up close." },
     cellar: { n: "Cellar door", price: 2500, where: "wineshop", line: "A cellar door extension off the wine shop: barrel racks, a tasting bar and a wall of every wine you've made. Visitors love a cellar door." }
   };
@@ -12490,9 +12522,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     F2.goals = { ...F2.goals || {}, [k]: Date.now() };
     if (k === "scooter" || k === "car") F2.ride = k;
     return {
-      garage: "The builders are done! There's a door at the back of the house now, through to your new garage.",
       scooter: "A shiny new scooter, parked in the garage. You'll zip about on it outdoors from now on.",
-      car: "A car! It's parked in the garage. You'll drive between screens from now on (a lot faster).",
+      car: "A cream convertible! Roof down, Maple in the back, Evan waving at everyone. You'll drive between screens from now on.",
       boat: "Your dolphin cruise boat is moored at the end of the jetty. Take everyone out!",
       cellar: "The cellar door is open! Through the new door on the wine shop's west wall."
     }[k];
@@ -12506,7 +12537,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     else {
       const pct = Math.min(100, Math.round(100 * F2.coins / g.price));
       h += `<div class="goalbar" role="img" aria-label="${pct}% saved"><span style="width:${pct}%"></span></div><p class="muted">${F2.coins} of ${g.price} ${coin()} saved${F2.coins < g.price ? `: ${g.price - F2.coins} to go` : ""}.</p>
-      <div class="actions"><button class="btn primary" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>${k === "garage" || k === "cellar" ? "Build it" : "Buy it"} (${g.price} ${coin()})</button></div>`;
+      <div class="actions"><button class="btn primary" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>${k === "cellar" ? "Build it" : "Buy it"} (${g.price} ${coin()})</button></div>`;
     }
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -12861,7 +12892,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     save2(true);
   }
   var remaining = () => allTasks().filter((t2) => !S2.doneIds.includes(t2.id));
-  var questsIn = (pl) => allTasks().filter((t2) => placeOf(t2) === pl);
+  var placeInfo = (pl) => VILLAGE[pl] || (ROOMS[pl] ? { name: ROOMS[pl].name, short: ROOMS[pl].name.toLowerCase().replace(/^the /, "the ") } : { name: pl, short: pl });
+  var questsIn = (pl) => allTasks().filter((t2) => placeOf(t2) === pl || pl === "home" && (placeOf(t2) === "office" || placeOf(t2) === "garage"));
   function phase() {
     if (S2.mode === "break") return "break";
     if (S2.mode === "decompress" && S2.decompFree) return "decompress";
@@ -12871,7 +12903,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return S2.doneIds.length ? "recap" : "empty";
   }
   var arrivedFor = (t2) => S2.arrived[t2.id] || scene === placeOf(t2) && atSpot === spotOf(t2);
-  var atClean = () => S2.wipe || scene === "home" && atSpot === "cupboard";
+  var atClean = () => S2.wipe || scene === "garage" && atSpot === "cupboard";
   function growth2(p) {
     if (!p || !p.crop || !p.wateredAt) return 0;
     return clamp((Date.now() - p.wateredAt + (p.bonus || 0)) / (CROPS[p.crop].dur / ((F.tools || {}).compost ? 1.25 : 1)), 0, 1);
@@ -13260,7 +13292,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (ph === "clean") return atClean() ? S2.wipe ? "Five minutes. Hard stop, promise." : sgHM() < 720 ? "Morning! Wet wipe first?" : "Hi! Wet wipe first?" : "To the cleaning cupboard at home!";
     if (ph === "task") {
       const t2 = remaining()[0];
-      return arrivedFor(t2) ? S2.firstStep[t2.id] ? "You're doing it. I'm watching the clock." : "We're here. Just the first tiny step." : `Next quest: the ${spotObj(placeOf(t2), spotOf(t2)).name.toLowerCase()} at ${VILLAGE[placeOf(t2)].short}.`;
+      return arrivedFor(t2) ? S2.firstStep[t2.id] ? "You're doing it. I'm watching the clock." : "We're here. Just the first tiny step." : `Next quest: the ${spotObj(placeOf(t2), spotOf(t2)).name.toLowerCase()} at ${placeInfo(placeOf(t2)).short}.`;
     }
     if (ph === "break") return "Zzz… break time. Wander, or rest.";
     if (ph === "decompress") return S2.decompFree ? "Clench, breathe, then three quick points in your journal." : `${S2.decompFor ? `“${S2.decompFor}” is done. ` : ""}Clench, breathe, then jot three quick points.`;
@@ -13588,8 +13620,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function goQuest(t2) {
     if (phase() === "clean") {
-      const c = spotObj("home", "cupboard");
-      go("home", c.tx, c.ty, () => arriveSpot("cupboard"));
+      const c = spotObj("garage", "cupboard");
+      go("garage", c.tx, c.ty, () => arriveSpot("cupboard"));
       return;
     }
     const pl = placeOf(t2), sp = spotObj(pl, spotOf(t2));
@@ -14094,7 +14126,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       const today2 = new Set(allTasks().map((t2) => t2.id));
       h += `<ul class="hlist tmr">${tmr.list.map((t2) => {
         const early = F.early[t2.id] === tmr.day, on = today2.has(t2.id);
-        return `<li><span class="pl">${icon(placeOf(t2), 18)}</span><span><b>${esc(t2.title)}</b><small>${t2.minutes || 25} min</small></span>${early ? `<span class="hbadge">done early</span>` : on ? `<span class="hbadge sched">on today's board</span>` : `<button class="next" data-early="${esc(t2.id)}">do today</button>`}</li>`;
+        return `<li><span class="pl">${icon(placeOf(t2) === "office" || placeOf(t2) === "garage" ? "home" : placeOf(t2), 18)}</span><span><b>${esc(t2.title)}</b><small>${t2.minutes || 25} min</small></span>${early ? `<span class="hbadge">done early</span>` : on ? `<span class="hbadge sched">on today's board</span>` : `<button class="next" data-early="${esc(t2.id)}">do today</button>`}</li>`;
       }).join("")}</ul>`;
     }
     el.innerHTML = h;
@@ -14184,8 +14216,16 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     house: "home",
     fridge: "home:fridge",
     kitchen: "home:kitchen",
-    cupboard: "home:cupboard",
-    treadmill: "home:treadmill",
+    cupboard: "garage:cupboard",
+    "cleaning cupboard": "garage:cupboard",
+    laundry: "garage:laundry",
+    garage: "garage",
+    treadmill: "office:treadmill",
+    "home office": "office",
+    office: "office",
+    desk: "office:desk",
+    "home desk": "office:desk",
+    "darren's desk": "office:office",
     sofa: "home:sofa",
     pond: "base:pond",
     garden: "farm",
@@ -15144,7 +15184,7 @@ ${SIGNOFF[t2.who] || ""}`;
     } else if (ph === "task") {
       const t2 = remaining()[0], fs = S2.firstStep[t2.id], pl = placeOf(t2), sp = spotObj(pl, spotOf(t2)), at = arrivedFor(t2);
       h += `${S2.last ? `<p class="ack">✓ ${esc(S2.last === "clean" ? "clean done" : S2.last)}</p>` : ""}
-      <h1><span class="lbl">quest · ${esc(VILLAGE[pl].name)} · ${esc(sp.name)}</span>${esc(t2.title)}</h1>
+      <h1><span class="lbl">quest · ${esc(placeInfo(pl).name)} · ${esc(sp.name)}</span>${esc(t2.title)}</h1>
       ${t2.at || t2.treadmill || isTreadTask(t2) || t2.chat || t2.notes || t2.email ? `<p class="stickers">${t2.at ? `<span class="sticker">${icon("clock", 14)} ${esc(t2.at)}</span>` : ""}${t2.treadmill || isTreadTask(t2) ? `<span class="sticker">${icon("walker", 14)} ${onTread(t2) ? "on the treadmill" : "treadmill-able, 1.2 and go"}</span>` : ""}${t2.notes ? `<span class="sticker">${icon("note", 14)} notes</span>` : ""}${t2.email ? `<span class="sticker">${icon("letter", 14)} email</span>` : ""}${t2.chat ? `<span class="sticker">${icon("chat", 14)} happens in chat</span>` : ""}</p>` : ""}
       ${fs || S2.timer && S2.timer.id === t2.id ? timerHTML(S2.timer && S2.timer.kind === "deal" ? "five-minute deal, then you may stop" : `${t2.minutes || 25}-minute time box`) : `<p class="stickers"><span class="sticker">${icon("clock", 14)} ${t2.minutes || 25}-minute time box once you start</span></p>`}
       <ul class="bujo">${fs ? `<li>Keep going. One thing at a time.</li>` : `<li class="first"><span><span class="hl">First step only:</span> ${esc(t2.firstStep || "open whatever you need for it. Just open it.")}</span></li><li>Then ${t2.minutes || 25} minutes on the rest.</li>`}
@@ -15343,8 +15383,8 @@ ${SIGNOFF[t2.who] || ""}`;
     if (vaultView && bv.pouring && !$("panel").hidden && !openView) return;
     c.dataset.kid = kid.open && scene === "kidroom" ? kid.open : "";
     if (kid.open && scene === "kidroom") h = kidPanel(kid.open);
-    else if (homeView && scene === "home") h = hestiaPanel(homeView);
-    else if (deskOpen && scene === "home") h = deskPanel();
+    else if (homeView && (scene === "home" || scene === "garage")) h = hestiaPanel(homeView);
+    else if (deskOpen && scene === "office") h = deskPanel();
     else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
     else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
     else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalPanel(F, goalView);
@@ -15454,7 +15494,7 @@ ${SIGNOFF[t2.who] || ""}`;
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>${outside() ? "Town quest board" : esc(ROOMS[scene].name) + " quests"}</h2>
       ${list2.length ? `<ul class="qlist">${list2.map((t2) => {
         const dn = S2.doneIds.includes(t2.id), sp = spotObj(placeOf(t2), spotOf(t2));
-        return `<li class="${dn ? "done" : ""}${t2.id === cur2 ? " cur" : ""}"${!dn && t2.id !== cur2 && phase() !== "clean" ? ` data-next="${esc(t2.id)}" role="button"` : ""}><span><b>${esc(t2.title)}</b><small>${outside() ? icon(placeOf(t2), 16) + " " + esc(VILLAGE[placeOf(t2)].name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t2.id !== cur2 && phase() !== "clean" ? `<button class="next" data-next="${esc(t2.id)}">do next</button>` : "<span></span>"}</li>`;
+        return `<li class="${dn ? "done" : ""}${t2.id === cur2 ? " cur" : ""}"${!dn && t2.id !== cur2 && phase() !== "clean" ? ` data-next="${esc(t2.id)}" role="button"` : ""}><span><b>${esc(t2.title)}</b><small>${outside() ? icon(placeOf(t2), 16) + " " + esc(placeInfo(placeOf(t2)).name) + " · " : ""}${esc(sp.name)}</small></span>${!dn && t2.id !== cur2 && phase() !== "clean" ? `<button class="next" data-next="${esc(t2.id)}">do next</button>` : "<span></span>"}</li>`;
       }).join("")}</ul>` : `<p class="sub">No quests ${outside() ? "today yet" : "in here today"}.</p>`}
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
     }
@@ -15468,8 +15508,8 @@ ${SIGNOFF[t2.who] || ""}`;
       stopKidGame();
       ctx();
     } });
-    if (homeView && scene === "home") wireHestia(c, homeView);
-    if (deskOpen && scene === "home") wireDesk(c, () => ctx());
+    if (homeView && (scene === "home" || scene === "garage")) wireHestia(c, homeView);
+    if (deskOpen && scene === "office") wireDesk(c, () => ctx());
     if (reviewOpen && scene === "hall") wireReview(c, F, { save: () => save2(), rerender: () => ctx(), say: (l) => speak(l, 5e3, true), sfx, canSend: !rw.noMcp, today: dayKey(), coins: (n) => {
       F.coins += n;
       S2.earned = (S2.earned || 0) + n;
@@ -15913,27 +15953,35 @@ ${SIGNOFF[t2.who] || ""}`;
     let h = "";
     if (scene === "base" && (c.chores || c.shop)) h = badge(232, 170, c.chores + c.shop, "broom");
     if (scene === "home") {
-      const cb = spotObj("home", "cupboard"), fr = spotObj("home", "fridge");
-      if (c.chores) h += badge(cb.x, cb.y - 100, c.chores, "broom");
+      const gd = spotObj("home", "gdoor"), fr = spotObj("home", "fridge");
+      if (c.chores) h += badge(gd.x + 26, gd.y - 120, c.chores, "broom");
       if (c.shop) h += badge(fr.x, fr.y - 100, c.shop, "fridge");
+    }
+    if (scene === "garage" && c.chores) {
+      const cb = spotObj("garage", "cupboard");
+      h += badge(cb.x, cb.y - 100, c.chores, "broom");
     }
     g.innerHTML = h;
   }
   function questMark() {
     const ph = phase(), m = $("qmarkWrap");
     let target = null;
-    if (ph === "clean" && !atClean()) target = { pl: "home", sp: "cupboard" };
+    if (ph === "clean" && !atClean()) target = { pl: "garage", sp: "cupboard" };
     if (ph === "task") {
       const t2 = remaining()[0];
       if (!arrivedFor(t2)) target = { pl: placeOf(t2), sp: spotOf(t2) };
     }
     let pos = null;
     if (target) {
-      if (outside() && target.pl === "base") pos = scene === "base" ? (() => {
+      const inner = INNER[target.pl], bld = inner ? inner.parent : target.pl, DOOR = { garage: "gdoor", office: "officedoor", room: "mydoor", kidroom: "kiddoor", kitchen: "kdoor", cellar: "cdoor" };
+      if (inner && scene === bld && DOOR[target.pl]) {
+        const d = spotObj(scene, DOOR[target.pl]);
+        pos = [d.x + (d.x > 260 ? 26 : -26), d.y - 120];
+      } else if (outside() && bld === "base") pos = scene === "base" ? (() => {
         const v = VILLAGE[target.sp];
         return v.mark || [v.door[0], v.door[1] - 64];
       })() : VILLAGE[BRIDGES[scene][nextHop(scene, "base")]].mark;
-      else if (outside()) pos = VILLAGE[target.pl].scene === scene ? VILLAGE[target.pl].mark : VILLAGE[BRIDGES[scene][nextHop(scene, outdoorOf(target.pl))]].mark;
+      else if (outside()) pos = VILLAGE[bld].scene === scene ? VILLAGE[bld].mark : VILLAGE[BRIDGES[scene][nextHop(scene, outdoorOf(bld))]].mark;
       else if (scene === target.pl) {
         const s = spotObj(scene, target.sp);
         pos = [s.x, s.y - 70];
@@ -16094,7 +16142,7 @@ ${SIGNOFF[t2.who] || ""}`;
     $("list").innerHTML = all.map((t2) => {
       const dn = S2.doneIds.includes(t2.id);
       const pickable = !dn && t2.id !== cur2 && phase() !== "clean";
-      return `<li class="${dn ? "done" : ""}${t2.id === cur2 ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t2.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t2), 20)}</span><span class="t">${dn ? `<i class="tk" aria-label="done"></i>` : ""}${esc(t2.title)}</span><small>${esc(VILLAGE[placeOf(t2)].name)} · ${esc(spotObj(placeOf(t2), spotOf(t2)).name)}${t2.id === cur2 ? " · doing now" : ""}${t2.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t2.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t2.id)}">do this now</button>` : "<span></span>"}</li>`;
+      return `<li class="${dn ? "done" : ""}${t2.id === cur2 ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t2.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t2), 20)}</span><span class="t">${dn ? `<i class="tk" aria-label="done"></i>` : ""}${esc(t2.title)}</span><small>${esc(placeInfo(placeOf(t2)).name)} · ${esc(spotObj(placeOf(t2), spotOf(t2)).name)}${t2.id === cur2 ? " · doing now" : ""}${t2.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t2.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t2.id)}">do this now</button>` : "<span></span>"}</li>`;
     }).join("") + ((S2.dropped || []).length ? `<li class="dropped"><small>Dropped today: ${(S2.dropped || []).map((id) => {
       const t2 = (P && P.tasks || []).find((x) => x.id === id);
       return t2 ? `${esc(t2.title)} <button class="drop" data-undrop="${esc(id)}">bring back</button>` : "";
@@ -16393,12 +16441,11 @@ ${SIGNOFF[t2.who] || ""}`;
       return;
     }
     if (id === "gdoor") {
-      if (owns(F, "garage")) setScene("garage", INNER.garage.arrive);
-      else {
-        goalView = "garage";
-        sfx("paper", true);
-        render();
-      }
+      setScene("garage", INNER.garage.arrive);
+      return;
+    }
+    if (id === "officedoor") {
+      setScene("office", INNER.office.arrive);
       return;
     }
     if (id === "cdoor") {
@@ -16528,12 +16575,12 @@ ${SIGNOFF[t2.who] || ""}`;
       render();
       return;
     }
-    if (ph === "clean" && scene === "home" && id === "cupboard" && !S2.wipe) {
+    if (ph === "clean" && scene === "garage" && id === "cupboard" && !S2.wipe) {
       setSay("Wet wipes live here. Grab one!");
       render();
       return;
     }
-    if (scene === "home" && (id === "cupboard" || id === "fridge") && !(ph === "task" && placeOf(remaining()[0]) === "home" && spotOf(remaining()[0]) === id && !S2.arrived[remaining()[0].id])) {
+    if ((scene === "home" || scene === "garage") && (id === "cupboard" || id === "fridge") && !(ph === "task" && placeOf(remaining()[0]) === scene && spotOf(remaining()[0]) === id && !S2.arrived[remaining()[0].id])) {
       homeView = id === "fridge" ? "fridge" : "chores";
       sfx(id === "fridge" ? "tap" : "paper");
       render();
@@ -16548,7 +16595,7 @@ ${SIGNOFF[t2.who] || ""}`;
         return;
       }
     }
-    if (scene === "home" && id === "desk") {
+    if (scene === "office" && id === "desk") {
       deskOpen = true;
       sfx("paper", true);
       render();
@@ -16972,7 +17019,10 @@ ${SIGNOFF[t2.who] || ""}`;
     const b = document.querySelector("#mel .bob");
     if (b) {
       b.insertAdjacentHTML("beforebegin", `<g class="rideScoot" style="stroke:var(--line)" stroke-width="1"><rect x="-15" y="-3" width="30" height="3.4" rx="1.6" style="fill:#7FB8E8"/><circle cx="-12" cy="1" r="2.6" style="fill:#2F2B28"/><circle cx="12" cy="1" r="2.6" style="fill:#2F2B28"/><path d="M12 -3 l3 -26 M10 -29 h9" fill="none" stroke-width="2"/></g>`);
-      b.insertAdjacentHTML("afterend", `<g class="rideCar" style="stroke:var(--line)" stroke-width="1.1"><path d="M-26 -4 v-14 q0 -4 4 -5 l8 -2 q4 -9 12 -9 h8 q8 0 11 9 l7 2 q4 1 4 5 v14z" style="fill:#E8566C"/><path d="M-10 -25 q3 -6 9 -6 h4 v7z M5 -31 h2 q6 0 9 7 h-11z" style="fill:#CFE0EE"/><circle cx="-14" cy="-3" r="5" style="fill:#2F2B28"/><circle cx="15" cy="-3" r="5" style="fill:#2F2B28"/><circle cx="23" cy="-15" r="1.6" style="fill:#F3C969"/></g>`);
+      b.insertAdjacentHTML("afterend", `<g class="rideCar" style="stroke:var(--line)" stroke-width="1.1"><g class="carEvan"><circle cx="-21" cy="-26" r="5" style="fill:var(--skin)"/><path d="M-26 -27 q5 -8 10 -1" style="fill:#2A211D"/><circle cx="-22.5" cy="-25.5" r=".7" style="fill:#2F2B28" stroke="none"/></g>
+    <path d="M-38 -22 l3 -8 l4 5z M-32 -23 l3 -7 l3 6z" style="fill:var(--fox)"/><ellipse cx="-32" cy="-19" rx="6" ry="4.6" style="fill:var(--fox)"/><path d="M-37 -17.5 q5 3 10 0" style="fill:#FFFDF6"/><circle cx="-34" cy="-20" r=".7" style="fill:#2F2B28" stroke="none"/>
+    <path d="M-40 -4 v-12 q0 -4 4 -5 h56 l8 4 q4 2 4 6 v7z" style="fill:#F3E7C9"/><path d="M-38 -14 h58" opacity=".5"/><path d="M14 -21 l4 -9" style="stroke:#9CC3E0" stroke-width="2.2"/>
+    <circle cx="-26" cy="-3" r="5" style="fill:#2F2B28"/><circle cx="16" cy="-3" r="5" style="fill:#2F2B28"/><circle cx="-26" cy="-3" r="2" style="fill:#CFC8BE"/><circle cx="16" cy="-3" r="2" style="fill:#CFC8BE"/><circle cx="29" cy="-11" r="1.6" style="fill:#F3C969"/></g>`);
     }
   }
   function familyPaddle() {
@@ -17810,7 +17860,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     const s = list2.find((s2) => Math.hypot(s2.tx - mel.x, s2.ty - mel.y) < 26);
     return s ? s.id : null;
   }
-  var EVAN_SPOTS = { mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[380, 520], [260, 330], [200, 600], [360, 330], [300, 300]] };
+  var EVAN_SPOTS = { mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[150, 340], [260, 330], [380, 330], [200, 580], [330, 590]] };
   function evanWalk(speed, dt) {
     const key = evan.tx + "," + evan.ty;
     if (key !== evan.rk) {
@@ -18040,7 +18090,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
             else go(n, 260, 560, null);
           } else arriveSpot(n);
         } else if (!outside() && scene !== "farm" && !INNER[scene] && mel.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
-        else if (INNER[scene] && scene !== "kidroom" && Math.abs(mel.x - INNER[scene].exit[0]) < 12 && Math.abs(mel.y - INNER[scene].exit[1]) < 56) {
+        else if (INNER[scene] && scene !== "kidroom" && (Math.abs(mel.x - INNER[scene].exit[0]) < 12 && Math.abs(mel.y - INNER[scene].exit[1]) < 56 || mel.y > 592 && Math.abs(mel.x - 260) < 60)) {
           const I3 = INNER[scene];
           go(I3.parent, I3.door[0] + 30, I3.door[1] + 20, null);
         } else if (scene === "farm" && mel.y > 592 && Math.abs(mel.x - 260) < 50) go("base", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
@@ -18048,9 +18098,24 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     }
     if (S2.cruise && (scene !== "shore" || Date.now() > S2.cruise.until)) endCruise();
     {
-      const rd = outside() ? ride(F) : "walk";
+      const rd = outside() ? ride(F) : "walk", drive = rd === "car" && mel.moving && !sup, withEvan = drive && evanHere() && !evanNight();
       nodes.mel.classList.toggle("scoot", rd === "scooter" && mel.moving && !sup);
-      nodes.mel.classList.toggle("drive", rd === "car" && mel.moving && !sup);
+      nodes.mel.classList.toggle("drive", drive);
+      nodes.mel.classList.toggle("withEvan", withEvan);
+      if (drive) {
+        mel.carEvan = withEvan;
+      } else if (mel.wasDriving) {
+        maple.x = maple.tx = mel.x - mel.dir * 22;
+        maple.y = maple.ty = mel.y + 3;
+        if (mel.carEvan) {
+          evan.x = evan.tx = mel.x + 18;
+          evan.y = evan.ty = mel.y + 6;
+          evan.path = [[evan.x, evan.y]];
+          evan.rk = evan.tx + "," + evan.ty;
+        }
+        mel.carEvan = false;
+      }
+      mel.wasDriving = drive;
     }
     if (sup) {
       if (scene !== "shore" || Date.now() > sup.until) endPaddle(true);
@@ -18091,9 +18156,9 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     placeNode(nodes.mel, mel);
     placeNode(nodes.maple, maple);
     placeNode(nodes.evan, evan);
-    nodes.evan.style.visibility = scene === "kidroom" && kid.sleep || cruisingNow() ? "hidden" : "";
-    nodes.maple.style.visibility = cruisingNow() ? "hidden" : "";
-    if (scene === "home" && atSpot === "treadmill" && !route2.length && S2.timer && S2.timer.kind === "task" && Math.abs(mel.x - mel.tx) < 2) {
+    nodes.evan.style.visibility = scene === "kidroom" && kid.sleep || cruisingNow() || mel.wasDriving && mel.carEvan ? "hidden" : "";
+    nodes.maple.style.visibility = cruisingNow() || mel.wasDriving ? "hidden" : "";
+    if (scene === "office" && atSpot === "treadmill" && !route2.length && S2.timer && S2.timer.kind === "task" && Math.abs(mel.x - mel.tx) < 2) {
       nodes.mel.classList.add("walk");
       mel.dir = 1;
     }
@@ -18215,7 +18280,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     markRead,
     agentName,
     onClose: () => render(),
-    placeLabel: (t2) => `${VILLAGE[placeOf(t2)].name} · ${spotObj(placeOf(t2), spotOf(t2)).name}`
+    placeLabel: (t2) => `${(VILLAGE[placeOf(t2)] || ROOMS[placeOf(t2)]).name} · ${spotObj(placeOf(t2), spotOf(t2)).name}`
   });
   initHestia({
     sfx,

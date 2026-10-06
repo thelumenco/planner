@@ -119,7 +119,7 @@ const hellos = () => { const t = sgHM(); return [t < 720 ? "Morning, Mel!" : t <
 function tickCourier(dt){
   const scene = api.scene(), mel = api.mel;
   if (courier && courier.scene !== scene) { drop(courier.id); courier = null; }
-  if (scene === "home" || scene === "room" || scene === "kidroom") return;   // only family inside the house (and nobody in Mel's room); notes wait until Mel steps out
+  if (scene === "home" || scene === "room" || scene === "kidroom" || scene === "office" || scene === "garage") return;   // only family inside the house (and nobody in Mel's room); notes wait until Mel steps out
   // the note she's carrying was replaced or read elsewhere (e.g. fresh mail arrived just after the page opened)
   if (courier && courier.state !== "leaving" && !api.unreadMail().some(m => m.id === courier.item.id)) { drop(courier.id); courier = null; }
   if (!courier) {

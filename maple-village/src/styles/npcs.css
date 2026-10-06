@@ -85,3 +85,4 @@
 #mel.scoot .rideScoot,#mel.drive .rideCar{display:inline}
 #mel.scoot .legL,#mel.scoot .legR,#mel.scoot .armL,#mel.scoot .armR{animation:none !important}
 #mel.drive .legL,#mel.drive .legR{visibility:hidden}
+#mel .carEvan{display:none}#mel.withEvan .carEvan{display:inline}
