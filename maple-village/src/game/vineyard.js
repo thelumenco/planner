@@ -110,6 +110,27 @@ function footfall(hm, weekend, visitors){ return (hm >= 17*60 && hm < 21*60 ? 2 
 // Simulates the minutes since the last tick (up to 12 hours): customers buying (into the honesty box, or straight
 // to Mel while she's serving behind the counter), and the vineyard hands watering thirsty vines while on shift.
 // -> {bottles, glasses, coins, toBox, watered, mins} or null when nothing happened
+// One plate for a customer: the tapas of the day first (65% of the time, on its own day), else a small plate
+function servePlate(v, gameDay, out){
+  if (v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === gameDay && Math.random() < .65) { v.tapas.plates--; out.plates++; out.tapas = (out.tapas || 0) + 1; out.coins += TAPAS[v.tapas.id].price; out.dish = "tapas:" + v.tapas.id; return; }
+  const live = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]); if (!live.length) return; const id = live[Math.floor(Math.random()*live.length)];
+  v.menu[id]--; if (!v.menu[id]) delete v.menu[id]; out.plates++; out.coins += DISHES[id].price; out.dish = id;
+}
+// A villager who sits down in the tasting room while Mel's there orders straight away: a glass of whatever's open (a
+// bottle from the shelf is opened if none is) and, 6 times in 10, a plate. Paid into the honesty box, or to Mel if
+// she's serving. -> {glasses, plates, coins, wine (type), dish, opened} or null when there's nothing to pour
+export function serveGuest(F, opts = {}){
+  const v = vineState(F), s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (!s) return null;
+  const out = {glasses: 1, plates: 0, coins: Math.max(1, Math.round(s.price/4)), wine: s.type, name: s.name, opened: !s.open};
+  if (!s.open) { s.n--; s.open = GLASSES; } s.open--;
+  if (Math.random() < .6) servePlate(v, opts.today, out);
+  v.shelf = v.shelf.filter(x => x.n > 0 || x.open > 0);
+  if (opts.serving) F.coins += out.coins; else v.box += out.coins;
+  v.glasses++; v.plates += out.plates;
+  const day = new Date(Date.now() + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
+  v.today.glasses++; v.today.plates = (v.today.plates || 0) + out.plates; v.today.coins += out.coins;
+  return out;
+}
 export function sellTick(F, opts = {}){
   const v = vineState(F), t = Date.now(), mins = Math.min(720, Math.floor((t - v.lastTick)/60000)); if (mins < 1) return null;
   if (t - v.lastTick > 720*60000) v.lastTick = t - 720*60000;
@@ -132,9 +153,7 @@ export function sellTick(F, opts = {}){
     const food = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]), tap = v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === new Date(at + off + 6*H).toISOString().slice(0, 10);
     const f = footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1);
     const gameDay = new Date(at + off + 6*H).toISOString().slice(0, 10);   // the game's day (it turns over at 2am)
-    const plate = () => { if (v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === gameDay && Math.random() < .65) { v.tapas.plates--; out.plates++; out.tapas = (out.tapas || 0) + 1; out.coins += TAPAS[v.tapas.id].price; return; }
-      const live = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]); if (!live.length) return; const id = live[Math.floor(Math.random()*live.length)];
-      v.menu[id]--; if (!v.menu[id]) delete v.menu[id]; out.plates++; out.coins += DISHES[id].price; };
+    const plate = () => servePlate(v, gameDay, out);
     if (onShelf.length && Math.random() < .0012*f) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; s.n--; out.bottles++; out.coins += s.price; }
     if (Math.random() < .001*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
       const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); if (Math.random() < .6) plate(); } }

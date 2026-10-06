@@ -1198,6 +1198,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
   const seated = await page.locator('#actors .act-sit').count();
   check(seated > 0 && await page.locator("#tableware svg").count() >= seated, "diners in the tasting room have wine and food on their tables");
+  check(await page.evaluate(n => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return v.today.glasses >= n && v.shelf.some(s => s.open > 0); }, seated), "everyone who sits down orders a glass, poured from an opened bottle");
   await page.screenshot({ path: join(shots, "tasting-tables.png") });
   await page.close();
 }

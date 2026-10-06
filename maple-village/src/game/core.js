@@ -8,7 +8,7 @@ import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, o
 import { vineSpot } from "../art/vineyard.js";
 import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, TAPAS, cookTick, cookLine } from "./kitchen.js";
 import { questBoost } from "./vineyard.js";
-import { vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, counterPanel, boxPanel, cafePanel, olivePanel, wireVine, shelfStock, vineyardName, shopName } from "./vineyard.js";
+import { vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, counterPanel, boxPanel, cafePanel, olivePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA, completeInSunsama, subtaskInSunsama } from "./sunsama.js";
@@ -1564,22 +1564,27 @@ function drawScene(){
   $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
   $("maphint").textContent = scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
 }
-// The tasting room's tables: each villager sitting down gets a glass of whatever's open and a plate from the menu
-// (the tapas of the day first). Redrawn only when who's sitting, or what's on offer, changes.
+// The tasting room's tables: a villager who sits down orders straight away (serveGuest: a glass from an open bottle,
+// a fresh one opened if needed, and sometimes a plate), and their table shows what they ordered. Orders are kept for
+// the day in S.served by who's sitting and which visit it is, so nobody orders twice in one sitting. Pilar, on her
+// break, just has a cup of something. Redrawn only when the orders change.
 let tableKey = "";
 function drawTableware(){
   if (scene !== "wineshop") return;
-  const v = vineState(F), sh = v.shelf.find(s => s.open > 0) || v.shelf.find(s => s.n > 0), t = tapasToday(F, dayKey());
-  const dishes = [...(t && t.plates > 0 ? ["tapas:" + t.id] : []), ...Object.keys(v.menu).filter(id => v.menu[id] > 0)];
+  S.served = S.served || {};
   const seats = npcActors().map(([, e]) => e).filter(e => e.kind === "npc" && e.act === "sit" && !e.moving);
-  const key = seats.map(e => e.def.id + Math.round(e.x)).join() + "|" + (sh ? sh.type : "") + "|" + dishes.join();
+  seats.forEach(e => { const k = `${e.def.id}:${e.key}`; if (k in S.served || e.def.id === "pilar") return;
+    const out = serveGuest(F, {serving: serving(), today: dayKey()}); S.served[k] = out ? {wine: out.wine, dish: out.dish || null} : {};
+    if (out) { save(); if (serving()) { sfx("coin"); flash(`+${out.coins} coins: ${e.def.name} ordered ${out.dish ? "a glass and a plate" : "a glass"}`); }
+      if (out.opened) setTimeout(() => npcSay(e.def.id, `Ooh, you've opened the ${out.name}! A glass of that, please.`), 600); } });
+  const orders = seats.map(e => [e, S.served[`${e.def.id}:${e.key}`] || {}]);
+  const key = orders.map(([e, o]) => `${e.def.id}${Math.round(e.x)}${o.wine || ""}${o.dish || ""}`).join();
   if (key === tableKey && $("tableware")) return; tableKey = key;
   const T = ROOMS.wineshop.pos.T, tables = [[T[0] - 70, T[1]], [T[0] + 70, T[1] - 6]];
   let h = "";
-  seats.forEach((e, n) => { const [tx, ty] = tables.reduce((a, b) => Math.abs(b[0] - e.x) < Math.abs(a[0] - e.x) ? b : a), side = e.x < tx ? -1 : 1;
-    const dish = dishes.length ? dishes[(e.def.id.charCodeAt(0) + n) % dishes.length] : null;
-    if (dish) h += `<g transform="translate(${tx + side*13 - 11} ${ty - 36})">${dishArt(dish, 22)}</g>`;
-    if (sh) h += `<g transform="translate(${tx + side*26 - 4} ${ty - 44})">${glassArt(sh.type, 14)}</g>`; });
+  orders.forEach(([e, o]) => { const [tx, ty] = tables.reduce((a, b) => Math.abs(b[0] - e.x) < Math.abs(a[0] - e.x) ? b : a), side = e.x < tx ? -1 : 1;
+    if (o.dish) h += `<g transform="translate(${tx + side*13 - 11} ${ty - 36})">${dishArt(o.dish, 22)}</g>`;
+    if (o.wine) h += `<g transform="translate(${tx + side*26 - 4} ${ty - 44})">${glassArt(o.wine, 14)}</g>`; });
   let g = $("tableware"); if (!g) { g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.id = "tableware"; g.setAttribute("pointer-events", "none"); $("sceneArt").appendChild(g); }
   g.innerHTML = h;
 }

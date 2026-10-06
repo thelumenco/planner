@@ -649,3 +649,11 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - **Fruit** and **Flowers**: only what Ma Ma has picked.
 
   The shop opens on Plant until something's planted. Tapping a spot still plants directly.
+
+### Round 53: guests order when they sit down
+- Mel noticed that someone "in for a tasting" didn't open a bottle: sales were only the per-minute chance in `sellTick`. Now `serveGuest` (vineyard.js) runs from core's `drawTableware` as soon as a villager sits in the tasting room while Mel's there:
+  - They get one glass from the open bottle, or a fresh bottle is opened (5 glasses).
+  - 6 times in 10 they also get a plate (`servePlate`, shared with `sellTick`).
+  - The money goes to the honesty box, or straight to Mel when she's serving.
+- `S.served["<npc>:<slot key>"]` records the order, so each sitting orders once. The tableware shows exactly what each guest ordered. Pilar's break doesn't count as a customer.
+- Away from the shop, sales are still the background chance in `sellTick`.
