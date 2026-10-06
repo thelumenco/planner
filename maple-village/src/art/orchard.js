@@ -5,6 +5,7 @@ import { sk, tapeLabel, tree, flowers, house, artCtx } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
 import { orchState, stateOf } from "../game/orchard.js";
+import { orchardRiver } from "./field.js";
 
 const W = `filter="url(#wob)" ${ink}`;
 
@@ -74,8 +75,8 @@ export function orchardArt(){
   const o = orchState(artCtx().F()), today = artCtx().day();
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="470" rx="230" ry="130" style="fill:var(--grass2)"/><ellipse cx="400" cy="60" rx="140" ry="50" style="fill:var(--grass2)"/></g>
-    ${tree(40, 50, .8)}${tree(160, 40, .7)}${tree(300, 46, .75)}${tree(470, 44, .8)}${hedge}
-    <g filter="url(#wob)"><path d="M0 270 H520 M132 270 V236 M415 270 V252 M160 270 V610 M260 270 V610 M360 270 V610" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
+    ${tree(40, 50, .8)}${tree(160, 40, .7)}${tree(300, 46, .75)}${orchardRiver}${hedge}
+    <g filter="url(#wob)"><path d="M260 150 V270 M0 270 H520 M132 270 V236 M415 270 V252 M160 270 V610 M260 270 V610 M360 270 V610" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
     ${flowers([[200, 150, "#EFA3A6"], [230, 160, "#F3C969"], [300, 150, "#C3CDEE"], [30, 600, "#EFA3A6"], [490, 600, "#F3C969"], [470, 330, "#C3CDEE"]])}`;
   const cottage = house("cottage", 74, 152, 116, 72, "#FFF6E8", "#C2505F", "Ma Ma's cottage", "var(--blush)",
     {art: `<rect x="84" y="200" width="22" height="14" rx="2" style="fill:#9CC27E"/><circle cx="90" cy="200" r="3" style="fill:#E8566C"/><circle cx="98" cy="199" r="3" style="fill:#F3C969"/>`, lines: `<rect x="84" y="200" width="22" height="14" rx="2"/><path d="M156 120 v-16 h10 v22"/><path class="smoke" d="M161 100 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>`});
@@ -91,6 +92,7 @@ export function orchardArt(){
     return `<g data-tree="${i}" aria-label="Tree spot ${i + 1}"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="30" ry="9" style="fill:var(--butter)"/>
       ${p ? `<g transform="translate(${x} ${y}) scale(1.25)" ${W}>${treeBody(p.k, st.stage, st.g)}</g>` : `<g ${W}><ellipse cx="${x}" cy="${y}" rx="14" ry="5" style="fill:#B08A6A"/><path d="M${x-4} ${y-1} q4 -3 8 0" opacity=".5"/></g>`}</g>`; }).join("")).join("");
   return lampDefs + ground + cottage + shop
+    + archGate("toFieldO", 260, 150, "The field", 316, 182, "var(--peri)", "Path to the field and the lake")
     + archGate("toBaseO", 500, 270, "Home", 474, 316, "var(--butter)", "Gate home")
     + archGate("toFlowers", 20, 270, "Flower farm", 70, 300, "var(--blush)", "Gate to the flower farm")
     + [[220, 252], [312, 252]].map(([x, y]) => streetLamp(x, y)).join("") + trees;

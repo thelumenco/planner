@@ -2,12 +2,14 @@
 import { H, M } from "../util.js";
 import { TREES, FLOWERS } from "./orchard.js";
 
+// yield: how many one plot gives at harvest (prices per piece are set so a whole harvest is worth a little more than
+// the old one-per-plot did: more ingredients for the kitchen, without flooding the market)
 export const CROPS = {
-  tulip:{n:"Tulip", e:"🌷", dur:1*H}, sunflower:{n:"Sunflower", e:"🌻", dur:1*H},
-  carrot:{n:"Carrot", e:"🥕", dur:4*H}, corn:{n:"Corn", e:"🌽", dur:4*H},
-  strawberry:{n:"Strawberry", e:"🍓", dur:24*H}, blueberry:{n:"Blueberry", e:"🫐", dur:24*H},
-  tomato:{n:"Tomato", dur:6*H}, potato:{n:"Potato", dur:8*H}, pepper:{n:"Pepper", dur:6*H},
-  pea:{n:"Peas", dur:4*H}, pumpkin:{n:"Pumpkin", dur:24*H}, leek:{n:"Leek", dur:8*H}
+  tulip:{n:"Tulip", ns:"tulips", e:"🌷", dur:1*H, yield:2}, sunflower:{n:"Sunflower", ns:"sunflowers", e:"🌻", dur:1*H, yield:2},
+  carrot:{n:"Carrot", ns:"carrots", e:"🥕", dur:4*H, yield:3}, corn:{n:"Corn", ns:"corn cobs", e:"🌽", dur:4*H, yield:3},
+  strawberry:{n:"Strawberry", ns:"strawberries", e:"🍓", dur:24*H, yield:5}, blueberry:{n:"Blueberry", ns:"handfuls of blueberries", e:"🫐", dur:24*H, yield:5},
+  tomato:{n:"Tomato", ns:"tomatoes", dur:6*H, yield:3}, potato:{n:"Potato", ns:"potatoes", dur:8*H, yield:4}, pepper:{n:"Pepper", ns:"peppers", dur:6*H, yield:3},
+  pea:{n:"Peas", ns:"handfuls of peas", dur:4*H, yield:4}, pumpkin:{n:"Pumpkin", ns:"pumpkins", dur:24*H, yield:2}, leek:{n:"Leek", ns:"leeks", dur:8*H, yield:3}
 };
 export const ITEMS = {
   tulip_seed:{e:"🌷", n:"Tulip seeds", kind:"seed", price:2, crop:"tulip", tab:"seeds", seasons:["spring"]},
@@ -45,6 +47,13 @@ export const ITEMS = {
   kopi:{n:"Kopi", kind:"gift", to:"darren", price:5, tab:"family", say:"Kopi! You're the best."},
   kaya:{n:"Kaya toast", kind:"gift", to:"darren", price:7, tab:"family", say:"Kaya toast? Okay, now it's a good day."},
   currypuff:{n:"Curry puff", kind:"gift", to:"darren", price:6, tab:"family", say:"Still warm! Want half?"},
+  // for Ma Ma and Gong Gong (given in person: whichever of them is nearest)
+  kuehlapis:{n:"Kueh lapis", kind:"gift", to:"grands", price:5, tab:"family", say:"Kueh lapis! You remember I like to peel the layers one by one."},
+  ondeh:{n:"Ondeh-ondeh", kind:"gift", to:"grands", price:4, tab:"family", say:"Ondeh-ondeh! Careful, the gula melaka squirts out."},
+  angku:{n:"Ang ku kueh", kind:"gift", to:"grands", price:4, tab:"family", say:"Ang ku kueh, so soft. Come, we share."},
+  mooncake:{n:"Mooncake", kind:"gift", to:"grands", price:12, tab:"family", seasons:["autumn"], say:"Mooncake! Come, we cut it together and have with tea."},
+  birdsnest:{n:"Bird's nest", kind:"gift", to:"grands", price:18, tab:"family", say:"Bird's nest? Aiyo, so expensive! You're too good to us."},
+  essence:{n:"Chicken essence", kind:"gift", to:"grands", price:10, tab:"family", say:"Chicken essence! One every morning, then strong like an ox."},
   sandpit:{n:"Sandpit", kind:"keep", to:"evan", price:150, tab:"family", say:"A sandpit at home! Evan's already digging."},
   truck:{n:"Toy truck", kind:"keep", to:"evan", price:80, tab:"family", say:"Vroom vroom! Evan won't put it down."},
   headphones:{n:"Headphones", kind:"keep", to:"darren", price:120, tab:"family", say:"Noise-cancelling! Darren's calls just got calmer."},
@@ -59,18 +68,18 @@ export const ITEMS = {
   goatfeed:{n:"Goat feed", kind:"feed", price:2, tab:"animals", what:"one meal for a goat"},
   milk:{n:"Goat's milk", kind:"ingredient", sell:6, what:"two make a cheese in the kitchen press"},
   egg:{n:"Fresh egg", kind:"food", sell:5, say:"A fresh egg from our hens! Breakfast sorted."},
-  tulip:{e:"🌷", n:"Tulip", kind:"flower", sell:4, say:"For me? I'll tuck it behind my ear."},
-  sunflower:{e:"🌻", n:"Sunflower", kind:"flower", sell:5, say:"So sunny! Thank you."},
-  carrot:{e:"🥕", n:"Carrot", kind:"food", sell:6, say:"Homegrown crunch!"},
-  corn:{e:"🌽", n:"Corn", kind:"food", sell:8, say:"Sweet corn! Nom."},
-  strawberry:{e:"🍓", n:"Strawberry", kind:"food", sell:14, xp:2, say:"Strawberries from our garden 🥹"},
-  blueberry:{e:"🫐", n:"Blueberries", kind:"food", sell:14, xp:2, say:"Blueberries! My favourite."},
-  tomato:{n:"Tomato", kind:"food", sell:7, say:"A sun-warm tomato. Mmm."},
-  potato:{n:"Potato", kind:"food", sell:6, say:"A potato? Raw? Brave. Okay."},
-  pepper:{n:"Pepper", kind:"food", sell:7, say:"Crunchy pepper! Spicy? No. Phew."},
-  pea:{n:"Peas", kind:"food", sell:5, say:"Pop, pop, pop. Fresh peas!"},
-  pumpkin:{n:"Pumpkin", kind:"food", sell:16, xp:2, say:"A whole pumpkin? I'll just... sit on it."},
-  leek:{n:"Leek", kind:"food", sell:7, say:"A leek. Very tall. Very serious."}
+  tulip:{e:"🌷", n:"Tulip", kind:"flower", sell:2, say:"For me? I'll tuck it behind my ear."},
+  sunflower:{e:"🌻", n:"Sunflower", kind:"flower", sell:3, say:"So sunny! Thank you."},
+  carrot:{e:"🥕", n:"Carrot", kind:"food", sell:3, say:"Homegrown crunch!"},
+  corn:{e:"🌽", n:"Corn", kind:"food", sell:4, say:"Sweet corn! Nom."},
+  strawberry:{e:"🍓", n:"Strawberry", kind:"food", sell:4, xp:2, say:"Strawberries from our garden 🥹"},
+  blueberry:{e:"🫐", n:"Blueberries", kind:"food", sell:4, xp:2, say:"Blueberries! My favourite."},
+  tomato:{n:"Tomato", kind:"food", sell:3, say:"A sun-warm tomato. Mmm."},
+  potato:{n:"Potato", kind:"food", sell:2, say:"A potato? Raw? Brave. Okay."},
+  pepper:{n:"Pepper", kind:"food", sell:3, say:"Crunchy pepper! Spicy? No. Phew."},
+  pea:{n:"Peas", kind:"food", sell:2, say:"Pop, pop, pop. Fresh peas!"},
+  pumpkin:{n:"Pumpkin", kind:"food", sell:10, xp:2, say:"A whole pumpkin? I'll just... sit on it."},
+  leek:{n:"Leek", kind:"food", sell:3, say:"A leek. Very tall. Very serious."}
 };
 // Home decor: bought once, shows up inside Mel's house. Items in the same slot swap (one wallpaper, one rug at a time).
 export const DECOR = {

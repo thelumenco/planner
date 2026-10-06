@@ -669,3 +669,27 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Workers:** `farid` works the orchard and `mei` the flower farm, 8am–5:30pm daily with lunch on site.
 - **Penny fix:** a tap on a speech bubble also reaches the person under it (`elementFromPoint` after hiding the bubble), so a bubble no longer blocks a messenger.
 - **Writing tasks:** `isWriting(t)` in world.js. Any writing (write, draft, blog, newsletter, copy, caption, script, outline, journal…) goes to Fresh Pages → writing desk, ahead of business keywords and planned places. Only treadmill batches and home-base outings come first.
+
+### Round 55: gifts for the grandparents, the field and lake, the river
+- **Gifts** (`tab: "family"`, `to: "grands"`):
+  - kueh lapis 5, ondeh-ondeh 4, ang ku kueh 4, mooncake 12 (autumn only, through the market's existing season filter), bird's nest 18, chicken essence 10.
+  - `giveGift` gives to whichever of Ma Ma and Gong Gong is nearest in the scene. If neither is there, it says where they are. Counts go in `F.fam.gifts.mama` and `F.fam.gifts.gonggong`.
+  - Icons are in icons.js.
+- **The field** (OUTDOOR `field`, art in `src/art/field.js`):
+  - A lake with two swans gliding (SMIL `animateTransform`), reeds, a bench, a picnic blanket and basket, and a football pitch.
+  - Gates: the orchard's top arch `toFieldO` ↔ the field's `toOrchardN` (bottom), and the town's west arch `toField` ↔ the field's `toTownF` (east).
+  - Spots, handled by `fieldSpot` in core:
+    - `lake`: feed the swans once a day (`S.swans`), 1 xp.
+    - `picnic`: Mel sits. A picnic from the backpack is eaten here for 4 xp, with Evan.
+    - `pitch`: a kickabout with Evan (`S.kickabout`, 1 xp a day); Pip asks for a pass.
+  - Evan comes along in the daytime (`evanHere`, `EVAN_SPOTS.field`), and Mel can sit there (`mel.sitting` kept in the field).
+- **Field visits** (`fieldVisits` and `fieldSlot` in tours.js, after tours and visits in `slotNow`):
+  - two picnickers 12–1:30pm,
+  - one villager feeding the swans 5:30–6:30pm,
+  - Pip playing football after school, and on weekend mornings and afternoons,
+  - Ma Ma and Gong Gong strolling round the lake on Friday afternoons and Sunday mornings.
+- **River:** the field's river leaves the lake's east side and runs south-east off the bottom edge at x≈380. In the orchard, `orchardRiver` enters at the top (x 380) and flows east off the right edge at y≈70, into the home screen's river along the top.
+- **Garden yields:** each crop now gives several per harvest (`CROPS[*].yield`: tulip 2, sunflower 2, carrot 3, corn 3, tomato 3, pepper 3, leek 3, pea 4, potato 4, strawberry 5, blueberry 5, pumpkin 2), and seed cards show it.
+  - Per-piece sale prices dropped (corn 4, carrot 3, potato 2, strawberry 4, pumpkin 10…), so a whole harvest sells for only about 1.3–1.5× what one piece used to. The real gain is ingredients for the kitchen.
+  - `CROPS[*].ns` is the plural, for Maple's harvest line.
+- Pip's weekday football in the field is 3:30–4:30pm, so his playground slot at the vineyard (4:30) still happens.

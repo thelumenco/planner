@@ -3,7 +3,7 @@
 import { NPCS, AGENTS } from "../data/npcs.js";
 import { personArt, letterArt } from "../art/people.js";
 import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
-import { tourSlot, visitSlot } from "./tours.js";
+import { tourSlot, visitSlot, fieldSlot } from "./tours.js";
 import { findPath, blocked } from "./paths.js";
 
 const NS = "http://www.w3.org/2000/svg";
@@ -18,14 +18,14 @@ const weekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
 const dowNow = () => new Date(now() + 8*H).getUTCDay();
 // Orchard tours and drop-in visits (tours.js) win over the usual routine while they're on
 const slotNow = def => { const t = sgHM(), we = weekend(), dw = dowNow();
-  const special = tourSlot(def.id, dayKey(), t) || visitSlot(def.id, dayKey(), t); if (special) return special;
+  const special = tourSlot(def.id, dayKey(), t) || visitSlot(def.id, dayKey(), t) || fieldSlot(def.id, dayKey(), t); if (special) return special;
   const owned = (api && api.F().fam && api.F().fam.owned) || {};
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };
 export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
 export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
 const PROPS = {water: "can", repair: "hammer", farm: "hoe"};
-const outdoors = s => s === "village" || s === "base" || s === "lane" || s === "vineyard" || s === "orchard" || s === "flowers";
+const outdoors = s => s === "village" || s === "base" || s === "lane" || s === "vineyard" || s === "orchard" || s === "flowers" || s === "field";
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 
 function makeNode(id, look, kid, letter, act){

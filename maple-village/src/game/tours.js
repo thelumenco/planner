@@ -52,3 +52,23 @@ export function visitSlot(id, day, hm){
 }
 // the tour on right now, if any
 export const tourNow = (day, hm) => toursOn(day).find(t => hm >= t.from && hm < t.to) || null;
+
+// The field: picnickers at lunchtime, someone feeding the swans in the early evening, Pip playing football after school
+// (and on weekend mornings), and Ma Ma and Gong Gong strolling round the lake on Friday afternoons and Sunday mornings.
+const PICNIC = [[106, 468], [138, 464]], LAKESIDE = [[196, 384], [236, 388], [272, 380]], PITCH = [[96, 560], [150, 548], [204, 566], [130, 574]], STROLL = [[60, 330], [100, 380], [300, 380], [70, 250]];
+export function fieldVisits(day){
+  const d = dow(day), we = d === 0 || d === 6, busy = [...toursOn(day).flatMap(t => [t.guide, ...t.group]), ...visitsOn(day).map(v => v.id)];
+  const pool = seed => groupFor(day + seed, 2, [...busy, "pip"]);
+  const [p1, p2] = pool("pic"), [s1] = groupFor(day + "swan", 1, [...busy, "pip", p1, p2]);
+  const out = [{id: p1, from: 12*60, to: 13*60 + 30, at: PICNIC[0], act: "sit"}, {id: p2, from: 12*60, to: 13*60 + 30, at: PICNIC[1], act: "sit"},
+    {id: s1, from: 17*60 + 30, to: 18*60 + 30, wander: LAKESIDE}];
+  if (we) out.push({id: "pip", from: 10*60, to: 11*60 + 30, wander: PITCH}, {id: "pip", from: 15*60, to: 16*60 + 30, wander: PITCH});
+  else out.push({id: "pip", from: 15*60 + 30, to: 16*60 + 30, wander: PITCH});
+  if (d === 5) out.push({id: "mama", from: 16*60, to: 17*60 + 30, wander: STROLL}, {id: "gonggong", from: 16*60, to: 17*60 + 30, wander: STROLL});
+  if (d === 0) out.push({id: "mama", from: 8*60, to: 9*60 + 30, wander: STROLL}, {id: "gonggong", from: 8*60, to: 9*60 + 30, wander: STROLL});
+  return out;
+}
+export function fieldSlot(id, day, hm){
+  const v = fieldVisits(day).find(x => x.id === id && hm >= x.from && hm < x.to);
+  return v ? Object.assign({from: v.from, to: v.to, scene: "field"}, v.at ? {at: v.at} : {wander: v.wander}, v.act ? {act: v.act} : {}) : null;
+}

@@ -1326,6 +1326,37 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // The field (lake, swans, picnic, football) between the orchard and town; gifts for Ma Ma and Gong Gong
+  console.log("\nthe field and grandparents' gifts");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`field pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/giftpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 100; localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
+  await page.goto(url + "?reset=1&seed=1&time=16:10&date=2026-10-09"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=16:10&date=2026-10-09&giftpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(600);
+  check(await page.locator('#world [data-place="toField"]').count() === 1, "the town square has a path west to the field");
+  await page.locator('#world [data-place="toField"]').dispatchEvent("click");
+  await page.waitForFunction(() => /field/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(900);
+  check(await page.locator('#actors [data-npc="pip"]').count() === 1 && await page.locator('#actors [data-npc="mama"]').count() === 1 && await page.locator('#actors [data-npc="gonggong"]').count() === 1, "on a Friday afternoon Pip's playing football and Ma Ma and Gong Gong are walking by the lake (4pm)");
+  await page.locator('#world [data-place="lake"]').dispatchEvent("click"); await page.waitForTimeout(4500);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.today") || "{}").swans === "2026-10-09" || /swan/i.test(document.querySelector("#speech").textContent)), "the swans can be fed");
+  await page.click('[data-open="bag"]').catch(() => {}); await page.keyboard.press("Escape");
+  await page.evaluate(() => window.__mapleScene("market")); await page.waitForTimeout(800);
+  await page.waitForSelector('#ctx [data-shop="family"]', { timeout: 20000 }); await page.click('#ctx [data-shop="family"]');
+  check(await page.locator('#ctx .item[data-id="mooncake"]').count() === 1 && await page.locator('#ctx .item[data-id="birdsnest"]').count() === 1, "Hana sells nyonya kueh, bird's nest, chicken essence, and mooncakes in autumn");
+  await page.click('#ctx .item[data-id="ondeh"]'); await page.waitForTimeout(200);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1000);
+  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="ondeh"]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return !f.inv.ondeh && ((f.fam.gifts.mama || 0) + (f.fam.gifts.gonggong || 0)) === 1; }), "the ondeh-ondeh goes to whichever grandparent is nearest");
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(600);
+  await page.locator('#world [data-place="toFieldO"]').dispatchEvent("click");
+  await page.waitForFunction(() => /field/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "and the field is up the path from the top of the orchard");
+  await page.close();
+}
+{
   // The bank: six vault jars of jewels for savings goals
   console.log("\nthe bank");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

@@ -58,6 +58,12 @@ export function villageArt(){
     ${flowers([[170,540,"#F3C969"],[184,548,"#EFA3A6"],[206,520,"#C3CDEE"],[300,520,"#F3C969"],[400,560,"#EFA3A6"],[150,580,"#C3CDEE"]])}`;
   const places =
     `<g transform="translate(-90 0)">${townHall()}</g>` + bankBuilding() + `<g transform="translate(-350 96)">${library()}</g>` + postOffice() +
+    // west path out to the field and the lake
+    `<g filter="url(#wob)"><path d="M10 196 C80 198 150 236 214 300" fill="none" style="stroke:var(--path)" stroke-width="16" stroke-linecap="round"/></g>
+    <g data-place="toField" aria-label="Path to the field and the lake"><ellipse class="hov" cx="24" cy="202" rx="24" ry="24" style="fill:var(--butter)"/>
+      ${sk(`<rect x="8" y="170" width="6" height="40" style="fill:var(--wood)"/><rect x="32" y="170" width="6" height="40" style="fill:var(--wood)"/><path d="M4 174 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--peri)"/>`,
+        `<rect x="8" y="170" width="6" height="40"/><rect x="32" y="170" width="6" height="40"/><path d="M4 174 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`)}
+      ${tapeLabel(42, 146, "The field", "var(--peri)", 11)}</g>` +
     // east gate to Makers' Lane (Chord and Chico live there now)
     `<g data-place="toLane" aria-label="Gate to Makers' Lane" transform="translate(-56 -112)"><ellipse class="hov" cx="496" cy="330" rx="26" ry="30" style="fill:var(--butter)"/>
       ${sk(`<rect x="484" y="292" width="6" height="56" style="fill:var(--wood)"/><rect x="508" y="292" width="6" height="56" style="fill:var(--wood)"/><path d="M480 296 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
