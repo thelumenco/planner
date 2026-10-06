@@ -644,3 +644,8 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Routine: TV on the cottage sofa, the orchard 9–11:30am and 5–6pm, the flower farm 1–2pm, and tea at 3 on the other side of the table.
   - He goes to town on Mondays and Saturdays, the vineyard on Wednesdays, and Mel's home at the weekend.
 - Villagers' hats come off indoors (`makeNode` drops `look.hat` when the scene isn't outdoors). The cottage has a two-seat sofa in front of the TV, where the grandparents sit in the evening.
+- **Farm shop rework (Mel's call).** Fruit and flowers come only from Mel's own trees and beds, and they're free: nothing is bought there. The shop has three tabs:
+  - **Plant**: `plantAny` buys and plants in the first empty or faded spot of that kind, and shows how many free spots there are.
+  - **Fruit** and **Flowers**: only what Ma Ma has picked.
+
+  The shop opens on Plant until something's planted. Tapping a spot still plants directly.

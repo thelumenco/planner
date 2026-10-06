@@ -1264,6 +1264,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForSelector('#ctx [data-or="take"][data-k="apple"]', { timeout: 15000 });
   await page.click('#ctx [data-or="take"][data-k="apple"]'); await page.waitForTimeout(200);
   check(await fox().then(f => f.inv.apple >= 1 && f.orch.stock.apple === 2), "fruit Ma Ma picked can be taken from the farm shop");
+  check(await page.locator('#ctx [data-or="buy"]').count() === 0, "fruit isn't for sale: it only comes from your own trees, free");
+  await page.click('#ctx [data-or="tab"][data-k="plant"]'); await page.waitForTimeout(200);
+  await page.click('#ctx [data-or="plantany"][data-where="bush"][data-k="heather"]'); await page.waitForTimeout(200);
+  check(await fox().then(f => f.orch.bushes[0] && f.orch.bushes[0].k === "heather" && f.coins === 266), "saplings, bushes and seedlings are bought on the farm shop's Plant tab");
   await page.click('#ctx [data-or="tab"][data-k="flowers"]'); await page.waitForTimeout(200);
   await page.click('#ctx [data-or="make"][data-kind="bouquet"][data-k="mum"]'); await page.waitForTimeout(200);
   await page.click('#ctx [data-or="make"][data-kind="pot"][data-k="mum"]'); await page.waitForTimeout(200);

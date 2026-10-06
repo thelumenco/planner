@@ -1716,8 +1716,6 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     camellia: { n: "Camellias", one: "camellia", bush: true, seasons: ["winter"], price: 22, col: "#F08AA0" }
   };
   var STEM_PRICE = 2;
-  var BOUQUET_PRICE = 8;
-  var POT_PRICE = 10;
   var BED_YIELD = 3;
   var BUSH_YIELD = 4;
   var TREE_ROWS = [372, 462, 552];
@@ -4760,14 +4758,6 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     F2.inv[item] = (F2.inv[item] || 0) + 1;
     return kind === "bouquet" ? `Ma Ma ties ${stemName(id, need)} with ribbon. A bouquet, into your backpack.` : `Ma Ma pots up ${stemName(id, need)}. Into your backpack, ready to place.`;
   }
-  function buyOne(F2, kind, id) {
-    const price = kind === "fruit" ? (ITEMS[id] && ITEMS[id].sell || 3) + 1 : kind === "bouquet" ? BOUQUET_PRICE : POT_PRICE;
-    if (F2.coins < price) return null;
-    F2.coins -= price;
-    const item = kind === "fruit" ? id : (kind === "bouquet" ? "bq_" : "pot_") + id;
-    F2.inv[item] = (F2.inv[item] || 0) + 1;
-    return kind === "fruit" ? `One ${fruitName(id, 1)}, for ${price} coins.` : kind === "bouquet" ? `A bouquet of ${FLOWERS[id].n.toLowerCase()}, for ${price} coins.` : `A pot of ${FLOWERS[id].n.toLowerCase()}, for ${price} coins.`;
-  }
   function placePot(F2, item, spot) {
     const it = ITEMS[item];
     if (!it || it.kind !== "pot" || !(F2.inv[item] > 0) || !POT_SPOTS[spot]) return null;
@@ -4801,29 +4791,46 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
   }
   function shopPanel(F2, today2, tab) {
     const o = orchState(F2), fruit = Object.values(TREES).map((t2) => t2.fruit).filter((x, i, a) => a.indexOf(x) === i), season = seasonOf(today2);
+    const anyPlanted = o.trees.some(Boolean) || o.beds.some(Boolean) || o.bushes.some(Boolean);
+    tab = tab || (anyPlanted ? "fruit" : "plant");
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Ma Ma's farm shop</h2>`;
-    h += `<p class="sub">What Ma Ma picks goes on these shelves. Villagers buy while it's open (9am to 6pm), and anything here is yours to take.${o.today.day === today2 && o.today.sold ? ` Today she's sold ${o.today.sold} thing${o.today.sold === 1 ? "" : "s"}.` : ""}</p>`;
-    h += `<div class="tabs" role="tablist"><button role="tab" data-or="tab" data-k="fruit" aria-selected="${tab !== "flowers"}">Fruit</button><button role="tab" data-or="tab" data-k="flowers" aria-selected="${tab === "flowers"}">Flowers</button></div>`;
-    if (tab !== "flowers") {
-      const have = fruit.filter((id) => o.stock[id] > 0), inSeason2 = Object.values(TREES).filter((t2) => t2.seasons.includes(season)).map((t2) => t2.fruit);
-      h += have.length ? `<ul class="hlist wlist">${have.map((id) => `<li><span class="wpic">${icon(id, 36)}</span><span class="wtxt"><b>${esc(fruitName(id, 2)[0].toUpperCase() + fruitName(id, 2).slice(1))}</b><small>${o.stock[id]} on the shelf</small></span><button class="btn small primary" data-or="take" data-k="${id}">Take one</button>${o.stock[id] > 1 ? `<button class="btn small alt" data-or="takeall" data-k="${id}">All</button>` : ""}</li>`).join("")}</ul>` : `<p class="muted">No fruit on the shelf just now. Plant some trees, or buy a little:</p>`;
-      const buy3 = inSeason2.filter((id) => !(o.stock[id] > 0));
-      if (buy3.length) h += `<div class="items shop">${buy3.map((id) => {
-        const price = (ITEMS[id] && ITEMS[id].sell || 3) + 1;
-        return `<button class="item" data-or="buy" data-kind="fruit" data-k="${id}" ${F2.coins < price ? "disabled" : ""}><span class="e">${icon(id, 34)}</span><span class="n">${esc(ITEMS[id].n)}</span><span class="c"><b>${price}</b> ${icon("coin", 13)}</span></button>`;
-      }).join("")}</div>`;
+    h += `<p class="sub">${tab === "plant" ? `Saplings, bushes and seedlings for ${SEASONS[season].n.toLowerCase()}. Pick one and Ma Ma plants it in the next free spot (or tap a spot in the orchard or flower farm).` : `What Ma Ma picks from your trees and flowers goes on these shelves: free for you to take. Villagers buy the rest while it's open (9am to 6pm).${o.today.day === today2 && o.today.sold ? ` Today she's sold ${o.today.sold} thing${o.today.sold === 1 ? "" : "s"}.` : ""}`}</p>`;
+    h += `<div class="tabs" role="tablist">${[["plant", "Plant"], ["fruit", "Fruit"], ["flowers", "Flowers"]].map(([k, n]) => `<button role="tab" data-or="tab" data-k="${k}" aria-selected="${tab === k}">${n}</button>`).join("")}</div>`;
+    if (tab === "plant") {
+      for (const where of ["tree", "bush", "bed"]) {
+        const free = o[SPOTS[where]].filter((p) => {
+          const st6 = stateOf(where, p, today2).stage;
+          return st6 === "empty" || st6 === "faded";
+        }).length;
+        const opts = Object.keys(cat(where)).filter((id) => cat(where)[id].seasons.includes(season) && (where === "tree" || !!cat(where)[id].bush === (where === "bush")));
+        h += `<h3 class="ph3">${where === "tree" ? "Fruit trees" : where === "bush" ? "Flower bushes" : "Flower seedlings"} <small class="muted">${free} free spot${free === 1 ? "" : "s"}${where === "tree" ? " in the orchard" : " at the flower farm"}</small></h3>`;
+        h += `<div class="items shop">${opts.map((id) => {
+          const C2 = cat(where)[id], off = !free || F2.coins < C2.price;
+          return `<button class="item" data-or="plantany" data-where="${where}" data-k="${id}" ${off ? "disabled" : ""}><span class="e">${where === "tree" ? treePic(id, "ripe", 44, off) : flowerPic(id, "ripe", where === "bush", 44, off)}</span><span class="n">${esc(C2.n)}</span><span class="c"><b>${C2.price}</b> ${icon("coin", 13)}</span><span class="d">${where === "tree" ? `${C2.yield} ${C2.fn[1]} a day` : `${where === "bush" ? BUSH_YIELD : BED_YIELD} stems a picking`}</span></button>`;
+        }).join("")}</div>`;
+      }
+      h += `<p class="muted">You have ${F2.coins} coins. Ma Ma does the watering and the picking. Trees and flowers last for their seasons, then the spot needs replanting.</p>`;
+    } else if (tab === "fruit") {
+      const have = fruit.filter((id) => o.stock[id] > 0);
+      h += have.length ? `<ul class="hlist wlist">${have.map((id) => `<li><span class="wpic">${icon(id, 36)}</span><span class="wtxt"><b>${esc(fruitName(id, 2)[0].toUpperCase() + fruitName(id, 2).slice(1))}</b><small>${o.stock[id]} on the shelf</small></span><button class="btn small primary" data-or="take" data-k="${id}">Take one</button>${o.stock[id] > 1 ? `<button class="btn small alt" data-or="takeall" data-k="${id}">All</button>` : ""}</li>`).join("")}</ul>` : `<p class="muted">${o.trees.some(Boolean) ? "Nothing picked yet. Ma Ma picks the fruit as soon as it's ripe." : "No fruit yet. Plant some trees (the Plant tab) and Ma Ma will pick the fruit once it's ripe."}</p>`;
       h += `<p class="muted">Fruit can go to the wine shop's fruit crate, or to Maple.</p>`;
     } else {
-      const ids = Object.keys(FLOWERS).filter((id) => stemsOf(o, id) > 0 || FLOWERS[id].seasons.includes(season));
-      h += `<ul class="hlist wlist orflowers">${ids.map((id) => {
-        const s = stemsOf(o, id), F22 = FLOWERS[id];
-        return `<li><span class="wpic">${icon("bq_" + id, 36)}</span><span class="wtxt"><b>${esc(F22.n)}</b><small>${s ? `${s} stem${s === 1 ? "" : "s"} picked` : "none picked yet"}</small></span>
-        <span class="orbtns">${s >= BOUQUET_STEMS ? `<button class="btn small primary" data-or="make" data-kind="bouquet" data-k="${id}">Bouquet</button>` : `<button class="btn small alt" data-or="buy" data-kind="bouquet" data-k="${id}" ${F2.coins < BOUQUET_PRICE ? "disabled" : ""}>Bouquet, ${BOUQUET_PRICE}</button>`}
-        ${s >= POT_STEMS ? `<button class="btn small primary" data-or="make" data-kind="pot" data-k="${id}">Pot</button>` : `<button class="btn small alt" data-or="buy" data-kind="pot" data-k="${id}" ${F2.coins < POT_PRICE ? "disabled" : ""}>Pot, ${POT_PRICE}</button>`}</span></li>`;
-      }).join("")}</ul>
-      <p class="muted">A bouquet takes ${BOUQUET_STEMS} stems, a pot ${POT_STEMS}. Give bouquets to anyone in the village; set pots at home, outside the wine shop, or in your room (tap them in your backpack).</p>`;
+      const ids = Object.keys(FLOWERS).filter((id) => stemsOf(o, id) > 0);
+      h += ids.length ? `<ul class="hlist wlist orflowers">${ids.map((id) => {
+        const s = stemsOf(o, id);
+        return `<li><span class="wpic">${icon("bq_" + id, 36)}</span><span class="wtxt"><b>${esc(FLOWERS[id].n)}</b><small>${s} stem${s === 1 ? "" : "s"} picked</small></span>
+        <span class="orbtns"><button class="btn small ${s >= BOUQUET_STEMS ? "primary" : "alt"}" data-or="make" data-kind="bouquet" data-k="${id}" ${s >= BOUQUET_STEMS ? "" : "disabled"}>Bouquet</button><button class="btn small ${s >= POT_STEMS ? "primary" : "alt"}" data-or="make" data-kind="pot" data-k="${id}" ${s >= POT_STEMS ? "" : "disabled"}>Pot</button></span></li>`;
+      }).join("")}</ul>` : `<p class="muted">${o.beds.some(Boolean) || o.bushes.some(Boolean) ? "No flowers picked yet. Ma Ma cuts them as soon as they bloom." : "No flowers yet. Plant seedlings or bushes (the Plant tab) and Ma Ma will cut them when they bloom."}</p>`;
+      h += `<p class="muted">A bouquet takes ${BOUQUET_STEMS} stems, a pot ${POT_STEMS}. Give bouquets to anyone in the village; set pots at home, outside the wine shop, or in your room (tap them in your backpack).</p>`;
     }
     return h + `<div class="actions">${close}</div>`;
+  }
+  function plantAny(F2, where, id, today2) {
+    const o = orchState(F2), i = o[SPOTS[where]].findIndex((p) => {
+      const st6 = stateOf(where, p, today2).stage;
+      return st6 === "empty" || st6 === "faded";
+    });
+    return i < 0 ? null : plant2(F2, where, i, id, today2);
   }
   function potPanel(F2, item) {
     const it = ITEMS[item];
@@ -4851,8 +4858,8 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       } else if (k === "take") line = takeFruit(F2, id);
       else if (k === "takeall") line = takeFruit(F2, id, true);
       else if (k === "make") line = makeFlowers(F2, b.dataset.kind, id);
-      else if (k === "buy") {
-        line = buyOne(F2, b.dataset.kind, id);
+      else if (k === "plantany") {
+        line = plantAny(F2, b.dataset.where, id, api4.today);
         snd = "coin";
       } else if (k === "place") {
         line = placePot(F2, api4.item, id);
@@ -11515,7 +11522,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var orView = null;
   var orAt = null;
-  var orTab = "fruit";
+  var orTab = null;
   var potItem = null;
   var kView = null;
   var reviewOpen = false;
@@ -14350,7 +14357,7 @@ Then tell chat "wind down" whenever you're ready.`
     $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "farm" ? farmArt() : roomArt(scene);
     const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: vineyardName(F), farm: "The garden", wineshop: shopName(F), orchard: "Ma Ma's orchard", flowers: "Ma Ma's flower farm" };
     $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-    $("maphint").textContent = scene === "orchard" ? "Tap a tree spot to plant. Ma Ma waters and picks. Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant flowers. The arch on the right goes back to the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+    $("maphint").textContent = scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
   }
   var tableKey = "";
   function drawTableware() {
@@ -14972,6 +14979,7 @@ Then tell chat "wind down" whenever you're ready.`
     }
     if (id === "farmshop") {
       orView = "shop";
+      orTab = null;
       sfx("paper", true);
       if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma picked them for you.", "Fresh this morning. Choose any.", "For you, no charge. You're my girl."]));
       render();

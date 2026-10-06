@@ -1,7 +1,8 @@
 // Ma Ma's orchard and flower farm (logic and panels). Mel buys and plants; Ma Ma tends and picks what's ripe between
 // 7am and 7pm into the farm shop. Villagers buy from the shop while it's open (9am to 6pm), and Ma Ma keeps the takings
 // in a tin she hands to Mel when she visits. Mel can take fruit, bouquets and potted flowers from the shop for herself
-// (or buy them when it's run out). Trees and flowers belong to their seasons: when the season turns, they fade and
+// (free: only what her own trees and flowers have given). Saplings, bushes and seedlings are bought on the shop's
+// Plant tab (or by tapping a spot). Trees and flowers belong to their seasons: when the season turns, they fade and
 // the spot is replanted. See data/orchard.js for the catalogue and timings.
 // State: F.orch = {trees[12], beds[12], bushes[4]: {k, at, next} | null, stock: {fruit|stem id: n}, tin, lastTick,
 // today: {day, sold, coins}, tea}; potted flowers placed around the village live in F.pots {spot: flower id}.
@@ -90,11 +91,6 @@ export function makeFlowers(F, kind, id){
   const item = (kind === "bouquet" ? "bq_" : "pot_") + id; F.inv[item] = (F.inv[item] || 0) + 1;
   return kind === "bouquet" ? `Ma Ma ties ${stemName(id, need)} with ribbon. A bouquet, into your backpack.` : `Ma Ma pots up ${stemName(id, need)}. Into your backpack, ready to place.`;
 }
-export function buyOne(F, kind, id){
-  const price = kind === "fruit" ? ((ITEMS[id] && ITEMS[id].sell) || 3) + 1 : kind === "bouquet" ? BOUQUET_PRICE : POT_PRICE; if (F.coins < price) return null;
-  F.coins -= price; const item = kind === "fruit" ? id : (kind === "bouquet" ? "bq_" : "pot_") + id; F.inv[item] = (F.inv[item] || 0) + 1;
-  return kind === "fruit" ? `One ${fruitName(id, 1)}, for ${price} coins.` : kind === "bouquet" ? `A bouquet of ${FLOWERS[id].n.toLowerCase()}, for ${price} coins.` : `A pot of ${FLOWERS[id].n.toLowerCase()}, for ${price} coins.`;
-}
 // Set a potted flower in one of the village's pot spots (replacing whatever was there). -> line or null
 export function placePot(F, item, spot){
   const it = ITEMS[item]; if (!it || it.kind !== "pot" || !(F.inv[item] > 0) || !POT_SPOTS[spot]) return null;
@@ -125,28 +121,44 @@ export function spotPanel(F, where, i, today){
     <p class="muted">${where === "tree" ? `${C.yield} ${C.fn[1]} a day once it's fruiting.` : `${where === "bush" ? BUSH_YIELD : BED_YIELD} stems each picking.`} In season: ${C.seasons.map(s => SEASONS[s].n.toLowerCase()).join(", ")}.</p>`;
   return h + `<div class="actions">${close}</div>`;
 }
+// The farm shop's tabs: Plant (saplings, bushes and seedlings, bought and planted in the first free spot), Fruit and
+// Flowers (only what Ma Ma has picked from Mel's own trees and beds: free for Mel to take)
 export function shopPanel(F, today, tab){
   const o = orchState(F), fruit = Object.values(TREES).map(t => t.fruit).filter((x, i, a) => a.indexOf(x) === i), season = seasonOf(today);
+  const anyPlanted = o.trees.some(Boolean) || o.beds.some(Boolean) || o.bushes.some(Boolean);
+  tab = tab || (anyPlanted ? "fruit" : "plant");
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Ma Ma's farm shop</h2>`;
-  h += `<p class="sub">What Ma Ma picks goes on these shelves. Villagers buy while it's open (9am to 6pm), and anything here is yours to take.${o.today.day === today && o.today.sold ? ` Today she's sold ${o.today.sold} thing${o.today.sold === 1 ? "" : "s"}.` : ""}</p>`;
-  h += `<div class="tabs" role="tablist"><button role="tab" data-or="tab" data-k="fruit" aria-selected="${tab !== "flowers"}">Fruit</button><button role="tab" data-or="tab" data-k="flowers" aria-selected="${tab === "flowers"}">Flowers</button></div>`;
-  if (tab !== "flowers") {
-    const have = fruit.filter(id => o.stock[id] > 0), inSeason = Object.values(TREES).filter(t => t.seasons.includes(season)).map(t => t.fruit);
+  h += `<p class="sub">${tab === "plant" ? `Saplings, bushes and seedlings for ${SEASONS[season].n.toLowerCase()}. Pick one and Ma Ma plants it in the next free spot (or tap a spot in the orchard or flower farm).`
+    : `What Ma Ma picks from your trees and flowers goes on these shelves: free for you to take. Villagers buy the rest while it's open (9am to 6pm).${o.today.day === today && o.today.sold ? ` Today she's sold ${o.today.sold} thing${o.today.sold === 1 ? "" : "s"}.` : ""}`}</p>`;
+  h += `<div class="tabs" role="tablist">${[["plant", "Plant"], ["fruit", "Fruit"], ["flowers", "Flowers"]].map(([k, n]) => `<button role="tab" data-or="tab" data-k="${k}" aria-selected="${tab === k}">${n}</button>`).join("")}</div>`;
+  if (tab === "plant") {
+    for (const where of ["tree", "bush", "bed"]) {
+      const free = o[SPOTS[where]].filter(p => { const st = stateOf(where, p, today).stage; return st === "empty" || st === "faded"; }).length;
+      const opts = Object.keys(cat(where)).filter(id => cat(where)[id].seasons.includes(season) && (where === "tree" || !!cat(where)[id].bush === (where === "bush")));
+      h += `<h3 class="ph3">${where === "tree" ? "Fruit trees" : where === "bush" ? "Flower bushes" : "Flower seedlings"} <small class="muted">${free} free spot${free === 1 ? "" : "s"}${where === "tree" ? " in the orchard" : " at the flower farm"}</small></h3>`;
+      h += `<div class="items shop">${opts.map(id => { const C = cat(where)[id], off = !free || F.coins < C.price;
+        return `<button class="item" data-or="plantany" data-where="${where}" data-k="${id}" ${off ? "disabled" : ""}><span class="e">${where === "tree" ? treePic(id, "ripe", 44, off) : flowerPic(id, "ripe", where === "bush", 44, off)}</span><span class="n">${esc(C.n)}</span><span class="c"><b>${C.price}</b> ${icon("coin", 13)}</span><span class="d">${where === "tree" ? `${C.yield} ${C.fn[1]} a day` : `${where === "bush" ? BUSH_YIELD : BED_YIELD} stems a picking`}</span></button>`; }).join("")}</div>`;
+    }
+    h += `<p class="muted">You have ${F.coins} coins. Ma Ma does the watering and the picking. Trees and flowers last for their seasons, then the spot needs replanting.</p>`;
+  } else if (tab === "fruit") {
+    const have = fruit.filter(id => o.stock[id] > 0);
     h += have.length ? `<ul class="hlist wlist">${have.map(id => `<li><span class="wpic">${icon(id, 36)}</span><span class="wtxt"><b>${esc(fruitName(id, 2)[0].toUpperCase() + fruitName(id, 2).slice(1))}</b><small>${o.stock[id]} on the shelf</small></span><button class="btn small primary" data-or="take" data-k="${id}">Take one</button>${o.stock[id] > 1 ? `<button class="btn small alt" data-or="takeall" data-k="${id}">All</button>` : ""}</li>`).join("")}</ul>`
-      : `<p class="muted">No fruit on the shelf just now. Plant some trees, or buy a little:</p>`;
-    const buy = inSeason.filter(id => !(o.stock[id] > 0));
-    if (buy.length) h += `<div class="items shop">${buy.map(id => { const price = ((ITEMS[id] && ITEMS[id].sell) || 3) + 1;
-      return `<button class="item" data-or="buy" data-kind="fruit" data-k="${id}" ${F.coins < price ? "disabled" : ""}><span class="e">${icon(id, 34)}</span><span class="n">${esc(ITEMS[id].n)}</span><span class="c"><b>${price}</b> ${icon("coin", 13)}</span></button>`; }).join("")}</div>`;
+      : `<p class="muted">${o.trees.some(Boolean) ? "Nothing picked yet. Ma Ma picks the fruit as soon as it's ripe." : "No fruit yet. Plant some trees (the Plant tab) and Ma Ma will pick the fruit once it's ripe."}</p>`;
     h += `<p class="muted">Fruit can go to the wine shop's fruit crate, or to Maple.</p>`;
   } else {
-    const ids = Object.keys(FLOWERS).filter(id => stemsOf(o, id) > 0 || FLOWERS[id].seasons.includes(season));
-    h += `<ul class="hlist wlist orflowers">${ids.map(id => { const s = stemsOf(o, id), F2 = FLOWERS[id];
-      return `<li><span class="wpic">${icon("bq_" + id, 36)}</span><span class="wtxt"><b>${esc(F2.n)}</b><small>${s ? `${s} stem${s === 1 ? "" : "s"} picked` : "none picked yet"}</small></span>
-        <span class="orbtns">${s >= BOUQUET_STEMS ? `<button class="btn small primary" data-or="make" data-kind="bouquet" data-k="${id}">Bouquet</button>` : `<button class="btn small alt" data-or="buy" data-kind="bouquet" data-k="${id}" ${F.coins < BOUQUET_PRICE ? "disabled" : ""}>Bouquet, ${BOUQUET_PRICE}</button>`}
-        ${s >= POT_STEMS ? `<button class="btn small primary" data-or="make" data-kind="pot" data-k="${id}">Pot</button>` : `<button class="btn small alt" data-or="buy" data-kind="pot" data-k="${id}" ${F.coins < POT_PRICE ? "disabled" : ""}>Pot, ${POT_PRICE}</button>`}</span></li>`; }).join("")}</ul>
-      <p class="muted">A bouquet takes ${BOUQUET_STEMS} stems, a pot ${POT_STEMS}. Give bouquets to anyone in the village; set pots at home, outside the wine shop, or in your room (tap them in your backpack).</p>`;
+    const ids = Object.keys(FLOWERS).filter(id => stemsOf(o, id) > 0);
+    h += ids.length ? `<ul class="hlist wlist orflowers">${ids.map(id => { const s = stemsOf(o, id);
+      return `<li><span class="wpic">${icon("bq_" + id, 36)}</span><span class="wtxt"><b>${esc(FLOWERS[id].n)}</b><small>${s} stem${s === 1 ? "" : "s"} picked</small></span>
+        <span class="orbtns"><button class="btn small ${s >= BOUQUET_STEMS ? "primary" : "alt"}" data-or="make" data-kind="bouquet" data-k="${id}" ${s >= BOUQUET_STEMS ? "" : "disabled"}>Bouquet</button><button class="btn small ${s >= POT_STEMS ? "primary" : "alt"}" data-or="make" data-kind="pot" data-k="${id}" ${s >= POT_STEMS ? "" : "disabled"}>Pot</button></span></li>`; }).join("")}</ul>`
+      : `<p class="muted">${o.beds.some(Boolean) || o.bushes.some(Boolean) ? "No flowers picked yet. Ma Ma cuts them as soon as they bloom." : "No flowers yet. Plant seedlings or bushes (the Plant tab) and Ma Ma will cut them when they bloom."}</p>`;
+    h += `<p class="muted">A bouquet takes ${BOUQUET_STEMS} stems, a pot ${POT_STEMS}. Give bouquets to anyone in the village; set pots at home, outside the wine shop, or in your room (tap them in your backpack).</p>`;
   }
   return h + `<div class="actions">${close}</div>`;
+}
+// Plant from the farm shop: the first empty (or faded) spot of that kind. -> line or null
+export function plantAny(F, where, id, today){
+  const o = orchState(F), i = o[SPOTS[where]].findIndex(p => { const st = stateOf(where, p, today).stage; return st === "empty" || st === "faded"; });
+  return i < 0 ? null : plant(F, where, i, id, today);
 }
 export function potPanel(F, item){
   const it = ITEMS[item]; orchState(F);
@@ -168,7 +180,7 @@ export function wireOrchard(root, F, api){
     else if (k === "tab") { api.tab(id); return; }
     else if (k === "take") line = takeFruit(F, id); else if (k === "takeall") line = takeFruit(F, id, true);
     else if (k === "make") line = makeFlowers(F, b.dataset.kind, id);
-    else if (k === "buy") { line = buyOne(F, b.dataset.kind, id); snd = "coin"; }
+    else if (k === "plantany") { line = plantAny(F, b.dataset.where, id, api.today); snd = "coin"; }
     else if (k === "place") { line = placePot(F, api.item, id); if (line) { api.sfx("chime"); api.say(line); api.save(); api.placed(); return; } }
     else if (k === "tea") { api.tea(); return; }
     if (line) { api.sfx(snd); api.say(line); api.save(); }
