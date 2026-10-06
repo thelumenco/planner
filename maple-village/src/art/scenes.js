@@ -21,6 +21,11 @@ let G = null;
 export const setArtContext = g => { G = g; };
 export const artCtx = () => G;
 
+// Darren's asleep in their bed from 11pm until his morning starts (7:00 on weekdays, 7:30 at weekends)
+export function darrenAsleep(){
+  const d = new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8*3600e3), m = d.getUTCHours()*60 + d.getUTCMinutes(), we = d.getUTCDay() === 0 || d.getUTCDay() === 6;
+  return m >= 23*60 || m < (we ? 7*60 + 30 : 7*60);
+}
 export function tapeLabel(x, y, text, col, size){
   const w = text.length*(size ? size*.56 : 8.2) + 22;
   x = Math.max(w/2 + 8, Math.min(520 - w/2 - 8, x));   // never off the edge of the map
@@ -452,13 +457,14 @@ export function furn(kind, x, y){
         <path d="M${x-58} ${y+6} v-8 q0 -3 3 -3 h7 l5 -6 h12 q3 0 4 3 l4 6 q4 0 4 4 v4z" style="fill:#E86A5C"/><path d="M${x+20} ${y+8} v-8 q0 -3 3 -3 h7 l5 -6 h12 q3 0 4 3 l4 6 q4 0 4 4 v4z" style="fill:#F7C548"/>`,
       `<path d="M${x-40} ${y-14} v-38 l40 -22 l40 22 v38z"/><path d="M${x-22} ${y-14} v-26 h44 v26z M${x-22} ${y-32} h44 M${x-22} ${y-24} h44"/><path d="M${x-58} ${y+6} v-8 q0 -3 3 -3 h7 l5 -6 h12 q3 0 4 3 l4 6 q4 0 4 4 v4z"/><circle cx="${x-50}" cy="${y+7}" r="3.4"/><circle cx="${x-32}" cy="${y+7}" r="3.4"/>
         <path d="M${x+20} ${y+8} v-8 q0 -3 3 -3 h7 l5 -6 h12 q3 0 4 3 l4 6 q4 0 4 4 v4z"/><circle cx="${x+28}" cy="${y+9}" r="3.4"/><circle cx="${x+46}" cy="${y+9}" r="3.4"/>`);
-    case "bed": { const sl = G.S && G.S().sleep, d = (G.F().decor || {}), pj = d.me_pj ? "#3B4A86" : "var(--tank)";
+    case "bed": { const sl = G.S && G.S().sleep, d = (G.F().decor || {}), pj = d.me_pj ? "#3B4A86" : "var(--tank)", dz = darrenAsleep();
       return sk(`<rect x="${x-78}" y="${y-132}" width="156" height="40" rx="10" style="fill:var(--wood)"/><rect x="${x-74}" y="${y-104}" width="148" height="100" rx="6" style="fill:#FFFDF6"/>
         <rect x="${x-66}" y="${y-100}" width="58" height="24" rx="9" style="fill:#F6EEF4"/><rect x="${x+8}" y="${y-100}" width="58" height="24" rx="9" style="fill:#F6EEF4"/>
-        <path d="M${x-74} ${y - (sl ? 74 : 60)} h148 v56 a6 6 0 0 1 -6 6 h-136 a6 6 0 0 1 -6 -6z" style="fill:var(--peri)"/>${d.r_throw ? `<path d="M${x+20} ${y-58} h54 v52 h-54z" style="fill:var(--blush)"/>` : ""}
+        ${dz ? `<circle class="darrenBed" cx="${x+36}" cy="${y-84}" r="11" style="fill:#E6BC98"/><path d="M${x+25} ${y-86} c0 -10 6 -13 11 -13 c6 0 11 3 11 12 c-4 -4 -12 -5 -22 1z" style="fill:#1A1716"/><path d="M${x+22} ${y-76} q14 -6 28 0 v6 h-28z" style="fill:#9A9A9A"/>` : ""}
+        <path d="M${x-74} ${y - (sl || dz ? 74 : 60)} h148 v56 a6 6 0 0 1 -6 6 h-136 a6 6 0 0 1 -6 -6z" style="fill:var(--peri)"/>${d.r_throw ? `<path d="M${x+20} ${y-58} h54 v52 h-54z" style="fill:var(--blush)"/>` : ""}
         ${sl ? `<circle cx="${x-36}" cy="${y-84}" r="11" style="fill:var(--skin)"/><path d="M${x-48} ${y-84} c0 -12 8 -15 13 -15 c8 0 13 5 11 13 c-3 -4 -8 -5 -12 -4 c-4 1 -8 3 -12 6z" style="fill:var(--hair)"/><path d="M${x-50} ${y-76} q14 -6 28 0 v6 h-28z" style="fill:${pj}"/>` : ""}`,
         `<rect x="${x-78}" y="${y-132}" width="156" height="40" rx="10"/><rect x="${x-74}" y="${y-104}" width="148" height="100" rx="6"/><rect x="${x-66}" y="${y-100}" width="58" height="24" rx="9"/><rect x="${x+8}" y="${y-100}" width="58" height="24" rx="9"/>
-        <path d="M${x-74} ${y - (sl ? 74 : 60)} h148"/>${d.r_throw ? `<path d="M${x+20} ${y-58} h54 v52 h-54z M${x+28} ${y-58} v52 M${x+40} ${y-58} v52 M${x+52} ${y-58} v52 M${x+64} ${y-58} v52" opacity=".7"/>` : ""}${legs(148, 6)}
+        ${dz ? `<circle cx="${x+36}" cy="${y-84}" r="11"/><path d="M${x+32} ${y-84} q2 1.5 4 0 M${x+38} ${y-84} q2 1.5 4 0" opacity=".7"/>` : ""}<path d="M${x-74} ${y - (sl || dz ? 74 : 60)} h148"/>${d.r_throw ? `<path d="M${x+20} ${y-58} h54 v52 h-54z M${x+28} ${y-58} v52 M${x+40} ${y-58} v52 M${x+52} ${y-58} v52 M${x+64} ${y-58} v52" opacity=".7"/>` : ""}${legs(148, 6)}
         ${sl ? `<path d="M${x-40} ${y-84} q2 1.6 4 0 M${x-33} ${y-84} q2 1.6 4 0"/>` : ""}`) + (sl ? `<text x="${x-14}" y="${y-104}" font-size="11" fill="#3b3530" class="zz" pointer-events="none">z z</text>` : ""); }
     case "curtwindow": { const g = G.F() || {}, night = G.dusk(), shut = g.curtains ? g.curtains === "closed" : (night || !!(G.S && G.S().sleep));
       // each curtain hangs from the rod and sways a little (CSS "sway"), pivoting at the top

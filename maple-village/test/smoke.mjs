@@ -1639,6 +1639,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(await ids().then(a => !two.some(f => a.includes(f))), `after 11pm ${two.join(" and ")} are behind the bedroom door`); }
   await page.locator('#world [data-spot="bedroom"]').dispatchEvent("click"); await page.waitForFunction(() => /asleep/.test(document.querySelector("#speech").textContent), null, { timeout: 15000 }).catch(() => {});
   check(/fast asleep/.test(await page.locator("#speech").textContent()), "knocking at night: they're fast asleep");
+  await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(1000);
+  check(await page.locator("#world .darrenBed").count() === 1, "and Darren's asleep in Mel's bed by 11pm");
+  await page.goto(url + "?seed=1&time=15:00&date=2026-10-13"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(1000);
+  check(await page.locator("#world .darrenBed").count() === 0, "but not in the afternoon");
   await page.close();
 }
 {

@@ -43,7 +43,7 @@ import { dishArt, glassArt } from "../art/wine.js";
 import { fieldArt, stallFront } from "../art/field.js";
 import { shoreArt } from "../art/shore.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, ride, rideSpeed } from "./goals.js";
-import { diningTable } from "../art/scenes.js";
+import { diningTable, darrenAsleep } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
 import { tourNow, eventNow, stallAt, STALL_SPOTS, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers } from "./tours.js";
@@ -1472,8 +1472,8 @@ function ctx(){
     }
   } else if (bedOpen && scene === "room") {
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>Your bed</h2>` + (S.sleep
-      ? `<p class="sub">${S.sleep.until ? `Napping. Up in about ${Math.max(1, Math.ceil((S.sleep.until - Date.now())/M))} min.` : "Fast asleep. Sweet dreams."}</p><div class="actions"><button class="btn yes" data-bed="up">Get up</button></div>`
-      : `<p class="sub">Fluffy pillows, cool sheets${(F.decor || {}).r_throw ? ", your knitted throw" : ""}.</p><div class="actions"><button class="btn primary" data-bed="nap">Nap for 20 minutes</button><button class="btn alt" data-bed="sleep">${sgHM() >= 20*60 || sgHM() < 5*60 ? "Go to sleep" : "Lie down"}</button></div>`);
+      ? `<p class="sub">${S.sleep.until ? `Napping. Up in about ${Math.max(1, Math.ceil((S.sleep.until - Date.now())/M))} min.` : `Fast asleep${darrenAsleep() ? ", Darren snoring softly beside you" : ""}. Sweet dreams.`}</p><div class="actions"><button class="btn yes" data-bed="up">Get up</button></div>`
+      : `<p class="sub">Fluffy pillows, cool sheets${(F.decor || {}).r_throw ? ", your knitted throw" : ""}.${darrenAsleep() ? " Darren's already fast asleep on his side. Tiptoe in." : ""}</p><div class="actions"><button class="btn primary" data-bed="nap">Nap for 20 minutes</button><button class="btn alt" data-bed="sleep">${sgHM() >= 20*60 || sgHM() < 5*60 ? "Go to sleep" : "Lie down"}</button></div>`);
   } else if (jarsOpen && scene === "room") {
     h = jarsPanel(jv);
   } else if (recOpen && scene === "room") {

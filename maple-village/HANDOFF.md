@@ -913,3 +913,4 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Tapping the door (core.js) says they're fast asleep at night (11pm to 6:30am), otherwise that it's private.
 - **Hair tie:** the blue hair tie and the two sprigs on Mel's sprite carry `class="usual"`. `applyWear` sets `#mel.restyled` whenever a worn outfit has a hair, dress or top piece, and `#mel.restyled .usual` hides them.
 - **Buttons:** `.panel .actions{margin-top:12px}` (0 when first child), so focus and highlight rings no longer touch the line above.
+- **Darren asleep (round 68b):** `darrenAsleep()` (scenes.js) is true from 23:00 until 7:00 on weekdays and 7:30 at weekends. The room's `bed` art then draws him on the right pillow (`.darrenBed`) with the covers pulled up, and the bed panel mentions him.
