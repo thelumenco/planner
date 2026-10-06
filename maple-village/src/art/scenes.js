@@ -342,6 +342,7 @@ export function furn(kind, x, y){
       for (let r = 0; r < 3; r++) for (let i = 0; i < 6; i++) { const k = r*6 + i; b += k < n ? `<rect x="${x-36 + i*12.5}" y="${y-86 + r*28}" width="7" height="20" rx="2.5" style="fill:${k % 3 === 1 ? "#9DBF8A" : "#5B2338"}"/>` : ""; }
       return sk(`<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3" style="fill:#8B5E3C"/>${b}`, `<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3"/><path d="M${x-44} ${y-68} h88 M${x-44} ${y-40} h88 M${x-44} ${y-12} h88"/>`); }
     case "winecounter": return `<rect x="${x-92}" y="${y-48}" width="184" height="48" fill="transparent"/>`;
+    case "chalkmenu": return `<rect x="${x-36}" y="${y-84}" width="72" height="84" fill="transparent"/>`;   // the chalkboard is painted on the wall (interiors.js)
     case "honestybox": { const n = G.vine ? G.vine().box : 0;
       return sk(`<rect x="${x-8}" y="${y-40}" width="16" height="40" style="fill:var(--wood)"/><rect x="${x-20}" y="${y-62}" width="40" height="24" rx="3" style="fill:#C46A4A"/><rect x="${x-10}" y="${y-60}" width="20" height="3" rx="1" style="fill:#3a2e28"/>`,
         `<rect x="${x-8}" y="${y-40}" width="16" height="40"/><rect x="${x-20}" y="${y-62}" width="40" height="24" rx="3"/><path d="M${x-14} ${y} h28"/>`)

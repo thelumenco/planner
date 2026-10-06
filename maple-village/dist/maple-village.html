@@ -1291,6 +1291,8 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
 #ctx .orflowers li{flex-wrap:wrap}
 #ctx .orbtns{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
 #ctx .orspot{width:100%;font:inherit;color:inherit}
+/* the wine shop's chalkboard menu */
+#ctx .wlist.chalk .mprice{flex:none;font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;color:#8E2C48}
 </style>
 </head>
 <body>
@@ -2236,7 +2238,8 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     ] },
     // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
     // and the tasting room's little tables
-    wineshop: { name: "The wine shop", wall: "#F4E6D6", trim: "#8E2C48", noBoard: true, pos: { S: [92, 262], C: [330, 318], H: [96, 440], T: [340, 520], K: [480, 390] }, stations: [
+    wineshop: { name: "The wine shop", wall: "#F4E6D6", trim: "#8E2C48", noBoard: true, pos: { S: [92, 262], C: [330, 318], H: [96, 440], T: [340, 520], K: [480, 390], M: [465, 128] }, stations: [
+      ["menu", "Menu", "M", "chalkmenu", null, "The chalkboard: today's menu.", 44],
       ["kdoor", "Kitchen", "K", "kitchendoor", null, "Into the kitchen.", 0],
       ["wshelf", "Wine shelves", "S", "wineshelf", null, "Your wines, waiting for customers.", 30],
       ["wcounter", "Counter", "C", "winecounter", null, "Behind the counter. Customers come more often while you serve.", -34],
@@ -4637,6 +4640,16 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
     <p class="muted">Served so far: ${v.glasses} glass${v.glasses === 1 ? "" : "es"} and ${v.plates} plate${v.plates === 1 ? "" : "s"}. Food brings more people in, and the tapas of the day most of all.</p>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
+  function menuPanel(F2, today2) {
+    const v = vineState(F2), t2 = v.tapas && v.tapas.day === today2 && v.tapas.plates > 0 && TAPAS[v.tapas.id] ? v.tapas : null;
+    const plates = Object.keys(v.menu).filter((id) => v.menu[id] > 0 && DISHES[id]), wines = v.shelf.filter((s) => s.n > 0 || s.open > 0), fruit = Object.keys(v.fruit).filter((id) => v.fruit[id] > 0 && ITEMS[id]);
+    const row2 = (pic3, name, note2, price) => `<li><span class="wpic">${pic3}</span><span class="wtxt"><b>${esc(name)}</b><small>${note2}</small></span><span class="mprice">${price}</span></li>`;
+    const sec = (title, items) => items.length ? `<p class="eyebrow">${title}</p><ul class="hlist wlist chalk">${items.join("")}</ul>` : "";
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Today's menu</h2><p class="sub">${shopName(F2)}, open 10am to 10pm.</p>`;
+    const body2 = sec("Tapas of the day", t2 ? [row2(dishArt("tapas:" + t2.id, 46), TAPAS[t2.id].n, `${t2.plates} plate${t2.plates === 1 ? "" : "s"} left`, TAPAS[t2.id].price)] : []) + sec("Small plates", plates.map((id) => row2(dishArt(id, 42), DISHES[id].n, `${v.menu[id]} left`, DISHES[id].price))) + sec("By the glass", wines.map((s) => row2(glassArt(s.type, 36), s.name, STYLES[s.type].n, Math.max(1, Math.round(s.price / 4))))) + sec("By the bottle", v.shelf.filter((s) => s.n > 0).map((s) => row2(bottleArt(s.type, 40), s.name, `${STYLES[s.type].n} · ${s.n} on the shelf`, s.price))) + sec("From Ma Ma's orchard", fruit.map((id) => row2(icon(id, 34), ITEMS[id].n, `${v.fruit[id]} in the crate`, ITEMS[id].sell || 3)));
+    h += body2 || `<p class="muted">Nothing on today. Bottle some wine and stock the shelves, or cook something in the kitchen.</p>`;
+    return h + `<p class="muted">Prices in coins.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
   function olivePanel(F2) {
     const v = vineState(F2), o = v.olive, ripe = oliveRipe(v), g = o ? Math.min(1, (Date.now() - (o.pickedAt || o.planted)) / OLIVE) : 0;
     return `<span class="tape stripe" aria-hidden="true"></span><h2>The olive tree</h2>${oliveArt(o ? ripe ? "ripe" : "growing" : "none", 150)}
@@ -6114,6 +6127,9 @@ body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
       }
       case "winecounter":
         return `<rect x="${x - 92}" y="${y - 48}" width="184" height="48" fill="transparent"/>`;
+      case "chalkmenu":
+        return `<rect x="${x - 36}" y="${y - 84}" width="72" height="84" fill="transparent"/>`;
+      // the chalkboard is painted on the wall (interiors.js)
       case "honestybox": {
         const n = G.vine ? G.vine().box : 0;
         return sk(
@@ -14056,7 +14072,7 @@ Then tell chat "wind down" whenever you're ready.`
     else if (orView === "tea" && scene === "cottage") h = teaPanel(F, dayKey(), isHere("mama"));
     else if (orView && (scene === "orchard" || scene === "flowers")) h = orView === "shop" ? shopPanel(F, dayKey(), orTab) : spotPanel(F, orAt.where, orAt.i, dayKey());
     else if (kView && scene === "kitchen") h = kView === "oven" ? ovenPanel(F) : kView === "press" ? pressPanel(F) : kView === "stove" ? stovePanel(F, dayKey()) : larderPanel(F);
-    else if (vyView && (scene === "vineyard" || scene === "wineshop")) h = vyView === "olive" ? olivePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F) : vyView === "shelf" ? shelfPanel(F) : vyView === "counter" ? counterPanel(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter((n) => n.id !== "celeste" && isHere(n.id)).map((n) => n.name), dayKey());
+    else if (vyView && (scene === "vineyard" || scene === "wineshop")) h = vyView === "olive" ? olivePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F) : vyView === "shelf" ? shelfPanel(F) : vyView === "menu" ? menuPanel(F, dayKey()) : vyView === "counter" ? counterPanel(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter((n) => n.id !== "celeste" && isHere(n.id)).map((n) => n.name), dayKey());
     else if (kudosOpen && scene === "trophy") h = kudosPanel();
     else if (trophyView && scene === "trophy") h = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : trophyView === "affirm" ? affirmPanel(F.affirm, affirmBusy, !!sampleCap) : trophyView === "fountain" ? fountainPanel(!!sampleCap) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
     else if (routOpen && scene === "room") h = routinesPanel();
@@ -15143,7 +15159,7 @@ Then tell chat "wind down" whenever you're ready.`
       return;
     }
     if (scene === "wineshop") {
-      vyView = { wshelf: "shelf", wcounter: "counter", hbox: "box", tasting: "tasting" }[id] || null;
+      vyView = { wshelf: "shelf", wcounter: "counter", hbox: "box", tasting: "tasting", menu: "menu" }[id] || null;
       if (vyView) {
         sfx("paper", true);
         if (id === "wcounter") {

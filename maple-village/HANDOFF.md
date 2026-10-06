@@ -694,3 +694,4 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - `CROPS[*].ns` is the plural, for Maple's harvest line.
 - More seasonal gifts for the grandparents: bak kwa 10 and pineapple tarts 8 (spring), rice dumplings (`bakchang`) 6 (summer), Christmas log cake 14 (winter). The market's dumpling stays a treat for Maple.
 - Pip's weekday football in the field is 3:30–4:30pm, so his playground slot at the vineyard (4:30) still happens.
+- **Chalkboard menu:** the wine shop's chalkboard is a station (`menu`, kind `chalkmenu`: a transparent hit area over the board painted in interiors.js). It opens `menuPanel` (vineyard.js), which lists only what's available now, with prices: today's tapas, small plates, wines by the glass and by the bottle, and the orchard fruit crate.

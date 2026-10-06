@@ -1149,6 +1149,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForSelector('#ctx [data-vystock]', { timeout: 15000 }); await page.click('#ctx [data-vystock]');
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.shelf.some(s => s.name === "Evan's Blush" && s.n === 6)), "the bottles are stocked on the shop shelves");
   await page.click('#ctx [data-close]');
+  await page.locator('#world [data-spot="menu"]').dispatchEvent("click");
+  await page.waitForSelector("#ctx .chalk", { timeout: 15000 });
+  check(/Today's menu/.test(await page.locator("#ctx h2").textContent()) && /Evan's Blush/.test(await page.locator("#ctx").textContent()), "the chalkboard opens today's menu: what's available, with prices");
+  await page.click('#ctx [data-close]');
   // customers while Mel's away: back-date the last tick, sales land in the honesty box
   await page.goto(url + "?seed=1&time=21:00&sold=1"); await page.waitForTimeout(4200);
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.box > 0), "villagers buy wine while Mel's away and pay into the honesty box");

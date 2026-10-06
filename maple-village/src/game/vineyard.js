@@ -246,6 +246,21 @@ export function cafePanel(F, guests, today){ const v = vineState(F), open = v.sh
     ${v.staffNote && v.staffNote.plates ? `<p class="muted">Last night's staff dinner: ${esc(v.staffNote.dish.toLowerCase())}. Marco, Ines and Celeste left something in the larder to say thanks.</p>` : ""}
     <p class="muted">Served so far: ${v.glasses} glass${v.glasses === 1 ? "" : "es"} and ${v.plates} plate${v.plates === 1 ? "" : "s"}. Food brings more people in, and the tapas of the day most of all.</p>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`; }
+// The chalkboard menu: everything that's actually available right now, with prices
+export function menuPanel(F, today){
+  const v = vineState(F), t = v.tapas && v.tapas.day === today && v.tapas.plates > 0 && TAPAS[v.tapas.id] ? v.tapas : null;
+  const plates = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]), wines = v.shelf.filter(s => s.n > 0 || s.open > 0), fruit = Object.keys(v.fruit).filter(id => v.fruit[id] > 0 && ITEMS[id]);
+  const row = (pic, name, note, price) => `<li><span class="wpic">${pic}</span><span class="wtxt"><b>${esc(name)}</b><small>${note}</small></span><span class="mprice">${price}</span></li>`;
+  const sec = (title, items) => items.length ? `<p class="eyebrow">${title}</p><ul class="hlist wlist chalk">${items.join("")}</ul>` : "";
+  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Today's menu</h2><p class="sub">${shopName(F)}, open 10am to 10pm.</p>`;
+  const body = sec("Tapas of the day", t ? [row(dishArt("tapas:" + t.id, 46), TAPAS[t.id].n, `${t.plates} plate${t.plates === 1 ? "" : "s"} left`, TAPAS[t.id].price)] : [])
+    + sec("Small plates", plates.map(id => row(dishArt(id, 42), DISHES[id].n, `${v.menu[id]} left`, DISHES[id].price)))
+    + sec("By the glass", wines.map(s => row(glassArt(s.type, 36), s.name, STYLES[s.type].n, Math.max(1, Math.round(s.price/4)))))
+    + sec("By the bottle", v.shelf.filter(s => s.n > 0).map(s => row(bottleArt(s.type, 40), s.name, `${STYLES[s.type].n} · ${s.n} on the shelf`, s.price)))
+    + sec("From Ma Ma's orchard", fruit.map(id => row(icon(id, 34), ITEMS[id].n, `${v.fruit[id]} in the crate`, ITEMS[id].sell || 3)));
+  h += body || `<p class="muted">Nothing on today. Bottle some wine and stock the shelves, or cook something in the kitchen.</p>`;
+  return h + `<p class="muted">Prices in coins.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
 // The olive tree's card
 export function olivePanel(F){
   const v = vineState(F), o = v.olive, ripe = oliveRipe(v), g = o ? Math.min(1, (Date.now() - (o.pickedAt || o.planted))/OLIVE) : 0;

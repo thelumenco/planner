@@ -182,7 +182,8 @@ export const ROOMS = {
     ["counter","Counter","C","bankcounter",null,"Opal's counter. Your passbook's here.",30]]},
   // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
   // and the tasting room's little tables
-  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,262], C:[330,318], H:[96,440], T:[340,520], K:[480,390]}, stations:[
+  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,262], C:[330,318], H:[96,440], T:[340,520], K:[480,390], M:[465,128]}, stations:[
+    ["menu","Menu","M","chalkmenu",null,"The chalkboard: today's menu.",44],
     ["kdoor","Kitchen","K","kitchendoor",null,"Into the kitchen.",0],
     ["wshelf","Wine shelves","S","wineshelf",null,"Your wines, waiting for customers.",30],
     ["wcounter","Counter","C","winecounter",null,"Behind the counter. Customers come more often while you serve.",-34],
