@@ -3,7 +3,7 @@
 import { NPCS, AGENTS } from "../data/npcs.js";
 import { personArt, letterArt } from "../art/people.js";
 import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
-import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dinnerSlot } from "./tours.js";
+import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dinnerSlot, dateSlot } from "./tours.js";
 import { SEA } from "../data/npcs.js";
 import { findPath, blocked } from "./paths.js";
 
@@ -32,7 +32,7 @@ const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw 
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 const routineNow = def => routineAt(def, dayKey(), sgHM());
 export function slotAt(def, day, t, live){
-  return (live && supSlot(def)) || dinnerSlot(def.id, day, t) || eventSlot(def.id, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
+  return (live && supSlot(def)) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || eventSlot(def.id, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
     || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || shoreSlot(def.id, day, t) || routineAt(def, day, t);
 }
 const slotNow = def => slotAt(def, dayKey(), sgHM(), true);
@@ -94,7 +94,7 @@ function tickVillager(def, dt){
   const near = Math.hypot(e.x - api.mel.x, e.y - api.mel.y) < 110;
   if (near && !sayer && Date.now() - (e.helloAt || 0) > 4*60e3 && Math.random() < dt*.08) {
     e.helloAt = Date.now(); if (!e.act) e.dir = api.mel.x < e.x ? -1 : 1;
-    say(e, pick(hellos()), 2600); api.sfx && api.sfx("babble", def.pitch || 1);
+    say(e, pick(def.hellos || hellos()), 2600); api.sfx && api.sfx("babble", def.pitch || 1);
   }
   const b = api.bounds();
   if (walk(e, def.kid ? 95 : slot.free ? 22 : 48, dt)) {

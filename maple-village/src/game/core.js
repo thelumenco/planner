@@ -1169,7 +1169,7 @@ function giveTo(id, w){
   F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
   sfx("chime"); flash(`Sent to ${GIFT_NAME[w]}`); speak(`Wrapped up and sent to ${GIFT_NAME[w]}. Watch your mailbox for a thank-you note.`, 4500); save(); bag();
 }
-const SIGNOFF = {mum: "Love, Mum xx", dad: "Love, Dad", mama: "Love you, ah girl. Ma Ma", gonggong: "Gong Gong", marcus: "Cheers sis, Marcus", angelina: "Love, Angelina", darren: "Love you. D", evan: "Love, Evan (Darren held the pencil)"};
+const SIGNOFF = {mum: "Love, Mum xx", dad: "Love, Dad", mama: "Love you, ah girl. Ma Ma", gonggong: "Gong Gong", marcus: "Cheers Zeh, Marcus", angelina: "Love, Angelina", darren: "Love you. D", evan: "Love, Evan (Darren held the pencil)"};
 function thankNote(t){
   const it = ITEMS[t.item] || {n: "present", say: ""}, line = (it.says && it.says[t.who]) || it.say || "";
   return `${t.who === "evan" ? "Dear Mama" : "Dear Mel"},\n\nThank you for the ${it.n.toLowerCase()}! ${line}\n\n${SIGNOFF[t.who] || ""}`;
@@ -1231,6 +1231,9 @@ function renderEvanHold(){
     balloon: `<path d="M7.4 -11 C10 -22 9 -30 12 -40" fill="none" stroke-width=".8"/><ellipse cx="12" cy="-47" rx="5.2" ry="6.4" fill="#E8574C"/><path d="M11 -40.6 h2 l-1 1.4z" fill="#E8574C"/>`,
     icecream: `<path d="M5.6 -14 h4.4 l-2.2 7z" fill="#E8C48E"/><circle cx="7.8" cy="-15.5" r="2.6" fill="#F4C7CF"/>`,
     storybook: `<rect x="5" y="-17" width="8" height="6" rx="1" fill="#B9D2A6"/><path d="M9 -17 v6" fill="none" stroke-width=".6"/>`,
+    dino: `<path d="M6 -14 q3 -6 7 -3 q3 0 4 4 l-2 0 l-1 3 h-6z" fill="#7FA35A"/><circle cx="14.5" cy="-14.5" r=".7" fill="#2F2B28"/>`,
+    plane: `<path d="M4 -16 h12 l3 -2 v4 l-3 -1 h-12z" fill="#7FB8E8"/><path d="M9 -16 l-2 -5 h3 l2 5z M9 -15 l-2 4 h3 l2 -4z" fill="#E8566C"/>`,
+    robot: `<rect x="7" y="-18" width="8" height="8" rx="1.5" fill="#C9CED6"/><rect x="8.5" y="-22" width="5" height="4" rx="1" fill="#C9CED6"/><circle cx="10" cy="-20" r=".6" fill="#2F2B28"/><circle cx="12" cy="-20" r=".6" fill="#2F2B28"/><path d="M11 -22 v-2" stroke="#E8566C" stroke-width=".8"/>`,
     truck: `<rect x="7" y="-6.5" width="7" height="4" rx=".8" fill="#F3C969"/><path d="M14 -5.5 h2.5 l1.5 1.8 v1.2 h-4z" fill="#EFA3A6"/><circle cx="9" cy="-1.8" r="1.3" fill="#5E5A55"/><circle cx="15.5" cy="-1.8" r="1.3" fill="#5E5A55"/>`
   }[k] || "";
 }
@@ -1767,7 +1770,7 @@ let route = [], keys = new Set();
 const svg = $("world");
 // Evan's bedtime: 8pm to 7am he's asleep in his car bed, so he isn't out at home base or in the house
 const evanNight = () => { const m = sgHM(); return m >= 20*60 || m < 7*60; };
-const evanHere = () => scene === "kidroom" || ((scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore") && !evanNight()) || evanAtDinner();
+const evanHere = () => scene === "kidroom" || ((scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "mumdad" || scene === "marcus") && !evanNight()) || evanAtDinner();
 // family dinner nights: Evan's at the table wherever dinner is (then home to bed)
 const evanAtDinner = () => { const d = dinnerNow(dayKey(), sgHM()); return !!d && scene === d.host; };
 function outside(){ return OUTDOOR.includes(scene); }
@@ -1782,7 +1785,7 @@ function setScene(id, at){
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
     if (id === "base") { evan.x = evan.tx = 300; evan.y = evan.ty = 360; }
-    else if (id === "vineyard" || id === "field" || id === "shore") { evan.x = evan.tx = p[0] + 26; evan.y = evan.ty = p[1] + 10; evan.run = false; evan.wait = 2; }
+    else if (id === "vineyard" || id === "field" || id === "shore" || id === "mumdad" || id === "marcus" || id === "cottage") { evan.x = evan.tx = p[0] + 26; evan.y = evan.ty = p[1] + 10; evan.run = false; evan.wait = 2; }
     else if (id === "home" && from === "kidroom") { evan.x = evan.tx = p[0] - 24; evan.y = evan.ty = p[1] + 6; evan.run = false; evan.wait = 3; }
     else if (id === "home") { evan.x = evan.tx = 300; evan.y = evan.ty = 520; }
     // Evan's room: he runs in ahead, Mel waits just inside the door, Maple stays out in the house
@@ -1801,6 +1804,8 @@ function setScene(id, at){
     else if (id === "hall" && kudosCount() >= 3 && Date.now() - (F.kudosSeen || 0) > 7*864e5 && S.kudosSaid !== dayKey()) { S.kudosSaid = dayKey(); setTimeout(() => speak(`${kudosCount()} kind words out in the courtyard. Fancy a read?`, 5000), 1500); }
     if (id === "trophy") { fetchObjectives(); if (F.revTarget) loadRevenue().then(checkTrophies); setTimeout(() => speak(onPedestals(F).length ? "The courtyard. Look at all this. You did that." : "The courtyard. Your first trophy goes on a pedestal.", 4000), 900); }
     if (id === "orchard" || id === "flowers") orchardArrive(id);
+    if (id === "marcus" && evanHere()) setTimeout(() => { evanSays(pick(["Uncle Marcus! Can I play Mario?", "Can we watch Spiderman? Pleeease?", "Game! Game! Can I play the game?"])); if (isHere("marcus")) setTimeout(() => npcSay("marcus", "Ha! Ask your mum, little man. Zeh? One level?"), 2200); }, 1500);
+    if (id === "wineshop" && isHere("marcus") && isHere("angelina") && sgHM() >= 19*60 + 30 && S.dateSaid !== dayKey()) { S.dateSaid = dayKey(); setTimeout(() => speak("Marcus and Angelina are on a date night at the middle table. Act natural.", 5000), 1600); }
     { const dn = dinnerOn(dayKey()), m = sgHM(); if (dn && m >= 17*60 + 30 && m < dn.to && S.dinnerSaid !== dayKey()) { S.dinnerSaid = dayKey();
       setTimeout(() => speak(m < dn.from ? `Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30! Tap the table when you get there.` : `Family dinner's on at ${HOST_NAME[dn.host]}! Everyone's at the table.`, 6000), 2600); } }
     if (id === "shore" && S.shoreSaid !== dayKey()) { S.shoreSaid = dayKey(); const fam = ["mum", "dad", "marcus", "angelina"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
@@ -1849,6 +1854,7 @@ function arriveSpot(id){
   if (id === "mydoor") { setScene("room", INNER.room.arrive); return; }
   if (scene === "cottage" && id === "tea") { orView = "tea"; sfx("paper", true); render(); return; }
   if (id === "dine") { sitForDinner(); return; }
+  if (scene === "marcus" && id === "games") { marcusGames(); return; }
   if (id === "kiddoor") { setScene("kidroom", INNER.kidroom.arrive); return; }
   if (id === "routines") { routOpen = true; rv.edit = false; sfx("paper", true); render(); return; }
   if (id === "bed") { bedOpen = true; sfx("paper", true); render(); return; }
@@ -2029,6 +2035,39 @@ function whosWhereHTML(){
   const town = NPCS.filter(n => !WHO_FAMILY.includes(n.id) && !n.tourist && !n.kid);
   const dn = dinnerOn(day);
   return `<h3 class="ph3">Who's where today</h3>${dn ? `<p class="muted">Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30.</p>` : ""}<p class="eyebrow">Family</p>${fam.map(row).join("")}<p class="eyebrow" style="margin-top:10px">Around the village</p>${town.map(row).join("")}`;
+}
+// Ah Gong and Ah Ma (Mel's dad and mum) with Evan: every minute or two when they're on the same screen, a little
+// exchange (Ah Gong: "Ah Gong loves who the most?"; Evan's cheeky with them), and once a day a surprise toy for him
+const SURPRISES = [["dino", "a little dinosaur"], ["plane", "a toy aeroplane"], ["robot", "a wind-up robot"]];
+let banterAt = Date.now() + 20000;
+function grandBanter(){
+  if (Date.now() < banterAt || !evanHere() || quietNow() || route.length) return;
+  const here = ["dad", "mum"].filter(w => npcPos(w)); if (!here.length) return;
+  banterAt = Date.now() + (60 + Math.random()*60)*1000;
+  const g = pick(here), title = g === "dad" ? "Ah Gong" : "Ah Ma", p = npcPos(g);
+  if (S.surpriseDay !== dayKey() && Math.random() < .6) {
+    const [k, n] = pick(SURPRISES); S.surpriseDay = dayKey();
+    npcSay(g, g === "dad" ? "Evan! Come, come. Ah Gong has a surprise for you!" : "Evan, come here! Ah Ma brought you something!");
+    setTimeout(() => { evan.tx = p.x + 20; evan.ty = p.y + 6; evan.run = true; evan.wait = 8; }, 800);
+    setTimeout(() => { S.evanHold = {k, until: Date.now() + 3*H}; renderEvanHold(); evanSays(`WOW! ${n[0].toUpperCase() + n.slice(1)}! Thank you ${title}!`); [0, 250, 500].forEach((d, i) => setTimeout(() => mprop("heart", evan.x + (i - 1)*14, evan.y - 40, 1600), d)); save(); }, 2600);
+    return;
+  }
+  if (g === "dad") { npcSay("dad", pick(["Ah Gong loves who the most?", "Evan! Ah Gong loves who the most?"]));
+    setTimeout(() => evanSays(pick(["ME!", "Evan! Hehe.", "Maple! Hehe. No, ME!", "Spiderman!", "Ah Ma! ...no, ME!"])), 1800);
+    setTimeout(() => npcSay("dad", pick(["Correct answer!", "Aiyo, this cheeky boy!", "Hahaha, so smart!"])), 4200); }
+  else { npcSay("mum", pick(["Evan, come give Ah Ma a hug!", "Evan, have you eaten? Come, Ah Ma feeds you.", "Evan, so handsome today!"]));
+    setTimeout(() => { evanSays(pick(["Catch me first, Ah Ma!", "No! Hehehe.", "Only if you say please!", "Ah Ma, look! I can jump!"])); const b = bounds(); evan.tx = clamp(evan.x + rnd(-80, 80), b[0] + 20, b[2] - 20); evan.ty = clamp(evan.y + rnd(-30, 30), b[1] + 20, b[3] - 20); evan.run = true; evan.wait = 5; }, 1800);
+    setTimeout(() => npcSay("mum", pick(["Aiyo, this boy!", "Come back here, cheeky!", "So naughty! Come, Ah Ma wants a hug."])), 4200); }
+}
+setInterval(grandBanter, 5000);
+// Evan at Marcus and Angelina's: he wants games (Mario, Spiderman) the moment he's in the door
+function marcusGames(){
+  if (!evanHere()) { speak(VILLAGE.marcus ? ROOMS.marcus.stations.find(x => x[0] === "games")[5] : "", 4000); render(); return; }
+  evan.tx = 150; evan.ty = 300; evan.run = true; evan.wait = 12; sfx("chime");
+  setTimeout(() => evanSays(pick(["Mario jump! Again! Again!", "Spiderman! Thwip thwip!", "I'm winning! I'm winning!"])), 1200);
+  if (isHere("marcus")) setTimeout(() => npcSay("marcus", pick(["Okay, one level. Then we ask your mum. Right, Zeh?", "Jump! No, the other jump! Haha.", "He's better than me already, Zeh."])), 2600);
+  if (S.gamesDay !== dayKey()) { S.gamesDay = dayKey(); gainXp(1); save(); }
+  speak(isHere("marcus") ? "Evan and Uncle Marcus play Mario. Evan mostly jumps into holes and laughs." : "One level of Mario for Evan. He mostly jumps into holes and laughs.", 4500); render();
 }
 // Family dinner: Mel takes her seat at the table (once a night it's a little xp, and a lot of hearts)
 function sitForDinner(){
@@ -2283,7 +2322,7 @@ function nearSpot(){
   const list = [...stationsOf(scene), scene !== "market" ? {id:"board", tx:260, ty:200} : null].filter(Boolean);
   const s = list.find(s => Math.hypot(s.tx - mel.x, s.ty - mel.y) < 26); return s ? s.id : null;
 }
-const EVAN_SPOTS = {shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[380,520],[260,330],[200,600],[360,330],[300,300]]};
+const EVAN_SPOTS = {mumdad:[[300,560],[200,380],[420,420],[150,560],[460,560]], marcus:[[230,560],[120,500],[460,560],[250,340],[300,600]], cottage:[[200,560],[440,540],[300,340]], shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[380,520],[260,330],[200,600],[360,330],[300,300]]};
 // Evan's destination is evan.tx/ty; outdoors he follows route-finder waypoints to it (round the house, not through it)
 function evanWalk(speed, dt){
   const key = evan.tx + "," + evan.ty;

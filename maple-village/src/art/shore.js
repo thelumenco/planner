@@ -28,9 +28,9 @@ const pine = (x, y, s = 1) => sk(`<rect x="${x - 3*s}" y="${y - 10*s}" width="${
 export function shoreArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="400" cy="560" rx="150" ry="80" style="fill:var(--grass2)"/><ellipse cx="440" cy="240" rx="110" ry="70" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M0 0 H150 C172 90 132 190 158 300 C182 400 140 500 166 640 H0Z" style="fill:#8FC1DE"/>
-      <path d="M0 0 H70 C90 120 60 260 84 380 C100 480 70 560 86 640 H0Z" style="fill:#7AB3D6" opacity=".7"/>
-      <path d="${SHORE} H228 C206 520 238 420 216 320 C196 210 234 110 208 0Z" style="fill:#F2E2B8"/></g>
+    <g filter="url(#wob)"><path d="M0 0 H150 C172 90 132 190 158 300 C182 400 140 500 166 640 H0Z" style="fill:var(--sea)"/>
+      <path d="M0 0 H70 C90 120 60 260 84 380 C100 480 70 560 86 640 H0Z" style="fill:var(--sea2)" opacity=".7"/>
+      <path d="${SHORE} H228 C206 520 238 420 216 320 C196 210 234 110 208 0Z" style="fill:var(--sand)"/></g>
     <g filter="url(#wob)" fill="none"><path d="${SHORE}" style="stroke:#FFFDF6" stroke-width="3.2" stroke-dasharray="10 7" opacity=".9"/><path d="${SHORE}" style="stroke:var(--line)" stroke-width="1" opacity=".45"/>
       <path d="M228 640 C206 520 238 420 216 320 C196 210 234 110 208 0" style="stroke:var(--line)" stroke-width="1" opacity=".35"/></g>
     <g pointer-events="none">${[[40, 120], [104, 170], [30, 280], [120, 330], [56, 420], [98, 520], [36, 600], [124, 600]].map(([x, y]) => `<path class="ripple" d="M${x} ${y} q5 -3.5 10 0 q5 3.5 10 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.3" opacity=".8"/>`).join("")}</g>

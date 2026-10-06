@@ -157,7 +157,7 @@ export const ROOMS = {
     ["pobox","Post box","E","pobox",null,"Your post box: unread mail from your work inbox."]]},
   // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
   // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
-  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{X:[190,452], A:[120,216], B:[414,228], H:[318,250], C:[124,450], R:[40,330], K:[480,330], D:[350,556], G:[436,448], E:[448,598], F:[96,596]}, stations:[
+  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{X:[168,244], A:[130,452], B:[440,228], H:[344,250], C:[124,450], R:[40,330], K:[480,330], D:[350,516], G:[436,448], E:[448,598], F:[96,596]}, stations:[
     ["desk","Home desk","A","desk",/./,"Your own little desk."],
     ["kitchen","Kitchen","B","kitchen",/cook|meal|lunch|dinner|bake|grocer|prep/,"Something smells good."],
     ["mydoor","My room","R","sidedoor",null,"Your room. Just you.",0],

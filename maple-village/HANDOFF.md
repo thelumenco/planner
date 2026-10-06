@@ -835,3 +835,22 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Dad: Sunday morning at the market, Tuesday late morning in the lane, Saturday afternoon at the vineyard, Wednesday sketching by the lake.
   - Marcus and Angelina: the Sunday market, Friday evening at the vineyard, the lane (Saturday / Wednesday).
   - Villagers in Makers' Lane (`LANE`): Mr Okada (Mon/Wed/Fri 2pm), Bo (Tue/Thu lunch), Juniper (weekdays 3:30pm).
+
+### Round 63: dark sea, date nights, family voices, Ah Gong and Ah Ma, Evan at Marcus's, desk and table swapped
+- **Dark sea:** the foreshore's sea and sand use `--sea`, `--sea2` and `--sand` (base.css), which have dark-theme values like the rest of the palette.
+- **Date night** (`dateSlot`, tours.js): Marcus and Angelina sit at the middle tasting table (seats c and d) on Tuesdays and Saturdays, 7:30 to 9pm. Mr Okada, Hana and Bo take those nights off. A one-line notice plays when Mel walks in.
+- **Voices:** NPC defs can carry `hellos` (used for the "hello near Mel" bubbles).
+  - Dad: "Hi darling! Love you, have a good day." (also in his intro and lines) and "Ah Gong loves who the most?"
+  - Marcus calls Mel "Zeh" (intro, hellos, lines, his thank-you sign-off, his honey line).
+  - Mum: "Hello darling! Have you eaten?"
+- **Ah Gong and Ah Ma** (`grandBanter`, every 5 seconds): when Evan and Dad or Mum share a screen, a little exchange every minute or two.
+  - Ah Gong asks "Ah Gong loves who the most?"; Evan answers cheekily and Ah Gong laughs.
+  - Ah Ma asks for a hug; Evan runs off with "Catch me first!".
+  - Once a day there's a surprise toy: a dinosaur, aeroplane or robot, drawn in Evan's hand via `S.evanHold`.
+- **Evan visits the family houses** by day: `evanHere` includes mumdad and marcus (with `EVAN_SPOTS`).
+  - At Marcus and Angelina's he asks for Mario or Spiderman as he arrives. Tapping the games corner (`marcusGames`) has him play a level, with Marcus chiming in; 1 xp once a day.
+- **Mel's home, tidied into zones:**
+  - The dining table along the back wall at left; the fridge (344) and kitchen (440) at the back right.
+  - Her home desk at middle left (130,452) with the treadmill below it; Darren's desk at middle right.
+  - The laundry basket (350,516) beside the cleaning cupboard at bottom right.
+  - The middle stays open on the way to the door.

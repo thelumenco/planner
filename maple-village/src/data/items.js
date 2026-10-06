@@ -63,7 +63,7 @@ export const ITEMS = {
   // says: what each one says (falls back to say)
   honey:{n:"Jar of wildflower honey", kind:"gift", to:"family", price:8, tab:"market", say:"Wildflower honey! Straight from the bees.",
     says:{evan:"Honey! Like Pooh bear! Can I lick the spoon?", darren:"Proper honey. That's going in my tea.", mama:"Honey! Good for the throat. Ma Ma will make honey lemon.", gonggong:"Raw honey? Wah, this one is the real thing.",
-      mum:"Honey! Perfect after my Zumba. Thank you, darling.", dad:"Honey for my throat. Good for the singing.", marcus:"Honey? For my toast tomorrow. Nice one, sis.", angelina:"Honey for my tea! Study fuel. Thank you!"}},
+      mum:"Honey! Perfect after my Zumba. Thank you, darling.", dad:"Honey for my throat. Good for the singing.", marcus:"Honey? For my toast tomorrow. Nice one, Zeh.", angelina:"Honey for my tea! Study fuel. Thank you!"}},
   honeycomb:{n:"Honeycomb", kind:"gift", to:"family", price:10, tab:"market", say:"A whole piece of honeycomb! You chew the wax.",
     says:{evan:"It's all sticky and hexagons! Bees made this?", darren:"Honeycomb on toast tomorrow. Sorted.", mama:"Honeycomb! When Ma Ma was small this was such a treat.", gonggong:"Honeycomb! Chew chew, then spit out the wax. Like last time."}},
   beecandle:{n:"Beeswax candle", kind:"gift", to:["darren", "mama", "gonggong", "mum", "angelina"], price:9, tab:"market", say:"A beeswax candle. It smells like honey when it burns.",

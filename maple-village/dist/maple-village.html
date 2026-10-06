@@ -215,9 +215,9 @@ details summary::after{content:"+";font-family:Mulish,sans-serif;font-weight:400
 details[open] summary::after{content:"–"}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 /* ---------- village ---------- */
-:root{--grass:#E4ECD6;--grass2:#D3E0C2;--path:#EFE4CF;--path2:#E2D3B6;--wood:#C9A27E;--stone:#CFC8BE;--tree:#9EBE8C;--tree2:#7FA36E;--water:#BFD6E6;--skin:#F8DECD;--hair:#2A211D;--tank:#F2A290;--denim:#7D97C2;--tee:#6E9FD6;--pants:#F3CF5A}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--grass:#2D3A2F;--grass2:#26322A;--path:#4A4038;--path2:#3E352E;--water:#3F5568;--stone:#5A544E}}
-:root[data-theme="dark"]{--grass:#2D3A2F;--grass2:#26322A;--path:#4A4038;--path2:#3E352E;--water:#3F5568;--stone:#5A544E}
+:root{--sea:#8FC1DE;--sea2:#7AB3D6;--sand:#F2E2B8;--grass:#E4ECD6;--grass2:#D3E0C2;--path:#EFE4CF;--path2:#E2D3B6;--wood:#C9A27E;--stone:#CFC8BE;--tree:#9EBE8C;--tree2:#7FA36E;--water:#BFD6E6;--skin:#F8DECD;--hair:#2A211D;--tank:#F2A290;--denim:#7D97C2;--tee:#6E9FD6;--pants:#F3CF5A}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sea:#2C4660;--sea2:#233A52;--sand:#5C5242;--grass:#2D3A2F;--grass2:#26322A;--path:#4A4038;--path2:#3E352E;--water:#3F5568;--stone:#5A544E}}
+:root[data-theme="dark"]{--sea:#2C4660;--sea2:#233A52;--sand:#5C5242;--grass:#2D3A2F;--grass2:#26322A;--path:#4A4038;--path2:#3E352E;--water:#3F5568;--stone:#5A544E}
 .mapcard{padding:12px}
 .map{position:relative;aspect-ratio:520/640;touch-action:manipulation}
 .map > svg{display:block;width:100%;height:100%;border-radius:4px;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -2243,7 +2243,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ] },
     // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
     // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
-    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { X: [190, 452], A: [120, 216], B: [414, 228], H: [318, 250], C: [124, 450], R: [40, 330], K: [480, 330], D: [350, 556], G: [436, 448], E: [448, 598], F: [96, 596] }, stations: [
+    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { X: [168, 244], A: [130, 452], B: [440, 228], H: [344, 250], C: [124, 450], R: [40, 330], K: [480, 330], D: [350, 516], G: [436, 448], E: [448, 598], F: [96, 596] }, stations: [
       ["desk", "Home desk", "A", "desk", /./, "Your own little desk."],
       ["kitchen", "Kitchen", "B", "kitchen", /cook|meal|lunch|dinner|bake|grocer|prep/, "Something smells good."],
       ["mydoor", "My room", "R", "sidedoor", null, "Your room. Just you.", 0],
@@ -2474,7 +2474,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         gonggong: "Raw honey? Wah, this one is the real thing.",
         mum: "Honey! Perfect after my Zumba. Thank you, darling.",
         dad: "Honey for my throat. Good for the singing.",
-        marcus: "Honey? For my toast tomorrow. Nice one, sis.",
+        marcus: "Honey? For my toast tomorrow. Nice one, Zeh.",
         angelina: "Honey for my tea! Study fuel. Thank you!"
       }
     },
@@ -3626,7 +3626,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       intro: "Hi love, I'm Hana! I moved here from a little seaside town. The honey toast is mine, and yes, I remember everyone's usual.",
       look: { skin: "#F3D2B8", hair: "#5A3A2A", hairStyle: "bun", top: "#EFA3A6", bottom: "#7A6A8C", extra: "apron" },
       routine: [
-        slot("19:30", "21:00", "wineshop", [227, 518], { act: "sit", days: "we" }),
+        slot("19:30", "21:00", "wineshop", [227, 518], { act: "sit", dow: [0] }),
         slot("8:00", "12:00", "market", [260, 352]),
         slot("12:00", "13:00", "market", [[200, 352], [320, 352], [260, 352]]),
         slot("13:00", "15:00", "market", [260, 352]),
@@ -3652,7 +3652,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       look: { skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses" },
       routine: [
         slot("14:00", "15:00", "lane", LANE, { dow: [1, 3, 5] }),
-        slot("19:30", "21:00", "wineshop", [313, 518], { act: "sit", days: "wd" }),
+        slot("19:30", "21:00", "wineshop", [313, 518], { act: "sit", dow: [1, 3, 4, 5] }),
         slot("7:30", "12:00", "village", [455, 512]),
         slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]),
         slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]),
@@ -3701,7 +3701,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       look: { skin: "#E2B590", hair: "#3B2A1E", hairStyle: "short", top: "#E9C46A", bottom: "#4F6B8A", extra: "cap" },
       routine: [
         slot("12:30", "13:30", "lane", LANE, { dow: [2, 4] }),
-        slot("18:30", "20:00", "wineshop", [227, 518], { act: "sit" }),
+        slot("18:30", "20:00", "wineshop", [227, 518], { act: "sit", dow: [0, 1, 3, 4, 5] }),
         slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]),
         slot("12:30", "13:30", "village", [346, 566]),
         slot("13:30", "18:00", "village", [[170, 300], [400, 280], [300, 450], [150, 520], [440, 560]])
@@ -4079,6 +4079,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       name: "Mum",
       job: "Mel's mum: exercise classes and volunteering",
       intro: "Hello darling! Can't stop long, I'm going for my Pilates. Have you eaten? There's food at home, take some!",
+      hellos: ["Hello darling! Have you eaten?", "Darling! Off to my Zumba, see you!"],
       look: { skin: "#E8C3A2", hair: "#1E1A18", hairStyle: "bobfringe", top: "#E8566C", bottom: "#2F2B28" },
       routine: [
         slot("15:00", "16:30", "vineyard", VINE_WALK, { dow: [4] }),
@@ -4119,7 +4120,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       pitch: 0.72,
       name: "Dad",
       job: "Mel's dad: music and drawing",
-      intro: "Ah, there she is! Come, listen to this. I've been working on it all week. Then you can see my drawing of the jetty.",
+      intro: "Hi darling! Love you, have a good day. Oh, and come listen to this. I've been working on it all week.",
+      hellos: ["Hi darling! Love you, have a good day.", "Hi darling, love you!", "Hi darling! Have a good day, ok?"],
       look: { skin: "#E6BC98", hair: "#141110", hairStyle: "short", top: "#5B7DB1", bottom: "#8C8F7A", shorts: true, specs: "#141110" },
       routine: [
         slot("9:00", "11:00", "field", MARKET_WALK, { dow: [0] }),
@@ -4139,7 +4141,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         slot("19:00", "22:00", "mumdad", [262, 300], { act: "type" })
       ],
       lines: [
+        "Hi darling, love you, have a good day.",
         "Listen to this bit. No, wait, listen.",
+        "Ah Gong loves who the most? Evan knows.",
         "I drew the dolphins this morning. They wouldn't sit still.",
         "Music is good for the soul. And the brain.",
         "Have you heard of this band? No? Let me play it for you.",
@@ -4159,7 +4163,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       pitch: 0.7,
       name: "Marcus",
       job: "Mel's brother, a banker",
-      intro: "Sis! Want a game later? I'll go easy on you. Probably.",
+      intro: "Zeh! Want a game later? I'll go easy on you. Probably.",
+      hellos: ["Zeh!", "Oi, Zeh!", "Hey Zeh. Eaten yet?"],
       look: { skin: "#E6BC98", hair: "#1A1716", hairStyle: "short", top: "#3E4A5C", bottom: "#2F3A4A", specs: "#C0C4CC", tall: true },
       routine: [
         slot("10:00", "12:00", "field", MARKET_WALK, { dow: [0] }),
@@ -4178,12 +4183,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ],
       lines: [
         "One more game. Then I'll sleep. Probably.",
-        "Need a hand with your jars? Compound interest, sis.",
+        "Need a hand with your jars? Compound interest, Zeh.",
         "Angelina's studying, so I'm being very quiet.",
-        "Paddleboarding this weekend? Bring Evan!",
+        "Paddleboarding this weekend, Zeh? Bring Evan!",
+        "Date night at the wine shop on Tuesday. Don't tell Mum we skipped her Zumba.",
+        "Evan wants Spiderman again. I've created a monster.",
         "Mum's at Zumba again.",
         "Dad played the same song four times today. Four.",
-        "Banker tip: pay yourself first. You're welcome."
+        "Banker tip, Zeh: pay yourself first. You're welcome."
       ],
       actLines: { game: ["Shh, boss fight.", "Nearly beat this level.", "Okay one more round."], farm: ["Ma Ma says I'm doing it wrong. I'm doing it great.", "Gong Gong's supervising. From the shade."], sup: ["Don't splash! Don't splash!", "Dolphin! Over there!"] },
       away: "Marcus is at work in the city.",
@@ -4218,7 +4225,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         "Marcus says he's 'helping'. He's playing games.",
         "How are you, really? Not the polite answer.",
         "The library's so quiet in the mornings. Perfect for studying.",
-        "Your mum invited me to Zumba again. I'm scared."
+        "Your mum invited me to Zumba again. I'm scared.",
+        "Marcus booked us a table at your wine shop. Very romantic. He's had two cheese boards.",
+        "Evan made me watch Mario jump for twenty minutes. Fascinating, honestly."
       ],
       actLines: { type: ["Highlighting everything. That's how studying works, right?", "Footnotes. So many footnotes.", "Nearly done this essay."], water: ["Helping Mei with the flowers. Good study break.", "Plants are very calming. That's actual research."], sup: ["I'm standing! I'm standing!", "Look, a dolphin!"] },
       away: "Angelina's studying somewhere quiet.",
@@ -4486,7 +4495,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var DINNER_TO = 20 * 60;
   var DINNER_HOSTS = ["home", "mumdad", "cottage", "marcus"];
   var HOST_NAME = { home: "your place", mumdad: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", marcus: "Marcus and Angelina's" };
-  var DINING = { home: { cx: 190, fy: 452 }, mumdad: { cx: 270, fy: 500 }, cottage: { cx: 320, fy: 470 }, marcus: { cx: 340, fy: 470 } };
+  var DINING = { home: { cx: 168, fy: 244 }, mumdad: { cx: 270, fy: 500 }, cottage: { cx: 320, fy: 470 }, marcus: { cx: 340, fy: 470 } };
   var BACK = ["mama", "gonggong", "mum", "dad", "angelina"];
   var FRONT = ["darren", "marcus", "evan", "mel"];
   function dinnerSeat(host, who3) {
@@ -4512,6 +4521,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const d = dinnerNow(day, hm2);
     if (!d) return null;
     return { from: d.from, to: d.to, scene: d.host, at: dinnerSeat(d.host, id), act: "sit", dir: BACK.includes(id) ? 1 : -1, dinner: true };
+  }
+  var DATE_DAYS = [2, 6];
+  var DATE_FROM = 19 * 60 + 30;
+  var DATE_TO = 21 * 60;
+  function dateSlot(id, day, hm2) {
+    if (id !== "marcus" && id !== "angelina" || !DATE_DAYS.includes(dow(day)) || hm2 < DATE_FROM || hm2 >= DATE_TO) return null;
+    return { from: DATE_FROM, to: DATE_TO, scene: "wineshop", at: id === "marcus" ? SEAT.c : SEAT.d, act: "sit", dir: id === "marcus" ? 1 : -1, date: true };
   }
 
   // src/art/wine.js
@@ -12003,7 +12019,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var routineNow = (def) => routineAt(def, dayKey(), sgHM());
   function slotAt(def, day, t2, live2) {
-    return live2 && supSlot(def) || dinnerSlot(def.id, day, t2) || eventSlot(def.id, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || routineAt(def, day, t2);
+    return live2 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || eventSlot(def.id, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || routineAt(def, day, t2);
   }
   var slotNow = (def) => slotAt(def, dayKey(), sgHM(), true);
   var whereIs = (id) => {
@@ -12109,7 +12125,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (near && !sayer && Date.now() - (e.helloAt || 0) > 4 * 6e4 && Math.random() < dt * 0.08) {
       e.helloAt = Date.now();
       if (!e.act) e.dir = api3.mel.x < e.x ? -1 : 1;
-      say(e, pick(hellos()), 2600);
+      say(e, pick(def.hellos || hellos()), 2600);
       api3.sfx && api3.sfx("babble", def.pitch || 1);
     }
     const b = api3.bounds();
@@ -12298,9 +12314,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function shoreArt() {
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="400" cy="560" rx="150" ry="80" style="fill:var(--grass2)"/><ellipse cx="440" cy="240" rx="110" ry="70" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M0 0 H150 C172 90 132 190 158 300 C182 400 140 500 166 640 H0Z" style="fill:#8FC1DE"/>
-      <path d="M0 0 H70 C90 120 60 260 84 380 C100 480 70 560 86 640 H0Z" style="fill:#7AB3D6" opacity=".7"/>
-      <path d="${SHORE} H228 C206 520 238 420 216 320 C196 210 234 110 208 0Z" style="fill:#F2E2B8"/></g>
+    <g filter="url(#wob)"><path d="M0 0 H150 C172 90 132 190 158 300 C182 400 140 500 166 640 H0Z" style="fill:var(--sea)"/>
+      <path d="M0 0 H70 C90 120 60 260 84 380 C100 480 70 560 86 640 H0Z" style="fill:var(--sea2)" opacity=".7"/>
+      <path d="${SHORE} H228 C206 520 238 420 216 320 C196 210 234 110 208 0Z" style="fill:var(--sand)"/></g>
     <g filter="url(#wob)" fill="none"><path d="${SHORE}" style="stroke:#FFFDF6" stroke-width="3.2" stroke-dasharray="10 7" opacity=".9"/><path d="${SHORE}" style="stroke:var(--line)" stroke-width="1" opacity=".45"/>
       <path d="M228 640 C206 520 238 420 216 320 C196 210 234 110 208 0" style="stroke:var(--line)" stroke-width="1" opacity=".35"/></g>
     <g pointer-events="none">${[[40, 120], [104, 170], [30, 280], [120, 330], [56, 420], [98, 520], [36, 600], [124, 600]].map(([x, y]) => `<path class="ripple" d="M${x} ${y} q5 -3.5 10 0 q5 3.5 10 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.3" opacity=".8"/>`).join("")}</g>
@@ -14703,7 +14719,7 @@ Then tell chat "wind down" whenever you're ready.`
     save2();
     bag();
   }
-  var SIGNOFF = { mum: "Love, Mum xx", dad: "Love, Dad", mama: "Love you, ah girl. Ma Ma", gonggong: "Gong Gong", marcus: "Cheers sis, Marcus", angelina: "Love, Angelina", darren: "Love you. D", evan: "Love, Evan (Darren held the pencil)" };
+  var SIGNOFF = { mum: "Love, Mum xx", dad: "Love, Dad", mama: "Love you, ah girl. Ma Ma", gonggong: "Gong Gong", marcus: "Cheers Zeh, Marcus", angelina: "Love, Angelina", darren: "Love you. D", evan: "Love, Evan (Darren held the pencil)" };
   function thankNote(t2) {
     const it = ITEMS[t2.item] || { n: "present", say: "" }, line = it.says && it.says[t2.who] || it.say || "";
     return `${t2.who === "evan" ? "Dear Mama" : "Dear Mel"},
@@ -14848,6 +14864,9 @@ ${SIGNOFF[t2.who] || ""}`;
       balloon: `<path d="M7.4 -11 C10 -22 9 -30 12 -40" fill="none" stroke-width=".8"/><ellipse cx="12" cy="-47" rx="5.2" ry="6.4" fill="#E8574C"/><path d="M11 -40.6 h2 l-1 1.4z" fill="#E8574C"/>`,
       icecream: `<path d="M5.6 -14 h4.4 l-2.2 7z" fill="#E8C48E"/><circle cx="7.8" cy="-15.5" r="2.6" fill="#F4C7CF"/>`,
       storybook: `<rect x="5" y="-17" width="8" height="6" rx="1" fill="#B9D2A6"/><path d="M9 -17 v6" fill="none" stroke-width=".6"/>`,
+      dino: `<path d="M6 -14 q3 -6 7 -3 q3 0 4 4 l-2 0 l-1 3 h-6z" fill="#7FA35A"/><circle cx="14.5" cy="-14.5" r=".7" fill="#2F2B28"/>`,
+      plane: `<path d="M4 -16 h12 l3 -2 v4 l-3 -1 h-12z" fill="#7FB8E8"/><path d="M9 -16 l-2 -5 h3 l2 5z M9 -15 l-2 4 h3 l2 -4z" fill="#E8566C"/>`,
+      robot: `<rect x="7" y="-18" width="8" height="8" rx="1.5" fill="#C9CED6"/><rect x="8.5" y="-22" width="5" height="4" rx="1" fill="#C9CED6"/><circle cx="10" cy="-20" r=".6" fill="#2F2B28"/><circle cx="12" cy="-20" r=".6" fill="#2F2B28"/><path d="M11 -22 v-2" stroke="#E8566C" stroke-width=".8"/>`,
       truck: `<rect x="7" y="-6.5" width="7" height="4" rx=".8" fill="#F3C969"/><path d="M14 -5.5 h2.5 l1.5 1.8 v1.2 h-4z" fill="#EFA3A6"/><circle cx="9" cy="-1.8" r="1.3" fill="#5E5A55"/><circle cx="15.5" cy="-1.8" r="1.3" fill="#5E5A55"/>`
     }[k] || "";
   }
@@ -15932,7 +15951,7 @@ ${SIGNOFF[t2.who] || ""}`;
     const m = sgHM();
     return m >= 20 * 60 || m < 7 * 60;
   };
-  var evanHere = () => scene === "kidroom" || (scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore") && !evanNight() || evanAtDinner();
+  var evanHere = () => scene === "kidroom" || (scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "mumdad" || scene === "marcus") && !evanNight() || evanAtDinner();
   var evanAtDinner = () => {
     const d = dinnerNow(dayKey(), sgHM());
     return !!d && scene === d.host;
@@ -15994,7 +16013,7 @@ ${SIGNOFF[t2.who] || ""}`;
       if (id === "base") {
         evan.x = evan.tx = 300;
         evan.y = evan.ty = 360;
-      } else if (id === "vineyard" || id === "field" || id === "shore") {
+      } else if (id === "vineyard" || id === "field" || id === "shore" || id === "mumdad" || id === "marcus" || id === "cottage") {
         evan.x = evan.tx = p[0] + 26;
         evan.y = evan.ty = p[1] + 10;
         evan.run = false;
@@ -16056,6 +16075,14 @@ ${SIGNOFF[t2.who] || ""}`;
         setTimeout(() => speak(onPedestals(F).length ? "The courtyard. Look at all this. You did that." : "The courtyard. Your first trophy goes on a pedestal.", 4e3), 900);
       }
       if (id === "orchard" || id === "flowers") orchardArrive(id);
+      if (id === "marcus" && evanHere()) setTimeout(() => {
+        evanSays(pick(["Uncle Marcus! Can I play Mario?", "Can we watch Spiderman? Pleeease?", "Game! Game! Can I play the game?"]));
+        if (isHere("marcus")) setTimeout(() => npcSay("marcus", "Ha! Ask your mum, little man. Zeh? One level?"), 2200);
+      }, 1500);
+      if (id === "wineshop" && isHere("marcus") && isHere("angelina") && sgHM() >= 19 * 60 + 30 && S2.dateSaid !== dayKey()) {
+        S2.dateSaid = dayKey();
+        setTimeout(() => speak("Marcus and Angelina are on a date night at the middle table. Act natural.", 5e3), 1600);
+      }
       {
         const dn = dinnerOn(dayKey()), m = sgHM();
         if (dn && m >= 17 * 60 + 30 && m < dn.to && S2.dinnerSaid !== dayKey()) {
@@ -16173,6 +16200,10 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     if (id === "dine") {
       sitForDinner();
+      return;
+    }
+    if (scene === "marcus" && id === "games") {
+      marcusGames();
       return;
     }
     if (id === "kiddoor") {
@@ -16814,6 +16845,72 @@ ${SIGNOFF[t2.who] || ""}`;
     const dn = dinnerOn(day);
     return `<h3 class="ph3">Who's where today</h3>${dn ? `<p class="muted">Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30.</p>` : ""}<p class="eyebrow">Family</p>${fam.map(row2).join("")}<p class="eyebrow" style="margin-top:10px">Around the village</p>${town.map(row2).join("")}`;
   }
+  var SURPRISES = [["dino", "a little dinosaur"], ["plane", "a toy aeroplane"], ["robot", "a wind-up robot"]];
+  var banterAt = Date.now() + 2e4;
+  function grandBanter() {
+    if (Date.now() < banterAt || !evanHere() || quietNow() || route2.length) return;
+    const here = ["dad", "mum"].filter((w) => npcPos(w));
+    if (!here.length) return;
+    banterAt = Date.now() + (60 + Math.random() * 60) * 1e3;
+    const g = pick(here), title = g === "dad" ? "Ah Gong" : "Ah Ma", p = npcPos(g);
+    if (S2.surpriseDay !== dayKey() && Math.random() < 0.6) {
+      const [k, n] = pick(SURPRISES);
+      S2.surpriseDay = dayKey();
+      npcSay(g, g === "dad" ? "Evan! Come, come. Ah Gong has a surprise for you!" : "Evan, come here! Ah Ma brought you something!");
+      setTimeout(() => {
+        evan.tx = p.x + 20;
+        evan.ty = p.y + 6;
+        evan.run = true;
+        evan.wait = 8;
+      }, 800);
+      setTimeout(() => {
+        S2.evanHold = { k, until: Date.now() + 3 * H };
+        renderEvanHold();
+        evanSays(`WOW! ${n[0].toUpperCase() + n.slice(1)}! Thank you ${title}!`);
+        [0, 250, 500].forEach((d, i) => setTimeout(() => mprop("heart", evan.x + (i - 1) * 14, evan.y - 40, 1600), d));
+        save2();
+      }, 2600);
+      return;
+    }
+    if (g === "dad") {
+      npcSay("dad", pick(["Ah Gong loves who the most?", "Evan! Ah Gong loves who the most?"]));
+      setTimeout(() => evanSays(pick(["ME!", "Evan! Hehe.", "Maple! Hehe. No, ME!", "Spiderman!", "Ah Ma! ...no, ME!"])), 1800);
+      setTimeout(() => npcSay("dad", pick(["Correct answer!", "Aiyo, this cheeky boy!", "Hahaha, so smart!"])), 4200);
+    } else {
+      npcSay("mum", pick(["Evan, come give Ah Ma a hug!", "Evan, have you eaten? Come, Ah Ma feeds you.", "Evan, so handsome today!"]));
+      setTimeout(() => {
+        evanSays(pick(["Catch me first, Ah Ma!", "No! Hehehe.", "Only if you say please!", "Ah Ma, look! I can jump!"]));
+        const b = bounds();
+        evan.tx = clamp(evan.x + rnd(-80, 80), b[0] + 20, b[2] - 20);
+        evan.ty = clamp(evan.y + rnd(-30, 30), b[1] + 20, b[3] - 20);
+        evan.run = true;
+        evan.wait = 5;
+      }, 1800);
+      setTimeout(() => npcSay("mum", pick(["Aiyo, this boy!", "Come back here, cheeky!", "So naughty! Come, Ah Ma wants a hug."])), 4200);
+    }
+  }
+  setInterval(grandBanter, 5e3);
+  function marcusGames() {
+    if (!evanHere()) {
+      speak(VILLAGE.marcus ? ROOMS.marcus.stations.find((x) => x[0] === "games")[5] : "", 4e3);
+      render();
+      return;
+    }
+    evan.tx = 150;
+    evan.ty = 300;
+    evan.run = true;
+    evan.wait = 12;
+    sfx("chime");
+    setTimeout(() => evanSays(pick(["Mario jump! Again! Again!", "Spiderman! Thwip thwip!", "I'm winning! I'm winning!"])), 1200);
+    if (isHere("marcus")) setTimeout(() => npcSay("marcus", pick(["Okay, one level. Then we ask your mum. Right, Zeh?", "Jump! No, the other jump! Haha.", "He's better than me already, Zeh."])), 2600);
+    if (S2.gamesDay !== dayKey()) {
+      S2.gamesDay = dayKey();
+      gainXp(1);
+      save2();
+    }
+    speak(isHere("marcus") ? "Evan and Uncle Marcus play Mario. Evan mostly jumps into holes and laughs." : "One level of Mario for Evan. He mostly jumps into holes and laughs.", 4500);
+    render();
+  }
   function sitForDinner() {
     const d = dinnerNow(dayKey(), sgHM()), next = dinnerOn(dayKey());
     if (!d || d.host !== scene) {
@@ -17429,7 +17526,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     const s = list2.find((s2) => Math.hypot(s2.tx - mel.x, s2.ty - mel.y) < 26);
     return s ? s.id : null;
   }
-  var EVAN_SPOTS = { shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[380, 520], [260, 330], [200, 600], [360, 330], [300, 300]] };
+  var EVAN_SPOTS = { mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[380, 520], [260, 330], [200, 600], [360, 330], [300, 300]] };
   function evanWalk(speed, dt) {
     const key = evan.tx + "," + evan.ty;
     if (key !== evan.rk) {

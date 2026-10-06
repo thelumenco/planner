@@ -24,7 +24,7 @@ export const NPCS = [
     id: "hana", pitch: 1.15, name: "Hana", job: "Runs the market",
     intro: "Hi love, I'm Hana! I moved here from a little seaside town. The honey toast is mine, and yes, I remember everyone's usual.",
     look: {skin: "#F3D2B8", hair: "#5A3A2A", hairStyle: "bun", top: "#EFA3A6", bottom: "#7A6A8C", extra: "apron"},
-    routine: [slot("19:30", "21:00", "wineshop", [227, 518], {act: "sit", days: "we"}), slot("8:00", "12:00", "market", [260, 352]), slot("12:00", "13:00", "market", [[200, 352], [320, 352], [260, 352]]),
+    routine: [slot("19:30", "21:00", "wineshop", [227, 518], {act: "sit", dow: [0]}), slot("8:00", "12:00", "market", [260, 352]), slot("12:00", "13:00", "market", [[200, 352], [320, 352], [260, 352]]),
       slot("13:00", "15:00", "market", [260, 352]), slot("15:00", "15:40", "village", [[362, 372], [392, 360], [340, 380]]), slot("15:40", "19:00", "market", [260, 352])],
     lines: ["Fresh dumplings today. Don't tell Maple, she'll want three.", "You look like a honey toast kind of person today.", "Lunch rush is wild. Everyone wants toast at once!",
       "Remember to eat something proper, not just snacks.", "The strawberries sell out first. Every time."],
@@ -36,7 +36,7 @@ export const NPCS = [
     intro: "Okada. Forty years delivering letters. Retired now, but I still can't stop sorting things. Even the pebbles by the well.",
     look: {skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses"},
     routine: [slot("14:00", "15:00", "lane", LANE, {dow: [1, 3, 5]}),
-      slot("19:30", "21:00", "wineshop", [313, 518], {act: "sit", days: "wd"}), slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("17:00", "19:30", "village", [322, 566])],
+      slot("19:30", "21:00", "wineshop", [313, 518], {act: "sit", dow: [1, 3, 4, 5]}), slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("17:00", "19:30", "village", [322, 566])],
     lines: ["Letters used to come in sacks. Now it's all on your little phone.", "The well water is sweeter in the afternoon. Don't ask me why.", "I've sorted the pebbles by colour. Then by size. Then by colour again.",
       "A tidy inbox is a tidy mind. Mine is a shoebox.", "The river's high today. Good for the ducks."],
     react: {inbox: "An email quest! Just like the old days. Stamp it and send it.", water: "Good, drink up. Forty years of walking taught me that.", quests3: "Steady work. That's the postmaster's way."}
@@ -57,7 +57,7 @@ export const NPCS = [
     intro: "Bo! Carpenter. If it creaks, wobbles or falls off, I'm your guy. Built half this village. *hums*",
     look: {skin: "#E2B590", hair: "#3B2A1E", hairStyle: "short", top: "#E9C46A", bottom: "#4F6B8A", extra: "cap"},
     routine: [slot("12:30", "13:30", "lane", LANE, {dow: [2, 4]}),
-      slot("18:30", "20:00", "wineshop", [227, 518], {act: "sit"}), slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]), slot("12:30", "13:30", "village", [346, 566]),
+      slot("18:30", "20:00", "wineshop", [227, 518], {act: "sit", dow: [0, 1, 3, 4, 5]}), slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]), slot("12:30", "13:30", "village", [346, 566]),
       slot("13:30", "18:00", "village", [[170, 300], [400, 280], [300, 450], [150, 520], [440, 560]])],
     lines: ["*hums a tune* Fixed the market's wobbly leg this morning.", "Measure twice, cut once. Or just cut and laugh.", "The workshop smells like sawdust and big ideas.",
       "Shipping is just building, but braver.", "Need a shelf? I always need a shelf."],
@@ -292,7 +292,7 @@ export const NPCS = [
   // volunteering. Dad: music (piano, double bass) and drawing (the easel, sketching on the sand).
   {
     id: "mum", pitch: 1.05, name: "Mum", job: "Mel's mum: exercise classes and volunteering",
-    intro: "Hello darling! Can't stop long, I'm going for my Pilates. Have you eaten? There's food at home, take some!",
+    intro: "Hello darling! Can't stop long, I'm going for my Pilates. Have you eaten? There's food at home, take some!", hellos: ["Hello darling! Have you eaten?", "Darling! Off to my Zumba, see you!"],
     look: {skin: "#E8C3A2", hair: "#1E1A18", hairStyle: "bobfringe", top: "#E8566C", bottom: "#2F2B28"},
     routine: [slot("15:00", "16:30", "vineyard", VINE_WALK, {dow: [4]}),
       slot("15:00", "17:00", "base", [[230, 360], [300, 590], [160, 520]], {dow: [0]}),
@@ -316,7 +316,7 @@ export const NPCS = [
   },
   {
     id: "dad", pitch: 0.72, name: "Dad", job: "Mel's dad: music and drawing",
-    intro: "Ah, there she is! Come, listen to this. I've been working on it all week. Then you can see my drawing of the jetty.",
+    intro: "Hi darling! Love you, have a good day. Oh, and come listen to this. I've been working on it all week.", hellos: ["Hi darling! Love you, have a good day.", "Hi darling, love you!", "Hi darling! Have a good day, ok?"],
     look: {skin: "#E6BC98", hair: "#141110", hairStyle: "short", top: "#5B7DB1", bottom: "#8C8F7A", shorts: true, specs: "#141110"},
     routine: [slot("9:00", "11:00", "field", MARKET_WALK, {dow: [0]}), slot("11:00", "12:30", "lane", LANE, {dow: [2]}), slot("15:00", "16:30", "vineyard", VINE_WALK, {dow: [6]}), slot("17:30", "18:30", "field", [170, 384], {dow: [3], act: "type"}),
       slot("15:00", "17:00", "base", [[250, 360], [320, 590], [180, 520]], {dow: [0]}),
@@ -330,7 +330,7 @@ export const NPCS = [
       slot("17:30", "19:00", "shore", SHORE_WALK),
       slot("19:00", "22:00", "mumdad", [112, 292], {act: "type", dow: [0, 2, 4, 6]}),
       slot("19:00", "22:00", "mumdad", [262, 300], {act: "type"})],
-    lines: ["Listen to this bit. No, wait, listen.", "I drew the dolphins this morning. They wouldn't sit still.", "Music is good for the soul. And the brain.", "Have you heard of this band? No? Let me play it for you.",
+    lines: ["Hi darling, love you, have a good day.", "Listen to this bit. No, wait, listen.", "Ah Gong loves who the most? Evan knows.", "I drew the dolphins this morning. They wouldn't sit still.", "Music is good for the soul. And the brain.", "Have you heard of this band? No? Let me play it for you.",
       "I'm sketching Evan next time he visits. He has to sit still for ten minutes. We'll see.", "Your mum's at Zumba. Or Pilates. One of those.", "Proud of you, you know."],
     actLines: {type: ["*plays a little jazz*", "This bar is tricky. Again.", "Just shading the clouds. Nearly done.", "*hums along*"], farm: ["Helping your Ma Ma. She's the boss.", "Gong Gong and I are on soil duty."]},
     away: "Dad's out. Maybe drawing by the water.",
@@ -341,7 +341,7 @@ export const NPCS = [
   // in psychology (the library in the mornings, her desk at home after lunch). Weekend afternoons they paddleboard.
   {
     id: "marcus", pitch: 0.7, name: "Marcus", job: "Mel's brother, a banker",
-    intro: "Sis! Want a game later? I'll go easy on you. Probably.",
+    intro: "Zeh! Want a game later? I'll go easy on you. Probably.", hellos: ["Zeh!", "Oi, Zeh!", "Hey Zeh. Eaten yet?"],
     look: {skin: "#E6BC98", hair: "#1A1716", hairStyle: "short", top: "#3E4A5C", bottom: "#2F3A4A", specs: "#C0C4CC", tall: true},
     routine: [slot("10:00", "12:00", "field", MARKET_WALK, {dow: [0]}), slot("17:30", "19:00", "vineyard", VINE_WALK, {dow: [5]}), slot("13:00", "14:00", "lane", LANE, {dow: [6]}),
       slot("8:30", "9:00", "shore", SHORE_WALK, {days: "wd"}),
@@ -354,8 +354,8 @@ export const NPCS = [
       slot("13:00", "16:00", "marcus", [90, 428], {act: "game", days: "we"}),
       slot("16:00", "17:00", "shore", SEA, {days: "we", act: "sup", free: true}),
       slot("17:00", "19:00", "shore", SHORE_WALK, {days: "we"})],
-    lines: ["One more game. Then I'll sleep. Probably.", "Need a hand with your jars? Compound interest, sis.", "Angelina's studying, so I'm being very quiet.", "Paddleboarding this weekend? Bring Evan!",
-      "Mum's at Zumba again.", "Dad played the same song four times today. Four.", "Banker tip: pay yourself first. You're welcome."],
+    lines: ["One more game. Then I'll sleep. Probably.", "Need a hand with your jars? Compound interest, Zeh.", "Angelina's studying, so I'm being very quiet.", "Paddleboarding this weekend, Zeh? Bring Evan!", "Date night at the wine shop on Tuesday. Don't tell Mum we skipped her Zumba.", "Evan wants Spiderman again. I've created a monster.",
+      "Mum's at Zumba again.", "Dad played the same song four times today. Four.", "Banker tip, Zeh: pay yourself first. You're welcome."],
     actLines: {game: ["Shh, boss fight.", "Nearly beat this level.", "Okay one more round."], farm: ["Ma Ma says I'm doing it wrong. I'm doing it great.", "Gong Gong's supervising. From the shade."], sup: ["Don't splash! Don't splash!", "Dolphin! Over there!"]},
     away: "Marcus is at work in the city.",
     react: {quests3: "Three done? Okay, overachiever.", lunch: "Lunch break! Even bankers eat."}
@@ -377,7 +377,7 @@ export const NPCS = [
       slot("17:00", "19:00", "shore", SHORE_WALK, {days: "we"}),
       slot("19:00", "22:30", "marcus", [132, 428], {act: "sit"})],
     lines: ["Did you know naming a feeling makes it smaller? It's true. I read it last night.", "Three more chapters. Then a break. Then three more chapters.", "Marcus says he's 'helping'. He's playing games.",
-      "How are you, really? Not the polite answer.", "The library's so quiet in the mornings. Perfect for studying.", "Your mum invited me to Zumba again. I'm scared."],
+      "How are you, really? Not the polite answer.", "The library's so quiet in the mornings. Perfect for studying.", "Your mum invited me to Zumba again. I'm scared.", "Marcus booked us a table at your wine shop. Very romantic. He's had two cheese boards.", "Evan made me watch Mario jump for twenty minutes. Fascinating, honestly."],
     actLines: {type: ["Highlighting everything. That's how studying works, right?", "Footnotes. So many footnotes.", "Nearly done this essay."], water: ["Helping Mei with the flowers. Good study break.", "Plants are very calming. That's actual research."], sup: ["I'm standing! I'm standing!", "Look, a dolphin!"]},
     away: "Angelina's studying somewhere quiet.",
     react: {quests3: "Three already? That's real momentum.", lunch: "Brain food time!"}

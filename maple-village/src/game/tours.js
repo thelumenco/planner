@@ -234,7 +234,7 @@ export const DINNER_FROM = 18*60 + 30, DINNER_TO = 20*60;
 export const DINNER_HOSTS = ["home", "mumdad", "cottage", "marcus"];
 export const HOST_NAME = {home: "your place", mumdad: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", marcus: "Marcus and Angelina's"};
 // where each house's dining table stands: cx = centre, fy = the front edge of the table on the floor
-export const DINING = {home: {cx: 190, fy: 452}, mumdad: {cx: 270, fy: 500}, cottage: {cx: 320, fy: 470}, marcus: {cx: 340, fy: 470}};
+export const DINING = {home: {cx: 168, fy: 244}, mumdad: {cx: 270, fy: 500}, cottage: {cx: 320, fy: 470}, marcus: {cx: 340, fy: 470}};
 const BACK = ["mama", "gonggong", "mum", "dad", "angelina"], FRONT = ["darren", "marcus", "evan", "mel"];
 export function dinnerSeat(host, who){
   const t = DINING[host]; if (!t) return null;
@@ -253,4 +253,12 @@ export function dinnerSlot(id, day, hm){
   if (!BACK.includes(id) && !FRONT.includes(id)) return null;
   const d = dinnerNow(day, hm); if (!d) return null;
   return {from: d.from, to: d.to, scene: d.host, at: dinnerSeat(d.host, id), act: "sit", dir: BACK.includes(id) ? 1 : -1, dinner: true};
+}
+
+// Date night: Marcus and Angelina at the middle table of the tasting room, Tuesdays and Saturdays 7:30 to 9pm
+// (Mr Okada and Hana, who usually sit there in the evenings, take those nights off)
+export const DATE_DAYS = [2, 6], DATE_FROM = 19*60 + 30, DATE_TO = 21*60;
+export function dateSlot(id, day, hm){
+  if ((id !== "marcus" && id !== "angelina") || !DATE_DAYS.includes(dow(day)) || hm < DATE_FROM || hm >= DATE_TO) return null;
+  return {from: DATE_FROM, to: DATE_TO, scene: "wineshop", at: id === "marcus" ? SEAT.c : SEAT.d, act: "sit", dir: id === "marcus" ? 1 : -1, date: true};
 }

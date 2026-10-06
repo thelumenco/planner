@@ -1479,7 +1479,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=09:30&date=2026-10-06"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("mumdad")); await page.waitForTimeout(1200);
   check(await ids().then(a => a.includes("dad")) && ["piano", "bass", "easel", "mat"].length === await page.locator("#world [data-spot]").evaluateAll(n => n.filter(x => ["piano", "bass", "easel", "mat"].includes(x.dataset.spot)).length), "inside Mum and Dad's: Dad at the piano, his double bass and easel, Mum's mat");
-  await page.goto(url + "?seed=1&time=20:00&date=2026-10-06"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=20:00&date=2026-10-05"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("marcus")); await page.waitForTimeout(1200);
   check(await page.locator('#actors [data-npc="marcus"].act-game').count() === 1 && await ids().then(a => a.includes("angelina")), "evenings at Marcus and Angelina's: Marcus gaming on the sofa, Angelina beside him");
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-05"); await page.waitForTimeout(800);
@@ -1523,6 +1523,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-11"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
   check(await ids().then(a => ["mum", "dad", "marcus", "angelina"].every(f => a.includes(f))), "the whole family's at the Sunday farmers market");
+  await page.goto(url + "?seed=1&time=20:00&date=2026-10-06"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
+  check(await page.locator('#actors [data-npc="marcus"].act-sit').count() === 1 && await page.locator('#actors [data-npc="angelina"].act-sit').count() === 1, "Tuesday is date night: Marcus and Angelina at a tasting table in the wine shop");
+  await page.goto(url + "?seed=1&time=14:00&date=2026-10-10"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("marcus")); await page.waitForTimeout(3000);
+  check(await page.locator("#evan").isVisible() && /Mario|Spiderman|game/i.test(await page.locator("#evanSay").textContent()), "Evan visits Uncle Marcus's and asks for Mario and Spiderman");
+  { const { NPCS } = await import(pathToFileURL(join(root, "src/data/npcs.js")).href), d = NPCS.find(n => n.id === "dad"), m = NPCS.find(n => n.id === "marcus");
+    check(d.hellos.includes("Hi darling! Love you, have a good day.") && d.lines.some(l => /Ah Gong loves who the most/.test(l)) && /Zeh/.test(m.intro), "Dad's \"Hi darling, love you, have a good day\", Ah Gong, and Marcus calling Mel Zeh"); }
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto(url + "?seed=1&time=21:00&date=2026-10-06"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1000);
+  check(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--sea").trim().toLowerCase() !== "#8fc1de"), "after dark the sea goes dark too");
+  await page.emulateMedia({ colorScheme: "light" });
   await page.close();
 }
 {
