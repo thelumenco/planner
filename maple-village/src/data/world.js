@@ -79,6 +79,7 @@ export const VILLAGE = {
   mumdad: {scene:"shore", name:"Mum and Dad's", short:"Mum and Dad's house", door:[360,226], mark:[360,110]},
   marcus: {scene:"shore", name:"Marcus and Angelina's", short:"Marcus and Angelina's house", door:[400,470], mark:[400,354]},
   suprack:{scene:"shore", name:"Paddleboards", door:[216,488], spot:true, line:"The paddleboard rack by the jetty. Fancy a paddle?"},
+  boat:   {scene:"shore", name:"Cruise boat", door:[206,550], spot:true, line:"The mooring at the end of the jetty."},
   dolphins:{scene:"shore", name:"Boardwalk bench", door:[214,262], spot:true, line:"A bench looking out to sea. Dolphins come by most mornings."},
   exlawn: {scene:"field", name:"Exercise lawn", door:[452,430], spot:true, line:"The exercise lawn. Mum's class is here most mornings at 8."},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
@@ -114,7 +115,10 @@ export const INNER = {
   kidroom: {parent: "home", door: [456, 340], arrive: [70, 420], exit: [34, 410]},
   trophy: {parent: "hall", door: [64, 372], arrive: [456, 400], exit: [486, 410]},
   // the wine shop's kitchen, through the door on its east wall; its own way out is the mat at the bottom
-  kitchen: {parent: "wineshop", door: [462, 390], arrive: [260, 560], exit: [260, 606]}
+  kitchen: {parent: "wineshop", door: [462, 390], arrive: [260, 560], exit: [260, 606]},
+  // big goals: the garage through the back door of the house, the cellar door through the wine shop's west wall
+  garage: {parent: "home", door: [366, 192], arrive: [260, 560], exit: [260, 606]},
+  cellar: {parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430]}
 };
 export const WORK = ["hall","chord","fresh","chico","post","home"];
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
@@ -157,7 +161,7 @@ export const ROOMS = {
     ["pobox","Post box","E","pobox",null,"Your post box: unread mail from your work inbox."]]},
   // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
   // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
-  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{X:[168,244], A:[130,452], B:[440,228], H:[344,250], C:[124,450], R:[40,330], K:[480,330], D:[350,516], G:[436,448], E:[448,598], F:[96,596]}, stations:[
+  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{X:[150,244], A:[130,452], B:[452,228], H:[318,250], Q:[366,170], C:[124,450], R:[40,330], K:[480,330], D:[350,516], G:[436,448], E:[448,598], F:[96,596]}, stations:[
     ["desk","Home desk","A","desk",/./,"Your own little desk."],
     ["kitchen","Kitchen","B","kitchen",/cook|meal|lunch|dinner|bake|grocer|prep/,"Something smells good."],
     ["mydoor","My room","R","sidedoor",null,"Your room. Just you.",0],
@@ -167,6 +171,7 @@ export const ROOMS = {
     ["fridge","Fridge","H","fridge",null,"The fridge: what we have, and the shopping list."],
     ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12],
     ["office","Darren's desk","G","office",null,"Darren's home office. Shh, he might be on a call."],
+    ["gdoor","Garage","Q","garagedoor",null,"The door at the back of the house, through to the garage.",20],
     ["dine","Dining table","X","dining",/read|rest|journal|meditat|book|nap/,"The big family table. Room for all nine of us, or a book and a cup of tea.",44]]},
   // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
   room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[262,300], W:[262,206], B:[72,262], E:[62,396], C:[66,500], D:[434,556], J:[260,594], N:[406,132]}, stations:[
@@ -204,9 +209,10 @@ export const ROOMS = {
     ["counter","Counter","C","bankcounter",null,"Opal's counter. Your passbook's here.",30]]},
   // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
   // and the tasting room's little tables
-  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,238], C:[330,318], H:[206,318], T:[340,520], K:[480,390], M:[465,128]}, stations:[
+  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,238], C:[330,318], H:[206,318], T:[340,520], K:[480,390], M:[465,128], Z:[40,400]}, stations:[
     ["menu","Menu","M","chalkmenu",null,"The chalkboard: today's menu.",44],
     ["kdoor","Kitchen","K","kitchendoor",null,"Into the kitchen.",0],
+    ["cdoor","Cellar door","Z","cellardoor",null,"The cellar door: barrel racks, a tasting bar and your wine wall.",0],
     ["wshelf","Wine shelves","S","wineshelf",null,"Your wines, waiting for customers.",30],
     ["wcounter","Counter","C","winecounter",null,"Behind the counter. Customers come more often while you serve.",-34],
     ["hbox","Honesty box","H","honestybox",null,"The honesty box.",30],
@@ -239,6 +245,18 @@ export const ROOMS = {
     ["study","Angelina's desk","D","studydesk",null,"Angelina's study desk. Highlighters in every colour.",36],
     ["msofa","Sofa","S","sofa",null,"The comfiest sofa on the foreshore.",30],
     ["dine","Dining table","X","dining",null,"Their dining table. Wedding magazines at one end, bank papers at the other.",44]]},
+  // the garage (a big goal): Darren's workbench, storage, the scooter and the car once they're bought
+  garage: {name:"The garage", wall:"#E3E6EA", trim:"#8FA3B8", noBoard:true, pos:{W:[130,250], K:[420,261], S:[120,470], C:[330,480]}, stations:[
+    ["gbench","Workbench","W","bench",null,"Darren's tools, all hung up on the wall. Mostly.",34],
+    ["gshelf","Storage","K","shelf",null,"Boxes labelled 'Christmas', 'Evan's baby clothes' and 'misc'.",34],
+    ["scooter","Scooter","S","scooterbay",null,"The scooter's spot.",30],
+    ["car","Car","C","carbay",null,"The car's spot.",30]]},
+  // the cellar door (a big goal): Mel's wine wall, the tasting bar, barrel racks, a high table
+  cellar: {name:"The cellar door", wall:"#E9DCCB", trim:"#6B3A2A", noBoard:true, pos:{W:[130,262], B:[340,262], R:[140,500], T:[360,500]}, stations:[
+    ["winewall","Wine wall","W","winewall",null,"A bottle of every wine you've made. It's getting full.",36],
+    ["flight","Tasting bar","B","tastebar",null,"The tasting bar. Pour yourself a flight.",34],
+    ["racks","Barrel racks","R","barrelrack",null,"Barrels resting, quietly getting better.",30],
+    ["ctable","High table","T","table",null,"A high table for tastings. Visitors linger here.",40]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };

@@ -187,6 +187,25 @@ const SHELLS = {
       `<rect x="214" y="44" width="54" height="40" rx="2"/><path d="M226 80 q8 -8 16 0 M240 80 q8 -8 16 0" opacity=".7"/><rect x="278" y="50" width="30" height="30" rx="2"/><path d="M284 74 l8 -12 l8 12" opacity=".7"/><rect x="318" y="44" width="36" height="44" rx="2"/><path d="M326 80 q10 -20 20 0" opacity=".7"/>`)}
     <g filter="url(#wob)">${[96, 70].map((rx, i) => `<ellipse cx="110" cy="412" rx="${rx}" ry="${rx*.42}" style="fill:${["#C9A3E0", "#F6E3A1"][i]}" opacity=".7"/>`).join("")}</g>
     ${plant(490, 610, 1.1)}${plant(30, 610, .9)}`,
+  // the garage: a concrete floor with oil-stain shadows, a pegboard of tools, a roller door, a strip light
+  garage: () => `<rect width="520" height="640" style="fill:#C9C6C0"/>
+    <g opacity=".35" style="stroke:#A9A59D" stroke-width="1.2">${rows(4, i => `<path d="M0 ${250 + i*110} H520"/>`)}${rows(4, i => `<path d="M${130*i} 150 V640"/>`)}</g>
+    <ellipse cx="330" cy="500" rx="70" ry="14" style="fill:#AFAAA2" opacity=".6"/>
+    ${wallBase("#E3E6EA", "#8FA3B8")}${skirting}
+    ${sk(`<rect x="40" y="30" width="180" height="90" rx="3" style="fill:#D9B48A"/>${rows(6, i => `<circle cx="${60 + i*30}" cy="46" r="2" style="fill:#8A6A4A"/>`)}<path d="M60 52 v34 M90 52 l10 30 M120 52 v26 h8 M150 52 q10 16 0 30 M180 52 v40" style="stroke:#5E5A55" stroke-width="3" fill="none"/>`,
+      `<rect x="40" y="30" width="180" height="90" rx="3"/>`)}
+    ${sk(`<rect x="250" y="20" width="230" height="118" rx="3" style="fill:#B9C3CC"/>${rows(8, i => `<rect x="250" y="${24 + i*14}" width="230" height="3" style="fill:#9AA6B1"/>`)}`, `<rect x="250" y="20" width="230" height="118" rx="3"/>`)}
+    ${sk(`<rect x="200" y="6" width="120" height="6" rx="3" style="fill:#FFFDF6"/>`, `<rect x="200" y="6" width="120" height="6" rx="3"/>`)}
+    ${plant(30, 610, .8)}`,
+  // the cellar door: stone walls, an arched brick ceiling line, warm lamps, and the way back on the east wall
+  cellar: () => `<rect width="520" height="640" style="fill:#B98E6A"/>
+    <g opacity=".45" style="stroke:#8E6A4A" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(26, i => `<path d="M${(i % 13)*40 + (Math.floor(i/13) % 2)*20} ${170 + (i % 12)*40} v40"/>`)}</g>
+    ${wallBase("#E9DCCB", "#6B3A2A")}${skirting}
+    <g opacity=".5">${rows(5, r => rows(13, c => `<rect x="${c*40 + (r % 2)*20}" y="${r*28}" width="38" height="26" rx="3" style="fill:#D9C3A6"/>`))}</g>
+    ${sk(`<path d="M200 138 v-60 q60 -60 120 0 v60z" style="fill:#3E2A20"/>${rows(3, i => `<ellipse cx="${232 + i*28}" cy="118" rx="12" ry="11" style="fill:#A8693F"/>`)}`, `<path d="M200 138 v-60 q60 -60 120 0 v60z"/>`)}
+    ${[110, 410].map(x => sk(`<circle cx="${x}" cy="60" r="10" style="fill:#FFD27A"/>`, `<path d="M${x} 20 v30"/><circle cx="${x}" cy="60" r="10"/>`)).join("")}
+    ${sk(`<path d="M520 316 L492 328 L492 428 L520 440z" style="fill:#6B3A2A"/>`, `<path d="M520 316 L492 328 L492 428 L520 440z"/><circle cx="497" cy="384" r="1.8"/>`)}
+    ${plant(490, 610, .9)}`,
   market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(24, i => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`)}</g>
     <g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--blush)"/></g>

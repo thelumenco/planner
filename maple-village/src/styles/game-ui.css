@@ -771,3 +771,6 @@ details.whowhere li.now{font-weight:700}
 .giftpick .actions{flex-wrap:wrap;gap:6px}
 .giftpick small{opacity:.75;font-weight:400}
 details.whowhere summary b{font-size:1rem;margin-right:6px}
+/* big goals: how much is saved towards one */
+.goalbar{height:12px;border-radius:999px;background:rgba(60,40,30,.12);overflow:hidden;margin:10px 0 4px;border:1.2px solid var(--line)}
+.goalbar span{display:block;height:100%;background:var(--honey);border-radius:999px}

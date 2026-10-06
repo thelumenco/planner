@@ -75,3 +75,13 @@
 .npc.act-game:not(.walk) > g{transform:translateY(7px)}
 .ch.npc.act-game:not(.walk) .armL,.ch.npc.act-game:not(.walk) .armR{animation:typeA .3s ease-in-out infinite alternate}
 @media (prefers-reduced-motion:reduce){.ch.sup .bob,.npc.act-sup .bob,.ch.npc.act-exercise .armL,.ch.npc.act-exercise .armR,.ch.npc.act-lead .armL,.ch.npc.act-lead .armR,#mel.exercise .armL,#mel.exercise .armR,.ch.npc.act-exercise .bob,.ch.npc.act-lead .bob,#mel.exercise .bob,.ch.npc.act-game .armL,.ch.npc.act-game .armR{animation:none}}
+/* the dolphin cruise boat: bobbing at the jetty; out on a cruise it sails up the coast and back (about 45 s) */
+.map .moored{animation:dbob 2.4s ease-in-out infinite}
+.map .cruising{animation:cruise 45s ease-in-out forwards}
+@keyframes cruise{0%{transform:translate(0,0)}25%{transform:translate(30px,-170px)}50%{transform:translate(10px,-330px)}75%{transform:translate(34px,-150px)}100%{transform:translate(0,0)}}
+@media (prefers-reduced-motion:reduce){.map .moored,.map .cruising{animation:none}}
+/* how Mel gets about once she owns them: the scooter under her feet, the car round her (garage, game/goals.js) */
+.rideScoot,.rideCar{display:none}
+#mel.scoot .rideScoot,#mel.drive .rideCar{display:inline}
+#mel.scoot .legL,#mel.scoot .legR,#mel.scoot .armL,#mel.scoot .armR{animation:none !important}
+#mel.drive .legL,#mel.drive .legR{visibility:hidden}

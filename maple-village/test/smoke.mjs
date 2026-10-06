@@ -1539,6 +1539,44 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // Big goals to save up for: the garage (through a door at the back of the house), a scooter and a car (faster between
+  // screens), a dolphin cruise boat at the jetty, and a cellar door extension off the wine shop
+  console.log("\nbig goals");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`goals pageerror: ${e.message}`));
+  const gf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/richpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 10500; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-06"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-06&richpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(800);
+  await page.locator('#world [data-spot="gdoor"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="garage"]', { timeout: 15000 });
+  check(/1200/.test(await page.locator("#ctx").textContent()), "a door at the back of the house: build the garage for 1,200 coins");
+  await page.click('#ctx [data-goal="garage"]'); await page.waitForTimeout(400);
+  check(await gf().then(f => f.goals.garage && f.coins === 9300), "the garage gets built");
+  await page.locator('#world [data-spot="gdoor"]').dispatchEvent("click"); await page.waitForTimeout(2500);
+  check(await page.locator('#world [data-spot="car"]').count() === 1, "through the back door into the garage");
+  await page.locator('#world [data-spot="scooter"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="scooter"]', { timeout: 15000 });
+  await page.click('#ctx [data-goal="scooter"]'); await page.waitForTimeout(400);
+  check(await gf().then(f => f.goals.scooter && f.ride === "scooter"), "a scooter, kept in the garage");
+  await page.click('#ctx [data-goal="car"]'); await page.waitForTimeout(400);
+  check(await gf().then(f => f.goals.car && f.ride === "car" && f.coins === 10500 - 1200 - 800 - 3500), "and a car");
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(600);
+  await page.locator('#world [data-place="toVine"]').dispatchEvent("click"); await page.waitForTimeout(250);
+  check(await page.locator("#mel.drive").count() === 1, "outdoors Mel drives the car between places");
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(800);
+  await page.locator('#world [data-spot="cdoor"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="cellar"]', { timeout: 15000 });
+  await page.click('#ctx [data-goal="cellar"]'); await page.waitForTimeout(400);
+  await page.locator('#world [data-spot="cdoor"]').dispatchEvent("click"); await page.waitForTimeout(2500);
+  check(await page.locator('#world [data-spot="flight"]').count() === 1 && await gf().then(f => f.goals.cellar), "the cellar door extension: through the wine shop's west wall to the tasting bar");
+  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(800);
+  await page.locator('#world [data-place="boat"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="boat"]', { timeout: 15000 });
+  await page.click('#ctx [data-goal="boat"]'); await page.waitForTimeout(400);
+  await page.locator('#world [data-place="boat"]').dispatchEvent("click"); await page.waitForTimeout(4000);
+  check(await page.locator("#world .cruising").count() === 1 && await page.evaluate(() => getComputedStyle(document.getElementById("mel")).visibility === "hidden"), "the dolphin cruise boat: everyone aboard and off up the coast");
+  await page.close();
+}
+{
   // The bank: six vault jars of jewels for savings goals
   console.log("\nthe bank");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

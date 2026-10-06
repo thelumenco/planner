@@ -550,6 +550,16 @@ button.subname[aria-expanded="true"]::after{content:"▴"}
 .npc.act-game:not(.walk) > g{transform:translateY(7px)}
 .ch.npc.act-game:not(.walk) .armL,.ch.npc.act-game:not(.walk) .armR{animation:typeA .3s ease-in-out infinite alternate}
 @media (prefers-reduced-motion:reduce){.ch.sup .bob,.npc.act-sup .bob,.ch.npc.act-exercise .armL,.ch.npc.act-exercise .armR,.ch.npc.act-lead .armL,.ch.npc.act-lead .armR,#mel.exercise .armL,#mel.exercise .armR,.ch.npc.act-exercise .bob,.ch.npc.act-lead .bob,#mel.exercise .bob,.ch.npc.act-game .armL,.ch.npc.act-game .armR{animation:none}}
+/* the dolphin cruise boat: bobbing at the jetty; out on a cruise it sails up the coast and back (about 45 s) */
+.map .moored{animation:dbob 2.4s ease-in-out infinite}
+.map .cruising{animation:cruise 45s ease-in-out forwards}
+@keyframes cruise{0%{transform:translate(0,0)}25%{transform:translate(30px,-170px)}50%{transform:translate(10px,-330px)}75%{transform:translate(34px,-150px)}100%{transform:translate(0,0)}}
+@media (prefers-reduced-motion:reduce){.map .moored,.map .cruising{animation:none}}
+/* how Mel gets about once she owns them: the scooter under her feet, the car round her (garage, game/goals.js) */
+.rideScoot,.rideCar{display:none}
+#mel.scoot .rideScoot,#mel.drive .rideCar{display:inline}
+#mel.scoot .legL,#mel.scoot .legR,#mel.scoot .armL,#mel.scoot .armR{animation:none !important}
+#mel.drive .legL,#mel.drive .legR{visibility:hidden}
 
 /* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
 :root{--mapw:max(300px,min(980px,calc((100dvh - 196px)*520/640 + 26px)))}
@@ -1324,6 +1334,9 @@ details.whowhere li.now{font-weight:700}
 .giftpick .actions{flex-wrap:wrap;gap:6px}
 .giftpick small{opacity:.75;font-weight:400}
 details.whowhere summary b{font-size:1rem;margin-right:6px}
+/* big goals: how much is saved towards one */
+.goalbar{height:12px;border-radius:999px;background:rgba(60,40,30,.12);overflow:hidden;margin:10px 0 4px;border:1.2px solid var(--line)}
+.goalbar span{display:block;height:100%;background:var(--honey);border-radius:999px}
 </style>
 </head>
 <body>
@@ -2161,6 +2174,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     mumdad: { scene: "shore", name: "Mum and Dad's", short: "Mum and Dad's house", door: [360, 226], mark: [360, 110] },
     marcus: { scene: "shore", name: "Marcus and Angelina's", short: "Marcus and Angelina's house", door: [400, 470], mark: [400, 354] },
     suprack: { scene: "shore", name: "Paddleboards", door: [216, 488], spot: true, line: "The paddleboard rack by the jetty. Fancy a paddle?" },
+    boat: { scene: "shore", name: "Cruise boat", door: [206, 550], spot: true, line: "The mooring at the end of the jetty." },
     dolphins: { scene: "shore", name: "Boardwalk bench", door: [214, 262], spot: true, line: "A bench looking out to sea. Dolphins come by most mornings." },
     exlawn: { scene: "field", name: "Exercise lawn", door: [452, 430], spot: true, line: "The exercise lawn. Mum's class is here most mornings at 8." },
     toTown: { scene: "base", name: "Bridge to town", door: [260, 114], spot: true, bridge: "village", mark: [260, 62], line: "Over the river to the town square." }
@@ -2200,7 +2214,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     kidroom: { parent: "home", door: [456, 340], arrive: [70, 420], exit: [34, 410] },
     trophy: { parent: "hall", door: [64, 372], arrive: [456, 400], exit: [486, 410] },
     // the wine shop's kitchen, through the door on its east wall; its own way out is the mat at the bottom
-    kitchen: { parent: "wineshop", door: [462, 390], arrive: [260, 560], exit: [260, 606] }
+    kitchen: { parent: "wineshop", door: [462, 390], arrive: [260, 560], exit: [260, 606] },
+    // big goals: the garage through the back door of the house, the cellar door through the wine shop's west wall
+    garage: { parent: "home", door: [366, 192], arrive: [260, 560], exit: [260, 606] },
+    cellar: { parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430] }
   };
   var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
   var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
@@ -2243,7 +2260,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ] },
     // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
     // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
-    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { X: [168, 244], A: [130, 452], B: [440, 228], H: [344, 250], C: [124, 450], R: [40, 330], K: [480, 330], D: [350, 516], G: [436, 448], E: [448, 598], F: [96, 596] }, stations: [
+    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { X: [150, 244], A: [130, 452], B: [452, 228], H: [318, 250], Q: [366, 170], C: [124, 450], R: [40, 330], K: [480, 330], D: [350, 516], G: [436, 448], E: [448, 598], F: [96, 596] }, stations: [
       ["desk", "Home desk", "A", "desk", /./, "Your own little desk."],
       ["kitchen", "Kitchen", "B", "kitchen", /cook|meal|lunch|dinner|bake|grocer|prep/, "Something smells good."],
       ["mydoor", "My room", "R", "sidedoor", null, "Your room. Just you.", 0],
@@ -2253,6 +2270,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["fridge", "Fridge", "H", "fridge", null, "The fridge: what we have, and the shopping list."],
       ["treadmill", "Treadmill", "F", "treadmill", /treadmill/, "1.2 and go. Walk and work.", -12],
       ["office", "Darren's desk", "G", "office", null, "Darren's home office. Shh, he might be on a call."],
+      ["gdoor", "Garage", "Q", "garagedoor", null, "The door at the back of the house, through to the garage.", 20],
       ["dine", "Dining table", "X", "dining", /read|rest|journal|meditat|book|nap/, "The big family table. Room for all nine of us, or a book and a cup of tea.", 44]
     ] },
     // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
@@ -2302,9 +2320,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ] },
     // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
     // and the tasting room's little tables
-    wineshop: { name: "The wine shop", wall: "#F4E6D6", trim: "#8E2C48", noBoard: true, pos: { S: [92, 238], C: [330, 318], H: [206, 318], T: [340, 520], K: [480, 390], M: [465, 128] }, stations: [
+    wineshop: { name: "The wine shop", wall: "#F4E6D6", trim: "#8E2C48", noBoard: true, pos: { S: [92, 238], C: [330, 318], H: [206, 318], T: [340, 520], K: [480, 390], M: [465, 128], Z: [40, 400] }, stations: [
       ["menu", "Menu", "M", "chalkmenu", null, "The chalkboard: today's menu.", 44],
       ["kdoor", "Kitchen", "K", "kitchendoor", null, "Into the kitchen.", 0],
+      ["cdoor", "Cellar door", "Z", "cellardoor", null, "The cellar door: barrel racks, a tasting bar and your wine wall.", 0],
       ["wshelf", "Wine shelves", "S", "wineshelf", null, "Your wines, waiting for customers.", 30],
       ["wcounter", "Counter", "C", "winecounter", null, "Behind the counter. Customers come more often while you serve.", -34],
       ["hbox", "Honesty box", "H", "honestybox", null, "The honesty box.", 30],
@@ -2341,6 +2360,20 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["study", "Angelina's desk", "D", "studydesk", null, "Angelina's study desk. Highlighters in every colour.", 36],
       ["msofa", "Sofa", "S", "sofa", null, "The comfiest sofa on the foreshore.", 30],
       ["dine", "Dining table", "X", "dining", null, "Their dining table. Wedding magazines at one end, bank papers at the other.", 44]
+    ] },
+    // the garage (a big goal): Darren's workbench, storage, the scooter and the car once they're bought
+    garage: { name: "The garage", wall: "#E3E6EA", trim: "#8FA3B8", noBoard: true, pos: { W: [130, 250], K: [420, 261], S: [120, 470], C: [330, 480] }, stations: [
+      ["gbench", "Workbench", "W", "bench", null, "Darren's tools, all hung up on the wall. Mostly.", 34],
+      ["gshelf", "Storage", "K", "shelf", null, "Boxes labelled 'Christmas', 'Evan's baby clothes' and 'misc'.", 34],
+      ["scooter", "Scooter", "S", "scooterbay", null, "The scooter's spot.", 30],
+      ["car", "Car", "C", "carbay", null, "The car's spot.", 30]
+    ] },
+    // the cellar door (a big goal): Mel's wine wall, the tasting bar, barrel racks, a high table
+    cellar: { name: "The cellar door", wall: "#E9DCCB", trim: "#6B3A2A", noBoard: true, pos: { W: [130, 262], B: [340, 262], R: [140, 500], T: [360, 500] }, stations: [
+      ["winewall", "Wine wall", "W", "winewall", null, "A bottle of every wine you've made. It's getting full.", 36],
+      ["flight", "Tasting bar", "B", "tastebar", null, "The tasting bar. Pour yourself a flight.", 34],
+      ["racks", "Barrel racks", "R", "barrelrack", null, "Barrels resting, quietly getting better.", 30],
+      ["ctable", "High table", "T", "table", null, "A high table for tastings. Visitors linger here.", 40]
     ] },
     market: { name: "Market", wall: "#F8E5E2", trim: "var(--blush)", stations: [
       ["stall", "Shop counter", "M", "shopcounter", null, "Welcome in! Have a browse."]
@@ -2866,6 +2899,27 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     )}
     <g filter="url(#wob)">${[96, 70].map((rx, i) => `<ellipse cx="110" cy="412" rx="${rx}" ry="${rx * 0.42}" style="fill:${["#C9A3E0", "#F6E3A1"][i]}" opacity=".7"/>`).join("")}</g>
     ${plant(490, 610, 1.1)}${plant(30, 610, 0.9)}`,
+    // the garage: a concrete floor with oil-stain shadows, a pegboard of tools, a roller door, a strip light
+    garage: () => `<rect width="520" height="640" style="fill:#C9C6C0"/>
+    <g opacity=".35" style="stroke:#A9A59D" stroke-width="1.2">${rows(4, (i) => `<path d="M0 ${250 + i * 110} H520"/>`)}${rows(4, (i) => `<path d="M${130 * i} 150 V640"/>`)}</g>
+    <ellipse cx="330" cy="500" rx="70" ry="14" style="fill:#AFAAA2" opacity=".6"/>
+    ${wallBase("#E3E6EA", "#8FA3B8")}${skirting}
+    ${sk(
+      `<rect x="40" y="30" width="180" height="90" rx="3" style="fill:#D9B48A"/>${rows(6, (i) => `<circle cx="${60 + i * 30}" cy="46" r="2" style="fill:#8A6A4A"/>`)}<path d="M60 52 v34 M90 52 l10 30 M120 52 v26 h8 M150 52 q10 16 0 30 M180 52 v40" style="stroke:#5E5A55" stroke-width="3" fill="none"/>`,
+      `<rect x="40" y="30" width="180" height="90" rx="3"/>`
+    )}
+    ${sk(`<rect x="250" y="20" width="230" height="118" rx="3" style="fill:#B9C3CC"/>${rows(8, (i) => `<rect x="250" y="${24 + i * 14}" width="230" height="3" style="fill:#9AA6B1"/>`)}`, `<rect x="250" y="20" width="230" height="118" rx="3"/>`)}
+    ${sk(`<rect x="200" y="6" width="120" height="6" rx="3" style="fill:#FFFDF6"/>`, `<rect x="200" y="6" width="120" height="6" rx="3"/>`)}
+    ${plant(30, 610, 0.8)}`,
+    // the cellar door: stone walls, an arched brick ceiling line, warm lamps, and the way back on the east wall
+    cellar: () => `<rect width="520" height="640" style="fill:#B98E6A"/>
+    <g opacity=".45" style="stroke:#8E6A4A" stroke-width="1.2">${rows(12, (i) => `<path d="M0 ${170 + i * 40} H520"/>`)}${rows(26, (i) => `<path d="M${i % 13 * 40 + Math.floor(i / 13) % 2 * 20} ${170 + i % 12 * 40} v40"/>`)}</g>
+    ${wallBase("#E9DCCB", "#6B3A2A")}${skirting}
+    <g opacity=".5">${rows(5, (r) => rows(13, (c) => `<rect x="${c * 40 + r % 2 * 20}" y="${r * 28}" width="38" height="26" rx="3" style="fill:#D9C3A6"/>`))}</g>
+    ${sk(`<path d="M200 138 v-60 q60 -60 120 0 v60z" style="fill:#3E2A20"/>${rows(3, (i) => `<ellipse cx="${232 + i * 28}" cy="118" rx="12" ry="11" style="fill:#A8693F"/>`)}`, `<path d="M200 138 v-60 q60 -60 120 0 v60z"/>`)}
+    ${[110, 410].map((x) => sk(`<circle cx="${x}" cy="60" r="10" style="fill:#FFD27A"/>`, `<path d="M${x} 20 v30"/><circle cx="${x}" cy="60" r="10"/>`)).join("")}
+    ${sk(`<path d="M520 316 L492 328 L492 428 L520 440z" style="fill:#6B3A2A"/>`, `<path d="M520 316 L492 328 L492 428 L520 440z"/><circle cx="497" cy="384" r="1.8"/>`)}
+    ${plant(490, 610, 0.9)}`,
     market: () => `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, (i) => `<path d="M0 ${170 + i * 40} H520"/>`)}${rows(24, (i) => `<path d="M${(i * 97 + i % 3 * 40) % 520} ${170 + i % 12 * 40} v40"/>`)}</g>
     <g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--blush)"/></g>
@@ -4495,7 +4549,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var DINNER_TO = 20 * 60;
   var DINNER_HOSTS = ["home", "mumdad", "cottage", "marcus"];
   var HOST_NAME = { home: "your place", mumdad: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", marcus: "Marcus and Angelina's" };
-  var DINING = { home: { cx: 168, fy: 244 }, mumdad: { cx: 270, fy: 500 }, cottage: { cx: 320, fy: 470 }, marcus: { cx: 340, fy: 470 } };
+  var DINING = { home: { cx: 150, fy: 244 }, mumdad: { cx: 270, fy: 500 }, cottage: { cx: 320, fy: 470 }, marcus: { cx: 340, fy: 470 } };
   var BACK = ["mama", "gonggong", "mum", "dad", "angelina"];
   var FRONT = ["darren", "marcus", "evan", "mel"];
   function dinnerSeat(host, who3) {
@@ -5249,7 +5303,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       const crate2 = Object.keys(v.fruit).filter((id) => v.fruit[id] > 0);
       if (!onShelf.length && !open2 && !platesLeft(v) && !crate2.length) continue;
       const food = Object.keys(v.menu).filter((id) => v.menu[id] > 0 && DISHES[id]), tap = v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === new Date(at + off + 6 * H).toISOString().slice(0, 10);
-      const f2 = footfall(hm2, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1);
+      const f2 = footfall(hm2, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1) * (F2.goals && F2.goals.cellar ? 1.15 : 1);
       const gameDay = new Date(at + off + 6 * H).toISOString().slice(0, 10);
       const plate = () => servePlate(v, gameDay, out);
       if (onShelf.length && Math.random() < 2e-3 * f2) {
@@ -6825,6 +6879,48 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
           `${back.map((cx) => `<rect x="${cx - 10}" y="${y - 66}" width="20" height="26" rx="4" style="fill:#B98A5A"/>`).join("")}${front.map((cx) => `<rect x="${cx - 10}" y="${y + 4}" width="20" height="12" rx="3" style="fill:#B98A5A"/>`).join("")}`,
           `${back.map((cx) => `<rect x="${cx - 10}" y="${y - 66}" width="20" height="26" rx="4"/><path d="M${cx - 6} ${y - 58} h12" opacity=".5"/>`).join("")}${front.map((cx) => `<rect x="${cx - 10}" y="${y + 4}" width="20" height="12" rx="3"/><path d="M${cx - 8} ${y + 16} v8 M${cx + 8} ${y + 16} v8"/>`).join("")}`
         ) + diningTable(x, y);
+      }
+      // big goals (game/goals.js): the garage's door at the back of the house (boarded up with a sign until it's built),
+      // the scooter and car bays in the garage, the cellar door off the wine shop, and the cellar's furniture
+      case "garagedoor": {
+        const built = !!(G.F().goals || {}).garage;
+        return built ? sk(`<rect x="${x - 24}" y="${y - 96}" width="48" height="92" rx="3" style="fill:#8FA3B8"/><rect x="${x - 16}" y="${y - 86}" width="32" height="18" rx="2" style="fill:#CFE0EE"/>`, `<rect x="${x - 24}" y="${y - 96}" width="48" height="92" rx="3"/><rect x="${x - 16}" y="${y - 86}" width="32" height="18" rx="2"/><circle cx="${x + 15}" cy="${y - 46}" r="2"/><path d="M${x - 24} ${y - 40} h48 M${x - 24} ${y - 24} h48" opacity=".35"/>`) : sk(
+          `<rect x="${x - 26}" y="${y - 90}" width="52" height="16" rx="2" transform="rotate(-6 ${x} ${y - 82})" style="fill:#C9A27E"/><rect x="${x - 26}" y="${y - 54}" width="52" height="16" rx="2" transform="rotate(5 ${x} ${y - 46})" style="fill:#C9A27E"/><rect x="${x - 18}" y="${y - 72}" width="36" height="16" rx="2" style="fill:#FFFDF6"/>`,
+          `<rect x="${x - 24}" y="${y - 96}" width="48" height="92" rx="3" stroke-dasharray="4 4"/><rect x="${x - 18}" y="${y - 72}" width="36" height="16" rx="2"/><path d="M${x - 12} ${y - 64} h24" opacity=".6"/>`
+        );
+      }
+      case "cellardoor": {
+        const built = !!(G.F().goals || {}).cellar;
+        return sk(
+          `<path d="M${x - 40} ${y - 108} L${x - 12} ${y - 96} L${x - 12} ${y + 4} L${x - 40} ${y + 14}z" style="fill:${built ? "#6B3A2A" : "#E8D9C0"}"/>${built ? `<path d="M${x - 36} ${y - 80} q8 -10 18 -4 v12 l-18 -4z" style="fill:#F3C969"/>` : `<rect x="${x - 38}" y="${y - 62}" width="24" height="14" transform="rotate(-4 ${x - 26} ${y - 55})" style="fill:#FFFDF6"/>`}`,
+          `<path d="M${x - 40} ${y - 108} L${x - 12} ${y - 96} L${x - 12} ${y + 4} L${x - 40} ${y + 14}z" ${built ? "" : `stroke-dasharray="4 4"`}/>${built ? `<circle cx="${x - 17}" cy="${y - 42}" r="1.8"/>` : `<path d="M${x - 34} ${y - 56} h14" opacity=".6"/>`}`
+        );
+      }
+      case "scooterbay": {
+        const own = !!(G.F().goals || {}).scooter;
+        return own ? sk(`<rect x="${x - 30}" y="${y - 12}" width="60" height="6" rx="3" style="fill:#7FB8E8"/><circle cx="${x - 24}" cy="${y - 4}" r="6" style="fill:#2F2B28"/><circle cx="${x + 24}" cy="${y - 4}" r="6" style="fill:#2F2B28"/><path d="M${x + 22} ${y - 10} l6 -44" style="stroke:#7FB8E8" stroke-width="4"/><path d="M${x + 18} ${y - 56} h18" style="stroke:#2F2B28" stroke-width="4"/>`, `<rect x="${x - 30}" y="${y - 12}" width="60" height="6" rx="3"/><circle cx="${x - 24}" cy="${y - 4}" r="6"/><circle cx="${x + 24}" cy="${y - 4}" r="6"/>`) : sk("", `<rect x="${x - 40}" y="${y - 40}" width="80" height="40" rx="6" stroke-dasharray="5 5" opacity=".6"/><path d="M${x - 14} ${y - 18} h28" opacity=".5"/>`);
+      }
+      case "carbay": {
+        const own = !!(G.F().goals || {}).car;
+        return own ? sk(
+          `<path d="M${x - 70} ${y - 14} v-24 q0 -10 10 -12 l24 -4 q12 -22 34 -22 h20 q20 0 30 22 l18 6 q8 2 8 12 v22z" style="fill:#E8566C"/><path d="M${x - 30} ${y - 54} q10 -16 26 -16 h14 v18z M${x + 14} ${y - 70} h4 q14 0 22 18 h-26z" style="fill:#CFE0EE"/><circle cx="${x - 40}" cy="${y - 12}" r="12" style="fill:#2F2B28"/><circle cx="${x + 44}" cy="${y - 12}" r="12" style="fill:#2F2B28"/><circle cx="${x - 40}" cy="${y - 12}" r="5" style="fill:#CFC8BE"/><circle cx="${x + 44}" cy="${y - 12}" r="5" style="fill:#CFC8BE"/>`,
+          `<path d="M${x - 70} ${y - 14} v-24 q0 -10 10 -12 l24 -4 q12 -22 34 -22 h20 q20 0 30 22 l18 6 q8 2 8 12 v22z"/><path d="M${x - 30} ${y - 54} q10 -16 26 -16 h14 v18z M${x + 14} ${y - 70} h4 q14 0 22 18 h-26z"/><circle cx="${x - 40}" cy="${y - 12}" r="12"/><circle cx="${x + 44}" cy="${y - 12}" r="12"/>`
+        ) : sk("", `<rect x="${x - 86}" y="${y - 70}" width="172" height="70" rx="8" stroke-dasharray="6 6" opacity=".6"/><path d="M${x - 40} ${y - 35} h80" opacity=".4"/>`);
+      }
+      case "tastebar":
+        return sk(
+          `<rect x="${x - 70}" y="${y - 40}" width="140" height="40" rx="3" style="fill:#6B3A2A"/><rect x="${x - 76}" y="${y - 46}" width="152" height="8" rx="2" style="fill:#B98A5A"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${x - 50 + i * 24} ${y - 58} q-4 0 -4 -6 h8 q0 6 -4 6z M${x - 50 + i * 24} ${y - 58} v8" style="fill:${["#7A1F3D", "#E98AA0", "#E8D57A", "#F3E7B0", "#7A1F3D"][i]}"/>`).join("")}`,
+          `<rect x="${x - 70}" y="${y - 40}" width="140" height="40" rx="3"/><rect x="${x - 76}" y="${y - 46}" width="152" height="8" rx="2"/><path d="M${x - 70} ${y - 20} h140" opacity=".35"/>`
+        );
+      case "barrelrack":
+        return sk(
+          `${[0, 1, 2].map((i) => `<ellipse cx="${x - 50 + i * 50}" cy="${y - 24}" rx="22" ry="20" style="fill:#A8693F"/><ellipse cx="${x - 50 + i * 50}" cy="${y - 62}" rx="22" ry="20" style="fill:#A8693F"/>`).join("")}<rect x="${x - 78}" y="${y - 6}" width="156" height="6" style="fill:#5E4636"/>`,
+          `${[0, 1, 2].map((i) => `<ellipse cx="${x - 50 + i * 50}" cy="${y - 24}" rx="22" ry="20"/><ellipse cx="${x - 50 + i * 50}" cy="${y - 24}" rx="9" ry="8"/><ellipse cx="${x - 50 + i * 50}" cy="${y - 62}" rx="22" ry="20"/><ellipse cx="${x - 50 + i * 50}" cy="${y - 62}" rx="9" ry="8"/>`).join("")}<rect x="${x - 78}" y="${y - 6}" width="156" height="6"/>`
+        );
+      case "winewall": {
+        let b = "";
+        for (let r = 0; r < 4; r++) for (let i = 0; i < 7; i++) b += `<path d="M${x - 48 + i * 16} ${y - 92 + r * 22} h8 v-4 q0 -4 -2 -6 v-6 h-4 v6 q-2 2 -2 6z" style="fill:${["#7A1F3D", "#E98AA0", "#E8D57A", "#F3E7B0"][(i + r) % 4]}"/>`;
+        return sk(`<rect x="${x - 58}" y="${y - 112}" width="116" height="112" rx="3" style="fill:#5E4636"/>${b}`, `<rect x="${x - 58}" y="${y - 112}" width="116" height="112" rx="3"/>${[0, 1, 2, 3].map((r) => `<path d="M${x - 58} ${y - 88 + r * 22} h116" opacity=".5"/>`).join("")}`);
       }
       case "sofa":
         return sk(
@@ -12360,7 +12456,68 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       "var(--blush)",
       { art: `<path d="M452 396 h-10 v10" style="fill:none"/><circle cx="356" cy="452" r="5" style="fill:#7FA35A"/><circle cx="444" cy="452" r="5" style="fill:#7FA35A"/>`, lines: `<path d="M352 456 h8 l-1 4 h-6z M440 456 h8 l-1 4 h-6z"/>` }
     );
-    return lampDefs + ground + sea + jetty + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench + rack + mumdad + marcus + archGate("toFieldS", 500, 292, "The field", 470, 334, "var(--peri)", "Gate to the field") + archGate("toFlowersS", 250, 616, "Flower farm", 314, 604, "var(--blush)", "Gate to the flower farm");
+    const G2 = artCtx(), F2 = G2.F(), S3 = G2.S ? G2.S() : {}, boatOwned = !!(F2.goals || {}).boat, cruising = !!(S3.cruise && Date.now() < S3.cruise.until);
+    const boat = boatOwned ? `<g data-place="boat" aria-label="Dolphin cruise boat"><ellipse class="hov" cx="206" cy="552" rx="30" ry="9" style="fill:var(--butter)"/>
+      <g class="${cruising ? "cruising" : "moored"}"><g ${W4}>
+        <path d="M30 506 h86 l-10 18 h-66z" style="fill:#FFFDF6"/><path d="M34 514 h78" style="stroke:#3E6B8C" stroke-width="3"/><rect x="58" y="488" width="34" height="18" rx="3" style="fill:#CFE0EE"/><path d="M56 488 h38" style="stroke:#3E6B8C" stroke-width="2"/>
+        <path d="M100 488 v-26 l16 10z" style="fill:#E8566C"/>
+        ${cruising ? `<circle cx="64" cy="482" r="5" style="fill:#F8DECD"/><path d="M60 480 q4 -8 9 -1" style="fill:#2A211D"/><circle cx="78" cy="485" r="3.6" style="fill:#F8DECD"/><path d="M75 483 q3 -5 6 0" style="fill:#2A211D"/>` : ""}</g>
+        ${cruising ? `<g class="podhop">${dolphin(130, 500, 4, 0, false)}${dolphin(4, 520, 5, 1.6, true)}</g>` : ""}</g>
+      ${tapeLabel(206, 574, "Dolphin cruise", "var(--peri)", 10)}</g>` : `<g data-place="boat" aria-label="The mooring: save up for a dolphin cruise boat"><ellipse class="hov" cx="206" cy="552" rx="26" ry="8" style="fill:var(--butter)"/>
+      ${sk(`<rect x="200" y="512" width="8" height="34" style="fill:var(--wood)"/><rect x="178" y="512" width="52" height="18" rx="2" style="fill:#FFFDF6"/>`, `<rect x="200" y="512" width="8" height="34"/><rect x="178" y="512" width="52" height="18" rx="2"/><path d="M186 521 h36" opacity=".55"/>`)}
+      ${tapeLabel(206, 574, "Boat mooring", "var(--peri)", 10)}</g>`;
+    return lampDefs + ground + sea + jetty + boat + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench + rack + mumdad + marcus + archGate("toFieldS", 500, 292, "The field", 470, 334, "var(--peri)", "Gate to the field") + archGate("toFlowersS", 250, 616, "Flower farm", 314, 604, "var(--blush)", "Gate to the flower farm");
+  }
+
+  // src/game/goals.js
+  var GOALS = {
+    garage: { n: "Garage", price: 1200, where: "home", line: "A garage off the back of the house, with a door from the living room. Somewhere to keep a scooter, and one day a car." },
+    scooter: { n: "Scooter", price: 800, needs: "garage", where: "garage", line: "A little electric scooter. Zips you from screen to screen about half again as fast as walking." },
+    car: { n: "Car", price: 3500, needs: "garage", where: "garage", line: "A small car, parked in the garage. Gets you round the village more than twice as fast as walking." },
+    boat: { n: "Dolphin cruise boat", price: 2e3, where: "shore", line: "A little cruise boat moored at the end of the jetty. Take the family out to see the dolphins up close." },
+    cellar: { n: "Cellar door", price: 2500, where: "wineshop", line: "A cellar door extension off the wine shop: barrel racks, a tasting bar and a wall of every wine you've made. Visitors love a cellar door." }
+  };
+  var owns = (F2, k) => !!(F2.goals && F2.goals[k]);
+  var ride = (F2) => {
+    const r = F2.ride;
+    return r === "car" && owns(F2, "car") ? "car" : r === "scooter" && owns(F2, "scooter") ? "scooter" : r === "walk" ? "walk" : owns(F2, "car") ? "car" : owns(F2, "scooter") ? "scooter" : "walk";
+  };
+  var rideSpeed = (F2) => ({ walk: 1, scooter: 1.6, car: 2.5 })[ride(F2)];
+  function buyGoal(F2, k) {
+    const g = GOALS[k];
+    if (!g || owns(F2, k) || F2.coins < g.price || g.needs && !owns(F2, g.needs)) return null;
+    F2.coins -= g.price;
+    F2.goals = { ...F2.goals || {}, [k]: Date.now() };
+    if (k === "scooter" || k === "car") F2.ride = k;
+    return {
+      garage: "The builders are done! There's a door at the back of the house now, through to your new garage.",
+      scooter: "A shiny new scooter, parked in the garage. You'll zip about on it outdoors from now on.",
+      car: "A car! It's parked in the garage. You'll drive between screens from now on (a lot faster).",
+      boat: "Your dolphin cruise boat is moored at the end of the jetty. Take everyone out!",
+      cellar: "The cellar door is open! Through the new door on the wine shop's west wall."
+    }[k];
+  }
+  var coin = () => icon("coin", 14);
+  function goalPanel(F2, k) {
+    const g = GOALS[k], have = owns(F2, k), need = g.needs && !owns(F2, g.needs);
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(g.n)}</h2><p class="sub">${esc(g.line)}</p>`;
+    if (have) h += `<p class="muted">Yours since ${new Date(F2.goals[k]).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}.</p>`;
+    else if (need) h += `<p class="muted">You'll need the ${esc(GOALS[g.needs].n.toLowerCase())} first.</p>`;
+    else {
+      const pct = Math.min(100, Math.round(100 * F2.coins / g.price));
+      h += `<div class="goalbar" role="img" aria-label="${pct}% saved"><span style="width:${pct}%"></span></div><p class="muted">${F2.coins} of ${g.price} ${coin()} saved${F2.coins < g.price ? `: ${g.price - F2.coins} to go` : ""}.</p>
+      <div class="actions"><button class="btn primary" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>${k === "garage" || k === "cellar" ? "Build it" : "Buy it"} (${g.price} ${coin()})</button></div>`;
+    }
+    return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function garagePanel(F2) {
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The garage</h2><p class="sub">How do you want to get about?</p><div class="actions">`;
+    h += [["walk", "Walk"], ["scooter", "Scooter"], ["car", "Car"]].map(([k, n]) => `<button class="btn small ${ride(F2) === k ? "primary" : "alt"}" data-ride="${k}" ${k !== "walk" && !owns(F2, k) ? "disabled" : ""}>${n}${k !== "walk" && !owns(F2, k) ? ` (${GOALS[k].price})` : ""}</button>`).join("") + `</div>`;
+    ["scooter", "car"].filter((k) => !owns(F2, k)).forEach((k) => {
+      const g = GOALS[k];
+      h += `<p class="eyebrow" style="margin-top:12px">${esc(g.n)}</p><p class="muted">${esc(g.line)} ${F2.coins} of ${g.price} ${coin()} saved.</p><div class="actions"><button class="btn primary small" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>Buy it (${g.price} ${coin()})</button></div>`;
+    });
+    return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
 
   // src/game/core.js
@@ -12724,6 +12881,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     compost: { n: "Compost bin", price: 150, ico: "compost", what: "Everything grows a quarter faster." },
     sprinkler: { n: "Sprinkler", price: 300, ico: "sprinkler", what: "New seeds water themselves the moment you plant them." }
   };
+  var goalView = null;
   var fieldView = null;
   var orView = null;
   var orAt = null;
@@ -12762,6 +12920,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   kView = null;
   orView = null;
   fieldView = null;
+  goalView = null;
   var jv = { mode: "shelf", blobs: [], note: "" };
   var BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]];
   var CYCLE = 12;
@@ -15115,6 +15274,7 @@ ${SIGNOFF[t2.who] || ""}`;
     kView = null;
     orView = null;
     fieldView = null;
+    goalView = null;
     selPlot = null;
     homeView = null;
     postOpen = false;
@@ -15187,6 +15347,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (deskOpen && scene === "home") h = deskPanel();
     else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
     else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
+    else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalPanel(F, goalView);
     else if (fieldView && scene === "field") {
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
       h = !st6 ? "" : st6.kind === "wine" ? stallMarketPanel(F, serving()) : st6.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : marketStallPanel(st6);
@@ -15318,6 +15479,28 @@ ${SIGNOFF[t2.who] || ""}`;
       ctx();
       drawScene();
     }, say: (l) => speak(l, 4500), sfx, today: dayKey() });
+    c.querySelectorAll("[data-goal]").forEach((b) => b.onclick = () => {
+      const line = buyGoal(F, b.dataset.goal);
+      if (!line) return;
+      sfx("chaching");
+      act("cheer");
+      flash(`${GOALS[b.dataset.goal].n}: yours!`);
+      gainXp(5);
+      [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("sparkle", mel.x + (k - 1) * 24, mel.y - 60, 1800), d));
+      speak(line, 7e3);
+      if (b.dataset.goal === "scooter" || b.dataset.goal === "car") goalView = "garagepick";
+      else goalView = null;
+      save2(true);
+      drawScene();
+      ctx();
+    });
+    c.querySelectorAll("[data-ride]").forEach((b) => b.onclick = () => {
+      F.ride = b.dataset.ride;
+      sfx("paper", true);
+      speak(F.ride === "car" ? "Keys in hand. You'll drive between screens." : F.ride === "scooter" ? "Helmet on. Scooter it is." : "On foot today. Nice and slow.", 3500);
+      save2();
+      ctx();
+    });
     if (orView || fieldView && scene === "field" && (stallAt(dayKey(), sgHM(), +fieldView.slice(-1)) || {}).kind === "orchard") wireOrchard(c, F, {
       save: () => save2(true),
       rerender: () => {
@@ -15372,6 +15555,7 @@ ${SIGNOFF[t2.who] || ""}`;
         kView = null;
         orView = null;
         fieldView = null;
+        goalView = null;
         ctx();
         drawScene();
       }, poured: vaultPoured });
@@ -15413,6 +15597,7 @@ ${SIGNOFF[t2.who] || ""}`;
         kView = null;
         orView = null;
         fieldView = null;
+        goalView = null;
         ctx();
         drawScene();
       } });
@@ -15428,6 +15613,7 @@ ${SIGNOFF[t2.who] || ""}`;
           kView = null;
           orView = null;
           fieldView = null;
+          goalView = null;
           ctx();
           sfx("coin");
           mprop("sparkle", 260 + rnd(-20, 20), 400);
@@ -15505,6 +15691,7 @@ ${SIGNOFF[t2.who] || ""}`;
       kView = null;
       orView = null;
       fieldView = null;
+      goalView = null;
       ctx();
     });
     c.querySelectorAll("[data-bed]").forEach((b) => b.onclick = () => bedAction(b.dataset.bed));
@@ -15544,6 +15731,7 @@ ${SIGNOFF[t2.who] || ""}`;
         kView = null;
         orView = null;
         fieldView = null;
+        goalView = null;
         A.decompNow();
         drawScene();
       } else startBreath(+k);
@@ -15863,7 +16051,7 @@ ${SIGNOFF[t2.who] || ""}`;
     show2("melScarf", !!d.me_scarf && !pj);
     show2("melPj", pj);
     const m = $("mel");
-    if (m) m.style.visibility = S2.sleep && scene === "room" ? "hidden" : "";
+    if (m) m.style.visibility = S2.sleep && scene === "room" || cruisingNow() ? "hidden" : "";
   }
   function render(redraw) {
     if (S2.day !== dayKey()) S2 = freshToday();
@@ -15996,6 +16184,7 @@ ${SIGNOFF[t2.who] || ""}`;
       kView = null;
       orView = null;
       fieldView = null;
+      goalView = null;
       homeView = null;
       postOpen = false;
       healthOpen = false;
@@ -16163,6 +16352,7 @@ ${SIGNOFF[t2.who] || ""}`;
     kView = null;
     orView = null;
     fieldView = null;
+    goalView = null;
     homeView = null;
     postOpen = false;
     healthOpen = false;
@@ -16200,6 +16390,41 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     if (id === "dine") {
       sitForDinner();
+      return;
+    }
+    if (id === "gdoor") {
+      if (owns(F, "garage")) setScene("garage", INNER.garage.arrive);
+      else {
+        goalView = "garage";
+        sfx("paper", true);
+        render();
+      }
+      return;
+    }
+    if (id === "cdoor") {
+      if (owns(F, "cellar")) setScene("cellar", INNER.cellar.arrive);
+      else {
+        goalView = "cellar";
+        sfx("paper", true);
+        render();
+      }
+      return;
+    }
+    if (scene === "garage" && (id === "scooter" || id === "car")) {
+      goalView = owns(F, id) ? "garagepick" : id;
+      sfx("paper", true);
+      render();
+      return;
+    }
+    if (scene === "cellar" && id === "flight") {
+      const first = S2.flightDay !== dayKey();
+      if (first) {
+        S2.flightDay = dayKey();
+        gainXp(2);
+        save2();
+      }
+      speak(first ? "A tasting flight: a splash of each of your wines, lined up on the bar. Honestly? They're good." : "Another little pour. Just to be sure.", 4500);
+      render();
       return;
     }
     if (scene === "marcus" && id === "games") {
@@ -16549,6 +16774,15 @@ ${SIGNOFF[t2.who] || ""}`;
       familyPaddle();
       return;
     }
+    if (id === "boat") {
+      if (owns(F, "boat")) startCruise();
+      else {
+        goalView = "boat";
+        sfx("paper", true);
+        render();
+      }
+      return;
+    }
     if (id === "dolphins") {
       mel.sitting = true;
       nodes.mel.classList.add("sit");
@@ -16712,6 +16946,7 @@ ${SIGNOFF[t2.who] || ""}`;
     gainXp(1);
     sfx("chime");
     fieldView = null;
+    goalView = null;
     ctx();
     if (k === "kite") {
       evan.tx = 200;
@@ -16733,6 +16968,13 @@ ${SIGNOFF[t2.who] || ""}`;
     const b = document.querySelector(`#${id} .bob`);
     if (b) b.insertAdjacentHTML("beforebegin", SUP_BOARD(k));
   });
+  {
+    const b = document.querySelector("#mel .bob");
+    if (b) {
+      b.insertAdjacentHTML("beforebegin", `<g class="rideScoot" style="stroke:var(--line)" stroke-width="1"><rect x="-15" y="-3" width="30" height="3.4" rx="1.6" style="fill:#7FB8E8"/><circle cx="-12" cy="1" r="2.6" style="fill:#2F2B28"/><circle cx="12" cy="1" r="2.6" style="fill:#2F2B28"/><path d="M12 -3 l3 -26 M10 -29 h9" fill="none" stroke-width="2"/></g>`);
+      b.insertAdjacentHTML("afterend", `<g class="rideCar" style="stroke:var(--line)" stroke-width="1.1"><path d="M-26 -4 v-14 q0 -4 4 -5 l8 -2 q4 -9 12 -9 h8 q8 0 11 9 l7 2 q4 1 4 5 v14z" style="fill:#E8566C"/><path d="M-10 -25 q3 -6 9 -6 h4 v7z M5 -31 h2 q6 0 9 7 h-11z" style="fill:#CFE0EE"/><circle cx="-14" cy="-3" r="5" style="fill:#2F2B28"/><circle cx="15" cy="-3" r="5" style="fill:#2F2B28"/><circle cx="23" cy="-15" r="1.6" style="fill:#F3C969"/></g>`);
+    }
+  }
   function familyPaddle() {
     if (sup) return;
     const m = sgHM();
@@ -16777,6 +17019,48 @@ ${SIGNOFF[t2.who] || ""}`;
       }
     }, 2e4);
     render();
+  }
+  var cruisingNow = () => !!(S2.cruise && Date.now() < S2.cruise.until && scene === "shore");
+  function startCruise() {
+    if (S2.cruise && Date.now() < S2.cruise.until) return;
+    const m = sgHM();
+    if (m >= 19 * 60 || m < 6 * 60) {
+      speak("Too dark for a cruise. The dolphins are tucked up for the night.", 3500);
+      render();
+      return;
+    }
+    S2.cruise = { until: Date.now() + 45e3 };
+    route2 = [];
+    mel.path = [];
+    atSpot = null;
+    [nodes.mel, nodes.maple, nodes.evan].forEach((n) => n.style.visibility = "hidden");
+    sfx("chime");
+    drawScene();
+    speak(evanHere() ? "All aboard! Evan's at the front, Maple's on your lap. Off up the coast." : "All aboard! Maple's on your lap. Off up the coast.", 5e3);
+    setTimeout(() => {
+      if (S2.cruise && scene === "shore") {
+        speak("Dolphins! A whole pod, right alongside the boat. One jumps clean out of the water.", 5500);
+        [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("heart", 90 + k * 20, 260, 1800), d));
+      }
+    }, 16e3);
+    render();
+  }
+  function endCruise() {
+    S2.cruise = null;
+    [nodes.mel, nodes.maple, nodes.evan].forEach((n) => n.style.visibility = "");
+    if (scene !== "shore") return;
+    mel.x = mel.tx = 206;
+    mel.y = mel.ty = 556;
+    maple.x = maple.tx = 184;
+    maple.y = maple.ty = 558;
+    if (S2.cruiseDay !== dayKey()) {
+      S2.cruiseDay = dayKey();
+      gainXp(3);
+      act("cheer");
+    }
+    speak("Back at the jetty. Salty hair, very happy faces.", 4500);
+    save2();
+    drawScene();
   }
   function endPaddle(walkBack) {
     if (!sup) return;
@@ -17731,7 +18015,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
       mel.tx = nx;
       mel.ty = ny;
     }
-    const arrived2 = stepTo2(mel, keys.size ? 190 : 220, dt);
+    const arrived2 = stepTo2(mel, (keys.size ? 190 : 220) * (outside() && !sup ? rideSpeed(F) : 1), dt);
     if (arrived2 && !keys.size && mel.path && mel.path.length) {
       const n = mel.path.shift();
       mel.tx = n[0];
@@ -17761,6 +18045,12 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
           go(I3.parent, I3.door[0] + 30, I3.door[1] + 20, null);
         } else if (scene === "farm" && mel.y > 592 && Math.abs(mel.x - 260) < 50) go("base", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
       }
+    }
+    if (S2.cruise && (scene !== "shore" || Date.now() > S2.cruise.until)) endCruise();
+    {
+      const rd = outside() ? ride(F) : "walk";
+      nodes.mel.classList.toggle("scoot", rd === "scooter" && mel.moving && !sup);
+      nodes.mel.classList.toggle("drive", rd === "car" && mel.moving && !sup);
     }
     if (sup) {
       if (scene !== "shore" || Date.now() > sup.until) endPaddle(true);
@@ -17801,7 +18091,8 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     placeNode(nodes.mel, mel);
     placeNode(nodes.maple, maple);
     placeNode(nodes.evan, evan);
-    nodes.evan.style.visibility = scene === "kidroom" && kid.sleep ? "hidden" : "";
+    nodes.evan.style.visibility = scene === "kidroom" && kid.sleep || cruisingNow() ? "hidden" : "";
+    nodes.maple.style.visibility = cruisingNow() ? "hidden" : "";
     if (scene === "home" && atSpot === "treadmill" && !route2.length && S2.timer && S2.timer.kind === "task" && Math.abs(mel.x - mel.tx) < 2) {
       nodes.mel.classList.add("walk");
       mel.dir = 1;

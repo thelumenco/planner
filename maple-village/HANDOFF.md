@@ -854,3 +854,19 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Her home desk at middle left (130,452) with the treadmill below it; Darren's desk at middle right.
   - The laundry basket (350,516) beside the cleaning cupboard at bottom right.
   - The middle stays open on the way to the door.
+
+### Round 64: big goals: garage, scooter, car, dolphin cruise boat, cellar door
+- **Why:** the economy check found about 1,300–1,500 coins a week once the vineyard is going, against about 5,000 coins of one-off buys, so Mel would run out of things to save for within a month.
+- **game/goals.js:** `GOALS` (garage 1,200; scooter 800 and car 3,500, both needing the garage; boat 2,000; cellar 2,500).
+  - `buyGoal` stores `F.goals[k]` (a timestamp). `goalPanel` is the "save up for it" card with a progress bar. `garagePanel` chooses how to get about (`F.ride`: walk, scooter or car).
+  - The generic purchase undo covers all of these.
+- **Garage:** the `gdoor` station on the back wall of the house, between the fridge (318) and the kitchen (452). It's boarded up with a sign until built.
+  - `INNER.garage` is entered through that door and left by the mat at the bottom. `ROOMS.garage` has the workbench, storage, and the scooter and car bays (dashed outlines until bought).
+- **Riding:** outdoors `stepTo(mel, ...)` is scaled by `rideSpeed(F)` (scooter 1.6×, car 2.5×).
+  - While she moves, `#mel.scoot` shows the scooter under her feet and `#mel.drive` shows the car around her (both injected in core.js). Neither shows during a paddle.
+- **Dolphin cruise boat:** the `boat` spot on the foreshore (a mooring post with a sign until bought, then the boat at the end of the jetty).
+  - `startCruise`: `S.cruise.until` lasts 45 seconds. The boat gets `.cruising` (CSS keyframes up the coast and back), with heads aboard and extra dolphins alongside.
+  - Mel, Evan and Maple are hidden (`cruisingNow` in the per-frame visibility lines). `endCruise` puts them back on the sand; 3 xp once a day. Not at night.
+- **Cellar door:** the `cdoor` station on the wine shop's west wall (dashed with a sign until built). `INNER.cellar` has its way back on the east wall.
+  - `ROOMS.cellar` has the wine wall, the tasting bar (`flight`: 2 xp once a day), barrel racks and a high table.
+  - It adds ×1.15 to the wine shop's footfall in `sellTick`.

@@ -3,7 +3,7 @@
 // jetty with its paddleboard rack, the boardwalk, Norfolk pines, and two family houses: Mum and Dad's, and Marcus
 // and Angelina's. Gates: east to the field, south down the boardwalk to the flower farm.
 import { ink } from "../util.js";
-import { sk, tapeLabel, house, flowers } from "./scenes.js";
+import { sk, tapeLabel, house, flowers, artCtx } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
 import { archGate } from "./orchard.js";
 
@@ -52,7 +52,20 @@ export function shoreArt(){
     {art: `<path d="M318 168 l4 -10 l4 10z M330 164 v-8 l6 -2 v8" style="fill:#2F2B28"/><rect x="300" y="210" width="120" height="6" style="fill:#3E6B8C"/>`, lines: `<circle cx="333" cy="164" r="2"/><circle cx="339" cy="162" r="2"/>`});
   const marcus = house("marcus", 340, 384, 120, 76, "#FFF3E6", "#8E5B9A", "Marcus and Angelina's", "var(--blush)",
     {art: `<path d="M452 396 h-10 v10" style="fill:none"/><circle cx="356" cy="452" r="5" style="fill:#7FA35A"/><circle cx="444" cy="452" r="5" style="fill:#7FA35A"/>`, lines: `<path d="M352 456 h8 l-1 4 h-6z M440 456 h8 l-1 4 h-6z"/>`});
-  return lampDefs + ground + sea + jetty + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench + rack + mumdad + marcus
+  // the dolphin cruise boat (a big goal) at the end of the jetty; out on a cruise it sails up the coast and back with
+  // the family aboard and dolphins alongside. Before it's bought: a mooring post with a "your boat here" sign
+  const G = artCtx(), F = G.F(), S = G.S ? G.S() : {}, boatOwned = !!((F.goals || {}).boat), cruising = !!(S.cruise && Date.now() < S.cruise.until);
+  const boat = boatOwned ? `<g data-place="boat" aria-label="Dolphin cruise boat"><ellipse class="hov" cx="206" cy="552" rx="30" ry="9" style="fill:var(--butter)"/>
+      <g class="${cruising ? "cruising" : "moored"}"><g ${W}>
+        <path d="M30 506 h86 l-10 18 h-66z" style="fill:#FFFDF6"/><path d="M34 514 h78" style="stroke:#3E6B8C" stroke-width="3"/><rect x="58" y="488" width="34" height="18" rx="3" style="fill:#CFE0EE"/><path d="M56 488 h38" style="stroke:#3E6B8C" stroke-width="2"/>
+        <path d="M100 488 v-26 l16 10z" style="fill:#E8566C"/>
+        ${cruising ? `<circle cx="64" cy="482" r="5" style="fill:#F8DECD"/><path d="M60 480 q4 -8 9 -1" style="fill:#2A211D"/><circle cx="78" cy="485" r="3.6" style="fill:#F8DECD"/><path d="M75 483 q3 -5 6 0" style="fill:#2A211D"/>` : ""}</g>
+        ${cruising ? `<g class="podhop">${dolphin(130, 500, 4, 0, false)}${dolphin(4, 520, 5, 1.6, true)}</g>` : ""}</g>
+      ${tapeLabel(206, 574, "Dolphin cruise", "var(--peri)", 10)}</g>`
+    : `<g data-place="boat" aria-label="The mooring: save up for a dolphin cruise boat"><ellipse class="hov" cx="206" cy="552" rx="26" ry="8" style="fill:var(--butter)"/>
+      ${sk(`<rect x="200" y="512" width="8" height="34" style="fill:var(--wood)"/><rect x="178" y="512" width="52" height="18" rx="2" style="fill:#FFFDF6"/>`, `<rect x="200" y="512" width="8" height="34"/><rect x="178" y="512" width="52" height="18" rx="2"/><path d="M186 521 h36" opacity=".55"/>`)}
+      ${tapeLabel(206, 574, "Boat mooring", "var(--peri)", 10)}</g>`;
+  return lampDefs + ground + sea + jetty + boat + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench + rack + mumdad + marcus
     + archGate("toFieldS", 500, 292, "The field", 470, 334, "var(--peri)", "Gate to the field")
     + archGate("toFlowersS", 250, 616, "Flower farm", 314, 604, "var(--blush)", "Gate to the flower farm");
 }
