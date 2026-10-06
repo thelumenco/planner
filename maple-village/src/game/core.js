@@ -8,7 +8,7 @@ import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, o
 import { vineSpot } from "../art/vineyard.js";
 import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, TAPAS, cookTick, cookLine } from "./kitchen.js";
 import { questBoost } from "./vineyard.js";
-import { vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, counterPanel, boxPanel, cafePanel, olivePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel } from "./vineyard.js";
+import { vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, counterPanel, boxPanel, cafePanel, olivePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel, stallMarketPanel } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA, completeInSunsama, subtaskInSunsama } from "./sunsama.js";
@@ -40,9 +40,9 @@ import { addReminder, cancelReminder, upcoming as upcomingReminders, dueNow, fmt
 import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos } from "./npcs.js";
 import { dishArt, glassArt } from "../art/wine.js";
 import { fieldArt } from "../art/field.js";
-import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf } from "./orchard.js";
+import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
-import { tourNow } from "./tours.js";
+import { tourNow, eventNow, stallAt } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
@@ -239,7 +239,7 @@ const SHED = {
   compost:   {n: "Compost bin", price: 150, ico: "compost", what: "Everything grows a quarter faster."},
   sprinkler: {n: "Sprinkler", price: 300, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."}
 };
-let orView = null, orAt = null, orTab = null, potItem = null, kView = null, reviewOpen = false, vyView = null, vyAt = null, vaultView = null, lettersOpen = false, trophyView = null, routOpen = false, kudosOpen = false, deskOpen = false, shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false, clientsOpen = false, planOpen = false, revOpen = false, jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null;
+let fieldView = null, orView = null, orAt = null, orTab = null, potItem = null, kView = null, reviewOpen = false, vyView = null, vyAt = null, vaultView = null, lettersOpen = false, trophyView = null, routOpen = false, kudosOpen = false, deskOpen = false, shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false, clientsOpen = false, planOpen = false, revOpen = false, jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null;
 let jv = {mode: "shelf", blobs: [], note: ""};   // the emotion shelf panel: shelf, make (picker) or jar (one jar)
 // Guided breathing in the calm corner: a ring grows as she breathes in (4 s), holds (2 s) and shrinks as she breathes out (6 s)
 const BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]], CYCLE = 12;
@@ -840,7 +840,7 @@ const PLACES = {home: "home", house: "home", fridge: "home:fridge", kitchen: "ho
   "wine shop kitchen": "kitchen", "shop kitchen": "kitchen", larder: "kitchen:larder", oven: "kitchen:oven", stove: "kitchen:stove", "cheese press": "kitchen:press", "olive tree": "vineyard:olive", olives: "vineyard:olive",
   "weekly review": "hall:review", review: "hall:review", scrapbook: "hall:review", "week review": "hall:review",
   field: "field:lake", lake: "field:lake", swans: "field:lake", picnic: "field:picnic", football: "field:pitch", park: "field:lake",
-  orchard: "orchard:farmshop", "farm shop": "orchard:farmshop", "fruit": "orchard:farmshop", "flower farm": "flowers", "ma ma": "cottage", "ma ma's cottage": "cottage", cottage: "cottage", "grandma": "cottage",
+  orchard: "orchard:farmshop", "farm shop": "orchard:farmshop", "tour sign": "orchard:toursign", tours: "orchard:toursign", "fruit": "orchard:farmshop", "flower farm": "flowers", "ma ma": "cottage", "ma ma's cottage": "cottage", cottage: "cottage", "grandma": "cottage",
   vineyard: "vineyard:barrels", vines: "vineyard:vinestall", "barrel shed": "vineyard:barrels", barrels: "vineyard:barrels", "wine shop": "wineshop", "honesty box": "wineshop:hbox", "tasting room": "wineshop:tasting", playground: "vineyard:pslide",
   "town hall": "hall", hall: "hall", bank: "bank", vaults: "bank", savings: "bank", "kind words": "trophy:kudos", "trophy room": "trophy", courtyard: "trophy", fountain: "trophy:fountain", trophies: "trophy", "trophy book": "trophy:tbook", affirmations: "trophy:affirm", routines: "room:routines", "routine board": "room:routines", compliments: "trophy:kudos", "client table": "hall:clients", clients: "hall:clients", "planning table": "hall:table", plans: "hall:table", revenue: "hall:revenue", "revenue chart": "hall:revenue", chord: "chord", "makers lane": "lane:plot3", lane: "lane:plot3", library: "fresh", "fresh pages": "fresh", chico: "chico", "post office": "post", post: "post", town: "village:board"};
 function walkToPlace(name){
@@ -910,7 +910,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"field|lake|picnic|football|orchard|farm shop|flower farm|ma ma's cottage|wine shop kitchen|larder|olive tree|weekly review|vineyard|barrels|wine shop|honesty box|tasting room|playground|home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"field|lake|picnic|football|orchard|farm shop|tour sign|flower farm|ma ma's cottage|wine shop kitchen|larder|olive tree|weekly review|vineyard|barrels|wine shop|honesty box|tasting room|playground|home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -1297,7 +1297,7 @@ function showPanel(hasCtx, skin){
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
   if (kid.open) { kid.open = null; stopKidGame(); ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1345,9 +1345,10 @@ function ctx(){
   else if (deskOpen && scene === "home") h = deskPanel();
   else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
   else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
+  else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : marketStallPanel(st); }
   else if (orView === "pot" && potItem) h = potPanel(F, potItem);
   else if (orView === "tea" && scene === "cottage") h = teaPanel(F, dayKey(), isHere("mama"));
-  else if (orView && (scene === "orchard" || scene === "flowers")) h = orView === "shop" ? shopPanel(F, dayKey(), orTab) : spotPanel(F, orAt.where, orAt.i, dayKey());
+  else if (orView && (scene === "orchard" || scene === "flowers")) h = orView === "shop" ? shopPanel(F, dayKey(), orTab) : orView === "tours" ? tourBoard(F, dayKey(), sgHM()) : spotPanel(F, orAt.where, orAt.i, dayKey());
   else if (kView && scene === "kitchen") h = kView === "oven" ? ovenPanel(F) : kView === "press" ? pressPanel(F) : kView === "stove" ? stovePanel(F, dayKey()) : larderPanel(F);
   else if (vyView && (scene === "vineyard" || scene === "wineshop")) h = vyView === "olive" ? olivePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F)
     : vyView === "shelf" ? shelfPanel(F) : vyView === "menu" ? menuPanel(F, dayKey()) : vyView === "counter" ? counterPanel(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter(n => n.id !== "celeste" && isHere(n.id)).map(n => n.name), dayKey());
@@ -1457,20 +1458,20 @@ function ctx(){
   if (deskOpen && scene === "home") wireDesk(c, () => ctx());
   if (reviewOpen && scene === "hall") wireReview(c, F, {save: () => save(), rerender: () => ctx(), say: l => speak(l, 5000, true), sfx, canSend: !rvw.noMcp, today: dayKey(), coins: n => { F.coins += n; S.earned = (S.earned || 0) + n; flash(`+${n} coins: weekly review`); }});
   if (kView && scene === "kitchen") wireKitchen(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, today: dayKey()});
-  if (orView) wireOrchard(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, today: dayKey(), where: orAt && orAt.where, i: orAt && orAt.i, item: potItem,
+  if (orView || (fieldView && scene === "field" && (stallAt(dayKey(), sgHM(), +fieldView.slice(-1)) || {}).kind === "orchard")) wireOrchard(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, today: dayKey(), where: orAt && orAt.where, i: orAt && orAt.i, item: potItem,
     tab: k => { orTab = k; ctx(); }, placed: () => { orView = null; potItem = null; ctx(); drawScene(); }, tea: haveTea});
   if (vyView && (scene === "vineyard" || scene === "wineshop")) wireVine(c, F, {harvest: (festivalOn(dayKey()) || {}).id === "harvest", save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, r: vyAt && vyAt.r, i: vyAt && vyAt.i});
   if (vaultView && scene === "bank") {
     c.querySelectorAll("[data-vopen]").forEach(el => { const go = () => { bv.slot = +el.dataset.vopen; bv.mode = "jar"; vaultView = "jar"; ctx(); }; el.onclick = go; el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } }; });
-    if (vaultView === "jar") wireVault(c, {rerender: () => { ctx(); drawScene(); }, undoable, sfx, close: () => { vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; ctx(); drawScene(); }, poured: vaultPoured});
+    if (vaultView === "jar") wireVault(c, {rerender: () => { ctx(); drawScene(); }, undoable, sfx, close: () => { vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; ctx(); drawScene(); }, poured: vaultPoured});
   }
   c.querySelectorAll("[data-letters]").forEach(b => b.onclick = () => { journalOpen = false; lettersOpen = true; lv.mode = "home"; sfx("paper", true); ctx(); });
   if (lettersOpen && (scene === "room" || scene === "base")) wireLetters(c, {rerender: () => ctx(), sample: sampleCap, toJournal: t => { const e = addEntry(t, "letter"); if (e) { sfx("chime"); flash("Saved to your journal"); } return !!e; },
     sent: (k, d) => { sfx("paper"); speak(k === "universe" ? "Posted. The universe always writes back. Keep an eye on the letterbox." : `Sealed. It'll arrive in your letterbox on ${new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", {day: "numeric", month: "long", year: "numeric", timeZone: "UTC"})}.`, 5000); }});
   if (routOpen && scene === "room") wireRoutines(c, {rerender: () => ctx(), undoable, done: routineCoins});
-  if (trophyView && scene === "trophy") { wireTrophies(c, F, {save: () => save(true), undoable, rerender: () => { ctx(); drawScene(); }, close: () => { trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; ctx(); drawScene(); }});
+  if (trophyView && scene === "trophy") { wireTrophies(c, F, {save: () => save(true), undoable, rerender: () => { ctx(); drawScene(); }, close: () => { trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; ctx(); drawScene(); }});
     if (trophyView === "fountain") wireFountain(c, {sample: sampleCap, rerender: () => ctx(),
-      coin: () => { trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; ctx(); sfx("coin"); mprop("sparkle", 260 + rnd(-20, 20), 400); speak(pick(["Plink. Wish made. I won't ask.", "A coin in the fountain. Something good's coming.", "Make it a big one."]), 3500); },
+      coin: () => { trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; ctx(); sfx("coin"); mprop("sparkle", 260 + rnd(-20, 20), 400); speak(pick(["Plink. Wish made. I won't ask.", "A coin in the fountain. Something good's coming.", "Make it a big one."]), 3500); },
       keep: v => { F.vision = v; save(); }});
     if (trophyView === "affirm") { F.affirm = F.affirm || {}; wireAffirm(c, F.affirm, (F.affirm.day === dayKey() && F.affirm.items && F.affirm.items.length) ? F.affirm.items : dailyAffirmations(), {save: () => save(), undoable, rerender: () => ctx(), fresh: freshAffirmations}); } }
   if (kudosOpen && scene === "trophy") wireKudos(c, {rerender: () => { ctx(); drawScene(); }, undoable, done: () => { sfx("chime"); hearts(2); speak("Pinned up. That's a keeper.", 3000); }});
@@ -1481,18 +1482,20 @@ function ctx(){
   c.querySelectorAll(".item[data-id]").forEach(b => b.onclick = () => {
     const id = b.dataset.id;
     if (scene === "market") { shopTab === "sell" ? sell(id) : buy(id); }
+    else if (scene === "field" && fieldView) { buy(id); ctx(); }   // a market or fair stall
     else if (scene === "farm") plant(selPlot, id);
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; ctx(); });
+  c.querySelectorAll("[data-fair]").forEach(b => b.onclick = () => fairActivity(b.dataset.fair));
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
   c.querySelectorAll('[data-rec="stop"]').forEach(b => b.onclick = () => { setMusic(false); speak("Needle up. Quiet time.", 2500); ctx(); drawScene(); });
   const rv = c.querySelector("#recVol"); if (rv) rv.oninput = () => setMusicVol(+rv.value);
   c.querySelectorAll("[data-calm]").forEach(b => b.onclick = () => { const k = b.dataset.calm;
-    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; A.decompNow(); drawScene(); } else startBreath(+k); });
+    if (k === "stop") stopBreath(false); else if (k === "decompress") { calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; A.decompNow(); drawScene(); } else startBreath(+k); });
   if (breath) tickBreath();
   if (journalOpen && scene === "room") wireJournal(c, undoable, e => { if (e) { sfx("chime"); speak(S.mode === "decompress" && S.decompFree ? "Written down. Now you can let it go." : "Page kept. Lovely.", 3500); } ctx(); });
   if (scratchOpen && scene === "hall") wireScratch(c, undoable, () => ctx());
@@ -1688,13 +1691,13 @@ const svg = $("world");
 const evanNight = () => { const m = sgHM(); return m >= 20*60 || m < 7*60; };
 const evanHere = () => scene === "kidroom" || ((scene === "base" || scene === "home" || scene === "vineyard" || scene === "field") && !evanNight());
 function outside(){ return OUTDOOR.includes(scene); }
-const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : (scene === "lane" || scene === "vineyard" || scene === "orchard" || scene === "flowers") ? [14, 140, W - 14, HH - 14] : scene === "field" ? [14, 164, W - 14, HH - 14] : [34, 168, W - 34, 612];
+const bounds = () => scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : (scene === "lane" || scene === "vineyard" || scene === "orchard" || scene === "flowers") ? [14, 140, W - 14, HH - 14] : scene === "field" ? [14, 150, W - 14, HH - 14] : [34, 168, W - 34, 612];
 
 function setScene(id, at){
   const w = $("world"), from = scene; w.classList.add("fading");
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
@@ -1718,6 +1721,7 @@ function setScene(id, at){
     else if (id === "hall" && kudosCount() >= 3 && Date.now() - (F.kudosSeen || 0) > 7*864e5 && S.kudosSaid !== dayKey()) { S.kudosSaid = dayKey(); setTimeout(() => speak(`${kudosCount()} kind words out in the courtyard. Fancy a read?`, 5000), 1500); }
     if (id === "trophy") { fetchObjectives(); if (F.revTarget) loadRevenue().then(checkTrophies); setTimeout(() => speak(onPedestals(F).length ? "The courtyard. Look at all this. You did that." : "The courtyard. Your first trophy goes on a pedestal.", 4000), 900); }
     if (id === "orchard" || id === "flowers") orchardArrive(id);
+    if (id === "field") { const ev = eventNow(dayKey(), sgHM()); if (ev && S.eventSaid !== dayKey()) { S.eventSaid = dayKey(); setTimeout(() => speak(ev.kind === "market" ? "It's the Sunday farmers market! Stalls all along the top, our wine stall with Ines, and Ma Ma's fruit and flowers." : "It's the field fair! Kites, face painting, lemonade. Evan's going to love this.", 6000), 1200); } }
     if (id === "market") speak(isHere("hana") ? "Welcome to the market! Hana's in. Have a browse." : NPCS.find(n => n.id === "hana").away, 4500);
   }, 220);
 }
@@ -1743,7 +1747,7 @@ function go(target, x, y, fn){
     if (INNER[target]) { const I = INNER[target]; legs.push({scene:I.parent, x:I.door[0], y:I.door[1], fn:() => setScene(target, I.arrive)}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -1811,10 +1815,15 @@ function arriveVillageSpot(id){
   if (v.bridge) { atSpot = null; setScene(v.bridge, ARRIVE[scene + ">" + v.bridge]); return; }
   if (id === "plot3" || id === "plot4") { speak(v.line, 4000); render(); return; }
   if (id === "olive") { vyView = "olive"; sfx("paper", true); render(); return; }
+  if (id === "toursign") { orView = "tours"; sfx("paper", true); render(); return; }
   if (id === "farmshop") { orView = "shop"; orTab = null; sfx("paper", true); if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma picked them for you.", "Fresh this morning. Choose any.", "For you, no charge. You're my girl."])); render(); return; }
   if (id === "barrels") { vyView = "barrels"; sfx("paper", true); render(); return; }
   if (id === "vinestall") { vyView = "stall"; sfx("paper", true); render(); return; }
-  if (id === "pswing" || id === "pslide" || id === "pseesaw") { playground(id); return; }
+  if (id === "pswing" || id === "pslide" || id === "pseesaw" || id === "pround") { playground(id); return; }
+  if (/^mstall\d$/.test(id)) { const st = stallAt(dayKey(), sgHM(), +id.slice(-1)); if (!st) { speak(eventNow(dayKey(), sgHM()) ? "Nobody's set up a stall there today." : "The stalls are packed away till the next market.", 3500); render(); return; }
+    fieldView = id; orTab = null; sfx("paper", true); if (st.kind === "wine") { vineTick(); speak("Behind the stall. Shoppers stop by more while you serve.", 3500); }
+    else if (st.kind === "orchard") { orchardTick(); if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma brought plenty.", "Everybody wants Ma Ma's fruit today.", "For you, free. For them, they pay!"])); }
+    else if (isHere(st.id)) npcSay(st.id, st.line); render(); return; }
   if (id === "lake" || id === "picnic" || id === "pitch") { fieldSpot(id); return; }
   // an outdoor quest at home base (Evan outing at the swing, garden jobs at the shed, a walk by the pond)
   if (scene === "base" && phase() === "task") { const t = remaining()[0];
@@ -1843,7 +1852,7 @@ function reviewNudge(){
 }
 /* ---------- The vineyard ---------- */
 // Mel's serving while she's standing at the wine shop counter
-const serving = () => scene === "wineshop" && atSpot === "wcounter";
+const serving = () => (scene === "wineshop" && atSpot === "wcounter") || (scene === "field" && /^mstall\d$/.test(atSpot || "") && (stallAt(dayKey(), sgHM(), +atSpot.slice(-1)) || {}).kind === "wine");
 // Every minute (and on load): customers buy from the shelves, the vineyard hands water thirsty vines.
 // Ma Ma picks what's ripe and the farm shop sells; if Mel's watching, the trees and beds redraw
 function orchardTick(){
@@ -1854,7 +1863,7 @@ function orchardTick(){
   save(scene === "orchard" || scene === "flowers");
 }
 function vineTick(){
-  const out = sellTick(F, {serving: serving(), harvest: (festivalOn(dayKey()) || {}).id === "harvest"});
+  const out = sellTick(F, {serving: scene === "wineshop" && serving(), stall: scene === "field" && serving(), harvest: (festivalOn(dayKey()) || {}).id === "harvest"});
   // Pilar runs the kitchen on her shifts (tells Mel what she's done only while Mel's in there with her)
   if (whereIs("pilar") === "kitchen") { const done = cookTick(F, dayKey()); if (done.length) { save(); if (scene === "kitchen" && !quietNow() && $("panel").hidden) speak(cookLine(done), 5500); } }
   // at closing, leftover tapas of the day go to the staff for dinner
@@ -1865,6 +1874,21 @@ function vineTick(){
   if (out.coins && serving()) { sfx("coin"); flash(`+${out.coins} coins from the wine shop`); }
   else if (out.mins >= 30 && out.coins) setTimeout(() => speak(`While you were away, villagers bought ${out.bottles ? `${out.bottles} bottle${out.bottles > 1 ? "s" : ""}` : ""}${out.bottles && out.glasses ? " and " : ""}${out.glasses ? `${out.glasses} glass${out.glasses > 1 ? "es" : ""}` : ""} of your wine. ${vineState(F).box} coins are waiting in the honesty box.`, 6500), 2500);
   if (typing) persist("fox"); else save(scene === "vineyard" || scene === "wineshop");
+}
+// A stall at the market or fair: what it sells (bought like at Hana's), or an activity for Evan (a kite, face paint)
+function marketStallPanel(st){
+  const ev = eventNow(dayKey(), sgHM()); if (!ev) return "";
+  const who = (NPCS.find(n => n.id === st.id) || {name: "Someone"}).name;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(st.n)}</h2><p class="sub">${esc(who)}'s stall at the ${esc(ev.name.toLowerCase())}. "${esc(st.line)}"</p>`;
+  if (st.items.length) h += `<div class="items shop">${st.items.map(id => itemBtn(id, `<b>${ITEMS[id].price}</b> ${icon("coin", 13)}`, F.coins < ITEMS[id].price, F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.</p>`;
+  if (st.act) h += `<div class="actions"><button class="btn primary" data-fair="${st.act}" ${evanHere() ? "" : "disabled"}>${st.act === "kite" ? "Get Evan a kite (3 coins)" : "Face paint for Evan (3 coins)"}</button></div>${evanHere() ? "" : `<p class="muted">Bring Evan along for this one.</p>`}`;
+  return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
+function fairActivity(k){
+  if (!evanHere() || F.coins < 3) return; F.coins -= 3; gainXp(1); sfx("chime"); fieldView = null; ctx();
+  if (k === "kite") { evan.tx = 200; evan.ty = 420; evan.run = true; evan.wait = 10; setTimeout(() => evanSays(pick(["kite! up up!", "it's flying!", "look Mama!"])), 900); speak("A red kite for Evan. He's running with it and it's actually flying. Mostly.", 5000); }
+  else { setTimeout(() => evanSays(pick(["I'm a tiger! RAWR", "butterfly!", "dinosaur face!"])), 800); speak("Face paint for Evan. He chose a tiger and won't stop roaring.", 5000); }
+  [0, 300].forEach((d, k2) => setTimeout(() => mprop("heart", evan.x + (k2 - .5)*20, evan.y - 44, 1800), d)); save(true);
 }
 // The field: feed the swans (once a day), a rest or a picnic on the blanket, a kickabout with Evan
 function fieldSpot(id){
@@ -1897,7 +1921,7 @@ function playground(id){
   const v = VILLAGE[id];
   if (!evanHere()) { speak(v.line, 3500); render(); return; }
   evan.tx = v.door[0] + rnd(-6, 6); evan.ty = v.door[1] - 6; evan.run = true; evan.wait = 8;
-  setTimeout(() => evanSays(pick(id === "pswing" ? ["wheee!", "push me!", "higher!"] : id === "pslide" ? ["again!", "whoosh!", "down!"] : ["up!", "down!", "bumpy!"])), 900);
+  setTimeout(() => evanSays(pick(id === "pswing" ? ["wheee!", "push me!", "higher!"] : id === "pslide" ? ["again!", "whoosh!", "down!"] : id === "pround" ? ["round round!", "faster!", "dizzy!"] : ["up!", "down!", "bumpy!"])), 900);
   if (isHere("pip")) setTimeout(() => npcSay("pip", pick(["Evan! Over here!", "My turn, then your turn!", "Race you to the slide!"])), 1800);
   speak(v.line, 3500); render();
 }

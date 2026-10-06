@@ -6,6 +6,7 @@
 import { esc, plain, H, now } from "../util.js";
 import { NPCS } from "../data/npcs.js";
 import { ITEMS } from "../data/items.js";
+import { eventNow } from "./tours.js";
 import { icon } from "../art/icons.js";
 import { DISHES, TAPAS } from "./kitchen.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
@@ -128,7 +129,7 @@ export function serveGuest(F, opts = {}){
   const b = opts.tourist && Math.random() < .5 && (v.shelf.find(x => x.id === s.id && x.n > 0) || v.shelf.find(x => x.n > 0));
   if (b) { b.n--; out.bottle = b.name; out.coins += b.price; v.sold++; out.bottles = 1; }
   v.shelf = v.shelf.filter(x => x.n > 0 || x.open > 0);
-  if (opts.serving) F.coins += out.coins; else v.box += out.coins;
+  if (opts.serving || opts.stall) F.coins += out.coins; else v.box += out.coins;
   v.glasses++; v.plates += out.plates;
   const day = new Date(Date.now() + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
   v.today.glasses++; v.today.plates = (v.today.plates || 0) + out.plates; v.today.coins += out.coins; v.today.bottles += out.bottles || 0;
@@ -150,6 +151,12 @@ export function sellTick(F, opts = {}){
         if (st) { v.grapes[st] -= PER_BATCH; v.barrels[i] = {style: st, start: at, dur: STYLES[st].dur, stage: 1}; out.filled++; } });
     }
     if (w.staff && v.help.stock && v.cellar.length) { out.stocked += v.cellar.reduce((n, c) => n + c.n, 0); v.cellar.slice().forEach(c => stock(F, c.id)); }
+    // the Sunday farmers market: the wine shop's stall at the field sells from these same shelves (Ines minds it;
+    // standing at the stall yourself brings more people over, and they pay you)
+    const ev = eventNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm);
+    if (ev && ev.wine) { const st = opts.stall && k === 1 ? 3 : 1, stock = v.shelf.filter(x => x.n > 0);
+      if (stock.length && Math.random() < .012*st) { const b = stock[Math.floor(Math.random()*stock.length)]; b.n--; out.bottles++; out.coins += b.price; out.market = (out.market || 0) + 1; }
+      if (Math.random() < .008*st) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.market = (out.market || 0) + 1; } } }
     if (hm < 10*60 || hm >= 22*60) continue;
     const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); const crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0);
     if (!onShelf.length && !open && !platesLeft(v) && !crate.length) continue;
@@ -157,11 +164,11 @@ export function sellTick(F, opts = {}){
     const f = footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1);
     const gameDay = new Date(at + off + 6*H).toISOString().slice(0, 10);   // the game's day (it turns over at 2am)
     const plate = () => servePlate(v, gameDay, out);
-    if (onShelf.length && Math.random() < .0012*f) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; s.n--; out.bottles++; out.coins += s.price; }
-    if (Math.random() < .001*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
+    if (onShelf.length && Math.random() < .002*f) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; s.n--; out.bottles++; out.coins += s.price; }
+    if (Math.random() < .0016*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
       const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); if (Math.random() < .6) plate(); } }
-    if (Math.random() < .0006*f) plate();   // someone pops in just for a bite
-    if (crate.length && Math.random() < .0012*f) { const id = crate[Math.floor(Math.random()*crate.length)]; v.fruit[id]--; if (!v.fruit[id]) delete v.fruit[id]; out.fruit = (out.fruit || 0) + 1; out.coins += (ITEMS[id] && ITEMS[id].sell) || 3; }   // fruit from Ma Ma's orchard
+    if (Math.random() < .001*f) plate();   // someone pops in just for a bite
+    if (crate.length && Math.random() < .0018*f) { const id = crate[Math.floor(Math.random()*crate.length)]; v.fruit[id]--; if (!v.fruit[id]) delete v.fruit[id]; out.fruit = (out.fruit || 0) + 1; out.coins += (ITEMS[id] && ITEMS[id].sell) || 3; }   // fruit from Ma Ma's orchard
   }
   v.shelf = v.shelf.filter(s => s.n > 0 || s.open > 0);
   if (!out.coins && !out.watered && !out.picked && !out.filled && !out.stocked) return null;
@@ -249,6 +256,15 @@ export function cafePanel(F, guests, today){ const v = vineState(F), open = v.sh
     ${v.staffNote && v.staffNote.plates ? `<p class="muted">Last night's staff dinner: ${esc(v.staffNote.dish.toLowerCase())}. Marco, Ines and Celeste left something in the larder to say thanks.</p>` : ""}
     <p class="muted">Served so far: ${v.glasses} glass${v.glasses === 1 ? "" : "es"} and ${v.plates} plate${v.plates === 1 ? "" : "s"}. Food brings more people in, and the tapas of the day most of all.</p>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`; }
+// The wine shop's stall at the Sunday farmers market: the same bottles as the shop's shelves (stock is shared)
+export function stallMarketPanel(F, serving){
+  const v = vineState(F), t = v.today;
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(shopName(F))}: market stall</h2>
+    <p class="sub">${serving ? "You're serving at the stall: more people stop by, and they pay you straight away." : "Ines is minding the stall. Step behind it to serve yourself."} These are the same bottles as the shop's shelves, so anything sold here comes off them.</p>
+    ${v.shelf.length ? `<ul class="hlist wlist">${v.shelf.map(s => `<li><span class="wpic">${bottleArt(s.type, 40)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${STYLES[s.type].n} · ${s.n} bottle${s.n === 1 ? "" : "s"} left${s.open ? " · one open for tastings" : ""}</small></span><span class="mprice">${s.price}</span></li>`).join("")}</ul>` : `<p class="muted">Nothing on the shelves to bring. Bottle some wine and stock the shop first.</p>`}
+    <p class="muted">Today: ${t.bottles} bottles and ${t.glasses} glasses sold, ${t.coins} coins (shop and stall together).</p>
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
 // The chalkboard menu: everything that's actually available right now, with prices
 export function menuPanel(F, today){
   const v = vineState(F), t = v.tapas && v.tapas.day === today && v.tapas.plates > 0 && TAPAS[v.tapas.id] ? v.tapas : null;

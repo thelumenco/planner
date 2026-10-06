@@ -85,7 +85,12 @@ function playArt(){
       `<rect x="364" y="572" width="92" height="7" rx="3" transform="rotate(-8 410 576)"/>`)}</g>
     ${sk(`<path d="M402 592 l8 -16 l8 16z" style="fill:#C46A4A"/>`, `<path d="M402 592 l8 -16 l8 16z"/>`)}
     ${tapeLabel(410, 620, "Seesaw", "var(--sky)", 10)}</g>`;
-  return `<g filter="url(#wob)"><ellipse cx="262" cy="584" rx="236" ry="48" style="fill:#EAD9B0"/></g>` + swing + slide + seesaw;
+  // the roundabout (a little nod to Swings & Roundabouts): it turns slowly
+  const round = `<g data-place="pround" aria-label="Roundabout"><ellipse class="hov" cx="470" cy="508" rx="34" ry="9" style="fill:var(--butter)"/>
+    ${sk(`<ellipse cx="470" cy="502" rx="28" ry="9" style="fill:#E8566C"/><ellipse cx="470" cy="498" rx="28" ry="9" style="fill:#F3C969"/>`, `<ellipse cx="470" cy="502" rx="28" ry="9"/><ellipse cx="470" cy="498" rx="28" ry="9"/><path d="M470 498 v-16 M458 488 h24"/>`)}
+    <g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.6" fill="none"><path d="M470 498 l20 -3 M470 498 l-20 -3 M470 498 l8 6 M470 498 l-8 6"><animateTransform attributeName="transform" type="scale" values="1 1; -1 1; 1 1" dur="6s" repeatCount="indefinite" additive="sum"/></path></g>
+    ${tapeLabel(474, 536, "Roundabout", "var(--peri)", 10)}</g>`;
+  return `<g filter="url(#wob)"><ellipse cx="262" cy="584" rx="236" ry="48" style="fill:#EAD9B0"/></g>` + swing + slide + seesaw + round;
 }
 export function vineyardArt(){
   const G = artCtx(), v = G.vine();

@@ -730,3 +730,27 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - `paySunsamaSubs`: subtasks ticked in Sunsama, on today's tasks and ahead tasks, pay like village ticks via the shared `paySub` (5 in a treadmill batch, else 1). They're recorded in `F.subDone[task].paid`.
   - The first run only records what's already ticked (`F.subBaseline`), so nothing pays retroactively.
   - The stub's `?ahead=1` adds such a task, for the test.
+
+### Round 57: busy weekends: families, roundabout, Sunday market, field fair
+- **Busier wine shop.**
+  - Background rates are up about 1.6×: bottle .002, glass .0016, plate alone .001, fruit .0018 per minute × footfall.
+  - Out-of-towners take more tasting seats: weekdays at 12, 1, 2:30, 4, 5 and 8:30pm; weekends also at 11 and 4:30.
+- **Tourist families** (`FAMILIES` and `familyVisits`/`familySlot` in tours.js; NPCs with `tourist: true`, and the kids also `kid: true`): parents Sam, Priya, Jonah and Mia, kids Lily, Max, Noah, Zara, Ollie and Ava.
+  - The kids run round the vineyard playground while a parent watches.
+  - One family on weekday afternoons (3:30–5pm). At weekends it's busy 10am–12:30 and 12:45–5:30pm.
+  - On market and fair days two families go to the field first.
+- **Roundabout** at the vineyard playground (`pround`, turning slowly), a nod to Swings & Roundabouts; `playground()` handles Evan on it.
+- **Field events** (`eventOn` and `eventNow` in tours.js; `eventSlot` comes first in `slotNow`):
+  - Stalls stand in a row along the top of the field (`STALL_SPOTS`, six places; each stall's `at` says which). Spots are `mstall0`–`mstall5`; `stallAt(day, hm, i)` says which stall stands there now, and `core.js` routes the tap by its `kind`.
+  - The **Sunday farmers market** runs 8am–1pm every week. Stalls: Elena (cheese and olives, 0), Felix (honey, 1), **our wine stall** (2, `kind: "wine"`, minded by Ines), **Ma Ma's fruit and flowers** (3, `kind: "orchard"`), Grace (flower crowns, 4) and Dev (bakery, 5). Ordinary stalls sell with `buy()`.
+  - The **field fair** runs on the last Saturday of the month, 10am–4pm. Hiro's kites and Aiko's face painting are activities for Evan (3 coins: `fairActivity`); Ben has lemonade and apples, and Clara has snacks.
+  - The art draws bunting and the event's name along the top, the stalls, a second picnic blanket, and kites at the fair. The pitch stays.
+  - Shoppers come in two waves of 4 (villagers, spare out-of-towners, Sam and Priya; never anyone on a tour). They browse along the stalls, then in the second half of each wave two of them sit on the picnic blankets (`PICNICKERS`). Pip runs about.
+  - Stall keepers are never picked for tours or tasting seats that day; Ma Ma doesn't guide Sunday tours.
+- **Wine stall:** it sells from the shop's own `v.shelf` (stock is shared). In `sellTick` the market adds bottle .012 and glass .008 per minute while it's open. Standing at the stall (`serving()` covers the field stall on market days) triples that and pays Mel directly (`opts.stall`). `stallMarketPanel` lists the shelf.
+- **Ma Ma's market stall** shares the farm shop's `o.stock`: `shopPanel(F, today, tab, true)` is the market mode (Fruit and Flowers tabs only, no Plant tab), still free for Mel. While the market's on, `orchTick` sells from the stock at .008 a minute into Ma Ma's tin (the farm shop's own 9–6 rate is replaced during those hours).
+
+### Round 58: the market moves up top, Ma Ma's market stall, the tour sign
+- See Round 57 for the stall row along the top of the field (`STALL_SPOTS`, `stallAt`), picnickers and Ma Ma's market stall.
+- **Tour sign** in the orchard (`toursign`, by the path up to the field): `tourBoard(F, today, hm)` in orchard.js lists today's tours (time, guide, who's signed up with visitors marked, the fee, "on now"/"done"), or the next day with tours if today has none left. Chat can go there ("tour sign", "tours").
+- The field arch label moved to (318, 178) and the right-hand lamp to x 334 to make room.

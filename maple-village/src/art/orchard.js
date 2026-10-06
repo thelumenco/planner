@@ -93,11 +93,16 @@ export function orchardArt(){
   const trees = TREE_ROWS.map((y, r) => TREE_XS.map((x, c) => { const i = r*4 + c, p = o.trees[i], st = stateOf("tree", p, today);
     return `<g data-tree="${i}" aria-label="Tree spot ${i + 1}"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="30" ry="9" style="fill:var(--butter)"/>
       ${p ? `<g transform="translate(${x} ${y}) scale(1.25)" ${W}>${treeBody(p.k, st.stage, st.g)}</g>` : `<g ${W}><ellipse cx="${x}" cy="${y}" rx="14" ry="5" style="fill:#B08A6A"/><path d="M${x-4} ${y-1} q4 -3 8 0" opacity=".5"/></g>`}</g>`; }).join("")).join("");
-  return lampDefs + ground + cottage + shop
-    + archGate("toFieldO", 260, 150, "The field", 316, 182, "var(--peri)", "Path to the field and the lake")
+  // the tour signboard by the path up to the field: tap for today's tours and who's signed up
+  const sign = `<g data-place="toursign" aria-label="Tour sign"><ellipse class="hov" cx="298" cy="236" rx="24" ry="7" style="fill:var(--butter)"/>
+    ${sk(`<path d="M286 236 v-30 M310 236 v-30" stroke-width="3"/><rect x="280" y="200" width="36" height="24" rx="2" style="fill:#FFF6E8"/><path d="M286 208 h24 M286 214 h18 M286 219 h21" stroke-width="1" opacity=".55"/>`,
+      `<path d="M286 236 v-30 M310 236 v-30"/><rect x="280" y="200" width="36" height="24" rx="2"/>`)}
+    ${tapeLabel(298, 256, "Tours", "var(--sage)", 10)}</g>`;
+  return lampDefs + ground + cottage + shop + sign
+    + archGate("toFieldO", 260, 150, "The field", 318, 178, "var(--peri)", "Path to the field and the lake")
     + archGate("toBaseO", 500, 270, "Home", 474, 316, "var(--butter)", "Gate home")
     + archGate("toFlowers", 20, 270, "Flower farm", 70, 300, "var(--blush)", "Gate to the flower farm")
-    + [[220, 252], [312, 252]].map(([x, y]) => streetLamp(x, y)).join("") + trees;
+    + [[220, 252], [334, 252]].map(([x, y]) => streetLamp(x, y)).join("") + trees;
 }
 export function flowerFarmArt(){
   const o = orchState(artCtx().F()), today = artCtx().day();

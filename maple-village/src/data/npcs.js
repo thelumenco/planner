@@ -242,6 +242,26 @@ export const NPCS = [
     lines: ["First time here. It's gorgeous!", "We came for the wine and stayed for the view.", "Is it always this peaceful?", "I'm taking some of this home, for sure.", "Do you live here? Lucky you.", "My friends are going to be so jealous."],
     actLines: {sit: ["This rosé is lovely. Who makes it?", "Cheers! To holidays.", "I'm buying a bottle before I go."]},
     away: `${name}'s gone back to town.`})),
+  // Out-of-town families: a parent and their kids, who only come for the vineyard playground (and the field on market
+  // and fair days). tours.js (familyVisits) says when.
+  ...[["sam", "Sam", {skin: "#E8C4A0", hair: "#5A3A2A", hairStyle: "short", top: "#7FB8E8", bottom: "#4A5568", hat: "cap"}],
+    ["priya", "Priya", {skin: "#B07A55", hair: "#1F1A17", hairStyle: "long", top: "#E8566C", bottom: "#3F4A6B"}],
+    ["jonah", "Jonah", {skin: "#F2D3BC", hair: "#D9B46A", hairStyle: "short", top: "#9CC27E", bottom: "#5E5A55", extra: "glasses"}],
+    ["mia", "Mia", {skin: "#D9A882", hair: "#2B2320", hairStyle: "bob", top: "#F3C969", bottom: "#5E6E8C", hat: "sunhat"}]
+  ].map(([id, name, look]) => ({id, pitch: .95, name, job: "Visiting with the kids", tourist: true, look, routine: [],
+    intro: `Hi, I'm ${name}! We drove up for the day. The kids haven't stopped running since we got here.`,
+    lines: ["They'll sleep well tonight!", "A glass of wine while they play? Perfect day.", "We'll definitely be back.", "Is the roundabout always this popular?"],
+    away: `${name}'s family has gone home.`})),
+  ...[["lily", "Lily", {skin: "#E8C4A0", hair: "#5A3A2A", hairStyle: "long", top: "#F4C7CF", bottom: "#7FB8E8"}],
+    ["max", "Max", {skin: "#E8C4A0", hair: "#5A3A2A", hairStyle: "spiky", top: "#F3C969", bottom: "#4C7BB0"}],
+    ["noah", "Noah", {skin: "#B07A55", hair: "#1F1A17", hairStyle: "spiky", top: "#9CC27E", bottom: "#5E5A55"}],
+    ["zara", "Zara", {skin: "#F2D3BC", hair: "#D9B46A", hairStyle: "bob", top: "#C9A3E0", bottom: "#E8566C"}],
+    ["ollie", "Ollie", {skin: "#F2D3BC", hair: "#D9B46A", hairStyle: "short", top: "#F28C6A", bottom: "#3F4A6B"}],
+    ["ava", "Ava", {skin: "#D9A882", hair: "#2B2320", hairStyle: "bun", top: "#8FB3E8", bottom: "#F3C969"}]
+  ].map(([id, name, look]) => ({id, pitch: 1.45, name, job: "Here for the playground", tourist: true, kid: true, look, routine: [],
+    intro: `I'm ${name}! Wanna race?`,
+    lines: ["Push me on the swing!", "Again! Again!", "The roundabout is the BEST.", "I'm not dizzy. Okay, a bit dizzy.", "Can Evan play too?"],
+    away: `${name}'s gone home.`})),
   // The wine shop's cook: on her shifts she runs the kitchen from whatever's in the larder (see cookTick)
   {
     id: "pilar", pitch: 0.95, name: "Pilar", job: "Cooks in the wine shop kitchen",

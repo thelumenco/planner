@@ -1332,6 +1332,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#actors [data-npc="farid"]').count() + await page.locator('#actors .act-guide').count() >= 1, "Farid works the orchard (or is leading the tour)");
   await page.locator('#world [data-place="farmshop"]').dispatchEvent("click"); await page.waitForSelector("#ctx .ortour", { timeout: 15000 });
   check(/10am with .*11:30.*2pm.*4pm/.test(await page.locator("#ctx .ortour").textContent()), "the farm shop lists today's four tours and their guides");
+  await page.click('#ctx [data-close]'); await page.locator('#world [data-place="toursign"]').dispatchEvent("click"); await page.waitForSelector("#ctx .wlist", { timeout: 15000 });
+  check(await page.locator("#ctx .wlist li").count() === 4 && /on now/.test(await page.locator("#ctx").textContent()) && /Signed up: .*\(visiting\)/.test(await page.locator("#ctx").textContent()), "the tour sign shows today's tours, which one's on now, and who's signed up");
   await page.goto(url + "?seed=1&time=11:05&date=2026-10-10"); await page.waitForTimeout(2500);
   check(await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")).orch; return o.tin >= 12 && o.tin % 4 === 0 && o.toursPaid.done.includes(0); }), "when a tour finishes, its visitors pay 4 coins each into Ma Ma's tin");
   await page.goto(url + "?seed=1&time=18:00&date=2026-10-08"); await page.waitForTimeout(900);
@@ -1372,6 +1374,45 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="toFieldO"]').dispatchEvent("click");
   await page.waitForFunction(() => /field/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(true, "and the field is up the path from the top of the orchard");
+  await page.close();
+}
+{
+  // A busy weekend: tourist families at the vineyard playground (and a roundabout), the Sunday farmers market at the field
+  // with the wine shop's stall selling off the shop's own shelves, and the field fair on the last Saturday of the month
+  console.log("\nplayground families, farmers market, field fair");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`market pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/mktpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 100; f.vine = f.vine || {}; f.vine.shelf = [{id: "m1", name: "Market Red", type: "red", n: 40, price: 18, open: 0}]; f.vine.lastTick = Date.now() - 290*60e3;
+    f.orch = f.orch || {}; f.orch.stock = {apple: 60, "stem:rose": 20}; f.orch.lastTick = Date.now() - 290*60e3;
+    localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
+  const kids = ["lily", "max", "noah", "zara", "ollie", "ava"];
+  await page.goto(url + "?reset=1&seed=1&time=10:40&date=2026-10-10"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1200);
+  check(await page.locator("#actors .npc").evaluateAll((n, k) => n.filter(x => k.includes(x.dataset.npc)).length, kids) >= 3 && await page.locator('#world [data-place="pround"]').count() === 1, "on a Saturday morning visiting families' kids fill the playground, roundabout and all");
+  await page.goto(url + "?seed=1&time=12:55&date=2026-10-11&mktpatch=1"); await page.waitForTimeout(2500);
+  check(await page.evaluate(() => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return v.shelf[0].n < 40; }), "on a Sunday morning the market stall sells bottles off the wine shop's own shelves");
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
+  check(await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")).orch; return o.stock.apple + o.stock["stem:rose"] < 80 && o.tin > 0; }), "Ma Ma's market stall sells fruit and flowers off the farm shop's own shelves, into her tin");
+  check(await page.locator('#world [data-place^="mstall"]').count() === 6 && await page.locator('#actors [data-npc="ines"]').count() === 1 && await page.locator('#actors [data-npc="mama"]').count() === 1, "the Sunday farmers market: six stalls along the top, our wine stall with Ines and Ma Ma's fruit and flowers");
+  check(await page.locator('#world [data-place="mstall0"]').evaluate(g => g.getBBox().y < 170), "the market stalls stand along the top of the field");
+  await page.locator('#world [data-place="mstall0"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx .item[data-id="cheese"]', { timeout: 15000 }); await page.click('#ctx .item[data-id="cheese"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.fox")).inv.cheese || 0) >= 1), "stall goods can be bought (cheese, for the kitchen)");
+  await page.click('#ctx [data-close]');
+  await page.locator('#world [data-place="mstall2"]').dispatchEvent("click");
+  await page.waitForSelector("#ctx .wlist", { timeout: 15000 });
+  check(/Market Red/.test(await page.locator("#ctx").textContent()), "the wine stall shows the same bottles as the shop's shelves");
+  await page.click('#ctx [data-close]');
+  await page.locator('#world [data-place="mstall3"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-or="take"]', { timeout: 15000 });
+  check(/market stall/.test(await page.locator("#ctx h2").textContent()) && await page.locator('#ctx [data-or="tab"][data-k="plant"]').count() === 0, "Ma Ma's stall shares the farm shop's shelves, fruit and flowers only (no planting)");
+  await page.click('#ctx [data-or="take"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.fox")).inv.apple || 0) >= 1), "Mel can take fruit from Ma Ma's stall for free");
+  await page.click('#ctx [data-close]');
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-31"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
+  check(/Field fair/.test(await page.locator("#sceneArt").textContent()) && await page.locator('#world [data-place^="mstall"]').count() === 4, "on the last Saturday of the month the field fair is on: kites, face painting, lemonade, snacks");
   await page.close();
 }
 {
