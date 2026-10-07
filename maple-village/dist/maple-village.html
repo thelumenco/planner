@@ -219,8 +219,8 @@ details[open] summary::after{content:"–"}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 /* ---------- village ---------- */
 :root{--sea:#8FC1DE;--sea2:#7AB3D6;--sand:#F2E2B8;--grass:#E4ECD6;--grass2:#D3E0C2;--path:#EFE4CF;--path2:#E2D3B6;--wood:#C9A27E;--stone:#CFC8BE;--tree:#9EBE8C;--tree2:#7FA36E;--water:#BFD6E6;--skin:#F8DECD;--hair:#2A211D;--tank:#F2A290;--denim:#7D97C2;--tee:#6E9FD6;--pants:#F3CF5A}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sea:#2C4660;--sea2:#233A52;--sand:#5C5242;--grass:#2D3A2F;--grass2:#26322A;--path:#4A4038;--path2:#3E352E;--water:#3F5568;--stone:#5A544E}}
-:root[data-theme="dark"]{--sea:#2C4660;--sea2:#233A52;--sand:#5C5242;--grass:#2D3A2F;--grass2:#26322A;--path:#4A4038;--path2:#3E352E;--water:#3F5568;--stone:#5A544E}
+/* the game world keeps its own (light) palette in dark mode too: only the menus and panels around it go dark */
+#world{--bg:#F2EEE7;--card:#F9F7F2;--edge:rgba(120,104,84,.13);--ink:#2F2B28;--soft:#8A8279;--faint:#B5ADA2;--navy:#2F3B73;--oat:#EAE3D8;--rule:#E4DDD2;--wash1:#F6E4D2;--wash2:#E0EAD8;color:#2F2B28}
 .mapcard{padding:12px}
 .map{position:relative;aspect-ratio:520/640;touch-action:manipulation}
 .map > svg{display:block;width:100%;height:100%;border-radius:4px;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -307,9 +307,6 @@ details[open] summary::after{content:"–"}
 
 /* street lamps: their warm pools of light only show in dark mode */
 .map .lglow{opacity:0;transition:opacity .6s}
-:root[data-theme="dark"] .map .lglow{opacity:1}
-:root[data-theme="dark"] .map .lglass{fill:#FFD27A !important}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .map .lglow{opacity:1}:root:not([data-theme="light"]) .map .lglass{fill:#FFD27A !important}}
 @keyframes flick{0%,100%{opacity:.22}45%{opacity:.3}55%{opacity:.18}}
 .map .lglow .flick{animation:flick 3.2s ease-in-out infinite}
 @media (prefers-reduced-motion: reduce){.map .lglow .flick{animation:none}}
@@ -1294,24 +1291,11 @@ body.season-spring{--tree:#B7D39A;--tree2:#F2BFCB}
 body.season-summer{--tree:#8FB57B;--tree2:#6E9A5C}
 body.season-autumn{--tree:#E3A35B;--tree2:#C9774D}
 body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"]) body.season-spring{--grass:#E3EED7}
-  :root:not([data-theme="dark"]) body.season-summer{--grass:#DDEBCB;--grass2:#CCDFB7}
-  :root:not([data-theme="dark"]) body.season-autumn{--grass:#E8E7CF;--grass2:#DCD6B4}
-  :root:not([data-theme="dark"]) body.season-winter{--grass:#E5ECE6;--grass2:#D5E0DA}
-}
-:root[data-theme="light"] body.season-spring{--grass:#E3EED7}
-:root[data-theme="light"] body.season-summer{--grass:#DDEBCB;--grass2:#CCDFB7}
-:root[data-theme="light"] body.season-autumn{--grass:#E8E7CF;--grass2:#DCD6B4}
-:root[data-theme="light"] body.season-winter{--grass:#E5ECE6;--grass2:#D5E0DA}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) body.season-spring{--tree2:#9C6E7A}
-  :root:not([data-theme="light"]) body.season-autumn{--tree:#9A6B3A;--tree2:#8A4E38}
-  :root:not([data-theme="light"]) body.season-winter{--tree:#6E847A;--tree2:#5A7068}
-}
-:root[data-theme="dark"] body.season-spring{--tree2:#9C6E7A}
-:root[data-theme="dark"] body.season-autumn{--tree:#9A6B3A;--tree2:#8A4E38}
-:root[data-theme="dark"] body.season-winter{--tree:#6E847A;--tree2:#5A7068}
+/* the seasons tint the grass the same whatever the phone's light or dark mode: the village always looks like the village */
+body.season-spring{--grass:#E3EED7}
+body.season-summer{--grass:#DDEBCB;--grass2:#CCDFB7}
+body.season-autumn{--grass:#E8E7CF;--grass2:#DCD6B4}
+body.season-winter{--grass:#E5ECE6;--grass2:#D5E0DA}
 /* the staff card at the wine shop counter: a tick per helper, then the two names */
 #ctx .vhelp{display:flex;flex-direction:column;gap:8px;margin:6px 0 10px}
 #ctx .vhelpi{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;text-align:left}
@@ -1352,6 +1336,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .wearpick input[type=checkbox]{width:18px;height:18px;accent-color:var(--sage)}
 .wearpick ul li{display:block}
 .wearpick ul li label > span:last-child{flex:1;min-width:0}
+
+.accs{display:grid;gap:8px}
+.acc{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(127,127,127,.08)}
+.acc .n{font-weight:600}.acc .n small{display:block;font-weight:400;color:var(--soft)}
 </style>
 </head>
 <body>
@@ -1990,6 +1978,30 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   I.wateringCan = [`<rect x="4" y="9" width="11" height="10" rx="2" ${f(C.water)}/>`, `<rect x="4" y="9" width="11" height="10" rx="2"/><path d="M15 12l5-4M19 6.5l2 2.5M6 9c0-3 7-3 7 0"/><circle cx="21" cy="11" r=".6"/><circle cx="20" cy="13.5" r=".6"/>`];
   I.compost = [`<path d="M5 9h14l-1.5 11h-11z" ${f(C.wood)}/><path d="M8 8c1-2 2-3 4-3s3 1 4 3" ${f(C.moss)}/>`, `<path d="M5 9h14l-1.5 11h-11zM4 9h16M8 13h8M8.5 16.5h7"/><path d="M8 8c1-2 2-3 4-3s3 1 4 3"/>`];
   I.sprinkler = [`<circle cx="12" cy="17" r="3" ${f(C.stone)}/>`, `<circle cx="12" cy="17" r="3"/><path d="M12 14v-3M12 21h0M5 9c2-3 4-4 7-4s5 1 7 4M8 10.5c1-1.5 2.5-2 4-2s3 .5 4 2"/><circle cx="5" cy="12" r=".7"/><circle cx="19" cy="12" r=".7"/><circle cx="8" cy="13" r=".7"/><circle cx="16" cy="13" r=".7"/>`];
+  I.protbar = [`<rect x="3" y="9" width="18" height="7" rx="2" ${f("#9CC27E")}/><rect x="8" y="9" width="8" height="7" ${f("#FFFDF6")}/>`, `<rect x="3" y="9" width="18" height="7" rx="2"/><path d="M8 9v7M16 9v7M10 12.5h4"/>`];
+  I.jerky = [`<path d="M5 5c4-1 9 0 12 3s3 9 1 11-9 0-12-3-4-10-1-11z" ${f("#9A4A32")}/>`, `<path d="M5 5c4-1 9 0 12 3s3 9 1 11-9 0-12-3-4-10-1-11z"/><path d="M8 9c2 1 4 3 5 6M11 7c2 1 4 3 5 6" opacity=".6"/>`];
+  I.chickenbox = [`<rect x="3" y="8" width="18" height="11" rx="2" ${f("#2F2B28")}/><rect x="5" y="10" width="7" height="7" rx="1" ${f("#FFFDF6")}/><rect x="13" y="10" width="6" height="7" rx="1" ${f("#E8A65A")}/>`, `<rect x="3" y="8" width="18" height="11" rx="2"/><rect x="5" y="10" width="7" height="7" rx="1"/><rect x="13" y="10" width="6" height="7" rx="1"/>`];
+  I.oatlatte = [`<path d="M7 7h10l-1.2 13H8.2z" ${f("#E8D3B0")}/><path d="M6.5 5h11v2h-11z" ${f("#FFFDF6")}/>`, `<path d="M7 7h10l-1.2 13H8.2zM6.5 5h11v2h-11zM8 12h8"/>`];
+  I.bubbletea = [`<path d="M6.5 7h11l-1.5 13.5h-8z" ${f("#D9B48A")}/><circle cx="10" cy="18" r="1.2" ${f("#2F2B28")}/><circle cx="13" cy="18.5" r="1.2" ${f("#2F2B28")}/><circle cx="11.5" cy="16.5" r="1.2" ${f("#2F2B28")}/>`, `<path d="M6.5 7h11l-1.5 13.5h-8zM6 7h12M13 7l2-5"/>`];
+  I.highlighters = [`<rect x="4" y="6" width="4" height="13" rx="1" ${f("#F4C7CF")}/><rect x="10" y="5" width="4" height="14" rx="1" ${f("#C3E8B8")}/><rect x="16" y="6" width="4" height="13" rx="1" ${f("#C3CDEE")}/>`, `<rect x="4" y="6" width="4" height="13" rx="1"/><rect x="10" y="5" width="4" height="14" rx="1"/><rect x="16" y="6" width="4" height="13" rx="1"/><path d="M4 9h4M10 8h4M16 9h4"/>`];
+  I.mochi = [`<rect x="3" y="9" width="18" height="10" rx="2" ${f("#F6EEF4")}/><circle cx="8" cy="14" r="3" ${f("#F4C7CF")}/><circle cx="16" cy="14" r="3" ${f("#C3E8B8")}/>`, `<rect x="3" y="9" width="18" height="10" rx="2"/><circle cx="8" cy="14" r="3"/><circle cx="16" cy="14" r="3"/>`];
+  I.friedchicken = [`<path d="M5 5c5-2 12 0 14 5s-1 10-6 10-10-2-10-7 0-6 2-8z" ${f("#D99A4A")}/>`, `<path d="M5 5c5-2 12 0 14 5s-1 10-6 10-10-2-10-7 0-6 2-8z"/><path d="M8 9l1 1M12 8l1 1M15 11l1 1M9 14l1 1M13 15l1 1" opacity=".7"/>`];
+  I.scallion = [`<circle cx="12" cy="12.5" r="8" ${f("#F0C878")}/>`, `<circle cx="12" cy="12.5" r="8"/><path d="M8 10h1M14 9h1M11 14h1M15 15h1M8 15h1" stroke="#5E8A4A" stroke-width="1.8"/><path d="M12 12.5c2 0 3-1 3-3" opacity=".5"/>`];
+  I.hotteok = [`<ellipse cx="12" cy="13" rx="8.5" ry="6" ${f("#E3B06A")}/><path d="M9 12c2 2 4 2 6 0" ${f("#8C5A3C")}/>`, `<ellipse cx="12" cy="13" rx="8.5" ry="6"/><path d="M9 12c2 2 4 2 6 0"/>`];
+  I.tteokbokki = [`<path d="M3.5 11h17c0 5-3.8 8.5-8.5 8.5S3.5 16 3.5 11z" ${f("#E8574C")}/><rect x="7" y="8" width="5" height="3" rx="1.5" ${f("#FFFDF6")}/><rect x="12" y="7.5" width="5" height="3" rx="1.5" ${f("#FFFDF6")}/>`, `<path d="M3.5 11h17c0 5-3.8 8.5-8.5 8.5S3.5 16 3.5 11z"/><rect x="7" y="8" width="5" height="3" rx="1.5"/><rect x="12" y="7.5" width="5" height="3" rx="1.5"/>`];
+  I.eggbread = [`<rect x="5" y="7" width="14" height="11" rx="3" ${f("#E8B86A")}/><ellipse cx="12" cy="11" rx="4" ry="3" ${f("#FFFDF6")}/><circle cx="12" cy="11" r="1.6" ${f("#F3C969")}/>`, `<rect x="5" y="7" width="14" height="11" rx="3"/><ellipse cx="12" cy="11" rx="4" ry="3"/>`];
+  I.pearlclip = [`<rect x="4" y="10" width="16" height="4" rx="2" ${f("#D9B46A")}/>${[7, 10, 13, 16].map((x) => `<circle cx="${x + 0.5}" cy="12" r="1.6" ${f("#FFFDF6")}/>`).join("")}`, `<rect x="4" y="10" width="16" height="4" rx="2"/>${[7, 10, 13, 16].map((x) => `<circle cx="${x + 0.5}" cy="12" r="1.6"/>`).join("")}`];
+  I.clawclip = [`<path d="M6 6c3 3 9 3 12 0v6c-3 3-9 3-12 0z" ${f("#A0623A")}/>`, `<path d="M6 6c3 3 9 3 12 0v6c-3 3-9 3-12 0zM8 12v6M11 13v6M13 13v6M16 12v6"/>`];
+  I.scrunchie = [`<ellipse cx="12" cy="12" rx="8" ry="7" ${f("#8E2C48")}/><ellipse cx="12" cy="12" rx="3.5" ry="3" ${f("#FFFDF6")}/>`, `<ellipse cx="12" cy="12" rx="8" ry="7"/><ellipse cx="12" cy="12" rx="3.5" ry="3"/><path d="M6 8l2 2M18 8l-2 2M6 16l2-2M18 16l-2-2" opacity=".6"/>`];
+  I.dinokey = [`<path d="M6 17c0-5 3-8 7-8 2-3 6-2 6 1 0 2-2 2-3 2 1 2 1 4 0 5z" ${f("#B8E8A0")}/>`, `<path d="M6 17c0-5 3-8 7-8 2-3 6-2 6 1 0 2-2 2-3 2 1 2 1 4 0 5zM6 17h11"/><circle cx="6" cy="5" r="2.5"/><path d="M6 7.5V10"/><circle cx="17" cy="9.5" r=".5"/>`];
+  I.luckycharm = [`<circle cx="12" cy="14" r="6" ${f("#FFFDF6")}/><path d="M7 10l1-4 3 3M17 10l-1-4-3 3" ${f("#FFFDF6")}/>`, `<circle cx="12" cy="14" r="6"/><path d="M7 10l1-4 3 3M17 10l-1-4-3 3M10 13h0M14 13h0M11 16q1 1 2 0"/><path d="M18 12l3-3" stroke="#E8574C" stroke-width="2"/>`];
+  I.cosysocks = [`<path d="M7 3h6v9l4 4c1.5 1.5 0 4-2 4h-4c-3 0-4-2-4-4z" ${f("#C3CDEE")}/>`, `<path d="M7 3h6v9l4 4c1.5 1.5 0 4-2 4h-4c-3 0-4-2-4-4zM7 6h6"/>`];
+  I.buckethat = [`<path d="M7 7c0-2 10-2 10 0l1.5 7h-13z" ${f("#3E6B8C")}/><path d="M3 14c3-1.5 15-1.5 18 0l-1 2.5c-4-1-12-1-16 0z" ${f("#3E6B8C")}/>`, `<path d="M7 7c0-2 10-2 10 0l1.5 7h-13zM3 14c3-1.5 15-1.5 18 0l-1 2.5c-4-1-12-1-16 0z"/>`];
+  I.dinotee = [`<path d="M8 4l-5 3 2 4 3-1v10h8V10l3 1 2-4-5-3c-1 2-7 2-8 0z" ${f("#7FB8E8")}/><path d="M9 15c1-3 4-4 6-2" ${f("#9CC27E")}/>`, `<path d="M8 4l-5 3 2 4 3-1v10h8V10l3 1 2-4-5-3c-1 2-7 2-8 0z"/>`];
+  I.tanghulu = [`${[6, 10, 14].map((y) => `<circle cx="12" cy="${y}" r="3" ${f("#E8574C")}/>`).join("")}`, `<path d="M12 3v19"/>${[6, 10, 14].map((y) => `<circle cx="12" cy="${y}" r="3"/>`).join("")}`];
+  I.eggwaffle = [`<path d="M5 5c6-2 12 1 14 6s-2 9-7 9-8-3-8-8 0-6 1-7z" ${f("#F3C969")}/>`, `<path d="M5 5c6-2 12 1 14 6s-2 9-7 9-8-3-8-8 0-6 1-7z"/>${[[8, 9], [12, 8], [15, 11], [9, 13], [13, 14], [11, 17]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.4"/>`).join("")}`];
+  I.sugarcane = [`<path d="M7 6h10l-1.2 14H8.2z" ${f("#D8E8A8")}/>`, `<path d="M7 6h10l-1.2 14H8.2zM12 6l3-4"/><path d="M5 20l3-16M4 9h3M4 14h3" stroke="#7FA35A"/>`];
+  I.grassjelly = [`<path d="M7 7h10l-1.2 13H8.2z" ${f("#3A3230")}/><path d="M7.5 10h9" ${f("#FFFDF6")}/>`, `<path d="M7 7h10l-1.2 13H8.2zM6.5 7h11M13 7l2-5"/>`];
   I.icecream = [`<path d="M8.5 11h7L12 21z" ${f("#E8C48E")}/><circle cx="12" cy="8.5" r="4" ${f(C.blush)}/><circle cx="9.5" cy="10" r="2.4" ${f(C.paper)}/>`, `<path d="M8.5 11h7L12 21zM10 13.5l3.6 3M14 13.5l-3.4 3"/><path d="M8.2 10.6A4 4 0 1 1 15.8 10.6"/><circle cx="9.5" cy="10" r="2.4"/>`];
   I.balloon = [`<ellipse cx="12" cy="9" rx="5.5" ry="6.5" ${f("#E8574C")}/>`, `<ellipse cx="12" cy="9" rx="5.5" ry="6.5"/><path d="M11 15.5h2l-1 1.5zM12 17c-1 1.5 1 2.5 0 5"/><path d="M9.5 6.5c.5-1.2 1.4-1.8 2.4-2" opacity=".6"/>`];
   I.wand = [`<circle cx="15" cy="7" r="4" ${f("#D8ECF6")}/><circle cx="7" cy="6" r="2" ${f("#D8ECF6")}/>`, `<circle cx="15" cy="7" r="4"/><circle cx="15" cy="7" r="2.2"/><path d="M12.5 10l-6 10"/><circle cx="7" cy="6" r="2"/><circle cx="19.5" cy="14" r="1.3"/>`];
@@ -2178,6 +2190,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     lake: { scene: "field", name: "The lake", door: [220, 378], spot: true, line: "The lake. Two swans, very dignified." },
     picnic: { scene: "field", name: "Picnic spot", door: [140, 484], spot: true, line: "A blanket and a basket. Perfect for lunch outside." },
     // market and fair days: the stalls (who's behind each one comes from tours.js) and the wine shop's own stall
+    jazzhat: { scene: "field", name: "Jazz stage", door: [424, 494], spot: true, line: "The little stage on the pitch. Night market nights, there's a jazz duo." },
     mstall0: { scene: "field", name: "Stall", door: [36, 164], spot: true, line: "A market stall." },
     mstall1: { scene: "field", name: "Stall", door: [96, 164], spot: true, line: "A market stall." },
     mstall2: { scene: "field", name: "Stall", door: [156, 164], spot: true, line: "A market stall." },
@@ -2234,12 +2247,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var outdoorOf = (s) => OUTDOOR.includes(s) ? s : INNER[s] ? outdoorOf(INNER[s].parent) : VILLAGE[s] ? VILLAGE[s].scene : "village";
   var INNER = {
     room: { parent: "home", door: [64, 340], arrive: [456, 400], exit: [486, 410] },
-    kidroom: { parent: "home", door: [456, 340], arrive: [70, 420], exit: [34, 410] },
+    kidroom: { parent: "home", door: [456, 512], arrive: [70, 420], exit: [34, 410] },
     trophy: { parent: "hall", door: [64, 372], arrive: [456, 400], exit: [486, 410] },
     // the wine shop's kitchen, through the door on its east wall; its own way out is the mat at the bottom
     kitchen: { parent: "wineshop", door: [462, 390], arrive: [260, 560], exit: [260, 606] },
     // big goals: the garage through the back door of the house, the cellar door through the wine shop's west wall
-    garage: { parent: "home", door: [456, 512], arrive: [70, 450], exit: [34, 440] },
+    garage: { parent: "home", door: [456, 340], arrive: [70, 450], exit: [34, 440] },
     office: { parent: "home", door: [64, 512], arrive: [450, 450], exit: [486, 440] },
     cellar: { parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430] }
   };
@@ -2285,8 +2298,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
     // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
     // the living room: the family dining table in the middle, the sofa, kitchen and fridge along the back, and four doors:
-    // Mel's room (left, top), the home office (left, below it), Evan's room (right, top), the garage (right, below it)
-    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { X: [260, 452], C: [130, 250], B: [436, 228], H: [334, 250], R: [40, 330], K: [480, 330], O: [40, 512], Q: [480, 512] }, stations: [
+    // Mel's room (left, top), the home office (left, below it), the garage (right, top), Evan's room (right, below it)
+    home: { name: "Home", wall: "#F8EED8", trim: "var(--butter)", pos: { X: [260, 452], C: [130, 250], B: [436, 228], H: [334, 250], R: [40, 330], K: [480, 512], O: [40, 512], Q: [480, 330] }, stations: [
       ["kitchen", "Kitchen", "B", "kitchen", /cook|meal|lunch|dinner|bake|grocer|prep/, "Something smells good."],
       ["sofa", "Sofa", "C", "sofa", /read|rest|journal|meditat|book|nap/, "Soft cushions, deep breaths."],
       ["mydoor", "My room", "R", "sidedoor", null, "Your room. Just you.", 0],
@@ -2624,6 +2637,137 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       say: "Mochi! Thank you!",
       says: { marcus: "Mochi, no dairy in it, right? Nice. We'll share. Probably.", angelina: "Mochi! We'll have them on the sofa tonight. Thank you, Mel!" }
     },
+    // The night market (Tuesday and Thursday evenings, tab "night": only sold at its stalls). Street food, sweets and
+    // little things, all gifts. Nothing with dairy goes to Marcus.
+    friedchicken: {
+      n: "XXL fried chicken",
+      kind: "gift",
+      to: ["darren", "marcus", "dad", "gonggong"],
+      price: 7,
+      tab: "night",
+      say: "Fried chicken as big as my face!",
+      says: { darren: "That's the size of a plate. I love it.", marcus: "Pure protein, Zeh. Okay, and batter. Worth it.", dad: "Wah, Taiwan-style! Crispy. Ah Gong share with Evan.", gonggong: "So big! Gong Gong eat slowly, slowly." }
+    },
+    scallion: {
+      n: "Scallion pancake",
+      kind: "gift",
+      to: "family",
+      price: 5,
+      tab: "night",
+      say: "Flaky scallion pancake, still hot!",
+      says: { evan: "Pancake! Can I tear it?", mama: "Cong you bing! Crispy outside. Very good.", angelina: "Ooh, flaky. Thank you, Mel!" }
+    },
+    hotteok: {
+      n: "Hotteok",
+      kind: "gift",
+      to: ["evan", "mum", "mama", "angelina"],
+      price: 5,
+      tab: "night",
+      say: "Hotteok! Careful, the sugar's like lava.",
+      says: { evan: "It's got sugar INSIDE!", mum: "Hotteok! Like the one we had in Seoul. Thank you, darling.", angelina: "Brown sugar and nuts? Okay, study break." }
+    },
+    tteokbokki: {
+      n: "Tteokbokki",
+      kind: "gift",
+      to: ["darren", "marcus", "angelina", "dad"],
+      price: 6,
+      tab: "night",
+      say: "Spicy rice cakes! Chewy and fiery.",
+      says: { darren: "Spicy! Good spicy. Pass the water.", marcus: "Tteokbokki! No cheese on it, right? Perfect.", angelina: "Spicy rice cakes! My favourite.", dad: "Aiyo, so spicy! But nice. Very nice." }
+    },
+    eggbread: {
+      n: "Egg bread",
+      kind: "gift",
+      to: ["evan", "gonggong", "mum", "darren"],
+      price: 4,
+      tab: "night",
+      say: "Gyeran-ppang: a whole egg baked into sweet bread.",
+      says: { evan: "There's an EGG in my bread!", gonggong: "Egg inside bread? Clever. Gong Gong like." }
+    },
+    pearlclip: {
+      n: "Pearl hair clip",
+      kind: "gift",
+      to: ["mum", "angelina", "mama"],
+      price: 6,
+      tab: "night",
+      say: "A pearl hair clip! So pretty.",
+      says: { mum: "Pearls! For my bob. You spoil me.", angelina: "Pearl clip! Wearing it to class tomorrow.", mama: "Pearls for Ma Ma? Aiyo, so pretty. Wear to temple." }
+    },
+    clawclip: {
+      n: "Tortoiseshell claw clip",
+      kind: "gift",
+      to: ["mum", "angelina"],
+      price: 5,
+      tab: "night",
+      say: "A claw clip! Exactly what I needed.",
+      says: { mum: "For my Pilates! Hair out of the face.", angelina: "Thesis-writing hair, sorted." }
+    },
+    scrunchie: { n: "Velvet scrunchie", kind: "gift", to: ["angelina", "mum", "mama"], price: 3, tab: "night", say: "A velvet scrunchie! So soft." },
+    dinokey: { n: "Glow-in-the-dark dino keychain", kind: "gift", to: "evan", price: 4, tab: "night", say: "A DINO! It GLOWS! RAWR!" },
+    luckycharm: {
+      n: "Lucky cat phone charm",
+      kind: "gift",
+      to: ["angelina", "marcus", "darren"],
+      price: 4,
+      tab: "night",
+      say: "A lucky cat! It waves!",
+      says: { marcus: "Lucky cat for the bank phone. Huat ah.", darren: "A waving cat. Okay, it's on my keys now." }
+    },
+    cosysocks: {
+      n: "Cosy socks",
+      kind: "gift",
+      to: "family",
+      price: 4,
+      tab: "night",
+      say: "Fluffy socks! Toasty toes.",
+      says: { evan: "They have DINOSAURS on!", mama: "Warm socks for aircon. Good girl.", gonggong: "Socks! Gong Gong's always cold feet. Thank you." }
+    },
+    buckethat: {
+      n: "Bucket hat",
+      kind: "gift",
+      to: ["darren", "marcus", "dad"],
+      price: 7,
+      tab: "night",
+      say: "A bucket hat! Very cool.",
+      says: { darren: "Garden hat upgrade. Thanks.", marcus: "Bucket hat? I'm wearing it to the gym.", dad: "A hat for my drawing by the sea. Very nice." }
+    },
+    dinotee: { n: "Dinosaur tee", kind: "gift", to: "evan", price: 6, tab: "night", say: "A dinosaur shirt! I'm wearing it to bed!" },
+    tanghulu: {
+      n: "Tanghulu",
+      kind: "gift",
+      to: "family",
+      price: 4,
+      tab: "night",
+      say: "Strawberries in crackly sugar! Crunch!",
+      says: { evan: "CRUNCH! It's like glass!", marcus: "Tanghulu! Sugar, sure, but it's fruit. Counts." }
+    },
+    eggwaffle: {
+      n: "Egg waffle",
+      kind: "gift",
+      to: ["evan", "angelina", "mama", "darren"],
+      price: 5,
+      tab: "night",
+      say: "An egg waffle! All the little bubbles.",
+      says: { evan: "Bubbles I can EAT!", mama: "Gai daan zai! Ma Ma used to buy these for you, you remember?" }
+    },
+    sugarcane: {
+      n: "Sugarcane juice",
+      kind: "gift",
+      to: "family",
+      price: 3,
+      tab: "night",
+      say: "Fresh sugarcane juice! So refreshing.",
+      says: { gonggong: "Sugarcane! With lemon? Shiok.", dad: "Ah, sugarcane. Like the hawker centre. Thank you, darling." }
+    },
+    grassjelly: {
+      n: "Grass jelly drink",
+      kind: "gift",
+      to: ["gonggong", "mama", "dad", "mum"],
+      price: 3,
+      tab: "night",
+      say: "Grass jelly! Cooling for the body.",
+      says: { mama: "Leong fun! Very cooling. Good for heaty body.", gonggong: "Grass jelly! Gong Gong's favourite when young." }
+    },
     // Sunday farmers market specials (tab "market": only sold at the market stalls, never at Hana's). Gifts for the family:
     // to "family" goes to whichever of Evan, Darren, Ma Ma and Gong Gong is nearest; a list names who it suits.
     // says: what each one says (falls back to say)
@@ -2756,6 +2900,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     r_vanity: { ico: "mirror", n: "Vanity mirror", slot: "r_vanity", val: "on", price: 45, tab: "me", where: "room" },
     r_throw: { ico: "throw", n: "Knitted throw", slot: "r_throw", val: "on", price: 20, tab: "me", where: "room" },
     r_candle: { ico: "candle", n: "Calm candle", slot: "r_candle", val: "on", price: 10, tab: "me", where: "room" },
+    // from the night market's lantern stall (tab "night": only sold there)
+    n_lanterns: { ico: "lantern", n: "Paper lanterns", slot: "lanterns", val: "on", price: 18, tab: "night" },
+    r_moon: { ico: "lamp", n: "Moon lamp", slot: "r_moon", val: "on", price: 16, tab: "night", where: "room" },
     me_bow: { ico: "bow", n: "Velvet hair bow", slot: "me_bow", val: "on", price: 15, tab: "me", where: "me" },
     me_scarf: { ico: "scarf", n: "Silk neck scarf", slot: "me_scarf", val: "on", price: 20, tab: "me", where: "me" },
     me_hat: { ico: "sunhat", n: "Straw sun hat", slot: "me_hat", val: "on", price: 20, tab: "me", where: "me" },
@@ -2904,6 +3051,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ${d.rug ? homeRug(d.rug) : `<g filter="url(#wash)" opacity=".55"><ellipse cx="260" cy="420" rx="150" ry="70" style="fill:var(--butter)"/></g>`}
     ${wallBase("#F8EED8", "var(--butter)")}${d.wall ? wallpaper(d.wall) : ""}
     ${d.art ? sk(`<rect x="152" y="40" width="44" height="36" rx="2" style="fill:var(--wood)"/><rect x="158" y="46" width="32" height="24" style="fill:var(--sky)"/><path d="M158 70 l10 -10 l8 7 l6 -5 l8 8z" style="fill:var(--moss)"/>`, `<rect x="152" y="40" width="44" height="36" rx="2"/><rect x="158" y="46" width="32" height="24"/><path d="M174 30 l-12 10 M174 30 l12 10"/>`) : ""}
+    ${d.lanterns ? `<g pointer-events="none"><path d="M8 8 Q130 26 252 10 Q384 26 512 8" fill="none" style="stroke:var(--line)" stroke-width="1.1" filter="url(#wob)"/>${[[40, 14], [96, 20], [160, 20], [212, 14], [300, 14], [352, 20], [420, 20], [476, 14]].map(([x, y], i) => sk(`<rect x="${x - 7}" y="${y + 2}" width="14" height="16" rx="6" style="fill:${["#E8566C", "#F3C969", "#F28C6A"][i % 3]}"/>`, `<path d="M${x} ${y - 2} v4"/><rect x="${x - 7}" y="${y + 2}" width="14" height="16" rx="6"/><path d="M${x - 6} ${y + 7} h12 M${x - 6} ${y + 13} h12 M${x - 3} ${y + 18} h6 v4" opacity=".6"/>`)).join("")}</g>` : ""}
     ${d.lamp ? sk(`<path d="M190 368 h24 l6 18 h-36z" style="fill:var(--butter)"/>`, `<path d="M190 368 h24 l6 18 h-36z M202 386 v52 M192 440 h20"/>`) : ""}
     ${d.plant ? plant(172, 606, 1.2) : ""}
     ${sk(`<rect x="60" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/><rect x="390" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/>`, `<rect x="60" y="34" width="70" height="58" rx="30"/><path d="M95 34 v58 M60 66 h70"/><rect x="390" y="34" width="70" height="58" rx="30"/><path d="M425 34 v58 M390 66 h70"/>`)}
@@ -2921,6 +3069,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ${d.r_art ? sk(`<rect x="112" y="34" width="56" height="44" rx="2" style="fill:#FFFDF6"/><circle cx="132" cy="56" r="7" style="fill:var(--rose)"/><circle cx="148" cy="54" r="6" style="fill:var(--peri)"/><path d="M132 63 v10 M148 60 v13" style="stroke:var(--moss2)"/>`, `<rect x="106" y="28" width="68" height="56" rx="2"/><rect x="112" y="34" width="56" height="44" rx="2"/>`) : ""}
     ${d.r_shelf ? sk(`<rect x="8" y="58" width="90" height="10" style="fill:var(--wood)"/>${["var(--rose)", "var(--peri)", "var(--sage)", "var(--butter)", "var(--peach)"].map((c, i) => `<rect x="${16 + i * 12}" y="${36 + i % 2 * 4}" width="10" height="${22 - i % 2 * 4}" style="fill:${c}"/>`).join("")}`, `<rect x="8" y="58" width="90" height="10"/><path d="M14 68 v8 M92 68 v8"/>`) : ""}
     ${d.r_plant ? plant(366, 300, 1.2) : ""}
+    ${d.r_moon ? `<circle cx="150" cy="226" r="20" style="fill:#FFF3C4" opacity=".35"/>` + sk(`<rect x="140" y="250" width="20" height="16" rx="2" style="fill:var(--wood)"/><circle cx="150" cy="226" r="12" style="fill:#FFF6D8"/>`, `<rect x="140" y="250" width="20" height="16" rx="2"/><path d="M150 238 v12"/><circle cx="150" cy="226" r="12"/><circle cx="146" cy="222" r="2.2" opacity=".5"/><circle cx="154" cy="230" r="1.6" opacity=".5"/><circle cx="155" cy="221" r="1.2" opacity=".5"/>`) : ""}
     ${d.r_vanity ? sk(`<rect x="38" y="584" width="70" height="12" rx="2" style="fill:var(--wood)"/><ellipse cx="73" cy="558" rx="20" ry="26" style="fill:#DCE8F4"/>`, `<rect x="38" y="584" width="70" height="12" rx="2"/><path d="M46 596 v16 M100 596 v16"/><ellipse cx="73" cy="558" rx="20" ry="26"/><path d="M64 544 l8 -8" opacity=".6"/>`) : ""}
     ${skirting}`;
     },
@@ -4212,6 +4361,50 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       actLines: { sit: ["This rosé is lovely. Who makes it?", "Cheers! To holidays.", "I'm buying a bottle before I go."] },
       away: `${name}'s gone back to town.`
     })),
+    // The night market's traders (Tuesday and Thursday evenings, tours.js NIGHT): out-of-towners who drive in with
+    // their stalls, and the evening's tourists. No routine of their own.
+    ...[
+      ["yun", "Yun", { skin: "#EAC4A4", hair: "#1F1A17", hairStyle: "bob", top: "#E8566C", bottom: "#2F2B28" }, "Street snacks, up from Taipei"],
+      ["jae", "Jae", { skin: "#F0D2B6", hair: "#231C19", hairStyle: "spiky", top: "#F6F2EA", bottom: "#3F4A6B", hat: "cap" }, "Korean street food, from Seoul"],
+      ["mina", "Mina", { skin: "#F2D3BC", hair: "#3A2A22", hairStyle: "long", top: "#F4C7CF", bottom: "#5E6E8C" }, "Makes hair clips and scrunchies"],
+      ["tomas", "Tomás", { skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#9C8CD9", bottom: "#4A5568", extra: "glasses" }, "Sells keychains and charms"],
+      ["sora", "Sora", { skin: "#EAC4A4", hair: "#7A4A32", hairStyle: "bun", top: "#7FB8E8", bottom: "#F6F2EA" }, "Socks, hats and tees"],
+      ["lior", "Lior", { skin: "#D9A882", hair: "#5A3A2A", hairStyle: "short", top: "#F3C969", bottom: "#3E4A43" }, "Makes paper lanterns"],
+      ["wen", "Wen", { skin: "#F0D2B6", hair: "#1F1A17", hairStyle: "long", top: "#C9A3E0", bottom: "#2F3B73" }, "Tanghulu and egg waffles"],
+      ["kai", "Kai", { skin: "#A8754F", hair: "#1F1A17", hairStyle: "spiky", top: "#9CC27E", bottom: "#4A5568" }, "Presses sugarcane to order"]
+    ].map(([id, name, look, job]) => ({
+      id,
+      pitch: 0.9 + id.charCodeAt(0) % 5 * 0.08,
+      name,
+      job,
+      tourist: true,
+      look,
+      routine: [],
+      intro: `Hi! I'm ${name}. ${job}. We're here Tuesdays and Thursdays, six till ten.`,
+      lines: ["Busy night! Everyone's out.", "Have you heard the band? They're so good.", "Love this little town. Best market on our route.", "Come back Thursday, I'll have a new batch."],
+      away: `${name}'s packed up and driven home.`
+    })),
+    ...[
+      ["noa", "Noa", { skin: "#F2D3BC", hair: "#D9B46A", hairStyle: "long", top: "#F28C6A", bottom: "#2F3B73" }],
+      ["jun", "Jun", { skin: "#EAC4A4", hair: "#231C19", hairStyle: "short", top: "#3E6B8C", bottom: "#5E5A55", extra: "satchel" }],
+      ["bea", "Bea", { skin: "#C99A78", hair: "#2A211D", hairStyle: "bun", top: "#F3C969", bottom: "#4A5568" }],
+      ["omar", "Omar", { skin: "#A8754F", hair: "#1F1A17", hairStyle: "short", top: "#F6F2EA", bottom: "#3F4A6B", extra: "glasses" }],
+      ["lucy", "Lucy", { skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#9C8CD9", bottom: "#5E6E8C" }],
+      ["tae", "Tae", { skin: "#F0D2B6", hair: "#1F1A17", hairStyle: "spiky", top: "#E8566C", bottom: "#2F2B28", hat: "cap" }],
+      ["ivy", "Ivy", { skin: "#D9A882", hair: "#3A2A22", hairStyle: "long", top: "#9CC27E", bottom: "#3E4A43" }],
+      ["rafe", "Rafe", { skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#7FB8E8", bottom: "#8A6A52" }]
+    ].map(([id, name, look]) => ({
+      id,
+      pitch: 0.9 + id.charCodeAt(0) % 5 * 0.08,
+      name,
+      job: "Here for the night market",
+      tourist: true,
+      look,
+      routine: [],
+      intro: `Hi! I'm ${name}. We drove up for the night market. Have you tried the fried chicken?`,
+      lines: ["This band is amazing.", "I've eaten three things already. No regrets.", "The fairy lights! So pretty.", "We're coming back Thursday.", "Is it always this lively here?"],
+      away: `${name}'s gone back to town.`
+    })),
     // Out-of-town families: a parent and their kids, who only come for the vineyard playground (and the field on market
     // and fair days). tours.js (familyVisits) says when.
     ...[
@@ -4610,6 +4803,19 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     { id: "ben", at: 4, short: "Lemonade", n: "Lemonade", items: ["apple"], col: "#F3D34A", line: "Fresh lemonade, and apples for the road." },
     { id: "clara", at: 5, short: "Snacks", n: "Snacks", items: ["dumpling", "ondeh"], col: "#F2A0B8", line: "Dumplings and ondeh-ondeh, made this morning." }
   ];
+  var NIGHT = [
+    { id: "yun", at: 0, short: "Taiwan eats", n: "Taiwanese street snacks", items: ["friedchicken", "scallion", "bubbletea"], col: "#E8566C", line: "Fried chicken as big as your face! And the bubble tea's brown sugar." },
+    { id: "jae", at: 1, short: "Seoul eats", n: "Korean street food", items: ["hotteok", "tteokbokki", "eggbread"], col: "#F28C6A", line: "Hotteok, hot off the griddle. Careful, the sugar's molten." },
+    { id: "mina", at: 2, short: "Hair things", n: "Hair clips and scrunchies", items: ["pearlclip", "clawclip", "scrunchie"], col: "#F4C7CF", line: "Pearl clips, claw clips, velvet scrunchies. Try them on!" },
+    { id: "tomas", at: 3, short: "Charms", n: "Keychains and charms", items: ["dinokey", "luckycharm"], col: "#9C8CD9", line: "Little charms for your keys and your phone. The dino glows in the dark." },
+    { id: "sora", at: 4, short: "Socks & tees", n: "Socks, hats and tees", items: ["cosysocks", "buckethat", "dinotee"], col: "#7FB8E8", line: "Cosy socks, three for the price of happy. And a bucket hat for everyone." },
+    { id: "lior", at: 5, short: "Lanterns", n: "Lanterns and lamps", items: [], decor: ["n_lanterns", "r_moon"], col: "#F3C969", line: "Paper lanterns for the house, and a moon lamp for your room." },
+    { id: "wen", at: 6, short: "Sweets", n: "Sweets", items: ["tanghulu", "eggwaffle"], col: "#C9A3E0", line: "Tanghulu, strawberries in crackly sugar. And egg waffles, still warm." },
+    { id: "kai", at: 7, short: "Drinks", n: "Night drinks", items: ["sugarcane", "grassjelly"], col: "#9CC27E", line: "Fresh sugarcane, pressed while you wait. Grass jelly for the old-school ones." }
+  ];
+  var NIGHT_TOURISTS = ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy", "rafe"];
+  var STAGE = { x: 452, y: 462 };
+  var STAGE_WATCH = [[404, 560], [446, 566], [492, 536], [508, 562], [426, 590]];
   function lastSaturday(day) {
     const dt = /* @__PURE__ */ new Date(day + "T00:00:00Z");
     if (dt.getUTCDay() !== 6) return false;
@@ -4619,6 +4825,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   function eventOn(day) {
     if (dow(day) === 0) return { kind: "market", name: "Sunday farmers market", from: 8 * 60, to: 13 * 60, stalls: MARKET, wine: true };
     if (lastSaturday(day)) return { kind: "fair", name: "Field fair", from: 10 * 60, to: 16 * 60, stalls: FAIR, wine: false };
+    if (dow(day) === 2 || dow(day) === 4) return { kind: "night", name: "Night market", from: 18 * 60, to: 22 * 60, stalls: NIGHT, wine: false };
     return null;
   }
   var eventNow = (day, hm2) => {
@@ -4660,11 +4867,23 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (!e || hm2 < e.from || hm2 >= e.to) return null;
     const st6 = e.stalls.find((s) => s.id === id);
     if (st6) return keeperSlot(st6, e, day, hm2);
+    if (e.kind === "night") return nightShopper(id, e, day, hm2);
     const mid = e.from + Math.round((e.to - e.from) / 2), wave = hm2 < mid ? 0 : 1, half = Math.round((wave ? e.to - mid : mid - e.from) / 2), start = wave ? mid : e.from;
     const crowd = groupFor(day + "ev" + wave, 4, ["pip", ...e.stalls.map((s) => s.id), ...toursOn(day).flatMap((t2) => [t2.guide, ...t2.group])], [...VISITORS, ...TOURISTS, "sam", "priya"]);
     const k = crowd.indexOf(id);
     if (k >= 2 && hm2 >= start + half) return { from: start + half, to: wave ? e.to : mid, scene: "field", at: PICNICKERS[wave ? k : k - 2], act: "sit" };
     if (k >= 0 || id === "pip") return { from: start, to: wave ? e.to : mid, scene: "field", wander: id === "pip" ? FIELD_PLAY : FIELD_WALK };
+    return null;
+  }
+  function nightShopper(id, e, day, hm2) {
+    const mid = e.from + (e.to - e.from) / 2, wave = hm2 < mid ? 0 : 1, from = wave ? mid : e.from, to = wave ? e.to : mid;
+    const tour = groupFor(day + "nt" + wave, 5, [], NIGHT_TOURISTS), vill = groupFor(day + "nv" + wave, 2, ["pip"], VISITORS);
+    const k = tour.indexOf(id), v = vill.indexOf(id), base = { from, to, scene: "field", night: true };
+    if (k === 0 || k === 1) return { ...base, at: STAGE_WATCH[k + wave * 2], dir: k ? -1 : 1 };
+    if (k === 2) return { ...base, at: PICNICKERS[wave], act: "sit" };
+    if (k >= 3) return { ...base, wander: FIELD_WALK };
+    if (v === 0) return { ...base, wander: FIELD_WALK };
+    if (v === 1) return { ...base, at: STAGE_WATCH[4], dir: 1 };
     return null;
   }
   var CLASS_FROM = 8 * 60;
@@ -5357,9 +5576,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       out.dish = "tapas:" + v.tapas.id;
       return;
     }
-    const live2 = Object.keys(v.menu).filter((id2) => v.menu[id2] > 0 && DISHES[id2]);
-    if (!live2.length) return;
-    const id = live2[Math.floor(Math.random() * live2.length)];
+    const live3 = Object.keys(v.menu).filter((id2) => v.menu[id2] > 0 && DISHES[id2]);
+    if (!live3.length) return;
+    const id = live3[Math.floor(Math.random() * live3.length)];
     v.menu[id]--;
     if (!v.menu[id]) delete v.menu[id];
     out.plates++;
@@ -6046,6 +6265,105 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     });
   }
 
+  // src/art/people.js
+  var S = (c) => `style="fill:${c}"`;
+  function hair(style, c, k) {
+    const y = -46 * k, r = 10.6 * k;
+    switch (style) {
+      case "bun":
+        return `<circle cx="0" cy="${y - r - 3 * k}" r="${5 * k}" ${S(c)}/>` + cap(c, y, r);
+      // a bob with a straight-cut fringe (Mel's mum): the bob behind, the fringe drawn over the forehead (see fringe)
+      case "bobfringe":
+      case "bob":
+        return `<path d="M${-r - 1.2} ${y + 1} c-1 -12 5 -16 ${r + 1} -16 c7 0 ${r + 2} 4 ${r + 1.6} 16 l0 ${7 * k} l${-4 * k} 0 l0 ${-8 * k} c-4 -1 -12 -1 -16 -3 l0 ${11 * k} l${-4 * k} 0z" ${S(c)}/>`;
+      case "long":
+        return `<path d="M${-r - 1} ${y} c-1 -12 5 -16 ${r + 1} -16 c7 0 ${r + 2} 4 ${r + 1} 16 l1 ${18 * k} l${-5 * k} 0 l-1 ${-16 * k} c-4 -2 -11 -2 -15 -5 l-1 ${21 * k} l${-5 * k} 0z" ${S(c)}/>`;
+      case "spiky":
+        return `<path d="M${-r} ${y - 1} l-1 -6 l4 2 l1 -6 l4 4 l3 -6 l3 6 l4 -4 l1 6 l4 -2 l-1 6 c-4 -3 -16 -3 -22 0z" ${S(c)}/>`;
+      // short curls: a cap with little round curls all over the top
+      case "curly":
+        return cap(c, y, r) + [[-9, -3], [-6.5, -8.5], [-1.5, -11], [3.5, -10.5], [8, -7], [10, -2], [-10.4, 2], [10.4, 2]].map(([dx, dy]) => `<circle cx="${dx * k}" cy="${y + dy * k}" r="${3.3 * k}" ${S(c)}/>`).join("");
+      default:
+        return cap(c, y, r);
+    }
+  }
+  var fringe = (c, y, r, k) => `<path d="M${-r - 0.4} ${y - 2.6 * k} h${2 * r + 0.8} c0 -7 -4 -11.4 ${-r} -11.4 c-6.4 0 ${-r} 4.4 ${-r} 11.4z" ${S(c)}/>`;
+  var board = (k) => `<ellipse cx="0" cy="${-1 * k}" rx="${22 * k}" ry="${3.6 * k}" style="fill:#F3C969"/><path d="M${-18 * k} ${-1 * k} h${36 * k}" fill="none" stroke-width=".8" style="stroke:#E8566C"/>`;
+  var paddle = (k) => `<path d="M${12 * k} ${-30 * k} l${5 * k} ${32 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${16 * k} ${-2 * k} l${2 * k} ${8 * k} l${3 * k} ${-1 * k} l${-2 * k} ${-8 * k}z" ${S("#7FB8E8")}/>`;
+  var cap = (c, y, r) => `<path d="M${-r - 0.2} ${y + 1} c-1 -9 4 -14 ${r} -14 c6 0 ${r + 1} 4 ${r} 14 c-3 -4 -8 -5 -12 -4 c-3 0 -6 2 -8 4z" ${S(c)}/>`;
+  function extra(kind, look, k) {
+    const y = -46 * k, r = 10.6 * k;
+    switch (kind) {
+      case "apron":
+        return `<path d="M${-6 * k} ${-30 * k} h${12 * k} l${1.5 * k} ${15 * k} h${-15 * k}z" ${S("#FFFDF6")}/><path d="M${-5 * k} ${-31 * k} l${-2 * k} ${-5 * k} M${5 * k} ${-31 * k} l${2 * k} ${-5 * k}" fill="none"/>`;
+      case "glasses":
+        return `<circle cx="${-3.8 * k}" cy="${y + 2}" r="${2.6 * k}" fill="none" stroke-width=".9"/><circle cx="${3.8 * k}" cy="${y + 2}" r="${2.6 * k}" fill="none" stroke-width=".9"/><path d="M${-1.2 * k} ${y + 2} h${2.4 * k}" fill="none" stroke-width=".9"/>`;
+      case "cap":
+        return `<path d="M${-r} ${y - 3} c0 -8 ${r * 2} -8 ${r * 2} 0z" ${S(look.top)}/><path d="M${r - 2} ${y - 3} h${7 * k}" stroke-width="2.2" style="stroke:${look.top}"/>`;
+      case "sunhat":
+        return `<ellipse cx="0" cy="${y - 6 * k}" rx="${16 * k}" ry="${3.6 * k}" ${S("#F3DFA6")}/><path d="M${-8 * k} ${y - 6 * k} c0 -10 ${16 * k} -10 ${16 * k} 0z" ${S("#F3DFA6")}/><path d="M${-8 * k} ${y - 7.5 * k} h${16 * k}" style="stroke:var(--rose)" stroke-width="1.6"/>`;
+      case "helmet":
+        return `<path d="M${-r - 1} ${y - 1} c0 -12 ${r * 2 + 2} -12 ${r * 2 + 2} 0z" ${S("#F6E3A1")}/><path d="M${-2 * k} ${y - 11 * k} v${8 * k} M${3 * k} ${y - 11 * k} v${8 * k}" fill="none" stroke-width=".8"/>`;
+      case "tie":
+        return `<path d="M0 ${-35 * k} l${-1.6 * k} ${3 * k} l${1.6 * k} ${8 * k} l${1.6 * k} ${-8 * k}z" ${S("#C2505F")}/>`;
+      case "satchel":
+        return `<path d="M${-7 * k} ${-35 * k} l${14 * k} ${16 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><rect x="${5 * k}" y="${-22 * k}" width="${8 * k}" height="${7 * k}" rx="1.5" ${S("#C9A27E")}/>`;
+      case "bell":
+        return `<path d="M${11 * k} ${-30 * k} l${4 * k} ${-6 * k}" fill="none"/><path d="M${13 * k} ${-37 * k} c0 -5 ${6 * k} -5 ${6 * k} 0 l1 ${3 * k} h${-8 * k}z" ${S("#F3C969")}/>`;
+      // held in the right hand (hand at about (10k, -21k))
+      case "can":
+        return `<path d="M${13 * k} ${-24 * k} q${5 * k} ${-7 * k} ${10 * k} 0" fill="none"/><rect x="${11 * k}" y="${-24 * k}" width="${12 * k}" height="${9 * k}" rx="2" ${S("#9CC3E0")}/><path d="M${23 * k} ${-20 * k} l${7 * k} ${-6 * k}" fill="none" stroke-width="1.6"/><g class="drips"><circle cx="${31 * k}" cy="${-21 * k}" r="${1 * k}" ${S("var(--water)")}/><circle cx="${33 * k}" cy="${-15 * k}" r="${1 * k}" ${S("var(--water)")}/></g>`;
+      case "hammer":
+        return `<g class="tool"><path d="M${10 * k} ${-20 * k} l${6 * k} ${-14 * k}" fill="none" stroke-width="2.2" style="stroke:#8A5A3A"/><rect x="${12 * k}" y="${-38 * k}" width="${10 * k}" height="${5 * k}" rx="1" transform="rotate(24 ${17 * k} ${-35.5 * k})" ${S("var(--stone)")}/></g>`;
+      case "hoe":
+        return `<g class="tool"><path d="M${16 * k} ${-48 * k} l${-4 * k} ${46 * k}" fill="none" stroke-width="2" style="stroke:#8A5A3A"/><path d="M${12 * k} ${-2 * k} h${-8 * k} l${1 * k} ${3 * k} h${7 * k}z" ${S("var(--stone)")}/></g>`;
+      case "lantern":
+        return `<path d="M${12 * k} ${-24 * k} v${-4 * k}" fill="none"/><rect x="${9 * k}" y="${-24 * k}" width="${7 * k}" height="${9 * k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5 * k}" cy="${-19.5 * k}" r="${1.8 * k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
+    }
+    return "";
+  }
+  function batik(col, k) {
+    const flower = (x, y) => `<circle cx="${x * k}" cy="${y * k}" r="${1.5 * k}" style="fill:${col}" stroke="none"/>` + [[0, -2.6], [2.5, 0], [0, 2.6], [-2.5, 0]].map(([dx, dy]) => `<circle cx="${(x + dx) * k}" cy="${(y + dy) * k}" r="${0.8 * k}" style="fill:${col}" stroke="none"/>`).join("");
+    const leaf2 = (x, y) => `<path d="M${x * k} ${y * k} q${1.6 * k} ${-1.6 * k} ${3.2 * k} 0 q${-1.6 * k} ${1.6 * k} ${-3.2 * k} 0z" style="fill:${col}" stroke="none"/>`;
+    return `<g opacity=".85" pointer-events="none">${flower(-4, -31)}${flower(4.5, -25)}${flower(-3.5, -19)}${leaf2(1, -33)}${leaf2(-7, -25)}${leaf2(4, -18)}
+    <path d="M${-5.6 * k} ${-12 * k} h${3 * k} M${-5.6 * k} ${-8 * k} h${3 * k} M${2 * k} ${-11 * k} h${3 * k} M${2 * k} ${-6 * k} h${3 * k}" stroke-width="${1.1 * k}" style="stroke:${col}"/></g>`;
+  }
+  function personArt(look, kid2) {
+    const k = kid2 ? 0.62 : look.tall ? 1.1 : 1;
+    const legH = 13 * k, legY = -15 * k, lw = 5 * k;
+    const shoe = "var(--sock)";
+    return `<g class="flip"><g filter="url(#wob)">
+    <ellipse cx="0" cy="0" rx="${11 * k}" ry="${3.5 * k}" fill="rgba(60,40,30,.18)"/>
+    <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
+      ${look.board ? board(k) : ""}
+      <g class="legL"><rect x="${-6.2 * k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
+      <g class="legR"><rect x="${1.2 * k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${0.8 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
+      <g class="armL"><rect x="${-12 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/></g>
+      <g class="armR"><rect x="${7.8 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/></g>
+      ${look.dress ? `<path d="M${-9 * k} ${-17 * k} L${-12.5 * k} ${-5 * k} h${25 * k} L${9 * k} ${-17 * k}z" ${S(look.dress)}/>` : ""}
+      <path d="M${-8.6 * k} ${-37 * k} q${8.6 * k} ${-2.4 * k} ${17.2 * k} 0 l${1.4 * k} ${23 * k} h${-20 * k}z" ${S(look.dress || look.top)}/>
+      ${look.batik ? batik(look.batik, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
+      <circle cx="0" cy="${-46 * k}" r="${10.6 * k}" ${S(look.skin)}/>
+      ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46 * k, 10.6 * k) : hair(look.hairStyle, look.hair, k)}
+      <ellipse cx="${-3.7 * k}" cy="${-44 * k}" rx="${1.2 * k}" ry="${1.6 * k}" ${S("var(--sock)")} stroke="none"/>
+      <ellipse cx="${3.7 * k}" cy="${-44 * k}" rx="${1.2 * k}" ry="${1.6 * k}" ${S("var(--sock)")} stroke="none"/>
+      <ellipse cx="${-6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
+      <ellipse cx="${6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
+      <path d="M${-1.6 * k} ${-40.4 * k} q${1.6 * k} ${1.4 * k} ${3.2 * k} 0" fill="none" stroke-width="1"/>
+      ${look.hairStyle === "bobfringe" ? fringe(look.hair, -46 * k, 10.6 * k, k) : ""}
+      ${["glasses", "cap", "sunhat", "helmet"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${look.hat ? extra(look.hat, look, k) : ""}
+      ${look.specs ? `<g fill="none" stroke-width="1" style="stroke:${look.specs}"><circle cx="${-3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><circle cx="${3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><path d="M${-1 * k} ${-44 * k} h${2 * k}"/></g>` : ""}
+      ${look.board ? paddle(k) : ""}
+      ${look.headphones ? `<path d="M${-11 * k} ${-46 * k} a${11 * k} ${12 * k} 0 0 1 ${22 * k} 0" fill="none" stroke-width="1.8" style="stroke:var(--peri2)"/><rect x="${-13.5 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/><rect x="${9 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/>` : ""}
+    </g>
+  </g></g>`;
+  }
+  var letterArt = `<g transform="translate(0 -70)"><g class="qmark"><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.3" stroke-linejoin="round">
+  <rect x="-11" y="-9" width="22" height="16" rx="2" style="fill:#FFFDF6"/><path d="M-11 -9 l11 9 l11 -9" fill="none"/><circle cx="0" cy="1" r="3" style="fill:var(--rose)"/></g></g></g>`;
+
   // src/art/field.js
   var W2 = `filter="url(#wob)" ${ink}`;
   var swan = (x, y, dx, dur2, flip) => `<g pointer-events="none"><g>
@@ -6082,6 +6400,39 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return `<path d="M${x - 6} ${y} h12 l-6 10z" style="fill:${["#E8566C", "#F3C969", "#7FB8E8", "#9CC27E"][i % 4]}"/>`;
   }).join("")}</g>`;
   var INLET = "M-10 56 C30 64 54 100 62 150 C68 190 80 222 106 252";
+  var bulbs = (pts, k0) => pts.map(([x, y], k) => `<circle cx="${x}" cy="${y}" r="6" style="fill:#FFE9A8" opacity=".35"/><circle cx="${x}" cy="${y}" r="2.4" style="fill:${["#FFE9A8", "#F9C6D0", "#FFF6D8"][(k + k0) % 3]}">
+  <animate attributeName="opacity" values="1;.55;1" dur="${2 + (k + k0) % 4 * 0.6}s" begin="${(k * 7 + k0) % 10 / 5}s" repeatCount="indefinite"/></circle>`).join("");
+  var sag = (x1, x2, y, d, n) => Array.from({ length: n }, (_, i) => {
+    const t2 = (i + 0.5) / n;
+    return [x1 + (x2 - x1) * t2, y + Math.sin(t2 * Math.PI) * d];
+  });
+  var fairyLights = () => `<g pointer-events="none"><path d="M10 64 Q135 96 260 64 Q385 96 510 64" fill="none" style="stroke:var(--line)" stroke-width=".9" opacity=".7"/>
+  ${bulbs([...sag(10, 260, 64, 22, 9), ...sag(260, 510, 64, 22, 9)], 0)}</g>`;
+  var OTIS = { skin: "#A8754F", hair: "#1F1A17", hairStyle: "short", top: "#2F2B28", bottom: "#3F4A6B", hat: "cap" };
+  var ELLA = { skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#8E2C48", bottom: "#2F2B28" };
+  var sway = (x, y, look, dur2) => `<g transform="translate(${x} ${y})"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.4;0 0" dur="${dur2}s" repeatCount="indefinite"/>${personArt(look)}</g></g>`;
+  var hat = (x, y) => `<g data-place="jazzhat" aria-label="The band's hat: drop in a tip"><ellipse class="hov" cx="${x}" cy="${y + 2}" rx="20" ry="7" style="fill:var(--butter)"/>
+    ${sk(`<ellipse cx="${x}" cy="${y}" rx="12" ry="3.5" style="fill:#2F2B28"/><path d="M${x - 7} ${y} q0 -9 7 -9 q7 0 7 9z" style="fill:#2F2B28"/><circle cx="${x - 3}" cy="${y - 2}" r="1.4" style="fill:#F3C969"/><circle cx="${x + 2}" cy="${y - 1}" r="1.4" style="fill:#F3C969"/>`, `<ellipse cx="${x}" cy="${y}" rx="12" ry="3.5"/><path d="M${x - 7} ${y} q0 -9 7 -9 q7 0 7 9"/>`)}
+    ${tapeLabel(x, y + 22, "Tip the band", "var(--butter)", 9)}</g>`;
+  function stage() {
+    const { x, y } = STAGE;
+    return `<g pointer-events="none">${sk(
+      `<rect x="${x - 62}" y="${y - 18}" width="124" height="18" rx="2" style="fill:#8B5E3C"/><rect x="${x - 62}" y="${y - 22}" width="124" height="5" rx="2" style="fill:#C9A27E"/>`,
+      `<rect x="${x - 62}" y="${y - 18}" width="124" height="18" rx="2"/><path d="M${x - 62} ${y - 22} h124 v5 h-124z M${x - 30} ${y - 18} v18 M${x} ${y - 18} v18 M${x + 30} ${y - 18} v18"/>`
+    )}
+    ${sway(x - 30, y - 20, ELLA, 1.1)}
+    ${sk(
+      `<rect x="${x - 50}" y="${y - 46}" width="38" height="7" rx="1.5" style="fill:#2F2B28"/>${[0, 1, 2, 3, 4, 5, 6].map((k) => `<rect x="${x - 48 + k * 5}" y="${y - 44}" width="4" height="4" style="fill:#FFFDF6"/>`).join("")}`,
+      `<rect x="${x - 50}" y="${y - 46}" width="38" height="7" rx="1.5"/><path d="M${x - 46} ${y - 39} l8 17 M${x - 16} ${y - 39} l-8 17"/>`
+    )}
+    ${sway(x + 22, y - 20, OTIS, 0.9)}
+    ${sk(
+      `<path d="M${x + 38} ${y - 66} v26 c-8 2 -10 8 -8 13 c-4 4 -2 12 8 13 c10 -1 12 -9 8 -13 c2 -5 0 -11 -8 -13z" style="fill:#A0623A"/>`,
+      `<path d="M${x + 38} ${y - 78} v38 c-8 2 -10 8 -8 13 c-4 4 -2 12 8 13 c10 -1 12 -9 8 -13 c2 -5 0 -11 -8 -13 M${x + 38} ${y - 14} v-4 M${x + 35} ${y - 30} h6"/>`
+    )}
+    ${bulbs(sag(x - 66, x + 66, y - 68, 6, 7), 2)}<path d="M${x - 66} ${y - 68} Q${x} ${y - 56} ${x + 66} ${y - 68} M${x - 66} ${y - 68} v48 M${x + 66} ${y - 68} v48" fill="none" style="stroke:var(--line)" stroke-width=".9" opacity=".7"/></g>
+    ${hat(x - 30, y + 20)}`;
+  }
   function fieldArt() {
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="160" cy="520" rx="170" ry="90" style="fill:var(--grass2)"/><ellipse cx="460" cy="460" rx="90" ry="140" style="fill:var(--grass2)"/></g>
@@ -6106,11 +6457,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       `<path d="M86 452 l58 -6 l8 26 l-58 6z"/><rect x="156" y="452" width="24" height="16" rx="3"/><path d="M158 452 q10 -12 20 0"/>`
     )}
     ${tapeLabel(130, 508, "Picnic spot", "var(--blush)", 11)}</g>`;
+    const ev0 = eventNow(artCtx().day(), sgHM()), night = !!ev0 && ev0.kind === "night";
     const pitch = `<g data-place="pitch" aria-label="Football pitch"><ellipse class="hov" cx="150" cy="590" rx="80" ry="12" style="fill:var(--butter)"/>
     <g ${W2} fill="none" opacity=".75"><rect x="66" y="530" width="168" height="56" rx="4" style="stroke:#FFFDF6" stroke-width="2.4"/><path d="M150 530 v56" style="stroke:#FFFDF6" stroke-width="2"/><circle cx="150" cy="558" r="10" style="stroke:#FFFDF6" stroke-width="2"/></g>
     ${sk(`<circle cx="176" cy="566" r="5" style="fill:#FFFDF6"/>`, `<path d="M62 544 v28 h-10 v-28z M238 544 v28 h10 v-28z"/><circle cx="176" cy="566" r="5"/><path d="M174 563 l3 2 l-1 3" opacity=".6"/>`)}
     ${tapeLabel(150, 612, "Football pitch", "var(--butter)", 11)}</g>`;
-    const lawn = `<g data-place="exlawn" aria-label="Exercise lawn"><ellipse class="hov" cx="456" cy="452" rx="52" ry="30" style="fill:var(--butter)"/>
+    const lawn = night ? "" : `<g data-place="exlawn" aria-label="Exercise lawn"><ellipse class="hov" cx="456" cy="452" rx="52" ry="30" style="fill:var(--butter)"/>
     ${sk(
       `${[[418, 444, "#E8566C"], [456, 452, "#7FB8E8"], [494, 444, "#C9A3E0"], [436, 480, "#9CC27E"]].map(([x, y, c]) => `<path d="M${x - 16} ${y + 3} l5 -10 h22 l-5 10z" style="fill:${c}"/>`).join("")}<rect x="476" y="392" width="14" height="18" rx="3" style="fill:#2F2B28"/>`,
       `${[[418, 444], [456, 452], [494, 444], [436, 480]].map(([x, y]) => `<path d="M${x - 16} ${y + 3} l5 -10 h22 l-5 10z"/>`).join("")}<rect x="476" y="392" width="14" height="18" rx="3"/><circle cx="483" cy="403" r="4"/>`
@@ -6129,8 +6481,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     )}
     ${tapeLabel(332, 614, "Orchard", "var(--sage)", 11)}</g>`;
     const ev = eventNow(artCtx().day(), sgHM());
-    const event = ev ? bunting + ev.stalls.map((s) => stall(s.at, STALL_SPOTS[s.at][0], STALL_SPOTS[s.at][1], s)).join("") + blanket2() + (ev.kind === "fair" ? kites : "") + tapeLabel(260, 30, ev.name, "var(--butter)", 12) : "";
-    return lampDefs + ground + swans + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + lawn + toTown + toOrchard + event + archGate("toShoreF", 20, 292, "Foreshore", 52, 332, "var(--sky)", "Gate to the foreshore");
+    const event = ev ? (ev.kind === "night" ? fairyLights() : bunting) + ev.stalls.map((s) => stall(s.at, STALL_SPOTS[s.at][0], STALL_SPOTS[s.at][1], s)).join("") + (ev.kind === "night" ? stage() : blanket2() + (ev.kind === "fair" ? kites : "")) + tapeLabel(260, 30, ev.name, "var(--butter)", 12) : "";
+    const dark = skyWash(sgHM());
+    return lampDefs + ground + swans + dark + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + lawn + toTown + toOrchard + event + archGate("toShoreF", 20, 292, "Foreshore", 52, 332, "var(--sky)", "Gate to the foreshore");
   }
   var orchardRiver = `<g filter="url(#wob)"><path d="M380 0 C400 40 450 66 520 70" fill="none" style="stroke:var(--water)" stroke-width="18" stroke-linecap="round"/>
   <path d="M371 0 C391 42 446 75 520 79 M389 0 C409 38 454 57 520 61" fill="none" style="stroke:var(--line)" stroke-width="1.1" opacity=".55"/></g>
@@ -6138,40 +6491,40 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 
   // src/art/orchard.js
   var W3 = `filter="url(#wob)" ${ink}`;
-  function treeBody(id, stage, g) {
+  function treeBody(id, stage2, g) {
     const T = TREES[id] || { col: "#D9433A" };
     const trunk = `<path d="M-3 0 L-2.4 -26 L2.4 -26 L3 0z" style="fill:var(--wood)"/>`;
-    if (stage === "growing") {
+    if (stage2 === "growing") {
       const s = 0.45 + 0.4 * (g || 0);
       return `<g transform="scale(${s.toFixed(2)})">${trunk}<circle cx="0" cy="-34" r="11" style="fill:#8DB86B"/><circle cx="-8" cy="-28" r="7" style="fill:#6E9F57"/><circle cx="8" cy="-29" r="7" style="fill:#6E9F57"/></g>`;
     }
-    if (stage === "faded") return `${trunk}<path d="M0 -24 L-12 -40 M0 -26 L10 -42 M-6 -32 L-14 -30 M5 -34 L13 -33" fill="none" stroke-width="2" style="stroke:var(--wood)"/>
+    if (stage2 === "faded") return `${trunk}<path d="M0 -24 L-12 -40 M0 -26 L10 -42 M-6 -32 L-14 -30 M5 -34 L13 -33" fill="none" stroke-width="2" style="stroke:var(--wood)"/>
     <ellipse cx="-12" cy="-41" rx="3" ry="2" style="fill:#C9A06A"/><ellipse cx="11" cy="-43" rx="3" ry="2" style="fill:#B98A5A"/><ellipse cx="-6" cy="2" rx="4" ry="1.6" style="fill:#C9A06A"/>`;
-    const fruit = stage === "ripe" ? T.col : stage === "budding" ? T.bloom || "#B9D88A" : null;
-    const dots2 = fruit ? [[-10, -38], [6, -44], [12, -32], [-4, -28], [-14, -28], [2, -36], [10, -24]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${stage === "ripe" ? 3.2 : 2.2}" style="fill:${fruit}"/>`).join("") : "";
+    const fruit = stage2 === "ripe" ? T.col : stage2 === "budding" ? T.bloom || "#B9D88A" : null;
+    const dots2 = fruit ? [[-10, -38], [6, -44], [12, -32], [-4, -28], [-14, -28], [2, -36], [10, -24]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${stage2 === "ripe" ? 3.2 : 2.2}" style="fill:${fruit}"/>`).join("") : "";
     return `${trunk}<circle cx="0" cy="-38" r="16" style="fill:#8DB86B"/><circle cx="-12" cy="-30" r="11" style="fill:#6E9F57"/><circle cx="12" cy="-31" r="11" style="fill:#6E9F57"/>${dots2}`;
   }
-  function bedBody(id, stage, g) {
+  function bedBody(id, stage2, g) {
     const c = (FLOWERS[id] || { col: "#E86A7C" }).col, soil = `<ellipse cx="0" cy="0" rx="32" ry="9" style="fill:#9C7A5C"/>`;
     const xs = [-20, -10, 0, 10, 20];
     if (!id) return soil;
-    if (stage === "faded") return soil + xs.map((x) => `<path d="M${x} -1 q2 -8 6 -6" fill="none" style="stroke:#A88A5A"/>`).join("");
-    const h = stage === "growing" ? 5 + 10 * (g || 0) : 20;
+    if (stage2 === "faded") return soil + xs.map((x) => `<path d="M${x} -1 q2 -8 6 -6" fill="none" style="stroke:#A88A5A"/>`).join("");
+    const h = stage2 === "growing" ? 5 + 10 * (g || 0) : 20;
     const stems = xs.map((x, k) => `<path d="M${x} -1 v${-h - k % 2 * 3}" fill="none" style="stroke:var(--moss2)"/><ellipse cx="${x - 3}" cy="${-h * 0.45}" rx="3" ry="1.6" style="fill:var(--moss)"/>`).join("");
-    const heads = stage === "ripe" ? xs.map((x, k) => `<circle cx="${x}" cy="${-h - k % 2 * 3 - 2}" r="5.2" style="fill:${c}"/><circle cx="${x}" cy="${-h - k % 2 * 3 - 2}" r="1.9" style="fill:#FFF0B8"/>`).join("") : stage === "budding" ? xs.map((x, k) => `<ellipse cx="${x}" cy="${-h - k % 2 * 3 - 1}" rx="2" ry="3" style="fill:var(--moss)"/><path d="M${x - 1} ${-h - k % 2 * 3 - 3} h2" style="stroke:${c}"/>`).join("") : "";
+    const heads = stage2 === "ripe" ? xs.map((x, k) => `<circle cx="${x}" cy="${-h - k % 2 * 3 - 2}" r="5.2" style="fill:${c}"/><circle cx="${x}" cy="${-h - k % 2 * 3 - 2}" r="1.9" style="fill:#FFF0B8"/>`).join("") : stage2 === "budding" ? xs.map((x, k) => `<ellipse cx="${x}" cy="${-h - k % 2 * 3 - 1}" rx="2" ry="3" style="fill:var(--moss)"/><path d="M${x - 1} ${-h - k % 2 * 3 - 3} h2" style="stroke:${c}"/>`).join("") : "";
     return soil + stems + heads;
   }
-  function bushBody(id, stage, g) {
+  function bushBody(id, stage2, g) {
     const c = (FLOWERS[id] || { col: "#E8566C" }).col;
     if (!id) return `<ellipse cx="0" cy="0" rx="22" ry="6" style="fill:#9C7A5C"/>`;
-    if (stage === "faded") return `<ellipse cx="0" cy="0" rx="22" ry="6" style="fill:#9C7A5C"/><path d="M-12 -2 L-4 -18 M0 -2 L2 -22 M10 -2 L6 -18" fill="none" style="stroke:#A88A5A"/>`;
-    const s = stage === "growing" ? 0.5 + 0.45 * (g || 0) : 1;
-    const dots2 = stage === "ripe" ? [[-12, -14], [-4, -22], [6, -20], [13, -12], [0, -12], [-8, -6], [9, -5]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.6" style="fill:${c}"/>`).join("") : stage === "budding" ? [[-10, -14], [2, -20], [12, -11], [-2, -8]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2" style="fill:${c}" opacity=".6"/>`).join("") : "";
+    if (stage2 === "faded") return `<ellipse cx="0" cy="0" rx="22" ry="6" style="fill:#9C7A5C"/><path d="M-12 -2 L-4 -18 M0 -2 L2 -22 M10 -2 L6 -18" fill="none" style="stroke:#A88A5A"/>`;
+    const s = stage2 === "growing" ? 0.5 + 0.45 * (g || 0) : 1;
+    const dots2 = stage2 === "ripe" ? [[-12, -14], [-4, -22], [6, -20], [13, -12], [0, -12], [-8, -6], [9, -5]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.6" style="fill:${c}"/>`).join("") : stage2 === "budding" ? [[-10, -14], [2, -20], [12, -11], [-2, -8]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2" style="fill:${c}" opacity=".6"/>`).join("") : "";
     return `<g transform="scale(${s.toFixed(2)})"><ellipse cx="0" cy="-12" rx="22" ry="15" style="fill:#6E9F57"/><ellipse cx="-8" cy="-16" rx="12" ry="9" style="fill:#8DB86B"/>${dots2}</g>`;
   }
   var pictureBox = (body2, size, off, vb = "-34 -64 68 70") => `<svg class="vybottle" viewBox="${vb}" width="${size}" height="${Math.round(size * 70 / 68)}" aria-hidden="true"><g ${W3} ${off ? 'opacity=".4"' : ""}>${body2}</g></svg>`;
-  var treePic = (id, stage, size = 60, off) => pictureBox(treeBody(id, stage, 0.6), size, off);
-  var flowerPic = (id, stage, bush, size = 60, off) => pictureBox(bush ? bushBody(id, stage, 0.6) : bedBody(id, stage, 0.6), size, off, bush ? "-30 -40 60 46" : "-36 -32 72 42");
+  var treePic = (id, stage2, size = 60, off) => pictureBox(treeBody(id, stage2, 0.6), size, off);
+  var flowerPic = (id, stage2, bush, size = 60, off) => pictureBox(bush ? bushBody(id, stage2, 0.6) : bedBody(id, stage2, 0.6), size, off, bush ? "-30 -40 60 46" : "-36 -32 72 42");
   function potArt(x, y, flower, style) {
     const c = (FLOWERS[flower] || { col: "#E86A7C" }).col;
     const heads = (pts, r) => pts.map(([dx, dy]) => `<circle cx="${x + dx}" cy="${y + dy}" r="${r}" style="fill:${c}"/><circle cx="${x + dx}" cy="${y + dy}" r="${r * 0.35}" style="fill:#FFF0B8"/>`).join("");
@@ -6890,15 +7243,28 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const famArt = (fam.sandpit ? `<g aria-label="Sandpit">${sk(`<rect x="208" y="512" width="56" height="24" rx="5" style="fill:#F2DDA8"/><path d="M246 506 h8 l-2 8 h-4z" style="fill:var(--rose)"/>`, `<rect x="208" y="512" width="56" height="24" rx="5"/><path d="M212 518 h48" opacity=".5"/><path d="M246 506 h8 l-2 8 h-4z M250 506 v-6"/><path d="M220 528 q5 -5 10 0" opacity=".6"/>`)}</g>` : "") + (fam.hammock ? sk(`<path d="M398 600 q32 18 64 0 z" style="fill:var(--peach)"/>`, `<path d="M392 622 v-34 M468 622 v-34 M392 594 l6 6 M468 594 l-6 6"/><path d="M398 600 q32 18 64 0"/><path d="M410 604 l2 -3 M430 608 l1 -4 M450 604 l-2 -3" opacity=".6"/>`) : "");
     const tools = G.F().tools || {};
     const toolArt = (tools.compost ? sk(`<path d="M192 452 h24 l-3 22 h-18z" style="fill:var(--wood)"/><path d="M196 451 c3 -6 13 -6 16 0" style="fill:var(--moss)"/>`, `<path d="M192 452 h24 l-3 22 h-18z M195 460 h18"/>`) : "") + (tools.can ? sk(`<rect x="466" y="262" width="14" height="11" rx="2" style="fill:#9CC3E0"/>`, `<rect x="466" y="262" width="14" height="11" rx="2"/><path d="M480 266 l7 -5 M468 262 c0 -5 9 -5 9 0"/>`) : "") + (tools.sprinkler ? sk(`<circle cx="108" cy="438" r="4" style="fill:var(--stone)"/>`, `<circle cx="108" cy="438" r="4"/><path d="M108 434 v-4"/><path class="ripple" d="M96 426 q12 -10 24 0" opacity=".7"/>`) : "");
-    return lampDefs + ground + BASE_LAMPS.map(([x, y]) => streetLamp(x, y)).join("") + places + potsIn("base") + runArt(G.F()) + famArt + treehouse + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : "");
+    return lampDefs + ground + BASE_LAMPS.map(([x, y]) => streetLamp(x, y)).join("") + places + potsIn("base") + runArt(G.F()) + famArt + treehouse + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : skyWash(sgHM()));
   }
   var BASE_LAMPS = [[192, 380], [328, 380]];
   var litLamp = (x, y) => `<circle cx="${x}" cy="${y - 6}" r="40" fill="url(#lampn)"/><circle class="flick" cx="${x}" cy="${y - 30}" r="16" fill="#FFE3A3" opacity=".45"/>
   <rect x="${x - 5}" y="${y - 36}" width="10" height="12" rx="2" fill="#FFE9A8" stroke="#3b3530" stroke-width="1.2"/><rect x="${x - 2.5}" y="${y - 33}" width="5" height="6" rx="1" fill="#FFFBEA"/>`;
+  var SKY = [[0, "#959CD3"], [5 * 60 + 45, "#959CD3"], [6 * 60 + 15, "#F2D6C8"], [6 * 60 + 45, "#FFFFFF"], [18 * 60, "#FFFFFF"], [18 * 60 + 45, "#F9D9C2"], [19 * 60 + 30, "#A3A9DC"], [21 * 60, "#959CD3"], [24 * 60, "#959CD3"]];
+  var mix = (a, b, t2) => "#" + [1, 3, 5].map((i) => Math.round(parseInt(a.slice(i, i + 2), 16) * (1 - t2) + parseInt(b.slice(i, i + 2), 16) * t2).toString(16).padStart(2, "0")).join("");
+  function skyColour(m) {
+    for (let i = 1; i < SKY.length; i++) if (m < SKY[i][0]) {
+      const [m0, c0] = SKY[i - 1], [m1, c1] = SKY[i];
+      return mix(c0, c1, (m - m0) / (m1 - m0)).toUpperCase();
+    }
+    return SKY[0][1];
+  }
+  var skyWash = (m) => {
+    const c = skyColour(Math.floor(m / 5) * 5);
+    return c === "#FFFFFF" ? "" : `<rect class="dusk" width="520" height="640" fill="${c}" style="mix-blend-mode:multiply" pointer-events="none"/>`;
+  };
   function duskArt() {
     const win = (x, y, w, h) => `<rect class="glow" x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="#FFD98A"/><rect x="${x - 8}" y="${y - 8}" width="${w + 16}" height="${h + 16}" rx="10" fill="#FFD98A" opacity=".18"/>`;
     const stars = [[30, 14], [96, 22], [176, 10], [330, 18], [420, 12], [500, 22], [250, 8]].map(([x, y]) => `<circle class="twinkle" cx="${x}" cy="${y}" r="1.6" fill="#FFF3C4"/>`).join("");
-    return `<rect class="dusk" width="520" height="640" fill="#A3A9DC" style="mix-blend-mode:multiply" pointer-events="none"/>
+    return `${skyWash(sgHM())}
     <defs><radialGradient id="lampn"><stop offset="0" stop-color="#FFD98A" stop-opacity=".7"/><stop offset=".5" stop-color="#FFC66B" stop-opacity=".28"/><stop offset="1" stop-color="#FFC66B" stop-opacity="0"/></radialGradient></defs>
     <g pointer-events="none">${BASE_LAMPS.map(([x, y]) => litLamp(x, y)).join("")}${stars}${win(217, 234, 20, 18)}${win(283, 234, 20, 18)}${win(448, 230, 12, 10)}
       <circle cx="276" cy="602" r="36" fill="#FFB65C" opacity=".28"/>
@@ -7903,9 +8269,33 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       arpVel: 0.035,
       mel: 0.4
     },
-    rain: { name: "Rain on the roof", mood: "Just rain, no music", rain: true, col: "#9CB4C9" }
+    rain: { name: "Rain on the roof", mood: "Just rain, no music", rain: true, col: "#9CB4C9" },
+    // live, not a record: the night market's jazz duo (keys and double bass) in F, swung. walk: the bass line, a note a
+    // beat; the keys comp on the "and" of 2 and on 4, with a loose top line over it
+    jazz: {
+      name: "The night market duo",
+      live: true,
+      bpm: 112,
+      steps: 8,
+      tone: "piano",
+      swing: 0.17,
+      comp: true,
+      arpVel: 0.05,
+      mel: 0.9,
+      bars: [[43, 58, 62, 65, 69], [36, 58, 62, 64, 67], [41, 57, 60, 64, 67], [38, 57, 60, 65, 69], [43, 58, 62, 65, 70], [36, 58, 62, 64, 69], [41, 57, 64, 67, 72], [36, 58, 64, 67, 70]],
+      walk: [[43, 45, 46, 47], [48, 46, 45, 43], [41, 43, 45, 46], [38, 40, 41, 42], [43, 46, 50, 48], [48, 47, 46, 45], [41, 45, 48, 45], [36, 38, 40, 42]]
+    }
   };
-  var cur = () => TRACKS[settings.track] || TRACKS.piano;
+  var live = null;
+  var cur = () => live && TRACKS[live] || TRACKS[settings.track] || TRACKS.piano;
+  function setLive(id) {
+    if ((id || null) === live) return;
+    live = id || null;
+    if (playing) {
+      stopMusic();
+      setTimeout(() => startMusic(), 450);
+    }
+  }
   var BEAT = 60 / 64;
   var BARS = TRACKS.piano.bars;
   var playing = false;
@@ -7950,6 +8340,17 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         if (step) loops++;
         newMelody();
         if (Math.random() > T.mel) melody = melody.map(() => []);
+      }
+      const sw3 = T.swing && e % 2 ? BEAT * T.swing : 0;
+      if (T.walk) {
+        if (e % 2 === 0) note(N(T.walk[bar][e / 2]), t2, BEAT * 0.95, 0.17);
+        if (T.comp && (e === 3 || e === 6)) b.slice(1).forEach((n) => note(N(n), t2 + sw3, 0.5, 0.045));
+        (melody[bar] || []).forEach(([beat, n]) => {
+          if (Math.abs(beat * 2 - e) < 0.01) note(N(n), t2 + sw3 + 0.01, 1.4, 0.09);
+        });
+        step++;
+        nextTime += BEAT / 2;
+        continue;
       }
       if (e === 0) {
         note(N(b[0]), t2, 3.4, 0.16);
@@ -9976,6 +10377,14 @@ Quests finished today: ${S3.doneIds.length}`;
   }
 
   // src/game/wardrobe.js
+  var ACCESSORIES = [["me_bow", "bow", "Velvet hair bow", ""], ["me_scarf", "scarf", "Silk neck scarf", ""], ["me_hat", "sunhat", "Straw sun hat", "outdoors"], ["me_pj", "pyjamas", "Silk pyjamas", "in your room"]];
+  var wearing = (F2, k) => !!(F2.decor || {})[k];
+  function accessories(F2) {
+    const own = ACCESSORIES.filter(([k]) => (F2.decorOwned || {})[k] || (F2.decor || {})[k]);
+    if (!own.length) return "";
+    return `<p class="eyebrow" style="margin:14px 0 6px">Your accessories</p><div class="accs">${own.map(([k, ico2, n, where]) => `<div class="acc"><span class="e">${icon(ico2, 30)}</span><span class="n">${esc(n)}${where ? `<small>${where}</small>` : ""}</span>
+    <button class="btn small ${wearing(F2, k) ? "primary" : "alt"}" data-acc="${k}" aria-pressed="${wearing(F2, k)}">${wearing(F2, k) ? "Wearing" : "Put on"}</button></div>`).join("")}</div>`;
+  }
   var FIELDS = [["top", "Top"], ["dress", "Dress"], ["bottom", "Bottom"], ["shoes", "Shoes"], ["bag", "Bag"], ["jewellery", "Jewellery"], ["sunglasses", "Sunglasses"], ["layer", "Layer"], ["hair", "Hair"]];
   var clean = (s, n = 140) => plain(String(s || "")).slice(0, n);
   var todayDoc = () => {
@@ -10007,6 +10416,7 @@ Quests finished today: ${S3.doneIds.length}`;
       h += `<div class="outfit wearpick"><p class="olabel">Put on ${esc(clean(pick3.label, 50) || "this outfit")}</p><p class="muted">Untick anything you're skipping.</p><ul>${fs.map(([k, n]) => `<li><label><input type="checkbox" data-wearf="${k}" checked> <span class="gpic">${garment(k === "layer" ? "layer" : k, pick3[k])}</span><span><small>${n}</small>${esc(clean(pick3[k]))}</span></label></li>`).join("")}</ul>
       <div class="actions"><button class="btn primary" data-wearok="${st6.pick}">Put it on</button><button class="btn alt small" data-wearback="1">Back</button></div></div>`;
     } else if (all.length) h += `<div class="outfits">${all.map(card).join("")}</div>`;
+    if (!pick3) h += accessories(F2);
     h += `<p class="eyebrow" style="margin:14px 0 6px">Want something different?</p>`;
     if (!inv) h += `<p class="muted">New outfits need your wardrobe list, which comes with the morning drop-off.</p>`;
     else if (!st6.sample) h += `<p class="muted">New outfits need Claude, which isn't reachable from this view just now.</p>`;
@@ -10609,7 +11019,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     "A worry, written down so it can stop circling."
   ];
   var journalPrompt = () => PROMPTS[Math.floor(Date.parse(dayKey() + "T00:00:00Z") / 864e5) % PROMPTS.length];
-  var live = () => J.entries.filter((e) => !e.deleted);
+  var live2 = () => J.entries.filter((e) => !e.deleted);
   var draft = "";
   function addEntry(text, kind) {
     text = String(text || "").trim().slice(0, 8e3);
@@ -10644,7 +11054,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   }
   var when4 = (e) => new Date(e.at).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Singapore" });
   function journalPanel(decompress) {
-    const list2 = live().slice(0, 12);
+    const list2 = live2().slice(0, 12);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>My journal</h2>
     <p class="sub">${decompress ? "Three quick points from that call or moment. Then let it go." : esc(journalPrompt())}</p>
     <form id="jForm" class="jform"><label class="sr" for="jText">Journal entry</label><textarea id="jText" rows="6" maxlength="8000" placeholder="${decompress ? "1.\n2.\n3." : "Write anything..."}">${esc(draft)}</textarea>
@@ -10680,8 +11090,8 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       });
     });
   }
-  var journalCount = () => live().length;
-  var journalSince = (ms) => live().filter((e) => e.at >= ms).length;
+  var journalCount = () => live2().length;
+  var journalSince = (ms) => live2().filter((e) => e.at >= ms).length;
   function scratchPanel() {
     const ago4 = SC.updatedAt ? Math.round((Date.now() - SC.updatedAt) / 6e4) : null;
     return `<span class="tape stripe" aria-hidden="true"></span><h2>Scratchpad</h2><p class="sub">Jot anything down. It saves as you type, and it's only yours.</p>
@@ -11966,7 +12376,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var snackPic = (id, size) => pic2(SNACKS[id].svg, size);
   var DINO_COLS = ["#7BB37A", "#7FB8E8", "#F2A65A", "#C9A3E8", "#F4A0B5"];
   var babyDino = (c) => `<path d="M14 54 q-4 -20 12 -26 q4 -14 16 -12 q10 2 8 12 q-2 6 -10 6 q4 8 2 20z" fill="${c}" ${sw2}/><circle cx="44" cy="22" r="2" fill="${INK4}"/><path d="M47 28 q-3 2 -6 1" fill="none" ${sw2}/><path d="M26 30 l-3 -5 l5 1 l1 -5 l4 3" fill="#FFFDF6" ${sw2}/>`;
-  var egg = (stage) => `<ellipse cx="32" cy="38" rx="20" ry="25" fill="#FFF6E2" ${sw2}/><circle cx="24" cy="30" r="3.4" fill="#A8CF8E"/><circle cx="38" cy="44" r="4" fill="#F2A65A"/><circle cx="36" cy="26" r="2.6" fill="#7FB8E8"/>${stage >= 1 ? `<path d="M14 36 l6 -5 l5 6 l6 -7 l6 7 l6 -6 l5 5" fill="none" ${sw2}/>` : ""}`;
+  var egg = (stage2) => `<ellipse cx="32" cy="38" rx="20" ry="25" fill="#FFF6E2" ${sw2}/><circle cx="24" cy="30" r="3.4" fill="#A8CF8E"/><circle cx="38" cy="44" r="4" fill="#F2A65A"/><circle cx="36" cy="26" r="2.6" fill="#7FB8E8"/>${stage2 >= 1 ? `<path d="M14 36 l6 -5 l5 6 l6 -7 l6 7 l6 -6 l5 5" fill="none" ${sw2}/>` : ""}`;
   var hatched = (c) => `${babyDino(c)}<path d="M12 44 l6 -5 l5 6 l6 -7 l6 7 l6 -6 l6 5 v6 a20 14 0 0 1 -41 0z" fill="#FFF6E2" ${sw2}/>`;
   var CAR_COLS = ["#E86A5C", "#5B8FD6", "#F3C14A"];
   var car = (c) => `<path d="M6 40 v-10 q0 -4 4 -4 h10 l8 -10 h18 q4 0 6 4 l6 10 q6 0 6 6 v4z" fill="${c}" ${sw2}/><path d="M30 18 h14 l5 8 h-24z" fill="#DCEBF6" ${sw2}/><circle cx="18" cy="42" r="7" fill="#3B3B44" ${sw2}/><circle cx="48" cy="42" r="7" fill="#3B3B44" ${sw2}/><circle cx="18" cy="42" r="2.4" fill="#D9D9D9"/><circle cx="48" cy="42" r="2.4" fill="#D9D9D9"/><circle cx="62" cy="32" r="2.6" fill="#FFE38A"/>`;
@@ -12223,105 +12633,6 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return out;
   }
 
-  // src/art/people.js
-  var S = (c) => `style="fill:${c}"`;
-  function hair(style, c, k) {
-    const y = -46 * k, r = 10.6 * k;
-    switch (style) {
-      case "bun":
-        return `<circle cx="0" cy="${y - r - 3 * k}" r="${5 * k}" ${S(c)}/>` + cap(c, y, r);
-      // a bob with a straight-cut fringe (Mel's mum): the bob behind, the fringe drawn over the forehead (see fringe)
-      case "bobfringe":
-      case "bob":
-        return `<path d="M${-r - 1.2} ${y + 1} c-1 -12 5 -16 ${r + 1} -16 c7 0 ${r + 2} 4 ${r + 1.6} 16 l0 ${7 * k} l${-4 * k} 0 l0 ${-8 * k} c-4 -1 -12 -1 -16 -3 l0 ${11 * k} l${-4 * k} 0z" ${S(c)}/>`;
-      case "long":
-        return `<path d="M${-r - 1} ${y} c-1 -12 5 -16 ${r + 1} -16 c7 0 ${r + 2} 4 ${r + 1} 16 l1 ${18 * k} l${-5 * k} 0 l-1 ${-16 * k} c-4 -2 -11 -2 -15 -5 l-1 ${21 * k} l${-5 * k} 0z" ${S(c)}/>`;
-      case "spiky":
-        return `<path d="M${-r} ${y - 1} l-1 -6 l4 2 l1 -6 l4 4 l3 -6 l3 6 l4 -4 l1 6 l4 -2 l-1 6 c-4 -3 -16 -3 -22 0z" ${S(c)}/>`;
-      // short curls: a cap with little round curls all over the top
-      case "curly":
-        return cap(c, y, r) + [[-9, -3], [-6.5, -8.5], [-1.5, -11], [3.5, -10.5], [8, -7], [10, -2], [-10.4, 2], [10.4, 2]].map(([dx, dy]) => `<circle cx="${dx * k}" cy="${y + dy * k}" r="${3.3 * k}" ${S(c)}/>`).join("");
-      default:
-        return cap(c, y, r);
-    }
-  }
-  var fringe = (c, y, r, k) => `<path d="M${-r - 0.4} ${y - 2.6 * k} h${2 * r + 0.8} c0 -7 -4 -11.4 ${-r} -11.4 c-6.4 0 ${-r} 4.4 ${-r} 11.4z" ${S(c)}/>`;
-  var board = (k) => `<ellipse cx="0" cy="${-1 * k}" rx="${22 * k}" ry="${3.6 * k}" style="fill:#F3C969"/><path d="M${-18 * k} ${-1 * k} h${36 * k}" fill="none" stroke-width=".8" style="stroke:#E8566C"/>`;
-  var paddle = (k) => `<path d="M${12 * k} ${-30 * k} l${5 * k} ${32 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${16 * k} ${-2 * k} l${2 * k} ${8 * k} l${3 * k} ${-1 * k} l${-2 * k} ${-8 * k}z" ${S("#7FB8E8")}/>`;
-  var cap = (c, y, r) => `<path d="M${-r - 0.2} ${y + 1} c-1 -9 4 -14 ${r} -14 c6 0 ${r + 1} 4 ${r} 14 c-3 -4 -8 -5 -12 -4 c-3 0 -6 2 -8 4z" ${S(c)}/>`;
-  function extra(kind, look, k) {
-    const y = -46 * k, r = 10.6 * k;
-    switch (kind) {
-      case "apron":
-        return `<path d="M${-6 * k} ${-30 * k} h${12 * k} l${1.5 * k} ${15 * k} h${-15 * k}z" ${S("#FFFDF6")}/><path d="M${-5 * k} ${-31 * k} l${-2 * k} ${-5 * k} M${5 * k} ${-31 * k} l${2 * k} ${-5 * k}" fill="none"/>`;
-      case "glasses":
-        return `<circle cx="${-3.8 * k}" cy="${y + 2}" r="${2.6 * k}" fill="none" stroke-width=".9"/><circle cx="${3.8 * k}" cy="${y + 2}" r="${2.6 * k}" fill="none" stroke-width=".9"/><path d="M${-1.2 * k} ${y + 2} h${2.4 * k}" fill="none" stroke-width=".9"/>`;
-      case "cap":
-        return `<path d="M${-r} ${y - 3} c0 -8 ${r * 2} -8 ${r * 2} 0z" ${S(look.top)}/><path d="M${r - 2} ${y - 3} h${7 * k}" stroke-width="2.2" style="stroke:${look.top}"/>`;
-      case "sunhat":
-        return `<ellipse cx="0" cy="${y - 6 * k}" rx="${16 * k}" ry="${3.6 * k}" ${S("#F3DFA6")}/><path d="M${-8 * k} ${y - 6 * k} c0 -10 ${16 * k} -10 ${16 * k} 0z" ${S("#F3DFA6")}/><path d="M${-8 * k} ${y - 7.5 * k} h${16 * k}" style="stroke:var(--rose)" stroke-width="1.6"/>`;
-      case "helmet":
-        return `<path d="M${-r - 1} ${y - 1} c0 -12 ${r * 2 + 2} -12 ${r * 2 + 2} 0z" ${S("#F6E3A1")}/><path d="M${-2 * k} ${y - 11 * k} v${8 * k} M${3 * k} ${y - 11 * k} v${8 * k}" fill="none" stroke-width=".8"/>`;
-      case "tie":
-        return `<path d="M0 ${-35 * k} l${-1.6 * k} ${3 * k} l${1.6 * k} ${8 * k} l${1.6 * k} ${-8 * k}z" ${S("#C2505F")}/>`;
-      case "satchel":
-        return `<path d="M${-7 * k} ${-35 * k} l${14 * k} ${16 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><rect x="${5 * k}" y="${-22 * k}" width="${8 * k}" height="${7 * k}" rx="1.5" ${S("#C9A27E")}/>`;
-      case "bell":
-        return `<path d="M${11 * k} ${-30 * k} l${4 * k} ${-6 * k}" fill="none"/><path d="M${13 * k} ${-37 * k} c0 -5 ${6 * k} -5 ${6 * k} 0 l1 ${3 * k} h${-8 * k}z" ${S("#F3C969")}/>`;
-      // held in the right hand (hand at about (10k, -21k))
-      case "can":
-        return `<path d="M${13 * k} ${-24 * k} q${5 * k} ${-7 * k} ${10 * k} 0" fill="none"/><rect x="${11 * k}" y="${-24 * k}" width="${12 * k}" height="${9 * k}" rx="2" ${S("#9CC3E0")}/><path d="M${23 * k} ${-20 * k} l${7 * k} ${-6 * k}" fill="none" stroke-width="1.6"/><g class="drips"><circle cx="${31 * k}" cy="${-21 * k}" r="${1 * k}" ${S("var(--water)")}/><circle cx="${33 * k}" cy="${-15 * k}" r="${1 * k}" ${S("var(--water)")}/></g>`;
-      case "hammer":
-        return `<g class="tool"><path d="M${10 * k} ${-20 * k} l${6 * k} ${-14 * k}" fill="none" stroke-width="2.2" style="stroke:#8A5A3A"/><rect x="${12 * k}" y="${-38 * k}" width="${10 * k}" height="${5 * k}" rx="1" transform="rotate(24 ${17 * k} ${-35.5 * k})" ${S("var(--stone)")}/></g>`;
-      case "hoe":
-        return `<g class="tool"><path d="M${16 * k} ${-48 * k} l${-4 * k} ${46 * k}" fill="none" stroke-width="2" style="stroke:#8A5A3A"/><path d="M${12 * k} ${-2 * k} h${-8 * k} l${1 * k} ${3 * k} h${7 * k}z" ${S("var(--stone)")}/></g>`;
-      case "lantern":
-        return `<path d="M${12 * k} ${-24 * k} v${-4 * k}" fill="none"/><rect x="${9 * k}" y="${-24 * k}" width="${7 * k}" height="${9 * k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5 * k}" cy="${-19.5 * k}" r="${1.8 * k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
-    }
-    return "";
-  }
-  function batik(col, k) {
-    const flower = (x, y) => `<circle cx="${x * k}" cy="${y * k}" r="${1.5 * k}" style="fill:${col}" stroke="none"/>` + [[0, -2.6], [2.5, 0], [0, 2.6], [-2.5, 0]].map(([dx, dy]) => `<circle cx="${(x + dx) * k}" cy="${(y + dy) * k}" r="${0.8 * k}" style="fill:${col}" stroke="none"/>`).join("");
-    const leaf2 = (x, y) => `<path d="M${x * k} ${y * k} q${1.6 * k} ${-1.6 * k} ${3.2 * k} 0 q${-1.6 * k} ${1.6 * k} ${-3.2 * k} 0z" style="fill:${col}" stroke="none"/>`;
-    return `<g opacity=".85" pointer-events="none">${flower(-4, -31)}${flower(4.5, -25)}${flower(-3.5, -19)}${leaf2(1, -33)}${leaf2(-7, -25)}${leaf2(4, -18)}
-    <path d="M${-5.6 * k} ${-12 * k} h${3 * k} M${-5.6 * k} ${-8 * k} h${3 * k} M${2 * k} ${-11 * k} h${3 * k} M${2 * k} ${-6 * k} h${3 * k}" stroke-width="${1.1 * k}" style="stroke:${col}"/></g>`;
-  }
-  function personArt(look, kid2) {
-    const k = kid2 ? 0.62 : look.tall ? 1.1 : 1;
-    const legH = 13 * k, legY = -15 * k, lw = 5 * k;
-    const shoe = "var(--sock)";
-    return `<g class="flip"><g filter="url(#wob)">
-    <ellipse cx="0" cy="0" rx="${11 * k}" ry="${3.5 * k}" fill="rgba(60,40,30,.18)"/>
-    <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
-      ${look.board ? board(k) : ""}
-      <g class="legL"><rect x="${-6.2 * k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
-      <g class="legR"><rect x="${1.2 * k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${0.8 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
-      <g class="armL"><rect x="${-12 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/></g>
-      <g class="armR"><rect x="${7.8 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/></g>
-      ${look.dress ? `<path d="M${-9 * k} ${-17 * k} L${-12.5 * k} ${-5 * k} h${25 * k} L${9 * k} ${-17 * k}z" ${S(look.dress)}/>` : ""}
-      <path d="M${-8.6 * k} ${-37 * k} q${8.6 * k} ${-2.4 * k} ${17.2 * k} 0 l${1.4 * k} ${23 * k} h${-20 * k}z" ${S(look.dress || look.top)}/>
-      ${look.batik ? batik(look.batik, k) : ""}
-      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe"].includes(look.extra) ? extra(look.extra, look, k) : ""}
-      ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
-      <circle cx="0" cy="${-46 * k}" r="${10.6 * k}" ${S(look.skin)}/>
-      ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46 * k, 10.6 * k) : hair(look.hairStyle, look.hair, k)}
-      <ellipse cx="${-3.7 * k}" cy="${-44 * k}" rx="${1.2 * k}" ry="${1.6 * k}" ${S("var(--sock)")} stroke="none"/>
-      <ellipse cx="${3.7 * k}" cy="${-44 * k}" rx="${1.2 * k}" ry="${1.6 * k}" ${S("var(--sock)")} stroke="none"/>
-      <ellipse cx="${-6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
-      <ellipse cx="${6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
-      <path d="M${-1.6 * k} ${-40.4 * k} q${1.6 * k} ${1.4 * k} ${3.2 * k} 0" fill="none" stroke-width="1"/>
-      ${look.hairStyle === "bobfringe" ? fringe(look.hair, -46 * k, 10.6 * k, k) : ""}
-      ${["glasses", "cap", "sunhat", "helmet"].includes(look.extra) ? extra(look.extra, look, k) : ""}
-      ${look.hat ? extra(look.hat, look, k) : ""}
-      ${look.specs ? `<g fill="none" stroke-width="1" style="stroke:${look.specs}"><circle cx="${-3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><circle cx="${3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><path d="M${-1 * k} ${-44 * k} h${2 * k}"/></g>` : ""}
-      ${look.board ? paddle(k) : ""}
-      ${look.headphones ? `<path d="M${-11 * k} ${-46 * k} a${11 * k} ${12 * k} 0 0 1 ${22 * k} 0" fill="none" stroke-width="1.8" style="stroke:var(--peri2)"/><rect x="${-13.5 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/><rect x="${9 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/>` : ""}
-    </g>
-  </g></g>`;
-  }
-  var letterArt = `<g transform="translate(0 -70)"><g class="qmark"><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.3" stroke-linejoin="round">
-  <rect x="-11" y="-9" width="22" height="16" rx="2" style="fill:#FFFDF6"/><path d="M-11 -9 l11 9 l11 -9" fill="none"/><circle cx="0" cy="1" r="3" style="fill:var(--rose)"/></g></g></g>`;
-
   // src/game/npcs.js
   var NS = "http://www.w3.org/2000/svg";
   var ents = {};
@@ -12347,9 +12658,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return def.routine.find((s) => t2 >= s.from && t2 < s.to && (!s.days || s.days === "we" === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null;
   };
   var routineNow = (def) => routineAt(def, dayKey(), sgHM());
-  function slotAt(def, day, t2, live2) {
-    return live2 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || eventSlot(def.id, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || routineAt(def, day, t2);
+  function slotAt(def, day, t2, live3) {
+    return live3 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || routineAt(def, day, t2);
   }
+  var nightOk = (s, def, day, t2) => !s || !s.night ? s : tastingSlot(def.id, day, t2) || (routineAt(def, day, t2) || {}).scene === "wineshop" ? null : s;
   var cellarBuilt = () => !!(api3 && api3.F().goals && api3.F().goals.cellar);
   var slotNow = (def) => slotAt(def, dayKey(), sgHM(), true);
   var whereIs = (id) => {
@@ -13763,6 +14075,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var lastReady = readyCount();
   var lastDusk = null;
+  var lastFieldEv = null;
+  var lastSky = null;
+  var skyKey = () => skyWash(sgHM()) + scene;
   setInterval(() => {
     if (S2.sleep && S2.sleep.until && Date.now() > S2.sleep.until) wakeUp();
     if (hushed() && !$("speech").hidden && Date.now() > speechLock && Date.now() - speechAt > 6e3) $("speech").hidden = true;
@@ -13803,7 +14118,18 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       drawScene();
       if (selPlot != null) ctx();
     }
-    if (scene === "base" && isDusk() !== lastDusk) drawScene();
+    if (outside() && skyKey() !== lastSky) {
+      lastSky = skyKey();
+      drawScene();
+    }
+    if (scene === "field") {
+      const ev = eventNow(dayKey(), sgHM()), k = ev ? ev.kind + (sgHM() >= 19 * 60) : "";
+      if (k !== lastFieldEv) {
+        lastFieldEv = k;
+        drawScene();
+      }
+      setLive(ev && ev.kind === "night" ? "jazz" : null);
+    } else setLive(null);
     renderEvanHold();
     lastDusk = isDusk();
     if (shelfOpen && Math.floor(Date.now() / 1e3) % 20 === 0) ctx();
@@ -14950,7 +15276,7 @@ Then tell chat "wind down" whenever you're ready.`
       F.decor[d.slot] = d.val;
       gainXp(1);
       flash(`Bought ${d.n.toLowerCase()}`);
-      speak(d.where === "me" ? id === "me_pj" ? "Silk pyjamas! You'll wear them in your room." : id === "me_hat" ? "Sun hat on whenever you're outside!" : "Ooh, that suits you." : d.where === "room" ? "Ooh! It's waiting in your room." : "Ooh! It's waiting for you at home.", 3500);
+      speak(d.where === "me" ? id === "me_pj" ? "Silk pyjamas! You'll wear them in your room. They live in your wardrobe: take them off there any time." : id === "me_hat" ? "Sun hat on whenever you're outside! It lives in your wardrobe: take it off there any time." : "Ooh, that suits you. It lives in your wardrobe now: take it off there any time." : d.where === "room" ? "Ooh! It's waiting in your room." : "Ooh! It's waiting for you at home.", 3500);
     } else if (F.decor[d.slot] === d.val) {
       delete F.decor[d.slot];
       speak("Put away for now.", 2500);
@@ -15669,7 +15995,7 @@ ${SIGNOFF[t2.who] || ""}`;
     } else if (recOpen && scene === "room") {
       const on = settings.music, ct = currentTrack();
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>Record player</h2><p class="sub">${on ? `Playing: ${esc(TRACKS[ct].name)}.` : "Pick a record to put on."}</p>
-      <div class="records">${Object.entries(TRACKS).map(([id, t2]) => `<button class="record${on && id === ct ? " on" : ""}" data-track="${id}"><svg viewBox="0 0 40 40" width="46" height="46" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#2F2B28"/><circle cx="20" cy="20" r="13" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="9" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="6.5" style="fill:${t2.col}"/><circle cx="20" cy="20" r="1.4" fill="#FFFDF6"/></svg><span class="n">${esc(t2.name)}</span><span class="c">${on && id === ct ? "playing now" : esc(t2.mood)}</span></button>`).join("")}</div>
+      <div class="records">${Object.entries(TRACKS).filter(([, t2]) => !t2.live).map(([id, t2]) => `<button class="record${on && id === ct ? " on" : ""}" data-track="${id}"><svg viewBox="0 0 40 40" width="46" height="46" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#2F2B28"/><circle cx="20" cy="20" r="13" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="9" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="6.5" style="fill:${t2.col}"/><circle cx="20" cy="20" r="1.4" fill="#FFFDF6"/></svg><span class="n">${esc(t2.name)}</span><span class="c">${on && id === ct ? "playing now" : esc(t2.mood)}</span></button>`).join("")}</div>
       <div class="actions recrow"><label for="recVol" class="muted">Volume</label><input id="recVol" type="range" min="0" max="1" step="0.05" value="${settings.musicVol}">${on ? `<button class="btn alt small" data-rec="stop">Lift the needle</button>` : ""}</div>`;
     } else if (calmOpen && scene === "room") {
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>Calm corner</h2>` + (breath ? `<div class="breathe"><div class="ring" style="animation-delay:-${((Date.now() - breath.start) / 1e3 % CYCLE).toFixed(2)}s"></div><p class="cue" id="breathCue">Breathe in</p></div><p class="sub" style="text-align:center"><span id="breathLeft"></span> left</p><div class="actions" style="justify-content:center"><button class="btn alt small" data-calm="stop">Stop</button></div>` : `<p class="sub">Cushions, ${(F.decor || {}).r_candle ? "a candle, " : ""}one slow breath.</p><p class="eyebrow">Guided breathing</p><div class="actions">${[1, 3, 5].map((m) => `<button class="btn ${m === 3 ? "primary" : "alt"} small" data-calm="${m}">${m} min</button>`).join("")}</div>
@@ -16071,6 +16397,16 @@ ${SIGNOFF[t2.who] || ""}`;
       ward.pick = null;
       ctx();
     });
+    c.querySelectorAll("[data-acc]").forEach((b) => b.onclick = () => {
+      const k = b.dataset.acc, on = !wearing(F, k), n = (ACCESSORIES.find((a) => a[0] === k) || [])[2] || "it";
+      if (on) F.decor[k] = "on";
+      else delete F.decor[k];
+      sfx("paper", true);
+      save2();
+      render();
+      drawScene();
+      speak(on ? `${n} on.${k === "me_hat" ? " It'll go on when you head outside." : k === "me_pj" ? " Cosy." : ""}` : `${n} off. It's back in the wardrobe.`, 3e3);
+    });
     c.querySelectorAll("[data-wearoff]").forEach((b) => b.onclick = () => {
       delete F.wear;
       save2();
@@ -16272,6 +16608,7 @@ ${SIGNOFF[t2.who] || ""}`;
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
     tableKey = "";
     $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "farm" ? farmArt() : roomArt(scene);
+    if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));
     const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: vineyardName(F), farm: "The garden", wineshop: shopName(F), orchard: "Ma Ma's orchard", flowers: "Ma Ma's flower farm", field: "The field", shore: "The foreshore" };
     $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
     $("maphint").textContent = scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Mum's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
@@ -16375,10 +16712,10 @@ ${SIGNOFF[t2.who] || ""}`;
       const e = $(id);
       if (e) e.style.display = on ? "" : "none";
     };
-    const pj = !!d.me_pj && scene === "room";
-    show2("melBow", !!d.me_bow);
-    show2("melHat", !!d.me_hat && outside());
-    show2("melScarf", !!d.me_scarf && !pj);
+    const pj = wearing(F, "me_pj") && scene === "room";
+    show2("melBow", wearing(F, "me_bow"));
+    show2("melHat", wearing(F, "me_hat") && outside());
+    show2("melScarf", wearing(F, "me_scarf") && !pj);
     show2("melPj", pj);
     applyWear(pj);
     const m = $("mel");
@@ -16386,6 +16723,10 @@ ${SIGNOFF[t2.who] || ""}`;
   }
   function render(redraw) {
     if (S2.day !== dayKey()) S2 = freshToday();
+    {
+      const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null;
+      setLive(ev && ev.kind === "night" ? "jazz" : null);
+    }
     $("evan").style.display = evanHere() ? "" : "none";
     creditEarly();
     dressMel();
@@ -16627,7 +16968,7 @@ ${SIGNOFF[t2.who] || ""}`;
         const ev = eventNow(dayKey(), sgHM());
         if (ev && S2.eventSaid !== dayKey()) {
           S2.eventSaid = dayKey();
-          setTimeout(() => speak(ev.kind === "market" ? "It's the Sunday farmers market! Stalls all along the top, our wine stall with Ines, and Ma Ma's fruit and flowers." : "It's the field fair! Kites, face painting, lemonade. Evan's going to love this.", 6e3), 1200);
+          setTimeout(() => speak(ev.kind === "market" ? "It's the Sunday farmers market! Stalls all along the top, our wine stall with Ines, and Ma Ma's fruit and flowers." : ev.kind === "night" ? "The night market! Fairy lights, street food all along the top, and a jazz duo on the little stage." : "It's the field fair! Kites, face painting, lemonade. Evan's going to love this.", 6e3), 1200);
         }
       }
       if (id === "market") speak(isHere("hana") ? "Welcome to the market! Hana's in. Have a browse." : NPCS.find((n) => n.id === "hana").away, 4500);
@@ -17129,6 +17470,10 @@ ${SIGNOFF[t2.who] || ""}`;
       joinClass();
       return;
     }
+    if (id === "jazzhat") {
+      tipBand();
+      return;
+    }
     if (id === "suprack" || id === "homejetty") {
       goalView = "jetty";
       sfx("paper", true);
@@ -17301,6 +17646,10 @@ ${SIGNOFF[t2.who] || ""}`;
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(st6.n)}</h2><p class="sub">${esc(who3)}'s stall at the ${esc(ev.name.toLowerCase())}. ${away ? `${esc(who3)}'s off wandering the market, so it's on the honesty tin: take what you like and pop the coins in.` : `"${esc(st6.line)}"`}</p>`;
     const items = stallItems(st6);
     if (items.length) h += `<div class="items shop">${items.map((id) => itemBtn(id, `<b>${stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < stallPrice(id), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.${st6.produce ? " Handy when the garden's between harvests: it all goes to the kitchen or to Maple." : ""}</p>`;
+    if (st6.decor) h += `<div class="items shop">${st6.decor.map((id) => {
+      const d = DECOR[id], own = F.decorOwned[id], on = own && F.decor[d.slot] === d.val;
+      return `<button class="item" data-decor="${id}" ${!own && F.coins < d.price ? "disabled" : ""}><span class="e">${icon(d.ico, 34)}</span><span class="n">${esc(d.n)}</span><span class="c">${on ? d.where === "room" ? "in your room" : "in your home" : own ? "tap to use" : `<b>${d.price}</b> ${icon("coin", 13)}`}</span></button>`;
+    }).join("")}</div><p class="muted">Bought once, kept forever. You have ${F.coins} coins.</p>`;
     if (st6.act) h += `<div class="actions"><button class="btn primary" data-fair="${st6.act}" ${evanHere() ? "" : "disabled"}>${st6.act === "kite" ? "Get Evan a kite (3 coins)" : "Face paint for Evan (3 coins)"}</button></div>${evanHere() ? "" : `<p class="muted">Bring Evan along for this one.</p>`}`;
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -17325,6 +17674,28 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     [0, 300].forEach((d, k2) => setTimeout(() => mprop("heart", evan.x + (k2 - 0.5) * 20, evan.y - 44, 1800), d));
     save2(true);
+  }
+  function tipBand() {
+    const ev = eventNow(dayKey(), sgHM());
+    if (!ev || ev.kind !== "night") {
+      speak("The stage is empty. The jazz duo plays the night market, Tuesday and Thursday evenings.", 4e3);
+      render();
+      return;
+    }
+    if (F.coins < 2) {
+      speak("Not even two coins! Next time.", 3e3);
+      render();
+      return;
+    }
+    F.coins -= 2;
+    S2.tips = (S2.tips || 0) + 1;
+    sfx("coin");
+    flash("-2 coins in the hat");
+    [0, 250, 500].forEach((d, k) => setTimeout(() => mprop("heart", STAGE.x - 20 + k * 20, STAGE.y - 70, 1800), d));
+    speak(pick(["Clink! The bass player tips his hat back at you.", "Two coins in the hat. The keys player plays a little flourish just for you.", `"Thank you! This next one's for the lady with the fox."`, "Clink. The duo grin and slide into something slower."]), 4500);
+    if (S2.tips === 1) gainXp(1);
+    save2();
+    render();
   }
   var sup = null;
   var SUP_BOARD = (k) => `<g class="supboard"><ellipse cx="0" cy="${-1 * k}" rx="${22 * k}" ry="${3.6 * k}" style="fill:#7FB8E8;stroke:var(--line)" stroke-width="1"/><path d="M${-18 * k} ${-1 * k} h${36 * k}" style="stroke:#FFFDF6" stroke-width=".9"/><path d="M${12 * k} ${-30 * k} l${5 * k} ${32 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${16 * k} ${-2 * k} l${2 * k} ${8 * k} l${3 * k} ${-1 * k} l${-2 * k} ${-8 * k}z" style="fill:#F3C969;stroke:var(--line)" stroke-width=".8"/></g>`;
