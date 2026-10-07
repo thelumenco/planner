@@ -1553,7 +1553,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto(url + "?seed=1&time=21:00&date=2026-10-06"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1000);
-  check(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--sea").trim().toLowerCase() !== "#8fc1de"), "after dark the sea goes dark too");
+  check(await page.evaluate(() => !!document.querySelector("#sceneArt rect.dusk")) && await page.evaluate(() => getComputedStyle(document.getElementById("world")).getPropertyValue("--sea").trim().toUpperCase() === "#8FC1DE"), "after dark the sea goes dark with the dusk (and dark mode doesn't stack on it)");
   await page.emulateMedia({ colorScheme: "light" });
   await page.close();
 }
