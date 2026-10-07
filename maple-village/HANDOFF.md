@@ -959,3 +959,8 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 ### Round 74: the cleaning cupboard tidied
 - Effort shows as word chips (quick, medium, big job) instead of dots. The timer buttons sit in an even row of three. There is more room around "One at a time" and the tabs, taller rows, and a bigger tap area on the remove button.
 - Ticking a chore (in the list or "One at a time") offers Undo (`offerUndo`, hestia.js). Unticking also refunds the coin, as before.
+
+### Round 75: bouquets go to the gift chooser
+- Tapping a bouquet in the backpack opens the same chooser as gifts: the whole family (`FAMILY_ALL`), plus "near" (the nearest villager within reach) when someone is about.
+- Someone here gets it in person (`bouquetTo`, or `giveBouquet` for a villager). Anyone else gets it sent round, and a thank-you note (`BQ_NOTE`) arrives about 10 minutes later.
+- In the farm shop's flower rows, the Bouquet and Pot buttons sit on their own line under the name.

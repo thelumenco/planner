@@ -746,6 +746,7 @@ body.season-winter{--grass:#E5ECE6;--grass2:#D5E0DA}
 #ctx .orpic{display:flex;justify-content:center;margin:2px 0 6px}
 #ctx .orflowers li{flex-wrap:wrap}
 #ctx .orbtns{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+#ctx .orflowers li{flex-wrap:wrap}#ctx .orflowers .orbtns{flex:1 0 100%;margin:8px 0 0 44px}
 #ctx .orspot{width:100%;font:inherit;color:inherit}
 /* the wine shop's chalkboard menu */
 #ctx .wlist.chalk .mprice{flex:none;font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;color:#8E2C48}

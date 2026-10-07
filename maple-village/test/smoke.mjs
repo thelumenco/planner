@@ -1347,7 +1347,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForSelector('#ctx [data-or="tea"]', { timeout: 15000 }); await page.click('#ctx [data-or="tea"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.coins === c0 + 3 && f.orch.tea === "2026-10-07"), "tea and cake with Ma Ma, once a day");
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="bq_mum"]'); await page.waitForTimeout(400);
-  check(await fox().then(f => f.bouquets && f.bouquets.mama === 1 && !f.inv.bq_mum), "a bouquet can be given to Ma Ma (or anyone nearby)");
+  check(await page.locator('#bag [data-giveto="dad"]').count() === 1 && await page.locator('#bag [data-giveto="mama"].primary').count() === 1, "a bouquet opens the chooser: the whole family, whoever's here first");
+  await page.click('#bag [data-giveto="mama"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.bouquets && f.bouquets.mama === 1 && !f.inv.bq_mum), "a bouquet can be given to Ma Ma in person (or sent to anyone in the family)");
   await page.screenshot({ path: join(shots, "cottage.png") });
   await page.close();
 }

@@ -1097,7 +1097,7 @@ function useItem(id){
   const it = ITEMS[id]; if (!it || !F.inv[id]) return;
   if (it.kind === "seed") { speak("Seeds go in the garden. Tap a plot there!", 3500); return; }
   if (it.kind === "gift") { giftPick = giftPick === id ? null : id; bag(); return; }
-  if (it.kind === "bouquet") { giveBouquet(id); return; }
+  if (it.kind === "bouquet") { giftPick = giftPick === id ? null : id; bag(); return; }   // choose who it's for, like a gift
   if (it.kind === "pot") { potItem = id; orView = "pot"; openView = null; render(); return; }
   if (it.kind === "ingredient") { toKitchen(id); return; }
   if (it.kind === "feed") { if (openView) { openView = null; ctx(); } speak("That's for the animals. Off to the run!", 3000); walkToPlace("animal run"); return; }
@@ -1141,6 +1141,14 @@ function giveBouquet(id){
   npcSay(who.id, pick(who.id === "mama" ? MAMA_THANKS : BQ_THANKS)); mprop("heart", near[0].x, near[0].y - 50, 1800); sfx("chime"); gainXp(1);
   flash(`${who.name} loved the ${it.n.toLowerCase()}`); save(true);
 }
+// a bouquet handed to one of the family who's right here
+function bouquetTo(id, w){
+  const it = ITEMS[id]; if (!it || !F.inv[id]) return;
+  addInv(id, -1); F.bouquets = F.bouquets || {}; F.bouquets[w] = (F.bouquets[w] || 0) + 1; F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1;
+  if (w === "evan") { evanSays("flowers! for me?"); mprop("heart", evan.x, evan.y - 44, 1800); flash("Evan sniffed every single flower"); }
+  else { const p = npcPos(w); npcSay(w, pick(w === "mama" ? MAMA_THANKS : BQ_THANKS)); if (p) mprop("heart", p.x, p.y - 50, 1800); flash(`${GIFT_NAME[w]} loved the ${it.n.toLowerCase()}`); }
+  sfx("chime"); gainXp(1); save(true);
+}
 // Tea and cake with Ma Ma in her cottage, once a day: a few coins, a little xp, and a lot of love
 function haveTea(){
   const o = orchState(F); if (o.tea === dayKey() || !isHere("mama")) return;
@@ -1160,6 +1168,11 @@ let bubbleT = null;
 const GIFT_NAME = {evan: "Evan", darren: "Darren", mama: "Ma Ma", gonggong: "Gong Gong", mum: "Mum", dad: "Dad", marcus: "Marcus", angelina: "Angellina"};
 const FOLKS = ["mum", "dad", "marcus", "angelina"];   // Mel's family on the foreshore: gifts go to them in person, wherever they are
 const giftWho = to => to === "family" ? ["evan", "darren", "mama", "gonggong", ...FOLKS] : to === "grands" ? ["mama", "gonggong"] : Array.isArray(to) ? to : [to];
+// a bouquet can go to anyone in the family (in person, or sent round), or to whoever's standing nearby
+const FAMILY_ALL = ["evan", "darren", "mama", "gonggong", ...FOLKS];
+function nearVillager(){ const n = npcActors().map(([, e]) => e).filter(e => e.kind === "npc" && !FAMILY_ALL.includes(e.def.id)).map(e => [e, Math.hypot(e.x - mel.x, e.y - mel.y)]).sort((a, b) => a[1] - b[1])[0]; return n && n[1] < 170 ? n[0] : null; }
+const recipients = it => it.kind === "bouquet" ? [...FAMILY_ALL, ...(nearVillager() ? ["near"] : [])] : giftWho(it.to);
+const recipName = w => w === "near" ? ((nearVillager() || {}).def || {name: "someone nearby"}).name : GIFT_NAME[w];
 const giftNames = to => to === "grands" ? "Ma Ma or Gong Gong" : to === "family" ? "the family" : giftWho(to).map(g => GIFT_NAME[g]).join(giftWho(to).length > 2 ? ", " : " or ").replace(/, ([^,]*)$/, " or $1");
 // Who's close enough to hand a gift to in person (null if they're not on this screen)
 const giftPos = w => w === "evan" ? (evanHere() ? evan : null) : w === "darren" ? (isHere("darren") ? npcPos("darren") : null) : npcPos(w);
@@ -1168,19 +1181,22 @@ const giftPos = w => w === "evan" ? (evanHere() ? evan : null) : w === "darren" 
 let giftPick = null;
 function giftPickHTML(id){
   const it = ITEMS[id]; if (!it || !F.inv[id]) return "";
-  return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${giftWho(it.to).map(w => `<button class="btn small ${giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(GIFT_NAME[w])}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}<button class="btn small alt" data-giveto="">Cancel</button></div>
+  return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${recipients(it).map(w => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}<button class="btn small alt" data-giveto="">Cancel</button></div>
     <p class="muted">Anyone who isn't here gets it sent round, and their thank-you note comes to your mailbox.</p></div>`;
 }
 function giveTo(id, w){
   giftPick = null; const it = ITEMS[id]; if (!w || !it || !F.inv[id]) { bag(); return; }
-  if (giftPos(w)) { giveGift(id, w); bag(); return; }
+  if (w === "near") { giveBouquet(id); bag(); return; }
+  if (giftPos(w)) { if (it.kind === "bouquet") bouquetTo(id, w); else giveGift(id, w); bag(); return; }
   addInv(id, -1); F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1; gainXp(1);
   F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
   sfx("chime"); flash(`Sent to ${GIFT_NAME[w]}`); speak(`Wrapped up and sent to ${GIFT_NAME[w]}. Watch your mailbox for a thank-you note.`, 4500); save(); bag();
 }
 const SIGNOFF = {mum: "Love, Mum xx", dad: "Love, Dad", mama: "Love you, ah girl. Ma Ma", gonggong: "Gong Gong", marcus: "Cheers Zeh, Marcus", angelina: "Love, Angellina", darren: "Love you. D", evan: "Love, Evan (Darren held the pencil)"};
+const BQ_NOTE = {mama: "Ma Ma put them by the TV. So pretty, I look at them every day.", gonggong: "Gong Gong put them in water for Ma Ma. Okay, also for me.", mum: "They're on the dining table. Dad keeps saying they're from him.", dad: "I'm going to draw them before they fade.",
+  marcus: "Angie put them in a vase. The flat smells amazing.", angelina: "They're on my desk while I study. Thank you!", darren: "In a jar by the kettle. Very fancy.", evan: "I smelled ALL of them."};
 function thankNote(t){
-  const it = ITEMS[t.item] || {n: "present", say: ""}, line = (it.says && it.says[t.who]) || it.say || "";
+  const it = ITEMS[t.item] || {n: "present", say: ""}, line = it.kind === "bouquet" ? BQ_NOTE[t.who] || "They're beautiful." : (it.says && it.says[t.who]) || it.say || "";
   return `${t.who === "evan" ? "Dear Mama" : "Dear Mel"},\n\nThank you for the ${it.n.toLowerCase()}! ${line}\n\n${SIGNOFF[t.who] || ""}`;
 }
 // thank-you notes that have arrived (they take about ten minutes to come back)
@@ -1625,7 +1641,7 @@ function bag(){
   const order = ["gift","food","ingredient","feed","flower","use","tool","seed"];
   ids.sort((a, b) => order.indexOf(ITEMS[a].kind) - order.indexOf(ITEMS[b].kind));
   $("bag").innerHTML = ids.map(id => { const it = ITEMS[id];
-    const lbl = it.kind === "bouquet" ? "give to someone" : it.kind === "pot" ? "place it" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${giftNames(it.to)}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed Maple" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
+    const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${giftNames(it.to)}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed Maple" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
     // kitchen ingredients can go to the wine shop's larder instead (food can still be fed to Maple)
     const kit = isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
     return itemBtn(id, lbl, it.kind === "seed", (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit); }).join("");

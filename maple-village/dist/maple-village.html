@@ -1312,6 +1312,7 @@ body.season-winter{--grass:#E5ECE6;--grass2:#D5E0DA}
 #ctx .orpic{display:flex;justify-content:center;margin:2px 0 6px}
 #ctx .orflowers li{flex-wrap:wrap}
 #ctx .orbtns{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+#ctx .orflowers li{flex-wrap:wrap}#ctx .orflowers .orbtns{flex:1 0 100%;margin:8px 0 0 44px}
 #ctx .orspot{width:100%;font:inherit;color:inherit}
 /* the wine shop's chalkboard menu */
 #ctx .wlist.chalk .mprice{flex:none;font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;color:#8E2C48}
@@ -15329,7 +15330,8 @@ Then tell chat "wind down" whenever you're ready.`
       return;
     }
     if (it.kind === "bouquet") {
-      giveBouquet(id);
+      giftPick = giftPick === id ? null : id;
+      bag();
       return;
     }
     if (it.kind === "pot") {
@@ -15434,6 +15436,27 @@ Then tell chat "wind down" whenever you're ready.`
     flash(`${who3.name} loved the ${it.n.toLowerCase()}`);
     save2(true);
   }
+  function bouquetTo(id, w) {
+    const it = ITEMS[id];
+    if (!it || !F.inv[id]) return;
+    addInv(id, -1);
+    F.bouquets = F.bouquets || {};
+    F.bouquets[w] = (F.bouquets[w] || 0) + 1;
+    F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1;
+    if (w === "evan") {
+      evanSays("flowers! for me?");
+      mprop("heart", evan.x, evan.y - 44, 1800);
+      flash("Evan sniffed every single flower");
+    } else {
+      const p = npcPos(w);
+      npcSay(w, pick(w === "mama" ? MAMA_THANKS : BQ_THANKS));
+      if (p) mprop("heart", p.x, p.y - 50, 1800);
+      flash(`${GIFT_NAME[w]} loved the ${it.n.toLowerCase()}`);
+    }
+    sfx("chime");
+    gainXp(1);
+    save2(true);
+  }
   function haveTea() {
     const o = orchState(F);
     if (o.tea === dayKey() || !isHere("mama")) return;
@@ -15459,13 +15482,20 @@ Then tell chat "wind down" whenever you're ready.`
   var GIFT_NAME = { evan: "Evan", darren: "Darren", mama: "Ma Ma", gonggong: "Gong Gong", mum: "Mum", dad: "Dad", marcus: "Marcus", angelina: "Angellina" };
   var FOLKS = ["mum", "dad", "marcus", "angelina"];
   var giftWho = (to) => to === "family" ? ["evan", "darren", "mama", "gonggong", ...FOLKS] : to === "grands" ? ["mama", "gonggong"] : Array.isArray(to) ? to : [to];
+  var FAMILY_ALL = ["evan", "darren", "mama", "gonggong", ...FOLKS];
+  function nearVillager() {
+    const n = npcActors().map(([, e]) => e).filter((e) => e.kind === "npc" && !FAMILY_ALL.includes(e.def.id)).map((e) => [e, Math.hypot(e.x - mel.x, e.y - mel.y)]).sort((a, b) => a[1] - b[1])[0];
+    return n && n[1] < 170 ? n[0] : null;
+  }
+  var recipients = (it) => it.kind === "bouquet" ? [...FAMILY_ALL, ...nearVillager() ? ["near"] : []] : giftWho(it.to);
+  var recipName = (w) => w === "near" ? ((nearVillager() || {}).def || { name: "someone nearby" }).name : GIFT_NAME[w];
   var giftNames = (to) => to === "grands" ? "Ma Ma or Gong Gong" : to === "family" ? "the family" : giftWho(to).map((g) => GIFT_NAME[g]).join(giftWho(to).length > 2 ? ", " : " or ").replace(/, ([^,]*)$/, " or $1");
   var giftPos = (w) => w === "evan" ? evanHere() ? evan : null : w === "darren" ? isHere("darren") ? npcPos("darren") : null : npcPos(w);
   var giftPick = null;
   function giftPickHTML(id) {
     const it = ITEMS[id];
     if (!it || !F.inv[id]) return "";
-    return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${giftWho(it.to).map((w) => `<button class="btn small ${giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(GIFT_NAME[w])}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}<button class="btn small alt" data-giveto="">Cancel</button></div>
+    return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${recipients(it).map((w) => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}<button class="btn small alt" data-giveto="">Cancel</button></div>
     <p class="muted">Anyone who isn't here gets it sent round, and their thank-you note comes to your mailbox.</p></div>`;
   }
   function giveTo(id, w) {
@@ -15475,8 +15505,14 @@ Then tell chat "wind down" whenever you're ready.`
       bag();
       return;
     }
+    if (w === "near") {
+      giveBouquet(id);
+      bag();
+      return;
+    }
     if (giftPos(w)) {
-      giveGift(id, w);
+      if (it.kind === "bouquet") bouquetTo(id, w);
+      else giveGift(id, w);
       bag();
       return;
     }
@@ -15491,8 +15527,18 @@ Then tell chat "wind down" whenever you're ready.`
     bag();
   }
   var SIGNOFF = { mum: "Love, Mum xx", dad: "Love, Dad", mama: "Love you, ah girl. Ma Ma", gonggong: "Gong Gong", marcus: "Cheers Zeh, Marcus", angelina: "Love, Angellina", darren: "Love you. D", evan: "Love, Evan (Darren held the pencil)" };
+  var BQ_NOTE = {
+    mama: "Ma Ma put them by the TV. So pretty, I look at them every day.",
+    gonggong: "Gong Gong put them in water for Ma Ma. Okay, also for me.",
+    mum: "They're on the dining table. Dad keeps saying they're from him.",
+    dad: "I'm going to draw them before they fade.",
+    marcus: "Angie put them in a vase. The flat smells amazing.",
+    angelina: "They're on my desk while I study. Thank you!",
+    darren: "In a jar by the kettle. Very fancy.",
+    evan: "I smelled ALL of them."
+  };
   function thankNote(t2) {
-    const it = ITEMS[t2.item] || { n: "present", say: "" }, line = it.says && it.says[t2.who] || it.say || "";
+    const it = ITEMS[t2.item] || { n: "present", say: "" }, line = it.kind === "bouquet" ? BQ_NOTE[t2.who] || "They're beautiful." : it.says && it.says[t2.who] || it.say || "";
     return `${t2.who === "evan" ? "Dear Mama" : "Dear Mel"},
 
 Thank you for the ${it.n.toLowerCase()}! ${line}
@@ -16507,7 +16553,7 @@ ${SIGNOFF[t2.who] || ""}`;
     ids.sort((a, b) => order.indexOf(ITEMS[a].kind) - order.indexOf(ITEMS[b].kind));
     $("bag").innerHTML = ids.map((id) => {
       const it = ITEMS[id];
-      const lbl = it.kind === "bouquet" ? "give to someone" : it.kind === "pot" ? "place it" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${giftNames(it.to)}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed Maple" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
+      const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${giftNames(it.to)}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed Maple" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
       const kit = isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
       return itemBtn(id, lbl, it.kind === "seed", (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit);
     }).join("");
