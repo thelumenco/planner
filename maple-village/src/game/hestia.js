@@ -104,6 +104,12 @@ export function hestiaCounts(){
 }
 
 /* ---------- ticking chores off ---------- */
+// ticked one by mistake: the undo bar offers to untick it straight away (unticking in the list works too, coin and all)
+function offerUndo(kind, id, also){
+  const list = kind === "daily" ? H.dailyTasks : kind === "weekly" ? H.weeklyTasks : ((H.zones || [])[H.currentZoneIndex] || {}).tasks;
+  const t = (list || []).find((x, i) => (kind === "zone" ? i : x.id) === id), name = t ? t.text : "that chore";
+  if (api.undoable) api.undoable(`Ticked off: ${name}`, () => { setDone(kind, id, false); if (also) also(); api.changed(); });
+}
 function setDone(kind, id, on){
   if (kind === "daily") { const d = H.dailyLog[today()] = H.dailyLog[today()] || {daily: {}, zone: {}}; d.daily[id] = on; }
   else if (kind === "weekly") { const w = H.weeklyLog[weekKey()] = H.weeklyLog[weekKey()] || {}; w[id] = on ? today() : false; }
@@ -182,7 +188,7 @@ export function hestiaPanel(which){
       + (z.tasks || []).map((t, i) => row("zone", i, t, zoneDone(i))).join("");
   }
   if (view.tab === "last") return h + `</ul><form class="row hadd" data-hlastadd="1"><input name="t" maxlength="60" placeholder="add something, e.g. clean the fridge"><select name="e" aria-label="How often">${EVERY.map(([v, n]) => `<option value="${v}">${n}</option>`).join("")}</select><button class="btn small alt">Add</button></form>`;
-  h += `</ul>${view.tab !== "zone" ? `<form class="row hadd" data-hadd="${view.tab}"><input name="t" maxlength="80" placeholder="add a ${view.tab} chore"><button class="btn small alt">Add</button></form>`
+  h += `</ul><p class="muted hhint">Ticked one by mistake? Tap Undo, or just untick it (the coin goes back).</p>${view.tab !== "zone" ? `<form class="row hadd" data-hadd="${view.tab}"><input name="t" maxlength="80" placeholder="add a ${view.tab} chore"><button class="btn small alt">Add</button></form>`
     : `<div class="actions"><button class="btn small alt" data-hnextzone="1">Move on to ${esc(H.zones[(H.currentZoneIndex + 1) % H.zones.length].name)}</button></div>`}`;
   return h;
 }
@@ -239,7 +245,7 @@ export function wireHestia(root, which){
     api.undoable(`Removed “${gone.name}”`, () => { if (!H.lastDone.some(x => x.id === gone.id)) H.lastDone.splice(Math.min(i, H.lastDone.length), 0, gone); save(); api.changed(); }); });
   on("form[data-hlastadd]", "submit", (el, e) => { e.preventDefault(); const v = el.t.value.trim(); if (!v) return; (H.lastDone = H.lastDone || []).push({id: "l" + Date.now(), name: v.slice(0, 60), last: null, every: +el.e.value || 0}); save(); api.changed(); });
   on("[data-htab]", "click", el => { view.tab = el.dataset.htab; api.changed(); });
-  on("[data-hdone]", "change", el => { const [k, id] = el.dataset.hdone.split(":"); setDone(k, k === "zone" ? +id : id, el.checked); });
+  on("[data-hdone]", "change", el => { const [k, id] = el.dataset.hdone.split(":"), key = k === "zone" ? +id : id; setDone(k, key, el.checked); if (el.checked) offerUndo(k, key); });
   on("[data-hdel]", "click", el => { const [k, id] = el.dataset.hdel.split(":"); const key = k === "daily" ? "dailyTasks" : "weeklyTasks";
     const i = H[key].findIndex(t => t.id === id); if (i < 0) return; const gone = H[key][i];
     H[key] = H[key].filter(t => t.id !== id); save(); api.changed();
@@ -251,7 +257,7 @@ export function wireHestia(root, which){
   on("[data-htctl]", "click", el => { const k = el.dataset.htctl;
     if (k === "pause" && timer) timer.pausedLeft = left(); else if (k === "play" && timer) { timer.endAt = Date.now() + timer.pausedLeft; timer.pausedLeft = null; } else timer = null; api.changed(); });
   on("[data-hfocus]", "click", () => { focus = {cards: dealCards(), i: 0}; if (!timer) startTimer(H.timerMinutes || 20); api.changed(); });
-  on("[data-hcard]", "click", el => { const c = focus && focus.cards[focus.i]; if (!c) return; if (el.dataset.hcard === "done") setDone(c.kind, c.id, true); focus.i++; api.changed(); });
+  on("[data-hcard]", "click", el => { const c = focus && focus.cards[focus.i]; if (!c) return; const f = focus, i = f.i; if (el.dataset.hcard === "done") { setDone(c.kind, c.id, true); offerUndo(c.kind, c.id, () => { if (focus === f) f.i = i; }); } f.i++; api.changed(); });
   on("[data-hback]", "click", () => { focus = null; api.changed(); });
   // fridge
   on("[data-hfr]", "click", el => { view.fridge = el.dataset.hfr; api.changed(); });

@@ -314,6 +314,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#ctx [data-hdone^="daily:"]').first().click();   // one tap (ticked chores move to the bottom)
   await page.waitForTimeout(300);
   check(/\+1 coins: home chore/.test(await page.locator("#earn").textContent()), "ticking a chore earns a coin");
+  { const c1 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
+    check(await page.locator("#undoBar").isVisible() && /Ticked off/.test(await page.locator("#undoMsg").textContent()), "ticking a chore offers Undo");
+    await page.click("#undoBtn"); await page.waitForTimeout(300);
+    check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins) === c1 - 1 && await page.locator('#ctx [data-hdone^="daily:"]:checked').count() === 0, "Undo unticks it and takes the coin back");
+    await page.locator('#ctx [data-hdone^="daily:"]').first().click(); await page.waitForTimeout(300); }
   // after a reload the cloud copy loads (frozen, like the real database): ticking must still stick, and a delete can be undone
   await page.waitForTimeout(1200);
   await page.goto(url + "?seed=1&nosample=1&time=19:30&date=2026-10-05"); await page.waitForTimeout(900);

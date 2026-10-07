@@ -1346,6 +1346,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 /* the cleaning cupboard: room between the timer, "One at a time", the tabs and the list */
 #ctx .htimer + .actions{margin:0 0 14px}
 #ctx .htimer + .actions + .tabs{margin-bottom:10px}
+.hhint{font-size:.8rem;margin:-4px 0 10px}
 </style>
 </head>
 <body>
@@ -9831,6 +9832,15 @@ Quests finished today: ${S3.doneIds.length}`;
     const shop = (H2.shoppingList || []).filter((s) => !s.purchased).length;
     return { chores: daily + weeklyToday, shop, zoneLeft: (zone().tasks || []).filter((_, i) => !zoneDone(i)).length };
   }
+  function offerUndo(kind, id, also) {
+    const list2 = kind === "daily" ? H2.dailyTasks : kind === "weekly" ? H2.weeklyTasks : ((H2.zones || [])[H2.currentZoneIndex] || {}).tasks;
+    const t2 = (list2 || []).find((x, i) => (kind === "zone" ? i : x.id) === id), name = t2 ? t2.text : "that chore";
+    if (api2.undoable) api2.undoable(`Ticked off: ${name}`, () => {
+      setDone(kind, id, false);
+      if (also) also();
+      api2.changed();
+    });
+  }
   function setDone(kind, id, on) {
     if (kind === "daily") {
       const d = H2.dailyLog[today()] = H2.dailyLog[today()] || { daily: {}, zone: {} };
@@ -9939,7 +9949,7 @@ Quests finished today: ${S3.doneIds.length}`;
       h += `<li class="hzone"><b>${esc(z.name)}</b> <small>week ${H2.currentZoneIndex + 1} of ${H2.zones.length} · ${d}/${n} done</small></li>` + (z.tasks || []).map((t2, i) => row("zone", i, t2, zoneDone(i))).join("");
     }
     if (view.tab === "last") return h + `</ul><form class="row hadd" data-hlastadd="1"><input name="t" maxlength="60" placeholder="add something, e.g. clean the fridge"><select name="e" aria-label="How often">${EVERY.map(([v, n]) => `<option value="${v}">${n}</option>`).join("")}</select><button class="btn small alt">Add</button></form>`;
-    h += `</ul>${view.tab !== "zone" ? `<form class="row hadd" data-hadd="${view.tab}"><input name="t" maxlength="80" placeholder="add a ${view.tab} chore"><button class="btn small alt">Add</button></form>` : `<div class="actions"><button class="btn small alt" data-hnextzone="1">Move on to ${esc(H2.zones[(H2.currentZoneIndex + 1) % H2.zones.length].name)}</button></div>`}`;
+    h += `</ul><p class="muted hhint">Ticked one by mistake? Tap Undo, or just untick it (the coin goes back).</p>${view.tab !== "zone" ? `<form class="row hadd" data-hadd="${view.tab}"><input name="t" maxlength="80" placeholder="add a ${view.tab} chore"><button class="btn small alt">Add</button></form>` : `<div class="actions"><button class="btn small alt" data-hnextzone="1">Move on to ${esc(H2.zones[(H2.currentZoneIndex + 1) % H2.zones.length].name)}</button></div>`}`;
     return h;
   }
   function focusPanel() {
@@ -10046,8 +10056,9 @@ Quests finished today: ${S3.doneIds.length}`;
       api2.changed();
     });
     on("[data-hdone]", "change", (el) => {
-      const [k, id] = el.dataset.hdone.split(":");
-      setDone(k, k === "zone" ? +id : id, el.checked);
+      const [k, id] = el.dataset.hdone.split(":"), key = k === "zone" ? +id : id;
+      setDone(k, key, el.checked);
+      if (el.checked) offerUndo(k, key);
     });
     on("[data-hdel]", "click", (el) => {
       const [k, id] = el.dataset.hdel.split(":");
@@ -10099,8 +10110,14 @@ Quests finished today: ${S3.doneIds.length}`;
     on("[data-hcard]", "click", (el) => {
       const c = focus && focus.cards[focus.i];
       if (!c) return;
-      if (el.dataset.hcard === "done") setDone(c.kind, c.id, true);
-      focus.i++;
+      const f2 = focus, i = f2.i;
+      if (el.dataset.hcard === "done") {
+        setDone(c.kind, c.id, true);
+        offerUndo(c.kind, c.id, () => {
+          if (focus === f2) f2.i = i;
+        });
+      }
+      f2.i++;
       api2.changed();
     });
     on("[data-hback]", "click", () => {

@@ -780,3 +780,4 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 /* the cleaning cupboard: room between the timer, "One at a time", the tabs and the list */
 #ctx .htimer + .actions{margin:0 0 14px}
 #ctx .htimer + .actions + .tabs{margin-bottom:10px}
+.hhint{font-size:.8rem;margin:-4px 0 10px}
