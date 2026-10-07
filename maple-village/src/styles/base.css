@@ -210,8 +210,8 @@ details[open] summary::after{content:"–"}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 /* ---------- village ---------- */
 :root{--sea:#8FC1DE;--sea2:#7AB3D6;--sand:#F2E2B8;--grass:#E4ECD6;--grass2:#D3E0C2;--path:#EFE4CF;--path2:#E2D3B6;--wood:#C9A27E;--stone:#CFC8BE;--tree:#9EBE8C;--tree2:#7FA36E;--water:#BFD6E6;--skin:#F8DECD;--hair:#2A211D;--tank:#F2A290;--denim:#7D97C2;--tee:#6E9FD6;--pants:#F3CF5A}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sea:#2C4660;--sea2:#233A52;--sand:#5C5242;--grass:#2D3A2F;--grass2:#26322A;--path:#4A4038;--path2:#3E352E;--water:#3F5568;--stone:#5A544E}}
-:root[data-theme="dark"]{--sea:#2C4660;--sea2:#233A52;--sand:#5C5242;--grass:#2D3A2F;--grass2:#26322A;--path:#4A4038;--path2:#3E352E;--water:#3F5568;--stone:#5A544E}
+/* the game world keeps its own (light) palette in dark mode too: only the menus and panels around it go dark */
+#world{--bg:#F2EEE7;--card:#F9F7F2;--edge:rgba(120,104,84,.13);--ink:#2F2B28;--soft:#8A8279;--faint:#B5ADA2;--navy:#2F3B73;--oat:#EAE3D8;--rule:#E4DDD2;--wash1:#F6E4D2;--wash2:#E0EAD8;color:#2F2B28}
 .mapcard{padding:12px}
 .map{position:relative;aspect-ratio:520/640;touch-action:manipulation}
 .map > svg{display:block;width:100%;height:100%;border-radius:4px;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -298,9 +298,6 @@ details[open] summary::after{content:"–"}
 
 /* street lamps: their warm pools of light only show in dark mode */
 .map .lglow{opacity:0;transition:opacity .6s}
-:root[data-theme="dark"] .map .lglow{opacity:1}
-:root[data-theme="dark"] .map .lglass{fill:#FFD27A !important}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .map .lglow{opacity:1}:root:not([data-theme="light"]) .map .lglass{fill:#FFD27A !important}}
 @keyframes flick{0%,100%{opacity:.22}45%{opacity:.3}55%{opacity:.18}}
 .map .lglow .flick{animation:flick 3.2s ease-in-out infinite}
 @media (prefers-reduced-motion: reduce){.map .lglow .flick{animation:none}}

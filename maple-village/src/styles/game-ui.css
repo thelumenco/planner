@@ -726,24 +726,11 @@ body.season-spring{--tree:#B7D39A;--tree2:#F2BFCB}
 body.season-summer{--tree:#8FB57B;--tree2:#6E9A5C}
 body.season-autumn{--tree:#E3A35B;--tree2:#C9774D}
 body.season-winter{--tree:#9DB5A8;--tree2:#7E9C8F}
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"]) body.season-spring{--grass:#E3EED7}
-  :root:not([data-theme="dark"]) body.season-summer{--grass:#DDEBCB;--grass2:#CCDFB7}
-  :root:not([data-theme="dark"]) body.season-autumn{--grass:#E8E7CF;--grass2:#DCD6B4}
-  :root:not([data-theme="dark"]) body.season-winter{--grass:#E5ECE6;--grass2:#D5E0DA}
-}
-:root[data-theme="light"] body.season-spring{--grass:#E3EED7}
-:root[data-theme="light"] body.season-summer{--grass:#DDEBCB;--grass2:#CCDFB7}
-:root[data-theme="light"] body.season-autumn{--grass:#E8E7CF;--grass2:#DCD6B4}
-:root[data-theme="light"] body.season-winter{--grass:#E5ECE6;--grass2:#D5E0DA}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) body.season-spring{--tree2:#9C6E7A}
-  :root:not([data-theme="light"]) body.season-autumn{--tree:#9A6B3A;--tree2:#8A4E38}
-  :root:not([data-theme="light"]) body.season-winter{--tree:#6E847A;--tree2:#5A7068}
-}
-:root[data-theme="dark"] body.season-spring{--tree2:#9C6E7A}
-:root[data-theme="dark"] body.season-autumn{--tree:#9A6B3A;--tree2:#8A4E38}
-:root[data-theme="dark"] body.season-winter{--tree:#6E847A;--tree2:#5A7068}
+/* the seasons tint the grass the same whatever the phone's light or dark mode: the village always looks like the village */
+body.season-spring{--grass:#E3EED7}
+body.season-summer{--grass:#DDEBCB;--grass2:#CCDFB7}
+body.season-autumn{--grass:#E8E7CF;--grass2:#DCD6B4}
+body.season-winter{--grass:#E5ECE6;--grass2:#D5E0DA}
 /* the staff card at the wine shop counter: a tick per helper, then the two names */
 #ctx .vhelp{display:flex;flex-direction:column;gap:8px;margin:6px 0 10px}
 #ctx .vhelpi{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;text-align:left}
