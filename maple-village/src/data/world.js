@@ -108,17 +108,17 @@ export function nextHop(from, to){
   return null;
 }
 export const outdoorOf = s => OUTDOOR.includes(s) ? s : INNER[s] ? outdoorOf(INNER[s].parent) : (VILLAGE[s] ? VILLAGE[s].scene : "village");
-// Rooms inside another room: Mel's room is through the west door of the house, Evan's through the east door.
+// Rooms inside another room: Mel's room is through the west door of the house, Evan's through the lower east door (the garage is the upper one).
 // door: where Mel steps into the parent room; arrive: where she steps into the inner room; exit: the inner room's
 // own door (on the opposite wall), where she walks to leave.
 export const INNER = {
   room: {parent: "home", door: [64, 340], arrive: [456, 400], exit: [486, 410]},
-  kidroom: {parent: "home", door: [456, 340], arrive: [70, 420], exit: [34, 410]},
+  kidroom: {parent: "home", door: [456, 512], arrive: [70, 420], exit: [34, 410]},
   trophy: {parent: "hall", door: [64, 372], arrive: [456, 400], exit: [486, 410]},
   // the wine shop's kitchen, through the door on its east wall; its own way out is the mat at the bottom
   kitchen: {parent: "wineshop", door: [462, 390], arrive: [260, 560], exit: [260, 606]},
   // big goals: the garage through the back door of the house, the cellar door through the wine shop's west wall
-  garage: {parent: "home", door: [456, 512], arrive: [70, 450], exit: [34, 440]},
+  garage: {parent: "home", door: [456, 340], arrive: [70, 450], exit: [34, 440]},
   office: {parent: "home", door: [64, 512], arrive: [450, 450], exit: [486, 440]},
   cellar: {parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430]}
 };
@@ -164,8 +164,8 @@ export const ROOMS = {
   // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
   // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
   // the living room: the family dining table in the middle, the sofa, kitchen and fridge along the back, and four doors:
-  // Mel's room (left, top), the home office (left, below it), Evan's room (right, top), the garage (right, below it)
-  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{X:[260,452], C:[130,250], B:[436,228], H:[334,250], R:[40,330], K:[480,330], O:[40,512], Q:[480,512]}, stations:[
+  // Mel's room (left, top), the home office (left, below it), the garage (right, top), Evan's room (right, below it)
+  home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{X:[260,452], C:[130,250], B:[436,228], H:[334,250], R:[40,330], K:[480,512], O:[40,512], Q:[480,330]}, stations:[
     ["kitchen","Kitchen","B","kitchen",/cook|meal|lunch|dinner|bake|grocer|prep/,"Something smells good."],
     ["sofa","Sofa","C","sofa",/read|rest|journal|meditat|book|nap/,"Soft cushions, deep breaths."],
     ["mydoor","My room","R","sidedoor",null,"Your room. Just you.",0],

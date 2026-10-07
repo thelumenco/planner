@@ -931,3 +931,6 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Angellina: brown sugar bubble tea, pastel highlighters.
   - Both of them: oat milk latte, box of mochi.
   - Nothing dairy goes to Marcus.
+
+### Round 71: Evan's room and garage doors swapped
+- The garage door is now the living room's upper east door (Q:[480,330], INNER.garage.door [456,340]); Evan's room is the lower one (K:[480,512], INNER.kidroom.door [456,512]).
