@@ -1677,6 +1677,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // The evening light: a sunset from 6pm deepening into dusk by 7:30, the same on every outdoor screen
+  console.log("\nsunset and dusk");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`sky pageerror: ${e.message}`));
+  const wash = async (t, sc) => { await page.goto(url + `?reset=1&seed=1&time=${t}&date=2026-10-14`); await page.waitForTimeout(700); await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(600);
+    return page.evaluate(() => { const r = document.querySelector("#sceneArt rect.dusk"); return r ? r.getAttribute("fill") : null; }); };
+  check(await wash("12:00", "village") === null, "no wash in the daytime");
+  const sun = await wash("18:45", "village"), dusk1 = await wash("19:30", "base"), dusk2 = await wash("19:30", "shore");
+  check(sun && sun !== dusk1, "a warm sunset wash at 6:45pm");
+  check(dusk1 === "#A3A9DC" && dusk2 === dusk1, "by 7:30 the dusk is the same on home and the foreshore");
+  await page.close();
+}
+{
   // The night market: Tuesday and Thursday evenings, 6 to 10pm on the field. Out-of-town traders, fairy lights, a jazz
   // duo on a little stage (tip the band), tourists and a few villagers shopping; the wine shop's evening regulars still come
   console.log("\nthe night market");

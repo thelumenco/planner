@@ -3,7 +3,7 @@
 // right corner, then east into the river at home.
 import { ink, sgHM } from "../util.js";
 import { eventNow, STALL_SPOTS, STAGE } from "../game/tours.js";
-import { sk, tapeLabel, tree, flowers, artCtx, duskWash } from "./scenes.js";
+import { sk, tapeLabel, tree, flowers, artCtx, skyWash } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
 import { archGate } from "./orchard.js";
 import { personArt } from "./people.js";
@@ -113,8 +113,8 @@ export function fieldArt(){
   const ev = eventNow(artCtx().day(), sgHM());
   const event = ev ? (ev.kind === "night" ? fairyLights() : bunting) + ev.stalls.map(s => stall(s.at, STALL_SPOTS[s.at][0], STALL_SPOTS[s.at][1], s)).join("") + (ev.kind === "night" ? stage() : blanket2() + (ev.kind === "fair" ? kites : ""))
     + tapeLabel(260, 30, ev.name, "var(--butter)", 12) : "";
-  // after 7 the dusk wash (as on every outdoor screen), under the market so the fairy lights glow; a touch of evening before that
-  const m = sgHM(), dark = m >= 19*60 || m < 6*60 ? duskWash : night ? `<rect width="520" height="640" pointer-events="none" style="fill:#CDD1EE;mix-blend-mode:multiply" opacity=".5"/>` : "";
+  // the evening light (as on every outdoor screen), under the market so the fairy lights glow
+  const dark = skyWash(sgHM());
   return lampDefs + ground + swans + dark + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + lawn + toTown + toOrchard + event
     + archGate("toShoreF", 20, 292, "Foreshore", 52, 332, "var(--sky)", "Gate to the foreshore");
 }
