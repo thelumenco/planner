@@ -142,12 +142,13 @@ function dealCards(){
 }
 
 /* ---------- panels ---------- */
-const effort = n => `<span class="heff" title="${["", "Low", "Medium", "High"][n || 1]} effort">${"●".repeat(n || 1)}<i>${"●".repeat(3 - (n || 1))}</i></span>`;
+// how big a job it is (Hestia's effort level), in words rather than dots
+const effort = n => `<span class="heff e${n || 1}">${["", "quick", "medium", "big job"][n || 1]}</span>`;
 function row(kind, id, t, done, badge){
   return `<li class="${done ? "done" : ""}"><label><input type="checkbox" data-hdone="${kind}:${id}" ${done ? "checked" : ""}><span>${esc(t.text)}</span></label>${badge || ""}${effort(t.effort)}${kind !== "zone" ? `<button class="hx" data-hdel="${kind}:${id}" aria-label="Remove this chore">✕</button>` : ""}</li>`;
 }
 function timerBlock(){
-  if (!timer) return `<div class="htimer"><span>${icon("clock", 18)} Tidy timer</span>${[10, 20, 30].map(m => `<button class="btn small ${m === H.timerMinutes ? "primary" : "alt"}" data-htimer="${m}">${m} min</button>`).join("")}</div>`;
+  if (!timer) return `<div class="htimer"><span>${icon("clock", 18)} Tidy timer</span><div class="htbtns">${[10, 20, 30].map(m => `<button class="btn small ${m === H.timerMinutes ? "primary" : "alt"}" data-htimer="${m}">${m} min</button>`).join("")}</div></div>`;
   return `<div class="htimer on"><b data-htleft>${mmss(left())}</b><small>${timer.pausedLeft != null ? "paused" : "time to tidy"}</small>
     <button class="tbtn" data-htctl="${timer.pausedLeft != null ? "play" : "pause"}" aria-label="${timer.pausedLeft != null ? "Resume" : "Pause"}">${icon(timer.pausedLeft != null ? "play" : "pause", 18)}</button>
     <button class="tbtn" data-htctl="stop" aria-label="Stop the timer">${icon("reset", 18)}</button></div>`;

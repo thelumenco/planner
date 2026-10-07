@@ -955,3 +955,6 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - The bedtime card's "I really need to get up" now asks inside the card (`#bedSure`: "Yes, just tonight" / "Back to sleep").
 - The bank's "Take some out" now uses the amount box.
 - The tests fail if a dialog ever opens. Don't use confirm, prompt or alert anywhere.
+
+### Round 74: the cleaning cupboard tidied
+- Effort shows as word chips (quick, medium, big job) instead of dots. The timer buttons sit in an even row of three. There is more room around "One at a time" and the tabs, taller rows, and a bigger tap area on the remove button.

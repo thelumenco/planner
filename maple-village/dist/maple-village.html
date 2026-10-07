@@ -856,7 +856,7 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 .pinned li.dropped{grid-column:1/-1;opacity:.8;transform:none}
 /* Hestia at home: chores in the cleaning cupboard, the fridge */
 .hlist{list-style:none;margin:6px 0 12px;padding:0}
-.hlist li{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px dashed #E4DDD2;font-size:.92rem}
+.hlist li{display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px dashed #E4DDD2;font-size:.92rem}
 .hlist li label{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
 .hlist li input[type=checkbox]{width:18px;height:18px;accent-color:#7FA36E;flex:none}
 .hlist li.done span,.hlist li.out > label span{color:#A39B90;text-decoration:line-through}
@@ -865,11 +865,12 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 .hlist .hzone{display:block;border-bottom:0;padding-top:2px}
 .hbadge{font-size:.7rem;font-weight:700;color:#8A8279;background:#F4EEE3;border-radius:999px;padding:2px 8px;flex:none}
 .hbadge.now{color:#B5562E;background:#FBE3D6}
-.heff{font-size:.55rem;letter-spacing:1px;color:#C9853E;flex:none}.heff i{font-style:normal;color:#E4DDD2}
-.hx{border:0;background:none;color:#B9B0A4;font-size:.85rem;padding:2px 4px;cursor:pointer;flex:none}
+.heff{font-size:.68rem;font-weight:700;border-radius:999px;padding:2px 8px;flex:none;color:#5E7A4E;background:#E8F0DF}.heff.e2{color:#8A6420;background:#F6ECD2}.heff.e3{color:#A2492C;background:#F8E0D6}
+.hx{border:0;background:none;color:#B9B0A4;font-size:.9rem;padding:8px 6px 8px 12px;margin-left:2px;cursor:pointer;flex:none}
 .hadd{gap:6px;flex-wrap:wrap}.hadd input{flex:1 1 140px}.hadd select{max-width:46%;font:inherit;font-size:.85rem;background:transparent;border:0;border-bottom:1.5px solid #E4DDD2}
-.htimer{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:4px 0 8px;font-size:.9rem;color:#5E5A55}
+.htimer{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:4px 0 14px;font-size:.9rem;color:#5E5A55}
 .htimer > span{display:inline-flex;align-items:center;gap:6px;margin-right:auto}
+.htbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}.htbtns .btn{margin:0;white-space:nowrap;padding-left:6px;padding-right:6px}
 .htimer.on b{font-family:"Klee One",serif;font-size:1.8rem;color:#2F3B73;font-variant-numeric:tabular-nums}
 .htimer.on small{margin-right:auto;color:#8A8279}
 .hcard{font-size:1.5rem;margin:6px 0 14px}
@@ -1341,6 +1342,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .accs{display:grid;gap:8px}
 .acc{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(127,127,127,.08)}
 .acc .n{font-weight:600}.acc .n small{display:block;font-weight:400;color:var(--soft)}
+
+/* the cleaning cupboard: room between the timer, "One at a time", the tabs and the list */
+#ctx .htimer + .actions{margin:0 0 14px}
+#ctx .htimer + .actions + .tabs{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -9894,12 +9899,12 @@ Quests finished today: ${S3.doneIds.length}`;
     });
     return cards;
   }
-  var effort = (n) => `<span class="heff" title="${["", "Low", "Medium", "High"][n || 1]} effort">${"●".repeat(n || 1)}<i>${"●".repeat(3 - (n || 1))}</i></span>`;
+  var effort = (n) => `<span class="heff e${n || 1}">${["", "quick", "medium", "big job"][n || 1]}</span>`;
   function row(kind, id, t2, done, badge) {
     return `<li class="${done ? "done" : ""}"><label><input type="checkbox" data-hdone="${kind}:${id}" ${done ? "checked" : ""}><span>${esc(t2.text)}</span></label>${badge || ""}${effort(t2.effort)}${kind !== "zone" ? `<button class="hx" data-hdel="${kind}:${id}" aria-label="Remove this chore">✕</button>` : ""}</li>`;
   }
   function timerBlock() {
-    if (!timer) return `<div class="htimer"><span>${icon("clock", 18)} Tidy timer</span>${[10, 20, 30].map((m) => `<button class="btn small ${m === H2.timerMinutes ? "primary" : "alt"}" data-htimer="${m}">${m} min</button>`).join("")}</div>`;
+    if (!timer) return `<div class="htimer"><span>${icon("clock", 18)} Tidy timer</span><div class="htbtns">${[10, 20, 30].map((m) => `<button class="btn small ${m === H2.timerMinutes ? "primary" : "alt"}" data-htimer="${m}">${m} min</button>`).join("")}</div></div>`;
     return `<div class="htimer on"><b data-htleft>${mmss(left2())}</b><small>${timer.pausedLeft != null ? "paused" : "time to tidy"}</small>
     <button class="tbtn" data-htctl="${timer.pausedLeft != null ? "play" : "pause"}" aria-label="${timer.pausedLeft != null ? "Resume" : "Pause"}">${icon(timer.pausedLeft != null ? "play" : "pause", 18)}</button>
     <button class="tbtn" data-htctl="stop" aria-label="Stop the timer">${icon("reset", 18)}</button></div>`;
