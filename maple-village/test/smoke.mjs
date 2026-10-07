@@ -1390,6 +1390,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("market")); await page.waitForTimeout(800);
   await page.waitForSelector('#ctx [data-shop="family"]', { timeout: 20000 }); await page.click('#ctx [data-shop="family"]');
   check(await page.locator('#ctx .item[data-id="mooncake"]').count() === 1 && await page.locator('#ctx .item[data-id="birdsnest"]').count() === 1, "Hana sells nyonya kueh, bird's nest, chicken essence, and mooncakes in autumn");
+  check(/Mum or Dad/.test(await page.locator('#ctx .item[data-id="kuehlapis"]').textContent()) && await page.locator('#ctx .item[data-id="protbar"]').count() === 1 && await page.locator('#ctx .item[data-id="bubbletea"]').count() === 1,
+    "the kuehs suit Mum and Dad too, and there are gifts for Marcus (dairy-free protein) and Angelina");
   await page.click('#ctx .item[data-id="ondeh"]'); await page.waitForTimeout(200);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1000);
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="ondeh"]'); await page.click('#bag [data-giveto].primary'); await page.waitForTimeout(400);

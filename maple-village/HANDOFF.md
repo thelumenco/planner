@@ -923,3 +923,11 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Home: "Paddle to the foreshore" (`data-sup="shore"`).
 - **The trip:** `paddleTo(dest)` (core.js) puts Mel, Maple and Evan (when he's around) on boards on the water, then about 1.3s later calls `setScene(dest, JETTY[dest])`; the scene fade is the blink. Mel steps off by the other rack. Paddling isn't allowed from 10pm to 6am.
 - **Room for a future top row:** Mel plans four more screens above the foreshore, the field, the town square and Makers' Lane (ideas: a holiday house or ice cream shop above the foreshore; a forest or mountainside above Makers' Lane; an airport somewhere), each reached by a gate. Keep the top edge (y < 40) of those four screens free, especially the top middle. On the foreshore the stream stays below y≈50, so a north path there would cross it on a footbridge.
+
+### Round 70: market gifts for Mum, Dad, Marcus and Angelina
+- The kuehs and festive treats (kueh lapis, ondeh-ondeh, ang ku kueh, mooncake, bak kwa, pineapple tarts, bak chang, log cake) now go `to:["mama","gonggong","mum","dad"]`, with `says` lines for Mum and Dad. Bird's nest and chicken essence stay with the grandparents.
+- New Family-tab gifts at Hana's market:
+  - Marcus (lactose intolerant, loves protein): plant protein bar, beef jerky, grilled chicken bento.
+  - Angelina: brown sugar bubble tea, pastel highlighters.
+  - Both of them: oat milk latte, box of mochi.
+  - Nothing dairy goes to Marcus.
