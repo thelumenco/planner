@@ -2314,7 +2314,11 @@ setInterval(() => {
   windAt = Date.now(); const left = 23*60 + 45 - m;
   speak(left <= 15 ? `${left} minute${left === 1 ? "" : "s"} till bed. ${WIND[windI++ % WIND.length]}` : WIND[windI++ % WIND.length], 6000, true);
 }, 5000);
-$("bedUp").onclick = () => { if (!confirm("Get up just for tonight? Stay in bed comes back on tomorrow night.")) return; F.bedSkip = nightKey(); save(); bedtimeTick(); speak("Okay, just this once. Be gentle with yourself.", 5000, true); };
+// (asked inside the card: pop-up confirms are blocked inside the artifact frame, so confirm() always said no)
+const bedAsk = on => { $("bedSure").hidden = !on; $("bedUp").hidden = on; };
+$("bedUp").onclick = () => bedAsk(true);
+$("bedNo").onclick = () => bedAsk(false);
+$("bedYes").onclick = () => { bedAsk(false); F.bedSkip = nightKey(); save(); bedtimeTick(); speak("Okay, just this once. Be gentle with yourself.", 5000, true); };
 // Backup: every part of the game this browser holds (the save, journal, jars, kind words, routines, letters, home) in one file
 $("setBackup").onclick = async () => {
   const data = {}; Object.keys(localStorage).filter(k => k.startsWith("fox.")).forEach(k => { try { data[k] = JSON.parse(localStorage.getItem(k)); } catch { data[k] = localStorage.getItem(k); } });

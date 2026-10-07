@@ -1017,7 +1017,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(!(await page.locator("#bedLock").isHidden()) && await page.evaluate(() => document.body.classList.contains("bedlocked")), "from 11:45pm the village rests: everything waits until 6am");
   await page.locator("#chatBtn").dispatchEvent("click").catch(() => {}); await page.waitForTimeout(200);
   check(await page.locator("#panel").isHidden(), "and nothing can be actioned");
-  await page.click("#bedUp"); await page.waitForTimeout(1500);
+  page.on("dialog", d => { errors.push("bedtime used a browser pop-up (blocked in the artifact frame)"); d.dismiss(); });
+  await page.click("#bedUp"); await page.waitForTimeout(300);
+  check(await page.locator("#bedSure").isVisible(), "\"I really need to get up\" asks inside the card (no browser pop-up, which the artifact frame blocks)");
+  await page.click("#bedNo"); await page.waitForTimeout(300);
+  check(!(await page.locator("#bedLock").isHidden()) && await page.locator("#bedUp").isVisible(), "\"Back to sleep\" keeps the village resting");
+  await page.click("#bedUp"); await page.click("#bedYes"); await page.waitForTimeout(1500);
   check(await page.locator("#bedLock").isHidden(), "unless Mel really needs to get up (just for tonight)");
   await page.close();
 }
@@ -1779,6 +1784,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(/\$0 of/.test(await page.locator("#ctx .sub").textContent()), "and can be emptied any time");
   await page.click("#undoBtn"); await page.waitForTimeout(200);
   check(/full/.test(await page.locator("#ctx .sub").textContent()), "with Undo");
+  page.on("dialog", d => { errors.push("the bank used a browser pop-up (blocked in the artifact frame)"); d.dismiss(); });
+  await page.fill("#vAmt", "150"); await page.click('#ctx [data-vb="out"]'); await page.waitForTimeout(400);
+  check(/\$850 of \$1,000/.test(await page.locator("#ctx .sub").textContent()), "taking some out uses the amount box (no pop-up)");
   await page.close();
 }
 await browser.close();

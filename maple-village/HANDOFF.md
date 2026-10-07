@@ -949,3 +949,9 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Evening light:** `duskWash` (scenes.js) is a gentle multiply wash (#CDD1EE) used on every outdoor screen after 7pm. Home draws it under its lamps and windows, the field under the market, and core.js appends it for the other outdoor screens. Before this, only home had a (much darker) wash.
 - **Sunset (round 72b):** `duskWash` is replaced by `skyWash(m)` / `skyColour(m)` (scenes.js), a multiply wash keyed through the day. It's white (no wash) by day, a warm sunset from 18:00 (#F9D9C2 at 18:45), the original dusk #A3A9DC by 19:30, darker from 21:00 into deep night (#5C6496) by 22:30. It lifts from 4:45 into a pink sunrise that's gone by 6:45. The colour is quantised to 5 minutes, and the interval redraws outdoor screens when it changes. Home lamps still light at 19:00 (`duskArt`).
 - **Night lamps and labels (round 72c):** the street lamps' `.lglow` used to switch on only in phone dark mode, which was removed. After 7pm, `nightLights()` (core.js, run from drawScene on outdoor screens) now appends a `.nightcopy` group above the dusk wash. It holds lit copies of every lamp glow and glass (home already has its own `litLamp`s), and copies of every `tapeLabel` on white tape. Each copy keeps its on-screen position via `getCTM`, and copies ignore taps, so the originals underneath still take them.
+
+### Round 73: no browser pop-ups (blocked in the artifact frame)
+- The artifact frame blocks `confirm()` and `prompt()`: confirm() returns false and prompt() returns null, so the buttons using them silently did nothing.
+- The bedtime card's "I really need to get up" now asks inside the card (`#bedSure`: "Yes, just tonight" / "Back to sleep").
+- The bank's "Take some out" now uses the amount box.
+- The tests fail if a dialog ever opens. Don't use confirm, prompt or alert anywhere.

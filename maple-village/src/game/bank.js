@@ -101,7 +101,7 @@ export function vaultPanel(){
   const full = isFull(j);
   return h + `<h2>${esc(j.label)}</h2><p class="sub">${esc(money(j.amount, j.cur))} of ${esc(money(j.goal, j.cur))}${full ? " · full!" : ` · ${esc(money(Math.max(0, j.goal - j.amount), j.cur))} to go`}</p>
     <div class="vbig${bv.pouring ? " pouring" : ""}${full ? " full" : ""}" id="vBig"><svg viewBox="0 0 160 300" width="160" height="300" aria-hidden="true">${jarArt(j, 120, 290, {id: "big", sparkle: full, cap: !bv.pouring})}</svg><div class="vpour" id="vPour"></div></div>
-    <form id="vAdd" class="row vadd"><label class="sr" for="vAmt">Amount to add</label><span class="vcur">${esc(j.cur)}</span><input id="vAmt" type="number" inputmode="decimal" step="1" placeholder="Amount" value="${esc(bv.amt)}"><button class="btn primary" type="submit" ${bv.pouring ? "disabled" : ""}>Add jewels</button></form>
+    <form id="vAdd" class="row vadd"><label class="sr" for="vAmt">Amount to add</label><span class="vcur">${esc(j.cur)}</span><input id="vAmt" type="number" inputmode="decimal" step="1" placeholder="Amount to add or take out" value="${esc(bv.amt)}"><button class="btn primary" type="submit" ${bv.pouring ? "disabled" : ""}>Add jewels</button></form>
     <div class="actions"><button class="btn alt small" data-vb="out">Take some out</button><button class="btn alt small" data-vb="setup">Change</button><button class="btn alt small" data-vb="empty" ${j.amount ? "" : "disabled"}>Empty the jar</button><button class="btn alt small" data-close="1">Back to the vault</button></div>
     ${(j.log || []).length ? `<details class="vlog"><summary>History</summary><ul>${j.log.slice().reverse().slice(0, 12).map(x => `<li><span>${new Date(x.at).toLocaleDateString("en-GB", {day: "numeric", month: "short", timeZone: "Asia/Singapore"})}</span><b>${x.emptied ? "emptied" : (x.amt > 0 ? "+" : "") + esc(money(x.amt, j.cur))}</b></li>`).join("")}</ul></details>` : ""}`;
 }
@@ -124,7 +124,8 @@ export function wireVault(root, api){
     const k = b.dataset.vb;
     if (k === "setup") { bv.mode = "setup"; bv.form = null; }
     else if (k === "back") { bv.mode = "jar"; bv.form = null; }
-    else if (k === "out") { const n = Math.round(Number(prompt("How much are you taking out?") || 0)); if (n > 0) { deposit(bv.slot, -n); api.sfx("paper"); } }
+    // takes out the amount typed in the box (a prompt() pop-up is blocked inside the artifact frame)
+    else if (k === "out") { const a = root.querySelector("#vAmt"), n = Math.round(Number(a && a.value) || 0); if (!(n > 0)) { if (a) { a.placeholder = "How much to take out?"; a.focus(); } return; } deposit(bv.slot, -n); bv.amt = ""; api.sfx("paper"); }
     else if (k === "empty") { const r = emptyJar(bv.slot); if (r) { api.sfx("pop"); api.undoable("Jar emptied", () => { r(); api.rerender(); }); } }
     else if (k === "remove") { const r = removeJar(bv.slot); bv.mode = "jar"; if (r) api.undoable("Vault removed", () => { r(); api.rerender(); }); return api.close(); }
     else if (k === "close") return api.close();

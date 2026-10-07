@@ -323,6 +323,7 @@ details[open] summary::after{content:"–"}
 .bedcard{position:relative;max-width:340px;text-align:center;background:#FFFDF6;color:#2F2B28;border-radius:14px;padding:24px 22px;box-shadow:0 20px 40px -20px rgba(0,0,0,.6);--ink:#2F2B28;--soft:#8A8279}
 .bedcard h2{font-family:"Klee One",serif;font-weight:600;font-size:1.8rem;margin:0 0 8px}
 .bedcard .bzz{font-family:"Klee One",serif;color:#8A8279;margin:0;letter-spacing:.3em}
+.bedcard #bedYes{color:#FFFDF6;background:#3B3550;border-color:#3B3550}.bedcard #bedSure p{margin:6px 0 0}.bedcard #bedSure .actions{justify-content:center}
 .bedcard #bedUp{color:#FFFDF6;background:#3B3550;border-color:#3B3550;margin-top:6px}
 body.bedlocked{overflow:hidden}
 
@@ -1369,7 +1370,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 <div class="bedlock" id="bedLock" hidden role="dialog" aria-modal="true" aria-labelledby="bedLockT">
   <div class="bedsky" aria-hidden="true"><span class="bmoon"></span><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <div class="bedcard"><p class="bzz" aria-hidden="true">z z z</p><h2 id="bedLockT">Bedtime</h2><p>You're tucked in. Everything in the village waits until <b>6am</b>, and this is your protected rest.</p>
-    <p class="muted" id="bedLockLeft"></p><button class="btn alt small" id="bedUp" type="button">I really need to get up</button></div>
+    <p class="muted" id="bedLockLeft"></p><button class="btn alt small" id="bedUp" type="button">I really need to get up</button>
+    <div id="bedSure" hidden><p>Get up just for tonight? Stay in bed comes back on tomorrow night.</p><div class="actions"><button class="btn alt small" id="bedYes" type="button">Yes, just tonight</button><button class="btn small" id="bedNo" type="button">Back to sleep</button></div></div></div>
 </div>
 <main class="wrap">
   <div class="head">
@@ -6949,7 +6951,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const full = isFull(j);
     return h + `<h2>${esc(j.label)}</h2><p class="sub">${esc(money(j.amount, j.cur))} of ${esc(money(j.goal, j.cur))}${full ? " · full!" : ` · ${esc(money(Math.max(0, j.goal - j.amount), j.cur))} to go`}</p>
     <div class="vbig${bv.pouring ? " pouring" : ""}${full ? " full" : ""}" id="vBig"><svg viewBox="0 0 160 300" width="160" height="300" aria-hidden="true">${jarArt2(j, 120, 290, { id: "big", sparkle: full, cap: !bv.pouring })}</svg><div class="vpour" id="vPour"></div></div>
-    <form id="vAdd" class="row vadd"><label class="sr" for="vAmt">Amount to add</label><span class="vcur">${esc(j.cur)}</span><input id="vAmt" type="number" inputmode="decimal" step="1" placeholder="Amount" value="${esc(bv.amt)}"><button class="btn primary" type="submit" ${bv.pouring ? "disabled" : ""}>Add jewels</button></form>
+    <form id="vAdd" class="row vadd"><label class="sr" for="vAmt">Amount to add</label><span class="vcur">${esc(j.cur)}</span><input id="vAmt" type="number" inputmode="decimal" step="1" placeholder="Amount to add or take out" value="${esc(bv.amt)}"><button class="btn primary" type="submit" ${bv.pouring ? "disabled" : ""}>Add jewels</button></form>
     <div class="actions"><button class="btn alt small" data-vb="out">Take some out</button><button class="btn alt small" data-vb="setup">Change</button><button class="btn alt small" data-vb="empty" ${j.amount ? "" : "disabled"}>Empty the jar</button><button class="btn alt small" data-close="1">Back to the vault</button></div>
     ${(j.log || []).length ? `<details class="vlog"><summary>History</summary><ul>${j.log.slice().reverse().slice(0, 12).map((x) => `<li><span>${new Date(x.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Asia/Singapore" })}</span><b>${x.emptied ? "emptied" : (x.amt > 0 ? "+" : "") + esc(money(x.amt, j.cur))}</b></li>`).join("")}</ul></details>` : ""}`;
   }
@@ -7003,11 +7005,17 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         bv.mode = "jar";
         bv.form = null;
       } else if (k === "out") {
-        const n = Math.round(Number(prompt("How much are you taking out?") || 0));
-        if (n > 0) {
-          deposit(bv.slot, -n);
-          api4.sfx("paper");
+        const a = root.querySelector("#vAmt"), n = Math.round(Number(a && a.value) || 0);
+        if (!(n > 0)) {
+          if (a) {
+            a.placeholder = "How much to take out?";
+            a.focus();
+          }
+          return;
         }
+        deposit(bv.slot, -n);
+        bv.amt = "";
+        api4.sfx("paper");
       } else if (k === "empty") {
         const r = emptyJar2(bv.slot);
         if (r) {
@@ -10427,7 +10435,7 @@ Quests finished today: ${S3.doneIds.length}`;
     const d = outfitDoc(), inv = inventory();
     if (!inv || !sample) return null;
     const shown = [...(todayDoc() || {}).options || [], ...extras(F2)].map((o2) => FIELDS.map(([k]) => o2[k]).filter(Boolean).join(", ")).slice(-8);
-    const prompt2 = `You are Mel's personal stylist. Suggest ONE outfit for today.
+    const prompt = `You are Mel's personal stylist. Suggest ONE outfit for today.
 Mel's style profile (from her stylist skill):
 - Colour season True/Deep Winter. Best: true black, pure white, icy white, deep navy, burgundy/wine, deep forest green, royal blue, emerald, plum, charcoal, cool blue-reds, hot pink, icy lavender. Wears silver AND gold. Avoid warm browns, camel, orange, yellow, warm beige, olive, rust, coral near the face (chocolate, mocha, tan work as neutrals away from the face). Neutrals: black, charcoal, navy, pure white.
 - Kibbe Romantic: soft, curved, fitted; fluid fabrics (jersey, silk, satin, chiffon); define the waist (tuck or belt); midi and maxi; soft florals or abstract prints, never geometric; rounded or almond toes; no boxy head-to-toe or oversized.
@@ -10442,7 +10450,7 @@ Calendar: ${(events || []).length ? events.slice(0, 12).map((e) => `${e.allDay ?
 Already suggested today (make this one clearly different): ${shown.join(" | ") || "none"}
 Mel's request: ${clean(ask2, 120) || "something different"}
 Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "", "shoes": "", "bag": "", "jewellery": "", "sunglasses": "", "layer": "", "hair": "up|down + short note", "why": "one sentence"} (leave fields empty when not used: dress OR top+bottom).`;
-    const o = await sample.json(prompt2, { modelTier: "quick", cache: false });
+    const o = await sample.json(prompt, { modelTier: "quick", cache: false });
     if (!o || typeof o !== "object") return null;
     const out = {};
     FIELDS.forEach(([k]) => {
@@ -10632,13 +10640,13 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     rerender();
     const snap = JSON.stringify({ overview: st.snap && st.snap.overview, projects: st.snap && st.snap.projects, needs_attention: st.snap && st.snap.attention }).slice(0, 4e4);
     const history = st.log.slice(-10, -1).map((m) => (m.role === "user" ? "Mel: " : "You: ") + m.content).join("\n");
-    const prompt2 = `You are the client desk in Mel's village game: a calm, practical assistant who knows her studio (she runs Fresh Pages Co / Ambidextrous, a copywriting and AI studio in Singapore). Answer in at most 5 short sentences or a short list, plain text, no emoji, no markdown headings. Be specific: names, dates, what's waiting on whom. Only state what the data shows; if it doesn't say, say so. You can't change anything in Chord.
+    const prompt = `You are the client desk in Mel's village game: a calm, practical assistant who knows her studio (she runs Fresh Pages Co / Ambidextrous, a copywriting and AI studio in Singapore). Answer in at most 5 short sentences or a short list, plain text, no emoji, no markdown headings. Be specific: names, dates, what's waiting on whom. Only state what the data shows; if it doesn't say, say so. You can't change anything in Chord.
 Snapshot from Chord (today): ${snap}
 ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     let reply = "";
     try {
       const lim = sample.limits ? await sample.limits().catch(() => null) : null;
-      const r = lim && lim.tools ? await sample(prompt2, { tools: TOOLS, modelTier: "default" }) : await sample(prompt2, { modelTier: "default", cache: false });
+      const r = lim && lim.tools ? await sample(prompt, { tools: TOOLS, modelTier: "default" }) : await sample(prompt, { modelTier: "default", cache: false });
       reply = plain(String(r && r.text || "")).trim();
     } catch (e) {
       reply = e && e.code === "rate_limited" ? "I need a breather. Ask again in a minute?" : "I couldn't get to the files just now. Try again?";
@@ -10787,7 +10795,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     const plans = (st2.plans || []).filter((p) => p && p.text).map((p) => `== ${p.title}${p.theme ? ` (theme: ${p.theme})` : ""} ==
 ${p.text}`).join("\n\n");
     const history = st2.log.slice(-10, -1).map((x) => (x.role === "user" ? "Mel: " : "You: ") + x.content).join("\n");
-    const prompt2 = `You are Mel's planning partner at the planning table in her village game. She runs Fresh Pages Co / Ambidextrous (copywriting, AI training) plus her apps Chord and Chico, and parents Evan (2-3). Coach in her boss-mode style: honest, kind, specific, one clear next step, protect rest and family time, no guilt. Answer in at most 6 short sentences or a short list. Plain text, no emoji, no markdown headings. Base everything on her plans and today's data below; if they don't say, say so rather than inventing.
+    const prompt = `You are Mel's planning partner at the planning table in her village game. She runs Fresh Pages Co / Ambidextrous (copywriting, AI training) plus her apps Chord and Chico, and parents Evan (2-3). Coach in her boss-mode style: honest, kind, specific, one clear next step, protect rest and family time, no guilt. Answer in at most 6 short sentences or a short list. Plain text, no emoji, no markdown headings. Base everything on her plans and today's data below; if they don't say, say so rather than inventing.
 Today: ${(/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })}.
 Her plans (Notion):
 ${plans || "(couldn't read the plans just now)"}
@@ -10796,7 +10804,7 @@ Today's calendar: ${JSON.stringify(ctx2.events || []).slice(0, 2e3)}
 ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     let reply = "";
     try {
-      const r = await sample(prompt2, { modelTier: "default", cache: false });
+      const r = await sample(prompt, { modelTier: "default", cache: false });
       reply = plain(String(r && r.text || "")).trim();
     } catch (e) {
       reply = e && e.code === "rate_limited" ? "Let's pause a moment. Ask again in a minute?" : "I couldn't think that through just now. Try again?";
@@ -18222,8 +18230,14 @@ ${SIGNOFF[t2.who] || ""}`;
     const left3 = 23 * 60 + 45 - m;
     speak(left3 <= 15 ? `${left3} minute${left3 === 1 ? "" : "s"} till bed. ${WIND[windI++ % WIND.length]}` : WIND[windI++ % WIND.length], 6e3, true);
   }, 5e3);
-  $("bedUp").onclick = () => {
-    if (!confirm("Get up just for tonight? Stay in bed comes back on tomorrow night.")) return;
+  var bedAsk = (on) => {
+    $("bedSure").hidden = !on;
+    $("bedUp").hidden = on;
+  };
+  $("bedUp").onclick = () => bedAsk(true);
+  $("bedNo").onclick = () => bedAsk(false);
+  $("bedYes").onclick = () => {
+    bedAsk(false);
     F.bedSkip = nightKey();
     save2();
     bedtimeTick();
