@@ -1391,7 +1391,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForSelector('#ctx [data-shop="family"]', { timeout: 20000 }); await page.click('#ctx [data-shop="family"]');
   check(await page.locator('#ctx .item[data-id="mooncake"]').count() === 1 && await page.locator('#ctx .item[data-id="birdsnest"]').count() === 1, "Hana sells nyonya kueh, bird's nest, chicken essence, and mooncakes in autumn");
   check(/Mum or Dad/.test(await page.locator('#ctx .item[data-id="kuehlapis"]').textContent()) && await page.locator('#ctx .item[data-id="protbar"]').count() === 1 && await page.locator('#ctx .item[data-id="bubbletea"]').count() === 1,
-    "the kuehs suit Mum and Dad too, and there are gifts for Marcus (dairy-free protein) and Angelina");
+    "the kuehs suit Mum and Dad too, and there are gifts for Marcus (dairy-free protein) and Angellina");
   await page.click('#ctx .item[data-id="ondeh"]'); await page.waitForTimeout(200);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1000);
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="ondeh"]'); await page.click('#bag [data-giveto].primary'); await page.waitForTimeout(400);
@@ -1465,7 +1465,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
 }
 {
   // The foreshore (west of the field): the sea with dolphins and paddleboarders, two family houses, Mum, Dad, Marcus and
-  // Angelina with their routines, Mum's exercise class at the field, a family paddle, and gifts for the family
+  // Angellina with their routines, Mum's exercise class at the field, a family paddle, and gifts for the family
   console.log("\nthe foreshore and Mel's family");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`shore pageerror: ${e.message}`));
@@ -1479,7 +1479,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=07:30&date=2026-10-06&shorepatch=1"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
   check(await page.locator('#world [data-place="mumdad"]').count() === 1 && await page.locator('#world [data-place="marcus"]').count() === 1 && await page.locator('#world [data-place="suprack"]').count() === 1
-    && await page.locator('#world [data-place="toFieldS"]').count() === 1 && await page.locator('#world [data-place="toFlowersS"]').count() === 1, "the foreshore: Mum and Dad's house, Marcus and Angelina's, the paddleboards, gates to the field and the flower farm");
+    && await page.locator('#world [data-place="toFieldS"]').count() === 1 && await page.locator('#world [data-place="toFlowersS"]').count() === 1, "the foreshore: Mum and Dad's house, Marcus and Angellina's, the paddleboards, gates to the field and the flower farm");
   check(await ids().then(a => a.includes("mum") && a.includes("dad")), "early on a Tuesday Mum's out for her walk and Dad's sketching on the sand");
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="paleale"]'); await page.click('#bag [data-giveto="dad"]'); await page.waitForTimeout(400);
   check(await ffox().then(f => !f.inv.paleale && f.fam.gifts.dad === 1), "a craft pale ale from the market can go to Dad");
@@ -1490,7 +1490,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#mel.sup").count() === 1 && await page.locator('#actors [data-npc="mum"].act-sup, #actors [data-npc="dad"].act-sup').count() === 2, "a family paddle: Mel takes a board out and Mum and Dad paddle out too");
   await page.goto(url + "?seed=1&time=16:30&date=2026-10-10"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
-  check(await page.locator('#actors [data-npc="marcus"].act-sup').count() === 1 && await page.locator('#actors [data-npc="angelina"].act-sup').count() === 1, "on weekend afternoons Marcus and Angelina go paddleboarding");
+  check(await page.locator('#actors [data-npc="marcus"].act-sup').count() === 1 && await page.locator('#actors [data-npc="angelina"].act-sup').count() === 1, "on weekend afternoons Marcus and Angellina go paddleboarding");
   await page.goto(url + "?seed=1&time=15:30&date=2026-10-11"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
   check(await page.locator('#actors [data-npc="darren"].act-sup').count() === 1, "Darren goes paddleboarding on Sunday afternoons");
@@ -1499,7 +1499,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await ids().then(a => a.includes("dad")) && ["piano", "bass", "easel", "mat"].length === await page.locator("#world [data-spot]").evaluateAll(n => n.filter(x => ["piano", "bass", "easel", "mat"].includes(x.dataset.spot)).length), "inside Mum and Dad's: Dad at the piano, his double bass and easel, Mum's mat");
   await page.goto(url + "?seed=1&time=20:00&date=2026-10-05"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("marcus")); await page.waitForTimeout(1200);
-  check(await page.locator('#actors [data-npc="marcus"].act-game').count() === 1 && await ids().then(a => a.includes("angelina")), "evenings at Marcus and Angelina's: Marcus gaming on the sofa, Angelina beside him");
+  check(await page.locator('#actors [data-npc="marcus"].act-game').count() === 1 && await ids().then(a => a.includes("angelina")), "evenings at Marcus and Angellina's: Marcus gaming on the sofa, Angellina beside him");
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-05"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("bank")); await page.waitForTimeout(1200);
   check(await ids().then(a => a.includes("marcus") && a.includes("opal")), "on Mondays Marcus works at the bank alongside Opal");
@@ -1537,13 +1537,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await ids().then(a => a.includes("okada")), "villagers wander Makers' Lane too (Mr Okada, Monday afternoon)");
   await page.goto(url + "?seed=1&time=18:00&date=2026-10-09"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1200);
-  check(await ids().then(a => a.includes("marcus") && a.includes("angelina")), "Marcus and Angelina come to the vineyard on Friday evenings");
+  check(await ids().then(a => a.includes("marcus") && a.includes("angelina")), "Marcus and Angellina come to the vineyard on Friday evenings");
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-11"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
   check(await ids().then(a => ["mum", "dad", "marcus", "angelina"].every(f => a.includes(f))), "the whole family's at the Sunday farmers market");
   await page.goto(url + "?seed=1&time=20:00&date=2026-10-06"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
-  check(await page.locator('#actors [data-npc="marcus"].act-sit').count() === 1 && await page.locator('#actors [data-npc="angelina"].act-sit').count() === 1, "Tuesday is date night: Marcus and Angelina at a tasting table in the wine shop");
+  check(await page.locator('#actors [data-npc="marcus"].act-sit').count() === 1 && await page.locator('#actors [data-npc="angelina"].act-sit').count() === 1, "Tuesday is date night: Marcus and Angellina at a tasting table in the wine shop");
   await page.goto(url + "?seed=1&time=14:00&date=2026-10-10"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("marcus")); await page.waitForTimeout(3000);
   check(await page.locator("#evan").isVisible() && /Mario|Spiderman|game/i.test(await page.locator("#evanSay").textContent()), "Evan visits Uncle Marcus's and asks for Mario and Spiderman");
@@ -1656,7 +1656,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
-  // Bedroom doors: Ma Ma and Gong Gong, Mum and Dad, Marcus and Angelina head to bed at 10:50pm and are gone after 11
+  // Bedroom doors: Ma Ma and Gong Gong, Mum and Dad, Marcus and Angellina head to bed at 10:50pm and are gone after 11
   console.log("\nbedroom doors");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`bedroom pageerror: ${e.message}`));

@@ -307,7 +307,7 @@ export function furn(kind, x, y){
       `<path d="M${x-26} ${y} l20 -112 M${x+26} ${y} l-20 -112 M${x} ${y-112} v112 M${x-34} ${y-50} h68"/><rect x="${x-30}" y="${y-100}" width="60" height="50" rx="1"/><path d="M${x-22} ${y-62} q10 -16 22 -8 q8 -14 20 -4 M${x-20} ${y-70} l8 -14 l6 8 l6 -12 l8 14" opacity=".7"/><path d="M${x+20} ${y-50} l10 -4" stroke-width="1.6" style="stroke:#F3C969"/>`);
     case "yogamat": return sk(`<path d="M${x-56} ${y-10} l10 -24 h92 l-10 24z" style="fill:#E8566C"/><ellipse cx="${x+50}" cy="${y-24}" rx="6" ry="12" style="fill:#C9A3E0"/><rect x="${x-70}" y="${y-22}" width="8" height="14" rx="3" style="fill:var(--peri)"/>`,
       `<path d="M${x-56} ${y-10} l10 -24 h92 l-10 24z"/><ellipse cx="${x+50}" cy="${y-24}" rx="6" ry="12"/><rect x="${x-70}" y="${y-22}" width="8" height="14" rx="3"/><path d="M${x-74} ${y-15} h16"/>`);
-    // Marcus and Angelina's: the games corner (TV, console, controllers), her psychology books, her study desk
+    // Marcus and Angellina's: the games corner (TV, console, controllers), her psychology books, her study desk
     case "gamingtv": return furn("tv", x, y) + sk(`<rect x="${x-14}" y="${y-22}" width="28" height="8" rx="2" style="fill:#FFFDF6"/><path d="M${x-30} ${y-58} l6 -6 l6 6 l-6 6z M${x+16} ${y-58} h10 v-6 h-10z" style="fill:#F3C969"/><circle cx="${x-4}" cy="${y-52}" r="3" style="fill:#E8566C"/>`,
       `<rect x="${x-14}" y="${y-22}" width="28" height="8" rx="2"/><circle cx="${x+8}" cy="${y-18}" r="1.4"/>`);
     case "psychshelf": { const cols = ["#C9A3E0", "#8FB3E8", "#F2A0B8", "#9CC27E", "#F3C969", "#B98AD9"]; let b = "";

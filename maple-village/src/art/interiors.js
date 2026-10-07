@@ -177,7 +177,7 @@ const SHELLS = {
       `<rect x="30" y="34" width="40" height="32" rx="2"/><path d="M36 58 q8 -14 16 -4 q6 -10 12 2" opacity=".7"/><rect x="84" y="28" width="34" height="44" rx="2"/><circle cx="101" cy="44" r="7" opacity=".7"/><path d="M92 64 q9 -8 18 0" opacity=".7"/><rect x="200" y="40" width="44" height="34" rx="2"/><path d="M206 66 l10 -14 l8 8 l8 -12 l8 18" opacity=".7"/>`)}
     <g filter="url(#wob)">${[96, 70, 44].map((rx, i) => `<ellipse cx="300" cy="420" rx="${rx}" ry="${rx*.42}" style="fill:${["#BFE0EE", "#FFFDF6", "#E8B4C0"][i]}" opacity=".75"/>`).join("")}</g>
     ${plant(490, 610, 1)}${plant(24, 610, .85)}`,
-  // Marcus and Angelina's: soft lilac walls, a gallery wall (their engagement photo), fairy lights, a plant shelf
+  // Marcus and Angellina's: soft lilac walls, a gallery wall (their engagement photo), fairy lights, a plant shelf
   marcus: () => `<rect width="520" height="640" style="fill:#CDB59A"/>
     <g opacity=".4" style="stroke:#AE9578" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}${rows(30, i => `<path d="M${(i*59) % 520} ${170 + (i % 13)*36} v36"/>`)}</g>
     ${wallBase("#F3ECF7", "#8E5B9A")}${skirting}

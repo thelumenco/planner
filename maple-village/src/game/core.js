@@ -1153,7 +1153,7 @@ function toKitchen(id){
 const DARREN_AT = {base: "outside at home", home: "inside the house", farm: "in the garden"};
 let bubbleT = null;
 // Who a gift suits: one of the family, Ma Ma and Gong Gong ("grands"), anyone in the family ("family"), or a list
-const GIFT_NAME = {evan: "Evan", darren: "Darren", mama: "Ma Ma", gonggong: "Gong Gong", mum: "Mum", dad: "Dad", marcus: "Marcus", angelina: "Angelina"};
+const GIFT_NAME = {evan: "Evan", darren: "Darren", mama: "Ma Ma", gonggong: "Gong Gong", mum: "Mum", dad: "Dad", marcus: "Marcus", angelina: "Angellina"};
 const FOLKS = ["mum", "dad", "marcus", "angelina"];   // Mel's family on the foreshore: gifts go to them in person, wherever they are
 const giftWho = to => to === "family" ? ["evan", "darren", "mama", "gonggong", ...FOLKS] : to === "grands" ? ["mama", "gonggong"] : Array.isArray(to) ? to : [to];
 const giftNames = to => to === "grands" ? "Ma Ma or Gong Gong" : to === "family" ? "the family" : giftWho(to).map(g => GIFT_NAME[g]).join(giftWho(to).length > 2 ? ", " : " or ").replace(/, ([^,]*)$/, " or $1");
@@ -1174,7 +1174,7 @@ function giveTo(id, w){
   F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
   sfx("chime"); flash(`Sent to ${GIFT_NAME[w]}`); speak(`Wrapped up and sent to ${GIFT_NAME[w]}. Watch your mailbox for a thank-you note.`, 4500); save(); bag();
 }
-const SIGNOFF = {mum: "Love, Mum xx", dad: "Love, Dad", mama: "Love you, ah girl. Ma Ma", gonggong: "Gong Gong", marcus: "Cheers Zeh, Marcus", angelina: "Love, Angelina", darren: "Love you. D", evan: "Love, Evan (Darren held the pencil)"};
+const SIGNOFF = {mum: "Love, Mum xx", dad: "Love, Dad", mama: "Love you, ah girl. Ma Ma", gonggong: "Gong Gong", marcus: "Cheers Zeh, Marcus", angelina: "Love, Angellina", darren: "Love you. D", evan: "Love, Evan (Darren held the pencil)"};
 function thankNote(t){
   const it = ITEMS[t.item] || {n: "present", say: ""}, line = (it.says && it.says[t.who]) || it.say || "";
   return `${t.who === "evan" ? "Dear Mama" : "Dear Mel"},\n\nThank you for the ${it.n.toLowerCase()}! ${line}\n\n${SIGNOFF[t.who] || ""}`;
@@ -1851,7 +1851,7 @@ function setScene(id, at){
       setTimeout(() => speak(m < 18*60 ? "Wine club tonight at the cellar door, 6pm! Eight members are coming to taste and buy." : "The wine club's on at the cellar door right now! Pop in and host.", 6000), 2800); } }
     if (id === "cellar" && wineClubNow(dayKey(), sgHM())) setTimeout(() => speak("The wine club's here! Glasses clinking, everyone talking at once. Tap the tasting bar to host.", 5000), 1200);
     if (id === "marcus" && evanHere()) setTimeout(() => { evanSays(pick(["Uncle Marcus! Can I play Mario?", "Can we watch Spiderman? Pleeease?", "Game! Game! Can I play the game?"])); if (isHere("marcus")) setTimeout(() => npcSay("marcus", "Ha! Ask your mum, little man. Zeh? One level?"), 2200); }, 1500);
-    if (id === "wineshop" && isHere("marcus") && isHere("angelina") && sgHM() >= 19*60 + 30 && S.dateSaid !== dayKey()) { S.dateSaid = dayKey(); setTimeout(() => speak("Marcus and Angelina are on a date night at the middle table. Act natural.", 5000), 1600); }
+    if (id === "wineshop" && isHere("marcus") && isHere("angelina") && sgHM() >= 19*60 + 30 && S.dateSaid !== dayKey()) { S.dateSaid = dayKey(); setTimeout(() => speak("Marcus and Angellina are on a date night at the middle table. Act natural.", 5000), 1600); }
     { const dn = dinnerOn(dayKey()), m = sgHM(); if (dn && m >= 17*60 + 30 && m < dn.to && S.dinnerSaid !== dayKey()) { S.dinnerSaid = dayKey();
       setTimeout(() => speak(m < dn.from ? `Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30! Tap the table when you get there.` : `Family dinner's on at ${HOST_NAME[dn.host]}! Everyone's at the table.`, 6000), 2600); } }
     if (id === "shore" && S.shoreSaid !== dayKey()) { S.shoreSaid = dayKey(); const fam = ["mum", "dad", "marcus", "angelina"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
@@ -1900,7 +1900,7 @@ function arriveSpot(id){
   if (id === "mydoor") { setScene("room", INNER.room.arrive); return; }
   if (scene === "cottage" && id === "tea") { orView = "tea"; sfx("paper", true); render(); return; }
   if (id === "dine") { sitForDinner(); return; }
-  if (id === "bedroom") { const m = sgHM(), who = {cottage: "Ma Ma and Gong Gong", mumdad: "Mum and Dad", marcus: "Marcus and Angelina"}[scene] || "They";
+  if (id === "bedroom") { const m = sgHM(), who = {cottage: "Ma Ma and Gong Gong", mumdad: "Mum and Dad", marcus: "Marcus and Angellina"}[scene] || "They";
     speak(m >= 23*60 || m < 6*60 + 30 ? `Shh. ${who} are fast asleep. See them in the morning.` : `${who}'s bedroom. Private! The door stays shut.`, 4000); render(); return; }
   if (id === "gdoor") { setScene("garage", INNER.garage.arrive); return; }
   if (id === "officedoor") { setScene("office", INNER.office.arrive); return; }
@@ -2165,7 +2165,7 @@ function grandBanter(){
     setTimeout(() => npcSay("mum", pick(["Aiyo, this boy!", "Come back here, cheeky!", "So naughty! Come, Ah Ma wants a hug."])), 4200); }
 }
 setInterval(grandBanter, 5000);
-// Evan at Marcus and Angelina's: he wants games (Mario, Spiderman) the moment he's in the door
+// Evan at Marcus and Angellina's: he wants games (Mario, Spiderman) the moment he's in the door
 function marcusGames(){
   if (!evanHere()) { speak(VILLAGE.marcus ? ROOMS.marcus.stations.find(x => x[0] === "games")[5] : "", 4000); render(); return; }
   evan.tx = 150; evan.ty = 300; evan.run = true; evan.wait = 12; sfx("chime");

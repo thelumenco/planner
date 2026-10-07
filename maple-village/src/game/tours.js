@@ -228,11 +228,11 @@ export function shoreSlot(id, day, hm){
 }
 
 // Family dinners: Wednesdays and Sundays, 6:30 to 8pm, at one of the four family houses in turn (Mel's home, Ma Ma's
-// cottage, Mum and Dad's, Marcus and Angelina's). Everyone sits round the big dining table: five along the back
-// (Ma Ma, Gong Gong, Mum, Dad, Angelina), four along the front (Darren, Marcus, Evan, Mel).
+// cottage, Mum and Dad's, Marcus and Angellina's). Everyone sits round the big dining table: five along the back
+// (Ma Ma, Gong Gong, Mum, Dad, Angellina), four along the front (Darren, Marcus, Evan, Mel).
 export const DINNER_FROM = 18*60 + 30, DINNER_TO = 20*60;
 export const DINNER_HOSTS = ["home", "mumdad", "cottage", "marcus"];
-export const HOST_NAME = {home: "your place", mumdad: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", marcus: "Marcus and Angelina's"};
+export const HOST_NAME = {home: "your place", mumdad: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", marcus: "Marcus and Angellina's"};
 // where each house's dining table stands: cx = centre, fy = the front edge of the table on the floor
 export const DINING = {home: {cx: 260, fy: 452}, mumdad: {cx: 270, fy: 500}, cottage: {cx: 320, fy: 470}, marcus: {cx: 340, fy: 470}};
 const BACK = ["mama", "gonggong", "mum", "dad", "angelina"], FRONT = ["darren", "marcus", "evan", "mel"];
@@ -255,7 +255,7 @@ export function dinnerSlot(id, day, hm){
   return {from: d.from, to: d.to, scene: d.host, at: dinnerSeat(d.host, id), act: "sit", dir: BACK.includes(id) ? 1 : -1, dinner: true};
 }
 
-// Date night: Marcus and Angelina at the middle table of the tasting room, Tuesdays and Saturdays 7:30 to 9pm
+// Date night: Marcus and Angellina at the middle table of the tasting room, Tuesdays and Saturdays 7:30 to 9pm
 // (Mr Okada and Hana, who usually sit there in the evenings, take those nights off)
 export const DATE_DAYS = [2, 6], DATE_FROM = 19*60 + 30, DATE_TO = 21*60;
 export function dateSlot(id, day, hm){

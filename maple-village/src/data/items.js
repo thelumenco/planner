@@ -66,7 +66,7 @@ export const ITEMS = {
   logcake:{n:"Christmas log cake", kind:"gift", to:["mama", "gonggong", "mum", "dad"], price:14, tab:"family", seasons:["winter"], say:"A log cake! So festive. Come, cut a big slice for Evan.",
     says:{mum:"A log cake! We'll have it after Christmas dinner.", dad:"Log cake! Ah Gong will cut the biggest slice for Evan."}},
   essence:{n:"Chicken essence", kind:"gift", to:"grands", price:10, tab:"family", say:"Chicken essence! One every morning, then strong like an ox."},
-  // for Marcus (lactose intolerant, loves his protein) and Angelina (studying for her psychology master's)
+  // for Marcus (lactose intolerant, loves his protein) and Angellina (studying for her psychology master's)
   protbar:{n:"Plant protein bar", kind:"gift", to:"marcus", price:4, tab:"family", say:"Plant protein, no dairy. You know me too well, Zeh. Post-gym sorted."},
   jerky:{n:"Beef jerky", kind:"gift", to:"marcus", price:7, tab:"family", say:"Jerky! Pure protein. Don't tell Angie, I'm not sharing."},
   chickenbox:{n:"Grilled chicken bento", kind:"gift", to:"marcus", price:9, tab:"family", say:"Grilled chicken and brown rice? Macros on point. Thanks, Zeh!"},

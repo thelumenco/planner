@@ -1,7 +1,7 @@
 // The foreshore: west of the field and north of Ma Ma's flower farm, after the Mandurah foreshore. The sea runs down
 // the west side (dolphins surfacing now and then, a paddleboarder far out), then a strip of sand with a bench and the
 // jetty with its paddleboard rack, the boardwalk, Norfolk pines, and two family houses: Mum and Dad's, and Marcus
-// and Angelina's. Gates: east to the field, south down the boardwalk to the flower farm.
+// and Angellina's. Gates: east to the field, south down the boardwalk to the flower farm.
 import { ink } from "../util.js";
 import { sk, tapeLabel, house, flowers, artCtx } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
@@ -61,7 +61,7 @@ export function shoreArt(){
     ${tapeLabel(214, 276, "Dolphin bench", "var(--peri)", 10)}</g>`;
   const mumdad = house("mumdad", 300, 140, 120, 76, "#EAF2F5", "#3E6B8C", "Mum and Dad's", "var(--sky)",
     {art: `<path d="M318 168 l4 -10 l4 10z M330 164 v-8 l6 -2 v8" style="fill:#2F2B28"/><rect x="300" y="210" width="120" height="6" style="fill:#3E6B8C"/>`, lines: `<circle cx="333" cy="164" r="2"/><circle cx="339" cy="162" r="2"/>`});
-  const marcus = house("marcus", 340, 384, 120, 76, "#FFF3E6", "#8E5B9A", "Marcus and Angelina's", "var(--blush)",
+  const marcus = house("marcus", 340, 384, 120, 76, "#FFF3E6", "#8E5B9A", "Marcus and Angellina's", "var(--blush)",
     {art: `<path d="M452 396 h-10 v10" style="fill:none"/><circle cx="356" cy="452" r="5" style="fill:#7FA35A"/><circle cx="444" cy="452" r="5" style="fill:#7FA35A"/>`, lines: `<path d="M352 456 h8 l-1 4 h-6z M440 456 h8 l-1 4 h-6z"/>`});
   // the dolphin cruise boat (a big goal) at the end of the jetty; out on a cruise it sails up the coast and back with
   // the family aboard and dolphins alongside. Before it's bought: a mooring post with a "your boat here" sign

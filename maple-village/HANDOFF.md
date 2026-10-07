@@ -789,15 +789,15 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **The foreshore** (`shore`, art/shore.js), modelled on the Mandurah foreshore. It sits west of the field and north of the flower farm.
   - The sea takes the west third, with three dolphins surfacing on SMIL loops and a far-off paddleboarder.
   - Then a strip of sand with the **Dolphin bench** (`dolphins`: Mel sits; mornings, once a day, dolphins and a little xp) and the jetty with the **paddleboard rack** (`suprack`).
-  - The boardwalk, Norfolk pines, two lamps, and two houses: **Mum and Dad's** (`mumdad`) and **Marcus and Angelina's** (`marcus`).
+  - The boardwalk, Norfolk pines, two lamps, and two houses: **Mum and Dad's** (`mumdad`) and **Marcus and Angellina's** (`marcus`).
   - Gates: `toFieldS` (east) ↔ the field's `toShoreF` (west), and `toFlowersS` (south) ↔ the flower farm's `toShoreFl` (top left; the hedge has a gap there).
   - Bounds keep Mel off the water (x ≥ 186). OBST covers the houses and the rack.
-- **Interiors:** `ROOMS.mumdad` has the piano, double bass, easel, Mum's mat and the kitchen table. `ROOMS.marcus` has the games corner, the psychology bookshelf, Angelina's desk, the sofa and a table. New furniture kinds are in scenes.js; the shells are in interiors.js.
+- **Interiors:** `ROOMS.mumdad` has the piano, double bass, easel, Mum's mat and the kitchen table. `ROOMS.marcus` has the games corner, the psychology bookshelf, Angellina's desk, the sofa and a table. New furniture kinds are in scenes.js; the shells are in interiors.js.
 - **New NPCs** (data/npcs.js):
   - **Mum** (bob with a fringe: hairStyle `bobfringe`): morning walk on the foreshore, then she leads the class at 8. After that she volunteers (the library Mon/Wed, the town hall Fri) or waters at the orchard (Tue/Thu). Flower farm in the early afternoon, town in the late afternoon, her mat at home.
   - **Dad** (black specs, T-shirt and berms): sketching on the sand at 7, piano, town, the orchard (Mon/Wed/Fri) or bass, the easel, a walk on the foreshore, and music in the evening.
   - **Marcus** (tall, silver specs): banker at the village bank Mon/Wed/Fri (`BANKER` look, covering Opal's lunch at the main counter). "At work in the city" Tue/Thu. Gaming on the sofa (act `game`) in the evenings. On weekends: the orchard, town, then paddleboarding 4–5pm.
-  - **Angelina** (`dress` look): studies at the library on weekday mornings and at her desk in the afternoons. Waters with Mei, walks the foreshore, paddleboards with Marcus at weekends.
+  - **Angellina** (`dress` look): studies at the library on weekday mornings and at her desk in the afternoons. Waters with Mei, walks the foreshore, paddleboards with Marcus at weekends.
   - `SHORE_WALK`/`SEA` are point lists. Slots with `free: true` move straight with no clamping (paddleboarders on the water, at speed 22).
 - **Mum's exercise class** (`classOn`/`classSlot` in tours.js): 8–9am Monday to Saturday on the field's **exercise lawn** (`exlawn`, east of the river). Pilates Mon/Wed, Zumba Tue/Thu, Piloxing Fri/Sat.
   - Mum leads (act `lead`) with 3 villagers from `CLASS_POOL` (act `exercise`).
@@ -805,11 +805,11 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Out-of-towners paddleboard** (`shoreSlot`): two on weekend mornings (9 to 12), one on weekday mornings (7 to 8:30).
 - **Family paddle** (`familyPaddle`/`endPaddle` in core.js, module state `sup`):
   - Mel (and Evan, if he's here) take boards out for 60 seconds. A `.supboard` is injected under their `.bob` and shown by the `.sup` class.
-  - Any of Mum, Dad, Marcus or Angelina whose routine has them on the foreshore paddle out too (`supSlot` in npcs.js, via `api.sup()`).
+  - Any of Mum, Dad, Marcus or Angellina whose routine has them on the foreshore paddle out too (`supSlot` in npcs.js, via `api.sup()`).
   - Maple waits by the rack and couriers wait at the water's edge. A dolphin moment comes at 20 seconds.
   - Tapping the shore ends it early. A finished paddle gives 2 xp once a day. Not at night or in the rain.
 - **Darren** paddleboards off the foreshore on Sunday afternoons (3 to 4:30).
-- **Gifts:** `"family"` now also covers Mum, Dad, Marcus and Angelina (`FOLKS`). Soaps, scrub and candles suit Mum and Angelina too; beers suit Dad and Marcus too; honey has a line for each of them.
+- **Gifts:** `"family"` now also covers Mum, Dad, Marcus and Angellina (`FOLKS`). Soaps, scrub and candles suit Mum and Angellina too; beers suit Dad and Marcus too; honey has a line for each of them.
 - people.js: `look.board` draws a board and paddle; `look.dress` draws a dress (the legs show below it); hairStyle `bobfringe` adds a straight-cut fringe.
 - CSS (npcs.css): paddleboarders bob and hide their shadow; `exercise`/`lead` raise and lower their arms; `game` sits with busy thumbs.
 
@@ -820,25 +820,25 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Once due, `thanksMail()` adds "Thank you from X" notes to `localMail`. Penny delivers them; `thankNote` builds the text from the gift's `says` line and the person's sign-off.
 - **Who's where today** (friendship view, `whosWhereHTML`): family first, then the village. Each person's day comes from `daySchedule(id, day)` in npcs.js (quarter-hour sampling of `slotAt`, cached per day).
   - npcs.js now has `slotAt(def, day, t, live)`. `slotNow` is the live case and adds the family paddle.
-- **Family dinners** (tours.js `dinnerOn`/`dinnerNow`/`dinnerSlot`/`dinnerSeat`): Wednesdays and Sundays, 6:30 to 8pm. The host goes round home → Mum and Dad's → the cottage → Marcus and Angelina's (`DINNER_HOSTS`, by week).
-  - Seats: Ma Ma, Gong Gong, Mum, Dad and Angelina along the back; Darren, Marcus, Evan and Mel along the front.
+- **Family dinners** (tours.js `dinnerOn`/`dinnerNow`/`dinnerSlot`/`dinnerSeat`): Wednesdays and Sundays, 6:30 to 8pm. The host goes round home → Mum and Dad's → the cottage → Marcus and Angellina's (`DINNER_HOSTS`, by week).
+  - Seats: Ma Ma, Gong Gong, Mum, Dad and Angellina along the back; Darren, Marcus, Evan and Mel along the front.
   - Every house has a `dining` station (`DINING` positions). The table is also a depth-sorted prop (`diningTable` in scenes.js, via `stallFronts`), so those along the back show from the waist up.
   - Furniture moved to make room:
     - Mel's home: the dining table replaced the sofa (it takes the sofa's reading/rest quests; Evan's storybook spot moved to it).
     - The cottage: the kitchenette now stands against the back wall and the tea table is bottom left.
     - Mum and Dad's: the kitchen table became the dining table and Mum's mat moved up.
-    - Marcus and Angelina's: re-laid out as a games-and-sofa corner on the left, Angelina's desk and bookshelf as a study nook at the back right, and the dining table in the middle right.
+    - Marcus and Angellina's: re-laid out as a games-and-sofa corner on the left, Angellina's desk and bookshelf as a study nook at the back right, and the dining table in the middle right.
     - The rugs moved to match.
   - Evan sits at his seat on dinner nights (`evanAtDinner`, `#evan.sit`). Tapping the table sits Mel down (2.5 seconds; 3 xp once a night). A reminder plays from 5:30pm, and chat "family dinner" walks there.
 - **Out and about:**
   - Mum: Thursday afternoon at the vineyard.
   - Dad: Sunday morning at the market, Tuesday late morning in the lane, Saturday afternoon at the vineyard, Wednesday sketching by the lake.
-  - Marcus and Angelina: the Sunday market, Friday evening at the vineyard, the lane (Saturday / Wednesday).
+  - Marcus and Angellina: the Sunday market, Friday evening at the vineyard, the lane (Saturday / Wednesday).
   - Villagers in Makers' Lane (`LANE`): Mr Okada (Mon/Wed/Fri 2pm), Bo (Tue/Thu lunch), Juniper (weekdays 3:30pm).
 
 ### Round 63: dark sea, date nights, family voices, Ah Gong and Ah Ma, Evan at Marcus's, desk and table swapped
 - **Dark sea:** the foreshore's sea and sand use `--sea`, `--sea2` and `--sand` (base.css), which have dark-theme values like the rest of the palette.
-- **Date night** (`dateSlot`, tours.js): Marcus and Angelina sit at the middle tasting table (seats c and d) on Tuesdays and Saturdays, 7:30 to 9pm. Mr Okada, Hana and Bo take those nights off. A one-line notice plays when Mel walks in.
+- **Date night** (`dateSlot`, tours.js): Marcus and Angellina sit at the middle tasting table (seats c and d) on Tuesdays and Saturdays, 7:30 to 9pm. Mr Okada, Hana and Bo take those nights off. A one-line notice plays when Mel walks in.
 - **Voices:** NPC defs can carry `hellos` (used for the "hello near Mel" bubbles).
   - Dad: "Hi darling! Love you, have a good day." (also in his intro and lines) and "Ah Gong loves who the most?"
   - Marcus calls Mel "Zeh" (intro, hellos, lines, his thank-you sign-off, his honey line).
@@ -848,7 +848,7 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Ah Ma asks for a hug; Evan runs off with "Catch me first!".
   - Once a day there's a surprise toy: a dinosaur, aeroplane or robot, drawn in Evan's hand via `S.evanHold`.
 - **Evan visits the family houses** by day: `evanHere` includes mumdad and marcus (with `EVAN_SPOTS`).
-  - At Marcus and Angelina's he asks for Mario or Spiderman as he arrives. Tapping the games corner (`marcusGames`) has him play a level, with Marcus chiming in; 1 xp once a day.
+  - At Marcus and Angellina's he asks for Mario or Spiderman as he arrives. Tapping the games corner (`marcusGames`) has him play a level, with Marcus chiming in; 1 xp once a day.
 - **Mel's home, tidied into zones:**
   - The dining table along the back wall at left; the fridge (344) and kitchen (440) at the back right.
   - Her home desk at middle left (130,452) with the treadmill below it; Darren's desk at middle right.
@@ -887,7 +887,7 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Their own sprites are hidden while the car moves (`mel.wasDriving`, `mel.carEvan`), and they hop out beside her when she stops.
 
 ### Round 66: the monthly wine club at the cellar door
-- `wineClubOn` / `wineClubNow` / `clubMembers` / `clubSlot` in tours.js: the first Friday of every month, 6 to 9pm, once the cellar door is built. Eight members are picked each month from `CLUB_POOL` (regulars, the orchard and vineyard hands, Mum, Dad, Marcus and Angelina) and wander the cellar (`CLUB_WALK`).
+- `wineClubOn` / `wineClubNow` / `clubMembers` / `clubSlot` in tours.js: the first Friday of every month, 6 to 9pm, once the cellar door is built. Eight members are picked each month from `CLUB_POOL` (regulars, the orchard and vineyard hands, Mum, Dad, Marcus and Angellina) and wander the cellar (`CLUB_WALK`).
   - npcs.js gates the overlay on `cellarBuilt()`. It comes after dinner and date night in `slotAt`.
 - **Sales** (`sellTick`): club minutes sell bottles at .04 and glasses at .03 off the shop's shelves.
   - With Mel in the cellar (`opts.club`), that's ×1.5 on the live minute, and the coins go to her; otherwise they go to the honesty box.
@@ -924,10 +924,10 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **The trip:** `paddleTo(dest)` (core.js) puts Mel, Maple and Evan (when he's around) on boards on the water, then about 1.3s later calls `setScene(dest, JETTY[dest])`; the scene fade is the blink. Mel steps off by the other rack. Paddling isn't allowed from 10pm to 6am.
 - **Room for a future top row:** Mel plans four more screens above the foreshore, the field, the town square and Makers' Lane (ideas: a holiday house or ice cream shop above the foreshore; a forest or mountainside above Makers' Lane; an airport somewhere), each reached by a gate. Keep the top edge (y < 40) of those four screens free, especially the top middle. On the foreshore the stream stays below y≈50, so a north path there would cross it on a footbridge.
 
-### Round 70: market gifts for Mum, Dad, Marcus and Angelina
+### Round 70: market gifts for Mum, Dad, Marcus and Angellina
 - The kuehs and festive treats (kueh lapis, ondeh-ondeh, ang ku kueh, mooncake, bak kwa, pineapple tarts, bak chang, log cake) now go `to:["mama","gonggong","mum","dad"]`, with `says` lines for Mum and Dad. Bird's nest and chicken essence stay with the grandparents.
 - New Family-tab gifts at Hana's market:
   - Marcus (lactose intolerant, loves protein): plant protein bar, beef jerky, grilled chicken bento.
-  - Angelina: brown sugar bubble tea, pastel highlighters.
+  - Angellina: brown sugar bubble tea, pastel highlighters.
   - Both of them: oat milk latte, box of mochi.
   - Nothing dairy goes to Marcus.

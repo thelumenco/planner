@@ -77,7 +77,7 @@ export const VILLAGE = {
   toFieldS:{scene:"shore", name:"Gate to the field", door:[498,300], spot:true, bridge:"field", mark:[490,246], line:"East through the gate to the field and the lake."},
   toFlowersS:{scene:"shore", name:"Gate to the flower farm", door:[250,622], spot:true, bridge:"flowers", mark:[290,560], line:"Down the boardwalk to Ma Ma's flower farm."},
   mumdad: {scene:"shore", name:"Mum and Dad's", short:"Mum and Dad's house", door:[360,226], mark:[360,110]},
-  marcus: {scene:"shore", name:"Marcus and Angelina's", short:"Marcus and Angelina's house", door:[400,470], mark:[400,354]},
+  marcus: {scene:"shore", name:"Marcus and Angellina's", short:"Marcus and Angellina's house", door:[400,470], mark:[400,354]},
   suprack:{scene:"shore", name:"Paddleboards", door:[216,488], spot:true, line:"The paddleboard rack by the jetty. Fancy a paddle?"},
   boat:   {scene:"shore", name:"Cruise boat", door:[206,550], spot:true, line:"The mooring at the end of the jetty."},
   dolphins:{scene:"shore", name:"Boardwalk bench", door:[214,262], spot:true, line:"A bench looking out to sea. Dolphins come by most mornings."},
@@ -246,12 +246,12 @@ export const ROOMS = {
     ["easel","Easel","E","easel",null,"Dad's sketches: the jetty, the dolphins, and Evan (twice).",34],
     ["mat","Mum's mat","Y","yogamat",null,"Mum's mat. Pilates, Zumba, Piloxing: she does them all.",26],
     ["dine","Dining table","X","dining",null,"The family table. There's always food on it. Take some home.",44]]},
-  // Marcus and Angelina's: the games corner, Angelina's study desk and psychology books, the sofa
-  marcus: {name:"Marcus and Angelina's", wall:"#F3ECF7", trim:"#8E5B9A", noBoard:true, pos:{G:[110,262], K:[428,261], D:[290,262], S:[110,420], X:[340,470], R:[480,340]}, stations:[
-    ["bedroom","Bedroom","R","bedroomdoor",null,"Marcus and Angelina's room.",0],
+  // Marcus and Angellina's: the games corner, Angellina's study desk and psychology books, the sofa
+  marcus: {name:"Marcus and Angellina's", wall:"#F3ECF7", trim:"#8E5B9A", noBoard:true, pos:{G:[110,262], K:[432,261], D:[284,262], S:[110,420], X:[340,470], R:[480,340]}, stations:[
+    ["bedroom","Bedroom","R","bedroomdoor",null,"Marcus and Angellina's room.",0],
     ["games","Games corner","G","gamingtv",null,"Marcus's games. He says he's 'nearly finished' this one. He's been nearly finished for a month.",36],
-    ["books","Bookshelf","K","psychshelf",null,"Angelina's psychology books, all with sticky notes.",36],
-    ["study","Angelina's desk","D","studydesk",null,"Angelina's study desk. Highlighters in every colour.",36],
+    ["books","Bookshelf","K","psychshelf",null,"Angellina's psychology books, all with sticky notes.",36],
+    ["study","Angellina's desk","D","studydesk",null,"Angellina's study desk. Highlighters in every colour.",36],
     ["msofa","Sofa","S","sofa",null,"The comfiest sofa on the foreshore.",30],
     ["dine","Dining table","X","dining",null,"Their dining table. Wedding magazines at one end, bank papers at the other.",44]]},
   // the garage (a big goal): Darren's workbench, storage, the scooter and the car once they're bought

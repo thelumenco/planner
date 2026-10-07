@@ -288,7 +288,7 @@ export const NPCS = [
     away: "Pilar's gone home. The kitchen's all yours."
   },
   // Mel's family on the foreshore (west of the field): Mum and Dad in one house, her brother Marcus and his fiancee
-  // Angelina in the other. All four help Ma Ma and Gong Gong in the orchard now and then, and walk about town.
+  // Angellina in the other. All four help Ma Ma and Gong Gong in the orchard now and then, and walk about town.
   // Mum: always off to an exercise class (she leads one at the field most mornings, see classSlot in tours.js) or
   // volunteering. Dad: music (piano, double bass) and drawing (the easel, sketching on the sand).
   {
@@ -338,7 +338,7 @@ export const NPCS = [
     react: {quests3: "Three already? Clever girl.", lunch: "Have you had lunch? Don't skip."}
   },
   // Marcus, Mel's brother: a banker (he covers Opal's counter at the village bank on Mondays, Wednesdays and Fridays,
-  // and works in the city on Tuesdays and Thursdays); loves games. Angelina, his fiancee, is studying for her master's
+  // and works in the city on Tuesdays and Thursdays); loves games. Angellina, his fiancee, is studying for her master's
   // in psychology (the library in the mornings, her desk at home after lunch). Weekend afternoons they paddleboard.
   {
     id: "marcus", pitch: 0.7, name: "Marcus", job: "Mel's brother, a banker",
@@ -355,14 +355,14 @@ export const NPCS = [
       slot("13:00", "16:00", "marcus", [90, 428], {act: "game", days: "we"}),
       slot("16:00", "17:00", "shore", SEA, {days: "we", act: "sup", free: true}),
       slot("17:00", "19:00", "shore", SHORE_WALK, {days: "we"})],
-    lines: ["One more game. Then I'll sleep. Probably.", "Need a hand with your jars? Compound interest, Zeh.", "Angelina's studying, so I'm being very quiet.", "Paddleboarding this weekend, Zeh? Bring Evan!", "Date night at the wine shop on Tuesday. Don't tell Mum we skipped her Zumba.", "Evan wants Spiderman again. I've created a monster.",
+    lines: ["One more game. Then I'll sleep. Probably.", "Need a hand with your jars? Compound interest, Zeh.", "Angellina's studying, so I'm being very quiet.", "Paddleboarding this weekend, Zeh? Bring Evan!", "Date night at the wine shop on Tuesday. Don't tell Mum we skipped her Zumba.", "Evan wants Spiderman again. I've created a monster.",
       "Mum's at Zumba again.", "Dad played the same song four times today. Four.", "Banker tip, Zeh: pay yourself first. You're welcome."],
     actLines: {game: ["Shh, boss fight.", "Nearly beat this level.", "Okay one more round."], farm: ["Ma Ma says I'm doing it wrong. I'm doing it great.", "Gong Gong's supervising. From the shade."], sup: ["Don't splash! Don't splash!", "Dolphin! Over there!"]},
     away: "Marcus is at work in the city.",
     react: {quests3: "Three done? Okay, overachiever.", lunch: "Lunch break! Even bankers eat."}
   },
   {
-    id: "angelina", pitch: 1.15, name: "Angelina", job: "Studying for her master's in psychology",
+    id: "angelina", pitch: 1.15, name: "Angellina", job: "Studying for her master's in psychology",
     intro: "Hi Mel! Sorry, I'm in exam mode. Ask me anything about attachment theory. Actually don't.",
     look: {skin: "#F0D0B4", hair: "#3A2A22", hairStyle: "long", top: "#C9A3E0", bottom: "#F0D0B4", dress: "#C9A3E0"},
     routine: [slot("10:00", "12:00", "field", MARKET_WALK, {dow: [0]}), slot("17:30", "19:00", "vineyard", VINE_WALK, {dow: [5]}), slot("12:00", "13:00", "lane", LANE, {dow: [3]}),
@@ -380,7 +380,7 @@ export const NPCS = [
     lines: ["Did you know naming a feeling makes it smaller? It's true. I read it last night.", "Three more chapters. Then a break. Then three more chapters.", "Marcus says he's 'helping'. He's playing games.",
       "How are you, really? Not the polite answer.", "The library's so quiet in the mornings. Perfect for studying.", "Your mum invited me to Zumba again. I'm scared.", "Marcus booked us a table at your wine shop. Very romantic. He's had two cheese boards.", "Evan made me watch Mario jump for twenty minutes. Fascinating, honestly."],
     actLines: {type: ["Highlighting everything. That's how studying works, right?", "Footnotes. So many footnotes.", "Nearly done this essay."], water: ["Helping Mei with the flowers. Good study break.", "Plants are very calming. That's actual research."], sup: ["I'm standing! I'm standing!", "Look, a dolphin!"]},
-    away: "Angelina's studying somewhere quiet.",
+    away: "Angellina's studying somewhere quiet.",
     react: {quests3: "Three already? That's real momentum.", lunch: "Brain food time!"}
   }
 ];
