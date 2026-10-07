@@ -1702,6 +1702,7 @@ function drawScene(){
   tableKey = "";
   $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "farm" ? farmArt() : roomArt(scene);
   if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));   // the same evening light everywhere outdoors
+  if (outside() && isDusk()) nightLights();
   const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), orchard:"Ma Ma's orchard", flowers:"Ma Ma's flower farm", field:"The field", shore:"The foreshore"};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
   $("maphint").textContent = scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Mum's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
@@ -1710,6 +1711,21 @@ function drawScene(){
 // a fresh one opened if needed, and sometimes a plate), and their table shows what they ordered. Orders are kept for
 // the day in S.served by who's sitting and which visit it is, so nobody orders twice in one sitting. Pilar, on her
 // break, just has a cup of something. Redrawn only when the orders change.
+// After 7pm outdoors: every street lamp lights up, drawn again above the dusk wash so it glows, and the place names
+// are drawn again above it on white tape so they read in the dark (copies that ignore taps: the originals underneath
+// still take them). Home's two lamps are already lit by its own dusk art.
+function nightLights(){
+  const art = $("sceneArt"); if (!art.querySelector("rect.dusk")) return;
+  const base = art.getCTM(); if (!base) return;
+  const inv = base.inverse(), mtx = el => { const m = inv.multiply(el.getCTM()); return `matrix(${[m.a, m.b, m.c, m.d, m.e, m.f].map(v => +v.toFixed(3)).join(" ")})`; };
+  let h = "";
+  if (scene !== "base") art.querySelectorAll(".lglow").forEach(g => { const c = g.querySelector("circle"), x = +c.getAttribute("cx"), y = +c.getAttribute("cy"), r = +c.getAttribute("r");
+    h += `<g transform="${mtx(g)}"><circle cx="${x}" cy="${y + 6}" r="${r + 10}" fill="url(#lampg)"/><circle class="flick" cx="${x}" cy="${y}" r="${(r*.45).toFixed(1)}" fill="#FFE3A3" opacity=".4"/>${r > 30 ? `<rect x="${x - 5}" y="${y - 6}" width="10" height="12" rx="2" fill="#FFE9A8" stroke="#3b3530" stroke-width="1.1"/>` : ""}</g>`; });
+  art.querySelectorAll("text.lab").forEach(t => { const g = t.parentNode; if (!g || g.closest(".nightcopy")) return;
+    const k = g.cloneNode(true), p = k.querySelector("path"); if (p) { p.style.fill = "#FFFDF6"; p.setAttribute("opacity", "1"); }
+    k.setAttribute("transform", mtx(g)); k.setAttribute("class", "nightlab"); h += k.outerHTML; });
+  art.insertAdjacentHTML("beforeend", `<g class="nightcopy" pointer-events="none">${h}</g>`);
+}
 let tableKey = "";
 // Market days: each stall's table is also a prop sorted among the people, so a keeper behind it is hidden from the waist down
 let frontKey = "", fronts = [];

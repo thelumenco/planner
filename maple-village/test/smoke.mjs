@@ -1687,6 +1687,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const sun = await wash("18:45", "village"), dusk1 = await wash("19:30", "base"), dusk2 = await wash("19:30", "shore");
   check(sun && sun !== dusk1, "a warm sunset wash at 6:45pm");
   check(dusk1 === "#A3A9DC" && dusk2 === dusk1, "by 7:30 the dusk is the same on home and the foreshore");
+  await wash("23:00", "village");
+  check(await page.evaluate(() => { const n = document.querySelectorAll("#sceneArt .nightcopy .nightlab").length, all = document.querySelectorAll("#sceneArt text.lab").length;
+    return n > 5 && n*2 === all && document.querySelectorAll("#sceneArt .nightcopy rect").length >= 4; }), "at night the street lamps light up and every place name sits on white tape above the dark");
   await page.close();
 }
 {
