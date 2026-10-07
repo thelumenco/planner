@@ -41,14 +41,19 @@ const kites = `<g pointer-events="none">${[[150, 110, "#E8566C"], [260, 86, "#7F
   <g ${W}><path d="M${x} ${y-14} l10 14 l-10 14 l-10 -14z" style="fill:${c}"/><path d="M${x} ${y+14} q6 30 -10 60 q-10 30 4 60" fill="none" stroke-width="1"/></g></g>`).join("")}</g>`;
 const bunting = `<g pointer-events="none" ${W} stroke-width="1"><path d="M20 70 Q260 96 500 70" fill="none"/>${Array.from({length: 15}, (_, i) => { const x = 36 + i*32, y = 70 + Math.sin(i/14*Math.PI)*24;
   return `<path d="M${x-6} ${y} h12 l-6 10z" style="fill:${["#E8566C", "#F3C969", "#7FB8E8", "#9CC27E"][i % 4]}"/>`; }).join("")}</g>`;
+// the stream from the foreshore: in at the top left corner, down under a footbridge on the path, into the lake
+const INLET = "M-10 56 C30 64 54 100 62 150 C68 190 80 222 106 252";
 export function fieldArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="160" cy="520" rx="170" ry="90" style="fill:var(--grass2)"/><ellipse cx="460" cy="460" rx="90" ry="140" style="fill:var(--grass2)"/></g>
     ${tree(40, 60, .9)}${tree(140, 46, .75)}${tree(300, 52, .8)}${tree(420, 40, .9)}${tree(490, 120, .8)}${tree(460, 330, .85)}${tree(470, 560, .9)}${tree(30, 600, .8)}
     <g filter="url(#wob)"><path d="M260 640 V392 M260 392 C150 392 54 384 54 300 C54 222 130 192 240 188 H520 M54 300 H20" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
     <g filter="url(#wob)"><path d="M322 304 C372 340 386 380 368 450 C352 520 372 580 380 640" fill="none" style="stroke:var(--water)" stroke-width="18" stroke-linecap="round"/>
+      <path d="${INLET}" fill="none" style="stroke:var(--water)" stroke-width="16" stroke-linecap="round"/>
       <ellipse cx="210" cy="280" rx="132" ry="62" style="fill:var(--water)"/></g>
+    <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".45"><path d="${INLET}" transform="translate(-8 0)"/><path d="${INLET}" transform="translate(8 0)"/></g>
     <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1.1" opacity=".55"><ellipse cx="210" cy="280" rx="132" ry="62"/><path d="M313 302 C363 338 377 380 359 450 C343 520 363 580 371 640 M331 306 C381 342 395 380 377 450 C361 520 381 580 389 640"/></g>
+    <g transform="translate(70 203) rotate(-48)">${sk(`<rect x="-24" y="-11" width="48" height="22" rx="2" style="fill:var(--wood)"/>`, `<rect x="-24" y="-11" width="48" height="22" rx="2"/><path d="M-14 -11 v22 M-4 -11 v22 M6 -11 v22 M16 -11 v22"/>`)}</g>
     ${ripples([[150, 262], [250, 300], [180, 316], [368, 470], [372, 590]])}
     <g ${W}>${[[86, 250], [92, 312], [330, 262]].map(([x, y]) => `<path d="M${x} ${y} v-14 M${x + 4} ${y} v-18 M${x + 8} ${y} v-12" fill="none" style="stroke:var(--moss2)"/><ellipse cx="${x + 4}" cy="${y - 19}" rx="1.6" ry="4" style="fill:#8C5A3C"/>`).join("")}</g>
     ${flowers([[30, 440, "#EFA3A6"], [44, 452, "#F3C969"], [440, 230, "#C3CDEE"], [480, 260, "#EFA3A6"], [300, 620, "#EFA3A6"], [200, 470, "#C3CDEE"]])}`;

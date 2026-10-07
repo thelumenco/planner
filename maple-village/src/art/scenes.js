@@ -122,6 +122,14 @@ function townRiver(){
 }
 
 /* ---------- home base: the house, garden, pond, shed and Evan's swing ---------- */
+// Mel's little jetty on the river's south bank: a short boardwalk out over the water and three paddleboards on a
+// rack. Paddle down the river and out to the foreshore (and back again from the foreshore's rack)
+function homeJetty(){
+  return `<g data-place="homejetty" aria-label="Little jetty: paddle to the foreshore"><ellipse class="hov" cx="150" cy="124" rx="40" ry="11" style="fill:var(--butter)"/>
+    ${sk(`<rect x="112" y="70" width="26" height="44" rx="2" style="fill:#C9A27E"/>${["#F3C969", "#7FB8E8", "#E8566C"].map((c, i) => `<path d="M${152 + i*9} 124 q-4 -18 2 -34 q6 16 2 34z" style="fill:${c}"/>`).join("")}<rect x="146" y="104" width="36" height="5" rx="2" style="fill:var(--wood)"/>`,
+      `<rect x="112" y="70" width="26" height="44" rx="2"/><path d="M112 80 h26 M112 90 h26 M112 100 h26 M116 114 v6 M134 114 v6 M114 70 v-4 M136 70 v-4"/>${[0, 1, 2].map(i => `<path d="M${152 + i*9} 124 q-4 -18 2 -34 q6 16 2 34z"/>`).join("")}<path d="M148 124 v-20 M180 124 v-20"/><rect x="146" y="104" width="36" height="5" rx="2"/>`)}
+    ${tapeLabel(132, 146, "Paddleboards", "var(--sky)", 10)}</g>`;
+}
 export function baseArt(){
   const D = VILLAGE;
   const grown = (G.F().plots || []).filter(p => p && p.crop).length;
@@ -140,7 +148,7 @@ export function baseArt(){
   // chimney stands on the right-hand roof slope (roof line runs y≈196 at x=290 to y≈204 at x=302)
   const homeX = {art:`<path d="M290 168 h12 v36 l-12 -8.6z" style="fill:var(--stone)"/>`, lines:`<path d="M290 196 v-28 h12 v36"/><path d="M288 168 h16"/><path class="smoke" d="M296 164 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>`};
   const places =
-    bridge("toTown", 260, 30, 110, "To town", 336, 124) + vineGate() + orchardGate() +
+    bridge("toTown", 260, 30, 110, "To town", 336, 124) + homeJetty() + vineGate() + orchardGate() +
     house("home", 205, 220, 110, 74, "var(--card)", "var(--butter)", "Home", "var(--butter)", homeX) +
     // Darren's repair corner: ladder against the wall, toolbox
     sk(`<rect x="326" y="282" width="20" height="12" rx="2" style="fill:var(--rose)"/>`, `<path d="M316 296 l12 -62 M326 296 l12 -62 M318 284 h10 M320 272 h10 M323 260 h10 M325 248 h10"/><rect x="326" y="282" width="20" height="12" rx="2"/><path d="M332 282 v-4 h8 v4"/>`) +

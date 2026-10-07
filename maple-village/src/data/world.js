@@ -82,6 +82,7 @@ export const VILLAGE = {
   boat:   {scene:"shore", name:"Cruise boat", door:[206,550], spot:true, line:"The mooring at the end of the jetty."},
   dolphins:{scene:"shore", name:"Boardwalk bench", door:[214,262], spot:true, line:"A bench looking out to sea. Dolphins come by most mornings."},
   exlawn: {scene:"field", name:"Exercise lawn", door:[452,430], spot:true, line:"The exercise lawn. Mum's class is here most mornings at 8."},
+  homejetty:{scene:"base", name:"Little jetty", door:[150,132], spot:true, line:"Your little jetty. Paddle down the river and out to the foreshore."},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };
 // Quests can also happen outdoors at home base: "base" is a quest place whose spots are the base's own places.

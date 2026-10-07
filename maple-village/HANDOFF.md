@@ -914,3 +914,11 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Hair tie:** the blue hair tie and the two sprigs on Mel's sprite carry `class="usual"`. `applyWear` sets `#mel.restyled` whenever a worn outfit has a hair, dress or top piece, and `#mel.restyled .usual` hides them.
 - **Buttons:** `.panel .actions{margin-top:12px}` (0 when first child), so focus and highlight rings no longer touch the line above.
 - **Darren asleep (round 68b):** from 22:00 to 23:00 he sits on the home sofa (slot in data/npcs.js). `darrenAsleep()` (scenes.js) is true from 23:00 until 7:00 on weekdays and 7:30 at weekends. The room's `bed` art then draws him on the right pillow (`.darrenBed`) with the covers pulled up, and the bed panel mentions him.
+
+### Round 69: the stream from the sea, and paddling between home and the foreshore
+- **Water:** a stream runs out of the sea at the top of the foreshore's sand and east across its top (`STREAM`/`BANK`, shore.js). It enters the field at the top left (`INLET`, field.js), goes under a small footbridge on the lake path and feeds the lake. The lake's river already runs on through the orchard to home.
+- **Home jetty:** `homejetty` (VILLAGE, base at [150,132]). `homeJetty()` in scenes.js draws a short boardwalk out over the river and three boards on a rack.
+- **Choices:** tapping the home jetty or the foreshore's `suprack` sets `goalView = "jetty"`, which shows `jettyPanel(scene, evanHere())` (goals.js).
+  - Foreshore: "Paddle about" (`data-sup="play"`, the old `familyPaddle`) or "Paddle home" (`data-sup="base"`).
+  - Home: "Paddle to the foreshore" (`data-sup="shore"`).
+- **The trip:** `paddleTo(dest)` (core.js) puts Mel, Maple and Evan (when he's around) on boards on the water, then about 1.3s later calls `setScene(dest, JETTY[dest])`; the scene fade is the blink. Mel steps off by the other rack. Paddling isn't allowed from 10pm to 6am.

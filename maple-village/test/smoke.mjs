@@ -1482,7 +1482,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="paleale"]'); await page.click('#bag [data-giveto="dad"]'); await page.waitForTimeout(400);
   check(await ffox().then(f => !f.inv.paleale && f.fam.gifts.dad === 1), "a craft pale ale from the market can go to Dad");
   await page.click('[data-open="bag"]').catch(() => {});
-  await page.locator('#world [data-place="suprack"]').dispatchEvent("click"); await page.waitForTimeout(4000);
+  await page.locator('#world [data-place="suprack"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="play"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-sup="base"]').count() === 1, "the paddleboards offer a paddle about, or a paddle home");
+  await page.click('#ctx [data-sup="play"]'); await page.waitForTimeout(4000);
   check(await page.locator("#mel.sup").count() === 1 && await page.locator('#actors [data-npc="mum"].act-sup, #actors [data-npc="dad"].act-sup').count() === 2, "a family paddle: Mel takes a board out and Mum and Dad paddle out too");
   await page.goto(url + "?seed=1&time=16:30&date=2026-10-10"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
@@ -1621,6 +1623,34 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const w = JSON.parse(localStorage.getItem("fox.fox")).wear; return w && w.dress && !w.layer; }), "unticked pieces are left off");
   check(await page.evaluate(() => { const d = document.getElementById("oDress"), l = document.getElementById("oLayer"); return getComputedStyle(d).display !== "none" && getComputedStyle(l).display === "none" && document.getElementById("mel").classList.contains("hairdown"); }), "Mel's character puts it on: the dress, hair down, no cardigan");
   check(!(await page.evaluate(() => [...document.querySelectorAll("#mel .usual")].some(e => getComputedStyle(e).display !== "none"))), "and the blue hair tie and sprigs come off (they're for the usual look only)");
+  await page.close();
+}
+{
+  // Paddling home: the stream from the sea feeds the lake, the river runs on home; a little jetty at home and the
+  // foreshore's rack take Mel (with Evan and Maple) straight from one to the other
+  console.log("\npaddling between home and the foreshore");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`paddle pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-14"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1000);
+  check(await page.locator('#world [data-place="homejetty"]').count() === 1, "a little jetty with paddleboards on the river at home");
+  await page.locator('#world [data-place="homejetty"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="shore"]', { timeout: 15000 });
+  await page.click('#ctx [data-sup="shore"]');
+  await page.waitForFunction(() => document.querySelector('#world [data-place="suprack"]'), null, { timeout: 15000 }); await page.waitForTimeout(1200);
+  check(await page.evaluate(() => { const r = document.getElementById("mel").getBoundingClientRect(), j = document.querySelector('#world [data-place="suprack"]').getBoundingClientRect(); return Math.abs(r.x - j.x) < 120 && Math.abs(r.y - j.y) < 160; }) && await page.locator("#evan").isVisible(),
+    "paddle to the foreshore: Mel steps off by the paddleboards there, Evan with her");
+  await page.locator('#world [data-place="suprack"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="base"]', { timeout: 15000 });
+  await page.click('#ctx [data-sup="base"]');
+  await page.waitForFunction(() => document.querySelector('#world [data-place="homejetty"]'), null, { timeout: 15000 }); await page.waitForTimeout(1200);
+  check(await page.evaluate(() => { const r = document.getElementById("mel").getBoundingClientRect(), j = document.querySelector('#world [data-place="homejetty"]').getBoundingClientRect(); return Math.abs(r.x - j.x) < 120 && Math.abs(r.y - j.y) < 160; }),
+    "and paddle home: straight back, standing by the little jetty");
+  await page.goto(url + "?seed=1&time=23:00&date=2026-10-14"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1000);
+  await page.locator('#world [data-place="homejetty"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="shore"]', { timeout: 15000 });
+  await page.click('#ctx [data-sup="shore"]');
+  const dark = await page.waitForFunction(() => /Too dark/.test(document.querySelector("#speech").textContent), null, { timeout: 5000 }).then(() => true, () => false);
+  await page.waitForTimeout(2000);
+  check(dark && await page.locator('#world [data-place="homejetty"]').count() === 1, "too dark to paddle the river late at night");
   await page.close();
 }
 {

@@ -49,3 +49,13 @@ export function garagePanel(F){
     h += `<p class="eyebrow" style="margin-top:12px">${esc(g.n)}</p><p class="muted">${esc(g.line)} ${F.coins} of ${g.price} ${coin()} saved.</p><div class="actions"><button class="btn primary small" data-goal="${k}" ${F.coins < g.price ? "disabled" : ""}>Buy it (${g.price} ${coin()})</button></div>`; });
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
+// The paddleboard jetties: at the foreshore, a paddle about with the dolphins or paddle up the river home; at home,
+// paddle down the river and out to the foreshore (Evan and Maple come too)
+export function jettyPanel(where, evan){
+  const fam = evan ? "Evan and Maple hop on with you." : "Maple hops on the front of your board.";
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${where === "shore" ? "The paddleboards" : "Your little jetty"}</h2>`;
+  h += where === "shore"
+    ? `<p class="sub">A paddle about with the dolphins, or up the stream, across the lake and down the river home?</p><div class="actions"><button class="btn primary" data-sup="play">Paddle about</button><button class="btn alt" data-sup="base">Paddle home</button></div>`
+    : `<p class="sub">Down the river, across the lake and out along the stream to the sea. ${fam}</p><div class="actions"><button class="btn primary" data-sup="shore">Paddle to the foreshore</button></div>`;
+  return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}

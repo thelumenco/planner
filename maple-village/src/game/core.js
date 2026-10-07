@@ -42,7 +42,7 @@ import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courier
 import { dishArt, glassArt } from "../art/wine.js";
 import { fieldArt, stallFront } from "../art/field.js";
 import { shoreArt } from "../art/shore.js";
-import { GOALS, owns, buyGoal, goalPanel, garagePanel, ride, rideSpeed } from "./goals.js";
+import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
 import { diningTable, darrenAsleep } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
@@ -245,7 +245,7 @@ const SHED = {
   compost:   {n: "Compost bin", price: 150, ico: "compost", what: "Everything grows a quarter faster."},
   sprinkler: {n: "Sprinkler", price: 300, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."}
 };
-let goalView = null;   // a big goal's "save up for it" card ("garagepick": the garage's ride chooser)
+let goalView = null, paddling = false;   // a big goal's "save up for it" card ("garagepick": the garage's ride chooser)
 let fieldView = null, orView = null, orAt = null, orTab = null, potItem = null, kView = null, reviewOpen = false, vyView = null, vyAt = null, vaultView = null, lettersOpen = false, trophyView = null, routOpen = false, kudosOpen = false, deskOpen = false, shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false, clientsOpen = false, planOpen = false, revOpen = false, jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null;
 let jv = {mode: "shelf", blobs: [], note: ""};   // the emotion shelf panel: shelf, make (picker) or jar (one jar)
 // Guided breathing in the calm corner: a ring grows as she breathes in (4 s), holds (2 s) and shrinks as she breathes out (6 s)
@@ -1417,7 +1417,7 @@ function ctx(){
   else if (deskOpen && scene === "office") h = deskPanel();
   else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
   else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
-  else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalPanel(F, goalView);
+  else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
   else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : marketStallPanel(st); }
   else if (orView === "pot" && potItem) h = potPanel(F, potItem);
   else if (orView === "tea" && scene === "cottage") h = teaPanel(F, dayKey(), isHere("mama"));
@@ -1533,6 +1533,7 @@ function ctx(){
   if (kView && scene === "kitchen") wireKitchen(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, today: dayKey()});
   c.querySelectorAll("[data-goal]").forEach(b => b.onclick = () => { const line = buyGoal(F, b.dataset.goal); if (!line) return; sfx("chaching"); act("cheer"); flash(`${GOALS[b.dataset.goal].n}: yours!`); gainXp(5);
     [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("sparkle", mel.x + (k - 1)*24, mel.y - 60, 1800), d)); speak(line, 7000); if (b.dataset.goal === "scooter" || b.dataset.goal === "car") goalView = "garagepick"; else goalView = null; save(true); drawScene(); ctx(); });
+  c.querySelectorAll("[data-sup]").forEach(b => b.onclick = () => { goalView = null; ctx(); if (b.dataset.sup === "play") familyPaddle(); else paddleTo(b.dataset.sup); });
   c.querySelectorAll("[data-ride]").forEach(b => b.onclick = () => { F.ride = b.dataset.ride; sfx("paper", true); speak(F.ride === "car" ? "Keys in hand. You'll drive between screens." : F.ride === "scooter" ? "Helmet on. Scooter it is." : "On foot today. Nice and slow.", 3500); save(); ctx(); });
   if (orView || (fieldView && scene === "field" && (stallAt(dayKey(), sgHM(), +fieldView.slice(-1)) || {}).kind === "orchard")) wireOrchard(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, today: dayKey(), where: orAt && orAt.where, i: orAt && orAt.i, item: potItem,
     tab: k => { orTab = k; ctx(); }, placed: () => { orView = null; potItem = null; ctx(); drawScene(); }, tea: haveTea});
@@ -1976,7 +1977,7 @@ function arriveVillageSpot(id){
     else speak("Nobody's minding this one just now. It's an honesty tin: pop your coins in.", 3500); render(); return; }
   if (id === "lake" || id === "picnic" || id === "pitch") { fieldSpot(id); return; }
   if (id === "exlawn") { joinClass(); return; }
-  if (id === "suprack") { familyPaddle(); return; }
+  if (id === "suprack" || id === "homejetty") { goalView = "jetty"; sfx("paper", true); render(); return; }
   if (id === "boat") { if (owns(F, "boat")) startCruise(); else { goalView = "boat"; sfx("paper", true); render(); } return; }
   if (id === "dolphins") { mel.sitting = true; nodes.mel.classList.add("sit"); mel.dir = -1; sfx("paper", true);
     const m = sgHM(), morning = m >= 6*60 && m < 11*60;
@@ -2077,6 +2078,23 @@ function familyPaddle(){
   speak(fam.length ? `Boards out! ${fam.map(n => NPCS.find(d => d.id === n).name).join(" and ").replace(/ and (?=.* and )/g, ", ")} ${fam.length > 1 ? "are" : "is"} paddling out with you.` : "Boards out! Off the jetty and onto the water. Maple's minding the towels.", 4500);
   setTimeout(() => { if (sup && scene === "shore") { speak("Dolphins! Right next to the boards. Don't fall in. Okay, maybe a little.", 4500); [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("heart", 80 + k*24, 330, 1800), d)); if (fam.length) npcSay(fam[0], "Dolphin! Over there, look!"); } }, 20000);
   render();
+}
+// Paddling between the home jetty and the foreshore: the river, the lake and the stream join them. Board on, a blink,
+// and Mel steps off by the other jetty (Evan and Maple too)
+const JETTY = {shore: [216, 500], base: [150, 134]};
+function paddleTo(dest){
+  if (paddling || sup) return;
+  const m = sgHM(); if (m >= 22*60 || m < 6*60) { speak("Too dark to paddle the river now. Walk tonight, paddle in the morning.", 3500); render(); return; }
+  const kid = evanHere(), off = scene === "shore" ? [[104, 372], [132, 404]] : [[124, 84], [96, 88]]; paddling = true; route = []; atSpot = null; mel.path = []; mel.sitting = false;
+  mel.x = mel.tx = off[0][0]; mel.y = mel.ty = off[0][1]; maple.x = maple.tx = off[0][0] + 6; maple.y = maple.ty = off[0][1] - 2; nodes.mel.classList.remove("sit"); nodes.mel.classList.add("sup");
+  if (kid) { evan.x = evan.tx = off[1][0]; evan.y = evan.ty = off[1][1]; evan.rk = off[1].join(","); evan.path = [off[1]]; evan.run = false; evan.wait = 99; evan.target = null; nodes.evan.classList.add("sup"); }
+  sfx("paper", true); speak(dest === "shore" ? (kid ? "Boards on! Evan's kneeling on his, Maple's on yours. Off down the river." : "Board on, Maple on the front. Off down the river.") : (kid ? "Boards on! Up the stream, across the lake and home." : "Board on. Up the stream and home."), 2500);
+  setTimeout(() => {
+    nodes.mel.classList.remove("sup"); nodes.evan.classList.remove("sup"); paddling = false;
+    setScene(dest, JETTY[dest]);
+    setTimeout(() => { if (evanHere()) { evan.x = evan.tx = JETTY[dest][0] + 26; evan.y = evan.ty = JETTY[dest][1] + 10; evan.run = false; evan.wait = 3; }
+      speak(dest === "shore" ? "Out at the foreshore. Salty air, and the dolphins are about." : "Home! Boards back on the rack.", 3500); }, 450);
+  }, 1300);
 }
 // The dolphin cruise (once the boat's bought): the boat sails up the coast and back with Mel, Evan and Maple aboard
 const cruisingNow = () => !!(S.cruise && Date.now() < S.cruise.until && scene === "shore");

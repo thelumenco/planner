@@ -25,6 +25,12 @@ const farPaddler = (x, y, dy, dur) => `<g pointer-events="none"><g><animateTrans
 const pine = (x, y, s = 1) => sk(`<rect x="${x - 3*s}" y="${y - 10*s}" width="${6*s}" height="${12*s}" style="fill:#8A5A3A"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${x - (22 - i*4)*s} ${y - (10 + i*14)*s} q${(22 - i*4)*s} ${-8*s} ${(44 - i*8)*s} 0 l${-6*s} ${-8*s} h${-(32 - i*8)*s}z" style="fill:${i % 2 ? "#5E8A5A" : "#6E9A63"}"/>`).join("")}`,
   `<path d="M${x} ${y - 82*s} v${80*s}"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${x - (22 - i*4)*s} ${y - (10 + i*14)*s} q${(22 - i*4)*s} ${-8*s} ${(44 - i*8)*s} 0"/>`).join("")}`);
 
+// the stream: out of the sea at the top of the sand, east across the top of the screen and on into the field's lake
+const STREAM = "M110 28 C196 24 238 46 290 40 C350 34 420 22 468 38 C494 46 510 52 534 56";
+const BANK = "M156 26 C206 24 238 46 290 40 C350 34 420 22 468 38 C494 46 510 52 534 56";
+const shoreStream = `<g filter="url(#wob)"><path d="${STREAM}" fill="none" style="stroke:var(--water)" stroke-width="16" stroke-linecap="round"/>
+  <path d="${BANK}" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".4" transform="translate(0 -8)"/><path d="${BANK}" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".4" transform="translate(0 8)"/></g>
+  <path class="ripple" d="M330 36 q4 -3 8 0 M440 28 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>`;
 export function shoreArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="400" cy="560" rx="150" ry="80" style="fill:var(--grass2)"/><ellipse cx="440" cy="240" rx="110" ry="70" style="fill:var(--grass2)"/></g>
@@ -33,6 +39,7 @@ export function shoreArt(){
       <path d="${SHORE} H228 C206 520 238 420 216 320 C196 210 234 110 208 0Z" style="fill:var(--sand)"/></g>
     <g filter="url(#wob)" fill="none"><path d="${SHORE}" style="stroke:#FFFDF6" stroke-width="3.2" stroke-dasharray="10 7" opacity=".9"/><path d="${SHORE}" style="stroke:var(--line)" stroke-width="1" opacity=".45"/>
       <path d="M228 640 C206 520 238 420 216 320 C196 210 234 110 208 0" style="stroke:var(--line)" stroke-width="1" opacity=".35"/></g>
+    ${shoreStream}
     <g pointer-events="none">${[[40, 120], [104, 170], [30, 280], [120, 330], [56, 420], [98, 520], [36, 600], [124, 600]].map(([x, y]) => `<path class="ripple" d="M${x} ${y} q5 -3.5 10 0 q5 3.5 10 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.3" opacity=".8"/>`).join("")}</g>
     <g ${W} opacity=".7">${[[186, 140], [178, 360], [196, 560], [170, 220]].map(([x, y]) => `<path d="M${x} ${y} l3 -3 l3 3 M${x + 10} ${y + 6} q2 -3 4 0" fill="none"/>`).join("")}</g>
     <g filter="url(#wob)"><path d="M250 150 V640 M250 300 H520 M360 300 V222 M400 300 V466" fill="none" style="stroke:#D9BE94" stroke-width="20" stroke-linecap="round"/>
