@@ -1,0 +1,468 @@
+<title>Lead Radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one working column — product tabs, status filter, then the lead list (table on desktop, stacked cards on phone). */
+:root {
+  --bg: #f7f5f5;
+  --surface: #ffffff;
+  --fg: #2a2626;
+  --muted: #7a7070;
+  --line: #e7e1e1;
+  --accent: #af8787;
+  --accent-ink: #8a5f5f;
+  --accent-soft: #f3e9e9;
+  --reddit: #d4512a;
+  --ok: #4f8a5b;
+  --ok-soft: #e6f1e8;
+  --warn: #b9832a;
+  --warn-soft: #f8eedb;
+  --idle: #8e8a8a;
+  --idle-soft: #efeded;
+  --display: "Outfit", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1a1717; --surface: #231f1f; --fg: #efe8e8; --muted: #a59a9a; --line: #3a3333;
+    --accent: #c9a0a0; --accent-ink: #e2bdbd; --accent-soft: #3a2b2b; --reddit: #f07a52;
+    --ok: #7fbf8b; --ok-soft: #22342a; --warn: #e2b260; --warn-soft: #3a2f1c; --idle: #a8a2a2; --idle-soft: #2e2929;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1a1717; --surface: #231f1f; --fg: #efe8e8; --muted: #a59a9a; --line: #3a3333;
+  --accent: #c9a0a0; --accent-ink: #e2bdbd; --accent-soft: #3a2b2b; --reddit: #f07a52;
+  --ok: #7fbf8b; --ok-soft: #22342a; --warn: #e2b260; --warn-soft: #3a2f1c; --idle: #a8a2a2; --idle-soft: #2e2929;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 14px; line-height: 1.5; padding-inline: 16px; padding-block: 24px 64px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+a { color: var(--accent-ink); }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; }
+h1 { font-family: var(--display); font-weight: 300; font-size: 30px; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h1 b { font-weight: 500; color: var(--accent-ink); }
+.sub { color: var(--muted); margin: 2px 0 0; }
+.scan { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: right; }
+.scan strong { color: var(--fg); font-weight: 500; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tab { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 14px; display: inline-flex; gap: 8px; align-items: center; }
+.tab[aria-selected="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.tab .n { font-family: var(--mono); font-size: 11px; background: var(--accent); color: #fff; border-radius: 999px; padding: 0 7px; }
+.tab.add { border-style: dashed; color: var(--accent-ink); background: transparent; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.phead { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+.phead h2 { font-family: var(--display); font-weight: 400; font-size: 20px; margin: 0; }
+.phead .meta { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 4px 14px; min-width: 0; }
+.phead .meta span { overflow-wrap: anywhere; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 12px; white-space: nowrap; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { background: var(--accent-ink); border-color: var(--accent-ink); }
+.btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
+.btn.danger { color: var(--reddit); }
+.btn:disabled { opacity: .55; cursor: default; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 18px; border-bottom: 1px solid var(--line); }
+.filter { border: 1px solid transparent; background: transparent; border-radius: 6px; padding: 4px 10px; color: var(--muted); display: inline-flex; gap: 6px; align-items: center; }
+.filter[aria-pressed="true"] { background: var(--accent-soft); color: var(--fg); border-color: var(--line); }
+.filter .c { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+.leads { display: flex; flex-direction: column; }
+.row { display: grid; grid-template-columns: minmax(0, 2.2fr) 56px minmax(0, 2.6fr) 150px; gap: 16px; padding: 14px 18px; border-bottom: 1px solid var(--line); align-items: start; }
+.row:last-child { border-bottom: 0; }
+.row.head { padding-block: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.post { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.post .t { font-weight: 500; color: var(--fg); text-decoration: none; overflow-wrap: anywhere; }
+.post .t:hover { text-decoration: underline; }
+.post .src { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 0 10px; }
+.post .src .sr { color: var(--reddit); }
+.post .why { font-size: 13px; color: var(--muted); }
+.post details summary { cursor: pointer; font-size: 12px; color: var(--accent-ink); }
+.post details p { margin: 6px 0 0; font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 220px; overflow: auto; }
+.fit { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 13px; text-align: center; border-radius: 6px; padding: 3px 0; }
+.fit.hi { background: var(--ok-soft); color: var(--ok); }
+.fit.mid { background: var(--warn-soft); color: var(--warn); }
+.fit.lo { background: var(--idle-soft); color: var(--idle); }
+.reply { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.reply textarea { width: 100%; min-height: 96px; resize: vertical; border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; background: var(--bg); line-height: 1.45; }
+.reply .tools { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.reply .redo { flex: 1 1 160px; min-width: 0; border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; background: transparent; font-size: 13px; }
+.reply .none { color: var(--muted); font-style: italic; }
+.act { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.pill { font-size: 12px; border-radius: 999px; padding: 3px 10px; text-align: center; font-weight: 500; border: 0; }
+.s-found { background: var(--warn-soft); color: var(--warn); }
+.s-drafted { background: var(--accent-soft); color: var(--accent-ink); }
+.s-posted { background: var(--ok-soft); color: var(--ok); }
+.s-skipped { background: var(--idle-soft); color: var(--idle); }
+.act select { border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; background: var(--surface); }
+.act .open { text-align: center; text-decoration: none; }
+.note { font-size: 12px; color: var(--muted); min-height: 1em; }
+
+.empty { padding: 36px 18px; text-align: center; color: var(--muted); display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.empty h3 { font-family: var(--display); font-weight: 400; font-size: 18px; color: var(--fg); margin: 0; }
+.empty p { margin: 0; max-width: 56ch; }
+
+form.edit { padding: 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; }
+form.edit .full { grid-column: 1 / -1; }
+form.edit label { display: flex; flex-direction: column; gap: 5px; font-size: 13px; font-weight: 500; }
+form.edit label small { font-weight: 400; color: var(--muted); }
+form.edit input, form.edit textarea { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; background: var(--bg); font-weight: 400; }
+form.edit textarea { min-height: 84px; resize: vertical; }
+form.edit textarea.list { font-family: var(--mono); font-size: 13px; min-height: 150px; }
+form.edit .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.confirm { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; }
+
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 8px 16px; border-radius: 999px; font-size: 13px; }
+.offline { background: var(--warn-soft); color: var(--warn); border-radius: 8px; padding: 10px 14px; font-size: 13px; }
+
+@media (max-width: 820px) {
+  .row { grid-template-columns: minmax(0, 1fr) 56px; }
+  .row.head { display: none; }
+  .reply, .act { grid-column: 1 / -1; }
+  .act { flex-direction: row; flex-wrap: wrap; }
+  .act > * { flex: 1 1 120px; }
+  form.edit { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Lead <b>Radar</b></h1>
+      <p class="sub">Reddit posts from people who need what you make, with a reply drafted and ready to post.</p>
+    </div>
+    <div class="scan" id="scan">Waiting for the first scan</div>
+  </header>
+
+  <div class="offline" id="offline" hidden>Lead Radar can't reach its saved data in this view. Open it from claude.ai while signed in to see your leads.</div>
+
+  <nav class="tabs" id="tabs" aria-label="Products"></nav>
+
+  <section class="panel" id="panel">
+    <div class="empty">
+      <h3>Loading your products…</h3>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const STATUSES = [
+  { key: "drafted", label: "Reply drafted" },
+  { key: "found", label: "Found" },
+  { key: "posted", label: "Posted" },
+  { key: "skipped", label: "Skipped" },
+];
+const REPLY_RULES = `Write a Reddit comment replying to this post.
+- Lead with genuinely useful help for the poster's actual problem (2-5 short sentences). The reply must be worth reading even without the link.
+- Mention the product once, naturally, with its URL, and disclose that you made it (e.g. "I built X for exactly this" or "full disclosure, it's mine").
+- Sound like a real person in that subreddit: plain, warm, specific. No marketing words, no emojis, no hashtags, no bullet lists, no sign-off.
+- Never invent features, prices or claims beyond the product description.
+- If the subreddit is likely strict about self-promotion, keep the link low-key at the end.`;
+
+const state = { db: null, sample: null, products: [], leads: [], scan: null, active: null, filter: "drafted", editing: null, loaded: false };
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const lines = (s) => String(s || "").split(/\n|,/).map((x) => x.trim()).filter(Boolean);
+const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "product";
+
+function ago(ts) {
+  if (!ts) return "";
+  const s = (Date.now() - (typeof ts === "number" ? ts * 1000 : Date.parse(ts))) / 1000;
+  if (s < 3600) return Math.max(1, Math.round(s / 60)) + "m ago";
+  if (s < 86400) return Math.round(s / 3600) + "h ago";
+  return Math.round(s / 86400) + "d ago";
+}
+let toastTimer;
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 2200);
+}
+const sampleErr = (e) => ({
+  not_granted: "Claude drafting is turned off for this page. Turn it on in the page's permissions.",
+  rate_limited: "Claude is busy. Try again in a minute.",
+  invalid_json: "Claude's answer came back in the wrong shape. Try again.",
+}[e?.code] || "Claude couldn't answer just now. Try again.");
+
+const productLeads = (pid) => state.leads.filter((l) => l.productId === pid);
+const activeProduct = () => state.products.find((p) => p.id === state.active);
+
+/* ---------- render ---------- */
+function render() {
+  renderScan();
+  renderTabs();
+  const p = activeProduct();
+  if (state.editing) return renderEditor(state.editing === "new" ? null : p);
+  if (!state.loaded) return;
+  if (!p) return renderEditor(null);
+  renderProduct(p);
+}
+
+function renderScan() {
+  const s = state.scan;
+  $("scan").innerHTML = s?.lastRunAt
+    ? `Last scan <strong>${esc(ago(s.lastRunAt))}</strong>${s.summary ? "<br>" + esc(s.summary) : ""}`
+    : "Daily scan runs each morning";
+}
+
+function renderTabs() {
+  const tabs = $("tabs");
+  tabs.innerHTML = state.products.map((p) => {
+    const n = productLeads(p.id).filter((l) => l.status === "drafted" || l.status === "found").length;
+    const sel = p.id === state.active && state.editing !== "new";
+    return `<button class="tab" role="tab" aria-selected="${sel}" data-tab="${esc(p.id)}">${esc(p.name)}${n ? `<span class="n">${n}</span>` : ""}</button>`;
+  }).join("") + (state.db ? `<button class="tab add" data-add>+ Add product</button>` : "");
+}
+
+function renderProduct(p) {
+  const all = productLeads(p.id);
+  const counts = Object.fromEntries(STATUSES.map((s) => [s.key, all.filter((l) => l.status === s.key).length]));
+  const shown = all
+    .filter((l) => state.filter === "all" || l.status === state.filter)
+    .sort((a, b) => (b.fit || 0) - (a.fit || 0) || String(b.foundAt).localeCompare(String(a.foundAt)));
+
+  const filters = STATUSES.map((s) =>
+    `<button class="filter" aria-pressed="${state.filter === s.key}" data-filter="${s.key}">${s.label} <span class="c">${counts[s.key]}</span></button>`
+  ).join("") + `<button class="filter" aria-pressed="${state.filter === "all"}" data-filter="all">All <span class="c">${all.length}</span></button>`;
+
+  let body;
+  if (!shown.length) {
+    const msg = all.length
+      ? { drafted: "No drafted replies waiting. Nice work.", found: "Nothing waiting for a draft.", posted: "You haven't marked any replies as posted yet.", skipped: "Nothing skipped.", all: "" }[state.filter]
+      : `The daily scan will search Reddit for ${esc(p.name)} using the ${p.keywords?.length || 0} keywords below and drop matches here, with a reply drafted for each.`;
+    body = `<div class="empty"><h3>${all.length ? "All clear" : "No leads yet"}</h3><p>${msg}</p></div>`;
+  } else {
+    body = `<div class="row head"><div>Post</div><div>Fit</div><div>Your reply</div><div>Status</div></div>` + shown.map(rowHtml).join("");
+  }
+
+  $("panel").innerHTML = `
+    <div class="phead">
+      <div style="min-width:0">
+        <h2>${esc(p.name)}</h2>
+        <div class="meta">
+          ${p.url ? `<span><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.url.replace(/^https?:\/\//, ""))}</a></span>` : ""}
+          <span>${p.keywords?.length || 0} keywords</span>
+          <span>${p.subreddits?.length ? p.subreddits.length + " subreddits" : "All of Reddit"}</span>
+        </div>
+      </div>
+      <button class="btn" data-edit>Edit search</button>
+    </div>
+    <div class="filters" role="group" aria-label="Filter by status">${filters}</div>
+    <div class="leads">${body}</div>`;
+}
+
+function rowHtml(l) {
+  const fitCls = l.fit >= 8 ? "hi" : l.fit >= 5 ? "mid" : "lo";
+  const sel = STATUSES.map((s) => `<option value="${s.key}" ${l.status === s.key ? "selected" : ""}>${s.label}</option>`).join("");
+  const reply = l.draft
+    ? `<textarea id="d-${esc(l.id)}" data-draft="${esc(l.id)}" aria-label="Reply draft">${esc(l.draft)}</textarea>`
+    : `<p class="none">No reply drafted yet.</p>`;
+  return `<div class="row" data-row="${esc(l.id)}">
+    <div class="post">
+      <a class="t" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.title)}</a>
+      <div class="src"><span class="sr">r/${esc(l.subreddit)}</span><span>${esc(ago(l.createdUtc))}</span>${l.numComments != null ? `<span>${esc(l.numComments)} comments</span>` : ""}</div>
+      ${l.why ? `<div class="why">${esc(l.why)}</div>` : ""}
+      ${l.body ? `<details><summary>Read the post</summary><p>${esc(l.body)}</p></details>` : ""}
+    </div>
+    <div class="fit ${fitCls}" title="How well this post fits the product, out of 10">${esc(l.fit ?? "–")}/10</div>
+    <div class="reply">
+      ${reply}
+      <div class="tools">
+        ${l.draft ? `<button class="btn primary" data-copy="${esc(l.id)}">Copy reply</button>` : ""}
+        <input class="redo" id="r-${esc(l.id)}" placeholder="${l.draft ? "Redraft: e.g. shorter, more casual" : "Notes for the draft (optional)"}" aria-label="Instructions for redrafting">
+        <button class="btn" data-redraft="${esc(l.id)}" ${state.sample ? "" : "hidden"}>${l.draft ? "Redraft" : "Draft reply"}</button>
+      </div>
+      <div class="note" id="n-${esc(l.id)}"></div>
+    </div>
+    <div class="act">
+      <select data-status="${esc(l.id)}" aria-label="Status" class="s-${esc(l.status)}">${sel}</select>
+      <a class="btn open" href="${esc(l.url)}" target="_blank" rel="noopener">Open on Reddit ↗</a>
+      ${l.status !== "posted" ? `<button class="btn" data-posted="${esc(l.id)}">Mark posted</button>` : `<span class="pill s-posted">Posted ${esc(ago(l.postedAt))}</span>`}
+    </div>
+  </div>`;
+}
+
+function renderEditor(p) {
+  const isNew = !p;
+  $("panel").innerHTML = `
+    <div class="phead"><div><h2>${isNew ? "Add a product" : "Edit " + esc(p.name)}</h2>
+      <div class="meta"><span>${isNew ? "Tell the scanner what you sell and who needs it. Claude can suggest keywords from your description." : "Changes apply from the next scan."}</span></div></div>
+      ${!isNew || state.products.length ? `<button class="btn ghost" data-cancel>Cancel</button>` : ""}
+    </div>
+    <form class="edit" id="editForm">
+      <label>Product name<input id="f-name" required value="${esc(p?.name)}" placeholder="Chico"></label>
+      <label>Product URL<input id="f-url" type="url" required value="${esc(p?.url)}" placeholder="https://…"></label>
+      <label class="full">What it does and who it's for <small>Two or three sentences. This is what Claude reads to judge fit and write replies.</small>
+        <textarea id="f-about" required placeholder="A planner app for… It helps people who struggle with…">${esc(p?.about)}</textarea></label>
+      <div class="full bar">
+        <button type="button" class="btn" id="suggest" ${state.sample ? "" : "hidden"}>Suggest keywords with Claude</button>
+        <span class="note" id="suggestNote"></span>
+      </div>
+      <label>Keywords and phrases <small>One per line. Phrases people use when they need this, like "looking for a planner app".</small>
+        <textarea class="list" id="f-keywords" required>${esc((p?.keywords || []).join("\n"))}</textarea></label>
+      <label>Subreddits <small>One per line, without r/. Leave empty to search all of Reddit.</small>
+        <textarea class="list" id="f-subs">${esc((p?.subreddits || []).join("\n"))}</textarea></label>
+      <label class="full">Reply notes <small>Optional. Tone, things to mention or avoid, a discount code.</small>
+        <textarea id="f-notes" placeholder="Friendly, short. Mention the free plan.">${esc(p?.replyNotes)}</textarea></label>
+      <div class="full bar">
+        <button class="btn primary" type="submit">${isNew ? "Add product" : "Save changes"}</button>
+        ${isNew ? "" : `<span id="delWrap"><button type="button" class="btn ghost danger" data-del>Delete product</button></span>`}
+        <span class="note" id="saveNote"></span>
+      </div>
+    </form>`;
+}
+
+/* ---------- actions ---------- */
+async function saveProduct(e) {
+  e.preventDefault();
+  const existing = state.editing === "new" ? null : activeProduct();
+  const name = $("f-name").value.trim();
+  let id = existing?.id || slug(name);
+  if (!existing) { let i = 2; const base = id; while (state.products.some((p) => p.id === id)) id = base + "-" + i++; }
+  const body = {
+    name, url: $("f-url").value.trim(), about: $("f-about").value.trim(),
+    keywords: lines($("f-keywords").value), subreddits: lines($("f-subs").value).map((s) => s.replace(/^\/?r\//i, "")),
+    replyNotes: $("f-notes").value.trim(),
+    createdAt: existing?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString(),
+  };
+  $("saveNote").textContent = "Saving…";
+  try {
+    await state.db.collection("products").doc(id).set(body);
+    state.active = id; state.editing = null; state.filter = "drafted";
+    toast(existing ? "Saved" : "Product added");
+    render();
+  } catch (err) {
+    $("saveNote").textContent = err?.code === "quota_exceeded" ? "Storage is full. Delete old skipped leads first." : "Couldn't save. Check your connection and try again.";
+  }
+}
+
+async function deleteProduct() {
+  const p = activeProduct(); if (!p) return;
+  try {
+    for (const l of productLeads(p.id)) await state.db.collection("leads").doc(l.id).delete();
+    await state.db.collection("products").doc(p.id).delete();
+    state.editing = null; state.active = state.products.find((x) => x.id !== p.id)?.id || null;
+    toast("Product deleted"); render();
+  } catch { toast("Couldn't delete. Try again."); }
+}
+
+async function suggestKeywords() {
+  const name = $("f-name").value.trim(), about = $("f-about").value.trim(), url = $("f-url").value.trim();
+  if (!about) { $("suggestNote").textContent = "Describe the product first."; return; }
+  const btn = $("suggest"); btn.disabled = true; $("suggestNote").textContent = "Thinking…";
+  try {
+    const out = await state.sample.json(
+      `You help find Reddit posts from people who would want this product.\nProduct: ${name}\nURL: ${url}\nDescription: ${about}\n\n` +
+      `Reply with only JSON: {"keywords": [15-25 short search phrases people would type in a Reddit post when they have the problem this solves or are asking for a tool like it — pain phrases and "looking for/recommend" phrases, not the product's own name], "subreddits": [8-15 active subreddit names without r/ where these people post]}`,
+      { modelTier: "default" });
+    if (Array.isArray(out?.keywords)) $("f-keywords").value = out.keywords.map(String).join("\n");
+    if (Array.isArray(out?.subreddits)) $("f-subs").value = out.subreddits.map((s) => String(s).replace(/^\/?r\//i, "")).join("\n");
+    $("suggestNote").textContent = "Suggestions added. Edit them before saving.";
+  } catch (err) { $("suggestNote").textContent = sampleErr(err); }
+  finally { btn.disabled = false; }
+}
+
+async function setLead(id, patch, msg) {
+  try { await state.db.collection("leads").doc(id).update({ ...patch, updatedAt: new Date().toISOString() }); if (msg) toast(msg); }
+  catch { toast("Couldn't save that change. Try again."); }
+}
+
+async function redraft(id) {
+  const l = state.leads.find((x) => x.id === id); const p = activeProduct(); if (!l || !p) return;
+  const extra = $("r-" + id)?.value.trim();
+  const note = $("n-" + id); const btn = document.querySelector(`[data-redraft="${CSS.escape(id)}"]`);
+  btn.disabled = true; note.textContent = "Claude is writing…";
+  const prompt = `${REPLY_RULES}\n\nProduct: ${p.name}\nURL: ${p.url}\nAbout: ${p.about}\n${p.replyNotes ? "Reply notes: " + p.replyNotes + "\n" : ""}` +
+    `\nSubreddit: r/${l.subreddit}\nPost title: ${l.title}\nPost body: ${l.body || "(no body)"}\n` +
+    (l.draft ? `\nCurrent draft:\n${l.draft}\n` : "") + (extra ? `\nInstruction for this version: ${extra}\n` : "") +
+    `\nReply with only the comment text.`;
+  try {
+    const { text } = await state.sample(prompt, { cache: false });
+    await setLead(id, { draft: text.trim(), status: l.status === "found" ? "drafted" : l.status }, "Reply drafted");
+  } catch (err) { note.textContent = sampleErr(err); }
+  finally { btn.disabled = false; }
+}
+
+async function copyReply(id) {
+  const ta = $("d-" + id); if (!ta) return;
+  try { await navigator.clipboard.writeText(ta.value); toast("Reply copied. Paste it on Reddit, then mark it posted."); }
+  catch { ta.focus(); ta.select(); toast("Press Ctrl/Cmd+C to copy the selected reply"); }
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("button"); if (!t) return;
+  const d = t.dataset;
+  if (d.tab) { state.active = d.tab; state.editing = null; render(); }
+  else if ("add" in d) { state.editing = "new"; render(); }
+  else if ("edit" in d) { state.editing = "edit"; render(); }
+  else if ("cancel" in d) { state.editing = null; render(); }
+  else if (d.filter) { state.filter = d.filter; render(); }
+  else if (d.copy) copyReply(d.copy);
+  else if (d.redraft) redraft(d.redraft);
+  else if (d.posted) setLead(d.posted, { status: "posted", postedAt: new Date().toISOString() }, "Marked posted");
+  else if (t.id === "suggest") suggestKeywords();
+  else if ("del" in d) {
+    $("delWrap").innerHTML = `<span class="confirm">Delete this product and its leads? <button type="button" class="btn danger" data-delyes>Delete</button><button type="button" class="btn ghost" data-delno>Keep</button></span>`;
+  }
+  else if ("delyes" in d) deleteProduct();
+  else if ("delno" in d) { $("delWrap").innerHTML = `<button type="button" class="btn ghost danger" data-del>Delete product</button>`; }
+});
+document.addEventListener("change", (e) => {
+  const s = e.target.closest("[data-status]");
+  if (s) setLead(s.dataset.status, { status: s.value, ...(s.value === "posted" ? { postedAt: new Date().toISOString() } : {}) }, "Status updated");
+});
+document.addEventListener("focusout", (e) => {
+  const ta = e.target.closest("[data-draft]"); if (!ta) return;
+  const l = state.leads.find((x) => x.id === ta.dataset.draft);
+  if (l && ta.value.trim() !== (l.draft || "").trim()) setLead(l.id, { draft: ta.value.trim() }, "Draft saved");
+});
+document.addEventListener("submit", (e) => { if (e.target.id === "editForm") saveProduct(e); });
+
+/* ---------- data ---------- */
+// Re-render from snapshots, but never while someone is typing in the page.
+let pending = false;
+function scheduleRender() {
+  const a = document.activeElement;
+  if (a && (a.matches("textarea, input") || state.editing)) { pending = true; return; }
+  render();
+}
+document.addEventListener("focusout", () => setTimeout(() => { if (pending && !state.editing) { pending = false; render(); } }, 50));
+
+(async function start() {
+  render();
+  const db = window.claude ? await window.claude.use("db") : null;
+  if (!db) {
+    $("offline").hidden = false;
+    $("panel").innerHTML = `<div class="empty"><h3>Your leads live in your Claude account</h3><p>Open this page from claude.ai to see and update them.</p></div>`;
+    return;
+  }
+  state.db = db;
+  window.claude.use("sample").then((s) => { state.sample = s; if (!state.editing) render(); });
+  let gotProducts = false, gotLeads = false;
+  db.collection("products").onSnapshot((snap) => {
+    state.products = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
+    if (!state.products.some((p) => p.id === state.active)) state.active = state.products[0]?.id || null;
+    gotProducts = true; state.loaded = gotLeads; if (!state.products.length) state.editing = null;
+    scheduleRender();
+  }, () => toast("Lost connection to your products. Reload the page."));
+  db.collection("leads").orderBy("foundAt", "desc").limit(1000).onSnapshot((snap) => {
+    state.leads = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    gotLeads = true; state.loaded = gotProducts;
+    scheduleRender();
+  }, () => toast("Lost connection to your leads. Reload the page."));
+  db.doc("meta/scan").onSnapshot((d) => { state.scan = d.exists ? d.data() : null; renderScan(); }, () => {});
+})();
+</script>
