@@ -59,9 +59,20 @@ export const TRACKS = {
   night: {name: "Night lights", mood: "A hushed lullaby", bpm: 50, steps: 8, tone: "bell", col: "var(--peri)",
     bars: [[44, 60, 63, 68, 72, 75], [41, 60, 65, 68, 72, 77], [37, 61, 65, 68, 73, 77], [39, 58, 63, 67, 70, 75]],
     arp: [1, 2, 3, 4, 5, 4, 3, 2], arpVel: .035, mel: .4},
-  rain: {name: "Rain on the roof", mood: "Just rain, no music", rain: true, col: "#9CB4C9"}
+  rain: {name: "Rain on the roof", mood: "Just rain, no music", rain: true, col: "#9CB4C9"},
+  // live, not a record: the night market's jazz duo (keys and double bass) in F, swung. walk: the bass line, a note a
+  // beat; the keys comp on the "and" of 2 and on 4, with a loose top line over it
+  jazz: {name: "The night market duo", live: true, bpm: 112, steps: 8, tone: "piano", swing: .17, comp: true, arpVel: .05, mel: .9,
+    bars: [[43, 58, 62, 65, 69], [36, 58, 62, 64, 67], [41, 57, 60, 64, 67], [38, 57, 60, 65, 69], [43, 58, 62, 65, 70], [36, 58, 62, 64, 69], [41, 57, 64, 67, 72], [36, 58, 64, 67, 70]],
+    walk: [[43, 45, 46, 47], [48, 46, 45, 43], [41, 43, 45, 46], [38, 40, 41, 42], [43, 46, 50, 48], [48, 47, 46, 45], [41, 45, 48, 45], [36, 38, 40, 42]]}
 };
-const cur = () => TRACKS[settings.track] || TRACKS.piano;
+// a live band (the night market's jazz duo) takes over from the record player while Mel's in earshot
+let live = null;
+const cur = () => (live && TRACKS[live]) || TRACKS[settings.track] || TRACKS.piano;
+export function setLive(id){
+  if ((id || null) === live) return; live = id || null;
+  if (playing) { stopMusic(); setTimeout(() => startMusic(), 450); }
+}
 let BEAT = 60/64, BARS = TRACKS.piano.bars;
 let playing = false, nextTime = 0, step = 0, timerId = 0, loops = 0, melody = [], rainSrc = null, bellWave = null, rhodesWave = null;
 
@@ -84,6 +95,13 @@ function schedule(){
   while (nextTime < ac.currentTime + .6) {
     const bar = Math.floor(step/S8) % BARS.length, e = step % S8, t = nextTime, b = BARS[bar];
     if (bar === 0 && e === 0) { if (step) loops++; newMelody(); if (Math.random() > T.mel) melody = melody.map(() => []); }
+    const sw = T.swing && e % 2 ? BEAT*T.swing : 0;                                    // swung eighths
+    if (T.walk) {                                                                      // walking double bass, comp on the keys
+      if (e % 2 === 0) note(N(T.walk[bar][e/2]), t, BEAT*.95, .17);
+      if (T.comp && (e === 3 || e === 6)) b.slice(1).forEach(n => note(N(n), t + sw, .5, .045));
+      (melody[bar] || []).forEach(([beat, n]) => { if (Math.abs(beat*2 - e) < .01) note(N(n), t + sw + .01, 1.4, .09); });
+      step++; nextTime += BEAT/2; continue;
+    }
     if (e === 0) { note(N(b[0]), t, 3.4, .16); note(N(b[0] + 12), t, 3, .08); }       // bass + octave
     if (S8 === 8 && e === 4) note(N(b[0] + 7), t, 2.4, .09);                            // fifth on beat 3
     if (T.bounce && (e === 2 || e === 6)) note(N(b[0] + 12), t, .6, .07);              // a skip in the step

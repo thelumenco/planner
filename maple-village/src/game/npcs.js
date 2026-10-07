@@ -32,9 +32,11 @@ const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw 
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 const routineNow = def => routineAt(def, dayKey(), sgHM());
 export function slotAt(def, day, t, live){
-  return (live && supSlot(def)) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || eventSlot(def.id, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
+  return (live && supSlot(def)) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
     || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || shoreSlot(def.id, day, t) || routineAt(def, day, t);
 }
+// a night-market shopper slot gives way to the wine shop: anyone due at a tasting or in the shop then goes there instead
+const nightOk = (s, def, day, t) => !s || !s.night ? s : tastingSlot(def.id, day, t) || (routineAt(def, day, t) || {}).scene === "wineshop" ? null : s;
 const cellarBuilt = () => !!(api && api.F().goals && api.F().goals.cellar);   // the wine club meets in the cellar door
 const slotNow = def => slotAt(def, dayKey(), sgHM(), true);
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };

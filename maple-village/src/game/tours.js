@@ -159,10 +159,24 @@ export const FAIR = [{id: "hiro", at: 2, short: "Kites", n: "Kites", items: [], 
   {id: "aiko", at: 3, short: "Faces", n: "Face painting", items: [], act: "face", col: "#C9A3E0", line: "Butterflies, tigers, dinosaurs. You choose!"},
   {id: "ben", at: 4, short: "Lemonade", n: "Lemonade", items: ["apple"], col: "#F3D34A", line: "Fresh lemonade, and apples for the road."},
   {id: "clara", at: 5, short: "Snacks", n: "Snacks", items: ["dumpling", "ondeh"], col: "#F2A0B8", line: "Dumplings and ondeh-ondeh, made this morning."}];
+// The night market, Tuesday and Thursday evenings 6 to 10pm, after the night markets of Taipei and Seoul: street food,
+// sweets, hair things, keychains, socks and tees, lanterns for the house. All out-of-towners, a jazz duo on a little
+// stage on the football pitch, fairy lights over everything. decor: things for the house (bought like at Hana's Home tab)
+export const NIGHT = [{id: "yun", at: 0, short: "Taiwan eats", n: "Taiwanese street snacks", items: ["friedchicken", "scallion", "bubbletea"], col: "#E8566C", line: "Fried chicken as big as your face! And the bubble tea's brown sugar."},
+  {id: "jae", at: 1, short: "Seoul eats", n: "Korean street food", items: ["hotteok", "tteokbokki", "eggbread"], col: "#F28C6A", line: "Hotteok, hot off the griddle. Careful, the sugar's molten."},
+  {id: "mina", at: 2, short: "Hair things", n: "Hair clips and scrunchies", items: ["pearlclip", "clawclip", "scrunchie"], col: "#F4C7CF", line: "Pearl clips, claw clips, velvet scrunchies. Try them on!"},
+  {id: "tomas", at: 3, short: "Charms", n: "Keychains and charms", items: ["dinokey", "luckycharm"], col: "#9C8CD9", line: "Little charms for your keys and your phone. The dino glows in the dark."},
+  {id: "sora", at: 4, short: "Socks & tees", n: "Socks, hats and tees", items: ["cosysocks", "buckethat", "dinotee"], col: "#7FB8E8", line: "Cosy socks, three for the price of happy. And a bucket hat for everyone."},
+  {id: "lior", at: 5, short: "Lanterns", n: "Lanterns and lamps", items: [], decor: ["n_lanterns", "r_moon"], col: "#F3C969", line: "Paper lanterns for the house, and a moon lamp for your room."},
+  {id: "wen", at: 6, short: "Sweets", n: "Sweets", items: ["tanghulu", "eggwaffle"], col: "#C9A3E0", line: "Tanghulu, strawberries in crackly sugar. And egg waffles, still warm."},
+  {id: "kai", at: 7, short: "Drinks", n: "Night drinks", items: ["sugarcane", "grassjelly"], col: "#9CC27E", line: "Fresh sugarcane, pressed while you wait. Grass jelly for the old-school ones."}];
+export const NIGHT_TOURISTS = ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy", "rafe"];
+export const STAGE = {x: 452, y: 462}, STAGE_WATCH = [[404, 560], [446, 566], [492, 536], [508, 562], [426, 590]];
 function lastSaturday(day){ const dt = new Date(day + "T00:00:00Z"); if (dt.getUTCDay() !== 6) return false; const n = new Date(dt.getTime() + 7*864e5); return n.getUTCMonth() !== dt.getUTCMonth(); }
 export function eventOn(day){
   if (dow(day) === 0) return {kind: "market", name: "Sunday farmers market", from: 8*60, to: 13*60, stalls: MARKET, wine: true};
   if (lastSaturday(day)) return {kind: "fair", name: "Field fair", from: 10*60, to: 16*60, stalls: FAIR, wine: false};
+  if (dow(day) === 2 || dow(day) === 4) return {kind: "night", name: "Night market", from: 18*60, to: 22*60, stalls: NIGHT, wine: false};
   return null;
 }
 export const eventNow = (day, hm) => { const e = eventOn(day); return e && hm >= e.from && hm < e.to ? e : null; };
@@ -195,11 +209,26 @@ export function eventSlot(id, day, hm){
   const e = eventOn(day); if (!e || hm < e.from || hm >= e.to) return null;
   const st = e.stalls.find(s => s.id === id);
   if (st) return keeperSlot(st, e, day, hm);
+  if (e.kind === "night") return nightShopper(id, e, day, hm);
   const mid = e.from + Math.round((e.to - e.from)/2), wave = hm < mid ? 0 : 1, half = Math.round((wave ? e.to - mid : mid - e.from)/2), start = wave ? mid : e.from;
   const crowd = groupFor(day + "ev" + wave, 4, ["pip", ...e.stalls.map(s => s.id), ...toursOn(day).flatMap(t => [t.guide, ...t.group])], [...VISITORS, ...TOURISTS, "sam", "priya"]);
   const k = crowd.indexOf(id);
   if (k >= 2 && hm >= start + half) return {from: start + half, to: wave ? e.to : mid, scene: "field", at: PICNICKERS[wave ? k : k - 2], act: "sit"};
   if (k >= 0 || id === "pip") return {from: start, to: wave ? e.to : mid, scene: "field", wander: id === "pip" ? FIELD_PLAY : FIELD_WALK};
+  return null;
+}
+// Night market shoppers: mostly tourists (five a wave, two waves), plus two villagers a wave. Some browse the stalls,
+// some stand by the stage listening to the jazz, two sit on the picnic blankets with their food. These slots are
+// marked night: npcs.js skips them for anyone due at the wine shop then, so the evening regulars still drop in.
+function nightShopper(id, e, day, hm){
+  const mid = e.from + (e.to - e.from)/2, wave = hm < mid ? 0 : 1, from = wave ? mid : e.from, to = wave ? e.to : mid;
+  const tour = groupFor(day + "nt" + wave, 5, [], NIGHT_TOURISTS), vill = groupFor(day + "nv" + wave, 2, ["pip"], VISITORS);
+  const k = tour.indexOf(id), v = vill.indexOf(id), base = {from, to, scene: "field", night: true};
+  if (k === 0 || k === 1) return {...base, at: STAGE_WATCH[k + wave*2], dir: k ? -1 : 1};
+  if (k === 2) return {...base, at: PICNICKERS[wave], act: "sit"};
+  if (k >= 3) return {...base, wander: FIELD_WALK};
+  if (v === 0) return {...base, wander: FIELD_WALK};
+  if (v === 1) return {...base, at: STAGE_WATCH[4], dir: 1};
   return null;
 }
 

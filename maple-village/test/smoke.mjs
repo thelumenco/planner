@@ -1656,6 +1656,61 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // Accessories in the wardrobe: bought once at Hana's, worn or put away from the wardrobe
+  console.log("\naccessories in the wardrobe");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`acc pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/accpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.decorOwned = {...(f.decorOwned || {}), me_bow: true, me_pj: true}; f.decor = {...(f.decor || {}), me_bow: "on", me_pj: "on"};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-06"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-06&accpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(800);
+  check(await page.locator("#melBow").isVisible() && await page.locator("#melPj").isVisible(), "Mel's wearing her velvet bow, and her silk pyjamas in her room");
+  await page.locator('#world [data-spot="wardrobe"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-acc="me_bow"]', { timeout: 15000 });
+  check(await page.locator("#ctx [data-acc]").count() === 2, "the wardrobe lists the accessories she owns");
+  await page.click('#ctx [data-acc="me_bow"]'); await page.waitForTimeout(300); await page.click('#ctx [data-acc="me_pj"]'); await page.waitForTimeout(400);
+  check(!(await page.locator("#melBow").isVisible()) && !(await page.locator("#melPj").isVisible()), "and she can take them off there");
+  await page.click('#ctx [data-acc="me_bow"]'); await page.waitForTimeout(400);
+  check(await page.locator("#melBow").isVisible(), "and put them back on");
+  await page.close();
+}
+{
+  // The night market: Tuesday and Thursday evenings, 6 to 10pm on the field. Out-of-town traders, fairy lights, a jazz
+  // duo on a little stage (tip the band), tourists and a few villagers shopping; the wine shop's evening regulars still come
+  console.log("\nthe night market");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`night pageerror: ${e.message}`));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  await page.addInitScript(() => { if (!/coinpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 100; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=19:30&date=2026-10-13"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=19:30&date=2026-10-13&coinpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2500);
+  const here = await ids();
+  check(["yun", "jae", "mina", "tomas", "sora", "lior", "wen", "kai"].every(n => here.includes(n)), "Tuesday evening: eight out-of-town traders at their stalls");
+  check(here.filter(n => ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy", "rafe"].includes(n)).length >= 4, "and tourists out shopping");
+  check(await page.locator('#world [data-place="jazzhat"]').count() === 1 && await page.locator('#world [data-place="exlawn"]').count() === 0, "a jazz stage on the lawn (the exercise mats packed away), with a hat for tips");
+  const c0 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
+  await page.locator('#world [data-place="jazzhat"]').dispatchEvent("click"); await page.waitForTimeout(4000);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins) === c0 - 2, "two coins in the band's hat");
+  await page.locator('#world [data-place="mstall0"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="friedchicken"]', { timeout: 15000 });
+  check(await page.locator('#ctx .item[data-id="scallion"]').count() === 1, "the Taiwanese snack stall sells fried chicken and scallion pancakes");
+  await page.click('#ctx .item[data-id="friedchicken"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.fox")).inv || {}).friedchicken === 1), "bought one, as a gift");
+  await page.click('#ctx [data-close]').catch(() => {});
+  await page.locator('#world [data-place="mstall5"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-decor="n_lanterns"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-decor="r_moon"]').count() === 1, "the lantern stall has lanterns for the house and a moon lamp for Mel's room");
+  check(await page.evaluate(() => [...document.querySelectorAll("#actors .npc")].length) > 0 && await page.evaluate(() => !document.querySelector('[data-track="jazz"]')), "the duo isn't a record on the record player");
+  await page.goto(url + "?seed=1&time=19:30&date=2026-10-12"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  check(!(await ids()).includes("yun") && await page.locator('#world [data-place="jazzhat"]').count() === 0, "no night market on a Monday");
+  await page.goto(url + "?seed=1&time=18:45&date=2026-10-13"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
+  check((await ids()).includes("juniper"), "the wine shop's evening regulars still drop in (Juniper at 6:45 on a night market Tuesday)");
+  await page.close();
+}
+{
   // Bedroom doors: Ma Ma and Gong Gong, Mum and Dad, Marcus and Angellina head to bed at 10:50pm and are gone after 11
   console.log("\nbedroom doors");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

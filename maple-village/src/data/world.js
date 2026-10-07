@@ -61,6 +61,7 @@ export const VILLAGE = {
   lake:   {scene:"field", name:"The lake", door:[220,378], spot:true, line:"The lake. Two swans, very dignified."},
   picnic: {scene:"field", name:"Picnic spot", door:[140,484], spot:true, line:"A blanket and a basket. Perfect for lunch outside."},
   // market and fair days: the stalls (who's behind each one comes from tours.js) and the wine shop's own stall
+  jazzhat:{scene:"field", name:"Jazz stage", door:[424,494], spot:true, line:"The little stage on the pitch. Night market nights, there's a jazz duo."},
   mstall0:{scene:"field", name:"Stall", door:[36,164], spot:true, line:"A market stall."},
   mstall1:{scene:"field", name:"Stall", door:[96,164], spot:true, line:"A market stall."},
   mstall2:{scene:"field", name:"Stall", door:[156,164], spot:true, line:"A market stall."},

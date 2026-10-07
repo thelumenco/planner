@@ -256,6 +256,32 @@ export const NPCS = [
     lines: ["First time here. It's gorgeous!", "We came for the wine and stayed for the view.", "Is it always this peaceful?", "I'm taking some of this home, for sure.", "Do you live here? Lucky you.", "My friends are going to be so jealous."],
     actLines: {sit: ["This rosé is lovely. Who makes it?", "Cheers! To holidays.", "I'm buying a bottle before I go."]},
     away: `${name}'s gone back to town.`})),
+  // The night market's traders (Tuesday and Thursday evenings, tours.js NIGHT): out-of-towners who drive in with
+  // their stalls, and the evening's tourists. No routine of their own.
+  ...[["yun", "Yun", {skin: "#EAC4A4", hair: "#1F1A17", hairStyle: "bob", top: "#E8566C", bottom: "#2F2B28"}, "Street snacks, up from Taipei"],
+    ["jae", "Jae", {skin: "#F0D2B6", hair: "#231C19", hairStyle: "spiky", top: "#F6F2EA", bottom: "#3F4A6B", hat: "cap"}, "Korean street food, from Seoul"],
+    ["mina", "Mina", {skin: "#F2D3BC", hair: "#3A2A22", hairStyle: "long", top: "#F4C7CF", bottom: "#5E6E8C"}, "Makes hair clips and scrunchies"],
+    ["tomas", "Tomás", {skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#9C8CD9", bottom: "#4A5568", extra: "glasses"}, "Sells keychains and charms"],
+    ["sora", "Sora", {skin: "#EAC4A4", hair: "#7A4A32", hairStyle: "bun", top: "#7FB8E8", bottom: "#F6F2EA"}, "Socks, hats and tees"],
+    ["lior", "Lior", {skin: "#D9A882", hair: "#5A3A2A", hairStyle: "short", top: "#F3C969", bottom: "#3E4A43"}, "Makes paper lanterns"],
+    ["wen", "Wen", {skin: "#F0D2B6", hair: "#1F1A17", hairStyle: "long", top: "#C9A3E0", bottom: "#2F3B73"}, "Tanghulu and egg waffles"],
+    ["kai", "Kai", {skin: "#A8754F", hair: "#1F1A17", hairStyle: "spiky", top: "#9CC27E", bottom: "#4A5568"}, "Presses sugarcane to order"]
+  ].map(([id, name, look, job]) => ({id, pitch: .9 + (id.charCodeAt(0) % 5)*.08, name, job, tourist: true, look, routine: [],
+    intro: `Hi! I'm ${name}. ${job}. We're here Tuesdays and Thursdays, six till ten.`,
+    lines: ["Busy night! Everyone's out.", "Have you heard the band? They're so good.", "Love this little town. Best market on our route.", "Come back Thursday, I'll have a new batch."],
+    away: `${name}'s packed up and driven home.`})),
+  ...[["noa", "Noa", {skin: "#F2D3BC", hair: "#D9B46A", hairStyle: "long", top: "#F28C6A", bottom: "#2F3B73"}],
+    ["jun", "Jun", {skin: "#EAC4A4", hair: "#231C19", hairStyle: "short", top: "#3E6B8C", bottom: "#5E5A55", extra: "satchel"}],
+    ["bea", "Bea", {skin: "#C99A78", hair: "#2A211D", hairStyle: "bun", top: "#F3C969", bottom: "#4A5568"}],
+    ["omar", "Omar", {skin: "#A8754F", hair: "#1F1A17", hairStyle: "short", top: "#F6F2EA", bottom: "#3F4A6B", extra: "glasses"}],
+    ["lucy", "Lucy", {skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#9C8CD9", bottom: "#5E6E8C"}],
+    ["tae", "Tae", {skin: "#F0D2B6", hair: "#1F1A17", hairStyle: "spiky", top: "#E8566C", bottom: "#2F2B28", hat: "cap"}],
+    ["ivy", "Ivy", {skin: "#D9A882", hair: "#3A2A22", hairStyle: "long", top: "#9CC27E", bottom: "#3E4A43"}],
+    ["rafe", "Rafe", {skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#7FB8E8", bottom: "#8A6A52"}]
+  ].map(([id, name, look]) => ({id, pitch: .9 + (id.charCodeAt(0) % 5)*.08, name, job: "Here for the night market", tourist: true, look, routine: [],
+    intro: `Hi! I'm ${name}. We drove up for the night market. Have you tried the fried chicken?`,
+    lines: ["This band is amazing.", "I've eaten three things already. No regrets.", "The fairy lights! So pretty.", "We're coming back Thursday.", "Is it always this lively here?"],
+    away: `${name}'s gone back to town.`})),
   // Out-of-town families: a parent and their kids, who only come for the vineyard playground (and the field on market
   // and fair days). tours.js (familyVisits) says when.
   ...[["sam", "Sam", {skin: "#E8C4A0", hair: "#5A3A2A", hairStyle: "short", top: "#7FB8E8", bottom: "#4A5568", hat: "cap"}],

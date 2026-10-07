@@ -934,3 +934,16 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 
 ### Round 71: Evan's room and garage doors swapped
 - The garage door is now the living room's upper east door (Q:[480,330], INNER.garage.door [456,340]); Evan's room is the lower one (K:[480,512], INNER.kidroom.door [456,512]).
+
+### Round 72: accessories in the wardrobe, the night market, one evening light everywhere
+- **Wardrobe accessories:** `ACCESSORIES` and `wearing(F, k)` (wardrobe.js). The wardrobe lists the owned `me_*` decor (bow, scarf, hat, pyjamas) with a Wearing/Put on toggle (`data-acc`). The toggle is the same `F.decor[slot]` switch as tapping the item at Hana's. `dressMel` uses `wearing`.
+- **Night market** (tours.js): `NIGHT` stalls, Tuesday and Thursday 18:00–22:00 at the field's stall spots.
+  - `eventOn` returns `{kind: "night"}`.
+  - Traders are new out-of-town NPCs (yun, jae, mina, tomas, sora, lior, wen, kai). Shoppers are `NIGHT_TOURISTS` (noa, jun, bea, omar, lucy, tae, ivy, rafe; all `tourist: true`, so they're hidden from who's-where) plus two villagers a wave (`nightShopper`).
+  - Shopper slots are marked `night`. npcs.js `nightOk` drops one for anyone due at a tasting or at the wine shop by routine, so the evening regulars still come.
+- **Goods:** 17 gift items with `tab:"night"` (street food, sweets, hair things, charms, socks and tees, drinks), each with `says` lines. Nothing dairy goes to Marcus. Lior's stall sells two decor items: `n_lanterns` (paper lanterns across the living room) and `r_moon` (a moon lamp by Mel's bed); `marketStallPanel` renders `st.decor`. Icons were added for these, and for last round's Marcus and Angellina gifts.
+- **Art** (field.js):
+  - `fairyLights()` replace the bunting.
+  - `stage()` stands on the exercise lawn (the mats are hidden on night market nights). It has keys (Ella) and double bass (Otis), drawn with `personArt` and swaying, a light frame, and the tip hat `jazzhat` (VILLAGE spot; `tipBand()` costs 2 coins). The second picnic blanket isn't drawn at night.
+- **Music** (audio.js): `TRACKS.jazz` (`live: true`, so it isn't on the record player). It has a swung walking bass (`walk`) and keys comping. `setLive("jazz")` takes over from the record while Mel is on the field during the night market. It's driven from `render()` and the 1-second interval, which also redraws the field when an event starts or ends.
+- **Evening light:** `duskWash` (scenes.js) is a gentle multiply wash (#CDD1EE) used on every outdoor screen after 7pm. Home draws it under its lamps and windows, the field under the market, and core.js appends it for the other outdoor screens. Before this, only home had a (much darker) wash.

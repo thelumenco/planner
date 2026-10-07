@@ -5,6 +5,18 @@
 import { esc, plain, dayKey } from "../util.js";
 import { outfitDoc } from "./feeds.js";
 import { garment } from "../art/garments.js";
+import { icon } from "../art/icons.js";
+
+// Accessories bought at Hana's "Me & my room" tab live in the wardrobe too: owned (F.decorOwned.me_*) and worn while
+// F.decor.me_* is set (the same switch as tapping it in the shop). The hat only shows outdoors, the pyjamas only in Mel's room.
+export const ACCESSORIES = [["me_bow", "bow", "Velvet hair bow", ""], ["me_scarf", "scarf", "Silk neck scarf", ""], ["me_hat", "sunhat", "Straw sun hat", "outdoors"], ["me_pj", "pyjamas", "Silk pyjamas", "in your room"]];
+export const wearing = (F, k) => !!(F.decor || {})[k];
+function accessories(F){
+  const own = ACCESSORIES.filter(([k]) => (F.decorOwned || {})[k] || (F.decor || {})[k]);
+  if (!own.length) return "";
+  return `<p class="eyebrow" style="margin:14px 0 6px">Your accessories</p><div class="accs">${own.map(([k, ico, n, where]) => `<div class="acc"><span class="e">${icon(ico, 30)}</span><span class="n">${esc(n)}${where ? `<small>${where}</small>` : ""}</span>
+    <button class="btn small ${wearing(F, k) ? "primary" : "alt"}" data-acc="${k}" aria-pressed="${wearing(F, k)}">${wearing(F, k) ? "Wearing" : "Put on"}</button></div>`).join("")}</div>`;
+}
 
 const FIELDS = [["top", "Top"], ["dress", "Dress"], ["bottom", "Bottom"], ["shoes", "Shoes"], ["bag", "Bag"], ["jewellery", "Jewellery"], ["sunglasses", "Sunglasses"], ["layer", "Layer"], ["hair", "Hair"]];
 const clean = (s, n = 140) => plain(String(s || "")).slice(0, n);
@@ -33,6 +45,7 @@ export function wardrobePanel(F, st){
     h += `<div class="outfit wearpick"><p class="olabel">Put on ${esc(clean(pick.label, 50) || "this outfit")}</p><p class="muted">Untick anything you're skipping.</p><ul>${fs.map(([k, n]) => `<li><label><input type="checkbox" data-wearf="${k}" checked> <span class="gpic">${garment(k === "layer" ? "layer" : k, pick[k])}</span><span><small>${n}</small>${esc(clean(pick[k]))}</span></label></li>`).join("")}</ul>
       <div class="actions"><button class="btn primary" data-wearok="${st.pick}">Put it on</button><button class="btn alt small" data-wearback="1">Back</button></div></div>`; }
   else if (all.length) h += `<div class="outfits">${all.map(card).join("")}</div>`;
+  if (!pick) h += accessories(F);
   h += `<p class="eyebrow" style="margin:14px 0 6px">Want something different?</p>`;
   if (!inv) h += `<p class="muted">New outfits need your wardrobe list, which comes with the morning drop-off.</p>`;
   else if (!st.sample) h += `<p class="muted">New outfits need Claude, which isn't reachable from this view just now.</p>`;

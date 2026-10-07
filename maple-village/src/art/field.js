@@ -2,10 +2,11 @@
 // spot, a little football pitch and benches. The lake's river runs out south-east and on into the orchard's top
 // right corner, then east into the river at home.
 import { ink, sgHM } from "../util.js";
-import { eventNow, STALL_SPOTS } from "../game/tours.js";
-import { sk, tapeLabel, tree, flowers, artCtx } from "./scenes.js";
+import { eventNow, STALL_SPOTS, STAGE } from "../game/tours.js";
+import { sk, tapeLabel, tree, flowers, artCtx, duskWash } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
 import { archGate } from "./orchard.js";
+import { personArt } from "./people.js";
 
 const W = `filter="url(#wob)" ${ink}`;
 // a swan gliding slowly back and forth (dx: how far it drifts, dur: seconds per lap)
@@ -43,6 +44,31 @@ const bunting = `<g pointer-events="none" ${W} stroke-width="1"><path d="M20 70 
   return `<path d="M${x-6} ${y} h12 l-6 10z" style="fill:${["#E8566C", "#F3C969", "#7FB8E8", "#9CC27E"][i % 4]}"/>`; }).join("")}</g>`;
 // the stream from the foreshore: in at the top left corner, down under a footbridge on the path, into the lake
 const INLET = "M-10 56 C30 64 54 100 62 150 C68 190 80 222 106 252";
+// The night market: strings of fairy lights over the stalls and the stage, bulbs twinkling out of step
+const bulbs = (pts, k0) => pts.map(([x, y], k) => `<circle cx="${x}" cy="${y}" r="6" style="fill:#FFE9A8" opacity=".35"/><circle cx="${x}" cy="${y}" r="2.4" style="fill:${["#FFE9A8", "#F9C6D0", "#FFF6D8"][(k + k0) % 3]}">
+  <animate attributeName="opacity" values="1;.55;1" dur="${2 + ((k + k0) % 4)*.6}s" begin="${((k*7 + k0) % 10)/5}s" repeatCount="indefinite"/></circle>`).join("");
+const sag = (x1, x2, y, d, n) => Array.from({length: n}, (_, i) => { const t = (i + .5)/n; return [x1 + (x2 - x1)*t, y + Math.sin(t*Math.PI)*d]; });
+const fairyLights = () => `<g pointer-events="none"><path d="M10 64 Q135 96 260 64 Q385 96 510 64" fill="none" style="stroke:var(--line)" stroke-width=".9" opacity=".7"/>
+  ${bulbs([...sag(10, 260, 64, 22, 9), ...sag(260, 510, 64, 22, 9)], 0)}</g>`;
+// a two-piece jazz band on a little stage on the football pitch: keys and double bass, a hat out front for tips
+const OTIS = {skin: "#A8754F", hair: "#1F1A17", hairStyle: "short", top: "#2F2B28", bottom: "#3F4A6B", hat: "cap"}, ELLA = {skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#8E2C48", bottom: "#2F2B28"};
+const sway = (x, y, look, dur) => `<g transform="translate(${x} ${y})"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.4;0 0" dur="${dur}s" repeatCount="indefinite"/>${personArt(look)}</g></g>`;
+const hat = (x, y) => `<g data-place="jazzhat" aria-label="The band's hat: drop in a tip"><ellipse class="hov" cx="${x}" cy="${y + 2}" rx="20" ry="7" style="fill:var(--butter)"/>
+    ${sk(`<ellipse cx="${x}" cy="${y}" rx="12" ry="3.5" style="fill:#2F2B28"/><path d="M${x - 7} ${y} q0 -9 7 -9 q7 0 7 9z" style="fill:#2F2B28"/><circle cx="${x - 3}" cy="${y - 2}" r="1.4" style="fill:#F3C969"/><circle cx="${x + 2}" cy="${y - 1}" r="1.4" style="fill:#F3C969"/>`, `<ellipse cx="${x}" cy="${y}" rx="12" ry="3.5"/><path d="M${x - 7} ${y} q0 -9 7 -9 q7 0 7 9"/>`)}
+    ${tapeLabel(x, y + 22, "Tip the band", "var(--butter)", 9)}</g>`;
+function stage(){
+  const {x, y} = STAGE;
+  return `<g pointer-events="none">${sk(`<rect x="${x - 62}" y="${y - 18}" width="124" height="18" rx="2" style="fill:#8B5E3C"/><rect x="${x - 62}" y="${y - 22}" width="124" height="5" rx="2" style="fill:#C9A27E"/>`,
+      `<rect x="${x - 62}" y="${y - 18}" width="124" height="18" rx="2"/><path d="M${x - 62} ${y - 22} h124 v5 h-124z M${x - 30} ${y - 18} v18 M${x} ${y - 18} v18 M${x + 30} ${y - 18} v18"/>`)}
+    ${sway(x - 30, y - 20, ELLA, 1.1)}
+    ${sk(`<rect x="${x - 50}" y="${y - 46}" width="38" height="7" rx="1.5" style="fill:#2F2B28"/>${[0, 1, 2, 3, 4, 5, 6].map(k => `<rect x="${x - 48 + k*5}" y="${y - 44}" width="4" height="4" style="fill:#FFFDF6"/>`).join("")}`,
+      `<rect x="${x - 50}" y="${y - 46}" width="38" height="7" rx="1.5"/><path d="M${x - 46} ${y - 39} l8 17 M${x - 16} ${y - 39} l-8 17"/>`)}
+    ${sway(x + 22, y - 20, OTIS, .9)}
+    ${sk(`<path d="M${x + 38} ${y - 66} v26 c-8 2 -10 8 -8 13 c-4 4 -2 12 8 13 c10 -1 12 -9 8 -13 c2 -5 0 -11 -8 -13z" style="fill:#A0623A"/>`,
+      `<path d="M${x + 38} ${y - 78} v38 c-8 2 -10 8 -8 13 c-4 4 -2 12 8 13 c10 -1 12 -9 8 -13 c2 -5 0 -11 -8 -13 M${x + 38} ${y - 14} v-4 M${x + 35} ${y - 30} h6"/>`)}
+    ${bulbs(sag(x - 66, x + 66, y - 68, 6, 7), 2)}<path d="M${x - 66} ${y - 68} Q${x} ${y - 56} ${x + 66} ${y - 68} M${x - 66} ${y - 68} v48 M${x + 66} ${y - 68} v48" fill="none" style="stroke:var(--line)" stroke-width=".9" opacity=".7"/></g>
+    ${hat(x - 30, y + 20)}`;
+}
 export function fieldArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="160" cy="520" rx="170" ry="90" style="fill:var(--grass2)"/><ellipse cx="460" cy="460" rx="90" ry="140" style="fill:var(--grass2)"/></g>
@@ -65,12 +91,13 @@ export function fieldArt(){
     ${sk(`<path d="M86 452 l58 -6 l8 26 l-58 6z" style="fill:#E8566C"/>${[0, 1, 2].map(i => `<path d="M${96 + i*18} ${451 - i*2} l8 26" style="stroke:#FFFDF6" stroke-width="4"/>`).join("")}<rect x="156" y="452" width="24" height="16" rx="3" style="fill:#C9A27E"/><path d="M158 452 q10 -12 20 0" style="fill:none"/>`,
       `<path d="M86 452 l58 -6 l8 26 l-58 6z"/><rect x="156" y="452" width="24" height="16" rx="3"/><path d="M158 452 q10 -12 20 0"/>`)}
     ${tapeLabel(130, 508, "Picnic spot", "var(--blush)", 11)}</g>`;
+  const ev0 = eventNow(artCtx().day(), sgHM()), night = !!ev0 && ev0.kind === "night";
   const pitch = `<g data-place="pitch" aria-label="Football pitch"><ellipse class="hov" cx="150" cy="590" rx="80" ry="12" style="fill:var(--butter)"/>
     <g ${W} fill="none" opacity=".75"><rect x="66" y="530" width="168" height="56" rx="4" style="stroke:#FFFDF6" stroke-width="2.4"/><path d="M150 530 v56" style="stroke:#FFFDF6" stroke-width="2"/><circle cx="150" cy="558" r="10" style="stroke:#FFFDF6" stroke-width="2"/></g>
     ${sk(`<circle cx="176" cy="566" r="5" style="fill:#FFFDF6"/>`, `<path d="M62 544 v28 h-10 v-28z M238 544 v28 h10 v-28z"/><circle cx="176" cy="566" r="5"/><path d="M174 563 l3 2 l-1 3" opacity=".6"/>`)}
     ${tapeLabel(150, 612, "Football pitch", "var(--butter)", 11)}</g>`;
   // the exercise lawn east of the river: Mum's class most mornings (mats out, a little speaker)
-  const lawn = `<g data-place="exlawn" aria-label="Exercise lawn"><ellipse class="hov" cx="456" cy="452" rx="52" ry="30" style="fill:var(--butter)"/>
+  const lawn = night ? "" : `<g data-place="exlawn" aria-label="Exercise lawn"><ellipse class="hov" cx="456" cy="452" rx="52" ry="30" style="fill:var(--butter)"/>
     ${sk(`${[[418, 444, "#E8566C"], [456, 452, "#7FB8E8"], [494, 444, "#C9A3E0"], [436, 480, "#9CC27E"]].map(([x, y, c]) => `<path d="M${x - 16} ${y + 3} l5 -10 h22 l-5 10z" style="fill:${c}"/>`).join("")}<rect x="476" y="392" width="14" height="18" rx="3" style="fill:#2F2B28"/>`,
       `${[[418, 444], [456, 452], [494, 444], [436, 480]].map(([x, y]) => `<path d="M${x - 16} ${y + 3} l5 -10 h22 l-5 10z"/>`).join("")}<rect x="476" y="392" width="14" height="18" rx="3"/><circle cx="483" cy="403" r="4"/>`)}
     ${tapeLabel(452, 502, "Exercise lawn", "var(--blush)", 10)}</g>`;
@@ -84,9 +111,11 @@ export function fieldArt(){
     ${tapeLabel(332, 614, "Orchard", "var(--sage)", 11)}</g>`;
   // market and fair days: stalls in a row along the top under the bunting, a second picnic blanket, kites at the fair
   const ev = eventNow(artCtx().day(), sgHM());
-  const event = ev ? bunting + ev.stalls.map(s => stall(s.at, STALL_SPOTS[s.at][0], STALL_SPOTS[s.at][1], s)).join("") + blanket2() + (ev.kind === "fair" ? kites : "")
+  const event = ev ? (ev.kind === "night" ? fairyLights() : bunting) + ev.stalls.map(s => stall(s.at, STALL_SPOTS[s.at][0], STALL_SPOTS[s.at][1], s)).join("") + (ev.kind === "night" ? stage() : blanket2() + (ev.kind === "fair" ? kites : ""))
     + tapeLabel(260, 30, ev.name, "var(--butter)", 12) : "";
-  return lampDefs + ground + swans + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + lawn + toTown + toOrchard + event
+  // after 7 the dusk wash (as on every outdoor screen), under the market so the fairy lights glow; a touch of evening before that
+  const m = sgHM(), dark = m >= 19*60 || m < 6*60 ? duskWash : night ? `<rect width="520" height="640" pointer-events="none" style="fill:#CDD1EE;mix-blend-mode:multiply" opacity=".5"/>` : "";
+  return lampDefs + ground + swans + dark + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + lawn + toTown + toOrchard + event
     + archGate("toShoreF", 20, 292, "Foreshore", 52, 332, "var(--sky)", "Gate to the foreshore");
 }
 // The river's stretch through the top right of Ma Ma's orchard (from the lake, on east to home)

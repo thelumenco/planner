@@ -784,3 +784,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .wearpick input[type=checkbox]{width:18px;height:18px;accent-color:var(--sage)}
 .wearpick ul li{display:block}
 .wearpick ul li label > span:last-child{flex:1;min-width:0}
+
+.accs{display:grid;gap:8px}
+.acc{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(127,127,127,.08)}
+.acc .n{font-weight:600}.acc .n small{display:block;font-weight:400;color:var(--soft)}

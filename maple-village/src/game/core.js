@@ -12,14 +12,14 @@ import { vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, co
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA, completeInSunsama, subtaskInSunsama } from "./sunsama.js";
-import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx, TRACKS, setTrack, currentTrack } from "./audio.js";
+import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx, TRACKS, setTrack, currentTrack, setLive } from "./audio.js";
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked } from "./paths.js";
 import { fetchPost, postPanel, postCount } from "./postbox.js";
 import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML } from "./feeds.js";
 import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia, chatLastDone, lastDueCount, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
 import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, roomLeft, hungry, hungryCount, KINDS } from "./pets.js";
-import { wardrobePanel, newOutfit, outfitsToday } from "./wardrobe.js";
+import { wardrobePanel, newOutfit, outfitsToday, wearing, ACCESSORIES } from "./wardrobe.js";
 import { colourOf } from "../art/garments.js";
 import { readPlan, PLAN_WORDS } from "./plans.js";
 import { loadClients, clientsPanel, askClients } from "./clients.js";
@@ -43,10 +43,10 @@ import { dishArt, glassArt } from "../art/wine.js";
 import { fieldArt, stallFront } from "../art/field.js";
 import { shoreArt } from "../art/shore.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
-import { diningTable, darrenAsleep } from "../art/scenes.js";
+import { diningTable, darrenAsleep, duskWash } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
-import { tourNow, eventNow, stallAt, STALL_SPOTS, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers } from "./tours.js";
+import { tourNow, eventNow, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
@@ -493,7 +493,7 @@ function timerHTML(label){
   return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-left/S.timer.total)}"/></svg>
     <div><span class="t" id="tLeft">${fmt(left)}</span><small>${S.timer.pausedLeft != null ? "paused" : esc(label)}</small></div>${timerBtns()}</div>`;
 }
-let lastReady = readyCount(), lastDusk = null;
+let lastReady = readyCount(), lastDusk = null, lastFieldEv = null;
 setInterval(() => {
   if (S.sleep && S.sleep.until && Date.now() > S.sleep.until) wakeUp();
   if (hushed() && !$("speech").hidden && Date.now() > speechLock && Date.now() - speechAt > 6000) $("speech").hidden = true;   // tuck Maple's bubble away
@@ -506,7 +506,10 @@ setInterval(() => {
   if (rc > lastReady) { speak(rc === 1 ? "Psst… something in the garden is ready!" : `${rc} crops ready in the garden!`, 5000); if (scene === "farm") drawScene(); }
   lastReady = rc;
   if (scene === "farm" && Math.random() < .2) { drawScene(); if (selPlot != null) ctx(); }
-  if (scene === "base" && isDusk() !== lastDusk) drawScene();
+  if (outside() && isDusk() !== lastDusk) drawScene();
+  // the field when a market, fair or night market starts or packs up (and the night market's light drops at 7): redraw, and the jazz starts or stops
+  if (scene === "field") { const ev = eventNow(dayKey(), sgHM()), k = ev ? ev.kind + (sgHM() >= 19*60) : ""; if (k !== lastFieldEv) { lastFieldEv = k; drawScene(); } setLive(ev && ev.kind === "night" ? "jazz" : null); }
+  else setLive(null);
   renderEvanHold();
   lastDusk = isDusk();
   if (shelfOpen && Math.floor(Date.now()/1000) % 20 === 0) ctx();   // keep "next digest in N min" fresh
@@ -1084,7 +1087,7 @@ function decorClick(id){
   if (!F.decorOwned[id]) {
     if (F.coins < d.price) return;
     F.coins -= d.price; F.decorOwned[id] = true; F.decor[d.slot] = d.val; gainXp(1);
-    flash(`Bought ${d.n.toLowerCase()}`); speak(d.where === "me" ? (id === "me_pj" ? "Silk pyjamas! You'll wear them in your room." : id === "me_hat" ? "Sun hat on whenever you're outside!" : "Ooh, that suits you.") : d.where === "room" ? "Ooh! It's waiting in your room." : "Ooh! It's waiting for you at home.", 3500);
+    flash(`Bought ${d.n.toLowerCase()}`); speak(d.where === "me" ? (id === "me_pj" ? "Silk pyjamas! You'll wear them in your room. They live in your wardrobe: take them off there any time." : id === "me_hat" ? "Sun hat on whenever you're outside! It lives in your wardrobe: take it off there any time." : "Ooh, that suits you. It lives in your wardrobe now: take it off there any time.") : d.where === "room" ? "Ooh! It's waiting in your room." : "Ooh! It's waiting for you at home.", 3500);
   } else if (F.decor[d.slot] === d.val) { delete F.decor[d.slot]; speak("Put away for now.", 2500); }
   else { F.decor[d.slot] = d.val; speak("Swapped in. Go and have a look!", 3000); }
   save(true);
@@ -1479,7 +1482,7 @@ function ctx(){
   } else if (recOpen && scene === "room") {
     const on = sound.music, ct = currentTrack();
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>Record player</h2><p class="sub">${on ? `Playing: ${esc(TRACKS[ct].name)}.` : "Pick a record to put on."}</p>
-      <div class="records">${Object.entries(TRACKS).map(([id, t]) => `<button class="record${on && id === ct ? " on" : ""}" data-track="${id}"><svg viewBox="0 0 40 40" width="46" height="46" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#2F2B28"/><circle cx="20" cy="20" r="13" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="9" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="6.5" style="fill:${t.col}"/><circle cx="20" cy="20" r="1.4" fill="#FFFDF6"/></svg><span class="n">${esc(t.name)}</span><span class="c">${on && id === ct ? "playing now" : esc(t.mood)}</span></button>`).join("")}</div>
+      <div class="records">${Object.entries(TRACKS).filter(([, t]) => !t.live).map(([id, t]) => `<button class="record${on && id === ct ? " on" : ""}" data-track="${id}"><svg viewBox="0 0 40 40" width="46" height="46" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#2F2B28"/><circle cx="20" cy="20" r="13" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="9" fill="none" stroke="#4A4540" stroke-width=".8"/><circle cx="20" cy="20" r="6.5" style="fill:${t.col}"/><circle cx="20" cy="20" r="1.4" fill="#FFFDF6"/></svg><span class="n">${esc(t.name)}</span><span class="c">${on && id === ct ? "playing now" : esc(t.mood)}</span></button>`).join("")}</div>
       <div class="actions recrow"><label for="recVol" class="muted">Volume</label><input id="recVol" type="range" min="0" max="1" step="0.05" value="${sound.musicVol}">${on ? `<button class="btn alt small" data-rec="stop">Lift the needle</button>` : ""}</div>`;
   } else if (calmOpen && scene === "room") {
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>Calm corner</h2>` + (breath
@@ -1593,6 +1596,9 @@ function ctx(){
   // wearing an outfit: choose one, untick anything you're skipping, put it on (kept for the day: applyWear)
   c.querySelectorAll("[data-wear]").forEach(b => b.onclick = () => { ward.pick = +b.dataset.wear; sfx("paper", true); ctx(); });
   c.querySelectorAll("[data-wearback]").forEach(b => b.onclick = () => { ward.pick = null; ctx(); });
+  c.querySelectorAll("[data-acc]").forEach(b => b.onclick = () => { const k = b.dataset.acc, on = !wearing(F, k), n = (ACCESSORIES.find(a => a[0] === k) || [])[2] || "it";
+    if (on) F.decor[k] = "on"; else delete F.decor[k]; sfx("paper", true); save(); render(); drawScene();
+    speak(on ? `${n} on.${k === "me_hat" ? " It'll go on when you head outside." : k === "me_pj" ? " Cosy." : ""}` : `${n} off. It's back in the wardrobe.`, 3000); });
   c.querySelectorAll("[data-wearoff]").forEach(b => b.onclick = () => { delete F.wear; save(); render(); speak("Back in your usual. Comfy.", 3000); });
   c.querySelectorAll("[data-wearok]").forEach(b => b.onclick = () => { const o = outfitsToday(F)[+b.dataset.wearok]; if (!o) return;
     const w = {day: dayKey(), label: o.label || "Today's outfit"}; c.querySelectorAll("[data-wearf]").forEach(x => { if (x.checked) w[x.dataset.wearf] = o[x.dataset.wearf]; });
@@ -1694,6 +1700,7 @@ function drawScene(){
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
   $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "farm" ? farmArt() : roomArt(scene);
+  if (outside() && scene !== "base" && scene !== "field" && isDusk()) $("sceneArt").insertAdjacentHTML("beforeend", duskWash);   // the same evening light everywhere outdoors
   const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), orchard:"Ma Ma's orchard", flowers:"Ma Ma's flower farm", field:"The field", shore:"The foreshore"};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
   $("maphint").textContent = scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Mum's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
@@ -1756,13 +1763,14 @@ function applyWear(pj){
 }
 function dressMel(){
   const d = F.decor || {}, show = (id, on) => { const e = $(id); if (e) e.style.display = on ? "" : "none"; };
-  const pj = !!d.me_pj && scene === "room";
-  show("melBow", !!d.me_bow); show("melHat", !!d.me_hat && outside()); show("melScarf", !!d.me_scarf && !pj); show("melPj", pj);
+  const pj = wearing(F, "me_pj") && scene === "room";
+  show("melBow", wearing(F, "me_bow")); show("melHat", wearing(F, "me_hat") && outside()); show("melScarf", wearing(F, "me_scarf") && !pj); show("melPj", pj);
   applyWear(pj);
   const m = $("mel"); if (m) m.style.visibility = (S.sleep && scene === "room") || cruisingNow() ? "hidden" : "";
 }
 function render(redraw){
   if (S.day !== dayKey()) S = freshToday();
+  { const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null; setLive(ev && ev.kind === "night" ? "jazz" : null); }   // the jazz duo, live
   $("evan").style.display = evanHere() ? "" : "none";
   creditEarly(); dressMel();
   if (redraw) drawScene();
@@ -1856,7 +1864,7 @@ function setScene(id, at){
       setTimeout(() => speak(m < dn.from ? `Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30! Tap the table when you get there.` : `Family dinner's on at ${HOST_NAME[dn.host]}! Everyone's at the table.`, 6000), 2600); } }
     if (id === "shore" && S.shoreSaid !== dayKey()) { S.shoreSaid = dayKey(); const fam = ["mum", "dad", "marcus", "angelina"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
       setTimeout(() => speak(`The foreshore. Sea breeze, Norfolk pines, and keep an eye out for dolphins.${fam.length ? ` ${fam.join(fam.length > 2 ? ", " : " and ").replace(/, ([^,]*)$/, " and $1")} ${fam.length > 1 ? "are" : "is"} out too.` : ""}`, 5500), 1200); }
-    if (id === "field") { const ev = eventNow(dayKey(), sgHM()); if (ev && S.eventSaid !== dayKey()) { S.eventSaid = dayKey(); setTimeout(() => speak(ev.kind === "market" ? "It's the Sunday farmers market! Stalls all along the top, our wine stall with Ines, and Ma Ma's fruit and flowers." : "It's the field fair! Kites, face painting, lemonade. Evan's going to love this.", 6000), 1200); } }
+    if (id === "field") { const ev = eventNow(dayKey(), sgHM()); if (ev && S.eventSaid !== dayKey()) { S.eventSaid = dayKey(); setTimeout(() => speak(ev.kind === "market" ? "It's the Sunday farmers market! Stalls all along the top, our wine stall with Ines, and Ma Ma's fruit and flowers." : ev.kind === "night" ? "The night market! Fairy lights, street food all along the top, and a jazz duo on the little stage." : "It's the field fair! Kites, face painting, lemonade. Evan's going to love this.", 6000), 1200); } }
     if (id === "market") speak(isHere("hana") ? "Welcome to the market! Hana's in. Have a browse." : NPCS.find(n => n.id === "hana").away, 4500);
   }, 220);
 }
@@ -1977,6 +1985,7 @@ function arriveVillageSpot(id){
     else speak("Nobody's minding this one just now. It's an honesty tin: pop your coins in.", 3500); render(); return; }
   if (id === "lake" || id === "picnic" || id === "pitch") { fieldSpot(id); return; }
   if (id === "exlawn") { joinClass(); return; }
+  if (id === "jazzhat") { tipBand(); return; }
   if (id === "suprack" || id === "homejetty") { goalView = "jetty"; sfx("paper", true); render(); return; }
   if (id === "boat") { if (owns(F, "boat")) startCruise(); else { goalView = "boat"; sfx("paper", true); render(); } return; }
   if (id === "dolphins") { mel.sitting = true; nodes.mel.classList.add("sit"); mel.dir = -1; sfx("paper", true);
@@ -2045,6 +2054,8 @@ function marketStallPanel(st){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(st.n)}</h2><p class="sub">${esc(who)}'s stall at the ${esc(ev.name.toLowerCase())}. ${away ? `${esc(who)}'s off wandering the market, so it's on the honesty tin: take what you like and pop the coins in.` : `"${esc(st.line)}"`}</p>`;
   const items = stallItems(st);
   if (items.length) h += `<div class="items shop">${items.map(id => itemBtn(id, `<b>${stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < stallPrice(id), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.${st.produce ? " Handy when the garden's between harvests: it all goes to the kitchen or to Maple." : ""}</p>`;
+  if (st.decor) h += `<div class="items shop">${st.decor.map(id => { const d = DECOR[id], own = F.decorOwned[id], on = own && F.decor[d.slot] === d.val;
+    return `<button class="item" data-decor="${id}" ${!own && F.coins < d.price ? "disabled" : ""}><span class="e">${icon(d.ico, 34)}</span><span class="n">${esc(d.n)}</span><span class="c">${on ? (d.where === "room" ? "in your room" : "in your home") : own ? "tap to use" : `<b>${d.price}</b> ${icon("coin", 13)}`}</span></button>`; }).join("")}</div><p class="muted">Bought once, kept forever. You have ${F.coins} coins.</p>`;
   if (st.act) h += `<div class="actions"><button class="btn primary" data-fair="${st.act}" ${evanHere() ? "" : "disabled"}>${st.act === "kite" ? "Get Evan a kite (3 coins)" : "Face paint for Evan (3 coins)"}</button></div>${evanHere() ? "" : `<p class="muted">Bring Evan along for this one.</p>`}`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
@@ -2053,6 +2064,16 @@ function fairActivity(k){
   if (k === "kite") { evan.tx = 200; evan.ty = 420; evan.run = true; evan.wait = 10; setTimeout(() => evanSays(pick(["kite! up up!", "it's flying!", "look Mama!"])), 900); speak("A red kite for Evan. He's running with it and it's actually flying. Mostly.", 5000); }
   else { setTimeout(() => evanSays(pick(["I'm a tiger! RAWR", "butterfly!", "dinosaur face!"])), 800); speak("Face paint for Evan. He chose a tiger and won't stop roaring.", 5000); }
   [0, 300].forEach((d, k2) => setTimeout(() => mprop("heart", evan.x + (k2 - .5)*20, evan.y - 44, 1800), d)); save(true);
+}
+// The night market's jazz duo: drop a couple of coins in the hat on the front of the stage
+function tipBand(){
+  const ev = eventNow(dayKey(), sgHM());
+  if (!ev || ev.kind !== "night") { speak("The stage is empty. The jazz duo plays the night market, Tuesday and Thursday evenings.", 4000); render(); return; }
+  if (F.coins < 2) { speak("Not even two coins! Next time.", 3000); render(); return; }
+  F.coins -= 2; S.tips = (S.tips || 0) + 1; sfx("coin"); flash("-2 coins in the hat");
+  [0, 250, 500].forEach((d, k) => setTimeout(() => mprop("heart", STAGE.x - 20 + k*20, STAGE.y - 70, 1800), d));
+  speak(pick(["Clink! The bass player tips his hat back at you.", "Two coins in the hat. The keys player plays a little flourish just for you.", "\"Thank you! This next one's for the lady with the fox.\"", "Clink. The duo grin and slide into something slower."]), 4500);
+  if (S.tips === 1) gainXp(1); save(); render();
 }
 // A family paddle off the foreshore: Mel (and Evan, if he's here) take boards out from the rack by the jetty for a
 // minute, and any of the family on the foreshore paddle out too. Maple guards the towels. Tap the shore to come back.
