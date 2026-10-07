@@ -25,12 +25,16 @@ const farPaddler = (x, y, dy, dur) => `<g pointer-events="none"><g><animateTrans
 const pine = (x, y, s = 1) => sk(`<rect x="${x - 3*s}" y="${y - 10*s}" width="${6*s}" height="${12*s}" style="fill:#8A5A3A"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${x - (22 - i*4)*s} ${y - (10 + i*14)*s} q${(22 - i*4)*s} ${-8*s} ${(44 - i*8)*s} 0 l${-6*s} ${-8*s} h${-(32 - i*8)*s}z" style="fill:${i % 2 ? "#5E8A5A" : "#6E9A63"}"/>`).join("")}`,
   `<path d="M${x} ${y - 82*s} v${80*s}"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${x - (22 - i*4)*s} ${y - (10 + i*14)*s} q${(22 - i*4)*s} ${-8*s} ${(44 - i*8)*s} 0"/>`).join("")}`);
 
-// the stream: out of the sea at the top of the sand, east across the top of the screen and on into the field's lake
-const STREAM = "M110 28 C196 24 238 46 290 40 C350 34 420 22 468 38 C494 46 510 52 534 56";
-const BANK = "M156 26 C206 24 238 46 290 40 C350 34 420 22 468 38 C494 46 510 52 534 56";
-const shoreStream = `<g filter="url(#wob)"><path d="${STREAM}" fill="none" style="stroke:var(--water)" stroke-width="16" stroke-linecap="round"/>
-  <path d="${BANK}" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".4" transform="translate(0 -8)"/><path d="${BANK}" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".4" transform="translate(0 8)"/></g>
-  <path class="ripple" d="M330 36 q4 -3 8 0 M440 28 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>`;
+// the stream: an inlet off the sea that narrows through the sand (same sea blue, same foam edge as the shoreline),
+// then runs east as a stream, its blue easing into the river's on the way to the field's lake. It stays off the top
+// edge so a future gate north (top middle, over the boardwalk's line) has room; a footbridge would carry that path.
+const STREAM = "M190 72 C226 72 248 71 272 70 C276 70 318 62 370 58 C420 54 474 52 534 56";
+const MOUTH = "M150 46 C178 50 204 60 232 64 C240 65 248 66 252 70 C248 76 240 79 232 80 C204 84 178 96 152 106 Z";
+const shoreStream = `<defs><linearGradient id="streamBlue" gradientUnits="userSpaceOnUse" x1="200" y1="0" x2="460" y2="0"><stop offset="0" style="stop-color:var(--sea)"/><stop offset="1" style="stop-color:var(--water)"/></linearGradient></defs>
+  <g filter="url(#wob)"><path d="${MOUTH}" style="fill:var(--sea)"/><path d="${STREAM}" fill="none" style="stroke:url(#streamBlue)" stroke-width="16" stroke-linecap="round"/></g>
+  <g filter="url(#wob)" fill="none"><path d="M152 46 C178 50 204 60 232 64 C272 62 318 54 370 50 M154 106 C178 96 204 84 232 80 C272 78 318 70 370 66" style="stroke:#FFFDF6" stroke-width="2.6" stroke-dasharray="10 7" opacity=".85"/>
+    <path d="M232 64 C272 62 318 54 370 50 C420 46 474 44 534 48 M232 80 C272 78 318 70 370 66 C420 62 474 60 534 64" style="stroke:var(--line)" stroke-width="1" opacity=".35"/></g>
+  <path class="ripple" d="M176 74 q5 -3.5 10 0 q5 3.5 10 0 M330 62 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>`;
 export function shoreArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="400" cy="560" rx="150" ry="80" style="fill:var(--grass2)"/><ellipse cx="440" cy="240" rx="110" ry="70" style="fill:var(--grass2)"/></g>
