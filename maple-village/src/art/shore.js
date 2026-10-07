@@ -48,14 +48,14 @@ export function shoreArt(){
     <g ${W} opacity=".7">${[[186, 140], [178, 360], [196, 560], [170, 220]].map(([x, y]) => `<path d="M${x} ${y} l3 -3 l3 3 M${x + 10} ${y + 6} q2 -3 4 0" fill="none"/>`).join("")}</g>
     <g filter="url(#wob)"><path d="M250 150 V640 M250 300 H520 M360 300 V222 M400 300 V466" fill="none" style="stroke:#D9BE94" stroke-width="20" stroke-linecap="round"/>
       <path d="M250 150 V640 M250 300 H520" fill="none" style="stroke:#C9A87A" stroke-width="20" stroke-dasharray="1.4 9" opacity=".7"/></g>
-    ${pine(286, 150, 1.1)}${pine(470, 210, 1)}${pine(300, 470, .95)}${pine(486, 560, 1.05)}${pine(330, 620, .9)}
+    ${pine(286, 150, 1.1)}${pine(470, 210, 1)}${pine(420, 632, .8)}${pine(500, 612, .95)}
     ${flowers([[440, 250, "#EFA3A6"], [462, 268, "#F3C969"], [288, 360, "#C3CDEE"], [470, 400, "#EFA3A6"], [300, 560, "#F3C969"]])}`;
   const sea = dolphin(80, 200, 11, 1, false) + dolphin(64, 238, 11, 2.2, false) + dolphin(96, 470, 14, 6, true) + farPaddler(40, 330, 140, 70);
   const jetty = `<g pointer-events="none">${sk(`<rect x="34" y="454" width="176" height="18" rx="2" style="fill:#C9A27E"/>`, `<rect x="34" y="454" width="176" height="18" rx="2"/>${Array.from({length: 11}, (_, i) => `<path d="M${50 + i*15} 454 v18"/>`).join("")}${[44, 88, 132, 176].map(x => `<path d="M${x} 472 v10"/>`).join("")}`)}</g>`;
   const rack = `<g data-place="suprack" aria-label="Paddleboard rack"><ellipse class="hov" cx="216" cy="480" rx="30" ry="9" style="fill:var(--butter)"/>
     ${sk(`${["#F3C969", "#7FB8E8", "#E8566C"].map((c, i) => `<path d="M${202 + i*9} 474 q-4 -20 2 -38 q6 18 2 38z" style="fill:${c}"/>`).join("")}<rect x="196" y="452" width="40" height="5" rx="2" style="fill:var(--wood)"/>`,
       `${[0, 1, 2].map(i => `<path d="M${202 + i*9} 474 q-4 -20 2 -38 q6 18 2 38z"/>`).join("")}<path d="M198 474 v-24 M234 474 v-24"/><rect x="196" y="452" width="40" height="5" rx="2"/>`)}
-    ${tapeLabel(214, 504, "Paddleboards", "var(--sky)", 10)}</g>`;
+    ${tapeLabel(214, 418, "Paddleboards", "var(--sky)", 10)}</g>`;
   const bench = `<g data-place="dolphins" aria-label="Boardwalk bench: watch for dolphins"><ellipse class="hov" cx="214" cy="256" rx="30" ry="9" style="fill:var(--butter)"/>
     ${sk(`<rect x="192" y="238" width="44" height="7" rx="2" style="fill:var(--wood)"/><rect x="192" y="228" width="44" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="192" y="238" width="44" height="7" rx="2"/><rect x="192" y="228" width="44" height="6" rx="2"/><path d="M196 245 v9 M232 245 v9 M196 234 v4 M232 234 v4"/>`)}
     ${tapeLabel(214, 276, "Dolphin bench", "var(--peri)", 10)}</g>`;
@@ -72,11 +72,11 @@ export function shoreArt(){
         <path d="M100 488 v-26 l16 10z" style="fill:#E8566C"/>
         ${cruising ? `<circle cx="64" cy="482" r="5" style="fill:#F8DECD"/><path d="M60 480 q4 -8 9 -1" style="fill:#2A211D"/><circle cx="78" cy="485" r="3.6" style="fill:#F8DECD"/><path d="M75 483 q3 -5 6 0" style="fill:#2A211D"/>` : ""}</g>
         ${cruising ? `<g class="podhop">${dolphin(130, 500, 4, 0, false)}${dolphin(4, 520, 5, 1.6, true)}</g>` : ""}</g>
-      ${tapeLabel(206, 574, "Dolphin cruise", "var(--peri)", 10)}</g>`
+      ${tapeLabel(168, 588, "Dolphin cruise", "var(--peri)", 10)}</g>`
     : `<g data-place="boat" aria-label="The mooring: save up for a dolphin cruise boat"><ellipse class="hov" cx="206" cy="552" rx="26" ry="8" style="fill:var(--butter)"/>
       ${sk(`<rect x="200" y="512" width="8" height="34" style="fill:var(--wood)"/><rect x="178" y="512" width="52" height="18" rx="2" style="fill:#FFFDF6"/>`, `<rect x="200" y="512" width="8" height="34"/><rect x="178" y="512" width="52" height="18" rx="2"/><path d="M186 521 h36" opacity=".55"/>`)}
-      ${tapeLabel(206, 574, "Boat mooring", "var(--peri)", 10)}</g>`;
+      ${tapeLabel(168, 588, "Boat mooring", "var(--peri)", 10)}</g>`;
   return lampDefs + ground + sea + jetty + boat + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench + rack + mumdad + marcus
-    + archGate("toFieldS", 500, 292, "The field", 470, 334, "var(--peri)", "Gate to the field")
-    + archGate("toFlowersS", 250, 616, "Flower farm", 314, 604, "var(--blush)", "Gate to the flower farm");
+    + archGate("toFieldS", 500, 292, "The field", 446, 320, "var(--peri)", "Gate to the field")
+    + archGate("toFlowersS", 250, 616, "Flower farm", 326, 606, "var(--blush)", "Gate to the flower farm");
 }
