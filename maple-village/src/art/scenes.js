@@ -196,9 +196,9 @@ const BASE_LAMPS = [[192, 380], [328, 380]];
 const litLamp = (x, y) => `<circle cx="${x}" cy="${y - 6}" r="40" fill="url(#lampn)"/><circle class="flick" cx="${x}" cy="${y - 30}" r="16" fill="#FFE3A3" opacity=".45"/>
   <rect x="${x - 5}" y="${y - 36}" width="10" height="12" rx="2" fill="#FFE9A8" stroke="#3b3530" stroke-width="1.2"/><rect x="${x - 2.5}" y="${y - 33}" width="5" height="6" rx="1" fill="#FFFBEA"/>`;
 // The light over every outdoor screen through the evening (a multiply wash, so white is daylight): a sunset glow from
-// 6pm, deepening into the blue of dusk by 7:30, a touch deeper again by 9, then a pink sunrise from 5:45 that's gone by
-// 6:45. Home's lamps, windows and firepit, and the night market's fairy lights, are drawn above it so they glow.
-const SKY = [[0, "#959CD3"], [5*60 + 45, "#959CD3"], [6*60 + 15, "#F2D6C8"], [6*60 + 45, "#FFFFFF"], [18*60, "#FFFFFF"], [18*60 + 45, "#F9D9C2"], [19*60 + 30, "#A3A9DC"], [21*60, "#959CD3"], [24*60, "#959CD3"]];
+// 6pm, deepening into the blue of dusk by 7:30, darker from 9 into deep night by 10:30, lifting from 4:45 into a pink
+// sunrise that's gone by 6:45. Home's lamps, windows and firepit, and the night market's fairy lights, are drawn above it so they glow.
+const SKY = [[0, "#5C6496"], [4*60 + 45, "#5C6496"], [5*60 + 30, "#8A91C8"], [6*60 + 15, "#F2D6C8"], [6*60 + 45, "#FFFFFF"], [18*60, "#FFFFFF"], [18*60 + 45, "#F9D9C2"], [19*60 + 30, "#A3A9DC"], [21*60, "#868DC6"], [22*60 + 30, "#5C6496"], [24*60, "#5C6496"]];
 const mix = (a, b, t) => "#" + [1, 3, 5].map(i => Math.round(parseInt(a.slice(i, i + 2), 16)*(1 - t) + parseInt(b.slice(i, i + 2), 16)*t).toString(16).padStart(2, "0")).join("");
 export function skyColour(m){
   for (let i = 1; i < SKY.length; i++) if (m < SKY[i][0]) { const [m0, c0] = SKY[i - 1], [m1, c1] = SKY[i]; return mix(c0, c1, (m - m0)/(m1 - m0)).toUpperCase(); }

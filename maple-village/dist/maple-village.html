@@ -7248,7 +7248,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var BASE_LAMPS = [[192, 380], [328, 380]];
   var litLamp = (x, y) => `<circle cx="${x}" cy="${y - 6}" r="40" fill="url(#lampn)"/><circle class="flick" cx="${x}" cy="${y - 30}" r="16" fill="#FFE3A3" opacity=".45"/>
   <rect x="${x - 5}" y="${y - 36}" width="10" height="12" rx="2" fill="#FFE9A8" stroke="#3b3530" stroke-width="1.2"/><rect x="${x - 2.5}" y="${y - 33}" width="5" height="6" rx="1" fill="#FFFBEA"/>`;
-  var SKY = [[0, "#959CD3"], [5 * 60 + 45, "#959CD3"], [6 * 60 + 15, "#F2D6C8"], [6 * 60 + 45, "#FFFFFF"], [18 * 60, "#FFFFFF"], [18 * 60 + 45, "#F9D9C2"], [19 * 60 + 30, "#A3A9DC"], [21 * 60, "#959CD3"], [24 * 60, "#959CD3"]];
+  var SKY = [[0, "#5C6496"], [4 * 60 + 45, "#5C6496"], [5 * 60 + 30, "#8A91C8"], [6 * 60 + 15, "#F2D6C8"], [6 * 60 + 45, "#FFFFFF"], [18 * 60, "#FFFFFF"], [18 * 60 + 45, "#F9D9C2"], [19 * 60 + 30, "#A3A9DC"], [21 * 60, "#868DC6"], [22 * 60 + 30, "#5C6496"], [24 * 60, "#5C6496"]];
   var mix = (a, b, t2) => "#" + [1, 3, 5].map((i) => Math.round(parseInt(a.slice(i, i + 2), 16) * (1 - t2) + parseInt(b.slice(i, i + 2), 16) * t2).toString(16).padStart(2, "0")).join("");
   function skyColour(m) {
     for (let i = 1; i < SKY.length; i++) if (m < SKY[i][0]) {
