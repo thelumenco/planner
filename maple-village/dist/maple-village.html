@@ -918,6 +918,9 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 .hlist.gnews span{display:grid;gap:2px}
 .hlist.gnews a{color:#2F3B73;font-weight:600;text-decoration:none}
 .hlist.gnews .src{font-style:italic}
+.hlist.ohreact li{display:flex;gap:10px;align-items:flex-start}.hlist.ohreact .ohemo{font-size:1.3rem;line-height:1.2;flex:none;width:1.7rem;text-align:center}.hlist.ohreact span{display:grid;gap:2px}.hlist.ohreact small{color:var(--soft)}
+#ctx .ohtiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}#ctx .ohtiles div{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:8px 10px}#ctx .ohtiles b{display:block;font-size:1.3rem}#ctx .ohtiles small{color:var(--soft)}
+.hlist.ohfunnel li{display:grid;grid-template-columns:64px 1fr 28px 38px;gap:8px;align-items:center}.hlist.ohfunnel .ohbar{height:10px;border-radius:5px;background:var(--rule);overflow:hidden}.hlist.ohfunnel .ohbar i{display:block;height:100%;border-radius:5px}.hlist.ohfunnel small{color:var(--soft);text-align:right}
 .hlist.gnews.vcal:not(.world) li::before{background:#9FD3C2}.hlist.gnews.vcal.fests:not(.world) li::before{background:#F2A0B8}.hlist.gnews.vcal small{color:var(--soft)}
 .hlist.gnews:not(.world) li::before{content:"";width:8px;height:8px;border-radius:50%;background:#F3C969;flex:none;box-shadow:0 0 0 1.5px rgba(60,40,30,.2)}
 /* tomorrow's quests, peeked from the quest list */
@@ -2358,11 +2361,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["table", "Planning table", "D", "table", /plan|schedule|roadmap|launch/, "Where Luna's plans happen."],
       ["status", "Health sign", "E", "healthluna", null, "Last night's Luna bug check."]
     ] },
-    ohayo: { name: "Ohayo house", wall: "#FFF4E6", trim: "#F2A65A", pos: { A: [400, 530], B: [420, 262], C: [130, 530], D: [130, 320], E: [290, 350] }, stations: [
-      ["laptop", "Laptop desk", "A", "desk", /build|fix|app|code|feature|bug|test|ship/, "Ohayo's engine room."],
+    // Ohayo (not launched yet: it sends video hellos): a reactions board and a hello chart from the founder desk's
+    // numbers (feeds.js ohayoHellos), the health sign, and the usual desk, shelf and sofa
+    ohayo: { name: "Ohayo house", wall: "#FFF4E6", trim: "#F2A65A", pos: { A: [400, 530], B: [420, 262], C: [130, 530], R: [110, 262], H: [372, 420], E: [170, 420] }, stations: [
+      ["laptop", "Laptop desk", "A", "desk", /build|fix|app|code|feature|bug|test|ship|plan|schedule|roadmap|launch/, "Ohayo's engine room."],
       ["shelf", "Plant shelf", "B", "craft", /design|brand|content|post|icon|copy/, "Colours, ideas, a lot of plants."],
-      ["sofa", "Cosy sofa", "C", "sofa", /user|beta|tester|feedback|call|interview/, "For morning chats with users."],
-      ["table", "Planning table", "D", "table", /plan|schedule|roadmap|launch/, "Where Ohayo's plans happen."],
+      ["sofa", "Cosy sofa", "C", "sofa", /user|beta|tester|feedback|call|interview|hello|video/, "For morning chats with users."],
+      ["reactions", "Reactions board", "R", "reactboard", null, "What people sent back from their hellos.", 34],
+      ["hellos", "Hello chart", "H", "hellochart", null, "How many people are waiting, and how many watched.", 30],
       ["status", "Health sign", "E", "healthohayo", null, "Last night's Ohayo bug check."]
     ] },
     post: { name: "Post office", wall: "#E3EEF5", trim: "var(--sky)", pos: { A: [260, 340], B: [436, 258], C: [400, 530], D: [110, 216], E: [72, 440] }, stations: [
@@ -7682,6 +7688,27 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
           `<rect x="${x - 44}" y="${y - 30}" width="88" height="30" rx="3" style="fill:var(--sage)"/><circle cx="${x - 14}" cy="${y - 46}" r="14" style="fill:var(--stone)"/><circle cx="${x + 18}" cy="${y - 46}" r="14" style="fill:var(--stone)"/><rect x="${x - 30}" y="${y - 70}" width="40" height="14" style="fill:#FFFDF6"/>`,
           `<rect x="${x - 44}" y="${y - 30}" width="88" height="30" rx="3"/><circle cx="${x - 14}" cy="${y - 46}" r="14"/><circle cx="${x + 18}" cy="${y - 46}" r="14"/><rect x="${x - 30}" y="${y - 70}" width="40" height="14"/><path d="M${x + 40} ${y - 30} l14 -30"/>`
         );
+      // Ohayo's reactions board (the latest reactions pinned up as notes, each with its emoji) and its hello chart (an
+      // easel: how many are waiting, and the watched percentage as a filling sun)
+      case "reactboard": {
+        const o = G.ohayo ? G.ohayo() : null, rs = o ? o.reactions.slice(0, 6) : [], c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#FCE2C2", "#DCE8C8", "#C3CDEE"];
+        const notes2 = Array.from({ length: 6 }, (_, i) => {
+          const nx = x - 40 + i % 3 * 28, ny = y - 92 + Math.floor(i / 3) * 30, r = rs[i];
+          return `<rect x="${nx}" y="${ny}" width="22" height="22" transform="rotate(${i % 2 ? 5 : -4} ${nx + 11} ${ny + 11})" style="fill:${r ? c[i] : "#E9D9C2"}"/>${r ? `<text x="${nx + 11}" y="${ny + 16}" text-anchor="middle" font-size="12" pointer-events="none">${r.emoji.replace(/[<&>]/g, "")}</text>` : ""}`;
+        }).join("");
+        return sk(`<rect x="${x - 50}" y="${y - 102}" width="100" height="66" rx="3" style="fill:#D9B893"/>${notes2}`, `<rect x="${x - 50}" y="${y - 102}" width="100" height="66" rx="3"/><path d="M${x - 38} ${y - 36} l-6 36 M${x + 38} ${y - 36} l6 36"/>`) + `<text x="${x}" y="${y - 106}" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9" style="fill:var(--line)" pointer-events="none">${rs.length ? "reactions" : "no reactions yet"}</text>`;
+      }
+      case "hellochart": {
+        const o = G.ohayo ? G.ohayo() : null, pct = o ? o.watchRate : 0, q = o ? o.queued : 0;
+        return sk(
+          `<path d="M${x - 30} ${y} l14 -86 M${x + 30} ${y} l-14 -86 M${x} ${y - 80} v80" style="stroke:var(--wood)" stroke-width="3"/><rect x="${x - 38}" y="${y - 100}" width="76" height="62" rx="3" style="fill:#FFFDF6"/>
+          <path d="M${x - 22} ${y - 52} a22 22 0 0 1 44 0z" style="fill:#FBE3C8"/>${pct > 0 ? (() => {
+            const t2 = Math.PI * (1 - Math.min(100, pct) / 100);
+            return `<path d="M${x} ${y - 52} L${x - 22} ${y - 52} A22 22 0 0 1 ${(x + 22 * Math.cos(t2)).toFixed(1)} ${(y - 52 - 22 * Math.sin(t2)).toFixed(1)}Z" style="fill:#F2A65A"/>`;
+          })() : ""}`,
+          `<rect x="${x - 38}" y="${y - 100}" width="76" height="62" rx="3"/><path d="M${x - 22} ${y - 52} a22 22 0 0 1 44 0z M${x - 28} ${y - 52} h56"/>`
+        ) + `<g font-family="Mulish,sans-serif" font-weight="800" text-anchor="middle" pointer-events="none" style="fill:var(--line)"><text x="${x}" y="${y - 58}" font-size="11">${o ? pct + "%" : "–"}</text><text x="${x}" y="${y - 88}" font-size="7.5">${o ? q + " waiting" : "no numbers yet"}</text><text x="${x}" y="${y - 42}" font-size="6.5" font-weight="600">watched</text></g>`;
+      }
       case "cork": {
         let p = "";
         const c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#C3CDEE", "#DCE8C8", "#FFFDF6"];
@@ -9901,7 +9928,7 @@ Quests finished today: ${S3.doneIds.length}`;
   // src/game/feeds.js
   var APPS2 = { chord: { name: "Chord", room: "chord" }, chico: { name: "Chico", room: "chico" }, luna: { name: "Luna", room: "luna" }, ohayo: { name: "Ohayo", room: "ohayo" } };
   var BRANDS = { chord: { name: "Chord", color: "var(--sage)" }, ambidextrous: { name: "Ambidextrous", color: "var(--peri)" } };
-  var DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
+  var DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "ohayo-hellos", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
   var KEY4 = "fox.feeds";
   var D2 = (() => {
     try {
@@ -9948,6 +9975,54 @@ Quests finished today: ${S3.doneIds.length}`;
     if (h.checks.length) s += `<ul class="hlist checks">${h.checks.map((c) => `<li><i style="background:${LIGHT[c.state]}"></i><span>${esc(c.name)}${c.detail ? ` <small>${esc(c.detail)}</small>` : ""}</span></li>`).join("")}</ul>`;
     if (h.link) s += `<div class="actions"><a class="btn small alt" href="${esc(h.link)}" target="_blank" rel="noopener">Open the ${a.name} founder room</a></div>`;
     return s;
+  }
+  var n0 = (v) => Math.max(0, Math.round(+v || 0));
+  function ohayoHellos() {
+    const d = D2["ohayo-hellos"];
+    if (!d || !d.at) return null;
+    const reactions = (Array.isArray(d.reactions) ? d.reactions : []).slice(0, 12).map((r) => ({
+      name: plain(String(r.name || "Someone")).slice(0, 30),
+      product: plain(String(r.product || "")).slice(0, 30),
+      emoji: [...String(r.emoji || "")].slice(0, 2).join("") || "💬",
+      text: plain(String(r.text || "")).slice(0, 140),
+      at: Date.parse(r.at) || 0
+    }));
+    const sent = n0(d.sent30), pct = (v) => sent ? Math.round(100 * n0(v) / sent) : 0;
+    return {
+      at: +d.at,
+      queued: n0(d.queued),
+      sent,
+      opened: n0(d.opened30),
+      watched: n0(d.watched30),
+      reacted: n0(d.reactions30),
+      arrived7: n0(d.arrived7),
+      total: n0(d.sentTotal),
+      avgWatch: n0(d.avgWatchSecs30),
+      watchRate: d.watchRate30 != null ? n0(d.watchRate30) : pct(d.watched30),
+      openRate: pct(d.opened30),
+      reactRate: pct(d.reactions30),
+      reactions
+    };
+  }
+  var agoD = (ms) => {
+    const n = Math.floor((Date.now() - ms) / 864e5);
+    return n <= 0 ? "today" : n === 1 ? "yesterday" : `${n} days ago`;
+  };
+  function reactionsPanel() {
+    const o = ohayoHellos();
+    let s = `<span class="tape gingham" aria-hidden="true"></span><h2>The reactions board</h2><p class="sub">What people sent back from their hello's watch page.</p>`;
+    if (!o) return s + `<p class="muted">Nothing pinned up yet. The morning feeds copy reactions over from the Ohayo Founder Desk.</p>`;
+    return s + (o.reactions.length ? `<ul class="hlist ohreact">${o.reactions.map((r) => `<li><span class="ohemo">${esc(r.emoji)}</span><span>${r.text ? `"${esc(r.text)}"` : ""}<small>${esc(r.name)}${r.product ? " · " + esc(r.product) : ""}${r.at ? " · " + agoD(r.at) : ""}</small></span></li>`).join("")}</ul>` : `<p class="muted">No reactions yet. They'll pin up here as people watch their hellos.</p>`);
+  }
+  function helloPanel() {
+    const o = ohayoHellos();
+    let s = `<span class="tape stripe" aria-hidden="true"></span><h2>Hello chart</h2>`;
+    if (!o) return s + `<p class="sub">No numbers yet. The morning feeds copy them over from the Ohayo Founder Desk.</p>`;
+    const bar = (label2, v, pct, col) => `<li><span class="ohl">${label2}</span><span class="ohbar"><i style="width:${Math.max(2, Math.min(100, pct))}%;background:${col}"></i></span><b>${v}</b><small>${pct}%</small></li>`;
+    s += `<p class="sub">Hellos in the last 30 days. Numbers from ${new Date(o.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Asia/Singapore" })}.</p>`;
+    s += `<div class="ohtiles"><div><b>${o.queued}</b><small>waiting for a hello</small></div><div><b>${o.watchRate}%</b><small>watched</small></div><div><b>${o.avgWatch}s</b><small>average watch</small></div><div><b>${o.arrived7}</b><small>new this week</small></div></div>`;
+    s += `<ul class="hlist ohfunnel">${bar("Sent", o.sent, o.sent ? 100 : 0, "#3D4C7A")}${bar("Opened", o.opened, o.openRate, "#7E8BB8")}${bar("Watched", o.watched, o.watchRate, "#F2A65A")}${bar("Reacted", o.reacted, o.reactRate, "#E8566C")}</ul>`;
+    return s + `<p class="muted">${o.total} hello${o.total === 1 ? "" : "s"} sent since the start. Apple Mail opens emails by itself, so "Opened" runs high: trust "Watched".</p>`;
   }
   function contentItems() {
     const out = [];
@@ -14190,7 +14265,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     });
   }
   migrate();
-  setArtContext({ F: () => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => {
+  setArtContext({ ohayo: () => ohayoHellos(), F: () => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => {
     const t2 = tapasToday(F, dayKey());
     return t2 ? TAPAS[t2.id].n : null;
   }, vineStock: () => shelfStock(vineState(F)), S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth2(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), goodNews: () => {
@@ -14327,7 +14402,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       if (id === "journal" && journalOpen && document.activeElement?.id !== "jText" || id === "scratch" && scratchOpen && document.activeElement?.id !== "scratchText") ctx();
     });
     attachFeeds(col, (id) => {
-      if (/^health/.test(id) && ["lane", ...APP_IDS].includes(scene)) {
+      if ((/^health/.test(id) || id === "ohayo-hellos") && ["lane", ...APP_IDS].includes(scene)) {
         drawScene();
         ctx();
       }
@@ -17078,7 +17153,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (routOpen && scene === "room") h = routinesPanel();
     else if (lettersOpen && (scene === "room" || scene === "base")) h = lettersPanel(!!sampleCap);
     else if (postOpen && scene === "post") h = postPanel();
-    else if (healthOpen && APP_IDS.includes(scene)) h = healthPanel(scene);
+    else if (healthOpen && APP_IDS.includes(scene)) h = healthOpen === "reactions" ? reactionsPanel() : healthOpen === "hellos" ? helloPanel() : healthPanel(scene);
     else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar());
     else if (scene === "market" && !shopClosed) {
       const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["deli", "Deli"], ["care", "Care"], ["family", "Family"], ["animals", "Animals"], ["home", "Home"], ["me", "Me & my room"], ["sell", "Sell"]];
@@ -18407,6 +18482,12 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     if (id === "status") {
       healthOpen = true;
+      sfx("paper");
+      render();
+      return;
+    }
+    if (scene === "ohayo" && (id === "reactions" || id === "hellos")) {
+      healthOpen = id;
       sfx("paper");
       render();
       return;
