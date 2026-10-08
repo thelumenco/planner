@@ -50,6 +50,7 @@ export const VILLAGE = {
   toBaseO:{scene:"orchard", name:"Gate home", door:[498,278], spot:true, bridge:"base", mark:[490,226], line:"Back along the path, home."},
   toFlowers:{scene:"orchard", name:"Gate to the flower farm", door:[22,278], spot:true, bridge:"flowers", mark:[30,226], line:"Through the arch to the flower farm."},
   cottage:{scene:"orchard", name:"Ma Ma's cottage", short:"Ma Ma's cottage", door:[132,228], mark:[132,96]},
+  cacao:{scene:"orchard", name:"Cacao tree", door:[466,486], spot:true, mark:[484,380], line:"Ma Ma's cacao tree, for the Cocoa Room."},
   farmshop:{scene:"orchard", name:"Farm shop", door:[415,254], spot:true, mark:[415,140], line:"Ma Ma's farm shop. Fruit and flowers, picked this morning."},
   toOrchardF:{scene:"flowers", name:"Gate to the orchard", door:[498,293], spot:true, bridge:"orchard", mark:[490,240], line:"Back through the arch to the orchard."},
   // the field: an open meadow with a lake, north of the orchard and west of the town square

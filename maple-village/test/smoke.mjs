@@ -1924,6 +1924,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(ws.filter(id => !["amara", "lila", "mateo"].includes(id)).length >= 4 && /Bonbon workshop/.test(await page.locator("#fore").textContent()), `Saturday's workshop class at the tables (${ws.join(", ")})`);
   await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(900);
   check(/Cacao tree/.test(await page.locator("#sceneArt").textContent()), "the cacao tree grows in Ma Ma's orchard");
+  await page.locator('#world [data-place="cacao"]').dispatchEvent("click"); await page.waitForTimeout(1500);
+  check(/next in about/.test(await page.locator("#say").textContent().catch(() => "") + await page.locator("body").textContent()), "walk up to the cacao tree: when the next sack is due");
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-12"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1500);
   check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("lila"), "with a second assistant the shop opens on Mondays: Lila's behind the counter");

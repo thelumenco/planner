@@ -73,16 +73,16 @@ export const archGate = (id, x, y, label, lx, ly, col, aria) => `<g data-place="
 const hedgeRow = gap => `<g ${W}>${Array.from({length: 14}, (_, i) => i*40 + 10).filter(x => !gap || x < gap[0] || x > gap[1]).map((x, k) => `<ellipse cx="${x}" cy="${118 + (Math.round((x - 10)/40) % 2)*4}" rx="26" ry="18" style="fill:var(--tree2)"/>`).join("")}</g>`;
 const hedge = hedgeRow([16, 96]);   // a gap at the top left: the arch up to the foreshore
 
-// the Cocoa Room's cacao tree (cocoa.js upgrade "tree"), up by the farm shop: a slim trunk, big glossy leaves, and
+// the Cocoa Room's cacao tree (cocoa.js upgrade "tree"), inside the orchard on the east side by the fruit trees: a slim trunk, big glossy leaves, and
 // pods in yellow, orange and maroon growing straight off the trunk, the way cacao does
 function cacaoTree(){
   const c = artCtx().cocoa ? artCtx().cocoa() : null; if (!c || !c.up || !c.up.tree) return "";
-  const x = 474, y = 112, pods = [[-5, -20, "#F3C33A"], [5, -28, "#C2505F"], [-4, -38, "#E8913A"], [6, -46, "#F3C33A"], [-6, -54, "#8A3A2E"]];
-  return `<g pointer-events="none">${sk(`<ellipse cx="${x}" cy="${y-70}" rx="34" ry="22" style="fill:#5E8C4A"/><ellipse cx="${x-22}" cy="${y-56}" rx="18" ry="12" style="fill:#6E9C58"/><ellipse cx="${x+22}" cy="${y-58}" rx="18" ry="12" style="fill:#6E9C58"/>
+  const x = 484, y = 470, pods = [[-5, -20, "#F3C33A"], [5, -28, "#C2505F"], [-4, -38, "#E8913A"], [6, -46, "#F3C33A"], [-6, -54, "#8A3A2E"]];
+  return `<g data-place="cacao" aria-label="Cacao tree"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="26" ry="8" style="fill:var(--butter)"/>${sk(`<ellipse cx="${x}" cy="${y-70}" rx="34" ry="22" style="fill:#5E8C4A"/><ellipse cx="${x-22}" cy="${y-56}" rx="18" ry="12" style="fill:#6E9C58"/><ellipse cx="${x+22}" cy="${y-58}" rx="18" ry="12" style="fill:#6E9C58"/>
       <path d="M${x-3} ${y} q-2 -40 1 -70 h4 q3 30 1 70z" style="fill:#7A5A3E"/>${pods.map(([dx, dy, col]) => `<ellipse cx="${x + dx}" cy="${y + dy}" rx="4" ry="7" style="fill:${col}"/>`).join("")}`,
     `<ellipse cx="${x}" cy="${y-70}" rx="34" ry="22"/><ellipse cx="${x-22}" cy="${y-56}" rx="18" ry="12"/><ellipse cx="${x+22}" cy="${y-58}" rx="18" ry="12"/><path d="M${x-3} ${y} q-2 -40 1 -70 h4 q3 30 1 70z"/>
       ${pods.map(([dx, dy]) => `<ellipse cx="${x + dx}" cy="${y + dy}" rx="4" ry="7"/><path d="M${x + dx} ${y + dy - 5} v10" opacity=".4"/>`).join("")}`)}
-    ${tapeLabel(x - 4, y + 12, "Cacao tree", "#E3C8A0", 10)}</g>`;
+    ${tapeLabel(x - 6, y + 20, "Cacao tree", "#E3C8A0", 10)}</g>`;
 }
 export function orchardArt(){
   const o = orchState(artCtx().F()), today = artCtx().day();

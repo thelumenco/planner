@@ -2466,6 +2466,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     toBaseO: { scene: "orchard", name: "Gate home", door: [498, 278], spot: true, bridge: "base", mark: [490, 226], line: "Back along the path, home." },
     toFlowers: { scene: "orchard", name: "Gate to the flower farm", door: [22, 278], spot: true, bridge: "flowers", mark: [30, 226], line: "Through the arch to the flower farm." },
     cottage: { scene: "orchard", name: "Ma Ma's cottage", short: "Ma Ma's cottage", door: [132, 228], mark: [132, 96] },
+    cacao: { scene: "orchard", name: "Cacao tree", door: [466, 486], spot: true, mark: [484, 380], line: "Ma Ma's cacao tree, for the Cocoa Room." },
     farmshop: { scene: "orchard", name: "Farm shop", door: [415, 254], spot: true, mark: [415, 140], line: "Ma Ma's farm shop. Fruit and flowers, picked this morning." },
     toOrchardF: { scene: "flowers", name: "Gate to the orchard", door: [498, 293], spot: true, bridge: "orchard", mark: [490, 240], line: "Back through the arch to the orchard." },
     // the field: an open meadow with a lake, north of the orchard and west of the town square
@@ -7260,14 +7261,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   function cacaoTree() {
     const c = artCtx().cocoa ? artCtx().cocoa() : null;
     if (!c || !c.up || !c.up.tree) return "";
-    const x = 474, y = 112, pods = [[-5, -20, "#F3C33A"], [5, -28, "#C2505F"], [-4, -38, "#E8913A"], [6, -46, "#F3C33A"], [-6, -54, "#8A3A2E"]];
-    return `<g pointer-events="none">${sk(
+    const x = 484, y = 470, pods = [[-5, -20, "#F3C33A"], [5, -28, "#C2505F"], [-4, -38, "#E8913A"], [6, -46, "#F3C33A"], [-6, -54, "#8A3A2E"]];
+    return `<g data-place="cacao" aria-label="Cacao tree"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="26" ry="8" style="fill:var(--butter)"/>${sk(
       `<ellipse cx="${x}" cy="${y - 70}" rx="34" ry="22" style="fill:#5E8C4A"/><ellipse cx="${x - 22}" cy="${y - 56}" rx="18" ry="12" style="fill:#6E9C58"/><ellipse cx="${x + 22}" cy="${y - 58}" rx="18" ry="12" style="fill:#6E9C58"/>
       <path d="M${x - 3} ${y} q-2 -40 1 -70 h4 q3 30 1 70z" style="fill:#7A5A3E"/>${pods.map(([dx, dy, col]) => `<ellipse cx="${x + dx}" cy="${y + dy}" rx="4" ry="7" style="fill:${col}"/>`).join("")}`,
       `<ellipse cx="${x}" cy="${y - 70}" rx="34" ry="22"/><ellipse cx="${x - 22}" cy="${y - 56}" rx="18" ry="12"/><ellipse cx="${x + 22}" cy="${y - 58}" rx="18" ry="12"/><path d="M${x - 3} ${y} q-2 -40 1 -70 h4 q3 30 1 70z"/>
       ${pods.map(([dx, dy]) => `<ellipse cx="${x + dx}" cy="${y + dy}" rx="4" ry="7"/><path d="M${x + dx} ${y + dy - 5} v10" opacity=".4"/>`).join("")}`
     )}
-    ${tapeLabel(x - 4, y + 12, "Cacao tree", "#E3C8A0", 10)}</g>`;
+    ${tapeLabel(x - 6, y + 20, "Cacao tree", "#E3C8A0", 10)}</g>`;
   }
   function orchardArt() {
     const o = orchState(artCtx().F()), today2 = artCtx().day();
@@ -20318,6 +20319,13 @@ ${SIGNOFF[t2.who] || ""}`;
       sfx("paper");
       speak(fresh2 ? "Pancake the village dog wags hello. Fresh good news this morning!" : "Pancake opens one eye, thumps a sleepy tail, and goes back to napping.", 4500);
       save2(true);
+      return;
+    }
+    if (id === "cacao") {
+      const c = cocoaState(F), h = Math.max(1, Math.round(((c.treeAt || Date.now()) + 2 * 864e5 - Date.now() - (globalThis.__mapleOffset || 0)) / 36e5));
+      speak(`Ma Ma's cacao tree, heavy with pods. She picks them and sends a sack of beans to the Cocoa Room's kitchen every two days: the next in about ${h} hour${h === 1 ? "" : "s"}.`, 5500);
+      if (isHere("mama")) setTimeout(() => npcSay("mama", pick(["Ma Ma talk to it every morning. That's why so many pods!", "Chocolate tree! Who knew can grow here?"])), 1500);
+      render();
       return;
     }
     if (id === "shed") {

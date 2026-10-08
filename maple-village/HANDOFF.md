@@ -1194,3 +1194,15 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - vineyard.js `wineNames(F, slot)` gives a ready barrel 12 suggestions, never repeating a name in the cellar or on the shelves. They come from three patterns: village places and moments plus a style word, family names plus places, and French ones per style.
   - The first suggestion is the input's placeholder, and is used if the name's left blank. "Suggest a name" cycles through the rest.
 - **Testing:** `block.py` needs the exact `console.log("\nthe vineyard")` marker; plain "the vineyard" finds another block first.
+
+### Map plan for the top row (agreed with Mel, round 93)
+- Above the foreshore: the bay (built).
+- **Above the field: the farm** (Felix and Elena's). It has the farmhouse, barn (milking; the dairy and cheese cave inside), cow and goat paddocks, beehives along a lavender hedge, and a farm stand by the gate. It's reached through a gate on the bay's east edge. The lake is south of it.
+- **Above the town square: the cottage lane and the train station**, at the foot of an incline (the start of the hill). It has four holiday cottages and the station, where guests arrive by train. This replaces the old airport idea.
+- **Above Makers' Lane: the base of the hill**, covered in trees. Not decided yet.
+- **Farmstay decisions:**
+  - Felix and Elena run the farm, and Mel helps and takes produce.
+  - Honeysuckle cottage is Mateo and Lila's; Clover is Noor's; Bluebell and Fig Tree are holiday lets that Mel can later buy (about 3,000 and 2,000) and do up.
+  - The decor styles are Cottagecore, Japandi, Coastal, Mid-century, Peranakan and Scandi. Turnover is hands-on by default, with a housekeeper available to hire.
+  - Cheeses get suggested names, like wines and bonbons.
+- **Round 93:** the cacao tree moved inside the orchard, on the east side by the fruit trees (`cacaoTree` at 484,470). It's a tappable place (`cacao`, world.js) that says when the next sack is due, and Ma Ma chimes in if she's there.

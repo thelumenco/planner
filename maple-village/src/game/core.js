@@ -2118,6 +2118,8 @@ function arriveVillageSpot(id){
   if (id === "letterbox" && lettersArrived().length) { lettersOpen = true; lv.mode = "home"; sfx("paper"); speak("Post! Letters for you.", 3000); render(); return; }
   if (id === "letterbox") { const p = paperWaiting(); if (p) { sfx("paper"); openMail(p); } else speak(`Nothing in the letterbox. ${paperName()} comes each morning.`, 3800); render(); return; }
   if (id === "news") { newsOpen = true; const g = goodNews(), fresh = g && F.goodRead !== g.at; if (g) F.goodRead = g.at; sfx("paper"); speak(fresh ? "Pancake the village dog wags hello. Fresh good news this morning!" : "Pancake opens one eye, thumps a sleepy tail, and goes back to napping.", 4500); save(true); return; }
+  if (id === "cacao") { const c = cocoaState(F), h = Math.max(1, Math.round(((c.treeAt || Date.now()) + 2*864e5 - Date.now() - (globalThis.__mapleOffset || 0))/36e5));
+    speak(`Ma Ma's cacao tree, heavy with pods. She picks them and sends a sack of beans to the Cocoa Room's kitchen every two days: the next in about ${h} hour${h === 1 ? "" : "s"}.`, 5500); if (isHere("mama")) setTimeout(() => npcSay("mama", pick(["Ma Ma talk to it every morning. That's why so many pods!", "Chocolate tree! Who knew can grow here?"])), 1500); render(); return; }
   if (id === "shed") { shedOpen = true; speak(v.line, 3800); render(); return; }
   if (id === "run") { runOpen = true; const n = hungryCount(F); speak(!F.pets.animals.length ? "An empty run. Chicks and bunnies are at the market." : n ? `${n === 1 ? "Someone's" : n + " little ones are"} peeping for breakfast.` : VILLAGE.run.line, 3800); render(); return; }
   if (id === "bench") { speak(v.line, 3800); render(); return; }
