@@ -1056,3 +1056,11 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - The Village feeds routine still only reads the Chord and Chico founder pages. Add the Luna and Ohayo founder desk URLs to its prompt once they exist.
 - **Quests:** routed by `/\bluna\b/` and `/ohayo/`; both houses are in `WORK`.
 - **Night market:** now 5:30pm to 10pm (tours.js `eventOn`; scoop.js `cartOn` and the evening boost).
+
+### Round 85: more stall goods, rotating
+- **The goods:** `src/data/stall-goods.js` has 77 more gifts (`GOODS`) for the Sunday market, the field fair and the night market. That's about three times the old range.
+  - Each good names an icon shape and colours (`art`). icons.js draws them with a set of shape makers (jar, bottle, cup, bun, clip, sock, lantern, and so on).
+  - items.js merges them into `ITEMS`.
+  - Dairy goods leave Marcus out of their `to` list.
+- **The rotation:** `POOLS[eventKind][keeper]` lists each stall's extra range. core.js `todaysGoods(st, day)` shows the stall's signature item (the first of its tours.js `items`) every time, plus `max(2, items.length)` picks from the rest of the range. The picks are ordered by `hash(day:keeper:item)`, so a given market day always shows the same mix and different days differ.
+  - Lior's lantern decor stays on every night; its gifts rotate.

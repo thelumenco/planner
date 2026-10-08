@@ -1471,7 +1471,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="honey"]'); await page.click('#bag [data-giveto].primary'); await page.waitForTimeout(400);
   check(await mfox().then(f => !f.inv.honey && Object.values(f.fam.gifts).reduce((a, b) => a + b, 0) === g0 + 1), "market honey can be given to anyone in the family who's here");
   await page.click('[data-open="bag"]').catch(() => {});
-  for (const [st, id] of [["mstall5", "soap_lav"], ["mstall6", "stout"]]) { await page.locator(`#world [data-place="${st}"]`).dispatchEvent("click"); await page.waitForSelector(`#ctx .item[data-id="${id}"]`, { timeout: 15000 }); await page.click('#ctx [data-close]'); }
+  for (const [st, id] of [["mstall5", "soap_lav"], ["mstall6", "paleale"]]) { await page.locator(`#world [data-place="${st}"]`).dispatchEvent("click"); await page.waitForSelector(`#ctx .item[data-id="${id}"]`, { timeout: 15000 }); await page.click('#ctx [data-close]'); }
   check(true, "Grace's handmade soap stall and Ben's craft beer stall");
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-31"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
@@ -1940,7 +1940,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="jazzhat"]').dispatchEvent("click"); await page.waitForTimeout(4000);
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins) === c0 - 2, "two coins in the band's hat");
   await page.locator('#world [data-place="mstall0"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="friedchicken"]', { timeout: 15000 });
-  check(await page.locator('#ctx .item[data-id="scallion"]').count() === 1, "the Taiwanese snack stall sells fried chicken and scallion pancakes");
+  const yunToday = await page.locator("#ctx .item[data-id]").evaluateAll(n => n.map(x => x.dataset.id));
+  check(yunToday.length >= 4, `the Taiwanese snack stall sells its fried chicken and a few more things tonight (${yunToday.join(", ")})`);
   await page.click('#ctx .item[data-id="friedchicken"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.fox")).inv || {}).friedchicken === 1), "bought one, as a gift");
   await page.click('#ctx [data-close]').catch(() => {});
@@ -1955,6 +1956,16 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=17:40&date=2026-10-13"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2000);
   check((await ids()).includes("yun") && await page.locator('#world [data-place="jazzhat"]').count() === 1, "the night market's already on at 5:40pm (it opens at 5:30)");
+  { // the stalls rotate their goods: another night market, another mix (the signature item stays)
+    const offers = [];
+    for (const d of ["2026-10-15", "2026-10-20", "2026-10-22"]) {
+      await page.goto(url + `?seed=1&time=19:30&date=${d}`); await page.waitForTimeout(800);
+      await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
+      await page.locator('#world [data-place="mstall0"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="friedchicken"]', { timeout: 15000 });
+      offers.push((await page.locator("#ctx .item[data-id]").evaluateAll(n => n.map(x => x.dataset.id))).join(","));
+      await page.click('#ctx [data-close]').catch(() => {}); }
+    check(new Set([yunToday.join(","), ...offers]).size >= 3, "the stalls rotate what they sell from one market to the next (fried chicken always)");
+  }
   await page.goto(url + "?seed=1&time=19:30&date=2026-10-12"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
   check(!(await ids()).includes("yun") && await page.locator('#world [data-place="jazzhat"]').count() === 0, "no night market on a Monday");

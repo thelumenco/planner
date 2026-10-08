@@ -1,6 +1,7 @@
 // Shop items, crops, garden plots and friendship levels.
 import { H, M } from "../util.js";
 import { TREES, FLOWERS } from "./orchard.js";
+import { GOODS } from "./stall-goods.js";
 
 // yield: how many one plot gives at harvest (prices per piece are set so a whole harvest is worth a little more than
 // the old one-per-plot did: more ingredients for the kitchen, without flooding the market)
@@ -232,6 +233,8 @@ Object.keys(FLOWERS).forEach(id => { const f = FLOWERS[id];
   ITEMS["bq_" + id] = {n: `Bouquet of ${f.n.toLowerCase()}`, kind: "bouquet", flower: id};
   ITEMS["pot_" + id] = {n: `Potted ${f.n.toLowerCase()}`, kind: "pot", flower: id}; });
 // Hand-drawn icon name for an item (see art/icons.js): seeds draw as a seed packet of their crop.
+// the market stalls' extra goods (data/stall-goods.js)
+Object.entries(GOODS).forEach(([id, g]) => { if (!ITEMS[id]) ITEMS[id] = g; });
 export const itemIco = id => ITEMS[id] && ITEMS[id].kind === "seed" ? "seed:" + ITEMS[id].crop : id;
 Object.keys(ITEMS).forEach(id => { ITEMS[id].ico = itemIco(id); });
 Object.keys(CROPS).forEach(id => { CROPS[id].ico = id; });

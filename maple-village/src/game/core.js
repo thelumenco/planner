@@ -1,5 +1,5 @@
 // Game core: state + persistence, quest flow, actions, UI renderers and the world sim.
-import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur, plain } from "../util.js";
+import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur, plain, hash } from "../util.js";
 import { icon, progressBar, progressBarV } from "../art/icons.js";
 import { VILLAGE, WORK, ROOMS, MAPLE_BED, OUTDOOR, BRIDGES, ARRIVE, INNER, nextHop, outdoorOf, isWeekend, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
 import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco, seasonOf, SEASONS } from "../data/items.js";
@@ -44,6 +44,7 @@ import { fieldArt, stallFront } from "../art/field.js";
 import { shoreArt } from "../art/shore.js";
 import { bayArt, DECK_SEATS } from "../art/bay.js";
 import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
+import { POOLS } from "../data/stall-goods.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
 import { diningTable, darrenAsleep, skyWash } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
@@ -2132,7 +2133,14 @@ function vineTick(){
 }
 // A stall at the market or fair: what it sells (bought like at Hana's), or an activity for Evan (a kite, face paint)
 // what a stall has out: the produce stall's vegetables and berries follow the season (the same as the seed packets at Hana's)
-const stallItems = st => !st.produce ? st.items : Object.keys(CROPS).filter(c => !["tulip", "sunflower"].includes(c) && ITEMS[c] && Object.values(ITEMS).some(it => it.crop === c && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
+// A stall's goods today: its signature item (the first in tours.js) always, plus a different handful each market day
+// from the rest of its range (data/stall-goods.js POOLS), picked by the date so the day's mix stays put
+const stallItems = st => !st.produce ? todaysGoods(st) : Object.keys(CROPS).filter(c => !["tulip", "sunflower"].includes(c) && ITEMS[c] && Object.values(ITEMS).some(it => it.crop === c && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
+function todaysGoods(st, day = dayKey()){
+  const ev = eventOn(day), pool = [...(st.items || []).slice(1), ...(((POOLS[ev ? ev.kind : ""] || {})[st.id]) || [])].filter(id => ITEMS[id]);
+  const n = Math.max(2, (st.items || []).length);
+  return [...(st.items || []).slice(0, 1), ...pool.map(id => [hash(day + ":" + st.id + ":" + id), id]).sort((a, b) => a[0] - b[0]).slice(0, n).map(([, id]) => id)];
+}
 const stallPrice = id => ITEMS[id].price || (ITEMS[id].sell || 2) + 2;
 function marketStallPanel(st){
   const ev = eventNow(dayKey(), sgHM()); if (!ev) return "";

@@ -1,4 +1,5 @@
 import { TREES, FLOWERS } from "../data/orchard.js";
+import { GOODS } from "../data/stall-goods.js";
 // Hand-drawn icon set (ink outline + marker fill, same look as the map). No emoji anywhere in the game.
 //   icon(name, size)        -> inline <svg> for HTML (buttons, panels, notes)
 //   iconAt(name, x, y, s)   -> nested <svg> centred at x,y for use inside the world SVG
@@ -262,6 +263,55 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
       `<path d="M8 13l4 9 4-9z"/>${headL(8.5, 8.5, 3)}${headL(15.5, 8.5, 3)}${headL(12, 5.5, 3)}<path d="M10 11.5l2 2.5 2-2.5"/>`];
     I["pot_" + id] = [`<path d="M7 14h10l-1.5 7h-7z" ${f("#C46A4A")}/><path d="M9.5 13.5c0-2 1-3.5 2.5-4.5M14.5 13.5c0-2-1-3.5-2.5-4.5" ${f("none")}/>${head(8.5, 9.5, 2.6)}${head(15.5, 9.5, 2.6)}${head(12, 6, 2.8)}`,
       `<path d="M7 14h10l-1.5 7h-7zM6.5 14h11"/>${headL(8.5, 9.5, 2.6)}${headL(15.5, 9.5, 2.6)}${headL(12, 6, 2.8)}<path d="M12 9v5"/>`]; });
+}
+
+// The market stalls' extra goods (data/stall-goods.js): each names a shape and its colours, drawn here
+{
+  const S = {
+    wedge: (a) => [`<path d="M3 17l15-9 3 2v7z" ${f(a)}/><circle cx="12" cy="15" r="1.2" ${f("#FFFDF6")}/>`, `<path d="M3 17l15-9 3 2v7zM3 17h18M18 8v9"/><circle cx="12" cy="15" r="1.2"/>`],
+    jar: (a, b = "#E8D3A6") => [`<path d="M7 9h10v9a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3z" ${f(a)}/><rect x="6.5" y="5" width="11" height="4" rx="1" ${f(b)}/>`, `<path d="M7 9h10v9a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3z"/><rect x="6.5" y="5" width="11" height="4" rx="1"/><rect x="9" y="12" width="6" height="4" rx="1"/>`],
+    box: (a, b = "#E8566C") => [`<rect x="4" y="8" width="16" height="11" rx="1.5" ${f(a)}/><rect x="4" y="8" width="16" height="3" ${f(b)}/>`, `<rect x="4" y="8" width="16" height="11" rx="1.5"/><path d="M4 11h16M12 8v11"/>`],
+    wheel: (a, b = "#9CC27E") => [`<ellipse cx="12" cy="14" rx="8" ry="4.5" ${f(a)}/><path d="M4 12v2M20 12v2" ${f("none")}/><circle cx="9" cy="12" r="1" ${f(b)}/><circle cx="14" cy="11.5" r="1" ${f(b)}/>`, `<ellipse cx="12" cy="11.5" rx="8" ry="4.5"/><path d="M4 11.5v3c0 2.5 3.6 4.5 8 4.5s8-2 8-4.5v-3"/>`],
+    sticks: (a) => [`${[7, 11, 15].map((x, i) => `<rect x="${x}" y="${4 + i}" width="2.4" height="15" rx="1.2" ${f(a)}/>`).join("")}`, `${[7, 11, 15].map((x, i) => `<rect x="${x}" y="${4 + i}" width="2.4" height="15" rx="1.2"/>`).join("")}`],
+    tube: (a) => [`<rect x="8.5" y="7" width="7" height="13" rx="2" ${f(a)}/><rect x="9.5" y="3.5" width="5" height="4" rx="1" ${f("#FFFDF6")}/>`, `<rect x="8.5" y="7" width="7" height="13" rx="2"/><rect x="9.5" y="3.5" width="5" height="4" rx="1"/><path d="M10.5 11h3"/>`],
+    cloth: (a, b = "#E8566C") => [`<rect x="4" y="6" width="16" height="12" rx="1" ${f(a)}/><circle cx="9" cy="10" r="1.5" ${f(b)}/><circle cx="15" cy="14" r="1.5" ${f(b)}/>`, `<rect x="4" y="6" width="16" height="12" rx="1"/><path d="M4 9h16" opacity=".5"/>`],
+    bottle: (a) => [`<path d="M10 3h4v4c2 1 3 2.5 3 4.5V20a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-8.5c0-2 1-3.5 3-4.5z" ${f(a)}/><rect x="8.5" y="13" width="7" height="4" ${f("#FFFDF6")}/>`, `<path d="M10 3h4v4c2 1 3 2.5 3 4.5V20a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-8.5c0-2 1-3.5 3-4.5z"/><rect x="8.5" y="13" width="7" height="4"/>`],
+    soap: (a) => [`<rect x="3.5" y="8" width="17" height="10" rx="3" ${f(a)}/>`, `<rect x="3.5" y="8" width="17" height="10" rx="3"/><path d="M7 4.5q1.5-1.5 3 0M14 3.5q1.5-1.5 3 0"/>`],
+    ball: (a, b = "#FFFDF6") => [`<circle cx="12" cy="13" r="7.5" ${f(a)}/><path d="M7 11c3 2 7 2 10 0" ${f("none")}/><circle cx="9.5" cy="10" r="1.2" ${f(b)}/>`, `<circle cx="12" cy="13" r="7.5"/><path d="M7 11.5c3 2 7 2 10 0" opacity=".6"/>`],
+    loaf: (a) => [`<path d="M4 15c0-5 3.5-8 8-8s8 3 8 8v3H4z" ${f(a)}/>`, `<path d="M4 15c0-5 3.5-8 8-8s8 3 8 8v3H4zM8 10l2 2M12 9l2 2M16 10l1.5 2"/>`],
+    candle: (a) => [`<rect x="6" y="10" width="12" height="10" rx="2" ${f("#D9DEE3")}/><rect x="6" y="13" width="12" height="4" ${f(a)}/><path d="M12 4c1.4 1.6 1.8 2.6 1.8 3.5a1.8 1.8 0 0 1-3.6 0c0-.9.4-1.9 1.8-3.5z" ${f("#F08A3C")}/>`, `<rect x="6" y="10" width="12" height="10" rx="2"/><path d="M12 10V8"/><path d="M12 4c1.4 1.6 1.8 2.6 1.8 3.5a1.8 1.8 0 0 1-3.6 0c0-.9.4-1.9 1.8-3.5z"/>`],
+    tart: (a) => [`<path d="M4 12h16l-2 7H6z" ${f("#E3B06A")}/><ellipse cx="12" cy="12" rx="7" ry="2.5" ${f(a)}/>`, `<path d="M4 12h16l-2 7H6z"/><ellipse cx="12" cy="12" rx="7" ry="2.5"/><path d="M8 13l1 5M12 13v5M16 13l-1 5" opacity=".4"/>`],
+    crescent: (a) => [`<path d="M3 15c2-6 6-9 9-9s7 3 9 9c-2-2-4-2-5-1-1-3-3-4-4-4s-3 1-4 4c-1-1-3-1-5 1z" ${f(a)}/>`, `<path d="M3 15c2-6 6-9 9-9s7 3 9 9c-2-2-4-2-5-1-1-3-3-4-4-4s-3 1-4 4c-1-1-3-1-5 1z"/><path d="M12 6v4" opacity=".5"/>`],
+    bun: (a, b = "#FFFDF6") => [`<path d="M4 15c0-4.5 3.5-7.5 8-7.5s8 3 8 7.5v2H4z" ${f(a)}/><path d="M8 12c2-2 6-2 8 0" ${f("none")}/><circle cx="12" cy="11" r="1.5" ${f(b)}/>`, `<path d="M4 15c0-4.5 3.5-7.5 8-7.5s8 3 8 7.5v2H4zM3 17h18"/><path d="M8 12.5c2-1.5 6-1.5 8 0" opacity=".6"/>`],
+    cup: (a) => [`<path d="M7 8h10l-1.5 13h-7z" ${f(a)}/><rect x="6.5" y="6" width="11" height="2.5" rx="1" ${f("#FFFDF6")}/>`, `<path d="M7 8h10l-1.5 13h-7zM6.5 6h11v2.5h-11zM13 6l2-4"/>`],
+    apple: (a) => [`<circle cx="12" cy="14" r="6.5" ${f(a)}/>`, `<circle cx="12" cy="14" r="6.5"/><path d="M12 7.5V2"/><path d="M8.5 12c.5-1 1.3-1.6 2.3-1.8" opacity=".6"/>`],
+    bag: (a, b = "#E8566C") => [`<path d="M6 7h12l-1 14H7z" ${f(a)}/>${[8, 12, 16].map(x => `<path d="M${x - 1} 7h2l-.4 14h-1.2z" ${f(b)}/>`).join("")}<circle cx="10" cy="5.5" r="2" ${f("#FFFDF6")}/><circle cx="14" cy="5" r="2" ${f("#FFFDF6")}/>`, `<path d="M6 7h12l-1 14H7z"/><circle cx="10" cy="5.5" r="2"/><circle cx="14" cy="5" r="2"/>`],
+    cloud: (a) => [`<circle cx="9" cy="9" r="4" ${f(a)}/><circle cx="14.5" cy="8" r="4.5" ${f(a)}/><circle cx="12" cy="12" r="4" ${f(a)}/>`, `<path d="M12 16v6"/><path d="M6 10a4 4 0 0 1 6-4 4.5 4.5 0 0 1 6.5 4 4 4 0 0 1-6.5 5.5A4 4 0 0 1 6 10z"/>`],
+    boat: (a) => [`<path d="M3 11h18l-3 8H6z" ${f("#FFFDF6")}/>${[7, 11, 15].map(x => `<circle cx="${x}" cy="10" r="2.6" ${f(a)}/>`).join("")}`, `<path d="M3 11h18l-3 8H6z"/>${[7, 11, 15].map(x => `<circle cx="${x}" cy="10" r="2.6"/>`).join("")}`],
+    bao: (a, b = "#A8432E") => [`<path d="M3 14c0-4 4-6 9-6s9 2 9 6c-3 2-15 2-18 0z" ${f(a)}/><path d="M5 13.5c3 1 11 1 14 0v1.5c-3 1-11 1-14 0z" ${f(b)}/>`, `<path d="M3 14c0-4 4-6 9-6s9 2 9 6c-3 2-15 2-18 0z"/><path d="M5 13.5c3 1 11 1 14 0"/>`],
+    bowl: (a) => [`<path d="M3 11h18a9 7 0 0 1-18 0z" ${f("#FFFDF6")}/><ellipse cx="12" cy="11" rx="8" ry="2" ${f(a)}/>`, `<path d="M3 11h18a9 7 0 0 1-18 0zM9 20h6"/><ellipse cx="12" cy="11" rx="9" ry="2"/>`],
+    plate: (a, b = "#E8566C") => [`<ellipse cx="12" cy="15" rx="9" ry="4" ${f("#FFFDF6")}/><ellipse cx="12" cy="13.5" rx="6" ry="2.6" ${f(a)}/><path d="M9 13c1 .5 2 .5 3 0s2-.5 3 0" ${f("none")} style="stroke:${b}" stroke-width="1.4"/>`, `<ellipse cx="12" cy="15" rx="9" ry="4"/><ellipse cx="12" cy="13.5" rx="6" ry="2.6"/>`],
+    roll: (a, b = "#F3D34A") => [`${[6, 12, 18].map(x => `<circle cx="${x}" cy="13" r="3.6" ${f(a)}/><circle cx="${x}" cy="13" r="2" ${f("#FFFDF6")}/><circle cx="${x}" cy="13" r=".9" ${f(b)}/>`).join("")}`, `${[6, 12, 18].map(x => `<circle cx="${x}" cy="13" r="3.6"/>`).join("")}`],
+    skewer: (a) => [`<rect x="9" y="4" width="6" height="12" rx="3" ${f(a)}/>`, `<rect x="9" y="4" width="6" height="12" rx="3"/><path d="M12 16v6"/>`],
+    fish: (a) => [`<path d="M3 12c3-4 9-5 13-2l4-3v10l-4-3c-4 3-10 2-13-2z" ${f(a)}/>`, `<path d="M3 12c3-4 9-5 13-2l4-3v10l-4-3c-4 3-10 2-13-2z"/><circle cx="7" cy="11" r=".8"/><path d="M10 10q1.5 2 0 4" opacity=".6"/>`],
+    disc: (a) => [`<circle cx="12" cy="12" r="8" ${f(a)}/><path d="M12 7.5l1.3 2.8 3 .3-2.2 2 .6 3-2.7-1.5-2.7 1.5.6-3-2.2-2 3-.3z" ${f("#C98A3A")}/>`, `<circle cx="12" cy="12" r="8"/><path d="M12 7.5l1.3 2.8 3 .3-2.2 2 .6 3-2.7-1.5-2.7 1.5.6-3-2.2-2 3-.3z"/>`],
+    bow: (a) => [`<path d="M12 12L4 7v10zM12 12l8-5v10z" ${f(a)}/><circle cx="12" cy="12" r="2" ${f(a)}/>`, `<path d="M12 12L4 7v10zM12 12l8-5v10z"/><circle cx="12" cy="12" r="2"/><path d="M11 14l-2 6M13 14l2 6"/>`],
+    band: (a) => [`<path d="M4 16a8 8 0 0 1 16 0" fill="none" style="stroke:var(--line)" stroke-width="3.6"/>${[5, 7.5, 10.5, 13.5, 16.5, 19].map((x, i) => `<circle cx="${x}" cy="${[15, 11, 9, 9, 11, 15][i]}" r="1.5" ${f(a)}/>`).join("")}`, `${[5, 7.5, 10.5, 13.5, 16.5, 19].map((x, i) => `<circle cx="${x}" cy="${[15, 11, 9, 9, 11, 15][i]}" r="1.5"/>`).join("")}`],
+    clip: (a) => [`<path d="M12 12c-2-5-7-6-8-3s3 6 8 3zM12 12c2-5 7-6 8-3s-3 6-8 3z" ${f(a)}/>`, `<path d="M12 12c-2-5-7-6-8-3s3 6 8 3zM12 12c2-5 7-6 8-3s-3 6-8 3zM12 12v8"/>`],
+    pins: (a) => [`${[8, 12, 16].map(x => `<circle cx="${x}" cy="6" r="1.8" ${f(a)}/>`).join("")}`, `${[8, 12, 16].map(x => `<circle cx="${x}" cy="6" r="1.8"/><path d="M${x} 8v12"/>`).join("")}`],
+    beads: (a) => [`${Array.from({length: 7}, (_, i) => `<circle cx="${12 + 7*Math.cos(i*0.9)}" cy="${12 + 7*Math.sin(i*0.9)}" r="2" ${f(i % 2 ? a : "#FFFDF6")}/>`).join("")}`, `<circle cx="12" cy="12" r="7" opacity=".4"/>`],
+    plush: (a) => [`<circle cx="12" cy="13" r="6.5" ${f(a)}/><path d="M6.5 9l1-5 3.5 3.5zM17.5 9l-1-5-3.5 3.5z" ${f(a)}/>`, `<circle cx="12" cy="13" r="6.5"/><path d="M6.5 9l1-5 3.5 3.5M17.5 9l-1-5-3.5 3.5"/><circle cx="9.5" cy="12.5" r=".8"/><circle cx="14.5" cy="12.5" r=".8"/><path d="M11 15q1 1 2 0"/>`],
+    pin: (a) => [`<circle cx="12" cy="12" r="7.5" ${f(a)}/><path d="M12 7l1.5 3.2 3.5.4-2.6 2.3.7 3.5-3.1-1.8-3.1 1.8.7-3.5-2.6-2.3 3.5-.4z" ${f("#FFFDF6")}/>`, `<circle cx="12" cy="12" r="7.5"/>`],
+    star: (a) => [`<path d="M12 3l2.6 5.6 6 .6-4.5 4 1.3 6-5.4-3.2-5.4 3.2 1.3-6-4.5-4 6-.6z" ${f(a)}/>`, `<path d="M12 3l2.6 5.6 6 .6-4.5 4 1.3 6-5.4-3.2-5.4 3.2 1.3-6-4.5-4 6-.6z"/>`],
+    sock: (a, b = "#FFFDF6") => [`<path d="M8 3h7v10l3 3a3 3 0 0 1-4 4l-6-5z" ${f(a)}/><rect x="8" y="6" width="7" height="2" ${f(b)}/><rect x="8" y="10" width="7" height="2" ${f(b)}/>`, `<path d="M8 3h7v10l3 3a3 3 0 0 1-4 4l-6-5z"/>`],
+    tee: (a) => [`<path d="M8 4l-5 3 2 4 3-1v10h8V10l3 1 2-4-5-3c-1 2-5 2-8 0z" ${f(a)}/>`, `<path d="M8 4l-5 3 2 4 3-1v10h8V10l3 1 2-4-5-3c-1 2-5 2-8 0z"/>`],
+    tote: (a, b = "#E8566C") => [`<rect x="5" y="9" width="14" height="12" rx="1" ${f(a)}/><circle cx="12" cy="15" r="2.5" ${f(b)}/>`, `<rect x="5" y="9" width="14" height="12" rx="1"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/>`],
+    mask: (a) => [`<path d="M3 10c3-2 15-2 18 0 0 4-3 6-6 5-1.5-.5-2-1.5-3-1.5S10.5 14.5 9 15c-3 1-6-1-6-5z" ${f(a)}/>`, `<path d="M3 10c3-2 15-2 18 0 0 4-3 6-6 5-1.5-.5-2-1.5-3-1.5S10.5 14.5 9 15c-3 1-6-1-6-5zM3 10H1M21 10h2"/>`],
+    beanie: (a) => [`<path d="M5 15a7 7 0 0 1 14 0z" ${f(a)}/><rect x="4" y="15" width="16" height="4" rx="1" ${f(a)}/><circle cx="12" cy="6" r="2" ${f("#FFFDF6")}/>`, `<path d="M5 15a7 7 0 0 1 14 0"/><rect x="4" y="15" width="16" height="4" rx="1"/><circle cx="12" cy="6" r="2"/>`],
+    lantern: (a) => [`<ellipse cx="12" cy="13" rx="6" ry="7" ${f(a)}/><rect x="9" y="4.5" width="6" height="2" ${f("#F3C969")}/><rect x="9" y="19.5" width="6" height="2" ${f("#F3C969")}/>`, `<ellipse cx="12" cy="13" rx="6" ry="7"/><path d="M12 2v2.5M12 6v14M9 7c-2 4-2 8 0 12M15 7c2 4 2 8 0 12" opacity=".6"/>`],
+    coconut: (a) => [`<circle cx="12" cy="14" r="7" ${f(a)}/><ellipse cx="12" cy="9" rx="4" ry="1.5" ${f("#FFFDF6")}/>`, `<circle cx="12" cy="14" r="7"/><ellipse cx="12" cy="9" rx="4" ry="1.5"/><path d="M14 9l3-7"/>`]
+  };
+  Object.entries(GOODS).forEach(([id, g]) => { if (I[id] || !g.art) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
 }
 export const icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
 export const iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size/2}" y="${y - size/2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;
