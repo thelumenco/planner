@@ -285,6 +285,13 @@ export const NPCS = [
     intro: "Hola! I'm Mateo. I study food science at the poly, and on Wednesdays, Fridays and Saturdays I keep the bars coming here. The bonbons are all yours, boss.",
     lines: ["Your bonbon shelf is full. I didn't touch a crumb!", "Exams next week. Tempering is very calming.", "My lecturer says I'm the only one who's ground beans by hand.", "The grinder's singing today.", "Forty dark bars on the wall. A personal best.", "I bought beans this morning. Don't worry, I kept to your budget."],
     hellos: ["Morning, boss! Roaster's warm.", "Hi Mel! Smell that?"], away: "Mateo's gone home. The kitchen's quiet."},
+  // Lila, the Cocoa Room's second assistant (cocoa.js upgrade "assistant"): Mondays (Amara's day off) and weekend afternoons
+  {id: "lila", pitch: 1.2, name: "Lila", job: "Serves at the Cocoa Room",
+    look: {skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#C2505F", bottom: "#F3E7C9", extra: "apron"},
+    routine: [slot("10:45", "20:15", "cocoa", [240, 268], {dow: [1], needs: "cc_assistant"}), slot("13:00", "20:15", "cocoa", [[180, 420], [400, 440], [240, 268]], {dow: [0, 6], needs: "cc_assistant"})],
+    intro: "Hi! I'm Lila. Mondays are mine, and I help Amara at weekends. I'm working my way through every bonbon. For research.",
+    lines: ["Mondays are quiet, but the regulars are lovely.", "I wrapped forty boxes on Saturday. My fingers are ribbon now.", "Someone asked if we deliver to the moon.", "The fountain is hypnotic. I keep staring at it."],
+    hellos: ["Hi Mel!", "Morning, boss!"], away: "Lila's not on today."},
   // Noor runs the pet adoption corner at the Sunday farmers market and the field fair (tours.js); no routine otherwise
   {id: "noor", pitch: 1.1, name: "Noor", job: "Finds homes for rescued pets", tourist: true, routine: [],
     look: {skin: "#C99A78", hair: "#2A211D", hairStyle: "long", top: "#9FD3C2", bottom: "#4A5568", extra: "apron"},

@@ -441,7 +441,7 @@ export function furn(kind, x, y){
         `${[[-24, 0, 26], [8, 0, 24], [-8, -26, 20]].map(([dx, dy, w]) => `<path d="M${x+dx-w/2} ${y+dy} q-3 -26 ${w/2} -30 q${w/2} 4 ${w/2} 30z"/>`).join("")}<path d="M${x-30} ${y-14} h12 M${x+2} ${y-12} h12" opacity=".5"/>`);
     case "roaster": return sk(`<rect x="${x-34}" y="${y-30}" width="68" height="30" rx="3" style="fill:#5E5A55"/><circle cx="${x}" cy="${y-52}" r="24" style="fill:#B9B0A4"/><circle cx="${x}" cy="${y-52}" r="14" style="fill:#6B4430"/><rect x="${x+20}" y="${y-90}" width="10" height="30" style="fill:#8A8279"/>`,
         `<rect x="${x-34}" y="${y-30}" width="68" height="30" rx="3"/><circle cx="${x}" cy="${y-52}" r="24"/><circle cx="${x}" cy="${y-52}" r="14"/><path d="M${x-8} ${y-52} h16" opacity=".6"/><rect x="${x+20}" y="${y-90}" width="10" height="30"/>`);
-    case "grinder": return sk(`<rect x="${x-36}" y="${y-28}" width="72" height="28" rx="3" style="fill:#7FA3B8"/><ellipse cx="${x}" cy="${y-38}" rx="32" ry="10" style="fill:#D9DEE3"/><ellipse cx="${x}" cy="${y-40}" rx="24" ry="6" style="fill:#6B4430"/><ellipse cx="${x-8}" cy="${y-44}" rx="8" ry="6" style="fill:#B9B0A4"/><ellipse cx="${x+10}" cy="${y-44}" rx="8" ry="6" style="fill:#B9B0A4"/>`,
+    case "grinder": return grinder2(x, y) + sk(`<rect x="${x-36}" y="${y-28}" width="72" height="28" rx="3" style="fill:#7FA3B8"/><ellipse cx="${x}" cy="${y-38}" rx="32" ry="10" style="fill:#D9DEE3"/><ellipse cx="${x}" cy="${y-40}" rx="24" ry="6" style="fill:#6B4430"/><ellipse cx="${x-8}" cy="${y-44}" rx="8" ry="6" style="fill:#B9B0A4"/><ellipse cx="${x+10}" cy="${y-44}" rx="8" ry="6" style="fill:#B9B0A4"/>`,
         `<rect x="${x-36}" y="${y-28}" width="72" height="28" rx="3"/><ellipse cx="${x}" cy="${y-38}" rx="32" ry="10"/><ellipse cx="${x-8}" cy="${y-44}" rx="8" ry="6"/><ellipse cx="${x+10}" cy="${y-44}" rx="8" ry="6"/>`);
     case "slab": return sk(`<rect x="${x-56}" y="${y-30}" width="112" height="30" rx="3" style="fill:#C9A27E"/><rect x="${x-60}" y="${y-38}" width="120" height="10" rx="2" style="fill:#EDEAE6"/><path d="M${x-30} ${y-34} q20 -6 40 0" style="fill:#4A2E22"/>`,
         `<rect x="${x-56}" y="${y-30}" width="112" height="30" rx="3"/><rect x="${x-60}" y="${y-38}" width="120" height="10" rx="2"/><path d="M${x+22} ${y-42} l14 -10" stroke-width="2"/>`);
@@ -613,6 +613,22 @@ export function furn(kind, x, y){
   }
   return "";
 }
+// the second stone grinder (Cocoa Room upgrade), a little smaller, to the left of the first
+function grinder2(x, y){
+  if (!((((G.cocoa ? G.cocoa() : null) || {}).up || {}).grinder2)) return "";
+  const X = x - 66, Y = y + 4;
+  return sk(`<rect x="${X-26}" y="${Y-22}" width="52" height="22" rx="3" style="fill:#7FA3B8"/><ellipse cx="${X}" cy="${Y-30}" rx="24" ry="8" style="fill:#D9DEE3"/><ellipse cx="${X}" cy="${Y-32}" rx="18" ry="5" style="fill:#4A2E22"/><ellipse cx="${X-6}" cy="${Y-35}" rx="6" ry="4.5" style="fill:#B9B0A4"/><ellipse cx="${X+7}" cy="${Y-35}" rx="6" ry="4.5" style="fill:#B9B0A4"/>`,
+    `<rect x="${X-26}" y="${Y-22}" width="52" height="22" rx="3"/><ellipse cx="${X}" cy="${Y-30}" rx="24" ry="8"/><ellipse cx="${X-6}" cy="${Y-35}" rx="6" ry="4.5"/><ellipse cx="${X+7}" cy="${Y-35}" rx="6" ry="4.5"/>`);
+}
+// the Cocoa Room's counter upgrades: a hot chocolate steamer with mugs (left end), a three-tier chocolate fountain (right)
+function ccCounterUps(x, y){
+  const up = ((G.cocoa ? G.cocoa() : null) || {}).up || {}; let h = "";
+  if (up.hotchoc) h += sk(`<rect x="${x-94}" y="${y-84}" width="20" height="32" rx="3" style="fill:#B9BFC6"/><rect x="${x-90}" y="${y-78}" width="12" height="8" rx="1.5" style="fill:#4A2E22"/><path d="M${x-100} ${y-52} h4 v-7 h-4z M${x-72} ${y-52} h5 v-7 h-5z" style="fill:#FFFDF6"/>`,
+    `<rect x="${x-94}" y="${y-84}" width="20" height="32" rx="3"/><rect x="${x-90}" y="${y-78}" width="12" height="8" rx="1.5"/><path class="smoke" d="M${x-84} ${y-88} q-3 -5 0 -10 M${x-80} ${y-88} q3 -5 0 -10" opacity=".6"/>`);
+  if (up.fountain) h += sk(`<path d="M${x+72} ${y-52} l-8 -4 h40 l-8 4z" style="fill:#B9BFC6"/><path d="M${x+66} ${y-58} q18 6 36 0 v-4 h-36z" style="fill:#6B4430"/><rect x="${x+82}" y="${y-92}" width="4" height="34" style="fill:#B9BFC6"/><path d="M${x+72} ${y-74} q12 5 24 0 v-3 h-24z" style="fill:#6B4430"/><path d="M${x+77} ${y-88} q7 3 14 0 v-2 h-14z" style="fill:#6B4430"/><path d="M${x+78} ${y-74} q-2 6 -4 14 M${x+90} ${y-74} q2 6 4 14" style="stroke:#4A2E22;fill:none" stroke-width="2.4"/>`,
+    `<path d="M${x+66} ${y-58} q18 6 36 0 v-4 h-36z M${x+72} ${y-74} q12 5 24 0 v-3 h-24z M${x+77} ${y-88} q7 3 14 0 v-2 h-14z"/><path d="M${x+84} ${y-92} v34"/>`);
+  return h;
+}
 // Things drawn over the characters, so people can stand behind them (the bank counter)
 export function foreArt(id){
   if (id === "wineshop") { const s = stationsOf("wineshop").find(t => t.kind === "winecounter"); const x = s.x, y = s.y;
@@ -621,7 +637,7 @@ export function foreArt(id){
   if (id === "cocoa") { const s = stationsOf("cocoa").find(t => t.kind === "ccounter"), x = s.x, y = s.y;
     return sk(`<rect x="${x-96}" y="${y-46}" width="192" height="46" rx="4" style="fill:#8A5A3A"/><rect x="${x-100}" y="${y-52}" width="200" height="8" rx="2" style="fill:#F6EEE4"/><path d="M${x-96} ${y-24} h192" style="stroke:#F3E7C9" stroke-width="4"/>
       ${[-70, -40, -10, 20].map((dx, i) => `<rect x="${x+dx}" y="${y-64}" width="22" height="12" rx="2" style="fill:#FFFDF6"/>${[0, 1, 2].map(k => `<circle cx="${x+dx+5 + k*6}" cy="${y-58}" r="2.4" style="fill:${["#4A2E22", "#8A5A3A", "#C2505F", "#F3E7C9"][(i + k) % 4]}"/>`).join("")}`).join("")}<rect x="${x+56}" y="${y-66}" width="26" height="14" rx="2" style="fill:#F3C969"/>`,
-      `<rect x="${x-96}" y="${y-46}" width="192" height="46" rx="4"/><rect x="${x-100}" y="${y-52}" width="200" height="8" rx="2"/>${[-70, -40, -10, 20].map(dx => `<rect x="${x+dx}" y="${y-64}" width="22" height="12" rx="2"/>`).join("")}<rect x="${x+56}" y="${y-66}" width="26" height="14" rx="2"/>`); }
+      `<rect x="${x-96}" y="${y-46}" width="192" height="46" rx="4"/><rect x="${x-100}" y="${y-52}" width="200" height="8" rx="2"/>${[-70, -40, -10, 20].map(dx => `<rect x="${x+dx}" y="${y-64}" width="22" height="12" rx="2"/>`).join("")}<rect x="${x+56}" y="${y-66}" width="26" height="14" rx="2"/>`) + ccCounterUps(x, y); }
   if (id === "scoopshop") { const s = stationsOf("scoopshop").find(t => t.kind === "gcounter"), x = s.x, y = s.y, sc = G.scoop ? G.scoop() : {recipes: [], tubs: {}};
     const rs = sc.recipes || [], tb = sc.tubs || {}, ids = Array.isArray(sc.display) ? sc.display : rs.filter(r => tb[r.id] > 0).map(r => r.id);   // the 8 display slots (scoop.js displayIds)
     const tubs = ids.map(id => rs.find(r => r.id === id)).filter(Boolean).slice(0, 8).map(r => tb[r.id] > 0 ? r : null);

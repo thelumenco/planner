@@ -1152,3 +1152,27 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - They're made at the bonbon table during the festival window, sold beside the case while the festival's on (shown in the case panel), and can be taken to give from the counter (gifts `sp_*` in stall-goods.js).
 - **Tests:** the Cocoa Room block covers each link. `smoke.mjs` also gets back its Scoop upgrades `c0` line, which round 89 removed by mistake.
 - **Still to come, step 4:** the upgrades catalogue, then the night market stall.
+
+### Round 91: The Cocoa Room, step 4 (upgrades and the night market cart)
+- **The catalogue:** "Shop upgrades" on the counter panel (`ccView "ups"`, `upsPanel`, `buyCcUp`, state in `c.up`). There are ten, 4450 coins in all (`CC_UPS`):
+  - **Window display (300):** sales ×1.2. bay.js draws tiered stands and twinkling lights in the window.
+  - **Hot chocolate bar (400):** `hotMinute` sells cups from loose chocolate, 1 piece each, at `prices.hot` (5).
+    - Busier in the evening, on rainy days and in the wet season.
+    - The counter has a price stepper and "Have a hot chocolate" (`haveHot`). The cart sells it too.
+    - A steamer is drawn on the counter (`ccCounterUps` in scenes.js).
+  - **Second grinder (600):** grinder slots `""` and `"2"` (`grind2`/`ground2`), with `slots`, `freeSlot` and `readyPot`.
+    - Mel and Mateo both use free slots; tempering takes whichever pot is ready.
+    - A smaller second grinder is drawn (`grinder2`).
+  - **Gift wrapping (350):** a quarter of bonbon customers buy a boxed 4 (+3 coins). The counter packs a grand box of 16 (`box16`/`box16d`).
+  - **Cacao tree (500):** a free sack every 2 days (`c.treeAt`). Not drawn in the orchard yet.
+  - **Chocolate fountain (450):** a quarter of sales leave a 1-coin tip. Evan reacts on arrival. Drawn on the counter.
+  - **Scoop supply deal (250):** from 9am each day, 10 loose dark pieces become 5 `housechoc` in the Scoop fridge (`c.supplyDay`).
+  - **Weekend workshops (700):** Saturday 2–4, paying 48 coins at 4pm (`sold[day].workshop`). It's also on the village calendar. No class is drawn at the tables yet.
+  - **Second assistant (500):** Lila (npcs.js) works Mondays and weekend afternoons; the shop opens Mondays (`openOn(day, hm, mon)`), sales ×1.1.
+    - Routine `needs` can now name a Cocoa upgrade as `cc_<k>` (npcs.js `routineAt`).
+  - **Night market cart (400):** tours.js NIGHT gets `{id: "mateo", at: 9, kind: "cocoa", needs: "cc_cart"}`.
+    - Stalls with `needs` only stand once core.js `setStallOwned` says so.
+    - `STALL_SPOTS[9]` is [196,520], with a world place `mstall9`. field.js draws `ccCart`/`ccBody`.
+    - `cocoaTick` sells there Tue/Thu 5:30–10, ×1.6 while Mel's at it (`opts.cart`). Its panel is the counter panel with `cart: true` (no plan, upgrades or rename).
+- **Selling** now goes through `sellTo(c, day, out, o)`: bonbons (sometimes boxed), bars or hot chocolate. It's shared by the counter, the cart and the wine club.
+- **Tests:** the Cocoa Room block (39 checks) buys everything and checks each upgrade, Lila on a Monday and the cart on a Tuesday night.

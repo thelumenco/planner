@@ -71,6 +71,7 @@ export const VILLAGE = {
   mstall6:{scene:"field", name:"Stall", door:[396,164], spot:true, line:"A market stall."},
   mstall7:{scene:"field", name:"Stall", door:[456,164], spot:true, line:"A market stall."},
   mstall8:{scene:"field", name:"Scoop Shack cart", door:[306,556], spot:true, line:"The Scoop Shack's cart at the night market."},
+  mstall9:{scene:"field", name:"Cocoa Room cart", door:[196,556], spot:true, line:"The Cocoa Room's chocolate cart at the night market."},
   pitch:  {scene:"field", name:"Football pitch", door:[150,600], spot:true, line:"The football pitch. Kids play here after school."},
   // the foreshore, west of the field and north of the flower farm: the sea along its west side (dolphins, paddleboarders),
   // a boardwalk, a jetty with the paddleboard rack, and two family houses

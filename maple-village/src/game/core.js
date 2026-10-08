@@ -47,13 +47,13 @@ import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, m
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
   pantryPanel, bonbonPanel, casePanel, stockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
-  sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial } from "./cocoa.js";
+  sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, haveHot, packGrand, readyPot, ccUp } from "./cocoa.js";
 import { keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, OWNER_NAME, PETS, petAt } from "./companions.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
 import { diningTable, darrenAsleep, skyWash } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
-import { tourNow, eventNow, eventOn, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers } from "./tours.js";
+import { tourNow, eventNow, eventOn, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
@@ -1002,7 +1002,8 @@ function villageCalendar(){
   const days = [];
   for (let i = 0; i < CAL_DAYS; i++) {
     const k = addD(today, i), ev = eventOn(k), dn = dinnerOn(k), list = [];
-    if (ev) list.push(`${ev.name}, ${hhmm(ev.from)} to ${hhmm(ev.to)} on the field${ev.kind === "market" ? " (our wine stall's there)" : ev.kind === "night" ? ` (with a jazz duo, and the cart from ${scoopState(F).name})` : ""}`);
+    if (ev) list.push(`${ev.name}, ${hhmm(ev.from)} to ${hhmm(ev.to)} on the field${ev.kind === "market" ? " (our wine stall's there)" : ev.kind === "night" ? ` (with a jazz duo, and the cart from ${scoopState(F).name}${F.cocoa && F.cocoa.up && F.cocoa.up.cart ? ` and ${cocoaState(F).name}'s` : ""})` : ""}`);
+    if (F.cocoa && F.cocoa.up && F.cocoa.up.workshop && new Date(k + "T00:00:00Z").getUTCDay() === 6) list.push(`Bonbon workshop at ${cocoaState(F).name}, 2 to 4pm`);
     if (owns(F, "cellar") && wineClubOn(k)) list.push(`Wine club at the cellar door, 6 to 9pm`);
     if (dn) list.push(`Family dinner at ${HOST_NAME[dn.host]}, 6:30pm`);
     fests.filter(x => x.k === k).forEach(x => list.push(`${x.f.name}!`));
@@ -1487,9 +1488,9 @@ function ctx(){
     : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, {pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt}) : scView === "counter" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), server: isHere("sofia")}) : scView === "menu" ? scMenuPanel(F)
     : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, {swap: scSt.swap});
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
-  else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : marketStallPanel(st); }
+  else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "cocoa" ? ccCounterPanel(F, {cart: true, server: isHere("mateo")}) : marketStallPanel(st); }
   else if (orView === "pot" && potItem) h = potPanel(F, potItem);
-  else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara"), hand: isHere("mateo")}) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccKitchenPanel(F, ccView);
+  else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara"), hand: isHere("mateo")}) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccView === "ups" ? ccUpsPanel(F) : ccKitchenPanel(F, ccView);
   else if (keepItem && F.inv[keepItem]) h = keepPanel(F, keepItem);
   else if (keepSpot) h = placedPanel(F, keepSpot);
   else if (adoptItem && F.inv[adoptItem]) h = adoptPanel(F, adoptItem, adoptSt);
@@ -1609,7 +1610,7 @@ function ctx(){
     [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("sparkle", mel.x + (k - 1)*24, mel.y - 60, 1800), d)); speak(line, 7000); if (b.dataset.goal === "scooter" || b.dataset.goal === "car") goalView = "garagepick"; else goalView = null; save(true); drawScene(); ctx(); });
   if (scView || (fieldView === "mstall8" && scene === "field")) wireScoop(c);
   wireCompanions(c);
-  if (ccView) wireCocoa(c);
+  if (ccView || (fieldView === "mstall9" && scene === "field")) wireCocoa(c);
   c.querySelectorAll("[data-sup]").forEach(b => b.onclick = () => { goalView = null; ctx(); if (b.dataset.sup === "play") familyPaddle(); else paddleTo(b.dataset.sup); });
   c.querySelectorAll("[data-ride]").forEach(b => b.onclick = () => { F.ride = b.dataset.ride; sfx("paper", true); speak(F.ride === "car" ? "Keys in hand. You'll drive between screens." : F.ride === "scooter" ? "Helmet on. Scooter it is." : "On foot today. Nice and slow.", 3500); save(); ctx(); });
   if (orView || (fieldView && scene === "field" && (stallAt(dayKey(), sgHM(), +fieldView.slice(-1)) || {}).kind === "orchard")) wireOrchard(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, today: dayKey(), where: orAt && orAt.where, i: orAt && orAt.i, item: potItem,
@@ -1955,6 +1956,7 @@ function setScene(id, at){
     if (id === "orchard" || id === "flowers") orchardArrive(id);
     { const m = sgHM(); if (owns(F, "cellar") && wineClubOn(dayKey()) && m >= 12*60 && m < 21*60 && S.clubSaid !== dayKey() && id !== "cellar") { S.clubSaid = dayKey();
       setTimeout(() => speak(m < 18*60 ? "Wine club tonight at the cellar door, 6pm! Eight members are coming to taste and buy." : "The wine club's on at the cellar door right now! Pop in and host.", 6000), 2800); } }
+    if (id === "cocoa" && evanHere() && ccUp(cocoaState(F), "fountain")) setTimeout(() => evanSays(pick(["THE FOUNTAIN!! Can I put my hand in? Just one finger?", "Mama, it's a chocolate waterfall!", "Can we dip a strawberry? Pleeease?"])), 1400);
     if (id === "cellar" && wineClubNow(dayKey(), sgHM())) setTimeout(() => speak("The wine club's here! Glasses clinking, everyone talking at once. Tap the tasting bar to host.", 5000), 1200);
     if (id === "marcus" && evanHere()) setTimeout(() => { evanSays(pick(["Uncle Marcus! Can I play Mario?", "Can we watch Spiderman? Pleeease?", "Game! Game! Can I play the game?"])); if (isHere("marcus")) setTimeout(() => npcSay("marcus", "Ha! Ask your mum, little man. Zeh? One level?"), 2200); }, 1500);
     if (id === "wineshop" && isHere("marcus") && isHere("angelina") && sgHM() >= 19*60 + 30 && S.dateSaid !== dayKey()) { S.dateSaid = dayKey(); setTimeout(() => speak("Marcus and Angellina are on a date night at the middle table. Act natural.", 5000), 1600); }
@@ -2089,6 +2091,7 @@ function arriveVillageSpot(id){
   if (/^mstall\d$/.test(id)) { const st = stallAt(dayKey(), sgHM(), +id.slice(-1)); if (!st) { speak(eventNow(dayKey(), sgHM()) ? "Nobody's set up a stall there today." : "The stalls are packed away till the next market.", 3500); render(); return; }
     fieldView = id; orTab = null; sfx("paper", true); if (st.kind === "wine") { vineTick(); speak("Behind the stall. Shoppers stop by more while you serve.", 3500); }
     else if (st.kind === "scoop") { scSt.pick = null; scoopNow(); speak("Behind the cart. More people stop for a scoop while you're serving.", 3500); if (isHere("tomo") && !keeperAway(st, dayKey(), sgHM())) setTimeout(() => npcSay("tomo", pick(["Night market crowd loves the gelato. Look at that queue.", "Cones are flying. Grab a scoop, boss.", "The jazz makes people hungry. Good for us."])), 1200); }
+    else if (st.kind === "cocoa") { cocoaNow(); speak("Behind the chocolate cart. More people stop while you're serving.", 3500); if (isHere("mateo") && !keeperAway(st, dayKey(), sgHM())) setTimeout(() => npcSay("mateo", pick(["Night market people LOVE hot chocolate.", "Better than studying, boss.", "The jazz duo bought six bars. Six!"])), 1200); }
     else if (st.kind === "orchard") { orchardTick(); if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma brought plenty.", "Everybody wants Ma Ma's fruit today.", "For you, free. For them, they pay!"])); }
     else if (isHere(st.id) && !keeperAway(st, dayKey(), sgHM())) npcSay(st.id, st.line);
     else speak("Nobody's minding this one just now. It's an honesty tin: pop your coins in.", 3500); render(); return; }
@@ -2236,12 +2239,15 @@ function deliver(w){
 // The Cocoa Room: beans to bars in the kitchen, bars off the wall at the counter; ticks along like the Scoop Shack
 function cocoaNow(){
   if (!owns(F, "cocoa")) return; lastCocoa = Date.now();
-  const out = cocoaTick(F, {serving: scene === "cocoa" && atSpot === "ccounter"});
+  const out = cocoaTick(F, {serving: scene === "cocoa" && atSpot === "ccounter", cart: scene === "field" && atSpot === "mstall9"});
+  if (out.cart && scene === "field") { sfx("coin"); flash(`+${out.cart} coins: the ${cocoaState(F).name} cart`); }
+  if (out.workshop) setTimeout(() => speak(`The Saturday workshop's done: six happy bonbon makers, ${out.workshop} coins.`, 5000), 1500);
+  if (out.tree && COCOA_IN.includes(scene)) speak("Ma Ma's sent a sack of beans from the cacao tree. They're with the others in the kitchen.", 4500);
   if (out.coins && (scene === "cocoa" || scene === "bay")) { sfx("coin"); flash(`+${out.coins} coins: ${cocoaState(F).name}`); }
   else if (out.coins && out.mins >= 30) setTimeout(() => speak(`While you were away, ${cocoaState(F).name} sold ${out.n} bar${out.n > 1 ? "s" : ""}: ${out.coins} coins.`, 5000), 2500);
   const hd = out.hand; if (hd && (hd.pots || hd.bars) && out.mins >= 30) setTimeout(() => speak(`Mateo's been busy: ${hd.pots} pot${hd.pots === 1 ? "" : "s"} tempered${hd.res ? `, ${hd.res} pieces onto the bonbon shelf` : ""}${hd.bars ? `, ${hd.bars} bars on the wall` : ""}${hd.sacks ? `, ${hd.sacks} sack${hd.sacks === 1 ? "" : "s"} of beans bought (${hd.spent} coins)` : ""}.`, 6000), out.coins ? 8000 : 2500);
   else if (hd && hd.pots && COCOA_IN.includes(scene) && isHere("mateo")) npcSay("mateo", hd.res ? "Another pot tempered. Some on your bonbon shelf!" : "Pot tempered. More bars for the wall.");
-  if (out.done === "grind" && cocoaState(F).ground && COCOA_IN.includes(scene)) speak("Ding! The grinder's done: a pot of chocolate, ready to temper on the marble slab.", 4500);
+  if (out.done === "grind" && readyPot(cocoaState(F)) !== undefined && COCOA_IN.includes(scene)) speak("Ding! The grinder's done: a pot of chocolate, ready to temper on the marble slab.", 4500);
   if (out.coins || out.done || out.mins >= 5) save(); if (ccView) ctx(); if (COCOA_IN.includes(scene)) drawScene();
 }
 function wireCocoa(c){
@@ -2256,6 +2262,11 @@ function wireCocoa(c){
     else if (a === "keep") { const s = cocoaState(F); s.keep[k] = Math.max(0, Math.min(120, s.keep[k] + n*6)); }
     else if (a === "plan") { const p = cocoaState(F).plan; if (k === "on" || k === "buy") p[k] = !p[k]; else if (k === "floor") p.floor = Math.max(0, Math.min(5000, p.floor + n*50)); else if (k === "hold") p.hold = Math.max(0, Math.min(20, p.hold + n)); sfx("tap");
       if (k === "on") speak(p.on ? "Mateo's back on the bar line." : "Mateo's taking a break from the bar line. The kitchen's all yours.", 3500); }
+    else if (a === "ups" || a === "counter") { ccView = a; }
+    else if (a === "buyup") { const line = buyCcUp(F, k); if (!line) return; sfx("coin"); act("cheer"); gainXp(2); speak(line, 5000); if (k === "cart") render(); }
+    else if (a === "hprice") { const s = cocoaState(F); s.prices.hot = Math.max(1, Math.min(20, s.prices.hot + n)); }
+    else if (a === "hot") { const kk = haveHot(F); if (!kk) return; sfx("chime"); mprop("heart", mel.x, mel.y - 60, 1600); speak(pick(["Hot chocolate, from your own chocolate. Pure comfort.", "Mmm. Thick, rich, a little bit of foam.", "The perfect rainy-day cup."]), 4000); if (evanHere()) setTimeout(() => evanSays(pick(["Can I have one too? With marshmallows?", "Mama, you have a chocolate moustache!"])), 900); }
+    else if (a === "grand") { const id = packGrand(F); if (!id) return; sfx("paper", true); flash(`${ITEMS[id].n} in your backpack`); }
     else if (a === "bprice") { const s = cocoaState(F); s.prices.bonbon = Math.max(1, Math.min(20, s.prices.bonbon + n)); }
     else if (a === "fill") { const got = stockPantry(F, k, n, b.dataset.src, orchState(F)); if (got) { sfx("tap"); flash(`+${got} on the fillings shelf`); } }
     else if (a === "shell") { ccSt.shell = k; ccSt.made = null; }
@@ -2929,6 +2940,7 @@ initHestia({sfx, alarm, speak, flash, undoable, earn: (n, why) => { earn(n, why)
   refund: (n, why) => { F.coins = Math.max(0, F.coins - n); S.earned = Math.max(0, (S.earned || 0) - n); flash(`-${n} coin: ${why}`); save(); }});
 $("hestiaFile").onchange = e => { const f = e.target.files && e.target.files[0]; if (!f) return; const r = new FileReader();
   r.onload = () => { const msg = importHestia(String(r.result)); $("hestiaNote").textContent = msg; speak(/^Imported/.test(msg) ? "Hestia's lists are in the house now!" : msg, 4500); }; r.readAsText(f); e.target.value = ""; };
+setStallOwned(() => ({cc_cart: !!(F.cocoa && F.cocoa.up && F.cocoa.up.cart)}));   // the Cocoa Room's night market cart stands once it's bought
 initNpcs({sfx, quiet: () => quietNow(), chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, sup: () => sup, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();

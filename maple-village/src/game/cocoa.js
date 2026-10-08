@@ -22,20 +22,52 @@
 //                plus 4 bonbons from the case (gift "pairbox"); on wine club nights members buy chocolates too
 //   festivals    around Christmas, Chinese New Year, Deepavali and Mid-Autumn the bonbon table makes that festival's
 //                special (12 pieces of chocolate), sold beside the case while the festival's on, or to give
+// Upgrades (step 4, CC_UPS, bought from the catalogue at the counter; c.up): a window display (busier), a hot chocolate
+// bar (hot chocolate from the loose chocolate, best in the evening and on rainy days), a second grinder (two pots at
+// once: slots grind/ground and grind2/ground2), gift wrapping (customers buy gift boxes; a grand box of 16), a cacao
+// tree at Ma Ma's (a free sack every two days), a chocolate fountain (tips; Evan loves it), a supply deal (10 dark
+// pieces to the Scoop Shack's fridge each morning), weekend workshops (Saturday 2 to 4: a class pays 48 coins), a
+// second assistant (Lila: open Mondays too, a little busier) and a night market cart (Mateo, Tuesday and Thursday
+// evenings, at stall place 9 on the field: tours.js NIGHT, shown once it's bought).
 // The shop is open 11am to 8pm, Tuesday to Sunday. Amara serves at the counter; customers buy bars off the wall (more
 // often while Mel's serving too). Takings go straight to Mel. Mel can have a bar or take one to give.
 import { esc, dayKey, sgHM, hash } from "../util.js";
 import { icon } from "../art/icons.js";
 import { INGR, farmShelf, scoopState, hasUp } from "./scoop.js";
 import { wineClubNow } from "./tours.js";
-import { festivalOn } from "../art/village-extras.js";
+import { festivalOn, rainyOn } from "../art/village-extras.js";
 
 export const OPEN = 11*60, CLOSE = 20*60, ROAST_MIN = 10, GRIND_MIN = 120, POT = 30, MOULD = 10, SACK = 10;
 export const KINDS = {milk: {n: "Milk chocolate", col: "#8A5A3A"}, dark: {n: "Dark chocolate", col: "#4A2E22"}, white: {n: "White chocolate", col: "#F3E7C9"}};
 export const BAR_ID = k => "bar_" + k;
 export const HAND = {3: [14*60, 18*60], 5: [14*60, 18*60], 6: [10*60, 17*60]}, WALL = 40;   // Mateo's shifts by weekday; he stops moulding a kind at 40 bars on the wall
 const now = () => Date.now() + (globalThis.__mapleOffset || 0);
-export const openOn = (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() !== 1 && hm >= OPEN && hm < CLOSE;
+export const openOn = (day, hm, mon) => (mon || new Date(day + "T00:00:00Z").getUTCDay() !== 1) && hm >= OPEN && hm < CLOSE;
+export const CC_UPS = {
+  window: {n: "Window display", price: 300, line: "A proper window: tiered stands of bonbons, a chocolate sculpture, little lights. More passers-by come in (about a fifth busier)."},
+  hotchoc: {n: "Hot chocolate bar", price: 400, line: "A steamer on the counter and a row of mugs. Hot chocolate from your own chocolate, 1 piece a cup; best in the evenings and on rainy days."},
+  grinder2: {n: "Second grinder", price: 600, line: "Another stone grinder beside the first, so two pots can grind at once."},
+  wrap: {n: "Gift wrapping station", price: 350, line: "Ribbons, tissue and boxes. Customers buy bonbons in gift boxes (a little extra each time), and you can pack a grand box of 16."},
+  tree: {n: "Cacao tree at Ma Ma's", price: 500, line: "A cacao tree in Ma Ma's orchard. She looks after it, and a free sack of beans turns up in the kitchen every two days."},
+  fountain: {n: "Chocolate fountain", price: 450, line: "A three-tier fountain on the end of the counter. Customers linger and leave tips. Evan will want to live here."},
+  supply: {n: "Supply deal with the Scoop Shack", price: 250, line: "Every morning, 10 pieces of loose dark chocolate go to the Scoop Shack's gelato fridge on their own (when there are 10 spare)."},
+  workshop: {n: "Weekend workshops", price: 700, line: "Saturday afternoons, 2 to 4: a class of six makes their own bonbons at the tables, and pays 8 coins each."},
+  assistant: {n: "Second assistant", price: 500, line: "Lila joins the team. The shop opens on Mondays too, and it's a little busier with two behind the counter."},
+  cart: {n: "Night market cart", price: 400, line: "A little chocolate cart for the Tuesday and Thursday night markets. Mateo runs it (evenings suit a student), selling bars, bonbons and hot chocolate."}
+};
+export const ccUp = (c, k) => !!(c.up && c.up[k]);
+export function buyCcUp(F, k){
+  const c = cocoaState(F), u = CC_UPS[k]; if (!u || c.up[k] || F.coins < u.price) return null;
+  F.coins -= u.price; c.up[k] = Date.now(); if (k === "tree") c.treeAt = now();
+  return {window: "The new window's in: tiered stands, little lights, and a chocolate sculpture of the bay.", hotchoc: "The hot chocolate bar's on the counter, mugs and all. Set its price at the counter.",
+    grinder2: "A second stone grinder, rumbling away beside the first.", wrap: "The wrapping station's set up: ribbons, tissue, boxes in every size.",
+    tree: "A cacao tree in Ma Ma's orchard! She says she'll talk to it every morning.", fountain: "The chocolate fountain's flowing. Evan is going to lose his mind.",
+    supply: "Done: the Scoop Shack gets 10 pieces of your dark chocolate every morning, when there's enough spare.", workshop: "Weekend workshops are on: Saturdays, 2 to 4, at the tables.",
+    assistant: "Lila starts Monday! The shop's open seven days now.", cart: "The chocolate cart's ready for the night market. Mateo's thrilled."}[k];
+}
+export const cartOn = (day, hm) => { const d = new Date(day + "T00:00:00Z").getUTCDay(); return (d === 2 || d === 4) && hm >= 17*60 + 30 && hm < 22*60; };
+export const workshopOn = (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() === 6 && hm >= 14*60 && hm < 16*60;
+export const WORKSHOP = 6, WORKSHOP_FEE = 8, TREE_EVERY = 2*864e5, BOX16 = 16;
 
 export function cocoaState(F){
   F.cocoa = F.cocoa || {};
@@ -45,7 +77,8 @@ export function cocoaState(F){
   c.prices = Object.assign({bar: 6, bonbon: 3}, c.prices || {}); c.sold = c.sold || {}; c.made = c.made || 0;
   c.pantry = c.pantry || {}; c.bonbons = c.bonbons || []; c.trays = c.trays || {};
   c.res = Object.assign({milk: 0, dark: 0, white: 0}, c.res || {}); c.keep = Object.assign({milk: 30, dark: 30, white: 0}, c.keep || {});
-  c.plan = Object.assign({on: true, buy: true, floor: 200, hold: 0}, c.plan || {}); c.specials = c.specials || {};
+  c.plan = Object.assign({on: true, buy: true, floor: 200, hold: 0}, c.plan || {}); c.specials = c.specials || {}; c.up = c.up || {};
+  c.prices.hot = c.prices.hot || 5;
   return c;
 }
 const left = t => { const m = Math.max(0, Math.ceil((t - now())/60000)); return m >= 60 ? `${Math.floor(m/60)}h ${m % 60}m` : `${m} min`; };
@@ -53,16 +86,20 @@ const left = t => { const m = Math.max(0, Math.ceil((t - now())/60000)); return 
 /* ---------- making ---------- */
 export function buyBeans(F, n = 1){ const c = cocoaState(F), cost = SACK*n; if (F.coins < cost) return false; F.coins -= cost; c.beans += n; return true; }
 export function startRoast(F){ const c = cocoaState(F); if (c.roast || c.beans < 1) return false; c.beans--; c.roast = {done: now() + ROAST_MIN*60000}; return true; }
-export function startGrind(F, kind){ const c = cocoaState(F); if (c.grind || c.ground || c.roasted < 1 || !KINDS[kind]) return false; c.roasted--; c.grind = {kind, done: now() + GRIND_MIN*60000}; return true; }
+// the grinders: slot "" always, slot "2" with the second grinder; a slot is free when nothing's grinding or waiting in it
+export const slots = c => ccUp(c, "grinder2") ? ["", "2"] : [""];
+export const freeSlot = c => slots(c).find(g => !c["grind" + g] && !c["ground" + g]);
+export const readyPot = c => ["", "2"].find(g => c["ground" + g]);
+export function startGrind(F, kind){ const c = cocoaState(F), g = freeSlot(c); if (g === undefined || c.roasted < 1 || !KINDS[kind]) return false; c.roasted--; c["grind" + g] = {kind, done: now() + GRIND_MIN*60000}; return true; }
 // a tempered pot: the bonbon shelf first, up to its target; the rest is loose chocolate for bars
 function pour(c, k){ const r = Math.max(0, Math.min(POT, c.keep[k] - c.res[k])); c.res[k] += r; c.choc[k] += POT - r; return r; }
-export function temper(F){ const c = cocoaState(F); if (!c.ground) return null; const k = c.ground; c.choc[k] += POT; c.ground = null; return k; }   // Mel's own pots: loose, for bars or bonbons
+export function temper(F){ const c = cocoaState(F), g = readyPot(c); if (g === undefined) return null; const k = c["ground" + g]; c.choc[k] += POT; c["ground" + g] = null; return k; }   // Mel's own pots: loose, for bars or bonbons
 export function mould(F, kind){ const c = cocoaState(F); if (!KINDS[kind] || c.choc[kind] < MOULD) return false; c.choc[kind] -= MOULD; c.bars[kind] += MOULD; c.made += MOULD; return true; }
 // the timers finishing: roasted beans out of the roaster, a pot out of the grinder (waiting to be tempered)
 function finish(c, t = now()){
   let out = null;
   if (c.roast && t >= c.roast.done) { c.roasted++; c.roast = null; out = "roast"; }
-  if (c.grind && t >= c.grind.done && !c.ground) { c.ground = c.grind.kind; c.grind = null; out = out || "grind"; }
+  for (const g of ["", "2"]) if (c["grind" + g] && t >= c["grind" + g].done && !c["ground" + g]) { c["ground" + g] = c["grind" + g].kind; c["grind" + g] = null; out = out || "grind"; }
   return out;
 }
 
@@ -170,15 +207,16 @@ export function eatBonbon(F, id){ const c = cocoaState(F), b = recipeOf(c, id); 
 export const handOn = (day, hm) => { const w = HAND[new Date(day + "T00:00:00Z").getUTCDay()]; return !!w && hm >= w[0] && hm < w[1]; };
 // which pot to grind next: the bonbon shelf's biggest gap, else whichever bar is lowest on the wall
 export function nextKind(c){
-  const gap = Object.keys(KINDS).map(k => [k, c.keep[k] - c.res[k] - (c.ground === k ? POT : 0)]).filter(([, g]) => g > 0).sort((a, b) => b[1] - a[1]);
+  const coming = k => ["", "2"].reduce((n, g) => n + (c["ground" + g] === k || (c["grind" + g] && c["grind" + g].kind === k) ? POT : 0), 0);
+  const gap = Object.keys(KINDS).map(k => [k, c.keep[k] - c.res[k] - coming(k)]).filter(([, g]) => g > 0).sort((a, b) => b[1] - a[1]);
   if (gap.length) return gap[0][0];
   return Object.keys(KINDS).sort((a, b) => (c.bars[a] + c.choc[a]) - (c.bars[b] + c.choc[b]))[0];
 }
 // one minute of Mateo's shift at time t: temper a finished pot, start a grind, roast (buying a sack if he may), mould
 function handStep(F, c, t, out){
   const h = out.hand;
-  if (c.ground) { const k = c.ground; h.res += pour(c, k); c.ground = null; h.pots++; }
-  if (!c.grind && !c.ground && c.roasted > 0) { c.roasted--; c.grind = {kind: nextKind(c), done: t + GRIND_MIN*60000, by: "hand"}; }
+  for (const g of ["", "2"]) if (c["ground" + g]) { const k = c["ground" + g]; h.res += pour(c, k); c["ground" + g] = null; h.pots++; }
+  let g; while (c.roasted > 0 && (g = freeSlot(c)) !== undefined) { const kind = nextKind(c); c.roasted--; c["grind" + g] = {kind, done: t + GRIND_MIN*60000, by: "hand"}; }
   if (!c.roast && c.roasted < 1) {
     if (c.beans <= c.plan.hold && c.plan.buy && F.coins - SACK >= c.plan.floor) { F.coins -= SACK; c.beans++; c.bought = (c.bought || 0) + 1; h.sacks++; h.spent += SACK; }
     if (c.beans > c.plan.hold) { c.beans--; c.roast = {done: t + ROAST_MIN*60000, by: "hand"}; }
@@ -194,28 +232,52 @@ export function cocoaTick(F, opts = {}){
     const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     out.mins++; out.done = finish(c, at) || out.done;
     if (c.plan.on && opts.hand !== false && handOn(day, hm)) handStep(F, c, at, out);
+    if (ccUp(c, "tree") && at - (c.treeAt || at) >= TREE_EVERY) { c.treeAt = at; c.beans++; out.tree = (out.tree || 0) + 1; }
+    if (ccUp(c, "supply") && hm >= 9*60 && c.supplyDay !== day && c.choc.dark >= SEND) { c.supplyDay = day; c.choc.dark -= SEND; const sc = scoopState(F); sc.fridge.housechoc = (sc.fridge.housechoc || 0) + TO_FRIDGE; out.supply = (out.supply || 0) + TO_FRIDGE; }
+    if (ccUp(c, "workshop") && hm === 16*60 && new Date(day + "T00:00:00Z").getUTCDay() === 6 && c.workDay !== day) { c.workDay = day; const fee = WORKSHOP*WORKSHOP_FEE, s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0}; s.workshop = fee; s.coins += fee; out.coins += fee; out.workshop = fee; }
+    if (ccUp(c, "cart") && cartOn(day, hm) && Math.random() < .03*(opts.cart ? 1.6 : 1)) { const r = sellTo(c, day, out, {hot: true}); if (r) { const s = c.sold[day]; s.cart = (s.cart || 0) + 1; out.cart = (out.cart || 0) + r; } }
     if (F.goals && F.goals.cellar && wineClubNow(day, hm) && Math.random() < .04) {   // wine club night: members pick up chocolates at the cellar door
       const shown = onDisplay(c), k = Object.keys(KINDS).find(x => c.bars[x] > 0), s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0};
-      if (shown.length) { const b = shown[Math.floor(Math.random()*shown.length)], n = Math.min(c.trays[b.id], 2 + Math.floor(Math.random()*3)); c.trays[b.id] -= n; s.bonbons = (s.bonbons || 0) + n; s.coins += n*c.prices.bonbon; out.coins += n*c.prices.bonbon; out.bonbons = (out.bonbons || 0) + n; s.club = (s.club || 0) + 1; out.club = (out.club || 0) + 1; }
-      else if (k) { c.bars[k]--; s.n++; s.coins += c.prices.bar; out.coins += c.prices.bar; out.n++; s.club = (s.club || 0) + 1; out.club = (out.club || 0) + 1; }
+      if (shown.length || k) { sellTo(c, day, out, {}); s.club = (s.club || 0) + 1; out.club = (out.club || 0) + 1; }
     }
-    if (!openOn(day, hm)) continue;
+    if (!openOn(day, hm, ccUp(c, "assistant"))) continue;
+    if (ccUp(c, "hotchoc") && hotMinute(c, day, hm, opts, out)) continue;
     const sp = specialOn(day);
     if (sp && c.specials[sp.id] > 0 && Math.random() < .012*(new Date(day + "T00:00:00Z").getUTCDay() % 6 === 0 ? 1.4 : 1)) {   // the festival special, beside the case
       const s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0}; c.specials[sp.id]--; s.specials = (s.specials || 0) + 1; s.coins += sp.price; out.coins += sp.price; out.specials = (out.specials || 0) + 1; }
     const stocked = Object.keys(KINDS).filter(k => c.bars[k] > 0), shown = onDisplay(c); if (!stocked.length && !shown.length) continue;
     const d = sg.getUTCDay(), we = d === 0 || d === 6, pf = Math.pow(6/Math.max(2, c.prices.bar), 1.3);
-    if (Math.random() >= .03*(we ? 1.4 : 1)*(hm >= 15*60 && hm < 18*60 ? 1.2 : 1)*(opts.serving ? 1.5 : 1)*pf) continue;
-    const s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0};
-    if (shown.length && (!stocked.length || Math.random() < .5)) {   // a few bonbons from the display case
-      const b = shown[Math.floor(Math.random()*shown.length)], n = Math.min(c.trays[b.id], 2 + Math.floor(Math.random()*3)), coins = n*c.prices.bonbon;
-      c.trays[b.id] -= n; s.bonbons = (s.bonbons || 0) + n; s.coins += coins; out.coins += coins; out.bonbons = (out.bonbons || 0) + n; continue; }
-    const k = stocked[Math.floor(Math.random()*stocked.length)], n = Math.min(c.bars[k], Math.random() < .3 ? 2 : 1);
-    c.bars[k] -= n; const coins = n*c.prices.bar; s.n += n; s.coins += coins; out.coins += coins; out.n += n;
+    const busy = (ccUp(c, "window") ? 1.2 : 1)*(ccUp(c, "assistant") ? 1.1 : 1);
+    if (Math.random() >= .03*(we ? 1.4 : 1)*(hm >= 15*60 && hm < 18*60 ? 1.2 : 1)*(opts.serving ? 1.5 : 1)*pf*busy) continue;
+    const got = sellTo(c, day, out, {box: ccUp(c, "wrap")});
+    if (got && ccUp(c, "fountain") && Math.random() < .25) { c.sold[day].coins++; c.sold[day].tips = (c.sold[day].tips || 0) + 1; out.coins++; }   // lingering by the fountain
   }
   out.done = finish(c) || out.done; c.at = from + out.mins*60000; if (out.coins) F.coins += out.coins;
   return out;
 }
+// one customer: a few bonbons from the case (sometimes boxed, with gift wrapping), or a bar or two, or (at the cart) a
+// hot chocolate. -> the coins
+function sellTo(c, day, out, o){
+  const stocked = Object.keys(KINDS).filter(k => c.bars[k] > 0), shown = onDisplay(c), s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0};
+  if (o.hot && ccUp(c, "hotchoc") && Math.random() < .3) { const k = ["milk", "dark", "white"].find(x => c.choc[x] > 0); if (k) { c.choc[k]--; s.hot = (s.hot || 0) + 1; s.coins += c.prices.hot; out.coins += c.prices.hot; out.hot = (out.hot || 0) + 1; return c.prices.hot; } }
+  if (shown.length && (!stocked.length || Math.random() < .5)) {
+    const boxed = o.box && Math.random() < .25, b = shown[Math.floor(Math.random()*shown.length)], n = Math.min(c.trays[b.id], boxed ? 4 : 2 + Math.floor(Math.random()*3)), coins = n*c.prices.bonbon + (boxed ? 3 : 0);
+    c.trays[b.id] -= n; s.bonbons = (s.bonbons || 0) + n; if (boxed) s.boxes = (s.boxes || 0) + 1; s.coins += coins; out.coins += coins; out.bonbons = (out.bonbons || 0) + n; return coins; }
+  if (!stocked.length) return 0;
+  const k = stocked[Math.floor(Math.random()*stocked.length)], n = Math.min(c.bars[k], Math.random() < .3 ? 2 : 1), coins = n*c.prices.bar;
+  c.bars[k] -= n; s.n += n; s.coins += coins; out.coins += coins; out.n += n; return coins;
+}
+// the hot chocolate bar: a cup from the loose chocolate (milk first), busier in the evening, on rainy days and in the
+// wet season -> true if one sold this minute
+function hotMinute(c, day, hm, opts, out){
+  const k = ["milk", "dark", "white"].find(x => c.choc[x] > 0); if (!k) return false;
+  const p = .015*(hm >= 17*60 ? 1.6 : 1)*(rainyOn(day) ? 1.6 : 1)*([11, 12, 1].includes(+day.slice(5, 7)) ? 1.2 : 1)*(opts.serving ? 1.3 : 1)*Math.pow(5/Math.max(2, c.prices.hot), 1.2);
+  if (Math.random() >= p) return false;
+  const s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0}; c.choc[k]--; s.hot = (s.hot || 0) + 1; s.coins += c.prices.hot; out.coins += c.prices.hot; out.hot = (out.hot || 0) + 1; return true;
+}
+export function haveHot(F){ const c = cocoaState(F), k = ["milk", "dark", "white"].find(x => c.choc[x] > 0); if (!ccUp(c, "hotchoc") || !k) return null; c.choc[k]--; return k; }
+// a grand box of 16 (gift wrapping station): from the case like the others
+export function packGrand(F){ const c = cocoaState(F); if (!ccUp(c, "wrap") || caseCount(c) < BOX16) return null; const id = pick(c, BOX16) ? "box16d" : "box16"; F.inv[id] = (F.inv[id] || 0) + 1; return id; }
 // a bar for Mel: eaten now, or into the backpack to give (a gift item, bar_<kind>)
 export function takeBar(F, kind, give){ const c = cocoaState(F); if (!(c.bars[kind] > 0)) return false; c.bars[kind]--; if (give) F.inv[BAR_ID(kind)] = (F.inv[BAR_ID(kind)] || 0) + 1; return true; }
 
@@ -224,11 +286,13 @@ const coin = () => icon("coin", 13), shut = `<div class="actions"><button class=
 const dot = c => `<span class="gdot" style="background:${c}"></span>`;
 export function counterPanel(F, st){
   const c = cocoaState(F), day = dayKey(), hm = sgHM(), t = c.sold[day] || {n: 0, coins: 0};
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${openOn(day, hm) ? "Open till 8pm." : "Closed: open 11am to 8pm, Tuesday to Sunday."} ${t.n || t.bonbons ? `Sold today: ${t.n} bar${t.n === 1 ? "" : "s"}${t.bonbons ? ` and ${t.bonbons} bonbon${t.bonbons === 1 ? "" : "s"}` : ""} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Amara's behind the counter." : ""}</p>`;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${st.cart ? "The night market cart. " : ""}${openOn(day, hm, ccUp(c, "assistant")) ? "Open till 8pm." : `Closed: open 11am to 8pm, ${ccUp(c, "assistant") ? "every day" : "Tuesday to Sunday"}.`} ${t.n || t.bonbons ? `Sold today: ${t.n} bar${t.n === 1 ? "" : "s"}${t.bonbons ? ` and ${t.bonbons} bonbon${t.bonbons === 1 ? "" : "s"}` : ""} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Amara's behind the counter." : ""}</p>`;
   h += `<ul class="hlist wlist">${Object.entries(KINDS).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n} bars</b><small>${c.bars[k]} on the wall · ${c.prices.bar} ${coin()} each</small></span><span class="orbtns"><button class="btn small primary" data-cc="eat" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>Have one</button><button class="btn small alt" data-cc="give" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>To give</button></span></li>`).join("")}</ul>`;
   h += `<div class="row gprices"><span>Price of a bar</span><span class="gstep"><button class="btn small alt" data-cc="price" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bar}</b><button class="btn small alt" data-cc="price" data-n="1" aria-label="Dearer">+</button></span></div>`;
-  h += `<form class="row hadd" data-ccname="1"><label class="sr" for="ccName">Shop name</label><input id="ccName" maxlength="30" value="${esc(c.name)}"><button class="btn small alt">Rename</button></form>`;
-  return h + counterBonbons(F) + planPanel(F, st) + `<p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut;
+  if (ccUp(c, "hotchoc")) h += `<div class="row gprices"><span>Hot chocolate${t.hot ? ` <small class="muted">(${t.hot} today)</small>` : ""}</span><span class="gstep"><button class="btn small alt" data-cc="hprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.hot}</b><button class="btn small alt" data-cc="hprice" data-n="1" aria-label="Dearer">+</button></span></div><div class="actions"><button class="btn small primary" data-cc="hot" ${Object.values(c.choc).some(n => n > 0) ? "" : "disabled"}>Have a hot chocolate</button></div>`;
+  if (!st.cart) h += `<form class="row hadd" data-ccname="1"><label class="sr" for="ccName">Shop name</label><input id="ccName" maxlength="30" value="${esc(c.name)}"><button class="btn small alt">Rename</button></form>`;
+  if (st.cart) return h + counterBonbons(F) + `<p class="muted">Mateo sells from the shop's stock: bars, bonbons from the case${ccUp(c, "hotchoc") ? ", and hot chocolate" : ""}. More people stop while you're serving.</p>` + shut;
+  return h + counterBonbons(F) + planPanel(F, st) + `<div class="actions"><button class="btn small alt" data-cc="ups">Shop upgrades</button></div><p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut;
 }
 export function barWallPanel(F){
   const c = cocoaState(F);
@@ -244,10 +308,12 @@ export function kitchenPanel(F, which){
     <p class="olabel">${c.beans} sack${c.beans === 1 ? "" : "s"} in the kitchen</p><div class="actions"><button class="btn primary" data-cc="beans" data-n="1" ${F.coins < SACK ? "disabled" : ""}>Buy a sack (${SACK} ${coin()})</button><button class="btn alt" data-cc="beans" data-n="3" ${F.coins < SACK*3 ? "disabled" : ""}>Three (${SACK*3} ${coin()})</button></div>${steps}` + shut;
   if (which === "roaster") return `<span class="tape stripe" aria-hidden="true"></span><h2>The roaster</h2><p class="sub">${c.roast ? `Roasting a sack: ready in ${left(c.roast.done)}.` : "Roast a sack of beans. Ten minutes, and the whole kitchen smells amazing."}</p>
     <div class="actions"><button class="btn primary" data-cc="roast" ${c.roast || c.beans < 1 ? "disabled" : ""}>${c.beans < 1 ? "No beans: buy a sack" : "Roast a sack"}</button></div>${steps}` + shut;
-  if (which === "grinder") return `<span class="tape gingham" aria-hidden="true"></span><h2>The stone grinder</h2><p class="sub">${c.grind ? `Grinding ${KINDS[c.grind.kind].n.toLowerCase()}: ready in ${left(c.grind.done)}.` : c.ground ? `A pot of ${KINDS[c.ground].n.toLowerCase()} is ready: temper it on the marble slab.` : "Roasted beans in, chocolate out. It takes two hours."}</p>
-    ${c.grind || c.ground ? "" : `<div class="actions">${Object.entries(KINDS).map(([k, d]) => `<button class="btn ${k === "milk" ? "primary" : "alt"}" data-cc="grind" data-k="${k}" ${c.roasted < 1 ? "disabled" : ""}>${dot(d.col)} ${d.n}</button>`).join("")}</div>${c.roasted < 1 ? `<p class="muted">Roast some beans first.</p>` : ""}`}${steps}` + shut;
-  if (which === "slab") return `<span class="tape stripe" aria-hidden="true"></span><h2>The marble slab</h2><p class="sub">${c.ground ? `Temper the ${KINDS[c.ground].n.toLowerCase()}: spread, scrape, fold, until it shines.` : "Tempering makes chocolate snap and shine. Bring a pot from the grinder."}</p>
-    <div class="actions"><button class="btn primary" data-cc="temper" ${c.ground ? "" : "disabled"}>Temper it (${POT} pieces)</button></div>${steps}` + shut;
+  const gline = g => c["grind" + g] ? `Grinding ${KINDS[c["grind" + g].kind].n.toLowerCase()}: ready in ${left(c["grind" + g].done)}.` : c["ground" + g] ? `A pot of ${KINDS[c["ground" + g]].n.toLowerCase()} is ready: temper it on the marble slab.` : "";
+  if (which === "grinder") return `<span class="tape gingham" aria-hidden="true"></span><h2>The stone grinder${slots(c).length > 1 ? "s" : ""}</h2><p class="sub">${slots(c).map((g, i) => gline(g) ? (slots(c).length > 1 ? `${i ? "Second" : "First"}: ` : "") + gline(g) : "").filter(Boolean).join(" ") || "Roasted beans in, chocolate out. It takes two hours."}</p>
+    ${freeSlot(c) === undefined ? "" : `<div class="actions">${Object.entries(KINDS).map(([k, d]) => `<button class="btn ${k === "milk" ? "primary" : "alt"}" data-cc="grind" data-k="${k}" ${c.roasted < 1 ? "disabled" : ""}>${dot(d.col)} ${d.n}</button>`).join("")}</div>${c.roasted < 1 ? `<p class="muted">Roast some beans first.</p>` : ""}`}${steps}` + shut;
+  const pot = readyPot(c) === undefined ? null : c["ground" + readyPot(c)];
+  if (which === "slab") return `<span class="tape stripe" aria-hidden="true"></span><h2>The marble slab</h2><p class="sub">${pot ? `Temper the ${KINDS[pot].n.toLowerCase()}: spread, scrape, fold, until it shines.` : "Tempering makes chocolate snap and shine. Bring a pot from the grinder."}</p>
+    <div class="actions"><button class="btn primary" data-cc="temper" ${pot ? "" : "disabled"}>Temper it (${POT} pieces)</button></div>${steps}` + shut;
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The moulds</h2><p class="sub">${MOULD} pieces of tempered chocolate make ${MOULD} bars, straight onto the bar wall.</p>
     <ul class="hlist wlist">${Object.entries(KINDS).map(([k, d]) => `<li><span class="wpic">${dot(d.col)}</span><span class="wtxt"><b>${d.n}</b><small>${c.choc[k]} pieces</small></span><button class="btn small primary" data-cc="mould" data-k="${k}" ${c.choc[k] < MOULD ? "disabled" : ""}>Mould ${MOULD} bars</button></li>`).join("")}</ul>${scoopSend(F)}${steps}` + shut;
 }
@@ -305,6 +371,11 @@ export function casePanel(F){
   h += `<div class="row gprices"><span>Price of a bonbon</span><span class="gstep"><button class="btn small alt" data-cc="bprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bonbon}</b><button class="btn small alt" data-cc="bprice" data-n="1" aria-label="Dearer">+</button></span></div>`;
   return h + shut;
 }
+// the upgrades catalogue (from the counter)
+export function upsPanel(F){
+  const c = cocoaState(F), btn = (k, u) => `<button class="btn small ${F.coins >= u.price ? "primary" : "alt"}" data-cc="buyup" data-k="${k}" ${F.coins >= u.price ? "" : "disabled"}>Buy · ${u.price} ${coin()}</button>`;
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>Shop upgrades</h2><p class="sub">Things to make ${esc(c.name)} even nicer. You have ${F.coins} ${coin()}.</p><ul class="hlist wlist gups">${Object.entries(CC_UPS).map(([k, u]) => `<li><span class="wtxt"><b>${esc(u.n)}</b><small>${esc(u.line)}</small></span>${c.up[k] ? `<span class="hbadge">yours</span>` : btn(k, u)}</li>`).join("")}</ul><div class="actions"><button class="btn alt small" data-cc="counter">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
+}
 // the kitchen plan, at the counter: Mateo on or off, the bonbon shelf's targets, auto-buy, the coin floor, sacks held back
 export function planPanel(F, st = {}){
   const c = cocoaState(F), p = c.plan;
@@ -320,7 +391,7 @@ export function planPanel(F, st = {}){
 export function counterBonbons(F){
   const c = cocoaState(F), shown = onDisplay(c), have = shown.reduce((a, b) => a + c.trays[b.id], 0); if (!c.bonbons.length) return giveSpecials(c);
   return `<p class="eyebrow" style="margin:12px 0 6px">Bonbons</p>${shown.length ? `<div class="gchips">${shown.map(b => `<button class="gchip" data-cc="eatbb" data-k="${esc(b.id)}">${dot(KINDS[b.shell].col)}<span>${esc(b.name)}</span></button>`).join("")}</div>` : `<p class="muted">The display case is empty.</p>`}
-    <div class="actions"><button class="btn small alt" data-cc="box" data-n="4" ${have >= 4 ? "" : "disabled"}>Gift box of 4</button><button class="btn small alt" data-cc="box" data-n="9" ${have >= 9 ? "" : "disabled"}>Gift box of 9</button></div>${pairing(F, have)}${giveSpecials(c)}`;
+    <div class="actions"><button class="btn small alt" data-cc="box" data-n="4" ${have >= 4 ? "" : "disabled"}>Gift box of 4</button><button class="btn small alt" data-cc="box" data-n="9" ${have >= 9 ? "" : "disabled"}>Gift box of 9</button>${ccUp(c, "wrap") ? `<button class="btn small alt" data-cc="grand" ${have >= BOX16 ? "" : "disabled"}>Grand box of 16</button>` : ""}</div>${pairing(F, have)}${giveSpecials(c)}`;
 }
 function pairing(F, have){
   const wines = wineShelf(F).slice(0, 4); if (!wines.length) return "";

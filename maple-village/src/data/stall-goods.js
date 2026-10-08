@@ -110,6 +110,8 @@ Object.assign(GOODS, {
   sp_coins: G("Box of gold chocolate coins", NOM, 12, "cocoa", "Gold coins! Huat ah! So much luck in one box.", ["box", "#F3C969", "#D9433A"], {evan: "I'm RICH! Chocolate rich!", mama: "Gold coins for Ma Ma? Huat ah!"}),
   sp_spiced: G("Spiced chocolate box", "family", 12, "cocoa", "Cardamom and chocolate? Oh, that's lovely. Happy Deepavali!", ["box", "#4A2E22", "#F6A23A"], {marcus: "Dark and spiced, dairy-free. Happy Deepavali, Zeh."}),
   sp_mooncake: G("Chocolate mooncake", NOM, 10, "cocoa", "A chocolate mooncake! Let's have it under the lanterns.", null, {mama: "Chocolate mooncake? Ma Ma never try before. So modern!"}),
+  box16: G("Grand box of 16 bonbons", NOM, 50, "cocoa", "Sixteen bonbons, in a ribbon box! I'm going to make these last. I'm not.", ["box", "#C2505F", "#F3C969"]),
+  box16d: G("Grand box of 16 dark bonbons", "family", 50, "cocoa", "Sixteen dark bonbons, all dairy-free! This is a treasure chest.", ["box", "#4A2E22", "#C2505F"], {marcus: "Sixteen, dairy-free. You spoil me, Zeh."}),
   box4: G("Box of 4 bonbons", NOM, 14, "cocoa", "A little box of your bonbons! Too pretty to eat. Almost.", ["box", "#8A5A3A", "#F3E7C9"]),
   box4d: G("Box of 4 dark bonbons", "family", 14, "cocoa", "Dark chocolate bonbons, all dairy-free!", ["box", "#4A2E22", "#F3C969"], {marcus: "Dairy-free bonbons? You thought of everything, Zeh."}),
   box9: G("Box of 9 bonbons", NOM, 30, "cocoa", "A whole box of bonbons! Every one different.", ["box", "#8A5A3A", "#E8566C"], {mum: "Nine! I'll share them with Dad. Maybe.", mama: "So beautiful, like jewels. Ma Ma keep for special guests."}),

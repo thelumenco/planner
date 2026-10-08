@@ -76,6 +76,7 @@ export function bayArt(){
     ${tapeLabel(396, 540, "Under renovation", "var(--card)", 10)}</g>`;
   // once it's bought, the shopfront is the Cocoa Room: cocoa walls, a cream-and-brown striped awning, a window of
   // chocolates, a hanging sign with its name
+  const ccUps = ((G.cocoa ? G.cocoa() : null) || {}).up || {};
   const cc = G.F && (G.F().goals || {}).cocoa, ccName = ((G.cocoa ? G.cocoa() : null) || {}).name || "The Cocoa Room";
   const cocoa = `<g data-place="cocoa" aria-label="${ccName.replace(/[<&>"]/g, "")}"><ellipse class="hov" cx="396" cy="526" rx="70" ry="10" style="fill:var(--butter)"/>
     ${sk(`<path d="M318 432 L396 392 L474 432z" style="fill:#6B4430"/><rect x="326" y="432" width="140" height="84" style="fill:#C9A27E"/>
@@ -86,6 +87,7 @@ export function bayArt(){
       <path d="M404 516 v-36 a12 12 0 0 1 24 0 v36"/><circle cx="423" cy="500" r="1.4"/><rect x="438" y="468" width="22" height="26" rx="2"/><path d="M449 468 v26 M438 481 h22" opacity=".6"/>`)}
     ${sk(`<path d="M352 414 h88 v14 h-88z" style="fill:#FFFDF6"/>`, `<path d="M352 414 h88 v14 h-88z M364 414 l-6 -10 M428 414 l6 -10"/>`)}
     <text x="396" y="424.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="${ccName.length > 16 ? 6.5 : 8}" fill="#6B4430" pointer-events="none">${ccName.replace(/[<&>]/g, "").slice(0, 24)}</text>
+    ${ccUps.window ? `<g pointer-events="none">${sk(`<path d="M346 494 h24 M350 486 h16 M354 478 h8" style="stroke:#F3C969" stroke-width="2"/>`, `<path d="M358 494 v-18"/>`)}${[0, 1, 2, 3, 4, 5].map(i => `<circle class="twinkle" cx="${339 + i*7.6}" cy="${465 + (i % 2)*2}" r="1.3" fill="#F3C969" style="animation-delay:${(i*.3).toFixed(1)}s"/>`).join("")}${[[352, 491], [364, 491], [355, 483], [361, 483], [358, 475]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${["#4A2E22", "#C2505F", "#8A5A3A", "#F3E7C9", "#4A2E22"][i]}" stroke="#3A2E28" stroke-width=".6"/>`).join("")}</g>` : ""}
     ${tapeLabel(396, 540, ccName.replace(/[<&>"]/g, "").slice(0, 24), "#E8D3BC", 10)}</g>`;
   return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17*60, 6*60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? bike() : "") + deck + (cc ? cocoa : reno)
     + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");

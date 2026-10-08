@@ -1924,6 +1924,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     sp_coins: G("Box of gold chocolate coins", NOM, 12, "cocoa", "Gold coins! Huat ah! So much luck in one box.", ["box", "#F3C969", "#D9433A"], { evan: "I'm RICH! Chocolate rich!", mama: "Gold coins for Ma Ma? Huat ah!" }),
     sp_spiced: G("Spiced chocolate box", "family", 12, "cocoa", "Cardamom and chocolate? Oh, that's lovely. Happy Deepavali!", ["box", "#4A2E22", "#F6A23A"], { marcus: "Dark and spiced, dairy-free. Happy Deepavali, Zeh." }),
     sp_mooncake: G("Chocolate mooncake", NOM, 10, "cocoa", "A chocolate mooncake! Let's have it under the lanterns.", null, { mama: "Chocolate mooncake? Ma Ma never try before. So modern!" }),
+    box16: G("Grand box of 16 bonbons", NOM, 50, "cocoa", "Sixteen bonbons, in a ribbon box! I'm going to make these last. I'm not.", ["box", "#C2505F", "#F3C969"]),
+    box16d: G("Grand box of 16 dark bonbons", "family", 50, "cocoa", "Sixteen dark bonbons, all dairy-free! This is a treasure chest.", ["box", "#4A2E22", "#C2505F"], { marcus: "Sixteen, dairy-free. You spoil me, Zeh." }),
     box4: G("Box of 4 bonbons", NOM, 14, "cocoa", "A little box of your bonbons! Too pretty to eat. Almost.", ["box", "#8A5A3A", "#F3E7C9"]),
     box4d: G("Box of 4 dark bonbons", "family", 14, "cocoa", "Dark chocolate bonbons, all dairy-free!", ["box", "#4A2E22", "#F3C969"], { marcus: "Dairy-free bonbons? You thought of everything, Zeh." }),
     box9: G("Box of 9 bonbons", NOM, 30, "cocoa", "A whole box of bonbons! Every one different.", ["box", "#8A5A3A", "#E8566C"], { mum: "Nine! I'll share them with Dad. Maybe.", mama: "So beautiful, like jewels. Ma Ma keep for special guests." }),
@@ -2485,6 +2487,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     mstall6: { scene: "field", name: "Stall", door: [396, 164], spot: true, line: "A market stall." },
     mstall7: { scene: "field", name: "Stall", door: [456, 164], spot: true, line: "A market stall." },
     mstall8: { scene: "field", name: "Scoop Shack cart", door: [306, 556], spot: true, line: "The Scoop Shack's cart at the night market." },
+    mstall9: { scene: "field", name: "Cocoa Room cart", door: [196, 556], spot: true, line: "The Cocoa Room's chocolate cart at the night market." },
     pitch: { scene: "field", name: "Football pitch", door: [150, 600], spot: true, line: "The football pitch. Kids play here after school." },
     // the foreshore, west of the field and north of the flower farm: the sea along its west side (dolphins, paddleboarders),
     // a boardwalk, a jetty with the paddleboard rack, and two family houses
@@ -4886,6 +4889,19 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       hellos: ["Morning, boss! Roaster's warm.", "Hi Mel! Smell that?"],
       away: "Mateo's gone home. The kitchen's quiet."
     },
+    // Lila, the Cocoa Room's second assistant (cocoa.js upgrade "assistant"): Mondays (Amara's day off) and weekend afternoons
+    {
+      id: "lila",
+      pitch: 1.2,
+      name: "Lila",
+      job: "Serves at the Cocoa Room",
+      look: { skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#C2505F", bottom: "#F3E7C9", extra: "apron" },
+      routine: [slot("10:45", "20:15", "cocoa", [240, 268], { dow: [1], needs: "cc_assistant" }), slot("13:00", "20:15", "cocoa", [[180, 420], [400, 440], [240, 268]], { dow: [0, 6], needs: "cc_assistant" })],
+      intro: "Hi! I'm Lila. Mondays are mine, and I help Amara at weekends. I'm working my way through every bonbon. For research.",
+      lines: ["Mondays are quiet, but the regulars are lovely.", "I wrapped forty boxes on Saturday. My fingers are ribbon now.", "Someone asked if we deliver to the moon.", "The fountain is hypnotic. I keep staring at it."],
+      hellos: ["Hi Mel!", "Morning, boss!"],
+      away: "Lila's not on today."
+    },
     // Noor runs the pet adoption corner at the Sunday farmers market and the field fair (tours.js); no routine otherwise
     {
       id: "noor",
@@ -5333,7 +5349,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const v = familyVisits(day).find((x) => x.id === id && hm2 >= x.from && hm2 < x.to);
     return v ? { from: v.from, to: v.to, scene: v.scene, wander: v.wander } : null;
   }
-  var STALL_SPOTS = [[36, 128], [96, 128], [156, 128], [216, 128], [276, 128], [336, 128], [396, 128], [456, 128], [306, 520]];
+  var STALL_SPOTS = [[36, 128], [96, 128], [156, 128], [216, 128], [276, 128], [336, 128], [396, 128], [456, 128], [306, 520], [196, 520]];
   var MARKET = [
     { id: "elena", at: 0, short: "Cheese", n: "Cheese and olives", items: ["cheese", "olives"], col: "#F3C969", line: "Aged on a farm up the hill. Try a slice!" },
     { id: "felix", at: 1, short: "Honey", n: "Honey and bee things", items: ["honey", "honeycomb", "beecandle", "toast"], col: "#E3A23A", line: "Wildflower honey, from my own bees. The candles are pure beeswax." },
@@ -5363,8 +5379,18 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     { id: "wen", at: 6, short: "Sweets", n: "Sweets", items: ["tanghulu", "eggwaffle"], col: "#C9A3E0", line: "Tanghulu, strawberries in crackly sugar. And egg waffles, still warm." },
     { id: "kai", at: 7, short: "Drinks", n: "Night drinks", items: ["sugarcane", "grassjelly"], col: "#9CC27E", line: "Fresh sugarcane, pressed while you wait. Grass jelly for the old-school ones." },
     // Mel's own: the Scoop Shack's cart, scooping from the shop's display (scoop.js cartOn). Tomo minds it after his day on the deck
-    { id: "tomo", at: 8, kind: "scoop", short: "Scoop Shack", n: "The Scoop Shack cart", items: [], col: "#F2A0B8", line: "Gelato from the Scoop Shack! Cup or cone?" }
+    { id: "tomo", at: 8, kind: "scoop", short: "Scoop Shack", n: "The Scoop Shack cart", items: [], col: "#F2A0B8", line: "Gelato from the Scoop Shack! Cup or cone?" },
+    // and the Cocoa Room's chocolate cart, once it's bought (cocoa.js upgrade "cart"): Mateo minds it
+    { id: "mateo", at: 9, kind: "cocoa", needs: "cc_cart", short: "Cocoa Room", n: "The Cocoa Room cart", items: [], col: "#8A5A3A", line: "Chocolate from the Cocoa Room! Bars, bonbons, hot chocolate." }
   ];
+  var ownedNow = () => ({});
+  var setStallOwned = (fn) => {
+    ownedNow = fn;
+  };
+  var standing = (list2) => {
+    const o = ownedNow();
+    return list2.filter((s) => !s.needs || o[s.needs]);
+  };
   var NIGHT_TOURISTS = ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy", "rafe"];
   var STAGE = { x: 452, y: 462 };
   var STAGE_WATCH = [[404, 560], [446, 566], [492, 536], [508, 562], [426, 590]];
@@ -5377,7 +5403,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   function eventOn(day) {
     if (dow(day) === 0) return { kind: "market", name: "Sunday farmers market", from: 8 * 60, to: 13 * 60, stalls: MARKET, wine: true };
     if (lastSaturday(day)) return { kind: "fair", name: "Field fair", from: 10 * 60, to: 16 * 60, stalls: FAIR, wine: false };
-    if (dow(day) === 2 || dow(day) === 4) return { kind: "night", name: "Night market", from: 17 * 60 + 30, to: 22 * 60, stalls: NIGHT, wine: false };
+    if (dow(day) === 2 || dow(day) === 4) return { kind: "night", name: "Night market", from: 17 * 60 + 30, to: 22 * 60, stalls: standing(NIGHT), wine: false };
     return null;
   }
   var eventNow = (day, hm2) => {
@@ -5407,7 +5433,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const { k, pose: pose2, from, to } = keeperPose(st6, day, hm2), [x, y] = STALL_SPOTS[st6.at], base = { from, to, scene: "field", glide: true };
     if (pose2 === "behind") return { ...base, at: [x + 3, y - 9] };
     if (pose2 === "front") return { ...base, at: [x + 9, y + 9] };
-    const side = st6.kind === "scoop" || st6.kind === "pets";
+    const side = st6.kind === "scoop" || st6.kind === "cocoa" || st6.kind === "pets";
     if (pose2 === "sit") return { ...base, at: [x + (side ? 34 : -17), y + 7], act: "sit", dir: side ? -1 : 1 };
     if (pose2 === "chat") {
       const side2 = k % 2 ? 1 : -1;
@@ -6998,7 +7024,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const w = s.kind === "wine" ? 24 : 23;
     return sk(`<rect x="${x - w}" y="${y - 22}" width="${w * 2}" height="22" rx="2" style="fill:${s.kind === "wine" ? "#8B5E3C" : "#C9A27E"}"/>${goods(i, x, y, s)}`, `<rect x="${x - w}" y="${y - 22}" width="${w * 2}" height="22" rx="2"/>`);
   };
-  var stallFront = (i, x, y, s) => `<g pointer-events="none">${s.kind === "scoop" ? cartBody(x, y) : s.kind === "pets" ? penFront(x, y) : table(i, x, y, s)}</g>`;
+  var stallFront = (i, x, y, s) => `<g pointer-events="none">${s.kind === "scoop" ? cartBody(x, y) : s.kind === "cocoa" ? ccBody(x, y) : s.kind === "pets" ? penFront(x, y) : table(i, x, y, s)}</g>`;
   var crate = (x, y) => sk(`<rect x="${x - 7}" y="${y - 7}" width="14" height="8" rx="1" style="fill:#B98A5A"/>`, `<rect x="${x - 7}" y="${y - 7}" width="14" height="8" rx="1"/><path d="M${x - 7} ${y - 3} h14"/>`);
   var CART_TUBS = ["#F8D59A", "#E8566C", "#B9D98A", "#9A7A6A"];
   var cartBody = (x, y) => sk(
@@ -7013,6 +7039,17 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     `<path d="M${x - 8} ${y - 70} q28 -22 56 0z M${x + 20} ${y - 70} v44"/><path d="M${x - 35} ${y - 46} l5 14 l5 -14z"/><circle cx="${x - 30}" cy="${y - 49}" r="5"/>`
   )}
   ${crate(x + 34, y + 6)}${cartBody(x, y)}${tapeLabel(x, y + 28, s.short, "#F4C7CF", 9)}</g>`;
+  var ccBody = (x, y) => sk(
+    `<rect x="${x - 24}" y="${y - 24}" width="48" height="20" rx="4" style="fill:#8A5A3A"/><rect x="${x - 26}" y="${y - 28}" width="52" height="6" rx="2" style="fill:#F3E7C9"/>${["#4A2E22", "#8A5A3A", "#F3E7C9"].map((c, k) => `<rect x="${x - 18 + k * 10}" y="${y - 34}" width="8" height="6" rx="1" style="fill:${c}"/>`).join("")}<rect x="${x + 12}" y="${y - 36}" width="8" height="8" rx="1.5" style="fill:#FFFDF6"/>
+    <circle cx="${x - 14}" cy="${y - 2}" r="6" style="fill:#F3E7C9"/><circle cx="${x + 14}" cy="${y - 2}" r="6" style="fill:#F3E7C9"/><path d="M${x - 24} ${y - 14} h48" style="stroke:#F3E7C9" stroke-width="3"/>`,
+    `<rect x="${x - 24}" y="${y - 24}" width="48" height="20" rx="4"/><rect x="${x - 26}" y="${y - 28}" width="52" height="6" rx="2"/><rect x="${x + 12}" y="${y - 36}" width="8" height="8" rx="1.5"/><path class="smoke" d="M${x + 16} ${y - 38} q-3 -4 0 -8" opacity=".6"/><circle cx="${x - 14}" cy="${y - 2}" r="6"/><circle cx="${x + 14}" cy="${y - 2}" r="6"/>`
+  );
+  var ccCart = (i, x, y, s) => `<g data-place="mstall${i}" aria-label="${s.n}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="32" ry="8" style="fill:var(--butter)"/>
+  ${sk(
+    `<path d="M${x + 20} ${y - 26} v-44" style="stroke:#6B4430" stroke-width="2"/><path d="M${x - 8} ${y - 70} q28 -22 56 0z" style="fill:#F3E7C9"/>${[0, 1, 2].map((k) => `<path d="M${x - 8 + k * 19} ${y - 70} q${4 + k * 2} -14 ${9} -17 l1 17z" style="fill:#8A5A3A"/>`).join("")}`,
+    `<path d="M${x - 8} ${y - 70} q28 -22 56 0z M${x + 20} ${y - 70} v44"/>`
+  )}
+  ${crate(x + 34, y + 6)}${ccBody(x, y)}${tapeLabel(x, y + 28, s.short, "#E3C8A0", 9)}</g>`;
   var penFront = (x, y) => sk(`<rect x="${x - 30}" y="${y - 14}" width="60" height="14" rx="2" style="fill:#D9B48A"/>`, `<rect x="${x - 30}" y="${y - 14}" width="60" height="14" rx="2"/>${[-20, -8, 4, 16].map((dx) => `<path d="M${x + dx} ${y - 14} v14" opacity=".5"/>`).join("")}`);
   var pen = (i, x, y, s) => `<g data-place="mstall${i}" aria-label="${s.n}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="36" ry="9" style="fill:var(--butter)"/>
   ${sk(`<ellipse cx="${x}" cy="${y - 12}" rx="30" ry="9" style="fill:#F3E1A0"/><rect x="${x - 24}" y="${y - 58}" width="30" height="18" rx="2" style="fill:#FFFDF6"/>`, `<ellipse cx="${x}" cy="${y - 12}" rx="30" ry="9"/><path d="M${x - 9} ${y - 40} v26"/><rect x="${x - 24}" y="${y - 58}" width="30" height="18" rx="2"/>`)}
@@ -7022,6 +7059,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var petMini = (c, k) => `<g style="stroke:var(--line)" stroke-width="1.2"><ellipse cx="0" cy="-5" rx="7" ry="5" style="fill:${c}"/><circle cx="5" cy="-11" r="4.5" style="fill:${c}"/>${k === "cat" ? `<path d="M2 -14 l1 -4 l2 3z M7 -15 l2 -3 l0 4z" style="fill:${c}"/>` : k === "dog" ? `<ellipse cx="2" cy="-11" rx="1.8" ry="3.5" style="fill:#8A5A3A"/>` : `<ellipse cx="4" cy="-18" rx="1.4" ry="4" style="fill:${c}"/><ellipse cx="7" cy="-18" rx="1.4" ry="4" style="fill:${c}"/>`}</g>`;
   var stall = (i, x, y, s) => {
     if (s.kind === "scoop") return cart(i, x, y, s);
+    if (s.kind === "cocoa") return ccCart(i, x, y, s);
     if (s.kind === "pets") return pen(i, x, y, s);
     const wine = s.kind === "wine", hw = wine ? 29 : 28, col = wine ? "#8E2C48" : s.col;
     return `<g data-place="mstall${i}" aria-label="${wine ? "The wine shop's market stall" : s.n + " stall"}"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="${hw}" ry="8" style="fill:var(--butter)"/>
@@ -8303,7 +8341,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
           `<rect x="${x - 34}" y="${y - 30}" width="68" height="30" rx="3"/><circle cx="${x}" cy="${y - 52}" r="24"/><circle cx="${x}" cy="${y - 52}" r="14"/><path d="M${x - 8} ${y - 52} h16" opacity=".6"/><rect x="${x + 20}" y="${y - 90}" width="10" height="30"/>`
         );
       case "grinder":
-        return sk(
+        return grinder2(x, y) + sk(
           `<rect x="${x - 36}" y="${y - 28}" width="72" height="28" rx="3" style="fill:#7FA3B8"/><ellipse cx="${x}" cy="${y - 38}" rx="32" ry="10" style="fill:#D9DEE3"/><ellipse cx="${x}" cy="${y - 40}" rx="24" ry="6" style="fill:#6B4430"/><ellipse cx="${x - 8}" cy="${y - 44}" rx="8" ry="6" style="fill:#B9B0A4"/><ellipse cx="${x + 10}" cy="${y - 44}" rx="8" ry="6" style="fill:#B9B0A4"/>`,
           `<rect x="${x - 36}" y="${y - 28}" width="72" height="28" rx="3"/><ellipse cx="${x}" cy="${y - 38}" rx="32" ry="10"/><ellipse cx="${x - 8}" cy="${y - 44}" rx="8" ry="6"/><ellipse cx="${x + 10}" cy="${y - 44}" rx="8" ry="6"/>`
         );
@@ -8640,6 +8678,27 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     }
     return "";
   }
+  function grinder2(x, y) {
+    if (!(((G2.cocoa ? G2.cocoa() : null) || {}).up || {}).grinder2) return "";
+    const X = x - 66, Y = y + 4;
+    return sk(
+      `<rect x="${X - 26}" y="${Y - 22}" width="52" height="22" rx="3" style="fill:#7FA3B8"/><ellipse cx="${X}" cy="${Y - 30}" rx="24" ry="8" style="fill:#D9DEE3"/><ellipse cx="${X}" cy="${Y - 32}" rx="18" ry="5" style="fill:#4A2E22"/><ellipse cx="${X - 6}" cy="${Y - 35}" rx="6" ry="4.5" style="fill:#B9B0A4"/><ellipse cx="${X + 7}" cy="${Y - 35}" rx="6" ry="4.5" style="fill:#B9B0A4"/>`,
+      `<rect x="${X - 26}" y="${Y - 22}" width="52" height="22" rx="3"/><ellipse cx="${X}" cy="${Y - 30}" rx="24" ry="8"/><ellipse cx="${X - 6}" cy="${Y - 35}" rx="6" ry="4.5"/><ellipse cx="${X + 7}" cy="${Y - 35}" rx="6" ry="4.5"/>`
+    );
+  }
+  function ccCounterUps(x, y) {
+    const up = ((G2.cocoa ? G2.cocoa() : null) || {}).up || {};
+    let h = "";
+    if (up.hotchoc) h += sk(
+      `<rect x="${x - 94}" y="${y - 84}" width="20" height="32" rx="3" style="fill:#B9BFC6"/><rect x="${x - 90}" y="${y - 78}" width="12" height="8" rx="1.5" style="fill:#4A2E22"/><path d="M${x - 100} ${y - 52} h4 v-7 h-4z M${x - 72} ${y - 52} h5 v-7 h-5z" style="fill:#FFFDF6"/>`,
+      `<rect x="${x - 94}" y="${y - 84}" width="20" height="32" rx="3"/><rect x="${x - 90}" y="${y - 78}" width="12" height="8" rx="1.5"/><path class="smoke" d="M${x - 84} ${y - 88} q-3 -5 0 -10 M${x - 80} ${y - 88} q3 -5 0 -10" opacity=".6"/>`
+    );
+    if (up.fountain) h += sk(
+      `<path d="M${x + 72} ${y - 52} l-8 -4 h40 l-8 4z" style="fill:#B9BFC6"/><path d="M${x + 66} ${y - 58} q18 6 36 0 v-4 h-36z" style="fill:#6B4430"/><rect x="${x + 82}" y="${y - 92}" width="4" height="34" style="fill:#B9BFC6"/><path d="M${x + 72} ${y - 74} q12 5 24 0 v-3 h-24z" style="fill:#6B4430"/><path d="M${x + 77} ${y - 88} q7 3 14 0 v-2 h-14z" style="fill:#6B4430"/><path d="M${x + 78} ${y - 74} q-2 6 -4 14 M${x + 90} ${y - 74} q2 6 4 14" style="stroke:#4A2E22;fill:none" stroke-width="2.4"/>`,
+      `<path d="M${x + 66} ${y - 58} q18 6 36 0 v-4 h-36z M${x + 72} ${y - 74} q12 5 24 0 v-3 h-24z M${x + 77} ${y - 88} q7 3 14 0 v-2 h-14z"/><path d="M${x + 84} ${y - 92} v34"/>`
+    );
+    return h;
+  }
   function foreArt(id) {
     if (id === "wineshop") {
       const s2 = stationsOf("wineshop").find((t2) => t2.kind === "winecounter");
@@ -8655,7 +8714,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         `<rect x="${x2 - 96}" y="${y2 - 46}" width="192" height="46" rx="4" style="fill:#8A5A3A"/><rect x="${x2 - 100}" y="${y2 - 52}" width="200" height="8" rx="2" style="fill:#F6EEE4"/><path d="M${x2 - 96} ${y2 - 24} h192" style="stroke:#F3E7C9" stroke-width="4"/>
       ${[-70, -40, -10, 20].map((dx, i) => `<rect x="${x2 + dx}" y="${y2 - 64}" width="22" height="12" rx="2" style="fill:#FFFDF6"/>${[0, 1, 2].map((k) => `<circle cx="${x2 + dx + 5 + k * 6}" cy="${y2 - 58}" r="2.4" style="fill:${["#4A2E22", "#8A5A3A", "#C2505F", "#F3E7C9"][(i + k) % 4]}"/>`).join("")}`).join("")}<rect x="${x2 + 56}" y="${y2 - 66}" width="26" height="14" rx="2" style="fill:#F3C969"/>`,
         `<rect x="${x2 - 96}" y="${y2 - 46}" width="192" height="46" rx="4"/><rect x="${x2 - 100}" y="${y2 - 52}" width="200" height="8" rx="2"/>${[-70, -40, -10, 20].map((dx) => `<rect x="${x2 + dx}" y="${y2 - 64}" width="22" height="12" rx="2"/>`).join("")}<rect x="${x2 + 56}" y="${y2 - 66}" width="26" height="14" rx="2"/>`
-      );
+      ) + ccCounterUps(x2, y2);
     }
     if (id === "scoopshop") {
       const s2 = stationsOf("scoopshop").find((t2) => t2.kind === "gcounter"), x2 = s2.x, y2 = s2.y, sc = G2.scoop ? G2.scoop() : { recipes: [], tubs: {} };
@@ -13532,7 +13591,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var dowOf = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
   var routineAt = (def, day, t2) => {
-    const dw = dowOf(day), we = dw === 0 || dw === 6, owned = Object.assign({}, api3 && api3.F().fam && api3.F().fam.owned || {}, api3 && api3.F().goals || {});
+    const dw = dowOf(day), we = dw === 0 || dw === 6, owned = Object.assign({}, api3 && api3.F().fam && api3.F().fam.owned || {}, api3 && api3.F().goals || {}, ...Object.keys(api3 && api3.F().cocoa && api3.F().cocoa.up || {}).map((k) => ({ ["cc_" + k]: 1 })));
     return def.routine.find((s) => t2 >= s.from && t2 < s.to && (!s.days || s.days === "we" === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null;
   };
   var routineNow = (def) => routineAt(def, dayKey(), sgHM());
@@ -13990,6 +14049,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <text x="396" y="471" text-anchor="middle" transform="rotate(-3 396 473)" font-family="Klee One,serif" font-weight="600" font-size="8" fill="#5E5A55" pointer-events="none">Coming soon</text>
     <text x="396" y="482" text-anchor="middle" transform="rotate(-3 396 473)" font-family="Klee One,serif" font-size="6.5" fill="#8A8279" pointer-events="none">a chocolatier? tap to see</text>
     ${tapeLabel(396, 540, "Under renovation", "var(--card)", 10)}</g>`;
+    const ccUps = ((G3.cocoa ? G3.cocoa() : null) || {}).up || {};
     const cc = G3.F && (G3.F().goals || {}).cocoa, ccName = ((G3.cocoa ? G3.cocoa() : null) || {}).name || "The Cocoa Room";
     const cocoa = `<g data-place="cocoa" aria-label="${ccName.replace(/[<&>"]/g, "")}"><ellipse class="hov" cx="396" cy="526" rx="70" ry="10" style="fill:var(--butter)"/>
     ${sk(
@@ -14002,6 +14062,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     )}
     ${sk(`<path d="M352 414 h88 v14 h-88z" style="fill:#FFFDF6"/>`, `<path d="M352 414 h88 v14 h-88z M364 414 l-6 -10 M428 414 l6 -10"/>`)}
     <text x="396" y="424.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="${ccName.length > 16 ? 6.5 : 8}" fill="#6B4430" pointer-events="none">${ccName.replace(/[<&>]/g, "").slice(0, 24)}</text>
+    ${ccUps.window ? `<g pointer-events="none">${sk(`<path d="M346 494 h24 M350 486 h16 M354 478 h8" style="stroke:#F3C969" stroke-width="2"/>`, `<path d="M358 494 v-18"/>`)}${[0, 1, 2, 3, 4, 5].map((i) => `<circle class="twinkle" cx="${339 + i * 7.6}" cy="${465 + i % 2 * 2}" r="1.3" fill="#F3C969" style="animation-delay:${(i * 0.3).toFixed(1)}s"/>`).join("")}${[[352, 491], [364, 491], [355, 483], [361, 483], [358, 475]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${["#4A2E22", "#C2505F", "#8A5A3A", "#F3E7C9", "#4A2E22"][i]}" stroke="#3A2E28" stroke-width=".6"/>`).join("")}</g>` : ""}
     ${tapeLabel(396, 540, ccName.replace(/[<&>"]/g, "").slice(0, 24), "#E8D3BC", 10)}</g>`;
     return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17 * 60, 6 * 60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? bike() : "") + deck + (cc ? cocoa : reno) + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
   }
@@ -14556,7 +14617,47 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var HAND = { 3: [14 * 60, 18 * 60], 5: [14 * 60, 18 * 60], 6: [10 * 60, 17 * 60] };
   var WALL = 40;
   var now2 = () => Date.now() + (globalThis.__mapleOffset || 0);
-  var openOn = (day, hm2) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() !== 1 && hm2 >= OPEN2 && hm2 < CLOSE2;
+  var openOn = (day, hm2, mon) => (mon || (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() !== 1) && hm2 >= OPEN2 && hm2 < CLOSE2;
+  var CC_UPS = {
+    window: { n: "Window display", price: 300, line: "A proper window: tiered stands of bonbons, a chocolate sculpture, little lights. More passers-by come in (about a fifth busier)." },
+    hotchoc: { n: "Hot chocolate bar", price: 400, line: "A steamer on the counter and a row of mugs. Hot chocolate from your own chocolate, 1 piece a cup; best in the evenings and on rainy days." },
+    grinder2: { n: "Second grinder", price: 600, line: "Another stone grinder beside the first, so two pots can grind at once." },
+    wrap: { n: "Gift wrapping station", price: 350, line: "Ribbons, tissue and boxes. Customers buy bonbons in gift boxes (a little extra each time), and you can pack a grand box of 16." },
+    tree: { n: "Cacao tree at Ma Ma's", price: 500, line: "A cacao tree in Ma Ma's orchard. She looks after it, and a free sack of beans turns up in the kitchen every two days." },
+    fountain: { n: "Chocolate fountain", price: 450, line: "A three-tier fountain on the end of the counter. Customers linger and leave tips. Evan will want to live here." },
+    supply: { n: "Supply deal with the Scoop Shack", price: 250, line: "Every morning, 10 pieces of loose dark chocolate go to the Scoop Shack's gelato fridge on their own (when there are 10 spare)." },
+    workshop: { n: "Weekend workshops", price: 700, line: "Saturday afternoons, 2 to 4: a class of six makes their own bonbons at the tables, and pays 8 coins each." },
+    assistant: { n: "Second assistant", price: 500, line: "Lila joins the team. The shop opens on Mondays too, and it's a little busier with two behind the counter." },
+    cart: { n: "Night market cart", price: 400, line: "A little chocolate cart for the Tuesday and Thursday night markets. Mateo runs it (evenings suit a student), selling bars, bonbons and hot chocolate." }
+  };
+  var ccUp = (c, k) => !!(c.up && c.up[k]);
+  function buyCcUp(F2, k) {
+    const c = cocoaState(F2), u = CC_UPS[k];
+    if (!u || c.up[k] || F2.coins < u.price) return null;
+    F2.coins -= u.price;
+    c.up[k] = Date.now();
+    if (k === "tree") c.treeAt = now2();
+    return {
+      window: "The new window's in: tiered stands, little lights, and a chocolate sculpture of the bay.",
+      hotchoc: "The hot chocolate bar's on the counter, mugs and all. Set its price at the counter.",
+      grinder2: "A second stone grinder, rumbling away beside the first.",
+      wrap: "The wrapping station's set up: ribbons, tissue, boxes in every size.",
+      tree: "A cacao tree in Ma Ma's orchard! She says she'll talk to it every morning.",
+      fountain: "The chocolate fountain's flowing. Evan is going to lose his mind.",
+      supply: "Done: the Scoop Shack gets 10 pieces of your dark chocolate every morning, when there's enough spare.",
+      workshop: "Weekend workshops are on: Saturdays, 2 to 4, at the tables.",
+      assistant: "Lila starts Monday! The shop's open seven days now.",
+      cart: "The chocolate cart's ready for the night market. Mateo's thrilled."
+    }[k];
+  }
+  var cartOn2 = (day, hm2) => {
+    const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+    return (d === 2 || d === 4) && hm2 >= 17 * 60 + 30 && hm2 < 22 * 60;
+  };
+  var WORKSHOP = 6;
+  var WORKSHOP_FEE = 8;
+  var TREE_EVERY = 2 * 864e5;
+  var BOX16 = 16;
   function cocoaState(F2) {
     F2.cocoa = F2.cocoa || {};
     const c = F2.cocoa;
@@ -14578,6 +14679,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     c.keep = Object.assign({ milk: 30, dark: 30, white: 0 }, c.keep || {});
     c.plan = Object.assign({ on: true, buy: true, floor: 200, hold: 0 }, c.plan || {});
     c.specials = c.specials || {};
+    c.up = c.up || {};
+    c.prices.hot = c.prices.hot || 5;
     return c;
   }
   var left3 = (t2) => {
@@ -14598,11 +14701,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     c.roast = { done: now2() + ROAST_MIN * 6e4 };
     return true;
   }
+  var slots = (c) => ccUp(c, "grinder2") ? ["", "2"] : [""];
+  var freeSlot2 = (c) => slots(c).find((g) => !c["grind" + g] && !c["ground" + g]);
+  var readyPot = (c) => ["", "2"].find((g) => c["ground" + g]);
   function startGrind(F2, kind) {
-    const c = cocoaState(F2);
-    if (c.grind || c.ground || c.roasted < 1 || !KINDS2[kind]) return false;
+    const c = cocoaState(F2), g = freeSlot2(c);
+    if (g === void 0 || c.roasted < 1 || !KINDS2[kind]) return false;
     c.roasted--;
-    c.grind = { kind, done: now2() + GRIND_MIN * 6e4 };
+    c["grind" + g] = { kind, done: now2() + GRIND_MIN * 6e4 };
     return true;
   }
   function pour2(c, k) {
@@ -14612,11 +14718,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return r;
   }
   function temper(F2) {
-    const c = cocoaState(F2);
-    if (!c.ground) return null;
-    const k = c.ground;
+    const c = cocoaState(F2), g = readyPot(c);
+    if (g === void 0) return null;
+    const k = c["ground" + g];
     c.choc[k] += POT;
-    c.ground = null;
+    c["ground" + g] = null;
     return k;
   }
   function mould(F2, kind) {
@@ -14634,9 +14740,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       c.roast = null;
       out = "roast";
     }
-    if (c.grind && t2 >= c.grind.done && !c.ground) {
-      c.ground = c.grind.kind;
-      c.grind = null;
+    for (const g of ["", "2"]) if (c["grind" + g] && t2 >= c["grind" + g].done && !c["ground" + g]) {
+      c["ground" + g] = c["grind" + g].kind;
+      c["grind" + g] = null;
       out = out || "grind";
     }
     return out;
@@ -14809,21 +14915,24 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return !!w && hm2 >= w[0] && hm2 < w[1];
   };
   function nextKind(c) {
-    const gap = Object.keys(KINDS2).map((k) => [k, c.keep[k] - c.res[k] - (c.ground === k ? POT : 0)]).filter(([, g]) => g > 0).sort((a, b) => b[1] - a[1]);
+    const coming = (k) => ["", "2"].reduce((n, g) => n + (c["ground" + g] === k || c["grind" + g] && c["grind" + g].kind === k ? POT : 0), 0);
+    const gap = Object.keys(KINDS2).map((k) => [k, c.keep[k] - c.res[k] - coming(k)]).filter(([, g]) => g > 0).sort((a, b) => b[1] - a[1]);
     if (gap.length) return gap[0][0];
     return Object.keys(KINDS2).sort((a, b) => c.bars[a] + c.choc[a] - (c.bars[b] + c.choc[b]))[0];
   }
   function handStep(F2, c, t2, out) {
     const h = out.hand;
-    if (c.ground) {
-      const k = c.ground;
+    for (const g2 of ["", "2"]) if (c["ground" + g2]) {
+      const k = c["ground" + g2];
       h.res += pour2(c, k);
-      c.ground = null;
+      c["ground" + g2] = null;
       h.pots++;
     }
-    if (!c.grind && !c.ground && c.roasted > 0) {
+    let g;
+    while (c.roasted > 0 && (g = freeSlot2(c)) !== void 0) {
+      const kind = nextKind(c);
       c.roasted--;
-      c.grind = { kind: nextKind(c), done: t2 + GRIND_MIN * 6e4, by: "hand" };
+      c["grind" + g] = { kind, done: t2 + GRIND_MIN * 6e4, by: "hand" };
     }
     if (!c.roast && c.roasted < 1) {
       if (c.beans <= c.plan.hold && c.plan.buy && F2.coins - SACK >= c.plan.floor) {
@@ -14852,63 +14961,127 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       out.mins++;
       out.done = finish(c, at) || out.done;
       if (c.plan.on && opts.hand !== false && handOn(day, hm2)) handStep(F2, c, at, out);
+      if (ccUp(c, "tree") && at - (c.treeAt || at) >= TREE_EVERY) {
+        c.treeAt = at;
+        c.beans++;
+        out.tree = (out.tree || 0) + 1;
+      }
+      if (ccUp(c, "supply") && hm2 >= 9 * 60 && c.supplyDay !== day && c.choc.dark >= SEND) {
+        c.supplyDay = day;
+        c.choc.dark -= SEND;
+        const sc = scoopState(F2);
+        sc.fridge.housechoc = (sc.fridge.housechoc || 0) + TO_FRIDGE;
+        out.supply = (out.supply || 0) + TO_FRIDGE;
+      }
+      if (ccUp(c, "workshop") && hm2 === 16 * 60 && (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() === 6 && c.workDay !== day) {
+        c.workDay = day;
+        const fee = WORKSHOP * WORKSHOP_FEE, s = c.sold[day] = c.sold[day] || { n: 0, coins: 0, bonbons: 0 };
+        s.workshop = fee;
+        s.coins += fee;
+        out.coins += fee;
+        out.workshop = fee;
+      }
+      if (ccUp(c, "cart") && cartOn2(day, hm2) && Math.random() < 0.03 * (opts.cart ? 1.6 : 1)) {
+        const r = sellTo(c, day, out, { hot: true });
+        if (r) {
+          const s = c.sold[day];
+          s.cart = (s.cart || 0) + 1;
+          out.cart = (out.cart || 0) + r;
+        }
+      }
       if (F2.goals && F2.goals.cellar && wineClubNow(day, hm2) && Math.random() < 0.04) {
-        const shown2 = onDisplay2(c), k2 = Object.keys(KINDS2).find((x) => c.bars[x] > 0), s2 = c.sold[day] = c.sold[day] || { n: 0, coins: 0, bonbons: 0 };
-        if (shown2.length) {
-          const b = shown2[Math.floor(Math.random() * shown2.length)], n2 = Math.min(c.trays[b.id], 2 + Math.floor(Math.random() * 3));
-          c.trays[b.id] -= n2;
-          s2.bonbons = (s2.bonbons || 0) + n2;
-          s2.coins += n2 * c.prices.bonbon;
-          out.coins += n2 * c.prices.bonbon;
-          out.bonbons = (out.bonbons || 0) + n2;
-          s2.club = (s2.club || 0) + 1;
-          out.club = (out.club || 0) + 1;
-        } else if (k2) {
-          c.bars[k2]--;
-          s2.n++;
-          s2.coins += c.prices.bar;
-          out.coins += c.prices.bar;
-          out.n++;
-          s2.club = (s2.club || 0) + 1;
+        const shown2 = onDisplay2(c), k = Object.keys(KINDS2).find((x) => c.bars[x] > 0), s = c.sold[day] = c.sold[day] || { n: 0, coins: 0, bonbons: 0 };
+        if (shown2.length || k) {
+          sellTo(c, day, out, {});
+          s.club = (s.club || 0) + 1;
           out.club = (out.club || 0) + 1;
         }
       }
-      if (!openOn(day, hm2)) continue;
+      if (!openOn(day, hm2, ccUp(c, "assistant"))) continue;
+      if (ccUp(c, "hotchoc") && hotMinute(c, day, hm2, opts, out)) continue;
       const sp = specialOn(day);
       if (sp && c.specials[sp.id] > 0 && Math.random() < 0.012 * ((/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() % 6 === 0 ? 1.4 : 1)) {
-        const s2 = c.sold[day] = c.sold[day] || { n: 0, coins: 0, bonbons: 0 };
+        const s = c.sold[day] = c.sold[day] || { n: 0, coins: 0, bonbons: 0 };
         c.specials[sp.id]--;
-        s2.specials = (s2.specials || 0) + 1;
-        s2.coins += sp.price;
+        s.specials = (s.specials || 0) + 1;
+        s.coins += sp.price;
         out.coins += sp.price;
         out.specials = (out.specials || 0) + 1;
       }
-      const stocked = Object.keys(KINDS2).filter((k2) => c.bars[k2] > 0), shown = onDisplay2(c);
+      const stocked = Object.keys(KINDS2).filter((k) => c.bars[k] > 0), shown = onDisplay2(c);
       if (!stocked.length && !shown.length) continue;
       const d = sg.getUTCDay(), we = d === 0 || d === 6, pf = Math.pow(6 / Math.max(2, c.prices.bar), 1.3);
-      if (Math.random() >= 0.03 * (we ? 1.4 : 1) * (hm2 >= 15 * 60 && hm2 < 18 * 60 ? 1.2 : 1) * (opts.serving ? 1.5 : 1) * pf) continue;
-      const s = c.sold[day] = c.sold[day] || { n: 0, coins: 0, bonbons: 0 };
-      if (shown.length && (!stocked.length || Math.random() < 0.5)) {
-        const b = shown[Math.floor(Math.random() * shown.length)], n2 = Math.min(c.trays[b.id], 2 + Math.floor(Math.random() * 3)), coins2 = n2 * c.prices.bonbon;
-        c.trays[b.id] -= n2;
-        s.bonbons = (s.bonbons || 0) + n2;
-        s.coins += coins2;
-        out.coins += coins2;
-        out.bonbons = (out.bonbons || 0) + n2;
-        continue;
+      const busy2 = (ccUp(c, "window") ? 1.2 : 1) * (ccUp(c, "assistant") ? 1.1 : 1);
+      if (Math.random() >= 0.03 * (we ? 1.4 : 1) * (hm2 >= 15 * 60 && hm2 < 18 * 60 ? 1.2 : 1) * (opts.serving ? 1.5 : 1) * pf * busy2) continue;
+      const got = sellTo(c, day, out, { box: ccUp(c, "wrap") });
+      if (got && ccUp(c, "fountain") && Math.random() < 0.25) {
+        c.sold[day].coins++;
+        c.sold[day].tips = (c.sold[day].tips || 0) + 1;
+        out.coins++;
       }
-      const k = stocked[Math.floor(Math.random() * stocked.length)], n = Math.min(c.bars[k], Math.random() < 0.3 ? 2 : 1);
-      c.bars[k] -= n;
-      const coins = n * c.prices.bar;
-      s.n += n;
-      s.coins += coins;
-      out.coins += coins;
-      out.n += n;
     }
     out.done = finish(c) || out.done;
     c.at = from + out.mins * 6e4;
     if (out.coins) F2.coins += out.coins;
     return out;
+  }
+  function sellTo(c, day, out, o) {
+    const stocked = Object.keys(KINDS2).filter((k2) => c.bars[k2] > 0), shown = onDisplay2(c), s = c.sold[day] = c.sold[day] || { n: 0, coins: 0, bonbons: 0 };
+    if (o.hot && ccUp(c, "hotchoc") && Math.random() < 0.3) {
+      const k2 = ["milk", "dark", "white"].find((x) => c.choc[x] > 0);
+      if (k2) {
+        c.choc[k2]--;
+        s.hot = (s.hot || 0) + 1;
+        s.coins += c.prices.hot;
+        out.coins += c.prices.hot;
+        out.hot = (out.hot || 0) + 1;
+        return c.prices.hot;
+      }
+    }
+    if (shown.length && (!stocked.length || Math.random() < 0.5)) {
+      const boxed = o.box && Math.random() < 0.25, b = shown[Math.floor(Math.random() * shown.length)], n2 = Math.min(c.trays[b.id], boxed ? 4 : 2 + Math.floor(Math.random() * 3)), coins2 = n2 * c.prices.bonbon + (boxed ? 3 : 0);
+      c.trays[b.id] -= n2;
+      s.bonbons = (s.bonbons || 0) + n2;
+      if (boxed) s.boxes = (s.boxes || 0) + 1;
+      s.coins += coins2;
+      out.coins += coins2;
+      out.bonbons = (out.bonbons || 0) + n2;
+      return coins2;
+    }
+    if (!stocked.length) return 0;
+    const k = stocked[Math.floor(Math.random() * stocked.length)], n = Math.min(c.bars[k], Math.random() < 0.3 ? 2 : 1), coins = n * c.prices.bar;
+    c.bars[k] -= n;
+    s.n += n;
+    s.coins += coins;
+    out.coins += coins;
+    out.n += n;
+    return coins;
+  }
+  function hotMinute(c, day, hm2, opts, out) {
+    const k = ["milk", "dark", "white"].find((x) => c.choc[x] > 0);
+    if (!k) return false;
+    const p = 0.015 * (hm2 >= 17 * 60 ? 1.6 : 1) * (rainyOn(day) ? 1.6 : 1) * ([11, 12, 1].includes(+day.slice(5, 7)) ? 1.2 : 1) * (opts.serving ? 1.3 : 1) * Math.pow(5 / Math.max(2, c.prices.hot), 1.2);
+    if (Math.random() >= p) return false;
+    const s = c.sold[day] = c.sold[day] || { n: 0, coins: 0, bonbons: 0 };
+    c.choc[k]--;
+    s.hot = (s.hot || 0) + 1;
+    s.coins += c.prices.hot;
+    out.coins += c.prices.hot;
+    out.hot = (out.hot || 0) + 1;
+    return true;
+  }
+  function haveHot(F2) {
+    const c = cocoaState(F2), k = ["milk", "dark", "white"].find((x) => c.choc[x] > 0);
+    if (!ccUp(c, "hotchoc") || !k) return null;
+    c.choc[k]--;
+    return k;
+  }
+  function packGrand(F2) {
+    const c = cocoaState(F2);
+    if (!ccUp(c, "wrap") || caseCount(c) < BOX16) return null;
+    const id = pick3(c, BOX16) ? "box16d" : "box16";
+    F2.inv[id] = (F2.inv[id] || 0) + 1;
+    return id;
   }
   function takeBar(F2, kind, give) {
     const c = cocoaState(F2);
@@ -14922,11 +15095,13 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var dot2 = (c) => `<span class="gdot" style="background:${c}"></span>`;
   function counterPanel3(F2, st6) {
     const c = cocoaState(F2), day = dayKey(), hm2 = sgHM(), t2 = c.sold[day] || { n: 0, coins: 0 };
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${openOn(day, hm2) ? "Open till 8pm." : "Closed: open 11am to 8pm, Tuesday to Sunday."} ${t2.n || t2.bonbons ? `Sold today: ${t2.n} bar${t2.n === 1 ? "" : "s"}${t2.bonbons ? ` and ${t2.bonbons} bonbon${t2.bonbons === 1 ? "" : "s"}` : ""} (${t2.coins} ${coin2()}).` : "Nothing sold yet today."}${st6.server ? " Amara's behind the counter." : ""}</p>`;
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${st6.cart ? "The night market cart. " : ""}${openOn(day, hm2, ccUp(c, "assistant")) ? "Open till 8pm." : `Closed: open 11am to 8pm, ${ccUp(c, "assistant") ? "every day" : "Tuesday to Sunday"}.`} ${t2.n || t2.bonbons ? `Sold today: ${t2.n} bar${t2.n === 1 ? "" : "s"}${t2.bonbons ? ` and ${t2.bonbons} bonbon${t2.bonbons === 1 ? "" : "s"}` : ""} (${t2.coins} ${coin2()}).` : "Nothing sold yet today."}${st6.server ? " Amara's behind the counter." : ""}</p>`;
     h += `<ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n} bars</b><small>${c.bars[k]} on the wall · ${c.prices.bar} ${coin2()} each</small></span><span class="orbtns"><button class="btn small primary" data-cc="eat" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>Have one</button><button class="btn small alt" data-cc="give" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>To give</button></span></li>`).join("")}</ul>`;
     h += `<div class="row gprices"><span>Price of a bar</span><span class="gstep"><button class="btn small alt" data-cc="price" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bar}</b><button class="btn small alt" data-cc="price" data-n="1" aria-label="Dearer">+</button></span></div>`;
-    h += `<form class="row hadd" data-ccname="1"><label class="sr" for="ccName">Shop name</label><input id="ccName" maxlength="30" value="${esc(c.name)}"><button class="btn small alt">Rename</button></form>`;
-    return h + counterBonbons(F2) + planPanel(F2, st6) + `<p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut2;
+    if (ccUp(c, "hotchoc")) h += `<div class="row gprices"><span>Hot chocolate${t2.hot ? ` <small class="muted">(${t2.hot} today)</small>` : ""}</span><span class="gstep"><button class="btn small alt" data-cc="hprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.hot}</b><button class="btn small alt" data-cc="hprice" data-n="1" aria-label="Dearer">+</button></span></div><div class="actions"><button class="btn small primary" data-cc="hot" ${Object.values(c.choc).some((n) => n > 0) ? "" : "disabled"}>Have a hot chocolate</button></div>`;
+    if (!st6.cart) h += `<form class="row hadd" data-ccname="1"><label class="sr" for="ccName">Shop name</label><input id="ccName" maxlength="30" value="${esc(c.name)}"><button class="btn small alt">Rename</button></form>`;
+    if (st6.cart) return h + counterBonbons(F2) + `<p class="muted">Mateo sells from the shop's stock: bars, bonbons from the case${ccUp(c, "hotchoc") ? ", and hot chocolate" : ""}. More people stop while you're serving.</p>` + shut2;
+    return h + counterBonbons(F2) + planPanel(F2, st6) + `<div class="actions"><button class="btn small alt" data-cc="ups">Shop upgrades</button></div><p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut2;
   }
   function barWallPanel(F2) {
     const c = cocoaState(F2);
@@ -14943,10 +15118,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <p class="olabel">${c.beans} sack${c.beans === 1 ? "" : "s"} in the kitchen</p><div class="actions"><button class="btn primary" data-cc="beans" data-n="1" ${F2.coins < SACK ? "disabled" : ""}>Buy a sack (${SACK} ${coin2()})</button><button class="btn alt" data-cc="beans" data-n="3" ${F2.coins < SACK * 3 ? "disabled" : ""}>Three (${SACK * 3} ${coin2()})</button></div>${steps}` + shut2;
     if (which === "roaster") return `<span class="tape stripe" aria-hidden="true"></span><h2>The roaster</h2><p class="sub">${c.roast ? `Roasting a sack: ready in ${left3(c.roast.done)}.` : "Roast a sack of beans. Ten minutes, and the whole kitchen smells amazing."}</p>
     <div class="actions"><button class="btn primary" data-cc="roast" ${c.roast || c.beans < 1 ? "disabled" : ""}>${c.beans < 1 ? "No beans: buy a sack" : "Roast a sack"}</button></div>${steps}` + shut2;
-    if (which === "grinder") return `<span class="tape gingham" aria-hidden="true"></span><h2>The stone grinder</h2><p class="sub">${c.grind ? `Grinding ${KINDS2[c.grind.kind].n.toLowerCase()}: ready in ${left3(c.grind.done)}.` : c.ground ? `A pot of ${KINDS2[c.ground].n.toLowerCase()} is ready: temper it on the marble slab.` : "Roasted beans in, chocolate out. It takes two hours."}</p>
-    ${c.grind || c.ground ? "" : `<div class="actions">${Object.entries(KINDS2).map(([k, d]) => `<button class="btn ${k === "milk" ? "primary" : "alt"}" data-cc="grind" data-k="${k}" ${c.roasted < 1 ? "disabled" : ""}>${dot2(d.col)} ${d.n}</button>`).join("")}</div>${c.roasted < 1 ? `<p class="muted">Roast some beans first.</p>` : ""}`}${steps}` + shut2;
-    if (which === "slab") return `<span class="tape stripe" aria-hidden="true"></span><h2>The marble slab</h2><p class="sub">${c.ground ? `Temper the ${KINDS2[c.ground].n.toLowerCase()}: spread, scrape, fold, until it shines.` : "Tempering makes chocolate snap and shine. Bring a pot from the grinder."}</p>
-    <div class="actions"><button class="btn primary" data-cc="temper" ${c.ground ? "" : "disabled"}>Temper it (${POT} pieces)</button></div>${steps}` + shut2;
+    const gline = (g) => c["grind" + g] ? `Grinding ${KINDS2[c["grind" + g].kind].n.toLowerCase()}: ready in ${left3(c["grind" + g].done)}.` : c["ground" + g] ? `A pot of ${KINDS2[c["ground" + g]].n.toLowerCase()} is ready: temper it on the marble slab.` : "";
+    if (which === "grinder") return `<span class="tape gingham" aria-hidden="true"></span><h2>The stone grinder${slots(c).length > 1 ? "s" : ""}</h2><p class="sub">${slots(c).map((g, i) => gline(g) ? (slots(c).length > 1 ? `${i ? "Second" : "First"}: ` : "") + gline(g) : "").filter(Boolean).join(" ") || "Roasted beans in, chocolate out. It takes two hours."}</p>
+    ${freeSlot2(c) === void 0 ? "" : `<div class="actions">${Object.entries(KINDS2).map(([k, d]) => `<button class="btn ${k === "milk" ? "primary" : "alt"}" data-cc="grind" data-k="${k}" ${c.roasted < 1 ? "disabled" : ""}>${dot2(d.col)} ${d.n}</button>`).join("")}</div>${c.roasted < 1 ? `<p class="muted">Roast some beans first.</p>` : ""}`}${steps}` + shut2;
+    const pot = readyPot(c) === void 0 ? null : c["ground" + readyPot(c)];
+    if (which === "slab") return `<span class="tape stripe" aria-hidden="true"></span><h2>The marble slab</h2><p class="sub">${pot ? `Temper the ${KINDS2[pot].n.toLowerCase()}: spread, scrape, fold, until it shines.` : "Tempering makes chocolate snap and shine. Bring a pot from the grinder."}</p>
+    <div class="actions"><button class="btn primary" data-cc="temper" ${pot ? "" : "disabled"}>Temper it (${POT} pieces)</button></div>${steps}` + shut2;
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The moulds</h2><p class="sub">${MOULD} pieces of tempered chocolate make ${MOULD} bars, straight onto the bar wall.</p>
     <ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${dot2(d.col)}</span><span class="wtxt"><b>${d.n}</b><small>${c.choc[k]} pieces</small></span><button class="btn small primary" data-cc="mould" data-k="${k}" ${c.choc[k] < MOULD ? "disabled" : ""}>Mould ${MOULD} bars</button></li>`).join("")}</ul>${scoopSend(F2)}${steps}` + shut2;
   }
@@ -15001,6 +15178,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     h += `<div class="row gprices"><span>Price of a bonbon</span><span class="gstep"><button class="btn small alt" data-cc="bprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bonbon}</b><button class="btn small alt" data-cc="bprice" data-n="1" aria-label="Dearer">+</button></span></div>`;
     return h + shut2;
   }
+  function upsPanel(F2) {
+    const c = cocoaState(F2), btn = (k, u) => `<button class="btn small ${F2.coins >= u.price ? "primary" : "alt"}" data-cc="buyup" data-k="${k}" ${F2.coins >= u.price ? "" : "disabled"}>Buy · ${u.price} ${coin2()}</button>`;
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>Shop upgrades</h2><p class="sub">Things to make ${esc(c.name)} even nicer. You have ${F2.coins} ${coin2()}.</p><ul class="hlist wlist gups">${Object.entries(CC_UPS).map(([k, u]) => `<li><span class="wtxt"><b>${esc(u.n)}</b><small>${esc(u.line)}</small></span>${c.up[k] ? `<span class="hbadge">yours</span>` : btn(k, u)}</li>`).join("")}</ul><div class="actions"><button class="btn alt small" data-cc="counter">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
   function planPanel(F2, st6 = {}) {
     const c = cocoaState(F2), p = c.plan;
     const step2 = (a, k, v, label2) => `<div class="row gprices"><span>${label2}</span><span class="gstep"><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="-1" aria-label="Less">−</button><b>${v}</b><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="1" aria-label="More">+</button></span></div>`;
@@ -15015,7 +15196,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const c = cocoaState(F2), shown = onDisplay2(c), have = shown.reduce((a, b) => a + c.trays[b.id], 0);
     if (!c.bonbons.length) return giveSpecials(c);
     return `<p class="eyebrow" style="margin:12px 0 6px">Bonbons</p>${shown.length ? `<div class="gchips">${shown.map((b) => `<button class="gchip" data-cc="eatbb" data-k="${esc(b.id)}">${dot2(KINDS2[b.shell].col)}<span>${esc(b.name)}</span></button>`).join("")}</div>` : `<p class="muted">The display case is empty.</p>`}
-    <div class="actions"><button class="btn small alt" data-cc="box" data-n="4" ${have >= 4 ? "" : "disabled"}>Gift box of 4</button><button class="btn small alt" data-cc="box" data-n="9" ${have >= 9 ? "" : "disabled"}>Gift box of 9</button></div>${pairing(F2, have)}${giveSpecials(c)}`;
+    <div class="actions"><button class="btn small alt" data-cc="box" data-n="4" ${have >= 4 ? "" : "disabled"}>Gift box of 4</button><button class="btn small alt" data-cc="box" data-n="9" ${have >= 9 ? "" : "disabled"}>Gift box of 9</button>${ccUp(c, "wrap") ? `<button class="btn small alt" data-cc="grand" ${have >= BOX16 ? "" : "disabled"}>Grand box of 16</button>` : ""}</div>${pairing(F2, have)}${giveSpecials(c)}`;
   }
   function pairing(F2, have) {
     const wines = wineShelf(F2).slice(0, 4);
@@ -17330,7 +17511,8 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
     const days = [];
     for (let i = 0; i < CAL_DAYS; i++) {
       const k = addD(today2, i), ev = eventOn(k), dn = dinnerOn(k), list2 = [];
-      if (ev) list2.push(`${ev.name}, ${hhmm(ev.from)} to ${hhmm(ev.to)} on the field${ev.kind === "market" ? " (our wine stall's there)" : ev.kind === "night" ? ` (with a jazz duo, and the cart from ${scoopState(F).name})` : ""}`);
+      if (ev) list2.push(`${ev.name}, ${hhmm(ev.from)} to ${hhmm(ev.to)} on the field${ev.kind === "market" ? " (our wine stall's there)" : ev.kind === "night" ? ` (with a jazz duo, and the cart from ${scoopState(F).name}${F.cocoa && F.cocoa.up && F.cocoa.up.cart ? ` and ${cocoaState(F).name}'s` : ""})` : ""}`);
+      if (F.cocoa && F.cocoa.up && F.cocoa.up.workshop && (/* @__PURE__ */ new Date(k + "T00:00:00Z")).getUTCDay() === 6) list2.push(`Bonbon workshop at ${cocoaState(F).name}, 2 to 4pm`);
       if (owns(F, "cellar") && wineClubOn(k)) list2.push(`Wine club at the cellar door, 6 to 9pm`);
       if (dn) list2.push(`Family dinner at ${HOST_NAME[dn.host]}, 6:30pm`);
       fests.filter((x) => x.k === k).forEach((x) => list2.push(`${x.f.name}!`));
@@ -18243,9 +18425,9 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
     else if (fieldView && scene === "field") {
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
-      h = !st6 ? "" : st6.kind === "wine" ? stallMarketPanel(F, serving()) : st6.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st6.kind === "scoop" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st6, dayKey(), sgHM()) }) : marketStallPanel(st6);
+      h = !st6 ? "" : st6.kind === "wine" ? stallMarketPanel(F, serving()) : st6.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st6.kind === "scoop" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st6, dayKey(), sgHM()) }) : st6.kind === "cocoa" ? counterPanel3(F, { cart: true, server: isHere("mateo") }) : marketStallPanel(st6);
     } else if (orView === "pot" && potItem) h = potPanel(F, potItem);
-    else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? counterPanel3(F, { server: isHere("amara"), hand: isHere("mateo") }) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : kitchenPanel(F, ccView);
+    else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? counterPanel3(F, { server: isHere("amara"), hand: isHere("mateo") }) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccView === "ups" ? upsPanel(F) : kitchenPanel(F, ccView);
     else if (keepItem && F.inv[keepItem]) h = keepPanel(F, keepItem);
     else if (keepSpot) h = placedPanel(F, keepSpot);
     else if (adoptItem && F.inv[adoptItem]) h = adoptPanel(F, adoptItem, adoptSt);
@@ -18396,7 +18578,7 @@ ${SIGNOFF[t2.who] || ""}`;
     });
     if (scView || fieldView === "mstall8" && scene === "field") wireScoop(c);
     wireCompanions(c);
-    if (ccView) wireCocoa(c);
+    if (ccView || fieldView === "mstall9" && scene === "field") wireCocoa(c);
     c.querySelectorAll("[data-sup]").forEach((b) => b.onclick = () => {
       goalView = null;
       ctx();
@@ -19344,6 +19526,7 @@ ${SIGNOFF[t2.who] || ""}`;
           setTimeout(() => speak(m < 18 * 60 ? "Wine club tonight at the cellar door, 6pm! Eight members are coming to taste and buy." : "The wine club's on at the cellar door right now! Pop in and host.", 6e3), 2800);
         }
       }
+      if (id === "cocoa" && evanHere() && ccUp(cocoaState(F), "fountain")) setTimeout(() => evanSays(pick(["THE FOUNTAIN!! Can I put my hand in? Just one finger?", "Mama, it's a chocolate waterfall!", "Can we dip a strawberry? Pleeease?"])), 1400);
       if (id === "cellar" && wineClubNow(dayKey(), sgHM())) setTimeout(() => speak("The wine club's here! Glasses clinking, everyone talking at once. Tap the tasting bar to host.", 5e3), 1200);
       if (id === "marcus" && evanHere()) setTimeout(() => {
         evanSays(pick(["Uncle Marcus! Can I play Mario?", "Can we watch Spiderman? Pleeease?", "Game! Game! Can I play the game?"]));
@@ -19917,6 +20100,10 @@ ${SIGNOFF[t2.who] || ""}`;
         scoopNow();
         speak("Behind the cart. More people stop for a scoop while you're serving.", 3500);
         if (isHere("tomo") && !keeperAway(st6, dayKey(), sgHM())) setTimeout(() => npcSay("tomo", pick(["Night market crowd loves the gelato. Look at that queue.", "Cones are flying. Grab a scoop, boss.", "The jazz makes people hungry. Good for us."])), 1200);
+      } else if (st6.kind === "cocoa") {
+        cocoaNow();
+        speak("Behind the chocolate cart. More people stop while you're serving.", 3500);
+        if (isHere("mateo") && !keeperAway(st6, dayKey(), sgHM())) setTimeout(() => npcSay("mateo", pick(["Night market people LOVE hot chocolate.", "Better than studying, boss.", "The jazz duo bought six bars. Six!"])), 1200);
       } else if (st6.kind === "orchard") {
         orchardTick();
         if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma brought plenty.", "Everybody wants Ma Ma's fruit today.", "For you, free. For them, they pay!"]));
@@ -20255,7 +20442,13 @@ ${SIGNOFF[t2.who] || ""}`;
   function cocoaNow() {
     if (!owns(F, "cocoa")) return;
     lastCocoa = Date.now();
-    const out = cocoaTick(F, { serving: scene === "cocoa" && atSpot === "ccounter" });
+    const out = cocoaTick(F, { serving: scene === "cocoa" && atSpot === "ccounter", cart: scene === "field" && atSpot === "mstall9" });
+    if (out.cart && scene === "field") {
+      sfx("coin");
+      flash(`+${out.cart} coins: the ${cocoaState(F).name} cart`);
+    }
+    if (out.workshop) setTimeout(() => speak(`The Saturday workshop's done: six happy bonbon makers, ${out.workshop} coins.`, 5e3), 1500);
+    if (out.tree && COCOA_IN.includes(scene)) speak("Ma Ma's sent a sack of beans from the cacao tree. They're with the others in the kitchen.", 4500);
     if (out.coins && (scene === "cocoa" || scene === "bay")) {
       sfx("coin");
       flash(`+${out.coins} coins: ${cocoaState(F).name}`);
@@ -20263,7 +20456,7 @@ ${SIGNOFF[t2.who] || ""}`;
     const hd = out.hand;
     if (hd && (hd.pots || hd.bars) && out.mins >= 30) setTimeout(() => speak(`Mateo's been busy: ${hd.pots} pot${hd.pots === 1 ? "" : "s"} tempered${hd.res ? `, ${hd.res} pieces onto the bonbon shelf` : ""}${hd.bars ? `, ${hd.bars} bars on the wall` : ""}${hd.sacks ? `, ${hd.sacks} sack${hd.sacks === 1 ? "" : "s"} of beans bought (${hd.spent} coins)` : ""}.`, 6e3), out.coins ? 8e3 : 2500);
     else if (hd && hd.pots && COCOA_IN.includes(scene) && isHere("mateo")) npcSay("mateo", hd.res ? "Another pot tempered. Some on your bonbon shelf!" : "Pot tempered. More bars for the wall.");
-    if (out.done === "grind" && cocoaState(F).ground && COCOA_IN.includes(scene)) speak("Ding! The grinder's done: a pot of chocolate, ready to temper on the marble slab.", 4500);
+    if (out.done === "grind" && readyPot(cocoaState(F)) !== void 0 && COCOA_IN.includes(scene)) speak("Ding! The grinder's done: a pot of chocolate, ready to temper on the marble slab.", 4500);
     if (out.coins || out.done || out.mins >= 5) save2();
     if (ccView) ctx();
     if (COCOA_IN.includes(scene)) drawScene();
@@ -20318,6 +20511,31 @@ ${SIGNOFF[t2.who] || ""}`;
         else if (k === "hold") p.hold = Math.max(0, Math.min(20, p.hold + n));
         sfx("tap");
         if (k === "on") speak(p.on ? "Mateo's back on the bar line." : "Mateo's taking a break from the bar line. The kitchen's all yours.", 3500);
+      } else if (a === "ups" || a === "counter") {
+        ccView = a;
+      } else if (a === "buyup") {
+        const line = buyCcUp(F, k);
+        if (!line) return;
+        sfx("coin");
+        act("cheer");
+        gainXp(2);
+        speak(line, 5e3);
+        if (k === "cart") render();
+      } else if (a === "hprice") {
+        const s = cocoaState(F);
+        s.prices.hot = Math.max(1, Math.min(20, s.prices.hot + n));
+      } else if (a === "hot") {
+        const kk = haveHot(F);
+        if (!kk) return;
+        sfx("chime");
+        mprop("heart", mel.x, mel.y - 60, 1600);
+        speak(pick(["Hot chocolate, from your own chocolate. Pure comfort.", "Mmm. Thick, rich, a little bit of foam.", "The perfect rainy-day cup."]), 4e3);
+        if (evanHere()) setTimeout(() => evanSays(pick(["Can I have one too? With marshmallows?", "Mama, you have a chocolate moustache!"])), 900);
+      } else if (a === "grand") {
+        const id = packGrand(F);
+        if (!id) return;
+        sfx("paper", true);
+        flash(`${ITEMS[id].n} in your backpack`);
       } else if (a === "bprice") {
         const s = cocoaState(F);
         s.prices.bonbon = Math.max(1, Math.min(20, s.prices.bonbon + n));
@@ -22147,6 +22365,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     r.readAsText(f2);
     e.target.value = "";
   };
+  setStallOwned(() => ({ cc_cart: !!(F.cocoa && F.cocoa.up && F.cocoa.up.cart) }));
   initNpcs({
     sfx,
     quiet: () => quietNow(),

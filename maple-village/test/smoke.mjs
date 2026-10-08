@@ -1785,6 +1785,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     if (m[1] === "links" || m[1] === "fest" || m[1] === "club") { Object.assign(f.cocoa, {choc: {milk: 40, dark: 40, white: 40}, plan: {...f.cocoa.plan, on: false}}); trays(); }
     if (m[1] === "links") { f.scoop = {...(f.scoop || {}), up: {...((f.scoop || {}).up || {}), dip: 1}}; f.vine = {...(f.vine || {}), shelf: [{id: "wtest", name: "Maple's Red", type: "red", n: 3, price: 18, open: 0}]}; }
     if (m[1] === "club") { f.goals.cellar = 1; f.cocoa.at = Date.parse("2026-11-06T10:00:00Z"); }
+    if (m[1] === "ups") { f.coins = 10000; Object.assign(f.cocoa, {choc: {milk: 40, dark: 40, white: 40}, bars: {milk: 10, dark: 10, white: 10}, roasted: 2, grind: null, ground: null, grind2: null, ground2: null, up: {}, plan: {...f.cocoa.plan, on: false}}); trays(); }
+    if (m[1] === "upsrun") { const t0 = +(/t0=(\d+)/.exec(location.search) || [])[1]; Object.assign(f.cocoa, {at: t0, treeAt: t0 - 3*864e5, beans: 0, choc: {milk: 40, dark: 40, white: 40}, bars: {milk: 20, dark: 20, white: 20}}); trays(); }
     if (m[1] === "mateo") Object.assign(f.cocoa, {at: 1, plan: {on: true, buy: true, floor: 200, hold: 0}, beans: 0, roasted: 0, roast: null, grind: null, ground: null, res: {milk: 0, dark: 0, white: 0}, keep: {milk: 30, dark: 30, white: 0}, choc: {milk: 0, dark: 0, white: 0}, bars: {milk: 0, dark: 0, white: 0}, made: 0});
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   const at = async (t, q = "") => { await page.goto(url + `?seed=1&time=${t}&date=2026-10-10${q}`); await page.waitForTimeout(900); };
@@ -1881,6 +1883,38 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=21:05&date=2026-11-06&ccpatch=club"); await page.waitForTimeout(1500);
   check(await fox().then(f => (f.cocoa.sold["2026-11-06"] || {}).club > 0), "wine club night: members buy chocolates at the cellar door");
+  // the upgrades catalogue: all ten, then what they do
+  await at("12:00", "&ccpatch=ups"); await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
+  await tap("ccounter", '#ctx [data-cc="ups"]'); await page.click('#ctx [data-cc="ups"]'); await page.waitForSelector('#ctx [data-cc="buyup"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-cc="buyup"]').count() === 10, "the Cocoa Room's catalogue lists ten upgrades");
+  for (let i = 0; i < 10; i++) { const b = page.locator('#ctx [data-cc="buyup"]').first(); if (!(await b.count())) break; await b.click(); await page.waitForTimeout(250); }
+  check(await fox().then(f => Object.keys(f.cocoa.up).length === 10 && f.coins === 10000 - 4450), "all ten bought (4450 coins)");
+  await page.click('#ctx [data-cc="counter"]'); await page.waitForSelector('#ctx [data-cc="hot"]', { timeout: 15000 }); await page.click('#ctx [data-cc="hot"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.cocoa.choc.milk === 39), "the hot chocolate bar: Mel has a cup (one piece of chocolate)");
+  await page.click('#ctx [data-cc="grand"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => (f.inv.box16 || 0) + (f.inv.box16d || 0) === 1), "the gift wrapping station packs a grand box of 16");
+  check(await page.locator("#fore").innerHTML().then(h => /q18 6 36 0/.test(h)), "a chocolate fountain on the counter");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await tap("grinder", '#ctx [data-cc="grind"][data-k="dark"]'); await page.click('#ctx [data-cc="grind"][data-k="dark"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-cc="grind"][data-k="milk"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.cocoa.grind && f.cocoa.grind2 && f.cocoa.grind.kind === "dark" && f.cocoa.grind2.kind === "milk"), "two grinders: two pots grinding at once");
+  await page.click("#ctx [data-close]").catch(() => {});
+  // Saturday afternoon: the workshop pays, the cacao tree sends a sack, the supply deal stocks the Scoop Shack
+  const t0 = await page.evaluate(() => Date.now() + (window.__mapleOffset || globalThis.__mapleOffset || 0));
+  await at("16:30", `&ccpatch=upsrun&t0=${t0}`); await page.waitForTimeout(1500);
+  const up = await fox();
+  check((up.cocoa.sold["2026-10-10"] || {}).workshop === 48, "Saturday's bonbon workshop: six makers, 48 coins");
+  check(up.cocoa.beans >= 1, "the cacao tree at Ma Ma's sends a sack of beans");
+  check((up.scoop.fridge.housechoc || 0) >= 5, "the supply deal sends dark chocolate to the Scoop Shack's fridge");
+  await page.goto(url + "?seed=1&time=12:00&date=2026-10-12"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1500);
+  check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("lila"), "with a second assistant the shop opens on Mondays: Lila's behind the counter");
+  await page.goto(url + "?seed=1&time=19:00&date=2026-10-13"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  check(await page.locator('#world [data-place="mstall9"]').count() === 1 && (await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("mateo"), "the Cocoa Room cart at Tuesday's night market, with Mateo");
+  await page.locator('#world [data-place="mstall9"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
+  check(/night market cart/.test(await page.locator("#ctx").innerText()), "and Mel can serve from it");
   await page.close();
 }
 {
