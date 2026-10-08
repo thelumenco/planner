@@ -176,11 +176,14 @@ export const ROOMS = {
     ["sofa","Cosy sofa","C","sofa",/user|beta|tester|feedback|call|interview/,"For evening chats with users."],
     ["table","Planning table","D","table",/plan|schedule|roadmap|launch/,"Where Luna's plans happen."],
     ["status","Health sign","E","healthluna",null,"Last night's Luna bug check."]]},
-  ohayo: {name:"Ohayo house", wall:"#FFF4E6", trim:"#F2A65A", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320], E:[290,350]}, stations:[
-    ["laptop","Laptop desk","A","desk",/build|fix|app|code|feature|bug|test|ship/,"Ohayo's engine room."],
+  // Ohayo (not launched yet: it sends video hellos): a reactions board and a hello chart from the founder desk's
+  // numbers (feeds.js ohayoHellos), the health sign, and the usual desk, shelf and sofa
+  ohayo: {name:"Ohayo house", wall:"#FFF4E6", trim:"#F2A65A", pos:{A:[400,530], B:[420,262], C:[130,530], R:[110,262], H:[372,420], E:[170,420]}, stations:[
+    ["laptop","Laptop desk","A","desk",/build|fix|app|code|feature|bug|test|ship|plan|schedule|roadmap|launch/,"Ohayo's engine room."],
     ["shelf","Plant shelf","B","craft",/design|brand|content|post|icon|copy/,"Colours, ideas, a lot of plants."],
-    ["sofa","Cosy sofa","C","sofa",/user|beta|tester|feedback|call|interview/,"For morning chats with users."],
-    ["table","Planning table","D","table",/plan|schedule|roadmap|launch/,"Where Ohayo's plans happen."],
+    ["sofa","Cosy sofa","C","sofa",/user|beta|tester|feedback|call|interview|hello|video/,"For morning chats with users."],
+    ["reactions","Reactions board","R","reactboard",null,"What people sent back from their hellos.",34],
+    ["hellos","Hello chart","H","hellochart",null,"How many people are waiting, and how many watched.",30],
     ["status","Health sign","E","healthohayo",null,"Last night's Ohayo bug check."]]},
   post:  {name:"Post office", wall:"#E3EEF5", trim:"var(--sky)", pos:{A:[260,340], B:[436,258], C:[400,530], D:[110,216], E:[72,440]}, stations:[
     ["counter","Sorting counter","A","counter",/email|inbox|reply|message|dm|respond/,"Letters in, letters out."],

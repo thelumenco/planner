@@ -16,7 +16,7 @@ import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, set
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked } from "./paths.js";
 import { fetchPost, postPanel, postCount } from "./postbox.js";
-import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML } from "./feeds.js";
+import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML, ohayoHellos, reactionsPanel, helloPanel } from "./feeds.js";
 import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia, chatLastDone, lastDueCount, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
 import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, roomLeft, hungry, hungryCount, KINDS } from "./pets.js";
 import { wardrobePanel, newOutfit, outfitsToday, wearing, ACCESSORIES } from "./wardrobe.js";
@@ -84,7 +84,7 @@ function migrate(){
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
-setArtContext({F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const t = tapasToday(F, dayKey()); return t ? TAPAS[t.id].n : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf(), kudos: () => kudosCount(), vault: x => { const i = [70, 165, 260, 355, 450].indexOf(x); return i < 0 ? null : jarAt(i); }, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, kid: () => ({sleep: kid.sleep || evanNight()})});
+setArtContext({ohayo: () => ohayoHellos(), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const t = tapasToday(F, dayKey()); return t ? TAPAS[t.id].n : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf(), kudos: () => kudosCount(), vault: x => { const i = [70, 165, 260, 355, 450].indexOf(x); return i < 0 ? null : jarAt(i); }, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, kid: () => ({sleep: kid.sleep || evanNight()})});
 function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
@@ -156,7 +156,7 @@ async function initDb(){
   attachJars(col, () => { if (scene === "room") drawScene(); if (jarsOpen && !/^(jNote|jcName)$/.test(document.activeElement?.id || "")) ctx(); });
   attachMyDocs(col, id => { if ((id === "journal" && journalOpen && document.activeElement?.id !== "jText") || (id === "scratch" && scratchOpen && document.activeElement?.id !== "scratchText")) ctx(); });
   attachFeeds(col, id => {
-    if (/^health/.test(id) && ["lane", ...APP_IDS].includes(scene)) { drawScene(); ctx(); }
+    if ((/^health/.test(id) || id === "ohayo-hellos") && ["lane", ...APP_IDS].includes(scene)) { drawScene(); ctx(); }
     if (/^content/.test(id) && openView === "cal" && calTab === "content") renderCal();
     if (id === "goodnews" && scene === "village") drawScene();
   });
@@ -1485,7 +1485,7 @@ function ctx(){
   else if (routOpen && scene === "room") h = routinesPanel();
   else if (lettersOpen && (scene === "room" || scene === "base")) h = lettersPanel(!!sampleCap);
   else if (postOpen && scene === "post") h = postPanel();
-  else if (healthOpen && APP_IDS.includes(scene)) h = healthPanel(scene);
+  else if (healthOpen && APP_IDS.includes(scene)) h = healthOpen === "reactions" ? reactionsPanel() : healthOpen === "hellos" ? helloPanel() : healthPanel(scene);
   else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar());
   else if (scene === "market" && !shopClosed) {
     const tabs = [["seeds","Seeds"],["treats","Treats"],["deli","Deli"],["care","Care"],["family","Family"],["animals","Animals"],["home","Home"],["me","Me & my room"],["sell","Sell"]];
@@ -2010,6 +2010,7 @@ function arriveSpot(id){
   if (id === "digest") { shelfOpen = true; speak(digestReady() ? (isHere("juniper") ? "Juniper's waving a digest at you!" : "A fresh digest is ready on the shelf.") : "Digests are rationed. Like dessert.", 3500); render(); return; }
   if (id === "stall") { shopClosed = false; render(); return; }
   if (id === "status") { healthOpen = true; sfx("paper"); render(); return; }
+  if (scene === "ohayo" && (id === "reactions" || id === "hellos")) { healthOpen = id; sfx("paper"); render(); return; }   // Ohayo's reactions board and hello chart
   if (id === "pobox") { postOpen = true; sfx("paper"); render(); fetchPost().then(() => { ctx(); drawScene(); }); return; }
   if (id === "board" && outside()) { openView = "quests"; speak("All of today's quests!", 3500); render(); return; }
   if (id === "board") { boardOpen = true; speak(outside() ? "All of today's quests!" : "Here's what needs doing in here.", 3500); render(); return; }

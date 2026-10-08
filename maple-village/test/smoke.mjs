@@ -1777,6 +1777,18 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-10"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(700);
   check(await page.locator('#world [data-place="luna"]').count() === 1 && await page.locator('#world [data-place="ohayo"]').count() === 1 && await page.locator('#world [data-place^="plot"]').count() === 0, "Luna and Ohayo have houses on Makers' Lane where their plots were");
+  await page.addInitScript(() => { if (!/hellopatch/.test(location.search)) return;
+    const d = {at: Date.now() - 3600e3, queued: 55, sent30: 3, opened30: 1, watched30: 1, reactions30: 1, watchRate30: 33, avgWatchSecs30: 7, arrived7: 68, sentTotal: 3, reactions: [{name: "Tester", product: "Chord", emoji: "❤️", text: "So lovely!", at: new Date().toISOString()}]};
+    const f = JSON.parse(localStorage.getItem("fox.feeds") || "{}"); f["ohayo-hellos"] = d; localStorage.setItem("fox.feeds", JSON.stringify(f)); localStorage.setItem("stub:data/users/me/ohayo-hellos", JSON.stringify(d)); });
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-10&hellopatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("ohayo")); await page.waitForTimeout(700);
+  check(/55 waiting/.test(await page.locator("#sceneArt").textContent()) && /33%/.test(await page.locator("#sceneArt").textContent()), "the Ohayo house's hello chart shows who's waiting and the watched percentage");
+  await page.locator('#world [data-spot="reactions"]').dispatchEvent("click"); await page.waitForSelector("#ctx .ohreact li", { timeout: 15000 });
+  check(/So lovely!/.test(await page.locator("#ctx .ohreact").innerText()), "and its reactions board pins up what people sent back");
+  await page.click("#pclose").catch(() => {});
+  await page.locator('#world [data-spot="hellos"]').dispatchEvent("click"); await page.waitForSelector("#ctx .ohfunnel li", { timeout: 15000 });
+  check(await page.locator("#ctx .ohfunnel li").count() === 4, "the hello chart opens: sent, opened, watched and reacted");
+  await page.click("#pclose").catch(() => {});
   for (const app of ["ohayo", "luna"]) {
     await page.evaluate(a => window.__mapleScene(a), app); await page.waitForTimeout(700);
     await page.locator('#world [data-spot="status"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });

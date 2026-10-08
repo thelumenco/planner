@@ -7,7 +7,7 @@ import { esc, plain, dayKey } from "../util.js";
 
 export const APPS = {chord: {name: "Chord", room: "chord"}, chico: {name: "Chico", room: "chico"}, luna: {name: "Luna", room: "luna"}, ohayo: {name: "Ohayo", room: "ohayo"}};
 export const BRANDS = {chord: {name: "Chord", color: "var(--sage)"}, ambidextrous: {name: "Ambidextrous", color: "var(--peri)"}};
-const DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
+const DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "ohayo-hellos", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
 const KEY = "fox.feeds";
 let D = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })();
 let onChange = () => {};
@@ -42,6 +42,36 @@ export function healthPanel(app){
   if (h.checks.length) s += `<ul class="hlist checks">${h.checks.map(c => `<li><i style="background:${LIGHT[c.state]}"></i><span>${esc(c.name)}${c.detail ? ` <small>${esc(c.detail)}</small>` : ""}</span></li>`).join("")}</ul>`;
   if (h.link) s += `<div class="actions"><a class="btn small alt" href="${esc(h.link)}" target="_blank" rel="noopener">Open the ${a.name} founder room</a></div>`;
   return s;
+}
+
+/* ---------- Ohayo's hellos: "ohayo-hellos" doc, copied from the Ohayo Founder Desk by the morning feeds routine ----------
+   {at, queued, sent30, opened30, watched30, reactions30, watchRate30, avgWatchSecs30, arrived7, sentTotal,
+    reactions: [{name, product, emoji, text, at}]}  (first names only) */
+const n0 = v => Math.max(0, Math.round(+v || 0));
+export function ohayoHellos(){
+  const d = D["ohayo-hellos"]; if (!d || !d.at) return null;
+  const reactions = (Array.isArray(d.reactions) ? d.reactions : []).slice(0, 12).map(r => ({name: plain(String(r.name || "Someone")).slice(0, 30), product: plain(String(r.product || "")).slice(0, 30),
+    emoji: [...String(r.emoji || "")].slice(0, 2).join("") || "💬", text: plain(String(r.text || "")).slice(0, 140), at: Date.parse(r.at) || 0}));
+  const sent = n0(d.sent30), pct = v => sent ? Math.round(100*n0(v)/sent) : 0;
+  return {at: +d.at, queued: n0(d.queued), sent, opened: n0(d.opened30), watched: n0(d.watched30), reacted: n0(d.reactions30), arrived7: n0(d.arrived7), total: n0(d.sentTotal),
+    avgWatch: n0(d.avgWatchSecs30), watchRate: d.watchRate30 != null ? n0(d.watchRate30) : pct(d.watched30), openRate: pct(d.opened30), reactRate: pct(d.reactions30), reactions};
+}
+const agoD = ms => { const n = Math.floor((Date.now() - ms)/864e5); return n <= 0 ? "today" : n === 1 ? "yesterday" : `${n} days ago`; };
+export function reactionsPanel(){
+  const o = ohayoHellos();
+  let s = `<span class="tape gingham" aria-hidden="true"></span><h2>The reactions board</h2><p class="sub">What people sent back from their hello's watch page.</p>`;
+  if (!o) return s + `<p class="muted">Nothing pinned up yet. The morning feeds copy reactions over from the Ohayo Founder Desk.</p>`;
+  return s + (o.reactions.length ? `<ul class="hlist ohreact">${o.reactions.map(r => `<li><span class="ohemo">${esc(r.emoji)}</span><span>${r.text ? `"${esc(r.text)}"` : ""}<small>${esc(r.name)}${r.product ? " · " + esc(r.product) : ""}${r.at ? " · " + agoD(r.at) : ""}</small></span></li>`).join("")}</ul>` : `<p class="muted">No reactions yet. They'll pin up here as people watch their hellos.</p>`);
+}
+export function helloPanel(){
+  const o = ohayoHellos();
+  let s = `<span class="tape stripe" aria-hidden="true"></span><h2>Hello chart</h2>`;
+  if (!o) return s + `<p class="sub">No numbers yet. The morning feeds copy them over from the Ohayo Founder Desk.</p>`;
+  const bar = (label, v, pct, col) => `<li><span class="ohl">${label}</span><span class="ohbar"><i style="width:${Math.max(2, Math.min(100, pct))}%;background:${col}"></i></span><b>${v}</b><small>${pct}%</small></li>`;
+  s += `<p class="sub">Hellos in the last 30 days. Numbers from ${new Date(o.at).toLocaleDateString("en-GB", {day: "numeric", month: "short", timeZone: "Asia/Singapore"})}.</p>`;
+  s += `<div class="ohtiles"><div><b>${o.queued}</b><small>waiting for a hello</small></div><div><b>${o.watchRate}%</b><small>watched</small></div><div><b>${o.avgWatch}s</b><small>average watch</small></div><div><b>${o.arrived7}</b><small>new this week</small></div></div>`;
+  s += `<ul class="hlist ohfunnel">${bar("Sent", o.sent, o.sent ? 100 : 0, "#3D4C7A")}${bar("Opened", o.opened, o.openRate, "#7E8BB8")}${bar("Watched", o.watched, o.watchRate, "#F2A65A")}${bar("Reacted", o.reacted, o.reactRate, "#E8566C")}</ul>`;
+  return s + `<p class="muted">${o.total} hello${o.total === 1 ? "" : "s"} sent since the start. Apple Mail opens emails by itself, so "Opened" runs high: trust "Watched".</p>`;
 }
 
 /* ---------- content calendar ---------- */
