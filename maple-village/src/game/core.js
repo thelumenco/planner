@@ -1956,6 +1956,7 @@ function setScene(id, at){
     if (id === "orchard" || id === "flowers") orchardArrive(id);
     { const m = sgHM(); if (owns(F, "cellar") && wineClubOn(dayKey()) && m >= 12*60 && m < 21*60 && S.clubSaid !== dayKey() && id !== "cellar") { S.clubSaid = dayKey();
       setTimeout(() => speak(m < 18*60 ? "Wine club tonight at the cellar door, 6pm! Eight members are coming to taste and buy." : "The wine club's on at the cellar door right now! Pop in and host.", 6000), 2800); } }
+    if (SCOOP_IN.includes(id) || id === "bay") scoopNow();   // catch up on arrival: sales, and anything the churner's finished
     if (id === "cocoa" && evanHere() && ccUp(cocoaState(F), "fountain")) setTimeout(() => evanSays(pick(["THE FOUNTAIN!! Can I put my hand in? Just one finger?", "Mama, it's a chocolate waterfall!", "Can we dip a strawberry? Pleeease?"])), 1400);
     if (id === "cellar" && wineClubNow(dayKey(), sgHM())) setTimeout(() => speak("The wine club's here! Glasses clinking, everyone talking at once. Tap the tasting bar to host.", 5000), 1200);
     if (id === "marcus" && evanHere()) setTimeout(() => { evanSays(pick(["Uncle Marcus! Can I play Mario?", "Can we watch Spiderman? Pleeease?", "Game! Game! Can I play the game?"])); if (isHere("marcus")) setTimeout(() => npcSay("marcus", "Ha! Ask your mum, little man. Zeh? One level?"), 2200); }, 1500);

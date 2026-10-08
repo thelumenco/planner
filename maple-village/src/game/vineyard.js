@@ -332,7 +332,7 @@ export function wireVine(root, F, api){
     else if (k === "putgr") { const v = vineState(F), c = b.dataset.k, n = (F.inv || {})["grape_" + c] || 0; if (n) { v.grapes[c] += n; delete F.inv["grape_" + c]; line = `${n} bunch${n > 1 ? "es" : ""} back in the crates.`; } }
     else if (k === "keep") { const v = vineState(F), c = b.dataset.k; v.keep[c] = Math.max(0, Math.min(30, (v.keep[c] || 0) + +b.dataset.n)); }
     else if (k === "second") line = secondFerment(F, i);
-    else if (k === "suggest") { const ns = wineNames(F, i); vy.sug = vy.sug || {}; vy.sug[i] = ((vy.sug[i] ?? -1) + 1) % Math.max(1, ns.length); vy.name[i] = ns[vy.sug[i]] || ""; api.sfx("tap"); }
+    else if (k === "suggest") { const ns = wineNames(F, i); vy.sug = vy.sug || {}; vy.sug[i] = ((vy.sug[i] ?? 0) + 1) % Math.max(1, ns.length); vy.name[i] = ns[vy.sug[i]] || ""; api.sfx("tap"); }
     else if (k === "bottle") { line = bottle(F, i, vy.name[i]); if (line) { vy.name[i] = ""; api.sfx("chime"); } }
     else if (k === "olives") { line = pickOlives(F); if (line) api.sfx("coin"); }
     else if (k === "names") { rename(F, "vineyard", (root.querySelector("#vyNameV") || {}).value); rename(F, "shop", (root.querySelector("#vyNameS") || {}).value); line = `${vineyardName(F)} and ${shopName(F)}. Lovely names!`; api.sfx("chime"); }

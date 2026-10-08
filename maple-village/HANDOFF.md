@@ -1176,3 +1176,21 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
     - `cocoaTick` sells there Tue/Thu 5:30–10, ×1.6 while Mel's at it (`opts.cart`). Its panel is the counter panel with `cart: true` (no plan, upgrades or rename).
 - **Selling** now goes through `sellTo(c, day, out, o)`: bonbons (sometimes boxed), bars or hot chocolate. It's shared by the counter, the cart and the wine club.
 - **Tests:** the Cocoa Room block (39 checks) buys everything and checks each upgrade, Lila on a Monday and the cart on a Tuesday night.
+
+### Round 92: the ice cream churner, the cart moves to Sunday, cacao tree and workshop art, wine name suggestions
+- **The churner (scoop.js):**
+  - Every tub, whether a new flavour's first or another of a known one, now spends `CHURN_MIN` (60) minutes blending and freezing before its 20 scoops are ready.
+  - The churner holds `CHURNS` (2) batches at a time: `s.churn = [{id, done, isNew}]`.
+  - `finishChurn(s, t)` runs in `scoopTick` (`out.churned`) and in the panels (`churnLine`). Finished tubs go to the freezer, and into the display if it's arranged and has room.
+  - `discover` and `makeTub` refuse, and `canMake` is false, while the churner's full.
+  - core.js says "Ding! … frozen and ready" in the Scoop screens and the bay. `scoopNow()` also runs on arriving at those screens, so finished tubs and sales catch up straight away.
+- **The Cocoa Room's cart is a Sunday farmers market cart now, not a night market one.** In tours.js it's a MARKET entry at place 9, beside Noor's pen, which stands where the Scoop Shack's cart does on night market evenings. `cartOn` is Sunday 8–1, and the calendar mentions it on market days.
+- **The cacao tree** is drawn in Ma Ma's orchard on the hedge line, top right (orchard.js `cacaoTree`).
+- **The Saturday workshop class:**
+  - tours.js `workshopSlot` / `workshopGroup` seats six visitors and tourists at the Cocoa Room tables, 2–4. It's gated by core's `setStallOwned` map, which now includes `cc_workshop`.
+  - Trays, piping bags and a "Bonbon workshop today" note appear on the tables.
+  - Tapping the tables during the class gives a line (and one from Evan).
+- **Wine names:**
+  - vineyard.js `wineNames(F, slot)` gives a ready barrel 12 suggestions, never repeating a name in the cellar or on the shelves. They come from three patterns: village places and moments plus a style word, family names plus places, and French ones per style.
+  - The first suggestion is the input's placeholder, and is used if the name's left blank. "Suggest a name" cycles through the rest.
+- **Testing:** `block.py` needs the exact `console.log("\nthe vineyard")` marker; plain "the vineyard" finds another block first.

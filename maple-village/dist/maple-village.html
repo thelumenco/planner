@@ -5360,7 +5360,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     { id: "ben", at: 6, short: "Craft beer", n: "Craft beer", items: ["paleale", "stout"], col: "#D9A441", line: "Brewed in my shed. Well, the shed's quite big." },
     { id: "dev", at: 7, short: "Bakery", n: "Bakery", items: ["kaya", "currypuff", "flour"], col: "#C98A4A", line: "Still warm! Kaya buns and curry puffs." },
     // Noor's pet adoption corner, on the grass by the river (place 8): a little pen of animals looking for homes
-    { id: "noor", at: 8, kind: "pets", short: "Adopt a pet", n: "Pet adoption corner", items: ["pet_kitten"], col: "#9FD3C2", line: "Every one of them needs a home. Who'll look after them?" }
+    { id: "noor", at: 8, kind: "pets", short: "Adopt a pet", n: "Pet adoption corner", items: ["pet_kitten"], col: "#9FD3C2", line: "Every one of them needs a home. Who'll look after them?" },
+    // the Cocoa Room's chocolate cart, once it's bought (cocoa.js upgrade "cart"), beside Noor's pen where the Scoop
+    // Shack's cart stands on night market evenings. Mateo minds it
+    { id: "mateo", at: 9, kind: "cocoa", needs: "cc_cart", short: "Cocoa Room", n: "The Cocoa Room cart", items: [], col: "#8A5A3A", line: "Chocolate from the Cocoa Room! Bars, bonbons, hot chocolate." }
   ];
   var FAIR = [
     { id: "hiro", at: 2, short: "Kites", n: "Kites", items: [], act: "kite", col: "#7FB8E8", line: "Pick a kite, any kite. They all fly!" },
@@ -5379,9 +5382,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     { id: "wen", at: 6, short: "Sweets", n: "Sweets", items: ["tanghulu", "eggwaffle"], col: "#C9A3E0", line: "Tanghulu, strawberries in crackly sugar. And egg waffles, still warm." },
     { id: "kai", at: 7, short: "Drinks", n: "Night drinks", items: ["sugarcane", "grassjelly"], col: "#9CC27E", line: "Fresh sugarcane, pressed while you wait. Grass jelly for the old-school ones." },
     // Mel's own: the Scoop Shack's cart, scooping from the shop's display (scoop.js cartOn). Tomo minds it after his day on the deck
-    { id: "tomo", at: 8, kind: "scoop", short: "Scoop Shack", n: "The Scoop Shack cart", items: [], col: "#F2A0B8", line: "Gelato from the Scoop Shack! Cup or cone?" },
-    // and the Cocoa Room's chocolate cart, once it's bought (cocoa.js upgrade "cart"): Mateo minds it
-    { id: "mateo", at: 9, kind: "cocoa", needs: "cc_cart", short: "Cocoa Room", n: "The Cocoa Room cart", items: [], col: "#8A5A3A", line: "Chocolate from the Cocoa Room! Bars, bonbons, hot chocolate." }
+    { id: "tomo", at: 8, kind: "scoop", short: "Scoop Shack", n: "The Scoop Shack cart", items: [], col: "#F2A0B8", line: "Gelato from the Scoop Shack! Cup or cone?" }
   ];
   var ownedNow = () => ({});
   var setStallOwned = (fn) => {
@@ -5401,9 +5402,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return n.getUTCMonth() !== dt.getUTCMonth();
   }
   function eventOn(day) {
-    if (dow(day) === 0) return { kind: "market", name: "Sunday farmers market", from: 8 * 60, to: 13 * 60, stalls: MARKET, wine: true };
+    if (dow(day) === 0) return { kind: "market", name: "Sunday farmers market", from: 8 * 60, to: 13 * 60, stalls: standing(MARKET), wine: true };
     if (lastSaturday(day)) return { kind: "fair", name: "Field fair", from: 10 * 60, to: 16 * 60, stalls: FAIR, wine: false };
-    if (dow(day) === 2 || dow(day) === 4) return { kind: "night", name: "Night market", from: 17 * 60 + 30, to: 22 * 60, stalls: standing(NIGHT), wine: false };
+    if (dow(day) === 2 || dow(day) === 4) return { kind: "night", name: "Night market", from: 17 * 60 + 30, to: 22 * 60, stalls: NIGHT, wine: false };
     return null;
   }
   var eventNow = (day, hm2) => {
@@ -5540,6 +5541,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   };
   var wineClubNow = (day, hm2) => wineClubOn(day) && hm2 >= CLUB_FROM && hm2 < CLUB_TO;
   var clubMembers = (day) => wineClubOn(day) ? groupFor(day + ":club", 8, [], CLUB_POOL) : [];
+  var WS_FROM = 14 * 60;
+  var WS_TO = 16 * 60;
+  var WS_SEATS = [[87, 518], [173, 518], [227, 518], [313, 518], [367, 512], [453, 512]];
+  var workshopGroup = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() === 6 && ownedNow().cc_workshop ? groupFor(day + ":workshop", 6, [], [...VISITORS.filter((v) => v !== "pip"), ...TOURISTS]) : [];
+  function workshopSlot(id, day, hm2) {
+    if (hm2 < WS_FROM || hm2 >= WS_TO) return null;
+    const i = workshopGroup(day).indexOf(id);
+    if (i < 0) return null;
+    return { from: WS_FROM, to: WS_TO, scene: "cocoa", at: WS_SEATS[i], act: "sit", dir: i % 2 ? -1 : 1, workshop: true };
+  }
   function clubSlot(id, day, hm2) {
     if (!wineClubNow(day, hm2) || !clubMembers(day).includes(id)) return null;
     return { from: CLUB_FROM, to: CLUB_TO, scene: "cellar", wander: CLUB_WALK, club: true };
@@ -6138,10 +6149,25 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     b.dur = STYLES.sparkling.dur2;
     return "Second fermentation for the bubbles. Two more hours.";
   }
+  var W_PLACE = ["Jetty Sunset", "Dolphin Bay", "Lantern Night", "Low Tide", "Sea Breeze", "Golden Hour", "Swan Lake", "Porch Swing", "First Light", "Rainy Window", "Orchard Hill", "Wildflower", "Night Market", "Paddleboard", "Harvest Moon", "Morning Mist", "Kite Day", "Sunday Picnic", "Firefly", "Boardwalk", "Lighthouse", "Monsoon", "Frangipani", "Hammock"];
+  var W_WHO = ["Maple's", "Evan's", "Ma Ma's", "Gong Gong's", "Ah Gong's", "Ah Ma's", "Darren's", "Marco's", "Ines's", "Grandpa's Porch"];
+  var W_WORD = { red: ["Red", "Reserve", "Rouge", "Old Vine"], rose: ["Rosé", "Blush", "Pink"], white: ["White", "Blanc", "Crisp"], sparkling: ["Bubbles", "Fizz", "Brut", "Sparkle"] };
+  var W_FR = { red: ["Château Maple", "Clos de la Baie", "Domaine du Lac", "Grand Cru Evan"], rose: ["Rosé de la Jetée", "Vie en Rose", "Clos des Cygnes"], white: ["Blanc de la Baie", "Domaine des Lanternes", "Clos du Matin"], sparkling: ["Cuvée Maple", "Crémant de la Baie", "Pétillant du Lac"] };
+  function wineNames(F2, slot2) {
+    const v = vineState(F2), b = v.barrels[slot2];
+    if (!b) return [];
+    const used = new Set([...v.cellar, ...v.shelf].map((x) => x.name.toLowerCase())), st6 = b.style, seed2 = Math.floor(b.start || 0) + slot2 * 7919, out = [];
+    for (let k = 0; out.length < 12 && k < 200; k++) {
+      const kind = k % 3, w = W_WORD[st6][(seed2 + k) % W_WORD[st6].length];
+      const nm3 = kind === 0 ? `${W_PLACE[(seed2 + k * 5) % W_PLACE.length]} ${w}` : kind === 1 ? `${W_WHO[(seed2 + k * 3) % W_WHO.length]} ${W_PLACE[(seed2 + k * 7 + 3) % W_PLACE.length]}` : W_FR[st6][(seed2 + k) % W_FR[st6].length] + (k > 8 ? ` ${(/* @__PURE__ */ new Date()).getFullYear()}` : "");
+      if (!used.has(nm3.toLowerCase()) && !out.includes(nm3)) out.push(nm3);
+    }
+    return out;
+  }
   function bottle(F2, slot2, name) {
     const v = vineState(F2), b = v.barrels[slot2];
     if (!b || barrelLeft(b) || b.style === "sparkling" && b.stage !== 2) return null;
-    const nm3 = plain(String(name || "")).trim().slice(0, 30) || `Maple's ${STYLES[b.style].n}`;
+    const nm3 = plain(String(name || "")).trim().slice(0, 30) || wineNames(F2, slot2)[0] || `Maple's ${STYLES[b.style].n}`;
     v.cellar.push({ id: "w" + Date.now().toString(36), name: nm3, type: b.style, n: BOTTLES });
     v.barrels[slot2] = null;
     return `${BOTTLES} bottles of ${nm3}, into the cellar. Stock them on the shop shelves.`;
@@ -6421,7 +6447,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         const left4 = barrelLeft(b), st6 = STYLES[b.style];
         if (left4) h += `<p>${st6.n}${b.style === "sparkling" ? b.stage === 1 ? ", first fermentation" : ", getting its bubbles" : ""}: ready in ${hrs2(left4)}.</p><span class="clbar"><i style="width:${Math.round(100 * (1 - left4 / b.dur))}%"></i></span>`;
         else if (b.style === "sparkling" && b.stage === 1) h += `<p>First fermentation done. Now the bubbles.</p><button class="btn primary small" data-vy="second" data-i="${i}">Start the second fermentation</button>`;
-        else h += `<p>${st6.n} is ready to bottle!</p><label class="sr" for="vyName${i}">Name this wine</label><input id="vyName${i}" class="vyname" maxlength="30" placeholder="Name it, e.g. Evan's Red" value="${esc(vy.name[i] || "")}"><button class="btn primary small" data-vy="bottle" data-i="${i}">Bottle it</button>`;
+        else h += `<p>${st6.n} is ready to bottle!</p><label class="sr" for="vyName${i}">Name this wine</label><input id="vyName${i}" class="vyname" maxlength="30" placeholder="${esc(wineNames(F2, i)[0] || "Name it")}" value="${esc(vy.name[i] || "")}"><button class="btn alt small" data-vy="suggest" data-i="${i}">Suggest a name</button><button class="btn primary small" data-vy="bottle" data-i="${i}">Bottle it</button>`;
       }
       h += `</div></div>`;
     });
@@ -6545,7 +6571,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         const v = vineState(F2), c = b.dataset.k;
         v.keep[c] = Math.max(0, Math.min(30, (v.keep[c] || 0) + +b.dataset.n));
       } else if (k === "second") line = secondFerment(F2, i);
-      else if (k === "bottle") {
+      else if (k === "suggest") {
+        const ns = wineNames(F2, i);
+        vy.sug = vy.sug || {};
+        vy.sug[i] = ((vy.sug[i] ?? 0) + 1) % Math.max(1, ns.length);
+        vy.name[i] = ns[vy.sug[i]] || "";
+        api4.sfx("tap");
+      } else if (k === "bottle") {
         line = bottle(F2, i, vy.name[i]);
         if (line) {
           vy.name[i] = "";
@@ -7225,6 +7257,18 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ${tapeLabel(lx, ly, label2, col, 11)}</g>`;
   var hedgeRow = (gap) => `<g ${W3}>${Array.from({ length: 14 }, (_, i) => i * 40 + 10).filter((x) => !gap || x < gap[0] || x > gap[1]).map((x, k) => `<ellipse cx="${x}" cy="${118 + Math.round((x - 10) / 40) % 2 * 4}" rx="26" ry="18" style="fill:var(--tree2)"/>`).join("")}</g>`;
   var hedge = hedgeRow([16, 96]);
+  function cacaoTree() {
+    const c = artCtx().cocoa ? artCtx().cocoa() : null;
+    if (!c || !c.up || !c.up.tree) return "";
+    const x = 474, y = 112, pods = [[-5, -20, "#F3C33A"], [5, -28, "#C2505F"], [-4, -38, "#E8913A"], [6, -46, "#F3C33A"], [-6, -54, "#8A3A2E"]];
+    return `<g pointer-events="none">${sk(
+      `<ellipse cx="${x}" cy="${y - 70}" rx="34" ry="22" style="fill:#5E8C4A"/><ellipse cx="${x - 22}" cy="${y - 56}" rx="18" ry="12" style="fill:#6E9C58"/><ellipse cx="${x + 22}" cy="${y - 58}" rx="18" ry="12" style="fill:#6E9C58"/>
+      <path d="M${x - 3} ${y} q-2 -40 1 -70 h4 q3 30 1 70z" style="fill:#7A5A3E"/>${pods.map(([dx, dy, col]) => `<ellipse cx="${x + dx}" cy="${y + dy}" rx="4" ry="7" style="fill:${col}"/>`).join("")}`,
+      `<ellipse cx="${x}" cy="${y - 70}" rx="34" ry="22"/><ellipse cx="${x - 22}" cy="${y - 56}" rx="18" ry="12"/><ellipse cx="${x + 22}" cy="${y - 58}" rx="18" ry="12"/><path d="M${x - 3} ${y} q-2 -40 1 -70 h4 q3 30 1 70z"/>
+      ${pods.map(([dx, dy]) => `<ellipse cx="${x + dx}" cy="${y + dy}" rx="4" ry="7"/><path d="M${x + dx} ${y + dy - 5} v10" opacity=".4"/>`).join("")}`
+    )}
+    ${tapeLabel(x - 4, y + 12, "Cacao tree", "#E3C8A0", 10)}</g>`;
+  }
   function orchardArt() {
     const o = orchState(artCtx().F()), today2 = artCtx().day();
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
@@ -7265,7 +7309,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       `<path d="M286 236 v-30 M310 236 v-30"/><rect x="280" y="200" width="36" height="24" rx="2"/>`
     )}
     ${tapeLabel(298, 256, "Tours", "var(--sage)", 10)}</g>`;
-    return lampDefs + ground + cottage + shop + sign + archGate("toFieldO", 260, 150, "The field", 318, 178, "var(--peri)", "Path to the field and the lake") + archGate("toBaseO", 500, 270, "Home", 474, 316, "var(--butter)", "Gate home") + archGate("toFlowers", 20, 270, "Flower farm", 70, 300, "var(--blush)", "Gate to the flower farm") + [[220, 252], [334, 252]].map(([x, y]) => streetLamp(x, y)).join("") + trees;
+    return lampDefs + ground + cottage + shop + sign + cacaoTree() + archGate("toFieldO", 260, 150, "The field", 318, 178, "var(--peri)", "Path to the field and the lake") + archGate("toBaseO", 500, 270, "Home", 474, 316, "var(--butter)", "Gate home") + archGate("toFlowers", 20, 270, "Flower farm", 70, 300, "var(--blush)", "Gate to the flower farm") + [[220, 252], [334, 252]].map(([x, y]) => streetLamp(x, y)).join("") + trees;
   }
   function flowerFarmArt() {
     const o = orchState(artCtx().F()), today2 = artCtx().day();
@@ -8697,6 +8741,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       `<path d="M${x + 72} ${y - 52} l-8 -4 h40 l-8 4z" style="fill:#B9BFC6"/><path d="M${x + 66} ${y - 58} q18 6 36 0 v-4 h-36z" style="fill:#6B4430"/><rect x="${x + 82}" y="${y - 92}" width="4" height="34" style="fill:#B9BFC6"/><path d="M${x + 72} ${y - 74} q12 5 24 0 v-3 h-24z" style="fill:#6B4430"/><path d="M${x + 77} ${y - 88} q7 3 14 0 v-2 h-14z" style="fill:#6B4430"/><path d="M${x + 78} ${y - 74} q-2 6 -4 14 M${x + 90} ${y - 74} q2 6 4 14" style="stroke:#4A2E22;fill:none" stroke-width="2.4"/>`,
       `<path d="M${x + 66} ${y - 58} q18 6 36 0 v-4 h-36z M${x + 72} ${y - 74} q12 5 24 0 v-3 h-24z M${x + 77} ${y - 88} q7 3 14 0 v-2 h-14z"/><path d="M${x + 84} ${y - 92} v34"/>`
     );
+    const day = G2.day ? G2.day() : "", hm2 = sgHM();
+    if (up.workshop && day && (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() === 6 && hm2 >= 14 * 60 && hm2 < 16 * 60)
+      h += [130, 270, 410].map((tx) => sk(
+        `<rect x="${tx - 16}" y="${y + 150}" width="20" height="10" rx="2" style="fill:#FFFDF6"/>${[0, 1, 2].map((k) => `<circle cx="${tx - 11 + k * 5}" cy="${y + 155}" r="2" style="fill:${["#4A2E22", "#C2505F", "#8A5A3A"][k]}"/>`).join("")}<path d="M${tx + 8} ${y + 158} l8 -10 l3 3z" style="fill:#F3E7C9"/><ellipse cx="${tx + 2}" cy="${y + 146}" rx="6" ry="3" style="fill:#8A5A3A"/>`,
+        `<rect x="${tx - 16}" y="${y + 150}" width="20" height="10" rx="2"/><path d="M${tx + 8} ${y + 158} l8 -10 l3 3z"/><ellipse cx="${tx + 2}" cy="${y + 146}" rx="6" ry="3"/>`
+      )).join("") + `<text x="${x}" y="${y + 120}" text-anchor="middle" font-family="Klee One,serif" font-size="9" font-weight="600" fill="#6B4430" pointer-events="none">Bonbon workshop today, 2 to 4</text>`;
     return h;
   }
   function foreArt(id) {
@@ -13596,7 +13646,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var routineNow = (def) => routineAt(def, dayKey(), sgHM());
   function slotAt(def, day, t2, live3) {
-    return live3 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || iceOk(scoopSlot(def.id, day, t2), def, day, t2) || routineAt(def, day, t2);
+    return live3 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || workshopSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || iceOk(scoopSlot(def.id, day, t2), def, day, t2) || routineAt(def, day, t2);
   }
   var nightOk = (s, def, day, t2) => !s || !s.night ? s : tastingSlot(def.id, day, t2) || (routineAt(def, day, t2) || {}).scene === "wineshop" ? null : s;
   var iceOk = (s, def, day, t2) => {
@@ -14071,6 +14121,30 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var OPEN = 10 * 60;
   var CLOSE = 20 * 60;
   var TUB = 20;
+  var CHURN_MIN = 60;
+  var CHURNS = 2;
+  var clock = () => Date.now() + (globalThis.__mapleOffset || 0);
+  var churnFull = (s) => s.churn.length >= CHURNS;
+  var churnLeft = (b) => {
+    const m = Math.max(0, Math.ceil((b.done - clock()) / 6e4));
+    return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m} min`;
+  };
+  function finishChurn(s, t2 = clock()) {
+    const done = s.churn.filter((b) => t2 >= b.done);
+    if (!done.length) return [];
+    s.churn = s.churn.filter((b) => t2 < b.done);
+    return done.map((b) => {
+      const r = recipeOf(s, b.id);
+      if (!r) return null;
+      s.tubs[r.id] = (s.tubs[r.id] || 0) + TUB;
+      if (Array.isArray(s.display) && !s.display.includes(r.id) && s.display.length < SLOTS2) s.display = [...s.display, r.id];
+      s.log = [`${r.name}: frozen and ready`, ...s.log].slice(0, 6);
+      return r;
+    }).filter(Boolean);
+  }
+  var toChurn = (s, id, isNew) => {
+    s.churn = [...s.churn, { id, done: clock() + CHURN_MIN * 6e4, isNew }];
+  };
   var FORMATS = { cup: { n: "Cup", p: 4 }, cone: { n: "Cone", p: 4 }, float: { n: "Float", p: 6 }, waffle: { n: "Waffle", p: 7 } };
   var FMT_W = [["cup", 0.34], ["cone", 0.4], ["float", 0.1], ["waffle", 0.16]];
   var FRUIT_COL = { cherry: "#C2334D", lemon: "#F3E27A", peach: "#F5B08A", mango: "#F3B33A", apple: "#B9D98A", pear: "#D9E39A", fig: "#8C5A7A", orange: "#F39A3A", persimmon: "#E8823A" };
@@ -14124,6 +14198,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     s.box = s.box || 0;
     s.notes = s.notes || [];
     s.dipIds = s.dipIds || [];
+    s.churn = s.churn || [];
     return s;
   }
   var recipeOf = (s, id) => s.recipes.find((r) => r.id === id);
@@ -14265,13 +14340,13 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const known = knownRecipe(s, ings);
     if (known) return { known, msg: `You already know this one: ${known.name}. Make another tub of it instead.` };
     if (!hasAll(s, ings)) return { msg: "The fridge is missing some of that." };
+    if (churnFull(s)) return { msg: `The churner's full: two batches are blending and freezing. The next one's ready in ${churnLeft(s.churn[0])}.` };
     useAll(s, ings);
     const r = { id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: ings.includes("milk"), special: false, found: Date.now() };
     s.recipes.push(r);
-    s.tubs[r.id] = (s.tubs[r.id] || 0) + TUB;
+    toChurn(s, r.id, true);
     registerItems(F2);
-    if (Array.isArray(s.display) && s.display.length < SLOTS2) s.display = [...s.display, r.id];
-    return { recipe: r, msg: `A new flavour: ${r.name}! ${displayIds(s).includes(r.id) ? "The first tub's in the display." : "The first tub's in the freezer (the display's full: swap it in from there)."}` };
+    return { recipe: r, msg: `A new flavour: ${r.name}! It's in the churner now: blending, then freezing. The first tub's ready in an hour.` };
   }
   var backpackIngr = (F2) => Object.keys(F2.inv || {}).filter((id) => isIngr(id) && F2.inv[id] > 0);
   function stockFridge(F2, id, n, from, orch) {
@@ -14293,16 +14368,15 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return n;
   }
   var farmShelf = (orch) => Object.keys(orch.stock || {}).filter((k) => orch.stock[k] > 0).map((k) => k.startsWith("stem:") ? "fl_" + k.slice(5) : k).filter(isIngr);
-  var canMake = (s, r) => r && hasAll(s, r.ings);
+  var canMake = (s, r) => r && hasAll(s, r.ings) && !churnFull(s);
   function makeTub(F2, rid) {
     const s = scoopState(F2), r = recipeOf(s, rid);
     if (!canMake(s, r)) return null;
     useAll(s, r.ings);
-    s.tubs[r.id] = (s.tubs[r.id] || 0) + TUB;
+    toChurn(s, r.id, false);
     const day = dayKey();
     s.made[day] = (s.made[day] || 0) + 1;
-    s.log = [`${r.name}: a fresh tub`, ...s.log].slice(0, 6);
-    if (Array.isArray(s.display) && !s.display.includes(r.id) && s.display.length < SLOTS2) s.display = [...s.display, r.id];
+    s.log = [`${r.name}: into the churner`, ...s.log].slice(0, 6);
     return r;
   }
   var priceOf = (s, fmt3, r) => s.prices[fmt3] + (r && r.special ? s.prices.special : 0);
@@ -14370,7 +14444,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       s.tubs[s.batch.id] = (s.tubs[s.batch.id] || 0) + TUB;
       s.batch = null;
     }
-    const out = { coins: 0, n: 0, mins: 0, box: 0 };
+    const out = { coins: 0, n: 0, mins: 0, box: 0, churned: finishChurn(s, now3) };
     for (let at = from + 6e4; at <= now3; at += 6e4) {
       const sg = new Date(at + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm2 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
       const sale = saleMinute(s, day, hm2, opts);
@@ -14575,18 +14649,27 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!inF.length) return h + `<p class="muted">The fridge is empty. Stock it first.</p>` + shut;
     h += `<div class="gchips">${inF.map((id) => `<button class="gchip${sel.includes(id) ? " on" : ""}" data-gsel="${id}" aria-pressed="${sel.includes(id)}" ${!sel.includes(id) && sel.length >= 4 ? "disabled" : ""}>${ingPic(id)}<span>${esc(INGR[id][0])}</span></button>`).join("")}</div>`;
     const made = st6.made && recipeOf(s, st6.made);
-    if (made && !sel.length) h += resultCard(made.col, made.name, `New flavour! ${made.dairy ? "A gelato" : "A dairy-free sorbet"}, and the first tub's in the display.`, true);
+    if (made && !sel.length) h += resultCard(made.col, made.name, `New flavour! ${made.dairy ? "A gelato" : "A dairy-free sorbet"}. It's in the churner: blending, then freezing, ready in an hour.`, true);
     else if (sel.length) {
       const ss = [...sel].sort();
       h += known ? resultCard(known.col, known.name, canMake(s, known) ? "You know this one already. Make another tub?" : "You know this one already.") : resultCard(blend(ss), nameFor(ss), `${ss.includes("milk") ? "A gelato" : "A dairy-free sorbet"}. Something new!`);
     } else h += `<p class="muted">Nothing picked yet.</p>`;
-    return h + `<div class="actions">${known ? `<button class="btn primary" data-gmake="${esc(known.id)}" ${canMake(s, known) ? "" : "disabled"}>Make another tub</button>` : `<button class="btn primary" data-gmix="1" ${!sel.length ? "disabled" : ""}>Mix it</button>`}<button class="btn alt small" data-close="1">Close</button></div>`;
+    return h + churnLine(s) + `<div class="actions">${known ? `<button class="btn primary" data-gmake="${esc(known.id)}" ${canMake(s, known) ? "" : "disabled"}>Make another tub</button>` : `<button class="btn primary" data-gmix="1" ${!sel.length || churnFull(s) ? "disabled" : ""}>Mix it</button>`}<button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function churnLine(s) {
+    finishChurn(s);
+    if (!s.churn.length) return `<p class="muted">The churner's free: a tub takes an hour to blend and freeze, two at a time.</p>`;
+    return `<p class="eyebrow" style="margin:10px 0 6px">In the churner (${s.churn.length} of ${CHURNS})</p><ul class="hlist">${s.churn.map((b) => {
+      const r = recipeOf(s, b.id);
+      return r ? `<li>${dot(r.col)} <b>${esc(r.name)}</b> <small class="muted">${b.isNew ? "new! " : ""}ready in ${churnLeft(b)}</small></li>` : "";
+    }).join("")}</ul>`;
   }
   function recipePanel(F2) {
     const s = scoopState(F2), day = dayKey();
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The recipe book</h2><p class="sub">Every flavour you've discovered. A tub is 20 scoops and uses one of each ingredient from the fridge. ${s.made[day] ? `${s.made[day]} made today.` : ""}</p>`;
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The recipe book</h2><p class="sub">Every flavour you've discovered. A tub is 20 scoops, uses one of each ingredient from the fridge, and takes an hour in the churner. ${s.made[day] ? `${s.made[day]} made today.` : ""}</p>`;
     if (!s.recipes.length) return h + `<p class="muted">No flavours yet. Discover one at the mixing bench.</p>` + shut;
     h += `<ul class="hlist wlist">${[...s.recipes].sort((a, b) => (s.tubs[a.id] || 0) - (s.tubs[b.id] || 0)).map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? `${s.tubs[r.id]} scoops left` : "none left"} · ${canMake(s, r) ? esc(r.ings.map((i) => INGR[i][0]).join(", ")) : "missing: " + esc(r.ings.filter((i) => !(s.fridge[i] > 0)).map((i) => INGR[i][0]).join(", "))}</small></span><button class="btn small ${canMake(s, r) ? "primary" : "alt"}" data-gmake="${esc(r.id)}" ${canMake(s, r) ? "" : "disabled"}>Make a tub</button></li>`).join("")}</ul>`;
+    h += churnLine(s);
     if (s.log.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Lately</p><ul class="hlist">${s.log.map((l) => `<li><small>${esc(l)}</small></li>`).join("")}</ul>`;
     return h + shut;
   }
@@ -14597,7 +14680,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (swap) return h + `<p class="olabel">${dot(swap.col)} Put ${esc(swap.name)} out in place of…</p><ul class="hlist wlist">${shown.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? s.tubs[r.id] + " scoops" : "sold out"}</small></span><button class="btn small primary" data-gswapout="${esc(r.id)}">Swap</button></li>`).join("")}</ul>
     <div class="actions"><button class="btn alt small" data-gswapcancel="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
     h += `<p class="eyebrow" style="margin:12px 0 6px">In the display (${shown.length} of ${SLOTS2})</p>`;
-    h += shown.length ? `<ul class="hlist wlist">${shown.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? `${s.tubs[r.id]} scoops` : "sold out: the slot's empty till Tomo makes more"} · ${ings(r)}</small></span><button class="btn small alt" data-gdisp="${esc(r.id)}">Take off</button></li>`).join("")}</ul>` : `<p class="muted">Empty.</p>`;
+    h += shown.length ? `<ul class="hlist wlist">${shown.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? `${s.tubs[r.id]} scoops` : "sold out: the slot's empty till you make more"} · ${ings(r)}</small></span><button class="btn small alt" data-gdisp="${esc(r.id)}">Take off</button></li>`).join("")}</ul>` : `<p class="muted">Empty.</p>`;
     h += `<p class="eyebrow" style="margin:12px 0 6px">Waiting in the freezer</p>`;
     h += rest.length ? `<ul class="hlist wlist">${rest.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops · ${ings(r)}</small></span><button class="btn small primary" data-gdisp="${esc(r.id)}">${ids.length < SLOTS2 ? "Put out" : "Swap in"}</button></li>`).join("")}</ul>` : `<p class="muted">Nothing else in stock.</p>`;
     return h + shut;
@@ -14628,7 +14711,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     supply: { n: "Supply deal with the Scoop Shack", price: 250, line: "Every morning, 10 pieces of loose dark chocolate go to the Scoop Shack's gelato fridge on their own (when there are 10 spare)." },
     workshop: { n: "Weekend workshops", price: 700, line: "Saturday afternoons, 2 to 4: a class of six makes their own bonbons at the tables, and pays 8 coins each." },
     assistant: { n: "Second assistant", price: 500, line: "Lila joins the team. The shop opens on Mondays too, and it's a little busier with two behind the counter." },
-    cart: { n: "Night market cart", price: 400, line: "A little chocolate cart for the Tuesday and Thursday night markets. Mateo runs it (evenings suit a student), selling bars, bonbons and hot chocolate." }
+    cart: { n: "Farmers market cart", price: 400, line: "A little chocolate cart for the Sunday farmers market, 8 to 1. Mateo runs it, selling bars, bonbons and hot chocolate." }
   };
   var ccUp = (c, k) => !!(c.up && c.up[k]);
   function buyCcUp(F2, k) {
@@ -14647,13 +14730,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       supply: "Done: the Scoop Shack gets 10 pieces of your dark chocolate every morning, when there's enough spare.",
       workshop: "Weekend workshops are on: Saturdays, 2 to 4, at the tables.",
       assistant: "Lila starts Monday! The shop's open seven days now.",
-      cart: "The chocolate cart's ready for the night market. Mateo's thrilled."
+      cart: "The chocolate cart's ready for Sunday's farmers market. Mateo's thrilled."
     }[k];
   }
-  var cartOn2 = (day, hm2) => {
-    const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
-    return (d === 2 || d === 4) && hm2 >= 17 * 60 + 30 && hm2 < 22 * 60;
-  };
+  var cartOn2 = (day, hm2) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() === 0 && hm2 >= 8 * 60 && hm2 < 13 * 60;
   var WORKSHOP = 6;
   var WORKSHOP_FEE = 8;
   var TREE_EVERY = 2 * 864e5;
@@ -15095,7 +15175,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var dot2 = (c) => `<span class="gdot" style="background:${c}"></span>`;
   function counterPanel3(F2, st6) {
     const c = cocoaState(F2), day = dayKey(), hm2 = sgHM(), t2 = c.sold[day] || { n: 0, coins: 0 };
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${st6.cart ? "The night market cart. " : ""}${openOn(day, hm2, ccUp(c, "assistant")) ? "Open till 8pm." : `Closed: open 11am to 8pm, ${ccUp(c, "assistant") ? "every day" : "Tuesday to Sunday"}.`} ${t2.n || t2.bonbons ? `Sold today: ${t2.n} bar${t2.n === 1 ? "" : "s"}${t2.bonbons ? ` and ${t2.bonbons} bonbon${t2.bonbons === 1 ? "" : "s"}` : ""} (${t2.coins} ${coin2()}).` : "Nothing sold yet today."}${st6.server ? " Amara's behind the counter." : ""}</p>`;
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${st6.cart ? "The farmers market cart. " : ""}${openOn(day, hm2, ccUp(c, "assistant")) ? "Open till 8pm." : `Closed: open 11am to 8pm, ${ccUp(c, "assistant") ? "every day" : "Tuesday to Sunday"}.`} ${t2.n || t2.bonbons ? `Sold today: ${t2.n} bar${t2.n === 1 ? "" : "s"}${t2.bonbons ? ` and ${t2.bonbons} bonbon${t2.bonbons === 1 ? "" : "s"}` : ""} (${t2.coins} ${coin2()}).` : "Nothing sold yet today."}${st6.server ? " Amara's behind the counter." : ""}</p>`;
     h += `<ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n} bars</b><small>${c.bars[k]} on the wall · ${c.prices.bar} ${coin2()} each</small></span><span class="orbtns"><button class="btn small primary" data-cc="eat" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>Have one</button><button class="btn small alt" data-cc="give" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>To give</button></span></li>`).join("")}</ul>`;
     h += `<div class="row gprices"><span>Price of a bar</span><span class="gstep"><button class="btn small alt" data-cc="price" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bar}</b><button class="btn small alt" data-cc="price" data-n="1" aria-label="Dearer">+</button></span></div>`;
     if (ccUp(c, "hotchoc")) h += `<div class="row gprices"><span>Hot chocolate${t2.hot ? ` <small class="muted">(${t2.hot} today)</small>` : ""}</span><span class="gstep"><button class="btn small alt" data-cc="hprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.hot}</b><button class="btn small alt" data-cc="hprice" data-n="1" aria-label="Dearer">+</button></span></div><div class="actions"><button class="btn small primary" data-cc="hot" ${Object.values(c.choc).some((n) => n > 0) ? "" : "disabled"}>Have a hot chocolate</button></div>`;
@@ -17511,7 +17591,7 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
     const days = [];
     for (let i = 0; i < CAL_DAYS; i++) {
       const k = addD(today2, i), ev = eventOn(k), dn = dinnerOn(k), list2 = [];
-      if (ev) list2.push(`${ev.name}, ${hhmm(ev.from)} to ${hhmm(ev.to)} on the field${ev.kind === "market" ? " (our wine stall's there)" : ev.kind === "night" ? ` (with a jazz duo, and the cart from ${scoopState(F).name}${F.cocoa && F.cocoa.up && F.cocoa.up.cart ? ` and ${cocoaState(F).name}'s` : ""})` : ""}`);
+      if (ev) list2.push(`${ev.name}, ${hhmm(ev.from)} to ${hhmm(ev.to)} on the field${ev.kind === "market" ? ` (our wine stall's there${F.cocoa && F.cocoa.up && F.cocoa.up.cart ? `, and ${cocoaState(F).name}'s chocolate cart` : ""})` : ev.kind === "night" ? ` (with a jazz duo, and the cart from ${scoopState(F).name})` : ""}`);
       if (F.cocoa && F.cocoa.up && F.cocoa.up.workshop && (/* @__PURE__ */ new Date(k + "T00:00:00Z")).getUTCDay() === 6) list2.push(`Bonbon workshop at ${cocoaState(F).name}, 2 to 4pm`);
       if (owns(F, "cellar") && wineClubOn(k)) list2.push(`Wine club at the cellar door, 6 to 9pm`);
       if (dn) list2.push(`Family dinner at ${HOST_NAME[dn.host]}, 6:30pm`);
@@ -19526,6 +19606,7 @@ ${SIGNOFF[t2.who] || ""}`;
           setTimeout(() => speak(m < 18 * 60 ? "Wine club tonight at the cellar door, 6pm! Eight members are coming to taste and buy." : "The wine club's on at the cellar door right now! Pop in and host.", 6e3), 2800);
         }
       }
+      if (SCOOP_IN.includes(id) || id === "bay") scoopNow();
       if (id === "cocoa" && evanHere() && ccUp(cocoaState(F), "fountain")) setTimeout(() => evanSays(pick(["THE FOUNTAIN!! Can I put my hand in? Just one finger?", "Mama, it's a chocolate waterfall!", "Can we dip a strawberry? Pleeease?"])), 1400);
       if (id === "cellar" && wineClubNow(dayKey(), sgHM())) setTimeout(() => speak("The wine club's here! Glasses clinking, everyone talking at once. Tap the tasting bar to host.", 5e3), 1200);
       if (id === "marcus" && evanHere()) setTimeout(() => {
@@ -19884,6 +19965,13 @@ ${SIGNOFF[t2.who] || ""}`;
       setScene("cocoakitchen", INNER.cocoakitchen.arrive);
       return;
     }
+    if (scene === "cocoa" && id === "ctables" && workshopGroup(dayKey()).length && sgHM() >= 14 * 60 && sgHM() < 16 * 60) {
+      speak("The bonbon workshop's on! Six makers at the tables, piping ganache and arguing about sprinkles. You show them how to temper.", 5500);
+      gainXp(1);
+      if (evanHere()) setTimeout(() => evanSays(pick(["Can I make one? I'll make a dinosaur one!", "I'm helping! *licks spoon*", "Mine has sprinkles AND more sprinkles."])), 1500);
+      render();
+      return;
+    }
     if (scene === "cocoa" && id === "ctables") {
       sitAt(SHOP_SEATS2);
       return;
@@ -20103,7 +20191,7 @@ ${SIGNOFF[t2.who] || ""}`;
       } else if (st6.kind === "cocoa") {
         cocoaNow();
         speak("Behind the chocolate cart. More people stop while you're serving.", 3500);
-        if (isHere("mateo") && !keeperAway(st6, dayKey(), sgHM())) setTimeout(() => npcSay("mateo", pick(["Night market people LOVE hot chocolate.", "Better than studying, boss.", "The jazz duo bought six bars. Six!"])), 1200);
+        if (isHere("mateo") && !keeperAway(st6, dayKey(), sgHM())) setTimeout(() => npcSay("mateo", pick(["Market people LOVE hot chocolate, even in the morning.", "Better than studying, boss.", "Ma Ma traded me a mango for a bar. Good deal?"])), 1200);
       } else if (st6.kind === "orchard") {
         orchardTick();
         if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma brought plenty.", "Everybody wants Ma Ma's fruit today.", "For you, free. For them, they pay!"]));
@@ -20363,6 +20451,15 @@ ${SIGNOFF[t2.who] || ""}`;
   function scoopNow() {
     lastScoop = Date.now();
     const s = scoopState(F), out = scoopTick(F, { serving: scene === "scoopshop" && atSpot === "gcounter", cart: atCart() });
+    if (out.churned.length) {
+      const r = out.churned[out.churned.length - 1], where = displayIds(s).includes(r.id) ? "in the display" : "in the freezer";
+      if (SCOOP_IN.includes(scene) || scene === "bay") {
+        sfx("chime");
+        speak(`Ding! ${out.churned.length > 1 ? `${out.churned.map((x) => x.name).join(" and ")} are` : `${r.name} is`} frozen and ready, ${where}.`, 5e3);
+      }
+      save2();
+      if (scView) ctx();
+    }
     if (!out.coins && !out.mins) return;
     if (out.box && (scene === "bay" || out.mins >= 30)) setTimeout(() => speak(`The honesty freezer's been busy: ${s.box} coins waiting in its box.`, 4500), out.coins ? 6e3 : 1500);
     if (out.cart && scene === "field") {
@@ -20938,8 +21035,8 @@ ${SIGNOFF[t2.who] || ""}`;
       sfx("chime");
       act("cheer");
       mprop("sparkle", mel.x, mel.y - 60, 1600);
-      flash(`A fresh tub of ${r.name}`);
-      speak(`Churned, tubbed, frozen. Twenty scoops of ${r.name}${displayIds(s).includes(r.id) ? " in the display" : " in the freezer"}.`, 4e3);
+      flash(`${r.name}: into the churner`);
+      speak(`${r.name} is in the churner: blending, then freezing. Twenty scoops, ready in an hour.`, 4500);
       re();
     });
     c.querySelectorAll("[data-gplan]").forEach((b) => b.onchange = () => {
@@ -22365,7 +22462,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     r.readAsText(f2);
     e.target.value = "";
   };
-  setStallOwned(() => ({ cc_cart: !!(F.cocoa && F.cocoa.up && F.cocoa.up.cart) }));
+  setStallOwned(() => ({ cc_cart: !!(F.cocoa && F.cocoa.up && F.cocoa.up.cart), cc_workshop: !!(F.cocoa && F.cocoa.up && F.cocoa.up.workshop) }));
   initNpcs({
     sfx,
     quiet: () => quietNow(),
