@@ -991,3 +991,24 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Take 1 or All puts `grape_red` / `grape_white` items in the backpack (ingredients for gelato); Put back returns them.
   - When Marco's "fills empty barrels" help is on, he only uses bunches beyond `v.keep[colour]`, which Mel sets with a stepper.
 - **Wine shop larder:** each good is a "Take one" button (`data-k="take"`) that moves it back to the backpack. `isGood` now allows loaves (new `ITEMS.loaf`) to go back in. Note: Pilar cooks from the larder on her shifts.
+
+### Round 79: Scoop Shack upgrades
+- **Catalogue:** `UPGRADES` in scoop.js, bought with `buyUpgrade` into `s.up`. Opened from the shop's catalogue stand (`gupgrades`) or the "Shop upgrades" button on the counter panel (`data-gview="upgrade"`, `data-gbuy`).
+- **Honesty freezer** (400): bay spot `hfreezer`.
+  - Sells cups only, 7–10am and 8–10pm, while the shop is shut (`honestyOpen`). It uses the same tubs as the counter.
+  - Coins collect in `s.box`, not Mel's purse. 15% of sales add an extra coin and a note (`s.notes`).
+  - Collect them in its panel (`collectBox`). The panel's `scView` is "honesty".
+- **Awning and fairy lights** (250): drawn on the deck. 25% of sales tip +1 (`t.tips`).
+- **Neon cone** (350): beside the shop door. Sales ×1.3 from 5pm, including the honesty freezer.
+- **Lit at night:** the neon and the fairy lights carry class `nglow`, which `nightLights` copies above the dusk wash.
+- **Delivery bike** (800): bay spot `dbike`.
+  - Its "deliver" panel is also reachable from the backpack's "Send an ice cream" button. It works 10am to 8pm.
+  - A delivery takes a scoop from a tub and sends it to one of the family as a gift with a thank-you note.
+  - Without the bike, a `gel` gift can't be sent round (it would melt): give it in person.
+- **Chocolate dip station** (500):
+  - INNER room `scoopdip` through the shop's east door (`gddoor`). Before purchase the door is dashed and opens the catalogue.
+  - Stations: `gpots` (dips in `DIPS`, bought with `buyDip`), `gtops` (`TOPPINGS`, bought with `buyTopping`) and `gdipbar` (`makeDipped`, to eat or to give).
+  - Dipped gifts are `gel_dip_<fmt>_<dip>_<top|none>_<flavour>`, registered from `s.dipIds` and the inventory. Milk, white and matcha dips count as dairy.
+  - Customers: cones and waffles get dipped 25–60% of the time (more dips and toppings, more takers), paying `prices.dip` plus maybe `prices.top`. Both prices have steppers on the menu.
+- **Mixing bench preview:** while ingredients are picked, `benchPanel` shows a result card (`.gresult`): a scoop in the blended colour, the flavour's name, and gelato or sorbet. Once mixed, it shows the new flavour (`scSt.made`, `.gresult.made`).
+- **Grape crates layout:** the crates list uses `orflowers grcrates`, so buttons sit on their own line, and the keep-back stepper has its own labelled row (`.grkeep`).

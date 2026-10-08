@@ -19,8 +19,28 @@ const dolphin = (x, y, dur, begin) => { const kt = "0;.55;.62;.7;.78;.84;1";
     <animateTransform attributeName="transform" type="translate" values="0 12;0 12;6 -2;14 -7;22 -2;28 12;28 12" keyTimes="${kt}" dur="${dur}s" begin="${begin}s" repeatCount="indefinite"/>
     <g ${W}><path d="M-14 2 C-8 -8 8 -10 16 -2 C10 -2 4 0 -2 4 C-6 6 -12 6 -14 2Z" style="fill:#7C93A8"/><path d="M0 -7 l4 -7 l2 7z" style="fill:#7C93A8"/></g></g></g>`; };
 
+// the time of day in Singapore, in minutes (the neon and the fairy lights come on in the evening)
+const hmNow = () => { const d = new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8*3600e3); return d.getUTCHours()*60 + d.getUTCMinutes(); };
+const lit = (on, off) => { const m = hmNow(); return m >= on || m < off; };
+// upgrades: the honesty freezer by the door, the delivery bike, the neon cone, the deck's striped awning and fairy lights
+const neon = on => `<g pointer-events="none" class="${on ? "nglow" : ""}">${on ? `<path d="M338 226 l9 26 l9 -26 M336 226 a11 10 0 0 1 22 0" fill="none" style="stroke:#FF8FC0" stroke-width="7" opacity=".35" stroke-linecap="round"/>` : ""}
+  <path d="M338 226 l9 26 l9 -26 M336 226 a11 10 0 0 1 22 0" fill="none" style="stroke:${on ? "#FFE3EF" : "#E6B9C9"}" stroke-width="2.4" stroke-linecap="round"/></g>`;
+const honestyFreezer = () => `<g data-place="hfreezer" aria-label="Honesty freezer"><g transform="translate(38 30)"><ellipse class="hov" cx="436" cy="298" rx="30" ry="7" style="fill:var(--butter)"/>
+  ${sk(`<rect x="414" y="268" width="44" height="28" rx="4" style="fill:#DCEBF2"/><rect x="418" y="264" width="36" height="6" rx="2" style="fill:#F6FBFD"/><rect x="440" y="252" width="14" height="12" rx="2" style="fill:#C9A87A"/><rect x="420" y="276" width="20" height="10" rx="2" style="fill:#FFFDF6"/>`,
+    `<rect x="414" y="268" width="44" height="28" rx="4"/><rect x="418" y="264" width="36" height="6" rx="2"/><rect x="440" y="252" width="14" height="12" rx="2"/><path d="M443 255 h8"/><rect x="420" y="276" width="20" height="10" rx="2"/>`)}
+  <text x="430" y="284" text-anchor="middle" font-family="Klee One,serif" font-size="5.5" fill="#C2505F" pointer-events="none">honesty</text>
+</g>${tapeLabel(474, 348, "Honesty freezer", "var(--card)", 9)}</g>`;
+const bike = () => `<g data-place="dbike" aria-label="Delivery bike"><g transform="translate(-186 -56)"><ellipse class="hov" cx="482" cy="340" rx="28" ry="7" style="fill:var(--butter)"/>
+  ${sk(`<circle cx="468" cy="330" r="9" style="fill:none"/><circle cx="496" cy="330" r="9" style="fill:none"/><path d="M468 330 l10 -16 h12 l6 16 M478 314 l-4 -6 M490 314 l2 -8 h6" fill="none" style="stroke:#7FCBB4" stroke-width="3"/><rect x="458" y="302" width="18" height="12" rx="2" style="fill:#F2A0B8"/>`,
+    `<circle cx="468" cy="330" r="9"/><circle cx="496" cy="330" r="9"/><rect x="458" y="302" width="18" height="12" rx="2"/><path d="M462 308 h10" opacity=".6"/>`)}
+</g>${tapeLabel(296, 296, "Delivery bike", "var(--card)", 8.5)}</g>`;
+const awning = on => { const bulbs = Array.from({length: 9}, (_, i) => { const t = (i + .5)/9, x = 112 + 128*t, y = 300 + 4*18*t*(1 - t); return [x, y]; });
+  return `<g pointer-events="none">${sk(`<path d="M112 326 V292 M240 326 V292" style="stroke:var(--wood)" stroke-width="4"/><path d="M104 286 H248 V296 ${Array.from({length: 8}, () => "q-9 8 -18 0").join(" ")}Z" style="fill:#FFFDF6"/>${Array.from({length: 4}, (_, i) => `<path d="M${230 - i*36} 286 h18 v10 q-9 8 -18 0z" style="fill:#F2A0B8"/>`).join("")}`,
+    `<path d="M112 326 V292 M240 326 V292"/><path d="M104 286 H248 V296 ${Array.from({length: 8}, () => "q-9 8 -18 0").join(" ")}Z"/>`)}
+    <g class="${on ? "nglow" : ""}"><path d="M112 300 Q176 336 240 300" fill="none" style="stroke:#5E5A55" stroke-width=".8"/>${bulbs.map(([x, y], i) => `${on ? `<circle cx="${x}" cy="${y + 3}" r="6" style="fill:#FFE9A0" opacity=".45"/>` : ""}<circle cx="${x}" cy="${y + 3}" r="2.4" style="fill:${on ? "#FFF6C8" : ["#F4C7CF", "#C3E8B8", "#F3E1A0"][i % 3]}"/>`).join("")}</g></g>`; };
+
 export function bayArt(){
-  const G = artCtx(), sc = G.scoop ? G.scoop() : {name: "The Scoop Shack"}, name = sc.name || "The Scoop Shack";
+  const G = artCtx(), sc = G.scoop ? G.scoop() : {name: "The Scoop Shack"}, name = sc.name || "The Scoop Shack", up = sc.up || {};
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="420" cy="360" rx="120" ry="70" style="fill:var(--grass2)"/><ellipse cx="380" cy="600" rx="140" ry="50" style="fill:var(--grass2)"/></g>
     <g filter="url(#wob)"><path d="M0 0 H150 C176 120 134 250 160 380 C182 480 140 560 150 640 H0Z" style="fill:var(--sea)"/>
@@ -44,7 +64,7 @@ export function bayArt(){
   const deck = `<g data-place="deck" aria-label="The deck"><ellipse class="hov" cx="176" cy="420" rx="70" ry="12" style="fill:var(--butter)"/>
     ${sk(`<rect x="112" y="326" width="128" height="92" rx="3" style="fill:#C9A27E"/>`, `<rect x="112" y="326" width="128" height="92" rx="3"/>${[0, 1, 2, 3, 4, 5, 6].map(i => `<path d="M112 ${338 + i*12} h128" opacity=".5"/>`).join("")}<path d="M112 326 v-10 M240 326 v-10 M112 316 h128" />`)}
     ${umb(152, 362, "#F2A0B8")}${umb(208, 362, "#9FD3C2")}${umb(170, 412, "#F3C969")}
-    ${tapeLabel(176, 446, "The deck", "var(--sky)", 10)}</g>`;
+    ${up.awning ? awning(lit(18*60, 5*60)) : ""}${tapeLabel(176, 446, "The deck", "var(--sky)", 10)}</g>`;
   // the shopfront under renovation: boards over the windows, scaffolding, a sign
   const reno = `<g data-place="reno" aria-label="Under renovation"><ellipse class="hov" cx="396" cy="526" rx="70" ry="10" style="fill:var(--butter)"/>
     ${sk(`<path d="M318 432 L396 390 L474 432z" style="fill:#B9B0A4"/><rect x="326" y="432" width="140" height="84" style="fill:#E8DCC8"/>${[0, 1, 2, 3, 4, 5, 6].map(i => `<rect x="${330 + i*19}" y="446" width="16" height="66" style="fill:${i % 2 ? "#D9BE94" : "#C9A87A"}"/>`).join("")}
@@ -54,6 +74,6 @@ export function bayArt(){
     <text x="396" y="471" text-anchor="middle" transform="rotate(-3 396 473)" font-family="Klee One,serif" font-weight="600" font-size="8" fill="#5E5A55" pointer-events="none">Coming soon</text>
     <text x="396" y="482" text-anchor="middle" transform="rotate(-3 396 473)" font-family="Klee One,serif" font-size="6.5" fill="#8A8279" pointer-events="none">brewery? chocolatier?</text>
     ${tapeLabel(396, 540, "Under renovation", "var(--card)", 10)}</g>`;
-  return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + deck + reno
+  return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17*60, 6*60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? bike() : "") + deck + reno
     + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
 }

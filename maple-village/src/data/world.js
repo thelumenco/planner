@@ -89,6 +89,8 @@ export const VILLAGE = {
   toShoreB:{scene:"bay", name:"Boardwalk to the foreshore", door:[250,622], spot:true, bridge:"shore", mark:[290,560], line:"Down the boardwalk to the foreshore."},
   scoopshop:{scene:"bay", name:"The Scoop Shack", short:"the Scoop Shack", door:[386,262], mark:[386,96]},
   deck:   {scene:"bay", name:"The deck", door:[215,412], spot:true, line:"The deck, looking out over the foreshore. Bring an ice cream."},
+  hfreezer:{scene:"bay", name:"Honesty freezer", door:[474,336], spot:true, line:"The honesty freezer: little cups while the shop's shut."},
+  dbike:  {scene:"bay", name:"Delivery bike", door:[300,290], spot:true, line:"The delivery bike."},
   reno:   {scene:"bay", name:"Under renovation", door:[396,520], spot:true, line:"Boarded up for now. Coming soon: a brewery? A chocolatier?"},
   homejetty:{scene:"base", name:"Little jetty", door:[150,132], spot:true, line:"Your little jetty. Paddle down the river and out to the foreshore."},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
@@ -130,7 +132,9 @@ export const INNER = {
   office: {parent: "home", door: [64, 512], arrive: [450, 450], exit: [486, 440]},
   cellar: {parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430]},
   // the Scoop Shack's kitchen, through the door on the shop's west wall; its own way back is the door on its east wall
-  scoopkitchen: {parent: "scoopshop", door: [64, 400], arrive: [450, 440], exit: [486, 440]}
+  scoopkitchen: {parent: "scoopshop", door: [64, 400], arrive: [450, 440], exit: [486, 440]},
+  // the chocolate dip station (an upgrade), through the door on the shop's east wall
+  scoopdip: {parent: "scoopshop", door: [456, 410], arrive: [70, 450], exit: [34, 440]}
 };
 export const WORK = ["hall","chord","fresh","chico","post","home"];
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
@@ -266,7 +270,9 @@ export const ROOMS = {
     ["dine","Dining table","X","dining",null,"Their dining table. Wedding magazines at one end, bank papers at the other.",44]]},
   // The Scoop Shack on the bay: the gelato counter (the display is drawn over the people, so Sofia stands behind it),
   // the chalkboard menu, tables, and the kitchen door on the west wall
-  scoopshop: {name:"The Scoop Shack", wall:"#E3F2EC", trim:"#F2A0B8", noBoard:true, pos:{C:[300,330], M:[465,128], Z:[40,400], T:[340,520]}, stations:[
+  scoopshop: {name:"The Scoop Shack", wall:"#E3F2EC", trim:"#F2A0B8", noBoard:true, pos:{C:[300,330], M:[465,128], Z:[40,400], T:[340,520], U:[96,262], D:[480,400]}, stations:[
+    ["gupgrades","Upgrades","U","gcatalogue",null,"The upgrades catalogue: things to make the shop even nicer.",34],
+    ["gddoor","Dip station","D","gdipdoor",null,"The chocolate dip station.",0],
     ["gmenu","Menu","M","chalkmenu",null,"The chalkboard menu: prices and flavours.",44],
     ["gcounter","Gelato counter","C","gcounter",null,"The gelato counter. Yours are free.",46],
     ["gkdoor","Kitchen","Z","gkdoor",null,"Into the gelato kitchen.",0],
@@ -277,6 +283,11 @@ export const ROOMS = {
     ["gfreezer","Freezer","Z","gfreezer",null,"The freezer: tubs waiting for the display.",30],
     ["gboard","Today's batches","B","gboard",null,"Tomo's board: what to make today.",74],
     ["gbench","Mixing bench","P","gbench",null,"The mixing bench: discover new flavours.",30]]},
+  // the chocolate dip station off the shop (an upgrade): the chocolate pots, the toppings shelf, and the dip bar
+  scoopdip: {name:"The dip station", wall:"#F6E6DA", trim:"#8A5A3A", noBoard:true, pos:{P:[340,262], S:[130,262], B:[300,480]}, stations:[
+    ["gpots","Chocolate pots","P","gpots",null,"Warm pots of chocolate for dipping.",34],
+    ["gtops","Toppings shelf","S","gtopshelf",null,"Jars of toppings.",34],
+    ["gdipbar","Dip bar","B","gdipbar",null,"Dip it, top it.",34]]},
   // the garage (a big goal): Darren's workbench, storage, the scooter and the car once they're bought
   garage: {name:"The garage", wall:"#E3E6EA", trim:"#8FA3B8", noBoard:true, pos:{W:[130,250], E:[300,262], K:[436,261], C:[310,480], D:[120,566], S:[440,566]}, stations:[
     ["gbench","Workbench","W","bench",null,"Darren's tools, all hung up on the wall. Mostly.",34],

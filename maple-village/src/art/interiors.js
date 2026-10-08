@@ -156,6 +156,13 @@ const SHELLS = {
     ${sk(`<rect x="160" y="40" width="110" height="6" style="fill:#B9C4CC"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${172 + i*20} 46 l6 18 l6 -18z" style="fill:#E8C48E"/>`).join("")}`, `<rect x="160" y="40" width="110" height="6"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${172 + i*20} 46 l6 18 l6 -18z"/>`).join("")}`)}
     ${plant(30, 612, .9)}`,
 
+  // the chocolate dip station: cream walls with a chocolate drip along the top, pink tiles, a little round window
+  scoopdip: () => `<rect width="520" height="640" style="fill:#FBEFF1"/>
+    <g opacity=".5">${rows(12, r => rows(13, c => (r + c) % 2 ? `<rect x="${c*40}" y="${150 + r*42}" width="40" height="42" style="fill:#F2D9CC"/>` : ""))}</g>
+    ${wallBase("#F6E6DA", "#8A5A3A")}<path d="M0 0 H520 V14 ${rows(26, i => `q-5 ${i % 3 ? 10 : 22} -10 0 q-5 -4 -10 0 `)}Z" style="fill:#6B4430"/>${skirting}
+    ${sk(`<circle cx="260" cy="76" r="38" style="fill:#CFE0EE"/><path d="M222 86 q38 -14 76 0 v4 a38 38 0 0 1 -76 0z" style="fill:#8FC1DE"/>`, `<circle cx="260" cy="76" r="38"/><path d="M222 76 h76 M260 38 v76"/>`)}
+    ${plant(490, 612, .9)}`,
+
   // The kitchen: checked tiles, a sage dado, open shelves with pots, a herb rail and a window over the garden
   kitchen: () => `<rect width="520" height="640" style="fill:#E9E2D4"/>
     <g opacity=".5">${rows(12, r => rows(13, c => (r + c) % 2 ? `<rect x="${c*40}" y="${150 + r*42}" width="40" height="42" style="fill:#D7E3CC"/>` : ""))}</g>

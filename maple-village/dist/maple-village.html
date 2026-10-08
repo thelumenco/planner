@@ -1313,6 +1313,10 @@ body.season-winter{--grass:#E5ECE6;--grass2:#D5E0DA}
 #ctx .orflowers li{flex-wrap:wrap}
 #ctx .orbtns{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
 #ctx .orflowers li{flex-wrap:wrap}#ctx .orflowers .orbtns{flex:1 0 100%;margin:8px 0 0 44px}
+#ctx .grcrates .orbtns{align-items:center}#ctx .grkeep{flex:0 0 calc(100% - 44px);box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0 0 44px;font-size:.85em;color:var(--soft)}
+#ctx .gresult{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:10px 0;border-radius:12px;background:var(--card);border:1.5px dashed var(--rule)}
+#ctx .gresult.made{border-style:solid;border-color:#9FD3C2;background:rgba(159,211,194,.18)}
+#ctx .gresult .gscoop{flex:none;width:44px;height:44px}#ctx .gresult b{display:block}#ctx .gresult small{color:var(--soft)}
 #ctx .orspot{width:100%;font:inherit;color:inherit}
 /* the wine shop's chalkboard menu */
 #ctx .wlist.chalk .mprice{flex:none;font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;color:#8E2C48}
@@ -2260,6 +2264,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     toShoreB: { scene: "bay", name: "Boardwalk to the foreshore", door: [250, 622], spot: true, bridge: "shore", mark: [290, 560], line: "Down the boardwalk to the foreshore." },
     scoopshop: { scene: "bay", name: "The Scoop Shack", short: "the Scoop Shack", door: [386, 262], mark: [386, 96] },
     deck: { scene: "bay", name: "The deck", door: [215, 412], spot: true, line: "The deck, looking out over the foreshore. Bring an ice cream." },
+    hfreezer: { scene: "bay", name: "Honesty freezer", door: [474, 336], spot: true, line: "The honesty freezer: little cups while the shop's shut." },
+    dbike: { scene: "bay", name: "Delivery bike", door: [300, 290], spot: true, line: "The delivery bike." },
     reno: { scene: "bay", name: "Under renovation", door: [396, 520], spot: true, line: "Boarded up for now. Coming soon: a brewery? A chocolatier?" },
     homejetty: { scene: "base", name: "Little jetty", door: [150, 132], spot: true, line: "Your little jetty. Paddle down the river and out to the foreshore." },
     toTown: { scene: "base", name: "Bridge to town", door: [260, 114], spot: true, bridge: "village", mark: [260, 62], line: "Over the river to the town square." }
@@ -2305,7 +2311,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     office: { parent: "home", door: [64, 512], arrive: [450, 450], exit: [486, 440] },
     cellar: { parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430] },
     // the Scoop Shack's kitchen, through the door on the shop's west wall; its own way back is the door on its east wall
-    scoopkitchen: { parent: "scoopshop", door: [64, 400], arrive: [450, 440], exit: [486, 440] }
+    scoopkitchen: { parent: "scoopshop", door: [64, 400], arrive: [450, 440], exit: [486, 440] },
+    // the chocolate dip station (an upgrade), through the door on the shop's east wall
+    scoopdip: { parent: "scoopshop", door: [456, 410], arrive: [70, 450], exit: [34, 440] }
   };
   var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
   var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
@@ -2459,7 +2467,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ] },
     // The Scoop Shack on the bay: the gelato counter (the display is drawn over the people, so Sofia stands behind it),
     // the chalkboard menu, tables, and the kitchen door on the west wall
-    scoopshop: { name: "The Scoop Shack", wall: "#E3F2EC", trim: "#F2A0B8", noBoard: true, pos: { C: [300, 330], M: [465, 128], Z: [40, 400], T: [340, 520] }, stations: [
+    scoopshop: { name: "The Scoop Shack", wall: "#E3F2EC", trim: "#F2A0B8", noBoard: true, pos: { C: [300, 330], M: [465, 128], Z: [40, 400], T: [340, 520], U: [96, 262], D: [480, 400] }, stations: [
+      ["gupgrades", "Upgrades", "U", "gcatalogue", null, "The upgrades catalogue: things to make the shop even nicer.", 34],
+      ["gddoor", "Dip station", "D", "gdipdoor", null, "The chocolate dip station.", 0],
       ["gmenu", "Menu", "M", "chalkmenu", null, "The chalkboard menu: prices and flavours.", 44],
       ["gcounter", "Gelato counter", "C", "gcounter", null, "The gelato counter. Yours are free.", 46],
       ["gkdoor", "Kitchen", "Z", "gkdoor", null, "Into the gelato kitchen.", 0],
@@ -2471,6 +2481,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["gfreezer", "Freezer", "Z", "gfreezer", null, "The freezer: tubs waiting for the display.", 30],
       ["gboard", "Today's batches", "B", "gboard", null, "Tomo's board: what to make today.", 74],
       ["gbench", "Mixing bench", "P", "gbench", null, "The mixing bench: discover new flavours.", 30]
+    ] },
+    // the chocolate dip station off the shop (an upgrade): the chocolate pots, the toppings shelf, and the dip bar
+    scoopdip: { name: "The dip station", wall: "#F6E6DA", trim: "#8A5A3A", noBoard: true, pos: { P: [340, 262], S: [130, 262], B: [300, 480] }, stations: [
+      ["gpots", "Chocolate pots", "P", "gpots", null, "Warm pots of chocolate for dipping.", 34],
+      ["gtops", "Toppings shelf", "S", "gtopshelf", null, "Jars of toppings.", 34],
+      ["gdipbar", "Dip bar", "B", "gdipbar", null, "Dip it, top it.", 34]
     ] },
     // the garage (a big goal): Darren's workbench, storage, the scooter and the car once they're bought
     garage: { name: "The garage", wall: "#E3E6EA", trim: "#8FA3B8", noBoard: true, pos: { W: [130, 250], E: [300, 262], K: [436, 261], C: [310, 480], D: [120, 566], S: [440, 566] }, stations: [
@@ -3228,6 +3244,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ${sk(`<rect x="300" y="30" width="80" height="64" rx="4" style="fill:#CFE0EE"/>`, `<rect x="300" y="30" width="80" height="64" rx="4"/><path d="M340 30 v64 M300 62 h80"/>`)}
     ${sk(`<rect x="160" y="40" width="110" height="6" style="fill:#B9C4CC"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${172 + i * 20} 46 l6 18 l6 -18z" style="fill:#E8C48E"/>`).join("")}`, `<rect x="160" y="40" width="110" height="6"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${172 + i * 20} 46 l6 18 l6 -18z"/>`).join("")}`)}
     ${plant(30, 612, 0.9)}`,
+    // the chocolate dip station: cream walls with a chocolate drip along the top, pink tiles, a little round window
+    scoopdip: () => `<rect width="520" height="640" style="fill:#FBEFF1"/>
+    <g opacity=".5">${rows(12, (r) => rows(13, (c) => (r + c) % 2 ? `<rect x="${c * 40}" y="${150 + r * 42}" width="40" height="42" style="fill:#F2D9CC"/>` : ""))}</g>
+    ${wallBase("#F6E6DA", "#8A5A3A")}<path d="M0 0 H520 V14 ${rows(26, (i) => `q-5 ${i % 3 ? 10 : 22} -10 0 q-5 -4 -10 0 `)}Z" style="fill:#6B4430"/>${skirting}
+    ${sk(`<circle cx="260" cy="76" r="38" style="fill:#CFE0EE"/><path d="M222 86 q38 -14 76 0 v4 a38 38 0 0 1 -76 0z" style="fill:#8FC1DE"/>`, `<circle cx="260" cy="76" r="38"/><path d="M222 76 h76 M260 38 v76"/>`)}
+    ${plant(490, 612, 0.9)}`,
     // The kitchen: checked tiles, a sage dado, open shelves with pots, a herb rail and a window over the garden
     kitchen: () => `<rect width="520" height="640" style="fill:#E9E2D4"/>
     <g opacity=".5">${rows(12, (r) => rows(13, (c) => (r + c) % 2 ? `<rect x="${c * 40}" y="${150 + r * 42}" width="40" height="42" style="fill:#D7E3CC"/>` : ""))}</g>
@@ -5967,11 +5989,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   function barrelPanel(F2) {
     const v = vineState(F2);
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles.</p>`;
-    h += `<p class="eyebrow">The grape crates</p><ul class="hlist wlist">${["red", "white"].map((c) => {
+    h += `<p class="eyebrow">The grape crates</p><ul class="hlist wlist orflowers grcrates">${["red", "white"].map((c) => {
       const back = (F2.inv || {})["grape_" + c] || 0;
       return `<li><span class="wpic">${grapePic(c)}</span><span class="wtxt"><b>${v.grapes[c]} ${c} bunch${v.grapes[c] === 1 ? "" : "es"}</b><small>${v.help.barrels ? `Marco keeps ${v.keep[c] || 0} back for you` : "picked and waiting"}</small></span>
-      <span class="orbtns"><button class="btn small primary" data-vy="takegr" data-k="${c}" data-n="1" ${v.grapes[c] ? "" : "disabled"}>Take 1</button><button class="btn small alt" data-vy="takegr" data-k="${c}" data-n="99" ${v.grapes[c] ? "" : "disabled"}>All</button>${back ? `<button class="btn small alt" data-vy="putgr" data-k="${c}">Put back ${back}</button>` : ""}
-      ${v.help.barrels ? `<span class="gstep"><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="-1" aria-label="Keep fewer back">−</button><b>${v.keep[c] || 0}</b><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="1" aria-label="Keep more back">+</button></span>` : ""}</span></li>`;
+      <span class="orbtns"><button class="btn small primary" data-vy="takegr" data-k="${c}" data-n="1" ${v.grapes[c] ? "" : "disabled"}>Take 1</button><button class="btn small alt" data-vy="takegr" data-k="${c}" data-n="99" ${v.grapes[c] ? "" : "disabled"}>All</button>${back ? `<button class="btn small alt" data-vy="putgr" data-k="${c}">Put back ${back}</button>` : ""}</span>
+      ${v.help.barrels ? `<span class="grkeep"><span>Keep back from the barrels</span><span class="gstep"><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="-1" aria-label="Keep fewer back">−</button><b>${v.keep[c] || 0}</b><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="1" aria-label="Keep more back">+</button></span></span>` : ""}</li>`;
     }).join("")}</ul>
     <p class="muted">Grapes you take go in your backpack (for gelato at the Scoop Shack).${v.help.barrels ? " Marco fills empty barrels only from bunches beyond what you keep back." : ""}</p><div class="vbarrels">`;
     v.barrels.forEach((b, i) => {
@@ -6384,16 +6406,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     }
     return h + `<div class="actions">${close}</div>`;
   }
-  function tourBoard(F2, today2, hmNow) {
+  function tourBoard(F2, today2, hmNow2) {
     const o = orchState(F2), shown = [...o.trees, ...o.beds, ...o.bushes].filter(Boolean).length;
     const who3 = (t2) => `<b>${esc(nm2(t2.guide))}</b> guiding. Signed up: ${t2.group.map((g) => esc(nm2(g)) + (TOURISTS.includes(g) ? ` <small class="muted">(visiting)</small>` : "")).join(", ")}`;
     const row2 = (t2, day) => {
-      const st6 = day !== today2 ? "" : hmNow >= t2.to ? "done" : hmNow >= t2.from ? "on now" : "";
+      const st6 = day !== today2 ? "" : hmNow2 >= t2.to ? "done" : hmNow2 >= t2.from ? "on now" : "";
       return `<li><span class="wtxt"><b>${fmtTime(t2.from)} to ${fmtTime(t2.to)}</b>${st6 ? ` <small class="muted">${st6}</small>` : ""}<small>${who3(t2)}</small><small>${t2.group.length} × ${TOUR_FEE} coins = ${t2.group.length * TOUR_FEE} coins</small></span></li>`;
     };
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Farm tours</h2>`;
-    const todays = toursOn(today2), left3 = todays.filter((t2) => t2.to > hmNow);
-    if (left3.length) h += `<p class="sub">${left3[0].from > hmNow ? `Next tour today at ${fmtTime(left3[0].from)}.` : "A tour's going round right now."} Weekends at 10am, 11:30, 2pm and 4pm; Darren's on Tuesday and Thursday evenings.</p><ul class="hlist wlist">${todays.map((t2) => row2(t2, today2)).join("")}</ul>`;
+    const todays = toursOn(today2), left3 = todays.filter((t2) => t2.to > hmNow2);
+    if (left3.length) h += `<p class="sub">${left3[0].from > hmNow2 ? `Next tour today at ${fmtTime(left3[0].from)}.` : "A tour's going round right now."} Weekends at 10am, 11:30, 2pm and 4pm; Darren's on Tuesday and Thursday evenings.</p><ul class="hlist wlist">${todays.map((t2) => row2(t2, today2)).join("")}</ul>`;
     else {
       let day = today2, tours = [];
       for (let k = 1; k <= 7 && !tours.length; k++) {
@@ -7810,6 +7832,39 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         );
       case "gcounter":
         return `<rect x="${x - 110}" y="${y - 56}" width="220" height="56" fill="transparent"/>`;
+      // the upgrades catalogue on a little stand, and the dip station's door on the east wall (dashed till it's bought)
+      case "gcatalogue":
+        return sk(
+          `<path d="M${x - 4} ${y} v-40 h8 v40z" style="fill:var(--wood)"/><rect x="${x - 18}" y="${y - 74}" width="36" height="40" rx="3" transform="rotate(-6 ${x} ${y - 54})" style="fill:#F2A0B8"/><rect x="${x - 13}" y="${y - 68}" width="26" height="30" transform="rotate(-6 ${x} ${y - 54})" style="fill:#FFFDF6"/>`,
+          `<path d="M${x - 4} ${y} v-40 h8 v40z M${x - 12} ${y} h24"/><rect x="${x - 18}" y="${y - 74}" width="36" height="40" rx="3" transform="rotate(-6 ${x} ${y - 54})"/><g transform="rotate(-6 ${x} ${y - 54})" opacity=".55"><path d="M${x - 8} ${y - 60} h16 M${x - 8} ${y - 54} h12 M${x - 8} ${y - 48} h14"/></g>`
+        );
+      case "gdipdoor": {
+        const sc = G.scoop ? G.scoop() : {}, built = !!(sc.up && sc.up.dip), d = `M${x + 40} ${y - 108} L${x + 12} ${y - 96} L${x + 12} ${y + 4} L${x + 40} ${y + 14}z`;
+        return sk(
+          `<path d="${d}" style="fill:${built ? "#8A5A3A" : "#F1E6DA"}"/>${built ? `<path d="M${x + 14} ${y - 96} L${x + 38} ${y - 106} v10 q-3 6 -6 0 q-3 8 -6 0 q-3 6 -6 0 q-3 7 -6 0z" style="fill:#5A3A2A"/><path d="M${x + 20} ${y - 78} l6 14 l6 -16z" style="fill:#E8C48E"/><circle cx="${x + 26}" cy="${y - 82}" r="5" style="fill:#5A3A2A"/>` : `<rect x="${x + 16}" y="${y - 64}" width="22" height="14" transform="rotate(4 ${x + 27} ${y - 57})" style="fill:#FFFDF6"/>`}`,
+          `<path d="${d}" ${built ? "" : `stroke-dasharray="4 4"`}/>${built ? `<circle cx="${x + 17}" cy="${y - 42}" r="1.8"/><path d="M${x + 20} ${y - 78} l6 14 l6 -16z"/>` : `<path d="M${x + 20} ${y - 58} h12" opacity=".6"/>`}`
+        );
+      }
+      // the dip station: chocolate pots warming on a counter, the toppings shelf, the dip bar with a stand of cones
+      case "gpots": {
+        const sc = G.scoop ? G.scoop() : { dips: { milk: 1 } }, cols = { milk: "#8A5A3A", dark: "#4A2E22", white: "#F6EBD2", pink: "#F2A0B8", matcha: "#8FB86A" }, ks = Object.keys(cols);
+        return sk(
+          `<rect x="${x - 90}" y="${y - 40}" width="180" height="40" rx="3" style="fill:#E7D3BF"/><rect x="${x - 94}" y="${y - 46}" width="188" height="8" rx="2" style="fill:#FFFDF6"/>${ks.map((k, i) => `<path d="M${x - 80 + i * 34} ${y - 46} v-16 h26 v16z" style="fill:#C9CED4"/>${(sc.dips || {})[k] ? `<ellipse cx="${x - 67 + i * 34}" cy="${y - 62}" rx="13" ry="4" style="fill:${cols[k]}"/>` : ""}`).join("")}`,
+          `<rect x="${x - 90}" y="${y - 40}" width="180" height="40" rx="3"/><rect x="${x - 94}" y="${y - 46}" width="188" height="8" rx="2"/>${ks.map((k, i) => `<path d="M${x - 80 + i * 34} ${y - 46} v-16 h26 v16z"/><ellipse cx="${x - 67 + i * 34}" cy="${y - 62}" rx="13" ry="4"/>`).join("")}`
+        );
+      }
+      case "gtopshelf": {
+        const sc = G.scoop ? G.scoop() : { tops: { sprinkles: 1 } }, cols = ["#F3C969", "#FFFDF6", "#B98A5A", "#F4C7CF", "#C98A3A", "#E8566C", "#9A5A2E", "#9FD3C2"], ks = ["sprinkles", "coconut", "nuts", "marsh", "caramel", "strawb", "gula", "pop"];
+        return sk(
+          `<rect x="${x - 56}" y="${y - 120}" width="112" height="120" rx="3" style="fill:var(--wood)"/><rect x="${x - 50}" y="${y - 114}" width="100" height="108" style="fill:#F3E6D6"/>${ks.map((k, i) => `<rect x="${x - 44 + i % 4 * 24}" y="${y - 104 + Math.floor(i / 4) * 52}" width="18" height="30" rx="4" style="fill:${(sc.tops || {})[k] ? cols[i] : "#FFFDF6"}" opacity="${(sc.tops || {})[k] ? 1 : 0.5}"/>`).join("")}`,
+          `<rect x="${x - 56}" y="${y - 120}" width="112" height="120" rx="3"/><path d="M${x - 50} ${y - 60} h100 M${x - 50} ${y - 8} h100"/>${ks.map((k, i) => `<rect x="${x - 44 + i % 4 * 24}" y="${y - 104 + Math.floor(i / 4) * 52}" width="18" height="30" rx="4" ${(sc.tops || {})[k] ? "" : `stroke-dasharray="3 3"`}/>`).join("")}`
+        );
+      }
+      case "gdipbar":
+        return sk(
+          `<rect x="${x - 80}" y="${y - 38}" width="160" height="38" rx="4" style="fill:#F2A0B8"/><rect x="${x - 84}" y="${y - 44}" width="168" height="8" rx="2" style="fill:#FFFDF6"/><rect x="${x - 60}" y="${y - 58}" width="40" height="14" rx="2" style="fill:#E8C48E"/>${[0, 1, 2].map((i) => `<path d="M${x - 56 + i * 12} ${y - 58} l4 -14 l4 14z" style="fill:#E8C48E"/><circle cx="${x - 52 + i * 12}" cy="${y - 74}" r="5" style="fill:${["#8A5A3A", "#F6EBD2", "#F2A0B8"][i]}"/>`).join("")}<ellipse cx="${x + 40}" cy="${y - 50}" rx="20" ry="6" style="fill:#5A3A2A"/>`,
+          `<rect x="${x - 80}" y="${y - 38}" width="160" height="38" rx="4"/><rect x="${x - 84}" y="${y - 44}" width="168" height="8" rx="2"/><rect x="${x - 60}" y="${y - 58}" width="40" height="14" rx="2"/><ellipse cx="${x + 40}" cy="${y - 50}" rx="20" ry="6"/><path d="M${x - 80} ${y - 20} h160" style="stroke:#FFFDF6" stroke-width="4"/>`
+        );
       case "gfridge": {
         const s = G.scoop ? G.scoop() : { fridge: {} }, n = Object.values(s.fridge || {}).reduce((a, b) => a + b, 0), cols = ["#E8566C", "#F3C969", "#9CC27E", "#F28C3A", "#FFFDF6", "#C9A3E0"];
         let jars = "";
@@ -8181,8 +8236,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       if (sl) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".32" pointer-events="none"/>`;
       return h;
     }
-    if (id === "office" || id === "garage" || id === "scoopkitchen") {
-      const e = id !== "garage", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx = e ? 486 : 34, sk2 = id === "scoopkitchen";
+    if (id === "office" || id === "garage" || id === "scoopkitchen" || id === "scoopdip") {
+      const e = id !== "garage" && id !== "scoopdip", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx = e ? 486 : 34, sk2 = id === "scoopkitchen" || id === "scoopdip";
       h += `<g data-exit="1" aria-label="${sk2 ? "Back to the shop" : "Back to the living room"}"><ellipse class="hov" cx="${hx}" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>
       ${sk(`<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z" style="fill:${sk2 ? "#E3F2EC" : "#F8EED8"}"/>`, `<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z"/><circle cx="${e ? 497 : 23}" cy="384" r="1.8"/>`)}${tapeLabel(e ? 456 : 64, sk2 ? 478 : 296, sk2 ? "The shop" : "Living room", "var(--card)", 11)}</g>`;
       return h;
@@ -13317,8 +13372,42 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <animateTransform attributeName="transform" type="translate" values="0 12;0 12;6 -2;14 -7;22 -2;28 12;28 12" keyTimes="${kt}" dur="${dur2}s" begin="${begin}s" repeatCount="indefinite"/>
     <g ${W5}><path d="M-14 2 C-8 -8 8 -10 16 -2 C10 -2 4 0 -2 4 C-6 6 -12 6 -14 2Z" style="fill:#7C93A8"/><path d="M0 -7 l4 -7 l2 7z" style="fill:#7C93A8"/></g></g></g>`;
   };
+  var hmNow = () => {
+    const d = new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8 * 36e5);
+    return d.getUTCHours() * 60 + d.getUTCMinutes();
+  };
+  var lit = (on, off) => {
+    const m = hmNow();
+    return m >= on || m < off;
+  };
+  var neon = (on) => `<g pointer-events="none" class="${on ? "nglow" : ""}">${on ? `<path d="M338 226 l9 26 l9 -26 M336 226 a11 10 0 0 1 22 0" fill="none" style="stroke:#FF8FC0" stroke-width="7" opacity=".35" stroke-linecap="round"/>` : ""}
+  <path d="M338 226 l9 26 l9 -26 M336 226 a11 10 0 0 1 22 0" fill="none" style="stroke:${on ? "#FFE3EF" : "#E6B9C9"}" stroke-width="2.4" stroke-linecap="round"/></g>`;
+  var honestyFreezer = () => `<g data-place="hfreezer" aria-label="Honesty freezer"><g transform="translate(38 30)"><ellipse class="hov" cx="436" cy="298" rx="30" ry="7" style="fill:var(--butter)"/>
+  ${sk(
+    `<rect x="414" y="268" width="44" height="28" rx="4" style="fill:#DCEBF2"/><rect x="418" y="264" width="36" height="6" rx="2" style="fill:#F6FBFD"/><rect x="440" y="252" width="14" height="12" rx="2" style="fill:#C9A87A"/><rect x="420" y="276" width="20" height="10" rx="2" style="fill:#FFFDF6"/>`,
+    `<rect x="414" y="268" width="44" height="28" rx="4"/><rect x="418" y="264" width="36" height="6" rx="2"/><rect x="440" y="252" width="14" height="12" rx="2"/><path d="M443 255 h8"/><rect x="420" y="276" width="20" height="10" rx="2"/>`
+  )}
+  <text x="430" y="284" text-anchor="middle" font-family="Klee One,serif" font-size="5.5" fill="#C2505F" pointer-events="none">honesty</text>
+</g>${tapeLabel(474, 348, "Honesty freezer", "var(--card)", 9)}</g>`;
+  var bike = () => `<g data-place="dbike" aria-label="Delivery bike"><g transform="translate(-186 -56)"><ellipse class="hov" cx="482" cy="340" rx="28" ry="7" style="fill:var(--butter)"/>
+  ${sk(
+    `<circle cx="468" cy="330" r="9" style="fill:none"/><circle cx="496" cy="330" r="9" style="fill:none"/><path d="M468 330 l10 -16 h12 l6 16 M478 314 l-4 -6 M490 314 l2 -8 h6" fill="none" style="stroke:#7FCBB4" stroke-width="3"/><rect x="458" y="302" width="18" height="12" rx="2" style="fill:#F2A0B8"/>`,
+    `<circle cx="468" cy="330" r="9"/><circle cx="496" cy="330" r="9"/><rect x="458" y="302" width="18" height="12" rx="2"/><path d="M462 308 h10" opacity=".6"/>`
+  )}
+</g>${tapeLabel(296, 296, "Delivery bike", "var(--card)", 8.5)}</g>`;
+  var awning = (on) => {
+    const bulbs2 = Array.from({ length: 9 }, (_, i) => {
+      const t2 = (i + 0.5) / 9, x = 112 + 128 * t2, y = 300 + 4 * 18 * t2 * (1 - t2);
+      return [x, y];
+    });
+    return `<g pointer-events="none">${sk(
+      `<path d="M112 326 V292 M240 326 V292" style="stroke:var(--wood)" stroke-width="4"/><path d="M104 286 H248 V296 ${Array.from({ length: 8 }, () => "q-9 8 -18 0").join(" ")}Z" style="fill:#FFFDF6"/>${Array.from({ length: 4 }, (_, i) => `<path d="M${230 - i * 36} 286 h18 v10 q-9 8 -18 0z" style="fill:#F2A0B8"/>`).join("")}`,
+      `<path d="M112 326 V292 M240 326 V292"/><path d="M104 286 H248 V296 ${Array.from({ length: 8 }, () => "q-9 8 -18 0").join(" ")}Z"/>`
+    )}
+    <g class="${on ? "nglow" : ""}"><path d="M112 300 Q176 336 240 300" fill="none" style="stroke:#5E5A55" stroke-width=".8"/>${bulbs2.map(([x, y], i) => `${on ? `<circle cx="${x}" cy="${y + 3}" r="6" style="fill:#FFE9A0" opacity=".45"/>` : ""}<circle cx="${x}" cy="${y + 3}" r="2.4" style="fill:${on ? "#FFF6C8" : ["#F4C7CF", "#C3E8B8", "#F3E1A0"][i % 3]}"/>`).join("")}</g></g>`;
+  };
   function bayArt() {
-    const G2 = artCtx(), sc = G2.scoop ? G2.scoop() : { name: "The Scoop Shack" }, name = sc.name || "The Scoop Shack";
+    const G2 = artCtx(), sc = G2.scoop ? G2.scoop() : { name: "The Scoop Shack" }, name = sc.name || "The Scoop Shack", up = sc.up || {};
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="420" cy="360" rx="120" ry="70" style="fill:var(--grass2)"/><ellipse cx="380" cy="600" rx="140" ry="50" style="fill:var(--grass2)"/></g>
     <g filter="url(#wob)"><path d="M0 0 H150 C176 120 134 250 160 380 C182 480 140 560 150 640 H0Z" style="fill:var(--sea)"/>
@@ -13341,7 +13430,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const deck = `<g data-place="deck" aria-label="The deck"><ellipse class="hov" cx="176" cy="420" rx="70" ry="12" style="fill:var(--butter)"/>
     ${sk(`<rect x="112" y="326" width="128" height="92" rx="3" style="fill:#C9A27E"/>`, `<rect x="112" y="326" width="128" height="92" rx="3"/>${[0, 1, 2, 3, 4, 5, 6].map((i) => `<path d="M112 ${338 + i * 12} h128" opacity=".5"/>`).join("")}<path d="M112 326 v-10 M240 326 v-10 M112 316 h128" />`)}
     ${umb(152, 362, "#F2A0B8")}${umb(208, 362, "#9FD3C2")}${umb(170, 412, "#F3C969")}
-    ${tapeLabel(176, 446, "The deck", "var(--sky)", 10)}</g>`;
+    ${up.awning ? awning(lit(18 * 60, 5 * 60)) : ""}${tapeLabel(176, 446, "The deck", "var(--sky)", 10)}</g>`;
     const reno = `<g data-place="reno" aria-label="Under renovation"><ellipse class="hov" cx="396" cy="526" rx="70" ry="10" style="fill:var(--butter)"/>
     ${sk(
       `<path d="M318 432 L396 390 L474 432z" style="fill:#B9B0A4"/><rect x="326" y="432" width="140" height="84" style="fill:#E8DCC8"/>${[0, 1, 2, 3, 4, 5, 6].map((i) => `<rect x="${330 + i * 19}" y="446" width="16" height="66" style="fill:${i % 2 ? "#D9BE94" : "#C9A87A"}"/>`).join("")}
@@ -13352,7 +13441,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <text x="396" y="471" text-anchor="middle" transform="rotate(-3 396 473)" font-family="Klee One,serif" font-weight="600" font-size="8" fill="#5E5A55" pointer-events="none">Coming soon</text>
     <text x="396" y="482" text-anchor="middle" transform="rotate(-3 396 473)" font-family="Klee One,serif" font-size="6.5" fill="#8A8279" pointer-events="none">brewery? chocolatier?</text>
     ${tapeLabel(396, 540, "Under renovation", "var(--card)", 10)}</g>`;
-    return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + deck + reno + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
+    return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17 * 60, 6 * 60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? bike() : "") + deck + reno + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
   }
 
   // src/game/scoop.js
@@ -13401,11 +13490,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     s.fridge = s.fridge || {};
     s.recipes = s.recipes || [];
     s.tubs = s.tubs || {};
-    s.prices = Object.assign({ cup: 4, cone: 4, float: 6, waffle: 7, special: 2 }, s.prices || {});
+    s.prices = Object.assign({ cup: 4, cone: 4, float: 6, waffle: 7, special: 2, dip: 2, top: 1 }, s.prices || {});
     s.plan = s.plan && s.plan.day === dayKey() ? s.plan : { day: dayKey(), ids: [] };
     s.made = s.made || {};
     s.sold = s.sold || {};
     s.log = s.log || [];
+    s.up = s.up || {};
+    s.dips = s.dips || { milk: 1 };
+    s.tops = s.tops || { sprinkles: 1 };
+    s.box = s.box || 0;
+    s.notes = s.notes || [];
+    s.dipIds = s.dipIds || [];
     return s;
   }
   var recipeOf = (s, id) => s.recipes.find((r) => r.id === id);
@@ -13415,6 +13510,71 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
     return d !== 0 && hm2 >= 8 * 60 && hm2 < 16 * 60 && !(hm2 >= 12 * 60 && hm2 < 12 * 60 + 45);
   };
+  var UPGRADES2 = {
+    honesty: { n: "Honesty freezer", price: 400, line: "A little freezer out front with pre-scooped cups and a wooden coin box. It sells while the shop's shut (7 to 10am, 8 to 10pm), and the coins wait in the box for you." },
+    awning: { n: "Striped awning and fairy lights", price: 250, line: "A pink striped awning over the deck, strung with fairy lights that glow in the evenings. Customers linger, and leave tips." },
+    neon: { n: "Neon cone sign", price: 350, line: "A pink neon cone by the door. It glows from 5pm, so more people find you in the evenings." },
+    bike: { n: "Delivery bike", price: 800, line: "A mint delivery bike with a cool box. Sofia pedals ice creams round to the family from anywhere (send one from your backpack), and a cone from the shop can be sent round without melting." },
+    dip: { n: "Chocolate dip station", price: 500, line: "A little room off the shop: warm pots of chocolate and a shelf of toppings. Cones and waffles can be dipped and topped (customers pay a bit extra), and you can make your own. Comes with milk chocolate and rainbow sprinkles; more dips and toppings to buy." }
+  };
+  var DIPS = {
+    milk: { n: "Milk chocolate", w: "milk-chocolate", col: "#8A5A3A", price: 0 },
+    dark: { n: "Dark chocolate", w: "dark-chocolate", col: "#4A2E22", price: 150 },
+    white: { n: "White chocolate", w: "white-chocolate", col: "#F6EBD2", price: 180 },
+    pink: { n: "Strawberry pink", w: "strawberry", col: "#F2A0B8", price: 200 },
+    matcha: { n: "Matcha", w: "matcha", col: "#8FB86A", price: 220 }
+  };
+  var TOPPINGS = {
+    sprinkles: { n: "Rainbow sprinkles", w: "sprinkles", col: "#F3C969", price: 0 },
+    coconut: { n: "Coconut shavings", w: "coconut shavings", col: "#FFFDF6", price: 100 },
+    nuts: { n: "Crushed hazelnuts", w: "crushed hazelnuts", col: "#B98A5A", price: 120 },
+    marsh: { n: "Mini marshmallows", w: "mini marshmallows", col: "#F4C7CF", price: 120 },
+    caramel: { n: "Salted caramel", w: "salted caramel", col: "#C98A3A", price: 160 },
+    strawb: { n: "Freeze-dried strawberries", w: "strawberry bits", col: "#E8566C", price: 160 },
+    gula: { n: "Gula melaka drizzle", w: "gula melaka", col: "#9A5A2E", price: 180 },
+    pop: { n: "Popping candy", w: "popping candy", col: "#9FD3C2", price: 220 }
+  };
+  var hasUp = (s, k) => !!(s.up && s.up[k]);
+  function buyUpgrade(F2, k) {
+    const s = scoopState(F2), u = UPGRADES2[k];
+    if (!u || s.up[k] || F2.coins < u.price) return null;
+    F2.coins -= u.price;
+    s.up[k] = Date.now();
+    return {
+      honesty: "The honesty freezer's out front, full of little cups. It sells from 7 to 10am and 8 to 10pm while the shop's shut.",
+      awning: "The striped awning's up over the deck, fairy lights and all. Wait till you see it at dusk.",
+      neon: "The neon cone's on the wall by the door. It switches on at 5pm.",
+      bike: "A mint delivery bike, parked by the shop. Send an ice cream from your backpack any time the shop's open.",
+      dip: "The chocolate dip station's open! Through the new door on the shop's east wall."
+    }[k];
+  }
+  function buyDip(F2, k) {
+    const s = scoopState(F2), d = DIPS[k];
+    if (!d || s.dips[k] || F2.coins < d.price) return false;
+    F2.coins -= d.price;
+    s.dips[k] = 1;
+    return true;
+  }
+  function buyTopping(F2, k) {
+    const s = scoopState(F2), t2 = TOPPINGS[k];
+    if (!t2 || s.tops[k] || F2.coins < t2.price) return false;
+    F2.coins -= t2.price;
+    s.tops[k] = 1;
+    return true;
+  }
+  var nDips = (s) => Object.keys(s.dips).filter((k) => DIPS[k]).length;
+  var nTops = (s) => Object.keys(s.tops).filter((k) => TOPPINGS[k]).length;
+  var honestyOpen = (hm2) => hm2 >= 7 * 60 && hm2 < OPEN || hm2 >= CLOSE && hm2 < 22 * 60;
+  var NOTES = [
+    "Best pandan ever. Sorry, only had coins for one! x",
+    "For the little one's birthday. He says thank you.",
+    "Left a bit extra. You deserve it!",
+    "Took two, paid for three. Pay it forward :)",
+    "Midnight snack, technically. Thank you!",
+    "The dolphins came by while I ate it. Perfect.",
+    "My grandma says it tastes like when she was a girl.",
+    "Extra coin for the jar. Keep making the good stuff."
+  ];
   var GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"];
   var SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
   var POETIC = ["Dolphin Bay", "Jetty Sunset", "Ma Ma's Garden", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Evan's Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
@@ -13497,12 +13657,30 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var priceOf = (s, fmt3, r) => s.prices[fmt3] + (r && r.special ? s.prices.special : 0);
   var DEFAULT = 4 + 4 + 6 + 7;
   function saleMinute(s, day, hm2, opts) {
-    if (!openNow(hm2)) return null;
+    const box = !openNow(hm2) && hasUp(s, "honesty") && honestyOpen(hm2);
+    if (!openNow(hm2) && !box) return null;
     const stocked = s.recipes.filter((r2) => (s.tubs[r2.id] || 0) > 0);
     if (!stocked.length) return null;
     const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay(), we = d === 0 || d === 6, night = (d === 2 || d === 4) && hm2 >= 18 * 60;
+    const glow = hasUp(s, "neon") && hm2 >= 17 * 60 ? 1.3 : 1;
+    if (box) {
+      if (Math.random() >= 0.012 * (we ? 1.3 : 1) * (night ? 1.4 : 1) * glow) return null;
+      const r2 = stocked[Math.floor(Math.random() * stocked.length)];
+      s.tubs[r2.id]--;
+      if (s.tubs[r2.id] <= 0) delete s.tubs[r2.id];
+      let coins2 = s.prices.cup;
+      if (Math.random() < 0.15) {
+        coins2++;
+        s.notes = [{ t: NOTES[Math.floor(Math.random() * NOTES.length)], day }, ...s.notes].slice(0, 4);
+      }
+      s.box += coins2;
+      const t3 = s.sold[day] = s.sold[day] || { n: 0, coins: 0 };
+      t3.n++;
+      t3.coins += coins2;
+      return { coins: coins2, box: true, fmt: "cup", r: r2 };
+    }
     const price = s.prices.cup + s.prices.cone + s.prices.float + s.prices.waffle, pf = Math.pow(DEFAULT / Math.max(4, price), 1.3);
-    const p = 0.035 * (we ? 1.5 : 1) * (night ? 1.4 : 1) * (hm2 >= 14 * 60 && hm2 < 17 * 60 ? 1.25 : 1) * pf * (opts.serving ? 1.5 : 1);
+    const p = 0.035 * (we ? 1.5 : 1) * (night ? 1.4 : 1) * (hm2 >= 14 * 60 && hm2 < 17 * 60 ? 1.25 : 1) * pf * (opts.serving ? 1.5 : 1) * glow;
     if (Math.random() >= p) return null;
     let x = Math.random(), fmt3 = "cone";
     for (const [f2, w] of FMT_W) {
@@ -13514,19 +13692,31 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const r = stocked[Math.floor(Math.random() * stocked.length)];
     s.tubs[r.id]--;
     if (s.tubs[r.id] <= 0) delete s.tubs[r.id];
-    const coins = priceOf(s, fmt3, r), t2 = s.sold[day] = s.sold[day] || { n: 0, coins: 0 };
+    let coins = priceOf(s, fmt3, r), dipped = false;
+    const t2 = s.sold[day] = s.sold[day] || { n: 0, coins: 0 };
+    if (hasUp(s, "dip") && (fmt3 === "cone" || fmt3 === "waffle") && Math.random() < Math.min(0.6, 0.25 + 0.03 * (nDips(s) - 1 + nTops(s)))) {
+      dipped = true;
+      coins += s.prices.dip;
+      if (Math.random() < 0.6) coins += s.prices.top;
+      t2.dipped = (t2.dipped || 0) + 1;
+    }
+    if (hasUp(s, "awning") && Math.random() < 0.25) {
+      coins++;
+      t2.tips = (t2.tips || 0) + 1;
+    }
     t2.n++;
     t2.coins += coins;
-    return { coins, fmt: fmt3, r };
+    return { coins, fmt: fmt3, r, dipped };
   }
   function scoopTick(F2, opts = {}) {
     const s = scoopState(F2), now2 = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now2, now2 - 2 * 864e5);
-    const out = { coins: 0, n: 0, mins: 0 };
+    const out = { coins: 0, n: 0, mins: 0, box: 0 };
     for (let at = from + 6e4; at <= now2; at += 6e4) {
       const sg = new Date(at + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm2 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
       kitchenMinute(s, day, hm2, at);
       const sale = saleMinute(s, day, hm2, opts);
-      if (sale) {
+      if (sale && sale.box) out.box += sale.coins;
+      else if (sale) {
         out.coins += sale.coins;
         out.n++;
       }
@@ -13536,10 +13726,41 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (out.coins) F2.coins += out.coins;
     return out;
   }
+  function collectBox(F2) {
+    const s = scoopState(F2), n = s.box;
+    if (!n) return 0;
+    s.box = 0;
+    F2.coins += n;
+    return n;
+  }
   var NO_DAIRY = ["evan", "darren", "mama", "gonggong", "mum", "dad", "angelina"];
   var giftId = (r, fmt3) => `gel_${fmt3}_${r.id.replace(/[^a-z0-9]+/g, "-")}`;
+  var DAIRY_DIP = ["milk", "white", "matcha"];
+  var dipId = (r, fmt3, dip, top) => `gel_dip_${fmt3}_${dip}_${top || "none"}_${r.id.replace(/[^a-z0-9]+/g, "-")}`;
+  var dipName = (r, fmt3, dip, top) => `${r.name} ${FORMATS[fmt3].n.toLowerCase()}, ${DIPS[dip].w} dipped${top && TOPPINGS[top] ? ` with ${TOPPINGS[top].w}` : ""}`;
+  function registerDip(s, id) {
+    const m = /^gel_dip_(\w+?)_(\w+?)_(\w+?)_(.+)$/.exec(id);
+    if (!m || !FORMATS[m[1]] || !DIPS[m[2]]) return;
+    const r = s.recipes.find((x) => x.id.replace(/[^a-z0-9]+/g, "-") === m[4]);
+    if (!r) return;
+    const top = m[3] === "none" ? null : m[3], dairy = r.dairy || DAIRY_DIP.includes(m[2]);
+    ITEMS[id] = {
+      n: dipName(r, m[1], m[2], top),
+      kind: "gift",
+      to: dairy ? NO_DAIRY : "family",
+      tab: "scoop",
+      ico: "ic_" + m[1],
+      gel: true,
+      dip: true,
+      say: `Dipped AND topped? You spoil me. ${r.name}, wow.`,
+      says: { evan: "CHOCOLATE ONE!! *chocolate everywhere*", marcus: "Dark choc and sorbet, so no tummy trouble. Legend, Zeh.", mama: "So fancy! Ma Ma eat slowly, slowly.", dad: "Now that's an ice cream. Your mum wants a bite. She can't have one." }
+    };
+  }
   function registerItems(F2) {
-    scoopState(F2).recipes.forEach((r) => Object.keys(FORMATS).forEach((fmt3) => {
+    const s0 = scoopState(F2);
+    s0.dipIds.forEach((id) => registerDip(s0, id));
+    Object.keys(F2.inv || {}).filter((k) => k.startsWith("gel_dip_")).forEach((id) => registerDip(s0, id));
+    s0.recipes.forEach((r) => Object.keys(FORMATS).forEach((fmt3) => {
       const id = giftId(r, fmt3);
       ITEMS[id] = {
         n: `${r.name} ${FORMATS[fmt3].n.toLowerCase()}`,
@@ -13563,6 +13784,18 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     F2.inv[id] = (F2.inv[id] || 0) + 1;
     return ITEMS[id];
   }
+  function makeDipped(F2, rid, fmt3, dip, top, give) {
+    const s = scoopState(F2), r = recipeOf(s, rid);
+    if (!hasUp(s, "dip") || !r || !(s.tubs[rid] > 0) || fmt3 !== "cone" && fmt3 !== "waffle" || !s.dips[dip] || top && !s.tops[top]) return null;
+    s.tubs[rid]--;
+    if (s.tubs[rid] <= 0) delete s.tubs[rid];
+    if (!give) return { r, name: dipName(r, fmt3, dip, top), col: r.col, dip: DIPS[dip].col };
+    const id = dipId(r, fmt3, dip, top);
+    if (!s.dipIds.includes(id)) s.dipIds = [...s.dipIds, id].slice(-200);
+    registerDip(s, id);
+    F2.inv[id] = (F2.inv[id] || 0) + 1;
+    return ITEMS[id];
+  }
   function eatOne(F2, rid) {
     const s = scoopState(F2), r = recipeOf(s, rid);
     if (!r || !(s.tubs[rid] > 0)) return null;
@@ -13575,23 +13808,78 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var ingPic = (id) => id.startsWith("fl_") ? icon("bq_" + id.slice(3), 26) : icon(id, 26);
   var shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var tubList = (s) => s.recipes.filter((r) => s.tubs[r.id] > 0);
+  var upBtn = `<div class="actions"><button class="btn small alt" data-gview="upgrade">Shop upgrades</button></div>`;
+  var buyBtn = (F2, price, attr, label2 = "Buy") => `<button class="btn small ${F2.coins >= price ? "primary" : "alt"}" ${attr} ${F2.coins >= price ? "" : "disabled"}>${label2} · ${price} ${coin()}</button>`;
+  function upgradePanel(F2) {
+    const s = scoopState(F2);
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Shop upgrades</h2><p class="sub">Things to make ${esc(s.name)} even nicer. You have ${F2.coins} ${coin()}.</p><ul class="hlist wlist gups">`;
+    h += Object.entries(UPGRADES2).map(([k, u]) => `<li><span class="wtxt"><b>${esc(u.n)}</b><small>${esc(u.line)}</small></span>${s.up[k] ? `<span class="hbadge">yours</span>` : buyBtn(F2, u.price, `data-gbuy="${k}"`)}</li>`).join("");
+    return h + `</ul>` + shut;
+  }
+  function honestyPanel(F2) {
+    const s = scoopState(F2);
+    if (!hasUp(s, "honesty")) return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(UPGRADES2.honesty.n)}</h2><p class="sub">${esc(UPGRADES2.honesty.line)}</p><div class="actions">${buyBtn(F2, UPGRADES2.honesty.price, 'data-gbuy="honesty"')}</div>` + shut;
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The honesty freezer</h2><p class="sub">Little cups at ${s.prices.cup} ${coin()} each, 7 to 10am and 8 to 10pm while the shop's shut. It takes from the same tubs as the counter.</p>`;
+    h += `<p class="muted">${s.box ? `<b>${s.box} coins</b> in the box.` : "The box is empty for now."}</p>`;
+    if (s.notes.length) h += `<p class="eyebrow" style="margin:10px 0 6px">Notes left with the coins</p><ul class="hlist">${s.notes.map((n) => `<li><small>"${esc(n.t)}"</small></li>`).join("")}</ul>`;
+    return h + `<div class="actions">${s.box ? `<button class="btn primary" data-gcollect="1">Collect the coins</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function dipPotsPanel(F2) {
+    const s = scoopState(F2);
+    return `<span class="tape stripe" aria-hidden="true"></span><h2>The chocolate pots</h2><p class="sub">Warm dips for cones and waffles. Customers pay ${s.prices.dip} ${coin()} extra for a dipped one (set it on the menu); more dips, more takers.</p>
+    <ul class="hlist wlist">${Object.entries(DIPS).map(([k, d]) => `<li><span class="wpic">${dot(d.col)}</span><span class="wtxt"><b>${esc(d.n)}</b><small>${s.dips[k] ? "warming in its pot" : "not yet"}</small></span>${s.dips[k] ? `<span class="hbadge">yours</span>` : buyBtn(F2, d.price, `data-gdipbuy="${k}"`)}</li>`).join("")}</ul>` + shut;
+  }
+  function toppingsPanel(F2) {
+    const s = scoopState(F2);
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>The toppings shelf</h2><p class="sub">Scattered on a dipped cone while it's still warm. ${s.prices.top} ${coin()} extra each (set it on the menu); the more jars on the shelf, the more people go for a dipped one.</p>
+    <ul class="hlist wlist">${Object.entries(TOPPINGS).map(([k, t2]) => `<li><span class="wpic">${dot(t2.col)}</span><span class="wtxt"><b>${esc(t2.n)}</b><small>${s.tops[k] ? "on the shelf" : "not yet"}</small></span>${s.tops[k] ? `<span class="hbadge">yours</span>` : buyBtn(F2, t2.price, `data-gtopbuy="${k}"`)}</li>`).join("")}</ul>` + shut;
+  }
+  function dipBarPanel(F2, st6) {
+    const s = scoopState(F2), tubs = tubList(s);
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The dip bar</h2><p class="sub">Pick a flavour, dip it, top it. Yours are free.</p>`;
+    if (!tubs.length) return h + `<p class="muted">No tubs in the display. Tomo's batches fill it.</p>` + shut;
+    const r = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
+    if (!r) return h + `<ul class="hlist wlist">${tubs.map((x) => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops</small></span><button class="btn small primary" data-gdpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut;
+    const dip = s.dips[st6.dip] ? st6.dip : "milk", top = st6.top && s.tops[st6.top] ? st6.top : null, fmt3 = st6.fmt === "waffle" ? "waffle" : "cone";
+    const chip2 = (attr, k, on, label2, col) => `<button class="gchip${on ? " on" : ""}" ${attr}="${k}" aria-pressed="${on}">${dot(col)}<span>${esc(label2)}</span></button>`;
+    h += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p>`;
+    h += `<p class="eyebrow" style="margin:10px 0 6px">On a</p><div class="gchips">${["cone", "waffle"].map((f2) => chip2("data-gdfmt", f2, f2 === fmt3, FORMATS[f2].n, "#E8C48E")).join("")}</div>`;
+    h += `<p class="eyebrow" style="margin:10px 0 6px">Dipped in</p><div class="gchips">${Object.keys(DIPS).filter((k) => s.dips[k]).map((k) => chip2("data-gddip", k, k === dip, DIPS[k].n, DIPS[k].col)).join("")}</div>`;
+    h += `<p class="eyebrow" style="margin:10px 0 6px">Topped with</p><div class="gchips">${chip2("data-gdtop", "none", !top, "Nothing", "#FFFDF6")}${Object.keys(TOPPINGS).filter((k) => s.tops[k]).map((k) => chip2("data-gdtop", k, k === top, TOPPINGS[k].n, TOPPINGS[k].col)).join("")}</div>`;
+    h += `<p class="muted">${esc(dipName(r, fmt3, dip, top))}</p>`;
+    return h + `<div class="actions"><button class="btn primary" data-gdmake="eat">Have it now</button><button class="btn alt" data-gdmake="give">Make one to give</button></div><div class="actions"><button class="btn alt small" data-gdback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function deliverPanel(F2, st6) {
+    const s = scoopState(F2), tubs = tubList(s), hm2 = sgHM();
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Scoop Shack delivery</h2><p class="sub">Sofia pedals it round in the cool box, and a thank-you note comes back to your mailbox.</p>`;
+    if (!hasUp(s, "bike")) return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(UPGRADES2.bike.n)}</h2><p class="sub">${esc(UPGRADES2.bike.line)}</p><div class="actions">${buyBtn(F2, UPGRADES2.bike.price, 'data-gbuy="bike"')}</div>` + shut;
+    if (!openNow(hm2)) return h + `<p class="muted">The shop's shut. Deliveries go out 10am to 8pm.</p>` + shut;
+    if (!tubs.length) return h + `<p class="muted">Nothing in the display to send.</p>` + shut;
+    const r = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
+    if (!r) return h + `<ul class="hlist wlist">${tubs.map((x) => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops${x.dairy ? "" : " · dairy-free"}</small></span><button class="btn small primary" data-gvpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut;
+    const fmt3 = FORMATS[st6.fmt] ? st6.fmt : "cone";
+    h += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p><div class="gchips">${Object.keys(FORMATS).map((f2) => `<button class="gchip${f2 === fmt3 ? " on" : ""}" data-gvfmt="${f2}" aria-pressed="${f2 === fmt3}"><span>${FORMATS[f2].n}</span></button>`).join("")}</div>`;
+    h += `<p class="eyebrow" style="margin:10px 0 6px">Send it to</p><div class="actions">${(st6.who || []).filter(([w]) => !r.dairy || w !== "marcus").map(([w, n]) => `<button class="btn small alt" data-gvto="${w}">${esc(n)}</button>`).join("")}</div>`;
+    return h + `<div class="actions"><button class="btn alt small" data-gvback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
   function counterPanel2(F2, st6) {
     const s = scoopState(F2), hm2 = sgHM(), t2 = s.sold[dayKey()] || { n: 0, coins: 0 }, tubs = tubList(s);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm2) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t2.n ? `Sold today: ${t2.n} (${t2.coins} ${coin()}).` : "Nothing sold yet today."}${st6.server ? " Sofia's behind the counter." : ""}</p>`;
-    if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), and Tomo will keep the tubs topped up.</p>` + shut;
+    if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), and Tomo will keep the tubs topped up.</p>` + upBtn + shut;
     const pick3 = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
     if (pick3) return h + `<div class="gpick"><p class="olabel">${dot(pick3.col)} ${esc(pick3.name)}${pick3.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick3.ings.map((i) => INGR[i][0]).join(", "))} · ${s.tubs[pick3.id]} scoops left</p>
     <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick3.id)}">Have one now${st6.evan ? ", and one for Evan" : ""}</button></div>
     <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map((f2) => `<button class="btn small alt" data-gtake="${f2}">${FORMATS[f2].n}</button>`).join("")}</div>
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
     h += `<ul class="hlist wlist">${tubs.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
-    return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p>` + shut;
+    return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p>` + upBtn + shut;
   }
   function menuPanel2(F2, st6) {
     const s = scoopState(F2), step2 = (k) => `<span class="gstep"><button class="btn small alt" data-gprice="${k}:-1" aria-label="Cheaper">−</button><b>${s.prices[k]}</b><button class="btn small alt" data-gprice="${k}:1" aria-label="Dearer">+</button></span>`;
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The menu</h2><p class="sub">Prices by type. A flavour marked special costs a little extra.</p>
     <ul class="hlist wlist gprices">${Object.keys(FORMATS).map((f2) => `<li><span class="wtxt"><b>${FORMATS[f2].n}</b><small>${f2 === "float" ? "a scoop in a fizzy float" : f2 === "waffle" ? "a scoop on a warm waffle" : "one scoop"}</small></span>${step2(f2)}</li>`).join("")}
-    <li><span class="wtxt"><b>Special surcharge</b><small>added to anything in a special flavour</small></span>${step2("special")}</li></ul>`;
+    <li><span class="wtxt"><b>Special surcharge</b><small>added to anything in a special flavour</small></span>${step2("special")}</li>${hasUp(s, "dip") ? `
+    <li><span class="wtxt"><b>Chocolate dip</b><small>extra for a dipped cone or waffle</small></span>${step2("dip")}</li><li><span class="wtxt"><b>Topping</b><small>extra for a topping on a dipped one</small></span>${step2("top")}</li>` : ""}</ul>`;
     h += s.recipes.length ? `<p class="eyebrow" style="margin:12px 0 6px">Flavours</p><ul class="hlist wlist gflav">${s.recipes.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? s.tubs[r.id] + " scoops" : "sold out"}</small></span><label class="gspec"><input type="checkbox" data-gspecial="${esc(r.id)}" ${r.special ? "checked" : ""}> special</label></li>`).join("")}</ul>` : `<p class="muted">No flavours yet: discover some at the mixing bench in the kitchen.</p>`;
     h += `<form class="row hadd" data-gname="1"><label class="sr" for="gName">Shop name</label><input id="gName" name="n" maxlength="30" value="${esc(s.name)}"><button class="btn small alt">Rename</button></form>`;
     return h + shut;
@@ -13609,13 +13897,20 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!bag2.length && !shelf2.length) h += `<p class="muted">Nothing to add right now. Milk comes from your goats or Hana's market; fruit and flowers from the orchard.</p>`;
     return h + shut;
   }
+  var scoopPic = (col) => `<svg class="gscoop" viewBox="0 0 44 44" aria-hidden="true"><path d="M14 22 l8 20 l8 -20z" fill="#E8C48E" stroke="#3A2E28" stroke-width="1.2" stroke-linejoin="round"/><path d="M16 28 l12 6 M28 28 l-12 6" stroke="#3A2E28" stroke-width=".8" opacity=".5"/><circle cx="22" cy="16" r="11" fill="${col}" stroke="#3A2E28" stroke-width="1.2"/><path d="M12 19 q3 4 6 0 q3 4 6 0 q3 4 6 0 q2 3 2 0" fill="${col}" stroke="#3A2E28" stroke-width="1.1"/><circle cx="18" cy="12" r="2.4" fill="#fff" opacity=".6"/></svg>`;
+  var resultCard = (col, name, line, made) => `<div class="gresult${made ? " made" : ""}">${scoopPic(col)}<span><b>${esc(name)}</b><small>${esc(line)}</small></span></div>`;
   function benchPanel(F2, st6) {
     const s = scoopState(F2), inF = Object.keys(s.fridge).filter((id) => s.fridge[id] > 0), sel = (st6.sel || []).filter((id) => inF.includes(id));
     const known = sel.length ? knownRecipe(s, sel) : null;
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The mixing bench</h2><p class="sub">Pick up to four things from the fridge and mix. Every combination makes a new flavour; there's no such thing as a bad one. ${s.recipes.length} discovered so far.</p>`;
     if (!inF.length) return h + `<p class="muted">The fridge is empty. Stock it first.</p>` + shut;
     h += `<div class="gchips">${inF.map((id) => `<button class="gchip${sel.includes(id) ? " on" : ""}" data-gsel="${id}" aria-pressed="${sel.includes(id)}" ${!sel.includes(id) && sel.length >= 4 ? "disabled" : ""}>${ingPic(id)}<span>${esc(INGR[id][0])}</span></button>`).join("")}</div>`;
-    h += `<p class="muted">${sel.length ? known ? `You know this one: <b>${esc(known.name)}</b>.` : `${sel.length} picked. ${sel.includes("milk") ? "With milk: a gelato." : "No milk: a dairy-free sorbet."} Something new!` : "Nothing picked yet."}</p>`;
+    const made = st6.made && recipeOf(s, st6.made);
+    if (made && !sel.length) h += resultCard(made.col, made.name, `New flavour! ${made.dairy ? "A gelato" : "A dairy-free sorbet"}, and the first tub's in the display.`, true);
+    else if (sel.length) {
+      const ss = [...sel].sort();
+      h += known ? resultCard(known.col, known.name, "You know this one already. Add it to today's batches on the board.") : resultCard(blend(ss), nameFor(ss), `${ss.includes("milk") ? "A gelato" : "A dairy-free sorbet"}. Something new!`);
+    } else h += `<p class="muted">Nothing picked yet.</p>`;
     return h + `<div class="actions"><button class="btn primary" data-gmix="1" ${!sel.length || known ? "disabled" : ""}>Mix it</button><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function batchPanel(F2, st6) {
@@ -14056,6 +14351,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var scSt = { pick: null, sel: [] };
   var evanSeat = null;
   var lastScoop = 0;
+  var SCOOP_IN = ["scoopshop", "scoopkitchen", "scoopdip"];
+  var SC_ANY = ["upgrade", "honesty", "deliver"];
   var fieldView = null;
   var orView = null;
   var orAt = null;
@@ -16102,6 +16399,11 @@ Then tell chat "wind down" whenever you're ready.`
       bag();
       return;
     }
+    if (it.gel && !hasUp(scoopState(F), "bike")) {
+      speak(`It'd melt on the way! Give it to ${GIFT_NAME[w]} in person, or get the Scoop Shack a delivery bike.`, 4500);
+      bag();
+      return;
+    }
     addInv(id, -1);
     F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1;
     gainXp(1);
@@ -16592,7 +16894,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (deskOpen && scene === "office") h = deskPanel();
     else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
     else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
-    else if (scView && (scene === "scoopshop" || scene === "scoopkitchen")) h = scView === "counter" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), server: isHere("sofia") }) : scView === "menu" ? menuPanel2(F) : scView === "fridge" ? fridgePanel2(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? batchPanel(F) : freezerPanel(F);
+    else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h = scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverPanel(F, { pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo() }) : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, { pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt }) : scView === "counter" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), server: isHere("sofia") }) : scView === "menu" ? menuPanel2(F) : scView === "fridge" ? fridgePanel2(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? batchPanel(F) : freezerPanel(F);
     else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
     else if (fieldView && scene === "field") {
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
@@ -17150,6 +17452,16 @@ ${SIGNOFF[t2.who] || ""}`;
     }).join("");
     if (giftPick && F.inv[giftPick]) $("bag").insertAdjacentHTML("afterbegin", giftPickHTML(giftPick));
     else giftPick = null;
+    if (hasUp(scoopState(F), "bike")) {
+      $("bag").insertAdjacentHTML("beforeend", `<button class="btn small alt" data-deliver="1" style="grid-column:1/-1">Send an ice cream (Scoop Shack delivery)</button>`);
+      $("bag").querySelector("[data-deliver]").onclick = () => {
+        openView = null;
+        scView = "deliver";
+        scSt.vpick = null;
+        scoopNow();
+        ctx();
+      };
+    }
     $("bag").querySelectorAll("[data-giveto]").forEach((b) => b.onclick = (ev) => {
       ev.stopPropagation();
       giveTo(giftPick, b.dataset.giveto);
@@ -17294,6 +17606,12 @@ ${SIGNOFF[t2.who] || ""}`;
     if (scene !== "base") art2.querySelectorAll(".lglow").forEach((g) => {
       const c = g.querySelector("circle"), x = +c.getAttribute("cx"), y = +c.getAttribute("cy"), r = +c.getAttribute("r");
       h += `<g transform="${mtx(g)}"><circle cx="${x}" cy="${y + 6}" r="${r + 10}" fill="url(#lampg)"/><circle class="flick" cx="${x}" cy="${y}" r="${(r * 0.45).toFixed(1)}" fill="#FFE3A3" opacity=".4"/>${r > 30 ? `<rect x="${x - 5}" y="${y - 6}" width="10" height="12" rx="2" fill="#FFE9A8" stroke="#3b3530" stroke-width="1.1"/>` : ""}</g>`;
+    });
+    art2.querySelectorAll(".nglow").forEach((g) => {
+      const k = g.cloneNode(true);
+      k.setAttribute("transform", mtx(g));
+      k.removeAttribute("class");
+      h += k.outerHTML;
     });
     art2.querySelectorAll("text.lab").forEach((t2) => {
       const g = t2.parentNode;
@@ -17525,7 +17843,7 @@ ${SIGNOFF[t2.who] || ""}`;
     const m = sgHM();
     return m >= 20 * 60 || m < 7 * 60;
   };
-  var evanHere = () => scene === "kidroom" || (scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "mumdad" || scene === "marcus") && !evanNight() || evanAtDinner();
+  var evanHere = () => scene === "kidroom" || (scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "scoopdip" || scene === "mumdad" || scene === "marcus") && !evanNight() || evanAtDinner();
   var evanAtDinner = () => {
     const d = dinnerNow(dayKey(), sgHM());
     return !!d && scene === d.host;
@@ -17541,6 +17859,7 @@ ${SIGNOFF[t2.who] || ""}`;
       if (S2.sleep && id !== "room") S2.sleep = null;
       scView = null;
       scSt.pick = null;
+      scSt.dpick = null;
       evanSeat = null;
       scene = id;
       cam.snap = true;
@@ -17591,7 +17910,7 @@ ${SIGNOFF[t2.who] || ""}`;
       if (id === "base") {
         evan.x = evan.tx = 300;
         evan.y = evan.ty = 360;
-      } else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "scoopshop" || id === "scoopkitchen" || id === "mumdad" || id === "marcus" || id === "cottage") {
+      } else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "mumdad" || id === "marcus" || id === "cottage") {
         evan.x = evan.tx = p[0] + 26;
         evan.y = evan.ty = p[1] + 10;
         evan.run = false;
@@ -18008,10 +18327,23 @@ ${SIGNOFF[t2.who] || ""}`;
       sitAt(SHOP_SEATS2);
       return;
     }
-    if (scene === "scoopshop" || scene === "scoopkitchen") {
-      scView = { gcounter: "counter", gmenu: "menu", gfridge: "fridge", gfreezer: "freezer", gboard: "batch", gbench: "bench" }[id] || null;
+    if (id === "gddoor") {
+      if (hasUp(scoopState(F), "dip")) {
+        setScene("scoopdip", INNER.scoopdip.arrive);
+        setTimeout(() => speak("Warm chocolate and a whole shelf of sprinkles. Dangerous.", 3500), 900);
+      } else {
+        scView = "upgrade";
+        sfx("paper", true);
+        render();
+      }
+      return;
+    }
+    if (SCOOP_IN.includes(scene)) {
+      scView = { gcounter: "counter", gmenu: "menu", gfridge: "fridge", gfreezer: "freezer", gboard: "batch", gbench: "bench", gupgrades: "upgrade", gpots: "pots", gtops: "tops", gdipbar: "dipbar" }[id] || null;
       if (scView) {
         scSt.pick = null;
+        scSt.dpick = null;
+        scSt.made = null;
         scoopNow();
         sfx("paper", true);
         if (id === "gcounter" && isHere("sofia")) npcSay("sofia", pick(["Hi Mel! What'll it be?", "On the house, boss. Which one?", "The new one's going fast!"]));
@@ -18205,6 +18537,21 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     if (id === "reno") {
       speak(RENO_LINE, 6e3);
+      render();
+      return;
+    }
+    if (id === "hfreezer") {
+      scoopNow();
+      scView = "honesty";
+      sfx("paper", true);
+      render();
+      return;
+    }
+    if (id === "dbike") {
+      scoopNow();
+      scView = "deliver";
+      scSt.vpick = null;
+      sfx("paper", true);
       render();
       return;
     }
@@ -18426,13 +18773,14 @@ ${SIGNOFF[t2.who] || ""}`;
     lastScoop = Date.now();
     const s = scoopState(F), out = scoopTick(F, { serving: scene === "scoopshop" && atSpot === "gcounter" });
     if (!out.coins && !out.mins) return;
+    if (out.box && (scene === "bay" || out.mins >= 30)) setTimeout(() => speak(`The honesty freezer's been busy: ${s.box} coins waiting in its box.`, 4500), out.coins ? 6e3 : 1500);
     if (out.coins && (scene === "scoopshop" || scene === "bay")) {
       sfx("coin");
       flash(`+${out.coins} coins: ${s.name}`);
     } else if (out.coins && out.mins >= 30) setTimeout(() => speak(`While you were away, ${s.name} sold ${out.n} ice cream${out.n > 1 ? "s" : ""}: ${out.coins} coins.`, 5e3), 1500);
-    if (out.coins || out.mins >= 5) save2();
+    if (out.coins || out.box || out.mins >= 5) save2();
     if (scView) ctx();
-    if (scene === "scoopshop" || scene === "scoopkitchen") drawScene();
+    if (SCOOP_IN.includes(scene)) drawScene();
   }
   function sitAt(seats) {
     const taken = npcActors().map(([, e]) => e).filter((e) => e.kind === "npc");
@@ -18476,6 +18824,24 @@ ${SIGNOFF[t2.who] || ""}`;
     speak(`${r.name}! ${evanHere() ? "Evan's got one too and it's already on his nose." : "Find a seat, or take it for a walk along the foreshore."}`, 5e3);
     if (evanHere()) setTimeout(() => evanSays(pick(["ICE CREAM!!", "yummy yummy!", "it's so cold!"])), 900);
     save2();
+    render();
+  }
+  var deliverTo = () => FAMILY_ALL.map((w) => [w, GIFT_NAME[w]]);
+  function deliver(w) {
+    const it = takeAway(F, scSt.vpick, FORMATS[scSt.vfmt] ? scSt.vfmt : "cone");
+    if (!it) return;
+    const id = Object.keys(ITEMS).find((k) => ITEMS[k] === it);
+    addInv(id, -1);
+    F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1;
+    gainXp(1);
+    F.thanks = [...F.thanks || [], { id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10 * M }].slice(-30);
+    sfx("chime");
+    flash(`On its way to ${GIFT_NAME[w]}`);
+    speak(`Sofia's pedalling a ${it.n.toLowerCase()} over to ${GIFT_NAME[w]} in the cool box. Watch your mailbox for a thank-you note.`, 5e3);
+    scSt.vpick = null;
+    scView = null;
+    save2();
+    ctx();
     render();
   }
   function wireScoop(c) {
@@ -18532,6 +18898,7 @@ ${SIGNOFF[t2.who] || ""}`;
       re();
     });
     c.querySelectorAll("[data-gsel]").forEach((b) => b.onclick = () => {
+      scSt.made = null;
       const id = b.dataset.gsel;
       scSt.sel = scSt.sel.includes(id) ? scSt.sel.filter((x) => x !== id) : [...scSt.sel, id].slice(0, 4);
       ctx();
@@ -18541,6 +18908,7 @@ ${SIGNOFF[t2.who] || ""}`;
       speak(out.msg, 5500);
       if (out.recipe) {
         scSt.sel = [];
+        scSt.made = out.recipe.id;
         sfx("chime");
         act("cheer");
         [0, 250, 500].forEach((t2, k) => setTimeout(() => mprop("sparkle", mel.x + (k - 1) * 22, mel.y - 60, 1600), t2));
@@ -18549,6 +18917,107 @@ ${SIGNOFF[t2.who] || ""}`;
       }
       re();
     });
+    const up = () => {
+      save2();
+      ctx();
+      drawScene();
+      if (scene === "bay" || scene === "scoopshop") render();
+    };
+    c.querySelectorAll("[data-gview]").forEach((b) => b.onclick = () => {
+      scView = b.dataset.gview;
+      sfx("paper", true);
+      ctx();
+    });
+    c.querySelectorAll("[data-gbuy]").forEach((b) => b.onclick = () => {
+      const line = buyUpgrade(F, b.dataset.gbuy);
+      if (!line) return;
+      sfx("chaching");
+      act("cheer");
+      gainXp(2);
+      [0, 250, 500].forEach((t2, k) => setTimeout(() => mprop("sparkle", mel.x + (k - 1) * 22, mel.y - 60, 1600), t2));
+      speak(line, 6e3);
+      scView = b.dataset.gbuy === "honesty" ? "honesty" : b.dataset.gbuy === "bike" ? "deliver" : "upgrade";
+      up();
+    });
+    c.querySelectorAll("[data-gcollect]").forEach((b) => b.onclick = () => {
+      const n = collectBox(F);
+      if (!n) return;
+      sfx("chaching");
+      flash(`+${n} coins from the honesty freezer`);
+      speak(`${n} coins from the honesty box. Thank you, neighbours!`, 3500);
+      up();
+    });
+    c.querySelectorAll("[data-gdipbuy]").forEach((b) => b.onclick = () => {
+      if (!buyDip(F, b.dataset.gdipbuy)) return;
+      sfx("chaching");
+      flash(`${DIPS[b.dataset.gdipbuy].n} in its pot`);
+      up();
+    });
+    c.querySelectorAll("[data-gtopbuy]").forEach((b) => b.onclick = () => {
+      if (!buyTopping(F, b.dataset.gtopbuy)) return;
+      sfx("chaching");
+      flash(`${TOPPINGS[b.dataset.gtopbuy].n} on the shelf`);
+      up();
+    });
+    c.querySelectorAll("[data-gdpick]").forEach((b) => b.onclick = () => {
+      scSt.dpick = b.dataset.gdpick;
+      ctx();
+    });
+    c.querySelectorAll("[data-gdback]").forEach((b) => b.onclick = () => {
+      scSt.dpick = null;
+      ctx();
+    });
+    c.querySelectorAll("[data-gdfmt]").forEach((b) => b.onclick = () => {
+      scSt.dfmt = b.dataset.gdfmt;
+      ctx();
+    });
+    c.querySelectorAll("[data-gddip]").forEach((b) => b.onclick = () => {
+      scSt.dip = b.dataset.gddip;
+      ctx();
+    });
+    c.querySelectorAll("[data-gdtop]").forEach((b) => b.onclick = () => {
+      scSt.top = b.dataset.gdtop === "none" ? null : b.dataset.gdtop;
+      ctx();
+    });
+    c.querySelectorAll("[data-gdmake]").forEach((b) => b.onclick = () => {
+      const give = b.dataset.gdmake === "give", dip = s.dips[scSt.dip] ? scSt.dip : "milk", top = scSt.top && s.tops[scSt.top] ? scSt.top : null;
+      const out = makeDipped(F, scSt.dpick, scSt.dfmt === "waffle" ? "waffle" : "cone", dip, top, give);
+      if (!out) return;
+      if (give) {
+        sfx("paper", true);
+        flash(`${out.n} in your backpack`);
+        speak("Wrapped in a napkin and into the cool pocket of your backpack. Tap it there to choose who it's for.", 4500);
+      } else {
+        S2.cone = { until: Date.now() + 4 * M, col: out.col };
+        sfx("chime");
+        act("cheer");
+        mprop("heart", mel.x, mel.y - 60, 1600);
+        if (S2.iceDay !== dayKey()) {
+          S2.iceDay = dayKey();
+          gainXp(1);
+        }
+        speak(`${out.name[0].toUpperCase() + out.name.slice(1)}. The chocolate's still setting. Eat fast!`, 5e3);
+        if (evanHere()) setTimeout(() => evanSays(pick(["I want chocolate one!", "sprinkles!! for me?", "Mama, share!"])), 1e3);
+        scView = null;
+      }
+      scSt.dpick = null;
+      save2();
+      ctx();
+      render();
+    });
+    c.querySelectorAll("[data-gvpick]").forEach((b) => b.onclick = () => {
+      scSt.vpick = b.dataset.gvpick;
+      ctx();
+    });
+    c.querySelectorAll("[data-gvback]").forEach((b) => b.onclick = () => {
+      scSt.vpick = null;
+      ctx();
+    });
+    c.querySelectorAll("[data-gvfmt]").forEach((b) => b.onclick = () => {
+      scSt.vfmt = b.dataset.gvfmt;
+      ctx();
+    });
+    c.querySelectorAll("[data-gvto]").forEach((b) => b.onclick = () => deliver(b.dataset.gvto));
     c.querySelectorAll("[data-gplan]").forEach((b) => b.onchange = () => {
       const id = b.dataset.gplan;
       s.plan.ids = b.checked ? [...s.plan.ids.filter((x) => x !== id), id] : s.plan.ids.filter((x) => x !== id);
@@ -18766,7 +19235,8 @@ ${SIGNOFF[t2.who] || ""}`;
     kitchen: "the wine shop kitchen",
     bay: "the bay",
     scoopshop: "the Scoop Shack",
-    scoopkitchen: "the gelato kitchen"
+    scoopkitchen: "the gelato kitchen",
+    scoopdip: "the dip station"
   };
   var ACT_WORD = {
     water: "watering",
@@ -19488,7 +19958,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     const s = list2.find((s2) => Math.hypot(s2.tx - mel.x, s2.ty - mel.y) < 26);
     return s ? s.id : null;
   }
-  var EVAN_SPOTS = { bay: [[300, 400], [250, 560], [300, 330], [200, 300], [290, 500]], scoopshop: [[200, 440], [380, 440], [300, 560], [140, 560], [260, 420]], scoopkitchen: [[200, 560], [380, 540], [300, 580]], mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[150, 340], [260, 330], [380, 330], [200, 580], [330, 590]] };
+  var EVAN_SPOTS = { bay: [[300, 400], [250, 560], [300, 330], [200, 300], [290, 500]], scoopshop: [[200, 440], [380, 440], [300, 560], [140, 560], [260, 420]], scoopkitchen: [[200, 560], [380, 540], [300, 580]], scoopdip: [[180, 560], [420, 560], [140, 420]], mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[150, 340], [260, 330], [380, 330], [200, 580], [330, 590]] };
   function evanWalk(speed, dt) {
     const key = evan.tx + "," + evan.ty;
     if (key !== evan.rk) {

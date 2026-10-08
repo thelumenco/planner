@@ -1710,7 +1710,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#ctx [data-close]");
   await page.locator('#world [data-spot="gbench"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gsel="mango"]', { timeout: 15000 });
   await page.click('#ctx [data-gsel="mango"]'); await page.click('#ctx [data-gsel="milk"]'); await page.waitForTimeout(200);
+  check(/Mango/.test(await page.locator("#ctx .gresult").innerText()), "the bench previews what it'll make, with a scoop in its colour");
   await page.click("#ctx [data-gmix]"); await page.waitForTimeout(500);
+  check(await page.locator("#ctx .gresult.made").count() === 1, "and once it's mixed, the new flavour shows on the bench");
   const r1 = await fox().then(f => f.scoop.recipes[0]);
   check(r1 && r1.dairy && /Mango/.test(r1.name) && (await fox()).scoop.tubs[r1.id] === 20, `mixing mango and milk discovers a gelato (${r1 && r1.name}), first tub in the display`);
   await page.click('#ctx [data-gsel="strawberry"]'); await page.waitForTimeout(200); await page.click("#ctx [data-gmix]"); await page.waitForTimeout(500);
@@ -1732,6 +1734,61 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=15:00&date=2026-10-12&scooppatch=rewind"); await page.waitForTimeout(2500);
   check(await fox().then(f => Object.values(f.scoop.sold).reduce((a, d) => a + d.n, 0) > 0), "customers buy while it's open (the takings come to Mel)");
   check(await fox().then(f => Object.values(f.scoop.made).reduce((a, b) => a + b, 0) > 0), "and Tomo makes fresh tubs on his shifts from what's in the fridge");
+  await page.close();
+}
+{
+  // Scoop Shack upgrades: buy them from the catalogue; the dip station's room (dips and toppings to buy, make a dipped
+  // one to give), the honesty freezer's coin box filling while the shop's shut, and the delivery bike
+  console.log("\nScoop Shack upgrades");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => { errors.push(`scoopup pageerror: ${e.message}`); console.log("PAGEERR", e.stack.slice(0, 600)); });
+  page.on("dialog", d => { errors.push("the upgrades used a browser pop-up"); d.dismiss(); });
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { const m = /uppatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    if (m[1] === "stock") { f.scoop = {recipes: [{id: "mango+milk", ings: ["mango", "milk"], name: "Mango Gelato", col: "#F8D59A", dairy: true, special: false}], tubs: {"mango+milk": 300}}; f.coins = 3000; }
+    if (m[1] === "rewind") f.scoop.at = 1;
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-10"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=12:00&date=2026-10-10&uppatch=stock"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
+  check(await page.locator('#world [data-place="hfreezer"]').count() === 0 && await page.locator('#world [data-place="dbike"]').count() === 0, "before any upgrades, no honesty freezer or bike on the bay");
+  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(700);
+  await page.locator('#world [data-spot="gupgrades"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gbuy]", { timeout: 15000 });
+  check(await page.locator("#ctx [data-gbuy]").count() === 5, "the catalogue in the shop lists five upgrades");
+  for (const k of ["honesty", "awning", "neon", "bike", "dip"]) { await page.evaluate(() => { document.querySelector("#ctx [data-close]")?.click(); });
+    await page.locator('#world [data-spot="gupgrades"]').dispatchEvent("click"); await page.waitForSelector(`#ctx [data-gbuy="${k}"]`, { timeout: 15000 }); await page.click(`#ctx [data-gbuy="${k}"]`); await page.waitForTimeout(300); }
+  const f1 = await fox();
+  check(["honesty", "awning", "neon", "bike", "dip"].every(k => f1.scoop.up[k]) && f1.coins === 3000 - 2300, `all five bought (coins ${f1.coins})`);
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.locator('#world [data-spot="gddoor"]').dispatchEvent("click"); await page.waitForTimeout(2500);
+  check(await page.locator('#world [data-spot="gdipbar"]').count() === 1 && await page.locator('#world [data-spot="gtops"]').count() === 1, "the dip station's door opens into its own room");
+  await page.evaluate(() => window.__mapleScene("scoopdip")); await page.waitForTimeout(700);
+  await page.locator('#world [data-spot="gtops"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gtopbuy="coconut"]', { timeout: 15000 }); await page.click('#ctx [data-gtopbuy="coconut"]'); await page.waitForTimeout(300);
+  await page.click("#ctx [data-close]");
+  await page.locator('#world [data-spot="gpots"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gdipbuy="dark"]', { timeout: 15000 }); await page.click('#ctx [data-gdipbuy="dark"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.scoop.tops.coconut && f.scoop.dips.dark), "toppings and dips are bought one by one");
+  await page.click("#ctx [data-close]");
+  await page.locator('#world [data-spot="gdipbar"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gdpick]", { timeout: 15000 });
+  await page.locator("#ctx [data-gdpick]").first().click(); await page.waitForTimeout(200);
+  await page.click('#ctx [data-gddip="dark"]'); await page.click('#ctx [data-gdtop="coconut"]'); await page.click('#ctx [data-gdfmt="waffle"]'); await page.waitForTimeout(200);
+  await page.click('#ctx [data-gdmake="give"]'); await page.waitForTimeout(400);
+  const dipped = await fox().then(f => Object.keys(f.inv).find(k => k.startsWith("gel_dip_waffle_dark_coconut")));
+  check(!!dipped, `a dark-chocolate dipped waffle with coconut, to give (${dipped})`);
+  await page.click('[data-open="bag"]'); await page.waitForTimeout(300);
+  check(/dark-chocolate dipped with coconut shavings/.test(await page.locator(`#bag .item[data-id="${dipped}"]`).innerText()), "it's in the backpack by name");
+  await page.click('#bag [data-deliver]'); await page.waitForSelector("#ctx [data-gvpick]", { timeout: 15000 });
+  await page.locator("#ctx [data-gvpick]").first().click(); await page.waitForTimeout(200);
+  check(await page.locator('#ctx [data-gvto="marcus"]').count() === 0 && await page.locator('#ctx [data-gvto="mum"]').count() === 1, "the delivery bike sends from anywhere (a gelato isn't offered to Marcus)");
+  await page.click('#ctx [data-gvto="mum"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => (f.thanks || []).some(t => t.who === "mum" && /^gel_/.test(t.item))), "Sofia pedals it to Mum, and a thank-you note is on its way");
+  await page.goto(url + "?seed=1&time=21:00&date=2026-10-12&uppatch=rewind"); await page.waitForTimeout(2500);
+  const box = await fox().then(f => f.scoop.box);
+  check(box > 0, `the honesty freezer sold while the shop was shut (${box} coins in its box)`);
+  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
+  check(await page.locator('#world [data-place="hfreezer"]').count() === 1 && await page.locator('#world [data-place="dbike"]').count() === 1 && await page.locator("#sceneArt .nightcopy circle").count() > 5, "the freezer and bike are on the bay, and the fairy lights glow at night");
+  const c0 = await fox().then(f => f.coins);
+  await page.locator('#world [data-place="hfreezer"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gcollect]", { timeout: 15000 }); await page.click("#ctx [data-gcollect]"); await page.waitForTimeout(300);
+  check(await fox().then(f => f.scoop.box === 0 && f.coins >= c0 + box), "collect the coins from the box");
   await page.close();
 }
 {

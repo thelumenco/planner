@@ -9,6 +9,11 @@
 //   sales        customers buy cups, cones, floats and waffles while it's open; the takings come to Mel. Prices
 //                are set per type, and a flavour marked special costs a little more
 //   for Mel      a free one at the counter (and one for Evan), or one to take away and give
+//   upgrades     bought from the catalogue in the shop (s.up): an honesty freezer out front that sells cups while
+//                the shop's shut (coins wait in its box), a striped awning and fairy lights over the deck (tips),
+//                a neon cone sign (busier evenings), a delivery bike (Sofia pedals ice creams round to the family
+//                from anywhere), and the chocolate dip station: a little room off the shop with dips and toppings,
+//                each bought separately, for dipped cones and waffles
 import { esc, dayKey, sgHM, hash } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
@@ -39,9 +44,10 @@ export function scoopState(F){
   F.scoop = F.scoop || {};
   const s = F.scoop;
   s.name = s.name || "The Scoop Shack"; s.fridge = s.fridge || {}; s.recipes = s.recipes || []; s.tubs = s.tubs || {};
-  s.prices = Object.assign({cup: 4, cone: 4, float: 6, waffle: 7, special: 2}, s.prices || {});
+  s.prices = Object.assign({cup: 4, cone: 4, float: 6, waffle: 7, special: 2, dip: 2, top: 1}, s.prices || {});
   s.plan = s.plan && s.plan.day === dayKey() ? s.plan : {day: dayKey(), ids: []};
   s.made = s.made || {}; s.sold = s.sold || {}; s.log = s.log || [];
+  s.up = s.up || {}; s.dips = s.dips || {milk: 1}; s.tops = s.tops || {sprinkles: 1}; s.box = s.box || 0; s.notes = s.notes || []; s.dipIds = s.dipIds || [];
   return s;
 }
 export const recipeOf = (s, id) => s.recipes.find(r => r.id === id);
@@ -49,6 +55,50 @@ export const flavourName = r => r ? r.name : "a flavour";
 export const scoopsLeft = s => Object.values(s.tubs).reduce((a, b) => a + b, 0);
 export const openNow = hm => hm >= OPEN && hm < CLOSE;
 export const cookOn = (day, hm) => { const d = new Date(day + "T00:00:00Z").getUTCDay(); return d !== 0 && hm >= 8*60 && hm < 16*60 && !(hm >= 12*60 && hm < 12*60 + 45); };
+
+/* ---------- upgrades ---------- */
+export const UPGRADES = {
+  honesty: {n: "Honesty freezer", price: 400, line: "A little freezer out front with pre-scooped cups and a wooden coin box. It sells while the shop's shut (7 to 10am, 8 to 10pm), and the coins wait in the box for you."},
+  awning: {n: "Striped awning and fairy lights", price: 250, line: "A pink striped awning over the deck, strung with fairy lights that glow in the evenings. Customers linger, and leave tips."},
+  neon: {n: "Neon cone sign", price: 350, line: "A pink neon cone by the door. It glows from 5pm, so more people find you in the evenings."},
+  bike: {n: "Delivery bike", price: 800, line: "A mint delivery bike with a cool box. Sofia pedals ice creams round to the family from anywhere (send one from your backpack), and a cone from the shop can be sent round without melting."},
+  dip: {n: "Chocolate dip station", price: 500, line: "A little room off the shop: warm pots of chocolate and a shelf of toppings. Cones and waffles can be dipped and topped (customers pay a bit extra), and you can make your own. Comes with milk chocolate and rainbow sprinkles; more dips and toppings to buy."}
+};
+export const DIPS = {
+  milk: {n: "Milk chocolate", w: "milk-chocolate", col: "#8A5A3A", price: 0},
+  dark: {n: "Dark chocolate", w: "dark-chocolate", col: "#4A2E22", price: 150},
+  white: {n: "White chocolate", w: "white-chocolate", col: "#F6EBD2", price: 180},
+  pink: {n: "Strawberry pink", w: "strawberry", col: "#F2A0B8", price: 200},
+  matcha: {n: "Matcha", w: "matcha", col: "#8FB86A", price: 220}
+};
+export const TOPPINGS = {
+  sprinkles: {n: "Rainbow sprinkles", w: "sprinkles", col: "#F3C969", price: 0},
+  coconut: {n: "Coconut shavings", w: "coconut shavings", col: "#FFFDF6", price: 100},
+  nuts: {n: "Crushed hazelnuts", w: "crushed hazelnuts", col: "#B98A5A", price: 120},
+  marsh: {n: "Mini marshmallows", w: "mini marshmallows", col: "#F4C7CF", price: 120},
+  caramel: {n: "Salted caramel", w: "salted caramel", col: "#C98A3A", price: 160},
+  strawb: {n: "Freeze-dried strawberries", w: "strawberry bits", col: "#E8566C", price: 160},
+  gula: {n: "Gula melaka drizzle", w: "gula melaka", col: "#9A5A2E", price: 180},
+  pop: {n: "Popping candy", w: "popping candy", col: "#9FD3C2", price: 220}
+};
+export const hasUp = (s, k) => !!(s.up && s.up[k]);
+// -> a line to say, or null if it can't be bought
+export function buyUpgrade(F, k){
+  const s = scoopState(F), u = UPGRADES[k]; if (!u || s.up[k] || F.coins < u.price) return null;
+  F.coins -= u.price; s.up[k] = Date.now();
+  return {honesty: "The honesty freezer's out front, full of little cups. It sells from 7 to 10am and 8 to 10pm while the shop's shut.",
+    awning: "The striped awning's up over the deck, fairy lights and all. Wait till you see it at dusk.",
+    neon: "The neon cone's on the wall by the door. It switches on at 5pm.",
+    bike: "A mint delivery bike, parked by the shop. Send an ice cream from your backpack any time the shop's open.",
+    dip: "The chocolate dip station's open! Through the new door on the shop's east wall."}[k];
+}
+export function buyDip(F, k){ const s = scoopState(F), d = DIPS[k]; if (!d || s.dips[k] || F.coins < d.price) return false; F.coins -= d.price; s.dips[k] = 1; return true; }
+export function buyTopping(F, k){ const s = scoopState(F), t = TOPPINGS[k]; if (!t || s.tops[k] || F.coins < t.price) return false; F.coins -= t.price; s.tops[k] = 1; return true; }
+const nDips = s => Object.keys(s.dips).filter(k => DIPS[k]).length, nTops = s => Object.keys(s.tops).filter(k => TOPPINGS[k]).length;
+// the honesty freezer sells while the shop's shut: 7 to 10am, 8 to 10pm
+export const honestyOpen = hm => (hm >= 7*60 && hm < OPEN) || (hm >= CLOSE && hm < 22*60);
+const NOTES = ["Best pandan ever. Sorry, only had coins for one! x", "For the little one's birthday. He says thank you.", "Left a bit extra. You deserve it!", "Took two, paid for three. Pay it forward :)",
+  "Midnight snack, technically. Thank you!", "The dolphins came by while I ate it. Perfect.", "My grandma says it tastes like when she was a girl.", "Extra coin for the jar. Keep making the good stuff."];
 
 /* ---------- discovering flavours ---------- */
 const GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"], SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
@@ -114,26 +164,37 @@ function kitchenMinute(s, day, hm, at){
 export const priceOf = (s, fmt, r) => s.prices[fmt] + (r && r.special ? s.prices.special : 0);
 const DEFAULT = 4 + 4 + 6 + 7;
 function saleMinute(s, day, hm, opts){
-  if (!openNow(hm)) return null;
+  const box = !openNow(hm) && hasUp(s, "honesty") && honestyOpen(hm); if (!openNow(hm) && !box) return null;
   const stocked = s.recipes.filter(r => (s.tubs[r.id] || 0) > 0); if (!stocked.length) return null;
   const d = new Date(day + "T00:00:00Z").getUTCDay(), we = d === 0 || d === 6, night = (d === 2 || d === 4) && hm >= 18*60;
+  const glow = hasUp(s, "neon") && hm >= 17*60 ? 1.3 : 1;
+  if (box) {   // the honesty freezer: cups only, and the coins go in its box
+    if (Math.random() >= .012*(we ? 1.3 : 1)*(night ? 1.4 : 1)*glow) return null;
+    const r = stocked[Math.floor(Math.random()*stocked.length)]; s.tubs[r.id]--; if (s.tubs[r.id] <= 0) delete s.tubs[r.id];
+    let coins = s.prices.cup; if (Math.random() < .15) { coins++; s.notes = [{t: NOTES[Math.floor(Math.random()*NOTES.length)], day}, ...s.notes].slice(0, 4); }
+    s.box += coins; const t = s.sold[day] = s.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; return {coins, box: true, fmt: "cup", r};
+  }
   const price = s.prices.cup + s.prices.cone + s.prices.float + s.prices.waffle, pf = Math.pow(DEFAULT/Math.max(4, price), 1.3);
-  const p = .035*(we ? 1.5 : 1)*(night ? 1.4 : 1)*(hm >= 14*60 && hm < 17*60 ? 1.25 : 1)*pf*(opts.serving ? 1.5 : 1);
+  const p = .035*(we ? 1.5 : 1)*(night ? 1.4 : 1)*(hm >= 14*60 && hm < 17*60 ? 1.25 : 1)*pf*(opts.serving ? 1.5 : 1)*glow;
   if (Math.random() >= p) return null;
   let x = Math.random(), fmt = "cone"; for (const [f, w] of FMT_W) { if ((x -= w) < 0) { fmt = f; break; } }
   const r = stocked[Math.floor(Math.random()*stocked.length)];
   s.tubs[r.id]--; if (s.tubs[r.id] <= 0) delete s.tubs[r.id];
-  const coins = priceOf(s, fmt, r), t = s.sold[day] = s.sold[day] || {n: 0, coins: 0};
-  t.n++; t.coins += coins; return {coins, fmt, r};
+  let coins = priceOf(s, fmt, r), dipped = false; const t = s.sold[day] = s.sold[day] || {n: 0, coins: 0};
+  // dipped (and maybe topped): more choice at the dip station, more people go for it
+  if (hasUp(s, "dip") && (fmt === "cone" || fmt === "waffle") && Math.random() < Math.min(.6, .25 + .03*(nDips(s) - 1 + nTops(s)))) {
+    dipped = true; coins += s.prices.dip; if (Math.random() < .6) coins += s.prices.top; t.dipped = (t.dipped || 0) + 1; }
+  if (hasUp(s, "awning") && Math.random() < .25) { coins++; t.tips = (t.tips || 0) + 1; }   // lingering under the fairy lights
+  t.n++; t.coins += coins; return {coins, fmt, r, dipped};
 }
 // catch up minute by minute since the last tick (at most two days): the kitchen, then the counter
 export function scoopTick(F, opts = {}){
   const s = scoopState(F), now = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now, now - 2*864e5);
-  const out = {coins: 0, n: 0, mins: 0};
+  const out = {coins: 0, n: 0, mins: 0, box: 0};
   for (let at = from + 60000; at <= now; at += 60000) {
     const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     kitchenMinute(s, day, hm, at);
-    const sale = saleMinute(s, day, hm, opts); if (sale) { out.coins += sale.coins; out.n++; }
+    const sale = saleMinute(s, day, hm, opts); if (sale && sale.box) out.box += sale.coins; else if (sale) { out.coins += sale.coins; out.n++; }
     out.mins++;
   }
   if (out.mins || !s.at) s.at = from + out.mins*60000;
@@ -141,13 +202,27 @@ export function scoopTick(F, opts = {}){
   return out;
 }
 
+export function collectBox(F){ const s = scoopState(F), n = s.box; if (!n) return 0; s.box = 0; F.coins += n; return n; }
+
 /* ---------- gifts: an ice cream to take away ---------- */
 // every flavour in each type becomes a backpack gift ("Mango Sorbet cone"); sorbets suit everyone, gelato everyone
 // but Marcus (lactose intolerant)
 const NO_DAIRY = ["evan", "darren", "mama", "gonggong", "mum", "dad", "angelina"];
 export const giftId = (r, fmt) => `gel_${fmt}_${r.id.replace(/[^a-z0-9]+/g, "-")}`;
+// dipped ones ("Mango Gelato cone, dark-chocolate dipped with sprinkles") are registered as they're made (s.dipIds)
+const DAIRY_DIP = ["milk", "white", "matcha"];
+export const dipId = (r, fmt, dip, top) => `gel_dip_${fmt}_${dip}_${top || "none"}_${r.id.replace(/[^a-z0-9]+/g, "-")}`;
+const dipName = (r, fmt, dip, top) => `${r.name} ${FORMATS[fmt].n.toLowerCase()}, ${DIPS[dip].w} dipped${top && TOPPINGS[top] ? ` with ${TOPPINGS[top].w}` : ""}`;
+function registerDip(s, id){
+  const m = /^gel_dip_(\w+?)_(\w+?)_(\w+?)_(.+)$/.exec(id); if (!m || !FORMATS[m[1]] || !DIPS[m[2]]) return;
+  const r = s.recipes.find(x => x.id.replace(/[^a-z0-9]+/g, "-") === m[4]); if (!r) return;
+  const top = m[3] === "none" ? null : m[3], dairy = r.dairy || DAIRY_DIP.includes(m[2]);
+  ITEMS[id] = {n: dipName(r, m[1], m[2], top), kind: "gift", to: dairy ? NO_DAIRY : "family", tab: "scoop", ico: "ic_" + m[1], gel: true, dip: true,
+    say: `Dipped AND topped? You spoil me. ${r.name}, wow.`, says: {evan: "CHOCOLATE ONE!! *chocolate everywhere*", marcus: "Dark choc and sorbet, so no tummy trouble. Legend, Zeh.", mama: "So fancy! Ma Ma eat slowly, slowly.", dad: "Now that's an ice cream. Your mum wants a bite. She can't have one."}};
+}
 export function registerItems(F){
-  scoopState(F).recipes.forEach(r => Object.keys(FORMATS).forEach(fmt => { const id = giftId(r, fmt);
+  const s0 = scoopState(F); s0.dipIds.forEach(id => registerDip(s0, id)); Object.keys(F.inv || {}).filter(k => k.startsWith("gel_dip_")).forEach(id => registerDip(s0, id));
+  s0.recipes.forEach(r => Object.keys(FORMATS).forEach(fmt => { const id = giftId(r, fmt);
     ITEMS[id] = {n: `${r.name} ${FORMATS[fmt].n.toLowerCase()}`, kind: "gift", to: r.dairy ? NO_DAIRY : "family", tab: "scoop", ico: "ic_" + fmt, gel: true,
       say: `Ice cream! ${r.name}? Ooh, I've never had that one.`, says: {evan: "ICE CREAM!! *happy dance*", marcus: "A sorbet, so no tummy trouble. Nice one, Zeh.", mama: "Ice cream for Ma Ma? Aiyo, so cold! So nice.", dad: "Ah Gong loves ice cream. Don't tell your mum."}}; }));
 }
@@ -155,6 +230,15 @@ export function takeAway(F, rid, fmt){
   const s = scoopState(F), r = recipeOf(s, rid); if (!r || !(s.tubs[rid] > 0) || !FORMATS[fmt]) return null;
   s.tubs[rid]--; if (s.tubs[rid] <= 0) delete s.tubs[rid]; registerItems(F);
   const id = giftId(r, fmt); F.inv[id] = (F.inv[id] || 0) + 1; return ITEMS[id];
+}
+// a dipped (and maybe topped) cone or waffle from the dip station: to eat now (null fmt) or to give
+export function makeDipped(F, rid, fmt, dip, top, give){
+  const s = scoopState(F), r = recipeOf(s, rid);
+  if (!hasUp(s, "dip") || !r || !(s.tubs[rid] > 0) || (fmt !== "cone" && fmt !== "waffle") || !s.dips[dip] || (top && !s.tops[top])) return null;
+  s.tubs[rid]--; if (s.tubs[rid] <= 0) delete s.tubs[rid];
+  if (!give) return {r, name: dipName(r, fmt, dip, top), col: r.col, dip: DIPS[dip].col};
+  const id = dipId(r, fmt, dip, top); if (!s.dipIds.includes(id)) s.dipIds = [...s.dipIds, id].slice(-200);
+  registerDip(s, id); F.inv[id] = (F.inv[id] || 0) + 1; return ITEMS[id];
 }
 export function eatOne(F, rid){
   const s = scoopState(F), r = recipeOf(s, rid); if (!r || !(s.tubs[rid] > 0)) return null;
@@ -167,23 +251,82 @@ const dot = c => `<span class="gdot" style="background:${c}"></span>`;
 const ingPic = id => id.startsWith("fl_") ? icon("bq_" + id.slice(3), 26) : icon(id, 26);
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 const tubList = s => s.recipes.filter(r => s.tubs[r.id] > 0);
+const upBtn = `<div class="actions"><button class="btn small alt" data-gview="upgrade">Shop upgrades</button></div>`;
+const buyBtn = (F, price, attr, label = "Buy") => `<button class="btn small ${F.coins >= price ? "primary" : "alt"}" ${attr} ${F.coins >= price ? "" : "disabled"}>${label} · ${price} ${coin()}</button>`;
+// the upgrades catalogue (a clipboard by the door, or from the counter)
+export function upgradePanel(F){
+  const s = scoopState(F);
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Shop upgrades</h2><p class="sub">Things to make ${esc(s.name)} even nicer. You have ${F.coins} ${coin()}.</p><ul class="hlist wlist gups">`;
+  h += Object.entries(UPGRADES).map(([k, u]) => `<li><span class="wtxt"><b>${esc(u.n)}</b><small>${esc(u.line)}</small></span>${s.up[k] ? `<span class="hbadge">yours</span>` : buyBtn(F, u.price, `data-gbuy="${k}"`)}</li>`).join("");
+  return h + `</ul>` + shut;
+}
+// the honesty freezer out front: what's in its coin box, and any notes left with the coins
+export function honestyPanel(F){
+  const s = scoopState(F);
+  if (!hasUp(s, "honesty")) return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(UPGRADES.honesty.n)}</h2><p class="sub">${esc(UPGRADES.honesty.line)}</p><div class="actions">${buyBtn(F, UPGRADES.honesty.price, 'data-gbuy="honesty"')}</div>` + shut;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The honesty freezer</h2><p class="sub">Little cups at ${s.prices.cup} ${coin()} each, 7 to 10am and 8 to 10pm while the shop's shut. It takes from the same tubs as the counter.</p>`;
+  h += `<p class="muted">${s.box ? `<b>${s.box} coins</b> in the box.` : "The box is empty for now."}</p>`;
+  if (s.notes.length) h += `<p class="eyebrow" style="margin:10px 0 6px">Notes left with the coins</p><ul class="hlist">${s.notes.map(n => `<li><small>"${esc(n.t)}"</small></li>`).join("")}</ul>`;
+  return h + `<div class="actions">${s.box ? `<button class="btn primary" data-gcollect="1">Collect the coins</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
+}
+// the dip station: its chocolate pots, the toppings shelf, and the bar where Mel makes one
+export function dipPotsPanel(F){
+  const s = scoopState(F);
+  return `<span class="tape stripe" aria-hidden="true"></span><h2>The chocolate pots</h2><p class="sub">Warm dips for cones and waffles. Customers pay ${s.prices.dip} ${coin()} extra for a dipped one (set it on the menu); more dips, more takers.</p>
+    <ul class="hlist wlist">${Object.entries(DIPS).map(([k, d]) => `<li><span class="wpic">${dot(d.col)}</span><span class="wtxt"><b>${esc(d.n)}</b><small>${s.dips[k] ? "warming in its pot" : "not yet"}</small></span>${s.dips[k] ? `<span class="hbadge">yours</span>` : buyBtn(F, d.price, `data-gdipbuy="${k}"`)}</li>`).join("")}</ul>` + shut;
+}
+export function toppingsPanel(F){
+  const s = scoopState(F);
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>The toppings shelf</h2><p class="sub">Scattered on a dipped cone while it's still warm. ${s.prices.top} ${coin()} extra each (set it on the menu); the more jars on the shelf, the more people go for a dipped one.</p>
+    <ul class="hlist wlist">${Object.entries(TOPPINGS).map(([k, t]) => `<li><span class="wpic">${dot(t.col)}</span><span class="wtxt"><b>${esc(t.n)}</b><small>${s.tops[k] ? "on the shelf" : "not yet"}</small></span>${s.tops[k] ? `<span class="hbadge">yours</span>` : buyBtn(F, t.price, `data-gtopbuy="${k}"`)}</li>`).join("")}</ul>` + shut;
+}
+export function dipBarPanel(F, st){
+  const s = scoopState(F), tubs = tubList(s);
+  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The dip bar</h2><p class="sub">Pick a flavour, dip it, top it. Yours are free.</p>`;
+  if (!tubs.length) return h + `<p class="muted">No tubs in the display. Tomo's batches fill it.</p>` + shut;
+  const r = st.pick && s.tubs[st.pick] > 0 ? recipeOf(s, st.pick) : null;
+  if (!r) return h + `<ul class="hlist wlist">${tubs.map(x => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops</small></span><button class="btn small primary" data-gdpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut;
+  const dip = s.dips[st.dip] ? st.dip : "milk", top = st.top && s.tops[st.top] ? st.top : null, fmt = st.fmt === "waffle" ? "waffle" : "cone";
+  const chip = (attr, k, on, label, col) => `<button class="gchip${on ? " on" : ""}" ${attr}="${k}" aria-pressed="${on}">${dot(col)}<span>${esc(label)}</span></button>`;
+  h += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p>`;
+  h += `<p class="eyebrow" style="margin:10px 0 6px">On a</p><div class="gchips">${["cone", "waffle"].map(f => chip("data-gdfmt", f, f === fmt, FORMATS[f].n, "#E8C48E")).join("")}</div>`;
+  h += `<p class="eyebrow" style="margin:10px 0 6px">Dipped in</p><div class="gchips">${Object.keys(DIPS).filter(k => s.dips[k]).map(k => chip("data-gddip", k, k === dip, DIPS[k].n, DIPS[k].col)).join("")}</div>`;
+  h += `<p class="eyebrow" style="margin:10px 0 6px">Topped with</p><div class="gchips">${chip("data-gdtop", "none", !top, "Nothing", "#FFFDF6")}${Object.keys(TOPPINGS).filter(k => s.tops[k]).map(k => chip("data-gdtop", k, k === top, TOPPINGS[k].n, TOPPINGS[k].col)).join("")}</div>`;
+  h += `<p class="muted">${esc(dipName(r, fmt, dip, top))}</p>`;
+  return h + `<div class="actions"><button class="btn primary" data-gdmake="eat">Have it now</button><button class="btn alt" data-gdmake="give">Make one to give</button></div><div class="actions"><button class="btn alt small" data-gdback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
+}
+// the delivery bike: pick a flavour and a type, then who it's for (st.who: [[id, name]] from the game)
+export function deliverPanel(F, st){
+  const s = scoopState(F), tubs = tubList(s), hm = sgHM();
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Scoop Shack delivery</h2><p class="sub">Sofia pedals it round in the cool box, and a thank-you note comes back to your mailbox.</p>`;
+  if (!hasUp(s, "bike")) return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(UPGRADES.bike.n)}</h2><p class="sub">${esc(UPGRADES.bike.line)}</p><div class="actions">${buyBtn(F, UPGRADES.bike.price, 'data-gbuy="bike"')}</div>` + shut;
+  if (!openNow(hm)) return h + `<p class="muted">The shop's shut. Deliveries go out 10am to 8pm.</p>` + shut;
+  if (!tubs.length) return h + `<p class="muted">Nothing in the display to send.</p>` + shut;
+  const r = st.pick && s.tubs[st.pick] > 0 ? recipeOf(s, st.pick) : null;
+  if (!r) return h + `<ul class="hlist wlist">${tubs.map(x => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops${x.dairy ? "" : " · dairy-free"}</small></span><button class="btn small primary" data-gvpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut;
+  const fmt = FORMATS[st.fmt] ? st.fmt : "cone";
+  h += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p><div class="gchips">${Object.keys(FORMATS).map(f => `<button class="gchip${f === fmt ? " on" : ""}" data-gvfmt="${f}" aria-pressed="${f === fmt}"><span>${FORMATS[f].n}</span></button>`).join("")}</div>`;
+  h += `<p class="eyebrow" style="margin:10px 0 6px">Send it to</p><div class="actions">${(st.who || []).filter(([w]) => !r.dairy || w !== "marcus").map(([w, n]) => `<button class="btn small alt" data-gvto="${w}">${esc(n)}</button>`).join("")}</div>`;
+  return h + `<div class="actions"><button class="btn alt small" data-gvback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
+}
 export function counterPanel(F, st){
   const s = scoopState(F), hm = sgHM(), t = s.sold[dayKey()] || {n: 0, coins: 0}, tubs = tubList(s);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t.n ? `Sold today: ${t.n} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Sofia's behind the counter." : ""}</p>`;
-  if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), and Tomo will keep the tubs topped up.</p>` + shut;
+  if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), and Tomo will keep the tubs topped up.</p>` + upBtn + shut;
   const pick = st.pick && s.tubs[st.pick] > 0 ? recipeOf(s, st.pick) : null;
   if (pick) return h + `<div class="gpick"><p class="olabel">${dot(pick.col)} ${esc(pick.name)}${pick.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick.ings.map(i => INGR[i][0]).join(", "))} · ${s.tubs[pick.id]} scoops left</p>
     <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick.id)}">Have one now${st.evan ? ", and one for Evan" : ""}</button></div>
     <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map(f => `<button class="btn small alt" data-gtake="${f}">${FORMATS[f].n}</button>`).join("")}</div>
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
   h += `<ul class="hlist wlist">${tubs.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
-  return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p>` + shut;
+  return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p>` + upBtn + shut;
 }
 export function menuPanel(F, st){
   const s = scoopState(F), step = k => `<span class="gstep"><button class="btn small alt" data-gprice="${k}:-1" aria-label="Cheaper">−</button><b>${s.prices[k]}</b><button class="btn small alt" data-gprice="${k}:1" aria-label="Dearer">+</button></span>`;
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The menu</h2><p class="sub">Prices by type. A flavour marked special costs a little extra.</p>
     <ul class="hlist wlist gprices">${Object.keys(FORMATS).map(f => `<li><span class="wtxt"><b>${FORMATS[f].n}</b><small>${f === "float" ? "a scoop in a fizzy float" : f === "waffle" ? "a scoop on a warm waffle" : "one scoop"}</small></span>${step(f)}</li>`).join("")}
-    <li><span class="wtxt"><b>Special surcharge</b><small>added to anything in a special flavour</small></span>${step("special")}</li></ul>`;
+    <li><span class="wtxt"><b>Special surcharge</b><small>added to anything in a special flavour</small></span>${step("special")}</li>${hasUp(s, "dip") ? `
+    <li><span class="wtxt"><b>Chocolate dip</b><small>extra for a dipped cone or waffle</small></span>${step("dip")}</li><li><span class="wtxt"><b>Topping</b><small>extra for a topping on a dipped one</small></span>${step("top")}</li>` : ""}</ul>`;
   h += s.recipes.length ? `<p class="eyebrow" style="margin:12px 0 6px">Flavours</p><ul class="hlist wlist gflav">${s.recipes.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? s.tubs[r.id] + " scoops" : "sold out"}</small></span><label class="gspec"><input type="checkbox" data-gspecial="${esc(r.id)}" ${r.special ? "checked" : ""}> special</label></li>`).join("")}</ul>` : `<p class="muted">No flavours yet: discover some at the mixing bench in the kitchen.</p>`;
   h += `<form class="row hadd" data-gname="1"><label class="sr" for="gName">Shop name</label><input id="gName" name="n" maxlength="30" value="${esc(s.name)}"><button class="btn small alt">Rename</button></form>`;
   return h + shut;
@@ -199,13 +342,20 @@ export function fridgePanel(F, orch){
   if (!bag.length && !shelf.length) h += `<p class="muted">Nothing to add right now. Milk comes from your goats or Hana's market; fruit and flowers from the orchard.</p>`;
   return h + shut;
 }
+const scoopPic = col => `<svg class="gscoop" viewBox="0 0 44 44" aria-hidden="true"><path d="M14 22 l8 20 l8 -20z" fill="#E8C48E" stroke="#3A2E28" stroke-width="1.2" stroke-linejoin="round"/><path d="M16 28 l12 6 M28 28 l-12 6" stroke="#3A2E28" stroke-width=".8" opacity=".5"/><circle cx="22" cy="16" r="11" fill="${col}" stroke="#3A2E28" stroke-width="1.2"/><path d="M12 19 q3 4 6 0 q3 4 6 0 q3 4 6 0 q2 3 2 0" fill="${col}" stroke="#3A2E28" stroke-width="1.1"/><circle cx="18" cy="12" r="2.4" fill="#fff" opacity=".6"/></svg>`;
+const resultCard = (col, name, line, made) => `<div class="gresult${made ? " made" : ""}">${scoopPic(col)}<span><b>${esc(name)}</b><small>${esc(line)}</small></span></div>`;
 export function benchPanel(F, st){
   const s = scoopState(F), inF = Object.keys(s.fridge).filter(id => s.fridge[id] > 0), sel = (st.sel || []).filter(id => inF.includes(id));
   const known = sel.length ? knownRecipe(s, sel) : null;
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The mixing bench</h2><p class="sub">Pick up to four things from the fridge and mix. Every combination makes a new flavour; there's no such thing as a bad one. ${s.recipes.length} discovered so far.</p>`;
   if (!inF.length) return h + `<p class="muted">The fridge is empty. Stock it first.</p>` + shut;
   h += `<div class="gchips">${inF.map(id => `<button class="gchip${sel.includes(id) ? " on" : ""}" data-gsel="${id}" aria-pressed="${sel.includes(id)}" ${!sel.includes(id) && sel.length >= 4 ? "disabled" : ""}>${ingPic(id)}<span>${esc(INGR[id][0])}</span></button>`).join("")}</div>`;
-  h += `<p class="muted">${sel.length ? known ? `You know this one: <b>${esc(known.name)}</b>.` : `${sel.length} picked. ${sel.includes("milk") ? "With milk: a gelato." : "No milk: a dairy-free sorbet."} Something new!` : "Nothing picked yet."}</p>`;
+  // what it'll be (or, just mixed, what it is): a scoop in its colour, and its name
+  const made = st.made && recipeOf(s, st.made);
+  if (made && !sel.length) h += resultCard(made.col, made.name, `New flavour! ${made.dairy ? "A gelato" : "A dairy-free sorbet"}, and the first tub's in the display.`, true);
+  else if (sel.length) { const ss = [...sel].sort(); h += known ? resultCard(known.col, known.name, "You know this one already. Add it to today's batches on the board.")
+    : resultCard(blend(ss), nameFor(ss), `${ss.includes("milk") ? "A gelato" : "A dairy-free sorbet"}. Something new!`); }
+  else h += `<p class="muted">Nothing picked yet.</p>`;
   return h + `<div class="actions"><button class="btn primary" data-gmix="1" ${!sel.length || known ? "disabled" : ""}>Mix it</button><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export function batchPanel(F, st){

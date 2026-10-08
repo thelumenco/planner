@@ -43,7 +43,7 @@ import { dishArt, glassArt } from "../art/wine.js";
 import { fieldArt, stallFront } from "../art/field.js";
 import { shoreArt } from "../art/shore.js";
 import { bayArt, DECK_SEATS } from "../art/bay.js";
-import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, batchPanel, freezerPanel, RENO_LINE, discover, stockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow } from "./scoop.js";
+import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, batchPanel, freezerPanel, RENO_LINE, discover, stockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
 import { diningTable, darrenAsleep, skyWash } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
@@ -247,7 +247,9 @@ const SHED = {
   compost:   {n: "Compost bin", price: 150, ico: "compost", what: "Everything grows a quarter faster."},
   sprinkler: {n: "Sprinkler", price: 300, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."}
 };
-let goalView = null, paddling = false, scView = null, scSt = {pick: null, sel: []}, evanSeat = null, lastScoop = 0;   // a big goal's "save up for it" card ("garagepick": the garage's ride chooser)
+let goalView = null, paddling = false, scView = null, scSt = {pick: null, sel: []}, evanSeat = null, lastScoop = 0;
+// the Scoop Shack's rooms, and its panels that open from anywhere (the catalogue, the honesty freezer, the delivery bike)
+const SCOOP_IN = ["scoopshop", "scoopkitchen", "scoopdip"], SC_ANY = ["upgrade", "honesty", "deliver"];   // a big goal's "save up for it" card ("garagepick": the garage's ride chooser)
 let fieldView = null, orView = null, orAt = null, orTab = null, potItem = null, kView = null, reviewOpen = false, vyView = null, vyAt = null, vaultView = null, lettersOpen = false, trophyView = null, routOpen = false, kudosOpen = false, deskOpen = false, shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, scratchOpen = false, calmOpen = false, recOpen = false, clientsOpen = false, planOpen = false, revOpen = false, jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null;
 let jv = {mode: "shelf", blobs: [], note: ""};   // the emotion shelf panel: shelf, make (picker) or jar (one jar)
 // Guided breathing in the calm corner: a ring grows as she breathes in (4 s), holds (2 s) and shrinks as she breathes out (6 s)
@@ -1192,6 +1194,7 @@ function giveTo(id, w){
   giftPick = null; const it = ITEMS[id]; if (!w || !it || !F.inv[id]) { bag(); return; }
   if (w === "near") { giveBouquet(id); bag(); return; }
   if (giftPos(w)) { if (it.kind === "bouquet") bouquetTo(id, w); else giveGift(id, w); bag(); return; }
+  if (it.gel && !hasUp(scoopState(F), "bike")) { speak(`It'd melt on the way! Give it to ${GIFT_NAME[w]} in person, or get the Scoop Shack a delivery bike.`, 4500); bag(); return; }
   addInv(id, -1); F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1; gainXp(1);
   F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
   sfx("chime"); flash(`Sent to ${GIFT_NAME[w]}`); speak(`Wrapped up and sent to ${GIFT_NAME[w]}. Watch your mailbox for a thank-you note.`, 4500); save(); bag();
@@ -1442,7 +1445,8 @@ function ctx(){
   else if (deskOpen && scene === "office") h = deskPanel();
   else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
   else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
-  else if (scView && (scene === "scoopshop" || scene === "scoopkitchen")) h = scView === "counter" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), server: isHere("sofia")}) : scView === "menu" ? scMenuPanel(F)
+  else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h = scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverPanel(F, {pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo()})
+    : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, {pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt}) : scView === "counter" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), server: isHere("sofia")}) : scView === "menu" ? scMenuPanel(F)
     : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? batchPanel(F) : freezerPanel(F);
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
   else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : marketStallPanel(st); }
@@ -1654,6 +1658,8 @@ function bag(){
     const kit = isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
     return itemBtn(id, lbl, it.kind === "seed", (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit); }).join("");
   if (giftPick && F.inv[giftPick]) $("bag").insertAdjacentHTML("afterbegin", giftPickHTML(giftPick)); else giftPick = null;
+  if (hasUp(scoopState(F), "bike")) { $("bag").insertAdjacentHTML("beforeend", `<button class="btn small alt" data-deliver="1" style="grid-column:1/-1">Send an ice cream (Scoop Shack delivery)</button>`);
+    $("bag").querySelector("[data-deliver]").onclick = () => { openView = null; scView = "deliver"; scSt.vpick = null; scoopNow(); ctx(); }; }
   $("bag").querySelectorAll("[data-giveto]").forEach(b => b.onclick = ev => { ev.stopPropagation(); giveTo(giftPick, b.dataset.giveto); });
   $("bag").querySelectorAll(".item").forEach(b => b.onclick = ev => { const k = ev.target.closest("[data-kit]"); if (k) { ev.stopPropagation(); toKitchen(k.dataset.kit); return; } useItem(b.dataset.id); });
   $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome gift of seeds is in here. Plant them in the garden." : "";
@@ -1745,6 +1751,7 @@ function nightLights(){
   let h = "";
   if (scene !== "base") art.querySelectorAll(".lglow").forEach(g => { const c = g.querySelector("circle"), x = +c.getAttribute("cx"), y = +c.getAttribute("cy"), r = +c.getAttribute("r");
     h += `<g transform="${mtx(g)}"><circle cx="${x}" cy="${y + 6}" r="${r + 10}" fill="url(#lampg)"/><circle class="flick" cx="${x}" cy="${y}" r="${(r*.45).toFixed(1)}" fill="#FFE3A3" opacity=".4"/>${r > 30 ? `<rect x="${x - 5}" y="${y - 6}" width="10" height="12" rx="2" fill="#FFE9A8" stroke="#3b3530" stroke-width="1.1"/>` : ""}</g>`; });
+  art.querySelectorAll(".nglow").forEach(g => { const k = g.cloneNode(true); k.setAttribute("transform", mtx(g)); k.removeAttribute("class"); h += k.outerHTML; });   // neon, fairy lights
   art.querySelectorAll("text.lab").forEach(t => { const g = t.parentNode; if (!g || g.closest(".nightcopy")) return;
     const k = g.cloneNode(true), p = k.querySelector("path"); if (p) { p.style.fill = "#FFFDF6"; p.setAttribute("opacity", "1"); }
     k.setAttribute("transform", mtx(g)); k.setAttribute("class", "nightlab"); h += k.outerHTML; });
@@ -1865,7 +1872,7 @@ let route = [], keys = new Set();
 const svg = $("world");
 // Evan's bedtime: 8pm to 7am he's asleep in his car bed, so he isn't out at home base or in the house
 const evanNight = () => { const m = sgHM(); return m >= 20*60 || m < 7*60; };
-const evanHere = () => scene === "kidroom" || ((scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "mumdad" || scene === "marcus") && !evanNight()) || evanAtDinner();
+const evanHere = () => scene === "kidroom" || ((scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "scoopdip" || scene === "mumdad" || scene === "marcus") && !evanNight()) || evanAtDinner();
 // family dinner nights: Evan's at the table wherever dinner is (then home to bed)
 const evanAtDinner = () => { const d = dinnerNow(dayKey(), sgHM()); return !!d && scene === d.host; };
 function outside(){ return OUTDOOR.includes(scene); }
@@ -1875,13 +1882,13 @@ function setScene(id, at){
   const w = $("world"), from = scene; w.classList.add("fading");
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
-    scView = null; scSt.pick = null; evanSeat = null;
+    scView = null; scSt.pick = null; scSt.dpick = null; evanSeat = null;
     scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
     if (id === "base") { evan.x = evan.tx = 300; evan.y = evan.ty = 360; }
-    else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "scoopshop" || id === "scoopkitchen" || id === "mumdad" || id === "marcus" || id === "cottage") { evan.x = evan.tx = p[0] + 26; evan.y = evan.ty = p[1] + 10; evan.run = false; evan.wait = 2; }
+    else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "mumdad" || id === "marcus" || id === "cottage") { evan.x = evan.tx = p[0] + 26; evan.y = evan.ty = p[1] + 10; evan.run = false; evan.wait = 2; }
     else if (id === "home" && from === "kidroom") { evan.x = evan.tx = p[0] - 24; evan.y = evan.ty = p[1] + 6; evan.run = false; evan.wait = 3; }
     else if (id === "home") { evan.x = evan.tx = 300; evan.y = evan.ty = 520; }
     // Evan's room: he runs in ahead, Mel waits just inside the door, Maple stays out in the house
@@ -1997,8 +2004,9 @@ function arriveSpot(id){
   if (id === "kdoor") { setScene("kitchen", INNER.kitchen.arrive); return; }
   if (id === "gkdoor") { setScene("scoopkitchen", INNER.scoopkitchen.arrive); if (isHere("tomo")) setTimeout(() => npcSay("tomo", pick(["Ciao! Fridge is over there. Bring me something good.", "Want to invent a flavour? The bench is all yours.", "Tubs are frozen and ready."])), 900); return; }
   if (scene === "scoopshop" && id === "gtables") { sitAt(SHOP_SEATS); return; }
-  if (scene === "scoopshop" || scene === "scoopkitchen") { scView = {gcounter: "counter", gmenu: "menu", gfridge: "fridge", gfreezer: "freezer", gboard: "batch", gbench: "bench"}[id] || null;
-    if (scView) { scSt.pick = null; scoopNow(); sfx("paper", true); if (id === "gcounter" && isHere("sofia")) npcSay("sofia", pick(["Hi Mel! What'll it be?", "On the house, boss. Which one?", "The new one's going fast!"])); render(); return; } }
+  if (id === "gddoor") { if (hasUp(scoopState(F), "dip")) { setScene("scoopdip", INNER.scoopdip.arrive); setTimeout(() => speak("Warm chocolate and a whole shelf of sprinkles. Dangerous.", 3500), 900); } else { scView = "upgrade"; sfx("paper", true); render(); } return; }
+  if (SCOOP_IN.includes(scene)) { scView = {gcounter: "counter", gmenu: "menu", gfridge: "fridge", gfreezer: "freezer", gboard: "batch", gbench: "bench", gupgrades: "upgrade", gpots: "pots", gtops: "tops", gdipbar: "dipbar"}[id] || null;
+    if (scView) { scSt.pick = null; scSt.dpick = null; scSt.made = null; scoopNow(); sfx("paper", true); if (id === "gcounter" && isHere("sofia")) npcSay("sofia", pick(["Hi Mel! What'll it be?", "On the house, boss. Which one?", "The new one's going fast!"])); render(); return; } }
   if (scene === "kitchen") { kView = id; sfx("paper", true); render(); return; }
   if (scene === "wineshop") { vyView = {wshelf: "shelf", wcounter: "counter", hbox: "box", tasting: "tasting", menu: "menu"}[id] || null;
     if (vyView) { sfx("paper", true); if (id === "wcounter") { vineTick(); speak(pick(["Behind the counter. Customers come in more often while you serve.", "Apron on. Who's first?", "Open for business!"]), 3500); if (isHere("celeste")) setTimeout(() => npcSay("celeste", pick(["Two of us! Let's see how busy we get.", "You pour, I'll chat."])), 1200); }
@@ -2034,6 +2042,8 @@ function arriveVillageSpot(id){
     else speak("Nobody's minding this one just now. It's an honesty tin: pop your coins in.", 3500); render(); return; }
   if (id === "deck") { sitAt(DECK_SEATS); return; }
   if (id === "reno") { speak(RENO_LINE, 6000); render(); return; }
+  if (id === "hfreezer") { scoopNow(); scView = "honesty"; sfx("paper", true); render(); return; }
+  if (id === "dbike") { scoopNow(); scView = "deliver"; scSt.vpick = null; sfx("paper", true); render(); return; }
   if (id === "lake" || id === "picnic" || id === "pitch") { fieldSpot(id); return; }
   if (id === "exlawn") { joinClass(); return; }
   if (id === "jazzhat") { tipBand(); return; }
@@ -2122,9 +2132,10 @@ function scoopNow(){
   lastScoop = Date.now();
   const s = scoopState(F), out = scoopTick(F, {serving: scene === "scoopshop" && atSpot === "gcounter"});
   if (!out.coins && !out.mins) return;
+  if (out.box && (scene === "bay" || out.mins >= 30)) setTimeout(() => speak(`The honesty freezer's been busy: ${s.box} coins waiting in its box.`, 4500), out.coins ? 6000 : 1500);
   if (out.coins && (scene === "scoopshop" || scene === "bay")) { sfx("coin"); flash(`+${out.coins} coins: ${s.name}`); }
   else if (out.coins && out.mins >= 30) setTimeout(() => speak(`While you were away, ${s.name} sold ${out.n} ice cream${out.n > 1 ? "s" : ""}: ${out.coins} coins.`, 5000), 1500);
-  if (out.coins || out.mins >= 5) save(); if (scView) ctx(); if (scene === "scoopshop" || scene === "scoopkitchen") drawScene();
+  if (out.coins || out.box || out.mins >= 5) save(); if (scView) ctx(); if (SCOOP_IN.includes(scene)) drawScene();
 }
 // sit on a free seat (the deck, or the shop's tables), with Evan beside if he's here; an ice cream in hand gets eaten
 function sitAt(seats){
@@ -2150,6 +2161,16 @@ function haveIceCream(rid){
   if (evanHere()) setTimeout(() => evanSays(pick(["ICE CREAM!!", "yummy yummy!", "it's so cold!"])), 900);
   save(); render();
 }
+// the delivery bike: Sofia pedals one round to someone in the family, and a thank-you note comes back
+const deliverTo = () => FAMILY_ALL.map(w => [w, GIFT_NAME[w]]);
+function deliver(w){
+  const it = takeAway(F, scSt.vpick, FORMATS[scSt.vfmt] ? scSt.vfmt : "cone"); if (!it) return;
+  const id = Object.keys(ITEMS).find(k => ITEMS[k] === it);
+  addInv(id, -1); F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1; gainXp(1);
+  F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
+  sfx("chime"); flash(`On its way to ${GIFT_NAME[w]}`); speak(`Sofia's pedalling a ${it.n.toLowerCase()} over to ${GIFT_NAME[w]} in the cool box. Watch your mailbox for a thank-you note.`, 5000);
+  scSt.vpick = null; scView = null; save(); ctx(); render();
+}
 function wireScoop(c){
   const s = scoopState(F), re = () => { save(); ctx(); drawScene(); };
   c.querySelectorAll("[data-gpick]").forEach(b => b.onclick = () => { scSt.pick = b.dataset.gpick; ctx(); });
@@ -2161,11 +2182,34 @@ function wireScoop(c){
   c.querySelectorAll("[data-gspecial]").forEach(b => b.onchange = () => { const r = recipeOf(s, b.dataset.gspecial); if (r) { r.special = b.checked; re(); } });
   const nf = c.querySelector("[data-gname]"); if (nf) nf.onsubmit = ev => { ev.preventDefault(); const v = (nf.querySelector("input").value || "").trim().slice(0, 30); if (!v) return; s.name = v; speak(`The sign now says ${v}.`, 3500); re(); render(); };
   c.querySelectorAll("[data-gfill]").forEach(b => b.onclick = () => { const [from, id, n] = b.dataset.gfill.split(":"), got = stockFridge(F, id, +n, from, orchState(F)); if (!got) return; sfx("tap"); flash(`+${got} into the fridge`); re(); });
-  c.querySelectorAll("[data-gsel]").forEach(b => b.onclick = () => { const id = b.dataset.gsel; scSt.sel = scSt.sel.includes(id) ? scSt.sel.filter(x => x !== id) : [...scSt.sel, id].slice(0, 4); ctx(); });
+  c.querySelectorAll("[data-gsel]").forEach(b => b.onclick = () => { scSt.made = null; const id = b.dataset.gsel; scSt.sel = scSt.sel.includes(id) ? scSt.sel.filter(x => x !== id) : [...scSt.sel, id].slice(0, 4); ctx(); });
   c.querySelectorAll("[data-gmix]").forEach(b => b.onclick = () => { const out = discover(F, scSt.sel); speak(out.msg, 5500);
-    if (out.recipe) { scSt.sel = []; sfx("chime"); act("cheer"); [0, 250, 500].forEach((t, k) => setTimeout(() => mprop("sparkle", mel.x + (k - 1)*22, mel.y - 60, 1600), t)); gainXp(2);
+    if (out.recipe) { scSt.sel = []; scSt.made = out.recipe.id; sfx("chime"); act("cheer"); [0, 250, 500].forEach((t, k) => setTimeout(() => mprop("sparkle", mel.x + (k - 1)*22, mel.y - 60, 1600), t)); gainXp(2);
       if (isHere("tomo")) setTimeout(() => npcSay("tomo", pick(["Bellissimo! I'll put that on the board.", "Never had that before. Never! Wonderful.", "Okay, that's going on the menu."])), 1400); }
     re(); });
+  // upgrades, the honesty freezer, the dip station and the delivery bike
+  const up = () => { save(); ctx(); drawScene(); if (scene === "bay" || scene === "scoopshop") render(); };
+  c.querySelectorAll("[data-gview]").forEach(b => b.onclick = () => { scView = b.dataset.gview; sfx("paper", true); ctx(); });
+  c.querySelectorAll("[data-gbuy]").forEach(b => b.onclick = () => { const line = buyUpgrade(F, b.dataset.gbuy); if (!line) return; sfx("chaching"); act("cheer"); gainXp(2);
+    [0, 250, 500].forEach((t, k) => setTimeout(() => mprop("sparkle", mel.x + (k - 1)*22, mel.y - 60, 1600), t)); speak(line, 6000); scView = b.dataset.gbuy === "honesty" ? "honesty" : b.dataset.gbuy === "bike" ? "deliver" : "upgrade"; up(); });
+  c.querySelectorAll("[data-gcollect]").forEach(b => b.onclick = () => { const n = collectBox(F); if (!n) return; sfx("chaching"); flash(`+${n} coins from the honesty freezer`); speak(`${n} coins from the honesty box. Thank you, neighbours!`, 3500); up(); });
+  c.querySelectorAll("[data-gdipbuy]").forEach(b => b.onclick = () => { if (!buyDip(F, b.dataset.gdipbuy)) return; sfx("chaching"); flash(`${DIPS[b.dataset.gdipbuy].n} in its pot`); up(); });
+  c.querySelectorAll("[data-gtopbuy]").forEach(b => b.onclick = () => { if (!buyTopping(F, b.dataset.gtopbuy)) return; sfx("chaching"); flash(`${TOPPINGS[b.dataset.gtopbuy].n} on the shelf`); up(); });
+  c.querySelectorAll("[data-gdpick]").forEach(b => b.onclick = () => { scSt.dpick = b.dataset.gdpick; ctx(); });
+  c.querySelectorAll("[data-gdback]").forEach(b => b.onclick = () => { scSt.dpick = null; ctx(); });
+  c.querySelectorAll("[data-gdfmt]").forEach(b => b.onclick = () => { scSt.dfmt = b.dataset.gdfmt; ctx(); });
+  c.querySelectorAll("[data-gddip]").forEach(b => b.onclick = () => { scSt.dip = b.dataset.gddip; ctx(); });
+  c.querySelectorAll("[data-gdtop]").forEach(b => b.onclick = () => { scSt.top = b.dataset.gdtop === "none" ? null : b.dataset.gdtop; ctx(); });
+  c.querySelectorAll("[data-gdmake]").forEach(b => b.onclick = () => { const give = b.dataset.gdmake === "give", dip = s.dips[scSt.dip] ? scSt.dip : "milk", top = scSt.top && s.tops[scSt.top] ? scSt.top : null;
+    const out = makeDipped(F, scSt.dpick, scSt.dfmt === "waffle" ? "waffle" : "cone", dip, top, give); if (!out) return;
+    if (give) { sfx("paper", true); flash(`${out.n} in your backpack`); speak("Wrapped in a napkin and into the cool pocket of your backpack. Tap it there to choose who it's for.", 4500); }
+    else { S.cone = {until: Date.now() + 4*M, col: out.col}; sfx("chime"); act("cheer"); mprop("heart", mel.x, mel.y - 60, 1600); if (S.iceDay !== dayKey()) { S.iceDay = dayKey(); gainXp(1); }
+      speak(`${out.name[0].toUpperCase() + out.name.slice(1)}. The chocolate's still setting. Eat fast!`, 5000); if (evanHere()) setTimeout(() => evanSays(pick(["I want chocolate one!", "sprinkles!! for me?", "Mama, share!"])), 1000); scView = null; }
+    scSt.dpick = null; save(); ctx(); render(); });
+  c.querySelectorAll("[data-gvpick]").forEach(b => b.onclick = () => { scSt.vpick = b.dataset.gvpick; ctx(); });
+  c.querySelectorAll("[data-gvback]").forEach(b => b.onclick = () => { scSt.vpick = null; ctx(); });
+  c.querySelectorAll("[data-gvfmt]").forEach(b => b.onclick = () => { scSt.vfmt = b.dataset.gvfmt; ctx(); });
+  c.querySelectorAll("[data-gvto]").forEach(b => b.onclick = () => deliver(b.dataset.gvto));
   c.querySelectorAll("[data-gplan]").forEach(b => b.onchange = () => { const id = b.dataset.gplan; s.plan.ids = b.checked ? [...s.plan.ids.filter(x => x !== id), id] : s.plan.ids.filter(x => x !== id); re(); });
 }
 // The night market's jazz duo: drop a couple of coins in the hat on the front of the stage
@@ -2247,7 +2291,7 @@ function endPaddle(walkBack){
 }
 // Who's where today: everyone's day at a glance (in the friendship view), family first, then the village
 const PLACE_NAME = {base: "outside at home", home: "your house", farm: "the garden", village: "the town square", lane: "Makers' Lane", vineyard: "the vineyard",
-  orchard: "the orchard", flowers: "the flower farm", field: "the field", shore: "the foreshore", kitchen: "the wine shop kitchen", bay: "the bay", scoopshop: "the Scoop Shack", scoopkitchen: "the gelato kitchen"};
+  orchard: "the orchard", flowers: "the flower farm", field: "the field", shore: "the foreshore", kitchen: "the wine shop kitchen", bay: "the bay", scoopshop: "the Scoop Shack", scoopkitchen: "the gelato kitchen", scoopdip: "the dip station"};
 const ACT_WORD = {water: "watering", farm: "gardening", sit: "sitting down", game: "gaming", sup: "paddleboarding", guide: "leading a tour", lead: "leading the class",
   exercise: "exercise class", cone: "with an ice cream", cook: "cooking", rest: "in the hammock", repair: "fixing things", type: "busy", play: "playing"};
 const placeName = sc => PLACE_NAME[sc] || (ROOMS[sc] && ROOMS[sc].name) || sc;
@@ -2555,7 +2599,7 @@ function nearSpot(){
   const list = [...stationsOf(scene), scene !== "market" ? {id:"board", tx:260, ty:200} : null].filter(Boolean);
   const s = list.find(s => Math.hypot(s.tx - mel.x, s.ty - mel.y) < 26); return s ? s.id : null;
 }
-const EVAN_SPOTS = {bay:[[300,400],[250,560],[300,330],[200,300],[290,500]], scoopshop:[[200,440],[380,440],[300,560],[140,560],[260,420]], scoopkitchen:[[200,560],[380,540],[300,580]], mumdad:[[300,560],[200,380],[420,420],[150,560],[460,560]], marcus:[[230,560],[120,500],[460,560],[250,340],[300,600]], cottage:[[200,560],[440,540],[300,340]], shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[150,340],[260,330],[380,330],[200,580],[330,590]]};
+const EVAN_SPOTS = {bay:[[300,400],[250,560],[300,330],[200,300],[290,500]], scoopshop:[[200,440],[380,440],[300,560],[140,560],[260,420]], scoopkitchen:[[200,560],[380,540],[300,580]], scoopdip:[[180,560],[420,560],[140,420]], mumdad:[[300,560],[200,380],[420,420],[150,560],[460,560]], marcus:[[230,560],[120,500],[460,560],[250,340],[300,600]], cottage:[[200,560],[440,540],[300,340]], shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[150,340],[260,330],[380,330],[200,580],[330,590]]};
 // Evan's destination is evan.tx/ty; outdoors he follows route-finder waypoints to it (round the house, not through it)
 function evanWalk(speed, dt){
   const key = evan.tx + "," + evan.ty;

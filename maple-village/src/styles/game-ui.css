@@ -747,6 +747,10 @@ body.season-winter{--grass:#E5ECE6;--grass2:#D5E0DA}
 #ctx .orflowers li{flex-wrap:wrap}
 #ctx .orbtns{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
 #ctx .orflowers li{flex-wrap:wrap}#ctx .orflowers .orbtns{flex:1 0 100%;margin:8px 0 0 44px}
+#ctx .grcrates .orbtns{align-items:center}#ctx .grkeep{flex:0 0 calc(100% - 44px);box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0 0 44px;font-size:.85em;color:var(--soft)}
+#ctx .gresult{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:10px 0;border-radius:12px;background:var(--card);border:1.5px dashed var(--rule)}
+#ctx .gresult.made{border-style:solid;border-color:#9FD3C2;background:rgba(159,211,194,.18)}
+#ctx .gresult .gscoop{flex:none;width:44px;height:44px}#ctx .gresult b{display:block}#ctx .gresult small{color:var(--soft)}
 #ctx .orspot{width:100%;font:inherit;color:inherit}
 /* the wine shop's chalkboard menu */
 #ctx .wlist.chalk .mprice{flex:none;font-family:"Klee One",serif;font-weight:600;font-size:1.1rem;color:#8E2C48}
