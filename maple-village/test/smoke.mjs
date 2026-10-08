@@ -2004,6 +2004,45 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // The cottage lane and Honeybrook station: four cottages, the windmill, the timetable, and trains along the top row
+  console.log("\nHoneybrook station");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`lane pageerror: ${e.message}`));
+  const npcs = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  const go = async (t, d, sc) => { await page.goto(url + `?seed=1&time=${t}&date=${d}`); await page.waitForTimeout(900); await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(1600); };
+  await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
+  await go("12:00", "2026-10-07", "hfarm");
+  check(await page.locator('#world [data-place="hfEast"]').count() === 1, "the farm's east gate leads on to the cottage lane");
+  await go("12:00", "2026-10-07", "hlane");
+  check(/Honeybrook station/.test(await page.locator("#sceneName").textContent()) && await page.locator('#world [data-place="honeysuckle"], #world [data-place="clover"], #world [data-place="bluebell"], #world [data-place="figtree"], #world [data-place="windmill"], #world [data-place="timetable"]').count() === 6,
+    "the lane: Honeysuckle, Clover, Bluebell and Fig Tree, the windmill and the timetable board");
+  check(await page.locator("#sceneArt animateTransform[type=rotate]").count() >= 1, "the windmill turns");
+  check(await page.locator("#sceneArt .train").count() === 0, "no train at noon");
+  await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
+  check(/9:15am/.test(await page.locator("#ctx").innerText()) && !/10:30pm/.test(await page.locator("#ctx").innerText()), "the timetable: today's trains (no late train on a Wednesday)");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await go("09:15", "2026-10-07", "hlane");
+  check(await page.locator("#sceneArt .train").count() === 1, "the 9:15 waits at the platform");
+  await go("09:13", "2026-10-07", "hfarm");
+  check(await page.locator("#sceneArt .train").count() === 1, "on its way in, it passes along the top of the farm");
+  await go("09:12", "2026-10-07", "bay");
+  check(await page.locator("#sceneArt .train").count() === 1, "and the bay, after crossing the trestle");
+  await go("18:30", "2026-10-07", "hlane");
+  check(await page.locator("#actors .act-sit").count() >= 3, "holiday guests out on the porches in the evening");
+  await go("19:30", "2026-10-07", "hlane");
+  check((await npcs()).includes("mateo"), "Mateo's home at Honeysuckle in the evening");
+  await go("10:00", "2026-10-06", "hlane");
+  check((await npcs()).includes("noor"), "Noor's in her garden at Clover with the rescues");
+  await go("22:15", "2026-10-06", "hlane");
+  check((await npcs()).filter(id => ["noa", "jun", "bea", "omar", "lucy"].includes(id)).length >= 3, "after the night market, the crowd waits for the 10:30 home");
+  await go("12:00", "2026-10-07", "hlane");
+  await page.locator('#world [data-place="honeysuckle"]').dispatchEvent("click"); await page.waitForTimeout(3500);
+  check(await page.locator('#world [data-spot="mdesk"]').count() === 1, "inside Honeysuckle: Mateo's desk, the sofa, Lila's records");
+  await go("12:00", "2026-10-07", "village");
+  check(await page.locator('#world [data-place="toStationV"]').count() === 1 && /Honeybrook/.test(await page.locator("#sceneArt").textContent()), "the town square: the station road up to Honeybrook, and the welcome sign");
+  await page.close();
+}
+{
   // Keepsakes on the shelves of Mel's buildings, and pets adopted at the market that live with someone in the family
   console.log("\nkeepsakes and pets");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

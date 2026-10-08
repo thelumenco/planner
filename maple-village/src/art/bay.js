@@ -5,6 +5,7 @@ import { ink } from "../util.js";
 import { sk, tapeLabel, house, flowers, artCtx } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
 import { archGate } from "./orchard.js";
+import { track, brook, trainLayer, RAIL_Y } from "./railway.js";
 
 const W = `filter="url(#wob)" ${ink}`;
 const COAST = "M150 0 C176 120 134 250 160 380 C182 480 140 560 150 640";
@@ -50,6 +51,7 @@ export function bayArt(){
     <g pointer-events="none">${[[40, 90], [100, 150], [30, 260], [110, 470], [50, 540], [120, 600]].map(([x, y]) => `<path class="ripple" d="M${x} ${y} q5 -3.5 10 0 q5 3.5 10 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.3" opacity=".8"/>`).join("")}</g>
     <g filter="url(#wob)"><path d="M250 640 V300 H386 V266" fill="none" style="stroke:#D9BE94" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M250 640 V300 H386" fill="none" style="stroke:#C9A87A" stroke-width="20" stroke-dasharray="1.4 9" opacity=".7"/></g>
+    ${sk(Array.from({length: 9}, (_, i) => `<rect x="${6 + i*20}" y="${RAIL_Y + 6}" width="5" height="${44 + (i % 2)*6}" style="fill:#8A6A52"/>`).join("") + `<path d="M0 ${RAIL_Y + 22} L180 ${RAIL_Y + 22}" style="stroke:#8A6A52" stroke-width="3"/>`, `<path d="M0 ${RAIL_Y + 8} H180"/>`)}${track(0, 520)}${brook(150, 520)}${trainLayer("bay")}
     ${pine(490, 150, 1)}${pine(300, 140, .9)}${pine(500, 470, .95)}${pine(398, 636, .78)}${pine(470, 624, .85)}
     ${flowers([[300, 320, "#EFA3A6"], [470, 300, "#F3C969"], [290, 470, "#C3CDEE"], [480, 380, "#EFA3A6"], [440, 570, "#F3C969"]])}`;
   const sea = dolphin(70, 210, 13, 2) + dolphin(56, 500, 16, 7);

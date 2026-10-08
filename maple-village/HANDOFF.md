@@ -1258,3 +1258,30 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - `takeWheel` cuts a ripe wheel into wedges: `chz_fresh`, `chz_cheddar`, `chz_blue`. They're gift items; none go to Marcus, and only the adventurous get the blue.
 - **Elena** spends 11–1 in the barn. Evan follows Mel onto the farm and into the barn.
 - **Not done yet:** the cheeses don't reach the wine shop's tapas, Elena's stall or Ma Ma's farm shop. That could come later.
+
+### Round 96: the town is Honeybrook; the farm is Wildflower Farm
+- Mel named the town **Honeybrook** and the farm **Wildflower Farm**; every "Honeybrook Farm" is now "Wildflower Farm". The cheese "Honeybrook blue" and the station keep the town's name.
+- The Good News board has a masthead, "The Honeybrook Gazette" (feeds.js).
+- The town square has a "Welcome to Honeybrook" sign, and the station road gate (`toStationV`, top middle) up to the lane. The tree that stood there was removed.
+
+### Round 97: the cottage lane and Honeybrook station (farmstay step 3)
+- **The screen:** `hlane` (OUTDOOR), east of Wildflower Farm through `hfEast` and back through `toFarmL`. The station road goes down to the town square: `toTownL` here, `toStationV` there. Art is in `src/art/hlane.js`:
+  - Along the top: the track, the platform between it and the brook (shelter, "Honeybrook" sign, `timetable` board), a footbridge down to the lane, and the fence at y=122.
+  - Four cottages:
+    - `honeysuckle`: Mateo and Lila's, a room.
+    - `clover`: Noor's, a room, with a pen of rescues beside it.
+    - `bluebell` and `figtree`: holiday lets, spots that say who's staying this week.
+  - The windmill (`windmill()`, sails rotating on a 28s loop), goats and sheep on the slope, a hen house, a hive in Honeysuckle's garden, and a `vanspot` (Campervan spot) waiting for step 4.
+  - Trees thicken to the east.
+- **The railway:** `src/art/railway.js` has `track`, `brook`, `trainArt` and `trainLayer`. The bay, farm and lane all draw the track and brook along the top; the bay's line crosses a trestle over the sea at its top-left, and the brook runs out to sea there.
+- **Trains:** `src/game/rail.js`.
+  - `TRAINS`: 7:40 milk train west, 9:15 east, 1:20 west, 5:05 east, and 10:30 west on Tuesdays and Thursdays only.
+  - `trainHere(scene)`: the lane sees each train arrive (t-1), wait (t, t+1) and depart (t+2). Eastbound trains pass the farm at t-2 and the bay at t-3; westbound ones pass the farm at t+3 and the bay at t+4.
+  - The train is SMIL-animated across its minute with a negative `begin`, so redraws carry on from where it is. core.js redraws when `trainKey` changes, and says a line as one arrives or passes.
+  - `timetablePanel` is the only place train times appear (`railOpen`). The ticket window says it opens when there's somewhere to go.
+- **People:**
+  - tours.js `trainSlot`: today's tourists on tours walk down the lane off the 9:15. On Tuesdays and Thursdays the night-market crowd comes in on the 5:05 and waits on the platform for the 10:30.
+  - `letSlot` / `letGuests`: two tourists per holiday let for the week (keyed by Monday), on the porches 7:30–9 and 6–9:30pm.
+  - Mateo (mornings and evenings) and Lila (evenings, and weekday mornings) are at Honeysuckle. Noor has a routine now (not a tourist): her garden at Clover in the mornings, the porch 4–7:30.
+- **Interiors:** shells for Honeysuckle (bunting, rag rug) and Clover (sage walls, paw prints, pet bowls). New furniture kind `petbeds`.
+- **Tests:** a "Honeybrook station" block with 14 checks.

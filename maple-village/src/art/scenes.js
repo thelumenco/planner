@@ -10,6 +10,7 @@ import { jarArt } from "../game/jars.js";
 import { upgradesArt, festivalArt, festivalOn, pondLanterns, streetLamp, lampDefs } from "./village-extras.js";
 import { trophySVG } from "../game/trophies.js";
 import { bankBuilding } from "./buildings.js";
+import { archGate } from "./orchard.js";
 import { vineGate } from "./vineyard.js";
 export { vineyardArt } from "./vineyard.js";
 export { orchardArt, flowerFarmArt } from "./orchard.js";
@@ -59,7 +60,7 @@ export function villageArt(){
     <g filter="url(#wob)"><path d="M250 300 C226 250 ${D.hall.door[0]} 236 ${D.hall.door[0]} ${D.hall.door[1]} M276 298 C300 250 ${D.bank.door[0]} 232 ${D.bank.door[0]} ${D.bank.door[1]} M220 320 C180 330 120 350 ${D.fresh.door[0]} ${D.fresh.door[1]} M260 322 C200 380 120 430 ${D.news.door[0]} ${D.news.door[1]} M260 322 C320 380 410 420 ${D.post.door[0]} ${D.post.door[1]} M290 316 C350 290 400 250 ${D.toLane.door[0]} ${D.toLane.door[1]} M260 322 L260 ${D.toBase.door[1]} M260 540 C290 560 310 570 ${D.bench.door[0]} ${D.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
     ${flowers([[30,262,"#EFA3A6"],[44,270,"#F3C969"],[60,214,"#C3CDEE"],[300,214,"#EFA3A6"],[488,270,"#F3C969"],[300,448,"#EFA3A6"],[214,450,"#C3CDEE"],[470,540,"#C3CDEE"],[20,430,"#F3C969"],[505,380,"#EFA3A6"]])}
-    ${tree(26,96,1.05)}${tree(262,84,.85)}${tree(494,96,1.05)}${tree(24,350,.9)}${tree(498,330,.9)}${tree(504,520,.85)}${tree(190,470,.8)}${tree(330,470,.8)}
+    ${tree(26,96,1.05)}${tree(494,96,1.05)}${tree(24,350,.9)}${tree(498,330,.9)}${tree(504,520,.85)}${tree(190,470,.8)}${tree(330,470,.8)}
     ${flowers([[170,540,"#F3C969"],[184,548,"#EFA3A6"],[206,520,"#C3CDEE"],[300,520,"#F3C969"],[400,560,"#EFA3A6"],[150,580,"#C3CDEE"]])}`;
   const places =
     `<g transform="translate(-90 0)">${townHall()}</g>` + bankBuilding() + `<g transform="translate(-350 96)">${library()}</g>` + postOffice() +
@@ -94,7 +95,11 @@ export function villageArt(){
   const light = (app, x, y) => { const h = G.health ? G.health(app) : null; if (!h) return "";
     return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`; };
   const lamps = [[384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
-  return lampDefs + ground + lamps + places + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
+  // the station road up to Honeybrook station, and the town's welcome sign
+  const station = archGate("toStationV", 281, 70, "Station road", 281, 118, "var(--peri)", "Up the station road to Honeybrook station")
+    + sk(`<rect x="228" y="232" width="66" height="22" rx="3" style="fill:#FFF6E8"/><path d="M236 254 v14 M286 254 v14" stroke-width="3"/>`, `<rect x="228" y="232" width="66" height="22" rx="3"/>`)
+    + `<g pointer-events="none" font-family="Klee One,serif" text-anchor="middle"><text x="261" y="241" font-size="5.8" fill="#8A6A52">Welcome to</text><text x="261" y="250.5" font-size="8.6" font-weight="700" fill="#5E8A5A">Honeybrook</text></g>`;
+  return lampDefs + ground + lamps + places + station + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day()));
 }
 /* ---------- the river between the two screens ---------- */
 const waterBand = (y1, y2) => `<path d="M0 ${y1+4} Q65 ${y1-4} 130 ${y1+3} T260 ${y1+2} T390 ${y1+4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2+5} 390 ${y2-2} T260 ${y2} T130 ${y2-3} T0 ${y2+2}`}z" style="fill:var(--water)"/>`;
@@ -441,6 +446,11 @@ export function furn(kind, x, y){
         `${[[-24, 0, 26], [8, 0, 24], [-8, -26, 20]].map(([dx, dy, w]) => `<path d="M${x+dx-w/2} ${y+dy} q-3 -26 ${w/2} -30 q${w/2} 4 ${w/2} 30z"/>`).join("")}<path d="M${x-30} ${y-14} h12 M${x+2} ${y-12} h12" opacity=".5"/>`);
     case "roaster": return sk(`<rect x="${x-34}" y="${y-30}" width="68" height="30" rx="3" style="fill:#5E5A55"/><circle cx="${x}" cy="${y-52}" r="24" style="fill:#B9B0A4"/><circle cx="${x}" cy="${y-52}" r="14" style="fill:#6B4430"/><rect x="${x+20}" y="${y-90}" width="10" height="30" style="fill:#8A8279"/>`,
         `<rect x="${x-34}" y="${y-30}" width="68" height="30" rx="3"/><circle cx="${x}" cy="${y-52}" r="24"/><circle cx="${x}" cy="${y-52}" r="14"/><path d="M${x-8} ${y-52} h16" opacity=".6"/><rect x="${x+20}" y="${y-90}" width="10" height="30"/>`);
+    // Noor's pet beds at Clover: three cushions, a curled-up cat and a bunny
+    case "petbeds": return sk(`<ellipse cx="${x-36}" cy="${y-8}" rx="24" ry="10" style="fill:#F2A0B8"/><ellipse cx="${x}" cy="${y-6}" rx="24" ry="10" style="fill:#9FD3C2"/><ellipse cx="${x+36}" cy="${y-8}" rx="24" ry="10" style="fill:#F3C969"/>
+      <ellipse cx="${x-36}" cy="${y-14}" rx="12" ry="7" style="fill:#F2A65A"/><circle cx="${x-28}" cy="${y-18}" r="5" style="fill:#F2A65A"/><path d="M${x-31} ${y-22} l1 -4 l2 3z M${x-26} ${y-23} l2 -3 l0 4z" style="fill:#F2A65A"/>
+      <ellipse cx="${x+36}" cy="${y-14}" rx="9" ry="7" style="fill:#FFFDF6"/><ellipse cx="${x+40}" cy="${y-24}" rx="2" ry="6" style="fill:#FFFDF6"/><ellipse cx="${x+44}" cy="${y-23}" rx="2" ry="6" style="fill:#FFFDF6"/>`,
+      `<ellipse cx="${x-36}" cy="${y-8}" rx="24" ry="10"/><ellipse cx="${x}" cy="${y-6}" rx="24" ry="10"/><ellipse cx="${x+36}" cy="${y-8}" rx="24" ry="10"/><ellipse cx="${x-36}" cy="${y-14}" rx="12" ry="7"/><path d="M${x-44} ${y-14} q4 3 8 0" opacity=".6"/>`);
     // Wildflower Farm's barn (hfarm.js)
     case "stalls": return sk(`${[0, 1, 2].map(i => `<rect x="${x-60 + i*40}" y="${y-40}" width="36" height="40" style="fill:#C9A27E"/><path d="M${x-60 + i*40} ${y-40} h36" style="stroke:#8A6A52" stroke-width="3"/>`).join("")}<ellipse cx="${x}" cy="${y-2}" rx="62" ry="5" style="fill:#E8C877"/>`,
       `${[0, 1, 2].map(i => `<rect x="${x-60 + i*40}" y="${y-40}" width="36" height="40"/><path d="M${x-60 + i*40} ${y-26} h36"/>`).join("")}`);

@@ -6,6 +6,7 @@ import { ink } from "../util.js";
 import { sk, tapeLabel, tree, flowers, house, artCtx } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
 import { archGate } from "./orchard.js";
+import { track, brook, trainLayer } from "./railway.js";
 import { hfState, COWS, GOATS, hiveFill, HIVE_SPOTS } from "../game/hfarm.js";
 
 const W = ink;
@@ -41,7 +42,7 @@ export function hfarmArt(){
   const st = hfState(artCtx().F());
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="60" rx="300" ry="70" style="fill:var(--grass2)"/><ellipse cx="130" cy="520" rx="120" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="600" rx="110" ry="40" style="fill:var(--grass2)"/></g>
-    ${tree(30, 64, .7)}${tree(486, 70, .75)}
+    ${track(0, 520)}${brook(0, 520)}${trainLayer("hfarm")}
     <g filter="url(#wob)"><path d="M0 282 H500 M30 282 V560 M490 282 V560 M100 560 H520 M260 560 V262 M260 270 C200 270 120 262 105 246 M260 270 C330 270 380 262 400 246 M130 560 V580" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
     ${rail(0, 520, 122)}
     ${flowers([[60, 290, "#EFA3A6"], [470, 290, "#F3C969"], [200, 520, "#C3CDEE"], [330, 610, "#EFA3A6"], [40, 610, "#F3C969"]])}`;
@@ -78,6 +79,6 @@ export function hfarmArt(){
     + `<text x="360" y="588" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="7.4" fill="#8E2C2C" pointer-events="none">Wildflower Farm</text>`;
   return lampDefs + ground + farmhouse + hives + barn + cows + goats + stand + sign
     + archGate("toBayF", 22, 280, "The bay", 50, 322, "var(--sky)", "Gate west to the bay")
-    + archGate("hfEast", 498, 560, "Cottages", 476, 516, "var(--butter)", "The lane east to the cottages")
+    + archGate("hfEast", 498, 560, "Cottage lane", 470, 516, "var(--butter)", "The lane east to the cottages")
     + streetLamp(300, 540);
 }

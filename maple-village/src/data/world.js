@@ -4,7 +4,7 @@ import { hash, now, H } from "../util.js";
 // Outdoor screens. "base" is home (house, garden, pond, shed, swing); "village" is the town square with the work
 // buildings. A river joins them: walk onto the bridge to cross. A third screen (say, for Luna) would be one more
 // OUTDOOR entry, a pair of bridge places and a BRIDGES/ARRIVE line.
-export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore", "bay", "hfarm"];
+export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore", "bay", "hfarm", "hlane"];
 export const VILLAGE = {
   // town square
   hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[170,180], mark:[132,64]},
@@ -98,7 +98,19 @@ export const VILLAGE = {
   toFarmB:{scene:"bay", name:"Gate to Wildflower Farm", door:[500,378], spot:true, bridge:"hfarm", mark:[490,320], line:"East through the gate to Wildflower Farm."},
   // Wildflower Farm (Felix and Elena's), east of the bay (art/hfarm.js, game/hfarm.js)
   toBayF: {scene:"hfarm", name:"Gate to the bay", door:[22,286], spot:true, bridge:"bay", mark:[30,226], line:"West through the gate to the bay."},
-  hfEast: {scene:"hfarm", name:"The lane to the cottages", door:[498,560], spot:true, mark:[490,506], line:"The lane east to Honeybrook's cottages and the station. Still being built: soon!"},
+  hfEast: {scene:"hfarm", name:"Gate to the cottage lane", door:[498,560], spot:true, bridge:"hlane", mark:[490,506], line:"East through the gate to the cottages and Honeybrook station."},
+  // the cottage lane and Honeybrook station, east of the farm, above the town square (art/hlane.js, game/rail.js)
+  toFarmL:{scene:"hlane", name:"Gate to Wildflower Farm", door:[22,560], spot:true, bridge:"hfarm", mark:[30,506], line:"West through the gate to Wildflower Farm."},
+  toTownL:{scene:"hlane", name:"Station road", door:[280,622], spot:true, bridge:"village", mark:[320,560], line:"Down the station road to the town square."},
+  station:{scene:"hlane", name:"Honeybrook station", door:[330,170], spot:true, mark:[330,40], line:"Honeybrook station: a platform, a shelter, a bench, and the brook burbling underneath."},
+  timetable:{scene:"hlane", name:"Timetable board", door:[400,170], spot:true, mark:[420,40], line:"The timetable board."},
+  honeysuckle:{scene:"hlane", name:"Honeysuckle", short:"Honeysuckle cottage", door:[110,264], mark:[110,150]},
+  clover: {scene:"hlane", name:"Clover", short:"Clover cottage", door:[110,434], mark:[110,320]},
+  bluebell:{scene:"hlane", name:"Bluebell", door:[338,262], spot:true, mark:[338,150], line:"Bluebell: a holiday cottage with blue shutters. Guests come and go on the train."},
+  figtree:{scene:"hlane", name:"Fig Tree", door:[338,436], spot:true, mark:[338,320], line:"Fig Tree: a holiday cottage with a fig tree by the door. Guests come and go on the train."},
+  windmill:{scene:"hlane", name:"The windmill", door:[440,356], spot:true, mark:[458,180], line:"The windmill, turning slowly on the slope. It's been here longer than anyone can remember."},
+  vanspot:{scene:"hlane", name:"Campervan spot", door:[440,600], spot:true, mark:[440,500], line:"A gravel spot just big enough for a campervan. One day..."},
+  toStationV:{scene:"village", name:"Station road", door:[281,156], spot:true, bridge:"hlane", mark:[300,90], line:"Up the station road to Honeybrook station and the cottages."},
   farmhouse:{scene:"hfarm", name:"The farmhouse", door:[105,246], spot:true, mark:[105,100], line:"Felix and Elena's farmhouse. The kettle's always on."},
   barn:   {scene:"hfarm", name:"The barn", short:"the barn", door:[400,250], mark:[400,90]},
   hives:  {scene:"hfarm", name:"The beehives", door:[250,256], spot:true, mark:[250,150], line:"Felix's beehives, in the lavender."},
@@ -121,9 +133,9 @@ const WORK_HINT = /chord|chico|luna|ohayo|ambidextrous|fresh pages|client|muse|p
 export const isWeekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
 const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
-export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl"}, shore:{field:"toFieldS", flowers:"toFlowersS", bay:"toBay"}, bay:{shore:"toShoreB", hfarm:"toFarmB"}, hfarm:{bay:"toBayF"}};
+export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField", hlane:"toStationV"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl"}, shore:{field:"toFieldS", flowers:"toFlowersS", bay:"toBay"}, bay:{shore:"toShoreB", hfarm:"toFarmB"}, hfarm:{bay:"toBayF", hlane:"hfEast"}, hlane:{hfarm:"toFarmL", village:"toTownL"}};
 // where Mel steps off, by "from>to"
-export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184], "field>shore":[470,304], "shore>field":[56,300], "flowers>shore":[250,590], "shore>flowers":[56,190], "shore>bay":[250,590], "bay>shore":[250,96], "bay>hfarm":[60,284], "hfarm>bay":[462,374]};
+export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184], "field>shore":[470,304], "shore>field":[56,300], "flowers>shore":[250,590], "shore>flowers":[56,190], "shore>bay":[250,590], "bay>shore":[250,96], "bay>hfarm":[60,284], "hfarm>bay":[462,374], "hfarm>hlane":[60,560], "hlane>hfarm":[462,560], "hlane>village":[281,170], "village>hlane":[280,590]};
 // the next outdoor screen on the way from one to another (screens form a little chain: base - village - lane)
 export function nextHop(from, to){
   if (from === to) return null; if (BRIDGES[from] && BRIDGES[from][to]) return to;
@@ -321,6 +333,18 @@ export const ROOMS = {
     ["gdipbar","Dip bar","B","gdipbar",null,"Dip it, top it.",34]]},
   // The Cocoa Room (a big goal, in the bay's old shopfront): the counter (Amara serves behind it; the front is drawn
   // over the people), the bar wall, a table, and the kitchen door; behind it the chocolate kitchen, bean to bar
+  // the two lived-in cottages on the lane: Honeysuckle (Mateo and Lila) and Clover (Noor and her rescues)
+  honeysuckle: {name:"Honeysuckle", wall:"#FFF3E6", trim:"#B5443A", noBoard:true, pos:{D:[110,262], S:[300,262], K:[440,262], R:[120,470], X:[360,470]}, stations:[
+    ["mdesk","Mateo's desk","D","studydesk",null,"Mateo's desk: food science textbooks, a cocoa-stained notebook, and a lot of highlighters.",30],
+    ["msofa","Sofa","S","sofa",null,"A squashy sofa with Lila's knitting on one end.",34],
+    ["mkitchen","Kitchenette","K","kitchenette",null,"The kitchenette. Mateo's sourdough starter lives here. It has a name: Gerald.",30],
+    ["mrecord","Record player","R","record",null,"Lila's records. Mostly jazz, one embarrassing pop album.",30],
+    ["mtable","Table","X","teatable",null,"A little table for two, and a jam jar of wildflowers.",34]]},
+  clover: {name:"Clover", wall:"#EEF5EC", trim:"#5E8A5A", noBoard:true, pos:{S:[120,262], K:[420,262], B:[270,262], P:[260,470]}, stations:[
+    ["nsofa","Sofa","S","sofa",null,"Noor's sofa, covered in a blanket and, usually, a cat.",34],
+    ["nkitchen","Kitchenette","K","kitchenette",null,"Noor's kitchenette: a shelf of pet food tins, and one of biscuits for her.",30],
+    ["nbooks","Bookcase","B","bookcase",null,"Books on animal care, and a photo of every pet she's ever rehomed.",30],
+    ["npets","Pet beds","P","petbeds",null,"A heap of cushions where the rescues curl up. Someone's asleep in the middle.",34]]},
   // Wildflower Farm's barn: milking stalls and the hay loft, the honey extractor, the yoghurt crocks, the cheese press
   // and the cheese cave (game/hfarm.js)
   barn: {name:"The barn", wall:"#C98A6A", trim:"#8E2C2C", noBoard:true, pos:{S:[110,262], H:[262,262], X:[420,262], Y:[100,470], P:[262,450], C:[424,480]}, stations:[

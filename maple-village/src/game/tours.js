@@ -322,6 +322,29 @@ export function workshopSlot(id, day, hm){
   if (hm < WS_FROM || hm >= WS_TO) return null; const i = workshopGroup(day).indexOf(id); if (i < 0) return null;
   return {from: WS_FROM, to: WS_TO, scene: "cocoa", at: WS_SEATS[i], act: "sit", dir: i % 2 ? -1 : 1, workshop: true};
 }
+// Honeybrook station (game/rail.js): today's tour-goers step off the 9:15 and wander down the lane to the station
+// road; on night market days the crowd comes in on the 5:05 and waits for the 10:30 home. And the holiday lets on the
+// lane (Bluebell and Fig Tree) each have two guests for the week, out on the porch in the mornings and evenings.
+const LANE_WALK = [[330, 176], [236, 300], [232, 440], [236, 540], [280, 600]], PLATFORM_WAIT = [[300, 178], [350, 180], [380, 184], [270, 186], [400, 182]];
+const nightDay = day => [2, 4].includes(dow(day));
+export function trainSlot(id, day, hm){
+  if (hm >= 9*60 + 15 && hm < 9*60 + 27 && toursOn(day).flatMap(t => t.group).filter(g => TOURISTS.includes(g)).includes(id)) return {from: 9*60 + 15, to: 9*60 + 27, scene: "hlane", wander: LANE_WALK};
+  if (nightDay(day) && NIGHT_TOURISTS.includes(id)) {
+    if (hm >= 17*60 + 5 && hm < 17*60 + 25) return {from: 17*60 + 5, to: 17*60 + 25, scene: "hlane", wander: LANE_WALK};
+    const i = NIGHT_TOURISTS.indexOf(id); if (hm >= 22*60 + 8 && hm < 22*60 + 31 && i < PLATFORM_WAIT.length) return {from: 22*60 + 8, to: 22*60 + 31, scene: "hlane", at: PLATFORM_WAIT[i]};
+  }
+  return null;
+}
+const weekOf = day => { const t = Date.parse(day + "T00:00:00Z"); return new Date(t - ((dow(day) + 6) % 7)*864e5).toISOString().slice(0, 10); };
+export const letGuests = day => { const g = groupFor(weekOf(day) + ":lets", 4, [], TOURISTS); return [g.slice(0, 2), g.slice(2, 4)]; };
+const LET_SEATS = [[[300, 292], [376, 292]], [[300, 466], [376, 466]]];
+export function letSlot(id, day, hm){
+  const lets = letGuests(day), c = lets.findIndex(g => g.includes(id)); if (c < 0) return null;
+  const k = lets[c].indexOf(id), at = LET_SEATS[c][k];
+  if (hm >= 7*60 + 30 && hm < 9*60) return {from: 7*60 + 30, to: 9*60, scene: "hlane", at, act: "sit", dir: k ? -1 : 1};
+  if (hm >= 18*60 && hm < 21*60 + 30) return {from: 18*60, to: 21*60 + 30, scene: "hlane", at, act: "sit", dir: k ? -1 : 1};
+  return null;
+}
 export function clubSlot(id, day, hm){
   if (!wineClubNow(day, hm) || !clubMembers(day).includes(id)) return null;
   return {from: CLUB_FROM, to: CLUB_TO, scene: "cellar", wander: CLUB_WALK, club: true};

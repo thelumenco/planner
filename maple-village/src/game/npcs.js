@@ -3,7 +3,7 @@
 import { NPCS, AGENTS } from "../data/npcs.js";
 import { personArt, letterArt } from "../art/people.js";
 import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
-import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dinnerSlot, dateSlot, clubSlot, scoopSlot, workshopSlot } from "./tours.js";
+import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dinnerSlot, dateSlot, clubSlot, scoopSlot, workshopSlot, trainSlot, letSlot } from "./tours.js";
 import { SEA } from "../data/npcs.js";
 import { findPath, blocked } from "./paths.js";
 
@@ -32,8 +32,8 @@ const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw 
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 const routineNow = def => routineAt(def, dayKey(), sgHM());
 export function slotAt(def, day, t, live){
-  return (live && supSlot(def)) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || workshopSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
-    || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || shoreSlot(def.id, day, t) || iceOk(scoopSlot(def.id, day, t), def, day, t) || routineAt(def, day, t);
+  return (live && supSlot(def)) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
+    || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || shoreSlot(def.id, day, t) || iceOk(scoopSlot(def.id, day, t), def, day, t) || letSlot(def.id, day, t) || routineAt(def, day, t);
 }
 // a night-market shopper slot gives way to the wine shop: anyone due at a tasting or in the shop then goes there instead
 const nightOk = (s, def, day, t) => !s || !s.night ? s : tastingSlot(def.id, day, t) || (routineAt(def, day, t) || {}).scene === "wineshop" ? null : s;

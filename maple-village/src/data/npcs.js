@@ -296,7 +296,8 @@ export const NPCS = [
   // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep), a student working part-time: Wed and Fri 2-6, Sat 10-5
   {id: "mateo", pitch: .95, name: "Mateo", job: "Kitchen hand at the Cocoa Room",
     look: {skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#F6F2EA", bottom: "#4A2E22", extra: "apron"},
-    routine: [slot("14:00", "18:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [3, 5], needs: "cocoa"}),
+    routine: [slot("08:00", "09:30", "hlane", [[200, 320], [236, 450], [330, 180]]), slot("19:00", "22:00", "hlane", [186, 298], {act: "sit"}),   // home: Honeysuckle, with Lila
+      slot("14:00", "18:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [3, 5], needs: "cocoa"}),
       slot("10:00", "17:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [6], needs: "cocoa"})],
     intro: "Hola! I'm Mateo. I study food science at the poly, and on Wednesdays, Fridays and Saturdays I keep the bars coming here. The bonbons are all yours, boss.",
     lines: ["Your bonbon shelf is full. I didn't touch a crumb!", "Exams next week. Tempering is very calming.", "My lecturer says I'm the only one who's ground beans by hand.", "The grinder's singing today.", "Forty dark bars on the wall. A personal best.", "I bought beans this morning. Don't worry, I kept to your budget."],
@@ -304,12 +305,14 @@ export const NPCS = [
   // Lila, the Cocoa Room's second assistant (cocoa.js upgrade "assistant"): Mondays (Amara's day off) and weekend afternoons
   {id: "lila", pitch: 1.2, name: "Lila", job: "Serves at the Cocoa Room",
     look: {skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#C2505F", bottom: "#F3E7C9", extra: "apron"},
-    routine: [slot("10:45", "20:15", "cocoa", [240, 268], {dow: [1], needs: "cc_assistant"}), slot("13:00", "20:15", "cocoa", [[180, 420], [400, 440], [240, 268]], {dow: [0, 6], needs: "cc_assistant"})],
+    routine: [slot("20:30", "22:30", "hlane", [206, 306], {act: "sit"}), slot("09:00", "10:30", "hlane", [[150, 300], [236, 400], [120, 500]], {dow: [2, 3, 4, 5]}),   // home: Honeysuckle
+      slot("10:45", "20:15", "cocoa", [240, 268], {dow: [1], needs: "cc_assistant"}), slot("13:00", "20:15", "cocoa", [[180, 420], [400, 440], [240, 268]], {dow: [0, 6], needs: "cc_assistant"})],
     intro: "Hi! I'm Lila. Mondays are mine, and I help Amara at weekends. I'm working my way through every bonbon. For research.",
     lines: ["Mondays are quiet, but the regulars are lovely.", "I wrapped forty boxes on Saturday. My fingers are ribbon now.", "Someone asked if we deliver to the moon.", "The fountain is hypnotic. I keep staring at it."],
     hellos: ["Hi Mel!", "Morning, boss!"], away: "Lila's not on today."},
   // Noor runs the pet adoption corner at the Sunday farmers market and the field fair (tours.js); no routine otherwise
-  {id: "noor", pitch: 1.1, name: "Noor", job: "Finds homes for rescued pets", tourist: true, routine: [],
+  // Noor lives at Clover on the cottage lane, with a pen of rescues in the garden
+  {id: "noor", pitch: 1.1, name: "Noor", job: "Finds homes for rescued pets", routine: [slot("08:00", "12:00", "hlane", [[198, 456], [150, 470], [236, 470]], {dow: [1, 2, 3, 4, 5, 6]}), slot("16:00", "19:30", "hlane", [176, 456], {act: "sit"})],
     look: {skin: "#C99A78", hair: "#2A211D", hairStyle: "long", top: "#9FD3C2", bottom: "#4A5568", extra: "apron"},
     intro: "Hi, I'm Noor! I find homes for little ones who need them. Kittens, puppies, bunnies... everyone deserves a cuddle.",
     lines: ["This one loves a chin scratch.", "Every pet that goes home, I cry a little. Happy tears.", "Ask me anything about looking after them!", "The duckling follows everyone. It thinks we're all its mum."],

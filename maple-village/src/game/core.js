@@ -44,6 +44,8 @@ import { fieldArt, stallFront } from "../art/field.js";
 import { shoreArt } from "../art/shore.js";
 import { bayArt, DECK_SEATS } from "../art/bay.js";
 import { hfarmArt } from "../art/hfarm.js";
+import { hlaneArt } from "../art/hlane.js";
+import { timetablePanel, trainKey, trainHere, fmt as railTime } from "./rail.js";
 import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush, milkOne, milkHerd, collectHives, buyStand, giveName, fullHives,
   extractorPanel, crockPanel, pressPanel as hfPressPanel, cavePanel as hfCavePanel, spinFrames, makeYoghurt, pressCheese, takeWheel, cheeseNames, CHEESES as HF_CHEESES } from "./hfarm.js";
 import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
@@ -56,7 +58,7 @@ import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpe
 import { diningTable, darrenAsleep, skyWash } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
-import { tourNow, eventNow, eventOn, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned, workshopGroup } from "./tours.js";
+import { tourNow, eventNow, eventOn, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned, workshopGroup, letGuests } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
@@ -258,6 +260,7 @@ const SHED = {
 // keepsakes and pets (companions.js): the keepsake being placed, a placed one's shelf, the pet being adopted (and for
 // whom), and the pet whose card is open
 // the Cocoa Room's open card: "counter", "wall", or a kitchen station ("sacks", "roaster", "grinder", "slab", "moulds")
+let railOpen = false, lastTrain = "";   // the timetable board on Honeybrook's platform
 let hfView = null, hfSt = {kind: "cheddar", name: "", sug: 0};   // Wildflower Farm: "cows" / "goats" / "hives" / "stand"; in the barn "extractor" / "crock" / "press" / "cave"
 let ccView = null, lastCocoa = 0, ccSt = {shell: "dark", sel: []};   // ccSt: the bonbon table's picks
 const COCOA_IN = ["cocoa", "cocoakitchen"];
@@ -528,7 +531,9 @@ setInterval(() => {
   if (scene === "farm" && Math.random() < .2) { drawScene(); if (selPlot != null) ctx(); }
   if (Date.now() - lastScoop > 20000) scoopNow();
   if (Date.now() - lastCocoa > 20000) cocoaNow();
-  if (outside() && skyKey() !== lastSky) { lastSky = skyKey(); drawScene(); }   // the sunset deepens: redraw every 5 minutes through the evening
+  if (outside() && skyKey() !== lastSky) { lastSky = skyKey(); drawScene(); }
+  { const tk = outside() ? trainKey(scene) : ""; if (tk !== lastTrain) { lastTrain = tk; drawScene();   // a train coming through: draw it (it runs on from where it is)
+      const t = tk && trainHere(scene); if (t && scene === "hlane" && t.mode === "arrive") speak(`Here comes the ${railTime(t.t)}: ${t.n.toLowerCase()} ${t.to}.`, 4000); else if (t && t.mode === "pass") speak(t.dir === "e" ? "Toot toot! A train rattles past, on its way to Honeybrook station." : "A train chuffs by along the top, off to the city.", 3500); } }   // the sunset deepens: redraw every 5 minutes through the evening
   // the field when a market, fair or night market starts or packs up (and the night market's light drops at 7): redraw, and the jazz starts or stops
   if (scene === "field") { const ev = eventNow(dayKey(), sgHM()), k = ev ? ev.kind + (sgHM() >= 19*60) : ""; if (k !== lastFieldEv) { lastFieldEv = k; drawScene(); } setLive(ev && ev.kind === "night" ? "jazz" : null); }
   else setLive(null);
@@ -1440,7 +1445,7 @@ function showPanel(hasCtx, skin){
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
   if (kid.open) { kid.open = null; stopKidGame(); ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; railOpen = false; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1493,6 +1498,7 @@ function ctx(){
     : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, {swap: scSt.swap});
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
   else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "cocoa" ? ccCounterPanel(F, {cart: true, server: isHere("mateo")}) : marketStallPanel(st); }
+  else if (railOpen && scene === "hlane") h = timetablePanel();
   else if (hfView && scene === "barn") h = hfView === "extractor" ? extractorPanel(F) : hfView === "crock" ? crockPanel(F) : hfView === "press" ? hfPressPanel(F, hfSt) : hfCavePanel(F);
   else if (hfView && scene === "hfarm") h = hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
   else if (orView === "pot" && potItem) h = potPanel(F, potItem);
@@ -1650,7 +1656,7 @@ function ctx(){
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
   c.querySelectorAll("[data-fair]").forEach(b => b.onclick = () => fairActivity(b.dataset.fair));
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ccView = null; hfView = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ccView = null; hfView = null; railOpen = false; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
@@ -1783,11 +1789,11 @@ function drawScene(){
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
-  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "farm" ? farmArt() : roomArt(scene);
+  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "farm" ? farmArt() : roomArt(scene);
   $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene));   // shelves with keepsakes, and pets at home here
   if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));   // the same evening light everywhere outdoors
   if (outside() && isDusk()) nightLights();
-  const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), orchard:"Ma Ma's orchard", flowers:"Ma Ma's flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", scoopshop: scoopState(F).name};
+  const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), orchard:"Ma Ma's orchard", flowers:"Ma Ma's flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", scoopshop: scoopState(F).name};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
   $("maphint").textContent = scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Mum's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
 }
@@ -1926,7 +1932,7 @@ let route = [], keys = new Set();
 const svg = $("world");
 // Evan's bedtime: 8pm to 7am he's asleep in his car bed, so he isn't out at home base or in the house
 const evanNight = () => { const m = sgHM(); return m >= 20*60 || m < 7*60; };
-const evanHere = () => scene === "kidroom" || ((scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "hfarm" || scene === "barn" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "scoopdip" || scene === "cocoa" || scene === "cocoakitchen" || scene === "mumdad" || scene === "marcus") && !evanNight()) || evanAtDinner();
+const evanHere = () => scene === "kidroom" || ((scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "hfarm" || scene === "barn" || scene === "hlane" || scene === "honeysuckle" || scene === "clover" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "scoopdip" || scene === "cocoa" || scene === "cocoakitchen" || scene === "mumdad" || scene === "marcus") && !evanNight()) || evanAtDinner();
 // family dinner nights: Evan's at the table wherever dinner is (then home to bed)
 const evanAtDinner = () => { const d = dinnerNow(dayKey(), sgHM()); return !!d && scene === d.host; };
 function outside(){ return OUTDOOR.includes(scene); }
@@ -1937,12 +1943,12 @@ function setScene(id, at){
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
     scView = null; scSt.pick = null; scSt.dpick = null; evanSeat = null;
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
     if (id === "base") { evan.x = evan.tx = 300; evan.y = evan.ty = 360; }
-    else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "hfarm" || id === "barn" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoa" || id === "cocoakitchen" || id === "mumdad" || id === "marcus" || id === "cottage") { evan.x = evan.tx = p[0] + 26; evan.y = evan.ty = p[1] + 10; evan.run = false; evan.wait = 2; }
+    else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "hfarm" || id === "barn" || id === "hlane" || id === "honeysuckle" || id === "clover" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoa" || id === "cocoakitchen" || id === "mumdad" || id === "marcus" || id === "cottage") { evan.x = evan.tx = p[0] + 26; evan.y = evan.ty = p[1] + 10; evan.run = false; evan.wait = 2; }
     else if (id === "home" && from === "kidroom") { evan.x = evan.tx = p[0] - 24; evan.y = evan.ty = p[1] + 6; evan.run = false; evan.wait = 3; }
     else if (id === "home") { evan.x = evan.tx = 300; evan.y = evan.ty = 520; }
     // Evan's room: he runs in ahead, Mel waits just inside the door, Maple stays out in the house
@@ -2098,6 +2104,8 @@ function arriveVillageSpot(id){
   if (id === "plot3" || id === "plot4") { speak(v.line, 4000); render(); return; }
   if (id === "olive") { vyView = "olive"; sfx("paper", true); render(); return; }
   if (id === "toursign") { orView = "tours"; sfx("paper", true); render(); return; }
+  if (id === "timetable" && scene === "hlane") { railOpen = true; sfx("paper", true); render(); return; }
+  if ((id === "bluebell" || id === "figtree") && scene === "hlane") { const g = letGuests(dayKey())[id === "bluebell" ? 0 : 1]; speak(`${VILLAGE[id].line}${g && g.length ? ` Staying this week: ${g.map(x => (NPCS.find(n => n.id === x) || {}).name).join(" and ")}.` : ""}`, 5000); render(); return; }
   if (scene === "hfarm" && (id === "cows" || id === "goats" || id === "hives" || id === "fstand")) { hfView = id === "fstand" ? "stand" : id; hfState(F); sfx("paper", true);
     if (id === "hives" && isHere("felix")) npcSay("felix", fullHives(hfState(F)).length ? "There's honey ready! Here, take the veil." : "Not quite ready. The bees are still busy.");
     else if ((id === "cows" || id === "goats") && isHere("elena")) npcSay("elena", pick(id === "cows" ? ["Daisy first, she insists.", "Mind Mochi's tail. It has opinions."] : ["Keep your shoelaces away from Toffee.", "Pepper! Out of the bucket!"]));
@@ -2484,7 +2492,7 @@ function endPaddle(walkBack){
 }
 // Who's where today: everyone's day at a glance (in the friendship view), family first, then the village
 const PLACE_NAME = {base: "outside at home", home: "your house", farm: "the garden", village: "the town square", lane: "Makers' Lane", vineyard: "the vineyard",
-  orchard: "the orchard", flowers: "the flower farm", field: "the field", shore: "the foreshore", kitchen: "the wine shop kitchen", bay: "the bay", hfarm: "Wildflower Farm", barn: "the barn at Wildflower Farm", scoopshop: "the Scoop Shack", scoopkitchen: "the gelato kitchen", scoopdip: "the dip station", cocoa: "the Cocoa Room", cocoakitchen: "the chocolate kitchen"};
+  orchard: "the orchard", flowers: "the flower farm", field: "the field", shore: "the foreshore", kitchen: "the wine shop kitchen", bay: "the bay", hfarm: "Wildflower Farm", hlane: "the cottage lane", honeysuckle: "Honeysuckle cottage", clover: "Clover cottage", barn: "the barn at Wildflower Farm", scoopshop: "the Scoop Shack", scoopkitchen: "the gelato kitchen", scoopdip: "the dip station", cocoa: "the Cocoa Room", cocoakitchen: "the chocolate kitchen"};
 const ACT_WORD = {water: "watering", farm: "gardening", sit: "sitting down", game: "gaming", sup: "paddleboarding", guide: "leading a tour", lead: "leading the class",
   exercise: "exercise class", cone: "with an ice cream", cook: "cooking", rest: "in the hammock", repair: "fixing things", type: "busy", play: "playing"};
 const placeName = sc => PLACE_NAME[sc] || (ROOMS[sc] && ROOMS[sc].name) || sc;
@@ -2796,7 +2804,7 @@ function nearSpot(){
   const list = [...stationsOf(scene), scene !== "market" ? {id:"board", tx:260, ty:200} : null].filter(Boolean);
   const s = list.find(s => Math.hypot(s.tx - mel.x, s.ty - mel.y) < 26); return s ? s.id : null;
 }
-const EVAN_SPOTS = {barn:[[200,560],[330,600],[160,380]], hfarm:[[260,520],[200,560],[330,580],[260,290],[60,500],[460,520]], bay:[[300,400],[250,560],[300,330],[200,300],[290,500]], scoopshop:[[200,440],[380,440],[300,560],[140,560],[260,420]], scoopkitchen:[[200,560],[380,540],[300,580]], scoopdip:[[180,560],[420,560],[140,420]], cocoa:[[200,440],[380,450],[140,560]], cocoakitchen:[[200,560],[380,560]], mumdad:[[300,560],[200,380],[420,420],[150,560],[460,560]], marcus:[[230,560],[120,500],[460,560],[250,340],[300,600]], cottage:[[200,560],[440,540],[300,340]], shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[150,340],[260,330],[380,330],[200,580],[330,590]]};
+const EVAN_SPOTS = {hlane:[[230,520],[200,560],[300,580],[230,300],[120,500]], honeysuckle:[[200,560],[330,600]], clover:[[200,560],[360,600],[160,380]], barn:[[200,560],[330,600],[160,380]], hfarm:[[260,520],[200,560],[330,580],[260,290],[60,500],[460,520]], bay:[[300,400],[250,560],[300,330],[200,300],[290,500]], scoopshop:[[200,440],[380,440],[300,560],[140,560],[260,420]], scoopkitchen:[[200,560],[380,540],[300,580]], scoopdip:[[180,560],[420,560],[140,420]], cocoa:[[200,440],[380,450],[140,560]], cocoakitchen:[[200,560],[380,560]], mumdad:[[300,560],[200,380],[420,420],[150,560],[460,560]], marcus:[[230,560],[120,500],[460,560],[250,340],[300,600]], cottage:[[200,560],[440,540],[300,340]], shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[150,340],[260,330],[380,330],[200,580],[330,590]]};
 // Evan's destination is evan.tx/ty; outdoors he follows route-finder waypoints to it (round the house, not through it)
 function evanWalk(speed, dt){
   const key = evan.tx + "," + evan.ty;
