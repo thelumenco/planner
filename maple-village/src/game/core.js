@@ -46,7 +46,8 @@ import { bayArt, DECK_SEATS } from "../art/bay.js";
 import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
-  pantryPanel, bonbonPanel, casePanel, stockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon } from "./cocoa.js";
+  pantryPanel, bonbonPanel, casePanel, stockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
+  sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial } from "./cocoa.js";
 import { keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, OWNER_NAME, PETS, petAt } from "./companions.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
 import { diningTable, darrenAsleep, skyWash } from "../art/scenes.js";
@@ -2264,6 +2265,12 @@ function wireCocoa(c){
       if (out.isNew) { [0, 250, 500].forEach((t, k2) => setTimeout(() => mprop("sparkle", mel.x + (k2 - 1)*22, mel.y - 60, 1600), t)); speak(`A new bonbon: ${out.r.name}! Twelve of them, ready for the display case.`, 5000); }
       else flash(`Another tray of ${out.r.name}`); }
     else if (a === "case") { if (!ccToggle(cocoaState(F), k)) return; sfx("tap"); }
+    else if (a === "scoop") { const got = sendScoop(F, k); if (!got) return; sfx("paper", true); gainXp(1);
+      speak(k === "dip" ? `${got} dips of house-made dark, off to the Scoop Shack's dip station. Cones dipped in it sell for more.` : `${got} bars of Cocoa Room chocolate, into the Scoop Shack's gelato fridge. Try it at the mixing bench!`, 5000); }
+    else if (a === "wine") { const got = wineToPantry(F, k); if (!got) return; sfx("tap"); flash(`${got.wine}: 4 fillings on the shelf`); }
+    else if (a === "pair") { const w = packPairing(F, k); if (!w) return; sfx("paper", true); flash(`Pairing box with ${w}, in your backpack`); speak("A bottle and four bonbons, ribboned together. Tap it in your backpack to choose who it's for.", 4500); }
+    else if (a === "special") { const sp = makeSpecial(F); if (!sp) return; sfx("chime"); act("cheer"); gainXp(2); [0, 250].forEach((t, i) => setTimeout(() => mprop("sparkle", mel.x + (i ? 20 : -20), mel.y - 60, 1500), t)); speak(`${sp.make} ${sp.n.toLowerCase()}${sp.make > 1 && !/s$/.test(sp.n) ? "s" : ""} for ${sp.fest}! They'll sell beside the display case.`, 5000); }
+    else if (a === "takesp") { if (!takeSpecial(F, k)) return; sfx("chime"); flash(`${ITEMS[k].n} in your backpack`); }
     else if (a === "eatbb") { const bb = eatBonbon(F, k); if (!bb) return; sfx("chime"); mprop("heart", mel.x, mel.y - 60, 1600); speak(`${bb.name}. Oh, that's good.`, 3500); if (evanHere() && eatBonbon(F, k)) setTimeout(() => evanSays(pick(["chocolate!!", "another one!", "mmm!"])), 900); }
     else if (a === "box") { const id = packBox(F, n); if (!id) return; sfx("paper", true); flash(`${ITEMS[id].n} in your backpack`); speak("Packed with a ribbon and in your backpack. Tap it there to choose who it's for.", 4500); }
     else if (a === "eat" || a === "give") { if (!takeBar(F, k, a === "give")) return; sfx("chime");

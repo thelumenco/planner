@@ -36,6 +36,7 @@ export const INGR = {
   hazelnut: ["Hazelnuts", "Hazelnut", "#B98A5A"], coconut: ["Coconut", "Coconut", "#F6F1E8"], matcha: ["Matcha", "Matcha", "#8FB86A"], pandan: ["Pandan", "Pandan", "#7FB86A"],
   gulamelaka: ["Gula melaka", "Gula Melaka", "#9A5A2E"], sesame: ["Black sesame", "Black Sesame", "#4A4440"], mint: ["Mint", "Mint", "#9FD3B2"], banana: ["Bananas", "Banana", "#F3E07A"],
   grape_red: ["Red grapes", "Red Grape", "#7A2E5A"], grape_white: ["White grapes", "White Grape", "#C9D98A"],
+  housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],   // from Mel's own chocolate shop (cocoa.js sendScoop)
   ...Object.fromEntries(Object.values(TREES).map(t => [t.fruit, [t.fruit[0].toUpperCase() + t.fruit.slice(1), t.fruit[0].toUpperCase() + t.fruit.slice(1), FRUIT_COL[t.fruit] || "#F3C969"]])),
   ...Object.fromEntries(Object.entries(FLOWERS).map(([id, f]) => ["fl_" + id, [f.n, f.n.replace(/s$/, "").replace(/ie$/, "y").replace("Sweet pea", "Sweet Pea"), f.col || "#F4C7CF"]]))
 };
@@ -85,6 +86,7 @@ export const DIPS = {
   milk: {n: "Milk chocolate", w: "milk-chocolate", col: "#8A5A3A", price: 0},
   dark: {n: "Dark chocolate", w: "dark-chocolate", col: "#4A2E22", price: 150},
   white: {n: "White chocolate", w: "white-chocolate", col: "#F6EBD2", price: 180},
+  house: {n: "House-made dark", w: "house-made-dark-chocolate", col: "#3F2519", price: 0, house: true},   // from the Cocoa Room, not bought: s.houseDips
   pink: {n: "Strawberry pink", w: "strawberry", col: "#F2A0B8", price: 200},
   matcha: {n: "Matcha", w: "matcha", col: "#8FB86A", price: 220}
 };
@@ -99,6 +101,8 @@ export const TOPPINGS = {
   pop: {n: "Popping candy", w: "popping candy", col: "#9FD3C2", price: 220}
 };
 export const hasUp = (s, k) => !!(s.up && s.up[k]);
+export const HOUSE_EXTRA = 2;   // a cone dipped in the Cocoa Room's house-made dark costs this much more
+export const dipReady = (s, k) => !!(DIPS[k] && s.dips[k] && (k !== "house" || s.houseDips > 0));
 // -> a line to say, or null if it can't be bought
 export function buyUpgrade(F, k){
   const s = scoopState(F), u = UPGRADES[k]; if (!u || s.up[k] || F.coins < u.price) return null;
@@ -109,7 +113,7 @@ export function buyUpgrade(F, k){
     bike: "A mint delivery bike, parked by the shop. Send an ice cream from your backpack any time the shop's open.",
     dip: "The chocolate dip station's open! Through the new door on the shop's east wall."}[k];
 }
-export function buyDip(F, k){ const s = scoopState(F), d = DIPS[k]; if (!d || s.dips[k] || F.coins < d.price) return false; F.coins -= d.price; s.dips[k] = 1; return true; }
+export function buyDip(F, k){ const s = scoopState(F), d = DIPS[k]; if (!d || d.house || s.dips[k] || F.coins < d.price) return false; F.coins -= d.price; s.dips[k] = 1; return true; }
 export function buyTopping(F, k){ const s = scoopState(F), t = TOPPINGS[k]; if (!t || s.tops[k] || F.coins < t.price) return false; F.coins -= t.price; s.tops[k] = 1; return true; }
 const nDips = s => Object.keys(s.dips).filter(k => DIPS[k]).length, nTops = s => Object.keys(s.tops).filter(k => TOPPINGS[k]).length;
 // the cart at the night market (Tuesday and Thursday, 5:30 to 10pm): scoops cups and cones from the display, busy
@@ -208,7 +212,8 @@ function saleMinute(s, day, hm, opts){
   let coins = priceOf(s, fmt, r), dipped = false; const t = s.sold[day] = s.sold[day] || {n: 0, coins: 0};
   // dipped (and maybe topped): more choice at the dip station, more people go for it
   if (hasUp(s, "dip") && (fmt === "cone" || fmt === "waffle") && Math.random() < Math.min(.6, .25 + .03*(nDips(s) - 1 + nTops(s)))) {
-    dipped = true; coins += s.prices.dip; if (Math.random() < .6) coins += s.prices.top; t.dipped = (t.dipped || 0) + 1; }
+    dipped = true; coins += s.prices.dip; if (Math.random() < .6) coins += s.prices.top; t.dipped = (t.dipped || 0) + 1;
+    if (s.houseDips > 0 && Math.random() < .45) { s.houseDips--; coins += HOUSE_EXTRA; t.house = (t.house || 0) + 1; } }   // the Cocoa Room's house-made dark
   if (hasUp(s, "awning") && Math.random() < .25) { coins++; t.tips = (t.tips || 0) + 1; }   // lingering under the fairy lights
   t.n++; t.coins += coins; return {coins, fmt, r, dipped};
 }
@@ -260,8 +265,8 @@ export function takeAway(F, rid, fmt){
 // a dipped (and maybe topped) cone or waffle from the dip station: to eat now (null fmt) or to give
 export function makeDipped(F, rid, fmt, dip, top, give){
   const s = scoopState(F), r = recipeOf(s, rid);
-  if (!hasUp(s, "dip") || !r || !(s.tubs[rid] > 0) || (fmt !== "cone" && fmt !== "waffle") || !s.dips[dip] || (top && !s.tops[top])) return null;
-  s.tubs[rid]--; if (s.tubs[rid] <= 0) delete s.tubs[rid];
+  if (!hasUp(s, "dip") || !r || !(s.tubs[rid] > 0) || (fmt !== "cone" && fmt !== "waffle") || !dipReady(s, dip) || (top && !s.tops[top])) return null;
+  s.tubs[rid]--; if (dip === "house") s.houseDips--; if (s.tubs[rid] <= 0) delete s.tubs[rid];
   if (!give) return {r, name: dipName(r, fmt, dip, top), col: r.col, dip: DIPS[dip].col};
   const id = dipId(r, fmt, dip, top); if (!s.dipIds.includes(id)) s.dipIds = [...s.dipIds, id].slice(-200);
   registerDip(s, id); F.inv[id] = (F.inv[id] || 0) + 1; return ITEMS[id];
@@ -299,7 +304,7 @@ export function honestyPanel(F){
 export function dipPotsPanel(F){
   const s = scoopState(F);
   return `<span class="tape stripe" aria-hidden="true"></span><h2>The chocolate pots</h2><p class="sub">Warm dips for cones and waffles. Customers pay ${s.prices.dip} ${coin()} extra for a dipped one (set it on the menu); more dips, more takers.</p>
-    <ul class="hlist wlist">${Object.entries(DIPS).map(([k, d]) => `<li><span class="wpic">${dot(d.col)}</span><span class="wtxt"><b>${esc(d.n)}</b><small>${s.dips[k] ? "warming in its pot" : "not yet"}</small></span>${s.dips[k] ? `<span class="hbadge">yours</span>` : buyBtn(F, d.price, `data-gdipbuy="${k}"`)}</li>`).join("")}</ul>` + shut;
+    <ul class="hlist wlist">${Object.entries(DIPS).map(([k, d]) => `<li><span class="wpic">${dot(d.col)}</span><span class="wtxt"><b>${esc(d.n)}</b><small>${d.house ? (s.houseDips > 0 ? `${s.houseDips} dips left, from the Cocoa Room` : "send dark chocolate from the Cocoa Room's moulds") : s.dips[k] ? "warming in its pot" : "not yet"}</small></span>${d.house ? "" : s.dips[k] ? `<span class="hbadge">yours</span>` : buyBtn(F, d.price, `data-gdipbuy="${k}"`)}</li>`).join("")}</ul>` + shut;
 }
 export function toppingsPanel(F){
   const s = scoopState(F);
@@ -312,11 +317,11 @@ export function dipBarPanel(F, st){
   if (!tubs.length) return h + `<p class="muted">No tubs in the display. Make some from the recipe book in the kitchen.</p>` + shut;
   const r = st.pick && s.tubs[st.pick] > 0 ? recipeOf(s, st.pick) : null;
   if (!r) return h + `<ul class="hlist wlist">${tubs.map(x => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops</small></span><button class="btn small primary" data-gdpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut;
-  const dip = s.dips[st.dip] ? st.dip : "milk", top = st.top && s.tops[st.top] ? st.top : null, fmt = st.fmt === "waffle" ? "waffle" : "cone";
+  const dip = dipReady(s, st.dip) ? st.dip : "milk", top = st.top && s.tops[st.top] ? st.top : null, fmt = st.fmt === "waffle" ? "waffle" : "cone";
   const chip = (attr, k, on, label, col) => `<button class="gchip${on ? " on" : ""}" ${attr}="${k}" aria-pressed="${on}">${dot(col)}<span>${esc(label)}</span></button>`;
   h += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p>`;
   h += `<p class="eyebrow" style="margin:10px 0 6px">On a</p><div class="gchips">${["cone", "waffle"].map(f => chip("data-gdfmt", f, f === fmt, FORMATS[f].n, "#E8C48E")).join("")}</div>`;
-  h += `<p class="eyebrow" style="margin:10px 0 6px">Dipped in</p><div class="gchips">${Object.keys(DIPS).filter(k => s.dips[k]).map(k => chip("data-gddip", k, k === dip, DIPS[k].n, DIPS[k].col)).join("")}</div>`;
+  h += `<p class="eyebrow" style="margin:10px 0 6px">Dipped in</p><div class="gchips">${Object.keys(DIPS).filter(k => dipReady(s, k)).map(k => chip("data-gddip", k, k === dip, DIPS[k].n, DIPS[k].col)).join("")}</div>`;
   h += `<p class="eyebrow" style="margin:10px 0 6px">Topped with</p><div class="gchips">${chip("data-gdtop", "none", !top, "Nothing", "#FFFDF6")}${Object.keys(TOPPINGS).filter(k => s.tops[k]).map(k => chip("data-gdtop", k, k === top, TOPPINGS[k].n, TOPPINGS[k].col)).join("")}</div>`;
   h += `<p class="muted">${esc(dipName(r, fmt, dip, top))}</p>`;
   return h + `<div class="actions"><button class="btn primary" data-gdmake="eat">Have it now</button><button class="btn alt" data-gdmake="give">Make one to give</button></div><div class="actions"><button class="btn alt small" data-gdback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;

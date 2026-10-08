@@ -1131,3 +1131,24 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - `c.bought` counts the sacks he's bought.
 - **The away message** says what he did: pots, shelf pieces, bars, sacks bought.
 - **Tests:** the Cocoa Room block pauses Mateo for Mel's hand-made run, then checks two days of his shifts from empty and the plan controls.
+
+### Round 90: Mateo goes part-time; the Cocoa Room, step 3 (village links)
+- **Mateo is a part-time student now:** shifts are Wednesday and Friday 2–6 and Saturday 10–5 (cocoa.js `HAND` by weekday; the npcs.js routine matches). Over two days that's about 5 pots instead of 9.
+- **Scoop Shack:**
+  - At the moulds, 10 loose dark pieces (`sendScoop`) go one of two ways:
+    - 5 "Cocoa Room chocolate" (`housechoc`, a new gelato ingredient in scoop.js INGR, not a bonbon filling) into the gelato fridge.
+    - With the dip station built, 20 house-made dark dips (`s.houseDips`, `DIPS.house`, which can't be bought).
+  - Customers who get a dipped cone pick house-made dark 45% of the time while there are dips, paying `HOUSE_EXTRA` (2) more.
+  - The dip bar offers it while dips are left (`dipReady`).
+- **Wine:**
+  - The fillings shelf can open a bottle off the wine shop shelf into 4 wine fillings (`WINE_FILL` `wine_<style>`; `FL()` looks up INGR or WINE_FILL).
+  - The counter packs a wine pairing box: a bottle plus 4 bonbons from the case (`packPairing`, gift `pairbox`, adults only).
+  - On wine club nights (with the cellar door), `cocoaTick` has members buying bonbons or bars, counted in `sold[day].club`.
+- **Festival specials** (`SPECIALS`, `specialOn(day)` via `festivalOn`):
+  - Christmas yule log: 12 dark make 4, at 18 coins.
+  - Chinese New Year gold coins: 12 milk make 6, at 12 coins.
+  - Deepavali spiced box: 12 dark make 6, at 12 coins.
+  - Mid-Autumn chocolate mooncake: 12 white make 6, at 10 coins.
+  - They're made at the bonbon table during the festival window, sold beside the case while the festival's on (shown in the case panel), and can be taken to give from the counter (gifts `sp_*` in stall-goods.js).
+- **Tests:** the Cocoa Room block covers each link. `smoke.mjs` also gets back its Scoop upgrades `c0` line, which round 89 removed by mistake.
+- **Still to come, step 4:** the upgrades catalogue, then the night market stall.

@@ -1919,6 +1919,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   Object.assign(GOODS, {
     bar_milk: { ...G("Milk chocolate bar", NOM, 6, "cocoa", "Your own chocolate! Smooth and creamy.", ["bar", "#8A5A3A"]), says: { evan: "CHOCOLATE! Mama made it!", mama: "You made this? From the bean? Aiyo, so clever." } },
     bar_dark: { ...G("Dark chocolate bar", "family", 6, "cocoa", "Dark chocolate, made from the bean! Rich.", ["bar", "#4A2E22"]), says: { marcus: "Dark choc, no dairy. Antioxidants, Zeh. Approved.", dad: "Dark chocolate with my coffee. Perfect." } },
+    pairbox: G("Wine and chocolate pairing box", ["darren", "dad", "mum", "angelina", "mama", "gonggong"], 40, "cocoa", "Your wine AND your bonbons? In one box? I'm saving this for a special night.", ["box", "#7A1F3D", "#F3C969"], { darren: "Wine and chocolate. You know me so well.", dad: "Ah Gong will share it with your mum. Maybe." }),
+    sp_log: G("Chocolate yule log", "family", 18, "cocoa", "A chocolate log! It's Christmas now, officially.", null, { evan: "A CHOCOLATE TREE! I mean log! Can I eat the holly?", marcus: "Dark choc log, no dairy. Merry Christmas, Zeh." }),
+    sp_coins: G("Box of gold chocolate coins", NOM, 12, "cocoa", "Gold coins! Huat ah! So much luck in one box.", ["box", "#F3C969", "#D9433A"], { evan: "I'm RICH! Chocolate rich!", mama: "Gold coins for Ma Ma? Huat ah!" }),
+    sp_spiced: G("Spiced chocolate box", "family", 12, "cocoa", "Cardamom and chocolate? Oh, that's lovely. Happy Deepavali!", ["box", "#4A2E22", "#F6A23A"], { marcus: "Dark and spiced, dairy-free. Happy Deepavali, Zeh." }),
+    sp_mooncake: G("Chocolate mooncake", NOM, 10, "cocoa", "A chocolate mooncake! Let's have it under the lanterns.", null, { mama: "Chocolate mooncake? Ma Ma never try before. So modern!" }),
     box4: G("Box of 4 bonbons", NOM, 14, "cocoa", "A little box of your bonbons! Too pretty to eat. Almost.", ["box", "#8A5A3A", "#F3E7C9"]),
     box4d: G("Box of 4 dark bonbons", "family", 14, "cocoa", "Dark chocolate bonbons, all dairy-free!", ["box", "#4A2E22", "#F3C969"], { marcus: "Dairy-free bonbons? You thought of everything, Zeh." }),
     box9: G("Box of 9 bonbons", NOM, 30, "cocoa", "A whole box of bonbons! Every one different.", ["box", "#8A5A3A", "#E8566C"], { mum: "Nine! I'll share them with Dad. Maybe.", mama: "So beautiful, like jewels. Ma Ma keep for special guests." }),
@@ -2382,6 +2387,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       bar: (a) => [`<rect x="5" y="4" width="14" height="17" rx="1.5" ${f(a)}/><path d="M5 11h14v10H5z" ${f("#E8D3A6")}/><path d="M5 11h14" ${f("none")}/>`, `<rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M5 11h14M12 4v7M5 7.5h14"/><path d="M8 15h8M8 18h5" opacity=".5"/>`],
       coconut: (a) => [`<circle cx="12" cy="14" r="7" ${f(a)}/><ellipse cx="12" cy="9" rx="4" ry="1.5" ${f("#FFFDF6")}/>`, `<circle cx="12" cy="14" r="7"/><ellipse cx="12" cy="9" rx="4" ry="1.5"/><path d="M14 9l3-7"/>`]
     };
+    I.housechoc = S3.bar("#3F2519");
+    I.sp_log = I.logcake;
+    I.sp_mooncake = I.mooncake;
+    [["red", "#7A1F3D"], ["rose", "#E98AA0"], ["white", "#E8D57A"], ["sparkling", "#F3E7B0"]].forEach(([k, c]) => {
+      I["wine_" + k] = S3.bottle(c);
+    });
     Object.entries(GOODS).forEach(([id, g]) => {
       if (I[id] || !g.art) return;
       const fn = S3[g.art[0]] || S3.box;
@@ -4859,16 +4870,19 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       hellos: ["Hi Mel! The wall's looking good.", "Boss! Want a taste?"],
       away: "Amara's off. The Cocoa Room's quiet."
     },
-    // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep): the bar line, 9 to 6, Tuesday to Sunday
+    // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep), a student working part-time: Wed and Fri 2-6, Sat 10-5
     {
       id: "mateo",
       pitch: 0.95,
       name: "Mateo",
       job: "Kitchen hand at the Cocoa Room",
       look: { skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#F6F2EA", bottom: "#4A2E22", extra: "apron" },
-      routine: [slot("09:00", "18:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], { dow: [0, 2, 3, 4, 5, 6], needs: "cocoa" })],
-      intro: "Hola! I'm Mateo. Roaster, grinder, slab, moulds: I keep the bars coming. The bonbons are all yours, boss.",
-      lines: ["Your bonbon shelf is full. I didn't touch a crumb!", "The grinder's singing today.", "Forty dark bars on the wall. A personal best.", "I bought beans this morning. Don't worry, I kept to your budget."],
+      routine: [
+        slot("14:00", "18:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], { dow: [3, 5], needs: "cocoa" }),
+        slot("10:00", "17:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], { dow: [6], needs: "cocoa" })
+      ],
+      intro: "Hola! I'm Mateo. I study food science at the poly, and on Wednesdays, Fridays and Saturdays I keep the bars coming here. The bonbons are all yours, boss.",
+      lines: ["Your bonbon shelf is full. I didn't touch a crumb!", "Exams next week. Tempering is very calming.", "My lecturer says I'm the only one who's ground beans by hand.", "The grinder's singing today.", "Forty dark bars on the wall. A personal best.", "I bought beans this morning. Don't worry, I kept to your budget."],
       hellos: ["Morning, boss! Roaster's warm.", "Hi Mel! Smell that?"],
       away: "Mateo's gone home. The kitchen's quiet."
     },
@@ -5214,14 +5228,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return null;
   }
   function visitsOn(day) {
-    const d = dow(day), busy2 = toursOn(day).flatMap((t4) => [t4.guide, ...t4.group]), pick3 = (seed2) => groupFor(day + seed2, 1, busy2)[0];
+    const d = dow(day), busy2 = toursOn(day).flatMap((t4) => [t4.guide, ...t4.group]), pick4 = (seed2) => groupFor(day + seed2, 1, busy2)[0];
     const tbusy = toursOn(day).flatMap((t4) => t4.group), [t1, t2, t3] = groupFor(day + "tv", 3, tbusy, TOURISTS);
     const tourists = [
       { id: t1, scene: "orchard", from: 10 * 60 + 30, to: 11 * 60 + 30, wander: SHOPSIDE },
       { id: t2, scene: "orchard", from: 10 * 60 + 45, to: 11 * 60 + 45, wander: SHOPSIDE },
       { id: t3, scene: "flowers", from: 14 * 60 + 30, to: 15 * 60 + 30 }
     ];
-    return (d === 0 || d === 6 ? [{ id: pick3("v1"), scene: "flowers", from: 12 * 60 + 30, to: 13 * 60 + 30 }] : [{ id: pick3("v1"), scene: "orchard", from: 12 * 60 + 15, to: 13 * 60 }, { id: pick3("v2"), scene: "flowers", from: 17 * 60 + 15, to: 18 * 60 }]).concat(tourists);
+    return (d === 0 || d === 6 ? [{ id: pick4("v1"), scene: "flowers", from: 12 * 60 + 30, to: 13 * 60 + 30 }] : [{ id: pick4("v1"), scene: "orchard", from: 12 * 60 + 15, to: 13 * 60 }, { id: pick4("v2"), scene: "flowers", from: 17 * 60 + 15, to: 18 * 60 }]).concat(tourists);
   }
   var SHOPSIDE = [[390, 290], [430, 296], [460, 300], [400, 318]];
   var WANDER = { orchard: [[160, 330], [260, 420], [360, 330], [310, 510], [210, 500]], flowers: [[160, 300], [260, 380], [360, 470], [310, 300], [210, 470]] };
@@ -11274,13 +11288,13 @@ Quests finished today: ${S3.doneIds.length}`;
     else h += `<p class="sub">Your stylist hasn't been by yet today. The morning briefing hangs three outfits in here.</p>`;
     const all = outfitsToday(F2), w = F2.wear && F2.wear.day === dayKey() ? F2.wear : null;
     if (w) h += `<p class="muted">Wearing today: <b>${esc(w.label || "your outfit")}</b>. <button class="btn small alt" data-wearoff="1">Back to my usual clothes</button></p>`;
-    const pick3 = st6.pick != null ? all[st6.pick] : null;
-    if (pick3) {
-      const fs = FIELDS.filter(([k]) => pick3[k]);
-      h += `<div class="outfit wearpick"><p class="olabel">Put on ${esc(clean(pick3.label, 50) || "this outfit")}</p><p class="muted">Untick anything you're skipping.</p><ul>${fs.map(([k, n]) => `<li><label><input type="checkbox" data-wearf="${k}" checked> <span class="gpic">${garment(k === "layer" ? "layer" : k, pick3[k])}</span><span><small>${n}</small>${esc(clean(pick3[k]))}</span></label></li>`).join("")}</ul>
+    const pick4 = st6.pick != null ? all[st6.pick] : null;
+    if (pick4) {
+      const fs = FIELDS.filter(([k]) => pick4[k]);
+      h += `<div class="outfit wearpick"><p class="olabel">Put on ${esc(clean(pick4.label, 50) || "this outfit")}</p><p class="muted">Untick anything you're skipping.</p><ul>${fs.map(([k, n]) => `<li><label><input type="checkbox" data-wearf="${k}" checked> <span class="gpic">${garment(k === "layer" ? "layer" : k, pick4[k])}</span><span><small>${n}</small>${esc(clean(pick4[k]))}</span></label></li>`).join("")}</ul>
       <div class="actions"><button class="btn primary" data-wearok="${st6.pick}">Put it on</button><button class="btn alt small" data-wearback="1">Back</button></div></div>`;
     } else if (all.length) h += `<div class="outfits">${all.map(card).join("")}</div>`;
-    if (!pick3) h += accessories(F2);
+    if (!pick4) h += accessories(F2);
     h += `<p class="eyebrow" style="margin:14px 0 6px">Want something different?</p>`;
     if (!inv) h += `<p class="muted">New outfits need your wardrobe list, which comes with the morning drop-off.</p>`;
     else if (!st6.sample) h += `<p class="muted">New outfits need Claude, which isn't reachable from this view just now.</p>`;
@@ -14024,6 +14038,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     banana: ["Bananas", "Banana", "#F3E07A"],
     grape_red: ["Red grapes", "Red Grape", "#7A2E5A"],
     grape_white: ["White grapes", "White Grape", "#C9D98A"],
+    housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
+    // from Mel's own chocolate shop (cocoa.js sendScoop)
     ...Object.fromEntries(Object.values(TREES).map((t2) => [t2.fruit, [t2.fruit[0].toUpperCase() + t2.fruit.slice(1), t2.fruit[0].toUpperCase() + t2.fruit.slice(1), FRUIT_COL[t2.fruit] || "#F3C969"]])),
     ...Object.fromEntries(Object.entries(FLOWERS).map(([id, f2]) => ["fl_" + id, [f2.n, f2.n.replace(/s$/, "").replace(/ie$/, "y").replace("Sweet pea", "Sweet Pea"), f2.col || "#F4C7CF"]]))
   };
@@ -14076,6 +14092,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     milk: { n: "Milk chocolate", w: "milk-chocolate", col: "#8A5A3A", price: 0 },
     dark: { n: "Dark chocolate", w: "dark-chocolate", col: "#4A2E22", price: 150 },
     white: { n: "White chocolate", w: "white-chocolate", col: "#F6EBD2", price: 180 },
+    house: { n: "House-made dark", w: "house-made-dark-chocolate", col: "#3F2519", price: 0, house: true },
+    // from the Cocoa Room, not bought: s.houseDips
     pink: { n: "Strawberry pink", w: "strawberry", col: "#F2A0B8", price: 200 },
     matcha: { n: "Matcha", w: "matcha", col: "#8FB86A", price: 220 }
   };
@@ -14090,6 +14108,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     pop: { n: "Popping candy", w: "popping candy", col: "#9FD3C2", price: 220 }
   };
   var hasUp = (s, k) => !!(s.up && s.up[k]);
+  var HOUSE_EXTRA = 2;
+  var dipReady = (s, k) => !!(DIPS[k] && s.dips[k] && (k !== "house" || s.houseDips > 0));
   function buyUpgrade(F2, k) {
     const s = scoopState(F2), u = UPGRADES2[k];
     if (!u || s.up[k] || F2.coins < u.price) return null;
@@ -14105,7 +14125,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function buyDip(F2, k) {
     const s = scoopState(F2), d = DIPS[k];
-    if (!d || s.dips[k] || F2.coins < d.price) return false;
+    if (!d || d.house || s.dips[k] || F2.coins < d.price) return false;
     F2.coins -= d.price;
     s.dips[k] = 1;
     return true;
@@ -14269,6 +14289,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       coins += s.prices.dip;
       if (Math.random() < 0.6) coins += s.prices.top;
       t2.dipped = (t2.dipped || 0) + 1;
+      if (s.houseDips > 0 && Math.random() < 0.45) {
+        s.houseDips--;
+        coins += HOUSE_EXTRA;
+        t2.house = (t2.house || 0) + 1;
+      }
     }
     if (hasUp(s, "awning") && Math.random() < 0.25) {
       coins++;
@@ -14365,8 +14390,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function makeDipped(F2, rid, fmt3, dip, top, give) {
     const s = scoopState(F2), r = recipeOf(s, rid);
-    if (!hasUp(s, "dip") || !r || !(s.tubs[rid] > 0) || fmt3 !== "cone" && fmt3 !== "waffle" || !s.dips[dip] || top && !s.tops[top]) return null;
+    if (!hasUp(s, "dip") || !r || !(s.tubs[rid] > 0) || fmt3 !== "cone" && fmt3 !== "waffle" || !dipReady(s, dip) || top && !s.tops[top]) return null;
     s.tubs[rid]--;
+    if (dip === "house") s.houseDips--;
     if (s.tubs[rid] <= 0) delete s.tubs[rid];
     if (!give) return { r, name: dipName(r, fmt3, dip, top), col: r.col, dip: DIPS[dip].col };
     const id = dipId(r, fmt3, dip, top);
@@ -14406,7 +14432,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function dipPotsPanel(F2) {
     const s = scoopState(F2);
     return `<span class="tape stripe" aria-hidden="true"></span><h2>The chocolate pots</h2><p class="sub">Warm dips for cones and waffles. Customers pay ${s.prices.dip} ${coin()} extra for a dipped one (set it on the menu); more dips, more takers.</p>
-    <ul class="hlist wlist">${Object.entries(DIPS).map(([k, d]) => `<li><span class="wpic">${dot(d.col)}</span><span class="wtxt"><b>${esc(d.n)}</b><small>${s.dips[k] ? "warming in its pot" : "not yet"}</small></span>${s.dips[k] ? `<span class="hbadge">yours</span>` : buyBtn(F2, d.price, `data-gdipbuy="${k}"`)}</li>`).join("")}</ul>` + shut;
+    <ul class="hlist wlist">${Object.entries(DIPS).map(([k, d]) => `<li><span class="wpic">${dot(d.col)}</span><span class="wtxt"><b>${esc(d.n)}</b><small>${d.house ? s.houseDips > 0 ? `${s.houseDips} dips left, from the Cocoa Room` : "send dark chocolate from the Cocoa Room's moulds" : s.dips[k] ? "warming in its pot" : "not yet"}</small></span>${d.house ? "" : s.dips[k] ? `<span class="hbadge">yours</span>` : buyBtn(F2, d.price, `data-gdipbuy="${k}"`)}</li>`).join("")}</ul>` + shut;
   }
   function toppingsPanel(F2) {
     const s = scoopState(F2);
@@ -14419,11 +14445,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!tubs.length) return h + `<p class="muted">No tubs in the display. Make some from the recipe book in the kitchen.</p>` + shut;
     const r = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
     if (!r) return h + `<ul class="hlist wlist">${tubs.map((x) => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops</small></span><button class="btn small primary" data-gdpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut;
-    const dip = s.dips[st6.dip] ? st6.dip : "milk", top = st6.top && s.tops[st6.top] ? st6.top : null, fmt3 = st6.fmt === "waffle" ? "waffle" : "cone";
+    const dip = dipReady(s, st6.dip) ? st6.dip : "milk", top = st6.top && s.tops[st6.top] ? st6.top : null, fmt3 = st6.fmt === "waffle" ? "waffle" : "cone";
     const chip2 = (attr, k, on, label2, col) => `<button class="gchip${on ? " on" : ""}" ${attr}="${k}" aria-pressed="${on}">${dot(col)}<span>${esc(label2)}</span></button>`;
     h += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p>`;
     h += `<p class="eyebrow" style="margin:10px 0 6px">On a</p><div class="gchips">${["cone", "waffle"].map((f2) => chip2("data-gdfmt", f2, f2 === fmt3, FORMATS[f2].n, "#E8C48E")).join("")}</div>`;
-    h += `<p class="eyebrow" style="margin:10px 0 6px">Dipped in</p><div class="gchips">${Object.keys(DIPS).filter((k) => s.dips[k]).map((k) => chip2("data-gddip", k, k === dip, DIPS[k].n, DIPS[k].col)).join("")}</div>`;
+    h += `<p class="eyebrow" style="margin:10px 0 6px">Dipped in</p><div class="gchips">${Object.keys(DIPS).filter((k) => dipReady(s, k)).map((k) => chip2("data-gddip", k, k === dip, DIPS[k].n, DIPS[k].col)).join("")}</div>`;
     h += `<p class="eyebrow" style="margin:10px 0 6px">Topped with</p><div class="gchips">${chip2("data-gdtop", "none", !top, "Nothing", "#FFFDF6")}${Object.keys(TOPPINGS).filter((k) => s.tops[k]).map((k) => chip2("data-gdtop", k, k === top, TOPPINGS[k].n, TOPPINGS[k].col)).join("")}</div>`;
     h += `<p class="muted">${esc(dipName(r, fmt3, dip, top))}</p>`;
     return h + `<div class="actions"><button class="btn primary" data-gdmake="eat">Have it now</button><button class="btn alt" data-gdmake="give">Make one to give</button></div><div class="actions"><button class="btn alt small" data-gdback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
@@ -14447,9 +14473,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (st6.cart && !tubs.length) return h + `<p class="muted">Nothing to scoop: the shop's display is empty tonight.</p>` + shut;
     if (!tubs.length && scoopsLeft(s)) return h + `<p class="muted">Nothing in the display, but there are tubs in the freezer.</p><div class="actions"><button class="btn small primary" data-gview="freezer">Put some out</button></div>` + upBtn + shut;
     if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), then make more tubs from the recipe book there.</p>` + upBtn + shut;
-    const pick3 = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
-    if (pick3) return h + `<div class="gpick"><p class="olabel">${dot(pick3.col)} ${esc(pick3.name)}${pick3.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick3.ings.map((i) => INGR[i][0]).join(", "))} · ${s.tubs[pick3.id]} scoops left</p>
-    <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick3.id)}">Have one now${st6.evan ? ", and one for Evan" : ""}</button></div>
+    const pick4 = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
+    if (pick4) return h + `<div class="gpick"><p class="olabel">${dot(pick4.col)} ${esc(pick4.name)}${pick4.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick4.ings.map((i) => INGR[i][0]).join(", "))} · ${s.tubs[pick4.id]} scoops left</p>
+    <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick4.id)}">Have one now${st6.evan ? ", and one for Evan" : ""}</button></div>
     <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map((f2) => `<button class="btn small alt" data-gtake="${f2}">${FORMATS[f2].n}</button>`).join("")}</div>
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
     h += `<ul class="hlist wlist">${tubs.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
@@ -14527,8 +14553,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var SACK = 10;
   var KINDS2 = { milk: { n: "Milk chocolate", col: "#8A5A3A" }, dark: { n: "Dark chocolate", col: "#4A2E22" }, white: { n: "White chocolate", col: "#F3E7C9" } };
   var BAR_ID = (k) => "bar_" + k;
-  var HAND_FROM = 9 * 60;
-  var HAND_TO = 18 * 60;
+  var HAND = { 3: [14 * 60, 18 * 60], 5: [14 * 60, 18 * 60], 6: [10 * 60, 17 * 60] };
   var WALL = 40;
   var now2 = () => Date.now() + (globalThis.__mapleOffset || 0);
   var openOn = (day, hm2) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() !== 1 && hm2 >= OPEN2 && hm2 < CLOSE2;
@@ -14552,6 +14577,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     c.res = Object.assign({ milk: 0, dark: 0, white: 0 }, c.res || {});
     c.keep = Object.assign({ milk: 30, dark: 30, white: 0 }, c.keep || {});
     c.plan = Object.assign({ on: true, buy: true, floor: 200, hold: 0 }, c.plan || {});
+    c.specials = c.specials || {};
     return c;
   }
   var left3 = (t2) => {
@@ -14618,29 +14644,35 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var SHELL = 6;
   var TRAY = 12;
   var CASE = 6;
-  var NOT_FILLING = ["milk", "egg", "olives", "corn", "carrot", "tomato"];
-  var isFilling = (id) => id in INGR && !NOT_FILLING.includes(id);
-  var fillName = (id) => INGR[id][0];
+  var NOT_FILLING = ["milk", "egg", "olives", "corn", "carrot", "tomato", "housechoc"];
+  var WINE_FILL = { wine_red: ["Red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Rosé", "Rosé", "#E98AA0"], wine_white: ["White wine", "White Wine", "#E8D57A"], wine_sparkling: ["Sparkling wine", "Bubbly", "#F3E7B0"] };
+  var WINE_FILLS = 4;
+  var FL = (id) => INGR[id] || WINE_FILL[id];
+  var isFilling = (id) => id in INGR && !NOT_FILLING.includes(id) || id in WINE_FILL;
+  var fillName = (id) => FL(id)[0];
   var STYLE = ["Truffle", "Bonbon", "Praline", "Ganache", "Heart"];
   var POETIC2 = ["Jetty Sunset", "Lantern Night", "Ma Ma's Garden", "Sea Breeze", "First Light", "Golden Hour", "Low Tide", "Porch Swing", "Maple's Secret", "Night Market"];
   var keyOf2 = (shell, fills) => [shell, ...[...new Set(fills)].sort()].join("+");
   function bonbonName(shell, fills) {
     const f2 = [...new Set(fills)].sort(), h = hash(keyOf2(shell, f2)), style = STYLE[h % STYLE.length], sh = shell[0].toUpperCase() + shell.slice(1);
-    if (f2.length === 1) return `${sh} ${INGR[f2[0]][1]} ${style}`;
+    if (f2.length === 1) return `${sh} ${FL(f2[0])[1]} ${style}`;
     if (h % 3 === 0) return `${POETIC2[h % POETIC2.length]} ${style}`;
-    return `${INGR[f2[0]][1]} & ${INGR[f2[1]][1]} ${style}`;
+    return `${FL(f2[0])[1]} & ${FL(f2[1])[1]} ${style}`;
   }
   var recipeOf2 = (c, id) => c.bonbons.find((b) => b.id === id);
   var knownBonbon = (c, shell, fills) => recipeOf2(c, keyOf2(shell, fills));
   var shellChoc = (c, k) => c.res[k] + c.choc[k];
+  function takeChoc(c, k, n) {
+    const r0 = Math.min(n, c.res[k]);
+    c.res[k] -= r0;
+    c.choc[k] -= n - r0;
+  }
   var canMakeBonbon = (c, shell, fills) => shellChoc(c, shell) >= SHELL && fills.length >= 1 && fills.every((f2) => (c.pantry[f2] || 0) >= 1);
   function makeBonbons(F2, shell, fills) {
     const c = cocoaState(F2);
     fills = [...new Set(fills)].filter(isFilling).slice(0, 2);
     if (!KINDS2[shell] || !fills.length || !canMakeBonbon(c, shell, fills)) return null;
-    const r0 = Math.min(SHELL, c.res[shell]);
-    c.res[shell] -= r0;
-    c.choc[shell] -= SHELL - r0;
+    takeChoc(c, shell, SHELL);
     fills.forEach((f2) => {
       c.pantry[f2]--;
       if (c.pantry[f2] <= 0) delete c.pantry[f2];
@@ -14648,7 +14680,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     let r = knownBonbon(c, shell, fills), isNew = false;
     if (!r) {
       isNew = true;
-      r = { id: keyOf2(shell, fills), shell, fills: [...fills].sort(), name: bonbonName(shell, fills), col: INGR[[...fills].sort()[0]][2], found: Date.now() };
+      r = { id: keyOf2(shell, fills), shell, fills: [...fills].sort(), name: bonbonName(shell, fills), col: FL([...fills].sort()[0])[2], found: Date.now() };
       c.bonbons.push(r);
       if (Array.isArray(c.display) && c.display.length < CASE) c.display = [...c.display, r.id];
     }
@@ -14688,9 +14720,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     c.pantry[id] = (c.pantry[id] || 0) + n;
     return n;
   }
-  function packBox(F2, size) {
-    const c = cocoaState(F2), shown = onDisplay2(c), have = shown.reduce((a, b) => a + c.trays[b.id], 0);
-    if (have < size) return null;
+  var caseCount = (c) => onDisplay2(c).reduce((a, b) => a + c.trays[b.id], 0);
+  function pick3(c, size) {
+    const shown = onDisplay2(c);
     let i = 0, dark = true;
     for (let k = 0; k < size; i++) {
       const b = shown[i % shown.length];
@@ -14700,9 +14732,71 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       k++;
       if (i > 200) break;
     }
-    const id = `box${size}${dark ? "d" : ""}`;
+    return dark;
+  }
+  function packBox(F2, size) {
+    const c = cocoaState(F2);
+    if (caseCount(c) < size) return null;
+    const id = `box${size}${pick3(c, size) ? "d" : ""}`;
     F2.inv[id] = (F2.inv[id] || 0) + 1;
     return id;
+  }
+  var wineShelf = (F2) => (F2.vine && F2.vine.shelf || []).filter((b) => b.n > 0 && WINE_FILL["wine_" + b.type]);
+  function wineToPantry(F2, shelfId) {
+    const c = cocoaState(F2), b = wineShelf(F2).find((x) => x.id === shelfId);
+    if (!b) return null;
+    b.n--;
+    const id = "wine_" + b.type;
+    c.pantry[id] = (c.pantry[id] || 0) + WINE_FILLS;
+    return { id, wine: b.name };
+  }
+  function packPairing(F2, shelfId) {
+    const c = cocoaState(F2), b = wineShelf(F2).find((x) => x.id === shelfId);
+    if (!b || caseCount(c) < 4) return null;
+    b.n--;
+    pick3(c, 4);
+    F2.inv.pairbox = (F2.inv.pairbox || 0) + 1;
+    return b.name;
+  }
+  var SEND = 10;
+  var TO_FRIDGE = 5;
+  var TO_DIPS = 20;
+  function sendScoop(F2, to) {
+    const c = cocoaState(F2), s = scoopState(F2);
+    if (c.choc.dark < SEND || to === "dip" && !hasUp(s, "dip")) return 0;
+    c.choc.dark -= SEND;
+    if (to === "dip") {
+      s.houseDips = (s.houseDips || 0) + TO_DIPS;
+      s.dips.house = 1;
+      return TO_DIPS;
+    }
+    s.fridge.housechoc = (s.fridge.housechoc || 0) + TO_FRIDGE;
+    return TO_FRIDGE;
+  }
+  var SPECIALS = {
+    christmas: { id: "sp_log", n: "Chocolate yule log", kind: "dark", use: 12, make: 4, price: 18, line: "A dark chocolate log with a sprig of holly." },
+    cny: { id: "sp_coins", n: "Box of gold chocolate coins", kind: "milk", use: 12, make: 6, price: 12, line: "Milk chocolate coins in gold foil, for luck." },
+    deepavali: { id: "sp_spiced", n: "Spiced chocolate box", kind: "dark", use: 12, make: 6, price: 12, line: "Dark chocolate with cardamom, cinnamon and a little chilli." },
+    midautumn: { id: "sp_mooncake", n: "Chocolate mooncake", kind: "white", use: 12, make: 6, price: 10, line: "A white chocolate snowskin mooncake with a ganache middle." }
+  };
+  var SPECIAL_IDS = Object.values(SPECIALS).map((x) => x.id);
+  var specialOn = (day) => {
+    const f2 = festivalOn(day);
+    return f2 && SPECIALS[f2.id] ? { ...SPECIALS[f2.id], fest: f2.name } : null;
+  };
+  function makeSpecial(F2) {
+    const c = cocoaState(F2), sp = specialOn(dayKey());
+    if (!sp || shellChoc(c, sp.kind) < sp.use) return null;
+    takeChoc(c, sp.kind, sp.use);
+    c.specials[sp.id] = (c.specials[sp.id] || 0) + sp.make;
+    return sp;
+  }
+  function takeSpecial(F2, id) {
+    const c = cocoaState(F2);
+    if (!(c.specials[id] > 0)) return false;
+    c.specials[id]--;
+    F2.inv[id] = (F2.inv[id] || 0) + 1;
+    return true;
   }
   function eatBonbon(F2, id) {
     const c = cocoaState(F2), b = recipeOf2(c, id);
@@ -14710,7 +14804,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     c.trays[id]--;
     return b;
   }
-  var handOn = (day, hm2) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() !== 1 && hm2 >= HAND_FROM && hm2 < HAND_TO;
+  var handOn = (day, hm2) => {
+    const w = HAND[(/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay()];
+    return !!w && hm2 >= w[0] && hm2 < w[1];
+  };
   function nextKind(c) {
     const gap = Object.keys(KINDS2).map((k) => [k, c.keep[k] - c.res[k] - (c.ground === k ? POT : 0)]).filter(([, g]) => g > 0).sort((a, b) => b[1] - a[1]);
     if (gap.length) return gap[0][0];
@@ -14755,7 +14852,37 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       out.mins++;
       out.done = finish(c, at) || out.done;
       if (c.plan.on && opts.hand !== false && handOn(day, hm2)) handStep(F2, c, at, out);
+      if (F2.goals && F2.goals.cellar && wineClubNow(day, hm2) && Math.random() < 0.04) {
+        const shown2 = onDisplay2(c), k2 = Object.keys(KINDS2).find((x) => c.bars[x] > 0), s2 = c.sold[day] = c.sold[day] || { n: 0, coins: 0, bonbons: 0 };
+        if (shown2.length) {
+          const b = shown2[Math.floor(Math.random() * shown2.length)], n2 = Math.min(c.trays[b.id], 2 + Math.floor(Math.random() * 3));
+          c.trays[b.id] -= n2;
+          s2.bonbons = (s2.bonbons || 0) + n2;
+          s2.coins += n2 * c.prices.bonbon;
+          out.coins += n2 * c.prices.bonbon;
+          out.bonbons = (out.bonbons || 0) + n2;
+          s2.club = (s2.club || 0) + 1;
+          out.club = (out.club || 0) + 1;
+        } else if (k2) {
+          c.bars[k2]--;
+          s2.n++;
+          s2.coins += c.prices.bar;
+          out.coins += c.prices.bar;
+          out.n++;
+          s2.club = (s2.club || 0) + 1;
+          out.club = (out.club || 0) + 1;
+        }
+      }
       if (!openOn(day, hm2)) continue;
+      const sp = specialOn(day);
+      if (sp && c.specials[sp.id] > 0 && Math.random() < 0.012 * ((/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() % 6 === 0 ? 1.4 : 1)) {
+        const s2 = c.sold[day] = c.sold[day] || { n: 0, coins: 0, bonbons: 0 };
+        c.specials[sp.id]--;
+        s2.specials = (s2.specials || 0) + 1;
+        s2.coins += sp.price;
+        out.coins += sp.price;
+        out.specials = (out.specials || 0) + 1;
+      }
       const stocked = Object.keys(KINDS2).filter((k2) => c.bars[k2] > 0), shown = onDisplay2(c);
       if (!stocked.length && !shown.length) continue;
       const d = sg.getUTCDay(), we = d === 0 || d === 6, pf = Math.pow(6 / Math.max(2, c.prices.bar), 1.3);
@@ -14821,7 +14948,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (which === "slab") return `<span class="tape stripe" aria-hidden="true"></span><h2>The marble slab</h2><p class="sub">${c.ground ? `Temper the ${KINDS2[c.ground].n.toLowerCase()}: spread, scrape, fold, until it shines.` : "Tempering makes chocolate snap and shine. Bring a pot from the grinder."}</p>
     <div class="actions"><button class="btn primary" data-cc="temper" ${c.ground ? "" : "disabled"}>Temper it (${POT} pieces)</button></div>${steps}` + shut2;
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The moulds</h2><p class="sub">${MOULD} pieces of tempered chocolate make ${MOULD} bars, straight onto the bar wall.</p>
-    <ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${dot2(d.col)}</span><span class="wtxt"><b>${d.n}</b><small>${c.choc[k]} pieces</small></span><button class="btn small primary" data-cc="mould" data-k="${k}" ${c.choc[k] < MOULD ? "disabled" : ""}>Mould ${MOULD} bars</button></li>`).join("")}</ul>${steps}` + shut2;
+    <ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${dot2(d.col)}</span><span class="wtxt"><b>${d.n}</b><small>${c.choc[k]} pieces</small></span><button class="btn small primary" data-cc="mould" data-k="${k}" ${c.choc[k] < MOULD ? "disabled" : ""}>Mould ${MOULD} bars</button></li>`).join("")}</ul>${scoopSend(F2)}${steps}` + shut2;
+  }
+  function scoopSend(F2) {
+    const c = cocoaState(F2), s = scoopState(F2), ok = c.choc.dark >= SEND;
+    return `<p class="eyebrow" style="margin:12px 0 6px">For ${esc(s.name)}</p><p class="muted">${SEND} pieces of dark chocolate: ${TO_FRIDGE} for the gelato fridge (Cocoa Room chocolate, a new ingredient)${hasUp(s, "dip") ? `, or ${TO_DIPS} dips of house-made dark for the dip station (they sell for more). ${s.houseDips ? `${s.houseDips} house dips left there.` : ""}` : "."}</p>
+    <div class="actions"><button class="btn small alt" data-cc="scoop" data-k="fridge" ${ok ? "" : "disabled"}>To the gelato fridge</button>${hasUp(s, "dip") ? `<button class="btn small alt" data-cc="scoop" data-k="dip" ${ok ? "" : "disabled"}>To the dip station</button>` : ""}</div>`;
   }
   var ingPic2 = (id) => id.startsWith("fl_") ? icon("bq_" + id.slice(3), 26) : icon(id, 26);
   var bonbonPic = (shell, col) => `<svg class="gscoop" viewBox="0 0 44 44" aria-hidden="true"><rect x="8" y="12" width="28" height="24" rx="7" fill="${KINDS2[shell].col}" stroke="#3A2E28" stroke-width="1.2"/><path d="M12 20 q5 -6 10 0 q5 6 10 0" fill="none" stroke="${col}" stroke-width="3" stroke-linecap="round"/><circle cx="15" cy="16" r="2" fill="#fff" opacity=".5"/></svg>`;
@@ -14833,7 +14965,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     h += inS.length ? `<ul class="hlist wlist">${inS.map((id) => cell(id, `${c.pantry[id]} on the shelf`)).join("")}</ul>` : `<p class="muted">Empty for now.</p>`;
     if (bag2.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From your backpack</p><ul class="hlist wlist">${bag2.map((id) => cell(id, `${F2.inv[id]} with you`, `<span class="orbtns"><button class="btn small primary" data-cc="fill" data-src="bag" data-k="${id}" data-n="1">Add 1</button><button class="btn small alt" data-cc="fill" data-src="bag" data-k="${id}" data-n="99">All</button></span>`)).join("")}</ul>`;
     if (shelf2.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From Ma Ma's farm shop</p><ul class="hlist wlist">${shelf2.map((id) => cell(id, `${orch.stock[id.startsWith("fl_") ? "stem:" + id.slice(3) : id]} on her shelf`, `<span class="orbtns"><button class="btn small primary" data-cc="fill" data-src="farm" data-k="${id}" data-n="1">Add 1</button><button class="btn small alt" data-cc="fill" data-src="farm" data-k="${id}" data-n="99">All</button></span>`)).join("")}</ul>`;
-    if (!bag2.length && !shelf2.length) h += `<p class="muted">Nothing to add right now. Hana's deli has honey, pandan, coffee, nuts and more; Ma Ma's farm shop has fruit and flowers.</p>`;
+    const wines = wineShelf(F2);
+    if (wines.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From the wine shop</p><ul class="hlist wlist">${wines.map((b) => cell("wine_" + b.type, `${esc(b.name)} · ${b.n} on the shelf`, `<button class="btn small primary" data-cc="wine" data-k="${esc(b.id)}">Open a bottle (${WINE_FILLS})</button>`)).join("")}</ul>`;
+    if (!bag2.length && !shelf2.length && !wines.length) h += `<p class="muted">Nothing to add right now. Hana's deli has honey, pandan, coffee, nuts and more; Ma Ma's farm shop has fruit and flowers.</p>`;
     return h + shut2;
   }
   function bonbonPanel(F2, st6) {
@@ -14843,25 +14977,34 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     h += `<p class="eyebrow" style="margin:10px 0 6px">Fillings</p>` + (inS.length ? `<div class="gchips">${inS.map((id) => `<button class="gchip${sel.includes(id) ? " on" : ""}" data-cc="sel" data-k="${id}" aria-pressed="${sel.includes(id)}" ${!sel.includes(id) && sel.length >= 2 ? "disabled" : ""}>${ingPic2(id)}<span>${esc(fillName(id))}</span></button>`).join("")}</div>` : `<p class="muted">The fillings shelf is empty. Stock it first.</p>`);
     const made = st6.made && recipeOf2(c, st6.made), known = sel.length ? knownBonbon(c, shell, sel) : null;
     if (made && !sel.length) h += card4(made.shell, made.col, made.name, st6.isNew ? "A new bonbon! The first tray's ready for the display case." : "Another tray of twelve, ready for the display case.", true);
-    else if (sel.length) h += card4(shell, INGR[[...sel].sort()[0]][2], known ? known.name : bonbonName(shell, sel), known ? "You know this one. Make another tray?" : "Something new!");
+    else if (sel.length) h += card4(shell, FL([...sel].sort()[0])[2], known ? known.name : bonbonName(shell, sel), known ? "You know this one. Make another tray?" : "Something new!");
     const ok = sel.length && canMakeBonbon(c, shell, sel);
     h += `<div class="actions"><button class="btn primary" data-cc="bonbon" ${ok ? "" : "disabled"}>${known ? "Make another tray" : "Make it"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
     if (sel.length && shellChoc(c, shell) < SHELL) h += `<p class="muted">Not enough ${KINDS2[shell].n.toLowerCase()}: temper some more first, or raise its bonbon shelf target at the counter so Mateo makes some.</p>`;
+    h += specialCard(c);
     if (c.bonbons.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map((b) => `<li><span class="wpic">${dot2(KINDS2[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS2[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span><button class="btn small alt" data-cc="again" data-k="${esc(b.id)}" ${canMakeBonbon(c, b.shell, b.fills) ? "" : "disabled"}>Another tray</button></li>`).join("")}</ul>`;
     return h;
+  }
+  function specialCard(c) {
+    const sp = specialOn(dayKey());
+    if (!sp) return `<p class="muted" style="margin-top:12px">Festival specials appear here around Deepavali, Christmas, Chinese New Year and Mid-Autumn.</p>`;
+    return `<p class="eyebrow" style="margin:12px 0 6px">${esc(sp.fest)} special</p><div class="gresult">${icon(sp.id, 34)}<span><b>${esc(sp.n)}</b><small>${esc(sp.line)} ${sp.use} pieces of ${KINDS2[sp.kind].n.toLowerCase()} make ${sp.make}, at ${sp.price} coins each. ${c.specials[sp.id] || 0} ready.</small></span></div>
+    <div class="actions"><button class="btn small primary" data-cc="special" ${shellChoc(c, sp.kind) >= sp.use ? "" : "disabled"}>Make ${sp.make}</button></div>`;
   }
   function casePanel(F2) {
     const c = cocoaState(F2), ids = displayIds2(c), shown = ids.map((id) => recipeOf2(c, id)), rest = c.bonbons.filter((b) => !ids.includes(b.id) && c.trays[b.id] > 0);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The display case</h2><p class="sub">Up to ${CASE} flavours of bonbons, ${c.prices.bonbon} ${coin2()} each. Customers pick two to four.</p>`;
     h += `<p class="eyebrow" style="margin:10px 0 6px">In the case (${shown.length} of ${CASE})</p>` + (shown.length ? `<ul class="hlist wlist">${shown.map((b) => `<li><span class="wpic">${dot2(KINDS2[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] ? c.trays[b.id] + " left" : "sold out"}</small></span><button class="btn small alt" data-cc="case" data-k="${esc(b.id)}">Take out</button></li>`).join("")}</ul>` : `<p class="muted">Empty. Make bonbons at the bonbon table in the kitchen.</p>`);
     if (rest.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Waiting in the kitchen</p><ul class="hlist wlist">${rest.map((b) => `<li><span class="wpic">${dot2(KINDS2[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id]} made</small></span><button class="btn small primary" data-cc="case" data-k="${esc(b.id)}" ${ids.length >= CASE ? "disabled" : ""}>Put in</button></li>`).join("")}</ul>`;
+    const sp = specialOn(dayKey());
+    if (sp) h += `<p class="eyebrow" style="margin:12px 0 6px">Beside the case</p><p class="muted">${icon(sp.id, 20)} ${esc(sp.n)}: ${c.specials[sp.id] || 0} left, ${sp.price} ${coin2()} each, for ${esc(sp.fest)}.</p>`;
     h += `<div class="row gprices"><span>Price of a bonbon</span><span class="gstep"><button class="btn small alt" data-cc="bprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bonbon}</b><button class="btn small alt" data-cc="bprice" data-n="1" aria-label="Dearer">+</button></span></div>`;
     return h + shut2;
   }
   function planPanel(F2, st6 = {}) {
     const c = cocoaState(F2), p = c.plan;
     const step2 = (a, k, v, label2) => `<div class="row gprices"><span>${label2}</span><span class="gstep"><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="-1" aria-label="Less">−</button><b>${v}</b><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="1" aria-label="More">+</button></span></div>`;
-    let h = `<p class="eyebrow" style="margin:14px 0 6px">Kitchen plan</p><p class="muted">${p.on ? `Mateo runs the bar line, 9 to 6, Tuesday to Sunday${st6.hand ? " (he's in the kitchen now)" : ""}. The bonbon shelf fills first and he never moulds it into bars.` : "Mateo's paused: the kitchen only runs when you work it."}</p>`;
+    let h = `<p class="eyebrow" style="margin:14px 0 6px">Kitchen plan</p><p class="muted">${p.on ? `Mateo runs the bar line on his shifts (he's a student: Wednesday and Friday 2 to 6, Saturday 10 to 5)${st6.hand ? " (he's in the kitchen now)" : ""}. The bonbon shelf fills first and he never moulds it into bars.` : "Mateo's paused: the kitchen only runs when you work it."}</p>`;
     h += `<div class="actions"><button class="btn small ${p.on ? "alt" : "primary"}" data-cc="plan" data-k="on">${p.on ? "Pause Mateo" : "Mateo, back to work"}</button></div>`;
     h += Object.entries(KINDS2).map(([k, d]) => step2("keep", k, c.keep[k], `${dot2(d.col)} Keep for bonbons: ${d.n.split(" ")[0].toLowerCase()} <small class="muted">(${c.res[k]} there)</small>`)).join("");
     h += `<div class="row gprices"><span>Auto-buy beans</span><button class="btn small ${p.buy ? "primary" : "alt"}" data-cc="plan" data-k="buy" aria-pressed="${p.buy}">${p.buy ? "On" : "Off"}</button></div>`;
@@ -14870,9 +15013,19 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function counterBonbons(F2) {
     const c = cocoaState(F2), shown = onDisplay2(c), have = shown.reduce((a, b) => a + c.trays[b.id], 0);
-    if (!c.bonbons.length) return "";
+    if (!c.bonbons.length) return giveSpecials(c);
     return `<p class="eyebrow" style="margin:12px 0 6px">Bonbons</p>${shown.length ? `<div class="gchips">${shown.map((b) => `<button class="gchip" data-cc="eatbb" data-k="${esc(b.id)}">${dot2(KINDS2[b.shell].col)}<span>${esc(b.name)}</span></button>`).join("")}</div>` : `<p class="muted">The display case is empty.</p>`}
-    <div class="actions"><button class="btn small alt" data-cc="box" data-n="4" ${have >= 4 ? "" : "disabled"}>Gift box of 4</button><button class="btn small alt" data-cc="box" data-n="9" ${have >= 9 ? "" : "disabled"}>Gift box of 9</button></div>`;
+    <div class="actions"><button class="btn small alt" data-cc="box" data-n="4" ${have >= 4 ? "" : "disabled"}>Gift box of 4</button><button class="btn small alt" data-cc="box" data-n="9" ${have >= 9 ? "" : "disabled"}>Gift box of 9</button></div>${pairing(F2, have)}${giveSpecials(c)}`;
+  }
+  function pairing(F2, have) {
+    const wines = wineShelf(F2).slice(0, 4);
+    if (!wines.length) return "";
+    return `<p class="eyebrow" style="margin:12px 0 6px">Wine pairing box</p><p class="muted">A bottle from the wine shop and 4 bonbons from the case, to give.</p><div class="actions">${wines.map((b) => `<button class="btn small alt" data-cc="pair" data-k="${esc(b.id)}" ${have >= 4 ? "" : "disabled"}>With ${esc(b.name)}</button>`).join("")}</div>`;
+  }
+  function giveSpecials(c) {
+    const have = Object.values(SPECIALS).filter((x) => c.specials[x.id] > 0);
+    if (!have.length) return "";
+    return `<div class="actions">${have.map((x) => `<button class="btn small alt" data-cc="takesp" data-k="${x.id}">${icon(x.id, 18)} ${esc(x.n)} to give (${c.specials[x.id]})</button>`).join("")}</div>`;
   }
 
   // src/game/companions.js
@@ -20196,6 +20349,35 @@ ${SIGNOFF[t2.who] || ""}`;
       } else if (a === "case") {
         if (!toggleDisplay(cocoaState(F), k)) return;
         sfx("tap");
+      } else if (a === "scoop") {
+        const got = sendScoop(F, k);
+        if (!got) return;
+        sfx("paper", true);
+        gainXp(1);
+        speak(k === "dip" ? `${got} dips of house-made dark, off to the Scoop Shack's dip station. Cones dipped in it sell for more.` : `${got} bars of Cocoa Room chocolate, into the Scoop Shack's gelato fridge. Try it at the mixing bench!`, 5e3);
+      } else if (a === "wine") {
+        const got = wineToPantry(F, k);
+        if (!got) return;
+        sfx("tap");
+        flash(`${got.wine}: 4 fillings on the shelf`);
+      } else if (a === "pair") {
+        const w = packPairing(F, k);
+        if (!w) return;
+        sfx("paper", true);
+        flash(`Pairing box with ${w}, in your backpack`);
+        speak("A bottle and four bonbons, ribboned together. Tap it in your backpack to choose who it's for.", 4500);
+      } else if (a === "special") {
+        const sp = makeSpecial(F);
+        if (!sp) return;
+        sfx("chime");
+        act("cheer");
+        gainXp(2);
+        [0, 250].forEach((t2, i) => setTimeout(() => mprop("sparkle", mel.x + (i ? 20 : -20), mel.y - 60, 1500), t2));
+        speak(`${sp.make} ${sp.n.toLowerCase()}${sp.make > 1 && !/s$/.test(sp.n) ? "s" : ""} for ${sp.fest}! They'll sell beside the display case.`, 5e3);
+      } else if (a === "takesp") {
+        if (!takeSpecial(F, k)) return;
+        sfx("chime");
+        flash(`${ITEMS[k].n} in your backpack`);
       } else if (a === "eatbb") {
         const bb = eatBonbon(F, k);
         if (!bb) return;

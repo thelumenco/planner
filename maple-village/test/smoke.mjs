@@ -1781,6 +1781,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.addInitScript(() => { const m = /ccpatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     if (m[1] === "coins") { f.coins = 2000; f.inv = {...(f.inv || {}), honey: 2, pandan: 1}; f.cocoa = {plan: {on: false}}; }   // Mateo paused while Mel works it by hand
     if (m[1] === "rewind") f.cocoa.at = 1;
+    const trays = () => f.cocoa.bonbons.forEach(b => { f.cocoa.trays[b.id] = 12; });
+    if (m[1] === "links" || m[1] === "fest" || m[1] === "club") { Object.assign(f.cocoa, {choc: {milk: 40, dark: 40, white: 40}, plan: {...f.cocoa.plan, on: false}}); trays(); }
+    if (m[1] === "links") { f.scoop = {...(f.scoop || {}), up: {...((f.scoop || {}).up || {}), dip: 1}}; f.vine = {...(f.vine || {}), shelf: [{id: "wtest", name: "Maple's Red", type: "red", n: 3, price: 18, open: 0}]}; }
+    if (m[1] === "club") { f.goals.cellar = 1; f.cocoa.at = Date.parse("2026-11-06T10:00:00Z"); }
     if (m[1] === "mateo") Object.assign(f.cocoa, {at: 1, plan: {on: true, buy: true, floor: 200, hold: 0}, beans: 0, roasted: 0, roast: null, grind: null, ground: null, res: {milk: 0, dark: 0, white: 0}, keep: {milk: 30, dark: 30, white: 0}, choc: {milk: 0, dark: 0, white: 0}, bars: {milk: 0, dark: 0, white: 0}, made: 0});
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   const at = async (t, q = "") => { await page.goto(url + `?seed=1&time=${t}&date=2026-10-10${q}`); await page.waitForTimeout(900); };
@@ -1846,6 +1850,37 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await tap("ccounter", '#ctx [data-cc="keep"][data-k="white"][data-n="1"]'); await page.click('#ctx [data-cc="keep"][data-k="white"][data-n="1"]'); await page.waitForTimeout(300);
   await page.click('#ctx [data-cc="plan"][data-k="buy"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.keep.white === 6 && f.cocoa.plan.buy === false), "the kitchen plan at the counter: a bonbon shelf target per chocolate, and auto-buy on or off");
+  await page.click("#ctx [data-close]").catch(() => {});
+  // around the village: house chocolate for the Scoop Shack, wine fillings and pairing boxes, festival specials, the wine club
+  await at("18:40", "&ccpatch=links"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await tap("moulds", '#ctx [data-cc="scoop"][data-k="fridge"]'); await page.click('#ctx [data-cc="scoop"][data-k="fridge"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-cc="scoop"][data-k="dip"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.scoop.fridge.housechoc === 5 && f.scoop.houseDips === 20 && f.scoop.dips.house && f.cocoa.choc.dark === 20), "dark chocolate goes to the Scoop Shack: Cocoa Room chocolate for the gelato fridge, house-made dark for the dip station");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await tap("pantry", '#ctx [data-cc="wine"][data-k="wtest"]'); await page.click('#ctx [data-cc="wine"][data-k="wtest"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.cocoa.pantry.wine_red === 4 && f.vine.shelf[0].n === 2), "a bottle off the wine shop shelf opens into four wine fillings");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await tap("bonbon", '#ctx [data-cc="sel"][data-k="wine_red"]'); await page.click('#ctx [data-cc="sel"][data-k="wine_red"]'); await page.waitForTimeout(200); await page.click('#ctx [data-cc="bonbon"]'); await page.waitForTimeout(300);
+  const wb = await fox().then(f => f.cocoa.bonbons.find(b => b.fills.includes("wine_red")));
+  check(!!wb, `a wine bonbon (${wb && wb.name})`);
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
+  await tap("ccounter", '#ctx [data-cc="pair"][data-k="wtest"]'); await page.click('#ctx [data-cc="pair"][data-k="wtest"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.pairbox === 1 && f.vine.shelf[0].n === 1), "a wine pairing box: a bottle and four bonbons, to give");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.goto(url + "?seed=1&time=12:00&date=2026-11-05&ccpatch=fest"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await tap("bonbon", '#ctx [data-cc="special"]');
+  check(/Deepavali special/i.test(await page.locator("#ctx").innerText()), "around Deepavali the bonbon table offers its festival special");
+  await page.click('#ctx [data-cc="special"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.cocoa.specials.sp_spiced === 6), "six spiced chocolate boxes made");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
+  await tap("ccounter", '#ctx [data-cc="takesp"][data-k="sp_spiced"]'); await page.click('#ctx [data-cc="takesp"][data-k="sp_spiced"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.sp_spiced === 1 && f.cocoa.specials.sp_spiced <= 5), "and one to give");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.goto(url + "?seed=1&time=21:05&date=2026-11-06&ccpatch=club"); await page.waitForTimeout(1500);
+  check(await fox().then(f => (f.cocoa.sold["2026-11-06"] || {}).club > 0), "wine club night: members buy chocolates at the cellar door");
   await page.close();
 }
 {
@@ -1965,6 +2000,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(box > 0, `the honesty freezer sold while the shop was shut (${box} coins in its box)`);
   await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
   check(await page.locator('#world [data-place="hfreezer"]').count() === 1 && await page.locator('#world [data-place="dbike"]').count() === 1 && await page.locator("#sceneArt .nightcopy circle").count() > 5, "the freezer and bike are on the bay, and the fairy lights glow at night");
+  const c0 = await fox().then(f => f.coins);
   await page.locator('#world [data-place="hfreezer"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gcollect]", { timeout: 15000 }); await page.click("#ctx [data-gcollect]"); await page.waitForTimeout(300);
   check(await fox().then(f => f.scoop.box === 0 && f.coins >= c0 + box), "collect the coins from the box");
   await page.locator('#world [data-place="hfreezer"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });

@@ -105,6 +105,11 @@ export const GOODS = {
 Object.assign(GOODS, {
   bar_milk: {...G("Milk chocolate bar", NOM, 6, "cocoa", "Your own chocolate! Smooth and creamy.", ["bar", "#8A5A3A"]), says: {evan: "CHOCOLATE! Mama made it!", mama: "You made this? From the bean? Aiyo, so clever."}},
   bar_dark: {...G("Dark chocolate bar", "family", 6, "cocoa", "Dark chocolate, made from the bean! Rich.", ["bar", "#4A2E22"]), says: {marcus: "Dark choc, no dairy. Antioxidants, Zeh. Approved.", dad: "Dark chocolate with my coffee. Perfect."}},
+  pairbox: G("Wine and chocolate pairing box", ["darren", "dad", "mum", "angelina", "mama", "gonggong"], 40, "cocoa", "Your wine AND your bonbons? In one box? I'm saving this for a special night.", ["box", "#7A1F3D", "#F3C969"], {darren: "Wine and chocolate. You know me so well.", dad: "Ah Gong will share it with your mum. Maybe."}),
+  sp_log: G("Chocolate yule log", "family", 18, "cocoa", "A chocolate log! It's Christmas now, officially.", null, {evan: "A CHOCOLATE TREE! I mean log! Can I eat the holly?", marcus: "Dark choc log, no dairy. Merry Christmas, Zeh."}),
+  sp_coins: G("Box of gold chocolate coins", NOM, 12, "cocoa", "Gold coins! Huat ah! So much luck in one box.", ["box", "#F3C969", "#D9433A"], {evan: "I'm RICH! Chocolate rich!", mama: "Gold coins for Ma Ma? Huat ah!"}),
+  sp_spiced: G("Spiced chocolate box", "family", 12, "cocoa", "Cardamom and chocolate? Oh, that's lovely. Happy Deepavali!", ["box", "#4A2E22", "#F6A23A"], {marcus: "Dark and spiced, dairy-free. Happy Deepavali, Zeh."}),
+  sp_mooncake: G("Chocolate mooncake", NOM, 10, "cocoa", "A chocolate mooncake! Let's have it under the lanterns.", null, {mama: "Chocolate mooncake? Ma Ma never try before. So modern!"}),
   box4: G("Box of 4 bonbons", NOM, 14, "cocoa", "A little box of your bonbons! Too pretty to eat. Almost.", ["box", "#8A5A3A", "#F3E7C9"]),
   box4d: G("Box of 4 dark bonbons", "family", 14, "cocoa", "Dark chocolate bonbons, all dairy-free!", ["box", "#4A2E22", "#F3C969"], {marcus: "Dairy-free bonbons? You thought of everything, Zeh."}),
   box9: G("Box of 9 bonbons", NOM, 30, "cocoa", "A whole box of bonbons! Every one different.", ["box", "#8A5A3A", "#E8566C"], {mum: "Nine! I'll share them with Dad. Maybe.", mama: "So beautiful, like jewels. Ma Ma keep for special guests."}),

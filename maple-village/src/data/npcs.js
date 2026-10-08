@@ -277,12 +277,13 @@ export const NPCS = [
     intro: "Hi, I'm Amara! I wrap, I sell, and I sneak the broken bits. Don't tell.",
     lines: ["The dark one's flying off the wall today.", "Someone bought six bars. Six!", "It smells like heaven in here, all day long.", "I told a tourist you make it from the bean. They nearly cried."],
     hellos: ["Hi Mel! The wall's looking good.", "Boss! Want a taste?"], away: "Amara's off. The Cocoa Room's quiet."},
-  // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep): the bar line, 9 to 6, Tuesday to Sunday
+  // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep), a student working part-time: Wed and Fri 2-6, Sat 10-5
   {id: "mateo", pitch: .95, name: "Mateo", job: "Kitchen hand at the Cocoa Room",
     look: {skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#F6F2EA", bottom: "#4A2E22", extra: "apron"},
-    routine: [slot("09:00", "18:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [0, 2, 3, 4, 5, 6], needs: "cocoa"})],
-    intro: "Hola! I'm Mateo. Roaster, grinder, slab, moulds: I keep the bars coming. The bonbons are all yours, boss.",
-    lines: ["Your bonbon shelf is full. I didn't touch a crumb!", "The grinder's singing today.", "Forty dark bars on the wall. A personal best.", "I bought beans this morning. Don't worry, I kept to your budget."],
+    routine: [slot("14:00", "18:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [3, 5], needs: "cocoa"}),
+      slot("10:00", "17:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [6], needs: "cocoa"})],
+    intro: "Hola! I'm Mateo. I study food science at the poly, and on Wednesdays, Fridays and Saturdays I keep the bars coming here. The bonbons are all yours, boss.",
+    lines: ["Your bonbon shelf is full. I didn't touch a crumb!", "Exams next week. Tempering is very calming.", "My lecturer says I'm the only one who's ground beans by hand.", "The grinder's singing today.", "Forty dark bars on the wall. A personal best.", "I bought beans this morning. Don't worry, I kept to your budget."],
     hellos: ["Morning, boss! Roaster's warm.", "Hi Mel! Smell that?"], away: "Mateo's gone home. The kitchen's quiet."},
   // Noor runs the pet adoption corner at the Sunday farmers market and the field fair (tours.js); no routine otherwise
   {id: "noor", pitch: 1.1, name: "Noor", job: "Finds homes for rescued pets", tourist: true, routine: [],

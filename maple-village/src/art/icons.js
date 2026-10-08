@@ -327,6 +327,9 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
     bar: (a) => [`<rect x="5" y="4" width="14" height="17" rx="1.5" ${f(a)}/><path d="M5 11h14v10H5z" ${f("#E8D3A6")}/><path d="M5 11h14" ${f("none")}/>`, `<rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M5 11h14M12 4v7M5 7.5h14"/><path d="M8 15h8M8 18h5" opacity=".5"/>`],
     coconut: (a) => [`<circle cx="12" cy="14" r="7" ${f(a)}/><ellipse cx="12" cy="9" rx="4" ry="1.5" ${f("#FFFDF6")}/>`, `<circle cx="12" cy="14" r="7"/><ellipse cx="12" cy="9" rx="4" ry="1.5"/><path d="M14 9l3-7"/>`]
   };
+  // the Cocoa Room's (cocoa.js): house chocolate for the gelato fridge, wine fillings, festival specials
+  I.housechoc = S.bar("#3F2519"); I.sp_log = I.logcake; I.sp_mooncake = I.mooncake;
+  [["red", "#7A1F3D"], ["rose", "#E98AA0"], ["white", "#E8D57A"], ["sparkling", "#F3E7B0"]].forEach(([k, c]) => { I["wine_" + k] = S.bottle(c); });
   Object.entries(GOODS).forEach(([id, g]) => { if (I[id] || !g.art) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
 }
 export const icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
