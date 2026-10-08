@@ -13455,7 +13455,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function phase() {
     if (S2.mode === "break") return "break";
     if (S2.mode === "decompress" && S2.decompFree) return "decompress";
-    if (!S2.cleanDone) return "clean";
+    if (!S2.cleanDone && !S2.cleanLater) return "clean";
     if (S2.mode === "decompress") return "decompress";
     if (remaining().length) return "task";
     return S2.doneIds.length ? "recap" : "empty";
@@ -14499,11 +14499,13 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function doNext(id) {
     const ids = allTasks().map((x) => x.id);
     if (S2.timer && S2.timer.kind !== "break") S2.timer = null;
+    const later2 = !S2.cleanDone && !S2.cleanLater;
+    if (later2) S2.cleanLater = true;
     S2.order = [id, ...ids.filter((x) => x !== id)];
     say2 = null;
     openView = null;
     boardOpen = false;
-    speak("New quest picked! Off we go.", 3e3);
+    speak(later2 ? "New quest picked! The five-minute clean will wait on the board for later." : "New quest picked! Off we go.", 3500);
     save2(true);
   }
   function countQuest() {
@@ -16868,9 +16870,9 @@ ${SIGNOFF[t2.who] || ""}`;
     $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
     $("qBadge").hidden = !rem.length;
     $("qBadge").textContent = rem.length;
-    $("list").innerHTML = all.map((t2) => {
+    $("list").innerHTML = (!S2.cleanDone && S2.cleanLater ? `<li class="pick" data-cleannow="1" role="button" tabindex="0"><span class="pl">${icon("home", 20)}</span><span class="t">Five-minute clean</span><small>waiting for later</small><button class="next" data-cleannow="1">do this now</button></li>` : "") + all.map((t2) => {
       const dn = S2.doneIds.includes(t2.id);
-      const pickable = !dn && t2.id !== cur2 && phase() !== "clean";
+      const pickable = !dn && t2.id !== cur2;
       return `<li class="${dn ? "done" : ""}${t2.id === cur2 ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t2.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t2), 20)}</span><span class="t">${dn ? `<i class="tk" aria-label="done"></i>` : ""}${esc(t2.title)}</span><small>${esc(placeInfo(placeOf(t2)).name)} · ${esc(spotObj(placeOf(t2), spotOf(t2)).name)}${t2.id === cur2 ? " · doing now" : ""}${t2.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t2.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t2.id)}">do this now</button>` : "<span></span>"}</li>`;
     }).join("") + ((S2.dropped || []).length ? `<li class="dropped"><small>Dropped today: ${(S2.dropped || []).map((id) => {
       const t2 = (P && P.tasks || []).find((x) => x.id === id);
@@ -16889,6 +16891,16 @@ ${SIGNOFF[t2.who] || ""}`;
       doNext(el.dataset.next);
     });
     $("list").querySelectorAll("[data-pick]").forEach((el) => el.onclick = () => doNext(el.dataset.pick));
+    $("list").querySelectorAll("[data-cleannow]").forEach((el) => el.onclick = (ev) => {
+      ev.stopPropagation();
+      S2.cleanLater = false;
+      if (S2.timer && S2.timer.kind !== "break") S2.timer = null;
+      say2 = null;
+      openView = null;
+      boardOpen = false;
+      speak("Five-minute clean first, then. Grab a wet wipe from the cleaning cupboard.", 4e3);
+      save2(true);
+    });
     renderTomorrow();
     const pin = $("paperIn"), paper = paperWaiting();
     if (pin) pin.style.display = paper ? "" : "none";
