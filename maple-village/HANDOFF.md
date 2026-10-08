@@ -1108,3 +1108,26 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - `cocoaTick` sells bonbons in half of sales: 2–4 at a time, at `prices.bonbon` (3 coins by default, set at the counter).
 - **Boxes:** `packBox` packs 4 or 9 bonbons into `box4`/`box9`, which are gift items in stall-goods.js. You get `box4d`/`box9d` (dairy-free) when every bonbon in the box has a dark shell. You can also eat one (`eatBonbon`).
 - **Still to come:** step 3 (house chocolate for the Scoop Shack and dip station, wine pairings, festival specials) and step 4 (the upgrades catalogue and a night market stall).
+
+### Round 89: Mateo, the Cocoa Room's kitchen hand
+- **Who he is:** Mateo (npcs.js) works in `cocoakitchen` from 9 to 6, Tuesday to Sunday, once the shop is owned. He moves between the stations.
+- **What he does:** in `cocoaTick`, each minute of his shift runs `handStep`:
+  - Temper a finished pot.
+  - Start a grind when roasted beans are waiting.
+  - Roast a sack when none is roasted, auto-buying one if allowed.
+  - Mould loose chocolate into bars, up to 40 of each kind on the wall (`WALL`).
+  - Timers now finish at the simulated minute (`finish(c, t)`), so catch-ups while Mel's away keep the line moving.
+- **The bonbon shelf:**
+  - Mateo's tempered pots go to `c.res[kind]` first, up to Mel's targets `c.keep` (default milk 30, dark 30, white 0). Only the rest becomes loose `c.choc`, and only loose chocolate is moulded.
+  - `nextKind` grinds whichever kind is furthest below its target; otherwise, the kind with the fewest bars.
+  - Mel's own pots from the slab stay loose.
+  - Bonbon shells take from the shelf first, then from loose chocolate (`shellChoc`).
+- **Kitchen plan** (`planPanel`, at the counter):
+  - Pause or resume Mateo (`c.plan.on`).
+  - Shelf targets per kind, in steps of 6.
+  - Auto-buy (`plan.buy`, on by default).
+  - A coin floor (`plan.floor`, 200, in steps of 50) he never spends below.
+  - Sacks he leaves alone (`plan.hold`).
+  - `c.bought` counts the sacks he's bought.
+- **The away message** says what he did: pots, shelf pieces, bars, sacks bought.
+- **Tests:** the Cocoa Room block pauses Mateo for Mel's hand-made run, then checks two days of his shifts from empty and the plan controls.

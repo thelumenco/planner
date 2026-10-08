@@ -4859,6 +4859,19 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       hellos: ["Hi Mel! The wall's looking good.", "Boss! Want a taste?"],
       away: "Amara's off. The Cocoa Room's quiet."
     },
+    // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep): the bar line, 9 to 6, Tuesday to Sunday
+    {
+      id: "mateo",
+      pitch: 0.95,
+      name: "Mateo",
+      job: "Kitchen hand at the Cocoa Room",
+      look: { skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#F6F2EA", bottom: "#4A2E22", extra: "apron" },
+      routine: [slot("09:00", "18:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], { dow: [0, 2, 3, 4, 5, 6], needs: "cocoa" })],
+      intro: "Hola! I'm Mateo. Roaster, grinder, slab, moulds: I keep the bars coming. The bonbons are all yours, boss.",
+      lines: ["Your bonbon shelf is full. I didn't touch a crumb!", "The grinder's singing today.", "Forty dark bars on the wall. A personal best.", "I bought beans this morning. Don't worry, I kept to your budget."],
+      hellos: ["Morning, boss! Roaster's warm.", "Hi Mel! Smell that?"],
+      away: "Mateo's gone home. The kitchen's quiet."
+    },
     // Noor runs the pet adoption corner at the Sunday farmers market and the field fair (tours.js); no routine otherwise
     {
       id: "noor",
@@ -14514,6 +14527,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var SACK = 10;
   var KINDS2 = { milk: { n: "Milk chocolate", col: "#8A5A3A" }, dark: { n: "Dark chocolate", col: "#4A2E22" }, white: { n: "White chocolate", col: "#F3E7C9" } };
   var BAR_ID = (k) => "bar_" + k;
+  var HAND_FROM = 9 * 60;
+  var HAND_TO = 18 * 60;
+  var WALL = 40;
   var now2 = () => Date.now() + (globalThis.__mapleOffset || 0);
   var openOn = (day, hm2) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() !== 1 && hm2 >= OPEN2 && hm2 < CLOSE2;
   function cocoaState(F2) {
@@ -14533,6 +14549,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     c.pantry = c.pantry || {};
     c.bonbons = c.bonbons || [];
     c.trays = c.trays || {};
+    c.res = Object.assign({ milk: 0, dark: 0, white: 0 }, c.res || {});
+    c.keep = Object.assign({ milk: 30, dark: 30, white: 0 }, c.keep || {});
+    c.plan = Object.assign({ on: true, buy: true, floor: 200, hold: 0 }, c.plan || {});
     return c;
   }
   var left3 = (t2) => {
@@ -14560,6 +14579,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     c.grind = { kind, done: now2() + GRIND_MIN * 6e4 };
     return true;
   }
+  function pour2(c, k) {
+    const r = Math.max(0, Math.min(POT, c.keep[k] - c.res[k]));
+    c.res[k] += r;
+    c.choc[k] += POT - r;
+    return r;
+  }
   function temper(F2) {
     const c = cocoaState(F2);
     if (!c.ground) return null;
@@ -14576,8 +14601,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     c.made += MOULD;
     return true;
   }
-  function finish(c) {
-    const t2 = now2();
+  function finish(c, t2 = now2()) {
     let out = null;
     if (c.roast && t2 >= c.roast.done) {
       c.roasted++;
@@ -14608,12 +14632,15 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var recipeOf2 = (c, id) => c.bonbons.find((b) => b.id === id);
   var knownBonbon = (c, shell, fills) => recipeOf2(c, keyOf2(shell, fills));
-  var canMakeBonbon = (c, shell, fills) => c.choc[shell] >= SHELL && fills.length >= 1 && fills.every((f2) => (c.pantry[f2] || 0) >= 1);
+  var shellChoc = (c, k) => c.res[k] + c.choc[k];
+  var canMakeBonbon = (c, shell, fills) => shellChoc(c, shell) >= SHELL && fills.length >= 1 && fills.every((f2) => (c.pantry[f2] || 0) >= 1);
   function makeBonbons(F2, shell, fills) {
     const c = cocoaState(F2);
     fills = [...new Set(fills)].filter(isFilling).slice(0, 2);
     if (!KINDS2[shell] || !fills.length || !canMakeBonbon(c, shell, fills)) return null;
-    c.choc[shell] -= SHELL;
+    const r0 = Math.min(SHELL, c.res[shell]);
+    c.res[shell] -= r0;
+    c.choc[shell] -= SHELL - r0;
     fills.forEach((f2) => {
       c.pantry[f2]--;
       if (c.pantry[f2] <= 0) delete c.pantry[f2];
@@ -14683,11 +14710,51 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     c.trays[id]--;
     return b;
   }
+  var handOn = (day, hm2) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() !== 1 && hm2 >= HAND_FROM && hm2 < HAND_TO;
+  function nextKind(c) {
+    const gap = Object.keys(KINDS2).map((k) => [k, c.keep[k] - c.res[k] - (c.ground === k ? POT : 0)]).filter(([, g]) => g > 0).sort((a, b) => b[1] - a[1]);
+    if (gap.length) return gap[0][0];
+    return Object.keys(KINDS2).sort((a, b) => c.bars[a] + c.choc[a] - (c.bars[b] + c.choc[b]))[0];
+  }
+  function handStep(F2, c, t2, out) {
+    const h = out.hand;
+    if (c.ground) {
+      const k = c.ground;
+      h.res += pour2(c, k);
+      c.ground = null;
+      h.pots++;
+    }
+    if (!c.grind && !c.ground && c.roasted > 0) {
+      c.roasted--;
+      c.grind = { kind: nextKind(c), done: t2 + GRIND_MIN * 6e4, by: "hand" };
+    }
+    if (!c.roast && c.roasted < 1) {
+      if (c.beans <= c.plan.hold && c.plan.buy && F2.coins - SACK >= c.plan.floor) {
+        F2.coins -= SACK;
+        c.beans++;
+        c.bought = (c.bought || 0) + 1;
+        h.sacks++;
+        h.spent += SACK;
+      }
+      if (c.beans > c.plan.hold) {
+        c.beans--;
+        c.roast = { done: t2 + ROAST_MIN * 6e4, by: "hand" };
+      }
+    }
+    for (const k of Object.keys(KINDS2)) while (c.choc[k] >= MOULD && c.bars[k] < WALL) {
+      c.choc[k] -= MOULD;
+      c.bars[k] += MOULD;
+      c.made += MOULD;
+      h.bars += MOULD;
+    }
+  }
   function cocoaTick(F2, opts = {}) {
-    const c = cocoaState(F2), t2 = now2(), from = Math.max(c.at || t2, t2 - 2 * 864e5), out = { coins: 0, n: 0, mins: 0, done: finish(c) };
+    const c = cocoaState(F2), t2 = now2(), from = Math.max(c.at || t2, t2 - 2 * 864e5), out = { coins: 0, n: 0, mins: 0, done: null, hand: { pots: 0, bars: 0, sacks: 0, spent: 0, res: 0 } };
     for (let at = from + 6e4; at <= t2; at += 6e4) {
       const sg = new Date(at + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm2 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
       out.mins++;
+      out.done = finish(c, at) || out.done;
+      if (c.plan.on && opts.hand !== false && handOn(day, hm2)) handStep(F2, c, at, out);
       if (!openOn(day, hm2)) continue;
       const stocked = Object.keys(KINDS2).filter((k2) => c.bars[k2] > 0), shown = onDisplay2(c);
       if (!stocked.length && !shown.length) continue;
@@ -14711,6 +14778,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       out.coins += coins;
       out.n += n;
     }
+    out.done = finish(c) || out.done;
     c.at = from + out.mins * 6e4;
     if (out.coins) F2.coins += out.coins;
     return out;
@@ -14731,7 +14799,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     h += `<ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n} bars</b><small>${c.bars[k]} on the wall · ${c.prices.bar} ${coin2()} each</small></span><span class="orbtns"><button class="btn small primary" data-cc="eat" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>Have one</button><button class="btn small alt" data-cc="give" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>To give</button></span></li>`).join("")}</ul>`;
     h += `<div class="row gprices"><span>Price of a bar</span><span class="gstep"><button class="btn small alt" data-cc="price" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bar}</b><button class="btn small alt" data-cc="price" data-n="1" aria-label="Dearer">+</button></span></div>`;
     h += `<form class="row hadd" data-ccname="1"><label class="sr" for="ccName">Shop name</label><input id="ccName" maxlength="30" value="${esc(c.name)}"><button class="btn small alt">Rename</button></form>`;
-    return h + counterBonbons(F2) + `<p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut2;
+    return h + counterBonbons(F2) + planPanel(F2, st6) + `<p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut2;
   }
   function barWallPanel(F2) {
     const c = cocoaState(F2);
@@ -14742,7 +14810,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function kitchenPanel(F2, which) {
     const c = cocoaState(F2);
     finish(c);
-    const steps = `<p class="muted">Beans ${c.beans} · roasted ${c.roasted} · chocolate ${Object.entries(c.choc).map(([k, n]) => `${KINDS2[k].n.split(" ")[0].toLowerCase()} ${n}`).join(", ")}</p>`;
+    const short = (k) => KINDS2[k].n.split(" ")[0].toLowerCase();
+    const steps = `<p class="muted">Beans ${c.beans} · roasted ${c.roasted} · for bars ${Object.keys(KINDS2).map((k) => `${short(k)} ${c.choc[k]}`).join(", ")} · bonbon shelf ${Object.keys(KINDS2).map((k) => `${short(k)} ${c.res[k]}/${c.keep[k]}`).join(", ")}</p>`;
     if (which === "sacks") return `<span class="tape gingham" aria-hidden="true"></span><h2>Bean sacks</h2><p class="sub">Cacao beans, ${SACK} ${coin2()} a sack. A sack makes a pot of chocolate: 30 pieces.</p>
     <p class="olabel">${c.beans} sack${c.beans === 1 ? "" : "s"} in the kitchen</p><div class="actions"><button class="btn primary" data-cc="beans" data-n="1" ${F2.coins < SACK ? "disabled" : ""}>Buy a sack (${SACK} ${coin2()})</button><button class="btn alt" data-cc="beans" data-n="3" ${F2.coins < SACK * 3 ? "disabled" : ""}>Three (${SACK * 3} ${coin2()})</button></div>${steps}` + shut2;
     if (which === "roaster") return `<span class="tape stripe" aria-hidden="true"></span><h2>The roaster</h2><p class="sub">${c.roast ? `Roasting a sack: ready in ${left3(c.roast.done)}.` : "Roast a sack of beans. Ten minutes, and the whole kitchen smells amazing."}</p>
@@ -14770,14 +14839,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function bonbonPanel(F2, st6) {
     const c = cocoaState(F2), inS = Object.keys(c.pantry).filter((id) => c.pantry[id] > 0 && isFilling(id)), sel = (st6.sel || []).filter((id) => inS.includes(id)), shell = KINDS2[st6.shell] ? st6.shell : "dark";
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The bonbon table</h2><p class="sub">A shell (${SHELL} pieces of chocolate) and one or two fillings make a tray of ${TRAY}. Every new pairing is a new bonbon. ${c.bonbons.length} discovered so far.</p>`;
-    h += `<p class="eyebrow" style="margin:10px 0 6px">Shell</p><div class="gchips">${Object.entries(KINDS2).map(([k, d]) => `<button class="gchip${k === shell ? " on" : ""}" data-cc="shell" data-k="${k}" aria-pressed="${k === shell}">${dot2(d.col)}<span>${d.n.split(" ")[0]} (${c.choc[k]})</span></button>`).join("")}</div>`;
+    h += `<p class="eyebrow" style="margin:10px 0 6px">Shell</p><div class="gchips">${Object.entries(KINDS2).map(([k, d]) => `<button class="gchip${k === shell ? " on" : ""}" data-cc="shell" data-k="${k}" aria-pressed="${k === shell}">${dot2(d.col)}<span>${d.n.split(" ")[0]} (${shellChoc(c, k)})</span></button>`).join("")}</div>`;
     h += `<p class="eyebrow" style="margin:10px 0 6px">Fillings</p>` + (inS.length ? `<div class="gchips">${inS.map((id) => `<button class="gchip${sel.includes(id) ? " on" : ""}" data-cc="sel" data-k="${id}" aria-pressed="${sel.includes(id)}" ${!sel.includes(id) && sel.length >= 2 ? "disabled" : ""}>${ingPic2(id)}<span>${esc(fillName(id))}</span></button>`).join("")}</div>` : `<p class="muted">The fillings shelf is empty. Stock it first.</p>`);
     const made = st6.made && recipeOf2(c, st6.made), known = sel.length ? knownBonbon(c, shell, sel) : null;
     if (made && !sel.length) h += card4(made.shell, made.col, made.name, st6.isNew ? "A new bonbon! The first tray's ready for the display case." : "Another tray of twelve, ready for the display case.", true);
     else if (sel.length) h += card4(shell, INGR[[...sel].sort()[0]][2], known ? known.name : bonbonName(shell, sel), known ? "You know this one. Make another tray?" : "Something new!");
     const ok = sel.length && canMakeBonbon(c, shell, sel);
     h += `<div class="actions"><button class="btn primary" data-cc="bonbon" ${ok ? "" : "disabled"}>${known ? "Make another tray" : "Make it"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
-    if (sel.length && c.choc[shell] < SHELL) h += `<p class="muted">Not enough ${KINDS2[shell].n.toLowerCase()}: temper some more first.</p>`;
+    if (sel.length && shellChoc(c, shell) < SHELL) h += `<p class="muted">Not enough ${KINDS2[shell].n.toLowerCase()}: temper some more first, or raise its bonbon shelf target at the counter so Mateo makes some.</p>`;
     if (c.bonbons.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map((b) => `<li><span class="wpic">${dot2(KINDS2[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS2[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span><button class="btn small alt" data-cc="again" data-k="${esc(b.id)}" ${canMakeBonbon(c, b.shell, b.fills) ? "" : "disabled"}>Another tray</button></li>`).join("")}</ul>`;
     return h;
   }
@@ -14788,6 +14857,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (rest.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Waiting in the kitchen</p><ul class="hlist wlist">${rest.map((b) => `<li><span class="wpic">${dot2(KINDS2[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id]} made</small></span><button class="btn small primary" data-cc="case" data-k="${esc(b.id)}" ${ids.length >= CASE ? "disabled" : ""}>Put in</button></li>`).join("")}</ul>`;
     h += `<div class="row gprices"><span>Price of a bonbon</span><span class="gstep"><button class="btn small alt" data-cc="bprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bonbon}</b><button class="btn small alt" data-cc="bprice" data-n="1" aria-label="Dearer">+</button></span></div>`;
     return h + shut2;
+  }
+  function planPanel(F2, st6 = {}) {
+    const c = cocoaState(F2), p = c.plan;
+    const step2 = (a, k, v, label2) => `<div class="row gprices"><span>${label2}</span><span class="gstep"><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="-1" aria-label="Less">−</button><b>${v}</b><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="1" aria-label="More">+</button></span></div>`;
+    let h = `<p class="eyebrow" style="margin:14px 0 6px">Kitchen plan</p><p class="muted">${p.on ? `Mateo runs the bar line, 9 to 6, Tuesday to Sunday${st6.hand ? " (he's in the kitchen now)" : ""}. The bonbon shelf fills first and he never moulds it into bars.` : "Mateo's paused: the kitchen only runs when you work it."}</p>`;
+    h += `<div class="actions"><button class="btn small ${p.on ? "alt" : "primary"}" data-cc="plan" data-k="on">${p.on ? "Pause Mateo" : "Mateo, back to work"}</button></div>`;
+    h += Object.entries(KINDS2).map(([k, d]) => step2("keep", k, c.keep[k], `${dot2(d.col)} Keep for bonbons: ${d.n.split(" ")[0].toLowerCase()} <small class="muted">(${c.res[k]} there)</small>`)).join("");
+    h += `<div class="row gprices"><span>Auto-buy beans</span><button class="btn small ${p.buy ? "primary" : "alt"}" data-cc="plan" data-k="buy" aria-pressed="${p.buy}">${p.buy ? "On" : "Off"}</button></div>`;
+    h += step2("plan", "floor", p.floor, `Never below <small class="muted">(coins)</small>`) + step2("plan", "hold", p.hold, `Sacks he leaves alone`);
+    return h;
   }
   function counterBonbons(F2) {
     const c = cocoaState(F2), shown = onDisplay2(c), have = shown.reduce((a, b) => a + c.trays[b.id], 0);
@@ -18013,7 +18092,7 @@ ${SIGNOFF[t2.who] || ""}`;
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
       h = !st6 ? "" : st6.kind === "wine" ? stallMarketPanel(F, serving()) : st6.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st6.kind === "scoop" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st6, dayKey(), sgHM()) }) : marketStallPanel(st6);
     } else if (orView === "pot" && potItem) h = potPanel(F, potItem);
-    else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? counterPanel3(F, { server: isHere("amara") }) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : kitchenPanel(F, ccView);
+    else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? counterPanel3(F, { server: isHere("amara"), hand: isHere("mateo") }) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : kitchenPanel(F, ccView);
     else if (keepItem && F.inv[keepItem]) h = keepPanel(F, keepItem);
     else if (keepSpot) h = placedPanel(F, keepSpot);
     else if (adoptItem && F.inv[adoptItem]) h = adoptPanel(F, adoptItem, adoptSt);
@@ -20028,7 +20107,10 @@ ${SIGNOFF[t2.who] || ""}`;
       sfx("coin");
       flash(`+${out.coins} coins: ${cocoaState(F).name}`);
     } else if (out.coins && out.mins >= 30) setTimeout(() => speak(`While you were away, ${cocoaState(F).name} sold ${out.n} bar${out.n > 1 ? "s" : ""}: ${out.coins} coins.`, 5e3), 2500);
-    if (out.done === "grind" && COCOA_IN.includes(scene)) speak("Ding! The grinder's done: a pot of chocolate, ready to temper on the marble slab.", 4500);
+    const hd = out.hand;
+    if (hd && (hd.pots || hd.bars) && out.mins >= 30) setTimeout(() => speak(`Mateo's been busy: ${hd.pots} pot${hd.pots === 1 ? "" : "s"} tempered${hd.res ? `, ${hd.res} pieces onto the bonbon shelf` : ""}${hd.bars ? `, ${hd.bars} bars on the wall` : ""}${hd.sacks ? `, ${hd.sacks} sack${hd.sacks === 1 ? "" : "s"} of beans bought (${hd.spent} coins)` : ""}.`, 6e3), out.coins ? 8e3 : 2500);
+    else if (hd && hd.pots && COCOA_IN.includes(scene) && isHere("mateo")) npcSay("mateo", hd.res ? "Another pot tempered. Some on your bonbon shelf!" : "Pot tempered. More bars for the wall.");
+    if (out.done === "grind" && cocoaState(F).ground && COCOA_IN.includes(scene)) speak("Ding! The grinder's done: a pot of chocolate, ready to temper on the marble slab.", 4500);
     if (out.coins || out.done || out.mins >= 5) save2();
     if (ccView) ctx();
     if (COCOA_IN.includes(scene)) drawScene();
@@ -20073,6 +20155,16 @@ ${SIGNOFF[t2.who] || ""}`;
       } else if (a === "price") {
         const s = cocoaState(F);
         s.prices.bar = Math.max(1, Math.min(30, s.prices.bar + n));
+      } else if (a === "keep") {
+        const s = cocoaState(F);
+        s.keep[k] = Math.max(0, Math.min(120, s.keep[k] + n * 6));
+      } else if (a === "plan") {
+        const p = cocoaState(F).plan;
+        if (k === "on" || k === "buy") p[k] = !p[k];
+        else if (k === "floor") p.floor = Math.max(0, Math.min(5e3, p.floor + n * 50));
+        else if (k === "hold") p.hold = Math.max(0, Math.min(20, p.hold + n));
+        sfx("tap");
+        if (k === "on") speak(p.on ? "Mateo's back on the bar line." : "Mateo's taking a break from the bar line. The kitchen's all yours.", 3500);
       } else if (a === "bprice") {
         const s = cocoaState(F);
         s.prices.bonbon = Math.max(1, Math.min(20, s.prices.bonbon + n));
