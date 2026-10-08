@@ -1779,7 +1779,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   page.on("dialog", d => { errors.push("the Cocoa Room used a browser pop-up"); d.dismiss(); });
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { const m = /ccpatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
-    if (m[1] === "coins") f.coins = 2000;
+    if (m[1] === "coins") { f.coins = 2000; f.inv = {...(f.inv || {}), honey: 2, pandan: 1}; }
     if (m[1] === "rewind") f.cocoa.at = 1;
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   const at = async (t, q = "") => { await page.goto(url + `?seed=1&time=${t}&date=2026-10-10${q}`); await page.waitForTimeout(900); };
@@ -1806,13 +1806,31 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await tap("moulds", '#ctx [data-cc="mould"][data-k="dark"]'); await page.click('#ctx [data-cc="mould"][data-k="dark"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.choc.dark === 20 && f.cocoa.bars.dark >= 9), "tempered on the marble slab (30 pieces), then moulded into ten bars for the wall");
   await page.click("#ctx [data-close]");
+  // bonbons: honey and pandan onto the fillings shelf, then a dark honey bonbon, then dark honey and pandan
+  await tap("pantry", '#ctx [data-cc="fill"][data-k="honey"]'); await page.click('#ctx [data-cc="fill"][data-src="bag"][data-k="honey"][data-n="99"]'); await page.waitForTimeout(200);
+  await page.click('#ctx [data-cc="fill"][data-src="bag"][data-k="pandan"][data-n="99"]'); await page.waitForTimeout(200);
+  check(await fox().then(f => f.cocoa.pantry.honey === 2 && f.cocoa.pantry.pandan === 1 && !f.inv.honey), "the fillings shelf is stocked from the backpack");
+  await page.click("#ctx [data-close]");
+  await tap("bonbon", '#ctx [data-cc="sel"][data-k="honey"]'); await page.click('#ctx [data-cc="sel"][data-k="honey"]'); await page.waitForTimeout(200);
+  check(/Honey/.test(await page.locator("#ctx .gresult").innerText()), "the bonbon table previews the bonbon it'll make");
+  await page.click('#ctx [data-cc="bonbon"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-cc="sel"][data-k="honey"]'); await page.click('#ctx [data-cc="sel"][data-k="pandan"]'); await page.waitForTimeout(200); await page.click('#ctx [data-cc="bonbon"]'); await page.waitForTimeout(300);
+  const bb = await fox().then(f => f.cocoa);
+  check(bb.bonbons.length === 2 && Object.values(bb.trays).every(n => n === 12) && bb.choc.dark === 8 && !bb.pantry.honey, `two new bonbons, a tray of twelve each (${bb.bonbons.map(b => b.name).join(", ")})`);
+  await page.click("#ctx [data-close]");
   await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(800);
   check(await page.locator('#world [data-spot="barwall"]').count() === 1 && await page.locator('#world [data-spot="ckdoor"]').count() === 1, "the shop front: the bar wall, the counter, the kitchen door");
   await tap("ccounter", '#ctx [data-cc="give"][data-k="dark"]'); await page.click('#ctx [data-cc="give"][data-k="dark"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.bar_dark === 1), "a dark chocolate bar to give (dairy-free, so even for Marcus)");
+  await page.click('#ctx [data-cc="box"][data-n="4"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.box4d === 1), "a gift box of four bonbons from the display case (all dark, so dairy-free)");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await tap("case", '#ctx [data-cc="case"]');
+  check(await page.locator('#ctx [data-cc="case"]').count() === 2, "the display case shows the bonbons");
+  await page.click("#ctx [data-close]").catch(() => {});
   await page.click("#ctx [data-close]").catch(() => {});
   await at("16:00", "&ccpatch=rewind"); await page.waitForTimeout(1500);
-  check(await fox().then(f => Object.values(f.cocoa.sold || {}).reduce((a, d) => a + d.n, 0) > 0), "customers buy bars off the wall while it's open (the takings come to Mel)");
+  check(await fox().then(f => Object.values(f.cocoa.sold || {}).reduce((a, d) => a + d.n, 0) > 0 && Object.values(f.cocoa.sold || {}).reduce((a, d) => a + (d.bonbons || 0), 0) > 0), "customers buy bars off the wall and bonbons from the case while it's open (the takings come to Mel)");
   await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1500);
   check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("amara"), "Amara's behind the counter");
   await page.close();

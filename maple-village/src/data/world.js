@@ -309,12 +309,15 @@ export const ROOMS = {
     ["gdipbar","Dip bar","B","gdipbar",null,"Dip it, top it.",34]]},
   // The Cocoa Room (a big goal, in the bay's old shopfront): the counter (Amara serves behind it; the front is drawn
   // over the people), the bar wall, a table, and the kitchen door; behind it the chocolate kitchen, bean to bar
-  cocoa: {name:"The Cocoa Room", wall:"#F3E4D2", trim:"#6B4430", noBoard:true, pos:{C:[300,330], W:[110,262], Z:[40,400], T:[340,520]}, stations:[
+  cocoa: {name:"The Cocoa Room", wall:"#F3E4D2", trim:"#6B4430", noBoard:true, pos:{C:[300,330], W:[110,262], Z:[40,400], T:[340,520], D:[440,262]}, stations:[
+    ["case","Display case","D","bonboncase",null,"The display case: bonbons, six flavours at a time.",36],
     ["ccounter","Counter","C","ccounter",null,"The counter. Yours are free.",46],
     ["barwall","Bar wall","W","barwall",null,"Wrapped bars of your own chocolate.",36],
     ["ckdoor","Kitchen","Z","gkdoor",null,"Into the chocolate kitchen.",0],
     ["ctables","Tables","T","cafetables",null,"A table for a little something.",34]]},
-  cocoakitchen: {name:"The chocolate kitchen", wall:"#F6EEE4", trim:"#8A5A3A", noBoard:true, pos:{S:[96,262], R:[260,262], G:[420,262], M:[170,480], O:[360,480]}, stations:[
+  cocoakitchen: {name:"The chocolate kitchen", wall:"#F6EEE4", trim:"#8A5A3A", noBoard:true, pos:{S:[96,262], R:[260,262], G:[420,262], M:[170,560], O:[370,560], P:[70,420], B:[270,410]}, stations:[
+    ["pantry","Fillings shelf","P","pantry",null,"The fillings shelf: what goes inside the bonbons.",30],
+    ["bonbon","Bonbon table","B","bonbontable",null,"The bonbon table: a shell and a filling or two.",30],
     ["sacks","Bean sacks","S","beansacks",null,"Sacks of cacao beans.",30],
     ["roaster","Roaster","R","roaster",null,"The bean roaster.",30],
     ["grinder","Stone grinder","G","grinder",null,"The stone grinder: roasted beans in, chocolate out.",30],

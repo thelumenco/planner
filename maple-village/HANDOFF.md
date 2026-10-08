@@ -1096,3 +1096,15 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Mel can have a bar or take one to give (gift items `bar_milk`, `bar_dark`, `bar_white`; dark is dairy-free).
 - **Amara** (npcs.js) serves Tuesday to Sunday, 10:45–8:15, once the shop is owned. Routine slots' `needs` now also checks `F.goals`.
 - **Still to come, steps 2–4:** bonbons (discovery, display case, gift boxes, recipe book), the Scoop Shack and wine shop links, festival specials, and the upgrades catalogue.
+
+### Round 88: The Cocoa Room, step 2 (bonbons)
+- **New kitchen stations:** the fillings pantry `pantry` (P) and the bonbon table `bonbon` (B). In the shop front, a display case `case` (D).
+- **Pantry:** fillings come from the backpack's ingredients (`isFilling`, which is INGR minus milk, egg, olives, corn, carrot and tomato). `stockPantry` moves them in. Orchard fruit can also be stocked straight in.
+- **Making bonbons:**
+  - Choose a shell (milk, dark or white; it uses 6 pieces of tempered chocolate, `SHELL`) and one or two fillings.
+  - `makeBonbons` makes a tray of 12 (`TRAY`) and gives the combination a name (`bonbonName`). The panel previews it before you make it.
+  - A combination you haven't made before is a discovery: it goes into `F.cocoa.bonbons` with xp and a toast.
+- **Display case:** holds 6 kinds (`CASE`). Tap a kind to put it in or take it out (`toggleDisplay`).
+  - `cocoaTick` sells bonbons in half of sales: 2–4 at a time, at `prices.bonbon` (3 coins by default, set at the counter).
+- **Boxes:** `packBox` packs 4 or 9 bonbons into `box4`/`box9`, which are gift items in stall-goods.js. You get `box4d`/`box9d` (dairy-free) when every bonbon in the box has a dark shell. You can also eat one (`eatBonbon`).
+- **Still to come:** step 3 (house chocolate for the Scoop Shack and dip station, wine pairings, festival specials) and step 4 (the upgrades catalogue and a night market stall).

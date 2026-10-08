@@ -45,7 +45,8 @@ import { shoreArt } from "../art/shore.js";
 import { bayArt, DECK_SEATS } from "../art/bay.js";
 import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { POOLS } from "../data/stall-goods.js";
-import { cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS } from "./cocoa.js";
+import { cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
+  pantryPanel, bonbonPanel, casePanel, stockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon } from "./cocoa.js";
 import { keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, OWNER_NAME, PETS, petAt } from "./companions.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
 import { diningTable, darrenAsleep, skyWash } from "../art/scenes.js";
@@ -253,7 +254,7 @@ const SHED = {
 // keepsakes and pets (companions.js): the keepsake being placed, a placed one's shelf, the pet being adopted (and for
 // whom), and the pet whose card is open
 // the Cocoa Room's open card: "counter", "wall", or a kitchen station ("sacks", "roaster", "grinder", "slab", "moulds")
-let ccView = null, lastCocoa = 0;
+let ccView = null, lastCocoa = 0, ccSt = {shell: "dark", sel: []};   // ccSt: the bonbon table's picks
 const COCOA_IN = ["cocoa", "cocoakitchen"];
 let keepItem = null, keepSpot = null, adoptItem = null, adoptSt = {}, petView = null;
 let goalView = null, paddling = false, scView = null, scSt = {pick: null, sel: []}, evanSeat = null, lastScoop = 0;
@@ -1487,7 +1488,7 @@ function ctx(){
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
   else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : marketStallPanel(st); }
   else if (orView === "pot" && potItem) h = potPanel(F, potItem);
-  else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara")}) : ccView === "wall" ? barWallPanel(F) : ccKitchenPanel(F, ccView);
+  else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara")}) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccKitchenPanel(F, ccView);
   else if (keepItem && F.inv[keepItem]) h = keepPanel(F, keepItem);
   else if (keepSpot) h = placedPanel(F, keepSpot);
   else if (adoptItem && F.inv[adoptItem]) h = adoptPanel(F, adoptItem, adoptSt);
@@ -1640,7 +1641,7 @@ function ctx(){
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
   c.querySelectorAll("[data-fair]").forEach(b => b.onclick = () => fairActivity(b.dataset.fair));
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ccView = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ccView = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
@@ -2051,7 +2052,7 @@ function arriveSpot(id){
   if (scene === "scoopshop" && id === "gtables") { sitAt(SHOP_SEATS); return; }
   if (id === "ckdoor") { setScene("cocoakitchen", INNER.cocoakitchen.arrive); return; }
   if (scene === "cocoa" && id === "ctables") { sitAt(SHOP_SEATS); return; }
-  if (COCOA_IN.includes(scene)) { ccView = {ccounter: "counter", barwall: "wall", sacks: "sacks", roaster: "roaster", grinder: "grinder", slab: "slab", moulds: "moulds"}[id] || null;
+  if (COCOA_IN.includes(scene)) { ccView = {ccounter: "counter", barwall: "wall", case: "case", pantry: "pantry", bonbon: "bonbon", sacks: "sacks", roaster: "roaster", grinder: "grinder", slab: "slab", moulds: "moulds"}[id] || null;
     if (ccView) { cocoaNow(); sfx("paper", true); if (id === "ccounter" && isHere("amara")) npcSay("amara", pick(["Hi boss! The wall's looking good.", "Want a taste? I saved you a broken one.", "Dark's flying today."])); render(); return; } }
   if (id === "gddoor") { if (hasUp(scoopState(F), "dip")) { setScene("scoopdip", INNER.scoopdip.arrive); setTimeout(() => speak("Warm chocolate and a whole shelf of sprinkles. Dangerous.", 3500), 900); } else { scView = "upgrade"; sfx("paper", true); render(); } return; }
   if (SCOOP_IN.includes(scene)) { scView = {gcounter: "counter", gmenu: "menu", gfridge: "fridge", gfreezer: "freezer", gboard: "batch", gbench: "bench", gupgrades: "upgrade", gpots: "pots", gtops: "tops", gdipbar: "dipbar"}[id] || null;
@@ -2249,6 +2250,17 @@ function wireCocoa(c){
     else if (a === "temper") { const kk = ccTemper(F); if (kk) { sfx("chime"); act("cheer"); gainXp(1); speak(`Spread, scrape, fold... it shines! 30 pieces of ${CC_KINDS[kk].n.toLowerCase()}.`, 4500); } }
     else if (a === "mould") { if (ccMould(F, k)) { sfx("chime"); flash(`10 ${CC_KINDS[k].n.toLowerCase()} bars on the wall`); gainXp(1); } }
     else if (a === "price") { const s = cocoaState(F); s.prices.bar = Math.max(1, Math.min(30, s.prices.bar + n)); }
+    else if (a === "bprice") { const s = cocoaState(F); s.prices.bonbon = Math.max(1, Math.min(20, s.prices.bonbon + n)); }
+    else if (a === "fill") { const got = stockPantry(F, k, n, b.dataset.src, orchState(F)); if (got) { sfx("tap"); flash(`+${got} on the fillings shelf`); } }
+    else if (a === "shell") { ccSt.shell = k; ccSt.made = null; }
+    else if (a === "sel") { ccSt.made = null; ccSt.sel = ccSt.sel.includes(k) ? ccSt.sel.filter(x => x !== k) : [...ccSt.sel, k].slice(0, 2); }
+    else if (a === "bonbon" || a === "again") { const r0 = a === "again" ? bonbonOf(cocoaState(F), k) : null, out = r0 ? makeBonbons(F, r0.shell, r0.fills) : makeBonbons(F, ccSt.shell, ccSt.sel); if (!out) return;
+      ccSt.sel = []; ccSt.made = out.r.id; ccSt.isNew = out.isNew; sfx("chime"); act("cheer"); gainXp(out.isNew ? 2 : 1);
+      if (out.isNew) { [0, 250, 500].forEach((t, k2) => setTimeout(() => mprop("sparkle", mel.x + (k2 - 1)*22, mel.y - 60, 1600), t)); speak(`A new bonbon: ${out.r.name}! Twelve of them, ready for the display case.`, 5000); }
+      else flash(`Another tray of ${out.r.name}`); }
+    else if (a === "case") { if (!ccToggle(cocoaState(F), k)) return; sfx("tap"); }
+    else if (a === "eatbb") { const bb = eatBonbon(F, k); if (!bb) return; sfx("chime"); mprop("heart", mel.x, mel.y - 60, 1600); speak(`${bb.name}. Oh, that's good.`, 3500); if (evanHere() && eatBonbon(F, k)) setTimeout(() => evanSays(pick(["chocolate!!", "another one!", "mmm!"])), 900); }
+    else if (a === "box") { const id = packBox(F, n); if (!id) return; sfx("paper", true); flash(`${ITEMS[id].n} in your backpack`); speak("Packed with a ribbon and in your backpack. Tap it there to choose who it's for.", 4500); }
     else if (a === "eat" || a === "give") { if (!takeBar(F, k, a === "give")) return; sfx("chime");
       if (a === "give") { flash(`${CC_KINDS[k].n} bar in your backpack`); speak("Wrapped and in your backpack. Tap it there to choose who it's for.", 4000); }
       else { mprop("heart", mel.x, mel.y - 60, 1600); speak(pick(["Snap! Your own chocolate. Perfect.", "It melts just right. You made this!", "From the bean. Mmm."]), 4000); if (evanHere() && takeBar(F, k, false)) setTimeout(() => evanSays(pick(["chocolate!!", "more Mama!", "mmm!"])), 900); } }
