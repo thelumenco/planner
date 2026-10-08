@@ -1488,7 +1488,7 @@ function ctx(){
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
   else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : marketStallPanel(st); }
   else if (orView === "pot" && potItem) h = potPanel(F, potItem);
-  else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara")}) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccKitchenPanel(F, ccView);
+  else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara"), hand: isHere("mateo")}) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccKitchenPanel(F, ccView);
   else if (keepItem && F.inv[keepItem]) h = keepPanel(F, keepItem);
   else if (keepSpot) h = placedPanel(F, keepSpot);
   else if (adoptItem && F.inv[adoptItem]) h = adoptPanel(F, adoptItem, adoptSt);
@@ -2238,7 +2238,9 @@ function cocoaNow(){
   const out = cocoaTick(F, {serving: scene === "cocoa" && atSpot === "ccounter"});
   if (out.coins && (scene === "cocoa" || scene === "bay")) { sfx("coin"); flash(`+${out.coins} coins: ${cocoaState(F).name}`); }
   else if (out.coins && out.mins >= 30) setTimeout(() => speak(`While you were away, ${cocoaState(F).name} sold ${out.n} bar${out.n > 1 ? "s" : ""}: ${out.coins} coins.`, 5000), 2500);
-  if (out.done === "grind" && COCOA_IN.includes(scene)) speak("Ding! The grinder's done: a pot of chocolate, ready to temper on the marble slab.", 4500);
+  const hd = out.hand; if (hd && (hd.pots || hd.bars) && out.mins >= 30) setTimeout(() => speak(`Mateo's been busy: ${hd.pots} pot${hd.pots === 1 ? "" : "s"} tempered${hd.res ? `, ${hd.res} pieces onto the bonbon shelf` : ""}${hd.bars ? `, ${hd.bars} bars on the wall` : ""}${hd.sacks ? `, ${hd.sacks} sack${hd.sacks === 1 ? "" : "s"} of beans bought (${hd.spent} coins)` : ""}.`, 6000), out.coins ? 8000 : 2500);
+  else if (hd && hd.pots && COCOA_IN.includes(scene) && isHere("mateo")) npcSay("mateo", hd.res ? "Another pot tempered. Some on your bonbon shelf!" : "Pot tempered. More bars for the wall.");
+  if (out.done === "grind" && cocoaState(F).ground && COCOA_IN.includes(scene)) speak("Ding! The grinder's done: a pot of chocolate, ready to temper on the marble slab.", 4500);
   if (out.coins || out.done || out.mins >= 5) save(); if (ccView) ctx(); if (COCOA_IN.includes(scene)) drawScene();
 }
 function wireCocoa(c){
@@ -2250,6 +2252,9 @@ function wireCocoa(c){
     else if (a === "temper") { const kk = ccTemper(F); if (kk) { sfx("chime"); act("cheer"); gainXp(1); speak(`Spread, scrape, fold... it shines! 30 pieces of ${CC_KINDS[kk].n.toLowerCase()}.`, 4500); } }
     else if (a === "mould") { if (ccMould(F, k)) { sfx("chime"); flash(`10 ${CC_KINDS[k].n.toLowerCase()} bars on the wall`); gainXp(1); } }
     else if (a === "price") { const s = cocoaState(F); s.prices.bar = Math.max(1, Math.min(30, s.prices.bar + n)); }
+    else if (a === "keep") { const s = cocoaState(F); s.keep[k] = Math.max(0, Math.min(120, s.keep[k] + n*6)); }
+    else if (a === "plan") { const p = cocoaState(F).plan; if (k === "on" || k === "buy") p[k] = !p[k]; else if (k === "floor") p.floor = Math.max(0, Math.min(5000, p.floor + n*50)); else if (k === "hold") p.hold = Math.max(0, Math.min(20, p.hold + n)); sfx("tap");
+      if (k === "on") speak(p.on ? "Mateo's back on the bar line." : "Mateo's taking a break from the bar line. The kitchen's all yours.", 3500); }
     else if (a === "bprice") { const s = cocoaState(F); s.prices.bonbon = Math.max(1, Math.min(20, s.prices.bonbon + n)); }
     else if (a === "fill") { const got = stockPantry(F, k, n, b.dataset.src, orchState(F)); if (got) { sfx("tap"); flash(`+${got} on the fillings shelf`); } }
     else if (a === "shell") { ccSt.shell = k; ccSt.made = null; }

@@ -1779,8 +1779,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   page.on("dialog", d => { errors.push("the Cocoa Room used a browser pop-up"); d.dismiss(); });
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { const m = /ccpatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
-    if (m[1] === "coins") { f.coins = 2000; f.inv = {...(f.inv || {}), honey: 2, pandan: 1}; }
+    if (m[1] === "coins") { f.coins = 2000; f.inv = {...(f.inv || {}), honey: 2, pandan: 1}; f.cocoa = {plan: {on: false}}; }   // Mateo paused while Mel works it by hand
     if (m[1] === "rewind") f.cocoa.at = 1;
+    if (m[1] === "mateo") Object.assign(f.cocoa, {at: 1, plan: {on: true, buy: true, floor: 200, hold: 0}, beans: 0, roasted: 0, roast: null, grind: null, ground: null, res: {milk: 0, dark: 0, white: 0}, keep: {milk: 30, dark: 30, white: 0}, choc: {milk: 0, dark: 0, white: 0}, bars: {milk: 0, dark: 0, white: 0}, made: 0});
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   const at = async (t, q = "") => { await page.goto(url + `?seed=1&time=${t}&date=2026-10-10${q}`); await page.waitForTimeout(900); };
   await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-10"); await page.waitForTimeout(800);
@@ -1833,6 +1834,18 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await fox().then(f => Object.values(f.cocoa.sold || {}).reduce((a, d) => a + d.n, 0) > 0 && Object.values(f.cocoa.sold || {}).reduce((a, d) => a + (d.bonbons || 0), 0) > 0), "customers buy bars off the wall and bonbons from the case while it's open (the takings come to Mel)");
   await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1500);
   check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("amara"), "Amara's behind the counter");
+  await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(1500);
+  check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("mateo"), "Mateo, the kitchen hand, is in the kitchen");
+  // Mateo runs the bar line on his own: two days of shifts, from no beans at all
+  await at("18:30", "&ccpatch=mateo"); await page.waitForTimeout(1500);
+  const mt = await fox().then(f => ({c: f.cocoa, coins: f.coins}));
+  check(mt.c.res.milk === 30 && mt.c.res.dark === 30 && mt.c.res.white === 0, `he fills the bonbon shelf first, to Mel's targets (milk ${mt.c.res.milk}, dark ${mt.c.res.dark})`);
+  check(mt.c.made >= 30 && Object.values(mt.c.bars).reduce((a, n) => a + n, 0) + Object.values(mt.c.sold).reduce((a, d) => a + d.n, 0) > 0, `then moulds the rest into bars (${mt.c.made} made), never touching the shelf`);
+  check(mt.c.bought >= 4 && mt.coins >= 200, `and buys his own beans with auto-buy (${mt.c.bought} sacks), keeping Mel above her coin floor`);
+  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
+  await tap("ccounter", '#ctx [data-cc="keep"][data-k="white"][data-n="1"]'); await page.click('#ctx [data-cc="keep"][data-k="white"][data-n="1"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-cc="plan"][data-k="buy"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.cocoa.keep.white === 6 && f.cocoa.plan.buy === false), "the kitchen plan at the counter: a bonbon shelf target per chocolate, and auto-buy on or off");
   await page.close();
 }
 {
@@ -1952,7 +1965,6 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(box > 0, `the honesty freezer sold while the shop was shut (${box} coins in its box)`);
   await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
   check(await page.locator('#world [data-place="hfreezer"]').count() === 1 && await page.locator('#world [data-place="dbike"]').count() === 1 && await page.locator("#sceneArt .nightcopy circle").count() > 5, "the freezer and bike are on the bay, and the fairy lights glow at night");
-  const c0 = await fox().then(f => f.coins);
   await page.locator('#world [data-place="hfreezer"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gcollect]", { timeout: 15000 }); await page.click("#ctx [data-gcollect]"); await page.waitForTimeout(300);
   check(await fox().then(f => f.scoop.box === 0 && f.coins >= c0 + box), "collect the coins from the box");
   await page.locator('#world [data-place="hfreezer"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
