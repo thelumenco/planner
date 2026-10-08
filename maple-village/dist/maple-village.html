@@ -1348,6 +1348,18 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 #ctx .htimer + .actions{margin:0 0 14px}
 #ctx .htimer + .actions + .tabs{margin-bottom:10px}
 .hhint{font-size:.8rem;margin:-4px 0 10px}
+
+/* the Scoop Shack */
+.gdot{display:inline-block;width:22px;height:22px;border-radius:50%;border:1.5px solid #3A2E28;vertical-align:middle}
+.wpic .gdot{width:30px;height:30px}
+.gchips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.gchip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px 6px 6px;border-radius:999px;border:1.5px solid rgba(120,104,84,.25);background:#FFFDF6;font:inherit;font-size:.85rem;color:#2F2B28;cursor:pointer}
+.gchip.on{background:#E3F2EC;border-color:#5E9A86;font-weight:700}
+.gchip[disabled]{opacity:.45;cursor:default}
+.gstep{display:inline-flex;align-items:center;gap:8px;flex:none}.gstep b{min-width:22px;text-align:center}.gstep .btn{margin:0;padding:2px 10px}
+.gspec{display:inline-flex;align-items:center;gap:4px;font-size:.8rem;color:#5E5A55;flex:none}
+.gpick{margin-top:6px}
+.hlist.gprices li{gap:10px}
 </style>
 </head>
 <body>
@@ -1438,6 +1450,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
                 <g id="oShades" style="display:none"><rect x="-8.2" y="-46.6" width="6.6" height="4.6" rx="1.8" style="fill:#2F2B28"/><rect x="1.6" y="-46.6" width="6.6" height="4.6" rx="1.8" style="fill:#2F2B28"/><path d="M-1.6 -44.6 h3.2" fill="none"/></g>
                 <g id="melPj" style="display:none"><path d="M-8.2 -36 q8.2 3.5 16.4 0 l0.8 13.6 h-18z" style="fill:#3B4A86"/><path d="M-8.6 -23 h17.2 l1 9.5 h-8 l-1.6 -3 l-1.6 3 h-8z" style="fill:#3B4A86"/><path d="M0 -34.4 v11 M-7.6 -24 h15.2" fill="none" style="stroke:#FFFDF6" stroke-width=".9"/></g>
                 <g id="melScarf" style="display:none"><path d="M-6 -37.5 q6 3 12 0 l-1 2.6 q-5 2 -10 0z" style="fill:var(--navy,#2E3A70)"/><path d="M3 -35.5 l3 6 l-3 -1 l-1 3 l-1.6 -6z" style="fill:var(--navy,#2E3A70)"/></g>
+                <g id="melCone" style="display:none"><path d="M9.5 -23 l3 10 l3 -10z" style="fill:#E8C48E"/><circle id="melConeTop" cx="12.5" cy="-25" r="3.6" style="fill:#F4C7CF"/></g>
                 <g id="melBow" style="display:none"><path d="M4.6 -57.5 l-5.4 -3.6 v7.2z M4.6 -57.5 l5.4 -3.6 v7.2z" style="fill:#8E2C48"/><circle cx="4.6" cy="-57.5" r="1.7" style="fill:#6E1F36"/></g>
                 <g id="melHat" style="display:none"><ellipse cx="0" cy="-55" rx="17" ry="3.8" style="fill:#F3DFA6"/><path d="M-9 -55 c0 -11 18 -11 18 0z" style="fill:#F3DFA6"/><path d="M-9 -56.5 h18" fill="none" style="stroke:#8E2C48" stroke-width="2"/></g>
               </g>
@@ -1994,6 +2007,26 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   I.bubbletea = [`<path d="M6.5 7h11l-1.5 13.5h-8z" ${f("#D9B48A")}/><circle cx="10" cy="18" r="1.2" ${f("#2F2B28")}/><circle cx="13" cy="18.5" r="1.2" ${f("#2F2B28")}/><circle cx="11.5" cy="16.5" r="1.2" ${f("#2F2B28")}/>`, `<path d="M6.5 7h11l-1.5 13.5h-8zM6 7h12M13 7l2-5"/>`];
   I.highlighters = [`<rect x="4" y="6" width="4" height="13" rx="1" ${f("#F4C7CF")}/><rect x="10" y="5" width="4" height="14" rx="1" ${f("#C3E8B8")}/><rect x="16" y="6" width="4" height="13" rx="1" ${f("#C3CDEE")}/>`, `<rect x="4" y="6" width="4" height="13" rx="1"/><rect x="10" y="5" width="4" height="14" rx="1"/><rect x="16" y="6" width="4" height="13" rx="1"/><path d="M4 9h4M10 8h4M16 9h4"/>`];
   I.mochi = [`<rect x="3" y="9" width="18" height="10" rx="2" ${f("#F6EEF4")}/><circle cx="8" cy="14" r="3" ${f("#F4C7CF")}/><circle cx="16" cy="14" r="3" ${f("#C3E8B8")}/>`, `<rect x="3" y="9" width="18" height="10" rx="2"/><circle cx="8" cy="14" r="3"/><circle cx="16" cy="14" r="3"/>`];
+  I.chocolate = [`<rect x="5" y="5" width="14" height="15" rx="1.5" ${f("#5A3A2A")}/><path d="M5 5h14v6l-4 3-5-3-5 2z" ${f("#E8566C")}/>`, `<rect x="5" y="5" width="14" height="15" rx="1.5"/><path d="M5 14l5-3 5 3 4-3M12 14v6M5 17h14"/>`];
+  I.vanilla = [`<path d="M7 20c2-6 6-12 10-16" ${f("#3A2A22")} stroke-width="3"/><path d="M14 18c1-1 3-1 4 0s-1 3-2 3-2-2-2-3z" ${f("#F6EBC8")}/>`, `<path d="M6 20c2-6 6-12 10-16M8 20c2-6 6-12 10-16"/><path d="M14 18c1-1 3-1 4 0s-1 3-2 3-2-2-2-3z"/>`];
+  I.coffee = [`<path d="M6 7h12l-1 13H7z" ${f("#C9A27E")}/><ellipse cx="12" cy="13" rx="2.6" ry="3.6" ${f("#5A3A2A")}/>`, `<path d="M6 7h12l-1 13H7zM6 7l2-3h8l2 3"/><path d="M12 9.5c-1 2-1 5 0 7"/>`];
+  I.pistachio = [`<ellipse cx="9" cy="13" rx="4" ry="6" ${f("#E8D9B8")}/><ellipse cx="15" cy="12" rx="4" ry="6" ${f("#A8C98A")}/>`, `<ellipse cx="9" cy="13" rx="4" ry="6"/><ellipse cx="15" cy="12" rx="4" ry="6"/>`];
+  I.hazelnut = [`<circle cx="12" cy="14" r="6" ${f("#B98A5A")}/><path d="M7 11c1-4 9-4 10 0z" ${f("#E8D9B8")}/>`, `<circle cx="12" cy="14" r="6"/><path d="M7 11c1-4 9-4 10 0M12 6v2"/>`];
+  I.coconut = [`<circle cx="12" cy="13" r="8" ${f("#8A5A3A")}/><path d="M6 11c2-3 10-3 12 0 0 5-12 5-12 0z" ${f("#F6F1E8")}/>`, `<circle cx="12" cy="13" r="8"/><path d="M6 11c2-3 10-3 12 0"/><circle cx="10" cy="7" r=".8"/><circle cx="14" cy="7" r=".8"/>`];
+  I.matcha = [`<path d="M4 12h16c0 5-3.6 8-8 8s-8-3-8-8z" ${f("#FFFDF6")}/><ellipse cx="12" cy="12" rx="8" ry="2.4" ${f("#8FB86A")}/>`, `<path d="M4 12h16c0 5-3.6 8-8 8s-8-3-8-8z"/><ellipse cx="12" cy="12" rx="8" ry="2.4"/>`];
+  I.pandan = [`<path d="M12 21C8 15 6 9 8 3c2 6 4 12 4 18zM12 21c4-6 6-12 4-18-2 6-4 12-4 18z" ${f("#7FB86A")}/>`, `<path d="M12 21C8 15 6 9 8 3c2 6 4 12 4 18zM12 21c4-6 6-12 4-18-2 6-4 12-4 18z"/>`];
+  I.gulamelaka = [`<path d="M5 9h14v9H5z" ${f("#9A5A2E")}/><ellipse cx="12" cy="9" rx="7" ry="2.4" ${f("#B97A4A")}/>`, `<path d="M5 9v9h14V9"/><ellipse cx="12" cy="9" rx="7" ry="2.4"/><path d="M5 18c2 1.4 12 1.4 14 0"/>`];
+  I.sesame = [`<path d="M4 12h16c0 5-3.6 8-8 8s-8-3-8-8z" ${f("#FFFDF6")}/>${[[8, 12], [11, 11], [14, 12], [10, 14], [13, 14]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="1" ry="1.6" ${f("#2F2B28")}/>`).join("")}`, `<path d="M4 12h16c0 5-3.6 8-8 8s-8-3-8-8zM4 12h16"/>`];
+  I.mint = [`<ellipse cx="9" cy="12" rx="4" ry="6" transform="rotate(-25 9 12)" ${f("#9FD3B2")}/><ellipse cx="15" cy="11" rx="4" ry="6" transform="rotate(25 15 11)" ${f("#7FB86A")}/>`, `<ellipse cx="9" cy="12" rx="4" ry="6" transform="rotate(-25 9 12)"/><ellipse cx="15" cy="11" rx="4" ry="6" transform="rotate(25 15 11)"/><path d="M12 21v-6"/>`];
+  I.banana = [`<path d="M5 8c2 8 9 11 14 8-1 3-5 5-9 4S4 14 5 8z" ${f("#F3E07A")}/>`, `<path d="M5 8c2 8 9 11 14 8-1 3-5 5-9 4S4 14 5 8zM5 8l-1-2"/>`];
+  var grapes = (c) => [`${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3" ${f(c)}/>`).join("")}`, `${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3"/>`).join("")}<path d="M12 5V2"/>`];
+  I.grape_red = grapes("#7A2E5A");
+  I.grape_white = grapes("#C9D98A");
+  I.loaf = [`<path d="M4 15c0-6 4-8 8-8s8 2 8 8v4H4z" ${f("#D9A066")}/>`, `<path d="M4 15c0-6 4-8 8-8s8 2 8 8v4H4zM9 9l1 4M13 8l1 4M17 9l-1 4"/>`];
+  I.ic_cup = [`<path d="M6 12h12l-1.6 8h-8.8z" ${f("#F4C7CF")}/><path d="M7 12c0-4 2.5-6 5-6s5 2 5 6z" ${f("#FFF6DC")}/>`, `<path d="M6 12h12l-1.6 8h-8.8zM7 12c0-4 2.5-6 5-6s5 2 5 6"/><path d="M14 6l3-3"/>`];
+  I.ic_cone = [`<path d="M8 11h8l-4 11z" ${f("#E8C48E")}/><circle cx="12" cy="8.5" r="4.5" ${f("#F4C7CF")}/>`, `<path d="M8 11h8l-4 11zM9.5 14l4 3M14.5 14l-4 3"/><circle cx="12" cy="8.5" r="4.5"/>`];
+  I.ic_float = [`<path d="M7 7h10l-1.5 14h-7z" ${f("#E3C9A8")}/><circle cx="12" cy="7" r="4" ${f("#FFF6DC")}/>`, `<path d="M7 7h10l-1.5 14h-7zM14 4l3-3"/><circle cx="12" cy="7" r="4"/><circle cx="10" cy="15" r=".7"/><circle cx="13" cy="17" r=".7"/>`];
+  I.ic_waffle = [`<path d="M3 15l9-5 9 5-9 5z" ${f("#E8B86A")}/><circle cx="12" cy="10" r="4" ${f("#C3E8B8")}/>`, `<path d="M3 15l9-5 9 5-9 5zM7.5 12.5l9 5M16.5 12.5l-9 5"/><circle cx="12" cy="10" r="4"/>`];
   I.friedchicken = [`<path d="M5 5c5-2 12 0 14 5s-1 10-6 10-10-2-10-7 0-6 2-8z" ${f("#D99A4A")}/>`, `<path d="M5 5c5-2 12 0 14 5s-1 10-6 10-10-2-10-7 0-6 2-8z"/><path d="M8 9l1 1M12 8l1 1M15 11l1 1M9 14l1 1M13 15l1 1" opacity=".7"/>`];
   I.scallion = [`<circle cx="12" cy="12.5" r="8" ${f("#F0C878")}/>`, `<circle cx="12" cy="12.5" r="8"/><path d="M8 10h1M14 9h1M11 14h1M15 15h1M8 15h1" stroke="#5E8A4A" stroke-width="1.8"/><path d="M12 12.5c2 0 3-1 3-3" opacity=".5"/>`];
   I.hotteok = [`<ellipse cx="12" cy="13" rx="8.5" ry="6" ${f("#E3B06A")}/><path d="M9 12c2 2 4 2 6 0" ${f("#8C5A3C")}/>`, `<ellipse cx="12" cy="13" rx="8.5" ry="6"/><path d="M9 12c2 2 4 2 6 0"/>`];
@@ -2142,7 +2175,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   }
 
   // src/data/world.js
-  var OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore"];
+  var OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore", "bay"];
   var VILLAGE = {
     // town square
     hall: { scene: "village", name: "Town hall", short: "the town hall", door: [170, 180], mark: [132, 64] },
@@ -2221,6 +2254,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     boat: { scene: "shore", name: "Cruise boat", door: [206, 550], spot: true, line: "The mooring at the end of the jetty." },
     dolphins: { scene: "shore", name: "Boardwalk bench", door: [214, 262], spot: true, line: "A bench looking out to sea. Dolphins come by most mornings." },
     exlawn: { scene: "field", name: "Exercise lawn", door: [452, 430], spot: true, line: "The exercise lawn. Mum's class is here most mornings at 8." },
+    // the bay, north of the foreshore up the boardwalk: Mel's ice cream shop (The Scoop Shack) and its deck, and a
+    // shopfront under renovation
+    toBay: { scene: "shore", name: "Boardwalk north", door: [250, 22], spot: true, bridge: "bay", mark: [290, 40], line: "Up the boardwalk to the bay and the Scoop Shack." },
+    toShoreB: { scene: "bay", name: "Boardwalk to the foreshore", door: [250, 622], spot: true, bridge: "shore", mark: [290, 560], line: "Down the boardwalk to the foreshore." },
+    scoopshop: { scene: "bay", name: "The Scoop Shack", short: "the Scoop Shack", door: [386, 262], mark: [386, 96] },
+    deck: { scene: "bay", name: "The deck", door: [215, 412], spot: true, line: "The deck, looking out over the foreshore. Bring an ice cream." },
+    reno: { scene: "bay", name: "Under renovation", door: [396, 520], spot: true, line: "Boarded up for now. Coming soon: a brewery? A chocolatier?" },
     homejetty: { scene: "base", name: "Little jetty", door: [150, 132], spot: true, line: "Your little jetty. Paddle down the river and out to the foreshore." },
     toTown: { scene: "base", name: "Bridge to town", door: [260, 114], spot: true, bridge: "village", mark: [260, 62], line: "Over the river to the town square." }
   };
@@ -2233,8 +2273,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var WORK_HINT = /chord|chico|ambidextrous|fresh pages|client|muse|proposal|invoice|copy|newsletter|launch|website|brand|audit|meeting|call with|zoom/;
   var isWeekend = () => [0, 6].includes(new Date(now() + 8 * H).getUTCDay());
   var baseSpotFor = (s) => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
-  var BRIDGES = { village: { base: "toBase", lane: "toLane", field: "toField" }, base: { village: "toTown", vineyard: "toVine", orchard: "toOrchard" }, lane: { village: "toTownE", vineyard: "toVineL" }, vineyard: { base: "toBaseV", lane: "toLaneV" }, orchard: { base: "toBaseO", flowers: "toFlowers", field: "toFieldO" }, field: { village: "toTownF", orchard: "toOrchardN", shore: "toShoreF" }, flowers: { orchard: "toOrchardF", shore: "toShoreFl" }, shore: { field: "toFieldS", flowers: "toFlowersS" } };
-  var ARRIVE = { "village>base": [260, 132], "base>village": [260, 578], "village>lane": [48, 330], "lane>village": [426, 238], "base>vineyard": [52, 300], "vineyard>base": [462, 470], "lane>vineyard": [290, 72], "vineyard>lane": [262, 586], "base>orchard": [470, 278], "orchard>base": [60, 196], "orchard>flowers": [466, 293], "flowers>orchard": [56, 278], "village>field": [470, 198], "field>village": [52, 212], "orchard>field": [260, 592], "field>orchard": [260, 184], "field>shore": [470, 304], "shore>field": [56, 300], "flowers>shore": [250, 590], "shore>flowers": [56, 190] };
+  var BRIDGES = { village: { base: "toBase", lane: "toLane", field: "toField" }, base: { village: "toTown", vineyard: "toVine", orchard: "toOrchard" }, lane: { village: "toTownE", vineyard: "toVineL" }, vineyard: { base: "toBaseV", lane: "toLaneV" }, orchard: { base: "toBaseO", flowers: "toFlowers", field: "toFieldO" }, field: { village: "toTownF", orchard: "toOrchardN", shore: "toShoreF" }, flowers: { orchard: "toOrchardF", shore: "toShoreFl" }, shore: { field: "toFieldS", flowers: "toFlowersS", bay: "toBay" }, bay: { shore: "toShoreB" } };
+  var ARRIVE = { "village>base": [260, 132], "base>village": [260, 578], "village>lane": [48, 330], "lane>village": [426, 238], "base>vineyard": [52, 300], "vineyard>base": [462, 470], "lane>vineyard": [290, 72], "vineyard>lane": [262, 586], "base>orchard": [470, 278], "orchard>base": [60, 196], "orchard>flowers": [466, 293], "flowers>orchard": [56, 278], "village>field": [470, 198], "field>village": [52, 212], "orchard>field": [260, 592], "field>orchard": [260, 184], "field>shore": [470, 304], "shore>field": [56, 300], "flowers>shore": [250, 590], "shore>flowers": [56, 190], "shore>bay": [250, 590], "bay>shore": [250, 96] };
   function nextHop(from, to) {
     if (from === to) return null;
     if (BRIDGES[from] && BRIDGES[from][to]) return to;
@@ -2263,7 +2303,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     // big goals: the garage through the back door of the house, the cellar door through the wine shop's west wall
     garage: { parent: "home", door: [456, 340], arrive: [70, 450], exit: [34, 440] },
     office: { parent: "home", door: [64, 512], arrive: [450, 450], exit: [486, 440] },
-    cellar: { parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430] }
+    cellar: { parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430] },
+    // the Scoop Shack's kitchen, through the door on the shop's west wall; its own way back is the door on its east wall
+    scoopkitchen: { parent: "scoopshop", door: [64, 400], arrive: [450, 440], exit: [486, 440] }
   };
   var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
   var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
@@ -2414,6 +2456,21 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["study", "Angellina's desk", "D", "studydesk", null, "Angellina's study desk. Highlighters in every colour.", 36],
       ["msofa", "Sofa", "S", "sofa", null, "The comfiest sofa on the foreshore.", 30],
       ["dine", "Dining table", "X", "dining", null, "Their dining table. Wedding magazines at one end, bank papers at the other.", 44]
+    ] },
+    // The Scoop Shack on the bay: the gelato counter (the display is drawn over the people, so Sofia stands behind it),
+    // the chalkboard menu, tables, and the kitchen door on the west wall
+    scoopshop: { name: "The Scoop Shack", wall: "#E3F2EC", trim: "#F2A0B8", noBoard: true, pos: { C: [300, 330], M: [465, 128], Z: [40, 400], T: [340, 520] }, stations: [
+      ["gmenu", "Menu", "M", "chalkmenu", null, "The chalkboard menu: prices and flavours.", 44],
+      ["gcounter", "Gelato counter", "C", "gcounter", null, "The gelato counter. Yours are free.", 46],
+      ["gkdoor", "Kitchen", "Z", "gkdoor", null, "Into the gelato kitchen.", 0],
+      ["gtables", "Tables", "T", "cafetables", null, "Tables for eating in. Bring an ice cream.", 34]
+    ] },
+    // The gelato kitchen behind it: the fridge (ingredients), the freezer (tubs), Tomo's batch board and the mixing bench
+    scoopkitchen: { name: "The gelato kitchen", wall: "#EEF2F4", trim: "#7FB8E8", noBoard: true, pos: { F: [110, 262], Z: [262, 262], B: [420, 262], P: [262, 470] }, stations: [
+      ["gfridge", "Fridge", "F", "gfridge", null, "The fridge: everything the gelato's made from.", 30],
+      ["gfreezer", "Freezer", "Z", "gfreezer", null, "The freezer: tubs waiting for the display.", 30],
+      ["gboard", "Today's batches", "B", "gboard", null, "Tomo's board: what to make today.", 74],
+      ["gbench", "Mixing bench", "P", "gbench", null, "The mixing bench: discover new flavours.", 30]
     ] },
     // the garage (a big goal): Darren's workbench, storage, the scooter and the car once they're bought
     garage: { name: "The garage", wall: "#E3E6EA", trim: "#8FA3B8", noBoard: true, pos: { W: [130, 250], E: [300, 262], K: [436, 261], C: [310, 480], D: [120, 566], S: [440, 566] }, stations: [
@@ -2874,7 +2931,25 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     rabbitfeed: { n: "Rabbit pellets", kind: "feed", price: 2, tab: "animals", what: "one meal for a bunny" },
     goat: { n: "Goat kid", kind: "pet", pet: "goat", price: 150, tab: "animals", say: "A little goat! She's already nibbling my sleeve." },
     goatfeed: { n: "Goat feed", kind: "feed", price: 2, tab: "animals", what: "one meal for a goat" },
-    milk: { n: "Goat's milk", kind: "ingredient", sell: 6, what: "two make a cheese in the kitchen press" },
+    // pantry staples on Hana's deli shelf, mostly for the Scoop Shack's gelato (chocolate will come from the
+    // chocolatier on the bay once it opens)
+    chocolate: { n: "Bar of dark chocolate", kind: "ingredient", price: 5, tab: "deli", sell: 2, what: "for gelato at the Scoop Shack" },
+    vanilla: { n: "Vanilla pods", kind: "ingredient", price: 6, tab: "deli", sell: 2, what: "for gelato at the Scoop Shack" },
+    coffee: { n: "Bag of coffee beans", kind: "ingredient", price: 5, tab: "deli", sell: 2, what: "for gelato at the Scoop Shack" },
+    pistachio: { n: "Pistachios", kind: "ingredient", price: 6, tab: "deli", sell: 2, what: "for gelato at the Scoop Shack" },
+    hazelnut: { n: "Hazelnuts", kind: "ingredient", price: 5, tab: "deli", sell: 2, what: "for gelato at the Scoop Shack" },
+    coconut: { n: "Coconut", kind: "ingredient", price: 4, tab: "deli", sell: 2, what: "for gelato at the Scoop Shack" },
+    matcha: { n: "Matcha powder", kind: "ingredient", price: 6, tab: "deli", sell: 2, what: "for gelato at the Scoop Shack" },
+    pandan: { n: "Pandan leaves", kind: "ingredient", price: 3, tab: "deli", sell: 1, what: "for gelato at the Scoop Shack" },
+    gulamelaka: { n: "Gula melaka", kind: "ingredient", price: 4, tab: "deli", sell: 2, what: "for gelato at the Scoop Shack" },
+    sesame: { n: "Black sesame", kind: "ingredient", price: 4, tab: "deli", sell: 2, what: "for gelato at the Scoop Shack" },
+    mint: { n: "Fresh mint", kind: "ingredient", price: 3, tab: "deli", sell: 1, what: "for gelato at the Scoop Shack" },
+    banana: { n: "Bananas", kind: "ingredient", price: 3, tab: "deli", sell: 1, what: "for gelato at the Scoop Shack" },
+    // from the vineyard's grape crates (take them out in the barrel shed)
+    grape_red: { n: "Red grapes", kind: "ingredient", sell: 2, what: "for gelato at the Scoop Shack, or back in the crates for wine" },
+    grape_white: { n: "White grapes", kind: "ingredient", sell: 2, what: "for gelato at the Scoop Shack, or back in the crates for wine" },
+    loaf: { n: "Loaf of bread", kind: "ingredient", sell: 2, what: "baked in the wine shop's oven" },
+    milk: { n: "Milk", kind: "ingredient", price: 4, tab: "deli", sell: 3, what: "for gelato at the Scoop Shack, or two make a cheese in the wine shop's kitchen press (your goats give it too)" },
     egg: { n: "Fresh egg", kind: "food", sell: 5, say: "A fresh egg from our hens! Breakfast sorted." },
     tulip: { e: "🌷", n: "Tulip", kind: "flower", sell: 2, say: "For me? I'll tuck it behind my ear." },
     sunflower: { e: "🌻", n: "Sunflower", kind: "flower", sell: 3, say: "So sunny! Thank you." },
@@ -3128,6 +3203,31 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     <g filter="url(#wob)">${[70, 165, 260, 355, 450].map((x) => `<path d="M${x - 36} 334 V60 a36 36 0 0 1 72 0 V334" style="fill:#E2E8D8;stroke:var(--line)" stroke-width="1.3"/>`).join("")}</g>
     <g style="fill:var(--honey)" opacity=".8">${[117, 212, 307, 402].map((x) => `<circle cx="${x}" cy="40" r="5"/>`).join("")}</g>
     ${sk(`<path d="M232 8 h56 l-6 14 h-44z" style="fill:var(--honey)"/>`, `<path d="M232 8 h56 l-6 14 h-44z"/><path d="M248 15 h24" opacity=".5"/>`)}${plant(30, 610, 1.1)}${plant(490, 610, 1)}`,
+    // The Scoop Shack: pink and white checks, mint walls with a stripe, a big window onto the bay, the chalkboard
+    // menu (prices from the shop's own settings), cone lamps and a neon-ish cone sign
+    scoopshop: () => {
+      const sc = artCtx() && artCtx().scoop ? artCtx().scoop() : { prices: { cup: 4, cone: 4, float: 6, waffle: 7 }, name: "The Scoop Shack" }, p = sc.prices;
+      return `<rect width="520" height="640" style="fill:#FBEFF1"/>
+    <g opacity=".55">${rows(12, (r) => rows(13, (c) => (r + c) % 2 ? `<rect x="${c * 40}" y="${150 + r * 42}" width="40" height="42" style="fill:#F4C7CF"/>` : ""))}</g>
+    ${wallBase("#E3F2EC", "#F2A0B8")}<g opacity=".5">${rows(13, (i) => `<rect x="${i * 40}" y="0" width="20" height="138" style="fill:#D2EBE1"/>`)}</g>${skirting}
+    ${sk(
+        `<rect x="150" y="26" width="200" height="92" rx="6" style="fill:#BFE0EE"/><path d="M150 84 q50 -12 100 0 t100 0 v34 h-200z" style="fill:#8FC1DE"/><path d="M150 100 h200 v18 h-200z" style="fill:#F2E2B8"/>`,
+        `<rect x="150" y="26" width="200" height="92" rx="6"/><path d="M250 26 v92 M150 72 h200"/>`
+      )}
+    ${sk(`<path d="M60 34 l14 44 l14 -44z" style="fill:#E8C48E"/><circle cx="74" cy="30" r="12" style="fill:#F4C7CF"/><circle cx="66" cy="22" r="8" style="fill:#C3E8B8"/>`, `<path d="M60 34 l14 44 l14 -44z M64 46 l18 18 M84 46 l-18 18"/><circle cx="74" cy="30" r="12"/><circle cx="66" cy="22" r="8"/>`)}
+    ${sk(`<rect x="430" y="46" width="70" height="84" rx="3" style="fill:#3E4A43"/>`, `<rect x="430" y="46" width="70" height="84" rx="3"/>`)}
+    <g font-family="Klee One,serif" font-weight="600" fill="#F6EFE3" pointer-events="none"><text x="465" y="62" font-size="9.5" text-anchor="middle" fill="#F3C969">Menu</text>
+      ${[["Cup", p.cup], ["Cone", p.cone], ["Float", p.float], ["Waffle", p.waffle]].map(([n, v], i) => `<text x="438" y="${80 + i * 13}" font-size="8.5">${n}</text><text x="494" y="${80 + i * 13}" font-size="8.5" text-anchor="end">${v}</text>`).join("")}</g>
+    ${sk("", `<path d="M120 0 v34 M400 0 v28"/>`)}${sk(`<path d="M110 34 h20 l-10 16z M390 28 h20 l-10 16z" style="fill:#F2A0B8"/>`, `<path d="M110 34 h20 l-10 16z M390 28 h20 l-10 16z"/>`)}
+    ${plant(492, 612, 1)}`;
+    },
+    // the gelato kitchen: pale blue tiles, steel, a window, a rack of cones
+    scoopkitchen: () => `<rect width="520" height="640" style="fill:#EEF2F4"/>
+    <g opacity=".5">${rows(12, (r) => rows(13, (c) => (r + c) % 2 ? `<rect x="${c * 40}" y="${150 + r * 42}" width="40" height="42" style="fill:#DCE8EF"/>` : ""))}</g>
+    ${wallBase("#EEF2F4", "#7FB8E8")}<g opacity=".35" style="stroke:#B9CDDA">${rows(13, (i) => `<path d="M${i * 40} 0 V138"/>`)}${rows(4, (i) => `<path d="M0 ${i * 36 + 18} H520"/>`)}</g>${skirting}
+    ${sk(`<rect x="300" y="30" width="80" height="64" rx="4" style="fill:#CFE0EE"/>`, `<rect x="300" y="30" width="80" height="64" rx="4"/><path d="M340 30 v64 M300 62 h80"/>`)}
+    ${sk(`<rect x="160" y="40" width="110" height="6" style="fill:#B9C4CC"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${172 + i * 20} 46 l6 18 l6 -18z" style="fill:#E8C48E"/>`).join("")}`, `<rect x="160" y="40" width="110" height="6"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${172 + i * 20} 46 l6 18 l6 -18z"/>`).join("")}`)}
+    ${plant(30, 612, 0.9)}`,
     // The kitchen: checked tiles, a sage dado, open shelves with pots, a herb rail and a window over the garden
     kitchen: () => `<rect width="520" height="640" style="fill:#E9E2D4"/>
     <g opacity=".5">${rows(12, (r) => rows(13, (c) => (r + c) % 2 ? `<rect x="${c * 40}" y="${150 + r * 42}" width="40" height="42" style="fill:#D7E3CC"/>` : ""))}</g>
@@ -4470,6 +4570,40 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       actLines: { cook: ["Stirring, tasting, stirring.", "Bread's in. Don't open the door!", "The cheese is coming along nicely.", "If the larder's empty, I just tidy. Hint, hint."] },
       away: "Pilar's gone home. The kitchen's all yours."
     },
+    // The Scoop Shack's staff: Sofia on the counter every day it's open (lunch on the deck), Tomo in the gelato
+    // kitchen Monday to Saturday making the day's batches (scoop.js makes the tubs on his shifts)
+    {
+      id: "sofia",
+      pitch: 1.2,
+      name: "Sofia",
+      job: "Runs the counter at the Scoop Shack",
+      intro: "Ciao, I'm Sofia! I scoop, I chat, I tell everyone the new flavour is the best one. Because it is.",
+      look: { skin: "#E8C4A0", hair: "#3A2A22", hairStyle: "bun", top: "#F4C7CF", bottom: "#3F4A6B", extra: "apron" },
+      routine: [slot("9:45", "14:00", "scoopshop", [300, 268]), slot("14:00", "14:30", "bay", [196, 360], { act: "sit" }), slot("14:30", "20:15", "scoopshop", [300, 268])],
+      lines: ["Cup or cone? Trick question: both.", "The deck's lovely this time of day.", "Someone ordered four scoops before lunch. Respect.", "Tomo's been in the kitchen since eight. Bless him."],
+      hellos: ["Hi Mel! What'll it be?", "Ciao, boss!", "The new flavour's flying out!"],
+      away: "Sofia's finished for the day. The counter's closed."
+    },
+    {
+      id: "tomo",
+      pitch: 0.8,
+      name: "Tomo",
+      job: "Makes the gelato at the Scoop Shack",
+      intro: "Tomo. I make the gelato. You bring me fruit and flowers and milk, I bring you tubs. Simple. Delicious.",
+      look: { skin: "#D9A882", hair: "#1F1A17", hairStyle: "short", top: "#FFFDF6", bottom: "#5E5A55", extra: "apron" },
+      routine: [
+        slot("8:00", "12:00", "scoopkitchen", [[262, 428], [180, 300], [330, 428]], { act: "cook", days: "wd" }),
+        slot("12:00", "12:45", "bay", [222, 352], { act: "sit", days: "wd" }),
+        slot("12:45", "16:00", "scoopkitchen", [[262, 428], [180, 300], [330, 428]], { act: "cook", days: "wd" }),
+        slot("8:00", "12:00", "scoopkitchen", [[262, 428], [180, 300], [330, 428]], { act: "cook", dow: [6] }),
+        slot("12:00", "12:45", "bay", [222, 352], { act: "sit", dow: [6] }),
+        slot("12:45", "16:00", "scoopkitchen", [[262, 428], [180, 300], [330, 428]], { act: "cook", dow: [6] }),
+        slot("15:00", "16:30", "shore", [[260, 200], [250, 420], [200, 300]], { dow: [0] })
+      ],
+      lines: ["Gelato is patience. And sugar.", "Every flavour is a good flavour. Mostly.", "More milk, please. Always more milk.", "I dream in pistachio."],
+      actLines: { cook: ["Churning, churning.", "Smell that? Mango.", "This tub's for the display.", "If the fridge is empty, I just polish the bench."] },
+      away: "Tomo's off. The kitchen's quiet."
+    },
     // Mel's family on the foreshore (west of the field): Mum and Dad in one house, her brother Marcus and his fiancee
     // Angellina in the other. All four help Ma Ma and Gong Gong in the orchard now and then, and walk about town.
     // Mum: always off to an exercise class (she leads one at the field most mornings, see classSlot in tours.js) or
@@ -4974,6 +5108,33 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (!wineClubNow(day, hm2) || !clubMembers(day).includes(id)) return null;
     return { from: CLUB_FROM, to: CLUB_TO, scene: "cellar", wander: CLUB_WALK, club: true };
   }
+  var SHOP_SEATS = [[87, 518], [173, 518], [227, 518], [313, 518], [367, 512], [453, 512]];
+  var DECK_FREE = [[134, 360], [172, 352], [150, 404], [190, 404]];
+  var QUEUE = [[256, 392], [344, 392], [300, 404]];
+  var STROLL_SHORE = [[260, 200], [240, 420], [200, 360], [262, 520], [214, 250]];
+  var SCOOP_POOL = [...VISITORS.filter((v) => v !== "pip"), ...TOURISTS, ...NIGHT_TOURISTS, "sam", "priya", "jonah", "mia", "mum", "dad", "marcus", "angelina"];
+  var scoopCache = {};
+  function scoopVisits(day) {
+    if (scoopCache[day]) return scoopCache[day];
+    const d = dow(day), we = d === 0 || d === 6, out = [];
+    for (let h = 10; h < 20; h++) {
+      const n = (we ? 3 : 2) + (h >= 14 && h < 17 ? 1 : 0), who3 = groupFor(day + ":ice" + h, n, [], SCOOP_POOL);
+      who3.forEach((id, k) => {
+        const from = h * 60 + hash(day + id + h) % 40, style = ["in", "deck", "walk"][hash(id + day + h) % 3];
+        out.push({ id, from, to: Math.min(20 * 60 + 15, from + 35), style, k: out.length });
+      });
+    }
+    return scoopCache[day] = out;
+  }
+  function scoopSlot(id, day, hm2) {
+    const v = scoopVisits(day).find((x) => x.id === id && hm2 >= x.from && hm2 < x.to);
+    if (!v) return null;
+    const base = { scene: "scoopshop", ice: true, glide: true };
+    if (hm2 < v.from + 6) return { ...base, from: v.from, to: v.from + 6, at: QUEUE[v.k % QUEUE.length], dir: 1 };
+    if (v.style === "in") return { ...base, from: v.from + 6, to: v.to, at: SHOP_SEATS[v.k % SHOP_SEATS.length], act: "sit" };
+    if (v.style === "deck") return { ...base, scene: "bay", from: v.from + 6, to: v.to, at: DECK_FREE[v.k % DECK_FREE.length], act: "sit", dir: -1 };
+    return { ...base, scene: "shore", from: v.from + 6, to: v.to, wander: STROLL_SHORE, act: "cone" };
+  }
 
   // src/art/wine.js
   var INK3 = `stroke="#3b3530" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"`;
@@ -5133,7 +5294,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     pumpkin: ["pumpkin", "pumpkins"],
     leek: ["leek", "leeks"]
   };
-  var isGood = (id) => id in GOODS && id !== "loaf";
+  var isGood = (id) => id in GOODS;
   var nm = (id, n) => GOODS[id] ? GOODS[id][n === 1 ? 0 : 1] : id;
   var needText = (need) => Object.entries(need).map(([k, n]) => `${n} ${nm(k, n)}`).join(" + ");
   var DISHES = {
@@ -5309,7 +5470,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var pic = (id, s = 34) => icon(id, s);
   var larderGrid = (k) => {
     const ids = Object.keys(k.larder).filter((id) => k.larder[id] > 0);
-    return ids.length ? `<div class="kgoods">${ids.map((id) => `<span class="kgood">${pic(id)}<b>${k.larder[id]}</b><small>${esc(nm(id, k.larder[id]))}</small></span>`).join("")}</div>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`;
+    return ids.length ? `<div class="kgoods">${ids.map((id) => `<button class="kgood kbtn" data-k="take" data-id="${id}">${pic(id)}<b>${k.larder[id]}</b><small>${esc(nm(id, k.larder[id]))}</small><em>Take one</em></button>`).join("")}</div><p class="muted">Tap one to take it back to your backpack (for the Scoop Shack, or a gift).</p>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`;
   };
   var needList = (k, need) => Object.entries(need).map(([id, n]) => `<span class="kneed ${(k.larder[id] || 0) >= n ? "ok" : ""}">${pic(id, 22)}${n} ${esc(nm(id, n))} <small>(${k.larder[id] || 0})</small></span>`).join("");
   function larderPanel(F2) {
@@ -5359,6 +5520,15 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       if (k === "send") {
         const n = sendToKitchen(F2, id);
         if (n) line = `${n} ${nm(id, n)} into the larder.`;
+      } else if (k === "take") {
+        const kk = kitchenState(F2);
+        if ((kk.larder[id] || 0) > 0) {
+          kk.larder[id]--;
+          if (kk.larder[id] <= 0) delete kk.larder[id];
+          F2.inv = F2.inv || {};
+          F2.inv[id] = (F2.inv[id] || 0) + 1;
+          line = `One ${nm(id, 1)} back in your backpack.`;
+        }
       } else if (k === "sendall") {
         const moved = backpackGoods(F2).map((x) => [x, sendToKitchen(F2, x)]).filter(([, n]) => n);
         if (moved.length) line = `Brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")}.`;
@@ -5413,6 +5583,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     v.rows = v.rows || [0, 1, 2].map((i) => ({ trellis: i === 0, vines: [null, null, null] }));
     v.cuttings = v.cuttings || { red: 1, white: 1 };
     v.grapes = v.grapes || { red: 0, white: 0 };
+    v.keep = v.keep || { red: 0, white: 0 };
     v.barrels = v.barrels || [null];
     v.cellar = v.cellar || [];
     v.shelf = v.shelf || [];
@@ -5653,7 +5824,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         }));
         if (v.help.barrels) v.barrels.forEach((b, i) => {
           if (b) return;
-          const st6 = v.grapes.red >= PER_BATCH ? "red" : v.grapes.white >= PER_BATCH ? "white" : null;
+          const spare = (c) => v.grapes[c] - (v.keep[c] || 0) >= PER_BATCH, st6 = spare("red") ? "red" : spare("white") ? "white" : null;
           if (st6) {
             v.grapes[st6] -= PER_BATCH;
             v.barrels[i] = { style: st6, start: at, dur: STYLES[st6].dur, stage: 1 };
@@ -5792,9 +5963,17 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   var vy = { name: {} };
+  var grapePic = (c) => `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2" fill="${c === "red" ? "#7A2E5A" : "#C9D98A"}" stroke="#3A2E28" stroke-width="1"/>`).join("")}<path d="M12 5 V2" stroke="#3A2E28" stroke-width="1.2"/></svg>`;
   function barrelPanel(F2) {
     const v = vineState(F2);
-    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles. Grapes: ${v.grapes.red} red, ${v.grapes.white} white.</p><div class="vbarrels">`;
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles.</p>`;
+    h += `<p class="eyebrow">The grape crates</p><ul class="hlist wlist">${["red", "white"].map((c) => {
+      const back = (F2.inv || {})["grape_" + c] || 0;
+      return `<li><span class="wpic">${grapePic(c)}</span><span class="wtxt"><b>${v.grapes[c]} ${c} bunch${v.grapes[c] === 1 ? "" : "es"}</b><small>${v.help.barrels ? `Marco keeps ${v.keep[c] || 0} back for you` : "picked and waiting"}</small></span>
+      <span class="orbtns"><button class="btn small primary" data-vy="takegr" data-k="${c}" data-n="1" ${v.grapes[c] ? "" : "disabled"}>Take 1</button><button class="btn small alt" data-vy="takegr" data-k="${c}" data-n="99" ${v.grapes[c] ? "" : "disabled"}>All</button>${back ? `<button class="btn small alt" data-vy="putgr" data-k="${c}">Put back ${back}</button>` : ""}
+      ${v.help.barrels ? `<span class="gstep"><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="-1" aria-label="Keep fewer back">−</button><b>${v.keep[c] || 0}</b><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="1" aria-label="Keep more back">+</button></span>` : ""}</span></li>`;
+    }).join("")}</ul>
+    <p class="muted">Grapes you take go in your backpack (for gelato at the Scoop Shack).${v.help.barrels ? " Marco fills empty barrels only from bunches beyond what you keep back." : ""}</p><div class="vbarrels">`;
     v.barrels.forEach((b, i) => {
       const ph = !b ? "empty" : barrelLeft(b) ? b.style === "sparkling" && b.stage === 2 ? "bubbles" : "ferment" : b.style === "sparkling" && b.stage === 1 ? "await2" : "ready";
       h += `<div class="vbarrel">${barrelPic(ph, b ? STYLES[b.style].col : "", b ? STYLES[b.style].n : "")}<div class="vbody"><b>Barrel ${i + 1}</b>${b ? stageStrip(b.style, ph) : ""}`;
@@ -5910,6 +6089,25 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       } else if (k === "fill") {
         line = fillBarrel(F2, i, b.dataset.k);
         if (line) api4.sfx("paper");
+      } else if (k === "takegr") {
+        const v = vineState(F2), c = b.dataset.k, n = Math.min(+b.dataset.n, v.grapes[c]);
+        if (n > 0) {
+          v.grapes[c] -= n;
+          F2.inv = F2.inv || {};
+          F2.inv["grape_" + c] = (F2.inv["grape_" + c] || 0) + n;
+          line = `${n} bunch${n > 1 ? "es" : ""} of ${c} grapes into your backpack.`;
+          api4.sfx("paper");
+        }
+      } else if (k === "putgr") {
+        const v = vineState(F2), c = b.dataset.k, n = (F2.inv || {})["grape_" + c] || 0;
+        if (n) {
+          v.grapes[c] += n;
+          delete F2.inv["grape_" + c];
+          line = `${n} bunch${n > 1 ? "es" : ""} back in the crates.`;
+        }
+      } else if (k === "keep") {
+        const v = vineState(F2), c = b.dataset.k;
+        v.keep[c] = Math.max(0, Math.min(30, (v.keep[c] || 0) + +b.dataset.n));
       } else if (k === "second") line = secondFerment(F2, i);
       else if (k === "bottle") {
         line = bottle(F2, i, vy.name[i]);
@@ -6324,6 +6522,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         return `<path d="M${13 * k} ${-24 * k} q${5 * k} ${-7 * k} ${10 * k} 0" fill="none"/><rect x="${11 * k}" y="${-24 * k}" width="${12 * k}" height="${9 * k}" rx="2" ${S("#9CC3E0")}/><path d="M${23 * k} ${-20 * k} l${7 * k} ${-6 * k}" fill="none" stroke-width="1.6"/><g class="drips"><circle cx="${31 * k}" cy="${-21 * k}" r="${1 * k}" ${S("var(--water)")}/><circle cx="${33 * k}" cy="${-15 * k}" r="${1 * k}" ${S("var(--water)")}/></g>`;
       case "hammer":
         return `<g class="tool"><path d="M${10 * k} ${-20 * k} l${6 * k} ${-14 * k}" fill="none" stroke-width="2.2" style="stroke:#8A5A3A"/><rect x="${12 * k}" y="${-38 * k}" width="${10 * k}" height="${5 * k}" rx="1" transform="rotate(24 ${17 * k} ${-35.5 * k})" ${S("var(--stone)")}/></g>`;
+      case "cone":
+        return `<path d="M${9.5 * k} ${-23 * k} l${3 * k} ${10 * k} l${3 * k} ${-10 * k}z" ${S("#E8C48E")}/><circle cx="${12.5 * k}" cy="${-25 * k}" r="${3.6 * k}" ${S(["#F4C7CF", "#C3E8B8", "#F3E27A", "#FFF6DC"][Math.round(k * 7 + (look.top || "").length) % 4])}/>`;
       case "hoe":
         return `<g class="tool"><path d="M${16 * k} ${-48 * k} l${-4 * k} ${46 * k}" fill="none" stroke-width="2" style="stroke:#8A5A3A"/><path d="M${12 * k} ${-2 * k} h${-8 * k} l${1 * k} ${3 * k} h${7 * k}z" ${S("var(--stone)")}/></g>`;
       case "lantern":
@@ -6352,7 +6552,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ${look.dress ? `<path d="M${-9 * k} ${-17 * k} L${-12.5 * k} ${-5 * k} h${25 * k} L${9 * k} ${-17 * k}z" ${S(look.dress)}/>` : ""}
       <path d="M${-8.6 * k} ${-37 * k} q${8.6 * k} ${-2.4 * k} ${17.2 * k} 0 l${1.4 * k} ${23 * k} h${-20 * k}z" ${S(look.dress || look.top)}/>
       ${look.batik ? batik(look.batik, k) : ""}
-      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
       <circle cx="0" cy="${-46 * k}" r="${10.6 * k}" ${S(look.skin)}/>
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46 * k, 10.6 * k) : hair(look.hairStyle, look.hair, k)}
@@ -6628,7 +6828,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var VINE_ROWS = [370, 420, 470];
   var VINE_XS = [262, 340, 418];
   var vineSpot = (r, i) => ({ x: VINE_XS[i], y: VINE_ROWS[r] + 16 });
-  var grapes = (x, y, col, s) => {
+  var grapes2 = (x, y, col, s) => {
     let g = "";
     const pts = [[0, 0], [-3, -3], [3, -3], [-5, -7], [0, -6], [5, -7], [-2, -10], [3, -10]];
     pts.forEach(([dx, dy]) => {
@@ -6646,7 +6846,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       const lx = x - 16 + k * 32 / (n - 1 || 1), ly = y - 30 - k % 2 * 8;
       leaves += leaf2(lx, ly, 7 + g * 3);
     }
-    const bunch2 = !vn.wateredAt ? "" : ripe ? grapes(x - 8, y - 22, col, 1.1) + grapes(x + 9, y - 20, col, 1) : g > 0.35 ? grapes(x, y - 21, unripe, 0.5 + g * 0.5) : "";
+    const bunch2 = !vn.wateredAt ? "" : ripe ? grapes2(x - 8, y - 22, col, 1.1) + grapes2(x + 9, y - 20, col, 1) : g > 0.35 ? grapes2(x, y - 21, unripe, 0.5 + g * 0.5) : "";
     return `<ellipse cx="${x}" cy="${y}" rx="12" ry="4" style="fill:${vn.wateredAt ? "#8A6A4E" : "#C9A27E"}" filter="url(#wob)"/>` + sk(`${leaves}`, `<path d="M${x} ${y} q-2 -12 2 -22 q3 -6 -1 -12 M${x + 1} ${y - 22} q8 -4 14 -10 M${x} ${y - 24} q-8 -2 -14 -8"/>`) + (bunch2 ? `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width=".8">${bunch2}</g>` : "") + (ripe ? `<g class="twinkle" pointer-events="none"><path d="M${x + 18} ${y - 38} l2 -5 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2z" fill="#FFE38A"/></g>` : "") + (!vn.wateredAt ? `<path d="M${x + 14} ${y - 30} q3 -6 0 -9 q-3 3 0 9" fill="#9CC3E0" opacity=".9" style="stroke:var(--line)" stroke-width=".8"/>` : "");
   }
   function rowArt(row2, r) {
@@ -6683,7 +6883,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       <rect x="332" y="162" width="46" height="26"/><rect x="410" y="162" width="38" height="26"/><path d="M429 162 v26" opacity=".6"/>
       <path d="M376 214 v-40 a14 14 0 0 1 28 0 v40z"/><circle cx="398" cy="196" r="1.4"/><rect x="368" y="92" width="44" height="18" rx="3"/><circle cx="430" cy="206" r="9"/><path d="M430 195 v2"/>`
     )}
-    <g filter="url(#wob)" style="stroke:var(--line)" stroke-width=".8">${grapes(390, 97, "#6B2A55", 0.7)}</g><path d="M390 92 q4 -4 8 -2" fill="none" style="stroke:var(--moss2)" stroke-width="1.4"/>
+    <g filter="url(#wob)" style="stroke:var(--line)" stroke-width=".8">${grapes2(390, 97, "#6B2A55", 0.7)}</g><path d="M390 92 q4 -4 8 -2" fill="none" style="stroke:var(--moss2)" stroke-width="1.4"/>
     ${tapeLabel(390, 240, tag(shopName(artCtx().F())), "#E8B4C0", 11.5)}</g>`;
   }
   function stallArt() {
@@ -7601,6 +7801,38 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
           `<rect x="${x - 48}" y="${y - 30}" width="96" height="22" rx="3"/><path d="M${x - 42} ${y - 8} v14 M${x + 42} ${y - 8} v14"/><path d="M${x - 40} ${y - 42} l38 -6 l38 6 v12 l-38 -4 l-38 4z M${x - 2} ${y - 48} v12"/><path d="M${x + 8} ${y - 37} h18 M${x + 8} ${y - 33} h14" opacity=".55"/>`
         );
       // the kitchen (behind the wine shop): its door on the shop's east wall, the oven, larder, stove and cheese press
+      // the Scoop Shack: its kitchen door (west wall), the counter's hit area (the display's drawn over the people), the
+      // gelato kitchen's fridge, freezer, Tomo's batch board and the mixing bench
+      case "gkdoor":
+        return sk(
+          `<path d="M${x - 40} ${y - 108} L${x - 12} ${y - 96} L${x - 12} ${y + 4} L${x - 40} ${y + 14}z" style="fill:#9FD3C2"/><path d="M${x - 36} ${y - 80} l20 6 v14 l-20 -6z" style="fill:#FFFDF6"/>`,
+          `<path d="M${x - 40} ${y - 108} L${x - 12} ${y - 96} L${x - 12} ${y + 4} L${x - 40} ${y + 14}z"/><circle cx="${x - 17}" cy="${y - 42}" r="1.8"/><path d="M${x - 36} ${y - 80} l20 6 v14 l-20 -6z"/>`
+        );
+      case "gcounter":
+        return `<rect x="${x - 110}" y="${y - 56}" width="220" height="56" fill="transparent"/>`;
+      case "gfridge": {
+        const s = G.scoop ? G.scoop() : { fridge: {} }, n = Object.values(s.fridge || {}).reduce((a, b) => a + b, 0), cols = ["#E8566C", "#F3C969", "#9CC27E", "#F28C3A", "#FFFDF6", "#C9A3E0"];
+        let jars = "";
+        for (let i = 0; i < Math.min(9, n); i++) jars += `<rect x="${x - 26 + i % 3 * 18}" y="${y - 92 + Math.floor(i / 3) * 22}" width="12" height="12" rx="3" style="fill:${cols[i % 6]}"/>`;
+        return sk(`<rect x="${x - 38}" y="${y - 110}" width="76" height="110" rx="6" style="fill:#F6F8FA"/>${jars}`, `<rect x="${x - 38}" y="${y - 110}" width="76" height="110" rx="6"/><path d="M${x - 38} ${y - 34} h76 M${x + 28} ${y - 100} v40 M${x + 28} ${y - 26} v14"/>`);
+      }
+      case "gfreezer": {
+        const s = G.scoop ? G.scoop() : { recipes: [], tubs: {} }, tubs = (s.recipes || []).filter((r) => (s.tubs || {})[r.id] > 0).slice(0, 6);
+        return sk(
+          `<rect x="${x - 60}" y="${y - 58}" width="120" height="58" rx="4" style="fill:#DCEBF2"/><rect x="${x - 54}" y="${y - 52}" width="108" height="22" rx="3" style="fill:#F6FBFD"/>${tubs.map((r, i) => `<rect x="${x - 50 + i * 17}" y="${y - 49}" width="14" height="16" rx="2" style="fill:${r.col}"/>`).join("")}`,
+          `<rect x="${x - 60}" y="${y - 58}" width="120" height="58" rx="4"/><rect x="${x - 54}" y="${y - 52}" width="108" height="22" rx="3"/><path d="M${x - 20} ${y - 18} h40"/>`
+        );
+      }
+      case "gboard":
+        return sk(
+          `<rect x="${x - 46}" y="${y - 124}" width="92" height="70" rx="3" style="fill:var(--wood)"/><rect x="${x - 38}" y="${y - 116}" width="38" height="46" style="fill:#FFFDF6"/><rect x="${x + 4}" y="${y - 112}" width="34" height="40" style="fill:#F6E3A1"/>`,
+          `<rect x="${x - 46}" y="${y - 124}" width="92" height="70" rx="3"/><rect x="${x - 38}" y="${y - 116}" width="38" height="46"/><path d="M${x - 32} ${y - 104} h26 M${x - 32} ${y - 94} h22 M${x - 32} ${y - 84} h24" opacity=".6"/><rect x="${x + 4}" y="${y - 112}" width="34" height="40"/>`
+        );
+      case "gbench":
+        return sk(
+          `<rect x="${x - 80}" y="${y - 36}" width="160" height="36" rx="3" style="fill:#D9DEE3"/><rect x="${x - 84}" y="${y - 42}" width="168" height="8" rx="2" style="fill:#F6F8FA"/><ellipse cx="${x - 30}" cy="${y - 48}" rx="18" ry="6" style="fill:#FFFDF6"/><path d="M${x + 20} ${y - 62} l6 14 h-12z" style="fill:#F4C7CF"/><circle cx="${x + 48}" cy="${y - 50}" r="7" style="fill:#F3C969"/>`,
+          `<rect x="${x - 80}" y="${y - 36}" width="160" height="36" rx="3"/><rect x="${x - 84}" y="${y - 42}" width="168" height="8" rx="2"/><ellipse cx="${x - 30}" cy="${y - 48}" rx="18" ry="6"/><path d="M${x - 30} ${y - 54} l10 -14"/><path d="M${x + 20} ${y - 62} l6 14 h-12z"/><circle cx="${x + 48}" cy="${y - 50}" r="7"/>`
+        );
       case "kitchendoor":
         return sk(
           `<path d="M${x + 40} ${y - 108} L${x + 12} ${y - 96} L${x + 12} ${y + 4} L${x + 40} ${y + 14}z" style="fill:#9CC27E"/><path d="M${x + 36} ${y - 80} l-20 6 v14 l20 -6z" style="fill:#FFFDF6"/>`,
@@ -7747,12 +7979,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         ) + (sl ? `<text x="${x - 14}" y="${y - 104}" font-size="11" fill="#3b3530" class="zz" pointer-events="none">z z</text>` : "");
       }
       case "curtwindow": {
-        const g = G.F() || {}, night = G.dusk(), shut = g.curtains ? g.curtains === "closed" : night || !!(G.S && G.S().sleep);
+        const g = G.F() || {}, night = G.dusk(), shut2 = g.curtains ? g.curtains === "closed" : night || !!(G.S && G.S().sleep);
         const cur2 = (fill, lines, ox, delay) => `<g class="sway" style="transform-origin:${ox}px ${y - 170}px;animation-delay:-${delay}s">${sk(fill, lines)}</g>`;
-        const curtains = shut ? cur2(`<path d="M${x - 50} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x - 50} ${y - 170} h50 v86 h-50z M${x - 40} ${y - 160} q4 30 0 70 M${x - 20} ${y - 164} q-4 34 0 74" opacity=".8"/>`, x - 25, 0) + cur2(`<path d="M${x} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x} ${y - 170} h50 v86 h-50z M${x + 20} ${y - 164} q4 34 0 74 M${x + 40} ${y - 160} q-4 30 0 70" opacity=".8"/>`, x + 25, 1.7) : cur2(`<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z" style="fill:var(--rose)"/>`, `<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z M${x - 50} ${y - 150} q4 30 -2 60" opacity=".8"/>`, x - 49, 0) + cur2(`<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z" style="fill:var(--rose)"/>`, `<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z M${x + 50} ${y - 150} q-4 30 2 60" opacity=".8"/>`, x + 49, 1.7);
+        const curtains = shut2 ? cur2(`<path d="M${x - 50} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x - 50} ${y - 170} h50 v86 h-50z M${x - 40} ${y - 160} q4 30 0 70 M${x - 20} ${y - 164} q-4 34 0 74" opacity=".8"/>`, x - 25, 0) + cur2(`<path d="M${x} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x} ${y - 170} h50 v86 h-50z M${x + 20} ${y - 164} q4 34 0 74 M${x + 40} ${y - 160} q-4 30 0 70" opacity=".8"/>`, x + 25, 1.7) : cur2(`<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z" style="fill:var(--rose)"/>`, `<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z M${x - 50} ${y - 150} q4 30 -2 60" opacity=".8"/>`, x - 49, 0) + cur2(`<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z" style="fill:var(--rose)"/>`, `<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z M${x + 50} ${y - 150} q-4 30 2 60" opacity=".8"/>`, x + 49, 1.7);
         return sk(
-          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4" style="fill:${night ? "#3E4673" : "var(--sky)"}"/>${night && !shut ? `<circle cx="${x + 18}" cy="${y - 142}" r="9" style="fill:#FFF3C4"/>` : !shut ? `<ellipse cx="${x - 14}" cy="${y - 120}" rx="18" ry="7" style="fill:#FFFDF6"/>` : ""}`,
-          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4"/><path d="M${x} ${y - 168} v82 M${x - 48} ${y - 128} h96" opacity="${shut ? 0 : 1}"/>`
+          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4" style="fill:${night ? "#3E4673" : "var(--sky)"}"/>${night && !shut2 ? `<circle cx="${x + 18}" cy="${y - 142}" r="9" style="fill:#FFF3C4"/>` : !shut2 ? `<ellipse cx="${x - 14}" cy="${y - 120}" rx="18" ry="7" style="fill:#FFFDF6"/>` : ""}`,
+          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4"/><path d="M${x} ${y - 168} v82 M${x - 48} ${y - 128} h96" opacity="${shut2 ? 0 : 1}"/>`
         ) + curtains + sk("", `<path d="M${x - 62} ${y - 172} h124" stroke-width="2.4"/><circle cx="${x - 62}" cy="${y - 172}" r="2.4"/><circle cx="${x + 62}" cy="${y - 172}" r="2.4"/>`);
       }
       case "record": {
@@ -7783,14 +8015,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         <path d="M${x + 30} ${y - 44} q-6 -2 -5 -10 q1 -8 9 -8 q8 0 9 8 q1 8 -5 10z"/><path d="M${x + 30} ${y - 62} v-4 M${x + 32} ${y - 62} q4 -2 7 -3 M${x + 28} ${y - 62} q-3 -1 -5 -2" style="stroke:var(--moss2)"/><circle cx="${x + 30}" cy="${y - 72}" r="6"/><circle cx="${x + 40}" cy="${y - 66}" r="5"/><circle cx="${x + 22}" cy="${y - 65}" r="5"/>`
         );
       case "jarshelf": {
-        const js = G.jars && G.jars() || [], W5 = 176, x0 = x - W5 / 2;
+        const js = G.jars && G.jars() || [], W6 = 176, x0 = x - W6 / 2;
         const mini = (j, i) => {
           const cx = x0 + 16 + i % 5 * 36, top = y - (i < 5 ? 66 : 32) - 22;
           return j ? `<svg x="${cx - 11}" y="${top}" width="22" height="29" viewBox="0 0 60 80">${jarArt(j)}</svg>` : "";
         };
         return sk(
-          `<rect x="${x0}" y="${y - 70}" width="${W5}" height="70" rx="3" style="fill:#E2CBA8"/><rect x="${x0}" y="${y - 38}" width="${W5}" height="6" style="fill:var(--wood)"/><rect x="${x0}" y="${y - 6}" width="${W5}" height="6" style="fill:var(--wood)"/>`,
-          `<rect x="${x0}" y="${y - 70}" width="${W5}" height="70" rx="3"/><path d="M${x0} ${y - 38} h${W5} M${x0} ${y - 32} h${W5} M${x0} ${y - 6} h${W5}"/>`
+          `<rect x="${x0}" y="${y - 70}" width="${W6}" height="70" rx="3" style="fill:#E2CBA8"/><rect x="${x0}" y="${y - 38}" width="${W6}" height="6" style="fill:var(--wood)"/><rect x="${x0}" y="${y - 6}" width="${W6}" height="6" style="fill:var(--wood)"/>`,
+          `<rect x="${x0}" y="${y - 70}" width="${W6}" height="70" rx="3"/><path d="M${x0} ${y - 38} h${W6} M${x0} ${y - 32} h${W6} M${x0} ${y - 6} h${W6}"/>`
         ) + `<g pointer-events="none">${js.map(mini).join("")}</g>`;
       }
       case "chartstand":
@@ -7831,12 +8063,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       case "healthchord":
       case "healthchico": {
         const h = G && G.health ? G.health(kind.slice(6)) : null, L2 = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
-        const st6 = h ? h.status : "grey", word = { green: "ALL GOOD", amber: "WATCH", red: "NEEDS YOU", grey: "NO REPORT" }[st6];
+        const st6 = h ? h.status : "grey", word2 = { green: "ALL GOOD", amber: "WATCH", red: "NEEDS YOU", grey: "NO REPORT" }[st6];
         const lights = (h && h.checks.length ? h.checks.slice(0, 3).map((c) => c.state) : [st6, st6, st6]).map((c, i) => `<circle cx="${x - 18 + i * 18}" cy="${y - 62}" r="6" style="fill:${L2[c]}"/>`).join("");
         return sk(
           `<rect x="${x - 3}" y="${y - 30}" width="6" height="30" style="fill:var(--wood)"/><rect x="${x - 34}" y="${y - 80}" width="68" height="52" rx="5" style="fill:#FFFDF6"/>${lights}`,
           `<rect x="${x - 34}" y="${y - 80}" width="68" height="52" rx="5"/><path d="M${x - 3} ${y - 28} v28 M${x + 3} ${y - 28} v28 M${x - 12} ${y} h24"/>${lights.replace(/ style="[^"]*"/g, "")}`
-        ) + `<text x="${x}" y="${y - 38}" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="800" font-size="9" letter-spacing=".6" style="fill:${L2[st6] === L2.grey ? "var(--line)" : L2[st6]}">${word}</text>`;
+        ) + `<text x="${x}" y="${y - 38}" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="800" font-size="9" letter-spacing=".6" style="fill:${L2[st6] === L2.grey ? "var(--line)" : L2[st6]}">${word2}</text>`;
       }
       case "pobox": {
         let c = "";
@@ -7873,6 +8105,17 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       return sk(
         `<rect x="${x2 - 90}" y="${y2 - 44}" width="180" height="44" rx="4" style="fill:#8B5E3C"/><rect x="${x2 - 94}" y="${y2 - 50}" width="188" height="8" rx="2" style="fill:#5B2338"/><path d="M${x2 - 60} ${y2 - 66} h8 l-1 14 h-6z" style="fill:#5B2338"/><path d="M${x2 - 42} ${y2 - 62} q5 0 5 6 q0 4 -5 4 q-5 0 -5 -4 q0 -6 5 -6z" style="fill:#F6E3C6"/><rect x="${x2 + 50}" y="${y2 - 62}" width="24" height="12" rx="2" style="fill:#F3C969"/>`,
         `<rect x="${x2 - 90}" y="${y2 - 44}" width="180" height="44" rx="4"/><rect x="${x2 - 94}" y="${y2 - 50}" width="188" height="8" rx="2"/><path d="M${x2 - 90} ${y2 - 22} h180" opacity=".35"/><path d="M${x2 - 60} ${y2 - 66} h8 l-1 14 h-6z M${x2 - 56} ${y2 - 66} v-6"/><path d="M${x2 - 42} ${y2 - 52} v4 M${x2 - 46} ${y2 - 48} h8"/><rect x="${x2 + 50}" y="${y2 - 62}" width="24" height="12" rx="2"/>`
+      );
+    }
+    if (id === "scoopshop") {
+      const s2 = stationsOf("scoopshop").find((t2) => t2.kind === "gcounter"), x2 = s2.x, y2 = s2.y, sc = G.scoop ? G.scoop() : { recipes: [], tubs: {} };
+      const tubs = (sc.recipes || []).filter((r) => (sc.tubs || {})[r.id] > 0).slice(0, 8);
+      return sk(
+        `<rect x="${x2 - 104}" y="${y2 - 48}" width="208" height="48" rx="4" style="fill:#F4C7CF"/><path d="M${x2 - 104} ${y2 - 48} h208 v-26 q-104 -12 -208 0z" style="fill:#EAF6FA" opacity=".9"/>${Array.from({ length: 8 }, (_, i) => {
+          const r = tubs[i];
+          return `<rect x="${x2 - 96 + i * 24}" y="${y2 - 70}" width="20" height="16" rx="3" style="fill:${r ? r.col : "#F6F1E8"}"/>${r ? `<path d="M${x2 - 94 + i * 24} ${y2 - 70} q8 -8 16 0z" style="fill:${r.col}"/>` : ""}`;
+        }).join("")}<path d="M${x2 - 104} ${y2 - 30} h208" style="stroke:#FFFDF6" stroke-width="5"/>`,
+        `<rect x="${x2 - 104}" y="${y2 - 48}" width="208" height="48" rx="4"/><path d="M${x2 - 104} ${y2 - 48} v-26 q104 -12 208 0 v26"/>${Array.from({ length: 8 }, (_, i) => `<rect x="${x2 - 96 + i * 24}" y="${y2 - 70}" width="20" height="16" rx="3"/>`).join("")}`
       );
     }
     if (id !== "bank") return "";
@@ -7938,10 +8181,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       if (sl) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".32" pointer-events="none"/>`;
       return h;
     }
-    if (id === "office" || id === "garage") {
-      const e = id === "office", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx = e ? 486 : 34;
-      h += `<g data-exit="1" aria-label="Back to the living room"><ellipse class="hov" cx="${hx}" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>
-      ${sk(`<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z" style="fill:#F8EED8"/>`, `<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z"/><circle cx="${e ? 497 : 23}" cy="384" r="1.8"/>`)}${tapeLabel(e ? 456 : 64, 296, "Living room", "var(--card)", 11)}</g>`;
+    if (id === "office" || id === "garage" || id === "scoopkitchen") {
+      const e = id !== "garage", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx = e ? 486 : 34, sk2 = id === "scoopkitchen";
+      h += `<g data-exit="1" aria-label="${sk2 ? "Back to the shop" : "Back to the living room"}"><ellipse class="hov" cx="${hx}" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>
+      ${sk(`<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z" style="fill:${sk2 ? "#E3F2EC" : "#F8EED8"}"/>`, `<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z"/><circle cx="${e ? 497 : 23}" cy="384" r="1.8"/>`)}${tapeLabel(e ? 456 : 64, sk2 ? 478 : 296, sk2 ? "The shop" : "Living room", "var(--card)", 11)}</g>`;
       return h;
     }
     h += `<g data-exit="1" aria-label="Exit"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
@@ -9563,8 +9806,8 @@ Quests finished today: ${S3.doneIds.length}`;
     const a = APPS2[app], h = health(app);
     let s = `<span class="tape stripe" aria-hidden="true"></span><h2>${a.name} health</h2>`;
     if (!h) return s + `<p class="sub">No report yet. When the ${a.name} nightly bug check runs, its results land here.</p>`;
-    const word = { green: "All good", amber: "Keep an eye on it", red: "Needs you", grey: "Unknown" }[h.status];
-    s += `<p class="hstatus"><i style="background:${LIGHT[h.status]}"></i><b>${word}</b>${h.headline ? ` · ${esc(h.headline)}` : ""}</p>
+    const word2 = { green: "All good", amber: "Keep an eye on it", red: "Needs you", grey: "Unknown" }[h.status];
+    s += `<p class="hstatus"><i style="background:${LIGHT[h.status]}"></i><b>${word2}</b>${h.headline ? ` · ${esc(h.headline)}` : ""}</p>
     <p class="sub">Checked ${ago2(h.at)}${h.stale ? " (that's a while: did tonight's check run?)" : ""}.</p>`;
     if (h.checks.length) s += `<ul class="hlist checks">${h.checks.map((c) => `<li><i style="background:${LIGHT[c.state]}"></i><span>${esc(c.name)}${c.detail ? ` <small>${esc(c.detail)}</small>` : ""}</span></li>`).join("")}</ul>`;
     if (h.link) s += `<div class="actions"><a class="btn small alt" href="${esc(h.link)}" target="_blank" rel="noopener">Open the ${a.name} founder room</a></div>`;
@@ -10898,7 +11141,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   var mlabel = (k) => (/* @__PURE__ */ new Date(k + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
   function chart(d, target) {
     const ms = Object.keys(d.byMonth), vals = ms.map((k) => d.byMonth[k]), max = Math.max(1, target || 0, ...vals) * 1.15;
-    const W5 = 320, H3 = 150, L2 = 8, B = 128, T = 14, bw = 36, gap = (W5 - L2 * 2 - bw * 6) / 5, y = (v) => B - (B - T) * v / max;
+    const W6 = 320, H3 = 150, L2 = 8, B = 128, T = 14, bw = 36, gap = (W6 - L2 * 2 - bw * 6) / 5, y = (v) => B - (B - T) * v / max;
     const bars2 = ms.map((k, i) => {
       const x = L2 + i * (bw + gap), v = vals[i], top = y(v), h = Math.max(0, B - top), cur2 = i === ms.length - 1;
       const r = Math.min(4, h);
@@ -10906,8 +11149,8 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       return `<g class="rbar${cur2 ? " cur" : ""}" tabindex="0" aria-label="${mlabel(k)}: ${money2(v, d.currency)}"><title>${mlabel(k)} ${k.slice(0, 4)}: ${money2(v, d.currency)}</title><rect x="${x - gap / 2}" y="${T}" width="${bw + gap}" height="${B - T}" fill="transparent"/>${path ? `<path d="${path}" fill="#4E9A4A" opacity="${cur2 ? 1 : 0.55}"/>` : ""}
       ${cur2 || v === Math.max(...vals) && v > 0 ? `<text x="${x + bw / 2}" y="${top - 4}" text-anchor="middle" class="rval">${money2(v, d.currency)}</text>` : ""}<text x="${x + bw / 2}" y="${B + 14}" text-anchor="middle" class="rax">${mlabel(k)}</text></g>`;
     }).join("");
-    const tl = target ? `<path d="M${L2} ${y(target)} H${W5 - L2}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W5 - L2}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money2(target, d.currency)}</text>` : "";
-    return `<svg class="rchart" viewBox="0 0 ${W5} ${H3}" role="img" aria-label="Paid income by month, last six months"><path d="M${L2} ${B} H${W5 - L2}" stroke="#D8CFC2" stroke-width="1"/>${bars2}${tl}</svg>`;
+    const tl = target ? `<path d="M${L2} ${y(target)} H${W6 - L2}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W6 - L2}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money2(target, d.currency)}</text>` : "";
+    return `<svg class="rchart" viewBox="0 0 ${W6} ${H3}" role="img" aria-label="Paid income by month, last six months"><path d="M${L2} ${B} H${W6 - L2}" stroke="#D8CFC2" stroke-width="1"/>${bars2}${tl}</svg>`;
   }
   var revenueNow = () => {
     if (!st3.data) return null;
@@ -12690,9 +12933,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var routineNow = (def) => routineAt(def, dayKey(), sgHM());
   function slotAt(def, day, t2, live3) {
-    return live3 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || routineAt(def, day, t2);
+    return live3 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || iceOk(scoopSlot(def.id, day, t2), def, day, t2) || routineAt(def, day, t2);
   }
   var nightOk = (s, def, day, t2) => !s || !s.night ? s : tastingSlot(def.id, day, t2) || (routineAt(def, day, t2) || {}).scene === "wineshop" ? null : s;
+  var iceOk = (s, def, day, t2) => {
+    if (!s) return null;
+    const r = routineAt(def, day, t2);
+    return !r || ["village", "lane", "field", "shore", "bay", "orchard", "flowers", "base", "vineyard"].includes(r.scene) ? s : null;
+  };
   var cellarBuilt = () => !!(api3 && api3.F().goals && api3.F().goals.cellar);
   var slotNow = (def) => slotAt(def, dayKey(), sgHM(), true);
   var whereIs = (id) => {
@@ -12708,7 +12956,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     api3.sfx && api3.sfx("babble", e.def.pitch || 1);
     return true;
   }
-  var PROPS = { water: "can", repair: "hammer", farm: "hoe" };
+  var PROPS = { water: "can", repair: "hammer", farm: "hoe", cone: "cone" };
   var outdoors = (s) => s === "village" || s === "base" || s === "lane" || s === "vineyard" || s === "orchard" || s === "flowers" || s === "field" || s === "shore";
   var isHere = (id) => {
     const d = NPCS.find((n) => n.id === id), s = d && slotNow(d);
@@ -13002,8 +13250,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     ${shoreStream}
     <g pointer-events="none">${[[40, 120], [104, 170], [30, 280], [120, 330], [56, 420], [98, 520], [36, 600], [124, 600]].map(([x, y]) => `<path class="ripple" d="M${x} ${y} q5 -3.5 10 0 q5 3.5 10 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.3" opacity=".8"/>`).join("")}</g>
     <g ${W4} opacity=".7">${[[186, 140], [178, 360], [196, 560], [170, 220]].map(([x, y]) => `<path d="M${x} ${y} l3 -3 l3 3 M${x + 10} ${y + 6} q2 -3 4 0" fill="none"/>`).join("")}</g>
-    <g filter="url(#wob)"><path d="M250 150 V640 M250 300 H520 M360 300 V222 M400 300 V466" fill="none" style="stroke:#D9BE94" stroke-width="20" stroke-linecap="round"/>
-      <path d="M250 150 V640 M250 300 H520" fill="none" style="stroke:#C9A87A" stroke-width="20" stroke-dasharray="1.4 9" opacity=".7"/></g>
+    <g filter="url(#wob)"><path d="M250 0 V640 M250 300 H520 M360 300 V222 M400 300 V466" fill="none" style="stroke:#D9BE94" stroke-width="20" stroke-linecap="round"/>
+      <path d="M250 0 V640 M250 300 H520" fill="none" style="stroke:#C9A87A" stroke-width="20" stroke-dasharray="1.4 9" opacity=".7"/></g>
+    <g pointer-events="none">${sk(`<rect x="236" y="48" width="28" height="34" rx="2" style="fill:var(--wood)"/>`, `<rect x="236" y="48" width="28" height="34" rx="2"/><path d="M236 56 h28 M236 64 h28 M236 72 h28 M232 46 v38 M268 46 v38"/>`)}</g>
     ${pine(286, 150, 1.1)}${pine(470, 210, 1)}${pine(420, 632, 0.8)}${pine(500, 612, 0.95)}
     ${flowers([[440, 250, "#EFA3A6"], [462, 268, "#F3C969"], [288, 360, "#C3CDEE"], [470, 400, "#EFA3A6"], [300, 560, "#F3C969"]])}`;
     const sea = dolphin(80, 200, 11, 1, false) + dolphin(64, 238, 11, 2.2, false) + dolphin(96, 470, 14, 6, true) + farPaddler(40, 330, 140, 70);
@@ -13051,8 +13300,338 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       ${tapeLabel(168, 588, "Dolphin cruise", "var(--peri)", 10)}</g>` : `<g data-place="boat" aria-label="The mooring: save up for a dolphin cruise boat"><ellipse class="hov" cx="206" cy="552" rx="26" ry="8" style="fill:var(--butter)"/>
       ${sk(`<rect x="200" y="512" width="8" height="34" style="fill:var(--wood)"/><rect x="178" y="512" width="52" height="18" rx="2" style="fill:#FFFDF6"/>`, `<rect x="200" y="512" width="8" height="34"/><rect x="178" y="512" width="52" height="18" rx="2"/><path d="M186 521 h36" opacity=".55"/>`)}
       ${tapeLabel(168, 588, "Boat mooring", "var(--peri)", 10)}</g>`;
-    return lampDefs + ground + sea + jetty + boat + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench + rack + mumdad + marcus + archGate("toFieldS", 500, 292, "The field", 446, 320, "var(--peri)", "Gate to the field") + archGate("toFlowersS", 250, 616, "Flower farm", 326, 606, "var(--blush)", "Gate to the flower farm");
+    return lampDefs + ground + sea + jetty + boat + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench + rack + mumdad + marcus + archGate("toFieldS", 500, 292, "The field", 446, 320, "var(--peri)", "Gate to the field") + archGate("toBay", 250, 30, "The bay", 312, 26, "var(--blush)", "Up the boardwalk to the bay and the Scoop Shack") + archGate("toFlowersS", 250, 616, "Flower farm", 326, 606, "var(--blush)", "Gate to the flower farm");
   }
+
+  // src/art/bay.js
+  var W5 = `filter="url(#wob)" ${ink}`;
+  var COAST = "M150 0 C176 120 134 250 160 380 C182 480 140 560 150 640";
+  var DECK_SEATS = [[134, 360], [172, 352], [196, 360], [222, 352], [150, 404], [190, 404]];
+  var pine2 = (x, y, s = 1) => sk(
+    `<rect x="${x - 3 * s}" y="${y - 10 * s}" width="${6 * s}" height="${12 * s}" style="fill:#8A5A3A"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${x - (22 - i * 4) * s} ${y - (10 + i * 14) * s} q${(22 - i * 4) * s} ${-8 * s} ${(44 - i * 8) * s} 0 l${-6 * s} ${-8 * s} h${-(32 - i * 8) * s}z" style="fill:${i % 2 ? "#5E8A5A" : "#6E9A63"}"/>`).join("")}`,
+    `<path d="M${x} ${y - 82 * s} v${80 * s}"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${x - (22 - i * 4) * s} ${y - (10 + i * 14) * s} q${(22 - i * 4) * s} ${-8 * s} ${(44 - i * 8) * s} 0"/>`).join("")}`
+  );
+  var dolphin2 = (x, y, dur2, begin) => {
+    const kt = "0;.55;.62;.7;.78;.84;1";
+    return `<g pointer-events="none" transform="translate(${x} ${y})"><g opacity="0"><animate attributeName="opacity" values="0;0;1;1;1;0;0" keyTimes="${kt}" dur="${dur2}s" begin="${begin}s" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="translate" values="0 12;0 12;6 -2;14 -7;22 -2;28 12;28 12" keyTimes="${kt}" dur="${dur2}s" begin="${begin}s" repeatCount="indefinite"/>
+    <g ${W5}><path d="M-14 2 C-8 -8 8 -10 16 -2 C10 -2 4 0 -2 4 C-6 6 -12 6 -14 2Z" style="fill:#7C93A8"/><path d="M0 -7 l4 -7 l2 7z" style="fill:#7C93A8"/></g></g></g>`;
+  };
+  function bayArt() {
+    const G2 = artCtx(), sc = G2.scoop ? G2.scoop() : { name: "The Scoop Shack" }, name = sc.name || "The Scoop Shack";
+    const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
+    <g filter="url(#wash)" opacity=".7"><ellipse cx="420" cy="360" rx="120" ry="70" style="fill:var(--grass2)"/><ellipse cx="380" cy="600" rx="140" ry="50" style="fill:var(--grass2)"/></g>
+    <g filter="url(#wob)"><path d="M0 0 H150 C176 120 134 250 160 380 C182 480 140 560 150 640 H0Z" style="fill:var(--sea)"/>
+      <path d="M0 0 H76 C96 140 62 280 88 400 C102 500 72 580 86 640 H0Z" style="fill:var(--sea2)" opacity=".7"/>
+      <path d="${COAST} H214 C230 540 200 440 226 330 C246 220 208 110 228 0Z" style="fill:var(--sand)"/></g>
+    <g filter="url(#wob)" fill="none"><path d="${COAST}" style="stroke:#FFFDF6" stroke-width="3.2" stroke-dasharray="10 7" opacity=".9"/><path d="${COAST}" style="stroke:var(--line)" stroke-width="1" opacity=".45"/></g>
+    <g pointer-events="none">${[[40, 90], [100, 150], [30, 260], [110, 470], [50, 540], [120, 600]].map(([x, y]) => `<path class="ripple" d="M${x} ${y} q5 -3.5 10 0 q5 3.5 10 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.3" opacity=".8"/>`).join("")}</g>
+    <g filter="url(#wob)"><path d="M250 640 V300 H386 V266" fill="none" style="stroke:#D9BE94" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M250 640 V300 H386" fill="none" style="stroke:#C9A87A" stroke-width="20" stroke-dasharray="1.4 9" opacity=".7"/></g>
+    ${pine2(490, 150, 1)}${pine2(300, 140, 0.9)}${pine2(500, 470, 0.95)}${pine2(398, 636, 0.78)}${pine2(470, 624, 0.85)}
+    ${flowers([[300, 320, "#EFA3A6"], [470, 300, "#F3C969"], [290, 470, "#C3CDEE"], [480, 380, "#EFA3A6"], [440, 570, "#F3C969"]])}`;
+    const sea = dolphin2(70, 210, 13, 2) + dolphin2(56, 500, 16, 7);
+    const shop = house("scoopshop", 316, 180, 140, 82, "#E3F2EC", "#F2A0B8", name, "var(--blush)", {
+      art: `<path d="M308 198 h156 l-6 14 h-144z" style="fill:#FFFDF6"/>${[0, 1, 2, 3, 4, 5].map((i) => `<path d="M${312 + i * 26} 198 h13 l-1 14 h-13z" style="fill:#F2A0B8"/>`).join("")}
+      <rect x="350" y="150" width="72" height="18" rx="3" style="fill:#FFFDF6"/><path d="M379 112 l7 24 l7 -24z" style="fill:#E8C48E"/><circle cx="386" cy="108" r="9" style="fill:#F4C7CF"/><circle cx="380" cy="100" r="6" style="fill:#C3E8B8"/>`,
+      lines: `<path d="M308 198 h156 l-6 14 h-144z"/><rect x="350" y="150" width="72" height="18" rx="3"/><path d="M379 112 l7 24 l7 -24z"/><circle cx="386" cy="108" r="9"/><circle cx="380" cy="100" r="6"/>`
+    });
+    const sign = `<text x="386" y="163" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="${name.length > 16 ? 7 : 8.5}" fill="#C2505F" pointer-events="none">${name.replace(/[<&>]/g, "").slice(0, 22)}</text>`;
+    const umb = (x, y, c) => sk(`<path d="M${x - 18} ${y - 34} q18 -16 36 0z" style="fill:${c}"/><ellipse cx="${x}" cy="${y - 8}" rx="13" ry="5" style="fill:#FFFDF6"/>`, `<path d="M${x - 18} ${y - 34} q18 -16 36 0z M${x} ${y - 34} v26"/><ellipse cx="${x}" cy="${y - 8}" rx="13" ry="5"/><path d="M${x} ${y - 3} v6"/>`);
+    const deck = `<g data-place="deck" aria-label="The deck"><ellipse class="hov" cx="176" cy="420" rx="70" ry="12" style="fill:var(--butter)"/>
+    ${sk(`<rect x="112" y="326" width="128" height="92" rx="3" style="fill:#C9A27E"/>`, `<rect x="112" y="326" width="128" height="92" rx="3"/>${[0, 1, 2, 3, 4, 5, 6].map((i) => `<path d="M112 ${338 + i * 12} h128" opacity=".5"/>`).join("")}<path d="M112 326 v-10 M240 326 v-10 M112 316 h128" />`)}
+    ${umb(152, 362, "#F2A0B8")}${umb(208, 362, "#9FD3C2")}${umb(170, 412, "#F3C969")}
+    ${tapeLabel(176, 446, "The deck", "var(--sky)", 10)}</g>`;
+    const reno = `<g data-place="reno" aria-label="Under renovation"><ellipse class="hov" cx="396" cy="526" rx="70" ry="10" style="fill:var(--butter)"/>
+    ${sk(
+      `<path d="M318 432 L396 390 L474 432z" style="fill:#B9B0A4"/><rect x="326" y="432" width="140" height="84" style="fill:#E8DCC8"/>${[0, 1, 2, 3, 4, 5, 6].map((i) => `<rect x="${330 + i * 19}" y="446" width="16" height="66" style="fill:${i % 2 ? "#D9BE94" : "#C9A87A"}"/>`).join("")}
+      <rect x="352" y="458" width="88" height="30" rx="2" transform="rotate(-3 396 473)" style="fill:#FFFDF6"/>`,
+      `<path d="M318 432 L396 390 L474 432z"/><rect x="326" y="432" width="140" height="84"/><path d="M322 516 V420 M470 516 V420 M322 444 H470 M322 480 H470 M322 420 L470 516 M470 420 L322 516" opacity=".55"/>
+      <rect x="352" y="458" width="88" height="30" rx="2" transform="rotate(-3 396 473)"/>`
+    )}
+    <text x="396" y="471" text-anchor="middle" transform="rotate(-3 396 473)" font-family="Klee One,serif" font-weight="600" font-size="8" fill="#5E5A55" pointer-events="none">Coming soon</text>
+    <text x="396" y="482" text-anchor="middle" transform="rotate(-3 396 473)" font-family="Klee One,serif" font-size="6.5" fill="#8A8279" pointer-events="none">brewery? chocolatier?</text>
+    ${tapeLabel(396, 540, "Under renovation", "var(--card)", 10)}</g>`;
+    return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + deck + reno + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
+  }
+
+  // src/game/scoop.js
+  var OPEN = 10 * 60;
+  var CLOSE = 20 * 60;
+  var TUB = 20;
+  var BATCH_MIN = 45;
+  var MAX_BATCHES = 4;
+  var FORMATS = { cup: { n: "Cup", p: 4 }, cone: { n: "Cone", p: 4 }, float: { n: "Float", p: 6 }, waffle: { n: "Waffle", p: 7 } };
+  var FMT_W = [["cup", 0.34], ["cone", 0.4], ["float", 0.1], ["waffle", 0.16]];
+  var FRUIT_COL = { cherry: "#C2334D", lemon: "#F3E27A", peach: "#F5B08A", mango: "#F3B33A", apple: "#B9D98A", pear: "#D9E39A", fig: "#8C5A7A", orange: "#F39A3A", persimmon: "#E8823A" };
+  var INGR = {
+    milk: ["Milk", "Milk", "#FFFBEF"],
+    honey: ["Honey", "Honey", "#F3C969"],
+    egg: ["Egg", "Custard", "#F6E3A1"],
+    olives: ["Olives", "Olive", "#9DAF6A"],
+    strawberry: ["Strawberries", "Strawberry", "#E8566C"],
+    blueberry: ["Blueberries", "Blueberry", "#5E6EB8"],
+    pumpkin: ["Pumpkin", "Pumpkin", "#E8913A"],
+    corn: ["Sweetcorn", "Sweetcorn", "#F3D34A"],
+    carrot: ["Carrots", "Carrot", "#F28C3A"],
+    tomato: ["Tomatoes", "Tomato", "#E05A44"],
+    chocolate: ["Dark chocolate", "Chocolate", "#5A3A2A"],
+    vanilla: ["Vanilla", "Vanilla", "#F6EBC8"],
+    coffee: ["Coffee", "Coffee", "#8A5A3A"],
+    pistachio: ["Pistachios", "Pistachio", "#A8C98A"],
+    hazelnut: ["Hazelnuts", "Hazelnut", "#B98A5A"],
+    coconut: ["Coconut", "Coconut", "#F6F1E8"],
+    matcha: ["Matcha", "Matcha", "#8FB86A"],
+    pandan: ["Pandan", "Pandan", "#7FB86A"],
+    gulamelaka: ["Gula melaka", "Gula Melaka", "#9A5A2E"],
+    sesame: ["Black sesame", "Black Sesame", "#4A4440"],
+    mint: ["Mint", "Mint", "#9FD3B2"],
+    banana: ["Bananas", "Banana", "#F3E07A"],
+    grape_red: ["Red grapes", "Red Grape", "#7A2E5A"],
+    grape_white: ["White grapes", "White Grape", "#C9D98A"],
+    ...Object.fromEntries(Object.values(TREES).map((t2) => [t2.fruit, [t2.fruit[0].toUpperCase() + t2.fruit.slice(1), t2.fruit[0].toUpperCase() + t2.fruit.slice(1), FRUIT_COL[t2.fruit] || "#F3C969"]])),
+    ...Object.fromEntries(Object.entries(FLOWERS).map(([id, f2]) => ["fl_" + id, [f2.n, f2.n.replace(/s$/, "").replace(/ie$/, "y").replace("Sweet pea", "Sweet Pea"), f2.col || "#F4C7CF"]]))
+  };
+  var isIngr = (id) => id in INGR;
+  var word = (id) => INGR[id][1];
+  function scoopState(F2) {
+    F2.scoop = F2.scoop || {};
+    const s = F2.scoop;
+    s.name = s.name || "The Scoop Shack";
+    s.fridge = s.fridge || {};
+    s.recipes = s.recipes || [];
+    s.tubs = s.tubs || {};
+    s.prices = Object.assign({ cup: 4, cone: 4, float: 6, waffle: 7, special: 2 }, s.prices || {});
+    s.plan = s.plan && s.plan.day === dayKey() ? s.plan : { day: dayKey(), ids: [] };
+    s.made = s.made || {};
+    s.sold = s.sold || {};
+    s.log = s.log || [];
+    return s;
+  }
+  var recipeOf = (s, id) => s.recipes.find((r) => r.id === id);
+  var scoopsLeft = (s) => Object.values(s.tubs).reduce((a, b) => a + b, 0);
+  var openNow = (hm2) => hm2 >= OPEN && hm2 < CLOSE;
+  var cookOn = (day, hm2) => {
+    const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+    return d !== 0 && hm2 >= 8 * 60 && hm2 < 16 * 60 && !(hm2 >= 12 * 60 && hm2 < 12 * 60 + 45);
+  };
+  var GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"];
+  var SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
+  var POETIC = ["Dolphin Bay", "Jetty Sunset", "Ma Ma's Garden", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Evan's Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
+  function nameFor(ings) {
+    const dairy = ings.includes("milk"), flav = ings.filter((i) => i !== "milk"), h = hash(ings.join("+"));
+    if (!flav.length) return "Fior di Latte";
+    const style = (dairy ? GELATO : SORBET)[h % (dairy ? GELATO.length : SORBET.length)];
+    if (flav.length === 1) return `${word(flav[0])} ${style}`;
+    if (flav.length === 2) return `${word(flav[0])} & ${word(flav[1])} ${style}`;
+    return `${POETIC[h % POETIC.length]} ${style}`;
+  }
+  var blend = (ings) => {
+    const cs = ings.map((i) => INGR[i][2]).filter((c) => c !== "#FFFBEF");
+    if (!cs.length) return "#FFF6DC";
+    const rgb = cs.map((c) => [1, 3, 5].map((k) => parseInt(c.slice(k, k + 2), 16))), avg = [0, 1, 2].map((k) => Math.round(rgb.reduce((a, r) => a + r[k], 0) / rgb.length));
+    const soft = ings.includes("milk") ? 0.45 : 0.15;
+    return "#" + avg.map((v) => Math.round(v + (255 - v) * soft).toString(16).padStart(2, "0")).join("");
+  };
+  var keyOf = (ings) => [...new Set(ings)].sort().join("+");
+  var knownRecipe = (s, ings) => s.recipes.find((r) => r.id === keyOf(ings));
+  var hasAll = (s, ings) => ings.every((i) => (s.fridge[i] || 0) >= 1);
+  var useAll = (s, ings) => ings.forEach((i) => {
+    s.fridge[i]--;
+    if (s.fridge[i] <= 0) delete s.fridge[i];
+  });
+  function discover(F2, ings) {
+    const s = scoopState(F2);
+    ings = [...new Set(ings)].filter(isIngr).slice(0, 4);
+    if (!ings.length) return { msg: "Pick something from the fridge to mix." };
+    const known = knownRecipe(s, ings);
+    if (known) return { known, msg: `You already know this one: ${known.name}. Add it to today's batches on the board.` };
+    if (!hasAll(s, ings)) return { msg: "The fridge is missing some of that." };
+    useAll(s, ings);
+    const r = { id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: ings.includes("milk"), special: false, found: Date.now() };
+    s.recipes.push(r);
+    s.tubs[r.id] = (s.tubs[r.id] || 0) + TUB;
+    registerItems(F2);
+    return { recipe: r, msg: `A new flavour: ${r.name}! The first tub's in the display.` };
+  }
+  var backpackIngr = (F2) => Object.keys(F2.inv || {}).filter((id) => isIngr(id) && F2.inv[id] > 0);
+  function stockFridge(F2, id, n, from, orch) {
+    const s = scoopState(F2);
+    if (from === "bag") {
+      const have = (F2.inv || {})[id] || 0;
+      n = Math.min(n, have);
+      if (n <= 0) return 0;
+      F2.inv[id] -= n;
+      if (F2.inv[id] <= 0) delete F2.inv[id];
+    } else {
+      const key = id.startsWith("fl_") ? "stem:" + id.slice(3) : id, have = orch.stock[key] || 0;
+      n = Math.min(n, have);
+      if (n <= 0) return 0;
+      orch.stock[key] -= n;
+      if (orch.stock[key] <= 0) delete orch.stock[key];
+    }
+    s.fridge[id] = (s.fridge[id] || 0) + n;
+    return n;
+  }
+  var farmShelf = (orch) => Object.keys(orch.stock || {}).filter((k) => orch.stock[k] > 0).map((k) => k.startsWith("stem:") ? "fl_" + k.slice(5) : k).filter(isIngr);
+  var canMake = (s, r) => r && hasAll(s, r.ings);
+  function todaysQueue(s) {
+    if (s.plan.ids.length) return s.plan.ids.map((id) => recipeOf(s, id)).filter(Boolean);
+    return [...s.recipes].filter((r) => (s.tubs[r.id] || 0) < TUB).sort((a, b) => (s.tubs[a.id] || 0) - (s.tubs[b.id] || 0)).slice(0, 3);
+  }
+  function kitchenMinute(s, day, hm2, at) {
+    if (s.batch && at >= s.batch.done) {
+      s.tubs[s.batch.id] = (s.tubs[s.batch.id] || 0) + TUB;
+      s.made[day] = (s.made[day] || 0) + 1;
+      s.log = [`${(recipeOf(s, s.batch.id) || {}).name || "A flavour"}: a fresh tub`, ...s.log].slice(0, 6);
+      s.batch = null;
+    }
+    if (s.batch || !cookOn(day, hm2) || (s.made[day] || 0) >= MAX_BATCHES) return;
+    const done = s.doneToday && s.doneToday.day === day ? s.doneToday.ids : [];
+    const next = todaysQueue(s).find((r) => !done.includes(r.id) && canMake(s, r));
+    if (!next) return;
+    useAll(s, next.ings);
+    s.batch = { id: next.id, done: at + BATCH_MIN * 6e4 };
+    s.doneToday = { day, ids: [...done, next.id] };
+  }
+  var priceOf = (s, fmt3, r) => s.prices[fmt3] + (r && r.special ? s.prices.special : 0);
+  var DEFAULT = 4 + 4 + 6 + 7;
+  function saleMinute(s, day, hm2, opts) {
+    if (!openNow(hm2)) return null;
+    const stocked = s.recipes.filter((r2) => (s.tubs[r2.id] || 0) > 0);
+    if (!stocked.length) return null;
+    const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay(), we = d === 0 || d === 6, night = (d === 2 || d === 4) && hm2 >= 18 * 60;
+    const price = s.prices.cup + s.prices.cone + s.prices.float + s.prices.waffle, pf = Math.pow(DEFAULT / Math.max(4, price), 1.3);
+    const p = 0.035 * (we ? 1.5 : 1) * (night ? 1.4 : 1) * (hm2 >= 14 * 60 && hm2 < 17 * 60 ? 1.25 : 1) * pf * (opts.serving ? 1.5 : 1);
+    if (Math.random() >= p) return null;
+    let x = Math.random(), fmt3 = "cone";
+    for (const [f2, w] of FMT_W) {
+      if ((x -= w) < 0) {
+        fmt3 = f2;
+        break;
+      }
+    }
+    const r = stocked[Math.floor(Math.random() * stocked.length)];
+    s.tubs[r.id]--;
+    if (s.tubs[r.id] <= 0) delete s.tubs[r.id];
+    const coins = priceOf(s, fmt3, r), t2 = s.sold[day] = s.sold[day] || { n: 0, coins: 0 };
+    t2.n++;
+    t2.coins += coins;
+    return { coins, fmt: fmt3, r };
+  }
+  function scoopTick(F2, opts = {}) {
+    const s = scoopState(F2), now2 = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now2, now2 - 2 * 864e5);
+    const out = { coins: 0, n: 0, mins: 0 };
+    for (let at = from + 6e4; at <= now2; at += 6e4) {
+      const sg = new Date(at + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm2 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
+      kitchenMinute(s, day, hm2, at);
+      const sale = saleMinute(s, day, hm2, opts);
+      if (sale) {
+        out.coins += sale.coins;
+        out.n++;
+      }
+      out.mins++;
+    }
+    if (out.mins || !s.at) s.at = from + out.mins * 6e4;
+    if (out.coins) F2.coins += out.coins;
+    return out;
+  }
+  var NO_DAIRY = ["evan", "darren", "mama", "gonggong", "mum", "dad", "angelina"];
+  var giftId = (r, fmt3) => `gel_${fmt3}_${r.id.replace(/[^a-z0-9]+/g, "-")}`;
+  function registerItems(F2) {
+    scoopState(F2).recipes.forEach((r) => Object.keys(FORMATS).forEach((fmt3) => {
+      const id = giftId(r, fmt3);
+      ITEMS[id] = {
+        n: `${r.name} ${FORMATS[fmt3].n.toLowerCase()}`,
+        kind: "gift",
+        to: r.dairy ? NO_DAIRY : "family",
+        tab: "scoop",
+        ico: "ic_" + fmt3,
+        gel: true,
+        say: `Ice cream! ${r.name}? Ooh, I've never had that one.`,
+        says: { evan: "ICE CREAM!! *happy dance*", marcus: "A sorbet, so no tummy trouble. Nice one, Zeh.", mama: "Ice cream for Ma Ma? Aiyo, so cold! So nice.", dad: "Ah Gong loves ice cream. Don't tell your mum." }
+      };
+    }));
+  }
+  function takeAway(F2, rid, fmt3) {
+    const s = scoopState(F2), r = recipeOf(s, rid);
+    if (!r || !(s.tubs[rid] > 0) || !FORMATS[fmt3]) return null;
+    s.tubs[rid]--;
+    if (s.tubs[rid] <= 0) delete s.tubs[rid];
+    registerItems(F2);
+    const id = giftId(r, fmt3);
+    F2.inv[id] = (F2.inv[id] || 0) + 1;
+    return ITEMS[id];
+  }
+  function eatOne(F2, rid) {
+    const s = scoopState(F2), r = recipeOf(s, rid);
+    if (!r || !(s.tubs[rid] > 0)) return null;
+    s.tubs[rid]--;
+    if (s.tubs[rid] <= 0) delete s.tubs[rid];
+    return r;
+  }
+  var coin = () => icon("coin", 13);
+  var dot = (c) => `<span class="gdot" style="background:${c}"></span>`;
+  var ingPic = (id) => id.startsWith("fl_") ? icon("bq_" + id.slice(3), 26) : icon(id, 26);
+  var shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var tubList = (s) => s.recipes.filter((r) => s.tubs[r.id] > 0);
+  function counterPanel2(F2, st6) {
+    const s = scoopState(F2), hm2 = sgHM(), t2 = s.sold[dayKey()] || { n: 0, coins: 0 }, tubs = tubList(s);
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm2) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t2.n ? `Sold today: ${t2.n} (${t2.coins} ${coin()}).` : "Nothing sold yet today."}${st6.server ? " Sofia's behind the counter." : ""}</p>`;
+    if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), and Tomo will keep the tubs topped up.</p>` + shut;
+    const pick3 = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
+    if (pick3) return h + `<div class="gpick"><p class="olabel">${dot(pick3.col)} ${esc(pick3.name)}${pick3.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick3.ings.map((i) => INGR[i][0]).join(", "))} · ${s.tubs[pick3.id]} scoops left</p>
+    <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick3.id)}">Have one now${st6.evan ? ", and one for Evan" : ""}</button></div>
+    <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map((f2) => `<button class="btn small alt" data-gtake="${f2}">${FORMATS[f2].n}</button>`).join("")}</div>
+    <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
+    h += `<ul class="hlist wlist">${tubs.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
+    return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p>` + shut;
+  }
+  function menuPanel2(F2, st6) {
+    const s = scoopState(F2), step2 = (k) => `<span class="gstep"><button class="btn small alt" data-gprice="${k}:-1" aria-label="Cheaper">−</button><b>${s.prices[k]}</b><button class="btn small alt" data-gprice="${k}:1" aria-label="Dearer">+</button></span>`;
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The menu</h2><p class="sub">Prices by type. A flavour marked special costs a little extra.</p>
+    <ul class="hlist wlist gprices">${Object.keys(FORMATS).map((f2) => `<li><span class="wtxt"><b>${FORMATS[f2].n}</b><small>${f2 === "float" ? "a scoop in a fizzy float" : f2 === "waffle" ? "a scoop on a warm waffle" : "one scoop"}</small></span>${step2(f2)}</li>`).join("")}
+    <li><span class="wtxt"><b>Special surcharge</b><small>added to anything in a special flavour</small></span>${step2("special")}</li></ul>`;
+    h += s.recipes.length ? `<p class="eyebrow" style="margin:12px 0 6px">Flavours</p><ul class="hlist wlist gflav">${s.recipes.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? s.tubs[r.id] + " scoops" : "sold out"}</small></span><label class="gspec"><input type="checkbox" data-gspecial="${esc(r.id)}" ${r.special ? "checked" : ""}> special</label></li>`).join("")}</ul>` : `<p class="muted">No flavours yet: discover some at the mixing bench in the kitchen.</p>`;
+    h += `<form class="row hadd" data-gname="1"><label class="sr" for="gName">Shop name</label><input id="gName" name="n" maxlength="30" value="${esc(s.name)}"><button class="btn small alt">Rename</button></form>`;
+    return h + shut;
+  }
+  function fridgePanel2(F2, orch) {
+    const s = scoopState(F2), inF = Object.keys(s.fridge).filter((id) => s.fridge[id] > 0), bag2 = backpackIngr(F2), shelf2 = farmShelf(orch);
+    const cell = (id, n, extra2) => `<li><span class="wpic">${ingPic(id)}</span><span class="wtxt"><b>${esc(INGR[id][0])}</b><small>${n}</small></span>${extra2 || ""}</li>`;
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The fridge</h2><p class="sub">What Tomo makes the gelato from. Each batch uses one of each of a flavour's ingredients.</p>`;
+    h += inF.length ? `<ul class="hlist wlist">${inF.map((id) => cell(id, `${s.fridge[id]} in the fridge`)).join("")}</ul>` : `<p class="muted">Empty. Add fruit, berries, flowers, milk, honey...</p>`;
+    if (bag2.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From your backpack</p><ul class="hlist wlist">${bag2.map((id) => cell(id, `${F2.inv[id]} with you`, `<span class="orbtns"><button class="btn small primary" data-gfill="bag:${id}:1">Add 1</button><button class="btn small alt" data-gfill="bag:${id}:99">All</button></span>`)).join("")}</ul>`;
+    if (shelf2.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From Ma Ma's farm shop</p><ul class="hlist wlist">${shelf2.map((id) => {
+      const n = orch.stock[id.startsWith("fl_") ? "stem:" + id.slice(3) : id];
+      return cell(id, `${n} on her shelf`, `<span class="orbtns"><button class="btn small primary" data-gfill="farm:${id}:1">Add 1</button><button class="btn small alt" data-gfill="farm:${id}:99">All</button></span>`);
+    }).join("")}</ul>`;
+    if (!bag2.length && !shelf2.length) h += `<p class="muted">Nothing to add right now. Milk comes from your goats or Hana's market; fruit and flowers from the orchard.</p>`;
+    return h + shut;
+  }
+  function benchPanel(F2, st6) {
+    const s = scoopState(F2), inF = Object.keys(s.fridge).filter((id) => s.fridge[id] > 0), sel = (st6.sel || []).filter((id) => inF.includes(id));
+    const known = sel.length ? knownRecipe(s, sel) : null;
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The mixing bench</h2><p class="sub">Pick up to four things from the fridge and mix. Every combination makes a new flavour; there's no such thing as a bad one. ${s.recipes.length} discovered so far.</p>`;
+    if (!inF.length) return h + `<p class="muted">The fridge is empty. Stock it first.</p>` + shut;
+    h += `<div class="gchips">${inF.map((id) => `<button class="gchip${sel.includes(id) ? " on" : ""}" data-gsel="${id}" aria-pressed="${sel.includes(id)}" ${!sel.includes(id) && sel.length >= 4 ? "disabled" : ""}>${ingPic(id)}<span>${esc(INGR[id][0])}</span></button>`).join("")}</div>`;
+    h += `<p class="muted">${sel.length ? known ? `You know this one: <b>${esc(known.name)}</b>.` : `${sel.length} picked. ${sel.includes("milk") ? "With milk: a gelato." : "No milk: a dairy-free sorbet."} Something new!` : "Nothing picked yet."}</p>`;
+    return h + `<div class="actions"><button class="btn primary" data-gmix="1" ${!sel.length || known ? "disabled" : ""}>Mix it</button><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function batchPanel(F2, st6) {
+    const s = scoopState(F2), day = dayKey(), hm2 = sgHM(), q = todaysQueue(s), b = s.batch && recipeOf(s, s.batch.id);
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Today's batches</h2><p class="sub">${b ? `Tomo's making ${esc(b.name)} now. ` : cookOn(day, hm2) ? "Tomo's in the kitchen. " : "Tomo's not in right now (he works 8am to 4pm, Monday to Saturday). "}Up to ${MAX_BATCHES} tubs a day; ${s.made[day] || 0} made so far.</p>`;
+    if (!s.recipes.length) return h + `<p class="muted">No flavours yet. Discover one at the mixing bench.</p>` + shut;
+    h += `<ul class="hlist">${s.recipes.map((r) => `<li><label><input type="checkbox" data-gplan="${esc(r.id)}" ${s.plan.ids.includes(r.id) ? "checked" : ""}><span>${dot(r.col)} ${esc(r.name)} <small>${s.tubs[r.id] || 0} scoops left · ${canMake(s, r) ? "fridge has it" : "missing: " + esc(r.ings.filter((i) => !(s.fridge[i] > 0)).map((i) => INGR[i][0]).join(", "))}</small></span></label></li>`).join("")}</ul>`;
+    h += `<p class="muted">${s.plan.ids.length ? "Tomo will make the ticked ones, in order, while the fridge has what they need." : "Nothing ticked: Tomo tops up whichever flavours are running lowest (" + (q.map((r) => esc(r.name)).join(", ") || "all full") + ")."}</p>`;
+    if (s.log.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Lately</p><ul class="hlist">${s.log.map((l) => `<li><small>${esc(l)}</small></li>`).join("")}</ul>`;
+    return h + shut;
+  }
+  function freezerPanel(F2) {
+    const s = scoopState(F2), tubs = tubList(s);
+    return `<span class="tape stripe" aria-hidden="true"></span><h2>The freezer</h2><p class="sub">Tubs keep frozen until they're sold. ${scoopsLeft(s)} scoops in all.</p>` + (tubs.length ? `<ul class="hlist wlist">${tubs.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops · ${esc(r.ings.map((i) => INGR[i][0]).join(", "))}</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty for now.</p>`) + shut;
+  }
+  var RENO_LINE = `Boarded up for now, with scaffolding out front. The sign says: "Coming soon: a craft brewery? A chocolatier?" Someone's pencilled "both!!" underneath.`;
 
   // src/game/goals.js
   var GOALS = {
@@ -13080,7 +13659,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       cellar: "The cellar door is open! Through the new door on the wine shop's west wall."
     }[k];
   }
-  var coin = () => icon("coin", 14);
+  var coin2 = () => icon("coin", 14);
   function goalPanel(F2, k) {
     const g = GOALS[k], have = owns(F2, k), need = g.needs && !owns(F2, g.needs);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(g.n)}</h2><p class="sub">${esc(g.line)}</p>`;
@@ -13088,8 +13667,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     else if (need) h += `<p class="muted">You'll need the ${esc(GOALS[g.needs].n.toLowerCase())} first.</p>`;
     else {
       const pct = Math.min(100, Math.round(100 * F2.coins / g.price));
-      h += `<div class="goalbar" role="img" aria-label="${pct}% saved"><span style="width:${pct}%"></span></div><p class="muted">${F2.coins} of ${g.price} ${coin()} saved${F2.coins < g.price ? `: ${g.price - F2.coins} to go` : ""}.</p>
-      <div class="actions"><button class="btn primary" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>${k === "cellar" ? "Build it" : "Buy it"} (${g.price} ${coin()})</button></div>`;
+      h += `<div class="goalbar" role="img" aria-label="${pct}% saved"><span style="width:${pct}%"></span></div><p class="muted">${F2.coins} of ${g.price} ${coin2()} saved${F2.coins < g.price ? `: ${g.price - F2.coins} to go` : ""}.</p>
+      <div class="actions"><button class="btn primary" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>${k === "cellar" ? "Build it" : "Buy it"} (${g.price} ${coin2()})</button></div>`;
     }
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -13098,7 +13677,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     h += [["walk", "Walk"], ["scooter", "Scooter"], ["car", "Car"]].map(([k, n]) => `<button class="btn small ${ride(F2) === k ? "primary" : "alt"}" data-ride="${k}" ${k !== "walk" && !owns(F2, k) ? "disabled" : ""}>${n}${k !== "walk" && !owns(F2, k) ? ` (${GOALS[k].price})` : ""}</button>`).join("") + `</div>`;
     ["scooter", "car"].filter((k) => !owns(F2, k)).forEach((k) => {
       const g = GOALS[k];
-      h += `<p class="eyebrow" style="margin-top:12px">${esc(g.n)}</p><p class="muted">${esc(g.line)} ${F2.coins} of ${g.price} ${coin()} saved.</p><div class="actions"><button class="btn primary small" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>Buy it (${g.price} ${coin()})</button></div>`;
+      h += `<p class="eyebrow" style="margin-top:12px">${esc(g.n)}</p><p class="muted">${esc(g.line)} ${F2.coins} of ${g.price} ${coin2()} saved.</p><div class="actions"><button class="btn primary small" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>Buy it (${g.price} ${coin2()})</button></div>`;
     });
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -13189,7 +13768,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     });
   }
   migrate();
-  setArtContext({ F: () => F, vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => {
+  setArtContext({ F: () => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => {
     const t2 = tapasToday(F, dayKey());
     return t2 ? TAPAS[t2.id].n : null;
   }, vineStock: () => shelfStock(vineState(F)), S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth2(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), goodNews: () => {
@@ -13473,6 +14052,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var goalView = null;
   var paddling = false;
+  var scView = null;
+  var scSt = { pick: null, sel: [] };
+  var evanSeat = null;
+  var lastScoop = 0;
   var fieldView = null;
   var orView = null;
   var orAt = null;
@@ -14149,6 +14732,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       drawScene();
       if (selPlot != null) ctx();
     }
+    if (Date.now() - lastScoop > 2e4) scoopNow();
     if (outside() && skyKey() !== lastSky) {
       lastSky = skyKey();
       drawScene();
@@ -15607,6 +16191,7 @@ ${SIGNOFF[t2.who] || ""}`;
       sfx("chime");
       flash(`Evan loved the ${it.n.toLowerCase()}!`);
       if (id === "icecream" || id === "storybook") S2.evanHold = { k: id, until: Date.now() + 3 * M };
+      if (it.gel) S2.evanHold = { k: "icecream", until: Date.now() + 3 * M };
       if (id === "balloon") S2.evanHold = { k: "balloon", until: 0 };
       if (id === "storybook" && scene === "home") {
         const s = spotObj("home", "dine");
@@ -16007,6 +16592,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (deskOpen && scene === "office") h = deskPanel();
     else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
     else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
+    else if (scView && (scene === "scoopshop" || scene === "scoopkitchen")) h = scView === "counter" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), server: isHere("sofia") }) : scView === "menu" ? menuPanel2(F) : scView === "fridge" ? fridgePanel2(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? batchPanel(F) : freezerPanel(F);
     else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
     else if (fieldView && scene === "field") {
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
@@ -16154,6 +16740,7 @@ ${SIGNOFF[t2.who] || ""}`;
       drawScene();
       ctx();
     });
+    if (scView) wireScoop(c);
     c.querySelectorAll("[data-sup]").forEach((b) => b.onclick = () => {
       goalView = null;
       ctx();
@@ -16332,6 +16919,8 @@ ${SIGNOFF[t2.who] || ""}`;
     });
     c.querySelectorAll("[data-fair]").forEach((b) => b.onclick = () => fairActivity(b.dataset.fair));
     c.querySelectorAll("[data-close]").forEach((b) => b.onclick = () => {
+      scView = null;
+      scSt.pick = null;
       boardOpen = false;
       shelfOpen = false;
       shedOpen = false;
@@ -16685,10 +17274,10 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
     tableKey = "";
-    $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "farm" ? farmArt() : roomArt(scene);
+    $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "farm" ? farmArt() : roomArt(scene);
     if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));
     if (outside() && isDusk()) nightLights();
-    const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: vineyardName(F), farm: "The garden", wineshop: shopName(F), orchard: "Ma Ma's orchard", flowers: "Ma Ma's flower farm", field: "The field", shore: "The foreshore" };
+    const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: vineyardName(F), farm: "The garden", wineshop: shopName(F), orchard: "Ma Ma's orchard", flowers: "Ma Ma's flower farm", field: "The field", shore: "The foreshore", bay: "The bay", scoopshop: scoopState(F).name };
     $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
     $("maphint").textContent = scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Mum's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
   }
@@ -16820,6 +17409,13 @@ ${SIGNOFF[t2.who] || ""}`;
       if (e) e.style.display = on ? "" : "none";
     };
     const pj = wearing(F, "me_pj") && scene === "room";
+    {
+      const cone = !!(S2.cone && Date.now() < S2.cone.until), el = $("melCone");
+      if (el) {
+        el.style.display = cone ? "" : "none";
+        if (cone) $("melConeTop").style.fill = S2.cone.col || "#F4C7CF";
+      }
+    }
     show2("melBow", wearing(F, "me_bow"));
     show2("melHat", wearing(F, "me_hat") && outside());
     show2("melScarf", wearing(F, "me_scarf") && !pj);
@@ -16830,6 +17426,7 @@ ${SIGNOFF[t2.who] || ""}`;
   }
   function render(redraw) {
     if (S2.day !== dayKey()) S2 = freshToday();
+    registerItems(F);
     {
       const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null;
       setLive(ev && ev.kind === "night" ? "jazz" : null);
@@ -16928,7 +17525,7 @@ ${SIGNOFF[t2.who] || ""}`;
     const m = sgHM();
     return m >= 20 * 60 || m < 7 * 60;
   };
-  var evanHere = () => scene === "kidroom" || (scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "mumdad" || scene === "marcus") && !evanNight() || evanAtDinner();
+  var evanHere = () => scene === "kidroom" || (scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "mumdad" || scene === "marcus") && !evanNight() || evanAtDinner();
   var evanAtDinner = () => {
     const d = dinnerNow(dayKey(), sgHM());
     return !!d && scene === d.host;
@@ -16942,6 +17539,9 @@ ${SIGNOFF[t2.who] || ""}`;
     w.classList.add("fading");
     setTimeout(() => {
       if (S2.sleep && id !== "room") S2.sleep = null;
+      scView = null;
+      scSt.pick = null;
+      evanSeat = null;
       scene = id;
       cam.snap = true;
       atSpot = null;
@@ -16991,7 +17591,7 @@ ${SIGNOFF[t2.who] || ""}`;
       if (id === "base") {
         evan.x = evan.tx = 300;
         evan.y = evan.ty = 360;
-      } else if (id === "vineyard" || id === "field" || id === "shore" || id === "mumdad" || id === "marcus" || id === "cottage") {
+      } else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "scoopshop" || id === "scoopkitchen" || id === "mumdad" || id === "marcus" || id === "cottage") {
         evan.x = evan.tx = p[0] + 26;
         evan.y = evan.ty = p[1] + 10;
         evan.run = false;
@@ -17265,10 +17865,10 @@ ${SIGNOFF[t2.who] || ""}`;
       return;
     }
     if (id === "window") {
-      const shut = F.curtains ? F.curtains === "closed" : isDusk() || !!S2.sleep;
-      F.curtains = shut ? "open" : "closed";
+      const shut2 = F.curtains ? F.curtains === "closed" : isDusk() || !!S2.sleep;
+      F.curtains = shut2 ? "open" : "closed";
       sfx("paper", true);
-      speak(shut ? "Curtains open. Hello, sky." : "Curtains closed. Cosy.", 2500);
+      speak(shut2 ? "Curtains open. Hello, sky." : "Curtains closed. Cosy.", 2500);
       save2(true);
       return;
     }
@@ -17398,6 +17998,26 @@ ${SIGNOFF[t2.who] || ""}`;
     if (id === "kdoor") {
       setScene("kitchen", INNER.kitchen.arrive);
       return;
+    }
+    if (id === "gkdoor") {
+      setScene("scoopkitchen", INNER.scoopkitchen.arrive);
+      if (isHere("tomo")) setTimeout(() => npcSay("tomo", pick(["Ciao! Fridge is over there. Bring me something good.", "Want to invent a flavour? The bench is all yours.", "Tubs are frozen and ready."])), 900);
+      return;
+    }
+    if (scene === "scoopshop" && id === "gtables") {
+      sitAt(SHOP_SEATS2);
+      return;
+    }
+    if (scene === "scoopshop" || scene === "scoopkitchen") {
+      scView = { gcounter: "counter", gmenu: "menu", gfridge: "fridge", gfreezer: "freezer", gboard: "batch", gbench: "bench" }[id] || null;
+      if (scView) {
+        scSt.pick = null;
+        scoopNow();
+        sfx("paper", true);
+        if (id === "gcounter" && isHere("sofia")) npcSay("sofia", pick(["Hi Mel! What'll it be?", "On the house, boss. Which one?", "The new one's going fast!"]));
+        render();
+        return;
+      }
     }
     if (scene === "kitchen") {
       kView = id;
@@ -17576,6 +18196,15 @@ ${SIGNOFF[t2.who] || ""}`;
         if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma brought plenty.", "Everybody wants Ma Ma's fruit today.", "For you, free. For them, they pay!"]));
       } else if (isHere(st6.id) && !keeperAway(st6, dayKey(), sgHM())) npcSay(st6.id, st6.line);
       else speak("Nobody's minding this one just now. It's an honesty tin: pop your coins in.", 3500);
+      render();
+      return;
+    }
+    if (id === "deck") {
+      sitAt(DECK_SEATS);
+      return;
+    }
+    if (id === "reno") {
+      speak(RENO_LINE, 6e3);
       render();
       return;
     }
@@ -17792,6 +18421,140 @@ ${SIGNOFF[t2.who] || ""}`;
     [0, 300].forEach((d, k2) => setTimeout(() => mprop("heart", evan.x + (k2 - 0.5) * 20, evan.y - 44, 1800), d));
     save2(true);
   }
+  var SHOP_SEATS2 = [[87, 518], [173, 518], [227, 518], [313, 518], [367, 512], [453, 512]];
+  function scoopNow() {
+    lastScoop = Date.now();
+    const s = scoopState(F), out = scoopTick(F, { serving: scene === "scoopshop" && atSpot === "gcounter" });
+    if (!out.coins && !out.mins) return;
+    if (out.coins && (scene === "scoopshop" || scene === "bay")) {
+      sfx("coin");
+      flash(`+${out.coins} coins: ${s.name}`);
+    } else if (out.coins && out.mins >= 30) setTimeout(() => speak(`While you were away, ${s.name} sold ${out.n} ice cream${out.n > 1 ? "s" : ""}: ${out.coins} coins.`, 5e3), 1500);
+    if (out.coins || out.mins >= 5) save2();
+    if (scView) ctx();
+    if (scene === "scoopshop" || scene === "scoopkitchen") drawScene();
+  }
+  function sitAt(seats) {
+    const taken = npcActors().map(([, e]) => e).filter((e) => e.kind === "npc");
+    const free = seats.filter(([x, y]) => !taken.some((e) => Math.hypot(e.x - x, e.y - y) < 14));
+    if (!free.length) {
+      speak("Every seat's taken. Busy day!", 3e3);
+      render();
+      return;
+    }
+    const near = free.map((p) => [p, Math.hypot(p[0] - mel.x, p[1] - mel.y)]).sort((a, b) => a[1] - b[1])[0][0];
+    mel.tx = near[0];
+    mel.ty = near[1];
+    mel.path = [];
+    setTimeout(() => {
+      mel.sitting = true;
+      nodes.mel.classList.add("sit");
+      mel.dir = scene === "bay" ? -1 : 1;
+    }, 700);
+    const mate = evanHere() && free.find((p) => p !== near && Math.hypot(p[0] - near[0], p[1] - near[1]) < 70);
+    if (mate) evanSeat = { x: mate[0], y: mate[1], scene };
+    const cone = S2.cone && Date.now() < S2.cone.until;
+    speak(cone ? scene === "bay" ? "Ice cream on the deck, the whole foreshore in front of you. Bliss." : "A little sit with an ice cream. Lovely." : scene === "bay" ? "A seat on the deck. The dolphins might come by." : "A seat by the window.", 4e3);
+    if (mate && cone) setTimeout(() => evanSays(pick(["mine's melting!", "yummy!", "Mama, taste mine!"])), 1800);
+    render();
+  }
+  function haveIceCream(rid) {
+    const r = eatOne(F, rid);
+    if (!r) return;
+    S2.cone = { until: Date.now() + 4 * M, col: r.col };
+    if (evanHere() && eatOne(F, rid) !== null) S2.evanHold = { k: "icecream", until: Date.now() + 4 * M };
+    scView = null;
+    scSt.pick = null;
+    ctx();
+    sfx("chime");
+    act("cheer");
+    mprop("heart", mel.x, mel.y - 60, 1600);
+    if (S2.iceDay !== dayKey()) {
+      S2.iceDay = dayKey();
+      gainXp(1);
+    }
+    speak(`${r.name}! ${evanHere() ? "Evan's got one too and it's already on his nose." : "Find a seat, or take it for a walk along the foreshore."}`, 5e3);
+    if (evanHere()) setTimeout(() => evanSays(pick(["ICE CREAM!!", "yummy yummy!", "it's so cold!"])), 900);
+    save2();
+    render();
+  }
+  function wireScoop(c) {
+    const s = scoopState(F), re = () => {
+      save2();
+      ctx();
+      drawScene();
+    };
+    c.querySelectorAll("[data-gpick]").forEach((b) => b.onclick = () => {
+      scSt.pick = b.dataset.gpick;
+      ctx();
+    });
+    c.querySelectorAll("[data-gback]").forEach((b) => b.onclick = () => {
+      scSt.pick = null;
+      ctx();
+    });
+    c.querySelectorAll("[data-geat]").forEach((b) => b.onclick = () => haveIceCream(b.dataset.geat));
+    c.querySelectorAll("[data-gtake]").forEach((b) => b.onclick = () => {
+      const it = takeAway(F, scSt.pick, b.dataset.gtake);
+      if (!it) return;
+      sfx("paper", true);
+      flash(`${it.n} in your backpack`);
+      speak(`One ${it.n.toLowerCase()} to give. It's in your backpack: tap it there to choose who it's for.`, 4500);
+      scSt.pick = null;
+      re();
+    });
+    c.querySelectorAll("[data-gprice]").forEach((b) => b.onclick = () => {
+      const [k, d] = b.dataset.gprice.split(":");
+      s.prices[k] = Math.max(k === "special" ? 0 : 1, Math.min(30, s.prices[k] + +d));
+      re();
+    });
+    c.querySelectorAll("[data-gspecial]").forEach((b) => b.onchange = () => {
+      const r = recipeOf(s, b.dataset.gspecial);
+      if (r) {
+        r.special = b.checked;
+        re();
+      }
+    });
+    const nf = c.querySelector("[data-gname]");
+    if (nf) nf.onsubmit = (ev) => {
+      ev.preventDefault();
+      const v = (nf.querySelector("input").value || "").trim().slice(0, 30);
+      if (!v) return;
+      s.name = v;
+      speak(`The sign now says ${v}.`, 3500);
+      re();
+      render();
+    };
+    c.querySelectorAll("[data-gfill]").forEach((b) => b.onclick = () => {
+      const [from, id, n] = b.dataset.gfill.split(":"), got = stockFridge(F, id, +n, from, orchState(F));
+      if (!got) return;
+      sfx("tap");
+      flash(`+${got} into the fridge`);
+      re();
+    });
+    c.querySelectorAll("[data-gsel]").forEach((b) => b.onclick = () => {
+      const id = b.dataset.gsel;
+      scSt.sel = scSt.sel.includes(id) ? scSt.sel.filter((x) => x !== id) : [...scSt.sel, id].slice(0, 4);
+      ctx();
+    });
+    c.querySelectorAll("[data-gmix]").forEach((b) => b.onclick = () => {
+      const out = discover(F, scSt.sel);
+      speak(out.msg, 5500);
+      if (out.recipe) {
+        scSt.sel = [];
+        sfx("chime");
+        act("cheer");
+        [0, 250, 500].forEach((t2, k) => setTimeout(() => mprop("sparkle", mel.x + (k - 1) * 22, mel.y - 60, 1600), t2));
+        gainXp(2);
+        if (isHere("tomo")) setTimeout(() => npcSay("tomo", pick(["Bellissimo! I'll put that on the board.", "Never had that before. Never! Wonderful.", "Okay, that's going on the menu."])), 1400);
+      }
+      re();
+    });
+    c.querySelectorAll("[data-gplan]").forEach((b) => b.onchange = () => {
+      const id = b.dataset.gplan;
+      s.plan.ids = b.checked ? [...s.plan.ids.filter((x) => x !== id), id] : s.plan.ids.filter((x) => x !== id);
+      re();
+    });
+  }
   function tipBand() {
     const ev = eventNow(dayKey(), sgHM());
     if (!ev || ev.kind !== "night") {
@@ -18000,7 +18763,10 @@ ${SIGNOFF[t2.who] || ""}`;
     flowers: "the flower farm",
     field: "the field",
     shore: "the foreshore",
-    kitchen: "the wine shop kitchen"
+    kitchen: "the wine shop kitchen",
+    bay: "the bay",
+    scoopshop: "the Scoop Shack",
+    scoopkitchen: "the gelato kitchen"
   };
   var ACT_WORD = {
     water: "watering",
@@ -18011,6 +18777,7 @@ ${SIGNOFF[t2.who] || ""}`;
     guide: "leading a tour",
     lead: "leading the class",
     exercise: "exercise class",
+    cone: "with an ice cream",
     cook: "cooking",
     rest: "in the hammock",
     repair: "fixing things",
@@ -18023,8 +18790,8 @@ ${SIGNOFF[t2.who] || ""}`;
     const day = dayKey(), t2 = sgHM(), hhmm = (m) => fmtTime(m);
     const row2 = (n) => {
       const sch = daySchedule(n.id, day), cur2 = sch.find((x) => t2 >= x.from && t2 < x.to);
-      const cls = classOn(day), word = (a) => a === "lead" && cls ? `leading ${cls.kind}` : a === "exercise" && cls && n.id !== "mum" ? `${cls.kind} with Mum` : ACT_WORD[a];
-      const what = (x) => x.club ? "the wine club at the cellar door" : x.dinner ? `family dinner at ${HOST_NAME[x.scene] || placeName(x.scene)}` : `${placeName(x.scene)}${x.act && word(x.act) ? ` (${word(x.act)})` : ""}`;
+      const cls = classOn(day), word2 = (a) => a === "lead" && cls ? `leading ${cls.kind}` : a === "exercise" && cls && n.id !== "mum" ? `${cls.kind} with Mum` : ACT_WORD[a];
+      const what = (x) => x.club ? "the wine club at the cellar door" : x.dinner ? `family dinner at ${HOST_NAME[x.scene] || placeName(x.scene)}` : `${placeName(x.scene)}${x.act && word2(x.act) ? ` (${word2(x.act)})` : ""}`;
       return `<details class="whowhere"><summary><b>${esc(n.name)}</b> <small class="muted">${cur2 ? `now: ${esc(what(cur2))}` : "not about just now"}</small></summary>
       <ul>${sch.map((x) => `<li class="${x === cur2 ? "now" : ""}"><span>${hhmm(x.from)}–${hhmm(x.to)}</span> ${esc(what(x))}</li>`).join("") || "<li>Not in the village today.</li>"}</ul></details>`;
     };
@@ -18721,7 +19488,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     const s = list2.find((s2) => Math.hypot(s2.tx - mel.x, s2.ty - mel.y) < 26);
     return s ? s.id : null;
   }
-  var EVAN_SPOTS = { mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[150, 340], [260, 330], [380, 330], [200, 580], [330, 590]] };
+  var EVAN_SPOTS = { bay: [[300, 400], [250, 560], [300, 330], [200, 300], [290, 500]], scoopshop: [[200, 440], [380, 440], [300, 560], [140, 560], [260, 420]], scoopkitchen: [[200, 560], [380, 540], [300, 580]], mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[150, 340], [260, 330], [380, 330], [200, 580], [330, 590]] };
   function evanWalk(speed, dt) {
     const key = evan.tx + "," + evan.ty;
     if (key !== evan.rk) {
@@ -18755,6 +19522,15 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
       const st6 = dinnerSeat(scene, "evan");
       evan.tx = st6[0];
       evan.ty = st6[1];
+      evan.run = false;
+      evan.wait = 9;
+      evanWalk(90, dt);
+      nodes.evan.classList.toggle("sit", !evan.moving);
+      return;
+    }
+    if (evanSeat && !route2.length) {
+      evan.tx = evanSeat.x;
+      evan.ty = evanSeat.y;
       evan.run = false;
       evan.wait = 9;
       evanWalk(90, dt);
@@ -18985,10 +19761,11 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     }
     if (melEx && (scene !== "field" || Math.hypot(mel.tx - melEx[0], mel.ty - melEx[1]) > 4 || !classOn(dayKey()) || sgHM() >= classOn(dayKey()).to)) melEx = null;
     nodes.mel.classList.toggle("exercise", !!melEx && !mel.moving);
-    if (mel.sitting && (mel.moving || scene !== "trophy" && scene !== "field" && scene !== "shore" && !DINING[scene])) {
+    if (mel.sitting && (mel.moving || scene !== "trophy" && scene !== "field" && scene !== "shore" && scene !== "bay" && scene !== "scoopshop" && !DINING[scene])) {
       mel.sitting = false;
       nodes.mel.classList.remove("sit");
     }
+    if (evanSeat && (!mel.sitting || evanSeat.scene !== scene)) evanSeat = null;
     mel.wasMoving = mel.moving;
     const inRoom = scene === "room", MB = [MAPLE_BED[0], MAPLE_BED[1] + 2];
     if (inRoom) {
