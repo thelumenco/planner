@@ -1913,6 +1913,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check((up.cocoa.sold["2026-10-10"] || {}).workshop === 48, "Saturday's bonbon workshop: six makers, 48 coins");
   check(up.cocoa.beans >= 1, "the cacao tree at Ma Ma's sends a sack of beans");
   check((up.scoop.fridge.housechoc || 0) >= 5, "the supply deal sends dark chocolate to the Scoop Shack's fridge");
+  await at("15:00"); await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1800);
+  const ws = await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  check(ws.filter(id => !["amara", "lila", "mateo"].includes(id)).length >= 4 && /Bonbon workshop/.test(await page.locator("#fore").textContent()), `Saturday's workshop class at the tables (${ws.join(", ")})`);
+  await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(900);
+  check(/Cacao tree/.test(await page.locator("#sceneArt").textContent()), "the cacao tree grows in Ma Ma's orchard");
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-12"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1500);
   check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("lila"), "with a second assistant the shop opens on Mondays: Lila's behind the counter");

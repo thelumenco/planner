@@ -627,6 +627,10 @@ function ccCounterUps(x, y){
     `<rect x="${x-94}" y="${y-84}" width="20" height="32" rx="3"/><rect x="${x-90}" y="${y-78}" width="12" height="8" rx="1.5"/><path class="smoke" d="M${x-84} ${y-88} q-3 -5 0 -10 M${x-80} ${y-88} q3 -5 0 -10" opacity=".6"/>`);
   if (up.fountain) h += sk(`<path d="M${x+72} ${y-52} l-8 -4 h40 l-8 4z" style="fill:#B9BFC6"/><path d="M${x+66} ${y-58} q18 6 36 0 v-4 h-36z" style="fill:#6B4430"/><rect x="${x+82}" y="${y-92}" width="4" height="34" style="fill:#B9BFC6"/><path d="M${x+72} ${y-74} q12 5 24 0 v-3 h-24z" style="fill:#6B4430"/><path d="M${x+77} ${y-88} q7 3 14 0 v-2 h-14z" style="fill:#6B4430"/><path d="M${x+78} ${y-74} q-2 6 -4 14 M${x+90} ${y-74} q2 6 4 14" style="stroke:#4A2E22;fill:none" stroke-width="2.4"/>`,
     `<path d="M${x+66} ${y-58} q18 6 36 0 v-4 h-36z M${x+72} ${y-74} q12 5 24 0 v-3 h-24z M${x+77} ${y-88} q7 3 14 0 v-2 h-14z"/><path d="M${x+84} ${y-92} v34"/>`);
+  const day = G.day ? G.day() : "", hm = sgHM();
+  if (up.workshop && day && new Date(day + "T00:00:00Z").getUTCDay() === 6 && hm >= 14*60 && hm < 16*60)   // the Saturday bonbon workshop: trays, piping bags and a bowl on each table
+    h += [130, 270, 410].map(tx => sk(`<rect x="${tx-16}" y="${y+150}" width="20" height="10" rx="2" style="fill:#FFFDF6"/>${[0, 1, 2].map(k => `<circle cx="${tx-11 + k*5}" cy="${y+155}" r="2" style="fill:${["#4A2E22", "#C2505F", "#8A5A3A"][k]}"/>`).join("")}<path d="M${tx+8} ${y+158} l8 -10 l3 3z" style="fill:#F3E7C9"/><ellipse cx="${tx+2}" cy="${y+146}" rx="6" ry="3" style="fill:#8A5A3A"/>`,
+      `<rect x="${tx-16}" y="${y+150}" width="20" height="10" rx="2"/><path d="M${tx+8} ${y+158} l8 -10 l3 3z"/><ellipse cx="${tx+2}" cy="${y+146}" rx="6" ry="3"/>`)).join("") + `<text x="${x}" y="${y+120}" text-anchor="middle" font-family="Klee One,serif" font-size="9" font-weight="600" fill="#6B4430" pointer-events="none">Bonbon workshop today, 2 to 4</text>`;
   return h;
 }
 // Things drawn over the characters, so people can stand behind them (the bank counter)

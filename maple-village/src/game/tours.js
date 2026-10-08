@@ -314,6 +314,14 @@ const CLUB_WALK = [[200, 360], [300, 380], [380, 430], [250, 460], [420, 340], [
 export const wineClubOn = day => { const d = new Date(day + "T00:00:00Z"); return d.getUTCDay() === 5 && d.getUTCDate() <= 7; };
 export const wineClubNow = (day, hm) => wineClubOn(day) && hm >= CLUB_FROM && hm < CLUB_TO;
 export const clubMembers = day => wineClubOn(day) ? groupFor(day + ":club", 8, [], CLUB_POOL) : [];
+// The Cocoa Room's Saturday bonbon workshop (cocoa.js upgrade "workshop"), 2 to 4: six villagers and visitors at the
+// shop's tables, making their own bonbons
+export const WS_FROM = 14*60, WS_TO = 16*60, WS_SEATS = [[87, 518], [173, 518], [227, 518], [313, 518], [367, 512], [453, 512]];
+export const workshopGroup = day => new Date(day + "T00:00:00Z").getUTCDay() === 6 && ownedNow().cc_workshop ? groupFor(day + ":workshop", 6, [], [...VISITORS.filter(v => v !== "pip"), ...TOURISTS]) : [];
+export function workshopSlot(id, day, hm){
+  if (hm < WS_FROM || hm >= WS_TO) return null; const i = workshopGroup(day).indexOf(id); if (i < 0) return null;
+  return {from: WS_FROM, to: WS_TO, scene: "cocoa", at: WS_SEATS[i], act: "sit", dir: i % 2 ? -1 : 1, workshop: true};
+}
 export function clubSlot(id, day, hm){
   if (!wineClubNow(day, hm) || !clubMembers(day).includes(id)) return null;
   return {from: CLUB_FROM, to: CLUB_TO, scene: "cellar", wander: CLUB_WALK, club: true};
