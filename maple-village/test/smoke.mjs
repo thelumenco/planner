@@ -1669,6 +1669,22 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // Picking a quest before the five-minute clean: the clean waits on the board for later
+  console.log("\nquests before the clean");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`pick pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-08"); await page.waitForTimeout(900);
+  await page.click('[data-open="quests"]'); await page.waitForTimeout(400);
+  check(await page.locator("#list [data-next]").count() > 0, "\"do this now\" shows on quests even before the five-minute clean");
+  await page.locator("#list [data-next]").first().click(); await page.waitForTimeout(500);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.today") || "{}").cleanLater === true), "picking one puts the clean off for later");
+  await page.click('[data-open="quests"]'); await page.waitForTimeout(400);
+  check(await page.locator('#list li[data-cleannow]').count() === 1, "the clean waits at the top of the board");
+  await page.locator('#list button[data-cleannow]').click(); await page.waitForTimeout(500);
+  check(await page.locator('#list li[data-cleannow]').count() === 0 && /wet wipe/.test(await page.locator("#speech").textContent()), "and \"do this now\" brings it back");
+  await page.close();
+}
+{
   // Accessories in the wardrobe: bought once at Hana's, worn or put away from the wardrobe
   console.log("\naccessories in the wardrobe");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

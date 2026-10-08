@@ -964,3 +964,7 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - Tapping a bouquet in the backpack opens the same chooser as gifts: the whole family (`FAMILY_ALL`), plus "near" (the nearest villager within reach) when someone is about.
 - Someone here gets it in person (`bouquetTo`, or `giveBouquet` for a villager). Anyone else gets it sent round, and a thank-you note (`BQ_NOTE`) arrives about 10 minutes later.
 - In the farm shop's flower rows, the Bouquet and Pot buttons sit on their own line under the name.
+
+### Round 76: quests before the five-minute clean
+- "do this now" was hidden on every quest until the five-minute clean was done (`phase() === "clean"`).
+- Now any quest can be picked. Picking one first sets `S.cleanLater`, so the clean stops gating the day and waits at the top of the board as "Five-minute clean · waiting for later". Its own "do this now" (`data-cleannow`) brings it back.

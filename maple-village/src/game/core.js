@@ -229,7 +229,7 @@ const questsIn = pl => allTasks().filter(t => placeOf(t) === pl || (pl === "home
 function phase(){
   if (S.mode === "break") return "break";   // a break Mel asks for comes first, even mid-clean
   if (S.mode === "decompress" && S.decompFree) return "decompress";   // decompress from the calm corner, any time
-  if (!S.cleanDone) return "clean";
+  if (!S.cleanDone && !S.cleanLater) return "clean";   // the five-minute clean opens the day, unless Mel picked a quest first (it waits on the board)
   if (S.mode === "decompress") return "decompress";
   if (remaining().length) return "task";
   return S.doneIds.length ? "recap" : "empty";
@@ -676,7 +676,8 @@ setInterval(flushSubs, 3*60e3); setTimeout(flushSubs, 8000);
 function doNext(id){
   const ids = allTasks().map(x => x.id);
   if (S.timer && S.timer.kind !== "break") S.timer = null;
-  S.order = [id, ...ids.filter(x => x !== id)]; say = null; openView = null; boardOpen = false; speak("New quest picked! Off we go.", 3000); save(true);
+  const later = !S.cleanDone && !S.cleanLater; if (later) S.cleanLater = true;
+  S.order = [id, ...ids.filter(x => x !== id)]; say = null; openView = null; boardOpen = false; speak(later ? "New quest picked! The five-minute clean will wait on the board for later." : "New quest picked! Off we go.", 3500); save(true);
 }
 // Every finished quest (here or in Sunsama) counts towards village upgrades, which stay forever.
 function countQuest(){
@@ -1833,14 +1834,15 @@ function render(redraw){
   const all = allTasks(), rem = remaining(), cur = (phase() === "task" && rem[0]) ? rem[0].id : null;
   $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
   $("qBadge").hidden = !rem.length; $("qBadge").textContent = rem.length;
-  $("list").innerHTML = all.map(t => { const dn = S.doneIds.includes(t.id);
-    const pickable = !dn && t.id !== cur && phase() !== "clean";
+  $("list").innerHTML = (!S.cleanDone && S.cleanLater ? `<li class="pick" data-cleannow="1" role="button" tabindex="0"><span class="pl">${icon("home", 20)}</span><span class="t">Five-minute clean</span><small>waiting for later</small><button class="next" data-cleannow="1">do this now</button></li>` : "") + all.map(t => { const dn = S.doneIds.includes(t.id);
+    const pickable = !dn && t.id !== cur;
     return `<li class="${dn ? "done" : ""}${t.id === cur ? " cur" : ""}${pickable ? " pick" : ""}"${pickable ? ` data-pick="${esc(t.id)}" role="button" tabindex="0"` : ""}><span class="pl">${icon(placeOf(t), 20)}</span><span class="t">${dn ? `<i class="tk" aria-label="done"></i>` : ""}${esc(t.title)}</span><small>${esc(placeInfo(placeOf(t)).name)} · ${esc(spotObj(placeOf(t), spotOf(t)).name)}${t.id === cur ? " · doing now" : ""}${t.early ? " · from tomorrow" : ""}${!dn ? ` <button class="drop" data-drop="${esc(t.id)}" aria-label="Not needed today: remove from today's quests">not today</button>` : ""}</small>${pickable ? `<button class="next" data-next="${esc(t.id)}">do this now</button>` : "<span></span>"}</li>`; }).join("")
     + ((S.dropped || []).length ? `<li class="dropped"><small>Dropped today: ${(S.dropped || []).map(id => { const t = ((P && P.tasks) || []).find(x => x.id === id); return t ? `${esc(t.title)} <button class="drop" data-undrop="${esc(id)}">bring back</button>` : ""; }).filter(Boolean).join(" · ")}</small></li>` : "");
   $("list").querySelectorAll("[data-drop]").forEach(el => el.onclick = ev => { ev.stopPropagation(); dropTask(el.dataset.drop); });
   $("list").querySelectorAll("[data-undrop]").forEach(el => el.onclick = ev => { ev.stopPropagation(); undropTask(el.dataset.undrop); });
   $("list").querySelectorAll("[data-next]").forEach(el => el.onclick = ev => { ev.stopPropagation(); doNext(el.dataset.next); });
   $("list").querySelectorAll("[data-pick]").forEach(el => el.onclick = () => doNext(el.dataset.pick));
+  $("list").querySelectorAll("[data-cleannow]").forEach(el => el.onclick = ev => { ev.stopPropagation(); S.cleanLater = false; if (S.timer && S.timer.kind !== "break") S.timer = null; say = null; openView = null; boardOpen = false; speak("Five-minute clean first, then. Grab a wet wipe from the cleaning cupboard.", 4000); save(true); });
   renderTomorrow();
   const pin = $("paperIn"), paper = paperWaiting(); if (pin) pin.style.display = paper ? "" : "none";
   if (scene === "base" && paper && S.paperSaid !== paper.id) { S.paperSaid = paper.id; setTimeout(() => speak(`${paperName()} is in the letterbox!`, 4500), 1800); }
