@@ -1064,3 +1064,14 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Dairy goods leave Marcus out of their `to` list.
 - **The rotation:** `POOLS[eventKind][keeper]` lists each stall's extra range. core.js `todaysGoods(st, day)` shows the stall's signature item (the first of its tours.js `items`) every time, plus `max(2, items.length)` picks from the rest of the range. The picks are ordered by `hash(day:keeper:item)`, so a given market day always shows the same mix and different days differ.
   - Lior's lantern decor stays on every night; its gifts rotate.
+
+### Round 86: keepsakes and pets
+- **Keepsakes** (`kind: "keepsake"`, 12 in stall-goods.js, sold in the stalls' rotating pools: Tomás, Lior, Grace, Felix, Ben, Dev, Sora, Wen):
+  - From the backpack they go on a wall shelf: two each in the Scoop Shack, the wine shop, home, Mel's room, Chord, Chico, Luna and Ohayo (companions.js `KEEP_SPOTS`, drawn by `keepsakesIn`).
+  - Placing one where another stands sends the old one back to the backpack. Tap a placed one (`data-keep`) to take it down. Stored in `F.keeps = {spot: item}`.
+- **Pets** (`kind: "pet"`, 8 kinds) come from Noor's adoption corner (new NPC `noor`), on the grass by the river at place 8, on Sunday markets and field fairs:
+  - The kitten is always there; the other pets rotate.
+  - From the backpack, choose an owner, then a home from `PET_HOMES` (19 screens; the hamster, goldfish and budgie live indoors only).
+  - Stored in `F.companions = [{id, kind, name, owner, scene, spot, since, patDay, playDay}]`, drawn by `petsIn` with a gentle bob.
+  - Tap a pet (`data-pet`) to pat it (xp once a day). When its owner is on the same screen, they can play together: a line for the pair and one from the owner, xp once a day. You can also rename it or move its home.
+  - An owner who isn't there sends a thank-you note.

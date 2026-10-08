@@ -242,6 +242,8 @@ details[open] summary::after{content:"–"}
 @keyframes swingA{from{transform:rotate(-24deg)}to{transform:rotate(24deg)}}
 @keyframes swingB{from{transform:rotate(24deg)}to{transform:rotate(-24deg)}}
 .ch.walk .bob{animation:cbob .3s ease-in-out infinite alternate}
+.petbob{animation:petbob 2.4s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}@keyframes petbob{from{transform:translateY(0)}to{transform:translateY(-1.6px) scaleY(1.03)}}
+@media (prefers-reduced-motion: reduce){.petbob{animation:none}}
 @keyframes cbob{from{transform:translateY(0)}to{transform:translateY(-1.8px)}}
 .pony{transform-box:fill-box;transform-origin:0% 15%;animation:pony 2.6s ease-in-out infinite}
 .ch.walk .pony{animation-duration:.6s}

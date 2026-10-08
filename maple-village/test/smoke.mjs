@@ -1436,9 +1436,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return v.shelf[0].n < 40; }), "on a Sunday morning the market stall sells bottles off the wine shop's own shelves");
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
   check(await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")).orch; return o.stock.apple + o.stock["stem:rose"] < 80 && o.tin > 0; }), "Ma Ma's market stall sells fruit and flowers off the farm shop's own shelves, into her tin");
-  check(await page.locator('#world [data-place^="mstall"]').count() === 8 && await page.locator('#actors [data-npc="ines"]').count() === 1 && await page.locator('#actors [data-npc="mama"]').count() === 1, "the Sunday farmers market: eight stalls along the top, our wine stall with Ines and Ma Ma's fruit and flowers");
+  check(await page.locator('#world [data-place^="mstall"]').count() === 9 && await page.locator('#actors [data-npc="ines"]').count() === 1 && await page.locator('#actors [data-npc="mama"]').count() === 1, "the Sunday farmers market: eight stalls along the top (and Noor's adoption corner), our wine stall with Ines and Ma Ma's fruit and flowers");
   check(await page.locator('#world [data-place="mstall0"]').evaluate(g => g.getBBox().y < 170), "the market stalls stand along the top of the field");
-  check(await page.locator("#actors .sfront").count() === 8, "each stall's table is drawn among the people, so a keeper can stand behind it");
+  check(await page.locator("#actors .sfront").count() === 9, "each stall's table (and the pet pen) is drawn among the people, so a keeper can stand behind it");
   { const { keeperPose, MARKET } = await import(pathToFileURL(join(root, "src/game/tours.js")).href);
     const poses = new Set(MARKET.flatMap(st => [510, 540, 570, 600, 630, 660, 690, 720, 750].map(hm => keeperPose(st, "2026-10-11", hm).pose)));
     check(["behind", "front", "sit", "chat", "wander"].every(p => poses.has(p)) && MARKET.every(st => keeperPose(st, "2026-10-11", 485).pose === "behind"), "keepers set up behind their stalls, then move about: in front, sitting, chatting, off wandering (honesty tin)"); }
@@ -1475,7 +1475,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(true, "Grace's handmade soap stall and Ben's craft beer stall");
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-31"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
-  check(/Field fair/.test(await page.locator("#sceneArt").textContent()) && await page.locator('#world [data-place^="mstall"]').count() === 4, "on the last Saturday of the month the field fair is on: kites, face painting, lemonade, snacks");
+  check(/Field fair/.test(await page.locator("#sceneArt").textContent()) && await page.locator('#world [data-place^="mstall"]').count() === 5, "on the last Saturday of the month the field fair is on: kites, face painting, lemonade, snacks");
   await page.close();
 }
 {
@@ -1767,6 +1767,44 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=15:00&date=2026-10-12&scooppatch=rewind"); await page.waitForTimeout(2500);
   check(await fox().then(f => Object.values(f.scoop.sold).reduce((a, d) => a + d.n, 0) > 0), "customers buy while it's open (the takings come to Mel)");
   check(await fox().then(f => Object.values(f.scoop.made || {}).reduce((a, b) => a + b, 0) === 2), "nobody makes tubs behind Mel's back: only the two she made (Tomo serves now)");
+  await page.close();
+}
+{
+  // Keepsakes on the shelves of Mel's buildings, and pets adopted at the market that live with someone in the family
+  console.log("\nkeepsakes and pets");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`pets pageerror: ${e.message}`));
+  page.on("dialog", d => { errors.push("keepsakes used a browser pop-up"); d.dismiss(); });
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/petpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.inv = {...(f.inv || {}), k_conelamp: 1, pet_puppy: 1}; f.coins = 100;
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-11"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  await page.locator('#world [data-place="mstall8"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="pet_kitten"]', { timeout: 15000 });
+  check(await page.locator('#ctx .item[data-id^="pet_"]').count() >= 3, "Noor's adoption corner at the Sunday market has pets looking for homes");
+  await page.click('#ctx [data-close]').catch(() => {});
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-10&petpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(700);
+  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="k_conelamp"]'); await page.waitForSelector('#ctx [data-keepat="scoop1"]', { timeout: 15000 });
+  await page.click('#ctx [data-keepat="scoop1"]'); await page.waitForTimeout(500);
+  check(await fox().then(f => f.keeps && f.keeps.scoop1 === "k_conelamp" && !f.inv.k_conelamp) && await page.locator('#world [data-keep="scoop1"]').count() === 1, "a keepsake goes on a shelf in the Scoop Shack");
+  await page.locator('#world [data-keep="scoop1"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-keepdown]", { timeout: 15000 });
+  await page.click("#ctx [data-keepdown]"); await page.waitForTimeout(400);
+  check(await fox().then(f => !f.keeps.scoop1 && f.inv.k_conelamp === 1), "and comes back down into the backpack");
+  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(900);
+  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="pet_puppy"]'); await page.waitForSelector('#ctx [data-adoptfor="evan"]', { timeout: 15000 });
+  await page.click('#ctx [data-adoptfor="evan"]'); await page.waitForSelector('#ctx [data-adoptat="home"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-adoptat="room"]').count() === 1 && await page.locator('#ctx [data-adoptat="field"]').count() === 1, "adopting a puppy: it can live at home, in a building or outdoors");
+  await page.click('#ctx [data-adoptat="home"]'); await page.waitForTimeout(800);
+  const pet = await fox().then(f => (f.companions || [])[0]);
+  check(pet && pet.owner === "evan" && pet.scene === "home" && pet.kind === "puppy" && await page.locator('#world [data-pet]').count() === 1, `the puppy is Evan's now and lives at home (${pet && pet.name})`);
+  await page.locator('#world [data-pet]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-petdo="pat"]', { timeout: 15000 });
+  await page.click('#ctx [data-petdo="pat"]'); await page.waitForTimeout(300);
+  const canPlay = await page.locator('#ctx [data-petdo="play"]').count();
+  if (canPlay) { await page.click('#ctx [data-petdo="play"]'); await page.waitForTimeout(500); }
+  check(canPlay === 1 && await fox().then(f => f.companions[0].playDay && f.companions[0].patDay), "pat the puppy, and with Evan home, they play together");
+  await page.click("#pclose").catch(() => {});
   await page.close();
 }
 {

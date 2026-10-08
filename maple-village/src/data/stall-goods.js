@@ -101,14 +101,41 @@ export const GOODS = {
   chrystea: G("Chrysanthemum tea", ["mama", "gonggong", "dad", "mum"], 3, "night", "Chrysanthemum tea. Good for the eyes!", ["cup", "#F3D34A"]),
   coconutshake: G("Coconut shake", "family", 5, "night", "A coconut shake, straight from the coconut.", ["coconut", "#7FA35A"])
 };
+// Keepsakes: little things to put on a shelf in Mel's buildings (the Scoop Shack, the wine shop, home, her room, the
+// app houses): companions.js places them. Pets: adopted at the market's adoption corner, then given to someone in
+// the family, who looks after it on the screen Mel picks (companions.js).
+const K = (n, price, line, art) => ({n, kind: "keepsake", price, line, art});
+const P = (n, price, line, art, pet) => ({n, kind: "pet", price, line, art, pet, say: "A new friend! I promise to look after it, always."});
+Object.assign(GOODS, {
+  k_luckycat: K("Lucky cat figurine", 9, "A golden lucky cat, waving for good fortune.", ["plush", "#F3C969"]),
+  k_bonsai: K("Tiny bonsai", 12, "A tiny juniper bonsai in a blue pot.", ["bonsai", "#7FA35A", "#7FB8E8"]),
+  k_snowglobe: K("Snow globe", 10, "A snow globe with a little village inside.", ["globe", "#C3CDEE"]),
+  k_seaglass: K("Jar of sea glass", 7, "Sea glass from the foreshore, in a jar.", ["jar", "#9FD3C2", "#E8D3A6"]),
+  k_conelamp: K("Ice cream cone lamp", 11, "A little lamp shaped like a cone. Perfect for a gelato shop.", ["cone", "#F4C7CF"]),
+  k_corkowl: K("Wine cork owl", 8, "An owl made of wine corks. Made for a wine shop.", ["owl", "#C9A27E"]),
+  k_crane: K("Paper crane mobile", 6, "Paper cranes on threads, turning in the breeze.", ["crane", "#F2A0B8"]),
+  k_bell: K("Little brass bell", 6, "A little brass bell for the door.", ["bell", "#E3B04A"]),
+  k_terrarium: K("Mossy terrarium", 12, "A tiny world of moss and pebbles in glass.", ["jar", "#7FA35A", "#C3CDEE"]),
+  k_honeypot: K("Honey pot ornament", 7, "A ceramic honey pot, with a bee on the lid.", ["jar", "#F3C969", "#F3D34A"]),
+  k_teaset: K("Mini tea set", 9, "A doll-sized tea set, cups and all.", ["cup", "#C3E8B8"]),
+  k_radio: K("Tiny retro radio", 10, "A little retro radio. It actually plays!", ["radio", "#E8566C"]),
+  pet_kitten: P("Kitten", 20, "A ginger kitten, looking for a home.", ["cat", "#F2A65A"], "kitten"),
+  pet_puppy: P("Puppy", 25, "A floppy-eared puppy, looking for a home.", ["dog", "#C98A4A"], "puppy"),
+  pet_bunny: P("Bunny", 18, "A soft grey bunny, looking for a home.", ["bunny", "#C9C2BA"], "bunny"),
+  pet_hamster: P("Hamster", 10, "A round little hamster, looking for a home.", ["hamster", "#E3B06A"], "hamster"),
+  pet_goldfish: P("Goldfish", 8, "A goldfish in a bowl, looking for a home.", ["fishbowl", "#F28C3A"], "goldfish"),
+  pet_budgie: P("Budgie", 14, "A chirpy blue budgie, looking for a home.", ["bird", "#7FB8E8"], "budgie"),
+  pet_tortoise: P("Tortoise", 22, "A slow, wise little tortoise, looking for a home.", ["tortoise", "#7FA35A"], "tortoise"),
+  pet_duckling: P("Duckling", 12, "A fluffy yellow duckling, looking for a home.", ["duck", "#F3D34A"], "duckling")
+});
 // what else each stall keeps in its pool, besides the items in tours.js (keyed by stall keeper)
 export const POOLS = {
-  market: {elena: ["cheddar", "olivejar", "figjam", "crackers", "goatcheese"], felix: ["lavhoney", "honeysticks", "lipbalm", "beewraps", "honeylemon", "mead"],
-    grace: ["soap_oat", "soap_citrus", "bathbomb", "shampoobar", "handcream", "bathsalts", "soap_dino", "loofah", "soycandle"], ben: ["gingerbeer", "lager", "cider", "rootbeer"],
-    dev: ["eggtart", "croissant", "bananabread", "cinnamonbun", "sourdough", "pineapplebun"]},
-  fair: {ben: ["pinklemonade", "candyapple"], clara: ["popcorn", "cottoncandy", "muahchee", "minipancakes"]},
+  market: {noor: ["pet_puppy", "pet_bunny", "pet_hamster", "pet_goldfish", "pet_budgie", "pet_tortoise", "pet_duckling"], elena: ["cheddar", "olivejar", "figjam", "crackers", "goatcheese"], felix: ["k_honeypot", "lavhoney", "honeysticks", "lipbalm", "beewraps", "honeylemon", "mead"],
+    grace: ["k_terrarium", "soap_oat", "soap_citrus", "bathbomb", "shampoobar", "handcream", "bathsalts", "soap_dino", "loofah", "soycandle"], ben: ["k_corkowl", "gingerbeer", "lager", "cider", "rootbeer"],
+    dev: ["k_teaset", "eggtart", "croissant", "bananabread", "cinnamonbun", "sourdough", "pineapplebun"]},
+  fair: {noor: ["pet_puppy", "pet_bunny", "pet_hamster", "pet_goldfish", "pet_budgie", "pet_tortoise", "pet_duckling"], ben: ["pinklemonade", "candyapple"], clara: ["popcorn", "cottoncandy", "muahchee", "minipancakes"]},
   night: {yun: ["popcornchicken", "pepperbun", "guabao", "taroballs", "lurourice", "oysteromelette"], jae: ["kimbap", "corndog", "bungeoppang", "odeng", "dalgona", "hobakjuk"],
-    mina: ["hairribbon", "pearlband", "butterflyclips", "bowclip", "hairpins", "beadtie"], tomas: ["catplush", "enamelpin", "phonestrap", "starcharm"],
-    sora: ["stripesocks", "cattee", "tote", "sleepmask", "beanie", "dinosocks"], lior: ["minilantern", "starlights", "rabbitlamp", "incense"],
-    wen: ["dragonbeard", "qqballs", "mangomochi", "castella"], kai: ["limejuice", "soymilk", "wintermelon", "chrystea", "coconutshake"]}
+    mina: ["hairribbon", "pearlband", "butterflyclips", "bowclip", "hairpins", "beadtie"], tomas: ["k_luckycat", "k_snowglobe", "k_bell", "catplush", "enamelpin", "phonestrap", "starcharm"],
+    sora: ["k_radio", "stripesocks", "cattee", "tote", "sleepmask", "beanie", "dinosocks"], lior: ["k_bonsai", "k_crane", "k_seaglass", "minilantern", "starlights", "rabbitlamp", "incense"],
+    wen: ["k_conelamp", "dragonbeard", "qqballs", "mangomochi", "castella"], kai: ["limejuice", "soymilk", "wintermelon", "chrystea", "coconutshake"]}
 };

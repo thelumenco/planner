@@ -155,11 +155,14 @@ export const MARKET = [{id: "elena", at: 0, short: "Cheese", n: "Cheese and oliv
   {id: "mama", at: 4, kind: "orchard", short: "Ma Ma's", n: "Ma Ma's fruit and flowers", items: [], col: "#E8566C", line: "Fresh from the orchard this morning. Come, take some!"},
   {id: "grace", at: 5, short: "Soap", n: "Handmade soap", items: ["soap_lav", "soap_rose", "soap_duck", "scrub", "crown"], col: "#C9A3E0", line: "All made by hand, in small batches. Smell the lavender!"},
   {id: "ben", at: 6, short: "Craft beer", n: "Craft beer", items: ["paleale", "stout"], col: "#D9A441", line: "Brewed in my shed. Well, the shed's quite big."},
-  {id: "dev", at: 7, short: "Bakery", n: "Bakery", items: ["kaya", "currypuff", "flour"], col: "#C98A4A", line: "Still warm! Kaya buns and curry puffs."}];
+  {id: "dev", at: 7, short: "Bakery", n: "Bakery", items: ["kaya", "currypuff", "flour"], col: "#C98A4A", line: "Still warm! Kaya buns and curry puffs."},
+  // Noor's pet adoption corner, on the grass by the river (place 8): a little pen of animals looking for homes
+  {id: "noor", at: 8, kind: "pets", short: "Adopt a pet", n: "Pet adoption corner", items: ["pet_kitten"], col: "#9FD3C2", line: "Every one of them needs a home. Who'll look after them?"}];
 export const FAIR = [{id: "hiro", at: 2, short: "Kites", n: "Kites", items: [], act: "kite", col: "#7FB8E8", line: "Pick a kite, any kite. They all fly!"},
   {id: "aiko", at: 3, short: "Faces", n: "Face painting", items: [], act: "face", col: "#C9A3E0", line: "Butterflies, tigers, dinosaurs. You choose!"},
   {id: "ben", at: 4, short: "Lemonade", n: "Lemonade", items: ["apple"], col: "#F3D34A", line: "Fresh lemonade, and apples for the road."},
-  {id: "clara", at: 5, short: "Snacks", n: "Snacks", items: ["dumpling", "ondeh"], col: "#F2A0B8", line: "Dumplings and ondeh-ondeh, made this morning."}];
+  {id: "clara", at: 5, short: "Snacks", n: "Snacks", items: ["dumpling", "ondeh"], col: "#F2A0B8", line: "Dumplings and ondeh-ondeh, made this morning."},
+  {id: "noor", at: 8, kind: "pets", short: "Adopt a pet", n: "Pet adoption corner", items: ["pet_kitten"], col: "#9FD3C2", line: "Every one of them needs a home. Who'll look after them?"}];
 // The night market, Tuesday and Thursday evenings 5:30 to 10pm, after the night markets of Taipei and Seoul: street food,
 // sweets, hair things, keychains, socks and tees, lanterns for the house. All out-of-towners, a jazz duo on a little
 // stage on the football pitch, fairy lights over everything. decor: things for the house (bought like at Hana's Home tab)
@@ -204,7 +207,8 @@ function keeperSlot(st, e, day, hm){
   const {k, pose, from, to} = keeperPose(st, day, hm), [x, y] = STALL_SPOTS[st.at], base = {from, to, scene: "field", glide: true};
   if (pose === "behind") return {...base, at: [x + 3, y - 9]};
   if (pose === "front") return {...base, at: [x + 9, y + 9]};
-  if (pose === "sit") return {...base, at: [x + (st.kind === "scoop" ? 34 : -17), y + 7], act: "sit", dir: st.kind === "scoop" ? -1 : 1};
+  const side = st.kind === "scoop" || st.kind === "pets";   // the cart and the pen have their crate on the right
+  if (pose === "sit") return {...base, at: [x + (side ? 34 : -17), y + 7], act: "sit", dir: side ? -1 : 1};
   if (pose === "chat") { const side = k % 2 ? 1 : -1; return {...base, at: [Math.max(30, Math.min(490, x + side*30)), y + 48], dir: -side}; }
   return {...base, wander: FIELD_WALK};
 }
