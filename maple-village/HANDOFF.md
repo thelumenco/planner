@@ -968,3 +968,19 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 ### Round 76: quests before the five-minute clean
 - "do this now" was hidden on every quest until the five-minute clean was done (`phase() === "clean"`).
 - Now any quest can be picked. Picking one first sets `S.cleanLater`, so the clean stops gating the day and waits at the top of the board as "Five-minute clean · waiting for later". Its own "do this now" (`data-cleannow`) brings it back.
+
+### Round 77: the bay and The Scoop Shack (Mel's ice cream shop)
+- **Map:** a new outdoor screen, `bay`, north of the foreshore. The foreshore's boardwalk (x=250) now runs to the top over a small footbridge across the stream, to the `toBay` arch; the bay's `toShoreB` arch leads back down.
+  - Art in `src/art/bay.js`: the sea and sand continue up the west side; The Scoop Shack (`scoopshop`, a `house()` with a striped awning, a cone on the roof and the shop's name on its sign); `deck` (three umbrella tables, `DECK_SEATS`); and `reno`, a boarded-up shopfront with scaffolding and a "Coming soon: brewery? chocolatier?" sign (`RENO_LINE`).
+- **Shop** (`ROOMS.scoopshop`): mint and pink. It has `gcounter` (the display case, drawn in `foreArt` so Sofia stands behind it, tubs in each flavour's colour), `gmenu` (chalkboard prices painted in the shell), `gtables` (tap to sit, Evan beside) and `gkdoor` to the kitchen.
+- **Kitchen** (`INNER.scoopkitchen`, a door on the east wall back to the shop): `gfridge`, `gfreezer`, `gboard` (today's batches) and `gbench` (mixing).
+- **Logic** (`src/game/scoop.js`, state in `F.scoop`):
+  - `INGR` is everything that can go in a flavour: fruit, berries and some garden crops, flower stems (`fl_<flower>`), milk, honey, egg and olives. The fridge is stocked from the backpack, or straight from Ma Ma's farm shop shelf.
+  - `discover(F, ings)`: any 1 to 4 ingredients make a flavour, and every combination is new. The id is the sorted combination; `nameFor` gives one or two ingredient names plus a style, or a poetic name for three or four. With milk it's a gelato, without a dairy-free sorbet. The first tub (20 scoops) is made on the spot.
+  - `scoopTick` catches up minute by minute (up to 2 days). Tomo (`cookOn`: Monday to Saturday 8:00–16:00, except his 12:00–12:45 lunch) makes up to 4 batches a day, 45 minutes each. He makes what's ticked on the board in order, or, if nothing is ticked, tops up the flavours running lowest, whenever the fridge has the ingredients.
+  - Sales happen 10:00–20:00. They are busier at weekends, mid-afternoon, Tue/Thu night-market evenings and while Mel stands at the counter, and slower at higher prices (`priceOf` is the price per type plus a special surcharge). Takings go to `F.coins`.
+- **For Mel:** at the counter, a free one now (Mel holds `#melCone`; Evan holds an ice cream), or one to take away. Take-aways are gift items registered per flavour and type (`registerItems`, ids `gel_<type>_<flavour>`, icons `ic_<type>`). They go through the normal gift chooser; gelato (dairy) isn't offered to Marcus.
+- **NPCs:** Sofia (counter, every day, lunch on the deck) and Tomo (kitchen, as above; Sunday afternoons on the foreshore).
+  - Customers come from `scoopVisits` / `scoopSlot` (tours.js): 2–4 an hour from villagers, tourists, night-market tourists, families and Mel's family. Each queues at the counter for 6 minutes, then eats inside, goes to the deck, or strolls the foreshore with a cone (`act: "cone"`, drawn by people.js).
+  - npcs.js `iceOk` only lets someone come when their routine leaves them free.
+- Milk is now sold in Hana's Deli tab (4 coins); goats still give it free.

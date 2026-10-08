@@ -313,6 +313,30 @@ export const NPCS = [
     actLines: {cook: ["Stirring, tasting, stirring.", "Bread's in. Don't open the door!", "The cheese is coming along nicely.", "If the larder's empty, I just tidy. Hint, hint."]},
     away: "Pilar's gone home. The kitchen's all yours."
   },
+  // The Scoop Shack's staff: Sofia on the counter every day it's open (lunch on the deck), Tomo in the gelato
+  // kitchen Monday to Saturday making the day's batches (scoop.js makes the tubs on his shifts)
+  {
+    id: "sofia", pitch: 1.2, name: "Sofia", job: "Runs the counter at the Scoop Shack",
+    intro: "Ciao, I'm Sofia! I scoop, I chat, I tell everyone the new flavour is the best one. Because it is.",
+    look: {skin: "#E8C4A0", hair: "#3A2A22", hairStyle: "bun", top: "#F4C7CF", bottom: "#3F4A6B", extra: "apron"},
+    routine: [slot("9:45", "14:00", "scoopshop", [300, 268]), slot("14:00", "14:30", "bay", [196, 360], {act: "sit"}), slot("14:30", "20:15", "scoopshop", [300, 268])],
+    lines: ["Cup or cone? Trick question: both.", "The deck's lovely this time of day.", "Someone ordered four scoops before lunch. Respect.", "Tomo's been in the kitchen since eight. Bless him."],
+    hellos: ["Hi Mel! What'll it be?", "Ciao, boss!", "The new flavour's flying out!"],
+    away: "Sofia's finished for the day. The counter's closed."
+  },
+  {
+    id: "tomo", pitch: 0.8, name: "Tomo", job: "Makes the gelato at the Scoop Shack",
+    intro: "Tomo. I make the gelato. You bring me fruit and flowers and milk, I bring you tubs. Simple. Delicious.",
+    look: {skin: "#D9A882", hair: "#1F1A17", hairStyle: "short", top: "#FFFDF6", bottom: "#5E5A55", extra: "apron"},
+    routine: [slot("8:00", "12:00", "scoopkitchen", [[262, 428], [180, 300], [330, 428]], {act: "cook", days: "wd"}), slot("12:00", "12:45", "bay", [222, 352], {act: "sit", days: "wd"}),
+      slot("12:45", "16:00", "scoopkitchen", [[262, 428], [180, 300], [330, 428]], {act: "cook", days: "wd"}),
+      slot("8:00", "12:00", "scoopkitchen", [[262, 428], [180, 300], [330, 428]], {act: "cook", dow: [6]}), slot("12:00", "12:45", "bay", [222, 352], {act: "sit", dow: [6]}),
+      slot("12:45", "16:00", "scoopkitchen", [[262, 428], [180, 300], [330, 428]], {act: "cook", dow: [6]}),
+      slot("15:00", "16:30", "shore", [[260, 200], [250, 420], [200, 300]], {dow: [0]})],
+    lines: ["Gelato is patience. And sugar.", "Every flavour is a good flavour. Mostly.", "More milk, please. Always more milk.", "I dream in pistachio."],
+    actLines: {cook: ["Churning, churning.", "Smell that? Mango.", "This tub's for the display.", "If the fridge is empty, I just polish the bench."]},
+    away: "Tomo's off. The kitchen's quiet."
+  },
   // Mel's family on the foreshore (west of the field): Mum and Dad in one house, her brother Marcus and his fiancee
   // Angellina in the other. All four help Ma Ma and Gong Gong in the orchard now and then, and walk about town.
   // Mum: always off to an exercise class (she leads one at the field most mornings, see classSlot in tours.js) or

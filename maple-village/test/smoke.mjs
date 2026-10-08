@@ -1685,6 +1685,56 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // The Scoop Shack on the bay: stock the fridge, discover a flavour at the bench, have one free, take one to give
+  // (gelato isn't offered to Marcus), and while time passes Tomo makes batches and customers buy
+  console.log("\nthe Scoop Shack");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => { errors.push(`scoop pageerror: ${e.message}`); console.log("PAGEERR", e.stack.slice(0, 600)); });
+  page.on("dialog", d => { errors.push("the Scoop Shack used a browser pop-up"); d.dismiss(); });
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { const m = /scooppatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    if (m[1] === "stock") { f.inv = {...(f.inv || {}), milk: 4, mango: 4, strawberry: 2}; f.coins = 50; }
+    if (m[1] === "rewind") f.scoop.at = 1;
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-10"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-10&scooppatch=stock"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(600);
+  check(await page.locator('#world [data-place="toBay"]').count() === 1, "the foreshore's boardwalk goes north to the bay");
+  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(800);
+  check(await page.locator('#world [data-place="scoopshop"]').count() === 1 && await page.locator('#world [data-place="deck"]').count() === 1 && await page.locator('#world [data-place="reno"]').count() === 1,
+    "the bay: the Scoop Shack, its deck, and a shopfront under renovation");
+  await page.evaluate(() => window.__mapleScene("scoopkitchen")); await page.waitForTimeout(800);
+  await page.locator('#world [data-spot="gfridge"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gfill^="bag:mango"]', { timeout: 15000 });
+  for (const id of ["mango", "milk", "strawberry"]) { await page.click(`#ctx [data-gfill="bag:${id}:99"]`); await page.waitForTimeout(200); }
+  check(await fox().then(f => f.scoop.fridge.mango === 4 && f.scoop.fridge.milk === 4 && !f.inv.mango), "the fridge is stocked from the backpack");
+  await page.click("#ctx [data-close]");
+  await page.locator('#world [data-spot="gbench"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gsel="mango"]', { timeout: 15000 });
+  await page.click('#ctx [data-gsel="mango"]'); await page.click('#ctx [data-gsel="milk"]'); await page.waitForTimeout(200);
+  await page.click("#ctx [data-gmix]"); await page.waitForTimeout(500);
+  const r1 = await fox().then(f => f.scoop.recipes[0]);
+  check(r1 && r1.dairy && /Mango/.test(r1.name) && (await fox()).scoop.tubs[r1.id] === 20, `mixing mango and milk discovers a gelato (${r1 && r1.name}), first tub in the display`);
+  await page.click('#ctx [data-gsel="strawberry"]'); await page.waitForTimeout(200); await page.click("#ctx [data-gmix]"); await page.waitForTimeout(500);
+  check(await fox().then(f => f.scoop.recipes.length === 2 && f.scoop.recipes[1].dairy === false), "and strawberry on its own is a dairy-free sorbet");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(800);
+  await page.locator('#world [data-spot="gcounter"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gpick]", { timeout: 15000 });
+  await page.locator("#ctx [data-gpick]").first().click(); await page.waitForTimeout(200);
+  await page.click("#ctx [data-geat]"); await page.waitForTimeout(500);
+  check(await page.locator("#melCone").isVisible() && await fox().then(f => f.scoop.tubs[r1.id] < 20), "a free one at the counter: Mel's holding a cone");
+  await page.locator('#world [data-spot="gcounter"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gpick]", { timeout: 15000 });
+  await page.locator("#ctx [data-gpick]").first().click(); await page.waitForTimeout(200);
+  await page.click('#ctx [data-gtake="cone"]'); await page.waitForTimeout(400);
+  const gid = await fox().then(f => Object.keys(f.inv).find(k => k.startsWith("gel_cone")));
+  check(!!gid, "one to take away goes in the backpack");
+  await page.click('[data-open="bag"]'); await page.click(`#bag .item[data-id="${gid}"]`); await page.waitForTimeout(300);
+  check(await page.locator('#bag [data-giveto="evan"]').count() === 1 && await page.locator('#bag [data-giveto="marcus"]').count() === 0, "it can be given like a gift (a gelato isn't offered to Marcus: lactose)");
+  await page.click('[data-open="bag"]').catch(() => {});
+  await page.goto(url + "?seed=1&time=15:00&date=2026-10-12&scooppatch=rewind"); await page.waitForTimeout(2500);
+  check(await fox().then(f => Object.values(f.scoop.sold).reduce((a, d) => a + d.n, 0) > 0), "customers buy while it's open (the takings come to Mel)");
+  check(await fox().then(f => Object.values(f.scoop.made).reduce((a, b) => a + b, 0) > 0), "and Tomo makes fresh tubs on his shifts from what's in the fridge");
+  await page.close();
+}
+{
   // Accessories in the wardrobe: bought once at Hana's, worn or put away from the wardrobe
   console.log("\naccessories in the wardrobe");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

@@ -406,6 +406,21 @@ export function furn(kind, x, y){
         <rect x="${x-16}" y="${y-48}" width="12" height="10" transform="rotate(4 ${x-10} ${y-43})" style="fill:#F4C7CF"/><rect x="${x+8}" y="${y-46}" width="22" height="5" style="fill:#F3C969"/><path d="M${x+28} ${y-36} l6 -10 l4 2 l-6 10z" style="fill:var(--rose)"/>`,
       `<rect x="${x-48}" y="${y-30}" width="96" height="22" rx="3"/><path d="M${x-42} ${y-8} v14 M${x+42} ${y-8} v14"/><path d="M${x-40} ${y-42} l38 -6 l38 6 v12 l-38 -4 l-38 4z M${x-2} ${y-48} v12"/><path d="M${x+8} ${y-37} h18 M${x+8} ${y-33} h14" opacity=".55"/>`);
     // the kitchen (behind the wine shop): its door on the shop's east wall, the oven, larder, stove and cheese press
+    // the Scoop Shack: its kitchen door (west wall), the counter's hit area (the display's drawn over the people), the
+    // gelato kitchen's fridge, freezer, Tomo's batch board and the mixing bench
+    case "gkdoor": return sk(`<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:#9FD3C2"/><path d="M${x-36} ${y-80} l20 6 v14 l-20 -6z" style="fill:#FFFDF6"/>`,
+      `<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z"/><circle cx="${x-17}" cy="${y-42}" r="1.8"/><path d="M${x-36} ${y-80} l20 6 v14 l-20 -6z"/>`);
+    case "gcounter": return `<rect x="${x-110}" y="${y-56}" width="220" height="56" fill="transparent"/>`;
+    case "gfridge": { const s = G.scoop ? G.scoop() : {fridge: {}}, n = Object.values(s.fridge || {}).reduce((a, b) => a + b, 0), cols = ["#E8566C", "#F3C969", "#9CC27E", "#F28C3A", "#FFFDF6", "#C9A3E0"];
+      let jars = ""; for (let i = 0; i < Math.min(9, n); i++) jars += `<rect x="${x-26 + (i % 3)*18}" y="${y-92 + Math.floor(i/3)*22}" width="12" height="12" rx="3" style="fill:${cols[i % 6]}"/>`;
+      return sk(`<rect x="${x-38}" y="${y-110}" width="76" height="110" rx="6" style="fill:#F6F8FA"/>${jars}`, `<rect x="${x-38}" y="${y-110}" width="76" height="110" rx="6"/><path d="M${x-38} ${y-34} h76 M${x+28} ${y-100} v40 M${x+28} ${y-26} v14"/>`); }
+    case "gfreezer": { const s = G.scoop ? G.scoop() : {recipes: [], tubs: {}}, tubs = (s.recipes || []).filter(r => (s.tubs || {})[r.id] > 0).slice(0, 6);
+      return sk(`<rect x="${x-60}" y="${y-58}" width="120" height="58" rx="4" style="fill:#DCEBF2"/><rect x="${x-54}" y="${y-52}" width="108" height="22" rx="3" style="fill:#F6FBFD"/>${tubs.map((r, i) => `<rect x="${x-50 + i*17}" y="${y-49}" width="14" height="16" rx="2" style="fill:${r.col}"/>`).join("")}`,
+        `<rect x="${x-60}" y="${y-58}" width="120" height="58" rx="4"/><rect x="${x-54}" y="${y-52}" width="108" height="22" rx="3"/><path d="M${x-20} ${y-18} h40"/>`); }
+    case "gboard": return sk(`<rect x="${x-46}" y="${y-124}" width="92" height="70" rx="3" style="fill:var(--wood)"/><rect x="${x-38}" y="${y-116}" width="38" height="46" style="fill:#FFFDF6"/><rect x="${x+4}" y="${y-112}" width="34" height="40" style="fill:#F6E3A1"/>`,
+      `<rect x="${x-46}" y="${y-124}" width="92" height="70" rx="3"/><rect x="${x-38}" y="${y-116}" width="38" height="46"/><path d="M${x-32} ${y-104} h26 M${x-32} ${y-94} h22 M${x-32} ${y-84} h24" opacity=".6"/><rect x="${x+4}" y="${y-112}" width="34" height="40"/>`);
+    case "gbench": return sk(`<rect x="${x-80}" y="${y-36}" width="160" height="36" rx="3" style="fill:#D9DEE3"/><rect x="${x-84}" y="${y-42}" width="168" height="8" rx="2" style="fill:#F6F8FA"/><ellipse cx="${x-30}" cy="${y-48}" rx="18" ry="6" style="fill:#FFFDF6"/><path d="M${x+20} ${y-62} l6 14 h-12z" style="fill:#F4C7CF"/><circle cx="${x+48}" cy="${y-50}" r="7" style="fill:#F3C969"/>`,
+      `<rect x="${x-80}" y="${y-36}" width="160" height="36" rx="3"/><rect x="${x-84}" y="${y-42}" width="168" height="8" rx="2"/><ellipse cx="${x-30}" cy="${y-48}" rx="18" ry="6"/><path d="M${x-30} ${y-54} l10 -14"/><path d="M${x+20} ${y-62} l6 14 h-12z"/><circle cx="${x+48}" cy="${y-50}" r="7"/>`);
     case "kitchendoor": return sk(`<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z" style="fill:#9CC27E"/><path d="M${x+36} ${y-80} l-20 6 v14 l20 -6z" style="fill:#FFFDF6"/>`,
       `<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z"/><circle cx="${x+17}" cy="${y-42}" r="1.8"/><path d="M${x+36} ${y-80} l-20 6 v14 l20 -6z"/><path d="M${x+20} ${y-70} h10 M${x+22} ${y-66} h7" opacity=".6"/>`);
     case "oven": { const k = G.kitchen ? G.kitchen() : {}, on = !!(k.oven), ready = on && k.oven.start + k.oven.dur <= Date.now();
@@ -552,6 +567,11 @@ export function foreArt(id){
   if (id === "wineshop") { const s = stationsOf("wineshop").find(t => t.kind === "winecounter"); const x = s.x, y = s.y;
     return sk(`<rect x="${x-90}" y="${y-44}" width="180" height="44" rx="4" style="fill:#8B5E3C"/><rect x="${x-94}" y="${y-50}" width="188" height="8" rx="2" style="fill:#5B2338"/><path d="M${x-60} ${y-66} h8 l-1 14 h-6z" style="fill:#5B2338"/><path d="M${x-42} ${y-62} q5 0 5 6 q0 4 -5 4 q-5 0 -5 -4 q0 -6 5 -6z" style="fill:#F6E3C6"/><rect x="${x+50}" y="${y-62}" width="24" height="12" rx="2" style="fill:#F3C969"/>`,
       `<rect x="${x-90}" y="${y-44}" width="180" height="44" rx="4"/><rect x="${x-94}" y="${y-50}" width="188" height="8" rx="2"/><path d="M${x-90} ${y-22} h180" opacity=".35"/><path d="M${x-60} ${y-66} h8 l-1 14 h-6z M${x-56} ${y-66} v-6"/><path d="M${x-42} ${y-52} v4 M${x-46} ${y-48} h8"/><rect x="${x+50}" y="${y-62}" width="24" height="12" rx="2"/>`); }
+  if (id === "scoopshop") { const s = stationsOf("scoopshop").find(t => t.kind === "gcounter"), x = s.x, y = s.y, sc = G.scoop ? G.scoop() : {recipes: [], tubs: {}};
+    const tubs = (sc.recipes || []).filter(r => (sc.tubs || {})[r.id] > 0).slice(0, 8);
+    return sk(`<rect x="${x-104}" y="${y-48}" width="208" height="48" rx="4" style="fill:#F4C7CF"/><path d="M${x-104} ${y-48} h208 v-26 q-104 -12 -208 0z" style="fill:#EAF6FA" opacity=".9"/>${Array.from({length: 8}, (_, i) => { const r = tubs[i];
+        return `<rect x="${x-96 + i*24}" y="${y-70}" width="20" height="16" rx="3" style="fill:${r ? r.col : "#F6F1E8"}"/>${r ? `<path d="M${x-94 + i*24} ${y-70} q8 -8 16 0z" style="fill:${r.col}"/>` : ""}`; }).join("")}<path d="M${x-104} ${y-30} h208" style="stroke:#FFFDF6" stroke-width="5"/>`,
+      `<rect x="${x-104}" y="${y-48}" width="208" height="48" rx="4"/><path d="M${x-104} ${y-48} v-26 q104 -12 208 0 v26"/>${Array.from({length: 8}, (_, i) => `<rect x="${x-96 + i*24}" y="${y-70}" width="20" height="16" rx="3"/>`).join("")}`); }
   if (id !== "bank") return "";
   const s = stationsOf("bank").find(t => t.kind === "bankcounter"); if (!s) return ""; const x = s.x, y = s.y;
   return sk(`<rect x="${x-90}" y="${y-44}" width="180" height="44" rx="4" style="fill:var(--wood)"/><rect x="${x-94}" y="${y-50}" width="188" height="8" rx="2" style="fill:#E7DCC2"/><circle cx="${x+64}" cy="${y-56}" r="6" style="fill:var(--honey)"/><rect x="${x-70}" y="${y-60}" width="26" height="10" rx="1" style="fill:#8E2C48"/>`,
@@ -608,9 +628,9 @@ export function roomArt(id){
     return h;
   }
   // the home office and the garage: their doors (not a mat) lead back into the living room
-  if (id === "office" || id === "garage") { const e = id === "office", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx = e ? 486 : 34;
-    h += `<g data-exit="1" aria-label="Back to the living room"><ellipse class="hov" cx="${hx}" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>
-      ${sk(`<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z" style="fill:#F8EED8"/>`, `<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z"/><circle cx="${e ? 497 : 23}" cy="384" r="1.8"/>`)}${tapeLabel(e ? 456 : 64, 296, "Living room", "var(--card)", 11)}</g>`;
+  if (id === "office" || id === "garage" || id === "scoopkitchen") { const e = id !== "garage", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx = e ? 486 : 34, sk2 = id === "scoopkitchen";
+    h += `<g data-exit="1" aria-label="${sk2 ? "Back to the shop" : "Back to the living room"}"><ellipse class="hov" cx="${hx}" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>
+      ${sk(`<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z" style="fill:${sk2 ? "#E3F2EC" : "#F8EED8"}"/>`, `<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z"/><circle cx="${e ? 497 : 23}" cy="384" r="1.8"/>`)}${tapeLabel(e ? 456 : 64, sk2 ? 478 : 296, sk2 ? "The shop" : "Living room", "var(--card)", 11)}</g>`;
     return h; }
   h += `<g data-exit="1" aria-label="Exit"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
     ${sk(`<rect x="214" y="600" width="92" height="26" rx="8" style="fill:${r.trim}"/>`, `<rect x="214" y="600" width="92" height="26" rx="8"/><path d="M222 606 h76 M222 620 h76" stroke-dasharray="3 4" opacity=".6"/>`)}

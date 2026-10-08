@@ -134,6 +134,28 @@ const SHELLS = {
     <g style="fill:var(--honey)" opacity=".8">${[117, 212, 307, 402].map(x => `<circle cx="${x}" cy="40" r="5"/>`).join("")}</g>
     ${sk(`<path d="M232 8 h56 l-6 14 h-44z" style="fill:var(--honey)"/>`, `<path d="M232 8 h56 l-6 14 h-44z"/><path d="M248 15 h24" opacity=".5"/>`)}${plant(30, 610, 1.1)}${plant(490, 610, 1)}`,
 
+  // The Scoop Shack: pink and white checks, mint walls with a stripe, a big window onto the bay, the chalkboard
+  // menu (prices from the shop's own settings), cone lamps and a neon-ish cone sign
+  scoopshop: () => { const sc = (artCtx() && artCtx().scoop) ? artCtx().scoop() : {prices: {cup: 4, cone: 4, float: 6, waffle: 7}, name: "The Scoop Shack"}, p = sc.prices;
+    return `<rect width="520" height="640" style="fill:#FBEFF1"/>
+    <g opacity=".55">${rows(12, r => rows(13, c => (r + c) % 2 ? `<rect x="${c*40}" y="${150 + r*42}" width="40" height="42" style="fill:#F4C7CF"/>` : ""))}</g>
+    ${wallBase("#E3F2EC", "#F2A0B8")}<g opacity=".5">${rows(13, i => `<rect x="${i*40}" y="0" width="20" height="138" style="fill:#D2EBE1"/>`)}</g>${skirting}
+    ${sk(`<rect x="150" y="26" width="200" height="92" rx="6" style="fill:#BFE0EE"/><path d="M150 84 q50 -12 100 0 t100 0 v34 h-200z" style="fill:#8FC1DE"/><path d="M150 100 h200 v18 h-200z" style="fill:#F2E2B8"/>`,
+      `<rect x="150" y="26" width="200" height="92" rx="6"/><path d="M250 26 v92 M150 72 h200"/>`)}
+    ${sk(`<path d="M60 34 l14 44 l14 -44z" style="fill:#E8C48E"/><circle cx="74" cy="30" r="12" style="fill:#F4C7CF"/><circle cx="66" cy="22" r="8" style="fill:#C3E8B8"/>`, `<path d="M60 34 l14 44 l14 -44z M64 46 l18 18 M84 46 l-18 18"/><circle cx="74" cy="30" r="12"/><circle cx="66" cy="22" r="8"/>`)}
+    ${sk(`<rect x="430" y="46" width="70" height="84" rx="3" style="fill:#3E4A43"/>`, `<rect x="430" y="46" width="70" height="84" rx="3"/>`)}
+    <g font-family="Klee One,serif" font-weight="600" fill="#F6EFE3" pointer-events="none"><text x="465" y="62" font-size="9.5" text-anchor="middle" fill="#F3C969">Menu</text>
+      ${[["Cup", p.cup], ["Cone", p.cone], ["Float", p.float], ["Waffle", p.waffle]].map(([n, v], i) => `<text x="438" y="${80 + i*13}" font-size="8.5">${n}</text><text x="494" y="${80 + i*13}" font-size="8.5" text-anchor="end">${v}</text>`).join("")}</g>
+    ${sk("", `<path d="M120 0 v34 M400 0 v28"/>`)}${sk(`<path d="M110 34 h20 l-10 16z M390 28 h20 l-10 16z" style="fill:#F2A0B8"/>`, `<path d="M110 34 h20 l-10 16z M390 28 h20 l-10 16z"/>`)}
+    ${plant(492, 612, 1)}`; },
+  // the gelato kitchen: pale blue tiles, steel, a window, a rack of cones
+  scoopkitchen: () => `<rect width="520" height="640" style="fill:#EEF2F4"/>
+    <g opacity=".5">${rows(12, r => rows(13, c => (r + c) % 2 ? `<rect x="${c*40}" y="${150 + r*42}" width="40" height="42" style="fill:#DCE8EF"/>` : ""))}</g>
+    ${wallBase("#EEF2F4", "#7FB8E8")}<g opacity=".35" style="stroke:#B9CDDA">${rows(13, i => `<path d="M${i*40} 0 V138"/>`)}${rows(4, i => `<path d="M0 ${i*36 + 18} H520"/>`)}</g>${skirting}
+    ${sk(`<rect x="300" y="30" width="80" height="64" rx="4" style="fill:#CFE0EE"/>`, `<rect x="300" y="30" width="80" height="64" rx="4"/><path d="M340 30 v64 M300 62 h80"/>`)}
+    ${sk(`<rect x="160" y="40" width="110" height="6" style="fill:#B9C4CC"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${172 + i*20} 46 l6 18 l6 -18z" style="fill:#E8C48E"/>`).join("")}`, `<rect x="160" y="40" width="110" height="6"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${172 + i*20} 46 l6 18 l6 -18z"/>`).join("")}`)}
+    ${plant(30, 612, .9)}`,
+
   // The kitchen: checked tiles, a sage dado, open shelves with pots, a herb rail and a window over the garden
   kitchen: () => `<rect width="520" height="640" style="fill:#E9E2D4"/>
     <g opacity=".5">${rows(12, r => rows(13, c => (r + c) % 2 ? `<rect x="${c*40}" y="${150 + r*42}" width="40" height="42" style="fill:#D7E3CC"/>` : ""))}</g>

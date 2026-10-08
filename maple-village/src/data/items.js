@@ -142,7 +142,7 @@ export const ITEMS = {
   rabbitfeed:{n:"Rabbit pellets", kind:"feed", price:2, tab:"animals", what:"one meal for a bunny"},
   goat:{n:"Goat kid", kind:"pet", pet:"goat", price:150, tab:"animals", say:"A little goat! She's already nibbling my sleeve."},
   goatfeed:{n:"Goat feed", kind:"feed", price:2, tab:"animals", what:"one meal for a goat"},
-  milk:{n:"Goat's milk", kind:"ingredient", sell:6, what:"two make a cheese in the kitchen press"},
+  milk:{n:"Milk", kind:"ingredient", price:4, tab:"deli", sell:3, what:"for gelato at the Scoop Shack, or two make a cheese in the wine shop's kitchen press (your goats give it too)"},
   egg:{n:"Fresh egg", kind:"food", sell:5, say:"A fresh egg from our hens! Breakfast sorted."},
   tulip:{e:"🌷", n:"Tulip", kind:"flower", sell:2, say:"For me? I'll tuck it behind my ear."},
   sunflower:{e:"🌻", n:"Sunflower", kind:"flower", sell:3, say:"So sunny! Thank you."},

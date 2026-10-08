@@ -304,3 +304,29 @@ export function clubSlot(id, day, hm){
   if (!wineClubNow(day, hm) || !clubMembers(day).includes(id)) return null;
   return {from: CLUB_FROM, to: CLUB_TO, scene: "cellar", wander: CLUB_WALK, club: true};
 }
+
+// Customers at the Scoop Shack (open 10am to 8pm): a couple each hour (three at weekends, more in the afternoon),
+// villagers and tourists. Each queues at the counter for a few minutes, then eats in at a table, takes it out to the
+// deck, or wanders off along the foreshore with a cone. npcs.js only lets a villager come when they're free.
+const SHOP_SEATS = [[87, 518], [173, 518], [227, 518], [313, 518], [367, 512], [453, 512]], DECK_FREE = [[134, 360], [172, 352], [150, 404], [190, 404]];
+const QUEUE = [[256, 392], [344, 392], [300, 404]], STROLL_SHORE = [[260, 200], [240, 420], [200, 360], [262, 520], [214, 250]];
+const SCOOP_POOL = [...VISITORS.filter(v => v !== "pip"), ...TOURISTS, ...NIGHT_TOURISTS, "sam", "priya", "jonah", "mia", "mum", "dad", "marcus", "angelina"];
+const scoopCache = {};
+export function scoopVisits(day){
+  if (scoopCache[day]) return scoopCache[day];
+  const d = dow(day), we = d === 0 || d === 6, out = [];
+  for (let h = 10; h < 20; h++) {
+    const n = (we ? 3 : 2) + (h >= 14 && h < 17 ? 1 : 0), who = groupFor(day + ":ice" + h, n, [], SCOOP_POOL);
+    who.forEach((id, k) => { const from = h*60 + (hash(day + id + h) % 40), style = ["in", "deck", "walk"][hash(id + day + h) % 3];
+      out.push({id, from, to: Math.min(20*60 + 15, from + 35), style, k: out.length}); });
+  }
+  return (scoopCache[day] = out);
+}
+export function scoopSlot(id, day, hm){
+  const v = scoopVisits(day).find(x => x.id === id && hm >= x.from && hm < x.to); if (!v) return null;
+  const base = {scene: "scoopshop", ice: true, glide: true};
+  if (hm < v.from + 6) return {...base, from: v.from, to: v.from + 6, at: QUEUE[v.k % QUEUE.length], dir: 1};
+  if (v.style === "in") return {...base, from: v.from + 6, to: v.to, at: SHOP_SEATS[v.k % SHOP_SEATS.length], act: "sit"};
+  if (v.style === "deck") return {...base, scene: "bay", from: v.from + 6, to: v.to, at: DECK_FREE[v.k % DECK_FREE.length], act: "sit", dir: -1};
+  return {...base, scene: "shore", from: v.from + 6, to: v.to, wander: STROLL_SHORE, act: "cone"};
+}

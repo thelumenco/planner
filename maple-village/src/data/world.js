@@ -4,7 +4,7 @@ import { hash, now, H } from "../util.js";
 // Outdoor screens. "base" is home (house, garden, pond, shed, swing); "village" is the town square with the work
 // buildings. A river joins them: walk onto the bridge to cross. A third screen (say, for Luna) would be one more
 // OUTDOOR entry, a pair of bridge places and a BRIDGES/ARRIVE line.
-export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore"];
+export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore", "bay"];
 export const VILLAGE = {
   // town square
   hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[170,180], mark:[132,64]},
@@ -83,6 +83,13 @@ export const VILLAGE = {
   boat:   {scene:"shore", name:"Cruise boat", door:[206,550], spot:true, line:"The mooring at the end of the jetty."},
   dolphins:{scene:"shore", name:"Boardwalk bench", door:[214,262], spot:true, line:"A bench looking out to sea. Dolphins come by most mornings."},
   exlawn: {scene:"field", name:"Exercise lawn", door:[452,430], spot:true, line:"The exercise lawn. Mum's class is here most mornings at 8."},
+  // the bay, north of the foreshore up the boardwalk: Mel's ice cream shop (The Scoop Shack) and its deck, and a
+  // shopfront under renovation
+  toBay:  {scene:"shore", name:"Boardwalk north", door:[250,22], spot:true, bridge:"bay", mark:[290,40], line:"Up the boardwalk to the bay and the Scoop Shack."},
+  toShoreB:{scene:"bay", name:"Boardwalk to the foreshore", door:[250,622], spot:true, bridge:"shore", mark:[290,560], line:"Down the boardwalk to the foreshore."},
+  scoopshop:{scene:"bay", name:"The Scoop Shack", short:"the Scoop Shack", door:[386,262], mark:[386,96]},
+  deck:   {scene:"bay", name:"The deck", door:[215,412], spot:true, line:"The deck, looking out over the foreshore. Bring an ice cream."},
+  reno:   {scene:"bay", name:"Under renovation", door:[396,520], spot:true, line:"Boarded up for now. Coming soon: a brewery? A chocolatier?"},
   homejetty:{scene:"base", name:"Little jetty", door:[150,132], spot:true, line:"Your little jetty. Paddle down the river and out to the foreshore."},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };
@@ -98,9 +105,9 @@ const WORK_HINT = /chord|chico|ambidextrous|fresh pages|client|muse|proposal|inv
 export const isWeekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
 const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
-export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl"}, shore:{field:"toFieldS", flowers:"toFlowersS"}};
+export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl"}, shore:{field:"toFieldS", flowers:"toFlowersS", bay:"toBay"}, bay:{shore:"toShoreB"}};
 // where Mel steps off, by "from>to"
-export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184], "field>shore":[470,304], "shore>field":[56,300], "flowers>shore":[250,590], "shore>flowers":[56,190]};
+export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184], "field>shore":[470,304], "shore>field":[56,300], "flowers>shore":[250,590], "shore>flowers":[56,190], "shore>bay":[250,590], "bay>shore":[250,96]};
 // the next outdoor screen on the way from one to another (screens form a little chain: base - village - lane)
 export function nextHop(from, to){
   if (from === to) return null; if (BRIDGES[from] && BRIDGES[from][to]) return to;
@@ -121,7 +128,9 @@ export const INNER = {
   // big goals: the garage through the back door of the house, the cellar door through the wine shop's west wall
   garage: {parent: "home", door: [456, 340], arrive: [70, 450], exit: [34, 440]},
   office: {parent: "home", door: [64, 512], arrive: [450, 450], exit: [486, 440]},
-  cellar: {parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430]}
+  cellar: {parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430]},
+  // the Scoop Shack's kitchen, through the door on the shop's west wall; its own way back is the door on its east wall
+  scoopkitchen: {parent: "scoopshop", door: [64, 400], arrive: [450, 440], exit: [486, 440]}
 };
 export const WORK = ["hall","chord","fresh","chico","post","home"];
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
@@ -255,6 +264,19 @@ export const ROOMS = {
     ["study","Angellina's desk","D","studydesk",null,"Angellina's study desk. Highlighters in every colour.",36],
     ["msofa","Sofa","S","sofa",null,"The comfiest sofa on the foreshore.",30],
     ["dine","Dining table","X","dining",null,"Their dining table. Wedding magazines at one end, bank papers at the other.",44]]},
+  // The Scoop Shack on the bay: the gelato counter (the display is drawn over the people, so Sofia stands behind it),
+  // the chalkboard menu, tables, and the kitchen door on the west wall
+  scoopshop: {name:"The Scoop Shack", wall:"#E3F2EC", trim:"#F2A0B8", noBoard:true, pos:{C:[300,330], M:[465,128], Z:[40,400], T:[340,520]}, stations:[
+    ["gmenu","Menu","M","chalkmenu",null,"The chalkboard menu: prices and flavours.",44],
+    ["gcounter","Gelato counter","C","gcounter",null,"The gelato counter. Yours are free.",46],
+    ["gkdoor","Kitchen","Z","gkdoor",null,"Into the gelato kitchen.",0],
+    ["gtables","Tables","T","cafetables",null,"Tables for eating in. Bring an ice cream.",34]]},
+  // The gelato kitchen behind it: the fridge (ingredients), the freezer (tubs), Tomo's batch board and the mixing bench
+  scoopkitchen: {name:"The gelato kitchen", wall:"#EEF2F4", trim:"#7FB8E8", noBoard:true, pos:{F:[110,262], Z:[262,262], B:[420,262], P:[262,470]}, stations:[
+    ["gfridge","Fridge","F","gfridge",null,"The fridge: everything the gelato's made from.",30],
+    ["gfreezer","Freezer","Z","gfreezer",null,"The freezer: tubs waiting for the display.",30],
+    ["gboard","Today's batches","B","gboard",null,"Tomo's board: what to make today.",74],
+    ["gbench","Mixing bench","P","gbench",null,"The mixing bench: discover new flavours.",30]]},
   // the garage (a big goal): Darren's workbench, storage, the scooter and the car once they're bought
   garage: {name:"The garage", wall:"#E3E6EA", trim:"#8FA3B8", noBoard:true, pos:{W:[130,250], E:[300,262], K:[436,261], C:[310,480], D:[120,566], S:[440,566]}, stations:[
     ["gbench","Workbench","W","bench",null,"Darren's tools, all hung up on the wall. Mostly.",34],

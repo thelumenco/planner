@@ -3,7 +3,7 @@
 import { NPCS, AGENTS } from "../data/npcs.js";
 import { personArt, letterArt } from "../art/people.js";
 import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
-import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dinnerSlot, dateSlot, clubSlot } from "./tours.js";
+import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dinnerSlot, dateSlot, clubSlot, scoopSlot } from "./tours.js";
 import { SEA } from "../data/npcs.js";
 import { findPath, blocked } from "./paths.js";
 
@@ -33,16 +33,18 @@ const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw 
 const routineNow = def => routineAt(def, dayKey(), sgHM());
 export function slotAt(def, day, t, live){
   return (live && supSlot(def)) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
-    || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || shoreSlot(def.id, day, t) || routineAt(def, day, t);
+    || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || shoreSlot(def.id, day, t) || iceOk(scoopSlot(def.id, day, t), def, day, t) || routineAt(def, day, t);
 }
 // a night-market shopper slot gives way to the wine shop: anyone due at a tasting or in the shop then goes there instead
 const nightOk = (s, def, day, t) => !s || !s.night ? s : tastingSlot(def.id, day, t) || (routineAt(def, day, t) || {}).scene === "wineshop" ? null : s;
+// an ice cream at the Scoop Shack: only for someone who isn't busy (no routine then, or just out and about)
+const iceOk = (s, def, day, t) => { if (!s) return null; const r = routineAt(def, day, t); return !r || ["village", "lane", "field", "shore", "bay", "orchard", "flowers", "base", "vineyard"].includes(r.scene) ? s : null; };
 const cellarBuilt = () => !!(api && api.F().goals && api.F().goals.cellar);   // the wine club meets in the cellar door
 const slotNow = def => slotAt(def, dayKey(), sgHM(), true);
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };
 export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
 export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
-const PROPS = {water: "can", repair: "hammer", farm: "hoe"};
+const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone"};
 const outdoors = s => s === "village" || s === "base" || s === "lane" || s === "vineyard" || s === "orchard" || s === "flowers" || s === "field" || s === "shore";
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 
