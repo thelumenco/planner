@@ -26,7 +26,7 @@ export function vineState(F){
   F.vine = F.vine || {};
   const v = F.vine;
   v.rows = v.rows || [0, 1, 2].map(i => ({trellis: i === 0, vines: [null, null, null]}));
-  v.cuttings = v.cuttings || {red: 1, white: 1}; v.grapes = v.grapes || {red: 0, white: 0};
+  v.cuttings = v.cuttings || {red: 1, white: 1}; v.grapes = v.grapes || {red: 0, white: 0}; v.keep = v.keep || {red: 0, white: 0};
   v.barrels = v.barrels || [null]; v.cellar = v.cellar || []; v.shelf = v.shelf || []; v.box = v.box || 0; v.sold = v.sold || 0; v.glasses = v.glasses || 0; v.menu = v.menu || {}; v.plates = v.plates || 0; v.fruit = v.fruit || {};
   v.help = Object.assign({cook: true, pick: true, barrels: true, stock: true, fetch: false}, v.help || {}); v.names = v.names || {};
   v.lastTick = v.lastTick || Date.now(); v.today = v.today || {day: "", bottles: 0, glasses: 0, coins: 0};
@@ -147,7 +147,7 @@ export function sellTick(F, opts = {}){
     if (w.workers) {
       if (v.help.pick) v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && vn.wateredAt && at - vn.wateredAt >= GROW) { const n = BUNCHES + (opts.harvest ? 1 : 0); v.grapes[vn.v] += n; vn.wateredAt = null; out.picked += n; } }));
       v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && !vn.wateredAt) { vn.wateredAt = at; out.watered++; } }));
-      if (v.help.barrels) v.barrels.forEach((b, i) => { if (b) return; const st = v.grapes.red >= PER_BATCH ? "red" : v.grapes.white >= PER_BATCH ? "white" : null;
+      if (v.help.barrels) v.barrels.forEach((b, i) => { if (b) return; const spare = c => v.grapes[c] - (v.keep[c] || 0) >= PER_BATCH, st = spare("red") ? "red" : spare("white") ? "white" : null;
         if (st) { v.grapes[st] -= PER_BATCH; v.barrels[i] = {style: st, start: at, dur: STYLES[st].dur, stage: 1}; out.filled++; } });
     }
     if (w.staff && v.help.stock && v.cellar.length) { out.stocked += v.cellar.reduce((n, c) => n + c.n, 0); v.cellar.slice().forEach(c => stock(F, c.id)); }
@@ -208,9 +208,17 @@ export function stallPanel(F){
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export const vy = {name: {}};
+const grapePic = c => `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2" fill="${c === "red" ? "#7A2E5A" : "#C9D98A"}" stroke="#3A2E28" stroke-width="1"/>`).join("")}<path d="M12 5 V2" stroke="#3A2E28" stroke-width="1.2"/></svg>`;
 export function barrelPanel(F){
   const v = vineState(F);
-  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles. Grapes: ${v.grapes.red} red, ${v.grapes.white} white.</p><div class="vbarrels">`;
+  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles.</p>`;
+  // the grape crates: picked grapes wait here. Take some for the Scoop Shack (or put them back); Marco only fills
+  // barrels from what's left over the amount Mel keeps back
+  h += `<p class="eyebrow">The grape crates</p><ul class="hlist wlist">${["red", "white"].map(c => { const back = (F.inv || {})["grape_" + c] || 0;
+    return `<li><span class="wpic">${grapePic(c)}</span><span class="wtxt"><b>${v.grapes[c]} ${c} bunch${v.grapes[c] === 1 ? "" : "es"}</b><small>${v.help.barrels ? `Marco keeps ${v.keep[c] || 0} back for you` : "picked and waiting"}</small></span>
+      <span class="orbtns"><button class="btn small primary" data-vy="takegr" data-k="${c}" data-n="1" ${v.grapes[c] ? "" : "disabled"}>Take 1</button><button class="btn small alt" data-vy="takegr" data-k="${c}" data-n="99" ${v.grapes[c] ? "" : "disabled"}>All</button>${back ? `<button class="btn small alt" data-vy="putgr" data-k="${c}">Put back ${back}</button>` : ""}
+      ${v.help.barrels ? `<span class="gstep"><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="-1" aria-label="Keep fewer back">−</button><b>${v.keep[c] || 0}</b><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="1" aria-label="Keep more back">+</button></span>` : ""}</span></li>`; }).join("")}</ul>
+    <p class="muted">Grapes you take go in your backpack (for gelato at the Scoop Shack).${v.help.barrels ? " Marco fills empty barrels only from bunches beyond what you keep back." : ""}</p><div class="vbarrels">`;
   v.barrels.forEach((b, i) => {
     const ph = !b ? "empty" : barrelLeft(b) ? (b.style === "sparkling" && b.stage === 2 ? "bubbles" : "ferment") : b.style === "sparkling" && b.stage === 1 ? "await2" : "ready";
     h += `<div class="vbarrel">${barrelPic(ph, b ? STYLES[b.style].col : "", b ? STYLES[b.style].n : "")}<div class="vbody"><b>Barrel ${i + 1}</b>${b ? stageStrip(b.style, ph) : ""}`;
@@ -303,6 +311,9 @@ export function wireVine(root, F, api){
     else if (k === "water") { line = waterVines(F, api.r); if (line) api.sfx("tap"); }
     else if (k === "harvest") { line = harvestVine(F, api.r, api.i, {harvest: api.harvest}); if (line) api.sfx("coin"); }
     else if (k === "fill") { line = fillBarrel(F, i, b.dataset.k); if (line) api.sfx("paper"); }
+    else if (k === "takegr") { const v = vineState(F), c = b.dataset.k, n = Math.min(+b.dataset.n, v.grapes[c]); if (n > 0) { v.grapes[c] -= n; F.inv = F.inv || {}; F.inv["grape_" + c] = (F.inv["grape_" + c] || 0) + n; line = `${n} bunch${n > 1 ? "es" : ""} of ${c} grapes into your backpack.`; api.sfx("paper"); } }
+    else if (k === "putgr") { const v = vineState(F), c = b.dataset.k, n = (F.inv || {})["grape_" + c] || 0; if (n) { v.grapes[c] += n; delete F.inv["grape_" + c]; line = `${n} bunch${n > 1 ? "es" : ""} back in the crates.`; } }
+    else if (k === "keep") { const v = vineState(F), c = b.dataset.k; v.keep[c] = Math.max(0, Math.min(30, (v.keep[c] || 0) + +b.dataset.n)); }
     else if (k === "second") line = secondFerment(F, i);
     else if (k === "bottle") { line = bottle(F, i, vy.name[i]); if (line) { vy.name[i] = ""; api.sfx("chime"); } }
     else if (k === "olives") { line = pickOlives(F); if (line) api.sfx("coin"); }

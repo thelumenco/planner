@@ -19,7 +19,7 @@ export const GOODS = {
   flour: ["bag of flour", "bags of flour"], cheese: ["cheese", "cheeses"], olives: ["jar of olives", "jars of olives"], loaf: ["loaf", "loaves"],
   apple: ["apple", "apples"], dumpling: ["dumpling", "dumplings"], fish: ["fish", "fish"], toast: ["honey toast", "honey toasts"],
   pea: ["handful of peas", "handfuls of peas"], pumpkin: ["pumpkin", "pumpkins"], leek: ["leek", "leeks"]};
-export const isGood = id => id in GOODS && id !== "loaf";   // loaves are only ever baked in the oven
+export const isGood = id => id in GOODS;   // (loaves are only ever baked in the oven, but one taken out can go back in)
 const nm = (id, n) => GOODS[id] ? GOODS[id][n === 1 ? 0 : 1] : id;
 export const needText = need => Object.entries(need).map(([k, n]) => `${n} ${nm(k, n)}`).join(" + ");
 
@@ -118,7 +118,7 @@ export const cookLine = done => `Pilar ${done.length > 1 ? done.slice(0, -1).joi
 /* ---------- panels ---------- */
 const pic = (id, s = 34) => icon(id, s);
 const larderGrid = k => { const ids = Object.keys(k.larder).filter(id => k.larder[id] > 0);
-  return ids.length ? `<div class="kgoods">${ids.map(id => `<span class="kgood">${pic(id)}<b>${k.larder[id]}</b><small>${esc(nm(id, k.larder[id]))}</small></span>`).join("")}</div>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`; };
+  return ids.length ? `<div class="kgoods">${ids.map(id => `<button class="kgood kbtn" data-k="take" data-id="${id}">${pic(id)}<b>${k.larder[id]}</b><small>${esc(nm(id, k.larder[id]))}</small><em>Take one</em></button>`).join("")}</div><p class="muted">Tap one to take it back to your backpack (for the Scoop Shack, or a gift).</p>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`; };
 const needList = (k, need) => Object.entries(need).map(([id, n]) => `<span class="kneed ${(k.larder[id] || 0) >= n ? "ok" : ""}">${pic(id, 22)}${n} ${esc(nm(id, n))} <small>(${k.larder[id] || 0})</small></span>`).join("");
 export function larderPanel(F){
   const k = kitchenState(F), bag = backpackGoods(F);
@@ -161,6 +161,7 @@ export function wireKitchen(root, F, api){
   root.querySelectorAll("[data-k]").forEach(b => b.onclick = () => {
     const k = b.dataset.k, id = b.dataset.dish || b.dataset.id; let line = null;   // (dish buttons avoid data-id: the market claims .item[data-id])
     if (k === "send") { const n = sendToKitchen(F, id); if (n) line = `${n} ${nm(id, n)} into the larder.`; }
+    else if (k === "take") { const kk = kitchenState(F); if ((kk.larder[id] || 0) > 0) { kk.larder[id]--; if (kk.larder[id] <= 0) delete kk.larder[id]; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; line = `One ${nm(id, 1)} back in your backpack.`; } }
     else if (k === "sendall") { const moved = backpackGoods(F).map(x => [x, sendToKitchen(F, x)]).filter(([, n]) => n); if (moved.length) line = `Brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")}.`; }
     else if (k === "bake") line = bake(F); else if (k === "loaves") line = takeLoaves(F);
     else if (k === "press") line = pressCheese(F); else if (k === "cheese") line = takeCheese(F);

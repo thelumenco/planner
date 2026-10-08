@@ -984,3 +984,10 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Customers come from `scoopVisits` / `scoopSlot` (tours.js): 2–4 an hour from villagers, tourists, night-market tourists, families and Mel's family. Each queues at the counter for 6 minutes, then eats inside, goes to the deck, or strolls the foreshore with a cone (`act: "cone"`, drawn by people.js).
   - npcs.js `iceOk` only lets someone come when their routine leaves them free.
 - Milk is now sold in Hana's Deli tab (4 coins); goats still give it free.
+
+### Round 78: ingredients
+- **Hana's deli tab** now sells gelato staples (all `kind: "ingredient"`, with icons, and in `INGR`): dark chocolate, vanilla, coffee beans, pistachios, hazelnuts, coconut, matcha, pandan, gula melaka, black sesame, fresh mint and bananas. Chocolate is meant to come from the bay's future chocolatier as well.
+- **Grape crates:** picked grapes still go to `v.grapes`, now shown as "The grape crates" at the top of the barrel shed panel.
+  - Take 1 or All puts `grape_red` / `grape_white` items in the backpack (ingredients for gelato); Put back returns them.
+  - When Marco's "fills empty barrels" help is on, he only uses bunches beyond `v.keep[colour]`, which Mel sets with a stepper.
+- **Wine shop larder:** each good is a "Take one" button (`data-k="take"`) that moves it back to the backpack. `isGood` now allows loaves (new `ITEMS.loaf`) to go back in. Note: Pilar cooks from the larder on her shifts.

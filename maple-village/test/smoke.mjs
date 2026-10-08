@@ -1735,6 +1735,34 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // Ingredients: pantry staples at Hana's deli, grapes out of the vineyard's crates, things back out of the larder
+  console.log("\ningredients");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`ingr pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/ingrpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.vine = f.vine || {}; f.vine.grapes = {red: 3, white: 0}; f.kitchen = {larder: {fish: 1}}; f.coins = 40;
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=09:00&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=09:00&date=2026-10-07&ingrpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("market")); await page.waitForTimeout(800);
+  await page.waitForSelector('#ctx [data-shop="deli"]', { timeout: 20000 }); await page.click('#ctx [data-shop="deli"]'); await page.waitForTimeout(300);
+  check(await page.locator('#ctx .item[data-id="chocolate"]').count() === 1 && await page.locator('#ctx .item[data-id="pandan"]').count() === 1 && await page.locator('#ctx .item[data-id="milk"]').count() === 1,
+    "Hana's deli stocks gelato staples: chocolate, vanilla, pistachios, pandan, milk and more");
+  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(800);
+  await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vy="takegr"]', { timeout: 15000 });
+  await page.click('#ctx [data-vy="takegr"][data-k="red"][data-n="1"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.grape_red === 1 && f.vine.grapes.red === 2), "grapes wait in the vineyard's crates; take a bunch for the ice cream shop");
+  await page.click('#ctx [data-vy="putgr"][data-k="red"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => !f.inv.grape_red && f.vine.grapes.red === 3), "or put them back for wine");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.evaluate(() => window.__mapleScene("kitchen")); await page.waitForTimeout(800);
+  await page.locator('#world [data-spot="larder"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="take"]', { timeout: 15000 });
+  await page.click('#ctx [data-k="take"][data-id="fish"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.fish >= 1 && !(f.kitchen.larder.fish)), "anything in the wine shop's larder can be taken back to the backpack");
+  await page.close();
+}
+{
   // Accessories in the wardrobe: bought once at Hana's, worn or put away from the wardrobe
   console.log("\naccessories in the wardrobe");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
