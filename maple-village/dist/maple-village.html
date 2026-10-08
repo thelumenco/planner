@@ -918,6 +918,7 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 .hlist.gnews span{display:grid;gap:2px}
 .hlist.gnews a{color:#2F3B73;font-weight:600;text-decoration:none}
 .hlist.gnews .src{font-style:italic}
+.hlist.gnews.vcal:not(.world) li::before{background:#9FD3C2}.hlist.gnews.vcal.fests:not(.world) li::before{background:#F2A0B8}.hlist.gnews.vcal small{color:var(--soft)}
 .hlist.gnews:not(.world) li::before{content:"";width:8px;height:8px;border-radius:50%;background:#F3C969;flex:none;box-shadow:0 0 0 1.5px rgba(60,40,30,.2)}
 /* tomorrow's quests, peeked from the quest list */
 .tmrh{margin:16px 0 4px}
@@ -2245,6 +2246,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     mstall5: { scene: "field", name: "Stall", door: [336, 164], spot: true, line: "A market stall." },
     mstall6: { scene: "field", name: "Stall", door: [396, 164], spot: true, line: "A market stall." },
     mstall7: { scene: "field", name: "Stall", door: [456, 164], spot: true, line: "A market stall." },
+    mstall8: { scene: "field", name: "Scoop Shack cart", door: [306, 556], spot: true, line: "The Scoop Shack's cart at the night market." },
     pitch: { scene: "field", name: "Football pitch", door: [150, 600], spot: true, line: "The football pitch. Kids play here after school." },
     // the foreshore, west of the field and north of the flower farm: the sea along its west side (dolphins, paddleboarders),
     // a boardwalk, a jetty with the paddleboard rack, and two family houses
@@ -4951,7 +4953,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const v = familyVisits(day).find((x) => x.id === id && hm2 >= x.from && hm2 < x.to);
     return v ? { from: v.from, to: v.to, scene: v.scene, wander: v.wander } : null;
   }
-  var STALL_SPOTS = [[36, 128], [96, 128], [156, 128], [216, 128], [276, 128], [336, 128], [396, 128], [456, 128]];
+  var STALL_SPOTS = [[36, 128], [96, 128], [156, 128], [216, 128], [276, 128], [336, 128], [396, 128], [456, 128], [306, 520]];
   var MARKET = [
     { id: "elena", at: 0, short: "Cheese", n: "Cheese and olives", items: ["cheese", "olives"], col: "#F3C969", line: "Aged on a farm up the hill. Try a slice!" },
     { id: "felix", at: 1, short: "Honey", n: "Honey and bee things", items: ["honey", "honeycomb", "beecandle", "toast"], col: "#E3A23A", line: "Wildflower honey, from my own bees. The candles are pure beeswax." },
@@ -4976,7 +4978,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     { id: "sora", at: 4, short: "Socks & tees", n: "Socks, hats and tees", items: ["cosysocks", "buckethat", "dinotee"], col: "#7FB8E8", line: "Cosy socks, three for the price of happy. And a bucket hat for everyone." },
     { id: "lior", at: 5, short: "Lanterns", n: "Lanterns and lamps", items: [], decor: ["n_lanterns", "r_moon"], col: "#F3C969", line: "Paper lanterns for the house, and a moon lamp for your room." },
     { id: "wen", at: 6, short: "Sweets", n: "Sweets", items: ["tanghulu", "eggwaffle"], col: "#C9A3E0", line: "Tanghulu, strawberries in crackly sugar. And egg waffles, still warm." },
-    { id: "kai", at: 7, short: "Drinks", n: "Night drinks", items: ["sugarcane", "grassjelly"], col: "#9CC27E", line: "Fresh sugarcane, pressed while you wait. Grass jelly for the old-school ones." }
+    { id: "kai", at: 7, short: "Drinks", n: "Night drinks", items: ["sugarcane", "grassjelly"], col: "#9CC27E", line: "Fresh sugarcane, pressed while you wait. Grass jelly for the old-school ones." },
+    // Mel's own: the Scoop Shack's cart, scooping from the shop's display (scoop.js cartOn). Tomo minds it after his shift
+    { id: "tomo", at: 8, kind: "scoop", short: "Scoop Shack", n: "The Scoop Shack cart", items: [], col: "#F2A0B8", line: "Gelato from the Scoop Shack! Cup or cone?" }
   ];
   var NIGHT_TOURISTS = ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy", "rafe"];
   var STAGE = { x: 452, y: 462 };
@@ -5020,7 +5024,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const { k, pose: pose2, from, to } = keeperPose(st6, day, hm2), [x, y] = STALL_SPOTS[st6.at], base = { from, to, scene: "field", glide: true };
     if (pose2 === "behind") return { ...base, at: [x + 3, y - 9] };
     if (pose2 === "front") return { ...base, at: [x + 9, y + 9] };
-    if (pose2 === "sit") return { ...base, at: [x - 17, y + 7], act: "sit", dir: 1 };
+    if (pose2 === "sit") return { ...base, at: [x + (st6.kind === "scoop" ? 34 : -17), y + 7], act: "sit", dir: st6.kind === "scoop" ? -1 : 1 };
     if (pose2 === "chat") {
       const side = k % 2 ? 1 : -1;
       return { ...base, at: [Math.max(30, Math.min(490, x + side * 30)), y + 48], dir: -side };
@@ -6610,9 +6614,23 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const w = s.kind === "wine" ? 24 : 23;
     return sk(`<rect x="${x - w}" y="${y - 22}" width="${w * 2}" height="22" rx="2" style="fill:${s.kind === "wine" ? "#8B5E3C" : "#C9A27E"}"/>${goods(i, x, y, s)}`, `<rect x="${x - w}" y="${y - 22}" width="${w * 2}" height="22" rx="2"/>`);
   };
-  var stallFront = (i, x, y, s) => `<g pointer-events="none">${table(i, x, y, s)}</g>`;
+  var stallFront = (i, x, y, s) => `<g pointer-events="none">${s.kind === "scoop" ? cartBody(x, y) : table(i, x, y, s)}</g>`;
   var crate = (x, y) => sk(`<rect x="${x - 7}" y="${y - 7}" width="14" height="8" rx="1" style="fill:#B98A5A"/>`, `<rect x="${x - 7}" y="${y - 7}" width="14" height="8" rx="1"/><path d="M${x - 7} ${y - 3} h14"/>`);
+  var CART_TUBS = ["#F8D59A", "#E8566C", "#B9D98A", "#9A7A6A"];
+  var cartBody = (x, y) => sk(
+    `<rect x="${x - 24}" y="${y - 24}" width="48" height="20" rx="4" style="fill:#F2A0B8"/><rect x="${x - 26}" y="${y - 28}" width="52" height="6" rx="2" style="fill:#FFFDF6"/>${CART_TUBS.map((c, k) => `<ellipse cx="${x - 15 + k * 10}" cy="${y - 28}" rx="4" ry="2.4" style="fill:${c}"/>`).join("")}
+    <circle cx="${x - 14}" cy="${y - 2}" r="6" style="fill:#FFFDF6"/><circle cx="${x + 14}" cy="${y - 2}" r="6" style="fill:#FFFDF6"/><path d="M${x - 24} ${y - 14} h48" style="stroke:#FFFDF6" stroke-width="3"/>`,
+    `<rect x="${x - 24}" y="${y - 24}" width="48" height="20" rx="4"/><rect x="${x - 26}" y="${y - 28}" width="52" height="6" rx="2"/><circle cx="${x - 14}" cy="${y - 2}" r="6"/><circle cx="${x + 14}" cy="${y - 2}" r="6"/>`
+  );
+  var cart = (i, x, y, s) => `<g data-place="mstall${i}" aria-label="${s.n}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="32" ry="8" style="fill:var(--butter)"/>
+  ${sk(
+    `<path d="M${x + 20} ${y - 26} v-44" style="stroke:#8A5A3A" stroke-width="2"/><path d="M${x - 8} ${y - 70} q28 -22 56 0z" style="fill:#FFFDF6"/>${[0, 1, 2].map((k) => `<path d="M${x - 8 + k * 19} ${y - 70} q${4 + k * 2} -14 ${9} -17 l1 17z" style="fill:#F2A0B8"/>`).join("")}
+      <path d="M${x - 30} ${y - 34} v-14" style="stroke:#8A5A3A" stroke-width="1.6"/><path d="M${x - 35} ${y - 46} l5 14 l5 -14z" style="fill:#E8C48E"/><circle cx="${x - 30}" cy="${y - 49}" r="5" style="fill:#F4C7CF"/>`,
+    `<path d="M${x - 8} ${y - 70} q28 -22 56 0z M${x + 20} ${y - 70} v44"/><path d="M${x - 35} ${y - 46} l5 14 l5 -14z"/><circle cx="${x - 30}" cy="${y - 49}" r="5"/>`
+  )}
+  ${crate(x + 34, y + 6)}${cartBody(x, y)}${tapeLabel(x, y + 28, s.short, "#F4C7CF", 9)}</g>`;
   var stall = (i, x, y, s) => {
+    if (s.kind === "scoop") return cart(i, x, y, s);
     const wine = s.kind === "wine", hw = wine ? 29 : 28, col = wine ? "#8E2C48" : s.col;
     return `<g data-place="mstall${i}" aria-label="${wine ? "The wine shop's market stall" : s.n + " stall"}"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="${hw}" ry="8" style="fill:var(--butter)"/>
   ${crate(x - 17, y + 6)}
@@ -9918,12 +9936,17 @@ Quests finished today: ${S3.doneIds.length}`;
     const d = D2.goodnews;
     return d && d.at ? d : null;
   }
-  function goodNewsHTML(localWins) {
+  function goodNewsHTML(localWins, cal) {
     const d = goodNews(), clean2 = (s) => plain(String(s || "")).slice(0, 220);
     const world = (d && d.world || []).slice(0, 6).filter((x) => x && x.title);
     const wins = [...localWins || [], ...(d && d.wins || []).map(clean2)].filter(Boolean).slice(0, 8);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Good news</h2><p class="sub">${d ? `Pinned up ${new Date(d.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short", timeZone: "Asia/Singapore" })}.` : "Fresh every morning."}</p>`;
     h += `<p class="eyebrow">Your wins</p>` + (wins.length ? `<ul class="hlist gnews">${wins.map((w) => `<li><span>${esc(w)}</span></li>`).join("")}</ul>` : `<p class="muted">Your wins show up here as the day goes on.</p>`);
+    if (cal) {
+      h += `<p class="eyebrow">Village calendar</p>`;
+      if (cal.fests.length) h += `<ul class="hlist gnews vcal fests">${cal.fests.map((f2) => `<li><span><b>${esc(f2.name)}</b><small>${esc(f2.when)} · ${esc(f2.until)}</small></span></li>`).join("")}</ul>`;
+      h += cal.days.length ? `<ul class="hlist gnews vcal">${cal.days.map((d2) => `<li><span><b>${esc(d2.when)}</b>${d2.list.map((x) => `<small>${esc(x)}</small>`).join("")}</span></li>`).join("")}</ul>` : `<p class="muted">A quiet fortnight in the village.</p>`;
+    }
     h += `<p class="eyebrow">In the world</p>` + (world.length ? `<ul class="hlist gnews world">${world.map((x) => `<li><span>${/^https:\/\//.test(x.link || "") ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(clean2(x.title))}</a>` : esc(clean2(x.title))}${x.summary ? `<small>${esc(clean2(x.summary))}</small>` : ""}${x.source ? `<small class="src">${esc(clean2(x.source))}</small>` : ""}</span></li>`).join("")}</ul>` : `<p class="muted">The morning's good news hasn't arrived yet.</p>`);
     return h;
   }
@@ -13577,6 +13600,28 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var nDips = (s) => Object.keys(s.dips).filter((k) => DIPS[k]).length;
   var nTops = (s) => Object.keys(s.tops).filter((k) => TOPPINGS[k]).length;
+  var cartOn = (day, hm2) => {
+    const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+    return (d === 2 || d === 4) && hm2 >= 18 * 60 && hm2 < 22 * 60;
+  };
+  function cartMinute(s, day, hm2, opts) {
+    if (!cartOn(day, hm2)) return null;
+    const stocked = onDisplay(s);
+    if (!stocked.length) return null;
+    const price = s.prices.cup + s.prices.cone, pf = Math.pow(8 / Math.max(2, price), 1.3);
+    if (Math.random() >= 0.03 * pf * (opts.cart ? 1.6 : 1)) return null;
+    const fmt3 = Math.random() < 0.45 ? "cup" : "cone", r = stocked[Math.floor(Math.random() * stocked.length)];
+    s.tubs[r.id]--;
+    if (s.tubs[r.id] <= 0) delete s.tubs[r.id];
+    let coins = priceOf(s, fmt3, r);
+    if (fmt3 === "cone" && hasUp(s, "dip") && Math.random() < 0.3) coins += s.prices.dip;
+    const t2 = s.sold[day] = s.sold[day] || { n: 0, coins: 0 };
+    t2.n++;
+    t2.coins += coins;
+    t2.cart = (t2.cart || 0) + 1;
+    t2.cartCoins = (t2.cartCoins || 0) + coins;
+    return { coins, fmt: fmt3, r };
+  }
   var honestyOpen = (hm2) => hm2 >= 7 * 60 && hm2 < OPEN || hm2 >= CLOSE && hm2 < 22 * 60;
   var NOTES = [
     "Best pandan ever. Sorry, only had coins for one! x",
@@ -13734,6 +13779,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         out.coins += sale.coins;
         out.n++;
       }
+      const cs = cartMinute(s, day, hm2, opts);
+      if (cs) {
+        out.coins += cs.coins;
+        out.n++;
+        out.cart = (out.cart || 0) + cs.coins;
+      }
       out.mins++;
     }
     if (out.mins || !s.at) s.at = from + out.mins * 6e4;
@@ -13878,7 +13929,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function counterPanel2(F2, st6) {
     const s = scoopState(F2), hm2 = sgHM(), t2 = s.sold[dayKey()] || { n: 0, coins: 0 }, tubs = onDisplay(s);
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm2) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t2.n ? `Sold today: ${t2.n} (${t2.coins} ${coin()}).` : "Nothing sold yet today."}${st6.server ? " Sofia's behind the counter." : ""}</p>`;
+    let h = st6.cart ? `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)} cart</h2><p class="sub">At the night market till 10pm, scooping from tubs already made (no batches at the market, just serving).${st6.keeper ? " Tomo's minding it." : " Tomo's off wandering: it's on an honesty tin."} ${t2.cart ? `Sold tonight: ${t2.cart} (${t2.cartCoins} ${coin()}).` : "Nothing sold yet tonight."} Stay and scoop, and more people stop.</p>` : `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm2) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t2.n ? `Sold today: ${t2.n} (${t2.coins} ${coin()}).` : "Nothing sold yet today."}${st6.server ? " Sofia's behind the counter." : ""}</p>`;
+    if (st6.cart && !tubs.length) return h + `<p class="muted">Nothing to scoop: the shop's display is empty tonight.</p>` + shut;
     if (!tubs.length && scoopsLeft(s)) return h + `<p class="muted">Nothing in the display, but there are tubs in the freezer.</p><div class="actions"><button class="btn small primary" data-gview="freezer">Put some out</button></div>` + upBtn + shut;
     if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), and Tomo will keep the tubs topped up.</p>` + upBtn + shut;
     const pick3 = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
@@ -13887,6 +13939,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map((f2) => `<button class="btn small alt" data-gtake="${f2}">${FORMATS[f2].n}</button>`).join("")}</div>
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
     h += `<ul class="hlist wlist">${tubs.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
+    if (st6.cart) return h + `<p class="muted">Yours are free. Cups and cones at the shop's prices.</p>` + shut;
     return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p><div class="actions"><button class="btn small alt" data-gview="freezer">Change what's in the display</button></div>` + upBtn + shut;
   }
   function menuPanel2(F2, st6) {
@@ -16048,6 +16101,34 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
     $("chatChips").innerHTML = ["What's next?", "I need a break", "Add milk to the shopping list", "I did the dishes"].map((c) => `<button type="button" data-chip="${esc(c)}">${esc(c)}</button>`).join("");
     $("chatChips").querySelectorAll("[data-chip]").forEach((b) => b.onclick = () => sendChat(b.dataset.chip));
   }
+  var CAL_DAYS = 14;
+  var FEST_DAYS = 92;
+  function villageCalendar() {
+    const today2 = dayKey(), addD = (k, n) => new Date(Date.parse(k + "T00:00:00Z") + n * 864e5).toISOString().slice(0, 10);
+    const fmtD = (k) => (/* @__PURE__ */ new Date(k + "T00:00:00Z")).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
+    const hhmm = (m) => {
+      const h = Math.floor(m / 60), mm = m % 60;
+      return `${h % 12 || 12}${mm ? ":" + String(mm).padStart(2, "0") : ""}${h < 12 ? "am" : "pm"}`;
+    };
+    const until = (k) => {
+      const n = Math.round((Date.parse(k + "T00:00:00Z") - Date.parse(today2 + "T00:00:00Z")) / 864e5);
+      return n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`;
+    };
+    const fests = FESTIVALS.flatMap((f2) => f2.dates.map((k) => ({ f: f2, k, from: addD(k, -f2.before), to: addD(k, f2.after) }))).filter((x) => x.to >= today2 && x.k <= addD(today2, FEST_DAYS)).sort((a, b) => a.k.localeCompare(b.k));
+    const days = [];
+    for (let i = 0; i < CAL_DAYS; i++) {
+      const k = addD(today2, i), ev = eventOn(k), dn = dinnerOn(k), list2 = [];
+      if (ev) list2.push(`${ev.name}, ${hhmm(ev.from)} to ${hhmm(ev.to)} on the field${ev.kind === "market" ? " (our wine stall's there)" : ev.kind === "night" ? ` (with a jazz duo, and the cart from ${scoopState(F).name})` : ""}`);
+      if (owns(F, "cellar") && wineClubOn(k)) list2.push(`Wine club at the cellar door, 6 to 9pm`);
+      if (dn) list2.push(`Family dinner at ${HOST_NAME[dn.host]}, 6:30pm`);
+      fests.filter((x) => x.k === k).forEach((x) => list2.push(`${x.f.name}!`));
+      if (list2.length) days.push({ k, list: list2 });
+    }
+    return {
+      fests: fests.map((x) => ({ name: x.f.name, when: x.k === x.from && x.k === x.to ? fmtD(x.k) : fmtD(x.k), until: x.from <= today2 && today2 <= x.to ? x.k < today2 ? "on now (decorations still up)" : x.k === today2 ? "today!" : `${until(x.k)}, decorations are up` : until(x.k) })),
+      days: days.map((d) => ({ when: d.k === today2 ? "Today" : d.k === addD(today2, 1) ? "Tomorrow" : fmtD(d.k), list: d.list }))
+    };
+  }
   function myWins() {
     const w = [], y = F.history && F.history[prevDay(dayKey())];
     if (S2.doneIds.length) w.push(`${S2.doneIds.length} quest${S2.doneIds.length > 1 ? "s" : ""} done today`);
@@ -16926,7 +17007,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
     else if (fieldView && scene === "field") {
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
-      h = !st6 ? "" : st6.kind === "wine" ? stallMarketPanel(F, serving()) : st6.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : marketStallPanel(st6);
+      h = !st6 ? "" : st6.kind === "wine" ? stallMarketPanel(F, serving()) : st6.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st6.kind === "scoop" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st6, dayKey(), sgHM()) }) : marketStallPanel(st6);
     } else if (orView === "pot" && potItem) h = potPanel(F, potItem);
     else if (orView === "tea" && scene === "cottage") h = teaPanel(F, dayKey(), isHere("mama"));
     else if (orView && (scene === "orchard" || scene === "flowers")) h = orView === "shop" ? shopPanel(F, dayKey(), orTab) : orView === "tours" ? tourBoard(F, dayKey(), sgHM()) : spotPanel(F, orAt.where, orAt.i, dayKey());
@@ -16938,7 +17019,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (lettersOpen && (scene === "room" || scene === "base")) h = lettersPanel(!!sampleCap);
     else if (postOpen && scene === "post") h = postPanel();
     else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
-    else if (newsOpen && scene === "village") h = goodNewsHTML(myWins());
+    else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar());
     else if (scene === "market" && !shopClosed) {
       const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["deli", "Deli"], ["care", "Care"], ["family", "Family"], ["animals", "Animals"], ["home", "Home"], ["me", "Me & my room"], ["sell", "Sell"]];
       h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
@@ -17070,7 +17151,7 @@ ${SIGNOFF[t2.who] || ""}`;
       drawScene();
       ctx();
     });
-    if (scView) wireScoop(c);
+    if (scView || fieldView === "mstall8" && scene === "field") wireScoop(c);
     c.querySelectorAll("[data-sup]").forEach((b) => b.onclick = () => {
       goalView = null;
       ctx();
@@ -18552,6 +18633,11 @@ ${SIGNOFF[t2.who] || ""}`;
       if (st6.kind === "wine") {
         vineTick();
         speak("Behind the stall. Shoppers stop by more while you serve.", 3500);
+      } else if (st6.kind === "scoop") {
+        scSt.pick = null;
+        scoopNow();
+        speak("Behind the cart. More people stop for a scoop while you're serving.", 3500);
+        if (isHere("tomo") && !keeperAway(st6, dayKey(), sgHM())) setTimeout(() => npcSay("tomo", pick(["Night market crowd loves the gelato. Look at that queue.", "Cones are flying. Grab a scoop, boss.", "The jazz makes people hungry. Good for us."])), 1200);
       } else if (st6.kind === "orchard") {
         orchardTick();
         if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma brought plenty.", "Everybody wants Ma Ma's fruit today.", "For you, free. For them, they pay!"]));
@@ -18798,12 +18884,16 @@ ${SIGNOFF[t2.who] || ""}`;
     save2(true);
   }
   var SHOP_SEATS2 = [[87, 518], [173, 518], [227, 518], [313, 518], [367, 512], [453, 512]];
+  var atCart = () => scene === "field" && atSpot === "mstall8" && (stallAt(dayKey(), sgHM(), 8) || {}).kind === "scoop";
   function scoopNow() {
     lastScoop = Date.now();
-    const s = scoopState(F), out = scoopTick(F, { serving: scene === "scoopshop" && atSpot === "gcounter" });
+    const s = scoopState(F), out = scoopTick(F, { serving: scene === "scoopshop" && atSpot === "gcounter", cart: atCart() });
     if (!out.coins && !out.mins) return;
     if (out.box && (scene === "bay" || out.mins >= 30)) setTimeout(() => speak(`The honesty freezer's been busy: ${s.box} coins waiting in its box.`, 4500), out.coins ? 6e3 : 1500);
-    if (out.coins && (scene === "scoopshop" || scene === "bay")) {
+    if (out.cart && scene === "field") {
+      sfx("coin");
+      flash(`+${out.cart} coins: the ${s.name} cart`);
+    } else if (out.coins && (scene === "scoopshop" || scene === "bay")) {
       sfx("coin");
       flash(`+${out.coins} coins: ${s.name}`);
     } else if (out.coins && out.mins >= 30) setTimeout(() => speak(`While you were away, ${s.name} sold ${out.n} ice cream${out.n > 1 ? "s" : ""}: ${out.coins} coins.`, 5e3), 1500);
@@ -18842,6 +18932,7 @@ ${SIGNOFF[t2.who] || ""}`;
     if (evanHere() && eatOne(F, rid) !== null) S2.evanHold = { k: "icecream", until: Date.now() + 4 * M };
     scView = null;
     scSt.pick = null;
+    if (fieldView === "mstall8") fieldView = null;
     ctx();
     sfx("chime");
     act("cheer");

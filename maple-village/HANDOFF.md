@@ -1031,3 +1031,9 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Base rate .03 a minute, ×1.6 while Mel stands at the cart (`atCart()` in core.js).
   - Takings go to Mel and are tracked as `t.cart` / `t.cartCoins`. The field flashes "+N coins: the … cart".
 - **Tapping the cart:** opens `counterPanel` in cart mode (`{cart: true, keeper}`), with free or take-away scoops. It's wired via `wireScoop` when `fieldView === "mstall8"`.
+
+### Round 82: the village calendar
+- **Where:** the good news board in the town square, between "Your wins" and "In the world". `goodNewsHTML(wins, cal)`; `villageCalendar()` in core.js builds the data.
+- **Festivals:** from the exported `FESTIVALS` (village-extras.js), any festival in the next 92 days, or one running now, with a countdown.
+- **The next 14 days, by day:** the field events (`eventOn`), the wine club if the cellar door is owned, and family dinners. The wine stall is only at the Sunday farmers market; the Scoop Shack cart is only at the night market.
+- The cart's panel now says it serves from tubs already made, with no batches at the market.

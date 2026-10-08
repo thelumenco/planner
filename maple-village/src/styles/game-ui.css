@@ -352,6 +352,7 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 .hlist.gnews span{display:grid;gap:2px}
 .hlist.gnews a{color:#2F3B73;font-weight:600;text-decoration:none}
 .hlist.gnews .src{font-style:italic}
+.hlist.gnews.vcal:not(.world) li::before{background:#9FD3C2}.hlist.gnews.vcal.fests:not(.world) li::before{background:#F2A0B8}.hlist.gnews.vcal small{color:var(--soft)}
 .hlist.gnews:not(.world) li::before{content:"";width:8px;height:8px;border-radius:50%;background:#F3C969;flex:none;box-shadow:0 0 0 1.5px rgba(60,40,30,.2)}
 /* tomorrow's quests, peeked from the quest list */
 .tmrh{margin:16px 0 4px}

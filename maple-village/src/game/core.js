@@ -3,7 +3,7 @@ import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur,
 import { icon, progressBar, progressBarV } from "../art/icons.js";
 import { VILLAGE, WORK, ROOMS, MAPLE_BED, OUTDOOR, BRIDGES, ARRIVE, INNER, nextHop, outdoorOf, isWeekend, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
 import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco, seasonOf, SEASONS } from "../data/items.js";
-import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn } from "../art/village-extras.js";
+import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, FESTIVALS } from "../art/village-extras.js";
 import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, orchardArt, flowerFarmArt, setArtContext } from "../art/scenes.js";
 import { vineSpot } from "../art/vineyard.js";
 import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, TAPAS, cookTick, cookLine } from "./kitchen.js";
@@ -48,7 +48,7 @@ import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpe
 import { diningTable, darrenAsleep, skyWash } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
-import { tourNow, eventNow, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers } from "./tours.js";
+import { tourNow, eventNow, eventOn, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
@@ -978,6 +978,27 @@ function renderChat(){
 }
 
 // Wins the page itself knows about, for the good news board (the morning routine adds more).
+// The village calendar, pinned on the good news board: festivals coming up (the next three months), and what's on
+// each day for the next two weeks (markets, the field fair, the night market, the wine club, family dinners)
+const CAL_DAYS = 14, FEST_DAYS = 92;
+function villageCalendar(){
+  const today = dayKey(), addD = (k, n) => new Date(Date.parse(k + "T00:00:00Z") + n*864e5).toISOString().slice(0, 10);
+  const fmtD = k => new Date(k + "T00:00:00Z").toLocaleDateString("en-GB", {weekday: "short", day: "numeric", month: "short", timeZone: "UTC"});
+  const hhmm = m => { const h = Math.floor(m/60), mm = m % 60; return `${h % 12 || 12}${mm ? ":" + String(mm).padStart(2, "0") : ""}${h < 12 ? "am" : "pm"}`; };
+  const until = k => { const n = Math.round((Date.parse(k + "T00:00:00Z") - Date.parse(today + "T00:00:00Z"))/864e5); return n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`; };
+  const fests = FESTIVALS.flatMap(f => f.dates.map(k => ({f, k, from: addD(k, -f.before), to: addD(k, f.after)}))).filter(x => x.to >= today && x.k <= addD(today, FEST_DAYS)).sort((a, b) => a.k.localeCompare(b.k));
+  const days = [];
+  for (let i = 0; i < CAL_DAYS; i++) {
+    const k = addD(today, i), ev = eventOn(k), dn = dinnerOn(k), list = [];
+    if (ev) list.push(`${ev.name}, ${hhmm(ev.from)} to ${hhmm(ev.to)} on the field${ev.kind === "market" ? " (our wine stall's there)" : ev.kind === "night" ? ` (with a jazz duo, and the cart from ${scoopState(F).name})` : ""}`);
+    if (owns(F, "cellar") && wineClubOn(k)) list.push(`Wine club at the cellar door, 6 to 9pm`);
+    if (dn) list.push(`Family dinner at ${HOST_NAME[dn.host]}, 6:30pm`);
+    fests.filter(x => x.k === k).forEach(x => list.push(`${x.f.name}!`));
+    if (list.length) days.push({k, list});
+  }
+  return {fests: fests.map(x => ({name: x.f.name, when: x.k === x.from && x.k === x.to ? fmtD(x.k) : fmtD(x.k), until: x.from <= today && today <= x.to ? (x.k < today ? "on now (decorations still up)" : x.k === today ? "today!" : `${until(x.k)}, decorations are up`) : until(x.k)})),
+    days: days.map(d => ({when: d.k === today ? "Today" : d.k === addD(today, 1) ? "Tomorrow" : fmtD(d.k), list: d.list}))};
+}
 function myWins(){
   const w = [], y = F.history && F.history[prevDay(dayKey())];
   if (S.doneIds.length) w.push(`${S.doneIds.length} quest${S.doneIds.length > 1 ? "s" : ""} done today`);
@@ -1462,7 +1483,7 @@ function ctx(){
   else if (lettersOpen && (scene === "room" || scene === "base")) h = lettersPanel(!!sampleCap);
   else if (postOpen && scene === "post") h = postPanel();
   else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
-  else if (newsOpen && scene === "village") h = goodNewsHTML(myWins());
+  else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar());
   else if (scene === "market" && !shopClosed) {
     const tabs = [["seeds","Seeds"],["treats","Treats"],["deli","Deli"],["care","Care"],["family","Family"],["animals","Animals"],["home","Home"],["me","Me & my room"],["sell","Sell"]];
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>

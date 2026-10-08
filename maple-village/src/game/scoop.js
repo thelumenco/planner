@@ -340,9 +340,9 @@ export function deliverPanel(F, st){
 }
 export function counterPanel(F, st){
   const s = scoopState(F), hm = sgHM(), t = s.sold[dayKey()] || {n: 0, coins: 0}, tubs = onDisplay(s);
-  let h = st.cart ? `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)} cart</h2><p class="sub">At the night market till 10pm, scooping from the shop's display.${st.keeper ? " Tomo's minding it." : " Tomo's off wandering: it's on an honesty tin."} ${t.cart ? `Sold tonight: ${t.cart} (${t.cartCoins} ${coin()}).` : "Nothing sold yet tonight."} Stay and scoop, and more people stop.</p>`
+  let h = st.cart ? `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)} cart</h2><p class="sub">At the night market till 10pm, scooping from tubs already made (no batches at the market, just serving).${st.keeper ? " Tomo's minding it." : " Tomo's off wandering: it's on an honesty tin."} ${t.cart ? `Sold tonight: ${t.cart} (${t.cartCoins} ${coin()}).` : "Nothing sold yet tonight."} Stay and scoop, and more people stop.</p>`
     : `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t.n ? `Sold today: ${t.n} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Sofia's behind the counter." : ""}</p>`;
-  if (st.cart && !tubs.length) return h + `<p class="muted">Nothing to scoop: the shop's display is empty. Tomo's batches fill it.</p>` + shut;
+  if (st.cart && !tubs.length) return h + `<p class="muted">Nothing to scoop: the shop's display is empty tonight.</p>` + shut;
   if (!tubs.length && scoopsLeft(s)) return h + `<p class="muted">Nothing in the display, but there are tubs in the freezer.</p><div class="actions"><button class="btn small primary" data-gview="freezer">Put some out</button></div>` + upBtn + shut;
   if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), and Tomo will keep the tubs topped up.</p>` + upBtn + shut;
   const pick = st.pick && s.tubs[st.pick] > 0 ? recipeOf(s, st.pick) : null;

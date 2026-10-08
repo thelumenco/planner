@@ -452,6 +452,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="news"]').dispatchEvent("click");
   await page.waitForFunction(() => /Good news/.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
   check(await page.locator("#ctx .hlist.gnews.world li").count() === 1 && await page.locator("#ctx").textContent().then(t => /Chord added 2 studios/.test(t)), "the good news board shows the world's good news and your wins");
+  { const t = await page.locator("#ctx").textContent();
+    check(/Village calendar/.test(t) && /Night market, 6pm to 10pm/.test(t) && /Sunday farmers market/.test(t) && /Deepavali/.test(t) && /Family dinner at/.test(t), "the good news board pins up the village calendar: markets, the night market, family dinners and festivals coming up"); }
   await page.screenshot({ path: join(shots, "good-news.png") });
   await page.click("#pclose");
   await page.locator('#world [data-place="toLane"]').dispatchEvent("click");

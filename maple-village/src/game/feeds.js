@@ -77,12 +77,15 @@ export const outfitDoc = () => { const d = D.outfit; return d && d.at ? d : null
 
 /* ---------- good news board (town square): "goodnews" doc from the morning routine + wins the page knows ---------- */
 export function goodNews(){ const d = D.goodnews; return d && d.at ? d : null; }
-export function goodNewsHTML(localWins){
+export function goodNewsHTML(localWins, cal){
   const d = goodNews(), clean = s => plain(String(s || "")).slice(0, 220);
   const world = ((d && d.world) || []).slice(0, 6).filter(x => x && x.title);
   const wins = [...(localWins || []), ...(((d && d.wins) || []).map(clean))].filter(Boolean).slice(0, 8);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Good news</h2><p class="sub">${d ? `Pinned up ${new Date(d.at).toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "short", timeZone: "Asia/Singapore"})}.` : "Fresh every morning."}</p>`;
   h += `<p class="eyebrow">Your wins</p>` + (wins.length ? `<ul class="hlist gnews">${wins.map(w => `<li><span>${esc(w)}</span></li>`).join("")}</ul>` : `<p class="muted">Your wins show up here as the day goes on.</p>`);
+  if (cal) { h += `<p class="eyebrow">Village calendar</p>`;
+    if (cal.fests.length) h += `<ul class="hlist gnews vcal fests">${cal.fests.map(f => `<li><span><b>${esc(f.name)}</b><small>${esc(f.when)} · ${esc(f.until)}</small></span></li>`).join("")}</ul>`;
+    h += cal.days.length ? `<ul class="hlist gnews vcal">${cal.days.map(d => `<li><span><b>${esc(d.when)}</b>${d.list.map(x => `<small>${esc(x)}</small>`).join("")}</span></li>`).join("")}</ul>` : `<p class="muted">A quiet fortnight in the village.</p>`; }
   h += `<p class="eyebrow">In the world</p>` + (world.length ? `<ul class="hlist gnews world">${world.map(x => `<li><span>${/^https:\/\//.test(x.link || "") ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(clean(x.title))}</a>` : esc(clean(x.title))}${x.summary ? `<small>${esc(clean(x.summary))}</small>` : ""}${x.source ? `<small class="src">${esc(clean(x.source))}</small>` : ""}</span></li>`).join("")}</ul>`
     : `<p class="muted">The morning's good news hasn't arrived yet.</p>`);
   return h;

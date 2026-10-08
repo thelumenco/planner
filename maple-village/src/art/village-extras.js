@@ -63,7 +63,7 @@ export function upgradesArt(n, where){
 }
 
 /* ---------- festivals + weather (Singapore). Lunar dates move: check the table each year. ---------- */
-const FESTIVALS = [
+export const FESTIVALS = [
   {id: "newyear",   name: "New Year",           dates: ["2026-12-31", "2027-12-31"], before: 1, after: 1},
   {id: "cny",       name: "Chinese New Year",   dates: ["2027-02-06", "2028-01-26"], before: 10, after: 14},
   {id: "national",  name: "National Day",       dates: ["2026-08-09", "2027-08-09"], before: 8, after: 1},
