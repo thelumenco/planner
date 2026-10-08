@@ -278,11 +278,11 @@ export const ROOMS = {
     ["gcounter","Gelato counter","C","gcounter",null,"The gelato counter. Yours are free.",46],
     ["gkdoor","Kitchen","Z","gkdoor",null,"Into the gelato kitchen.",0],
     ["gtables","Tables","T","cafetables",null,"Tables for eating in. Bring an ice cream.",34]]},
-  // The gelato kitchen behind it: the fridge (ingredients), the freezer (tubs), Tomo's batch board and the mixing bench
+  // The gelato kitchen behind it: the fridge (ingredients), the freezer (tubs), the recipe book and the mixing bench
   scoopkitchen: {name:"The gelato kitchen", wall:"#EEF2F4", trim:"#7FB8E8", noBoard:true, pos:{F:[110,262], Z:[262,262], B:[420,262], P:[262,470]}, stations:[
     ["gfridge","Fridge","F","gfridge",null,"The fridge: everything the gelato's made from.",30],
     ["gfreezer","Freezer","Z","gfreezer",null,"The freezer: tubs waiting for the display.",30],
-    ["gboard","Today's batches","B","gboard",null,"Tomo's board: what to make today.",74],
+    ["gboard","Recipe book","B","gboard",null,"The recipe book: make another tub of any flavour you know.",74],
     ["gbench","Mixing bench","P","gbench",null,"The mixing bench: discover new flavours.",30]]},
   // the chocolate dip station off the shop (an upgrade): the chocolate pots, the toppings shelf, and the dip bar
   scoopdip: {name:"The dip station", wall:"#F6E6DA", trim:"#8A5A3A", noBoard:true, pos:{P:[340,262], S:[130,262], B:[300,480]}, stations:[

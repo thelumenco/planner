@@ -2477,11 +2477,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["gkdoor", "Kitchen", "Z", "gkdoor", null, "Into the gelato kitchen.", 0],
       ["gtables", "Tables", "T", "cafetables", null, "Tables for eating in. Bring an ice cream.", 34]
     ] },
-    // The gelato kitchen behind it: the fridge (ingredients), the freezer (tubs), Tomo's batch board and the mixing bench
+    // The gelato kitchen behind it: the fridge (ingredients), the freezer (tubs), the recipe book and the mixing bench
     scoopkitchen: { name: "The gelato kitchen", wall: "#EEF2F4", trim: "#7FB8E8", noBoard: true, pos: { F: [110, 262], Z: [262, 262], B: [420, 262], P: [262, 470] }, stations: [
       ["gfridge", "Fridge", "F", "gfridge", null, "The fridge: everything the gelato's made from.", 30],
       ["gfreezer", "Freezer", "Z", "gfreezer", null, "The freezer: tubs waiting for the display.", 30],
-      ["gboard", "Today's batches", "B", "gboard", null, "Tomo's board: what to make today.", 74],
+      ["gboard", "Recipe book", "B", "gboard", null, "The recipe book: make another tub of any flavour you know.", 74],
       ["gbench", "Mixing bench", "P", "gbench", null, "The mixing bench: discover new flavours.", 30]
     ] },
     // the chocolate dip station off the shop (an upgrade): the chocolate pots, the toppings shelf, and the dip bar
@@ -4594,8 +4594,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       actLines: { cook: ["Stirring, tasting, stirring.", "Bread's in. Don't open the door!", "The cheese is coming along nicely.", "If the larder's empty, I just tidy. Hint, hint."] },
       away: "Pilar's gone home. The kitchen's all yours."
     },
-    // The Scoop Shack's staff: Sofia on the counter every day it's open (lunch on the deck), Tomo in the gelato
-    // kitchen Monday to Saturday making the day's batches (scoop.js makes the tubs on his shifts)
+    // The Scoop Shack's staff: Sofia on the counter every day it's open (lunch on the deck), Tomo serving out on the
+    // shop floor and the deck every day 10 to 6 (and doing the deliveries once there's a bike; scoop.js waiterOn)
     {
       id: "sofia",
       pitch: 1.2,
@@ -4604,7 +4604,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       intro: "Ciao, I'm Sofia! I scoop, I chat, I tell everyone the new flavour is the best one. Because it is.",
       look: { skin: "#E8C4A0", hair: "#3A2A22", hairStyle: "bun", top: "#F4C7CF", bottom: "#3F4A6B", extra: "apron" },
       routine: [slot("9:45", "14:00", "scoopshop", [300, 268]), slot("14:00", "14:30", "bay", [196, 360], { act: "sit" }), slot("14:30", "20:15", "scoopshop", [300, 268])],
-      lines: ["Cup or cone? Trick question: both.", "The deck's lovely this time of day.", "Someone ordered four scoops before lunch. Respect.", "Tomo's been in the kitchen since eight. Bless him."],
+      lines: ["Cup or cone? Trick question: both.", "The deck's lovely this time of day.", "Someone ordered four scoops before lunch. Respect.", "Tomo's run off his feet on the deck. Bless him."],
       hellos: ["Hi Mel! What'll it be?", "Ciao, boss!", "The new flavour's flying out!"],
       away: "Sofia's finished for the day. The counter's closed."
     },
@@ -4612,21 +4612,19 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       id: "tomo",
       pitch: 0.8,
       name: "Tomo",
-      job: "Makes the gelato at the Scoop Shack",
-      intro: "Tomo. I make the gelato. You bring me fruit and flowers and milk, I bring you tubs. Simple. Delicious.",
+      job: "Serves on the deck and in the Scoop Shack (and does the deliveries)",
+      intro: "Tomo. I carry the cones to the tables, I wipe the tables, I chat. Give me a bike and I'll deliver too.",
       look: { skin: "#D9A882", hair: "#1F1A17", hairStyle: "short", top: "#FFFDF6", bottom: "#5E5A55", extra: "apron" },
       routine: [
-        slot("8:00", "12:00", "scoopkitchen", [[262, 428], [180, 300], [330, 428]], { act: "cook", days: "wd" }),
-        slot("12:00", "12:45", "bay", [222, 352], { act: "sit", days: "wd" }),
-        slot("12:45", "16:00", "scoopkitchen", [[262, 428], [180, 300], [330, 428]], { act: "cook", days: "wd" }),
-        slot("8:00", "12:00", "scoopkitchen", [[262, 428], [180, 300], [330, 428]], { act: "cook", dow: [6] }),
-        slot("12:00", "12:45", "bay", [222, 352], { act: "sit", dow: [6] }),
-        slot("12:45", "16:00", "scoopkitchen", [[262, 428], [180, 300], [330, 428]], { act: "cook", dow: [6] }),
-        slot("15:00", "16:30", "shore", [[260, 200], [250, 420], [200, 300]], { dow: [0] })
+        slot("10:00", "11:30", "scoopshop", [[200, 440], [380, 450], [140, 560], [300, 560]], { act: "cone" }),
+        slot("11:30", "13:00", "bay", [[150, 440], [230, 440], [200, 312], [262, 380]], { act: "cone" }),
+        slot("13:00", "13:45", "bay", [222, 352], { act: "sit" }),
+        slot("13:45", "15:30", "scoopshop", [[200, 440], [380, 450], [140, 560], [300, 560]], { act: "cone" }),
+        slot("15:30", "18:00", "bay", [[150, 440], [230, 440], [200, 312], [262, 380]], { act: "cone" })
       ],
-      lines: ["Gelato is patience. And sugar.", "Every flavour is a good flavour. Mostly.", "More milk, please. Always more milk.", "I dream in pistachio."],
-      actLines: { cook: ["Churning, churning.", "Smell that? Mango.", "This tub's for the display.", "If the fridge is empty, I just polish the bench."] },
-      away: "Tomo's off. The kitchen's quiet."
+      lines: ["Table four wants another round. Table four always wants another round.", "Best view in the village, this deck.", "Napkins! Who needs napkins?", "I dream in pistachio."],
+      actLines: { cone: ["Two cones for the deck, coming through!", "Mind the drips!", "Anyone for a waffle?", "Enjoy! Don't let the gulls see."] },
+      away: "Tomo's off for the day."
     },
     // Mel's family on the foreshore (west of the field): Mum and Dad in one house, her brother Marcus and his fiancee
     // Angellina in the other. All four help Ma Ma and Gong Gong in the orchard now and then, and walk about town.
@@ -4979,7 +4977,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     { id: "lior", at: 5, short: "Lanterns", n: "Lanterns and lamps", items: [], decor: ["n_lanterns", "r_moon"], col: "#F3C969", line: "Paper lanterns for the house, and a moon lamp for your room." },
     { id: "wen", at: 6, short: "Sweets", n: "Sweets", items: ["tanghulu", "eggwaffle"], col: "#C9A3E0", line: "Tanghulu, strawberries in crackly sugar. And egg waffles, still warm." },
     { id: "kai", at: 7, short: "Drinks", n: "Night drinks", items: ["sugarcane", "grassjelly"], col: "#9CC27E", line: "Fresh sugarcane, pressed while you wait. Grass jelly for the old-school ones." },
-    // Mel's own: the Scoop Shack's cart, scooping from the shop's display (scoop.js cartOn). Tomo minds it after his shift
+    // Mel's own: the Scoop Shack's cart, scooping from the shop's display (scoop.js cartOn). Tomo minds it after his day on the deck
     { id: "tomo", at: 8, kind: "scoop", short: "Scoop Shack", n: "The Scoop Shack cart", items: [], col: "#F2A0B8", line: "Gelato from the Scoop Shack! Cup or cone?" }
   ];
   var NIGHT_TOURISTS = ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy", "rafe"];
@@ -13472,8 +13470,6 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var OPEN = 10 * 60;
   var CLOSE = 20 * 60;
   var TUB = 20;
-  var BATCH_MIN = 45;
-  var MAX_BATCHES = 4;
   var FORMATS = { cup: { n: "Cup", p: 4 }, cone: { n: "Cone", p: 4 }, float: { n: "Float", p: 6 }, waffle: { n: "Waffle", p: 7 } };
   var FMT_W = [["cup", 0.34], ["cone", 0.4], ["float", 0.1], ["waffle", 0.16]];
   var FRUIT_COL = { cherry: "#C2334D", lemon: "#F3E27A", peach: "#F5B08A", mango: "#F3B33A", apple: "#B9D98A", pear: "#D9E39A", fig: "#8C5A7A", orange: "#F39A3A", persimmon: "#E8823A" };
@@ -13542,15 +13538,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var scoopsLeft = (s) => Object.values(s.tubs).reduce((a, b) => a + b, 0);
   var openNow = (hm2) => hm2 >= OPEN && hm2 < CLOSE;
-  var cookOn = (day, hm2) => {
-    const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
-    return d !== 0 && hm2 >= 8 * 60 && hm2 < 16 * 60 && !(hm2 >= 12 * 60 && hm2 < 12 * 60 + 45);
-  };
+  var waiterOn = (hm2) => hm2 >= OPEN && hm2 < 18 * 60 && !(hm2 >= 13 * 60 && hm2 < 13 * 60 + 45);
   var UPGRADES2 = {
     honesty: { n: "Honesty freezer", price: 400, line: "A little freezer out front with pre-scooped cups and a wooden coin box. It sells while the shop's shut (7 to 10am, 8 to 10pm), and the coins wait in the box for you." },
     awning: { n: "Striped awning and fairy lights", price: 250, line: "A pink striped awning over the deck, strung with fairy lights that glow in the evenings. Customers linger, and leave tips." },
     neon: { n: "Neon cone sign", price: 350, line: "A pink neon cone by the door. It glows from 5pm, so more people find you in the evenings." },
-    bike: { n: "Delivery bike", price: 800, line: "A mint delivery bike with a cool box. Sofia pedals ice creams round to the family from anywhere (send one from your backpack), and a cone from the shop can be sent round without melting." },
+    bike: { n: "Delivery bike", price: 800, line: "A mint delivery bike with a cool box. Tomo pedals ice creams round to the family from anywhere (send one from your backpack), and a cone from the shop can be sent round without melting." },
     dip: { n: "Chocolate dip station", price: 500, line: "A little room off the shop: warm pots of chocolate and a shelf of toppings. Cones and waffles can be dipped and topped (customers pay a bit extra), and you can make your own. Comes with milk chocolate and rainbow sprinkles; more dips and toppings to buy." }
   };
   var DIPS = {
@@ -13663,7 +13656,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     ings = [...new Set(ings)].filter(isIngr).slice(0, 4);
     if (!ings.length) return { msg: "Pick something from the fridge to mix." };
     const known = knownRecipe(s, ings);
-    if (known) return { known, msg: `You already know this one: ${known.name}. Add it to today's batches on the board.` };
+    if (known) return { known, msg: `You already know this one: ${known.name}. Make another tub of it instead.` };
     if (!hasAll(s, ings)) return { msg: "The fridge is missing some of that." };
     useAll(s, ings);
     const r = { id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: ings.includes("milk"), special: false, found: Date.now() };
@@ -13694,24 +13687,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var farmShelf = (orch) => Object.keys(orch.stock || {}).filter((k) => orch.stock[k] > 0).map((k) => k.startsWith("stem:") ? "fl_" + k.slice(5) : k).filter(isIngr);
   var canMake = (s, r) => r && hasAll(s, r.ings);
-  function todaysQueue(s) {
-    if (s.plan.ids.length) return s.plan.ids.map((id) => recipeOf(s, id)).filter(Boolean);
-    return [...s.recipes].filter((r) => (s.tubs[r.id] || 0) < TUB).sort((a, b) => (s.tubs[a.id] || 0) - (s.tubs[b.id] || 0)).slice(0, 3);
-  }
-  function kitchenMinute(s, day, hm2, at) {
-    if (s.batch && at >= s.batch.done) {
-      s.tubs[s.batch.id] = (s.tubs[s.batch.id] || 0) + TUB;
-      s.made[day] = (s.made[day] || 0) + 1;
-      s.log = [`${(recipeOf(s, s.batch.id) || {}).name || "A flavour"}: a fresh tub`, ...s.log].slice(0, 6);
-      s.batch = null;
-    }
-    if (s.batch || !cookOn(day, hm2) || (s.made[day] || 0) >= MAX_BATCHES) return;
-    const done = s.doneToday && s.doneToday.day === day ? s.doneToday.ids : [];
-    const next = todaysQueue(s).find((r) => !done.includes(r.id) && canMake(s, r));
-    if (!next) return;
-    useAll(s, next.ings);
-    s.batch = { id: next.id, done: at + BATCH_MIN * 6e4 };
-    s.doneToday = { day, ids: [...done, next.id] };
+  function makeTub(F2, rid) {
+    const s = scoopState(F2), r = recipeOf(s, rid);
+    if (!canMake(s, r)) return null;
+    useAll(s, r.ings);
+    s.tubs[r.id] = (s.tubs[r.id] || 0) + TUB;
+    const day = dayKey();
+    s.made[day] = (s.made[day] || 0) + 1;
+    s.log = [`${r.name}: a fresh tub`, ...s.log].slice(0, 6);
+    if (Array.isArray(s.display) && !s.display.includes(r.id) && s.display.length < SLOTS2) s.display = [...s.display, r.id];
+    return r;
   }
   var priceOf = (s, fmt3, r) => s.prices[fmt3] + (r && r.special ? s.prices.special : 0);
   var DEFAULT = 4 + 4 + 6 + 7;
@@ -13739,7 +13724,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       return { coins: coins2, box: true, fmt: "cup", r: r2 };
     }
     const price = s.prices.cup + s.prices.cone + s.prices.float + s.prices.waffle, pf = Math.pow(DEFAULT / Math.max(4, price), 1.3);
-    const p = 0.035 * (we ? 1.5 : 1) * (night ? 1.4 : 1) * (hm2 >= 14 * 60 && hm2 < 17 * 60 ? 1.25 : 1) * pf * (opts.serving ? 1.5 : 1) * glow;
+    const p = 0.035 * (we ? 1.5 : 1) * (night ? 1.4 : 1) * (hm2 >= 14 * 60 && hm2 < 17 * 60 ? 1.25 : 1) * pf * (opts.serving ? 1.5 : 1) * glow * (waiterOn(hm2) ? 1.2 : 1);
     if (Math.random() >= p) return null;
     let x = Math.random(), fmt3 = "cone";
     for (const [f2, w] of FMT_W) {
@@ -13769,10 +13754,13 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function scoopTick(F2, opts = {}) {
     const s = scoopState(F2), now2 = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now2, now2 - 2 * 864e5);
+    if (s.batch) {
+      s.tubs[s.batch.id] = (s.tubs[s.batch.id] || 0) + TUB;
+      s.batch = null;
+    }
     const out = { coins: 0, n: 0, mins: 0, box: 0 };
     for (let at = from + 6e4; at <= now2; at += 6e4) {
       const sg = new Date(at + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm2 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
-      kitchenMinute(s, day, hm2, at);
       const sale = saleMinute(s, day, hm2, opts);
       if (sale && sale.box) out.box += sale.coins;
       else if (sale) {
@@ -13902,7 +13890,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function dipBarPanel(F2, st6) {
     const s = scoopState(F2), tubs = tubList(s);
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The dip bar</h2><p class="sub">Pick a flavour, dip it, top it. Yours are free.</p>`;
-    if (!tubs.length) return h + `<p class="muted">No tubs in the display. Tomo's batches fill it.</p>` + shut;
+    if (!tubs.length) return h + `<p class="muted">No tubs in the display. Make some from the recipe book in the kitchen.</p>` + shut;
     const r = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
     if (!r) return h + `<ul class="hlist wlist">${tubs.map((x) => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops</small></span><button class="btn small primary" data-gdpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut;
     const dip = s.dips[st6.dip] ? st6.dip : "milk", top = st6.top && s.tops[st6.top] ? st6.top : null, fmt3 = st6.fmt === "waffle" ? "waffle" : "cone";
@@ -13916,9 +13904,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function deliverPanel(F2, st6) {
     const s = scoopState(F2), tubs = tubList(s), hm2 = sgHM();
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Scoop Shack delivery</h2><p class="sub">Sofia pedals it round in the cool box, and a thank-you note comes back to your mailbox.</p>`;
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Scoop Shack delivery</h2><p class="sub">Tomo pedals it round in the cool box, and a thank-you note comes back to your mailbox.</p>`;
     if (!hasUp(s, "bike")) return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(UPGRADES2.bike.n)}</h2><p class="sub">${esc(UPGRADES2.bike.line)}</p><div class="actions">${buyBtn(F2, UPGRADES2.bike.price, 'data-gbuy="bike"')}</div>` + shut;
-    if (!openNow(hm2)) return h + `<p class="muted">The shop's shut. Deliveries go out 10am to 8pm.</p>` + shut;
+    if (!waiterOn(hm2)) return h + `<p class="muted">${hm2 >= 13 * 60 && hm2 < 13 * 60 + 45 ? "Tomo's on his lunch break till 1:45." : "Tomo's not on. Deliveries go out 10am to 6pm."}</p>` + shut;
     if (!tubs.length) return h + `<p class="muted">Nothing in the display to send.</p>` + shut;
     const r = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
     if (!r) return h + `<ul class="hlist wlist">${tubs.map((x) => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops${x.dairy ? "" : " · dairy-free"}</small></span><button class="btn small primary" data-gvpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut;
@@ -13932,7 +13920,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     let h = st6.cart ? `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)} cart</h2><p class="sub">At the night market till 10pm, scooping from tubs already made (no batches at the market, just serving).${st6.keeper ? " Tomo's minding it." : " Tomo's off wandering: it's on an honesty tin."} ${t2.cart ? `Sold tonight: ${t2.cart} (${t2.cartCoins} ${coin()}).` : "Nothing sold yet tonight."} Stay and scoop, and more people stop.</p>` : `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm2) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t2.n ? `Sold today: ${t2.n} (${t2.coins} ${coin()}).` : "Nothing sold yet today."}${st6.server ? " Sofia's behind the counter." : ""}</p>`;
     if (st6.cart && !tubs.length) return h + `<p class="muted">Nothing to scoop: the shop's display is empty tonight.</p>` + shut;
     if (!tubs.length && scoopsLeft(s)) return h + `<p class="muted">Nothing in the display, but there are tubs in the freezer.</p><div class="actions"><button class="btn small primary" data-gview="freezer">Put some out</button></div>` + upBtn + shut;
-    if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), and Tomo will keep the tubs topped up.</p>` + upBtn + shut;
+    if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), then make more tubs from the recipe book there.</p>` + upBtn + shut;
     const pick3 = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
     if (pick3) return h + `<div class="gpick"><p class="olabel">${dot(pick3.col)} ${esc(pick3.name)}${pick3.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick3.ings.map((i) => INGR[i][0]).join(", "))} · ${s.tubs[pick3.id]} scoops left</p>
     <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick3.id)}">Have one now${st6.evan ? ", and one for Evan" : ""}</button></div>
@@ -13955,7 +13943,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function fridgePanel2(F2, orch) {
     const s = scoopState(F2), inF = Object.keys(s.fridge).filter((id) => s.fridge[id] > 0), bag2 = backpackIngr(F2), shelf2 = farmShelf(orch);
     const cell = (id, n, extra2) => `<li><span class="wpic">${ingPic(id)}</span><span class="wtxt"><b>${esc(INGR[id][0])}</b><small>${n}</small></span>${extra2 || ""}</li>`;
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The fridge</h2><p class="sub">What Tomo makes the gelato from. Each batch uses one of each of a flavour's ingredients.</p>`;
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The fridge</h2><p class="sub">What your gelato's made from. Each tub uses one of each of a flavour's ingredients.</p>`;
     h += inF.length ? `<ul class="hlist wlist">${inF.map((id) => cell(id, `${s.fridge[id]} in the fridge`)).join("")}</ul>` : `<p class="muted">Empty. Add fruit, berries, flowers, milk, honey...</p>`;
     if (bag2.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From your backpack</p><ul class="hlist wlist">${bag2.map((id) => cell(id, `${F2.inv[id]} with you`, `<span class="orbtns"><button class="btn small primary" data-gfill="bag:${id}:1">Add 1</button><button class="btn small alt" data-gfill="bag:${id}:99">All</button></span>`)).join("")}</ul>`;
     if (shelf2.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From Ma Ma's farm shop</p><ul class="hlist wlist">${shelf2.map((id) => {
@@ -13977,16 +13965,15 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (made && !sel.length) h += resultCard(made.col, made.name, `New flavour! ${made.dairy ? "A gelato" : "A dairy-free sorbet"}, and the first tub's in the display.`, true);
     else if (sel.length) {
       const ss = [...sel].sort();
-      h += known ? resultCard(known.col, known.name, "You know this one already. Add it to today's batches on the board.") : resultCard(blend(ss), nameFor(ss), `${ss.includes("milk") ? "A gelato" : "A dairy-free sorbet"}. Something new!`);
+      h += known ? resultCard(known.col, known.name, canMake(s, known) ? "You know this one already. Make another tub?" : "You know this one already.") : resultCard(blend(ss), nameFor(ss), `${ss.includes("milk") ? "A gelato" : "A dairy-free sorbet"}. Something new!`);
     } else h += `<p class="muted">Nothing picked yet.</p>`;
-    return h + `<div class="actions"><button class="btn primary" data-gmix="1" ${!sel.length || known ? "disabled" : ""}>Mix it</button><button class="btn alt small" data-close="1">Close</button></div>`;
+    return h + `<div class="actions">${known ? `<button class="btn primary" data-gmake="${esc(known.id)}" ${canMake(s, known) ? "" : "disabled"}>Make another tub</button>` : `<button class="btn primary" data-gmix="1" ${!sel.length ? "disabled" : ""}>Mix it</button>`}<button class="btn alt small" data-close="1">Close</button></div>`;
   }
-  function batchPanel(F2, st6) {
-    const s = scoopState(F2), day = dayKey(), hm2 = sgHM(), q = todaysQueue(s), b = s.batch && recipeOf(s, s.batch.id);
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Today's batches</h2><p class="sub">${b ? `Tomo's making ${esc(b.name)} now. ` : cookOn(day, hm2) ? "Tomo's in the kitchen. " : "Tomo's not in right now (he works 8am to 4pm, Monday to Saturday). "}Up to ${MAX_BATCHES} tubs a day; ${s.made[day] || 0} made so far.</p>`;
+  function recipePanel(F2) {
+    const s = scoopState(F2), day = dayKey();
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The recipe book</h2><p class="sub">Every flavour you've discovered. A tub is 20 scoops and uses one of each ingredient from the fridge. ${s.made[day] ? `${s.made[day]} made today.` : ""}</p>`;
     if (!s.recipes.length) return h + `<p class="muted">No flavours yet. Discover one at the mixing bench.</p>` + shut;
-    h += `<ul class="hlist">${s.recipes.map((r) => `<li><label><input type="checkbox" data-gplan="${esc(r.id)}" ${s.plan.ids.includes(r.id) ? "checked" : ""}><span>${dot(r.col)} ${esc(r.name)} <small>${s.tubs[r.id] || 0} scoops left · ${canMake(s, r) ? "fridge has it" : "missing: " + esc(r.ings.filter((i) => !(s.fridge[i] > 0)).map((i) => INGR[i][0]).join(", "))}</small></span></label></li>`).join("")}</ul>`;
-    h += `<p class="muted">${s.plan.ids.length ? "Tomo will make the ticked ones, in order, while the fridge has what they need." : "Nothing ticked: Tomo tops up whichever flavours are running lowest (" + (q.map((r) => esc(r.name)).join(", ") || "all full") + ")."}</p>`;
+    h += `<ul class="hlist wlist">${[...s.recipes].sort((a, b) => (s.tubs[a.id] || 0) - (s.tubs[b.id] || 0)).map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? `${s.tubs[r.id]} scoops left` : "none left"} · ${canMake(s, r) ? esc(r.ings.map((i) => INGR[i][0]).join(", ")) : "missing: " + esc(r.ings.filter((i) => !(s.fridge[i] > 0)).map((i) => INGR[i][0]).join(", "))}</small></span><button class="btn small ${canMake(s, r) ? "primary" : "alt"}" data-gmake="${esc(r.id)}" ${canMake(s, r) ? "" : "disabled"}>Make a tub</button></li>`).join("")}</ul>`;
     if (s.log.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Lately</p><ul class="hlist">${s.log.map((l) => `<li><small>${esc(l)}</small></li>`).join("")}</ul>`;
     return h + shut;
   }
@@ -17003,7 +16990,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (deskOpen && scene === "office") h = deskPanel();
     else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
     else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
-    else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h = scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverPanel(F, { pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo() }) : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, { pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt }) : scView === "counter" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), server: isHere("sofia") }) : scView === "menu" ? menuPanel2(F) : scView === "fridge" ? fridgePanel2(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? batchPanel(F) : freezerPanel(F, { swap: scSt.swap });
+    else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h = scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverPanel(F, { pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo() }) : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, { pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt }) : scView === "counter" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), server: isHere("sofia") }) : scView === "menu" ? menuPanel2(F) : scView === "fridge" ? fridgePanel2(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, { swap: scSt.swap });
     else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
     else if (fieldView && scene === "field") {
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
@@ -18429,7 +18416,6 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     if (id === "gkdoor") {
       setScene("scoopkitchen", INNER.scoopkitchen.arrive);
-      if (isHere("tomo")) setTimeout(() => npcSay("tomo", pick(["Ciao! Fridge is over there. Bring me something good.", "Want to invent a flavour? The bench is all yours.", "Tubs are frozen and ready."])), 900);
       return;
     }
     if (scene === "scoopshop" && id === "gtables") {
@@ -18957,7 +18943,7 @@ ${SIGNOFF[t2.who] || ""}`;
     F.thanks = [...F.thanks || [], { id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10 * M }].slice(-30);
     sfx("chime");
     flash(`On its way to ${GIFT_NAME[w]}`);
-    speak(`Sofia's pedalling a ${it.n.toLowerCase()} over to ${GIFT_NAME[w]} in the cool box. Watch your mailbox for a thank-you note.`, 5e3);
+    speak(`Tomo's pedalling a ${it.n.toLowerCase()} over to ${GIFT_NAME[w]} in the cool box. Watch your mailbox for a thank-you note.`, 5e3);
     scSt.vpick = null;
     scView = null;
     save2();
@@ -19033,7 +19019,7 @@ ${SIGNOFF[t2.who] || ""}`;
         act("cheer");
         [0, 250, 500].forEach((t2, k) => setTimeout(() => mprop("sparkle", mel.x + (k - 1) * 22, mel.y - 60, 1600), t2));
         gainXp(2);
-        if (isHere("tomo")) setTimeout(() => npcSay("tomo", pick(["Bellissimo! I'll put that on the board.", "Never had that before. Never! Wonderful.", "Okay, that's going on the menu."])), 1400);
+        if (isHere("tomo")) setTimeout(() => npcSay("tomo", pick(["Bellissimo! Can I taste?", "Never had that before. Never! Wonderful.", "I'll tell the deck about it."])), 1400);
       }
       re();
     });
@@ -19163,6 +19149,17 @@ ${SIGNOFF[t2.who] || ""}`;
     c.querySelectorAll("[data-gswapcancel]").forEach((b) => b.onclick = () => {
       scSt.swap = null;
       ctx();
+    });
+    c.querySelectorAll("[data-gmake]").forEach((b) => b.onclick = () => {
+      const r = makeTub(F, b.dataset.gmake);
+      if (!r) return;
+      scSt.sel = [];
+      sfx("chime");
+      act("cheer");
+      mprop("sparkle", mel.x, mel.y - 60, 1600);
+      flash(`A fresh tub of ${r.name}`);
+      speak(`Churned, tubbed, frozen. Twenty scoops of ${r.name}${displayIds(s).includes(r.id) ? " in the display" : " in the freezer"}.`, 4e3);
+      re();
     });
     c.querySelectorAll("[data-gplan]").forEach((b) => b.onchange = () => {
       const id = b.dataset.gplan;

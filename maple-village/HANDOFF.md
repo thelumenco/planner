@@ -1037,3 +1037,13 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Festivals:** from the exported `FESTIVALS` (village-extras.js), any festival in the next 92 days, or one running now, with a countdown.
 - **The next 14 days, by day:** the field events (`eventOn`), the wine club if the cellar door is owned, and family dinners. The wine stall is only at the Sunday farmers market; the Scoop Shack cart is only at the night market.
 - The cart's panel now says it serves from tubs already made, with no batches at the market.
+
+### Round 83: Tomo serves, Mel makes the tubs
+- **Tomo's new role:** he no longer cooks. He serves on the shop floor and the deck every day, 10–6 with lunch 1–1:45 (npcs.js routine, act "cone"; scoop.js `waiterOn`).
+  - Shop sales are ×1.2 while he's on.
+  - He does the delivery-bike runs; deliveries now go out 10am–6pm, outside his lunch.
+  - He still minds the night market cart.
+- **Making tubs:** `kitchenMinute` / `todaysQueue` / `cookOn` are gone. Mel makes tubs herself with `makeTub(F, id)`: one of each ingredient from the fridge, +20 scoops, into a free display slot if the display is arranged.
+  - From the recipe book (station `gboard`, now "Recipe book", `recipePanel`, `data-gmake`).
+  - Or at the mixing bench: picking a known combination shows "Make another tub".
+  - A batch left over from an old save is finished straight away.

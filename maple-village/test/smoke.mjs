@@ -1722,11 +1722,20 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-gsel="strawberry"]'); await page.waitForTimeout(200); await page.click("#ctx [data-gmix]"); await page.waitForTimeout(500);
   check(await fox().then(f => f.scoop.recipes.length === 2 && f.scoop.recipes[1].dairy === false), "and strawberry on its own is a dairy-free sorbet");
   await page.click("#ctx [data-close]").catch(() => {});
+  await page.locator('#world [data-spot="gboard"]').dispatchEvent("click"); await page.waitForSelector(`#ctx [data-gmake="${r1.id}"]`, { timeout: 15000 });
+  await page.click(`#ctx [data-gmake="${r1.id}"]`); await page.waitForTimeout(300);
+  check(await fox().then(f => f.scoop.tubs[r1.id] === 40 && f.scoop.fridge.mango === 2), "Mel makes another tub herself from the recipe book (one of each ingredient)");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.locator('#world [data-spot="gbench"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gsel="mango"]', { timeout: 15000 });
+  await page.click('#ctx [data-gsel="mango"]'); await page.click('#ctx [data-gsel="milk"]'); await page.waitForTimeout(200);
+  await page.click(`#ctx [data-gmake="${r1.id}"]`); await page.waitForTimeout(300);
+  check(await fox().then(f => f.scoop.tubs[r1.id] === 60), "or at the mixing bench, picking a flavour she already knows");
+  await page.click("#ctx [data-close]").catch(() => {});
   await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="gcounter"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gpick]", { timeout: 15000 });
   await page.locator("#ctx [data-gpick]").first().click(); await page.waitForTimeout(200);
   await page.click("#ctx [data-geat]"); await page.waitForTimeout(500);
-  check(await page.locator("#melCone").isVisible() && await fox().then(f => f.scoop.tubs[r1.id] < 20), "a free one at the counter: Mel's holding a cone");
+  check(await page.locator("#melCone").isVisible() && await fox().then(f => f.scoop.tubs[r1.id] < 60), "a free one at the counter: Mel's holding a cone");
   await page.locator('#world [data-spot="gcounter"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gpick]", { timeout: 15000 });
   await page.locator("#ctx [data-gpick]").first().click(); await page.waitForTimeout(200);
   await page.click('#ctx [data-gtake="cone"]'); await page.waitForTimeout(400);
@@ -1757,7 +1766,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=15:00&date=2026-10-12&scooppatch=rewind"); await page.waitForTimeout(2500);
   check(await fox().then(f => Object.values(f.scoop.sold).reduce((a, d) => a + d.n, 0) > 0), "customers buy while it's open (the takings come to Mel)");
-  check(await fox().then(f => Object.values(f.scoop.made).reduce((a, b) => a + b, 0) > 0), "and Tomo makes fresh tubs on his shifts from what's in the fridge");
+  check(await fox().then(f => Object.values(f.scoop.made || {}).reduce((a, b) => a + b, 0) === 2), "nobody makes tubs behind Mel's back: only the two she made (Tomo serves now)");
   await page.close();
 }
 {
@@ -1804,7 +1813,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator("#ctx [data-gvpick]").first().click(); await page.waitForTimeout(200);
   check(await page.locator('#ctx [data-gvto="marcus"]').count() === 0 && await page.locator('#ctx [data-gvto="mum"]').count() === 1, "the delivery bike sends from anywhere (a gelato isn't offered to Marcus)");
   await page.click('#ctx [data-gvto="mum"]'); await page.waitForTimeout(400);
-  check(await fox().then(f => (f.thanks || []).some(t => t.who === "mum" && /^gel_/.test(t.item))), "Sofia pedals it to Mum, and a thank-you note is on its way");
+  check(await fox().then(f => (f.thanks || []).some(t => t.who === "mum" && /^gel_/.test(t.item))), "Tomo pedals it to Mum, and a thank-you note is on its way");
   await page.goto(url + "?seed=1&time=21:00&date=2026-10-13&uppatch=rewind"); await page.waitForTimeout(2500);
   const box = await fox().then(f => f.scoop.box);
   check(await fox().then(f => (f.scoop.sold["2026-10-13"] || {}).cart > 0), "the cart sells at Tuesday's night market (the takings come to Mel)");
