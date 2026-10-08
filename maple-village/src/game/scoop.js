@@ -52,12 +52,13 @@ export const INGR = {
   gulamelaka: ["Gula melaka", "Gula Melaka", "#9A5A2E"], sesame: ["Black sesame", "Black Sesame", "#4A4440"], mint: ["Mint", "Mint", "#9FD3B2"], banana: ["Bananas", "Banana", "#F3E07A"],
   grape_red: ["Red grapes", "Red Grape", "#7A2E5A"], grape_white: ["White grapes", "White Grape", "#C9D98A"],
   housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
-  goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],   // from Honeybrook Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)
+  goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
+  yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Honeybrook Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)
   ...Object.fromEntries(Object.values(TREES).map(t => [t.fruit, [t.fruit[0].toUpperCase() + t.fruit.slice(1), t.fruit[0].toUpperCase() + t.fruit.slice(1), FRUIT_COL[t.fruit] || "#F3C969"]])),
   ...Object.fromEntries(Object.entries(FLOWERS).map(([id, f]) => ["fl_" + id, [f.n, f.n.replace(/s$/, "").replace(/ie$/, "y").replace("Sweet pea", "Sweet Pea"), f.col || "#F4C7CF"]]))
 };
 export const isIngr = id => id in INGR;
-export const isDairy = ings => ings.includes("milk") || ings.includes("goatmilk");   // milk or goat's milk makes it a gelato
+export const isDairy = ings => ings.includes("milk") || ings.includes("goatmilk") || ings.includes("yoghurt");   // milk or goat's milk makes it a gelato
 const word = id => INGR[id][1];
 
 export function scoopState(F){

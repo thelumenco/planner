@@ -44,7 +44,8 @@ import { fieldArt, stallFront } from "../art/field.js";
 import { shoreArt } from "../art/shore.js";
 import { bayArt, DECK_SEATS } from "../art/bay.js";
 import { hfarmArt } from "../art/hfarm.js";
-import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush, milkOne, milkHerd, collectHives, buyStand, giveName, fullHives } from "./hfarm.js";
+import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush, milkOne, milkHerd, collectHives, buyStand, giveName, fullHives,
+  extractorPanel, crockPanel, pressPanel as hfPressPanel, cavePanel as hfCavePanel, spinFrames, makeYoghurt, pressCheese, takeWheel, cheeseNames, CHEESES as HF_CHEESES } from "./hfarm.js";
 import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
@@ -257,7 +258,7 @@ const SHED = {
 // keepsakes and pets (companions.js): the keepsake being placed, a placed one's shelf, the pet being adopted (and for
 // whom), and the pet whose card is open
 // the Cocoa Room's open card: "counter", "wall", or a kitchen station ("sacks", "roaster", "grinder", "slab", "moulds")
-let hfView = null;   // Honeybrook Farm: "cows" / "goats" / "hives" / "stand"
+let hfView = null, hfSt = {kind: "cheddar", name: "", sug: 0};   // Honeybrook Farm: "cows" / "goats" / "hives" / "stand"; in the barn "extractor" / "crock" / "press" / "cave"
 let ccView = null, lastCocoa = 0, ccSt = {shell: "dark", sel: []};   // ccSt: the bonbon table's picks
 const COCOA_IN = ["cocoa", "cocoakitchen"];
 let keepItem = null, keepSpot = null, adoptItem = null, adoptSt = {}, petView = null;
@@ -1492,6 +1493,7 @@ function ctx(){
     : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, {swap: scSt.swap});
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
   else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "cocoa" ? ccCounterPanel(F, {cart: true, server: isHere("mateo")}) : marketStallPanel(st); }
+  else if (hfView && scene === "barn") h = hfView === "extractor" ? extractorPanel(F) : hfView === "crock" ? crockPanel(F) : hfView === "press" ? hfPressPanel(F, hfSt) : hfCavePanel(F);
   else if (hfView && scene === "hfarm") h = hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
   else if (orView === "pot" && potItem) h = potPanel(F, potItem);
   else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara"), hand: isHere("mateo")}) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccView === "ups" ? ccUpsPanel(F) : ccKitchenPanel(F, ccView);
@@ -1615,7 +1617,7 @@ function ctx(){
   if (scView || (fieldView === "mstall8" && scene === "field")) wireScoop(c);
   wireCompanions(c);
   if (ccView || (fieldView === "mstall9" && scene === "field")) wireCocoa(c);
-  if (hfView && scene === "hfarm") wireFarm(c);
+  if (hfView && (scene === "hfarm" || scene === "barn")) wireFarm(c);
   c.querySelectorAll("[data-sup]").forEach(b => b.onclick = () => { goalView = null; ctx(); if (b.dataset.sup === "play") familyPaddle(); else paddleTo(b.dataset.sup); });
   c.querySelectorAll("[data-ride]").forEach(b => b.onclick = () => { F.ride = b.dataset.ride; sfx("paper", true); speak(F.ride === "car" ? "Keys in hand. You'll drive between screens." : F.ride === "scooter" ? "Helmet on. Scooter it is." : "On foot today. Nice and slow.", 3500); save(); ctx(); });
   if (orView || (fieldView && scene === "field" && (stallAt(dayKey(), sgHM(), +fieldView.slice(-1)) || {}).kind === "orchard")) wireOrchard(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, today: dayKey(), where: orAt && orAt.where, i: orAt && orAt.i, item: potItem,
@@ -1924,7 +1926,7 @@ let route = [], keys = new Set();
 const svg = $("world");
 // Evan's bedtime: 8pm to 7am he's asleep in his car bed, so he isn't out at home base or in the house
 const evanNight = () => { const m = sgHM(); return m >= 20*60 || m < 7*60; };
-const evanHere = () => scene === "kidroom" || ((scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "scoopdip" || scene === "cocoa" || scene === "cocoakitchen" || scene === "mumdad" || scene === "marcus") && !evanNight()) || evanAtDinner();
+const evanHere = () => scene === "kidroom" || ((scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "hfarm" || scene === "barn" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "scoopdip" || scene === "cocoa" || scene === "cocoakitchen" || scene === "mumdad" || scene === "marcus") && !evanNight()) || evanAtDinner();
 // family dinner nights: Evan's at the table wherever dinner is (then home to bed)
 const evanAtDinner = () => { const d = dinnerNow(dayKey(), sgHM()); return !!d && scene === d.host; };
 function outside(){ return OUTDOOR.includes(scene); }
@@ -1940,7 +1942,7 @@ function setScene(id, at){
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
     if (id === "base") { evan.x = evan.tx = 300; evan.y = evan.ty = 360; }
-    else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "hfarm" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoa" || id === "cocoakitchen" || id === "mumdad" || id === "marcus" || id === "cottage") { evan.x = evan.tx = p[0] + 26; evan.y = evan.ty = p[1] + 10; evan.run = false; evan.wait = 2; }
+    else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "hfarm" || id === "barn" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoa" || id === "cocoakitchen" || id === "mumdad" || id === "marcus" || id === "cottage") { evan.x = evan.tx = p[0] + 26; evan.y = evan.ty = p[1] + 10; evan.run = false; evan.wait = 2; }
     else if (id === "home" && from === "kidroom") { evan.x = evan.tx = p[0] - 24; evan.y = evan.ty = p[1] + 6; evan.run = false; evan.wait = 3; }
     else if (id === "home") { evan.x = evan.tx = 300; evan.y = evan.ty = 520; }
     // Evan's room: he runs in ahead, Mel waits just inside the door, Maple stays out in the house
@@ -2063,6 +2065,10 @@ function arriveSpot(id){
   if (scene === "cocoa" && id === "ctables" && workshopGroup(dayKey()).length && sgHM() >= 14*60 && sgHM() < 16*60) { speak("The bonbon workshop's on! Six makers at the tables, piping ganache and arguing about sprinkles. You show them how to temper.", 5500); gainXp(1);
     if (evanHere()) setTimeout(() => evanSays(pick(["Can I make one? I'll make a dinosaur one!", "I'm helping! *licks spoon*", "Mine has sprinkles AND more sprinkles."])), 1500); render(); return; }
   if (scene === "cocoa" && id === "ctables") { sitAt(SHOP_SEATS); return; }
+  if (scene === "barn" && (id === "extractor" || id === "crock" || id === "press" || id === "cave")) { hfView = id; hfState(F); sfx("paper", true);
+    if (id === "cave" && isHere("elena")) npcSay("elena", pick(["Turn them every morning. They like the attention.", "Smell that? That's a cheese thinking."]));
+    else if (id === "press" && isHere("elena")) npcSay("elena", "Name it something nice. A wheel with a good name ages better. Everyone knows that.");
+    render(); return; }
   if (COCOA_IN.includes(scene)) { ccView = {ccounter: "counter", barwall: "wall", case: "case", pantry: "pantry", bonbon: "bonbon", sacks: "sacks", roaster: "roaster", grinder: "grinder", slab: "slab", moulds: "moulds"}[id] || null;
     if (ccView) { cocoaNow(); sfx("paper", true); if (id === "ccounter" && isHere("amara")) npcSay("amara", pick(["Hi boss! The wall's looking good.", "Want a taste? I saved you a broken one.", "Dark's flying today."])); render(); return; } }
   if (id === "gddoor") { if (hasUp(scoopState(F), "dip")) { setScene("scoopdip", INNER.scoopdip.arrive); setTimeout(() => speak("Warm chocolate and a whole shelf of sprinkles. Dangerous.", 3500), 900); } else { scView = "upgrade"; sfx("paper", true); render(); } return; }
@@ -2311,6 +2317,7 @@ function wireCocoa(c){
 // Honeybrook Farm: hay, brushing, milking, honey, the farm stand
 function wireFarm(c){
   const re = () => { save(); ctx(); drawScene(); };
+  const nm = c.querySelector("#hfName"); if (nm) nm.oninput = () => { hfSt.name = nm.value; };
   c.querySelectorAll("[data-hf]").forEach(b => b.onclick = () => { const a = b.dataset.hf, k = b.dataset.k;
     if (a === "feed") { const n = feedHerd(F, k); if (!n) return; sfx("tap"); gainXp(1); speak(k === "cows" ? "Hay in the rack, water in the trough. Three happy munchers." : "Hay for the goats. Pepper's already climbing the rack.", 4000); }
     else if (a === "brush") { const an = hfBrush(F, k); if (!an) return; sfx("chime"); gainXp(1); mprop("heart", mel.x, mel.y - 60, 1600); speak(an.line, 3500); }
@@ -2318,6 +2325,12 @@ function wireFarm(c){
     else if (a === "milkall") { const n = milkHerd(F, k); if (!n) { speak("Nobody to milk: they've been done today, or need their hay first.", 4000); return; } sfx("chime"); gainXp(1); flash(`+${n} ${giveName(k === "cows" ? "milk" : "goatmilk")} in your backpack`); }
     else if (a === "honey") { const n = collectHives(F); if (!n) return; sfx("chime"); act("cheer"); gainXp(2); speak(`${n} jars of honey, golden and still warm from the sun. Felix keeps the rest for his stall.`, 5000); }
     else if (a === "buy") { if (!buyStand(F, k)) return; sfx("coin"); flash(`${giveName(k)} from the farm stand`); }
+    else if (a === "spin") { const r = spinFrames(F); if (!r) return; sfx("chime"); act("cheer"); gainXp(1); speak(`Whirr, whirr... ${r.n} jar${r.n === 1 ? "" : "s"} of ${r.kind.n} honey, golden and still warm.`, 4500); }
+    else if (a === "yog" || a === "yogall") { const n = makeYoghurt(F, a === "yogall"); if (!n) return; sfx("tap"); flash(`${n} pot${n === 1 ? "" : "s"} of yoghurt`); }
+    else if (a === "ckind") { hfSt.kind = k; hfSt.name = ""; hfSt.sug = 0; }
+    else if (a === "csug") { const ns = cheeseNames(F, hfSt.kind, Math.floor((Date.now() + (globalThis.__mapleOffset || 0))/864e5)); hfSt.sug = (hfSt.sug + 1) % Math.max(1, ns.length); hfSt.name = ns[hfSt.sug] || ""; sfx("tap"); }
+    else if (a === "press") { const w = pressCheese(F, hfSt.kind, hfSt.name); if (!w) return; hfSt.name = ""; hfSt.sug = 0; sfx("chime"); act("cheer"); gainXp(2); speak(`${w.name} is pressed and on a shelf in the cave. Ripe in ${HF_CHEESES[w.kind].days} day${HF_CHEESES[w.kind].days === 1 ? "" : "s"}.`, 5000); }
+    else if (a === "wheel") { const r = takeWheel(F, +k); if (!r) return; sfx("chime"); act("cheer"); gainXp(1); mprop("heart", mel.x, mel.y - 60, 1600); speak(`${r.w.name}: ripe and perfect. ${r.c.wedges} wedges of ${r.c.n.toLowerCase()} in your backpack.`, 5000); }
     re(); });
 }
 // keepsakes: put one on a shelf, or take one down; pets: adopt (who, then where), pat, play with the owner, rename, move
@@ -2471,7 +2484,7 @@ function endPaddle(walkBack){
 }
 // Who's where today: everyone's day at a glance (in the friendship view), family first, then the village
 const PLACE_NAME = {base: "outside at home", home: "your house", farm: "the garden", village: "the town square", lane: "Makers' Lane", vineyard: "the vineyard",
-  orchard: "the orchard", flowers: "the flower farm", field: "the field", shore: "the foreshore", kitchen: "the wine shop kitchen", bay: "the bay", hfarm: "Honeybrook Farm", scoopshop: "the Scoop Shack", scoopkitchen: "the gelato kitchen", scoopdip: "the dip station", cocoa: "the Cocoa Room", cocoakitchen: "the chocolate kitchen"};
+  orchard: "the orchard", flowers: "the flower farm", field: "the field", shore: "the foreshore", kitchen: "the wine shop kitchen", bay: "the bay", hfarm: "Honeybrook Farm", barn: "the barn at Honeybrook", scoopshop: "the Scoop Shack", scoopkitchen: "the gelato kitchen", scoopdip: "the dip station", cocoa: "the Cocoa Room", cocoakitchen: "the chocolate kitchen"};
 const ACT_WORD = {water: "watering", farm: "gardening", sit: "sitting down", game: "gaming", sup: "paddleboarding", guide: "leading a tour", lead: "leading the class",
   exercise: "exercise class", cone: "with an ice cream", cook: "cooking", rest: "in the hammock", repair: "fixing things", type: "busy", play: "playing"};
 const placeName = sc => PLACE_NAME[sc] || (ROOMS[sc] && ROOMS[sc].name) || sc;
@@ -2783,7 +2796,7 @@ function nearSpot(){
   const list = [...stationsOf(scene), scene !== "market" ? {id:"board", tx:260, ty:200} : null].filter(Boolean);
   const s = list.find(s => Math.hypot(s.tx - mel.x, s.ty - mel.y) < 26); return s ? s.id : null;
 }
-const EVAN_SPOTS = {hfarm:[[260,520],[200,560],[330,580],[260,290],[60,500],[460,520]], bay:[[300,400],[250,560],[300,330],[200,300],[290,500]], scoopshop:[[200,440],[380,440],[300,560],[140,560],[260,420]], scoopkitchen:[[200,560],[380,540],[300,580]], scoopdip:[[180,560],[420,560],[140,420]], cocoa:[[200,440],[380,450],[140,560]], cocoakitchen:[[200,560],[380,560]], mumdad:[[300,560],[200,380],[420,420],[150,560],[460,560]], marcus:[[230,560],[120,500],[460,560],[250,340],[300,600]], cottage:[[200,560],[440,540],[300,340]], shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[150,340],[260,330],[380,330],[200,580],[330,590]]};
+const EVAN_SPOTS = {barn:[[200,560],[330,600],[160,380]], hfarm:[[260,520],[200,560],[330,580],[260,290],[60,500],[460,520]], bay:[[300,400],[250,560],[300,330],[200,300],[290,500]], scoopshop:[[200,440],[380,440],[300,560],[140,560],[260,420]], scoopkitchen:[[200,560],[380,540],[300,580]], scoopdip:[[180,560],[420,560],[140,420]], cocoa:[[200,440],[380,450],[140,560]], cocoakitchen:[[200,560],[380,560]], mumdad:[[300,560],[200,380],[420,420],[150,560],[460,560]], marcus:[[230,560],[120,500],[460,560],[250,340],[300,600]], cottage:[[200,560],[440,540],[300,340]], shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[150,340],[260,330],[380,330],[200,580],[330,590]]};
 // Evan's destination is evan.tx/ty; outdoors he follows route-finder waypoints to it (round the house, not through it)
 function evanWalk(speed, dt){
   const key = evan.tx + "," + evan.ty;

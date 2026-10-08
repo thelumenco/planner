@@ -2264,6 +2264,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   I.goatfeed = [`<path d="M6 7h12l1 13H5z" ${f("#D9C79A")}/><path d="M6 7l1.5-3h9L18 7z" ${f(C.sage)}/><path d="M9 15q3-4 6 0q-3 3-6 0z" ${f(C.moss)}/>`, `<path d="M6 7h12l1 13H5z M6 7l1.5-3h9L18 7"/><path d="M9 15q3-4 6 0q-3 3-6 0z"/>`];
   I.loaf = [`<path d="M4 15c0-5 3.5-8 8-8s8 3 8 8v3H4z" ${f("#D9A066")}/>`, `<path d="M4 15c0-5 3.5-8 8-8s8 3 8 8v3H4z"/><path d="M8 10l1.5 3M12 9l.5 3.5M16 10l-1.5 3"/>`];
   I.goatmilk = [`<path d="M9 3h6v3l2 3v11a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V9l2-3z" ${f("#FFFDF6")}/><rect x="8.5" y="2" width="7" height="2.5" rx=".8" ${f("#9CC27E")}/><path d="M7 12h10v5H7z" ${f("#E3EED2")}/>`, `<path d="M9 3h6v3l2 3v11a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V9l2-3z"/><rect x="8.5" y="2" width="7" height="2.5" rx=".8"/><path d="M7 12h10M7 17h10"/><path d="M10 14.5q2-1.5 4 0" opacity=".6"/>`];
+  I.yoghurt = [`<path d="M6 9h12l-1.5 10a2 2 0 0 1-2 1.7h-5a2 2 0 0 1-2-1.7z" ${f("#FFFDF6")}/><rect x="5.5" y="6.5" width="13" height="3" rx="1" ${f("#9FD3E8")}/>`, `<path d="M6 9h12l-1.5 10a2 2 0 0 1-2 1.7h-5a2 2 0 0 1-2-1.7z"/><rect x="5.5" y="6.5" width="13" height="3" rx="1"/><path d="M8.5 13h7" opacity=".5"/>`];
+  {
+    const wedge = (c) => [`<path d="M3 17l15-9 3 2v7z" ${f(c)}/><circle cx="12" cy="15" r="1.2" ${f("#FFFDF6")}/>`, `<path d="M3 17l15-9 3 2v7zM3 17h18M18 8v9"/><circle cx="12" cy="15" r="1.2"/>`];
+    I.chz_cheddar = wedge("#F3C969");
+    I.chz_blue = wedge("#DCE3E8");
+    I.chz_fresh = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#FFF8EC")}/>`, `<rect x="4" y="9" width="16" height="9" rx="4.5"/><path d="M8 11v5M12 11v5M16 11v5" opacity=".35"/>`];
+  }
   I.egg = [`<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z" ${f("#F6EBDD")}/>`, `<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z"/><path d="M9 12c0-2 .8-3.6 1.8-4.5" opacity=".6"/>`];
   I.coop = [
     `<path d="M3 11l9-7 9 7z" ${f(C.rose)}/><rect x="5" y="11" width="14" height="9" ${f(C.butter)}/><rect x="10" y="14" width="4" height="6" ${f(C.wood)}/>`,
@@ -2287,6 +2294,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   I.mooncake = [`<circle cx="12" cy="12.5" r="8" ${f("#C98A4A")}/><circle cx="12" cy="12.5" r="5" ${f("#E3B06A")}/>`, `<circle cx="12" cy="12.5" r="8"/><circle cx="12" cy="12.5" r="5"/><path d="M12 9.5v6M9 12.5h6M10 10.5l4 4M14 10.5l-4 4" opacity=".55"/>`];
   I.birdsnest = [`<path d="M6 9h12v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z" ${f("#F6EFE3")}/><rect x="5" y="5" width="14" height="4" rx="1.5" ${f("#C2505F")}/>`, `<path d="M6 9h12v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><rect x="5" y="5" width="14" height="4" rx="1.5"/><path d="M9 14q3 2 6 0" opacity=".6"/>`];
   I.honey = [`<path d="M7 8h10v10a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3z" ${f(C.honey)}/><rect x="6.5" y="4.5" width="11" height="3.5" rx="1" ${f("#E8D3A6")}/><rect x="8.5" y="11.5" width="7" height="5" rx="1" ${f(C.paper)}/>`, `<path d="M7 8h10v10a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3z"/><rect x="6.5" y="4.5" width="11" height="3.5" rx="1"/><rect x="8.5" y="11.5" width="7" height="5" rx="1"/><path d="M10 14h4" opacity=".6"/>`];
+  I.honey_lav = [I.honey[0].replace(/fill:[^"]*"/, 'fill:#C9A8E0"'), I.honey[1]];
+  I.honey_blossom = [I.honey[0].replace(/fill:[^"]*"/, 'fill:#F6D98A"'), I.honey[1]];
   I.honeycomb = [`<path d="M3 8h18v10H3z" ${f("#F3C33A")}/>`, `<path d="M3 8h18v10H3z"/><path d="M6 10.5l2 -1.2 2 1.2v2.4l-2 1.2-2-1.2zM10 10.5l2-1.2 2 1.2v2.4l-2 1.2-2-1.2zM14 10.5l2-1.2 2 1.2v2.4l-2 1.2-2-1.2zM8 13.9v2.4l2 1.2 2-1.2v-2.4M12 16.3l2 1.2 2-1.2v-2.4"/><path d="M17 18c0 1.5 .5 2.5 1 3" opacity=".7"/>`];
   I.beecandle = [`<rect x="8.5" y="9" width="7" height="12" rx="1" ${f("#F3D98A")}/><path d="M12 3.5c1.6 1.8 2 3 2 4a2 2 0 0 1-4 0c0-1 .4-2.2 2-4z" ${f("#F08A3C")}/>`, `<rect x="8.5" y="9" width="7" height="12" rx="1"/><path d="M12 3.5c1.6 1.8 2 3 2 4a2 2 0 0 1-4 0c0-1 .4-2.2 2-4zM12 9.5v-1M8.5 12.5h7M8.5 16h7" /><path d="M10 12.5v3.5M13 12.5v3.5M11.5 16v5" opacity=".5"/>`];
   var soap = (c) => [`<rect x="3.5" y="8" width="17" height="10" rx="3" ${f(c)}/><path d="M7 4.5q1.5 -1.5 3 0M15 3.5q1.5 -1.5 3 0" ${f("none")}/>`, `<rect x="3.5" y="8" width="17" height="10" rx="3"/><path d="M7 13h10" opacity=".6"/><circle cx="8" cy="5" r="1.4"/><circle cx="16.5" cy="4.2" r="1"/>`];
@@ -2517,7 +2526,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     toBayF: { scene: "hfarm", name: "Gate to the bay", door: [22, 286], spot: true, bridge: "bay", mark: [30, 226], line: "West through the gate to the bay." },
     hfEast: { scene: "hfarm", name: "The lane to the cottages", door: [498, 560], spot: true, mark: [490, 506], line: "The lane east to Honeybrook's cottages and the station. Still being built: soon!" },
     farmhouse: { scene: "hfarm", name: "The farmhouse", door: [105, 246], spot: true, mark: [105, 100], line: "Felix and Elena's farmhouse. The kettle's always on." },
-    barn: { scene: "hfarm", name: "The barn", door: [400, 250], spot: true, mark: [400, 90], line: "The big red barn: hay up top, milking stalls below. Elena's setting up a dairy and a cheese cave inside." },
+    barn: { scene: "hfarm", name: "The barn", short: "the barn", door: [400, 250], mark: [400, 90] },
     hives: { scene: "hfarm", name: "The beehives", door: [250, 256], spot: true, mark: [250, 150], line: "Felix's beehives, in the lavender." },
     cows: { scene: "hfarm", name: "The cow paddock", door: [135, 490], spot: true, mark: [135, 300], line: "Daisy, Buttercup and Mochi." },
     goats: { scene: "hfarm", name: "The goat paddock", door: [385, 490], spot: true, mark: [385, 300], line: "Pepper, Biscuit, Nutmeg and Toffee." },
@@ -2765,6 +2774,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ] },
     // The Cocoa Room (a big goal, in the bay's old shopfront): the counter (Amara serves behind it; the front is drawn
     // over the people), the bar wall, a table, and the kitchen door; behind it the chocolate kitchen, bean to bar
+    // Honeybrook Farm's barn: milking stalls and the hay loft, the honey extractor, the yoghurt crocks, the cheese press
+    // and the cheese cave (game/hfarm.js)
+    barn: { name: "The barn", wall: "#C98A6A", trim: "#8E2C2C", noBoard: true, pos: { S: [110, 262], H: [262, 262], X: [420, 262], Y: [100, 470], P: [262, 450], C: [424, 480] }, stations: [
+      ["stalls", "Milking stalls", "S", "stalls", null, "The milking stalls. Daisy, Buttercup and Mochi come in here when it rains; the rest of the time they're milked out in the paddock.", 30],
+      ["hayloft", "Hay loft", "H", "hayloft", null, "Bales of sweet hay, all the way up to the rafters. Biscuit the goat has tried to climb it twice.", 30],
+      ["extractor", "Honey extractor", "X", "extractor", null, "The honey extractor: frames in, honey out.", 30],
+      ["crock", "Yoghurt crocks", "Y", "crock", null, "Crocks of yoghurt, setting.", 30],
+      ["press", "Cheese press", "P", "hfpress", null, "The cheese press.", 30],
+      ["cave", "Cheese cave", "C", "cheesecave", null, "The cheese cave.", 30]
+    ] },
     cocoa: { name: "The Cocoa Room", wall: "#F3E4D2", trim: "#6B4430", noBoard: true, pos: { C: [300, 330], W: [110, 262], Z: [40, 400], T: [340, 520], D: [440, 262] }, stations: [
       ["case", "Display case", "D", "bonboncase", null, "The display case: bonbons, six flavours at a time.", 36],
       ["ccounter", "Counter", "C", "ccounter", null, "The counter. Yours are free.", 46],
@@ -3262,6 +3281,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     loaf: { n: "Loaf of bread", kind: "ingredient", sell: 2, what: "baked in the wine shop's oven" },
     milk: { n: "Milk", kind: "ingredient", price: 4, tab: "deli", sell: 3, what: "for gelato at the Scoop Shack, or two make a cheese in the wine shop's kitchen press (your goats give it too)" },
     goatmilk: { n: "Goat's milk", kind: "ingredient", price: 5, sell: 3, what: "from Honeybrook Farm's goats: for gelato at the Scoop Shack, and soon goat's cheese at the farm's dairy" },
+    yoghurt: { n: "Pot of yoghurt", kind: "ingredient", price: 5, sell: 3, what: "made in Honeybrook Farm's barn: frozen yoghurt at the Scoop Shack" },
+    honey_lav: { n: "Jar of lavender honey", kind: "gift", to: "family", price: 9, say: "Lavender honey! It smells like the flower farm.", says: { mama: "Lavender honey? Ma Ma put in tea. So fragrant!" } },
+    honey_blossom: { n: "Jar of orchard blossom honey", kind: "gift", to: "family", price: 9, say: "Orchard blossom honey, from Ma Ma's trees? That's lovely.", says: { mama: "From my trees! The bees know where the good flowers are." } },
+    chz_fresh: { n: "Fresh goat's cheese", kind: "gift", to: ["darren", "mama", "gonggong", "mum", "dad", "angelina"], price: 8, say: "Fresh goat's cheese! On toast with honey. Perfect.", says: { darren: "Goat's cheese and crackers tonight. Sorted." } },
+    chz_cheddar: { n: "Wedge of farmhouse cheddar", kind: "gift", to: ["darren", "mama", "gonggong", "mum", "dad", "angelina"], price: 9, say: "Farmhouse cheddar, from Elena's cave! Sharp and crumbly.", says: { dad: "Proper cheese. Ah Gong approves." } },
+    chz_blue: { n: "Wedge of Honeybrook blue", kind: "gift", to: ["darren", "dad", "angelina"], price: 10, say: "A blue! Bold choice. I love it.", says: { darren: "Blue cheese and a glass of your red. Perfect evening." } },
     egg: { n: "Fresh egg", kind: "food", sell: 5, say: "A fresh egg from our hens! Breakfast sorted." },
     tulip: { e: "🌷", n: "Tulip", kind: "flower", sell: 2, say: "For me? I'll tuck it behind my ear." },
     sunflower: { e: "🌻", n: "Sunflower", kind: "flower", sell: 3, say: "So sunny! Thank you." },
@@ -3566,6 +3591,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     <g font-family="Klee One,serif" font-weight="600" text-anchor="middle" pointer-events="none"><text x="260" y="58" font-size="13" fill="#F3C969">from the bean</text><text x="260" y="80" font-size="9" fill="#F6EFE3">made right here, in the kitchen</text></g>
     ${sk(`<ellipse cx="400" cy="70" rx="12" ry="18" style="fill:#C2505F"/><ellipse cx="460" cy="70" rx="12" ry="18" style="fill:#E3A23A"/>`, `<ellipse cx="400" cy="70" rx="12" ry="18"/><path d="M400 52 v36" opacity=".5"/><ellipse cx="460" cy="70" rx="12" ry="18"/><path d="M460 52 v36" opacity=".5"/>`)}
     ${plant(492, 612, 1)}`,
+    // Honeybrook Farm's barn: red-brown planks, straw on the floor, a beam with lanterns, a hay door letting light in
+    barn: () => `<rect width="520" height="640" style="fill:#E8D3A0"/>
+    <g opacity=".45">${rows(30, (i) => `<path d="M${i * 37 % 520} ${160 + i * 53 % 470} l14 -4 M${(i * 61 + 20) % 520} ${170 + i * 29 % 460} l-10 -5" style="stroke:#C9A86A" stroke-width="2"/>`)}</g>
+    ${wallBase("#B5644A", "#8E2C2C")}<g opacity=".35" style="stroke:#7A3A2A">${rows(14, (i) => `<path d="M${i * 40} 0 V138"/>`)}</g>${skirting}
+    ${sk(`<rect x="0" y="20" width="520" height="10" style="fill:#7A4A32"/><rect x="226" y="40" width="68" height="60" style="fill:#F6E6B8"/>`, `<path d="M0 20 H520 M0 30 H520"/><rect x="226" y="40" width="68" height="60"/><path d="M260 40 v60 M226 70 h68"/>`)}
+    ${[90, 430].map((x) => sk(`<path d="M${x} 30 v14"/><rect x="${x - 7}" y="44" width="14" height="18" rx="3" style="fill:#F3C969"/>`, `<path d="M${x} 30 v14"/><rect x="${x - 7}" y="44" width="14" height="18" rx="3"/>`)).join("")}`,
     // the chocolate kitchen: white tiles, a window, copper pans on a rail
     cocoakitchen: () => `<rect width="520" height="640" style="fill:#F2EBE2"/>
     <g opacity=".5">${rows(12, (r) => rows(13, (c) => (r + c) % 2 ? `<rect x="${c * 40}" y="${150 + r * 42}" width="40" height="42" style="fill:#E6D9C8"/>` : ""))}</g>
@@ -4899,7 +4930,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       look: { skin: "#D9A882", hair: "#5A3A2A", hairStyle: "bun", top: "#9C8CD9", bottom: "#3E4A43", extra: "apron" },
       routine: [
         slot("06:00", "11:00", "hfarm", [[30, 400], [260, 400], [490, 420], [440, 516]]),
-        slot("11:00", "13:00", "hfarm", [458, 270]),
+        slot("11:00", "13:00", "barn", [[262, 520], [380, 560], [160, 560]]),
         slot("13:00", "18:00", "hfarm", [[200, 600], [260, 524], [440, 512], [458, 270]])
       ],
       intro: "I'm Elena. Cows, goats, and soon a proper cheese cave in the barn. The cheese at my market stall? Aged right here.",
@@ -7090,8 +7121,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 
   // src/art/field.js
   var W2 = `filter="url(#wob)" ${ink}`;
-  var swan = (x, y, dx, dur2, flip) => `<g pointer-events="none"><g>
-    <animateTransform attributeName="transform" type="translate" values="0 0; ${dx} 4; 0 0" dur="${dur2}s" repeatCount="indefinite"/>
+  var swan = (x, y, dx, dur3, flip) => `<g pointer-events="none"><g>
+    <animateTransform attributeName="transform" type="translate" values="0 0; ${dx} 4; 0 0" dur="${dur3}s" repeatCount="indefinite"/>
     <g transform="translate(${x} ${y}) scale(${flip ? -1 : 1} 1)" ${W2} stroke-width="1.2">
       <path d="M-14 0 q2 -9 14 -8 q10 0 12 -6 l2 0 q-1 9 -6 12 q-6 4 -18 4 q-4 0 -4 -2z" style="fill:#FFFDF6"/>
       <path d="M8 -12 q-4 -8 1 -14 q4 -4 7 0" fill="none" stroke-width="3.4" style="stroke:#FFFDF6"/><path d="M8 -12 q-4 -8 1 -14 q4 -4 7 0" fill="none"/>
@@ -7168,7 +7199,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   ${bulbs([...sag(10, 260, 64, 22, 9), ...sag(260, 510, 64, 22, 9)], 0)}</g>`;
   var OTIS = { skin: "#A8754F", hair: "#1F1A17", hairStyle: "short", top: "#2F2B28", bottom: "#3F4A6B", hat: "cap" };
   var ELLA = { skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#8E2C48", bottom: "#2F2B28" };
-  var sway = (x, y, look, dur2) => `<g transform="translate(${x} ${y})"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.4;0 0" dur="${dur2}s" repeatCount="indefinite"/>${personArt(look)}</g></g>`;
+  var sway = (x, y, look, dur3) => `<g transform="translate(${x} ${y})"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.4;0 0" dur="${dur3}s" repeatCount="indefinite"/>${personArt(look)}</g></g>`;
   var hat = (x, y) => `<g data-place="jazzhat" aria-label="The band's hat: drop in a tip"><ellipse class="hov" cx="${x}" cy="${y + 2}" rx="20" ry="7" style="fill:var(--butter)"/>
     ${sk(`<ellipse cx="${x}" cy="${y}" rx="12" ry="3.5" style="fill:#2F2B28"/><path d="M${x - 7} ${y} q0 -9 7 -9 q7 0 7 9z" style="fill:#2F2B28"/><circle cx="${x - 3}" cy="${y - 2}" r="1.4" style="fill:#F3C969"/><circle cx="${x + 2}" cy="${y - 1}" r="1.4" style="fill:#F3C969"/>`, `<ellipse cx="${x}" cy="${y}" rx="12" ry="3.5"/><path d="M${x - 7} ${y} q0 -9 7 -9 q7 0 7 9"/>`)}
     ${tapeLabel(x, y + 22, "Tip the band", "var(--butter)", 9)}</g>`;
@@ -8431,6 +8462,40 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
           `<rect x="${x - 34}" y="${y - 30}" width="68" height="30" rx="3" style="fill:#5E5A55"/><circle cx="${x}" cy="${y - 52}" r="24" style="fill:#B9B0A4"/><circle cx="${x}" cy="${y - 52}" r="14" style="fill:#6B4430"/><rect x="${x + 20}" y="${y - 90}" width="10" height="30" style="fill:#8A8279"/>`,
           `<rect x="${x - 34}" y="${y - 30}" width="68" height="30" rx="3"/><circle cx="${x}" cy="${y - 52}" r="24"/><circle cx="${x}" cy="${y - 52}" r="14"/><path d="M${x - 8} ${y - 52} h16" opacity=".6"/><rect x="${x + 20}" y="${y - 90}" width="10" height="30"/>`
         );
+      // Honeybrook Farm's barn (hfarm.js)
+      case "stalls":
+        return sk(
+          `${[0, 1, 2].map((i) => `<rect x="${x - 60 + i * 40}" y="${y - 40}" width="36" height="40" style="fill:#C9A27E"/><path d="M${x - 60 + i * 40} ${y - 40} h36" style="stroke:#8A6A52" stroke-width="3"/>`).join("")}<ellipse cx="${x}" cy="${y - 2}" rx="62" ry="5" style="fill:#E8C877"/>`,
+          `${[0, 1, 2].map((i) => `<rect x="${x - 60 + i * 40}" y="${y - 40}" width="36" height="40"/><path d="M${x - 60 + i * 40} ${y - 26} h36"/>`).join("")}`
+        );
+      case "hayloft":
+        return sk(
+          `<rect x="${x - 50}" y="${y - 30}" width="40" height="28" rx="3" style="fill:#E8C877"/><rect x="${x - 6}" y="${y - 30}" width="40" height="28" rx="3" style="fill:#E3BC5E"/><rect x="${x - 28}" y="${y - 58}" width="40" height="28" rx="3" style="fill:#EFD48A"/><rect x="${x + 38}" y="${y - 56}" width="4" height="56" style="fill:#8A6A52"/>${[0, 1, 2, 3].map((i) => `<rect x="${x + 34}" y="${y - 48 + i * 12}" width="12" height="3" style="fill:#8A6A52"/>`).join("")}`,
+          `<rect x="${x - 50}" y="${y - 30}" width="40" height="28" rx="3"/><rect x="${x - 6}" y="${y - 30}" width="40" height="28" rx="3"/><rect x="${x - 28}" y="${y - 58}" width="40" height="28" rx="3"/><path d="M${x - 46} ${y - 16} h32 M${x - 2} ${y - 16} h32"/>`
+        );
+      case "extractor":
+        return sk(
+          `<ellipse cx="${x}" cy="${y - 6}" rx="22" ry="6" style="fill:#9AA9B8"/><rect x="${x - 22}" y="${y - 44}" width="44" height="38" style="fill:#C3CCD4"/><ellipse cx="${x}" cy="${y - 44}" rx="22" ry="6" style="fill:#DDE3E8"/><path d="M${x} ${y - 50} v-10 h16" style="stroke:#7A8A98;fill:none" stroke-width="3"/><path d="M${x + 22} ${y - 14} h10 v6" style="stroke:#7A8A98;fill:none" stroke-width="3"/><rect x="${x + 26}" y="${y - 8}" width="14" height="10" rx="2" style="fill:#F3C33A"/>${[-34, -24].map((dx) => `<rect x="${x + dx - 30}" y="${y - 30}" width="10" height="14" rx="2" style="fill:#F3C33A"/>`).join("")}`,
+          `<rect x="${x - 22}" y="${y - 44}" width="44" height="38"/><ellipse cx="${x}" cy="${y - 44}" rx="22" ry="6"/><rect x="${x + 26}" y="${y - 8}" width="14" height="10" rx="2"/>`
+        );
+      case "crock":
+        return sk(
+          `<rect x="${x - 46}" y="${y - 22}" width="92" height="22" rx="3" style="fill:#B98A5A"/>${[-30, 0, 30].map((dx) => `<path d="M${x + dx - 11} ${y - 22} q-2 -18 11 -20 q13 2 11 20z" style="fill:#E3D2BC"/><rect x="${x + dx - 9}" y="${y - 44}" width="18" height="5" rx="2" style="fill:#FFFDF6"/>`).join("")}`,
+          `<rect x="${x - 46}" y="${y - 22}" width="92" height="22" rx="3"/>${[-30, 0, 30].map((dx) => `<path d="M${x + dx - 11} ${y - 22} q-2 -18 11 -20 q13 2 11 20z"/>`).join("")}`
+        );
+      case "hfpress":
+        return sk(
+          `<rect x="${x - 34}" y="${y - 18}" width="68" height="18" rx="2" style="fill:#B98A5A"/><rect x="${x - 26}" y="${y - 60}" width="6" height="44" style="fill:#8A6A52"/><rect x="${x + 20}" y="${y - 60}" width="6" height="44" style="fill:#8A6A52"/><rect x="${x - 30}" y="${y - 64}" width="60" height="8" style="fill:#8A6A52"/><path d="M${x} ${y - 56} v14" style="stroke:#6B5A4A" stroke-width="4"/><rect x="${x - 16}" y="${y - 42}" width="32" height="20" rx="4" style="fill:#F6EBC8"/><circle cx="${x}" cy="${y - 68}" r="7" style="fill:none;stroke:#6B5A4A" stroke-width="3"/>`,
+          `<rect x="${x - 34}" y="${y - 18}" width="68" height="18" rx="2"/><rect x="${x - 30}" y="${y - 64}" width="60" height="8"/><rect x="${x - 16}" y="${y - 42}" width="32" height="20" rx="4"/>`
+        );
+      case "cheesecave": {
+        const h = (G2.F ? (G2.F().hfarm || {}).cave : null) || [], cols = { fresh: "#FFF8EC", cheddar: "#F3C969", blue: "#DCE3E8" };
+        return sk(
+          `<path d="M${x - 56} ${y} V${y - 60} a56 40 0 0 1 112 0 V${y}z" style="fill:#8A8278"/><path d="M${x - 44} ${y} V${y - 56} a44 32 0 0 1 88 0 V${y}z" style="fill:#4A4440"/>${[0, 1].map((r) => `<rect x="${x - 40}" y="${y - 48 + r * 24}" width="80" height="4" style="fill:#8A6A52"/>`).join("")}
+        ${Array.from({ length: 6 }, (_, i) => h[i] ? `<ellipse cx="${x - 26 + i % 3 * 26}" cy="${y - 52 + Math.floor(i / 3) * 24}" rx="10" ry="5" style="fill:${cols[h[i].kind] || "#F3C969"}"/>` : "").join("")}`,
+          `<path d="M${x - 56} ${y} V${y - 60} a56 40 0 0 1 112 0 V${y}"/><path d="M${x - 44} ${y} V${y - 56} a44 32 0 0 1 88 0 V${y}"/>`
+        );
+      }
       case "grinder":
         return grinder2(x, y) + sk(
           `<rect x="${x - 36}" y="${y - 28}" width="72" height="28" rx="3" style="fill:#7FA3B8"/><ellipse cx="${x}" cy="${y - 38}" rx="32" ry="10" style="fill:#D9DEE3"/><ellipse cx="${x}" cy="${y - 40}" rx="24" ry="6" style="fill:#6B4430"/><ellipse cx="${x - 8}" cy="${y - 44}" rx="8" ry="6" style="fill:#B9B0A4"/><ellipse cx="${x + 10}" cy="${y - 44}" rx="8" ry="6" style="fill:#B9B0A4"/>`,
@@ -9272,7 +9337,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var rainSrc = null;
   var bellWave = null;
   var rhodesWave = null;
-  function note(freq, t2, dur2, vel) {
+  function note(freq, t2, dur3, vel) {
     const o = ac.createOscillator(), g = ac.createGain(), f2 = ac.createBiquadFilter(), tone = cur().tone;
     if (!bellWave) {
       bellWave = ac.createPeriodicWave(new Float32Array([0, 1, 0, 0.35, 0, 0.12, 0, 0.05]), new Float32Array(8));
@@ -9285,10 +9350,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     g.gain.setValueAtTime(0, t2);
     g.gain.linearRampToValueAtTime(vel, t2 + 6e-3);
     g.gain.exponentialRampToValueAtTime(vel * 0.35, t2 + 0.25);
-    g.gain.exponentialRampToValueAtTime(1e-4, t2 + dur2);
+    g.gain.exponentialRampToValueAtTime(1e-4, t2 + dur3);
     o.connect(f2).connect(g).connect(musicBus);
     o.start(t2);
-    o.stop(t2 + dur2 + 0.05);
+    o.stop(t2 + dur3 + 0.05);
   }
   function newMelody() {
     melody = BARS.map((b, i) => {
@@ -9432,17 +9497,17 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     s.buffer = b;
     return s;
   }
-  function bell(freq, t2, dur2, vel) {
+  function bell(freq, t2, dur3, vel) {
     [1, 2.76, 5.4].forEach((m, i) => {
       const o = ac.createOscillator(), g = ac.createGain();
       o.type = "sine";
       o.frequency.value = freq * m;
       g.gain.setValueAtTime(0, t2);
       g.gain.linearRampToValueAtTime(vel / (i * 1.8 + 1), t2 + 4e-3);
-      g.gain.exponentialRampToValueAtTime(1e-4, t2 + dur2 / (i + 1));
+      g.gain.exponentialRampToValueAtTime(1e-4, t2 + dur3 / (i + 1));
       o.connect(g).connect(sfxBus);
       o.start(t2);
-      o.stop(t2 + dur2);
+      o.stop(t2 + dur3);
     });
   }
   var FX = {
@@ -13979,15 +14044,15 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   // src/art/shore.js
   var W4 = `filter="url(#wob)" ${ink}`;
   var SHORE = "M150 0 C172 90 132 190 158 300 C182 400 140 500 166 640";
-  var dolphin = (x, y, dur2, begin, flip) => {
+  var dolphin = (x, y, dur3, begin, flip) => {
     const kt = "0;.55;.62;.7;.78;.84;1";
     return `<g pointer-events="none" transform="translate(${x} ${y})${flip ? " scale(-1 1)" : ""}"><g opacity="0">
-    <animate attributeName="opacity" values="0;0;1;1;1;0;0" keyTimes="${kt}" dur="${dur2}s" begin="${begin}s" repeatCount="indefinite"/>
-    <animateTransform attributeName="transform" type="translate" values="0 12;0 12;6 -2;14 -7;22 -2;28 12;28 12" keyTimes="${kt}" dur="${dur2}s" begin="${begin}s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0;1;1;1;0;0" keyTimes="${kt}" dur="${dur3}s" begin="${begin}s" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="translate" values="0 12;0 12;6 -2;14 -7;22 -2;28 12;28 12" keyTimes="${kt}" dur="${dur3}s" begin="${begin}s" repeatCount="indefinite"/>
     <g ${W4}><path d="M-14 2 C-8 -8 8 -10 16 -2 C10 -2 4 0 -2 4 C-6 6 -12 6 -14 2Z" style="fill:#7C93A8"/><path d="M0 -7 l4 -7 l2 7z" style="fill:#7C93A8"/><path d="M-14 2 l-6 -4 l1 5 l-1 5z" style="fill:#7C93A8"/><circle cx="10" cy="-4" r=".9" style="fill:var(--line)"/></g>
     <path d="M-16 13 q6 -4 12 0 M14 13 q6 -4 12 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.4"/></g></g>`;
   };
-  var farPaddler = (x, y, dy, dur2) => `<g pointer-events="none"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 ${dy};0 0" dur="${dur2}s" repeatCount="indefinite"/>
+  var farPaddler = (x, y, dy, dur3) => `<g pointer-events="none"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 ${dy};0 0" dur="${dur3}s" repeatCount="indefinite"/>
   <g ${W4} stroke-width=".8"><ellipse cx="${x}" cy="${y}" rx="11" ry="2" style="fill:#F3C969"/><rect x="${x - 2.4}" y="${y - 14}" width="4.8" height="9" rx="2" style="fill:#E8566C"/><path d="M${x - 1.5} ${y - 5} v4 M${x + 1.5} ${y - 5} v4" fill="none"/><circle cx="${x}" cy="${y - 17}" r="3" style="fill:#E6BC98"/><path d="M${x + 4} ${y - 14} l3 13" fill="none" style="stroke:#8A5A3A"/></g></g></g>`;
   var pine = (x, y, s = 1) => sk(
     `<rect x="${x - 3 * s}" y="${y - 10 * s}" width="${6 * s}" height="${12 * s}" style="fill:#8A5A3A"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${x - (22 - i * 4) * s} ${y - (10 + i * 14) * s} q${(22 - i * 4) * s} ${-8 * s} ${(44 - i * 8) * s} 0 l${-6 * s} ${-8 * s} h${-(32 - i * 8) * s}z" style="fill:${i % 2 ? "#5E8A5A" : "#6E9A63"}"/>`).join("")}`,
@@ -14072,10 +14137,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     `<rect x="${x - 3 * s}" y="${y - 10 * s}" width="${6 * s}" height="${12 * s}" style="fill:#8A5A3A"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${x - (22 - i * 4) * s} ${y - (10 + i * 14) * s} q${(22 - i * 4) * s} ${-8 * s} ${(44 - i * 8) * s} 0 l${-6 * s} ${-8 * s} h${-(32 - i * 8) * s}z" style="fill:${i % 2 ? "#5E8A5A" : "#6E9A63"}"/>`).join("")}`,
     `<path d="M${x} ${y - 82 * s} v${80 * s}"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${x - (22 - i * 4) * s} ${y - (10 + i * 14) * s} q${(22 - i * 4) * s} ${-8 * s} ${(44 - i * 8) * s} 0"/>`).join("")}`
   );
-  var dolphin2 = (x, y, dur2, begin) => {
+  var dolphin2 = (x, y, dur3, begin) => {
     const kt = "0;.55;.62;.7;.78;.84;1";
-    return `<g pointer-events="none" transform="translate(${x} ${y})"><g opacity="0"><animate attributeName="opacity" values="0;0;1;1;1;0;0" keyTimes="${kt}" dur="${dur2}s" begin="${begin}s" repeatCount="indefinite"/>
-    <animateTransform attributeName="transform" type="translate" values="0 12;0 12;6 -2;14 -7;22 -2;28 12;28 12" keyTimes="${kt}" dur="${dur2}s" begin="${begin}s" repeatCount="indefinite"/>
+    return `<g pointer-events="none" transform="translate(${x} ${y})"><g opacity="0"><animate attributeName="opacity" values="0;0;1;1;1;0;0" keyTimes="${kt}" dur="${dur3}s" begin="${begin}s" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="translate" values="0 12;0 12;6 -2;14 -7;22 -2;28 12;28 12" keyTimes="${kt}" dur="${dur3}s" begin="${begin}s" repeatCount="indefinite"/>
     <g ${W5}><path d="M-14 2 C-8 -8 8 -10 16 -2 C10 -2 4 0 -2 4 C-6 6 -12 6 -14 2Z" style="fill:#7C93A8"/><path d="M0 -7 l4 -7 l2 7z" style="fill:#7C93A8"/></g></g></g>`;
   };
   var hmNow = () => {
@@ -14193,6 +14258,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     h.fed = h.fed || {};
     h.brushed = h.brushed || {};
     h.milked = h.milked || {};
+    h.frames = h.frames || 0;
+    h.cave = h.cave || [];
+    h.names = h.names || [];
     if (!Array.isArray(h.hives) || h.hives.length !== HIVES) h.hives = Array.from({ length: HIVES }, (_, i) => t2 - (i * 0.7 + 0.4) * 864e5);
     return h;
   }
@@ -14239,9 +14307,71 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       h.hives[i] = t2;
     });
     const n = full.length * JARS;
-    F2.inv = F2.inv || {};
-    F2.inv.honey = (F2.inv.honey || 0) + n;
+    h.frames += n;
     return n;
+  }
+  var HONEYS = [{ id: "honey", n: "wildflower" }, { id: "honey_lav", n: "lavender" }, { id: "honey_blossom", n: "orchard blossom" }];
+  var honeyNow = (day = dayKey()) => HONEYS[Math.floor(Date.parse(day + "T00:00:00Z") / (7 * 864e5)) % HONEYS.length];
+  function spinFrames(F2) {
+    const h = hfState(F2), n = h.frames, kind = honeyNow();
+    if (!n) return null;
+    h.frames = 0;
+    F2.inv = F2.inv || {};
+    F2.inv[kind.id] = (F2.inv[kind.id] || 0) + n;
+    return { n, kind };
+  }
+  function makeYoghurt(F2, all) {
+    const inv = F2.inv || {};
+    let n = 0;
+    for (const m of ["milk", "goatmilk"]) while ((inv[m] || 0) > 0 && (all || !n)) {
+      inv[m]--;
+      if (!inv[m]) delete inv[m];
+      n++;
+    }
+    if (n) inv.yoghurt = (inv.yoghurt || 0) + n;
+    F2.inv = inv;
+    return n;
+  }
+  var CHEESES = {
+    fresh: { n: "Fresh goat's cheese", milk: "goatmilk", need: 2, days: 1, wedges: 4, id: "chz_fresh", col: "#FFF8EC", words: ["Chèvre", "Little Log", "Fresh", "Curd"] },
+    cheddar: { n: "Farmhouse cheddar", milk: "milk", need: 3, days: 4, wedges: 6, id: "chz_cheddar", col: "#F3C969", words: ["Cheddar", "Clothbound", "Farmhouse", "Tasty"] },
+    blue: { n: "Honeybrook blue", milk: "milk", need: 3, days: 6, wedges: 6, id: "chz_blue", col: "#DCE3E8", words: ["Blue", "Bleu", "Veined Blue"] }
+  };
+  var CAVE = 6;
+  var C_PLACE = ["Lavender Hill", "Barn Door", "Honeybrook", "Hay Loft", "Morning Mist", "Stone Wall", "Sunday", "Windmill", "Brookside", "Old Gate", "Clover Field", "Harvest", "Lantern", "Bee Hive", "Rainy Day", "Golden Hour"];
+  var C_FR = { fresh: ["Petit Chèvre de Honeybrook", "Chèvre du Ruisseau", "Frais de la Ferme"], cheddar: ["Tomme de Honeybrook", "Vieux Grange", "Tomme du Moulin"], blue: ["Bleu de la Baie", "Bleu du Ruisseau", "Bleu de Honeybrook"] };
+  function cheeseNames(F2, kind, seed2 = 0) {
+    const h = hfState(F2), c = CHEESES[kind];
+    if (!c) return [];
+    const used = new Set([...h.names, ...h.cave.map((w) => w.name)].map((x) => x.toLowerCase())), from = kind === "fresh" ? GOATS : COWS, out = [];
+    const sd = Math.floor(seed2) + h.names.length * 31 + Object.keys(CHEESES).indexOf(kind) * 7;
+    for (let k = 0; out.length < 12 && k < 200; k++) {
+      const w = c.words[(sd + k) % c.words.length], a = from[(sd + k * 3) % from.length].n, kind3 = k % 3;
+      const nm3 = kind3 === 0 ? `${C_PLACE[(sd + k * 5) % C_PLACE.length]} ${w}` : kind3 === 1 ? `${a}'s ${C_PLACE[(sd + k * 7 + 2) % C_PLACE.length]} ${w}` : C_FR[kind][(sd + k) % C_FR[kind].length];
+      if (!used.has(nm3.toLowerCase()) && !out.includes(nm3)) out.push(nm3);
+    }
+    return out;
+  }
+  var caveLeft = (w) => Math.max(0, w.done - clock());
+  function pressCheese2(F2, kind, name) {
+    const h = hfState(F2), c = CHEESES[kind], inv = F2.inv || {};
+    if (!c || h.cave.length >= CAVE || (inv[c.milk] || 0) < c.need) return null;
+    inv[c.milk] -= c.need;
+    if (!inv[c.milk]) delete inv[c.milk];
+    const nm3 = String(name || "").replace(/[<>&"]/g, "").trim().slice(0, 30) || cheeseNames(F2, kind, clock() / 864e5)[0] || c.n, t2 = clock();
+    const w = { kind, name: nm3, start: t2, done: t2 + c.days * 864e5 };
+    h.cave.push(w);
+    h.names = [...h.names, nm3].slice(-60);
+    return w;
+  }
+  function takeWheel(F2, i) {
+    const h = hfState(F2), w = h.cave[i];
+    if (!w || caveLeft(w)) return null;
+    const c = CHEESES[w.kind];
+    h.cave.splice(i, 1);
+    F2.inv = F2.inv || {};
+    F2.inv[c.id] = (F2.inv[c.id] || 0) + c.wedges;
+    return { w, c };
   }
   function buyStand(F2, id) {
     const p = STAND[id];
@@ -14263,12 +14393,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function hivesPanel(F2, keeper) {
     const h = hfState(F2), full = fullHives(h);
-    let p = `<span class="tape stripe" aria-hidden="true"></span><h2>The beehives</h2><p class="sub">Five hives in the lavender. Each fills over three days; collect a full one and you get ${JARS} jars of honey (Felix keeps the rest for his market stall). ${keeper ? "Felix lends you his bee veil." : "Put on the bee veil from the hook."}</p>`;
+    let p = `<span class="tape stripe" aria-hidden="true"></span><h2>The beehives</h2><p class="sub">Five hives in the lavender. Each fills over three days; collect a full one and you get ${JARS} frames of comb to spin into jars at the extractor in the barn (Felix keeps the rest for his market stall). This week the bees are on the ${honeyNow().n}. ${keeper ? "Felix lends you his bee veil." : "Put on the bee veil from the hook."}</p>`;
     p += `<ul class="hlist wlist">${h.hives.map((_, i) => {
       const f2 = hiveFill(h, i);
       return `<li><span class="wpic">${icon("honey", 22)}</span><span class="wtxt"><b>Hive ${i + 1}</b><small>${f2 >= 1 ? "full, heavy with honey" : `${Math.round(f2 * 100)}% full`}</small></span><span class="clbar" style="width:80px"><i style="width:${Math.round(f2 * 100)}%"></i></span></li>`;
     }).join("")}</ul>`;
-    return p + `<div class="actions"><button class="btn primary small" data-hf="honey" ${full.length ? "" : "disabled"}>${full.length ? `Collect ${full.length * JARS} jars` : "Nothing ready yet"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
+    return p + `<div class="actions"><button class="btn primary small" data-hf="honey" ${full.length ? "" : "disabled"}>${full.length ? `Collect ${full.length * JARS} frames` : "Nothing ready yet"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function standPanel(F2) {
     let p = `<span class="tape gingham" aria-hidden="true"></span><h2>The farm stand</h2><p class="sub">Fresh from the farm, an honesty tin for the coins. You have ${F2.coins} ${coin()}.</p>`;
@@ -14276,6 +14406,38 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return p + shut;
   }
   var giveName = (id) => NAMES[id] || id;
+  var dur2 = (ms) => {
+    const hrs4 = Math.ceil(ms / 36e5);
+    return hrs4 >= 24 ? `${Math.floor(hrs4 / 24)}d ${hrs4 % 24}h` : `${hrs4}h`;
+  };
+  function extractorPanel(F2) {
+    const h = hfState(F2), k = honeyNow();
+    return `<span class="tape stripe" aria-hidden="true"></span><h2>The honey extractor</h2><p class="sub">Frames of comb from the hives go in the drum; a good spin, and the honey runs into jars. This week it's ${k.n} honey. ${h.frames ? `${h.frames} frame${h.frames === 1 ? "" : "s"} waiting.` : "No frames waiting: collect them from the hives."}</p>
+    <div class="actions"><button class="btn primary small" data-hf="spin" ${h.frames ? "" : "disabled"}>${h.frames ? `Spin and jar (${h.frames})` : "Nothing to spin"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function crockPanel(F2) {
+    const inv = F2.inv || {}, m = (inv.milk || 0) + (inv.goatmilk || 0);
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>The yoghurt crocks</h2><p class="sub">A bottle of milk or goat's milk makes a pot of thick yoghurt: for frozen yoghurt at the Scoop Shack, or breakfast. You have ${m} bottle${m === 1 ? "" : "s"} of milk${inv.yoghurt ? ` and ${inv.yoghurt} pot${inv.yoghurt === 1 ? "" : "s"} of yoghurt` : ""}.</p>
+    <div class="actions"><button class="btn primary small" data-hf="yog" ${m ? "" : "disabled"}>Make one</button><button class="btn alt small" data-hf="yogall" ${m > 1 ? "" : "disabled"}>All of it</button><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function pressPanel2(F2, st6 = {}) {
+    const h = hfState(F2), inv = F2.inv || {}, kind = CHEESES[st6.kind] ? st6.kind : "cheddar", c = CHEESES[kind], ok = h.cave.length < CAVE && (inv[c.milk] || 0) >= c.need, sug = cheeseNames(F2, kind, Math.floor(clock() / 864e5));
+    let p = `<span class="tape stripe" aria-hidden="true"></span><h2>The cheese press</h2><p class="sub">Choose a cheese, give the wheel a name, and press it. It ages on a shelf in the cave until it's ripe. ${h.cave.length} of ${CAVE} shelves in use.</p>`;
+    p += `<div class="gchips">${Object.entries(CHEESES).map(([k, x]) => `<button class="gchip${k === kind ? " on" : ""}" data-hf="ckind" data-k="${k}" aria-pressed="${k === kind}"><span class="gdot" style="background:${x.col}"></span><span>${esc(x.n)}</span></button>`).join("")}</div>`;
+    p += `<p class="muted">${esc(c.n)}: ${c.need} ${c.milk === "goatmilk" ? "goat's milk" : "milk"} (you have ${inv[c.milk] || 0}), ripe in ${c.days} day${c.days === 1 ? "" : "s"}, ${c.wedges} wedges.</p>`;
+    p += `<label class="sr" for="hfName">Name this wheel</label><input id="hfName" class="vyname" maxlength="30" placeholder="${esc(sug[0] || "Name it")}" value="${esc(st6.name || "")}"><div class="actions"><button class="btn alt small" data-hf="csug">Suggest a name</button><button class="btn primary small" data-hf="press" ${ok ? "" : "disabled"}>Press it</button><button class="btn alt small" data-close="1">Close</button></div>`;
+    if (!ok) p += `<p class="muted">${h.cave.length >= CAVE ? "The cave's full: take a ripe wheel out first." : `Not enough ${c.milk === "goatmilk" ? "goat's milk" : "milk"}: milk the ${c.milk === "goatmilk" ? "goats" : "cows"} in the morning.`}</p>`;
+    return p;
+  }
+  function cavePanel(F2) {
+    const h = hfState(F2);
+    let p = `<span class="tape gingham" aria-hidden="true"></span><h2>The cheese cave</h2><p class="sub">Cool and dark, with wheels on oak shelves. Elena turns them every morning. ${h.cave.length} of ${CAVE} shelves in use.</p>`;
+    p += h.cave.length ? `<ul class="hlist wlist">${h.cave.map((w, i) => {
+      const c = CHEESES[w.kind], left4 = caveLeft(w);
+      return `<li><span class="wpic"><span class="gdot" style="background:${c.col}"></span></span><span class="wtxt"><b>${esc(w.name)}</b><small>${esc(c.n)} · ${left4 ? `ripe in ${dur2(left4)}` : "ripe!"}</small></span>${left4 ? `<span class="clbar" style="width:70px"><i style="width:${Math.round(100 * (1 - left4 / (c.days * 864e5)))}%"></i></span>` : `<button class="btn small primary" data-hf="wheel" data-k="${i}">Cut it</button>`}</li>`;
+    }).join("")}</ul>` : `<p class="muted">Empty shelves. Press a wheel at the cheese press.</p>`;
+    return p + shut;
+  }
 
   // src/art/hfarm.js
   var W6 = ink;
@@ -14418,12 +14580,15 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     grape_white: ["White grapes", "White Grape", "#C9D98A"],
     housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
     goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
+    yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"],
+    honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"],
+    honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],
     // from Honeybrook Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)
     ...Object.fromEntries(Object.values(TREES).map((t2) => [t2.fruit, [t2.fruit[0].toUpperCase() + t2.fruit.slice(1), t2.fruit[0].toUpperCase() + t2.fruit.slice(1), FRUIT_COL[t2.fruit] || "#F3C969"]])),
     ...Object.fromEntries(Object.entries(FLOWERS).map(([id, f2]) => ["fl_" + id, [f2.n, f2.n.replace(/s$/, "").replace(/ie$/, "y").replace("Sweet pea", "Sweet Pea"), f2.col || "#F4C7CF"]]))
   };
   var isIngr = (id) => id in INGR;
-  var isDairy = (ings) => ings.includes("milk") || ings.includes("goatmilk");
+  var isDairy = (ings) => ings.includes("milk") || ings.includes("goatmilk") || ings.includes("yoghurt");
   var word = (id) => INGR[id][1];
   function scoopState(F2) {
     F2.scoop = F2.scoop || {};
@@ -15075,7 +15240,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var SHELL = 6;
   var TRAY = 12;
   var CASE = 6;
-  var NOT_FILLING = ["milk", "goatmilk", "egg", "olives", "corn", "carrot", "tomato", "housechoc"];
+  var NOT_FILLING = ["milk", "goatmilk", "yoghurt", "egg", "olives", "corn", "carrot", "tomato", "housechoc"];
   var WINE_FILL = { wine_red: ["Red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Rosé", "Rosé", "#E98AA0"], wine_white: ["White wine", "White Wine", "#E8D57A"], wine_sparkling: ["Sparkling wine", "Bubbly", "#F3E7B0"] };
   var WINE_FILLS = 4;
   var FL = (id) => INGR[id] || WINE_FILL[id];
@@ -16126,6 +16291,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     sprinkler: { n: "Sprinkler", price: 300, ico: "sprinkler", what: "New seeds water themselves the moment you plant them." }
   };
   var hfView = null;
+  var hfSt = { kind: "cheddar", name: "", sug: 0 };
   var ccView = null;
   var lastCocoa = 0;
   var ccSt = { shell: "dark", sel: [] };
@@ -18753,7 +18919,8 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (fieldView && scene === "field") {
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
       h = !st6 ? "" : st6.kind === "wine" ? stallMarketPanel(F, serving()) : st6.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st6.kind === "scoop" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st6, dayKey(), sgHM()) }) : st6.kind === "cocoa" ? counterPanel3(F, { cart: true, server: isHere("mateo") }) : marketStallPanel(st6);
-    } else if (hfView && scene === "hfarm") h = hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
+    } else if (hfView && scene === "barn") h = hfView === "extractor" ? extractorPanel(F) : hfView === "crock" ? crockPanel(F) : hfView === "press" ? pressPanel2(F, hfSt) : cavePanel(F);
+    else if (hfView && scene === "hfarm") h = hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
     else if (orView === "pot" && potItem) h = potPanel(F, potItem);
     else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? counterPanel3(F, { server: isHere("amara"), hand: isHere("mateo") }) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccView === "ups" ? upsPanel(F) : kitchenPanel(F, ccView);
     else if (keepItem && F.inv[keepItem]) h = keepPanel(F, keepItem);
@@ -18907,7 +19074,7 @@ ${SIGNOFF[t2.who] || ""}`;
     if (scView || fieldView === "mstall8" && scene === "field") wireScoop(c);
     wireCompanions(c);
     if (ccView || fieldView === "mstall9" && scene === "field") wireCocoa(c);
-    if (hfView && scene === "hfarm") wireFarm(c);
+    if (hfView && (scene === "hfarm" || scene === "barn")) wireFarm(c);
     c.querySelectorAll("[data-sup]").forEach((b) => b.onclick = () => {
       goalView = null;
       ctx();
@@ -19717,7 +19884,7 @@ ${SIGNOFF[t2.who] || ""}`;
     const m = sgHM();
     return m >= 20 * 60 || m < 7 * 60;
   };
-  var evanHere = () => scene === "kidroom" || (scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "scoopdip" || scene === "cocoa" || scene === "cocoakitchen" || scene === "mumdad" || scene === "marcus") && !evanNight() || evanAtDinner();
+  var evanHere = () => scene === "kidroom" || (scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "hfarm" || scene === "barn" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "scoopdip" || scene === "cocoa" || scene === "cocoakitchen" || scene === "mumdad" || scene === "marcus") && !evanNight() || evanAtDinner();
   var evanAtDinner = () => {
     const d = dinnerNow(dayKey(), sgHM());
     return !!d && scene === d.host;
@@ -19788,7 +19955,7 @@ ${SIGNOFF[t2.who] || ""}`;
       if (id === "base") {
         evan.x = evan.tx = 300;
         evan.y = evan.ty = 360;
-      } else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "hfarm" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoa" || id === "cocoakitchen" || id === "mumdad" || id === "marcus" || id === "cottage") {
+      } else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "hfarm" || id === "barn" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoa" || id === "cocoakitchen" || id === "mumdad" || id === "marcus" || id === "cottage") {
         evan.x = evan.tx = p[0] + 26;
         evan.y = evan.ty = p[1] + 10;
         evan.run = false;
@@ -20225,6 +20392,15 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     if (scene === "cocoa" && id === "ctables") {
       sitAt(SHOP_SEATS2);
+      return;
+    }
+    if (scene === "barn" && (id === "extractor" || id === "crock" || id === "press" || id === "cave")) {
+      hfView = id;
+      hfState(F);
+      sfx("paper", true);
+      if (id === "cave" && isHere("elena")) npcSay("elena", pick(["Turn them every morning. They like the attention.", "Smell that? That's a cheese thinking."]));
+      else if (id === "press" && isHere("elena")) npcSay("elena", "Name it something nice. A wheel with a good name ages better. Everyone knows that.");
+      render();
       return;
     }
     if (COCOA_IN.includes(scene)) {
@@ -21005,6 +21181,10 @@ ${SIGNOFF[t2.who] || ""}`;
       ctx();
       drawScene();
     };
+    const nm3 = c.querySelector("#hfName");
+    if (nm3) nm3.oninput = () => {
+      hfSt.name = nm3.value;
+    };
     c.querySelectorAll("[data-hf]").forEach((b) => b.onclick = () => {
       const a = b.dataset.hf, k = b.dataset.k;
       if (a === "feed") {
@@ -21048,6 +21228,44 @@ ${SIGNOFF[t2.who] || ""}`;
         if (!buyStand(F, k)) return;
         sfx("coin");
         flash(`${giveName(k)} from the farm stand`);
+      } else if (a === "spin") {
+        const r = spinFrames(F);
+        if (!r) return;
+        sfx("chime");
+        act("cheer");
+        gainXp(1);
+        speak(`Whirr, whirr... ${r.n} jar${r.n === 1 ? "" : "s"} of ${r.kind.n} honey, golden and still warm.`, 4500);
+      } else if (a === "yog" || a === "yogall") {
+        const n = makeYoghurt(F, a === "yogall");
+        if (!n) return;
+        sfx("tap");
+        flash(`${n} pot${n === 1 ? "" : "s"} of yoghurt`);
+      } else if (a === "ckind") {
+        hfSt.kind = k;
+        hfSt.name = "";
+        hfSt.sug = 0;
+      } else if (a === "csug") {
+        const ns = cheeseNames(F, hfSt.kind, Math.floor((Date.now() + (globalThis.__mapleOffset || 0)) / 864e5));
+        hfSt.sug = (hfSt.sug + 1) % Math.max(1, ns.length);
+        hfSt.name = ns[hfSt.sug] || "";
+        sfx("tap");
+      } else if (a === "press") {
+        const w = pressCheese2(F, hfSt.kind, hfSt.name);
+        if (!w) return;
+        hfSt.name = "";
+        hfSt.sug = 0;
+        sfx("chime");
+        act("cheer");
+        gainXp(2);
+        speak(`${w.name} is pressed and on a shelf in the cave. Ripe in ${CHEESES[w.kind].days} day${CHEESES[w.kind].days === 1 ? "" : "s"}.`, 5e3);
+      } else if (a === "wheel") {
+        const r = takeWheel(F, +k);
+        if (!r) return;
+        sfx("chime");
+        act("cheer");
+        gainXp(1);
+        mprop("heart", mel.x, mel.y - 60, 1600);
+        speak(`${r.w.name}: ripe and perfect. ${r.c.wedges} wedges of ${r.c.n.toLowerCase()} in your backpack.`, 5e3);
       }
       re();
     });
@@ -21577,6 +21795,7 @@ ${SIGNOFF[t2.who] || ""}`;
     kitchen: "the wine shop kitchen",
     bay: "the bay",
     hfarm: "Honeybrook Farm",
+    barn: "the barn at Honeybrook",
     scoopshop: "the Scoop Shack",
     scoopkitchen: "the gelato kitchen",
     scoopdip: "the dip station",
@@ -22322,7 +22541,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     const s = list2.find((s2) => Math.hypot(s2.tx - mel.x, s2.ty - mel.y) < 26);
     return s ? s.id : null;
   }
-  var EVAN_SPOTS = { hfarm: [[260, 520], [200, 560], [330, 580], [260, 290], [60, 500], [460, 520]], bay: [[300, 400], [250, 560], [300, 330], [200, 300], [290, 500]], scoopshop: [[200, 440], [380, 440], [300, 560], [140, 560], [260, 420]], scoopkitchen: [[200, 560], [380, 540], [300, 580]], scoopdip: [[180, 560], [420, 560], [140, 420]], cocoa: [[200, 440], [380, 450], [140, 560]], cocoakitchen: [[200, 560], [380, 560]], mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[150, 340], [260, 330], [380, 330], [200, 580], [330, 590]] };
+  var EVAN_SPOTS = { barn: [[200, 560], [330, 600], [160, 380]], hfarm: [[260, 520], [200, 560], [330, 580], [260, 290], [60, 500], [460, 520]], bay: [[300, 400], [250, 560], [300, 330], [200, 300], [290, 500]], scoopshop: [[200, 440], [380, 440], [300, 560], [140, 560], [260, 420]], scoopkitchen: [[200, 560], [380, 540], [300, 580]], scoopdip: [[180, 560], [420, 560], [140, 420]], cocoa: [[200, 440], [380, 450], [140, 560]], cocoakitchen: [[200, 560], [380, 560]], mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[150, 340], [260, 330], [380, 330], [200, 580], [330, 590]] };
   function evanWalk(speed, dt) {
     const key = evan.tx + "," + evan.ty;
     if (key !== evan.rk) {

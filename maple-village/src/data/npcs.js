@@ -281,7 +281,7 @@ export const NPCS = [
     hellos: ["Morning, Mel!", "Ah, a helper!"], away: "Felix is in the farmhouse with his feet up."},
   {id: "elena", pitch: 1.05, name: "Elena", job: "Runs the dairy at Honeybrook Farm",
     look: {skin: "#D9A882", hair: "#5A3A2A", hairStyle: "bun", top: "#9C8CD9", bottom: "#3E4A43", extra: "apron"},
-    routine: [slot("06:00", "11:00", "hfarm", [[30, 400], [260, 400], [490, 420], [440, 516]]), slot("11:00", "13:00", "hfarm", [458, 270]),
+    routine: [slot("06:00", "11:00", "hfarm", [[30, 400], [260, 400], [490, 420], [440, 516]]), slot("11:00", "13:00", "barn", [[262, 520], [380, 560], [160, 560]]),
       slot("13:00", "18:00", "hfarm", [[200, 600], [260, 524], [440, 512], [458, 270]])],
     intro: "I'm Elena. Cows, goats, and soon a proper cheese cave in the barn. The cheese at my market stall? Aged right here.",
     lines: ["Daisy's the boss of the paddock. Mochi just pretends.", "Milking at six. The goats prefer six-fifteen.", "A good cheese takes patience. So does a good goat.", "Pepper ate my notebook again."],

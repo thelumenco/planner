@@ -1241,3 +1241,20 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Round 94c:**
   - The honesty freezer sits against the Scoop Shack's front wall, right of the door (bay.js `translate(-4 -32)`, place door 432,290). It's outside so it can sell while the shop's shut.
   - The farm's paddocks are smaller and lower (cows 54–216, goats 304–466, y 336–470), with paths round them at x=30, x=490 and y=282.
+
+### Round 95: Honeybrook Farm, step 2 (the barn)
+- **The barn is a room now** (`ROOMS.barn`, entered from the farm's `barn` place). Its shell is in interiors.js: red planks, straw, a beam with lanterns and a hay door. Stations:
+  - `stalls` and `hayloft`: just lines.
+  - `extractor` (the honey extractor), `crock` (yoghurt crocks), `press` (the cheese press, furniture kind `hfpress`, since `cheesepress` is the wine kitchen's), `cave` (the cheese cave, which draws a wheel on its shelves for each one ageing).
+  - Station taps go through the room-spot handler (beside the Cocoa Room's), setting `hfView`. Panels are in hfarm.js; actions run through `wireFarm`.
+- **Honey:**
+  - Collecting a full hive now gives 2 frames (`h.frames`), not jars.
+  - The extractor (`spinFrames`) turns frames into jars of this week's honey (`honeyNow`, rotating weekly): wildflower `honey`, `honey_lav` or `honey_blossom`. The new two are gift items, gelato ingredients and bonbon fillings.
+- **Yoghurt:** `makeYoghurt` turns 1 milk or goat's milk into 1 `yoghurt` (an ingredient; dairy in gelato, so frozen yoghurt).
+- **Cheese:**
+  - `CHEESES`: fresh goat's cheese (2 goat's milk, 1 day, 4 wedges), farmhouse cheddar (3 milk, 4 days, 6), Honeybrook blue (3 milk, 6 days, 6).
+  - `pressCheese` puts a named wheel on one of 6 cave shelves (`h.cave`). `cheeseNames` suggests names from farm places, the animal and French ones, never repeating a name used before (`h.names`).
+  - The press panel works like the wine bottling: the first suggestion is the placeholder (used if blank), and "Suggest a name" cycles through the rest. `hfSt` holds the choice.
+  - `takeWheel` cuts a ripe wheel into wedges: `chz_fresh`, `chz_cheddar`, `chz_blue`. They're gift items; none go to Marcus, and only the adventurous get the blue.
+- **Elena** spends 11–1 in the barn. Evan follows Mel onto the farm and into the barn.
+- **Not done yet:** the cheeses don't reach the wine shop's tapas, Elena's stall or Ma Ma's farm shop. That could come later.

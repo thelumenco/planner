@@ -100,7 +100,7 @@ export const VILLAGE = {
   toBayF: {scene:"hfarm", name:"Gate to the bay", door:[22,286], spot:true, bridge:"bay", mark:[30,226], line:"West through the gate to the bay."},
   hfEast: {scene:"hfarm", name:"The lane to the cottages", door:[498,560], spot:true, mark:[490,506], line:"The lane east to Honeybrook's cottages and the station. Still being built: soon!"},
   farmhouse:{scene:"hfarm", name:"The farmhouse", door:[105,246], spot:true, mark:[105,100], line:"Felix and Elena's farmhouse. The kettle's always on."},
-  barn:   {scene:"hfarm", name:"The barn", door:[400,250], spot:true, mark:[400,90], line:"The big red barn: hay up top, milking stalls below. Elena's setting up a dairy and a cheese cave inside."},
+  barn:   {scene:"hfarm", name:"The barn", short:"the barn", door:[400,250], mark:[400,90]},
   hives:  {scene:"hfarm", name:"The beehives", door:[250,256], spot:true, mark:[250,150], line:"Felix's beehives, in the lavender."},
   cows:   {scene:"hfarm", name:"The cow paddock", door:[135,490], spot:true, mark:[135,300], line:"Daisy, Buttercup and Mochi."},
   goats:  {scene:"hfarm", name:"The goat paddock", door:[385,490], spot:true, mark:[385,300], line:"Pepper, Biscuit, Nutmeg and Toffee."},
@@ -321,6 +321,15 @@ export const ROOMS = {
     ["gdipbar","Dip bar","B","gdipbar",null,"Dip it, top it.",34]]},
   // The Cocoa Room (a big goal, in the bay's old shopfront): the counter (Amara serves behind it; the front is drawn
   // over the people), the bar wall, a table, and the kitchen door; behind it the chocolate kitchen, bean to bar
+  // Honeybrook Farm's barn: milking stalls and the hay loft, the honey extractor, the yoghurt crocks, the cheese press
+  // and the cheese cave (game/hfarm.js)
+  barn: {name:"The barn", wall:"#C98A6A", trim:"#8E2C2C", noBoard:true, pos:{S:[110,262], H:[262,262], X:[420,262], Y:[100,470], P:[262,450], C:[424,480]}, stations:[
+    ["stalls","Milking stalls","S","stalls",null,"The milking stalls. Daisy, Buttercup and Mochi come in here when it rains; the rest of the time they're milked out in the paddock.",30],
+    ["hayloft","Hay loft","H","hayloft",null,"Bales of sweet hay, all the way up to the rafters. Biscuit the goat has tried to climb it twice.",30],
+    ["extractor","Honey extractor","X","extractor",null,"The honey extractor: frames in, honey out.",30],
+    ["crock","Yoghurt crocks","Y","crock",null,"Crocks of yoghurt, setting.",30],
+    ["press","Cheese press","P","hfpress",null,"The cheese press.",30],
+    ["cave","Cheese cave","C","cheesecave",null,"The cheese cave.",30]]},
   cocoa: {name:"The Cocoa Room", wall:"#F3E4D2", trim:"#6B4430", noBoard:true, pos:{C:[300,330], W:[110,262], Z:[40,400], T:[340,520], D:[440,262]}, stations:[
     ["case","Display case","D","bonboncase",null,"The display case: bonbons, six flavours at a time.",36],
     ["ccounter","Counter","C","ccounter",null,"The counter. Yours are free.",46],
