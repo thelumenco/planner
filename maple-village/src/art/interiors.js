@@ -173,6 +173,22 @@ const SHELLS = {
     ${sk(`<rect x="160" y="40" width="110" height="6" style="fill:#B9C4CC"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${172 + i*20} 46 l6 18 l6 -18z" style="fill:#E8C48E"/>`).join("")}`, `<rect x="160" y="40" width="110" height="6"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${172 + i*20} 46 l6 18 l6 -18z"/>`).join("")}`)}
     ${plant(30, 612, .9)}`,
 
+  // The Cocoa Room: warm cream walls with a cocoa stripe, a chalk sign, cocoa-pod sconces, a herringbone floor
+  cocoa: () => `<rect width="520" height="640" style="fill:#E8D3BC"/>
+    <g opacity=".5">${rows(12, r => rows(13, c => `<path d="M${c*40} ${150 + r*42} l20 21 l20 -21" fill="none" style="stroke:#D2B89C" stroke-width="1.4"/>`))}</g>
+    ${wallBase("#F3E4D2", "#6B4430")}<g opacity=".4">${rows(13, i => `<rect x="${i*40}" y="0" width="14" height="138" style="fill:#E8D3BC"/>`)}</g>${skirting}
+    ${sk(`<rect x="196" y="30" width="128" height="72" rx="3" style="fill:#3E4A43"/>`, `<rect x="196" y="30" width="128" height="72" rx="3"/>`)}
+    <g font-family="Klee One,serif" font-weight="600" text-anchor="middle" pointer-events="none"><text x="260" y="58" font-size="13" fill="#F3C969">from the bean</text><text x="260" y="80" font-size="9" fill="#F6EFE3">made right here, in the kitchen</text></g>
+    ${sk(`<ellipse cx="400" cy="70" rx="12" ry="18" style="fill:#C2505F"/><ellipse cx="460" cy="70" rx="12" ry="18" style="fill:#E3A23A"/>`, `<ellipse cx="400" cy="70" rx="12" ry="18"/><path d="M400 52 v36" opacity=".5"/><ellipse cx="460" cy="70" rx="12" ry="18"/><path d="M460 52 v36" opacity=".5"/>`)}
+    ${plant(492, 612, 1)}`,
+  // the chocolate kitchen: white tiles, a window, copper pans on a rail
+  cocoakitchen: () => `<rect width="520" height="640" style="fill:#F2EBE2"/>
+    <g opacity=".5">${rows(12, r => rows(13, c => (r + c) % 2 ? `<rect x="${c*40}" y="${150 + r*42}" width="40" height="42" style="fill:#E6D9C8"/>` : ""))}</g>
+    ${wallBase("#F6EEE4", "#8A5A3A")}<g opacity=".35" style="stroke:#D8C8B4">${rows(13, i => `<path d="M${i*40} 0 V138"/>`)}${rows(4, i => `<path d="M0 ${i*36 + 18} H520"/>`)}</g>${skirting}
+    ${sk(`<rect x="180" y="30" width="80" height="64" rx="4" style="fill:#CFE0EE"/>`, `<rect x="180" y="30" width="80" height="64" rx="4"/><path d="M220 30 v64 M180 62 h80"/>`)}
+    ${sk(`<path d="M300 40 h150" /><circle cx="330" cy="60" r="12" style="fill:#C98A4A"/><circle cx="370" cy="62" r="14" style="fill:#C98A4A"/><circle cx="412" cy="58" r="10" style="fill:#C98A4A"/>`, `<path d="M300 40 h150 M330 40 v8 M370 40 v8 M412 40 v8"/><circle cx="330" cy="60" r="12"/><circle cx="370" cy="62" r="14"/><circle cx="412" cy="58" r="10"/>`)}
+    ${plant(30, 612, .9)}`,
+
   // the chocolate dip station: cream walls with a chocolate drip along the top, pink tiles, a little round window
   scoopdip: () => `<rect width="520" height="640" style="fill:#FBEFF1"/>
     <g opacity=".5">${rows(12, r => rows(13, c => (r + c) % 2 ? `<rect x="${c*40}" y="${150 + r*42}" width="40" height="42" style="fill:#F2D9CC"/>` : ""))}</g>

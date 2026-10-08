@@ -1075,3 +1075,24 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Stored in `F.companions = [{id, kind, name, owner, scene, spot, since, patDay, playDay}]`, drawn by `petsIn` with a gentle bob.
   - Tap a pet (`data-pet`) to pat it (xp once a day). When its owner is on the same screen, they can play together: a line for the pair and one from the owner, xp once a day. You can also rename it or move its home.
   - An owner who isn't there sends a thank-you note.
+
+### Round 87: The Cocoa Room, step 1
+- **Opening it:** a big goal (`goals.js` "cocoa", 1000 coins), bought by tapping the bay's boarded-up shopfront (`reno`).
+  - Once owned, bay.js draws the shop there: cocoa walls, a striped awning, a window of chocolates, and a sign with its name. VILLAGE `cocoa`, door [396,516].
+- **Rooms:**
+  - `cocoa` (shop front): counter `ccounter`, whose front is drawn over the people in foreArt so Amara stands behind it; bar wall `barwall`; tables; kitchen door `ckdoor`.
+  - `cocoakitchen`: `sacks`, `roaster`, `grinder`, `slab`, `moulds`.
+- **cocoa.js** (state in `F.cocoa`), bean to bar, all done by Mel:
+  - Buy a sack (10 coins).
+  - Roast it (10 min, `ROAST_MIN`).
+  - Grind it as milk, dark or white (2 h, `GRIND_MIN`).
+  - Temper it on the slab (+30 pieces).
+  - Mould 10 pieces into 10 bars on the wall.
+  - Timers use the game clock and finish when ticked (`cocoaTick`).
+- **Sales:**
+  - Open 11–8, Tuesday to Sunday.
+  - Base rate .03 a minute; ×1.4 at weekends, ×1.2 from 3 to 6pm, ×1.5 while Mel's at the counter. 30% of customers buy two bars.
+  - The bar price is set at the counter, where Mel can also rename the shop.
+  - Mel can have a bar or take one to give (gift items `bar_milk`, `bar_dark`, `bar_white`; dark is dairy-free).
+- **Amara** (npcs.js) serves Tuesday to Sunday, 10:45–8:15, once the shop is owned. Routine slots' `needs` now also checks `F.goals`.
+- **Still to come, steps 2–4:** bonbons (discovery, display case, gift boxes, recipe book), the Scoop Shack and wine shop links, festival specials, and the upgrades catalogue.

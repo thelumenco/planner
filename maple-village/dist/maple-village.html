@@ -1916,6 +1916,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     chrystea: G("Chrysanthemum tea", ["mama", "gonggong", "dad", "mum"], 3, "night", "Chrysanthemum tea. Good for the eyes!", ["cup", "#F3D34A"]),
     coconutshake: G("Coconut shake", "family", 5, "night", "A coconut shake, straight from the coconut.", ["coconut", "#7FA35A"])
   };
+  Object.assign(GOODS, {
+    bar_milk: { ...G("Milk chocolate bar", NOM, 6, "cocoa", "Your own chocolate! Smooth and creamy.", ["bar", "#8A5A3A"]), says: { evan: "CHOCOLATE! Mama made it!", mama: "You made this? From the bean? Aiyo, so clever." } },
+    bar_dark: { ...G("Dark chocolate bar", "family", 6, "cocoa", "Dark chocolate, made from the bean! Rich.", ["bar", "#4A2E22"]), says: { marcus: "Dark choc, no dairy. Antioxidants, Zeh. Approved.", dad: "Dark chocolate with my coffee. Perfect." } },
+    bar_white: { ...G("White chocolate bar", NOM, 6, "cocoa", "White chocolate, sweet and vanilla-y.", ["bar", "#F3E7C9"]), says: { evan: "White chocolate! It's like milk but CHOCOLATE!" } }
+  });
   var K = (n, price, line, art2) => ({ n, kind: "keepsake", price, line, art: art2 });
   var P = (n, price, line, art2, pet) => ({ n, kind: "pet", price, line, art: art2, pet, say: "A new friend! I promise to look after it, always." });
   Object.assign(GOODS, {
@@ -2370,6 +2375,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       bird: (a) => [`<ellipse cx="11" cy="13" rx="6" ry="7" ${f(a)}/><circle cx="13" cy="7.5" r="3.5" ${f("#F3E07A")}/><path d="M16 7.5l3 1-3 1z" ${f("#F2A65A")}/>`, `<ellipse cx="11" cy="13" rx="6" ry="7"/><circle cx="13" cy="7.5" r="3.5"/><path d="M16 7.5l3 1-3 1M9 20v2M13 20v2M5 15l-3 4"/><circle cx="13.5" cy="7" r=".7"/>`],
       tortoise: (a) => [`<path d="M3 17q0-10 9-10t9 10z" ${f(a)}/><ellipse cx="21" cy="14" rx="2.5" ry="2" ${f("#B9D98A")}/>`, `<path d="M3 17q0-10 9-10t9 10zM8 10l4-2 4 2M6 14h12"/><ellipse cx="21" cy="14" rx="2.5" ry="2"/>`],
       duck: (a) => [`<ellipse cx="11" cy="15" rx="7" ry="5.5" ${f(a)}/><circle cx="15" cy="8.5" r="4" ${f(a)}/><path d="M18.5 8.5l3.5 1-3.5 1.5z" ${f("#F2A65A")}/>`, `<ellipse cx="11" cy="15" rx="7" ry="5.5"/><circle cx="15" cy="8.5" r="4"/><path d="M18.5 8.5l3.5 1-3.5 1.5"/><circle cx="16" cy="8" r=".7"/>`],
+      bar: (a) => [`<rect x="5" y="4" width="14" height="17" rx="1.5" ${f(a)}/><path d="M5 11h14v10H5z" ${f("#E8D3A6")}/><path d="M5 11h14" ${f("none")}/>`, `<rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M5 11h14M12 4v7M5 7.5h14"/><path d="M8 15h8M8 18h5" opacity=".5"/>`],
       coconut: (a) => [`<circle cx="12" cy="14" r="7" ${f(a)}/><ellipse cx="12" cy="9" rx="4" ry="1.5" ${f("#FFFDF6")}/>`, `<circle cx="12" cy="14" r="7"/><ellipse cx="12" cy="9" rx="4" ry="1.5"/><path d="M14 9l3-7"/>`]
     };
     Object.entries(GOODS).forEach(([id, g]) => {
@@ -2485,6 +2491,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     deck: { scene: "bay", name: "The deck", door: [215, 412], spot: true, line: "The deck, looking out over the foreshore. Bring an ice cream." },
     hfreezer: { scene: "bay", name: "Honesty freezer", door: [474, 336], spot: true, line: "The honesty freezer: little cups while the shop's shut." },
     dbike: { scene: "bay", name: "Delivery bike", door: [300, 290], spot: true, line: "The delivery bike." },
+    cocoa: { scene: "bay", name: "The Cocoa Room", short: "the Cocoa Room", door: [396, 516], mark: [396, 372] },
     reno: { scene: "bay", name: "Under renovation", door: [396, 520], spot: true, line: "Boarded up for now. Coming soon: a brewery? A chocolatier?" },
     homejetty: { scene: "base", name: "Little jetty", door: [150, 132], spot: true, line: "Your little jetty. Paddle down the river and out to the foreshore." },
     toTown: { scene: "base", name: "Bridge to town", door: [260, 114], spot: true, bridge: "village", mark: [260, 62], line: "Over the river to the town square." }
@@ -2532,7 +2539,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     // the Scoop Shack's kitchen, through the door on the shop's west wall; its own way back is the door on its east wall
     scoopkitchen: { parent: "scoopshop", door: [64, 400], arrive: [450, 440], exit: [486, 440] },
     // the chocolate dip station (an upgrade), through the door on the shop's east wall
-    scoopdip: { parent: "scoopshop", door: [456, 410], arrive: [70, 450], exit: [34, 440] }
+    scoopdip: { parent: "scoopshop", door: [456, 410], arrive: [70, 450], exit: [34, 440] },
+    // the Cocoa Room's kitchen, through the door on the shop's west wall
+    cocoakitchen: { parent: "cocoa", door: [64, 400], arrive: [450, 440], exit: [486, 440] }
   };
   var WORK = ["hall", "chord", "fresh", "chico", "luna", "ohayo", "post", "home"];
   var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
@@ -2723,6 +2732,21 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["gpots", "Chocolate pots", "P", "gpots", null, "Warm pots of chocolate for dipping.", 34],
       ["gtops", "Toppings shelf", "S", "gtopshelf", null, "Jars of toppings.", 34],
       ["gdipbar", "Dip bar", "B", "gdipbar", null, "Dip it, top it.", 34]
+    ] },
+    // The Cocoa Room (a big goal, in the bay's old shopfront): the counter (Amara serves behind it; the front is drawn
+    // over the people), the bar wall, a table, and the kitchen door; behind it the chocolate kitchen, bean to bar
+    cocoa: { name: "The Cocoa Room", wall: "#F3E4D2", trim: "#6B4430", noBoard: true, pos: { C: [300, 330], W: [110, 262], Z: [40, 400], T: [340, 520] }, stations: [
+      ["ccounter", "Counter", "C", "ccounter", null, "The counter. Yours are free.", 46],
+      ["barwall", "Bar wall", "W", "barwall", null, "Wrapped bars of your own chocolate.", 36],
+      ["ckdoor", "Kitchen", "Z", "gkdoor", null, "Into the chocolate kitchen.", 0],
+      ["ctables", "Tables", "T", "cafetables", null, "A table for a little something.", 34]
+    ] },
+    cocoakitchen: { name: "The chocolate kitchen", wall: "#F6EEE4", trim: "#8A5A3A", noBoard: true, pos: { S: [96, 262], R: [260, 262], G: [420, 262], M: [170, 480], O: [360, 480] }, stations: [
+      ["sacks", "Bean sacks", "S", "beansacks", null, "Sacks of cacao beans.", 30],
+      ["roaster", "Roaster", "R", "roaster", null, "The bean roaster.", 30],
+      ["grinder", "Stone grinder", "G", "grinder", null, "The stone grinder: roasted beans in, chocolate out.", 30],
+      ["slab", "Marble slab", "M", "slab", null, "The marble slab, for tempering.", 30],
+      ["moulds", "Moulds", "O", "moulds", null, "Bar moulds.", 30]
     ] },
     // the garage (a big goal): Darren's workbench, storage, the scooter and the car once they're bought
     garage: { name: "The garage", wall: "#E3E6EA", trim: "#8FA3B8", noBoard: true, pos: { W: [130, 250], E: [300, 262], K: [436, 261], C: [310, 480], D: [120, 566], S: [440, 566] }, stations: [
@@ -3500,6 +3524,21 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ${sk(`<rect x="300" y="30" width="80" height="64" rx="4" style="fill:#CFE0EE"/>`, `<rect x="300" y="30" width="80" height="64" rx="4"/><path d="M340 30 v64 M300 62 h80"/>`)}
     ${sk(`<rect x="160" y="40" width="110" height="6" style="fill:#B9C4CC"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${172 + i * 20} 46 l6 18 l6 -18z" style="fill:#E8C48E"/>`).join("")}`, `<rect x="160" y="40" width="110" height="6"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${172 + i * 20} 46 l6 18 l6 -18z"/>`).join("")}`)}
     ${plant(30, 612, 0.9)}`,
+    // The Cocoa Room: warm cream walls with a cocoa stripe, a chalk sign, cocoa-pod sconces, a herringbone floor
+    cocoa: () => `<rect width="520" height="640" style="fill:#E8D3BC"/>
+    <g opacity=".5">${rows(12, (r) => rows(13, (c) => `<path d="M${c * 40} ${150 + r * 42} l20 21 l20 -21" fill="none" style="stroke:#D2B89C" stroke-width="1.4"/>`))}</g>
+    ${wallBase("#F3E4D2", "#6B4430")}<g opacity=".4">${rows(13, (i) => `<rect x="${i * 40}" y="0" width="14" height="138" style="fill:#E8D3BC"/>`)}</g>${skirting}
+    ${sk(`<rect x="196" y="30" width="128" height="72" rx="3" style="fill:#3E4A43"/>`, `<rect x="196" y="30" width="128" height="72" rx="3"/>`)}
+    <g font-family="Klee One,serif" font-weight="600" text-anchor="middle" pointer-events="none"><text x="260" y="58" font-size="13" fill="#F3C969">from the bean</text><text x="260" y="80" font-size="9" fill="#F6EFE3">made right here, in the kitchen</text></g>
+    ${sk(`<ellipse cx="400" cy="70" rx="12" ry="18" style="fill:#C2505F"/><ellipse cx="460" cy="70" rx="12" ry="18" style="fill:#E3A23A"/>`, `<ellipse cx="400" cy="70" rx="12" ry="18"/><path d="M400 52 v36" opacity=".5"/><ellipse cx="460" cy="70" rx="12" ry="18"/><path d="M460 52 v36" opacity=".5"/>`)}
+    ${plant(492, 612, 1)}`,
+    // the chocolate kitchen: white tiles, a window, copper pans on a rail
+    cocoakitchen: () => `<rect width="520" height="640" style="fill:#F2EBE2"/>
+    <g opacity=".5">${rows(12, (r) => rows(13, (c) => (r + c) % 2 ? `<rect x="${c * 40}" y="${150 + r * 42}" width="40" height="42" style="fill:#E6D9C8"/>` : ""))}</g>
+    ${wallBase("#F6EEE4", "#8A5A3A")}<g opacity=".35" style="stroke:#D8C8B4">${rows(13, (i) => `<path d="M${i * 40} 0 V138"/>`)}${rows(4, (i) => `<path d="M0 ${i * 36 + 18} H520"/>`)}</g>${skirting}
+    ${sk(`<rect x="180" y="30" width="80" height="64" rx="4" style="fill:#CFE0EE"/>`, `<rect x="180" y="30" width="80" height="64" rx="4"/><path d="M220 30 v64 M180 62 h80"/>`)}
+    ${sk(`<path d="M300 40 h150" /><circle cx="330" cy="60" r="12" style="fill:#C98A4A"/><circle cx="370" cy="62" r="14" style="fill:#C98A4A"/><circle cx="412" cy="58" r="10" style="fill:#C98A4A"/>`, `<path d="M300 40 h150 M330 40 v8 M370 40 v8 M412 40 v8"/><circle cx="330" cy="60" r="12"/><circle cx="370" cy="62" r="14"/><circle cx="412" cy="58" r="10"/>`)}
+    ${plant(30, 612, 0.9)}`,
     // the chocolate dip station: cream walls with a chocolate drip along the top, pink tiles, a little round window
     scoopdip: () => `<rect width="520" height="640" style="fill:#FBEFF1"/>
     <g opacity=".5">${rows(12, (r) => rows(13, (c) => (r + c) % 2 ? `<rect x="${c * 40}" y="${150 + r * 42}" width="40" height="42" style="fill:#F2D9CC"/>` : ""))}</g>
@@ -3704,8 +3743,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (!P3.animals.length) h += `<p class="muted">It's quiet in here. Chicks and bunnies are in the market's Animals tab, with their food.</p>`;
     else {
       h += `<ul class="hlist pets">${P3.animals.map((a) => {
-        const hu = hungry(a, F2), left3 = Math.max(0, GROW - (a.feeds || 0));
-        return `<li><span class="pico">${icon(a.kind === "chick" ? isGrown(a) ? "hen" : "chick" : a.kind === "goat" ? "goat" : "rabbit", 30)}</span><span><b>${esc(a.name)}</b><small>${label(a)} · ${hu ? "hungry" : "fed and happy"}${left3 ? ` · ${left3} more ${left3 === 1 ? "meal" : "meals"} to grow up` : a.kind === "chick" ? " · lays an egg when fed" : ""}</small></span>${hu ? `<button class="next" data-feed="${a.id}">feed</button>` : `<span class="hbadge">full</span>`}</li>`;
+        const hu = hungry(a, F2), left4 = Math.max(0, GROW - (a.feeds || 0));
+        return `<li><span class="pico">${icon(a.kind === "chick" ? isGrown(a) ? "hen" : "chick" : a.kind === "goat" ? "goat" : "rabbit", 30)}</span><span><b>${esc(a.name)}</b><small>${label(a)} · ${hu ? "hungry" : "fed and happy"}${left4 ? ` · ${left4} more ${left4 === 1 ? "meal" : "meals"} to grow up` : a.kind === "chick" ? " · lays an egg when fed" : ""}</small></span>${hu ? `<button class="next" data-feed="${a.id}">feed</button>` : `<span class="hbadge">full</span>`}</li>`;
       }).join("")}</ul>`;
       if (hungryCount(F2) > 1) h += `<div class="actions"><button class="btn primary small" data-feed="all">Feed everyone</button></div>`;
     }
@@ -4046,10 +4085,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   function award(F2, list2) {
     const first = !Array.isArray(F2.trophies);
     if (first) F2.trophies = [];
-    const have = new Set(F2.trophies.map((t2) => t2.id)), now2 = Date.now(), fresh2 = [];
+    const have = new Set(F2.trophies.map((t2) => t2.id)), now3 = Date.now(), fresh2 = [];
     list2.forEach((m, i) => {
       if (have.has(m.id)) return;
-      const t2 = { ...m, at: now2 + i, book: false };
+      const t2 = { ...m, at: now3 + i, book: false };
       F2.trophies.push(t2);
       fresh2.push(t2);
     });
@@ -4057,7 +4096,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const moved = shown.slice(PEDESTALS);
     moved.forEach((t2) => {
       t2.book = true;
-      t2.bookAt = now2;
+      t2.bookAt = now3;
     });
     return { fresh: fresh2, first, moved };
   }
@@ -4800,6 +4839,19 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       lines: ["Busy night! Everyone's out.", "Have you heard the band? They're so good.", "Love this little town. Best market on our route.", "Come back Thursday, I'll have a new batch."],
       away: `${name}'s packed up and driven home.`
     })),
+    // Amara serves at the Cocoa Room's counter (once Mel opens it, goals.js "cocoa"), Tuesday to Sunday
+    {
+      id: "amara",
+      pitch: 1.15,
+      name: "Amara",
+      job: "Serves at the Cocoa Room",
+      look: { skin: "#A8754F", hair: "#1F1A17", hairStyle: "bun", top: "#8A5A3A", bottom: "#F3E7C9", extra: "apron" },
+      routine: [slot("10:45", "20:15", "cocoa", [300, 268], { dow: [0, 2, 3, 4, 5, 6], needs: "cocoa" })],
+      intro: "Hi, I'm Amara! I wrap, I sell, and I sneak the broken bits. Don't tell.",
+      lines: ["The dark one's flying off the wall today.", "Someone bought six bars. Six!", "It smells like heaven in here, all day long.", "I told a tourist you make it from the bean. They nearly cried."],
+      hellos: ["Hi Mel! The wall's looking good.", "Boss! Want a taste?"],
+      away: "Amara's off. The Cocoa Room's quiet."
+    },
     // Noor runs the pet adoption corner at the Sunday farmers market and the field fair (tours.js); no routine otherwise
     {
       id: "noor",
@@ -6306,8 +6358,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         return `<button class="btn small ${ok ? "alt" : "alt"}" data-vy="fill" data-i="${i}" data-k="${k}" ${ok ? "" : "disabled"}>${st6.n}</button>`;
       }).join("")}</div>`;
       else {
-        const left3 = barrelLeft(b), st6 = STYLES[b.style];
-        if (left3) h += `<p>${st6.n}${b.style === "sparkling" ? b.stage === 1 ? ", first fermentation" : ", getting its bubbles" : ""}: ready in ${hrs2(left3)}.</p><span class="clbar"><i style="width:${Math.round(100 * (1 - left3 / b.dur))}%"></i></span>`;
+        const left4 = barrelLeft(b), st6 = STYLES[b.style];
+        if (left4) h += `<p>${st6.n}${b.style === "sparkling" ? b.stage === 1 ? ", first fermentation" : ", getting its bubbles" : ""}: ready in ${hrs2(left4)}.</p><span class="clbar"><i style="width:${Math.round(100 * (1 - left4 / b.dur))}%"></i></span>`;
         else if (b.style === "sparkling" && b.stage === 1) h += `<p>First fermentation done. Now the bubbles.</p><button class="btn primary small" data-vy="second" data-i="${i}">Start the second fermentation</button>`;
         else h += `<p>${st6.n} is ready to bottle!</p><label class="sr" for="vyName${i}">Name this wine</label><input id="vyName${i}" class="vyname" maxlength="30" placeholder="Name it, e.g. Evan's Red" value="${esc(vy.name[i] || "")}"><button class="btn primary small" data-vy="bottle" data-i="${i}">Bottle it</button>`;
       }
@@ -6716,8 +6768,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       return `<li><span class="wtxt"><b>${fmtTime(t2.from)} to ${fmtTime(t2.to)}</b>${st6 ? ` <small class="muted">${st6}</small>` : ""}<small>${who3(t2)}</small><small>${t2.group.length} × ${TOUR_FEE} coins = ${t2.group.length * TOUR_FEE} coins</small></span></li>`;
     };
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Farm tours</h2>`;
-    const todays = toursOn(today2), left3 = todays.filter((t2) => t2.to > hmNow2);
-    if (left3.length) h += `<p class="sub">${left3[0].from > hmNow2 ? `Next tour today at ${fmtTime(left3[0].from)}.` : "A tour's going round right now."} Weekends at 10am, 11:30, 2pm and 4pm; Darren's on Tuesday and Thursday evenings.</p><ul class="hlist wlist">${todays.map((t2) => row2(t2, today2)).join("")}</ul>`;
+    const todays = toursOn(today2), left4 = todays.filter((t2) => t2.to > hmNow2);
+    if (left4.length) h += `<p class="sub">${left4[0].from > hmNow2 ? `Next tour today at ${fmtTime(left4[0].from)}.` : "A tour's going round right now."} Weekends at 10am, 11:30, 2pm and 4pm; Darren's on Tuesday and Thursday evenings.</p><ul class="hlist wlist">${todays.map((t2) => row2(t2, today2)).join("")}</ul>`;
     else {
       let day = today2, tours = [];
       for (let k = 1; k <= 7 && !tours.length; k++) {
@@ -8041,10 +8093,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       // a bedroom door (the family's houses): on the west or east wall depending on where it stands, with a little
       // heart sign; from 11pm to the morning a "shh" sign hangs on it
       case "bedroomdoor": {
-        const left3 = x < 260, d = left3 ? `M${x - 40} ${y - 108} L${x - 12} ${y - 96} L${x - 12} ${y + 4} L${x - 40} ${y + 14}z` : `M${x + 40} ${y - 108} L${x + 12} ${y - 96} L${x + 12} ${y + 4} L${x + 40} ${y + 14}z`, sx = left3 ? x - 26 : x + 26, m = new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8 * 36e5).getUTCHours(), night = m >= 23 || m < 6;
+        const left4 = x < 260, d = left4 ? `M${x - 40} ${y - 108} L${x - 12} ${y - 96} L${x - 12} ${y + 4} L${x - 40} ${y + 14}z` : `M${x + 40} ${y - 108} L${x + 12} ${y - 96} L${x + 12} ${y + 4} L${x + 40} ${y + 14}z`, sx = left4 ? x - 26 : x + 26, m = new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8 * 36e5).getUTCHours(), night = m >= 23 || m < 6;
         return sk(
           `<path d="${d}" style="fill:#E8B4C0"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2" style="fill:#FFFDF6"/>` : `<path d="M${sx} ${y - 58} c-4 -6 -10 -2 -6 3 l6 5 l6 -5 c4 -5 -2 -9 -6 -3z" style="fill:#E8566C"/>`}`,
-          `<path d="${d}"/><circle cx="${left3 ? x - 17 : x + 17}" cy="${y - 42}" r="1.8"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2"/><path d="M${sx - 6} ${y - 64} h12" opacity=".6"/>` : ""}`
+          `<path d="${d}"/><circle cx="${left4 ? x - 17 : x + 17}" cy="${y - 42}" r="1.8"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2"/><path d="M${sx - 6} ${y - 64} h12" opacity=".6"/>` : ""}`
         );
       }
       // the home office door on the living room's west wall, below Mel's
@@ -8177,6 +8229,42 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         );
       case "gcounter":
         return `<rect x="${x - 110}" y="${y - 56}" width="220" height="56" fill="transparent"/>`;
+      // the Cocoa Room: the counter's hit area (its front is drawn over the people, foreArt), the bar wall, and the
+      // kitchen's bean sacks, roaster, stone grinder, marble slab and moulds
+      case "ccounter":
+        return `<rect x="${x - 100}" y="${y - 56}" width="200" height="56" fill="transparent"/>`;
+      case "barwall": {
+        const c = G2.cocoa ? G2.cocoa() : { bars: {} }, cols = { milk: "#8A5A3A", dark: "#4A2E22", white: "#F3E7C9" }, ks = ["dark", "milk", "white"];
+        return sk(
+          `<rect x="${x - 50}" y="${y - 110}" width="100" height="110" rx="3" style="fill:#8A5A3A"/><rect x="${x - 44}" y="${y - 104}" width="88" height="98" style="fill:#F3E4D2"/>${ks.map((k, r) => Array.from({ length: Math.min(6, Math.ceil(((c.bars || {})[k] || 0) / 2)) }, (_, i) => `<rect x="${x - 40 + i * 14}" y="${y - 98 + r * 32}" width="11" height="22" rx="1" style="fill:${cols[k]}"/><rect x="${x - 40 + i * 14}" y="${y - 88 + r * 32}" width="11" height="12" style="fill:#E8D3A6"/>`).join("")).join("")}`,
+          `<rect x="${x - 50}" y="${y - 110}" width="100" height="110" rx="3"/><path d="M${x - 44} ${y - 72} h88 M${x - 44} ${y - 40} h88"/>`
+        );
+      }
+      case "beansacks":
+        return sk(
+          `${[[-24, 0, 26], [8, 0, 24], [-8, -26, 20]].map(([dx, dy, w]) => `<path d="M${x + dx - w / 2} ${y + dy} q-3 -26 ${w / 2} -30 q${w / 2} 4 ${w / 2} 30z" style="fill:#C9A27E"/>`).join("")}<ellipse cx="${x - 24}" cy="${y - 28}" rx="8" ry="3" style="fill:#6B4430"/>`,
+          `${[[-24, 0, 26], [8, 0, 24], [-8, -26, 20]].map(([dx, dy, w]) => `<path d="M${x + dx - w / 2} ${y + dy} q-3 -26 ${w / 2} -30 q${w / 2} 4 ${w / 2} 30z"/>`).join("")}<path d="M${x - 30} ${y - 14} h12 M${x + 2} ${y - 12} h12" opacity=".5"/>`
+        );
+      case "roaster":
+        return sk(
+          `<rect x="${x - 34}" y="${y - 30}" width="68" height="30" rx="3" style="fill:#5E5A55"/><circle cx="${x}" cy="${y - 52}" r="24" style="fill:#B9B0A4"/><circle cx="${x}" cy="${y - 52}" r="14" style="fill:#6B4430"/><rect x="${x + 20}" y="${y - 90}" width="10" height="30" style="fill:#8A8279"/>`,
+          `<rect x="${x - 34}" y="${y - 30}" width="68" height="30" rx="3"/><circle cx="${x}" cy="${y - 52}" r="24"/><circle cx="${x}" cy="${y - 52}" r="14"/><path d="M${x - 8} ${y - 52} h16" opacity=".6"/><rect x="${x + 20}" y="${y - 90}" width="10" height="30"/>`
+        );
+      case "grinder":
+        return sk(
+          `<rect x="${x - 36}" y="${y - 28}" width="72" height="28" rx="3" style="fill:#7FA3B8"/><ellipse cx="${x}" cy="${y - 38}" rx="32" ry="10" style="fill:#D9DEE3"/><ellipse cx="${x}" cy="${y - 40}" rx="24" ry="6" style="fill:#6B4430"/><ellipse cx="${x - 8}" cy="${y - 44}" rx="8" ry="6" style="fill:#B9B0A4"/><ellipse cx="${x + 10}" cy="${y - 44}" rx="8" ry="6" style="fill:#B9B0A4"/>`,
+          `<rect x="${x - 36}" y="${y - 28}" width="72" height="28" rx="3"/><ellipse cx="${x}" cy="${y - 38}" rx="32" ry="10"/><ellipse cx="${x - 8}" cy="${y - 44}" rx="8" ry="6"/><ellipse cx="${x + 10}" cy="${y - 44}" rx="8" ry="6"/>`
+        );
+      case "slab":
+        return sk(
+          `<rect x="${x - 56}" y="${y - 30}" width="112" height="30" rx="3" style="fill:#C9A27E"/><rect x="${x - 60}" y="${y - 38}" width="120" height="10" rx="2" style="fill:#EDEAE6"/><path d="M${x - 30} ${y - 34} q20 -6 40 0" style="fill:#4A2E22"/>`,
+          `<rect x="${x - 56}" y="${y - 30}" width="112" height="30" rx="3"/><rect x="${x - 60}" y="${y - 38}" width="120" height="10" rx="2"/><path d="M${x + 22} ${y - 42} l14 -10" stroke-width="2"/>`
+        );
+      case "moulds":
+        return sk(
+          `<rect x="${x - 52}" y="${y - 30}" width="104" height="30" rx="3" style="fill:#C9A27E"/>${[0, 1, 2].map((i) => `<rect x="${x - 44 + i * 32}" y="${y - 44}" width="24" height="14" rx="2" style="fill:#7FB8E8"/>`).join("")}`,
+          `<rect x="${x - 52}" y="${y - 30}" width="104" height="30" rx="3"/>${[0, 1, 2].map((i) => `<rect x="${x - 44 + i * 32}" y="${y - 44}" width="24" height="14" rx="2"/><path d="M${x - 36 + i * 32} ${y - 44} v14" opacity=".5"/>`).join("")}`
+        );
       // the upgrades catalogue on a little stand, and the dip station's door on the east wall (dashed till it's bought)
       case "gcatalogue":
         return sk(
@@ -8379,12 +8467,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         ) + (sl ? `<text x="${x - 14}" y="${y - 104}" font-size="11" fill="#3b3530" class="zz" pointer-events="none">z z</text>` : "");
       }
       case "curtwindow": {
-        const g = G2.F() || {}, night = G2.dusk(), shut2 = g.curtains ? g.curtains === "closed" : night || !!(G2.S && G2.S().sleep);
+        const g = G2.F() || {}, night = G2.dusk(), shut3 = g.curtains ? g.curtains === "closed" : night || !!(G2.S && G2.S().sleep);
         const cur2 = (fill2, lines, ox, delay) => `<g class="sway" style="transform-origin:${ox}px ${y - 170}px;animation-delay:-${delay}s">${sk(fill2, lines)}</g>`;
-        const curtains = shut2 ? cur2(`<path d="M${x - 50} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x - 50} ${y - 170} h50 v86 h-50z M${x - 40} ${y - 160} q4 30 0 70 M${x - 20} ${y - 164} q-4 34 0 74" opacity=".8"/>`, x - 25, 0) + cur2(`<path d="M${x} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x} ${y - 170} h50 v86 h-50z M${x + 20} ${y - 164} q4 34 0 74 M${x + 40} ${y - 160} q-4 30 0 70" opacity=".8"/>`, x + 25, 1.7) : cur2(`<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z" style="fill:var(--rose)"/>`, `<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z M${x - 50} ${y - 150} q4 30 -2 60" opacity=".8"/>`, x - 49, 0) + cur2(`<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z" style="fill:var(--rose)"/>`, `<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z M${x + 50} ${y - 150} q-4 30 2 60" opacity=".8"/>`, x + 49, 1.7);
+        const curtains = shut3 ? cur2(`<path d="M${x - 50} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x - 50} ${y - 170} h50 v86 h-50z M${x - 40} ${y - 160} q4 30 0 70 M${x - 20} ${y - 164} q-4 34 0 74" opacity=".8"/>`, x - 25, 0) + cur2(`<path d="M${x} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x} ${y - 170} h50 v86 h-50z M${x + 20} ${y - 164} q4 34 0 74 M${x + 40} ${y - 160} q-4 30 0 70" opacity=".8"/>`, x + 25, 1.7) : cur2(`<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z" style="fill:var(--rose)"/>`, `<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z M${x - 50} ${y - 150} q4 30 -2 60" opacity=".8"/>`, x - 49, 0) + cur2(`<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z" style="fill:var(--rose)"/>`, `<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z M${x + 50} ${y - 150} q-4 30 2 60" opacity=".8"/>`, x + 49, 1.7);
         return sk(
-          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4" style="fill:${night ? "#3E4673" : "var(--sky)"}"/>${night && !shut2 ? `<circle cx="${x + 18}" cy="${y - 142}" r="9" style="fill:#FFF3C4"/>` : !shut2 ? `<ellipse cx="${x - 14}" cy="${y - 120}" rx="18" ry="7" style="fill:#FFFDF6"/>` : ""}`,
-          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4"/><path d="M${x} ${y - 168} v82 M${x - 48} ${y - 128} h96" opacity="${shut2 ? 0 : 1}"/>`
+          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4" style="fill:${night ? "#3E4673" : "var(--sky)"}"/>${night && !shut3 ? `<circle cx="${x + 18}" cy="${y - 142}" r="9" style="fill:#FFF3C4"/>` : !shut3 ? `<ellipse cx="${x - 14}" cy="${y - 120}" rx="18" ry="7" style="fill:#FFFDF6"/>` : ""}`,
+          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4"/><path d="M${x} ${y - 168} v82 M${x - 48} ${y - 128} h96" opacity="${shut3 ? 0 : 1}"/>`
         ) + curtains + sk("", `<path d="M${x - 62} ${y - 172} h124" stroke-width="2.4"/><circle cx="${x - 62}" cy="${y - 172}" r="2.4"/><circle cx="${x + 62}" cy="${y - 172}" r="2.4"/>`);
       }
       case "record": {
@@ -8509,6 +8597,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         `<rect x="${x2 - 90}" y="${y2 - 44}" width="180" height="44" rx="4"/><rect x="${x2 - 94}" y="${y2 - 50}" width="188" height="8" rx="2"/><path d="M${x2 - 90} ${y2 - 22} h180" opacity=".35"/><path d="M${x2 - 60} ${y2 - 66} h8 l-1 14 h-6z M${x2 - 56} ${y2 - 66} v-6"/><path d="M${x2 - 42} ${y2 - 52} v4 M${x2 - 46} ${y2 - 48} h8"/><rect x="${x2 + 50}" y="${y2 - 62}" width="24" height="12" rx="2"/>`
       );
     }
+    if (id === "cocoa") {
+      const s2 = stationsOf("cocoa").find((t2) => t2.kind === "ccounter"), x2 = s2.x, y2 = s2.y;
+      return sk(
+        `<rect x="${x2 - 96}" y="${y2 - 46}" width="192" height="46" rx="4" style="fill:#8A5A3A"/><rect x="${x2 - 100}" y="${y2 - 52}" width="200" height="8" rx="2" style="fill:#F6EEE4"/><path d="M${x2 - 96} ${y2 - 24} h192" style="stroke:#F3E7C9" stroke-width="4"/>
+      ${[-70, -40, -10, 20].map((dx, i) => `<rect x="${x2 + dx}" y="${y2 - 64}" width="22" height="12" rx="2" style="fill:#FFFDF6"/>${[0, 1, 2].map((k) => `<circle cx="${x2 + dx + 5 + k * 6}" cy="${y2 - 58}" r="2.4" style="fill:${["#4A2E22", "#8A5A3A", "#C2505F", "#F3E7C9"][(i + k) % 4]}"/>`).join("")}`).join("")}<rect x="${x2 + 56}" y="${y2 - 66}" width="26" height="14" rx="2" style="fill:#F3C969"/>`,
+        `<rect x="${x2 - 96}" y="${y2 - 46}" width="192" height="46" rx="4"/><rect x="${x2 - 100}" y="${y2 - 52}" width="200" height="8" rx="2"/>${[-70, -40, -10, 20].map((dx) => `<rect x="${x2 + dx}" y="${y2 - 64}" width="22" height="12" rx="2"/>`).join("")}<rect x="${x2 + 56}" y="${y2 - 66}" width="26" height="14" rx="2"/>`
+      );
+    }
     if (id === "scoopshop") {
       const s2 = stationsOf("scoopshop").find((t2) => t2.kind === "gcounter"), x2 = s2.x, y2 = s2.y, sc = G2.scoop ? G2.scoop() : { recipes: [], tubs: {} };
       const rs = sc.recipes || [], tb = sc.tubs || {}, ids = Array.isArray(sc.display) ? sc.display : rs.filter((r) => tb[r.id] > 0).map((r) => r.id);
@@ -8584,8 +8680,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       if (sl) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".32" pointer-events="none"/>`;
       return h;
     }
-    if (id === "office" || id === "garage" || id === "scoopkitchen" || id === "scoopdip") {
-      const e = id !== "garage" && id !== "scoopdip", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx = e ? 486 : 34, sk2 = id === "scoopkitchen" || id === "scoopdip";
+    if (id === "office" || id === "garage" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoakitchen") {
+      const e = id !== "garage" && id !== "scoopdip", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx = e ? 486 : 34, sk2 = id === "scoopkitchen" || id === "scoopdip" || id === "cocoakitchen";
       h += `<g data-exit="1" aria-label="${sk2 ? "Back to the shop" : "Back to the living room"}"><ellipse class="hov" cx="${hx}" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>
       ${sk(`<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z" style="fill:${sk2 ? "#E3F2EC" : "#F8EED8"}"/>`, `<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z"/><circle cx="${e ? 497 : 23}" cy="384" r="1.8"/>`)}${tapeLabel(e ? 456 : 64, sk2 ? 478 : 296, sk2 ? "The shop" : "Living room", "var(--card)", 11)}</g>`;
       return h;
@@ -9558,13 +9654,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ${done.length ? `<button class="subdonebtn" data-nb="subdone" aria-expanded="${doneOpen || !todo.length}">Done (${done.length}) ${doneOpen || !todo.length ? "▴" : "▾"}</button>${doneOpen || !todo.length ? `<ul class="sublist">${done.map(row2).join("")}</ul>` : ""}` : ""}</div>`;
   }
   function taskPage(t2) {
-    const S3 = api.S(), fs = api.fs(t2), left3 = api.timerLeft(t2), say3 = api.sayNow();
+    const S3 = api.S(), fs = api.fs(t2), left4 = api.timerLeft(t2), say3 = api.sayNow();
     const tread = api.onTread(t2);
     const em = t2.email || null;
     let h = `<button class="nbx" data-nb="close" aria-label="Close notebook">✕</button>
     <p class="nbmeta">${esc(api.placeLabel(t2))}${t2.at ? ` · at ${esc(t2.at)}` : ""}</p>
     <h2 id="nbTitle">${esc(t2.title)}</h2>`;
-    if (left3 != null) h += `<p class="nbtimer"><span data-tleft>${left3}</span> <small>${S3.timer && S3.timer.pausedLeft != null ? "paused" : tread ? "walking at 1.2" : "left on the time box"}</small>${api.timerBtns ? api.timerBtns() : ""}</p>`;
+    if (left4 != null) h += `<p class="nbtimer"><span data-tleft>${left4}</span> <small>${S3.timer && S3.timer.pausedLeft != null ? "paused" : tread ? "walking at 1.2" : "left on the time box"}</small>${api.timerBtns ? api.timerBtns() : ""}</p>`;
     h += `<div class="nbbody">`;
     h += `<p class="nbfirst"><span class="hl">First step:</span> ${esc(t2.firstStep || "open whatever you need for it. Just open it.")}${fs ? " <b>✓</b>" : ""}</p>`;
     const sv = api.subs ? api.subs(t2) : { list: [], notes: t2.notes || "" };
@@ -9697,14 +9793,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     input.value = "";
     busy = new AbortController();
     refreshNotebook();
-    const S3 = api.S(), left3 = api.timerLeft(t2);
+    const S3 = api.S(), left4 = api.timerLeft(t2);
     const brief = `You are Maple, a tiny fox who coaches Mel through her work day inside a cosy village game. Warm, direct, short sentences, never guilt, no lectures.
 Reply in at most 3 short sentences and end with exactly one tiny physical next action. Plain text, no markdown, at most one emoji.
 If the task involves pricing, remind her to price on the value delivered, not on what the buyer can afford.
 Never claim to have done anything outside this conversation (you can't send emails, tick tasks or set timers).
 Quest: ${t2.title}
 First step: ${t2.firstStep || "(none given)"}
-Time box: ${t2.minutes || 25} minutes${left3 ? `, ${left3} left` : ""}${api.fs(t2) ? ", first step done" : ", not started yet"}
+Time box: ${t2.minutes || 25} minutes${left4 ? `, ${left4} left` : ""}${api.fs(t2) ? ", first step done" : ", not started yet"}
 Notes: ${(api.subs ? api.subs(t2).notes : t2.notes) || "(none)"}${api.subs && api.subs(t2).list.length ? `
 Subtasks: ${api.subs(t2).list.map((x) => (x.done ? "[done] " : "[ ] ") + x.title).join("; ")}` : ""}${t2.email ? `
 Email: ${JSON.stringify(t2.email)}` : ""}
@@ -11617,10 +11713,10 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   function revenuePanel(F2) {
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Revenue</h2>`;
     if (!st3.data) return h + (st3.error ? `<p class="sub">${esc(CLIENT_ERRORS[st3.error] || "Couldn't reach Chord just now.")}</p><div class="actions"><button class="btn alt small" data-rv="refresh">Try again</button></div>` : `<p class="sub">Counting it up from Chord…</p>`);
-    const d = st3.data, c = d.currency, ms = Object.keys(d.byMonth), now2 = d.byMonth[ms[ms.length - 1]], target = Number(F2.revTarget) || 0;
-    const pct = target ? Math.min(100, Math.round(100 * now2 / target)) : 0, retTotal = Number(d.retTotal) || d.retainers.reduce((s, r) => s + (Number(r.monthly_amount) || 0), 0);
+    const d = st3.data, c = d.currency, ms = Object.keys(d.byMonth), now3 = d.byMonth[ms[ms.length - 1]], target = Number(F2.revTarget) || 0;
+    const pct = target ? Math.min(100, Math.round(100 * now3 / target)) : 0, retTotal = Number(d.retTotal) || d.retainers.reduce((s, r) => s + (Number(r.monthly_amount) || 0), 0);
     h += `<p class="sub">Studio income from Chord: paid invoices, by the month they were paid${st3.busy ? " · refreshing…" : ""}.</p>
-    <div class="rhero"><p class="rbig">${money2(now2, c)}</p><p class="muted">${esc((/* @__PURE__ */ new Date(ms[ms.length - 1] + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" }))} so far${target ? ` · ${pct}% of your ${money2(target, c)} target` : ""}</p>
+    <div class="rhero"><p class="rbig">${money2(now3, c)}</p><p class="muted">${esc((/* @__PURE__ */ new Date(ms[ms.length - 1] + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" }))} so far${target ? ` · ${pct}% of your ${money2(target, c)} target` : ""}</p>
       ${target ? `<span class="clbar rprog"><i style="width:${pct}%"></i></span>` : ""}
       ${st3.editing || !target ? `<form class="row rtarget" id="rvForm"><label for="rvIn" class="muted">Monthly target</label><input id="rvIn" type="number" min="0" step="50" inputmode="numeric" value="${target || ""}" placeholder="e.g. 6000"><button class="btn small" type="submit">Set</button></form>` : `<button class="btn alt small" data-rv="edit">Change target</button>`}</div>
     ${chart(d, target)}
@@ -12162,11 +12258,11 @@ ${e.text}`, { modelTier: "default", cache: false });
       return h + `<h2>${open2 ? `From you, ${esc(shortWhen(e.at))}` : "A sealed letter"}</h2>${open2 ? `<div class="lletter mine">${para(e.text)}</div>` : `<p class="muted">Sealed until ${esc(longDate(e.deliver))}. No peeking.</p>`}
       <div class="actions">${open2 ? `<button class="btn alt small" data-lt="journal" data-id="${esc(e.id)}" ${e.journaled ? "disabled" : ""}>${e.journaled ? "In your journal" : "Save to my journal"}</button>` : ""}<button class="btn alt small" data-lt="home">Back</button></div>`;
     }
-    const u = universe(), f2 = future(), now2 = Date.now(), news = arrived();
+    const u = universe(), f2 = future(), now3 = Date.now(), news = arrived();
     h += `<h2>Letters</h2><p class="sub">Write to the universe, or to the you of later on.</p>
     <div class="vmenu"><button class="btn primary" data-lt="universe">Dear Universe…</button><button class="btn alt" data-lt="future">Dear future me…</button></div>`;
     if (news.length) h += `<p class="eyebrow" style="margin-top:14px">Arrived</p><ul class="hlist lnew">${news.map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${e.kind === "universe" ? "A letter from the universe" : "A letter from your past self"}</b><small>${e.kind === "universe" ? "in reply to " + esc(shortWhen(e.at)) : "written " + esc(shortWhen(e.at))}</small></span><span class="hbadge now">new</span></li>`).join("")}</ul>`;
-    if (u.length) h += `<p class="eyebrow" style="margin-top:14px">Pen pals with the universe</p><ul class="hlist">${u.slice().reverse().slice(0, 12).map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${esc(e.text.split("\n")[0].slice(0, 60))}</b><small>${esc(shortWhen(e.at))} · ${e.reply && e.reply.due <= now2 ? "answered" : "on its way"}</small></span></li>`).join("")}</ul>`;
+    if (u.length) h += `<p class="eyebrow" style="margin-top:14px">Pen pals with the universe</p><ul class="hlist">${u.slice().reverse().slice(0, 12).map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${esc(e.text.split("\n")[0].slice(0, 60))}</b><small>${esc(shortWhen(e.at))} · ${e.reply && e.reply.due <= now3 ? "answered" : "on its way"}</small></span></li>`).join("")}</ul>`;
     if (f2.length) h += `<p class="eyebrow" style="margin-top:14px">To future me</p><ul class="hlist">${f2.slice().reverse().map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${e.deliver <= dayKey() ? esc(e.text.split("\n")[0].slice(0, 60)) : "Sealed"}</b><small>written ${esc(shortWhen(e.at))} · ${e.deliver <= dayKey() ? "arrived " : "arrives "}${esc(longDate(e.deliver))}</small></span></li>`).join("")}</ul>`;
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -12690,8 +12786,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       h += step2 ? `<p class="eyebrow">Today · ${DAY_NAMES[tk]}</p><button class="rtoday${done ? " done" : ""}" data-rt="tickday" aria-pressed="${done}"><span class="rbox${done ? " on" : ""}" aria-hidden="true"></span><span>${esc(step2)}</span></button>` : `<p class="sub">${Object.keys(l.days || {}).length ? `Nothing on ${DAY_NAMES[tk]}. A rest day.` : "No steps yet. Tap Edit and paste your week in."}</p>`;
       h += `<ul class="rweek">${DAYS2.map((d) => `<li class="${d === tk ? "now" : ""}"><b>${DAY_NAMES[d].slice(0, 3)}</b><span>${esc((l.days || {})[d] || "—")}</span></li>`).join("")}</ul>`;
     } else {
-      const left3 = l.items.filter((i) => !tickOf(l.id, i.id)).length;
-      h += `<p class="sub">${l.items.length ? left3 ? `${left3} to go today.` : "All done today. Lovely start." : "No steps yet. Tap Edit to add some."} Fresh every morning.</p>
+      const left4 = l.items.filter((i) => !tickOf(l.id, i.id)).length;
+      h += `<p class="sub">${l.items.length ? left4 ? `${left4} to go today.` : "All done today. Lovely start." : "No steps yet. Tap Edit to add some."} Fresh every morning.</p>
       <ul class="rcheck">${l.items.map((i) => {
         const on = tickOf(l.id, i.id);
         return `<li class="${on ? "on" : ""}" data-rt="tick" data-id="${esc(i.id)}" role="checkbox" aria-checked="${on}" tabindex="0"><span class="rbox${on ? " on" : ""}" aria-hidden="true"></span><span>${esc(i.text)}</span></li>`;
@@ -13384,7 +13480,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var dowOf = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
   var routineAt = (def, day, t2) => {
-    const dw = dowOf(day), we = dw === 0 || dw === 6, owned = api3 && api3.F().fam && api3.F().fam.owned || {};
+    const dw = dowOf(day), we = dw === 0 || dw === 6, owned = Object.assign({}, api3 && api3.F().fam && api3.F().fam.owned || {}, api3 && api3.F().goals || {});
     return def.routine.find((s) => t2 >= s.from && t2 < s.to && (!s.days || s.days === "we" === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null;
   };
   var routineNow = (def) => routineAt(def, dayKey(), sgHM());
@@ -13840,9 +13936,22 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       <rect x="352" y="458" width="88" height="30" rx="2" transform="rotate(-3 396 473)"/>`
     )}
     <text x="396" y="471" text-anchor="middle" transform="rotate(-3 396 473)" font-family="Klee One,serif" font-weight="600" font-size="8" fill="#5E5A55" pointer-events="none">Coming soon</text>
-    <text x="396" y="482" text-anchor="middle" transform="rotate(-3 396 473)" font-family="Klee One,serif" font-size="6.5" fill="#8A8279" pointer-events="none">brewery? chocolatier?</text>
+    <text x="396" y="482" text-anchor="middle" transform="rotate(-3 396 473)" font-family="Klee One,serif" font-size="6.5" fill="#8A8279" pointer-events="none">a chocolatier? tap to see</text>
     ${tapeLabel(396, 540, "Under renovation", "var(--card)", 10)}</g>`;
-    return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17 * 60, 6 * 60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? bike() : "") + deck + reno + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
+    const cc = G3.F && (G3.F().goals || {}).cocoa, ccName = ((G3.cocoa ? G3.cocoa() : null) || {}).name || "The Cocoa Room";
+    const cocoa = `<g data-place="cocoa" aria-label="${ccName.replace(/[<&>"]/g, "")}"><ellipse class="hov" cx="396" cy="526" rx="70" ry="10" style="fill:var(--butter)"/>
+    ${sk(
+      `<path d="M318 432 L396 392 L474 432z" style="fill:#6B4430"/><rect x="326" y="432" width="140" height="84" style="fill:#C9A27E"/>
+      <path d="M320 440 h152 l-6 14 h-140z" style="fill:#FFFDF6"/>${[0, 1, 2, 3, 4, 5].map((i) => `<path d="M${324 + i * 24} 440 h12 l-1 14 h-12z" style="fill:#6B4430"/>`).join("")}
+      <rect x="336" y="462" width="44" height="34" rx="3" style="fill:#F6EEE4"/>${[0, 1, 2, 3].map((i) => `<circle cx="${344 + i * 9}" cy="${486 - i % 2 * 4}" r="3.4" style="fill:${["#4A2E22", "#8A5A3A", "#F3E7C9", "#C2505F"][i]}"/>`).join("")}
+      <path d="M404 516 v-36 a12 12 0 0 1 24 0 v36z" style="fill:#4A2E22"/><rect x="438" y="468" width="22" height="26" rx="2" style="fill:#F6EEE4"/>`,
+      `<path d="M318 432 L396 392 L474 432z"/><rect x="326" y="432" width="140" height="84"/><path d="M320 440 h152 l-6 14 h-140z"/><rect x="336" y="462" width="44" height="34" rx="3"/>
+      <path d="M404 516 v-36 a12 12 0 0 1 24 0 v36"/><circle cx="423" cy="500" r="1.4"/><rect x="438" y="468" width="22" height="26" rx="2"/><path d="M449 468 v26 M438 481 h22" opacity=".6"/>`
+    )}
+    ${sk(`<path d="M352 414 h88 v14 h-88z" style="fill:#FFFDF6"/>`, `<path d="M352 414 h88 v14 h-88z M364 414 l-6 -10 M428 414 l6 -10"/>`)}
+    <text x="396" y="424.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="${ccName.length > 16 ? 6.5 : 8}" fill="#6B4430" pointer-events="none">${ccName.replace(/[<&>]/g, "").slice(0, 24)}</text>
+    ${tapeLabel(396, 540, ccName.replace(/[<&>"]/g, "").slice(0, 24), "#E8D3BC", 10)}</g>`;
+    return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17 * 60, 6 * 60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? bike() : "") + deck + (cc ? cocoa : reno) + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
   }
 
   // src/game/scoop.js
@@ -14132,13 +14241,13 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return { coins, fmt: fmt3, r, dipped };
   }
   function scoopTick(F2, opts = {}) {
-    const s = scoopState(F2), now2 = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now2, now2 - 2 * 864e5);
+    const s = scoopState(F2), now3 = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now3, now3 - 2 * 864e5);
     if (s.batch) {
       s.tubs[s.batch.id] = (s.tubs[s.batch.id] || 0) + TUB;
       s.batch = null;
     }
     const out = { coins: 0, n: 0, mins: 0, box: 0 };
-    for (let at = from + 6e4; at <= now2; at += 6e4) {
+    for (let at = from + 6e4; at <= now3; at += 6e4) {
       const sg = new Date(at + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm2 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
       const sale = saleMinute(s, day, hm2, opts);
       if (sale && sale.box) out.box += sale.coins;
@@ -14370,6 +14479,152 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var RENO_LINE = `Boarded up for now, with scaffolding out front. The sign says: "Coming soon: a craft brewery? A chocolatier?" Someone's pencilled "both!!" underneath.`;
 
+  // src/game/cocoa.js
+  var OPEN2 = 11 * 60;
+  var CLOSE2 = 20 * 60;
+  var ROAST_MIN = 10;
+  var GRIND_MIN = 120;
+  var POT = 30;
+  var MOULD = 10;
+  var SACK = 10;
+  var KINDS2 = { milk: { n: "Milk chocolate", col: "#8A5A3A" }, dark: { n: "Dark chocolate", col: "#4A2E22" }, white: { n: "White chocolate", col: "#F3E7C9" } };
+  var BAR_ID = (k) => "bar_" + k;
+  var now2 = () => Date.now() + (globalThis.__mapleOffset || 0);
+  var openOn = (day, hm2) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() !== 1 && hm2 >= OPEN2 && hm2 < CLOSE2;
+  function cocoaState(F2) {
+    F2.cocoa = F2.cocoa || {};
+    const c = F2.cocoa;
+    c.name = c.name || "The Cocoa Room";
+    c.beans = c.beans || 0;
+    c.roasted = c.roasted || 0;
+    c.roast = c.roast || null;
+    c.grind = c.grind || null;
+    c.ground = c.ground || null;
+    c.choc = Object.assign({ milk: 0, dark: 0, white: 0 }, c.choc || {});
+    c.bars = Object.assign({ milk: 0, dark: 0, white: 0 }, c.bars || {});
+    c.prices = Object.assign({ bar: 6 }, c.prices || {});
+    c.sold = c.sold || {};
+    c.made = c.made || 0;
+    return c;
+  }
+  var left3 = (t2) => {
+    const m = Math.max(0, Math.ceil((t2 - now2()) / 6e4));
+    return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m} min`;
+  };
+  function buyBeans(F2, n = 1) {
+    const c = cocoaState(F2), cost = SACK * n;
+    if (F2.coins < cost) return false;
+    F2.coins -= cost;
+    c.beans += n;
+    return true;
+  }
+  function startRoast(F2) {
+    const c = cocoaState(F2);
+    if (c.roast || c.beans < 1) return false;
+    c.beans--;
+    c.roast = { done: now2() + ROAST_MIN * 6e4 };
+    return true;
+  }
+  function startGrind(F2, kind) {
+    const c = cocoaState(F2);
+    if (c.grind || c.ground || c.roasted < 1 || !KINDS2[kind]) return false;
+    c.roasted--;
+    c.grind = { kind, done: now2() + GRIND_MIN * 6e4 };
+    return true;
+  }
+  function temper(F2) {
+    const c = cocoaState(F2);
+    if (!c.ground) return null;
+    const k = c.ground;
+    c.choc[k] += POT;
+    c.ground = null;
+    return k;
+  }
+  function mould(F2, kind) {
+    const c = cocoaState(F2);
+    if (!KINDS2[kind] || c.choc[kind] < MOULD) return false;
+    c.choc[kind] -= MOULD;
+    c.bars[kind] += MOULD;
+    c.made += MOULD;
+    return true;
+  }
+  function finish(c) {
+    const t2 = now2();
+    let out = null;
+    if (c.roast && t2 >= c.roast.done) {
+      c.roasted++;
+      c.roast = null;
+      out = "roast";
+    }
+    if (c.grind && t2 >= c.grind.done && !c.ground) {
+      c.ground = c.grind.kind;
+      c.grind = null;
+      out = out || "grind";
+    }
+    return out;
+  }
+  function cocoaTick(F2, opts = {}) {
+    const c = cocoaState(F2), t2 = now2(), from = Math.max(c.at || t2, t2 - 2 * 864e5), out = { coins: 0, n: 0, mins: 0, done: finish(c) };
+    for (let at = from + 6e4; at <= t2; at += 6e4) {
+      const sg = new Date(at + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm2 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
+      out.mins++;
+      if (!openOn(day, hm2)) continue;
+      const stocked = Object.keys(KINDS2).filter((k2) => c.bars[k2] > 0);
+      if (!stocked.length) continue;
+      const d = sg.getUTCDay(), we = d === 0 || d === 6, pf = Math.pow(6 / Math.max(2, c.prices.bar), 1.3);
+      if (Math.random() >= 0.03 * (we ? 1.4 : 1) * (hm2 >= 15 * 60 && hm2 < 18 * 60 ? 1.2 : 1) * (opts.serving ? 1.5 : 1) * pf) continue;
+      const k = stocked[Math.floor(Math.random() * stocked.length)], n = Math.min(c.bars[k], Math.random() < 0.3 ? 2 : 1);
+      c.bars[k] -= n;
+      const coins = n * c.prices.bar, s = c.sold[day] = c.sold[day] || { n: 0, coins: 0 };
+      s.n += n;
+      s.coins += coins;
+      out.coins += coins;
+      out.n += n;
+    }
+    c.at = from + out.mins * 6e4;
+    if (out.coins) F2.coins += out.coins;
+    return out;
+  }
+  function takeBar(F2, kind, give) {
+    const c = cocoaState(F2);
+    if (!(c.bars[kind] > 0)) return false;
+    c.bars[kind]--;
+    if (give) F2.inv[BAR_ID(kind)] = (F2.inv[BAR_ID(kind)] || 0) + 1;
+    return true;
+  }
+  var coin2 = () => icon("coin", 13);
+  var shut2 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var dot2 = (c) => `<span class="gdot" style="background:${c}"></span>`;
+  function counterPanel3(F2, st6) {
+    const c = cocoaState(F2), day = dayKey(), hm2 = sgHM(), t2 = c.sold[day] || { n: 0, coins: 0 };
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${openOn(day, hm2) ? "Open till 8pm." : "Closed: open 11am to 8pm, Tuesday to Sunday."} ${t2.n ? `Sold today: ${t2.n} bar${t2.n > 1 ? "s" : ""} (${t2.coins} ${coin2()}).` : "Nothing sold yet today."}${st6.server ? " Amara's behind the counter." : ""}</p>`;
+    h += `<ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n} bars</b><small>${c.bars[k]} on the wall · ${c.prices.bar} ${coin2()} each</small></span><span class="orbtns"><button class="btn small primary" data-cc="eat" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>Have one</button><button class="btn small alt" data-cc="give" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>To give</button></span></li>`).join("")}</ul>`;
+    h += `<div class="row gprices"><span>Price of a bar</span><span class="gstep"><button class="btn small alt" data-cc="price" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bar}</b><button class="btn small alt" data-cc="price" data-n="1" aria-label="Dearer">+</button></span></div>`;
+    h += `<form class="row hadd" data-ccname="1"><label class="sr" for="ccName">Shop name</label><input id="ccName" maxlength="30" value="${esc(c.name)}"><button class="btn small alt">Rename</button></form>`;
+    return h + `<p class="muted">Yours are free. Customers buy bars off the wall while the shop's open, more often while you're here.</p>` + shut2;
+  }
+  function barWallPanel(F2) {
+    const c = cocoaState(F2);
+    return `<span class="tape stripe" aria-hidden="true"></span><h2>The bar wall</h2><p class="sub">Wrapped bars, ready to sell. ${c.made} made so far.</p>
+    <ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n}</b><small>${c.bars[k]} bars</small></span></li>`).join("")}</ul>
+    <p class="muted">${Object.values(c.bars).some((n) => n) ? "Make more in the kitchen when it runs low." : "Empty! Beans to bars happens in the kitchen, through the door on the west wall."}</p>` + shut2;
+  }
+  function kitchenPanel(F2, which) {
+    const c = cocoaState(F2);
+    finish(c);
+    const steps = `<p class="muted">Beans ${c.beans} · roasted ${c.roasted} · chocolate ${Object.entries(c.choc).map(([k, n]) => `${KINDS2[k].n.split(" ")[0].toLowerCase()} ${n}`).join(", ")}</p>`;
+    if (which === "sacks") return `<span class="tape gingham" aria-hidden="true"></span><h2>Bean sacks</h2><p class="sub">Cacao beans, ${SACK} ${coin2()} a sack. A sack makes a pot of chocolate: 30 pieces.</p>
+    <p class="olabel">${c.beans} sack${c.beans === 1 ? "" : "s"} in the kitchen</p><div class="actions"><button class="btn primary" data-cc="beans" data-n="1" ${F2.coins < SACK ? "disabled" : ""}>Buy a sack (${SACK} ${coin2()})</button><button class="btn alt" data-cc="beans" data-n="3" ${F2.coins < SACK * 3 ? "disabled" : ""}>Three (${SACK * 3} ${coin2()})</button></div>${steps}` + shut2;
+    if (which === "roaster") return `<span class="tape stripe" aria-hidden="true"></span><h2>The roaster</h2><p class="sub">${c.roast ? `Roasting a sack: ready in ${left3(c.roast.done)}.` : "Roast a sack of beans. Ten minutes, and the whole kitchen smells amazing."}</p>
+    <div class="actions"><button class="btn primary" data-cc="roast" ${c.roast || c.beans < 1 ? "disabled" : ""}>${c.beans < 1 ? "No beans: buy a sack" : "Roast a sack"}</button></div>${steps}` + shut2;
+    if (which === "grinder") return `<span class="tape gingham" aria-hidden="true"></span><h2>The stone grinder</h2><p class="sub">${c.grind ? `Grinding ${KINDS2[c.grind.kind].n.toLowerCase()}: ready in ${left3(c.grind.done)}.` : c.ground ? `A pot of ${KINDS2[c.ground].n.toLowerCase()} is ready: temper it on the marble slab.` : "Roasted beans in, chocolate out. It takes two hours."}</p>
+    ${c.grind || c.ground ? "" : `<div class="actions">${Object.entries(KINDS2).map(([k, d]) => `<button class="btn ${k === "milk" ? "primary" : "alt"}" data-cc="grind" data-k="${k}" ${c.roasted < 1 ? "disabled" : ""}>${dot2(d.col)} ${d.n}</button>`).join("")}</div>${c.roasted < 1 ? `<p class="muted">Roast some beans first.</p>` : ""}`}${steps}` + shut2;
+    if (which === "slab") return `<span class="tape stripe" aria-hidden="true"></span><h2>The marble slab</h2><p class="sub">${c.ground ? `Temper the ${KINDS2[c.ground].n.toLowerCase()}: spread, scrape, fold, until it shines.` : "Tempering makes chocolate snap and shine. Bring a pot from the grinder."}</p>
+    <div class="actions"><button class="btn primary" data-cc="temper" ${c.ground ? "" : "disabled"}>Temper it (${POT} pieces)</button></div>${steps}` + shut2;
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>The moulds</h2><p class="sub">${MOULD} pieces of tempered chocolate make ${MOULD} bars, straight onto the bar wall.</p>
+    <ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${dot2(d.col)}</span><span class="wtxt"><b>${d.n}</b><small>${c.choc[k]} pieces</small></span><button class="btn small primary" data-cc="mould" data-k="${k}" ${c.choc[k] < MOULD ? "disabled" : ""}>Mould ${MOULD} bars</button></li>`).join("")}</ul>${steps}` + shut2;
+  }
+
   // src/game/companions.js
   var KEEP_SPOTS = {
     scoop1: { scene: "scoopshop", at: [112, 128], n: "the Scoop Shack, by the cone" },
@@ -14547,6 +14802,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     scooter: { n: "Scooter", price: 800, where: "garage", line: "A little electric scooter. Zips you from screen to screen about half again as fast as walking." },
     car: { n: "Cream convertible", price: 3500, where: "garage", line: "A cream convertible, roof down. Room for you, Maple and Evan, and more than twice as fast as walking." },
     boat: { n: "Dolphin cruise boat", price: 2e3, where: "shore", line: "A little cruise boat moored at the end of the jetty. Take the family out to see the dolphins up close." },
+    cocoa: { n: "The Cocoa Room", price: 1e3, where: "bay", line: "The boarded-up shopfront on the bay, turned into your own chocolate shop: a shop front with a wall of bars, and a kitchen where you make chocolate from the bean. Amara will run the counter." },
     cellar: { n: "Cellar door", price: 2500, where: "wineshop", line: "A cellar door extension off the wine shop: barrel racks, a tasting bar and a wall of every wine you've made. Visitors love a cellar door, and once a month it hosts the wine club." }
   };
   var owns = (F2, k) => !!(F2.goals && F2.goals[k]);
@@ -14565,10 +14821,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       scooter: "A shiny new scooter, parked in the garage. You'll zip about on it outdoors from now on.",
       car: "A cream convertible! Roof down, Maple in the back, Evan waving at everyone. You'll drive between screens from now on.",
       boat: "Your dolphin cruise boat is moored at the end of the jetty. Take everyone out!",
-      cellar: "The cellar door is open! Through the new door on the wine shop's west wall."
+      cellar: "The cellar door is open! Through the new door on the wine shop's west wall.",
+      cocoa: "The hoarding's down: The Cocoa Room is yours! Buy some beans in the kitchen and make your first bars."
     }[k];
   }
-  var coin2 = () => icon("coin", 14);
+  var coin3 = () => icon("coin", 14);
   function goalPanel(F2, k) {
     const g = GOALS[k], have = owns(F2, k), need = g.needs && !owns(F2, g.needs);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(g.n)}</h2><p class="sub">${esc(g.line)}</p>`;
@@ -14576,8 +14833,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     else if (need) h += `<p class="muted">You'll need the ${esc(GOALS[g.needs].n.toLowerCase())} first.</p>`;
     else {
       const pct = Math.min(100, Math.round(100 * F2.coins / g.price));
-      h += `<div class="goalbar" role="img" aria-label="${pct}% saved"><span style="width:${pct}%"></span></div><p class="muted">${F2.coins} of ${g.price} ${coin2()} saved${F2.coins < g.price ? `: ${g.price - F2.coins} to go` : ""}.</p>
-      <div class="actions"><button class="btn primary" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>${k === "cellar" ? "Build it" : "Buy it"} (${g.price} ${coin2()})</button></div>`;
+      h += `<div class="goalbar" role="img" aria-label="${pct}% saved"><span style="width:${pct}%"></span></div><p class="muted">${F2.coins} of ${g.price} ${coin3()} saved${F2.coins < g.price ? `: ${g.price - F2.coins} to go` : ""}.</p>
+      <div class="actions"><button class="btn primary" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>${k === "cellar" ? "Build it" : "Buy it"} (${g.price} ${coin3()})</button></div>`;
     }
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -14586,7 +14843,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     h += [["walk", "Walk"], ["scooter", "Scooter"], ["car", "Car"]].map(([k, n]) => `<button class="btn small ${ride(F2) === k ? "primary" : "alt"}" data-ride="${k}" ${k !== "walk" && !owns(F2, k) ? "disabled" : ""}>${n}${k !== "walk" && !owns(F2, k) ? ` (${GOALS[k].price})` : ""}</button>`).join("") + `</div>`;
     ["scooter", "car"].filter((k) => !owns(F2, k)).forEach((k) => {
       const g = GOALS[k];
-      h += `<p class="eyebrow" style="margin-top:12px">${esc(g.n)}</p><p class="muted">${esc(g.line)} ${F2.coins} of ${g.price} ${coin2()} saved.</p><div class="actions"><button class="btn primary small" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>Buy it (${g.price} ${coin2()})</button></div>`;
+      h += `<p class="eyebrow" style="margin-top:12px">${esc(g.n)}</p><p class="muted">${esc(g.line)} ${F2.coins} of ${g.price} ${coin3()} saved.</p><div class="actions"><button class="btn primary small" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>Buy it (${g.price} ${coin3()})</button></div>`;
     });
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -14677,7 +14934,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     });
   }
   migrate();
-  setArtContext({ ohayo: () => ohayoHellos(), F: () => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => {
+  setArtContext({ cocoa: () => cocoaState(F), ohayo: () => ohayoHellos(), F: () => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => {
     const t2 = tapasToday(F, dayKey());
     return t2 ? TAPAS[t2.id].n : null;
   }, vineStock: () => shelfStock(vineState(F)), S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth2(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), goodNews: () => {
@@ -14959,6 +15216,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     compost: { n: "Compost bin", price: 150, ico: "compost", what: "Everything grows a quarter faster." },
     sprinkler: { n: "Sprinkler", price: 300, ico: "sprinkler", what: "New seeds water themselves the moment you plant them." }
   };
+  var ccView = null;
+  var lastCocoa = 0;
+  var COCOA_IN = ["cocoa", "cocoakitchen"];
   var keepItem = null;
   var keepSpot = null;
   var adoptItem = null;
@@ -15047,8 +15307,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       stopBreath(false);
       return;
     }
-    const el = Date.now() - breath.start, left3 = breath.total - el;
-    if (left3 <= 0) {
+    const el = Date.now() - breath.start, left4 = breath.total - el;
+    if (left4 <= 0) {
       stopBreath(true);
       return;
     }
@@ -15062,7 +15322,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     const c = $("breathCue"), l = $("breathLeft");
     if (c && c.textContent !== cue) c.textContent = cue;
-    if (l) l.textContent = `${Math.floor(left3 / 6e4)}:${String(Math.floor(left3 / 1e3) % 60).padStart(2, "0")}`;
+    if (l) l.textContent = `${Math.floor(left4 / 6e4)}:${String(Math.floor(left4 / 1e3) % 60).padStart(2, "0")}`;
   }
   var ward = { busy: false, error: "", ask: "" };
   function buyTool(id) {
@@ -15596,12 +15856,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       timerCtl(b.dataset.tctl);
     }
   }, true);
-  var fmt2 = (left3) => left3 ? `${Math.floor(left3 / M)}:${String(Math.floor(left3 / 1e3) % 60).padStart(2, "0")}` : "time!";
+  var fmt2 = (left4) => left4 ? `${Math.floor(left4 / M)}:${String(Math.floor(left4 / 1e3) % 60).padStart(2, "0")}` : "time!";
   function timerHTML(label2) {
     if (!S2.timer) return "";
-    const left3 = tLeft(), C2 = 2 * Math.PI * 28;
-    return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C2}" stroke-dashoffset="${C2 * (1 - left3 / S2.timer.total)}"/></svg>
-    <div><span class="t" id="tLeft">${fmt2(left3)}</span><small>${S2.timer.pausedLeft != null ? "paused" : esc(label2)}</small></div>${timerBtns()}</div>`;
+    const left4 = tLeft(), C2 = 2 * Math.PI * 28;
+    return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C2}" stroke-dashoffset="${C2 * (1 - left4 / S2.timer.total)}"/></svg>
+    <div><span class="t" id="tLeft">${fmt2(left4)}</span><small>${S2.timer.pausedLeft != null ? "paused" : esc(label2)}</small></div>${timerBtns()}</div>`;
   }
   var lastReady = readyCount();
   var lastDusk = null;
@@ -15649,6 +15909,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       if (selPlot != null) ctx();
     }
     if (Date.now() - lastScoop > 2e4) scoopNow();
+    if (Date.now() - lastCocoa > 2e4) cocoaNow();
     if (outside() && skyKey() !== lastSky) {
       lastSky = skyKey();
       drawScene();
@@ -15665,12 +15926,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     lastDusk = isDusk();
     if (shelfOpen && Math.floor(Date.now() / 1e3) % 20 === 0) ctx();
     if (!S2.timer) return;
-    const left3 = tLeft();
+    const left4 = tLeft();
     const t2 = $("tLeft"), r = $("ringFg");
-    if (t2) t2.textContent = fmt2(left3);
-    document.querySelectorAll("[data-tleft]").forEach((el) => el.textContent = fmt2(left3));
-    if (r) r.style.strokeDashoffset = 2 * Math.PI * 28 * (1 - left3 / S2.timer.total);
-    if (!left3 && !S2.timer.fired) {
+    if (t2) t2.textContent = fmt2(left4);
+    document.querySelectorAll("[data-tleft]").forEach((el) => el.textContent = fmt2(left4));
+    if (r) r.style.strokeDashoffset = 2 * Math.PI * 28 * (1 - left4 / S2.timer.total);
+    if (!left4 && !S2.timer.fired) {
       S2.timer.fired = true;
       timerDone(S2.timer.kind);
     }
@@ -15929,8 +16190,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       if (paid > 1) sfx("chaching");
       earn(paid, paid > 1 ? "batch quest done" : "subtask");
     } else sfx(done ? "tap" : "paper", true);
-    const left3 = subView(t2).list.filter((y) => !y.done).length;
-    if (done && !left3) speak("Every subtask ticked! Tap Done when you're ready.", 4500, true);
+    const left4 = subView(t2).list.filter((y) => !y.done).length;
+    if (done && !left4) speak("Every subtask ticked! Tap Done when you're ready.", 4500, true);
     save2();
     refreshNotebook();
   }
@@ -16011,9 +16272,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function countQuest() {
     const before = unlocked(F.totalQuests || 0).length;
     F.totalQuests = (F.totalQuests || 0) + 1;
-    const now2 = unlocked(F.totalQuests);
-    if (now2.length > before) {
-      const u = now2[now2.length - 1];
+    const now3 = unlocked(F.totalQuests);
+    if (now3.length > before) {
+      const u = now3[now3.length - 1];
       F.upgradeLog.push({ id: u.id, day: dayKey() });
       setTimeout(() => {
         act("cheer");
@@ -17496,6 +17757,7 @@ ${SIGNOFF[t2.who] || ""}`;
     postOpen = false;
     healthOpen = false;
     newsOpen = false;
+    ccView = null;
     keepItem = null;
     keepSpot = null;
     adoptItem = null;
@@ -17579,6 +17841,7 @@ ${SIGNOFF[t2.who] || ""}`;
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
       h = !st6 ? "" : st6.kind === "wine" ? stallMarketPanel(F, serving()) : st6.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st6.kind === "scoop" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st6, dayKey(), sgHM()) }) : marketStallPanel(st6);
     } else if (orView === "pot" && potItem) h = potPanel(F, potItem);
+    else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? counterPanel3(F, { server: isHere("amara") }) : ccView === "wall" ? barWallPanel(F) : kitchenPanel(F, ccView);
     else if (keepItem && F.inv[keepItem]) h = keepPanel(F, keepItem);
     else if (keepSpot) h = placedPanel(F, keepSpot);
     else if (adoptItem && F.inv[adoptItem]) h = adoptPanel(F, adoptItem, adoptSt);
@@ -17635,8 +17898,8 @@ ${SIGNOFF[t2.who] || ""}`;
         const g = growth2(p), cr = CROPS[p.crop];
         if (!p.wateredAt) h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n} seeds, waiting for water.</p><div class="actions"><button class="btn primary" data-farm="water">Water it</button></div>`;
         else if (g < 1) {
-          const left3 = cr.dur * (1 - g);
-          h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n}, growing. About ${dur(left3)} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(g * 100).toFixed(0)}%"></i></div>`;
+          const left4 = cr.dur * (1 - g);
+          h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n}, growing. About ${dur(left4)} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(g * 100).toFixed(0)}%"></i></div>`;
         } else h += `<p class="sub">${icon(cr.ico, 18)} ${cr.n} is ready!</p><div class="actions"><button class="btn yes" data-farm="harvest">Harvest</button></div>`;
       }
     } else if (bedOpen && scene === "room") {
@@ -17729,6 +17992,7 @@ ${SIGNOFF[t2.who] || ""}`;
     });
     if (scView || fieldView === "mstall8" && scene === "field") wireScoop(c);
     wireCompanions(c);
+    if (ccView) wireCocoa(c);
     c.querySelectorAll("[data-sup]").forEach((b) => b.onclick = () => {
       goalView = null;
       ctx();
@@ -17907,6 +18171,7 @@ ${SIGNOFF[t2.who] || ""}`;
     });
     c.querySelectorAll("[data-fair]").forEach((b) => b.onclick = () => fairActivity(b.dataset.fair));
     c.querySelectorAll("[data-close]").forEach((b) => b.onclick = () => {
+      ccView = null;
       keepItem = null;
       keepSpot = null;
       adoptItem = null;
@@ -18535,7 +18800,7 @@ ${SIGNOFF[t2.who] || ""}`;
     const m = sgHM();
     return m >= 20 * 60 || m < 7 * 60;
   };
-  var evanHere = () => scene === "kidroom" || (scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "scoopdip" || scene === "mumdad" || scene === "marcus") && !evanNight() || evanAtDinner();
+  var evanHere = () => scene === "kidroom" || (scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "scoopdip" || scene === "cocoa" || scene === "cocoakitchen" || scene === "mumdad" || scene === "marcus") && !evanNight() || evanAtDinner();
   var evanAtDinner = () => {
     const d = dinnerNow(dayKey(), sgHM());
     return !!d && scene === d.host;
@@ -18591,6 +18856,7 @@ ${SIGNOFF[t2.who] || ""}`;
       newsOpen = false;
       keepSpot = null;
       petView = null;
+      ccView = null;
       resetScene();
       if (id === "post") fetchPost().then(() => {
         if (scene === "post") drawScene();
@@ -18604,7 +18870,7 @@ ${SIGNOFF[t2.who] || ""}`;
       if (id === "base") {
         evan.x = evan.tx = 300;
         evan.y = evan.ty = 360;
-      } else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "mumdad" || id === "marcus" || id === "cottage") {
+      } else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoa" || id === "cocoakitchen" || id === "mumdad" || id === "marcus" || id === "cottage") {
         evan.x = evan.tx = p[0] + 26;
         evan.y = evan.ty = p[1] + 10;
         evan.run = false;
@@ -18645,10 +18911,10 @@ ${SIGNOFF[t2.who] || ""}`;
         setTimeout(() => speak("The chicks and bunnies are peeping for breakfast. Their run is by the garden.", 4500), 1400);
       }
       if (id === "room" && S2.routSaid !== dayKey() && sgHM() < 12 * 60) {
-        const st6 = todaysSteps().filter((x) => !x.done), left3 = checklistLeft();
-        if (st6.length || left3) {
+        const st6 = todaysSteps().filter((x) => !x.done), left4 = checklistLeft();
+        if (st6.length || left4) {
           S2.routSaid = dayKey();
-          setTimeout(() => speak(st6.length ? `${st6[0].name}, today: ${st6[0].text}.` : `${left3} morning routine step${left3 > 1 ? "s" : ""} on the board.`, 5e3), 1500);
+          setTimeout(() => speak(st6.length ? `${st6[0].name}, today: ${st6[0].text}.` : `${left4} morning routine step${left4 > 1 ? "s" : ""} on the board.`, 5e3), 1500);
         }
       }
       if (id === "hall" && F.trophyIntro) {
@@ -18878,10 +19144,10 @@ ${SIGNOFF[t2.who] || ""}`;
       return;
     }
     if (id === "window") {
-      const shut2 = F.curtains ? F.curtains === "closed" : isDusk() || !!S2.sleep;
-      F.curtains = shut2 ? "open" : "closed";
+      const shut3 = F.curtains ? F.curtains === "closed" : isDusk() || !!S2.sleep;
+      F.curtains = shut3 ? "open" : "closed";
       sfx("paper", true);
-      speak(shut2 ? "Curtains open. Hello, sky." : "Curtains closed. Cosy.", 2500);
+      speak(shut3 ? "Curtains open. Hello, sky." : "Curtains closed. Cosy.", 2500);
       save2(true);
       return;
     }
@@ -19025,6 +19291,24 @@ ${SIGNOFF[t2.who] || ""}`;
     if (scene === "scoopshop" && id === "gtables") {
       sitAt(SHOP_SEATS2);
       return;
+    }
+    if (id === "ckdoor") {
+      setScene("cocoakitchen", INNER.cocoakitchen.arrive);
+      return;
+    }
+    if (scene === "cocoa" && id === "ctables") {
+      sitAt(SHOP_SEATS2);
+      return;
+    }
+    if (COCOA_IN.includes(scene)) {
+      ccView = { ccounter: "counter", barwall: "wall", sacks: "sacks", roaster: "roaster", grinder: "grinder", slab: "slab", moulds: "moulds" }[id] || null;
+      if (ccView) {
+        cocoaNow();
+        sfx("paper", true);
+        if (id === "ccounter" && isHere("amara")) npcSay("amara", pick(["Hi boss! The wall's looking good.", "Want a taste? I saved you a broken one.", "Dark's flying today."]));
+        render();
+        return;
+      }
     }
     if (id === "gddoor") {
       if (hasUp(scoopState(F), "dip")) {
@@ -19241,7 +19525,11 @@ ${SIGNOFF[t2.who] || ""}`;
       return;
     }
     if (id === "reno") {
-      speak(RENO_LINE, 6e3);
+      if (!owns(F, "cocoa")) {
+        goalView = "cocoa";
+        sfx("paper", true);
+        speak("The old shopfront. It would make a lovely chocolate shop...", 4e3);
+      } else speak(RENO_LINE, 6e3);
       render();
       return;
     }
@@ -19558,6 +19846,84 @@ ${SIGNOFF[t2.who] || ""}`;
     save2();
     ctx();
     render();
+  }
+  function cocoaNow() {
+    if (!owns(F, "cocoa")) return;
+    lastCocoa = Date.now();
+    const out = cocoaTick(F, { serving: scene === "cocoa" && atSpot === "ccounter" });
+    if (out.coins && (scene === "cocoa" || scene === "bay")) {
+      sfx("coin");
+      flash(`+${out.coins} coins: ${cocoaState(F).name}`);
+    } else if (out.coins && out.mins >= 30) setTimeout(() => speak(`While you were away, ${cocoaState(F).name} sold ${out.n} bar${out.n > 1 ? "s" : ""}: ${out.coins} coins.`, 5e3), 2500);
+    if (out.done === "grind" && COCOA_IN.includes(scene)) speak("Ding! The grinder's done: a pot of chocolate, ready to temper on the marble slab.", 4500);
+    if (out.coins || out.done || out.mins >= 5) save2();
+    if (ccView) ctx();
+    if (COCOA_IN.includes(scene)) drawScene();
+  }
+  function wireCocoa(c) {
+    const re = () => {
+      save2();
+      ctx();
+      drawScene();
+    };
+    c.querySelectorAll("[data-cc]").forEach((b) => b.onclick = () => {
+      const k = b.dataset.k, n = +b.dataset.n, a = b.dataset.cc;
+      if (a === "beans") {
+        if (buyBeans(F, n)) {
+          sfx("coin");
+          flash(`${n} sack${n > 1 ? "s" : ""} of cacao beans`);
+        }
+      } else if (a === "roast") {
+        if (startRoast(F)) {
+          sfx("paper", true);
+          speak("Beans in the roaster. Ten minutes, and the whole kitchen will smell of chocolate.", 4e3);
+        }
+      } else if (a === "grind") {
+        if (startGrind(F, k)) {
+          sfx("paper", true);
+          speak(`${KINDS2[k].n} in the stone grinder. It'll be ready in two hours.`, 4e3);
+        }
+      } else if (a === "temper") {
+        const kk = temper(F);
+        if (kk) {
+          sfx("chime");
+          act("cheer");
+          gainXp(1);
+          speak(`Spread, scrape, fold... it shines! 30 pieces of ${KINDS2[kk].n.toLowerCase()}.`, 4500);
+        }
+      } else if (a === "mould") {
+        if (mould(F, k)) {
+          sfx("chime");
+          flash(`10 ${KINDS2[k].n.toLowerCase()} bars on the wall`);
+          gainXp(1);
+        }
+      } else if (a === "price") {
+        const s = cocoaState(F);
+        s.prices.bar = Math.max(1, Math.min(30, s.prices.bar + n));
+      } else if (a === "eat" || a === "give") {
+        if (!takeBar(F, k, a === "give")) return;
+        sfx("chime");
+        if (a === "give") {
+          flash(`${KINDS2[k].n} bar in your backpack`);
+          speak("Wrapped and in your backpack. Tap it there to choose who it's for.", 4e3);
+        } else {
+          mprop("heart", mel.x, mel.y - 60, 1600);
+          speak(pick(["Snap! Your own chocolate. Perfect.", "It melts just right. You made this!", "From the bean. Mmm."]), 4e3);
+          if (evanHere() && takeBar(F, k, false)) setTimeout(() => evanSays(pick(["chocolate!!", "more Mama!", "mmm!"])), 900);
+        }
+      }
+      re();
+    });
+    const nf = c.querySelector("[data-ccname]");
+    if (nf) nf.onsubmit = (e) => {
+      e.preventDefault();
+      const v = (nf.querySelector("input").value || "").trim().slice(0, 30);
+      if (!v) return;
+      cocoaState(F).name = v;
+      speak(`The sign now says ${v}.`, 3500);
+      re();
+      render();
+    };
   }
   function wireCompanions(c) {
     const done = () => {
@@ -20085,7 +20451,9 @@ ${SIGNOFF[t2.who] || ""}`;
     bay: "the bay",
     scoopshop: "the Scoop Shack",
     scoopkitchen: "the gelato kitchen",
-    scoopdip: "the dip station"
+    scoopdip: "the dip station",
+    cocoa: "the Cocoa Room",
+    cocoakitchen: "the chocolate kitchen"
   };
   var ACT_WORD = {
     water: "watering",
@@ -20370,8 +20738,8 @@ ${SIGNOFF[t2.who] || ""}`;
       }
     }
     if (lock) {
-      const left3 = (6 * 60 - m + 24 * 60) % (24 * 60);
-      $("bedLockLeft").textContent = `Good morning in ${Math.floor(left3 / 60)}h ${left3 % 60}m.`;
+      const left4 = (6 * 60 - m + 24 * 60) % (24 * 60);
+      $("bedLockLeft").textContent = `Good morning in ${Math.floor(left4 / 60)}h ${left4 % 60}m.`;
     }
   }
   var WIND = [
@@ -20393,8 +20761,8 @@ ${SIGNOFF[t2.who] || ""}`;
     if (F.bedLock === false || m < 23 * 60 || m >= 23 * 60 + 45 || document.hidden) return;
     if (Date.now() - windAt < 28e3 || openView || !$("panel").hidden || document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
     windAt = Date.now();
-    const left3 = 23 * 60 + 45 - m;
-    speak(left3 <= 15 ? `${left3} minute${left3 === 1 ? "" : "s"} till bed. ${WIND[windI++ % WIND.length]}` : WIND[windI++ % WIND.length], 6e3, true);
+    const left4 = 23 * 60 + 45 - m;
+    speak(left4 <= 15 ? `${left4} minute${left4 === 1 ? "" : "s"} till bed. ${WIND[windI++ % WIND.length]}` : WIND[windI++ % WIND.length], 6e3, true);
   }, 5e3);
   var bedAsk = (on) => {
     $("bedSure").hidden = !on;
@@ -20826,7 +21194,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     const s = list2.find((s2) => Math.hypot(s2.tx - mel.x, s2.ty - mel.y) < 26);
     return s ? s.id : null;
   }
-  var EVAN_SPOTS = { bay: [[300, 400], [250, 560], [300, 330], [200, 300], [290, 500]], scoopshop: [[200, 440], [380, 440], [300, 560], [140, 560], [260, 420]], scoopkitchen: [[200, 560], [380, 540], [300, 580]], scoopdip: [[180, 560], [420, 560], [140, 420]], mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[150, 340], [260, 330], [380, 330], [200, 580], [330, 590]] };
+  var EVAN_SPOTS = { bay: [[300, 400], [250, 560], [300, 330], [200, 300], [290, 500]], scoopshop: [[200, 440], [380, 440], [300, 560], [140, 560], [260, 420]], scoopkitchen: [[200, 560], [380, 540], [300, 580]], scoopdip: [[180, 560], [420, 560], [140, 420]], cocoa: [[200, 440], [380, 450], [140, 560]], cocoakitchen: [[200, 560], [380, 560]], mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[150, 340], [260, 330], [380, 330], [200, 580], [330, 590]] };
   function evanWalk(speed, dt) {
     const key = evan.tx + "," + evan.ty;
     if (key !== evan.rk) {
@@ -21008,18 +21376,18 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     if (el.hidden) return;
     const wrap2 = $("map"), cw = wrap2.clientWidth, sc = cam.s;
     const bw = el.offsetWidth, bh = el.offsetHeight, px = ex * sc + cam.ox, py = (ey - off) * sc + cam.oy;
-    const left3 = clamp(px, bw / 2 + 2, cw - bw / 2 - 2);
-    el.style.left = left3 + "px";
-    el.style.setProperty("--tail", clamp(px - left3 + bw / 2, 16, bw - 16) + "px");
+    const left4 = clamp(px, bw / 2 + 2, cw - bw / 2 - 2);
+    el.style.left = left4 + "px";
+    el.style.setProperty("--tail", clamp(px - left4 + bw / 2, 16, bw - 16) + "px");
     const roomBelow = (ey + 8) * sc + cam.oy + 10 + bh < wrap2.clientHeight + 4;
     const below = forceBelow && roomBelow || py - bh - 10 < cam.top - 6;
     el.classList.toggle("below", below);
     el.style.top = (below ? (ey + 8) * sc + cam.oy + 10 : py - 10) + "px";
   }
   var last = performance.now();
-  function frame(now2) {
-    const dt = Math.min(0.05, (now2 - last) / 1e3);
-    last = now2;
+  function frame(now3) {
+    const dt = Math.min(0.05, (now3 - last) / 1e3);
+    last = now3;
     if (keys.size) {
       const v = 190 * dt, b = bounds();
       let dx = 0, dy = 0;

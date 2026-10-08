@@ -1771,6 +1771,53 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // The Cocoa Room: bought from the bay's old shopfront, then bean to bar in its kitchen (roast 10 min, grind 2 hours,
+  // temper, mould) and bars sold off the wall
+  console.log("\nthe Cocoa Room");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => { errors.push(`cocoa pageerror: ${e.message}`); console.log("PAGEERR", e.stack.slice(0, 600)); });
+  page.on("dialog", d => { errors.push("the Cocoa Room used a browser pop-up"); d.dismiss(); });
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { const m = /ccpatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    if (m[1] === "coins") f.coins = 2000;
+    if (m[1] === "rewind") f.cocoa.at = 1;
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  const at = async (t, q = "") => { await page.goto(url + `?seed=1&time=${t}&date=2026-10-10${q}`); await page.waitForTimeout(900); };
+  await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-10"); await page.waitForTimeout(800);
+  await at("12:00", "&ccpatch=coins");
+  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
+  await page.locator('#world [data-place="reno"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="cocoa"]', { timeout: 20000 });
+  await page.click('#ctx [data-goal="cocoa"]'); await page.waitForTimeout(500);
+  check(await fox().then(f => f.goals.cocoa && f.coins === 1000) && await page.locator('#world [data-place="cocoa"]').count() === 1 && await page.locator('#world [data-place="reno"]').count() === 0, "the old shopfront becomes the Cocoa Room for 1000 coins");
+  const tap = async (spot, sel) => { await page.locator(`#world [data-spot="${spot}"]`).dispatchEvent("click"); await page.waitForSelector(sel, { timeout: 15000 }); };
+  await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await tap("sacks", '#ctx [data-cc="beans"][data-n="3"]'); await page.click('#ctx [data-cc="beans"][data-n="3"]'); await page.waitForTimeout(300);
+  await page.click("#ctx [data-close]");
+  await tap("roaster", '#ctx [data-cc="roast"]'); await page.click('#ctx [data-cc="roast"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.cocoa.beans === 2 && f.cocoa.roast && f.coins === 970), "three sacks of beans (30 coins), one in the roaster");
+  await at("12:15"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await tap("grinder", '#ctx [data-cc="grind"][data-k="dark"]'); await page.click('#ctx [data-cc="grind"][data-k="dark"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.cocoa.roasted === 0 && f.cocoa.grind && f.cocoa.grind.kind === "dark"), "ten minutes later the beans are roasted, and go in the grinder as dark chocolate");
+  await at("13:00"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  check(await fox().then(f => f.cocoa.grind && !f.cocoa.ground), "an hour on, it's still grinding (two hours)");
+  await at("14:20"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await tap("slab", '#ctx [data-cc="temper"]'); await page.click('#ctx [data-cc="temper"]'); await page.waitForTimeout(300);
+  await page.click("#ctx [data-close]");
+  await tap("moulds", '#ctx [data-cc="mould"][data-k="dark"]'); await page.click('#ctx [data-cc="mould"][data-k="dark"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.cocoa.choc.dark === 20 && f.cocoa.bars.dark >= 9), "tempered on the marble slab (30 pieces), then moulded into ten bars for the wall");
+  await page.click("#ctx [data-close]");
+  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(800);
+  check(await page.locator('#world [data-spot="barwall"]').count() === 1 && await page.locator('#world [data-spot="ckdoor"]').count() === 1, "the shop front: the bar wall, the counter, the kitchen door");
+  await tap("ccounter", '#ctx [data-cc="give"][data-k="dark"]'); await page.click('#ctx [data-cc="give"][data-k="dark"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.bar_dark === 1), "a dark chocolate bar to give (dairy-free, so even for Marcus)");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await at("16:00", "&ccpatch=rewind"); await page.waitForTimeout(1500);
+  check(await fox().then(f => Object.values(f.cocoa.sold || {}).reduce((a, d) => a + d.n, 0) > 0), "customers buy bars off the wall while it's open (the takings come to Mel)");
+  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1500);
+  check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("amara"), "Amara's behind the counter");
+  await page.close();
+}
+{
   // Keepsakes on the shelves of Mel's buildings, and pets adopted at the market that live with someone in the family
   console.log("\nkeepsakes and pets");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

@@ -92,6 +92,7 @@ export const VILLAGE = {
   deck:   {scene:"bay", name:"The deck", door:[215,412], spot:true, line:"The deck, looking out over the foreshore. Bring an ice cream."},
   hfreezer:{scene:"bay", name:"Honesty freezer", door:[474,336], spot:true, line:"The honesty freezer: little cups while the shop's shut."},
   dbike:  {scene:"bay", name:"Delivery bike", door:[300,290], spot:true, line:"The delivery bike."},
+  cocoa:  {scene:"bay", name:"The Cocoa Room", short:"the Cocoa Room", door:[396,516], mark:[396,372]},
   reno:   {scene:"bay", name:"Under renovation", door:[396,520], spot:true, line:"Boarded up for now. Coming soon: a brewery? A chocolatier?"},
   homejetty:{scene:"base", name:"Little jetty", door:[150,132], spot:true, line:"Your little jetty. Paddle down the river and out to the foreshore."},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
@@ -135,7 +136,9 @@ export const INNER = {
   // the Scoop Shack's kitchen, through the door on the shop's west wall; its own way back is the door on its east wall
   scoopkitchen: {parent: "scoopshop", door: [64, 400], arrive: [450, 440], exit: [486, 440]},
   // the chocolate dip station (an upgrade), through the door on the shop's east wall
-  scoopdip: {parent: "scoopshop", door: [456, 410], arrive: [70, 450], exit: [34, 440]}
+  scoopdip: {parent: "scoopshop", door: [456, 410], arrive: [70, 450], exit: [34, 440]},
+  // the Cocoa Room's kitchen, through the door on the shop's west wall
+  cocoakitchen: {parent: "cocoa", door: [64, 400], arrive: [450, 440], exit: [486, 440]}
 };
 export const WORK = ["hall","chord","fresh","chico","luna","ohayo","post","home"];
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
@@ -304,6 +307,19 @@ export const ROOMS = {
     ["gpots","Chocolate pots","P","gpots",null,"Warm pots of chocolate for dipping.",34],
     ["gtops","Toppings shelf","S","gtopshelf",null,"Jars of toppings.",34],
     ["gdipbar","Dip bar","B","gdipbar",null,"Dip it, top it.",34]]},
+  // The Cocoa Room (a big goal, in the bay's old shopfront): the counter (Amara serves behind it; the front is drawn
+  // over the people), the bar wall, a table, and the kitchen door; behind it the chocolate kitchen, bean to bar
+  cocoa: {name:"The Cocoa Room", wall:"#F3E4D2", trim:"#6B4430", noBoard:true, pos:{C:[300,330], W:[110,262], Z:[40,400], T:[340,520]}, stations:[
+    ["ccounter","Counter","C","ccounter",null,"The counter. Yours are free.",46],
+    ["barwall","Bar wall","W","barwall",null,"Wrapped bars of your own chocolate.",36],
+    ["ckdoor","Kitchen","Z","gkdoor",null,"Into the chocolate kitchen.",0],
+    ["ctables","Tables","T","cafetables",null,"A table for a little something.",34]]},
+  cocoakitchen: {name:"The chocolate kitchen", wall:"#F6EEE4", trim:"#8A5A3A", noBoard:true, pos:{S:[96,262], R:[260,262], G:[420,262], M:[170,480], O:[360,480]}, stations:[
+    ["sacks","Bean sacks","S","beansacks",null,"Sacks of cacao beans.",30],
+    ["roaster","Roaster","R","roaster",null,"The bean roaster.",30],
+    ["grinder","Stone grinder","G","grinder",null,"The stone grinder: roasted beans in, chocolate out.",30],
+    ["slab","Marble slab","M","slab",null,"The marble slab, for tempering.",30],
+    ["moulds","Moulds","O","moulds",null,"Bar moulds.",30]]},
   // the garage (a big goal): Darren's workbench, storage, the scooter and the car once they're bought
   garage: {name:"The garage", wall:"#E3E6EA", trim:"#8FA3B8", noBoard:true, pos:{W:[130,250], E:[300,262], K:[436,261], C:[310,480], D:[120,566], S:[440,566]}, stations:[
     ["gbench","Workbench","W","bench",null,"Darren's tools, all hung up on the wall. Mostly.",34],

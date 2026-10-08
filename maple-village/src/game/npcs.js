@@ -28,7 +28,7 @@ function supSlot(def){
 // Where someone is on a given day at a given time (Singapore minutes): the special happenings first (a family paddle,
 // dinner, the market, a tour, Mum's class, visits, tastings), then their own routine. slotNow is right now.
 const dowOf = day => new Date(day + "T00:00:00Z").getUTCDay();
-const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw === 6, owned = (api && api.F().fam && api.F().fam.owned) || {};
+const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw === 6, owned = Object.assign({}, (api && api.F().fam && api.F().fam.owned) || {}, (api && api.F().goals) || {});   // things bought for the family, and big goals
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 const routineNow = def => routineAt(def, dayKey(), sgHM());
 export function slotAt(def, day, t, live){

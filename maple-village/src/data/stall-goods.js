@@ -101,6 +101,12 @@ export const GOODS = {
   chrystea: G("Chrysanthemum tea", ["mama", "gonggong", "dad", "mum"], 3, "night", "Chrysanthemum tea. Good for the eyes!", ["cup", "#F3D34A"]),
   coconutshake: G("Coconut shake", "family", 5, "night", "A coconut shake, straight from the coconut.", ["coconut", "#7FA35A"])
 };
+// The Cocoa Room's bars (cocoa.js), to give: dark is dairy-free, so it suits Marcus too
+Object.assign(GOODS, {
+  bar_milk: {...G("Milk chocolate bar", NOM, 6, "cocoa", "Your own chocolate! Smooth and creamy.", ["bar", "#8A5A3A"]), says: {evan: "CHOCOLATE! Mama made it!", mama: "You made this? From the bean? Aiyo, so clever."}},
+  bar_dark: {...G("Dark chocolate bar", "family", 6, "cocoa", "Dark chocolate, made from the bean! Rich.", ["bar", "#4A2E22"]), says: {marcus: "Dark choc, no dairy. Antioxidants, Zeh. Approved.", dad: "Dark chocolate with my coffee. Perfect."}},
+  bar_white: {...G("White chocolate bar", NOM, 6, "cocoa", "White chocolate, sweet and vanilla-y.", ["bar", "#F3E7C9"]), says: {evan: "White chocolate! It's like milk but CHOCOLATE!"}}
+});
 // Keepsakes: little things to put on a shelf in Mel's buildings (the Scoop Shack, the wine shop, home, her room, the
 // app houses): companions.js places them. Pets: adopted at the market's adoption corner, then given to someone in
 // the family, who looks after it on the screen Mel picks (companions.js).

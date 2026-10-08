@@ -11,6 +11,7 @@ export const GOALS = {
   scooter: {n: "Scooter", price: 800, where: "garage", line: "A little electric scooter. Zips you from screen to screen about half again as fast as walking."},
   car: {n: "Cream convertible", price: 3500, where: "garage", line: "A cream convertible, roof down. Room for you, Maple and Evan, and more than twice as fast as walking."},
   boat: {n: "Dolphin cruise boat", price: 2000, where: "shore", line: "A little cruise boat moored at the end of the jetty. Take the family out to see the dolphins up close."},
+  cocoa: {n: "The Cocoa Room", price: 1000, where: "bay", line: "The boarded-up shopfront on the bay, turned into your own chocolate shop: a shop front with a wall of bars, and a kitchen where you make chocolate from the bean. Amara will run the counter."},
   cellar: {n: "Cellar door", price: 2500, where: "wineshop", line: "A cellar door extension off the wine shop: barrel racks, a tasting bar and a wall of every wine you've made. Visitors love a cellar door, and once a month it hosts the wine club."}
 };
 export const owns = (F, k) => !!(F.goals && F.goals[k]);
@@ -26,7 +27,8 @@ export function buyGoal(F, k){
   return {scooter: "A shiny new scooter, parked in the garage. You'll zip about on it outdoors from now on.",
     car: "A cream convertible! Roof down, Maple in the back, Evan waving at everyone. You'll drive between screens from now on.",
     boat: "Your dolphin cruise boat is moored at the end of the jetty. Take everyone out!",
-    cellar: "The cellar door is open! Through the new door on the wine shop's west wall."}[k];
+    cellar: "The cellar door is open! Through the new door on the wine shop's west wall.",
+    cocoa: "The hoarding's down: The Cocoa Room is yours! Buy some beans in the kitchen and make your first bars."}[k];
 }
 
 const coin = () => icon("coin", 14);
