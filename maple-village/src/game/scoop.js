@@ -51,6 +51,20 @@ export function scoopState(F){
   return s;
 }
 export const recipeOf = (s, id) => s.recipes.find(r => r.id === id);
+// The display holds 8 flavours (s.display, in slot order). Until Mel arranges it herself, it fills itself with
+// whatever's in stock. Customers (and the honesty freezer) only buy what's in the display.
+export const SLOTS = 8;
+export const displayIds = s => Array.isArray(s.display) ? s.display.filter(id => recipeOf(s, id)).slice(0, SLOTS) : s.recipes.filter(r => s.tubs[r.id] > 0).slice(0, SLOTS).map(r => r.id);
+export const onDisplay = s => displayIds(s).map(id => recipeOf(s, id)).filter(r => s.tubs[r.id] > 0);
+// put a flavour out (in place of `out` when the display's full), or take one off
+export function setDisplay(s, id, out){
+  const ids = displayIds(s); if (!recipeOf(s, id)) return false;
+  if (ids.includes(id)) s.display = ids.filter(x => x !== id);
+  else if (out && ids.includes(out)) s.display = ids.map(x => x === out ? id : x);
+  else if (ids.length < SLOTS) s.display = [...ids, id];
+  else return false;
+  return true;
+}
 export const flavourName = r => r ? r.name : "a flavour";
 export const scoopsLeft = s => Object.values(s.tubs).reduce((a, b) => a + b, 0);
 export const openNow = hm => hm >= OPEN && hm < CLOSE;
@@ -128,7 +142,8 @@ export function discover(F, ings){
   useAll(s, ings);
   const r = {id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: ings.includes("milk"), special: false, found: Date.now()};
   s.recipes.push(r); s.tubs[r.id] = (s.tubs[r.id] || 0) + TUB; registerItems(F);
-  return {recipe: r, msg: `A new flavour: ${r.name}! The first tub's in the display.`};
+  if (Array.isArray(s.display) && s.display.length < SLOTS) s.display = [...s.display, r.id];   // a free slot? straight out
+  return {recipe: r, msg: `A new flavour: ${r.name}! ${displayIds(s).includes(r.id) ? "The first tub's in the display." : "The first tub's in the freezer (the display's full: swap it in from there)."}`};
 }
 
 /* ---------- the kitchen fridge ---------- */
@@ -165,7 +180,7 @@ export const priceOf = (s, fmt, r) => s.prices[fmt] + (r && r.special ? s.prices
 const DEFAULT = 4 + 4 + 6 + 7;
 function saleMinute(s, day, hm, opts){
   const box = !openNow(hm) && hasUp(s, "honesty") && honestyOpen(hm); if (!openNow(hm) && !box) return null;
-  const stocked = s.recipes.filter(r => (s.tubs[r.id] || 0) > 0); if (!stocked.length) return null;
+  const stocked = onDisplay(s); if (!stocked.length) return null;
   const d = new Date(day + "T00:00:00Z").getUTCDay(), we = d === 0 || d === 6, night = (d === 2 || d === 4) && hm >= 18*60;
   const glow = hasUp(s, "neon") && hm >= 17*60 ? 1.3 : 1;
   if (box) {   // the honesty freezer: cups only, and the coins go in its box
@@ -310,8 +325,9 @@ export function deliverPanel(F, st){
   return h + `<div class="actions"><button class="btn alt small" data-gvback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export function counterPanel(F, st){
-  const s = scoopState(F), hm = sgHM(), t = s.sold[dayKey()] || {n: 0, coins: 0}, tubs = tubList(s);
+  const s = scoopState(F), hm = sgHM(), t = s.sold[dayKey()] || {n: 0, coins: 0}, tubs = onDisplay(s);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t.n ? `Sold today: ${t.n} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Sofia's behind the counter." : ""}</p>`;
+  if (!tubs.length && scoopsLeft(s)) return h + `<p class="muted">Nothing in the display, but there are tubs in the freezer.</p><div class="actions"><button class="btn small primary" data-gview="freezer">Put some out</button></div>` + upBtn + shut;
   if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), and Tomo will keep the tubs topped up.</p>` + upBtn + shut;
   const pick = st.pick && s.tubs[st.pick] > 0 ? recipeOf(s, st.pick) : null;
   if (pick) return h + `<div class="gpick"><p class="olabel">${dot(pick.col)} ${esc(pick.name)}${pick.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick.ings.map(i => INGR[i][0]).join(", "))} · ${s.tubs[pick.id]} scoops left</p>
@@ -319,7 +335,7 @@ export function counterPanel(F, st){
     <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map(f => `<button class="btn small alt" data-gtake="${f}">${FORMATS[f].n}</button>`).join("")}</div>
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
   h += `<ul class="hlist wlist">${tubs.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
-  return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p>` + upBtn + shut;
+  return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p><div class="actions"><button class="btn small alt" data-gview="freezer">Change what's in the display</button></div>` + upBtn + shut;
 }
 export function menuPanel(F, st){
   const s = scoopState(F), step = k => `<span class="gstep"><button class="btn small alt" data-gprice="${k}:-1" aria-label="Cheaper">−</button><b>${s.prices[k]}</b><button class="btn small alt" data-gprice="${k}:1" aria-label="Dearer">+</button></span>`;
@@ -367,9 +383,16 @@ export function batchPanel(F, st){
   if (s.log.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Lately</p><ul class="hlist">${s.log.map(l => `<li><small>${esc(l)}</small></li>`).join("")}</ul>`;
   return h + shut;
 }
-export function freezerPanel(F){
-  const s = scoopState(F), tubs = tubList(s);
-  return `<span class="tape stripe" aria-hidden="true"></span><h2>The freezer</h2><p class="sub">Tubs keep frozen until they're sold. ${scoopsLeft(s)} scoops in all.</p>`
-    + (tubs.length ? `<ul class="hlist wlist">${tubs.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops · ${esc(r.ings.map(i => INGR[i][0]).join(", "))}</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty for now.</p>`) + shut;
+export function freezerPanel(F, st = {}){
+  const s = scoopState(F), ids = displayIds(s), shown = ids.map(id => recipeOf(s, id)), rest = s.recipes.filter(r => !ids.includes(r.id) && s.tubs[r.id] > 0);
+  const ings = r => esc(r.ings.map(i => INGR[i][0]).join(", ")), swap = st.swap && recipeOf(s, st.swap);
+  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The freezer</h2><p class="sub">Tubs keep frozen until they're sold. ${scoopsLeft(s)} scoops in all. The display out front holds ${SLOTS}; customers only buy what's in it.${Array.isArray(s.display) ? "" : " For now it fills itself with whatever's in stock."}</p>`;
+  if (swap) return h + `<p class="olabel">${dot(swap.col)} Put ${esc(swap.name)} out in place of…</p><ul class="hlist wlist">${shown.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? s.tubs[r.id] + " scoops" : "sold out"}</small></span><button class="btn small primary" data-gswapout="${esc(r.id)}">Swap</button></li>`).join("")}</ul>
+    <div class="actions"><button class="btn alt small" data-gswapcancel="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
+  h += `<p class="eyebrow" style="margin:12px 0 6px">In the display (${shown.length} of ${SLOTS})</p>`;
+  h += shown.length ? `<ul class="hlist wlist">${shown.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? `${s.tubs[r.id]} scoops` : "sold out: the slot's empty till Tomo makes more"} · ${ings(r)}</small></span><button class="btn small alt" data-gdisp="${esc(r.id)}">Take off</button></li>`).join("")}</ul>` : `<p class="muted">Empty.</p>`;
+  h += `<p class="eyebrow" style="margin:12px 0 6px">Waiting in the freezer</p>`;
+  h += rest.length ? `<ul class="hlist wlist">${rest.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops · ${ings(r)}</small></span><button class="btn small primary" data-gdisp="${esc(r.id)}">${ids.length < SLOTS ? "Put out" : "Swap in"}</button></li>`).join("")}</ul>` : `<p class="muted">Nothing else in stock.</p>`;
+  return h + shut;
 }
 export const RENO_LINE = "Boarded up for now, with scaffolding out front. The sign says: \"Coming soon: a craft brewery? A chocolatier?\" Someone's pencilled \"both!!\" underneath.";

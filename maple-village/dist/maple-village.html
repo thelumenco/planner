@@ -8164,7 +8164,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     }
     if (id === "scoopshop") {
       const s2 = stationsOf("scoopshop").find((t2) => t2.kind === "gcounter"), x2 = s2.x, y2 = s2.y, sc = G.scoop ? G.scoop() : { recipes: [], tubs: {} };
-      const tubs = (sc.recipes || []).filter((r) => (sc.tubs || {})[r.id] > 0).slice(0, 8);
+      const rs = sc.recipes || [], tb = sc.tubs || {}, ids = Array.isArray(sc.display) ? sc.display : rs.filter((r) => tb[r.id] > 0).map((r) => r.id);
+      const tubs = ids.map((id2) => rs.find((r) => r.id === id2)).filter(Boolean).slice(0, 8).map((r) => tb[r.id] > 0 ? r : null);
       return sk(
         `<rect x="${x2 - 104}" y="${y2 - 48}" width="208" height="48" rx="4" style="fill:#F4C7CF"/><path d="M${x2 - 104} ${y2 - 48} h208 v-26 q-104 -12 -208 0z" style="fill:#EAF6FA" opacity=".9"/>${Array.from({ length: 8 }, (_, i) => {
           const r = tubs[i];
@@ -13504,6 +13505,18 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return s;
   }
   var recipeOf = (s, id) => s.recipes.find((r) => r.id === id);
+  var SLOTS2 = 8;
+  var displayIds = (s) => Array.isArray(s.display) ? s.display.filter((id) => recipeOf(s, id)).slice(0, SLOTS2) : s.recipes.filter((r) => s.tubs[r.id] > 0).slice(0, SLOTS2).map((r) => r.id);
+  var onDisplay = (s) => displayIds(s).map((id) => recipeOf(s, id)).filter((r) => s.tubs[r.id] > 0);
+  function setDisplay(s, id, out) {
+    const ids = displayIds(s);
+    if (!recipeOf(s, id)) return false;
+    if (ids.includes(id)) s.display = ids.filter((x) => x !== id);
+    else if (out && ids.includes(out)) s.display = ids.map((x) => x === out ? id : x);
+    else if (ids.length < SLOTS2) s.display = [...ids, id];
+    else return false;
+    return true;
+  }
   var scoopsLeft = (s) => Object.values(s.tubs).reduce((a, b) => a + b, 0);
   var openNow = (hm2) => hm2 >= OPEN && hm2 < CLOSE;
   var cookOn = (day, hm2) => {
@@ -13612,7 +13625,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     s.recipes.push(r);
     s.tubs[r.id] = (s.tubs[r.id] || 0) + TUB;
     registerItems(F2);
-    return { recipe: r, msg: `A new flavour: ${r.name}! The first tub's in the display.` };
+    if (Array.isArray(s.display) && s.display.length < SLOTS2) s.display = [...s.display, r.id];
+    return { recipe: r, msg: `A new flavour: ${r.name}! ${displayIds(s).includes(r.id) ? "The first tub's in the display." : "The first tub's in the freezer (the display's full: swap it in from there)."}` };
   }
   var backpackIngr = (F2) => Object.keys(F2.inv || {}).filter((id) => isIngr(id) && F2.inv[id] > 0);
   function stockFridge(F2, id, n, from, orch) {
@@ -13659,7 +13673,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function saleMinute(s, day, hm2, opts) {
     const box = !openNow(hm2) && hasUp(s, "honesty") && honestyOpen(hm2);
     if (!openNow(hm2) && !box) return null;
-    const stocked = s.recipes.filter((r2) => (s.tubs[r2.id] || 0) > 0);
+    const stocked = onDisplay(s);
     if (!stocked.length) return null;
     const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay(), we = d === 0 || d === 6, night = (d === 2 || d === 4) && hm2 >= 18 * 60;
     const glow = hasUp(s, "neon") && hm2 >= 17 * 60 ? 1.3 : 1;
@@ -13863,8 +13877,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return h + `<div class="actions"><button class="btn alt small" data-gvback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function counterPanel2(F2, st6) {
-    const s = scoopState(F2), hm2 = sgHM(), t2 = s.sold[dayKey()] || { n: 0, coins: 0 }, tubs = tubList(s);
+    const s = scoopState(F2), hm2 = sgHM(), t2 = s.sold[dayKey()] || { n: 0, coins: 0 }, tubs = onDisplay(s);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm2) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t2.n ? `Sold today: ${t2.n} (${t2.coins} ${coin()}).` : "Nothing sold yet today."}${st6.server ? " Sofia's behind the counter." : ""}</p>`;
+    if (!tubs.length && scoopsLeft(s)) return h + `<p class="muted">Nothing in the display, but there are tubs in the freezer.</p><div class="actions"><button class="btn small primary" data-gview="freezer">Put some out</button></div>` + upBtn + shut;
     if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), and Tomo will keep the tubs topped up.</p>` + upBtn + shut;
     const pick3 = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
     if (pick3) return h + `<div class="gpick"><p class="olabel">${dot(pick3.col)} ${esc(pick3.name)}${pick3.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick3.ings.map((i) => INGR[i][0]).join(", "))} · ${s.tubs[pick3.id]} scoops left</p>
@@ -13872,7 +13887,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map((f2) => `<button class="btn small alt" data-gtake="${f2}">${FORMATS[f2].n}</button>`).join("")}</div>
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
     h += `<ul class="hlist wlist">${tubs.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
-    return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p>` + upBtn + shut;
+    return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p><div class="actions"><button class="btn small alt" data-gview="freezer">Change what's in the display</button></div>` + upBtn + shut;
   }
   function menuPanel2(F2, st6) {
     const s = scoopState(F2), step2 = (k) => `<span class="gstep"><button class="btn small alt" data-gprice="${k}:-1" aria-label="Cheaper">−</button><b>${s.prices[k]}</b><button class="btn small alt" data-gprice="${k}:1" aria-label="Dearer">+</button></span>`;
@@ -13922,9 +13937,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (s.log.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Lately</p><ul class="hlist">${s.log.map((l) => `<li><small>${esc(l)}</small></li>`).join("")}</ul>`;
     return h + shut;
   }
-  function freezerPanel(F2) {
-    const s = scoopState(F2), tubs = tubList(s);
-    return `<span class="tape stripe" aria-hidden="true"></span><h2>The freezer</h2><p class="sub">Tubs keep frozen until they're sold. ${scoopsLeft(s)} scoops in all.</p>` + (tubs.length ? `<ul class="hlist wlist">${tubs.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops · ${esc(r.ings.map((i) => INGR[i][0]).join(", "))}</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty for now.</p>`) + shut;
+  function freezerPanel(F2, st6 = {}) {
+    const s = scoopState(F2), ids = displayIds(s), shown = ids.map((id) => recipeOf(s, id)), rest = s.recipes.filter((r) => !ids.includes(r.id) && s.tubs[r.id] > 0);
+    const ings = (r) => esc(r.ings.map((i) => INGR[i][0]).join(", ")), swap = st6.swap && recipeOf(s, st6.swap);
+    let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The freezer</h2><p class="sub">Tubs keep frozen until they're sold. ${scoopsLeft(s)} scoops in all. The display out front holds ${SLOTS2}; customers only buy what's in it.${Array.isArray(s.display) ? "" : " For now it fills itself with whatever's in stock."}</p>`;
+    if (swap) return h + `<p class="olabel">${dot(swap.col)} Put ${esc(swap.name)} out in place of…</p><ul class="hlist wlist">${shown.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? s.tubs[r.id] + " scoops" : "sold out"}</small></span><button class="btn small primary" data-gswapout="${esc(r.id)}">Swap</button></li>`).join("")}</ul>
+    <div class="actions"><button class="btn alt small" data-gswapcancel="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
+    h += `<p class="eyebrow" style="margin:12px 0 6px">In the display (${shown.length} of ${SLOTS2})</p>`;
+    h += shown.length ? `<ul class="hlist wlist">${shown.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? `${s.tubs[r.id]} scoops` : "sold out: the slot's empty till Tomo makes more"} · ${ings(r)}</small></span><button class="btn small alt" data-gdisp="${esc(r.id)}">Take off</button></li>`).join("")}</ul>` : `<p class="muted">Empty.</p>`;
+    h += `<p class="eyebrow" style="margin:12px 0 6px">Waiting in the freezer</p>`;
+    h += rest.length ? `<ul class="hlist wlist">${rest.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops · ${ings(r)}</small></span><button class="btn small primary" data-gdisp="${esc(r.id)}">${ids.length < SLOTS2 ? "Put out" : "Swap in"}</button></li>`).join("")}</ul>` : `<p class="muted">Nothing else in stock.</p>`;
+    return h + shut;
   }
   var RENO_LINE = `Boarded up for now, with scaffolding out front. The sign says: "Coming soon: a craft brewery? A chocolatier?" Someone's pencilled "both!!" underneath.`;
 
@@ -16894,7 +16917,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (deskOpen && scene === "office") h = deskPanel();
     else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
     else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
-    else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h = scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverPanel(F, { pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo() }) : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, { pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt }) : scView === "counter" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), server: isHere("sofia") }) : scView === "menu" ? menuPanel2(F) : scView === "fridge" ? fridgePanel2(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? batchPanel(F) : freezerPanel(F);
+    else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h = scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverPanel(F, { pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo() }) : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, { pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt }) : scView === "counter" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), server: isHere("sofia") }) : scView === "menu" ? menuPanel2(F) : scView === "fridge" ? fridgePanel2(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? batchPanel(F) : freezerPanel(F, { swap: scSt.swap });
     else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
     else if (fieldView && scene === "field") {
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
@@ -18344,6 +18367,7 @@ ${SIGNOFF[t2.who] || ""}`;
         scSt.pick = null;
         scSt.dpick = null;
         scSt.made = null;
+        scSt.swap = null;
         scoopNow();
         sfx("paper", true);
         if (id === "gcounter" && isHere("sofia")) npcSay("sofia", pick(["Hi Mel! What'll it be?", "On the house, boss. Which one?", "The new one's going fast!"]));
@@ -19018,6 +19042,32 @@ ${SIGNOFF[t2.who] || ""}`;
       ctx();
     });
     c.querySelectorAll("[data-gvto]").forEach((b) => b.onclick = () => deliver(b.dataset.gvto));
+    c.querySelectorAll("[data-gdisp]").forEach((b) => b.onclick = () => {
+      const id = b.dataset.gdisp, ids = displayIds(s);
+      if (!ids.includes(id) && ids.length >= SLOTS2) {
+        scSt.swap = id;
+        ctx();
+        return;
+      }
+      if (setDisplay(s, id)) {
+        sfx("tap");
+        flash(ids.includes(id) ? `${recipeOf(s, id).name} back in the freezer` : `${recipeOf(s, id).name} in the display`);
+        re();
+      }
+    });
+    c.querySelectorAll("[data-gswapout]").forEach((b) => b.onclick = () => {
+      const r = recipeOf(s, scSt.swap), out = recipeOf(s, b.dataset.gswapout);
+      if (r && setDisplay(s, r.id, b.dataset.gswapout)) {
+        sfx("tap");
+        flash(`${r.name} out, ${out.name} back in the freezer`);
+      }
+      scSt.swap = null;
+      re();
+    });
+    c.querySelectorAll("[data-gswapcancel]").forEach((b) => b.onclick = () => {
+      scSt.swap = null;
+      ctx();
+    });
     c.querySelectorAll("[data-gplan]").forEach((b) => b.onchange = () => {
       const id = b.dataset.gplan;
       s.plan.ids = b.checked ? [...s.plan.ids.filter((x) => x !== id), id] : s.plan.ids.filter((x) => x !== id);

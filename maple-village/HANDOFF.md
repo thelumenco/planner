@@ -1012,3 +1012,12 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Customers: cones and waffles get dipped 25–60% of the time (more dips and toppings, more takers), paying `prices.dip` plus maybe `prices.top`. Both prices have steppers on the menu.
 - **Mixing bench preview:** while ingredients are picked, `benchPanel` shows a result card (`.gresult`): a scoop in the blended colour, the flavour's name, and gelato or sorbet. Once mixed, it shows the new flavour (`scSt.made`, `.gresult.made`).
 - **Grape crates layout:** the crates list uses `orflowers grcrates`, so buttons sit on their own line, and the keep-back stepper has its own labelled row (`.grkeep`).
+
+### Round 80: choosing the display
+- **The display:** it holds `SLOTS` (8) flavours, kept in `s.display` in slot order.
+  - Until Mel changes it, `s.display` is undefined and `displayIds` fills it with whatever's in stock.
+  - `onDisplay(s)` lists displayed flavours that have scoops left. Customer sales, the honesty freezer and the counter's free and take-away list only use those. The dip bar and the delivery bike can still take from any tub.
+- **Changing it:** in the freezer panel (also reachable from the counter's "Change what's in the display" button), Take off or Put out a flavour (`data-gdisp`).
+  - When all 8 slots are full, Swap in opens a chooser (`scSt.swap`, `data-gswapout`), and `setDisplay(s, id, out)` puts the new flavour in the chosen slot.
+  - A displayed flavour that sells out keeps its slot, drawn as an empty tub.
+  - A newly discovered flavour goes straight into a free slot, if there is one.

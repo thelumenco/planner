@@ -43,7 +43,7 @@ import { dishArt, glassArt } from "../art/wine.js";
 import { fieldArt, stallFront } from "../art/field.js";
 import { shoreArt } from "../art/shore.js";
 import { bayArt, DECK_SEATS } from "../art/bay.js";
-import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, batchPanel, freezerPanel, RENO_LINE, discover, stockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
+import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, batchPanel, freezerPanel, RENO_LINE, discover, stockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
 import { diningTable, darrenAsleep, skyWash } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
@@ -1447,7 +1447,7 @@ function ctx(){
   else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
   else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h = scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverPanel(F, {pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo()})
     : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, {pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt}) : scView === "counter" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), server: isHere("sofia")}) : scView === "menu" ? scMenuPanel(F)
-    : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? batchPanel(F) : freezerPanel(F);
+    : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? batchPanel(F) : freezerPanel(F, {swap: scSt.swap});
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
   else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : marketStallPanel(st); }
   else if (orView === "pot" && potItem) h = potPanel(F, potItem);
@@ -2006,7 +2006,7 @@ function arriveSpot(id){
   if (scene === "scoopshop" && id === "gtables") { sitAt(SHOP_SEATS); return; }
   if (id === "gddoor") { if (hasUp(scoopState(F), "dip")) { setScene("scoopdip", INNER.scoopdip.arrive); setTimeout(() => speak("Warm chocolate and a whole shelf of sprinkles. Dangerous.", 3500), 900); } else { scView = "upgrade"; sfx("paper", true); render(); } return; }
   if (SCOOP_IN.includes(scene)) { scView = {gcounter: "counter", gmenu: "menu", gfridge: "fridge", gfreezer: "freezer", gboard: "batch", gbench: "bench", gupgrades: "upgrade", gpots: "pots", gtops: "tops", gdipbar: "dipbar"}[id] || null;
-    if (scView) { scSt.pick = null; scSt.dpick = null; scSt.made = null; scoopNow(); sfx("paper", true); if (id === "gcounter" && isHere("sofia")) npcSay("sofia", pick(["Hi Mel! What'll it be?", "On the house, boss. Which one?", "The new one's going fast!"])); render(); return; } }
+    if (scView) { scSt.pick = null; scSt.dpick = null; scSt.made = null; scSt.swap = null; scoopNow(); sfx("paper", true); if (id === "gcounter" && isHere("sofia")) npcSay("sofia", pick(["Hi Mel! What'll it be?", "On the house, boss. Which one?", "The new one's going fast!"])); render(); return; } }
   if (scene === "kitchen") { kView = id; sfx("paper", true); render(); return; }
   if (scene === "wineshop") { vyView = {wshelf: "shelf", wcounter: "counter", hbox: "box", tasting: "tasting", menu: "menu"}[id] || null;
     if (vyView) { sfx("paper", true); if (id === "wcounter") { vineTick(); speak(pick(["Behind the counter. Customers come in more often while you serve.", "Apron on. Who's first?", "Open for business!"]), 3500); if (isHere("celeste")) setTimeout(() => npcSay("celeste", pick(["Two of us! Let's see how busy we get.", "You pour, I'll chat."])), 1200); }
@@ -2210,6 +2210,13 @@ function wireScoop(c){
   c.querySelectorAll("[data-gvback]").forEach(b => b.onclick = () => { scSt.vpick = null; ctx(); });
   c.querySelectorAll("[data-gvfmt]").forEach(b => b.onclick = () => { scSt.vfmt = b.dataset.gvfmt; ctx(); });
   c.querySelectorAll("[data-gvto]").forEach(b => b.onclick = () => deliver(b.dataset.gvto));
+  // the display: put a flavour out, take one off, or (when it's full) swap one in for another
+  c.querySelectorAll("[data-gdisp]").forEach(b => b.onclick = () => { const id = b.dataset.gdisp, ids = displayIds(s);
+    if (!ids.includes(id) && ids.length >= SLOTS) { scSt.swap = id; ctx(); return; }
+    if (setDisplay(s, id)) { sfx("tap"); flash(ids.includes(id) ? `${recipeOf(s, id).name} back in the freezer` : `${recipeOf(s, id).name} in the display`); re(); } });
+  c.querySelectorAll("[data-gswapout]").forEach(b => b.onclick = () => { const r = recipeOf(s, scSt.swap), out = recipeOf(s, b.dataset.gswapout);
+    if (r && setDisplay(s, r.id, b.dataset.gswapout)) { sfx("tap"); flash(`${r.name} out, ${out.name} back in the freezer`); } scSt.swap = null; re(); });
+  c.querySelectorAll("[data-gswapcancel]").forEach(b => b.onclick = () => { scSt.swap = null; ctx(); });
   c.querySelectorAll("[data-gplan]").forEach(b => b.onchange = () => { const id = b.dataset.gplan; s.plan.ids = b.checked ? [...s.plan.ids.filter(x => x !== id), id] : s.plan.ids.filter(x => x !== id); re(); });
 }
 // The night market's jazz duo: drop a couple of coins in the hat on the front of the stage

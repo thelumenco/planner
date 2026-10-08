@@ -1695,6 +1695,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.addInitScript(() => { const m = /scooppatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     if (m[1] === "stock") { f.inv = {...(f.inv || {}), milk: 4, mango: 4, strawberry: 2}; f.coins = 50; }
     if (m[1] === "rewind") f.scoop.at = 1;
+    if (m[1] === "full") { const rs = Array.from({length: 9}, (_, i) => ({id: "f" + i, ings: ["milk"], name: "Flavour " + i, col: "#F4C7CF", dairy: true, special: false}));
+      f.scoop.recipes = rs; f.scoop.tubs = Object.fromEntries(rs.map(r => [r.id, 20])); f.scoop.display = rs.slice(0, 8).map(r => r.id); }
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-10"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-10&scooppatch=stock"); await page.waitForTimeout(900);
@@ -1731,6 +1733,26 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('[data-open="bag"]'); await page.click(`#bag .item[data-id="${gid}"]`); await page.waitForTimeout(300);
   check(await page.locator('#bag [data-giveto="evan"]').count() === 1 && await page.locator('#bag [data-giveto="marcus"]').count() === 0, "it can be given like a gift (a gelato isn't offered to Marcus: lactose)");
   await page.click('[data-open="bag"]').catch(() => {});
+  // the display: take a flavour off (customers can't buy it then), put it back, and swap one in when all 8 slots are full
+  await page.evaluate(() => window.__mapleScene("scoopkitchen")); await page.waitForTimeout(700);
+  await page.locator('#world [data-spot="gfreezer"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gdisp]", { timeout: 15000 });
+  const sorbet = await fox().then(f => f.scoop.recipes[1].id);
+  await page.click(`#ctx [data-gdisp="${sorbet}"]`); await page.waitForTimeout(300);
+  check(await fox().then(f => Array.isArray(f.scoop.display) && !f.scoop.display.includes(sorbet) && f.scoop.display.length === 1), "a flavour can be taken off the display (it waits in the freezer)");
+  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(700);
+  await page.locator('#world [data-spot="gcounter"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gpick]", { timeout: 15000 });
+  check(await page.locator("#ctx [data-gpick]").count() === 1, "and the counter only offers what's in the display");
+  await page.click('#ctx [data-gview="freezer"]'); await page.waitForSelector(`#ctx [data-gdisp="${sorbet}"]`, { timeout: 15000 });
+  await page.click(`#ctx [data-gdisp="${sorbet}"]`); await page.waitForTimeout(300);
+  check(await fox().then(f => f.scoop.display.includes(sorbet)), "put it back out, straight from the counter");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-10&scooppatch=full"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("scoopkitchen")); await page.waitForTimeout(700);
+  await page.locator('#world [data-spot="gfreezer"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gdisp="f8"]', { timeout: 15000 });
+  await page.click('#ctx [data-gdisp="f8"]'); await page.waitForSelector('#ctx [data-gswapout="f2"]', { timeout: 15000 });
+  await page.click('#ctx [data-gswapout="f2"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.scoop.display.length === 8 && f.scoop.display[2] === "f8" && !f.scoop.display.includes("f2")), "with all 8 slots full, a flavour swaps in for one you choose");
+  await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=15:00&date=2026-10-12&scooppatch=rewind"); await page.waitForTimeout(2500);
   check(await fox().then(f => Object.values(f.scoop.sold).reduce((a, d) => a + d.n, 0) > 0), "customers buy while it's open (the takings come to Mel)");
   check(await fox().then(f => Object.values(f.scoop.made).reduce((a, b) => a + b, 0) > 0), "and Tomo makes fresh tubs on his shifts from what's in the fridge");
