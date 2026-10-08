@@ -270,16 +270,16 @@ export const NPCS = [
     intro: `Hi! I'm ${name}. ${job}. We're here Tuesdays and Thursdays, half five till ten.`,
     lines: ["Busy night! Everyone's out.", "Have you heard the band? They're so good.", "Love this little town. Best market on our route.", "Come back Thursday, I'll have a new batch."],
     away: `${name}'s packed up and driven home.`})),
-  // Felix and Elena run Honeybrook Farm, east of the bay (game/hfarm.js): Felix keeps the bees, Elena the cows, goats
+  // Felix and Elena run Wildflower Farm, east of the bay (game/hfarm.js): Felix keeps the bees, Elena the cows, goats
   // and the dairy. Sunday mornings they're at their market stalls (tours.js MARKET), selling the farm's honey and cheese
-  {id: "felix", pitch: .85, name: "Felix", job: "Keeps the bees at Honeybrook Farm",
+  {id: "felix", pitch: .85, name: "Felix", job: "Keeps the bees at Wildflower Farm",
     look: {skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#7FB069", bottom: "#8A6A52", extra: "glasses", hat: "sunhat"},
     routine: [slot("07:00", "12:00", "hfarm", [[186, 286], [310, 286], [300, 520]]), slot("12:00", "13:00", "hfarm", [60, 270], {act: "sit"}),
       slot("13:00", "18:00", "hfarm", [[186, 286], [200, 524], [300, 520], [310, 286]])],
-    intro: "Felix. I keep the bees up here at Honeybrook. Lavender honey, orchard blossom, wildflower... they decide, not me.",
+    intro: "Felix. I keep the bees up here at Wildflower Farm. Lavender honey, orchard blossom, wildflower... they decide, not me.",
     lines: ["The bees are cheerful today. Can you hear them?", "Never wear blue near a hive. They think you're a flower.", "Elena says I talk to the bees more than to her. She's not wrong.", "Hive three is my favourite. Don't tell the others."],
     hellos: ["Morning, Mel!", "Ah, a helper!"], away: "Felix is in the farmhouse with his feet up."},
-  {id: "elena", pitch: 1.05, name: "Elena", job: "Runs the dairy at Honeybrook Farm",
+  {id: "elena", pitch: 1.05, name: "Elena", job: "Runs the dairy at Wildflower Farm",
     look: {skin: "#D9A882", hair: "#5A3A2A", hairStyle: "bun", top: "#9C8CD9", bottom: "#3E4A43", extra: "apron"},
     routine: [slot("06:00", "11:00", "hfarm", [[30, 400], [260, 400], [490, 420], [440, 516]]), slot("11:00", "13:00", "barn", [[262, 520], [380, 560], [160, 560]]),
       slot("13:00", "18:00", "hfarm", [[200, 600], [260, 524], [440, 512], [458, 270]])],

@@ -1,4 +1,4 @@
-// Honeybrook Farm (Felix and Elena's): a new outdoor screen east of the bay, above the field. The top strip (y < 120)
+// Wildflower Farm (Felix and Elena's): a new outdoor screen east of the bay, above the field. The top strip (y < 120)
 // is kept clear for the railway line and Honeybrook, the brook that runs west under it to the sea (the cottage lane
 // and Honeybrook station come next, through the east gate). The farmhouse, the beehives in their lavender and the red
 // barn along the top; the cow paddock and the goat paddock below; the farm stand by the west gate from the bay.
@@ -75,7 +75,7 @@ export function hfarmArt(){
       `<rect x="100" y="530" width="60" height="24" rx="2"/><path d="M94 530 h72 l-6 -16 h-60z"/>`)}
     ${tapeLabel(130, 584, "Farm stand", "#F4C7CF", 10)}</g>`;
   const sign = sk(`<rect x="330" y="574" width="60" height="22" rx="2" style="fill:#FFF6E8"/><path d="M338 596 v12 M382 596 v12" stroke-width="3"/>`, `<rect x="330" y="574" width="60" height="22" rx="2"/>`)
-    + `<text x="360" y="588" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="7.4" fill="#8E2C2C" pointer-events="none">Honeybrook Farm</text>`;
+    + `<text x="360" y="588" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="7.4" fill="#8E2C2C" pointer-events="none">Wildflower Farm</text>`;
   return lampDefs + ground + farmhouse + hives + barn + cows + goats + stand + sign
     + archGate("toBayF", 22, 280, "The bay", 50, 322, "var(--sky)", "Gate west to the bay")
     + archGate("hfEast", 498, 560, "Cottages", 476, 516, "var(--butter)", "The lane east to the cottages")

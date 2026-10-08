@@ -1,4 +1,4 @@
-// Honeybrook Farm (Felix and Elena run it; Mel helps and takes a share). State in F.hfarm:
+// Wildflower Farm (Felix and Elena run it; Mel helps and takes a share). State in F.hfarm:
 //   fed / brushed / milked   {animalId: day}  (feeding is per herd, brushing and milking per animal)
 //   hives                    [time each hive was last emptied]
 // The cows and goats are milked in the morning, 6 to 10, if they've been fed today or yesterday: a cow gives 2 milk,

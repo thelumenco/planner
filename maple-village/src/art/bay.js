@@ -90,6 +90,6 @@ export function bayArt(){
     ${ccUps.window ? `<g pointer-events="none">${sk(`<path d="M346 494 h24 M350 486 h16 M354 478 h8" style="stroke:#F3C969" stroke-width="2"/>`, `<path d="M358 494 v-18"/>`)}${[0, 1, 2, 3, 4, 5].map(i => `<circle class="twinkle" cx="${339 + i*7.6}" cy="${465 + (i % 2)*2}" r="1.3" fill="#F3C969" style="animation-delay:${(i*.3).toFixed(1)}s"/>`).join("")}${[[352, 491], [364, 491], [355, 483], [361, 483], [358, 475]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${["#4A2E22", "#C2505F", "#8A5A3A", "#F3E7C9", "#4A2E22"][i]}" stroke="#3A2E28" stroke-width=".6"/>`).join("")}</g>` : ""}
     ${tapeLabel(396, 540, ccName.replace(/[<&>"]/g, "").slice(0, 24), "#E8D3BC", 10)}</g>`;
   return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17*60, 6*60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? bike() : "") + deck + (cc ? cocoa : reno)
-    + archGate("toFarmB", 500, 374, "Honeybrook", 486, 404, "#F3E1A0", "Gate east to Honeybrook Farm")
+    + archGate("toFarmB", 500, 374, "Wildflower Farm", 466, 404, "#F3E1A0", "Gate east to Wildflower Farm")
     + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
 }

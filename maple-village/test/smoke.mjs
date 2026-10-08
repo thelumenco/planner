@@ -1940,8 +1940,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
-  // Honeybrook Farm, east of the bay: Felix's bees, Elena's cows and goats, the farm stand
-  console.log("\nHoneybrook Farm");
+  // Wildflower Farm, east of the bay: Felix's bees, Elena's cows and goats, the farm stand
+  console.log("\nWildflower Farm");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`farm pageerror: ${e.message}`));
   page.on("dialog", d => { errors.push("the farm used a browser pop-up"); d.dismiss(); });
@@ -1952,9 +1952,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?reset=1&seed=1&time=08:00&date=2026-10-07"); await page.waitForTimeout(900);
   await page.goto(url + "?seed=1&time=08:00&date=2026-10-07&hfpatch=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
-  check(await page.locator('#world [data-place="toFarmB"]').count() === 1, "a gate on the bay's east side leads to Honeybrook Farm");
+  check(await page.locator('#world [data-place="toFarmB"]').count() === 1, "a gate on the bay's east side leads to Wildflower Farm");
   await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(1800);
-  check(/Honeybrook Farm/.test(await page.locator("#sceneName").textContent()) && await page.locator('#world [data-place="farmhouse"], #world [data-place="barn"], #world [data-place="hives"], #world [data-place="cows"], #world [data-place="goats"], #world [data-place="fstand"]').count() === 6,
+  check(/Wildflower Farm/.test(await page.locator("#sceneName").textContent()) && await page.locator('#world [data-place="farmhouse"], #world [data-place="barn"], #world [data-place="hives"], #world [data-place="cows"], #world [data-place="goats"], #world [data-place="fstand"]').count() === 6,
     "the farm: farmhouse, barn, beehives, cow and goat paddocks, farm stand");
   const who = await npcs(); check(who.includes("felix") && who.includes("elena"), `Felix and Elena are out working (${who.join(", ")})`);
   const tap = async (place, sel) => { await page.locator(`#world [data-place="${place}"]`).dispatchEvent("click"); await page.waitForSelector(sel, { timeout: 15000 }); };

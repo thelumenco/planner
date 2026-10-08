@@ -12,7 +12,7 @@ const DARREN = [17*60 + 45, 18*60 + 30], DARREN_DAYS = [2, 4];
 const GUIDES = ["mama", "gonggong", "farid", "mei"];
 export const VISITORS = ["hana", "okada", "juniper", "bo", "lin", "pip", "opal", "theo"];
 // out-of-towners (data/npcs.js, tourist: true): they only come for tours, tastings and the farm shop
-export const TOURISTS = ["aiko", "ben", "clara", "dev", "rosa", "bastien", "grace", "hiro"];   // Felix and Elena farm at Honeybrook now
+export const TOURISTS = ["aiko", "ben", "clara", "dev", "rosa", "bastien", "grace", "hiro"];   // Felix and Elena farm at Wildflower Farm now
 const dow = day => new Date(day + "T00:00:00Z").getUTCDay();
 export const fmtTime = m => `${Math.floor(m/60) > 12 ? Math.floor(m/60) - 12 : Math.floor(m/60)}${m % 60 ? ":" + String(m % 60).padStart(2, "0") : ""}${m >= 12*60 ? "pm" : "am"}`;
 

@@ -111,7 +111,7 @@ export function goodNewsHTML(localWins, cal){
   const d = goodNews(), clean = s => plain(String(s || "")).slice(0, 220);
   const world = ((d && d.world) || []).slice(0, 6).filter(x => x && x.title);
   const wins = [...(localWins || []), ...(((d && d.wins) || []).map(clean))].filter(Boolean).slice(0, 8);
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Good news</h2><p class="sub">${d ? `Pinned up ${new Date(d.at).toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "short", timeZone: "Asia/Singapore"})}.` : "Fresh every morning."}</p>`;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><p class="eyebrow" style="margin:0 0 2px">The Honeybrook Gazette</p><h2>Good news</h2><p class="sub">${d ? `Pinned up ${new Date(d.at).toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "short", timeZone: "Asia/Singapore"})}.` : "Fresh every morning."}</p>`;
   h += `<p class="eyebrow">Your wins</p>` + (wins.length ? `<ul class="hlist gnews">${wins.map(w => `<li><span>${esc(w)}</span></li>`).join("")}</ul>` : `<p class="muted">Your wins show up here as the day goes on.</p>`);
   if (cal) { h += `<p class="eyebrow">Village calendar</p>`;
     if (cal.fests.length) h += `<ul class="hlist gnews vcal fests">${cal.fests.map(f => `<li><span><b>${esc(f.name)}</b><small>${esc(f.when)} · ${esc(f.until)}</small></span></li>`).join("")}</ul>`;

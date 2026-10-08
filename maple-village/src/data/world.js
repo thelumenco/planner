@@ -95,8 +95,8 @@ export const VILLAGE = {
   hfreezer:{scene:"bay", name:"Honesty freezer", door:[432,290], spot:true, line:"The honesty freezer: little cups while the shop's shut."},
   dbike:  {scene:"bay", name:"Delivery bike", door:[300,290], spot:true, line:"The delivery bike."},
   cocoa:  {scene:"bay", name:"The Cocoa Room", short:"the Cocoa Room", door:[396,516], mark:[396,372]},
-  toFarmB:{scene:"bay", name:"Gate to Honeybrook Farm", door:[500,378], spot:true, bridge:"hfarm", mark:[490,320], line:"East through the gate to Honeybrook Farm."},
-  // Honeybrook Farm (Felix and Elena's), east of the bay (art/hfarm.js, game/hfarm.js)
+  toFarmB:{scene:"bay", name:"Gate to Wildflower Farm", door:[500,378], spot:true, bridge:"hfarm", mark:[490,320], line:"East through the gate to Wildflower Farm."},
+  // Wildflower Farm (Felix and Elena's), east of the bay (art/hfarm.js, game/hfarm.js)
   toBayF: {scene:"hfarm", name:"Gate to the bay", door:[22,286], spot:true, bridge:"bay", mark:[30,226], line:"West through the gate to the bay."},
   hfEast: {scene:"hfarm", name:"The lane to the cottages", door:[498,560], spot:true, mark:[490,506], line:"The lane east to Honeybrook's cottages and the station. Still being built: soon!"},
   farmhouse:{scene:"hfarm", name:"The farmhouse", door:[105,246], spot:true, mark:[105,100], line:"Felix and Elena's farmhouse. The kettle's always on."},
@@ -321,7 +321,7 @@ export const ROOMS = {
     ["gdipbar","Dip bar","B","gdipbar",null,"Dip it, top it.",34]]},
   // The Cocoa Room (a big goal, in the bay's old shopfront): the counter (Amara serves behind it; the front is drawn
   // over the people), the bar wall, a table, and the kitchen door; behind it the chocolate kitchen, bean to bar
-  // Honeybrook Farm's barn: milking stalls and the hay loft, the honey extractor, the yoghurt crocks, the cheese press
+  // Wildflower Farm's barn: milking stalls and the hay loft, the honey extractor, the yoghurt crocks, the cheese press
   // and the cheese cave (game/hfarm.js)
   barn: {name:"The barn", wall:"#C98A6A", trim:"#8E2C2C", noBoard:true, pos:{S:[110,262], H:[262,262], X:[420,262], Y:[100,470], P:[262,450], C:[424,480]}, stations:[
     ["stalls","Milking stalls","S","stalls",null,"The milking stalls. Daisy, Buttercup and Mochi come in here when it rains; the rest of the time they're milked out in the paddock.",30],

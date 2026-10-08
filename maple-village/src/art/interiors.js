@@ -181,7 +181,7 @@ const SHELLS = {
     <g font-family="Klee One,serif" font-weight="600" text-anchor="middle" pointer-events="none"><text x="260" y="58" font-size="13" fill="#F3C969">from the bean</text><text x="260" y="80" font-size="9" fill="#F6EFE3">made right here, in the kitchen</text></g>
     ${sk(`<ellipse cx="400" cy="70" rx="12" ry="18" style="fill:#C2505F"/><ellipse cx="460" cy="70" rx="12" ry="18" style="fill:#E3A23A"/>`, `<ellipse cx="400" cy="70" rx="12" ry="18"/><path d="M400 52 v36" opacity=".5"/><ellipse cx="460" cy="70" rx="12" ry="18"/><path d="M460 52 v36" opacity=".5"/>`)}
     ${plant(492, 612, 1)}`,
-  // Honeybrook Farm's barn: red-brown planks, straw on the floor, a beam with lanterns, a hay door letting light in
+  // Wildflower Farm's barn: red-brown planks, straw on the floor, a beam with lanterns, a hay door letting light in
   barn: () => `<rect width="520" height="640" style="fill:#E8D3A0"/>
     <g opacity=".45">${rows(30, i => `<path d="M${(i*37) % 520} ${160 + (i*53) % 470} l14 -4 M${(i*61 + 20) % 520} ${170 + (i*29) % 460} l-10 -5" style="stroke:#C9A86A" stroke-width="2"/>`)}</g>
     ${wallBase("#B5644A", "#8E2C2C")}<g opacity=".35" style="stroke:#7A3A2A">${rows(14, i => `<path d="M${i*40} 0 V138"/>`)}</g>${skirting}
