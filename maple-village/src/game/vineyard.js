@@ -81,9 +81,26 @@ export function fillBarrel(F, slot, style){
   return `Into the barrel. It'll be ready in about ${Math.round(st.dur/H)} hours. Off you go, it doesn't need you.`;
 }
 export function secondFerment(F, slot){ const v = vineState(F), b = v.barrels[slot]; if (!b || b.style !== "sparkling" || b.stage !== 1 || barrelLeft(b)) return null; b.stage = 2; b.start = Date.now(); b.dur = STYLES.sparkling.dur2; return "Second fermentation for the bubbles. Two more hours."; }
+// suggested names for a barrel (like the ice cream flavours and bonbons): places and moments from the village, the
+// family, and a few in French, matched to the style. Each barrel gets its own list; ones already in the cellar or on
+// the shelves are skipped. k picks the next suggestion.
+const W_PLACE = ["Jetty Sunset", "Dolphin Bay", "Lantern Night", "Low Tide", "Sea Breeze", "Golden Hour", "Swan Lake", "Porch Swing", "First Light", "Rainy Window", "Orchard Hill", "Wildflower", "Night Market", "Paddleboard", "Harvest Moon", "Morning Mist", "Kite Day", "Sunday Picnic", "Firefly", "Boardwalk", "Lighthouse", "Monsoon", "Frangipani", "Hammock"];
+const W_WHO = ["Maple's", "Evan's", "Ma Ma's", "Gong Gong's", "Ah Gong's", "Ah Ma's", "Darren's", "Marco's", "Ines's", "Grandpa's Porch"];
+const W_WORD = {red: ["Red", "Reserve", "Rouge", "Old Vine"], rose: ["Rosé", "Blush", "Pink"], white: ["White", "Blanc", "Crisp"], sparkling: ["Bubbles", "Fizz", "Brut", "Sparkle"]};
+const W_FR = {red: ["Château Maple", "Clos de la Baie", "Domaine du Lac", "Grand Cru Evan"], rose: ["Rosé de la Jetée", "Vie en Rose", "Clos des Cygnes"], white: ["Blanc de la Baie", "Domaine des Lanternes", "Clos du Matin"], sparkling: ["Cuvée Maple", "Crémant de la Baie", "Pétillant du Lac"]};
+export function wineNames(F, slot){
+  const v = vineState(F), b = v.barrels[slot]; if (!b) return [];
+  const used = new Set([...v.cellar, ...v.shelf].map(x => x.name.toLowerCase())), st = b.style, seed = Math.floor(b.start || 0) + slot*7919, out = [];
+  for (let k = 0; out.length < 12 && k < 200; k++) {
+    const kind = k % 3, w = W_WORD[st][(seed + k) % W_WORD[st].length];
+    const nm = kind === 0 ? `${W_PLACE[(seed + k*5) % W_PLACE.length]} ${w}` : kind === 1 ? `${W_WHO[(seed + k*3) % W_WHO.length]} ${W_PLACE[(seed + k*7 + 3) % W_PLACE.length]}` : W_FR[st][(seed + k) % W_FR[st].length] + (k > 8 ? ` ${new Date().getFullYear()}` : "");
+    if (!used.has(nm.toLowerCase()) && !out.includes(nm)) out.push(nm);
+  }
+  return out;
+}
 export function bottle(F, slot, name){
   const v = vineState(F), b = v.barrels[slot]; if (!b || barrelLeft(b) || (b.style === "sparkling" && b.stage !== 2)) return null;
-  const nm = plain(String(name || "")).trim().slice(0, 30) || `Maple's ${STYLES[b.style].n}`;
+  const nm = plain(String(name || "")).trim().slice(0, 30) || wineNames(F, slot)[0] || `Maple's ${STYLES[b.style].n}`;
   v.cellar.push({id: "w" + Date.now().toString(36), name: nm, type: b.style, n: BOTTLES}); v.barrels[slot] = null;
   return `${BOTTLES} bottles of ${nm}, into the cellar. Stock them on the shop shelves.`;
 }
@@ -226,7 +243,7 @@ export function barrelPanel(F){
     else { const left = barrelLeft(b), st = STYLES[b.style];
       if (left) h += `<p>${st.n}${b.style === "sparkling" ? (b.stage === 1 ? ", first fermentation" : ", getting its bubbles") : ""}: ready in ${hrs(left)}.</p><span class="clbar"><i style="width:${Math.round(100*(1 - left/b.dur))}%"></i></span>`;
       else if (b.style === "sparkling" && b.stage === 1) h += `<p>First fermentation done. Now the bubbles.</p><button class="btn primary small" data-vy="second" data-i="${i}">Start the second fermentation</button>`;
-      else h += `<p>${st.n} is ready to bottle!</p><label class="sr" for="vyName${i}">Name this wine</label><input id="vyName${i}" class="vyname" maxlength="30" placeholder="Name it, e.g. Evan's Red" value="${esc(vy.name[i] || "")}"><button class="btn primary small" data-vy="bottle" data-i="${i}">Bottle it</button>`; }
+      else h += `<p>${st.n} is ready to bottle!</p><label class="sr" for="vyName${i}">Name this wine</label><input id="vyName${i}" class="vyname" maxlength="30" placeholder="${esc(wineNames(F, i)[0] || "Name it")}" value="${esc(vy.name[i] || "")}"><button class="btn alt small" data-vy="suggest" data-i="${i}">Suggest a name</button><button class="btn primary small" data-vy="bottle" data-i="${i}">Bottle it</button>`; }
     h += `</div></div>`;
   });
   h += `</div>${v.cellar.length ? `<p class="eyebrow">In the cellar</p><ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottles</small></span></li>`).join("")}</ul><p class="muted">Take them to the wine shop to stock the shelves.</p>` : ""}`;
@@ -315,6 +332,7 @@ export function wireVine(root, F, api){
     else if (k === "putgr") { const v = vineState(F), c = b.dataset.k, n = (F.inv || {})["grape_" + c] || 0; if (n) { v.grapes[c] += n; delete F.inv["grape_" + c]; line = `${n} bunch${n > 1 ? "es" : ""} back in the crates.`; } }
     else if (k === "keep") { const v = vineState(F), c = b.dataset.k; v.keep[c] = Math.max(0, Math.min(30, (v.keep[c] || 0) + +b.dataset.n)); }
     else if (k === "second") line = secondFerment(F, i);
+    else if (k === "suggest") { const ns = wineNames(F, i); vy.sug = vy.sug || {}; vy.sug[i] = ((vy.sug[i] ?? -1) + 1) % Math.max(1, ns.length); vy.name[i] = ns[vy.sug[i]] || ""; api.sfx("tap"); }
     else if (k === "bottle") { line = bottle(F, i, vy.name[i]); if (line) { vy.name[i] = ""; api.sfx("chime"); } }
     else if (k === "olives") { line = pickOlives(F); if (line) api.sfx("coin"); }
     else if (k === "names") { rename(F, "vineyard", (root.querySelector("#vyNameV") || {}).value); rename(F, "shop", (root.querySelector("#vyNameS") || {}).value); line = `${vineyardName(F)} and ${shopName(F)}. Lovely names!`; api.sfx("chime"); }

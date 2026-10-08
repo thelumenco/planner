@@ -1181,7 +1181,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="toVine"]').dispatchEvent("click");
   await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-place="barrels"]').dispatchEvent("click");
-  await page.waitForSelector('#vyName0', { timeout: 15000 }); await page.fill('#vyName0', "Evan's Blush"); await page.click('#ctx [data-vy="bottle"]');
+  await page.waitForSelector('#vyName0', { timeout: 15000 });
+  const ph = await page.locator('#vyName0').getAttribute("placeholder"); await page.click('#ctx [data-vy="suggest"]'); await page.waitForTimeout(300);
+  const sug = await page.locator('#vyName0').inputValue();
+  check(ph && sug && ph !== "Name it" && sug.length > 3, `a ready barrel suggests names (${ph}; ${sug})`);
+  await page.fill('#vyName0', "Evan's Blush"); await page.click('#ctx [data-vy="bottle"]');
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.cellar.some(c => c.name === "Evan's Blush" && c.n === 6)), "a ready barrel is named and bottled: six bottles in the cellar");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-place="wineshop"]').dispatchEvent("click");
