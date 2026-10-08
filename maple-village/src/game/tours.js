@@ -160,7 +160,7 @@ export const FAIR = [{id: "hiro", at: 2, short: "Kites", n: "Kites", items: [], 
   {id: "aiko", at: 3, short: "Faces", n: "Face painting", items: [], act: "face", col: "#C9A3E0", line: "Butterflies, tigers, dinosaurs. You choose!"},
   {id: "ben", at: 4, short: "Lemonade", n: "Lemonade", items: ["apple"], col: "#F3D34A", line: "Fresh lemonade, and apples for the road."},
   {id: "clara", at: 5, short: "Snacks", n: "Snacks", items: ["dumpling", "ondeh"], col: "#F2A0B8", line: "Dumplings and ondeh-ondeh, made this morning."}];
-// The night market, Tuesday and Thursday evenings 6 to 10pm, after the night markets of Taipei and Seoul: street food,
+// The night market, Tuesday and Thursday evenings 5:30 to 10pm, after the night markets of Taipei and Seoul: street food,
 // sweets, hair things, keychains, socks and tees, lanterns for the house. All out-of-towners, a jazz duo on a little
 // stage on the football pitch, fairy lights over everything. decor: things for the house (bought like at Hana's Home tab)
 export const NIGHT = [{id: "yun", at: 0, short: "Taiwan eats", n: "Taiwanese street snacks", items: ["friedchicken", "scallion", "bubbletea"], col: "#E8566C", line: "Fried chicken as big as your face! And the bubble tea's brown sugar."},
@@ -179,7 +179,7 @@ function lastSaturday(day){ const dt = new Date(day + "T00:00:00Z"); if (dt.getU
 export function eventOn(day){
   if (dow(day) === 0) return {kind: "market", name: "Sunday farmers market", from: 8*60, to: 13*60, stalls: MARKET, wine: true};
   if (lastSaturday(day)) return {kind: "fair", name: "Field fair", from: 10*60, to: 16*60, stalls: FAIR, wine: false};
-  if (dow(day) === 2 || dow(day) === 4) return {kind: "night", name: "Night market", from: 18*60, to: 22*60, stalls: NIGHT, wine: false};
+  if (dow(day) === 2 || dow(day) === 4) return {kind: "night", name: "Night market", from: 17*60 + 30, to: 22*60, stalls: NIGHT, wine: false};
   return null;
 }
 export const eventNow = (day, hm) => { const e = eventOn(day); return e && hm >= e.from && hm < e.to ? e : null; };

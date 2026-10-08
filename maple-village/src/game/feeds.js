@@ -1,13 +1,13 @@
 // Reports other routines send to the village, all read-only here:
-//  - "health-chord" / "health-chico": the nightly bug checks. Shown as a standing health sign in each building
+//  - "health-chord" / "health-chico" / "health-luna" / "health-ohayo": the nightly bug checks. Shown as a standing health sign in each building
 //    and a little light on the building in the town square.
 //  - "content-chord" / "content-ambidextrous": the two content calendars. Shown on the calendar panel's Content tab.
 // Docs live in the per-user collection; routines write them, the page only reads (see ROUTINE-STEPS.md).
 import { esc, plain, dayKey } from "../util.js";
 
-export const APPS = {chord: {name: "Chord", room: "chord"}, chico: {name: "Chico", room: "chico"}};
+export const APPS = {chord: {name: "Chord", room: "chord"}, chico: {name: "Chico", room: "chico"}, luna: {name: "Luna", room: "luna"}, ohayo: {name: "Ohayo", room: "ohayo"}};
 export const BRANDS = {chord: {name: "Chord", color: "var(--sage)"}, ambidextrous: {name: "Ambidextrous", color: "var(--peri)"}};
-const DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
+const DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
 const KEY = "fox.feeds";
 let D = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })();
 let onChange = () => {};

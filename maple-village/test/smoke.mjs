@@ -453,7 +453,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => /Good news/.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
   check(await page.locator("#ctx .hlist.gnews.world li").count() === 1 && await page.locator("#ctx").textContent().then(t => /Chord added 2 studios/.test(t)), "the good news board shows the world's good news and your wins");
   { const t = await page.locator("#ctx").textContent();
-    check(/Village calendar/.test(t) && /Night market, 6pm to 10pm/.test(t) && /Sunday farmers market/.test(t) && /Deepavali/.test(t) && /Family dinner at/.test(t), "the good news board pins up the village calendar: markets, the night market, family dinners and festivals coming up"); }
+    check(/Village calendar/.test(t) && /Night market, 5:30pm to 10pm/.test(t) && /Sunday farmers market/.test(t) && /Deepavali/.test(t) && /Family dinner at/.test(t), "the good news board pins up the village calendar: markets, the night market, family dinners and festivals coming up"); }
   await page.screenshot({ path: join(shots, "good-news.png") });
   await page.click("#pclose");
   await page.locator('#world [data-place="toLane"]').dispatchEvent("click");
@@ -1770,6 +1770,22 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // Makers' Lane: Luna and Ohayo have their own buildings now, each with a health sign for its nightly bug check
+  console.log("\nLuna and Ohayo on Makers' Lane");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`apps pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-10"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(700);
+  check(await page.locator('#world [data-place="luna"]').count() === 1 && await page.locator('#world [data-place="ohayo"]').count() === 1 && await page.locator('#world [data-place^="plot"]').count() === 0, "Luna and Ohayo have houses on Makers' Lane where their plots were");
+  for (const app of ["ohayo", "luna"]) {
+    await page.evaluate(a => window.__mapleScene(a), app); await page.waitForTimeout(700);
+    await page.locator('#world [data-spot="status"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
+    check(new RegExp(`${app === "luna" ? "Luna" : "Ohayo"} health`).test(await page.locator("#ctx h2").innerText()) && /nightly bug check/.test(await page.locator("#ctx").innerText()), `inside the ${app} house, a health sign waiting for its nightly bug check`);
+    await page.click("#pclose").catch(() => {});
+  }
+  await page.close();
+}
+{
   // Scoop Shack upgrades: buy them from the catalogue; the dip station's room (dips and toppings to buy, make a dipped
   // one to give), the honesty freezer's coin box filling while the shop's shut, and the delivery bike
   console.log("\nScoop Shack upgrades");
@@ -1924,6 +1940,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(/cart/.test(await page.locator("#ctx h2").innerText()), "tap the cart to serve from it (it scoops from the shop's display)");
   await page.click('#ctx [data-close]').catch(() => {});
   check(await page.evaluate(() => [...document.querySelectorAll("#actors .npc")].length) > 0 && await page.evaluate(() => !document.querySelector('[data-track="jazz"]')), "the duo isn't a record on the record player");
+  await page.goto(url + "?seed=1&time=17:40&date=2026-10-13"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2000);
+  check((await ids()).includes("yun") && await page.locator('#world [data-place="jazzhat"]').count() === 1, "the night market's already on at 5:40pm (it opens at 5:30)");
   await page.goto(url + "?seed=1&time=19:30&date=2026-10-12"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
   check(!(await ids()).includes("yun") && await page.locator('#world [data-place="jazzhat"]').count() === 0, "no night market on a Monday");

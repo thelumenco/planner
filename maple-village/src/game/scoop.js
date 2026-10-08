@@ -112,8 +112,8 @@ export function buyUpgrade(F, k){
 export function buyDip(F, k){ const s = scoopState(F), d = DIPS[k]; if (!d || s.dips[k] || F.coins < d.price) return false; F.coins -= d.price; s.dips[k] = 1; return true; }
 export function buyTopping(F, k){ const s = scoopState(F), t = TOPPINGS[k]; if (!t || s.tops[k] || F.coins < t.price) return false; F.coins -= t.price; s.tops[k] = 1; return true; }
 const nDips = s => Object.keys(s.dips).filter(k => DIPS[k]).length, nTops = s => Object.keys(s.tops).filter(k => TOPPINGS[k]).length;
-// the cart at the night market (Tuesday and Thursday, 6 to 10pm): scoops cups and cones from the display, busy
-export const cartOn = (day, hm) => { const d = new Date(day + "T00:00:00Z").getUTCDay(); return (d === 2 || d === 4) && hm >= 18*60 && hm < 22*60; };
+// the cart at the night market (Tuesday and Thursday, 5:30 to 10pm): scoops cups and cones from the display, busy
+export const cartOn = (day, hm) => { const d = new Date(day + "T00:00:00Z").getUTCDay(); return (d === 2 || d === 4) && hm >= 17*60 + 30 && hm < 22*60; };
 function cartMinute(s, day, hm, opts){
   if (!cartOn(day, hm)) return null;
   const stocked = onDisplay(s); if (!stocked.length) return null;
@@ -191,7 +191,7 @@ const DEFAULT = 4 + 4 + 6 + 7;
 function saleMinute(s, day, hm, opts){
   const box = !openNow(hm) && hasUp(s, "honesty") && honestyOpen(hm); if (!openNow(hm) && !box) return null;
   const stocked = onDisplay(s); if (!stocked.length) return null;
-  const d = new Date(day + "T00:00:00Z").getUTCDay(), we = d === 0 || d === 6, night = (d === 2 || d === 4) && hm >= 18*60;
+  const d = new Date(day + "T00:00:00Z").getUTCDay(), we = d === 0 || d === 6, night = (d === 2 || d === 4) && hm >= 17*60 + 30;
   const glow = hasUp(s, "neon") && hm >= 17*60 ? 1.3 : 1;
   if (box) {   // the honesty freezer: cups only, and the coins go in its box
     if (Math.random() >= .012*(we ? 1.3 : 1)*(night ? 1.4 : 1)*glow) return null;

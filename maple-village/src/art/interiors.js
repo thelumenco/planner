@@ -56,6 +56,23 @@ const SHELLS = {
       `<circle cx="96" cy="66" r="34"/><path d="M62 66 h68 M96 32 v68"/><circle cx="424" cy="66" r="34"/><path d="M390 66 h68 M424 32 v68"/><path d="M168 0 v46 M156 52 l-6 14 M180 52 l6 14"/>`)}
     ${skirting}${plant(52, 430, 1)}${plant(478, 430, .85)}`,
 
+  // Luna house: a dusky lavender room, a starry ceiling band, a round window with the moon in it, a rug
+  luna: () => `<rect width="520" height="640" style="fill:#E6E0F2"/>
+    <g opacity=".4" style="stroke:#D2C8E6" stroke-width="1.1">${rows(12, i => `<path d="M0 ${176 + i*40} H520"/>`)}</g>
+    <g filter="url(#wob)"><ellipse cx="260" cy="430" rx="120" ry="58" style="fill:#C3CDEE" opacity=".7"/></g>
+    ${wallBase("#EEE9F8", "#B9A6E8")}
+    <rect width="520" height="36" style="fill:#4B4A7A"/><g style="fill:#FFF3C4">${rows(16, i => `<circle cx="${i*33 + 14}" cy="${(i % 3)*9 + 9}" r="${i % 2 ? 1.6 : 2.4}"/>`)}</g>
+    ${sk(`<circle cx="420" cy="86" r="34" style="fill:#4B4A7A"/><path d="M428 66 a18 18 0 1 0 8 32 a14 14 0 1 1 -8 -32z" style="fill:#FFF3C4"/>`, `<circle cx="420" cy="86" r="34"/>`)}
+    ${skirting}${plant(52, 430, 1)}${plant(478, 430, .85)}`,
+
+  // Ohayo house: morning light. Pale wood floor, a peach wall with a sunrise window, a low shelf of plants
+  ohayo: () => `<rect width="520" height="640" style="fill:#F3E6D2"/>
+    <g opacity=".45" style="stroke:#E2CCAE" stroke-width="1.1">${rows(12, i => `<path d="M0 ${176 + i*40} H520"/>`)}</g>
+    <g filter="url(#wob)"><rect x="160" y="380" width="200" height="90" rx="8" style="fill:#FBE3C8" opacity=".8"/></g>
+    ${wallBase("#FFF4E6", "#F2A65A")}
+    ${sk(`<rect x="364" y="26" width="120" height="92" rx="4" style="fill:#FCE2C2"/><circle cx="424" cy="118" r="30" style="fill:#F3C969"/><rect x="364" y="104" width="120" height="14" style="fill:#F2A65A"/>`, `<rect x="364" y="26" width="120" height="92" rx="4"/><path d="M424 26 v78"/>`)}
+    ${skirting}${plant(52, 430, 1)}${plant(478, 430, .85)}`,
+
   // Post office: checkerboard tiles, pigeonhole wall, a clock and a stamp poster, parcel stack.
   post: () => `<rect width="520" height="640" style="fill:#E9F0F4"/>
     <g style="fill:#D6E2EA">${rows(13, r => rows(13, c => (r + c) % 2 ? `<rect x="${c*40}" y="${150 + r*38}" width="40" height="38"/>` : ""))}</g>

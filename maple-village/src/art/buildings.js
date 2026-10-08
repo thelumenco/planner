@@ -89,6 +89,41 @@ export function chicoCottage(){
   return wrap("chico", "Chico", "var(--blush)", 85, 500, 58, art, lines);
 }
 
+// Luna house: a little observatory for the evening app. Lavender walls, a domed roof with a telescope slot, a
+// crescent moon on the dome, an arched door and a star-shaped window.
+export function lunaHouse(){
+  const art = `<rect x="108" y="456" width="104" height="64" rx="4" style="fill:#EEE9F8"/>
+    <path d="M100 460 Q100 398 160 396 Q220 398 220 460Z" style="fill:#B9A6E8"/>
+    <path d="M154 398 h12 l-2 40 h-8z" style="fill:#7E6CB8"/>
+    <path d="M180 418 a10 10 0 1 0 6 16 a8 8 0 1 1 -6 -16z" style="fill:#FFF3C4"/>
+    <path d="M148 520 v-22 a12 12 0 0 1 24 0 v22z" style="fill:#7E6CB8"/>
+    <path d="M128 476 l3 6 l7 1 l-5 5 l1 7 l-6 -3 l-6 3 l1 -7 l-5 -5 l7 -1z" style="fill:var(--sky)"/>
+    <circle cx="194" cy="484" r="9" style="fill:var(--sky)"/>`;
+  const lines = `<rect x="108" y="456" width="104" height="64" rx="4"/><path d="M100 460 Q100 398 160 396 Q220 398 220 460Z"/><path d="M112 440 q48 -12 96 0" opacity=".4"/>
+    <path d="M154 398 h12 l-2 40 h-8z"/><path d="M180 418 a10 10 0 1 0 6 16 a8 8 0 1 1 -6 -16z"/>
+    <path d="M148 520 v-22 a12 12 0 0 1 24 0 v22"/><circle cx="166" cy="510" r="1.4"/>
+    <path d="M128 476 l3 6 l7 1 l-5 5 l1 7 l-6 -3 l-6 3 l1 -7 l-5 -5 l7 -1z"/><circle cx="194" cy="484" r="9"/><path d="M185 484 h18 M194 475 v18" opacity=".6"/>`;
+  return wrap("luna", "Luna", "var(--peri)", 160, 520, 60, art, lines);
+}
+
+// Ohayo house: a morning house. Warm cream walls under a peach tiled roof with upturned eaves, a big rising sun on
+// the gable, a sliding door hung with a striped noren curtain, a little bench out front.
+export function ohayoHouse(){
+  const art = `<rect x="312" y="456" width="100" height="64" style="fill:#FFF4E6"/>
+    <path d="M298 462 q4 -6 10 -8 L362 412 L416 454 q6 2 10 8 q-64 -8 -128 0z" style="fill:#F2A65A"/>
+    <circle cx="362" cy="440" r="11" style="fill:#F3C969"/>
+    <rect x="344" y="482" width="36" height="38" style="fill:#E8D5BC"/>
+    <path d="M344 482 h36 v14 h-36z" style="fill:#E8566C"/>
+    <rect x="320" y="474" width="16" height="16" style="fill:var(--sky)"/><rect x="388" y="474" width="16" height="16" style="fill:var(--sky)"/>
+    <rect x="392" y="508" width="26" height="5" rx="1" style="fill:var(--wood)"/>`;
+  const lines = `<rect x="312" y="456" width="100" height="64"/><path d="M298 462 q4 -6 10 -8 L362 412 L416 454 q6 2 10 8 q-64 -8 -128 0z"/><path d="M320 446 h84 M334 432 h56" opacity=".35"/>
+    <circle cx="362" cy="440" r="11"/>${[0, 45, 90, 135, 180, 225, 270, 315].map(a => `<path d="M362 425 v-4" transform="rotate(${a} 362 440)"/>`).join("")}
+    <rect x="344" y="482" width="36" height="38"/><path d="M362 482 v38 M344 496 h36 M356 482 v14 M368 482 v14"/>
+    <rect x="320" y="474" width="16" height="16"/><path d="M328 474 v16 M320 482 h16"/><rect x="388" y="474" width="16" height="16"/><path d="M396 474 v16 M388 482 h16"/>
+    <rect x="392" y="508" width="26" height="5" rx="1"/><path d="M395 513 v6 M415 513 v6"/>`;
+  return wrap("ohayo", "Ohayo", "var(--peach)", 362, 520, 60, art, lines);
+}
+
 // Post office: flat roof with a cornice, POST sign board, striped awning over the door, postbox.
 export function postOffice(){
   const art = `<rect x="384" y="426" width="102" height="64" style="fill:#EAF1F6"/>

@@ -156,7 +156,7 @@ async function initDb(){
   attachJars(col, () => { if (scene === "room") drawScene(); if (jarsOpen && !/^(jNote|jcName)$/.test(document.activeElement?.id || "")) ctx(); });
   attachMyDocs(col, id => { if ((id === "journal" && journalOpen && document.activeElement?.id !== "jText") || (id === "scratch" && scratchOpen && document.activeElement?.id !== "scratchText")) ctx(); });
   attachFeeds(col, id => {
-    if (/^health/.test(id) && ["lane", "chord", "chico"].includes(scene)) { drawScene(); ctx(); }
+    if (/^health/.test(id) && ["lane", ...APP_IDS].includes(scene)) { drawScene(); ctx(); }
     if (/^content/.test(id) && openView === "cal" && calTab === "content") renderCal();
     if (id === "goodnews" && scene === "village") drawScene();
   });
@@ -174,8 +174,8 @@ async function initDb(){
   refs.stats.onSnapshot(snap => {
     const before = ST; ST = snap.exists ? JSON.parse(JSON.stringify(snap.data() || {})) : {};
     try { localStorage.setItem("fox.stats", JSON.stringify(ST)); } catch {}
-    const grew = ["chord", "chico"].find(k => ST[k] && before[k] && ST[k].users > before[k].users);
-    if (grew) speak(`${grew === "chord" ? "Chord" : "Chico"} grew to ${ST[grew].users.toLocaleString()} users! New flowers 🌼`, 5000);
+    const grew = APP_IDS.find(k => ST[k] && before[k] && ST[k].users > before[k].users);
+    if (grew) speak(`${APP_NAME[grew]} grew to ${ST[grew].users.toLocaleString()} users! New flowers 🌼`, 5000);
     render(outside());
   }, () => {});
   let firstPlan = true;
@@ -874,7 +874,7 @@ const PLACES = {home: "home", house: "home", fridge: "home:fridge", kitchen: "ho
   field: "field:lake", lake: "field:lake", swans: "field:lake", picnic: "field:picnic", football: "field:pitch", park: "field:lake",
   orchard: "orchard:farmshop", "farm shop": "orchard:farmshop", "tour sign": "orchard:toursign", tours: "orchard:toursign", "fruit": "orchard:farmshop", "flower farm": "flowers", foreshore: "shore:dolphins", beach: "shore:dolphins", seaside: "shore:dolphins", "dolphin bench": "shore:dolphins", dolphins: "shore:dolphins", paddleboard: "shore:suprack", paddleboards: "shore:suprack", "paddleboarding": "shore:suprack", "mum's house": "mumdad", "mum and dad's": "mumdad", "parents' house": "mumdad", "marcus's house": "marcus", "marcus and angelina's": "marcus", "exercise lawn": "field:exlawn", "exercise class": "field:exlawn", pilates: "field:exlawn", zumba: "field:exlawn", "ma ma": "cottage", "ma ma's cottage": "cottage", cottage: "cottage", "grandma": "cottage",
   vineyard: "vineyard:barrels", vines: "vineyard:vinestall", "barrel shed": "vineyard:barrels", barrels: "vineyard:barrels", "wine shop": "wineshop", "honesty box": "wineshop:hbox", "tasting room": "wineshop:tasting", playground: "vineyard:pslide",
-  "town hall": "hall", hall: "hall", bank: "bank", vaults: "bank", savings: "bank", "kind words": "trophy:kudos", "trophy room": "trophy", courtyard: "trophy", fountain: "trophy:fountain", trophies: "trophy", "trophy book": "trophy:tbook", affirmations: "trophy:affirm", routines: "room:routines", "routine board": "room:routines", compliments: "trophy:kudos", "client table": "hall:clients", clients: "hall:clients", "planning table": "hall:table", plans: "hall:table", revenue: "hall:revenue", "revenue chart": "hall:revenue", chord: "chord", "makers lane": "lane:plot3", lane: "lane:plot3", library: "fresh", "fresh pages": "fresh", chico: "chico", "post office": "post", post: "post", town: "village:board"};
+  "town hall": "hall", hall: "hall", bank: "bank", vaults: "bank", savings: "bank", "kind words": "trophy:kudos", "trophy room": "trophy", courtyard: "trophy", fountain: "trophy:fountain", trophies: "trophy", "trophy book": "trophy:tbook", affirmations: "trophy:affirm", routines: "room:routines", "routine board": "room:routines", compliments: "trophy:kudos", "client table": "hall:clients", clients: "hall:clients", "planning table": "hall:table", plans: "hall:table", revenue: "hall:revenue", "revenue chart": "hall:revenue", chord: "chord", "makers lane": "lane:plot3", lane: "lane:plot3", library: "fresh", "fresh pages": "fresh", chico: "chico", luna: "luna", "luna house": "luna", ohayo: "ohayo", "ohayo house": "ohayo", "post office": "post", post: "post", town: "village:board"};
 function walkToPlace(name){
   if (/dinner|dining table/.test(String(name || "").toLowerCase())) { const d = dinnerOn(dayKey()), host = d ? d.host : "home", st = spotObj(host, "dine"); go(host, st.tx, st.ty, () => arriveSpot("dine")); return name; }
   const k = PLACES[String(name || "").toLowerCase().trim()]; if (!k) return null;
@@ -943,7 +943,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"family dinner|foreshore|dolphin bench|paddleboards|mum's house|marcus's house|exercise lawn|field|lake|picnic|football|orchard|farm shop|tour sign|flower farm|ma ma's cottage|wine shop kitchen|larder|olive tree|weekly review|vineyard|barrels|wine shop|honesty box|tasting room|playground|home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"family dinner|foreshore|dolphin bench|paddleboards|mum's house|marcus's house|exercise lawn|field|lake|picnic|football|orchard|farm shop|tour sign|flower farm|ma ma's cottage|wine shop kitchen|larder|olive tree|weekly review|vineyard|barrels|wine shop|honesty box|tasting room|playground|home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|luna|ohayo|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -999,15 +999,18 @@ function villageCalendar(){
   return {fests: fests.map(x => ({name: x.f.name, when: x.k === x.from && x.k === x.to ? fmtD(x.k) : fmtD(x.k), until: x.from <= today && today <= x.to ? (x.k < today ? "on now (decorations still up)" : x.k === today ? "today!" : `${until(x.k)}, decorations are up`) : until(x.k)})),
     days: days.map(d => ({when: d.k === today ? "Today" : d.k === addD(today, 1) ? "Tomorrow" : fmtD(d.k), list: d.list}))};
 }
+// the apps on Makers' Lane, each with a building, a nightly bug check (health-<id>) and a user garden (stats.<id>)
+const APP_IDS = ["chord", "chico", "luna", "ohayo"], APP_NAME = {chord: "Chord", chico: "Chico", luna: "Luna", ohayo: "Ohayo"};
 function myWins(){
   const w = [], y = F.history && F.history[prevDay(dayKey())];
   if (S.doneIds.length) w.push(`${S.doneIds.length} quest${S.doneIds.length > 1 ? "s" : ""} done today`);
   if (y && y.q) w.push(`${y.q} quest${y.q > 1 ? "s" : ""} finished yesterday`);
   if (F.streak >= 2) w.push(`${F.streak} cosy days in a row with ${F.name}`);
   if (S.harvested) w.push(`${S.harvested} harvest${S.harvested > 1 ? "s" : ""} from the garden today`);
-  ["chord", "chico"].forEach(a => { const h = health(a); if (h && h.status === "green") w.push(`${a === "chord" ? "Chord" : "Chico"}: all checks green last night`); });
+  APP_IDS.forEach(a => { const h = health(a); if (h && h.status === "green") w.push(`${APP_NAME[a]}: all checks green last night`); });
   if (ST.chord && ST.chord.users) w.push(`Chord is home to ${ST.chord.users} ${ST.chord.label || "studios"}`);
   if (ST.chico && ST.chico.users) w.push(`${ST.chico.users} ${ST.chico.label || "families"} use Chico`);
+  ["luna", "ohayo"].forEach(a => { if (ST[a] && ST[a].users) w.push(`${ST[a].users} ${ST[a].label || "users"} use ${APP_NAME[a]}`); });
   return w;
 }
 
@@ -1482,7 +1485,7 @@ function ctx(){
   else if (routOpen && scene === "room") h = routinesPanel();
   else if (lettersOpen && (scene === "room" || scene === "base")) h = lettersPanel(!!sampleCap);
   else if (postOpen && scene === "post") h = postPanel();
-  else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
+  else if (healthOpen && APP_IDS.includes(scene)) h = healthPanel(scene);
   else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar());
   else if (scene === "market" && !shopClosed) {
     const tabs = [["seeds","Seeds"],["treats","Treats"],["deli","Deli"],["care","Care"],["family","Family"],["animals","Animals"],["home","Home"],["me","Me & my room"],["sell","Sell"]];

@@ -12,18 +12,18 @@ export const VILLAGE = {
   chord:  {scene:"lane", name:"Chord workshop", short:"the Chord workshop", door:[145,272], mark:[145,150]},
   fresh:  {scene:"village", name:"Fresh Pages library", short:"the library", door:[85,368], mark:[95,256]},
   chico:  {scene:"lane", name:"Chico cottage", short:"Chico cottage", door:[380,282], mark:[380,170]},
+  luna:   {scene:"lane", name:"Luna house", short:"the Luna house", door:[160,520], mark:[160,380]},
+  ohayo:  {scene:"lane", name:"Ohayo house", short:"the Ohayo house", door:[362,520], mark:[362,380]},
   post:   {scene:"village", name:"Post office", short:"the post office", door:[435,502], mark:[435,386]},
   market: {scene:"village", name:"Market", short:"the market", door:[362,350], mark:[362,290]},
   board:  {scene:"village", name:"Quest board", door:[260,338], spot:true, line:"All of today's quests, in one place."},
   well:   {scene:"village", name:"Well", door:[196,414], spot:true, line:"Fresh water! Glug glug."},
   news:   {scene:"village", name:"Good news board", door:[90,488], spot:true, line:"The good news board. Fresh every morning."},
   bench:  {scene:"village", name:"Riverside bench", door:[334,580], spot:true, line:"A bench by the river. Lunch spot for half the town."},
-  toLane: {scene:"village", name:"Gate to Makers' Lane", door:[444,218], spot:true, bridge:"lane", mark:[430,170], line:"Through the gate to Makers' Lane: Chord and Chico."},
+  toLane: {scene:"village", name:"Gate to Makers' Lane", door:[444,218], spot:true, bridge:"lane", mark:[430,170], line:"Through the gate to Makers' Lane: Chord, Chico, Luna and Ohayo."},
   // Makers' Lane: the apps (Chord, Chico, and a plot waiting for the next one)
   toTownE:{scene:"lane", name:"Gate to the town square", door:[20,330], spot:true, bridge:"village", mark:[34,282], line:"Back to the town square."},
   toVineL:{scene:"lane", name:"Path to the vineyard", door:[262,622], spot:true, bridge:"vineyard", mark:[300,586], line:"Down the lane to the vineyard."},
-  plot3:  {scene:"lane", name:"Luna's plot", door:[160,540], spot:true, line:"Luna's plot. Waiting for its building."},
-  plot4:  {scene:"lane", name:"Ohayo's plot", door:[362,540], spot:true, line:"Ohayo's plot. Waiting for its building."},
   toBase: {scene:"village", name:"Bridge home", door:[260,598], spot:true, bridge:"base", mark:[260,548], line:"Over the bridge and home."},
   // home base
   home:   {scene:"base", name:"Home", short:"home", door:[260,308], mark:[260,160]},
@@ -103,7 +103,7 @@ export const BASE_SPOTS = [
   ["shed",  /garden|plant|weed|prune|repair|diy|gutter|leak|recycl|declutter the|fix (the |a )?(tap|door|shelf|light|sink|toilet|bike|fan)|bike\b|wash the car/],
   ["pond",  /stroll|fresh air|picnic|sit outside|sunshine|walk outside|evening walk|nature walk/]
 ];
-const WORK_HINT = /chord|chico|ambidextrous|fresh pages|client|muse|proposal|invoice|copy|newsletter|launch|website|brand|audit|meeting|call with|zoom/;
+const WORK_HINT = /chord|chico|luna|ohayo|ambidextrous|fresh pages|client|muse|proposal|invoice|copy|newsletter|launch|website|brand|audit|meeting|call with|zoom/;
 // Saturday or Sunday in Singapore
 export const isWeekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
 const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
@@ -137,7 +137,7 @@ export const INNER = {
   // the chocolate dip station (an upgrade), through the door on the shop's east wall
   scoopdip: {parent: "scoopshop", door: [456, 410], arrive: [70, 450], exit: [34, 440]}
 };
-export const WORK = ["hall","chord","fresh","chico","post","home"];
+export const WORK = ["hall","chord","fresh","chico","luna","ohayo","post","home"];
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
 // Each room may place its slots differently via `pos` (falls back to POS). Stations with a null regex are never
 // picked for a quest (the market counter, the library's digest shelf).
@@ -170,6 +170,18 @@ export const ROOMS = {
     ["sofa","Cosy sofa","C","sofa",/user|beta|tester|feedback|call|interview|parent/,"Perfect for chats with parents."],
     ["kitchen","Kitchen table","D","table",/plan|family|schedule|meal|roadmap/,"Where family plans happen."],
     ["status","Health sign","E","healthchico",null,"Last night's Chico bug check."]]},
+  luna: {name:"Luna house", wall:"#EEE9F8", trim:"#B9A6E8", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320], E:[290,350]}, stations:[
+    ["laptop","Laptop desk","A","desk",/build|fix|app|code|feature|bug|test|ship/,"Luna's engine room."],
+    ["shelf","Bookshelf","B","shelf",/design|brand|content|post|icon|copy/,"Star charts and notebooks."],
+    ["sofa","Cosy sofa","C","sofa",/user|beta|tester|feedback|call|interview/,"For evening chats with users."],
+    ["table","Planning table","D","table",/plan|schedule|roadmap|launch/,"Where Luna's plans happen."],
+    ["status","Health sign","E","healthluna",null,"Last night's Luna bug check."]]},
+  ohayo: {name:"Ohayo house", wall:"#FFF4E6", trim:"#F2A65A", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320], E:[290,350]}, stations:[
+    ["laptop","Laptop desk","A","desk",/build|fix|app|code|feature|bug|test|ship/,"Ohayo's engine room."],
+    ["shelf","Plant shelf","B","craft",/design|brand|content|post|icon|copy/,"Colours, ideas, a lot of plants."],
+    ["sofa","Cosy sofa","C","sofa",/user|beta|tester|feedback|call|interview/,"For morning chats with users."],
+    ["table","Planning table","D","table",/plan|schedule|roadmap|launch/,"Where Ohayo's plans happen."],
+    ["status","Health sign","E","healthohayo",null,"Last night's Ohayo bug check."]]},
   post:  {name:"Post office", wall:"#E3EEF5", trim:"var(--sky)", pos:{A:[260,340], B:[436,258], C:[400,530], D:[110,216], E:[72,440]}, stations:[
     ["counter","Sorting counter","A","counter",/email|inbox|reply|message|dm|respond/,"Letters in, letters out."],
     ["cabinet","Filing cabinet","B","cabinet",/admin|file|doc|contract|tax|form|organi/,"A place for everything."],
@@ -338,6 +350,8 @@ function basePlace(t){
   if (!WORK_HINT.test(s) && !t.meeting && baseSpotFor(s)) return "base";
   if (/chord/.test(s)) return "chord";
   if (/chico/.test(s)) return "chico";
+  if (/\bluna\b/.test(s)) return "luna";
+  if (/ohayo/.test(s)) return "ohayo";
   if (/ambidextrous|town hall/.test(s)) return "hall";
   if (t.meeting) return "hall";
   if (/clean|fold|laundry|cook|chore|grocer|wash|tidy|evan|hestia|skincare|gym|workout/.test(s)) return "home";

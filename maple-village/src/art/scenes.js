@@ -15,7 +15,7 @@ export { vineyardArt } from "./vineyard.js";
 export { orchardArt, flowerFarmArt } from "./orchard.js";
 import { orchardGate, potsIn } from "./orchard.js";
 import { jarArt as vaultArt, isFull as vaultFull } from "../game/bank.js";
-import { townHall, chordWorkshop, library, chicoCottage, postOffice } from "./buildings.js";
+import { townHall, chordWorkshop, library, chicoCottage, postOffice, lunaHouse, ohayoHouse } from "./buildings.js";
 
 let G = null;
 export const setArtContext = g => { G = g; };
@@ -233,7 +233,7 @@ export function laneArt(){
   const D = VILLAGE;
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D.chico.door[0]} ${D.chico.door[1]} M150 336 L${D.chord.door[0]} ${D.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D.plot3.door[0]} ${D.plot3.door[1]} M262 420 C300 470 340 500 ${D.plot4.door[0]} ${D.plot4.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D.chico.door[0]} ${D.chico.door[1]} M150 336 L${D.chord.door[0]} ${D.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D.luna.door[0]} ${D.luna.door[1]} M262 420 C300 470 340 500 ${D.ohayo.door[0]} ${D.ohayo.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[40,200,"#EFA3A6"],[60,214,"#F3C969"],[480,330,"#C3CDEE"],[300,420,"#EFA3A6"],[200,600,"#F3C969"],[90,560,"#C3CDEE"],[460,600,"#EFA3A6"],[330,250,"#F3C969"]])}
     ${tree(30,120,1)}${tree(250,80,.9)}${tree(490,110,1)}${tree(40,620,.95)}${tree(490,620,.9)}${tree(470,430,.85)}${tree(60,440,.9)}`;
   const gate = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
@@ -251,11 +251,11 @@ export function laneArt(){
       `<path d="M${x-54} 526 V452 H${x+54} V526 M${x-54} 526 H${x-12} M${x+12} 526 H${x+54}" fill="none"/><path d="M${x-44} 474 h88 M${x-44} 492 h88 M${x-44} 508 h88" opacity=".35"/><rect x="${x-32}" y="432" width="64" height="22" rx="2"/>`)}
     <text x="${x}" y="447" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" textLength="52" lengthAdjust="spacingAndGlyphs" style="fill:var(--line)">coming soon</text>
     ${tapeLabel(x, 552, name, col, 11)}</g>`;
-  const plot = plotArt("plot3", 160, "Luna", "var(--peri)") + plotArt("plot4", 362, "Ohayo", "var(--peach)");
+  const plot = lunaHouse() + ohayoHouse();   // (plotArt is kept for the next app that needs a plot)
   return lampDefs + ground + gate + vgate + [[70, 352], [250, 352], [460, 352], [222, 572]].map(([x, y]) => streetLamp(x, y)).join("")
     + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot
-    + light("chord", 200, 196) + light("chico", 433, 206)
-    + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12)
+    + light("chord", 200, 196) + light("chico", 433, 206) + light("luna", 212, 452) + light("ohayo", 414, 450)
+    + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12) + userGarden("luna", 76, 570, 4, 2, 12) + userGarden("ohayo", 420, 562, 4, 2, 12)
     + upgradesArt(G.F().totalQuests || 0, "lane");
 }
 export function notesArt(x, y, n){
@@ -556,7 +556,7 @@ export function furn(kind, x, y){
       `<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3"/><path d="M${x-36} ${y-30} h28 l-4 -10 h-20z M${x-22} ${y-40} v-10 h-10 h20"/><rect x="${x+10}" y="${y-48}" width="12" height="18" rx="2"/><rect x="${x+28}" y="${y-40}" width="20" height="10"/><path d="M${x-46} ${y-6} v14 M${x+46} ${y-6} v14"/>`);
     case "treadmill": return sk(`<rect x="${x-24}" y="${y-74}" width="48" height="74" rx="8" style="fill:var(--sock)"/><rect x="${x-17}" y="${y-66}" width="34" height="58" rx="4" style="fill:#6B5A52"/><rect x="${x-30}" y="${y-96}" width="60" height="16" rx="4" style="fill:var(--peri)"/><rect x="${x-14}" y="${y-93}" width="20" height="9" rx="2" style="fill:#DCE8C8"/>`,
       `<rect x="${x-24}" y="${y-74}" width="48" height="74" rx="8"/><path d="M${x-17} ${y-56} h34 M${x-17} ${y-44} h34 M${x-17} ${y-32} h34 M${x-17} ${y-20} h34" opacity=".45"/><path d="M${x-26} ${y-80} v28 M${x+26} ${y-80} v28" stroke-width="2.4"/><rect x="${x-30}" y="${y-96}" width="60" height="16" rx="4"/><rect x="${x-14}" y="${y-93}" width="20" height="9" rx="2"/><text x="${x-4}" y="${y-86}" text-anchor="middle" font-family="Klee One,serif" font-size="7" stroke="none" style="fill:var(--line)">1.2</text>`);
-    case "healthchord": case "healthchico": {
+    case "healthchord": case "healthchico": case "healthluna": case "healthohayo": {
       // a standing sign: three lights (worst check first) and a big status word from the nightly bug check
       const h = G && G.health ? G.health(kind.slice(6)) : null, L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
       const st = h ? h.status : "grey", word = {green: "ALL GOOD", amber: "WATCH", red: "NEEDS YOU", grey: "NO REPORT"}[st];
@@ -693,7 +693,7 @@ export function userGarden(key, x, y, cols, rows, gap){
   if (!st || !(st.users >= 0)) return "";
   const per = st.per > 0 ? st.per : 10, users = Math.floor(st.users), n = Math.min(cols*rows, Math.ceil(users/per));
   const tier = GARDEN_TIERS.reduce((t, [min, k]) => users >= min ? k : t, "daisy");
-  const cols4 = key === "chord" ? ["#F3C969", "#FFFDF6", "#C3CDEE"] : ["#EFA3A6", "#F4C7CF", "#FFFDF6"];
+  const cols4 = key === "chord" ? ["#F3C969", "#FFFDF6", "#C3CDEE"] : key === "luna" ? ["#B9A6E8", "#C3CDEE", "#FFFDF6"] : key === "ohayo" ? ["#F2A65A", "#F3C969", "#FFFDF6"] : ["#EFA3A6", "#F4C7CF", "#FFFDF6"];
   let f = "";
   for (let i = 0; i < n; i++) {
     const cx = x + 4 + (i % cols)*gap + (Math.floor(i/cols) % 2)*gap/2, cy = y + 10 + Math.floor(i/cols)*gap, c = cols4[i % 3];
@@ -706,7 +706,7 @@ export function userGarden(key, x, y, cols, rows, gap){
   const w = cols*gap, signX = x + w/2 + (key === "chord" ? 26 : 0), signY = y + rows*gap + 10;
   const tree = users >= 500 ? `<g filter="url(#wob)" ${ink}><rect x="${x+w-6}" y="${y+4}" width="4" height="12" style="fill:var(--wood)"/><circle cx="${x+w-4}" cy="${y}" r="9" style="fill:#F4C7CF"/><circle cx="${x+w-10}" cy="${y+4}" r="6" style="fill:#EFA3A6"/></g>` : "";
   const sparkle = users >= 1000 ? `<g class="twinkle">${iconAt("sparkle", x - 2, y - 2, 12)}${iconAt("sparkle", x + w + 2, y + rows*gap - 4, 11)}</g>` : "";
-  const label = `${users.toLocaleString()} ${st.label || (key === "chord" ? "studios" : "families")}`;
+  const label = `${users.toLocaleString()} ${st.label || (key === "chord" ? "studios" : key === "chico" ? "families" : "users")}`;
   return `<g data-ugarden="${key}" aria-label="${label}">${f}${tree}${sparkle}
     ${tapeLabel(signX, signY, label, key === "chord" ? "var(--sage)" : "var(--blush)", 10)}</g>`;
 }

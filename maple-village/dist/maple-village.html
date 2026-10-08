@@ -1904,6 +1904,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     chord: [`<circle cx="12" cy="12" r="6.5" ${f(C.sage)}/>`, `<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2.4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>`],
     fresh: [`<path d="M12 6.5C9.5 5 6.5 4.5 3 5v13c3.5-.5 6.5 0 9 1.5 2.5-1.5 5.5-2 9-1.5V5c-3.5-.5-6.5 0-9 1.5z" ${f(C.peach)}/>`, `<path d="M12 6.5C9.5 5 6.5 4.5 3 5v13c3.5-.5 6.5 0 9 1.5 2.5-1.5 5.5-2 9-1.5V5c-3.5-.5-6.5 0-9 1.5zM12 6.5v13M5.5 9c1.5 0 3 .2 4 .7M5.5 12c1.5 0 3 .2 4 .7M14.5 9.7c1-.5 2.5-.7 4-.7"/>`],
     chico: [`<path d="M3 12c0-5 4-8 9-8s9 3 9 8z" ${f(C.rose)}/><rect x="5" y="12" width="14" height="8" rx="1" ${f("#FBEFEA")}/>`, `<path d="M3 12c0-5 4-8 9-8s9 3 9 8zM5 12h14v8H5zM10 20v-4a2 2 0 0 1 4 0v4"/><path d="M12 8.4c-.6-.9-1.8-.4-1.2.5l1.2 1.1 1.2-1.1c.6-.9-.6-1.4-1.2-.5z"/>`],
+    luna: [`<path d="M15 4a8 8 0 1 0 5 13 6.5 6.5 0 1 1-5-13z" ${f("#B9A6E8")}/>`, `<path d="M15 4a8 8 0 1 0 5 13 6.5 6.5 0 1 1-5-13z"/><path d="M6 6l.6 1.3 1.3.2-1 .9.3 1.3L6 9l-1.2.7.3-1.3-1-.9 1.3-.2z"/>`],
+    ohayo: [`<circle cx="12" cy="13" r="5" ${f("#F3C969")}/>`, `<circle cx="12" cy="13" r="5"/><path d="M12 4.5V6.5M4.5 13H6.5M17.5 13h2M6.7 7.7l1.4 1.4M17.3 7.7l-1.4 1.4M3 20h18"/>`],
     post: [`<rect x="4" y="7" width="16" height="13" ${f("#EAF1F6")}/><rect x="3" y="4.5" width="18" height="3" ${f(C.sky)}/>`, `<rect x="4" y="7" width="16" height="13"/><rect x="3" y="4.5" width="18" height="3"/><path d="M7 10h10v6H7zM7 10l5 3.5 5-3.5"/>`],
     home: [`<path d="M3 11l9-7 9 7z" ${f(C.butter)}/><rect x="5" y="11" width="14" height="9" ${f(C.paper)}/>`, `<path d="M3 11l9-7 9 7zM5 11h14v9H5zM10 20v-5h4v5M16 6.5V4h2v4"/>`],
     market: [`<path d="M3 5h18l-1.5 4h-15z" ${f(C.rose)}/><rect x="5" y="11" width="14" height="7" ${f(C.wood)}/>`, `<path d="M3 5h18l-1.5 4h-15zM5 9v11M19 9v11M5 11h14v7H5z"/><circle cx="9" cy="14.5" r="1.4"/><circle cx="13" cy="14.5" r="1.4"/>`],
@@ -2188,18 +2190,18 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     chord: { scene: "lane", name: "Chord workshop", short: "the Chord workshop", door: [145, 272], mark: [145, 150] },
     fresh: { scene: "village", name: "Fresh Pages library", short: "the library", door: [85, 368], mark: [95, 256] },
     chico: { scene: "lane", name: "Chico cottage", short: "Chico cottage", door: [380, 282], mark: [380, 170] },
+    luna: { scene: "lane", name: "Luna house", short: "the Luna house", door: [160, 520], mark: [160, 380] },
+    ohayo: { scene: "lane", name: "Ohayo house", short: "the Ohayo house", door: [362, 520], mark: [362, 380] },
     post: { scene: "village", name: "Post office", short: "the post office", door: [435, 502], mark: [435, 386] },
     market: { scene: "village", name: "Market", short: "the market", door: [362, 350], mark: [362, 290] },
     board: { scene: "village", name: "Quest board", door: [260, 338], spot: true, line: "All of today's quests, in one place." },
     well: { scene: "village", name: "Well", door: [196, 414], spot: true, line: "Fresh water! Glug glug." },
     news: { scene: "village", name: "Good news board", door: [90, 488], spot: true, line: "The good news board. Fresh every morning." },
     bench: { scene: "village", name: "Riverside bench", door: [334, 580], spot: true, line: "A bench by the river. Lunch spot for half the town." },
-    toLane: { scene: "village", name: "Gate to Makers' Lane", door: [444, 218], spot: true, bridge: "lane", mark: [430, 170], line: "Through the gate to Makers' Lane: Chord and Chico." },
+    toLane: { scene: "village", name: "Gate to Makers' Lane", door: [444, 218], spot: true, bridge: "lane", mark: [430, 170], line: "Through the gate to Makers' Lane: Chord, Chico, Luna and Ohayo." },
     // Makers' Lane: the apps (Chord, Chico, and a plot waiting for the next one)
     toTownE: { scene: "lane", name: "Gate to the town square", door: [20, 330], spot: true, bridge: "village", mark: [34, 282], line: "Back to the town square." },
     toVineL: { scene: "lane", name: "Path to the vineyard", door: [262, 622], spot: true, bridge: "vineyard", mark: [300, 586], line: "Down the lane to the vineyard." },
-    plot3: { scene: "lane", name: "Luna's plot", door: [160, 540], spot: true, line: "Luna's plot. Waiting for its building." },
-    plot4: { scene: "lane", name: "Ohayo's plot", door: [362, 540], spot: true, line: "Ohayo's plot. Waiting for its building." },
     toBase: { scene: "village", name: "Bridge home", door: [260, 598], spot: true, bridge: "base", mark: [260, 548], line: "Over the bridge and home." },
     // home base
     home: { scene: "base", name: "Home", short: "home", door: [260, 308], mark: [260, 160] },
@@ -2278,7 +2280,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ["shed", /garden|plant|weed|prune|repair|diy|gutter|leak|recycl|declutter the|fix (the |a )?(tap|door|shelf|light|sink|toilet|bike|fan)|bike\b|wash the car/],
     ["pond", /stroll|fresh air|picnic|sit outside|sunshine|walk outside|evening walk|nature walk/]
   ];
-  var WORK_HINT = /chord|chico|ambidextrous|fresh pages|client|muse|proposal|invoice|copy|newsletter|launch|website|brand|audit|meeting|call with|zoom/;
+  var WORK_HINT = /chord|chico|luna|ohayo|ambidextrous|fresh pages|client|muse|proposal|invoice|copy|newsletter|launch|website|brand|audit|meeting|call with|zoom/;
   var isWeekend = () => [0, 6].includes(new Date(now() + 8 * H).getUTCDay());
   var baseSpotFor = (s) => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
   var BRIDGES = { village: { base: "toBase", lane: "toLane", field: "toField" }, base: { village: "toTown", vineyard: "toVine", orchard: "toOrchard" }, lane: { village: "toTownE", vineyard: "toVineL" }, vineyard: { base: "toBaseV", lane: "toLaneV" }, orchard: { base: "toBaseO", flowers: "toFlowers", field: "toFieldO" }, field: { village: "toTownF", orchard: "toOrchardN", shore: "toShoreF" }, flowers: { orchard: "toOrchardF", shore: "toShoreFl" }, shore: { field: "toFieldS", flowers: "toFlowersS", bay: "toBay" }, bay: { shore: "toShoreB" } };
@@ -2317,7 +2319,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     // the chocolate dip station (an upgrade), through the door on the shop's east wall
     scoopdip: { parent: "scoopshop", door: [456, 410], arrive: [70, 450], exit: [34, 440] }
   };
-  var WORK = ["hall", "chord", "fresh", "chico", "post", "home"];
+  var WORK = ["hall", "chord", "fresh", "chico", "luna", "ohayo", "post", "home"];
   var POS = { A: [120, 250], B: [400, 250], C: [120, 440], D: [400, 440], E: [410, 598], F: [112, 596], G: [292, 334], M: [260, 400] };
   var ROOMS = {
     hall: { name: "Town hall", wall: "#E6E9F5", trim: "var(--peri)", pos: { A: [448, 262], B: [110, 258], C: [420, 474], D: [316, 266], E: [118, 474], R: [40, 362], W: [268, 420] }, stations: [
@@ -2348,6 +2350,20 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["sofa", "Cosy sofa", "C", "sofa", /user|beta|tester|feedback|call|interview|parent/, "Perfect for chats with parents."],
       ["kitchen", "Kitchen table", "D", "table", /plan|family|schedule|meal|roadmap/, "Where family plans happen."],
       ["status", "Health sign", "E", "healthchico", null, "Last night's Chico bug check."]
+    ] },
+    luna: { name: "Luna house", wall: "#EEE9F8", trim: "#B9A6E8", pos: { A: [400, 530], B: [420, 262], C: [130, 530], D: [130, 320], E: [290, 350] }, stations: [
+      ["laptop", "Laptop desk", "A", "desk", /build|fix|app|code|feature|bug|test|ship/, "Luna's engine room."],
+      ["shelf", "Bookshelf", "B", "shelf", /design|brand|content|post|icon|copy/, "Star charts and notebooks."],
+      ["sofa", "Cosy sofa", "C", "sofa", /user|beta|tester|feedback|call|interview/, "For evening chats with users."],
+      ["table", "Planning table", "D", "table", /plan|schedule|roadmap|launch/, "Where Luna's plans happen."],
+      ["status", "Health sign", "E", "healthluna", null, "Last night's Luna bug check."]
+    ] },
+    ohayo: { name: "Ohayo house", wall: "#FFF4E6", trim: "#F2A65A", pos: { A: [400, 530], B: [420, 262], C: [130, 530], D: [130, 320], E: [290, 350] }, stations: [
+      ["laptop", "Laptop desk", "A", "desk", /build|fix|app|code|feature|bug|test|ship/, "Ohayo's engine room."],
+      ["shelf", "Plant shelf", "B", "craft", /design|brand|content|post|icon|copy/, "Colours, ideas, a lot of plants."],
+      ["sofa", "Cosy sofa", "C", "sofa", /user|beta|tester|feedback|call|interview/, "For morning chats with users."],
+      ["table", "Planning table", "D", "table", /plan|schedule|roadmap|launch/, "Where Ohayo's plans happen."],
+      ["status", "Health sign", "E", "healthohayo", null, "Last night's Ohayo bug check."]
     ] },
     post: { name: "Post office", wall: "#E3EEF5", trim: "var(--sky)", pos: { A: [260, 340], B: [436, 258], C: [400, 530], D: [110, 216], E: [72, 440] }, stations: [
       ["counter", "Sorting counter", "A", "counter", /email|inbox|reply|message|dm|respond/, "Letters in, letters out."],
@@ -2538,6 +2554,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (!WORK_HINT.test(s) && !t2.meeting && baseSpotFor(s)) return "base";
     if (/chord/.test(s)) return "chord";
     if (/chico/.test(s)) return "chico";
+    if (/\bluna\b/.test(s)) return "luna";
+    if (/ohayo/.test(s)) return "ohayo";
     if (/ambidextrous|town hall/.test(s)) return "hall";
     if (t2.meeting) return "hall";
     if (/clean|fold|laundry|cook|chore|grocer|wash|tidy|evan|hestia|skincare|gym|workout/.test(s)) return "home";
@@ -3131,6 +3149,21 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       `<circle cx="96" cy="66" r="34" style="fill:var(--sky)"/><circle cx="424" cy="66" r="34" style="fill:var(--sky)"/><path d="M168 20 v26" style="stroke:var(--line)"/><circle cx="168" cy="58" r="12" style="fill:var(--moss)"/>`,
       `<circle cx="96" cy="66" r="34"/><path d="M62 66 h68 M96 32 v68"/><circle cx="424" cy="66" r="34"/><path d="M390 66 h68 M424 32 v68"/><path d="M168 0 v46 M156 52 l-6 14 M180 52 l6 14"/>`
     )}
+    ${skirting}${plant(52, 430, 1)}${plant(478, 430, 0.85)}`,
+    // Luna house: a dusky lavender room, a starry ceiling band, a round window with the moon in it, a rug
+    luna: () => `<rect width="520" height="640" style="fill:#E6E0F2"/>
+    <g opacity=".4" style="stroke:#D2C8E6" stroke-width="1.1">${rows(12, (i) => `<path d="M0 ${176 + i * 40} H520"/>`)}</g>
+    <g filter="url(#wob)"><ellipse cx="260" cy="430" rx="120" ry="58" style="fill:#C3CDEE" opacity=".7"/></g>
+    ${wallBase("#EEE9F8", "#B9A6E8")}
+    <rect width="520" height="36" style="fill:#4B4A7A"/><g style="fill:#FFF3C4">${rows(16, (i) => `<circle cx="${i * 33 + 14}" cy="${i % 3 * 9 + 9}" r="${i % 2 ? 1.6 : 2.4}"/>`)}</g>
+    ${sk(`<circle cx="420" cy="86" r="34" style="fill:#4B4A7A"/><path d="M428 66 a18 18 0 1 0 8 32 a14 14 0 1 1 -8 -32z" style="fill:#FFF3C4"/>`, `<circle cx="420" cy="86" r="34"/>`)}
+    ${skirting}${plant(52, 430, 1)}${plant(478, 430, 0.85)}`,
+    // Ohayo house: morning light. Pale wood floor, a peach wall with a sunrise window, a low shelf of plants
+    ohayo: () => `<rect width="520" height="640" style="fill:#F3E6D2"/>
+    <g opacity=".45" style="stroke:#E2CCAE" stroke-width="1.1">${rows(12, (i) => `<path d="M0 ${176 + i * 40} H520"/>`)}</g>
+    <g filter="url(#wob)"><rect x="160" y="380" width="200" height="90" rx="8" style="fill:#FBE3C8" opacity=".8"/></g>
+    ${wallBase("#FFF4E6", "#F2A65A")}
+    ${sk(`<rect x="364" y="26" width="120" height="92" rx="4" style="fill:#FCE2C2"/><circle cx="424" cy="118" r="30" style="fill:#F3C969"/><rect x="364" y="104" width="120" height="14" style="fill:#F2A65A"/>`, `<rect x="364" y="26" width="120" height="92" rx="4"/><path d="M424 26 v78"/>`)}
     ${skirting}${plant(52, 430, 1)}${plant(478, 430, 0.85)}`,
     // Post office: checkerboard tiles, pigeonhole wall, a clock and a stamp poster, parcel stack.
     post: () => `<rect width="520" height="640" style="fill:#E9F0F4"/>
@@ -4047,6 +4080,35 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     <circle cx="52" cy="474" r="8"/><path d="M44 474 h16 M52 466 v16" opacity=".6"/><circle cx="118" cy="474" r="8"/><path d="M110 474 h16 M118 466 v16" opacity=".6"/>
     <rect x="42" y="484" width="20" height="6" rx="2"/><rect x="108" y="484" width="20" height="6" rx="2"/>`;
     return wrap("chico", "Chico", "var(--blush)", 85, 500, 58, art2, lines);
+  }
+  function lunaHouse() {
+    const art2 = `<rect x="108" y="456" width="104" height="64" rx="4" style="fill:#EEE9F8"/>
+    <path d="M100 460 Q100 398 160 396 Q220 398 220 460Z" style="fill:#B9A6E8"/>
+    <path d="M154 398 h12 l-2 40 h-8z" style="fill:#7E6CB8"/>
+    <path d="M180 418 a10 10 0 1 0 6 16 a8 8 0 1 1 -6 -16z" style="fill:#FFF3C4"/>
+    <path d="M148 520 v-22 a12 12 0 0 1 24 0 v22z" style="fill:#7E6CB8"/>
+    <path d="M128 476 l3 6 l7 1 l-5 5 l1 7 l-6 -3 l-6 3 l1 -7 l-5 -5 l7 -1z" style="fill:var(--sky)"/>
+    <circle cx="194" cy="484" r="9" style="fill:var(--sky)"/>`;
+    const lines = `<rect x="108" y="456" width="104" height="64" rx="4"/><path d="M100 460 Q100 398 160 396 Q220 398 220 460Z"/><path d="M112 440 q48 -12 96 0" opacity=".4"/>
+    <path d="M154 398 h12 l-2 40 h-8z"/><path d="M180 418 a10 10 0 1 0 6 16 a8 8 0 1 1 -6 -16z"/>
+    <path d="M148 520 v-22 a12 12 0 0 1 24 0 v22"/><circle cx="166" cy="510" r="1.4"/>
+    <path d="M128 476 l3 6 l7 1 l-5 5 l1 7 l-6 -3 l-6 3 l1 -7 l-5 -5 l7 -1z"/><circle cx="194" cy="484" r="9"/><path d="M185 484 h18 M194 475 v18" opacity=".6"/>`;
+    return wrap("luna", "Luna", "var(--peri)", 160, 520, 60, art2, lines);
+  }
+  function ohayoHouse() {
+    const art2 = `<rect x="312" y="456" width="100" height="64" style="fill:#FFF4E6"/>
+    <path d="M298 462 q4 -6 10 -8 L362 412 L416 454 q6 2 10 8 q-64 -8 -128 0z" style="fill:#F2A65A"/>
+    <circle cx="362" cy="440" r="11" style="fill:#F3C969"/>
+    <rect x="344" y="482" width="36" height="38" style="fill:#E8D5BC"/>
+    <path d="M344 482 h36 v14 h-36z" style="fill:#E8566C"/>
+    <rect x="320" y="474" width="16" height="16" style="fill:var(--sky)"/><rect x="388" y="474" width="16" height="16" style="fill:var(--sky)"/>
+    <rect x="392" y="508" width="26" height="5" rx="1" style="fill:var(--wood)"/>`;
+    const lines = `<rect x="312" y="456" width="100" height="64"/><path d="M298 462 q4 -6 10 -8 L362 412 L416 454 q6 2 10 8 q-64 -8 -128 0z"/><path d="M320 446 h84 M334 432 h56" opacity=".35"/>
+    <circle cx="362" cy="440" r="11"/>${[0, 45, 90, 135, 180, 225, 270, 315].map((a) => `<path d="M362 425 v-4" transform="rotate(${a} 362 440)"/>`).join("")}
+    <rect x="344" y="482" width="36" height="38"/><path d="M362 482 v38 M344 496 h36 M356 482 v14 M368 482 v14"/>
+    <rect x="320" y="474" width="16" height="16"/><path d="M328 474 v16 M320 482 h16"/><rect x="388" y="474" width="16" height="16"/><path d="M396 474 v16 M388 482 h16"/>
+    <rect x="392" y="508" width="26" height="5" rx="1"/><path d="M395 513 v6 M415 513 v6"/>`;
+    return wrap("ohayo", "Ohayo", "var(--peach)", 362, 520, 60, art2, lines);
   }
   function postOffice() {
     const art2 = `<rect x="384" y="426" width="102" height="64" style="fill:#EAF1F6"/>
@@ -4992,7 +5054,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   function eventOn(day) {
     if (dow(day) === 0) return { kind: "market", name: "Sunday farmers market", from: 8 * 60, to: 13 * 60, stalls: MARKET, wine: true };
     if (lastSaturday(day)) return { kind: "fair", name: "Field fair", from: 10 * 60, to: 16 * 60, stalls: FAIR, wine: false };
-    if (dow(day) === 2 || dow(day) === 4) return { kind: "night", name: "Night market", from: 18 * 60, to: 22 * 60, stalls: NIGHT, wine: false };
+    if (dow(day) === 2 || dow(day) === 4) return { kind: "night", name: "Night market", from: 17 * 60 + 30, to: 22 * 60, stalls: NIGHT, wine: false };
     return null;
   }
   var eventNow = (day, hm2) => {
@@ -7537,7 +7599,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const D3 = VILLAGE;
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D3.chico.door[0]} ${D3.chico.door[1]} M150 336 L${D3.chord.door[0]} ${D3.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D3.plot3.door[0]} ${D3.plot3.door[1]} M262 420 C300 470 340 500 ${D3.plot4.door[0]} ${D3.plot4.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D3.chico.door[0]} ${D3.chico.door[1]} M150 336 L${D3.chord.door[0]} ${D3.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D3.luna.door[0]} ${D3.luna.door[1]} M262 420 C300 470 340 500 ${D3.ohayo.door[0]} ${D3.ohayo.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[40, 200, "#EFA3A6"], [60, 214, "#F3C969"], [480, 330, "#C3CDEE"], [300, 420, "#EFA3A6"], [200, 600, "#F3C969"], [90, 560, "#C3CDEE"], [460, 600, "#EFA3A6"], [330, 250, "#F3C969"]])}
     ${tree(30, 120, 1)}${tree(250, 80, 0.9)}${tree(490, 110, 1)}${tree(40, 620, 0.95)}${tree(490, 620, 0.9)}${tree(470, 430, 0.85)}${tree(60, 440, 0.9)}`;
     const gate = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
@@ -7559,8 +7621,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     )}
     <text x="${x}" y="447" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" textLength="52" lengthAdjust="spacingAndGlyphs" style="fill:var(--line)">coming soon</text>
     ${tapeLabel(x, 552, name, col, 11)}</g>`;
-    const plot = plotArt("plot3", 160, "Luna", "var(--peri)") + plotArt("plot4", 362, "Ohayo", "var(--peach)");
-    return lampDefs + ground + gate + vgate + [[70, 352], [250, 352], [460, 352], [222, 572]].map(([x, y]) => streetLamp(x, y)).join("") + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot + light("chord", 200, 196) + light("chico", 433, 206) + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12) + upgradesArt(G.F().totalQuests || 0, "lane");
+    const plot = lunaHouse() + ohayoHouse();
+    return lampDefs + ground + gate + vgate + [[70, 352], [250, 352], [460, 352], [222, 572]].map(([x, y]) => streetLamp(x, y)).join("") + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot + light("chord", 200, 196) + light("chico", 433, 206) + light("luna", 212, 452) + light("ohayo", 414, 450) + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12) + userGarden("luna", 76, 570, 4, 2, 12) + userGarden("ohayo", 420, 562, 4, 2, 12) + upgradesArt(G.F().totalQuests || 0, "lane");
   }
   function notesArt(x, y, n) {
     const c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#C3CDEE", "#DCE8C8"];
@@ -8132,7 +8194,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
           `<rect x="${x - 24}" y="${y - 74}" width="48" height="74" rx="8"/><path d="M${x - 17} ${y - 56} h34 M${x - 17} ${y - 44} h34 M${x - 17} ${y - 32} h34 M${x - 17} ${y - 20} h34" opacity=".45"/><path d="M${x - 26} ${y - 80} v28 M${x + 26} ${y - 80} v28" stroke-width="2.4"/><rect x="${x - 30}" y="${y - 96}" width="60" height="16" rx="4"/><rect x="${x - 14}" y="${y - 93}" width="20" height="9" rx="2"/><text x="${x - 4}" y="${y - 86}" text-anchor="middle" font-family="Klee One,serif" font-size="7" stroke="none" style="fill:var(--line)">1.2</text>`
         );
       case "healthchord":
-      case "healthchico": {
+      case "healthchico":
+      case "healthluna":
+      case "healthohayo": {
         const h = G && G.health ? G.health(kind.slice(6)) : null, L2 = { green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4" };
         const st6 = h ? h.status : "grey", word2 = { green: "ALL GOOD", amber: "WATCH", red: "NEEDS YOU", grey: "NO REPORT" }[st6];
         const lights = (h && h.checks.length ? h.checks.slice(0, 3).map((c) => c.state) : [st6, st6, st6]).map((c, i) => `<circle cx="${x - 18 + i * 18}" cy="${y - 62}" r="6" style="fill:${L2[c]}"/>`).join("");
@@ -8300,7 +8364,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (!st6 || !(st6.users >= 0)) return "";
     const per = st6.per > 0 ? st6.per : 10, users = Math.floor(st6.users), n = Math.min(cols * rows2, Math.ceil(users / per));
     const tier = GARDEN_TIERS.reduce((t2, [min, k]) => users >= min ? k : t2, "daisy");
-    const cols4 = key === "chord" ? ["#F3C969", "#FFFDF6", "#C3CDEE"] : ["#EFA3A6", "#F4C7CF", "#FFFDF6"];
+    const cols4 = key === "chord" ? ["#F3C969", "#FFFDF6", "#C3CDEE"] : key === "luna" ? ["#B9A6E8", "#C3CDEE", "#FFFDF6"] : key === "ohayo" ? ["#F2A65A", "#F3C969", "#FFFDF6"] : ["#EFA3A6", "#F4C7CF", "#FFFDF6"];
     let f2 = "";
     for (let i = 0; i < n; i++) {
       const cx = x + 4 + i % cols * gap + Math.floor(i / cols) % 2 * gap / 2, cy = y + 10 + Math.floor(i / cols) * gap, c = cols4[i % 3];
@@ -8313,7 +8377,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const w = cols * gap, signX = x + w / 2 + (key === "chord" ? 26 : 0), signY = y + rows2 * gap + 10;
     const tree2 = users >= 500 ? `<g filter="url(#wob)" ${ink}><rect x="${x + w - 6}" y="${y + 4}" width="4" height="12" style="fill:var(--wood)"/><circle cx="${x + w - 4}" cy="${y}" r="9" style="fill:#F4C7CF"/><circle cx="${x + w - 10}" cy="${y + 4}" r="6" style="fill:#EFA3A6"/></g>` : "";
     const sparkle = users >= 1e3 ? `<g class="twinkle">${iconAt("sparkle", x - 2, y - 2, 12)}${iconAt("sparkle", x + w + 2, y + rows2 * gap - 4, 11)}</g>` : "";
-    const label2 = `${users.toLocaleString()} ${st6.label || (key === "chord" ? "studios" : "families")}`;
+    const label2 = `${users.toLocaleString()} ${st6.label || (key === "chord" ? "studios" : key === "chico" ? "families" : "users")}`;
     return `<g data-ugarden="${key}" aria-label="${label2}">${f2}${tree2}${sparkle}
     ${tapeLabel(signX, signY, label2, key === "chord" ? "var(--sage)" : "var(--blush)", 10)}</g>`;
   }
@@ -9835,9 +9899,9 @@ Quests finished today: ${S3.doneIds.length}`;
   }
 
   // src/game/feeds.js
-  var APPS2 = { chord: { name: "Chord", room: "chord" }, chico: { name: "Chico", room: "chico" } };
+  var APPS2 = { chord: { name: "Chord", room: "chord" }, chico: { name: "Chico", room: "chico" }, luna: { name: "Luna", room: "luna" }, ohayo: { name: "Ohayo", room: "ohayo" } };
   var BRANDS = { chord: { name: "Chord", color: "var(--sage)" }, ambidextrous: { name: "Ambidextrous", color: "var(--peri)" } };
-  var DOCS = ["health-chord", "health-chico", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
+  var DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
   var KEY4 = "fox.feeds";
   var D2 = (() => {
     try {
@@ -13595,7 +13659,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var nTops = (s) => Object.keys(s.tops).filter((k) => TOPPINGS[k]).length;
   var cartOn = (day, hm2) => {
     const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
-    return (d === 2 || d === 4) && hm2 >= 18 * 60 && hm2 < 22 * 60;
+    return (d === 2 || d === 4) && hm2 >= 17 * 60 + 30 && hm2 < 22 * 60;
   };
   function cartMinute(s, day, hm2, opts) {
     if (!cartOn(day, hm2)) return null;
@@ -13705,7 +13769,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!openNow(hm2) && !box) return null;
     const stocked = onDisplay(s);
     if (!stocked.length) return null;
-    const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay(), we = d === 0 || d === 6, night = (d === 2 || d === 4) && hm2 >= 18 * 60;
+    const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay(), we = d === 0 || d === 6, night = (d === 2 || d === 4) && hm2 >= 17 * 60 + 30;
     const glow = hasUp(s, "neon") && hm2 >= 17 * 60 ? 1.3 : 1;
     if (box) {
       if (Math.random() >= 0.012 * (we ? 1.3 : 1) * (night ? 1.4 : 1) * glow) return null;
@@ -14263,7 +14327,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       if (id === "journal" && journalOpen && document.activeElement?.id !== "jText" || id === "scratch" && scratchOpen && document.activeElement?.id !== "scratchText") ctx();
     });
     attachFeeds(col, (id) => {
-      if (/^health/.test(id) && ["lane", "chord", "chico"].includes(scene)) {
+      if (/^health/.test(id) && ["lane", ...APP_IDS].includes(scene)) {
         drawScene();
         ctx();
       }
@@ -14296,8 +14360,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         localStorage.setItem("fox.stats", JSON.stringify(ST));
       } catch {
       }
-      const grew = ["chord", "chico"].find((k) => ST[k] && before[k] && ST[k].users > before[k].users);
-      if (grew) speak(`${grew === "chord" ? "Chord" : "Chico"} grew to ${ST[grew].users.toLocaleString()} users! New flowers 🌼`, 5e3);
+      const grew = APP_IDS.find((k) => ST[k] && before[k] && ST[k].users > before[k].users);
+      if (grew) speak(`${APP_NAME[grew]} grew to ${ST[grew].users.toLocaleString()} users! New flowers 🌼`, 5e3);
       render(outside());
     }, () => {
     });
@@ -15850,6 +15914,10 @@ Only describe ideas the book is genuinely known for; don't invent quotes.`, { mo
     library: "fresh",
     "fresh pages": "fresh",
     chico: "chico",
+    luna: "luna",
+    "luna house": "luna",
+    ohayo: "ohayo",
+    "ohayo house": "ohayo",
     "post office": "post",
     post: "post",
     town: "village:board"
@@ -16046,7 +16114,7 @@ Available actions (use only these):
 {"type":"break","minutes":10}  {"type":"back"}  (start or end a break)
 {"type":"quest_add","title":"...","minutes":25}  {"type":"quest_drop","title":"..."}  {"type":"quest_next","title":"..."}
 {"type":"water","ml":250}  {"type":"steps","total":4200}
-{"type":"go","place":"family dinner|foreshore|dolphin bench|paddleboards|mum's house|marcus's house|exercise lawn|field|lake|picnic|football|orchard|farm shop|tour sign|flower farm|ma ma's cottage|wine shop kitchen|larder|olive tree|weekly review|vineyard|barrels|wine shop|honesty box|tasting room|playground|home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|post office"}
+{"type":"go","place":"family dinner|foreshore|dolphin bench|paddleboards|mum's house|marcus's house|exercise lawn|field|lake|picnic|football|orchard|farm shop|tour sign|flower farm|ma ma's cottage|wine shop kitchen|larder|olive tree|weekly review|vineyard|barrels|wine shop|honesty box|tasting room|playground|home|fridge|kitchen|cupboard|treadmill|sofa|my room|bed|journal|emotion shelf|wardrobe|scratchpad|pond|garden|shed|swing|letterbox|animal run|client table|planning table|bank|courtyard|trophy room|trophy book|affirmations|kind words|routines|revenue chart|market|well|town hall|chord|library|chico|luna|ohayo|post office"}
 {"type":"open","what":"fridge|chores|quests|bag|mail|cal|settings|friend"}
 {"type":"pet"}
 {"type":"feed_animals"}  (feed the chicks and bunnies from her backpack)
@@ -16116,18 +16184,23 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
       days: days.map((d) => ({ when: d.k === today2 ? "Today" : d.k === addD(today2, 1) ? "Tomorrow" : fmtD(d.k), list: d.list }))
     };
   }
+  var APP_IDS = ["chord", "chico", "luna", "ohayo"];
+  var APP_NAME = { chord: "Chord", chico: "Chico", luna: "Luna", ohayo: "Ohayo" };
   function myWins() {
     const w = [], y = F.history && F.history[prevDay(dayKey())];
     if (S2.doneIds.length) w.push(`${S2.doneIds.length} quest${S2.doneIds.length > 1 ? "s" : ""} done today`);
     if (y && y.q) w.push(`${y.q} quest${y.q > 1 ? "s" : ""} finished yesterday`);
     if (F.streak >= 2) w.push(`${F.streak} cosy days in a row with ${F.name}`);
     if (S2.harvested) w.push(`${S2.harvested} harvest${S2.harvested > 1 ? "s" : ""} from the garden today`);
-    ["chord", "chico"].forEach((a) => {
+    APP_IDS.forEach((a) => {
       const h = health(a);
-      if (h && h.status === "green") w.push(`${a === "chord" ? "Chord" : "Chico"}: all checks green last night`);
+      if (h && h.status === "green") w.push(`${APP_NAME[a]}: all checks green last night`);
     });
     if (ST.chord && ST.chord.users) w.push(`Chord is home to ${ST.chord.users} ${ST.chord.label || "studios"}`);
     if (ST.chico && ST.chico.users) w.push(`${ST.chico.users} ${ST.chico.label || "families"} use Chico`);
+    ["luna", "ohayo"].forEach((a) => {
+      if (ST[a] && ST[a].users) w.push(`${ST[a].users} ${ST[a].label || "users"} use ${APP_NAME[a]}`);
+    });
     return w;
   }
   var sgAt = (day, h, m = 0) => Date.UTC(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8, 10), h - 8, m);
@@ -17005,7 +17078,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (routOpen && scene === "room") h = routinesPanel();
     else if (lettersOpen && (scene === "room" || scene === "base")) h = lettersPanel(!!sampleCap);
     else if (postOpen && scene === "post") h = postPanel();
-    else if (healthOpen && (scene === "chord" || scene === "chico")) h = healthPanel(scene);
+    else if (healthOpen && APP_IDS.includes(scene)) h = healthPanel(scene);
     else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar());
     else if (scene === "market" && !shopClosed) {
       const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["deli", "Deli"], ["care", "Care"], ["family", "Family"], ["animals", "Animals"], ["home", "Home"], ["me", "Me & my room"], ["sell", "Sell"]];

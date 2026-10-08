@@ -1047,3 +1047,12 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - From the recipe book (station `gboard`, now "Recipe book", `recipePanel`, `data-gmake`).
   - Or at the mixing bench: picking a known combination shows "Make another tub".
   - A batch left over from an old save is finished straight away.
+
+### Round 84: Luna and Ohayo houses; night market from 5:30
+- **The houses:** Makers' Lane's two plots now hold the Luna house (a lavender observatory, door [160,520]) and the Ohayo house (a sunrise house with a noren curtain, door [362,520]).
+  - Building art is in buildings.js (`lunaHouse`, `ohayoHouse`); rooms `luna` and `ohayo` in world.js, with shells in interiors.js. Each room has a desk, shelf, sofa, planning table and a health sign (`healthluna`, `healthohayo`).
+  - `plotArt` remains for future apps.
+- **Feeds:** `APPS` and `DOCS` in feeds.js include `health-luna` and `health-ohayo`. Each building shows a light on the lane, and a user garden appears once `stats.luna` or `stats.ohayo` has users. core.js uses `APP_IDS` / `APP_NAME`.
+  - The Village feeds routine still only reads the Chord and Chico founder pages. Add the Luna and Ohayo founder desk URLs to its prompt once they exist.
+- **Quests:** routed by `/\bluna\b/` and `/ohayo/`; both houses are in `WORK`.
+- **Night market:** now 5:30pm to 10pm (tours.js `eventOn`; scoop.js `cartOn` and the evening boost).
