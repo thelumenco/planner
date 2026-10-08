@@ -27,8 +27,8 @@
 // once: slots grind/ground and grind2/ground2), gift wrapping (customers buy gift boxes; a grand box of 16), a cacao
 // tree at Ma Ma's (a free sack every two days), a chocolate fountain (tips; Evan loves it), a supply deal (10 dark
 // pieces to the Scoop Shack's fridge each morning), weekend workshops (Saturday 2 to 4: a class pays 48 coins), a
-// second assistant (Lila: open Mondays too, a little busier) and a night market cart (Mateo, Tuesday and Thursday
-// evenings, at stall place 9 on the field: tours.js NIGHT, shown once it's bought).
+// second assistant (Lila: open Mondays too, a little busier) and a farmers market cart (Mateo, Sunday mornings 8 to 1,
+// at stall place 9 on the field: tours.js MARKET, shown once it's bought).
 // The shop is open 11am to 8pm, Tuesday to Sunday. Amara serves at the counter; customers buy bars off the wall (more
 // often while Mel's serving too). Takings go straight to Mel. Mel can have a bar or take one to give.
 import { esc, dayKey, sgHM, hash } from "../util.js";
@@ -53,7 +53,7 @@ export const CC_UPS = {
   supply: {n: "Supply deal with the Scoop Shack", price: 250, line: "Every morning, 10 pieces of loose dark chocolate go to the Scoop Shack's gelato fridge on their own (when there are 10 spare)."},
   workshop: {n: "Weekend workshops", price: 700, line: "Saturday afternoons, 2 to 4: a class of six makes their own bonbons at the tables, and pays 8 coins each."},
   assistant: {n: "Second assistant", price: 500, line: "Lila joins the team. The shop opens on Mondays too, and it's a little busier with two behind the counter."},
-  cart: {n: "Night market cart", price: 400, line: "A little chocolate cart for the Tuesday and Thursday night markets. Mateo runs it (evenings suit a student), selling bars, bonbons and hot chocolate."}
+  cart: {n: "Farmers market cart", price: 400, line: "A little chocolate cart for the Sunday farmers market, 8 to 1. Mateo runs it, selling bars, bonbons and hot chocolate."}
 };
 export const ccUp = (c, k) => !!(c.up && c.up[k]);
 export function buyCcUp(F, k){
@@ -63,9 +63,9 @@ export function buyCcUp(F, k){
     grinder2: "A second stone grinder, rumbling away beside the first.", wrap: "The wrapping station's set up: ribbons, tissue, boxes in every size.",
     tree: "A cacao tree in Ma Ma's orchard! She says she'll talk to it every morning.", fountain: "The chocolate fountain's flowing. Evan is going to lose his mind.",
     supply: "Done: the Scoop Shack gets 10 pieces of your dark chocolate every morning, when there's enough spare.", workshop: "Weekend workshops are on: Saturdays, 2 to 4, at the tables.",
-    assistant: "Lila starts Monday! The shop's open seven days now.", cart: "The chocolate cart's ready for the night market. Mateo's thrilled."}[k];
+    assistant: "Lila starts Monday! The shop's open seven days now.", cart: "The chocolate cart's ready for Sunday's farmers market. Mateo's thrilled."}[k];
 }
-export const cartOn = (day, hm) => { const d = new Date(day + "T00:00:00Z").getUTCDay(); return (d === 2 || d === 4) && hm >= 17*60 + 30 && hm < 22*60; };
+export const cartOn = (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() === 0 && hm >= 8*60 && hm < 13*60;   // the Sunday farmers market
 export const workshopOn = (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() === 6 && hm >= 14*60 && hm < 16*60;
 export const WORKSHOP = 6, WORKSHOP_FEE = 8, TREE_EVERY = 2*864e5, BOX16 = 16;
 
@@ -286,7 +286,7 @@ const coin = () => icon("coin", 13), shut = `<div class="actions"><button class=
 const dot = c => `<span class="gdot" style="background:${c}"></span>`;
 export function counterPanel(F, st){
   const c = cocoaState(F), day = dayKey(), hm = sgHM(), t = c.sold[day] || {n: 0, coins: 0};
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${st.cart ? "The night market cart. " : ""}${openOn(day, hm, ccUp(c, "assistant")) ? "Open till 8pm." : `Closed: open 11am to 8pm, ${ccUp(c, "assistant") ? "every day" : "Tuesday to Sunday"}.`} ${t.n || t.bonbons ? `Sold today: ${t.n} bar${t.n === 1 ? "" : "s"}${t.bonbons ? ` and ${t.bonbons} bonbon${t.bonbons === 1 ? "" : "s"}` : ""} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Amara's behind the counter." : ""}</p>`;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${st.cart ? "The farmers market cart. " : ""}${openOn(day, hm, ccUp(c, "assistant")) ? "Open till 8pm." : `Closed: open 11am to 8pm, ${ccUp(c, "assistant") ? "every day" : "Tuesday to Sunday"}.`} ${t.n || t.bonbons ? `Sold today: ${t.n} bar${t.n === 1 ? "" : "s"}${t.bonbons ? ` and ${t.bonbons} bonbon${t.bonbons === 1 ? "" : "s"}` : ""} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Amara's behind the counter." : ""}</p>`;
   h += `<ul class="hlist wlist">${Object.entries(KINDS).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n} bars</b><small>${c.bars[k]} on the wall · ${c.prices.bar} ${coin()} each</small></span><span class="orbtns"><button class="btn small primary" data-cc="eat" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>Have one</button><button class="btn small alt" data-cc="give" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>To give</button></span></li>`).join("")}</ul>`;
   h += `<div class="row gprices"><span>Price of a bar</span><span class="gstep"><button class="btn small alt" data-cc="price" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bar}</b><button class="btn small alt" data-cc="price" data-n="1" aria-label="Dearer">+</button></span></div>`;
   if (ccUp(c, "hotchoc")) h += `<div class="row gprices"><span>Hot chocolate${t.hot ? ` <small class="muted">(${t.hot} today)</small>` : ""}</span><span class="gstep"><button class="btn small alt" data-cc="hprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.hot}</b><button class="btn small alt" data-cc="hprice" data-n="1" aria-label="Dearer">+</button></span></div><div class="actions"><button class="btn small primary" data-cc="hot" ${Object.values(c.choc).some(n => n > 0) ? "" : "disabled"}>Have a hot chocolate</button></div>`;

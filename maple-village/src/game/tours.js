@@ -157,7 +157,10 @@ export const MARKET = [{id: "elena", at: 0, short: "Cheese", n: "Cheese and oliv
   {id: "ben", at: 6, short: "Craft beer", n: "Craft beer", items: ["paleale", "stout"], col: "#D9A441", line: "Brewed in my shed. Well, the shed's quite big."},
   {id: "dev", at: 7, short: "Bakery", n: "Bakery", items: ["kaya", "currypuff", "flour"], col: "#C98A4A", line: "Still warm! Kaya buns and curry puffs."},
   // Noor's pet adoption corner, on the grass by the river (place 8): a little pen of animals looking for homes
-  {id: "noor", at: 8, kind: "pets", short: "Adopt a pet", n: "Pet adoption corner", items: ["pet_kitten"], col: "#9FD3C2", line: "Every one of them needs a home. Who'll look after them?"}];
+  {id: "noor", at: 8, kind: "pets", short: "Adopt a pet", n: "Pet adoption corner", items: ["pet_kitten"], col: "#9FD3C2", line: "Every one of them needs a home. Who'll look after them?"},
+  // the Cocoa Room's chocolate cart, once it's bought (cocoa.js upgrade "cart"), beside Noor's pen where the Scoop
+  // Shack's cart stands on night market evenings. Mateo minds it
+  {id: "mateo", at: 9, kind: "cocoa", needs: "cc_cart", short: "Cocoa Room", n: "The Cocoa Room cart", items: [], col: "#8A5A3A", line: "Chocolate from the Cocoa Room! Bars, bonbons, hot chocolate."}];
 export const FAIR = [{id: "hiro", at: 2, short: "Kites", n: "Kites", items: [], act: "kite", col: "#7FB8E8", line: "Pick a kite, any kite. They all fly!"},
   {id: "aiko", at: 3, short: "Faces", n: "Face painting", items: [], act: "face", col: "#C9A3E0", line: "Butterflies, tigers, dinosaurs. You choose!"},
   {id: "ben", at: 4, short: "Lemonade", n: "Lemonade", items: ["apple"], col: "#F3D34A", line: "Fresh lemonade, and apples for the road."},
@@ -175,9 +178,7 @@ export const NIGHT = [{id: "yun", at: 0, short: "Taiwan eats", n: "Taiwanese str
   {id: "wen", at: 6, short: "Sweets", n: "Sweets", items: ["tanghulu", "eggwaffle"], col: "#C9A3E0", line: "Tanghulu, strawberries in crackly sugar. And egg waffles, still warm."},
   {id: "kai", at: 7, short: "Drinks", n: "Night drinks", items: ["sugarcane", "grassjelly"], col: "#9CC27E", line: "Fresh sugarcane, pressed while you wait. Grass jelly for the old-school ones."},
   // Mel's own: the Scoop Shack's cart, scooping from the shop's display (scoop.js cartOn). Tomo minds it after his day on the deck
-  {id: "tomo", at: 8, kind: "scoop", short: "Scoop Shack", n: "The Scoop Shack cart", items: [], col: "#F2A0B8", line: "Gelato from the Scoop Shack! Cup or cone?"},
-  // and the Cocoa Room's chocolate cart, once it's bought (cocoa.js upgrade "cart"): Mateo minds it
-  {id: "mateo", at: 9, kind: "cocoa", needs: "cc_cart", short: "Cocoa Room", n: "The Cocoa Room cart", items: [], col: "#8A5A3A", line: "Chocolate from the Cocoa Room! Bars, bonbons, hot chocolate."}];
+  {id: "tomo", at: 8, kind: "scoop", short: "Scoop Shack", n: "The Scoop Shack cart", items: [], col: "#F2A0B8", line: "Gelato from the Scoop Shack! Cup or cone?"}];
 // stalls that only stand once Mel's bought them (needs): core.js tells us what's owned
 let ownedNow = () => ({});
 export const setStallOwned = fn => { ownedNow = fn; };
@@ -186,9 +187,9 @@ export const NIGHT_TOURISTS = ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy"
 export const STAGE = {x: 452, y: 462}, STAGE_WATCH = [[404, 560], [446, 566], [492, 536], [508, 562], [426, 590]];
 function lastSaturday(day){ const dt = new Date(day + "T00:00:00Z"); if (dt.getUTCDay() !== 6) return false; const n = new Date(dt.getTime() + 7*864e5); return n.getUTCMonth() !== dt.getUTCMonth(); }
 export function eventOn(day){
-  if (dow(day) === 0) return {kind: "market", name: "Sunday farmers market", from: 8*60, to: 13*60, stalls: MARKET, wine: true};
+  if (dow(day) === 0) return {kind: "market", name: "Sunday farmers market", from: 8*60, to: 13*60, stalls: standing(MARKET), wine: true};
   if (lastSaturday(day)) return {kind: "fair", name: "Field fair", from: 10*60, to: 16*60, stalls: FAIR, wine: false};
-  if (dow(day) === 2 || dow(day) === 4) return {kind: "night", name: "Night market", from: 17*60 + 30, to: 22*60, stalls: standing(NIGHT), wine: false};
+  if (dow(day) === 2 || dow(day) === 4) return {kind: "night", name: "Night market", from: 17*60 + 30, to: 22*60, stalls: NIGHT, wine: false};
   return null;
 }
 export const eventNow = (day, hm) => { const e = eventOn(day); return e && hm >= e.from && hm < e.to ? e : null; };

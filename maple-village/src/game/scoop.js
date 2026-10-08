@@ -20,6 +20,21 @@ import { ITEMS } from "../data/items.js";
 import { TREES, FLOWERS } from "../data/orchard.js";
 
 export const OPEN = 10*60, CLOSE = 20*60, TUB = 20;
+// the churner: every tub (a new flavour's first, or another of a known one) blends and then freezes before it's ready,
+// an hour in all; it holds two batches at once (s.churn: [{id, done, isNew}])
+export const CHURN_MIN = 60, CHURNS = 2;
+const clock = () => Date.now() + (globalThis.__mapleOffset || 0);
+export const churnFull = s => s.churn.length >= CHURNS;
+export const churnLeft = b => { const m = Math.max(0, Math.ceil((b.done - clock())/60000)); return m >= 60 ? `${Math.floor(m/60)}h ${m % 60}m` : `${m} min`; };
+// batches whose time is up go into the freezer (and the display, if it's arranged and has room) -> the recipes done
+export function finishChurn(s, t = clock()){
+  const done = s.churn.filter(b => t >= b.done); if (!done.length) return [];
+  s.churn = s.churn.filter(b => t < b.done);
+  return done.map(b => { const r = recipeOf(s, b.id); if (!r) return null; s.tubs[r.id] = (s.tubs[r.id] || 0) + TUB;
+    if (Array.isArray(s.display) && !s.display.includes(r.id) && s.display.length < SLOTS) s.display = [...s.display, r.id];
+    s.log = [`${r.name}: frozen and ready`, ...s.log].slice(0, 6); return r; }).filter(Boolean);
+}
+const toChurn = (s, id, isNew) => { s.churn = [...s.churn, {id, done: clock() + CHURN_MIN*60000, isNew}]; };
 // Sofia runs the counter; Tomo serves out on the floor and the deck (a little busier while he's on) and does the
 // deliveries once there's a bike
 export const SERVER = "sofia", WAITER = "tomo";
@@ -50,7 +65,7 @@ export function scoopState(F){
   s.prices = Object.assign({cup: 4, cone: 4, float: 6, waffle: 7, special: 2, dip: 2, top: 1}, s.prices || {});
   s.plan = s.plan && s.plan.day === dayKey() ? s.plan : {day: dayKey(), ids: []};
   s.made = s.made || {}; s.sold = s.sold || {}; s.log = s.log || [];
-  s.up = s.up || {}; s.dips = s.dips || {milk: 1}; s.tops = s.tops || {sprinkles: 1}; s.box = s.box || 0; s.notes = s.notes || []; s.dipIds = s.dipIds || [];
+  s.up = s.up || {}; s.dips = s.dips || {milk: 1}; s.tops = s.tops || {sprinkles: 1}; s.box = s.box || 0; s.notes = s.notes || []; s.dipIds = s.dipIds || []; s.churn = s.churn || [];
   return s;
 }
 export const recipeOf = (s, id) => s.recipes.find(r => r.id === id);
@@ -159,11 +174,11 @@ export function discover(F, ings){
   if (!ings.length) return {msg: "Pick something from the fridge to mix."};
   const known = knownRecipe(s, ings); if (known) return {known, msg: `You already know this one: ${known.name}. Make another tub of it instead.`};
   if (!hasAll(s, ings)) return {msg: "The fridge is missing some of that."};
+  if (churnFull(s)) return {msg: `The churner's full: two batches are blending and freezing. The next one's ready in ${churnLeft(s.churn[0])}.`};
   useAll(s, ings);
   const r = {id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: ings.includes("milk"), special: false, found: Date.now()};
-  s.recipes.push(r); s.tubs[r.id] = (s.tubs[r.id] || 0) + TUB; registerItems(F);
-  if (Array.isArray(s.display) && s.display.length < SLOTS) s.display = [...s.display, r.id];   // a free slot? straight out
-  return {recipe: r, msg: `A new flavour: ${r.name}! ${displayIds(s).includes(r.id) ? "The first tub's in the display." : "The first tub's in the freezer (the display's full: swap it in from there)."}`};
+  s.recipes.push(r); toChurn(s, r.id, true); registerItems(F);
+  return {recipe: r, msg: `A new flavour: ${r.name}! It's in the churner now: blending, then freezing. The first tub's ready in an hour.`};
 }
 
 /* ---------- the kitchen fridge ---------- */
@@ -178,14 +193,13 @@ export function stockFridge(F, id, n, from, orch){
 export const farmShelf = orch => Object.keys(orch.stock || {}).filter(k => orch.stock[k] > 0).map(k => k.startsWith("stem:") ? "fl_" + k.slice(5) : k).filter(isIngr);
 
 /* ---------- making tubs ---------- */
-export const canMake = (s, r) => r && hasAll(s, r.ings);
+export const canMake = (s, r) => r && hasAll(s, r.ings) && !churnFull(s);
 // Mel makes another tub of a flavour she knows: one of each ingredient from the fridge, 20 scoops into the freezer
 // (and straight into the display if it's arranged and has a free slot)
 export function makeTub(F, rid){
   const s = scoopState(F), r = recipeOf(s, rid); if (!canMake(s, r)) return null;
-  useAll(s, r.ings); s.tubs[r.id] = (s.tubs[r.id] || 0) + TUB; const day = dayKey(); s.made[day] = (s.made[day] || 0) + 1;
-  s.log = [`${r.name}: a fresh tub`, ...s.log].slice(0, 6);
-  if (Array.isArray(s.display) && !s.display.includes(r.id) && s.display.length < SLOTS) s.display = [...s.display, r.id];
+  useAll(s, r.ings); toChurn(s, r.id, false); const day = dayKey(); s.made[day] = (s.made[day] || 0) + 1;
+  s.log = [`${r.name}: into the churner`, ...s.log].slice(0, 6);
   return r;
 }
 
@@ -221,7 +235,7 @@ function saleMinute(s, day, hm, opts){
 export function scoopTick(F, opts = {}){
   const s = scoopState(F), now = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now, now - 2*864e5);
   if (s.batch) { s.tubs[s.batch.id] = (s.tubs[s.batch.id] || 0) + TUB; s.batch = null; }   // a batch Tomo had on the go (from when he still cooked)
-  const out = {coins: 0, n: 0, mins: 0, box: 0};
+  const out = {coins: 0, n: 0, mins: 0, box: 0, churned: finishChurn(s, now)};
   for (let at = from + 60000; at <= now; at += 60000) {
     const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     const sale = saleMinute(s, day, hm, opts); if (sale && sale.box) out.box += sale.coins; else if (sale) { out.coins += sale.coins; out.n++; }
@@ -387,18 +401,25 @@ export function benchPanel(F, st){
   h += `<div class="gchips">${inF.map(id => `<button class="gchip${sel.includes(id) ? " on" : ""}" data-gsel="${id}" aria-pressed="${sel.includes(id)}" ${!sel.includes(id) && sel.length >= 4 ? "disabled" : ""}>${ingPic(id)}<span>${esc(INGR[id][0])}</span></button>`).join("")}</div>`;
   // what it'll be (or, just mixed, what it is): a scoop in its colour, and its name
   const made = st.made && recipeOf(s, st.made);
-  if (made && !sel.length) h += resultCard(made.col, made.name, `New flavour! ${made.dairy ? "A gelato" : "A dairy-free sorbet"}, and the first tub's in the display.`, true);
+  if (made && !sel.length) h += resultCard(made.col, made.name, `New flavour! ${made.dairy ? "A gelato" : "A dairy-free sorbet"}. It's in the churner: blending, then freezing, ready in an hour.`, true);
   else if (sel.length) { const ss = [...sel].sort(); h += known ? resultCard(known.col, known.name, canMake(s, known) ? "You know this one already. Make another tub?" : "You know this one already.")
     : resultCard(blend(ss), nameFor(ss), `${ss.includes("milk") ? "A gelato" : "A dairy-free sorbet"}. Something new!`); }
   else h += `<p class="muted">Nothing picked yet.</p>`;
-  return h + `<div class="actions">${known ? `<button class="btn primary" data-gmake="${esc(known.id)}" ${canMake(s, known) ? "" : "disabled"}>Make another tub</button>` : `<button class="btn primary" data-gmix="1" ${!sel.length ? "disabled" : ""}>Mix it</button>`}<button class="btn alt small" data-close="1">Close</button></div>`;
+  return h + churnLine(s) + `<div class="actions">${known ? `<button class="btn primary" data-gmake="${esc(known.id)}" ${canMake(s, known) ? "" : "disabled"}>Make another tub</button>` : `<button class="btn primary" data-gmix="1" ${!sel.length || churnFull(s) ? "disabled" : ""}>Mix it</button>`}<button class="btn alt small" data-close="1">Close</button></div>`;
+}
+// what's in the churner, and when it'll be ready
+export function churnLine(s){
+  finishChurn(s);
+  if (!s.churn.length) return `<p class="muted">The churner's free: a tub takes an hour to blend and freeze, two at a time.</p>`;
+  return `<p class="eyebrow" style="margin:10px 0 6px">In the churner (${s.churn.length} of ${CHURNS})</p><ul class="hlist">${s.churn.map(b => { const r = recipeOf(s, b.id); return r ? `<li>${dot(r.col)} <b>${esc(r.name)}</b> <small class="muted">${b.isNew ? "new! " : ""}ready in ${churnLeft(b)}</small></li>` : ""; }).join("")}</ul>`;
 }
 // the recipe book on the kitchen wall: every flavour Mel knows, how much is left, and another tub at a tap
 export function recipePanel(F){
   const s = scoopState(F), day = dayKey();
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The recipe book</h2><p class="sub">Every flavour you've discovered. A tub is 20 scoops and uses one of each ingredient from the fridge. ${s.made[day] ? `${s.made[day]} made today.` : ""}</p>`;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The recipe book</h2><p class="sub">Every flavour you've discovered. A tub is 20 scoops, uses one of each ingredient from the fridge, and takes an hour in the churner. ${s.made[day] ? `${s.made[day]} made today.` : ""}</p>`;
   if (!s.recipes.length) return h + `<p class="muted">No flavours yet. Discover one at the mixing bench.</p>` + shut;
   h += `<ul class="hlist wlist">${[...s.recipes].sort((a, b) => (s.tubs[a.id] || 0) - (s.tubs[b.id] || 0)).map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? `${s.tubs[r.id]} scoops left` : "none left"} · ${canMake(s, r) ? esc(r.ings.map(i => INGR[i][0]).join(", ")) : "missing: " + esc(r.ings.filter(i => !(s.fridge[i] > 0)).map(i => INGR[i][0]).join(", "))}</small></span><button class="btn small ${canMake(s, r) ? "primary" : "alt"}" data-gmake="${esc(r.id)}" ${canMake(s, r) ? "" : "disabled"}>Make a tub</button></li>`).join("")}</ul>`;
+  h += churnLine(s);
   if (s.log.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Lately</p><ul class="hlist">${s.log.map(l => `<li><small>${esc(l)}</small></li>`).join("")}</ul>`;
   return h + shut;
 }
@@ -409,7 +430,7 @@ export function freezerPanel(F, st = {}){
   if (swap) return h + `<p class="olabel">${dot(swap.col)} Put ${esc(swap.name)} out in place of…</p><ul class="hlist wlist">${shown.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? s.tubs[r.id] + " scoops" : "sold out"}</small></span><button class="btn small primary" data-gswapout="${esc(r.id)}">Swap</button></li>`).join("")}</ul>
     <div class="actions"><button class="btn alt small" data-gswapcancel="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
   h += `<p class="eyebrow" style="margin:12px 0 6px">In the display (${shown.length} of ${SLOTS})</p>`;
-  h += shown.length ? `<ul class="hlist wlist">${shown.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? `${s.tubs[r.id]} scoops` : "sold out: the slot's empty till Tomo makes more"} · ${ings(r)}</small></span><button class="btn small alt" data-gdisp="${esc(r.id)}">Take off</button></li>`).join("")}</ul>` : `<p class="muted">Empty.</p>`;
+  h += shown.length ? `<ul class="hlist wlist">${shown.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? `${s.tubs[r.id]} scoops` : "sold out: the slot's empty till you make more"} · ${ings(r)}</small></span><button class="btn small alt" data-gdisp="${esc(r.id)}">Take off</button></li>`).join("")}</ul>` : `<p class="muted">Empty.</p>`;
   h += `<p class="eyebrow" style="margin:12px 0 6px">Waiting in the freezer</p>`;
   h += rest.length ? `<ul class="hlist wlist">${rest.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops · ${ings(r)}</small></span><button class="btn small primary" data-gdisp="${esc(r.id)}">${ids.length < SLOTS ? "Put out" : "Swap in"}</button></li>`).join("")}</ul>` : `<p class="muted">Nothing else in stock.</p>`;
   return h + shut;

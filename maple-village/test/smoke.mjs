@@ -1719,19 +1719,25 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#ctx [data-gmix]"); await page.waitForTimeout(500);
   check(await page.locator("#ctx .gresult.made").count() === 1, "and once it's mixed, the new flavour shows on the bench");
   const r1 = await fox().then(f => f.scoop.recipes[0]);
-  check(r1 && r1.dairy && /Mango/.test(r1.name) && (await fox()).scoop.tubs[r1.id] === 20, `mixing mango and milk discovers a gelato (${r1 && r1.name}), first tub in the display`);
+  check(r1 && r1.dairy && /Mango/.test(r1.name) && await fox().then(f => !f.scoop.tubs[r1.id] && f.scoop.churn.length === 1), `mixing mango and milk discovers a gelato (${r1 && r1.name}); it goes in the churner to blend and freeze`);
   await page.click('#ctx [data-gsel="strawberry"]'); await page.waitForTimeout(200); await page.click("#ctx [data-gmix]"); await page.waitForTimeout(500);
-  check(await fox().then(f => f.scoop.recipes.length === 2 && f.scoop.recipes[1].dairy === false), "and strawberry on its own is a dairy-free sorbet");
+  check(await fox().then(f => f.scoop.recipes.length === 2 && f.scoop.recipes[1].dairy === false && f.scoop.churn.length === 2), "and strawberry on its own is a dairy-free sorbet (the churner holds two)");
+  check(await page.locator("#ctx [data-gmix]").isDisabled(), "with the churner full, nothing else can be mixed for now");
   await page.click("#ctx [data-close]").catch(() => {});
+  await page.goto(url + "?seed=1&time=12:05&date=2026-10-10"); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__mapleScene("scoopkitchen")); await page.waitForTimeout(800);
+  check(await fox().then(f => f.scoop.tubs[r1.id] === 20 && f.scoop.tubs[f.scoop.recipes[1].id] === 20 && !f.scoop.churn.length), "an hour later both are frozen: a tub of each, in the display");
   await page.locator('#world [data-spot="gboard"]').dispatchEvent("click"); await page.waitForSelector(`#ctx [data-gmake="${r1.id}"]`, { timeout: 15000 });
   await page.click(`#ctx [data-gmake="${r1.id}"]`); await page.waitForTimeout(300);
-  check(await fox().then(f => f.scoop.tubs[r1.id] === 40 && f.scoop.fridge.mango === 2), "Mel makes another tub herself from the recipe book (one of each ingredient)");
+  check(await fox().then(f => f.scoop.churn.length === 1 && f.scoop.fridge.mango === 2), "Mel makes another tub herself from the recipe book (one of each ingredient, into the churner)");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.locator('#world [data-spot="gbench"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gsel="mango"]', { timeout: 15000 });
   await page.click('#ctx [data-gsel="mango"]'); await page.click('#ctx [data-gsel="milk"]'); await page.waitForTimeout(200);
   await page.click(`#ctx [data-gmake="${r1.id}"]`); await page.waitForTimeout(300);
-  check(await fox().then(f => f.scoop.tubs[r1.id] === 60), "or at the mixing bench, picking a flavour she already knows");
+  check(await fox().then(f => f.scoop.churn.length === 2), "or at the mixing bench, picking a flavour she already knows");
   await page.click("#ctx [data-close]").catch(() => {});
+  await page.goto(url + "?seed=1&time=13:10&date=2026-10-10"); await page.waitForTimeout(1500);
+  check(await fox().then(f => f.scoop.tubs[r1.id] === 60), "an hour on, two more tubs are ready");
   await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="gcounter"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gpick]", { timeout: 15000 });
   await page.locator("#ctx [data-gpick]").first().click(); await page.waitForTimeout(200);
@@ -1912,9 +1918,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("lila"), "with a second assistant the shop opens on Mondays: Lila's behind the counter");
   await page.goto(url + "?seed=1&time=19:00&date=2026-10-13"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
-  check(await page.locator('#world [data-place="mstall9"]').count() === 1 && (await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("mateo"), "the Cocoa Room cart at Tuesday's night market, with Mateo");
+  check(await page.locator('#world [data-place="mstall9"]').count() === 0, "no chocolate cart at the night market (that's the Scoop Shack's evening)");
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-11"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  check(await page.locator('#world [data-place="mstall9"]').count() === 1 && (await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("mateo"), "the Cocoa Room cart at the Sunday farmers market, with Mateo");
   await page.locator('#world [data-place="mstall9"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
-  check(/night market cart/.test(await page.locator("#ctx").innerText()), "and Mel can serve from it");
+  check(/farmers market cart/.test(await page.locator("#ctx").innerText()), "and Mel can serve from it");
   await page.close();
 }
 {
