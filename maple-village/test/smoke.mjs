@@ -1598,6 +1598,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(600);
   await page.locator('#world [data-place="toVine"]').dispatchEvent("click"); await page.waitForTimeout(250);
   check(await page.locator("#mel.drive").count() === 1 && await page.locator("#mel.withEvan").count() === 1, "outdoors Mel drives the convertible between places, with Evan and Maple aboard");
+  await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 30000 });   // let the drive arrive before jumping elsewhere
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="cdoor"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="cellar"]', { timeout: 15000 });
   await page.click('#ctx [data-goal="cellar"]'); await page.waitForTimeout(400);
