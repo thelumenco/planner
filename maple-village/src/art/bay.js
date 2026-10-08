@@ -25,11 +25,11 @@ const lit = (on, off) => { const m = hmNow(); return m >= on || m < off; };
 // upgrades: the honesty freezer by the door, the delivery bike, the neon cone, the deck's striped awning and fairy lights
 const neon = on => `<g pointer-events="none" class="${on ? "nglow" : ""}">${on ? `<path d="M338 226 l9 26 l9 -26 M336 226 a11 10 0 0 1 22 0" fill="none" style="stroke:#FF8FC0" stroke-width="7" opacity=".35" stroke-linecap="round"/>` : ""}
   <path d="M338 226 l9 26 l9 -26 M336 226 a11 10 0 0 1 22 0" fill="none" style="stroke:${on ? "#FFE3EF" : "#E6B9C9"}" stroke-width="2.4" stroke-linecap="round"/></g>`;
-const honestyFreezer = () => `<g data-place="hfreezer" aria-label="Honesty freezer"><g transform="translate(38 30)"><ellipse class="hov" cx="436" cy="298" rx="30" ry="7" style="fill:var(--butter)"/>
+const honestyFreezer = () => `<g data-place="hfreezer" aria-label="Honesty freezer"><g transform="translate(-4 -32)"><ellipse class="hov" cx="436" cy="298" rx="30" ry="7" style="fill:var(--butter)"/>
   ${sk(`<rect x="414" y="268" width="44" height="28" rx="4" style="fill:#DCEBF2"/><rect x="418" y="264" width="36" height="6" rx="2" style="fill:#F6FBFD"/><rect x="440" y="252" width="14" height="12" rx="2" style="fill:#C9A87A"/><rect x="420" y="276" width="20" height="10" rx="2" style="fill:#FFFDF6"/>`,
     `<rect x="414" y="268" width="44" height="28" rx="4"/><rect x="418" y="264" width="36" height="6" rx="2"/><rect x="440" y="252" width="14" height="12" rx="2"/><path d="M443 255 h8"/><rect x="420" y="276" width="20" height="10" rx="2"/>`)}
   <text x="430" y="284" text-anchor="middle" font-family="Klee One,serif" font-size="5.5" fill="#C2505F" pointer-events="none">honesty</text>
-</g>${tapeLabel(420, 344, "Honesty freezer", "var(--card)", 9)}</g>`;
+</g>${tapeLabel(452, 306, "Honesty freezer", "var(--card)", 8)}</g>`;
 const bike = () => `<g data-place="dbike" aria-label="Delivery bike"><g transform="translate(-186 -56)"><ellipse class="hov" cx="482" cy="340" rx="28" ry="7" style="fill:var(--butter)"/>
   ${sk(`<circle cx="468" cy="330" r="9" style="fill:none"/><circle cx="496" cy="330" r="9" style="fill:none"/><path d="M468 330 l10 -16 h12 l6 16 M478 314 l-4 -6 M490 314 l2 -8 h6" fill="none" style="stroke:#7FCBB4" stroke-width="3"/><rect x="458" y="302" width="18" height="12" rx="2" style="fill:#F2A0B8"/>`,
     `<circle cx="468" cy="330" r="9"/><circle cx="496" cy="330" r="9"/><rect x="458" y="302" width="18" height="12" rx="2"/><path d="M462 308 h10" opacity=".6"/>`)}

@@ -42,7 +42,7 @@ export function hfarmArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="60" rx="300" ry="70" style="fill:var(--grass2)"/><ellipse cx="130" cy="520" rx="120" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="600" rx="110" ry="40" style="fill:var(--grass2)"/></g>
     ${tree(30, 64, .7)}${tree(486, 70, .75)}
-    <g filter="url(#wob)"><path d="M0 282 H250 M100 560 H520 M260 560 V262 M260 270 C200 270 120 262 105 246 M260 270 C330 270 380 262 400 246 M130 560 V580" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M0 282 H500 M30 282 V560 M490 282 V560 M100 560 H520 M260 560 V262 M260 270 C200 270 120 262 105 246 M260 270 C330 270 380 262 400 246 M130 560 V580" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
     ${rail(0, 520, 122)}
     ${flowers([[60, 290, "#EFA3A6"], [470, 290, "#F3C969"], [200, 520, "#C3CDEE"], [330, 610, "#EFA3A6"], [40, 610, "#F3C969"]])}`;
   const farmhouse = house("farmhouse", 40, 168, 130, 70, "#FFF6E8", "#B5443A", "The farmhouse", "var(--blush)",
@@ -61,13 +61,13 @@ export function hfarmArt(){
     <g filter="url(#wob)">${lav}</g>${HIVE_SPOTS.map(([x, y], i) => hive(x, y, HIVE_COLS[i], hiveFill(st, i), i)).join("")}
     ${tapeLabel(250, 266, "Beehives", "#F3E1A0", 11)}</g>`;
   // the paddocks, the animals, a trough, and a cable spool for the goats to climb
-  const cows = `<g data-place="cows" aria-label="The cow paddock"><ellipse class="hov" cx="135" cy="480" rx="90" ry="10" style="fill:var(--butter)"/>${paddock(30, 300, 240, 466)}
-    ${sk(`<rect x="182" y="440" width="44" height="14" rx="3" style="fill:#9AA9B8"/><rect x="185" y="442" width="38" height="5" style="fill:#9FD3E8"/>`, `<rect x="182" y="440" width="44" height="14" rx="3"/>`)}
-    ${cowArt(84, 352, COWS[0], 0)}${cowArt(160, 410, COWS[1], 1, true)}${cowArt(196, 344, COWS[2], 2, true)}${tapeLabel(135, 492, "Cows", "#F3E7C9", 11)}</g>`;
-  const goats = `<g data-place="goats" aria-label="The goat paddock"><ellipse class="hov" cx="385" cy="480" rx="90" ry="10" style="fill:var(--butter)"/>${paddock(280, 300, 490, 466)}
-    ${sk(`<ellipse cx="440" cy="392" rx="26" ry="9" style="fill:#B98A5A"/><rect x="420" y="364" width="40" height="28" style="fill:#C9A27E"/><ellipse cx="440" cy="364" rx="26" ry="9" style="fill:#D9B48A"/><path d="M300 440 l30 -26 l30 26" style="fill:none;stroke:#8A6A52" stroke-width="4"/>`,
-      `<ellipse cx="440" cy="364" rx="26" ry="9"/><path d="M414 364 v28 M466 364 v28"/><path d="M300 440 l30 -26 l30 26"/>`)}
-    ${goatArt(440, 350, GOATS[0], 0)}${goatArt(328, 404, GOATS[1], 1)}${goatArt(372, 344, GOATS[2], 2, true)}${goatArt(400, 430, GOATS[3], 3, true)}${tapeLabel(385, 492, "Goats", "#E3EED2", 11)}</g>`;
+  const cows = `<g data-place="cows" aria-label="The cow paddock"><ellipse class="hov" cx="135" cy="484" rx="80" ry="10" style="fill:var(--butter)"/>${paddock(54, 336, 216, 470)}
+    ${sk(`<rect x="160" y="444" width="44" height="14" rx="3" style="fill:#9AA9B8"/><rect x="163" y="446" width="38" height="5" style="fill:#9FD3E8"/>`, `<rect x="160" y="444" width="44" height="14" rx="3"/>`)}
+    ${cowArt(92, 384, COWS[0], 0)}${cowArt(140, 430, COWS[1], 1, true)}${cowArt(180, 378, COWS[2], 2, true)}${tapeLabel(135, 496, "Cows", "#F3E7C9", 11)}</g>`;
+  const goats = `<g data-place="goats" aria-label="The goat paddock"><ellipse class="hov" cx="385" cy="484" rx="80" ry="10" style="fill:var(--butter)"/>${paddock(304, 336, 466, 470)}
+    ${sk(`<ellipse cx="430" cy="410" rx="24" ry="8" style="fill:#B98A5A"/><rect x="412" y="384" width="36" height="26" style="fill:#C9A27E"/><ellipse cx="430" cy="384" rx="24" ry="8" style="fill:#D9B48A"/><path d="M318 452 l26 -22 l26 22" style="fill:none;stroke:#8A6A52" stroke-width="4"/>`,
+      `<ellipse cx="430" cy="384" rx="24" ry="8"/><path d="M406 384 v26 M454 384 v26"/><path d="M318 452 l26 -22 l26 22"/>`)}
+    ${goatArt(430, 370, GOATS[0], 0)}${goatArt(342, 412, GOATS[1], 1)}${goatArt(372, 372, GOATS[2], 2, true)}${goatArt(404, 444, GOATS[3], 3, true)}${tapeLabel(385, 496, "Goats", "#E3EED2", 11)}</g>`;
   // the farm stand: a little striped awning over crates of milk bottles, honey jars and eggs, an honesty tin
   const stand = `<g data-place="fstand" aria-label="Farm stand"><ellipse class="hov" cx="130" cy="560" rx="40" ry="9" style="fill:var(--butter)"/>
     ${sk(`<rect x="100" y="530" width="60" height="24" rx="2" style="fill:#C9A27E"/><path d="M94 530 h72 l-6 -16 h-60z" style="fill:#FFFDF6"/>${[0, 1, 2, 3].map(i => `<path d="M${100 + i*16} 514 h8 l1 16 h-10z" style="fill:#B5443A"/>`).join("")}
