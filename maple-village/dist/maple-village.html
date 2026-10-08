@@ -2512,9 +2512,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     hfreezer: { scene: "bay", name: "Honesty freezer", door: [474, 336], spot: true, line: "The honesty freezer: little cups while the shop's shut." },
     dbike: { scene: "bay", name: "Delivery bike", door: [300, 290], spot: true, line: "The delivery bike." },
     cocoa: { scene: "bay", name: "The Cocoa Room", short: "the Cocoa Room", door: [396, 516], mark: [396, 372] },
-    toFarmB: { scene: "bay", name: "Gate to Honeybrook Farm", door: [498, 526], spot: true, bridge: "hfarm", mark: [490, 470], line: "East through the gate to Honeybrook Farm." },
+    toFarmB: { scene: "bay", name: "Gate to Honeybrook Farm", door: [500, 378], spot: true, bridge: "hfarm", mark: [490, 320], line: "East through the gate to Honeybrook Farm." },
     // Honeybrook Farm (Felix and Elena's), east of the bay (art/hfarm.js, game/hfarm.js)
-    toBayF: { scene: "hfarm", name: "Gate to the bay", door: [22, 560], spot: true, bridge: "bay", mark: [30, 506], line: "West through the gate to the bay." },
+    toBayF: { scene: "hfarm", name: "Gate to the bay", door: [22, 286], spot: true, bridge: "bay", mark: [30, 226], line: "West through the gate to the bay." },
     hfEast: { scene: "hfarm", name: "The lane to the cottages", door: [498, 560], spot: true, mark: [490, 506], line: "The lane east to Honeybrook's cottages and the station. Still being built: soon!" },
     farmhouse: { scene: "hfarm", name: "The farmhouse", door: [105, 246], spot: true, mark: [105, 100], line: "Felix and Elena's farmhouse. The kettle's always on." },
     barn: { scene: "hfarm", name: "The barn", door: [400, 250], spot: true, mark: [400, 90], line: "The big red barn: hay up top, milking stalls below. Elena's setting up a dairy and a cheese cave inside." },
@@ -2536,7 +2536,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var isWeekend = () => [0, 6].includes(new Date(now() + 8 * H).getUTCDay());
   var baseSpotFor = (s) => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
   var BRIDGES = { village: { base: "toBase", lane: "toLane", field: "toField" }, base: { village: "toTown", vineyard: "toVine", orchard: "toOrchard" }, lane: { village: "toTownE", vineyard: "toVineL" }, vineyard: { base: "toBaseV", lane: "toLaneV" }, orchard: { base: "toBaseO", flowers: "toFlowers", field: "toFieldO" }, field: { village: "toTownF", orchard: "toOrchardN", shore: "toShoreF" }, flowers: { orchard: "toOrchardF", shore: "toShoreFl" }, shore: { field: "toFieldS", flowers: "toFlowersS", bay: "toBay" }, bay: { shore: "toShoreB", hfarm: "toFarmB" }, hfarm: { bay: "toBayF" } };
-  var ARRIVE = { "village>base": [260, 132], "base>village": [260, 578], "village>lane": [48, 330], "lane>village": [426, 238], "base>vineyard": [52, 300], "vineyard>base": [462, 470], "lane>vineyard": [290, 72], "vineyard>lane": [262, 586], "base>orchard": [470, 278], "orchard>base": [60, 196], "orchard>flowers": [466, 293], "flowers>orchard": [56, 278], "village>field": [470, 198], "field>village": [52, 212], "orchard>field": [260, 592], "field>orchard": [260, 184], "field>shore": [470, 304], "shore>field": [56, 300], "flowers>shore": [250, 590], "shore>flowers": [56, 190], "shore>bay": [250, 590], "bay>shore": [250, 96], "bay>hfarm": [56, 560], "hfarm>bay": [462, 526] };
+  var ARRIVE = { "village>base": [260, 132], "base>village": [260, 578], "village>lane": [48, 330], "lane>village": [426, 238], "base>vineyard": [52, 300], "vineyard>base": [462, 470], "lane>vineyard": [290, 72], "vineyard>lane": [262, 586], "base>orchard": [470, 278], "orchard>base": [60, 196], "orchard>flowers": [466, 293], "flowers>orchard": [56, 278], "village>field": [470, 198], "field>village": [52, 212], "orchard>field": [260, 592], "field>orchard": [260, 184], "field>shore": [470, 304], "shore>field": [56, 300], "flowers>shore": [250, 590], "shore>flowers": [56, 190], "shore>bay": [250, 590], "bay>shore": [250, 96], "bay>hfarm": [60, 284], "hfarm>bay": [462, 374] };
   function nextHop(from, to) {
     if (from === to) return null;
     if (BRIDGES[from] && BRIDGES[from][to]) return to;
@@ -14094,7 +14094,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     `<rect x="414" y="268" width="44" height="28" rx="4"/><rect x="418" y="264" width="36" height="6" rx="2"/><rect x="440" y="252" width="14" height="12" rx="2"/><path d="M443 255 h8"/><rect x="420" y="276" width="20" height="10" rx="2"/>`
   )}
   <text x="430" y="284" text-anchor="middle" font-family="Klee One,serif" font-size="5.5" fill="#C2505F" pointer-events="none">honesty</text>
-</g>${tapeLabel(474, 348, "Honesty freezer", "var(--card)", 9)}</g>`;
+</g>${tapeLabel(420, 344, "Honesty freezer", "var(--card)", 9)}</g>`;
   var bike = () => `<g data-place="dbike" aria-label="Delivery bike"><g transform="translate(-186 -56)"><ellipse class="hov" cx="482" cy="340" rx="28" ry="7" style="fill:var(--butter)"/>
   ${sk(
     `<circle cx="468" cy="330" r="9" style="fill:none"/><circle cx="496" cy="330" r="9" style="fill:none"/><path d="M468 330 l10 -16 h12 l6 16 M478 314 l-4 -6 M490 314 l2 -8 h6" fill="none" style="stroke:#7FCBB4" stroke-width="3"/><rect x="458" y="302" width="18" height="12" rx="2" style="fill:#F2A0B8"/>`,
@@ -14123,7 +14123,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <g pointer-events="none">${[[40, 90], [100, 150], [30, 260], [110, 470], [50, 540], [120, 600]].map(([x, y]) => `<path class="ripple" d="M${x} ${y} q5 -3.5 10 0 q5 3.5 10 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.3" opacity=".8"/>`).join("")}</g>
     <g filter="url(#wob)"><path d="M250 640 V300 H386 V266" fill="none" style="stroke:#D9BE94" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M250 640 V300 H386" fill="none" style="stroke:#C9A87A" stroke-width="20" stroke-dasharray="1.4 9" opacity=".7"/></g>
-    ${pine2(490, 150, 1)}${pine2(300, 140, 0.9)}${pine2(500, 470, 0.95)}${pine2(398, 636, 0.78)}${pine2(456, 648, 0.7)}
+    ${pine2(490, 150, 1)}${pine2(300, 140, 0.9)}${pine2(500, 470, 0.95)}${pine2(398, 636, 0.78)}${pine2(470, 624, 0.85)}
     ${flowers([[300, 320, "#EFA3A6"], [470, 300, "#F3C969"], [290, 470, "#C3CDEE"], [480, 380, "#EFA3A6"], [440, 570, "#F3C969"]])}`;
     const sea = dolphin2(70, 210, 13, 2) + dolphin2(56, 500, 16, 7);
     const shop = house("scoopshop", 316, 180, 140, 82, "#E3F2EC", "#F2A0B8", name, "var(--blush)", {
@@ -14162,7 +14162,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <text x="396" y="424.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="${ccName.length > 16 ? 6.5 : 8}" fill="#6B4430" pointer-events="none">${ccName.replace(/[<&>]/g, "").slice(0, 24)}</text>
     ${ccUps.window ? `<g pointer-events="none">${sk(`<path d="M346 494 h24 M350 486 h16 M354 478 h8" style="stroke:#F3C969" stroke-width="2"/>`, `<path d="M358 494 v-18"/>`)}${[0, 1, 2, 3, 4, 5].map((i) => `<circle class="twinkle" cx="${339 + i * 7.6}" cy="${465 + i % 2 * 2}" r="1.3" fill="#F3C969" style="animation-delay:${(i * 0.3).toFixed(1)}s"/>`).join("")}${[[352, 491], [364, 491], [355, 483], [361, 483], [358, 475]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${["#4A2E22", "#C2505F", "#8A5A3A", "#F3E7C9", "#4A2E22"][i]}" stroke="#3A2E28" stroke-width=".6"/>`).join("")}</g>` : ""}
     ${tapeLabel(396, 540, ccName.replace(/[<&>"]/g, "").slice(0, 24), "#E8D3BC", 10)}</g>`;
-    return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17 * 60, 6 * 60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? bike() : "") + deck + (cc ? cocoa : reno) + archGate("toFarmB", 498, 520, "Honeybrook Farm", 462, 568, "#F3E1A0", "Gate east to Honeybrook Farm") + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
+    return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17 * 60, 6 * 60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? bike() : "") + deck + (cc ? cocoa : reno) + archGate("toFarmB", 500, 374, "Honeybrook", 486, 404, "#F3E1A0", "Gate east to Honeybrook Farm") + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
   }
 
   // src/game/hfarm.js
@@ -14307,7 +14307,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="60" rx="300" ry="70" style="fill:var(--grass2)"/><ellipse cx="130" cy="520" rx="120" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="600" rx="110" ry="40" style="fill:var(--grass2)"/></g>
     ${tree(30, 64, 0.7)}${tree(486, 70, 0.75)}
-    <g filter="url(#wob)"><path d="M0 560 H520 M260 560 V262 M260 270 C200 270 120 262 105 246 M260 270 C330 270 380 262 400 246 M130 560 V580" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M0 282 H250 M100 560 H520 M260 560 V262 M260 270 C200 270 120 262 105 246 M260 270 C330 270 380 262 400 246 M130 560 V580" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
     ${rail(0, 520, 122)}
     ${flowers([[60, 290, "#EFA3A6"], [470, 290, "#F3C969"], [200, 520, "#C3CDEE"], [330, 610, "#EFA3A6"], [40, 610, "#F3C969"]])}`;
     const farmhouse = house(
@@ -14357,7 +14357,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     )}
     ${tapeLabel(130, 584, "Farm stand", "#F4C7CF", 10)}</g>`;
     const sign = sk(`<rect x="330" y="574" width="60" height="22" rx="2" style="fill:#FFF6E8"/><path d="M338 596 v12 M382 596 v12" stroke-width="3"/>`, `<rect x="330" y="574" width="60" height="22" rx="2"/>`) + `<text x="360" y="588" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="7.4" fill="#8E2C2C" pointer-events="none">Honeybrook Farm</text>`;
-    return lampDefs + ground + farmhouse + hives + barn + cows + goats + stand + sign + archGate("toBayF", 22, 560, "The bay", 40, 516, "var(--sky)", "Gate west to the bay") + archGate("hfEast", 498, 560, "Cottages", 476, 516, "var(--butter)", "The lane east to the cottages") + streetLamp(300, 540);
+    return lampDefs + ground + farmhouse + hives + barn + cows + goats + stand + sign + archGate("toBayF", 22, 280, "The bay", 50, 322, "var(--sky)", "Gate west to the bay") + archGate("hfEast", 498, 560, "Cottages", 476, 516, "var(--butter)", "The lane east to the cottages") + streetLamp(300, 540);
   }
 
   // src/game/scoop.js

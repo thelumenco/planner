@@ -1235,3 +1235,6 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - In the tourist list, Rosa and Bastien replace them (npcs.js, tours.js `TOURISTS`).
 - **Tests:** a new "Honeybrook Farm" block. The big-goals test now starts with 13,000 coins, for the new boat price.
 - **Still to come, step 2:** the dairy and cheese cave inside the barn (cheeses that take time, with suggested names) and the honey hut.
+- **Round 94b:**
+  - The bay's gate to the farm moved up into the gap between the Scoop Shack and the Cocoa Room (500,374), labelled "Honeybrook". The honesty freezer's label moved left to make room, and the bottom-right pine is back where it was.
+  - The farm's west gate lines up with it, at (22,280), on a little track between the farmhouse and the cow paddock.

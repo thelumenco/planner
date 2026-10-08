@@ -29,7 +29,7 @@ const honestyFreezer = () => `<g data-place="hfreezer" aria-label="Honesty freez
   ${sk(`<rect x="414" y="268" width="44" height="28" rx="4" style="fill:#DCEBF2"/><rect x="418" y="264" width="36" height="6" rx="2" style="fill:#F6FBFD"/><rect x="440" y="252" width="14" height="12" rx="2" style="fill:#C9A87A"/><rect x="420" y="276" width="20" height="10" rx="2" style="fill:#FFFDF6"/>`,
     `<rect x="414" y="268" width="44" height="28" rx="4"/><rect x="418" y="264" width="36" height="6" rx="2"/><rect x="440" y="252" width="14" height="12" rx="2"/><path d="M443 255 h8"/><rect x="420" y="276" width="20" height="10" rx="2"/>`)}
   <text x="430" y="284" text-anchor="middle" font-family="Klee One,serif" font-size="5.5" fill="#C2505F" pointer-events="none">honesty</text>
-</g>${tapeLabel(474, 348, "Honesty freezer", "var(--card)", 9)}</g>`;
+</g>${tapeLabel(420, 344, "Honesty freezer", "var(--card)", 9)}</g>`;
 const bike = () => `<g data-place="dbike" aria-label="Delivery bike"><g transform="translate(-186 -56)"><ellipse class="hov" cx="482" cy="340" rx="28" ry="7" style="fill:var(--butter)"/>
   ${sk(`<circle cx="468" cy="330" r="9" style="fill:none"/><circle cx="496" cy="330" r="9" style="fill:none"/><path d="M468 330 l10 -16 h12 l6 16 M478 314 l-4 -6 M490 314 l2 -8 h6" fill="none" style="stroke:#7FCBB4" stroke-width="3"/><rect x="458" y="302" width="18" height="12" rx="2" style="fill:#F2A0B8"/>`,
     `<circle cx="468" cy="330" r="9"/><circle cx="496" cy="330" r="9"/><rect x="458" y="302" width="18" height="12" rx="2"/><path d="M462 308 h10" opacity=".6"/>`)}
@@ -50,7 +50,7 @@ export function bayArt(){
     <g pointer-events="none">${[[40, 90], [100, 150], [30, 260], [110, 470], [50, 540], [120, 600]].map(([x, y]) => `<path class="ripple" d="M${x} ${y} q5 -3.5 10 0 q5 3.5 10 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.3" opacity=".8"/>`).join("")}</g>
     <g filter="url(#wob)"><path d="M250 640 V300 H386 V266" fill="none" style="stroke:#D9BE94" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M250 640 V300 H386" fill="none" style="stroke:#C9A87A" stroke-width="20" stroke-dasharray="1.4 9" opacity=".7"/></g>
-    ${pine(490, 150, 1)}${pine(300, 140, .9)}${pine(500, 470, .95)}${pine(398, 636, .78)}${pine(456, 648, .7)}
+    ${pine(490, 150, 1)}${pine(300, 140, .9)}${pine(500, 470, .95)}${pine(398, 636, .78)}${pine(470, 624, .85)}
     ${flowers([[300, 320, "#EFA3A6"], [470, 300, "#F3C969"], [290, 470, "#C3CDEE"], [480, 380, "#EFA3A6"], [440, 570, "#F3C969"]])}`;
   const sea = dolphin(70, 210, 13, 2) + dolphin(56, 500, 16, 7);
   // The Scoop Shack: mint walls, a pink and white striped awning, a big cone on the roof and the sign
@@ -90,6 +90,6 @@ export function bayArt(){
     ${ccUps.window ? `<g pointer-events="none">${sk(`<path d="M346 494 h24 M350 486 h16 M354 478 h8" style="stroke:#F3C969" stroke-width="2"/>`, `<path d="M358 494 v-18"/>`)}${[0, 1, 2, 3, 4, 5].map(i => `<circle class="twinkle" cx="${339 + i*7.6}" cy="${465 + (i % 2)*2}" r="1.3" fill="#F3C969" style="animation-delay:${(i*.3).toFixed(1)}s"/>`).join("")}${[[352, 491], [364, 491], [355, 483], [361, 483], [358, 475]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${["#4A2E22", "#C2505F", "#8A5A3A", "#F3E7C9", "#4A2E22"][i]}" stroke="#3A2E28" stroke-width=".6"/>`).join("")}</g>` : ""}
     ${tapeLabel(396, 540, ccName.replace(/[<&>"]/g, "").slice(0, 24), "#E8D3BC", 10)}</g>`;
   return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17*60, 6*60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? bike() : "") + deck + (cc ? cocoa : reno)
-    + archGate("toFarmB", 498, 520, "Honeybrook Farm", 462, 568, "#F3E1A0", "Gate east to Honeybrook Farm")
+    + archGate("toFarmB", 500, 374, "Honeybrook", 486, 404, "#F3E1A0", "Gate east to Honeybrook Farm")
     + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
 }

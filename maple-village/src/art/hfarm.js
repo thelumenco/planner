@@ -42,7 +42,7 @@ export function hfarmArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="60" rx="300" ry="70" style="fill:var(--grass2)"/><ellipse cx="130" cy="520" rx="120" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="600" rx="110" ry="40" style="fill:var(--grass2)"/></g>
     ${tree(30, 64, .7)}${tree(486, 70, .75)}
-    <g filter="url(#wob)"><path d="M0 560 H520 M260 560 V262 M260 270 C200 270 120 262 105 246 M260 270 C330 270 380 262 400 246 M130 560 V580" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M0 282 H250 M100 560 H520 M260 560 V262 M260 270 C200 270 120 262 105 246 M260 270 C330 270 380 262 400 246 M130 560 V580" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
     ${rail(0, 520, 122)}
     ${flowers([[60, 290, "#EFA3A6"], [470, 290, "#F3C969"], [200, 520, "#C3CDEE"], [330, 610, "#EFA3A6"], [40, 610, "#F3C969"]])}`;
   const farmhouse = house("farmhouse", 40, 168, 130, 70, "#FFF6E8", "#B5443A", "The farmhouse", "var(--blush)",
@@ -77,7 +77,7 @@ export function hfarmArt(){
   const sign = sk(`<rect x="330" y="574" width="60" height="22" rx="2" style="fill:#FFF6E8"/><path d="M338 596 v12 M382 596 v12" stroke-width="3"/>`, `<rect x="330" y="574" width="60" height="22" rx="2"/>`)
     + `<text x="360" y="588" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="7.4" fill="#8E2C2C" pointer-events="none">Honeybrook Farm</text>`;
   return lampDefs + ground + farmhouse + hives + barn + cows + goats + stand + sign
-    + archGate("toBayF", 22, 560, "The bay", 40, 516, "var(--sky)", "Gate west to the bay")
+    + archGate("toBayF", 22, 280, "The bay", 50, 322, "var(--sky)", "Gate west to the bay")
     + archGate("hfEast", 498, 560, "Cottages", 476, 516, "var(--butter)", "The lane east to the cottages")
     + streetLamp(300, 540);
 }
