@@ -162,6 +162,7 @@ export const ITEMS = {
   grape_white:{n:"White grapes", kind:"ingredient", sell:2, what:"for gelato at the Scoop Shack, or back in the crates for wine"},
   loaf:{n:"Loaf of bread", kind:"ingredient", sell:2, what:"baked in the wine shop's oven"},
   milk:{n:"Milk", kind:"ingredient", price:4, tab:"deli", sell:3, what:"for gelato at the Scoop Shack, or two make a cheese in the wine shop's kitchen press (your goats give it too)"},
+  goatmilk:{n:"Goat's milk", kind:"ingredient", price:5, sell:3, what:"from Honeybrook Farm's goats: for gelato at the Scoop Shack, and soon goat's cheese at the farm's dairy"},
   egg:{n:"Fresh egg", kind:"food", sell:5, say:"A fresh egg from our hens! Breakfast sorted."},
   tulip:{e:"🌷", n:"Tulip", kind:"flower", sell:2, say:"For me? I'll tuck it behind my ear."},
   sunflower:{e:"🌻", n:"Sunflower", kind:"flower", sell:3, say:"So sunny! Thank you."},

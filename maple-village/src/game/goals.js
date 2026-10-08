@@ -10,7 +10,7 @@ import { icon } from "../art/icons.js";
 export const GOALS = {
   scooter: {n: "Scooter", price: 800, where: "garage", line: "A little electric scooter. Zips you from screen to screen about half again as fast as walking."},
   car: {n: "Cream convertible", price: 3500, where: "garage", line: "A cream convertible, roof down. Room for you, Maple and Evan, and more than twice as fast as walking."},
-  boat: {n: "Dolphin cruise boat", price: 2000, where: "shore", line: "A little cruise boat moored at the end of the jetty. Take the family out to see the dolphins up close."},
+  boat: {n: "Dolphin cruise boat", price: 4500, where: "shore", line: "A little cruise boat moored at the end of the jetty. Take the family out to see the dolphins up close."},
   cocoa: {n: "The Cocoa Room", price: 1000, where: "bay", line: "The boarded-up shopfront on the bay, turned into your own chocolate shop: a shop front with a wall of bars, and a kitchen where you make chocolate from the bean. Amara will run the counter."},
   cellar: {n: "Cellar door", price: 2500, where: "wineshop", line: "A cellar door extension off the wine shop: barrel racks, a tasting bar and a wall of every wine you've made. Visitors love a cellar door, and once a month it hosts the wine club."}
 };

@@ -106,7 +106,7 @@ function finish(c, t = now()){
 /* ---------- bonbons ---------- */
 export const SHELL = 6, TRAY = 12, CASE = 6;
 // what can go in a bonbon: the gelato fridge's ingredients, minus the savoury ones
-const NOT_FILLING = ["milk", "egg", "olives", "corn", "carrot", "tomato", "housechoc"];
+const NOT_FILLING = ["milk", "goatmilk", "egg", "olives", "corn", "carrot", "tomato", "housechoc"];
 // and wine from Mel's own bottles: one bottle off the wine shop shelf makes 4 fillings
 export const WINE_FILL = {wine_red: ["Red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Rosé", "Rosé", "#E98AA0"], wine_white: ["White wine", "White Wine", "#E8D57A"], wine_sparkling: ["Sparkling wine", "Bubbly", "#F3E7B0"]};
 export const WINE_FILLS = 4;

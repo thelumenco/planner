@@ -1206,3 +1206,32 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - The decor styles are Cottagecore, Japandi, Coastal, Mid-century, Peranakan and Scandi. Turnover is hands-on by default, with a housekeeper available to hire.
   - Cheeses get suggested names, like wines and bonbons.
 - **Round 93:** the cacao tree moved inside the orchard, on the east side by the fruit trees (`cacaoTree` at 484,470). It's a tappable place (`cacao`, world.js) that says when the next sack is due, and Ma Ma chimes in if she's there.
+
+### Round 94: Honeybrook Farm, step 1 (the farm screen)
+- **Decisions:**
+  - The dolphin cruise boat now costs 4,500 (goals.js), so it's the priciest vehicle. The campervan will be about 3,800, above the car's 3,500.
+  - The campervan stays parked as a place to stay, with future road trips off the map. Train times go on a platform board only, not the village calendar, and train tickets will later lead to other destinations.
+  - Honeybrook (the brook) runs along the top of the cottage lane, farm and bay, under the railway, and out to sea. It never crosses the field, so the market stays clear.
+  - The river: the waterfall in the woods is the source. It runs down through Makers' Lane and the vineyard, along the top of the home screen, through the orchard, into the lake, and out to the foreshore.
+  - There's no gate between the farm and the field: one would land on the market stall row.
+- **The screen:** `hfarm` (OUTDOOR), east of the bay through `toFarmB` (bay.js gate at 498,520) and back through `toBayF`.
+  - `hfEast` is the future lane to the cottages (just a line for now).
+  - Art is in `src/art/hfarm.js` (`hfarmArt`):
+    - The top strip (y < 120) is kept for the railway and the brook. The shared post-and-rail fence runs at y=122.
+    - Along the top: the farmhouse (`house()`), the lavender bed with five painted hives, and a red gambrel barn.
+    - The cow and goat paddocks below, with SMIL grazing and hopping, a trough and a climbing spool.
+    - The farm stand, a "Honeybrook Farm" sign and a lamp.
+  - Obstacles are in paths.js `hfarm`. The bay's bottom-right pine moved to make room for the gate.
+- **Logic:** `src/game/hfarm.js`, state in `F.hfarm`.
+  - `feedHerd` is per herd, each day. `brush` is per animal, each day, for XP and a line.
+  - `milkOne` / `milkHerd` work 6–10am, once a day, if the animal was fed today or yesterday. A cow gives 2 `milk`, a goat 1 `goatmilk`.
+  - Five hives fill over `HIVE_DAYS` (3) days, staggered from the start. `collectHives` gives 2 honey per full hive.
+  - The farm stand (`STAND`) sells milk 3, goat's milk 4, honey 6 and eggs 3.
+  - Panels: `herdPanel`, `hivesPanel`, `standPanel`. core.js `hfView` and `wireFarm` (`data-hf`) handle them, with Felix, Elena and Evan lines.
+- **Goat's milk:** a new ingredient (`goatmilk`, items.js, icon, scoop.js INGR). `isDairy` makes a flavour with it a gelato. It isn't a bonbon filling.
+- **Felix and Elena** are farm residents now (npcs.js), not tourists.
+  - Felix works the hives and the paths, with a lunch sit by the farmhouse. Elena works the paddocks and the barn front.
+  - They still keep their Sunday market stalls (eventSlot).
+  - In the tourist list, Rosa and Bastien replace them (npcs.js, tours.js `TOURISTS`).
+- **Tests:** a new "Honeybrook Farm" block. The big-goals test now starts with 13,000 coins, for the new boat price.
+- **Still to come, step 2:** the dairy and cheese cave inside the barn (cheeses that take time, with suggested names) and the honey hut.

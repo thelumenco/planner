@@ -247,8 +247,8 @@ export const NPCS = [
     ["ben", "Ben", {skin: "#E8C4A0", hair: "#B5562E", hairStyle: "short", top: "#6E9FD6", bottom: "#5E5A55", extra: "satchel"}, "Here on a cycling holiday"],
     ["clara", "Clara", {skin: "#F2D3BC", hair: "#D9B46A", hairStyle: "long", top: "#E8566C", bottom: "#2F3B73"}, "On a weekend away"],
     ["dev", "Dev", {skin: "#A8754F", hair: "#1F1A17", hairStyle: "short", top: "#F3E7B0", bottom: "#4A5568", hat: "cap"}, "Food blogger, just passing through"],
-    ["elena", "Elena", {skin: "#D9A882", hair: "#5A3A2A", hairStyle: "bun", top: "#9C8CD9", bottom: "#3E4A43", extra: "satchel"}, "Wine lover on a tasting trip"],
-    ["felix", "Felix", {skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#7FB069", bottom: "#8A6A52", extra: "glasses"}, "Retired, touring the countryside"],
+    ["rosa", "Rosa", {skin: "#D9A882", hair: "#2A211D", hairStyle: "long", top: "#C2505F", bottom: "#3E4A43", extra: "satchel"}, "Wine lover on a tasting trip"],
+    ["bastien", "Bastien", {skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#6E9FD6", bottom: "#8A6A52", extra: "glasses"}, "Retired, touring the countryside"],
     ["grace", "Grace", {skin: "#C99A78", hair: "#2A211D", hairStyle: "long", top: "#F4C7CF", bottom: "#5E6E8C", hat: "sunhat"}, "Visiting her sister for the week"],
     ["hiro", "Hiro", {skin: "#EAC4A4", hair: "#231C19", hairStyle: "spiky", top: "#3E6B8C", bottom: "#2F2B28", extra: "satchel"}, "Here for the farm tours"]
   ].map(([id, name, look, job]) => ({id, pitch: .9 + (id.charCodeAt(0) % 5)*.08, name, job, tourist: true, look, routine: [],
@@ -270,6 +270,22 @@ export const NPCS = [
     intro: `Hi! I'm ${name}. ${job}. We're here Tuesdays and Thursdays, half five till ten.`,
     lines: ["Busy night! Everyone's out.", "Have you heard the band? They're so good.", "Love this little town. Best market on our route.", "Come back Thursday, I'll have a new batch."],
     away: `${name}'s packed up and driven home.`})),
+  // Felix and Elena run Honeybrook Farm, east of the bay (game/hfarm.js): Felix keeps the bees, Elena the cows, goats
+  // and the dairy. Sunday mornings they're at their market stalls (tours.js MARKET), selling the farm's honey and cheese
+  {id: "felix", pitch: .85, name: "Felix", job: "Keeps the bees at Honeybrook Farm",
+    look: {skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#7FB069", bottom: "#8A6A52", extra: "glasses", hat: "sunhat"},
+    routine: [slot("07:00", "12:00", "hfarm", [[186, 286], [310, 286], [300, 520]]), slot("12:00", "13:00", "hfarm", [60, 270], {act: "sit"}),
+      slot("13:00", "18:00", "hfarm", [[186, 286], [200, 524], [300, 520], [310, 286]])],
+    intro: "Felix. I keep the bees up here at Honeybrook. Lavender honey, orchard blossom, wildflower... they decide, not me.",
+    lines: ["The bees are cheerful today. Can you hear them?", "Never wear blue near a hive. They think you're a flower.", "Elena says I talk to the bees more than to her. She's not wrong.", "Hive three is my favourite. Don't tell the others."],
+    hellos: ["Morning, Mel!", "Ah, a helper!"], away: "Felix is in the farmhouse with his feet up."},
+  {id: "elena", pitch: 1.05, name: "Elena", job: "Runs the dairy at Honeybrook Farm",
+    look: {skin: "#D9A882", hair: "#5A3A2A", hairStyle: "bun", top: "#9C8CD9", bottom: "#3E4A43", extra: "apron"},
+    routine: [slot("06:00", "11:00", "hfarm", [[80, 512], [260, 400], [440, 512]]), slot("11:00", "13:00", "hfarm", [458, 270]),
+      slot("13:00", "18:00", "hfarm", [[200, 600], [260, 524], [440, 512], [458, 270]])],
+    intro: "I'm Elena. Cows, goats, and soon a proper cheese cave in the barn. The cheese at my market stall? Aged right here.",
+    lines: ["Daisy's the boss of the paddock. Mochi just pretends.", "Milking at six. The goats prefer six-fifteen.", "A good cheese takes patience. So does a good goat.", "Pepper ate my notebook again."],
+    hellos: ["Hi Mel! Grab a bucket.", "Morning! Hay's in the barn."], away: "Elena's done for the day. Even the goats are asleep."},
   // Amara serves at the Cocoa Room's counter (once Mel opens it, goals.js "cocoa"), Tuesday to Sunday
   {id: "amara", pitch: 1.15, name: "Amara", job: "Serves at the Cocoa Room",
     look: {skin: "#A8754F", hair: "#1F1A17", hairStyle: "bun", top: "#8A5A3A", bottom: "#F3E7C9", extra: "apron"},

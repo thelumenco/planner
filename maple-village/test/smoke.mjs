@@ -1583,7 +1583,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   page.on("pageerror", e => errors.push(`goals pageerror: ${e.message}`));
   const gf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { if (!/richpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
-    f.coins = 10500; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+    f.coins = 13000; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-06"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-06&richpatch=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(800);
@@ -1598,7 +1598,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-goal="scooter"]'); await page.waitForTimeout(400);
   check(await gf().then(f => f.goals.scooter && f.ride === "scooter"), "a scooter, kept in the garage");
   await page.click('#ctx [data-goal="car"]'); await page.waitForTimeout(400);
-  check(await gf().then(f => f.goals.car && f.ride === "car" && f.coins === 10500 - 800 - 3500), "and a cream convertible");
+  check(await gf().then(f => f.goals.car && f.ride === "car" && f.coins === 13000 - 800 - 3500), "and a cream convertible");
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(600);
   await page.locator('#world [data-place="toVine"]').dispatchEvent("click"); await page.waitForTimeout(250);
   check(await page.locator("#mel.drive").count() === 1 && await page.locator("#mel.withEvan").count() === 1, "outdoors Mel drives the convertible between places, with Evan and Maple aboard");
@@ -1937,6 +1937,48 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#world [data-place="mstall9"]').count() === 1 && (await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("mateo"), "the Cocoa Room cart at the Sunday farmers market, with Mateo");
   await page.locator('#world [data-place="mstall9"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
   check(/farmers market cart/.test(await page.locator("#ctx").innerText()), "and Mel can serve from it");
+  await page.close();
+}
+{
+  // Honeybrook Farm, east of the bay: Felix's bees, Elena's cows and goats, the farm stand
+  console.log("\nHoneybrook Farm");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`farm pageerror: ${e.message}`));
+  page.on("dialog", d => { errors.push("the farm used a browser pop-up"); d.dismiss(); });
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const npcs = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  await page.addInitScript(() => { if (!/hfpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 50; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=08:00&date=2026-10-07"); await page.waitForTimeout(900);
+  await page.goto(url + "?seed=1&time=08:00&date=2026-10-07&hfpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
+  check(await page.locator('#world [data-place="toFarmB"]').count() === 1, "a gate on the bay's east side leads to Honeybrook Farm");
+  await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(1800);
+  check(/Honeybrook Farm/.test(await page.locator("#sceneName").textContent()) && await page.locator('#world [data-place="farmhouse"], #world [data-place="barn"], #world [data-place="hives"], #world [data-place="cows"], #world [data-place="goats"], #world [data-place="fstand"]').count() === 6,
+    "the farm: farmhouse, barn, beehives, cow and goat paddocks, farm stand");
+  const who = await npcs(); check(who.includes("felix") && who.includes("elena"), `Felix and Elena are out working (${who.join(", ")})`);
+  const tap = async (place, sel) => { await page.locator(`#world [data-place="${place}"]`).dispatchEvent("click"); await page.waitForSelector(sel, { timeout: 15000 }); };
+  await tap("cows", '#ctx [data-hf="feed"]'); await page.click('#ctx [data-hf="feed"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-hf="brush"][data-k="daisy"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-hf="milkall"]'); await page.waitForTimeout(300);
+  const f1 = await fox(); check(f1.hfarm.fed.daisy === "2026-10-07" && f1.hfarm.brushed.daisy === "2026-10-07" && f1.inv.milk === 6, "hay for the cows, a brush for Daisy, and morning milking: 6 milk");
+  check(await page.locator('#ctx [data-hf="milk"]:not([disabled])').count() === 0, "each cow is milked once a day");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await tap("goats", '#ctx [data-hf="feed"]'); await page.click('#ctx [data-hf="feed"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-hf="milk"][data-k="pepper"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.goatmilk === 1), "a goat gives a bottle of goat's milk");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await tap("hives", '#ctx [data-hf="honey"]'); await page.click('#ctx [data-hf="honey"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.honey >= 2), "a full hive gives Mel two jars of honey");
+  await page.click("#ctx [data-close]").catch(() => {});
+  const c0 = await fox().then(f => f.coins);
+  await tap("fstand", '#ctx [data-hf="buy"][data-k="egg"]'); await page.click('#ctx [data-hf="buy"][data-k="egg"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.egg === 1 && f.coins === c0 - 3), "the farm stand sells eggs (3 coins)");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.goto(url + "?seed=1&time=14:00&date=2026-10-07"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(900);
+  await tap("goats", '#ctx [data-hf="milkall"]');
+  check(await page.locator('#ctx [data-hf="milkall"]').isDisabled(), "milking is mornings only");
   await page.close();
 }
 {

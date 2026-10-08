@@ -51,11 +51,13 @@ export const INGR = {
   hazelnut: ["Hazelnuts", "Hazelnut", "#B98A5A"], coconut: ["Coconut", "Coconut", "#F6F1E8"], matcha: ["Matcha", "Matcha", "#8FB86A"], pandan: ["Pandan", "Pandan", "#7FB86A"],
   gulamelaka: ["Gula melaka", "Gula Melaka", "#9A5A2E"], sesame: ["Black sesame", "Black Sesame", "#4A4440"], mint: ["Mint", "Mint", "#9FD3B2"], banana: ["Bananas", "Banana", "#F3E07A"],
   grape_red: ["Red grapes", "Red Grape", "#7A2E5A"], grape_white: ["White grapes", "White Grape", "#C9D98A"],
-  housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],   // from Mel's own chocolate shop (cocoa.js sendScoop)
+  housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
+  goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],   // from Honeybrook Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)
   ...Object.fromEntries(Object.values(TREES).map(t => [t.fruit, [t.fruit[0].toUpperCase() + t.fruit.slice(1), t.fruit[0].toUpperCase() + t.fruit.slice(1), FRUIT_COL[t.fruit] || "#F3C969"]])),
   ...Object.fromEntries(Object.entries(FLOWERS).map(([id, f]) => ["fl_" + id, [f.n, f.n.replace(/s$/, "").replace(/ie$/, "y").replace("Sweet pea", "Sweet Pea"), f.col || "#F4C7CF"]]))
 };
 export const isIngr = id => id in INGR;
+export const isDairy = ings => ings.includes("milk") || ings.includes("goatmilk");   // milk or goat's milk makes it a gelato
 const word = id => INGR[id][1];
 
 export function scoopState(F){
@@ -153,7 +155,7 @@ const NOTES = ["Best pandan ever. Sorry, only had coins for one! x", "For the li
 const GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"], SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
 const POETIC = ["Dolphin Bay", "Jetty Sunset", "Ma Ma's Garden", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Evan's Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
 export function nameFor(ings){
-  const dairy = ings.includes("milk"), flav = ings.filter(i => i !== "milk"), h = hash(ings.join("+"));
+  const dairy = isDairy(ings), flav = ings.filter(i => i !== "milk"), h = hash(ings.join("+"));
   if (!flav.length) return "Fior di Latte";
   const style = (dairy ? GELATO : SORBET)[h % (dairy ? GELATO.length : SORBET.length)];
   if (flav.length === 1) return `${word(flav[0])} ${style}`;
@@ -162,7 +164,7 @@ export function nameFor(ings){
 }
 const blend = ings => { const cs = ings.map(i => INGR[i][2]).filter(c => c !== "#FFFBEF"); if (!cs.length) return "#FFF6DC";
   const rgb = cs.map(c => [1, 3, 5].map(k => parseInt(c.slice(k, k + 2), 16))), avg = [0, 1, 2].map(k => Math.round(rgb.reduce((a, r) => a + r[k], 0)/rgb.length));
-  const soft = ings.includes("milk") ? .45 : .15;   // milk makes it paler and creamier
+  const soft = isDairy(ings) ? .45 : .15;   // milk makes it paler and creamier
   return "#" + avg.map(v => Math.round(v + (255 - v)*soft).toString(16).padStart(2, "0")).join(""); };
 const keyOf = ings => [...new Set(ings)].sort().join("+");
 export const knownRecipe = (s, ings) => s.recipes.find(r => r.id === keyOf(ings));
@@ -176,7 +178,7 @@ export function discover(F, ings){
   if (!hasAll(s, ings)) return {msg: "The fridge is missing some of that."};
   if (churnFull(s)) return {msg: `The churner's full: two batches are blending and freezing. The next one's ready in ${churnLeft(s.churn[0])}.`};
   useAll(s, ings);
-  const r = {id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: ings.includes("milk"), special: false, found: Date.now()};
+  const r = {id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: isDairy(ings), special: false, found: Date.now()};
   s.recipes.push(r); toChurn(s, r.id, true); registerItems(F);
   return {recipe: r, msg: `A new flavour: ${r.name}! It's in the churner now: blending, then freezing. The first tub's ready in an hour.`};
 }
@@ -403,7 +405,7 @@ export function benchPanel(F, st){
   const made = st.made && recipeOf(s, st.made);
   if (made && !sel.length) h += resultCard(made.col, made.name, `New flavour! ${made.dairy ? "A gelato" : "A dairy-free sorbet"}. It's in the churner: blending, then freezing, ready in an hour.`, true);
   else if (sel.length) { const ss = [...sel].sort(); h += known ? resultCard(known.col, known.name, canMake(s, known) ? "You know this one already. Make another tub?" : "You know this one already.")
-    : resultCard(blend(ss), nameFor(ss), `${ss.includes("milk") ? "A gelato" : "A dairy-free sorbet"}. Something new!`); }
+    : resultCard(blend(ss), nameFor(ss), `${isDairy(ss) ? "A gelato" : "A dairy-free sorbet"}. Something new!`); }
   else h += `<p class="muted">Nothing picked yet.</p>`;
   return h + churnLine(s) + `<div class="actions">${known ? `<button class="btn primary" data-gmake="${esc(known.id)}" ${canMake(s, known) ? "" : "disabled"}>Make another tub</button>` : `<button class="btn primary" data-gmix="1" ${!sel.length || churnFull(s) ? "disabled" : ""}>Mix it</button>`}<button class="btn alt small" data-close="1">Close</button></div>`;
 }

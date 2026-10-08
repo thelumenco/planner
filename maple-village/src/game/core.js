@@ -43,6 +43,8 @@ import { dishArt, glassArt } from "../art/wine.js";
 import { fieldArt, stallFront } from "../art/field.js";
 import { shoreArt } from "../art/shore.js";
 import { bayArt, DECK_SEATS } from "../art/bay.js";
+import { hfarmArt } from "../art/hfarm.js";
+import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush, milkOne, milkHerd, collectHives, buyStand, giveName, fullHives } from "./hfarm.js";
 import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
@@ -255,6 +257,7 @@ const SHED = {
 // keepsakes and pets (companions.js): the keepsake being placed, a placed one's shelf, the pet being adopted (and for
 // whom), and the pet whose card is open
 // the Cocoa Room's open card: "counter", "wall", or a kitchen station ("sacks", "roaster", "grinder", "slab", "moulds")
+let hfView = null;   // Honeybrook Farm: "cows" / "goats" / "hives" / "stand"
 let ccView = null, lastCocoa = 0, ccSt = {shell: "dark", sel: []};   // ccSt: the bonbon table's picks
 const COCOA_IN = ["cocoa", "cocoakitchen"];
 let keepItem = null, keepSpot = null, adoptItem = null, adoptSt = {}, petView = null;
@@ -1436,7 +1439,7 @@ function showPanel(hasCtx, skin){
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
   if (kid.open) { kid.open = null; stopKidGame(); ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1489,6 +1492,7 @@ function ctx(){
     : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, {swap: scSt.swap});
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
   else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "cocoa" ? ccCounterPanel(F, {cart: true, server: isHere("mateo")}) : marketStallPanel(st); }
+  else if (hfView && scene === "hfarm") h = hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
   else if (orView === "pot" && potItem) h = potPanel(F, potItem);
   else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara"), hand: isHere("mateo")}) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccView === "ups" ? ccUpsPanel(F) : ccKitchenPanel(F, ccView);
   else if (keepItem && F.inv[keepItem]) h = keepPanel(F, keepItem);
@@ -1611,6 +1615,7 @@ function ctx(){
   if (scView || (fieldView === "mstall8" && scene === "field")) wireScoop(c);
   wireCompanions(c);
   if (ccView || (fieldView === "mstall9" && scene === "field")) wireCocoa(c);
+  if (hfView && scene === "hfarm") wireFarm(c);
   c.querySelectorAll("[data-sup]").forEach(b => b.onclick = () => { goalView = null; ctx(); if (b.dataset.sup === "play") familyPaddle(); else paddleTo(b.dataset.sup); });
   c.querySelectorAll("[data-ride]").forEach(b => b.onclick = () => { F.ride = b.dataset.ride; sfx("paper", true); speak(F.ride === "car" ? "Keys in hand. You'll drive between screens." : F.ride === "scooter" ? "Helmet on. Scooter it is." : "On foot today. Nice and slow.", 3500); save(); ctx(); });
   if (orView || (fieldView && scene === "field" && (stallAt(dayKey(), sgHM(), +fieldView.slice(-1)) || {}).kind === "orchard")) wireOrchard(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, today: dayKey(), where: orAt && orAt.where, i: orAt && orAt.i, item: potItem,
@@ -1643,7 +1648,7 @@ function ctx(){
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
   c.querySelectorAll("[data-fair]").forEach(b => b.onclick = () => fairActivity(b.dataset.fair));
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ccView = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ccView = null; hfView = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
@@ -1776,11 +1781,11 @@ function drawScene(){
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
-  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "farm" ? farmArt() : roomArt(scene);
+  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "farm" ? farmArt() : roomArt(scene);
   $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene));   // shelves with keepsakes, and pets at home here
   if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));   // the same evening light everywhere outdoors
   if (outside() && isDusk()) nightLights();
-  const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), orchard:"Ma Ma's orchard", flowers:"Ma Ma's flower farm", field:"The field", shore:"The foreshore", bay:"The bay", scoopshop: scoopState(F).name};
+  const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), orchard:"Ma Ma's orchard", flowers:"Ma Ma's flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Honeybrook Farm", scoopshop: scoopState(F).name};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
   $("maphint").textContent = scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Mum's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
 }
@@ -1930,12 +1935,12 @@ function setScene(id, at){
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
     scView = null; scSt.pick = null; scSt.dpick = null; evanSeat = null;
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; keepSpot = null; petView = null; ccView = null; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
     if (id === "base") { evan.x = evan.tx = 300; evan.y = evan.ty = 360; }
-    else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoa" || id === "cocoakitchen" || id === "mumdad" || id === "marcus" || id === "cottage") { evan.x = evan.tx = p[0] + 26; evan.y = evan.ty = p[1] + 10; evan.run = false; evan.wait = 2; }
+    else if (id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "hfarm" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoa" || id === "cocoakitchen" || id === "mumdad" || id === "marcus" || id === "cottage") { evan.x = evan.tx = p[0] + 26; evan.y = evan.ty = p[1] + 10; evan.run = false; evan.wait = 2; }
     else if (id === "home" && from === "kidroom") { evan.x = evan.tx = p[0] - 24; evan.y = evan.ty = p[1] + 6; evan.run = false; evan.wait = 3; }
     else if (id === "home") { evan.x = evan.tx = 300; evan.y = evan.ty = 520; }
     // Evan's room: he runs in ahead, Mel waits just inside the door, Maple stays out in the house
@@ -2087,6 +2092,11 @@ function arriveVillageSpot(id){
   if (id === "plot3" || id === "plot4") { speak(v.line, 4000); render(); return; }
   if (id === "olive") { vyView = "olive"; sfx("paper", true); render(); return; }
   if (id === "toursign") { orView = "tours"; sfx("paper", true); render(); return; }
+  if (scene === "hfarm" && (id === "cows" || id === "goats" || id === "hives" || id === "fstand")) { hfView = id === "fstand" ? "stand" : id; hfState(F); sfx("paper", true);
+    if (id === "hives" && isHere("felix")) npcSay("felix", fullHives(hfState(F)).length ? "There's honey ready! Here, take the veil." : "Not quite ready. The bees are still busy.");
+    else if ((id === "cows" || id === "goats") && isHere("elena")) npcSay("elena", pick(id === "cows" ? ["Daisy first, she insists.", "Mind Mochi's tail. It has opinions."] : ["Keep your shoelaces away from Toffee.", "Pepper! Out of the bucket!"]));
+    if (evanHere() && (id === "cows" || id === "goats")) setTimeout(() => evanSays(pick(id === "cows" ? ["MOO! Mama, the cow said moo!", "Can I pat her? Is she soft?"] : ["The goat is eating my shoe!", "Baby goat! Can we take it home?"])), 1300);
+    render(); return; }
   if (id === "farmshop") { orView = "shop"; orTab = null; sfx("paper", true); if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma picked them for you.", "Fresh this morning. Choose any.", "For you, no charge. You're my girl."])); render(); return; }
   if (id === "barrels") { vyView = "barrels"; sfx("paper", true); render(); return; }
   if (id === "vinestall") { vyView = "stall"; sfx("paper", true); render(); return; }
@@ -2298,6 +2308,18 @@ function wireCocoa(c){
     re(); });
   const nf = c.querySelector("[data-ccname]"); if (nf) nf.onsubmit = e => { e.preventDefault(); const v = (nf.querySelector("input").value || "").trim().slice(0, 30); if (!v) return; cocoaState(F).name = v; speak(`The sign now says ${v}.`, 3500); re(); render(); };
 }
+// Honeybrook Farm: hay, brushing, milking, honey, the farm stand
+function wireFarm(c){
+  const re = () => { save(); ctx(); drawScene(); };
+  c.querySelectorAll("[data-hf]").forEach(b => b.onclick = () => { const a = b.dataset.hf, k = b.dataset.k;
+    if (a === "feed") { const n = feedHerd(F, k); if (!n) return; sfx("tap"); gainXp(1); speak(k === "cows" ? "Hay in the rack, water in the trough. Three happy munchers." : "Hay for the goats. Pepper's already climbing the rack.", 4000); }
+    else if (a === "brush") { const an = hfBrush(F, k); if (!an) return; sfx("chime"); gainXp(1); mprop("heart", mel.x, mel.y - 60, 1600); speak(an.line, 3500); }
+    else if (a === "milk") { const r = milkOne(F, b.dataset.herd, k); if (!r.n) { speak(r.err, 3500); return; } sfx("paper", true); flash(`+${r.n} ${giveName(r.gives)}: ${r.a.n}`); }
+    else if (a === "milkall") { const n = milkHerd(F, k); if (!n) { speak("Nobody to milk: they've been done today, or need their hay first.", 4000); return; } sfx("chime"); gainXp(1); flash(`+${n} ${giveName(k === "cows" ? "milk" : "goatmilk")} in your backpack`); }
+    else if (a === "honey") { const n = collectHives(F); if (!n) return; sfx("chime"); act("cheer"); gainXp(2); speak(`${n} jars of honey, golden and still warm from the sun. Felix keeps the rest for his stall.`, 5000); }
+    else if (a === "buy") { if (!buyStand(F, k)) return; sfx("coin"); flash(`${giveName(k)} from the farm stand`); }
+    re(); });
+}
 // keepsakes: put one on a shelf, or take one down; pets: adopt (who, then where), pat, play with the owner, rename, move
 function wireCompanions(c){
   const done = () => { save(); render(); drawScene(); };
@@ -2449,7 +2471,7 @@ function endPaddle(walkBack){
 }
 // Who's where today: everyone's day at a glance (in the friendship view), family first, then the village
 const PLACE_NAME = {base: "outside at home", home: "your house", farm: "the garden", village: "the town square", lane: "Makers' Lane", vineyard: "the vineyard",
-  orchard: "the orchard", flowers: "the flower farm", field: "the field", shore: "the foreshore", kitchen: "the wine shop kitchen", bay: "the bay", scoopshop: "the Scoop Shack", scoopkitchen: "the gelato kitchen", scoopdip: "the dip station", cocoa: "the Cocoa Room", cocoakitchen: "the chocolate kitchen"};
+  orchard: "the orchard", flowers: "the flower farm", field: "the field", shore: "the foreshore", kitchen: "the wine shop kitchen", bay: "the bay", hfarm: "Honeybrook Farm", scoopshop: "the Scoop Shack", scoopkitchen: "the gelato kitchen", scoopdip: "the dip station", cocoa: "the Cocoa Room", cocoakitchen: "the chocolate kitchen"};
 const ACT_WORD = {water: "watering", farm: "gardening", sit: "sitting down", game: "gaming", sup: "paddleboarding", guide: "leading a tour", lead: "leading the class",
   exercise: "exercise class", cone: "with an ice cream", cook: "cooking", rest: "in the hammock", repair: "fixing things", type: "busy", play: "playing"};
 const placeName = sc => PLACE_NAME[sc] || (ROOMS[sc] && ROOMS[sc].name) || sc;
@@ -2761,7 +2783,7 @@ function nearSpot(){
   const list = [...stationsOf(scene), scene !== "market" ? {id:"board", tx:260, ty:200} : null].filter(Boolean);
   const s = list.find(s => Math.hypot(s.tx - mel.x, s.ty - mel.y) < 26); return s ? s.id : null;
 }
-const EVAN_SPOTS = {bay:[[300,400],[250,560],[300,330],[200,300],[290,500]], scoopshop:[[200,440],[380,440],[300,560],[140,560],[260,420]], scoopkitchen:[[200,560],[380,540],[300,580]], scoopdip:[[180,560],[420,560],[140,420]], cocoa:[[200,440],[380,450],[140,560]], cocoakitchen:[[200,560],[380,560]], mumdad:[[300,560],[200,380],[420,420],[150,560],[460,560]], marcus:[[230,560],[120,500],[460,560],[250,340],[300,600]], cottage:[[200,560],[440,540],[300,340]], shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[150,340],[260,330],[380,330],[200,580],[330,590]]};
+const EVAN_SPOTS = {hfarm:[[260,520],[200,560],[330,580],[260,290],[60,500],[460,520]], bay:[[300,400],[250,560],[300,330],[200,300],[290,500]], scoopshop:[[200,440],[380,440],[300,560],[140,560],[260,420]], scoopkitchen:[[200,560],[380,540],[300,580]], scoopdip:[[180,560],[420,560],[140,420]], cocoa:[[200,440],[380,450],[140,560]], cocoakitchen:[[200,560],[380,560]], mumdad:[[300,560],[200,380],[420,420],[150,560],[460,560]], marcus:[[230,560],[120,500],[460,560],[250,340],[300,600]], cottage:[[200,560],[440,540],[300,340]], shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[150,340],[260,330],[380,330],[200,580],[330,590]]};
 // Evan's destination is evan.tx/ty; outdoors he follows route-finder waypoints to it (round the house, not through it)
 function evanWalk(speed, dt){
   const key = evan.tx + "," + evan.ty;

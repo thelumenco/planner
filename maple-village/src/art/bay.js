@@ -50,7 +50,7 @@ export function bayArt(){
     <g pointer-events="none">${[[40, 90], [100, 150], [30, 260], [110, 470], [50, 540], [120, 600]].map(([x, y]) => `<path class="ripple" d="M${x} ${y} q5 -3.5 10 0 q5 3.5 10 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.3" opacity=".8"/>`).join("")}</g>
     <g filter="url(#wob)"><path d="M250 640 V300 H386 V266" fill="none" style="stroke:#D9BE94" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M250 640 V300 H386" fill="none" style="stroke:#C9A87A" stroke-width="20" stroke-dasharray="1.4 9" opacity=".7"/></g>
-    ${pine(490, 150, 1)}${pine(300, 140, .9)}${pine(500, 470, .95)}${pine(398, 636, .78)}${pine(470, 624, .85)}
+    ${pine(490, 150, 1)}${pine(300, 140, .9)}${pine(500, 470, .95)}${pine(398, 636, .78)}${pine(456, 648, .7)}
     ${flowers([[300, 320, "#EFA3A6"], [470, 300, "#F3C969"], [290, 470, "#C3CDEE"], [480, 380, "#EFA3A6"], [440, 570, "#F3C969"]])}`;
   const sea = dolphin(70, 210, 13, 2) + dolphin(56, 500, 16, 7);
   // The Scoop Shack: mint walls, a pink and white striped awning, a big cone on the roof and the sign
@@ -90,5 +90,6 @@ export function bayArt(){
     ${ccUps.window ? `<g pointer-events="none">${sk(`<path d="M346 494 h24 M350 486 h16 M354 478 h8" style="stroke:#F3C969" stroke-width="2"/>`, `<path d="M358 494 v-18"/>`)}${[0, 1, 2, 3, 4, 5].map(i => `<circle class="twinkle" cx="${339 + i*7.6}" cy="${465 + (i % 2)*2}" r="1.3" fill="#F3C969" style="animation-delay:${(i*.3).toFixed(1)}s"/>`).join("")}${[[352, 491], [364, 491], [355, 483], [361, 483], [358, 475]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${["#4A2E22", "#C2505F", "#8A5A3A", "#F3E7C9", "#4A2E22"][i]}" stroke="#3A2E28" stroke-width=".6"/>`).join("")}</g>` : ""}
     ${tapeLabel(396, 540, ccName.replace(/[<&>"]/g, "").slice(0, 24), "#E8D3BC", 10)}</g>`;
   return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17*60, 6*60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? bike() : "") + deck + (cc ? cocoa : reno)
+    + archGate("toFarmB", 498, 520, "Honeybrook Farm", 462, 568, "#F3E1A0", "Gate east to Honeybrook Farm")
     + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
 }
