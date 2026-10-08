@@ -1021,3 +1021,13 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - When all 8 slots are full, Swap in opens a chooser (`scSt.swap`, `data-gswapout`), and `setDisplay(s, id, out)` puts the new flavour in the chosen slot.
   - A displayed flavour that sells out keeps its slot, drawn as an empty tub.
   - A newly discovered flavour goes straight into a free slot, if there is one.
+
+### Round 81: the Scoop Shack's night market cart
+- **The stall:** `NIGHT` has a ninth stall, `{id: "tomo", at: 8, kind: "scoop"}`.
+  - Place 8 (`STALL_SPOTS[8] = [306, 520]`, VILLAGE `mstall8`) isn't on the top row. It's on the grass between the middle path and the river.
+  - field.js draws it as a pink cart under a striped umbrella (`cart`, `cartBody`, also the depth-sorted front).
+  - Tomo minds it after his kitchen shift, with the usual keeper poses; his sitting crate is on the right.
+- **Sales:** `cartMinute` (scoop.js, `cartOn` = Tuesday and Thursday, 6–10pm) sells cups and cones from `onDisplay` at the shop's prices, sometimes dipped.
+  - Base rate .03 a minute, ×1.6 while Mel stands at the cart (`atCart()` in core.js).
+  - Takings go to Mel and are tracked as `t.cart` / `t.cartCoins`. The field flashes "+N coins: the … cart".
+- **Tapping the cart:** opens `counterPanel` in cart mode (`{cart: true, keeper}`), with free or take-away scoops. It's wired via `wireScoop` when `fieldView === "mstall8"`.

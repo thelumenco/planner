@@ -145,7 +145,8 @@ export function familySlot(id, day, hm){
 // above the path. Out-of-towners run most of them; at the Sunday market the wine shop has a stall (Ines minds it, selling
 // from the shop's own shelves) and so does Ma Ma (fruit and flowers from the orchard's farm shop stock).
 // at: which of the six stall places along the top it stands in
-export const STALL_SPOTS = [[36, 128], [96, 128], [156, 128], [216, 128], [276, 128], [336, 128], [396, 128], [456, 128]];
+// (place 8 isn't on the top row: it's the Scoop Shack's cart on the grass between the path and the river)
+export const STALL_SPOTS = [[36, 128], [96, 128], [156, 128], [216, 128], [276, 128], [336, 128], [396, 128], [456, 128], [306, 520]];
 // produce: the stall sells whatever vegetables and berries are in season (core.js works out which)
 export const MARKET = [{id: "elena", at: 0, short: "Cheese", n: "Cheese and olives", items: ["cheese", "olives"], col: "#F3C969", line: "Aged on a farm up the hill. Try a slice!"},
   {id: "felix", at: 1, short: "Honey", n: "Honey and bee things", items: ["honey", "honeycomb", "beecandle", "toast"], col: "#E3A23A", line: "Wildflower honey, from my own bees. The candles are pure beeswax."},
@@ -169,7 +170,9 @@ export const NIGHT = [{id: "yun", at: 0, short: "Taiwan eats", n: "Taiwanese str
   {id: "sora", at: 4, short: "Socks & tees", n: "Socks, hats and tees", items: ["cosysocks", "buckethat", "dinotee"], col: "#7FB8E8", line: "Cosy socks, three for the price of happy. And a bucket hat for everyone."},
   {id: "lior", at: 5, short: "Lanterns", n: "Lanterns and lamps", items: [], decor: ["n_lanterns", "r_moon"], col: "#F3C969", line: "Paper lanterns for the house, and a moon lamp for your room."},
   {id: "wen", at: 6, short: "Sweets", n: "Sweets", items: ["tanghulu", "eggwaffle"], col: "#C9A3E0", line: "Tanghulu, strawberries in crackly sugar. And egg waffles, still warm."},
-  {id: "kai", at: 7, short: "Drinks", n: "Night drinks", items: ["sugarcane", "grassjelly"], col: "#9CC27E", line: "Fresh sugarcane, pressed while you wait. Grass jelly for the old-school ones."}];
+  {id: "kai", at: 7, short: "Drinks", n: "Night drinks", items: ["sugarcane", "grassjelly"], col: "#9CC27E", line: "Fresh sugarcane, pressed while you wait. Grass jelly for the old-school ones."},
+  // Mel's own: the Scoop Shack's cart, scooping from the shop's display (scoop.js cartOn). Tomo minds it after his shift
+  {id: "tomo", at: 8, kind: "scoop", short: "Scoop Shack", n: "The Scoop Shack cart", items: [], col: "#F2A0B8", line: "Gelato from the Scoop Shack! Cup or cone?"}];
 export const NIGHT_TOURISTS = ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy", "rafe"];
 export const STAGE = {x: 452, y: 462}, STAGE_WATCH = [[404, 560], [446, 566], [492, 536], [508, 562], [426, 590]];
 function lastSaturday(day){ const dt = new Date(day + "T00:00:00Z"); if (dt.getUTCDay() !== 6) return false; const n = new Date(dt.getTime() + 7*864e5); return n.getUTCMonth() !== dt.getUTCMonth(); }
@@ -201,7 +204,7 @@ function keeperSlot(st, e, day, hm){
   const {k, pose, from, to} = keeperPose(st, day, hm), [x, y] = STALL_SPOTS[st.at], base = {from, to, scene: "field", glide: true};
   if (pose === "behind") return {...base, at: [x + 3, y - 9]};
   if (pose === "front") return {...base, at: [x + 9, y + 9]};
-  if (pose === "sit") return {...base, at: [x - 17, y + 7], act: "sit", dir: 1};
+  if (pose === "sit") return {...base, at: [x + (st.kind === "scoop" ? 34 : -17), y + 7], act: "sit", dir: st.kind === "scoop" ? -1 : 1};
   if (pose === "chat") { const side = k % 2 ? 1 : -1; return {...base, at: [Math.max(30, Math.min(490, x + side*30)), y + 48], dir: -side}; }
   return {...base, wander: FIELD_WALK};
 }

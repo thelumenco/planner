@@ -1803,8 +1803,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#ctx [data-gvto="marcus"]').count() === 0 && await page.locator('#ctx [data-gvto="mum"]').count() === 1, "the delivery bike sends from anywhere (a gelato isn't offered to Marcus)");
   await page.click('#ctx [data-gvto="mum"]'); await page.waitForTimeout(400);
   check(await fox().then(f => (f.thanks || []).some(t => t.who === "mum" && /^gel_/.test(t.item))), "Sofia pedals it to Mum, and a thank-you note is on its way");
-  await page.goto(url + "?seed=1&time=21:00&date=2026-10-12&uppatch=rewind"); await page.waitForTimeout(2500);
+  await page.goto(url + "?seed=1&time=21:00&date=2026-10-13&uppatch=rewind"); await page.waitForTimeout(2500);
   const box = await fox().then(f => f.scoop.box);
+  check(await fox().then(f => (f.scoop.sold["2026-10-13"] || {}).cart > 0), "the cart sells at Tuesday's night market (the takings come to Mel)");
   check(box > 0, `the honesty freezer sold while the shop was shut (${box} coins in its box)`);
   await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
   check(await page.locator('#world [data-place="hfreezer"]').count() === 1 && await page.locator('#world [data-place="dbike"]').count() === 1 && await page.locator("#sceneArt .nightcopy circle").count() > 5, "the freezer and bike are on the bay, and the fairy lights glow at night");
@@ -1906,6 +1907,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-close]').catch(() => {});
   await page.locator('#world [data-place="mstall5"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-decor="n_lanterns"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-decor="r_moon"]').count() === 1, "the lantern stall has lanterns for the house and a moon lamp for Mel's room");
+  await page.click('#ctx [data-close]').catch(() => {});
+  check(here.includes("tomo") && await page.locator('#world [data-place="mstall8"]').count() === 1, "and the Scoop Shack's cart, with Tomo scooping");
+  await page.locator('#world [data-place="mstall8"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
+  check(/cart/.test(await page.locator("#ctx h2").innerText()), "tap the cart to serve from it (it scoops from the shop's display)");
+  await page.click('#ctx [data-close]').catch(() => {});
   check(await page.evaluate(() => [...document.querySelectorAll("#actors .npc")].length) > 0 && await page.evaluate(() => !document.querySelector('[data-track="jazz"]')), "the duo isn't a record on the record player");
   await page.goto(url + "?seed=1&time=19:30&date=2026-10-12"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);

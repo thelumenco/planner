@@ -25,10 +25,20 @@ const goods = (i, x, y, s) => s.kind === "wine" ? [-16, -7, 2, 11].map((dx, k) =
   : [[-14, -26], [-5, -27], [4, -26], [13, -27]].map(([dx, dy], k) => `<circle cx="${x + dx}" cy="${y + dy}" r="3.2" style="fill:${(s.kind === "orchard" ? ["#D9433A", "#E8566C", "#F3C969", "#C9A3E0"] : ["#E8566C", "#F3C969", "#9CC27E", "#C98A4A"])[(k + i) % 4]}"/>`).join("");
 const table = (i, x, y, s) => { const w = s.kind === "wine" ? 24 : 23;
   return sk(`<rect x="${x-w}" y="${y-22}" width="${w*2}" height="22" rx="2" style="fill:${s.kind === "wine" ? "#8B5E3C" : "#C9A27E"}"/>${goods(i, x, y, s)}`, `<rect x="${x-w}" y="${y-22}" width="${w*2}" height="22" rx="2"/>`); };
-export const stallFront = (i, x, y, s) => `<g pointer-events="none">${table(i, x, y, s)}</g>`;
+export const stallFront = (i, x, y, s) => `<g pointer-events="none">${s.kind === "scoop" ? cartBody(x, y) : table(i, x, y, s)}</g>`;
 // a crate beside each stall for the keeper to sit on
 const crate = (x, y) => sk(`<rect x="${x - 7}" y="${y - 7}" width="14" height="8" rx="1" style="fill:#B98A5A"/>`, `<rect x="${x - 7}" y="${y - 7}" width="14" height="8" rx="1"/><path d="M${x - 7} ${y - 3} h14"/>`);
-const stall = (i, x, y, s) => { const wine = s.kind === "wine", hw = wine ? 29 : 28, col = wine ? "#8E2C48" : s.col;
+// the Scoop Shack's cart: a pink cart on two wheels under a striped umbrella, a cone on a stick, tubs in the lid
+const CART_TUBS = ["#F8D59A", "#E8566C", "#B9D98A", "#9A7A6A"];
+const cartBody = (x, y) => sk(`<rect x="${x-24}" y="${y-24}" width="48" height="20" rx="4" style="fill:#F2A0B8"/><rect x="${x-26}" y="${y-28}" width="52" height="6" rx="2" style="fill:#FFFDF6"/>${CART_TUBS.map((c, k) => `<ellipse cx="${x-15 + k*10}" cy="${y-28}" rx="4" ry="2.4" style="fill:${c}"/>`).join("")}
+    <circle cx="${x-14}" cy="${y-2}" r="6" style="fill:#FFFDF6"/><circle cx="${x+14}" cy="${y-2}" r="6" style="fill:#FFFDF6"/><path d="M${x-24} ${y-14} h48" style="stroke:#FFFDF6" stroke-width="3"/>`,
+  `<rect x="${x-24}" y="${y-24}" width="48" height="20" rx="4"/><rect x="${x-26}" y="${y-28}" width="52" height="6" rx="2"/><circle cx="${x-14}" cy="${y-2}" r="6"/><circle cx="${x+14}" cy="${y-2}" r="6"/>`);
+const cart = (i, x, y, s) => `<g data-place="mstall${i}" aria-label="${s.n}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="32" ry="8" style="fill:var(--butter)"/>
+  ${sk(`<path d="M${x+20} ${y-26} v-44" style="stroke:#8A5A3A" stroke-width="2"/><path d="M${x-8} ${y-70} q28 -22 56 0z" style="fill:#FFFDF6"/>${[0, 1, 2].map(k => `<path d="M${x-8 + k*19} ${y-70} q${4 + k*2} -14 ${9} -17 l1 17z" style="fill:#F2A0B8"/>`).join("")}
+      <path d="M${x-30} ${y-34} v-14" style="stroke:#8A5A3A" stroke-width="1.6"/><path d="M${x-35} ${y-46} l5 14 l5 -14z" style="fill:#E8C48E"/><circle cx="${x-30}" cy="${y-49}" r="5" style="fill:#F4C7CF"/>`,
+    `<path d="M${x-8} ${y-70} q28 -22 56 0z M${x+20} ${y-70} v44"/><path d="M${x-35} ${y-46} l5 14 l5 -14z"/><circle cx="${x-30}" cy="${y-49}" r="5"/>`)}
+  ${crate(x + 34, y + 6)}${cartBody(x, y)}${tapeLabel(x, y + 28, s.short, "#F4C7CF", 9)}</g>`;
+const stall = (i, x, y, s) => { if (s.kind === "scoop") return cart(i, x, y, s); const wine = s.kind === "wine", hw = wine ? 29 : 28, col = wine ? "#8E2C48" : s.col;
   return `<g data-place="mstall${i}" aria-label="${wine ? "The wine shop's market stall" : s.n + " stall"}"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="${hw}" ry="8" style="fill:var(--butter)"/>
   ${crate(x - 17, y + 6)}
   ${sk(`<path d="M${x-hw} ${y-40} h${hw*2} l-4 12 h-${hw*2 - 8}z" style="fill:${col}"/>${wine ? "" : [0, 1, 2].map(k => `<path d="M${x-22 + k*16} ${y-40} l-2 12 h6 l2 -12z" style="fill:#FFFDF6"/>`).join("")}`,

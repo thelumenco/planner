@@ -109,6 +109,19 @@ export function buyUpgrade(F, k){
 export function buyDip(F, k){ const s = scoopState(F), d = DIPS[k]; if (!d || s.dips[k] || F.coins < d.price) return false; F.coins -= d.price; s.dips[k] = 1; return true; }
 export function buyTopping(F, k){ const s = scoopState(F), t = TOPPINGS[k]; if (!t || s.tops[k] || F.coins < t.price) return false; F.coins -= t.price; s.tops[k] = 1; return true; }
 const nDips = s => Object.keys(s.dips).filter(k => DIPS[k]).length, nTops = s => Object.keys(s.tops).filter(k => TOPPINGS[k]).length;
+// the cart at the night market (Tuesday and Thursday, 6 to 10pm): scoops cups and cones from the display, busy
+export const cartOn = (day, hm) => { const d = new Date(day + "T00:00:00Z").getUTCDay(); return (d === 2 || d === 4) && hm >= 18*60 && hm < 22*60; };
+function cartMinute(s, day, hm, opts){
+  if (!cartOn(day, hm)) return null;
+  const stocked = onDisplay(s); if (!stocked.length) return null;
+  const price = s.prices.cup + s.prices.cone, pf = Math.pow(8/Math.max(2, price), 1.3);
+  if (Math.random() >= .03*pf*(opts.cart ? 1.6 : 1)) return null;
+  const fmt = Math.random() < .45 ? "cup" : "cone", r = stocked[Math.floor(Math.random()*stocked.length)];
+  s.tubs[r.id]--; if (s.tubs[r.id] <= 0) delete s.tubs[r.id];
+  let coins = priceOf(s, fmt, r); if (fmt === "cone" && hasUp(s, "dip") && Math.random() < .3) coins += s.prices.dip;
+  const t = s.sold[day] = s.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.cart = (t.cart || 0) + 1; t.cartCoins = (t.cartCoins || 0) + coins;
+  return {coins, fmt, r};
+}
 // the honesty freezer sells while the shop's shut: 7 to 10am, 8 to 10pm
 export const honestyOpen = hm => (hm >= 7*60 && hm < OPEN) || (hm >= CLOSE && hm < 22*60);
 const NOTES = ["Best pandan ever. Sorry, only had coins for one! x", "For the little one's birthday. He says thank you.", "Left a bit extra. You deserve it!", "Took two, paid for three. Pay it forward :)",
@@ -210,6 +223,7 @@ export function scoopTick(F, opts = {}){
     const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     kitchenMinute(s, day, hm, at);
     const sale = saleMinute(s, day, hm, opts); if (sale && sale.box) out.box += sale.coins; else if (sale) { out.coins += sale.coins; out.n++; }
+    const cs = cartMinute(s, day, hm, opts); if (cs) { out.coins += cs.coins; out.n++; out.cart = (out.cart || 0) + cs.coins; }
     out.mins++;
   }
   if (out.mins || !s.at) s.at = from + out.mins*60000;
@@ -326,7 +340,9 @@ export function deliverPanel(F, st){
 }
 export function counterPanel(F, st){
   const s = scoopState(F), hm = sgHM(), t = s.sold[dayKey()] || {n: 0, coins: 0}, tubs = onDisplay(s);
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t.n ? `Sold today: ${t.n} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Sofia's behind the counter." : ""}</p>`;
+  let h = st.cart ? `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)} cart</h2><p class="sub">At the night market till 10pm, scooping from the shop's display.${st.keeper ? " Tomo's minding it." : " Tomo's off wandering: it's on an honesty tin."} ${t.cart ? `Sold tonight: ${t.cart} (${t.cartCoins} ${coin()}).` : "Nothing sold yet tonight."} Stay and scoop, and more people stop.</p>`
+    : `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t.n ? `Sold today: ${t.n} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Sofia's behind the counter." : ""}</p>`;
+  if (st.cart && !tubs.length) return h + `<p class="muted">Nothing to scoop: the shop's display is empty. Tomo's batches fill it.</p>` + shut;
   if (!tubs.length && scoopsLeft(s)) return h + `<p class="muted">Nothing in the display, but there are tubs in the freezer.</p><div class="actions"><button class="btn small primary" data-gview="freezer">Put some out</button></div>` + upBtn + shut;
   if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), and Tomo will keep the tubs topped up.</p>` + upBtn + shut;
   const pick = st.pick && s.tubs[st.pick] > 0 ? recipeOf(s, st.pick) : null;
@@ -335,6 +351,7 @@ export function counterPanel(F, st){
     <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map(f => `<button class="btn small alt" data-gtake="${f}">${FORMATS[f].n}</button>`).join("")}</div>
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
   h += `<ul class="hlist wlist">${tubs.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
+  if (st.cart) return h + `<p class="muted">Yours are free. Cups and cones at the shop's prices.</p>` + shut;
   return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p><div class="actions"><button class="btn small alt" data-gview="freezer">Change what's in the display</button></div>` + upBtn + shut;
 }
 export function menuPanel(F, st){
