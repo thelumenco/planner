@@ -1811,6 +1811,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const c0 = await fox().then(f => f.coins);
   await page.locator('#world [data-place="hfreezer"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gcollect]", { timeout: 15000 }); await page.click("#ctx [data-gcollect]"); await page.waitForTimeout(300);
   check(await fox().then(f => f.scoop.box === 0 && f.coins >= c0 + box), "collect the coins from the box");
+  await page.locator('#world [data-place="hfreezer"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
+  await page.click("#pclose"); await page.waitForTimeout(400);
+  check(await page.locator("#panel").isHidden() || !(await page.locator("#ctx").innerText()).includes("honesty freezer"), "the ✕ closes the Scoop Shack's panels too");
   await page.close();
 }
 {

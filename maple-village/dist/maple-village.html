@@ -16850,6 +16850,11 @@ ${SIGNOFF[t2.who] || ""}`;
     postOpen = false;
     healthOpen = false;
     newsOpen = false;
+    scView = null;
+    scSt.pick = null;
+    scSt.dpick = null;
+    scSt.vpick = null;
+    scSt.swap = null;
     if (scene === "market") shopClosed = true;
     ctx();
   }
