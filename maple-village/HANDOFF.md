@@ -1238,3 +1238,6 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Round 94b:**
   - The bay's gate to the farm moved up into the gap between the Scoop Shack and the Cocoa Room (500,374), labelled "Honeybrook". The honesty freezer's label moved left to make room, and the bottom-right pine is back where it was.
   - The farm's west gate lines up with it, at (22,280), on a little track between the farmhouse and the cow paddock.
+- **Round 94c:**
+  - The honesty freezer sits against the Scoop Shack's front wall, right of the door (bay.js `translate(-4 -32)`, place door 432,290). It's outside so it can sell while the shop's shut.
+  - The farm's paddocks are smaller and lower (cows 54–216, goats 304–466, y 336–470), with paths round them at x=30, x=490 and y=282.

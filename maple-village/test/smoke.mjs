@@ -1253,7 +1253,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#actors [data-npc="farid"].act-sit').count() === 1 && await page.locator('#actors [data-npc="mei"].act-sit').count() === 1 && await page.locator("#actors .act-sit").count() >= 5, "after work the orchard's farmhands come in for a tasting too (five at the tables at 7pm)");
   await page.goto(url + "?seed=1&time=13:20&date=2026-10-07"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
-  check(await page.locator("#actors .act-sit").evaluateAll(n => n.filter(x => ["aiko", "ben", "clara", "dev", "elena", "felix", "grace", "hiro"].includes(x.dataset.npc)).length) === 2, "out-of-towners drop in for a lunchtime tasting");
+  check(await page.locator("#actors .act-sit").evaluateAll(n => n.filter(x => ["aiko", "ben", "clara", "dev", "rosa", "bastien", "grace", "hiro"].includes(x.dataset.npc)).length) === 2, "out-of-towners drop in for a lunchtime tasting");
   await page.goto(url + "?seed=1&time=19:45&date=2026-10-05"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
   const seated = await page.locator('#actors .act-sit').count();
