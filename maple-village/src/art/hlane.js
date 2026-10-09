@@ -10,6 +10,7 @@ import { archGate } from "./orchard.js";
 import { track, brook, trainLayer, RAIL_Y } from "./railway.js";
 import { artCtx } from "./scenes.js";
 import { STYLES } from "../game/van.js";
+import { bikeRack } from "./transport.js";
 
 const W = ink;
 const rail = (x1, x2, y) => sk(`<path d="M${x1} ${y-10} H${x2} M${x1} ${y-2} H${x2}" style="stroke:#B98A5A" stroke-width="3"/>${Array.from({length: Math.floor((x2 - x1)/28) + 1}, (_, i) => `<rect x="${x1 + i*28 - 2}" y="${y-16}" width="4" height="18" style="fill:#8A6A52"/>`).join("")}`,
@@ -53,7 +54,7 @@ export function hlaneArt(){
     + rail(0, 310, 122) + rail(352, 520, 122)
     + `<g data-place="station" aria-label="Honeybrook station">${sk(`<rect x="182" y="60" width="62" height="14" rx="2" style="fill:#FFFDF6"/><path d="M188 74 v10 M238 74 v10" stroke-width="2.4"/>`, `<rect x="182" y="60" width="62" height="14" rx="2"/>`)}<text x="213" y="70.5" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="8.6" fill="#5E8A5A" pointer-events="none">Honeybrook</text></g>`
     + `<g data-place="timetable" aria-label="Timetable board"><ellipse class="hov" cx="420" cy="140" rx="30" ry="8" style="fill:var(--butter)"/>${sk(`<rect x="404" y="54" width="34" height="22" rx="2" style="fill:#3E4A43"/><path d="M408 60 h26 M408 65 h20 M408 70 h24" style="stroke:#F6EBC8" stroke-width="1.4"/>`, `<rect x="404" y="54" width="34" height="22" rx="2"/>`)}${tapeLabel(420, 140, "Timetable", "#E3EED2", 9)}</g>`;
-  const trees = [[506, 150, .8], [494, 400, .9], [512, 470, .75], [500, 610, .85], [30, 140, .6], [470, 150, .6]].map(([x, y, s]) => tree(x, y, s)).join("");
+  const trees = [[494, 400, .9], [512, 470, .75], [500, 610, .85], [30, 140, .6], [506, 330, .7]].map(([x, y, s]) => tree(x, y, s)).join("");
   const honeysuckle = house("honeysuckle", 60, 200, 100, 60, "#FFF6E8", "#B5443A", "Honeysuckle", "#F4C7CF",
     {art: `<path d="M60 206 q-8 20 2 40 q-6 10 0 14" style="fill:none;stroke:#7FA35A" stroke-width="3"/>${[[58, 214], [62, 232], [57, 248]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" style="fill:#F3C969"/>`).join("")}`, lines: ""});
   const clover = house("clover", 60, 370, 100, 60, "#F3F7EC", "#B5443A", "Clover", "#C3E8DA",
@@ -69,5 +70,6 @@ export function hlaneArt(){
     + grazer(470, 372, "#FFFDF6", 0) + grazer(496, 352, "#D9B48A", 1) + grazer(484, 520, "#FFFDF6", 2) + van
     + archGate("toFarmL", 22, 560, "Wildflower Farm", 70, 520, "var(--butter)", "Gate west to Wildflower Farm")
     + archGate("toTownL", 280, 620, "Town square", 336, 600, "var(--peri)", "Down the station road to the town square")
+    + archGate("toWoodsL", 498, 176, "Woods", 452, 196, "#C3E8DA", "East through the gate into Honeybrook Woods") + bikeRack("bikesst", 232, 200)
     + streetLamp(250, 150) + streetLamp(250, 470);
 }

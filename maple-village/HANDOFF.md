@@ -1379,3 +1379,43 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Bouquet orders** (orchard.js `orderOf(day)`, `fillOrder`, `ORDER_PAY` 25): six days in seven, a villager asks for a bouquet for an occasion. It shows in Ma Ma's farm shop (not the market stall); hand over any `bq_*` for 25 coins, once a day (`o.orderDay`).
 - **Ma Ma's tomato and egg** (core.js `sitForDinner`): at the first sit-down of a family dinner, if Mel has 2 tomatoes and 2 eggs, Ma Ma cooks it (+2 XP, a line from Ma Ma and Evan; `S.tomeggDay`). If Mel has only some of them, the dinner line says what's needed.
 - **Tests:** "flowers, eggs and Ma Ma's tomato and egg" block.
+
+### Round 103: Honeybrook Woods, bike hire, the river taxi, villagers on the new screens
+- **Woods screen `hwoods`** (art/hwoods.js), east of the cottage lane and above Makers' Lane:
+  - Along the top, the railway runs into a tunnel under the hill (the hill is drawn after `trainLayer`). rail.js has no `hwoods` WINDOWS yet, so no train shows there.
+  - The cliff and waterfall feed the pool, which feeds the Honeybrook (west, under the station) and the river (`RIVER`, south-west to Makers' Lane). `riverPath(pts, w)` is reused for the lane.
+  - Places: `ranger` (cabin, `rangerPanel`), `forage`, `lookout`, `fishpool` (4th fishing spot: minnow, brown trout, grayling; the journal now has 20), `taxiwoods`, `bikeswoods`. Gates: `toLaneW` (to hlane) and `toMakersW` (to lane).
+  - The cottage lane gets the `toWoodsL` gate (top-right) and `bikesst`. Makers' Lane gets the river down its west edge (with a plank at the town gate), the `toWoodsM` arch at the top, and `taxilane`.
+- **Foraging** (game/woods.js `forage`, `F.woods.forageDay`): once a day, by season. Spring: 3 wild garlic. Summer: 4 blackberries. Autumn: 3 mushrooms (+1 if raining). Winter: 4 chestnuts.
+  - Kitchen: wild garlic tortilla (spring), wild mushrooms on toast and roast chestnuts with honey (autumn and winter), and the blackberry crumble small plate.
+  - Gelato `INGR` gains blackberry and chestnut (so they're bonbon fillings too).
+- **Bike hire** (game/transport.js; art/transport.js `bikeRack`, `bikeArt`):
+  - Racks at the station, the woods and the town square (`bikesvillage`).
+  - `hireBike`: 5 coins for 60 minutes (`F.bike = {until, col}`). goals.js `ride` returns "bike" while it's out; speed 1.3 (scooter 1.6, car 2.5). `bikeExpired` runs in the periodic tick.
+  - Mel shows `.rideBike` (class `biking`) while moving.
+  - Villagers: `look.bike` draws a bike under them in personArt. In npcs.js they move at 86 instead of 48 and get raincoats rather than brollies.
+- **River taxi** (`STOPS`, `taxiPanel`, `takeTaxi`, core.js `rideTaxi` with a 2.6 s `.taxiride` overlay of the launch and riverbank):
+  - Stops: waterfall pool, Makers' Lane, home jetty (`taxihome` by the bridge), the lake (`taxilake`) and the foreshore (`taxishore`).
+  - Runs 7am to 9pm; 4 coins any stop. Stops on existing screens are drawn by `transportArt(scene)`.
+  - Why a river taxi and not a bus: it follows the river that already runs from the waterfall to the sea. The foreshore stop is one gate from the flower farm.
+- **Schedules:**
+  - New ranger **Wren**: bikes up Makers' Lane at 7:30, walks the woods 8 to 5, lunch at the cabin, fishes the pool on Saturday evenings.
+  - New prop `fish` (a rod) via `PROPS`.
+  - New slots:
+    - Okada: woods walks Tue/Thu (through the station lane), fishing the lake Sun.
+    - Juniper: bike rides Mon/Wed/Fri at 7 and Sat; the Tue 7:40 train.
+    - Bo: the bay Wed/Fri lunch, bike Sat.
+    - Opal: the farm stand Sat, woods Sun.
+    - Theo: woods Sat, the bay deck Sun.
+    - Hana: the farm stand Mon/Thu at 7.
+    - Celeste: foraging Mon.
+    - Gong Gong: fishing the lake Sun, the farm Tue (with Ma Ma).
+    - Mei: woods Sun.
+    - Felix: the 7:40 milk train daily, the barn Mon/Wed/Fri afternoons.
+    - Mateo and Lila: inside Honeysuckle in the evenings. Noor: inside Clover.
+    - Mum: woods Wed. Dad: fishing off the pier Sat. Marcus: bike Sun.
+    - Angelina: the bay Sat. Darren: woods Sat.
+    - Holiday-let guests: a bike ride and a lookout walk in the woods (tours.js `letSlot`).
+  - npcs.js `outdoors` now uses `OUTDOOR`, so hats stay on at the bay, farm, lane and woods.
+- **Fixes:** runtime-registered items (fishing catches, forage finds) now get `ico: id`. The backpack crashed without it.
+- **Tests:** the "Honeybrook Woods, bikes and the river taxi" block. The fishing journal now expects 19 locked, the autumn stove 26 tapas.

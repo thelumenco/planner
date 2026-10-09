@@ -1,4 +1,5 @@
 // Big, slow goals: things worth saving up for once the vineyard is running.
+import { bikeOn } from "./transport.js";
 //   scooter  gets Mel from screen to screen faster (kept in the garage, through the living room's east door)
 //   car      faster still: a cream convertible with room for Maple and Evan
 //   boat     a dolphin cruise boat moored at the jetty on the foreshore
@@ -17,8 +18,8 @@ export const GOALS = {
 };
 export const owns = (F, k) => !!(F.goals && F.goals[k]);
 // how much faster Mel moves outdoors, and on what
-export const ride = F => { const r = F.ride; return r === "car" && owns(F, "car") ? "car" : r === "scooter" && owns(F, "scooter") ? "scooter" : r === "walk" ? "walk" : owns(F, "car") ? "car" : owns(F, "scooter") ? "scooter" : "walk"; };
-export const rideSpeed = F => ({walk: 1, scooter: 1.6, car: 2.5})[ride(F)];
+export const ride = F => { if (bikeOn(F)) return "bike"; const r = F.ride; return r === "car" && owns(F, "car") ? "car" : r === "scooter" && owns(F, "scooter") ? "scooter" : r === "walk" ? "walk" : owns(F, "car") ? "car" : owns(F, "scooter") ? "scooter" : "walk"; };
+export const rideSpeed = F => ({walk: 1, bike: 1.3, scooter: 1.6, car: 2.5})[ride(F)];   // a hire bike (transport.js) for an hour
 
 // -> a line to say, or null if it can't be bought (yet)
 export function buyGoal(F, k){

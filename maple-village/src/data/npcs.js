@@ -17,6 +17,10 @@ const BANKER = {top: "#DCE7F2", bottom: "#2F3A4A", extra: "tie"};
 const LANE = [[262, 320], [200, 390], [320, 400], [262, 470], [110, 360], [420, 380]];
 const MARKET_WALK = [[120, 200], [220, 196], [320, 200], [420, 200], [130, 470]];
 const VINE_WALK = [[262, 390], [340, 440], [300, 300], [200, 560], [418, 490]];
+// round 103: Honeybrook Woods (the trails, the lookout, the pool), and the cottage lane on the way through
+const WOODS_WALK = [[100, 330], [200, 318], [300, 300], [330, 420], [300, 560], [200, 470], [420, 330], [440, 510]];
+const WOODS_RIDE = [[60, 330], [300, 300], [330, 600], [330, 420], [200, 318]];
+const BIKE = {bike: true};
 const slot = (from, to, scene, where, opts) => Object.assign({from: hm(from), to: hm(to), scene}, Array.isArray(where[0]) ? {wander: where} : {at: where}, opts || {});
 
 export const NPCS = [
@@ -24,7 +28,7 @@ export const NPCS = [
     id: "hana", pitch: 1.15, name: "Hana", job: "Runs the market",
     intro: "Hi love, I'm Hana! I moved here from a little seaside town. The honey toast is mine, and yes, I remember everyone's usual.",
     look: {skin: "#F3D2B8", hair: "#5A3A2A", hairStyle: "bun", top: "#EFA3A6", bottom: "#7A6A8C", extra: "apron"},
-    routine: [slot("19:30", "21:00", "wineshop", [227, 518], {act: "sit", dow: [0]}), slot("8:00", "12:00", "market", [260, 352]), slot("12:00", "13:00", "market", [[200, 352], [320, 352], [260, 352]]),
+    routine: [slot("7:00", "7:45", "hfarm", [[130, 600], [190, 590]], {dow: [1, 4]}), slot("19:30", "21:00", "wineshop", [227, 518], {act: "sit", dow: [0]}), slot("8:00", "12:00", "market", [260, 352]), slot("12:00", "13:00", "market", [[200, 352], [320, 352], [260, 352]]),
       slot("13:00", "15:00", "market", [260, 352]), slot("15:00", "15:40", "village", [[362, 372], [392, 360], [340, 380]]), slot("15:40", "19:00", "market", [260, 352])],
     lines: ["Fresh dumplings today. Don't tell Maple, she'll want three.", "You look like a honey toast kind of person today.", "Lunch rush is wild. Everyone wants toast at once!",
       "Remember to eat something proper, not just snacks.", "The strawberries sell out first. Every time."],
@@ -35,7 +39,7 @@ export const NPCS = [
     id: "okada", pitch: 0.75, name: "Mr Okada", job: "Retired postmaster, unofficial well-keeper",
     intro: "Okada. Forty years delivering letters. Retired now, but I still can't stop sorting things. Even the pebbles by the well.",
     look: {skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses"},
-    routine: [slot("14:00", "15:00", "lane", LANE, {dow: [1, 3, 5]}),
+    routine: [slot("7:15", "7:30", "hlane", [[250, 300], [250, 180], [460, 186]], {dow: [2, 4]}), slot("7:30", "9:00", "hwoods", WOODS_WALK, {dow: [2, 4]}), slot("6:30", "9:00", "field", [96, 352], {act: "fish", dow: [0], dir: 1}), slot("14:00", "15:00", "lane", LANE, {dow: [1, 3, 5]}),
       slot("19:30", "21:00", "wineshop", [313, 518], {act: "sit", dow: [1, 3, 4, 5]}), slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("17:00", "19:30", "village", [322, 566])],
     lines: ["Letters used to come in sacks. Now it's all on your little phone.", "The well water is sweeter in the afternoon. Don't ask me why.", "I've sorted the pebbles by colour. Then by size. Then by colour again.",
       "A tidy inbox is a tidy mind. Mine is a shoebox.", "The river's high today. Good for the ducks."],
@@ -45,7 +49,7 @@ export const NPCS = [
     id: "juniper", pitch: 1.05, name: "Juniper", job: "Librarian at the Fresh Pages library",
     intro: "Welcome to the library! I'm Juniper. I love a good semicolon; I also write poetry, but that's a secret. One book recommendation a week, guaranteed.",
     look: {skin: "#C99A78", hair: "#2B2320", hairStyle: "bob", top: "#B9D2A6", bottom: "#3F4A6B", extra: "glasses"},
-    routine: [slot("15:30", "16:30", "lane", LANE, {dow: [1, 2, 3, 4, 5]}),
+    routine: [slot("7:20", "7:42", "hlane", [250, 150], {dow: [2], dir: 1}), slot("7:00", "8:00", "hwoods", WOODS_RIDE, {dow: [1, 3, 5], look: BIKE}), slot("9:00", "11:00", "hwoods", WOODS_RIDE, {dow: [6], look: BIKE}), slot("15:30", "16:30", "lane", LANE, {dow: [1, 2, 3, 4, 5]}),
       slot("18:30", "20:00", "wineshop", [453, 512], {act: "sit"}), slot("8:30", "13:00", "fresh", [[160, 300], [330, 300], [240, 330]]), slot("13:00", "15:30", "fresh", [356, 330]),
       slot("15:30", "16:00", "trophy", [292, 590], {act: "sit"}), slot("16:00", "18:00", "fresh", [[90, 330], [180, 330], [140, 312]])],
     lines: ["This week's pick: anything with a map in the front.", "A semicolon is a pause that believes in you.", "Shh… the nook is in reading hour. Join me?",
@@ -56,7 +60,7 @@ export const NPCS = [
     id: "bo", pitch: 0.8, name: "Bo", job: "Carpenter at the Chord workshop",
     intro: "Bo! Carpenter. If it creaks, wobbles or falls off, I'm your guy. Built half this village. *hums*",
     look: {skin: "#E2B590", hair: "#3B2A1E", hairStyle: "short", top: "#E9C46A", bottom: "#4F6B8A", extra: "cap"},
-    routine: [slot("12:30", "13:30", "lane", LANE, {dow: [2, 4]}),
+    routine: [slot("12:30", "13:30", "bay", [[180, 420], [240, 430], [300, 420]], {dow: [3, 5]}), slot("8:00", "10:00", "hwoods", WOODS_RIDE, {dow: [6], look: BIKE}), slot("12:30", "13:30", "lane", LANE, {dow: [2, 4]}),
       slot("18:30", "20:00", "wineshop", [227, 518], {act: "sit", dow: [0, 1, 3, 4, 5]}), slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]), slot("12:30", "13:30", "village", [346, 566]),
       slot("13:30", "18:00", "village", [[170, 300], [400, 280], [300, 450], [150, 520], [440, 560]])],
     lines: ["*hums a tune* Fixed the market's wobbly leg this morning.", "Measure twice, cut once. Or just cut and laugh.", "The workshop smells like sawdust and big ideas.",
@@ -85,7 +89,7 @@ export const NPCS = [
     id: "opal", pitch: 1.0, name: "Opal", job: "The banker",
     intro: "Welcome to the bank! I'm Opal. Five vaults, all yours. Every little deposit is a jewel in the jar, and yes, I polish them.",
     look: {skin: "#E8C3A2", hair: "#2E2622", hairStyle: "bun", top: "#7FA88A", bottom: "#3F4A3A", extra: "glasses"},
-    routine: [slot("18:00", "19:30", "wineshop", [367, 512], {act: "sit"}), slot("9:00", "12:30", "bank", [260, 500]), slot("12:30", "13:30", "village", [[300, 214], [262, 230]]), slot("13:30", "17:30", "bank", [260, 500])],
+    routine: [slot("10:00", "11:30", "hfarm", [[140, 600], [200, 560], [260, 600]], {dow: [6]}), slot("9:00", "11:00", "hwoods", WOODS_WALK, {dow: [0]}), slot("18:00", "19:30", "wineshop", [367, 512], {act: "sit"}), slot("9:00", "12:30", "bank", [260, 500]), slot("12:30", "13:30", "village", [[300, 214], [262, 230]]), slot("13:30", "17:30", "bank", [260, 500])],
     lines: ["Every jewel counts. Even the little ones. Especially the little ones.", "Pay yourself first, then the rest. That's the banker's secret.", "I polished the sapphires this morning. Don't tell the rubies.",
       "Slow and steady fills a jar. Promise.", "A full jar is the prettiest thing in this town."],
     away: "Opal's on her lunch break. The vaults are always open to you.",
@@ -95,7 +99,7 @@ export const NPCS = [
     id: "theo", pitch: 0.9, name: "Theo", job: "Town hall clerk",
     intro: "Theo, town clerk. I keep the village records. And, if you have a moment, I have a stamp collection you would not believe.",
     look: {skin: "#F0D0B4", hair: "#6B4A2E", hairStyle: "short", top: "#C3CDEE", bottom: "#3A3A48", extra: "tie"},
-    routine: [slot("17:30", "19:00", "wineshop", [313, 518], {act: "sit"}), slot("9:00", "12:00", "hall", [[200, 320], [330, 320]]), slot("12:00", "13:00", "trophy", [228, 590], {act: "sit"}), slot("13:00", "17:00", "hall", [[200, 320], [330, 320]])],
+    routine: [slot("9:00", "12:00", "hwoods", WOODS_WALK, {dow: [6]}), slot("15:00", "17:00", "bay", [[180, 420], [240, 430]], {dow: [0], act: "sit"}), slot("17:30", "19:00", "wineshop", [313, 518], {act: "sit"}), slot("9:00", "12:00", "hall", [[200, 320], [330, 320]]), slot("12:00", "13:00", "trophy", [228, 590], {act: "sit"}), slot("13:00", "17:00", "hall", [[200, 320], [330, 320]])],
     lines: ["Records say you've been busy. I'm very proud. Officially.", "This stamp is from 1962. Look at the little bird!", "Everything filed, everything stamped. Bliss.",
       "The quest board is the most important document in town.", "I've started a register of Maple's naps. It's long."],
     react: {quests3: "I've stamped three completed quests in the register. Gold stamp!", planning: "A planning quest! My favourite kind of paperwork."}
@@ -106,7 +110,7 @@ export const NPCS = [
     look: {skin: "#E6BC98", hair: "#1A1716", hairStyle: "short", top: "#9A9A9A", bottom: "#4F6B8A", tall: true},
     // Weekdays: water the garden, work at the home office desk, fix something at lunch, tend the farm after work.
     // Weekends: mostly outdoors.
-    routine: [
+    routine: [slot("14:30", "16:00", "hwoods", WOODS_WALK, {dow: [6]}), 
       slot("19:30", "21:30", "base", [430, 606], {act: "rest", needs: "hammock"}),   // once Mel buys him the hammock
       slot("15:00", "16:30", "shore", SEA, {dow: [0], act: "sup", free: true}),   // Sunday afternoons: paddleboarding off the foreshore
       slot("7:00", "8:30", "base", [190, 452], {days: "wd", act: "water", dir: -1}),
@@ -163,7 +167,7 @@ export const NPCS = [
     id: "celeste", pitch: 1.05, name: "Celeste", job: "Runs the wine shop counter",
     intro: "Bienvenue! I'm Celeste. I mind the counter, pour the tastings and write the chalkboard. Your wines sell themselves, honestly. I just smile.",
     look: {skin: "#B9835F", hair: "#231C19", hairStyle: "bun", top: "#8E2C48", bottom: "#2F2B28", extra: "apron"},
-    routine: [slot("11:00", "15:00", "wineshop", [372, 286]), slot("15:00", "15:30", "vineyard", [[300, 260], [440, 270], [360, 300]]), slot("15:30", "21:30", "wineshop", [372, 286])],
+    routine: [slot("9:00", "10:45", "hwoods", [[132, 590], [180, 560], [100, 600]], {dow: [1]}), slot("11:00", "15:00", "wineshop", [372, 286]), slot("15:00", "15:30", "vineyard", [[300, 260], [440, 270], [360, 300]]), slot("15:30", "21:30", "wineshop", [372, 286])],
     lines: ["The honesty box is very honest today.", "Someone asked who makes these. I said a very busy lady.", "Evenings are the best. Everyone wants a glass.", "If the shelves are full, I'm happy."],
     away: "Celeste's not on. The honesty box minds the shop."
   },
@@ -174,7 +178,7 @@ export const NPCS = [
     id: "mama", pitch: 0.9, name: "Ma Ma", job: "Grandma, keeper of the orchard",
     intro: "Ah girl! Come, come. Have you eaten? I've cut some fruit for you. I love you, you know that?",
     look: {skin: "#D9A57E", hair: "#1E1A18", hairStyle: "curly", top: "#3E6B8C", bottom: "#7A4A2E", batik: "#F3D9A0", hat: "sunhat"},
-    routine: [slot("9:30", "11:30", "village", [[200, 420], [300, 440], [250, 520]], {dow: [6]}),
+    routine: [slot("15:00", "16:30", "hfarm", [[200, 530], [280, 520], [340, 530]], {dow: [2]}), slot("9:30", "11:30", "village", [[200, 420], [300, 440], [250, 520]], {dow: [6]}),
       slot("15:00", "17:00", "base", [[230, 360], [300, 590], [160, 520]], {dow: [0]}),
       slot("16:00", "17:30", "vineyard", [[262, 390], [340, 440], [300, 300]], {dow: [2, 4]}),
       slot("7:00", "11:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 500], [310, 330]], {act: "water"}),
@@ -197,7 +201,7 @@ export const NPCS = [
     id: "gonggong", pitch: 0.75, name: "Gong Gong", job: "Grandpa, Ma Ma's helper in the orchard",
     intro: "Ah, my girl is here. Sit, sit. Gong Gong is just watching the news. Have you eaten?",
     look: {skin: "#F2D6BD", hair: "#D9D4CC", hairStyle: "short", top: "#FFFFFF", bottom: "#8C8F7A", shorts: true, specs: "#C9A23A", tall: true},
-    routine: [slot("10:00", "12:00", "village", [[230, 420], [300, 470], [190, 520]], {dow: [1], look: OUT}),
+    routine: [slot("6:30", "9:00", "field", [76, 300], {act: "fish", dow: [0], dir: 1}), slot("15:00", "16:30", "hfarm", [[180, 520], [260, 520], [330, 520]], {dow: [2], look: OUT}), slot("10:00", "12:00", "village", [[230, 420], [300, 470], [190, 520]], {dow: [1], look: OUT}),
       slot("9:30", "11:30", "village", [[220, 430], [290, 450], [260, 520]], {dow: [6], look: OUT}),
       slot("15:00", "17:00", "vineyard", [[300, 300], [380, 300], [262, 440]], {dow: [3], look: OUT}),
       slot("15:00", "17:00", "base", [[250, 360], [320, 590], [180, 520]], {dow: [0, 6], look: OUT}),
@@ -234,7 +238,7 @@ export const NPCS = [
     id: "mei", pitch: 1.2, name: "Mei", job: "Works the flower farm",
     intro: "Hi, I'm Mei! I look after the flower beds. Ma Ma taught me everything, including how to sing to the roses. Don't laugh.",
     look: {skin: "#EAC4A4", hair: "#2B2320", hairStyle: "bob", top: "#F4C7CF", bottom: "#5E6E8C", hat: "sunhat"},
-    routine: [slot("8:00", "12:00", "flowers", [[160, 300], [260, 380], [360, 470], [210, 470], [310, 300]], {act: "water"}),
+    routine: [slot("7:00", "8:00", "hwoods", [[132, 590], [180, 560], [100, 600]], {dow: [0]}), slot("8:00", "12:00", "flowers", [[160, 300], [260, 380], [360, 470], [210, 470], [310, 300]], {act: "water"}),
       slot("12:00", "13:00", "flowers", [44, 486], {act: "sit"}),
       slot("13:00", "17:30", "flowers", [[160, 380], [260, 470], [360, 300], [410, 380]], {act: "farm"})],
     lines: ["The dahlias are showing off today.", "Ma Ma says flowers know when you're happy.", "Bouquet for someone special? Just say.", "I could do this forever."],
@@ -274,7 +278,7 @@ export const NPCS = [
   // and the dairy. Sunday mornings they're at their market stalls (tours.js MARKET), selling the farm's honey and cheese
   {id: "felix", pitch: .85, name: "Felix", job: "Keeps the bees at Wildflower Farm",
     look: {skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#7FB069", bottom: "#8A6A52", extra: "glasses", hat: "sunhat"},
-    routine: [slot("07:00", "12:00", "hfarm", [[186, 286], [310, 286], [300, 520]]), slot("12:00", "13:00", "hfarm", [60, 270], {act: "sit"}),
+    routine: [slot("7:15", "7:50", "hlane", [300, 150], {dir: -1}), slot("14:00", "16:00", "barn", [[200, 400], [320, 400], [262, 500]], {dow: [1, 3, 5]}), slot("07:00", "12:00", "hfarm", [[186, 286], [310, 286], [300, 520]]), slot("12:00", "13:00", "hfarm", [60, 270], {act: "sit"}),
       slot("13:00", "18:00", "hfarm", [[186, 286], [200, 524], [300, 520], [310, 286]])],
     intro: "Felix. I keep the bees up here at Wildflower Farm. Lavender honey, orchard blossom, wildflower... they decide, not me.",
     lines: ["The bees are cheerful today. Can you hear them?", "Never wear blue near a hive. They think you're a flower.", "Elena says I talk to the bees more than to her. She's not wrong.", "Hive three is my favourite. Don't tell the others."],
@@ -296,7 +300,7 @@ export const NPCS = [
   // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep), a student working part-time: Wed and Fri 2-6, Sat 10-5
   {id: "mateo", pitch: .95, name: "Mateo", job: "Kitchen hand at the Cocoa Room",
     look: {skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#F6F2EA", bottom: "#4A2E22", extra: "apron"},
-    routine: [slot("08:00", "09:30", "hlane", [[200, 320], [236, 450], [330, 180]]), slot("19:00", "22:00", "hlane", [186, 298], {act: "sit"}),   // home: Honeysuckle, with Lila
+    routine: [slot("20:30", "22:00", "honeysuckle", [300, 470], {act: "sit"}), slot("08:00", "09:30", "hlane", [[200, 320], [236, 450], [330, 180]]), slot("19:00", "22:00", "hlane", [186, 298], {act: "sit"}),   // home: Honeysuckle, with Lila
       slot("14:00", "18:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [3, 5], needs: "cocoa"}),
       slot("10:00", "17:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [6], needs: "cocoa"})],
     intro: "Hola! I'm Mateo. I study food science at the poly, and on Wednesdays, Fridays and Saturdays I keep the bars coming here. The bonbons are all yours, boss.",
@@ -305,14 +309,14 @@ export const NPCS = [
   // Lila, the Cocoa Room's second assistant (cocoa.js upgrade "assistant"): Mondays (Amara's day off) and weekend afternoons
   {id: "lila", pitch: 1.2, name: "Lila", job: "Serves at the Cocoa Room",
     look: {skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#C2505F", bottom: "#F3E7C9", extra: "apron"},
-    routine: [slot("20:30", "22:30", "hlane", [206, 306], {act: "sit"}), slot("09:00", "10:30", "hlane", [[150, 300], [236, 400], [120, 500]], {dow: [2, 3, 4, 5]}),   // home: Honeysuckle
+    routine: [slot("21:00", "22:30", "honeysuckle", [220, 470], {act: "sit"}), slot("20:30", "22:30", "hlane", [206, 306], {act: "sit"}), slot("09:00", "10:30", "hlane", [[150, 300], [236, 400], [120, 500]], {dow: [2, 3, 4, 5]}),   // home: Honeysuckle
       slot("10:45", "20:15", "cocoa", [240, 268], {dow: [1], needs: "cc_assistant"}), slot("13:00", "20:15", "cocoa", [[180, 420], [400, 440], [240, 268]], {dow: [0, 6], needs: "cc_assistant"})],
     intro: "Hi! I'm Lila. Mondays are mine, and I help Amara at weekends. I'm working my way through every bonbon. For research.",
     lines: ["Mondays are quiet, but the regulars are lovely.", "I wrapped forty boxes on Saturday. My fingers are ribbon now.", "Someone asked if we deliver to the moon.", "The fountain is hypnotic. I keep staring at it."],
     hellos: ["Hi Mel!", "Morning, boss!"], away: "Lila's not on today."},
   // Noor runs the pet adoption corner at the Sunday farmers market and the field fair (tours.js); no routine otherwise
   // Noor lives at Clover on the cottage lane, with a pen of rescues in the garden
-  {id: "noor", pitch: 1.1, name: "Noor", job: "Finds homes for rescued pets", routine: [slot("08:00", "12:00", "hlane", [[198, 456], [150, 470], [236, 470]], {dow: [1, 2, 3, 4, 5, 6]}), slot("16:00", "19:30", "hlane", [176, 456], {act: "sit"})],
+  {id: "noor", pitch: 1.1, name: "Noor", job: "Finds homes for rescued pets", routine: [slot("18:30", "19:30", "clover", [262, 470], {act: "sit"}), slot("08:00", "12:00", "hlane", [[198, 456], [150, 470], [236, 470]], {dow: [1, 2, 3, 4, 5, 6]}), slot("16:00", "19:30", "hlane", [176, 456], {act: "sit"})],
     look: {skin: "#C99A78", hair: "#2A211D", hairStyle: "long", top: "#9FD3C2", bottom: "#4A5568", extra: "apron"},
     intro: "Hi, I'm Noor! I find homes for little ones who need them. Kittens, puppies, bunnies... everyone deserves a cuddle.",
     lines: ["This one loves a chin scratch.", "Every pet that goes home, I cry a little. Happy tears.", "Ask me anything about looking after them!", "The duckling follows everyone. It thinks we're all its mum."],
@@ -350,6 +354,18 @@ export const NPCS = [
     lines: ["Push me on the swing!", "Again! Again!", "The roundabout is the BEST.", "I'm not dizzy. Okay, a bit dizzy.", "Can Evan play too?"],
     away: `${name}'s gone home.`})),
   // The wine shop's cook: on her shifts she runs the kitchen from whatever's in the larder (see cookTick)
+  // Honeybrook Woods' ranger (round 103): cycles up from Makers' Lane in the morning, walks the trails, keeps the
+  // cabin, and fishes the pool on Saturday evenings
+  {
+    id: "wren", pitch: 1.05, name: "Wren", job: "Honeybrook Woods' ranger",
+    intro: "Wren, the ranger. I look after the woods: the trails, the waterfall, the foraging patch. If it grows up here, I know about it.",
+    look: {skin: "#E6B892", hair: "#8A5A3A", hairStyle: "short", top: "#5E8A5A", bottom: "#6B5A44", extra: "satchel", hat: "cap"},
+    routine: [slot("7:30", "8:00", "lane", [[262, 600], [262, 420], [330, 160]], {look: BIKE}), slot("17:00", "18:30", "hwoods", [214, 266], {act: "fish", dow: [6], dir: 1}),
+      slot("8:00", "12:00", "hwoods", WOODS_WALK), slot("12:00", "13:00", "hwoods", [414, 300], {act: "sit"}), slot("13:00", "17:00", "hwoods", WOODS_WALK)],
+    lines: ["Stay on the trails and the woods stay wild.", "The waterfall's loud today. All that rain up the hill.", "Mushrooms: if you're not sure, don't. Ask me.", "Kingfisher by the pool this morning. Blink and you miss it.", "Bikes are a lovely way up here. Mind the roots."],
+    actLines: {fish: ["Shh. Trout.", "Catch and release, mostly. Mostly."]},
+    away: "Wren's off duty. The noticeboard at the cabin has everything."
+  },
   {
     id: "pilar", pitch: 0.95, name: "Pilar", job: "Cooks in the wine shop kitchen",
     intro: "Pilar! I cook. You keep the larder full, I keep the oven warm, the cheese pressing and the tapas coming. Deal?",
@@ -390,7 +406,7 @@ export const NPCS = [
     id: "mum", pitch: 1.05, name: "Mum", job: "Mel's mum: exercise classes and volunteering",
     intro: "Hello darling! Can't stop long, I'm going for my Pilates. Have you eaten? There's food at home, take some!", hellos: ["Hello darling! Have you eaten?", "Darling! Off to my Zumba, see you!"],
     look: {skin: "#E8C3A2", hair: "#1E1A18", hairStyle: "bobfringe", top: "#E8566C", bottom: "#2F2B28"},
-    routine: [slot("15:00", "16:30", "vineyard", VINE_WALK, {dow: [4]}),
+    routine: [slot("13:00", "15:00", "hwoods", WOODS_WALK, {dow: [3]}), slot("15:00", "16:30", "vineyard", VINE_WALK, {dow: [4]}),
       slot("15:00", "17:00", "base", [[230, 360], [300, 590], [160, 520]], {dow: [0]}),
       slot("8:00", "13:00", "field", [[120, 200], [220, 196], [320, 200], [130, 470]], {dow: [0]}),
       slot("6:45", "7:45", "shore", SHORE_WALK),
@@ -414,7 +430,7 @@ export const NPCS = [
     id: "dad", pitch: 0.72, name: "Dad", job: "Mel's dad: music and drawing",
     intro: "Hi darling! Love you, have a good day. Oh, and come listen to this. I've been working on it all week.", hellos: ["Hi darling! Love you, have a good day.", "Hi darling, love you!", "Hi darling! Have a good day, ok?"],
     look: {skin: "#E6BC98", hair: "#141110", hairStyle: "short", top: "#5B7DB1", bottom: "#8C8F7A", shorts: true, specs: "#141110"},
-    routine: [slot("9:00", "11:00", "field", MARKET_WALK, {dow: [0]}), slot("11:00", "12:30", "lane", LANE, {dow: [2]}), slot("15:00", "16:30", "vineyard", VINE_WALK, {dow: [6]}), slot("17:30", "18:30", "field", [170, 384], {dow: [3], act: "type"}),
+    routine: [slot("7:00", "9:00", "shore", [140, 468], {act: "fish", dow: [6], dir: -1}), slot("9:00", "11:00", "field", MARKET_WALK, {dow: [0]}), slot("11:00", "12:30", "lane", LANE, {dow: [2]}), slot("15:00", "16:30", "vineyard", VINE_WALK, {dow: [6]}), slot("17:30", "18:30", "field", [170, 384], {dow: [3], act: "type"}),
       slot("15:00", "17:00", "base", [[250, 360], [320, 590], [180, 520]], {dow: [0]}),
       slot("7:00", "9:00", "shore", [212, 372], {act: "type", dir: -1}),
       slot("9:00", "11:00", "mumdad", [112, 292], {act: "type"}),
@@ -439,7 +455,7 @@ export const NPCS = [
     id: "marcus", pitch: 0.7, name: "Marcus", job: "Mel's brother, a banker",
     intro: "Zeh! Want a game later? I'll go easy on you. Probably.", hellos: ["Zeh!", "Oi, Zeh!", "Hey Zeh. Eaten yet?"],
     look: {skin: "#E6BC98", hair: "#1A1716", hairStyle: "short", top: "#3E4A5C", bottom: "#2F3A4A", specs: "#C0C4CC", tall: true},
-    routine: [slot("10:00", "12:00", "field", MARKET_WALK, {dow: [0]}), slot("17:30", "19:00", "vineyard", VINE_WALK, {dow: [5]}), slot("13:00", "14:00", "lane", LANE, {dow: [6]}),
+    routine: [slot("7:30", "9:30", "hwoods", WOODS_RIDE, {dow: [0], look: BIKE}), slot("10:00", "12:00", "field", MARKET_WALK, {dow: [0]}), slot("17:30", "19:00", "vineyard", VINE_WALK, {dow: [5]}), slot("13:00", "14:00", "lane", LANE, {dow: [6]}),
       slot("8:30", "9:00", "shore", SHORE_WALK, {days: "wd"}),
       slot("12:30", "13:30", "bank", [260, 500], {dow: [1, 3, 5], look: BANKER}),
       slot("9:00", "17:30", "bank", [404, 500], {dow: [1, 3, 5], look: BANKER}),
@@ -460,7 +476,7 @@ export const NPCS = [
     id: "angelina", pitch: 1.15, name: "Angellina", job: "Studying for her master's in psychology",
     intro: "Hi Mel! Sorry, I'm in exam mode. Ask me anything about attachment theory. Actually don't.",
     look: {skin: "#F0D0B4", hair: "#3A2A22", hairStyle: "long", top: "#C9A3E0", bottom: "#F0D0B4", dress: "#C9A3E0"},
-    routine: [slot("10:00", "12:00", "field", MARKET_WALK, {dow: [0]}), slot("17:30", "19:00", "vineyard", VINE_WALK, {dow: [5]}), slot("12:00", "13:00", "lane", LANE, {dow: [3]}),
+    routine: [slot("8:00", "9:00", "bay", [[180, 420], [240, 430]], {dow: [6]}), slot("10:00", "12:00", "field", MARKET_WALK, {dow: [0]}), slot("17:30", "19:00", "vineyard", VINE_WALK, {dow: [5]}), slot("12:00", "13:00", "lane", LANE, {dow: [3]}),
       slot("9:00", "12:00", "fresh", [420, 300], {days: "wd", act: "type"}),
       slot("12:00", "13:00", "village", [[220, 430], [290, 450], [260, 520]], {days: "wd"}),
       slot("13:00", "16:30", "marcus", [322, 302], {days: "wd", act: "type"}),

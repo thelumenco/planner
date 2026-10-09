@@ -40,6 +40,7 @@ function extra(kind, look, k){
     case "hammer": return `<g class="tool"><path d="M${10*k} ${-20*k} l${6*k} ${-14*k}" fill="none" stroke-width="2.2" style="stroke:#8A5A3A"/><rect x="${12*k}" y="${-38*k}" width="${10*k}" height="${5*k}" rx="1" transform="rotate(24 ${17*k} ${-35.5*k})" ${S("var(--stone)")}/></g>`;
     case "cone": return `<path d="M${9.5*k} ${-23*k} l${3*k} ${10*k} l${3*k} ${-10*k}z" ${S("#E8C48E")}/><circle cx="${12.5*k}" cy="${-25*k}" r="${3.6*k}" ${S(["#F4C7CF", "#C3E8B8", "#F3E27A", "#FFF6DC"][Math.round(k*7 + (look.top || "").length) % 4])}/>`;
     case "hoe": return `<g class="tool"><path d="M${16*k} ${-48*k} l${-4*k} ${46*k}" fill="none" stroke-width="2" style="stroke:#8A5A3A"/><path d="M${12*k} ${-2*k} h${-8*k} l${1*k} ${3*k} h${7*k}z" ${S("var(--stone)")}/></g>`;
+    case "rod": return `<path d="M${9*k} ${-22*k} L${34*k} ${-56*k}" fill="none" stroke-width="${1.8*k}" style="stroke:#8A5A3A"/><circle cx="${13*k}" cy="${-27*k}" r="${2.2*k}" ${S("#F3C969")}/><path d="M${34*k} ${-56*k} Q${39*k} ${-30*k} ${42*k} ${-4*k}" fill="none" stroke-width=".6"/><circle cx="${42*k}" cy="${-4*k}" r="${2.2*k}" ${S("#E8566C")}/>`;
     case "lantern": return `<path d="M${12*k} ${-24*k} v${-4*k}" fill="none"/><rect x="${9*k}" y="${-24*k}" width="${7*k}" height="${9*k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5*k}" cy="${-19.5*k}" r="${1.8*k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
   }
   return "";
@@ -52,6 +53,7 @@ function batik(col, k){
   return `<g opacity=".85" pointer-events="none">${flower(-4, -31)}${flower(4.5, -25)}${flower(-3.5, -19)}${leaf(1, -33)}${leaf(-7, -25)}${leaf(4, -18)}
     <path d="M${-5.6*k} ${-12*k} h${3*k} M${-5.6*k} ${-8*k} h${3*k} M${2*k} ${-11*k} h${3*k} M${2*k} ${-6*k} h${3*k}" stroke-width="${1.1*k}" style="stroke:${col}"/></g>`;
 }
+import { bikeArt } from "./transport.js";
 // Rain gear (everyone outdoors on a rainy day, each their own): an umbrella or a raincoat with a hood and wellies.
 // gear = {kind: "brolly"|"coat", a, b (colours), pat: "solid"|"stripe"|"dots"|"scallop"|"check"|"clear"|"paper"}.
 const BROLLY_COLS = [["#E8566C", "#FFFDF6"], ["#3E6B8C", "#F3C969"], ["#F3C969", "#E8913A"], ["#7FB8A8", "#FFFDF6"], ["#2F2B28", "#E8566C"], ["#9AA9DD", "#FFFDF6"], ["#C2505F", "#F4C7CF"], ["#5E8A5A", "#F3E7C9"], ["#F4C7CF", "#8E2C48"], ["#E3E8EC", "#3E6B8C"]];
@@ -97,6 +99,7 @@ export function personArt(look, kid){
     <ellipse cx="0" cy="0" rx="${11*k}" ry="${3.5*k}" fill="rgba(60,40,30,.18)"/>
     <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
       ${look.board ? board(k) : ""}
+      ${look.bike ? `<g transform="translate(0 ${7*k})">${bikeArt(look.bike === true ? "#3E6B8C" : look.bike, k)}</g>` : ""}
       <g class="legL"><rect x="${-6.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
       <g class="legR"><rect x="${1.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${.8*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
       <g class="armL"><rect x="${-12*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/>${sleeve(-12*k)}</g>
@@ -105,7 +108,7 @@ export function personArt(look, kid){
       <path d="M${-8.6*k} ${-37*k} q${8.6*k} ${-2.4*k} ${17.2*k} 0 l${1.4*k} ${23*k} h${-20*k}z" ${S(look.dress || look.top)}/>
       ${look.batik && !coat ? batik(look.batik, k) : ""}
       ${coat ? coatArt(rain, k) : ""}
-      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
       <circle cx="0" cy="${-46*k}" r="${10.6*k}" ${S(look.skin)}/>
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46*k, 10.6*k) : hair(look.hairStyle, look.hair, k)}

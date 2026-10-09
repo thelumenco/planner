@@ -81,7 +81,9 @@
 @keyframes cruise{0%{transform:translate(0,0)}25%{transform:translate(30px,-170px)}50%{transform:translate(10px,-330px)}75%{transform:translate(34px,-150px)}100%{transform:translate(0,0)}}
 @media (prefers-reduced-motion:reduce){.map .moored,.map .cruising{animation:none}}
 /* how Mel gets about once she owns them: the scooter under her feet, the car round her (garage, game/goals.js) */
-.rideScoot,.rideCar{display:none}
+.rideScoot,.rideCar,.rideBike{display:none}#mel.biking .rideBike{display:inline}
+.bikeWheel{transform-box:fill-box;transform-origin:50% 50%}#mel.biking .bikeWheel,.npc.walk .bikeWheel{animation:bspin .5s linear infinite}@keyframes bspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#mel.biking .bikeWheel,.npc.walk .bikeWheel{animation:none}}
 #mel.scoot .rideScoot,#mel.drive .rideCar{display:inline}
 #mel.scoot .legL,#mel.scoot .legR,#mel.scoot .armL,#mel.scoot .armR{animation:none !important}
 #mel.drive .legL,#mel.drive .legR{visibility:hidden}

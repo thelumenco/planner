@@ -1105,7 +1105,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const k = JSON.parse(localStorage.getItem("fox.fox")).kitchen; return !!k.oven && !k.larder.flour; }), "flour goes in the oven to bake");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="tapas"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-k="tapas"]').count() === 24, "the stove offers this season's tapas (24 in autumn: garden, seafood and farm dishes)");
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 26, "the stove offers this season's tapas (26 in autumn: garden, seafood, farm and woods dishes)");
   await page.click('#ctx [data-k="tapas"][data-id="tortilla"]'); await page.waitForTimeout(200); await page.click('#ctx [data-k="cooktapas"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapas.id === "tortilla" && f.vine.tapas.plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
   await page.click('#ctx [data-k="dish"][data-dish="olives"]'); await page.waitForTimeout(300);
@@ -2475,7 +2475,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(got.length === 1 && ["roach", "trout", "perch", "boot"].includes(got[0]) && /New in the journal/.test(await page.locator("#ctx .fcatch").textContent()), "reel while the marker's in the green and it's landed: a river fish, new in the journal");
   check(["boot"].includes(got[0]) || (f1.inv[got[0] === "trout" ? "trout" : "fish"] || 0) >= 1, "and it's in the backpack (trout for the kitchen, others as fish)");
   await page.click('#ctx [data-fish="view"][data-k="journal"]'); await page.waitForTimeout(200);
-  check(await page.locator("#ctx li.locked").count() === 16 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, sixteen still to find, each with a hint (the golden koi at dusk)");
+  check(await page.locator("#ctx li.locked").count() === 19 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, nineteen still to find, each with a hint (the golden koi at dusk)");
   await page.click('#ctx [data-fish="view"][data-k="fish"]'); await page.waitForTimeout(200);
   await page.click('#ctx [data-fish="cast"]'); await page.waitForSelector("#ctx .fbar", { timeout: 9000 }); await page.waitForTimeout(3700);
   check(/slipped away/.test(await page.locator("#ctx").textContent()) && await fox().then(f => f.fish.bait === 0), "wait too long after the bite and it slips away");
@@ -2545,6 +2545,50 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("cottage")); await page.waitForTimeout(2000);
   await page.locator('#world [data-spot="dine"]').dispatchEvent("click"); await page.waitForTimeout(1500);
   check(await fox().then(f => !f.inv.tomato && (f.inv.egg || 0) === eggs0), "at family dinner, two tomatoes and two eggs become Ma Ma's tomato and egg");
+  await page.close();
+}
+{
+  // Round 103: Honeybrook Woods (the waterfall, the ranger, foraging, the pool), hire bikes, the river taxi, and
+  // villagers out and about on the new screens (on bikes, fishing, at the farm and in the cottages)
+  console.log("\nHoneybrook Woods, bikes and the river taxi");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`woods pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  await page.addInitScript(() => { if (!/woodpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 100; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-10"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-10&woodpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  check(await page.locator('#world [data-place="toWoodsL"]').count() === 1 && await page.locator('#world [data-place="bikesst"]').count() === 1, "the cottage lane has a gate east into the woods, and bike hire by the station");
+  await page.locator('#world [data-place="toWoodsL"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Woods/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(await page.evaluate(() => ["ranger", "forage", "lookout", "fishpool", "taxiwoods", "bikeswoods", "toMakersW", "toLaneW"].every(id => document.querySelector(`#world [data-place="${id}"]`))), "Honeybrook Woods: the ranger's cabin, foraging, the lookout, the pool, the river taxi, bike hire, gates to the lane and Makers' Lane");
+  await page.waitForTimeout(1500);
+  check(await ids().then(a => a.includes("wren")) && await page.locator('#actors .npc[data-npc="juniper"] .bikeArt').count() === 1, "Wren the ranger walks the trails, and Juniper's out on a bike (Saturday morning)");
+  await page.locator('#world [data-place="forage"]').dispatchEvent("click"); await page.waitForTimeout(4000);
+  check(await fox().then(f => f.inv.mushroom === 3 && f.woods.forageDay === "2026-10-10"), "foraging in autumn: three wild mushrooms, once a day");
+  await page.locator('#world [data-place="bikeswoods"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bike="hire"]', { timeout: 15000 });
+  await page.click('#ctx [data-bike="hire"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.coins === 95 && f.bike && f.bike.until > Date.now()), "a hire bike: 5 coins for an hour");
+  await page.click('#ctx [data-close]');
+  await page.locator('#world [data-place="lookout"]').dispatchEvent("click"); await page.waitForTimeout(400);
+  check(await page.locator("#mel.biking").count() === 1, "Mel rides it (faster than walking, slower than the scooter)");
+  await page.waitForTimeout(3500);
+  await page.locator('#world [data-place="taxiwoods"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-taxi]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-taxi]').count() === 4, "the river taxi stops: Makers' Lane, home, the lake and the foreshore");
+  await page.click('#ctx [data-taxi="taxishore"]'); await page.waitForTimeout(800);
+  check(await page.locator(".taxiride").count() === 1, "a little ride down the river on the launch");
+  await page.waitForFunction(() => /foreshore/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 15000 });
+  check(await fox().then(f => f.coins === 91), "and off at the foreshore, one gate from Ma Ma's flower farm (4 coins)");
+  await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(900);
+  check(await page.locator('#world [data-place="toWoodsM"]').count() === 1 && await page.locator('#world [data-place="taxilane"]').count() === 1, "Makers' Lane: the river comes down from the woods, with a taxi stop and a path up the hill");
+  await page.goto(url + "?seed=1&time=7:00&date=2026-10-10"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(2000);
+  check(await page.locator('#actors .npc[data-npc="dad"] .bikeArt, #actors .npc[data-npc="dad"]').count() >= 1 && await page.evaluate(() => { const n = document.querySelector('#actors .npc[data-npc="dad"]'); return !!n && n.innerHTML.includes("#8A5A3A") && n.innerHTML.includes("#E8566C"); }), "Dad's fishing off the pier on a Saturday morning");
+  await page.goto(url + "?seed=1&time=21:30&date=2026-10-07"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("honeysuckle")); await page.waitForTimeout(2000);
+  check(await ids().then(a => a.includes("mateo") && a.includes("lila")), "Mateo and Lila are home in Honeysuckle in the evening");
   await page.close();
 }
 await browser.close();

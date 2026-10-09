@@ -4,7 +4,7 @@ import { hash, now, H } from "../util.js";
 // Outdoor screens. "base" is home (house, garden, pond, shed, swing); "village" is the town square with the work
 // buildings. A river joins them: walk onto the bridge to cross. A third screen (say, for Luna) would be one more
 // OUTDOOR entry, a pair of bridge places and a BRIDGES/ARRIVE line.
-export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore", "bay", "hfarm", "hlane"];
+export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore", "bay", "hfarm", "hlane", "hwoods"];
 export const VILLAGE = {
   // town square
   hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[170,180], mark:[132,64]},
@@ -120,6 +120,23 @@ export const VILLAGE = {
   stray:  {scene:"hfarm", name:"A runaway goat", door:[260,524], spot:true, line:"A goat on the loose!"},
   fstand: {scene:"hfarm", name:"Farm stand", door:[130,580], spot:true, mark:[130,500], line:"The farm stand: milk, honey and eggs."},
   reno:   {scene:"bay", name:"Under renovation", door:[396,520], spot:true, line:"Boarded up for now. Coming soon: a brewery? A chocolatier?"},
+  // round 103: Honeybrook Woods, bike hire, the river taxi
+  toLaneW:{scene:"hwoods", name:"Gate to the cottage lane", door:[22,330], spot:true, bridge:"hlane", mark:[30,276], line:"West through the gate to the cottage lane and the station."},
+  toMakersW:{scene:"hwoods", name:"Path down to Makers' Lane", door:[330,622], spot:true, bridge:"lane", mark:[370,560], line:"Down the hill to Makers' Lane."},
+  ranger: {scene:"hwoods", name:"The ranger's cabin", door:[414,292], spot:true, mark:[414,180], line:"The ranger's cabin. Maps, a kettle, and a noticeboard of what's growing in the woods."},
+  bikeswoods:{scene:"hwoods", name:"Bike hire", door:[478,346], spot:true, mark:[478,290], line:"Hire bikes, by the ranger's cabin."},
+  forage: {scene:"hwoods", name:"The foraging patch", door:[132,576], spot:true, mark:[132,500], line:"Brambles, a mushroom ring, a chestnut tree and wild garlic: whatever's in season."},
+  lookout:{scene:"hwoods", name:"The lookout", door:[460,512], spot:true, mark:[460,360], line:"The lookout. On a clear day you can see the whole of Honeybrook, all the way to the sea."},
+  fishpool:{scene:"hwoods", name:"Fishing spot", door:[322,270], spot:true, mark:[322,220], line:"A good spot for fishing."},
+  taxiwoods:{scene:"hwoods", name:"River taxi", door:[168,282], spot:true, mark:[168,220], line:"The river taxi's first stop, under the waterfall."},
+  toWoodsL:{scene:"hlane", name:"Gate to Honeybrook Woods", door:[498,176], spot:true, bridge:"hwoods", mark:[490,120], line:"East through the gate into Honeybrook Woods."},
+  bikesst:{scene:"hlane", name:"Bike hire", door:[232,212], spot:true, mark:[232,150], line:"Hire bikes, by the station."},
+  toWoodsM:{scene:"lane", name:"Path up to Honeybrook Woods", door:[330,146], spot:true, bridge:"hwoods", mark:[330,40], line:"Up the hill into Honeybrook Woods."},
+  taxilane:{scene:"lane", name:"River taxi", door:[62,226], spot:true, mark:[52,160], line:"The river taxi stop on Makers' Lane."},
+  taxihome:{scene:"base", name:"River taxi", door:[376,134], spot:true, mark:[340,70], line:"The river taxi stop, by the bridge."},
+  taxilake:{scene:"field", name:"River taxi", door:[300,362], spot:true, mark:[300,300], line:"The river taxi stop on the lake."},
+  taxishore:{scene:"shore", name:"River taxi", door:[214,156], spot:true, mark:[214,100], line:"The river taxi stop, where the river meets the sea."},
+  bikesvillage:{scene:"village", name:"Bike hire", door:[196,580], spot:true, mark:[196,500], line:"Hire bikes, in the town square."},
   fishriver:{scene:"base", name:"Fishing spot", door:[396,118], spot:true, mark:[396,70], line:"A good spot for fishing."},
   fishlake:{scene:"field", name:"Fishing spot", door:[60,290], spot:true, mark:[60,236], line:"A good spot for fishing."},
   fishsea:{scene:"shore", name:"Fishing spot", door:[204,376], spot:true, mark:[234,320], line:"A good spot for fishing."},
@@ -138,9 +155,9 @@ const WORK_HINT = /chord|chico|luna|ohayo|ambidextrous|fresh pages|client|muse|p
 export const isWeekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
 const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
-export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField", hlane:"toStationV"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl"}, shore:{field:"toFieldS", flowers:"toFlowersS", bay:"toBay"}, bay:{shore:"toShoreB", hfarm:"toFarmB"}, hfarm:{bay:"toBayF", hlane:"hfEast"}, hlane:{hfarm:"toFarmL", village:"toTownL"}};
+export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField", hlane:"toStationV"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL", hwoods:"toWoodsM"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl"}, shore:{field:"toFieldS", flowers:"toFlowersS", bay:"toBay"}, bay:{shore:"toShoreB", hfarm:"toFarmB"}, hfarm:{bay:"toBayF", hlane:"hfEast"}, hlane:{hfarm:"toFarmL", village:"toTownL", hwoods:"toWoodsL"}, hwoods:{hlane:"toLaneW", lane:"toMakersW"}};
 // where Mel steps off, by "from>to"
-export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184], "field>shore":[470,304], "shore>field":[56,300], "flowers>shore":[250,590], "shore>flowers":[56,190], "shore>bay":[250,590], "bay>shore":[250,96], "bay>hfarm":[60,284], "hfarm>bay":[462,374], "hfarm>hlane":[60,560], "hlane>hfarm":[462,560], "hlane>village":[281,170], "village>hlane":[280,590]};
+export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184], "field>shore":[470,304], "shore>field":[56,300], "flowers>shore":[250,590], "shore>flowers":[56,190], "shore>bay":[250,590], "bay>shore":[250,96], "bay>hfarm":[60,284], "hfarm>bay":[462,374], "hfarm>hlane":[60,560], "hlane>hfarm":[462,560], "hlane>village":[281,170], "village>hlane":[280,590], "hlane>hwoods":[60,330], "hwoods>hlane":[462,186], "lane>hwoods":[330,590], "hwoods>lane":[330,170]};
 // the next outdoor screen on the way from one to another (screens form a little chain: base - village - lane)
 export function nextHop(from, to){
   if (from === to) return null; if (BRIDGES[from] && BRIDGES[from][to]) return to;

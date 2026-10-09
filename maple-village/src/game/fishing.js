@@ -16,7 +16,8 @@ import { rainyOn } from "../art/village-extras.js";
 export const SPOTS = {
   river: {scene: "base", n: "The home river", place: "fishriver", line: "The river runs quick and clear past the bridge."},
   lake: {scene: "field", n: "The lake", place: "fishlake", line: "Still water, reeds, and the swans keeping an eye on you."},
-  sea: {scene: "shore", n: "The sea by the pier", place: "fishsea", line: "Waves on the sand, and gulls hoping you're bad at this."}
+  sea: {scene: "shore", n: "The sea by the pier", place: "fishsea", line: "Waves on the sand, and gulls hoping you're bad at this."},
+  pool: {scene: "hwoods", n: "The waterfall pool", place: "fishpool", line: "Cold, clear water under the falls. The trout here are wily."}
 };
 export const spotIn = scene => Object.keys(SPOTS).find(k => SPOTS[k].scene === scene) || null;
 // when: "day" 7am-6pm, "dawn" 5-10am, "dusk" 6-8pm, "night" 7pm-6am; rain: only on a rainy day
@@ -38,6 +39,9 @@ export const FISH = {
   seabream: {n: "Sea bream", spot: "sea", w: 14, cm: [25, 45], hard: 3, item: "seabream", hint: "The sea, any time. Fussy."},
   squid: {n: "Squid", spot: "sea", w: 14, when: "night", cm: [20, 40], hard: 3, item: "squid", hint: "The sea, after dark."},
   octopus: {n: "Octopus", spot: "sea", w: 8, rain: true, cm: [40, 80], hard: 4, item: "octopus", hint: "The sea, when it's raining."},
+  minnow: {n: "Minnow", spot: "pool", w: 30, cm: [4, 9], hard: 1, item: "fish", hint: "The waterfall pool, any time. Tiny."},
+  browntrout: {n: "Brown trout", spot: "pool", w: 22, cm: [25, 55], hard: 3, item: "trout", hint: "The waterfall pool, any time."},
+  grayling: {n: "Grayling", spot: "pool", w: 14, when: "day", cm: [25, 40], hard: 3, item: "fish", hint: "The waterfall pool, in daylight. A big sail of a fin."},
   seaglass: {n: "Sea glass", spot: "sea", w: 6, cm: [2, 4], hard: 1, item: null, junk: true, hint: "The sea. Smoothed by the waves; it goes on the windowsill."}
 };
 // crayfish come out at night or in the rain
@@ -53,7 +57,7 @@ export const fishHere = (spot, day, hm) => Object.keys(FISH).filter(id => FISH[i
 const ING = {trout: ["Rainbow trout", 4, "with almond butter, at the kitchen"], crayfish: ["Crayfish", 2, "four on toast with garlic, at the kitchen"],
   sardine: ["Sardine", 2, "three on the grill, at the kitchen"], mackerel: ["Mackerel", 3, "escabeche with peppers, at the kitchen"],
   seabream: ["Sea bream", 5, "baked with olives, at the kitchen"], squid: ["Squid", 4, "fried calamari, at the kitchen"], octopus: ["Octopus", 6, "pulpo a la gallega, at the kitchen"]};
-Object.entries(ING).forEach(([id, [n, sell, what]]) => { if (!ITEMS[id]) ITEMS[id] = {n, kind: "ingredient", sell, what}; });
+Object.entries(ING).forEach(([id, [n, sell, what]]) => { if (!ITEMS[id]) ITEMS[id] = {n, ico: id, kind: "ingredient", sell, what}; });
 
 export const ROD = 80, REEL = 400, BAIT_DAY = 3, BAIT_MAX = 20;
 export function fishState(F){

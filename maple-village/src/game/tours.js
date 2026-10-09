@@ -343,6 +343,9 @@ export function letSlot(id, day, hm){
   const k = lets[c].indexOf(id), at = LET_SEATS[c][k];
   if (hm >= 7*60 + 30 && hm < 9*60) return {from: 7*60 + 30, to: 9*60, scene: "hlane", at, act: "sit", dir: k ? -1 : 1};
   if (hm >= 18*60 && hm < 21*60 + 30) return {from: 18*60, to: 21*60 + 30, scene: "hlane", at, act: "sit", dir: k ? -1 : 1};
+  // round 103: holidaymakers explore Honeybrook Woods: one rides a hire bike round the trails, the other walks up to the lookout
+  if (k === 0 && hm >= 10*60 && hm < 12*60) return {from: 10*60, to: 12*60, scene: "hwoods", wander: [[60, 330], [300, 300], [330, 600], [330, 420]], look: {bike: true}};
+  if (k === 1 && hm >= 14*60 && hm < 15*60 + 30) return {from: 14*60, to: 15*60 + 30, scene: "hwoods", wander: [[200, 318], [330, 420], [440, 510], [300, 300]]};
   return null;
 }
 export function clubSlot(id, day, hm){

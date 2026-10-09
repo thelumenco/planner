@@ -46,8 +46,8 @@ const slotNow = def => slotAt(def, dayKey(), sgHM(), true);
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };
 export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
 export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
-const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone"};
-const outdoors = s => s === "village" || s === "base" || s === "lane" || s === "vineyard" || s === "orchard" || s === "flowers" || s === "field" || s === "shore";
+const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone", fish: "rod"};
+const outdoors = s => OUTDOOR.includes(s);
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 
 function makeNode(id, look, kid, letter, act){
@@ -58,7 +58,7 @@ function makeNode(id, look, kid, letter, act){
   const owned = (api.F().fam && api.F().fam.owned) || {};
   if (id === "darren" && act === "type" && owned.headphones) look = Object.assign({}, look, {headphones: true});
   // a rainy day outdoors: everyone has their own brolly or raincoat (a coat if their right hand's busy or they're on a board)
-  if (OUTDOOR.includes(api.scene()) && rainyOn(dayKey()) && !look.board) look = Object.assign({}, look, {rain: rainGearFor(id, {coat: !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell"].includes(look.extra)})});
+  if (OUTDOOR.includes(api.scene()) && rainyOn(dayKey()) && !look.board) look = Object.assign({}, look, {rain: rainGearFor(id, {coat: !!look.bike || !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look.extra)})});
   g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "");
   $("actors").appendChild(g);
   return g;
@@ -96,7 +96,7 @@ function tickVillager(def, dt){
     const was = slot.glide && e && e.key && e.key.split(":")[0] === slot.scene ? [e.x, e.y] : null;
     if (e) drop(def.id);
     const p = slot.at || jitter(pick(slot.wander)), s0 = was || p;
-    e = ents[def.id] = {def, key, act: slot.act, kind: "npc", x: s0[0], y: s0[1], tx: s0[0], ty: s0[1], dir: slot.dir || (Math.random() < .5 ? -1 : 1), moving: false, wait: rnd(1, 4), node: makeNode(def.id, Object.assign({}, def.look, slot.look || {}, outdoors(scene) ? {} : {hat: null}), def.kid, false, slot.act)};   // hats come off indoors
+    e = ents[def.id] = {def, key, act: slot.act, kind: "npc", x: s0[0], y: s0[1], tx: s0[0], ty: s0[1], dir: slot.dir || (Math.random() < .5 ? -1 : 1), moving: false, wait: rnd(1, 4), bike: !!((slot.look && slot.look.bike) || def.look.bike) && OUTDOOR.includes(scene), node: makeNode(def.id, Object.assign({}, def.look, slot.look || {}, outdoors(scene) ? {} : {hat: null}, OUTDOOR.includes(scene) ? {} : {bike: null}), def.kid, false, slot.act)};   // hats come off indoors
     if (was) { e.tx = p[0]; e.ty = p[1]; e.path = []; }   // straight across the open field (stalls sit above the walkable area)
   }
   // Now and then a neighbour near Mel says hello (each at most every few minutes).
@@ -106,7 +106,7 @@ function tickVillager(def, dt){
     say(e, pick(def.hellos || hellos()), 2600); api.sfx && api.sfx("babble", def.pitch || 1);
   }
   const b = api.bounds();
-  if (walk(e, def.kid ? 95 : slot.free ? 22 : 48, dt)) {
+  if (walk(e, def.kid ? 95 : slot.free ? 22 : e.bike ? 86 : 48, dt)) {   // on a bike (look.bike), nearly twice walking pace
     e.wait -= dt;
     if (e.wait <= 0 && slot.wander) {
       let p = jitter(pick(slot.wander));

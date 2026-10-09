@@ -22,7 +22,7 @@ export const GOODS = {
   trout: ["rainbow trout", "rainbow trout"], crayfish: ["crayfish", "crayfish"], sardine: ["sardine", "sardines"], mackerel: ["mackerel", "mackerel"],
   seabream: ["sea bream", "sea bream"], squid: ["squid", "squid"], octopus: ["octopus", "octopuses"],
   goatmilk: ["goat's milk", "goat's milk"], yoghurt: ["pot of yoghurt", "pots of yoghurt"], pear: ["pear", "pears"], fig: ["fig", "figs"],
-  honeycomb: ["piece of honeycomb", "pieces of honeycomb"], lemon: ["lemon", "lemons"], syrup: ["bottle of petal syrup", "bottles of petal syrup"],
+  honeycomb: ["piece of honeycomb", "pieces of honeycomb"], lemon: ["lemon", "lemons"], wildgarlic: ["bunch of wild garlic", "bunches of wild garlic"], blackberry: ["blackberry", "blackberries"], mushroom: ["wild mushroom", "wild mushrooms"], chestnut: ["chestnut", "chestnuts"], syrup: ["bottle of petal syrup", "bottles of petal syrup"],
   // groups (round 101): anything that fits, see ALT
   farmcheese: ["farm cheese", "farm cheeses"], halloumi: ["halloumi", "halloumi"], bluecheese: ["Honeybrook blue", "Honeybrook blue"], cheddar: ["farmhouse cheddar", "farmhouse cheddar"],
   honey: ["jar of honey", "jars of honey"], petals: ["garden flower", "garden flowers"]};
@@ -46,7 +46,8 @@ export const DISHES = {
   honeycake: {n: "Honey cake", need: {egg: 1, honey: 1, flour: 1}, plates: 4, price: 7},
   shortbread: {n: "Flower shortbread", need: {flour: 1, petals: 2}, plates: 4, price: 5},
   bluetart: {n: "Blueberry tart", need: {blueberry: 3, flour: 1}, plates: 4, price: 6},
-  posset: {n: "Lemon and petal posset", need: {milk: 1, lemon: 1, syrup: 1}, plates: 4, price: 7}};
+  posset: {n: "Lemon and petal posset", need: {milk: 1, lemon: 1, syrup: 1}, plates: 4, price: 7},
+  crumble: {n: "Blackberry crumble", need: {blackberry: 3, flour: 1}, plates: 4, price: 6}};
 // the tapas of the day: garden dishes, one chosen each day, 6 plates a batch
 export const TAPAS = {
   patatas: {n: "Patatas bravas", need: {potato: 2, tomato: 1}, price: 8, seasons: ["autumn"]},
@@ -78,7 +79,11 @@ export const TAPAS = {
   azul: {n: "Honeybrook blue with pear", need: {bluecheese: 1, pear: 2}, price: 11},
   manzana: {n: "Apple and cheddar tostas", need: {cheddar: 1, apple: 2, loaf: 1}, price: 11},
   tarta: {n: "Leek and cheese tart", need: {leek: 2, cheese: 1, flour: 1}, price: 10, seasons: ["autumn", "winter"]},
-  panal: {n: "Honeycomb with farm cheese", need: {honeycomb: 1, farmcheese: 1}, price: 12}};
+  panal: {n: "Honeycomb with farm cheese", need: {honeycomb: 1, farmcheese: 1}, price: 12},
+  // round 103: from the woods (foraging, woods.js)
+  ajo: {n: "Wild garlic tortilla", need: {wildgarlic: 2, egg: 2, potato: 1}, price: 10, seasons: ["spring"]},
+  setas: {n: "Wild mushrooms on toast", need: {mushroom: 2, loaf: 1}, price: 10, seasons: ["autumn", "winter"]},
+  castanas: {n: "Roast chestnuts with honey", need: {chestnut: 4, honey: 1}, price: 9, seasons: ["autumn", "winter"]}};
 export const inSeason = (id, season) => !TAPAS[id].seasons || TAPAS[id].seasons.includes(season);
 export const TAPAS_PLATES = 6;
 // The chef's request: each day someone in town has a craving for one of the season's tapas. Make it the tapas of the

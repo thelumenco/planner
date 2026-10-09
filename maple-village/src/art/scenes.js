@@ -13,6 +13,7 @@ import { bankBuilding } from "./buildings.js";
 import { archGate } from "./orchard.js";
 import { STYLES as VAN_STYLES } from "../game/van.js";
 import { vineGate } from "./vineyard.js";
+import { riverPath } from "./hwoods.js";
 export { vineyardArt } from "./vineyard.js";
 export { orchardArt, flowerFarmArt } from "./orchard.js";
 import { orchardGate, potsIn } from "./orchard.js";
@@ -241,7 +242,7 @@ export function laneArt(){
     <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
     <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D.chico.door[0]} ${D.chico.door[1]} M150 336 L${D.chord.door[0]} ${D.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D.luna.door[0]} ${D.luna.door[1]} M262 420 C300 470 340 500 ${D.ohayo.door[0]} ${D.ohayo.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[40,200,"#EFA3A6"],[60,214,"#F3C969"],[480,330,"#C3CDEE"],[300,420,"#EFA3A6"],[200,600,"#F3C969"],[90,560,"#C3CDEE"],[460,600,"#EFA3A6"],[330,250,"#F3C969"]])}
-    ${tree(30,120,1)}${tree(250,80,.9)}${tree(490,110,1)}${tree(40,620,.95)}${tree(490,620,.9)}${tree(470,430,.85)}${tree(60,440,.9)}`;
+    ${tree(70,120,1)}${tree(220,80,.9)}${tree(490,110,1)}${tree(40,620,.95)}${tree(490,620,.9)}${tree(470,430,.85)}${tree(60,440,.9)}`;
   const gate = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
     ${sk(`<rect x="6" y="292" width="6" height="56" style="fill:var(--wood)"/><rect x="30" y="292" width="6" height="56" style="fill:var(--wood)"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
       `<rect x="6" y="292" width="6" height="56"/><rect x="30" y="292" width="6" height="56"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`)}
@@ -258,7 +259,11 @@ export function laneArt(){
     <text x="${x}" y="447" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" textLength="52" lengthAdjust="spacingAndGlyphs" style="fill:var(--line)">coming soon</text>
     ${tapeLabel(x, 552, name, col, 11)}</g>`;
   const plot = lunaHouse() + ohayoHouse();   // (plotArt is kept for the next app that needs a plot)
-  return lampDefs + ground + gate + vgate + [[70, 352], [250, 352], [460, 352], [222, 572]].map(([x, y]) => streetLamp(x, y)).join("")
+  // round 103: the river comes down from the waterfall in the woods along the west edge (on to the vineyard), with a
+  // plank bridge where the town square path crosses it; the path up the hill to the woods leaves from the top
+  const river = riverPath([[18, -20], [22, 150], [14, 330], [20, 480], [12, 660]], 16) + sk(`<rect x="2" y="322" width="36" height="20" rx="2" style="fill:#C9A27E"/>`, `<rect x="2" y="322" width="36" height="20" rx="2"/><path d="M12 322 v20 M22 322 v20" opacity=".5"/>`);
+  const up = `<g filter="url(#wob)"><path d="M262 344 C262 260 300 200 330 150 L330 40" fill="none" style="stroke:var(--path)" stroke-width="16" stroke-linecap="round"/></g>` + archGate("toWoodsM", 330, 48, "Honeybrook Woods", 404, 70, "#C3E8DA", "Up the hill into Honeybrook Woods");
+  return lampDefs + ground + river + up + gate + vgate + [[70, 352], [250, 352], [460, 352], [222, 572]].map(([x, y]) => streetLamp(x, y)).join("")
     + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot
     + light("chord", 200, 196) + light("chico", 433, 206) + light("luna", 212, 452) + light("ohayo", 414, 450)
     + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12) + userGarden("luna", 76, 570, 4, 2, 12) + userGarden("ohayo", 420, 562, 4, 2, 12)
