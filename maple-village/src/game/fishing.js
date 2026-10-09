@@ -42,6 +42,7 @@ export const FISH = {
   minnow: {n: "Minnow", spot: "pool", w: 30, cm: [4, 9], hard: 1, item: "fish", hint: "The waterfall pool, any time. Tiny."},
   browntrout: {n: "Brown trout", spot: "pool", w: 22, cm: [25, 55], hard: 3, item: "trout", hint: "The waterfall pool, any time."},
   grayling: {n: "Grayling", spot: "pool", w: 14, when: "day", cm: [25, 40], hard: 3, item: "fish", hint: "The waterfall pool, in daylight. A big sail of a fin."},
+  shrimp: {n: "Shrimp", spot: "sea", w: 26, when: "dawn", cm: [6, 12], hard: 1, item: "shrimp", hint: "The sea, in the morning. For gambas!"},   // round 109
   seaglass: {n: "Sea glass", spot: "sea", w: 6, cm: [2, 4], hard: 1, item: null, junk: true, hint: "The sea. Smoothed by the waves; it goes on the windowsill."}
 };
 // crayfish come out at night or in the rain
@@ -56,7 +57,7 @@ export const fishHere = (spot, day, hm) => Object.keys(FISH).filter(id => FISH[i
 // the backpack items (the generic "fish" already exists: a market treat)
 const ING = {trout: ["Rainbow trout", 4, "with almond butter, at the kitchen"], crayfish: ["Crayfish", 2, "four on toast with garlic, at the kitchen"],
   sardine: ["Sardine", 2, "three on the grill, at the kitchen"], mackerel: ["Mackerel", 3, "escabeche with peppers, at the kitchen"],
-  seabream: ["Sea bream", 5, "baked with olives, at the kitchen"], squid: ["Squid", 4, "fried calamari, at the kitchen"], octopus: ["Octopus", 6, "pulpo a la gallega, at the kitchen"]};
+  seabream: ["Sea bream", 5, "baked with olives, at the kitchen"], squid: ["Squid", 4, "fried calamari, at the kitchen"], octopus: ["Octopus", 6, "pulpo a la gallega, at the kitchen"], shrimp: ["Shrimp", 2, "gambas al ajillo with garlic and olive oil, at the kitchen"]};
 Object.entries(ING).forEach(([id, [n, sell, what]]) => { if (!ITEMS[id]) ITEMS[id] = {n, ico: id, kind: "ingredient", sell, what}; });
 
 export const ROD = 80, REEL = 400, BAIT_DAY = 3, BAIT_MAX = 20;

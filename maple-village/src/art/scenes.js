@@ -14,6 +14,7 @@ import { archGate } from "./orchard.js";
 import { STYLES as VAN_STYLES } from "../game/van.js";
 import { vineGate } from "./vineyard.js";
 import { riverPath } from "./hwoods.js";
+import { ghOutside } from "./greenhouse.js";
 export { vineyardArt } from "./vineyard.js";
 export { orchardArt, flowerFarmArt } from "./orchard.js";
 import { orchardGate, potsIn } from "./orchard.js";
@@ -767,7 +768,7 @@ export function farmArt(){
     <g filter="url(#wob)" ${ink}><path d="M20 140 H500 M20 140 V600 M500 140 V600 M20 600 H210 M310 600 H500" style="stroke:var(--wood)" stroke-width="3"/>
       ${Array.from({length:17}, (_, i) => `<path d="M${20 + i*30} 132 v16" style="stroke:var(--wood)" stroke-width="2.4"/>`).join("")}</g>
     ${tree(60,110,1)}${tree(460,110,1)}
-    ${sk(`<rect x="232" y="40" width="56" height="66" rx="4" style="fill:var(--wood)"/><path d="M226 44 l34 -26 l34 26z" style="fill:var(--sage)"/>`, `<rect x="232" y="40" width="56" height="66" rx="4"/><path d="M226 44 l34 -26 l34 26z"/><path d="M248 106 v-26 h24 v26"/>`)}
+    ${ghOutside(260, 106, !!(G.F().goals && G.F().goals.greenhouse))}
     <g filter="url(#wob)" ${ink}><path d="M120 76 v40 M104 86 h32" style="stroke:var(--wood)" stroke-width="3"/><circle cx="120" cy="70" r="9" style="fill:var(--butter)"/><path d="M110 64 l10 -8 l10 8z" style="fill:var(--peach)"/></g>`;
   PLOTS.forEach((p, i) => {
     const s = G.F().plots[i], g = s && s.crop ? G.growth(s) : null;

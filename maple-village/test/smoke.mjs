@@ -2774,6 +2774,32 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   k.planTapas(F, "puerros", "2026-10-15"); k.planTapas(F, "tortilla", "2026-10-15");
   check(k.tapasAll(F, "2026-10-15").map(t => t.id).join() === "puerros,tortilla", "tomorrow's planned tapas are on the chalkboard first thing the next day");
 }
+{
+  console.log("\nthe greenhouse, herbs and gambas");
+  { const g = await import(new URL("../src/game/greenhouse.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), k = await import(new URL("../src/game/kitchen.js", import.meta.url)), fi = await import(new URL("../src/game/fishing.js", import.meta.url));
+    const F = {inv: {basil_seed: 1, gh_strawberry_seed: 1}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; if (F.inv[id] <= 0) delete F.inv[id]; };
+    check(!!g.ghPlant(F, 0, "basil_seed", add) && !!g.ghPlant(F, 1, "gh_strawberry_seed", add) && !F.inv.basil_seed, "basil and out-of-season strawberries planted in the greenhouse beds");
+    F.gh.beds[0].plantedAt -= 5*3600e3; const r = g.ghHarvest(F, 0, add);
+    check(r && F.inv.basil === 3 && !g.ghHarvest(F, 1, add), "the basil's ready in four hours (three bunches); the strawberries take longer");
+    check(["garlic", "basil", "mint", "rosemary", "chives", "thyme"].every(h => it.CROPS[h] && it.ITEMS[h + "_seed"] && it.ITEMS[h + "_seed"].greenhouse) && it.ITEMS.gh_leek_seed && it.ITEMS.gh_leek_seed.greenhouse, "six herbs to grow, and greenhouse packets of seasonal seeds like leeks");
+    check(fi.FISH.shrimp && fi.FISH.shrimp.spot === "sea" && k.TAPAS.gambas && k.TAPAS.gambas.need.shrimp === 3 && k.TAPAS.gambas.need.garlic === 2 && k.TAPAS.gambas.need.oliveoil === 1, "shrimp from the sea, and gambas al ajillo: shrimp, garlic and olive oil"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`greenhouse pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/ghcoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 500; f.inv = Object.assign(f.inv || {}, {garlic_seed: 1}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-14"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-14&ghcoins=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("farm")); await page.waitForTimeout(900);
+  await page.locator('#world [data-gh="door"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="greenhouse"]', { timeout: 15000 });
+  await page.click('#ctx [data-goal="greenhouse"]'); await page.waitForTimeout(800);
+  await page.locator('#world [data-gh="door"]').dispatchEvent("click");
+  await page.waitForFunction(() => /greenhouse/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.locator('#world [data-ghbed="0"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gh="plant"][data-id="garlic_seed"]', { timeout: 15000 });
+  await page.click('#ctx [data-gh="plant"][data-id="garlic_seed"]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.gh && f.gh.beds[0] && f.gh.beds[0].crop === "garlic"; }), "through the glass door: garlic planted in the first bed");
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.coins <= 100 && f.goals && f.goals.greenhouse; }), "the greenhouse cost 400 coins");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

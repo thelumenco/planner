@@ -362,6 +362,13 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
   Object.entries(TOWN_GOODS).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   I.wine_tempranillo = S.bottle("#5A1630");
 }
+// round 109: greenhouse herbs, and shrimp from the sea
+I.garlic = [`<path d="M12 4c1 3 6 5 6 10a6 5 0 0 1-12 0c0-5 5-7 6-10z" ${f("#F6F1E8")}/><path d="M12 4v-2" ${f("none")}/>`, `<path d="M12 4c1 3 6 5 6 10a6 5 0 0 1-12 0c0-5 5-7 6-10zM12 9v10M9 10c-1 3-1 6 0 9M15 10c1 3 1 6 0 9" /><path d="M12 4v-2"/>`];
+I.basil = [`<ellipse cx="8" cy="13" rx="5" ry="3.4" transform="rotate(-30 8 13)" ${f("#5E9A4A")}/><ellipse cx="16" cy="13" rx="5" ry="3.4" transform="rotate(30 16 13)" ${f("#6FAE58")}/><ellipse cx="12" cy="8" rx="3.4" ry="5" ${f("#7FB86A")}/>`, `<path d="M12 21v-9"/><ellipse cx="8" cy="13" rx="5" ry="3.4" transform="rotate(-30 8 13)"/><ellipse cx="16" cy="13" rx="5" ry="3.4" transform="rotate(30 16 13)"/><ellipse cx="12" cy="8" rx="3.4" ry="5"/>`];
+I.rosemary = [`${[5, 8, 11, 14, 17].map((y, i) => `<ellipse cx="${i % 2 ? 15 : 9}" cy="${y}" rx="3" ry="1.2" transform="rotate(${i % 2 ? -30 : 30} ${i % 2 ? 15 : 9} ${y})" ${f("#6F8F6A")}/>`).join("")}`, `<path d="M12 21V3"/>${[5, 8, 11, 14, 17].map((y, i) => `<ellipse cx="${i % 2 ? 15 : 9}" cy="${y}" rx="3" ry="1.2" transform="rotate(${i % 2 ? -30 : 30} ${i % 2 ? 15 : 9} ${y})"/>`).join("")}`];
+I.chives = [`<path d="M8 21V6M11 21V3M14 21V5M17 21V8" ${f("none")} style="stroke:#5E9A4A" stroke-width="2.4"/><circle cx="11" cy="3" r="2" ${f("#C9A3E0")}/>`, `<path d="M6 21h13"/><circle cx="11" cy="3" r="2"/>`];
+I.thyme = [`${[[8, 8], [12, 6], [16, 9], [10, 12], [14, 13], [12, 16]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.8" ${f("#8FA88A")}/>`).join("")}`, `<path d="M12 21V7M12 12l-3-3M12 14l3-3"/>`];
+I.shrimp = [`<path d="M6 8c6-3 13 0 13 6s-6 7-10 5c3-1 5-3 4-5-1-3-5-3-7-6z" ${f("#F28C6A")}/><path d="M6 8l-3-3M6 8l-4 0" ${f("none")}/>`, `<path d="M6 8c6-3 13 0 13 6s-6 7-10 5c3-1 5-3 4-5-1-3-5-3-7-6zM6 8l-3-3M6 8h-4M12 9l1 3M15 10l0 3"/>`];
 export const icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
 export const iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size/2}" y="${y - size/2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;
 export const ICON_NAMES = Object.keys(I);

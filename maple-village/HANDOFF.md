@@ -1605,3 +1605,14 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Tapas: `v.tapasList` (up to `TAPAS_MAX` 3 a day; old `v.tapas` migrates in `vineState`).
   - `v.tapasPlan` = {day, ids}: tomorrow's tapas, applied by `tapasAll` on the day.
   - Fold-outs remember being open (`KP`).
+
+### Round 109: the greenhouse, herbs and gambas (the olive mill and grove come next round)
+- **Greenhouse:**
+  - `GOALS.greenhouse` (400) turns the garden's old shed into a glass house (art/greenhouse.js `ghOutside`, drawn in farmArt with `data-gh="door"`).
+  - Inside is `INNER.greenhouse` (parent farm), drawn by `greenhouseArt`.
+  - Six beds (`F.gh.beds`, game/greenhouse.js). The misters keep them damp, so there's no watering, and quest boosts apply (`ghBoost`).
+- **Herbs:** `CROPS` garlic, basil, mint, rosemary, chives, thyme (`herb: true`). The `<herb>_seed` packets are greenhouse-only (`greenhouse: true`, `needs: "greenhouse"`).
+- **Out-of-season seeds:** every seasonal seed has a `gh_<seed>` twin (×1.5 price). Hana's seed shelf shows a twin only while the ordinary seed is out of season, and only once the greenhouse is built. The garden's plots don't take greenhouse packets.
+- **Uses:** herbs are kitchen GOODS. Basil, rosemary and thyme are gelato ingredients (and so bonbon fillings); mint already was.
+- **New tapas:** gambas al ajillo (3 shrimp, 2 garlic, 1 olive oil), rosemary potatoes, tomato and basil bruschetta, chive omelette, and roast pumpkin with thyme.
+- **Shrimp:** a sea catch in the morning (fishing.js `FISH.shrimp`).

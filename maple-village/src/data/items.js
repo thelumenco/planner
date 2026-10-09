@@ -10,7 +10,11 @@ export const CROPS = {
   carrot:{n:"Carrot", ns:"carrots", e:"🥕", dur:4*H, yield:3}, corn:{n:"Corn", ns:"corn cobs", e:"🌽", dur:4*H, yield:3},
   strawberry:{n:"Strawberry", ns:"strawberries", e:"🍓", dur:24*H, yield:5}, blueberry:{n:"Blueberry", ns:"handfuls of blueberries", e:"🫐", dur:24*H, yield:5},
   tomato:{n:"Tomato", ns:"tomatoes", dur:6*H, yield:3}, potato:{n:"Potato", ns:"potatoes", dur:8*H, yield:4}, pepper:{n:"Pepper", ns:"peppers", dur:6*H, yield:3},
-  pea:{n:"Peas", ns:"handfuls of peas", dur:4*H, yield:4}, pumpkin:{n:"Pumpkin", ns:"pumpkins", dur:24*H, yield:2}, leek:{n:"Leek", ns:"leeks", dur:8*H, yield:3}
+  pea:{n:"Peas", ns:"handfuls of peas", dur:4*H, yield:4}, pumpkin:{n:"Pumpkin", ns:"pumpkins", dur:24*H, yield:2}, // round 109: herbs, grown in the greenhouse (game/greenhouse.js)
+  garlic:{n:"Garlic", ns:"bulbs of garlic", dur:8*H, yield:4, herb:true}, basil:{n:"Basil", ns:"bunches of basil", dur:4*H, yield:3, herb:true},
+  mint:{n:"Mint", ns:"bunches of mint", dur:4*H, yield:3, herb:true}, rosemary:{n:"Rosemary", ns:"sprigs of rosemary", dur:6*H, yield:3, herb:true},
+  chives:{n:"Chives", ns:"bunches of chives", dur:3*H, yield:3, herb:true}, thyme:{n:"Thyme", ns:"bunches of thyme", dur:6*H, yield:3, herb:true},
+  leek:{n:"Leek", ns:"leeks", dur:8*H, yield:3}
 };
 export const ITEMS = {
   tulip_seed:{e:"🌷", n:"Tulip bulbs", kind:"seed", price:2, crop:"tulip", tab:"seeds", seasons:["autumn","winter","spring"]},
@@ -25,6 +29,13 @@ export const ITEMS = {
   pumpkin_seed:{n:"Pumpkin seeds", kind:"seed", price:6, crop:"pumpkin", tab:"seeds", seasons:["autumn","winter"]},
   leek_seed:{n:"Leek seedlings", kind:"seed", price:4, crop:"leek", tab:"seeds", seasons:["winter"]},
   pepper_seed:{n:"Pepper seeds", kind:"seed", price:5, crop:"pepper", tab:"seeds", seasons:["summer"]},
+  // round 109: herb seeds, for the greenhouse only (all year round, once the greenhouse is built)
+  garlic_seed:{n:"Garlic cloves", kind:"seed", price:4, crop:"garlic", tab:"seeds", greenhouse:true, needs:"greenhouse"},
+  basil_seed:{n:"Basil seeds", kind:"seed", price:3, crop:"basil", tab:"seeds", greenhouse:true, needs:"greenhouse"},
+  mint_seed:{n:"Mint cuttings", kind:"seed", price:3, crop:"mint", tab:"seeds", greenhouse:true, needs:"greenhouse"},
+  rosemary_seed:{n:"Rosemary cuttings", kind:"seed", price:4, crop:"rosemary", tab:"seeds", greenhouse:true, needs:"greenhouse"},
+  chives_seed:{n:"Chive seeds", kind:"seed", price:3, crop:"chives", tab:"seeds", greenhouse:true, needs:"greenhouse"},
+  thyme_seed:{n:"Thyme seeds", kind:"seed", price:3, crop:"thyme", tab:"seeds", greenhouse:true, needs:"greenhouse"},
   // Hana's deli shelf: ingredients for the wine shop's kitchen (send them there from the backpack)
   flour:{n:"Bag of flour", kind:"ingredient", price:3, tab:"deli", what:"bakes two loaves in the kitchen oven"},
   cheese:{n:"Cheese", kind:"ingredient", price:9, tab:"deli", what:"for cheese boards and tostas"},
@@ -248,6 +259,14 @@ Object.keys(FLOWERS).forEach(id => { const f = FLOWERS[id];
 // Hand-drawn icon name for an item (see art/icons.js): seeds draw as a seed packet of their crop.
 // the market stalls' extra goods (data/stall-goods.js)
 Object.entries(GOODS).forEach(([id, g]) => { if (!ITEMS[id]) ITEMS[id] = g; });
+// Round 109: out-of-season seeds for the greenhouse. Every seasonal packet has a greenhouse twin (half as dear again)
+// that Hana sells all year once the greenhouse is built; it only grows under glass (the garden won't take it).
+Object.keys(ITEMS).filter(id => ITEMS[id].kind === "seed" && ITEMS[id].seasons).forEach(id => { const s = ITEMS[id];
+  ITEMS["gh_" + id] = {n: s.n + " (greenhouse)", kind: "seed", price: Math.ceil(s.price*1.5), crop: s.crop, tab: "seeds", greenhouse: true, needs: "greenhouse", ghOf: id}; });
+// the herbs themselves (mint is already on Hana's deli shelf)
+Object.assign(ITEMS, {garlic: {n: "Garlic", kind: "ingredient", sell: 1, what: "from the greenhouse: gambas, garlicky tapas"}, basil: {n: "Basil", kind: "ingredient", sell: 1, what: "from the greenhouse: bruschetta, basil gelato, a bonbon filling"},
+  rosemary: {n: "Rosemary", kind: "ingredient", sell: 1, what: "from the greenhouse: rosemary potatoes, a rosemary bonbon, gelato"}, chives: {n: "Chives", kind: "ingredient", sell: 1, what: "from the greenhouse: a chive omelette"},
+  thyme: {n: "Thyme", kind: "ingredient", sell: 1, what: "from the greenhouse: roast tapas, thyme and lemon gelato"}});
 export const itemIco = id => ITEMS[id] && ITEMS[id].kind === "seed" ? "seed:" + ITEMS[id].crop : id;
 Object.keys(ITEMS).forEach(id => { ITEMS[id].ico = itemIco(id); });
 Object.keys(CROPS).forEach(id => { CROPS[id].ico = id; });

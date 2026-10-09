@@ -176,6 +176,8 @@ export const INNER = {
   trophy: {parent: "hall", door: [64, 372], arrive: [456, 400], exit: [486, 410]},
   // the wine shop's kitchen, through the door on its east wall; its own way out is the mat at the bottom
   kitchen: {parent: "wineshop", door: [462, 390], arrive: [260, 560], exit: [260, 606]},
+  // round 109: the greenhouse, through the glass door at the back of the garden
+  greenhouse: {parent: "farm", door: [260, 128], arrive: [260, 560], exit: [260, 606]},
   // big goals: the garage through the back door of the house, the cellar door through the wine shop's west wall
   garage: {parent: "home", door: [456, 340], arrive: [70, 450], exit: [34, 440]},
   office: {parent: "home", door: [64, 512], arrive: [450, 450], exit: [486, 440]},
