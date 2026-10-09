@@ -833,3 +833,4 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 @keyframes tfade{0%{opacity:0}12%,88%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.taxiride,.taxiboat{animation:none}}
 .taxibank{position:absolute;left:0;top:calc(38% - 90px);width:200%;height:90px;animation:tbank 2.6s linear both}@keyframes tbank{to{transform:translateX(-50%)}}@media (prefers-reduced-motion:reduce){.taxibank{animation:none}}
+.storylog{margin:6px 0;padding:6px 10px;border-radius:10px;background:#F6EFE3}.storylog summary{cursor:pointer}.storylog p{margin:6px 0;line-height:1.5}

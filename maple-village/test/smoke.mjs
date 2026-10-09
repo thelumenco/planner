@@ -2591,6 +2591,41 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await ids().then(a => a.includes("mateo") && a.includes("lila")), "Mateo and Lila are home in Honeysuckle in the evening");
   await page.close();
 }
+{
+  // Round 104: backstories told a chapter at a time in the bubbles (on days with a quest done), with rewards; and
+  // Mel's family at the night market and the fair
+  console.log("\nstories and the family out at the fairs");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`stories pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  await page.addInitScript(() => { if (!/storypatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.met = {...(f.met || {}), celeste: true}; f.goals = {...(f.goals || {}), cocoa: 1}; f.story = {heard: {celeste: 4}, day: {}, log: [], flags: {}};
+    if (/quest=1/.test(location.search)) f.storyDay = "2026-10-07";
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=12:00&date=2026-10-07&storypatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(2800);
+  check(await page.locator('#actors .npc[data-npc="celeste"].story').count() === 0, "no quest done today: no story chapter yet");
+  await page.goto(url + "?seed=1&time=12:00&date=2026-10-07&storypatch=1&quest=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(2800);
+  check(await page.locator('#actors .npc[data-npc="celeste"].story').count() === 1, "a quest done today: Celeste has a chapter ready (the little … over her head)");
+  await page.locator('#actors .npc[data-npc="celeste"]').dispatchEvent("click"); await page.waitForTimeout(600);
+  check(/smelled chocolate again/.test(await page.locator("#npcSay").textContent()), "she tells it in her bubbles: the old chocolatier was her family's");
+  const f1 = await fox();
+  check(f1.story.heard.celeste === 5 && f1.inv.s_recipebook === 1 && f1.inv.s_praline === 2, "and gives Mel Henri's recipe book and his pralines");
+  await page.waitForTimeout(12000);
+  await page.locator('#actors .npc[data-npc="celeste"]').dispatchEvent("click"); await page.waitForTimeout(400);
+  check(await fox().then(f => f.story.heard.celeste === 5), "one chapter a day: the next waits for another day");
+  // the family at the night market (Tuesday) and the fair (the last Saturday)
+  await page.goto(url + "?seed=1&time=18:45&date=2026-10-06"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2500);
+  check(await ids().then(a => ["mama", "gonggong", "marcus", "angelina"].every(x => a.includes(x))), "Tuesday's night market: Ma Ma, Gong Gong, Marcus and Angellina are there");
+  await page.goto(url + "?seed=1&time=11:30&date=2026-10-31"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2500);
+  check(await ids().then(a => ["mum", "dad", "mama", "gonggong"].every(x => a.includes(x))), "the field fair: Mum, Dad, Ma Ma and Gong Gong are there in the morning");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

@@ -50,6 +50,7 @@ import { hwoodsArt } from "../art/hwoods.js";
 import { bikeArt, taxiBoat, taxiBank, transportArt } from "../art/transport.js";
 import { bikeOn, bikeLeft, hireBike, returnBike, bikeExpired, bikePanel, STOPS as TAXI_STOPS, taxiPanel, takeTaxi } from "./transport.js";
 import { forage, rangerPanel } from "./woods.js";
+import { tellStory, storyReady, storiesHTML, applyFlags as storyFlags, storyState } from "./stories.js";
 import { fishState, fishPanel, spotIn, SPOTS as FISH_SPOTS, cast as fishCast, land as fishLand, buyRod, buyReel, addBait, markerAt, inZone, ESCAPE as FISH_ESCAPE, FISH } from "./fishing.js";
 import { fishSpotArt, koiArt } from "../art/fishing.js";
 import { timetablePanel, trainKey, trainHere, fmt as railTime } from "./rail.js";
@@ -736,6 +737,7 @@ function doNext(id){
 function countQuest(){
   const before = unlocked(F.totalQuests || 0).length;
   F.totalQuests = (F.totalQuests || 0) + 1;
+  F.storyDay = dayKey();   // villagers tell their stories on days Mel's done something real (stories.js)
   addBait(F, 1);   // every quest done digs up a worm for the bait tin (fishing.js)
   const now = unlocked(F.totalQuests);
   if (now.length > before) {
@@ -1959,6 +1961,7 @@ function dressMel(){
 }
 function render(redraw){
   if (S.day !== dayKey()) S = freshToday();
+  storyFlags(F);   // story rewards that change the game (the koi tip, Farid's pastries)
   registerItems(F);   // each discovered gelato flavour is a gift item (one per type) in the backpack
   { const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null; setLive(ev && ev.kind === "night" ? "jazz" : null); }   // the jazz duo, live
   $("evan").style.display = evanHere() ? "" : "none";
@@ -1984,7 +1987,7 @@ function render(redraw){
     <h3 class="ph3">Village upgrades</h3>
     <p class="muted">${F.totalQuests || 0} quests finished so far. ${(() => { const nx = nextUpgrade(F.totalQuests || 0); return nx ? `Next at ${nx.at}: ${esc(nx.name)}.` : "Every upgrade unlocked!"; })()}</p>
     <ul class="uplist">${UPGRADES.map(u => `<li class="${(F.totalQuests || 0) >= u.at ? "got" : ""}">${icon((F.totalQuests || 0) >= u.at ? "sparkle" : "clock", 16)} <span>${esc(u.name)}</span> <small>${u.at}</small></li>`).join("")}</ul>`;
-  $("friendBody").insertAdjacentHTML("beforeend", whosWhereHTML());
+  $("friendBody").insertAdjacentHTML("beforeend", whosWhereHTML() + storiesHTML(F, Object.fromEntries(NPCS.map(n => [n.id, n.name]))));
   $("friendBody").insertAdjacentHTML("beforeend", `<h3 class="ph3">Family</h3><p class="muted">${icon("heart", 14)} Gifts for Evan: ${F.fam.gifts.evan} · for Darren: ${F.fam.gifts.darren}. Every third gift, they give you something back. Treats and keepsakes are in the market's Family tab.</p>`);
   renderEvanHold();
   const all = allTasks(), rem = remaining(), cur = (phase() === "task" && rem[0]) ? rem[0].id : null;
@@ -3098,7 +3101,7 @@ initHestia({sfx, alarm, speak, flash, undoable, earn: (n, why) => { earn(n, why)
 $("hestiaFile").onchange = e => { const f = e.target.files && e.target.files[0]; if (!f) return; const r = new FileReader();
   r.onload = () => { const msg = importHestia(String(r.result)); $("hestiaNote").textContent = msg; speak(/^Imported/.test(msg) ? "Hestia's lists are in the house now!" : msg, 4500); }; r.readAsText(f); e.target.value = ""; };
 setStallOwned(() => ({cc_cart: !!(F.cocoa && F.cocoa.up && F.cocoa.up.cart), cc_workshop: !!(F.cocoa && F.cocoa.up && F.cocoa.up.workshop)}));   // the Cocoa Room's market cart and Saturday workshop, once bought
-initNpcs({sfx, quiet: () => quietNow(), chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, sup: () => sup, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
+initNpcs({sfx, story: id => tellStory(F, id, addInv), storyReady: id => !!storyReady(F, id), flash, quiet: () => quietNow(), chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, sup: () => sup, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();
 render(true);

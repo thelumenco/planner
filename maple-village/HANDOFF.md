@@ -1419,3 +1419,45 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - npcs.js `outdoors` now uses `OUTDOOR`, so hats stay on at the bay, farm, lane and woods.
 - **Fixes:** runtime-registered items (fishing catches, forage finds) now get `ico: id`. The backpack crashed without it.
 - **Tests:** the "Honeybrook Woods, bikes and the river taxi" block. The fishing journal now expects 19 locked, the autumn stove 26 tapas.
+
+### Round 104: backstories, and the family at the night market and fair
+- **Family at events** (tours.js `FAMILY_EVENTS`, `familyAtEvent`, checked in `eventSlot` after the stall keepers):
+  - Night market, Tuesday: Ma Ma and Gong Gong 5:45 to 7, Marcus and Angellina 6:30 to 8:30.
+  - Night market, Thursday: Mum and Dad 6 to 8, Darren 7 to 8:30.
+  - Fair: Mum and Dad 10 to 12, Ma Ma and Gong Gong 11 to 1, Darren 1 to 3, Marcus and Angellina 1 to 3:30.
+  - The Sunday market was already in their routines.
+- **Backstories** (data/stories.js `STORIES`; game/stories.js):
+  - 25 villagers, 3 to 6 chapters each, told in bubbles on tap. npcs.js `tapNpc` runs `api.story`, chaining the bubbles one after another.
+  - When: one chapter per villager per day, only when `F.storyDay` is today (core.js `countQuest` sets it, so stories need a real quest done that day), after the intro, and once the chapter's gates are met (`cocoa`, `cellar`, `trust1`, `fish5`, `bouquet`, `<npc>:<n>`).
+  - A ready chapter shows a "…" cue (`.storycue`, class `story`), and the hello bubble becomes "Mel! Got a minute?".
+  - The heard chapters are listed as "Stories so far" in the friendship view (`storiesHTML`). State: `F.story = {heard, day, log, flags}`.
+- **The threads:**
+  - The old chocolatier, Marchand & Fille (1962), which became the Cocoa Room: Celeste's family. Grandfather Henri, mother Margaux, brothers in Lyon who wanted it sold.
+  - Marco and Margaux were sweethearts; his first red was named for her.
+  - Dad painted the Marchand label at art school in the city. Dad and Mum met when she brought her cracked guitar into the music shop where he worked; the family moved here together from the city when Ma Ma found the orchard.
+  - Bo carved and kept the old sign.
+  - Mateo's abuela was Margaux's tempering girl.
+  - Opal paid the building's rates for nine years.
+  - Okada's one undelivered letter was from Hana's father.
+  - Juniper is the Gazette's secret poet "J."; Theo collects the poems and leaves pressed flowers.
+  - Elena and Marcus worked at the same city bank; Marcus starts helping in the dairy on Saturdays, nudged by Angellina.
+  - Felix's first bees swarmed in Ma Ma's apple tree.
+  - Mei's mother was Ma Ma's dearest friend (a bouquet for her birthday).
+  - Wren is Bo's niece; the gran was the last ranger.
+  - Noor's city rescue closed.
+  - Tomo is Pilar's nephew; Pilar fixes Sofia's nonna's fior di latte.
+  - Farid trained in his uncle's bakery.
+  - Gong Gong taught Darren to fix things.
+- **Rewards** (`REWARDS`):
+  - henri: `s_recipebook` keepsake and 2 `s_praline`.
+  - margaux: a "Margaux 1984" bottle in the cellar.
+  - label: `s_label` keepsake.
+  - blossom: a jar of orchard blossom honey.
+  - toast: 2 `s_toast`.
+  - sign: the `flags.sign` Marchand & Fille sign on the Cocoa Room in bay.js.
+  - koi: koi weight 3 → 7.
+  - bouquet: uses up one `bq_*`.
+  - nonna: 2 `s_nonna`.
+  - pastry: a tapas, "Farid's honey and pistachio pastries".
+  - Game-changing flags are re-applied each render (`applyFlags`). Story items live in stall-goods.js (not sold anywhere).
+- **Tests:** "stories and the family out at the fairs" block.

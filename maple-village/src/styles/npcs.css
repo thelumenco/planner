@@ -88,3 +88,5 @@
 #mel.scoot .legL,#mel.scoot .legR,#mel.scoot .armL,#mel.scoot .armR{animation:none !important}
 #mel.drive .legL,#mel.drive .legR{visibility:hidden}
 #mel .carEvan{display:none}#mel.withEvan .carEvan{display:inline}
+
+.storycue{display:none}.npc.story .storycue{display:inline}.npc.story .storycue > g{animation:cuebob 1.6s ease-in-out infinite}@keyframes cuebob{50%{transform:translateY(-3px)}}@media (prefers-reduced-motion:reduce){.npc.story .storycue > g{animation:none}}

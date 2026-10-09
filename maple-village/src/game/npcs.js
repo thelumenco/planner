@@ -11,7 +11,7 @@ import { findPath, blocked } from "./paths.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const ents = {};            // id -> entity (villagers and the active messenger)
-let api = null;             // see core: scene(), bounds(), mel, evan, F(), S(), save(), facts(), bubble(), openMail(), unreadMail(), evanSays(), gift()
+let api = null, storyT = null;             // see core: scene(), bounds(), mel, evan, F(), S(), save(), facts(), bubble(), openMail(), unreadMail(), evanSays(), gift()
 let courier = null;         // the messenger currently on screen
 let sayer = null, sayT = null;
 const greeted = new Set();  // messengers say hello once, then just tag along quietly
@@ -59,7 +59,7 @@ function makeNode(id, look, kid, letter, act){
   if (id === "darren" && act === "type" && owned.headphones) look = Object.assign({}, look, {headphones: true});
   // a rainy day outdoors: everyone has their own brolly or raincoat (a coat if their right hand's busy or they're on a board)
   if (OUTDOOR.includes(api.scene()) && rainyOn(dayKey()) && !look.board) look = Object.assign({}, look, {rain: rainGearFor(id, {coat: !!look.bike || !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look.extra)})});
-  g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "");
+  g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "") + `<g class="storycue" transform="translate(0 ${kid ? -48 : -72})" pointer-events="none"><g filter="url(#wob)"><rect x="-13" y="-9" width="26" height="16" rx="8" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1.2"/><circle cx="-6" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="0" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="6" cy="-1" r="1.8" style="fill:var(--line)"/></g></g>`;
   $("actors").appendChild(g);
   return g;
 }
@@ -101,9 +101,11 @@ function tickVillager(def, dt){
   }
   // Now and then a neighbour near Mel says hello (each at most every few minutes).
   const near = Math.hypot(e.x - api.mel.x, e.y - api.mel.y) < 110;
+  // a story chapter ready to tell (stories.js): the little "…" over their head
+  if (!e.cueAt || Date.now() - e.cueAt > 2000) { e.cueAt = Date.now(); e.story = !!(api.storyReady && api.storyReady(def.id)); e.node.classList.toggle("story", e.story); }
   if (near && !sayer && Date.now() - (e.helloAt || 0) > 4*60e3 && Math.random() < dt*.08) {
     e.helloAt = Date.now(); if (!e.act) e.dir = api.mel.x < e.x ? -1 : 1;
-    say(e, pick(def.hellos || hellos()), 2600); api.sfx && api.sfx("babble", def.pitch || 1);
+    say(e, e.story ? pick(["Mel! Got a minute?", "Oh, Mel, I wanted to tell you something.", "Have you got a moment?"]) : pick(def.hellos || hellos()), 2600); api.sfx && api.sfx("babble", def.pitch || 1);
   }
   const b = api.bounds();
   if (walk(e, def.kid ? 95 : slot.free ? 22 : e.bike ? 86 : 48, dt)) {   // on a bike (look.bike), nearly twice walking pace
@@ -187,6 +189,10 @@ export function tapNpc(id){
     if (def.gift && !(F.gifts || {})[id]) { F.gifts = Object.assign(F.gifts || {}, {[id]: true}); setTimeout(() => { api.gift(def.gift); say(e, "Here, a free packet of seeds. Plant them by morning.", 4500); }, 7200); }
     api.save(); return;
   }
+  // their story, a chapter at a time (stories.js): the bubbles follow on, one after another
+  { const t = api.story && api.story(id); if (t) { clearTimeout(storyT); let i = 0;
+    const next = () => { if (i >= t.lines.length) { if (t.reward) api.flash && api.flash(`From ${def.name}: ${t.reward}`); return; } const line = t.lines[i++], ms = 2400 + line.length*42; say(e, line, ms); storyT = setTimeout(next, ms + 300); };
+    next(); e.story = false; e.node.classList.remove("story"); api.sfx && api.sfx("babble", def.pitch || 1); api.save(); return; } }
   const facts = api.facts();
   const cond = Object.keys(def.react || {}).find(k => facts[k] && !S.npcSaid[id + ":" + k]);
   if (cond) { S.npcSaid[id + ":" + cond] = true; say(e, def.react[cond], 4500); api.save(); return; }

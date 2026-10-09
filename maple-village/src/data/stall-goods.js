@@ -123,6 +123,14 @@ Object.assign(GOODS, {
 // the family, who looks after it on the screen Mel picks (companions.js).
 const K = (n, price, line, art) => ({n, kind: "keepsake", price, line, art});
 const P = (n, price, line, art, pet) => ({n, kind: "pet", price, line, art, pet, say: "A new friend! I promise to look after it, always."});
+// story rewards (game/stories.js): not sold anywhere, given by villagers as their stories unfold
+Object.assign(GOODS, {
+  s_recipebook: K("Henri's recipe book", 0, "Henri Marchand's chocolate recipes, in faded ink, 1962 onwards.", ["box", "#8A5A3A"]),
+  s_label: K("The first Marchand label", 0, "Dad's painting of the Marchand & Fille label: a ribbon and a copper pot.", ["star", "#E8C48E"]),
+  s_praline: G("Henri's hazelnut pralines", "family", 0, null, "Hazelnut pralines, from Henri's own recipe. Melt-in-the-mouth.", ["box", "#C98A4A"]),
+  s_toast: G("Postman's toast", "family", 0, null, "Honey, butter and a pinch of sea salt. Hana's new favourite.", ["loaf", "#E3B04B"]),
+  s_nonna: G("Nonna's fior di latte", "family", 0, null, "Just milk and sugar, the way Sofia's nonna made it in Napoli.", ["cone", "#FFF6DC"])
+});
 Object.assign(GOODS, {
   k_luckycat: K("Lucky cat figurine", 9, "A golden lucky cat, waving for good fortune.", ["plush", "#F3C969"]),
   k_bonsai: K("Tiny bonsai", 12, "A tiny juniper bonsai in a blue pot.", ["bonsai", "#7FA35A", "#7FB8E8"]),
