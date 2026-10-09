@@ -1303,3 +1303,4 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - `vanLook` / `lookLine` judge the look: dressed count, main style and share, from "All Coastal" to "Eclectic! Or a bit chaotic". It's meant to be reused for the cottages' rating later.
 - **core.js:** `vanView` / `vanSt`, `moodPanel`, `data-van` actions. Evan follows into the van.
 - **Tests:** a "the campervan" block.
+- **Round 98b:** the van's inside is redrawn as a long, narrow van seen from the back doors: the bed across the far end under the roof window, side windows with curtains, lights down both walls, the kitchenette and table along the sides. A narrow walkable aisle (`bounds` [182,210,338,612]).

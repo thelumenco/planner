@@ -186,11 +186,16 @@ const SHELLS = {
   // the campervan: a curved ceiling with a roof window, cream panels, mint trim, and whatever's been chosen for the
   // curtains and lights (game/van.js; colours via the art context)
   van: () => { const u = ((artCtx() && artCtx().F().van) || {}).use || {}, st = k => { const m = /^van_\w+?_(\w+)$/.exec(u[k] || ""); return m ? VAN_COLS[m[1]] : null; }, cu = st("curtains"), li = st("lights");
-    return `<rect width="520" height="640" style="fill:#D9B48A"/><g opacity=".35" style="stroke:#B9935F" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}</g>
-    ${wallBase("#F6EBC8", "#9FD3C2")}<path d="M0 0 H520 V30 Q260 60 0 30z" style="fill:#EAD8B0"/>${skirting}
-    ${sk(`<rect x="210" y="8" width="100" height="20" rx="8" style="fill:#2F3B73"/><circle cx="240" cy="16" r="1.2" style="fill:#FFFDF6"/><circle cx="270" cy="20" r="1" style="fill:#FFFDF6"/><circle cx="292" cy="14" r="1.3" style="fill:#FFFDF6"/>`, `<rect x="210" y="8" width="100" height="20" rx="8"/>`)}
-    ${[60, 380].map(wx => sk(`<rect x="${wx}" y="52" width="80" height="54" rx="14" style="fill:#CFE0EE"/>${cu ? `<path d="M${wx} 52 q12 30 4 54 h-4z M${wx + 80} 52 q-12 30 -4 54 h4z" style="fill:${cu}"/><rect x="${wx - 4}" y="48" width="88" height="6" rx="3" style="fill:${cu}"/>` : ""}`, `<rect x="${wx}" y="52" width="80" height="54" rx="14"/>`)).join("")}
-    ${li ? `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1" fill="none"><path d="M10 40 Q130 70 260 52 T510 40"/></g>${rows(16, i => `<circle class="twinkle" cx="${20 + i*31}" cy="${46 + Math.sin(i/2)*7}" r="2.8" fill="${li}" style="animation-delay:${(i*.2).toFixed(1)}s"/>`)}` : ""}`; },
+    // a long, narrow van seen from the back doors: gravel and grass outside, cream walls with a mint stripe, a timber
+    // floor down the aisle, windows in both side walls (with the chosen curtains), lights along the walls if chosen
+    const win = (x, y) => sk(`<rect x="${x}" y="${y}" width="16" height="70" rx="6" style="fill:#CFE0EE"/>${cu ? `<path d="M${x} ${y} h16 q-6 14 -2 22 h-12z M${x} ${y + 70} h16 q-6 -14 -2 -22 h-12z" style="fill:${cu}"/>` : ""}`, `<rect x="${x}" y="${y}" width="16" height="70" rx="6"/>`);
+    return `<rect width="520" height="640" style="fill:#B9D98A"/><g opacity=".5">${rows(24, i => `<circle cx="${(i*83) % 520}" cy="${(i*131) % 640}" r="${2 + i % 3}" style="fill:#9CC27E"/>`)}</g>
+    ${sk(`<rect x="124" y="14" width="272" height="626" rx="40" style="fill:#F6EBC8"/><rect x="142" y="34" width="236" height="606" rx="26" style="fill:#D9B48A"/><path d="M124 120 v420 M396 120 v420" style="stroke:#9FD3C2" stroke-width="8"/>`,
+      `<rect x="124" y="14" width="272" height="626" rx="40"/><rect x="142" y="34" width="236" height="606" rx="26"/>`)}
+    <g opacity=".35" style="stroke:#B9935F" stroke-width="1.2">${rows(16, i => `<path d="M146 ${70 + i*36} H374"/>`)}</g>
+    ${sk(`<rect x="200" y="40" width="120" height="40" rx="10" style="fill:#2F3B73"/><circle cx="230" cy="54" r="1.4" style="fill:#FFFDF6"/><circle cx="262" cy="66" r="1.1" style="fill:#FFFDF6"/><circle cx="296" cy="52" r="1.5" style="fill:#FFFDF6"/>`, `<rect x="200" y="40" width="120" height="40" rx="10"/>`)}
+    ${win(126, 230)}${win(378, 230)}${win(126, 400)}${win(378, 400)}
+    ${li ? [146, 374].map(x => rows(12, i => `<circle class="twinkle" cx="${x}" cy="${110 + i*40}" r="2.8" fill="${li}" style="animation-delay:${(i*.25).toFixed(2)}s"/>`)).join("") : ""}`; },
   // Honeysuckle (Mateo and Lila's): warm floorboards, a rag rug, bunting, a window onto the lane
   honeysuckle: () => `<rect width="520" height="640" style="fill:#D9B48A"/>
     <g opacity=".4" style="stroke:#B9935F" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}</g>

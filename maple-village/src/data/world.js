@@ -335,7 +335,7 @@ export const ROOMS = {
   // The Cocoa Room (a big goal, in the bay's old shopfront): the counter (Amara serves behind it; the front is drawn
   // over the people), the bar wall, a table, and the kitchen door; behind it the chocolate kitchen, bean to bar
   // the campervan (goals.js "van", game/van.js): a cosy inside, done up from the mood board
-  van: {name:"The campervan", wall:"#F6EBC8", trim:"#9FD3C2", noBoard:true, pos:{B:[130,300], K:[400,280], T:[300,470], M:[120,470]}, stations:[
+  van: {name:"The campervan", wall:"#F6EBC8", trim:"#9FD3C2", noBoard:true, pos:{B:[260,170], K:[328,360], T:[204,500], M:[186,300]}, stations:[
     ["vbed","Bed","B","vanbed",null,"The bed, tucked in under the pop-top. You can see the stars through the roof window.",30],
     ["vkitchen","Kitchenette","K","vankitchen",null,"A two-ring stove, a tiny sink, and a kettle that whistles.",30],
     ["vtable","Table","T","vantable",null,"A fold-down table with a bench either side. Cards, tea, or both.",30],
