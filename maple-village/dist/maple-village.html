@@ -2315,6 +2315,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     I.crayfish = [`<path d="M8 9h8v7a4 4 0 0 1-8 0z" ${f("#D9614C")}/><path d="M8 10L4 6l2-2 3 4M16 10l4-4-2-2-3 4" ${f("#D9614C")}/>`, `<path d="M8 9h8v7a4 4 0 0 1-8 0zM8 10L4 6l2-2 3 4M16 10l4-4-2-2-3 4M9 13h6M9 16h6M10 20l-1 2M14 20l1 2"/>`];
     I.boot = [`<path d="M8 3h6v11l6 3v4H8z" ${f("#5E8A5A")}/>`, `<path d="M8 3h6v11l6 3v4H8zM8 18h12M8 6h6"/>`];
     I.seaglass = [`<path d="M6 10l5-5 7 3 1 7-6 5-6-3z" ${f("#9FD3C0")}/>`, `<path d="M6 10l5-5 7 3 1 7-6 5-6-3z"/><path d="M10 9l3 1" opacity=".6"/>`];
+    I.syrup = [`<path d="M10 3h4v4l2 3v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10l2-3z" ${f("#F4B8C8")}/><path d="M8 13h8v5H8z" ${f("#FFFDF6")}/>`, `<path d="M10 3h4v4l2 3v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10l2-3zM8 13h8M8 18h8"/><circle cx="12" cy="15.5" r="1.2"/>`];
     I.rod = [`<path d="M4 21L19 4" ${f("none")}/><circle cx="7" cy="17" r="2.2" ${f("#F3C969")}/>`, `<path d="M4 21L19 4M19 4v9"/><circle cx="7" cy="17" r="2.2"/><circle cx="19" cy="14" r="1.4"/>`];
   }
   I.egg = [`<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z" ${f("#F6EBDD")}/>`, `<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z"/><path d="M9 12c0-2 .8-3.6 1.8-4.5" opacity=".6"/>`];
@@ -3366,6 +3367,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     loaf: { n: "Loaf of bread", kind: "ingredient", sell: 2, what: "baked in the wine shop's oven" },
     milk: { n: "Milk", kind: "ingredient", price: 4, tab: "deli", sell: 3, what: "for gelato at the Scoop Shack, or two make a cheese in the wine shop's kitchen press (the farm stand sells it, and Wildflower Farm's cows give it)" },
     goatmilk: { n: "Goat's milk", kind: "ingredient", price: 5, sell: 3, what: "from Wildflower Farm's goats: for gelato at the Scoop Shack, or the kitchen's cheese press (like milk)" },
+    syrup: { n: "Petal syrup", kind: "ingredient", sell: 4, what: "from the kitchen (three garden flowers): gelato, a bonbon filling, or a lemon and petal posset" },
     yoghurt: { n: "Pot of yoghurt", kind: "ingredient", price: 5, sell: 3, what: "made in Wildflower Farm's barn: frozen yoghurt at the Scoop Shack, or yoghurt with honey at the kitchen" },
     honey_lav: { n: "Jar of lavender honey", kind: "gift", to: "family", price: 9, say: "Lavender honey! It smells like the flower farm.", says: { mama: "Lavender honey? Ma Ma put in tea. So fragrant!" } },
     honey_blossom: { n: "Jar of orchard blossom honey", kind: "gift", to: "family", price: 9, say: "Orchard blossom honey, from Ma Ma's trees? That's lovely.", says: { mama: "From my trees! The bees know where the good flowers are." } },
@@ -4130,11 +4132,22 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     a.fedDay = dayKey();
     a.fedMeal = mealNow();
     a.feeds = (a.feeds || 0) + 1;
-    const grew = !wasGrown && isGrown(a), egg2 = wasGrown && a.kind === "chick";
-    if (egg2) addInv2("egg", 1);
+    const grew = !wasGrown && isGrown(a), egg2 = wasGrown && a.kind === "chick" ? ensurePets(F2).treat === dayKey() ? 2 : 1 : 0;
+    if (egg2) addInv2("egg", egg2);
     const milk = wasGrown && a.kind === "goat";
     if (milk) addInv2("goatmilk", 1);
     return { ok: true, grew, egg: egg2, milk, food };
+  }
+  var canTreat = (F2) => {
+    const P3 = ensurePets(F2);
+    return P3.treat !== dayKey() && P3.animals.some(henMeals);
+  };
+  function scatterTreat(F2, addInv2) {
+    const P3 = ensurePets(F2);
+    if (!canTreat(F2) || !(F2.inv.sunflower > 0)) return null;
+    addInv2("sunflower", -1);
+    P3.treat = dayKey();
+    return "Sunflower seeds for the hens! They'll lay two eggs a meal for the rest of today.";
   }
   function upgradeRun(F2) {
     const P3 = ensurePets(F2), nx = RUNS[P3.run + 1];
@@ -4153,6 +4166,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         return `<li><span class="pico">${icon(a.kind === "chick" ? isGrown(a) ? "hen" : "chick" : a.kind === "goat" ? "goat" : "rabbit", 30)}</span><span><b>${esc(a.name)}</b><small>${label(a)} · ${hu ? "hungry" : "fed and happy"}${left4 ? ` · ${left4} more ${left4 === 1 ? "meal" : "meals"} to grow up` : a.kind === "chick" ? " · lays an egg when fed" : ""}</small></span>${hu ? `<button class="next" data-feed="${a.id}">feed</button>` : `<span class="hbadge">full</span>`}</li>`;
       }).join("")}</ul>`;
       if (hungryCount(F2) > 1) h += `<div class="actions"><button class="btn primary small" data-feed="all">Feed everyone</button></div>`;
+      if (P3.animals.some(henMeals)) h += P3.treat === dayKey() ? `<p class="muted">Sunflower seeds scattered today: two eggs a meal from every hen.</p>` : `<p class="muted">A garden sunflower's seeds are a treat for the hens: two eggs a meal for the rest of the day. <button class="btn small alt" data-treat="1" ${F2.inv.sunflower > 0 ? "" : "disabled"}>Scatter seeds (${F2.inv.sunflower || 0} sunflower${F2.inv.sunflower === 1 ? "" : "s"})</button></p>`;
     }
     h += `<p class="eyebrow" style="margin:12px 0 6px">Make the run nicer</p>`;
     h += nx ? `<div class="items shop"><button class="item" data-runup="1" ${F2.coins < nx.price ? "disabled" : ""}><span class="e">${icon("coop", 34)}</span><span class="n">${esc(nx.n)}</span><span class="c"><b>${nx.price}</b> ${icon("coin", 13)}</span><span class="d">${esc(nx.what)}</span></button></div>` : `<p class="muted">The run's as cosy as it gets. Clover, a trough, a coop and a hutch.</p>`;
@@ -6215,6 +6229,30 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     <p class="muted">${where === "tree" ? `${C2.yield} ${C2.fn[1]} a day once it's fruiting.` : `${where === "bush" ? BUSH_YIELD : BED_YIELD} stems each picking.`} In season: ${C2.seasons.map((s) => SEASONS[s].n.toLowerCase()).join(", ")}.</p>`;
     return h + `<div class="actions">${close}</div>`;
   }
+  var OCCASIONS = ["a birthday", "an anniversary dinner", "a new baby next door", "a get-well visit", "a thank-you for a neighbour", "a first date", "the café tables", "a housewarming"];
+  var ORDER_FROM = ["Rosa", "Bastien", "Noor", "Lila", "Celeste", "Felix", "Elena", "Mateo"];
+  var ORDER_PAY = 25;
+  function orderOf(today2) {
+    const h = hash(today2 + "bouquet");
+    return h % 7 === 0 ? null : { who: ORDER_FROM[(h >> 3) % ORDER_FROM.length], why: OCCASIONS[(h >> 6) % OCCASIONS.length] };
+  }
+  var bouquetIn = (F2) => Object.keys(F2.inv || {}).find((id) => /^bq_/.test(id) && F2.inv[id] > 0);
+  function fillOrder(F2, today2) {
+    const o = orchState(F2), q = orderOf(today2), bq = bouquetIn(F2);
+    if (!q || o.orderDay === today2 || !bq) return null;
+    F2.inv[bq]--;
+    if (!F2.inv[bq]) delete F2.inv[bq];
+    o.orderDay = today2;
+    F2.coins += ORDER_PAY;
+    return `Ma Ma wraps it in paper for ${q.who}: for ${q.why}. ${ORDER_PAY} coins in the tin for you!`;
+  }
+  function orderHtml(F2, today2) {
+    const o = orchState(F2), q = orderOf(today2);
+    if (!q) return "";
+    if (o.orderDay === today2) return `<p class="krequest">${icon("heart", 16)} Today's bouquet order for ${esc(q.who)} is done. Ma Ma says thank you!</p>`;
+    const bq = bouquetIn(F2);
+    return `<p class="krequest">${icon("heart", 16)} <b>Bouquet order:</b> ${esc(q.who)} would like a bouquet for ${esc(q.why)}. Pays ${ORDER_PAY} ${icon("coin", 13)}. <button class="btn small ${bq ? "primary" : "alt"}" data-or="order" ${bq ? "" : "disabled"}>${bq ? "Hand over a bouquet" : "Make a bouquet first"}</button></p>`;
+  }
   function shopPanel(F2, today2, tab, market) {
     const o = orchState(F2), fruit = Object.values(TREES).map((t2) => t2.fruit).filter((x, i, a) => a.indexOf(x) === i), season = seasonOf(today2);
     const anyPlanted = o.trees.some(Boolean) || o.beds.some(Boolean) || o.bushes.some(Boolean);
@@ -6222,7 +6260,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (market && tab === "plant") tab = "fruit";
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${market ? "Ma Ma's market stall" : "Ma Ma's farm shop"}</h2>`;
     h += `<p class="sub">${market ? `Ma Ma brought the farm shop's shelves to the Sunday market: fruit and flowers only. Still free for you; shoppers pay into the tin.${o.today.day === today2 && o.today.sold ? ` She's sold ${o.today.sold} thing${o.today.sold === 1 ? "" : "s"} today.` : ""}` : tab === "plant" ? `Saplings, bushes and seedlings for ${SEASONS[season].n.toLowerCase()}. Pick one and Ma Ma plants it in the next free spot (or tap a spot in the orchard or flower farm).` : `What Ma Ma picks from your trees and flowers goes on these shelves: free for you to take. Villagers buy the rest while it's open (9am to 6pm).${o.today.day === today2 && o.today.sold ? ` Today she's sold ${o.today.sold} thing${o.today.sold === 1 ? "" : "s"}.` : ""}`}</p>`;
-    if (!market) h += tourLine(o, today2);
+    if (!market) h += tourLine(o, today2) + orderHtml(F2, today2);
     h += `<div class="tabs" role="tablist">${[["plant", "Plant"], ["fruit", "Fruit"], ["flowers", "Flowers"]].filter(([k]) => !market || k !== "plant").map(([k, n]) => `<button role="tab" data-or="tab" data-k="${k}" aria-selected="${tab === k}">${n}</button>`).join("")}</div>`;
     if (tab === "plant") {
       for (const where of ["tree", "bush", "bed"]) {
@@ -6316,7 +6354,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       } else if (k === "take") line = takeFruit(F2, id);
       else if (k === "takeall") line = takeFruit(F2, id, true);
       else if (k === "make") line = makeFlowers(F2, b.dataset.kind, id);
-      else if (k === "plantany") {
+      else if (k === "order") {
+        line = fillOrder(F2, api4.today);
+        snd = "coin";
+      } else if (k === "plantany") {
         line = plantAny(F2, b.dataset.where, id, api4.today);
         snd = "coin";
       } else if (k === "place") {
@@ -6775,6 +6816,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       honeycake: plate + `<path d="M13 30 l11 -10 l12 7 v5 l-12 3z" fill="#E3B04B" ${INK3}/><path d="M13 30 l11 -10 l12 7 l-12 4z" fill="#F3C969" ${INK3}/><path d="M18 26 q4 2 8 0 q3 -1 6 1" fill="none" stroke="#C9853E" stroke-width="1.4"/>`,
       shortbread: plate + [[15, 27], [24, 25], [33, 27]].map(([x, y]) => `<rect x="${x - 4}" y="${y - 3}" width="8" height="6" rx="1.2" fill="#F3DFA6" ${INK3} stroke-width="1"/><circle cx="${x}" cy="${y}" r="1.4" fill="#E86A7C"/>`).join(""),
       bluetart: plate + `<ellipse cx="24" cy="26" rx="14" ry="7" fill="#E3B47A" ${INK3}/><ellipse cx="24" cy="25" rx="10.5" ry="4.8" fill="#5E6EB8"/>` + [[19, 24], [24, 23], [29, 25], [22, 27], [27, 27]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#3F4F9A" stroke="#3b3530" stroke-width=".6"/>`).join(""),
+      posset: plate + [[16, 26], [30, 26]].map(([x, y]) => `<path d="M${x - 6} ${y - 4} h12 l-1.5 8 h-9z" fill="#FFF6DC" ${INK3} stroke-width="1"/><ellipse cx="${x}" cy="${y - 4}" rx="6" ry="1.6" fill="#F4B8C8" ${INK3} stroke-width=".8"/>`).join(""),
       bread: plate + `<path d="M11 28 q0 -9 13 -9 q13 0 13 9 v2 h-26z" fill="#D9A066" ${INK3}/><path d="M17 22 l2 5 M23 20 l1 6 M29 21 l-1 5" stroke="#9C6B3E" stroke-width="1.2"/><rect x="31" y="29" width="7" height="4" rx="1" fill="#FFF3C4" ${INK3} stroke-width="1"/>`,
       olives: `<path d="M7 24 h34 q-2 13 -17 13 q-15 0 -17 -13z" fill="#E7EFF2" ${INK3}/>` + [[16, 22], [22, 20], [28, 22], [19, 26], [26, 26], [32, 25]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3.2" ry="2.4" fill="#7FA35A" ${INK3} stroke-width=".9"/>`).join("") + `<path d="M36 18 l6 -8" stroke="#8B5E3C" stroke-width="1.6" stroke-linecap="round"/>`,
       carrotcake: plate + `<path d="M13 30 l12 -12 l11 8 v5 l-12 3z" fill="#E3A36A" ${INK3}/><path d="M13 30 l12 -12 l11 8 l-12 4z" fill="#FFF3E6" ${INK3}/><path d="M22 21 l-2 -4 M24 20 l1 -4" stroke="#7FA35A" stroke-width="1.4" stroke-linecap="round"/><path d="M21 22 l5 0 l-2.5 4z" fill="#F08A3C" stroke="#3b3530" stroke-width=".8"/>`,
@@ -6822,6 +6864,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     pear: ["pear", "pears"],
     fig: ["fig", "figs"],
     honeycomb: ["piece of honeycomb", "pieces of honeycomb"],
+    lemon: ["lemon", "lemons"],
+    syrup: ["bottle of petal syrup", "bottles of petal syrup"],
     // groups (round 101): anything that fits, see ALT
     farmcheese: ["farm cheese", "farm cheeses"],
     halloumi: ["halloumi", "halloumi"],
@@ -6845,7 +6889,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     apples: { n: "Apple slices", need: { apple: 2 }, plates: 4, price: 3 },
     honeycake: { n: "Honey cake", need: { egg: 1, honey: 1, flour: 1 }, plates: 4, price: 7 },
     shortbread: { n: "Flower shortbread", need: { flour: 1, petals: 2 }, plates: 4, price: 5 },
-    bluetart: { n: "Blueberry tart", need: { blueberry: 3, flour: 1 }, plates: 4, price: 6 }
+    bluetart: { n: "Blueberry tart", need: { blueberry: 3, flour: 1 }, plates: 4, price: 6 },
+    posset: { n: "Lemon and petal posset", need: { milk: 1, lemon: 1, syrup: 1 }, plates: 4, price: 7 }
   };
   var TAPAS = {
     patatas: { n: "Patatas bravas", need: { potato: 2, tomato: 1 }, price: 8, seasons: ["autumn"] },
@@ -6964,6 +7009,15 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     add(k, "cheese", 1);
     return "A little round of cheese, into the larder.";
   }
+  var SYRUP_PETALS = 3;
+  function makeSyrup(F2) {
+    const k = kitchenState(F2);
+    if (!has(k, { petals: SYRUP_PETALS })) return null;
+    use(k, { petals: SYRUP_PETALS });
+    F2.inv = F2.inv || {};
+    F2.inv.syrup = (F2.inv.syrup || 0) + 2;
+    return "Two bottles of petal syrup, pink and fragrant. Into your backpack.";
+  }
   function cookDish(F2, id) {
     const k = kitchenState(F2), d = DISHES[id], v = vineState(F2);
     if (!d || !has(k, d.need)) return null;
@@ -7059,6 +7113,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The larder</h2>${larderGrid(k)}
     <h3 class="ph3">In your backpack</h3>${bag2.length ? `<div class="kgoods">${bag2.map((id) => `<button class="kgood kbtn" data-k="send" data-id="${id}">${pic(id)}<b>${F2.inv[id]}</b><small>${esc(nm2(id, F2.inv[id]))}</small><em>Bring in</em></button>`).join("")}</div>
     <div class="actions"><button class="btn primary small" data-k="sendall">Bring everything in</button></div>` : `<p class="muted">Nothing for the kitchen in your backpack right now. Crops from the garden, eggs and milk from the animal run, olives from the olive tree, and Hana's deli shelf all help.</p>`}
+    <h3 class="ph3">Petal syrup</h3><p class="muted">${SYRUP_PETALS} garden flowers (tulips or sunflowers) make two bottles: for gelato, a bonbon filling, or the lemon and petal posset. Flowers in the larder: ${larderCount(k, "petals")}.</p>
+    <div class="actions"><button class="btn small ${larderCount(k, "petals") >= SYRUP_PETALS ? "primary" : "alt"}" data-k="syrup" ${larderCount(k, "petals") >= SYRUP_PETALS ? "" : "disabled"}>Make petal syrup</button></div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function ovenPanel(F2) {
@@ -7105,7 +7161,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       if (k === "send") {
         const n = sendToKitchen(F2, id);
         if (n) line = `${n} ${nm2(id, n)} into the larder.`;
-      } else if (k === "take") {
+      } else if (k === "syrup") line = makeSyrup(F2);
+      else if (k === "take") {
         const kk = kitchenState(F2);
         if ((kk.larder[id] || 0) > 0) {
           kk.larder[id]--;
@@ -15553,6 +15610,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     carrot: ["Carrots", "Carrot", "#F28C3A"],
     tomato: ["Tomatoes", "Tomato", "#E05A44"],
     pea: ["Peas", "Pea and mint", "#B9D88A"],
+    syrup: ["Petal syrup", "Petal", "#F4B8C8"],
     chocolate: ["Dark chocolate", "Chocolate", "#5A3A2A"],
     vanilla: ["Vanilla", "Vanilla", "#F6EBC8"],
     coffee: ["Coffee", "Coffee", "#8A5A3A"],
@@ -16229,7 +16287,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var SHELL = 6;
   var TRAY = 12;
   var CASE = 6;
-  var NOT_FILLING = ["milk", "goatmilk", "yoghurt", "egg", "olives", "corn", "carrot", "tomato", "housechoc"];
+  var NOT_FILLING = ["milk", "goatmilk", "yoghurt", "egg", "olives", "corn", "carrot", "tomato", "housechoc", "pea"];
   var WINE_FILL = { wine_red: ["Red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Rosé", "Rosé", "#E98AA0"], wine_white: ["White wine", "White Wine", "#E8D57A"], wine_sparkling: ["Sparkling wine", "Bubbly", "#F3E7B0"] };
   var WINE_FILLS = 4;
   var FL = (id) => INGR[id] || WINE_FILL[id];
@@ -17585,7 +17643,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       const r = feedOne(F, a, F.inv, addInv);
       if (r.ok) {
         fed++;
-        if (r.egg) eggs++;
+        if (r.egg) eggs += r.egg;
         if (r.milk) milk++;
         if (r.grew) grew.push(a);
       } else if (r.msg) miss = r.msg;
@@ -20533,6 +20591,16 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     c.querySelectorAll("[data-feed]").forEach((b) => b.onclick = () => feedAnimals(b.dataset.feed));
     c.querySelectorAll("[data-runup]").forEach((b) => b.onclick = () => buyRunUpgrade());
+    c.querySelectorAll("[data-treat]").forEach((b) => b.onclick = () => {
+      const line = scatterTreat(F, addInv);
+      if (!line) return;
+      sfx("chime");
+      gainXp(1);
+      speak(line, 4500);
+      if (scene === "base") mprop("heart", 110, 520, 1700);
+      save2(true);
+      ctx();
+    });
     c.querySelectorAll("[data-tool]").forEach((b) => b.onclick = () => buyTool(b.dataset.tool));
     c.querySelectorAll("[data-dig]").forEach((b) => b.onclick = () => {
       const k = b.dataset.dig;
@@ -23209,7 +23277,21 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     const who3 = ["mama", "mum", "gonggong", "dad"].find(isHere);
     if (who3) setTimeout(() => npcSay(who3, pick(who3 === "mama" ? ["Eat, eat! Ma Ma made too much again.", "Come, sit next to Ma Ma."] : who3 === "mum" ? ["Have more! You're too thin.", "Everyone's here. This is the best."] : who3 === "gonggong" ? ["Have you eaten? Now you have.", "Pass the soup, pass the soup."] : ["Who wants to hear what I played today?", "Evan, eat your vegetables. For Grandpa."])), 1200);
-    speak("Family dinner. Everyone round one table, all talking at once. The best.", 4500);
+    if (S2.tomeggDay !== dayKey() && (F.inv.tomato || 0) >= 2 && (F.inv.egg || 0) >= 2) {
+      S2.tomeggDay = dayKey();
+      addInv("tomato", -2);
+      addInv("egg", -2);
+      gainXp(2);
+      setTimeout(() => {
+        if (isHere("mama")) npcSay("mama", "Tomatoes and eggs! Ma Ma makes her tomato and egg. Everybody eat!");
+        if (evanHere()) setTimeout(() => evanSays(pick(["Ma Ma's eggs are the best!", "More rice please!", "Yummy yummy!"])), 1800);
+      }, 2600);
+      speak("You hand Ma Ma two tomatoes and two eggs. Ten minutes later: her tomato and egg, over rice. Everyone goes quiet, then asks for seconds.", 6500);
+      save2();
+      render();
+      return;
+    }
+    speak(F.inv.tomato || 0 || (F.inv.egg || 0) ? "Family dinner. Everyone round one table, all talking at once. (Two tomatoes and two eggs and Ma Ma will make her tomato and egg.)" : "Family dinner. Everyone round one table, all talking at once. The best.", 4500);
     render();
   }
   var melEx = null;
