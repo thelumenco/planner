@@ -2800,6 +2800,41 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.coins <= 100 && f.goals && f.goals.greenhouse; }), "the greenhouse cost 400 coins");
   await page.close();
 }
+{
+  console.log("\nthe old mill and the olive grove");
+  const m = await import(new URL("../src/game/mill.js", import.meta.url)), v = await import(new URL("../src/game/vineyard.js", import.meta.url));
+  const F = {coins: 999, inv: {olives: 5}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
+  const vs = v.vineState(F); vs.oliveCrate = 4;
+  const started = m.startPress(F, 3);
+  check(!!started && !F.inv.olives && vs.oliveCrate === 0 && F.mill.press.n === 3, "pressing three bottles: nine jars of olives, from the backpack first, then the vineyard crate");
+  check(!m.collectOil(F, add), "the oil isn't ready straight away");
+  F.mill.press.start -= 2*3600e3;
+  check(!!m.collectOil(F, add) && F.inv.oliveoil === 3 && !F.mill.press, "an hour later: three bottles of olive oil");
+  v.buy(F, "grove");
+  check(!vs.grove && F.coins === 999, "the grove needs the first olive tree by the path");
+  v.buy(F, "olive"); v.buy(F, "grove");
+  check(!!vs.grove && F.coins === 999 - 150 - 300, "the olive grove: four more trees for 300 coins");
+  vs.grove.planted -= 9*3600e3;
+  check(!!v.pickGrove(F) && F.inv.olives === 8 && !v.pickGrove(F), "picking the grove: eight jars of olives, then it needs eight hours");
+  vs.oliveCrate = 6;
+  check(!!v.takeOliveCrate(F) && F.inv.olives === 14 && !vs.oliveCrate, "taking the olive crate the vineyard hands filled");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`mill pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/millp/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 800; f.inv = Object.assign(f.inv || {}, {olives: 7}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-14"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-14&millp=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="windmill"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="mill"]', { timeout: 20000 });
+  await page.click('#ctx [data-goal="mill"]'); await page.waitForTimeout(600); await page.click("#ctx [data-close]").catch(() => {});
+  await page.locator('#world [data-place="windmill"]').dispatchEvent("click");
+  await page.waitForFunction(() => /old mill/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "the windmill opens up as the old mill (350 coins), and you can go inside");
+  await page.locator('#world [data-millspot="press"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-mill="press"][data-n="2"]', { timeout: 15000 });
+  await page.click('#ctx [data-mill="press"][data-n="2"]'); await page.waitForTimeout(800);
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.mill && f.mill.press && f.mill.press.n === 2 && f.inv.olives === 1 && f.goals.mill; }), "seven jars of olives: two bottles' worth goes under the millstone");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

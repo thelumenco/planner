@@ -1616,3 +1616,10 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Uses:** herbs are kitchen GOODS. Basil, rosemary and thyme are gelato ingredients (and so bonbon fillings); mint already was.
 - **New tapas:** gambas al ajillo (3 shrimp, 2 garlic, 1 olive oil), rosemary potatoes, tomato and basil bruschetta, chive omelette, and roast pumpkin with thyme.
 - **Shrimp:** a sea catch in the morning (fishing.js `FISH.shrimp`).
+- **Garden fence:** there's a gate gap in the top fence (x 232–288) and stepping stones to the greenhouse door.
+
+### Round 110: the old mill and the olive grove
+- **The mill:** `GOALS.mill` (350). The windmill on the cottage lane (spot `windmill`) opens the goal panel; once owned, it goes inside the `mill` scene (`VILLAGE.mill` holds its door, so Exit works; art/mill.js `millArt`).
+- **Pressing:** tap the millstone or the press for `millPanel` (game/mill.js). 3 jars of olives make 1 bottle, up to 4 bottles a pressing, 1 hour; then "Bottle it" puts them in the backpack. Olives come from the backpack first, then the vineyard's `v.oliveCrate`.
+- **The grove:** `SHOP.grove` (300, needs the olive tree) adds four small trees in a row on the top-left terrace of the vineyard (place `grove`, `grovePanel`). 8 jars every 8 hours (`pickGrove`).
+- **Workers:** Marco and Ines (help.pick) pick the olive tree and the grove on shift into `v.oliveCrate` (`takeOliveCrate`).

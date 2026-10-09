@@ -43,6 +43,9 @@ export const VILLAGE = {
   vinestall:{scene:"vineyard", name:"Vineyard stall", door:[90,452], spot:true, line:"Cuttings, trellises and barrels."},
   pswing: {scene:"vineyard", name:"Swings", door:[110,594], spot:true, line:"The swings. Wheee!"},
   pslide: {scene:"vineyard", name:"Slide", door:[262,592], spot:true, line:"The slide. Down you go!"},
+  grove:  {scene:"vineyard", name:"Olive grove", door:[205,142], spot:true, line:"The olive grove along the top terrace."},
+  // round 110: the old mill (the windmill on the cottage lane, once it's opened up as an olive mill): its inside
+  mill:   {scene:"hlane", name:"The old mill", short:"the old mill", door:[440,356]},
   olive:  {scene:"vineyard", name:"Olive tree", door:[250,262], spot:true, line:"The olive tree. Olives every few hours, once it's planted."},
   pround: {scene:"vineyard", name:"Roundabout", door:[188,598], spot:true, line:"The roundabout. Round and round and round!"},
   pseesaw:{scene:"vineyard", name:"Seesaw", door:[410,600], spot:true, line:"The seesaw. Up, down, up, down."},

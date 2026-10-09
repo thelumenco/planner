@@ -765,8 +765,10 @@ export function roomArt(id){
 export function farmArt(){
   let h = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="90" rx="200" ry="50" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)" ${ink}><path d="M20 140 H500 M20 140 V600 M500 140 V600 M20 600 H210 M310 600 H500" style="stroke:var(--wood)" stroke-width="3"/>
-      ${Array.from({length:17}, (_, i) => `<path d="M${20 + i*30} 132 v16" style="stroke:var(--wood)" stroke-width="2.4"/>`).join("")}</g>
+    <g filter="url(#wob)" ${ink}><path d="M20 140 H232 M288 140 H500 M20 140 V600 M500 140 V600 M20 600 H210 M310 600 H500" style="stroke:var(--wood)" stroke-width="3"/>
+      ${Array.from({length:17}, (_, i) => 20 + i*30).filter(x => x < 232 || x > 288).map(x => `<path d="M${x} 132 v16" style="stroke:var(--wood)" stroke-width="2.4"/>`).join("")}
+      <path d="M232 128 v20 M288 128 v20" style="stroke:var(--wood)" stroke-width="4"/><path d="M232 134 l-14 -4 M288 134 l14 -4" style="stroke:var(--wood)" stroke-width="2.4"/></g>
+    <g pointer-events="none" filter="url(#wob)">${[[260, 112], [252, 126], [266, 140], [256, 156]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="5" style="fill:#D9CBB2;stroke:var(--line)" stroke-width="1"/>`).join("")}</g>
     ${tree(60,110,1)}${tree(460,110,1)}
     ${ghOutside(260, 106, !!(G.F().goals && G.F().goals.greenhouse))}
     <g filter="url(#wob)" ${ink}><path d="M120 76 v40 M104 86 h32" style="stroke:var(--wood)" stroke-width="3"/><circle cx="120" cy="70" r="9" style="fill:var(--butter)"/><path d="M110 64 l10 -8 l10 8z" style="fill:var(--peach)"/></g>`;

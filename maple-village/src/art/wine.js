@@ -108,6 +108,7 @@ export function stallIcon(id, off){
   if (id === "cut_red" || id === "cut_white") { const c = id === "cut_red" ? "#6B2A55" : "#C9D66A";
     return w(`<path d="M24 46 V22" stroke="#7A5638" stroke-width="3" stroke-linecap="round"/>${leaf(16, 16, .9, -25, "#86B26A")}${leaf(32, 14, .8, 25, "#9CC27E")}${bunch(24, 24, c, 2.8, 9)}`); }
   if (id === "olive") return w(oliveTree(24, 46, .62, "ripe"));
+  if (id === "grove") return w(oliveTree(14, 44, .4, "ripe") + oliveTree(34, 44, .4, "ripe") + oliveTree(24, 34, .36, "ripe"));
   if (id === "terrace") return w(`<path d="M6 16 h36 l-3 -8 h-30z" fill="#9CC27E" ${INK}/><path d="M9 16 v26 M39 16 v26" stroke="#8B5E3C" stroke-width="2.4"/><ellipse cx="24" cy="32" rx="9" ry="3.5" fill="#FFFDF6" ${INK}/><path d="M24 35 v8 M19 43 h10" ${INK}/><circle cx="14" cy="12" r="2" fill="#6B2A55"/><circle cx="32" cy="12" r="2" fill="#6B2A55"/>`);
   if (id === "trellis") return w(`<path d="M8 44 V8 M40 44 V8" stroke="#8B5E3C" stroke-width="3.4" stroke-linecap="round"/><path d="M8 16 H40 M8 28 H40" fill="none" stroke="#3b3530" stroke-width="1.2"/>${leaf(20, 20, .7, -15, "#86B26A")}${leaf(30, 30, .6, 20, "#9CC27E")}`);
   return w(`<path d="M8 24 C8 12 14 8 24 8 C34 8 40 12 40 24 C40 36 34 40 24 40 C14 40 8 36 8 24Z" fill="#B07B52" ${INK}/><path d="M14 9 C11 18 11 30 14 39 M34 9 C37 18 37 30 34 39" fill="none" stroke="#4A3A30" stroke-width="2.2"/><path d="M24 8 V40" stroke="#8A5A3A" stroke-width="1" opacity=".7"/>`);

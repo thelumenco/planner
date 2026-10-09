@@ -117,7 +117,10 @@ export function vineyardArt(){
   const ol = v.olive, ripe = ol && Date.now() - (ol.pickedAt || ol.planted) >= 8*3600e3;
   const olive = `<g data-place="olive" aria-label="Olive tree"><ellipse class="hov" cx="250" cy="258" rx="34" ry="9" style="fill:var(--butter)"/>${ol ? `<g filter="url(#wob)">${oliveTree(250, 254, 1, ripe ? "ripe" : "growing")}</g>` + (ripe ? `<g class="twinkle" pointer-events="none"><path d="M276 196 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" stroke="#3b3530" stroke-width="1"/></g>` : "")
     : sk(`<ellipse cx="250" cy="252" rx="16" ry="5" style="fill:#9C7A5C"/>`, `<ellipse cx="250" cy="252" rx="16" ry="5"/><path d="M262 252 v-18 M256 236 h14 v8 h-14z"/>`)}${tapeLabel(250, 276, "Olive tree", "var(--sage)", 10)}</g>`;
-  return lampDefs + ground + gate + lgate + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive
+  // round 110: the olive grove, four small trees in a neat row along the top terrace (bought at the stall)
+  const gv = v.grove, gripe = gv && Date.now() - (gv.pickedAt || gv.planted) >= 8*3600e3;
+  const grove = gv ? `<g data-place="grove" aria-label="The olive grove"><ellipse class="hov" cx="125" cy="92" rx="100" ry="12" style="fill:var(--butter)"/><g filter="url(#wob)">${[50, 100, 150, 200].map(x => oliveTree(x, 92, .62, gripe ? "ripe" : "growing")).join("")}</g>${tapeLabel(125, 110, "Olive grove", "var(--sage)", 10)}</g>` : "";
+  return lampDefs + ground + gate + lgate + grove + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive
     + shedArt(v) + shopArt(v) + potsIn("vineyard") + stallArt() + sign + v.rows.map((row, r) => rowArt(row, r)).join("") + playArt()
     // the shop terrace (bought at the stall): a vine-covered pergola and two little tables beside the shop
     + (v.terrace ? sk(`<path d="M466 132 h48 l-4 -10 h-40z" style="fill:#9CC27E"/><ellipse cx="478" cy="196" rx="11" ry="4" style="fill:#FFFDF6"/><ellipse cx="502" cy="206" rx="11" ry="4" style="fill:#FFFDF6"/><circle cx="474" cy="128" r="2.4" style="fill:#6B2A55"/><circle cx="500" cy="128" r="2.4" style="fill:#6B2A55"/>`,
