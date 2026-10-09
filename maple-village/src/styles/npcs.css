@@ -90,3 +90,10 @@
 #mel .carEvan{display:none}#mel.withEvan .carEvan{display:inline}#mel .bikeEvan{display:none}#mel.withEvan .bikeEvan{display:inline}
 
 .storycue{display:none}.npc.story .storycue{display:inline}.npc.story .storycue > g{animation:cuebob 1.6s ease-in-out infinite}@keyframes cuebob{50%{transform:translateY(-3px)}}@media (prefers-reduced-motion:reduce){.npc.story .storycue > g{animation:none}}
+/* round 107, Ronda: Manolo's strumming, Mum dancing, Ma Ma haggling, Gong Gong dozing behind his paper, sketching */
+.ch.npc.act-guitar:not(.walk) .tool{animation:strum .28s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 50%}@keyframes strum{to{transform:rotate(-6deg)}}
+.ch.npc.act-dance:not(.walk) > g{animation:dance 1.1s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}@keyframes dance{25%{transform:rotate(-8deg) translateY(-2px)}50%{transform:rotate(0) translateY(0)}75%{transform:rotate(8deg) translateY(-2px)}}
+.ch.npc.act-dance:not(.walk) .armL{animation:exL .55s ease-in-out infinite alternate}.ch.npc.act-dance:not(.walk) .armR,.ch.npc.act-haggle:not(.walk) .armR{animation:exR .55s ease-in-out infinite alternate}
+.ch.npc.act-sketch:not(.walk) .tool{animation:tapT .6s ease-in-out infinite alternate}
+.npc.act-doze:not(.walk) .legL,.npc.act-doze:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}.npc.act-doze:not(.walk) > g{transform:translateY(7px)}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-guitar .tool,.ch.npc.act-dance > g,.ch.npc.act-dance .armL,.ch.npc.act-dance .armR,.ch.npc.act-haggle .armR,.ch.npc.act-sketch .tool{animation:none}}

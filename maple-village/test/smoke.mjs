@@ -2678,6 +2678,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(F.ronda.bench, "all eight tiles: the tiled bench for the pond");
     r.rondaVisit(F, "2026-10-10"); r.rondaVisit(F, "2026-10-10"); const first = r.buyVines(F); r.rondaVisit(F, "2026-10-12");
     check(!first && r.buyVines(F) && F.vine.cuttings.tempranillo === 3 && F.vine.tempra, "Rafael sells Tempranillo cuttings on your second visit (three for 120)"); }
+  // Ronda's locals tell their stories on a trip day (no quest needed); Doña Carmen knew Pilar's mother
+  { const st = await import(new URL("../src/game/stories.js", import.meta.url)), day = "2026-10-11", F = {met: {carmen: true, pilar: true}, inv: {}};
+    const add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
+    check(!!st.storyReady(F, "carmen", day) && !st.storyReady(F, "pilar", day), "in Ronda, Doña Carmen tells her story without a quest that day (Honeybrook's villagers still wait for one)");
+    F.story = {heard: {pilar: 2, carmen: 2}, day: {}, log: [], flags: {}};
+    const t = st.tellStory(F, "carmen", add, day);
+    check(t && /Rosario/.test(t.lines.join(" ")) && F.inv.yemas === 2, "Carmen's third chapter: Pilar is Rosario's girl, and two boxes of yemas to take home");
+    F.storyDay = "2026-10-12"; F.story.heard.pilar = 3;
+    check(/Carmen/.test((st.storyReady(F, "pilar", "2026-10-12") || {ch: {lines: []}}).ch.lines.join(" ")), "and back home, Pilar has a new chapter about Doña Carmen"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, resume: true });
   page.on("pageerror", e => errors.push(`ronda pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
@@ -2701,6 +2710,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="rdToPlaza"]').dispatchEvent("click");
   await page.waitForFunction(() => /plaza/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
   check(await ids().then(a => a.includes("mama") && a.includes("gonggong")), "they follow Mel to the plaza");
+  check(await ids().then(a => a.includes("rafael") && a.includes("carmen")) && await page.locator('#actors .npc[data-npc="mama"].act-haggle').count() === 1, "the plaza on a Sunday morning: Rafael at his stall, Doña Carmen at her door, and Ma Ma haggling");
   check(await page.evaluate(() => ["mercado", "tapas", "dulces", "fuente", "rdBridgeN", "rdToStation"].every(id => document.querySelector(`#world [data-place="${id}"]`))), "the plaza: the market, the tapas bar, the sweet shop, the fountain, Puente Nuevo");
   await page.locator('#actors .npc[data-npc="mama"]').dispatchEvent("click"); await page.waitForTimeout(400);
   await page.locator('#actors .npc[data-npc="mama"]').dispatchEvent("click"); await page.waitForTimeout(400);

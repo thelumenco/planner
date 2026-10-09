@@ -1580,3 +1580,18 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - **The tile shop:** 8 tiles (orange in winter and spring, geranium in spring and summer, almond blossom in winter). All eight set `F.ronda.bench`, and core.js draws `tileBench(236, 548)` at home. Also a painted fan and cork coasters (gifts).
   - **Picnic:** a picnic at the Alameda balcony uses the basket (`F.ronda.picnics`).
   - **Tempranillo** (vineyard.js `STYLES.tempranillo`): 12h in the barrel, 28 coins a bottle. It has its own wine names and colours (wine.js and vineyard art), and Marco fills it first.
+- **Round 4 (locals and family):**
+  - **Locals:** Doña Carmen, Rafael, Lucía and Manolo are in data/npcs.js with `local: "ronda"`. Their routines are on Ronda's screens only, and they're left out of the who's-where directory.
+  - **Stories:** they have stories in data/stories.js. stories.js `LOCALS` tell theirs on a trip day without a quest; the two-a-day limit still applies.
+  - **Story gates:** `ronda2` (a second visit) and `tiles4`.
+  - **Pilar and Carmen:** Carmen's chapter 3 (needs `pilar:2`) reveals Pilar's mother Rosario and gives 2 yemas. Pilar's chapter 4 (needs `carmen:3`) follows.
+  - **Family acts:** `TOWNS.ronda.acts` drives them through trips.js `tripSlot` (at a spot, in hours; slots `glide` between spots):
+    - Mum dances while Manolo plays (11–14, 18–22).
+    - Dad sketches (bridge, Alameda).
+    - Ma Ma haggles at the market (8–14).
+    - Gong Gong dozes behind a newspaper on a bench.
+    - Marcus photographs.
+    - Angellina takes notes.
+    - Darren wanders the steps.
+    - Evan comments on each screen and sticks by Mel on the bridge.
+  - **Art and props:** the props are people.js extras (`guitar`, `sketchbook`, `camera`, `notebook`, `newspaper`; npcs.js `PROPS`). The animations are in npcs.css (`act-guitar`, `act-dance`, `act-haggle`, `act-sketch`, `act-doze`).

@@ -355,6 +355,42 @@ export const NPCS = [
     away: `${name}'s gone home.`})),
   // The wine shop's cook: on her shifts she runs the kitchen from whatever's in the larder (see cookTick)
   // Honeybrook Woods' ranger (round 103): cycles up from Makers' Lane in the morning, walks the trails, keeps the
+  // Round 107: Ronda's locals (local: "ronda"). They're only ever on Ronda's screens, so Mel meets them on a day trip.
+  // Doña Carmen keeps the sweet shop (and knew Pilar's mother); Rafael sells his family's oil and almonds at the market
+  // (and, once he trusts Mel, Tempranillo cuttings); Lucía paints the tiles; Manolo busks by the fountain.
+  {
+    id: "carmen", local: "ronda", pitch: 0.9, name: "Doña Carmen", job: "Keeps the sweet shop on Ronda's plaza",
+    intro: "¡Hola, guapa! Doña Carmen. Yemas, almond cake, and sixty years of gossip. Come in, come in, out of the sun.",
+    look: {skin: "#D9A47E", hair: "#E8E4DE", hairStyle: "bun", top: "#3A3430", bottom: "#3A3430", extra: "apron"},
+    routine: [slot("9:00", "14:00", "rd_plaza", [[414, 520], [424, 530], [404, 526]]), slot("17:30", "21:00", "rd_plaza", [[414, 520], [424, 530]]), slot("21:00", "22:00", "rd_plaza", [320, 290], {act: "sit"})],
+    lines: ["Sit, sit. Have a yema. Have two.", "In my day this plaza was all donkeys. Now it's all telephones.", "The nuns taught me everything. Except patience.", "Too thin! Eat something."],
+    away: "Doña Carmen's having her siesta. The shop opens again at half past five."
+  },
+  {
+    id: "rafael", local: "ronda", pitch: 0.65, name: "Rafael", job: "Olive farmer, with a stall at Ronda's market",
+    intro: "Rafael. Oil, almonds. My family has pressed olives in the valley for five generations. Taste. No bread, just taste.",
+    look: {skin: "#B9825E", hair: "#4A4440", hairStyle: "short", top: "#7A8A5A", bottom: "#5A4A3E", extra: "cap"},
+    routine: [slot("8:00", "14:00", "rd_plaza", [[118, 214], [140, 216], [128, 222]]), slot("18:00", "20:00", "rd_plaza", [440, 296], {act: "sit", dir: -1})],
+    lines: ["Good oil, you taste it in the back of the throat. It bites a little.", "The olives don't care about your problems. That's why I like them.", "Almonds this year: small, but sweet. Like my grandmother.", "Hmph. You again. Good."],
+    away: "Rafael's back at the farm in the valley. The market stall's covered up till morning."
+  },
+  {
+    id: "lucia", local: "ronda", pitch: 1.15, name: "Lucía", job: "Paints the tiles at her shop in the old town",
+    intro: "Hola! Lucía. Every tile in here I painted myself. I'm doing every view in Ronda. Two hundred and eleven so far.",
+    look: {skin: "#E2B590", hair: "#2A211D", hairStyle: "long", top: "#3E6BAE", bottom: "#F3ECDD", extra: "apron"},
+    routine: [slot("10:00", "14:00", "rd_old", [[384, 450], [360, 452], [404, 452]]), slot("14:00", "15:30", "rd_bridge", [420, 300], {act: "sketch", dir: -1}), slot("17:00", "20:30", "rd_old", [[384, 450], [360, 452]])],
+    lines: ["The light at five o'clock: that's when the bridge goes gold.", "Blue from the mountains, yellow from the sun. That's all you need.", "A tile is a little window. You can hang a view on the wall.", "Careful, that one's still drying!"],
+    away: "Lucía's shop is closed for lunch. A sign on the door: 'Painting the bridge. Back at five.'"
+  },
+  {
+    id: "manolo", local: "ronda", pitch: 0.8, name: "Manolo", job: "Plays flamenco guitar by the fountain",
+    intro: "Manolo. I play, people walk past, some of them stop. The pigeons always stop. They never tip.",
+    look: {skin: "#C68E68", hair: "#1E1A18", hairStyle: "short", top: "#F6EFE3", bottom: "#2F2B28"},
+    routine: [slot("11:00", "14:00", "rd_plaza", [306, 378], {act: "guitar", dir: -1}), slot("15:30", "18:00", "rd_station", [232, 500], {act: "guitar", dir: -1}), slot("18:00", "22:00", "rd_plaza", [306, 378], {act: "guitar", dir: -1})],
+    lines: ["This one's a bulería. Clap on twelve. No, twelve. Never mind.", "A guitar is just wood and string and a bit of heartbreak.", "Your family has good ears. Especially the lady who dances.", "Requests? I know three songs. And forty more."],
+    actLines: {guitar: ["*strums*", "Olé!", "This one's for the pigeons."]},
+    away: "Manolo's guitar case is shut. He's having a coffee somewhere."
+  },
   // cabin, and fishes the pool on Saturday evenings
   {
     id: "wren", pitch: 1.05, name: "Wren", job: "Honeybrook Woods' ranger",

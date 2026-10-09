@@ -27,6 +27,16 @@ export const TOWNS = {
       marcus: {rd_old: [[120, 140], [240, 300], [300, 520]], rd_bridge: [[300, 240], [460, 280]], rd_plaza: [[240, 480], [400, 330]], rd_station: [[130, 500], [330, 300]]},
       angelina: {rd_plaza: [[420, 236], [440, 246]], rd_bridge: [[300, 520], [380, 500]], rd_station: [[260, 460], [150, 520]], rd_old: [[300, 470], [420, 480]]}
     },
+    // what they do at their favourite spots (some only at certain times: Mum dances while Manolo's playing, Ma Ma
+    // haggles while the market's on). act: an npcs.js act (a prop, an animation)
+    acts: {
+      mum: {rd_plaza: {act: "dance", at: [282, 398], hours: [[11*60, 14*60], [18*60, 22*60]]}},
+      dad: {rd_bridge: {act: "sketch", at: [452, 304], dir: -1}, rd_station: {act: "sketch", at: [130, 470], dir: -1}},
+      mama: {rd_plaza: {act: "haggle", at: [150, 222], dir: -1, hours: [[8*60, 14*60]]}},
+      gonggong: {rd_plaza: {act: "doze", at: [206, 446]}, rd_station: {act: "doze", at: [260, 494]}},
+      marcus: {rd_bridge: {act: "photo", at: [300, 120]}, rd_old: {act: "photo", at: [124, 130]}},
+      angelina: {rd_plaza: {act: "notes", at: [440, 248], dir: -1}, rd_bridge: {act: "notes", at: [300, 520]}}
+    },
     // a word now and then, and what they say when Mel taps them (on top of their usual chat)
     lines: {
       mum: ["Listen to that guitar! See? THIS is how fast a guitar should be.", "Everything's so white it hurts my eyes. In a good way.", "Mel, smell that! Orange blossom. Or oranges. Something orange."],

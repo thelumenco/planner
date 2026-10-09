@@ -138,7 +138,31 @@ export const STORIES = {
   pilar: [
     {lines: ["Tomo's my nephew. My sister's boy. Eats like a horse, works like one too."]},
     {lines: ["My mother cooked for a whole village in Andalucía. I'm doing the same, one plate at a time."]},
-    {needs: ["sofia:2"], lines: ["Sofia's nonna's fior di latte? She's been whipping it to death. I told her: let the milk be milk."]}
+    {needs: ["sofia:2"], lines: ["Sofia's nonna's fior di latte? She's been whipping it to death. I told her: let the milk be milk."]},
+    // round 107: Doña Carmen, in Ronda, knew Pilar's mother
+    {needs: ["carmen:3"], lines: ["Doña Carmen sent me a kiss? From Ronda?", "She was my mother's best friend. Mamá used to say Carmen's yemas were the only sweets worth the sugar.", "I'm making Mamá's salmorejo tonight. For both of them."]}
+  ],
+  // Ronda's locals (round 107): told on a day trip (no quest needed; the two-a-day limit still holds)
+  carmen: [
+    {lines: ["I learned the yemas from the nuns at the convent when I was nine. They paid me in sugar."]},
+    {lines: ["There was a girl, Rosario, who came to my shop every Sunday. She cooked like an angel.", "She went north, to a little village, and cooked for everyone. I never saw her again."]},
+    {needs: ["pilar:2"], lines: ["Pilar? A cook called Pilar, in your village? Her mother was from Andalucía?", "¡Ay! Rosario's girl! Tell her Doña Carmen sends a kiss. And take her these."], reward: "carmen"},
+    {lines: ["The nuns are getting old. Soon nobody will turn the wheel at the convent.", "Maybe I'll learn the biscuits too. At my age! Why not."]}
+  ],
+  rafael: [
+    {lines: ["My grandfather pressed the olives with a donkey. I have a machine. The donkey was better company."]},
+    {needs: ["ronda2"], lines: ["My son wants to be a DJ. In Málaga. A DJ! Who will press the oil?"]},
+    {needs: ["rafael:2"], lines: ["He came home for the harvest. He put music on in the mill, very loud.", "The olives didn't mind. Neither did I. Don't tell him."]}
+  ],
+  lucia: [
+    {lines: ["My grandmother painted the tiles round the fountain in the plaza. I fix them when the frost cracks one."]},
+    {lines: ["Two hundred and eleven views. I'll never finish. That's the good part."]},
+    {needs: ["tiles4"], lines: ["You're nearly a whole set! Where will they go?", "A bench by a pond in Honeybrook? Send me a photo. Then I'll paint Honeybrook. View two hundred and twelve."]}
+  ],
+  manolo: [
+    {lines: ["I had a band once, in Sevilla. Five of us in a van. Then I came home.", "The fountain has better acoustics. And it never asks for a bigger share."]},
+    {lines: ["The lady in your family who dances: she claps on the right beats. Nobody claps on the right beats."]},
+    {lines: ["Here, this one's new. I wrote it about the vultures. It's slow. They're very patient birds."]}
   ],
   sofia: [
     {lines: ["My nonna had a gelato cart in Napoli. This little book is all her recipes."]},

@@ -38,7 +38,12 @@ export function initTrips(getF){ setAway(day => { const F = getF(); return F ? a
 export function tripSlot(F, id, day, hm, melScene){
   const t = tripOn(F, day); if (!t || !t.party.includes(id) || hm < t.from) return null;
   const T = TOWNS[t.town], scene = townOf(melScene) === t.town ? melScene : T.arrive[0], spots = (T.spots[id] || {})[scene];
-  return {from: t.from, to: T.backTo, scene, wander: spots || [[260, 400], [300, 360]], follow: true, trip: true};
+  // at their spot doing their thing (in its hours), else strolling; the slot starts when the act starts or stops,
+  // so they walk over (glide) rather than popping
+  const a = ((T.acts || {})[id] || {})[scene], w = a && (a.hours ? a.hours.find(([f, e]) => hm >= f && hm < e) : [t.from, T.backTo]);
+  if (w) return {from: Math.max(t.from, w[0]), to: w[1], scene, at: a.at, act: a.act, dir: a.dir, follow: true, glide: true, trip: true};
+  const ended = a && a.hours ? Math.max(t.from, ...a.hours.map(([, e]) => e).filter(e => e <= hm)) : t.from;
+  return {from: ended, to: T.backTo, scene, wander: spots || [[260, 400], [300, 360]], follow: true, glide: true, trip: true};
 }
 // a town line for a family member (tapping them in town, or the odd remark)
 export const townLine = (F, id, scene) => { const town = townOf(scene), t = town && TOWNS[town]; return t && t.lines[id] ? t.lines[id] : null; };

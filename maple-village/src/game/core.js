@@ -2114,6 +2114,8 @@ function setScene(id, at){
     $("evan").style.display = evanHere() ? "" : "none";
     render(true); w.classList.remove("fading");
     if (townOf(id)) save();   // a day out: remember which screen of the town (reopening puts Mel back there)
+    if (townOf(id) && evanHere()) setTimeout(() => { evanSays(pick(id === "rd_bridge" ? ["so HIGH", "Mama, hold hand", "big big hole!"] : id === "rd_plaza" ? ["pigeons!", "catch it!", "birdies, come back!"] : ["Spain!", "big birdies!", "it's SO sunny"]));
+      if (id === "rd_bridge") { evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.target = "mel"; evan.wait = 6; } }, 1400);
     if (route.length) nextLeg();
     if (id === "base" && hungryCount(F) && !S.petNudge) { S.petNudge = true; setTimeout(() => speak("The chicks and bunnies are peeping for breakfast. Their run is by the garden.", 4500), 1400); }
     if (id === "room" && S.routSaid !== dayKey() && sgHM() < 12*60) { const st = todaysSteps().filter(x => !x.done), left = checklistLeft(); if (st.length || left) { S.routSaid = dayKey(); setTimeout(() => speak(st.length ? `${st[0].name}, today: ${st[0].text}.` : `${left} morning routine step${left > 1 ? "s" : ""} on the board.`, 5000), 1500); } }
@@ -2685,7 +2687,7 @@ function whosWhereHTML(){
     return `<details class="whowhere"><summary><b>${esc(n.name)}</b> <small class="muted">${cur ? `now: ${esc(what(cur))}` : "not about just now"}</small></summary>
       <ul>${sch.map(x => `<li class="${x === cur ? "now" : ""}"><span>${hhmm(x.from)}–${hhmm(x.to)}</span> ${esc(what(x))}</li>`).join("") || "<li>Not in the village today.</li>"}</ul></details>`; };
   const fam = WHO_FAMILY.map(id => NPCS.find(n => n.id === id)).filter(Boolean);
-  const town = NPCS.filter(n => !WHO_FAMILY.includes(n.id) && !n.tourist && !n.kid);
+  const town = NPCS.filter(n => !WHO_FAMILY.includes(n.id) && !n.tourist && !n.kid && !n.local);
   const dn = dinnerOn(day);
   const club = owns(F, "cellar") && wineClubOn(day);
   return `<h3 class="ph3">Who's where today</h3>${dn ? `<p class="muted">Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30.</p>` : ""}${club ? `<p class="muted">Wine club tonight at the cellar door, 6 to 9pm.</p>` : ""}<p class="eyebrow">Family</p>${fam.map(row).join("")}<p class="eyebrow" style="margin-top:10px">Around the village</p>${town.map(row).join("")}`;

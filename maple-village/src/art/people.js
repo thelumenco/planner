@@ -41,6 +41,12 @@ function extra(kind, look, k){
     case "cone": return `<path d="M${9.5*k} ${-23*k} l${3*k} ${10*k} l${3*k} ${-10*k}z" ${S("#E8C48E")}/><circle cx="${12.5*k}" cy="${-25*k}" r="${3.6*k}" ${S(["#F4C7CF", "#C3E8B8", "#F3E27A", "#FFF6DC"][Math.round(k*7 + (look.top || "").length) % 4])}/>`;
     case "hoe": return `<g class="tool"><path d="M${16*k} ${-48*k} l${-4*k} ${46*k}" fill="none" stroke-width="2" style="stroke:#8A5A3A"/><path d="M${12*k} ${-2*k} h${-8*k} l${1*k} ${3*k} h${7*k}z" ${S("var(--stone)")}/></g>`;
     case "rod": return `<path d="M${9*k} ${-22*k} L${34*k} ${-56*k}" fill="none" stroke-width="${1.8*k}" style="stroke:#8A5A3A"/><circle cx="${13*k}" cy="${-27*k}" r="${2.2*k}" ${S("#F3C969")}/><path d="M${34*k} ${-56*k} Q${39*k} ${-30*k} ${42*k} ${-4*k}" fill="none" stroke-width=".6"/><circle cx="${42*k}" cy="${-4*k}" r="${2.2*k}" ${S("#E8566C")}/>`;
+    // round 107, for Ronda: Manolo's guitar, Dad's (and Lucía's) sketchbook, Marcus's camera, Angellina's notebook, Gong Gong's paper
+    case "guitar": return `<g class="tool"><ellipse cx="${2*k}" cy="${-22*k}" rx="${7*k}" ry="${5.5*k}" transform="rotate(-20 ${2*k} ${-22*k})" ${S("#C98A4A")}/><circle cx="${2*k}" cy="${-22*k}" r="${1.8*k}" ${S("#3A2E28")}/><path d="M${7*k} ${-25*k} L${20*k} ${-34*k}" stroke-width="${2.4*k}" style="stroke:#7A4A30"/></g>`;
+    case "sketchbook": return `<rect x="${4*k}" y="${-30*k}" width="${11*k}" height="${9*k}" rx="1" ${S("#FFFDF6")}/><path d="M${6*k} ${-27*k} q${3*k} ${-2*k} ${7*k} 0 M${6*k} ${-24*k} h${5*k}" fill="none" stroke-width=".7"/><g class="tool"><path d="M${14*k} ${-22*k} l${4*k} ${-6*k}" fill="none" stroke-width="1.4" style="stroke:#E3A23A"/></g>`;
+    case "camera": return `<rect x="${7*k}" y="${-31*k}" width="${10*k}" height="${7*k}" rx="1.5" ${S("#3A3430")}/><circle cx="${12*k}" cy="${-27.5*k}" r="${2.2*k}" ${S("#9FD3E8")}/><rect x="${8*k}" y="${-33*k}" width="${3*k}" height="${2*k}" ${S("#3A3430")}/>`;
+    case "notebook": return `<rect x="${7*k}" y="${-29*k}" width="${8*k}" height="${10*k}" rx="1" ${S("#E8566C")}/><path d="M${9*k} ${-26*k} h${4*k} M${9*k} ${-23*k} h${4*k}" fill="none" stroke-width=".7"/>`;
+    case "newspaper": return `<rect x="${-10*k}" y="${-34*k}" width="${20*k}" height="${13*k}" rx="1" ${S("#F3ECDD")}/><path d="M${-8*k} ${-31*k} h${7*k} M${-8*k} ${-28*k} h${16*k} M${-8*k} ${-25*k} h${16*k} M${1*k} ${-31*k} h${7*k}" fill="none" stroke-width=".7"/>`;
     case "lantern": return `<path d="M${12*k} ${-24*k} v${-4*k}" fill="none"/><rect x="${9*k}" y="${-24*k}" width="${7*k}" height="${9*k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5*k}" cy="${-19.5*k}" r="${1.8*k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
   }
   return "";
@@ -108,7 +114,7 @@ export function personArt(look, kid){
       <path d="M${-8.6*k} ${-37*k} q${8.6*k} ${-2.4*k} ${17.2*k} 0 l${1.4*k} ${23*k} h${-20*k}z" ${S(look.dress || look.top)}/>
       ${look.batik && !coat ? batik(look.batik, k) : ""}
       ${coat ? coatArt(rain, k) : ""}
-      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
       <circle cx="0" cy="${-46*k}" r="${10.6*k}" ${S(look.skin)}/>
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46*k, 10.6*k) : hair(look.hairStyle, look.hair, k)}

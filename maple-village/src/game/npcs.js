@@ -48,7 +48,7 @@ const slotNow = def => slotAt(def, dayKey(), sgHM(), true);
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };
 export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
 export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
-const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone", fish: "rod"};
+const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone", fish: "rod", guitar: "guitar", sketch: "sketchbook", photo: "camera", notes: "notebook", doze: "newspaper"};   // (the last five: Ronda, round 107)
 const outdoors = s => OUTDOOR.includes(s);
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 
@@ -99,7 +99,8 @@ function tickVillager(def, dt){
     if (e) drop(def.id);
     const p = slot.at || jitter(pick(slot.wander)), s0 = was || p;
     e = ents[def.id] = {def, key, act: slot.act, kind: "npc", x: s0[0], y: s0[1], tx: s0[0], ty: s0[1], dir: slot.dir || (Math.random() < .5 ? -1 : 1), moving: false, wait: rnd(1, 4), bike: !!((slot.look && slot.look.bike) || def.look.bike) && OUTDOOR.includes(scene), node: makeNode(def.id, Object.assign({}, def.look, slot.look || {}, outdoors(scene) ? {} : {hat: null}, OUTDOOR.includes(scene) ? {} : {bike: null}), def.kid, false, slot.act)};   // hats come off indoors
-    if (was) { e.tx = p[0]; e.ty = p[1]; e.path = []; }   // straight across the open field (stalls sit above the walkable area)
+    if (was && slot.follow) route(e, p[0], p[1]);   // on a day trip: round things to the next spot
+    else if (was) { e.tx = p[0]; e.ty = p[1]; e.path = []; }   // straight across the open field (stalls sit above the walkable area)
     // on a day trip the family come in with Mel (from just behind her) and stroll over to their favourite spot
     else if (slot.follow && api.mel) { const b = api.bounds(); e.x = clamp(api.mel.x + rnd(-30, 30), b[0], b[2]); e.y = clamp(api.mel.y + rnd(6, 26), b[1], b[3]); route(e, p[0], p[1]); }
   }

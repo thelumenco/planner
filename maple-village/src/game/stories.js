@@ -17,6 +17,8 @@ function gateOk(F, g){
   if (g === "cocoa" || g === "cellar") return owns(F, g);
   if (g === "trust1") return ((F.hfarm && F.hfarm.trust) || 0) >= 40;
   if (g === "fish5") return Object.keys((F.fish && F.fish.caught) || {}).length >= 5;
+  if (g === "ronda2") return ((F.ronda && F.ronda.days) || []).length >= 2;   // a second day in Ronda
+  if (g === "tiles4") return Object.keys((F.ronda && F.ronda.tiles) || {}).length >= 4;
   if (g === "bouquet") return Object.keys(F.inv || {}).some(id => /^bq_/.test(id) && F.inv[id] > 0);
   return false;
 }
@@ -31,12 +33,14 @@ function eligible(F, id, day){
 // those with a chapter ready, in an order that changes day to day; once two have told theirs, that's it till tomorrow.
 export const TELLERS_PER_DAY = 2;
 const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
+// Ronda's locals tell theirs on a day trip, quest or no quest (Mel's on holiday); the two-a-day limit still holds
+const LOCALS = ["carmen", "rafael", "lucia", "manolo"];
 export function storyReady(F, id, day = dayKey()){
-  if (F.storyDay !== day) return null;
+  if (F.storyDay !== day && !LOCALS.includes(id)) return null;
   const s = storyState(F), told = Object.keys(s.day).filter(x => s.day[x] === day).length, left = TELLERS_PER_DAY - told;
   if (left <= 0) return null;
   const r = eligible(F, id, day); if (!r) return null;
-  const today = Object.keys(STORIES).filter(x => eligible(F, x, day)).sort((a, b) => order(day, a) - order(day, b)).slice(0, left);
+  const today = Object.keys(STORIES).filter(x => (F.storyDay === day || LOCALS.includes(x)) && eligible(F, x, day)).sort((a, b) => order(day, a) - order(day, b)).slice(0, left);
   return today.includes(id) ? r : null;
 }
 // the chapter's rewards, applied once when it's told; addInv adds to the backpack; -> a line for the flash, or ""
@@ -50,6 +54,7 @@ const REWARDS = {
   koi: F => { storyState(F).flags.koi = true; applyFlags(F); return "a ranger's tip: golden koi bite more often at dusk"; },
   bouquet: F => { const id = Object.keys(F.inv || {}).find(x => /^bq_/.test(x) && F.inv[x] > 0); if (id) { F.inv[id]--; if (!F.inv[id]) delete F.inv[id]; } return ""; },
   nonna: (F, addInv) => { addInv("s_nonna", 2); return "two cups of Nonna's fior di latte"; },
+  carmen: (F, addInv) => { addInv("yemas", 2); return "two boxes of Doña Carmen's yemas (one's for Pilar)"; },
   pastry: F => { storyState(F).flags.pastry = true; applyFlags(F); return "Farid's honey and pistachio pastries, on the tapas menu"; }
 };
 // flags that change the game: the koi tip, Farid's pastries on the menu
