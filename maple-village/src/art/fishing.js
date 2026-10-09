@@ -1,7 +1,7 @@
 // Fishing spots: a little post with a fish sign and a coiled net by the water, and (at home) the golden koi in the pond.
 import { sk, tapeLabel } from "./scenes.js";
 
-const AT = {base: {x: 430, y: 108, side: 1, label: [436, 138]}, field: {x: 60, y: 284, side: 1, label: [60, 316]}, shore: {x: 192, y: 414, side: -1, label: [192, 384]}};
+const AT = {base: {x: 430, y: 108, side: 1, label: [436, 138]}, field: {x: 60, y: 284, side: 1, label: [60, 316]}, shore: {x: 234, y: 368, side: -1, label: [236, 336]}};
 const PLACE = {base: "fishriver", field: "fishlake", shore: "fishsea"};
 export function fishSpotArt(scene){
   const a = AT[scene]; if (!a) return "";
