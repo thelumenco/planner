@@ -53,7 +53,7 @@ const coin = () => icon("coin", 13);
 // The ticket window (Honeybrook station): where to, and who's coming
 export function ticketPanel(F, pick, town = "ronda", hm = sgHM()){
   const t = TOWNS[town], party = FAMILY.filter(id => pick.includes(id)), cost = fareFor(town, party), open = canLeave(town, hm), on = tripOn(F);
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Tickets to ${esc(t.n)}</h2><p class="sub">${esc(t.blurb)}</p>
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Tickets to ${esc(t.n)}</h2><div class="gchips">${Object.entries(TOWNS).map(([k, x]) => `<button class="gchip${k === town ? " on" : ""}" data-ttown="${k}" aria-pressed="${k === town}"><span>${esc(x.n)}</span></button>`).join("")}</div><p class="sub">${esc(t.blurb)}</p>
     <p class="muted">${t.fare} ${coin()} return a person (Evan rides free). Trains out ${fmt(t.outFrom)} to ${fmt(t.outTo)}; the last train home leaves ${esc(t.n)} at ${fmt(t.backTo)}. A day trip: you'll be home tonight.</p>`;
   if (on) return h + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: go again tomorrow.</p>` + shut;
   if (!open) return h + `<p><b>${hm < t.outFrom ? `The first train to ${esc(t.n)} is at ${fmt(t.outFrom)}.` : `That's the last train to ${esc(t.n)} gone for today. Tomorrow!`}</b></p>` + shut;

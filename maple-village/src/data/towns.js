@@ -81,6 +81,60 @@ export const TOWNS = {
       banos: "The Arab baths: low domes with star-shaped skylights, eight hundred years old.",
       puerta: "The old town gate, with its horseshoe arches. Beyond it the road winds down into the valley."
     }
+  },
+  // Kyoto (round 121): an old capital in a bowl of wooded hills. Top row: the little station with its tram and the
+  // bamboo grove (west), then the stone lane of Higashiyama up to the pagoda. Bottom row: the river and the canal
+  // quarter (west) and the temple with its torii tunnel (east).
+  //   kt_station | kt_lane
+  //   -----------+----------
+  //   kt_river   | kt_temple
+  kyoto: {
+    n: "Kyoto", by: "train", fare: 60, free: ["evan"], outFrom: 7*60, outTo: 15*60, backTo: 22*60,
+    screens: ["kt_station", "kt_lane", "kt_temple", "kt_river"], arrive: ["kt_station", [332, 216]], station: "kttrain", music: "kyoto",
+    blurb: "An old capital in a bowl of wooded hills: wooden townhouses, stone lanes, paper lanterns, temple bells, moss, maples and the sound of water. A longer ride: trains out until 3pm.",
+    arriveLine: "Kyoto! Dark wood and paper lanterns, a tram clanking past, and the bamboo whispering behind the station.",
+    evanArrive: ["a TRAM, Mama!", "the trees are so TALL", "is this Japan? is it?"],
+    evanScreen: {kt_station: ["bamboo! so tall!", "ding ding tram!"], kt_lane: ["a tower! a tall tower!", "red lanterns!"], kt_temple: ["red gates! lots!", "fishies in the pond!"], kt_river: ["stepping stones! turtles!", "a big bird!"]},
+    hints: {kt_station: "Kyoto's little station (trains home till 10pm), the bamboo grove and the yukata shop. East: Higashiyama. South: the river.",
+      kt_lane: "The old stone lane up to the pagoda: the tea house, the sweet shop, the pottery. West: the station. South: steps down to the temple.",
+      kt_temple: "The temple hall, the torii gates, the gravel garden and the koi pond. North: up to the lane. West: the river.",
+      kt_river: "The river and its turtle stones, the covered market and the willow canal. North: the station. East: over the canal to the temple."},
+    spots: {
+      mum: {kt_station: [[220, 360], [300, 520]], kt_lane: [[260, 300], [300, 520]], kt_temple: [[330, 250], [180, 420]], kt_river: [[200, 270], [330, 500]]},
+      dad: {kt_station: [[200, 500], [420, 540]], kt_lane: [[230, 260], [340, 300]], kt_temple: [[420, 470], [260, 240]], kt_river: [[340, 260], [200, 520]]},
+      mama: {kt_station: [[250, 470], [380, 560]], kt_lane: [[200, 330], [280, 560]], kt_temple: [[200, 470], [300, 470]], kt_river: [[160, 260], [320, 480]]},
+      gonggong: {kt_station: [[230, 450], [240, 460]], kt_lane: [[230, 360], [240, 370]], kt_temple: [[200, 460], [210, 470]], kt_river: [[180, 480], [190, 490]]},
+      darren: {kt_station: [[300, 560], [420, 270]], kt_lane: [[160, 300], [300, 400]], kt_temple: [[280, 560], [250, 260]], kt_river: [[220, 230], [300, 250]]},
+      marcus: {kt_station: [[440, 560], [200, 330]], kt_lane: [[330, 520], [270, 230]], kt_temple: [[280, 260], [440, 480]], kt_river: [[380, 520], [140, 240]]},
+      angelina: {kt_station: [[280, 360], [380, 300]], kt_lane: [[300, 330], [200, 580]], kt_temple: [[330, 470], [270, 380]], kt_river: [[240, 500], [300, 280]]}
+    },
+    // what they do (new animations come in round 3: Mum's parasol, Dad's wheel, Ma Ma's cranes, Gong Gong's Go,
+    // Darren's skewers, Marcus's calligraphy, Angelina's fortunes; nothing they did in Ronda)
+    acts: {},
+    lines: {
+      mum: ["Listen. You can hear the bamboo creaking. Like a boat.", "Everything here is so neat. I want to fold my clothes now. Strange feeling.", "I want a yukata. A blue one. With little white flowers."],
+      dad: ["Look at the joinery on that roof. Not a single nail. Not one.", "That pagoda's been standing here longer than anything I've ever fixed.", "I'd like to try making a cup. A bowl. Anything round."],
+      mama: ["So clean! You can eat off the street. Ma Ma won't. But you can.", "The moss here, so green. Ma Ma's garden never this green. Must be the rain.", "Paper cranes, a thousand, you get a wish. Ma Ma start now."],
+      gonggong: ["Quiet town. Old town. Gong Gong feels young here.", "Koi fish. Very fat. Very lucky.", "Somebody playing Go under that tree. Gong Gong watch only. For now."],
+      darren: ["I've eaten four things on sticks and I'm not stopping.", "There's a vending machine for everything here. Even hot soup. HOT SOUP.", "Mel, how do you say 'another one, please'? Asking for me."],
+      marcus: ["Everyone here bows. I've bowed to a vending machine twice.", "That brush calligraphy looks easy. It is not easy, is it?", "The steps up to that temple: one hundred and twelve. I counted. Zeh, don't."],
+      angelina: ["I drew a fortune. 'Great blessing.' I'm framing it.", "Everyone's so polite I feel loud just breathing.", "The tea house garden has a little waterfall and nobody's even looking at it. I am."],
+      evan: ["tram! ding ding!", "red gates! red gates!", "fishies!", "Mama, the trees are talking"]
+    },
+    say: {
+      bamboo: "The bamboo grove: thousands of stalks, taller than houses, creaking and knocking together in the wind. The light comes through in green stripes.",
+      yukata: "The yukata shop: rows of cotton summer kimonos in indigo, red and white. (It opens properly soon.)",
+      pagoda: "The five-storey pagoda: each roof a little smaller than the last, with a golden spire on top. It's stood through more than four hundred years of earthquakes.",
+      chaya: "The tea house: a cloth curtain over the door, a red lantern, and the smell of roasted tea. (Its door opens soon.)",
+      wagashi: "The sweet shop: tiny sweets shaped like flowers and leaves, one for each season, under glass. (Its door opens soon.)",
+      pottery: "The pottery workshop: cups and bowls drying on boards, and the kiln ticking as it cools. (Its door opens soon.)",
+      hall: "The temple hall: a deep, sweeping roof on red pillars, incense curling up from the burner, and a great bell inside. (Its doors open soon.)",
+      torii: "The torii gates: a tunnel of vermilion gates climbing the hill, each one given by somebody, with their name painted on the back.",
+      zen: "The gravel garden: raked lines flowing round three mossy rocks like water round islands. Nobody walks on it. You just sit and look.",
+      koi: "The koi pond: orange, white and red koi gliding under the little red bridge. They come up to see if you've brought anything.",
+      stones: "The turtle stones: stepping stones shaped like turtles, right across the river. You hop from shell to shell.",
+      nishiki: "The covered market: a long arcade of little stalls: pickles, tofu, rolled omelette, knives, tea. (Its stalls open soon.)"
+    }
   }
 };
 export const TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t]) => [...t.screens, ...Object.keys(t.rooms || {})].map(s => [s, id])));
@@ -118,16 +172,47 @@ export const TOWN_PLACES = {
   rd_jardin: {scene: "rd_bridge", name: "The Moorish garden", door: [330, 432]},
   cuero: {scene: "rd_old", name: "The leather workshop", door: [91, 466], spot: true, mark: [91, 320], line: "The leather workshop."},
   rd_cuero: {scene: "rd_old", name: "The leather workshop", door: [91, 466]},
+  // Kyoto (round 121)
+  kttrain: {scene: "kt_station", name: "Kyoto station", door: [332, 190], spot: true, mark: [332, 54], line: "Kyoto's little station. Trains home to Honeybrook until 10pm."},
+  bamboo: {scene: "kt_station", name: "The bamboo grove", door: [158, 420], spot: true, mark: [150, 330], line: "The bamboo grove."},
+  yukata: {scene: "kt_station", name: "The yukata shop", door: [440, 484], spot: true, mark: [440, 360], line: "The yukata shop."},
+  ktToLane: {scene: "kt_station", name: "To Higashiyama", door: [500, 300], spot: true, bridge: "kt_lane", mark: [470, 240], line: "East along the tram line to the old lane."},
+  ktToRiver: {scene: "kt_station", name: "To the river", door: [330, 612], spot: true, bridge: "kt_river", mark: [330, 540], line: "South to the river and the canal."},
+  pagoda: {scene: "kt_lane", name: "The pagoda", door: [432, 192], spot: true, mark: [432, 10], line: "The pagoda."},
+  chaya: {scene: "kt_lane", name: "The tea house", door: [114, 188], spot: true, mark: [114, 50], line: "The tea house."},
+  wagashi: {scene: "kt_lane", name: "The sweet shop", door: [420, 440], spot: true, mark: [420, 300], line: "The sweet shop."},
+  pottery: {scene: "kt_lane", name: "The pottery workshop", door: [110, 536], spot: true, mark: [110, 400], line: "The pottery workshop."},
+  ktToStation: {scene: "kt_lane", name: "To the station", door: [16, 300], spot: true, bridge: "kt_station", mark: [40, 240], line: "West back to the station."},
+  ktStepsDown: {scene: "kt_lane", name: "Steps down to the temple", door: [330, 612], spot: true, bridge: "kt_temple", mark: [330, 540], line: "Down the stone steps to the temple."},
+  hall: {scene: "kt_temple", name: "The temple hall", door: [375, 192], spot: true, mark: [375, 30], line: "The temple hall."},
+  torii: {scene: "kt_temple", name: "The torii gates", door: [230, 596], spot: true, mark: [230, 260], line: "The torii gates."},
+  zen: {scene: "kt_temple", name: "The gravel garden", door: [400, 448], spot: true, mark: [400, 280], line: "The gravel garden."},
+  koi: {scene: "kt_temple", name: "The koi pond", door: [190, 520], spot: true, mark: [110, 440], line: "The koi pond."},
+  ktStepsUp: {scene: "kt_temple", name: "Steps up to the lane", door: [150, 40], spot: true, bridge: "kt_lane", mark: [150, 20], line: "Up the stone steps to the lane."},
+  ktToRiverW: {scene: "kt_temple", name: "To the river", door: [16, 380], spot: true, bridge: "kt_river", mark: [40, 320], line: "West along the canal to the river."},
+  nishiki: {scene: "kt_river", name: "The covered market", door: [145, 190], spot: true, mark: [145, 50], line: "The covered market."},
+  stones: {scene: "kt_river", name: "The turtle stones", door: [262, 300], spot: true, mark: [262, 250], line: "The turtle stones."},
+  ktToStationN: {scene: "kt_river", name: "To the station", door: [300, 40], spot: true, bridge: "kt_station", mark: [300, 20], line: "North along the river to the station."},
+  ktToTemple: {scene: "kt_river", name: "To the temple", door: [504, 520], spot: true, bridge: "kt_temple", mark: [476, 460], line: "East over the canal bridge to the temple."},
   rdStepsUp: {scene: "rd_old", name: "Steps up out of the gorge", door: [120, 40], spot: true, bridge: "rd_station", mark: [200, 30], line: "Down into the gorge, over the old bridge and up the steps to the new town."}
 };
 export const TOWN_BRIDGES = {rd_station: {rd_plaza: "rdToPlaza", rd_old: "rdStepsDown"}, rd_plaza: {rd_station: "rdToStation", rd_bridge: "rdBridgeN"},
-  rd_bridge: {rd_plaza: "rdBridgeS", rd_old: "rdToOld"}, rd_old: {rd_bridge: "rdToBridge", rd_station: "rdStepsUp"}};
+  rd_bridge: {rd_plaza: "rdBridgeS", rd_old: "rdToOld"}, rd_old: {rd_bridge: "rdToBridge", rd_station: "rdStepsUp"},
+  kt_station: {kt_lane: "ktToLane", kt_river: "ktToRiver"}, kt_lane: {kt_station: "ktToStation", kt_temple: "ktStepsDown"},
+  kt_temple: {kt_lane: "ktStepsUp", kt_river: "ktToRiverW"}, kt_river: {kt_station: "ktToStationN", kt_temple: "ktToTemple"}};
 export const TOWN_ARRIVE = {"rd_station>rd_plaza": [44, 330], "rd_plaza>rd_station": [474, 300], "rd_plaza>rd_bridge": [310, 60], "rd_bridge>rd_plaza": [330, 572],
-  "rd_bridge>rd_old": [476, 380], "rd_old>rd_bridge": [44, 520], "rd_station>rd_old": [130, 76], "rd_old>rd_station": [180, 566]};
+  "rd_bridge>rd_old": [476, 380], "rd_old>rd_bridge": [44, 520], "rd_station>rd_old": [130, 76], "rd_old>rd_station": [180, 566],
+  "kt_station>kt_lane": [44, 300], "kt_lane>kt_station": [474, 300], "kt_station>kt_river": [300, 76], "kt_river>kt_station": [330, 576],
+  "kt_lane>kt_temple": [150, 80], "kt_temple>kt_lane": [330, 576], "kt_temple>kt_river": [474, 520], "kt_river>kt_temple": [44, 380]};
 // walking areas, and what's in the way (paths.js)
-export const TOWN_BOUNDS = {rd_cuero: [30, 250, 490, 600], rd_tapas: [30, 250, 490, 600], rd_cafe: [30, 260, 490, 600], rd_banos: [30, 220, 490, 600], rd_jardin: [30, 176, 490, 606], rd_mercado: [30, 250, 490, 600],
+export const TOWN_BOUNDS = {kt_station: [140, 178, 506, 616], kt_lane: [14, 180, 506, 616], kt_temple: [14, 40, 506, 616], kt_river: [14, 40, 506, 616],
+  rd_cuero: [30, 250, 490, 600], rd_tapas: [30, 250, 490, 600], rd_cafe: [30, 260, 490, 600], rd_banos: [30, 220, 490, 600], rd_jardin: [30, 176, 490, 606], rd_mercado: [30, 250, 490, 600],
   rd_station: [90, 178, 506, 616], rd_plaza: [14, 180, 506, 616], rd_bridge: [14, 22, 506, 616], rd_old: [14, 36, 506, 616]};
 export const TOWN_OBST = {
+  kt_station: [[0, 0, 134, 640], [262, 56, 404, 162], [376, 376, 504, 466]],
+  kt_lane: [[26, 56, 206, 174], [26, 414, 198, 522], [336, 312, 508, 428], [380, 10, 486, 178], [218, 382, 296, 438]],
+  kt_temple: [[250, 40, 500, 174], [300, 296, 498, 434], [30, 470, 190, 550]],
+  kt_river: [[24, 58, 266, 176], [0, 316, 246, 426], [278, 316, 420, 426], [416, 0, 470, 538], [416, 564, 470, 640]],
   // the interiors: the tables, the hedges, the stalls
   rd_tapas: [[96, 362, 144, 392], [276, 402, 324, 432], [396, 282, 444, 312], [30, 486, 116, 510], [372, 498, 520, 552], [466, 376, 520, 480]],
   rd_cafe: [[90, 316, 130, 340], [180, 456, 220, 480], [350, 406, 390, 430], [56, 446, 96, 470], [432, 516, 472, 540], [436, 326, 476, 350]],

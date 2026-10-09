@@ -1949,6 +1949,71 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         banos: "The Arab baths: low domes with star-shaped skylights, eight hundred years old.",
         puerta: "The old town gate, with its horseshoe arches. Beyond it the road winds down into the valley."
       }
+    },
+    // Kyoto (round 121): an old capital in a bowl of wooded hills. Top row: the little station with its tram and the
+    // bamboo grove (west), then the stone lane of Higashiyama up to the pagoda. Bottom row: the river and the canal
+    // quarter (west) and the temple with its torii tunnel (east).
+    //   kt_station | kt_lane
+    //   -----------+----------
+    //   kt_river   | kt_temple
+    kyoto: {
+      n: "Kyoto",
+      by: "train",
+      fare: 60,
+      free: ["evan"],
+      outFrom: 7 * 60,
+      outTo: 15 * 60,
+      backTo: 22 * 60,
+      screens: ["kt_station", "kt_lane", "kt_temple", "kt_river"],
+      arrive: ["kt_station", [332, 216]],
+      station: "kttrain",
+      music: "kyoto",
+      blurb: "An old capital in a bowl of wooded hills: wooden townhouses, stone lanes, paper lanterns, temple bells, moss, maples and the sound of water. A longer ride: trains out until 3pm.",
+      arriveLine: "Kyoto! Dark wood and paper lanterns, a tram clanking past, and the bamboo whispering behind the station.",
+      evanArrive: ["a TRAM, Mama!", "the trees are so TALL", "is this Japan? is it?"],
+      evanScreen: { kt_station: ["bamboo! so tall!", "ding ding tram!"], kt_lane: ["a tower! a tall tower!", "red lanterns!"], kt_temple: ["red gates! lots!", "fishies in the pond!"], kt_river: ["stepping stones! turtles!", "a big bird!"] },
+      hints: {
+        kt_station: "Kyoto's little station (trains home till 10pm), the bamboo grove and the yukata shop. East: Higashiyama. South: the river.",
+        kt_lane: "The old stone lane up to the pagoda: the tea house, the sweet shop, the pottery. West: the station. South: steps down to the temple.",
+        kt_temple: "The temple hall, the torii gates, the gravel garden and the koi pond. North: up to the lane. West: the river.",
+        kt_river: "The river and its turtle stones, the covered market and the willow canal. North: the station. East: over the canal to the temple."
+      },
+      spots: {
+        mum: { kt_station: [[220, 360], [300, 520]], kt_lane: [[260, 300], [300, 520]], kt_temple: [[330, 250], [180, 420]], kt_river: [[200, 270], [330, 500]] },
+        dad: { kt_station: [[200, 500], [420, 540]], kt_lane: [[230, 260], [340, 300]], kt_temple: [[420, 470], [260, 240]], kt_river: [[340, 260], [200, 520]] },
+        mama: { kt_station: [[250, 470], [380, 560]], kt_lane: [[200, 330], [280, 560]], kt_temple: [[200, 470], [300, 470]], kt_river: [[160, 260], [320, 480]] },
+        gonggong: { kt_station: [[230, 450], [240, 460]], kt_lane: [[230, 360], [240, 370]], kt_temple: [[200, 460], [210, 470]], kt_river: [[180, 480], [190, 490]] },
+        darren: { kt_station: [[300, 560], [420, 270]], kt_lane: [[160, 300], [300, 400]], kt_temple: [[280, 560], [250, 260]], kt_river: [[220, 230], [300, 250]] },
+        marcus: { kt_station: [[440, 560], [200, 330]], kt_lane: [[330, 520], [270, 230]], kt_temple: [[280, 260], [440, 480]], kt_river: [[380, 520], [140, 240]] },
+        angelina: { kt_station: [[280, 360], [380, 300]], kt_lane: [[300, 330], [200, 580]], kt_temple: [[330, 470], [270, 380]], kt_river: [[240, 500], [300, 280]] }
+      },
+      // what they do (new animations come in round 3: Mum's parasol, Dad's wheel, Ma Ma's cranes, Gong Gong's Go,
+      // Darren's skewers, Marcus's calligraphy, Angelina's fortunes; nothing they did in Ronda)
+      acts: {},
+      lines: {
+        mum: ["Listen. You can hear the bamboo creaking. Like a boat.", "Everything here is so neat. I want to fold my clothes now. Strange feeling.", "I want a yukata. A blue one. With little white flowers."],
+        dad: ["Look at the joinery on that roof. Not a single nail. Not one.", "That pagoda's been standing here longer than anything I've ever fixed.", "I'd like to try making a cup. A bowl. Anything round."],
+        mama: ["So clean! You can eat off the street. Ma Ma won't. But you can.", "The moss here, so green. Ma Ma's garden never this green. Must be the rain.", "Paper cranes, a thousand, you get a wish. Ma Ma start now."],
+        gonggong: ["Quiet town. Old town. Gong Gong feels young here.", "Koi fish. Very fat. Very lucky.", "Somebody playing Go under that tree. Gong Gong watch only. For now."],
+        darren: ["I've eaten four things on sticks and I'm not stopping.", "There's a vending machine for everything here. Even hot soup. HOT SOUP.", "Mel, how do you say 'another one, please'? Asking for me."],
+        marcus: ["Everyone here bows. I've bowed to a vending machine twice.", "That brush calligraphy looks easy. It is not easy, is it?", "The steps up to that temple: one hundred and twelve. I counted. Zeh, don't."],
+        angelina: ["I drew a fortune. 'Great blessing.' I'm framing it.", "Everyone's so polite I feel loud just breathing.", "The tea house garden has a little waterfall and nobody's even looking at it. I am."],
+        evan: ["tram! ding ding!", "red gates! red gates!", "fishies!", "Mama, the trees are talking"]
+      },
+      say: {
+        bamboo: "The bamboo grove: thousands of stalks, taller than houses, creaking and knocking together in the wind. The light comes through in green stripes.",
+        yukata: "The yukata shop: rows of cotton summer kimonos in indigo, red and white. (It opens properly soon.)",
+        pagoda: "The five-storey pagoda: each roof a little smaller than the last, with a golden spire on top. It's stood through more than four hundred years of earthquakes.",
+        chaya: "The tea house: a cloth curtain over the door, a red lantern, and the smell of roasted tea. (Its door opens soon.)",
+        wagashi: "The sweet shop: tiny sweets shaped like flowers and leaves, one for each season, under glass. (Its door opens soon.)",
+        pottery: "The pottery workshop: cups and bowls drying on boards, and the kiln ticking as it cools. (Its door opens soon.)",
+        hall: "The temple hall: a deep, sweeping roof on red pillars, incense curling up from the burner, and a great bell inside. (Its doors open soon.)",
+        torii: "The torii gates: a tunnel of vermilion gates climbing the hill, each one given by somebody, with their name painted on the back.",
+        zen: "The gravel garden: raked lines flowing round three mossy rocks like water round islands. Nobody walks on it. You just sit and look.",
+        koi: "The koi pond: orange, white and red koi gliding under the little red bridge. They come up to see if you've brought anything.",
+        stones: "The turtle stones: stepping stones shaped like turtles, right across the river. You hop from shell to shell.",
+        nishiki: "The covered market: a long arcade of little stalls: pickles, tofu, rolled omelette, knives, tea. (Its stalls open soon.)"
+      }
     }
   };
   var TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t2]) => [...t2.screens, ...Object.keys(t2.rooms || {})].map((s) => [s, id])));
@@ -1956,7 +2021,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const t2 = TOWNS[TOWN_SCENES[scene2]];
     return t2 && t2.rooms && t2.rooms[scene2] || null;
   };
-  var roomBehind = (town, place) => Object.keys((TOWNS[town] || {}).rooms || {}).find((r) => TOWNS[town].rooms[r].door === place) || null;
+  var roomBehind = (town, place2) => Object.keys((TOWNS[town] || {}).rooms || {}).find((r) => TOWNS[town].rooms[r].door === place2) || null;
   var townOf = (scene2) => TOWN_SCENES[scene2] || null;
   var TOWN_PLACES = {
     rdtrain: { scene: "rd_station", name: "Ronda station", door: [330, 186], spot: true, mark: [330, 54], line: "Ronda's little station. Trains home to Honeybrook until 10pm." },
@@ -1987,13 +2052,39 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     rd_jardin: { scene: "rd_bridge", name: "The Moorish garden", door: [330, 432] },
     cuero: { scene: "rd_old", name: "The leather workshop", door: [91, 466], spot: true, mark: [91, 320], line: "The leather workshop." },
     rd_cuero: { scene: "rd_old", name: "The leather workshop", door: [91, 466] },
+    // Kyoto (round 121)
+    kttrain: { scene: "kt_station", name: "Kyoto station", door: [332, 190], spot: true, mark: [332, 54], line: "Kyoto's little station. Trains home to Honeybrook until 10pm." },
+    bamboo: { scene: "kt_station", name: "The bamboo grove", door: [158, 420], spot: true, mark: [150, 330], line: "The bamboo grove." },
+    yukata: { scene: "kt_station", name: "The yukata shop", door: [440, 484], spot: true, mark: [440, 360], line: "The yukata shop." },
+    ktToLane: { scene: "kt_station", name: "To Higashiyama", door: [500, 300], spot: true, bridge: "kt_lane", mark: [470, 240], line: "East along the tram line to the old lane." },
+    ktToRiver: { scene: "kt_station", name: "To the river", door: [330, 612], spot: true, bridge: "kt_river", mark: [330, 540], line: "South to the river and the canal." },
+    pagoda: { scene: "kt_lane", name: "The pagoda", door: [432, 192], spot: true, mark: [432, 10], line: "The pagoda." },
+    chaya: { scene: "kt_lane", name: "The tea house", door: [114, 188], spot: true, mark: [114, 50], line: "The tea house." },
+    wagashi: { scene: "kt_lane", name: "The sweet shop", door: [420, 440], spot: true, mark: [420, 300], line: "The sweet shop." },
+    pottery: { scene: "kt_lane", name: "The pottery workshop", door: [110, 536], spot: true, mark: [110, 400], line: "The pottery workshop." },
+    ktToStation: { scene: "kt_lane", name: "To the station", door: [16, 300], spot: true, bridge: "kt_station", mark: [40, 240], line: "West back to the station." },
+    ktStepsDown: { scene: "kt_lane", name: "Steps down to the temple", door: [330, 612], spot: true, bridge: "kt_temple", mark: [330, 540], line: "Down the stone steps to the temple." },
+    hall: { scene: "kt_temple", name: "The temple hall", door: [375, 192], spot: true, mark: [375, 30], line: "The temple hall." },
+    torii: { scene: "kt_temple", name: "The torii gates", door: [230, 596], spot: true, mark: [230, 260], line: "The torii gates." },
+    zen: { scene: "kt_temple", name: "The gravel garden", door: [400, 448], spot: true, mark: [400, 280], line: "The gravel garden." },
+    koi: { scene: "kt_temple", name: "The koi pond", door: [190, 520], spot: true, mark: [110, 440], line: "The koi pond." },
+    ktStepsUp: { scene: "kt_temple", name: "Steps up to the lane", door: [150, 40], spot: true, bridge: "kt_lane", mark: [150, 20], line: "Up the stone steps to the lane." },
+    ktToRiverW: { scene: "kt_temple", name: "To the river", door: [16, 380], spot: true, bridge: "kt_river", mark: [40, 320], line: "West along the canal to the river." },
+    nishiki: { scene: "kt_river", name: "The covered market", door: [145, 190], spot: true, mark: [145, 50], line: "The covered market." },
+    stones: { scene: "kt_river", name: "The turtle stones", door: [262, 300], spot: true, mark: [262, 250], line: "The turtle stones." },
+    ktToStationN: { scene: "kt_river", name: "To the station", door: [300, 40], spot: true, bridge: "kt_station", mark: [300, 20], line: "North along the river to the station." },
+    ktToTemple: { scene: "kt_river", name: "To the temple", door: [504, 520], spot: true, bridge: "kt_temple", mark: [476, 460], line: "East over the canal bridge to the temple." },
     rdStepsUp: { scene: "rd_old", name: "Steps up out of the gorge", door: [120, 40], spot: true, bridge: "rd_station", mark: [200, 30], line: "Down into the gorge, over the old bridge and up the steps to the new town." }
   };
   var TOWN_BRIDGES = {
     rd_station: { rd_plaza: "rdToPlaza", rd_old: "rdStepsDown" },
     rd_plaza: { rd_station: "rdToStation", rd_bridge: "rdBridgeN" },
     rd_bridge: { rd_plaza: "rdBridgeS", rd_old: "rdToOld" },
-    rd_old: { rd_bridge: "rdToBridge", rd_station: "rdStepsUp" }
+    rd_old: { rd_bridge: "rdToBridge", rd_station: "rdStepsUp" },
+    kt_station: { kt_lane: "ktToLane", kt_river: "ktToRiver" },
+    kt_lane: { kt_station: "ktToStation", kt_temple: "ktStepsDown" },
+    kt_temple: { kt_lane: "ktStepsUp", kt_river: "ktToRiverW" },
+    kt_river: { kt_station: "ktToStationN", kt_temple: "ktToTemple" }
   };
   var TOWN_ARRIVE = {
     "rd_station>rd_plaza": [44, 330],
@@ -2003,9 +2094,21 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     "rd_bridge>rd_old": [476, 380],
     "rd_old>rd_bridge": [44, 520],
     "rd_station>rd_old": [130, 76],
-    "rd_old>rd_station": [180, 566]
+    "rd_old>rd_station": [180, 566],
+    "kt_station>kt_lane": [44, 300],
+    "kt_lane>kt_station": [474, 300],
+    "kt_station>kt_river": [300, 76],
+    "kt_river>kt_station": [330, 576],
+    "kt_lane>kt_temple": [150, 80],
+    "kt_temple>kt_lane": [330, 576],
+    "kt_temple>kt_river": [474, 520],
+    "kt_river>kt_temple": [44, 380]
   };
   var TOWN_BOUNDS = {
+    kt_station: [140, 178, 506, 616],
+    kt_lane: [14, 180, 506, 616],
+    kt_temple: [14, 40, 506, 616],
+    kt_river: [14, 40, 506, 616],
     rd_cuero: [30, 250, 490, 600],
     rd_tapas: [30, 250, 490, 600],
     rd_cafe: [30, 260, 490, 600],
@@ -2018,6 +2121,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     rd_old: [14, 36, 506, 616]
   };
   var TOWN_OBST = {
+    kt_station: [[0, 0, 134, 640], [262, 56, 404, 162], [376, 376, 504, 466]],
+    kt_lane: [[26, 56, 206, 174], [26, 414, 198, 522], [336, 312, 508, 428], [380, 10, 486, 178], [218, 382, 296, 438]],
+    kt_temple: [[250, 40, 500, 174], [300, 296, 498, 434], [30, 470, 190, 550]],
+    kt_river: [[24, 58, 266, 176], [0, 316, 246, 426], [278, 316, 420, 426], [416, 0, 470, 538], [416, 564, 470, 640]],
     // the interiors: the tables, the hedges, the stalls
     rd_tapas: [[96, 362, 144, 392], [276, 402, 324, 432], [396, 282, 444, 312], [30, 486, 116, 510], [372, 498, 520, 552], [466, 376, 520, 480]],
     rd_cafe: [[90, 316, 130, 340], [180, 456, 220, 480], [350, 406, 390, 430], [56, 446, 96, 470], [432, 516, 472, 540], [436, 326, 476, 350]],
@@ -6793,8 +6900,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var stemName = (id, n) => `${n} ${n === 1 ? FLOWERS[id].one : FLOWERS[id].one + (/s$/.test(FLOWERS[id].one) ? "" : "s")}`;
   function stateOf(where, p, today2) {
     if (!p) return { stage: "empty", g: 0, left: 0 };
-    const C3 = cat(where)[p.k];
-    if (!C3 || !C3.seasons.includes(seasonOf(today2))) return { stage: "faded", g: 0, left: 0 };
+    const C4 = cat(where)[p.k];
+    if (!C4 || !C4.seasons.includes(seasonOf(today2))) return { stage: "faded", g: 0, left: 0 };
     const t2 = Date.now(), [grow] = timing(where);
     if (t2 < p.at + grow) return { stage: "growing", g: (t2 - p.at) / grow, left: p.at + grow - t2 };
     if (t2 < p.next) {
@@ -6804,16 +6911,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return { stage: "ripe", g: 1, left: 0 };
   }
   function plant2(F2, where, i, id, today2) {
-    const o = orchState(F2), list2 = o[SPOTS2[where]], C3 = cat(where)[id];
-    if (!C3 || !list2 || i < 0 || i >= list2.length || !C3.seasons.includes(seasonOf(today2))) return null;
-    if (where !== "tree" && !!C3.bush !== (where === "bush")) return null;
+    const o = orchState(F2), list2 = o[SPOTS2[where]], C4 = cat(where)[id];
+    if (!C4 || !list2 || i < 0 || i >= list2.length || !C4.seasons.includes(seasonOf(today2))) return null;
+    if (where !== "tree" && !!C4.bush !== (where === "bush")) return null;
     const st6 = stateOf(where, list2[i], today2);
     if (st6.stage !== "empty" && st6.stage !== "faded") return null;
-    if (F2.coins < C3.price) return null;
-    F2.coins -= C3.price;
+    if (F2.coins < C4.price) return null;
+    F2.coins -= C4.price;
     const [grow, first] = timing(where), t2 = Date.now();
     list2[i] = { k: id, at: t2, next: t2 + grow + first };
-    return where === "tree" ? `A little ${C3.n.toLowerCase().replace(" tree", "")} sapling, in the ground. Ma Ma will water it. Fruit in about ${Math.round((grow + first) / H)} hours.` : `${C3.n} ${where === "bush" ? "bush" : "seedlings"}, planted. Ma Ma's already fussing over them. Flowers in about ${Math.round(grow / H)} hours.`;
+    return where === "tree" ? `A little ${C4.n.toLowerCase().replace(" tree", "")} sapling, in the ground. Ma Ma will water it. Fruit in about ${Math.round((grow + first) / H)} hours.` : `${C4.n} ${where === "bush" ? "bush" : "seedlings"}, planted. Ma Ma's already fussing over them. Flowers in about ${Math.round(grow / H)} hours.`;
   }
   function orchTick(F2, today2) {
     const o = orchState(F2), t2 = Date.now(), off = now() - t2, hm2 = (ms) => {
@@ -6824,7 +6931,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     let any = false;
     if (hm2(t2) >= 7 * 60 && hm2(t2) < 19 * 60) for (const where of ["tree", "bed", "bush"]) o[SPOTS2[where]].forEach((p) => {
       if (stateOf(where, p, today2).stage !== "ripe") return;
-      const C3 = cat(where)[p.k], id = where === "tree" ? C3.fruit : "stem:" + p.k, n = where === "tree" ? C3.yield : where === "bed" ? BED_YIELD : BUSH_YIELD;
+      const C4 = cat(where)[p.k], id = where === "tree" ? C4.fruit : "stem:" + p.k, n = where === "tree" ? C4.yield : where === "bed" ? BED_YIELD : BUSH_YIELD;
       o.stock[id] = (o.stock[id] || 0) + n;
       out.picked[id] = (out.picked[id] || 0) + n;
       p.picked = t2;
@@ -6931,16 +7038,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       const opts = Object.keys(cat(where)).filter((id) => cat(where)[id].seasons.includes(season) && (where === "tree" || !!cat(where)[id].bush === (where === "bush")));
       h += st6.stage === "faded" ? `<div class="orpic">${pic3}</div><p class="sub">The ${nameOf(where, p.k).toLowerCase()} ${where === "tree" ? "has" : "have"} had their season. Plant something for ${SEASONS[season].n.toLowerCase()}.</p>` : `<p class="sub">An empty spot. What shall we plant? ${SEASONS[season].n} ${where === "tree" ? "saplings" : where === "bush" ? "bushes" : "seedlings"}, from Ma Ma's stall:</p>`;
       h += `<div class="items shop">${opts.map((id) => {
-        const C4 = cat(where)[id], off = F2.coins < C4.price;
-        return `<button class="item" data-or="plant" data-k="${id}" ${off ? "disabled" : ""}><span class="e">${where === "tree" ? treePic(id, "ripe", 44, off) : flowerPic(id, "ripe", where === "bush", 44, off)}</span><span class="n">${esc(C4.n)}</span><span class="c"><b>${C4.price}</b> ${icon("coin", 13)}</span><span class="d">${where === "tree" ? `${C4.yield} ${C4.fn[1]} a day` : `${where === "bush" ? BUSH_YIELD : BED_YIELD} stems a picking`}</span></button>`;
+        const C5 = cat(where)[id], off = F2.coins < C5.price;
+        return `<button class="item" data-or="plant" data-k="${id}" ${off ? "disabled" : ""}><span class="e">${where === "tree" ? treePic(id, "ripe", 44, off) : flowerPic(id, "ripe", where === "bush", 44, off)}</span><span class="n">${esc(C5.n)}</span><span class="c"><b>${C5.price}</b> ${icon("coin", 13)}</span><span class="d">${where === "tree" ? `${C5.yield} ${C5.fn[1]} a day` : `${where === "bush" ? BUSH_YIELD : BED_YIELD} stems a picking`}</span></button>`;
       }).join("")}</div>`;
       h += `<p class="muted">You have ${F2.coins} coins. Ma Ma does the watering and the picking.</p>`;
       return h + `<div class="actions">${close}</div>`;
     }
-    const C3 = cat(where)[p.k];
+    const C4 = cat(where)[p.k];
     h += `<div class="orpic">${pic3}</div><p class="sub">${esc(nameOf(where, p.k))}. ${st6.stage === "growing" ? `Still growing: ${where === "tree" ? "fruit" : "flowers"} in about ${hrs(st6.left + (where === "tree" ? TREE_FIRST : 0))}.` : st6.stage === "budding" ? `${where === "tree" ? "Fruit ripening" : "In bud"}: ready in about ${hrs(st6.left)}.` : `${where === "tree" ? "Ripe fruit" : "In full bloom"}! Ma Ma will pick ${where === "tree" ? "it" : "them"} for the farm shop.`}</p>
     <span class="clbar"><i style="width:${Math.round(st6.g * 100)}%"></i></span>
-    <p class="muted">${where === "tree" ? `${C3.yield} ${C3.fn[1]} a day once it's fruiting.` : `${where === "bush" ? BUSH_YIELD : BED_YIELD} stems each picking.`} In season: ${C3.seasons.map((s) => SEASONS[s].n.toLowerCase()).join(", ")}.</p>`;
+    <p class="muted">${where === "tree" ? `${C4.yield} ${C4.fn[1]} a day once it's fruiting.` : `${where === "bush" ? BUSH_YIELD : BED_YIELD} stems each picking.`} In season: ${C4.seasons.map((s) => SEASONS[s].n.toLowerCase()).join(", ")}.</p>`;
     return h + `<div class="actions">${close}</div>`;
   }
   var OCCASIONS = ["a birthday", "an anniversary dinner", "a new baby next door", "a get-well visit", "a thank-you for a neighbour", "a first date", "the café tables", "a housewarming"];
@@ -6985,8 +7092,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         const opts = Object.keys(cat(where)).filter((id) => cat(where)[id].seasons.includes(season) && (where === "tree" || !!cat(where)[id].bush === (where === "bush")));
         h += `<h3 class="ph3">${where === "tree" ? "Fruit trees" : where === "bush" ? "Flower bushes" : "Flower seedlings"} <small class="muted">${free} free spot${free === 1 ? "" : "s"}${where === "tree" ? " in the orchard" : " at the flower farm"}</small></h3>`;
         h += `<div class="items shop">${opts.map((id) => {
-          const C3 = cat(where)[id], off = !free || F2.coins < C3.price;
-          return `<button class="item" data-or="plantany" data-where="${where}" data-k="${id}" ${off ? "disabled" : ""}><span class="e">${where === "tree" ? treePic(id, "ripe", 44, off) : flowerPic(id, "ripe", where === "bush", 44, off)}</span><span class="n">${esc(C3.n)}</span><span class="c"><b>${C3.price}</b> ${icon("coin", 13)}</span><span class="d">${where === "tree" ? `${C3.yield} ${C3.fn[1]} a day` : `${where === "bush" ? BUSH_YIELD : BED_YIELD} stems a picking`}</span></button>`;
+          const C4 = cat(where)[id], off = !free || F2.coins < C4.price;
+          return `<button class="item" data-or="plantany" data-where="${where}" data-k="${id}" ${off ? "disabled" : ""}><span class="e">${where === "tree" ? treePic(id, "ripe", 44, off) : flowerPic(id, "ripe", where === "bush", 44, off)}</span><span class="n">${esc(C4.n)}</span><span class="c"><b>${C4.price}</b> ${icon("coin", 13)}</span><span class="d">${where === "tree" ? `${C4.yield} ${C4.fn[1]} a day` : `${where === "bush" ? BUSH_YIELD : BED_YIELD} stems a picking`}</span></button>`;
         }).join("")}</div>`;
       }
       h += `<p class="muted">You have ${F2.coins} coins. Ma Ma does the watering and the picking. Trees and flowers last for their seasons, then the spot needs replanting.</p>`;
@@ -8903,7 +9010,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     <g filter="url(#wob)"><path d="M24 300 H486 M112 300 V238 M390 300 V222 M186 300 C186 400 190 480 210 548 M290 0 C296 100 284 200 296 300" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[30, 140, "#EFA3A6"], [200, 140, "#F3C969"], [480, 250, "#C3CDEE"], [490, 330, "#EFA3A6"], [150, 350, "#F3C969"], [40, 520, "#C3CDEE"], [480, 520, "#F3C969"], [300, 250, "#EFA3A6"]])}
     ${tree(250, 130, 0.9)}${tree(495, 150, 0.9)}${tree(26, 620, 0.8)}${tree(500, 620, 0.85)}${tree(40, 380, 0.8)}`;
-    const gate2 = `<g data-place="toBaseV" aria-label="Gate home"><ellipse class="hov" cx="24" cy="300" rx="26" ry="30" style="fill:var(--butter)"/>
+    const gate3 = `<g data-place="toBaseV" aria-label="Gate home"><ellipse class="hov" cx="24" cy="300" rx="26" ry="30" style="fill:var(--butter)"/>
     ${sk(
       `<rect x="0" y="290" width="40" height="22" rx="2" style="fill:var(--wood)"/><rect x="42" y="262" width="6" height="52" style="fill:var(--wood)"/><path d="M38 266 q12 -14 20 0" style="fill:var(--moss)"/>`,
       `<rect x="0" y="290" width="40" height="22" rx="2"/><path d="M8 290 v22 M16 290 v22 M24 290 v22 M32 290 v22" opacity=".6"/><rect x="42" y="262" width="6" height="52"/>`
@@ -8920,7 +9027,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const olive = `<g data-place="olive" aria-label="Olive tree"><ellipse class="hov" cx="250" cy="258" rx="34" ry="9" style="fill:var(--butter)"/>${ol ? `<g filter="url(#wob)">${oliveTree(250, 254, 1, ripe ? "ripe" : "growing")}</g>` + (ripe ? `<g class="twinkle" pointer-events="none"><path d="M276 196 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" stroke="#3b3530" stroke-width="1"/></g>` : "") : sk(`<ellipse cx="250" cy="252" rx="16" ry="5" style="fill:#9C7A5C"/>`, `<ellipse cx="250" cy="252" rx="16" ry="5"/><path d="M262 252 v-18 M256 236 h14 v8 h-14z"/>`)}${tapeLabel(250, 276, "Olive tree", "var(--sage)", 10)}</g>`;
     const gv = v.grove, gripe = gv && Date.now() - (gv.pickedAt || gv.planted) >= 8 * 36e5;
     const grove = gv ? `<g data-place="grove" aria-label="The olive grove"><ellipse class="hov" cx="125" cy="92" rx="100" ry="12" style="fill:var(--butter)"/><g filter="url(#wob)">${[50, 100, 150, 200].map((x) => oliveTree(x, 92, 0.62, gripe ? "ripe" : "growing")).join("")}</g>${tapeLabel(125, 110, "Olive grove", "var(--sage)", 10)}</g>` : "";
-    return lampDefs + ground + gate2 + lgate + grove + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive + shedArt(v) + shopArt(v) + potsIn("vineyard") + stallArt() + sign + v.rows.map((row2, r) => rowArt(row2, r)).join("") + playArt() + (v.terrace ? sk(
+    return lampDefs + ground + gate3 + lgate + grove + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive + shedArt(v) + shopArt(v) + potsIn("vineyard") + stallArt() + sign + v.rows.map((row2, r) => rowArt(row2, r)).join("") + playArt() + (v.terrace ? sk(
       `<path d="M466 132 h48 l-4 -10 h-40z" style="fill:#9CC27E"/><ellipse cx="478" cy="196" rx="11" ry="4" style="fill:#FFFDF6"/><ellipse cx="502" cy="206" rx="11" ry="4" style="fill:#FFFDF6"/><circle cx="474" cy="128" r="2.4" style="fill:#6B2A55"/><circle cx="500" cy="128" r="2.4" style="fill:#6B2A55"/>`,
       `<path d="M466 132 h48 l-4 -10 h-40z M470 132 v80 M510 132 v80"/><ellipse cx="478" cy="196" rx="11" ry="4"/><path d="M478 200 v12 M502 210 v10"/><ellipse cx="502" cy="206" rx="11" ry="4"/>`
     ) : "") + ((festivalOn(G3.day()) || {}).id === "harvest" ? bunting(214, 318, 466, 318, ["#8E2C48", "#F3C969", "#9CC27E"]) + bunting(214, 498, 466, 498, ["#F3C969", "#8E2C48", "#F6E3C6"]) : "");
@@ -8973,7 +9080,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const nx = nextTrain(day, hm2);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Honeybrook</h2><p class="sub">Trains today. Every one stops here for two minutes.${nx ? ` Next: ${nx.n.toLowerCase()} at ${fmt2(nx.t)}.` : " That's the last one gone for today."}</p>`;
     h += `<ul class="hlist wlist">${trainsOn(day).map((t2) => `<li class="${nx && t2.id === nx.id ? "now" : ""}"><span class="wtxt"><b>${fmt2(t2.t)} · ${t2.n} ${t2.to}</b><small>${t2.line}</small></span></li>`).join("")}</ul>`;
-    h += tickets ? `<div class="actions"><button class="btn primary" data-tickets="1">Ticket window: a day trip to Ronda</button></div>` : `<p class="muted">The ticket window's shutters are down for now: it opens when there's somewhere to go.</p>`;
+    h += tickets ? `<div class="actions"><button class="btn primary" data-tickets="1">Ticket window: day trips to Ronda and Kyoto</button></div>` : `<p class="muted">The ticket window's shutters are down for now: it opens when there's somewhere to go.</p>`;
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
 
@@ -9670,7 +9777,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D3.chico.door[0]} ${D3.chico.door[1]} M150 336 L${D3.chord.door[0]} ${D3.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D3.luna.door[0]} ${D3.luna.door[1]} M262 420 C300 470 340 500 ${D3.ohayo.door[0]} ${D3.ohayo.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[40, 200, "#EFA3A6"], [60, 214, "#F3C969"], [480, 330, "#C3CDEE"], [300, 420, "#EFA3A6"], [200, 600, "#F3C969"], [90, 560, "#C3CDEE"], [460, 600, "#EFA3A6"], [330, 250, "#F3C969"]])}
     ${tree(70, 120, 1)}${tree(220, 80, 0.9)}${tree(490, 110, 1)}${tree(40, 620, 0.95)}${tree(490, 620, 0.9)}${tree(470, 430, 0.85)}${tree(60, 440, 0.9)}`;
-    const gate2 = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
+    const gate3 = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
     ${sk(
       `<rect x="6" y="292" width="6" height="56" style="fill:var(--wood)"/><rect x="30" y="292" width="6" height="56" style="fill:var(--wood)"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
       `<rect x="6" y="292" width="6" height="56"/><rect x="30" y="292" width="6" height="56"/><path d="M2 296 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`
@@ -9692,7 +9799,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const plot = lunaHouse() + ohayoHouse();
     const river = riverPath([[18, -20], [22, 150], [14, 330], [20, 480], [12, 660]], 16) + sk(`<rect x="2" y="322" width="36" height="20" rx="2" style="fill:#C9A27E"/>`, `<rect x="2" y="322" width="36" height="20" rx="2"/><path d="M12 322 v20 M22 322 v20" opacity=".5"/>`);
     const up = `<g filter="url(#wob)"><path d="M262 344 C262 260 300 200 330 150 L330 40" fill="none" style="stroke:var(--path)" stroke-width="16" stroke-linecap="round"/></g>` + archGate("toWoodsM", 330, 48, "Honeybrook Woods", 404, 70, "#C3E8DA", "Up the hill into Honeybrook Woods");
-    return lampDefs + ground + river + up + gate2 + vgate + [[70, 352], [250, 352], [460, 352], [222, 572]].map(([x, y]) => streetLamp(x, y)).join("") + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot + light("chord", 200, 196) + light("chico", 433, 206) + light("luna", 212, 452) + light("ohayo", 414, 450) + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12) + userGarden("luna", 76, 570, 4, 2, 12) + userGarden("ohayo", 420, 562, 4, 2, 12) + upgradesArt(G2.F().totalQuests || 0, "lane");
+    return lampDefs + ground + river + up + gate3 + vgate + [[70, 352], [250, 352], [460, 352], [222, 572]].map(([x, y]) => streetLamp(x, y)).join("") + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot + light("chord", 200, 196) + light("chico", 433, 206) + light("luna", 212, 452) + light("ohayo", 414, 450) + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12) + userGarden("luna", 76, 570, 4, 2, 12) + userGarden("ohayo", 420, 562, 4, 2, 12) + upgradesArt(G2.F().totalQuests || 0, "lane");
   }
   function notesArt(x, y, n) {
     const c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#C3CDEE", "#DCE8C8"];
@@ -10363,14 +10470,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         <path d="M${x + 30} ${y - 44} q-6 -2 -5 -10 q1 -8 9 -8 q8 0 9 8 q1 8 -5 10z"/><path d="M${x + 30} ${y - 62} v-4 M${x + 32} ${y - 62} q4 -2 7 -3 M${x + 28} ${y - 62} q-3 -1 -5 -2" style="stroke:var(--moss2)"/><circle cx="${x + 30}" cy="${y - 72}" r="6"/><circle cx="${x + 40}" cy="${y - 66}" r="5"/><circle cx="${x + 22}" cy="${y - 65}" r="5"/>`
         );
       case "jarshelf": {
-        const js = G2.jars && G2.jars() || [], W10 = 176, x0 = x - W10 / 2;
+        const js = G2.jars && G2.jars() || [], W11 = 176, x0 = x - W11 / 2;
         const mini = (j, i) => {
           const cx = x0 + 16 + i % 5 * 36, top = y - (i < 5 ? 66 : 32) - 22;
           return j ? `<svg x="${cx - 11}" y="${top}" width="22" height="29" viewBox="0 0 60 80">${jarArt(j)}</svg>` : "";
         };
         return sk(
-          `<rect x="${x0}" y="${y - 70}" width="${W10}" height="70" rx="3" style="fill:#E2CBA8"/><rect x="${x0}" y="${y - 38}" width="${W10}" height="6" style="fill:var(--wood)"/><rect x="${x0}" y="${y - 6}" width="${W10}" height="6" style="fill:var(--wood)"/>`,
-          `<rect x="${x0}" y="${y - 70}" width="${W10}" height="70" rx="3"/><path d="M${x0} ${y - 38} h${W10} M${x0} ${y - 32} h${W10} M${x0} ${y - 6} h${W10}"/>`
+          `<rect x="${x0}" y="${y - 70}" width="${W11}" height="70" rx="3" style="fill:#E2CBA8"/><rect x="${x0}" y="${y - 38}" width="${W11}" height="6" style="fill:var(--wood)"/><rect x="${x0}" y="${y - 6}" width="${W11}" height="6" style="fill:var(--wood)"/>`,
+          `<rect x="${x0}" y="${y - 70}" width="${W11}" height="70" rx="3"/><path d="M${x0} ${y - 38} h${W11} M${x0} ${y - 32} h${W11} M${x0} ${y - 6} h${W11}"/>`
         ) + `<g pointer-events="none">${js.map(mini).join("")}</g>`;
       }
       case "chartstand":
@@ -11008,6 +11115,20 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         [[0, 69], [1, 72], [2, 69], [2.5, 67], [3, 65]],
         [[0, 64], [1, 65], [1.5, 64], [2, 65], [2.5, 64], [3, 68]]
       ]
+    },
+    // live, all over Kyoto (round 121): a koto (plucked, like the guitar but sparser), in the old miyako-bushi scale
+    // (D, Eb, G, A, Bb: the flattened second and sixth are what makes it sound like Kyoto), slow and spacious
+    kyoto: {
+      name: "Koto in Kyoto",
+      live: true,
+      bpm: 72,
+      steps: 8,
+      tone: "guitar",
+      arp: [1, 3, 2, 4, 3, 5, 4, 2],
+      arpVel: 0.045,
+      mel: 0.6,
+      bars: [[38, 50, 62, 63, 67, 69], [38, 50, 62, 67, 69, 70], [31, 43, 55, 62, 63, 67], [33, 45, 57, 62, 63, 69], [38, 50, 62, 63, 67, 69], [34, 46, 58, 62, 67, 70], [31, 43, 55, 63, 67, 69], [38, 50, 57, 62, 63, 69]],
+      lines: [[[0, 74], [1, 75], [2, 74], [3, 69]], [[0, 70], [2, 69], [3, 67]], [[0, 67], [1, 69], [2, 70], [3, 69]], [[0, 75], [1, 74], [3, 69]], [[0, 74], [2, 79], [3, 75]], [[0, 74], [1, 70], [2, 69]], [[0, 67], [2, 63], [3, 62]], [[0, 62], [2, 63], [3, 62]]]
     },
     // Round 116: each of Ronda's interiors has its own music (live, while Mel's inside)
     // the tapas bar: a quick rumba on the guitar in D minor, strummed on every off-beat
@@ -13760,7 +13881,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   var mlabel = (k) => (/* @__PURE__ */ new Date(k + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
   function chart(d, target) {
     const ms = Object.keys(d.byMonth), vals = ms.map((k) => d.byMonth[k]), max = Math.max(1, target || 0, ...vals) * 1.15;
-    const W10 = 320, H3 = 150, L2 = 8, B = 128, T = 14, bw = 36, gap = (W10 - L2 * 2 - bw * 6) / 5, y = (v) => B - (B - T) * v / max;
+    const W11 = 320, H3 = 150, L2 = 8, B = 128, T = 14, bw = 36, gap = (W11 - L2 * 2 - bw * 6) / 5, y = (v) => B - (B - T) * v / max;
     const bars2 = ms.map((k, i) => {
       const x = L2 + i * (bw + gap), v = vals[i], top = y(v), h = Math.max(0, B - top), cur2 = i === ms.length - 1;
       const r = Math.min(4, h);
@@ -13768,8 +13889,8 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       return `<g class="rbar${cur2 ? " cur" : ""}" tabindex="0" aria-label="${mlabel(k)}: ${money2(v, d.currency)}"><title>${mlabel(k)} ${k.slice(0, 4)}: ${money2(v, d.currency)}</title><rect x="${x - gap / 2}" y="${T}" width="${bw + gap}" height="${B - T}" fill="transparent"/>${path ? `<path d="${path}" fill="#4E9A4A" opacity="${cur2 ? 1 : 0.55}"/>` : ""}
       ${cur2 || v === Math.max(...vals) && v > 0 ? `<text x="${x + bw / 2}" y="${top - 4}" text-anchor="middle" class="rval">${money2(v, d.currency)}</text>` : ""}<text x="${x + bw / 2}" y="${B + 14}" text-anchor="middle" class="rax">${mlabel(k)}</text></g>`;
     }).join("");
-    const tl = target ? `<path d="M${L2} ${y(target)} H${W10 - L2}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W10 - L2}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money2(target, d.currency)}</text>` : "";
-    return `<svg class="rchart" viewBox="0 0 ${W10} ${H3}" role="img" aria-label="Paid income by month, last six months"><path d="M${L2} ${B} H${W10 - L2}" stroke="#D8CFC2" stroke-width="1"/>${bars2}${tl}</svg>`;
+    const tl = target ? `<path d="M${L2} ${y(target)} H${W11 - L2}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W11 - L2}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money2(target, d.currency)}</text>` : "";
+    return `<svg class="rchart" viewBox="0 0 ${W11} ${H3}" role="img" aria-label="Paid income by month, last six months"><path d="M${L2} ${B} H${W11 - L2}" stroke="#D8CFC2" stroke-width="1"/>${bars2}${tl}</svg>`;
   }
   var revenueNow = () => {
     if (!st3.data) return null;
@@ -15580,7 +15701,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var coin2 = () => icon("coin", 13);
   function ticketPanel(F2, pick4, town = "ronda", hm2 = sgHM()) {
     const t2 = TOWNS[town], party = FAMILY.filter((id) => pick4.includes(id)), cost = fareFor(town, party), open2 = canLeave(town, hm2), on = tripOn(F2);
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Tickets to ${esc(t2.n)}</h2><p class="sub">${esc(t2.blurb)}</p>
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Tickets to ${esc(t2.n)}</h2><div class="gchips">${Object.entries(TOWNS).map(([k, x]) => `<button class="gchip${k === town ? " on" : ""}" data-ttown="${k}" aria-pressed="${k === town}"><span>${esc(x.n)}</span></button>`).join("")}</div><p class="sub">${esc(t2.blurb)}</p>
     <p class="muted">${t2.fare} ${coin2()} return a person (Evan rides free). Trains out ${fmt3(t2.outFrom)} to ${fmt3(t2.outTo)}; the last train home leaves ${esc(t2.n)} at ${fmt3(t2.backTo)}. A day trip: you'll be home tonight.</p>`;
     if (on) return h + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: go again tomorrow.</p>` + shut2;
     if (!open2) return h + `<p><b>${hm2 < t2.outFrom ? `The first train to ${esc(t2.n)} is at ${fmt3(t2.outFrom)}.` : `That's the last train to ${esc(t2.n)} gone for today. Tomorrow!`}</b></p>` + shut2;
@@ -17186,10 +17307,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function ghHarvest(F2, i, addInv2) {
     const g2 = ghState(F2), b = g2.beds[i];
     if (!b || ghGrowth(b) < 1) return null;
-    const C3 = CROPS[b.crop], n = C3.yield || 1;
+    const C4 = CROPS[b.crop], n = C4.yield || 1;
     addInv2(b.crop, n);
     g2.beds[i] = null;
-    return { crop: b.crop, n, line: `${n} ${C3.ns || C3.n.toLowerCase()} from the greenhouse, into your backpack.` };
+    return { crop: b.crop, n, line: `${n} ${C4.ns || C4.n.toLowerCase()} from the greenhouse, into your backpack.` };
   }
   function ghBoost(F2, ms) {
     const g2 = ghState(F2);
@@ -17213,13 +17334,187 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       const seeds = ghSeeds(F2);
       return h + (seeds.length ? `<p class="sub">What shall we grow? Herbs grow here all year, and so does anything else, whatever the season.</p><ul class="hlist wlist">${seeds.map((id) => `<li><span class="wpic">${icon(ITEMS[id].crop, 26)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${dur3(CROPS[ITEMS[id].crop].dur)} to grow · ${F2.inv[id]} in your backpack</small></span><button class="btn small primary" data-gh="plant" data-i="${i}" data-id="${id}">Plant</button></li>`).join("")}</ul>` : `<p class="sub">No seeds in your backpack. Hana's seed shelf has herbs, and greenhouse packets of anything out of season.</p>`) + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
     }
-    const gr = ghGrowth(b), C3 = CROPS[b.crop];
-    h += gr >= 1 ? `<p class="sub">${icon(b.crop, 18)} ${esc(C3.n)} is ready!</p><div class="actions"><button class="btn yes" data-gh="harvest" data-i="${i}">Harvest</button><button class="btn alt small" data-close="1">Close</button></div>` : `<p class="sub">${icon(b.crop, 18)} ${esc(C3.n)}, growing under the glass. About ${dur3(C3.dur / (compostOn() ? 1.25 : 1) * (1 - gr))} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(gr * 100).toFixed(0)}%"></i></div><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+    const gr = ghGrowth(b), C4 = CROPS[b.crop];
+    h += gr >= 1 ? `<p class="sub">${icon(b.crop, 18)} ${esc(C4.n)} is ready!</p><div class="actions"><button class="btn yes" data-gh="harvest" data-i="${i}">Harvest</button><button class="btn alt small" data-close="1">Close</button></div>` : `<p class="sub">${icon(b.crop, 18)} ${esc(C4.n)}, growing under the glass. About ${dur3(C4.dur / (compostOn() ? 1.25 : 1) * (1 - gr))} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(gr * 100).toFixed(0)}%"></i></div><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
     return h;
   }
 
-  // src/art/town-ronda.js
+  // src/art/town-kyoto.js
   var C2 = {
+    gravel: "#E8E2D4",
+    gravel2: "#DDD5C4",
+    stone: "#CFC8BA",
+    stone2: "#B9B0A4",
+    timber: "#4A3A2E",
+    timber2: "#6B5444",
+    plaster: "#F3EFE6",
+    roof: "#5E6670",
+    roof2: "#47505A",
+    vermilion: "#D0452F",
+    moss: "#7E9A5A",
+    moss2: "#6E8B4A",
+    bamboo: "#8DB255",
+    bamboo2: "#6E9A44",
+    water: "#8FC3D8",
+    paper: "#FBF3DF",
+    lanternRed: "#C8432F",
+    ink: "#2F2B28"
+  };
+  var W9 = ink;
+  var ssn = () => seasonOf(dayKey());
+  var lab = (x, y, t2, col = "#F6E3B4", size = 10) => tapeLabel(x, y, t2, col, size);
+  var shade2 = (x, y, w, h, d = 12) => `<path d="M${x + w} ${y + 6} l${d} ${d * 0.7} V${y + h + d * 0.7} H${x + d} l${-d} ${-d * 0.7}z" style="fill:#6F7C9C" opacity=".18" pointer-events="none"/>`;
+  var roofArt = (x, y, w, h) => `<path d="M${x - 10} ${y + h} q8 -4 14 -${h} H${x + w - 4} q6 ${h - 4} 14 ${h}z" style="fill:${C2.roof}"/>${Array.from({ length: Math.floor((w + 10) / 8) }, (_, i) => `<path d="M${x - 2 + i * 8} ${y + 3} v${h - 5}" style="stroke:${C2.roof2}" stroke-width="1.2"/>`).join("")}`;
+  var roofLines = (x, y, w, h) => `<path d="M${x - 10} ${y + h} q8 -4 14 -${h} H${x + w - 4} q6 ${h - 4} 14 ${h}z"/>`;
+  function machiya(x, y, w, h, o = {}) {
+    const lat = Array.from({ length: Math.floor((w - 12) / 5) }, (_, i) => `<path d="M${x + 8 + i * 5} ${y + h * 0.42} V${y + h - 6}" style="stroke:${C2.timber2}" stroke-width="1.4"/>`).join("");
+    const dx = o.doorX || w / 2, noren = o.noren || "#3E5E7A";
+    return shade2(x, y, w, h) + sk(`<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:${C2.timber}"/><rect x="${x + 4}" y="${y + 4}" width="${w - 8}" height="${h * 0.36}" style="fill:${C2.plaster}"/>${lat}
+    <rect x="${x + dx - 14}" y="${y + h * 0.45}" width="28" height="${h * 0.55}" style="fill:#2A221C"/><path d="M${x + dx - 18} ${y + h * 0.42} h36 v${h * 0.22} h-36z" style="fill:${noren}"/><path d="M${x + dx - 6} ${y + h * 0.42} v${h * 0.22} M${x + dx + 6} ${y + h * 0.42} v${h * 0.22}" style="stroke:${C2.paper}" stroke-width="1"/>
+    ${roofArt(x, y - 16, w, 18)}`, `<rect x="${x}" y="${y}" width="${w}" height="${h}"/><path d="M${x + dx - 18} ${y + h * 0.42} h36 v${h * 0.22} h-36z"/>${roofLines(x, y - 16, w, 18)}`) + (o.sign ? `<rect x="${x + dx - 22}" y="${y + 8}" width="44" height="13" rx="2" style="fill:${C2.timber2};stroke:var(--line)" stroke-width=".8" pointer-events="none"/><text x="${x + dx}" y="${y + 18}" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="8" fill="${C2.paper}" pointer-events="none">${o.sign}</text>` : "") + (o.lantern ? chochin(x + dx + 26, y + h * 0.38) : "");
+  }
+  var chochin = (x, y, col = C2.lanternRed) => lampGlow(x, y + 8, 22) + `<g pointer-events="none" ${W9} stroke-width="1"><path d="M${x} ${y - 6} v4"/><ellipse cx="${x}" cy="${y + 8}" rx="6" ry="9" style="fill:${col}"/><path d="M${x - 5} ${y + 4} h10 M${x - 6} ${y + 9} h12 M${x - 5} ${y + 14} h10" stroke-width=".6"/></g>`;
+  var toro = (x, y, s = 1) => `<g pointer-events="none">${sk(
+    `<rect x="${x - 4 * s}" y="${y - 20 * s}" width="${8 * s}" height="${20 * s}" style="fill:${C2.stone2}"/><path d="M${x - 11 * s} ${y - 20 * s} h${22 * s} l${-4 * s} ${-5 * s} h${-14 * s}z" style="fill:${C2.stone}"/><rect x="${x - 7 * s}" y="${y - 34 * s}" width="${14 * s}" height="${9 * s}" style="fill:#E6DED0"/><rect x="${x - 3.5 * s}" y="${y - 32 * s}" width="${7 * s}" height="${5 * s}" style="fill:#F6D98A"/><path d="M${x - 13 * s} ${y - 34 * s} q${13 * s} ${-11 * s} ${26 * s} 0z" style="fill:${C2.stone2}"/>`,
+    `<rect x="${x - 4 * s}" y="${y - 20 * s}" width="${8 * s}" height="${20 * s}"/><path d="M${x - 13 * s} ${y - 34 * s} q${13 * s} ${-11 * s} ${26 * s} 0z"/><rect x="${x - 7 * s}" y="${y - 34 * s}" width="${14 * s}" height="${9 * s}"/>`
+  )}</g>` + lampGlow(x, y - 29 * s, 16);
+  function maple(x, y, s = 1) {
+    const se = ssn(), cols = se === "autumn" ? ["#C8432F", "#E0782E", "#E8B13A"] : se === "winter" ? null : se === "spring" ? ["#9CC27E", "#B9D88A", "#7FA35A"] : ["#6E9A44", "#86AE58", "#5E8A3A"];
+    const trunk = `<path d="M${x} ${y} q-2 ${-12 * s} ${-6 * s} ${-20 * s} M${x} ${y - 10 * s} q4 ${-8 * s} ${10 * s} ${-14 * s}" style="fill:none;stroke:#5A4636" stroke-width="${3 * s}"/>`;
+    if (!cols) return `<g pointer-events="none">${sk(trunk, trunk)}</g>`;
+    const blobs = [[-12, -26, 12], [6, -32, 13], [16, -20, 10], [-4, -16, 10], [-18, -14, 8]];
+    return `<g pointer-events="none">${sk(trunk + blobs.map(([dx, dy, r], i) => `<circle cx="${x + dx * s}" cy="${y + dy * s}" r="${r * s}" style="fill:${cols[i % 3]}"/>`).join(""), blobs.slice(0, 3).map(([dx, dy, r]) => `<circle cx="${x + dx * s}" cy="${y + dy * s}" r="${r * s}"/>`).join(""))}</g>`;
+  }
+  function sakura(x, y, s = 1) {
+    const se = ssn(), col = se === "spring" ? ["#F6C7D6", "#F2A0B8", "#FBE1EA"] : se === "winter" ? null : se === "autumn" ? ["#C9A44A", "#B98A4A", "#D9B86A"] : ["#7FA35A", "#8FB46A", "#6E9A44"];
+    const trunk = `<path d="M${x} ${y} q-4 ${-16 * s} ${2 * s} ${-26 * s} M${x} ${y - 14 * s} q-8 ${-6 * s} ${-14 * s} ${-8 * s}" style="fill:none;stroke:#5A4040" stroke-width="${3.4 * s}"/>`;
+    if (!col) return `<g pointer-events="none">${sk(trunk, trunk)}</g>`;
+    const blobs = [[-14, -30, 13], [6, -36, 14], [18, -26, 11], [-2, -22, 11]];
+    return `<g pointer-events="none">${sk(trunk + blobs.map(([dx, dy, r], i) => `<circle cx="${x + dx * s}" cy="${y + dy * s}" r="${r * s}" style="fill:${col[i % 3]}"/>`).join(""), blobs.slice(0, 2).map(([dx, dy, r]) => `<circle cx="${x + dx * s}" cy="${y + dy * s}" r="${r * s}"/>`).join(""))}</g>`;
+  }
+  function seasonFx() {
+    const se = ssn();
+    if (se === "spring") return `<g pointer-events="none">${Array.from({ length: 10 }, (_, i) => `<ellipse cx="0" cy="0" rx="2.6" ry="1.6" fill="#F6C7D6"><animateMotion dur="${9 + i}s" begin="${-i * 1.7}s" repeatCount="indefinite" path="M${40 + i * 48} -10 q30 160 -20 330 t10 330"/></ellipse>`).join("")}</g>`;
+    if (se === "winter") return `<g pointer-events="none">${Array.from({ length: 14 }, (_, i) => `<circle r="1.8" fill="#FFFFFF" opacity=".9"><animateMotion dur="${10 + i % 5}s" begin="${-i * 1.3}s" repeatCount="indefinite" path="M${20 + i * 36} -10 q-12 330 8 660"/></circle>`).join("")}</g>`;
+    return "";
+  }
+  var torii = (x, y, w = 40, h = 46, col = C2.vermilion) => sk(
+    `<rect x="${x - w / 2 + 4}" y="${y - h}" width="5" height="${h}" style="fill:${col}"/><rect x="${x + w / 2 - 9}" y="${y - h}" width="5" height="${h}" style="fill:${col}"/><path d="M${x - w / 2 - 4} ${y - h - 4} q${w / 2 + 4} -6 ${w + 8} 0 v5 h-${w + 8}z" style="fill:${col}"/><path d="M${x - w / 2 - 6} ${y - h - 8} q${w / 2 + 6} -6 ${w + 12} 0 v4 h-${w + 12}z" style="fill:#2F2B28"/><rect x="${x - w / 2 + 2}" y="${y - h + 8}" width="${w - 4}" height="4" style="fill:${col}"/>`,
+    `<rect x="${x - w / 2 + 4}" y="${y - h}" width="5" height="${h}"/><rect x="${x + w / 2 - 9}" y="${y - h}" width="5" height="${h}"/><path d="M${x - w / 2 - 6} ${y - h - 8} q${w / 2 + 6} -6 ${w + 12} 0 v4 h-${w + 12}z"/>`
+  );
+  var gate = (id, x, y, label2, lx, ly, aria, col = "#F6E3B4") => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="26" ry="20" style="fill:var(--butter)"/>
+  ${sk(
+    `<rect x="${x - 18}" y="${y - 30}" width="6" height="40" style="fill:${C2.timber2}"/><rect x="${x + 12}" y="${y - 30}" width="6" height="40" style="fill:${C2.timber2}"/><path d="M${x - 26} ${y - 30} q26 -10 52 0 v5 h-52z" style="fill:${C2.roof}"/>`,
+    `<rect x="${x - 18}" y="${y - 30}" width="6" height="40"/><rect x="${x + 12}" y="${y - 30}" width="6" height="40"/><path d="M${x - 26} ${y - 30} q26 -10 52 0 v5 h-52z"/>`
+  )}${lab(lx, ly, label2, col, 11)}</g>`;
+  var place = (id, x, y, rx, ry, aria, body2, label2, lx, ly, col) => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>${body2}${label2 ? lab(lx, ly, label2, col, 10) : ""}</g>`;
+  var flags = (pts, w = 40) => `<g filter="url(#wob)"><path d="${pts}" fill="none" style="stroke:${C2.stone}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/><path d="${pts}" fill="none" style="stroke:${C2.stone2}" stroke-width="${w - 4}" stroke-dasharray="10 12" stroke-linecap="butt" opacity=".35"/></g>`;
+  var heron = (x, y) => `<g pointer-events="none" ${W9} stroke-width="1"><path d="M${x} ${y} v-12 M${x + 4} ${y} v-12" stroke-width="1.2"/><ellipse cx="${x + 2}" cy="${y - 18}" rx="8" ry="6" style="fill:#E6E8EC"/><path d="M${x + 8} ${y - 20} q6 -10 2 -18" style="fill:none;stroke:#E6E8EC" stroke-width="3"/><path d="M${x + 8} ${y - 20} q6 -10 2 -18" fill="none"/><path d="M${x + 10} ${y - 38} l9 2 l-9 2z" style="fill:#E8B13A"/></g>`;
+  var koi = (pts) => `<g pointer-events="none" ${W9} stroke-width=".7">${pts.map(([x, y, c], i) => `<g transform="translate(${x} ${y})"><g><path d="M-7 0 q7 -5 13 0 q-6 5 -13 0z M6 0 l5 -3 v6z" style="fill:${c}"/><animateTransform attributeName="transform" type="translate" values="0 0;${i % 2 ? 18 : -16} 4;0 0" dur="${8 + i * 2}s" repeatCount="indefinite"/></g></g>`).join("")}</g>`;
+  var stalks = (x0, x1, y0, y1, n, seed2 = 0) => `<g pointer-events="none">${Array.from({ length: n }, (_, i) => {
+    const x = x0 + (i * 37 + seed2 * 13) % (x1 - x0), c = i % 3 ? C2.bamboo : C2.bamboo2;
+    return `<path d="M${x} ${y1} V${y0}" style="stroke:${c}" stroke-width="${5 + i % 3}"/>${Array.from({ length: Math.floor((y1 - y0) / 46) }, (_2, k) => `<path d="M${x - 3} ${y1 - 30 - k * 46} h6" style="stroke:#5E8A3A" stroke-width="1.2"/>`).join("")}<path d="M${x} ${y0 + 20 + i % 4 * 40} q10 -6 18 -2 q-8 4 -18 2z M${x} ${y0 + 60 + i % 5 * 50} q-10 -6 -18 -2 q8 4 18 2z" style="fill:#9CC27E"/>`;
+  }).join("")}</g>`;
+  var defs = `<defs><pattern id="ktgrav" width="18" height="10" patternUnits="userSpaceOnUse"><rect width="18" height="10" fill="${C2.gravel}"/><circle cx="4" cy="3" r="1" fill="${C2.gravel2}"/><circle cx="12" cy="7" r="1.1" fill="${C2.gravel2}"/></pattern></defs>`;
+  function stationScreen() {
+    const ground = `<rect width="520" height="640" fill="url(#ktgrav)"/><g filter="url(#wash)" opacity=".7"><ellipse cx="320" cy="560" rx="160" ry="50" style="fill:#C9D3A8"/><ellipse cx="460" cy="250" rx="70" ry="60" style="fill:#C9D3A8"/></g>
+    ${flags("M330 168 V300 H510 M330 300 V610")}`;
+    const rail3 = `<g pointer-events="none"><rect x="130" y="36" width="390" height="16" style="fill:#BFB7A6"/>${Array.from({ length: 26 }, (_, i) => `<rect x="${136 + i * 15}" y="36" width="5" height="16" style="fill:#6B5444"/>`).join("")}<path d="M130 40 H520 M130 48 H520" style="stroke:#7A7A80" stroke-width="1.6"/></g>
+    ${sk(
+      `<rect x="150" y="10" width="120" height="34" rx="6" style="fill:#7A2E4A"/><rect x="150" y="10" width="120" height="13" rx="6" style="fill:${C2.paper}"/>${[162, 186, 210, 234].map((x) => `<rect x="${x}" y="14" width="16" height="10" rx="2" style="fill:#BFE0F2"/>`).join("")}<circle cx="170" cy="44" r="5" style="fill:#3A3430"/><circle cx="250" cy="44" r="5" style="fill:#3A3430"/>`,
+      `<rect x="150" y="10" width="120" height="34" rx="6"/>`
+    )}`;
+    const st6 = `<g data-place="kttrain" aria-label="Kyoto station">${shade2(262, 80, 140, 76)}
+    ${sk(
+      `<rect x="262" y="80" width="140" height="76" style="fill:${C2.timber}"/><rect x="268" y="86" width="128" height="26" style="fill:${C2.plaster}"/>${Array.from({ length: 24 }, (_, i) => `<path d="M${270 + i * 5.3} 116 V150" style="stroke:${C2.timber2}" stroke-width="1.4"/>`).join("")}<rect x="318" y="116" width="28" height="40" style="fill:#2A221C"/>${roofArt(262, 58, 140, 22)}`,
+      `<rect x="262" y="80" width="140" height="76"/>${roofLines(262, 58, 140, 22)}`
+    )}
+    <rect x="300" y="90" width="64" height="16" rx="2" style="fill:${C2.paper};stroke:var(--line)" stroke-width="1"/><text x="332" y="102" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="10" fill="${C2.ink}" pointer-events="none">京都 KYOTO</text>
+    ${chochin(276, 118)}${chochin(388, 118)}${lab(332, 182, "Station · trains home", "#C3DDF3", 10)}</g>`;
+    const grove = `<g pointer-events="none"><rect x="0" y="0" width="134" height="640" style="fill:#B9CC8E"/><g opacity=".35">${[40, 140, 260, 380, 500].map((y) => `<path d="M0 ${y} L134 ${y + 60} V${y + 80} L0 ${y + 20}z" fill="#FFF6D8"/>`).join("")}</g></g>
+    ${stalks(6, 128, 0, 640, 26, 1)}`;
+    const groveSpot = place("bamboo", 150, 420, 30, 14, "The bamboo grove", "", "Bamboo grove", 160, 446, "#DCEBC8");
+    const yukata = `<g data-place="yukata" aria-label="The yukata shop"><ellipse class="hov" cx="440" cy="474" rx="40" ry="12" style="fill:var(--butter)"/>${machiya(380, 384, 120, 80, { noren: "#3E5E7A", sign: "YUKATA", doorX: 60 })}
+    ${sk(`<path d="M392 430 l6 -14 h12 l6 14 l-4 30 h-16z" style="fill:#3E5E7A"/><path d="M466 430 l6 -14 h12 l6 14 l-4 30 h-16z" style="fill:#C8432F"/>${[0, 1, 2].map((i) => `<circle cx="${400 + i * 3}" cy="${440 + i * 6}" r="1.6" style="fill:#FFFDF6"/><circle cx="${474 + i * 3}" cy="${440 + i * 6}" r="1.6" style="fill:#F3C969"/>`).join("")}`, `<path d="M392 430 l6 -14 h12 l6 14 l-4 30 h-16z M466 430 l6 -14 h12 l6 14 l-4 30 h-16z"/>`)}
+    ${lab(440, 492, "Yukata rental", "#E7D9F2", 10)}</g>`;
+    const vend = `<g pointer-events="none">${sk(`<rect x="420" y="128" width="26" height="40" rx="2" style="fill:#C8432F"/><rect x="424" y="132" width="18" height="16" style="fill:#EAF6FA"/>${[0, 1, 2].map((i) => `<rect x="${426 + i * 5}" y="${136}" width="3" height="8" style="fill:${["#3E6BAE", "#F3C969", "#5E8A48"][i]}"/>`).join("")}`, `<rect x="420" y="128" width="26" height="40" rx="2"/>`)}</g>`;
+    const trees = maple(214, 300, 1.1) + maple(470, 300, 0.9) + sakura(220, 560, 1) + maple(470, 600, 0.9) + toro(260, 420) + toro(410, 330, 0.9);
+    return defs + lampDefs + ground + grove + rail3 + st6 + vend + trees + groveSpot + yukata + seasonFx() + gate("ktToLane", 500, 300, "Higashiyama", 466, 262, "East along the tram line to the old lane and the pagoda") + gate("ktToRiver", 330, 616, "The river", 392, 604, "South to the river and the canal");
+  }
+  function laneScreen() {
+    const ground = `<rect width="520" height="640" style="fill:#D9D0BC"/>${flags("M14 300 H200 Q260 300 280 250 L330 190 M280 250 Q300 400 330 470 V616", 46)}`;
+    const tiers = [0, 1, 2, 3, 4].map((i) => {
+      const w = 92 - i * 12, x = 432 - w / 2, y = 168 - i * 30;
+      return `<rect x="${x + 8}" y="${y - 18}" width="${w - 16}" height="18" style="fill:${C2.vermilion}"/>${roofArt(x, y - 30, w, 12)}`;
+    }).join("");
+    const pagoda = `<g data-place="pagoda" aria-label="The five-storey pagoda"><ellipse class="hov" cx="432" cy="182" rx="44" ry="12" style="fill:var(--butter)"/>${shade2(386, 20, 92, 160)}
+    ${sk(tiers + `<path d="M432 14 v-12" style="stroke:#C9A44A" stroke-width="3"/>${[0, 1, 2, 3].map((i) => `<circle cx="432" cy="${10 - i * 3}" r="2" style="fill:#C9A44A"/>`).join("")}`, [0, 1, 2, 3, 4].map((i) => {
+      const w = 92 - i * 12, x = 432 - w / 2, y = 168 - i * 30;
+      return roofLines(x, y - 30, w, 12);
+    }).join(""))}
+    ${lab(432, 200, "The pagoda", "#F6D3DC", 10)}</g>`;
+    const teahouse = `<g data-place="chaya" aria-label="The tea house">${machiya(26, 76, 176, 96, { noren: "#5E7A4A", sign: "お茶 TEA", lantern: true, doorX: 88 })}${lab(114, 194, "Tea house", "#DCEBC8", 10)}</g>`;
+    const sweets = `<g data-place="wagashi" aria-label="The sweet shop">${machiya(336, 330, 168, 96, { noren: "#E8A0B4", sign: "WAGASHI", doorX: 84 })}${lab(420, 446, "Sweet shop", "#F6D3DC", 10)}</g>`;
+    const pottery = `<g data-place="pottery" aria-label="The pottery workshop">${machiya(26, 430, 168, 90, { noren: "#8A6A52", sign: "POTTERY", doorX: 84 })}
+    ${sk([0, 1, 2].map((i) => `<path d="M${46 + i * 16} 524 q-3 -10 4 -12 h6 q7 2 4 12z" style="fill:${["#5E7A8A", "#C9A27E", "#3E5E4A"][i]}"/>`).join(""), "")}${lab(110, 540, "Pottery", "#E8D3BC", 10)}</g>`;
+    const rickshaw = `<g pointer-events="none">${sk(`<circle cx="236" cy="420" r="16" style="fill:none;stroke:#2F2B28" stroke-width="3"/><path d="M226 404 h22 l4 -22 h-22z" style="fill:#2F2B28"/><path d="M230 384 q10 -14 22 -2" style="fill:#C8432F"/><path d="M252 410 l40 6" style="stroke:#8A6A52" stroke-width="3"/>`, `<circle cx="236" cy="420" r="16"/>`)}</g>`;
+    const trees = maple(250, 180, 1) + maple(220, 600, 1) + sakura(470, 600, 0.9) + maple(300, 120, 0.8) + toro(372, 250, 0.9) + toro(380, 560);
+    return defs + lampDefs + ground + teahouse + pottery + sweets + pagoda + rickshaw + trees + seasonFx() + gate("ktToStation", 16, 300, "The station", 60, 262, "West back to the station and the bamboo") + gate("ktStepsDown", 330, 616, "Temple", 394, 604, "Down the stone steps to the temple");
+  }
+  function templeScreen() {
+    const ground = `<rect width="520" height="640" style="fill:#D6CDB8"/><g filter="url(#wash)" opacity=".8"><ellipse cx="110" cy="520" rx="110" ry="80" style="fill:#B5C58E"/><ellipse cx="420" cy="560" rx="110" ry="60" style="fill:#B5C58E"/></g>
+    ${flags("M150 26 V120 Q150 200 230 200 H350 M230 200 V610 M14 380 H230", 40)}`;
+    const hall = `<g data-place="hall" aria-label="The temple hall">${shade2(270, 70, 210, 100)}
+    ${sk(
+      `<rect x="276" y="92" width="198" height="80" style="fill:${C2.timber}"/>${[290, 330, 370, 410, 450].map((x) => `<rect x="${x}" y="96" width="8" height="76" style="fill:#8E3A2A"/>`).join("")}<rect x="340" y="120" width="70" height="52" style="fill:#2A221C"/><path d="M250 98 q18 -8 30 -44 H470 q12 36 30 44z" style="fill:${C2.roof}"/>${Array.from({ length: 26 }, (_, i) => `<path d="M${270 + i * 8.4} 58 v36" style="stroke:${C2.roof2}" stroke-width="1.2"/>`).join("")}<path d="M300 54 q75 -24 150 0z" style="fill:${C2.roof2}"/>`,
+      `<rect x="276" y="92" width="198" height="80"/><path d="M250 98 q18 -8 30 -44 H470 q12 36 30 44z"/><path d="M300 54 q75 -24 150 0z"/>`
+    )}
+    <g pointer-events="none"><rect x="366" y="176" width="20" height="10" rx="2" style="fill:#5A4636;stroke:var(--line)" stroke-width=".8"/>${[0, 1].map((i) => `<path class="smoke" d="M${372 + i * 8} 174 q-4 -8 0 -14 q4 -6 0 -12" fill="none" style="stroke:#B9B0A4" stroke-width="1.4" opacity=".6"/>`).join("")}</g>
+    ${lab(375, 204, "Temple hall", "#F6E3B4", 10)}</g>`;
+    const tunnel = `<g data-place="torii" aria-label="The torii gates">${[0, 1, 2, 3, 4, 5, 6, 7].map((i) => torii(230, 610 - i * 44, 54 - i * 1.5, 50 - i)).join("")}${lab(290, 520, "Torii gates", "#F6D3DC", 10)}</g>`;
+    const garden = `<g data-place="zen" aria-label="The gravel garden"><ellipse class="hov" cx="400" cy="372" rx="90" ry="50" style="fill:var(--butter)"/>
+    ${sk(`<rect x="304" y="300" width="190" height="130" rx="6" style="fill:#EFEAE0"/>`, `<rect x="304" y="300" width="190" height="130" rx="6"/>`)}
+    <g pointer-events="none" fill="none" style="stroke:#C9C1AE" stroke-width="1.2">${Array.from({ length: 11 }, (_, i) => `<path d="M310 ${308 + i * 11} H488"/>`).join("")}${[[350, 340, 12], [430, 360, 16], [400, 404, 10]].map(([x, y, r]) => [1, 2, 3].map((k) => `<ellipse cx="${x}" cy="${y}" rx="${r + k * 6}" ry="${r * 0.7 + k * 4}" style="fill:#EFEAE0"/>`).join("")).join("")}</g>
+    ${sk([[350, 340, 12], [430, 360, 16], [400, 404, 10]].map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.7}" style="fill:#8A8478"/><ellipse cx="${x - 2}" cy="${y - 3}" rx="${r * 0.6}" ry="${r * 0.3}" style="fill:#7E9A5A"/>`).join(""), "")}
+    ${lab(400, 448, "Gravel garden", "#EFEAE0", 10)}</g>`;
+    const pond = `<g data-place="koi" aria-label="The koi pond"><ellipse class="hov" cx="110" cy="520" rx="80" ry="34" style="fill:var(--butter)"/>
+    ${sk(`<ellipse cx="110" cy="510" rx="78" ry="38" style="fill:${C2.water}"/><path d="M70 500 q40 -24 80 0" style="fill:none;stroke:${C2.vermilion}" stroke-width="7"/>`, `<ellipse cx="110" cy="510" rx="78" ry="38"/><path d="M70 500 q40 -24 80 0"/>`)}
+    ${koi([[80, 520, "#F28C28"], [130, 506, "#FFFDF6"], [110, 530, "#E8566C"]])}${lab(110, 566, "Koi pond", "#DCEBF6", 10)}</g>`;
+    const trees = maple(60, 300, 1.1) + maple(470, 230, 0.9) + sakura(470, 520, 1) + maple(60, 160, 0.9) + toro(180, 300) + toro(290, 300, 0.9);
+    return defs + lampDefs + ground + hall + garden + pond + trees + tunnel + seasonFx() + gate("ktStepsUp", 150, 30, "Higashiyama", 214, 30, "Up the stone steps to the lane and the pagoda") + gate("ktToRiverW", 16, 380, "The river", 60, 342, "West along the canal to the river");
+  }
+  function riverScreen() {
+    const ground = `<rect width="520" height="640" style="fill:#C9D3A8"/><rect x="0" y="0" width="520" height="300" fill="url(#ktgrav)"/>${flags("M300 26 V300 M60 300 H420 M260 420 V560 H510", 36)}`;
+    const turtles = [0, 1, 2, 3].map((i) => {
+      const x = 262, y = 334 + i * 22;
+      return `<ellipse cx="${x}" cy="${y}" rx="16" ry="8" style="fill:#9A9488"/><circle cx="${x + 16}" cy="${y}" r="4" style="fill:#9A9488"/><path d="M${x - 8} ${y} h16 M${x} ${y - 6} v12" style="stroke:#7A7468" stroke-width="1"/>`;
+    }).join("");
+    const river = `<g pointer-events="none">${sk(`<path d="M0 318 Q260 306 520 322 V424 Q260 436 0 420z" style="fill:${C2.water}"/>`, `<path d="M0 318 Q260 306 520 322 M0 420 Q260 436 520 424"/>`)}
+    ${[0, 1, 2, 3, 4].map((i) => `<path class="ripple" d="M${40 + i * 100} ${350 + i % 2 * 40} q8 -4 16 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2"/>`).join("")}</g>`;
+    const stones = `<g data-place="stones" aria-label="The turtle stepping stones"><ellipse class="hov" cx="262" cy="368" rx="30" ry="50" style="fill:var(--butter)"/>${sk(turtles, "")}${lab(330, 390, "Turtle stones", "#DCEBF6", 9)}</g>`;
+    const market = `<g data-place="nishiki" aria-label="The covered market">${shade2(30, 76, 230, 96)}
+    ${sk(
+      `<rect x="30" y="80" width="230" height="92" style="fill:${C2.timber}"/><path d="M24 80 q121 -40 242 0z" style="fill:#EAF2F4" opacity=".9"/><rect x="40" y="110" width="210" height="62" style="fill:#2A221C"/>${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="${48 + i * 34}" y="${150}" width="26" height="22" style="fill:${["#E8566C", "#F3C969", "#9CC27E", "#F28C28", "#E6DED0", "#8A5A3A"][i]}"/>`).join("")}`,
+      `<rect x="30" y="80" width="230" height="92"/><path d="M24 80 q121 -40 242 0z"/>`
+    )}
+    <rect x="100" y="88" width="90" height="16" rx="2" style="fill:${C2.vermilion};stroke:var(--line)" stroke-width="1"/><text x="145" y="100" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="9" fill="${C2.paper}" pointer-events="none">MARKET 市場</text>
+    ${[60, 110, 180, 230].map((x) => chochin(x, 112)).join("")}${lab(145, 192, "Covered market", "#F6E3B4", 10)}</g>`;
+    const canal = `<g pointer-events="none">${sk(`<rect x="420" y="0" width="46" height="640" style="fill:${C2.water}"/><rect x="410" y="540" width="66" height="22" style="fill:${C2.stone}"/>`, `<path d="M420 0 V540 M466 0 V540 M420 562 V640 M466 562 V640"/><rect x="410" y="540" width="66" height="22"/>`)}
+    ${[120, 260, 470].map((y) => `<g>${sk(`<path d="M408 ${y} v-40" style="stroke:#5A4636" stroke-width="3"/>${[0, 1, 2, 3, 4].map((k) => `<path d="M${398 + k * 6} ${y - 40} q${-2 + k} 30 ${4 - k} 54" style="fill:none;stroke:#8FB46A" stroke-width="3"/>`).join("")}`, `<path d="M408 ${y} v-40"/>`)}</g>`).join("")}</g>`;
+    const trees = sakura(80, 560, 1.1) + maple(170, 560, 0.9) + toro(60, 280, 0.9) + toro(380, 600, 0.8);
+    return defs + lampDefs + ground + river + canal + market + stones + heron(120, 380) + heron(400, 400) + trees + seasonFx() + gate("ktToStationN", 300, 26, "The station", 364, 30, "North along the river to the station") + gate("ktToTemple", 504, 520, "Temple", 470, 482, "East over the canal bridge to the temple");
+  }
+  function kyotoArt(scene2) {
+    return scene2 === "kt_station" ? stationScreen() : scene2 === "kt_lane" ? laneScreen() : scene2 === "kt_temple" ? templeScreen() : riverScreen();
+  }
+  var kyotoRide = () => `<svg class="taxibank" viewBox="0 0 600 90" preserveAspectRatio="none" aria-hidden="true"><g style="stroke:#3b3530" stroke-width="1.1">
+  <path d="M0 40 L60 16 L120 34 L190 12 L260 30 L330 10 L400 28 L470 14 L540 30 L600 18 V60 H0z" fill="#9AAFC2"/>
+  <path d="M0 60 Q75 36 150 56 T300 56 T450 56 T600 56 V90 H0z" fill="#8FB46A"/><path d="M0 74 Q100 54 200 72 T400 72 T600 72 V90 H0z" fill="#6E9A44"/>
+  ${[80, 260, 450].map((x) => `<rect x="${x}" y="44" width="10" height="14" fill="#D0452F"/><path d="M${x - 6} 44 h22 l-3 -4 h-16z" fill="#47505A"/><path d="M${x - 4} 38 h18 l-3 -4 h-12z" fill="#47505A"/>`).join("")}
+  ${[170, 370, 540].map((x) => `<path d="M${x} 66 v-12 M${x + 14} 66 v-12 M${x - 3} 54 h20" stroke="#D0452F" stroke-width="3"/>`).join("")}</g></svg>`;
+
+  // src/art/town-ronda.js
+  var C3 = {
     white: "#FBF7EE",
     wall2: "#F3ECDD",
     ochre: "#D9A441",
@@ -17242,58 +17537,58 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     shutter: "#4F7A5A",
     sky: "#7FB8E8"
   };
-  var W9 = ink;
-  var ssn = () => seasonOf(dayKey());
-  var lab = (x, y, t2, col = "#F6E3B4", size = 10) => tapeLabel(x, y, t2, col, size);
-  var shade2 = (x, y, w, h, d = 16) => `<path d="M${x + w} ${y + 6} l${d} ${d * 0.7} V${y + h + d * 0.7} H${x + d} l${-d} ${-d * 0.7}z" style="fill:#6F7C9C" opacity=".28" pointer-events="none"/>`;
+  var W10 = ink;
+  var ssn2 = () => seasonOf(dayKey());
+  var lab2 = (x, y, t2, col = "#F6E3B4", size = 10) => tapeLabel(x, y, t2, col, size);
+  var shade3 = (x, y, w, h, d = 16) => `<path d="M${x + w} ${y + 6} l${d} ${d * 0.7} V${y + h + d * 0.7} H${x + d} l${-d} ${-d * 0.7}z" style="fill:#6F7C9C" opacity=".28" pointer-events="none"/>`;
   function tileRoof(x, y, w, h) {
     const ridges = Array.from({ length: Math.floor(w / 7) }, (_, i) => `M${x + 4 + i * 7} ${y + 2} V${y + h - 2}`).join(" ");
-    const eave = Array.from({ length: Math.floor(w / 7) }, (_, i) => `<circle cx="${x + 3.5 + i * 7}" cy="${y + h}" r="3.5" style="fill:${C2.terra}"/>`).join("");
+    const eave = Array.from({ length: Math.floor(w / 7) }, (_, i) => `<circle cx="${x + 3.5 + i * 7}" cy="${y + h}" r="3.5" style="fill:${C3.terra}"/>`).join("");
     return {
-      art: `<path d="M${x + 6} ${y} H${x + w - 6} L${x + w} ${y + h} H${x}z" style="fill:${C2.terra}"/>${eave}<path d="${ridges}" style="stroke:${C2.terra2}" stroke-width="1.3"/>`,
+      art: `<path d="M${x + 6} ${y} H${x + w - 6} L${x + w} ${y + h} H${x}z" style="fill:${C3.terra}"/>${eave}<path d="${ridges}" style="stroke:${C3.terra2}" stroke-width="1.3"/>`,
       lines: `<path d="M${x + 6} ${y} H${x + w - 6} L${x + w} ${y + h} H${x}z"/>`
     };
   }
   var reja = (x, y, w = 16, h = 20) => ({
-    art: `<rect x="${x - 3}" y="${y - 3}" width="${w + 6}" height="${h + 6}" rx="2" style="fill:${C2.ochre}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5" style="fill:#3A3A44"/>`,
+    art: `<rect x="${x - 3}" y="${y - 3}" width="${w + 6}" height="${h + 6}" rx="2" style="fill:${C3.ochre}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5" style="fill:#3A3A44"/>`,
     lines: `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5"/><path d="M${x + w / 3} ${y} v${h} M${x + 2 * w / 3} ${y} v${h} M${x} ${y + h / 2} h${w}" stroke-width=".9"/>`
   });
   var shutters = (x, y, w = 14, h = 20) => ({
-    art: `<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:#7FB8E8" opacity=".7"/><rect x="${x - 8}" y="${y}" width="8" height="${h}" style="fill:${C2.shutter}"/><rect x="${x + w}" y="${y}" width="8" height="${h}" style="fill:${C2.shutter}"/>`,
+    art: `<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:#7FB8E8" opacity=".7"/><rect x="${x - 8}" y="${y}" width="8" height="${h}" style="fill:${C3.shutter}"/><rect x="${x + w}" y="${y}" width="8" height="${h}" style="fill:${C3.shutter}"/>`,
     lines: `<rect x="${x - 8}" y="${y}" width="${w + 16}" height="${h}"/><path d="M${x} ${y} v${h} M${x + w} ${y} v${h}"/>`
   });
-  var pot = (x, y, col = C2.geranium) => `<g pointer-events="none" ${W9} stroke-width=".9"><path d="M${x - 5} ${y - 7} h10 l-1.5 7 h-7z" style="fill:${C2.pot}"/>${[[-3, -10], [2, -11], [0, -14], [4, -8], [-5, -8]].map(([dx, dy]) => `<circle cx="${x + dx}" cy="${y + dy}" r="2.6" style="fill:${col}"/>`).join("")}<circle cx="${x - 1}" cy="${y - 7}" r="2" style="fill:#5E8A4A" stroke="none"/></g>`;
+  var pot = (x, y, col = C3.geranium) => `<g pointer-events="none" ${W10} stroke-width=".9"><path d="M${x - 5} ${y - 7} h10 l-1.5 7 h-7z" style="fill:${C3.pot}"/>${[[-3, -10], [2, -11], [0, -14], [4, -8], [-5, -8]].map(([dx, dy]) => `<circle cx="${x + dx}" cy="${y + dy}" r="2.6" style="fill:${col}"/>`).join("")}<circle cx="${x - 1}" cy="${y - 7}" r="2" style="fill:#5E8A4A" stroke="none"/></g>`;
   var balcony = (x, y, w = 30) => ({
-    art: `<rect x="${x}" y="${y - 2}" width="${w}" height="3" style="fill:${C2.iron}"/>`,
+    art: `<rect x="${x}" y="${y - 2}" width="${w}" height="3" style="fill:${C3.iron}"/>`,
     lines: `<path d="M${x} ${y - 12} h${w} ${Array.from({ length: Math.floor(w / 5) + 1 }, (_, i) => `M${x + i * 5} ${y - 12} v12`).join(" ")}" stroke-width=".9"/>`,
     pots: pot(x + 7, y - 11) + pot(x + w - 7, y - 11, "#E85A8A")
   });
   function bougain(x, y, r = 16) {
-    const s = ssn(), n = s === "autumn" ? 16 : s === "winter" ? 6 : 11, col = s === "winter" ? "#B24A7E" : C2.bougain;
+    const s = ssn2(), n = s === "autumn" ? 16 : s === "winter" ? 6 : 11, col = s === "winter" ? "#B24A7E" : C3.bougain;
     return `<g pointer-events="none" filter="url(#wob)">${Array.from({ length: n }, (_, i) => {
       const a = i * 2.4, d = r * (0.3 + i % 5 / 6);
       return `<circle cx="${(x + Math.cos(a) * d).toFixed(1)}" cy="${(y + Math.sin(a) * d * 0.7).toFixed(1)}" r="${3 + i % 3}" style="fill:${i % 4 ? col : "#7A9A4A"}"/>`;
     }).join("")}</g>`;
   }
   function orangeTree(x, y, s = 1) {
-    const se = ssn(), fruit = se === "winter" ? "#F28C28" : se === "autumn" ? "#E8A43A" : se === "summer" ? "#9DB85A" : null, bloom = se === "spring";
+    const se = ssn2(), fruit = se === "winter" ? "#F28C28" : se === "autumn" ? "#E8A43A" : se === "summer" ? "#9DB85A" : null, bloom = se === "spring";
     const dots2 = [[-8, -26], [6, -30], [10, -18], [-4, -16], [0, -36], [-12, -14], [12, -28]];
     return `<g pointer-events="none">${sk(
-      `<rect x="${x - 2.5 * s}" y="${y - 12 * s}" width="${5 * s}" height="${12 * s}" style="fill:#7A5638"/><circle cx="${x}" cy="${y - 24 * s}" r="${15 * s}" style="fill:${C2.leaf}"/><circle cx="${x - 8 * s}" cy="${y - 18 * s}" r="${8 * s}" style="fill:#5E8A48"/>`,
+      `<rect x="${x - 2.5 * s}" y="${y - 12 * s}" width="${5 * s}" height="${12 * s}" style="fill:#7A5638"/><circle cx="${x}" cy="${y - 24 * s}" r="${15 * s}" style="fill:${C3.leaf}"/><circle cx="${x - 8 * s}" cy="${y - 18 * s}" r="${8 * s}" style="fill:#5E8A48"/>`,
       `<circle cx="${x}" cy="${y - 24 * s}" r="${15 * s}"/>`
-    )}<g ${W9} stroke-width=".6">${dots2.map(([dx, dy]) => fruit ? `<circle cx="${x + dx * s}" cy="${y + dy * s}" r="${2.4 * s}" style="fill:${fruit}"/>` : bloom ? `<circle cx="${x + dx * s}" cy="${y + dy * s}" r="${1.8 * s}" style="fill:#FFFDF6"/>` : "").join("")}</g>
+    )}<g ${W10} stroke-width=".6">${dots2.map(([dx, dy]) => fruit ? `<circle cx="${x + dx * s}" cy="${y + dy * s}" r="${2.4 * s}" style="fill:${fruit}"/>` : bloom ? `<circle cx="${x + dx * s}" cy="${y + dy * s}" r="${1.8 * s}" style="fill:#FFFDF6"/>` : "").join("")}</g>
     <ellipse cx="${x}" cy="${y + 1}" rx="${9 * s}" ry="${3 * s}" style="fill:#B98F4E" opacity=".5"/></g>`;
   }
   var cypress = (x, y, s = 1) => `<g pointer-events="none">${sk(
-    `<path d="M${x} ${y - 64 * s} C${x + 9 * s} ${y - 44 * s} ${x + 10 * s} ${y - 14 * s} ${x + 4 * s} ${y} H${x - 4 * s} C${x - 10 * s} ${y - 14 * s} ${x - 9 * s} ${y - 44 * s} ${x} ${y - 64 * s}z" style="fill:${C2.cypress}"/>`,
+    `<path d="M${x} ${y - 64 * s} C${x + 9 * s} ${y - 44 * s} ${x + 10 * s} ${y - 14 * s} ${x + 4 * s} ${y} H${x - 4 * s} C${x - 10 * s} ${y - 14 * s} ${x - 9 * s} ${y - 44 * s} ${x} ${y - 64 * s}z" style="fill:${C3.cypress}"/>`,
     `<path d="M${x} ${y - 64 * s} C${x + 9 * s} ${y - 44 * s} ${x + 10 * s} ${y - 14 * s} ${x + 4 * s} ${y} H${x - 4 * s} C${x - 10 * s} ${y - 14 * s} ${x - 9 * s} ${y - 44 * s} ${x} ${y - 64 * s}z"/>`
   )}</g>`;
   var oliveTree2 = (x, y, s = 1) => `<g pointer-events="none">${sk(
-    `<path d="M${x - 2 * s} ${y} q-3 ${-8 * s} ${2 * s} ${-14 * s} q3 ${-4 * s} 0 ${-8 * s}" style="fill:none;stroke:#8A7A62" stroke-width="${3.5 * s}"/><ellipse cx="${x - 6 * s}" cy="${y - 24 * s}" rx="${11 * s}" ry="${8 * s}" style="fill:${C2.olive}"/><ellipse cx="${x + 7 * s}" cy="${y - 27 * s}" rx="${10 * s}" ry="${7 * s}" style="fill:#A9B58E"/>`,
+    `<path d="M${x - 2 * s} ${y} q-3 ${-8 * s} ${2 * s} ${-14 * s} q3 ${-4 * s} 0 ${-8 * s}" style="fill:none;stroke:#8A7A62" stroke-width="${3.5 * s}"/><ellipse cx="${x - 6 * s}" cy="${y - 24 * s}" rx="${11 * s}" ry="${8 * s}" style="fill:${C3.olive}"/><ellipse cx="${x + 7 * s}" cy="${y - 27 * s}" rx="${10 * s}" ry="${7 * s}" style="fill:#A9B58E"/>`,
     `<ellipse cx="${x - 6 * s}" cy="${y - 24 * s}" rx="${11 * s}" ry="${8 * s}"/><ellipse cx="${x + 7 * s}" cy="${y - 27 * s}" rx="${10 * s}" ry="${7 * s}"/>`
   )}</g>`;
   function planeTree(x, y, s = 1) {
-    const se = ssn(), crown = se === "autumn" ? "#C9A44A" : "#A9BF7A", bare = se === "winter";
+    const se = ssn2(), crown = se === "autumn" ? "#C9A44A" : "#A9BF7A", bare = se === "winter";
     return `<g pointer-events="none">${sk(
       `<rect x="${x - 3.5 * s}" y="${y - 22 * s}" width="${7 * s}" height="${22 * s}" style="fill:#C9B48E"/><circle cx="${x - 1 * s}" cy="${y - 14 * s}" r="${2 * s}" style="fill:#E7DCC4"/><circle cx="${x + 1.5 * s}" cy="${y - 6 * s}" r="${1.6 * s}" style="fill:#9C8A6A"/>${bare ? `<path d="M${x} ${y - 22 * s} l${-12 * s} ${-14 * s} M${x} ${y - 22 * s} l${10 * s} ${-16 * s} M${x} ${y - 24 * s} v${-18 * s}" style="stroke:#9C8A6A" stroke-width="${2.4 * s}"/>` : `<ellipse cx="${x}" cy="${y - 38 * s}" rx="${22 * s}" ry="${17 * s}" style="fill:${crown}"/><ellipse cx="${x - 10 * s}" cy="${y - 32 * s}" rx="${10 * s}" ry="${8 * s}" style="fill:#95AE68"/>`}`,
       bare ? `<rect x="${x - 3.5 * s}" y="${y - 22 * s}" width="${7 * s}" height="${22 * s}"/>` : `<ellipse cx="${x}" cy="${y - 38 * s}" rx="${22 * s}" ry="${17 * s}"/><rect x="${x - 3.5 * s}" y="${y - 22 * s}" width="${7 * s}" height="${22 * s}"/>`
@@ -17304,26 +17599,26 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     `<path d="M${x} ${y - 70 * s} L${x + 28 * s} ${y - 12 * s} H${x - 28 * s}z"/>`
   )}</g>`;
   function almond(x, y, s = 1) {
-    const se = ssn(), col = se === "winter" ? "#F6D5DF" : se === "autumn" ? "#C9B07A" : "#B4C48A";
+    const se = ssn2(), col = se === "winter" ? "#F6D5DF" : se === "autumn" ? "#C9B07A" : "#B4C48A";
     return `<g pointer-events="none">${sk(
       `<path d="M${x} ${y} v${-14 * s} l${-8 * s} ${-8 * s} M${x} ${y - 14 * s} l${8 * s} ${-10 * s}" style="stroke:#7A5A44;fill:none" stroke-width="${2.4 * s}"/><ellipse cx="${x}" cy="${y - 24 * s}" rx="${15 * s}" ry="${10 * s}" style="fill:${col}"/>`,
       `<ellipse cx="${x}" cy="${y - 24 * s}" rx="${15 * s}" ry="${10 * s}"/>`
     )}${se === "winter" ? `<g pointer-events="none">${[[-8, -26], [4, -30], [9, -22], [-2, -20], [-11, -20]].map(([dx, dy]) => `<circle cx="${x + dx * s}" cy="${y + dy * s}" r="${1.8 * s}" style="fill:#E890A8"/>`).join("")}</g>` : ""}</g>`;
   }
-  var pricklyPear = (x, y) => `<g pointer-events="none" ${W9} stroke-width=".9">${[[0, 0, 7, 9], [-7, -9, 6, 7], [7, -11, 6, 8], [1, -18, 5, 6]].map(([dx, dy, rx, ry]) => `<ellipse cx="${x + dx}" cy="${y + dy}" rx="${rx}" ry="${ry}" style="fill:#7C9A5A"/>`).join("")}${ssn() === "summer" ? `<circle cx="${x + 9}" cy="${y - 19}" r="2" style="fill:#E8566C"/><circle cx="${x - 6}" cy="${y - 16}" r="2" style="fill:#F3C969"/>` : ""}</g>`;
+  var pricklyPear = (x, y) => `<g pointer-events="none" ${W10} stroke-width=".9">${[[0, 0, 7, 9], [-7, -9, 6, 7], [7, -11, 6, 8], [1, -18, 5, 6]].map(([dx, dy, rx, ry]) => `<ellipse cx="${x + dx}" cy="${y + dy}" rx="${rx}" ry="${ry}" style="fill:#7C9A5A"/>`).join("")}${ssn2() === "summer" ? `<circle cx="${x + 9}" cy="${y - 19}" r="2" style="fill:#E8566C"/><circle cx="${x - 6}" cy="${y - 16}" r="2" style="fill:#F3C969"/>` : ""}</g>`;
   var lantern = (x, y) => lampGlow(x, y - 34, 30) + sk(`<path d="M${x - 5} ${y - 40} h10 l-2 10 h-6z" style="fill:#F6C26B"/>`, `<path d="M${x} ${y} v-30 M${x - 5} ${y} h10 M${x - 5} ${y - 40} h10 l-2 10 h-6z M${x - 6} ${y - 40} l6 -5 l6 5"/>`);
-  var gate = (id, x, y, label2, lx, ly, aria, col = "#F6E3B4") => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="26" ry="20" style="fill:var(--butter)"/>
+  var gate2 = (id, x, y, label2, lx, ly, aria, col = "#F6E3B4") => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="26" ry="20" style="fill:var(--butter)"/>
   ${sk(
-    `<rect x="${x - 20}" y="${y - 30}" width="8" height="40" style="fill:${C2.ochre}"/><rect x="${x + 12}" y="${y - 30}" width="8" height="40" style="fill:${C2.ochre}"/><path d="M${x - 22} ${y - 28} q22 -22 44 0 v6 q-22 -18 -44 0z" style="fill:${C2.white}"/>`,
+    `<rect x="${x - 20}" y="${y - 30}" width="8" height="40" style="fill:${C3.ochre}"/><rect x="${x + 12}" y="${y - 30}" width="8" height="40" style="fill:${C3.ochre}"/><path d="M${x - 22} ${y - 28} q22 -22 44 0 v6 q-22 -18 -44 0z" style="fill:${C3.white}"/>`,
     `<rect x="${x - 20}" y="${y - 30}" width="8" height="40"/><rect x="${x + 12}" y="${y - 30}" width="8" height="40"/><path d="M${x - 22} ${y - 28} q22 -22 44 0 v6 q-22 -18 -44 0z"/>`
-  )}${lab(lx, ly, label2, col, 11)}</g>`;
+  )}${lab2(lx, ly, label2, col, 11)}</g>`;
   var vultures = (cx, cy, rx, ry, n = 3) => `<g pointer-events="none">${Array.from({ length: n }, (_, i) => `<g><path d="M-14 0 q7 -6 14 -1 q7 -5 14 1 q-7 -2 -14 3 q-7 -5 -14 -3z" style="fill:#5A4636;stroke:var(--line)" stroke-width=".8"/><circle cx="0" cy="-1" r="2" style="fill:#E7D3B2"/>
   <animateMotion dur="${26 + i * 7}s" begin="${-i * 9}s" repeatCount="indefinite" path="M${cx + rx} ${cy + i * 10} a${rx} ${ry} 0 1 ${i % 2} ${-2 * rx} 0 a${rx} ${ry} 0 1 ${i % 2} ${2 * rx} 0"/></g>`).join("")}</g>`;
-  var swifts = (cx, cy) => ssn() !== "summer" ? "" : `<g pointer-events="none">${[0, 1, 2, 3].map((i) => `<path d="M-6 2 q3 -4 6 -1 q3 -3 6 1" style="fill:none;stroke:#2F2B28" stroke-width="1.4"><animateMotion dur="${4 + i}s" begin="${-i * 1.3}s" repeatCount="indefinite" path="M${cx} ${cy + i * 12} c60 -40 120 30 40 50 s-120 -10 -40 -50"/></path>`).join("")}</g>`;
-  var pigeons = (pts) => `<g pointer-events="none" ${W9} stroke-width=".8">${pts.map(([x, y], i) => `<g><ellipse cx="${x}" cy="${y}" rx="5" ry="3.4" style="fill:#9AA0AE"/><circle cx="${x + (i % 2 ? -5 : 5)}" cy="${y - 3}" r="2.4" style="fill:#7D8496"/><animateTransform attributeName="transform" type="translate" values="0 0;0 1.5;0 0" dur="${0.8 + i * 0.2}s" repeatCount="indefinite"/></g>`).join("")}</g>`;
-  var cat2 = (x, y, col = "#E8A45A") => `<g pointer-events="none" ${W9} stroke-width=".9"><ellipse cx="${x}" cy="${y}" rx="9" ry="5" style="fill:${col}"/><circle cx="${x + 8}" cy="${y - 3}" r="4" style="fill:${col}"/><path d="M${x + 5} ${y - 6} l1 -4 l2 3 M${x + 9} ${y - 6} l2 -4 l1 4"/><path d="M${x - 9} ${y + 1} q-6 1 -4 -5" fill="none"/></g>`;
+  var swifts = (cx, cy) => ssn2() !== "summer" ? "" : `<g pointer-events="none">${[0, 1, 2, 3].map((i) => `<path d="M-6 2 q3 -4 6 -1 q3 -3 6 1" style="fill:none;stroke:#2F2B28" stroke-width="1.4"><animateMotion dur="${4 + i}s" begin="${-i * 1.3}s" repeatCount="indefinite" path="M${cx} ${cy + i * 12} c60 -40 120 30 40 50 s-120 -10 -40 -50"/></path>`).join("")}</g>`;
+  var pigeons = (pts) => `<g pointer-events="none" ${W10} stroke-width=".8">${pts.map(([x, y], i) => `<g><ellipse cx="${x}" cy="${y}" rx="5" ry="3.4" style="fill:#9AA0AE"/><circle cx="${x + (i % 2 ? -5 : 5)}" cy="${y - 3}" r="2.4" style="fill:#7D8496"/><animateTransform attributeName="transform" type="translate" values="0 0;0 1.5;0 0" dur="${0.8 + i * 0.2}s" repeatCount="indefinite"/></g>`).join("")}</g>`;
+  var cat2 = (x, y, col = "#E8A45A") => `<g pointer-events="none" ${W10} stroke-width=".9"><ellipse cx="${x}" cy="${y}" rx="9" ry="5" style="fill:${col}"/><circle cx="${x + 8}" cy="${y - 3}" r="4" style="fill:${col}"/><path d="M${x + 5} ${y - 6} l1 -4 l2 3 M${x + 9} ${y - 6} l2 -4 l1 4"/><path d="M${x - 9} ${y + 1} q-6 1 -4 -5" fill="none"/></g>`;
   var bench = (x, y) => `<g pointer-events="none">${sk(`<rect x="${x - 20}" y="${y - 8}" width="40" height="6" rx="2" style="fill:#C9A27E"/><rect x="${x - 20}" y="${y - 16}" width="40" height="4" rx="2" style="fill:#C9A27E"/>`, `<rect x="${x - 20}" y="${y - 8}" width="40" height="6" rx="2"/><path d="M${x - 17} ${y - 2} v6 M${x + 17} ${y - 2} v6 M${x - 18} ${y - 12} v4 M${x + 18} ${y - 12} v4"/>`)}</g>`;
-  var defs = `<defs><pattern id="rdcob" width="22" height="16" patternUnits="userSpaceOnUse"><rect width="22" height="16" fill="${C2.cobble}"/><ellipse cx="5" cy="4" rx="4" ry="2.6" fill="#C7BEAE"/><ellipse cx="16" cy="5" rx="4.4" ry="2.4" fill="#CFC6B6"/><ellipse cx="10" cy="12" rx="4.2" ry="2.6" fill="#C2B9A8"/><ellipse cx="20" cy="13" rx="2.6" ry="2" fill="#CBC2B2"/></pattern>
+  var defs2 = `<defs><pattern id="rdcob" width="22" height="16" patternUnits="userSpaceOnUse"><rect width="22" height="16" fill="${C3.cobble}"/><ellipse cx="5" cy="4" rx="4" ry="2.6" fill="#C7BEAE"/><ellipse cx="16" cy="5" rx="4.4" ry="2.4" fill="#CFC6B6"/><ellipse cx="10" cy="12" rx="4.2" ry="2.6" fill="#C2B9A8"/><ellipse cx="20" cy="13" rx="2.6" ry="2" fill="#CBC2B2"/></pattern>
   <linearGradient id="rdgorge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6E5843"/><stop offset=".6" stop-color="#3E3128"/><stop offset="1" stop-color="#2E241E"/></linearGradient>
   <linearGradient id="rdvalley" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9DB0C8"/><stop offset=".18" stop-color="#C8D2A8"/><stop offset="1" stop-color="#B3BE86"/></linearGradient></defs>`;
   function casa(x, y, w, h, o = {}) {
@@ -17332,8 +17627,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     for (let i = 0; i < nW; i++) win.push(o.shut ? shutters(x + 18 + i * ((w - 36) / Math.max(1, nW - 1 || 1)), y + 12) : reja(x + 14 + i * ((w - 30) / Math.max(1, nW - 1 || 1)), y + 12));
     const bal = o.balcony ? balcony(x + w / 2 - 16, y + 34) : null;
     const door = o.door === false ? { art: "", lines: "" } : { art: `<path d="M${x + (o.doorX || w / 2) - 9} ${y + h} v-24 q9 -9 18 0 v24z" style="fill:#7A4A30"/>`, lines: `<path d="M${x + (o.doorX || w / 2) - 9} ${y + h} v-24 q9 -9 18 0 v24z"/>` };
-    return shade2(x, y, w, h) + sk(
-      `<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:${o.wall || C2.white}"/><rect x="${x}" y="${y + h - 7}" width="${w}" height="7" style="fill:${C2.ochre}" opacity=".85"/>${roof.art}${win.map((v) => v.art).join("")}${bal ? bal.art : ""}${door.art}`,
+    return shade3(x, y, w, h) + sk(
+      `<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:${o.wall || C3.white}"/><rect x="${x}" y="${y + h - 7}" width="${w}" height="7" style="fill:${C3.ochre}" opacity=".85"/>${roof.art}${win.map((v) => v.art).join("")}${bal ? bal.art : ""}${door.art}`,
       `<rect x="${x}" y="${y}" width="${w}" height="${h}"/>${roof.lines}${win.map((v) => v.lines).join("")}${bal ? bal.lines : ""}${door.lines}`
     ) + (bal ? bal.pots : "") + (o.bougain ? bougain(x + (o.bougain === "l" ? 6 : w - 6), y + 4, 14) : "") + (o.pots ? pot(x + 8, y + h + 2) + pot(x + w - 8, y + h + 2, "#E85A8A") : "");
   }
@@ -17342,100 +17637,100 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const rim = Array.from({ length: Math.ceil(w / 16) + 1 }, (_, i) => `${x1 + i * 16} ${y1 + (i % 2 ? 3 : -2)}`).join(" L");
     const lip = Array.from({ length: Math.ceil(w / 14) + 1 }, (_, i) => `${x2 - i * 14} ${y2 - (i % 2 ? 2 : 6)}`).join(" L");
     return `<g pointer-events="none"><path d="M${x1} ${y1} H${x2} V${y2} H${x1}z" fill="url(#rdgorge)"/>
-    <path d="M${rim} V${y1 + face} H${x1}z" style="fill:${C2.cliff}" filter="url(#marker)"/>
-    <g ${W9} stroke-width="1.1" filter="url(#wob)"><path d="M${rim}" fill="none"/>${Array.from({ length: Math.ceil(w / 22) }, (_, i) => `<path d="M${x1 + 8 + i * 22} ${y1 + 6} l${i % 2 ? 3 : -2} ${face * 0.6}" style="stroke:${C2.cliff2}" stroke-width="1.6"/>`).join("")}</g>
+    <path d="M${rim} V${y1 + face} H${x1}z" style="fill:${C3.cliff}" filter="url(#marker)"/>
+    <g ${W10} stroke-width="1.1" filter="url(#wob)"><path d="M${rim}" fill="none"/>${Array.from({ length: Math.ceil(w / 22) }, (_, i) => `<path d="M${x1 + 8 + i * 22} ${y1 + 6} l${i % 2 ? 3 : -2} ${face * 0.6}" style="stroke:${C3.cliff2}" stroke-width="1.6"/>`).join("")}</g>
     ${o.river !== false ? `<path d="M${x1} ${y1 + face + (y2 - y1 - face) * 0.55} q${w / 4} -6 ${w / 2} 0 t${w / 2} 0" style="fill:none;stroke:#8FC4D8" stroke-width="3" opacity=".8"/>` : ""}
-    <path d="M${x1} ${y2} L${lip} L${x1} ${y2 - 4}z" style="fill:${C2.earth}" filter="url(#marker)"/><path d="M${lip}" ${W9} fill="none" filter="url(#wob)"/></g>`;
+    <path d="M${x1} ${y2} L${lip} L${x1} ${y2 - 4}z" style="fill:${C3.earth}" filter="url(#marker)"/><path d="M${lip}" ${W10} fill="none" filter="url(#wob)"/></g>`;
   }
-  var railing = (x1, x2, y, v) => `<g pointer-events="none" ${W9} stroke-width="1.1" filter="url(#wob)">${v ? `<path d="M${y} ${x1} V${x2} M${y + 4} ${x1} V${x2}"/>${Array.from({ length: Math.floor((x2 - x1) / 9) }, (_, i) => `<path d="M${y - 2} ${x1 + i * 9} h8" stroke-width=".8"/>`).join("")}` : `<path d="M${x1} ${y} H${x2} M${x1} ${y - 9} H${x2}"/>${Array.from({ length: Math.floor((x2 - x1) / 7) + 1 }, (_, i) => `<path d="M${x1 + i * 7} ${y} v-9" stroke-width=".8"/>`).join("")}`}</g>`;
+  var railing = (x1, x2, y, v) => `<g pointer-events="none" ${W10} stroke-width="1.1" filter="url(#wob)">${v ? `<path d="M${y} ${x1} V${x2} M${y + 4} ${x1} V${x2}"/>${Array.from({ length: Math.floor((x2 - x1) / 9) }, (_, i) => `<path d="M${y - 2} ${x1 + i * 9} h8" stroke-width=".8"/>`).join("")}` : `<path d="M${x1} ${y} H${x2} M${x1} ${y - 9} H${x2}"/>${Array.from({ length: Math.floor((x2 - x1) / 7) + 1 }, (_, i) => `<path d="M${x1 + i * 7} ${y} v-9" stroke-width=".8"/>`).join("")}`}</g>`;
   function valley() {
-    const se = ssn(), field = { spring: ["#B9C98A", "#D9473A", "#C8D49A", "#E9E3B0"], summer: ["#E9C84A", "#D8C27A", "#B8B070", "#EAD9A0"], autumn: ["#8E5A6E", "#B9A06A", "#9A7A4A", "#C9B07A"], winter: ["#9DB07A", "#B4BE90", "#C6C3A0", "#A8B58A"] }[se];
+    const se = ssn2(), field = { spring: ["#B9C98A", "#D9473A", "#C8D49A", "#E9E3B0"], summer: ["#E9C84A", "#D8C27A", "#B8B070", "#EAD9A0"], autumn: ["#8E5A6E", "#B9A06A", "#9A7A4A", "#C9B07A"], winter: ["#9DB07A", "#B4BE90", "#C6C3A0", "#A8B58A"] }[se];
     const patches = [[6, 200, 30, 40], [36, 180, 34, 50], [4, 250, 40, 60], [44, 236, 26, 70], [10, 320, 34, 50], [48, 312, 22, 60], [6, 380, 44, 56], [50, 380, 22, 70], [8, 446, 36, 70], [46, 456, 24, 60], [4, 520, 40, 60], [44, 520, 26, 70], [10, 584, 30, 56]];
     return `<g pointer-events="none"><rect x="0" y="0" width="84" height="640" fill="url(#rdvalley)"/>
     <path d="M0 40 L12 22 L22 34 L34 14 L48 30 L60 12 L72 28 L84 18 V70 H0z" style="fill:#7F95B8"/><path d="M0 70 L14 52 L28 62 L42 48 L58 60 L70 50 L84 58 V90 H0z" style="fill:#94A7C2"/>
     ${patches.map(([x, y, w, h], i) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" style="fill:${field[i % 4]}" opacity=".85"/>`).join("")}
     <g style="fill:#7F8E5C">${Array.from({ length: 40 }, (_, i) => `<circle cx="${6 + i * 17 % 70}" cy="${110 + Math.floor(i / 4) * 50 + i % 3 * 6}" r="2.2"/>`).join("")}</g>
-    ${[[30, 150], [60, 300], [20, 430], [56, 560]].map(([x, y]) => `<rect x="${x}" y="${y}" width="9" height="6" style="fill:#FBF7EE;stroke:var(--line)" stroke-width=".6"/><path d="M${x - 1} ${y} l5.5 -3 l5.5 3z" style="fill:${C2.terra}"/>`).join("")}
-    <path d="M70 0 L80 40 L72 90 L82 150 L74 220 L84 300 L76 380 L86 460 L78 540 L84 640 H96 V0z" style="fill:${C2.cliff}" filter="url(#marker)"/>
-    <path d="M70 0 L80 40 L72 90 L82 150 L74 220 L84 300 L76 380 L86 460 L78 540 L84 640" ${W9} fill="none" filter="url(#wob)"/></g>`;
+    ${[[30, 150], [60, 300], [20, 430], [56, 560]].map(([x, y]) => `<rect x="${x}" y="${y}" width="9" height="6" style="fill:#FBF7EE;stroke:var(--line)" stroke-width=".6"/><path d="M${x - 1} ${y} l5.5 -3 l5.5 3z" style="fill:${C3.terra}"/>`).join("")}
+    <path d="M70 0 L80 40 L72 90 L82 150 L74 220 L84 300 L76 380 L86 460 L78 540 L84 640 H96 V0z" style="fill:${C3.cliff}" filter="url(#marker)"/>
+    <path d="M70 0 L80 40 L72 90 L82 150 L74 220 L84 300 L76 380 L86 460 L78 540 L84 640" ${W10} fill="none" filter="url(#wob)"/></g>`;
   }
-  function stationScreen() {
-    const ground = `<rect width="520" height="640" style="fill:${C2.earth}"/>
-    <g filter="url(#wob)"><path d="M330 168 V400 Q330 440 290 450 L130 468" fill="none" style="stroke:${C2.gravel}" stroke-width="34" stroke-linecap="round"/><path d="M340 300 H520" fill="none" style="stroke:${C2.gravel}" stroke-width="30"/><path d="M180 470 V600" fill="none" style="stroke:${C2.gravel}" stroke-width="26"/></g>
-    <ellipse cx="200" cy="480" rx="120" ry="70" style="fill:${C2.gravel}" filter="url(#wash)" opacity=".9"/>`;
+  function stationScreen2() {
+    const ground = `<rect width="520" height="640" style="fill:${C3.earth}"/>
+    <g filter="url(#wob)"><path d="M330 168 V400 Q330 440 290 450 L130 468" fill="none" style="stroke:${C3.gravel}" stroke-width="34" stroke-linecap="round"/><path d="M340 300 H520" fill="none" style="stroke:${C3.gravel}" stroke-width="30"/><path d="M180 470 V600" fill="none" style="stroke:${C3.gravel}" stroke-width="26"/></g>
+    <ellipse cx="200" cy="480" rx="120" ry="70" style="fill:${C3.gravel}" filter="url(#wash)" opacity=".9"/>`;
     const rail3 = `<g pointer-events="none"><rect x="0" y="34" width="520" height="18" style="fill:#CBBFA6"/>${Array.from({ length: 33 }, (_, i) => `<rect x="${i * 16}" y="34" width="6" height="18" style="fill:#8A6A52"/>`).join("")}<path d="M0 38 H520 M0 48 H520" style="stroke:#7D7A78" stroke-width="2.4"/></g>
     ${sk(
       `<rect x="40" y="10" width="150" height="34" rx="8" style="fill:#FFFDF6"/><rect x="40" y="30" width="150" height="8" style="fill:#3E6BAE"/>${[54, 82, 110, 138, 166].map((x) => `<rect x="${x}" y="15" width="18" height="11" rx="2" style="fill:#9FD3E8"/>`).join("")}`,
       `<rect x="40" y="10" width="150" height="34" rx="8"/>`
     )}`;
-    const st6 = `<g data-place="rdtrain" aria-label="Ronda station">${shade2(250, 76, 160, 80)}
+    const st6 = `<g data-place="rdtrain" aria-label="Ronda station">${shade3(250, 76, 160, 80)}
     ${sk(
-      `<rect x="250" y="76" width="160" height="80" style="fill:${C2.white}"/>${tileRoof(244, 58, 172, 20).art}<rect x="250" y="148" width="160" height="8" style="fill:${C2.ochre}"/>${[268, 300, 360, 392].map((x) => shutters(x, 96, 12, 22).art).join("")}<path d="M320 156 v-34 q10 -10 20 0 v34z" style="fill:#4F7A5A"/><circle cx="330" cy="88" r="7" style="fill:#FFFDF6"/><rect x="300" y="160" width="60" height="6" style="fill:#B9AE9A"/>`,
+      `<rect x="250" y="76" width="160" height="80" style="fill:${C3.white}"/>${tileRoof(244, 58, 172, 20).art}<rect x="250" y="148" width="160" height="8" style="fill:${C3.ochre}"/>${[268, 300, 360, 392].map((x) => shutters(x, 96, 12, 22).art).join("")}<path d="M320 156 v-34 q10 -10 20 0 v34z" style="fill:#4F7A5A"/><circle cx="330" cy="88" r="7" style="fill:#FFFDF6"/><rect x="300" y="160" width="60" height="6" style="fill:#B9AE9A"/>`,
       `<rect x="250" y="76" width="160" height="80"/>${tileRoof(244, 58, 172, 20).lines}${[268, 300, 360, 392].map((x) => shutters(x, 96, 12, 22).lines).join("")}<path d="M320 156 v-34 q10 -10 20 0 v34z"/><circle cx="330" cy="88" r="7"/><path d="M330 84 v4 h3"/>`
     )}
     <rect x="296" y="64" width="68" height="13" rx="2" style="fill:#3E6BAE;stroke:var(--line)" stroke-width="1"/><text x="330" y="74" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="9" fill="#FFFDF6" pointer-events="none">RONDA</text>
-    ${pot(258, 166)}${pot(402, 166, "#E85A8A")}${lab(330, 180, "Station · trains home", "#C3DDF3", 10)}</g>`;
+    ${pot(258, 166)}${pot(402, 166, "#E85A8A")}${lab2(330, 180, "Station · trains home", "#C3DDF3", 10)}</g>`;
     const avenue = [[286, 262], [374, 262], [286, 350], [374, 370]].map(([x, y], i) => i % 2 ? orangeTree(x, y, 0.9) : planeTree(x, y, 1)).join("") + lantern(300, 400) + lantern(360, 280);
-    const kiosk = `<g data-place="bandstand" aria-label="The bandstand">${shade2(182, 420, 64, 44, 10)}
+    const kiosk = `<g data-place="bandstand" aria-label="The bandstand">${shade3(182, 420, 64, 44, 10)}
     ${sk(
-      `<path d="M184 466 L192 450 H236 L244 466z" style="fill:${C2.white}"/><path d="M180 428 Q214 396 248 428z" style="fill:#8FA79A"/><rect x="180" y="426" width="68" height="5" style="fill:#FFFDF6"/>`,
+      `<path d="M184 466 L192 450 H236 L244 466z" style="fill:${C3.white}"/><path d="M180 428 Q214 396 248 428z" style="fill:#8FA79A"/><rect x="180" y="426" width="68" height="5" style="fill:#FFFDF6"/>`,
       `<path d="M184 466 L192 450 H236 L244 466z"/><path d="M180 428 Q214 396 248 428z"/><path d="M188 431 V452 M204 431 V450 M224 431 V450 M240 431 V452"/>`
-    )}${lab(214, 488 + 16, "Bandstand", "#E7D9F2", 9)}</g>`;
+    )}${lab2(214, 488 + 16, "Bandstand", "#E7D9F2", 9)}</g>`;
     const balc = `<g data-place="alameda" aria-label="The Alameda balcony over the valley"><ellipse class="hov" cx="114" cy="470" rx="32" ry="40" style="fill:var(--butter)"/>
     ${sk(`<path d="M96 420 Q64 470 96 520 H122 V420z" style="fill:#E3D3AE"/>`, `<path d="M96 420 Q64 470 96 520"/>`)}
-    <path d="M96 420 Q64 470 96 520" fill="none" style="stroke:${C2.iron}" stroke-width="2" filter="url(#wob)"/><path d="M92 424 Q60 470 92 516" fill="none" style="stroke:${C2.iron}" stroke-width="1" stroke-dasharray="1 5" filter="url(#wob)"/>
-    ${bench(116, 452)}${lab(122, 548, "The Alameda balcony", "#F6E3B4", 10)}</g>`;
-    const garden = pinsapo(300, 540, 0.9) + pinsapo(384, 470, 0.8) + pinsapo(150, 380, 0.7) + cypress(470, 560, 0.9) + cypress(500, 470, 0.8) + orangeTree(260, 420, 0.8) + `<g pointer-events="none">${[[150, 560], [250, 556], [330, 600], [430, 420]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="22" ry="8" style="fill:#B7C09C;stroke:var(--line)" stroke-width=".8"/>`).join("")}</g>` + [[140, 566], [160, 558], [244, 560], [262, 552], [320, 604], [344, 598], [420, 424], [440, 418]].map(([x, y], i) => pot(x, y, i % 2 ? C2.geranium : "#E85A8A")).join("") + bench(260, 500) + bench(400, 520) + lantern(150, 520) + lantern(250, 380);
-    const edge = gorgeBand(84, 520, 594, 640) + railing(84, 152, 594) + railing(210, 520, 594) + `<g pointer-events="none" ${W9} stroke-width="1">${[0, 1, 2, 3, 4].map((i) => `<rect x="${158 + i * 2}" y="${596 + i * 9}" width="${44 - i * 4}" height="7" style="fill:#CDBF9F"/>`).join("")}</g><g data-place="rdStepsDown" aria-label="Down the steps into the gorge, to the old town"><ellipse class="hov" cx="180" cy="612" rx="30" ry="18" style="fill:var(--butter)" opacity=".0"/>${lab(180, 576, "Steps down into the gorge", "#F6E3B4", 10)}</g>`;
-    return defs + lampDefs + ground + valley() + vultures(40, 300, 30, 70) + rail3 + avenue + garden + kiosk + balc + st6 + edge + gate("rdToPlaza", 500, 300, "The plaza", 470, 262, "East to the plaza and the market") + cat2(420, 170) + swifts(200, 120);
+    <path d="M96 420 Q64 470 96 520" fill="none" style="stroke:${C3.iron}" stroke-width="2" filter="url(#wob)"/><path d="M92 424 Q60 470 92 516" fill="none" style="stroke:${C3.iron}" stroke-width="1" stroke-dasharray="1 5" filter="url(#wob)"/>
+    ${bench(116, 452)}${lab2(122, 548, "The Alameda balcony", "#F6E3B4", 10)}</g>`;
+    const garden = pinsapo(300, 540, 0.9) + pinsapo(384, 470, 0.8) + pinsapo(150, 380, 0.7) + cypress(470, 560, 0.9) + cypress(500, 470, 0.8) + orangeTree(260, 420, 0.8) + `<g pointer-events="none">${[[150, 560], [250, 556], [330, 600], [430, 420]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="22" ry="8" style="fill:#B7C09C;stroke:var(--line)" stroke-width=".8"/>`).join("")}</g>` + [[140, 566], [160, 558], [244, 560], [262, 552], [320, 604], [344, 598], [420, 424], [440, 418]].map(([x, y], i) => pot(x, y, i % 2 ? C3.geranium : "#E85A8A")).join("") + bench(260, 500) + bench(400, 520) + lantern(150, 520) + lantern(250, 380);
+    const edge = gorgeBand(84, 520, 594, 640) + railing(84, 152, 594) + railing(210, 520, 594) + `<g pointer-events="none" ${W10} stroke-width="1">${[0, 1, 2, 3, 4].map((i) => `<rect x="${158 + i * 2}" y="${596 + i * 9}" width="${44 - i * 4}" height="7" style="fill:#CDBF9F"/>`).join("")}</g><g data-place="rdStepsDown" aria-label="Down the steps into the gorge, to the old town"><ellipse class="hov" cx="180" cy="612" rx="30" ry="18" style="fill:var(--butter)" opacity=".0"/>${lab2(180, 576, "Steps down into the gorge", "#F6E3B4", 10)}</g>`;
+    return defs2 + lampDefs + ground + valley() + vultures(40, 300, 30, 70) + rail3 + avenue + garden + kiosk + balc + st6 + edge + gate2("rdToPlaza", 500, 300, "The plaza", 470, 262, "East to the plaza and the market") + cat2(420, 170) + swifts(200, 120);
   }
   function plazaScreen() {
     const ground = `<rect width="520" height="640" fill="url(#rdcob)"/><ellipse cx="260" cy="350" rx="150" ry="96" style="fill:#E4DCCB" filter="url(#wash)"/>
-    <g ${W9} stroke-width=".8" opacity=".5">${Array.from({ length: 10 }, (_, i) => `<path d="M${110 + i * 30} ${290 + i % 2 * 4} l10 6" />`).join("")}</g>`;
-    const market = `<g data-place="mercado" aria-label="The covered market">${shade2(30, 50, 198, 122)}
+    <g ${W10} stroke-width=".8" opacity=".5">${Array.from({ length: 10 }, (_, i) => `<path d="M${110 + i * 30} ${290 + i % 2 * 4} l10 6" />`).join("")}</g>`;
+    const market = `<g data-place="mercado" aria-label="The covered market">${shade3(30, 50, 198, 122)}
     ${sk(
-      `<rect x="30" y="50" width="198" height="122" style="fill:${C2.white}"/>${tileRoof(24, 28, 210, 24).art}<rect x="30" y="164" width="198" height="8" style="fill:${C2.ochre}"/>${[48, 112, 176].map((x) => `<path d="M${x} 172 v-56 q20 -24 40 0 v56z" style="fill:#5A4A3E"/><rect x="${x + 6}" y="150" width="28" height="12" style="fill:#C9A27E"/>${[0, 1, 2, 3].map((k) => `<circle cx="${x + 10 + k * 7}" cy="148" r="3.2" style="fill:#F28C28"/>`).join("")}`).join("")}`,
+      `<rect x="30" y="50" width="198" height="122" style="fill:${C3.white}"/>${tileRoof(24, 28, 210, 24).art}<rect x="30" y="164" width="198" height="8" style="fill:${C3.ochre}"/>${[48, 112, 176].map((x) => `<path d="M${x} 172 v-56 q20 -24 40 0 v56z" style="fill:#5A4A3E"/><rect x="${x + 6}" y="150" width="28" height="12" style="fill:#C9A27E"/>${[0, 1, 2, 3].map((k) => `<circle cx="${x + 10 + k * 7}" cy="148" r="3.2" style="fill:#F28C28"/>`).join("")}`).join("")}`,
       `<rect x="30" y="50" width="198" height="122"/>${tileRoof(24, 28, 210, 24).lines}${[48, 112, 176].map((x) => `<path d="M${x} 172 v-56 q20 -24 40 0 v56z"/>`).join("")}`
     )}
     <rect x="86" y="58" width="86" height="15" rx="2" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1"/><text x="129" y="69" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="9.5" fill="#A84E2E" pointer-events="none">MERCADO</text>
-    ${lab(130, 202, "The covered market", "#F6E3B4", 10)}</g>`;
-    const bar = `<g data-place="tapas" aria-label="The tapas bar">${shade2(292, 50, 196, 122)}
+    ${lab2(130, 202, "The covered market", "#F6E3B4", 10)}</g>`;
+    const bar = `<g data-place="tapas" aria-label="The tapas bar">${shade3(292, 50, 196, 122)}
     ${sk(
-      `<rect x="292" y="50" width="196" height="122" style="fill:${C2.white}"/>${tileRoof(286, 28, 208, 24).art}<rect x="292" y="50" width="196" height="12" style="fill:${C2.ochre}"/><rect x="292" y="164" width="196" height="8" style="fill:${C2.ochre}"/>${reja(310, 92, 22, 26).art}${reja(446, 92, 22, 26).art}<path d="M380 172 v-46 q12 -12 24 0 v46z" style="fill:${C2.shutter}"/>${balcony(354, 90, 76).art}`,
+      `<rect x="292" y="50" width="196" height="122" style="fill:${C3.white}"/>${tileRoof(286, 28, 208, 24).art}<rect x="292" y="50" width="196" height="12" style="fill:${C3.ochre}"/><rect x="292" y="164" width="196" height="8" style="fill:${C3.ochre}"/>${reja(310, 92, 22, 26).art}${reja(446, 92, 22, 26).art}<path d="M380 172 v-46 q12 -12 24 0 v46z" style="fill:${C3.shutter}"/>${balcony(354, 90, 76).art}`,
       `<rect x="292" y="50" width="196" height="122"/>${tileRoof(286, 28, 208, 24).lines}${reja(310, 92, 22, 26).lines}${reja(446, 92, 22, 26).lines}<path d="M380 172 v-46 q12 -12 24 0 v46z"/>${balcony(354, 90, 76).lines}`
     )}${balcony(354, 90, 76).pots}
     <rect x="344" y="66" width="96" height="14" rx="2" style="fill:#8E2C48;stroke:var(--line)" stroke-width="1"/><text x="392" y="76.5" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="9" fill="#FFFDF6" pointer-events="none">BAR · TAPAS</text>
-    ${bougain(296, 70, 16)}${lab(392, 202, "The tapas bar", "#F6D3DC", 10)}</g>`;
+    ${bougain(296, 70, 16)}${lab2(392, 202, "The tapas bar", "#F6D3DC", 10)}</g>`;
     const terrace = [[318, 236], [462, 236], [470, 290]].map(([x, y]) => `<g pointer-events="none">${sk(
       `<ellipse cx="${x}" cy="${y}" rx="11" ry="5" style="fill:#FFFDF6"/><rect x="${x - 1}" y="${y}" width="2" height="9" style="fill:#7D7A78"/><path d="M${x - 22} ${y - 28} Q${x} ${y - 46} ${x + 22} ${y - 28}z" style="fill:#E8D6A8"/><path d="M${x - 11} ${y - 33} Q${x} ${y - 46} ${x + 11} ${y - 33}" style="fill:none;stroke:#5E8A5A" stroke-width="3"/><rect x="${x - 0.8}" y="${y - 40}" width="1.6" height="40" style="fill:#7D7A78"/>`,
       `<ellipse cx="${x}" cy="${y}" rx="11" ry="5"/><path d="M${x - 22} ${y - 28} Q${x} ${y - 46} ${x + 22} ${y - 28}z"/>`
     )}<circle cx="${x - 16}" cy="${y + 4}" r="4" style="fill:#C9A27E;stroke:var(--line)" stroke-width=".8"/><circle cx="${x + 16}" cy="${y + 4}" r="4" style="fill:#C9A27E;stroke:var(--line)" stroke-width=".8"/></g>`).join("");
-    const sweets = `<g data-place="dulces" aria-label="Doña Carmen's sweet shop">${shade2(440, 384, 80, 116, 10)}
+    const sweets = `<g data-place="dulces" aria-label="Doña Carmen's sweet shop">${shade3(440, 384, 80, 116, 10)}
     ${sk(
-      `<rect x="440" y="384" width="80" height="116" style="fill:${C2.wall2}"/>${tileRoof(436, 366, 88, 20).art}<rect x="440" y="492" width="80" height="8" style="fill:${C2.ochre}"/><rect x="452" y="414" width="44" height="34" rx="2" style="fill:#FFF3D8"/>${[0, 1, 2, 3, 4].map((k) => `<circle cx="${460 + k * 7}" cy="${438}" r="3" style="fill:#F3C24A"/>`).join("")}<rect x="458" y="420" width="12" height="9" rx="2" style="fill:#C98A4A"/><path d="M440 404 h80 l-4 10 h-72z" style="fill:#F2A0B8"/><path d="M450 404 l-2 10 M466 404 l-2 10 M482 404 l-2 10 M498 404 l-2 10" style="stroke:#FFFDF6" stroke-width="3"/><path d="M444 500 v-36 q8 -8 16 0 v36z" style="fill:#7A4A30"/>`,
+      `<rect x="440" y="384" width="80" height="116" style="fill:${C3.wall2}"/>${tileRoof(436, 366, 88, 20).art}<rect x="440" y="492" width="80" height="8" style="fill:${C3.ochre}"/><rect x="452" y="414" width="44" height="34" rx="2" style="fill:#FFF3D8"/>${[0, 1, 2, 3, 4].map((k) => `<circle cx="${460 + k * 7}" cy="${438}" r="3" style="fill:#F3C24A"/>`).join("")}<rect x="458" y="420" width="12" height="9" rx="2" style="fill:#C98A4A"/><path d="M440 404 h80 l-4 10 h-72z" style="fill:#F2A0B8"/><path d="M450 404 l-2 10 M466 404 l-2 10 M482 404 l-2 10 M498 404 l-2 10" style="stroke:#FFFDF6" stroke-width="3"/><path d="M444 500 v-36 q8 -8 16 0 v36z" style="fill:#7A4A30"/>`,
       `<rect x="440" y="384" width="80" height="116"/>${tileRoof(436, 366, 88, 20).lines}<rect x="452" y="414" width="44" height="34" rx="2"/><path d="M440 404 h80 l-4 10 h-72z"/><path d="M444 500 v-36 q8 -8 16 0 v36z"/>`
     )}
     <rect x="456" y="456" width="52" height="12" rx="2" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1"/><text x="482" y="465" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="7.6" fill="#C2307A" pointer-events="none">DULCES</text>
-    ${pot(432, 506)}${lab(456, 524, "Doña Carmen's sweets", "#F6D3DC", 10)}</g>`;
+    ${pot(432, 506)}${lab2(456, 524, "Doña Carmen's sweets", "#F6D3DC", 10)}</g>`;
     const fountain = `<g data-place="fuente" aria-label="The fountain"><ellipse class="hov" cx="260" cy="350" rx="50" ry="26" style="fill:var(--butter)"/>
     ${sk(
       `<path d="M222 336 L238 318 H282 L298 336 V352 L282 368 H238 L222 352z" style="fill:#F3ECDD"/><path d="M226 338 L240 322 H280 L294 338 V348 L280 362 H240 L226 348z" style="fill:#9FD3E8"/><rect x="254" y="306" width="12" height="30" rx="3" style="fill:#E3D3AE"/>`,
       `<path d="M222 336 L238 318 H282 L298 336 V352 L282 368 H238 L222 352z"/><rect x="254" y="306" width="12" height="30" rx="3"/>`
     )}
     <g pointer-events="none">${[0, 1, 2, 3, 4, 5, 6, 7].map((k) => `<rect x="${228 + k * 8}" y="${352 + (k > 0 && k < 7 ? 8 : 0)}" width="6" height="5" style="fill:${k % 2 ? "#3E6BAE" : "#FFFDF6"};stroke:var(--line)" stroke-width=".5"/>`).join("")}
-    <path d="M260 308 q-16 -6 -24 22 M260 308 q16 -6 24 22" style="fill:none;stroke:#CFE8F4" stroke-width="2.4" stroke-dasharray="4 5"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1s" repeatCount="indefinite"/></path></g>${lab(260, 390, "Fountain", "#C3DDF3", 9)}</g>`;
+    <path d="M260 308 q-16 -6 -24 22 M260 308 q16 -6 24 22" style="fill:none;stroke:#CFE8F4" stroke-width="2.4" stroke-dasharray="4 5"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1s" repeatCount="indefinite"/></path></g>${lab2(260, 390, "Fountain", "#C3DDF3", 9)}</g>`;
     const trees = orangeTree(130, 300, 1) + orangeTree(400, 316, 1) + orangeTree(120, 460, 1) + orangeTree(350, 470, 0.95) + orangeTree(210, 250, 0.8);
     const side = casa(0, 520, 70, 64, { door: false, bougain: "r", pots: true }) + casa(0, 404, 56, 80, { door: false, balcony: true });
     const benches = bench(206, 452) + bench(320, 288) + lantern(170, 340) + lantern(350, 360) + lantern(80, 210);
     const edge = gorgeBand(0, 520, 600, 640, { river: false }) + railing(0, 290, 598) + railing(372, 520, 598) + `${sk(`<rect x="292" y="586" width="10" height="54" style="fill:#CDA261"/><rect x="360" y="586" width="10" height="54" style="fill:#CDA261"/><rect x="302" y="590" width="58" height="50" fill="url(#rdcob)"/>`, `<rect x="292" y="586" width="10" height="54"/><rect x="360" y="586" width="10" height="54"/>`)}
-    ${lantern(290, 586)}${lantern(372, 586)}<g data-place="rdBridgeN" aria-label="Over Puente Nuevo to the south side"><ellipse class="hov" cx="330" cy="614" rx="30" ry="14" style="fill:var(--butter)"/>${lab(330, 570, "Puente Nuevo", "#F6E3B4", 11)}</g>`;
-    return defs + lampDefs + ground + market + bar + terrace + trees + side + sweets + fountain + benches + pigeons([[218, 396], [236, 404], [290, 398], [180, 360], [312, 410]]) + edge + gate("rdToStation", 16, 330, "The station", 50, 292, "West to the station and the Alameda") + cat2(150, 176, "#5A4A40") + vultures(260, 560, 120, 30, 2);
+    ${lantern(290, 586)}${lantern(372, 586)}<g data-place="rdBridgeN" aria-label="Over Puente Nuevo to the south side"><ellipse class="hov" cx="330" cy="614" rx="30" ry="14" style="fill:var(--butter)"/>${lab2(330, 570, "Puente Nuevo", "#F6E3B4", 11)}</g>`;
+    return defs2 + lampDefs + ground + market + bar + terrace + trees + side + sweets + fountain + benches + pigeons([[218, 396], [236, 404], [290, 398], [180, 360], [312, 410]]) + edge + gate2("rdToStation", 16, 330, "The station", 50, 292, "West to the station and the Alameda") + cat2(150, 176, "#5A4A40") + vultures(260, 560, 120, 30, 2);
   }
   function bridgeScreen() {
-    const ground = `<rect width="520" height="640" style="fill:${C2.earth}"/><g filter="url(#wob)"><path d="M310 214 V300 Q310 330 280 340 Q230 360 230 440 L20 520 M330 330 C380 300 420 280 440 262 M310 330 V430" fill="none" style="stroke:${C2.cobble}" stroke-width="30" stroke-linecap="round"/></g>`;
+    const ground = `<rect width="520" height="640" style="fill:${C3.earth}"/><g filter="url(#wob)"><path d="M310 214 V300 Q310 330 280 340 Q230 360 230 440 L20 520 M330 330 C380 300 420 280 440 262 M310 330 V430" fill="none" style="stroke:${C3.cobble}" stroke-width="30" stroke-linecap="round"/></g>`;
     const gorge = `<g pointer-events="none"><rect x="0" y="0" width="520" height="214" fill="url(#rdgorge)"/>
-    <path d="M0 0 H520 V18 L500 60 L470 90 L440 104 L400 120 H120 L80 104 L40 80 L0 60z" style="fill:${C2.cliff}" filter="url(#marker)"/>
-    <g ${W9} filter="url(#wob)"><path d="M0 60 L40 80 L80 104 L120 120 H400 L440 104 L470 90 L500 60 L520 18" fill="none"/>${Array.from({ length: 22 }, (_, i) => `<path d="M${10 + i * 24} ${8 + i % 3 * 4} l${i % 2 ? 4 : -3} ${40 + i % 4 * 12}" style="stroke:${C2.cliff2}" stroke-width="1.6"/>`).join("")}</g>
+    <path d="M0 0 H520 V18 L500 60 L470 90 L440 104 L400 120 H120 L80 104 L40 80 L0 60z" style="fill:${C3.cliff}" filter="url(#marker)"/>
+    <g ${W10} filter="url(#wob)"><path d="M0 60 L40 80 L80 104 L120 120 H400 L440 104 L470 90 L500 60 L520 18" fill="none"/>${Array.from({ length: 22 }, (_, i) => `<path d="M${10 + i * 24} ${8 + i % 3 * 4} l${i % 2 ? 4 : -3} ${40 + i % 4 * 12}" style="stroke:${C3.cliff2}" stroke-width="1.6"/>`).join("")}</g>
     <path d="M0 160 q130 -10 260 0 t260 0" style="fill:none;stroke:#8FC4D8" stroke-width="5"/><path d="M0 160 q130 -10 260 0 t260 0" style="fill:none;stroke:#FFFDF6" stroke-width="1.4" stroke-dasharray="6 16"><animate attributeName="stroke-dashoffset" from="0" to="-44" dur="2.4s" repeatCount="indefinite"/></path>
     ${pricklyPear(60, 70)}${pricklyPear(470, 74)}</g>`;
     const arch = (x) => `<path d="M${x} 180 V104 Q${x + 22} 62 ${x + 44} 104 V180z" style="fill:#3A2E26"/>`;
@@ -17445,74 +17740,74 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       `<path d="M196 16 H424 L410 186 H210z"/><path d="M212 180 V104 Q234 62 256 104 V180 M364 180 V104 Q386 62 408 104 V180"/>`
     ) + `<g pointer-events="none" filter="url(#wob)">${fallIn(212)}${fallIn(364)}</g>`;
     const deck = `<g pointer-events="none"><rect x="268" y="0" width="84" height="214" fill="url(#rdcob)"/>${sk(`<rect x="262" y="0" width="8" height="214" style="fill:#CDA261"/><rect x="350" y="0" width="8" height="214" style="fill:#CDA261"/>`, `<rect x="262" y="0" width="8" height="214"/><rect x="350" y="0" width="8" height="214"/>`)}</g>${lantern(266, 120)}${lantern(354, 40)}
-    <g data-place="rdBridgeS" aria-label="Back over the bridge to the plaza"><ellipse class="hov" cx="310" cy="30" rx="30" ry="16" style="fill:var(--butter)"/>${lab(240, 30, "Puente Nuevo · the plaza", "#F6E3B4", 10)}</g>`;
+    <g data-place="rdBridgeS" aria-label="Back over the bridge to the plaza"><ellipse class="hov" cx="310" cy="30" rx="30" ry="16" style="fill:var(--butter)"/>${lab2(240, 30, "Puente Nuevo · the plaza", "#F6E3B4", 10)}</g>`;
     const hanging = casa(10, 222, 70, 34, { door: false }) + casa(96, 218, 90, 36, { door: false, bougain: "r" }) + cypress(206, 268, 0.8);
     const view2 = `<g data-place="mirador" aria-label="The viewpoint over the gorge"><ellipse class="hov" cx="440" cy="246" rx="52" ry="26" style="fill:var(--butter)"/>
     ${sk(`<path d="M390 268 Q392 200 440 196 Q488 200 490 268z" style="fill:#E3D3AE"/><rect x="458" y="226" width="6" height="22" style="fill:#7D7A78"/><rect x="452" y="218" width="18" height="9" rx="3" style="fill:#5E8A5A"/>`, `<path d="M390 268 Q392 200 440 196 Q488 200 490 268"/><rect x="452" y="218" width="18" height="9" rx="3"/>`)}
-    <path d="M394 262 Q394 206 440 202 Q486 206 486 262" fill="none" style="stroke:${C2.iron}" stroke-width="2" filter="url(#wob)"/>${lab(440, 286, "The viewpoint", "#F6E3B4", 10)}</g>`;
-    const palace = `<g pointer-events="none">${shade2(24, 300, 182, 120)}${sk(
-      `<rect x="24" y="300" width="182" height="120" style="fill:${C2.white}"/>${tileRoof(20, 280, 190, 22).art}<rect x="150" y="250" width="44" height="60" style="fill:#C98A5A"/>${tileRoof(146, 236, 52, 16).art}<path d="M100 420 v-40 q15 -18 30 0 v40z" style="fill:#6B4430"/><rect x="94" y="372" width="42" height="48" style="fill:none;stroke:#CDA261" stroke-width="5"/>${reja(46, 330, 20, 24).art}${reja(168, 330, 20, 24).art}<path d="M160 266 h24 M160 278 h24 M160 290 h24" style="stroke:#A86A44" stroke-width="1.4"/>`,
+    <path d="M394 262 Q394 206 440 202 Q486 206 486 262" fill="none" style="stroke:${C3.iron}" stroke-width="2" filter="url(#wob)"/>${lab2(440, 286, "The viewpoint", "#F6E3B4", 10)}</g>`;
+    const palace = `<g pointer-events="none">${shade3(24, 300, 182, 120)}${sk(
+      `<rect x="24" y="300" width="182" height="120" style="fill:${C3.white}"/>${tileRoof(20, 280, 190, 22).art}<rect x="150" y="250" width="44" height="60" style="fill:#C98A5A"/>${tileRoof(146, 236, 52, 16).art}<path d="M100 420 v-40 q15 -18 30 0 v40z" style="fill:#6B4430"/><rect x="94" y="372" width="42" height="48" style="fill:none;stroke:#CDA261" stroke-width="5"/>${reja(46, 330, 20, 24).art}${reja(168, 330, 20, 24).art}<path d="M160 266 h24 M160 278 h24 M160 290 h24" style="stroke:#A86A44" stroke-width="1.4"/>`,
       `<rect x="24" y="300" width="182" height="120"/>${tileRoof(20, 280, 190, 22).lines}<rect x="150" y="250" width="44" height="60"/>${tileRoof(146, 236, 52, 16).lines}<path d="M100 420 v-40 q15 -18 30 0 v40z"/>${reja(46, 330, 20, 24).lines}${reja(168, 330, 20, 24).lines}`
-    )}${bougain(30, 310, 16)}${lab(115, 440, "The palace", "#F6E3B4", 10)}</g>`;
-    const se = ssn();
+    )}${bougain(30, 310, 16)}${lab2(115, 440, "The palace", "#F6E3B4", 10)}</g>`;
+    const se = ssn2();
     const garden = `<g data-place="jardin" aria-label="The Moorish garden"><ellipse class="hov" cx="330" cy="470" rx="70" ry="30" style="fill:var(--butter)" opacity=".0"/>
     <rect x="214" y="440" width="290" height="176" rx="4" style="fill:#D9B48A" filter="url(#marker)"/>
     ${[[226, 452], [370, 452], [226, 538], [370, 538]].map(([x, y]) => `<rect x="${x}" y="${y}" width="${x < 300 ? 68 : 120}" height="66" rx="3" style="fill:#7C9A5A;stroke:var(--line)" stroke-width="1"/><rect x="${x + 6}" y="${y + 6}" width="${(x < 300 ? 68 : 120) - 12}" height="54" rx="2" style="fill:${se === "spring" ? "#C9D9A0" : "#A9BF7A"}"/>`).join("")}
     ${sk(`<rect x="316" y="446" width="28" height="164" style="fill:#9FD3E8"/><ellipse cx="330" cy="515" rx="26" ry="16" style="fill:#9FD3E8"/>`, `<rect x="316" y="446" width="28" height="164"/><ellipse cx="330" cy="515" rx="26" ry="16"/>`)}
     <g pointer-events="none">${[470, 515, 580].map((y) => `<path d="M330 ${y} v-10" style="stroke:#FFFDF6" stroke-width="2" stroke-dasharray="3 3"><animate attributeName="stroke-dashoffset" from="0" to="-12" dur=".8s" repeatCount="indefinite"/></path>`).join("")}</g>
-    ${lab(420, 628, "The Moorish garden", "#C3E8DA", 10)}</g>` + [236, 266, 384, 420, 456, 492].map((x, i) => cypress(x, i < 2 ? 452 : 450, 0.8)).join("") + orangeTree(260, 612, 0.8) + orangeTree(470, 612, 0.8);
-    return defs + lampDefs + ground + gorge + pier + deck + hanging + palace + garden + view2 + bench(420, 330) + lantern(380, 300) + lantern(190, 470) + vultures(150, 100, 90, 34) + swifts(380, 70) + gate("rdToOld", 16, 520, "The old town", 56, 484, "West into the old town") + cat2(60, 432, "#3A3430");
+    ${lab2(420, 628, "The Moorish garden", "#C3E8DA", 10)}</g>` + [236, 266, 384, 420, 456, 492].map((x, i) => cypress(x, i < 2 ? 452 : 450, 0.8)).join("") + orangeTree(260, 612, 0.8) + orangeTree(470, 612, 0.8);
+    return defs2 + lampDefs + ground + gorge + pier + deck + hanging + palace + garden + view2 + bench(420, 330) + lantern(380, 300) + lantern(190, 470) + vultures(150, 100, 90, 34) + swifts(380, 70) + gate2("rdToOld", 16, 520, "The old town", 56, 484, "West into the old town") + cat2(60, 432, "#3A3430");
   }
   function oldScreen() {
-    const ground = `<rect width="520" height="640" style="fill:${C2.earth}"/>
-    <g filter="url(#wob)"><path d="M124 96 C150 170 230 230 230 300 C232 380 280 460 320 520 L330 640 M230 300 C300 330 400 370 520 380" fill="none" style="stroke:${C2.cobble}" stroke-width="40" stroke-linecap="round"/></g>
+    const ground = `<rect width="520" height="640" style="fill:${C3.earth}"/>
+    <g filter="url(#wob)"><path d="M124 96 C150 170 230 230 230 300 C232 380 280 460 320 520 L330 640 M230 300 C300 330 400 370 520 380" fill="none" style="stroke:${C3.cobble}" stroke-width="40" stroke-linecap="round"/></g>
     <path d="M124 96 C150 170 230 230 230 300 C232 380 280 460 320 520 L330 640 M230 300 C300 330 400 370 520 380" fill="none" style="stroke:url(#rdcobS)" stroke-width="36"/>`;
     const gorge = `<g pointer-events="none"><rect x="0" y="0" width="520" height="104" fill="url(#rdgorge)"/>
-    <path d="M0 0 H520 V30 L480 44 L420 52 H100 L40 44 L0 30z" style="fill:${C2.cliff}" filter="url(#marker)"/>
-    <g ${W9} filter="url(#wob)"><path d="M0 30 L40 44 L100 52 H420 L480 44 L520 30" fill="none"/>${Array.from({ length: 22 }, (_, i) => `<path d="M${8 + i * 24} 4 l${i % 2 ? 3 : -2} 30" style="stroke:${C2.cliff2}" stroke-width="1.4"/>`).join("")}</g>
+    <path d="M0 0 H520 V30 L480 44 L420 52 H100 L40 44 L0 30z" style="fill:${C3.cliff}" filter="url(#marker)"/>
+    <g ${W10} filter="url(#wob)"><path d="M0 30 L40 44 L100 52 H420 L480 44 L520 30" fill="none"/>${Array.from({ length: 22 }, (_, i) => `<path d="M${8 + i * 24} 4 l${i % 2 ? 3 : -2} 30" style="stroke:${C3.cliff2}" stroke-width="1.4"/>`).join("")}</g>
     <path d="M0 76 q130 -6 260 0 t260 0" style="fill:none;stroke:#8FC4D8" stroke-width="4"/>
     ${sk(`<path d="M186 62 H246 V80 H236 Q216 64 196 80 H186z" style="fill:#CDA261"/>`, `<path d="M186 62 H246 V80 H236 Q216 64 196 80 H186z"/>`)}
-    <path d="M0 104 L30 98 L60 106 L90 98 L160 98 L200 106 L260 98 L320 106 L380 98 L440 106 L520 98 V112 H0z" style="fill:${C2.earth}" filter="url(#marker)"/>
-    <g ${W9} stroke-width="1">${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="${100 + i % 2 * 16}" y="${18 + i * 14}" width="34" height="8" style="fill:#CDBF9F"/>`).join("")}</g>${pricklyPear(30, 96)}${pricklyPear(470, 96)}</g>
-    <g data-place="rdStepsUp" aria-label="Down into the gorge and up the steps to the station"><ellipse class="hov" cx="124" cy="60" rx="28" ry="36" style="fill:var(--butter)" opacity=".0"/>${lab(210, 124, "Steps up to the station", "#F6E3B4", 10)}</g>`;
+    <path d="M0 104 L30 98 L60 106 L90 98 L160 98 L200 106 L260 98 L320 106 L380 98 L440 106 L520 98 V112 H0z" style="fill:${C3.earth}" filter="url(#marker)"/>
+    <g ${W10} stroke-width="1">${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="${100 + i % 2 * 16}" y="${18 + i * 14}" width="34" height="8" style="fill:#CDBF9F"/>`).join("")}</g>${pricklyPear(30, 96)}${pricklyPear(470, 96)}</g>
+    <g data-place="rdStepsUp" aria-label="Down into the gorge and up the steps to the station"><ellipse class="hov" cx="124" cy="60" rx="28" ry="36" style="fill:var(--butter)" opacity=".0"/>${lab2(210, 124, "Steps up to the station", "#F6E3B4", 10)}</g>`;
     const cuero = `<g data-place="cuero" aria-label="The leather workshop"><ellipse class="hov" cx="91" cy="456" rx="40" ry="12" style="fill:var(--butter)"/>${casa(26, 340, 130, 104, { balcony: true, pots: true })}
     ${sk(`<rect x="44" y="384" width="94" height="14" rx="2" style="fill:#7A3A2A"/><path d="M130 408 h12 v4 h-12z" style="fill:#2F2B28"/><path d="M134 412 q-6 2 -6 12 h20 q0 -10 -6 -12z" style="fill:#A8754F"/>`, `<rect x="44" y="384" width="94" height="14" rx="2"/><path d="M134 412 q-6 2 -6 12 h20 q0 -10 -6 -12z M134 412 q4 -8 8 0"/>`)}
-    <text x="91" y="394.5" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="7.6" fill="#F3E7C8" pointer-events="none">PIEL · UBRIQUE</text>${lab(91, 470, "Leather workshop", "#E8D3BC", 9)}</g>`;
+    <text x="91" y="394.5" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="7.6" fill="#F3E7C8" pointer-events="none">PIEL · UBRIQUE</text>${lab2(91, 470, "Leather workshop", "#E8D3BC", 9)}</g>`;
     const houses = casa(26, 160, 150, 102, { balcony: true, bougain: "l", pots: true }) + cuero;
-    const convent = `<g data-place="convento" aria-label="The convent hatch">${shade2(326, 140, 174, 104)}
+    const convent = `<g data-place="convento" aria-label="The convent hatch">${shade3(326, 140, 174, 104)}
     ${sk(
-      `<rect x="326" y="140" width="174" height="104" style="fill:${C2.white}"/>${tileRoof(322, 124, 182, 18).art}<path d="M384 124 V90 H424 V124z" style="fill:${C2.white}"/><path d="M384 90 L404 74 L424 90z" style="fill:${C2.white}"/><path d="M392 114 v-12 q5 -6 10 0 v12z M406 114 v-12 q5 -6 10 0 v12z" style="fill:#3A3A44"/><circle cx="397" cy="110" r="3" style="fill:${C2.ochre}"/><circle cx="411" cy="110" r="3" style="fill:${C2.ochre}"/><path d="M342 244 v-40 q14 -14 28 0 v40z" style="fill:#6B4430"/><circle cx="404" cy="216" r="14" style="fill:#A8754F"/><circle cx="404" cy="216" r="9" style="fill:#7A4A30"/>${reja(450, 170, 20, 26).art}`,
+      `<rect x="326" y="140" width="174" height="104" style="fill:${C3.white}"/>${tileRoof(322, 124, 182, 18).art}<path d="M384 124 V90 H424 V124z" style="fill:${C3.white}"/><path d="M384 90 L404 74 L424 90z" style="fill:${C3.white}"/><path d="M392 114 v-12 q5 -6 10 0 v12z M406 114 v-12 q5 -6 10 0 v12z" style="fill:#3A3A44"/><circle cx="397" cy="110" r="3" style="fill:${C3.ochre}"/><circle cx="411" cy="110" r="3" style="fill:${C3.ochre}"/><path d="M342 244 v-40 q14 -14 28 0 v40z" style="fill:#6B4430"/><circle cx="404" cy="216" r="14" style="fill:#A8754F"/><circle cx="404" cy="216" r="9" style="fill:#7A4A30"/>${reja(450, 170, 20, 26).art}`,
       `<rect x="326" y="140" width="174" height="104"/>${tileRoof(322, 124, 182, 18).lines}<path d="M384 124 V90 L404 74 L424 90 V124"/><path d="M342 244 v-40 q14 -14 28 0 v40z"/><circle cx="404" cy="216" r="14"/><path d="M395 216 h18 M404 207 v18" stroke-width=".8"/>${reja(450, 170, 20, 26).lines}`
     )}
-    ${lab(410, 270, "Convent hatch", "#E7D9F2", 10)}</g>`;
+    ${lab2(410, 270, "Convent hatch", "#E7D9F2", 10)}</g>`;
     const tiles2 = ["#3E6BAE", "#F3C969", "#2E8B8B", "#E8913A", "#3E6BAE", "#C2307A"];
-    const tileShop = `<g data-place="azulejos" aria-label="Lucía's tile shop">${shade2(300, 324, 172, 96)}
+    const tileShop = `<g data-place="azulejos" aria-label="Lucía's tile shop">${shade3(300, 324, 172, 96)}
     ${sk(
-      `<rect x="300" y="324" width="172" height="96" style="fill:${C2.white}"/>${tileRoof(296, 306, 180, 20).art}<rect x="370" y="372" width="30" height="48" style="fill:#3E6BAE"/><path d="M374 420 v-40 q11 -11 22 0 v40z" style="fill:#7A4A30"/>${tiles2.map((c, i) => `<rect x="${314 + i % 3 * 15}" y="${342 + Math.floor(i / 3) * 15}" width="12" height="12" style="fill:#FFFDF6"/><circle cx="${320 + i % 3 * 15}" cy="${348 + Math.floor(i / 3) * 15}" r="3.6" style="fill:${c}"/>`).join("")}${tiles2.map((c, i) => `<rect x="${414 + i % 3 * 15}" y="${342 + Math.floor(i / 3) * 15}" width="12" height="12" style="fill:${c}"/><path d="M${414 + i % 3 * 15} ${342 + Math.floor(i / 3) * 15} l12 12" style="stroke:#FFFDF6" stroke-width="1.4"/>`).join("")}`,
+      `<rect x="300" y="324" width="172" height="96" style="fill:${C3.white}"/>${tileRoof(296, 306, 180, 20).art}<rect x="370" y="372" width="30" height="48" style="fill:#3E6BAE"/><path d="M374 420 v-40 q11 -11 22 0 v40z" style="fill:#7A4A30"/>${tiles2.map((c, i) => `<rect x="${314 + i % 3 * 15}" y="${342 + Math.floor(i / 3) * 15}" width="12" height="12" style="fill:#FFFDF6"/><circle cx="${320 + i % 3 * 15}" cy="${348 + Math.floor(i / 3) * 15}" r="3.6" style="fill:${c}"/>`).join("")}${tiles2.map((c, i) => `<rect x="${414 + i % 3 * 15}" y="${342 + Math.floor(i / 3) * 15}" width="12" height="12" style="fill:${c}"/><path d="M${414 + i % 3 * 15} ${342 + Math.floor(i / 3) * 15} l12 12" style="stroke:#FFFDF6" stroke-width="1.4"/>`).join("")}`,
       `<rect x="300" y="324" width="172" height="96"/>${tileRoof(296, 306, 180, 20).lines}<path d="M374 420 v-40 q11 -11 22 0 v40z"/>`
     )}
     <rect x="352" y="332" width="68" height="12" rx="2" style="fill:#3E6BAE;stroke:var(--line)" stroke-width="1"/><text x="386" y="341" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="7.8" fill="#FFFDF6" pointer-events="none">AZULEJOS</text>
-    ${pot(310, 426)}${pot(462, 426, "#E85A8A")}${lab(386, 448, "Lucía's tiles", "#C3DDF3", 10)}</g>`;
-    const baths = `<g data-place="banos" aria-label="The Arab baths">${shade2(36, 520, 160, 60, 10)}
+    ${pot(310, 426)}${pot(462, 426, "#E85A8A")}${lab2(386, 448, "Lucía's tiles", "#C3DDF3", 10)}</g>`;
+    const baths = `<g data-place="banos" aria-label="The Arab baths">${shade3(36, 520, 160, 60, 10)}
     ${sk(
       `<rect x="36" y="530" width="160" height="50" style="fill:#D9C29A"/>${[70, 116, 162].map((x) => `<path d="M${x - 20} 532 Q${x} 498 ${x + 20} 532z" style="fill:#E3CFA6"/>${[[-8, 524], [0, 516], [8, 524]].map(([dx, y]) => `<path d="M${x + dx} ${y - 3} l1.2 2.4 l2.6 .4 l-1.9 1.8 l.5 2.6 l-2.4 -1.2 l-2.4 1.2 l.5 -2.6 l-1.9 -1.8 l2.6 -.4z" style="fill:#5A4A3E"/>`).join("")}`).join("")}<path d="M104 580 v-24 q12 -18 24 0 v24z" style="fill:#5A4A3E"/>`,
       `<rect x="36" y="530" width="160" height="50"/>${[70, 116, 162].map((x) => `<path d="M${x - 20} 532 Q${x} 498 ${x + 20} 532"/>`).join("")}<path d="M104 580 v-24 q12 -18 24 0 v24z"/>`
     )}
-    ${lab(118, 612, "The Arab baths", "#F6E3B4", 10)}</g>`;
+    ${lab2(118, 612, "The Arab baths", "#F6E3B4", 10)}</g>`;
     const puerta = `<g data-place="puerta" aria-label="The old town gate">${sk(
       `<rect x="270" y="590" width="122" height="50" style="fill:#CDA261"/>${[284, 318, 352].map((x) => `<path d="M${x} 640 v-22 q-4 -16 13 -18 q17 2 13 18 v22z" style="fill:#4E3E31"/>`).join("")}${[276, 296, 316, 336, 356, 376].map((x) => `<rect x="${x}" y="582" width="10" height="10" style="fill:#CDA261"/>`).join("")}`,
       `<rect x="270" y="590" width="122" height="50"/>${[284, 318, 352].map((x) => `<path d="M${x} 640 v-22 q-4 -16 13 -18 q17 2 13 18 v22"/>`).join("")}`
-    )}${lab(420, 600, "Old town gate", "#F6E3B4", 9)}</g>`;
-    const plants = cypress(200, 160, 0.9) + cypress(184, 340, 0.8) + almond(480, 300, 1) + almond(250, 470, 0.9) + oliveTree2(460, 560, 1) + oliveTree2(220, 600, 0.8) + orangeTree(280, 260, 0.8) + [[180, 270], [168, 452], [300, 440], [478, 254]].map(([x, y], i) => pot(x, y, i % 2 ? C2.geranium : "#E85A8A")).join("") + lantern(260, 380) + lantern(180, 300) + lantern(460, 400);
-    return defs.replace("</defs>", `<pattern id="rdcobS" width="22" height="16" patternUnits="userSpaceOnUse"><ellipse cx="5" cy="4" rx="4" ry="2.6" fill="#C7BEAE"/><ellipse cx="16" cy="5" rx="4.4" ry="2.4" fill="#CFC6B6"/><ellipse cx="10" cy="12" rx="4.2" ry="2.6" fill="#C2B9A8"/></pattern></defs>`) + lampDefs + ground + gorge + houses + convent + tileShop + baths + puerta + plants + cat2(90, 152) + vultures(300, 50, 120, 20, 2) + gate("rdToBridge", 504, 380, "Puente Nuevo", 470, 414, "East to the bridge and the viewpoint");
+    )}${lab2(420, 600, "Old town gate", "#F6E3B4", 9)}</g>`;
+    const plants = cypress(200, 160, 0.9) + cypress(184, 340, 0.8) + almond(480, 300, 1) + almond(250, 470, 0.9) + oliveTree2(460, 560, 1) + oliveTree2(220, 600, 0.8) + orangeTree(280, 260, 0.8) + [[180, 270], [168, 452], [300, 440], [478, 254]].map(([x, y], i) => pot(x, y, i % 2 ? C3.geranium : "#E85A8A")).join("") + lantern(260, 380) + lantern(180, 300) + lantern(460, 400);
+    return defs2.replace("</defs>", `<pattern id="rdcobS" width="22" height="16" patternUnits="userSpaceOnUse"><ellipse cx="5" cy="4" rx="4" ry="2.6" fill="#C7BEAE"/><ellipse cx="16" cy="5" rx="4.4" ry="2.4" fill="#CFC6B6"/><ellipse cx="10" cy="12" rx="4.2" ry="2.6" fill="#C2B9A8"/></pattern></defs>`) + lampDefs + ground + gorge + houses + convent + tileShop + baths + puerta + plants + cat2(90, 152) + vultures(300, 50, 120, 20, 2) + gate2("rdToBridge", 504, 380, "Puente Nuevo", 470, 414, "East to the bridge and the viewpoint");
   }
   function rondaArt(scene2) {
-    return scene2 === "rd_station" ? stationScreen() : scene2 === "rd_plaza" ? plazaScreen() : scene2 === "rd_bridge" ? bridgeScreen() : oldScreen();
+    return scene2 === "rd_station" ? stationScreen2() : scene2 === "rd_plaza" ? plazaScreen() : scene2 === "rd_bridge" ? bridgeScreen() : oldScreen();
   }
   function trainRideArt(town) {
     const south = !!town;
     const hills = south ? ["#D9C27A", "#B8B070", "#C9A44A"] : ["#9CC27E", "#7FA35A", "#B9D2A0"];
-    const bank = `<svg class="taxibank" viewBox="0 0 600 90" preserveAspectRatio="none" aria-hidden="true"><g style="stroke:#3b3530" stroke-width="1.1">
+    const bank = town === "kyoto" ? kyotoRide() : `<svg class="taxibank" viewBox="0 0 600 90" preserveAspectRatio="none" aria-hidden="true"><g style="stroke:#3b3530" stroke-width="1.1">
     ${south ? `<path d="M0 40 L40 18 L80 34 L130 10 L180 30 L230 14 L290 34 L340 12 L400 30 L450 16 L520 34 L600 18 V60 H0z" fill="#8FA3C2"/>` : ""}
     <path d="M0 60 Q75 34 150 56 T300 56 T450 56 T600 56 V90 H0z" fill="${hills[0]}"/><path d="M0 74 Q100 52 200 72 T400 72 T600 72 V90 H0z" fill="${hills[1]}"/>
     ${[40, 120, 210, 300, 380, 470, 550].map((x, i) => south ? i % 3 === 1 ? `<rect x="${x}" y="58" width="16" height="10" fill="#FBF7EE"/><path d="M${x - 2} 58 l10 -5 l10 5z" fill="#C8643B"/>` : `<ellipse cx="${x}" cy="66" rx="9" ry="6" fill="#9DAA80"/>` : `<circle cx="${x}" cy="62" r="${9 + i % 2 * 4}" fill="${hills[2]}"/>`).join("")}</g></svg>`;
@@ -17523,7 +17818,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
 
   // src/art/ronda-rooms.js
-  var lab2 = (x, y, t2, col = "#F6E3B4", size = 10) => tapeLabel(x, y, t2, col, size);
+  var lab3 = (x, y, t2, col = "#F6E3B4", size = 10) => tapeLabel(x, y, t2, col, size);
   var spot = (id, tx, ty, aria, hov, body2) => `<g data-rdspot="${id}" data-x="${tx}" data-y="${ty}" aria-label="${aria}">${hov}${body2}</g>`;
   var hovE = (x, y, rx, ry) => `<ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>`;
   var exit = (col = "#C9A27E") => `<g data-exit="1" aria-label="Back outside"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
@@ -17547,7 +17842,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var niche = (x, y) => g(`<path d="M${x - 10} ${y} v-18 a10 10 0 0 1 20 0 v18z" style="fill:#4E3E31;stroke:var(--line)" stroke-width="1"/><path d="M${x - 5} ${y - 3} h10 l-2 -4 h-6z" style="fill:#C8643B"/><path d="M${x} ${y - 7} q-3 -5 0 -9 q3 4 0 9z" fill="#F3C969"><animate attributeName="opacity" values="1;.6;1" dur="1.3s" repeatCount="indefinite"/></path><circle cx="${x}" cy="${y - 10}" r="14" fill="#F3C969" opacity=".14"/>`);
   function tapasRoom() {
     const floor = tiles(170, 40, 40, "#C8643B", "#B85A34", "#8E4428");
-    const wall = `<g pointer-events="none"><rect width="520" height="170" style="fill:${C2.white}"/>${azulejos(116, 40)}<rect y="156" width="520" height="14" style="fill:#8A5A3A"/>
+    const wall = `<g pointer-events="none"><rect width="520" height="170" style="fill:${C3.white}"/>${azulejos(116, 40)}<rect y="156" width="520" height="14" style="fill:#8A5A3A"/>
     <rect y="22" width="520" height="12" style="fill:#5A3E2C"/>${[60, 104, 148].map((x) => `<path d="M${x} 34 v8" style="stroke:#3A3430"/>`).join("")}</g>
     ${sk(
       [60, 104, 148].map((x) => `<path d="M${x - 9} 44 q-3 26 9 34 q12 -8 9 -34z" style="fill:#B5443A"/><path d="M${x - 3} 76 q3 4 6 0" style="fill:#F3E1D0"/>`).join("") + `<path d="M196 34 v26" style="stroke:#3A3430"/>${[0, 1, 2, 3].map((i) => `<circle cx="${192 + i % 2 * 8}" cy="${44 + i * 6}" r="4" style="fill:#F3EFE8"/>`).join("")}`,
@@ -17566,7 +17861,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         `<rect x="40" y="188" width="300" height="48" rx="3" style="fill:#8A5A3A"/><rect x="34" y="180" width="312" height="10" rx="2" style="fill:#B9B0A4"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${54 + i * 58} 196 v32" style="stroke:#6B4430" stroke-width="2"/>`).join("")}
       <rect x="90" y="164" width="120" height="16" rx="3" style="fill:#EAF6FA" opacity=".85"/>${[0, 1, 2, 3, 4].map((i) => `<ellipse cx="${104 + i * 23}" cy="176" rx="8" ry="3" style="fill:${["#E8566C", "#E8C48E", "#C8643B", "#F3E7C8", "#F28C28"][i]}"/>`).join("")}<rect x="276" y="150" width="8" height="30" style="fill:#B9B0A4"/><path d="M274 152 h12" style="stroke:#3A3430" stroke-width="3"/>`,
         `<rect x="40" y="188" width="300" height="48" rx="3"/><rect x="34" y="180" width="312" height="10" rx="2"/><rect x="90" y="164" width="120" height="16" rx="3"/>`
-      ) + lab2(186, 282, "The bar: order a tapa", "#F6D3DC", 10)
+      ) + lab3(186, 282, "The bar: order a tapa", "#F6D3DC", 10)
     );
     const tables = [[120, 380], [300, 420], [420, 300]].map(([x, y]) => stool(x - 28, y + 14) + stool(x + 28, y + 14) + barrel(x, y)).join("");
     const plant5 = pot(470, 250) + pot(486, 254, "#E85A8A");
@@ -17586,7 +17881,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       <rect x="388" y="476" width="18" height="5" rx="2" style="fill:#C9A27E"/><path d="M390 481 v16 M404 481 v16 M390 476 v-14 h14 v14" style="stroke:#6B4430;fill:none" stroke-width="2"/>
       <path d="M486 492 l-8 -14 h18z" style="fill:#C8343A"/><path d="M478 478 q8 18 18 0" style="fill:none;stroke:#F3C969" stroke-width="1.4" stroke-dasharray="2 2"/>`,
         `<path d="M372 498 h146 v54 h-146z"/>`
-      ) + `<g pointer-events="none"><path d="M500 0 L420 498 h80z" fill="#FFF6D8" opacity=".12"/></g>` + lab2(440, 574, "Flamenco · 1pm & 8pm", "#F6D3DC", 9)
+      ) + `<g pointer-events="none"><path d="M500 0 L420 498 h80z" fill="#FFF6D8" opacity=".12"/></g>` + lab3(440, 574, "Flamenco · 1pm & 8pm", "#F6D3DC", 9)
     );
     return floor + wall + bottles + lamp2(140, 90) + lamp2(380, 120) + bar + tables + more + rack + coat + aboard + plant5 + stage2 + exit("#8A5A3A");
   }
@@ -17612,14 +17907,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       sk(
         `<rect x="300" y="196" width="190" height="44" rx="3" style="fill:#8A5A3A"/><rect x="300" y="170" width="190" height="28" rx="3" style="fill:#EAF6FA" opacity=".9"/>${[0, 1, 2].map((i) => `<ellipse cx="${336 + i * 60}" cy="190" rx="22" ry="5" style="fill:#FFFDF6"/>`).join("")}${[0, 1, 2, 3, 4].map((i) => `<circle cx="${322 + i * 7}" cy="186" r="3.4" style="fill:#F3C24A"/>`).join("")}<path d="M380 188 q16 -12 32 0z" style="fill:#E8C48E"/>${[0, 1, 2].map((i) => `<path d="M${440 + i * 10} 190 q2 -10 6 0" style="fill:none;stroke:#C98A4A" stroke-width="3"/>`).join("")}`,
         `<rect x="300" y="196" width="190" height="44" rx="3"/><rect x="300" y="170" width="190" height="28" rx="3"/>`
-      ) + lab2(395, 288, "Sweets and coffee", "#F6E3B4", 10)
+      ) + lab3(395, 288, "Sweets and coffee", "#F6E3B4", 10)
     );
     const tables = [[110, 340], [200, 480], [370, 430]].map(([x, y]) => chair(x - 30, y, 1) + chair(x + 30, y, -1) + table2(x, y)).join("");
     const more = [[76, 470], [452, 540], [456, 350]].map(([x, y]) => chair(x - 30, y, 1) + chair(x + 30, y, -1) + table2(x, y)).join("");
     const rack = spot("postales", 60, 296, "The postcard stand", hovE(48, 280, 30, 10), sk(
       `<path d="M48 280 v-60 M36 280 h24" style="stroke:#3A3430" stroke-width="2.4"/>${[0, 1, 2].map((r) => [0, 1].map((c) => `<rect x="${32 + c * 17}" y="${214 + r * 18}" width="14" height="16" rx="1" style="fill:${["#7FB8E8", "#F3C969", "#E8566C", "#9CC27E", "#FBF7EE", "#C9A3E0"][r * 2 + c]}"/>`).join("")).join("")}`,
       `<path d="M48 280 v-60"/>${[0, 1, 2].map((r) => [0, 1].map((c) => `<rect x="${32 + c * 17}" y="${214 + r * 18}" width="14" height="16" rx="1"/>`).join("")).join("")}`
-    ) + lab2(48, 296, "Postcards", "#E7D9F2", 8.5));
+    ) + lab3(48, 296, "Postcards", "#E7D9F2", 8.5));
     const cake = g(sk(`<path d="M480 168 v-10 M470 158 h20" style="stroke:#B9B0A4" stroke-width="2"/><path d="M470 156 q10 -16 20 0z" style="fill:#E8C48E"/>`, `<path d="M470 156 q10 -16 20 0z"/>`));
     return floor + wall + cake + counter + tables + more + rack + palm(40, 612) + palm(486, 612) + crates(156, 612, "#F3C24A") + exit("#4F7A5A");
   }
@@ -17640,7 +17935,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <path d="M0 0 H520 V40 Q260 70 0 40z" style="fill:#B9734E"/>${[110, 260, 410].map(arch).join("")}<rect x="0" y="196" width="520" height="6" style="fill:#A8754F"/></g>`;
     const stars = [70, 170, 260, 350, 450].map((x, i) => `<path d="${star2(x, 22 + i % 2 * 8, 9)}" style="fill:#FFF6D8;stroke:var(--line)" stroke-width="1"/>`).join("");
     const shafts = `<g pointer-events="none">${[[70, 150], [170, 250], [260, 330], [350, 410], [450, 470]].map(([x, fx], i) => `<path d="M${x - 6} ${26 + i % 2 * 8} L${x + 6} ${26 + i % 2 * 8} L${fx + 22} ${300 + i % 3 * 60} L${fx - 22} ${300 + i % 3 * 60}z" fill="#FFF6D8" opacity=".16"><animate attributeName="opacity" values=".1;.22;.1" dur="${7 + i}s" repeatCount="indefinite"/></path><ellipse cx="${fx}" cy="${300 + i % 3 * 60}" rx="24" ry="7" fill="#FFF6D8" opacity=".3"/>`).join("")}</g>`;
-    const look = spot("banos", 260, 360, "The star skylights", hovE(260, 340, 60, 14), lab2(260, 360, "Look up: the stars", "#F6E3B4", 10));
+    const look = spot("banos", 260, 360, "The star skylights", hovE(260, 340, 60, 14), lab3(260, 360, "Look up: the stars", "#F6E3B4", 10));
     const basin = `<g pointer-events="none">${sk(`<path d="M220 470 l12 -26 h56 l12 26 l-12 26 h-56z" style="fill:#B9B0A4"/><path d="M234 470 l8 -16 h36 l8 16 l-8 16 h-36z" style="fill:#9FC0C8"/>`, `<path d="M220 470 l12 -26 h56 l12 26 l-12 26 h-56z M234 470 l8 -16 h36 l8 16 l-8 16 h-36z"/>`)}<path class="ripple" d="M252 470 q8 -4 16 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2"/></g>`;
     const pillars = [[46, 600], [474, 600]].map(([x, y]) => sk(`<rect x="${x - 10}" y="${y - 380}" width="20" height="380" style="fill:#E8D3A8"/><rect x="${x - 14}" y="${y - 386}" width="28" height="10" style="fill:#C9A27E"/>`, `<rect x="${x - 10}" y="${y - 380}" width="20" height="380"/><rect x="${x - 14}" y="${y - 386}" width="28" height="10"/>`)).join("");
     const niches = niche(185, 176) + niche(335, 176) + niche(30, 176) + niche(490, 176);
@@ -17656,14 +17951,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         `<ellipse cx="420" cy="566" rx="30" ry="9" style="fill:#D9A441"/><path d="M412 568 v14 M428 568 v14" style="stroke:#8A6A3A" stroke-width="2"/><ellipse cx="380" cy="582" rx="14" ry="6" style="fill:#3E8A8A"/><ellipse cx="460" cy="582" rx="14" ry="6" style="fill:#B5443A"/>
       <path d="M414 558 q-2 -10 6 -10 q8 0 6 10z" style="fill:#D9D9D9"/><path d="M426 552 l8 -4" style="stroke:#B9B0A4" stroke-width="2"/>${[0, 1, 2].map((i) => `<rect x="${400 + i * 14}" y="558" width="5" height="7" rx="1" style="fill:${["#5E8A48", "#C8343A", "#3E6BAE"][i]}"/>`).join("")}`,
         `<ellipse cx="420" cy="566" rx="30" ry="9"/><path d="M414 558 q-2 -10 6 -10 q8 0 6 10z"/>`
-      ) + lab2(420, 600, "Mint tea", "#DCEBF2", 9)
+      ) + lab3(420, 600, "Mint tea", "#DCEBF2", 9)
     );
     return floor + wall + stars + niches + pillars + benches + basin + tinaja(90, 600) + tinaja(116, 604, 0.8) + tinaja(150, 602, 0.7) + plaque + tea + shafts + look + exit("#A8754F");
   }
   function jardinRoom() {
-    const ground = `<rect width="520" height="640" style="fill:${C2.gravel}"/>`;
+    const ground = `<rect width="520" height="640" style="fill:${C3.gravel}"/>`;
     const wall = `<g pointer-events="none">${sk(
-      `<rect x="0" y="0" width="520" height="150" style="fill:${C2.white}"/>${[150, 260, 370].map((x) => `<path d="M${x - 34} 150 V92 a34 38 0 1 1 68 0 V150z" style="fill:#E8DFCC"/>`).join("")}<rect y="150" width="520" height="10" style="fill:#C9A27E"/>`,
+      `<rect x="0" y="0" width="520" height="150" style="fill:${C3.white}"/>${[150, 260, 370].map((x) => `<path d="M${x - 34} 150 V92 a34 38 0 1 1 68 0 V150z" style="fill:#E8DFCC"/>`).join("")}<rect y="150" width="520" height="10" style="fill:#C9A27E"/>`,
       `<path d="M0 150 H520"/>${[150, 260, 370].map((x) => `<path d="M${x - 34} 150 V92 a34 38 0 1 1 68 0 V150"/>`).join("")}`
     )}</g>` + bougain(60, 70, 22) + bougain(470, 60, 20) + cypress(30, 178, 1.1) + cypress(490, 178, 1.1);
     const beds = [[60, 196, 154, 148], [306, 196, 154, 148], [60, 420, 154, 140], [306, 420, 154, 140]].map(([x, y, w, h]) => `<g pointer-events="none">${sk(`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14" style="fill:#6E9A58"/><rect x="${x + 12}" y="${y + 12}" width="${w - 24}" height="${h - 24}" rx="8" style="fill:#B9C98E"/>`, `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14"/>`)}${orangeTree(x + w / 2, y + h / 2 + 26, 1.25)}</g>`).join("");
@@ -17675,10 +17970,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       430,
       "The fountain: sit a while",
       hovE(260, 380, 56, 20),
-      sk(`<path d="M220 378 l12 -30 h56 l12 30 l-12 30 h-56z" style="fill:#F3ECDD"/><path d="M230 378 l9 -22 h42 l9 22 l-9 22 h-42z" style="fill:#7FB8E8"/><rect x="254" y="350" width="12" height="24" style="fill:#F3ECDD"/><circle cx="260" cy="348" r="8" style="fill:#F3ECDD"/>`, `<path d="M220 378 l12 -30 h56 l12 30 l-12 30 h-56z"/><circle cx="260" cy="348" r="8"/>`) + `<g pointer-events="none">${[-1, 1].map((d) => `<path d="M260 340 q${d * 12} -16 ${d * 20} 8" fill="none" style="stroke:#BFE0F2" stroke-width="1.8"><animate attributeName="stroke-dasharray" values="0 40;40 0" dur="1.2s" repeatCount="indefinite"/></path>`).join("")}</g>` + lab2(260, 426, "The fountain", "#DCEBF6", 10)
+      sk(`<path d="M220 378 l12 -30 h56 l12 30 l-12 30 h-56z" style="fill:#F3ECDD"/><path d="M230 378 l9 -22 h42 l9 22 l-9 22 h-42z" style="fill:#7FB8E8"/><rect x="254" y="350" width="12" height="24" style="fill:#F3ECDD"/><circle cx="260" cy="348" r="8" style="fill:#F3ECDD"/>`, `<path d="M220 378 l12 -30 h56 l12 30 l-12 30 h-56z"/><circle cx="260" cy="348" r="8"/>`) + `<g pointer-events="none">${[-1, 1].map((d) => `<path d="M260 340 q${d * 12} -16 ${d * 20} 8" fill="none" style="stroke:#BFE0F2" stroke-width="1.8"><animate attributeName="stroke-dasharray" values="0 40;40 0" dur="1.2s" repeatCount="indefinite"/></path>`).join("")}</g>` + lab3(260, 426, "The fountain", "#DCEBF6", 10)
     );
     const benches = [130, 390].map((x) => sk(`<rect x="${x - 34}" y="${590}" width="68" height="14" rx="3" style="fill:#FFFDF6"/>${Array.from({ length: 8 }, (_, i) => `<rect x="${x - 32 + i * 8}" y="592" width="7" height="10" style="fill:${i % 2 ? "#F3C969" : "#3E6BAE"}"/>`).join("")}`, `<rect x="${x - 34}" y="590" width="68" height="14" rx="3"/>`)).join("");
-    const pots = [210, 270, 330, 450, 510, 570].map((y, i) => pot(30, y, i % 2 ? "#E85A8A" : C2.geranium) + pot(490, y, i % 2 ? C2.geranium : "#E85A8A")).join("");
+    const pots = [210, 270, 330, 450, 510, 570].map((y, i) => pot(30, y, i % 2 ? "#E85A8A" : C3.geranium) + pot(490, y, i % 2 ? C3.geranium : "#E85A8A")).join("");
     const lantern2 = (x) => g(sk(`<rect x="${x - 2}" y="560" width="4" height="46" style="fill:#2F2B28"/><path d="M${x - 8} 562 h16 l-3 -16 h-10z" style="fill:#F6D98A"/>`, `<path d="M${x - 8} 562 h16 l-3 -16 h-10z"/>`) + `<circle cx="${x}" cy="554" r="14" fill="#F6D98A" opacity=".18"/>`);
     const jasmine = g([180, 340].map((x) => `${[0, 1, 2, 3, 4, 5].map((i) => `<circle cx="${x + i % 3 * 6 - 6}" cy="${600 - Math.floor(i / 3) * 8}" r="5" style="fill:#5E8A48;stroke:var(--line)" stroke-width=".6"/><circle cx="${x + i % 3 * 6 - 5}" cy="${598 - Math.floor(i / 3) * 8}" r="1.6" fill="#FFFDF6"/>`).join("")}`).join(""));
     const sideBenches = bench2(40, 400, 40, "#FFFDF6") + bench2(480, 400, 40, "#FFFDF6");
@@ -17687,7 +17982,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function cueroRoom() {
     const floor = `<rect y="170" width="520" height="470" style="fill:#B98F5E"/>${Array.from({ length: 12 }, (_, r) => `<path d="M0 ${190 + r * 40} H520" style="stroke:#A07A4C" stroke-width="1.4"/>${Array.from({ length: 4 }, (_2, c) => `<path d="M${(c * 140 + r % 2 * 70) % 520} ${170 + r * 40} v40" style="stroke:#A07A4C" stroke-width="1.2"/>`).join("")}`).join("")}`;
     const hide = (x, y, col, s = 1) => `<path d="M${x} ${y} q${14 * s} -8 ${28 * s} 0 q${10 * s} 14 ${4 * s} ${34 * s} q${-4 * s} ${12 * s} ${-18 * s} ${10 * s} q${-16 * s} 2 ${-20 * s} ${-12 * s} q${-6 * s} ${-20 * s} ${6 * s} ${-32 * s}z" style="fill:${col}"/>`;
-    const wall = `<g pointer-events="none"><rect width="520" height="170" style="fill:${C2.white}"/><rect y="160" width="520" height="10" style="fill:#7A5638"/><rect y="24" width="520" height="8" style="fill:#7A5638"/></g>
+    const wall = `<g pointer-events="none"><rect width="520" height="170" style="fill:${C3.white}"/><rect y="160" width="520" height="10" style="fill:#7A5638"/><rect y="24" width="520" height="8" style="fill:#7A5638"/></g>
     ${sk(
       hide(40, 50, "#A8754F", 1.3) + hide(120, 46, "#7A3A2A", 1.2) + hide(424, 52, "#C98A4A", 1.3),
       hide(40, 50, "none", 1.3) + hide(120, 46, "none", 1.2) + hide(424, 52, "none", 1.3)
@@ -17710,7 +18005,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       sk(
         `<rect x="330" y="200" width="150" height="40" rx="3" style="fill:#7A5638"/><rect x="326" y="194" width="158" height="8" rx="2" style="fill:#A8754F"/>${[0, 1, 2].map((i) => `<rect x="${346 + i * 40}" y="${182}" width="26" height="12" rx="2" style="fill:${["#7A3A2A", "#C98A4A", "#3A2A22"][i]}"/>`).join("")}`,
         `<rect x="330" y="200" width="150" height="40" rx="3"/><rect x="326" y="194" width="158" height="8" rx="2"/>`
-      ) + lab2(400, 288, "Shop: leather from Ubrique", "#E8D3BC", 10)
+      ) + lab3(400, 288, "Shop: leather from Ubrique", "#E8D3BC", 10)
     );
     const display = (x, y, items) => g(sk(`<rect x="${x - 46}" y="${y - 22}" width="92" height="22" rx="2" style="fill:#7A5638"/><path d="M${x - 40} ${y} v14 M${x + 40} ${y} v14" style="stroke:#5A3E2C" stroke-width="3"/>${items}`, `<rect x="${x - 46}" y="${y - 22}" width="92" height="22" rx="2"/>`));
     const wallets = display(124, 452, [0, 1, 2, 3, 4, 5].map((i) => `<rect x="${86 + i * 13}" y="${436 - i % 2 * 3}" width="11" height="9" rx="1.5" style="fill:${["#7A3A2A", "#C98A4A", "#3A2A22", "#A8754F", "#5A3A2A", "#B5443A"][i]}"/>`).join("") + `<circle cx="104" cy="424" r="7" style="fill:none;stroke:#3A2A22" stroke-width="3.4"/><circle cx="146" cy="424" r="7" style="fill:none;stroke:#C98A4A" stroke-width="3.4"/>`);
@@ -17752,7 +18047,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       sk(
         `<rect x="180" y="196" width="160" height="44" rx="3" style="fill:#C9A27E"/><path d="M174 172 h172 l-6 -12 h-160z" style="fill:#9DAA80"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${196 + i * 12} 196 v-16 h6 v16z" style="fill:#B9B04A"/>`).join("")}${[0, 1, 2].map((i) => `<path d="M${266 + i * 22} 196 q-8 -20 10 -22 q18 2 10 22z" style="fill:#E8D3A8"/>`).join("")}`,
         `<rect x="180" y="196" width="160" height="44" rx="3"/><path d="M174 172 h172 l-6 -12 h-160z"/>`
-      ) + lab2(222, 284, "Rafael's stall", "#E4EBD0", 10)
+      ) + lab3(222, 284, "Rafael's stall", "#E4EBD0", 10)
     );
     const fruit = `<g pointer-events="none">${sk(`<rect x="44" y="306" width="108" height="40" rx="3" style="fill:#B98A5A"/>${[0, 1, 2].map((i) => `<rect x="${50 + i * 34}" y="${296}" width="30" height="14" rx="2" style="fill:#8A6A52"/>${[0, 1, 2].map((k) => `<circle cx="${57 + i * 34 + k * 8}" cy="296" r="4.4" style="fill:${["#F28C28", "#F3E27A", "#E8566C"][i]}"/>`).join("")}`).join("")}`, `<rect x="44" y="306" width="108" height="40" rx="3"/>`)}</g>`;
     const ham = `<g pointer-events="none">${sk(`<rect x="368" y="306" width="108" height="40" rx="3" style="fill:#B98A5A"/><path d="M364 268 h116" style="stroke:#6B4430" stroke-width="3"/>${[384, 410, 436, 462].map((x) => `<path d="M${x - 7} 270 q-3 22 7 28 q10 -6 7 -28z" style="fill:#B5443A"/>`).join("")}<path d="M380 306 q14 -14 28 0z" style="fill:#F3E7C8"/><path d="M420 306 q14 -14 28 0z" style="fill:#F3E7C8"/>`, `<rect x="368" y="306" width="108" height="40" rx="3"/>`)}</g>`;
@@ -17761,8 +18056,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const olives = spot("ceramica", 452, 432, "The ceramics corner", hovE(466, 414, 46, 12), sk(
       `<rect x="424" y="356" width="88" height="54" style="fill:#7A5638"/><path d="M424 382 h88" style="stroke:#5A3E2C" stroke-width="3"/>${[0, 1, 2].map((i) => `<ellipse cx="${440 + i * 28}" cy="374" rx="11" ry="6" style="fill:${["#3E6BAE", "#E8B13A", "#5E8A48"][i]}"/><path d="M${434 + i * 28} 374 q6 -4 12 0" style="fill:none;stroke:#FFFDF6" stroke-width="1.2"/>`).join("")}${[0, 1, 2].map((i) => `<path d="M${434 + i * 28} 404 q-2 -12 6 -14 q8 2 6 14z" style="fill:${["#C8643B", "#3E6BAE", "#F3ECDD"][i]}"/>`).join("")}`,
       `<rect x="424" y="356" width="88" height="54"/><path d="M424 382 h88"/>`
-    ) + lab2(466, 426, "Ceramics", "#DCEBF6", 9));
-    const spices = spot("especias", 430, 534, "The spice stall", hovE(430, 518, 56, 12), spices0 + lab2(430, 530, "Spices", "#F6E3B4", 9));
+    ) + lab3(466, 426, "Ceramics", "#DCEBF6", 9));
+    const spices = spot("especias", 430, 534, "The spice stall", hovE(430, 518, 56, 12), spices0 + lab3(430, 530, "Spices", "#F6E3B4", 9));
     const bread = g(sk(`<ellipse cx="80" cy="410" rx="30" ry="10" style="fill:#C9A27E"/>${[0, 1, 2].map((i) => `<ellipse cx="${66 + i * 14}" cy="404" rx="8" ry="5" style="fill:#E8C48E"/>`).join("")}`, `<ellipse cx="80" cy="410" rx="30" ry="10"/>`));
     return floor + wall + column(160) + column(360) + lamp2(110, 70) + lamp2(410, 70) + rafa + fruit + ham + flowers2 + bread + olives + spices + crates(170, 610) + crates(480, 610, "#F3E27A") + exit("#3E6B5A");
   }
@@ -20209,6 +20504,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var railOpen = false;
   var lastTrain = "";
   var tripPick = [];
+  var tripTown = "ronda";
   var lastFarm = 0;
   function farmNow() {
     lastFarm = Date.now();
@@ -20774,7 +21070,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function hearts(n) {
     for (let i = 0; i < n; i++) setTimeout(() => {
       prop("heart", "p-heart", 58 + Math.random() * 16, 48 + Math.random() * 10, 1900);
-      mprop("heart", maple.x + rnd(-8, 8), maple.y - 30, 1900);
+      mprop("heart", maple2.x + rnd(-8, 8), maple2.y - 30, 1900);
     }, i * 240);
   }
   function pose() {
@@ -20791,7 +21087,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     mm.classList.remove("hop");
     void mm.getBBox();
     if (kind !== "nudge" && kind !== "nap") mm.classList.add("hop");
-    if (item) mprop(item.ico, maple.x, maple.y - 34, 1900);
+    if (item) mprop(item.ico, maple2.x, maple2.y - 34, 1900);
     let d = 3200;
     if (kind === "eat") {
       prop(item.ico, "p-food", null, null, 2300);
@@ -20884,8 +21180,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var fmt4 = (left4) => left4 ? `${Math.floor(left4 / M)}:${String(Math.floor(left4 / 1e3) % 60).padStart(2, "0")}` : "time!";
   function timerHTML(label2) {
     if (!S2.timer) return "";
-    const left4 = tLeft(), C3 = 2 * Math.PI * 28;
-    return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C3}" stroke-dashoffset="${C3 * (1 - left4 / S2.timer.total)}"/></svg>
+    const left4 = tLeft(), C4 = 2 * Math.PI * 28;
+    return `<div class="timer"><svg class="ring" viewBox="0 0 66 66" aria-hidden="true"><circle class="bg" cx="33" cy="33" r="28"/><circle class="fg" id="ringFg" cx="33" cy="33" r="28" stroke-dasharray="${C4}" stroke-dashoffset="${C4 * (1 - left4 / S2.timer.total)}"/></svg>
     <div><span class="t" id="tLeft">${fmt4(left4)}</span><small>${S2.timer.pausedLeft != null ? "paused" : esc(label2)}</small></div>${timerBtns()}</div>`;
   }
   var lastReady = readyCount();
@@ -22668,7 +22964,7 @@ ${SIGNOFF[t2.who] || ""}`;
   function harvest(i) {
     const p = F.plots[i];
     if (!p || !p.crop || growth2(p) < 1) return;
-    const C3 = CROPS[p.crop], n = C3.yield || 1;
+    const C4 = CROPS[p.crop], n = C4.yield || 1;
     addInv(p.crop, n);
     F.plots[i] = null;
     gainXp(1);
@@ -22676,7 +22972,7 @@ ${SIGNOFF[t2.who] || ""}`;
     F.harvestTotal = (F.harvestTotal || 0) + 1;
     mprop(CROPS[p.crop].ico, PLOTS[i].x + 50, PLOTS[i].y + 20, 1900);
     act("cheer");
-    speak(n > 1 ? `Harvested ${n} ${C3.ns || C3.n.toLowerCase()}! They're in your backpack.` : `Harvested a ${C3.n.toLowerCase()}! It's in your backpack.`, 4e3);
+    speak(n > 1 ? `Harvested ${n} ${C4.ns || C4.n.toLowerCase()}! They're in your backpack.` : `Harvested a ${C4.n.toLowerCase()}! It's in your backpack.`, 4e3);
     save2(true);
   }
   function notes() {
@@ -22927,7 +23223,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (fieldView && scene === "field") {
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
       h = !st6 ? "" : st6.kind === "wine" ? stallMarketPanel(F, serving()) : st6.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st6.kind === "scoop" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st6, dayKey(), sgHM()) }) : st6.kind === "cocoa" ? counterPanel3(F, { cart: true, server: isHere("mateo") }) : marketStallPanel(st6);
-    } else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick);
+    } else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick, tripTown);
     else if (railOpen && scene === "hlane") h = timetablePanel(dayKey(), sgHM(), true);
     else if (railOpen && townOf(scene)) h = homePanel(F, townOf(scene));
     else if (rondaView && townOf(scene)) h = rondaPanel(F, rondaView, { flam: flamSt, hm: sgHM(), tea: teaSt, amina: isHere("amina"), paint: paintSt });
@@ -23221,6 +23517,11 @@ ${SIGNOFF[t2.who] || ""}`;
     c.querySelectorAll("[data-tickets]").forEach((b) => b.onclick = () => {
       railOpen = "tickets";
       sfx("paper", true);
+      ctx();
+    });
+    c.querySelectorAll("[data-ttown]").forEach((b) => b.onclick = () => {
+      tripTown = b.dataset.ttown;
+      sfx("tap");
       ctx();
     });
     c.querySelectorAll("[data-tpick]").forEach((b) => b.onclick = () => {
@@ -23934,8 +24235,8 @@ ${SIGNOFF[t2.who] || ""}`;
     m.setAttribute("transform", `translate(${pos[0]} ${pos[1]})`);
   }
   function drawScene() {
-    const ssn2 = seasonOf(dayKey());
-    ["spring", "summer", "autumn", "winter"].forEach((k) => document.body.classList.toggle("season-" + k, k === ssn2));
+    const ssn3 = seasonOf(dayKey());
+    ["spring", "summer", "autumn", "winter"].forEach((k) => document.body.classList.toggle("season-" + k, k === ssn3));
     const day = dayKey(), wet = outside() && !townOf(scene) && rainyOn(day), fest = festivalOn(day);
     $("rain").hidden = !wet;
     $("rain").classList.toggle("light", rainLevel(day) === 1);
@@ -23959,13 +24260,13 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
     tableKey = "";
-    $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? rondaRoomArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
+    $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? rondaRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
     $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt(F.fish && F.fish.koi || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") : ""));
     if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));
     if (outside() && isDusk()) nightLights();
-    const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: vineyardName(F), farm: "The garden", wineshop: shopName(F), orchard: "Ma Ma's orchard", flowers: "Ma Ma's flower farm", field: "The field", shore: "The foreshore", bay: "The bay", hfarm: "Wildflower Farm", hlane: "Honeybrook station", hwoods: "Honeybrook Woods", greenhouse: "The greenhouse", mill: "The old mill", scoopshop: scoopState(F).name, rd_station: "Ronda: the station", rd_plaza: "Ronda: the plaza", rd_bridge: "Ronda: Puente Nuevo", rd_old: "Ronda: the old town" };
+    const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: vineyardName(F), farm: "The garden", wineshop: shopName(F), orchard: "Ma Ma's orchard", flowers: "Ma Ma's flower farm", field: "The field", shore: "The foreshore", bay: "The bay", hfarm: "Wildflower Farm", hlane: "Honeybrook station", hwoods: "Honeybrook Woods", greenhouse: "The greenhouse", mill: "The old mill", scoopshop: scoopState(F).name, kt_station: "Kyoto: the station", kt_lane: "Kyoto: Higashiyama", kt_temple: "Kyoto: the temple", kt_river: "Kyoto: the river", rd_station: "Ronda: the station", rd_plaza: "Ronda: the plaza", rd_bridge: "Ronda: Puente Nuevo", rd_old: "Ronda: the old town" };
     $("sceneName").innerHTML = `<span>${esc(names[scene] || (townRoom(scene) ? `${TOWNS[townOf(scene)].n}: ${townRoom(scene).n.replace(/^The /, "the ")}` : ROOMS[scene].name))}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-    $("maphint").textContent = townRoom(scene) ? `${townRoom(scene).say} Exit at the bottom, back out the way you came.` : townOf(scene) ? { rd_station: "Ronda's station (trains home till 10pm) and the Alameda balcony over the valley. East: the plaza. South: steps down into the gorge.", rd_plaza: "The plaza: the market, the tapas bar, Doña Carmen's sweets. West: the station. South: over Puente Nuevo.", rd_bridge: "Puente Nuevo over the gorge, the viewpoint and the Moorish garden. North: back over the bridge. West: the old town.", rd_old: "La Ciudad: the convent hatch, the tile shop, the Arab baths. North: the gorge steps up to the station. East: the bridge." }[scene] : scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Mum's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+    $("maphint").textContent = townRoom(scene) ? `${townRoom(scene).say} Exit at the bottom, back out the way you came.` : townOf(scene) && TOWNS[townOf(scene)].hints ? TOWNS[townOf(scene)].hints[scene] : townOf(scene) ? { rd_station: "Ronda's station (trains home till 10pm) and the Alameda balcony over the valley. East: the plaza. South: steps down into the gorge.", rd_plaza: "The plaza: the market, the tapas bar, Doña Carmen's sweets. West: the station. South: over Puente Nuevo.", rd_bridge: "Puente Nuevo over the gorge, the viewpoint and the Moorish garden. North: back over the bridge. West: the old town.", rd_old: "La Ciudad: the convent hatch, the tile shop, the Arab baths. North: the gorge steps up to the station. East: the bridge." }[scene] : scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Mum's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
   }
   function nightLights() {
     const art2 = $("sceneArt");
@@ -24213,8 +24514,8 @@ ${SIGNOFF[t2.who] || ""}`;
     trainRide(`All aboard for ${r.town.n}!`, town, () => {
       if (town === "ronda") rondaVisit(F);
       setScene(r.town.arrive[0], r.town.arrive[1]);
-      setTimeout(() => speak(`${r.town.n}! Whitewashed walls, orange trees and a sky so blue it hums.${t2.party.length ? ` ${partyList(t2)} pile${t2.party.length > 1 ? "" : "s"} off the train behind you.` : ""} The last train home is at 10pm.`, 6500), 900);
-      if (inParty(F, "evan")) setTimeout(() => evanSays(pick(["Mama, it's SO sunny!", "Big birdies in the sky!", "Are we in Spain? Is this Spain?"])), 3200);
+      setTimeout(() => speak(`${r.town.arriveLine || `${r.town.n}! Whitewashed walls, orange trees and a sky so blue it hums.`}${t2.party.length ? ` ${partyList(t2)} pile${t2.party.length > 1 ? "" : "s"} off the train behind you.` : ""} The last train home is at 10pm.`, 6500), 900);
+      if (inParty(F, "evan")) setTimeout(() => evanSays(pick(r.town.evanArrive || ["Mama, it's SO sunny!", "Big birdies in the sky!", "Are we in Spain? Is this Spain?"])), 3200);
     });
   }
   function tripHome(late) {
@@ -24276,14 +24577,14 @@ ${SIGNOFF[t2.who] || ""}`;
       sfx("chime");
       speak(pick(["The fountain splashes, the water runs off down the channel, and the noise of the town just... stops.", "Orange blossom, myrtle, cool stone. You could sit here all afternoon.", "A sparrow drinks from the edge of the fountain. Nobody's in a hurry."]), 5500);
       const t2 = tripOn(F), who3 = t2 ? t2.party.filter((x) => x !== "evan" && isHere(x)) : [];
-      if (who3.length) setTimeout(() => npcSay(who3[0], pick(TOWNS.ronda.lines[who3[0]] || ["Lovely."])), 2600);
+      if (who3.length) setTimeout(() => npcSay(who3[0], pick(TOWNS[townOf(scene)].lines[who3[0]] || ["Lovely."])), 2600);
       render();
       return;
     }
   }
   function townSpot(id) {
     const town = townOf(scene), T = TOWNS[town];
-    if (id === "rdtrain") {
+    if (id === T.station) {
       railOpen = true;
       sfx("paper", true);
       render();
@@ -24551,7 +24852,7 @@ ${SIGNOFF[t2.who] || ""}`;
     refreshNotebook();
   }
   var mel = { x: VILLAGE.home.door[0], y: VILLAGE.home.door[1], tx: VILLAGE.home.door[0], ty: VILLAGE.home.door[1], dir: 1, moving: false };
-  var maple = { x: mel.x - 24, y: mel.y + 2, tx: mel.x - 24, ty: mel.y + 2, dir: 1, moving: false };
+  var maple2 = { x: mel.x - 24, y: mel.y + 2, tx: mel.x - 24, ty: mel.y + 2, dir: 1, moving: false };
   var evan = { x: 250, y: 360, tx: 250, ty: 360, dir: 1, moving: false, run: false, wait: 2 };
   var route2 = [];
   var keys = /* @__PURE__ */ new Set();
@@ -24634,8 +24935,8 @@ ${SIGNOFF[t2.who] || ""}`;
       mel.x = mel.tx = p[0];
       mel.y = mel.ty = p[1];
       mel.path = [];
-      maple.x = maple.tx = p[0] - 22;
-      maple.y = maple.ty = p[1] + 2;
+      maple2.x = maple2.tx = p[0] - 22;
+      maple2.y = maple2.ty = p[1] + 2;
       if (id === "base") {
         evan.x = evan.tx = 300;
         evan.y = evan.ty = 360;
@@ -24675,7 +24976,8 @@ ${SIGNOFF[t2.who] || ""}`;
       render(true);
       w.classList.remove("fading");
       if (townOf(id)) save2();
-      if (townOf(id) && evanHere()) setTimeout(() => {
+      if (townOf(id) && evanHere() && (TOWNS[townOf(id)].evanScreen || {})[id]) setTimeout(() => evanSays(pick(TOWNS[townOf(id)].evanScreen[id])), 1400);
+      else if (townOf(id) && evanHere()) setTimeout(() => {
         evanSays(pick(id === "rd_bridge" ? ["so HIGH", "Mama, hold hand", "big big hole!"] : id === "rd_plaza" ? ["pigeons!", "catch it!", "birdies, come back!"] : ["Spain!", "big birdies!", "it's SO sunny"]));
         if (id === "rd_bridge") {
           evan.tx = mel.x + 16;
@@ -26651,8 +26953,8 @@ ${SIGNOFF[t2.who] || ""}`;
     mel.sitting = false;
     mel.x = mel.tx = off[0][0];
     mel.y = mel.ty = off[0][1];
-    maple.x = maple.tx = off[0][0] + 6;
-    maple.y = maple.ty = off[0][1] - 2;
+    maple2.x = maple2.tx = off[0][0] + 6;
+    maple2.y = maple2.ty = off[0][1] - 2;
     nodes.mel.classList.remove("sit");
     nodes.mel.classList.add("sup");
     if (kid2) {
@@ -26714,8 +27016,8 @@ ${SIGNOFF[t2.who] || ""}`;
     if (scene !== "shore") return;
     mel.x = mel.tx = 206;
     mel.y = mel.ty = 556;
-    maple.x = maple.tx = 184;
-    maple.y = maple.ty = 558;
+    maple2.x = maple2.tx = 184;
+    maple2.y = maple2.ty = 558;
     if (S2.cruiseDay !== dayKey()) {
       S2.cruiseDay = dayKey();
       gainXp(3);
@@ -27589,7 +27891,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     const s = list2.find((s2) => Math.hypot(s2.tx - mel.x, s2.ty - mel.y) < 26);
     return s ? s.id : null;
   }
-  var EVAN_SPOTS = { rd_station: [[200, 520], [300, 330], [240, 460], [160, 420]], rd_plaza: [[220, 300], [300, 420], [180, 380], [340, 330], [260, 460]], rd_bridge: [[310, 120], [300, 260], [420, 300], [330, 520]], rd_old: [[220, 300], [300, 480], [160, 300], [420, 300]], hwoods: [[240, 360], [300, 440], [200, 480], [380, 400], [260, 560]], van: [[220, 560], [330, 600]], hlane: [[230, 520], [200, 560], [300, 580], [230, 300], [120, 500]], honeysuckle: [[200, 560], [330, 600]], clover: [[200, 560], [360, 600], [160, 380]], barn: [[200, 560], [330, 600], [160, 380]], hfarm: [[260, 520], [200, 560], [330, 580], [260, 290], [60, 500], [460, 520]], bay: [[300, 400], [250, 560], [300, 330], [200, 300], [290, 500]], scoopshop: [[200, 440], [380, 440], [300, 560], [140, 560], [260, 420]], scoopkitchen: [[200, 560], [380, 540], [300, 580]], scoopdip: [[180, 560], [420, 560], [140, 420]], cocoa: [[200, 440], [380, 450], [140, 560]], cocoakitchen: [[200, 560], [380, 560]], mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[150, 340], [260, 330], [380, 330], [200, 580], [330, 590]] };
+  var EVAN_SPOTS = { kt_station: [[220, 420], [300, 540], [400, 300], [260, 260]], kt_lane: [[200, 320], [300, 520], [260, 240], [160, 580]], kt_temple: [[230, 520], [260, 250], [200, 420], [330, 260]], kt_river: [[262, 300], [200, 260], [320, 500], [160, 500]], rd_station: [[200, 520], [300, 330], [240, 460], [160, 420]], rd_plaza: [[220, 300], [300, 420], [180, 380], [340, 330], [260, 460]], rd_bridge: [[310, 120], [300, 260], [420, 300], [330, 520]], rd_old: [[220, 300], [300, 480], [160, 300], [420, 300]], hwoods: [[240, 360], [300, 440], [200, 480], [380, 400], [260, 560]], van: [[220, 560], [330, 600]], hlane: [[230, 520], [200, 560], [300, 580], [230, 300], [120, 500]], honeysuckle: [[200, 560], [330, 600]], clover: [[200, 560], [360, 600], [160, 380]], barn: [[200, 560], [330, 600], [160, 380]], hfarm: [[260, 520], [200, 560], [330, 580], [260, 290], [60, 500], [460, 520]], bay: [[300, 400], [250, 560], [300, 330], [200, 300], [290, 500]], scoopshop: [[200, 440], [380, 440], [300, 560], [140, 560], [260, 420]], scoopkitchen: [[200, 560], [380, 540], [300, 580]], scoopdip: [[180, 560], [420, 560], [140, 420]], cocoa: [[200, 440], [380, 450], [140, 560]], cocoakitchen: [[200, 560], [380, 560]], mumdad: [[300, 560], [200, 380], [420, 420], [150, 560], [460, 560]], marcus: [[230, 560], [120, 500], [460, 560], [250, 340], [300, 600]], cottage: [[200, 560], [440, 540], [300, 340]], shore: [[230, 200], [246, 320], [300, 320], [236, 430], [260, 560], [200, 380], [214, 520]], field: [[150, 560], [200, 570], [120, 470], [230, 390], [60, 330], [280, 470], [110, 600]], vineyard: [[110, 600], [262, 598], [410, 606], [200, 560], [160, 320], [300, 330], [230, 580]], base: [[260, 350], [200, 360], [330, 360], [150, 330], [230, 420], [160, 540], [300, 600], [360, 516], [240, 560], [420, 340]], home: [[150, 340], [260, 330], [380, 330], [200, 580], [330, 590]] };
   function evanWalk(speed, dt) {
     const key = evan.tx + "," + evan.ty;
     if (key !== evan.rk) {
@@ -27666,8 +27968,8 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
           evan.run = true;
           evan.target = "mel";
         } else if (r < 0.5) {
-          evan.tx = clamp(maple.x + rnd(-18, 18), b[0], b[2]);
-          evan.ty = clamp(maple.y + rnd(2, 12), b[1], b[3]);
+          evan.tx = clamp(maple2.x + rnd(-18, 18), b[0], b[2]);
+          evan.ty = clamp(maple2.y + rnd(2, 12), b[1], b[3]);
           evan.run = true;
           evan.target = "maple";
         } else if (scene === "base" && F.pets.animals.length && r < 0.45 && r > 0.3) {
@@ -27848,8 +28150,8 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
       if (carry) {
         mel.carEvan = withEvan;
       } else if (mel.wasDriving) {
-        maple.x = maple.tx = mel.x - mel.dir * 22;
-        maple.y = maple.ty = mel.y + 3;
+        maple2.x = maple2.tx = mel.x - mel.dir * 22;
+        maple2.y = maple2.ty = mel.y + 3;
         if (mel.carEvan) {
           evan.x = evan.tx = mel.x + 18;
           evan.y = evan.ty = mel.y + 6;
@@ -27875,30 +28177,30 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     mel.wasMoving = mel.moving;
     const inRoom = scene === "room", MB = [MAPLE_BED[0], MAPLE_BED[1] + 2];
     if (inRoom) {
-      maple.tx = MB[0];
-      maple.ty = MB[1];
-      stepTo2(maple, 110, dt);
+      maple2.tx = MB[0];
+      maple2.ty = MB[1];
+      stepTo2(maple2, 110, dt);
     }
-    const sleeping = inRoom ? !maple.moving && Math.hypot(maple.x - MB[0], maple.y - MB[1]) < 6 : phase() === "break" || Date.now() < mapleNap;
+    const sleeping = inRoom ? !maple2.moving && Math.hypot(maple2.x - MB[0], maple2.y - MB[1]) < 6 : phase() === "break" || Date.now() < mapleNap;
     nodes.maple.classList.toggle("sleep", sleeping);
     if (inRoom || scene === "kidroom") {
     } else if (sup && scene === "shore") {
-      maple.tx = 196;
-      maple.ty = 486;
-      stepTo2(maple, 120, dt);
+      maple2.tx = 196;
+      maple2.ty = 486;
+      stepTo2(maple2, 120, dt);
     } else if (!sleeping) {
-      maple.tx = mel.x - mel.dir * 24;
-      maple.ty = mel.y + 3;
-      const d = Math.hypot(maple.tx - maple.x, maple.ty - maple.y);
-      stepTo2(maple, Math.max(120, d * 3.2), dt);
-      if (!maple.moving) maple.dir = mel.dir;
-    } else maple.moving = false;
+      maple2.tx = mel.x - mel.dir * 24;
+      maple2.ty = mel.y + 3;
+      const d = Math.hypot(maple2.tx - maple2.x, maple2.ty - maple2.y);
+      stepTo2(maple2, Math.max(120, d * 3.2), dt);
+      if (!maple2.moving) maple2.dir = mel.dir;
+    } else maple2.moving = false;
     tickEvan(dt);
     tickNpcs(dt);
     updateCam(dt);
     drawTableware();
     placeNode(nodes.mel, mel);
-    placeNode(nodes.maple, maple);
+    placeNode(nodes.maple, maple2);
     placeNode(nodes.evan, evan);
     nodes.evan.style.visibility = scene === "kidroom" && kid.sleep || cruisingNow() || mel.wasDriving && mel.carEvan ? "hidden" : "";
     nodes.maple.style.visibility = cruisingNow() || mel.wasDriving ? "hidden" : "";
@@ -27907,13 +28209,13 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
       mel.dir = 1;
     }
     nodes.evan.classList.toggle("run", evan.run && evan.moving);
-    const order2 = [[nodes.mel, mel], [nodes.maple, maple], [nodes.evan, evan], ...npcActors(), ...stallFronts()].sort((a, b) => a[1].y - b[1].y);
+    const order2 = [[nodes.mel, mel], [nodes.maple, maple2], [nodes.evan, evan], ...npcActors(), ...stallFronts()].sort((a, b) => a[1].y - b[1].y);
     const g2 = $("actors");
     order2.forEach(([n]) => {
       if (g2.lastElementChild !== n) g2.appendChild(n);
     });
-    const close2 = Math.hypot(maple.x - mel.x, maple.y - mel.y) < 60;
-    bubbleAt($("speech"), close2 ? maple.x * 0.35 + mel.x * 0.65 : maple.x, close2 ? Math.min(maple.y, mel.y) : maple.y, close2 ? 76 : sleeping ? 18 : 30);
+    const close2 = Math.hypot(maple2.x - mel.x, maple2.y - mel.y) < 60;
+    bubbleAt($("speech"), close2 ? maple2.x * 0.35 + mel.x * 0.65 : maple2.x, close2 ? Math.min(maple2.y, mel.y) : maple2.y, close2 ? 76 : sleeping ? 18 : 30);
     if (evanHere()) bubbleAt($("evanSay"), evan.x, evan.y, 40);
     else $("evanSay").hidden = true;
     bubbleAt($("melSay"), mel.x, mel.y, 70);
@@ -28098,8 +28400,8 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
       mel.x = mel.tx = w.x;
       mel.y = mel.ty = w.y;
       mel.path = [];
-      maple.x = maple.tx = w.x - 22;
-      maple.y = maple.ty = w.y + 2;
+      maple2.x = maple2.tx = w.x - 22;
+      maple2.y = maple2.ty = w.y + 2;
     }
   }
   render(true);

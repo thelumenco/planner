@@ -1748,3 +1748,23 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Gate `ines:5`: the recipe. Reward flag `oilcake` puts "Ines's abuela's olive oil cake" on the tapas menu (oil, flour and egg).
 - **Fishing on the lake field:** the spot moved from beside the foreshore gate to the lake's south-west shore, at [112,352].
 - **Ronda's flamenco dancer is now Paloma.** Rosario is already Pilar's late mother in the stories.
+
+### Round 121: Kyoto, round 1 (the trip and the four screens)
+- **Approved plan (Mel):**
+  - Called Kyoto, by train, 60 a ticket, Evan free. Trains out 7am–3pm, last home 10pm.
+  - Yukata rental: yes.
+  - The stamp book's reward: one small stone lantern at the far end of the pond at home, with no maple.
+  - Builds in four rounds: (1) trip and screens; (2) goods, shops and recipes; (3) locals, family acts and the five interiors; (4) the activities, the stamp book and polish.
+- **Data:** `TOWNS.kyoto` in towns.js. Its places, gates, bridges, arrivals, bounds and obstacles all use the `kt_` prefix.
+  - New town fields any town can use: `arriveLine`, `evanArrive`, `evanScreen`, `hints`. core.js reads them for the arrival speech, Evan's lines and the map hint.
+  - `acts` is empty until round 3. A test checks that no Kyoto act repeats a Ronda one.
+- **Screens:** art/town-kyoto.js (`kyotoArt`), using the same patterns as Ronda.
+  - Palette: dark timber, white plaster, grey roofs with upturned eaves, vermilion, moss, bamboo.
+  - **kt_station:** the station, a maroon tram, the bamboo grove down the west side, the yukata shop, a red vending machine.
+  - **kt_lane:** a stone lane up to the five-storey pagoda, with the tea house, sweet shop and pottery workshop (each a lattice-fronted townhouse with a noren and a sign), and a rickshaw.
+  - **kt_temple:** the hall with incense smoke, eight vermilion torii up the path, a raked gravel garden with three mossy rocks, a koi pond with a red bridge.
+  - **kt_river:** the river with turtle stones (the only crossing) and two herons, the covered market, the willow canal with a stone bridge to the east gate.
+  - **Seasons:** maples are red and gold in autumn, green in spring and summer, bare in winter. Sakura are pink in spring. Petals drift in spring and snow falls in winter.
+- **The ticket window** now picks a town (`data-ttown`; `ticketPanel(F, pick, town)`). The train ride shows green hills, pagodas and torii (`kyotoRide`).
+- **Music:** `kyoto` is a koto in the miyako-bushi scale (D, Eb, G, A, Bb).
+- **For now,** the tea house, sweet shop, pottery, hall, market and yukata shop just say a line ("opens soon"). They become interiors and shops in rounds 2–3.

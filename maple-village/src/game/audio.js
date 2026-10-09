@@ -72,6 +72,11 @@ export const TRACKS = {
     bars: [[45, 57, 64, 69, 72, 76], [43, 55, 62, 67, 71, 74], [41, 53, 60, 65, 69, 72], [40, 52, 59, 64, 68, 71], [45, 57, 64, 69, 72, 76], [43, 55, 62, 67, 71, 74], [41, 53, 60, 65, 69, 72], [40, 52, 59, 64, 68, 71]],
     lines: [[[0, 76], [1, 77], [1.5, 76], [2, 74], [3, 72]], [[0, 74], [1, 72], [2, 71], [3, 69]], [[0, 72], [1, 71], [1.5, 72], [2, 69], [3, 68]], [[0, 77], [1, 76], [2, 74], [2.5, 72], [3, 71]],
       [[0, 69], [.5, 71], [1, 72], [2, 76], [3, 72]], [[0, 71], [1, 74], [2, 71], [3, 67]], [[0, 69], [1, 72], [2, 69], [2.5, 67], [3, 65]], [[0, 64], [1, 65], [1.5, 64], [2, 65], [2.5, 64], [3, 68]]]},
+  // live, all over Kyoto (round 121): a koto (plucked, like the guitar but sparser), in the old miyako-bushi scale
+  // (D, Eb, G, A, Bb: the flattened second and sixth are what makes it sound like Kyoto), slow and spacious
+  kyoto: {name: "Koto in Kyoto", live: true, bpm: 72, steps: 8, tone: "guitar", arp: [1, 3, 2, 4, 3, 5, 4, 2], arpVel: .045, mel: .6,
+    bars: [[38, 50, 62, 63, 67, 69], [38, 50, 62, 67, 69, 70], [31, 43, 55, 62, 63, 67], [33, 45, 57, 62, 63, 69], [38, 50, 62, 63, 67, 69], [34, 46, 58, 62, 67, 70], [31, 43, 55, 63, 67, 69], [38, 50, 57, 62, 63, 69]],
+    lines: [[[0, 74], [1, 75], [2, 74], [3, 69]], [[0, 70], [2, 69], [3, 67]], [[0, 67], [1, 69], [2, 70], [3, 69]], [[0, 75], [1, 74], [3, 69]], [[0, 74], [2, 79], [3, 75]], [[0, 74], [1, 70], [2, 69]], [[0, 67], [2, 63], [3, 62]], [[0, 62], [2, 63], [3, 62]]]},
   // Round 116: each of Ronda's interiors has its own music (live, while Mel's inside)
   // the tapas bar: a quick rumba on the guitar in D minor, strummed on every off-beat
   rd_tapas: {name: "Rumba at the tapas bar", live: true, bpm: 132, steps: 8, tone: "guitar", strum: [0, 2, 3, 5, 6], arp: [1, 3, 2, 4, 5, 3, 2, 4], arpVel: .045, mel: .9,

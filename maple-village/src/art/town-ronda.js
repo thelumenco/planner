@@ -12,6 +12,7 @@ import { ink, dayKey } from "../util.js";
 import { sk, tapeLabel } from "./scenes.js";
 import { lampDefs, lampGlow } from "./village-extras.js";
 import { seasonOf } from "../data/items.js";
+import { kyotoRide } from "./town-kyoto.js";
 
 const C = {white: "#FBF7EE", wall2: "#F3ECDD", ochre: "#D9A441", terra: "#C8643B", terra2: "#A84E2E", cobble: "#D6CEC0", earth: "#EADFC6", gravel: "#E6D6B2",
   cliff: "#D9B26A", cliff2: "#B98F4E", deep: "#4E3E31", olive: "#9DAA80", sage: "#B7C09C", cypress: "#3F5A3C", leaf: "#4F7A3E", iron: "#2F2B28",
@@ -302,7 +303,7 @@ export function rondaArt(scene){
 export function trainRideArt(town){
   const south = !!town;
   const hills = south ? ["#D9C27A", "#B8B070", "#C9A44A"] : ["#9CC27E", "#7FA35A", "#B9D2A0"];
-  const bank = `<svg class="taxibank" viewBox="0 0 600 90" preserveAspectRatio="none" aria-hidden="true"><g style="stroke:#3b3530" stroke-width="1.1">
+  const bank = town === "kyoto" ? kyotoRide() : `<svg class="taxibank" viewBox="0 0 600 90" preserveAspectRatio="none" aria-hidden="true"><g style="stroke:#3b3530" stroke-width="1.1">
     ${south ? `<path d="M0 40 L40 18 L80 34 L130 10 L180 30 L230 14 L290 34 L340 12 L400 30 L450 16 L520 34 L600 18 V60 H0z" fill="#8FA3C2"/>` : ""}
     <path d="M0 60 Q75 34 150 56 T300 56 T450 56 T600 56 V90 H0z" fill="${hills[0]}"/><path d="M0 74 Q100 52 200 72 T400 72 T600 72 V90 H0z" fill="${hills[1]}"/>
     ${[40, 120, 210, 300, 380, 470, 550].map((x, i) => south ? (i % 3 === 1 ? `<rect x="${x}" y="58" width="16" height="10" fill="#FBF7EE"/><path d="M${x - 2} 58 l10 -5 l10 5z" fill="#C8643B"/>` : `<ellipse cx="${x}" cy="66" rx="9" ry="6" fill="#9DAA80"/>`) : `<circle cx="${x}" cy="62" r="${9 + (i % 2)*4}" fill="${hills[2]}"/>`).join("")}</g></svg>`;

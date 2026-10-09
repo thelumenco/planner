@@ -2661,6 +2661,42 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  console.log("\na day trip to Kyoto");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), K = tw.TOWNS.kyoto;
+  check(K.fare === 60 && K.screens.length === 4 && K.screens.every(sc => tw.townOf(sc) === "kyoto") && Object.keys(tw.TOWN_BRIDGES).filter(k => k.startsWith("kt_")).length === 4, "Kyoto: four screens, 60 coins a ticket");
+  const ronda = tw.TOWNS.ronda.acts, used = new Set(Object.values(ronda).flatMap(a => Object.values(a).map(x => x.act)));
+  check(Object.values(K.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "nobody in the family does the same thing in Kyoto as in Ronda");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`kyoto pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  await page.addInitScript(() => { if (!/ktcoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 300; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-11-12"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-11-12&ktcoins=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
+  await page.click('#ctx [data-tickets]'); await page.waitForSelector('#ctx [data-ttown="kyoto"]', { timeout: 15000 });
+  await page.click('#ctx [data-ttown="kyoto"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-tpick="gonggong"]'); await page.click('#ctx [data-tpick="evan"]');
+  check(/120/.test(await page.locator("#ctx [data-trip]").textContent()) && /Kyoto/.test(await page.locator("#ctx h2").textContent()), "the ticket window offers Kyoto: Mel and Gong Gong, 120 coins (Evan free)");
+  await page.click("#ctx [data-trip]");
+  await page.waitForFunction(() => /Kyoto/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2000);
+  check(await fox().then(f => f.coins === 180 && f.trip.town === "kyoto") && await ids().then(a => a.includes("gonggong")), "off the train at Kyoto station, with Gong Gong and Evan");
+  check(await page.evaluate(() => ["kttrain", "bamboo", "yukata", "ktToLane", "ktToRiver"].every(id => document.querySelector(`#world [data-place="${id}"]`))), "the station screen: the station, the bamboo grove, the yukata shop, and the ways east and south");
+  for (const [gate, want, places] of [["ktToLane", "Higashiyama", ["pagoda", "chaya", "wagashi", "pottery"]], ["ktStepsDown", "temple", ["hall", "torii", "zen", "koi"]], ["ktToRiverW", "river", ["nishiki", "stones"]], ["ktToStationN", "station", ["kttrain"]]]) {
+    await page.locator(`#world [data-place="${gate}"]`).dispatchEvent("click");
+    await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
+    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("gonggong")), `through the gate to Kyoto's ${want} (Gong Gong follows)`);
+  }
+  await page.locator('#world [data-place="kttrain"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-triphome]", { timeout: 15000 });
+  await page.click("#ctx [data-triphome]");
+  await page.waitForFunction(() => /Honeybrook station/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(await fox().then(f => f.trip.done), "and the train home from Kyoto");
+  await page.close();
+}
+
+{
   console.log("\na day trip to Ronda");
   // who's away: tours, Ma Ma's stall, Mum's class and the family dinner all work round them
   { const t = await import(new URL("../src/game/tours.js", import.meta.url)), sun = "2026-10-11", tue = "2026-10-13", wed = "2026-10-14";
