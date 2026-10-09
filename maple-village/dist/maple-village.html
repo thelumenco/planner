@@ -1424,6 +1424,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .tile{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:inherit;font:inherit;cursor:pointer;text-align:center}
 .tile b{font-size:.74rem;line-height:1.15}.tile small{font-size:.7rem;opacity:.75}.tile.own{background:#DCEBF6}.tile:disabled{cursor:default}.tile:disabled:not(.own){opacity:.6}
 @media (max-width:420px){.tilegrid{grid-template-columns:repeat(2,1fr)}}
+/* round 108: the larder's keep-back counters, and the stove's plan and Pilar's list */
+.kgoodw{display:flex;flex-direction:column;align-items:stretch;gap:3px}
+.kkeep{display:flex;align-items:center;justify-content:center;gap:3px;font-size:.72rem}.kkeep .btn{padding:0 7px;min-height:22px;line-height:1}
+.kplan{margin:8px 0;padding:6px 8px;border:1.5px dashed var(--line);border-radius:10px}.kplan summary{cursor:pointer}.kplan summary small{opacity:.75;margin-left:4px}
 </style>
 </head>
 <body>
@@ -1487,9 +1491,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 <g class="ch" id="mel" data-ent="mel"><g class="flip"><g filter="url(#wob)">
               <ellipse cx="0" cy="0" rx="11" ry="3.5" fill="rgba(60,40,30,.18)"/>
               <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
-                <g class="legL"><rect x="-6.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="-3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><rect class="otrouser" x="-6.6" y="-15" width="5.8" height="13.4" rx="1.6" style="display:none"/><ellipse class="oshoe" cx="-3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
-                <g class="legR"><rect x="1.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><rect class="otrouser" x="0.8" y="-15" width="5.8" height="13.4" rx="1.6" style="display:none"/><ellipse class="oshoe" cx="3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
-                <path d="M-8.6 -23 h17.2 l1 9.5 h-8 l-1.6 -3 l-1.6 3 h-8z" style="fill:var(--denim)"/>
+                <g class="legL"><rect x="-6.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="-3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><rect class="otrouser" x="-8" y="-15" width="7.2" height="13.4" rx="1.6" style="display:none"/><ellipse class="oshoe" cx="-3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
+                <g class="legR"><rect x="1.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><rect class="otrouser" x="0.8" y="-15" width="7.2" height="13.4" rx="1.6" style="display:none"/><ellipse class="oshoe" cx="3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
+                <path id="oHips" d="M-8.6 -23 h17.2 l1 9.5 h-8 l-1.6 -3 l-1.6 3 h-8z" style="fill:var(--denim)"/><path id="oHipSides" d="M-8.6 -23 l0.4 8.6 M8.6 -23 l-0.4 8.6" fill="none" style="display:none"/>
                 <g class="armL"><rect x="-12" y="-34" width="4.2" height="13.5" rx="2.1" style="fill:var(--skin)"/><rect class="osleeve" x="-12" y="-34" width="4.2" height="10.5" rx="2.1" style="display:none"/></g>
                 <g class="armR"><rect x="7.8" y="-34" width="4.2" height="13.5" rx="2.1" style="fill:var(--skin)"/><rect class="osleeve" x="7.8" y="-34" width="4.2" height="10.5" rx="2.1" style="display:none"/></g>
                 <rect x="-2.2" y="-40" width="4.4" height="6" style="fill:var(--skin)" stroke="none"/>
@@ -7301,6 +7305,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var knows = (F2, id) => !TAPAS[id].learn || !!(F2.learned && F2.learned[id]);
   var inSeason = (id, season) => !TAPAS[id].seasons || TAPAS[id].seasons.includes(season);
   var TAPAS_PLATES = 6;
+  var TAPAS_MAX = 3;
   var ASKERS = ["Rosa", "Bastien", "Noor", "Felix", "Elena", "Mateo", "Lila", "Celeste"];
   function requestOf(today2) {
     const ids = Object.keys(TAPAS).filter((id) => inSeason(id, seasonOf(today2)) && !TAPAS[id].learn), h = hash(today2 + "crave");
@@ -7309,10 +7314,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var tapasPrice = (id, today2) => Math.round(TAPAS[id].price * (requestOf(today2).id === id ? 1.5 : 1));
   var OVEN = 1 * H;
   var PRESS = 3 * H;
+  var KP = {};
+  var nextDay = (d) => new Date(Date.parse(d + "T00:00:00Z") + 864e5).toISOString().slice(0, 10);
   function kitchenState(F2) {
     F2.kitchen = F2.kitchen || {};
     const k = F2.kitchen;
     k.larder = k.larder || {};
+    k.keep = k.keep || {};
+    k.pilarNo = k.pilarNo || {};
     if (!("oven" in k)) k.oven = null;
     if (!("press" in k)) k.press = null;
     return k;
@@ -7339,6 +7348,24 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       if (k.larder[id] <= 0) delete k.larder[id];
     }
   });
+  var spareOf = (k, id) => Math.max(0, (k.larder[id] || 0) - (k.keep[id] || 0));
+  var spareCount = (k, g) => pool(k, g).reduce((a, id) => a + spareOf(k, id), 0);
+  var canSpare = (k, need, also = {}) => Object.entries(need).every(([g, n]) => spareCount(k, g) - (also[g] || 0) >= n);
+  var useSpare = (k, need) => Object.entries(need).forEach(([g, n]) => {
+    for (const id of pool(k, g)) {
+      if (n <= 0) break;
+      const m = Math.min(n, spareOf(k, id));
+      k.larder[id] -= m;
+      n -= m;
+      if (k.larder[id] <= 0) delete k.larder[id];
+    }
+  });
+  function setKeep(F2, id, d) {
+    const k = kitchenState(F2), n = Math.max(0, Math.min(99, (k.keep[id] || 0) + d));
+    if (n) k.keep[id] = n;
+    else delete k.keep[id];
+    return n;
+  }
   var add = (k, id, n) => {
     k.larder[id] = (k.larder[id] || 0) + n;
   };
@@ -7393,43 +7420,68 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     F2.inv.syrup = (F2.inv.syrup || 0) + 2;
     return "Two bottles of petal syrup, pink and fragrant. Into your backpack.";
   }
-  function cookDish(F2, id) {
+  function cookDish(F2, id, pilar) {
     const k = kitchenState(F2), d = DISHES[id], v = vineState(F2);
-    if (!d || !has(k, d.need)) return null;
-    use(k, d.need);
+    if (!d || !(pilar ? canSpare(k, d.need) : has(k, d.need))) return null;
+    (pilar ? useSpare : use)(k, d.need);
     v.menu[id] = (v.menu[id] || 0) + d.plates;
     return `${d.plates} plates of ${d.n.toLowerCase()}, out to the tasting room.`;
   }
-  var tapasToday = (F2, today2) => {
-    const v = vineState(F2);
-    return v.tapas && v.tapas.day === today2 ? v.tapas : null;
-  };
-  function chooseTapas(F2, id, today2) {
-    const v = vineState(F2), t2 = tapasToday(F2, today2);
-    if (!TAPAS[id] || !knows(F2, id) || !inSeason(id, seasonOf(today2)) || t2 && t2.cooked) return null;
-    v.tapas = { day: today2, id, plates: 0, cooked: 0 };
-    return `Today's tapas: ${TAPAS[id].n}. It's on the chalkboard.`;
+  function tapasAll(F2, today2) {
+    const v = vineState(F2), p = v.tapasPlan;
+    if (p && p.day === today2 && !p.done) {
+      p.done = true;
+      (p.ids || []).forEach((id) => chooseTapas(F2, id, today2));
+    }
+    return tapasOn(v, today2);
   }
-  function cookTapas(F2, today2) {
-    const k = kitchenState(F2), t2 = tapasToday(F2, today2);
-    if (!t2 || !has(k, TAPAS[t2.id].need)) return null;
-    use(k, TAPAS[t2.id].need);
+  var tapasToday = (F2, today2) => tapasAll(F2, today2)[0] || null;
+  function chooseTapas(F2, id, today2) {
+    const v = vineState(F2), list2 = tapasOn(v, today2);
+    if (!TAPAS[id] || !knows(F2, id) || !inSeason(id, seasonOf(today2)) || list2.length >= TAPAS_MAX || list2.some((t2) => t2.id === id)) return null;
+    v.tapasList = [...(v.tapasList || []).filter((t2) => t2.day === today2 || t2.plates > 0), { day: today2, id, plates: 0, cooked: 0 }];
+    return `${TAPAS[id].n} is on today's chalkboard.`;
+  }
+  function dropTapas(F2, id, today2) {
+    const v = vineState(F2), t2 = tapasOn(v, today2).find((x) => x.id === id);
+    if (!t2 || t2.cooked) return null;
+    v.tapasList = v.tapasList.filter((x) => x !== t2);
+    return "Okay, it's off the chalkboard.";
+  }
+  function cookTapas(F2, today2, id, pilar) {
+    const k = kitchenState(F2), list2 = tapasAll(F2, today2), t2 = id && list2.find((x) => x.id === id) || !id && list2[0];
+    if (!t2) return null;
+    const need = TAPAS[t2.id].need;
+    if (!(pilar ? canSpare(k, need) : has(k, need))) return null;
+    (pilar ? useSpare : use)(k, need);
     t2.plates += TAPAS_PLATES;
     t2.cooked++;
     return `${TAPAS_PLATES} plates of ${TAPAS[t2.id].n.toLowerCase()}! Out they go.`;
   }
+  function planTapas(F2, id, tomorrow2) {
+    const v = vineState(F2);
+    if (!v.tapasPlan || v.tapasPlan.day !== tomorrow2) v.tapasPlan = { day: tomorrow2, ids: [] };
+    const p = v.tapasPlan;
+    if (p.ids.includes(id)) p.ids = p.ids.filter((x) => x !== id);
+    else if (p.ids.length < TAPAS_MAX && TAPAS[id] && knows(F2, id)) p.ids = [...p.ids, id];
+    else return null;
+    return p.ids.length ? `Tomorrow's chalkboard: ${p.ids.map((x) => TAPAS[x].n).join(", ")}.` : "Nothing planned for tomorrow yet.";
+  }
   var THANKS = [["olives", "Marco"], ["egg", "Ines"], ["flour", "Celeste"]];
   function staffDinner(F2, today2, hm2) {
-    const v = vineState(F2), t2 = v.tapas;
-    if (!t2 || !t2.plates || t2.day === today2 && hm2 < 22 * 60) return null;
-    const k = kitchenState(F2), plates = t2.plates, gifts = {};
+    const v = vineState(F2), over = (v.tapasList || []).filter((t3) => t3.plates > 0 && !(t3.day === today2 && hm2 < 22 * 60));
+    if (!over.length) return null;
+    const k = kitchenState(F2), plates = over.reduce((a, t3) => a + t3.plates, 0), gifts = {}, t2 = over[0];
     for (let i = 0; i < Math.ceil(plates / 2); i++) {
       const [id] = THANKS[i % 3];
       add(k, id, 1);
       gifts[id] = (gifts[id] || 0) + 1;
     }
-    t2.plates = 0;
-    v.staffNote = { day: t2.day, plates, dish: TAPAS[t2.id] ? TAPAS[t2.id].n : "tapas", gifts, seen: false };
+    over.forEach((x) => {
+      x.plates = 0;
+    });
+    v.tapasList = v.tapasList.filter((x) => x.day === today2);
+    v.staffNote = { day: t2.day, plates, dish: over.map((x) => TAPAS[x.id] ? TAPAS[x.id].n : "tapas").join(" and "), gifts, seen: false };
     return v.staffNote;
   }
   var staffLine = (n) => `Leftover ${n.dish.toLowerCase()} (${n.plates} plate${n.plates === 1 ? "" : "s"}) went to Marco, Ines and Celeste for dinner. They left ${Object.entries(n.gifts).map(([id, c]) => `${c} ${nm2(id, c)}`).join(", ")} in the larder to say thanks.`;
@@ -7451,24 +7503,36 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       takeCheese(F2);
       done.push("unwrapped a new cheese");
     }
-    if (!k.press && pressCheese(F2)) done.push("started a cheese in the press");
-    if (!k.oven && (k.larder.loaf || 0) < 3 && bake(F2)) done.push("put bread in the oven");
-    let t2 = tapasToday(F2, today2);
-    if (!t2) {
-      const best = Object.keys(TAPAS).filter((id) => inSeason(id, seasonOf(today2)) && knows(F2, id) && has(k, TAPAS[id].need)).sort((a, b) => tapasPrice(b, today2) - tapasPrice(a, today2))[0];
+    if (!k.press && !k.pilarNo.press && canSpare(k, { milk: 2 })) {
+      useSpare(k, { milk: 2 });
+      k.press = { start: Date.now(), dur: PRESS };
+      done.push("started a cheese in the press");
+    }
+    if (!k.oven && !k.pilarNo.bread && (k.larder.loaf || 0) < 3 && canSpare(k, { flour: 1 })) {
+      useSpare(k, { flour: 1 });
+      k.oven = { start: Date.now(), dur: OVEN };
+      done.push("put bread in the oven");
+    }
+    let list2 = tapasAll(F2, today2);
+    if (!list2.length && !k.pilarNo.tapas) {
+      const best = Object.keys(TAPAS).filter((id) => inSeason(id, seasonOf(today2)) && knows(F2, id) && canSpare(k, TAPAS[id].need)).sort((a, b) => tapasPrice(b, today2) - tapasPrice(a, today2))[0];
       if (best) {
         chooseTapas(F2, best, today2);
-        t2 = tapasToday(F2, today2);
+        list2 = tapasAll(F2, today2);
         done.push(`chose ${TAPAS[best].n.toLowerCase()} for the tapas of the day`);
       }
     }
-    if (t2 && t2.plates < 2 && cookTapas(F2, today2)) done.push(`cooked ${TAPAS_PLATES} plates of ${TAPAS[t2.id].n.toLowerCase()}`);
-    const keep6 = t2 ? TAPAS[t2.id].need : {};
+    list2.forEach((t2) => {
+      if (t2.plates < 2 && cookTapas(F2, today2, t2.id, true)) done.push(`cooked ${TAPAS_PLATES} plates of ${TAPAS[t2.id].n.toLowerCase()}`);
+    });
+    const keep6 = {};
+    list2.forEach((t2) => Object.entries(TAPAS[t2.id].need).forEach(([g, n]) => {
+      keep6[g] = (keep6[g] || 0) + n;
+    }));
     for (const id of Object.keys(DISHES)) {
       const d = DISHES[id];
-      if ((v.menu[id] || 0) >= 2) continue;
-      const spare = Object.entries(d.need).every(([g, n]) => larderCount(k, g) - (keep6[g] || 0) >= n);
-      if (spare && cookDish(F2, id)) done.push(`made ${d.n.toLowerCase()}`);
+      if ((v.menu[id] || 0) >= 2 || k.pilarNo[id]) continue;
+      if (canSpare(k, d.need, keep6) && cookDish(F2, id, true)) done.push(`made ${d.n.toLowerCase()}`);
     }
     if (done.length) {
       k.cookAt = Date.now();
@@ -7480,7 +7544,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var pic = (id, s = 34) => icon(id, s);
   var larderGrid = (k) => {
     const ids = Object.keys(k.larder).filter((id) => k.larder[id] > 0);
-    return ids.length ? `<div class="kgoods">${ids.map((id) => `<button class="kgood kbtn" data-k="take" data-id="${id}">${pic(id)}<b>${k.larder[id]}</b><small>${esc(nm2(id, k.larder[id]))}</small><em>Take one</em></button>`).join("")}</div><p class="muted">Tap one to take it back to your backpack (for the Scoop Shack, or a gift).</p>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`;
+    return ids.length ? `<div class="kgoods">${ids.map((id) => `<div class="kgoodw"><button class="kgood kbtn" data-k="take" data-id="${id}">${pic(id)}<b>${k.larder[id]}</b><small>${esc(nm2(id, k.larder[id]))}</small><em>Take one</em></button>
+      <span class="kkeep" title="Pilar leaves these alone"><button class="btn small alt" data-k="keep" data-id="${id}" data-n="-1" aria-label="Keep fewer back">−</button><span>${k.keep[id] ? `keep ${k.keep[id]}` : "keep 0"}</span><button class="btn small alt" data-k="keep" data-id="${id}" data-n="1" aria-label="Keep one more back">+</button></span></div>`).join("")}</div><p class="muted">Tap one to take it back to your backpack (for the Scoop Shack, or a gift). <b>Keep</b>: how many Pilar must leave alone (say, flowers you're saving for petal syrup). You can still use them yourself.</p>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`;
   };
   var needList = (k, need) => Object.entries(need).map(([id, n]) => `<span class="kneed ${larderCount(k, id) >= n ? "ok" : ""}">${pic(GROUP_ICON[id] || id, 22)}${n} ${esc(nm2(id, n))} <small>(${larderCount(k, id)})</small></span>`).join("");
   function larderPanel(F2) {
@@ -7512,17 +7577,24 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const v = vineState(F2), on = !v.help || v.help.cook !== false;
     h += `<p class="sub kcook">${on ? `Pilar runs the kitchen on her shifts (10am to 2:30pm, 4 to 9:30pm). You can still cook anything yourself.` : `Pilar's off for now. Turn her back on in the staff card at the shop counter.`}</p>${on && k.log && k.log.length ? `<ul class="klog">${k.log.map((l) => `<li>${esc(l[0].toUpperCase() + l.slice(1))}.</li>`).join("")}</ul>` : ""}`;
     h += `<section class="ktapas"><h3 class="ph3">Tapas of the day</h3>`;
+    const list2 = tapasAll(F2, today2), tomorrow2 = nextDay(today2), plan = v.tapasPlan && v.tapasPlan.day === tomorrow2 ? v.tapasPlan.ids : [];
     {
       const rq = requestOf(today2), R2 = TAPAS[rq.id];
-      h += `<p class="krequest">${icon("heart", 16)} <b>${esc(rq.who)}</b> has been craving <b>${esc(R2.n.toLowerCase())}</b>. Make it today's tapas and it sells for ${tapasPrice(rq.id, today2)} coins a plate instead of ${R2.price}.${t2 && t2.id === rq.id ? " It's on!" : ""} <small>Needs ${esc(needText(R2.need))}.</small></p>`;
+      h += `<p class="krequest">${icon("heart", 16)} <b>${esc(rq.who)}</b> has been craving <b>${esc(R2.n.toLowerCase())}</b>. Put it on today's chalkboard and it sells for ${tapasPrice(rq.id, today2)} coins a plate instead of ${R2.price}.${list2.some((t3) => t3.id === rq.id) ? " It's on!" : ""} <small>Needs ${esc(needText(R2.need))}.</small></p>`;
     }
-    if (t2) h += `<div class="kdish chosen">${dishArt("tapas:" + t2.id, 52)}<span><b>${esc(T.n)}</b><small>${t2.plates} plate${t2.plates === 1 ? "" : "s"} on the menu · ${tapasPrice(t2.id, today2)} coins each · needs ${needText(T.need)}</small><span class="kneeds">${needList(k, T.need)}</span></span></div>
-      <div class="actions"><button class="btn primary" data-k="cooktapas" ${has(k, T.need) ? "" : "disabled"}>Cook a batch (${TAPAS_PLATES} plates)</button>${!t2.cooked ? `<button class="btn alt small" data-k="untapas">Pick a different dish</button>` : ""}</div>
-      <p class="muted">Leftovers at closing time (10pm) go to the staff for dinner.</p>`;
-    else h += `<p class="sub">Pick today's dish. It goes on the chalkboard, sells for more than the small plates and brings extra people in. <b>${SEASONS[seasonOf(today2)].n}</b> menu: ${SEASONS[seasonOf(today2)].line.toLowerCase()}.</p><div class="kdishes">${Object.keys(TAPAS).filter((id) => inSeason(id, seasonOf(today2)) && knows(F2, id)).map((id) => {
+    list2.forEach((t3) => {
+      const T2 = TAPAS[t3.id];
+      h += `<div class="kdish chosen">${dishArt("tapas:" + t3.id, 52)}<span><b>${esc(T2.n)}</b><small>${t3.plates} plate${t3.plates === 1 ? "" : "s"} on the menu · ${tapasPrice(t3.id, today2)} coins each · needs ${needText(T2.need)}</small><span class="kneeds">${needList(k, T2.need)}</span></span></div>
+      <div class="actions"><button class="btn primary small" data-k="cooktapas" data-id="${t3.id}" ${has(k, T2.need) ? "" : "disabled"}>Cook a batch (${TAPAS_PLATES} plates)</button>${!t3.cooked ? `<button class="btn alt small" data-k="untapas" data-id="${t3.id}">Take it off</button>` : ""}</div>`;
+    });
+    if (list2.length) h += `<p class="muted">Leftovers at closing time (10pm) go to the staff for dinner.</p>`;
+    const chooser = (ids, act2, on2 = []) => `<div class="kdishes">${ids.map((id) => {
       const d = TAPAS[id], ok = has(k, d.need);
-      return `<button class="kdish ${ok ? "ok" : ""}" data-k="tapas" data-id="${id}">${dishArt("tapas:" + id, 46)}<span><b>${esc(d.n)}</b><small>${d.price} coins a plate</small><span class="kneeds">${needList(k, d.need)}</span></span></button>`;
+      return `<button class="kdish ${ok ? "ok" : ""}${on2.includes(id) ? " chosen" : ""}" data-k="${act2}" data-id="${id}" aria-pressed="${on2.includes(id)}">${dishArt("tapas:" + id, 46)}<span><b>${esc(d.n)}${on2.includes(id) ? " ✓" : ""}</b><small>${d.price} coins a plate</small><span class="kneeds">${needList(k, d.need)}</span></span></button>`;
     }).join("")}</div>`;
+    if (list2.length < TAPAS_MAX) h += `<p class="sub">${list2.length ? `Add another (${list2.length} of ${TAPAS_MAX})` : "Pick today's dish"}: it goes on the chalkboard, sells for more than the small plates and brings extra people in. <b>${SEASONS[seasonOf(today2)].n}</b> menu: ${SEASONS[seasonOf(today2)].line.toLowerCase()}.</p>${chooser(Object.keys(TAPAS).filter((id) => inSeason(id, seasonOf(today2)) && knows(F2, id) && !list2.some((t3) => t3.id === id)), "tapas")}`;
+    h += `<details class="kplan" data-kp="plan"${KP.plan ? " open" : ""}><summary><b>Plan tomorrow's tapas</b> <small>${plan.length ? plan.map((x) => esc(TAPAS[x].n)).join(", ") : `up to ${TAPAS_MAX}, they go on the chalkboard first thing`}</small></summary>${chooser(Object.keys(TAPAS).filter((id) => inSeason(id, seasonOf(tomorrow2)) && knows(F2, id)), "plantapas", plan)}</details>`;
+    h += `<details class="kplan" data-kp="pilar"${KP.pilar ? " open" : ""}><summary><b>Pilar's list</b> <small>what she may make without asking</small></summary><div class="gchips">${[["tapas", "Pick a tapas if I haven't"], ["bread", "Bake bread"], ["press", "Press cheese"], ...Object.keys(DISHES).map((id) => [id, DISHES[id].n])].map(([id, n]) => `<button class="gchip${k.pilarNo[id] ? "" : " on"}" data-k="pilarno" data-id="${id}" aria-pressed="${!k.pilarNo[id]}">${esc(n)}</button>`).join("")}</div><p class="muted">Untick anything you'd rather do yourself. To save particular ingredients, use <b>keep</b> in the larder.</p></details>`;
     h += `</section><h3 class="ph3">Small plates</h3><div class="items shop dishes">${Object.keys(DISHES).map((id) => {
       const d = DISHES[id], ok = has(k, d.need);
       return `<button class="item" data-k="dish" data-dish="${id}" ${ok ? "" : "disabled"}><span class="e">${dishArt(id, 44, !ok)}</span><span class="n">${esc(d.n)}</span><span class="c">${esc(needText(d.need))}</span><span class="d">${d.plates} plates · ${d.price} coins each</span></button>`;
@@ -7530,6 +7602,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function wireKitchen(root, F2, api4) {
+    root.querySelectorAll("details[data-kp]").forEach((d) => d.ontoggle = () => {
+      KP[d.dataset.kp] = d.open;
+    });
     root.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => {
       const k = b.dataset.k, id = b.dataset.dish || b.dataset.id;
       let line = null;
@@ -7555,13 +7630,22 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       else if (k === "cheese") line = takeCheese(F2);
       else if (k === "dish") line = cookDish(F2, id);
       else if (k === "tapas") line = chooseTapas(F2, id, api4.today);
-      else if (k === "untapas") {
-        const v = vineState(F2);
-        if (v.tapas && !v.tapas.cooked) {
-          v.tapas = null;
-          line = "Okay, pick another.";
-        }
-      } else if (k === "cooktapas") line = cookTapas(F2, api4.today);
+      else if (k === "untapas") line = dropTapas(F2, id, api4.today);
+      else if (k === "cooktapas") line = cookTapas(F2, api4.today, id);
+      else if (k === "plantapas") line = planTapas(F2, id, nextDay(api4.today));
+      else if (k === "keep") {
+        const n = setKeep(F2, id, +b.dataset.n);
+        api4.save();
+        api4.rerender();
+        return;
+      } else if (k === "pilarno") {
+        const kk = kitchenState(F2);
+        if (kk.pilarNo[id]) delete kk.pilarNo[id];
+        else kk.pilarNo[id] = true;
+        api4.save();
+        api4.rerender();
+        return;
+      }
       if (line) {
         api4.sfx(k === "send" || k === "sendall" ? "paper" : "chime");
         api4.say(line);
@@ -7600,7 +7684,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var PER_BATCH = 3;
   var BOTTLES = 6;
   var GLASSES = 5;
-  var platesLeft = (v) => Object.values(v.menu || {}).reduce((a, n) => a + n, 0) + (v.tapas ? v.tapas.plates || 0 : 0);
+  var tapasOn = (v, day) => (v.tapasList || []).filter((t2) => t2 && t2.day === day && TAPAS[t2.id]);
+  var platesLeft = (v) => Object.values(v.menu || {}).reduce((a, n) => a + n, 0) + (v.tapasList || []).reduce((a, t2) => a + (t2.plates || 0), 0);
   var OLIVE = 8 * H;
   var oliveRipe = (v) => !!v.olive && Date.now() - (v.olive.pickedAt || v.olive.planted) >= OLIVE;
   function vineState(F2) {
@@ -7626,6 +7711,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       v.grapes[k] = v.grapes[k] || 0;
       v.keep[k] = v.keep[k] || 0;
     });
+    if (v.tapas) {
+      v.tapasList = [v.tapas];
+      delete v.tapas;
+    }
+    v.tapasList = v.tapasList || [];
     v.lastTick = v.lastTick || Date.now();
     v.today = v.today || { day: "", bottles: 0, glasses: 0, coins: 0 };
     return v;
@@ -7795,12 +7885,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return (hm2 >= 17 * 60 && hm2 < 21 * 60 ? 2 : hm2 >= 12 * 60 && hm2 < 14 * 60 ? 1.3 : 1) * (weekend ? 1.5 : 1) * (1 + 0.4 * visitors);
   }
   function servePlate(v, gameDay, out) {
-    if (v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === gameDay && Math.random() < 0.65) {
-      v.tapas.plates--;
+    const taps = tapasOn(v, gameDay).filter((t2) => t2.plates > 0);
+    if (taps.length && Math.random() < 0.65) {
+      const t2 = taps[Math.floor(Math.random() * taps.length)];
+      t2.plates--;
       out.plates++;
       out.tapas = (out.tapas || 0) + 1;
-      out.coins += tapasPrice(v.tapas.id, gameDay);
-      out.dish = "tapas:" + v.tapas.id;
+      out.coins += tapasPrice(t2.id, gameDay);
+      out.dish = "tapas:" + t2.id;
       return;
     }
     const live3 = Object.keys(v.menu).filter((id2) => v.menu[id2] > 0 && DISHES[id2]);
@@ -7938,7 +8030,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       const onShelf = v.shelf.filter((s) => s.n > 0), open2 = v.shelf.find((s) => s.open > 0);
       const crate2 = Object.keys(v.fruit).filter((id) => v.fruit[id] > 0);
       if (!onShelf.length && !open2 && !platesLeft(v) && !crate2.length) continue;
-      const food = Object.keys(v.menu).filter((id) => v.menu[id] > 0 && DISHES[id]), tap = v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === new Date(at + off + 6 * H).toISOString().slice(0, 10);
+      const food = Object.keys(v.menu).filter((id) => v.menu[id] > 0 && DISHES[id]), tap = tapasOn(v, new Date(at + off + 6 * H).toISOString().slice(0, 10)).some((t3) => t3.plates > 0);
       const f2 = footfall(hm2, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1) * (F2.goals && F2.goals.cellar ? 1.15 : 1);
       const gameDay = new Date(at + off + 6 * H).toISOString().slice(0, 10);
       const plate = () => servePlate(v, gameDay, out);
@@ -8083,9 +8175,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   }
   function cafePanel(F2, guests, today2) {
     const v = vineState(F2), open2 = v.shelf.filter((s) => s.n > 0 || s.open > 0), menu = Object.keys(v.menu).filter((id) => v.menu[id] > 0 && DISHES[id]);
-    const t2 = v.tapas && v.tapas.day === today2 ? v.tapas : null, T = t2 && TAPAS[t2.id];
+    const taps = tapasOn(v, today2);
     return `<span class="tape stripe" aria-hidden="true"></span><h2>The tasting room</h2><p class="sub">${guests.length ? `${guests.join(" and ")} ${guests.length > 1 ? "are" : "is"} in for a tasting.` : "Quiet for now. Villagers drop in for a glass, mostly in the evenings and at weekends."}</p>
-    <p class="eyebrow">Tapas of the day</p>${T ? `<ul class="hlist wlist"><li><span class="wpic">${dishArt("tapas:" + t2.id, 52)}</span><span class="wtxt"><b>${esc(T.n)}</b><small>${t2.plates ? `${t2.plates} plate${t2.plates === 1 ? "" : "s"} left · ${T.price} coins each` : "All gone! Cook another batch in the kitchen."}</small></span></li></ul>` : `<p class="muted">Not chosen yet today. Pick one at the stove in the kitchen.</p>`}
+    <p class="eyebrow">Tapas of the day</p>${taps.length ? `<ul class="hlist wlist">${taps.map((t2) => {
+      const T = TAPAS[t2.id];
+      return `<li><span class="wpic">${dishArt("tapas:" + t2.id, 52)}</span><span class="wtxt"><b>${esc(T.n)}</b><small>${t2.plates ? `${t2.plates} plate${t2.plates === 1 ? "" : "s"} left · ${T.price} coins each` : "All gone! Cook another batch in the kitchen."}</small></span></li>`;
+    }).join("")}</ul>` : `<p class="muted">Not chosen yet today. Pick one at the stove in the kitchen.</p>`}
     <p class="eyebrow">Small plates</p>${menu.length ? `<ul class="hlist wlist">${menu.map((id) => `<li><span class="wpic">${dishArt(id, 46)}</span><span class="wtxt"><b>${esc(DISHES[id].n)}</b><small>${v.menu[id]} plate${v.menu[id] === 1 ? "" : "s"} left · ${DISHES[id].price} coins each</small></span></li>`).join("")}</ul>` : `<p class="muted">None on the menu. They're cooked at the stove in the kitchen.</p>`}
     <p class="eyebrow">By the glass</p>${open2.length ? `<ul class="hlist wlist">${open2.map((s) => `<li><span class="wpic">${glassArt(s.type, 40)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${STYLES2[s.type].n} · ${Math.max(1, Math.round(s.price / 4))} coins a glass</small></span></li>`).join("")}</ul>` : `<p class="muted">Stock the shelves and your wines are poured here too.</p>`}
     ${v.staffNote && v.staffNote.plates ? `<p class="muted">Last night's staff dinner: ${esc(v.staffNote.dish.toLowerCase())}. Marco, Ines and Celeste left something in the larder to say thanks.</p>` : ""}
@@ -8101,12 +8196,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function menuPanel(F2, today2) {
-    const v = vineState(F2), t2 = v.tapas && v.tapas.day === today2 && v.tapas.plates > 0 && TAPAS[v.tapas.id] ? v.tapas : null;
+    const v = vineState(F2), taps = tapasOn(v, today2).filter((t2) => t2.plates > 0);
     const plates = Object.keys(v.menu).filter((id) => v.menu[id] > 0 && DISHES[id]), wines = v.shelf.filter((s) => s.n > 0 || s.open > 0), fruit = Object.keys(v.fruit).filter((id) => v.fruit[id] > 0 && ITEMS[id]);
     const row2 = (pic3, name, note2, price) => `<li><span class="wpic">${pic3}</span><span class="wtxt"><b>${esc(name)}</b><small>${note2}</small></span><span class="mprice">${price}</span></li>`;
     const sec = (title, items) => items.length ? `<p class="eyebrow">${title}</p><ul class="hlist wlist chalk">${items.join("")}</ul>` : "";
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Today's menu</h2><p class="sub">${shopName(F2)}, open 10am to 10pm.</p>`;
-    const body2 = sec("Tapas of the day", t2 ? [row2(dishArt("tapas:" + t2.id, 46), TAPAS[t2.id].n, `${t2.plates} plate${t2.plates === 1 ? "" : "s"} left`, TAPAS[t2.id].price)] : []) + sec("Small plates", plates.map((id) => row2(dishArt(id, 42), DISHES[id].n, `${v.menu[id]} left`, DISHES[id].price))) + sec("By the glass", wines.map((s) => row2(glassArt(s.type, 36), s.name, STYLES2[s.type].n, Math.max(1, Math.round(s.price / 4))))) + sec("By the bottle", v.shelf.filter((s) => s.n > 0).map((s) => row2(bottleArt(s.type, 40), s.name, `${STYLES2[s.type].n} · ${s.n} on the shelf`, s.price))) + sec("From Ma Ma's orchard", fruit.map((id) => row2(icon(id, 34), ITEMS[id].n, `${v.fruit[id]} in the crate`, ITEMS[id].sell || 3)));
+    const body2 = sec("Tapas of the day", taps.map((t2) => row2(dishArt("tapas:" + t2.id, 46), TAPAS[t2.id].n, `${t2.plates} plate${t2.plates === 1 ? "" : "s"} left`, TAPAS[t2.id].price))) + sec("Small plates", plates.map((id) => row2(dishArt(id, 42), DISHES[id].n, `${v.menu[id]} left`, DISHES[id].price))) + sec("By the glass", wines.map((s) => row2(glassArt(s.type, 36), s.name, STYLES2[s.type].n, Math.max(1, Math.round(s.price / 4))))) + sec("By the bottle", v.shelf.filter((s) => s.n > 0).map((s) => row2(bottleArt(s.type, 40), s.name, `${STYLES2[s.type].n} · ${s.n} on the shelf`, s.price))) + sec("From Ma Ma's orchard", fruit.map((id) => row2(icon(id, 34), ITEMS[id].n, `${v.fruit[id]} in the crate`, ITEMS[id].sell || 3)));
     h += body2 || `<p class="muted">Nothing on today. Bottle some wine and stock the shelves, or cook something in the kitchen.</p>`;
     return h + `<p class="muted">Prices in coins.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -18515,8 +18610,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   migrate();
   setArtContext({ cocoa: () => cocoaState(F), ohayo: () => ohayoHellos(), F: () => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => {
-    const t2 = tapasToday(F, dayKey());
-    return t2 ? TAPAS[t2.id].n : null;
+    const l = tapasAll(F, dayKey());
+    return l.length ? l.map((t2) => TAPAS[t2.id].n).join(" · ") : null;
   }, vineStock: () => shelfStock(vineState(F)), S: () => S2, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth2(p), stats: () => ST, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), goodNews: () => {
     const g = goodNews();
     return g && F.goodRead !== g.at ? g : null;
@@ -22454,6 +22549,14 @@ ${SIGNOFF[t2.who] || ""}`;
     m.querySelectorAll(".oshoe").forEach((e) => fill2(e, w && w.shoes ? c("shoes", "#2F2B28") : null));
     const long = !!(w && w.bottom && !w.dress && !/short|skirt|skort|mini/i.test(w.bottom));
     m.querySelectorAll(".otrouser").forEach((e) => fill2(e, long ? c("bottom", "#2F2B28") : null));
+    {
+      const hips = $("oHips"), sides = $("oHipSides");
+      if (hips) {
+        hips.setAttribute("d", long ? "M-8.6 -23 h17.2 l-0.4 8.6 h-16.4z" : "M-8.6 -23 h17.2 l1 9.5 h-8 l-1.6 -3 l-1.6 3 h-8z");
+        hips.style.stroke = long ? "none" : "";
+      }
+      if (sides) sides.style.display = long ? "" : "none";
+    }
     const bag2 = $("oBag");
     bag2.style.display = w && w.bag ? "" : "none";
     if (w && w.bag) bag2.querySelector("rect").style.fill = c("bag", "#2F2B28");

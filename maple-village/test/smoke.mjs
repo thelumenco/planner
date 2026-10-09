@@ -1070,7 +1070,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     if (q.includes("menupatch")) { f.coins = 40; f.inv = Object.assign(f.inv || {}, {potato: 2}); }
     if (q.includes("menupatch")) { f.inv = Object.assign(f.inv || {}, {flour: 1, egg: 2, olives: 1}); }
     if (q.includes("menupatch")) { f.vine = f.vine || {}; f.vine.help = Object.assign(f.vine.help || {}, {cook: false}); }   // Mel cooks herself here (Pilar has her own test)
-    if (q.includes("dinnerpatch")) { f.vine.tapas.day = "2026-01-01"; }
+    if (q.includes("dinnerpatch")) { (f.vine.tapasList || []).forEach(t => { t.day = "2026-01-01"; }); }
     if (q.includes("goatpatch")) { f.coins = 200; f.pets = f.pets || {run: 0, animals: [], next: 1}; f.pets.animals = [{id: "g1", kind: "goat", name: "Biscuit", born: Date.now(), feeds: 3, fedDay: null, col: 0}]; f.inv = Object.assign(f.inv || {}, {goatfeed: 1}); }
     if (q.includes("platepatch")) { f.vine = f.vine || {}; f.vine.shelf = [{id: "w9", name: "Test Red", type: "red", n: 40, price: 24, open: 0}]; f.vine.menu = {cheese: 40}; f.vine.lastTick = Date.now() - 600*60e3; }
     localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
@@ -1110,7 +1110,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="tapas"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-k="tapas"]').count() === 26, "the stove offers this season's tapas (26 in autumn: garden, seafood, farm and woods dishes)");
   await page.click('#ctx [data-k="tapas"][data-id="tortilla"]'); await page.waitForTimeout(200); await page.click('#ctx [data-k="cooktapas"]'); await page.waitForTimeout(300);
-  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapas.id === "tortilla" && f.vine.tapas.plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapasList[0].id === "tortilla" && f.vine.tapasList[0].plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
   await page.click('#ctx [data-k="dish"][data-dish="olives"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.menu.olives === 4), "small plates are cooked at the stove too");
   await page.click('#ctx [data-close]');
@@ -1119,7 +1119,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(/Tortilla/.test(await page.locator("#sceneArt").textContent()), "the shop's chalkboard names today's tapas");
   // the next day: leftovers went to the staff, who left something in the larder
   await page.goto(url + "?seed=1&time=18:00&dinnerpatch=1"); await page.waitForTimeout(4200);
-  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.staffNote && f.vine.staffNote.plates === 6 && f.vine.tapas.plates === 0 && f.kitchen.larder.olives >= 1; }), "leftover tapas go to the staff for dinner, and they leave thanks in the larder");
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.staffNote && f.vine.staffNote.plates === 6 && !(f.vine.tapasList || []).some(t => t.plates) && f.kitchen.larder.olives >= 1; }), "leftover tapas go to the staff for dinner, and they leave thanks in the larder");
   // Hana's deli shelf and the goat
   await page.evaluate(() => window.__mapleScene("market")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="stall"]').dispatchEvent("click").catch(() => {}); await page.waitForTimeout(600);
@@ -1218,7 +1218,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     const H = 3600e3, t = Date.now(); f.vine = f.vine || {}; f.vine.rows = [0, 1, 2].map(i => ({trellis: i === 0, vines: [null, null, null]}));
     f.vine.rows[0].vines[0] = {v: "red", planted: t - 20*H, wateredAt: t - 9*H}; f.vine.grapes = {red: 0, white: 0}; f.vine.barrels = [null];
     f.vine.cellar = [{id: "wc1", name: "Cellar White", type: "white", n: 6}]; f.vine.shelf = [{id: "ws1", name: "Evan's Blush", type: "rose", n: 6, price: 15, open: 2}];
-    f.vine.lastTick = t - 3*60e3; f.vine.menu = {}; f.vine.tapas = null;
+    f.vine.lastTick = t - 3*60e3; f.vine.menu = {}; f.vine.tapasList = [];
     f.kitchen = {larder: {flour: 2, milk: 2, potato: 4, egg: 4, olives: 2, loaf: 1}, oven: null, press: null};
     localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
   await page.goto(url + "?reset=1&seed=1&time=11:10&date=2026-10-05"); await page.waitForTimeout(900);
@@ -1227,7 +1227,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(st.v.rows[0].vines[0].wateredAt && Date.now() - st.v.rows[0].vines[0].wateredAt < 3600e3 && st.v.barrels[0] && st.v.barrels[0].style === "red", "Marco and Ines pick the ripe vine, water it again and fill the empty barrel with red");
   check(!st.v.cellar.length && st.v.shelf.some(s => s.name === "Cellar White" && s.n === 6), "Celeste stocks the cellar's wine on the shelves");
   check(!!st.k.oven && !!st.k.press, "Pilar puts bread in the oven and milk in the cheese press");
-  check(st.v.tapas && st.v.tapas.id === "tortilla" && st.v.tapas.plates === 6, "she picks the dearest tapas the larder can make (tortilla) and cooks a batch");
+  check(st.v.tapasList[0] && st.v.tapasList[0].id === "tortilla" && st.v.tapasList[0].plates === 6, "she picks the dearest tapas the larder can make (tortilla) and cooks a batch");
   check(st.v.menu.bread > 0 && st.v.menu.olives > 0, "and cooks small plates from what's left");
   await page.evaluate(() => window.__mapleScene("kitchen")); await page.waitForTimeout(800);
   check(await page.locator('#actors [data-npc="pilar"]').count() === 1, "Pilar is in the kitchen on her shift");
@@ -2505,7 +2505,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const txt = await page.locator("#ctx").textContent();
   check(["Grilled halloumi with honey", "Huevos rotos", "Yoghurt with honey and walnuts", "Grilled sardines"].every(n => txt.includes(n)) && ["Honey cake", "Flower shortbread", "Blueberry tart", "Farm cheese board"].every(n => txt.includes(n)), "new tapas (halloumi, huevos rotos, yoghurt, seafood) and small plates (honey cake, flower shortbread, blueberry tart, farm cheese board)");
   await page.locator('#ctx [data-k="tapas"][data-id="halloumi"]').click(); await page.waitForTimeout(200); await page.locator('#ctx [data-k="cooktapas"]').click(); await page.waitForTimeout(300);
-  check(await fox().then(f => f.vine.tapas.id === "halloumi" && f.vine.tapas.plates === 6 && !f.kitchen.larder.chz_halloumi && f.kitchen.larder.honey === 1), "Wildflower Farm's halloumi and honey make grilled halloumi with honey");
+  check(await fox().then(f => f.vine.tapasList.some(t => t.id === "halloumi" && t.plates === 6) && !f.kitchen.larder.chz_halloumi && f.kitchen.larder.honey === 1), "Wildflower Farm's halloumi and honey make grilled halloumi with honey");
   await page.locator('#ctx [data-k="dish"][data-dish="shortbread"]').click(); await page.waitForTimeout(300);
   check(await fox().then(f => f.vine.menu.shortbread === 4 && !f.kitchen.larder.tulip), "garden tulips go into flower shortbread");
   await page.close();
@@ -2757,6 +2757,22 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-tickets]'); await page.waitForTimeout(400);
   check(await page.locator("#ctx [data-trip]").count() === 0 && /last train to Ronda gone/.test(await page.locator("#ctx").innerText()), "after 6pm there are no more trains out to Ronda");
   await page.close();
+}
+{
+  console.log("\nPilar's list, keeping things back, and more tapas");
+  const k = await import(new URL("../src/game/kitchen.js", import.meta.url)), day = "2026-10-14", F = {coins: 0, inv: {}};
+  const kk = k.kitchenState(F); Object.assign(kk.larder, {tulip: 2, flour: 3, potato: 4, egg: 4, tomato: 4, loaf: 2});
+  k.setKeep(F, "tulip", 2);
+  k.cookTick(F, day);
+  check(kk.larder.tulip === 2 && !(F.vine.menu || {}).shortbread, "flowers kept back for petal syrup: Pilar doesn't make flower shortbread with them");
+  kk.pilarNo.bread = true; kk.pilarNo.tapas = true; F.vine.tapasList = []; kk.larder.flour = 1; kk.oven = null;
+  k.cookTick(F, day);
+  check(!kk.oven && !k.tapasAll(F, day).length, "untick bread and tapas on Pilar's list: she leaves the oven and the chalkboard to Mel");
+  ["tortilla", "huevos", "patatas", "puerros"].forEach(id => k.chooseTapas(F, id, day));
+  check(k.tapasAll(F, day).map(t => t.id).join() === "tortilla,huevos,patatas", "up to three tapas of the day on the chalkboard");
+  check(!!k.dropTapas(F, "patatas", day) && k.tapasAll(F, day).length === 2, "and one can come off again before it's cooked");
+  k.planTapas(F, "puerros", "2026-10-15"); k.planTapas(F, "tortilla", "2026-10-15");
+  check(k.tapasAll(F, "2026-10-15").map(t => t.id).join() === "puerros,tortilla", "tomorrow's planned tapas are on the chalkboard first thing the next day");
 }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }

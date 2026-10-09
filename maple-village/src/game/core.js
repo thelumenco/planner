@@ -7,7 +7,7 @@ import { brollyArt, hoodArt } from "../art/people.js";
 import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, stormyOn, rainLevel, FESTIVALS } from "../art/village-extras.js";
 import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, orchardArt, flowerFarmArt, setArtContext } from "../art/scenes.js";
 import { vineSpot } from "../art/vineyard.js";
-import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, TAPAS, cookTick, cookLine } from "./kitchen.js";
+import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, tapasAll, TAPAS, cookTick, cookLine } from "./kitchen.js";
 import { questBoost } from "./vineyard.js";
 import { vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, counterPanel, boxPanel, cafePanel, olivePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel, stallMarketPanel } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
@@ -108,7 +108,7 @@ function migrate(){
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
-setArtContext({cocoa: () => cocoaState(F), ohayo: () => ohayoHellos(), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const t = tapasToday(F, dayKey()); return t ? TAPAS[t.id].n : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf(), kudos: () => kudosCount(), vault: x => { const i = [70, 165, 260, 355, 450].indexOf(x); return i < 0 ? null : jarAt(i); }, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, kid: () => ({sleep: kid.sleep || evanNight()})});
+setArtContext({cocoa: () => cocoaState(F), ohayo: () => ohayoHellos(), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf(), kudos: () => kudosCount(), vault: x => { const i = [70, 165, 260, 355, 450].indexOf(x); return i < 0 ? null : jarAt(i); }, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, kid: () => ({sleep: kid.sleep || evanNight()})});
 function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
@@ -1940,6 +1940,8 @@ function applyWear(pj){
   // trousers go all the way down to the shoes; shorts and skirts stay short
   const long = !!(w && w.bottom && !w.dress && !/short|skirt|skort|mini/i.test(w.bottom));
   m.querySelectorAll(".otrouser").forEach(e => fill(e, long ? c("bottom", "#2F2B28") : null));
+  // trousers: the hips run straight on into the legs (no shorts hem drawn across them)
+  { const hips = $("oHips"), sides = $("oHipSides"); if (hips) { hips.setAttribute("d", long ? "M-8.6 -23 h17.2 l-0.4 8.6 h-16.4z" : "M-8.6 -23 h17.2 l1 9.5 h-8 l-1.6 -3 l-1.6 3 h-8z"); hips.style.stroke = long ? "none" : ""; } if (sides) sides.style.display = long ? "" : "none"; }
   const bag = $("oBag"); bag.style.display = w && w.bag ? "" : "none"; if (w && w.bag) bag.querySelector("rect").style.fill = c("bag", "#2F2B28");
   const ear = $("oEar"); ear.style.display = w && w.jewellery ? "" : "none";
   if (w && w.jewellery) ear.querySelectorAll("circle").forEach(e => e.style.fill = /silver|platinum|white gold/i.test(w.jewellery) ? "#BFC3CA" : /pearl/i.test(w.jewellery) ? "#F6F1E8" : "#D9A93A");

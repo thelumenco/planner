@@ -845,3 +845,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .tile{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:inherit;font:inherit;cursor:pointer;text-align:center}
 .tile b{font-size:.74rem;line-height:1.15}.tile small{font-size:.7rem;opacity:.75}.tile.own{background:#DCEBF6}.tile:disabled{cursor:default}.tile:disabled:not(.own){opacity:.6}
 @media (max-width:420px){.tilegrid{grid-template-columns:repeat(2,1fr)}}
+/* round 108: the larder's keep-back counters, and the stove's plan and Pilar's list */
+.kgoodw{display:flex;flex-direction:column;align-items:stretch;gap:3px}
+.kkeep{display:flex;align-items:center;justify-content:center;gap:3px;font-size:.72rem}.kkeep .btn{padding:0 7px;min-height:22px;line-height:1}
+.kplan{margin:8px 0;padding:6px 8px;border:1.5px dashed var(--line);border-radius:10px}.kplan summary{cursor:pointer}.kplan summary small{opacity:.75;margin-left:4px}

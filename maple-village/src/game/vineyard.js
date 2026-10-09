@@ -24,7 +24,9 @@ export function addCuttings(F, kind, n){ const v = vineState(F); v.cuttings[kind
 export const SHOP = {cut_red: {n: "Red grape vine", price: 20, say: "A red grape cutting. Plant it on a trellis."}, cut_white: {n: "White grape vine", price: 20, say: "A white grape cutting. Plant it on a trellis."},
   olive: {n: "Olive tree", price: 150, say: "An olive tree, planted by the path. Olives in about eight hours."}, trellis: {n: "Trellis (one row)", price: 80, say: "A new trellis row, ready for three vines."}, barrel: {n: "Oak barrel", price: 150, say: "Another barrel for the cellar."}, terrace: {n: "Shop terrace", price: 600, say: "Tables and a vine-covered pergola outside the wine shop. More people stop for a glass."}};
 const BUNCHES = 3, PER_BATCH = 3, BOTTLES = 6, GLASSES = 5;
-export const platesLeft = v => Object.values(v.menu || {}).reduce((a, n) => a + n, 0) + (v.tapas ? v.tapas.plates || 0 : 0);
+// the tapas of the day (round 108: up to three a day): v.tapasList = [{day, id, plates, cooked}]
+export const tapasOn = (v, day) => (v.tapasList || []).filter(t => t && t.day === day && TAPAS[t.id]);
+export const platesLeft = v => Object.values(v.menu || {}).reduce((a, n) => a + n, 0) + (v.tapasList || []).reduce((a, t) => a + (t.plates || 0), 0);
 // the olive tree (bought at the stall, planted by the path): ripe every 8 hours, two jars of olives a picking
 export const OLIVE = 8*H;
 export const oliveRipe = v => !!v.olive && Date.now() - (v.olive.pickedAt || v.olive.planted) >= OLIVE;
@@ -36,6 +38,8 @@ export function vineState(F){
   v.barrels = v.barrels || [null]; v.cellar = v.cellar || []; v.shelf = v.shelf || []; v.box = v.box || 0; v.sold = v.sold || 0; v.glasses = v.glasses || 0; v.menu = v.menu || {}; v.plates = v.plates || 0; v.fruit = v.fruit || {};
   v.help = Object.assign({cook: true, pick: true, barrels: true, stock: true, fetch: false}, v.help || {}); v.names = v.names || {};
   ["tempranillo"].forEach(k => { v.cuttings[k] = v.cuttings[k] || 0; v.grapes[k] = v.grapes[k] || 0; v.keep[k] = v.keep[k] || 0; });
+  if (v.tapas) { v.tapasList = [v.tapas]; delete v.tapas; }   // (saves from before round 108 had one tapas a day)
+  v.tapasList = v.tapasList || [];
   v.lastTick = v.lastTick || Date.now(); v.today = v.today || {day: "", bottles: 0, glasses: 0, coins: 0};
   return v;
 }
@@ -140,7 +144,8 @@ function footfall(hm, weekend, visitors){ return (hm >= 17*60 && hm < 21*60 ? 2 
 // -> {bottles, glasses, coins, toBox, watered, mins} or null when nothing happened
 // One plate for a customer: the tapas of the day first (65% of the time, on its own day), else a small plate
 function servePlate(v, gameDay, out){
-  if (v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === gameDay && Math.random() < .65) { v.tapas.plates--; out.plates++; out.tapas = (out.tapas || 0) + 1; out.coins += tapasPrice(v.tapas.id, gameDay); out.dish = "tapas:" + v.tapas.id; return; }
+  const taps = tapasOn(v, gameDay).filter(t => t.plates > 0);
+  if (taps.length && Math.random() < .65) { const t = taps[Math.floor(Math.random()*taps.length)]; t.plates--; out.plates++; out.tapas = (out.tapas || 0) + 1; out.coins += tapasPrice(t.id, gameDay); out.dish = "tapas:" + t.id; return; }
   const live = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]); if (!live.length) return; const id = live[Math.floor(Math.random()*live.length)];
   v.menu[id]--; if (!v.menu[id]) delete v.menu[id]; out.plates++; out.coins += DISHES[id].price; out.dish = id;
 }
@@ -192,7 +197,7 @@ export function sellTick(F, opts = {}){
     if (hm < 10*60 || hm >= 22*60) continue;
     const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); const crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0);
     if (!onShelf.length && !open && !platesLeft(v) && !crate.length) continue;
-    const food = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]), tap = v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === new Date(at + off + 6*H).toISOString().slice(0, 10);
+    const food = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]), tap = tapasOn(v, new Date(at + off + 6*H).toISOString().slice(0, 10)).some(t => t.plates > 0);
     const f = footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1) * (F.goals && F.goals.cellar ? 1.15 : 1);   // the cellar door (a big goal) draws a few more visitors
     const gameDay = new Date(at + off + 6*H).toISOString().slice(0, 10);   // the game's day (it turns over at 2am)
     const plate = () => servePlate(v, gameDay, out);
@@ -288,9 +293,9 @@ export function boxPanel(F){ const v = vineState(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The honesty box</h2><p class="sub">${v.box ? `${v.box} coins inside, left by customers while you were away.` : "Empty for now. Villagers drop coins in when they buy."}</p>
     <div class="actions">${v.box ? `<button class="btn primary" data-vy="collect">Collect ${v.box} coins</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`; }
 export function cafePanel(F, guests, today){ const v = vineState(F), open = v.shelf.filter(s => s.n > 0 || s.open > 0), menu = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]);
-  const t = v.tapas && v.tapas.day === today ? v.tapas : null, T = t && TAPAS[t.id];
+  const taps = tapasOn(v, today);
   return `<span class="tape stripe" aria-hidden="true"></span><h2>The tasting room</h2><p class="sub">${guests.length ? `${guests.join(" and ")} ${guests.length > 1 ? "are" : "is"} in for a tasting.` : "Quiet for now. Villagers drop in for a glass, mostly in the evenings and at weekends."}</p>
-    <p class="eyebrow">Tapas of the day</p>${T ? `<ul class="hlist wlist"><li><span class="wpic">${dishArt("tapas:" + t.id, 52)}</span><span class="wtxt"><b>${esc(T.n)}</b><small>${t.plates ? `${t.plates} plate${t.plates === 1 ? "" : "s"} left · ${T.price} coins each` : "All gone! Cook another batch in the kitchen."}</small></span></li></ul>` : `<p class="muted">Not chosen yet today. Pick one at the stove in the kitchen.</p>`}
+    <p class="eyebrow">Tapas of the day</p>${taps.length ? `<ul class="hlist wlist">${taps.map(t => { const T = TAPAS[t.id]; return `<li><span class="wpic">${dishArt("tapas:" + t.id, 52)}</span><span class="wtxt"><b>${esc(T.n)}</b><small>${t.plates ? `${t.plates} plate${t.plates === 1 ? "" : "s"} left · ${T.price} coins each` : "All gone! Cook another batch in the kitchen."}</small></span></li>`; }).join("")}</ul>` : `<p class="muted">Not chosen yet today. Pick one at the stove in the kitchen.</p>`}
     <p class="eyebrow">Small plates</p>${menu.length ? `<ul class="hlist wlist">${menu.map(id => `<li><span class="wpic">${dishArt(id, 46)}</span><span class="wtxt"><b>${esc(DISHES[id].n)}</b><small>${v.menu[id]} plate${v.menu[id] === 1 ? "" : "s"} left · ${DISHES[id].price} coins each</small></span></li>`).join("")}</ul>` : `<p class="muted">None on the menu. They're cooked at the stove in the kitchen.</p>`}
     <p class="eyebrow">By the glass</p>${open.length ? `<ul class="hlist wlist">${open.map(s => `<li><span class="wpic">${glassArt(s.type, 40)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${STYLES[s.type].n} · ${Math.max(1, Math.round(s.price/4))} coins a glass</small></span></li>`).join("")}</ul>` : `<p class="muted">Stock the shelves and your wines are poured here too.</p>`}
     ${v.staffNote && v.staffNote.plates ? `<p class="muted">Last night's staff dinner: ${esc(v.staffNote.dish.toLowerCase())}. Marco, Ines and Celeste left something in the larder to say thanks.</p>` : ""}
@@ -307,12 +312,12 @@ export function stallMarketPanel(F, serving){
 }
 // The chalkboard menu: everything that's actually available right now, with prices
 export function menuPanel(F, today){
-  const v = vineState(F), t = v.tapas && v.tapas.day === today && v.tapas.plates > 0 && TAPAS[v.tapas.id] ? v.tapas : null;
+  const v = vineState(F), taps = tapasOn(v, today).filter(t => t.plates > 0);
   const plates = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]), wines = v.shelf.filter(s => s.n > 0 || s.open > 0), fruit = Object.keys(v.fruit).filter(id => v.fruit[id] > 0 && ITEMS[id]);
   const row = (pic, name, note, price) => `<li><span class="wpic">${pic}</span><span class="wtxt"><b>${esc(name)}</b><small>${note}</small></span><span class="mprice">${price}</span></li>`;
   const sec = (title, items) => items.length ? `<p class="eyebrow">${title}</p><ul class="hlist wlist chalk">${items.join("")}</ul>` : "";
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Today's menu</h2><p class="sub">${shopName(F)}, open 10am to 10pm.</p>`;
-  const body = sec("Tapas of the day", t ? [row(dishArt("tapas:" + t.id, 46), TAPAS[t.id].n, `${t.plates} plate${t.plates === 1 ? "" : "s"} left`, TAPAS[t.id].price)] : [])
+  const body = sec("Tapas of the day", taps.map(t => row(dishArt("tapas:" + t.id, 46), TAPAS[t.id].n, `${t.plates} plate${t.plates === 1 ? "" : "s"} left`, TAPAS[t.id].price)))
     + sec("Small plates", plates.map(id => row(dishArt(id, 42), DISHES[id].n, `${v.menu[id]} left`, DISHES[id].price)))
     + sec("By the glass", wines.map(s => row(glassArt(s.type, 36), s.name, STYLES[s.type].n, Math.max(1, Math.round(s.price/4)))))
     + sec("By the bottle", v.shelf.filter(s => s.n > 0).map(s => row(bottleArt(s.type, 40), s.name, `${STYLES[s.type].n} · ${s.n} on the shelf`, s.price)))

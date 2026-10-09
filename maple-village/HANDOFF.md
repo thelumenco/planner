@@ -1595,3 +1595,13 @@ Write the proposal for Mel covering every item below. Only build after she says 
     - Darren wanders the steps.
     - Evan comments on each screen and sticks by Mel on the bridge.
   - **Art and props:** the props are people.js extras (`guitar`, `sketchbook`, `camera`, `notebook`, `newspaper`; npcs.js `PROPS`). The animations are in npcs.css (`act-guitar`, `act-dance`, `act-haggle`, `act-sketch`, `act-doze`).
+
+### Round 108: trousers, the letterbox flag, and running the kitchen
+- **Wardrobe:** a bottom that isn't shorts or a skirt shows long trouser legs (`.otrouser` in index.html). The hips (`#oHips`) lose the shorts hem, so it reads as one garment (core.js `applyWear`).
+- **Letterbox:** only the newest daily paper and the newest weekend edition count as unread (core.js `stalePapers`).
+- **Kitchen:**
+  - `k.keep` (larder id -> count): the larder's keep steppers; Pilar never uses kept stock (`canSpare`/`useSpare`).
+  - `k.pilarNo` (Pilar's list on the stove): dishes, "tapas", "bread" and "press" she may not do on her own.
+  - Tapas: `v.tapasList` (up to `TAPAS_MAX` 3 a day; old `v.tapas` migrates in `vineState`).
+  - `v.tapasPlan` = {day, ids}: tomorrow's tapas, applied by `tapasAll` on the day.
+  - Fold-outs remember being open (`KP`).
