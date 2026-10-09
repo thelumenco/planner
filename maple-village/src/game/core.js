@@ -50,7 +50,7 @@ import { hwoodsArt } from "../art/hwoods.js";
 import { greenhouseArt, GH_BED_AT } from "../art/greenhouse.js";
 import { millArt } from "../art/mill.js";
 import { millState, pressLeft, millPanel, startPress, collectOil } from "./mill.js";
-import { ghState, ghGrowth, bedPanel, ghPlant, ghHarvest, ghBoost } from "./greenhouse.js";
+import { ghState, ghGrowth, bedPanel, ghPlant, ghHarvest, ghBoost, setGhCompost } from "./greenhouse.js";
 import { rondaArt, trainRideArt } from "../art/town-ronda.js";
 import { TOWNS, townOf, TOWN_BOUNDS } from "../data/towns.js";
 import { rondaPanel, rondaVisit, buyGood, buyVines, taste, buyTile, picnic as rondaPicnic, tileBench } from "./ronda.js";
@@ -3222,6 +3222,7 @@ initNpcs({sfx, story: id => tellStory(F, id, addInv), storyReady: id => !!storyR
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();
 initTrips(() => F);
+setGhCompost(() => !!(F.tools || {}).compost);
 // Pick up where Mel left off (round 105): the same game day, back on the screen she closed the game on (a new day, she
 // wakes up at home as usual). F.where is kept by save().
 { const w = !globalThis.__mapleNoResume && F.where, ok = w && w.day === dayKey() && w.scene && w.scene !== scene && (OUTDOOR.includes(w.scene) || ROOMS[w.scene] || INNER[w.scene] || VILLAGE[w.scene]) && !["kidroom", "room"].includes(w.scene) && (!townOf(w.scene) || !!tripOn(F));

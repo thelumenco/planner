@@ -16393,7 +16393,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     g.beds = g.beds || Array(GH_BEDS).fill(null);
     return g;
   }
-  var ghGrowth = (b) => b && b.crop ? Math.min(1, (Date.now() - b.plantedAt + (b.bonus || 0)) / CROPS[b.crop].dur) : 0;
+  var compostOn = () => false;
+  var setGhCompost = (fn) => {
+    compostOn = fn;
+  };
+  var ghGrowth = (b) => b && b.crop ? Math.min(1, (Date.now() - b.plantedAt + (b.bonus || 0)) / (CROPS[b.crop].dur / (compostOn() ? 1.25 : 1))) : 0;
   var ghSeeds = (F2) => Object.keys(F2.inv || {}).filter((id) => F2.inv[id] > 0 && ITEMS[id] && ITEMS[id].kind === "seed" && CROPS[ITEMS[id].crop]);
   function ghPlant(F2, i, seed2, addInv2) {
     const g = ghState(F2), it = ITEMS[seed2];
@@ -16433,7 +16437,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       return h + (seeds.length ? `<p class="sub">What shall we grow? Herbs grow here all year, and so does anything else, whatever the season.</p><ul class="hlist wlist">${seeds.map((id) => `<li><span class="wpic">${icon(ITEMS[id].crop, 26)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${dur3(CROPS[ITEMS[id].crop].dur)} to grow · ${F2.inv[id]} in your backpack</small></span><button class="btn small primary" data-gh="plant" data-i="${i}" data-id="${id}">Plant</button></li>`).join("")}</ul>` : `<p class="sub">No seeds in your backpack. Hana's seed shelf has herbs, and greenhouse packets of anything out of season.</p>`) + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
     }
     const gr = ghGrowth(b), C3 = CROPS[b.crop];
-    h += gr >= 1 ? `<p class="sub">${icon(b.crop, 18)} ${esc(C3.n)} is ready!</p><div class="actions"><button class="btn yes" data-gh="harvest" data-i="${i}">Harvest</button><button class="btn alt small" data-close="1">Close</button></div>` : `<p class="sub">${icon(b.crop, 18)} ${esc(C3.n)}, growing under the glass. About ${dur3(C3.dur * (1 - gr))} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(gr * 100).toFixed(0)}%"></i></div><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+    h += gr >= 1 ? `<p class="sub">${icon(b.crop, 18)} ${esc(C3.n)} is ready!</p><div class="actions"><button class="btn yes" data-gh="harvest" data-i="${i}">Harvest</button><button class="btn alt small" data-close="1">Close</button></div>` : `<p class="sub">${icon(b.crop, 18)} ${esc(C3.n)}, growing under the glass. About ${dur3(C3.dur / (compostOn() ? 1.25 : 1) * (1 - gr))} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(gr * 100).toFixed(0)}%"></i></div><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
     return h;
   }
 
@@ -26683,6 +26687,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
   });
   measureHud();
   initTrips(() => F);
+  setGhCompost(() => !!(F.tools || {}).compost);
   {
     const w = !globalThis.__mapleNoResume && F.where, ok = w && w.day === dayKey() && w.scene && w.scene !== scene && (OUTDOOR.includes(w.scene) || ROOMS[w.scene] || INNER[w.scene] || VILLAGE[w.scene]) && !["kidroom", "room"].includes(w.scene) && (!townOf(w.scene) || !!tripOn(F));
     if (ok) {

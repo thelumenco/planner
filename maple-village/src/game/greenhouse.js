@@ -11,7 +11,10 @@ import { ITEMS, CROPS } from "../data/items.js";
 export const GH_BEDS = 6;
 export function ghState(F){ F.gh = F.gh || {}; const g = F.gh; g.beds = g.beds || Array(GH_BEDS).fill(null); return g; }
 // finishing quests speeds the greenhouse up too (bonus ms, like the garden)
-export const ghGrowth = b => b && b.crop ? Math.min(1, (Date.now() - b.plantedAt + (b.bonus || 0))/CROPS[b.crop].dur) : 0;
+// the shed's compost (a garden tool) works in here too: everything grows a quarter faster
+let compostOn = () => false;
+export const setGhCompost = fn => { compostOn = fn; };
+export const ghGrowth = b => b && b.crop ? Math.min(1, (Date.now() - b.plantedAt + (b.bonus || 0))/(CROPS[b.crop].dur/(compostOn() ? 1.25 : 1))) : 0;
 // seeds the greenhouse takes: herb packets, greenhouse packets, and ordinary seasonal seeds too
 export const ghSeeds = F => Object.keys(F.inv || {}).filter(id => F.inv[id] > 0 && ITEMS[id] && ITEMS[id].kind === "seed" && CROPS[ITEMS[id].crop]);
 export function ghPlant(F, i, seed, addInv){
@@ -35,6 +38,6 @@ export function bedPanel(F, i){
       : `<p class="sub">No seeds in your backpack. Hana's seed shelf has herbs, and greenhouse packets of anything out of season.</p>`) + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`; }
   const gr = ghGrowth(b), C = CROPS[b.crop];
   h += gr >= 1 ? `<p class="sub">${icon(b.crop, 18)} ${esc(C.n)} is ready!</p><div class="actions"><button class="btn yes" data-gh="harvest" data-i="${i}">Harvest</button><button class="btn alt small" data-close="1">Close</button></div>`
-    : `<p class="sub">${icon(b.crop, 18)} ${esc(C.n)}, growing under the glass. About ${dur(C.dur*(1 - gr))} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(gr*100).toFixed(0)}%"></i></div><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+    : `<p class="sub">${icon(b.crop, 18)} ${esc(C.n)}, growing under the glass. About ${dur(C.dur/(compostOn() ? 1.25 : 1)*(1 - gr))} to go. Every finished quest takes 30 minutes off.</p><div class="plotbar"><i style="width:${(gr*100).toFixed(0)}%"></i></div><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   return h;
 }
