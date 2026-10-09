@@ -1105,7 +1105,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const k = JSON.parse(localStorage.getItem("fox.fox")).kitchen; return !!k.oven && !k.larder.flour; }), "flour goes in the oven to bake");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="tapas"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-k="tapas"]').count() === 8, "the stove offers this season's garden tapas (eight in autumn)");
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 24, "the stove offers this season's tapas (24 in autumn: garden, seafood and farm dishes)");
   await page.click('#ctx [data-k="tapas"][data-id="tortilla"]'); await page.waitForTimeout(200); await page.click('#ctx [data-k="cooktapas"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapas.id === "tortilla" && f.vine.tapas.plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
   await page.click('#ctx [data-k="dish"][data-dish="olives"]'); await page.waitForTimeout(300);
