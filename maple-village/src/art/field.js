@@ -99,7 +99,7 @@ export function fieldArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="160" cy="520" rx="170" ry="90" style="fill:var(--grass2)"/><ellipse cx="460" cy="460" rx="90" ry="140" style="fill:var(--grass2)"/></g>
     ${tree(40, 60, .9)}${tree(140, 46, .75)}${tree(300, 52, .8)}${tree(420, 40, .9)}${tree(490, 120, .8)}${tree(460, 330, .85)}${tree(470, 560, .9)}${tree(30, 600, .8)}
-    <g filter="url(#wob)"><path d="M260 640 V392 M260 392 C150 392 54 384 54 300 C54 222 130 192 240 188 H520 M54 300 H20" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M260 640 V392 M260 392 C150 392 54 384 54 300 C54 222 130 192 240 188 H520 M54 300 H20 M366 188 V0" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
     <g filter="url(#wob)"><path d="M322 304 C372 340 386 380 368 450 C352 520 372 580 380 640" fill="none" style="stroke:var(--water)" stroke-width="18" stroke-linecap="round"/>
       <path d="${INLET}" fill="none" style="stroke:var(--water)" stroke-width="16" stroke-linecap="round"/>
       <ellipse cx="210" cy="280" rx="132" ry="62" style="fill:var(--water)"/></g>
@@ -131,6 +131,11 @@ export function fieldArt(){
     ${sk(`<rect x="484" y="160" width="6" height="40" style="fill:var(--wood)"/><rect x="508" y="160" width="6" height="40" style="fill:var(--wood)"/><path d="M480 164 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
       `<rect x="484" y="160" width="6" height="40"/><rect x="508" y="160" width="6" height="40"/><path d="M480 164 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`)}
     ${tapeLabel(458, 226, "Town square", "var(--butter)", 11)}</g>`;
+  // round 114: the path north to Wildflower Farm, between the trees at the top
+  const toFarm = `<g data-place="toFarmN" aria-label="Path to Wildflower Farm"><ellipse class="hov" cx="366" cy="40" rx="26" ry="20" style="fill:var(--butter)"/>
+    ${sk(`<rect x="348" y="12" width="6" height="40" style="fill:var(--wood)"/><rect x="378" y="12" width="6" height="40" style="fill:var(--wood)"/><path d="M344 16 q22 -14 44 0 v6 q-22 -12 -44 0z" style="fill:#E7C6E8"/>`,
+      `<rect x="348" y="12" width="6" height="40"/><rect x="378" y="12" width="6" height="40"/><path d="M344 16 q22 -14 44 0 v6 q-22 -12 -44 0z"/>`)}
+    ${eventNow(artCtx().day(), sgHM()) ? "" : tapeLabel(366, 70, "Wildflower Farm", "#E7C6E8", 10)}</g>`;   // (no label on market days: the stalls fill the top row)
   const toOrchard = `<g data-place="toOrchardN" aria-label="Path to Ma Ma's orchard"><ellipse class="hov" cx="260" cy="622" rx="28" ry="16" style="fill:var(--butter)"/>
     ${sk(`<rect x="240" y="594" width="6" height="42" style="fill:var(--wood)"/><rect x="274" y="594" width="6" height="42" style="fill:var(--wood)"/><path d="M236 598 q24 -16 48 0 v6 q-24 -14 -48 0z" style="fill:#9CC27E"/>`,
       `<rect x="240" y="594" width="6" height="42"/><rect x="274" y="594" width="6" height="42"/><path d="M236 598 q24 -16 48 0 v6 q-24 -14 -48 0z"/>`)}
@@ -141,7 +146,7 @@ export function fieldArt(){
     + tapeLabel(260, 30, ev.name, "var(--butter)", 12) : "";
   // the evening light (as on every outdoor screen), under the market so the fairy lights glow
   const dark = skyWash(sgHM());
-  return lampDefs + ground + swans + dark + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + lawn + toTown + toOrchard + event
+  return lampDefs + ground + swans + dark + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + lawn + toTown + toFarm + toOrchard + event
     + archGate("toShoreF", 20, 292, "Foreshore", 52, 332, "var(--sky)", "Gate to the foreshore");
 }
 // The river's stretch through the top right of Ma Ma's orchard (from the lake, on east to home)

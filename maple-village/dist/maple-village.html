@@ -2493,6 +2493,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const fsh = (a, b) => [`<path d="M3 12c3-4.5 9-5.5 13-2l4-3v10l-4-3c-4 3.5-10 2.5-13-2z" ${f(a)}/><path d="M9 8.4q2-2.6 4-.6" ${f(b)}/>`, `<path d="M3 12c3-4.5 9-5.5 13-2l4-3v10l-4-3c-4 3.5-10 2.5-13-2z"/><circle cx="6.8" cy="11" r=".8"/><path d="M10 9.6q1.5 2.4 0 4.8" opacity=".6"/>`];
     I.trout = fsh("#C9D6B8", "#E8899A");
     I.sardine = fsh("#BFD3E2", "#8FA9BF");
+    I.mullet = fsh("#F2B0A8", "#D9534F");
+    I.tuna = fsh("#6F8AA8", "#C9D6E2");
     I.mackerel = fsh("#9FC0C8", "#3E6B8C");
     I.seabream = fsh("#E3D6CF", "#D9A93A");
     I.koi = fsh("#F3B23A", "#FFFDF6");
@@ -2760,6 +2762,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     pitch: { scene: "field", name: "Football pitch", door: [150, 600], spot: true, line: "The football pitch. Kids play here after school." },
     // the foreshore, west of the field and north of the flower farm: the sea along its west side (dolphins, paddleboarders),
     // a boardwalk, a jetty with the paddleboard rack, and two family houses
+    // round 114: the path up from the lake field to Wildflower Farm (it sits right above the field)
+    toFarmN: { scene: "field", name: "Path to Wildflower Farm", door: [366, 40], spot: true, bridge: "hfarm", mark: [366, 20], line: "North up the path to Wildflower Farm." },
+    toFieldH: { scene: "hfarm", name: "Path to the lake field", door: [260, 626], spot: true, bridge: "field", mark: [260, 566], line: "South down the path to the lake field." },
     toShoreF: { scene: "field", name: "Gate to the foreshore", door: [22, 300], spot: true, bridge: "shore", mark: [30, 246], line: "West through the gate to the foreshore." },
     toShoreFl: { scene: "flowers", name: "Gate to the foreshore", door: [52, 152], spot: true, bridge: "shore", mark: [52, 96], line: "Up through the arch to the foreshore." },
     toFieldS: { scene: "shore", name: "Gate to the field", door: [498, 300], spot: true, bridge: "field", mark: [490, 246], line: "East through the gate to the field and the lake." },
@@ -2834,6 +2839,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     fishriver: { scene: "base", name: "Fishing spot", door: [396, 118], spot: true, mark: [396, 70], line: "A good spot for fishing." },
     fishlake: { scene: "field", name: "Fishing spot", door: [60, 290], spot: true, mark: [60, 236], line: "A good spot for fishing." },
     fishsea: { scene: "shore", name: "Fishing spot", door: [204, 376], spot: true, mark: [234, 320], line: "A good spot for fishing." },
+    fishbay: { scene: "bay", name: "Sunset fishing", door: [196, 262], spot: true, line: "Friday evenings, 5 to 8: sunset fishing off the beach." },
     homejetty: { scene: "base", name: "Little jetty", door: [150, 132], spot: true, line: "Your little jetty. Paddle down the river and out to the foreshore." },
     toTown: { scene: "base", name: "Bridge to town", door: [260, 114], spot: true, bridge: "village", mark: [260, 62], line: "Over the river to the town square." }
   };
@@ -2847,8 +2853,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var WORK_HINT = /chord|chico|luna|ohayo|ambidextrous|fresh pages|client|muse|proposal|invoice|copy|newsletter|launch|website|brand|audit|meeting|call with|zoom/;
   var isWeekend = () => [0, 6].includes(new Date(now() + 8 * H).getUTCDay());
   var baseSpotFor = (s) => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
-  var BRIDGES = { village: { base: "toBase", lane: "toLane", field: "toField", hlane: "toStationV" }, base: { village: "toTown", vineyard: "toVine", orchard: "toOrchard" }, lane: { village: "toTownE", vineyard: "toVineL", hwoods: "toWoodsM" }, vineyard: { base: "toBaseV", lane: "toLaneV" }, orchard: { base: "toBaseO", flowers: "toFlowers", field: "toFieldO" }, field: { village: "toTownF", orchard: "toOrchardN", shore: "toShoreF" }, flowers: { orchard: "toOrchardF", shore: "toShoreFl" }, shore: { field: "toFieldS", flowers: "toFlowersS", bay: "toBay" }, bay: { shore: "toShoreB", hfarm: "toFarmB" }, hfarm: { bay: "toBayF", hlane: "hfEast" }, hlane: { hfarm: "toFarmL", village: "toTownL", hwoods: "toWoodsL" }, hwoods: { hlane: "toLaneW", lane: "toMakersW" }, ...TOWN_BRIDGES };
-  var ARRIVE = { "village>base": [260, 132], "base>village": [260, 578], "village>lane": [48, 330], "lane>village": [426, 238], "base>vineyard": [52, 300], "vineyard>base": [462, 470], "lane>vineyard": [290, 72], "vineyard>lane": [262, 586], "base>orchard": [470, 278], "orchard>base": [60, 196], "orchard>flowers": [466, 293], "flowers>orchard": [56, 278], "village>field": [470, 198], "field>village": [52, 212], "orchard>field": [260, 592], "field>orchard": [260, 184], "field>shore": [470, 304], "shore>field": [56, 300], "flowers>shore": [250, 590], "shore>flowers": [56, 190], "shore>bay": [250, 590], "bay>shore": [250, 96], "bay>hfarm": [60, 284], "hfarm>bay": [462, 374], "hfarm>hlane": [60, 560], "hlane>hfarm": [462, 560], "hlane>village": [281, 170], "village>hlane": [280, 590], "hlane>hwoods": [60, 330], "hwoods>hlane": [462, 186], "lane>hwoods": [330, 590], "hwoods>lane": [330, 170], ...TOWN_ARRIVE };
+  var BRIDGES = { village: { base: "toBase", lane: "toLane", field: "toField", hlane: "toStationV" }, base: { village: "toTown", vineyard: "toVine", orchard: "toOrchard" }, lane: { village: "toTownE", vineyard: "toVineL", hwoods: "toWoodsM" }, vineyard: { base: "toBaseV", lane: "toLaneV" }, orchard: { base: "toBaseO", flowers: "toFlowers", field: "toFieldO" }, field: { village: "toTownF", orchard: "toOrchardN", shore: "toShoreF", hfarm: "toFarmN" }, flowers: { orchard: "toOrchardF", shore: "toShoreFl" }, shore: { field: "toFieldS", flowers: "toFlowersS", bay: "toBay" }, bay: { shore: "toShoreB", hfarm: "toFarmB" }, hfarm: { bay: "toBayF", hlane: "hfEast", field: "toFieldH" }, hlane: { hfarm: "toFarmL", village: "toTownL", hwoods: "toWoodsL" }, hwoods: { hlane: "toLaneW", lane: "toMakersW" }, ...TOWN_BRIDGES };
+  var ARRIVE = { "field>hfarm": [260, 592], "hfarm>field": [366, 76], "village>base": [260, 132], "base>village": [260, 578], "village>lane": [48, 330], "lane>village": [426, 238], "base>vineyard": [52, 300], "vineyard>base": [462, 470], "lane>vineyard": [290, 72], "vineyard>lane": [262, 586], "base>orchard": [470, 278], "orchard>base": [60, 196], "orchard>flowers": [466, 293], "flowers>orchard": [56, 278], "village>field": [470, 198], "field>village": [52, 212], "orchard>field": [260, 592], "field>orchard": [260, 184], "field>shore": [470, 304], "shore>field": [56, 300], "flowers>shore": [250, 590], "shore>flowers": [56, 190], "shore>bay": [250, 590], "bay>shore": [250, 96], "bay>hfarm": [60, 284], "hfarm>bay": [462, 374], "hfarm>hlane": [60, 560], "hlane>hfarm": [462, 560], "hlane>village": [281, 170], "village>hlane": [280, 590], "hlane>hwoods": [60, 330], "hwoods>hlane": [462, 186], "lane>hwoods": [330, 590], "hwoods>lane": [330, 170], ...TOWN_ARRIVE };
   function nextHop(from, to) {
     if (from === to) return null;
     if (BRIDGES[from] && BRIDGES[from][to]) return to;
@@ -6937,7 +6943,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="160" cy="520" rx="170" ry="90" style="fill:var(--grass2)"/><ellipse cx="460" cy="460" rx="90" ry="140" style="fill:var(--grass2)"/></g>
     ${tree(40, 60, 0.9)}${tree(140, 46, 0.75)}${tree(300, 52, 0.8)}${tree(420, 40, 0.9)}${tree(490, 120, 0.8)}${tree(460, 330, 0.85)}${tree(470, 560, 0.9)}${tree(30, 600, 0.8)}
-    <g filter="url(#wob)"><path d="M260 640 V392 M260 392 C150 392 54 384 54 300 C54 222 130 192 240 188 H520 M54 300 H20" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M260 640 V392 M260 392 C150 392 54 384 54 300 C54 222 130 192 240 188 H520 M54 300 H20 M366 188 V0" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
     <g filter="url(#wob)"><path d="M322 304 C372 340 386 380 368 450 C352 520 372 580 380 640" fill="none" style="stroke:var(--water)" stroke-width="18" stroke-linecap="round"/>
       <path d="${INLET}" fill="none" style="stroke:var(--water)" stroke-width="16" stroke-linecap="round"/>
       <ellipse cx="210" cy="280" rx="132" ry="62" style="fill:var(--water)"/></g>
@@ -6974,6 +6980,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       `<rect x="484" y="160" width="6" height="40"/><rect x="508" y="160" width="6" height="40"/><path d="M480 164 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`
     )}
     ${tapeLabel(458, 226, "Town square", "var(--butter)", 11)}</g>`;
+    const toFarm = `<g data-place="toFarmN" aria-label="Path to Wildflower Farm"><ellipse class="hov" cx="366" cy="40" rx="26" ry="20" style="fill:var(--butter)"/>
+    ${sk(
+      `<rect x="348" y="12" width="6" height="40" style="fill:var(--wood)"/><rect x="378" y="12" width="6" height="40" style="fill:var(--wood)"/><path d="M344 16 q22 -14 44 0 v6 q-22 -12 -44 0z" style="fill:#E7C6E8"/>`,
+      `<rect x="348" y="12" width="6" height="40"/><rect x="378" y="12" width="6" height="40"/><path d="M344 16 q22 -14 44 0 v6 q-22 -12 -44 0z"/>`
+    )}
+    ${eventNow(artCtx().day(), sgHM()) ? "" : tapeLabel(366, 70, "Wildflower Farm", "#E7C6E8", 10)}</g>`;
     const toOrchard = `<g data-place="toOrchardN" aria-label="Path to Ma Ma's orchard"><ellipse class="hov" cx="260" cy="622" rx="28" ry="16" style="fill:var(--butter)"/>
     ${sk(
       `<rect x="240" y="594" width="6" height="42" style="fill:var(--wood)"/><rect x="274" y="594" width="6" height="42" style="fill:var(--wood)"/><path d="M236 598 q24 -16 48 0 v6 q-24 -14 -48 0z" style="fill:#9CC27E"/>`,
@@ -6983,7 +6995,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const ev = eventNow(artCtx().day(), sgHM());
     const event = ev ? (ev.kind === "night" ? fairyLights() : bunting2) + ev.stalls.map((s) => stall(s.at, STALL_SPOTS[s.at][0], STALL_SPOTS[s.at][1], s)).join("") + (ev.kind === "night" ? stage() : blanket2() + (ev.kind === "fair" ? kites : "")) + tapeLabel(260, 30, ev.name, "var(--butter)", 12) : "";
     const dark = skyWash(sgHM());
-    return lampDefs + ground + swans + dark + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic2 + pitch + lawn + toTown + toOrchard + event + archGate("toShoreF", 20, 292, "Foreshore", 52, 332, "var(--sky)", "Gate to the foreshore");
+    return lampDefs + ground + swans + dark + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic2 + pitch + lawn + toTown + toFarm + toOrchard + event + archGate("toShoreF", 20, 292, "Foreshore", 52, 332, "var(--sky)", "Gate to the foreshore");
   }
   var orchardRiver = `<g filter="url(#wob)"><path d="M380 0 C400 40 450 66 520 70" fill="none" style="stroke:var(--water)" stroke-width="18" stroke-linecap="round"/>
   <path d="M371 0 C391 42 446 75 520 79 M389 0 C409 38 454 57 520 61" fill="none" style="stroke:var(--line)" stroke-width="1.1" opacity=".55"/></g>
@@ -8745,16 +8757,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   }
 
   // src/art/fishing.js
-  var AT = { base: { x: 430, y: 108, side: 1, label: [436, 138] }, field: { x: 60, y: 284, side: 1, label: [60, 316] }, shore: { x: 234, y: 368, side: -1, label: [236, 336] }, hwoods: { x: 348, y: 264, side: -1, label: [300, 294] } };
-  var PLACE = { base: "fishriver", field: "fishlake", shore: "fishsea", hwoods: "fishpool" };
-  function fishSpotArt(scene2) {
+  var AT = { base: { x: 430, y: 108, side: 1, label: [436, 138] }, field: { x: 60, y: 284, side: 1, label: [60, 316] }, shore: { x: 234, y: 368, side: -1, label: [236, 336] }, hwoods: { x: 348, y: 264, side: -1, label: [300, 294] }, bay: { x: 172, y: 252, side: -1, label: [172, 280], text: "Sunset fishing" } };
+  var PLACE = { base: "fishriver", field: "fishlake", shore: "fishsea", hwoods: "fishpool", bay: "fishbay" };
+  function fishSpotArt(scene2, open2 = true) {
     const a = AT[scene2];
-    if (!a) return "";
+    if (!a || !open2) return "";
     const { x, y } = a, s = a.side;
     const post = `<rect x="${x - 2}" y="${y - 30}" width="4" height="30" rx="1" style="fill:#A8754F"/><path d="M${x - 11} ${y - 30} q11 -8 22 0 q-11 8 -22 0z" style="fill:#9FC0C8"/><path d="M${x + 11 * s} ${y - 30} l${4 * s} -4 v8z" style="fill:#9FC0C8"/>`;
     const lines = `<rect x="${x - 2}" y="${y - 30}" width="4" height="30" rx="1"/><path d="M${x - 11} ${y - 30} q11 -8 22 0 q-11 8 -22 0z M${x + 11 * s} ${y - 30} l${4 * s} -4 v8z"/><circle cx="${x - 6 * s}" cy="${y - 31}" r=".8"/>`;
     const bucket = `<path d="M${x - 16 * s - 5} ${y - 9} h10 l-1.4 9 h-7.2z" style="fill:#BFD3E2"/>`, bl = `<path d="M${x - 16 * s - 5} ${y - 9} h10 l-1.4 9 h-7.2z M${x - 16 * s - 5} ${y - 9} q5 -6 10 0"/>`;
-    return `<g data-place="${PLACE[scene2]}" aria-label="Fishing spot"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="26" ry="8" style="fill:var(--butter)"/>${sk(post + bucket, lines + bl)}${tapeLabel(a.label[0], a.label[1], "Fishing", "#DCEBF6", 9)}</g>`;
+    return `<g data-place="${PLACE[scene2]}" aria-label="Fishing spot"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="26" ry="8" style="fill:var(--butter)"/>${sk(post + bucket, lines + bl)}${tapeLabel(a.label[0], a.label[1], a.text || "Fishing", a.text ? "#F6D3B4" : "#DCEBF6", 9)}</g>`;
   }
   function koiArt(n) {
     if (!n) return "";
@@ -16254,7 +16266,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="60" rx="300" ry="70" style="fill:var(--grass2)"/><ellipse cx="130" cy="520" rx="120" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="600" rx="110" ry="40" style="fill:var(--grass2)"/></g>
     ${track(0, 520)}${brook(0, 520)}${trainLayer("hfarm")}
-    <g filter="url(#wob)"><path d="M0 282 H500 M30 282 V560 M490 282 V560 M100 560 H520 M260 560 V262 M260 270 C200 270 120 262 105 246 M260 270 C330 270 380 262 400 246 M130 560 V580" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M0 282 H500 M30 282 V560 M490 282 V560 M100 560 H520 M260 560 V262 M260 270 C200 270 120 262 105 246 M260 270 C330 270 380 262 400 246 M130 560 V580 M260 560 V640" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
     ${rail(0, 520, 122)}
     ${flowers([[60, 290, "#EFA3A6"], [470, 290, "#F3C969"], [200, 520, "#C3CDEE"], [330, 610, "#EFA3A6"], [40, 610, "#F3C969"]])}`;
     const farmhouse = house(
@@ -16305,7 +16317,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     ${tapeLabel(130, 584, "Farm stand", "#F4C7CF", 10)}</g>`;
     const sign = sk(`<rect x="330" y="574" width="60" height="22" rx="2" style="fill:#FFF6E8"/><path d="M338 596 v12 M382 596 v12" stroke-width="3"/>`, `<rect x="330" y="574" width="60" height="22" rx="2"/>`) + `<text x="360" y="588" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="7.4" fill="#8E2C2C" pointer-events="none">Wildflower Farm</text>`;
     const sg = strayGoat(artCtx().F()), stray = sg ? `<g data-place="stray" aria-label="A runaway goat"><ellipse class="hov" cx="${sg.at[0]}" cy="${sg.at[1] + 10}" rx="22" ry="7" style="fill:var(--butter)"/>${goatArt(sg.at[0], sg.at[1], sg.goat, 1)}${tapeLabel(sg.at[0], sg.at[1] + 28, `${sg.goat.n}'s out!`, "#F4C7CF", 9)}</g>` : "";
-    return lampDefs + ground + farmhouse + hives + barn + cows + goats + stand + sign + stray + archGate("toBayF", 22, 280, "The bay", 50, 322, "var(--sky)", "Gate west to the bay") + archGate("hfEast", 498, 560, "Cottage lane", 470, 516, "var(--butter)", "The lane east to the cottages") + streetLamp(300, 540);
+    return lampDefs + ground + farmhouse + hives + barn + cows + goats + stand + sign + stray + archGate("toBayF", 22, 280, "The bay", 50, 322, "var(--sky)", "Gate west to the bay") + archGate("toFieldH", 260, 618, "Lake field", 318, 626, "var(--sky)", "The path south to the lake field") + archGate("hfEast", 498, 560, "Cottage lane", 470, 516, "var(--butter)", "The lane east to the cottages") + streetLamp(300, 540);
   }
 
   // src/art/hlane.js
@@ -16471,9 +16483,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     river: { scene: "base", n: "The home river", place: "fishriver", line: "The river runs quick and clear past the bridge." },
     lake: { scene: "field", n: "The lake", place: "fishlake", line: "Still water, reeds, and the swans keeping an eye on you." },
     sea: { scene: "shore", n: "The sea by the pier", place: "fishsea", line: "Waves on the sand, and gulls hoping you're bad at this." },
-    pool: { scene: "hwoods", n: "The waterfall pool", place: "fishpool", line: "Cold, clear water under the falls. The trout here are wily." }
+    pool: { scene: "hwoods", n: "The waterfall pool", place: "fishpool", line: "Cold, clear water under the falls. The trout here are wily." },
+    // round 114: sunset fishing off the bay, Friday evenings 5 to 8 only (red mullet, and once in a blue moon a tuna)
+    bay: { scene: "bay", n: "Sunset fishing at the bay", place: "fishbay", line: "Friday evening, the sun going down over the sea, and the fish coming up to feed.", open: (day, hm2) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() === 5 && hm2 >= 17 * 60 && hm2 < 20 * 60 }
   };
   var spotIn = (scene2) => Object.keys(SPOTS3).find((k) => SPOTS3[k].scene === scene2) || null;
+  var spotOpen = (spot, day = dayKey(), hm2 = sgHM()) => !SPOTS3[spot].open || SPOTS3[spot].open(day, hm2);
   var FISH = {
     roach: { n: "Roach", spot: "river", w: 34, cm: [10, 24], hard: 1, item: "fish", hint: "The river, any time at all." },
     trout: { n: "Rainbow trout", spot: "river", w: 22, when: "day", cm: [24, 52], hard: 2, item: "trout", hint: "The river, in daylight." },
@@ -16486,9 +16501,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     rudd: { n: "Rudd", spot: "lake", w: 26, cm: [12, 26], hard: 1, item: "fish", hint: "The lake, any time. Red fins." },
     crayfish: { n: "Crayfish", spot: "lake", w: 16, cm: [8, 15], hard: 1, item: "crayfish", hint: "The lake, at night or in the rain." },
     eel: { n: "Eel", spot: "lake", w: 9, when: "night", cm: [40, 90], hard: 4, item: "fish", hint: "The lake, at night." },
-    sardine: { n: "Sardine", spot: "sea", w: 32, cm: [12, 20], hard: 1, item: "sardine", hint: "The sea, any time." },
-    mackerel: { n: "Mackerel", spot: "sea", w: 24, when: "day", cm: [25, 40], hard: 2, item: "mackerel", hint: "The sea, in daylight." },
-    seabream: { n: "Sea bream", spot: "sea", w: 14, cm: [25, 45], hard: 3, item: "seabream", hint: "The sea, any time. Fussy." },
+    sardine: { n: "Sardine", spot: "sea", also: ["bay"], w: 32, cm: [12, 20], hard: 1, item: "sardine", hint: "The sea, any time." },
+    mackerel: { n: "Mackerel", spot: "sea", also: ["bay"], w: 24, when: "day", cm: [25, 40], hard: 2, item: "mackerel", hint: "The sea, in daylight." },
+    seabream: { n: "Sea bream", spot: "sea", also: ["bay"], w: 14, cm: [25, 45], hard: 3, item: "seabream", hint: "The sea, any time. Fussy." },
     squid: { n: "Squid", spot: "sea", w: 14, when: "night", cm: [20, 40], hard: 3, item: "squid", hint: "The sea, after dark." },
     octopus: { n: "Octopus", spot: "sea", w: 8, rain: true, cm: [40, 80], hard: 4, item: "octopus", hint: "The sea, when it's raining." },
     minnow: { n: "Minnow", spot: "pool", w: 30, cm: [4, 9], hard: 1, item: "fish", hint: "The waterfall pool, any time. Tiny." },
@@ -16496,6 +16511,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     grayling: { n: "Grayling", spot: "pool", w: 14, when: "day", cm: [25, 40], hard: 3, item: "fish", hint: "The waterfall pool, in daylight. A big sail of a fin." },
     shrimp: { n: "Shrimp", spot: "sea", w: 26, when: "dawn", cm: [6, 12], hard: 1, item: "shrimp", hint: "The sea, in the morning. For gambas!" },
     // round 109
+    mullet: { n: "Red mullet", spot: "bay", w: 16, cm: [15, 30], hard: 3, item: "mullet", hint: "The bay, on a Friday at sunset." },
+    tuna: { n: "Bluefin tuna", spot: "bay", w: 2, cm: [80, 160], hard: 5, item: "tuna", rare: true, hint: "The bay at sunset. Once in a blue moon." },
     seaglass: { n: "Sea glass", spot: "sea", w: 6, cm: [2, 4], hard: 1, item: null, junk: true, hint: "The sea. Smoothed by the waves; it goes on the windowsill." }
   };
   var OK_WHEN = { day: (m) => m >= 7 * 60 && m < 18 * 60, dawn: (m) => m >= 5 * 60 && m < 10 * 60, dusk: (m) => m >= 18 * 60 && m < 20 * 60, night: (m) => m >= 19 * 60 || m < 6 * 60 };
@@ -16506,7 +16523,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (id === "crayfish" && !(OK_WHEN.night(hm2) || rainyOn(day))) return false;
     return true;
   }
-  var fishHere = (spot, day, hm2) => Object.keys(FISH).filter((id) => FISH[id].spot === spot && canBite(id, day, hm2));
+  var fishHere = (spot, day, hm2) => !spotOpen(spot, day, hm2) ? [] : Object.keys(FISH).filter((id) => (FISH[id].spot === spot || (FISH[id].also || []).includes(spot)) && canBite(id, day, hm2));
   var ING = {
     trout: ["Rainbow trout", 4, "with almond butter, at the kitchen"],
     crayfish: ["Crayfish", 2, "four on toast with garlic, at the kitchen"],
@@ -16515,7 +16532,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     seabream: ["Sea bream", 5, "baked with olives, at the kitchen"],
     squid: ["Squid", 4, "fried calamari, at the kitchen"],
     octopus: ["Octopus", 6, "pulpo a la gallega, at the kitchen"],
-    shrimp: ["Shrimp", 2, "gambas al ajillo with garlic and olive oil, at the kitchen"]
+    shrimp: ["Shrimp", 2, "gambas al ajillo with garlic and olive oil, at the kitchen"],
+    mullet: ["Red mullet", 6, "grill it on the bonfire at home, or Sal pays well for it"],
+    tuna: ["Bluefin tuna", 30, "an enormous fish: Sal will pay a fortune"]
   };
   Object.entries(ING).forEach(([id, [n, sell2, what]]) => {
     if (!ITEMS[id]) ITEMS[id] = { n, ico: id, kind: "ingredient", sell: sell2, what };
@@ -16582,6 +16601,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const s = fishState(F2);
     if (!s.rod) return "rod";
     if (s.bait <= 0) return "bait";
+    if (!spotOpen(spot)) return "closed";
     s.bait--;
     const fish = pickFish(spot, dayKey(), sgHM(), rng);
     return { spot, fish, bite: Date.now() + BITE_MIN + rng() * (BITE_MAX - BITE_MIN), zone: zoneFor(fish, s.reel, rng()), t0: null };
@@ -16618,7 +16638,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       } else if (st6.msg) h += `<p class="muted">${esc(st6.msg)}</p>`;
       h += `<div class="actions"><button class="btn primary" data-fish="cast" ${s.bait > 0 ? "" : "disabled"}>${s.bait > 0 ? "Cast" : "Out of worms"}</button></div>`;
       if (!s.bait) h += `<p class="muted">No worms left. Finish a quest and you'll dig up another (three more turn up tomorrow morning anyway).</p>`;
-      h += catchHtml(F2);
+      h += catchHtml(F2, spot === "bay" ? 1.5 : 1);
       if (!s.reel) h += `<p class="muted">The better reel makes every fish easier to land (the green's wider). <button class="btn small alt" data-fish="reelup" ${F2.coins >= REEL ? "" : "disabled"}>Buy · ${REEL} ${coin4()}</button></p>`;
     }
     return h + shut4;
@@ -16639,11 +16659,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     F2.coins += got.coins;
     return got;
   }
-  var catchHtml = (F2) => {
+  var catchHtml = (F2, mult = 1) => {
     const have = CATCH.filter((x) => (F2.inv || {})[x] > 0 && ITEMS[x] && ITEMS[x].sell);
     if (!have.length) return "";
-    const all = have.reduce((a, x) => a + F2.inv[x] * ITEMS[x].sell, 0);
-    return `<h3 class="ph3">Your catch</h3><p class="muted">The fishmonger's van takes anything you've caught (or keep it for the kitchen).</p><ul class="hlist wlist">${have.map((x) => `<li><span class="wpic">${icon(x, 26)}</span><span class="wtxt"><b>${esc(ITEMS[x].n)} ×${F2.inv[x]}</b><small>${ITEMS[x].sell} coins each</small></span><button class="btn small alt" data-fish="sell" data-k="${x}">Sell one</button></li>`).join("")}</ul>
+    const all = have.reduce((a, x) => a + Math.round(F2.inv[x] * ITEMS[x].sell * mult), 0);
+    return `<h3 class="ph3">Your catch</h3><p class="muted">${mult > 1 ? "Sal's van is just up the beach, and he pays half as much again on a Friday." : "The fishmonger's van takes anything you've caught (or keep it for the kitchen)."}</p><ul class="hlist wlist">${have.map((x) => `<li><span class="wpic">${icon(x, 26)}</span><span class="wtxt"><b>${esc(ITEMS[x].n)} ×${F2.inv[x]}</b><small>${Math.round(ITEMS[x].sell * mult * 10) / 10} coins each</small></span><button class="btn small alt" data-fish="sell" data-k="${x}">Sell one</button></li>`).join("")}</ul>
     <div class="actions"><button class="btn primary small" data-fish="sellall">Sell the lot · ${all} ${coin4()}</button></div>`;
   };
   function catchLine(r) {
@@ -16662,7 +16682,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
 
   // src/game/friday.js
-  var VAN_GOODS = { worms: { n: "Five worms", price: 6, line: "For the bait tin. Wriggly." }, clams: { n: "Clams", price: 4, line: "For clams with garlic and lemon, at the kitchen." }, lemon: { n: "Lemon", price: 3, line: "For the clams, or a lemon and petal posset." } };
+  var VAN_GOODS = {
+    worms: { n: "Five worms", price: 6, line: "For the bait tin. Wriggly." },
+    clams: { n: "Clams", price: 4, line: "For clams with garlic and lemon, at the kitchen." },
+    lemon: { n: "Lemon", price: 3, line: "For the clams, or a lemon and petal posset." },
+    sardine: { n: "Three sardines", price: 9, line: "Fresh off the boat. Grill them on the bonfire at home." }
+  };
   var VAN_MULT = 1.5;
   function vanBuy(F2, id, addInv2) {
     const g = VAN_GOODS[id];
@@ -16671,6 +16696,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (id === "worms") {
       addBait(F2, 5);
       return "Five worms, into the bait tin.";
+    }
+    if (id === "sardine") {
+      addInv2("sardine", 3);
+      return "Three sardines, wrapped in paper. For the bonfire tonight.";
     }
     addInv2(id, 1);
     return `${g.n === "Clams" ? "A bag of clams" : "A lemon"}, into your backpack.`;
@@ -16698,11 +16727,30 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     F2.fri = Object.assign(F2.fri || {}, { lanterns: day });
     return weekQuests(F2, day);
   }
+  var GRILL = ["sardine", "mullet"];
+  var GRILL_MAX = 6;
+  var grilledToday = (F2, day = dayKey()) => (F2.fri || {}).grill === day;
+  var grillable = (F2) => GRILL.reduce((a, id) => a + ((F2.inv || {})[id] || 0), 0);
+  function grillFish(F2, day = dayKey()) {
+    if (grilledToday(F2, day) || !grillable(F2)) return null;
+    let left4 = GRILL_MAX, n = 0;
+    GRILL.forEach((id) => {
+      const k = Math.min(left4, F2.inv[id] || 0);
+      if (!k) return;
+      F2.inv[id] -= k;
+      if (F2.inv[id] <= 0) delete F2.inv[id];
+      left4 -= k;
+      n += k;
+    });
+    F2.fri = Object.assign(F2.fri || {}, { grill: day });
+    return n;
+  }
   function bonfirePanel(F2, family) {
-    const n = weekQuests(F2), done = lanternsDone(F2);
+    const n = weekQuests(F2), done = lanternsDone(F2), fish = grillable(F2), grilled = grilledToday(F2);
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The bonfire</h2><p class="sub">The firepit at the bottom of the garden, crackling away, the river going dark.${family ? ` ${esc(family)}.` : ""}</p>
     <p>${done ? "The week's lanterns are already up and away over the house." : n ? `<b>${n} quest${n > 1 ? "s" : ""}</b> finished this week: a paper lantern for each.` : "No quests this week. That's alright: one lantern anyway, for getting through it."}</p>
-    <div class="actions">${done ? "" : `<button class="btn primary" data-fire="lanterns">Release the week's lanterns</button>`}<button class="btn alt" data-fire="sit">Sit by the fire</button></div>` + shut5;
+    <p class="muted">${grilled ? "The fish are eaten. Just the smell of the grill left, and happy faces." : fish ? `${fish} fish in your backpack for the grill.` : "Nothing to grill. Sal's van at the bay sells sardines, or catch some at sunset."}</p>
+    <div class="actions">${done ? "" : `<button class="btn primary" data-fire="lanterns">Release the week's lanterns</button>`}${!grilled && fish ? `<button class="btn primary" data-fire="grill">Grill the fish</button>` : ""}<button class="btn alt" data-fire="sit">Sit by the fire</button></div>` + shut5;
   }
   var BAY_POOL = [...new Set([...MARKET, ...NIGHT].flatMap((s) => s.items || []).concat(Object.values(POOLS).flatMap((p) => Object.values(p).flat())))].filter((id) => ITEMS[id] && (ITEMS[id].price || GOODS[id]) && ITEMS[id].kind !== "pet" && ITEMS[id].kind !== "seed");
   function bayStallGoods(day, k) {
@@ -20158,7 +20206,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     townTick();
     {
-      const k = scene === "base" ? `${bonfireNow(dayKey(), sgHM())}` : scene === "bay" ? `${vanNow(dayKey(), sgHM())}` : scene === "field" ? `${!!(S2.kite && S2.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : "";
+      const k = scene === "base" ? `${bonfireNow(dayKey(), sgHM())}` : scene === "bay" ? `${vanNow(dayKey(), sgHM())}${spotOpen("bay")}` : scene === "field" ? `${!!(S2.kite && S2.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : "";
       if (k !== lastFri) {
         lastFri = k;
         if (k) drawScene();
@@ -22372,6 +22420,21 @@ ${SIGNOFF[t2.who] || ""}`;
         save2();
         return;
       }
+      if (b.dataset.fire === "grill") {
+        const n = grillFish(F);
+        if (!n) return;
+        friView = null;
+        ctx();
+        gainXp(2);
+        hearts(3);
+        sfx("chime");
+        speak(`${n} fish on the grill, a squeeze of lemon, and everyone eating with their fingers. Perfect.`, 6e3);
+        if (evanHere() && !evanNight()) setTimeout(() => evanSays(pick(["fishy! yum!", "more please!", "I ate the crispy bit!"])), 1800);
+        const who3 = ["gonggong", "dad", "mum", "mama"].filter(isHere)[0];
+        if (who3) setTimeout(() => npcSay(who3, pick(["Ah, that's the smell of a Friday.", "Grilled just right. Who taught you that?", "Best sardines this side of the sea!"])), 3600);
+        save2();
+        return;
+      }
       mel.sitting = true;
       nodes.mel.classList.add("sit");
       friView = null;
@@ -23054,7 +23117,7 @@ ${SIGNOFF[t2.who] || ""}`;
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
     tableKey = "";
     $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
-    $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt(F.fish && F.fish.koi || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") : ""));
+    $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt(F.fish && F.fish.koi || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") : ""));
     if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));
     if (outside() && isDusk()) nightLights();
     const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: vineyardName(F), farm: "The garden", wineshop: shopName(F), orchard: "Ma Ma's orchard", flowers: "Ma Ma's flower farm", field: "The field", shore: "The foreshore", bay: "The bay", hfarm: "Wildflower Farm", hlane: "Honeybrook station", hwoods: "Honeybrook Woods", greenhouse: "The greenhouse", mill: "The old mill", scoopshop: scoopState(F).name, rd_station: "Ronda: the station", rd_plaza: "Ronda: the plaza", rd_bridge: "Ronda: Puente Nuevo", rd_old: "Ronda: the old town" };
@@ -23378,7 +23441,7 @@ ${SIGNOFF[t2.who] || ""}`;
   function fishGo(a, k) {
     if (a === "view") fishSt = { ...fishSt, view: k };
     else if (a === "sell" || a === "sellall") {
-      const g = sellCatch(F, a === "sell" ? k : null);
+      const g = sellCatch(F, a === "sell" ? k : null, fishSpot === "bay" ? VAN_MULT : 1);
       if (!g) return;
       sfx("chaching");
       speak(g.n > 1 ? `Sold ${g.n} to the fishmonger: ${g.coins} coins.` : `Sold to the fishmonger: ${g.coins} coin${g.coins === 1 ? "" : "s"}.`, 3500);
@@ -24448,11 +24511,11 @@ ${SIGNOFF[t2.who] || ""}`;
       render();
       return;
     }
-    if (id === "fishriver" || id === "fishlake" || id === "fishsea" || id === "fishpool") {
+    if (id === "fishriver" || id === "fishlake" || id === "fishsea" || id === "fishpool" || id === "fishbay") {
       fishSpot = spotIn(scene);
       fishSt = {};
       fishState(F);
-      mel.dir = scene === "shore" ? -1 : 1;
+      mel.dir = scene === "shore" || scene === "bay" ? -1 : 1;
       sfx("paper", true);
       render();
       return;

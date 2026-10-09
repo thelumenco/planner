@@ -17,9 +17,12 @@ export const SPOTS = {
   river: {scene: "base", n: "The home river", place: "fishriver", line: "The river runs quick and clear past the bridge."},
   lake: {scene: "field", n: "The lake", place: "fishlake", line: "Still water, reeds, and the swans keeping an eye on you."},
   sea: {scene: "shore", n: "The sea by the pier", place: "fishsea", line: "Waves on the sand, and gulls hoping you're bad at this."},
-  pool: {scene: "hwoods", n: "The waterfall pool", place: "fishpool", line: "Cold, clear water under the falls. The trout here are wily."}
+  pool: {scene: "hwoods", n: "The waterfall pool", place: "fishpool", line: "Cold, clear water under the falls. The trout here are wily."},
+  // round 114: sunset fishing off the bay, Friday evenings 5 to 8 only (red mullet, and once in a blue moon a tuna)
+  bay: {scene: "bay", n: "Sunset fishing at the bay", place: "fishbay", line: "Friday evening, the sun going down over the sea, and the fish coming up to feed.", open: (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() === 5 && hm >= 17*60 && hm < 20*60}
 };
 export const spotIn = scene => Object.keys(SPOTS).find(k => SPOTS[k].scene === scene) || null;
+export const spotOpen = (spot, day = dayKey(), hm = sgHM()) => !SPOTS[spot].open || SPOTS[spot].open(day, hm);
 // when: "day" 7am-6pm, "dawn" 5-10am, "dusk" 6-8pm, "night" 7pm-6am; rain: only on a rainy day
 // item: what goes in the backpack (null: journal only). hard 1-5 narrows the green zone.
 export const FISH = {
@@ -34,15 +37,17 @@ export const FISH = {
   rudd: {n: "Rudd", spot: "lake", w: 26, cm: [12, 26], hard: 1, item: "fish", hint: "The lake, any time. Red fins."},
   crayfish: {n: "Crayfish", spot: "lake", w: 16, cm: [8, 15], hard: 1, item: "crayfish", hint: "The lake, at night or in the rain."},
   eel: {n: "Eel", spot: "lake", w: 9, when: "night", cm: [40, 90], hard: 4, item: "fish", hint: "The lake, at night."},
-  sardine: {n: "Sardine", spot: "sea", w: 32, cm: [12, 20], hard: 1, item: "sardine", hint: "The sea, any time."},
-  mackerel: {n: "Mackerel", spot: "sea", w: 24, when: "day", cm: [25, 40], hard: 2, item: "mackerel", hint: "The sea, in daylight."},
-  seabream: {n: "Sea bream", spot: "sea", w: 14, cm: [25, 45], hard: 3, item: "seabream", hint: "The sea, any time. Fussy."},
+  sardine: {n: "Sardine", spot: "sea", also: ["bay"], w: 32, cm: [12, 20], hard: 1, item: "sardine", hint: "The sea, any time."},
+  mackerel: {n: "Mackerel", spot: "sea", also: ["bay"], w: 24, when: "day", cm: [25, 40], hard: 2, item: "mackerel", hint: "The sea, in daylight."},
+  seabream: {n: "Sea bream", spot: "sea", also: ["bay"], w: 14, cm: [25, 45], hard: 3, item: "seabream", hint: "The sea, any time. Fussy."},
   squid: {n: "Squid", spot: "sea", w: 14, when: "night", cm: [20, 40], hard: 3, item: "squid", hint: "The sea, after dark."},
   octopus: {n: "Octopus", spot: "sea", w: 8, rain: true, cm: [40, 80], hard: 4, item: "octopus", hint: "The sea, when it's raining."},
   minnow: {n: "Minnow", spot: "pool", w: 30, cm: [4, 9], hard: 1, item: "fish", hint: "The waterfall pool, any time. Tiny."},
   browntrout: {n: "Brown trout", spot: "pool", w: 22, cm: [25, 55], hard: 3, item: "trout", hint: "The waterfall pool, any time."},
   grayling: {n: "Grayling", spot: "pool", w: 14, when: "day", cm: [25, 40], hard: 3, item: "fish", hint: "The waterfall pool, in daylight. A big sail of a fin."},
   shrimp: {n: "Shrimp", spot: "sea", w: 26, when: "dawn", cm: [6, 12], hard: 1, item: "shrimp", hint: "The sea, in the morning. For gambas!"},   // round 109
+  mullet: {n: "Red mullet", spot: "bay", w: 16, cm: [15, 30], hard: 3, item: "mullet", hint: "The bay, on a Friday at sunset."},
+  tuna: {n: "Bluefin tuna", spot: "bay", w: 2, cm: [80, 160], hard: 5, item: "tuna", rare: true, hint: "The bay at sunset. Once in a blue moon."},
   seaglass: {n: "Sea glass", spot: "sea", w: 6, cm: [2, 4], hard: 1, item: null, junk: true, hint: "The sea. Smoothed by the waves; it goes on the windowsill."}
 };
 // crayfish come out at night or in the rain
@@ -52,12 +57,13 @@ export function canBite(id, day = dayKey(), hm = sgHM()){
   if (id === "crayfish" && !(OK_WHEN.night(hm) || rainyOn(day))) return false;
   return true;
 }
-export const fishHere = (spot, day, hm) => Object.keys(FISH).filter(id => FISH[id].spot === spot && canBite(id, day, hm));
+export const fishHere = (spot, day, hm) => !spotOpen(spot, day, hm) ? [] : Object.keys(FISH).filter(id => (FISH[id].spot === spot || (FISH[id].also || []).includes(spot)) && canBite(id, day, hm));
 
 // the backpack items (the generic "fish" already exists: a market treat)
 const ING = {trout: ["Rainbow trout", 4, "with almond butter, at the kitchen"], crayfish: ["Crayfish", 2, "four on toast with garlic, at the kitchen"],
   sardine: ["Sardine", 2, "three on the grill, at the kitchen"], mackerel: ["Mackerel", 3, "escabeche with peppers, at the kitchen"],
-  seabream: ["Sea bream", 5, "baked with olives, at the kitchen"], squid: ["Squid", 4, "fried calamari, at the kitchen"], octopus: ["Octopus", 6, "pulpo a la gallega, at the kitchen"], shrimp: ["Shrimp", 2, "gambas al ajillo with garlic and olive oil, at the kitchen"]};
+  seabream: ["Sea bream", 5, "baked with olives, at the kitchen"], squid: ["Squid", 4, "fried calamari, at the kitchen"], octopus: ["Octopus", 6, "pulpo a la gallega, at the kitchen"], shrimp: ["Shrimp", 2, "gambas al ajillo with garlic and olive oil, at the kitchen"],
+  mullet: ["Red mullet", 6, "grill it on the bonfire at home, or Sal pays well for it"], tuna: ["Bluefin tuna", 30, "an enormous fish: Sal will pay a fortune"]};
 Object.entries(ING).forEach(([id, [n, sell, what]]) => { if (!ITEMS[id]) ITEMS[id] = {n, ico: id, kind: "ingredient", sell, what}; });
 
 export const ROD = 80, REEL = 400, BAIT_DAY = 3, BAIT_MAX = 20;
@@ -84,7 +90,7 @@ export const inZone = (z, p) => Math.abs(p - z.at) <= z.width/2;
 // start a cast -> the cast {spot, fish, bite (ms), zone, t0: null} or a reason string
 export const BITE_MIN = 2000, BITE_MAX = 6000, ESCAPE = 3500;
 export function cast(F, spot, rng = Math.random){
-  const s = fishState(F); if (!s.rod) return "rod"; if (s.bait <= 0) return "bait";
+  const s = fishState(F); if (!s.rod) return "rod"; if (s.bait <= 0) return "bait"; if (!spotOpen(spot)) return "closed";
   s.bait--; const fish = pickFish(spot, dayKey(), sgHM(), rng);
   return {spot, fish, bite: Date.now() + BITE_MIN + rng()*(BITE_MAX - BITE_MIN), zone: zoneFor(fish, s.reel, rng()), t0: null};
 }
@@ -123,7 +129,7 @@ export function fishPanel(F, spot, st = {}){
     else if (st.msg) h += `<p class="muted">${esc(st.msg)}</p>`;
     h += `<div class="actions"><button class="btn primary" data-fish="cast" ${s.bait > 0 ? "" : "disabled"}>${s.bait > 0 ? "Cast" : "Out of worms"}</button></div>`;
     if (!s.bait) h += `<p class="muted">No worms left. Finish a quest and you'll dig up another (three more turn up tomorrow morning anyway).</p>`;
-    h += catchHtml(F);
+    h += catchHtml(F, spot === "bay" ? 1.5 : 1);
     if (!s.reel) h += `<p class="muted">The better reel makes every fish easier to land (the green's wider). <button class="btn small alt" data-fish="reelup" ${F.coins >= REEL ? "" : "disabled"}>Buy · ${REEL} ${coin()}</button></p>`;
   }
   return h + shut;
@@ -138,9 +144,9 @@ export function sellCatch(F, id, mult = 1){
     F.inv[x] -= n; if (F.inv[x] <= 0) delete F.inv[x]; got.n += n; got.coins += Math.round(n*ITEMS[x].sell*mult); });
   if (!got.n) return null; F.coins += got.coins; return got;
 }
-const catchHtml = F => { const have = CATCH.filter(x => (F.inv || {})[x] > 0 && ITEMS[x] && ITEMS[x].sell); if (!have.length) return "";
-  const all = have.reduce((a, x) => a + F.inv[x]*ITEMS[x].sell, 0);
-  return `<h3 class="ph3">Your catch</h3><p class="muted">The fishmonger's van takes anything you've caught (or keep it for the kitchen).</p><ul class="hlist wlist">${have.map(x => `<li><span class="wpic">${icon(x, 26)}</span><span class="wtxt"><b>${esc(ITEMS[x].n)} ×${F.inv[x]}</b><small>${ITEMS[x].sell} coins each</small></span><button class="btn small alt" data-fish="sell" data-k="${x}">Sell one</button></li>`).join("")}</ul>
+const catchHtml = (F, mult = 1) => { const have = CATCH.filter(x => (F.inv || {})[x] > 0 && ITEMS[x] && ITEMS[x].sell); if (!have.length) return "";
+  const all = have.reduce((a, x) => a + Math.round(F.inv[x]*ITEMS[x].sell*mult), 0);
+  return `<h3 class="ph3">Your catch</h3><p class="muted">${mult > 1 ? "Sal's van is just up the beach, and he pays half as much again on a Friday." : "The fishmonger's van takes anything you've caught (or keep it for the kitchen)."}</p><ul class="hlist wlist">${have.map(x => `<li><span class="wpic">${icon(x, 26)}</span><span class="wtxt"><b>${esc(ITEMS[x].n)} ×${F.inv[x]}</b><small>${Math.round(ITEMS[x].sell*mult*10)/10} coins each</small></span><button class="btn small alt" data-fish="sell" data-k="${x}">Sell one</button></li>`).join("")}</ul>
     <div class="actions"><button class="btn primary small" data-fish="sellall">Sell the lot · ${all} ${coin()}</button></div>`; };
 export function catchLine(r){
   const f = FISH[r.id];

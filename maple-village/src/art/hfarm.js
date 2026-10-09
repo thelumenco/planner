@@ -43,7 +43,7 @@ export function hfarmArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="60" rx="300" ry="70" style="fill:var(--grass2)"/><ellipse cx="130" cy="520" rx="120" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="600" rx="110" ry="40" style="fill:var(--grass2)"/></g>
     ${track(0, 520)}${brook(0, 520)}${trainLayer("hfarm")}
-    <g filter="url(#wob)"><path d="M0 282 H500 M30 282 V560 M490 282 V560 M100 560 H520 M260 560 V262 M260 270 C200 270 120 262 105 246 M260 270 C330 270 380 262 400 246 M130 560 V580" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M0 282 H500 M30 282 V560 M490 282 V560 M100 560 H520 M260 560 V262 M260 270 C200 270 120 262 105 246 M260 270 C330 270 380 262 400 246 M130 560 V580 M260 560 V640" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
     ${rail(0, 520, 122)}
     ${flowers([[60, 290, "#EFA3A6"], [470, 290, "#F3C969"], [200, 520, "#C3CDEE"], [330, 610, "#EFA3A6"], [40, 610, "#F3C969"]])}`;
   const farmhouse = house("farmhouse", 40, 168, 130, 70, "#FFF6E8", "#B5443A", "The farmhouse", "var(--blush)",
@@ -80,6 +80,7 @@ export function hfarmArt(){
   const sg = strayGoat(artCtx().F()), stray = sg ? `<g data-place="stray" aria-label="A runaway goat"><ellipse class="hov" cx="${sg.at[0]}" cy="${sg.at[1] + 10}" rx="22" ry="7" style="fill:var(--butter)"/>${goatArt(sg.at[0], sg.at[1], sg.goat, 1)}${tapeLabel(sg.at[0], sg.at[1] + 28, `${sg.goat.n}'s out!`, "#F4C7CF", 9)}</g>` : "";
   return lampDefs + ground + farmhouse + hives + barn + cows + goats + stand + sign + stray
     + archGate("toBayF", 22, 280, "The bay", 50, 322, "var(--sky)", "Gate west to the bay")
+    + archGate("toFieldH", 260, 618, "Lake field", 318, 626, "var(--sky)", "The path south to the lake field")
     + archGate("hfEast", 498, 560, "Cottage lane", 470, 516, "var(--butter)", "The lane east to the cottages")
     + streetLamp(300, 540);
 }

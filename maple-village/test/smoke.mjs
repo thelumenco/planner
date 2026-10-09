@@ -2478,7 +2478,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(got.length === 1 && ["roach", "trout", "perch", "boot"].includes(got[0]) && /New in the journal/.test(await page.locator("#ctx .fcatch").textContent()), "reel while the marker's in the green and it's landed: a river fish, new in the journal");
   check(["boot"].includes(got[0]) || (f1.inv[got[0] === "trout" ? "trout" : "fish"] || 0) >= 1, "and it's in the backpack (trout for the kitchen, others as fish)");
   await page.click('#ctx [data-fish="view"][data-k="journal"]'); await page.waitForTimeout(200);
-  check(await page.locator("#ctx li.locked").count() === 20 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, twenty still to find, each with a hint (the golden koi at dusk)");
+  check(await page.locator("#ctx li.locked").count() === 22 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, twenty-two still to find, each with a hint (the golden koi at dusk)");
   await page.click('#ctx [data-fish="view"][data-k="fish"]'); await page.waitForTimeout(200);
   await page.click('#ctx [data-fish="cast"]'); await page.waitForSelector("#ctx .fbar", { timeout: 9000 }); await page.waitForTimeout(3700);
   check(/slipped away/.test(await page.locator("#ctx").textContent()) && await fox().then(f => f.fish.bait === 0), "wait too long after the bite and it slips away");
@@ -2845,6 +2845,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   console.log("\nFriday evenings: aperitivo, the bonfire, Sal's van, kites");
   const t = await import(new URL("../src/game/tours.js", import.meta.url)), fr = await import(new URL("../src/game/friday.js", import.meta.url));
   const fri = "2026-10-16", thu = "2026-10-15";
+  { const fi = await import(new URL("../src/game/fishing.js", import.meta.url)), w = await import(new URL("../src/data/world.js", import.meta.url));
+    check(fi.fishHere("bay", fri, 18*60).includes("mullet") && fi.fishHere("bay", fri, 18*60).includes("sardine") && !fi.fishHere("bay", thu, 18*60).length && !fi.fishHere("bay", fri, 20*60 + 30).length, "sunset fishing at the bay: Fridays 5 to 8, red mullet and sardines");
+    const F = {coins: 20, inv: {mullet: 1}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
+    check(!!fr.vanBuy(F, "sardine", add) && F.inv.sardine === 3 && F.coins === 11, "Sal sells three sardines for the grill");
+    check(fr.grillFish(F, fri) === 4 && !F.inv.sardine && !F.inv.mullet && fr.grillFish(F, fri) === null, "the fish go on the bonfire, once a Friday");
+    check(w.nextHop("field", "hfarm") === "hfarm" && w.nextHop("hfarm", "field") === "field", "a path joins the lake field and Wildflower Farm"); }
   check(t.aperitivoNow(fri, 17*60) && !t.aperitivoNow(fri, 19*60 + 5) && !t.aperitivoNow(thu, 17*60), "aperitivo hour: Fridays, 4:30 to 7");
   check(t.tastingSlot("theo", fri, 17*60 + 30) && t.tastingSlot("opal", fri, 17*60), "the tasting room fills up on a Friday afternoon");
   check(t.bonfireSlot("dad", fri, 19*60 + 30).act === "guitar" && t.bonfireSlot("mum", fri, 20*60).scene === "base" && !t.bonfireSlot("dad", thu, 19*60 + 30) && !t.bonfireSlot("marcus", fri, 19*60 + 10), "the bonfire, 7 to 10 on a Friday: Dad on guitar, Mum on a log, Marcus and Angellina from half seven");

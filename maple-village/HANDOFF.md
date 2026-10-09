@@ -1657,3 +1657,15 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - The bay keeps only the van and the bonfire.
 - Movie night (`MOVIE`, 7:30 to 9:30, last Friday of the month) also uses the Sunday market spot, with the screen at `SCREEN` [236,128]. It starts 15 minutes after the market packs up, and a test checks the gap. The family spread out over the field instead of bunching at the screen: Mum and Dad on the one blanket by the screen, Ma Ma and Gong Gong at the picnic spot, and Marcus and Angellina strolling round the exercise lawn (`LAWN_STROLL`). A test checks that no more than two sit near the screen.
 - Omar is now Ezra. The id stays `omar`, so saves and schedules carry on.
+
+### Round 115: sunset fishing, grilled sardines, and the farm path
+- **Sunset fishing at the bay:** `SPOTS.bay` (place `fishbay`), Friday 5 to 8pm only.
+  - `spotOpen` gates it, and the spot art is hidden outside those hours.
+  - Fish: sardine, mackerel and sea bream (shared with the sea through `also`), plus two new ones: red mullet (`mullet`, sells 6) and a very rare bluefin tuna (`tuna`, sells 30).
+  - Selling at this spot pays Sal's ×1.5.
+- **Sal's van** sells three sardines for 9. That's the same as his buy price, so there's no profit in buying and selling back.
+- **Grill at the bonfire:** "Grill the fish" in the bonfire panel uses up to 6 sardines or mullet, once a Friday (`grillFish`, `F.fri.grill`), and gives hearts and XP.
+- **Farm path:** a path joins the lake field and Wildflower Farm, which sits right above it.
+  - Field gate `toFarmN` at the top, at x=366, between the trees. Its label is hidden on market days because the stalls fill the top row.
+  - Farm gate `toFieldH` at the bottom of the centre lane.
+  - Both are in BRIDGES and ARRIVE, so routing now goes field↔farm directly.
