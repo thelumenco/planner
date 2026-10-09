@@ -352,6 +352,7 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
     tortoise: (a) => [`<path d="M3 17q0-10 9-10t9 10z" ${f(a)}/><ellipse cx="21" cy="14" rx="2.5" ry="2" ${f("#B9D98A")}/>`, `<path d="M3 17q0-10 9-10t9 10zM8 10l4-2 4 2M6 14h12"/><ellipse cx="21" cy="14" rx="2.5" ry="2"/>`],
     duck: (a) => [`<ellipse cx="11" cy="15" rx="7" ry="5.5" ${f(a)}/><circle cx="15" cy="8.5" r="4" ${f(a)}/><path d="M18.5 8.5l3.5 1-3.5 1.5z" ${f("#F2A65A")}/>`, `<ellipse cx="11" cy="15" rx="7" ry="5.5"/><circle cx="15" cy="8.5" r="4"/><path d="M18.5 8.5l3.5 1-3.5 1.5"/><circle cx="16" cy="8" r=".7"/>`],
     bar: (a) => [`<rect x="5" y="4" width="14" height="17" rx="1.5" ${f(a)}/><path d="M5 11h14v10H5z" ${f("#E8D3A6")}/><path d="M5 11h14" ${f("none")}/>`, `<rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M5 11h14M12 4v7M5 7.5h14"/><path d="M8 15h8M8 18h5" opacity=".5"/>`],
+    tile: (a, b) => [`<rect x="4" y="4" width="16" height="16" rx="1.5" ${f(b || "#FFFDF6")}/><path d="M12 6.5l5.5 5.5-5.5 5.5-5.5-5.5z" ${f(a)}/><circle cx="12" cy="12" r="1.6" ${f(b || "#FFFDF6")}/>`, `<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M12 6.5l5.5 5.5-5.5 5.5-5.5-5.5z"/>`],
     coconut: (a) => [`<circle cx="12" cy="14" r="7" ${f(a)}/><ellipse cx="12" cy="9" rx="4" ry="1.5" ${f("#FFFDF6")}/>`, `<circle cx="12" cy="14" r="7"/><ellipse cx="12" cy="9" rx="4" ry="1.5"/><path d="M14 9l3-7"/>`]
   };
   // the Cocoa Room's (cocoa.js): house chocolate for the gelato fridge, wine fillings, festival specials

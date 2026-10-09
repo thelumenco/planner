@@ -849,3 +849,15 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .kgoodw{display:flex;flex-direction:column;align-items:stretch;gap:3px}
 .kkeep{display:flex;align-items:center;justify-content:center;gap:3px;font-size:.72rem}.kkeep .btn{padding:0 7px;min-height:22px;line-height:1}
 .kplan{margin:8px 0;padding:6px 8px;border:1.5px dashed var(--line);border-radius:10px}.kplan summary{cursor:pointer}.kplan summary small{opacity:.75;margin-left:4px}
+/* round 118: Ronda's flamenco palmas (a compás of twelve, the claps on the dark beats), mint tea glasses, tile painting */
+.compas{position:relative;display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin:10px 0;padding:4px;border-radius:10px;background:#F6EFE3;border:1.5px solid var(--line);overflow:hidden}
+.ccell{display:flex;align-items:center;justify-content:center;height:30px;border-radius:6px;font:700 .8rem Mulish,sans-serif;color:#8A7A6A;background:#FFFDF6}
+.ccell.acc{background:#C8343A;color:#FFFDF6}
+.cmark{position:absolute;top:0;bottom:0;left:0;width:4px;margin-left:-2px;background:#2F2B28;border-radius:2px;animation-name:csweep;animation-timing-function:linear;animation-fill-mode:both}
+@keyframes csweep{from{left:0}to{left:100%}}
+.tglasses{display:flex;gap:12px;justify-content:center;margin:8px 0}
+.tglass{width:22px;height:30px;border:1.5px solid var(--line);border-radius:3px 3px 6px 6px;background:linear-gradient(#FFFDF6 55%,#D9B86A 55%)}
+.tglass.good{background:linear-gradient(#FFFDF6 18%,#F6EEDB 18%,#F6EEDB 32%,#C99A3A 32%)}
+.tglass.meh{background:linear-gradient(#FFFDF6 30%,#B98A3A 30%)}
+.paintrow{display:flex;gap:12px;align-items:center;margin:6px 0}
+@media (prefers-reduced-motion:reduce){.cmark{animation-duration:0s!important}}

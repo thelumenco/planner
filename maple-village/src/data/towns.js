@@ -129,12 +129,12 @@ export const TOWN_BOUNDS = {rd_cuero: [30, 250, 490, 600], rd_tapas: [30, 250, 4
   rd_station: [90, 178, 506, 616], rd_plaza: [14, 180, 506, 616], rd_bridge: [14, 22, 506, 616], rd_old: [14, 36, 506, 616]};
 export const TOWN_OBST = {
   // the interiors: the tables, the hedges, the stalls
-  rd_tapas: [[96, 362, 144, 392], [276, 402, 324, 432], [396, 282, 444, 312]],
-  rd_cafe: [[90, 316, 130, 340], [180, 456, 220, 480], [350, 406, 390, 430]],
-  rd_banos: [[214, 440, 306, 500]],
+  rd_tapas: [[96, 362, 144, 392], [276, 402, 324, 432], [396, 282, 444, 312], [30, 486, 116, 510], [372, 498, 520, 552], [466, 376, 520, 480]],
+  rd_cafe: [[90, 316, 130, 340], [180, 456, 220, 480], [350, 406, 390, 430], [56, 446, 96, 470], [432, 516, 472, 540], [436, 326, 476, 350]],
+  rd_banos: [[214, 440, 306, 500], [388, 556, 452, 576]],
   rd_jardin: [[60, 196, 214, 344], [306, 196, 460, 344], [60, 420, 214, 560], [306, 420, 460, 560], [224, 344, 296, 410]],
-  rd_cuero: [[170, 300, 350, 350]],
-  rd_mercado: [[40, 296, 156, 350], [364, 296, 480, 350], [40, 466, 136, 514]],
+  rd_cuero: [[170, 300, 350, 350], [76, 428, 172, 466], [352, 446, 448, 484], [20, 240, 74, 400], [470, 240, 520, 400]],
+  rd_mercado: [[40, 296, 156, 350], [364, 296, 480, 350], [40, 466, 136, 514], [374, 466, 486, 514], [424, 356, 512, 412], [48, 396, 112, 418]],
   rd_station: [[0, 0, 84, 640], [244, 60, 418, 160], [178, 418, 250, 474], [84, 588, 156, 640], [206, 588, 520, 640], [400, 380, 470, 440]],
   rd_plaza: [[30, 36, 228, 172], [292, 36, 488, 172], [222, 306, 298, 366], [440, 384, 520, 500], [0, 592, 296, 640], [366, 592, 520, 640], [180, 432, 232, 458], [0, 392, 60, 488], [0, 508, 74, 590]],
   rd_bridge: [[0, 0, 268, 214], [352, 0, 520, 214], [24, 292, 206, 420], [300, 470, 360, 560], [0, 214, 200, 252]],
@@ -163,6 +163,19 @@ export const TOWN_GOODS = {
   cinturon: {n: "Leather belt", kind: "gift", to: ["dad", "darren", "marcus", "gonggong"], price: 30, shop: "cuero", art: ["roll", "#5A3A2A", "#D9A441"], say: "A proper leather belt, hand-stitched. Very smart."},
   libreta: {n: "Leather notebook", kind: "gift", to: ["angelina", "mum", "darren"], price: 18, shop: "cuero", art: ["box", "#A8754F", "#F3E7C8"], say: "A leather notebook! For lists. And secret lists."},
   llavero: {n: "Leather keyring", kind: "gift", to: "family", price: 6, shop: "cuero", art: ["disc", "#C98A4A", "#D9A441"], say: "A little leather keyring, with a stamped bridge on it. Sweet!"},
+  // round 118: shopping corners: spices and ceramics at the market, postcards and fans at Doña Carmen's
+  azafran: {n: "Saffron", kind: "gift", to: ["mama", "mum", "gonggong"], price: 12, shop: "especias", art: ["bag", "#C8343A", "#F3C24A"], say: "Real saffron! Worth more than gold, gram for gram. Paella this weekend?"},
+  pimenton: {n: "Smoked paprika", kind: "gift", to: ["dad", "gonggong", "darren", "marcus"], price: 6, shop: "especias", art: ["box", "#B5443A", "#F3E7C8"], say: "Smoked paprika in a little tin. Everything I cook is going to taste of Spain now."},
+  especiero: {n: "Spice tin set", kind: "gift", to: "family", price: 10, shop: "especias", art: ["box", "#D9A441", "#8A5A3A"], say: "Little spice tins, all labelled in Spanish! So pretty on the shelf."},
+  cuenco: {n: "Painted bowl", kind: "gift", to: "family", price: 14, shop: "ceramica", art: ["disc", "#3E6BAE", "#F3C969"], say: "A hand-painted bowl, blue and yellow like the tiles! For olives. Or for looking at."},
+  aceitera: {n: "Olive dish", kind: "gift", to: ["mama", "gonggong", "mum"], price: 9, shop: "ceramica", art: ["disc", "#5E8A48", "#F3ECDD"], say: "A little dish with a pit for the stones. Ma Ma approves of practical things."},
+  jarra: {n: "Little jug", kind: "gift", to: ["mum", "angelina", "mama"], price: 11, shop: "ceramica", art: ["bottle", "#C8643B", "#F3ECDD"], say: "A painted jug! For flowers from the garden."},
+  postal: {n: "Postcard of the bridge", kind: "gift", to: "family", price: 2, shop: "postales", art: ["box", "#7FB8E8", "#FFFDF6"], say: "A postcard of Puente Nuevo! Did you write on the back? You did. Aww."},
+  iman: {n: "Ronda fridge magnet", kind: "gift", to: "family", price: 3, shop: "postales", art: ["disc", "#FBF7EE", "#C8643B"], say: "A little white house with a red roof, for the fridge. It's going right in the middle."},
+  encaje: {n: "Lace fan", kind: "gift", to: ["mum", "mama", "angelina"], price: 14, shop: "postales", art: ["cloth", "#FFFDF6", "#3A3430"], say: "A black lace fan! So elegant. I feel like a flamenco dancer already."},
+  // touches: Rocío's carnation for Evan (free), and the tiles Mel (and Evan) paint at Lucía's (keepsakes)
+  clavel: {n: "A red carnation", kind: "gift", to: "family", price: 0, art: ["disc", "#D8343A", "#5E8A48"], say: "A carnation from Ronda! Evan gave it to you? Oh, that boy."},
+  etile: {n: "Evan's painted tile", kind: "keepsake", price: 0, art: ["tile", "#7FB8E8", "#F3C969"], line: "Blue thumbprints, a yellow smudge and a lot of love. Painted by Evan at Lucía's in Ronda."},
   corcho: {n: "Cork coasters", kind: "gift", to: ["dad", "darren", "gonggong", "marcus"], price: 9, shop: "azulejos", art: ["disc", "#B98A5A", "#8A6A52"], say: "Cork from the cork oaks! Light as anything."}
 };
 // Lucía's painted tiles: collect all eight and they become a tiled bench by the pond at home. Some only in season.
@@ -172,6 +185,10 @@ export const TILES = {
   banos: {n: "The Arab baths", price: 35, col: "#C9A27E"}, geranium: {n: "A geranium pot", price: 25, col: "#D8343A", seasons: ["spring", "summer"]},
   guitar: {n: "Manolo's guitar", price: 35, col: "#A8754F"}, almond: {n: "Almond blossom", price: 30, col: "#E890A8", seasons: ["winter"]}
 };
+// Round 118: paint your own tile at Lucía's: a colour and a pattern, four strokes, fired in her kiln (a keepsake)
+export const PAINT = {price: 8, colours: {azul: ["cobalt blue", "#3E6BAE"], amarillo: ["saffron yellow", "#E8B13A"], verde: ["olive green", "#5E8A48"]},
+  patterns: {star: "an eight-point star", flower: "a geranium flower", wave: "waves, like the river in the gorge"}};
+Object.keys(PAINT.colours).forEach(c => Object.keys(PAINT.patterns).forEach(p => { TOWN_GOODS[`ptile_${c}_${p}`] = {n: "Your painted tile", kind: "keepsake", price: 0, tile: [c, p], art: ["tile", PAINT.colours[c][1], "#FFFDF6"], line: `A tile you painted yourself at Lucía's in Ronda: ${PAINT.patterns[p]}, in ${PAINT.colours[c][0]}.`}; }));
 // The tapas bar: order a little plate on the terrace and it's yours to cook at home (kitchen.js TAPAS, learn: true)
 export const TASTINGS = {
   salmorejo: {price: 5, line: "Salmorejo: cold, thick, tomato and bread and olive oil, with egg and jamón on top. Like eating summer with a spoon."},

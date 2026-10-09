@@ -56,7 +56,7 @@ import { ghState, ghGrowth, bedPanel, ghPlant, ghHarvest, ghBoost, setGhCompost 
 import { rondaArt, trainRideArt } from "../art/town-ronda.js";
 import { rondaRoomArt } from "../art/ronda-rooms.js";
 import { TOWNS, townOf, townRoom, roomBehind, TOWN_BOUNDS } from "../data/towns.js";
-import { rondaPanel, rondaVisit, buyGood, buyVines, taste, buyTile, picnic as rondaPicnic, tileBench, cafeTreat } from "./ronda.js";
+import { rondaPanel, rondaVisit, buyGood, buyVines, taste, buyTile, picnic as rondaPicnic, tileBench, cafeTreat, showOn, palmasStart, palmasEnd, clap, ole, paintTile, pour, TEA_GLASSES, rondaState } from "./ronda.js";
 import { tripOn, inParty, buyTrip, endTrip, ticketPanel, homePanel, initTrips, nameOf as tripName, awayOn } from "./trips.js";
 import { bikeArt, taxiBoat, taxiBank, transportArt } from "../art/transport.js";
 import { bikeOn, bikeLeft, hireBike, returnBike, bikeExpired, bikePanel, STOPS as TAXI_STOPS, taxiPanel, takeTaxi } from "./transport.js";
@@ -1556,7 +1556,7 @@ function ctx(){
   else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick);
   else if (railOpen && scene === "hlane") h = timetablePanel(dayKey(), sgHM(), true);
   else if (railOpen && townOf(scene)) h = homePanel(F, townOf(scene));
-  else if (rondaView && townOf(scene)) h = rondaPanel(F, rondaView);
+  else if (rondaView && townOf(scene)) h = rondaPanel(F, rondaView, {flam: flamSt, hm: sgHM(), tea: teaSt, amina: isHere("amina"), paint: paintSt});
   else if (fishSpot && FISH_SPOTS[fishSpot].scene === scene) h = fishPanel(F, fishSpot, fishSt);
   else if (woodsView === "ranger" && scene === "hwoods") h = rangerPanel(F, isHere("wren"));
   else if (woodsView === "bike" && outside()) h = bikePanel(F, F.ride === "car" && owns(F, "car") ? "car" : owns(F, "scooter") && F.ride !== "walk" ? "scooter" : "");
@@ -1701,7 +1701,7 @@ function ctx(){
     save(); ctx(); drawScene(); });
   c.querySelectorAll("[data-bike]").forEach(b => b.onclick = () => { const line = b.dataset.bike === "hire" ? hireBike(F) : returnBike(F); if (!line) return; sfx(b.dataset.bike === "hire" ? "chaching" : "tap"); speak(line, 4000); save(true); ctx(); });
   c.querySelectorAll("[data-taxi]").forEach(b => b.onclick = () => rideTaxi(b.dataset.taxi));
-  c.querySelectorAll("[data-van]").forEach(b => b.onclick = () => { const id = b.dataset.van;
+  c.querySelectorAll("[data-salvan]").forEach(b => b.onclick = () => { const id = b.dataset.salvan;
     if (id === "sellall") { const g = sellCatch(F, null, VAN_MULT); if (!g) return; sfx("chaching"); speak(`Sal weighs it all up: ${g.coins} coins for ${g.n}. "Good fish, that."`, 4000); }
     else { const l = vanBuy(F, id, addInv); if (!l) return; sfx("chaching"); speak(l, 3000); }
     save(); ctx(); });
@@ -1729,11 +1729,35 @@ function ctx(){
   c.querySelectorAll("[data-triphome]").forEach(b => b.onclick = () => tripHome(false));
   c.querySelectorAll("[data-rbuy]").forEach(b => b.onclick = () => { const id = b.dataset.rbuy;
     if (id === "vines") { if (!buyVines(F)) return; sfx("chaching"); flash("Three Tempranillo cuttings"); speak("Rafael wraps three cuttings in damp newspaper. \"Plant them in the sun. Talk to them. They're from my grandfather's vines.\" Plant them on a trellis at home.", 7000); }
-    else { const g = buyGood(F, id, addInv); if (!g) return; sfx("chaching"); flash(g.n); }
+    else { const g = buyGood(F, id, addInv); if (!g) return; sfx("chaching"); flash(g.n);
+      if (g.shop === "cuero" && id !== "llavero") speak("Antonio takes a little brass stamp and presses an M into the corner. \"For free. So everyone knows it's yours.\"", 5000);
+      else if (g.shop === "postales" && id === "postal") speak("Doña Carmen stamps it for you, and points: \"The postbox is by the fountain.\"", 4000); }
     save(); ctx(); });
   c.querySelectorAll("[data-rcafe]").forEach(b => b.onclick = () => { if (!cafeTreat(F, b.dataset.rcafe)) return; rondaView = null; ctx(); sfx("chime"); gainXp(1); hearts(2);
     mel.sitting = true; nodes.mel.classList.add("sit"); if (b.dataset.rcafe === "choc") speak(pick(["Dip, bite, dip again. The chocolate's so thick the churro stands up in it.", "Hot churros, crisp and sugary, and a cup of chocolate you could stand a spoon in. Heaven."]), 6000); else speak(pick(["Café con leche in a glass, a churro to dip, and the fan ticking round overhead. Bliss.", "Doña Carmen sets it down: \"Eat, eat. You're too thin.\" The churro's still hot.", "Coffee, sugar, the plaza going by outside the window. Nobody's in a rush."]), 6000);
     if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["churro! mine!", "sugar on my nose!", "more churro please"])), 1800); save(); });
+  c.querySelectorAll("[data-rflam]").forEach(b => b.onclick = () => {
+    if (b.dataset.rflam === "start") { flamSt = palmasStart(); clearTimeout(flamT); sfx("tap"); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["clap clap CLAP!", "I'm clapping, Mama!", "olé! olé!"])), 2400);
+      flamT = setTimeout(() => { flamSt.done = true; const won = ole(flamSt); const r = rondaState(F); if (won) { r.oles = (r.oles || 0) + 1; gainXp(2); hearts(3); sfx("yay"); act("cheer"); go(scene, 430, 540, () => { act("cheer"); mprop("sparkle", mel.x, mel.y - 60, 1600); });
+          speak("Rosario takes your hands and spins you round the stage. The whole bar shouts ¡Olé!", 6000); if (isHere("mum")) setTimeout(() => npcSay("mum", "THAT'S my girl! Olé!"), 2000); } else sfx("chime");
+        if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(won ? "Mama DANCED!" : "again! again!"), 1600); save(); ctx(); }, palmasEnd(flamSt) - Date.now() + 300);
+      ctx(); return; }
+    if (!flamSt || flamSt.done) return; const r = clap(flamSt); if (r === "hit") sfx("tap"); else if (r === "miss") sfx("paper", true); ctx(); });
+  c.querySelectorAll("[data-rtea]").forEach(b => b.onclick = () => {
+    if (b.dataset.rtea === "start") { teaSt = {t0: Date.now(), glasses: []}; sfx("paper", true); ctx(); return; }
+    if (!teaSt || teaSt.glasses.length >= TEA_GLASSES) return; const ok = pour(teaSt); sfx(ok ? "chime" : "tap");
+    if (teaSt.glasses.length >= TEA_GLASSES) { const good = teaSt.glasses.filter(Boolean).length, r = rondaState(F); if (r.teaDay !== dayKey()) { r.teaDay = dayKey(); gainXp(good >= 2 ? 2 : 1); }
+      if (good >= 2) hearts(2); speak(good >= 2 ? "Sweet, minty, frothy on top. Amina raises her glass: \"To Ronda.\"" : "A bit flat, but still lovely. Amina says the froth comes with practice.", 5000);
+      if (inParty(F, "evan") && !evanNight()) setTimeout(() => { evanSays(pick(["sugar cube! for me?", "crunch crunch", "Amina gave me sugar!"])); }, 1600); save(); }
+    ctx(); });
+  c.querySelectorAll("[data-rpaint]").forEach(b => b.onclick = () => { const [k, v] = b.dataset.rpaint.split(":");
+    if (k === "c" || k === "p") paintSt = {...paintSt, [k]: v, step: 0, oops: false};
+    else if (k === "s") { const want = (paintSt.step || 0) + 1; if (+v === want) { paintSt = {...paintSt, step: want, oops: false}; sfx("tap"); } else { paintSt = {...paintSt, oops: true}; sfx("paper", true); } }
+    else if (k === "reset") paintSt = {};
+    else if (k === "fire") { const evanToo = inParty(F, "evan") && !evanNight(), id = paintTile(F, paintSt.c, paintSt.p, evanToo, addInv); if (!id) return; paintSt = {}; sfx("chime"); gainXp(1); flash("Your painted tile");
+      speak(`Lucía slides it into the kiln and brings it out an hour later, glazed and shiny. Yours to keep: put it on a shelf at home.${evanToo ? " Evan's finger-painted one comes out too, mostly thumbprints." : ""}`, 7000);
+      if (evanToo) setTimeout(() => evanSays(pick(["I PAINTED it!", "blue! my blue!", "for my room!"])), 1800); save(); }
+    ctx(); });
   c.querySelectorAll("[data-rtaste]").forEach(b => b.onclick = () => { const r = taste(F, b.dataset.rtaste); if (!r) return; sfx("chime"); act("cheer"); gainXp(r.fresh ? 1 : 0);
     speak(r.line + (r.fresh ? " You've got the recipe now: it's on your stove at home." : ""), 8000); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["more!", "yummy!", "Mama, can I try?"])), 1800); save(); ctx(); });
   c.querySelectorAll("[data-rtile]").forEach(b => b.onclick = () => { const r = buyTile(F, b.dataset.rtile); if (!r) return; sfx("chaching"); flash(`Tile: ${r.t.n}`);
@@ -2057,13 +2081,16 @@ function tripHome(late){
 // places on a town's screens (the gates are handled as bridges): the station, and a line for everywhere else
 // inside one of a town's rooms (round 116): the bar, the café counter and Rafael's stall open their panels; the
 // baths' skylights tell you something about them; the garden's fountain is for sitting by
-let bathFact = 0;
+let bathFact = 0, flamSt = null, flamT = 0, teaSt = null, paintSt = {};   // round 118: the flamenco palmas, Amina's mint tea, Lucía's tile painting
 const BATH_FACTS = ["Eight hundred years old: the best-kept Arab baths in Spain. The water came up from the river on a wheel turned by a donkey.",
   "Three rooms, cold, warm and hot, like a hammam. The star-shaped holes let the light down and the steam out.",
   "Under the floor, hot air from a furnace ran through channels, so the stones were warm under your feet.",
   "People came to wash, but mostly to talk. Like a café, with more steam."];
 function roomSpot(id){
-  if (id === "tapas" || id === "mercado" || id === "dulces" || id === "cuero") { rondaView = id; sfx("paper", true); render(); return; }
+  if (id === "flamenco" || id === "tea") { rondaView = id; if (id === "flamenco") { flamSt = null; clearTimeout(flamT); } else teaSt = null; sfx("paper", true); render(); return; }
+  if (id === "cat") { sfx("chime"); speak(pick(["The workshop cat opens one eye, decides you're alright, and goes back to sleep on the hides.", "A purr like a little engine. Antonio says she's called Piel. Of course she is.", "The cat stretches, yawns, and rolls over onto a half-finished belt."]), 4500);
+    if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["kitty!", "soft kitty", "she's purring, Mama!"])), 1400); render(); return; }
+  if (id === "tapas" || id === "mercado" || id === "dulces" || id === "cuero" || id === "especias" || id === "ceramica" || id === "postales") { rondaView = id; sfx("paper", true); render(); return; }
   if (id === "banos") { mel.dir = 1; speak(BATH_FACTS[bathFact++ % BATH_FACTS.length], 7000); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["stars! in the roof!", "echo! ECHO!", "it's dark and sparkly"])), 1600); render(); return; }
   if (id === "jardin") { mel.sitting = true; nodes.mel.classList.add("sit"); sfx("chime"); speak(pick(["The fountain splashes, the water runs off down the channel, and the noise of the town just... stops.", "Orange blossom, myrtle, cool stone. You could sit here all afternoon.", "A sparrow drinks from the edge of the fountain. Nobody's in a hurry."]), 5500);
     const t = tripOn(F), who = t ? t.party.filter(x => x !== "evan" && isHere(x)) : []; if (who.length) setTimeout(() => npcSay(who[0], pick(TOWNS.ronda.lines[who[0]] || ["Lovely."])), 2600); render(); return; }
@@ -2072,7 +2099,11 @@ function townSpot(id){
   const town = townOf(scene), T = TOWNS[town];
   if (id === "rdtrain") { railOpen = true; sfx("paper", true); render(); return; }
   const room = roomBehind(town, id);   // round 116: the tapas bar, the café, the market, the baths and the garden have insides
-  if (room) { sfx("paper", true); setScene(room, [260, 560]); setTimeout(() => speak(T.rooms[room].say, 5000), 700); return; }
+  if (room) { sfx("paper", true); setScene(room, [260, 560]); setTimeout(() => speak(T.rooms[room].say, 5000), 700);
+    // a touch: Rocío gives Evan a carnation (once a day), and he gives it straight to Mel
+    const r = rondaState(F); if (room === "rd_mercado" && inParty(F, "evan") && !evanNight() && r.flowerDay !== dayKey() && NPCS.some(n => n.id === "rocio") ) setTimeout(() => { if (scene !== "rd_mercado" || !isHere("rocio")) return; r.flowerDay = dayKey(); addInv("clavel", 1);
+      npcSay("rocio", "¡Para ti, guapo! A carnation, for the little one."); setTimeout(() => evanSays("for you, Mama!"), 2200); save(); }, 3200);
+    return; }
   if (["mercado", "tapas", "dulces", "convento", "azulejos"].includes(id)) { rondaView = id; sfx("paper", true); speak(T.say[id], 4000);
     if (id === "convento" && inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["Knock knock! Hello nuns!", "The wall is spinning!", "Biscuits from a WALL?"])), 1600);
     render(); return; }

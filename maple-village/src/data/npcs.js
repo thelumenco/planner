@@ -386,7 +386,9 @@ export const NPCS = [
     id: "manolo", local: "ronda", pitch: 0.8, name: "Manolo", job: "Plays flamenco guitar by the fountain",
     intro: "Manolo. I play, people walk past, some of them stop. The pigeons always stop. They never tip.",
     look: {skin: "#C68E68", hair: "#1E1A18", hairStyle: "short", top: "#F6EFE3", bottom: "#2F2B28"},
-    routine: [slot("11:00", "14:00", "rd_plaza", [306, 378], {act: "guitar", dir: -1}), slot("15:30", "18:00", "rd_station", [232, 500], {act: "guitar", dir: -1}), slot("18:00", "22:00", "rd_plaza", [306, 378], {act: "guitar", dir: -1})],
+    // (and plays for Rosario's flamenco in the tapas bar, 1 to 3 and 8 to 10)
+    routine: [slot("11:00", "13:00", "rd_plaza", [306, 378], {act: "guitar", dir: -1}), slot("13:00", "15:00", "rd_tapas", [404, 520], {act: "guitar", dir: 1}), slot("15:30", "18:00", "rd_station", [232, 500], {act: "guitar", dir: -1}),
+      slot("18:00", "20:00", "rd_plaza", [306, 378], {act: "guitar", dir: -1}), slot("20:00", "22:00", "rd_tapas", [404, 520], {act: "guitar", dir: 1})],
     lines: ["This one's a bulería. Clap on twelve. No, twelve. Never mind.", "A guitar is just wood and string and a bit of heartbreak.", "Your family has good ears. Especially the lady who dances.", "Requests? I know three songs. And forty more."],
     actLines: {guitar: ["*strums*", "Olé!", "This one's for the pigeons."]},
     away: "Manolo's guitar case is shut. He's having a coffee somewhere."
@@ -433,6 +435,14 @@ export const NPCS = [
     routine: [slot("9:00", "13:00", "rd_jardin", [214, 360], {act: "water", dir: 1}), slot("16:00", "19:00", "rd_jardin", [306, 410], {act: "water", dir: -1})],
     lines: ["Myrtle, orange, cypress. The same plants for a thousand years. They know what they're doing.", "Listen. The water. That's the whole point of a garden like this.", "Don't pick the oranges. Bitter! For marmalade only.", "Shade, water, quiet. Stay as long as you like."],
     away: "Joaquín's gone home for lunch. The water keeps on running."
+  },
+  {
+    id: "rosario", local: "ronda", pitch: 1.1, name: "Rosario", job: "Dances flamenco in the tapas bar",
+    intro: "Rosario. I dance. Manolo plays, I dance, and if you clap in the right places, I dance better. Olé!",
+    look: {skin: "#D9A47E", hair: "#1E1A18", hairStyle: "bun", top: "#C8343A", bottom: "#C8343A"},
+    routine: [slot("13:00", "15:00", "rd_tapas", [462, 516], {act: "dance", dir: -1}), slot("20:00", "22:00", "rd_tapas", [462, 516], {act: "dance", dir: -1})],
+    lines: ["Clap on three, six, eight, ten and twelve. It's easy! It's not easy.", "Flamenco is not happy, not sad. It's both, at the same time.", "My grandmother danced on this same stage. Well, the old one. It fell down.", "¡Venga, Evan! Clap with me!"],
+    away: "Rosario's resting her feet. The show's at one and at eight."
   },
   {
     id: "antonio", local: "ronda", pitch: 0.7, name: "Antonio", job: "Leatherworker from Ubrique, with a workshop in the old town",

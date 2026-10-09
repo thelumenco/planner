@@ -2706,7 +2706,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => /Ronda/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2500);
   check(await fox().then(f => f.coins === 180 && f.trip && f.trip.party.join() === "mama,gonggong,evan"), "tickets paid, and the trip's on");
   { const tw = await import(new URL("../src/data/towns.js", import.meta.url)), R = tw.TOWNS.ronda.rooms, mus = Object.values(R).map(r => r.music);
-    check(Object.keys(R).length >= 5 && new Set([...mus, tw.TOWNS.ronda.music]).size === mus.length + 1 && Object.keys(R).every(r => tw.townOf(r) === "ronda" && tw.TOWN_PLACES[R[r].door]), "Ronda has its interiors behind its doors (six: Mel asked for the leather workshop too), each with its own music"); }
+    check(Object.keys(R).length >= 5 && new Set([...mus, tw.TOWNS.ronda.music]).size === mus.length + 1 && Object.keys(R).every(r => tw.townOf(r) === "ronda" && tw.TOWN_PLACES[R[r].door]), "Ronda has its interiors behind its doors (six: Mel asked for the leather workshop too), each with its own music");
+    const rd = await import(new URL("../src/game/ronda.js", import.meta.url));
+    const good = rd.palmasStart(0); [0, 1].forEach(k => rd.ACCENTS.forEach(a => rd.clap(good, good.t0 + (k*12 + a)*rd.BEAT_MS + 100)));
+    const bad = rd.palmasStart(0); for (let bt = 0; bt < 24; bt++) rd.clap(bad, bad.t0 + bt*rd.BEAT_MS + 100);
+    check(rd.showOn(13*60 + 30) && rd.showOn(20*60 + 30) && !rd.showOn(16*60) && rd.ole(good) && good.hits === 10 && !rd.ole(bad), "flamenco at 1 and 8: clap on 3, 6, 8, 10 and 12 for an olé (clapping on every beat doesn't count)");
+    const tea = {t0: 0, glasses: []}; rd.pour(tea, .82*900); rd.pour(tea, 0); check(tea.glasses.join() === "true,false", "Amina's mint tea: pour from high up and it froths");
+    const Fp = {coins: 10, inv: {}}, addp = (id, n) => { Fp.inv[id] = (Fp.inv[id] || 0) + n; };
+    check(rd.paintTile(Fp, "azul", "star", true, addp) === "ptile_azul_star" && Fp.coins === 2 && Fp.inv.etile === 1 && rd.paintTile(Fp, "verde", "wave", false, addp) === null, "painting a tile at Lucía's (8 coins): a keepsake, and Evan's finger-painted one too");
+    check(["especias", "ceramica", "postales"].every(s => Object.values(tw.TOWN_GOODS).filter(g => g.shop === s).length === 3), "shopping corners: spices and ceramics at the market, postcards at Doña Carmen's"); }
   check(await ids().then(a => a.includes("mama") && a.includes("gonggong")) && await page.locator("#evan").evaluate(n => n.style.display !== "none"), "off the train at Ronda station: Ma Ma, Gong Gong and Evan came too");
   check(await page.evaluate(() => ["rdtrain", "alameda", "bandstand", "rdToPlaza", "rdStepsDown"].every(id => document.querySelector(`#world [data-place="${id}"]`))), "Ronda's station screen: the station, the Alameda balcony, the bandstand, the way to the plaza and the gorge steps");
   await page.locator('#world [data-place="rdToPlaza"]').dispatchEvent("click");
