@@ -1722,3 +1722,8 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Antonio stamps an M into leather you buy, and Doña Carmen stamps your postcard.
   - Rocío gives Evan a carnation once a day at the market, and he hands it to Mel (`clavel`).
   - The workshop cat Piel sleeps on Antonio's counter: tap her.
+
+### Round 119: take things back out
+- **Scoop Shack fridge:** each item in the fridge has "Take 1" and "All" buttons (`data-gback`, `unstockFridge`). Note that `data-gtake` is already the gelato take-away button.
+- **Cocoa Room fillings shelf:** each item has the same buttons (`data-cc="take"`, `unstockPantry`). Wine fillings stay on the shelf.
+- **Where things go:** items go back into the backpack. Flower stems aren't backpack items, so they go back onto Ma Ma's farm shop shelf. The shared helper is `takeBack` in scoop.js.

@@ -1698,6 +1698,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   // The Scoop Shack on the bay: stock the fridge, discover a flavour at the bench, have one free, take one to give
   // (gelato isn't offered to Marcus), and while time passes Tomo makes batches and customers buy
   console.log("\nthe Scoop Shack");
+  { const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {inv: {}, scoop: {fridge: {milk: 3, fl_rose: 2}}, cocoa: {}}, orch = {stock: {}};
+    check(sc.unstockFridge(F, "milk", 2, orch).to === "bag" && F.inv.milk === 2 && F.scoop.fridge.milk === 1 && sc.unstockFridge(F, "fl_rose", 99, orch).to === "farm" && orch.stock["stem:rose"] === 2, "things can come back out of the gelato fridge (flower stems go back to Ma Ma's shelf)");
+    cc.cocoaState(F).pantry = {honey: 2}; check(cc.unstockPantry(F, "honey", 99, orch).n === 2 && F.inv.honey === 2, "and off the Cocoa Room's fillings shelf"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => { errors.push(`scoop pageerror: ${e.message}`); console.log("PAGEERR", e.stack.slice(0, 600)); });
   page.on("dialog", d => { errors.push("the Scoop Shack used a browser pop-up"); d.dismiss(); });

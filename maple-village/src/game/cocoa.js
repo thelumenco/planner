@@ -33,7 +33,7 @@
 // often while Mel's serving too). Takings go straight to Mel. Mel can have a bar or take one to give.
 import { esc, dayKey, sgHM, hash } from "../util.js";
 import { icon } from "../art/icons.js";
-import { INGR, farmShelf, scoopState, hasUp } from "./scoop.js";
+import { INGR, farmShelf, scoopState, hasUp, takeBack } from "./scoop.js";
 import { wineClubNow } from "./tours.js";
 import { festivalOn, rainyOn } from "../art/village-extras.js";
 
@@ -154,6 +154,8 @@ export function stockPantry(F, id, n, from, orch){
   else { const key = id.startsWith("fl_") ? "stem:" + id.slice(3) : id; n = Math.min(n, orch.stock[key] || 0); if (n <= 0) return 0; orch.stock[key] -= n; if (orch.stock[key] <= 0) delete orch.stock[key]; }
   c.pantry[id] = (c.pantry[id] || 0) + n; return n;
 }
+// take fillings back off the shelf (into the backpack, or flower stems back to Ma Ma's shelf); wine fillings stay
+export const unstockPantry = (F, id, n, orch) => id.startsWith("wine_") ? null : takeBack(cocoaState(F).pantry, id, n, F, orch);
 // gift boxes from what's on display: 4 or 9 bonbons, packed in turn from each flavour. All dark shells (dairy-free)
 // makes a box Marcus can have too
 export const caseCount = c => onDisplay(c).reduce((a, b) => a + c.trays[b.id], 0);
@@ -333,7 +335,7 @@ export function pantryPanel(F, orch){
   const c = cocoaState(F), inS = Object.keys(c.pantry).filter(id => c.pantry[id] > 0), bag = backpackFillings(F), shelf = farmFillings(orch);
   const cell = (id, n, extra) => `<li><span class="wpic">${ingPic(id)}</span><span class="wtxt"><b>${esc(fillName(id))}</b><small>${n}</small></span>${extra || ""}</li>`;
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The fillings shelf</h2><p class="sub">What goes inside the bonbons: fruit, flowers, honey, pandan, coffee, nuts... A tray uses one of each filling.</p>`;
-  h += inS.length ? `<ul class="hlist wlist">${inS.map(id => cell(id, `${c.pantry[id]} on the shelf`)).join("")}</ul>` : `<p class="muted">Empty for now.</p>`;
+  h += inS.length ? `<ul class="hlist wlist">${inS.map(id => cell(id, `${c.pantry[id]} on the shelf`, id.startsWith("wine_") ? "" : `<span class="orbtns"><button class="btn small alt" data-cc="take" data-k="${id}" data-n="1">Take 1</button><button class="btn small alt" data-cc="take" data-k="${id}" data-n="99">All</button></span>`)).join("")}</ul>` : `<p class="muted">Empty for now.</p>`;
   if (bag.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From your backpack</p><ul class="hlist wlist">${bag.map(id => cell(id, `${F.inv[id]} with you`, `<span class="orbtns"><button class="btn small primary" data-cc="fill" data-src="bag" data-k="${id}" data-n="1">Add 1</button><button class="btn small alt" data-cc="fill" data-src="bag" data-k="${id}" data-n="99">All</button></span>`)).join("")}</ul>`;
   if (shelf.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From Ma Ma's farm shop</p><ul class="hlist wlist">${shelf.map(id => cell(id, `${orch.stock[id.startsWith("fl_") ? "stem:" + id.slice(3) : id]} on her shelf`, `<span class="orbtns"><button class="btn small primary" data-cc="fill" data-src="farm" data-k="${id}" data-n="1">Add 1</button><button class="btn small alt" data-cc="fill" data-src="farm" data-k="${id}" data-n="99">All</button></span>`)).join("")}</ul>`;
   const wines = wineShelf(F);

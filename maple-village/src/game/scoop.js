@@ -194,6 +194,15 @@ export function stockFridge(F, id, n, from, orch){
   else { const key = id.startsWith("fl_") ? "stem:" + id.slice(3) : id, have = orch.stock[key] || 0; n = Math.min(n, have); if (n <= 0) return 0; orch.stock[key] -= n; if (orch.stock[key] <= 0) delete orch.stock[key]; }
   s.fridge[id] = (s.fridge[id] || 0) + n; return n;
 }
+// take things back out of the fridge (Mel's request, round 119): into the backpack, or, for flower stems (which
+// aren't backpack items), back onto Ma Ma's farm shop shelf where they came from. -> how many, and where
+export function takeBack(store, id, n, F, orch){
+  const have = store[id] || 0; n = Math.min(n, have); if (n <= 0) return null;
+  store[id] -= n; if (store[id] <= 0) delete store[id];
+  if (ITEMS[id]) { F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + n; return {n, to: "bag"}; }
+  const key = id.startsWith("fl_") ? "stem:" + id.slice(3) : id; orch.stock[key] = (orch.stock[key] || 0) + n; return {n, to: "farm"};
+}
+export const unstockFridge = (F, id, n, orch) => takeBack(scoopState(F).fridge, id, n, F, orch);
 // what Ma Ma's farm shop has on its shelves that could go in the fridge (fruit, and flower stems)
 export const farmShelf = orch => Object.keys(orch.stock || {}).filter(k => orch.stock[k] > 0).map(k => k.startsWith("stem:") ? "fl_" + k.slice(5) : k).filter(isIngr);
 
@@ -389,7 +398,7 @@ export function fridgePanel(F, orch){
   const s = scoopState(F), inF = Object.keys(s.fridge).filter(id => s.fridge[id] > 0), bag = backpackIngr(F), shelf = farmShelf(orch);
   const cell = (id, n, extra) => `<li><span class="wpic">${ingPic(id)}</span><span class="wtxt"><b>${esc(INGR[id][0])}</b><small>${n}</small></span>${extra || ""}</li>`;
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The fridge</h2><p class="sub">What your gelato's made from. Each tub uses one of each of a flavour's ingredients.</p>`;
-  h += inF.length ? `<ul class="hlist wlist">${inF.map(id => cell(id, `${s.fridge[id]} in the fridge`)).join("")}</ul>` : `<p class="muted">Empty. Add fruit, berries, flowers, milk, honey...</p>`;
+  h += inF.length ? `<ul class="hlist wlist">${inF.map(id => cell(id, `${s.fridge[id]} in the fridge`, `<span class="orbtns"><button class="btn small alt" data-gback="${id}:1">Take 1</button><button class="btn small alt" data-gback="${id}:99">All</button></span>`)).join("")}</ul>` : `<p class="muted">Empty. Add fruit, berries, flowers, milk, honey...</p>`;
   if (bag.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From your backpack</p><ul class="hlist wlist">${bag.map(id => cell(id, `${F.inv[id]} with you`, `<span class="orbtns"><button class="btn small primary" data-gfill="bag:${id}:1">Add 1</button><button class="btn small alt" data-gfill="bag:${id}:99">All</button></span>`)).join("")}</ul>`;
   if (shelf.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From Ma Ma's farm shop</p><ul class="hlist wlist">${shelf.map(id => { const n = orch.stock[id.startsWith("fl_") ? "stem:" + id.slice(3) : id];
     return cell(id, `${n} on her shelf`, `<span class="orbtns"><button class="btn small primary" data-gfill="farm:${id}:1">Add 1</button><button class="btn small alt" data-gfill="farm:${id}:99">All</button></span>`); }).join("")}</ul>`;

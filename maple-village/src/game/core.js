@@ -69,10 +69,10 @@ import { moodPanel, vanPick, vanClear, lookLine as vanLookLine } from "./van.js"
 import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush, milkOne, milkHerd, collectHives, buyStand, giveName, fullHives,
   extractorPanel, crockPanel, pressPanel as hfPressPanel, cavePanel as hfCavePanel, spinFrames, makeYoghurt, pressCheese, takeWheel, cheeseNames, CHEESES as HF_CHEESES,
   gainTrust, muckOut, latchGate, catchGoat, nameHive, creamHoney, cutComb, turnWheels, finishRequest, stockShelf, hfTick, farmhousePanel, LEVELS as HF_LEVELS, MOODS as HF_MOODS } from "./hfarm.js";
-import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
+import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, unstockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
-  pantryPanel, bonbonPanel, casePanel, stockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
+  pantryPanel, bonbonPanel, casePanel, stockPantry, unstockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
   sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, haveHot, packGrand, readyPot, ccUp } from "./cocoa.js";
 import { keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, OWNER_NAME, PETS, petAt } from "./companions.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
@@ -2620,6 +2620,7 @@ function wireCocoa(c){
     else if (a === "grand") { const id = packGrand(F); if (!id) return; sfx("paper", true); flash(`${ITEMS[id].n} in your backpack`); }
     else if (a === "bprice") { const s = cocoaState(F); s.prices.bonbon = Math.max(1, Math.min(20, s.prices.bonbon + n)); }
     else if (a === "fill") { const got = stockPantry(F, k, n, b.dataset.src, orchState(F)); if (got) { sfx("tap"); flash(`+${got} on the fillings shelf`); } }
+    else if (a === "take") { const got = unstockPantry(F, k, n, orchState(F)); if (got) { sfx("tap"); flash(got.to === "bag" ? `${got.n} back into your backpack` : `${got.n} back to Ma Ma's shelf`); } }
     else if (a === "shell") { ccSt.shell = k; ccSt.made = null; }
     else if (a === "sel") { ccSt.made = null; ccSt.sel = ccSt.sel.includes(k) ? ccSt.sel.filter(x => x !== k) : [...ccSt.sel, k].slice(0, 2); }
     else if (a === "bonbon" || a === "again") { const r0 = a === "again" ? bonbonOf(cocoaState(F), k) : null, out = r0 ? makeBonbons(F, r0.shell, r0.fills) : makeBonbons(F, ccSt.shell, ccSt.sel); if (!out) return;
@@ -2701,6 +2702,7 @@ function wireScoop(c){
   c.querySelectorAll("[data-gprice]").forEach(b => b.onclick = () => { const [k, d] = b.dataset.gprice.split(":"); s.prices[k] = Math.max(k === "special" ? 0 : 1, Math.min(30, s.prices[k] + +d)); re(); });
   c.querySelectorAll("[data-gspecial]").forEach(b => b.onchange = () => { const r = recipeOf(s, b.dataset.gspecial); if (r) { r.special = b.checked; re(); } });
   const nf = c.querySelector("[data-gname]"); if (nf) nf.onsubmit = ev => { ev.preventDefault(); const v = (nf.querySelector("input").value || "").trim().slice(0, 30); if (!v) return; s.name = v; speak(`The sign now says ${v}.`, 3500); re(); render(); };
+  c.querySelectorAll("[data-gback]").forEach(b => b.onclick = () => { const [id, n] = b.dataset.gback.split(":"), got = unstockFridge(F, id, +n, orchState(F)); if (!got) return; sfx("tap"); flash(got.to === "bag" ? `${got.n} back into your backpack` : `${got.n} back to Ma Ma's shelf`); re(); });
   c.querySelectorAll("[data-gfill]").forEach(b => b.onclick = () => { const [from, id, n] = b.dataset.gfill.split(":"), got = stockFridge(F, id, +n, from, orchState(F)); if (!got) return; sfx("tap"); flash(`+${got} into the fridge`); re(); });
   c.querySelectorAll("[data-gsel]").forEach(b => b.onclick = () => { scSt.made = null; const id = b.dataset.gsel; scSt.sel = scSt.sel.includes(id) ? scSt.sel.filter(x => x !== id) : [...scSt.sel, id].slice(0, 4); ctx(); });
   c.querySelectorAll("[data-gmix]").forEach(b => b.onclick = () => { const out = discover(F, scSt.sel); speak(out.msg, 5500);
