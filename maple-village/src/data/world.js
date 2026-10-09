@@ -90,6 +90,8 @@ export const VILLAGE = {
   mumdad: {scene:"shore", name:"Mum and Dad's", short:"Mum and Dad's house", door:[360,226], mark:[360,110]},
   marcus: {scene:"shore", name:"Marcus and Angellina's", short:"Marcus and Angellina's house", door:[400,470], mark:[400,354]},
   suprack:{scene:"shore", name:"Paddleboards", door:[216,488], spot:true, line:"The paddleboard rack by the jetty. Fancy a paddle?"},
+  ferry:  {scene:"shore", name:"Ferry to Jeju", door:[86,466], spot:true, mark:[78,400], line:"The ferry stop at the end of the jetty: boats to Jeju."},
+  wishtower:{scene:"hwoods", name:"The wish-tower", door:[124,470], spot:true, mark:[110,400], line:"A little tower of stones by the river. Add one and make a wish."},
   boat:   {scene:"shore", name:"Cruise boat", door:[206,550], spot:true, line:"The mooring at the end of the jetty."},
   dolphins:{scene:"shore", name:"Boardwalk bench", door:[214,262], spot:true, line:"A bench looking out to sea. Dolphins come by most mornings."},
   exlawn: {scene:"field", name:"Exercise lawn", door:[452,430], spot:true, line:"The exercise lawn. Mum's class is here most mornings at 8."},

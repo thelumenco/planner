@@ -2894,6 +2894,47 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  console.log("\nJeju, by ferry and by train");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), J = tw.TOWNS.jeju;
+  check(J.screens.length === 4 && J.screens.every(sc => tw.townOf(sc) === "jeju" && sc.startsWith("jj_")) && J.arrive[0] === "jj_village" && J.arrive[0] !== J.screens[0] && J.ferry.arrive[0] === "jj_harbour",
+    "Jeju: four screens; the station's in the village (bottom right, not top left like the others) and the ferry comes into the harbour");
+  check(J.fare === 70 && J.ferry.fare === 50 && Object.keys(tw.TOWN_PLACES).filter(k => tw.TOWN_PLACES[k].scene && tw.TOWN_PLACES[k].scene.startsWith("jj_")).every(k => k.startsWith("jj")), "70 by train, 50 by ferry; every Jeju place starts with jj");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`jeju pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  await page.addInitScript(() => { if (!/jjcoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 300; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-11-12"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-11-12&jjcoins=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-trip="jeju"][data-by="ferry"]', { timeout: 15000 });
+  await page.click('#ctx [data-tpick="mama"]'); await page.click('#ctx [data-tpick="evan"]');
+  check(/100/.test(await page.locator("#ctx [data-trip]").textContent()) && /ferry to Jeju/i.test(await page.locator("#ctx h2").textContent()), "the ferry stop at the end of the jetty: Mel and Ma Ma to Jeju, 100 coins (Evan sails free)");
+  await page.click("#ctx [data-trip]");
+  await page.waitForFunction(() => /Jeju/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2000);
+  check(await fox().then(f => f.coins === 200 && f.trip.town === "jeju" && f.trip.by === "ferry") && /harbour/.test(await page.locator("#sceneName").textContent()) && await ids().then(a => a.includes("mama")), "off the ferry at Jeju's harbour, with Ma Ma and Evan");
+  await page.locator('#world [data-place="jjpier"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="ferry"]', { timeout: 15000 });
+  check(/ferry home/i.test(await page.locator("#ctx").innerText()), "the pier: a ferry home whenever you're ready");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  for (const [gate, want, places] of [["jjToShoreN", "Seongsan", ["jjcone", "jjhaenyeo", "jjpools"]], ["jjToFarms", "tangerine farms", ["jjorchard", "jjshed", "jjponies", "jjcairns"]], ["jjToVillage", "stone village", ["jjtrain", "jjcafe", "jjdye", "jjstatues"]], ["jjToHarbourW", "harbour", ["jjpier", "jjmarket", "jjlights"]]]) {
+    await page.locator(`#world [data-place="${gate}"]`).dispatchEvent("click");
+    await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
+    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("mama")), `through the gate to Jeju's ${want} (Ma Ma follows)`);
+  }
+  await page.evaluate(() => window.__mapleScene("jj_village")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="jjtrain"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="train"]', { timeout: 15000 });
+  await page.click('#ctx [data-triphome="train"]');
+  await page.waitForFunction(() => !/Jeju/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
+  check(await fox().then(f => f.trip.done) && /station|lane/i.test(await page.locator("#sceneName").textContent()), "or home on the train over the sea bridge, whichever way you came");
+  await page.evaluate(() => window.__mapleScene("hwoods")); await page.waitForTimeout(1000);
+  await page.locator('#world [data-place="wishtower"]').dispatchEvent("click"); await page.waitForTimeout(2600);
+  const w1 = await fox().then(f => f.wish && f.wish.n);
+  await page.locator('#world [data-place="wishtower"]').dispatchEvent("click"); await page.waitForTimeout(800);
+  check(w1 === 4 && await fox().then(f => f.wish.n === 4), "the wish-tower by the river in the woods: one stone a day, and it grows");
+  await page.close();
+}
+{
   console.log("\nPilar's list, keeping things back, and more tapas");
   const k = await import(new URL("../src/game/kitchen.js", import.meta.url)), day = "2026-10-14", F = {coins: 0, inv: {}};
   const kk = k.kitchenState(F); Object.assign(kk.larder, {tulip: 2, flour: 3, potato: 4, egg: 4, tomato: 4, loaf: 2});

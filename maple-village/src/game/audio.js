@@ -77,6 +77,11 @@ export const TRACKS = {
   kyoto: {name: "Koto in Kyoto", live: true, bpm: 72, steps: 8, tone: "guitar", arp: [1, 3, 2, 4, 3, 5, 4, 2], arpVel: .045, mel: .6,
     bars: [[38, 50, 62, 63, 67, 69], [38, 50, 62, 67, 69, 70], [31, 43, 55, 62, 63, 67], [33, 45, 57, 62, 63, 69], [38, 50, 62, 63, 67, 69], [34, 46, 58, 62, 67, 70], [31, 43, 55, 63, 67, 69], [38, 50, 57, 62, 63, 69]],
     lines: [[[0, 74], [1, 75], [2, 74], [3, 69]], [[0, 70], [2, 69], [3, 67]], [[0, 67], [1, 69], [2, 70], [3, 69]], [[0, 75], [1, 74], [3, 69]], [[0, 74], [2, 79], [3, 75]], [[0, 74], [1, 70], [2, 69]], [[0, 67], [2, 63], [3, 62]], [[0, 62], [2, 63], [3, 62]]]},
+  // live, all over Jeju (round 127): a gayageum (the plucked twelve-string zither: guitar tone, rolling arpeggios)
+  // in a Korean pentatonic on D (D, E, F#, A, B), lilting like the sea, a little quicker than Kyoto's koto
+  jeju: {name: "Gayageum by the sea", live: true, bpm: 80, steps: 8, tone: "guitar", arp: [1, 2, 3, 5, 4, 3, 2, 4], arpVel: .045, mel: .65,
+    bars: [[38, 50, 57, 62, 64, 69], [40, 52, 59, 64, 66, 71], [47, 59, 62, 66, 69, 71], [45, 57, 62, 64, 69, 71], [38, 50, 57, 62, 66, 69], [40, 52, 57, 64, 69, 71], [47, 54, 59, 62, 66, 71], [38, 50, 57, 62, 64, 69]],
+    lines: [[[0, 74], [1, 76], [2, 74], [3, 69]], [[0, 71], [2, 69], [3, 66]], [[0, 69], [1, 71], [2, 74], [3, 71]], [[0, 76], [1, 74], [3, 71]], [[0, 74], [2, 78], [3, 76]], [[0, 74], [1, 71], [2, 69]], [[0, 66], [2, 69], [3, 64]], [[0, 62], [2, 64], [3, 62]]]},
   // Round 123: Kyoto's interiors, each its own
   // the tea house: a slow koto, a few notes and a lot of space
   kt_tea: {name: "Calm water", live: true, bpm: 52, steps: 8, tone: "guitar", arp: [1, 0, 3, 0, 2, 0, 4, 0], arpVel: .04, mel: .45,

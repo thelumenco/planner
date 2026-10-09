@@ -1823,3 +1823,29 @@ Write the proposal for Mel covering every item below. Only build after she says 
 ### Round 126: the bamboo grove, in the right view
 - Kyoto's grove (`town-kyoto.js` `grove`) is now drawn in the same raised view as the trees. Rows of thin culms, each rooted at its own spot on the ground and about twice a maple's height (88–112px). They're drawn back to front so the near ones overlap the far ones, with joints, leaf sprays near the top and a low brushwood fence with short posts.
 - **Playbook (Mel, round 126):** tall things must stand in the scene's raised view. Root each one on the ground, size it against the trees (a maple is about 45px), and crowd stands of plants rather than drawing a few full-height stripes; those read as a wall standing upright next to things lying flat on the ground.
+
+### Round 127: Jeju, round 1 (the trip, the ferry and the four screens)
+- **Approved plan (Mel):** a volcanic island, reachable by train or ferry, built in four rounds:
+  1. Trip, ferry, train and screens.
+  2. Goods, shops and five interiors: the divers' kitchen, the tangerine packing shed, the stone-house café, the market hall and the persimmon-dye workshop.
+  3. People and the three activities: the divers' breath song, tangerine sorting and persimmon dyeing.
+  4. Family acts (all new), touches and the Honeybrook links: Ma Ma's tangerine sapling, a second fridge-magnet spot, the slow-post box.
+- **Station placement (Mel):** the train station must NOT be on the top-left screen like Ronda's and Kyoto's. Jeju's is at the bottom of `jj_village` (bottom right), where the sea bridge comes in. Vary the station screen in future towns too.
+- **Data:** `TOWNS.jeju` in towns.js (`jj_` screens, `jj` place ids).
+  - Train: 70.
+  - Ferry: `TOWNS.jeju.ferry = {fare: 50, pier, arrive, arriveLine}`. Same hours as the train.
+  - Layout: `jj_shore` | `jj_farms` on top, `jj_harbour` | `jj_village` below.
+- **Ferry:**
+  - Tickets at the new "Ferry to Jeju" signboard at the end of the foreshore jetty (world.js `ferry`, shore.js). The ticket panel is `ticketPanel(F, pick, "jeju", hm, "ferry")`.
+  - `F.trip.by` records how you came ("train" or "ferry"). `buyTrip`/`fareFor` take `by`.
+  - Home either way: the station (`data-triphome="train"`) lands at Honeybrook station; the pier (`data-triphome="ferry"`) lands at the foreshore jetty. At the 10pm last call, you go home the way you came.
+  - `ferryRide` (core) and `ferryRideArt` (art/town-jeju.js) cover the crossing; the train ride uses `jejuRide` for the sea bridge.
+- **Screens** (art/town-jeju.js):
+  - Pieces: black dry-stone walls, thatched stone houses with rope nets, tangerine trees (fruit in autumn and winter, blossom in spring), stone grandfathers, ponies, wish-towers, Olle ribbons, divers' floats (heads pop up), squid boats, horse lighthouses, rapeseed in spring.
+  - **jj_shore:** Seongsan crater, divers' house, rock pools.
+  - **jj_farms:** two walled orchards, the blue-roofed packing shed, the pony paddock, wish-towers.
+  - **jj_harbour:** the ferry, the pier, the market hall, the horse lighthouses.
+  - **jj_village:** café, dye workshop with cloth drying, stone grandfathers at the north gate, station and rails at the bottom.
+- **Music:** `jeju`, a gayageum in D pentatonic.
+- **Wish-tower (Mel):** in Honeybrook Woods by the river, not at home (`wishtower`). One stone a day, from 3 up to 9 (`F.wish = {n, day}`); Evan cheers.
+- **For now:** the divers' house, packing shed, market, café and dye workshop just say a line ("opens soon"). `acts` and `rooms` are empty until rounds 2–4.

@@ -37,6 +37,6 @@ export function timetablePanel(day = dayKey(), hm = sgHM(), tickets = false){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Honeybrook</h2><p class="sub">Trains today. Every one stops here for two minutes.${nx ? ` Next: ${nx.n.toLowerCase()} at ${fmt(nx.t)}.` : " That's the last one gone for today."}</p>`;
   h += `<ul class="hlist wlist">${trainsOn(day).map(t => `<li class="${nx && t.id === nx.id ? "now" : ""}"><span class="wtxt"><b>${fmt(t.t)} · ${t.n} ${t.to}</b><small>${t.line}</small></span></li>`).join("")}</ul>`;
   // round 107: the ticket window's open, for day trips (trips.js)
-  h += tickets ? `<div class="actions"><button class="btn primary" data-tickets="1">Ticket window: day trips to Ronda and Kyoto</button></div>` : `<p class="muted">The ticket window's shutters are down for now: it opens when there's somewhere to go.</p>`;
+  h += tickets ? `<div class="actions"><button class="btn primary" data-tickets="1">Ticket window: day trips to Ronda, Kyoto and Jeju</button></div>` : `<p class="muted">The ticket window's shutters are down for now: it opens when there's somewhere to go.</p>`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }

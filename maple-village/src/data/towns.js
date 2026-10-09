@@ -156,6 +156,65 @@ export const TOWNS = {
       ktstones: "The turtle stones: stepping stones shaped like turtles, right across the river. You hop from shell to shell.",
       ktnishiki: "The covered market: a long arcade of little stalls: pickles, tofu, rolled omelette, knives, tea. (Its stalls open soon.)"
     }
+  },
+  // Jeju (round 127): a volcanic island off the south coast of Korea. Black basalt everywhere (walls, houses, the
+  // shore), green crater cones, tangerine orchards behind low stone walls, thatched stone houses, the women divers
+  // (haenyeo) and their orange floats, wind and sea. Two ways there: the train over the long sea bridge (into the
+  // village, bottom right; Jeju's station is NOT top left like the other towns') or the ferry from Honeybrook's
+  // foreshore jetty (into the harbour, bottom left). Go one way, come home the other if you like.
+  //   jj_shore   | jj_farms
+  //   -----------+-----------
+  //   jj_harbour | jj_village   (the station, at the bottom of the village, where the sea bridge comes in)
+  jeju: {
+    n: "Jeju", by: "train", fare: 70, free: ["evan"], outFrom: 7*60, outTo: 15*60, backTo: 22*60,
+    screens: ["jj_shore", "jj_farms", "jj_harbour", "jj_village"], arrive: ["jj_village", [396, 584]], station: "jjtrain", music: "jeju",
+    // the ferry: tickets at the foreshore jetty (world.js "ferry"), into the harbour; same hours as the train
+    ferry: {fare: 50, pier: "jjpier", arrive: ["jj_harbour", [214, 436]], arriveLine: "Jeju! The ferry noses in past two little horse-shaped lighthouses, one red, one white. Gulls, salt, and black rocks everywhere."},
+    blurb: "A volcanic island: black stone walls, tangerine orchards, thatched stone houses, a green crater by the sea and the women divers bobbing out past the rocks. By train over the sea bridge, or by ferry from the foreshore jetty (50).",
+    arriveLine: "Jeju! The train rolls off the sea bridge into a little stone station. Black stone walls, orange tangerines, and the wind smells of the sea.",
+    evanArrive: ["black rocks, Mama!", "it's windy! my hair!", "oranges on the trees!"],
+    evanScreen: {jj_shore: ["a big green mountain!", "swimming ladies!"], jj_farms: ["horsies! little horsies!", "SO many oranges"], jj_harbour: ["red lighthouse! white lighthouse!", "big boats!"], jj_village: ["stone grandpas!", "hairy roofs!"]},
+    hints: {jj_shore: "Seongsan: the crater by the sea, the divers' house and the rock pools. East: the tangerine farms. South: the harbour.",
+      jj_farms: "The Olle trail through the tangerine farms: the packing shed, the ponies, the wish-towers. West: the shore. South: the village.",
+      jj_harbour: "The harbour: the ferry home (till 10pm), the horse lighthouses and the market hall. North: the shore. East: the village.",
+      jj_village: "The stone village: the café, the dye workshop, the stone grandfathers, and the station at the bottom (trains home till 10pm). North: the farms. West: the harbour."},
+    spots: {
+      mum: {jj_shore: [[260, 300], [330, 520]], jj_farms: [[230, 360], [300, 560]], jj_harbour: [[300, 300], [380, 520]], jj_village: [[220, 320], [260, 520]]},
+      dad: {jj_shore: [[300, 260], [420, 460]], jj_farms: [[260, 300], [200, 560]], jj_harbour: [[260, 380], [420, 300]], jj_village: [[200, 230], [300, 420]]},
+      mama: {jj_shore: [[240, 420], [330, 300]], jj_farms: [[180, 320], [240, 420]], jj_harbour: [[330, 250], [300, 480]], jj_village: [[240, 260], [180, 480]]},
+      gonggong: {jj_shore: [[300, 420], [310, 430]], jj_farms: [[270, 470], [280, 480]], jj_harbour: [[280, 520], [290, 530]], jj_village: [[290, 260], [300, 270]]},
+      darren: {jj_shore: [[380, 300], [260, 560]], jj_farms: [[300, 420], [220, 260]], jj_harbour: [[240, 300], [440, 480]], jj_village: [[260, 360], [200, 560]]},
+      marcus: {jj_shore: [[420, 560], [220, 300]], jj_farms: [[300, 260], [200, 480]], jj_harbour: [[440, 300], [260, 560]], jj_village: [[300, 480], [220, 400]]},
+      angelina: {jj_shore: [[440, 300], [280, 360]], jj_farms: [[240, 300], [300, 520]], jj_harbour: [[360, 400], [300, 260]], jj_village: [[240, 440], [300, 300]]}
+    },
+    // what they do comes in round 4 (all new: Mum's kite, Dad and the stone grandfather, Ma Ma picking tangerines,
+    // Gong Gong mending nets, Darren's wish-tower, Marcus and Angellina's tandem, Evan's rock-pool net)
+    acts: {},
+    rooms: {},
+    lines: {
+      mum: ["The wind here! Hold on to your hat, Mel. Hold on to Evan.", "Black stone walls everywhere, with gaps in them. So the wind goes through and they never fall down. Clever.", "I'd like to see the sunrise from that crater. Not at five in the morning, though."],
+      dad: ["Every one of those walls is dry stone. No mortar. Just balance.", "Look at the rope on those roofs, tied down in a net against the wind.", "The divers are out. Seventy years old, some of them, and they hold their breath for two minutes."],
+      mama: ["Tangerines! Ma Ma want to know how they grow them so sweet.", "So much wind. Good for the washing.", "The divers, all grandmas. Strong grandmas. Ma Ma like this place."],
+      gonggong: ["Fishing boats with lights all along. For the squid, at night.", "The sea here, very blue. Very cold, I think. Gong Gong won't check.", "Old stone, old trees, old men by the harbour. Gong Gong fits in."],
+      darren: ["Everyone's piled little stone towers along the path. One for each wish, apparently.", "I've had a tangerine, a tangerine juice and a tangerine chocolate. Next: tangerine.", "Those ponies are tiny. And very confident."],
+      marcus: ["The crater's a five-thousand-year-old volcano. And they put a café at the bottom.", "Zeh, those ribbons on the posts, blue and orange: that's the trail. Follow the ribbons.", "I could cycle round the whole island. Two hundred and fifty kilometres. I could. I won't."],
+      angelina: ["Everything here is black and orange and blue. It's like it was designed.", "The stone statues have such kind faces. Like grandpas.", "I'm sending a postcard from here to myself. Is that weird? It's not weird."],
+      evan: ["black rocks!", "oranges! oranges!", "windy windy!", "horsies!"]
+    },
+    say: {
+      jjcone: "Seongsan, the sunrise peak: a crater left by an eruption under the sea, five thousand years ago, now a great green bowl with grass on the rim. People climb it in the dark to watch the sun come up out of the sea.",
+      jjhaenyeo: "The divers' house: low black stone walls, a thatched roof, wetsuits drying on a line and orange floats stacked by the door. The haenyeo eat here after a dive. (Its door opens soon.)",
+      jjpools: "The rock pools: black rock full of little pools, with sea snails, tiny crabs and green weed waving. The tide's going out.",
+      jjorchard: "The tangerine orchards: rows of little trees heavy with fruit, each field behind a low black stone wall to keep the wind off.",
+      jjshed: "The packing shed: blue roof, crates stacked up, and the sweet smell of tangerines. (Its doors open soon.)",
+      jjponies: "Jeju ponies: small, sturdy and shaggy, grazing in the stone-walled field. They've lived on the island for hundreds of years.",
+      jjcairns: "The wish-towers: little piles of black stones along the trail. Everyone who walks by adds one and makes a wish.",
+      jjmarket: "The market hall: the smell of grilled fish and sesame, stalls of dried seaweed, tangerines and chocolate. (Its stalls open soon.)",
+      jjlights: "The horse lighthouses: two little lighthouses shaped like Jeju ponies, one red and one white, guarding the harbour mouth.",
+      jjcafe: "The stone-house café: an old black stone house with a tangerine painted on the door. (It opens soon.)",
+      jjdye: "The dye workshop: lengths of cloth drying in the sun, from pale green to deep rusty orange. They're dyed with green persimmon juice. (Its door opens soon.)",
+      jjstatues: "The stone grandfathers (dol hareubang): carved from black volcanic rock, with big round eyes, hats and hands on their tummies. They keep the village safe."
+    }
   }
 };
 export const TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t]) => [...t.screens, ...Object.keys(t.rooms || {})].map(s => [s, id])));
@@ -218,22 +277,56 @@ export const TOWN_PLACES = {
   kt_tea: {scene: "kt_lane", name: "The tea house", door: [114, 188]}, kt_sweets: {scene: "kt_lane", name: "The sweet shop", door: [420, 440]},
   kt_pottery: {scene: "kt_lane", name: "The pottery", door: [110, 536]}, kt_hall: {scene: "kt_temple", name: "The temple hall", door: [375, 192]},
   kt_market: {scene: "kt_river", name: "The covered market", door: [145, 190]},
+  // Jeju (round 127): every id starts with jj
+  jjtrain: {scene: "jj_village", name: "Jeju station", door: [404, 562], spot: true, mark: [420, 452], line: "Jeju's little station, where the sea bridge comes in. Trains home to Honeybrook until 10pm."},
+  jjcafe: {scene: "jj_village", name: "The stone-house café", door: [112, 186], spot: true, mark: [112, 56], line: "The café."},
+  jjdye: {scene: "jj_village", name: "The dye workshop", door: [410, 352], spot: true, mark: [410, 222], line: "The dye workshop."},
+  jjstatues: {scene: "jj_village", name: "The stone grandfathers", door: [262, 120], spot: true, mark: [262, 40], line: "The stone grandfathers."},
+  jjToFarmsN: {scene: "jj_village", name: "To the farms", door: [262, 40], spot: true, bridge: "jj_farms", mark: [200, 30], line: "North between the stone grandfathers to the tangerine farms."},
+  jjToHarbourW: {scene: "jj_village", name: "To the harbour", door: [16, 400], spot: true, bridge: "jj_harbour", mark: [40, 340], line: "West down to the harbour."},
+  jjcone: {scene: "jj_shore", name: "Seongsan, the sunrise peak", door: [150, 226], spot: true, mark: [120, 40], line: "The sunrise peak."},
+  jjhaenyeo: {scene: "jj_shore", name: "The divers' house", door: [404, 190], spot: true, mark: [404, 60], line: "The divers' house."},
+  jjpools: {scene: "jj_shore", name: "The rock pools", door: [214, 470], spot: true, mark: [120, 380], line: "The rock pools."},
+  jjToFarms: {scene: "jj_shore", name: "To the farms", door: [504, 330], spot: true, bridge: "jj_farms", mark: [476, 270], line: "East along the Olle trail to the tangerine farms."},
+  jjToHarbour: {scene: "jj_shore", name: "To the harbour", door: [300, 612], spot: true, bridge: "jj_harbour", mark: [300, 540], line: "South along the coast to the harbour."},
+  jjorchard: {scene: "jj_farms", name: "The tangerine orchards", door: [150, 288], spot: true, mark: [130, 120], line: "The tangerine orchards."},
+  jjshed: {scene: "jj_farms", name: "The packing shed", door: [396, 186], spot: true, mark: [396, 60], line: "The packing shed."},
+  jjponies: {scene: "jj_farms", name: "The ponies", door: [396, 408], spot: true, mark: [420, 470], line: "The ponies."},
+  jjcairns: {scene: "jj_farms", name: "The wish-towers", door: [150, 548], spot: true, mark: [130, 470], line: "The wish-towers."},
+  jjToShore: {scene: "jj_farms", name: "To the shore", door: [16, 330], spot: true, bridge: "jj_shore", mark: [40, 270], line: "West along the trail to the shore and the crater."},
+  jjToVillage: {scene: "jj_farms", name: "To the village", door: [262, 612], spot: true, bridge: "jj_village", mark: [262, 540], line: "South down the lane to the stone village."},
+  jjpier: {scene: "jj_harbour", name: "The ferry pier", door: [214, 424], spot: true, mark: [110, 350], line: "The ferry pier. Ferries home to Honeybrook until 10pm."},
+  jjlights: {scene: "jj_harbour", name: "The horse lighthouses", door: [150, 560], spot: true, mark: [100, 480], line: "The horse lighthouses."},
+  jjmarket: {scene: "jj_harbour", name: "The market hall", door: [396, 190], spot: true, mark: [396, 60], line: "The market hall."},
+  jjToShoreN: {scene: "jj_harbour", name: "To the shore", door: [300, 26], spot: true, bridge: "jj_shore", mark: [240, 30], line: "North up the coast to the shore and the crater."},
+  jjToVillageE: {scene: "jj_harbour", name: "To the village", door: [504, 400], spot: true, bridge: "jj_village", mark: [476, 340], line: "East up into the stone village."},
   rdStepsUp: {scene: "rd_old", name: "Steps up out of the gorge", door: [120, 40], spot: true, bridge: "rd_station", mark: [200, 30], line: "Down into the gorge, over the old bridge and up the steps to the new town."}
 };
 export const TOWN_BRIDGES = {rd_station: {rd_plaza: "rdToPlaza", rd_old: "rdStepsDown"}, rd_plaza: {rd_station: "rdToStation", rd_bridge: "rdBridgeN"},
   rd_bridge: {rd_plaza: "rdBridgeS", rd_old: "rdToOld"}, rd_old: {rd_bridge: "rdToBridge", rd_station: "rdStepsUp"},
   kt_station: {kt_lane: "ktToLane", kt_river: "ktToRiver"}, kt_lane: {kt_station: "ktToStation", kt_temple: "ktStepsDown"},
-  kt_temple: {kt_lane: "ktStepsUp", kt_river: "ktToRiverW"}, kt_river: {kt_station: "ktToStationN", kt_temple: "ktToTemple"}};
+  kt_temple: {kt_lane: "ktStepsUp", kt_river: "ktToRiverW"}, kt_river: {kt_station: "ktToStationN", kt_temple: "ktToTemple"},
+  jj_shore: {jj_farms: "jjToFarms", jj_harbour: "jjToHarbour"}, jj_farms: {jj_shore: "jjToShore", jj_village: "jjToVillage"},
+  jj_harbour: {jj_shore: "jjToShoreN", jj_village: "jjToVillageE"}, jj_village: {jj_farms: "jjToFarmsN", jj_harbour: "jjToHarbourW"}};
 export const TOWN_ARRIVE = {"rd_station>rd_plaza": [44, 330], "rd_plaza>rd_station": [474, 300], "rd_plaza>rd_bridge": [310, 60], "rd_bridge>rd_plaza": [330, 572],
   "rd_bridge>rd_old": [476, 380], "rd_old>rd_bridge": [44, 520], "rd_station>rd_old": [130, 76], "rd_old>rd_station": [180, 566],
   "kt_station>kt_lane": [44, 300], "kt_lane>kt_station": [474, 300], "kt_station>kt_river": [300, 76], "kt_river>kt_station": [330, 576],
-  "kt_lane>kt_temple": [150, 80], "kt_temple>kt_lane": [330, 576], "kt_temple>kt_river": [474, 520], "kt_river>kt_temple": [44, 380]};
+  "kt_lane>kt_temple": [150, 80], "kt_temple>kt_lane": [330, 576], "kt_temple>kt_river": [474, 520], "kt_river>kt_temple": [44, 380],
+  "jj_shore>jj_farms": [44, 330], "jj_farms>jj_shore": [474, 330], "jj_shore>jj_harbour": [300, 70], "jj_harbour>jj_shore": [300, 572],
+  "jj_farms>jj_village": [262, 84], "jj_village>jj_farms": [262, 572], "jj_harbour>jj_village": [44, 400], "jj_village>jj_harbour": [474, 400]};
 // walking areas, and what's in the way (paths.js)
-export const TOWN_BOUNDS = {kt_tea: [30, 250, 490, 600], kt_hall: [30, 250, 490, 600], kt_sweets: [30, 260, 490, 600], kt_market: [30, 240, 490, 600], kt_pottery: [30, 250, 490, 600],
+export const TOWN_BOUNDS = {jj_shore: [14, 200, 506, 616], jj_farms: [14, 190, 506, 616], jj_harbour: [14, 26, 506, 616], jj_village: [14, 40, 506, 590],
+  kt_tea: [30, 250, 490, 600], kt_hall: [30, 250, 490, 600], kt_sweets: [30, 260, 490, 600], kt_market: [30, 240, 490, 600], kt_pottery: [30, 250, 490, 600],
   kt_station: [140, 178, 506, 616], kt_lane: [14, 180, 506, 616], kt_temple: [14, 40, 506, 616], kt_river: [14, 40, 506, 616],
   rd_cuero: [30, 250, 490, 600], rd_tapas: [30, 250, 490, 600], rd_cafe: [30, 260, 490, 600], rd_banos: [30, 220, 490, 600], rd_jardin: [30, 176, 490, 606], rd_mercado: [30, 250, 490, 600],
   rd_station: [90, 178, 506, 616], rd_plaza: [14, 180, 506, 616], rd_bridge: [14, 22, 506, 616], rd_old: [14, 36, 506, 616]};
 export const TOWN_OBST = {
+  // Jeju: the crater, the divers' house, the rock pools; the orchards, the shed, the paddock; the sea, the ferry, the
+  // lighthouses, the market; the café, the dye workshop, the station and the rails
+  jj_shore: [[0, 0, 256, 214], [330, 70, 486, 180], [24, 380, 190, 520], [0, 214, 60, 640]],
+  jj_farms: [[20, 50, 264, 270], [320, 60, 476, 176], [330, 420, 506, 572], [60, 500, 120, 540]],
+  jj_harbour: [[0, 0, 150, 330], [0, 450, 190, 640], [0, 330, 110, 450], [314, 66, 486, 180], [190, 610, 520, 640]],
+  jj_village: [[26, 66, 202, 176], [326, 238, 494, 344], [336, 460, 504, 552], [300, 592, 520, 640], [200, 70, 228, 112], [296, 70, 324, 112], [36, 250, 166, 336], [26, 450, 166, 542]],
   kt_tea: [[300, 340, 460, 420]], kt_hall: [[180, 190, 340, 240], [396, 396, 500, 470], [36, 400, 134, 460]], kt_sweets: [[290, 190, 490, 250], [40, 380, 120, 430]],
   kt_market: [[30, 250, 130, 300], [390, 250, 490, 300], [30, 380, 130, 430], [390, 380, 490, 430]], kt_pottery: [[120, 300, 200, 350], [330, 200, 480, 250]],
   kt_station: [[0, 0, 134, 640], [262, 56, 404, 162], [376, 376, 504, 466]],
