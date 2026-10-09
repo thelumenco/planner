@@ -2043,6 +2043,36 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // The campervan: bought at its spot on the cottage lane, then done up inside from the mood board
+  console.log("\nthe campervan");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`van pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/vanpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 4000; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=12:00&date=2026-10-07&vanpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="vanspot"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="van"]', { timeout: 15000 });
+  await page.click('#ctx [data-goal="van"]'); await page.waitForTimeout(500);
+  check(await fox().then(f => f.goals.van && f.coins === 200) && await page.locator('#world [data-place="van"]').count() === 1 && await page.locator('#world [data-place="vanspot"]').count() === 0, "the campervan (3800 coins), parked at its spot on the lane");
+  await page.locator('#world [data-place="van"]').dispatchEvent("click"); await page.waitForTimeout(3500);
+  check(await page.locator('#world [data-spot="vbed"], #world [data-spot="vkitchen"], #world [data-spot="vtable"], #world [data-spot="vboard"]').count() === 4, "inside: the bed, the kitchenette, the table and the mood board");
+  await page.locator('#world [data-spot="vboard"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-van="pick"]', { timeout: 15000 });
+  await page.click('#ctx [data-van="pick"][data-k="bedding"][data-s="coastal"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-van="slot"][data-k="curtains"]'); await page.waitForTimeout(200);
+  await page.click('#ctx [data-van="pick"][data-k="curtains"][data-s="coastal"]'); await page.waitForTimeout(300);
+  const v = await fox();
+  check(v.van.use.bedding === "van_bedding_coastal" && v.van.use.curtains === "van_curtains_coastal" && v.coins === 130, "coastal bedding and curtains bought and in the van (70 coins)");
+  check(/Mostly Coastal|All Coastal/.test(await page.locator("#ctx").innerText()), "the mood board sees it's coming together");
+  check(await page.locator("#sceneArt").innerHTML().then(h => h.includes("#9FD3E8")), "and the van's inside shows them");
+  await page.click('#ctx [data-van="slot"][data-k="bedding"]'); await page.waitForTimeout(200);
+  await page.click('#ctx [data-van="pick"][data-k="bedding"][data-s="cottage"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-van="pick"][data-k="bedding"][data-s="coastal"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.coins === 90 && f.van.use.bedding === "van_bedding_coastal"), "a piece bought once can be swapped back in for free");
+  await page.close();
+}
+{
   // Keepsakes on the shelves of Mel's buildings, and pets adopted at the market that live with someone in the family
   console.log("\nkeepsakes and pets");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

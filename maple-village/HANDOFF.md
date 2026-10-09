@@ -1285,3 +1285,21 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - Mateo (mornings and evenings) and Lila (evenings, and weekday mornings) are at Honeysuckle. Noor has a routine now (not a tourist): her garden at Clover in the mornings, the porch 4–7:30.
 - **Interiors:** shells for Honeysuckle (bunting, rag rug) and Clover (sage walls, paw prints, pet bowls). New furniture kind `petbeds`.
 - **Tests:** a "Honeybrook station" block with 14 checks.
+
+### Round 98: the campervan (farmstay step 4)
+- **A big goal** (goals.js `van`, 3,800), bought by tapping the `vanspot` on the cottage lane.
+  - Once owned, hlane.js draws `campervan(420,588)`: cream over mint, a pop-top roof, round headlights, a spare wheel. Its window curtains take the chosen curtain colour, and fairy lights twinkle along the roof if lights are chosen.
+  - It's the `van` place, which leads into `ROOMS.van`.
+  - It doesn't drive around town (Mel's call). Road trips off the map come later.
+- **Inside** (interiors.js `van` shell): a curved ceiling with a starry roof window, two round windows with curtains, and a string of lights if chosen. Stations:
+  - `vbed`: a line, plus one from Evan.
+  - `vkitchen`: shows the plant, if chosen.
+  - `vtable`: the rug goes under it.
+  - `vboard`: the mood board.
+  - Furniture kinds `vanbed`, `vankitchen`, `vantable` and `vanboard` read the decor through scenes.js `vanSt`.
+- **Decor** (`src/game/van.js`, state in `F.van`):
+  - Six `SLOTS` (bedding 40, curtains 30, lights 25, rug 30, cushions 20, plant 15) in six `STYLES`: Cottagecore, Japandi, Coastal, Mid-century, Peranakan, Scandi. Each piece has its own name.
+  - `vanPick` buys a piece once, then swaps freely; `vanClear` takes it out.
+  - `vanLook` / `lookLine` judge the look: dressed count, main style and share, from "All Coastal" to "Eclectic! Or a bit chaotic". It's meant to be reused for the cottages' rating later.
+- **core.js:** `vanView` / `vanSt`, `moodPanel`, `data-van` actions. Evan follows into the van.
+- **Tests:** a "the campervan" block.

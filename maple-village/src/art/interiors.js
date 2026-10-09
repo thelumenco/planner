@@ -1,6 +1,8 @@
 // Interior shells: each building has its own floor, wall treatment and decor. Furniture positions live in
 // ROOMS[id].pos (data/world.js); decor here stays clear of those and of the walk from the exit to the quest board.
 import { sk, artCtx } from "./scenes.js";
+import { STYLES as VAN_STYLES } from "../game/van.js";
+const VAN_COLS = Object.fromEntries(Object.entries(VAN_STYLES).map(([k, v]) => [k, v.a]));
 
 const rows = (n, f) => Array.from({length: n}, (_, i) => f(i)).join("");
 const wallBase = (wall, trim) => `<rect width="520" height="150" style="fill:${wall}"/><rect y="138" width="520" height="12" style="fill:${trim}" opacity=".9"/>`;
@@ -181,6 +183,14 @@ const SHELLS = {
     <g font-family="Klee One,serif" font-weight="600" text-anchor="middle" pointer-events="none"><text x="260" y="58" font-size="13" fill="#F3C969">from the bean</text><text x="260" y="80" font-size="9" fill="#F6EFE3">made right here, in the kitchen</text></g>
     ${sk(`<ellipse cx="400" cy="70" rx="12" ry="18" style="fill:#C2505F"/><ellipse cx="460" cy="70" rx="12" ry="18" style="fill:#E3A23A"/>`, `<ellipse cx="400" cy="70" rx="12" ry="18"/><path d="M400 52 v36" opacity=".5"/><ellipse cx="460" cy="70" rx="12" ry="18"/><path d="M460 52 v36" opacity=".5"/>`)}
     ${plant(492, 612, 1)}`,
+  // the campervan: a curved ceiling with a roof window, cream panels, mint trim, and whatever's been chosen for the
+  // curtains and lights (game/van.js; colours via the art context)
+  van: () => { const u = ((artCtx() && artCtx().F().van) || {}).use || {}, st = k => { const m = /^van_\w+?_(\w+)$/.exec(u[k] || ""); return m ? VAN_COLS[m[1]] : null; }, cu = st("curtains"), li = st("lights");
+    return `<rect width="520" height="640" style="fill:#D9B48A"/><g opacity=".35" style="stroke:#B9935F" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}</g>
+    ${wallBase("#F6EBC8", "#9FD3C2")}<path d="M0 0 H520 V30 Q260 60 0 30z" style="fill:#EAD8B0"/>${skirting}
+    ${sk(`<rect x="210" y="8" width="100" height="20" rx="8" style="fill:#2F3B73"/><circle cx="240" cy="16" r="1.2" style="fill:#FFFDF6"/><circle cx="270" cy="20" r="1" style="fill:#FFFDF6"/><circle cx="292" cy="14" r="1.3" style="fill:#FFFDF6"/>`, `<rect x="210" y="8" width="100" height="20" rx="8"/>`)}
+    ${[60, 380].map(wx => sk(`<rect x="${wx}" y="52" width="80" height="54" rx="14" style="fill:#CFE0EE"/>${cu ? `<path d="M${wx} 52 q12 30 4 54 h-4z M${wx + 80} 52 q-12 30 -4 54 h4z" style="fill:${cu}"/><rect x="${wx - 4}" y="48" width="88" height="6" rx="3" style="fill:${cu}"/>` : ""}`, `<rect x="${wx}" y="52" width="80" height="54" rx="14"/>`)).join("")}
+    ${li ? `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1" fill="none"><path d="M10 40 Q130 70 260 52 T510 40"/></g>${rows(16, i => `<circle class="twinkle" cx="${20 + i*31}" cy="${46 + Math.sin(i/2)*7}" r="2.8" fill="${li}" style="animation-delay:${(i*.2).toFixed(1)}s"/>`)}` : ""}`; },
   // Honeysuckle (Mateo and Lila's): warm floorboards, a rag rug, bunting, a window onto the lane
   honeysuckle: () => `<rect width="520" height="640" style="fill:#D9B48A"/>
     <g opacity=".4" style="stroke:#B9935F" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}</g>

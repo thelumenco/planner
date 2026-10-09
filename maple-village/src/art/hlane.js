@@ -8,6 +8,8 @@ import { sk, tapeLabel, tree, flowers, house } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
 import { archGate } from "./orchard.js";
 import { track, brook, trainLayer, RAIL_Y } from "./railway.js";
+import { artCtx } from "./scenes.js";
+import { STYLES } from "../game/van.js";
 
 const W = ink;
 const rail = (x1, x2, y) => sk(`<path d="M${x1} ${y-10} H${x2} M${x1} ${y-2} H${x2}" style="stroke:#B98A5A" stroke-width="3"/>${Array.from({length: Math.floor((x2 - x1)/28) + 1}, (_, i) => `<rect x="${x1 + i*28 - 2}" y="${y-16}" width="4" height="18" style="fill:#8A6A52"/>`).join("")}`,
@@ -24,6 +26,20 @@ const hens = (x, y) => `<g pointer-events="none">${sk(`<rect x="${x-20}" y="${y-
 const hive = (x, y) => sk(`<rect x="${x-9}" y="${y-22}" width="18" height="22" style="fill:#F3C969"/><path d="M${x-11} ${y-22} h22 l-2 -5 h-18z" style="fill:#F6EEE4"/>`, `<rect x="${x-9}" y="${y-22}" width="18" height="22"/><path d="M${x-9} ${y-11} h18"/>`);
 const grazer = (x, y, col, k) => `<g ${W} stroke-width="1" pointer-events="none"><ellipse cx="${x}" cy="${y}" rx="10" ry="6" style="fill:${col}"/><circle cx="${x + 10}" cy="${y - 4}" r="4" style="fill:${col === "#FFFDF6" ? "#3A2E28" : col}"/><path d="M${x-6} ${y + 5} v6 M${x + 6} ${y + 5} v6"/><animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 -3;0 0" keyTimes="0;.8;.88;1" dur="${7 + k}s" repeatCount="indefinite"/></g>`;
 
+// the campervan, once it's bought (goals.js "van"): cream on top, mint below, a pop-top roof, round headlights, a
+// spare wheel on the back; curtains in the windows (and fairy lights, if the van's done up with lights)
+const vanOwned = () => { const F = artCtx() && artCtx().F(); return !!(F && F.goals && F.goals.van); };
+export function campervan(x, y){
+  const F = artCtx().F(), use = (F.van && F.van.use) || {}, st = k => { const m = /^van_\w+?_(\w+)$/.exec(use[k] || ""); return m && STYLES[m[1]]; };
+  const cur = st("curtains"), lit = st("lights");
+  return `<g data-place="van" aria-label="The campervan"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="56" ry="10" style="fill:var(--butter)"/>
+    ${sk(`<path d="M${x-48} ${y-50} q0 -6 6 -6 h62 q6 0 6 6z" style="fill:#F6EBC8"/><rect x="${x-50}" y="${y-50}" width="100" height="22" rx="10" style="fill:#FFFDF6"/><rect x="${x-50}" y="${y-30}" width="100" height="24" rx="6" style="fill:#9FD3C2"/><path d="M${x-50} ${y-30} h100" style="stroke:#FFFDF6" stroke-width="3"/>
+      ${[-36, -14, 8].map(dx => `<rect x="${x + dx}" y="${y-46}" width="18" height="13" rx="3" style="fill:${cur ? cur.a : "#CFE0EE"}"/>`).join("")}<rect x="${x + 30}" y="${y-46}" width="16" height="14" rx="4" style="fill:#CFE0EE"/>
+      <circle cx="${x + 46}" cy="${y-16}" r="3.4" style="fill:#F3C969"/><circle cx="${x-30}" cy="${y-4}" r="8" style="fill:#3A2E28"/><circle cx="${x + 28}" cy="${y-4}" r="8" style="fill:#3A2E28"/><circle cx="${x-30}" cy="${y-4}" r="3.4" style="fill:#FFFDF6"/><circle cx="${x + 28}" cy="${y-4}" r="3.4" style="fill:#FFFDF6"/><circle cx="${x-52}" cy="${y-22}" r="6" style="fill:#9FD3C2"/>`,
+      `<path d="M${x-48} ${y-50} q0 -6 6 -6 h62 q6 0 6 6z"/><rect x="${x-50}" y="${y-50}" width="100" height="44" rx="8"/>${[-36, -14, 8].map(dx => `<rect x="${x + dx}" y="${y-46}" width="18" height="13" rx="3"/>`).join("")}<rect x="${x + 30}" y="${y-46}" width="16" height="14" rx="4"/><path d="M${x-6} ${y-28} v22"/><circle cx="${x-30}" cy="${y-4}" r="8"/><circle cx="${x + 28}" cy="${y-4}" r="8"/>`)}
+    ${lit ? `<g pointer-events="none">${Array.from({length: 9}, (_, i) => `<circle class="twinkle" cx="${x-46 + i*11}" cy="${y-52 + Math.sin(i)*2}" r="1.6" fill="${lit.c === "#FFFDF6" ? "#F3C969" : lit.a}" style="animation-delay:${(i*.25).toFixed(2)}s"/>`).join("")}</g>` : ""}
+    ${tapeLabel(x, y + 20, "Campervan", "#C3E8DA", 9)}</g>`;
+}
 export function hlaneArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".75"><ellipse cx="470" cy="300" rx="150" ry="230" style="fill:var(--grass2)"/><ellipse cx="120" cy="560" rx="120" ry="40" style="fill:var(--grass2)"/></g>
@@ -47,7 +63,7 @@ export function hlaneArt(){
   const bluebell = `<g data-place="bluebell" aria-label="Bluebell cottage">${house("bluebellh", 290, 196, 96, 60, "#EEF3FA", "#B5443A", "Bluebell", "#C3CDEE").replace(/data-place="bluebellh"[^>]*>/, ">")}</g>`;
   const figtree = `<g data-place="figtree" aria-label="Fig Tree cottage">${house("figtreeh", 290, 370, 96, 60, "#FFF3E3", "#B5443A", "Fig Tree", "#F3E1A0").replace(/data-place="figtreeh"[^>]*>/, ">")}</g>`
     + `<g ${W} pointer-events="none"><rect x="413" y="398" width="6" height="18" style="fill:var(--wood)"/><circle cx="416" cy="388" r="14" style="fill:#7FA35A"/>${[[410, 386], [421, 392], [414, 380]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" style="fill:#8C5A7A"/>`).join("")}</g>`;
-  const van = `<g data-place="vanspot" aria-label="Campervan spot"><ellipse class="hov" cx="420" cy="584" rx="48" ry="10" style="fill:var(--butter)"/>${sk(`<rect x="372" y="548" width="96" height="40" rx="6" style="fill:#D8CFC2" opacity=".85"/>`, `<rect x="372" y="548" width="96" height="40" rx="6" stroke-dasharray="4 5"/>`)}${tapeLabel(420, 536, "Campervan spot", "#E3EED2", 9)}</g>`;
+  const van = vanOwned() ? campervan(420, 588) : `<g data-place="vanspot" aria-label="Campervan spot"><ellipse class="hov" cx="420" cy="584" rx="48" ry="10" style="fill:var(--butter)"/>${sk(`<rect x="372" y="548" width="96" height="40" rx="6" style="fill:#D8CFC2" opacity=".85"/>`, `<rect x="372" y="548" width="96" height="40" rx="6" stroke-dasharray="4 5"/>`)}${tapeLabel(420, 536, "Campervan spot", "#E3EED2", 9)}</g>`;
   return lampDefs + ground + top + trainLayer("hlane") + trees + honeysuckle + hive(180, 254) + clover + pen + bluebell + figtree + hens(436, 486)
     + `<g data-place="windmill" aria-label="The windmill"><ellipse class="hov" cx="458" cy="344" rx="30" ry="8" style="fill:var(--butter)"/>${windmill(458, 340)}</g>`
     + grazer(470, 372, "#FFFDF6", 0) + grazer(496, 352, "#D9B48A", 1) + grazer(484, 520, "#FFFDF6", 2) + van

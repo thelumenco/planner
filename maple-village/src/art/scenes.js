@@ -11,6 +11,7 @@ import { upgradesArt, festivalArt, festivalOn, pondLanterns, streetLamp, lampDef
 import { trophySVG } from "../game/trophies.js";
 import { bankBuilding } from "./buildings.js";
 import { archGate } from "./orchard.js";
+import { STYLES as VAN_STYLES } from "../game/van.js";
 import { vineGate } from "./vineyard.js";
 export { vineyardArt } from "./vineyard.js";
 export { orchardArt, flowerFarmArt } from "./orchard.js";
@@ -446,6 +447,20 @@ export function furn(kind, x, y){
         `${[[-24, 0, 26], [8, 0, 24], [-8, -26, 20]].map(([dx, dy, w]) => `<path d="M${x+dx-w/2} ${y+dy} q-3 -26 ${w/2} -30 q${w/2} 4 ${w/2} 30z"/>`).join("")}<path d="M${x-30} ${y-14} h12 M${x+2} ${y-12} h12" opacity=".5"/>`);
     case "roaster": return sk(`<rect x="${x-34}" y="${y-30}" width="68" height="30" rx="3" style="fill:#5E5A55"/><circle cx="${x}" cy="${y-52}" r="24" style="fill:#B9B0A4"/><circle cx="${x}" cy="${y-52}" r="14" style="fill:#6B4430"/><rect x="${x+20}" y="${y-90}" width="10" height="30" style="fill:#8A8279"/>`,
         `<rect x="${x-34}" y="${y-30}" width="68" height="30" rx="3"/><circle cx="${x}" cy="${y-52}" r="24"/><circle cx="${x}" cy="${y-52}" r="14"/><path d="M${x-8} ${y-52} h16" opacity=".6"/><rect x="${x+20}" y="${y-90}" width="10" height="30"/>`);
+    // the campervan's furniture, coloured by what's been chosen on the mood board (game/van.js)
+    case "vanbed": { const bd = vanSt("bedding"), cu = vanSt("cushions"), q = bd ? bd.a : "#F6F1E8", q2 = bd ? bd.b : "#E3DDD4";
+      return sk(`<rect x="${x-70}" y="${y-30}" width="140" height="30" rx="6" style="fill:#C9A27E"/><rect x="${x-66}" y="${y-44}" width="132" height="20" rx="8" style="fill:${q}"/>${bd ? [0, 1, 2, 3].map(i => `<rect x="${x-56 + i*30}" y="${y-42}" width="14" height="16" rx="3" style="fill:${q2}" opacity=".7"/>`).join("") : ""}<rect x="${x-62}" y="${y-56}" width="34" height="16" rx="7" style="fill:${cu ? cu.a : "#FFFDF6"}"/><rect x="${x-24}" y="${y-56}" width="30" height="16" rx="7" style="fill:${cu ? cu.b : "#FFFDF6"}"/>`,
+        `<rect x="${x-70}" y="${y-30}" width="140" height="30" rx="6"/><rect x="${x-66}" y="${y-44}" width="132" height="20" rx="8"/><rect x="${x-62}" y="${y-56}" width="34" height="16" rx="7"/><rect x="${x-24}" y="${y-56}" width="30" height="16" rx="7"/>`); }
+    case "vankitchen": { const pl = vanSt("plant");
+      return sk(`<rect x="${x-50}" y="${y-36}" width="100" height="36" rx="3" style="fill:#9FD3C2"/><rect x="${x-52}" y="${y-40}" width="104" height="6" rx="2" style="fill:#C9A27E"/><circle cx="${x-28}" cy="${y-42}" r="7" style="fill:#5E5A55"/><circle cx="${x-10}" cy="${y-42}" r="7" style="fill:#5E5A55"/><path d="M${x-30} ${y-50} q4 -8 10 -2 v-4" style="fill:#C2505F"/><rect x="${x+12}" y="${y-46}" width="22" height="8" rx="3" style="fill:#DDE3E8"/>
+        ${pl ? `<rect x="${x+38}" y="${y-54}" width="12" height="12" rx="2" style="fill:${pl.c}"/><circle cx="${x+44}" cy="${y-60}" r="8" style="fill:#7FA35A"/><circle cx="${x+44}" cy="${y-62}" r="3" style="fill:${pl.b}"/>` : ""}`,
+        `<rect x="${x-50}" y="${y-36}" width="100" height="36" rx="3"/><rect x="${x-52}" y="${y-40}" width="104" height="6" rx="2"/><path d="M${x} ${y-36} v36"/>`); }
+    case "vantable": { const rg = vanSt("rug");
+      return (rg ? sk(`<ellipse cx="${x}" cy="${y+6}" rx="90" ry="22" style="fill:${rg.a}" opacity=".85"/><ellipse cx="${x}" cy="${y+6}" rx="70" ry="15" style="fill:none;stroke:${rg.b}" stroke-width="3" opacity=".7"/>`, "") : "")
+        + sk(`<rect x="${x-34}" y="${y-30}" width="68" height="8" rx="3" style="fill:#C9A27E"/><rect x="${x-3}" y="${y-22}" width="6" height="22" style="fill:#8A6A52"/><rect x="${x-64}" y="${y-16}" width="24" height="16" rx="3" style="fill:#9FD3C2"/><rect x="${x+40}" y="${y-16}" width="24" height="16" rx="3" style="fill:#9FD3C2"/><rect x="${x-10}" y="${y-38}" width="8" height="8" rx="2" style="fill:#FFFDF6"/>`,
+        `<rect x="${x-34}" y="${y-30}" width="68" height="8" rx="3"/><rect x="${x-64}" y="${y-16}" width="24" height="16" rx="3"/><rect x="${x+40}" y="${y-16}" width="24" height="16" rx="3"/>`); }
+    case "vanboard": return sk(`<rect x="${x-30}" y="${y-56}" width="60" height="46" rx="3" style="fill:#E8D3A6"/><path d="M${x-12} ${y-10} l-6 10 M${x+12} ${y-10} l6 10" stroke-width="2.4"/>${Object.values(VAN_STYLES).map((st, i) => `<rect x="${x-24 + (i % 3)*17}" y="${y-50 + Math.floor(i/3)*19}" width="13" height="15" rx="1" style="fill:${st.a}"/><circle cx="${x-17.5 + (i % 3)*17}" cy="${y-50 + Math.floor(i/3)*19}" r="1.6" style="fill:#C2505F"/>`).join("")}`,
+      `<rect x="${x-30}" y="${y-56}" width="60" height="46" rx="3"/>`);
     // Noor's pet beds at Clover: three cushions, a curled-up cat and a bunny
     case "petbeds": return sk(`<ellipse cx="${x-36}" cy="${y-8}" rx="24" ry="10" style="fill:#F2A0B8"/><ellipse cx="${x}" cy="${y-6}" rx="24" ry="10" style="fill:#9FD3C2"/><ellipse cx="${x+36}" cy="${y-8}" rx="24" ry="10" style="fill:#F3C969"/>
       <ellipse cx="${x-36}" cy="${y-14}" rx="12" ry="7" style="fill:#F2A65A"/><circle cx="${x-28}" cy="${y-18}" r="5" style="fill:#F2A65A"/><path d="M${x-31} ${y-22} l1 -4 l2 3z M${x-26} ${y-23} l2 -3 l0 4z" style="fill:#F2A65A"/>
@@ -638,6 +653,9 @@ export function furn(kind, x, y){
   }
   return "";
 }
+// what the campervan's been dressed in, for a slot: that style's colours, or null
+const vanSt = slot => { const u = ((G.F ? G.F().van : null) || {}).use || {}, m = /^van_\w+?_(\w+)$/.exec(u[slot] || ""); return m ? VAN_STYLES[m[1]] : null; };
+export const vanStyleOf = vanSt;
 // the second stone grinder (Cocoa Room upgrade), a little smaller, to the left of the first
 function grinder2(x, y){
   if (!((((G.cocoa ? G.cocoa() : null) || {}).up || {}).grinder2)) return "";

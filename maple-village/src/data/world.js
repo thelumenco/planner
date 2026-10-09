@@ -109,7 +109,8 @@ export const VILLAGE = {
   bluebell:{scene:"hlane", name:"Bluebell", door:[338,262], spot:true, mark:[338,150], line:"Bluebell: a holiday cottage with blue shutters. Guests come and go on the train."},
   figtree:{scene:"hlane", name:"Fig Tree", door:[338,436], spot:true, mark:[338,320], line:"Fig Tree: a holiday cottage with a fig tree by the door. Guests come and go on the train."},
   windmill:{scene:"hlane", name:"The windmill", door:[440,356], spot:true, mark:[458,180], line:"The windmill, turning slowly on the slope. It's been here longer than anyone can remember."},
-  vanspot:{scene:"hlane", name:"Campervan spot", door:[440,600], spot:true, mark:[440,500], line:"A gravel spot just big enough for a campervan. One day..."},
+  vanspot:{scene:"hlane", name:"Campervan spot", door:[420,600], spot:true, mark:[420,500], line:"A gravel spot just big enough for a campervan. One day..."},
+  van:    {scene:"hlane", name:"The campervan", short:"the campervan", door:[420,600], mark:[420,500]},
   toStationV:{scene:"village", name:"Station road", door:[281,156], spot:true, bridge:"hlane", mark:[300,90], line:"Up the station road to Honeybrook station and the cottages."},
   farmhouse:{scene:"hfarm", name:"The farmhouse", door:[105,246], spot:true, mark:[105,100], line:"Felix and Elena's farmhouse. The kettle's always on."},
   barn:   {scene:"hfarm", name:"The barn", short:"the barn", door:[400,250], mark:[400,90]},
@@ -333,6 +334,12 @@ export const ROOMS = {
     ["gdipbar","Dip bar","B","gdipbar",null,"Dip it, top it.",34]]},
   // The Cocoa Room (a big goal, in the bay's old shopfront): the counter (Amara serves behind it; the front is drawn
   // over the people), the bar wall, a table, and the kitchen door; behind it the chocolate kitchen, bean to bar
+  // the campervan (goals.js "van", game/van.js): a cosy inside, done up from the mood board
+  van: {name:"The campervan", wall:"#F6EBC8", trim:"#9FD3C2", noBoard:true, pos:{B:[130,300], K:[400,280], T:[300,470], M:[120,470]}, stations:[
+    ["vbed","Bed","B","vanbed",null,"The bed, tucked in under the pop-top. You can see the stars through the roof window.",30],
+    ["vkitchen","Kitchenette","K","vankitchen",null,"A two-ring stove, a tiny sink, and a kettle that whistles.",30],
+    ["vtable","Table","T","vantable",null,"A fold-down table with a bench either side. Cards, tea, or both.",30],
+    ["vboard","Mood board","M","vanboard",null,"The mood board: do up the van.",30]]},
   // the two lived-in cottages on the lane: Honeysuckle (Mateo and Lila) and Clover (Noor and her rescues)
   honeysuckle: {name:"Honeysuckle", wall:"#FFF3E6", trim:"#B5443A", noBoard:true, pos:{D:[110,262], S:[300,262], K:[440,262], R:[120,470], X:[360,470]}, stations:[
     ["mdesk","Mateo's desk","D","studydesk",null,"Mateo's desk: food science textbooks, a cocoa-stained notebook, and a lot of highlighters.",30],
