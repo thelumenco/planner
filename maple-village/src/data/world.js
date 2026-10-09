@@ -1,10 +1,11 @@
 // Village layout, building interiors (stations) and task -> place/spot matching.
 import { hash, now, H } from "../util.js";
+import { TOWNS, TOWN_PLACES, TOWN_BRIDGES, TOWN_ARRIVE } from "./towns.js";
 
 // Outdoor screens. "base" is home (house, garden, pond, shed, swing); "village" is the town square with the work
 // buildings. A river joins them: walk onto the bridge to cross. A third screen (say, for Luna) would be one more
 // OUTDOOR entry, a pair of bridge places and a BRIDGES/ARRIVE line.
-export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore", "bay", "hfarm", "hlane", "hwoods"];
+export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore", "bay", "hfarm", "hlane", "hwoods", ...Object.values(TOWNS).flatMap(t => t.screens)];   // + the towns (towns.js)
 export const VILLAGE = {
   // town square
   hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[170,180], mark:[132,64]},
@@ -142,6 +143,7 @@ export const VILLAGE = {
   homejetty:{scene:"base", name:"Little jetty", door:[150,132], spot:true, line:"Your little jetty. Paddle down the river and out to the foreshore."},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };
+Object.assign(VILLAGE, TOWN_PLACES);   // the towns' places and gates (towns.js)
 // Quests can also happen outdoors at home base: "base" is a quest place whose spots are the base's own places.
 VILLAGE.base = {scene:"(quests)", name:"Home base", short:"home base"};
 export const BASE_SPOTS = [
@@ -154,9 +156,9 @@ const WORK_HINT = /chord|chico|luna|ohayo|ambidextrous|fresh pages|client|muse|p
 export const isWeekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
 const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
-export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField", hlane:"toStationV"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL", hwoods:"toWoodsM"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl"}, shore:{field:"toFieldS", flowers:"toFlowersS", bay:"toBay"}, bay:{shore:"toShoreB", hfarm:"toFarmB"}, hfarm:{bay:"toBayF", hlane:"hfEast"}, hlane:{hfarm:"toFarmL", village:"toTownL", hwoods:"toWoodsL"}, hwoods:{hlane:"toLaneW", lane:"toMakersW"}};
+export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField", hlane:"toStationV"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL", hwoods:"toWoodsM"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl"}, shore:{field:"toFieldS", flowers:"toFlowersS", bay:"toBay"}, bay:{shore:"toShoreB", hfarm:"toFarmB"}, hfarm:{bay:"toBayF", hlane:"hfEast"}, hlane:{hfarm:"toFarmL", village:"toTownL", hwoods:"toWoodsL"}, hwoods:{hlane:"toLaneW", lane:"toMakersW"}, ...TOWN_BRIDGES};
 // where Mel steps off, by "from>to"
-export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184], "field>shore":[470,304], "shore>field":[56,300], "flowers>shore":[250,590], "shore>flowers":[56,190], "shore>bay":[250,590], "bay>shore":[250,96], "bay>hfarm":[60,284], "hfarm>bay":[462,374], "hfarm>hlane":[60,560], "hlane>hfarm":[462,560], "hlane>village":[281,170], "village>hlane":[280,590], "hlane>hwoods":[60,330], "hwoods>hlane":[462,186], "lane>hwoods":[330,590], "hwoods>lane":[330,170]};
+export const ARRIVE = {"village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184], "field>shore":[470,304], "shore>field":[56,300], "flowers>shore":[250,590], "shore>flowers":[56,190], "shore>bay":[250,590], "bay>shore":[250,96], "bay>hfarm":[60,284], "hfarm>bay":[462,374], "hfarm>hlane":[60,560], "hlane>hfarm":[462,560], "hlane>village":[281,170], "village>hlane":[280,590], "hlane>hwoods":[60,330], "hwoods>hlane":[462,186], "lane>hwoods":[330,590], "hwoods>lane":[330,170], ...TOWN_ARRIVE};
 // the next outdoor screen on the way from one to another (screens form a little chain: base - village - lane)
 export function nextHop(from, to){
   if (from === to) return null; if (BRIDGES[from] && BRIDGES[from][to]) return to;

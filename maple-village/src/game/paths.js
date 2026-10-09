@@ -1,6 +1,7 @@
 // Walking around things outdoors: Mel goes round buildings, the pond, the garden fence and so on instead of
 // straight through them. Each outdoor scene has a list of blocked rectangles; a coarse grid of open points is
 // searched with A*, then the route is pulled tight so she walks in natural straight runs.
+import { TOWN_OBST } from "../data/towns.js";
 const OBST = {
   village: [[100, 40, 240, 172], [322, 64, 438, 168], [27, 246, 143, 350], [377, 380, 493, 484],
     [334, 304, 390, 336], [178, 368, 214, 404], [230, 284, 290, 326], [314, 548, 354, 568], [62, 436, 118, 476]],
@@ -16,6 +17,7 @@ const OBST = {
   base: [[198, 176, 322, 294], [314, 232, 348, 294], [394, 198, 470, 272], [50, 262, 98, 306], [32, 396, 184, 480],
     [336, 534, 480, 598], [300, 540, 336, 554], [36, 494, 184, 594]]
 };
+Object.assign(OBST, TOWN_OBST);   // the towns' screens (towns.js)
 const PAD = 5, STEP = 24;
 const inside = (x, y, r, p) => x > r[0] - p && x < r[2] + p && y > r[1] - p && y < r[3] + p;
 export const blocked = (scene, x, y) => (OBST[scene] || []).some(r => inside(x, y, r, 0));

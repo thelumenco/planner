@@ -834,3 +834,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 @media (prefers-reduced-motion:reduce){.taxiride,.taxiboat{animation:none}}
 .taxibank{position:absolute;left:0;top:calc(38% - 90px);width:200%;height:90px;animation:tbank 2.6s linear both}@keyframes tbank{to{transform:translateX(-50%)}}@media (prefers-reduced-motion:reduce){.taxibank{animation:none}}
 .storylog{margin:6px 0;padding:6px 10px;border-radius:10px;background:#F6EFE3}.storylog summary{cursor:pointer}.storylog p{margin:6px 0;line-height:1.5}
+/* day trips (round 107): the train ride, and picking who comes */
+.trainride{background:linear-gradient(#9FCBEA 0 38%,#E7D9A8 38%)}
+.trippicks{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}
+.tpick{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 2px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:inherit;font:inherit;cursor:pointer}
+.tpick b{font-size:.85rem}.tpick small{font-size:.72rem;opacity:.75;display:flex;align-items:center;gap:2px}
+.tpick.on{background:#C3E8DA;box-shadow:inset 0 0 0 2px #5E8A5A}
+@media (max-width:420px){.trippicks{grid-template-columns:repeat(2,1fr)}}

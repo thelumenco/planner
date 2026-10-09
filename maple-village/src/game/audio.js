@@ -64,7 +64,14 @@ export const TRACKS = {
   // beat; the keys comp on the "and" of 2 and on 4, with a loose top line over it
   jazz: {name: "The night market duo", live: true, bpm: 112, steps: 8, tone: "piano", swing: .17, comp: true, arpVel: .05, mel: .9,
     bars: [[43, 58, 62, 65, 69], [36, 58, 62, 64, 67], [41, 57, 60, 64, 67], [38, 57, 60, 65, 69], [43, 58, 62, 65, 70], [36, 58, 62, 64, 69], [41, 57, 64, 67, 72], [36, 58, 64, 67, 70]],
-    walk: [[43, 45, 46, 47], [48, 46, 45, 43], [41, 43, 45, 46], [38, 40, 41, 42], [43, 46, 50, 48], [48, 47, 46, 45], [41, 45, 48, 45], [36, 38, 40, 42]]}
+    walk: [[43, 45, 46, 47], [48, 46, 45, 43], [41, 43, 45, 46], [38, 40, 41, 42], [43, 46, 50, 48], [48, 47, 46, 45], [41, 45, 48, 45], [36, 38, 40, 42]]},
+  // live, all over Ronda (round 107): a Spanish guitar in the streets, nothing like Honeybrook's piano. The Andalusian
+  // cadence (Am, G, F, E), plucked; strummed on the 3+3+2 of each bar, picked in between, with a falling Phrygian line
+  // over the top (the F over the E chord is what makes it sound like the south of Spain)
+  ronda: {name: "A guitar in Ronda", live: true, bpm: 104, steps: 8, tone: "guitar", strum: [0, 3, 6], arp: [1, 4, 3, 2, 5, 4, 3, 5], arpVel: .05, mel: .95,
+    bars: [[45, 57, 64, 69, 72, 76], [43, 55, 62, 67, 71, 74], [41, 53, 60, 65, 69, 72], [40, 52, 59, 64, 68, 71], [45, 57, 64, 69, 72, 76], [43, 55, 62, 67, 71, 74], [41, 53, 60, 65, 69, 72], [40, 52, 59, 64, 68, 71]],
+    lines: [[[0, 76], [1, 77], [1.5, 76], [2, 74], [3, 72]], [[0, 74], [1, 72], [2, 71], [3, 69]], [[0, 72], [1, 71], [1.5, 72], [2, 69], [3, 68]], [[0, 77], [1, 76], [2, 74], [2.5, 72], [3, 71]],
+      [[0, 69], [.5, 71], [1, 72], [2, 76], [3, 72]], [[0, 71], [1, 74], [2, 71], [3, 67]], [[0, 69], [1, 72], [2, 69], [2.5, 67], [3, 65]], [[0, 64], [1, 65], [1.5, 64], [2, 65], [2.5, 64], [3, 68]]]}
 };
 // a live band (the night market's jazz duo) takes over from the record player while Mel's in earshot
 let live = null;
@@ -74,15 +81,17 @@ export function setLive(id){
   if (playing) { stopMusic(); setTimeout(() => startMusic(), 450); }
 }
 let BEAT = 60/64, BARS = TRACKS.piano.bars;
-let playing = false, nextTime = 0, step = 0, timerId = 0, loops = 0, melody = [], rainSrc = null, bellWave = null, rhodesWave = null;
+let playing = false, nextTime = 0, step = 0, timerId = 0, loops = 0, melody = [], rainSrc = null, bellWave = null, rhodesWave = null, guitarWave = null;
 
 function note(freq, t, dur, vel){
   const o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter(), tone = cur().tone;
   if (!bellWave) { bellWave = ac.createPeriodicWave(new Float32Array([0, 1, 0, .35, 0, .12, 0, .05]), new Float32Array(8)); rhodesWave = ac.createPeriodicWave(new Float32Array([0, 1, .25, .12, .02]), new Float32Array(5)); }
-  o.setPeriodicWave(tone === "bell" ? bellWave : tone === "rhodes" ? rhodesWave : pianoWave); o.frequency.value = freq;
+  if (!guitarWave) guitarWave = ac.createPeriodicWave(new Float32Array([0, 1, .7, .5, .38, .26, .18, .12, .08, .05]), new Float32Array(10));
+  o.setPeriodicWave(tone === "bell" ? bellWave : tone === "rhodes" ? rhodesWave : tone === "guitar" ? guitarWave : pianoWave); o.frequency.value = freq;
   f.type = "lowpass"; f.frequency.value = Math.min(4200, 900 + freq*2.2);
-  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel, t + .006);
-  g.gain.exponentialRampToValueAtTime(vel*.35, t + .25); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel, t + (tone === "guitar" ? .003 : .006));
+  if (tone === "guitar") { f.frequency.setValueAtTime(Math.min(5200, 1600 + freq*4), t); f.frequency.exponentialRampToValueAtTime(Math.max(500, freq*1.6), t + .35); dur = Math.min(dur, 1.6); }   // a plucked nylon string: bright, then dull
+  g.gain.exponentialRampToValueAtTime(vel*(tone === "guitar" ? .22 : .35), t + (tone === "guitar" ? .16 : .25)); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
   o.connect(f).connect(g).connect(musicBus); o.start(t); o.stop(t + dur + .05);
 }
 function newMelody(){
@@ -94,12 +103,19 @@ function schedule(){
   const T = cur(), S8 = T.steps || 8, up = T.up || 0;
   while (nextTime < ac.currentTime + .6) {
     const bar = Math.floor(step/S8) % BARS.length, e = step % S8, t = nextTime, b = BARS[bar];
-    if (bar === 0 && e === 0) { if (step) loops++; newMelody(); if (Math.random() > T.mel) melody = melody.map(() => []); }
+    if (bar === 0 && e === 0) { if (step) loops++; newMelody(); if (T.lines && Math.random() < .7) melody = T.lines.map(l => l.slice()); if (Math.random() > T.mel) melody = melody.map(() => []); }
     const sw = T.swing && e % 2 ? BEAT*T.swing : 0;                                    // swung eighths
     if (T.walk) {                                                                      // walking double bass, comp on the keys
       if (e % 2 === 0) note(N(T.walk[bar][e/2]), t, BEAT*.95, .17);
       if (T.comp && (e === 3 || e === 6)) b.slice(1).forEach(n => note(N(n), t + sw, .5, .045));
       (melody[bar] || []).forEach(([beat, n]) => { if (Math.abs(beat*2 - e) < .01) note(N(n), t + sw + .01, 1.4, .09); });
+      step++; nextTime += BEAT/2; continue;
+    }
+    if (T.strum) {                                                                     // the guitar: strum, pick, bass on 1 and 3
+      if (e === 0 || e === 4) note(N(b[0]), t, 1.5, .15);
+      if (T.strum.includes(e)) b.slice(1).forEach((n, i) => note(N(n), t + i*.014 + (Math.random() - .5)*.006, 1.1, (e ? .04 : .05) + Math.random()*.01));
+      else note(N(b[Math.min(T.arp[e], b.length - 1)]), t + (Math.random() - .5)*.01, 1.2, T.arpVel + Math.random()*.015);
+      (melody[bar] || []).forEach(([beat, n]) => { if (Math.abs(beat*2 - e) < .01) note(N(n), t + .008, 1.4, .1); });
       step++; nextTime += BEAT/2; continue;
     }
     if (e === 0) { note(N(b[0]), t, 3.4, .16); note(N(b[0] + 12), t, 3, .08); }       // bass + octave

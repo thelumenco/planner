@@ -2657,6 +2657,74 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#ctx .item[data-id="tulip_seed"]').count() === 1 && await page.locator('#ctx .item[data-id="sunflower_seed"]').count() === 1, "in autumn the seed shelf has tulip bulbs and sunflower seeds");
   await page.close();
 }
+{
+  console.log("\na day trip to Ronda");
+  // who's away: tours, Ma Ma's stall, Mum's class and the family dinner all work round them
+  { const t = await import(new URL("../src/game/tours.js", import.meta.url)), sun = "2026-10-11", tue = "2026-10-13", wed = "2026-10-14";
+    const host0 = t.dinnerOn(sun).host;
+    t.setAway(() => ["mama", "gonggong", "mum", "dad", "darren"]);
+    check(t.toursOn(sun).every(x => !["mama", "gonggong"].includes(x.guide)) && t.eventOn(sun).stalls.find(x => x.at === 4).id === "mei", "Ma Ma and Gong Gong away: Farid or Mei lead the tours, and Mei minds Ma Ma's stall");
+    check(t.toursOn(tue)[0].guide === "farid" && !t.classOn(tue), "Darren away: Farid leads his Tuesday tour; Mum away: no class that morning");
+    const hostAway = d => ({mumdad: ["mum", "dad"], cottage: ["mama", "gonggong"], marcus: [], home: []})[t.dinnerOn(d).host].length > 0;
+    check(!hostAway(sun) && !hostAway(wed) && (["mumdad", "cottage"].includes(host0) ? t.dinnerOn(sun).host !== host0 : true), "a family dinner whose hosts are away moves to another house");
+    t.setAway(() => []);
+    check(t.dinnerOn(sun).host === host0 && t.eventOn(sun).stalls.find(x => x.at === 4).id === "mama", "and with nobody away, everything's as usual"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, resume: true });
+  page.on("pageerror", e => errors.push(`ronda pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  const scn = () => page.locator("#sceneName").textContent();
+  await page.addInitScript(() => { if (!/tripcoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 300; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-11"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-11&tripcoins=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
+  await page.click('#ctx [data-tickets]'); await page.waitForSelector('#ctx [data-tpick="mama"]', { timeout: 15000 });
+  check(await page.locator("#ctx [data-tpick]").count() === 8 && /40/.test(await page.locator("#ctx").innerText()), "the ticket window: Ronda, 40 coins a person, pick from all eight of the family");
+  for (const id of ["mama", "gonggong", "evan"]) await page.click(`#ctx [data-tpick="${id}"]`);
+  check(/120/.test(await page.locator("#ctx [data-trip]").textContent()), "Mel, Ma Ma and Gong Gong: three tickets; Evan rides free (120 coins)");
+  await page.click("#ctx [data-trip]");
+  await page.waitForFunction(() => /Ronda/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2500);
+  check(await fox().then(f => f.coins === 180 && f.trip && f.trip.party.join() === "mama,gonggong,evan"), "tickets paid, and the trip's on");
+  check(await ids().then(a => a.includes("mama") && a.includes("gonggong")) && await page.locator("#evan").evaluate(n => n.style.display !== "none"), "off the train at Ronda station: Ma Ma, Gong Gong and Evan came too");
+  check(await page.evaluate(() => ["rdtrain", "alameda", "bandstand", "rdToPlaza", "rdStepsDown"].every(id => document.querySelector(`#world [data-place="${id}"]`))), "Ronda's station screen: the station, the Alameda balcony, the bandstand, the way to the plaza and the gorge steps");
+  await page.locator('#world [data-place="rdToPlaza"]').dispatchEvent("click");
+  await page.waitForFunction(() => /plaza/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
+  check(await ids().then(a => a.includes("mama") && a.includes("gonggong")), "they follow Mel to the plaza");
+  check(await page.evaluate(() => ["mercado", "tapas", "dulces", "fuente", "rdBridgeN", "rdToStation"].every(id => document.querySelector(`#world [data-place="${id}"]`))), "the plaza: the market, the tapas bar, the sweet shop, the fountain, Puente Nuevo");
+  await page.locator('#actors .npc[data-npc="mama"]').dispatchEvent("click"); await page.waitForTimeout(400);
+  await page.locator('#actors .npc[data-npc="mama"]').dispatchEvent("click"); await page.waitForTimeout(400);
+  { let town = false; for (let k = 0; k < 6 && !town; k++) { await page.locator('#actors .npc[data-npc="mama"]').dispatchEvent("click"); await page.waitForTimeout(300); town = /sweeter|Aiyo|big drop/.test(await page.locator("#npcSay").textContent()); }
+    check(town, "Ma Ma has things to say about Ronda (her own oranges are sweeter)"); }
+  await page.waitForTimeout(1500);
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-11"); await page.waitForTimeout(1800);
+  check(/plaza/.test(await scn()) && await ids().then(a => a.includes("mama")), "reopening mid-trip: back in Ronda's plaza, with the family");
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  check(await ids().then(a => a.includes("mei") && !a.includes("mama") && !a.includes("gonggong")), "back in Honeybrook, Ma Ma's not at the market: Mei's minding her stall");
+  await page.evaluate(() => window.__mapleScene("rd_station")); await page.waitForTimeout(1000);
+  await page.locator('#world [data-place="rdtrain"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-triphome]", { timeout: 15000 });
+  await page.click("#ctx [data-triphome]");
+  await page.waitForFunction(() => /Honeybrook station/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(await fox().then(f => f.trip.done), "the train home: back at Honeybrook station, the trip's over");
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  check(await ids().then(a => a.includes("mama")), "and Ma Ma's back at her market stall");
+  // the last train, and the window closing for the day
+  await page.goto(url + "?seed=1&time=17:00&date=2026-10-12&tripcoins=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
+  await page.click('#ctx [data-tickets]'); await page.waitForSelector("#ctx [data-trip]", { timeout: 15000 }); await page.click("#ctx [data-trip]");
+  await page.waitForFunction(() => /Ronda/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
+  await page.goto(url + "?seed=1&time=22:00&date=2026-10-12"); await page.waitForTimeout(1000);
+  await page.waitForFunction(() => /Honeybrook station/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }).catch(() => {});
+  check(/Honeybrook station/.test(await scn()) && await fox().then(f => f.trip.done), "10pm: the last train home from Ronda");
+  await page.goto(url + "?seed=1&time=18:30&date=2026-10-13"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
+  await page.click('#ctx [data-tickets]'); await page.waitForTimeout(400);
+  check(await page.locator("#ctx [data-trip]").count() === 0 && /last train to Ronda gone/.test(await page.locator("#ctx").innerText()), "after 6pm there are no more trains out to Ronda");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

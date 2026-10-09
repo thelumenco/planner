@@ -1538,3 +1538,36 @@ Write the proposal for Mel covering every item below. Only build after she says 
 ### Round 106: tidier home river, two storytellers a day
 - The home river's separate river taxi stop is gone. The taxi now stops at the little jetty (`homejetty`): its panel (goals.js `jettyPanel`) offers "Paddle to the foreshore" or "Take the river taxi" (`data-taxiopen` sets `woodsView = "taxihome"`). `STOPS.taxihome.at` is the jetty (150,140).
 - Stories: at most **two villagers a day** tell a chapter (`TELLERS_PER_DAY`). Today's tellers are the first eligible villagers in an order hashed by day; once two have told theirs, no more cues or chapters until tomorrow.
+
+### Round 107: Ronda, the first train town (trip system + the four screens)
+- **Data:** `src/data/towns.js`. `TOWNS.ronda` holds the fare (40 a person, Evan free), the hours (out 7am to 6pm, back until 10pm), the screens, the arrival point, the station place, the music track, family `spots` and `lines` per screen, and `say` lines for the places. `TOWN_PLACES`, `TOWN_BRIDGES`, `TOWN_ARRIVE`, `TOWN_OBST` and `TOWN_BOUNDS` are merged into world.js (VILLAGE, OUTDOOR, BRIDGES, ARRIVE) and paths.js (OBST). `townOf(scene)` returns the town id, or null for Honeybrook.
+- **Trips:** `src/game/trips.js`.
+  - State: `F.trip = {town, day, party, from, done?}`. `tripOn` gives the live trip (null once done, or on another day).
+  - Functions: `buyTrip`, `endTrip`, `fareFor`, `ticketPanel` (the family picker), `homePanel` (the town station).
+  - `tripSlot` is the **first** entry in npcs.js `slotAt`. Party members are wherever Mel is in the town (`follow`: they walk in from behind her to their spot); while she's on the train they're nowhere.
+  - `initTrips(() => F)` takes a getter (F can be swapped by a cloud sync) and hands tours.js its `setAway`.
+- **Guards** (tours.js `awayToday`):
+  - Tour guides skip anyone away; Farid takes Darren's tour.
+  - Mei minds Ma Ma's market stall.
+  - `classOn` is null when Mum is away, and `joinClass` explains why.
+  - `dinnerOn` moves to the next house when both hosts are away.
+  - Couriers don't come to towns.
+  - Mel walks in towns (no Honeybrook bike, scooter or car), and it doesn't rain there.
+  - `go()` refuses a target in another town ("head home first"), and `questMark` points to the town's station.
+  - The default line says quests keep till home.
+- **core.js:**
+  - `trainRide(text, town, then)` is an overlay (`.taxiride.trainride`; art in `trainRideArt`).
+  - `startTrip` / `tripHome` / `townSpot` handle the trip and the town's places.
+  - `townTick`: the occasional family remark, and the forced last train at 10pm.
+  - `liveNow()` picks the live music: "ronda" in the towns, jazz at the night market.
+  - `setScene` saves on town screens, so resume works.
+  - Resume into a town only while the trip's on.
+- **Music:** audio.js `TRACKS.ronda` (live). A plucked "guitar" tone (bright attack, filter closing), strummed 3+3+2, and the Andalusian cadence Am–G–F–E with a Phrygian top line (`lines`).
+- **Art:** `src/art/town-ronda.js`.
+  - Palette `C`; helpers `casa`, `tileRoof`, `reja`, `shutters`, `balcony`, `pot`, `bougain`, `orangeTree`, `cypress`, `oliveTree`, `planeTree`, `pinsapo`, `almond`, `pricklyPear`, `lantern`, `gate`, `vultures`, `swifts`, `pigeons`, `cat`, `gorgeBand`, `railing`, and `valley`.
+  - Seasons drive fruit and blossom, plane leaves, valley colours, bougainvillea and swifts.
+- **Not yet (rounds 3 and 4):**
+  - Places are lines only for now: the market, tapas taste-to-learn, the sweet shop, the convent, tiles and the bench, the picnic, and Tempranillo.
+  - The locals: Carmen, Rafael, Lucía and Manolo, plus Pilar's chapter.
+  - Family acts: dance, sketch, haggle, doze, count, jog/photo, notebook.
+- **Tests:** smoke "a day trip to Ronda".

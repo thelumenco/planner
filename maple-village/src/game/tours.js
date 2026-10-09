@@ -7,6 +7,11 @@
 import { hash } from "../util.js";
 
 export const TOUR_FEE = 4;
+// Round 107: family away on a day trip (trips.js says who). Tours, Ma Ma's stall, Mum's class and the family dinner
+// all work round them: someone else leads or minds it, the class is off, dinner moves to another house.
+let awayOf = () => [];
+export const setAway = fn => { awayOf = fn; };
+export const awayToday = day => awayOf(day) || [];
 const WEEKEND = [[10*60, 10*60 + 45], [11*60 + 30, 12*60 + 15], [14*60, 14*60 + 45], [16*60, 16*60 + 45]];
 const DARREN = [17*60 + 45, 18*60 + 30], DARREN_DAYS = [2, 4];
 const GUIDES = ["mama", "gonggong", "farid", "mei"];
@@ -27,10 +32,10 @@ export function toursOn(day){
   const d = dow(day), out = [];
   // groups are a mix: a couple of villagers and one or two out-of-towners
   const ev = eventOn(day), keepers = ev ? ev.stalls.map(x => x.id) : [];
-  const guides = GUIDES.filter(g => !keepers.includes(g));
+  const away = awayToday(day), guides = GUIDES.filter(g => !keepers.includes(g) && !away.includes(g));
   if (d === 0 || d === 6) WEEKEND.forEach(([from, to], i) => { const guide = guides[(hash(day) + i) % guides.length], t = 1 + (hash(day + "t" + i) % 2);
     out.push({i, from, to, guide, group: [...groupFor(day + ":" + i, 3 + (hash(day + "n" + i) % 2) - t), ...groupFor(day + ":t" + i, t, keepers, TOURISTS)]}); });
-  else if (DARREN_DAYS.includes(d)) out.push({i: 0, from: DARREN[0], to: DARREN[1], guide: "darren", group: [...groupFor(day + ":d", 2), ...groupFor(day + ":dt", 1, [], TOURISTS)]});
+  else if (DARREN_DAYS.includes(d)) out.push({i: 0, from: DARREN[0], to: DARREN[1], guide: away.includes("darren") ? "farid" : "darren", group: [...groupFor(day + ":d", 2), ...groupFor(day + ":dt", 1, [], TOURISTS)]});
   return out;
 }
 // Where the group stands: round the trees first, then over to the flower beds for the second half
@@ -182,12 +187,13 @@ export const NIGHT = [{id: "yun", at: 0, short: "Taiwan eats", n: "Taiwanese str
 // stalls that only stand once Mel's bought them (needs): core.js tells us what's owned
 let ownedNow = () => ({});
 export const setStallOwned = fn => { ownedNow = fn; };
-const standing = list => { const o = ownedNow(); return list.filter(s => !s.needs || o[s.needs]); };
+const standing = (list, day) => { const o = ownedNow(), away = awayToday(day);
+  return list.filter(s => !s.needs || o[s.needs]).map(s => s.id === "mama" && away.includes("mama") ? {...s, id: "mei", line: "Ma Ma's away for the day, so I'm minding her stall. Same fruit, same prices!"} : s); };
 export const NIGHT_TOURISTS = ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy", "rafe"];
 export const STAGE = {x: 452, y: 462}, STAGE_WATCH = [[404, 560], [446, 566], [492, 536], [508, 562], [426, 590]];
 function lastSaturday(day){ const dt = new Date(day + "T00:00:00Z"); if (dt.getUTCDay() !== 6) return false; const n = new Date(dt.getTime() + 7*864e5); return n.getUTCMonth() !== dt.getUTCMonth(); }
 export function eventOn(day){
-  if (dow(day) === 0) return {kind: "market", name: "Sunday farmers market", from: 8*60, to: 13*60, stalls: standing(MARKET), wine: true};
+  if (dow(day) === 0) return {kind: "market", name: "Sunday farmers market", from: 8*60, to: 13*60, stalls: standing(MARKET, day), wine: true};
   if (lastSaturday(day)) return {kind: "fair", name: "Field fair", from: 10*60, to: 16*60, stalls: FAIR, wine: false};
   if (dow(day) === 2 || dow(day) === 4) return {kind: "night", name: "Night market", from: 17*60 + 30, to: 22*60, stalls: NIGHT, wine: false};
   return null;
@@ -267,7 +273,7 @@ export const CLASS_FROM = 8*60, CLASS_TO = 9*60, LAWN = [452, 404];
 const CLASS_KIND = {1: "Pilates", 2: "Zumba", 3: "Pilates", 4: "Zumba", 5: "Piloxing", 6: "Piloxing"};
 const MATS = [[418, 444], [456, 452], [494, 444], [436, 480]];
 const CLASS_POOL = ["lin", "okada", "juniper", "hana", "opal", "bo", "angelina", "priya"];
-export const classOn = day => CLASS_KIND[dow(day)] ? {kind: CLASS_KIND[dow(day)], from: CLASS_FROM, to: CLASS_TO,
+export const classOn = day => CLASS_KIND[dow(day)] && !awayToday(day).includes("mum") ? {kind: CLASS_KIND[dow(day)], from: CLASS_FROM, to: CLASS_TO,
   who: groupFor(day + ":class", 3, [], CLASS_POOL)} : null;
 export function classSlot(id, day, hm){
   const c = classOn(day); if (!c || hm < c.from || hm >= c.to) return null;
@@ -289,6 +295,7 @@ export function shoreSlot(id, day, hm){
 // (Ma Ma, Gong Gong, Mum, Dad, Angellina), four along the front (Darren, Marcus, Evan, Mel).
 export const DINNER_FROM = 18*60 + 30, DINNER_TO = 20*60;
 export const DINNER_HOSTS = ["home", "mumdad", "cottage", "marcus"];
+const HOST_FAMILY = {mumdad: ["mum", "dad"], cottage: ["mama", "gonggong"], marcus: ["marcus", "angelina"]};
 export const HOST_NAME = {home: "your place", mumdad: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", marcus: "Marcus and Angellina's"};
 // where each house's dining table stands: cx = centre, fy = the front edge of the table on the floor
 export const DINING = {home: {cx: 260, fy: 452}, mumdad: {cx: 270, fy: 500}, cottage: {cx: 320, fy: 470}, marcus: {cx: 340, fy: 470}};
@@ -303,7 +310,10 @@ export function dinnerSeat(host, who){
 export function dinnerOn(day){
   const d = dow(day); if (d !== 3 && d !== 0) return null;
   const week = Math.floor(Date.parse(day + "T00:00:00Z")/(7*864e5));
-  return {host: DINNER_HOSTS[(week*2 + (d === 0 ? 1 : 0)) % 4], from: DINNER_FROM, to: DINNER_TO};
+  const away = awayToday(day), k = (week*2 + (d === 0 ? 1 : 0)) % 4;
+  // the hosts are off on a trip: dinner moves to the next house along (Mel's place is always there to fall back on)
+  const host = [0, 1, 2, 3].map(i => DINNER_HOSTS[(k + i) % 4]).find(h => !(HOST_FAMILY[h] || []).every(id => away.includes(id)) || h === "home");
+  return {host, from: DINNER_FROM, to: DINNER_TO};
 }
 export const dinnerNow = (day, hm) => { const d = dinnerOn(day); return d && hm >= d.from && hm < d.to ? d : null; };
 export function dinnerSlot(id, day, hm){

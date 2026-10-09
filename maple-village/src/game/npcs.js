@@ -8,6 +8,8 @@ import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.j
 import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dinnerSlot, dateSlot, clubSlot, scoopSlot, workshopSlot, trainSlot, letSlot } from "./tours.js";
 import { SEA } from "../data/npcs.js";
 import { findPath, blocked } from "./paths.js";
+import { tripSlot, townLine } from "./trips.js";
+import { townOf } from "../data/towns.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const ents = {};            // id -> entity (villagers and the active messenger)
@@ -34,7 +36,7 @@ const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw 
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 const routineNow = def => routineAt(def, dayKey(), sgHM());
 export function slotAt(def, day, t, live){
-  return (live && supSlot(def)) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
+  return (api && tripSlot(api.F(), def.id, day, t, live ? api.scene() : null)) || (live && supSlot(def)) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
     || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || shoreSlot(def.id, day, t) || iceOk(scoopSlot(def.id, day, t), def, day, t) || letSlot(def.id, day, t) || routineAt(def, day, t);
 }
 // a night-market shopper slot gives way to the wine shop: anyone due at a tasting or in the shop then goes there instead
@@ -58,7 +60,7 @@ function makeNode(id, look, kid, letter, act){
   const owned = (api.F().fam && api.F().fam.owned) || {};
   if (id === "darren" && act === "type" && owned.headphones) look = Object.assign({}, look, {headphones: true});
   // a rainy day outdoors: everyone has their own brolly or raincoat (a coat if their right hand's busy or they're on a board)
-  if (OUTDOOR.includes(api.scene()) && rainyOn(dayKey()) && !look.board) look = Object.assign({}, look, {rain: rainGearFor(id, {coat: !!look.bike || !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look.extra)})});
+  if (OUTDOOR.includes(api.scene()) && !townOf(api.scene()) && rainyOn(dayKey()) && !look.board) look = Object.assign({}, look, {rain: rainGearFor(id, {coat: !!look.bike || !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look.extra)})});
   g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "") + `<g class="storycue" transform="translate(0 ${kid ? -48 : -72})" pointer-events="none"><g filter="url(#wob)"><rect x="-13" y="-9" width="26" height="16" rx="8" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1.2"/><circle cx="-6" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="0" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="6" cy="-1" r="1.8" style="fill:var(--line)"/></g></g>`;
   $("actors").appendChild(g);
   return g;
@@ -98,6 +100,8 @@ function tickVillager(def, dt){
     const p = slot.at || jitter(pick(slot.wander)), s0 = was || p;
     e = ents[def.id] = {def, key, act: slot.act, kind: "npc", x: s0[0], y: s0[1], tx: s0[0], ty: s0[1], dir: slot.dir || (Math.random() < .5 ? -1 : 1), moving: false, wait: rnd(1, 4), bike: !!((slot.look && slot.look.bike) || def.look.bike) && OUTDOOR.includes(scene), node: makeNode(def.id, Object.assign({}, def.look, slot.look || {}, outdoors(scene) ? {} : {hat: null}, OUTDOOR.includes(scene) ? {} : {bike: null}), def.kid, false, slot.act)};   // hats come off indoors
     if (was) { e.tx = p[0]; e.ty = p[1]; e.path = []; }   // straight across the open field (stalls sit above the walkable area)
+    // on a day trip the family come in with Mel (from just behind her) and stroll over to their favourite spot
+    else if (slot.follow && api.mel) { const b = api.bounds(); e.x = clamp(api.mel.x + rnd(-30, 30), b[0], b[2]); e.y = clamp(api.mel.y + rnd(6, 26), b[1], b[3]); route(e, p[0], p[1]); }
   }
   // Now and then a neighbour near Mel says hello (each at most every few minutes).
   const near = Math.hypot(e.x - api.mel.x, e.y - api.mel.y) < 110;
@@ -105,7 +109,8 @@ function tickVillager(def, dt){
   if (!e.cueAt || Date.now() - e.cueAt > 2000) { e.cueAt = Date.now(); e.story = !!(api.storyReady && api.storyReady(def.id)); e.node.classList.toggle("story", e.story); }
   if (near && !sayer && Date.now() - (e.helloAt || 0) > 4*60e3 && Math.random() < dt*.08) {
     e.helloAt = Date.now(); if (!e.act) e.dir = api.mel.x < e.x ? -1 : 1;
-    say(e, e.story ? pick(["Mel! Got a minute?", "Oh, Mel, I wanted to tell you something.", "Have you got a moment?"]) : pick(def.hellos || hellos()), 2600); api.sfx && api.sfx("babble", def.pitch || 1);
+    const tl = slot.trip && townLine(api.F(), def.id, scene);
+    say(e, e.story ? pick(["Mel! Got a minute?", "Oh, Mel, I wanted to tell you something.", "Have you got a moment?"]) : tl && Math.random() < .7 ? pick(tl) : pick(def.hellos || hellos()), tl ? 4200 : 2600); api.sfx && api.sfx("babble", def.pitch || 1);
   }
   const b = api.bounds();
   if (walk(e, def.kid ? 95 : slot.free ? 22 : e.bike ? 86 : 48, dt)) {   // on a bike (look.bike), nearly twice walking pace
@@ -130,7 +135,7 @@ const hellos = () => { const t = sgHM(); return [t < 720 ? "Morning, Mel!" : t <
 function tickCourier(dt){
   const scene = api.scene(), mel = api.mel;
   if (courier && courier.scene !== scene) { drop(courier.id); courier = null; }
-  if (scene === "home" || scene === "room" || scene === "kidroom" || scene === "office" || scene === "garage") return;   // only family inside the house (and nobody in Mel's room); notes wait until Mel steps out
+  if (scene === "home" || scene === "room" || scene === "kidroom" || scene === "office" || scene === "garage" || townOf(scene)) return;   // (and nobody posts letters to Ronda)   // only family inside the house (and nobody in Mel's room); notes wait until Mel steps out
   // the note she's carrying was replaced or read elsewhere (e.g. fresh mail arrived just after the page opened)
   if (courier && courier.state !== "leaving" && !api.unreadMail().some(m => m.id === courier.item.id)) { drop(courier.id); courier = null; }
   if (!courier) {
@@ -196,6 +201,7 @@ export function tapNpc(id){
   const facts = api.facts();
   const cond = Object.keys(def.react || {}).find(k => facts[k] && !S.npcSaid[id + ":" + k]);
   if (cond) { S.npcSaid[id + ":" + cond] = true; say(e, def.react[cond], 4500); api.save(); return; }
+  { const tl = townLine(F, id, api.scene()); if (tl && Math.random() < .75) { say(e, pick(tl), 4500); return; } }   // on a day trip: the town's lines
   if (e.act && def.actLines && def.actLines[e.act] && Math.random() < .6) { say(e, pick(def.actLines[e.act])); return; }
   say(e, pick(def.lines));
 }
