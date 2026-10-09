@@ -1503,6 +1503,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Screens:** four outdoor screens (2×2) joined by gates, with their own palette and art file (`src/art/town-<id>.js`) and their own obstacles and bounds. They're not linked to Honeybrook's BRIDGES; travel is the only way in or out.
 - **Interiors (Mel, round 116): every new town gets four to five interior screens**, more if Mel asks for them (Ronda has six). You go in through the door of the matching place on an outdoor screen.
   - **Layout:** each room's layout is ours to design: its own floor, walls, light and furniture, kept calm with a few strong pieces and plenty of floor.
+  - **Detail around the edges (Mel, round 117):** rooms must not feel bare. Fill the walls and edges: shelves and displays full of the shop's goods, plenty of tables and chairs in cafés and bars, plants in the corners, crates, jars, lamps, benches, signs. Keep the middle of the floor and the paths to the spots clear, so it stays calm. Add each new piece of furniture to TOWN_OBST so people walk round it.
   - **People:** each room has people in it, locals and tourists with routines across the day, two to four at a time, so it never feels empty but never crowded. The family follow Mel inside.
   - **Music:** each room has its own live track in audio.js, different from the town's street music and from every other room.
   - **How it's built:** list the rooms in `rooms` on the town (door, name, music, party spots, the line said on entering). Add a TOWN_PLACES entry with the room's id so the Exit works, its bounds and obstacles in TOWN_BOUNDS and TOWN_OBST, and its art in `src/art/<town>-rooms.js`. Things to tap inside use `data-rdspot` (core.js `roomSpot`).
@@ -1687,3 +1688,13 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **New Ronda locals and tourists**, with routines spread over the rooms: Paco (waiter), Pepe (paper, siesta), Lola (shopping), Amina (baths guide), Joaquín (gardener), Rocío (flowers), Antonio (leather), and the tourists Ingrid, Kenji and Chloé.
   - Doña Carmen now works inside her café, and Rafael inside the market.
 - **Inside rooms**, Mel, Evan and the villagers route round the furniture: findPath is on for town rooms.
+
+### Round 117: fuller Ronda interiors (Mel: "a bit bare")
+- **Edges filled, middles kept clear**, with new pieces in ronda-rooms.js (`palm`, `crates`, `tinaja`, `bench`, `niche`):
+  - **Tapas bar:** a bottle shelf, a table for two each side, a barrel rack, a coat stand, an A-board, crates.
+  - **Café:** six tables now, plus a newspaper rack, a cake stand, palms in the corners, a crate of lemons.
+  - **Baths:** lamp niches, stone benches, tinajas, a plaque.
+  - **Garden:** geraniums all along both walls, side benches, lanterns and jasmine by the gate.
+  - **Market:** a spice stall, olive barrels, bread, crates.
+  - **Leather workshop:** tall shelf units of bags, wallets and belts on both walls, fuller display tables, a saddle, a hat stand of satchels, boxes.
+- **TOWN_OBST updated** for all the new furniture.
