@@ -473,6 +473,104 @@ export const NPCS = [
       [slot("10:00", "12:00", "rd_cafe", [170, 480], {act: "sit"}), slot("12:00", "13:30", "rd_mercado", [[200, 400], [330, 450], [260, 380]]), slot("14:00", "16:00", "rd_jardin", [406, 604], {act: "notes", dir: -1}), slot("16:30", "18:00", "rd_banos", [[200, 320], [330, 340], [260, 420]]), slot("18:00", "19:30", "rd_cuero", [[200, 420], [330, 440], [260, 500]]), slot("20:00", "22:00", "rd_tapas", [328, 434], {act: "sit", dir: -1})],
       ["I'm writing a postcard to every friend I have. I have too many friends.", "The tapas! Free with a drink! France must learn.", "Have you been to the baths? So peaceful."]]
   ].map(([id, name, look, job, intro, routine, lines]) => ({id, local: "ronda", tourist: true, pitch: .95 + (id.charCodeAt(0) % 4)*.07, name, job, intro, look, routine, lines, away: `${name}'s off seeing another bit of Ronda.`})),
+  // Round 122: Kyoto's people (local: "kyoto"). Sachiko keeps the tea house (Okada's grandmother taught her the tea
+  // ceremony); Jōshin is the temple's cheerful monk; Mr Tanaka makes the sweets; Fumiko runs a pickle stall at the
+  // market; Ishida throws pots; Mr Mori plays Go under the maples. And two tourists, so the rooms never feel empty.
+  {
+    id: "sachiko", local: "kyoto", pitch: 0.95, name: "Sachiko", job: "Keeps the tea house on the lane",
+    intro: "Welcome. I am Sachiko. Please, sit. The water is nearly ready. In this room, nothing is in a hurry.",
+    look: {skin: "#EAC4A0", hair: "#2A211D", hairStyle: "bun", top: "#7A8A5A", bottom: "#7A8A5A"},
+    routine: [slot("9:00", "17:00", "kt_tea", [[300, 300], [380, 300]], {act: "sit"}), slot("17:00", "21:00", "kt_tea", [340, 300], {act: "sit"})],
+    lines: ["Turn the bowl twice, so the prettiest side faces me. That is a kindness.", "One meeting, one chance. Every cup of tea happens only once.", "The scroll says 'calm water'. I change it with the seasons.", "Slowly. You are doing very well."],
+    away: "The tea house is resting. Sachiko is arranging tomorrow's flowers."
+  },
+  {
+    id: "joshin", local: "kyoto", pitch: 0.85, name: "Jōshin", job: "A monk at the temple",
+    intro: "Jōshin! I'm a monk. I used to sell insurance in Tokyo, which was much harder. Would you like to sit and breathe a little?",
+    look: {skin: "#E2B590", hair: "#E2B590", hairStyle: "short", top: "#C98A3A", bottom: "#5A4A3E"},
+    routine: [slot("7:00", "12:00", "kt_hall", [[150, 330], [210, 330]], {act: "sit"}), slot("12:00", "13:00", "kt_temple", [[300, 260], [200, 420], [350, 250]]), slot("13:00", "20:00", "kt_hall", [[150, 330], [210, 330]], {act: "sit"})],
+    lines: ["Breathe in. Breathe out. That's it. That's the whole secret. Don't tell anyone.", "The garden is raked every morning. It never stays perfect. That's the lesson.", "Ring the bell gently. It's very old and very loud.", "I laugh a lot for a monk. My teacher says it's my practice."],
+    away: "Jōshin is at evening prayers. The bell will ring soon."
+  },
+  {
+    id: "tanaka", local: "kyoto", pitch: 0.7, name: "Mr Tanaka", job: "Makes wagashi, the fourth generation",
+    intro: "Tanaka. My great-grandfather opened this shop. Every sweet is a season. Today's is a maple leaf. Tomorrow? We'll see.",
+    look: {skin: "#E2B590", hair: "#B9B0A4", hairStyle: "short", top: "#FFFDF6", bottom: "#3A3430", extra: "apron"},
+    routine: [slot("8:30", "18:30", "kt_sweets", [390, 262], {dir: -1})],
+    lines: ["White bean paste, a little sugar, warm hands. That's all.", "A sweet should look like the weather outside the window.", "My father's hands were faster. Mine are more patient.", "Please, try. It's only sugar. It forgives."],
+    away: "Mr Tanaka has closed the shop for the day. The shutters have a little drawing of a camellia."
+  },
+  {
+    id: "fumiko", local: "kyoto", pitch: 1.1, name: "Fumiko", job: "Sells pickles at the covered market",
+    intro: "Fumiko! Pickles for forty years. Try this one. And this one. You're too thin, try three.",
+    look: {skin: "#E2B590", hair: "#3A3430", hairStyle: "curly", top: "#C8432F", bottom: "#3A3430", extra: "apron"},
+    routine: [slot("8:00", "17:00", "kt_market", [80, 320], {dir: 1})],
+    lines: ["Purple ones are shiso. Yellow ones are radish. Green ones are a mystery even to me.", "Everybody in this market knows everybody's business. It's very efficient.", "Tofu man, knife man, tea lady, me. We've been neighbours longer than some marriages.", "Ahh, the little boy! A rice cracker for him."],
+    away: "Fumiko's stall is covered with a cloth. A sign says: back tomorrow, with more pickles."
+  },
+  {
+    id: "ishida", local: "kyoto", pitch: 0.8, name: "Ishida", job: "A potter on the lane",
+    intro: "Ishida. Potter. Clay is honest: if you rush it, it tells you.",
+    look: {skin: "#D9A47E", hair: "#2A211D", hairStyle: "short", top: "#5E6670", bottom: "#4A4440", extra: "apron"},
+    routine: [slot("9:00", "18:00", "kt_pottery", [[360, 300], [300, 420]], {act: "repair"})],
+    lines: ["The kiln decides the colour. I only suggest.", "A cup with a little crack mended in gold is more beautiful than a perfect one.", "Your father has strong hands. Too strong. Gently!", "Wonky is fine. Wonky has character."],
+    away: "Ishida is firing the kiln tonight. It's too hot to go in."
+  },
+  {
+    id: "mori", local: "kyoto", pitch: 0.65, name: "Mr Mori", job: "Plays Go under the maples",
+    intro: "Mori. I play Go here every day. Forty years. I win most days. Not always against myself.",
+    look: {skin: "#D9A47E", hair: "#E8E4DE", hairStyle: "short", top: "#3E5E7A", bottom: "#4A4440", hat: "cap"},
+    routine: [slot("9:30", "17:30", "kt_temple", [330, 470], {act: "sit", dir: -1})],
+    lines: ["Black stone, white stone. The whole world on one board.", "Your grandfather plays like a river. Very patient. Then suddenly, flood.", "Sit, watch. You'll learn more watching than playing.", "Again tomorrow? Good. Bring your grandfather."],
+    away: "Mr Mori's gone home for supper. The Go board waits under its cloth."
+  },
+  {
+    id: "kato", local: "kyoto", pitch: 0.75, name: "Mr Kato", job: "Station attendant",
+    intro: "Kato. Station attendant, thirty-one years. The trams are never late. If they are, it's my fault, so they aren't.",
+    look: {skin: "#E2B590", hair: "#3A3430", hairStyle: "short", top: "#3E5E7A", bottom: "#2F3A55", hat: "cap"},
+    routine: [slot("7:00", "13:00", "kt_station", [[350, 220], [300, 230]]), slot("14:00", "22:00", "kt_station", [[350, 220], [300, 230]])],
+    lines: ["The bamboo grove is best early, before the crowds. And the last half-hour before dark.", "Your train home is the 10pm. I'll wave.", "Lost? Everyone is, the first day. That's the fun part.", "The little one likes the tram? Ding ding!"],
+    away: "Mr Kato's on his lunch break, eating rice balls on the bench."
+  },
+  {
+    id: "ren", local: "kyoto", pitch: 0.95, name: "Ren", job: "Pulls a rickshaw up and down the lane",
+    intro: "Ren! Rickshaw, best legs in Kyoto. I know every story on this lane. Ask me anything.",
+    look: {skin: "#C99470", hair: "#1E1A18", hairStyle: "spiky", top: "#2F2B28", bottom: "#2F2B28", extra: "satchel"},
+    routine: [slot("9:00", "18:00", "kt_lane", [[262, 430], [300, 420]], {dir: -1})],
+    lines: ["That pagoda's been rebuilt after fires, after storms. It always comes back.", "The tea house? Sachiko-san's. Best tea on the lane. Don't tell the others I said.", "Up this hill a thousand times a day. My calves have calves.", "Maple season! Everyone wants a photo. I'm in most of them."],
+    away: "Ren's rickshaw is parked. He's off for noodles."
+  },
+  {
+    id: "haru", local: "kyoto", pitch: 0.7, name: "Haru", job: "Rakes the temple's gravel garden",
+    intro: "Haru. Every morning I rake the gravel into waves. Every afternoon, the wind and the cats undo it. Then again tomorrow.",
+    look: {skin: "#D9A47E", hair: "#B9B0A4", hairStyle: "short", top: "#7E9A5A", bottom: "#5A4A3E", hat: "sunhat"},
+    routine: [slot("8:00", "12:00", "kt_temple", [300, 446], {act: "farm", dir: 1}), slot("14:00", "17:00", "kt_temple", [[260, 260], [200, 430]])],
+    lines: ["The three rocks are islands. The gravel is the sea. Don't step in the sea.", "Moss grows slowly. That's why it's beautiful.", "The koi know my footsteps. They think I'm lunch.", "Sit, look, don't think. That's the garden's job."],
+    away: "Haru's resting under the eaves with a cup of tea."
+  },
+  ...[
+    ["lena", "Lena", {skin: "#F6D9C4", hair: "#C98A4A", hairStyle: "long", top: "#9CC27E", bottom: "#3E5E7A", extra: "satchel"}, "Here from Berlin for the autumn leaves", "Lena, from Berlin! I came for the leaves. I've taken four hundred photos of one tree.",
+      [slot("9:00", "11:00", "kt_market", [[240, 460], [320, 360], [180, 500]]), slot("11:00", "13:00", "kt_temple", [[300, 260], [260, 560], [200, 420]]), slot("13:00", "15:00", "kt_tea", [140, 300], {act: "sit"}), slot("15:00", "17:00", "kt_pottery", [[260, 460], [200, 520]]), slot("17:00", "19:00", "kt_lane", [[260, 300], [300, 540]])],
+      ["Every corner here looks like a painting.", "I bought a tea bowl. I can't carry anything else now.", "The monk made me laugh during meditation. Is that allowed?"]],
+    ["arjun", "Arjun", {skin: "#B9825E", hair: "#1E1A18", hairStyle: "short", top: "#F3ECDD", bottom: "#5A6A7A", extra: "satchel"}, "Backpacking round Japan", "Arjun! Two weeks in Japan, eleven cities, one very tired backpack.",
+      [slot("9:30", "11:30", "kt_hall", [[300, 440], [200, 480]]), slot("11:30", "13:30", "kt_sweets", [[200, 480], [300, 520]]), slot("13:30", "15:30", "kt_river", [[200, 260], [330, 500]]), slot("15:30", "17:30", "kt_market", [[280, 460], [200, 360]]), slot("18:00", "20:00", "kt_lane", [[230, 300], [320, 520]])],
+      ["I've eaten my weight in mochi. No regrets.", "The tram here is older than my grandad. And faster.", "Did you try the tea ceremony? My legs went to sleep."]],
+    ["sophie", "Sophie", {skin: "#F6D9C4", hair: "#8A5A3A", hairStyle: "bob", top: "#E8566C", bottom: "#3A3430", hat: "sunhat"}, "On her honeymoon, from Bristol", "Sophie! From Bristol, on our honeymoon. My husband's lost. Again. Somewhere near a temple.",
+      [slot("9:00", "11:00", "kt_station", [[230, 520], [420, 560], [300, 380]]), slot("11:00", "13:00", "kt_lane", [[250, 300], [320, 560]]), slot("13:00", "15:00", "kt_sweets", [[200, 480], [300, 540]]), slot("15:00", "17:30", "kt_river", [[180, 260], [340, 520]]), slot("17:30", "19:30", "kt_temple", [[260, 260], [200, 420]])],
+      ["We wore yukata yesterday. I fell over twice. Worth it.", "Have you seen the turtle stones? I made it across! He didn't.", "Everything's so beautiful I keep forgetting to eat. Then I eat everything."]],
+    ["mateus", "Mateus", {skin: "#C08B66", hair: "#2A211D", hairStyle: "curly", top: "#F3C969", bottom: "#3E5E7A", extra: "satchel"}, "From São Paulo, on a food trip", "Mateus, from São Paulo. I came for the food. I'm staying for the food. Also the food.",
+      [slot("9:00", "11:30", "kt_market", [[300, 470], [200, 360], [260, 520]]), slot("11:30", "13:00", "kt_river", [[220, 230], [340, 270]]), slot("13:00", "15:00", "kt_station", [[260, 500], [400, 560]]), slot("15:00", "17:00", "kt_tea", [200, 300], {act: "sit"}), slot("17:00", "20:00", "kt_lane", [[300, 520], [230, 300]])],
+      ["Grilled mochi on a stick. Life-changing. I'm not exaggerating.", "Fumiko gave me eleven pickles to try. ELEVEN.", "The tea was bitter, then sweet. Like a good story."]],
+    ["chika", "Chika", {skin: "#EAC4A0", hair: "#3A2A22", hairStyle: "long", top: "#B9A8E0", bottom: "#F3ECDD"}, "Visiting from Osaka", "Chika, from Osaka! Kyoto's very polite. Osaka's very loud. I like both.",
+      [slot("10:00", "12:00", "kt_temple", [[280, 270], [210, 430], [300, 560]]), slot("12:00", "14:00", "kt_lane", [[240, 320], [300, 460]]), slot("14:00", "16:00", "kt_hall", [[300, 470], [220, 520]]), slot("16:00", "18:00", "kt_station", [[250, 450], [380, 300]]), slot("18:00", "20:00", "kt_river", [[200, 270], [330, 500]])],
+      ["In Osaka we'd say: 'Are you eating properly?' instead of hello.", "The fortune slips here are strict. I got 'small blessing'. Small!", "Try the yuzu. Then try it again in tofu. Trust me."]],
+    ["jin", "Jin", {skin: "#EAC4A0", hair: "#1E1A18", hairStyle: "short", top: "#3A3430", bottom: "#5A6A7A", extra: "satchel"}, "A student from Seoul, sketching temples", "Jin. Architecture student, Seoul. I'm drawing every roof in Kyoto. Two hundred and six so far.",
+      [slot("9:00", "11:00", "kt_lane", [[300, 260], [240, 520]]), slot("11:00", "13:00", "kt_pottery", [[240, 460], [300, 520]]), slot("13:00", "15:00", "kt_temple", [[320, 260], [220, 560]]), slot("15:00", "17:00", "kt_river", [[300, 260], [200, 500]]), slot("17:00", "19:00", "kt_station", [[220, 400], [300, 560]])],
+      ["Look at the eaves. They curve up so the rain jumps off. Clever.", "No nails in that pagoda. Just joints. Like a puzzle.", "I'll be drawing roofs in my sleep tonight."]],
+    ["tess", "Tess", {skin: "#8A5A3A", hair: "#1E1A18", hairStyle: "curly", top: "#9CC27E", bottom: "#F3ECDD", hat: "sunhat"}, "From Melbourne, travelling with her mum", "Tess! From Melbourne, here with my mum. She's bought six teapots. We have one suitcase.",
+      [slot("9:30", "11:30", "kt_tea", [260, 300], {act: "sit"}), slot("11:30", "13:30", "kt_market", [[220, 470], [320, 520]]), slot("13:30", "15:30", "kt_lane", [[260, 540], [320, 300]]), slot("15:30", "17:30", "kt_temple", [[240, 400], [300, 560]]), slot("17:30", "19:30", "kt_river", [[180, 500], [320, 270]])],
+      ["Mum's in the pottery buying a seventh teapot. Send help.", "The koi in the temple pond are bigger than my cat.", "I didn't think anywhere could be this quiet and this busy at once."]]
+  ].map(([id, name, look, job, intro, routine, lines]) => ({id, local: "kyoto", tourist: true, pitch: .95 + (id.charCodeAt(0) % 4)*.07, name, job, intro, look, routine, lines, away: `${name}'s off seeing another bit of Kyoto.`})),
   // cabin, and fishes the pool on Saturday evenings
   {
     id: "wren", pitch: 1.05, name: "Wren", job: "Honeybrook Woods' ranger",

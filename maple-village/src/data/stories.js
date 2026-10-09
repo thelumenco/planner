@@ -60,7 +60,9 @@ export const STORIES = {
     {lines: ["I kept it in my desk all these years. You don't throw away somebody's words."]},
     {needs: ["hana:2"], lines: ["Hana says she grew up in a seaside town. Her father was a fisherman.", "The letter's postmark… is a fishing harbour."]},
     {lines: ["I gave it to her this morning. My hands were shaking more than hers."]},
-    {lines: ["It was from her father, before he went to sea and didn't come back. Forty years late.", "She hugged me. Then she gave me toast. I believe that's how Hana says thank you."]}
+    {lines: ["It was from her father, before he went to sea and didn't come back. Forty years late.", "She hugged me. Then she gave me toast. I believe that's how Hana says thank you."]},
+    // round 122: Sachiko in Kyoto kept his grandmother's tea scoop
+    {needs: ["sachiko:3"], lines: ["My grandmother's tea scoop. Sachiko kept it? All these years?", "Grandmother taught half the lane. She'd be glad it was you who brought it. Thank you, Mel. Truly."]}
   ],
   hana: [
     {lines: ["I grew up by the sea. Dad had a little blue boat. He'd bring home fish, and I'd make the toast."]},
@@ -151,6 +153,24 @@ export const STORIES = {
     {needs: ["mill"], lines: ["You opened up the old mill! Did you see the initials on the beam? T.R. That's him!", "Family story: he carved them the day the millstone stopped, and said one day it would turn again, for olives."]},
     {needs: ["oil"], lines: ["I took a bottle of your oil to Abuela. From his tree's grandchildren, pressed in his mill. She cried into her bread. Then she ate the bread.", "She sent this. He carved it from a branch of that tree in 1913. It should live with the oil now."], reward: "spoon"},
     {needs: ["ines:5"], lines: ["Abuela's been baking her olive oil cake again, the one from his village.", "She said I could give you the recipe. That's basically a royal decree."], reward: "oilcake"}
+  ],
+  // Kyoto's locals (round 122), told on a day trip like Ronda's. Sachiko and Okada: his grandmother taught her the tea ceremony
+  sachiko: [
+    {lines: ["I learned the tea ceremony from an old lady on this lane. Okada-sensei. She rapped my knuckles with a fan when I rushed."]},
+    {lines: ["Her grandson went across the sea to deliver letters, they said. She was so proud. She kept his postcards by the kettle."]},
+    {needs: ["okada:1"], lines: ["Okada? The postman in your village? A tall man who never throws anything away?", "Then please give him this: his grandmother's tea scoop. I've kept it forty years. It should go home."], reward: "chashaku"},
+    {lines: ["One meeting, one chance. She used to say it every time I left. I say it to you now."]}
+  ],
+  joshin: [
+    {lines: ["I sold insurance in Tokyo for eleven years. Very good at it. Very unhappy."]},
+    {lines: ["One morning on the train I couldn't remember the last time I'd looked at the sky. I got off. I came here. I never went back."]},
+    {lines: ["My teacher made me rake the gravel garden for a year before I was allowed to sit. Best year of my life."]},
+    {lines: ["Here's my secret: every morning I'm terrible at meditation. Then I laugh. Then I'm a little better."]}
+  ],
+  tanaka: [
+    {lines: ["My great-grandfather opened this shop in 1921. The wooden moulds on the wall are his."]},
+    {lines: ["There is one sweet I make only one day a year: the first snow. White, round, a little cold. My father taught me on the day he retired."]},
+    {lines: ["My daughter wants to make chocolate wagashi. Chocolate! My father would faint.", "...I tried one. It was very good. Don't tell her."]}
   ],
   // Ronda's locals (round 107): told on a day trip (no quest needed; the two-a-day limit still holds)
   carmen: [

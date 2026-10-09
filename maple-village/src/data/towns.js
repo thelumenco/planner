@@ -110,7 +110,28 @@ export const TOWNS = {
     },
     // what they do (new animations come in round 3: Mum's parasol, Dad's wheel, Ma Ma's cranes, Gong Gong's Go,
     // Darren's skewers, Marcus's calligraphy, Angelina's fortunes; nothing they did in Ronda)
-    acts: {},
+    acts: {
+      mum: {kt_lane: {act: "parasol", at: [270, 300], dir: -1}, kt_station: {act: "parasol", at: [230, 380]}},
+      dad: {kt_pottery: {act: "wheel", at: [150, 330], dir: 1}},
+      mama: {kt_temple: {act: "cranes", at: [180, 420], dir: 1}, kt_river: {act: "cranes", at: [170, 270], dir: 1}},
+      gonggong: {kt_temple: {act: "go", at: [300, 470], dir: 1}},
+      darren: {kt_market: {act: "skewer", at: [260, 480]}, kt_river: {act: "skewer", at: [330, 250], dir: -1}},
+      marcus: {kt_hall: {act: "brush", at: [400, 520], dir: -1}},
+      angelina: {kt_temple: {act: "fortune", at: [260, 250], dir: 1}, kt_hall: {act: "fortune", at: [120, 470]}}
+    },
+    // round 122: the five interiors, behind the doors on the lane, the temple and the river
+    rooms: {
+      kt_tea: {door: "ktchaya", n: "The tea house", music: "kt_tea", party: [[200, 540], [330, 560], [120, 520], [420, 520]],
+        say: "The tea house: tatami mats, paper screens slid open onto a little garden, a scroll in the alcove, and the kettle just beginning to sing."},
+      kt_hall: {door: "kthall", n: "The temple hall", music: "kt_hall", party: [[200, 560], [330, 560], [120, 520], [400, 560]],
+        say: "Inside the temple hall: candlelight on gold, incense, and a deep quiet. A monk is sitting in the meditation corner by the moss garden."},
+      kt_sweets: {door: "ktwagashi", n: "The sweet shop", music: "kt_sweets", party: [[200, 540], [330, 560], [120, 540], [420, 540]],
+        say: "The sweet shop: little glass cases of sweets shaped like flowers and leaves, and Mr Tanaka at his counter, shaping one with a wooden stick."},
+      kt_market: {door: "ktnishiki", n: "The covered market", music: "kt_market", party: [[200, 480], [320, 480], [260, 560], [140, 420]],
+        say: "The covered market: a long arcade of little stalls, steam rising, everyone calling out what's good today."},
+      kt_pottery: {door: "ktpottery", n: "The pottery", music: "kt_pottery", party: [[220, 540], [340, 540], [140, 520], [420, 520]],
+        say: "The pottery: a wheel turning, shelves of cups drying, and the kiln glowing orange at the back."}
+    },
     lines: {
       mum: ["Listen. You can hear the bamboo creaking. Like a boat.", "Everything here is so neat. I want to fold my clothes now. Strange feeling.", "I want a yukata. A blue one. With little white flowers."],
       dad: ["Look at the joinery on that roof. Not a single nail. Not one.", "That pagoda's been standing here longer than anything I've ever fixed.", "I'd like to try making a cup. A bowl. Anything round."],
@@ -194,6 +215,9 @@ export const TOWN_PLACES = {
   ktstones: {scene: "kt_river", name: "The turtle stones", door: [262, 300], spot: true, mark: [262, 250], line: "The turtle stones."},
   ktToStationN: {scene: "kt_river", name: "To the station", door: [300, 40], spot: true, bridge: "kt_station", mark: [300, 20], line: "North along the river to the station."},
   ktToTemple: {scene: "kt_river", name: "To the temple", door: [504, 520], spot: true, bridge: "kt_temple", mark: [476, 460], line: "East over the canal bridge to the temple."},
+  kt_tea: {scene: "kt_lane", name: "The tea house", door: [114, 188]}, kt_sweets: {scene: "kt_lane", name: "The sweet shop", door: [420, 440]},
+  kt_pottery: {scene: "kt_lane", name: "The pottery", door: [110, 536]}, kt_hall: {scene: "kt_temple", name: "The temple hall", door: [375, 192]},
+  kt_market: {scene: "kt_river", name: "The covered market", door: [145, 190]},
   rdStepsUp: {scene: "rd_old", name: "Steps up out of the gorge", door: [120, 40], spot: true, bridge: "rd_station", mark: [200, 30], line: "Down into the gorge, over the old bridge and up the steps to the new town."}
 };
 export const TOWN_BRIDGES = {rd_station: {rd_plaza: "rdToPlaza", rd_old: "rdStepsDown"}, rd_plaza: {rd_station: "rdToStation", rd_bridge: "rdBridgeN"},
@@ -205,10 +229,13 @@ export const TOWN_ARRIVE = {"rd_station>rd_plaza": [44, 330], "rd_plaza>rd_stati
   "kt_station>kt_lane": [44, 300], "kt_lane>kt_station": [474, 300], "kt_station>kt_river": [300, 76], "kt_river>kt_station": [330, 576],
   "kt_lane>kt_temple": [150, 80], "kt_temple>kt_lane": [330, 576], "kt_temple>kt_river": [474, 520], "kt_river>kt_temple": [44, 380]};
 // walking areas, and what's in the way (paths.js)
-export const TOWN_BOUNDS = {kt_station: [140, 178, 506, 616], kt_lane: [14, 180, 506, 616], kt_temple: [14, 40, 506, 616], kt_river: [14, 40, 506, 616],
+export const TOWN_BOUNDS = {kt_tea: [30, 250, 490, 600], kt_hall: [30, 250, 490, 600], kt_sweets: [30, 260, 490, 600], kt_market: [30, 240, 490, 600], kt_pottery: [30, 250, 490, 600],
+  kt_station: [140, 178, 506, 616], kt_lane: [14, 180, 506, 616], kt_temple: [14, 40, 506, 616], kt_river: [14, 40, 506, 616],
   rd_cuero: [30, 250, 490, 600], rd_tapas: [30, 250, 490, 600], rd_cafe: [30, 260, 490, 600], rd_banos: [30, 220, 490, 600], rd_jardin: [30, 176, 490, 606], rd_mercado: [30, 250, 490, 600],
   rd_station: [90, 178, 506, 616], rd_plaza: [14, 180, 506, 616], rd_bridge: [14, 22, 506, 616], rd_old: [14, 36, 506, 616]};
 export const TOWN_OBST = {
+  kt_tea: [[300, 340, 460, 420]], kt_hall: [[180, 190, 340, 240], [396, 396, 500, 470], [36, 400, 134, 460]], kt_sweets: [[290, 190, 490, 250], [40, 380, 120, 430]],
+  kt_market: [[30, 250, 130, 300], [390, 250, 490, 300], [30, 380, 130, 430], [390, 380, 490, 430]], kt_pottery: [[120, 300, 200, 350], [330, 200, 480, 250]],
   kt_station: [[0, 0, 134, 640], [262, 56, 404, 162], [376, 376, 504, 466]],
   kt_lane: [[26, 56, 206, 174], [26, 414, 198, 522], [336, 312, 508, 428], [380, 10, 486, 178], [218, 382, 296, 438]],
   kt_temple: [[250, 40, 500, 174], [300, 296, 498, 434], [30, 470, 190, 550]],
@@ -250,6 +277,28 @@ export const TOWN_GOODS = {
   cinturon: {n: "Leather belt", kind: "gift", to: ["dad", "darren", "marcus", "gonggong"], price: 30, shop: "cuero", art: ["roll", "#5A3A2A", "#D9A441"], say: "A proper leather belt, hand-stitched. Very smart."},
   libreta: {n: "Leather notebook", kind: "gift", to: ["angelina", "mum", "darren"], price: 18, shop: "cuero", art: ["box", "#A8754F", "#F3E7C8"], say: "A leather notebook! For lists. And secret lists."},
   llavero: {n: "Leather keyring", kind: "gift", to: "family", price: 6, shop: "cuero", art: ["disc", "#C98A4A", "#D9A441"], say: "A little leather keyring, with a stamped bridge on it. Sweet!"},
+  // round 122: Kyoto's goods. Ingredients go to the Scoop Shack (gelato), the Cocoa Room (bonbon fillings) and the
+  // kitchen (Kyoto tapas); the rest are gifts, or keepsakes for a shelf at home
+  yuzu: {n: "Yuzu", kind: "ingredient", price: 5, sell: 2, shop: "kt_market", art: ["apple", "#F3D34A", "#7FA35A"], what: "from Kyoto's market: yuzu gelato or bonbons, cold tofu with yuzu at the kitchen"},
+  miso: {n: "White miso", kind: "ingredient", price: 6, sell: 2, shop: "kt_market", art: ["jar", "#F3E7C8", "#C9A27E"], what: "sweet Kyoto miso: miso-glazed fish at the kitchen"},
+  tofu: {n: "Fresh tofu", kind: "ingredient", price: 4, sell: 1, shop: "kt_market", art: ["box", "#FFFDF6", "#E6DED0"], what: "silky Kyoto tofu: cold tofu with yuzu at the kitchen"},
+  mochi: {n: "Mochi", kind: "ingredient", price: 4, sell: 1, shop: "kt_sweets", art: ["disc", "#FFFDF6", "#F6C7D6"], what: "soft rice cakes: mochi gelato, mochi with honey at the kitchen"},
+  hojicha: {n: "Hōjicha", kind: "ingredient", price: 5, sell: 2, shop: "kt_tea", art: ["bag", "#8A5A3A", "#C9A27E"], what: "roasted green tea: hōjicha gelato or bonbons"},
+  sakura: {n: "Salted sakura blossoms", kind: "ingredient", price: 6, sell: 2, shop: "kt_sweets", art: ["jar", "#F6C7D6", "#F2A0B8"], what: "pickled cherry blossoms: sakura gelato or bonbons"},
+  matcha: {n: "Matcha powder", kind: "ingredient", price: 6, sell: 2, shop: "kt_tea", art: ["bag", "#8FB86A", "#5E8A48"], what: "ceremonial matcha from the tea house: gelato, bonbons"},
+  shichimi: {n: "Shichimi spice", kind: "gift", to: ["dad", "gonggong", "darren"], price: 6, shop: "kt_market", art: ["bottle", "#C8432F", "#F3E7C8"], say: "Seven-spice pepper from Kyoto! Everything's getting some of this."},
+  hocho: {n: "Kyoto kitchen knife", kind: "gift", to: ["dad", "mama", "marcus"], price: 40, shop: "kt_market", art: ["roll", "#BFC3CA", "#5A3A2A"], say: "A proper Kyoto knife, folded steel! I'll guard it with my life."},
+  wagashibox: {n: "Box of wagashi", kind: "gift", to: "family", price: 8, shop: "kt_sweets", art: ["box", "#F6C7D6", "#9CC27E"], say: "Little sweets shaped like flowers! Too pretty to eat. Almost."},
+  furoshiki: {n: "Furoshiki cloth", kind: "gift", to: ["mum", "mama", "angelina"], price: 9, shop: "ktyukata", art: ["cloth", "#3E5E7A", "#F3C969"], say: "A furoshiki! For wrapping presents, or my lunch. Or both."},
+  sensu: {n: "Folding fan", kind: "gift", to: "family", price: 11, shop: "ktyukata", art: ["cloth", "#F3ECDD", "#C8432F"], say: "A folding fan with cranes on it. Very elegant."},
+  k_chawan: {n: "Tea bowl", kind: "keepsake", price: 20, shop: "kt_tea", art: ["disc", "#5E7A4A", "#C9A27E"], line: "A rough, beautiful tea bowl from the tea house in Kyoto. Made to be held in two hands."},
+  k_tetsubin: {n: "Cast-iron teapot", kind: "keepsake", price: 30, shop: "kt_tea", art: ["jar", "#3A3430", "#5A4636"], line: "A heavy cast-iron teapot from Kyoto, bumpy like a hailstone. It keeps tea hot for an hour."},
+  k_maneki: {n: "Lucky cat", kind: "keepsake", price: 12, shop: "kt_pottery", art: ["cat", "#FFFDF6"], line: "A little white lucky cat from Kyoto, one paw up, waving fortune in."},
+  k_furin: {n: "Wind chime", kind: "keepsake", price: 10, shop: "kt_pottery", art: ["bell", "#BFE0F2"], line: "A glass wind chime from Kyoto, painted with a goldfish. It tinkles in the smallest breeze."},
+  k_daruma: {n: "Daruma doll", kind: "keepsake", price: 8, shop: "kt_pottery", art: ["disc", "#C8432F", "#FFFDF6"], line: "A round red daruma from Kyoto. Paint one eye when you start something big, the other when it's done."},
+  k_cranes: {n: "String of paper cranes", kind: "keepsake", price: 0, art: ["crane", "#F2A0B8"], line: "A string of paper cranes Ma Ma folded in Kyoto, one for each of the family. Make a wish."},
+  k_mycup: {n: "Your Kyoto teacup", kind: "keepsake", price: 0, art: ["disc", "#3E5E7A", "#C9A27E"], line: "A teacup you threw on the wheel and glazed yourself at the pottery in Kyoto. A little wonky. Perfect."},
+  k_dadcup: {n: "Dad's lopsided cup", kind: "keepsake", price: 0, art: ["disc", "#8A6A52", "#C9A27E"], line: "Dad's teacup from the Kyoto pottery. It leans. He says it's 'expressive'."},
   // round 118: shopping corners: spices and ceramics at the market, postcards and fans at Doña Carmen's
   azafran: {n: "Saffron", kind: "gift", to: ["mama", "mum", "gonggong"], price: 12, shop: "especias", art: ["bag", "#C8343A", "#F3C24A"], say: "Real saffron! Worth more than gold, gram for gram. Paella this weekend?"},
   pimenton: {n: "Smoked paprika", kind: "gift", to: ["dad", "gonggong", "darren", "marcus"], price: 6, shop: "especias", art: ["box", "#B5443A", "#F3E7C8"], say: "Smoked paprika in a little tin. Everything I cook is going to taste of Spain now."},
@@ -276,6 +325,10 @@ export const TILES = {
 export const PAINT = {price: 8, colours: {azul: ["cobalt blue", "#3E6BAE"], amarillo: ["saffron yellow", "#E8B13A"], verde: ["olive green", "#5E8A48"]},
   patterns: {star: "an eight-point star", flower: "a geranium flower", wave: "waves, like the river in the gorge"}};
 Object.keys(PAINT.colours).forEach(c => Object.keys(PAINT.patterns).forEach(p => { TOWN_GOODS[`ptile_${c}_${p}`] = {n: "Your painted tile", kind: "keepsake", price: 0, tile: [c, p], art: ["tile", PAINT.colours[c][1], "#FFFDF6"], line: `A tile you painted yourself at Lucía's in Ronda: ${PAINT.patterns[p]}, in ${PAINT.colours[c][0]}.`}; }));
+// Round 123: the nerikiri sweets Mel makes with Mr Tanaka in Kyoto (gifts), one shape for each season
+[["sakura", "cherry blossom", "#F6C7D6"], ["ajisai", "hydrangea", "#B9A8E0"], ["momiji", "maple leaf", "#E0782E"], ["tsubaki", "camellia", "#C8432F"]].forEach(([k, n, col]) => {
+  TOWN_GOODS["nk_" + k] = {n: `Nerikiri: ${n}`, kind: "gift", to: "family", price: 0, art: ["disc", col, "#FFFDF6"], say: `A little sweet shaped like a ${n}! You made this? Too beautiful to eat. I'll eat it anyway.`}; });
+TOWN_GOODS.tsukemono = {n: "Fumiko's pickles", kind: "gift", to: ["mama", "gonggong", "dad"], price: 7, shop: "kt_market", art: ["jar", "#C9B04A", "#8E5A6E"], say: "Kyoto pickles! Purple ones, yellow ones... Ma Ma approves."};
 // The tapas bar: order a little plate on the terrace and it's yours to cook at home (kitchen.js TAPAS, learn: true)
 export const TASTINGS = {
   salmorejo: {price: 5, line: "Salmorejo: cold, thick, tomato and bread and olive oil, with egg and jamón on top. Like eating summer with a spoon."},

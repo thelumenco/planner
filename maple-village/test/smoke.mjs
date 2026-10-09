@@ -1108,7 +1108,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const k = JSON.parse(localStorage.getItem("fox.fox")).kitchen; return !!k.oven && !k.larder.flour; }), "flour goes in the oven to bake");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="tapas"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-k="tapas"]').count() === 32, "the stove offers this season's tapas (32 in autumn: garden, seafood, farm, woods, greenhouse and Sal's clams)");
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 35, "the stove offers this season's tapas (35 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams and Kyoto)");
   await page.click('#ctx [data-k="tapas"][data-id="tortilla"]'); await page.waitForTimeout(200); await page.click('#ctx [data-k="cooktapas"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapasList[0].id === "tortilla" && f.vine.tapasList[0].plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
   await page.click('#ctx [data-k="dish"][data-dish="olives"]'); await page.waitForTimeout(300);
@@ -2668,6 +2668,14 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(K.fare === 60 && K.screens.length === 4 && K.screens.every(sc => tw.townOf(sc) === "kyoto") && Object.keys(tw.TOWN_BRIDGES).filter(k => k.startsWith("kt_")).length === 4, "Kyoto: four screens, 60 coins a ticket");
   const ronda = tw.TOWNS.ronda.acts, used = new Set(Object.values(ronda).flatMap(a => Object.values(a).map(x => x.act)));
   check(Object.values(K.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "nobody in the family does the same thing in Kyoto as in Ronda");
+  { const ky = await import(new URL("../src/game/kyoto.js", import.meta.url)), F = {coins: 100, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
+    const w = ky.whiskStart(0); for (let i = 0; i < 8; i++) ky.whisk(w, w.t0 + i*ky.TEA.BEAT + 30); const w2 = ky.whiskStart(0); for (let i = 0; i < 8; i++) ky.whisk(w2, w2.t0 + i*ky.TEA.BEAT + 280);
+    check(ky.froth(w) && !ky.froth(w2), "the tea ceremony: whisks on the beat froth the tea, off the beat don't");
+    const b = ky.sitStart(0); [["in", 100], ["out", 4100], ["in", 8100], ["out", 12100], ["in", 16100], ["out", 20100]].forEach(([k, t]) => ky.breathe(b, k, b.t0 + t)); check(b.done && ky.calm(b), "meditation: three breaths with the circle");
+    check(ky.makeNerikiri(F, "sakura", add) === "nk_sakura" && ky.throwCup(F, true, add) && F.inv.k_mycup === 1 && F.inv.k_dadcup === 1 && F.coins === 82, "a nerikiri (8) and a teacup on the wheel (10), Dad's lopsided one too");
+    Object.keys(ky.STAMP_AT).forEach(p => ky.stamp(F, p)); check(F.kyoto.lantern && ky.stampCount(F) === 8, "eight stamps fill the book, and the stone lantern goes by the pond at home"); }
+  { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), ids = np.NPCS.map(n => n.id), kt = np.NPCS.filter(n => n.local === "kyoto");
+    check(new Set(ids).size === ids.length && kt.length >= 15 && kt.filter(n => n.tourist).length >= 6, "Kyoto has plenty of people to meet (and no two villagers share an id)"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`kyoto pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
@@ -2691,6 +2699,40 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
     check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("gonggong")), `through the gate to Kyoto's ${want} (Gong Gong follows)`);
   }
+  // round 122-124: the yukata shop, the five rooms and their activities, the stamp book
+  await page.locator('#world [data-place="ktyukata"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-kt="yukata:indigo"]', { timeout: 15000 });
+  await page.click('#ctx [data-kt="yukata:indigo"]'); await page.waitForTimeout(500);
+  check(await fox().then(f => f.kyoto.yukata && f.kyoto.yukata.col === "indigo" && f.coins === 165) && await page.locator("#oDress").evaluate(e => e.style.display !== "none"), "a yukata for the day (15 coins): Mel's in indigo");
+  check(await page.locator("#evan").evaluate(e => e.style.getPropertyValue("--tee") === "#3E5E7A"), "and Evan's in a little jinbei");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.locator('#world [data-place="ktToLane"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Higashiyama/.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 }); await page.waitForTimeout(1000);
+  await page.locator('#world [data-place="ktchaya"]').dispatchEvent("click");
+  await page.waitForFunction(() => /tea house/.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 }); await page.waitForTimeout(7000);
+  check(await ids().then(a => a.includes("sachiko")) && await fox().then(f => f.kyoto.stamps.tea), "inside the tea house: Sachiko by the kettle, and the tea house stamp in the book");
+  await page.locator('#world [data-rdspot="kt_tea"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-kt="tea"]', { timeout: 15000 });
+  await page.evaluate(() => new Promise(res => { document.querySelector('#ctx [data-kt="tea"]').click(); const t0 = Date.now() + 1200; for (let i = 0; i < 8; i++) setTimeout(() => { const b = document.querySelector('#ctx [data-kt="whisk"]'); if (b) b.click(); }, t0 + i*560 + 20 - Date.now()); setTimeout(res, t0 + 8*560 + 400 - Date.now()); }));
+  await page.waitForSelector('#ctx [data-kt="bow"]', { timeout: 8000 }); check(/perfect jade froth/.test(await page.locator("#ctx").innerText()), "the tea ceremony: whisk in time with Sachiko, and it's a perfect froth");
+  await page.click('#ctx [data-kt="bow"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.kyoto.teas === 1 && f.coins === 155), "then turn the bowl and bow (10 coins)");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  for (const [room, spot, who] of [["kt_sweets", "kt_sweets", "tanaka"], ["kt_pottery", "kt_pottery", "ishida"], ["kt_hall", "kt_hall", "joshin"], ["kt_market", "kt_market", "fumiko"]]) {
+    await page.evaluate(r => window.__mapleScene(r), room); await page.waitForTimeout(1300);
+    check(await ids().then(a => a.includes(who)) && await page.locator(`#world [data-rdspot="${spot}"]`).count() === 1, `${room}: ${who} is there, and there's something to do`);
+  }
+  await page.evaluate(() => window.__mapleScene("kt_sweets")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-rdspot="kt_sweets"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-kt="shape:momiji"]', { timeout: 15000 });
+  await page.click('#ctx [data-kt="shape:momiji"]'); for (const s of [0, 2, 1, 2, 3]) await page.click(`#ctx [data-kt="step:${s}"]`).catch(() => {});
+  await page.click('#ctx [data-kt="neri"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.nk_momiji === 1), "a nerikiri maple leaf, made with Mr Tanaka, boxed up as a gift");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.evaluate(() => window.__mapleScene("kt_hall")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-rdspot="kt_hall"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-kt="sit"]', { timeout: 15000 });
+  check(/stamp book/i.test(await page.locator("#ctx").innerText()), "the temple hall: sit with Jōshin, draw a fortune, and see the stamp book");
+  await page.click('#ctx [data-kt="fortune"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.kyoto.fortunes === 1), "a fortune slip (1 coin)");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.evaluate(() => window.__mapleScene("kt_station")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="kttrain"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-triphome]", { timeout: 15000 });
   await page.click("#ctx [data-triphome]");
   await page.waitForFunction(() => /Honeybrook station/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });

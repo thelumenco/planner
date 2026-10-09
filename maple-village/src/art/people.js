@@ -47,6 +47,15 @@ function extra(kind, look, k){
     case "camera": return `<rect x="${7*k}" y="${-31*k}" width="${10*k}" height="${7*k}" rx="1.5" ${S("#3A3430")}/><circle cx="${12*k}" cy="${-27.5*k}" r="${2.2*k}" ${S("#9FD3E8")}/><rect x="${8*k}" y="${-33*k}" width="${3*k}" height="${2*k}" ${S("#3A3430")}/>`;
     case "notebook": return `<rect x="${7*k}" y="${-29*k}" width="${8*k}" height="${10*k}" rx="1" ${S("#E8566C")}/><path d="M${9*k} ${-26*k} h${4*k} M${9*k} ${-23*k} h${4*k}" fill="none" stroke-width=".7"/>`;
     case "newspaper": return `<rect x="${-10*k}" y="${-34*k}" width="${20*k}" height="${13*k}" rx="1" ${S("#F3ECDD")}/><path d="M${-8*k} ${-31*k} h${7*k} M${-8*k} ${-28*k} h${16*k} M${-8*k} ${-25*k} h${16*k} M${1*k} ${-31*k} h${7*k}" fill="none" stroke-width=".7"/>`;
+    // round 122, for Kyoto (never what they did in Ronda): Mum's red paper parasol, Dad's clay cup on the wheel, Ma Ma's
+    // paper cranes, Gong Gong's Go board, Darren's skewers, Marcus's calligraphy brush, Angellina's fortune slip
+    case "parasol": return `<g class="tool"><path d="M${10*k} ${-20*k} L${10*k} ${-62*k}" fill="none" stroke-width="1.4" style="stroke:#5A4636"/><path d="M${-8*k} ${-56*k} Q${10*k} ${-76*k} ${28*k} ${-56*k}z" ${S("#C8432F")}/>${[0, 1, 2, 3].map(i => `<path d="M${10*k} ${-68*k} L${(-4 + i*9)*k} ${-57*k}" fill="none" stroke-width=".6" style="stroke:#F3C969"/>`).join("")}</g>`;
+    case "claycup": return `<ellipse cx="${10*k}" cy="${-10*k}" rx="${11*k}" ry="${3*k}" ${S("#8A6A52")}/><path d="M${4*k} ${-11*k} q${-1*k} ${-10*k} ${3*k} ${-11*k} h${6*k} q${4*k} ${1*k} ${2*k} ${11*k}z" ${S("#C9A27E")}/><g class="tool"><path d="M${10*k} ${-14*k} h${2*k}" fill="none" stroke-width=".8"/></g>`;
+    case "crane": return `<g class="tool"><path d="M${8*k} ${-28*k} l${6*k} ${-6*k} l${6*k} ${6*k} l${-6*k} ${2*k}z" ${S("#F2A0B8")}/><path d="M${14*k} ${-34*k} l${4*k} ${-4*k}" fill="none" stroke-width=".8"/></g><path d="M${-12*k} ${-6*k} l${4*k} ${-4*k} l${4*k} ${4*k}z M${-4*k} ${-4*k} l${4*k} ${-4*k} l${4*k} ${4*k}z" ${S("#BFE0F2")}/>`;
+    case "goboard": return `<rect x="${8*k}" y="${-10*k}" width="${22*k}" height="${10*k}" rx="1" ${S("#D9B86A")}/><path d="M${11*k} ${-7*k} h${16*k} M${11*k} ${-4*k} h${16*k} M${15*k} ${-10*k} v${10*k} M${21*k} ${-10*k} v${10*k}" fill="none" stroke-width=".5"/>${[[13, -7, "#2F2B28"], [19, -4, "#FFFDF6"], [23, -7, "#2F2B28"], [17, -7, "#FFFDF6"]].map(([x, y, c]) => `<circle cx="${x*k}" cy="${y*k}" r="${1.4*k}" style="fill:${c}" stroke-width=".4"/>`).join("")}`;
+    case "skewer": return `<g class="tool"><path d="M${10*k} ${-20*k} L${14*k} ${-40*k}" fill="none" stroke-width="1" style="stroke:#C9A27E"/>${[0, 1, 2].map(i => `<circle cx="${(13.2 - i*.8)*k}" cy="${(-36 + i*5)*k}" r="${2.4*k}" ${S(["#FBEFF2", "#9CC27E", "#F6C7D6"][i])}/>`).join("")}</g>`;
+    case "brush": return `<rect x="${-14*k}" y="${-8*k}" width="${16*k}" height="${8*k}" ${S("#FFFDF6")}/><path d="M${-11*k} ${-6*k} q${3*k} ${2*k} ${6*k} 0 M${-8*k} ${-3*k} v${2*k}" fill="none" stroke-width="1.4" style="stroke:#2F2B28"/><g class="tool"><path d="M${10*k} ${-20*k} L${16*k} ${-34*k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${9*k} ${-18*k} l${2*k} ${-3*k} l${2*k} ${2*k}z" style="fill:#2F2B28"/></g>`;
+    case "fortune": return `<g class="tool"><rect x="${8*k}" y="${-32*k}" width="${6*k}" height="${14*k}" rx="1" ${S("#FFFDF6")}/><path d="M${10*k} ${-29*k} v${8*k} M${12*k} ${-29*k} v${5*k}" fill="none" stroke-width=".6" style="stroke:#C8432F"/></g>`;
     case "lantern": return `<path d="M${12*k} ${-24*k} v${-4*k}" fill="none"/><rect x="${9*k}" y="${-24*k}" width="${7*k}" height="${9*k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5*k}" cy="${-19.5*k}" r="${1.8*k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
   }
   return "";
@@ -114,7 +123,7 @@ export function personArt(look, kid){
       <path d="M${-8.6*k} ${-37*k} q${8.6*k} ${-2.4*k} ${17.2*k} 0 l${1.4*k} ${23*k} h${-20*k}z" ${S(look.dress || look.top)}/>
       ${look.batik && !coat ? batik(look.batik, k) : ""}
       ${coat ? coatArt(rain, k) : ""}
-      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
       <circle cx="0" cy="${-46*k}" r="${10.6*k}" ${S(look.skin)}/>
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46*k, 10.6*k) : hair(look.hairStyle, look.hair, k)}

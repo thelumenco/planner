@@ -36,7 +36,7 @@ function eligible(F, id, day){
 export const TELLERS_PER_DAY = 2;
 const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 // Ronda's locals tell theirs on a day trip, quest or no quest (Mel's on holiday); the two-a-day limit still holds
-const LOCALS = ["carmen", "rafael", "lucia", "manolo"];
+const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka"];   // Ronda's and Kyoto's
 export function storyReady(F, id, day = dayKey()){
   if (F.storyDay !== day && !LOCALS.includes(id)) return null;
   const s = storyState(F), told = Object.keys(s.day).filter(x => s.day[x] === day).length, left = TELLERS_PER_DAY - told;
@@ -58,6 +58,7 @@ const REWARDS = {
   nonna: (F, addInv) => { addInv("s_nonna", 2); return "two cups of Nonna's fior di latte"; },
   carmen: (F, addInv) => { addInv("yemas", 2); return "two boxes of Doña Carmen's yemas (one's for Pilar)"; },
   pastry: F => { storyState(F).flags.pastry = true; applyFlags(F); return "Farid's honey and pistachio pastries, on the tapas menu"; },
+  chashaku: () => "Okada's grandmother's bamboo tea scoop, to take home to him",
   spoon: (F, addInv) => { addInv("s_spoon", 1); return "Tomás's olive-wood spoon (a keepsake)"; },
   oilcake: F => { storyState(F).flags.oilcake = true; applyFlags(F); return "Ines's abuela's olive oil cake, on the tapas menu"; }
 };

@@ -1769,3 +1769,45 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Music:** `kyoto` is a koto in the miyako-bushi scale (D, Eb, G, A, Bb).
 - **Kyoto place ids all start with `kt`.** Its "hall" once replaced Honeybrook's Town hall in VILLAGE, and a test now guards against any clash.
 - **For now,** the tea house, sweet shop, pottery, hall, market and yukata shop just say a line ("opens soon"). They become interiors and shops in rounds 2–3.
+
+### Rounds 122–124: Kyoto's goods, rooms, people and activities
+- **Goods** (TOWN_GOODS, by shop; all bought through the shared `data-rbuy`/`buyGood`):
+  - **Market (`kt_market`):** yuzu, white miso, tofu, shichimi, a Kyoto knife, Fumiko's pickles.
+  - **Tea house (`kt_tea`):** hōjicha, matcha, and keepsakes: a tea bowl, a cast-iron teapot.
+  - **Sweet shop (`kt_sweets`):** mochi, salted sakura, a box of wagashi.
+  - **Pottery (`kt_pottery`):** keepsakes: a lucky cat, a wind chime, a daruma.
+  - **Yukata shop (`ktyukata`):** a furoshiki and a folding fan.
+- **Where the ingredients go:**
+  - New INGR (gelato and bonbons): yuzu, hōjicha, mochi, sakura. Matcha already existed.
+  - New kitchen TAPAS (always known): miso-glazed fish (fish and miso), cold tofu with yuzu and chives, mochi with honey.
+- **Five interiors** (`TOWNS.kyoto.rooms`, art/kyoto-rooms.js, each with its own live track):
+  - **Tea house (`kt_tea`):** tatami, a shoji open on a little garden, an alcove scroll, the hearth and kettle.
+  - **Temple hall (`kt_hall`):** a golden altar, candles, the bell, the meditation corner by the moss garden, a rack of ema plaques, an offering table.
+  - **Sweet shop (`kt_sweets`):** wooden moulds on the wall, glass cases, Mr Tanaka's counter.
+  - **Market (`kt_market`):** four stalls under lanterns.
+  - **Pottery (`kt_pottery`):** the wheel, shelves of cups, the glowing kiln, a wind chime, a cat on the clay.
+- **Activities** (game/kyoto.js, `data-kt`):
+  - **Tea ceremony (10):** whisk eight times in time with the pulse (`whisk`, `froth` needs 6), then turn the bowl and bow.
+  - **Meditation (free, with an optional 2 in the box):** three breaths with the breathing circle (`breathe`, `calm`). The bell; Evan rings it.
+  - **Fortune slip (1):** a bad one gets tied to the rack.
+  - **Nerikiri (8):** pick a season shape, four steps in order, a boxed gift (`nk_<shape>`).
+  - **Teacup on the wheel (10):** centre the clay three times on the `.fbar` sweep, pick a glaze. You get `k_mycup`, and Dad's lopsided `k_dadcup` if he's along.
+  - **Yukata rental (15):** for the day (`F.kyoto.yukata`). In Kyoto, Mel's dress is drawn in the colour and Evan gets an indigo jinbei (via the `--tee`/`--pants` CSS variables on `#evan`).
+- **Stamp book:**
+  - Eight stamps: bamboo, pagoda, tea house, sweet shop, torii, gravel garden, turtle stones, market (`STAMP_AT`), stamped on walking up or going in.
+  - Shown in the temple hall panel.
+  - A full book sets `F.kyoto.lantern`, which puts the stone lantern at (492,588) by the home pond.
+- **People** (local "kyoto"):
+  - Locals: Sachiko (tea), Jōshin (monk), Mr Tanaka (sweets), Fumiko (pickles), Ishida (potter), Mr Mori (Go), Mr Kato (station), Ren (rickshaw), Haru (gravel garden).
+  - Tourists: Lena, Arjun, Sophie, Mateus, Chika, Jin, Tess. Mel asked for more people to talk to.
+  - Stories for Sachiko, Jōshin and Tanaka. Sachiko kept Okada's grandmother's tea scoop, and a new Okada chapter (`needs sachiko:3`) receives it.
+  - A test checks there are no duplicate NPC ids. Aiko, Dev and Grace already existed as Honeybrook visitors.
+- **Family acts in Kyoto** (all new props in people.js):
+  - Mum: a parasol.
+  - Dad: a clay cup on the wheel.
+  - Ma Ma: paper cranes. A string `k_cranes` comes home once if she came along.
+  - Gong Gong: a Go board, opposite Mr Mori.
+  - Darren: skewers.
+  - Marcus: a calligraphy brush.
+  - Angellina: a fortune slip.
+- **Touches:** Fumiko gives Evan a rice cracker, the hall bell rings, and the pottery's wind chime tinkles.

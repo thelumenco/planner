@@ -56,6 +56,8 @@ import { ghState, ghGrowth, bedPanel, ghPlant, ghHarvest, ghBoost, setGhCompost 
 import { rondaArt, trainRideArt } from "../art/town-ronda.js";
 import { rondaRoomArt } from "../art/ronda-rooms.js";
 import { kyotoArt } from "../art/town-kyoto.js";
+import { kyotoRoomArt } from "../art/kyoto-rooms.js";
+import { kyotoPanel, kyotoState, stamp as ktStamp, rentYukata, yukataOn, YUKATA, whiskStart, whisk, froth, TEA, sitStart, breathe, calm, drawFortune, makeNerikiri, seasonShape, centre as ktCentre, throwCup, NERI } from "./kyoto.js";
 import { TOWNS, townOf, townRoom, roomBehind, TOWN_BOUNDS } from "../data/towns.js";
 import { rondaPanel, rondaVisit, buyGood, buyVines, taste, buyTile, picnic as rondaPicnic, tileBench, cafeTreat, showOn, palmasStart, palmasEnd, clap, ole, paintTile, pour, TEA_GLASSES, rondaState } from "./ronda.js";
 import { tripOn, inParty, buyTrip, endTrip, ticketPanel, homePanel, initTrips, nameOf as tripName, awayOn } from "./trips.js";
@@ -1501,7 +1503,7 @@ function showPanel(hasCtx, skin){
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
   if (kid.open) { kid.open = null; stopKidGame(); ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; ghBed = null; millOpen = false; friView = null; vanView = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1557,6 +1559,7 @@ function ctx(){
   else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick, tripTown);
   else if (railOpen && scene === "hlane") h = timetablePanel(dayKey(), sgHM(), true);
   else if (railOpen && townOf(scene)) h = homePanel(F, townOf(scene));
+  else if (kyotoView && townOf(scene) === "kyoto") h = kyotoPanel(F, kyotoView, {...ktSt, evan: inParty(F, "evan") && !evanNight()});
   else if (rondaView && townOf(scene)) h = rondaPanel(F, rondaView, {flam: flamSt, hm: sgHM(), tea: teaSt, amina: isHere("amina"), paint: paintSt});
   else if (fishSpot && FISH_SPOTS[fishSpot].scene === scene) h = fishPanel(F, fishSpot, fishSt);
   else if (woodsView === "ranger" && scene === "hwoods") h = rangerPanel(F, isHere("wren"));
@@ -1738,6 +1741,29 @@ function ctx(){
   c.querySelectorAll("[data-rcafe]").forEach(b => b.onclick = () => { if (!cafeTreat(F, b.dataset.rcafe)) return; rondaView = null; ctx(); sfx("chime"); gainXp(1); hearts(2);
     mel.sitting = true; nodes.mel.classList.add("sit"); if (b.dataset.rcafe === "choc") speak(pick(["Dip, bite, dip again. The chocolate's so thick the churro stands up in it.", "Hot churros, crisp and sugary, and a cup of chocolate you could stand a spoon in. Heaven."]), 6000); else speak(pick(["Café con leche in a glass, a churro to dip, and the fan ticking round overhead. Bliss.", "Doña Carmen sets it down: \"Eat, eat. You're too thin.\" The churro's still hot.", "Coffee, sugar, the plaza going by outside the window. Nobody's in a rush."]), 6000);
     if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["churro! mine!", "sugar on my nose!", "more churro please"])), 1800); save(); });
+  c.querySelectorAll("[data-kt]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.kt.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); };
+    if (a === "yukata") { const n = rentYukata(F, v); if (!n) return; sfx("chaching"); flash("A yukata for the day"); speak(`You change into the ${n.toLowerCase()}, an obi tied at the back, wooden sandals clacking.${evanOn ? " Evan's in a little indigo jinbei and won't stop twirling." : ""}`, 6000); ev(["look at me, Mama!", "I'm a samurai!", "twirl twirl!"], 2200); save(); dressMel(); }
+    else if (a === "tea") { if (F.coins < TEA.price) return; F.coins -= TEA.price; ktSt = {tea: whiskStart()}; sfx("paper", true); save(); }
+    else if (a === "teaagain") { ktSt = {}; }
+    else if (a === "whisk") { if (!ktSt.tea) return; const ok = whisk(ktSt.tea); sfx(ok ? "tap" : "paper", true); }
+    else if (a === "bow") { if (!ktSt.tea || !ktSt.tea.done) return; ktSt.tea.bowed = true; const k = kyotoState(F); k.teas = (k.teas || 0) + 1; gainXp(froth(ktSt.tea) ? 2 : 1); hearts(froth(ktSt.tea) ? 3 : 1); sfx("chime");
+      speak(froth(ktSt.tea) ? "You turn the bowl twice and bow. Sachiko bows back, very low. That's the best thing that's happened all week." : "You turn the bowl twice and bow. Sachiko bows back and smiles.", 5500); ev(["I bowed too!", "sweetie for me?", "bow bow!"]); save(); }
+    else if (a === "sit") { ktSt = {sit: sitStart()}; sfx("paper", true); [0, 1, 2, 3, 4, 5, 6].forEach(i => setTimeout(() => { if (kyotoView === "kt_hall" && ktSt.sit && !ktSt.sit.done) ctx(); }, 1600 + i*4000)); }
+    else if (a === "in" || a === "out") { if (!ktSt.sit) return; const r = breathe(ktSt.sit, a); if (!r) return; sfx(r === "ok" ? "tap" : "paper", true);
+      if (ktSt.sit.done) { const k = kyotoState(F); k.sits = (k.sits || 0) + 1; gainXp(calm(ktSt.sit) ? 2 : 1); sfx("chime"); mel.sitting = true; nodes.mel.classList.add("sit"); ev(["BONG!", "can I ring it? can I?", "shhh, Mama's being quiet"], 2000); save(); } }
+    else if (a === "donate") { if (F.coins < 2) return; F.coins -= 2; sfx("coin"); speak("The coin drops into the wooden box. Jōshin bows, smiling.", 3500); save(); }
+    else if (a === "fortune") { const f = drawFortune(F); if (!f) return; ktSt = {fortune: f}; sfx("paper", true); speak(f[0] === "Bad luck" ? "Bad luck! You tie the slip to the rack and leave it there. Already feeling better." : `${f[0]}! ${f[1]}`, 5000); save(); }
+    else if (a === "shape") { ktSt = {neri: {shape: v, step: 0}}; sfx("tap"); }
+    else if (a === "step") { const n = ktSt.neri; if (!n) return; if (+v === n.step) { n.step++; n.oops = false; sfx("tap"); } else { n.oops = true; sfx("paper", true); } }
+    else if (a === "nerireset") { ktSt = {}; }
+    else if (a === "neri") { const n = ktSt.neri; if (!n || !makeNerikiri(F, n.shape, addInv)) return; ktSt = {}; sfx("chime"); gainXp(1); flash(`Nerikiri: ${NERI.shapes[n.shape][0].replace(/^A /, "").toLowerCase()}`);
+      speak(`${NERI.shapes[n.shape][0]}, in a little box with a paper ribbon. "Very good," says Mr Tanaka. "My father would say: too good for a beginner." A gift for someone at home.`, 6500); ev(["can I eat it? please?", "I made one too!", "pink! pretty!"]); save(); }
+    else if (a === "wheel") { if (F.coins < 10) return; ktSt = {cup: {t0: Date.now(), good: 0, tries: 0}}; sfx("paper", true); }
+    else if (a === "centre") { const c = ktSt.cup; if (!c || c.good >= 3) return; sfx(ktCentre(c) ? "tap" : "paper", true); }
+    else if (a === "glaze") { const c = ktSt.cup; if (!c || c.good < 3) return; const dadToo = inParty(F, "dad"); if (!throwCup(F, dadToo, addInv)) return; ktSt = {}; sfx("chime"); gainXp(1); flash("Your Kyoto teacup");
+      speak(`Ishida dips it in ${v === "indigo" ? "deep indigo" : v === "celadon" ? "pale celadon" : "warm amber"} glaze and fires it. A little wonky. Perfect. It's a keepsake for a shelf at home.${dadToo ? " Dad's comes out too, leaning badly. He's thrilled." : ""}`, 6500);
+      if (dadToo && isHere("dad")) setTimeout(() => npcSay("dad", "Expressive. That's the word. It's expressive."), 2400); save(); }
+    ctx(); });
   c.querySelectorAll("[data-rflam]").forEach(b => b.onclick = () => {
     if (b.dataset.rflam === "start") { flamSt = palmasStart(); clearTimeout(flamT); sfx("tap"); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["clap clap CLAP!", "I'm clapping, Mama!", "olé! olé!"])), 2400);
       flamT = setTimeout(() => { flamSt.done = true; const won = ole(flamSt); const r = rondaState(F); if (won) { r.oles = (r.oles || 0) + 1; gainXp(2); hearts(3); sfx("yay"); act("cheer"); go(scene, 430, 540, () => { act("cheer"); mprop("sparkle", mel.x, mel.y - 60, 1600); });
@@ -1799,7 +1825,7 @@ function ctx(){
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
   c.querySelectorAll("[data-fair]").forEach(b => b.onclick = () => fairActivity(b.dataset.fair));
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; ghBed = null; millOpen = false; friView = null; vanView = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
@@ -1935,8 +1961,8 @@ function drawScene(){
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; const light = rainLevel(day) === 1; setTimeout(() => speak(light ? "A light shower today. Brollies up!" : "Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
-  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? rondaRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
-  $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") : ""));   // shelves with keepsakes, and pets at home here
+  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
+  $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") : ""));   // shelves with keepsakes, and pets at home here
   if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));   // the same evening light everywhere outdoors
   if (outside() && isDusk()) nightLights();
   const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), orchard:"Ma Ma's orchard", flowers:"Ma Ma's flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", hwoods:"Honeybrook Woods", greenhouse:"The greenhouse", mill:"The old mill", scoopshop: scoopState(F).name, kt_station:"Kyoto: the station", kt_lane:"Kyoto: Higashiyama", kt_temple:"Kyoto: the temple", kt_river:"Kyoto: the river", rd_station:"Ronda: the station", rd_plaza:"Ronda: the plaza", rd_bridge:"Ronda: Puente Nuevo", rd_old:"Ronda: the old town"};
@@ -2000,7 +2026,8 @@ function drawTableware(){
 // down are drawn over her. Pyjamas in her room win.
 const wearToday = () => F.wear && F.wear.day === dayKey() ? F.wear : null;
 function applyWear(pj){
-  const m = $("mel"); if (!m) return; const w = pj ? null : wearToday(), c = (f, fb) => colourOf(w[f], fb);
+  const m = $("mel"); if (!m) return; const yk = !pj && townOf(scene) === "kyoto" && yukataOn(F), w = yk ? {dress: `${YUKATA.cols[yk][1]} maxi`, shoes: "tan"} : pj ? null : wearToday(), c = (f, fb) => colourOf(w[f], fb);
+  { const e = $("evan"); if (e) { if (yk && inParty(F, "evan")) { e.style.setProperty("--tee", "#3E5E7A"); e.style.setProperty("--pants", "#3E5E7A"); } else { e.style.removeProperty("--tee"); e.style.removeProperty("--pants"); } } }
   const fill = (el, col) => { el.style.display = col ? "" : "none"; if (col) el.style.fill = col; };
   if (w && w.top && !w.dress) m.style.setProperty("--tank", c("top", "#FFFDF6")); else m.style.removeProperty("--tank");
   if (w && w.bottom && !w.dress) m.style.setProperty("--denim", c("bottom", "#2F2B28")); else m.style.removeProperty("--denim");
@@ -2076,7 +2103,10 @@ function startTrip(town){
     if (inParty(F, "evan")) setTimeout(() => evanSays(pick(r.town.evanArrive || ["Mama, it's SO sunny!", "Big birdies in the sky!", "Are we in Spain? Is this Spain?"])), 3200); });
 }
 function tripHome(late){
-  const t = tripOn(F), town = t ? TOWNS[t.town] : TOWNS[townOf(scene) || "ronda"]; endTrip(F); railOpen = false; ctx(); save(true);
+  const t = tripOn(F), town = t ? TOWNS[t.town] : TOWNS[townOf(scene) || "ronda"]; endTrip(F); railOpen = false; kyotoView = null; ctx();
+  // Ma Ma folded paper cranes all day in Kyoto: a string of them comes home, one for each of the family (once)
+  if (t && t.town === "kyoto" && t.party.includes("mama") && !kyotoState(F).cranes) { kyotoState(F).cranes = true; addInv("k_cranes", 1); setTimeout(() => flash("Ma Ma's paper cranes"), 3400); }
+  save(true);
   trainRide(late ? "The last train home, everyone sleepy..." : "Home to Honeybrook...", null, () => { setScene("hlane", VILLAGE.timetable.door);
     setTimeout(() => speak(`Back in Honeybrook. ${town.n} was ${pick(["unforgettable", "a proper adventure", "glorious"])}.${t && t.party.length ? ` ${partyList(t)} head${t.party.length > 1 ? "" : "s"} off home.` : ""}`, 5000), 800); });
 }
@@ -2088,7 +2118,15 @@ const BATH_FACTS = ["Eight hundred years old: the best-kept Arab baths in Spain.
   "Three rooms, cold, warm and hot, like a hammam. The star-shaped holes let the light down and the steam out.",
   "Under the floor, hot air from a furnace ran through channels, so the stones were warm under your feet.",
   "People came to wash, but mostly to talk. Like a café, with more steam."];
+// Kyoto (round 123): a stamp in the book for each place; the room spots open the activities
+let kyotoView = null, ktSt = {};
+function stampHere(place){ const s = ktStamp(F, place); if (!s) return; sfx("chime"); flash(`Stamp: ${s.n}`); gainXp(1);
+  if (s.full) setTimeout(() => speak("The stamp book's full! Eight ink stamps from round Kyoto. Back home, there's a little stone lantern by the pond now.", 6500), 1200); save(); }
+const homeLantern = (x, y) => `<g pointer-events="none" class="homelantern"><g style="stroke:var(--line)" stroke-width="1.3" stroke-linejoin="round"><rect x="${x-4}" y="${y-22}" width="8" height="22" fill="#B9B0A4"/><path d="M${x-12} ${y-22} h24 l-4 -6 h-16z" fill="#CFC6B8"/><rect x="${x-8}" y="${y-38}" width="16" height="10" fill="#E6DED0"/><rect x="${x-4}" y="${y-36}" width="8" height="6" fill="#F6D98A"/><path d="M${x-14} ${y-38} q14 -12 28 0z" fill="#B9B0A4"/><circle cx="${x}" cy="${y-48}" r="2.5" fill="#B9B0A4"/></g><circle cx="${x}" cy="${y-33}" r="14" fill="#F6D98A" opacity=".18"/></g>`;
 function roomSpot(id){
+  if (id === "kt_tea" || id === "kt_hall" || id === "kt_sweets" || id === "kt_market" || id === "kt_pottery") { kyotoView = id; ktSt = {}; sfx("paper", true); render(); return; }
+  if (id === "ktbell") { sfx("chime"); speak(pick(["BONNNG. The sound rolls round the hall and out over the garden, and keeps going long after.", "You strike the bell gently. It hums for a whole minute."]), 5000); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["BONG! again!", "it's SO loud", "my turn! BONG!"])), 1600); render(); return; }
+  if (id === "ktchime") { sfx("chime"); speak("The wind chime tinkles: a little glass bell with a goldfish painted on it. Ishida sells them for 10.", 4000); render(); return; }
   if (id === "flamenco" || id === "tea") { rondaView = id; if (id === "flamenco") { flamSt = null; clearTimeout(flamT); } else teaSt = null; sfx("paper", true); render(); return; }
   if (id === "cat") { sfx("chime"); speak(pick(["The workshop cat opens one eye, decides you're alright, and goes back to sleep on the hides.", "A purr like a little engine. Antonio says she's called Piel. Of course she is.", "The cat stretches, yawns, and rolls over onto a half-finished belt."]), 4500);
     if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["kitty!", "soft kitty", "she's purring, Mama!"])), 1400); render(); return; }
@@ -2101,7 +2139,9 @@ function townSpot(id){
   const town = townOf(scene), T = TOWNS[town];
   if (id === T.station) { railOpen = true; sfx("paper", true); render(); return; }
   const room = roomBehind(town, id);   // round 116: the tapas bar, the café, the market, the baths and the garden have insides
-  if (room) { sfx("paper", true); setScene(room, [260, 560]); setTimeout(() => speak(T.rooms[room].say, 5000), 700);
+  if (room) { sfx("paper", true); setScene(room, [260, 560]); setTimeout(() => speak(T.rooms[room].say, 5000), 700); if (town === "kyoto") setTimeout(() => stampHere(room), 5800);
+    // a touch: at Kyoto's market, Fumiko gives Evan a rice cracker (once a day)
+    if (room === "kt_market" && inParty(F, "evan") && !evanNight() && kyotoState(F).cracker !== dayKey()) setTimeout(() => { if (scene !== "kt_market" || !isHere("fumiko")) return; kyotoState(F).cracker = dayKey(); npcSay("fumiko", "A rice cracker for the little one! Careful, crunchy."); setTimeout(() => evanSays("CRUNCH! more?"), 2200); save(); }, 3200);
     // a touch: Rocío gives Evan a carnation (once a day), and he gives it straight to Mel
     const r = rondaState(F); if (room === "rd_mercado" && inParty(F, "evan") && !evanNight() && r.flowerDay !== dayKey() && NPCS.some(n => n.id === "rocio") ) setTimeout(() => { if (scene !== "rd_mercado" || !isHere("rocio")) return; r.flowerDay = dayKey(); addInv("clavel", 1);
       npcSay("rocio", "¡Para ti, guapo! A carnation, for the little one."); setTimeout(() => evanSays("for you, Mama!"), 2200); save(); }, 3200);
@@ -2116,6 +2156,8 @@ function townSpot(id){
     who.slice(0, 3).forEach((id, i) => setTimeout(() => npcSay(id, pick(T.lines[id] || ["Mmm."])), 2400 + i*2600));
     if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["Picnic!", "Orange for Evan!", "Look, the birdies want some!"])), 1800);
     save(); render(); return; }
+  if (id === "ktyukata") { kyotoView = "ktyukata"; sfx("paper", true); render(); return; }
+  if (town === "kyoto") stampHere(id);
   speak(T.say[id] || VILLAGE[id].line, 6000);
   if (inParty(F, "evan") && (id === "mirador" || id === "alameda") && !evanNight()) setTimeout(() => evanSays(pick(["so HIGH", "Mama, hold hand", "big birdies!"])), 1800);
   render();
@@ -2236,7 +2278,7 @@ function setScene(id, at){
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
     scView = null; scSt.pick = null; scSt.dpick = null; evanSeat = null;
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; ghBed = null; millOpen = false; friView = null; vanView = null; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;

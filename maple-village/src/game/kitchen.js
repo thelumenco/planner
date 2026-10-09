@@ -31,7 +31,9 @@ export const GOODS = {
   clams: ["clam", "clams"], chives: ["bunch of chives", "bunches of chives"], thyme: ["bunch of thyme", "bunches of thyme"], shrimp: ["shrimp", "shrimp"],
   // round 107: from Ronda's market
   almond: ["bag of almonds", "bags of almonds"], sevilla: ["Seville orange", "Seville oranges"], oliveoil: ["bottle of olive oil", "bottles of olive oil"], jamon: ["piece of jamón", "pieces of jamón"],
-  payoyo: ["payoyo cheese", "payoyo cheeses"], membrillo: ["block of membrillo", "blocks of membrillo"]};
+  payoyo: ["payoyo cheese", "payoyo cheeses"], membrillo: ["block of membrillo", "blocks of membrillo"],
+  // round 122: from Kyoto
+  yuzu: ["yuzu", "yuzu"], miso: ["tub of white miso", "tubs of white miso"], tofu: ["block of tofu", "blocks of tofu"], mochi: ["mochi", "mochi"], matcha: ["tin of matcha", "tins of matcha"]};
 export const GROUP_ICON = {farmcheese: "chz_cheddar", halloumi: "chz_halloumi", bluecheese: "chz_blue", cheddar: "chz_cheddar", honey: "honey", petals: "tulip"};
 // Wildflower Farm's cheeses (chz_*) come in as themselves: any of them does for "cheese" in a recipe, and the farm
 // cheese board wants one; goat's milk does for milk (the press, the crema). See ALT.
@@ -100,6 +102,9 @@ export const TAPAS = {
   payoyo: {n: "Payoyo with membrillo", need: {payoyo: 1, membrillo: 1}, price: 14, learn: true},
   naranjas: {n: "Orange and olive salad", need: {sevilla: 2, olives: 1, oliveoil: 1}, price: 10, learn: true}};
 // round 109: with herbs from the greenhouse (and shrimp from the sea)
+// round 122: Kyoto dishes (fish from Mel's own catch, tofu and miso from the market, chives from the greenhouse)
+Object.assign(TAPAS, {misofish: {n: "Miso-glazed fish", need: {fish: 1, miso: 1}, price: 11}, hiyayakko: {n: "Cold tofu with yuzu and chives", need: {tofu: 1, yuzu: 1, chives: 1}, price: 9},
+  mochihoney: {n: "Mochi with honey", need: {mochi: 2, honey: 1}, price: 8}});
 Object.assign(TAPAS, {gambas: {n: "Gambas al ajillo", need: {shrimp: 3, garlic: 2, oliveoil: 1}, price: 13},
   romero: {n: "Rosemary potatoes", need: {potato: 2, rosemary: 1}, price: 9}, bruschetta: {n: "Tomato and basil bruschetta", need: {loaf: 1, tomato: 2, basil: 1}, price: 10, seasons: ["summer", "autumn"]},
   almejas: {n: "Clams with garlic and lemon", need: {clams: 4, garlic: 1, lemon: 1}, price: 12},

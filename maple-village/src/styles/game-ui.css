@@ -861,3 +861,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .tglass.meh{background:linear-gradient(#FFFDF6 30%,#B98A3A 30%)}
 .paintrow{display:flex;gap:12px;align-items:center;margin:6px 0}
 @media (prefers-reduced-motion:reduce){.cmark{animation-duration:0s!important}}
+/* round 123: Kyoto's tea ceremony (whisk in time with the pulse) and meditation (breathe with the circle) */
+.ktpulse{display:flex;justify-content:center;align-items:center;height:96px;margin:8px 0}
+.ktpulse span{width:44px;height:44px;border-radius:50%;background:#8FB86A;border:2px solid var(--line);animation-name:ktpulse;animation-timing-function:ease-out;animation-iteration-count:infinite;animation-fill-mode:both}
+@keyframes ktpulse{0%{transform:scale(1.5);background:#B9D88A}30%{transform:scale(1)}100%{transform:scale(1);background:#8FB86A}}
+.ktbreath{display:flex;justify-content:center;align-items:center;height:150px;margin:8px 0}
+.ktbreath span{width:50px;height:50px;border-radius:50%;background:radial-gradient(#FFF6D8,#E8D3A8);border:2px solid var(--line);animation-name:ktbreath;animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-fill-mode:both}
+@keyframes ktbreath{0%{transform:scale(1)}50%{transform:scale(2.6)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.ktpulse span,.ktbreath span{animation-duration:0s!important}}

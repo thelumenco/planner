@@ -77,6 +77,22 @@ export const TRACKS = {
   kyoto: {name: "Koto in Kyoto", live: true, bpm: 72, steps: 8, tone: "guitar", arp: [1, 3, 2, 4, 3, 5, 4, 2], arpVel: .045, mel: .6,
     bars: [[38, 50, 62, 63, 67, 69], [38, 50, 62, 67, 69, 70], [31, 43, 55, 62, 63, 67], [33, 45, 57, 62, 63, 69], [38, 50, 62, 63, 67, 69], [34, 46, 58, 62, 67, 70], [31, 43, 55, 63, 67, 69], [38, 50, 57, 62, 63, 69]],
     lines: [[[0, 74], [1, 75], [2, 74], [3, 69]], [[0, 70], [2, 69], [3, 67]], [[0, 67], [1, 69], [2, 70], [3, 69]], [[0, 75], [1, 74], [3, 69]], [[0, 74], [2, 79], [3, 75]], [[0, 74], [1, 70], [2, 69]], [[0, 67], [2, 63], [3, 62]], [[0, 62], [2, 63], [3, 62]]]},
+  // Round 123: Kyoto's interiors, each its own
+  // the tea house: a slow koto, a few notes and a lot of space
+  kt_tea: {name: "Calm water", live: true, bpm: 52, steps: 8, tone: "guitar", arp: [1, 0, 3, 0, 2, 0, 4, 0], arpVel: .04, mel: .45,
+    bars: [[38, 50, 62, 63, 69], [38, 50, 62, 67, 70], [31, 43, 55, 62, 67], [33, 45, 57, 63, 69]]},
+  // the temple hall: a low drone and slow bells, like the great bell's hum
+  kt_hall: {name: "The temple bell", live: true, bpm: 40, steps: 8, tone: "bell", arp: [1, 2, 3, 2, 4, 3, 2, 1], arpVel: .028, mel: .3,
+    bars: [[26, 50, 57, 62, 69], [26, 50, 55, 62, 67], [26, 50, 57, 63, 69], [26, 50, 55, 62, 70]]},
+  // the sweet shop: a music-box sweetness, pentatonic and light
+  kt_sweets: {name: "Little sweets", live: true, bpm: 88, steps: 6, tone: "bell", arp: [1, 3, 5, 3, 4, 2], arpVel: .04, mel: .6, up: 12,
+    bars: [[50, 62, 66, 69, 74], [47, 62, 66, 71, 74], [45, 61, 64, 69, 73], [50, 62, 66, 69, 74]]},
+  // the covered market: a quick, bright shamisen-like pluck
+  kt_market: {name: "Market morning, Kyoto", live: true, bpm: 126, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 3, 2, 4, 1, 4, 3, 5], arpVel: .05, mel: .85,
+    bars: [[45, 57, 64, 69, 71, 76], [43, 55, 62, 67, 69, 74], [45, 57, 64, 69, 72, 76], [40, 52, 59, 64, 69, 71]]},
+  // the pottery: soft rain-like plucks, the wheel turning
+  kt_pottery: {name: "The wheel turns", live: true, bpm: 66, steps: 8, tone: "rhodes", arp: [1, 2, 3, 4, 3, 2, 4, 5], arpVel: .04, mel: .5,
+    bars: [[41, 60, 65, 69, 72], [43, 59, 62, 67, 71], [38, 57, 62, 65, 69], [40, 59, 64, 67, 72]]},
   // Round 116: each of Ronda's interiors has its own music (live, while Mel's inside)
   // the tapas bar: a quick rumba on the guitar in D minor, strummed on every off-beat
   rd_tapas: {name: "Rumba at the tapas bar", live: true, bpm: 132, steps: 8, tone: "guitar", strum: [0, 2, 3, 5, 6], arp: [1, 3, 2, 4, 5, 3, 2, 4], arpVel: .045, mel: .9,

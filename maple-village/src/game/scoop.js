@@ -53,6 +53,7 @@ export const INGR = {
   grape_red: ["Red grapes", "Red Grape", "#7A2E5A"], grape_white: ["White grapes", "White Grape", "#C9D98A"], grape_tempranillo: ["Tempranillo grapes", "Tempranillo", "#3A2050"],
   basil: ["Basil", "Basil", "#7FB86A"], rosemary: ["Rosemary", "Rosemary", "#8FA88A"], thyme: ["Thyme", "Thyme", "#9DB08A"],   // greenhouse herbs (round 109)
   almond: ["Marcona almonds", "Almond", "#E8D3A8"], sevilla: ["Seville oranges", "Bitter Orange", "#F28C28"], membrillo: ["Membrillo", "Quince", "#D98A4A"], oliveoil: ["Olive oil", "Olive Oil", "#C9C25A"],   // from Ronda (round 107)
+  yuzu: ["Yuzu", "Yuzu", "#F3D34A"], hojicha: ["Hōjicha", "Hōjicha", "#A8754F"], mochi: ["Mochi", "Mochi", "#FBEFF2"], sakura: ["Sakura", "Sakura", "#F6C7D6"],   // from Kyoto (round 122)
   housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
   goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
   yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)
