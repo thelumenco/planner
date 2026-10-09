@@ -1133,7 +1133,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(700);
   await page.locator('#world [data-place="run"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-feed]', { timeout: 15000 }); await page.click('#ctx [data-feed]'); await page.waitForTimeout(400);
-  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).inv.milk === 1), "a grown goat gives a bottle of milk when fed");
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).inv.goatmilk === 1), "a grown goat gives a bottle of goat's milk when fed");
   await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(700);
   await page.locator('#world [data-place="vinestall"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vybuy="olive"]', { timeout: 15000 });
   await page.click('#ctx [data-vybuy="olive"]'); await page.waitForTimeout(300);
@@ -1995,12 +1995,73 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("barn")); await page.waitForTimeout(900);
   await spot("cave", '#ctx [data-hf="wheel"]'); await page.click('#ctx [data-hf="wheel"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.inv.chz_cheddar === 6 && !f.hfarm.cave.length), "five days on it's ripe: six wedges of farmhouse cheddar");
+  check(await fox().then(f => f.inv.chz_cheddar === 5 && !f.hfarm.cave.length), "five days on it's ripe, but never turned: a rustic cheddar, five wedges");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=14:00&date=2026-10-07"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(900);
   await tap("goats", '#ctx [data-hf="milkall"]');
   check(await page.locator('#ctx [data-hf="milkall"]').isDisabled(), "milking is mornings only");
+  await page.close();
+}
+{
+  // Farm life: moods and yields, the goat gate, trust and what it unlocks, Felix and Elena's asks, swarms, turning cheese
+  console.log("\nfarm life");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`farm life pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { const m = /flpatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    const h = f.hfarm = f.hfarm || {}, now = Date.now() + (globalThis.__mapleOffset || 0);
+    if (m[1] === "start") { h.since = "2026-10-01"; f.inv = {...(f.inv || {}), egg: 3}; }
+    if (m[1] === "trust") { h.trust = 38; }
+    if (m[1] === "swarm") { h.hives = [now - 6*864e5, now, now, now, now]; }
+    if (m[1] === "wheel") { h.cave = [{kind: "cheddar", name: "Test Cheddar", start: now - 5*864e5, done: now - 3600e3, turns: 4}]; }
+    if (m[1] === "partner") { h.trust = 205; f.inv = {...(f.inv || {}), chz_cheddar: 3, milk: 3}; h.at = now - 6*3600e3; }
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  const go = async (t, d, q = "") => { await page.goto(url + `?seed=1&time=${t}&date=${d}${q}`); await page.waitForTimeout(900); await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(1200); };
+  const tap = async (place, sel) => { await page.locator(`#world [data-place="${place}"]`).dispatchEvent("click"); await page.waitForSelector(sel, { timeout: 15000 }); };
+  await page.goto(url + "?reset=1&seed=1&time=07:00&date=2026-10-07"); await page.waitForTimeout(800);
+  await go("07:00", "2026-10-07", "&flpatch=start");
+  await tap("cows", '#ctx [data-hf="feed"]'); await page.click('#ctx [data-hf="feed"]'); await page.waitForTimeout(200);
+  await page.click('#ctx [data-hf="muck"]'); await page.waitForTimeout(200);
+  await page.click('#ctx [data-hf="brush"][data-k="daisy"]'); await page.waitForTimeout(200);
+  await page.click('#ctx [data-hf="milk"][data-k="daisy"]'); await page.waitForTimeout(200);
+  check(await fox().then(f => f.inv.milk === 3), "a happy cow (hay, a brush, a mucked-out stall) gives 3 milk");
+  check(/happy/.test(await page.locator("#ctx").innerText()), "the paddock shows each animal's mood");
+  await page.click('#ctx [data-hf="milk"][data-k="buttercup"]'); await page.waitForTimeout(200);
+  check(await fox().then(f => f.inv.milk === 5), "a content one (just hay) gives 2");
+  await page.click("#ctx [data-close]").catch(() => {});
+  let outDay = null; for (const d of ["2026-10-08", "2026-10-09", "2026-10-11", "2026-10-12", "2026-10-13", "2026-10-14"]) { await go("08:00", d); if (await page.locator('#world [data-place="stray"]').count()) { outDay = d; break; } }
+  check(!!outDay, `with the gate left unlatched, a goat gets out (${outDay})`);
+  if (outDay) { await page.locator('#world [data-place="stray"]').dispatchEvent("click"); await page.waitForTimeout(3000);
+    check(await page.locator('#world [data-place="stray"]').count() === 0 && await fox().then(f => f.hfarm.caught === outDay), "and Mel rounds it up"); }
+  await tap("goats", '#ctx [data-hf="latch"]'); await page.click('#ctx [data-hf="latch"]'); await page.waitForTimeout(200);
+  await page.click("#ctx [data-close]").catch(() => {});
+  await go("08:00", "2026-10-10");
+  check(await page.locator('#world [data-place="stray"]').count() === 0, "latched the night before: everyone's in");
+  await tap("farmhouse", "#ctx h2");
+  check(/helper/i.test(await page.locator("#ctx").innerText()) && /asks/i.test(await page.locator("#ctx").innerText()), "the farmhouse: Mel's trust level and today's ask");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await go("08:00", "2026-10-10", "&flpatch=trust");
+  await tap("cows", '#ctx [data-hf="feed"]'); await page.click('#ctx [data-hf="feed"]'); await page.waitForTimeout(1500);
+  check(await fox().then(f => f.hfarm.trust >= 40 && f.hfarm.myHive), "enough help and they trust her more: a trusted hand, with a hive of her own");
+  await page.click("#ctx [data-close]").catch(() => {});
+  check(await page.locator('#world [data-place="hives"]').innerHTML().then(h => h.includes("#E8566C")), "her hive sits in the lavender with a little flag");
+  await go("08:00", "2026-10-10", "&flpatch=swarm"); await page.waitForTimeout(21000);
+  check(await fox().then(f => f.hfarm.swarms >= 1), "a full hive left too long swarms");
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-10&flpatch=wheel"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("barn")); await page.waitForTimeout(900);
+  await page.locator('#world [data-spot="cave"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-hf="wheel"]', { timeout: 15000 });
+  await page.click('#ctx [data-hf="wheel"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.chz_cheddar_ex === 6), "a wheel turned faithfully comes out excellent");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.goto(url + "?seed=1&time=14:00&date=2026-10-10&flpatch=partner"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("barn")); await page.waitForTimeout(900);
+  await page.locator('#world [data-spot="press"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-hf="ckind"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-hf="ckind"]').count() === 6, "an apprentice and up: Elena's taught brie, halloumi and smoked");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(900);
+  await tap("fstand", '#ctx [data-hf="shelf"]'); await page.click('#ctx [data-hf="shelf"][data-k="chz_cheddar"][data-n="99"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.hfarm.shelf.chz_cheddar === 3 && !f.inv.chz_cheddar), "a partner has her own shelf at the farm stand");
   await page.close();
 }
 {

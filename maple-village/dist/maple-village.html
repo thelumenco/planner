@@ -2269,7 +2269,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const wedge = (c) => [`<path d="M3 17l15-9 3 2v7z" ${f(c)}/><circle cx="12" cy="15" r="1.2" ${f("#FFFDF6")}/>`, `<path d="M3 17l15-9 3 2v7zM3 17h18M18 8v9"/><circle cx="12" cy="15" r="1.2"/>`];
     I.chz_cheddar = wedge("#F3C969");
     I.chz_blue = wedge("#DCE3E8");
+    I.chz_brie = wedge("#FFF6E0");
+    I.chz_smoked = wedge("#D9944A");
+    I.chz_halloumi = [`<rect x="4" y="9" width="16" height="9" rx="2" ${f("#F6F1E8")}/>`, `<rect x="4" y="9" width="16" height="9" rx="2"/><path d="M7 12h10M7 15h10" opacity=".35"/>`];
     I.chz_fresh = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#FFF8EC")}/>`, `<rect x="4" y="9" width="16" height="9" rx="4.5"/><path d="M8 11v5M12 11v5M16 11v5" opacity=".35"/>`];
+    ["chz_fresh", "chz_cheddar", "chz_blue", "chz_brie", "chz_halloumi", "chz_smoked"].forEach((k) => {
+      I[k + "_ex"] = [I[k][0] + `<path d="M18 3l1 2.2 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z" ${f("#F3C33A")}/>`, I[k][1]];
+    });
   }
   I.egg = [`<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z" ${f("#F6EBDD")}/>`, `<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z"/><path d="M9 12c0-2 .8-3.6 1.8-4.5" opacity=".6"/>`];
   I.coop = [
@@ -2294,6 +2300,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   I.mooncake = [`<circle cx="12" cy="12.5" r="8" ${f("#C98A4A")}/><circle cx="12" cy="12.5" r="5" ${f("#E3B06A")}/>`, `<circle cx="12" cy="12.5" r="8"/><circle cx="12" cy="12.5" r="5"/><path d="M12 9.5v6M9 12.5h6M10 10.5l4 4M14 10.5l-4 4" opacity=".55"/>`];
   I.birdsnest = [`<path d="M6 9h12v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z" ${f("#F6EFE3")}/><rect x="5" y="5" width="14" height="4" rx="1.5" ${f("#C2505F")}/>`, `<path d="M6 9h12v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><rect x="5" y="5" width="14" height="4" rx="1.5"/><path d="M9 14q3 2 6 0" opacity=".6"/>`];
   I.honey = [`<path d="M7 8h10v10a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3z" ${f(C.honey)}/><rect x="6.5" y="4.5" width="11" height="3.5" rx="1" ${f("#E8D3A6")}/><rect x="8.5" y="11.5" width="7" height="5" rx="1" ${f(C.paper)}/>`, `<path d="M7 8h10v10a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3z"/><rect x="6.5" y="4.5" width="11" height="3.5" rx="1"/><rect x="8.5" y="11.5" width="7" height="5" rx="1"/><path d="M10 14h4" opacity=".6"/>`];
+  I.honey_cream = [I.honey[0].replace(/fill:[^"]*"/, 'fill:#F6E6B8"'), I.honey[1]];
   I.honey_lav = [I.honey[0].replace(/fill:[^"]*"/, 'fill:#C9A8E0"'), I.honey[1]];
   I.honey_blossom = [I.honey[0].replace(/fill:[^"]*"/, 'fill:#F6D98A"'), I.honey[1]];
   I.honeycomb = [`<path d="M3 8h18v10H3z" ${f("#F3C33A")}/>`, `<path d="M3 8h18v10H3z"/><path d="M6 10.5l2 -1.2 2 1.2v2.4l-2 1.2-2-1.2zM10 10.5l2-1.2 2 1.2v2.4l-2 1.2-2-1.2zM14 10.5l2-1.2 2 1.2v2.4l-2 1.2-2-1.2zM8 13.9v2.4l2 1.2 2-1.2v-2.4M12 16.3l2 1.2 2-1.2v-2.4"/><path d="M17 18c0 1.5 .5 2.5 1 3" opacity=".7"/>`];
@@ -2543,6 +2550,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     hives: { scene: "hfarm", name: "The beehives", door: [250, 256], spot: true, mark: [250, 150], line: "Felix's beehives, in the lavender." },
     cows: { scene: "hfarm", name: "The cow paddock", door: [135, 490], spot: true, mark: [135, 300], line: "Daisy, Buttercup and Mochi." },
     goats: { scene: "hfarm", name: "The goat paddock", door: [385, 490], spot: true, mark: [385, 300], line: "Pepper, Biscuit, Nutmeg and Toffee." },
+    stray: { scene: "hfarm", name: "A runaway goat", door: [260, 524], spot: true, line: "A goat on the loose!" },
     fstand: { scene: "hfarm", name: "Farm stand", door: [130, 580], spot: true, mark: [130, 500], line: "The farm stand: milk, honey and eggs." },
     reno: { scene: "bay", name: "Under renovation", door: [396, 520], spot: true, line: "Boarded up for now. Coming soon: a brewery? A chocolatier?" },
     homejetty: { scene: "base", name: "Little jetty", door: [150, 132], spot: true, line: "Your little jetty. Paddle down the river and out to the foreshore." },
@@ -3313,7 +3321,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     grape_red: { n: "Red grapes", kind: "ingredient", sell: 2, what: "for gelato at the Scoop Shack, or back in the crates for wine" },
     grape_white: { n: "White grapes", kind: "ingredient", sell: 2, what: "for gelato at the Scoop Shack, or back in the crates for wine" },
     loaf: { n: "Loaf of bread", kind: "ingredient", sell: 2, what: "baked in the wine shop's oven" },
-    milk: { n: "Milk", kind: "ingredient", price: 4, tab: "deli", sell: 3, what: "for gelato at the Scoop Shack, or two make a cheese in the wine shop's kitchen press (your goats give it too)" },
+    milk: { n: "Milk", kind: "ingredient", price: 4, tab: "deli", sell: 3, what: "for gelato at the Scoop Shack, or two make a cheese in the wine shop's kitchen press (the farm stand sells it, and Wildflower Farm's cows give it)" },
     goatmilk: { n: "Goat's milk", kind: "ingredient", price: 5, sell: 3, what: "from Wildflower Farm's goats: for gelato at the Scoop Shack, and soon goat's cheese at the farm's dairy" },
     yoghurt: { n: "Pot of yoghurt", kind: "ingredient", price: 5, sell: 3, what: "made in Wildflower Farm's barn: frozen yoghurt at the Scoop Shack" },
     honey_lav: { n: "Jar of lavender honey", kind: "gift", to: "family", price: 9, say: "Lavender honey! It smells like the flower farm.", says: { mama: "Lavender honey? Ma Ma put in tea. So fragrant!" } },
@@ -3321,6 +3329,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     chz_fresh: { n: "Fresh goat's cheese", kind: "gift", to: ["darren", "mama", "gonggong", "mum", "dad", "angelina"], price: 8, say: "Fresh goat's cheese! On toast with honey. Perfect.", says: { darren: "Goat's cheese and crackers tonight. Sorted." } },
     chz_cheddar: { n: "Wedge of farmhouse cheddar", kind: "gift", to: ["darren", "mama", "gonggong", "mum", "dad", "angelina"], price: 9, say: "Farmhouse cheddar, from Elena's cave! Sharp and crumbly.", says: { dad: "Proper cheese. Ah Gong approves." } },
     chz_blue: { n: "Wedge of Honeybrook blue", kind: "gift", to: ["darren", "dad", "angelina"], price: 10, say: "A blue! Bold choice. I love it.", says: { darren: "Blue cheese and a glass of your red. Perfect evening." } },
+    chz_brie: { n: "Wedge of barn brie", kind: "gift", to: ["darren", "mama", "gonggong", "mum", "dad", "angelina"], price: 10, say: "Brie! Soft and creamy. I'm having this on everything.", says: { angelina: "Brie and crackers and a quiet evening. Perfect." } },
+    chz_halloumi: { n: "Block of goat's halloumi", kind: "gift", to: ["darren", "mama", "gonggong", "mum", "dad", "angelina"], price: 9, say: "Halloumi! Fried in a pan till it squeaks. Yes please.", says: { darren: "Halloumi on the barbecue this weekend. Sorted." } },
+    chz_smoked: { n: "Wedge of smoked farmhouse", kind: "gift", to: ["darren", "dad", "gonggong", "angelina"], price: 10, say: "Smoked cheese! It smells like a campfire. In a good way.", says: { gonggong: "Smoky one! Gong Gong likes. With beer." } },
+    honey_cream: { n: "Jar of creamed honey", kind: "gift", to: "family", price: 10, say: "Creamed honey! It spreads like butter. Toast is about to get serious.", says: { evan: "HONEY BUTTER! On everything!" } },
     egg: { n: "Fresh egg", kind: "food", sell: 5, say: "A fresh egg from our hens! Breakfast sorted." },
     tulip: { e: "🌷", n: "Tulip", kind: "flower", sell: 2, say: "For me? I'll tuck it behind my ear." },
     sunflower: { e: "🌻", n: "Sunflower", kind: "flower", sell: 3, say: "So sunny! Thank you." },
@@ -3937,7 +3949,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const grew = !wasGrown && isGrown(a), egg2 = wasGrown && a.kind === "chick";
     if (egg2) addInv2("egg", 1);
     const milk = wasGrown && a.kind === "goat";
-    if (milk) addInv2("milk", 1);
+    if (milk) addInv2("goatmilk", 1);
     return { ok: true, grew, egg: egg2, milk, food };
   }
   function upgradeRun(F2) {
@@ -14554,6 +14566,26 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var HIVE_DAYS = 3;
   var JARS = 2;
   var HIVE_SPOTS = [[204, 214], [240, 200], [276, 214], [222, 242], [262, 242]];
+  var MY_HIVE_SPOT = [300, 182];
+  var MY_FRAMES = 4;
+  var SWARM_DAYS = 2;
+  var LEVELS2 = [
+    { n: "Helper", at: 0, gives: "" },
+    { n: "Trusted hand", at: 40, gives: "your own bee veil, and a hive of your own to name (all its honey is yours)" },
+    { n: "Apprentice", at: 100, gives: "Elena teaches you brie, halloumi and a smoked cheese; Felix teaches creamed honey and cut honeycomb" },
+    { n: "Partner", at: 200, gives: "a shelf of your own at the farm stand, and three more shelves in the cave" }
+  ];
+  var levelOf = (h) => LEVELS2.reduce((l, x, i) => h.trust >= x.at ? i : l, 0);
+  function gainTrust(F2, n) {
+    const h = hfState(F2), before = levelOf(h);
+    h.trust += n;
+    const after = levelOf(h);
+    if (after > before) {
+      if (after >= 1 && !h.myHive) h.myHive = { t: clock(), name: "Maple's Meadow" };
+      return after;
+    }
+    return null;
+  }
   var STAND = { milk: 3, goatmilk: 4, honey: 6, egg: 3 };
   var clock = () => Date.now() + (globalThis.__mapleOffset || 0);
   var yesterday = (day) => new Date(Date.parse(day + "T00:00:00Z") - 864e5).toISOString().slice(0, 10);
@@ -14567,12 +14599,74 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     h.cave = h.cave || [];
     h.names = h.names || [];
     if (!Array.isArray(h.hives) || h.hives.length !== HIVES) h.hives = Array.from({ length: HIVES }, (_, i) => t2 - (i * 0.7 + 0.4) * 864e5);
+    h.trust = h.trust || 0;
+    h.mucked = h.mucked || {};
+    h.since = h.since || dayKey();
+    h.shelf = h.shelf || {};
+    h.sold = h.sold || {};
+    h.swarms = h.swarms || 0;
     return h;
   }
-  var hiveFill = (h, i) => Math.min(1, (clock() - h.hives[i]) / (HIVE_DAYS * 864e5));
+  var DAY = 864e5;
+  function beeTime(t0) {
+    const now3 = clock(), span = now3 - t0;
+    if (span <= 0) return 0;
+    let rain = 0;
+    for (let d = Math.floor(t0 / DAY); d <= Math.floor(now3 / DAY); d++) {
+      const k = new Date(d * DAY).toISOString().slice(0, 10);
+      if (rainyOn(k)) rain += Math.max(0, Math.min(now3, (d + 1) * DAY) - Math.max(t0, d * DAY));
+    }
+    return span - rain / 2;
+  }
+  var hiveT = (h, i) => i === "mine" ? h.myHive ? h.myHive.t : clock() : h.hives[i];
+  var hiveFill = (h, i) => Math.min(1, beeTime(hiveT(h, i)) / (HIVE_DAYS * DAY));
+  var restless = (h, i) => beeTime(hiveT(h, i)) >= (HIVE_DAYS + SWARM_DAYS * 0.5) * DAY;
   var fullHives = (h) => h.hives.map((_, i) => i).filter((i) => hiveFill(h, i) >= 1);
+  function swarmCheck(F2) {
+    const h = hfState(F2), t2 = clock(), gone = [];
+    h.hives.forEach((t0, i) => {
+      if (beeTime(t0) >= (HIVE_DAYS + SWARM_DAYS) * DAY) {
+        h.hives[i] = t2;
+        gone.push(i + 1);
+      }
+    });
+    if (h.myHive && beeTime(h.myHive.t) >= (HIVE_DAYS + SWARM_DAYS) * DAY) {
+      h.myHive.t = t2;
+      gone.push(h.myHive.name);
+    }
+    h.swarms += gone.length;
+    return gone;
+  }
   var milkingNow = (hm2 = sgHM()) => hm2 >= MILK_FROM && hm2 < MILK_TO;
   var wellFed = (h, id, day = dayKey()) => h.fed[id] === day || h.fed[id] === yesterday(day);
+  var recent = (d, day) => d === day || d === yesterday(day);
+  var herdOf = (id) => COWS.some((a) => a.id === id) ? "cows" : "goats";
+  var moodOf = (h, id, day = dayKey()) => (wellFed(h, id, day) ? 1 : 0) + (recent(h.brushed[id], day) && recent(h.mucked[herdOf(id)], day) ? 1 : 0);
+  var MOODS = ["grumpy", "content", "happy"];
+  var yieldOf = (herd, mood) => herd === "cows" ? [1, 2, 3][mood] : [1, 1, 2][mood];
+  function muckOut(F2, herd) {
+    const h = hfState(F2), day = dayKey();
+    if (!HERDS[herd] || h.mucked[herd] === day) return false;
+    h.mucked[herd] = day;
+    return true;
+  }
+  var latchGate = (F2) => {
+    const h = hfState(F2), day = dayKey();
+    if (h.latched === day) return false;
+    h.latched = day;
+    return true;
+  };
+  function strayGoat(F2, day = dayKey()) {
+    const h = hfState(F2);
+    if (h.caught === day || h.latched === yesterday(day) || h.since >= yesterday(day) || hash(day + "gate") % 10 >= 6) return null;
+    return { goat: GOATS[hash(day + "goat") % GOATS.length], at: [[60, 520], [470, 300], [200, 600], [380, 560]][hash(day + "where") % 4] };
+  }
+  function catchGoat(F2) {
+    const h = hfState(F2), g = strayGoat(F2);
+    if (!g) return null;
+    h.caught = dayKey();
+    return g.goat;
+  }
   function feedHerd(F2, herd) {
     const h = hfState(F2), day = dayKey(), list2 = HERDS[herd].list.filter((a) => h.fed[a.id] !== day);
     list2.forEach((a) => {
@@ -14591,11 +14685,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!a) return { err: "?" };
     if (!milkingNow()) return { err: "Milking's in the morning, 6 to 10." };
     if (h.milked[id] === day) return { err: `${a.n}'s been milked today.` };
-    if (!wellFed(h, id, day)) return { err: `${a.n} needs her hay first.` };
+    const mood = moodOf(h, id, day), n = yieldOf(herd, mood);
     h.milked[id] = day;
     F2.inv = F2.inv || {};
-    F2.inv[H3.gives] = (F2.inv[H3.gives] || 0) + H3.per;
-    return { n: H3.per, gives: H3.gives, a };
+    F2.inv[H3.gives] = (F2.inv[H3.gives] || 0) + n;
+    return { n, gives: H3.gives, a, mood };
   }
   function milkHerd(F2, herd) {
     let n = 0;
@@ -14607,13 +14701,40 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function collectHives(F2) {
     const h = hfState(F2), full = fullHives(h), t2 = clock();
-    if (!full.length) return 0;
+    let n = full.length * JARS;
     full.forEach((i) => {
       h.hives[i] = t2;
     });
-    const n = full.length * JARS;
+    if (h.myHive && hiveFill(h, "mine") >= 1) {
+      h.myHive.t = t2;
+      n += MY_FRAMES;
+    }
     h.frames += n;
     return n;
+  }
+  var myHiveFull = (h) => !!h.myHive && hiveFill(h, "mine") >= 1;
+  function nameHive(F2, name) {
+    const h = hfState(F2), n = String(name || "").replace(/[<>&"]/g, "").trim().slice(0, 24);
+    if (!h.myHive || !n) return null;
+    h.myHive.name = n;
+    return n;
+  }
+  function creamHoney(F2) {
+    const inv = F2.inv || {}, k = ["honey", "honey_lav", "honey_blossom"].find((x) => inv[x] > 0);
+    if (!k || levelOf(hfState(F2)) < 2) return null;
+    inv[k]--;
+    if (!inv[k]) delete inv[k];
+    inv.honey_cream = (inv.honey_cream || 0) + 1;
+    F2.inv = inv;
+    return k;
+  }
+  function cutComb(F2) {
+    const h = hfState(F2);
+    if (!h.frames || levelOf(h) < 2) return false;
+    h.frames--;
+    F2.inv = F2.inv || {};
+    F2.inv.honeycomb = (F2.inv.honeycomb || 0) + 1;
+    return true;
   }
   var HONEYS = [{ id: "honey", n: "wildflower" }, { id: "honey_lav", n: "lavender" }, { id: "honey_blossom", n: "orchard blossom" }];
   var honeyNow = (day = dayKey()) => HONEYS[Math.floor(Date.parse(day + "T00:00:00Z") / (7 * 864e5)) % HONEYS.length];
@@ -14640,9 +14761,36 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var CHEESES = {
     fresh: { n: "Fresh goat's cheese", milk: "goatmilk", need: 2, days: 1, wedges: 4, id: "chz_fresh", col: "#FFF8EC", words: ["Chèvre", "Little Log", "Fresh", "Curd"] },
     cheddar: { n: "Farmhouse cheddar", milk: "milk", need: 3, days: 4, wedges: 6, id: "chz_cheddar", col: "#F3C969", words: ["Cheddar", "Clothbound", "Farmhouse", "Tasty"] },
-    blue: { n: "Honeybrook blue", milk: "milk", need: 3, days: 6, wedges: 6, id: "chz_blue", col: "#DCE3E8", words: ["Blue", "Bleu", "Veined Blue"] }
+    blue: { n: "Honeybrook blue", milk: "milk", need: 3, days: 6, wedges: 6, id: "chz_blue", col: "#DCE3E8", words: ["Blue", "Bleu", "Veined Blue"] },
+    // Elena's to teach, once Mel's her apprentice (level 2)
+    brie: { n: "Barn brie", milk: "milk", need: 3, days: 3, wedges: 5, id: "chz_brie", col: "#FFF6E0", words: ["Brie", "Soft White", "Bloomy"], lvl: 2 },
+    halloumi: { n: "Goat's halloumi", milk: "goatmilk", need: 3, days: 2, wedges: 5, id: "chz_halloumi", col: "#F6F1E8", words: ["Halloumi", "Squeaky", "Grilling"], lvl: 2 },
+    smoked: { n: "Smoked farmhouse", milk: "milk", need: 3, days: 5, wedges: 6, id: "chz_smoked", col: "#D9944A", words: ["Smoked", "Applewood", "Oak Smoked"], lvl: 2 }
   };
   var CAVE = 6;
+  var caveSize = (h) => levelOf(h) >= 3 ? 9 : CAVE;
+  var cheesesFor = (h) => Object.entries(CHEESES).filter(([, c]) => !c.lvl || levelOf(h) >= c.lvl);
+  var quality = (w) => {
+    const r = (w.turns || 0) / Math.max(1, CHEESES[w.kind].days);
+    return r >= 0.75 ? "excellent" : r >= 0.35 ? "good" : "rustic";
+  };
+  function turnWheels(F2) {
+    const h = hfState(F2), day = dayKey();
+    let n = 0;
+    h.cave.forEach((w) => {
+      if (caveLeft(w) && w.lastTurn !== day) {
+        w.turns = (w.turns || 0) + 1;
+        w.lastTurn = day;
+        n++;
+      }
+    });
+    return n;
+  }
+  var exName = (n) => n.startsWith("Wedge of ") ? n.replace("Wedge of ", "Wedge of excellent ") : "Excellent " + n[0].toLowerCase() + n.slice(1);
+  Object.values(CHEESES).forEach((c) => {
+    const base = ITEMS[c.id];
+    if (base && !ITEMS[c.id + "_ex"]) ITEMS[c.id + "_ex"] = { ...base, n: exName(base.n), price: (base.price || 8) + 5, say: `${base.say} And this one's extraordinary. You made this?!` };
+  });
   var C_PLACE = ["Lavender Hill", "Barn Door", "Honeybrook", "Hay Loft", "Morning Mist", "Stone Wall", "Sunday", "Windmill", "Brookside", "Old Gate", "Clover Field", "Harvest", "Lantern", "Bee Hive", "Rainy Day", "Golden Hour"];
   var C_FR = { fresh: ["Petit Chèvre de Honeybrook", "Chèvre du Ruisseau", "Frais de la Ferme"], cheddar: ["Tomme de Honeybrook", "Vieux Grange", "Tomme du Moulin"], blue: ["Bleu de la Baie", "Bleu du Ruisseau", "Bleu de Honeybrook"] };
   function cheeseNames(F2, kind, seed2 = 0) {
@@ -14660,7 +14808,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var caveLeft = (w) => Math.max(0, w.done - clock());
   function pressCheese2(F2, kind, name) {
     const h = hfState(F2), c = CHEESES[kind], inv = F2.inv || {};
-    if (!c || h.cave.length >= CAVE || (inv[c.milk] || 0) < c.need) return null;
+    if (!c || c.lvl && levelOf(h) < c.lvl || h.cave.length >= caveSize(h) || (inv[c.milk] || 0) < c.need) return null;
     inv[c.milk] -= c.need;
     if (!inv[c.milk]) delete inv[c.milk];
     const nm3 = String(name || "").replace(/[<>&"]/g, "").trim().slice(0, 30) || cheeseNames(F2, kind, clock() / 864e5)[0] || c.n, t2 = clock();
@@ -14672,11 +14820,78 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function takeWheel(F2, i) {
     const h = hfState(F2), w = h.cave[i];
     if (!w || caveLeft(w)) return null;
-    const c = CHEESES[w.kind];
+    const c = CHEESES[w.kind], q = quality(w), id = q === "excellent" ? c.id + "_ex" : c.id, n = q === "rustic" ? c.wedges - 1 : c.wedges;
     h.cave.splice(i, 1);
     F2.inv = F2.inv || {};
-    F2.inv[c.id] = (F2.inv[c.id] || 0) + c.wedges;
-    return { w, c };
+    F2.inv[id] = (F2.inv[id] || 0) + n;
+    return { w, c, q, n, id };
+  }
+  var REQUESTS = [
+    { id: "eggs", who: "elena", ask: "Could you bring me 3 eggs? I'm teaching a cheese class tomorrow.", need: { egg: 3 } },
+    { id: "apples", who: "felix", ask: "Two apples from Ma Ma's? The bees deserve a treat. Well. I do.", need: { apple: 2 } },
+    { id: "carrots", who: "elena", ask: "Bring 2 carrots for the goats? Biscuit's been very good. Ish.", need: { carrot: 2 } },
+    { id: "muck", who: "elena", ask: "Could you muck out both stalls today? My back's complaining.", act: "muck" },
+    { id: "brush", who: "felix", ask: "The cows are in the Gazette this week. Could you brush all three for their photo?", act: "brush" },
+    { id: "turn", who: "elena", ask: "Turn the wheels in the cave for me today? I'm run off my feet.", act: "turn" },
+    { id: "hive", who: "felix", ask: "Help me move hive four, out of the wind? Grab the other side, would you?", act: "hive" },
+    { id: "milkall", who: "elena", ask: "Milk everyone this morning? Cows and goats. I'll make you a cheese toastie.", act: "milkall" }
+  ];
+  var requestToday = (day = dayKey()) => REQUESTS[hash(day + "req") % REQUESTS.length];
+  function requestReady(F2, day = dayKey()) {
+    const h = hfState(F2), r = requestToday(day), inv = F2.inv || {};
+    if (h.reqDone === day) return false;
+    if (r.need) return Object.entries(r.need).every(([k, n]) => (inv[k] || 0) >= n);
+    if (r.act === "muck") return h.mucked.cows === day && h.mucked.goats === day;
+    if (r.act === "brush") return COWS.every((a) => h.brushed[a.id] === day);
+    if (r.act === "turn") return h.turnedDay === day;
+    if (r.act === "milkall") return [...COWS, ...GOATS].every((a) => h.milked[a.id] === day);
+    return r.act === "hive";
+  }
+  function finishRequest(F2) {
+    const h = hfState(F2), day = dayKey(), r = requestToday(day);
+    if (!requestReady(F2, day)) return null;
+    if (r.need) {
+      const inv = F2.inv;
+      Object.entries(r.need).forEach(([k, n]) => {
+        inv[k] -= n;
+        if (!inv[k]) delete inv[k];
+      });
+    }
+    h.reqDone = day;
+    return r;
+  }
+  var SELLABLE = (id) => /^chz_|^honey|^honeycomb$/.test(id) && ITEMS[id];
+  var sellables = (F2) => Object.keys(F2.inv || {}).filter((id) => F2.inv[id] > 0 && SELLABLE(id));
+  var shelfPrice = (id) => ITEMS[id] && ITEMS[id].price || 8;
+  function stockShelf(F2, id, n) {
+    const h = hfState(F2), inv = F2.inv || {};
+    if (levelOf(h) < 3 || !SELLABLE(id)) return 0;
+    n = Math.min(n, inv[id] || 0);
+    if (n <= 0) return 0;
+    inv[id] -= n;
+    if (!inv[id]) delete inv[id];
+    h.shelf[id] = (h.shelf[id] || 0) + n;
+    return n;
+  }
+  function hfTick(F2) {
+    const h = hfState(F2), t2 = clock(), from = Math.max(h.at || t2, t2 - 2 * DAY), out = { coins: 0, n: 0, swarms: swarmCheck(F2) };
+    for (let at = from + 6e4; at <= t2; at += 6e4) {
+      const sg = new Date(at + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm2 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
+      if (hm2 < 8 * 60 || hm2 >= 18 * 60) continue;
+      const ids = Object.keys(h.shelf).filter((k) => h.shelf[k] > 0);
+      if (!ids.length || Math.random() >= 0.02) continue;
+      const id = ids[Math.floor(Math.random() * ids.length)], p = shelfPrice(id);
+      h.shelf[id]--;
+      if (!h.shelf[id]) delete h.shelf[id];
+      const s = h.sold[day] = h.sold[day] || { n: 0, coins: 0 };
+      s.n++;
+      s.coins += p;
+      out.coins += p;
+      out.n++;
+    }
+    h.at = t2;
+    if (out.coins) F2.coins += out.coins;
+    return out;
   }
   function buyStand(F2, id) {
     const p = STAND[id];
@@ -14691,23 +14906,43 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var NAMES = { milk: "milk", goatmilk: "goat's milk", honey: "honey", egg: "eggs" };
   function herdPanel(F2, herd, keeper) {
     const h = hfState(F2), day = dayKey(), H3 = HERDS[herd], cow = herd === "cows", hungry2 = H3.list.filter((a) => h.fed[a.id] !== day).length;
-    let p = `<span class="tape gingham" aria-hidden="true"></span><h2>The ${H3.n}</h2><p class="sub">${cow ? "Daisy, Buttercup and Mochi." : "Pepper, Biscuit, Nutmeg and Toffee, and their climbing spool."} ${milkingNow() ? "It's milking time (6 to 10)." : "Milking's in the morning, 6 to 10."} ${cow ? "Each cow gives 2 milk" : "Each goat gives 1 goat's milk"}, if she's had her hay today or yesterday. ${keeper ? "Elena's here to help." : ""}</p>`;
-    p += `<div class="actions"><button class="btn primary small" data-hf="feed" data-k="${herd}" ${hungry2 ? "" : "disabled"}>${hungry2 ? `Hay and water for everyone` : "Everyone's fed today"}</button><button class="btn alt small" data-hf="milkall" data-k="${herd}" ${milkingNow() ? "" : "disabled"}>Milk them all</button></div>`;
-    p += `<ul class="hlist wlist">${H3.list.map((a) => `<li><span class="wpic"><span class="gdot" style="background:${a.col}"></span></span><span class="wtxt"><b>${esc(a.n)}</b><small>${h.fed[a.id] === day ? "fed" : wellFed(h, a.id, day) ? "fed yesterday" : "hungry"} · ${h.brushed[a.id] === day ? "brushed" : "unbrushed"} · ${h.milked[a.id] === day ? "milked" : "not milked"}</small></span><span class="orbtns"><button class="btn small alt" data-hf="brush" data-k="${a.id}" ${h.brushed[a.id] === day ? "disabled" : ""}>Brush</button><button class="btn small primary" data-hf="milk" data-herd="${herd}" data-k="${a.id}" ${milkingNow() && h.milked[a.id] !== day && wellFed(h, a.id, day) ? "" : "disabled"}>Milk</button></span></li>`).join("")}</ul>`;
+    let p = `<span class="tape gingham" aria-hidden="true"></span><h2>The ${H3.n}</h2><p class="sub">${cow ? "Daisy, Buttercup and Mochi." : "Pepper, Biscuit, Nutmeg and Toffee, and their climbing spool."} ${milkingNow() ? "It's milking time (6 to 10)." : "Milking's in the morning, 6 to 10."} A happy animal (hay, a brush, and a mucked-out stall) gives the most: ${cow ? "a cow up to 3 milk" : "a goat up to 2 goat's milk"}. ${keeper ? "Elena's here to help." : ""}</p>`;
+    p += `<div class="actions"><button class="btn primary small" data-hf="feed" data-k="${herd}" ${hungry2 ? "" : "disabled"}>${hungry2 ? "Hay and water" : "Everyone's fed"}</button><button class="btn alt small" data-hf="muck" data-k="${herd}" ${h.mucked[herd] === day ? "disabled" : ""}>${h.mucked[herd] === day ? "Stalls are clean" : "Muck out the stalls"}</button><button class="btn alt small" data-hf="milkall" data-k="${herd}" ${milkingNow() ? "" : "disabled"}>Milk them all</button>${cow ? "" : `<button class="btn alt small" data-hf="latch" ${h.latched === day ? "disabled" : ""}>${h.latched === day ? "Gate's latched" : "Latch the gate"}</button>`}</div>`;
+    if (!cow) p += `<p class="muted">${h.latched === day ? "Gate latched for the night. Everyone will be here in the morning." : "Latch the gate before you go, or someone will be out exploring tomorrow."}</p>`;
+    p += `<ul class="hlist wlist">${H3.list.map((a) => {
+      const m = moodOf(h, a.id, day);
+      return `<li><span class="wpic"><span class="gdot" style="background:${a.col}"></span></span><span class="wtxt"><b>${esc(a.n)} <small class="muted">· ${MOODS[m]}</small></b><small>${h.fed[a.id] === day ? "fed" : wellFed(h, a.id, day) ? "fed yesterday" : "hungry"} · ${h.brushed[a.id] === day ? "brushed" : "unbrushed"} · ${h.milked[a.id] === day ? "milked" : "not milked"}</small></span><span class="orbtns"><button class="btn small alt" data-hf="brush" data-k="${a.id}" ${h.brushed[a.id] === day ? "disabled" : ""}>Brush</button><button class="btn small primary" data-hf="milk" data-herd="${herd}" data-k="${a.id}" ${milkingNow() && h.milked[a.id] !== day ? "" : "disabled"}>Milk</button></span></li>`;
+    }).join("")}</ul>`;
     return p + shut2;
   }
   function hivesPanel(F2, keeper) {
-    const h = hfState(F2), full = fullHives(h);
-    let p = `<span class="tape stripe" aria-hidden="true"></span><h2>The beehives</h2><p class="sub">Five hives in the lavender. Each fills over three days; collect a full one and you get ${JARS} frames of comb to spin into jars at the extractor in the barn (Felix keeps the rest for his market stall). This week the bees are on the ${honeyNow().n}. ${keeper ? "Felix lends you his bee veil." : "Put on the bee veil from the hook."}</p>`;
-    p += `<ul class="hlist wlist">${h.hives.map((_, i) => {
-      const f2 = hiveFill(h, i);
-      return `<li><span class="wpic">${icon("honey", 22)}</span><span class="wtxt"><b>Hive ${i + 1}</b><small>${f2 >= 1 ? "full, heavy with honey" : `${Math.round(f2 * 100)}% full`}</small></span><span class="clbar" style="width:80px"><i style="width:${Math.round(f2 * 100)}%"></i></span></li>`;
-    }).join("")}</ul>`;
-    return p + `<div class="actions"><button class="btn primary small" data-hf="honey" ${full.length ? "" : "disabled"}>${full.length ? `Collect ${full.length * JARS} frames` : "Nothing ready yet"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
+    const h = hfState(F2), full = fullHives(h), mine = myHiveFull(h), rain = rainyOn(dayKey()), n = full.length * JARS + (mine ? MY_FRAMES : 0);
+    let p = `<span class="tape stripe" aria-hidden="true"></span><h2>The beehives</h2><p class="sub">Each hive fills over three days${rain ? " (slower today: it's raining, so the bees are staying in)" : ""}. Collect a full one for ${JARS} frames of comb to spin at the barn's extractor (Felix keeps the rest), but don't leave it too long: a full hive gets restless and swarms. This week the bees are on the ${honeyNow().n}. ${keeper ? "Felix lends you his bee veil." : levelOf(h) >= 1 ? "Your own veil's on its hook." : "Put on the bee veil from the hook."}</p>`;
+    const row2 = (label2, f2, warn, extra2 = "") => `<li><span class="wpic">${icon("honey", 22)}</span><span class="wtxt"><b>${label2}</b><small>${f2 >= 1 ? warn ? "full, and the bees are restless: collect it soon!" : "full, heavy with honey" : `${Math.round(f2 * 100)}% full`}</small>${extra2}</span><span class="clbar" style="width:70px"><i style="width:${Math.round(f2 * 100)}%"></i></span></li>`;
+    p += `<ul class="hlist wlist">${h.hives.map((_, i) => row2(`Hive ${i + 1}`, hiveFill(h, i), restless(h, i))).join("")}${h.myHive ? row2(`${esc(h.myHive.name)} <small class="muted">(yours: all ${MY_FRAMES} frames)</small>`, hiveFill(h, "mine"), restless(h, "mine")) : ""}</ul>`;
+    if (h.myHive) p += `<form class="row hadd" data-hfname="1"><label class="sr" for="hfHive">Name your hive</label><input id="hfHive" maxlength="24" value="${esc(h.myHive.name)}"><button class="btn small alt">Rename</button></form>`;
+    if (h.swarms) p += `<p class="muted">${h.swarms} swarm${h.swarms === 1 ? "" : "s"} so far. Felix says every beekeeper has a few.</p>`;
+    return p + `<div class="actions"><button class="btn primary small" data-hf="honey" ${n ? "" : "disabled"}>${n ? `Collect ${n} frames` : "Nothing ready yet"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function standPanel(F2) {
+    const h = hfState(F2), partner = levelOf(h) >= 3;
     let p = `<span class="tape gingham" aria-hidden="true"></span><h2>The farm stand</h2><p class="sub">Fresh from the farm, an honesty tin for the coins. You have ${F2.coins} ${coin2()}.</p>`;
     p += `<ul class="hlist wlist">${Object.entries(STAND).map(([id, pr]) => `<li><span class="wpic">${icon(id, 24)}</span><span class="wtxt"><b>${id === "egg" ? "Fresh eggs" : id === "honey" ? "Wildflower honey" : id === "goatmilk" ? "Goat's milk" : "Milk"}</b><small>${pr} ${coin2()} · ${(F2.inv || {})[id] || 0} in your backpack</small></span><button class="btn small primary" data-hf="buy" data-k="${id}" ${F2.coins >= pr ? "" : "disabled"}>Buy</button></li>`).join("")}</ul>`;
+    if (!partner) return p + `<p class="muted">One day, when you're Felix and Elena's partner, there'll be a shelf here for your own cheese and honey.</p>` + shut2;
+    const on = Object.keys(h.shelf).filter((k) => h.shelf[k] > 0), mine = sellables(F2), t2 = h.sold[dayKey()];
+    p += `<p class="eyebrow" style="margin:12px 0 6px">Your shelf</p><p class="muted">Passers-by buy from it, 8 to 6, at full price. ${t2 ? `Sold today: ${t2.n} (${t2.coins} ${coin2()}).` : ""}</p>`;
+    p += on.length ? `<ul class="hlist wlist">${on.map((id) => `<li><span class="wpic">${icon(id, 22)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${h.shelf[id]} on the shelf · ${shelfPrice(id)} ${coin2()}</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty.</p>`;
+    if (mine.length) p += `<ul class="hlist wlist">${mine.map((id) => `<li><span class="wpic">${icon(id, 22)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${F2.inv[id]} with you</small></span><span class="orbtns"><button class="btn small primary" data-hf="shelf" data-k="${id}" data-n="1">Put 1 out</button><button class="btn small alt" data-hf="shelf" data-k="${id}" data-n="99">All</button></span></li>`).join("")}</ul>`;
+    return p + shut2;
+  }
+  function farmhousePanel(F2, here) {
+    const h = hfState(F2), lv2 = levelOf(h), next = LEVELS2[lv2 + 1], r = requestToday(), done = h.reqDone === dayKey(), ready = requestReady(F2);
+    const who3 = r.who === "felix" ? "Felix" : "Elena", pct = next ? Math.round(100 * (h.trust - LEVELS2[lv2].at) / (next.at - LEVELS2[lv2].at)) : 100;
+    let p = `<span class="tape gingham" aria-hidden="true"></span><h2>The farmhouse</h2><p class="sub">The kettle's on, and there's a chalkboard by the door.</p>`;
+    p += `<p class="olabel">You're their ${LEVELS2[lv2].n.toLowerCase()}</p><span class="clbar"><i style="width:${pct}%"></i></span><p class="muted">${next ? `${next.at - h.trust} more trust to become their ${next.n.toLowerCase()}: ${next.gives}.` : "Partners, officially. Elena's had a sign made."} Every bit of help counts: feeding, brushing, mucking out, milking, the hives, turning the cheese.</p>`;
+    p += `<p class="eyebrow" style="margin:12px 0 6px">${who3} asks</p><p>"${esc(r.ask)}"</p>`;
+    p += done ? `<p class="muted">Done today. ${who3} is very grateful.</p>` : `<div class="actions"><button class="btn primary small" data-hf="req" ${ready && (r.act !== "hive" || here) ? "" : "disabled"}>${r.need ? "Hand them over" : r.act === "hive" ? here ? `Help ${who3}` : `${who3}'s not here just now` : "Tell them it's done"}</button></div>`;
+    if (lv2 >= 1) p += `<p class="eyebrow" style="margin:12px 0 6px">What you've earned</p><ul class="hlist">${LEVELS2.slice(1, lv2 + 1).map((x) => `<li><small><b>${x.n}:</b> ${esc(x.gives)}</small></li>`).join("")}</ul>`;
     return p + shut2;
   }
   var giveName = (id) => NAMES[id] || id;
@@ -14718,7 +14953,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function extractorPanel(F2) {
     const h = hfState(F2), k = honeyNow();
     return `<span class="tape stripe" aria-hidden="true"></span><h2>The honey extractor</h2><p class="sub">Frames of comb from the hives go in the drum; a good spin, and the honey runs into jars. This week it's ${k.n} honey. ${h.frames ? `${h.frames} frame${h.frames === 1 ? "" : "s"} waiting.` : "No frames waiting: collect them from the hives."}</p>
-    <div class="actions"><button class="btn primary small" data-hf="spin" ${h.frames ? "" : "disabled"}>${h.frames ? `Spin and jar (${h.frames})` : "Nothing to spin"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
+    <div class="actions"><button class="btn primary small" data-hf="spin" ${h.frames ? "" : "disabled"}>${h.frames ? `Spin and jar (${h.frames})` : "Nothing to spin"}</button>${levelOf(h) >= 2 ? `<button class="btn alt small" data-hf="comb" ${h.frames ? "" : "disabled"}>Cut a frame as comb</button><button class="btn alt small" data-hf="cream" ${["honey", "honey_lav", "honey_blossom"].some((k2) => (F2.inv || {})[k2] > 0) ? "" : "disabled"}>Cream a jar</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>${levelOf(h) >= 2 ? `<p class="muted">Felix's tricks: comb straight from the frame, or a jar whipped into creamed honey.</p>` : ""}`;
   }
   function crockPanel(F2) {
     const inv = F2.inv || {}, m = (inv.milk || 0) + (inv.goatmilk || 0);
@@ -14726,20 +14961,22 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <div class="actions"><button class="btn primary small" data-hf="yog" ${m ? "" : "disabled"}>Make one</button><button class="btn alt small" data-hf="yogall" ${m > 1 ? "" : "disabled"}>All of it</button><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function pressPanel2(F2, st6 = {}) {
-    const h = hfState(F2), inv = F2.inv || {}, kind = CHEESES[st6.kind] ? st6.kind : "cheddar", c = CHEESES[kind], ok = h.cave.length < CAVE && (inv[c.milk] || 0) >= c.need, sug = cheeseNames(F2, kind, Math.floor(clock() / 864e5));
-    let p = `<span class="tape stripe" aria-hidden="true"></span><h2>The cheese press</h2><p class="sub">Choose a cheese, give the wheel a name, and press it. It ages on a shelf in the cave until it's ripe. ${h.cave.length} of ${CAVE} shelves in use.</p>`;
-    p += `<div class="gchips">${Object.entries(CHEESES).map(([k, x]) => `<button class="gchip${k === kind ? " on" : ""}" data-hf="ckind" data-k="${k}" aria-pressed="${k === kind}"><span class="gdot" style="background:${x.col}"></span><span>${esc(x.n)}</span></button>`).join("")}</div>`;
+    const h = hfState(F2), inv = F2.inv || {}, kind = CHEESES[st6.kind] ? st6.kind : "cheddar", c = CHEESES[kind], ok = h.cave.length < caveSize(h) && (inv[c.milk] || 0) >= c.need && (!c.lvl || levelOf(h) >= c.lvl), sug = cheeseNames(F2, kind, Math.floor(clock() / 864e5));
+    let p = `<span class="tape stripe" aria-hidden="true"></span><h2>The cheese press</h2><p class="sub">Choose a cheese, give the wheel a name, and press it. It ages on a shelf in the cave until it's ripe. ${h.cave.length} of ${caveSize(h)} shelves in use. Turn the wheels in the cave every day or so: the better they're looked after, the better the cut.</p>`;
+    p += `<div class="gchips">${cheesesFor(h).map(([k, x]) => `<button class="gchip${k === kind ? " on" : ""}" data-hf="ckind" data-k="${k}" aria-pressed="${k === kind}"><span class="gdot" style="background:${x.col}"></span><span>${esc(x.n)}</span></button>`).join("")}</div>`;
     p += `<p class="muted">${esc(c.n)}: ${c.need} ${c.milk === "goatmilk" ? "goat's milk" : "milk"} (you have ${inv[c.milk] || 0}), ripe in ${c.days} day${c.days === 1 ? "" : "s"}, ${c.wedges} wedges.</p>`;
     p += `<label class="sr" for="hfName">Name this wheel</label><input id="hfName" class="vyname" maxlength="30" placeholder="${esc(sug[0] || "Name it")}" value="${esc(st6.name || "")}"><div class="actions"><button class="btn alt small" data-hf="csug">Suggest a name</button><button class="btn primary small" data-hf="press" ${ok ? "" : "disabled"}>Press it</button><button class="btn alt small" data-close="1">Close</button></div>`;
-    if (!ok) p += `<p class="muted">${h.cave.length >= CAVE ? "The cave's full: take a ripe wheel out first." : `Not enough ${c.milk === "goatmilk" ? "goat's milk" : "milk"}: milk the ${c.milk === "goatmilk" ? "goats" : "cows"} in the morning.`}</p>`;
+    if (!ok) p += `<p class="muted">${h.cave.length >= caveSize(h) ? "The cave's full: take a ripe wheel out first." : `Not enough ${c.milk === "goatmilk" ? "goat's milk" : "milk"}: milk the ${c.milk === "goatmilk" ? "goats" : "cows"} in the morning.`}</p>`;
     return p;
   }
   function cavePanel(F2) {
-    const h = hfState(F2);
-    let p = `<span class="tape gingham" aria-hidden="true"></span><h2>The cheese cave</h2><p class="sub">Cool and dark, with wheels on oak shelves. Elena turns them every morning. ${h.cave.length} of ${CAVE} shelves in use.</p>`;
+    const h = hfState(F2), day = dayKey(), toTurn = h.cave.filter((w) => caveLeft(w) && w.lastTurn !== day).length;
+    let p = `<span class="tape gingham" aria-hidden="true"></span><h2>The cheese cave</h2><p class="sub">Cool and dark, with wheels on oak shelves. Turn them every day or so while they age: turned faithfully, a wheel comes out excellent; forgotten, rustic. ${h.cave.length} of ${caveSize(h)} shelves in use.</p>`;
+    if (h.cave.some((w) => caveLeft(w))) p += `<div class="actions"><button class="btn primary small" data-hf="turn" ${toTurn ? "" : "disabled"}>${toTurn ? `Turn the wheels (${toTurn})` : "All turned today"}</button></div>`;
+    const QW = { excellent: "on track for excellent", good: "looking good", rustic: "could do with more turning" };
     p += h.cave.length ? `<ul class="hlist wlist">${h.cave.map((w, i) => {
-      const c = CHEESES[w.kind], left4 = caveLeft(w);
-      return `<li><span class="wpic"><span class="gdot" style="background:${c.col}"></span></span><span class="wtxt"><b>${esc(w.name)}</b><small>${esc(c.n)} · ${left4 ? `ripe in ${dur2(left4)}` : "ripe!"}</small></span>${left4 ? `<span class="clbar" style="width:70px"><i style="width:${Math.round(100 * (1 - left4 / (c.days * 864e5)))}%"></i></span>` : `<button class="btn small primary" data-hf="wheel" data-k="${i}">Cut it</button>`}</li>`;
+      const c = CHEESES[w.kind], left4 = caveLeft(w), q = quality(w);
+      return `<li><span class="wpic"><span class="gdot" style="background:${c.col}"></span></span><span class="wtxt"><b>${esc(w.name)}</b><small>${esc(c.n)} · ${left4 ? `ripe in ${dur2(left4)} · turned ${w.turns || 0}× · ${QW[q]}` : `ripe! ${q === "excellent" ? "Excellent." : q === "good" ? "A good one." : "A bit rustic."}`}</small></span>${left4 ? `<span class="clbar" style="width:70px"><i style="width:${Math.round(100 * (1 - left4 / (c.days * 864e5)))}%"></i></span>` : `<button class="btn small primary" data-hf="wheel" data-k="${i}">Cut it</button>`}</li>`;
     }).join("")}</ul>` : `<p class="muted">Empty shelves. Press a wheel at the cheese press.</p>`;
     return p + shut2;
   }
@@ -14805,7 +15042,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       return `<ellipse cx="${x}" cy="${y}" rx="9" ry="5" style="fill:#9C8CD9" opacity=".85"/><path d="M${x - 4} ${y - 2} v-6 M${x} ${y - 3} v-8 M${x + 4} ${y - 2} v-6" style="stroke:#7D6BC0" stroke-width="1.6"/>`;
     }).join("");
     const hives = `<g data-place="hives" aria-label="The beehives"><ellipse class="hov" cx="250" cy="246" rx="66" ry="12" style="fill:var(--butter)"/>
-    <g filter="url(#wob)">${lav}</g>${HIVE_SPOTS.map(([x, y], i) => hive(x, y, HIVE_COLS[i], hiveFill(st6, i), i)).join("")}
+    <g filter="url(#wob)">${lav}</g>${HIVE_SPOTS.map(([x, y], i) => hive(x, y, HIVE_COLS[i], hiveFill(st6, i), i)).join("")}${st6.myHive ? hive(MY_HIVE_SPOT[0], MY_HIVE_SPOT[1], "#E8566C", hiveFill(st6, "mine"), 5) + sk(`<path d="M${MY_HIVE_SPOT[0] + 12} ${MY_HIVE_SPOT[1] - 30} v-16" stroke-width="1.4"/><path d="M${MY_HIVE_SPOT[0] + 12} ${MY_HIVE_SPOT[1] - 46} l10 4 l-10 4z" style="fill:#F3C969"/>`, "") : ""}
     ${tapeLabel(250, 266, "Beehives", "#F3E1A0", 11)}</g>`;
     const cows = `<g data-place="cows" aria-label="The cow paddock"><ellipse class="hov" cx="135" cy="484" rx="80" ry="10" style="fill:var(--butter)"/>${paddock(54, 336, 216, 470)}
     ${sk(`<rect x="160" y="444" width="44" height="14" rx="3" style="fill:#9AA9B8"/><rect x="163" y="446" width="38" height="5" style="fill:#9FD3E8"/>`, `<rect x="160" y="444" width="44" height="14" rx="3"/>`)}
@@ -14824,7 +15061,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     )}
     ${tapeLabel(130, 584, "Farm stand", "#F4C7CF", 10)}</g>`;
     const sign = sk(`<rect x="330" y="574" width="60" height="22" rx="2" style="fill:#FFF6E8"/><path d="M338 596 v12 M382 596 v12" stroke-width="3"/>`, `<rect x="330" y="574" width="60" height="22" rx="2"/>`) + `<text x="360" y="588" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="7.4" fill="#8E2C2C" pointer-events="none">Wildflower Farm</text>`;
-    return lampDefs + ground + farmhouse + hives + barn + cows + goats + stand + sign + archGate("toBayF", 22, 280, "The bay", 50, 322, "var(--sky)", "Gate west to the bay") + archGate("hfEast", 498, 560, "Cottage lane", 470, 516, "var(--butter)", "The lane east to the cottages") + streetLamp(300, 540);
+    const sg = strayGoat(artCtx().F()), stray = sg ? `<g data-place="stray" aria-label="A runaway goat"><ellipse class="hov" cx="${sg.at[0]}" cy="${sg.at[1] + 10}" rx="22" ry="7" style="fill:var(--butter)"/>${goatArt(sg.at[0], sg.at[1], sg.goat, 1)}${tapeLabel(sg.at[0], sg.at[1] + 28, `${sg.goat.n}'s out!`, "#F4C7CF", 9)}</g>` : "";
+    return lampDefs + ground + farmhouse + hives + barn + cows + goats + stand + sign + stray + archGate("toBayF", 22, 280, "The bay", 50, 322, "var(--sky)", "Gate west to the bay") + archGate("hfEast", 498, 560, "Cottage lane", 470, 516, "var(--butter)", "The lane east to the cottages") + streetLamp(300, 540);
   }
 
   // src/art/hlane.js
@@ -16681,6 +16919,34 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var vanSt2 = { slot: "bedding" };
   var railOpen = false;
   var lastTrain = "";
+  var lastFarm = 0;
+  function farmNow() {
+    lastFarm = Date.now();
+    if (!F.hfarm) return;
+    const out = hfTick(F);
+    if (out.swarms.length) {
+      if (scene === "hfarm") {
+        speak(`Oh no: ${out.swarms.map((x) => typeof x === "number" ? `hive ${x}` : x).join(" and ")} swarmed! A cloud of bees off over the barn. Felix sighs: "Next time, collect it a bit sooner."`, 6e3);
+        drawScene();
+      } else flash(`A hive swarmed at Wildflower Farm`);
+    }
+    if (out.coins && scene === "hfarm") {
+      sfx("coin");
+      flash(`+${out.coins} coins from your shelf at the farm stand`);
+    }
+    if (out.coins || out.swarms.length) save2();
+  }
+  function farmTrust(n) {
+    const lv2 = gainTrust(F, n);
+    if (lv2 == null) return;
+    const L2 = LEVELS2[lv2];
+    setTimeout(() => {
+      sfx("chaching");
+      act("cheer");
+      [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("sparkle", mel.x + (k - 1) * 24, mel.y - 60, 1800), d));
+      speak(`Felix and Elena trust you more and more: you're their ${L2.n.toLowerCase()} now! They've given you ${L2.gives}.`, 7e3);
+    }, 900);
+  }
   var hfView = null;
   var hfSt = { kind: "cheddar", name: "", sug: 0 };
   var ccView = null;
@@ -16965,7 +17231,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (scene === "base") [0, 300].forEach((d) => setTimeout(() => mprop("heart", 110 + rnd(-30, 30), 520, 1700), d));
     const g = grew[0];
     speak(g ? `${g.name} is all grown up! ${g.kind === "chick" ? "A proper hen now, eggs from tomorrow." : g.kind === "goat" ? "A proper goat now, milk from tomorrow." : "A big fluffy rabbit now."}` : milk && !eggs ? `${milk === 1 ? "A bottle of milk" : milk + " bottles of milk"} for your backpack. Cheese, here we come.` : eggs ? `${eggs === 1 ? "An egg" : eggs + " eggs"} for your backpack! Fresh from the coop.` : fed > 1 ? "Everyone's munching away. Happy run." : `${list2[0].name} gobbles it up. Happy little face.`, 4500);
-    if (eggs || milk) flash([eggs ? `+${eggs} fresh egg${eggs > 1 ? "s" : ""}` : "", milk ? `+${milk} milk` : ""].filter(Boolean).join(", ") + " in your backpack");
+    if (eggs || milk) flash([eggs ? `+${eggs} fresh egg${eggs > 1 ? "s" : ""}` : "", milk ? `+${milk} goat's milk` : ""].filter(Boolean).join(", ") + " in your backpack");
     if (miss && fed < list2.length) setTimeout(() => speak(miss, 4e3), 4600);
     save2(true);
     return fed;
@@ -17378,6 +17644,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     if (Date.now() - lastScoop > 2e4) scoopNow();
     if (Date.now() - lastCocoa > 2e4) cocoaNow();
+    if (Date.now() - lastFarm > 2e4) farmNow();
     if (outside() && skyKey() !== lastSky) {
       lastSky = skyKey();
       drawScene();
@@ -19325,7 +19592,7 @@ ${SIGNOFF[t2.who] || ""}`;
     } else if (railOpen && scene === "hlane") h = timetablePanel();
     else if (vanView && scene === "van") h = moodPanel(F, vanSt2);
     else if (hfView && scene === "barn") h = hfView === "extractor" ? extractorPanel(F) : hfView === "crock" ? crockPanel(F) : hfView === "press" ? pressPanel2(F, hfSt) : cavePanel(F);
-    else if (hfView && scene === "hfarm") h = hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
+    else if (hfView && scene === "hfarm") h = hfView === "house" ? farmhousePanel(F, isHere("felix")) : hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
     else if (orView === "pot" && potItem) h = potPanel(F, potItem);
     else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? counterPanel3(F, { server: isHere("amara"), hand: isHere("mateo") }) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccView === "ups" ? upsPanel(F) : kitchenPanel(F, ccView);
     else if (keepItem && F.inv[keepItem]) h = keepPanel(F, keepItem);
@@ -21032,6 +21299,30 @@ ${SIGNOFF[t2.who] || ""}`;
       render();
       return;
     }
+    if (scene === "hfarm" && id === "farmhouse") {
+      hfView = "house";
+      hfState(F);
+      sfx("paper", true);
+      render();
+      return;
+    }
+    if (scene === "hfarm" && id === "stray") {
+      const g = catchGoat(F);
+      if (!g) {
+        render();
+        return;
+      }
+      sfx("chime");
+      act("cheer");
+      gainXp(1);
+      farmTrust(3);
+      speak(`Got you, ${g.n}! Back in the paddock you go. Latch the gate tonight and nobody gets out.`, 5e3);
+      if (evanHere()) setTimeout(() => evanSays("The goat ran away! I helped catch it!"), 1200);
+      save2();
+      drawScene();
+      render();
+      return;
+    }
     if (scene === "hfarm" && (id === "cows" || id === "goats" || id === "hives" || id === "fstand")) {
       hfView = id === "fstand" ? "stand" : id;
       hfState(F);
@@ -21644,6 +21935,15 @@ ${SIGNOFF[t2.who] || ""}`;
     if (nm3) nm3.oninput = () => {
       hfSt.name = nm3.value;
     };
+    const hn = c.querySelector("[data-hfname]");
+    if (hn) hn.onsubmit = (e) => {
+      e.preventDefault();
+      const n = nameHive(F, hn.querySelector("input").value);
+      if (n) {
+        speak(`Your hive's called ${n} now. Felix paints it on the lid.`, 4e3);
+        re();
+      }
+    };
     c.querySelectorAll("[data-hf]").forEach((b) => b.onclick = () => {
       const a = b.dataset.hf, k = b.dataset.k;
       if (a === "feed") {
@@ -21651,12 +21951,14 @@ ${SIGNOFF[t2.who] || ""}`;
         if (!n) return;
         sfx("tap");
         gainXp(1);
+        farmTrust(2);
         speak(k === "cows" ? "Hay in the rack, water in the trough. Three happy munchers." : "Hay for the goats. Pepper's already climbing the rack.", 4e3);
       } else if (a === "brush") {
         const an = brush(F, k);
         if (!an) return;
         sfx("chime");
         gainXp(1);
+        farmTrust(1);
         mprop("heart", mel.x, mel.y - 60, 1600);
         speak(an.line, 3500);
       } else if (a === "milk") {
@@ -21666,9 +21968,13 @@ ${SIGNOFF[t2.who] || ""}`;
           return;
         }
         sfx("paper", true);
+        farmTrust(1);
+        if (r.mood === 0) speak(`${r.a.n}'s a bit grumpy: hay, a brush and a clean stall, and she'll give more.`, 4500);
+        else if (r.mood === 2) speak(`${r.a.n}'s a happy ${b.dataset.herd === "cows" ? "cow" : "goat"} today. A full bucket!`, 3500);
         flash(`+${r.n} ${giveName(r.gives)}: ${r.a.n}`);
       } else if (a === "milkall") {
         const n = milkHerd(F, k);
+        if (n) farmTrust(2);
         if (!n) {
           speak("Nobody to milk: they've been done today, or need their hay first.", 4e3);
           return;
@@ -21682,6 +21988,7 @@ ${SIGNOFF[t2.who] || ""}`;
         sfx("chime");
         act("cheer");
         gainXp(2);
+        farmTrust(Math.ceil(n / 2));
         speak(`${n} jars of honey, golden and still warm from the sun. Felix keeps the rest for his stall.`, 5e3);
       } else if (a === "buy") {
         if (!buyStand(F, k)) return;
@@ -21699,6 +22006,50 @@ ${SIGNOFF[t2.who] || ""}`;
         if (!n) return;
         sfx("tap");
         flash(`${n} pot${n === 1 ? "" : "s"} of yoghurt`);
+      } else if (a === "muck") {
+        if (!muckOut(F, k)) return;
+        sfx("tap");
+        gainXp(1);
+        farmTrust(2);
+        speak(k === "cows" ? "Old straw out, fresh straw in. Daisy approves, loudly." : "The goat stalls, mucked out. Pepper immediately lies down in the clean straw.", 4e3);
+      } else if (a === "latch") {
+        if (!latchGate(F)) return;
+        sfx("tap");
+        farmTrust(1);
+        speak("Click. The goat gate's latched for the night. Toffee looks betrayed.", 3500);
+      } else if (a === "turn") {
+        const n = turnWheels(F);
+        if (!n) return;
+        sfx("paper", true);
+        gainXp(1);
+        if (hfState(F).turnedDay !== dayKey()) {
+          hfState(F).turnedDay = dayKey();
+          farmTrust(2);
+        }
+        speak(`${n} wheel${n === 1 ? "" : "s"} turned. They smell more like cheese every day.`, 3500);
+      } else if (a === "comb") {
+        if (!cutComb(F)) return;
+        sfx("tap");
+        flash("A slab of honeycomb in your backpack");
+      } else if (a === "cream") {
+        if (!creamHoney(F)) return;
+        sfx("tap");
+        flash("A jar of creamed honey in your backpack");
+      } else if (a === "shelf") {
+        const n = stockShelf(F, k, +b.dataset.n);
+        if (!n) return;
+        sfx("tap");
+        flash(`${n} on your shelf at the farm stand`);
+      } else if (a === "req") {
+        const r = finishRequest(F);
+        if (!r) return;
+        sfx("chime");
+        act("cheer");
+        gainXp(2);
+        const who3 = r.who === "felix" ? "Felix" : "Elena";
+        speak(`${who3} beams. "You're a star. Thank you!"`, 4500);
+        if (isHere(r.who)) npcSay(r.who, pick(["You're a natural.", "What would we do without you?", "That's exactly what I needed."]));
+        farmTrust(10);
       } else if (a === "ckind") {
         hfSt.kind = k;
         hfSt.name = "";
@@ -21722,9 +22073,9 @@ ${SIGNOFF[t2.who] || ""}`;
         if (!r) return;
         sfx("chime");
         act("cheer");
-        gainXp(1);
+        gainXp(r.q === "excellent" ? 3 : 1);
         mprop("heart", mel.x, mel.y - 60, 1600);
-        speak(`${r.w.name}: ripe and perfect. ${r.c.wedges} wedges of ${r.c.n.toLowerCase()} in your backpack.`, 5e3);
+        speak(`${r.w.name}: ${r.q === "excellent" ? "excellent! Elena actually gasps." : r.q === "good" ? "a good, honest cheese." : "a bit rustic. Still tasty. Turn the next one more often."} ${r.n} wedges in your backpack.`, 5500);
       }
       re();
     });

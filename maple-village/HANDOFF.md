@@ -1304,3 +1304,29 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **core.js:** `vanView` / `vanSt`, `moodPanel`, `data-van` actions. Evan follows into the van.
 - **Tests:** a "the campervan" block.
 - **Round 98b:** the van's inside is redrawn as a long, narrow van seen from the back doors: the bed across the far end under the roof window, side windows with curtains, lights down both walls, the kitchenette and table along the sides. A narrow walkable aisle (`bounds` [182,210,338,612]).
+
+### Round 99: farm life (Wildflower Farm gets deeper); home goats give goat's milk
+- **Home goats** (pets.js, the animal run) now give `goatmilk`, not `milk`, so goats always mean goat's milk. Milk comes from the farm's cows and the stand.
+- **Trust** (`h.trust`, `LEVELS`, `levelOf`, `gainTrust`; core.js `farmTrust(n)` celebrates each new level):
+  - Earned from chores: hay 2, brush 1, muck out 2, milk 1 (2 for milking the herd), collecting hives about 1 per frame, turning cheese 2 a day, latching the gate 1, catching a runaway goat 3, a request 10.
+  - **Helper (0).**
+  - **Trusted hand (40):** Mel's own hive (`h.myHive`, at `MY_HIVE_SPOT` with a flag, renameable; gives `MY_FRAMES` 4) and her own veil.
+  - **Apprentice (100):**
+    - The press offers brie, halloumi and smoked (`lvl: 2`).
+    - At the extractor, frames can be cut as `honeycomb` and jars creamed into `honey_cream`.
+  - **Partner (200):**
+    - A shelf at the farm stand (`stockShelf`; `hfTick` sells from it 8–6 at full price).
+    - Nine cave shelves instead of six (`caveSize`).
+- **Moods:**
+  - `moodOf` is 0, 1 or 2: hay today or yesterday, plus a brush and a mucked-out stall (`muckOut`, per herd per day).
+  - Yield: a cow gives 1/2/3 milk, a goat 1/1/2. Animals can now be milked unfed; they just give less.
+- **The goat gate:** `latchGate` in the evening. If it wasn't latched the night before, a goat is out 60% of the time (`strayGoat`: a deterministic goat and spot). Tap the `stray` place to round it up.
+- **Bees:**
+  - `beeTime` counts rainy days as half (`rainyOn`). A hive left full past `SWARM_DAYS` (2) swarms (`swarmCheck`, in `hfTick`), losing the batch.
+  - The panel warns when a hive is restless.
+- **Cheese:**
+  - `turnWheels` turns each ageing wheel once a day (`w.turns`).
+  - `quality` is excellent (≥75% of its days turned), good (≥35%) or rustic. Excellent cuts give `<id>_ex` items (registered in hfarm.js from items.js, +5 price, a warmer line, icons with a star); rustic gives one wedge fewer.
+- **Requests:** `REQUESTS`, one a day (`requestToday` by hash). Some ask for things (3 eggs, 2 apples, 2 carrots), others for a job done today (muck out both stalls, brush all the cows, turn the wheels, milk everyone, help Felix move a hive while he's there). They're shown in the new `farmhousePanel` (tap the farmhouse) with the trust bar and what's been earned.
+- **New items:** `chz_brie`, `chz_halloumi`, `chz_smoked`, `honey_cream`, plus `_ex` versions of every cheese.
+- **Tests:** a new "farm life" block. The old cheddar check now expects a rustic five wedges.

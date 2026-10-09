@@ -7,7 +7,7 @@ import { sk, tapeLabel, tree, flowers, house, artCtx } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
 import { archGate } from "./orchard.js";
 import { track, brook, trainLayer } from "./railway.js";
-import { hfState, COWS, GOATS, hiveFill, HIVE_SPOTS } from "../game/hfarm.js";
+import { hfState, COWS, GOATS, hiveFill, HIVE_SPOTS, MY_HIVE_SPOT, strayGoat } from "../game/hfarm.js";
 
 const W = ink;
 // the shared post-and-rail fence (it carries on along the cottage lane, at the same height)
@@ -59,7 +59,7 @@ export function hfarmArt(){
   // the hives, in a bed of lavender between the house and the barn
   const lav = Array.from({length: 18}, (_, i) => { const x = 196 + (i % 6)*22, y = 166 + Math.floor(i/6)*30; return `<ellipse cx="${x}" cy="${y}" rx="9" ry="5" style="fill:#9C8CD9" opacity=".85"/><path d="M${x-4} ${y-2} v-6 M${x} ${y-3} v-8 M${x+4} ${y-2} v-6" style="stroke:#7D6BC0" stroke-width="1.6"/>`; }).join("");
   const hives = `<g data-place="hives" aria-label="The beehives"><ellipse class="hov" cx="250" cy="246" rx="66" ry="12" style="fill:var(--butter)"/>
-    <g filter="url(#wob)">${lav}</g>${HIVE_SPOTS.map(([x, y], i) => hive(x, y, HIVE_COLS[i], hiveFill(st, i), i)).join("")}
+    <g filter="url(#wob)">${lav}</g>${HIVE_SPOTS.map(([x, y], i) => hive(x, y, HIVE_COLS[i], hiveFill(st, i), i)).join("")}${st.myHive ? hive(MY_HIVE_SPOT[0], MY_HIVE_SPOT[1], "#E8566C", hiveFill(st, "mine"), 5) + sk(`<path d="M${MY_HIVE_SPOT[0] + 12} ${MY_HIVE_SPOT[1] - 30} v-16" stroke-width="1.4"/><path d="M${MY_HIVE_SPOT[0] + 12} ${MY_HIVE_SPOT[1] - 46} l10 4 l-10 4z" style="fill:#F3C969"/>`, "") : ""}
     ${tapeLabel(250, 266, "Beehives", "#F3E1A0", 11)}</g>`;
   // the paddocks, the animals, a trough, and a cable spool for the goats to climb
   const cows = `<g data-place="cows" aria-label="The cow paddock"><ellipse class="hov" cx="135" cy="484" rx="80" ry="10" style="fill:var(--butter)"/>${paddock(54, 336, 216, 470)}
@@ -77,7 +77,8 @@ export function hfarmArt(){
     ${tapeLabel(130, 584, "Farm stand", "#F4C7CF", 10)}</g>`;
   const sign = sk(`<rect x="330" y="574" width="60" height="22" rx="2" style="fill:#FFF6E8"/><path d="M338 596 v12 M382 596 v12" stroke-width="3"/>`, `<rect x="330" y="574" width="60" height="22" rx="2"/>`)
     + `<text x="360" y="588" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="7.4" fill="#8E2C2C" pointer-events="none">Wildflower Farm</text>`;
-  return lampDefs + ground + farmhouse + hives + barn + cows + goats + stand + sign
+  const sg = strayGoat(artCtx().F()), stray = sg ? `<g data-place="stray" aria-label="A runaway goat"><ellipse class="hov" cx="${sg.at[0]}" cy="${sg.at[1] + 10}" rx="22" ry="7" style="fill:var(--butter)"/>${goatArt(sg.at[0], sg.at[1], sg.goat, 1)}${tapeLabel(sg.at[0], sg.at[1] + 28, `${sg.goat.n}'s out!`, "#F4C7CF", 9)}</g>` : "";
+  return lampDefs + ground + farmhouse + hives + barn + cows + goats + stand + sign + stray
     + archGate("toBayF", 22, 280, "The bay", 50, 322, "var(--sky)", "Gate west to the bay")
     + archGate("hfEast", 498, 560, "Cottage lane", 470, 516, "var(--butter)", "The lane east to the cottages")
     + streetLamp(300, 540);

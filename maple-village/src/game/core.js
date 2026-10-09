@@ -48,7 +48,8 @@ import { hlaneArt } from "../art/hlane.js";
 import { timetablePanel, trainKey, trainHere, fmt as railTime } from "./rail.js";
 import { moodPanel, vanPick, vanClear, lookLine as vanLookLine } from "./van.js";
 import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush, milkOne, milkHerd, collectHives, buyStand, giveName, fullHives,
-  extractorPanel, crockPanel, pressPanel as hfPressPanel, cavePanel as hfCavePanel, spinFrames, makeYoghurt, pressCheese, takeWheel, cheeseNames, CHEESES as HF_CHEESES } from "./hfarm.js";
+  extractorPanel, crockPanel, pressPanel as hfPressPanel, cavePanel as hfCavePanel, spinFrames, makeYoghurt, pressCheese, takeWheel, cheeseNames, CHEESES as HF_CHEESES,
+  gainTrust, muckOut, latchGate, catchGoat, nameHive, creamHoney, cutComb, turnWheels, finishRequest, stockShelf, hfTick, farmhousePanel, LEVELS as HF_LEVELS, MOODS as HF_MOODS } from "./hfarm.js";
 import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
@@ -263,6 +264,18 @@ const SHED = {
 // the Cocoa Room's open card: "counter", "wall", or a kitchen station ("sacks", "roaster", "grinder", "slab", "moulds")
 let vanView = null, vanSt = {slot: "bedding"};   // the campervan's mood board
 let railOpen = false, lastTrain = "";   // the timetable board on Honeybrook's platform
+let lastFarm = 0;
+// the farm's clock: Mel's shelf at the farm stand sells, and a hive left full too long swarms
+function farmNow(){
+  lastFarm = Date.now(); if (!F.hfarm) return;
+  const out = hfTick(F);
+  if (out.swarms.length) { if (scene === "hfarm") { speak(`Oh no: ${out.swarms.map(x => typeof x === "number" ? `hive ${x}` : x).join(" and ")} swarmed! A cloud of bees off over the barn. Felix sighs: "Next time, collect it a bit sooner."`, 6000); drawScene(); } else flash(`A hive swarmed at Wildflower Farm`); }
+  if (out.coins && scene === "hfarm") { sfx("coin"); flash(`+${out.coins} coins from your shelf at the farm stand`); }
+  if (out.coins || out.swarms.length) save();
+}
+// trust from Felix and Elena: a little for every chore, and a celebration at each new level
+function farmTrust(n){ const lv = gainTrust(F, n); if (lv == null) return;
+  const L = HF_LEVELS[lv]; setTimeout(() => { sfx("chaching"); act("cheer"); [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("sparkle", mel.x + (k - 1)*24, mel.y - 60, 1800), d)); speak(`Felix and Elena trust you more and more: you're their ${L.n.toLowerCase()} now! They've given you ${L.gives}.`, 7000); }, 900); }
 let hfView = null, hfSt = {kind: "cheddar", name: "", sug: 0};   // Wildflower Farm: "cows" / "goats" / "hives" / "stand"; in the barn "extractor" / "crock" / "press" / "cave"
 let ccView = null, lastCocoa = 0, ccSt = {shell: "dark", sel: []};   // ccSt: the bonbon table's picks
 const COCOA_IN = ["cocoa", "cocoakitchen"];
@@ -348,7 +361,7 @@ function feedAnimals(which){
   sfx("chime"); gainXp(1); if (scene === "base") [0, 300].forEach(d => setTimeout(() => mprop("heart", 110 + rnd(-30, 30), 520, 1700), d));
   const g = grew[0];
   speak(g ? `${g.name} is all grown up! ${g.kind === "chick" ? "A proper hen now, eggs from tomorrow." : g.kind === "goat" ? "A proper goat now, milk from tomorrow." : "A big fluffy rabbit now."}` : milk && !eggs ? `${milk === 1 ? "A bottle of milk" : milk + " bottles of milk"} for your backpack. Cheese, here we come.` : eggs ? `${eggs === 1 ? "An egg" : eggs + " eggs"} for your backpack! Fresh from the coop.` : fed > 1 ? "Everyone's munching away. Happy run." : `${list[0].name} gobbles it up. Happy little face.`, 4500);
-  if (eggs || milk) flash([eggs ? `+${eggs} fresh egg${eggs > 1 ? "s" : ""}` : "", milk ? `+${milk} milk` : ""].filter(Boolean).join(", ") + " in your backpack");
+  if (eggs || milk) flash([eggs ? `+${eggs} fresh egg${eggs > 1 ? "s" : ""}` : "", milk ? `+${milk} goat's milk` : ""].filter(Boolean).join(", ") + " in your backpack");
   if (miss && fed < list.length) setTimeout(() => speak(miss, 4000), 4600);
   save(true); return fed;
 }
@@ -533,6 +546,7 @@ setInterval(() => {
   if (scene === "farm" && Math.random() < .2) { drawScene(); if (selPlot != null) ctx(); }
   if (Date.now() - lastScoop > 20000) scoopNow();
   if (Date.now() - lastCocoa > 20000) cocoaNow();
+  if (Date.now() - lastFarm > 20000) farmNow();
   if (outside() && skyKey() !== lastSky) { lastSky = skyKey(); drawScene(); }
   { const tk = outside() ? trainKey(scene) : ""; if (tk !== lastTrain) { lastTrain = tk; drawScene();   // a train coming through: draw it (it runs on from where it is)
       const t = tk && trainHere(scene); if (t && scene === "hlane" && t.mode === "arrive") speak(`Here comes the ${railTime(t.t)}: ${t.n.toLowerCase()} ${t.to}.`, 4000); else if (t && t.mode === "pass") speak(t.dir === "e" ? "Toot toot! A train rattles past, on its way to Honeybrook station." : "A train chuffs by along the top, off to the city.", 3500); } }   // the sunset deepens: redraw every 5 minutes through the evening
@@ -1503,7 +1517,7 @@ function ctx(){
   else if (railOpen && scene === "hlane") h = timetablePanel();
   else if (vanView && scene === "van") h = moodPanel(F, vanSt);
   else if (hfView && scene === "barn") h = hfView === "extractor" ? extractorPanel(F) : hfView === "crock" ? crockPanel(F) : hfView === "press" ? hfPressPanel(F, hfSt) : hfCavePanel(F);
-  else if (hfView && scene === "hfarm") h = hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
+  else if (hfView && scene === "hfarm") h = hfView === "house" ? farmhousePanel(F, isHere("felix")) : hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
   else if (orView === "pot" && potItem) h = potPanel(F, potItem);
   else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara"), hand: isHere("mateo")}) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccView === "ups" ? ccUpsPanel(F) : ccKitchenPanel(F, ccView);
   else if (keepItem && F.inv[keepItem]) h = keepPanel(F, keepItem);
@@ -2117,6 +2131,8 @@ function arriveVillageSpot(id){
   if (id === "vanspot" && scene === "hlane") { if (!owns(F, "van")) { goalView = "van"; sfx("paper", true); speak("A gravel spot just big enough for a campervan...", 4000); } render(); return; }
   if (id === "timetable" && scene === "hlane") { railOpen = true; sfx("paper", true); render(); return; }
   if ((id === "bluebell" || id === "figtree") && scene === "hlane") { const g = letGuests(dayKey())[id === "bluebell" ? 0 : 1]; speak(`${VILLAGE[id].line}${g && g.length ? ` Staying this week: ${g.map(x => (NPCS.find(n => n.id === x) || {}).name).join(" and ")}.` : ""}`, 5000); render(); return; }
+  if (scene === "hfarm" && id === "farmhouse") { hfView = "house"; hfState(F); sfx("paper", true); render(); return; }
+  if (scene === "hfarm" && id === "stray") { const g = catchGoat(F); if (!g) { render(); return; } sfx("chime"); act("cheer"); gainXp(1); farmTrust(3); speak(`Got you, ${g.n}! Back in the paddock you go. Latch the gate tonight and nobody gets out.`, 5000); if (evanHere()) setTimeout(() => evanSays("The goat ran away! I helped catch it!"), 1200); save(); drawScene(); render(); return; }
   if (scene === "hfarm" && (id === "cows" || id === "goats" || id === "hives" || id === "fstand")) { hfView = id === "fstand" ? "stand" : id; hfState(F); sfx("paper", true);
     if (id === "hives" && isHere("felix")) npcSay("felix", fullHives(hfState(F)).length ? "There's honey ready! Here, take the veil." : "Not quite ready. The bees are still busy.");
     else if ((id === "cows" || id === "goats") && isHere("elena")) npcSay("elena", pick(id === "cows" ? ["Daisy first, she insists.", "Mind Mochi's tail. It has opinions."] : ["Keep your shoelaces away from Toffee.", "Pepper! Out of the bucket!"]));
@@ -2337,19 +2353,28 @@ function wireCocoa(c){
 function wireFarm(c){
   const re = () => { save(); ctx(); drawScene(); };
   const nm = c.querySelector("#hfName"); if (nm) nm.oninput = () => { hfSt.name = nm.value; };
+  const hn = c.querySelector("[data-hfname]"); if (hn) hn.onsubmit = e => { e.preventDefault(); const n = nameHive(F, hn.querySelector("input").value); if (n) { speak(`Your hive's called ${n} now. Felix paints it on the lid.`, 4000); re(); } };
   c.querySelectorAll("[data-hf]").forEach(b => b.onclick = () => { const a = b.dataset.hf, k = b.dataset.k;
-    if (a === "feed") { const n = feedHerd(F, k); if (!n) return; sfx("tap"); gainXp(1); speak(k === "cows" ? "Hay in the rack, water in the trough. Three happy munchers." : "Hay for the goats. Pepper's already climbing the rack.", 4000); }
-    else if (a === "brush") { const an = hfBrush(F, k); if (!an) return; sfx("chime"); gainXp(1); mprop("heart", mel.x, mel.y - 60, 1600); speak(an.line, 3500); }
-    else if (a === "milk") { const r = milkOne(F, b.dataset.herd, k); if (!r.n) { speak(r.err, 3500); return; } sfx("paper", true); flash(`+${r.n} ${giveName(r.gives)}: ${r.a.n}`); }
-    else if (a === "milkall") { const n = milkHerd(F, k); if (!n) { speak("Nobody to milk: they've been done today, or need their hay first.", 4000); return; } sfx("chime"); gainXp(1); flash(`+${n} ${giveName(k === "cows" ? "milk" : "goatmilk")} in your backpack`); }
-    else if (a === "honey") { const n = collectHives(F); if (!n) return; sfx("chime"); act("cheer"); gainXp(2); speak(`${n} jars of honey, golden and still warm from the sun. Felix keeps the rest for his stall.`, 5000); }
+    if (a === "feed") { const n = feedHerd(F, k); if (!n) return; sfx("tap"); gainXp(1); farmTrust(2); speak(k === "cows" ? "Hay in the rack, water in the trough. Three happy munchers." : "Hay for the goats. Pepper's already climbing the rack.", 4000); }
+    else if (a === "brush") { const an = hfBrush(F, k); if (!an) return; sfx("chime"); gainXp(1); farmTrust(1); mprop("heart", mel.x, mel.y - 60, 1600); speak(an.line, 3500); }
+    else if (a === "milk") { const r = milkOne(F, b.dataset.herd, k); if (!r.n) { speak(r.err, 3500); return; } sfx("paper", true); farmTrust(1); if (r.mood === 0) speak(`${r.a.n}'s a bit grumpy: hay, a brush and a clean stall, and she'll give more.`, 4500); else if (r.mood === 2) speak(`${r.a.n}'s a happy ${b.dataset.herd === "cows" ? "cow" : "goat"} today. A full bucket!`, 3500); flash(`+${r.n} ${giveName(r.gives)}: ${r.a.n}`); }
+    else if (a === "milkall") { const n = milkHerd(F, k); if (n) farmTrust(2); if (!n) { speak("Nobody to milk: they've been done today, or need their hay first.", 4000); return; } sfx("chime"); gainXp(1); flash(`+${n} ${giveName(k === "cows" ? "milk" : "goatmilk")} in your backpack`); }
+    else if (a === "honey") { const n = collectHives(F); if (!n) return; sfx("chime"); act("cheer"); gainXp(2); farmTrust(Math.ceil(n/2)); speak(`${n} jars of honey, golden and still warm from the sun. Felix keeps the rest for his stall.`, 5000); }
     else if (a === "buy") { if (!buyStand(F, k)) return; sfx("coin"); flash(`${giveName(k)} from the farm stand`); }
     else if (a === "spin") { const r = spinFrames(F); if (!r) return; sfx("chime"); act("cheer"); gainXp(1); speak(`Whirr, whirr... ${r.n} jar${r.n === 1 ? "" : "s"} of ${r.kind.n} honey, golden and still warm.`, 4500); }
     else if (a === "yog" || a === "yogall") { const n = makeYoghurt(F, a === "yogall"); if (!n) return; sfx("tap"); flash(`${n} pot${n === 1 ? "" : "s"} of yoghurt`); }
+    else if (a === "muck") { if (!muckOut(F, k)) return; sfx("tap"); gainXp(1); farmTrust(2); speak(k === "cows" ? "Old straw out, fresh straw in. Daisy approves, loudly." : "The goat stalls, mucked out. Pepper immediately lies down in the clean straw.", 4000); }
+    else if (a === "latch") { if (!latchGate(F)) return; sfx("tap"); farmTrust(1); speak("Click. The goat gate's latched for the night. Toffee looks betrayed.", 3500); }
+    else if (a === "turn") { const n = turnWheels(F); if (!n) return; sfx("paper", true); gainXp(1); if (hfState(F).turnedDay !== dayKey()) { hfState(F).turnedDay = dayKey(); farmTrust(2); } speak(`${n} wheel${n === 1 ? "" : "s"} turned. They smell more like cheese every day.`, 3500); }
+    else if (a === "comb") { if (!cutComb(F)) return; sfx("tap"); flash("A slab of honeycomb in your backpack"); }
+    else if (a === "cream") { if (!creamHoney(F)) return; sfx("tap"); flash("A jar of creamed honey in your backpack"); }
+    else if (a === "shelf") { const n = stockShelf(F, k, +b.dataset.n); if (!n) return; sfx("tap"); flash(`${n} on your shelf at the farm stand`); }
+    else if (a === "req") { const r = finishRequest(F); if (!r) return; sfx("chime"); act("cheer"); gainXp(2); const who = r.who === "felix" ? "Felix" : "Elena"; speak(`${who} beams. "You're a star. Thank you!"`, 4500); if (isHere(r.who)) npcSay(r.who, pick(["You're a natural.", "What would we do without you?", "That's exactly what I needed."])); farmTrust(10); }
     else if (a === "ckind") { hfSt.kind = k; hfSt.name = ""; hfSt.sug = 0; }
     else if (a === "csug") { const ns = cheeseNames(F, hfSt.kind, Math.floor((Date.now() + (globalThis.__mapleOffset || 0))/864e5)); hfSt.sug = (hfSt.sug + 1) % Math.max(1, ns.length); hfSt.name = ns[hfSt.sug] || ""; sfx("tap"); }
     else if (a === "press") { const w = pressCheese(F, hfSt.kind, hfSt.name); if (!w) return; hfSt.name = ""; hfSt.sug = 0; sfx("chime"); act("cheer"); gainXp(2); speak(`${w.name} is pressed and on a shelf in the cave. Ripe in ${HF_CHEESES[w.kind].days} day${HF_CHEESES[w.kind].days === 1 ? "" : "s"}.`, 5000); }
-    else if (a === "wheel") { const r = takeWheel(F, +k); if (!r) return; sfx("chime"); act("cheer"); gainXp(1); mprop("heart", mel.x, mel.y - 60, 1600); speak(`${r.w.name}: ripe and perfect. ${r.c.wedges} wedges of ${r.c.n.toLowerCase()} in your backpack.`, 5000); }
+    else if (a === "wheel") { const r = takeWheel(F, +k); if (!r) return; sfx("chime"); act("cheer"); gainXp(r.q === "excellent" ? 3 : 1); mprop("heart", mel.x, mel.y - 60, 1600);
+      speak(`${r.w.name}: ${r.q === "excellent" ? "excellent! Elena actually gasps." : r.q === "good" ? "a good, honest cheese." : "a bit rustic. Still tasty. Turn the next one more often."} ${r.n} wedges in your backpack.`, 5500); }
     re(); });
 }
 // keepsakes: put one on a shelf, or take one down; pets: adopt (who, then where), pat, play with the owner, rename, move

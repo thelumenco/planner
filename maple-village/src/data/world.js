@@ -117,6 +117,7 @@ export const VILLAGE = {
   hives:  {scene:"hfarm", name:"The beehives", door:[250,256], spot:true, mark:[250,150], line:"Felix's beehives, in the lavender."},
   cows:   {scene:"hfarm", name:"The cow paddock", door:[135,490], spot:true, mark:[135,300], line:"Daisy, Buttercup and Mochi."},
   goats:  {scene:"hfarm", name:"The goat paddock", door:[385,490], spot:true, mark:[385,300], line:"Pepper, Biscuit, Nutmeg and Toffee."},
+  stray:  {scene:"hfarm", name:"A runaway goat", door:[260,524], spot:true, line:"A goat on the loose!"},
   fstand: {scene:"hfarm", name:"Farm stand", door:[130,580], spot:true, mark:[130,500], line:"The farm stand: milk, honey and eggs."},
   reno:   {scene:"bay", name:"Under renovation", door:[396,520], spot:true, line:"Boarded up for now. Coming soon: a brewery? A chocolatier?"},
   homejetty:{scene:"base", name:"Little jetty", door:[150,132], spot:true, line:"Your little jetty. Paddle down the river and out to the foreshore."},

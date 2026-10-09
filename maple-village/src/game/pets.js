@@ -59,7 +59,7 @@ export function feedOne(F, a, inv, addInv){
   addInv(food, -1); a.fedDay = dayKey(); a.fedMeal = mealNow(); a.feeds = (a.feeds || 0) + 1;
   const grew = !wasGrown && isGrown(a), egg = wasGrown && a.kind === "chick";
   if (egg) addInv("egg", 1);
-  const milk = wasGrown && a.kind === "goat"; if (milk) addInv("milk", 1);   // a grown goat gives a bottle of milk when fed
+  const milk = wasGrown && a.kind === "goat"; if (milk) addInv("goatmilk", 1);   // a grown goat gives a bottle of goat's milk when fed
   return {ok: true, grew, egg, milk, food};
 }
 export function upgradeRun(F){
