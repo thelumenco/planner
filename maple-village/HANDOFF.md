@@ -1504,6 +1504,11 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Interiors (Mel, round 116): every new town gets four to five interior screens**, more if Mel asks for them (Ronda has six). You go in through the door of the matching place on an outdoor screen.
   - **Layout:** each room's layout is ours to design: its own floor, walls, light and furniture, kept calm with a few strong pieces and plenty of floor.
   - **Detail around the edges (Mel, round 117):** rooms must not feel bare. Fill the walls and edges: shelves and displays full of the shop's goods, plenty of tables and chairs in cafés and bars, plants in the corners, crates, jars, lamps, benches, signs. Keep the middle of the floor and the paths to the spots clear, so it stays calm. Add each new piece of furniture to TOWN_OBST so people walk round it.
+  - **A cultural activity in two or three rooms (Mel, round 117):** something specific to that culture that Mel can take part in, more than a speech bubble.
+    - Examples: a flamenco corner with a little stage in Ronda's tapas bar; a monk with a meditation corner in a Kyoto temple.
+    - Mel joins in (a short interaction or mini-moment with a result: clapping the rhythm, a breathing exercise, a lesson), and Evan can join in too, since he usually comes along.
+    - Plan these in the town proposal.
+  - **Shopping corners and thoughtful touches (Mel, round 117):** Mel loves shopping. Give rooms different corners that sell different things, a wide variety rather than one short list, and add small, unexpected but thoughtful touches: a free flower for Evan, a stamp on a postcard, a shop cat, the owner remembering her.
   - **People:** each room has people in it, locals and tourists with routines across the day, two to four at a time, so it never feels empty but never crowded. The family follow Mel inside.
   - **Music:** each room has its own live track in audio.js, different from the town's street music and from every other room.
   - **How it's built:** list the rooms in `rooms` on the town (door, name, music, party spots, the line said on entering). Add a TOWN_PLACES entry with the room's id so the Exit works, its bounds and obstacles in TOWN_BOUNDS and TOWN_OBST, and its art in `src/art/<town>-rooms.js`. Things to tap inside use `data-rdspot` (core.js `roomSpot`).
