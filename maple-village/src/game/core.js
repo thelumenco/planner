@@ -2534,7 +2534,10 @@ const SUP_BOARD = k => `<g class="supboard"><ellipse cx="0" cy="${-1*k}" rx="${2
 [["mel", 1], ["evan", .62]].forEach(([id, k]) => { const b = document.querySelector(`#${id} .bob`); if (b) b.insertAdjacentHTML("beforebegin", SUP_BOARD(k)); });
 // Mel's scooter (under her feet) and car (round her, her head above the roof line), shown while she's on the move outdoors
 { const b = document.querySelector("#mel .bob"); if (b) {
-  b.insertAdjacentHTML("beforebegin", `<g class="rideBike" transform="translate(0 7)">${bikeArt("#5E8A5A")}</g>`);   // a hire bike (transport.js)
+  // a hire bike (transport.js): a child seat on the back for Evan, a basket on the front for Maple
+  b.insertAdjacentHTML("beforebegin", `<g class="rideBike" transform="translate(0 7)">${bikeArt("#5E8A5A")}</g>`);
+  b.insertAdjacentHTML("afterend", `<g class="rideBike" transform="translate(0 7)" style="stroke:var(--line)" stroke-width="1"><g class="bikeEvan"><path d="M-22 -18 h10 v8 h-10z" style="fill:#3E6B8C"/><path d="M-22 -18 v-8" stroke-width="1.6"/><circle cx="-17" cy="-26" r="4.6" style="fill:var(--skin)"/><path d="M-21.6 -27 q4.6 -7 9.2 0" style="fill:var(--hair)"/><path d="M-22.6 -27.6 q5.6 -9 11.2 0z" style="fill:#F3C969"/><circle cx="-18.4" cy="-25.6" r=".7" style="fill:#2F2B28" stroke="none"/><path d="M-13 -14 l5 -1" stroke-width="1.6"/></g>
+    <path d="M14 -24 h12 l-2 9 h-8z" style="fill:#C9A27E"/><path d="M15 -21 h10 M16 -18 h8" opacity=".5"/><g class="bikeMaple"><path d="M17 -27 l1 -6 l3 3z M25 -27 l-1 -6 l-3 3z" style="fill:var(--fox)"/><ellipse cx="21" cy="-26" rx="5" ry="4" style="fill:var(--fox)"/><path d="M17.5 -25 q3.5 3 7 0" style="fill:var(--cream)" stroke="none"/><circle cx="19.4" cy="-27" r=".7" style="fill:#2F2B28" stroke="none"/><circle cx="22.6" cy="-27" r=".7" style="fill:#2F2B28" stroke="none"/></g></g>`);
   b.insertAdjacentHTML("beforebegin", `<g class="rideScoot" style="stroke:var(--line)" stroke-width="1"><rect x="-15" y="-3" width="30" height="3.4" rx="1.6" style="fill:#7FB8E8"/><circle cx="-12" cy="1" r="2.6" style="fill:#2F2B28"/><circle cx="12" cy="1" r="2.6" style="fill:#2F2B28"/><path d="M12 -3 l3 -26 M10 -29 h9" fill="none" stroke-width="2"/></g>`);
   // the cream convertible, roof down: Mel at the wheel, Maple in the back, Evan beside her when he's along (and awake)
   b.insertAdjacentHTML("afterend", `<g class="rideCar" style="stroke:var(--line)" stroke-width="1.1"><g class="carEvan"><circle cx="-21" cy="-26" r="5" style="fill:var(--skin)"/><path d="M-26 -27 q5 -8 10 -1" style="fill:#2A211D"/><circle cx="-22.5" cy="-25.5" r=".7" style="fill:#2F2B28" stroke="none"/></g>
@@ -3026,12 +3029,13 @@ function frame(now){
     }
   }
   if (S.cruise && (scene !== "shore" || Date.now() > S.cruise.until)) endCruise();
-  { const rd = outside() ? ride(F) : "walk", drive = rd === "car" && mel.moving && !sup, withEvan = drive && evanHere() && !evanNight();
+  { const rd = outside() ? ride(F) : "walk", drive = rd === "car" && mel.moving && !sup, carry = (drive || rd === "bike") && mel.moving && !sup, withEvan = carry && evanHere() && !evanNight();
     nodes.mel.classList.toggle("scoot", rd === "scooter" && mel.moving && !sup); nodes.mel.classList.toggle("biking", rd === "bike" && mel.moving && !sup);
     if (rd === "bike" && F.bike && nodes.mel.dataset.bikeCol !== F.bike.col) { nodes.mel.dataset.bikeCol = F.bike.col; nodes.mel.querySelectorAll(".rideBike .bikeArt > path").forEach(p => p.style.stroke = F.bike.col); } nodes.mel.classList.toggle("drive", drive); nodes.mel.classList.toggle("withEvan", withEvan);
-    // Maple and Evan ride along in the convertible, and hop out beside Mel when she stops
-    if (drive) { mel.carEvan = withEvan; } else if (mel.wasDriving) { maple.x = maple.tx = mel.x - mel.dir*22; maple.y = maple.ty = mel.y + 3; if (mel.carEvan) { evan.x = evan.tx = mel.x + 18; evan.y = evan.ty = mel.y + 6; evan.path = [[evan.x, evan.y]]; evan.rk = evan.tx + "," + evan.ty; } mel.carEvan = false; }
-    mel.wasDriving = drive; }
+    // Maple and Evan ride along in the convertible (or on the hire bike: Evan in the child seat, Maple in the front
+    // basket), and hop out beside Mel when she stops
+    if (carry) { mel.carEvan = withEvan; } else if (mel.wasDriving) { maple.x = maple.tx = mel.x - mel.dir*22; maple.y = maple.ty = mel.y + 3; if (mel.carEvan) { evan.x = evan.tx = mel.x + 18; evan.y = evan.ty = mel.y + 6; evan.path = [[evan.x, evan.y]]; evan.rk = evan.tx + "," + evan.ty; } mel.carEvan = false; }
+    mel.wasDriving = carry; }
   if (sup) { if (scene !== "shore" || Date.now() > sup.until) endPaddle(true); else if (!sup.out && mel.x < 160) sup.out = true; else if (sup.out && mel.tx > 170) endPaddle(false); }
   if (melEx && (scene !== "field" || Math.hypot(mel.tx - melEx[0], mel.ty - melEx[1]) > 4 || !classOn(dayKey()) || sgHM() >= classOn(dayKey()).to)) melEx = null;
   nodes.mel.classList.toggle("exercise", !!melEx && !mel.moving);

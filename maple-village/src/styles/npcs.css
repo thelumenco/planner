@@ -87,6 +87,6 @@
 #mel.scoot .rideScoot,#mel.drive .rideCar{display:inline}
 #mel.scoot .legL,#mel.scoot .legR,#mel.scoot .armL,#mel.scoot .armR{animation:none !important}
 #mel.drive .legL,#mel.drive .legR{visibility:hidden}
-#mel .carEvan{display:none}#mel.withEvan .carEvan{display:inline}
+#mel .carEvan{display:none}#mel.withEvan .carEvan{display:inline}#mel .bikeEvan{display:none}#mel.withEvan .bikeEvan{display:inline}
 
 .storycue{display:none}.npc.story .storycue{display:inline}.npc.story .storycue > g{animation:cuebob 1.6s ease-in-out infinite}@keyframes cuebob{50%{transform:translateY(-3px)}}@media (prefers-reduced-motion:reduce){.npc.story .storycue > g{animation:none}}
