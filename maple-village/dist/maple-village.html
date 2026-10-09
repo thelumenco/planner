@@ -2776,15 +2776,15 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     toShoreB: { scene: "bay", name: "Boardwalk to the foreshore", door: [250, 622], spot: true, bridge: "shore", mark: [290, 560], line: "Down the boardwalk to the foreshore." },
     scoopshop: { scene: "bay", name: "The Scoop Shack", short: "the Scoop Shack", door: [386, 262], mark: [386, 96] },
     // round 112: Friday evenings at the bay (the fire pit on the beach; the fishmonger's van 5 to 10pm), and kite flying on the field
-    bonfire: { scene: "bay", name: "The bonfire", door: [198, 566], spot: true, line: "A fire pit on the beach. On Friday nights there's a bonfire." },
+    bonfire: { scene: "bay", name: "The bonfire", door: [404, 392], spot: true, line: "A fire pit on the beach. On Friday nights there's a bonfire." },
     fishvan: { scene: "bay", name: "The fishmonger's van", door: [330, 620], spot: true, line: "Sal's fish van parks here on Friday evenings." },
-    // round 113: the Friday market at the bay (4:30 to 8) and movie night on the field (the last Friday, 7:30 to 9:30)
-    bm0: { scene: "bay", name: "Market stall", door: [300, 396], spot: true, line: "A market stall." },
-    bm1: { scene: "bay", name: "Market stall", door: [362, 396], spot: true, line: "A market stall." },
-    bm2: { scene: "bay", name: "Market stall", door: [424, 396], spot: true, line: "A market stall." },
-    kites: { scene: "bay", name: "Hiro's kites", door: [214, 450], spot: true, line: "Kites!" },
-    screen: { scene: "field", name: "The outdoor cinema", door: [150, 560], spot: true, line: "Movie night." },
-    popcorn: { scene: "field", name: "Popcorn cart", door: [262, 500], spot: true, line: "Popcorn." },
+    // round 113: the Friday market (4:30 to 7:15) and movie night (the last Friday, 7:30 to 9:30), both on the field where the Sunday market stands
+    bm0: { scene: "field", name: "Market stall", door: [156, 156], spot: true, line: "A market stall." },
+    bm1: { scene: "field", name: "Market stall", door: [236, 156], spot: true, line: "A market stall." },
+    bm2: { scene: "field", name: "Market stall", door: [316, 156], spot: true, line: "A market stall." },
+    kites: { scene: "field", name: "Hiro's kites", door: [380, 162], spot: true, line: "Kites!" },
+    screen: { scene: "field", name: "The outdoor cinema", door: [236, 240], spot: true, line: "Movie night." },
+    popcorn: { scene: "field", name: "Popcorn cart", door: [406, 196], spot: true, line: "Popcorn." },
     kitefly: { scene: "field", name: "Kite flying", door: [440, 330], spot: true, line: "Open grass and a good breeze off the sea: the place to fly a kite." },
     deck: { scene: "bay", name: "The deck", door: [215, 412], spot: true, line: "The deck, looking out over the foreshore. Bring an ice cream." },
     hfreezer: { scene: "bay", name: "Honesty freezer", door: [432, 290], spot: true, line: "The honesty freezer: little cups while the shop's shut." },
@@ -5422,45 +5422,33 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var aperitivoNow = (day, hm2) => isFri(day) && hm2 >= APERITIVO[0] && hm2 < APERITIVO[1];
   var vanNow = (day, hm2) => isFri(day) && hm2 >= VAN[0] && hm2 < VAN[1];
   var bonfireNow = (day, hm2) => isFri(day) && hm2 >= BONFIRE[0] && hm2 < BONFIRE[1];
-  var FIRE = [196, 506];
-  var LOGS = { dad: [[148, 506], 1], mum: [[166, 478], 1], gonggong: [[196, 468], 1], mama: [[226, 478], -1], marcus: [[244, 506], -1], angelina: [[154, 536], 1], darren: [[238, 538], -1] };
+  var FIRE = [404, 350];
+  var LOGS = { dad: [[356, 358], 1], gonggong: [[454, 358], -1], mum: [[344, 386], 1], mama: [[466, 386], -1], marcus: [[374, 410], 1], angelina: [[436, 410], -1], darren: [[322, 404], 1] };
   var BONFIRE_FAMILY = { dad: 19 * 60, mum: 19 * 60, gonggong: 19 * 60, mama: 19 * 60, marcus: 19 * 60 + 30, angelina: 19 * 60 + 30, darren: 21 * 60 + 30 };
   var MOVIE = [19 * 60 + 30, 21 * 60 + 30];
-  var BAYMKT = [16 * 60 + 30, 20 * 60];
+  var BAYMKT = [16 * 60 + 30, 19 * 60 + 15];
   var lastFriday = (day) => {
     const dt = /* @__PURE__ */ new Date(day + "T00:00:00Z");
     return dt.getUTCDay() === 5 && new Date(dt.getTime() + 7 * 864e5).getUTCMonth() !== dt.getUTCMonth();
   };
   var movieNow = (day, hm2) => lastFriday(day) && hm2 >= MOVIE[0] && hm2 < MOVIE[1];
-  var SCREEN = [130, 436];
-  var BLANKET = {
-    mum: [96, 486],
-    dad: [124, 488],
-    mama: [152, 486],
-    gonggong: [180, 490],
-    marcus: [108, 524],
-    angelina: [136, 526],
-    darren: [168, 526],
-    lin: [212, 500],
-    opal: [236, 504],
-    theo: [214, 532],
-    hana: [240, 534]
-  };
+  var SCREEN = [236, 128];
+  var BLANKET = { mum: [146, 210], dad: [176, 212], mama: [206, 210], gonggong: [236, 212], marcus: [266, 210], angelina: [296, 212], darren: [326, 210] };
   function movieSlot(id, day, hm2) {
     if (!movieNow(day, hm2) || !BLANKET[id] || awayToday(day).includes(id)) return null;
-    return { from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: id === "hana" || id === "opal" ? -1 : 1, movie: true };
+    return { from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: 1, movie: true };
   }
   var bayMarketNow = (day, hm2) => dow(day) === 5 && hm2 >= BAYMKT[0] && hm2 < BAYMKT[1];
-  var BAY_STALLS = [[300, 376], [362, 376], [424, 376]];
-  var KITE_SELLER = [186, 438];
+  var BAY_STALLS = [[156, 128], [236, 128], [316, 128]];
+  var KITE_SELLER = [396, 150];
   var bayKeepers = (day) => groupFor(day + ":baymkt", 3, [], NIGHT_TOURISTS);
   function bayMarketSlot(id, day, hm2) {
     if (!bayMarketNow(day, hm2)) return null;
-    if (id === "hiro") return { from: BAYMKT[0], to: BAYMKT[1], scene: "bay", at: KITE_SELLER, dir: 1, act: "kites" };
+    if (id === "hiro") return { from: BAYMKT[0], to: BAYMKT[1], scene: "field", at: KITE_SELLER, dir: -1, act: "kites" };
     const k = bayKeepers(day).indexOf(id);
     if (k < 0) return null;
     const [x, y] = BAY_STALLS[k];
-    return { from: BAYMKT[0], to: BAYMKT[1], scene: "bay", at: [x + 4, y - 10], dir: 1 };
+    return { from: BAYMKT[0], to: BAYMKT[1], scene: "field", at: [x + 3, y - 9], dir: 1 };
   }
   function bonfireSlot(id, day, hm2) {
     if (!bonfireNow(day, hm2) || awayToday(day).includes(id)) return null;
@@ -6148,7 +6136,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["noa", "Noa", { skin: "#F2D3BC", hair: "#D9B46A", hairStyle: "long", top: "#F28C6A", bottom: "#2F3B73" }],
       ["jun", "Jun", { skin: "#EAC4A4", hair: "#231C19", hairStyle: "short", top: "#3E6B8C", bottom: "#5E5A55", extra: "satchel" }],
       ["bea", "Bea", { skin: "#C99A78", hair: "#2A211D", hairStyle: "bun", top: "#F3C969", bottom: "#4A5568" }],
-      ["omar", "Omar", { skin: "#A8754F", hair: "#1F1A17", hairStyle: "short", top: "#F6F2EA", bottom: "#3F4A6B", extra: "glasses" }],
+      ["omar", "Ezra", { skin: "#A8754F", hair: "#1F1A17", hairStyle: "short", top: "#F6F2EA", bottom: "#3F4A6B", extra: "glasses" }],
       ["lucy", "Lucy", { skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#9C8CD9", bottom: "#5E6E8C" }],
       ["tae", "Tae", { skin: "#F0D2B6", hair: "#1F1A17", hairStyle: "spiky", top: "#E8566C", bottom: "#2F2B28", hat: "cap" }],
       ["ivy", "Ivy", { skin: "#D9A882", hair: "#3A2A22", hairStyle: "long", top: "#9CC27E", bottom: "#3E4A43" }],
@@ -16421,12 +16409,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
 
   // src/art/friday.js
-  var LOG_AT = [[148, 514], [166, 486], [196, 476], [226, 486], [244, 514], [154, 544], [238, 546]];
   function bonfireArt(x, y, lit2) {
-    const logs = LOG_AT.map(([lx, ly]) => sk(`<rect x="${lx - 14}" y="${ly - 5}" width="28" height="9" rx="4" style="fill:#8A6A52"/>`, `<rect x="${lx - 14}" y="${ly - 5}" width="28" height="9" rx="4"/><circle cx="${lx - 10}" cy="${ly - 0.5}" r="2.4"/>`)).join("");
     const fire = lit2 ? lampGlow(x, y - 10, 70) + `<g pointer-events="none">${[0, 1, 2].map((i) => `<path d="M${x - 12 + i * 12} ${y - 2} q${-6 + i * 3} -16 ${2 - i} -30 q${8 - i * 2} 14 ${4} 30z" style="fill:${["#F28C28", "#F3C969", "#E8566C"][i]};stroke:var(--line)" stroke-width=".8"><animateTransform attributeName="transform" type="scale" values="1 1;1.05 1.12;.96 .94;1 1" dur="${0.8 + i * 0.2}s" repeatCount="indefinite" additive="sum"/></path>`).join("")}
     ${[0, 1, 2, 3].map((i) => `<circle cx="${x - 6 + i * 4}" cy="${y - 30}" r="1.4" fill="#F3C969"><animate attributeName="cy" values="${y - 30};${y - 70}" dur="${1.6 + i * 0.4}s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="${1.6 + i * 0.4}s" repeatCount="indefinite"/></circle>`).join("")}</g>` : "";
-    return `<g data-place="bonfire" aria-label="The bonfire"><ellipse class="hov" cx="${x}" cy="${y}" rx="44" ry="18" style="fill:var(--butter)"/>${logs}
+    return `<g data-place="bonfire" aria-label="The bonfire"><ellipse class="hov" cx="${x}" cy="${y}" rx="44" ry="18" style="fill:var(--butter)"/>
     ${sk(`<circle cx="${x}" cy="${y}" r="16" style="fill:#B9B0A4"/><path d="M${x - 14} ${y + 2} l28 -6 M${x - 12} ${y - 6} l26 8" style="stroke:#5A4636" stroke-width="5"/>`, `<circle cx="${x}" cy="${y}" r="16"/>`)}
     ${fire}${tapeLabel(x, y + 66, lit2 ? "Bonfire" : "Fire pit", "#F3C969", 10)}</g>`;
   }
@@ -16461,18 +16447,19 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     ${tapeLabel(x, y + 18, "Kites", "#DCEBF6", 9)}</g>`;
   }
   function movieArt(sx, sy, film) {
-    const scr = `<g data-place="screen" aria-label="The outdoor cinema"><ellipse class="hov" cx="${sx}" cy="${sy + 50}" rx="80" ry="14" style="fill:var(--butter)"/>
+    const scr = `<g data-place="screen" aria-label="The outdoor cinema"><ellipse class="hov" cx="${sx}" cy="${sy + 8}" rx="80" ry="14" style="fill:var(--butter)"/>
     ${sk(`<rect x="${sx - 66}" y="${sy - 88}" width="132" height="76" style="fill:#FFFDF6"/><path d="M${sx - 70} ${sy} V${sy - 92} M${sx + 70} ${sy} V${sy - 92}" style="stroke:#8A6A52" stroke-width="4"/>`, `<rect x="${sx - 66}" y="${sy - 88}" width="132" height="76"/>`)}
     <g pointer-events="none"><rect x="${sx - 62}" y="${sy - 84}" width="124" height="68" fill="#2E3A55"/><circle cx="${sx + 34}" cy="${sy - 70}" r="7" fill="#FFF3C4"/><path d="M${sx - 62} ${sy - 30} q30 -14 62 -4 t62 -6 V${sy - 16} H${sx - 62}z" fill="#5E7A5A"/>
       <g><path d="M${sx - 40} ${sy - 34} q4 -8 10 -4 q4 -6 8 0 l-2 6 h-14z" fill="#E8913A"/><animateTransform attributeName="transform" type="translate" values="0 0;60 0;0 0" dur="14s" repeatCount="indefinite"/></g>
       ${[0, 1, 2, 3].map((i) => `<circle cx="${sx - 40 + i * 24}" cy="${sy - 50 - i % 2 * 8}" r="1.6" fill="#F3E27A"><animate attributeName="opacity" values="1;.2;1" dur="${1.4 + i * 0.3}s" repeatCount="indefinite"/></circle>`).join("")}</g>
-    ${tapeLabel(sx, sy + 70, film, "#E7D9F2", 9)}</g>`;
-    const cart2 = `<g data-place="popcorn" aria-label="Popcorn cart"><ellipse class="hov" cx="262" cy="476" rx="26" ry="8" style="fill:var(--butter)"/>
+    ${tapeLabel(sx, sy + 14, film, "#E7D9F2", 9)}</g>`;
+    const cx = sx + 170, cy = sy + 50;
+    const cart2 = `<g data-place="popcorn" aria-label="Popcorn cart"><ellipse class="hov" cx="${cx}" cy="${cy + 6}" rx="26" ry="8" style="fill:var(--butter)"/>
     ${sk(
-      `<rect x="244" y="440" width="36" height="30" rx="3" style="fill:#E8566C"/><rect x="246" y="420" width="32" height="22" rx="2" style="fill:#FFF6DC"/><path d="M240 420 h44 l-4 -10 h-36z" style="fill:#FFFDF6"/><circle cx="250" cy="474" r="5" style="fill:#3A3430"/><circle cx="274" cy="474" r="5" style="fill:#3A3430"/>`,
-      `<rect x="244" y="440" width="36" height="30" rx="3"/><rect x="246" y="420" width="32" height="22" rx="2"/><path d="M240 420 h44 l-4 -10 h-36z"/>`
-    )}${tapeLabel(262, 494, "Popcorn", "#F6D3DC", 9)}</g>`;
-    const blankets = [[110, 494, "#F2A0B8"], [166, 498, "#7FB8E8"], [122, 532, "#F3C969"], [226, 518, "#9CC27E"]].map(([x, y, c]) => `<rect x="${x - 26}" y="${y - 10}" width="52" height="22" rx="3" style="fill:${c};stroke:var(--line)" stroke-width="1" opacity=".9" pointer-events="none"/>`).join("");
+      `<rect x="${cx - 18}" y="${cy - 30}" width="36" height="30" rx="3" style="fill:#E8566C"/><rect x="${cx - 16}" y="${cy - 50}" width="32" height="22" rx="2" style="fill:#FFF6DC"/><path d="M${cx - 22} ${cy - 50} h44 l-4 -10 h-36z" style="fill:#FFFDF6"/><circle cx="${cx - 12}" cy="${cy + 4}" r="5" style="fill:#3A3430"/><circle cx="${cx + 12}" cy="${cy + 4}" r="5" style="fill:#3A3430"/>`,
+      `<rect x="${cx - 18}" y="${cy - 30}" width="36" height="30" rx="3"/><rect x="${cx - 16}" y="${cy - 50}" width="32" height="22" rx="2"/><path d="M${cx - 22} ${cy - 50} h44 l-4 -10 h-36z"/>`
+    )}${tapeLabel(cx, cy + 24, "Popcorn", "#F6D3DC", 9)}</g>`;
+    const blankets = [[sx - 60, sy + 84, "#F2A0B8"], [sx, sy + 86, "#7FB8E8"], [sx + 60, sy + 84, "#F3C969"]].map(([x, y, c]) => `<rect x="${x - 26}" y="${y - 10}" width="52" height="22" rx="3" style="fill:${c};stroke:var(--line)" stroke-width="1" opacity=".9" pointer-events="none"/>`).join("");
     return blankets + scr + cart2;
   }
 
@@ -16672,7 +16659,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
 
   // src/game/friday.js
-  var VAN_GOODS = { worms: { n: "Five worms", price: 6, line: "For the bait tin. Wriggly." }, clams: { n: "Clams", price: 4, line: "For clams with garlic and lemon, at the kitchen." }, lemon: { n: "Lemon", price: 3, line: "For the clams, the posset, the gambas." } };
+  var VAN_GOODS = { worms: { n: "Five worms", price: 6, line: "For the bait tin. Wriggly." }, clams: { n: "Clams", price: 4, line: "For clams with garlic and lemon, at the kitchen." }, lemon: { n: "Lemon", price: 3, line: "For the clams, or a lemon and petal posset." } };
   var VAN_MULT = 1.5;
   function vanBuy(F2, id, addInv2) {
     const g = VAN_GOODS[id];
@@ -16710,7 +16697,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function bonfirePanel(F2, family) {
     const n = weekQuests(F2), done = lanternsDone(F2);
-    return `<span class="tape gingham" aria-hidden="true"></span><h2>The bonfire</h2><p class="sub">Driftwood crackling on the sand, logs to sit on, the sea going dark.${family ? ` ${esc(family)}.` : ""}</p>
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>The bonfire</h2><p class="sub">Driftwood crackling on the grass above the beach, the sea going dark.${family ? ` ${esc(family)}.` : ""}</p>
     <p>${done ? "The week's lanterns are already out over the sea." : n ? `<b>${n} quest${n > 1 ? "s" : ""}</b> finished this week: a paper lantern for each.` : "No quests this week. That's alright: one lantern anyway, for getting through it."}</p>
     <div class="actions">${done ? "" : `<button class="btn primary" data-fire="lanterns">Release the week's lanterns</button>`}<button class="btn alt" data-fire="sit">Sit by the fire</button></div>` + shut5;
   }
@@ -20168,7 +20155,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     townTick();
     {
-      const k = scene === "bay" ? `${bonfireNow(dayKey(), sgHM())}${vanNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : scene === "field" ? `${!!(S2.kite && S2.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}` : "";
+      const k = scene === "bay" ? `${bonfireNow(dayKey(), sgHM())}${vanNow(dayKey(), sgHM())}` : scene === "field" ? `${!!(S2.kite && S2.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : "";
       if (k !== lastFri) {
         lastFri = k;
         if (k) drawScene();
@@ -22214,7 +22201,7 @@ ${SIGNOFF[t2.who] || ""}`;
       h = bedPanel(F, ghBed);
     } else if (scene === "mill" && millOpen) {
       h = millPanel(F);
-    } else if (friView && scene === "bay" && (/^bm\d$/.test(friView) || friView === "kites")) {
+    } else if (friView && scene === "field" && (/^bm\d$/.test(friView) || friView === "kites")) {
       h = bayMarketPanel(friView);
     } else if (friView && (scene === "bay" || scene === "field")) {
       const fam = ["dad", "mum", "gonggong", "mama", "marcus", "angelina", "darren"].filter(isHere).map((n) => NPCS.find((d) => d.id === n).name);
@@ -22655,7 +22642,7 @@ ${SIGNOFF[t2.who] || ""}`;
       } else if (scene === "field" && fieldView) {
         buy2(id, stallPrice(id));
         ctx();
-      } else if (scene === "bay" && friView && (/^bm\d$/.test(friView) || friView === "kites")) {
+      } else if (scene === "field" && friView && (/^bm\d$/.test(friView) || friView === "kites")) {
         buy2(id, friView === "kites" ? ITEMS.kite.price : stallPrice(id));
         ctx();
       } else if (scene === "farm") plant4(selPlot, id);
@@ -23232,13 +23219,13 @@ ${SIGNOFF[t2.who] || ""}`;
   }
   var isFri2 = () => (/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).getUTCDay() === 5;
   function fridayLayer(sc) {
-    if (sc === "bay") return bonfireArt(FIRE[0], FIRE[1], bonfireNow(dayKey(), sgHM())) + (vanNow(dayKey(), sgHM()) ? fishVanArt(330, 600) : "") + (bayMarketNow(dayKey(), sgHM()) ? BAY_STALLS.map(([x, y], k) => bayStallArt(k, x, y, `${bayKeeperName(dayKey(), k)}'s stall`)).join("") + kiteSellerArt(KITE_SELLER[0] + 26, KITE_SELLER[1] + 4) : "");
-    if (sc === "field") return (movieNow(dayKey(), sgHM()) ? movieArt(SCREEN[0], SCREEN[1], filmOf(dayKey())) : "") + `<g data-place="kitefly" aria-label="Kite flying"><ellipse class="hov" cx="440" cy="334" rx="30" ry="9" style="fill:var(--butter)"/><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M452 336 v-46" stroke-width="2"/><path d="M452 292 l18 4 l-2 8 l-16 2z" style="fill:#E8913A"/><path d="M458 293 v12 M464 294 v10" style="stroke:#FFFDF6" stroke-width="2"/></g>${tapeLabel(440, 352, "Kite flying", "#DCEBF6", 9)}</g>` + (S2.kite && S2.kite.until > Date.now() ? kiteArt(S2.kite.x, S2.kite.y) : "");
+    if (sc === "bay") return bonfireArt(FIRE[0], FIRE[1], bonfireNow(dayKey(), sgHM())) + (vanNow(dayKey(), sgHM()) ? fishVanArt(330, 600) : "");
+    if (sc === "field") return (movieNow(dayKey(), sgHM()) ? movieArt(SCREEN[0], SCREEN[1], filmOf(dayKey())) : "") + (bayMarketNow(dayKey(), sgHM()) ? BAY_STALLS.map(([x, y], k) => bayStallArt(k, x, y, `${bayKeeperName(dayKey(), k)}'s stall`)).join("") + kiteSellerArt(KITE_SELLER[0] - 22, KITE_SELLER[1] + 4) : "") + `<g data-place="kitefly" aria-label="Kite flying"><ellipse class="hov" cx="440" cy="334" rx="30" ry="9" style="fill:var(--butter)"/><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M452 336 v-46" stroke-width="2"/><path d="M452 292 l18 4 l-2 8 l-16 2z" style="fill:#E8913A"/><path d="M458 293 v12 M464 294 v10" style="stroke:#FFFDF6" stroke-width="2"/></g>${tapeLabel(440, 352, "Kite flying", "#DCEBF6", 9)}</g>` + (S2.kite && S2.kite.until > Date.now() ? kiteArt(S2.kite.x, S2.kite.y) : "");
     return "";
   }
   function bayMarketPanel(v) {
     const kites2 = v === "kites", k = kites2 ? -1 : +v.slice(2), items = kites2 ? ["kite"] : bayStallGoods(dayKey(), k), who3 = kites2 ? "Hiro" : bayKeeperName(dayKey(), k);
-    return `<span class="tape gingham" aria-hidden="true"></span><h2>${kites2 ? "Hiro's kites" : `${esc(who3)}'s stall`}</h2><p class="sub">${kites2 ? '"Red, blue or yellow? They all fly. The breeze off the sea does the rest." Fly yours on the field, by the river.' : "The Friday market at the bay: a different mix every week."}</p>
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>${kites2 ? "Hiro's kites" : `${esc(who3)}'s stall`}</h2><p class="sub">${kites2 ? '"Red, blue or yellow? They all fly. The breeze off the sea does the rest." Fly yours over by the river, at the kite flying spot.' : "The Friday market on the field: a different mix every week."}</p>
     <div class="items shop">${items.map((id) => itemBtn(id, `<b>${kites2 ? ITEMS.kite.price : stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < (kites2 ? ITEMS.kite.price : stallPrice(id)), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -24340,7 +24327,7 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     if (/^bm\d$/.test(id) || id === "kites") {
       if (!bayMarketNow(dayKey(), sgHM())) {
-        speak("The Friday market's packed away. It's on Fridays, 4:30 to 8.", 4e3);
+        speak("The Friday market's packed away. It's on Fridays, 4:30 to 7:15, here on the field.", 4e3);
         render();
         return;
       }
