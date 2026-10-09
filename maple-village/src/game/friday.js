@@ -7,7 +7,7 @@ import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
 import { addBait, CATCH } from "./fishing.js";
 
-export const VAN_GOODS = {worms: {n: "Five worms", price: 6, line: "For the bait tin. Wriggly."}, clams: {n: "Clams", price: 4, line: "For clams with garlic and lemon, at the kitchen."}, lemon: {n: "Lemon", price: 3, line: "For the clams, the posset, the gambas."}};
+export const VAN_GOODS = {worms: {n: "Five worms", price: 6, line: "For the bait tin. Wriggly."}, clams: {n: "Clams", price: 4, line: "For clams with garlic and lemon, at the kitchen."}, lemon: {n: "Lemon", price: 3, line: "For the clams, or a lemon and petal posset."}};
 export const VAN_MULT = 1.5;
 export function vanBuy(F, id, addInv){
   const g = VAN_GOODS[id]; if (!g || F.coins < g.price) return null; F.coins -= g.price;
