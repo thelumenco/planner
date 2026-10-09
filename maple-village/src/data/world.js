@@ -96,12 +96,12 @@ export const VILLAGE = {
   toShoreB:{scene:"bay", name:"Boardwalk to the foreshore", door:[250,622], spot:true, bridge:"shore", mark:[290,560], line:"Down the boardwalk to the foreshore."},
   scoopshop:{scene:"bay", name:"The Scoop Shack", short:"the Scoop Shack", door:[386,262], mark:[386,96]},
   // round 112: Friday evenings at the bay (the fire pit on the beach; the fishmonger's van 5 to 10pm), and kite flying on the field
-  bonfire:{scene:"bay", name:"The bonfire", door:[198,566], spot:true, line:"A fire pit on the beach. On Friday nights there's a bonfire."},
+  bonfire:{scene:"bay", name:"The bonfire", door:[404,392], spot:true, line:"A fire pit on the beach. On Friday nights there's a bonfire."},
   fishvan:{scene:"bay", name:"The fishmonger's van", door:[330,620], spot:true, line:"Sal's fish van parks here on Friday evenings."},
-  // round 113: the Friday market at the bay (4:30 to 8) and movie night on the field (the last Friday, 7:30 to 9:30)
-  bm0:    {scene:"bay", name:"Market stall", door:[300,396], spot:true, line:"A market stall."}, bm1: {scene:"bay", name:"Market stall", door:[362,396], spot:true, line:"A market stall."},
-  bm2:    {scene:"bay", name:"Market stall", door:[424,396], spot:true, line:"A market stall."}, kites: {scene:"bay", name:"Hiro's kites", door:[214,450], spot:true, line:"Kites!"},
-  screen: {scene:"field", name:"The outdoor cinema", door:[150,560], spot:true, line:"Movie night."}, popcorn: {scene:"field", name:"Popcorn cart", door:[262,500], spot:true, line:"Popcorn."},
+  // round 113: the Friday market (4:30 to 7:15) and movie night (the last Friday, 7:30 to 9:30), both on the field where the Sunday market stands
+  bm0:    {scene:"field", name:"Market stall", door:[156,156], spot:true, line:"A market stall."}, bm1: {scene:"field", name:"Market stall", door:[236,156], spot:true, line:"A market stall."},
+  bm2:    {scene:"field", name:"Market stall", door:[316,156], spot:true, line:"A market stall."}, kites: {scene:"field", name:"Hiro's kites", door:[380,162], spot:true, line:"Kites!"},
+  screen: {scene:"field", name:"The outdoor cinema", door:[236,240], spot:true, line:"Movie night."}, popcorn: {scene:"field", name:"Popcorn cart", door:[406,196], spot:true, line:"Popcorn."},
   kitefly:{scene:"field", name:"Kite flying", door:[440,330], spot:true, line:"Open grass and a good breeze off the sea: the place to fly a kite."},
   deck:   {scene:"bay", name:"The deck", door:[215,412], spot:true, line:"The deck, looking out over the foreshore. Bring an ice cream."},
   hfreezer:{scene:"bay", name:"Honesty freezer", door:[432,290], spot:true, line:"The honesty freezer: little cups while the shop's shut."},

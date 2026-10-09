@@ -573,7 +573,7 @@ setInterval(() => {
   if (Date.now() - lastFarm > 20000) farmNow();
   { const l = bikeExpired(F); if (l) { speak(l, 4500); save(); } }
   townTick();
-  { const k = scene === "bay" ? `${bonfireNow(dayKey(), sgHM())}${vanNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : scene === "field" ? `${!!(S.kite && S.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}` : ""; if (k !== lastFri) { lastFri = k; if (k) drawScene(); } }
+  { const k = scene === "bay" ? `${bonfireNow(dayKey(), sgHM())}${vanNow(dayKey(), sgHM())}` : scene === "field" ? `${!!(S.kite && S.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : ""; if (k !== lastFri) { lastFri = k; if (k) drawScene(); } }
   if (scene === "mill") { const m = millState(F), k = m.press ? (pressLeft(m) ? "on" : "ready") : ""; if (k !== lastMill) { lastMill = k; drawScene(); if (millOpen) ctx(); } }
   if (outside() && skyKey() !== lastSky) { lastSky = skyKey(); drawScene(); }
   { const tk = outside() ? trainKey(scene) : ""; if (tk !== lastTrain) { lastTrain = tk; drawScene();   // a train coming through: draw it (it runs on from where it is)
@@ -1610,7 +1610,7 @@ function ctx(){
     h += `</div>`;
   } else if (scene === "greenhouse" && ghBed != null) { h = bedPanel(F, ghBed);
   } else if (scene === "mill" && millOpen) { h = millPanel(F);
-  } else if (friView && scene === "bay" && (/^bm\d$/.test(friView) || friView === "kites")) { h = bayMarketPanel(friView);
+  } else if (friView && scene === "field" && (/^bm\d$/.test(friView) || friView === "kites")) { h = bayMarketPanel(friView);
   } else if (friView && (scene === "bay" || scene === "field")) { const fam = ["dad", "mum", "gonggong", "mama", "marcus", "angelina", "darren"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
     h = friView === "van" ? vanPanel(F) : bonfirePanel(F, fam.length ? `${fam.join(", ").replace(/, ([^,]*)$/, " and $1")} ${fam.length > 1 ? "are" : "is"} round the fire` : "");
   } else if (scene === "farm" && selPlot != null) {
@@ -1758,7 +1758,7 @@ function ctx(){
     const id = b.dataset.id;
     if (scene === "market") { shopTab === "sell" ? sell(id) : buy(id); }
     else if (scene === "field" && fieldView) { buy(id, stallPrice(id)); ctx(); }   // a market or fair stall
-    else if (scene === "bay" && friView && (/^bm\d$/.test(friView) || friView === "kites")) { buy(id, friView === "kites" ? ITEMS.kite.price : stallPrice(id)); ctx(); }   // the Friday bay market
+    else if (scene === "field" && friView && (/^bm\d$/.test(friView) || friView === "kites")) { buy(id, friView === "kites" ? ITEMS.kite.price : stallPrice(id)); ctx(); }   // the Friday bay market
     else if (scene === "farm") plant(selPlot, id);
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
@@ -1994,16 +1994,16 @@ function rideTaxi(to){
 // Friday evenings (round 112): the bonfire and the fish van at the bay, and a kite on the field
 const isFri = () => new Date(dayKey() + "T00:00:00Z").getUTCDay() === 5;
 function fridayLayer(sc){
-  if (sc === "bay") return bonfireArt(FIRE[0], FIRE[1], bonfireNow(dayKey(), sgHM())) + (vanNow(dayKey(), sgHM()) ? fishVanArt(330, 600) : "")
-    + (bayMarketNow(dayKey(), sgHM()) ? BAY_STALLS.map(([x, y], k) => bayStallArt(k, x, y, `${bayKeeperName(dayKey(), k)}'s stall`)).join("") + kiteSellerArt(KITE_SELLER[0] + 26, KITE_SELLER[1] + 4) : "");
-  if (sc === "field") return (movieNow(dayKey(), sgHM()) ? movieArt(SCREEN[0], SCREEN[1], filmOf(dayKey())) : "") + `<g data-place="kitefly" aria-label="Kite flying"><ellipse class="hov" cx="440" cy="334" rx="30" ry="9" style="fill:var(--butter)"/><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M452 336 v-46" stroke-width="2"/><path d="M452 292 l18 4 l-2 8 l-16 2z" style="fill:#E8913A"/><path d="M458 293 v12 M464 294 v10" style="stroke:#FFFDF6" stroke-width="2"/></g>${tapeLabel(440, 352, "Kite flying", "#DCEBF6", 9)}</g>`
+  if (sc === "bay") return bonfireArt(FIRE[0], FIRE[1], bonfireNow(dayKey(), sgHM())) + (vanNow(dayKey(), sgHM()) ? fishVanArt(330, 600) : "");
+  if (sc === "field") return (movieNow(dayKey(), sgHM()) ? movieArt(SCREEN[0], SCREEN[1], filmOf(dayKey())) : "")
+    + (bayMarketNow(dayKey(), sgHM()) ? BAY_STALLS.map(([x, y], k) => bayStallArt(k, x, y, `${bayKeeperName(dayKey(), k)}'s stall`)).join("") + kiteSellerArt(KITE_SELLER[0] - 22, KITE_SELLER[1] + 4) : "") + `<g data-place="kitefly" aria-label="Kite flying"><ellipse class="hov" cx="440" cy="334" rx="30" ry="9" style="fill:var(--butter)"/><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M452 336 v-46" stroke-width="2"/><path d="M452 292 l18 4 l-2 8 l-16 2z" style="fill:#E8913A"/><path d="M458 293 v12 M464 294 v10" style="stroke:#FFFDF6" stroke-width="2"/></g>${tapeLabel(440, 352, "Kite flying", "#DCEBF6", 9)}</g>`
     + (S.kite && S.kite.until > Date.now() ? kiteArt(S.kite.x, S.kite.y) : "");
   return "";
 }
 // a stall at the Friday bay market (or Hiro's kites on the beach)
 function bayMarketPanel(v){
   const kites = v === "kites", k = kites ? -1 : +v.slice(2), items = kites ? ["kite"] : bayStallGoods(dayKey(), k), who = kites ? "Hiro" : bayKeeperName(dayKey(), k);
-  return `<span class="tape gingham" aria-hidden="true"></span><h2>${kites ? "Hiro's kites" : `${esc(who)}'s stall`}</h2><p class="sub">${kites ? "\"Red, blue or yellow? They all fly. The breeze off the sea does the rest.\" Fly yours on the field, by the river." : "The Friday market at the bay: a different mix every week."}</p>
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>${kites ? "Hiro's kites" : `${esc(who)}'s stall`}</h2><p class="sub">${kites ? "\"Red, blue or yellow? They all fly. The breeze off the sea does the rest.\" Fly yours over by the river, at the kite flying spot." : "The Friday market on the field: a different mix every week."}</p>
     <div class="items shop">${items.map(id => itemBtn(id, `<b>${kites ? ITEMS.kite.price : stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < (kites ? ITEMS.kite.price : stallPrice(id)), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
@@ -2349,7 +2349,7 @@ function arriveVillageSpot(id){
     else speak(isFri() && sgHM() < 19*60 ? "The bonfire's lit at seven tonight. Bring the family." : "A fire pit on the sand. On Friday nights there's a bonfire here, 7 to 10.", 4500); render(); return; }
   if (id === "fishvan") { if (vanNow(dayKey(), sgHM())) { friView = "van"; sfx("paper", true); } else speak("Sal's fish van parks here on Friday evenings, five till ten.", 4000); render(); return; }
   if (id === "kitefly") { flyKite(); return; }
-  if (/^bm\d$/.test(id) || id === "kites") { if (!bayMarketNow(dayKey(), sgHM())) { speak("The Friday market's packed away. It's on Fridays, 4:30 to 8.", 4000); render(); return; } friView = id; sfx("paper", true); render(); return; }
+  if (/^bm\d$/.test(id) || id === "kites") { if (!bayMarketNow(dayKey(), sgHM())) { speak("The Friday market's packed away. It's on Fridays, 4:30 to 7:15, here on the field.", 4000); render(); return; } friView = id; sfx("paper", true); render(); return; }
   if (id === "screen") { if (!movieNow(dayKey(), sgHM())) { render(); return; } mel.sitting = true; nodes.mel.classList.add("sit"); sfx("paper", true); gainXp(S.movieDay !== dayKey() ? 1 : 0); S.movieDay = dayKey();
     speak(`Movie night: "${filmOf(dayKey())}". Blankets, the dark, the whole village laughing at the same bits.`, 6000); if (evanHere() && !evanNight()) setTimeout(() => evanSays(pick(["shh Mama, it's starting!", "is it a fox? IT'S A FOX!", "popcorn please?"])), 2000); render(); return; }
   if (id === "popcorn") { if (!movieNow(dayKey(), sgHM())) { render(); return; } if (F.coins < 3) { speak("Popcorn's 3 coins.", 2500); return; } F.coins -= 3; addInv("popcorn", 1); sfx("pop"); speak("A paper cone of popcorn, still warm. (It's in your backpack: give it to someone, or Evan.)", 4500); save(); render(); return; }

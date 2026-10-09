@@ -306,32 +306,33 @@ const isFri = day => dow(day) === 5;
 export const aperitivoNow = (day, hm) => isFri(day) && hm >= APERITIVO[0] && hm < APERITIVO[1];
 export const vanNow = (day, hm) => isFri(day) && hm >= VAN[0] && hm < VAN[1];
 export const bonfireNow = (day, hm) => isFri(day) && hm >= BONFIRE[0] && hm < BONFIRE[1];
-// the logs round the fire (the fire's at FIRE on the bay beach)
-export const FIRE = [196, 506];
-// round the fire: along the back and the sides (nobody sits in front of the flames)
-const LOGS = {dad: [[148, 506], 1], mum: [[166, 478], 1], gonggong: [[196, 468], 1], mama: [[226, 478], -1], marcus: [[244, 506], -1], angelina: [[154, 536], 1], darren: [[238, 538], -1]};
+// where everyone sits round the fire (the fire is at FIRE, on the grass above the beach)
+export const FIRE = [404, 350];   // on the grass between the Scoop Shack and the old shopfront, well back from the sea
+// round the fire, sitting on the grass: along the back and the sides (nobody in front of the flames)
+const LOGS = {dad: [[356, 358], 1], gonggong: [[454, 358], -1], mum: [[344, 386], 1], mama: [[466, 386], -1], marcus: [[374, 410], 1], angelina: [[436, 410], -1], darren: [[322, 404], 1]};
 const BONFIRE_FAMILY = {dad: 19*60, mum: 19*60, gonggong: 19*60, mama: 19*60, marcus: 19*60 + 30, angelina: 19*60 + 30, darren: 21*60 + 30};
 // Round 113: movie night on the field, the last Friday of the month, 7:30 to 9:30 (the family's on the blankets
-// instead of round the bonfire that night); and a little Friday market at the bay, 4:30 to 8: three stalls with a
+// instead of round the bonfire that night); and a little Friday market on the field, 4:30 to 7:15 (a quarter of an hour before the film): three stalls with a
 // different mix every week, and Hiro selling kites on the beach.
-export const MOVIE = [19*60 + 30, 21*60 + 30], BAYMKT = [16*60 + 30, 20*60];
+export const MOVIE = [19*60 + 30, 21*60 + 30], BAYMKT = [16*60 + 30, 19*60 + 15];   // the market packs up a quarter of an hour before the film
 export const lastFriday = day => { const dt = new Date(day + "T00:00:00Z"); return dt.getUTCDay() === 5 && new Date(dt.getTime() + 7*864e5).getUTCMonth() !== dt.getUTCMonth(); };
 export const movieNow = (day, hm) => lastFriday(day) && hm >= MOVIE[0] && hm < MOVIE[1];
-export const SCREEN = [130, 436];   // the screen on the field (its bottom middle)
-const BLANKET = {mum: [96, 486], dad: [124, 488], mama: [152, 486], gonggong: [180, 490], marcus: [108, 524], angelina: [136, 526], darren: [168, 526],
-  lin: [212, 500], opal: [236, 504], theo: [214, 532], hana: [240, 534]};
+export const SCREEN = [236, 128];   // the screen stands where the Sunday market's stalls go, along the top of the field
+// just the family, in one tidy row on the blankets (kept small so the field stays calm)
+const BLANKET = {mum: [146, 210], dad: [176, 212], mama: [206, 210], gonggong: [236, 212], marcus: [266, 210], angelina: [296, 212], darren: [326, 210]};
 export function movieSlot(id, day, hm){
   if (!movieNow(day, hm) || !BLANKET[id] || awayToday(day).includes(id)) return null;
-  return {from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: id === "hana" || id === "opal" ? -1 : 1, movie: true};
+  return {from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: 1, movie: true};
 }
 export const bayMarketNow = (day, hm) => dow(day) === 5 && hm >= BAYMKT[0] && hm < BAYMKT[1];
-export const BAY_STALLS = [[300, 376], [362, 376], [424, 376]], KITE_SELLER = [186, 438];
+// (the "bay market" lives on the field now, where the Sunday market stands: Mel asked for the bay to stay calm)
+export const BAY_STALLS = [[156, 128], [236, 128], [316, 128]], KITE_SELLER = [396, 150];
 export const bayKeepers = day => groupFor(day + ":baymkt", 3, [], NIGHT_TOURISTS);
 export function bayMarketSlot(id, day, hm){
   if (!bayMarketNow(day, hm)) return null;
-  if (id === "hiro") return {from: BAYMKT[0], to: BAYMKT[1], scene: "bay", at: KITE_SELLER, dir: 1, act: "kites"};
+  if (id === "hiro") return {from: BAYMKT[0], to: BAYMKT[1], scene: "field", at: KITE_SELLER, dir: -1, act: "kites"};
   const k = bayKeepers(day).indexOf(id); if (k < 0) return null;
-  const [x, y] = BAY_STALLS[k]; return {from: BAYMKT[0], to: BAYMKT[1], scene: "bay", at: [x + 4, y - 10], dir: 1};
+  const [x, y] = BAY_STALLS[k]; return {from: BAYMKT[0], to: BAYMKT[1], scene: "field", at: [x + 3, y - 9], dir: 1};
 }
 export function bonfireSlot(id, day, hm){
   if (!bonfireNow(day, hm) || awayToday(day).includes(id)) return null;
