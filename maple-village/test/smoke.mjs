@@ -2487,8 +2487,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(/Too soon/.test(await page.locator("#ctx").textContent()) && await fox().then(f => f.fish.bait === 2), "reel in before the bite and it's gone (with the worm)");
   await page.click('#ctx [data-fish="cast"]'); await page.waitForSelector("#ctx .fbar", { timeout: 9000 });
   check(await page.locator("#world #melRod").isVisible(), "Mel holds her rod while she's fishing");
-  await page.waitForFunction(() => { const e = document.querySelector("#ctx .fbar"); if (!e) return true; const q = ((Date.now() - +e.dataset.t0)/+e.dataset.dur) % 2, m = q < 1 ? q : 2 - q; return Math.abs(m - +e.dataset.at) < +e.dataset.w/2 - .03; }, null, { polling: 10, timeout: 5000 });
-  await page.click('#ctx [data-fish="reel"]'); await page.waitForTimeout(300);
+  await page.waitForFunction(() => { const e = document.querySelector("#ctx .fbar"); if (!e) return true; const q = ((Date.now() - +e.dataset.t0)/+e.dataset.dur) % 2, m = q < 1 ? q : 2 - q; if (Math.abs(m - +e.dataset.at) >= +e.dataset.w/2 - .03) return false; document.querySelector('#ctx [data-fish="reel"]').click(); return true; }, null, { polling: 10, timeout: 5000 });   // reel the instant it's in the green (a separate click can miss it on a busy machine)
+  await page.waitForTimeout(300);
   const f1 = await fox(), got = Object.keys(f1.fish.caught);
   check(got.length === 1 && ["roach", "trout", "perch", "boot"].includes(got[0]) && /New in the journal/.test(await page.locator("#ctx .fcatch").textContent()), "reel while the marker's in the green and it's landed: a river fish, new in the journal");
   check(["boot"].includes(got[0]) || (f1.inv[got[0] === "trout" ? "trout" : "fish"] || 0) >= 1, "and it's in the backpack (trout for the kitchen, others as fish)");

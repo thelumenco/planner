@@ -9328,8 +9328,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const ol = v.olive, ripe = ol && Date.now() - (ol.pickedAt || ol.planted) >= 8 * 36e5;
     const olive = `<g data-place="olive" aria-label="Olive tree"><ellipse class="hov" cx="250" cy="258" rx="34" ry="9" style="fill:var(--butter)"/>${ol ? `<g filter="url(#wob)">${oliveTree(250, 254, 1, ripe ? "ripe" : "growing")}</g>` + (ripe ? `<g class="twinkle" pointer-events="none"><path d="M276 196 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" stroke="#3b3530" stroke-width="1"/></g>` : "") : sk(`<ellipse cx="250" cy="252" rx="16" ry="5" style="fill:#9C7A5C"/>`, `<ellipse cx="250" cy="252" rx="16" ry="5"/><path d="M262 252 v-18 M256 236 h14 v8 h-14z"/>`)}${tapeLabel(250, 276, "Olive tree", "var(--sage)", 10)}</g>`;
     const gv = v.grove, gripe = gv && Date.now() - (gv.pickedAt || gv.planted) >= 8 * 36e5;
-    const grove = gv ? `<g data-place="grove" aria-label="The olive grove"><ellipse class="hov" cx="125" cy="92" rx="100" ry="12" style="fill:var(--butter)"/><g filter="url(#wob)">${[50, 100, 150, 200].map((x) => oliveTree(x, 92, 0.62, gripe ? "ripe" : "growing")).join("")}</g>${tapeLabel(125, 110, "Olive grove", "var(--sage)", 10)}</g>` : "";
-    return lampDefs + ground + gate3 + lgate + grove + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive + shedArt(v) + shopArt(v) + potsIn("vineyard") + stallArt() + sign + v.rows.map((row3, r) => rowArt(row3, r)).join("") + playArt() + (v.terrace ? sk(
+    const grove2 = gv ? `<g data-place="grove" aria-label="The olive grove"><ellipse class="hov" cx="125" cy="92" rx="100" ry="12" style="fill:var(--butter)"/><g filter="url(#wob)">${[50, 100, 150, 200].map((x) => oliveTree(x, 92, 0.62, gripe ? "ripe" : "growing")).join("")}</g>${tapeLabel(125, 110, "Olive grove", "var(--sage)", 10)}</g>` : "";
+    return lampDefs + ground + gate3 + lgate + grove2 + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive + shedArt(v) + shopArt(v) + potsIn("vineyard") + stallArt() + sign + v.rows.map((row3, r) => rowArt(row3, r)).join("") + playArt() + (v.terrace ? sk(
       `<path d="M466 132 h48 l-4 -10 h-40z" style="fill:#9CC27E"/><ellipse cx="478" cy="196" rx="11" ry="4" style="fill:#FFFDF6"/><ellipse cx="502" cy="206" rx="11" ry="4" style="fill:#FFFDF6"/><circle cx="474" cy="128" r="2.4" style="fill:#6B2A55"/><circle cx="500" cy="128" r="2.4" style="fill:#6B2A55"/>`,
       `<path d="M466 132 h48 l-4 -10 h-40z M470 132 v80 M510 132 v80"/><ellipse cx="478" cy="196" rx="11" ry="4"/><path d="M478 200 v12 M502 210 v10"/><ellipse cx="502" cy="206" rx="11" ry="4"/>`
     ) : "") + ((festivalOn(G3.day()) || {}).id === "harvest" ? bunting(214, 318, 466, 318, ["#8E2C48", "#F3C969", "#9CC27E"]) + bunting(214, 498, 466, 498, ["#F3C969", "#8E2C48", "#F6E3C6"]) : "");
@@ -17810,10 +17810,26 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var flags = (pts, w = 40) => `<g filter="url(#wob)"><path d="${pts}" fill="none" style="stroke:${C2.stone}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/><path d="${pts}" fill="none" style="stroke:${C2.stone2}" stroke-width="${w - 4}" stroke-dasharray="10 12" stroke-linecap="butt" opacity=".35"/></g>`;
   var heron = (x, y) => `<g pointer-events="none" ${W9} stroke-width="1"><path d="M${x} ${y} v-12 M${x + 4} ${y} v-12" stroke-width="1.2"/><ellipse cx="${x + 2}" cy="${y - 18}" rx="8" ry="6" style="fill:#E6E8EC"/><path d="M${x + 8} ${y - 20} q6 -10 2 -18" style="fill:none;stroke:#E6E8EC" stroke-width="3"/><path d="M${x + 8} ${y - 20} q6 -10 2 -18" fill="none"/><path d="M${x + 10} ${y - 38} l9 2 l-9 2z" style="fill:#E8B13A"/></g>`;
   var koi = (pts) => `<g pointer-events="none" ${W9} stroke-width=".7">${pts.map(([x, y, c], i) => `<g transform="translate(${x} ${y})"><g><path d="M-7 0 q7 -5 13 0 q-6 5 -13 0z M6 0 l5 -3 v6z" style="fill:${c}"/><animateTransform attributeName="transform" type="translate" values="0 0;${i % 2 ? 18 : -16} 4;0 0" dur="${8 + i * 2}s" repeatCount="indefinite"/></g></g>`).join("")}</g>`;
-  var stalks = (x0, x1, y0, y1, n, seed2 = 0) => `<g pointer-events="none">${Array.from({ length: n }, (_, i) => {
-    const x = x0 + (i * 37 + seed2 * 13) % (x1 - x0), c = i % 3 ? C2.bamboo : C2.bamboo2;
-    return `<path d="M${x} ${y1} V${y0}" style="stroke:${c}" stroke-width="${5 + i % 3}"/>${Array.from({ length: Math.floor((y1 - y0) / 46) }, (_2, k) => `<path d="M${x - 3} ${y1 - 30 - k * 46} h6" style="stroke:#5E8A3A" stroke-width="1.2"/>`).join("")}<path d="M${x} ${y0 + 20 + i % 4 * 40} q10 -6 18 -2 q-8 4 -18 2z M${x} ${y0 + 60 + i % 5 * 50} q-10 -6 -18 -2 q8 4 18 2z" style="fill:#9CC27E"/>`;
-  }).join("")}</g>`;
+  var leafSpray = (x, y, dir, sz, col) => `<g transform="translate(${x} ${y}) scale(${dir * sz} ${sz})">${[[-28, 1], [-8, 0.9], [14, 1.1], [36, 0.8], [58, 0.95]].map(([r, l]) => `<path d="M0 0 q${10 * l} -3 ${22 * l} 3 q${-10 * l} 2 ${-22 * l} -3z" transform="rotate(${r})" style="fill:${col}"/>`).join("")}<path d="M0 0 l-6 -2" style="stroke:#5E7A3A" stroke-width="1"/></g>`;
+  function grove(x0, x1) {
+    const w = x1 - x0, rnd4 = (i) => (i * 9301 + 49297) % 233280 / 233280;
+    const culm = (x, wd, col, hi, node, op = 1) => `<g opacity="${op}"><rect x="${x - wd / 2}" y="0" width="${wd}" height="640" style="fill:${col}"/>${wd > 5 ? `<rect x="${x - wd / 2 + 1.5}" y="0" width="${Math.max(1.5, wd * 0.22)}" height="640" style="fill:${hi}" opacity=".7"/>` : ""}
+    ${Array.from({ length: 13 }, (_, k) => {
+      const y = 30 + k * 50 + x * 7 % 22;
+      return `<path d="M${x - wd / 2 - 0.8} ${y} h${wd + 1.6}" style="stroke:${node}" stroke-width="${wd > 7 ? 1.8 : 1.1}"/><path d="M${x - wd / 2} ${y + 2.2} h${wd}" style="stroke:${hi}" stroke-width=".8" opacity=".8"/>`;
+    }).join("")}</g>`;
+    const back = `<rect x="${x0}" y="0" width="${w}" height="640" style="fill:#E4EAD0"/><g opacity=".5">${Array.from({ length: 7 }, (_, i) => `<ellipse cx="${x0 + rnd4(i + 3) * w}" cy="${40 + i * 92}" rx="40" ry="60" style="fill:#F7F2DC"/>`).join("")}</g>`;
+    const far = Array.from({ length: 13 }, (_, i) => culm(x0 + 4 + (i * 23 + 7) % (w - 8), 3, "#B9CB95", "#D6E2B8", "#9DB27A", 0.75)).join("");
+    const mid = Array.from({ length: 8 }, (_, i) => culm(x0 + 10 + (i * 41 + 15) % (w - 20), 6, "#93B35E", "#C2D79A", "#6E8B44")).join("");
+    const nearX = [x0 + 14, x0 + 44, x0 + 70, x0 + 98, x0 + 120].filter((x) => x < x1 - 4);
+    const near = nearX.map((x, i) => culm(x, 10 + i % 2 * 2, i % 2 ? "#6E9A44" : "#7BA64C", "#A9CB78", "#4E7330")).join("");
+    const shafts = `<g opacity=".28">${[30, 170, 330, 480].map((y) => `<path d="M${x0} ${y} L${x1} ${y + 70} V${y + 92} L${x0} ${y + 22}z" fill="#FFF6D8"/>`).join("")}</g>`;
+    const canopy = Array.from({ length: 16 }, (_, i) => leafSpray(x0 + 6 + rnd4(i) * (w - 12), 6 + rnd4(i + 40) * 70, i % 2 ? 1 : -1, 0.9 + rnd4(i + 9) * 0.5, i % 3 ? "#7FA850" : "#5E8A3A")).join("");
+    const sprays = nearX.flatMap((x, i) => [0, 1, 2].map((k) => leafSpray(x + (k % 2 ? 5 : -5), 150 + k * 170 + i * 31 % 90, k % 2 ? 1 : -1, 0.75, k % 2 ? "#8DB255" : "#6E9A44"))).join("");
+    const fx = x1 - 6, fence = `<rect x="${fx - 5}" y="0" width="14" height="640" style="fill:#A8865E"/>${Array.from({ length: 80 }, (_, i) => `<path d="M${fx - 4 + i % 4 * 3.5} ${i * 8} l${i % 3 - 1} 9" style="stroke:#7A5A3A" stroke-width="1"/>`).join("")}
+    ${Array.from({ length: 8 }, (_, i) => `<rect x="${fx - 7}" y="${30 + i * 82}" width="18" height="5" rx="2" style="fill:#5A4030"/>`).join("")}<path d="M${fx - 5} 0 V640 M${fx + 9} 0 V640" style="stroke:var(--line)" stroke-width="1"/>`;
+    return `<g pointer-events="none">${back}${far}${shafts}${mid}${near}${sprays}${canopy}${fence}</g>`;
+  }
   var defs = `<defs><pattern id="ktgrav" width="18" height="10" patternUnits="userSpaceOnUse"><rect width="18" height="10" fill="${C2.gravel}"/><circle cx="4" cy="3" r="1" fill="${C2.gravel2}"/><circle cx="12" cy="7" r="1.1" fill="${C2.gravel2}"/></pattern></defs>`;
   function stationScreen() {
     const ground = `<rect width="520" height="640" fill="url(#ktgrav)"/><g filter="url(#wash)" opacity=".7"><ellipse cx="320" cy="560" rx="160" ry="50" style="fill:#C9D3A8"/><ellipse cx="460" cy="250" rx="70" ry="60" style="fill:#C9D3A8"/></g>
@@ -17830,15 +17846,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     )}
     <rect x="300" y="90" width="64" height="16" rx="2" style="fill:${C2.paper};stroke:var(--line)" stroke-width="1"/><text x="332" y="102" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="10" fill="${C2.ink}" pointer-events="none">京都 KYOTO</text>
     ${chochin(276, 118)}${chochin(388, 118)}${lab(332, 182, "Station · trains home", "#C3DDF3", 10)}</g>`;
-    const grove = `<g pointer-events="none"><rect x="0" y="0" width="134" height="640" style="fill:#B9CC8E"/><g opacity=".35">${[40, 140, 260, 380, 500].map((y) => `<path d="M0 ${y} L134 ${y + 60} V${y + 80} L0 ${y + 20}z" fill="#FFF6D8"/>`).join("")}</g></g>
-    ${stalks(6, 128, 0, 640, 26, 1)}`;
+    const groveArt = grove(0, 136);
     const groveSpot = place("ktbamboo", 150, 420, 30, 14, "The bamboo grove", "", "Bamboo grove", 160, 446, "#DCEBC8");
     const yukata = `<g data-place="ktyukata" aria-label="The yukata shop"><ellipse class="hov" cx="440" cy="474" rx="40" ry="12" style="fill:var(--butter)"/>${machiya(380, 384, 120, 80, { noren: "#3E5E7A", sign: "YUKATA", doorX: 60 })}
     ${sk(`<path d="M392 430 l6 -14 h12 l6 14 l-4 30 h-16z" style="fill:#3E5E7A"/><path d="M466 430 l6 -14 h12 l6 14 l-4 30 h-16z" style="fill:#C8432F"/>${[0, 1, 2].map((i) => `<circle cx="${400 + i * 3}" cy="${440 + i * 6}" r="1.6" style="fill:#FFFDF6"/><circle cx="${474 + i * 3}" cy="${440 + i * 6}" r="1.6" style="fill:#F3C969"/>`).join("")}`, `<path d="M392 430 l6 -14 h12 l6 14 l-4 30 h-16z M466 430 l6 -14 h12 l6 14 l-4 30 h-16z"/>`)}
     ${lab(440, 492, "Yukata rental", "#E7D9F2", 10)}</g>`;
     const vend = `<g pointer-events="none">${sk(`<rect x="420" y="128" width="26" height="40" rx="2" style="fill:#C8432F"/><rect x="424" y="132" width="18" height="16" style="fill:#EAF6FA"/>${[0, 1, 2].map((i) => `<rect x="${426 + i * 5}" y="${136}" width="3" height="8" style="fill:${["#3E6BAE", "#F3C969", "#5E8A48"][i]}"/>`).join("")}`, `<rect x="420" y="128" width="26" height="40" rx="2"/>`)}</g>`;
     const trees = maple(214, 300, 1.1) + maple(470, 300, 0.9) + sakura(220, 560, 1) + maple(470, 600, 0.9) + toro(260, 420) + toro(410, 330, 0.9);
-    return defs + lampDefs + ground + grove + rail3 + st6 + vend + trees + groveSpot + yukata + seasonFx() + gate("ktToLane", 500, 300, "Higashiyama", 466, 262, "East along the tram line to the old lane and the pagoda") + gate("ktToRiver", 330, 616, "The river", 392, 604, "South to the river and the canal");
+    return defs + lampDefs + ground + groveArt + rail3 + st6 + vend + trees + groveSpot + yukata + seasonFx() + gate("ktToLane", 500, 300, "Higashiyama", 466, 262, "East along the tram line to the old lane and the pagoda") + gate("ktToRiver", 330, 616, "The river", 392, 604, "South to the river and the canal");
   }
   function laneScreen() {
     const ground = `<rect width="520" height="640" style="fill:#D9D0BC"/>${flags("M14 300 H200 Q260 300 280 250 L330 190 M280 250 Q300 400 330 470 V616", 46)}`;
