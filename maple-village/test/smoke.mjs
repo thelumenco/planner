@@ -18,6 +18,9 @@ execSync("node build.mjs --dev --once", { cwd: root, stdio: "inherit" });
 const shots = join(root, "test/shots"); mkdirSync(shots, { recursive: true });
 const url = pathToFileURL(join(root, "dist/dev.html")).href;
 const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM || undefined });
+// Most checks expect a reload to start at home base: pages opt out of "pick up where Mel left off" (core.js F.where)
+// unless they ask for it with newPage({resume: true}).
+{ const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, ...rest } = o; const pg = await np(rest); if (!resume) await pg.addInitScript(() => { window.__mapleNoResume = true; }); return pg; }; }
 const errors = [];
 const check = (cond, msg) => { if (!cond) { errors.push("FAIL: " + msg); console.log("  ✗ " + msg); } else console.log("  ✓ " + msg); };
 
@@ -2624,6 +2627,25 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=11:30&date=2026-10-31"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2500);
   check(await ids().then(a => ["mum", "dad", "mama", "gonggong"].every(x => a.includes(x))), "the field fair: Mum, Dad, Ma Ma and Gong Gong are there in the morning");
+  await page.close();
+}
+{
+  // Round 105: reopening the game the same day picks up where Mel left off; tulip bulbs on sale in autumn
+  console.log("\npicking up where you left off");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, resume: true });
+  page.on("pageerror", e => errors.push(`resume pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("hwoods")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="lookout"]').dispatchEvent("click"); await page.waitForTimeout(3500);
+  await page.goto(url + "?seed=1&time=12:30&date=2026-10-07"); await page.waitForTimeout(1500);
+  check(/Woods/.test(await page.locator("#sceneName").textContent()), "reopening the same day: back in Honeybrook Woods, where Mel left off");
+  await page.goto(url + "?seed=1&time=9:00&date=2026-10-08"); await page.waitForTimeout(1500);
+  check(/Home/.test(await page.locator("#sceneName").textContent()), "a new day: she wakes up at home");
+  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(800);
+  await page.locator('#world [data-place="market"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-shop="seeds"]', { timeout: 20000 });
+  await page.click('#ctx [data-shop="seeds"]'); await page.waitForTimeout(300);
+  check(await page.locator('#ctx .item[data-id="tulip_seed"]').count() === 1 && await page.locator('#ctx .item[data-id="sunflower_seed"]').count() === 1, "in autumn the seed shelf has tulip bulbs and sunflower seeds");
   await page.close();
 }
 await browser.close();
