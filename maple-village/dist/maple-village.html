@@ -24348,7 +24348,7 @@ ${SIGNOFF[t2.who] || ""}`;
     if (typing) persist("fox");
     else save2(scene === "vineyard" || scene === "wineshop");
   }
-  var stallItems = (st6) => !st6.produce ? todaysGoods(st6) : Object.keys(CROPS).filter((c) => !["tulip", "sunflower"].includes(c) && ITEMS[c] && Object.values(ITEMS).some((it) => it.crop === c && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
+  var stallItems = (st6) => !st6.produce ? todaysGoods(st6) : Object.keys(CROPS).filter((c) => !["tulip", "sunflower"].includes(c) && ITEMS[c] && !CROPS[c].herb && Object.values(ITEMS).some((it) => it.crop === c && !it.greenhouse && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
   function todaysGoods(st6, day = dayKey()) {
     const ev = eventOn(day), pool2 = [...(st6.items || []).slice(1), ...(POOLS[ev ? ev.kind : ""] || {})[st6.id] || []].filter((id) => ITEMS[id]);
     const n = Math.max(2, (st6.items || []).length);

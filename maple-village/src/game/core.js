@@ -2392,7 +2392,7 @@ function vineTick(){
 // what a stall has out: the produce stall's vegetables and berries follow the season (the same as the seed packets at Hana's)
 // A stall's goods today: its signature item (the first in tours.js) always, plus a different handful each market day
 // from the rest of its range (data/stall-goods.js POOLS), picked by the date so the day's mix stays put
-const stallItems = st => !st.produce ? todaysGoods(st) : Object.keys(CROPS).filter(c => !["tulip", "sunflower"].includes(c) && ITEMS[c] && Object.values(ITEMS).some(it => it.crop === c && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
+const stallItems = st => !st.produce ? todaysGoods(st) : Object.keys(CROPS).filter(c => !["tulip", "sunflower"].includes(c) && ITEMS[c] && !CROPS[c].herb && Object.values(ITEMS).some(it => it.crop === c && !it.greenhouse && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
 function todaysGoods(st, day = dayKey()){
   const ev = eventOn(day), pool = [...(st.items || []).slice(1), ...(((POOLS[ev ? ev.kind : ""] || {})[st.id]) || [])].filter(id => ITEMS[id]);
   const n = Math.max(2, (st.items || []).length);

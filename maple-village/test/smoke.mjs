@@ -1108,7 +1108,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const k = JSON.parse(localStorage.getItem("fox.fox")).kitchen; return !!k.oven && !k.larder.flour; }), "flour goes in the oven to bake");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="tapas"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-k="tapas"]').count() === 26, "the stove offers this season's tapas (26 in autumn: garden, seafood, farm and woods dishes)");
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 31, "the stove offers this season's tapas (31 in autumn: garden, seafood, farm, woods and greenhouse dishes)");
   await page.click('#ctx [data-k="tapas"][data-id="tortilla"]'); await page.waitForTimeout(200); await page.click('#ctx [data-k="cooktapas"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapasList[0].id === "tortilla" && f.vine.tapasList[0].plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
   await page.click('#ctx [data-k="dish"][data-dish="olives"]'); await page.waitForTimeout(300);
@@ -2478,7 +2478,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(got.length === 1 && ["roach", "trout", "perch", "boot"].includes(got[0]) && /New in the journal/.test(await page.locator("#ctx .fcatch").textContent()), "reel while the marker's in the green and it's landed: a river fish, new in the journal");
   check(["boot"].includes(got[0]) || (f1.inv[got[0] === "trout" ? "trout" : "fish"] || 0) >= 1, "and it's in the backpack (trout for the kitchen, others as fish)");
   await page.click('#ctx [data-fish="view"][data-k="journal"]'); await page.waitForTimeout(200);
-  check(await page.locator("#ctx li.locked").count() === 19 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, nineteen still to find, each with a hint (the golden koi at dusk)");
+  check(await page.locator("#ctx li.locked").count() === 20 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, twenty still to find, each with a hint (the golden koi at dusk)");
   await page.click('#ctx [data-fish="view"][data-k="fish"]'); await page.waitForTimeout(200);
   await page.click('#ctx [data-fish="cast"]'); await page.waitForSelector("#ctx .fbar", { timeout: 9000 }); await page.waitForTimeout(3700);
   check(/slipped away/.test(await page.locator("#ctx").textContent()) && await fox().then(f => f.fish.bait === 0), "wait too long after the bite and it slips away");
