@@ -6,7 +6,7 @@
 import { esc, plain, H, now } from "../util.js";
 import { NPCS } from "../data/npcs.js";
 import { ITEMS } from "../data/items.js";
-import { eventNow, wineClubNow } from "./tours.js";
+import { eventNow, wineClubNow, aperitivoNow } from "./tours.js";
 import { icon } from "../art/icons.js";
 import { DISHES, TAPAS, tapasPrice } from "./kitchen.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
@@ -209,18 +209,20 @@ export function sellTick(F, opts = {}){
     const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); const crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0);
     if (!onShelf.length && !open && !platesLeft(v) && !crate.length) continue;
     const food = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]), tap = tapasOn(v, new Date(at + off + 6*H).toISOString().slice(0, 10)).some(t => t.plates > 0);
-    const f = footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1) * (F.goals && F.goals.cellar ? 1.15 : 1);   // the cellar door (a big goal) draws a few more visitors
+    const f = (aperitivoNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm) ? 1.6 : 1) * footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1) * (F.goals && F.goals.cellar ? 1.15 : 1);   // the cellar door (a big goal) draws a few more visitors
     const gameDay = new Date(at + off + 6*H).toISOString().slice(0, 10);   // the game's day (it turns over at 2am)
+    const apero = aperitivoNow(gameDay, hm); if (apero) out.apero = true;   // Friday aperitivo hour: busier, and everyone wants a plate
     const plate = () => servePlate(v, gameDay, out);
     if (onShelf.length && Math.random() < .002*f) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; if (Math.random() < winePf(s)) { s.n--; out.bottles++; out.coins += s.price; } }
     if (Math.random() < .0016*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
-      const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s && Math.random() < winePf(s)) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); if (Math.random() < .6) plate(); } }
-    if (Math.random() < .001*f) plate();   // someone pops in just for a bite
+      const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s && Math.random() < winePf(s)) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); if (Math.random() < (apero ? .9 : .6)) plate(); } }
+    if (Math.random() < (apero ? .005 : .0016)*f) plate();   // someone pops in just for a bite (round 112: a bit more often, and lots more at aperitivo hour)
     if (crate.length && Math.random() < .0018*f) { const id = crate[Math.floor(Math.random()*crate.length)]; v.fruit[id]--; if (!v.fruit[id]) delete v.fruit[id]; out.fruit = (out.fruit || 0) + 1; out.coins += (ITEMS[id] && ITEMS[id].sell) || 3; }   // fruit from Ma Ma's orchard
   }
   v.shelf = v.shelf.filter(s => s.n > 0 || s.open > 0);
   if (!out.coins && !out.watered && !out.picked && !out.filled && !out.stocked && !out.olives) return null;
   v.plates += out.plates;
+  if (opts.serving && out.apero && out.coins) { out.tips = Math.max(1, Math.round(out.coins*.2)); out.coins += out.tips; }   // serving at aperitivo hour: people tip
   if (opts.serving) F.coins += out.coins; else v.box += out.coins;
   v.sold += out.bottles; v.glasses += out.glasses;
   const day = new Date(t + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};

@@ -105,7 +105,10 @@ const TASTINGS = [
   {id: "marco", from: 18*60, to: 19*60, at: SEAT.b},
   {id: "farid", from: 18*60 + 45, to: 20*60 + 15, at: SEAT.a},
   {id: "mei", from: 19*60, to: 20*60 + 30, at: SEAT.b},
-  {id: "darren", from: 20*60, to: 21*60 + 30, at: SEAT.e, dow: [5]}
+  {id: "darren", from: 20*60, to: 21*60 + 30, at: SEAT.e, dow: [5]},
+  // round 112: Friday aperitivo hour (4:30 to 7): the end of the week, and the tasting room fills up
+  {id: "lin", from: 16*60 + 30, to: 18*60, at: SEAT.c, dow: [5]}, {id: "opal", from: 16*60 + 30, to: 18*60 + 30, at: SEAT.d, dow: [5]},
+  {id: "theo", from: 16*60 + 45, to: 19*60, at: SEAT.f, dow: [5]}, {id: "bo", from: 17*60, to: 19*60, at: SEAT.e, dow: [5]}, {id: "juniper", from: 18*60, to: 19*60, at: SEAT.c, dow: [5]}
 ];
 // Out-of-towners at the tasting tables, in the gaps between the regulars: a pair at lunchtime, a pair late afternoon,
 // a pair late evening, and an extra pair late morning at weekends (a different pair each time, from whoever isn't touring)
@@ -296,6 +299,23 @@ export function shoreSlot(id, day, hm){
 export const DINNER_FROM = 18*60 + 30, DINNER_TO = 20*60;
 export const DINNER_HOSTS = ["home", "mumdad", "cottage", "marcus"];
 const HOST_FAMILY = {mumdad: ["mum", "dad"], cottage: ["mama", "gonggong"], marcus: ["marcus", "angelina"]};
+// Round 112: Friday evenings. Aperitivo hour at the wine shop (4:30 to 7), the fishmonger's van at the bay (5 to 10)
+// and the bonfire on the bay beach (7 to 10), with the family round it.
+export const APERITIVO = [16*60 + 30, 19*60], VAN = [17*60, 22*60], BONFIRE = [19*60, 22*60];
+const isFri = day => dow(day) === 5;
+export const aperitivoNow = (day, hm) => isFri(day) && hm >= APERITIVO[0] && hm < APERITIVO[1];
+export const vanNow = (day, hm) => isFri(day) && hm >= VAN[0] && hm < VAN[1];
+export const bonfireNow = (day, hm) => isFri(day) && hm >= BONFIRE[0] && hm < BONFIRE[1];
+// the logs round the fire (the fire's at FIRE on the bay beach)
+export const FIRE = [196, 506];
+// round the fire: along the back and the sides (nobody sits in front of the flames)
+const LOGS = {dad: [[148, 506], 1], mum: [[166, 478], 1], gonggong: [[196, 468], 1], mama: [[226, 478], -1], marcus: [[244, 506], -1], angelina: [[154, 536], 1], darren: [[238, 538], -1]};
+const BONFIRE_FAMILY = {dad: 19*60, mum: 19*60, gonggong: 19*60, mama: 19*60, marcus: 19*60 + 30, angelina: 19*60 + 30, darren: 21*60 + 30};
+export function bonfireSlot(id, day, hm){
+  if (!bonfireNow(day, hm) || awayToday(day).includes(id)) return null;
+  const from = BONFIRE_FAMILY[id]; if (from == null || hm < from) return null;
+  const [at, dir] = LOGS[id]; return {from, to: BONFIRE[1], scene: "bay", at, act: id === "dad" ? "guitar" : "sit", dir, bonfire: true};
+}
 export const HOST_NAME = {home: "your place", mumdad: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", marcus: "Marcus and Angellina's"};
 // where each house's dining table stands: cx = centre, fy = the front edge of the table on the floor
 export const DINING = {home: {cx: 260, fy: 452}, mumdad: {cx: 270, fy: 500}, cottage: {cx: 320, fy: 470}, marcus: {cx: 340, fy: 470}};

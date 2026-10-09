@@ -95,6 +95,10 @@ export const VILLAGE = {
   toBay:  {scene:"shore", name:"Boardwalk north", door:[250,22], spot:true, bridge:"bay", mark:[290,40], line:"Up the boardwalk to the bay and the Scoop Shack."},
   toShoreB:{scene:"bay", name:"Boardwalk to the foreshore", door:[250,622], spot:true, bridge:"shore", mark:[290,560], line:"Down the boardwalk to the foreshore."},
   scoopshop:{scene:"bay", name:"The Scoop Shack", short:"the Scoop Shack", door:[386,262], mark:[386,96]},
+  // round 112: Friday evenings at the bay (the fire pit on the beach; the fishmonger's van 5 to 10pm), and kite flying on the field
+  bonfire:{scene:"bay", name:"The bonfire", door:[198,566], spot:true, line:"A fire pit on the beach. On Friday nights there's a bonfire."},
+  fishvan:{scene:"bay", name:"The fishmonger's van", door:[330,620], spot:true, line:"Sal's fish van parks here on Friday evenings."},
+  kitefly:{scene:"field", name:"Kite flying", door:[440,330], spot:true, line:"Open grass and a good breeze off the sea: the place to fly a kite."},
   deck:   {scene:"bay", name:"The deck", door:[215,412], spot:true, line:"The deck, looking out over the foreshore. Bring an ice cream."},
   hfreezer:{scene:"bay", name:"Honesty freezer", door:[432,290], spot:true, line:"The honesty freezer: little cups while the shop's shut."},
   dbike:  {scene:"bay", name:"Delivery bike", door:[300,290], spot:true, line:"The delivery bike."},

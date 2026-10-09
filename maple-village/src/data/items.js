@@ -263,6 +263,10 @@ Object.entries(GOODS).forEach(([id, g]) => { if (!ITEMS[id]) ITEMS[id] = g; });
 // that Hana sells all year once the greenhouse is built; it only grows under glass (the garden won't take it).
 Object.keys(ITEMS).filter(id => ITEMS[id].kind === "seed" && ITEMS[id].seasons).forEach(id => { const s = ITEMS[id];
   ITEMS["gh_" + id] = {n: s.n + " (greenhouse)", kind: "seed", price: Math.ceil(s.price*1.5), crop: s.crop, tab: "seeds", greenhouse: true, needs: "greenhouse", ghOf: id}; });
+// round 112: a kite (Hana's Family shelf, the fair's kite stall): fly it on the field with Evan; and clams from the
+// fishmonger's van on Friday evenings
+Object.assign(ITEMS, {kite: {n: "Kite", kind: "toy", price: 12, tab: "family", what: "fly it on the field (the open grass by the river), with Evan if he's about"},
+  clams: {n: "Clams", kind: "ingredient", sell: 2, what: "from the fishmonger's van: clams with garlic and lemon, at the kitchen"}});
 // the herbs themselves (mint is already on Hana's deli shelf)
 Object.assign(ITEMS, {garlic: {n: "Garlic", kind: "ingredient", sell: 1, what: "from the greenhouse: gambas, garlicky tapas"}, basil: {n: "Basil", kind: "ingredient", sell: 1, what: "from the greenhouse: bruschetta, basil gelato, a bonbon filling"},
   rosemary: {n: "Rosemary", kind: "ingredient", sell: 1, what: "from the greenhouse: rosemary potatoes, a rosemary bonbon, gelato"}, chives: {n: "Chives", kind: "ingredient", sell: 1, what: "from the greenhouse: a chive omelette"},

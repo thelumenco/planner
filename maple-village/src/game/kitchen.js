@@ -28,7 +28,7 @@ export const GOODS = {
   honey: ["jar of honey", "jars of honey"], petals: ["garden flower", "garden flowers"],
   // round 109: from the greenhouse, and shrimp from the sea
   garlic: ["bulb of garlic", "bulbs of garlic"], basil: ["bunch of basil", "bunches of basil"], mint: ["bunch of mint", "bunches of mint"], rosemary: ["sprig of rosemary", "sprigs of rosemary"],
-  chives: ["bunch of chives", "bunches of chives"], thyme: ["bunch of thyme", "bunches of thyme"], shrimp: ["shrimp", "shrimp"],
+  clams: ["clam", "clams"], chives: ["bunch of chives", "bunches of chives"], thyme: ["bunch of thyme", "bunches of thyme"], shrimp: ["shrimp", "shrimp"],
   // round 107: from Ronda's market
   almond: ["bag of almonds", "bags of almonds"], sevilla: ["Seville orange", "Seville oranges"], oliveoil: ["bottle of olive oil", "bottles of olive oil"], jamon: ["piece of jamón", "pieces of jamón"],
   payoyo: ["payoyo cheese", "payoyo cheeses"], membrillo: ["block of membrillo", "blocks of membrillo"]};
@@ -102,6 +102,7 @@ export const TAPAS = {
 // round 109: with herbs from the greenhouse (and shrimp from the sea)
 Object.assign(TAPAS, {gambas: {n: "Gambas al ajillo", need: {shrimp: 3, garlic: 2, oliveoil: 1}, price: 13},
   romero: {n: "Rosemary potatoes", need: {potato: 2, rosemary: 1}, price: 9}, bruschetta: {n: "Tomato and basil bruschetta", need: {loaf: 1, tomato: 2, basil: 1}, price: 10, seasons: ["summer", "autumn"]},
+  almejas: {n: "Clams with garlic and lemon", need: {clams: 4, garlic: 1, lemon: 1}, price: 12},
   cebollino: {n: "Chive omelette", need: {egg: 2, chives: 1}, price: 8}, tomillo: {n: "Roast pumpkin with thyme", need: {pumpkin: 1, thyme: 1}, price: 9, seasons: ["autumn", "winter"]}});
 // a tapas Mel can cook: the Ronda ones once she's tasted them there
 export const knows = (F, id) => !TAPAS[id].learn || !!(F.learned && F.learned[id]);

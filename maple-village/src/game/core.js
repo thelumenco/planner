@@ -49,6 +49,8 @@ import { hlaneArt } from "../art/hlane.js";
 import { hwoodsArt } from "../art/hwoods.js";
 import { greenhouseArt, GH_BED_AT } from "../art/greenhouse.js";
 import { millArt } from "../art/mill.js";
+import { bonfireArt, fishVanArt, kiteArt } from "../art/friday.js";
+import { vanPanel, vanBuy, VAN_MULT, bonfirePanel, releaseLanterns } from "./friday.js";
 import { millState, pressLeft, millPanel, startPress, collectOil } from "./mill.js";
 import { ghState, ghGrowth, bedPanel, ghPlant, ghHarvest, ghBoost, setGhCompost } from "./greenhouse.js";
 import { rondaArt, trainRideArt } from "../art/town-ronda.js";
@@ -73,10 +75,10 @@ import { cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, ki
   sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, haveHot, packGrand, readyPot, ccUp } from "./cocoa.js";
 import { keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, OWNER_NAME, PETS, petAt } from "./companions.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
-import { diningTable, darrenAsleep, skyWash } from "../art/scenes.js";
+import { diningTable, darrenAsleep, skyWash, tapeLabel } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
-import { tourNow, eventNow, eventOn, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned, workshopGroup, letGuests } from "./tours.js";
+import { aperitivoNow, bonfireNow, vanNow, FIRE, tourNow, eventNow, eventOn, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned, workshopGroup, letGuests } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
@@ -279,6 +281,7 @@ const SHED = {
 // whom), and the pet whose card is open
 // the Cocoa Room's open card: "counter", "wall", or a kitchen station ("sacks", "roaster", "grinder", "slab", "moulds")
 let vanView = null, vanSt = {slot: "bedding"};   // the campervan's mood board
+let friView = null, lastFri = "";   // round 112: the bonfire or the fishmonger's van panel; the Friday art key
 let ghBed = null, millOpen = false, lastMill = "";   // round 110: the olive press panel, and the mill's art key   // round 109: the greenhouse bed being looked at
 let rondaView = null;   // round 107: a Ronda shop (ronda.js): "mercado", "tapas", "dulces", "convento", "azulejos"
 let woodsView = null;   // round 103: "ranger", "bike" or a river taxi stop id (transport.js, woods.js)
@@ -570,6 +573,7 @@ setInterval(() => {
   if (Date.now() - lastFarm > 20000) farmNow();
   { const l = bikeExpired(F); if (l) { speak(l, 4500); save(); } }
   townTick();
+  { const k = scene === "bay" ? `${bonfireNow(dayKey(), sgHM())}${vanNow(dayKey(), sgHM())}` : scene === "field" ? String(!!(S.kite && S.kite.until > Date.now())) : ""; if (k !== lastFri) { lastFri = k; if (k) drawScene(); } }
   if (scene === "mill") { const m = millState(F), k = m.press ? (pressLeft(m) ? "on" : "ready") : ""; if (k !== lastMill) { lastMill = k; drawScene(); if (millOpen) ctx(); } }
   if (outside() && skyKey() !== lastSky) { lastSky = skyKey(); drawScene(); }
   { const tk = outside() ? trainKey(scene) : ""; if (tk !== lastTrain) { lastTrain = tk; drawScene();   // a train coming through: draw it (it runs on from where it is)
@@ -1495,7 +1499,7 @@ function showPanel(hasCtx, skin){
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
   if (kid.open) { kid.open = null; stopKidGame(); ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; ghBed = null; millOpen = false; vanView = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; ghBed = null; millOpen = false; friView = null; vanView = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1606,6 +1610,8 @@ function ctx(){
     h += `</div>`;
   } else if (scene === "greenhouse" && ghBed != null) { h = bedPanel(F, ghBed);
   } else if (scene === "mill" && millOpen) { h = millPanel(F);
+  } else if (friView && (scene === "bay" || scene === "field")) { const fam = ["dad", "mum", "gonggong", "mama", "marcus", "angelina", "darren"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
+    h = friView === "van" ? vanPanel(F) : bonfirePanel(F, fam.length ? `${fam.join(", ").replace(/, ([^,]*)$/, " and $1")} ${fam.length > 1 ? "are" : "is"} round the fire` : "");
   } else if (scene === "farm" && selPlot != null) {
     const p = F.plots[selPlot], i = selPlot;
     h = `<span class="tape stripe" aria-hidden="true"></span><h2>Plot ${i + 1}</h2>`;
@@ -1693,6 +1699,17 @@ function ctx(){
     save(); ctx(); drawScene(); });
   c.querySelectorAll("[data-bike]").forEach(b => b.onclick = () => { const line = b.dataset.bike === "hire" ? hireBike(F) : returnBike(F); if (!line) return; sfx(b.dataset.bike === "hire" ? "chaching" : "tap"); speak(line, 4000); save(true); ctx(); });
   c.querySelectorAll("[data-taxi]").forEach(b => b.onclick = () => rideTaxi(b.dataset.taxi));
+  c.querySelectorAll("[data-van]").forEach(b => b.onclick = () => { const id = b.dataset.van;
+    if (id === "sellall") { const g = sellCatch(F, null, VAN_MULT); if (!g) return; sfx("chaching"); speak(`Sal weighs it all up: ${g.coins} coins for ${g.n}. "Good fish, that."`, 4000); }
+    else { const l = vanBuy(F, id, addInv); if (!l) return; sfx("chaching"); speak(l, 3000); }
+    save(); ctx(); });
+  c.querySelectorAll("[data-fire]").forEach(b => b.onclick = () => {
+    if (b.dataset.fire === "lanterns") { const n = releaseLanterns(F); if (n == null) return; friView = null; ctx(); lanternFlight(Math.max(1, n)); gainXp(Math.min(5, 1 + Math.floor(n/3))); sfx("chime");
+      speak(n ? `${n} paper lantern${n > 1 ? "s" : ""}, one for each quest this week, lifting off over the sea. Look at that.` : "One lantern, for getting through the week. It drifts out over the sea.", 7000);
+      if (evanHere()) setTimeout(() => evanSays(pick(["lanterns! so many!", "bye bye lanterns!", "up up up!"])), 1800);
+      ["mum", "dad", "mama"].filter(isHere).slice(0, 1).forEach(id => setTimeout(() => npcSay(id, pick(["Look at all of them! You worked hard this week.", "So pretty. Well done, my girl.", "Every one of those is something you did."])), 3600));
+      save(); return; }
+    mel.sitting = true; nodes.mel.classList.add("sit"); friView = null; ctx(); sfx("paper", true); speak(pick(["The fire pops and crackles. Nobody needs to say anything.", "Warm on your face, cool on your back. Friday.", "Sparks going up into the dark. The week's done."]), 4500); });
   c.querySelectorAll("[data-mill]").forEach(b => b.onclick = () => { const l = b.dataset.mill === "press" ? startPress(F, +b.dataset.n) : collectOil(F, addInv);
     if (l) { sfx(b.dataset.mill === "press" ? "crunch" : "chime"); if (b.dataset.mill !== "press") { gainXp(1); act("cheer"); } speak(l, 4500); save(true); } ctx(); });
   c.querySelectorAll("[data-gh]").forEach(b => b.onclick = () => { const i = +b.dataset.i;
@@ -1745,7 +1762,7 @@ function ctx(){
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
   c.querySelectorAll("[data-fair]").forEach(b => b.onclick = () => fairActivity(b.dataset.fair));
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; ghBed = null; millOpen = false; vanView = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; ghBed = null; millOpen = false; friView = null; vanView = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
@@ -1881,7 +1898,7 @@ function drawScene(){
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
   $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
-  $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene) + transportArt(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") : ""));   // shelves with keepsakes, and pets at home here
+  $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") : ""));   // shelves with keepsakes, and pets at home here
   if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));   // the same evening light everywhere outdoors
   if (outside() && isDusk()) nightLights();
   const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), orchard:"Ma Ma's orchard", flowers:"Ma Ma's flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", hwoods:"Honeybrook Woods", greenhouse:"The greenhouse", mill:"The old mill", scoopshop: scoopState(F).name, rd_station:"Ronda: the station", rd_plaza:"Ronda: the plaza", rd_bridge:"Ronda: Puente Nuevo", rd_old:"Ronda: the old town"};
@@ -1968,9 +1985,34 @@ function applyWear(pj){
 // The river taxi (transport.js): pay, a few seconds on the launch (an overlay), then step off at the other stop
 function rideTaxi(to){
   const s = takeTaxi(F, to); if (!s) return;
-  woodsView = null; rondaView = null; ghBed = null; millOpen = false; ctx(); sfx("chaching"); save(true);
+  woodsView = null; rondaView = null; ghBed = null; millOpen = false; friView = null; ctx(); sfx("chaching"); save(true);
   const o = document.createElement("div"); o.className = "taxiride"; o.innerHTML = `${taxiBank}<div class="taxiboat">${taxiBoat}</div><p>Down the river to ${esc(s.n.replace(/^The /, "the "))}...</p>`; $("map").appendChild(o);
   setTimeout(() => { o.remove(); setScene(s.scene, s.at); setTimeout(() => speak(`The river taxi drops you at ${s.n}.`, 3500), 700); }, 2600);
+}
+// Friday evenings (round 112): the bonfire and the fish van at the bay, and a kite on the field
+const isFri = () => new Date(dayKey() + "T00:00:00Z").getUTCDay() === 5;
+function fridayLayer(sc){
+  if (sc === "bay") return bonfireArt(FIRE[0], FIRE[1], bonfireNow(dayKey(), sgHM())) + (vanNow(dayKey(), sgHM()) ? fishVanArt(330, 600) : "");
+  if (sc === "field") return `<g data-place="kitefly" aria-label="Kite flying"><ellipse class="hov" cx="440" cy="334" rx="30" ry="9" style="fill:var(--butter)"/><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M452 336 v-46" stroke-width="2"/><path d="M452 292 l18 4 l-2 8 l-16 2z" style="fill:#E8913A"/><path d="M458 293 v12 M464 294 v10" style="stroke:#FFFDF6" stroke-width="2"/></g>${tapeLabel(440, 352, "Kite flying", "#DCEBF6", 9)}</g>`
+    + (S.kite && S.kite.until > Date.now() ? kiteArt(S.kite.x, S.kite.y) : "");
+  return "";
+}
+function flyKite(){
+  if (!(F.inv.kite > 0)) { speak("A good breeze for a kite! Hana sells them (the Family shelf at the market).", 4500); render(); return; }
+  S.kite = {until: Date.now() + 60e3, x: mel.x, y: mel.y}; mel.dir = -1; sfx("whistle"); drawScene(); gainXp(1);
+  speak(pick(["Up it goes! The red kite catches the wind.", "Run, run... and up! It's flying.", "The kite tugs on the string like it wants to go to sea."]), 4500);
+  if (evanHere() && !evanNight()) { evan.tx = mel.x - 40; evan.ty = mel.y + 10; evan.run = true; evan.wait = 8; [900, 4000, 8000].forEach((d, i) => setTimeout(() => evanSays(["kite! up up!", "my turn! my turn!", "it's so HIGH, Mama!"][i]), d)); }
+  save(); render();
+}
+// the week's lanterns: little glowing paper lanterns rising from the fire and drifting out over the sea
+function lanternFlight(n){
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("pointer-events", "none");
+  const t0 = $("world").getCurrentTime ? $("world").getCurrentTime() : 0;   // SVG animations count from page load: start them now
+  g.innerHTML = Array.from({length: Math.min(n, 24)}, (_, i) => { const x = FIRE[0] - 20 + (i*37) % 60, dx = -60 - (i*53) % 110, d = 6 + (i % 5);
+    return `<g opacity="0"><rect x="${x - 5}" y="${FIRE[1] - 30}" width="10" height="13" rx="3" fill="#F6C26B" stroke="#3b3530" stroke-width=".8"/><circle cx="${x}" cy="${FIRE[1] - 24}" r="9" fill="url(#lampg)"/>
+      <animateTransform attributeName="transform" type="translate" from="0 0" to="${dx} ${-260 - (i*29) % 160}" dur="${d}s" begin="${(t0 + i*.35).toFixed(2)}s" fill="freeze"/><animate attributeName="opacity" values="0;1;1;0" dur="${d}s" begin="${(t0 + i*.35).toFixed(2)}s" fill="freeze"/></g>`; }).join("");
+  let fx = $("fxLayer"); if (!fx) { fx = document.createElementNS("http://www.w3.org/2000/svg", "g"); fx.id = "fxLayer"; fx.setAttribute("pointer-events", "none"); $("world").appendChild(fx); }   // above everyone
+  fx.appendChild(g); setTimeout(() => g.remove(), 20000);
 }
 // Day trips (trips.js, round 107): tickets at Honeybrook station, the train, a day in the town, the train home.
 const liveNow = () => { const town = townOf(scene); if (town) return TOWNS[town].music; const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null; return ev && ev.kind === "night" ? "jazz" : null; };
@@ -2125,7 +2167,7 @@ function setScene(id, at){
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
     scView = null; scSt.pick = null; scSt.dpick = null; evanSeat = null;
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; ghBed = null; millOpen = false; vanView = null; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; ghBed = null; millOpen = false; friView = null; vanView = null; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
@@ -2156,6 +2198,7 @@ function setScene(id, at){
       setTimeout(() => speak(m < 18*60 ? "Wine club tonight at the cellar door, 6pm! Eight members are coming to taste and buy." : "The wine club's on at the cellar door right now! Pop in and host.", 6000), 2800); } }
     if (SCOOP_IN.includes(id) || id === "bay") scoopNow();   // catch up on arrival: sales, and anything the churner's finished
     if (id === "cocoa" && evanHere() && ccUp(cocoaState(F), "fountain")) setTimeout(() => evanSays(pick(["THE FOUNTAIN!! Can I put my hand in? Just one finger?", "Mama, it's a chocolate waterfall!", "Can we dip a strawberry? Pleeease?"])), 1400);
+    if (id === "wineshop" && aperitivoNow(dayKey(), sgHM()) && S.aperoSaid !== dayKey()) { S.aperoSaid = dayKey(); setTimeout(() => speak("Friday aperitivo hour! The whole village is knocking off for a glass and a plate. Stand behind the counter: they tip.", 6000), 1200); }
     if (id === "cellar" && wineClubNow(dayKey(), sgHM())) setTimeout(() => speak("The wine club's here! Glasses clinking, everyone talking at once. Tap the tasting bar to host.", 5000), 1200);
     if (id === "marcus" && evanHere()) setTimeout(() => { evanSays(pick(["Uncle Marcus! Can I play Mario?", "Can we watch Spiderman? Pleeease?", "Game! Game! Can I play the game?"])); if (isHere("marcus")) setTimeout(() => npcSay("marcus", "Ha! Ask your mum, little man. Zeh? One level?"), 2200); }, 1500);
     if (id === "wineshop" && isHere("marcus") && isHere("angelina") && sgHM() >= 19*60 + 30 && S.dateSaid !== dayKey()) { S.dateSaid = dayKey(); setTimeout(() => speak("Marcus and Angellina are on a date night at the middle table. Act natural.", 5000), 1600); }
@@ -2292,6 +2335,10 @@ function arriveVillageSpot(id){
   if (townOf(scene)) { townSpot(id); return; }
   if (id === "plot3" || id === "plot4") { speak(v.line, 4000); render(); return; }
   if (id === "olive") { vyView = "olive"; sfx("paper", true); render(); return; }
+  if (id === "bonfire") { if (bonfireNow(dayKey(), sgHM())) { friView = "fire"; sfx("paper", true); if (evanHere() && !evanNight()) setTimeout(() => evanSays(pick(["marshmallow! please!", "it's so warm!", "fire! big fire!"])), 1200); }
+    else speak(isFri() && sgHM() < 19*60 ? "The bonfire's lit at seven tonight. Bring the family." : "A fire pit on the sand. On Friday nights there's a bonfire here, 7 to 10.", 4500); render(); return; }
+  if (id === "fishvan") { if (vanNow(dayKey(), sgHM())) { friView = "van"; sfx("paper", true); } else speak("Sal's fish van parks here on Friday evenings, five till ten.", 4000); render(); return; }
+  if (id === "kitefly") { flyKite(); return; }
   if (id === "grove") { vyView = "grove"; sfx("paper", true); if (isHere("marco")) npcSay("marco", pick(["Olives are coming on nicely.", "I'll put what I pick in the crate.", "Taste one? No! Not raw. Trust me."])); render(); return; }
   if (id === "windmill") { if (owns(F, "mill")) { setScene("mill", [260, 560]); setTimeout(() => speak(millState(F).press ? "The millstone's still turning..." : "The old mill. Smells of olives and old wood.", 3500), 600); }
     else { goalView = "mill"; sfx("paper", true); speak("The old windmill. Inside it's dusty... but you could make olive oil here.", 4000); render(); } return; }

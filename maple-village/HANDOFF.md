@@ -1624,3 +1624,17 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **The grove:** `SHOP.grove` (300, needs the olive tree) adds four small trees in a row on the top-left terrace of the vineyard (place `grove`, `grovePanel`). 8 jars every 8 hours (`pickGrove`).
 - **Workers:** Marco and Ines (help.pick) pick the olive tree and the grove on shift into `v.oliveCrate` (`takeOliveCrate`).
 - **Round 111: selling the catch:** fishing.js `sellCatch` and `CATCH`. A "Your catch" section at every fishing spot lets you sell one or "Sell the lot", at the same prices as the market Sell tab; the everyday "fish" item now sells for 3.
+
+### Round 112: Friday evenings
+- **Aperitivo** (tours.js `aperitivoNow`, Fri 4:30–7):
+  - More villagers at the tasting tables.
+  - In vineyard.js `sellTick`: footfall ×1.6, more plates (walk-ins `.005` vs `.0016`, 90% of glasses come with a plate), and 20% tips while Mel serves.
+  - The everyday walk-in plate rate went up too (`.001` → `.0016`).
+- **The bonfire** (`bonfireNow`, Fri 7–10, on the bay beach at `FIRE`):
+  - `bonfireSlot`: the family on logs, with Dad playing guitar.
+  - The fire pit is always drawn; it's lit on Friday nights (art/friday.js).
+  - The bonfire panel releases the week's lanterns (friday.js `weekQuests`/`releaseLanterns`, once a Friday). `lanternFlight` draws them in `#fxLayer`, begun at `getCurrentTime()`.
+- **Sal's fish van** (`vanNow`, Fri 5–10, place `fishvan`): sells worms ×5 (6), clams (4) and lemons (3), and buys the catch ×1.5 (`sellCatch` mult).
+  - New tapas: clams with garlic and lemon (`almejas`).
+- **Kites:** the `kite` item (Hana's Family shelf, 12 coins). The field's place `kitefly` flies it for a minute (`S.kite`, `kiteArt`), and Evan runs along.
+- **Still to come (round 113):** movie night on the field (the last Friday of the month) and a small Friday market at the bay.

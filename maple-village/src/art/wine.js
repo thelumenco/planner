@@ -115,7 +115,7 @@ export function stallIcon(id, off){
 }
 
 // Small plates for the tasting room: each dish on a cream plate (or in a bowl), `s` pixels; `off` fades it
-const TAPAS_COL = {gambas: ["#E8704C", "#F3C969"], romero: ["#E3B04B", "#7F9A6A"], bruschetta: ["#D9A066", "#E8574C"], cebollino: ["#F3C969", "#7FB86A"], tomillo: ["#E8913A", "#9DB08A"], salmorejo: ["#E8704C", "#F6E3A1"], ajoblanco: ["#F6F1E2", "#9A6A86"], croqjamon: ["#C98A4A", "#E3B04B"], payoyo: ["#F3E7C8", "#C8643B"], naranjas: ["#F28C28", "#3A3430"], patatas: ["#E86A5C", "#F3C969"], tortilla: ["#F3C969", "#E3B04B"], pancon: ["#D9A066", "#E8574C"], pimientos: ["#D9433A", "#7FA35A"], fritters: ["#E3B04B", "#F6E3A1"],
+const TAPAS_COL = {almejas: ["#F3E7C8", "#9DB08A"], gambas: ["#E8704C", "#F3C969"], romero: ["#E3B04B", "#7F9A6A"], bruschetta: ["#D9A066", "#E8574C"], cebollino: ["#F3C969", "#7FB86A"], tomillo: ["#E8913A", "#9DB08A"], salmorejo: ["#E8704C", "#F6E3A1"], ajoblanco: ["#F6F1E2", "#9A6A86"], croqjamon: ["#C98A4A", "#E3B04B"], payoyo: ["#F3E7C8", "#C8643B"], naranjas: ["#F28C28", "#3A3430"], patatas: ["#E86A5C", "#F3C969"], tortilla: ["#F3C969", "#E3B04B"], pancon: ["#D9A066", "#E8574C"], pimientos: ["#D9433A", "#7FA35A"], fritters: ["#E3B04B", "#F6E3A1"],
   carrots: ["#F08A3C", "#7FA35A"], crema: ["#F6E3C6", "#E8574C"], tostas: ["#D9A066", "#F6A23A"], rellenos: ["#C9433A", "#F3C969"],
   guisantes: ["#B9D88A", "#7FA35A"], croquetas: ["#E3B04B", "#F08A3C"], calabaza: ["#F08A3C", "#3B3045"], puerros: ["#E7EFD8", "#9CC27E"],
   sardinas: ["#E3D6CF", "#8FA9BF"], escabeche: ["#F3C969", "#3E6B8C"], calamares: ["#F6E3A1", "#E3B04B"], pulpo: ["#F3C969", "#E8899A"], dorada: ["#E3D6CF", "#5E7A4E"], trucha: ["#F6E3C6", "#E8899A"], cangrejos: ["#D9A066", "#D9614C"],

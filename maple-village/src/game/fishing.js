@@ -132,10 +132,10 @@ export function fishPanel(F, spot, st = {}){
 // same prices as Hana's Sell tab. CATCH: every backpack item a fish can turn into.
 export const CATCH = [...new Set(Object.values(FISH).map(f => f.item).filter(Boolean))];
 if (ITEMS.fish && !ITEMS.fish.sell) ITEMS.fish.sell = 3;   // the everyday catch (roach, perch, carp...) sells too
-export function sellCatch(F, id){
+export function sellCatch(F, id, mult = 1){
   const ids = id ? [id] : CATCH, got = {n: 0, coins: 0};
   ids.forEach(x => { const n = id ? Math.min(1, (F.inv || {})[x] || 0) : ((F.inv || {})[x] || 0); if (!n || !ITEMS[x] || !ITEMS[x].sell) return;
-    F.inv[x] -= n; if (F.inv[x] <= 0) delete F.inv[x]; got.n += n; got.coins += n*ITEMS[x].sell; });
+    F.inv[x] -= n; if (F.inv[x] <= 0) delete F.inv[x]; got.n += n; got.coins += Math.round(n*ITEMS[x].sell*mult); });
   if (!got.n) return null; F.coins += got.coins; return got;
 }
 const catchHtml = F => { const have = CATCH.filter(x => (F.inv || {})[x] > 0 && ITEMS[x] && ITEMS[x].sell); if (!have.length) return "";

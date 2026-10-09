@@ -2841,6 +2841,33 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.mill && f.mill.press && f.mill.press.n === 2 && f.inv.olives === 1 && f.goals.mill; }), "seven jars of olives: two bottles' worth goes under the millstone");
   await page.close();
 }
+{
+  console.log("\nFriday evenings: aperitivo, the bonfire, Sal's van, kites");
+  const t = await import(new URL("../src/game/tours.js", import.meta.url)), fr = await import(new URL("../src/game/friday.js", import.meta.url));
+  const fri = "2026-10-16", thu = "2026-10-15";
+  check(t.aperitivoNow(fri, 17*60) && !t.aperitivoNow(fri, 19*60 + 5) && !t.aperitivoNow(thu, 17*60), "aperitivo hour: Fridays, 4:30 to 7");
+  check(t.tastingSlot("theo", fri, 17*60 + 30) && t.tastingSlot("opal", fri, 17*60), "the tasting room fills up on a Friday afternoon");
+  check(t.bonfireSlot("dad", fri, 19*60 + 30).act === "guitar" && t.bonfireSlot("mum", fri, 20*60).scene === "bay" && !t.bonfireSlot("dad", thu, 19*60 + 30) && !t.bonfireSlot("marcus", fri, 19*60 + 10), "the bonfire, 7 to 10 on a Friday: Dad on guitar, Mum on a log, Marcus and Angellina from half seven");
+  { const F = {coins: 20, inv: {}, history: {"2026-10-12": {q: 2}, "2026-10-14": {q: 3}, "2026-10-08": {q: 9}}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
+    check(fr.weekQuests(F, fri) === 5 && fr.releaseLanterns(F, fri) === 5 && fr.releaseLanterns(F, fri) === null, "five quests this week: five lanterns, released once a Friday");
+    check(!!fr.vanBuy(F, "clams", add) && !!fr.vanBuy(F, "worms", add) && F.inv.clams === 1 && F.coins === 10 && F.fish.bait >= 5, "Sal's van sells clams and worms"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`friday pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/kitep/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.inv = Object.assign(f.inv || {}, {kite: 1}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=15:30&date=2026-10-16"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=15:30&date=2026-10-16&kitep=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="kitefly"]').dispatchEvent("click"); await page.waitForSelector("#world .kitefly", { timeout: 20000 }).catch(() => {});
+  check(await page.locator("#world .kitefly").count() === 1, "a kite of your own, flying over the field");
+  await page.goto(url + "?seed=1&time=19:40&date=2026-10-16"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(1500);
+  check(await page.locator('#world [data-place="fishvan"]').count() === 1 && await page.locator('#actors .npc[data-npc="dad"].act-guitar').count() === 1, "Friday night at the bay: Sal's van, and Dad playing guitar by the bonfire");
+  await page.locator('#world [data-place="bonfire"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-fire="lanterns"]', { timeout: 20000 });
+  await page.click('#ctx [data-fire="lanterns"]'); await page.waitForTimeout(600);
+  check(await page.locator("#fxLayer g").count() >= 1, "the week's lanterns lift off over the sea");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");
