@@ -7405,7 +7405,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       if (k.larder[id] <= 0) delete k.larder[id];
     }
   });
-  var spareOf = (k, id) => Math.max(0, (k.larder[id] || 0) - (k.keep[id] || 0));
+  var FRESH_HOLD = 15 * 6e4;
+  var heldNew = (k, id) => {
+    const f2 = k.fresh && k.fresh[id];
+    return f2 && f2.until > Date.now() ? f2.n : 0;
+  };
+  var spareOf = (k, id) => Math.max(0, (k.larder[id] || 0) - Math.max(k.keep[id] || 0, heldNew(k, id)));
   var spareCount = (k, g) => pool(k, g).reduce((a, id) => a + spareOf(k, id), 0);
   var canSpare = (k, need, also = {}) => Object.entries(need).every(([g, n]) => spareCount(k, g) - (also[g] || 0) >= n);
   var useSpare = (k, need) => Object.entries(need).forEach(([g, n]) => {
@@ -7431,12 +7436,18 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const m = Math.ceil(ms / 6e4);
     return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`;
   };
-  function sendToKitchen(F2, id, n) {
+  function sendToKitchen(F2, id, n, hold = true) {
     if (!isGood(id) || !(F2.inv && F2.inv[id] > 0)) return 0;
     const k = kitchenState(F2), m = Math.min(F2.inv[id], n || F2.inv[id]);
     F2.inv[id] -= m;
     if (F2.inv[id] <= 0) delete F2.inv[id];
     add(k, id, m);
+    if (!hold) return m;
+    k.fresh = k.fresh || {};
+    Object.keys(k.fresh).forEach((x) => {
+      if (k.fresh[x].until <= Date.now()) delete k.fresh[x];
+    });
+    k.fresh[id] = { n: heldNew(k, id) + m, until: Date.now() + FRESH_HOLD };
     return m;
   }
   var backpackGoods = (F2) => Object.keys(F2.inv || {}).filter((id) => isGood(id) && F2.inv[id] > 0);
@@ -7549,7 +7560,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const k = kitchenState(F2), v = vineState(F2), help = v.help || {}, done = [];
     if (help.cook === false) return done;
     if (help.fetch) {
-      const moved = backpackGoods(F2).map((x) => [x, sendToKitchen(F2, x)]).filter(([, n]) => n);
+      const moved = backpackGoods(F2).map((x) => [x, sendToKitchen(F2, x, 0, false)]).filter(([, n]) => n);
       if (moved.length) done.push(`brought in ${moved.map(([x, n]) => `${n} ${nm2(x, n)}`).join(", ")} from your backpack`);
     }
     if (k.oven && !left(k.oven)) {
@@ -7602,7 +7613,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var larderGrid = (k) => {
     const ids = Object.keys(k.larder).filter((id) => k.larder[id] > 0);
     return ids.length ? `<div class="kgoods">${ids.map((id) => `<div class="kgoodw"><button class="kgood kbtn" data-k="take" data-id="${id}">${pic(id)}<b>${k.larder[id]}</b><small>${esc(nm2(id, k.larder[id]))}</small><em>Take one</em></button>
-      <span class="kkeep" title="Pilar leaves these alone"><button class="btn small alt" data-k="keep" data-id="${id}" data-n="-1" aria-label="Keep fewer back">−</button><span>${k.keep[id] ? `keep ${k.keep[id]}` : "keep 0"}</span><button class="btn small alt" data-k="keep" data-id="${id}" data-n="1" aria-label="Keep one more back">+</button></span></div>`).join("")}</div><p class="muted">Tap one to take it back to your backpack (for the Scoop Shack, or a gift). <b>Keep</b>: how many Pilar must leave alone (say, flowers you're saving for petal syrup). You can still use them yourself.</p>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`;
+      <span class="kkeep" title="Pilar leaves these alone"><button class="btn small alt" data-k="keep" data-id="${id}" data-n="-1" aria-label="Keep fewer back">−</button><span>${k.keep[id] ? `keep ${k.keep[id]}` : heldNew(k, id) ? `new: held ${Math.max(1, Math.ceil((k.fresh[id].until - Date.now()) / 6e4))}m` : "keep 0"}</span><button class="btn small alt" data-k="keep" data-id="${id}" data-n="1" aria-label="Keep one more back">+</button></span></div>`).join("")}</div><p class="muted">Tap one to take it back to your backpack (for the Scoop Shack, or a gift). <b>Keep</b>: how many Pilar must leave alone (say, flowers you're saving for petal syrup). You can still use them yourself. Anything you've just brought in, she leaves for 15 minutes, so you've time to decide.</p>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`;
   };
   var needList = (k, need) => Object.entries(need).map(([id, n]) => `<span class="kneed ${larderCount(k, id) >= n ? "ok" : ""}">${pic(GROUP_ICON[id] || id, 22)}${n} ${esc(nm2(id, n))} <small>(${larderCount(k, id)})</small></span>`).join("");
   function larderPanel(F2) {

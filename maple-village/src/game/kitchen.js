@@ -127,7 +127,11 @@ const has = (k, need) => Object.entries(need).every(([id, n]) => larderCount(k, 
 const use = (k, need) => Object.entries(need).forEach(([g, n]) => { for (const id of pool(k, g)) { if (n <= 0) break; const m = Math.min(n, k.larder[id] || 0); k.larder[id] -= m; n -= m; if (k.larder[id] <= 0) delete k.larder[id]; } });
 // Round 108: what Pilar may use. Mel keeps some of anything back (k.keep: larder id -> how many), and Pilar never
 // touches those; Mel cooking herself can use everything.
-const spareOf = (k, id) => Math.max(0, (k.larder[id] || 0) - (k.keep[id] || 0));
+// Things Mel's just brought in wait FRESH_HOLD before Pilar may use them (k.fresh: id -> {n, until}), so there's
+// time to set "keep" first.
+export const FRESH_HOLD = 15*60e3;
+const heldNew = (k, id) => { const f = k.fresh && k.fresh[id]; return f && f.until > Date.now() ? f.n : 0; };
+const spareOf = (k, id) => Math.max(0, (k.larder[id] || 0) - Math.max(k.keep[id] || 0, heldNew(k, id)));
 const spareCount = (k, g) => pool(k, g).reduce((a, id) => a + spareOf(k, id), 0);
 const canSpare = (k, need, also = {}) => Object.entries(need).every(([g, n]) => spareCount(k, g) - (also[g] || 0) >= n);
 const useSpare = (k, need) => Object.entries(need).forEach(([g, n]) => { for (const id of pool(k, g)) { if (n <= 0) break; const m = Math.min(n, spareOf(k, id)); k.larder[id] -= m; n -= m; if (k.larder[id] <= 0) delete k.larder[id]; } });
@@ -138,9 +142,12 @@ const hrs = ms => { const m = Math.ceil(ms/60000); return m >= 60 ? `${Math.floo
 
 /* ---------- moving things in ---------- */
 // from the backpack (F.inv) into the larder. n: how many (default all). -> how many moved
-export function sendToKitchen(F, id, n){
+export function sendToKitchen(F, id, n, hold = true){
   if (!isGood(id) || !(F.inv && F.inv[id] > 0)) return 0; const k = kitchenState(F), m = Math.min(F.inv[id], n || F.inv[id]);
-  F.inv[id] -= m; if (F.inv[id] <= 0) delete F.inv[id]; add(k, id, m); return m;
+  F.inv[id] -= m; if (F.inv[id] <= 0) delete F.inv[id]; add(k, id, m);
+  if (!hold) return m;
+  k.fresh = k.fresh || {}; Object.keys(k.fresh).forEach(x => { if (k.fresh[x].until <= Date.now()) delete k.fresh[x]; });
+  k.fresh[id] = {n: heldNew(k, id) + m, until: Date.now() + FRESH_HOLD}; return m;
 }
 export const backpackGoods = F => Object.keys(F.inv || {}).filter(id => isGood(id) && F.inv[id] > 0);
 
@@ -194,7 +201,7 @@ const cookLog = (k, line) => { k.log = [line, ...(k.log || [])].slice(0, 4); };
 export function cookTick(F, today){
   const k = kitchenState(F), v = vineState(F), help = v.help || {}, done = [];
   if (help.cook === false) return done;
-  if (help.fetch) { const moved = backpackGoods(F).map(x => [x, sendToKitchen(F, x)]).filter(([, n]) => n); if (moved.length) done.push(`brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")} from your backpack`); }
+  if (help.fetch) { const moved = backpackGoods(F).map(x => [x, sendToKitchen(F, x, 0, false)]).filter(([, n]) => n); if (moved.length) done.push(`brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")} from your backpack`); }
   if (k.oven && !left(k.oven)) { takeLoaves(F); done.push("took two loaves out of the oven"); }
   if (k.press && !left(k.press)) { takeCheese(F); done.push("unwrapped a new cheese"); }
   if (!k.press && !k.pilarNo.press && canSpare(k, {milk: 2})) { useSpare(k, {milk: 2}); k.press = {start: Date.now(), dur: PRESS}; done.push("started a cheese in the press"); }
@@ -216,7 +223,7 @@ export const cookLine = done => `Pilar ${done.length > 1 ? done.slice(0, -1).joi
 const pic = (id, s = 34) => icon(id, s);
 const larderGrid = k => { const ids = Object.keys(k.larder).filter(id => k.larder[id] > 0);
   return ids.length ? `<div class="kgoods">${ids.map(id => `<div class="kgoodw"><button class="kgood kbtn" data-k="take" data-id="${id}">${pic(id)}<b>${k.larder[id]}</b><small>${esc(nm(id, k.larder[id]))}</small><em>Take one</em></button>
-      <span class="kkeep" title="Pilar leaves these alone"><button class="btn small alt" data-k="keep" data-id="${id}" data-n="-1" aria-label="Keep fewer back">−</button><span>${k.keep[id] ? `keep ${k.keep[id]}` : "keep 0"}</span><button class="btn small alt" data-k="keep" data-id="${id}" data-n="1" aria-label="Keep one more back">+</button></span></div>`).join("")}</div><p class="muted">Tap one to take it back to your backpack (for the Scoop Shack, or a gift). <b>Keep</b>: how many Pilar must leave alone (say, flowers you're saving for petal syrup). You can still use them yourself.</p>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`; };
+      <span class="kkeep" title="Pilar leaves these alone"><button class="btn small alt" data-k="keep" data-id="${id}" data-n="-1" aria-label="Keep fewer back">−</button><span>${k.keep[id] ? `keep ${k.keep[id]}` : heldNew(k, id) ? `new: held ${Math.max(1, Math.ceil((k.fresh[id].until - Date.now())/60e3))}m` : "keep 0"}</span><button class="btn small alt" data-k="keep" data-id="${id}" data-n="1" aria-label="Keep one more back">+</button></span></div>`).join("")}</div><p class="muted">Tap one to take it back to your backpack (for the Scoop Shack, or a gift). <b>Keep</b>: how many Pilar must leave alone (say, flowers you're saving for petal syrup). You can still use them yourself. Anything you've just brought in, she leaves for 15 minutes, so you've time to decide.</p>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`; };
 const needList = (k, need) => Object.entries(need).map(([id, n]) => `<span class="kneed ${larderCount(k, id) >= n ? "ok" : ""}">${pic(GROUP_ICON[id] || id, 22)}${n} ${esc(nm(id, n))} <small>(${larderCount(k, id)})</small></span>`).join("");
 export function larderPanel(F){
   const k = kitchenState(F), bag = backpackGoods(F);

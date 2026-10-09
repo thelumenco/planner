@@ -2773,6 +2773,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(!!k.dropTapas(F, "patatas", day) && k.tapasAll(F, day).length === 2, "and one can come off again before it's cooked");
   k.planTapas(F, "puerros", "2026-10-15"); k.planTapas(F, "tortilla", "2026-10-15");
   check(k.tapasAll(F, "2026-10-15").map(t => t.id).join() === "puerros,tortilla", "tomorrow's planned tapas are on the chalkboard first thing the next day");
+  { const G = {inv: {honey: 1}}; const gk = k.kitchenState(G); Object.assign(gk.larder, {egg: 2, flour: 2}); gk.pilarNo.bread = true; k.sendToKitchen(G, "honey");
+    k.cookTick(G, day); const held = !(G.vine.menu || {}).honeycake && gk.larder.honey === 1;
+    gk.fresh.honey.until = Date.now() - 1; k.cookTick(G, day);
+    check(held && G.vine.menu.honeycake === 4, "honey just brought in waits 15 minutes before Pilar can bake it into honey cake (time to set keep)"); }
 }
 {
   console.log("\nthe greenhouse, herbs and gambas");
