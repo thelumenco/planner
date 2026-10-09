@@ -19,7 +19,7 @@ import { findPath, blocked } from "./paths.js";
 import { fetchPost, postPanel, postCount } from "./postbox.js";
 import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML, ohayoHellos, reactionsPanel, helloPanel } from "./feeds.js";
 import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia, chatLastDone, lastDueCount, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
-import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, roomLeft, hungry, hungryCount, KINDS } from "./pets.js";
+import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, scatterTreat, roomLeft, hungry, hungryCount, KINDS } from "./pets.js";
 import { wardrobePanel, newOutfit, outfitsToday, wearing, ACCESSORIES } from "./wardrobe.js";
 import { colourOf } from "../art/garments.js";
 import { readPlan, PLAN_WORDS } from "./plans.js";
@@ -360,7 +360,7 @@ function wakeUp(){ S.sleep = null; sfx("chime"); speak("Rise and shine! Nap done
 function feedAnimals(which){
   const list = which === "all" ? F.pets.animals.filter(a => hungry(a, F)) : F.pets.animals.filter(a => a.id === which);
   let fed = 0, eggs = 0, milk = 0, grew = [], miss = "";
-  list.forEach(a => { const r = feedOne(F, a, F.inv, addInv); if (r.ok) { fed++; if (r.egg) eggs++; if (r.milk) milk++; if (r.grew) grew.push(a); } else if (r.msg) miss = r.msg; });
+  list.forEach(a => { const r = feedOne(F, a, F.inv, addInv); if (r.ok) { fed++; if (r.egg) eggs += r.egg; if (r.milk) milk++; if (r.grew) grew.push(a); } else if (r.msg) miss = r.msg; });
   if (!fed) { if (miss) speak(miss, 4000); ctx(); return 0; }
   sfx("chime"); gainXp(1); if (scene === "base") [0, 300].forEach(d => setTimeout(() => mprop("heart", 110 + rnd(-30, 30), 520, 1700), d));
   const g = grew[0];
@@ -1729,6 +1729,7 @@ function ctx(){
       ward.busy = false; if (o) { ward.ask = ""; save(true); speak(`How about this: ${o.label.toLowerCase()}?`, 4000); } else ward.error = "Hmm, nothing came back. Try again?"; ctx(); }; }
   c.querySelectorAll("[data-feed]").forEach(b => b.onclick = () => feedAnimals(b.dataset.feed));
   c.querySelectorAll("[data-runup]").forEach(b => b.onclick = () => buyRunUpgrade());
+  c.querySelectorAll("[data-treat]").forEach(b => b.onclick = () => { const line = scatterTreat(F, addInv); if (!line) return; sfx("chime"); gainXp(1); speak(line, 4500); if (scene === "base") mprop("heart", 110, 520, 1700); save(true); ctx(); });
   c.querySelectorAll("[data-tool]").forEach(b => b.onclick = () => buyTool(b.dataset.tool));
   c.querySelectorAll("[data-dig]").forEach(b => b.onclick = () => {
     const k = b.dataset.dig;
@@ -2628,7 +2629,11 @@ function sitForDinner(){
   if (S.dinnerDay !== dayKey()) { S.dinnerDay = dayKey(); gainXp(3); [0, 250, 500, 750].forEach((t, k) => setTimeout(() => mprop("heart", seat[0] - 120 + k*70, seat[1] - 70, 1800), t)); save(); }
   const who = ["mama", "mum", "gonggong", "dad"].find(isHere);
   if (who) setTimeout(() => npcSay(who, pick(who === "mama" ? ["Eat, eat! Ma Ma made too much again.", "Come, sit next to Ma Ma."] : who === "mum" ? ["Have more! You're too thin.", "Everyone's here. This is the best."] : who === "gonggong" ? ["Have you eaten? Now you have.", "Pass the soup, pass the soup."] : ["Who wants to hear what I played today?", "Evan, eat your vegetables. For Grandpa."])), 1200);
-  speak("Family dinner. Everyone round one table, all talking at once. The best.", 4500); render();
+  // bring two tomatoes and two eggs and Ma Ma makes her tomato and egg for the table (once a dinner)
+  if (S.tomeggDay !== dayKey() && (F.inv.tomato || 0) >= 2 && (F.inv.egg || 0) >= 2) { S.tomeggDay = dayKey(); addInv("tomato", -2); addInv("egg", -2); gainXp(2);
+    setTimeout(() => { if (isHere("mama")) npcSay("mama", "Tomatoes and eggs! Ma Ma makes her tomato and egg. Everybody eat!"); if (evanHere()) setTimeout(() => evanSays(pick(["Ma Ma's eggs are the best!", "More rice please!", "Yummy yummy!"])), 1800); }, 2600);
+    speak("You hand Ma Ma two tomatoes and two eggs. Ten minutes later: her tomato and egg, over rice. Everyone goes quiet, then asks for seconds.", 6500); save(); render(); return; }
+  speak((F.inv.tomato || 0) || (F.inv.egg || 0) ? "Family dinner. Everyone round one table, all talking at once. (Two tomatoes and two eggs and Ma Ma will make her tomato and egg.)" : "Family dinner. Everyone round one table, all talking at once. The best.", 4500); render();
 }
 // Mum's exercise class on the exercise lawn at the field: Mel joins on the spare mat (once a day it earns a little)
 let melEx = null;

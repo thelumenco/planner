@@ -2507,6 +2507,46 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await fox().then(f => f.vine.menu.shortbread === 4 && !f.kitchen.larder.tulip), "garden tulips go into flower shortbread");
   await page.close();
 }
+{
+  // Phase 4, the rest: sunflower seeds for the hens, petal syrup, bouquet orders, Ma Ma's tomato and egg at dinner
+  console.log("\nflowers, eggs and Ma Ma's tomato and egg");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`phase4 pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/p4patch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.inv = {...(f.inv || {}), sunflower: 1, chickfeed: 3, tomato: 2, egg: 2, bq_tulip: 1}; f.pets = {...(f.pets || {}), animals: [{id: "a1", kind: "chick", name: "Hennie", born: 0, feeds: 9, fedDay: null, col: 0}], next: 2, run: 0};
+    f.kitchen = {larder: {tulip: 3, milk: 1, lemon: 1}, oven: null, press: null}; f.vine = {...(f.vine || {}), help: {cook: false}};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=12:30&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=12:30&date=2026-10-07&p4patch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="run"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-treat]', { timeout: 20000 });
+  await page.click('#ctx [data-treat]'); await page.waitForTimeout(300);
+  const eggs0 = await fox().then(f => f.inv.egg || 0);
+  await page.locator('#ctx [data-feed]').first().click(); await page.waitForTimeout(300);
+  check(await fox().then(f => !f.inv.sunflower && f.pets.treat === "2026-10-07" && (f.inv.egg || 0) === eggs0 + 2), "a garden sunflower's seeds for the hens: two eggs a meal today");
+  await page.evaluate(() => window.__mapleScene("kitchen")); await page.waitForTimeout(900);
+  await page.locator('#world [data-spot="larder"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="syrup"]', { timeout: 15000 });
+  await page.click('#ctx [data-k="syrup"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.syrup === 2 && !f.kitchen.larder.tulip), "three garden tulips make two bottles of petal syrup");
+  await page.locator('#ctx [data-k="send"][data-id="syrup"]').click(); await page.waitForTimeout(200);
+  await page.locator('#ctx [data-close]').first().click();
+  await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-dish="posset"]', { timeout: 15000 });
+  await page.click('#ctx [data-dish="posset"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.vine.menu.posset === 4), "petal syrup, milk and a lemon make a lemon and petal posset");
+  await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="farmshop"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-or="order"]', { timeout: 20000 }).catch(() => {});
+  const c0 = await fox().then(f => f.coins);
+  if (await page.locator('#ctx [data-or="order"]').count()) { await page.click('#ctx [data-or="order"]'); await page.waitForTimeout(300);
+    check(await fox().then(f => f.coins === c0 + 25 && !f.inv.bq_tulip), "a bouquet order at Ma Ma's: hand one over for 25 coins"); }
+  else check(false, "a bouquet order at Ma Ma's: hand one over for 25 coins");
+  await page.goto(url + "?seed=1&time=19:00&date=2026-10-07"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("cottage")); await page.waitForTimeout(2000);
+  await page.locator('#world [data-spot="dine"]').dispatchEvent("click"); await page.waitForTimeout(1500);
+  check(await fox().then(f => !f.inv.tomato && (f.inv.egg || 0) === eggs0), "at family dinner, two tomatoes and two eggs become Ma Ma's tomato and egg");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

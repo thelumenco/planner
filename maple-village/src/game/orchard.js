@@ -6,7 +6,7 @@
 // the spot is replanted. See data/orchard.js for the catalogue and timings.
 // State: F.orch = {trees[12], beds[12], bushes[4]: {k, at, next} | null, stock: {fruit|stem id: n}, tin, lastTick,
 // today: {day, sold, coins}, tea}; potted flowers placed around the village live in F.pots {spot: flower id}.
-import { esc, H, now } from "../util.js";
+import { esc, H, now, hash } from "../util.js";
 import { ITEMS, seasonOf, SEASONS } from "../data/items.js";
 import { TREES, FLOWERS, TREE_GROW, TREE_FIRST, TREE_AGAIN, BED_GROW, BED_AGAIN, BUSH_GROW, BUSH_AGAIN, BED_YIELD, BUSH_YIELD,
   BOUQUET_STEMS, POT_STEMS, STEM_PRICE, BOUQUET_PRICE, POT_PRICE, POT_SPOTS } from "../data/orchard.js";
@@ -138,6 +138,24 @@ export function spotPanel(F, where, i, today){
 }
 // The farm shop's tabs: Plant (saplings, bushes and seedlings, bought and planted in the first free spot), Fruit and
 // Flowers (only what Ma Ma has picked from Mel's own trees and beds: free for Mel to take)
+// Bouquet orders: most days (not one in seven) someone in the village asks Ma Ma for a bouquet for an occasion. Hand
+// over any bouquet from the backpack (make one here from the stems) for ORDER_PAY coins. One order a day.
+const OCCASIONS = ["a birthday", "an anniversary dinner", "a new baby next door", "a get-well visit", "a thank-you for a neighbour", "a first date", "the café tables", "a housewarming"];
+const ORDER_FROM = ["Rosa", "Bastien", "Noor", "Lila", "Celeste", "Felix", "Elena", "Mateo"];
+export const ORDER_PAY = 25;
+export function orderOf(today){ const h = hash(today + "bouquet"); return h % 7 === 0 ? null : {who: ORDER_FROM[(h >> 3) % ORDER_FROM.length], why: OCCASIONS[(h >> 6) % OCCASIONS.length]}; }
+const bouquetIn = F => Object.keys(F.inv || {}).find(id => /^bq_/.test(id) && F.inv[id] > 0);
+export function fillOrder(F, today){
+  const o = orchState(F), q = orderOf(today), bq = bouquetIn(F); if (!q || o.orderDay === today || !bq) return null;
+  F.inv[bq]--; if (!F.inv[bq]) delete F.inv[bq]; o.orderDay = today; F.coins += ORDER_PAY;
+  return `Ma Ma wraps it in paper for ${q.who}: for ${q.why}. ${ORDER_PAY} coins in the tin for you!`;
+}
+function orderHtml(F, today){
+  const o = orchState(F), q = orderOf(today); if (!q) return "";
+  if (o.orderDay === today) return `<p class="krequest">${icon("heart", 16)} Today's bouquet order for ${esc(q.who)} is done. Ma Ma says thank you!</p>`;
+  const bq = bouquetIn(F);
+  return `<p class="krequest">${icon("heart", 16)} <b>Bouquet order:</b> ${esc(q.who)} would like a bouquet for ${esc(q.why)}. Pays ${ORDER_PAY} ${icon("coin", 13)}. <button class="btn small ${bq ? "primary" : "alt"}" data-or="order" ${bq ? "" : "disabled"}>${bq ? "Hand over a bouquet" : "Make a bouquet first"}</button></p>`;
+}
 export function shopPanel(F, today, tab, market){
   const o = orchState(F), fruit = Object.values(TREES).map(t => t.fruit).filter((x, i, a) => a.indexOf(x) === i), season = seasonOf(today);
   const anyPlanted = o.trees.some(Boolean) || o.beds.some(Boolean) || o.bushes.some(Boolean);
@@ -145,7 +163,7 @@ export function shopPanel(F, today, tab, market){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${market ? "Ma Ma's market stall" : "Ma Ma's farm shop"}</h2>`;
   h += `<p class="sub">${market ? `Ma Ma brought the farm shop's shelves to the Sunday market: fruit and flowers only. Still free for you; shoppers pay into the tin.${o.today.day === today && o.today.sold ? ` She's sold ${o.today.sold} thing${o.today.sold === 1 ? "" : "s"} today.` : ""}` : tab === "plant" ? `Saplings, bushes and seedlings for ${SEASONS[season].n.toLowerCase()}. Pick one and Ma Ma plants it in the next free spot (or tap a spot in the orchard or flower farm).`
     : `What Ma Ma picks from your trees and flowers goes on these shelves: free for you to take. Villagers buy the rest while it's open (9am to 6pm).${o.today.day === today && o.today.sold ? ` Today she's sold ${o.today.sold} thing${o.today.sold === 1 ? "" : "s"}.` : ""}`}</p>`;
-  if (!market) h += tourLine(o, today);
+  if (!market) h += tourLine(o, today) + orderHtml(F, today);
   h += `<div class="tabs" role="tablist">${[["plant", "Plant"], ["fruit", "Fruit"], ["flowers", "Flowers"]].filter(([k]) => !market || k !== "plant").map(([k, n]) => `<button role="tab" data-or="tab" data-k="${k}" aria-selected="${tab === k}">${n}</button>`).join("")}</div>`;
   if (tab === "plant") {
     for (const where of ["tree", "bush", "bed"]) {
@@ -221,6 +239,7 @@ export function wireOrchard(root, F, api){
     else if (k === "tab") { api.tab(id); return; }
     else if (k === "take") line = takeFruit(F, id); else if (k === "takeall") line = takeFruit(F, id, true);
     else if (k === "make") line = makeFlowers(F, b.dataset.kind, id);
+    else if (k === "order") { line = fillOrder(F, api.today); snd = "coin"; }
     else if (k === "plantany") { line = plantAny(F, b.dataset.where, id, api.today); snd = "coin"; }
     else if (k === "place") { line = placePot(F, api.item, id); if (line) { api.sfx("chime"); api.say(line); api.save(); api.placed(); return; } }
     else if (k === "tea") { api.tea(); return; }

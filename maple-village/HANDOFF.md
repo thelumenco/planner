@@ -1370,4 +1370,12 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
     - Van road trips (fuel and campsite fees).
     - A weekly animal feed bill.
   - **Phase 5, growth ladder and small wins:** Honeybrook Woods, buying and renting cottages, and a collection book with stickers for fish, flavours, wine labels and cheeses.
-  - **Also still to do from phase 4:** sunflower seeds as hen treats (more eggs), petal syrup, event bouquet orders, and Ma Ma's tomato and egg at family dinners.
+
+### Round 102: phase 4, the rest
+- **Hen treats** (pets.js `canTreat`, `scatterTreat`; `P.treat` = day): one garden sunflower scattered in the run (a button in the run panel). For the rest of that day every grown hen lays 2 eggs a meal. `feedOne` now returns `egg` as a count.
+- **Petal syrup** (kitchen.js `makeSyrup`, `SYRUP_PETALS` 3): made at the larder from 3 garden flowers (the `petals` group: tulip or sunflower). It gives 2 `syrup` items in the backpack.
+  - Uses: gelato (`INGR.syrup`, "Petal"), a bonbon filling (via INGR), and the new small plate "Lemon and petal posset" (milk + lemon + syrup, 4 plates at 7).
+  - Lemons and syrup are now kitchen goods. Pea is excluded from bonbon fillings.
+- **Bouquet orders** (orchard.js `orderOf(day)`, `fillOrder`, `ORDER_PAY` 25): six days in seven, a villager asks for a bouquet for an occasion. It shows in Ma Ma's farm shop (not the market stall); hand over any `bq_*` for 25 coins, once a day (`o.orderDay`).
+- **Ma Ma's tomato and egg** (core.js `sitForDinner`): at the first sit-down of a family dinner, if Mel has 2 tomatoes and 2 eggs, Ma Ma cooks it (+2 XP, a line from Ma Ma and Evan; `S.tomeggDay`). If Mel has only some of them, the dinner line says what's needed.
+- **Tests:** "flowers, eggs and Ma Ma's tomato and egg" block.

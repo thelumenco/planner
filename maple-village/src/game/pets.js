@@ -57,11 +57,14 @@ export function feedOne(F, a, inv, addInv){
   if (!food) return {ok: false, msg: `No ${KINDS[a.kind].foodName} in your backpack. The market sells it.`};
   const wasGrown = isGrown(a);
   addInv(food, -1); a.fedDay = dayKey(); a.fedMeal = mealNow(); a.feeds = (a.feeds || 0) + 1;
-  const grew = !wasGrown && isGrown(a), egg = wasGrown && a.kind === "chick";
-  if (egg) addInv("egg", 1);
+  const grew = !wasGrown && isGrown(a), egg = wasGrown && a.kind === "chick" ? (ensurePets(F).treat === dayKey() ? 2 : 1) : 0;   // sunflower seeds today: two eggs a meal
+  if (egg) addInv("egg", egg);
   const milk = wasGrown && a.kind === "goat"; if (milk) addInv("goatmilk", 1);   // a grown goat gives a bottle of goat's milk when fed
   return {ok: true, grew, egg, milk, food};
 }
+// Sunflower seeds scattered in the run (one garden sunflower): every hen lays two eggs a meal for the rest of the day
+export const canTreat = F => { const P = ensurePets(F); return P.treat !== dayKey() && P.animals.some(henMeals); };
+export function scatterTreat(F, addInv){ const P = ensurePets(F); if (!canTreat(F) || !(F.inv.sunflower > 0)) return null; addInv("sunflower", -1); P.treat = dayKey(); return "Sunflower seeds for the hens! They'll lay two eggs a meal for the rest of today."; }
 export function upgradeRun(F){
   const P = ensurePets(F), nx = RUNS[P.run + 1]; if (!nx || F.coins < nx.price) return null;
   F.coins -= nx.price; P.run++; return nx;
@@ -76,6 +79,8 @@ export function runPanel(F){
     h += `<ul class="hlist pets">${P.animals.map(a => { const hu = hungry(a, F), left = Math.max(0, GROW - (a.feeds || 0));
       return `<li><span class="pico">${icon(a.kind === "chick" ? (isGrown(a) ? "hen" : "chick") : a.kind === "goat" ? "goat" : "rabbit", 30)}</span><span><b>${esc(a.name)}</b><small>${label(a)} · ${hu ? "hungry" : "fed and happy"}${left ? ` · ${left} more ${left === 1 ? "meal" : "meals"} to grow up` : a.kind === "chick" ? " · lays an egg when fed" : ""}</small></span>${hu ? `<button class="next" data-feed="${a.id}">feed</button>` : `<span class="hbadge">full</span>`}</li>`; }).join("")}</ul>`;
     if (hungryCount(F) > 1) h += `<div class="actions"><button class="btn primary small" data-feed="all">Feed everyone</button></div>`;
+    if (P.animals.some(henMeals)) h += P.treat === dayKey() ? `<p class="muted">Sunflower seeds scattered today: two eggs a meal from every hen.</p>`
+      : `<p class="muted">A garden sunflower's seeds are a treat for the hens: two eggs a meal for the rest of the day. <button class="btn small alt" data-treat="1" ${F.inv.sunflower > 0 ? "" : "disabled"}>Scatter seeds (${F.inv.sunflower || 0} sunflower${F.inv.sunflower === 1 ? "" : "s"})</button></p>`;
   }
   h += `<p class="eyebrow" style="margin:12px 0 6px">Make the run nicer</p>`;
   h += nx ? `<div class="items shop"><button class="item" data-runup="1" ${F.coins < nx.price ? "disabled" : ""}><span class="e">${icon("coop", 34)}</span><span class="n">${esc(nx.n)}</span><span class="c"><b>${nx.price}</b> ${icon("coin", 13)}</span><span class="d">${esc(nx.what)}</span></button></div>`

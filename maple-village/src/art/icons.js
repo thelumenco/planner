@@ -226,6 +226,7 @@ I.yoghurt = [`<path d="M6 9h12l-1.5 10a2 2 0 0 1-2 1.7h-5a2 2 0 0 1-2-1.7z" ${f(
   I.crayfish = [`<path d="M8 9h8v7a4 4 0 0 1-8 0z" ${f("#D9614C")}/><path d="M8 10L4 6l2-2 3 4M16 10l4-4-2-2-3 4" ${f("#D9614C")}/>`, `<path d="M8 9h8v7a4 4 0 0 1-8 0zM8 10L4 6l2-2 3 4M16 10l4-4-2-2-3 4M9 13h6M9 16h6M10 20l-1 2M14 20l1 2"/>`];
   I.boot = [`<path d="M8 3h6v11l6 3v4H8z" ${f("#5E8A5A")}/>`, `<path d="M8 3h6v11l6 3v4H8zM8 18h12M8 6h6"/>`];
   I.seaglass = [`<path d="M6 10l5-5 7 3 1 7-6 5-6-3z" ${f("#9FD3C0")}/>`, `<path d="M6 10l5-5 7 3 1 7-6 5-6-3z"/><path d="M10 9l3 1" opacity=".6"/>`];
+  I.syrup = [`<path d="M10 3h4v4l2 3v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10l2-3z" ${f("#F4B8C8")}/><path d="M8 13h8v5H8z" ${f("#FFFDF6")}/>`, `<path d="M10 3h4v4l2 3v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10l2-3zM8 13h8M8 18h8"/><circle cx="12" cy="15.5" r="1.2"/>`];
   I.rod = [`<path d="M4 21L19 4" ${f("none")}/><circle cx="7" cy="17" r="2.2" ${f("#F3C969")}/>`, `<path d="M4 21L19 4M19 4v9"/><circle cx="7" cy="17" r="2.2"/><circle cx="19" cy="14" r="1.4"/>`]; }
 I.egg = [`<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z" ${f("#F6EBDD")}/>`, `<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z"/><path d="M9 12c0-2 .8-3.6 1.8-4.5" opacity=".6"/>`];
 I.coop = [`<path d="M3 11l9-7 9 7z" ${f(C.rose)}/><rect x="5" y="11" width="14" height="9" ${f(C.butter)}/><rect x="10" y="14" width="4" height="6" ${f(C.wood)}/>`,

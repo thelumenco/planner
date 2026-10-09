@@ -22,7 +22,7 @@ export const GOODS = {
   trout: ["rainbow trout", "rainbow trout"], crayfish: ["crayfish", "crayfish"], sardine: ["sardine", "sardines"], mackerel: ["mackerel", "mackerel"],
   seabream: ["sea bream", "sea bream"], squid: ["squid", "squid"], octopus: ["octopus", "octopuses"],
   goatmilk: ["goat's milk", "goat's milk"], yoghurt: ["pot of yoghurt", "pots of yoghurt"], pear: ["pear", "pears"], fig: ["fig", "figs"],
-  honeycomb: ["piece of honeycomb", "pieces of honeycomb"],
+  honeycomb: ["piece of honeycomb", "pieces of honeycomb"], lemon: ["lemon", "lemons"], syrup: ["bottle of petal syrup", "bottles of petal syrup"],
   // groups (round 101): anything that fits, see ALT
   farmcheese: ["farm cheese", "farm cheeses"], halloumi: ["halloumi", "halloumi"], bluecheese: ["Honeybrook blue", "Honeybrook blue"], cheddar: ["farmhouse cheddar", "farmhouse cheddar"],
   honey: ["jar of honey", "jars of honey"], petals: ["garden flower", "garden flowers"]};
@@ -45,7 +45,8 @@ export const DISHES = {
   apples: {n: "Apple slices", need: {apple: 2}, plates: 4, price: 3},
   honeycake: {n: "Honey cake", need: {egg: 1, honey: 1, flour: 1}, plates: 4, price: 7},
   shortbread: {n: "Flower shortbread", need: {flour: 1, petals: 2}, plates: 4, price: 5},
-  bluetart: {n: "Blueberry tart", need: {blueberry: 3, flour: 1}, plates: 4, price: 6}};
+  bluetart: {n: "Blueberry tart", need: {blueberry: 3, flour: 1}, plates: 4, price: 6},
+  posset: {n: "Lemon and petal posset", need: {milk: 1, lemon: 1, syrup: 1}, plates: 4, price: 7}};
 // the tapas of the day: garden dishes, one chosen each day, 6 plates a batch
 export const TAPAS = {
   patatas: {n: "Patatas bravas", need: {potato: 2, tomato: 1}, price: 8, seasons: ["autumn"]},
@@ -113,6 +114,10 @@ export function bake(F){ const k = kitchenState(F); if (k.oven || !has(k, {flour
 export function takeLoaves(F){ const k = kitchenState(F); if (!k.oven || left(k.oven)) return null; k.oven = null; add(k, "loaf", 2); return "Two warm loaves, into the larder. Smells amazing."; }
 export function pressCheese(F){ const k = kitchenState(F); if (k.press || !has(k, {milk: 2})) return null; use(k, {milk: 2}); k.press = {start: Date.now(), dur: PRESS}; return "Milk in the press. Cheese in about three hours."; }
 export function takeCheese(F){ const k = kitchenState(F); if (!k.press || left(k.press)) return null; k.press = null; add(k, "cheese", 1); return "A little round of cheese, into the larder."; }
+// Petal syrup: three garden flowers (tulips, sunflowers) simmered with sugar make two bottles, into the backpack:
+// for gelato at the Scoop Shack, a bonbon filling at the Cocoa Room, or the lemon and petal posset here
+export const SYRUP_PETALS = 3;
+export function makeSyrup(F){ const k = kitchenState(F); if (!has(k, {petals: SYRUP_PETALS})) return null; use(k, {petals: SYRUP_PETALS}); F.inv = F.inv || {}; F.inv.syrup = (F.inv.syrup || 0) + 2; return "Two bottles of petal syrup, pink and fragrant. Into your backpack."; }
 export function cookDish(F, id){ const k = kitchenState(F), d = DISHES[id], v = vineState(F); if (!d || !has(k, d.need)) return null; use(k, d.need); v.menu[id] = (v.menu[id] || 0) + d.plates; return `${d.plates} plates of ${d.n.toLowerCase()}, out to the tasting room.`; }
 export const tapasToday = (F, today) => { const v = vineState(F); return v.tapas && v.tapas.day === today ? v.tapas : null; };
 // choose today's tapas (can change it until a batch is cooked)
@@ -167,6 +172,8 @@ export function larderPanel(F){
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The larder</h2>${larderGrid(k)}
     <h3 class="ph3">In your backpack</h3>${bag.length ? `<div class="kgoods">${bag.map(id => `<button class="kgood kbtn" data-k="send" data-id="${id}">${pic(id)}<b>${F.inv[id]}</b><small>${esc(nm(id, F.inv[id]))}</small><em>Bring in</em></button>`).join("")}</div>
     <div class="actions"><button class="btn primary small" data-k="sendall">Bring everything in</button></div>` : `<p class="muted">Nothing for the kitchen in your backpack right now. Crops from the garden, eggs and milk from the animal run, olives from the olive tree, and Hana's deli shelf all help.</p>`}
+    <h3 class="ph3">Petal syrup</h3><p class="muted">${SYRUP_PETALS} garden flowers (tulips or sunflowers) make two bottles: for gelato, a bonbon filling, or the lemon and petal posset. Flowers in the larder: ${larderCount(k, "petals")}.</p>
+    <div class="actions"><button class="btn small ${larderCount(k, "petals") >= SYRUP_PETALS ? "primary" : "alt"}" data-k="syrup" ${larderCount(k, "petals") >= SYRUP_PETALS ? "" : "disabled"}>Make petal syrup</button></div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export function ovenPanel(F){
@@ -204,6 +211,7 @@ export function wireKitchen(root, F, api){
   root.querySelectorAll("[data-k]").forEach(b => b.onclick = () => {
     const k = b.dataset.k, id = b.dataset.dish || b.dataset.id; let line = null;   // (dish buttons avoid data-id: the market claims .item[data-id])
     if (k === "send") { const n = sendToKitchen(F, id); if (n) line = `${n} ${nm(id, n)} into the larder.`; }
+    else if (k === "syrup") line = makeSyrup(F);
     else if (k === "take") { const kk = kitchenState(F); if ((kk.larder[id] || 0) > 0) { kk.larder[id]--; if (kk.larder[id] <= 0) delete kk.larder[id]; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; line = `One ${nm(id, 1)} back in your backpack.`; } }
     else if (k === "sendall") { const moved = backpackGoods(F).map(x => [x, sendToKitchen(F, x)]).filter(([, n]) => n); if (moved.length) line = `Brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")}.`; }
     else if (k === "bake") line = bake(F); else if (k === "loaves") line = takeLoaves(F);
