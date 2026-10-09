@@ -753,7 +753,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const subC0 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
   await page.click('#notebook .sub.upnext [data-nb="sub"]');
   await page.waitForFunction(() => (window.__subTicks || []).length, null, { timeout: 8000 }).catch(() => {});
-  check(await page.evaluate(c => JSON.parse(localStorage.getItem("fox.fox")).coins === c + 5, subC0), "a subtask in a treadmill batch pays like a quest (5 coins)");
+  check(await page.evaluate(c => JSON.parse(localStorage.getItem("fox.fox")).coins === c + 8, subC0), "a subtask in a treadmill batch pays like a quest (8 coins)");
   check(await page.evaluate(() => { const x = (window.__subTicks || [])[0]; return !!x && x.tool === "mark_subtask_as_completed" && x.input.taskId === "s3" && x.input.subtaskId === "x"; }), "ticking a subtask ticks it in Sunsama too");
   check(/2 of 2 done/.test(await page.locator("#notebook .subcount").textContent()) && await page.locator("#notebook .suball").count() === 1, "and the checklist shows everything done");
   await page.click('#notebook [data-nb="close"]').catch(() => {});
@@ -916,7 +916,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   for (let i = 1; i < steps; i++) { await page.click(`#ctx .rcheck li >> nth=${i}`); await page.waitForTimeout(120); }
   await page.click("#ctx .rcheck li >> nth=0"); await page.click("#ctx .rcheck li >> nth=0"); await page.waitForTimeout(200);
   const coins1 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
-  check(coins1 - coins0 === (steps - 1) + 5, `each routine step earns a coin and finishing the routine earns a 5-coin bonus, once a day (+${coins1 - coins0})`);
+  check(coins1 - coins0 === (steps - 1) + 8, `each routine step earns a coin and finishing the routine earns an 8-coin bonus, once a day (+${coins1 - coins0})`);
   await page.click('#ctx [data-rt="sel"]:has-text("Beauty")'); await page.click('#ctx [data-rt="edit"]');
   check(await page.locator('#ctx [data-day="sun"]').inputValue() === "Air shot micro-needling + face mask", "Mel's beauty week is already on the board");
   await page.click("#ctx .rpaste summary");
@@ -1813,7 +1813,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await tap("sacks", '#ctx [data-cc="beans"][data-n="3"]'); await page.click('#ctx [data-cc="beans"][data-n="3"]'); await page.waitForTimeout(300);
   await page.click("#ctx [data-close]");
   await tap("roaster", '#ctx [data-cc="roast"]'); await page.click('#ctx [data-cc="roast"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.cocoa.beans === 2 && f.cocoa.roast && f.coins === 970), "three sacks of beans (30 coins), one in the roaster");
+  check(await fox().then(f => f.cocoa.beans === 2 && f.cocoa.roast && f.coins === 925), "three sacks of beans (75 coins), one in the roaster");
   await at("12:15"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
   await tap("grinder", '#ctx [data-cc="grind"][data-k="dark"]'); await page.click('#ctx [data-cc="grind"][data-k="dark"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.roasted === 0 && f.cocoa.grind && f.cocoa.grind.kind === "dark"), "ten minutes later the beans are roasted, and go in the grinder as dark chocolate");
