@@ -7,11 +7,11 @@
 //   dinner, and they leave something for the larder by way of thanks.
 // State: F.kitchen = {larder: {id: n}, oven: {start, dur} | null, press: {start, dur} | null}; plates live in F.vine
 // (v.menu for small plates, v.tapas = {day, id, plates} for today's tapas, v.staffNote for the last staff dinner).
-import { esc, H } from "../util.js";
+import { esc, H, hash } from "../util.js";
 import { vineState } from "./vineyard.js";
 import { dishArt } from "../art/wine.js";
 import { icon } from "../art/icons.js";
-import { seasonOf, SEASONS } from "../data/items.js";
+import { seasonOf, SEASONS, ITEMS } from "../data/items.js";
 
 export const GOODS = {
   carrot: ["carrot", "carrots"], corn: ["corn cob", "corn cobs"], strawberry: ["strawberry", "strawberries"], blueberry: ["blueberry", "blueberries"],
@@ -20,9 +20,17 @@ export const GOODS = {
   apple: ["apple", "apples"], dumpling: ["dumpling", "dumplings"], fish: ["fish", "fish"], toast: ["honey toast", "honey toasts"],
   pea: ["handful of peas", "handfuls of peas"], pumpkin: ["pumpkin", "pumpkins"], leek: ["leek", "leeks"],
   trout: ["rainbow trout", "rainbow trout"], crayfish: ["crayfish", "crayfish"], sardine: ["sardine", "sardines"], mackerel: ["mackerel", "mackerel"],
-  seabream: ["sea bream", "sea bream"], squid: ["squid", "squid"], octopus: ["octopus", "octopuses"]};
-export const isGood = id => id in GOODS;   // (loaves are only ever baked in the oven, but one taken out can go back in)
-const nm = (id, n) => GOODS[id] ? GOODS[id][n === 1 ? 0 : 1] : id;
+  seabream: ["sea bream", "sea bream"], squid: ["squid", "squid"], octopus: ["octopus", "octopuses"],
+  goatmilk: ["goat's milk", "goat's milk"], yoghurt: ["pot of yoghurt", "pots of yoghurt"], pear: ["pear", "pears"], fig: ["fig", "figs"],
+  honeycomb: ["piece of honeycomb", "pieces of honeycomb"],
+  // groups (round 101): anything that fits, see ALT
+  farmcheese: ["farm cheese", "farm cheeses"], halloumi: ["halloumi", "halloumi"], bluecheese: ["Honeybrook blue", "Honeybrook blue"], cheddar: ["farmhouse cheddar", "farmhouse cheddar"],
+  honey: ["jar of honey", "jars of honey"], petals: ["garden flower", "garden flowers"]};
+export const GROUP_ICON = {farmcheese: "chz_cheddar", halloumi: "chz_halloumi", bluecheese: "chz_blue", cheddar: "chz_cheddar", honey: "honey", petals: "tulip"};
+// Wildflower Farm's cheeses (chz_*) come in as themselves: any of them does for "cheese" in a recipe, and the farm
+// cheese board wants one; goat's milk does for milk (the press, the crema). See ALT.
+export const isGood = id => (id in GOODS && !GROUP_ICON[id]) || /^chz_|^honey(_lav|_blossom|_cream)?$/.test(id) || id === "tulip" || id === "sunflower";   // (loaves are only ever baked in the oven, but one taken out can go back in)
+const nm = (id, n) => GOODS[id] ? GOODS[id][n === 1 ? 0 : 1] : ITEMS[id] ? ITEMS[id].n.toLowerCase() : id;
 export const needText = need => Object.entries(need).map(([k, n]) => `${n} ${nm(k, n)}`).join(" + ");
 
 // small plates for the tasting room, cooked at the stove
@@ -30,10 +38,14 @@ export const DISHES = {
   bread: {n: "Bread and butter", need: {loaf: 1}, plates: 4, price: 3},
   olives: {n: "Bowl of olives", need: {olives: 1}, plates: 4, price: 4},
   cheese: {n: "Cheese board", need: {cheese: 1, loaf: 1}, plates: 4, price: 8},
+  farmboard: {n: "Farm cheese board", need: {farmcheese: 1, loaf: 1}, plates: 4, price: 12},
   dumplings: {n: "Dumplings", need: {dumpling: 2}, plates: 4, price: 6},
   honeytoast: {n: "Honey toast soldiers", need: {toast: 1}, plates: 3, price: 7},
   fish: {n: "Grilled fish", need: {fish: 1}, plates: 3, price: 8},
-  apples: {n: "Apple slices", need: {apple: 2}, plates: 4, price: 3}};
+  apples: {n: "Apple slices", need: {apple: 2}, plates: 4, price: 3},
+  honeycake: {n: "Honey cake", need: {egg: 1, honey: 1, flour: 1}, plates: 4, price: 7},
+  shortbread: {n: "Flower shortbread", need: {flour: 1, petals: 2}, plates: 4, price: 5},
+  bluetart: {n: "Blueberry tart", need: {blueberry: 3, flour: 1}, plates: 4, price: 6}};
 // the tapas of the day: garden dishes, one chosen each day, 6 plates a batch
 export const TAPAS = {
   patatas: {n: "Patatas bravas", need: {potato: 2, tomato: 1}, price: 8, seasons: ["autumn"]},
@@ -45,10 +57,10 @@ export const TAPAS = {
   crema: {n: "Strawberry crema", need: {strawberry: 2, milk: 1}, price: 9, seasons: ["spring"]},
   tostas: {n: "Tomato and cheese tostas", need: {loaf: 1, tomato: 1, cheese: 1}, price: 10, seasons: ["summer", "autumn"]},
   rellenos: {n: "Stuffed peppers", need: {pepper: 2, cheese: 1}, price: 10, seasons: ["summer"]},
-  guisantes: {n: "Peas with mint and cheese", need: {pea: 2, cheese: 1}, price: 8, seasons: ["spring"]},
+  guisantes: {n: "Peas with mint and cheese", need: {pea: 2, cheese: 1}, price: 8, seasons: ["spring", "summer"]},
   croquetas: {n: "Pumpkin croquetas", need: {pumpkin: 1, egg: 1, loaf: 1}, price: 10, seasons: ["autumn", "winter"]},
   calabaza: {n: "Roast pumpkin with olives", need: {pumpkin: 1, olives: 1}, price: 8, seasons: ["autumn", "winter"]},
-  puerros: {n: "Leek and potato soup cups", need: {leek: 2, potato: 1}, price: 8, seasons: ["winter"]},
+  puerros: {n: "Leek and potato soup cups", need: {leek: 2, potato: 1}, price: 8, seasons: ["autumn", "winter"]},
   // from the fishing spots, all year round
   sardinas: {n: "Grilled sardines", need: {sardine: 3}, price: 8},
   escabeche: {n: "Mackerel escabeche", need: {mackerel: 2, pepper: 1}, price: 10},
@@ -56,14 +68,34 @@ export const TAPAS = {
   pulpo: {n: "Pulpo a la gallega", need: {octopus: 1, potato: 2}, price: 12},
   dorada: {n: "Sea bream with olives", need: {seabream: 1, olives: 1}, price: 11},
   trucha: {n: "Trout with almond butter", need: {trout: 2, milk: 1}, price: 10},
-  cangrejos: {n: "Garlic crayfish on toast", need: {crayfish: 4, loaf: 1}, price: 10}};
+  cangrejos: {n: "Garlic crayfish on toast", need: {crayfish: 4, loaf: 1}, price: 10},
+  // round 101: more ways to use eggs, tomatoes, yoghurt, honey, the farm's cheeses, pears and leeks
+  huevos: {n: "Huevos rotos", need: {egg: 2, potato: 2}, price: 9},
+  tomatoegg: {n: "Ma Ma's tomato and egg", need: {tomato: 2, egg: 2}, price: 8, seasons: ["summer", "autumn"]},
+  yogur: {n: "Yoghurt with honey and walnuts", need: {yoghurt: 2, honey: 1}, price: 8},
+  halloumi: {n: "Grilled halloumi with honey", need: {halloumi: 1, honey: 1}, price: 11},
+  azul: {n: "Honeybrook blue with pear", need: {bluecheese: 1, pear: 2}, price: 11},
+  manzana: {n: "Apple and cheddar tostas", need: {cheddar: 1, apple: 2, loaf: 1}, price: 11},
+  tarta: {n: "Leek and cheese tart", need: {leek: 2, cheese: 1, flour: 1}, price: 10, seasons: ["autumn", "winter"]},
+  panal: {n: "Honeycomb with farm cheese", need: {honeycomb: 1, farmcheese: 1}, price: 12}};
 export const inSeason = (id, season) => !TAPAS[id].seasons || TAPAS[id].seasons.includes(season);
 export const TAPAS_PLATES = 6;
+// The chef's request: each day someone in town has a craving for one of the season's tapas. Make it the tapas of the
+// day and it sells for half as much again (a reason to cook something different each day).
+const ASKERS = ["Rosa", "Bastien", "Noor", "Felix", "Elena", "Mateo", "Lila", "Celeste"];
+export function requestOf(today){ const ids = Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today))), h = hash(today + "crave"); return {id: ids[h % ids.length], who: ASKERS[(h >> 5) % ASKERS.length]}; }
+export const tapasPrice = (id, today) => Math.round(TAPAS[id].price*(requestOf(today).id === id ? 1.5 : 1));
 const OVEN = 1*H, PRESS = 3*H;
 
 export function kitchenState(F){ F.kitchen = F.kitchen || {}; const k = F.kitchen; k.larder = k.larder || {}; if (!("oven" in k)) k.oven = null; if (!("press" in k)) k.press = null; return k; }
-const has = (k, need) => Object.entries(need).every(([id, n]) => (k.larder[id] || 0) >= n);
-const use = (k, need) => Object.entries(need).forEach(([id, n]) => { k.larder[id] -= n; if (k.larder[id] <= 0) delete k.larder[id]; });
+// what in the larder does for a need: the thing itself first, then its stand-ins
+const ALT = {cheese: id => id === "cheese" || /^chz_/.test(id), milk: id => id === "milk" || id === "goatmilk", farmcheese: id => /^chz_/.test(id),
+  halloumi: id => /^chz_halloumi/.test(id), bluecheese: id => /^chz_blue/.test(id), cheddar: id => /^chz_cheddar/.test(id),
+  honey: id => /^honey(_lav|_blossom|_cream)?$/.test(id), petals: id => id === "tulip" || id === "sunflower"};
+const pool = (k, g) => ALT[g] ? Object.keys(k.larder).filter(ALT[g]).sort((a, b) => (b === g) - (a === g)) : [g];
+export const larderCount = (k, g) => pool(k, g).reduce((a, id) => a + (k.larder[id] || 0), 0);
+const has = (k, need) => Object.entries(need).every(([id, n]) => larderCount(k, id) >= n);
+const use = (k, need) => Object.entries(need).forEach(([g, n]) => { for (const id of pool(k, g)) { if (n <= 0) break; const m = Math.min(n, k.larder[id] || 0); k.larder[id] -= m; n -= m; if (k.larder[id] <= 0) delete k.larder[id]; } });
 const add = (k, id, n) => { k.larder[id] = (k.larder[id] || 0) + n; };
 const left = t => t ? Math.max(0, t.start + t.dur - Date.now()) : 0;
 const hrs = ms => { const m = Math.ceil(ms/60000); return m >= 60 ? `${Math.floor(m/60)}h ${m % 60}m` : `${m}m`; };
@@ -113,13 +145,13 @@ export function cookTick(F, today){
   if (!k.press && pressCheese(F)) done.push("started a cheese in the press");
   if (!k.oven && (k.larder.loaf || 0) < 3 && bake(F)) done.push("put bread in the oven");
   let t = tapasToday(F, today);
-  if (!t) { const best = Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today)) && has(k, TAPAS[id].need)).sort((a, b) => TAPAS[b].price - TAPAS[a].price)[0];
+  if (!t) { const best = Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today)) && has(k, TAPAS[id].need)).sort((a, b) => tapasPrice(b, today) - tapasPrice(a, today))[0];
     if (best) { chooseTapas(F, best, today); t = tapasToday(F, today); done.push(`chose ${TAPAS[best].n.toLowerCase()} for the tapas of the day`); } }
   if (t && t.plates < 2 && cookTapas(F, today)) done.push(`cooked ${TAPAS_PLATES} plates of ${TAPAS[t.id].n.toLowerCase()}`);
   // small plates from what's left, keeping back one more batch of the tapas
   const keep = t ? TAPAS[t.id].need : {};
   for (const id of Object.keys(DISHES)) { const d = DISHES[id]; if ((v.menu[id] || 0) >= 2) continue;
-    const spare = Object.entries(d.need).every(([g, n]) => (k.larder[g] || 0) - (keep[g] || 0) >= n); if (spare && cookDish(F, id)) done.push(`made ${d.n.toLowerCase()}`); }
+    const spare = Object.entries(d.need).every(([g, n]) => larderCount(k, g) - (keep[g] || 0) >= n); if (spare && cookDish(F, id)) done.push(`made ${d.n.toLowerCase()}`); }
   if (done.length) { k.cookAt = Date.now(); cookLog(k, done.join(", ")); }
   return done;
 }
@@ -129,7 +161,7 @@ export const cookLine = done => `Pilar ${done.length > 1 ? done.slice(0, -1).joi
 const pic = (id, s = 34) => icon(id, s);
 const larderGrid = k => { const ids = Object.keys(k.larder).filter(id => k.larder[id] > 0);
   return ids.length ? `<div class="kgoods">${ids.map(id => `<button class="kgood kbtn" data-k="take" data-id="${id}">${pic(id)}<b>${k.larder[id]}</b><small>${esc(nm(id, k.larder[id]))}</small><em>Take one</em></button>`).join("")}</div><p class="muted">Tap one to take it back to your backpack (for the Scoop Shack, or a gift).</p>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`; };
-const needList = (k, need) => Object.entries(need).map(([id, n]) => `<span class="kneed ${(k.larder[id] || 0) >= n ? "ok" : ""}">${pic(id, 22)}${n} ${esc(nm(id, n))} <small>(${k.larder[id] || 0})</small></span>`).join("");
+const needList = (k, need) => Object.entries(need).map(([id, n]) => `<span class="kneed ${larderCount(k, id) >= n ? "ok" : ""}">${pic(GROUP_ICON[id] || id, 22)}${n} ${esc(nm(id, n))} <small>(${larderCount(k, id)})</small></span>`).join("");
 export function larderPanel(F){
   const k = kitchenState(F), bag = backpackGoods(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The larder</h2>${larderGrid(k)}
@@ -146,10 +178,10 @@ export function ovenPanel(F){
 }
 export function pressPanel(F){
   const k = kitchenState(F), l = left(k.press);
-  return `<span class="tape stripe" aria-hidden="true"></span><h2>The cheese press</h2><p class="sub">Two bottles of goat's milk make a little round of cheese in three hours. Milk: ${k.larder.milk || 0} · cheese in the larder: ${k.larder.cheese || 0}.</p>
+  return `<span class="tape stripe" aria-hidden="true"></span><h2>The cheese press</h2><p class="sub">Two bottles of milk (cow's or goat's) make a little round of cheese in three hours. Milk: ${larderCount(k, "milk")} · cheese in the larder: ${k.larder.cheese || 0}.</p>
     ${k.press ? (l ? `<p>Pressing: ready in ${hrs(l)}.</p><span class="clbar"><i style="width:${Math.round(100*(1 - l/k.press.dur))}%"></i></span>` : `<p>The cheese is ready!</p>`) : `<p class="muted">Empty.</p>`}
-    <div class="actions">${k.press ? (l ? "" : `<button class="btn primary" data-k="cheese">Take out the cheese</button>`) : `<button class="btn primary" data-k="press" ${(k.larder.milk || 0) >= 2 ? "" : "disabled"}>Press cheese</button>`}<button class="btn alt small" data-close="1">Close</button></div>
-    ${(k.larder.milk || 0) < 2 && !k.press ? `<p class="muted">Milk comes from a goat in the animal run at home (the market's Animals tab), or buy cheese ready-made on Hana's deli shelf.</p>` : ""}`;
+    <div class="actions">${k.press ? (l ? "" : `<button class="btn primary" data-k="cheese">Take out the cheese</button>`) : `<button class="btn primary" data-k="press" ${larderCount(k, "milk") >= 2 ? "" : "disabled"}>Press cheese</button>`}<button class="btn alt small" data-close="1">Close</button></div>
+    ${larderCount(k, "milk") < 2 && !k.press ? `<p class="muted">Milk comes from a goat in the animal run at home (the market's Animals tab), or buy cheese ready-made on Hana's deli shelf.</p>` : ""}`;
 }
 export function stovePanel(F, today){
   const k = kitchenState(F), t = tapasToday(F, today), T = t && TAPAS[t.id];
@@ -157,7 +189,8 @@ export function stovePanel(F, today){
   const v = vineState(F), on = !v.help || v.help.cook !== false;
   h += `<p class="sub kcook">${on ? `Pilar runs the kitchen on her shifts (10am to 2:30pm, 4 to 9:30pm). You can still cook anything yourself.` : `Pilar's off for now. Turn her back on in the staff card at the shop counter.`}</p>${on && k.log && k.log.length ? `<ul class="klog">${k.log.map(l => `<li>${esc(l[0].toUpperCase() + l.slice(1))}.</li>`).join("")}</ul>` : ""}`;
   h += `<section class="ktapas"><h3 class="ph3">Tapas of the day</h3>`;
-  if (t) h += `<div class="kdish chosen">${dishArt("tapas:" + t.id, 52)}<span><b>${esc(T.n)}</b><small>${t.plates} plate${t.plates === 1 ? "" : "s"} on the menu · ${T.price} coins each · needs ${needText(T.need)}</small><span class="kneeds">${needList(k, T.need)}</span></span></div>
+  { const rq = requestOf(today), R = TAPAS[rq.id]; h += `<p class="krequest">${icon("heart", 16)} <b>${esc(rq.who)}</b> has been craving <b>${esc(R.n.toLowerCase())}</b>. Make it today's tapas and it sells for ${tapasPrice(rq.id, today)} coins a plate instead of ${R.price}.${t && t.id === rq.id ? " It's on!" : ""} <small>Needs ${esc(needText(R.need))}.</small></p>`; }
+  if (t) h += `<div class="kdish chosen">${dishArt("tapas:" + t.id, 52)}<span><b>${esc(T.n)}</b><small>${t.plates} plate${t.plates === 1 ? "" : "s"} on the menu · ${tapasPrice(t.id, today)} coins each · needs ${needText(T.need)}</small><span class="kneeds">${needList(k, T.need)}</span></span></div>
       <div class="actions"><button class="btn primary" data-k="cooktapas" ${has(k, T.need) ? "" : "disabled"}>Cook a batch (${TAPAS_PLATES} plates)</button>${!t.cooked ? `<button class="btn alt small" data-k="untapas">Pick a different dish</button>` : ""}</div>
       <p class="muted">Leftovers at closing time (10pm) go to the staff for dinner.</p>`;
   else h += `<p class="sub">Pick today's dish. It goes on the chalkboard, sells for more than the small plates and brings extra people in. <b>${SEASONS[seasonOf(today)].n}</b> menu: ${SEASONS[seasonOf(today)].line.toLowerCase()}.</p><div class="kdishes">${Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today))).map(id => { const d = TAPAS[id], ok = has(k, d.need);

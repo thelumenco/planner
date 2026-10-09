@@ -1330,3 +1330,44 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 - **Requests:** `REQUESTS`, one a day (`requestToday` by hash). Some ask for things (3 eggs, 2 apples, 2 carrots), others for a job done today (muck out both stalls, brush all the cows, turn the wheels, milk everyone, help Felix move a hive while he's there). They're shown in the new `farmhousePanel` (tap the farmhouse) with the trust bar and what's been earned.
 - **New items:** `chz_brie`, `chz_halloumi`, `chz_smoked`, `honey_cream`, plus `_ex` versions of every cheese.
 - **Tests:** a new "farm life" block. The old cheddar check now expects a rustic five wedges.
+
+### Round 100: rain all year, everyone's own rain gear; fishing
+- **Rain** (village-extras.js `rainLevel`): 0 dry, 1 light shower, 2 downpour. Nov–Jan: 34% downpour, 10% shower. Other months: about 14% shower (about 12% measured). `rainyOn` = any rain; `stormyOn` = downpour (only that calls off the family paddle). The `#rain` overlay gets class `light` for showers; the arrival line says "A light shower today. Brollies up!".
+- **Rain gear** (people.js):
+  - `rainGearFor(seed, {coat, brolly})` gives each villager their own: a coat for about a third of them, otherwise a brolly. Brolly patterns: solid, stripe, dots, scallop, check, clear, paper. Colours come from `BROLLY_COLS` / `COAT_COLS`.
+  - `brollyArt`, `hoodArt`, `coatArt` (class `rcoat`); coats bring wellies and sleeves.
+  - npcs.js `makeNode` adds `look.rain` outdoors (`OUTDOOR`) on rainy days. Anyone holding a prop in the right hand gets a coat; no gear on a paddleboard.
+  - Mel: `#melRain` with `MEL_BROLLY` (periwinkle, white dots). Evan: `#evanRain` hood, class `raincoat` (yellow `--tee`, `.esleeve`, `.welly`). Both set in core.js `dressRain()` from `dressMel`.
+- **Fishing** (fishing.js; art/fishing.js):
+  - Spots: places `fishriver` (base), `fishlake` (field), `fishsea` (shore), each with a post (`fishSpotArt`).
+  - `FISH`: 17 entries by spot, `when` (day/dawn/dusk/night), `rain`, weight, size and `hard`. The golden koi is dusk on the river; `F.fish.koi` (up to 3) is drawn in the home pond (`koiArt`). The boot and sea glass are journal-only.
+  - Bait: `BAIT_DAY` 3 worms each morning, plus 1 per quest (`countQuest` calls `addBait`), up to 20.
+  - Rod 80, better reel 400 (green zone ×1.35).
+  - A cast: bite after 2–6 s; the marker sweeps (`DUR` 900 ms each way, `markerAt`). Reeling in the green lands it (`land`); reeling early loses it; it escapes after `ESCAPE` 3.5 s.
+  - Panel `fishPanel` (Fishing / Journal tabs). Mel's `#melRod` (class `bite` when it bites). core.js: `fishSpot`, `fishSt`, `fishGo`, `fishBite`.
+  - New items (kitchen ingredients): trout, crayfish, sardine, mackerel, seabream, squid, octopus. Other fish give the existing `fish` item.
+  - Seven seafood tapas, all year: sardinas, escabeche, calamares, pulpo, dorada, trucha, cangrejos.
+- **Tests:** "rainy days" and "fishing" blocks.
+
+### Round 101: balance (phase 1) and more uses per item (phase 4)
+- **Phase 1:**
+  - Quests pay 8 (`QUEST_PAY`, was 5), including Sunsama and treadmill subtasks. Finishing a routine pays 8 (`ROUTINE_DONE`).
+  - Wine: price elasticity, `winePf(s)` = (style price / price)^1.3, capped at 1.6. It applies to shop bottles and glasses, the market stall, the wine club and tourist souvenirs. The shelf shows "pricey: fewer buyers" or "a bargain".
+  - Cacao beans cost 25 a sack (`SACK`, was 10).
+  - Catch-up is 24 h everywhere: vineyard and orchard were 12 h; Scoop, Cocoa and farm were 2 days.
+  - Ma Ma's farm shop sells 5× more (.008/min).
+  - The kitchen press takes goat's milk. Larder **groups** (kitchen.js `ALT`, `larderCount`, `GROUP_ICON`): cheese (deli, press or any `chz_*`), milk (milk or goatmilk), farmcheese, halloumi, bluecheese, cheddar, honey (any honey jar, creamed included), petals (garden tulip or sunflower). Farm cheeses, honey jars, honeycomb, yoghurt, pears and figs can be brought into the larder.
+- **Phase 4:**
+  - New small plates: farm cheese board (12), honey cake, flower shortbread, blueberry tart.
+  - New tapas: huevos rotos, Ma Ma's tomato and egg, yoghurt with honey, grilled halloumi with honey, Honeybrook blue with pear, apple and cheddar tostas, leek and cheese tart, honeycomb with farm cheese. That makes 28 tapas.
+  - Peas now run spring and summer; leek soup autumn and winter. Pea and mint gelato (`INGR.pea`).
+  - **Chef's request** (`requestOf(day)`): a villager craves one in-season tapas; as the tapas of the day it sells at 1.5× (`tapasPrice`). Pilar picks by `tapasPrice`.
+- **Parked (Mel said not yet; keep for later):**
+  - **Phase 2, stars:** a real-life-only currency for big buys. On hold: Mel doesn't want stars piling up with nothing else to spend them on.
+  - **Phase 3, ongoing costs:**
+    - Staff wages with a Sunday report (takings − wages − ingredients).
+    - Train tickets to destination screens (150–600 a trip).
+    - Van road trips (fuel and campsite fees).
+    - A weekly animal feed bill.
+  - **Phase 5, growth ladder and small wins:** Honeybrook Woods, buying and renting cottages, and a collection book with stickers for fish, flavours, wine labels and cheeses.
+  - **Also still to do from phase 4:** sunflower seeds as hen treats (more eggs), petal syrup, event bouquet orders, and Ma Ma's tomato and egg at family dinners.

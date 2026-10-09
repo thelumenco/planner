@@ -61,16 +61,16 @@ export function orchTick(F, today){
     const C = cat(where)[p.k], id = where === "tree" ? C.fruit : "stem:" + p.k, n = where === "tree" ? C.yield : where === "bed" ? BED_YIELD : BUSH_YIELD;
     o.stock[id] = (o.stock[id] || 0) + n; out.picked[id] = (out.picked[id] || 0) + n; p.picked = t; p.next = t + timing(where)[2]; any = true;
   });
-  const mins = Math.min(720, Math.floor((t - o.lastTick)/60000));
+  const mins = Math.min(1440, Math.floor((t - o.lastTick)/60000));
   if (mins >= 1) {
-    if (t - o.lastTick > 720*60000) o.lastTick = t - 720*60000;
+    if (t - o.lastTick > 1440*60000) o.lastTick = t - 1440*60000;
     o.lastTick += mins*60000;
     for (let k = mins; k > 0; k--) {
       const at = t - k*60000, m = hm(at), d = new Date(at + off + 8*H), we = [0, 6].includes(d.getUTCDay());
       // Sunday market mornings Ma Ma sells from her stall at the field instead (busier, from the same shelves)
       const mkt = eventNow(d.toISOString().slice(0, 10), m); if (!(mkt && mkt.kind === "market") && (m < 9*60 || m >= 18*60)) continue;
       const ids = Object.keys(o.stock).filter(x => o.stock[x] > 0); if (!ids.length) break;
-      if (Math.random() < (mkt && mkt.kind === "market" ? .02 : .0016*(we ? 1.5 : 1))) { const id = ids[Math.floor(Math.random()*ids.length)];
+      if (Math.random() < (mkt && mkt.kind === "market" ? .02 : .008*(we ? 1.5 : 1))) { const id = ids[Math.floor(Math.random()*ids.length)];
         o.stock[id]--; if (!o.stock[id]) delete o.stock[id];
         const price = id.startsWith("stem:") ? STEM_PRICE : (ITEMS[id] && ITEMS[id].sell) || 3; out.sold++; out.coins += price; }
     }

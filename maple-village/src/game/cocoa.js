@@ -1,6 +1,6 @@
 // The Cocoa Room: Mel's chocolate shop on the bay (in the shopfront that was under renovation; opened as a big goal,
 // goals.js "cocoa"). Mel makes everything herself, bean to bar:
-//   beans   a sack of cacao beans from the sacks in the kitchen (10 coins a sack)
+//   beans   a sack of cacao beans from the sacks in the kitchen (25 coins a sack)
 //   roast   a sack at a time in the roaster: ready in 10 minutes
 //   grind   roasted beans in the stone grinder, as milk, dark or white chocolate: ready in 2 hours
 //   temper  the ground pot on the marble slab: 30 pieces of chocolate, ready to use
@@ -37,7 +37,7 @@ import { INGR, farmShelf, scoopState, hasUp } from "./scoop.js";
 import { wineClubNow } from "./tours.js";
 import { festivalOn, rainyOn } from "../art/village-extras.js";
 
-export const OPEN = 11*60, CLOSE = 20*60, ROAST_MIN = 10, GRIND_MIN = 120, POT = 30, MOULD = 10, SACK = 10;
+export const OPEN = 11*60, CLOSE = 20*60, ROAST_MIN = 10, GRIND_MIN = 120, POT = 30, MOULD = 10, SACK = 25;
 export const KINDS = {milk: {n: "Milk chocolate", col: "#8A5A3A"}, dark: {n: "Dark chocolate", col: "#4A2E22"}, white: {n: "White chocolate", col: "#F3E7C9"}};
 export const BAR_ID = k => "bar_" + k;
 export const HAND = {3: [14*60, 18*60], 5: [14*60, 18*60], 6: [10*60, 17*60]}, WALL = 40;   // Mateo's shifts by weekday; he stops moulding a kind at 40 bars on the wall
@@ -227,7 +227,7 @@ function handStep(F, c, t, out){
 /* ---------- selling ---------- */
 // catch up minute by minute (at most two days): customers buy a bar or two of whatever's on the wall
 export function cocoaTick(F, opts = {}){
-  const c = cocoaState(F), t = now(), from = Math.max(c.at || t, t - 2*864e5), out = {coins: 0, n: 0, mins: 0, done: null, hand: {pots: 0, bars: 0, sacks: 0, spent: 0, res: 0}};
+  const c = cocoaState(F), t = now(), from = Math.max(c.at || t, t - 864e5), out = {coins: 0, n: 0, mins: 0, done: null, hand: {pots: 0, bars: 0, sacks: 0, spent: 0, res: 0}};
   for (let at = from + 60000; at <= t; at += 60000) {
     const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     out.mins++; out.done = finish(c, at) || out.done;

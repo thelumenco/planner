@@ -2482,6 +2482,31 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#ctx [data-fish="cast"]').isDisabled() && /Finish a quest/.test(await page.locator("#ctx").textContent()), "no worms left: finish a quest to dig up another");
   await page.close();
 }
+{
+  // Round 101: goat's milk in the press, farm cheeses and honey in the kitchen, the chef's request, more tapas
+  console.log("\nmore uses, more tapas");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`tapas pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/kitpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.kitchen = {larder: {egg: 4, potato: 4, honey: 2, chz_halloumi: 1, goatmilk: 2, flour: 2, tulip: 2}, oven: null, press: null}; f.vine = {...(f.vine || {}), help: {cook: false}};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=12:00&date=2026-10-07&kitpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("kitchen")); await page.waitForTimeout(900);
+  await page.locator('#world [data-spot="press"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="press"]', { timeout: 15000 });
+  check(/cow's or goat's/.test(await page.locator("#ctx").textContent()) && await page.locator('#ctx [data-k="press"]').isEnabled(), "the cheese press takes goat's milk");
+  await page.locator('#ctx [data-close]').first().click();
+  await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector("#ctx .krequest", { timeout: 15000 });
+  check(/has been craving .* sells for \d+ coins a plate instead of \d+/.test(await page.locator("#ctx .krequest").textContent()), "someone in town is craving one of the season's tapas: it sells for half as much again");
+  const txt = await page.locator("#ctx").textContent();
+  check(["Grilled halloumi with honey", "Huevos rotos", "Yoghurt with honey and walnuts", "Grilled sardines"].every(n => txt.includes(n)) && ["Honey cake", "Flower shortbread", "Blueberry tart", "Farm cheese board"].every(n => txt.includes(n)), "new tapas (halloumi, huevos rotos, yoghurt, seafood) and small plates (honey cake, flower shortbread, blueberry tart, farm cheese board)");
+  await page.locator('#ctx [data-k="tapas"][data-id="halloumi"]').click(); await page.waitForTimeout(200); await page.locator('#ctx [data-k="cooktapas"]').click(); await page.waitForTimeout(300);
+  check(await fox().then(f => f.vine.tapas.id === "halloumi" && f.vine.tapas.plates === 6 && !f.kitchen.larder.chz_halloumi && f.kitchen.larder.honey === 1), "Wildflower Farm's halloumi and honey make grilled halloumi with honey");
+  await page.locator('#ctx [data-k="dish"][data-dish="shortbread"]').click(); await page.waitForTimeout(300);
+  check(await fox().then(f => f.vine.menu.shortbread === 4 && !f.kitchen.larder.tulip), "garden tulips go into flower shortbread");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

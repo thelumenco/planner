@@ -589,7 +589,7 @@ const A = {
   cleanDone(){ S.cleanDone = true; S.timer = null; earn(3, "five-minute clean"); gainXp(1); S.last = "clean"; act("cheer"); setSay("First tick of the day! Look at that ✨"); save(); },
   firstStep(t){ S.firstStep[t.id] = true; S.arrived[t.id] = true; startTimer("task", t.minutes || 25, t.id); setSay("Hard part's done. Now the rest, on the clock."); save(); },
   done(t){
-    S.doneIds.push(t.id); S.timer = null; sfx("chaching"); earn(5, "quest complete"); gainXp(1); S.last = t.title; countQuest();
+    S.doneIds.push(t.id); S.timer = null; sfx("chaching"); earn(QUEST_PAY, "quest complete"); gainXp(1); S.last = t.title; countQuest();
     if (t.source === "sunsama" && !t.completed) tickSunsama(t.id);
     if (t.early) { F.early[t.id] = t.early; setTimeout(() => speak("Done a day early! It's ticked off in Sunsama, and it'll already be done on tomorrow's board.", 6000), 4200); }
     let grew = 0; F.plots.forEach(p => { if (p && p.crop && p.wateredAt && growth(p) < 1) { p.bonus = (p.bonus || 0) + QUEST_BOOST; grew++; } });
@@ -684,12 +684,13 @@ function subTick(t, key, done){
 // Subtasks pay the first time they're ticked, in the village or in Sunsama (F.subDone[task].paid remembers, so unticking
 // and re-ticking doesn't pay twice). In a treadmill batch each subtask was a task of its own, so it pays like one: 5 coins,
 // 1 xp and the growing boost; any other subtask pays 1. -> coins owed (the caller pays them), 0 if already paid
+const QUEST_PAY = 8;   // a quest done (round 101: up from 5, so real life keeps pace with the shops)
 function paySub(t, key){
   F.subDone = F.subDone || {}; const rec = F.subDone[t.id] = F.subDone[t.id] || {s: {}, at: Date.now()}; rec.paid = rec.paid || {};
   if (rec.paid[key]) return 0; rec.paid[key] = true;
   if (!isTreadTask(t)) return 1;
   gainXp(1); F.plots.forEach(p => { if (p && p.crop && p.wateredAt && growth(p) < 1) p.bonus = (p.bonus || 0) + QUEST_BOOST; }); questBoost(F, QUEST_BOOST);
-  return 5;
+  return QUEST_PAY;
 }
 // Subtasks ticked over in Sunsama (today's tasks, and later days' tasks started early) pay too. The first time this
 // runs, whatever's already ticked is just noted, so nothing done before pays twice. -> coins paid
@@ -705,7 +706,7 @@ function paySunsamaSubs(list){
 // A later day's task ticked off early in Sunsama: 5 coins now, and it's already done when its day comes (F.early)
 function creditAhead(list){
   let n = 0;
-  (list || []).forEach(t => { if (!t.completed || F.early[t.id]) return; F.early[t.id] = t.day; earn(5, "done early in Sunsama"); gainXp(1); countQuest(); n++; });
+  (list || []).forEach(t => { if (!t.completed || F.early[t.id]) return; F.early[t.id] = t.day; earn(QUEST_PAY, "done early in Sunsama"); gainXp(1); countQuest(); n++; });
   if (n) setTimeout(() => speak(n === 1 ? "You ticked one of tomorrow's quests off early in Sunsama. Coins now, and it's already done when tomorrow comes!" : `${n} of tomorrow's quests done early in Sunsama! Coins now.`, 5500), 1200);
   return n;
 }
@@ -771,7 +772,7 @@ function creditDone(tasks, quiet){
     if (F.early[t.id]) { S.doneIds.push(t.id); return; }   // done early (paid back then)
     S.doneIds.push(t.id); got.push(t); if (got.length === 1) sfx("chaching");
     const q = allTasks().find(x => x.id === t.id); if (q && q.early) F.early[t.id] = q.early;
-    earn(5, "done in Sunsama"); gainXp(1); countQuest();
+    earn(QUEST_PAY, "done in Sunsama"); gainXp(1); countQuest();
     if (cur && cur.id === t.id) { if (S.timer && S.timer.id === t.id) S.timer = null; S.firstStep[t.id] = false; }
   });
   if (got.length && !quiet) { act("cheer"); speak(got.length === 1 ? `You already did “${got[0].title}” in Sunsama! Counted.` : `${got.length} quests already done in Sunsama! Counted.`, 5000); }
@@ -2686,7 +2687,7 @@ function vaultPoured(j, nowFull){
 
 /* ---------- Routine bonuses: 1 coin a checklist step, 5 for finishing a routine (a weekly one's step counts as
    finishing it). Each pays once a day: unticking and re-ticking earns nothing more. ---------- */
-const ROUTINE_STEP = 1, ROUTINE_DONE = 5;
+const ROUTINE_STEP = 1, ROUTINE_DONE = 8;
 function routineCoins(r){
   S.rCoins = S.rCoins || {}; let n = 0;
   if (!r.weekly && !S.rCoins[r.list + ":" + r.item]) { S.rCoins[r.list + ":" + r.item] = true; n += ROUTINE_STEP; }

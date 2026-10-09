@@ -181,7 +181,7 @@ export const shelfPrice = id => (ITEMS[id] && ITEMS[id].price) || 8;
 export function stockShelf(F, id, n){ const h = hfState(F), inv = F.inv || {}; if (levelOf(h) < 3 || !SELLABLE(id)) return 0; n = Math.min(n, inv[id] || 0); if (n <= 0) return 0; inv[id] -= n; if (!inv[id]) delete inv[id]; h.shelf[id] = (h.shelf[id] || 0) + n; return n; }
 // catch up minute by minute (at most two days): passers-by buy off Mel's shelf, 8am to 6pm, and any hive left too long swarms
 export function hfTick(F){
-  const h = hfState(F), t = clock(), from = Math.max(h.at || t, t - 2*DAY), out = {coins: 0, n: 0, swarms: swarmCheck(F)};
+  const h = hfState(F), t = clock(), from = Math.max(h.at || t, t - DAY), out = {coins: 0, n: 0, swarms: swarmCheck(F)};
   for (let at = from + 60000; at <= t; at += 60000) {
     const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     if (hm < 8*60 || hm >= 18*60) continue; const ids = Object.keys(h.shelf).filter(k => h.shelf[k] > 0); if (!ids.length || Math.random() >= .02) continue;

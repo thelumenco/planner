@@ -46,7 +46,7 @@ const FRUIT_COL = {cherry: "#C2334D", lemon: "#F3E27A", peach: "#F5B08A", mango:
 export const INGR = {
   milk: ["Milk", "Milk", "#FFFBEF"], honey: ["Honey", "Honey", "#F3C969"], egg: ["Egg", "Custard", "#F6E3A1"], olives: ["Olives", "Olive", "#9DAF6A"],
   strawberry: ["Strawberries", "Strawberry", "#E8566C"], blueberry: ["Blueberries", "Blueberry", "#5E6EB8"], pumpkin: ["Pumpkin", "Pumpkin", "#E8913A"],
-  corn: ["Sweetcorn", "Sweetcorn", "#F3D34A"], carrot: ["Carrots", "Carrot", "#F28C3A"], tomato: ["Tomatoes", "Tomato", "#E05A44"],
+  corn: ["Sweetcorn", "Sweetcorn", "#F3D34A"], carrot: ["Carrots", "Carrot", "#F28C3A"], tomato: ["Tomatoes", "Tomato", "#E05A44"], pea: ["Peas", "Pea and mint", "#B9D88A"],
   chocolate: ["Dark chocolate", "Chocolate", "#5A3A2A"], vanilla: ["Vanilla", "Vanilla", "#F6EBC8"], coffee: ["Coffee", "Coffee", "#8A5A3A"], pistachio: ["Pistachios", "Pistachio", "#A8C98A"],
   hazelnut: ["Hazelnuts", "Hazelnut", "#B98A5A"], coconut: ["Coconut", "Coconut", "#F6F1E8"], matcha: ["Matcha", "Matcha", "#8FB86A"], pandan: ["Pandan", "Pandan", "#7FB86A"],
   gulamelaka: ["Gula melaka", "Gula Melaka", "#9A5A2E"], sesame: ["Black sesame", "Black Sesame", "#4A4440"], mint: ["Mint", "Mint", "#9FD3B2"], banana: ["Bananas", "Banana", "#F3E07A"],
@@ -236,7 +236,7 @@ function saleMinute(s, day, hm, opts){
 }
 // catch up minute by minute since the last tick (at most two days): the kitchen, then the counter
 export function scoopTick(F, opts = {}){
-  const s = scoopState(F), now = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now, now - 2*864e5);
+  const s = scoopState(F), now = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now, now - 864e5);
   if (s.batch) { s.tubs[s.batch.id] = (s.tubs[s.batch.id] || 0) + TUB; s.batch = null; }   // a batch Tomo had on the go (from when he still cooked)
   const out = {coins: 0, n: 0, mins: 0, box: 0, churned: finishChurn(s, now)};
   for (let at = from + 60000; at <= now; at += 60000) {

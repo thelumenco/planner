@@ -8,7 +8,7 @@ import { NPCS } from "../data/npcs.js";
 import { ITEMS } from "../data/items.js";
 import { eventNow, wineClubNow } from "./tours.js";
 import { icon } from "../art/icons.js";
-import { DISHES, TAPAS } from "./kitchen.js";
+import { DISHES, TAPAS, tapasPrice } from "./kitchen.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
 
 export const GROW = 8*H;                                     // a watered vine ripens in 8 hours
@@ -107,6 +107,9 @@ export function bottle(F, slot, name){
 export function stock(F, id){ const v = vineState(F), c = v.cellar.find(x => x.id === id); if (!c) return null;
   const s = v.shelf.find(x => x.id === id); if (s) s.n += c.n; else v.shelf.push({id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES[c.type].price, open: 0});
   v.cellar = v.cellar.filter(x => x.id !== id); return `${c.name} is on the shelves.`; }
+// Pricier bottles sell less often (and cheaper ones a little more), like the Scoop Shack and the Cocoa Room: each
+// style's usual price is the sweet spot. Glasses are a quarter of the bottle price and follow it.
+export const winePf = s => Math.min(1.6, Math.pow(((STYLES[s.type] || {}).price || 18)/Math.max(2, s.price || 1), 1.3));
 export function setPrice(F, id, p){ const s = vineState(F).shelf.find(x => x.id === id); if (s) s.price = Math.max(1, Math.min(999, Math.round(p) || 1)); }
 export function collect(F){ const v = vineState(F), n = v.box; if (!n) return 0; F.coins += n; v.box = 0; return n; }
 
@@ -130,7 +133,7 @@ function footfall(hm, weekend, visitors){ return (hm >= 17*60 && hm < 21*60 ? 2 
 // -> {bottles, glasses, coins, toBox, watered, mins} or null when nothing happened
 // One plate for a customer: the tapas of the day first (65% of the time, on its own day), else a small plate
 function servePlate(v, gameDay, out){
-  if (v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === gameDay && Math.random() < .65) { v.tapas.plates--; out.plates++; out.tapas = (out.tapas || 0) + 1; out.coins += TAPAS[v.tapas.id].price; out.dish = "tapas:" + v.tapas.id; return; }
+  if (v.tapas && v.tapas.plates > 0 && TAPAS[v.tapas.id] && v.tapas.day === gameDay && Math.random() < .65) { v.tapas.plates--; out.plates++; out.tapas = (out.tapas || 0) + 1; out.coins += tapasPrice(v.tapas.id, gameDay); out.dish = "tapas:" + v.tapas.id; return; }
   const live = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]); if (!live.length) return; const id = live[Math.floor(Math.random()*live.length)];
   v.menu[id]--; if (!v.menu[id]) delete v.menu[id]; out.plates++; out.coins += DISHES[id].price; out.dish = id;
 }
@@ -143,7 +146,7 @@ export function serveGuest(F, opts = {}){
   if (!s.open) { s.n--; s.open = GLASSES; } s.open--;
   if (Math.random() < .6) servePlate(v, opts.today, out);
   // out-of-towners often take a bottle home as a souvenir
-  const b = opts.tourist && Math.random() < .5 && (v.shelf.find(x => x.id === s.id && x.n > 0) || v.shelf.find(x => x.n > 0));
+  const b = opts.tourist && Math.random() < .5*winePf(s) && (v.shelf.find(x => x.id === s.id && x.n > 0) || v.shelf.find(x => x.n > 0));
   if (b) { b.n--; out.bottle = b.name; out.coins += b.price; v.sold++; out.bottles = 1; }
   v.shelf = v.shelf.filter(x => x.n > 0 || x.open > 0);
   if (opts.serving || opts.stall || opts.club) F.coins += out.coins; else v.box += out.coins;
@@ -153,8 +156,8 @@ export function serveGuest(F, opts = {}){
   return out;
 }
 export function sellTick(F, opts = {}){
-  const v = vineState(F), t = Date.now(), mins = Math.min(720, Math.floor((t - v.lastTick)/60000)); if (mins < 1) return null;
-  if (t - v.lastTick > 720*60000) v.lastTick = t - 720*60000;
+  const v = vineState(F), t = Date.now(), mins = Math.min(1440, Math.floor((t - v.lastTick)/60000)); if (mins < 1) return null;
+  if (t - v.lastTick > 1440*60000) v.lastTick = t - 1440*60000;
   v.lastTick += mins*60000;
   const out = {bottles: 0, glasses: 0, plates: 0, coins: 0, toBox: !opts.serving, watered: 0, picked: 0, filled: 0, stocked: 0, mins};
   let w = null; const off = now() - t;   // the game clock (equal to real time outside tests)
@@ -172,13 +175,13 @@ export function sellTick(F, opts = {}){
     // standing at the stall yourself brings more people over, and they pay you)
     const ev = eventNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm);
     if (ev && ev.wine) { const st = opts.stall && k === 1 ? 3 : 1, stock = v.shelf.filter(x => x.n > 0);
-      if (stock.length && Math.random() < .012*st) { const b = stock[Math.floor(Math.random()*stock.length)]; b.n--; out.bottles++; out.coins += b.price; out.market = (out.market || 0) + 1; }
-      if (Math.random() < .008*st) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.market = (out.market || 0) + 1; } } }
+      if (stock.length && Math.random() < .012*st) { const b = stock[Math.floor(Math.random()*stock.length)]; if (Math.random() < winePf(b)) { b.n--; out.bottles++; out.coins += b.price; out.market = (out.market || 0) + 1; } }
+      if (Math.random() < .008*st) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g && Math.random() < winePf(g)) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.market = (out.market || 0) + 1; } } }
     // the monthly wine club in the cellar door (first Friday, 6 to 9pm): members buy bottles and glasses off the same
     // shelves; with Mel there hosting they buy half as much again, and pay her
     if (F.goals && F.goals.cellar && wineClubNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm)) { const hst = opts.club && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
-      if (stock.length && Math.random() < .04*hst) { const b = stock[Math.floor(Math.random()*stock.length)]; b.n--; out.bottles++; out.coins += b.price; out.club = (out.club || 0) + 1; }
-      if (Math.random() < .03*hst) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.club = (out.club || 0) + 1; } } }
+      if (stock.length && Math.random() < .04*hst) { const b = stock[Math.floor(Math.random()*stock.length)]; if (Math.random() < winePf(b)) { b.n--; out.bottles++; out.coins += b.price; out.club = (out.club || 0) + 1; } }
+      if (Math.random() < .03*hst) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g && Math.random() < winePf(g)) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.club = (out.club || 0) + 1; } } }
     if (hm < 10*60 || hm >= 22*60) continue;
     const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); const crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0);
     if (!onShelf.length && !open && !platesLeft(v) && !crate.length) continue;
@@ -186,9 +189,9 @@ export function sellTick(F, opts = {}){
     const f = footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1) * (F.goals && F.goals.cellar ? 1.15 : 1);   // the cellar door (a big goal) draws a few more visitors
     const gameDay = new Date(at + off + 6*H).toISOString().slice(0, 10);   // the game's day (it turns over at 2am)
     const plate = () => servePlate(v, gameDay, out);
-    if (onShelf.length && Math.random() < .002*f) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; s.n--; out.bottles++; out.coins += s.price; }
+    if (onShelf.length && Math.random() < .002*f) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; if (Math.random() < winePf(s)) { s.n--; out.bottles++; out.coins += s.price; } }
     if (Math.random() < .0016*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
-      const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); if (Math.random() < .6) plate(); } }
+      const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s && Math.random() < winePf(s)) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); if (Math.random() < .6) plate(); } }
     if (Math.random() < .001*f) plate();   // someone pops in just for a bite
     if (crate.length && Math.random() < .0018*f) { const id = crate[Math.floor(Math.random()*crate.length)]; v.fruit[id]--; if (!v.fruit[id]) delete v.fruit[id]; out.fruit = (out.fruit || 0) + 1; out.coins += (ITEMS[id] && ITEMS[id].sell) || 3; }   // fruit from Ma Ma's orchard
   }
@@ -259,7 +262,7 @@ const fruitCrate = F => { const v = vineState(F), crate = Object.keys(v.fruit).f
 export function shelfPanel(F){
   const v = vineState(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The wine shelves</h2>
-    ${v.shelf.length ? `<ul class="hlist wlist wshelf">${v.shelf.map(s => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${STYLES[s.type].n} · ${s.n} on the shelf${s.open ? ` · a bottle open for tasting` : ""}</small></span><label class="wprice"><span class="sr">Price</span><input type="number" min="1" max="999" data-vyprice="${esc(s.id)}" value="${s.price}"> coins</label></li>`).join("")}</ul>` : `<p class="sub">The shelves are bare.</p>`}
+    ${v.shelf.length ? `<ul class="hlist wlist wshelf">${v.shelf.map(s => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${STYLES[s.type].n} · ${s.n} on the shelf${s.open ? ` · a bottle open for tasting` : ""}${s.price > STYLES[s.type].price*1.3 ? ` · pricey: fewer buyers` : s.price < STYLES[s.type].price*.75 ? ` · a bargain: flying off` : ""}</small></span><label class="wprice"><span class="sr">Price</span><input type="number" min="1" max="999" data-vyprice="${esc(s.id)}" value="${s.price}"> coins</label></li>`).join("")}</ul>` : `<p class="sub">The shelves are bare.</p>`}
     ${fruitCrate(F)}
     ${v.cellar.length ? `<p class="eyebrow">From the cellar</p><ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottles</small></span><button class="btn small primary" data-vystock="${esc(c.id)}">Stock it</button></li>`).join("")}</ul>` : `<p class="muted">Bottled wines wait in the cellar until you stock them here.</p>`}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
