@@ -17,6 +17,8 @@ function gateOk(F, g){
   if (g === "cocoa" || g === "cellar") return owns(F, g);
   if (g === "trust1") return ((F.hfarm && F.hfarm.trust) || 0) >= 40;
   if (g === "fish5") return Object.keys((F.fish && F.fish.caught) || {}).length >= 5;
+  if (g === "mill") return owns(F, "mill");
+  if (g === "oil") return ((F.mill && F.mill.made) || 0) > 0;   // the first bottle pressed at the old mill
   if (g === "ronda2") return ((F.ronda && F.ronda.days) || []).length >= 2;   // a second day in Ronda
   if (g === "tiles4") return Object.keys((F.ronda && F.ronda.tiles) || {}).length >= 4;
   if (g === "bouquet") return Object.keys(F.inv || {}).some(id => /^bq_/.test(id) && F.inv[id] > 0);
@@ -55,12 +57,15 @@ const REWARDS = {
   bouquet: F => { const id = Object.keys(F.inv || {}).find(x => /^bq_/.test(x) && F.inv[x] > 0); if (id) { F.inv[id]--; if (!F.inv[id]) delete F.inv[id]; } return ""; },
   nonna: (F, addInv) => { addInv("s_nonna", 2); return "two cups of Nonna's fior di latte"; },
   carmen: (F, addInv) => { addInv("yemas", 2); return "two boxes of Doña Carmen's yemas (one's for Pilar)"; },
-  pastry: F => { storyState(F).flags.pastry = true; applyFlags(F); return "Farid's honey and pistachio pastries, on the tapas menu"; }
+  pastry: F => { storyState(F).flags.pastry = true; applyFlags(F); return "Farid's honey and pistachio pastries, on the tapas menu"; },
+  spoon: (F, addInv) => { addInv("s_spoon", 1); return "Tomás's olive-wood spoon (a keepsake)"; },
+  oilcake: F => { storyState(F).flags.oilcake = true; applyFlags(F); return "Ines's abuela's olive oil cake, on the tapas menu"; }
 };
 // flags that change the game: the koi tip, Farid's pastries on the menu
 export function applyFlags(F){
   const f = storyState(F).flags;
   if (f.koi && FISH.koi) FISH.koi.w = 7;
+  if (f.oilcake && !TAPAS.tortaaceite) TAPAS.tortaaceite = {n: "Ines's abuela's olive oil cake", need: {oliveoil: 1, flour: 1, egg: 1}, price: 12};
   if (f.pastry && !TAPAS.pasteles) TAPAS.pasteles = {n: "Farid's honey and pistachio pastries", need: {honey: 1, flour: 1}, price: 9};
 }
 // tell the chapter: marks it heard, applies the reward -> {lines, reward}

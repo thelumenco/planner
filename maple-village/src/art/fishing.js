@@ -1,7 +1,7 @@
 // Fishing spots: a little post with a fish sign and a coiled net by the water, and (at home) the golden koi in the pond.
 import { sk, tapeLabel } from "./scenes.js";
 
-const AT = {base: {x: 430, y: 108, side: 1, label: [436, 138]}, field: {x: 60, y: 284, side: 1, label: [60, 316]}, shore: {x: 234, y: 368, side: -1, label: [236, 336]}, hwoods: {x: 348, y: 264, side: -1, label: [300, 294]}, bay: {x: 172, y: 252, side: -1, label: [172, 280], text: "Sunset fishing"}};
+const AT = {base: {x: 430, y: 108, side: 1, label: [436, 138]}, field: {x: 112, y: 352, side: 1, label: [112, 382]}, shore: {x: 234, y: 368, side: -1, label: [236, 336]}, hwoods: {x: 348, y: 264, side: -1, label: [300, 294]}, bay: {x: 172, y: 252, side: -1, label: [172, 280], text: "Sunset fishing"}};
 const PLACE = {base: "fishriver", field: "fishlake", shore: "fishsea", hwoods: "fishpool", bay: "fishbay"};
 // open: false hides a spot that's only there some of the time (the bay's sunset fishing, Friday 5 to 8)
 export function fishSpotArt(scene, open = true){

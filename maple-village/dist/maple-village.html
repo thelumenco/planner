@@ -2264,6 +2264,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     s_label: K("The first Marchand label", 0, "Dad's painting of the Marchand & Fille label: a ribbon and a copper pot.", ["star", "#E8C48E"]),
     s_praline: G("Henri's hazelnut pralines", "family", 0, null, "Hazelnut pralines, from Henri's own recipe. Melt-in-the-mouth.", ["box", "#C98A4A"]),
     s_toast: G("Postman's toast", "family", 0, null, "Honey, butter and a pinch of sea salt. Hana's new favourite.", ["loaf", "#E3B04B"]),
+    s_spoon: K("Tomás's olive-wood spoon", 0, "An olive-wood spoon Tomás Ruiz carved in 1913 from a branch of the tree by the mill. Worn smooth by four generations of soup.", ["roll", "#C9A27E"]),
     s_nonna: G("Nonna's fior di latte", "family", 0, null, "Just milk and sugar, the way Sofia's nonna made it in Napoli.", ["cone", "#FFF6DC"])
   });
   Object.assign(GOODS, {
@@ -2959,7 +2960,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     taxishore: { scene: "shore", name: "River taxi", door: [214, 156], spot: true, mark: [214, 100], line: "The river taxi stop, where the river meets the sea." },
     bikesvillage: { scene: "village", name: "Bike hire", door: [196, 580], spot: true, mark: [196, 500], line: "Hire bikes, in the town square." },
     fishriver: { scene: "base", name: "Fishing spot", door: [396, 118], spot: true, mark: [396, 70], line: "A good spot for fishing." },
-    fishlake: { scene: "field", name: "Fishing spot", door: [60, 290], spot: true, mark: [60, 236], line: "A good spot for fishing." },
+    fishlake: { scene: "field", name: "Fishing spot", door: [124, 368], spot: true, mark: [112, 296], line: "A good spot for fishing." },
     fishsea: { scene: "shore", name: "Fishing spot", door: [204, 376], spot: true, mark: [234, 320], line: "A good spot for fishing." },
     fishbay: { scene: "bay", name: "Sunset fishing", door: [196, 262], spot: true, line: "Friday evenings, 5 to 8: sunset fishing off the beach." },
     homejetty: { scene: "base", name: "Little jetty", door: [150, 132], spot: true, line: "Your little jetty. Paddle down the river and out to the foreshore." },
@@ -5966,11 +5967,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       away: "Marco's gone home. The vines can wait till morning.",
       react: { harvest: "Lovely bunches! Into the barrel with them.", quests3: "Hard work. Like a good harvest." }
     },
+    // round 120: Ines is Tomás Ruiz's great-great-granddaughter (the railwayman who planted the olive by the mill in
+    // 1912); her story (data/stories.js) tells it
     {
       id: "ines",
       pitch: 1.2,
       name: "Ines",
-      job: "Vineyard hand",
+      job: "Vineyard hand (and Tomás's great-great-granddaughter)",
       intro: "Hi! I'm Ines. Summers here, winters dreaming about here. I'm in charge of the trellises, and of telling Marco to take a break.",
       look: { skin: "#E8B996", hair: "#7A3B22", hairStyle: "long", top: "#F3C969", bottom: "#5E6E8C" },
       routine: [
@@ -6373,7 +6376,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       job: "Plays flamenco guitar by the fountain",
       intro: "Manolo. I play, people walk past, some of them stop. The pigeons always stop. They never tip.",
       look: { skin: "#C68E68", hair: "#1E1A18", hairStyle: "short", top: "#F6EFE3", bottom: "#2F2B28" },
-      // (and plays for Rosario's flamenco in the tapas bar, 1 to 3 and 8 to 10)
+      // (and plays for Paloma's flamenco in the tapas bar, 1 to 3 and 8 to 10)
       routine: [
         slot("11:00", "13:00", "rd_plaza", [306, 378], { act: "guitar", dir: -1 }),
         slot("13:00", "15:00", "rd_tapas", [404, 520], { act: "guitar", dir: 1 }),
@@ -6449,16 +6452,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       away: "Joaquín's gone home for lunch. The water keeps on running."
     },
     {
-      id: "rosario",
+      id: "paloma",
       local: "ronda",
       pitch: 1.1,
-      name: "Rosario",
+      name: "Paloma",
       job: "Dances flamenco in the tapas bar",
-      intro: "Rosario. I dance. Manolo plays, I dance, and if you clap in the right places, I dance better. Olé!",
+      intro: "Paloma. I dance. Manolo plays, I dance, and if you clap in the right places, I dance better. Olé!",
       look: { skin: "#D9A47E", hair: "#1E1A18", hairStyle: "bun", top: "#C8343A", bottom: "#C8343A" },
       routine: [slot("13:00", "15:00", "rd_tapas", [462, 516], { act: "dance", dir: -1 }), slot("20:00", "22:00", "rd_tapas", [462, 516], { act: "dance", dir: -1 })],
       lines: ["Clap on three, six, eight, ten and twelve. It's easy! It's not easy.", "Flamenco is not happy, not sad. It's both, at the same time.", "My grandmother danced on this same stage. Well, the old one. It fell down.", "¡Venga, Evan! Clap with me!"],
-      away: "Rosario's resting her feet. The show's at one and at eight."
+      away: "Paloma's resting her feet. The show's at one and at eight."
     },
     {
       id: "antonio",
@@ -9014,7 +9017,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   }
 
   // src/art/fishing.js
-  var AT = { base: { x: 430, y: 108, side: 1, label: [436, 138] }, field: { x: 60, y: 284, side: 1, label: [60, 316] }, shore: { x: 234, y: 368, side: -1, label: [236, 336] }, hwoods: { x: 348, y: 264, side: -1, label: [300, 294] }, bay: { x: 172, y: 252, side: -1, label: [172, 280], text: "Sunset fishing" } };
+  var AT = { base: { x: 430, y: 108, side: 1, label: [436, 138] }, field: { x: 112, y: 352, side: 1, label: [112, 382] }, shore: { x: 234, y: 368, side: -1, label: [236, 336] }, hwoods: { x: 348, y: 264, side: -1, label: [300, 294] }, bay: { x: 172, y: 252, side: -1, label: [172, 280], text: "Sunset fishing" } };
   var PLACE = { base: "fishriver", field: "fishlake", shore: "fishsea", hwoods: "fishpool", bay: "fishbay" };
   function fishSpotArt(scene2, open2 = true) {
     const a = AT[scene2];
@@ -17910,11 +17913,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var ole = (st6) => st6.hits >= 7 && st6.misses <= 3;
   function flamencoPanel(F2, st6, hm2) {
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Flamenco</h2>`;
-    if (!showOn(hm2)) return h + `<p class="sub">A little wooden stage in the corner, a chair for the guitarist, and a pair of red shoes under it. Manolo and Rosario do a show at one and at eight.</p>` + shut6;
-    if (!st6 || !st6.t0) return h + `<p class="sub">Manolo's playing a bulería, Rosario's dancing, and the whole bar is clapping the rhythm: twelve beats, with the claps on <b>3, 6, 8, 10 and 12</b>. Want to join in?</p>
+    if (!showOn(hm2)) return h + `<p class="sub">A little wooden stage in the corner, a chair for the guitarist, and a pair of red shoes under it. Manolo and Paloma do a show at one and at eight.</p>` + shut6;
+    if (!st6 || !st6.t0) return h + `<p class="sub">Manolo's playing a bulería, Paloma's dancing, and the whole bar is clapping the rhythm: twelve beats, with the claps on <b>3, 6, 8, 10 and 12</b>. Want to join in?</p>
     <div class="actions"><button class="btn primary" data-rflam="start">Clap along</button></div>` + shut6;
     const left4 = st6.done ? 0 : 1, cells = Array.from({ length: COMPAS }, (_, i) => `<span class="ccell${ACCENTS.includes(i) ? " acc" : ""}">${i + 1}</span>`).join("");
-    if (st6.done) return h + `<p class="sub">${ole(st6) ? `<b>¡Olé!</b> ${st6.hits} claps right on the beat. Rosario points at you, laughs, and pulls you up onto the stage for a twirl.` : `${st6.hits} claps on the beat. "Not bad!" says Rosario. "Flamenco takes a lifetime. Try again!"`}</p>
+    if (st6.done) return h + `<p class="sub">${ole(st6) ? `<b>¡Olé!</b> ${st6.hits} claps right on the beat. Paloma points at you, laughs, and pulls you up onto the stage for a twirl.` : `${st6.hits} claps on the beat. "Not bad!" says Paloma. "Flamenco takes a lifetime. Try again!"`}</p>
     <div class="actions"><button class="btn primary" data-rflam="start">Again</button></div>` + shut6;
     return h + `<p class="sub">Clap on the dark beats: 3, 6, 8, 10, 12. Two rounds.${Date.now() < st6.t0 ? " Ready... (Manolo counts you in)" : ""}</p>
     <div class="compas">${cells}<span class="cmark" style="animation-delay:${st6.t0 - Date.now()}ms;animation-duration:${COMPAS * BEAT_MS}ms;animation-iteration-count:${ROUNDS}"></span></div>
@@ -18208,6 +18211,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       // round 107: Doña Carmen, in Ronda, knew Pilar's mother
       { needs: ["carmen:3"], lines: ["Doña Carmen sent me a kiss? From Ronda?", "She was my mother's best friend. Mamá used to say Carmen's yemas were the only sweets worth the sugar.", "I'm making Mamá's salmorejo tonight. For both of them."] }
     ],
+    // round 120: Ines is Tomás Ruiz's great-great-granddaughter. He came with the railway in 1912 from a village near
+    // Ronda and planted an olive cutting by the windmill; his initials are on the mill's beam
+    ines: [
+      { lines: ["My great-great-grandad Tomás came with the railway. Laid the track from the coast, sleeper by sleeper.", "He meant to go home to Spain when it was done. He met my great-great-grandma at the station tea room instead."] },
+      { lines: ["He had a cutting from his grandfather's olive tree in his pocket the whole way, wrapped in a wet handkerchief.", "Everyone said an olive would never grow here. He planted it by the windmill anyway. Stubborn. It runs in the family."] },
+      { lines: ["See the trees on the top terrace? My abuela takes a cutting from the old tree by the windmill every spring.", "Half the olives in this valley are that tree's grandchildren. Including yours, probably."] },
+      { needs: ["mill"], lines: ["You opened up the old mill! Did you see the initials on the beam? T.R. That's him!", "Family story: he carved them the day the millstone stopped, and said one day it would turn again, for olives."] },
+      { needs: ["oil"], lines: ["I took a bottle of your oil to Abuela. From his tree's grandchildren, pressed in his mill. She cried into her bread. Then she ate the bread.", "She sent this. He carved it from a branch of that tree in 1913. It should live with the oil now."], reward: "spoon" },
+      { needs: ["ines:5"], lines: ["Abuela's been baking her olive oil cake again, the one from his village.", "She said I could give you the recipe. That's basically a royal decree."], reward: "oilcake" }
+    ],
     // Ronda's locals (round 107): told on a day trip (no quest needed; the two-a-day limit still holds)
     carmen: [
       { lines: ["I learned the yemas from the nuns at the convent when I was nine. They paid me in sugar."] },
@@ -18259,6 +18272,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (g2 === "cocoa" || g2 === "cellar") return owns(F2, g2);
     if (g2 === "trust1") return (F2.hfarm && F2.hfarm.trust || 0) >= 40;
     if (g2 === "fish5") return Object.keys(F2.fish && F2.fish.caught || {}).length >= 5;
+    if (g2 === "mill") return owns(F2, "mill");
+    if (g2 === "oil") return (F2.mill && F2.mill.made || 0) > 0;
     if (g2 === "ronda2") return (F2.ronda && F2.ronda.days || []).length >= 2;
     if (g2 === "tiles4") return Object.keys(F2.ronda && F2.ronda.tiles || {}).length >= 4;
     if (g2 === "bouquet") return Object.keys(F2.inv || {}).some((id) => /^bq_/.test(id) && F2.inv[id] > 0);
@@ -18340,11 +18355,21 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       storyState(F2).flags.pastry = true;
       applyFlags(F2);
       return "Farid's honey and pistachio pastries, on the tapas menu";
+    },
+    spoon: (F2, addInv2) => {
+      addInv2("s_spoon", 1);
+      return "Tomás's olive-wood spoon (a keepsake)";
+    },
+    oilcake: (F2) => {
+      storyState(F2).flags.oilcake = true;
+      applyFlags(F2);
+      return "Ines's abuela's olive oil cake, on the tapas menu";
     }
   };
   function applyFlags(F2) {
     const f2 = storyState(F2).flags;
     if (f2.koi && FISH.koi) FISH.koi.w = 7;
+    if (f2.oilcake && !TAPAS.tortaaceite) TAPAS.tortaaceite = { n: "Ines's abuela's olive oil cake", need: { oliveoil: 1, flour: 1, egg: 1 }, price: 12 };
     if (f2.pastry && !TAPAS.pasteles) TAPAS.pasteles = { n: "Farid's honey and pistachio pastries", need: { honey: 1, flour: 1 }, price: 9 };
   }
   function tellStory(F2, id, addInv2, day = dayKey()) {
@@ -23258,7 +23283,7 @@ ${SIGNOFF[t2.who] || ""}`;
               act("cheer");
               mprop("sparkle", mel.x, mel.y - 60, 1600);
             });
-            speak("Rosario takes your hands and spins you round the stage. The whole bar shouts ¡Olé!", 6e3);
+            speak("Paloma takes your hands and spins you round the stage. The whole bar shouts ¡Olé!", 6e3);
             if (isHere("mum")) setTimeout(() => npcSay("mum", "THAT'S my girl! Olé!"), 2e3);
           } else sfx("chime");
           if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(won ? "Mama DANCED!" : "again! again!"), 1600);

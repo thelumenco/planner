@@ -89,7 +89,7 @@ export function tilePanel(F, day = dayKey(), st = {}){
 
 /* ---------- round 118: three things to join in with, Ronda style ---------- */
 // Flamenco in the tapas bar (1 to 3, 8 to 10): clap the palmas along with Manolo's bulería. Twelve beats, the claps
-// fall on 3, 6, 8, 10 and 12; two rounds. Seven good claps (and not too many stray ones) and Rosario pulls you up.
+// fall on 3, 6, 8, 10 and 12; two rounds. Seven good claps (and not too many stray ones) and Paloma pulls you up.
 export const SHOWS = [[13*60, 15*60], [20*60, 22*60]], COMPAS = 12, ACCENTS = [2, 5, 7, 9, 11], BEAT_MS = 380, ROUNDS = 2, COUNT_IN = 1500;
 export const showOn = hm => SHOWS.some(([a, b]) => hm >= a && hm < b);
 export const palmasStart = (now = Date.now()) => ({t0: now + COUNT_IN, clapped: [], hits: 0, misses: 0, done: false});
@@ -103,11 +103,11 @@ export function clap(st, now = Date.now()){
 export const ole = st => st.hits >= 7 && st.misses <= 3;
 export function flamencoPanel(F, st, hm){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Flamenco</h2>`;
-  if (!showOn(hm)) return h + `<p class="sub">A little wooden stage in the corner, a chair for the guitarist, and a pair of red shoes under it. Manolo and Rosario do a show at one and at eight.</p>` + shut;
-  if (!st || !st.t0) return h + `<p class="sub">Manolo's playing a bulería, Rosario's dancing, and the whole bar is clapping the rhythm: twelve beats, with the claps on <b>3, 6, 8, 10 and 12</b>. Want to join in?</p>
+  if (!showOn(hm)) return h + `<p class="sub">A little wooden stage in the corner, a chair for the guitarist, and a pair of red shoes under it. Manolo and Paloma do a show at one and at eight.</p>` + shut;
+  if (!st || !st.t0) return h + `<p class="sub">Manolo's playing a bulería, Paloma's dancing, and the whole bar is clapping the rhythm: twelve beats, with the claps on <b>3, 6, 8, 10 and 12</b>. Want to join in?</p>
     <div class="actions"><button class="btn primary" data-rflam="start">Clap along</button></div>` + shut;
   const left = st.done ? 0 : 1, cells = Array.from({length: COMPAS}, (_, i) => `<span class="ccell${ACCENTS.includes(i) ? " acc" : ""}">${i + 1}</span>`).join("");
-  if (st.done) return h + `<p class="sub">${ole(st) ? `<b>¡Olé!</b> ${st.hits} claps right on the beat. Rosario points at you, laughs, and pulls you up onto the stage for a twirl.` : `${st.hits} claps on the beat. "Not bad!" says Rosario. "Flamenco takes a lifetime. Try again!"`}</p>
+  if (st.done) return h + `<p class="sub">${ole(st) ? `<b>¡Olé!</b> ${st.hits} claps right on the beat. Paloma points at you, laughs, and pulls you up onto the stage for a twirl.` : `${st.hits} claps on the beat. "Not bad!" says Paloma. "Flamenco takes a lifetime. Try again!"`}</p>
     <div class="actions"><button class="btn primary" data-rflam="start">Again</button></div>` + shut;
   return h + `<p class="sub">Clap on the dark beats: 3, 6, 8, 10, 12. Two rounds.${Date.now() < st.t0 ? " Ready... (Manolo counts you in)" : ""}</p>
     <div class="compas">${cells}<span class="cmark" style="animation-delay:${st.t0 - Date.now()}ms;animation-duration:${COMPAS*BEAT_MS}ms;animation-iteration-count:${ROUNDS}"></span></div>

@@ -1705,7 +1705,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **TOWN_OBST updated** for all the new furniture.
 
 ### Round 118: things to join in with in Ronda, shopping corners, little touches
-- **Flamenco corner in the tapas bar:** a stage in the bottom-right corner. Manolo (guitar) and the new local Rosario (dancer) play 1–3pm and 8–10pm.
+- **Flamenco corner in the tapas bar:** a stage in the bottom-right corner. Manolo (guitar) and the new local Paloma (dancer) play 1–3pm and 8–10pm.
   - Tap the stage to clap the palmas: a 12-beat bulería, claps on 3, 6, 8, 10 and 12, two rounds, on a `.compas` bar.
   - Seven or more good claps, with three or fewer stray ones, earns an Olé: Rosario twirls Mel on the stage, with hearts and XP. Mum cheers if she's there, and Evan claps along.
   - Code: `palmasStart`, `clap`, `ole`, `showOn` in ronda.js.
@@ -1735,3 +1735,15 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Tomás, a Spanish track-layer from a village near Ronda, planted an olive cutting beside it and said it would press olives one day.
   - His initials, "T.R. 1912", are carved on the press beam.
   - The story ends by counting the bottles Mel has pressed.
+
+### Round 120b: Tomás's descendant, the lake's fishing spot, the dancer's name
+- **Ines is Tomás Ruiz's great-great-granddaughter.** Mel wanted an existing villager, not a new one. A brief new villager, Remedios, was removed.
+- **Ines's story** (data/stories.js) has six chapters:
+  - The railway, and the tea room where he met his wife.
+  - The cutting in a wet handkerchief.
+  - Her abuela's cuttings: the valley's olives are that tree's grandchildren.
+  - Gate `mill`: the T.R. initials on the beam.
+  - Gate `oil`: Mel's first bottle reaches her abuela. Reward: the keepsake `s_spoon`, Tomás's olive-wood spoon.
+  - Gate `ines:5`: the recipe. Reward flag `oilcake` puts "Ines's abuela's olive oil cake" on the tapas menu (oil, flour and egg).
+- **Fishing on the lake field:** the spot moved from beside the foreshore gate to the lake's south-west shore, at [112,352].
+- **Ronda's flamenco dancer is now Paloma.** Rosario is already Pilar's late mother in the stories.

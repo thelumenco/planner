@@ -152,7 +152,7 @@ export const VILLAGE = {
   taxishore:{scene:"shore", name:"River taxi", door:[214,156], spot:true, mark:[214,100], line:"The river taxi stop, where the river meets the sea."},
   bikesvillage:{scene:"village", name:"Bike hire", door:[196,580], spot:true, mark:[196,500], line:"Hire bikes, in the town square."},
   fishriver:{scene:"base", name:"Fishing spot", door:[396,118], spot:true, mark:[396,70], line:"A good spot for fishing."},
-  fishlake:{scene:"field", name:"Fishing spot", door:[60,290], spot:true, mark:[60,236], line:"A good spot for fishing."},
+  fishlake:{scene:"field", name:"Fishing spot", door:[124,368], spot:true, mark:[112,296], line:"A good spot for fishing."},
   fishsea:{scene:"shore", name:"Fishing spot", door:[204,376], spot:true, mark:[234,320], line:"A good spot for fishing."},
   fishbay:{scene:"bay", name:"Sunset fishing", door:[196,262], spot:true, line:"Friday evenings, 5 to 8: sunset fishing off the beach."},
   homejetty:{scene:"base", name:"Little jetty", door:[150,132], spot:true, line:"Your little jetty. Paddle down the river and out to the foreshore."},

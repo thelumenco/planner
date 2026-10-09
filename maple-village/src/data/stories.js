@@ -142,6 +142,16 @@ export const STORIES = {
     // round 107: Doña Carmen, in Ronda, knew Pilar's mother
     {needs: ["carmen:3"], lines: ["Doña Carmen sent me a kiss? From Ronda?", "She was my mother's best friend. Mamá used to say Carmen's yemas were the only sweets worth the sugar.", "I'm making Mamá's salmorejo tonight. For both of them."]}
   ],
+  // round 120: Ines is Tomás Ruiz's great-great-granddaughter. He came with the railway in 1912 from a village near
+  // Ronda and planted an olive cutting by the windmill; his initials are on the mill's beam
+  ines: [
+    {lines: ["My great-great-grandad Tomás came with the railway. Laid the track from the coast, sleeper by sleeper.", "He meant to go home to Spain when it was done. He met my great-great-grandma at the station tea room instead."]},
+    {lines: ["He had a cutting from his grandfather's olive tree in his pocket the whole way, wrapped in a wet handkerchief.", "Everyone said an olive would never grow here. He planted it by the windmill anyway. Stubborn. It runs in the family."]},
+    {lines: ["See the trees on the top terrace? My abuela takes a cutting from the old tree by the windmill every spring.", "Half the olives in this valley are that tree's grandchildren. Including yours, probably."]},
+    {needs: ["mill"], lines: ["You opened up the old mill! Did you see the initials on the beam? T.R. That's him!", "Family story: he carved them the day the millstone stopped, and said one day it would turn again, for olives."]},
+    {needs: ["oil"], lines: ["I took a bottle of your oil to Abuela. From his tree's grandchildren, pressed in his mill. She cried into her bread. Then she ate the bread.", "She sent this. He carved it from a branch of that tree in 1913. It should live with the oil now."], reward: "spoon"},
+    {needs: ["ines:5"], lines: ["Abuela's been baking her olive oil cake again, the one from his village.", "She said I could give you the recipe. That's basically a royal decree."], reward: "oilcake"}
+  ],
   // Ronda's locals (round 107): told on a day trip (no quest needed; the two-a-day limit still holds)
   carmen: [
     {lines: ["I learned the yemas from the nuns at the convent when I was nine. They paid me in sugar."]},

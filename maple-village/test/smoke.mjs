@@ -2853,7 +2853,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   console.log("\nthe old mill and the olive grove");
   { const tw = await import(new URL("../src/data/towns.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), ml = await import(new URL("../src/game/mill.js", import.meta.url));
     check(tw.TOWN_GOODS.oliveoil.sell > ml.JARS_PER_BOTTLE*it.ITEMS.olives.sell && tw.TOWN_GOODS.oliveoil.price > tw.TOWN_GOODS.oliveoil.sell, "a bottle of oil sells for more than the three jars of olives it takes (and Rafael's costs more than it sells for)");
-    check(/T\.R\. 1912/.test(ml.millStory({})), "the old photograph tells the mill's story: Tomás, 1912"); }
+    check(/T\.R\. 1912/.test(ml.millStory({})), "the old photograph tells the mill's story: Tomás, 1912");
+    const sd = await import(new URL("../src/data/stories.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
+    check(!np.NPCS.some(n => n.id === "remedios") && /Tomás/.test(np.NPCS.find(n => n.id === "ines").job) && sd.STORIES.ines.some(c => (c.needs || []).includes("mill")) && sd.STORIES.ines.some(c => c.reward === "spoon") && sd.STORIES.ines.some(c => c.reward === "oilcake"), "Tomás's descendant in Honeybrook: Ines at the vineyard, and her story"); }
   const m = await import(new URL("../src/game/mill.js", import.meta.url)), v = await import(new URL("../src/game/vineyard.js", import.meta.url));
   const F = {coins: 999, inv: {olives: 5}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
   const vs = v.vineState(F); vs.oliveCrate = 4;

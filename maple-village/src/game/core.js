@@ -1739,7 +1739,7 @@ function ctx(){
   c.querySelectorAll("[data-rflam]").forEach(b => b.onclick = () => {
     if (b.dataset.rflam === "start") { flamSt = palmasStart(); clearTimeout(flamT); sfx("tap"); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["clap clap CLAP!", "I'm clapping, Mama!", "olé! olé!"])), 2400);
       flamT = setTimeout(() => { flamSt.done = true; const won = ole(flamSt); const r = rondaState(F); if (won) { r.oles = (r.oles || 0) + 1; gainXp(2); hearts(3); sfx("yay"); act("cheer"); go(scene, 430, 540, () => { act("cheer"); mprop("sparkle", mel.x, mel.y - 60, 1600); });
-          speak("Rosario takes your hands and spins you round the stage. The whole bar shouts ¡Olé!", 6000); if (isHere("mum")) setTimeout(() => npcSay("mum", "THAT'S my girl! Olé!"), 2000); } else sfx("chime");
+          speak("Paloma takes your hands and spins you round the stage. The whole bar shouts ¡Olé!", 6000); if (isHere("mum")) setTimeout(() => npcSay("mum", "THAT'S my girl! Olé!"), 2000); } else sfx("chime");
         if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(won ? "Mama DANCED!" : "again! again!"), 1600); save(); ctx(); }, palmasEnd(flamSt) - Date.now() + 300);
       ctx(); return; }
     if (!flamSt || flamSt.done) return; const r = clap(flamSt); if (r === "hit") sfx("tap"); else if (r === "miss") sfx("paper", true); ctx(); });
