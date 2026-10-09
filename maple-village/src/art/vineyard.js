@@ -17,7 +17,7 @@ const grapes = (x, y, col, s) => { let g = ""; const pts = [[0, 0], [-3, -3], [3
 
 function vineArt(vn, x, y){
   if (!vn) return sk(`<ellipse cx="${x}" cy="${y}" rx="12" ry="4" style="fill:#B08A6A"/>`, `<ellipse cx="${x}" cy="${y}" rx="12" ry="4"/><path d="M${x-4} ${y-1} q4 -3 8 0" opacity=".5"/>`);
-  const g = growth(vn), ripe = g >= 1, col = vn.v === "red" ? "#6B2A55" : "#B9CF6A", unripe = "#A9C98A";
+  const g = growth(vn), ripe = g >= 1, col = vn.v === "red" ? "#6B2A55" : vn.v === "tempranillo" ? "#3A2050" : "#B9CF6A", unripe = "#A9C98A";
   const leaf = (lx, ly, r) => `<path d="M${lx} ${ly} q${-r} ${-r*.4} ${-r*.5} ${-r} q${r*.5} ${r*.1} ${r*.5} ${r} q${r*.1} ${-r*.7} ${r*.6} ${-r*.9} q${-r*.1} ${r*.6} ${-r*.6} ${r*.9}z" style="fill:var(--moss)"/>`;
   const n = vn.wateredAt ? 3 + Math.round(g*3) : 2;
   let leaves = ""; for (let k = 0; k < n; k++) { const lx = x - 16 + (k*32/(n - 1 || 1)), ly = y - 30 - (k % 2)*8; leaves += leaf(lx, ly, 7 + g*3); }

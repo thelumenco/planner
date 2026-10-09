@@ -1,3 +1,4 @@
+import { TOWN_GOODS } from "../data/towns.js";
 import { TREES, FLOWERS } from "../data/orchard.js";
 import { GOODS } from "../data/stall-goods.js";
 // Hand-drawn icon set (ink outline + marker fill, same look as the map). No emoji anywhere in the game.
@@ -145,7 +146,7 @@ I.sesame = [`<path d="M4 12h16c0 5-3.6 8-8 8s-8-3-8-8z" ${f("#FFFDF6")}/>${[[8, 
 I.mint = [`<ellipse cx="9" cy="12" rx="4" ry="6" transform="rotate(-25 9 12)" ${f("#9FD3B2")}/><ellipse cx="15" cy="11" rx="4" ry="6" transform="rotate(25 15 11)" ${f("#7FB86A")}/>`, `<ellipse cx="9" cy="12" rx="4" ry="6" transform="rotate(-25 9 12)"/><ellipse cx="15" cy="11" rx="4" ry="6" transform="rotate(25 15 11)"/><path d="M12 21v-6"/>`];
 I.banana = [`<path d="M5 8c2 8 9 11 14 8-1 3-5 5-9 4S4 14 5 8z" ${f("#F3E07A")}/>`, `<path d="M5 8c2 8 9 11 14 8-1 3-5 5-9 4S4 14 5 8zM5 8l-1-2"/>`];
 const grapes = c => [`${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3" ${f(c)}/>`).join("")}`, `${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3"/>`).join("")}<path d="M12 5V2"/>`];
-I.grape_red = grapes("#7A2E5A"); I.grape_white = grapes("#C9D98A");
+I.grape_red = grapes("#7A2E5A"); I.grape_white = grapes("#C9D98A"); I.grape_tempranillo = grapes("#3A2050");
 I.loaf = [`<path d="M4 15c0-6 4-8 8-8s8 2 8 8v4H4z" ${f("#D9A066")}/>`, `<path d="M4 15c0-6 4-8 8-8s8 2 8 8v4H4zM9 9l1 4M13 8l1 4M17 9l-1 4"/>`];
 // the Scoop Shack: an ice cream to give, by type
 I.ic_cup = [`<path d="M6 12h12l-1.6 8h-8.8z" ${f("#F4C7CF")}/><path d="M7 12c0-4 2.5-6 5-6s5 2 5 6z" ${f("#FFF6DC")}/>`, `<path d="M6 12h12l-1.6 8h-8.8zM7 12c0-4 2.5-6 5-6s5 2 5 6"/><path d="M14 6l3-3"/>`];
@@ -357,6 +358,9 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
   I.housechoc = S.bar("#3F2519"); I.sp_log = I.logcake; I.sp_mooncake = I.mooncake;
   [["red", "#7A1F3D"], ["rose", "#E98AA0"], ["white", "#E8D57A"], ["sparkling", "#F3E7B0"]].forEach(([k, c]) => { I["wine_" + k] = S.bottle(c); });
   Object.entries(GOODS).forEach(([id, g]) => { if (I[id] || !g.art) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
+  // round 107: Ronda's goods, and the Tempranillo grape and wine
+  Object.entries(TOWN_GOODS).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
+  I.wine_tempranillo = S.bottle("#5A1630");
 }
 export const icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
 export const iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size/2}" y="${y - size/2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;

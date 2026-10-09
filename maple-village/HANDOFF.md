@@ -1571,3 +1571,12 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - The locals: Carmen, Rafael, Lucía and Manolo, plus Pilar's chapter.
   - Family acts: dance, sketch, haggle, doze, count, jog/photo, notebook.
 - **Tests:** smoke "a day trip to Ronda".
+- **Round 3 (places, goods and recipes):** `src/game/ronda.js`, with data in towns.js (`TOWN_GOODS`, `TILES`, `TASTINGS`).
+  - **The market:** almonds, Seville oranges, olive oil, jamón, payoyo, membrillo and a picnic basket. From the second visit (`F.ronda.days`), Tempranillo cuttings: 3 for 120 (`vineyard.addCuttings`; `v.tempra` unlocks the grape in the plant, crate and barrel panels).
+  - **The tapas bar:** tasting sets `F.learned[id]`. kitchen.js `TAPAS` entries with `learn: true` (salmorejo, ajo blanco, jamón croquetas, payoyo with membrillo, orange salad) show on the stove, and get picked by Pilar, only once learned (`knows`). They're never the chef's request.
+  - **New small plates:** salted almonds, bread with oil.
+  - **Ingredients elsewhere:** almonds, Seville oranges, membrillo and olive oil are gelato ingredients (scoop.js `INGR`), and so bonbon fillings too.
+  - **The sweet shop and convent:** yemas and almond cake; convent biscuits (all gifts).
+  - **The tile shop:** 8 tiles (orange in winter and spring, geranium in spring and summer, almond blossom in winter). All eight set `F.ronda.bench`, and core.js draws `tileBench(236, 548)` at home. Also a painted fan and cork coasters (gifts).
+  - **Picnic:** a picnic at the Alameda balcony uses the basket (`F.ronda.picnics`).
+  - **Tempranillo** (vineyard.js `STYLES.tempranillo`): 12h in the barrel, 28 coins a bottle. It has its own wine names and colours (wine.js and vineyard art), and Marco fills it first.

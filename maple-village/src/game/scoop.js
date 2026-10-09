@@ -50,7 +50,8 @@ export const INGR = {
   chocolate: ["Dark chocolate", "Chocolate", "#5A3A2A"], vanilla: ["Vanilla", "Vanilla", "#F6EBC8"], coffee: ["Coffee", "Coffee", "#8A5A3A"], pistachio: ["Pistachios", "Pistachio", "#A8C98A"],
   hazelnut: ["Hazelnuts", "Hazelnut", "#B98A5A"], coconut: ["Coconut", "Coconut", "#F6F1E8"], matcha: ["Matcha", "Matcha", "#8FB86A"], pandan: ["Pandan", "Pandan", "#7FB86A"],
   gulamelaka: ["Gula melaka", "Gula Melaka", "#9A5A2E"], sesame: ["Black sesame", "Black Sesame", "#4A4440"], mint: ["Mint", "Mint", "#9FD3B2"], banana: ["Bananas", "Banana", "#F3E07A"],
-  grape_red: ["Red grapes", "Red Grape", "#7A2E5A"], grape_white: ["White grapes", "White Grape", "#C9D98A"],
+  grape_red: ["Red grapes", "Red Grape", "#7A2E5A"], grape_white: ["White grapes", "White Grape", "#C9D98A"], grape_tempranillo: ["Tempranillo grapes", "Tempranillo", "#3A2050"],
+  almond: ["Marcona almonds", "Almond", "#E8D3A8"], sevilla: ["Seville oranges", "Bitter Orange", "#F28C28"], membrillo: ["Membrillo", "Quince", "#D98A4A"], oliveoil: ["Olive oil", "Olive Oil", "#C9C25A"],   // from Ronda (round 107)
   housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
   goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
   yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)

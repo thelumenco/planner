@@ -25,7 +25,10 @@ export const GOODS = {
   honeycomb: ["piece of honeycomb", "pieces of honeycomb"], lemon: ["lemon", "lemons"], wildgarlic: ["bunch of wild garlic", "bunches of wild garlic"], blackberry: ["blackberry", "blackberries"], mushroom: ["wild mushroom", "wild mushrooms"], chestnut: ["chestnut", "chestnuts"], syrup: ["bottle of petal syrup", "bottles of petal syrup"],
   // groups (round 101): anything that fits, see ALT
   farmcheese: ["farm cheese", "farm cheeses"], halloumi: ["halloumi", "halloumi"], bluecheese: ["Honeybrook blue", "Honeybrook blue"], cheddar: ["farmhouse cheddar", "farmhouse cheddar"],
-  honey: ["jar of honey", "jars of honey"], petals: ["garden flower", "garden flowers"]};
+  honey: ["jar of honey", "jars of honey"], petals: ["garden flower", "garden flowers"],
+  // round 107: from Ronda's market
+  almond: ["bag of almonds", "bags of almonds"], sevilla: ["Seville orange", "Seville oranges"], oliveoil: ["bottle of olive oil", "bottles of olive oil"], jamon: ["piece of jamón", "pieces of jamón"],
+  payoyo: ["payoyo cheese", "payoyo cheeses"], membrillo: ["block of membrillo", "blocks of membrillo"]};
 export const GROUP_ICON = {farmcheese: "chz_cheddar", halloumi: "chz_halloumi", bluecheese: "chz_blue", cheddar: "chz_cheddar", honey: "honey", petals: "tulip"};
 // Wildflower Farm's cheeses (chz_*) come in as themselves: any of them does for "cheese" in a recipe, and the farm
 // cheese board wants one; goat's milk does for milk (the press, the crema). See ALT.
@@ -47,7 +50,10 @@ export const DISHES = {
   shortbread: {n: "Flower shortbread", need: {flour: 1, petals: 2}, plates: 4, price: 5},
   bluetart: {n: "Blueberry tart", need: {blueberry: 3, flour: 1}, plates: 4, price: 6},
   posset: {n: "Lemon and petal posset", need: {milk: 1, lemon: 1, syrup: 1}, plates: 4, price: 7},
-  crumble: {n: "Blackberry crumble", need: {blackberry: 3, flour: 1}, plates: 4, price: 6}};
+  crumble: {n: "Blackberry crumble", need: {blackberry: 3, flour: 1}, plates: 4, price: 6},
+  // round 107: with Ronda's almonds and olive oil
+  almendras: {n: "Salted almonds", need: {almond: 1}, plates: 4, price: 5},
+  panaceite: {n: "Bread with olive oil", need: {loaf: 1, oliveoil: 1}, plates: 4, price: 5}};
 // the tapas of the day: garden dishes, one chosen each day, 6 plates a batch
 export const TAPAS = {
   patatas: {n: "Patatas bravas", need: {potato: 2, tomato: 1}, price: 8, seasons: ["autumn"]},
@@ -83,13 +89,21 @@ export const TAPAS = {
   // round 103: from the woods (foraging, woods.js)
   ajo: {n: "Wild garlic tortilla", need: {wildgarlic: 2, egg: 2, potato: 1}, price: 10, seasons: ["spring"]},
   setas: {n: "Wild mushrooms on toast", need: {mushroom: 2, loaf: 1}, price: 10, seasons: ["autumn", "winter"]},
-  castanas: {n: "Roast chestnuts with honey", need: {chestnut: 4, honey: 1}, price: 9, seasons: ["autumn", "winter"]}};
+  castanas: {n: "Roast chestnuts with honey", need: {chestnut: 4, honey: 1}, price: 9, seasons: ["autumn", "winter"]},
+  // round 107: tasted at the tapas bar in Ronda (learn: only once Mel's tried them there, towns.js TASTINGS)
+  salmorejo: {n: "Salmorejo", need: {tomato: 2, loaf: 1, oliveoil: 1}, price: 11, seasons: ["summer", "autumn"], learn: true},
+  ajoblanco: {n: "Ajo blanco", need: {almond: 2, loaf: 1, oliveoil: 1}, price: 11, learn: true},
+  croqjamon: {n: "Jamón croquetas", need: {jamon: 1, milk: 1, flour: 1}, price: 13, learn: true},
+  payoyo: {n: "Payoyo with membrillo", need: {payoyo: 1, membrillo: 1}, price: 14, learn: true},
+  naranjas: {n: "Orange and olive salad", need: {sevilla: 2, olives: 1, oliveoil: 1}, price: 10, learn: true}};
+// a tapas Mel can cook: the Ronda ones once she's tasted them there
+export const knows = (F, id) => !TAPAS[id].learn || !!(F.learned && F.learned[id]);
 export const inSeason = (id, season) => !TAPAS[id].seasons || TAPAS[id].seasons.includes(season);
 export const TAPAS_PLATES = 6;
 // The chef's request: each day someone in town has a craving for one of the season's tapas. Make it the tapas of the
 // day and it sells for half as much again (a reason to cook something different each day).
 const ASKERS = ["Rosa", "Bastien", "Noor", "Felix", "Elena", "Mateo", "Lila", "Celeste"];
-export function requestOf(today){ const ids = Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today))), h = hash(today + "crave"); return {id: ids[h % ids.length], who: ASKERS[(h >> 5) % ASKERS.length]}; }
+export function requestOf(today){ const ids = Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today)) && !TAPAS[id].learn), h = hash(today + "crave"); return {id: ids[h % ids.length], who: ASKERS[(h >> 5) % ASKERS.length]}; }
 export const tapasPrice = (id, today) => Math.round(TAPAS[id].price*(requestOf(today).id === id ? 1.5 : 1));
 const OVEN = 1*H, PRESS = 3*H;
 
@@ -126,7 +140,7 @@ export function makeSyrup(F){ const k = kitchenState(F); if (!has(k, {petals: SY
 export function cookDish(F, id){ const k = kitchenState(F), d = DISHES[id], v = vineState(F); if (!d || !has(k, d.need)) return null; use(k, d.need); v.menu[id] = (v.menu[id] || 0) + d.plates; return `${d.plates} plates of ${d.n.toLowerCase()}, out to the tasting room.`; }
 export const tapasToday = (F, today) => { const v = vineState(F); return v.tapas && v.tapas.day === today ? v.tapas : null; };
 // choose today's tapas (can change it until a batch is cooked)
-export function chooseTapas(F, id, today){ const v = vineState(F), t = tapasToday(F, today); if (!TAPAS[id] || !inSeason(id, seasonOf(today)) || (t && t.cooked)) return null; v.tapas = {day: today, id, plates: 0, cooked: 0}; return `Today's tapas: ${TAPAS[id].n}. It's on the chalkboard.`; }
+export function chooseTapas(F, id, today){ const v = vineState(F), t = tapasToday(F, today); if (!TAPAS[id] || !knows(F, id) || !inSeason(id, seasonOf(today)) || (t && t.cooked)) return null; v.tapas = {day: today, id, plates: 0, cooked: 0}; return `Today's tapas: ${TAPAS[id].n}. It's on the chalkboard.`; }
 export function cookTapas(F, today){ const k = kitchenState(F), t = tapasToday(F, today); if (!t || !has(k, TAPAS[t.id].need)) return null; use(k, TAPAS[t.id].need); t.plates += TAPAS_PLATES; t.cooked++; return `${TAPAS_PLATES} plates of ${TAPAS[t.id].n.toLowerCase()}! Out they go.`; }
 // At closing (or the next day), leftover tapas feed the staff, who leave something for the larder. -> note or null
 const THANKS = [["olives", "Marco"], ["egg", "Ines"], ["flour", "Celeste"]];
@@ -155,7 +169,7 @@ export function cookTick(F, today){
   if (!k.press && pressCheese(F)) done.push("started a cheese in the press");
   if (!k.oven && (k.larder.loaf || 0) < 3 && bake(F)) done.push("put bread in the oven");
   let t = tapasToday(F, today);
-  if (!t) { const best = Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today)) && has(k, TAPAS[id].need)).sort((a, b) => tapasPrice(b, today) - tapasPrice(a, today))[0];
+  if (!t) { const best = Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today)) && knows(F, id) && has(k, TAPAS[id].need)).sort((a, b) => tapasPrice(b, today) - tapasPrice(a, today))[0];
     if (best) { chooseTapas(F, best, today); t = tapasToday(F, today); done.push(`chose ${TAPAS[best].n.toLowerCase()} for the tapas of the day`); } }
   if (t && t.plates < 2 && cookTapas(F, today)) done.push(`cooked ${TAPAS_PLATES} plates of ${TAPAS[t.id].n.toLowerCase()}`);
   // small plates from what's left, keeping back one more batch of the tapas
@@ -205,7 +219,7 @@ export function stovePanel(F, today){
   if (t) h += `<div class="kdish chosen">${dishArt("tapas:" + t.id, 52)}<span><b>${esc(T.n)}</b><small>${t.plates} plate${t.plates === 1 ? "" : "s"} on the menu · ${tapasPrice(t.id, today)} coins each · needs ${needText(T.need)}</small><span class="kneeds">${needList(k, T.need)}</span></span></div>
       <div class="actions"><button class="btn primary" data-k="cooktapas" ${has(k, T.need) ? "" : "disabled"}>Cook a batch (${TAPAS_PLATES} plates)</button>${!t.cooked ? `<button class="btn alt small" data-k="untapas">Pick a different dish</button>` : ""}</div>
       <p class="muted">Leftovers at closing time (10pm) go to the staff for dinner.</p>`;
-  else h += `<p class="sub">Pick today's dish. It goes on the chalkboard, sells for more than the small plates and brings extra people in. <b>${SEASONS[seasonOf(today)].n}</b> menu: ${SEASONS[seasonOf(today)].line.toLowerCase()}.</p><div class="kdishes">${Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today))).map(id => { const d = TAPAS[id], ok = has(k, d.need);
+  else h += `<p class="sub">Pick today's dish. It goes on the chalkboard, sells for more than the small plates and brings extra people in. <b>${SEASONS[seasonOf(today)].n}</b> menu: ${SEASONS[seasonOf(today)].line.toLowerCase()}.</p><div class="kdishes">${Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today)) && knows(F, id)).map(id => { const d = TAPAS[id], ok = has(k, d.need);
       return `<button class="kdish ${ok ? "ok" : ""}" data-k="tapas" data-id="${id}">${dishArt("tapas:" + id, 46)}<span><b>${esc(d.n)}</b><small>${d.price} coins a plate</small><span class="kneeds">${needList(k, d.need)}</span></span></button>`; }).join("")}</div>`;
   h += `</section><h3 class="ph3">Small plates</h3><div class="items shop dishes">${Object.keys(DISHES).map(id => { const d = DISHES[id], ok = has(k, d.need);
     return `<button class="item" data-k="dish" data-dish="${id}" ${ok ? "" : "disabled"}><span class="e">${dishArt(id, 44, !ok)}</span><span class="n">${esc(d.n)}</span><span class="c">${esc(needText(d.need))}</span><span class="d">${d.plates} plates · ${d.price} coins each</span></button>`; }).join("")}</div>`;

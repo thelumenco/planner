@@ -14,7 +14,13 @@ import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dis
 export const GROW = 8*H;                                     // a watered vine ripens in 8 hours
 // Fermenting is a once-a-day rhythm: fill a barrel one evening, bottle it the next day (finishing quests speeds it up).
 export const STYLES = {red: {n: "Red", grape: "red", dur: 10*H, price: 18, col: "#7A1F3D"}, rose: {n: "Rosé", grape: "red", dur: 6*H, price: 15, col: "#E98AA0"},
-  white: {n: "White", grape: "white", dur: 8*H, price: 16, col: "#E8D57A"}, sparkling: {n: "Sparkling", grape: "white", dur: 8*H, dur2: 5*H, price: 26, col: "#F3E7B0"}};
+  white: {n: "White", grape: "white", dur: 8*H, price: 16, col: "#E8D57A"}, sparkling: {n: "Sparkling", grape: "white", dur: 8*H, dur2: 5*H, price: 26, col: "#F3E7B0"},
+  // round 107: from Rafael's cuttings in Ronda. A deep Spanish red: longer in the barrel, dearer on the shelf
+  tempranillo: {n: "Tempranillo", grape: "tempranillo", dur: 12*H, price: 28, col: "#5A1630"}};
+// the grapes Mel can grow (Tempranillo once she's brought cuttings home from Ronda)
+export const grapeKinds = v => ["red", "white", ...(v.tempra ? ["tempranillo"] : [])];
+const GRAPE_N = {red: "Red", white: "White", tempranillo: "Tempranillo"};
+export function addCuttings(F, kind, n){ const v = vineState(F); v.cuttings[kind] = (v.cuttings[kind] || 0) + n; if (kind === "tempranillo") v.tempra = true; }
 export const SHOP = {cut_red: {n: "Red grape vine", price: 20, say: "A red grape cutting. Plant it on a trellis."}, cut_white: {n: "White grape vine", price: 20, say: "A white grape cutting. Plant it on a trellis."},
   olive: {n: "Olive tree", price: 150, say: "An olive tree, planted by the path. Olives in about eight hours."}, trellis: {n: "Trellis (one row)", price: 80, say: "A new trellis row, ready for three vines."}, barrel: {n: "Oak barrel", price: 150, say: "Another barrel for the cellar."}, terrace: {n: "Shop terrace", price: 600, say: "Tables and a vine-covered pergola outside the wine shop. More people stop for a glass."}};
 const BUNCHES = 3, PER_BATCH = 3, BOTTLES = 6, GLASSES = 5;
@@ -29,6 +35,7 @@ export function vineState(F){
   v.cuttings = v.cuttings || {red: 1, white: 1}; v.grapes = v.grapes || {red: 0, white: 0}; v.keep = v.keep || {red: 0, white: 0};
   v.barrels = v.barrels || [null]; v.cellar = v.cellar || []; v.shelf = v.shelf || []; v.box = v.box || 0; v.sold = v.sold || 0; v.glasses = v.glasses || 0; v.menu = v.menu || {}; v.plates = v.plates || 0; v.fruit = v.fruit || {};
   v.help = Object.assign({cook: true, pick: true, barrels: true, stock: true, fetch: false}, v.help || {}); v.names = v.names || {};
+  ["tempranillo"].forEach(k => { v.cuttings[k] = v.cuttings[k] || 0; v.grapes[k] = v.grapes[k] || 0; v.keep[k] = v.keep[k] || 0; });
   v.lastTick = v.lastTick || Date.now(); v.today = v.today || {day: "", bottles: 0, glasses: 0, coins: 0};
   return v;
 }
@@ -86,8 +93,8 @@ export function secondFerment(F, slot){ const v = vineState(F), b = v.barrels[sl
 // the shelves are skipped. k picks the next suggestion.
 const W_PLACE = ["Jetty Sunset", "Dolphin Bay", "Lantern Night", "Low Tide", "Sea Breeze", "Golden Hour", "Swan Lake", "Porch Swing", "First Light", "Rainy Window", "Orchard Hill", "Wildflower", "Night Market", "Paddleboard", "Harvest Moon", "Morning Mist", "Kite Day", "Sunday Picnic", "Firefly", "Boardwalk", "Lighthouse", "Monsoon", "Frangipani", "Hammock"];
 const W_WHO = ["Maple's", "Evan's", "Ma Ma's", "Gong Gong's", "Ah Gong's", "Ah Ma's", "Darren's", "Marco's", "Ines's", "Grandpa's Porch"];
-const W_WORD = {red: ["Red", "Reserve", "Rouge", "Old Vine"], rose: ["Rosé", "Blush", "Pink"], white: ["White", "Blanc", "Crisp"], sparkling: ["Bubbles", "Fizz", "Brut", "Sparkle"]};
-const W_FR = {red: ["Château Maple", "Clos de la Baie", "Domaine du Lac", "Grand Cru Evan"], rose: ["Rosé de la Jetée", "Vie en Rose", "Clos des Cygnes"], white: ["Blanc de la Baie", "Domaine des Lanternes", "Clos du Matin"], sparkling: ["Cuvée Maple", "Crémant de la Baie", "Pétillant du Lac"]};
+const W_WORD = {tempranillo: ["Tempranillo", "Reserva", "Crianza", "Tinto"], red: ["Red", "Reserve", "Rouge", "Old Vine"], rose: ["Rosé", "Blush", "Pink"], white: ["White", "Blanc", "Crisp"], sparkling: ["Bubbles", "Fizz", "Brut", "Sparkle"]};
+const W_FR = {tempranillo: ["Puente Nuevo", "Tajo Reserva", "Viña Ronda", "Bodega Maple"], red: ["Château Maple", "Clos de la Baie", "Domaine du Lac", "Grand Cru Evan"], rose: ["Rosé de la Jetée", "Vie en Rose", "Clos des Cygnes"], white: ["Blanc de la Baie", "Domaine des Lanternes", "Clos du Matin"], sparkling: ["Cuvée Maple", "Crémant de la Baie", "Pétillant du Lac"]};
 export function wineNames(F, slot){
   const v = vineState(F), b = v.barrels[slot]; if (!b) return [];
   const used = new Set([...v.cellar, ...v.shelf].map(x => x.name.toLowerCase())), st = b.style, seed = Math.floor(b.start || 0) + slot*7919, out = [];
@@ -167,7 +174,7 @@ export function sellTick(F, opts = {}){
     if (w.workers) {
       if (v.help.pick) v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && vn.wateredAt && at - vn.wateredAt >= GROW) { const n = BUNCHES + (opts.harvest ? 1 : 0); v.grapes[vn.v] += n; vn.wateredAt = null; out.picked += n; } }));
       v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && !vn.wateredAt) { vn.wateredAt = at; out.watered++; } }));
-      if (v.help.barrels) v.barrels.forEach((b, i) => { if (b) return; const spare = c => v.grapes[c] - (v.keep[c] || 0) >= PER_BATCH, st = spare("red") ? "red" : spare("white") ? "white" : null;
+      if (v.help.barrels) v.barrels.forEach((b, i) => { if (b) return; const spare = c => v.grapes[c] - (v.keep[c] || 0) >= PER_BATCH, st = spare("tempranillo") ? "tempranillo" : spare("red") ? "red" : spare("white") ? "white" : null;
         if (st) { v.grapes[st] -= PER_BATCH; v.barrels[i] = {style: st, start: at, dur: STYLES[st].dur, stage: 1}; out.filled++; } });
     }
     if (w.staff && v.help.stock && v.cellar.length) { out.stocked += v.cellar.reduce((n, c) => n + c.n, 0); v.cellar.slice().forEach(c => stock(F, c.id)); }
@@ -214,7 +221,7 @@ export function vinePanel(F, r, i){
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Vine ${r + 1}.${i + 1}</h2>`;
   h += vineCloseup(vn, vn ? growth(vn) : 0, row.trellis);
   if (!row.trellis) return h + `<p class="sub">This row needs a trellis before vines can climb it. The vineyard stall sells them.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
-  if (!vn) return h + `<p class="sub">An empty spot on the trellis. What shall we plant?</p><div class="actions">${["red", "white"].map(k => `<button class="btn ${v.cuttings[k] ? "primary" : "alt"} small" data-vy="plant" data-k="${k}" ${v.cuttings[k] ? "" : "disabled"}>${k === "red" ? "Red" : "White"} vine (${v.cuttings[k]})</button>`).join("")}<button class="btn alt small" data-close="1">Close</button></div>${!v.cuttings.red && !v.cuttings.white ? `<p class="muted">No cuttings left: the stall has more.</p>` : ""}`;
+  if (!vn) return h + `<p class="sub">An empty spot on the trellis. What shall we plant?</p><div class="actions">${grapeKinds(v).map(k => `<button class="btn ${v.cuttings[k] ? "primary" : "alt"} small" data-vy="plant" data-k="${k}" ${v.cuttings[k] ? "" : "disabled"}>${GRAPE_N[k]} vine (${v.cuttings[k]})</button>`).join("")}<button class="btn alt small" data-close="1">Close</button></div>${!v.cuttings.red && !v.cuttings.white ? `<p class="muted">No cuttings left: the stall has more.</p>` : ""}`;
   const g = growth(vn);
   return h + `<p class="sub">A ${vn.v} grape vine. ${!vn.wateredAt ? "Thirsty! Water it and it starts fruiting." : g >= 1 ? "Heavy with ripe grapes!" : `Ripening: ready in about ${hrs(GROW*(1 - g))}.`}</p>
     ${vn.wateredAt ? `<span class="clbar"><i style="width:${Math.round(g*100)}%"></i></span>` : ""}
@@ -222,19 +229,19 @@ export function vinePanel(F, r, i){
 }
 export function stallPanel(F){
   const v = vineState(F);
-  return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F.coins} coins. Cuttings: ${v.cuttings.red} red, ${v.cuttings.white} white. Grapes: ${v.grapes.red} red, ${v.grapes.white} white bunches.</p>
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F.coins} coins. Cuttings: ${v.cuttings.red} red, ${v.cuttings.white} white${v.tempra ? `, ${v.cuttings.tempranillo} Tempranillo` : ""}. Grapes: ${v.grapes.red} red, ${v.grapes.white} white${v.tempra ? `, ${v.grapes.tempranillo} Tempranillo` : ""} bunches.</p>
     <div class="items shop">${Object.keys(SHOP).map(id => { const it = SHOP[id], price = shopPrice(v, id), have = (id === "trellis" && v.rows.every(r => r.trellis)) || (id === "barrel" && v.barrels.length >= 3) || (id === "olive" && !!v.olive) || (id === "terrace" && !!v.terrace), off = have || F.coins < price;
       return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c">${have ? "owned" : `<b>${price}</b> coins`}</span>${id === "terrace" ? `<span class="d">a third more customers</span>` : ""}</button>`; }).join("")}</div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export const vy = {name: {}};
-const grapePic = c => `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2" fill="${c === "red" ? "#7A2E5A" : "#C9D98A"}" stroke="#3A2E28" stroke-width="1"/>`).join("")}<path d="M12 5 V2" stroke="#3A2E28" stroke-width="1.2"/></svg>`;
+const grapePic = c => `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2" fill="${c === "red" ? "#7A2E5A" : c === "tempranillo" ? "#3A2050" : "#C9D98A"}" stroke="#3A2E28" stroke-width="1"/>`).join("")}<path d="M12 5 V2" stroke="#3A2E28" stroke-width="1.2"/></svg>`;
 export function barrelPanel(F){
   const v = vineState(F);
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles.</p>`;
   // the grape crates: picked grapes wait here. Take some for the Scoop Shack (or put them back); Marco only fills
   // barrels from what's left over the amount Mel keeps back
-  h += `<p class="eyebrow">The grape crates</p><ul class="hlist wlist orflowers grcrates">${["red", "white"].map(c => { const back = (F.inv || {})["grape_" + c] || 0;
+  h += `<p class="eyebrow">The grape crates</p><ul class="hlist wlist orflowers grcrates">${grapeKinds(v).map(c => { const back = (F.inv || {})["grape_" + c] || 0;
     return `<li><span class="wpic">${grapePic(c)}</span><span class="wtxt"><b>${v.grapes[c]} ${c} bunch${v.grapes[c] === 1 ? "" : "es"}</b><small>${v.help.barrels ? `Marco keeps ${v.keep[c] || 0} back for you` : "picked and waiting"}</small></span>
       <span class="orbtns"><button class="btn small primary" data-vy="takegr" data-k="${c}" data-n="1" ${v.grapes[c] ? "" : "disabled"}>Take 1</button><button class="btn small alt" data-vy="takegr" data-k="${c}" data-n="99" ${v.grapes[c] ? "" : "disabled"}>All</button>${back ? `<button class="btn small alt" data-vy="putgr" data-k="${c}">Put back ${back}</button>` : ""}</span>
       ${v.help.barrels ? `<span class="grkeep"><span>Keep back from the barrels</span><span class="gstep"><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="-1" aria-label="Keep fewer back">−</button><b>${v.keep[c] || 0}</b><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="1" aria-label="Keep more back">+</button></span></span>` : ""}</li>`; }).join("")}</ul>
@@ -242,7 +249,7 @@ export function barrelPanel(F){
   v.barrels.forEach((b, i) => {
     const ph = !b ? "empty" : barrelLeft(b) ? (b.style === "sparkling" && b.stage === 2 ? "bubbles" : "ferment") : b.style === "sparkling" && b.stage === 1 ? "await2" : "ready";
     h += `<div class="vbarrel">${barrelPic(ph, b ? STYLES[b.style].col : "", b ? STYLES[b.style].n : "")}<div class="vbody"><b>Barrel ${i + 1}</b>${b ? stageStrip(b.style, ph) : ""}`;
-    if (!b) h += `<p class="muted">Empty.</p><div class="vbtns">${Object.keys(STYLES).map(k => { const st = STYLES[k], ok = v.grapes[st.grape] >= PER_BATCH; return `<button class="btn small ${ok ? "alt" : "alt"}" data-vy="fill" data-i="${i}" data-k="${k}" ${ok ? "" : "disabled"}>${st.n}</button>`; }).join("")}</div>`;
+    if (!b) h += `<p class="muted">Empty.</p><div class="vbtns">${Object.keys(STYLES).filter(k => k !== "tempranillo" || v.tempra).map(k => { const st = STYLES[k], ok = v.grapes[st.grape] >= PER_BATCH; return `<button class="btn small ${ok ? "alt" : "alt"}" data-vy="fill" data-i="${i}" data-k="${k}" ${ok ? "" : "disabled"}>${st.n}</button>`; }).join("")}</div>`;
     else { const left = barrelLeft(b), st = STYLES[b.style];
       if (left) h += `<p>${st.n}${b.style === "sparkling" ? (b.stage === 1 ? ", first fermentation" : ", getting its bubbles") : ""}: ready in ${hrs(left)}.</p><span class="clbar"><i style="width:${Math.round(100*(1 - left/b.dur))}%"></i></span>`;
       else if (b.style === "sparkling" && b.stage === 1) h += `<p>First fermentation done. Now the bubbles.</p><button class="btn primary small" data-vy="second" data-i="${i}">Start the second fermentation</button>`;

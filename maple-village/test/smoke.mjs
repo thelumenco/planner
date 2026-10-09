@@ -2669,6 +2669,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(!hostAway(sun) && !hostAway(wed) && (["mumdad", "cottage"].includes(host0) ? t.dinnerOn(sun).host !== host0 : true), "a family dinner whose hosts are away moves to another house");
     t.setAway(() => []);
     check(t.dinnerOn(sun).host === host0 && t.eventOn(sun).stalls.find(x => x.at === 4).id === "mama", "and with nobody away, everything's as usual"); }
+  // Ronda's tapas are learned by tasting them; the tiles, some only in season, make a bench; vines once Rafael trusts you
+  { const k = await import(new URL("../src/game/kitchen.js", import.meta.url)), r = await import(new URL("../src/game/ronda.js", import.meta.url)), F = {coins: 999, inv: {}};
+    check(!k.knows(F, "salmorejo") && k.knows(F, "patatas") && !!r.taste(F, "salmorejo") && k.knows(F, "salmorejo") && F.coins === 994, "tasting salmorejo at the tapas bar (5 coins) puts it on the stove at home");
+    ["bridge", "vulture", "pinsapo", "banos", "guitar"].forEach(id => r.buyTile(F, id, "2026-10-10"));
+    check(Object.keys(F.ronda.tiles).length === 5 && !r.buyTile(F, "orange", "2026-10-10") && !r.buyTile(F, "almond", "2026-10-10"), "five tiles in autumn; the orange and almond blossom tiles aren't painted till winter");
+    r.buyTile(F, "orange", "2027-01-10"); r.buyTile(F, "almond", "2027-01-10"); r.buyTile(F, "geranium", "2027-04-10");
+    check(F.ronda.bench, "all eight tiles: the tiled bench for the pond");
+    r.rondaVisit(F, "2026-10-10"); r.rondaVisit(F, "2026-10-10"); const first = r.buyVines(F); r.rondaVisit(F, "2026-10-12");
+    check(!first && r.buyVines(F) && F.vine.cuttings.tempranillo === 3 && F.vine.tempra, "Rafael sells Tempranillo cuttings on your second visit (three for 120)"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, resume: true });
   page.on("pageerror", e => errors.push(`ronda pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
@@ -2697,6 +2706,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#actors .npc[data-npc="mama"]').dispatchEvent("click"); await page.waitForTimeout(400);
   { let town = false; for (let k = 0; k < 6 && !town; k++) { await page.locator('#actors .npc[data-npc="mama"]').dispatchEvent("click"); await page.waitForTimeout(300); town = /sweeter|Aiyo|big drop/.test(await page.locator("#npcSay").textContent()); }
     check(town, "Ma Ma has things to say about Ronda (her own oranges are sweeter)"); }
+  await page.locator('#world [data-place="tapas"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rtaste="naranjas"]', { timeout: 15000 });
+  await page.click('#ctx [data-rtaste="naranjas"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.learned && f.learned.naranjas && f.coins === 176), "the tapas bar: a taste of orange salad (4 coins), and now Mel knows how to make it");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.locator('#world [data-place="mercado"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="almond"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-rbuy="vines"]').count() === 0 && await page.locator("#ctx [data-rbuy]").count() === 7, "the covered market: almonds, oranges, oil, jamón, payoyo, membrillo and a picnic basket (no vines for a stranger)");
+  await page.click('#ctx [data-rbuy="almond"]'); await page.click('#ctx [data-rbuy="picnic"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.almond === 1 && f.inv.picnic === 1), "almonds and a picnic basket, into the backpack");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   await page.waitForTimeout(1500);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-11"); await page.waitForTimeout(1800);
   check(/plaza/.test(await scn()) && await ids().then(a => a.includes("mama")), "reopening mid-trip: back in Ronda's plaza, with the family");
@@ -2707,6 +2725,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#ctx [data-triphome]");
   await page.waitForFunction(() => /Honeybrook station/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(await fox().then(f => f.trip.done), "the train home: back at Honeybrook station, the trip's over");
+  await page.addInitScript(() => { if (!/benchpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.ronda = Object.assign(f.ronda || {}, {bench: true}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?seed=1&time=10:50&date=2026-10-11&benchpatch=1"); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1000);
+  check(await page.locator("#world .tilebench").count() === 1, "with all eight tiles, the tiled bench stands by the pond at home");
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
   check(await ids().then(a => a.includes("mama")), "and Ma Ma's back at her market stall");
   // the last train, and the window closing for the day
