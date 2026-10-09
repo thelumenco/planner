@@ -1487,8 +1487,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 <g class="ch" id="mel" data-ent="mel"><g class="flip"><g filter="url(#wob)">
               <ellipse cx="0" cy="0" rx="11" ry="3.5" fill="rgba(60,40,30,.18)"/>
               <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
-                <g class="legL"><rect x="-6.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="-3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><ellipse class="oshoe" cx="-3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
-                <g class="legR"><rect x="1.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><ellipse class="oshoe" cx="3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
+                <g class="legL"><rect x="-6.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="-3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><rect class="otrouser" x="-6.6" y="-15" width="5.8" height="13.4" rx="1.6" style="display:none"/><ellipse class="oshoe" cx="-3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
+                <g class="legR"><rect x="1.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><rect class="otrouser" x="0.8" y="-15" width="5.8" height="13.4" rx="1.6" style="display:none"/><ellipse class="oshoe" cx="3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
                 <path d="M-8.6 -23 h17.2 l1 9.5 h-8 l-1.6 -3 l-1.6 3 h-8z" style="fill:var(--denim)"/>
                 <g class="armL"><rect x="-12" y="-34" width="4.2" height="13.5" rx="2.1" style="fill:var(--skin)"/><rect class="osleeve" x="-12" y="-34" width="4.2" height="10.5" rx="2.1" style="display:none"/></g>
                 <g class="armR"><rect x="7.8" y="-34" width="4.2" height="13.5" rx="2.1" style="fill:var(--skin)"/><rect class="osleeve" x="7.8" y="-34" width="4.2" height="10.5" rx="2.1" style="display:none"/></g>
@@ -20701,7 +20701,21 @@ Then tell chat "wind down" whenever you're ready.`
       next();
     });
   }
-  var unreadMail = () => allMail().filter((m) => m && m.id && !F.mailRead[m.id] && (!m.at || Date.now() - m.at < 36 * H)).sort((a, b) => (a.at || 0) - (b.at || 0));
+  var paperKind = (m) => String(m.id).startsWith("weekly-") ? "weekly" : "daily";
+  function stalePapers() {
+    const newest = {};
+    allMail().forEach((m) => {
+      if (m && m.id && m.from === "crier") {
+        const k = paperKind(m);
+        if (!newest[k] || (m.at || 0) > (newest[k].at || 0)) newest[k] = m;
+      }
+    });
+    return new Set(allMail().filter((m) => m && m.id && m.from === "crier" && newest[paperKind(m)] !== m).map((m) => m.id));
+  }
+  var unreadMail = () => {
+    const stale = stalePapers();
+    return allMail().filter((m) => m && m.id && !F.mailRead[m.id] && !stale.has(m.id) && (!m.at || Date.now() - m.at < 36 * H)).sort((a, b) => (a.at || 0) - (b.at || 0));
+  };
   var paperName = () => (F.paperName || "").trim() || "The Morning Crier";
   var paperWaiting = () => unreadMail().find((m) => m.from === "crier");
   function markRead(item) {
@@ -22438,6 +22452,8 @@ ${SIGNOFF[t2.who] || ""}`;
     fill2($("oLayer"), w && w.layer ? c("layer", "#6B6B72") : null);
     m.querySelectorAll(".osleeve").forEach((e) => fill2(e, w && w.layer ? c("layer", "#6B6B72") : null));
     m.querySelectorAll(".oshoe").forEach((e) => fill2(e, w && w.shoes ? c("shoes", "#2F2B28") : null));
+    const long = !!(w && w.bottom && !w.dress && !/short|skirt|skort|mini/i.test(w.bottom));
+    m.querySelectorAll(".otrouser").forEach((e) => fill2(e, long ? c("bottom", "#2F2B28") : null));
     const bag2 = $("oBag");
     bag2.style.display = w && w.bag ? "" : "none";
     if (w && w.bag) bag2.querySelector("rect").style.fill = c("bag", "#2F2B28");

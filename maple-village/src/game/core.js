@@ -1139,7 +1139,14 @@ function windDown(item){
     next();
   });
 }
-const unreadMail = () => allMail().filter(m => m && m.id && !F.mailRead[m.id] && (!m.at || Date.now() - m.at < 36*H)).sort((a, b) => (a.at || 0) - (b.at || 0));
+// Only the newest paper counts (the daily one and the weekend edition each): once today's is out, yesterday's unread
+// one isn't "new post" any more, so it doesn't put the flag up on the letterbox again after Mel's read today's.
+const paperKind = m => String(m.id).startsWith("weekly-") ? "weekly" : "daily";
+function stalePapers(){
+  const newest = {}; allMail().forEach(m => { if (m && m.id && m.from === "crier") { const k = paperKind(m); if (!newest[k] || (m.at || 0) > (newest[k].at || 0)) newest[k] = m; } });
+  return new Set(allMail().filter(m => m && m.id && m.from === "crier" && newest[paperKind(m)] !== m).map(m => m.id));
+}
+const unreadMail = () => { const stale = stalePapers(); return allMail().filter(m => m && m.id && !F.mailRead[m.id] && !stale.has(m.id) && (!m.at || Date.now() - m.at < 36*H)).sort((a, b) => (a.at || 0) - (b.at || 0)); };
 // The village paper's name: Mel can rename it in Settings (kept with the fox doc, so it follows her across devices).
 const paperName = () => (F.paperName || "").trim() || "The Morning Crier";
 const paperWaiting = () => unreadMail().find(m => m.from === "crier");
@@ -1930,6 +1937,9 @@ function applyWear(pj){
   fill($("oLayer"), w && w.layer ? c("layer", "#6B6B72") : null);
   m.querySelectorAll(".osleeve").forEach(e => fill(e, w && w.layer ? c("layer", "#6B6B72") : null));
   m.querySelectorAll(".oshoe").forEach(e => fill(e, w && w.shoes ? c("shoes", "#2F2B28") : null));
+  // trousers go all the way down to the shoes; shorts and skirts stay short
+  const long = !!(w && w.bottom && !w.dress && !/short|skirt|skort|mini/i.test(w.bottom));
+  m.querySelectorAll(".otrouser").forEach(e => fill(e, long ? c("bottom", "#2F2B28") : null));
   const bag = $("oBag"); bag.style.display = w && w.bag ? "" : "none"; if (w && w.bag) bag.querySelector("rect").style.fill = c("bag", "#2F2B28");
   const ear = $("oEar"); ear.style.display = w && w.jewellery ? "" : "none";
   if (w && w.jewellery) ear.querySelectorAll("circle").forEach(e => e.style.fill = /silver|platinum|white gold/i.test(w.jewellery) ? "#BFC3CA" : /pearl/i.test(w.jewellery) ? "#F6F1E8" : "#D9A93A");
