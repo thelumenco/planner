@@ -157,7 +157,7 @@ function noteHistory(){
   F.history[S.day] = {q: S.doneIds.length, steps: S.steps || 0, water: S.waterMl || 0, harvest: S.harvested || 0, coins: S.earned || 0, chats: (S.chats || []).slice(0, 12)};
   Object.keys(F.history).sort().slice(0, -21).forEach(k => delete F.history[k]);
 }
-const save = (redraw) => { noteHistory(); persist("today"); persist("fox"); render(redraw); };
+const save = (redraw) => { F.where = {scene, x: Math.round(mel.x), y: Math.round(mel.y), day: dayKey()}; noteHistory(); persist("today"); persist("fox"); render(redraw); };
 
 async function initDb(){
   if (!window.claude || !claude.use) return;
@@ -3104,6 +3104,10 @@ setStallOwned(() => ({cc_cart: !!(F.cocoa && F.cocoa.up && F.cocoa.up.cart), cc_
 initNpcs({sfx, story: id => tellStory(F, id, addInv), storyReady: id => !!storyReady(F, id), flash, quiet: () => quietNow(), chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, sup: () => sup, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();
+// Pick up where Mel left off (round 105): the same game day, back on the screen she closed the game on (a new day, she
+// wakes up at home as usual). F.where is kept by save().
+{ const w = F.where, ok = w && w.day === dayKey() && w.scene && w.scene !== scene && (OUTDOOR.includes(w.scene) || ROOMS[w.scene] || INNER[w.scene] || VILLAGE[w.scene]) && !["kidroom", "room"].includes(w.scene);
+  if (ok) { scene = w.scene; mel.x = mel.tx = w.x; mel.y = mel.ty = w.y; mel.path = []; maple.x = maple.tx = w.x - 22; maple.y = maple.ty = w.y + 2; } }
 render(true);
 if (F.gift) setTimeout(() => speak("A welcome gift! Seeds are in your backpack 🌷", 5000), 1200);
 requestAnimationFrame(frame);

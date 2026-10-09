@@ -1465,3 +1465,19 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 ### Noted (Mel, after round 104): the boat travels to other towns
 - Once bought, the dolphin cruise boat (goals.js `boat`, moored at the foreshore) should also take Mel to other towns along the coast, alongside the dolphin cruise.
 - It is one of three ways to destination screens: the train (tickets at the station window), the campervan (road trips), and the boat (coastal towns). The destination screens aren't built yet; see the proposal in chat.
+- **Mel's picks for the boat (build later; the boat is a big goal, so its towns should feel big):**
+  - **Saltwick Harbour:**
+    - Fish market: lobster, clams, onions, sea salt, seaweed.
+    - These are things you can't get in Honeybrook. They feed new tapas, and sea salt and seaweed go into gelato and bonbons through the normal discovery (sea salt + dark chocolate → sea salt dark chocolate gelato; savoury seaweed flavours too).
+    - Also: the chandlery, a café on the quay, the lighthouse.
+  - **Puffin Isle:** the lighthouse keeper, rock pools, seabirds, sea glass.
+  - **Both:** a souvenir collection, locals (with stories), and **picnics**. No accommodation.
+- **Towns in general (Mel's picks):**
+  - A town is **2×2 screens** (four screens), more interesting than one.
+  - Visits are day trips: stay as long as you like, then travel back home. There's no overnight stay, and the van doesn't count.
+  - **Train towns are commissioned:** Mel names an inspiration ("a little town inspired by Ronda / Kyoto / Provence / the English countryside") and it gets built to the shared town template.
+  - **Campervan:** click the parked van to open a **roadmap**. Each stop on the map is a single screen with something to explore. From each screen, click on to the next stop.
+
+### Round 105 (in progress)
+- Reopening the game puts Mel back where she was (`F.where`, written by `save()`, restored at boot) if it's the same game day. On a new day she wakes at home. Mel's room and Evan's room always start fresh.
+- Tulip bulbs are on sale autumn to spring, and sunflower seeds summer and autumn, so there are garden flowers (petal syrup, shortbread, hen treats) in every season.

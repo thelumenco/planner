@@ -13,8 +13,8 @@ export const CROPS = {
   pea:{n:"Peas", ns:"handfuls of peas", dur:4*H, yield:4}, pumpkin:{n:"Pumpkin", ns:"pumpkins", dur:24*H, yield:2}, leek:{n:"Leek", ns:"leeks", dur:8*H, yield:3}
 };
 export const ITEMS = {
-  tulip_seed:{e:"🌷", n:"Tulip seeds", kind:"seed", price:2, crop:"tulip", tab:"seeds", seasons:["spring"]},
-  sunflower_seed:{e:"🌻", n:"Sunflower seeds", kind:"seed", price:3, crop:"sunflower", tab:"seeds", seasons:["summer"]},
+  tulip_seed:{e:"🌷", n:"Tulip bulbs", kind:"seed", price:2, crop:"tulip", tab:"seeds", seasons:["autumn","winter","spring"]},
+  sunflower_seed:{e:"🌻", n:"Sunflower seeds", kind:"seed", price:3, crop:"sunflower", tab:"seeds", seasons:["summer","autumn"]},
   carrot_seed:{e:"🥕", n:"Carrot seeds", kind:"seed", price:3, crop:"carrot", tab:"seeds", seasons:["spring","autumn","winter"]},
   corn_seed:{e:"🌽", n:"Corn seeds", kind:"seed", price:4, crop:"corn", tab:"seeds", seasons:["summer","autumn"]},
   strawberry_seed:{e:"🍓", n:"Strawberry seeds", kind:"seed", price:6, crop:"strawberry", tab:"seeds", seasons:["spring"]},
