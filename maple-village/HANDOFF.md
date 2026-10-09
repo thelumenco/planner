@@ -1382,7 +1382,7 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 
 ### Round 103: Honeybrook Woods, bike hire, the river taxi, villagers on the new screens
 - **Woods screen `hwoods`** (art/hwoods.js), east of the cottage lane and above Makers' Lane:
-  - Along the top, the railway runs into a tunnel under the hill (the hill is drawn after `trainLayer`). rail.js has no `hwoods` WINDOWS yet, so no train shows there.
+  - Along the top, the railway runs into a tunnel under the hill (the hill is drawn after `trainLayer`). rail.js `WINDOWS.hwoods`: east-bound trains pass 3 minutes after their station time, west-bound 2 minutes before.
   - The cliff and waterfall feed the pool, which feeds the Honeybrook (west, under the station) and the river (`RIVER`, south-west to Makers' Lane). `riverPath(pts, w)` is reused for the lane.
   - Places: `ranger` (cabin, `rangerPanel`), `forage`, `lookout`, `fishpool` (4th fishing spot: minnow, brown trout, grayling; the journal now has 20), `taxiwoods`, `bikeswoods`. Gates: `toLaneW` (to hlane) and `toMakersW` (to lane).
   - The cottage lane gets the `toWoodsL` gate (top-right) and `bikesst`. Makers' Lane gets the river down its west edge (with a plank at the town gate), the `toWoodsM` arch at the top, and `taxilane`.

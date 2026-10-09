@@ -18,7 +18,8 @@ export const trainsOn = day => TRAINS.filter(t => !t.dow || t.dow.includes(dow(d
 const WINDOWS = {
   hlane: {e: [[-1, "arrive"], [0, "dwell"], [1, "dwell"], [2, "depart"]], w: [[-1, "arrive"], [0, "dwell"], [1, "dwell"], [2, "depart"]]},
   hfarm: {e: [[-2, "pass"]], w: [[3, "pass"]]},
-  bay: {e: [[-3, "pass"]], w: [[4, "pass"]]}
+  bay: {e: [[-3, "pass"]], w: [[4, "pass"]]},
+  hwoods: {e: [[3, "pass"]], w: [[-2, "pass"]]}   // round 103: on east into the tunnel under the hill (and back out)
 };
 const secs = () => { const d = new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8*3600e3); return d.getUTCSeconds() + d.getUTCMilliseconds()/1000; };
 // the train on a screen right now: {id, dir, mode, elapsed (seconds into its minute; dwell counts both minutes)} or null
