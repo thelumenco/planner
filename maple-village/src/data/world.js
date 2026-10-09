@@ -120,6 +120,9 @@ export const VILLAGE = {
   stray:  {scene:"hfarm", name:"A runaway goat", door:[260,524], spot:true, line:"A goat on the loose!"},
   fstand: {scene:"hfarm", name:"Farm stand", door:[130,580], spot:true, mark:[130,500], line:"The farm stand: milk, honey and eggs."},
   reno:   {scene:"bay", name:"Under renovation", door:[396,520], spot:true, line:"Boarded up for now. Coming soon: a brewery? A chocolatier?"},
+  fishriver:{scene:"base", name:"Fishing spot", door:[396,118], spot:true, mark:[396,70], line:"A good spot for fishing."},
+  fishlake:{scene:"field", name:"Fishing spot", door:[60,290], spot:true, mark:[60,236], line:"A good spot for fishing."},
+  fishsea:{scene:"shore", name:"Fishing spot", door:[192,420], spot:true, mark:[192,366], line:"A good spot for fishing."},
   homejetty:{scene:"base", name:"Little jetty", door:[150,132], spot:true, line:"Your little jetty. Paddle down the river and out to the foreshore."},
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };

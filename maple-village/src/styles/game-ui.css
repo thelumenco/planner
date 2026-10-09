@@ -231,6 +231,8 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 .map .rain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.35;
   background-image:repeating-linear-gradient(105deg,transparent 0 14px,rgba(120,150,190,.55) 14px 15px,transparent 15px 34px);background-size:200px 200px;animation:rainfall .55s linear infinite}
 .map .rain[hidden]{display:none}
+.map .rain.light{opacity:.2;background-size:260px 260px;animation-duration:.8s}
+#evan .welly,#evan .esleeve{display:none}#evan.raincoat .welly,#evan.raincoat .esleeve{display:inline}
 @keyframes rainfall{from{background-position:0 0}to{background-position:-40px 200px}}
 .floaty{animation:floaty 3s ease-in-out infinite;transform-box:fill-box}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
@@ -802,3 +804,23 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .gspec{display:inline-flex;align-items:center;gap:4px;font-size:.8rem;color:#5E5A55;flex:none}
 .gpick{margin-top:6px}
 .hlist.gprices li{gap:10px}
+
+/* round 100: fishing (fishing.js): the float, the bite, the reel bar; Mel's rod; koi in the pond */
+.fishwater{position:relative;height:54px;margin:8px 0;border-radius:14px;background:linear-gradient(#CFE3EE,#B6D2E2);overflow:hidden;border:1.5px solid var(--line)}
+.fishwater::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 22px,rgba(255,255,255,.35) 22px 34px);background-size:68px 100%;animation:fwave 3s linear infinite;opacity:.6}
+.fbob{position:absolute;left:50%;top:22px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:linear-gradient(#E8566C 50%,#FFFDF6 50%);border:1.5px solid var(--line);z-index:1;animation:fbob 1.8s ease-in-out infinite}
+.fishwater.bite .fbob{animation:fdip .35s ease-in-out infinite alternate}
+.fbang{position:absolute;left:calc(50% + 12px);top:2px;font:700 22px "Klee One",serif;color:#C2505F;z-index:1;animation:fbang .5s ease-in-out infinite alternate}
+.fbar{position:relative;height:22px;margin:10px 0;border-radius:11px;background:#F6EFE3;border:1.5px solid var(--line);overflow:hidden}
+.fzone{position:absolute;top:0;bottom:0;background:#B9D88A}
+.fmark{position:absolute;top:-2px;bottom:-2px;left:0;width:4px;margin-left:-2px;background:#2F2B28;border-radius:2px;animation:fsweep .9s linear infinite alternate}
+.fcatch{display:flex;gap:10px;align-items:center;margin:10px 0;padding:8px 10px;border-radius:12px;background:#F6EFE3}
+.fcatch .wtxt{display:flex;flex-direction:column}
+@keyframes fsweep{from{left:0}to{left:100%}}
+@keyframes fbob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+@keyframes fdip{from{transform:translateY(0)}to{transform:translateY(10px)}}
+@keyframes fbang{from{transform:scale(1)}to{transform:scale(1.25)}}
+@keyframes fwave{to{background-position:68px 0}}
+#melRod .fbobber{animation:fbob 1.8s ease-in-out infinite}#melRod.bite .fbobber{animation:fdip .35s ease-in-out infinite alternate}
+.koi{animation:koi 9s ease-in-out infinite}@keyframes koi{0%,100%{transform:translate(0,0)}25%{transform:translate(10px,3px)}50%{transform:translate(4px,-4px) scaleX(-1)}75%{transform:translate(-8px,2px) scaleX(-1)}}
+@media (prefers-reduced-motion:reduce){.fishwater::after,.fbob,.fbang,.fmark,#melRod .fbobber,.koi{animation:none}}

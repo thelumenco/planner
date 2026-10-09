@@ -1,7 +1,9 @@
 // NPC engine: places villagers by their Singapore-time routine, walks them about, handles taps and daily reactions,
 // and runs agent messengers who carry unread mail to Mel. Core owns the frame loop and calls tickNpcs / tapNpc.
 import { NPCS, AGENTS } from "../data/npcs.js";
-import { personArt, letterArt } from "../art/people.js";
+import { personArt, letterArt, rainGearFor } from "../art/people.js";
+import { rainyOn } from "../art/village-extras.js";
+import { OUTDOOR } from "../data/world.js";
 import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
 import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dinnerSlot, dateSlot, clubSlot, scoopSlot, workshopSlot, trainSlot, letSlot } from "./tours.js";
 import { SEA } from "../data/npcs.js";
@@ -55,6 +57,8 @@ function makeNode(id, look, kid, letter, act){
   if (act === "sup") look = Object.assign({}, look, {board: true, hat: null});
   const owned = (api.F().fam && api.F().fam.owned) || {};
   if (id === "darren" && act === "type" && owned.headphones) look = Object.assign({}, look, {headphones: true});
+  // a rainy day outdoors: everyone has their own brolly or raincoat (a coat if their right hand's busy or they're on a board)
+  if (OUTDOOR.includes(api.scene()) && rainyOn(dayKey()) && !look.board) look = Object.assign({}, look, {rain: rainGearFor(id, {coat: !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell"].includes(look.extra)})});
   g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "");
   $("actors").appendChild(g);
   return g;

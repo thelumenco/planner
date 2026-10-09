@@ -79,8 +79,12 @@ export function festivalOn(day){
   for (const f of FESTIVALS) for (const k of f.dates) { const x = dayNum(k); if (d >= x - f.before && d <= x + f.after) return f; }
   return null;
 }
-// Wet season (Nov to Jan): roughly one day in three is a rainy one in the village.
-export const rainyOn = day => [11, 12, 1].includes(+day.slice(5, 7)) && hash(day + "rain") % 100 < 34;
+// Wet season (Nov to Jan): roughly one day in three is a proper downpour, and another one in ten a light shower. The
+// rest of the year a shower blows through about one day in seven: brollies up, nothing called off.
+// rainLevel: 0 dry, 1 a light shower, 2 a downpour (paddling's off).
+export function rainLevel(day){ const h = hash(day + "rain") % 100; return [11, 12, 1].includes(+day.slice(5, 7)) ? (h < 34 ? 2 : h < 44 ? 1 : 0) : (h < 14 ? 1 : 0); }
+export const rainyOn = day => rainLevel(day) > 0;
+export const stormyOn = day => rainLevel(day) === 2;
 
 export function festivalArt(f){
   if (!f) return "";

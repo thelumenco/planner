@@ -2433,6 +2433,55 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(/\$850 of \$1,000/.test(await page.locator("#ctx .sub").textContent()), "taking some out uses the amount box (no pop-up)");
   await page.close();
 }
+{
+  // Rain on any day of the year (light showers outside the wet season), and everyone in their own rain gear
+  console.log("\nrainy days");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`rain pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-12"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1500);
+  check(await page.evaluate(() => { const r = document.getElementById("rain"); return !r.hidden && r.classList.contains("light"); }), "a light shower in October (not just the wet season)");
+  check(await page.locator("#melRain .brolly").count() === 1 && await page.evaluate(() => document.getElementById("evan").classList.contains("raincoat")), "Mel under her brolly, Evan in his raincoat and wellies");
+  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(2500);
+  const gear = await page.evaluate(() => [...document.querySelectorAll("#actors .npc")].map(n => n.querySelector(".brolly") ? "b:" + n.querySelector(".brolly > path:nth-of-type(3)").getAttribute("style") : n.querySelector(".rcoat") ? "c:" + n.querySelector(".rcoat").getAttribute("style") : ""));
+  check(gear.length > 0 && gear.every(Boolean) && new Set(gear).size > 1, "everyone in town has a brolly or a raincoat, not all the same");
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-07"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(1500);
+  check(await page.evaluate(() => document.getElementById("rain").hidden) && await page.locator("#melRain .brolly, #actors .brolly").count() === 0, "and on a dry day the brollies are put away");
+  await page.close();
+}
+{
+  // Fishing: a rod, worms from real-life quests, cast, wait for the bite, reel in the green; a journal of catches
+  console.log("\nfishing");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`fishing pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/fishpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 500; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=12:00&date=2026-10-07&fishpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(900);
+  check(await page.locator('#world [data-place="fishriver"]').count() === 1, "a fishing spot on the home river");
+  await page.locator('#world [data-place="fishriver"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-fish="rod"]', { timeout: 15000 });
+  await page.click('#ctx [data-fish="rod"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.coins === 420 && f.fish.rod && f.fish.bait === 3) && /3 worms/.test(await page.locator("#ctx").textContent()), "a rod for 80 coins, and three worms in the bait tin to start the day");
+  await page.click('#ctx [data-fish="cast"]'); await page.waitForTimeout(200); await page.click('#ctx [data-fish="reel"]'); await page.waitForTimeout(200);
+  check(/Too soon/.test(await page.locator("#ctx").textContent()) && await fox().then(f => f.fish.bait === 2), "reel in before the bite and it's gone (with the worm)");
+  await page.click('#ctx [data-fish="cast"]'); await page.waitForSelector("#ctx .fbar", { timeout: 9000 });
+  check(await page.locator("#world #melRod").isVisible(), "Mel holds her rod while she's fishing");
+  await page.waitForFunction(() => { const e = document.querySelector("#ctx .fbar"); if (!e) return true; const q = ((Date.now() - +e.dataset.t0)/+e.dataset.dur) % 2, m = q < 1 ? q : 2 - q; return Math.abs(m - +e.dataset.at) < +e.dataset.w/2 - .03; }, null, { polling: 10, timeout: 5000 });
+  await page.click('#ctx [data-fish="reel"]'); await page.waitForTimeout(300);
+  const f1 = await fox(), got = Object.keys(f1.fish.caught);
+  check(got.length === 1 && ["roach", "trout", "perch", "boot"].includes(got[0]) && /New in the journal/.test(await page.locator("#ctx .fcatch").textContent()), "reel while the marker's in the green and it's landed: a river fish, new in the journal");
+  check(["boot"].includes(got[0]) || (f1.inv[got[0] === "trout" ? "trout" : "fish"] || 0) >= 1, "and it's in the backpack (trout for the kitchen, others as fish)");
+  await page.click('#ctx [data-fish="view"][data-k="journal"]'); await page.waitForTimeout(200);
+  check(await page.locator("#ctx li.locked").count() === 16 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, sixteen still to find, each with a hint (the golden koi at dusk)");
+  await page.click('#ctx [data-fish="view"][data-k="fish"]'); await page.waitForTimeout(200);
+  await page.click('#ctx [data-fish="cast"]'); await page.waitForSelector("#ctx .fbar", { timeout: 9000 }); await page.waitForTimeout(3700);
+  check(/slipped away/.test(await page.locator("#ctx").textContent()) && await fox().then(f => f.fish.bait === 0), "wait too long after the bite and it slips away");
+  check(await page.locator('#ctx [data-fish="cast"]').isDisabled() && /Finish a quest/.test(await page.locator("#ctx").textContent()), "no worms left: finish a quest to dig up another");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

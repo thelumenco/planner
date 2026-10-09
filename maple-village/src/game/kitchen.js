@@ -18,7 +18,9 @@ export const GOODS = {
   tomato: ["tomato", "tomatoes"], potato: ["potato", "potatoes"], pepper: ["pepper", "peppers"], egg: ["egg", "eggs"], milk: ["milk", "milk"],
   flour: ["bag of flour", "bags of flour"], cheese: ["cheese", "cheeses"], olives: ["jar of olives", "jars of olives"], loaf: ["loaf", "loaves"],
   apple: ["apple", "apples"], dumpling: ["dumpling", "dumplings"], fish: ["fish", "fish"], toast: ["honey toast", "honey toasts"],
-  pea: ["handful of peas", "handfuls of peas"], pumpkin: ["pumpkin", "pumpkins"], leek: ["leek", "leeks"]};
+  pea: ["handful of peas", "handfuls of peas"], pumpkin: ["pumpkin", "pumpkins"], leek: ["leek", "leeks"],
+  trout: ["rainbow trout", "rainbow trout"], crayfish: ["crayfish", "crayfish"], sardine: ["sardine", "sardines"], mackerel: ["mackerel", "mackerel"],
+  seabream: ["sea bream", "sea bream"], squid: ["squid", "squid"], octopus: ["octopus", "octopuses"]};
 export const isGood = id => id in GOODS;   // (loaves are only ever baked in the oven, but one taken out can go back in)
 const nm = (id, n) => GOODS[id] ? GOODS[id][n === 1 ? 0 : 1] : id;
 export const needText = need => Object.entries(need).map(([k, n]) => `${n} ${nm(k, n)}`).join(" + ");
@@ -46,7 +48,15 @@ export const TAPAS = {
   guisantes: {n: "Peas with mint and cheese", need: {pea: 2, cheese: 1}, price: 8, seasons: ["spring"]},
   croquetas: {n: "Pumpkin croquetas", need: {pumpkin: 1, egg: 1, loaf: 1}, price: 10, seasons: ["autumn", "winter"]},
   calabaza: {n: "Roast pumpkin with olives", need: {pumpkin: 1, olives: 1}, price: 8, seasons: ["autumn", "winter"]},
-  puerros: {n: "Leek and potato soup cups", need: {leek: 2, potato: 1}, price: 8, seasons: ["winter"]}};
+  puerros: {n: "Leek and potato soup cups", need: {leek: 2, potato: 1}, price: 8, seasons: ["winter"]},
+  // from the fishing spots, all year round
+  sardinas: {n: "Grilled sardines", need: {sardine: 3}, price: 8},
+  escabeche: {n: "Mackerel escabeche", need: {mackerel: 2, pepper: 1}, price: 10},
+  calamares: {n: "Fried calamari", need: {squid: 2, flour: 1}, price: 11},
+  pulpo: {n: "Pulpo a la gallega", need: {octopus: 1, potato: 2}, price: 12},
+  dorada: {n: "Sea bream with olives", need: {seabream: 1, olives: 1}, price: 11},
+  trucha: {n: "Trout with almond butter", need: {trout: 2, milk: 1}, price: 10},
+  cangrejos: {n: "Garlic crayfish on toast", need: {crayfish: 4, loaf: 1}, price: 10}};
 export const inSeason = (id, season) => !TAPAS[id].seasons || TAPAS[id].seasons.includes(season);
 export const TAPAS_PLATES = 6;
 const OVEN = 1*H, PRESS = 3*H;

@@ -218,6 +218,15 @@ I.yoghurt = [`<path d="M6 9h12l-1.5 10a2 2 0 0 1-2 1.7h-5a2 2 0 0 1-2-1.7z" ${f(
   I.chz_fresh = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#FFF8EC")}/>`, `<rect x="4" y="9" width="16" height="9" rx="4.5"/><path d="M8 11v5M12 11v5M16 11v5" opacity=".35"/>`];
   // an excellent cut: the same, with a little gold star
   ["chz_fresh", "chz_cheddar", "chz_blue", "chz_brie", "chz_halloumi", "chz_smoked"].forEach(k => { I[k + "_ex"] = [I[k][0] + `<path d="M18 3l1 2.2 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z" ${f("#F3C33A")}/>`, I[k][1]]; }); }
+// fishing catches: a fish in its own colours (body, fin), plus squid, octopus, crayfish, the koi, a boot and sea glass
+{ const fsh = (a, b) => [`<path d="M3 12c3-4.5 9-5.5 13-2l4-3v10l-4-3c-4 3.5-10 2.5-13-2z" ${f(a)}/><path d="M9 8.4q2-2.6 4-.6" ${f(b)}/>`, `<path d="M3 12c3-4.5 9-5.5 13-2l4-3v10l-4-3c-4 3.5-10 2.5-13-2z"/><circle cx="6.8" cy="11" r=".8"/><path d="M10 9.6q1.5 2.4 0 4.8" opacity=".6"/>`];
+  I.trout = fsh("#C9D6B8", "#E8899A"); I.sardine = fsh("#BFD3E2", "#8FA9BF"); I.mackerel = fsh("#9FC0C8", "#3E6B8C"); I.seabream = fsh("#E3D6CF", "#D9A93A"); I.koi = fsh("#F3B23A", "#FFFDF6");
+  I.squid = [`<path d="M12 2c3 2 4 6 3 10H9c-1-4 0-8 3-10z" ${f("#F4C7CF")}/><path d="M9 12l-2 9M11 12l-.5 9M13 12l.5 9M15 12l2 9" ${f("none")}/>`, `<path d="M12 2c3 2 4 6 3 10H9c-1-4 0-8 3-10zM9 12l-2 9M11 12l-.5 9M13 12l.5 9M15 12l2 9"/><circle cx="11" cy="9" r=".7"/><circle cx="13" cy="9" r=".7"/>`];
+  I.octopus = [`<path d="M6 11a6 6 0 0 1 12 0v2H6z" ${f("#E8899A")}/><path d="M6 13q-2 4-4 4M9 13q-1 5-3 7M12 13v7M15 13q1 5 3 7M18 13q2 4 4 4" ${f("none")}/>`, `<path d="M6 11a6 6 0 0 1 12 0v2H6zM6 13q-2 4-4 4M9 13q-1 5-3 7M12 13v7M15 13q1 5 3 7M18 13q2 4 4 4"/><circle cx="10" cy="10" r=".8"/><circle cx="14" cy="10" r=".8"/>`];
+  I.crayfish = [`<path d="M8 9h8v7a4 4 0 0 1-8 0z" ${f("#D9614C")}/><path d="M8 10L4 6l2-2 3 4M16 10l4-4-2-2-3 4" ${f("#D9614C")}/>`, `<path d="M8 9h8v7a4 4 0 0 1-8 0zM8 10L4 6l2-2 3 4M16 10l4-4-2-2-3 4M9 13h6M9 16h6M10 20l-1 2M14 20l1 2"/>`];
+  I.boot = [`<path d="M8 3h6v11l6 3v4H8z" ${f("#5E8A5A")}/>`, `<path d="M8 3h6v11l6 3v4H8zM8 18h12M8 6h6"/>`];
+  I.seaglass = [`<path d="M6 10l5-5 7 3 1 7-6 5-6-3z" ${f("#9FD3C0")}/>`, `<path d="M6 10l5-5 7 3 1 7-6 5-6-3z"/><path d="M10 9l3 1" opacity=".6"/>`];
+  I.rod = [`<path d="M4 21L19 4" ${f("none")}/><circle cx="7" cy="17" r="2.2" ${f("#F3C969")}/>`, `<path d="M4 21L19 4M19 4v9"/><circle cx="7" cy="17" r="2.2"/><circle cx="19" cy="14" r="1.4"/>`]; }
 I.egg = [`<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z" ${f("#F6EBDD")}/>`, `<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z"/><path d="M9 12c0-2 .8-3.6 1.8-4.5" opacity=".6"/>`];
 I.coop = [`<path d="M3 11l9-7 9 7z" ${f(C.rose)}/><rect x="5" y="11" width="14" height="9" ${f(C.butter)}/><rect x="10" y="14" width="4" height="6" ${f(C.wood)}/>`,
   `<path d="M3 11l9-7 9 7"/><rect x="5" y="11" width="14" height="9"/><rect x="10" y="14" width="4" height="6"/><path d="M14 20l5 2.5"/>`];
