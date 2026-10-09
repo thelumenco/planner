@@ -2584,6 +2584,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator(".taxiride").count() === 1, "a little ride down the river on the launch");
   await page.waitForFunction(() => /foreshore/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 15000 });
   check(await fox().then(f => f.coins === 91), "and off at the foreshore, one gate from Ma Ma's flower farm (4 coins)");
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="homejetty"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-taxiopen]', { timeout: 15000 });
+  await page.click('#ctx [data-taxiopen]'); await page.waitForTimeout(300);
+  check(await page.locator('#ctx [data-taxi]').count() === 4 && await page.locator('#world [data-place="taxihome"]').count() === 0, "at home the river taxi stops at the little jetty (no separate stop): paddle or take the taxi");
+  await page.locator('#ctx [data-close]').first().click();
   await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(900);
   check(await page.locator('#world [data-place="toWoodsM"]').count() === 1 && await page.locator('#world [data-place="taxilane"]').count() === 1, "Makers' Lane: the river comes down from the woods, with a taxi stop and a path up the hill");
   await page.goto(url + "?seed=1&time=7:00&date=2026-10-10"); await page.waitForTimeout(900);
@@ -2620,6 +2625,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(12000);
   await page.locator('#actors .npc[data-npc="celeste"]').dispatchEvent("click"); await page.waitForTimeout(400);
   check(await fox().then(f => f.story.heard.celeste === 5), "one chapter a day: the next waits for another day");
+  { const st = await import(new URL("../src/game/stories.js", import.meta.url)), day = "2026-10-07", ids = ["celeste", "okada", "hana", "bo", "theo", "juniper"];
+    const F = {storyDay: day, met: Object.fromEntries(ids.map(i => [i, true])), story: {heard: {}, day: {}, log: [], flags: {}}}, ready = () => ids.filter(i => st.storyReady(F, i, day));
+    const r0 = ready().length; st.tellStory(F, ready()[0], () => {}, day); st.tellStory(F, ready()[0], () => {}, day);
+    check(r0 === 2 && ready().length === 0, "at most two villagers tell a chapter a day (six could; two do)"); }
   // the family at the night market (Tuesday) and the fair (the last Saturday)
   await page.goto(url + "?seed=1&time=18:45&date=2026-10-06"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2500);

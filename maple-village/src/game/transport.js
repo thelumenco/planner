@@ -36,7 +36,7 @@ export function bikePanel(F, ownRide){
 export const STOPS = {
   taxiwoods: {scene: "hwoods", n: "Waterfall pool", at: [168, 290], line: "Honeybrook Woods, under the waterfall"},
   taxilane: {scene: "lane", n: "Makers' Lane", at: [62, 236], line: "Makers' Lane"},
-  taxihome: {scene: "base", n: "Home jetty", at: [372, 142], line: "home, by the bridge"},
+  taxihome: {scene: "base", n: "Home jetty", at: [150, 140], line: "home, at your little jetty"},
   taxilake: {scene: "field", n: "The lake", at: [300, 372], line: "the lake on the field (one gate from the orchard)"},
   taxishore: {scene: "shore", n: "The foreshore", at: [214, 168], line: "the foreshore (one gate from Ma Ma's flower farm)"}
 };

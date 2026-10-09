@@ -61,6 +61,7 @@ export function jettyPanel(where, evan){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${where === "shore" ? "The paddleboards" : "Your little jetty"}</h2>`;
   h += where === "shore"
     ? `<p class="sub">A paddle about with the dolphins, or up the stream, across the lake and down the river home?</p><div class="actions"><button class="btn primary" data-sup="play">Paddle about</button><button class="btn alt" data-sup="base">Paddle home</button></div>`
-    : `<p class="sub">Down the river, across the lake and out along the stream to the sea. ${fam}</p><div class="actions"><button class="btn primary" data-sup="shore">Paddle to the foreshore</button></div>`;
+    : `<p class="sub">Down the river, across the lake and out along the stream to the sea. ${fam}</p><div class="actions"><button class="btn primary" data-sup="shore">Paddle to the foreshore</button></div>
+      <p class="sub" style="margin-top:14px">The river taxi stops here too (7am to 9pm): up to the woods, Makers' Lane, the lake and the foreshore.</p><div class="actions"><button class="btn alt" data-taxiopen="taxihome">Take the river taxi</button></div>`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }

@@ -1533,3 +1533,8 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Puffin Isle (boat):** the lighthouse keeper, rock pools, seabirds, sea glass, picnics.
 - **Train towns:** commissioned by Mel by inspiration, each with a detailed plan first.
 - **Campervan:** the roadmap of single-screen stops, with stamps for stops visited.
+- Tests: `browser.newPage` in smoke.mjs sets `window.__mapleNoResume` unless the page asks for `{resume: true}`; core.js skips the resume when that flag is set.
+
+### Round 106: tidier home river, two storytellers a day
+- The home river's separate river taxi stop is gone. The taxi now stops at the little jetty (`homejetty`): its panel (goals.js `jettyPanel`) offers "Paddle to the foreshore" or "Take the river taxi" (`data-taxiopen` sets `woodsView = "taxihome"`). `STOPS.taxihome.at` is the jetty (150,140).
+- Stories: at most **two villagers a day** tell a chapter (`TELLERS_PER_DAY`). Today's tellers are the first eligible villagers in an order hashed by day; once two have told theirs, no more cues or chapters until tomorrow.

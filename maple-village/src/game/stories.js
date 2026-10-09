@@ -20,12 +20,24 @@ function gateOk(F, g){
   if (g === "bouquet") return Object.keys(F.inv || {}).some(id => /^bq_/.test(id) && F.inv[id] > 0);
   return false;
 }
-// the next chapter for this villager, if it's ready today -> {k, ch} or null
-export function storyReady(F, id, day = dayKey()){
+// a chapter that could be told today (gates met, villager met, not told today) -> {k, ch} or null
+function eligible(F, id, day){
   const list = STORIES[id]; if (!list) return null;
   const s = storyState(F), k = s.heard[id] || 0, ch = list[k];
-  if (!ch || F.storyDay !== day || s.day[id] === day || !(F.met && F.met[id])) return null;
+  if (!ch || s.day[id] === day || !(F.met && F.met[id])) return null;
   return (ch.needs || []).every(g => gateOk(F, g)) ? {k, ch} : null;
+}
+// At most two villagers tell Mel a chapter each day (Mel asked: not everyone at once). Today's tellers are picked from
+// those with a chapter ready, in an order that changes day to day; once two have told theirs, that's it till tomorrow.
+export const TELLERS_PER_DAY = 2;
+const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
+export function storyReady(F, id, day = dayKey()){
+  if (F.storyDay !== day) return null;
+  const s = storyState(F), told = Object.keys(s.day).filter(x => s.day[x] === day).length, left = TELLERS_PER_DAY - told;
+  if (left <= 0) return null;
+  const r = eligible(F, id, day); if (!r) return null;
+  const today = Object.keys(STORIES).filter(x => eligible(F, x, day)).sort((a, b) => order(day, a) - order(day, b)).slice(0, left);
+  return today.includes(id) ? r : null;
 }
 // the chapter's rewards, applied once when it's told; addInv adds to the backpack; -> a line for the flash, or ""
 const REWARDS = {

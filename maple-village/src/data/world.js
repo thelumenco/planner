@@ -133,7 +133,6 @@ export const VILLAGE = {
   bikesst:{scene:"hlane", name:"Bike hire", door:[232,212], spot:true, mark:[232,150], line:"Hire bikes, by the station."},
   toWoodsM:{scene:"lane", name:"Path up to Honeybrook Woods", door:[330,146], spot:true, bridge:"hwoods", mark:[330,40], line:"Up the hill into Honeybrook Woods."},
   taxilane:{scene:"lane", name:"River taxi", door:[62,226], spot:true, mark:[52,160], line:"The river taxi stop on Makers' Lane."},
-  taxihome:{scene:"base", name:"River taxi", door:[376,134], spot:true, mark:[340,70], line:"The river taxi stop, by the bridge."},
   taxilake:{scene:"field", name:"River taxi", door:[300,362], spot:true, mark:[300,300], line:"The river taxi stop on the lake."},
   taxishore:{scene:"shore", name:"River taxi", door:[214,156], spot:true, mark:[214,100], line:"The river taxi stop, where the river meets the sea."},
   bikesvillage:{scene:"village", name:"Bike hire", door:[196,580], spot:true, mark:[196,500], line:"Hire bikes, in the town square."},

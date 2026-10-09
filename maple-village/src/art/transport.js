@@ -33,7 +33,7 @@ export const taxiBoat = `<svg viewBox="0 0 120 60" width="180" height="90" aria-
 
 // the stops and racks drawn on screens that already existed (the woods draws its own): core.js appends this
 export function transportArt(scene){
-  return scene === "base" ? taxiStop("taxihome", 376, 120, scene, 158) : scene === "field" ? taxiStop("taxilake", 300, 348, scene)
+  return scene === "field" ? taxiStop("taxilake", 300, 348, scene)
     : scene === "shore" ? taxiStop("taxishore", 214, 142, scene) : scene === "lane" ? taxiStop("taxilane", 56, 212, scene)
     : scene === "village" ? bikeRack("bikesvillage", 196, 566) : "";
 }
