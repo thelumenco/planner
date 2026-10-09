@@ -2663,6 +2663,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
 {
   console.log("\na day trip to Kyoto");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), K = tw.TOWNS.kyoto;
+  { const own = [...readFileSync(join(root, "src/data/world.js"), "utf8").matchAll(/^  ([a-zA-Z_]+):\s*\{scene:/gm)].map(m => m[1]);
+    check(!Object.keys(tw.TOWN_PLACES).some(k => own.includes(k)), "no town's places share a name with a Honeybrook place (Kyoto's temple hall once replaced the Town hall)"); }
   check(K.fare === 60 && K.screens.length === 4 && K.screens.every(sc => tw.townOf(sc) === "kyoto") && Object.keys(tw.TOWN_BRIDGES).filter(k => k.startsWith("kt_")).length === 4, "Kyoto: four screens, 60 coins a ticket");
   const ronda = tw.TOWNS.ronda.acts, used = new Set(Object.values(ronda).flatMap(a => Object.values(a).map(x => x.act)));
   check(Object.values(K.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "nobody in the family does the same thing in Kyoto as in Ronda");
@@ -2683,8 +2685,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#ctx [data-trip]");
   await page.waitForFunction(() => /Kyoto/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2000);
   check(await fox().then(f => f.coins === 180 && f.trip.town === "kyoto") && await ids().then(a => a.includes("gonggong")), "off the train at Kyoto station, with Gong Gong and Evan");
-  check(await page.evaluate(() => ["kttrain", "bamboo", "yukata", "ktToLane", "ktToRiver"].every(id => document.querySelector(`#world [data-place="${id}"]`))), "the station screen: the station, the bamboo grove, the yukata shop, and the ways east and south");
-  for (const [gate, want, places] of [["ktToLane", "Higashiyama", ["pagoda", "chaya", "wagashi", "pottery"]], ["ktStepsDown", "temple", ["hall", "torii", "zen", "koi"]], ["ktToRiverW", "river", ["nishiki", "stones"]], ["ktToStationN", "station", ["kttrain"]]]) {
+  check(await page.evaluate(() => ["kttrain", "ktbamboo", "ktyukata", "ktToLane", "ktToRiver"].every(id => document.querySelector(`#world [data-place="${id}"]`))), "the station screen: the station, the bamboo grove, the yukata shop, and the ways east and south");
+  for (const [gate, want, places] of [["ktToLane", "Higashiyama", ["ktpagoda", "ktchaya", "ktwagashi", "ktpottery"]], ["ktStepsDown", "temple", ["kthall", "kttorii", "ktzen", "ktkoi"]], ["ktToRiverW", "river", ["ktnishiki", "ktstones"]], ["ktToStationN", "station", ["kttrain"]]]) {
     await page.locator(`#world [data-place="${gate}"]`).dispatchEvent("click");
     await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
     check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("gonggong")), `through the gate to Kyoto's ${want} (Gong Gong follows)`);

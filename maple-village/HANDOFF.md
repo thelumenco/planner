@@ -1767,4 +1767,5 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - **Seasons:** maples are red and gold in autumn, green in spring and summer, bare in winter. Sakura are pink in spring. Petals drift in spring and snow falls in winter.
 - **The ticket window** now picks a town (`data-ttown`; `ticketPanel(F, pick, town)`). The train ride shows green hills, pagodas and torii (`kyotoRide`).
 - **Music:** `kyoto` is a koto in the miyako-bushi scale (D, Eb, G, A, Bb).
+- **Kyoto place ids all start with `kt`.** Its "hall" once replaced Honeybrook's Town hall in VILLAGE, and a test now guards against any clash.
 - **For now,** the tea house, sweet shop, pottery, hall, market and yukata shop just say a line ("opens soon"). They become interiors and shops in rounds 2–3.

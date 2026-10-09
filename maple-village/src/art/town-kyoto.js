@@ -99,9 +99,9 @@ function stationScreen(){
   // the bamboo grove down the west side: tall stalks, light coming through in stripes
   const grove = `<g pointer-events="none"><rect x="0" y="0" width="134" height="640" style="fill:#B9CC8E"/><g opacity=".35">${[40, 140, 260, 380, 500].map(y => `<path d="M0 ${y} L134 ${y + 60} V${y + 80} L0 ${y + 20}z" fill="#FFF6D8"/>`).join("")}</g></g>
     ${stalks(6, 128, 0, 640, 26, 1)}`;
-  const groveSpot = place("bamboo", 150, 420, 30, 14, "The bamboo grove", "", "Bamboo grove", 160, 446, "#DCEBC8");
+  const groveSpot = place("ktbamboo", 150, 420, 30, 14, "The bamboo grove", "", "Bamboo grove", 160, 446, "#DCEBC8");
   // the yukata shop: a townhouse with indigo and red yukata hanging out front
-  const yukata = `<g data-place="yukata" aria-label="The yukata shop"><ellipse class="hov" cx="440" cy="474" rx="40" ry="12" style="fill:var(--butter)"/>${machiya(380, 384, 120, 80, {noren: "#3E5E7A", sign: "YUKATA", doorX: 60})}
+  const yukata = `<g data-place="ktyukata" aria-label="The yukata shop"><ellipse class="hov" cx="440" cy="474" rx="40" ry="12" style="fill:var(--butter)"/>${machiya(380, 384, 120, 80, {noren: "#3E5E7A", sign: "YUKATA", doorX: 60})}
     ${sk(`<path d="M392 430 l6 -14 h12 l6 14 l-4 30 h-16z" style="fill:#3E5E7A"/><path d="M466 430 l6 -14 h12 l6 14 l-4 30 h-16z" style="fill:#C8432F"/>${[0, 1, 2].map(i => `<circle cx="${400 + i*3}" cy="${440 + i*6}" r="1.6" style="fill:#FFFDF6"/><circle cx="${474 + i*3}" cy="${440 + i*6}" r="1.6" style="fill:#F3C969"/>`).join("")}`, `<path d="M392 430 l6 -14 h12 l6 14 l-4 30 h-16z M466 430 l6 -14 h12 l6 14 l-4 30 h-16z"/>`)}
     ${lab(440, 492, "Yukata rental", "#E7D9F2", 10)}</g>`;
   // a red vending machine by the station (of course), maples, a stone lantern, a bench of sorts
@@ -117,12 +117,12 @@ function laneScreen(){
   const ground = `<rect width="520" height="640" style="fill:#D9D0BC"/>${flags("M14 300 H200 Q260 300 280 250 L330 190 M280 250 Q300 400 330 470 V616", 46)}`;
   // the five-storey pagoda at the top of the lane
   const tiers = [0, 1, 2, 3, 4].map(i => { const w = 92 - i*12, x = 432 - w/2, y = 168 - i*30; return `<rect x="${x + 8}" y="${y - 18}" width="${w - 16}" height="18" style="fill:${C.vermilion}"/>${roofArt(x, y - 30, w, 12)}`; }).join("");
-  const pagoda = `<g data-place="pagoda" aria-label="The five-storey pagoda"><ellipse class="hov" cx="432" cy="182" rx="44" ry="12" style="fill:var(--butter)"/>${shade(386, 20, 92, 160)}
+  const pagoda = `<g data-place="ktpagoda" aria-label="The five-storey pagoda"><ellipse class="hov" cx="432" cy="182" rx="44" ry="12" style="fill:var(--butter)"/>${shade(386, 20, 92, 160)}
     ${sk(tiers + `<path d="M432 14 v-12" style="stroke:#C9A44A" stroke-width="3"/>${[0, 1, 2, 3].map(i => `<circle cx="432" cy="${10 - i*3}" r="2" style="fill:#C9A44A"/>`).join("")}`, [0, 1, 2, 3, 4].map(i => { const w = 92 - i*12, x = 432 - w/2, y = 168 - i*30; return roofLines(x, y - 30, w, 12); }).join(""))}
     ${lab(432, 200, "The pagoda", "#F6D3DC", 10)}</g>`;
-  const teahouse = `<g data-place="chaya" aria-label="The tea house">${machiya(26, 76, 176, 96, {noren: "#5E7A4A", sign: "お茶 TEA", lantern: true, doorX: 88})}${lab(114, 194, "Tea house", "#DCEBC8", 10)}</g>`;
-  const sweets = `<g data-place="wagashi" aria-label="The sweet shop">${machiya(336, 330, 168, 96, {noren: "#E8A0B4", sign: "WAGASHI", doorX: 84})}${lab(420, 446, "Sweet shop", "#F6D3DC", 10)}</g>`;
-  const pottery = `<g data-place="pottery" aria-label="The pottery workshop">${machiya(26, 430, 168, 90, {noren: "#8A6A52", sign: "POTTERY", doorX: 84})}
+  const teahouse = `<g data-place="ktchaya" aria-label="The tea house">${machiya(26, 76, 176, 96, {noren: "#5E7A4A", sign: "お茶 TEA", lantern: true, doorX: 88})}${lab(114, 194, "Tea house", "#DCEBC8", 10)}</g>`;
+  const sweets = `<g data-place="ktwagashi" aria-label="The sweet shop">${machiya(336, 330, 168, 96, {noren: "#E8A0B4", sign: "WAGASHI", doorX: 84})}${lab(420, 446, "Sweet shop", "#F6D3DC", 10)}</g>`;
+  const pottery = `<g data-place="ktpottery" aria-label="The pottery workshop">${machiya(26, 430, 168, 90, {noren: "#8A6A52", sign: "POTTERY", doorX: 84})}
     ${sk([0, 1, 2].map(i => `<path d="M${46 + i*16} 524 q-3 -10 4 -12 h6 q7 2 4 12z" style="fill:${["#5E7A8A", "#C9A27E", "#3E5E4A"][i]}"/>`).join(""), "")}${lab(110, 540, "Pottery", "#E8D3BC", 10)}</g>`;
   // a rickshaw parked by the lane, maples, lanterns, a cat on a step
   const rickshaw = `<g pointer-events="none">${sk(`<circle cx="236" cy="420" r="16" style="fill:none;stroke:#2F2B28" stroke-width="3"/><path d="M226 404 h22 l4 -22 h-22z" style="fill:#2F2B28"/><path d="M230 384 q10 -14 22 -2" style="fill:#C8432F"/><path d="M252 410 l40 6" style="stroke:#8A6A52" stroke-width="3"/>`, `<circle cx="236" cy="420" r="16"/>`)}</g>`;
@@ -137,21 +137,21 @@ function templeScreen(){
   const ground = `<rect width="520" height="640" style="fill:#D6CDB8"/><g filter="url(#wash)" opacity=".8"><ellipse cx="110" cy="520" rx="110" ry="80" style="fill:#B5C58E"/><ellipse cx="420" cy="560" rx="110" ry="60" style="fill:#B5C58E"/></g>
     ${flags("M150 26 V120 Q150 200 230 200 H350 M230 200 V610 M14 380 H230", 40)}`;
   // the temple hall: a deep sweeping roof on red-brown pillars, a gong, incense smoke
-  const hall = `<g data-place="hall" aria-label="The temple hall">${shade(270, 70, 210, 100)}
+  const hall = `<g data-place="kthall" aria-label="The temple hall">${shade(270, 70, 210, 100)}
     ${sk(`<rect x="276" y="92" width="198" height="80" style="fill:${C.timber}"/>${[290, 330, 370, 410, 450].map(x => `<rect x="${x}" y="96" width="8" height="76" style="fill:#8E3A2A"/>`).join("")}<rect x="340" y="120" width="70" height="52" style="fill:#2A221C"/><path d="M250 98 q18 -8 30 -44 H470 q12 36 30 44z" style="fill:${C.roof}"/>${Array.from({length: 26}, (_, i) => `<path d="M${270 + i*8.4} 58 v36" style="stroke:${C.roof2}" stroke-width="1.2"/>`).join("")}<path d="M300 54 q75 -24 150 0z" style="fill:${C.roof2}"/>`,
       `<rect x="276" y="92" width="198" height="80"/><path d="M250 98 q18 -8 30 -44 H470 q12 36 30 44z"/><path d="M300 54 q75 -24 150 0z"/>`)}
     <g pointer-events="none"><rect x="366" y="176" width="20" height="10" rx="2" style="fill:#5A4636;stroke:var(--line)" stroke-width=".8"/>${[0, 1].map(i => `<path class="smoke" d="M${372 + i*8} 174 q-4 -8 0 -14 q4 -6 0 -12" fill="none" style="stroke:#B9B0A4" stroke-width="1.4" opacity=".6"/>`).join("")}</g>
     ${lab(375, 204, "Temple hall", "#F6E3B4", 10)}</g>`;
   // the torii tunnel climbing the path: vermilion gates close together, getting smaller as they climb
-  const tunnel = `<g data-place="torii" aria-label="The torii gates">${[0, 1, 2, 3, 4, 5, 6, 7].map(i => torii(230, 610 - i*44, 54 - i*1.5, 50 - i)).join("")}${lab(290, 520, "Torii gates", "#F6D3DC", 10)}</g>`;
+  const tunnel = `<g data-place="kttorii" aria-label="The torii gates">${[0, 1, 2, 3, 4, 5, 6, 7].map(i => torii(230, 610 - i*44, 54 - i*1.5, 50 - i)).join("")}${lab(290, 520, "Torii gates", "#F6D3DC", 10)}</g>`;
   // the raked gravel garden: lines raked round three rocks
-  const garden = `<g data-place="zen" aria-label="The gravel garden"><ellipse class="hov" cx="400" cy="372" rx="90" ry="50" style="fill:var(--butter)"/>
+  const garden = `<g data-place="ktzen" aria-label="The gravel garden"><ellipse class="hov" cx="400" cy="372" rx="90" ry="50" style="fill:var(--butter)"/>
     ${sk(`<rect x="304" y="300" width="190" height="130" rx="6" style="fill:#EFEAE0"/>`, `<rect x="304" y="300" width="190" height="130" rx="6"/>`)}
     <g pointer-events="none" fill="none" style="stroke:#C9C1AE" stroke-width="1.2">${Array.from({length: 11}, (_, i) => `<path d="M310 ${308 + i*11} H488"/>`).join("")}${[[350, 340, 12], [430, 360, 16], [400, 404, 10]].map(([x, y, r]) => [1, 2, 3].map(k => `<ellipse cx="${x}" cy="${y}" rx="${r + k*6}" ry="${r*.7 + k*4}" style="fill:#EFEAE0"/>`).join("")).join("")}</g>
     ${sk([[350, 340, 12], [430, 360, 16], [400, 404, 10]].map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.7}" style="fill:#8A8478"/><ellipse cx="${x - 2}" cy="${y - 3}" rx="${r*.6}" ry="${r*.3}" style="fill:#7E9A5A"/>`).join(""), "")}
     ${lab(400, 448, "Gravel garden", "#EFEAE0", 10)}</g>`;
   // the koi pond, with its little red bridge
-  const pond = `<g data-place="koi" aria-label="The koi pond"><ellipse class="hov" cx="110" cy="520" rx="80" ry="34" style="fill:var(--butter)"/>
+  const pond = `<g data-place="ktkoi" aria-label="The koi pond"><ellipse class="hov" cx="110" cy="520" rx="80" ry="34" style="fill:var(--butter)"/>
     ${sk(`<ellipse cx="110" cy="510" rx="78" ry="38" style="fill:${C.water}"/><path d="M70 500 q40 -24 80 0" style="fill:none;stroke:${C.vermilion}" stroke-width="7"/>`, `<ellipse cx="110" cy="510" rx="78" ry="38"/><path d="M70 500 q40 -24 80 0"/>`)}
     ${koi([[80, 520, "#F28C28"], [130, 506, "#FFFDF6"], [110, 530, "#E8566C"]])}${lab(110, 566, "Koi pond", "#DCEBF6", 10)}</g>`;
   const trees = maple(60, 300, 1.1) + maple(470, 230, .9) + sakura(470, 520, 1) + maple(60, 160, .9) + toro(180, 300) + toro(290, 300, .9);
@@ -167,9 +167,9 @@ function riverScreen(){
   const turtles = [0, 1, 2, 3].map(i => { const x = 262, y = 334 + i*22; return `<ellipse cx="${x}" cy="${y}" rx="16" ry="8" style="fill:#9A9488"/><circle cx="${x + 16}" cy="${y}" r="4" style="fill:#9A9488"/><path d="M${x - 8} ${y} h16 M${x} ${y - 6} v12" style="stroke:#7A7468" stroke-width="1"/>`; }).join("");
   const river = `<g pointer-events="none">${sk(`<path d="M0 318 Q260 306 520 322 V424 Q260 436 0 420z" style="fill:${C.water}"/>`, `<path d="M0 318 Q260 306 520 322 M0 420 Q260 436 520 424"/>`)}
     ${[0, 1, 2, 3, 4].map(i => `<path class="ripple" d="M${40 + i*100} ${350 + (i % 2)*40} q8 -4 16 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2"/>`).join("")}</g>`;
-  const stones = `<g data-place="stones" aria-label="The turtle stepping stones"><ellipse class="hov" cx="262" cy="368" rx="30" ry="50" style="fill:var(--butter)"/>${sk(turtles, "")}${lab(330, 390, "Turtle stones", "#DCEBF6", 9)}</g>`;
+  const stones = `<g data-place="ktstones" aria-label="The turtle stepping stones"><ellipse class="hov" cx="262" cy="368" rx="30" ry="50" style="fill:var(--butter)"/>${sk(turtles, "")}${lab(330, 390, "Turtle stones", "#DCEBF6", 9)}</g>`;
   // the covered market: a long arcade with a coloured awning and paper lanterns
-  const market = `<g data-place="nishiki" aria-label="The covered market">${shade(30, 76, 230, 96)}
+  const market = `<g data-place="ktnishiki" aria-label="The covered market">${shade(30, 76, 230, 96)}
     ${sk(`<rect x="30" y="80" width="230" height="92" style="fill:${C.timber}"/><path d="M24 80 q121 -40 242 0z" style="fill:#EAF2F4" opacity=".9"/><rect x="40" y="110" width="210" height="62" style="fill:#2A221C"/>${[0, 1, 2, 3, 4, 5].map(i => `<rect x="${48 + i*34}" y="${150}" width="26" height="22" style="fill:${["#E8566C", "#F3C969", "#9CC27E", "#F28C28", "#E6DED0", "#8A5A3A"][i]}"/>`).join("")}`,
       `<rect x="30" y="80" width="230" height="92"/><path d="M24 80 q121 -40 242 0z"/>`)}
     <rect x="100" y="88" width="90" height="16" rx="2" style="fill:${C.vermilion};stroke:var(--line)" stroke-width="1"/><text x="145" y="100" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="9" fill="${C.paper}" pointer-events="none">MARKET 市場</text>
