@@ -1857,11 +1857,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       // haggles while the market's on). act: an npcs.js act (a prop, an animation)
       acts: {
         mum: { rd_plaza: { act: "dance", at: [282, 398], hours: [[11 * 60, 14 * 60], [18 * 60, 22 * 60]] } },
-        dad: { rd_bridge: { act: "sketch", at: [452, 304], dir: -1 }, rd_station: { act: "sketch", at: [130, 470], dir: -1 } },
-        mama: { rd_plaza: { act: "haggle", at: [150, 222], dir: -1, hours: [[8 * 60, 14 * 60]] } },
-        gonggong: { rd_plaza: { act: "doze", at: [206, 446] }, rd_station: { act: "doze", at: [260, 494] } },
-        marcus: { rd_bridge: { act: "photo", at: [300, 120] }, rd_old: { act: "photo", at: [124, 130] } },
-        angelina: { rd_plaza: { act: "notes", at: [440, 248], dir: -1 }, rd_bridge: { act: "notes", at: [300, 520] } }
+        dad: { rd_bridge: { act: "sketch", at: [452, 304], dir: -1 }, rd_station: { act: "sketch", at: [130, 470], dir: -1 }, rd_banos: { act: "sketch", at: [430, 380], dir: -1 } },
+        mama: { rd_plaza: { act: "haggle", at: [150, 222], dir: -1, hours: [[8 * 60, 14 * 60]] }, rd_mercado: { act: "haggle", at: [170, 362], dir: -1 } },
+        gonggong: { rd_plaza: { act: "doze", at: [206, 446] }, rd_station: { act: "doze", at: [260, 494] }, rd_jardin: { act: "doze", at: [380, 604] } },
+        marcus: { rd_bridge: { act: "photo", at: [300, 120] }, rd_old: { act: "photo", at: [124, 130] }, rd_banos: { act: "photo", at: [110, 330] } },
+        angelina: { rd_plaza: { act: "notes", at: [440, 248], dir: -1 }, rd_bridge: { act: "notes", at: [300, 520] }, rd_cafe: { act: "notes", at: [230, 482], dir: -1 } }
       },
       // a word now and then, and what they say when Mel taps them (on top of their usual chat)
       lines: {
@@ -1874,6 +1874,53 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         angelina: ["Everyone here talks with their hands. I'm taking notes.", "That couple at the café have been arguing for an hour and they're so happy.", "I could read in that garden all day."],
         evan: ["so HIGH", "birdies! big birdies!", "pigeons! catch it!", "Mama, hold hand"]
       },
+      // round 116: the interiors (see the playbook: every town gets four or five, through the doors on its screens).
+      // door: the outdoor place you go in by; music: each room's own live track (audio.js); party: where the family
+      // wander inside; say: a line as Mel steps in
+      rooms: {
+        rd_tapas: {
+          door: "tapas",
+          n: "The tapas bar",
+          music: "rd_tapas",
+          party: [[220, 520], [300, 540], [180, 480], [390, 520], [250, 300]],
+          say: "Inside the tapas bar: hams hanging from the beams, tiles on the walls, and everyone talking at once."
+        },
+        rd_cafe: {
+          door: "dulces",
+          n: "Doña Carmen's café",
+          music: "rd_cafe",
+          party: [[260, 560], [300, 380], [200, 560], [420, 520], [120, 560]],
+          say: "Doña Carmen's: cool tiles, a ceiling fan turning, trays of yemas, and the smell of coffee."
+        },
+        rd_banos: {
+          door: "banos",
+          n: "The Arab baths",
+          music: "rd_banos",
+          party: [[160, 520], [360, 520], [260, 560], [120, 360], [400, 360]],
+          say: "The Arab baths. Cool and quiet under the domes, with little star-shaped holes letting the sun in."
+        },
+        rd_jardin: {
+          door: "jardin",
+          n: "The Moorish garden",
+          music: "rd_jardin",
+          party: [[230, 220], [290, 520], [60, 380], [460, 380], [260, 590]],
+          say: "The Moorish garden: water running down the middle, orange trees, myrtle hedges. It's ten degrees cooler in here."
+        },
+        rd_cuero: {
+          door: "cuero",
+          n: "The leather workshop",
+          music: "rd_cuero",
+          party: [[200, 520], [320, 540], [140, 440], [400, 470]],
+          say: "The leather workshop: the smell of new leather, hides hanging on the walls, and Antonio stitching at his bench. Everything here comes from Ubrique, over the hills."
+        },
+        rd_mercado: {
+          door: "mercado",
+          n: "The covered market",
+          music: "rd_mercado",
+          party: [[200, 420], [320, 420], [260, 530], [120, 420], [400, 440]],
+          say: "The covered market: iron columns, a glass roof, and a hundred voices haggling."
+        }
+      },
       // places on the four screens with nothing else to do yet: a line when Mel walks up
       say: {
         alameda: "The Alameda balcony: an iron railing right on the cliff edge. Far below, the valley: olive groves, cork oaks, little white farms, and the blue mountains beyond.",
@@ -1885,13 +1932,19 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         mirador: "The viewpoint over the gorge. A hundred metres straight down to the river, and the waterfall roaring under the bridge.",
         jardin: "The Moorish garden: fountains, water channels and cypress hedges, cool even at midday.",
         convento: "The convent. There's a little turntable in the wall: knock, and the nuns pass out biscuits.",
+        cuero: "A leather workshop, with bags and belts in the window. A sign says: Piel de Ubrique.",
         azulejos: "Lucía's tile shop: hand-painted tiles of every view in Ronda, cork crafts and painted fans.",
         banos: "The Arab baths: low domes with star-shaped skylights, eight hundred years old.",
         puerta: "The old town gate, with its horseshoe arches. Beyond it the road winds down into the valley."
       }
     }
   };
-  var TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t2]) => t2.screens.map((s) => [s, id])));
+  var TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t2]) => [...t2.screens, ...Object.keys(t2.rooms || {})].map((s) => [s, id])));
+  var townRoom = (scene2) => {
+    const t2 = TOWNS[TOWN_SCENES[scene2]];
+    return t2 && t2.rooms && t2.rooms[scene2] || null;
+  };
+  var roomBehind = (town, place) => Object.keys((TOWNS[town] || {}).rooms || {}).find((r) => TOWNS[town].rooms[r].door === place) || null;
   var townOf = (scene2) => TOWN_SCENES[scene2] || null;
   var TOWN_PLACES = {
     rdtrain: { scene: "rd_station", name: "Ronda station", door: [330, 186], spot: true, mark: [330, 54], line: "Ronda's little station. Trains home to Honeybrook until 10pm." },
@@ -1914,6 +1967,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     banos: { scene: "rd_old", name: "The Arab baths", door: [118, 598], spot: true, mark: [118, 500], line: "The Arab baths." },
     puerta: { scene: "rd_old", name: "The old town gate", door: [330, 604], spot: true, mark: [330, 520], line: "The old town gate." },
     rdToBridge: { scene: "rd_old", name: "To the bridge", door: [504, 380], spot: true, bridge: "rd_bridge", mark: [476, 320], line: "East to Puente Nuevo and the viewpoint." },
+    // the interiors' own entries (their way out is back through the door they came in by)
+    rd_tapas: { scene: "rd_plaza", name: "The tapas bar", door: [392, 184] },
+    rd_cafe: { scene: "rd_plaza", name: "Doña Carmen's café", door: [424, 470] },
+    rd_mercado: { scene: "rd_plaza", name: "The covered market", door: [130, 184] },
+    rd_banos: { scene: "rd_old", name: "The Arab baths", door: [118, 598] },
+    rd_jardin: { scene: "rd_bridge", name: "The Moorish garden", door: [330, 432] },
+    cuero: { scene: "rd_old", name: "The leather workshop", door: [91, 466], spot: true, mark: [91, 320], line: "The leather workshop." },
+    rd_cuero: { scene: "rd_old", name: "The leather workshop", door: [91, 466] },
     rdStepsUp: { scene: "rd_old", name: "Steps up out of the gorge", door: [120, 40], spot: true, bridge: "rd_station", mark: [200, 30], line: "Down into the gorge, over the old bridge and up the steps to the new town." }
   };
   var TOWN_BRIDGES = {
@@ -1932,8 +1993,26 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     "rd_station>rd_old": [130, 76],
     "rd_old>rd_station": [180, 566]
   };
-  var TOWN_BOUNDS = { rd_station: [90, 178, 506, 616], rd_plaza: [14, 180, 506, 616], rd_bridge: [14, 22, 506, 616], rd_old: [14, 36, 506, 616] };
+  var TOWN_BOUNDS = {
+    rd_cuero: [30, 250, 490, 600],
+    rd_tapas: [30, 250, 490, 600],
+    rd_cafe: [30, 260, 490, 600],
+    rd_banos: [30, 220, 490, 600],
+    rd_jardin: [30, 176, 490, 606],
+    rd_mercado: [30, 250, 490, 600],
+    rd_station: [90, 178, 506, 616],
+    rd_plaza: [14, 180, 506, 616],
+    rd_bridge: [14, 22, 506, 616],
+    rd_old: [14, 36, 506, 616]
+  };
   var TOWN_OBST = {
+    // the interiors: the tables, the hedges, the stalls
+    rd_tapas: [[96, 362, 144, 392], [276, 402, 324, 432], [396, 282, 444, 312]],
+    rd_cafe: [[90, 316, 130, 340], [180, 456, 220, 480], [350, 406, 390, 430]],
+    rd_banos: [[214, 440, 306, 500]],
+    rd_jardin: [[60, 196, 214, 344], [306, 196, 460, 344], [60, 420, 214, 560], [306, 420, 460, 560], [224, 344, 296, 410]],
+    rd_cuero: [[170, 300, 350, 350]],
+    rd_mercado: [[40, 296, 156, 350], [364, 296, 480, 350], [40, 466, 136, 514]],
     rd_station: [[0, 0, 84, 640], [244, 60, 418, 160], [178, 418, 250, 474], [84, 588, 156, 640], [206, 588, 520, 640], [400, 380, 470, 440]],
     rd_plaza: [[30, 36, 228, 172], [292, 36, 488, 172], [222, 306, 298, 366], [440, 384, 520, 500], [0, 592, 296, 640], [366, 592, 520, 640], [180, 432, 232, 458], [0, 392, 60, 488], [0, 508, 74, 590]],
     rd_bridge: [[0, 0, 268, 214], [352, 0, 520, 214], [24, 292, 206, 420], [300, 470, 360, 560], [0, 214, 200, 252]],
@@ -1947,10 +2026,17 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     payoyo: { n: "Payoyo goat's cheese", kind: "ingredient", price: 12, sell: 4, shop: "mercado", art: ["wheel", "#F3E7C8", "#C9A27E"], what: "a mountain goat's cheese from Ronda: payoyo with membrillo at the kitchen" },
     membrillo: { n: "Membrillo", kind: "ingredient", price: 6, sell: 2, shop: "mercado", art: ["bar", "#C8643B"], what: "quince paste from Ronda: with payoyo at the kitchen, a quince bonbon filling" },
     picnic: { n: "Picnic basket", kind: "picnic", price: 18, sell: 0, shop: "mercado", art: ["tote", "#C9A27E", "#E8566C"], what: "bread, cheese, jamón and oranges: spread it out at the Alameda balcony" },
+    churros: { n: "Churros", kind: "gift", to: "family", price: 4, shop: "dulces", art: ["roll", "#E8C48E", "#C98A4A"], say: "Churros! Still warm, and sugary all over. Is there chocolate?", says: { evan: "CHURROS! Dip dip dip!" } },
     yemas: { n: "Yemas del Tajo", kind: "gift", to: "family", price: 8, shop: "dulces", art: ["box", "#F3C24A", "#FFFDF6"], say: "Yemas! Egg yolk and sugar, like little suns. From Ronda?" },
     tartaalm: { n: "Almond cake", kind: "gift", to: "family", price: 10, shop: "dulces", art: ["tart", "#E8C48E", "#FFFDF6"], say: "An almond cake, all the way from Ronda. Kettle on!" },
     pastas: { n: "Convent biscuits", kind: "gift", to: "family", price: 5, shop: "convento", art: ["disc", "#E8C48E", "#C98A4A"], say: "Biscuits made by nuns! They taste like a hundred years of practice.", says: { evan: "Biscuits from a WALL! Again!" } },
     abanico: { n: "Painted fan", kind: "gift", to: ["mum", "mama", "angelina"], price: 12, shop: "azulejos", art: ["cloth", "#C2307A", "#F3C969"], say: "A painted fan! Very elegant. Very useful in this heat." },
+    // round 116: Antonio's leather workshop in the old town, everything made in Ubrique, the leather village over the hills
+    cartera: { n: "Leather wallet", kind: "gift", to: ["dad", "darren", "marcus", "gonggong"], price: 24, shop: "cuero", art: ["box", "#8A5A3A", "#C98A4A"], say: "A leather wallet from Ubrique! Smells amazing. Feel those stitches." },
+    bolso: { n: "Leather handbag", kind: "gift", to: ["mum", "mama", "angelina"], price: 60, shop: "cuero", art: ["tote", "#7A3A2A", "#C98A4A"], say: "Oh, Mel. A Ubrique bag! This will last me forever." },
+    cinturon: { n: "Leather belt", kind: "gift", to: ["dad", "darren", "marcus", "gonggong"], price: 30, shop: "cuero", art: ["roll", "#5A3A2A", "#D9A441"], say: "A proper leather belt, hand-stitched. Very smart." },
+    libreta: { n: "Leather notebook", kind: "gift", to: ["angelina", "mum", "darren"], price: 18, shop: "cuero", art: ["box", "#A8754F", "#F3E7C8"], say: "A leather notebook! For lists. And secret lists." },
+    llavero: { n: "Leather keyring", kind: "gift", to: "family", price: 6, shop: "cuero", art: ["disc", "#C98A4A", "#D9A441"], say: "A little leather keyring, with a stamped bridge on it. Sweet!" },
     corcho: { n: "Cork coasters", kind: "gift", to: ["dad", "darren", "gonggong", "marcus"], price: 9, shop: "azulejos", art: ["disc", "#B98A5A", "#8A6A52"], say: "Cork from the cork oaks! Light as anything." }
   };
   var TILES = {
@@ -6215,7 +6301,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       job: "Keeps the sweet shop on Ronda's plaza",
       intro: "¡Hola, guapa! Doña Carmen. Yemas, almond cake, and sixty years of gossip. Come in, come in, out of the sun.",
       look: { skin: "#D9A47E", hair: "#E8E4DE", hairStyle: "bun", top: "#3A3430", bottom: "#3A3430", extra: "apron" },
-      routine: [slot("9:00", "14:00", "rd_plaza", [[414, 520], [424, 530], [404, 526]]), slot("17:30", "21:00", "rd_plaza", [[414, 520], [424, 530]]), slot("21:00", "22:00", "rd_plaza", [320, 290], { act: "sit" })],
+      routine: [slot("9:00", "14:00", "rd_cafe", [[336, 262], [458, 262], [400, 300]]), slot("17:30", "21:00", "rd_cafe", [[336, 262], [458, 262]]), slot("21:00", "22:00", "rd_plaza", [320, 290], { act: "sit" })],
       lines: ["Sit, sit. Have a yema. Have two.", "In my day this plaza was all donkeys. Now it's all telephones.", "The nuns taught me everything. Except patience.", "Too thin! Eat something."],
       away: "Doña Carmen's having her siesta. The shop opens again at half past five."
     },
@@ -6227,7 +6313,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       job: "Olive farmer, with a stall at Ronda's market",
       intro: "Rafael. Oil, almonds. My family has pressed olives in the valley for five generations. Taste. No bread, just taste.",
       look: { skin: "#B9825E", hair: "#4A4440", hairStyle: "short", top: "#7A8A5A", bottom: "#5A4A3E", extra: "cap" },
-      routine: [slot("8:00", "14:00", "rd_plaza", [[118, 214], [140, 216], [128, 222]]), slot("18:00", "20:00", "rd_plaza", [440, 296], { act: "sit", dir: -1 })],
+      routine: [slot("8:00", "14:00", "rd_mercado", [312, 262], { dir: -1 }), slot("18:00", "20:00", "rd_plaza", [440, 296], { act: "sit", dir: -1 })],
       lines: ["Good oil, you taste it in the back of the throat. It bites a little.", "The olives don't care about your problems. That's why I like them.", "Almonds this year: small, but sweet. Like my grandmother.", "Hmph. You again. Good."],
       away: "Rafael's back at the farm in the valley. The market stall's covered up till morning."
     },
@@ -6256,6 +6342,122 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       actLines: { guitar: ["*strums*", "Olé!", "This one's for the pigeons."] },
       away: "Manolo's guitar case is shut. He's having a coffee somewhere."
     },
+    // Round 116: the people in Ronda's interiors (local: "ronda"), so the rooms never feel empty: Paco the waiter,
+    // Pepe with his paper, Lola with her shopping, Amina who shows people round the baths, Joaquín the gardener,
+    // Rocío's flowers at the market, and three tourists doing the sights (a few in each room at a time, never a crowd)
+    {
+      id: "paco",
+      local: "ronda",
+      pitch: 0.75,
+      name: "Paco",
+      job: "Waiter at the tapas bar",
+      intro: "Paco! Sit anywhere, anywhere. The croquetas are hot, the beer is cold, and my feet are tired.",
+      look: { skin: "#C99470", hair: "#2A211D", hairStyle: "short", top: "#FFFDF6", bottom: "#2F2B28", extra: "apron" },
+      routine: [slot("9:30", "16:00", "rd_tapas", [[200, 290], [360, 270], [240, 360], [380, 400], [160, 330]]), slot("19:00", "22:30", "rd_tapas", [[200, 290], [360, 270], [240, 360], [380, 400]])],
+      lines: ["Two salmorejo, one croqueta, coming!", "In Ronda we eat late. Lunch at three, dinner at ten. Breakfast? Coffee.", "The ham's from the mountains. The pigs ate acorns all their lives. Happy pigs.", "Mind the step, guapa."],
+      away: "Paco's having his own lunch, in the kitchen, standing up."
+    },
+    {
+      id: "pepe",
+      local: "ronda",
+      pitch: 0.6,
+      name: "Pepe",
+      job: "Retired, reads the paper all over town",
+      intro: "Pepe. Eighty-one. I've read the paper in every chair in Ronda. This one's the best.",
+      look: { skin: "#C08B66", hair: "#E8E4DE", hairStyle: "short", top: "#7A6A5A", bottom: "#4A4440", extra: "cap" },
+      routine: [slot("9:00", "12:00", "rd_cafe", [80, 340], { act: "sit" }), slot("12:30", "15:00", "rd_tapas", [92, 392], { act: "sit" }), slot("17:00", "20:00", "rd_jardin", [120, 604], { act: "doze" })],
+      lines: ["The news is the same as yesterday. Only louder.", "When I was a boy we swam in the river at the bottom of the gorge. Mad.", "Sit, sit. The chair's free. The advice is free too.", "Hmm? Oh. I was resting my eyes."],
+      away: "Pepe's having his siesta. Nobody disturbs Pepe's siesta."
+    },
+    {
+      id: "lola",
+      local: "ronda",
+      pitch: 1.05,
+      name: "Lola",
+      job: "Lives above the plaza, shops every morning",
+      intro: "Lola. I live up there, the balcony with all the geraniums. You're the family from the train? Welcome!",
+      look: { skin: "#D9A47E", hair: "#3A2A22", hairStyle: "bun", top: "#C2307A", bottom: "#2F2B28", extra: "satchel" },
+      routine: [slot("8:30", "12:00", "rd_mercado", [[220, 400], [300, 440], [190, 420], [340, 380]]), slot("12:00", "13:30", "rd_cafe", [140, 342], { act: "sit", dir: -1 }), slot("18:00", "20:00", "rd_tapas", [148, 394], { act: "sit", dir: -1 })],
+      lines: ["Rafael's almonds, Carmen's yemas, Paco's croquetas. That's my whole diet.", "Every morning the same walk, and every morning it's beautiful.", "Don't buy the oranges at the front. The good ones are at the back.", "¡Qué niño más guapo!"],
+      away: "Lola's up on her balcony, watering the geraniums."
+    },
+    {
+      id: "amina",
+      local: "ronda",
+      pitch: 1.1,
+      name: "Amina",
+      job: "Shows people round the Arab baths",
+      intro: "Welcome to the baths! Amina. Eight hundred years old, these domes. Look up: the stars are holes in the roof.",
+      look: { skin: "#B9825E", hair: "#1E1A18", hairStyle: "long", top: "#3E8A8A", bottom: "#F3ECDD", extra: "glasses" },
+      routine: [slot("10:00", "14:00", "rd_banos", [[200, 300], [320, 300], [260, 380], [180, 420]]), slot("16:00", "19:00", "rd_banos", [[200, 300], [320, 300], [260, 380]])],
+      lines: ["Three rooms: cold, warm, hot. Like a sauna, before saunas.", "The water came up from the river on a wheel, turned by a donkey.", "Clap your hands. Hear that echo? Eight hundred years.", "The star holes kept the heat in and let the light down. Clever, no?"],
+      away: "The baths are closed for lunch. Amina's in the shade with a book."
+    },
+    {
+      id: "joaquin",
+      local: "ronda",
+      pitch: 0.7,
+      name: "Joaquín",
+      job: "Keeps the Moorish garden",
+      intro: "Joaquín. Gardener. The water does most of the work. I just tell it where to go.",
+      look: { skin: "#B07A55", hair: "#4A4440", hairStyle: "short", top: "#5E8A5A", bottom: "#6B5A44", hat: "sunhat" },
+      routine: [slot("9:00", "13:00", "rd_jardin", [214, 360], { act: "water", dir: 1 }), slot("16:00", "19:00", "rd_jardin", [306, 410], { act: "water", dir: -1 })],
+      lines: ["Myrtle, orange, cypress. The same plants for a thousand years. They know what they're doing.", "Listen. The water. That's the whole point of a garden like this.", "Don't pick the oranges. Bitter! For marmalade only.", "Shade, water, quiet. Stay as long as you like."],
+      away: "Joaquín's gone home for lunch. The water keeps on running."
+    },
+    {
+      id: "antonio",
+      local: "ronda",
+      pitch: 0.7,
+      name: "Antonio",
+      job: "Leatherworker from Ubrique, with a workshop in the old town",
+      intro: "Antonio. From Ubrique, over the hills: a whole village of leatherworkers. My grandfather made saddles. I make bags. Same stitch.",
+      look: { skin: "#C08B66", hair: "#3A3430", hairStyle: "short", top: "#8A5A3A", bottom: "#3A3430", extra: "apron" },
+      routine: [slot("10:00", "14:00", "rd_cuero", [262, 296], { act: "repair" }), slot("17:00", "20:00", "rd_cuero", [262, 296], { act: "repair" })],
+      lines: ["Saddle stitch: two needles, one thread. A machine can't do it.", "Smell that? Good leather smells like a library.", "This wallet will outlive both of us.", "Ubrique: two thousand people, and every one of them can sew."],
+      away: "Antonio's gone home to Ubrique for lunch. Twenty minutes of bends in the road."
+    },
+    {
+      id: "rocio",
+      local: "ronda",
+      pitch: 1.2,
+      name: "Rocío",
+      job: "Sells flowers at the covered market",
+      intro: "¡Hola! Rocío. Carnations, roses, whatever the hills give me this week. Smell!",
+      look: { skin: "#E2B590", hair: "#6A3A22", hairStyle: "curly", top: "#F3C969", bottom: "#3E6BAE", extra: "apron" },
+      routine: [slot("8:00", "14:00", "rd_mercado", [150, 500], { dir: -1 })],
+      lines: ["Red carnations for love, white for luck. Yellow? Yellow's for my mother.", "Up at five, down to the valley, back by eight. Every day.", "Take one for the little boy. Free! Go on.", "The flowers in winter come from the coast. The ones in spring, from my field."],
+      away: "Rocío's stall is just empty buckets. She's sold out and gone home."
+    },
+    ...[
+      [
+        "ingrid",
+        "Ingrid",
+        { skin: "#F6D9C4", hair: "#E8D27A", hairStyle: "long", top: "#7FB8E8", bottom: "#F3ECDD", hat: "sunhat" },
+        "On holiday from Sweden",
+        "Ingrid, from Sweden! I came for one day. That was four days ago.",
+        [slot("10:00", "11:30", "rd_banos", [[160, 300], [340, 320], [260, 420]]), slot("11:30", "13:00", "rd_jardin", [[230, 250], [290, 520], [60, 380], [460, 380]]), slot("13:00", "15:00", "rd_tapas", [392, 312], { act: "sit" }), slot("16:00", "17:30", "rd_cafe", [340, 430], { act: "sit" }), slot("17:30", "19:00", "rd_mercado", [[220, 420], [320, 400], [260, 520]])],
+        ["It's so hot! In Sweden it's snowing. Probably.", "I've eaten six yemas today. Don't tell anyone.", "The light here! Everything glows."]
+      ],
+      [
+        "kenji",
+        "Kenji",
+        { skin: "#EAC4A0", hair: "#1E1A18", hairStyle: "short", top: "#F3ECDD", bottom: "#5A6A7A", extra: "satchel" },
+        "Photographing his way round Spain",
+        "Kenji. Tokyo. I have taken eleven hundred photographs of the bridge. One more.",
+        [slot("9:30", "11:00", "rd_mercado", [420, 420], { act: "photo", dir: -1 }), slot("11:00", "12:30", "rd_banos", [380, 330], { act: "photo", dir: -1 }), slot("13:30", "15:00", "rd_cafe", [400, 432], { act: "sit", dir: -1 }), slot("15:00", "17:00", "rd_jardin", [300, 470], { act: "photo" }), slot("19:00", "21:30", "rd_tapas", [272, 432], { act: "sit" })],
+        ["The light through the star holes! Perfect.", "Smile? No, natural. Okay, smile.", "Tomorrow, Granada. Then Seville. Then... more bridges."]
+      ],
+      [
+        "chloe",
+        "Chloé",
+        { skin: "#F0CBB0", hair: "#8A4A2A", hairStyle: "bob", top: "#E8566C", bottom: "#3A2E28", extra: "satchel" },
+        "Backpacking through Andalusia",
+        "Chloé! From Lyon. Backpacking, sleeping very little, eating very much.",
+        [slot("10:00", "12:00", "rd_cafe", [170, 480], { act: "sit" }), slot("12:00", "13:30", "rd_mercado", [[200, 400], [330, 450], [260, 380]]), slot("14:00", "16:00", "rd_jardin", [406, 604], { act: "notes", dir: -1 }), slot("16:30", "18:00", "rd_banos", [[200, 320], [330, 340], [260, 420]]), slot("18:00", "19:30", "rd_cuero", [[200, 420], [330, 440], [260, 500]]), slot("20:00", "22:00", "rd_tapas", [328, 434], { act: "sit", dir: -1 })],
+        ["I'm writing a postcard to every friend I have. I have too many friends.", "The tapas! Free with a drink! France must learn.", "Have you been to the baths? So peaceful."]
+      ]
+    ].map(([id, name, look, job, intro, routine, lines]) => ({ id, local: "ronda", tourist: true, pitch: 0.95 + id.charCodeAt(0) % 4 * 0.07, name, job, intro, look, routine, lines, away: `${name}'s off seeing another bit of Ronda.` })),
     // cabin, and fishes the pool on Saturday evenings
     {
       id: "wren",
@@ -6652,14 +6854,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     F2.inv[item] = (F2.inv[item] || 0) + 1;
     return kind === "bouquet" ? `Ma Ma ties ${stemName(id, need)} with ribbon. A bouquet, into your backpack.` : `Ma Ma pots up ${stemName(id, need)}. Into your backpack, ready to place.`;
   }
-  function placePot(F2, item, spot) {
+  function placePot(F2, item, spot2) {
     const it = ITEMS[item];
-    if (!it || it.kind !== "pot" || !(F2.inv[item] > 0) || !POT_SPOTS[spot]) return null;
+    if (!it || it.kind !== "pot" || !(F2.inv[item] > 0) || !POT_SPOTS[spot2]) return null;
     orchState(F2);
     F2.inv[item]--;
     if (!F2.inv[item]) delete F2.inv[item];
-    F2.pots[spot] = it.flower;
-    return `${FLOWERS[it.flower].n} in ${POT_SPOTS[spot].n}. So pretty.`;
+    F2.pots[spot2] = it.flower;
+    return `${FLOWERS[it.flower].n} in ${POT_SPOTS[spot2].n}. So pretty.`;
   }
   var close = `<button class="btn alt small" data-close="1">Close</button>`;
   function spotPanel(F2, where, i, today2) {
@@ -9977,11 +10179,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         ) + `<text x="${x}" y="${y - 45}" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="7.5" fill="#FFFDF6" pointer-events="none">honesty</text>` + (n ? `<g class="twinkle" pointer-events="none"><circle cx="${x + 18}" cy="${y - 66}" r="5" fill="#F3C969" stroke="#3a2e28" stroke-width=".8"/></g>` : "");
       }
       case "cafetables": {
-        const table2 = (tx, ty) => sk(
+        const table3 = (tx, ty) => sk(
           `<ellipse cx="${tx}" cy="${ty - 26}" rx="30" ry="12" style="fill:#FFFDF6"/><path d="M${tx - 4} ${ty - 40} h8 l-1 12 h-6z" style="fill:#5B2338"/><circle cx="${tx + 14}" cy="${ty - 28}" r="3" style="fill:#E8D57A"/>`,
           `<ellipse cx="${tx}" cy="${ty - 26}" rx="30" ry="12"/><path d="M${tx} ${ty - 14} v14 M${tx - 10} ${ty} h20"/><path d="M${tx - 4} ${ty - 40} h8 l-1 12 h-6z"/>`
         ) + sk(`<rect x="${tx - 50}" y="${ty - 22}" width="14" height="6" rx="2" style="fill:var(--wood)"/><rect x="${tx + 36}" y="${ty - 22}" width="14" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="${tx - 50}" y="${ty - 22}" width="14" height="6" rx="2"/><path d="M${tx - 48} ${ty - 16} v12 M${tx - 38} ${ty - 16} v12 M${tx - 50} ${ty - 22} v-16"/><rect x="${tx + 36}" y="${ty - 22}" width="14" height="6" rx="2"/><path d="M${tx + 38} ${ty - 16} v12 M${tx + 48} ${ty - 16} v12 M${tx + 50} ${ty - 22} v-16"/>`);
-        return table2(x - 210, y + 2) + table2(x - 70, y) + table2(x + 70, y - 6);
+        return table3(x - 210, y + 2) + table3(x - 70, y) + table3(x + 70, y - 6);
       }
       // the counter's front panel is drawn over the characters (foreArt), so Opal stands behind it
       case "bankcounter":
@@ -10748,6 +10950,83 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         [[0, 69], [1, 72], [2, 69], [2.5, 67], [3, 65]],
         [[0, 64], [1, 65], [1.5, 64], [2, 65], [2.5, 64], [3, 68]]
       ]
+    },
+    // Round 116: each of Ronda's interiors has its own music (live, while Mel's inside)
+    // the tapas bar: a quick rumba on the guitar in D minor, strummed on every off-beat
+    rd_tapas: {
+      name: "Rumba at the tapas bar",
+      live: true,
+      bpm: 132,
+      steps: 8,
+      tone: "guitar",
+      strum: [0, 2, 3, 5, 6],
+      arp: [1, 3, 2, 4, 5, 3, 2, 4],
+      arpVel: 0.045,
+      mel: 0.9,
+      bars: [[38, 50, 57, 62, 65, 69], [36, 48, 55, 60, 64, 67], [34, 46, 53, 58, 62, 65], [33, 45, 52, 57, 61, 64], [38, 50, 57, 62, 65, 69], [36, 48, 55, 60, 64, 67], [34, 46, 53, 58, 62, 65], [33, 45, 52, 57, 61, 64]]
+    },
+    // Doña Carmen's café: a slow waltz on the electric piano, in D, like an old radio on the counter
+    rd_cafe: {
+      name: "Café waltz",
+      live: true,
+      bpm: 96,
+      steps: 6,
+      tone: "rhodes",
+      arp: [1, 3, 4, 3, 2, 3],
+      arpVel: 0.045,
+      mel: 0.7,
+      bars: [[38, 62, 66, 69, 74], [35, 62, 66, 71, 74], [43, 62, 67, 71, 74], [45, 61, 64, 67, 69, 73], [38, 62, 66, 69, 74], [43, 59, 62, 67, 71], [45, 61, 64, 69, 73], [38, 57, 62, 66, 69]]
+    },
+    // the Arab baths: slow bells over a low drone, the flattened second of the old modes, echoing under the domes
+    rd_banos: {
+      name: "Under the star domes",
+      live: true,
+      bpm: 44,
+      steps: 8,
+      tone: "bell",
+      arp: [1, 2, 3, 4, 3, 2, 4, 3],
+      arpVel: 0.03,
+      mel: 0.35,
+      bars: [[38, 62, 63, 69, 74], [38, 62, 65, 70, 74], [38, 62, 63, 67, 74], [38, 61, 65, 69, 73]]
+    },
+    // the Moorish garden: bright little bells like water, rippling up and down in A
+    rd_jardin: {
+      name: "The fountain garden",
+      live: true,
+      bpm: 78,
+      steps: 8,
+      tone: "bell",
+      arp: [1, 2, 3, 4, 5, 4, 3, 2],
+      arpVel: 0.04,
+      mel: 0.55,
+      up: 12,
+      bars: [[45, 61, 64, 69, 73, 76], [42, 61, 66, 69, 73, 78], [38, 62, 66, 69, 74, 78], [40, 59, 64, 68, 71, 76]]
+    },
+    // the leather workshop: a slow soleá on the workshop radio, in E, unhurried like the stitching
+    rd_cuero: {
+      name: "The workshop radio",
+      live: true,
+      bpm: 80,
+      steps: 8,
+      tone: "guitar",
+      strum: [0, 4],
+      arp: [1, 2, 3, 4, 5, 4, 3, 2],
+      arpVel: 0.04,
+      mel: 0.6,
+      bars: [[40, 52, 59, 64, 68, 71], [41, 53, 60, 65, 69, 72], [43, 55, 62, 67, 71, 74], [41, 53, 60, 65, 69, 72], [45, 57, 64, 69, 72, 76], [43, 55, 62, 67, 71, 74], [41, 53, 60, 65, 69, 72], [40, 52, 59, 64, 68, 71]]
+    },
+    // the covered market: a sunny strum in G, all major chords, for the morning bustle
+    rd_mercado: {
+      name: "Market morning",
+      live: true,
+      bpm: 116,
+      steps: 8,
+      tone: "guitar",
+      strum: [0, 3, 6],
+      arp: [1, 4, 3, 2, 5, 4, 3, 5],
+      arpVel: 0.05,
+      mel: 0.85,
+      bars: [[43, 55, 59, 62, 67, 71], [48, 55, 60, 64, 67, 72], [50, 57, 62, 66, 69, 74], [43, 55, 59, 62, 67, 71], [40, 52, 59, 64, 67, 71], [48, 55, 60, 64, 67, 72], [50, 57, 62, 66, 69, 74], [43, 55, 59, 62, 67, 71]]
     }
   };
   var live = null;
@@ -15229,7 +15508,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function tripSlot(F2, id, day, hm2, melScene) {
     const t2 = tripOn(F2, day);
     if (!t2 || !t2.party.includes(id) || hm2 < t2.from) return null;
-    const T = TOWNS[t2.town], scene2 = townOf(melScene) === t2.town ? melScene : T.arrive[0], spots = (T.spots[id] || {})[scene2];
+    const T = TOWNS[t2.town], scene2 = townOf(melScene) === t2.town ? melScene : T.arrive[0], spots = (T.spots[id] || {})[scene2] || ((T.rooms || {})[scene2] || {}).party;
     const a = ((T.acts || {})[id] || {})[scene2], w = a && (a.hours ? a.hours.find(([f2, e]) => hm2 >= f2 && hm2 < e) : [t2.from, T.backTo]);
     if (w) return { from: Math.max(t2.from, w[0]), to: w[1], scene: scene2, at: a.at, act: a.act, dir: a.dir, follow: true, glide: true, trip: true };
     const ended = a && a.hours ? Math.max(t2.from, ...a.hours.map(([, e]) => e).filter((e) => e <= hm2)) : t2.from;
@@ -15287,7 +15566,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var routineNow = (def) => routineAt(def, dayKey(), sgHM());
   function slotAt(def, day, t2, live3) {
-    return api3 && tripSlot(api3.F(), def.id, day, t2, live3 ? api3.scene() : null) || live3 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || movieSlot(def.id, day, t2) || bonfireSlot(def.id, day, t2) || bayMarketSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || workshopSlot(def.id, day, t2) || trainSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || iceOk(scoopSlot(def.id, day, t2), def, day, t2) || letSlot(def.id, day, t2) || routineAt(def, day, t2);
+    return api3 && tripSlot(api3.F(), def.id, day, t2, live3 ? api3.scene() : null) || live3 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || movieSlot(def.id, day, t2) || bonfireSlot(def.id, day, t2) || bayMarketSlot(def.id, day, t2) || workshopSlot(def.id, day, t2) || trainSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || iceOk(scoopSlot(def.id, day, t2), def, day, t2) || letSlot(def.id, day, t2) || routineAt(def, day, t2);
   }
   var nightOk = (s, def, day, t2) => !s || !s.night ? s : tastingSlot(def.id, day, t2) || (routineAt(def, day, t2) || {}).scene === "wineshop" ? null : s;
   var iceOk = (s, def, day, t2) => {
@@ -15356,7 +15635,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function route(e, x, y) {
     const s = api3.scene();
     e.goal = [x, y];
-    if (outdoors(s)) {
+    if (outdoors(s) || townRoom(s)) {
       const pts = findPath(s, [e.x, e.y], [x, y], api3.bounds());
       const f2 = pts.shift();
       e.tx = f2[0];
@@ -16419,9 +16698,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     )}
     ${pressing || ready ? `<path d="M448 464 v12" style="stroke:#B9B04A" stroke-width="2.4" stroke-dasharray="3 3"><animate attributeName="stroke-dashoffset" from="0" to="-12" dur="1s" repeatCount="indefinite"/></path>` : ""}
     ${tapeLabel(390, 522, ready ? "Oil's ready!" : "Olive press", ready ? "#F3C969" : "#F3E1A0", 10)}</g>`;
-    const exit = `<g data-exit="1" aria-label="Back out to the cottage lane"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
+    const exit2 = `<g data-exit="1" aria-label="Back out to the cottage lane"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
     ${sk(`<rect x="214" y="600" width="92" height="26" rx="8" style="fill:#C9A27E"/>`, `<rect x="214" y="600" width="92" height="26" rx="8"/>`)}<text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none">Exit</text></g>`;
-    return floor + wall + jars + stone + press + exit;
+    return floor + wall + jars + stone + press + exit2;
   }
 
   // src/art/friday.js
@@ -16488,7 +16767,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     bay: { scene: "bay", n: "Sunset fishing at the bay", place: "fishbay", line: "Friday evening, the sun going down over the sea, and the fish coming up to feed.", open: (day, hm2) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() === 5 && hm2 >= 17 * 60 && hm2 < 20 * 60 }
   };
   var spotIn = (scene2) => Object.keys(SPOTS3).find((k) => SPOTS3[k].scene === scene2) || null;
-  var spotOpen = (spot, day = dayKey(), hm2 = sgHM()) => !SPOTS3[spot].open || SPOTS3[spot].open(day, hm2);
+  var spotOpen = (spot2, day = dayKey(), hm2 = sgHM()) => !SPOTS3[spot2].open || SPOTS3[spot2].open(day, hm2);
   var FISH = {
     roach: { n: "Roach", spot: "river", w: 34, cm: [10, 24], hard: 1, item: "fish", hint: "The river, any time at all." },
     trout: { n: "Rainbow trout", spot: "river", w: 22, when: "day", cm: [24, 52], hard: 2, item: "trout", hint: "The river, in daylight." },
@@ -16523,7 +16802,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (id === "crayfish" && !(OK_WHEN.night(hm2) || rainyOn(day))) return false;
     return true;
   }
-  var fishHere = (spot, day, hm2) => !spotOpen(spot, day, hm2) ? [] : Object.keys(FISH).filter((id) => (FISH[id].spot === spot || (FISH[id].also || []).includes(spot)) && canBite(id, day, hm2));
+  var fishHere = (spot2, day, hm2) => !spotOpen(spot2, day, hm2) ? [] : Object.keys(FISH).filter((id) => (FISH[id].spot === spot2 || (FISH[id].also || []).includes(spot2)) && canBite(id, day, hm2));
   var ING = {
     trout: ["Rainbow trout", 4, "with almond butter, at the kitchen"],
     crayfish: ["Crayfish", 2, "four on toast with garlic, at the kitchen"],
@@ -16575,8 +16854,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     s.reel = 1;
     return true;
   }
-  function pickFish(spot, day = dayKey(), hm2 = sgHM(), rng = Math.random) {
-    const ids = fishHere(spot, day, hm2), tot = ids.reduce((a, id) => a + FISH[id].w, 0);
+  function pickFish(spot2, day = dayKey(), hm2 = sgHM(), rng = Math.random) {
+    const ids = fishHere(spot2, day, hm2), tot = ids.reduce((a, id) => a + FISH[id].w, 0);
     let r = rng() * tot;
     for (const id of ids) {
       r -= FISH[id].w;
@@ -16597,14 +16876,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var BITE_MIN = 2e3;
   var BITE_MAX = 6e3;
   var ESCAPE = 3500;
-  function cast(F2, spot, rng = Math.random) {
+  function cast(F2, spot2, rng = Math.random) {
     const s = fishState(F2);
     if (!s.rod) return "rod";
     if (s.bait <= 0) return "bait";
-    if (!spotOpen(spot)) return "closed";
+    if (!spotOpen(spot2)) return "closed";
     s.bait--;
-    const fish = pickFish(spot, dayKey(), sgHM(), rng);
-    return { spot, fish, bite: Date.now() + BITE_MIN + rng() * (BITE_MAX - BITE_MIN), zone: zoneFor(fish, s.reel, rng()), t0: null };
+    const fish = pickFish(spot2, dayKey(), sgHM(), rng);
+    return { spot: spot2, fish, bite: Date.now() + BITE_MIN + rng() * (BITE_MAX - BITE_MIN), zone: zoneFor(fish, s.reel, rng()), t0: null };
   }
   function land(F2, id, rng = Math.random, addInv2) {
     const s = fishState(F2), f2 = FISH[id], cm = Math.round(f2.cm[0] + Math.pow(rng(), 1.6) * (f2.cm[1] - f2.cm[0]));
@@ -16619,8 +16898,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var coin4 = () => icon("coin", 13);
   var shut4 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var worms = (n) => `${n} worm${n === 1 ? "" : "s"}`;
-  function fishPanel(F2, spot, st6 = {}) {
-    const s = fishState(F2), sp = SPOTS3[spot];
+  function fishPanel(F2, spot2, st6 = {}) {
+    const s = fishState(F2), sp = SPOTS3[spot2];
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(sp.n)}</h2>`;
     h += `<div class="gchips"><button class="gchip${st6.view !== "journal" ? " on" : ""}" data-fish="view" data-k="fish"><span>Fishing</span></button><button class="gchip${st6.view === "journal" ? " on" : ""}" data-fish="view" data-k="journal"><span>Journal · ${journalCount2(F2)} of ${Object.keys(FISH).length}</span></button></div>`;
     if (st6.view === "journal") return h + journalHtml(F2) + shut4;
@@ -16638,7 +16917,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       } else if (st6.msg) h += `<p class="muted">${esc(st6.msg)}</p>`;
       h += `<div class="actions"><button class="btn primary" data-fish="cast" ${s.bait > 0 ? "" : "disabled"}>${s.bait > 0 ? "Cast" : "Out of worms"}</button></div>`;
       if (!s.bait) h += `<p class="muted">No worms left. Finish a quest and you'll dig up another (three more turn up tomorrow morning anyway).</p>`;
-      h += catchHtml(F2, spot === "bay" ? 1.5 : 1);
+      h += catchHtml(F2, spot2 === "bay" ? 1.5 : 1);
       if (!s.reel) h += `<p class="muted">The better reel makes every fish easier to land (the green's wider). <button class="btn small alt" data-fish="reelup" ${F2.coins >= REEL ? "" : "disabled"}>Buy · ${REEL} ${coin4()}</button></p>`;
     }
     return h + shut4;
@@ -17127,17 +17406,20 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <path d="M0 104 L30 98 L60 106 L90 98 L160 98 L200 106 L260 98 L320 106 L380 98 L440 106 L520 98 V112 H0z" style="fill:${C2.earth}" filter="url(#marker)"/>
     <g ${W9} stroke-width="1">${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="${100 + i % 2 * 16}" y="${18 + i * 14}" width="34" height="8" style="fill:#CDBF9F"/>`).join("")}</g>${pricklyPear(30, 96)}${pricklyPear(470, 96)}</g>
     <g data-place="rdStepsUp" aria-label="Down into the gorge and up the steps to the station"><ellipse class="hov" cx="124" cy="60" rx="28" ry="36" style="fill:var(--butter)" opacity=".0"/>${lab(210, 124, "Steps up to the station", "#F6E3B4", 10)}</g>`;
-    const houses = casa(26, 160, 150, 102, { balcony: true, bougain: "l", pots: true }) + casa(26, 340, 130, 104, { balcony: true, pots: true });
+    const cuero = `<g data-place="cuero" aria-label="The leather workshop"><ellipse class="hov" cx="91" cy="456" rx="40" ry="12" style="fill:var(--butter)"/>${casa(26, 340, 130, 104, { balcony: true, pots: true })}
+    ${sk(`<rect x="44" y="384" width="94" height="14" rx="2" style="fill:#7A3A2A"/><path d="M130 408 h12 v4 h-12z" style="fill:#2F2B28"/><path d="M134 412 q-6 2 -6 12 h20 q0 -10 -6 -12z" style="fill:#A8754F"/>`, `<rect x="44" y="384" width="94" height="14" rx="2"/><path d="M134 412 q-6 2 -6 12 h20 q0 -10 -6 -12z M134 412 q4 -8 8 0"/>`)}
+    <text x="91" y="394.5" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="7.6" fill="#F3E7C8" pointer-events="none">PIEL · UBRIQUE</text>${lab(91, 470, "Leather workshop", "#E8D3BC", 9)}</g>`;
+    const houses = casa(26, 160, 150, 102, { balcony: true, bougain: "l", pots: true }) + cuero;
     const convent = `<g data-place="convento" aria-label="The convent hatch">${shade2(326, 140, 174, 104)}
     ${sk(
       `<rect x="326" y="140" width="174" height="104" style="fill:${C2.white}"/>${tileRoof(322, 124, 182, 18).art}<path d="M384 124 V90 H424 V124z" style="fill:${C2.white}"/><path d="M384 90 L404 74 L424 90z" style="fill:${C2.white}"/><path d="M392 114 v-12 q5 -6 10 0 v12z M406 114 v-12 q5 -6 10 0 v12z" style="fill:#3A3A44"/><circle cx="397" cy="110" r="3" style="fill:${C2.ochre}"/><circle cx="411" cy="110" r="3" style="fill:${C2.ochre}"/><path d="M342 244 v-40 q14 -14 28 0 v40z" style="fill:#6B4430"/><circle cx="404" cy="216" r="14" style="fill:#A8754F"/><circle cx="404" cy="216" r="9" style="fill:#7A4A30"/>${reja(450, 170, 20, 26).art}`,
       `<rect x="326" y="140" width="174" height="104"/>${tileRoof(322, 124, 182, 18).lines}<path d="M384 124 V90 L404 74 L424 90 V124"/><path d="M342 244 v-40 q14 -14 28 0 v40z"/><circle cx="404" cy="216" r="14"/><path d="M395 216 h18 M404 207 v18" stroke-width=".8"/>${reja(450, 170, 20, 26).lines}`
     )}
     ${lab(410, 270, "Convent hatch", "#E7D9F2", 10)}</g>`;
-    const tiles = ["#3E6BAE", "#F3C969", "#2E8B8B", "#E8913A", "#3E6BAE", "#C2307A"];
+    const tiles2 = ["#3E6BAE", "#F3C969", "#2E8B8B", "#E8913A", "#3E6BAE", "#C2307A"];
     const tileShop = `<g data-place="azulejos" aria-label="Lucía's tile shop">${shade2(300, 324, 172, 96)}
     ${sk(
-      `<rect x="300" y="324" width="172" height="96" style="fill:${C2.white}"/>${tileRoof(296, 306, 180, 20).art}<rect x="370" y="372" width="30" height="48" style="fill:#3E6BAE"/><path d="M374 420 v-40 q11 -11 22 0 v40z" style="fill:#7A4A30"/>${tiles.map((c, i) => `<rect x="${314 + i % 3 * 15}" y="${342 + Math.floor(i / 3) * 15}" width="12" height="12" style="fill:#FFFDF6"/><circle cx="${320 + i % 3 * 15}" cy="${348 + Math.floor(i / 3) * 15}" r="3.6" style="fill:${c}"/>`).join("")}${tiles.map((c, i) => `<rect x="${414 + i % 3 * 15}" y="${342 + Math.floor(i / 3) * 15}" width="12" height="12" style="fill:${c}"/><path d="M${414 + i % 3 * 15} ${342 + Math.floor(i / 3) * 15} l12 12" style="stroke:#FFFDF6" stroke-width="1.4"/>`).join("")}`,
+      `<rect x="300" y="324" width="172" height="96" style="fill:${C2.white}"/>${tileRoof(296, 306, 180, 20).art}<rect x="370" y="372" width="30" height="48" style="fill:#3E6BAE"/><path d="M374 420 v-40 q11 -11 22 0 v40z" style="fill:#7A4A30"/>${tiles2.map((c, i) => `<rect x="${314 + i % 3 * 15}" y="${342 + Math.floor(i / 3) * 15}" width="12" height="12" style="fill:#FFFDF6"/><circle cx="${320 + i % 3 * 15}" cy="${348 + Math.floor(i / 3) * 15}" r="3.6" style="fill:${c}"/>`).join("")}${tiles2.map((c, i) => `<rect x="${414 + i % 3 * 15}" y="${342 + Math.floor(i / 3) * 15}" width="12" height="12" style="fill:${c}"/><path d="M${414 + i % 3 * 15} ${342 + Math.floor(i / 3) * 15} l12 12" style="stroke:#FFFDF6" stroke-width="1.4"/>`).join("")}`,
       `<rect x="300" y="324" width="172" height="96"/>${tileRoof(296, 306, 180, 20).lines}<path d="M374 420 v-40 q11 -11 22 0 v40z"/>`
     )}
     <rect x="352" y="332" width="68" height="12" rx="2" style="fill:#3E6BAE;stroke:var(--line)" stroke-width="1"/><text x="386" y="341" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="7.8" fill="#FFFDF6" pointer-events="none">AZULEJOS</text>
@@ -17169,6 +17451,174 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <rect x="8" y="12" width="144" height="34" rx="9" fill="#FFFDF6"/><rect x="8" y="32" width="144" height="7" fill="#3E6BAE"/>${[20, 48, 76, 104, 128].map((x) => `<rect x="${x}" y="17" width="20" height="11" rx="2" fill="#9FD3E8"/>`).join("")}
     <circle cx="30" cy="50" r="6" fill="#5A4A40"/><circle cx="58" cy="50" r="6" fill="#5A4A40"/><circle cx="102" cy="50" r="6" fill="#5A4A40"/><circle cx="130" cy="50" r="6" fill="#5A4A40"/><circle cx="57" cy="23" r="4" fill="#F2D3BC"/><circle cx="86" cy="23" r="4" fill="#C99A78"/></g></svg></div>`;
     return bank + train;
+  }
+
+  // src/art/ronda-rooms.js
+  var lab2 = (x, y, t2, col = "#F6E3B4", size = 10) => tapeLabel(x, y, t2, col, size);
+  var spot = (id, tx, ty, aria, hov, body2) => `<g data-rdspot="${id}" data-x="${tx}" data-y="${ty}" aria-label="${aria}">${hov}${body2}</g>`;
+  var hovE = (x, y, rx, ry) => `<ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>`;
+  var exit = (col = "#C9A27E") => `<g data-exit="1" aria-label="Back outside"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
+  ${sk(`<rect x="214" y="600" width="92" height="26" rx="8" style="fill:${col}"/>`, `<rect x="214" y="600" width="92" height="26" rx="8"/>`)}<text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none">Exit</text></g>`;
+  var tiles = (y0, w, h, a, b, line) => `<rect y="${y0}" width="520" height="${640 - y0}" style="fill:${a}"/>${Array.from({ length: Math.ceil((640 - y0) / h) }, (_, r) => Array.from({ length: Math.ceil(520 / w) }, (_2, c) => (r + c) % 2 ? `<rect x="${c * w}" y="${y0 + r * h}" width="${w}" height="${h}" style="fill:${b}"/>` : "").join("")).join("")}
+  <g style="stroke:${line}" stroke-width="1" opacity=".6">${Array.from({ length: Math.ceil(520 / w) + 1 }, (_, c) => `<path d="M${c * w} ${y0} V640"/>`).join("")}${Array.from({ length: Math.ceil((640 - y0) / h) + 1 }, (_, r) => `<path d="M0 ${y0 + r * h} H520"/>`).join("")}</g>`;
+  var azulejos = (y, h, cols = ["#3E6BAE", "#F3C969"]) => `<g pointer-events="none"><rect y="${y}" width="520" height="${h}" style="fill:#FFFDF6"/>${Array.from({ length: 26 }, (_, i) => `<rect x="${i * 20 + 3}" y="${y + 3}" width="14" height="${h - 6}" rx="1" style="fill:none;stroke:${cols[i % 2]}" stroke-width="2"/><circle cx="${i * 20 + 10}" cy="${y + h / 2}" r="3" style="fill:${cols[(i + 1) % 2]}"/>`).join("")}<path d="M0 ${y} H520 M0 ${y + h} H520" style="stroke:var(--line)" stroke-width="1.2"/></g>`;
+  var stool = (x, y) => sk(`<rect x="${x - 8}" y="${y - 14}" width="16" height="5" rx="2" style="fill:#8A5A3A"/><path d="M${x - 6} ${y - 9} l-2 9 M${x + 6} ${y - 9} l2 9" style="stroke:#6B4430" stroke-width="2"/>`, `<rect x="${x - 8}" y="${y - 14}" width="16" height="5" rx="2"/>`);
+  var chair = (x, y, d = 1) => sk(`<path d="M${x - 8 * d} ${y - 30} v22" style="stroke:#6B4430" stroke-width="2.4"/><rect x="${x - 9}" y="${y - 12}" width="18" height="4" rx="2" style="fill:#8A5A3A"/><path d="M${x - 7} ${y - 8} v8 M${x + 7} ${y - 8} v8" style="stroke:#6B4430" stroke-width="2"/>`, `<rect x="${x - 9}" y="${y - 12}" width="18" height="4" rx="2"/>`);
+  var table2 = (x, y) => `<g pointer-events="none">${sk(`<path d="M${x} ${y - 20} v18 M${x - 8} ${y} h16" style="stroke:#3A3430" stroke-width="2.4"/><ellipse cx="${x}" cy="${y - 22}" rx="20" ry="7" style="fill:#F3EFE8"/><path d="M${x - 5} ${y - 28} h8 v5 h-8z" style="fill:#FFFDF6"/>`, `<ellipse cx="${x}" cy="${y - 22}" rx="20" ry="7"/><path d="M${x - 5} ${y - 28} h8 v5 h-8z M${x + 3} ${y - 26} q3 0 3 2 q0 2 -3 2"/>`)}</g>`;
+  var barrel = (x, y) => `<g pointer-events="none">${sk(
+    `<path d="M${x - 18} ${y - 34} q-4 17 0 34 h36 q4 -17 0 -34z" style="fill:#8A5A3A"/><ellipse cx="${x}" cy="${y - 34}" rx="18" ry="5" style="fill:#A8754F"/><path d="M${x - 20} ${y - 24} h40 M${x - 20} ${y - 10} h40" style="stroke:#3A3430" stroke-width="2"/><circle cx="${x - 6}" cy="${y - 35}" r="4" style="fill:#FFFDF6"/><circle cx="${x - 6}" cy="${y - 35}" r="2" style="fill:#C8643B"/><circle cx="${x + 7}" cy="${y - 34}" r="3.6" style="fill:#FFFDF6"/><circle cx="${x + 7}" cy="${y - 34}" r="1.8" style="fill:#E8C48E"/>`,
+    `<path d="M${x - 18} ${y - 34} q-4 17 0 34 h36 q4 -17 0 -34z"/><ellipse cx="${x}" cy="${y - 34}" rx="18" ry="5"/>`
+  )}</g>`;
+  var lamp2 = (x, len, col = "#F6D98A") => `<g pointer-events="none"><path d="M${x} 0 v${len}" style="stroke:#3A3430" stroke-width="1"/><path d="M${x - 9} ${len + 8} q9 -14 18 0z" style="fill:#3A3430"/><circle cx="${x}" cy="${len + 10}" r="4" style="fill:${col}"/><circle cx="${x}" cy="${len + 14}" r="22" style="fill:${col}" opacity=".18"/></g>`;
+  function tapasRoom() {
+    const floor = tiles(170, 40, 40, "#C8643B", "#B85A34", "#8E4428");
+    const wall = `<g pointer-events="none"><rect width="520" height="170" style="fill:${C2.white}"/>${azulejos(116, 40)}<rect y="156" width="520" height="14" style="fill:#8A5A3A"/>
+    <rect y="22" width="520" height="12" style="fill:#5A3E2C"/>${[60, 104, 148].map((x) => `<path d="M${x} 34 v8" style="stroke:#3A3430"/>`).join("")}</g>
+    ${sk(
+      [60, 104, 148].map((x) => `<path d="M${x - 9} 44 q-3 26 9 34 q12 -8 9 -34z" style="fill:#B5443A"/><path d="M${x - 3} 76 q3 4 6 0" style="fill:#F3E1D0"/>`).join("") + `<path d="M196 34 v26" style="stroke:#3A3430"/>${[0, 1, 2, 3].map((i) => `<circle cx="${192 + i % 2 * 8}" cy="${44 + i * 6}" r="4" style="fill:#F3EFE8"/>`).join("")}`,
+      [60, 104, 148].map((x) => `<path d="M${x - 9} 44 q-3 26 9 34 q12 -8 9 -34z"/>`).join("")
+    )}
+    ${sk(`<rect x="340" y="40" width="120" height="66" rx="3" style="fill:#2F3A33"/><rect x="336" y="36" width="128" height="74" rx="4" style="fill:none;stroke:#8A5A3A" stroke-width="5"/>`, `<rect x="336" y="36" width="128" height="74" rx="4"/>`)}
+    <g pointer-events="none" style="font-family:Klee One,serif" fill="#FFFDF6"><text x="400" y="56" text-anchor="middle" font-size="11" font-weight="700">TAPAS</text>${["salmorejo · 3", "croquetas · 3", "payoyo · 3", "naranjas · 2"].map((t2, i) => `<text x="352" y="${70 + i * 9.5}" font-size="7">${t2}</text>`).join("")}</g>
+    ${sk(`<path d="M262 44 q14 -6 14 14 q0 18 -14 22 q-14 -4 -14 -22 q0 -20 14 -14z" style="fill:#C98A4A"/><rect x="259" y="20" width="6" height="30" style="fill:#6B4430"/><circle cx="262" cy="62" r="5" style="fill:#3A3430"/>`, `<path d="M262 44 q14 -6 14 14 q0 18 -14 22 q-14 -4 -14 -22 q0 -20 14 -14z"/><rect x="259" y="20" width="6" height="30"/>`)}`;
+    const bar = spot(
+      "tapas",
+      186,
+      262,
+      "The bar: order a tapa",
+      hovE(186, 244, 120, 18),
+      sk(
+        `<rect x="40" y="188" width="300" height="48" rx="3" style="fill:#8A5A3A"/><rect x="34" y="180" width="312" height="10" rx="2" style="fill:#B9B0A4"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${54 + i * 58} 196 v32" style="stroke:#6B4430" stroke-width="2"/>`).join("")}
+      <rect x="90" y="164" width="120" height="16" rx="3" style="fill:#EAF6FA" opacity=".85"/>${[0, 1, 2, 3, 4].map((i) => `<ellipse cx="${104 + i * 23}" cy="176" rx="8" ry="3" style="fill:${["#E8566C", "#E8C48E", "#C8643B", "#F3E7C8", "#F28C28"][i]}"/>`).join("")}<rect x="276" y="150" width="8" height="30" style="fill:#B9B0A4"/><path d="M274 152 h12" style="stroke:#3A3430" stroke-width="3"/>`,
+        `<rect x="40" y="188" width="300" height="48" rx="3"/><rect x="34" y="180" width="312" height="10" rx="2"/><rect x="90" y="164" width="120" height="16" rx="3"/>`
+      ) + lab2(186, 282, "The bar: order a tapa", "#F6D3DC", 10)
+    );
+    const tables = [[120, 380], [300, 420], [420, 300]].map(([x, y]) => stool(x - 28, y + 14) + stool(x + 28, y + 14) + barrel(x, y)).join("");
+    const plant5 = pot(470, 250) + pot(486, 254, "#E85A8A");
+    return floor + wall + lamp2(140, 90) + lamp2(380, 120) + bar + tables + plant5 + exit("#8A5A3A");
+  }
+  function cafeRoom() {
+    const floor = tiles(170, 32, 32, "#F3ECDD", "#D9CFC0", "#BFB3A2");
+    const wall = `<g pointer-events="none"><rect width="520" height="170" style="fill:#F6E7C1"/>${azulejos(130, 30, ["#4F7A5A", "#E8C48E"])}<rect y="160" width="520" height="10" style="fill:#8A5A3A"/></g>
+    ${sk(
+      `<path d="M40 128 V64 q0 -44 64 -44 q64 0 64 44 V128z" style="fill:#BFE0F2"/><rect x="40" y="100" width="128" height="28" style="fill:#FBF7EE"/><circle cx="104" cy="104" r="10" style="fill:#E6DCCB"/><path d="M100 94 q4 -12 8 0" style="fill:none;stroke:#7FB8E8" stroke-width="2"/>`,
+      `<path d="M40 128 V64 q0 -44 64 -44 q64 0 64 44 V128z M104 20 V128 M40 72 h128"/>`
+    )}
+    ${sk(
+      `<rect x="300" y="48" width="180" height="6" style="fill:#8A5A3A"/><rect x="300" y="96" width="180" height="6" style="fill:#8A5A3A"/>${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="${308 + i * 29}" y="${28}" width="18" height="20" rx="4" style="fill:#EAF6FA"/><circle cx="${317 + i * 29}" cy="42" r="5" style="fill:${["#F3C24A", "#E8566C", "#C8643B", "#F3C969", "#E890A8", "#9CC27E"][i]}"/>`).join("")}<rect x="400" y="66" width="34" height="30" rx="3" style="fill:#B9B0A4"/><rect x="408" y="72" width="18" height="10" rx="2" style="fill:#3A3430"/><path d="M412 86 h10 v6 h-10z" style="fill:#FFFDF6"/>`,
+      `<rect x="300" y="48" width="180" height="6"/><rect x="300" y="96" width="180" height="6"/><rect x="400" y="66" width="34" height="30" rx="3"/>`
+    )}
+    ${sk(`<rect x="220" y="44" width="40" height="50" rx="2" style="fill:#FFFDF6"/><rect x="226" y="50" width="28" height="30" style="fill:#C9A27E"/><circle cx="240" cy="62" r="7" style="fill:#3A3430"/>`, `<rect x="220" y="44" width="40" height="50" rx="2"/>`)}
+    <g transform="translate(260 18)" pointer-events="none"><g>${[0, 1, 2, 3].map((i) => `<ellipse cx="0" cy="0" rx="34" ry="5" transform="rotate(${i * 45})" style="fill:#8A5A3A" opacity=".85"/>`).join("")}<circle r="5" style="fill:#3A3430"/><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="6s" repeatCount="indefinite"/></g></g>`;
+    const counter = spot(
+      "dulces",
+      395,
+      268,
+      "The counter: sweets and coffee",
+      hovE(395, 252, 100, 16),
+      sk(
+        `<rect x="300" y="196" width="190" height="44" rx="3" style="fill:#8A5A3A"/><rect x="300" y="170" width="190" height="28" rx="3" style="fill:#EAF6FA" opacity=".9"/>${[0, 1, 2].map((i) => `<ellipse cx="${336 + i * 60}" cy="190" rx="22" ry="5" style="fill:#FFFDF6"/>`).join("")}${[0, 1, 2, 3, 4].map((i) => `<circle cx="${322 + i * 7}" cy="186" r="3.4" style="fill:#F3C24A"/>`).join("")}<path d="M380 188 q16 -12 32 0z" style="fill:#E8C48E"/>${[0, 1, 2].map((i) => `<path d="M${440 + i * 10} 190 q2 -10 6 0" style="fill:none;stroke:#C98A4A" stroke-width="3"/>`).join("")}`,
+        `<rect x="300" y="196" width="190" height="44" rx="3"/><rect x="300" y="170" width="190" height="28" rx="3"/>`
+      ) + lab2(395, 288, "Sweets and coffee", "#F6E3B4", 10)
+    );
+    const tables = [[110, 340], [200, 480], [370, 430]].map(([x, y]) => chair(x - 30, y, 1) + chair(x + 30, y, -1) + table2(x, y)).join("");
+    return floor + wall + counter + tables + pot(486, 300) + exit("#4F7A5A");
+  }
+  var star2 = (x, y, r) => {
+    const p = Array.from({ length: 16 }, (_, i) => {
+      const a = i * Math.PI / 8, d = i % 2 ? r * 0.5 : r;
+      return `${(x + Math.cos(a) * d).toFixed(1)} ${(y + Math.sin(a) * d).toFixed(1)}`;
+    });
+    return `M${p.join(" L")}z`;
+  };
+  function banosRoom() {
+    const floor = `<rect y="200" width="520" height="440" style="fill:#D8C8A8"/>${Array.from({ length: 11 }, (_, r) => Array.from({ length: 7 }, (_2, c) => `<rect x="${c * 80 - r % 2 * 40 + 2}" y="${202 + r * 40}" width="76" height="36" rx="5" style="fill:none;stroke:#BFAE8C" stroke-width="1.4"/>`).join("")).join("")}`;
+    const arch = (x) => `<path d="M${x - 40} 200 V112 a40 44 0 1 1 80 0 V200z" style="fill:#4E3E31"/>${Array.from({ length: 9 }, (_, i) => {
+      const a = Math.PI * (1.1 - i * 0.15);
+      return `<path d="M${(x + Math.cos(a) * 40).toFixed(1)} ${(112 - Math.sin(a) * 44).toFixed(1)} L${(x + Math.cos(a) * 52).toFixed(1)} ${(112 - Math.sin(a) * 56).toFixed(1)}" style="stroke:${i % 2 ? "#E8D3A8" : "#B9734E"}" stroke-width="9"/>`;
+    }).join("")}`;
+    const wall = `<g pointer-events="none"><rect width="520" height="200" style="fill:#C98A62"/>${Array.from({ length: 10 }, (_, r) => `<path d="M0 ${r * 20 + 10} H520" style="stroke:#B9734E" stroke-width="1"/>`).join("")}
+    <path d="M0 0 H520 V40 Q260 70 0 40z" style="fill:#B9734E"/>${[110, 260, 410].map(arch).join("")}<rect x="0" y="196" width="520" height="6" style="fill:#A8754F"/></g>`;
+    const stars = [70, 170, 260, 350, 450].map((x, i) => `<path d="${star2(x, 22 + i % 2 * 8, 9)}" style="fill:#FFF6D8;stroke:var(--line)" stroke-width="1"/>`).join("");
+    const shafts = `<g pointer-events="none">${[[70, 150], [170, 250], [260, 330], [350, 410], [450, 470]].map(([x, fx], i) => `<path d="M${x - 6} ${26 + i % 2 * 8} L${x + 6} ${26 + i % 2 * 8} L${fx + 22} ${300 + i % 3 * 60} L${fx - 22} ${300 + i % 3 * 60}z" fill="#FFF6D8" opacity=".16"><animate attributeName="opacity" values=".1;.22;.1" dur="${7 + i}s" repeatCount="indefinite"/></path><ellipse cx="${fx}" cy="${300 + i % 3 * 60}" rx="24" ry="7" fill="#FFF6D8" opacity=".3"/>`).join("")}</g>`;
+    const look = spot("banos", 260, 360, "The star skylights", hovE(260, 340, 60, 14), lab2(260, 360, "Look up: the stars", "#F6E3B4", 10));
+    const basin = `<g pointer-events="none">${sk(`<path d="M220 470 l12 -26 h56 l12 26 l-12 26 h-56z" style="fill:#B9B0A4"/><path d="M234 470 l8 -16 h36 l8 16 l-8 16 h-36z" style="fill:#9FC0C8"/>`, `<path d="M220 470 l12 -26 h56 l12 26 l-12 26 h-56z M234 470 l8 -16 h36 l8 16 l-8 16 h-36z"/>`)}<path class="ripple" d="M252 470 q8 -4 16 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2"/></g>`;
+    const pillars = [[46, 600], [474, 600]].map(([x, y]) => sk(`<rect x="${x - 10}" y="${y - 380}" width="20" height="380" style="fill:#E8D3A8"/><rect x="${x - 14}" y="${y - 386}" width="28" height="10" style="fill:#C9A27E"/>`, `<rect x="${x - 10}" y="${y - 380}" width="20" height="380"/><rect x="${x - 14}" y="${y - 386}" width="28" height="10"/>`)).join("");
+    return floor + wall + stars + pillars + basin + shafts + look + exit("#A8754F");
+  }
+  function jardinRoom() {
+    const ground = `<rect width="520" height="640" style="fill:${C2.gravel}"/>`;
+    const wall = `<g pointer-events="none">${sk(
+      `<rect x="0" y="0" width="520" height="150" style="fill:${C2.white}"/>${[150, 260, 370].map((x) => `<path d="M${x - 34} 150 V92 a34 38 0 1 1 68 0 V150z" style="fill:#E8DFCC"/>`).join("")}<rect y="150" width="520" height="10" style="fill:#C9A27E"/>`,
+      `<path d="M0 150 H520"/>${[150, 260, 370].map((x) => `<path d="M${x - 34} 150 V92 a34 38 0 1 1 68 0 V150"/>`).join("")}`
+    )}</g>` + bougain(60, 70, 22) + bougain(470, 60, 20) + cypress(30, 178, 1.1) + cypress(490, 178, 1.1);
+    const beds = [[60, 196, 154, 148], [306, 196, 154, 148], [60, 420, 154, 140], [306, 420, 154, 140]].map(([x, y, w, h]) => `<g pointer-events="none">${sk(`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14" style="fill:#6E9A58"/><rect x="${x + 12}" y="${y + 12}" width="${w - 24}" height="${h - 24}" rx="8" style="fill:#B9C98E"/>`, `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14"/>`)}${orangeTree(x + w / 2, y + h / 2 + 26, 1.25)}</g>`).join("");
+    const jets = [190, 230, 270, 310, 450, 490, 530, 570].filter((y) => y < 344 || y > 414).map((y, i) => `<path d="M254 ${y} q6 -14 12 0" fill="none" style="stroke:#BFE0F2" stroke-width="1.6"><animate attributeName="opacity" values="1;.4;1" dur="${1.4 + i % 3 * 0.3}s" repeatCount="indefinite"/></path>`).join("");
+    const water = `<g pointer-events="none">${sk(`<rect x="248" y="164" width="24" height="440" style="fill:#7FB8E8"/>`, `<path d="M248 164 V604 M272 164 V604"/>`)}${jets}</g>`;
+    const fountain = spot(
+      "jardin",
+      260,
+      430,
+      "The fountain: sit a while",
+      hovE(260, 380, 56, 20),
+      sk(`<path d="M220 378 l12 -30 h56 l12 30 l-12 30 h-56z" style="fill:#F3ECDD"/><path d="M230 378 l9 -22 h42 l9 22 l-9 22 h-42z" style="fill:#7FB8E8"/><rect x="254" y="350" width="12" height="24" style="fill:#F3ECDD"/><circle cx="260" cy="348" r="8" style="fill:#F3ECDD"/>`, `<path d="M220 378 l12 -30 h56 l12 30 l-12 30 h-56z"/><circle cx="260" cy="348" r="8"/>`) + `<g pointer-events="none">${[-1, 1].map((d) => `<path d="M260 340 q${d * 12} -16 ${d * 20} 8" fill="none" style="stroke:#BFE0F2" stroke-width="1.8"><animate attributeName="stroke-dasharray" values="0 40;40 0" dur="1.2s" repeatCount="indefinite"/></path>`).join("")}</g>` + lab2(260, 426, "The fountain", "#DCEBF6", 10)
+    );
+    const benches = [130, 390].map((x) => sk(`<rect x="${x - 34}" y="${590}" width="68" height="14" rx="3" style="fill:#FFFDF6"/>${Array.from({ length: 8 }, (_, i) => `<rect x="${x - 32 + i * 8}" y="592" width="7" height="10" style="fill:${i % 2 ? "#F3C969" : "#3E6BAE"}"/>`).join("")}`, `<rect x="${x - 34}" y="590" width="68" height="14" rx="3"/>`)).join("");
+    return ground + wall + beds + water + fountain + benches + exit("#C9A27E");
+  }
+  function cueroRoom() {
+    const floor = `<rect y="170" width="520" height="470" style="fill:#B98F5E"/>${Array.from({ length: 12 }, (_, r) => `<path d="M0 ${190 + r * 40} H520" style="stroke:#A07A4C" stroke-width="1.4"/>${Array.from({ length: 4 }, (_2, c) => `<path d="M${(c * 140 + r % 2 * 70) % 520} ${170 + r * 40} v40" style="stroke:#A07A4C" stroke-width="1.2"/>`).join("")}`).join("")}`;
+    const hide = (x, y, col, s = 1) => `<path d="M${x} ${y} q${14 * s} -8 ${28 * s} 0 q${10 * s} 14 ${4 * s} ${34 * s} q${-4 * s} ${12 * s} ${-18 * s} ${10 * s} q${-16 * s} 2 ${-20 * s} ${-12 * s} q${-6 * s} ${-20 * s} ${6 * s} ${-32 * s}z" style="fill:${col}"/>`;
+    const wall = `<g pointer-events="none"><rect width="520" height="170" style="fill:${C2.white}"/><rect y="160" width="520" height="10" style="fill:#7A5638"/><rect y="24" width="520" height="8" style="fill:#7A5638"/></g>
+    ${sk(
+      hide(40, 50, "#A8754F", 1.3) + hide(120, 46, "#7A3A2A", 1.2) + hide(424, 52, "#C98A4A", 1.3),
+      hide(40, 50, "none", 1.3) + hide(120, 46, "none", 1.2) + hide(424, 52, "none", 1.3)
+    )}
+    ${sk(
+      `<rect x="210" y="70" width="190" height="6" style="fill:#7A5638"/><rect x="210" y="128" width="190" height="6" style="fill:#7A5638"/>${[0, 1, 2, 3].map((i) => `<path d="M${222 + i * 46} 70 q-4 -26 16 -26 q20 0 16 26z" style="fill:${["#7A3A2A", "#A8754F", "#3A2A22", "#C98A4A"][i]}"/><path d="M${230 + i * 46} 44 q8 -10 16 0" style="fill:none;stroke:#3A2A22" stroke-width="1.6"/>`).join("")}${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="${218 + i * 30}" y="${112}" width="22" height="16" rx="2" style="fill:${["#8A5A3A", "#C98A4A", "#5A3A2A"][i % 3]}"/>`).join("")}`,
+      `<rect x="210" y="70" width="190" height="6"/><rect x="210" y="128" width="190" height="6"/>${[0, 1, 2, 3].map((i) => `<path d="M${222 + i * 46} 70 q-4 -26 16 -26 q20 0 16 26z"/>`).join("")}`
+    )}
+    ${sk(`<path d="M480 34 v120" style="stroke:#7A5638" stroke-width="3"/>${[0, 1, 2, 3].map((i) => `<path d="M${470 - i * 4} ${44 + i * 4} v${90 - i * 8}" style="stroke:${["#3A2A22", "#7A3A2A", "#A8754F", "#C98A4A"][i]}" stroke-width="5"/>`).join("")}`, `<path d="M480 34 v120"/>`)}`;
+    const bench2 = `<g pointer-events="none">${sk(
+      `<rect x="170" y="300" width="180" height="16" rx="2" style="fill:#8A5A3A"/><path d="M178 316 v34 M342 316 v34" style="stroke:#6B4430" stroke-width="5"/><rect x="196" y="288" width="60" height="12" rx="2" style="fill:#C98A4A"/><rect x="300" y="290" width="22" height="8" rx="2" style="fill:#5A3A2A"/><circle cx="276" cy="294" r="5" style="fill:#F3E7C8"/>`,
+      `<rect x="170" y="300" width="180" height="16" rx="2"/><rect x="196" y="288" width="60" height="12" rx="2"/>`
+    )}</g>`;
+    const counter = spot(
+      "cuero",
+      400,
+      268,
+      "Antonio's counter: bags, wallets, belts",
+      hovE(400, 252, 80, 16),
+      sk(
+        `<rect x="330" y="200" width="150" height="40" rx="3" style="fill:#7A5638"/><rect x="326" y="194" width="158" height="8" rx="2" style="fill:#A8754F"/>${[0, 1, 2].map((i) => `<rect x="${346 + i * 40}" y="${182}" width="26" height="12" rx="2" style="fill:${["#7A3A2A", "#C98A4A", "#3A2A22"][i]}"/>`).join("")}`,
+        `<rect x="330" y="200" width="150" height="40" rx="3"/><rect x="326" y="194" width="158" height="8" rx="2"/>`
+      ) + lab2(400, 288, "Shop: leather from Ubrique", "#E8D3BC", 10)
+    );
+    return floor + wall + lamp2(140, 80, "#F3C969") + lamp2(380, 90, "#F3C969") + bench2 + counter + pot(40, 300) + exit("#7A5638");
+  }
+  function mercadoRoom() {
+    const floor = tiles(170, 52, 40, "#E6DCCB", "#DCD0BC", "#C4B79F");
+    const wall = `<g pointer-events="none"><rect width="520" height="170" style="fill:#F3ECDD"/>${[70, 190, 330, 450].map((x) => `<path d="M${x - 44} 160 V70 a44 44 0 0 1 88 0 V160z" style="fill:#CFE6F2"/><path d="M${x - 44} 160 V70 a44 44 0 0 1 88 0 V160 M${x} 26 V160 M${x - 44} 100 h88" fill="none" style="stroke:#3E6B5A" stroke-width="3"/>`).join("")}
+    <circle cx="260" cy="40" r="18" style="fill:#FFFDF6;stroke:#3E6B5A" stroke-width="3"/><path d="M260 40 v-10 M260 40 h8" style="stroke:#3A3430" stroke-width="2"/><rect y="160" width="520" height="10" style="fill:#3E6B5A"/></g>`;
+    const column = (x) => sk(`<rect x="${x - 5}" y="170" width="10" height="180" style="fill:#3E6B5A"/><path d="M${x - 14} 176 h28 l-6 -8 h-16z" style="fill:#3E6B5A"/>`, `<rect x="${x - 5}" y="170" width="10" height="180"/>`);
+    const rafa = spot(
+      "mercado",
+      222,
+      266,
+      "Rafael's stall: oil, almonds and more",
+      hovE(260, 250, 90, 16),
+      sk(
+        `<rect x="180" y="196" width="160" height="44" rx="3" style="fill:#C9A27E"/><path d="M174 172 h172 l-6 -12 h-160z" style="fill:#9DAA80"/>${[0, 1, 2, 3, 4].map((i) => `<path d="M${196 + i * 12} 196 v-16 h6 v16z" style="fill:#B9B04A"/>`).join("")}${[0, 1, 2].map((i) => `<path d="M${266 + i * 22} 196 q-8 -20 10 -22 q18 2 10 22z" style="fill:#E8D3A8"/>`).join("")}`,
+        `<rect x="180" y="196" width="160" height="44" rx="3"/><path d="M174 172 h172 l-6 -12 h-160z"/>`
+      ) + lab2(222, 284, "Rafael's stall", "#E4EBD0", 10)
+    );
+    const fruit = `<g pointer-events="none">${sk(`<rect x="44" y="306" width="108" height="40" rx="3" style="fill:#B98A5A"/>${[0, 1, 2].map((i) => `<rect x="${50 + i * 34}" y="${296}" width="30" height="14" rx="2" style="fill:#8A6A52"/>${[0, 1, 2].map((k) => `<circle cx="${57 + i * 34 + k * 8}" cy="296" r="4.4" style="fill:${["#F28C28", "#F3E27A", "#E8566C"][i]}"/>`).join("")}`).join("")}`, `<rect x="44" y="306" width="108" height="40" rx="3"/>`)}</g>`;
+    const ham = `<g pointer-events="none">${sk(`<rect x="368" y="306" width="108" height="40" rx="3" style="fill:#B98A5A"/><path d="M364 268 h116" style="stroke:#6B4430" stroke-width="3"/>${[384, 410, 436, 462].map((x) => `<path d="M${x - 7} 270 q-3 22 7 28 q10 -6 7 -28z" style="fill:#B5443A"/>`).join("")}<path d="M380 306 q14 -14 28 0z" style="fill:#F3E7C8"/><path d="M420 306 q14 -14 28 0z" style="fill:#F3E7C8"/>`, `<rect x="368" y="306" width="108" height="40" rx="3"/>`)}</g>`;
+    const flowers2 = `<g pointer-events="none">${sk([60, 90, 120].map((x, i) => `<path d="M${x - 10} 514 l2 -26 h16 l2 26z" style="fill:#9FC0C8"/>${[0, 1, 2, 3].map((k) => `<circle cx="${x - 6 + k * 4}" cy="${484 - k % 2 * 6}" r="4" style="fill:${["#D8343A", "#FFFDF6", "#F3C969"][i]}"/>`).join("")}`).join(""), [60, 90, 120].map((x) => `<path d="M${x - 10} 514 l2 -26 h16 l2 26z"/>`).join(""))}</g>`;
+    return floor + wall + column(160) + column(360) + lamp2(110, 70) + lamp2(410, 70) + rafa + fruit + ham + flowers2 + exit("#3E6B5A");
+  }
+  function rondaRoomArt(scene2) {
+    return scene2 === "rd_tapas" ? tapasRoom() : scene2 === "rd_cafe" ? cafeRoom() : scene2 === "rd_banos" ? banosRoom() : scene2 === "rd_jardin" ? jardinRoom() : scene2 === "rd_cuero" ? cueroRoom() : mercadoRoom();
   }
 
   // src/game/ronda.js
@@ -17222,6 +17672,18 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (all) r.bench = true;
     return { t: t2, all };
   }
+  var CAFE = {
+    leche: { n: "Café con leche and a churro", price: 3, line: "Sit down at a marble table under the fan. Doña Carmen brings it over." },
+    choc: { n: "Churros con chocolate", price: 4, line: "A plate of hot churros and a cup of chocolate so thick the spoon stands up." }
+  };
+  function cafeTreat(F2, kind = "leche") {
+    const c = CAFE[kind];
+    if (!c || F2.coins < c.price) return null;
+    F2.coins -= c.price;
+    const r = rondaState(F2);
+    r.cafes = (r.cafes || 0) + 1;
+    return r.cafes;
+  }
   function picnic(F2, addInv2, day = dayKey()) {
     const r = rondaState(F2);
     if (!(F2.inv && F2.inv.picnic > 0)) return null;
@@ -17255,10 +17717,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function shopPanel2(F2, shop) {
     const head = {
-      dulces: ["Doña Carmen's sweet shop", "Trays of yemas like little golden suns, and almond cakes dusted with sugar. Doña Carmen learned the yemas from the nuns when she was a girl."],
+      dulces: ["Doña Carmen's café", "Trays of yemas like little golden suns, and almond cakes dusted with sugar. Doña Carmen learned the yemas from the nuns when she was a girl."],
+      cuero: ["Antonio's leather workshop", "Everything here was cut and stitched by hand in Ubrique, the leather village over the hills: wallets, bags, belts, notebooks. Antonio does the repairs himself, at the bench."],
       convento: ["The convent hatch", "A wooden turntable in the wall. You knock, say what you'd like, put your coins on it, and it turns: biscuits, from nuns you never see."]
     }[shop];
-    return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(head[0])}</h2><p class="sub">${esc(head[1])}</p><ul class="hlist wlist">${shopGoods(shop).map((id) => goodRow(F2, id)).join("")}</ul>` + shut6;
+    const cafe = shop === "dulces" ? `<h3 class="ph3">At a table</h3><ul class="hlist wlist">${Object.entries(CAFE).map(([k, c]) => `<li><span class="wpic">${icon(k === "leche" ? "coffee" : "churros", 28)}</span><span class="wtxt"><b>${esc(c.n)}</b><small>${esc(c.line)}</small></span><button class="btn small primary" data-rcafe="${k}" ${F2.coins >= c.price ? "" : "disabled"}>${c.price} ${coin6()}</button></li>`).join("")}</ul><h3 class="ph3">To take away</h3>` : "";
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(head[0])}</h2><p class="sub">${esc(head[1])}</p>${cafe}<ul class="hlist wlist">${shopGoods(shop).map((id) => goodRow(F2, id)).join("")}</ul>` + shut6;
   }
   var tilePic = (t2, own) => `<svg viewBox="0 0 40 40" width="44" height="44" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="2" fill="${own ? "#FFFDF6" : "#EFE8DA"}" stroke="#3b3530" stroke-width="1.4"/><rect x="6" y="6" width="28" height="28" fill="none" stroke="#3E6BAE" stroke-width="2"/><circle cx="20" cy="20" r="8" fill="${t2.col}" opacity="${own ? 1 : 0.35}"/><path d="M6 6l5 5M34 6l-5 5M6 34l5-5M34 34l-5-5" stroke="#3E6BAE" stroke-width="1.4"/></svg>`;
   function tilePanel(F2, day = dayKey()) {
@@ -18878,20 +19342,20 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var BUILDING = { scoopshop: "The Scoop Shack", wineshop: "The wine shop", home: "Home", room: "Your room", chord: "Chord workshop", chico: "Chico cottage", luna: "Luna house", ohayo: "Ohayo house" };
   var keeps = (F2) => F2.keeps = F2.keeps || {};
-  function placeKeep(F2, item, spot) {
-    const it = ITEMS[item], sp = KEEP_SPOTS[spot];
+  function placeKeep(F2, item, spot2) {
+    const it = ITEMS[item], sp = KEEP_SPOTS[spot2];
     if (!it || it.kind !== "keepsake" || !sp || !(F2.inv[item] > 0)) return null;
-    const K3 = keeps(F2), old = K3[spot];
+    const K3 = keeps(F2), old = K3[spot2];
     F2.inv[item]--;
     if (!F2.inv[item]) delete F2.inv[item];
     if (old) F2.inv[old] = (F2.inv[old] || 0) + 1;
-    K3[spot] = item;
+    K3[spot2] = item;
     return `${it.n} on the shelf in ${sp.n}.${old ? ` The ${ITEMS[old].n.toLowerCase()} is back in your backpack.` : ""}`;
   }
-  function takeKeep(F2, spot) {
-    const K3 = keeps(F2), id = K3[spot];
+  function takeKeep(F2, spot2) {
+    const K3 = keeps(F2), id = K3[spot2];
     if (!id) return null;
-    delete K3[spot];
+    delete K3[spot2];
     F2.inv[id] = (F2.inv[id] || 0) + 1;
     return ITEMS[id];
   }
@@ -18902,11 +19366,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     ${by.map(([sc, ks]) => `<p class="eyebrow" style="margin:10px 0 4px">${esc(BUILDING[sc])}</p><div class="vhelp">${ks.map((k) => `<button class="vhelpi" data-keepat="${k}"><span><b>${esc(KEEP_SPOTS[k].n.replace(/^[^,]+, /, "").replace(/^./, (c) => c.toUpperCase()))}</b><small>${K3[k] ? `${esc(ITEMS[K3[k]].n)} there now (it comes back to you)` : "empty shelf"}</small></span></button>`).join("")}</div>`).join("")}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
-  function placedPanel(F2, spot) {
-    const id = keeps(F2)[spot], it = ITEMS[id];
+  function placedPanel(F2, spot2) {
+    const id = keeps(F2)[spot2], it = ITEMS[id];
     if (!it) return "";
-    return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(it.n)}</h2><p class="sub">${esc(it.line)} On the shelf in ${esc(KEEP_SPOTS[spot].n)}.</p>
-    <div class="actions"><button class="btn alt" data-keepdown="${spot}">Take it down</button><button class="btn alt small" data-close="1">Close</button></div>`;
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(it.n)}</h2><p class="sub">${esc(it.line)} On the shelf in ${esc(KEEP_SPOTS[spot2].n)}.</p>
+    <div class="actions"><button class="btn alt" data-keepdown="${spot2}">Take it down</button><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function keepsakesIn(F2, scene2) {
     const K3 = keeps(F2);
@@ -18956,8 +19420,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const list2 = companions(F2), taken = list2.map((c2) => c2.name), name = PETS[kind].names.find((n) => !taken.includes(n)) || PETS[kind].names[0] + " " + (list2.length + 1);
     F2.inv[item]--;
     if (!F2.inv[item]) delete F2.inv[item];
-    const used = list2.filter((c2) => c2.scene === home2).map((c2) => c2.spot), spot = PET_HOMES[home2].spots.findIndex((_, i) => !used.includes(i));
-    const c = { id: "p" + Date.now().toString(36), kind, name, owner, scene: home2, spot: spot < 0 ? list2.length % PET_HOMES[home2].spots.length : spot, since: Date.now() };
+    const used = list2.filter((c2) => c2.scene === home2).map((c2) => c2.spot), spot2 = PET_HOMES[home2].spots.findIndex((_, i) => !used.includes(i));
+    const c = { id: "p" + Date.now().toString(36), kind, name, owner, scene: home2, spot: spot2 < 0 ? list2.length % PET_HOMES[home2].spots.length : spot2, since: Date.now() };
     list2.push(c);
     return c;
   }
@@ -22508,6 +22972,20 @@ ${SIGNOFF[t2.who] || ""}`;
       save2();
       ctx();
     });
+    c.querySelectorAll("[data-rcafe]").forEach((b) => b.onclick = () => {
+      if (!cafeTreat(F, b.dataset.rcafe)) return;
+      rondaView = null;
+      ctx();
+      sfx("chime");
+      gainXp(1);
+      hearts(2);
+      mel.sitting = true;
+      nodes.mel.classList.add("sit");
+      if (b.dataset.rcafe === "choc") speak(pick(["Dip, bite, dip again. The chocolate's so thick the churro stands up in it.", "Hot churros, crisp and sugary, and a cup of chocolate you could stand a spoon in. Heaven."]), 6e3);
+      else speak(pick(["Café con leche in a glass, a churro to dip, and the fan ticking round overhead. Bliss.", `Doña Carmen sets it down: "Eat, eat. You're too thin." The churro's still hot.`, "Coffee, sugar, the plaza going by outside the window. Nobody's in a rush."]), 6e3);
+      if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["churro! mine!", "sugar on my nose!", "more churro please"])), 1800);
+      save2();
+    });
     c.querySelectorAll("[data-rtaste]").forEach((b) => b.onclick = () => {
       const r = taste(F, b.dataset.rtaste);
       if (!r) return;
@@ -23070,7 +23548,8 @@ ${SIGNOFF[t2.who] || ""}`;
       if (inner && scene === bld && DOOR[target.pl]) {
         const d = spotObj(scene, DOOR[target.pl]);
         pos = [d.x + (d.x > 260 ? 26 : -26), d.y - 120];
-      } else if (townOf(scene)) {
+      } else if (townRoom(scene)) pos = [260, 560];
+      else if (townOf(scene)) {
         const T = TOWNS[townOf(scene)], st6 = T.arrive[0];
         pos = scene === st6 ? VILLAGE[T.station].mark : VILLAGE[BRIDGES[scene][nextHop(scene, st6)]].mark;
       } else if (outside() && bld === "base") pos = scene === "base" ? (() => {
@@ -23116,13 +23595,13 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
     tableKey = "";
-    $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
+    $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? rondaRoomArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
     $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt(F.fish && F.fish.koi || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") : ""));
     if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));
     if (outside() && isDusk()) nightLights();
     const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: vineyardName(F), farm: "The garden", wineshop: shopName(F), orchard: "Ma Ma's orchard", flowers: "Ma Ma's flower farm", field: "The field", shore: "The foreshore", bay: "The bay", hfarm: "Wildflower Farm", hlane: "Honeybrook station", hwoods: "Honeybrook Woods", greenhouse: "The greenhouse", mill: "The old mill", scoopshop: scoopState(F).name, rd_station: "Ronda: the station", rd_plaza: "Ronda: the plaza", rd_bridge: "Ronda: Puente Nuevo", rd_old: "Ronda: the old town" };
-    $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-    $("maphint").textContent = townOf(scene) ? { rd_station: "Ronda's station (trains home till 10pm) and the Alameda balcony over the valley. East: the plaza. South: steps down into the gorge.", rd_plaza: "The plaza: the market, the tapas bar, Doña Carmen's sweets. West: the station. South: over Puente Nuevo.", rd_bridge: "Puente Nuevo over the gorge, the viewpoint and the Moorish garden. North: back over the bridge. West: the old town.", rd_old: "La Ciudad: the convent hatch, the tile shop, the Arab baths. North: the gorge steps up to the station. East: the bridge." }[scene] : scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Mum's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+    $("sceneName").innerHTML = `<span>${esc(names[scene] || (townRoom(scene) ? `${TOWNS[townOf(scene)].n}: ${townRoom(scene).n.replace(/^The /, "the ")}` : ROOMS[scene].name))}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
+    $("maphint").textContent = townRoom(scene) ? `${townRoom(scene).say} Exit at the bottom, back out the way you came.` : townOf(scene) ? { rd_station: "Ronda's station (trains home till 10pm) and the Alameda balcony over the valley. East: the plaza. South: steps down into the gorge.", rd_plaza: "The plaza: the market, the tapas bar, Doña Carmen's sweets. West: the station. South: over Puente Nuevo.", rd_bridge: "Puente Nuevo over the gorge, the viewpoint and the Moorish garden. North: back over the bridge. West: the old town.", rd_old: "La Ciudad: the convent hatch, the tile shop, the Arab baths. North: the gorge steps up to the station. East: the bridge." }[scene] : scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Mum's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
   }
   function nightLights() {
     const art2 = $("sceneArt");
@@ -23338,6 +23817,8 @@ ${SIGNOFF[t2.who] || ""}`;
     setTimeout(() => g.remove(), 2e4);
   }
   var liveNow = () => {
+    const room = townRoom(scene);
+    if (room) return room.music;
     const town = townOf(scene);
     if (town) return TOWNS[town].music;
     const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null;
@@ -23383,12 +23864,51 @@ ${SIGNOFF[t2.who] || ""}`;
       setTimeout(() => speak(`Back in Honeybrook. ${town.n} was ${pick(["unforgettable", "a proper adventure", "glorious"])}.${t2 && t2.party.length ? ` ${partyList(t2)} head${t2.party.length > 1 ? "" : "s"} off home.` : ""}`, 5e3), 800);
     });
   }
+  var bathFact = 0;
+  var BATH_FACTS = [
+    "Eight hundred years old: the best-kept Arab baths in Spain. The water came up from the river on a wheel turned by a donkey.",
+    "Three rooms, cold, warm and hot, like a hammam. The star-shaped holes let the light down and the steam out.",
+    "Under the floor, hot air from a furnace ran through channels, so the stones were warm under your feet.",
+    "People came to wash, but mostly to talk. Like a café, with more steam."
+  ];
+  function roomSpot(id) {
+    if (id === "tapas" || id === "mercado" || id === "dulces" || id === "cuero") {
+      rondaView = id;
+      sfx("paper", true);
+      render();
+      return;
+    }
+    if (id === "banos") {
+      mel.dir = 1;
+      speak(BATH_FACTS[bathFact++ % BATH_FACTS.length], 7e3);
+      if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["stars! in the roof!", "echo! ECHO!", "it's dark and sparkly"])), 1600);
+      render();
+      return;
+    }
+    if (id === "jardin") {
+      mel.sitting = true;
+      nodes.mel.classList.add("sit");
+      sfx("chime");
+      speak(pick(["The fountain splashes, the water runs off down the channel, and the noise of the town just... stops.", "Orange blossom, myrtle, cool stone. You could sit here all afternoon.", "A sparrow drinks from the edge of the fountain. Nobody's in a hurry."]), 5500);
+      const t2 = tripOn(F), who3 = t2 ? t2.party.filter((x) => x !== "evan" && isHere(x)) : [];
+      if (who3.length) setTimeout(() => npcSay(who3[0], pick(TOWNS.ronda.lines[who3[0]] || ["Lovely."])), 2600);
+      render();
+      return;
+    }
+  }
   function townSpot(id) {
     const town = townOf(scene), T = TOWNS[town];
     if (id === "rdtrain") {
       railOpen = true;
       sfx("paper", true);
       render();
+      return;
+    }
+    const room = roomBehind(town, id);
+    if (room) {
+      sfx("paper", true);
+      setScene(room, [260, 560]);
+      setTimeout(() => speak(T.rooms[room].say, 5e3), 700);
       return;
     }
     if (["mercado", "tapas", "dulces", "convento", "azulejos"].includes(id)) {
@@ -23920,7 +24440,7 @@ ${SIGNOFF[t2.who] || ""}`;
   }
   function walkTo(x, y) {
     const b = bounds(), to = [clamp(x, b[0], b[2]), clamp(y, b[1], b[3])];
-    const pts = outside() ? findPath(scene, [mel.x, mel.y], to, b) : [to];
+    const pts = outside() || townRoom(scene) ? findPath(scene, [mel.x, mel.y], to, b) : [to];
     const first = pts.shift();
     mel.tx = first[0];
     mel.ty = first[1];
@@ -26522,6 +27042,14 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
       });
       return;
     }
+    const rs = ev.target.closest("[data-rdspot]");
+    if (rs && townRoom(scene)) {
+      go(scene, +rs.dataset.x, +rs.dataset.y, () => {
+        atSpot = "rd";
+        roomSpot(rs.dataset.rdspot);
+      });
+      return;
+    }
     const pl = ev.target.closest("[data-place]");
     if (pl && outside()) {
       const id = pl.dataset.place, v = VILLAGE[id];
@@ -26650,7 +27178,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     const key = evan.tx + "," + evan.ty;
     if (key !== evan.rk) {
       evan.rk = key;
-      evan.path = outside() ? findPath(scene, [evan.x, evan.y], [evan.tx, evan.ty], bounds()) : [[evan.tx, evan.ty]];
+      evan.path = outside() || townRoom(scene) ? findPath(scene, [evan.x, evan.y], [evan.tx, evan.ty], bounds()) : [[evan.tx, evan.ty]];
     }
     const p = evan.path && evan.path[0];
     if (!p) {
@@ -26740,7 +27268,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
           evan.target = null;
           if (Math.random() < 0.4) setTimeout(() => evanSays(pick(["dig dig!", "sandcastle!", "look Mama!"])), 1500);
         } else {
-          const s = pick(EVAN_SPOTS[scene]);
+          const s = pick(EVAN_SPOTS[scene] || (townRoom(scene) || {}).party || [[260, 420]]);
           evan.tx = s[0] + rnd(-14, 14);
           evan.ty = s[1] + rnd(-8, 8);
           evan.run = Math.random() < 0.35;

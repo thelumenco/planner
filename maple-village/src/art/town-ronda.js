@@ -260,7 +260,11 @@ function oldScreen(){
     <g ${W} stroke-width="1">${[0, 1, 2, 3, 4, 5].map(i => `<rect x="${100 + (i % 2)*16}" y="${18 + i*14}" width="34" height="8" style="fill:#CDBF9F"/>`).join("")}</g>${pricklyPear(30, 96)}${pricklyPear(470, 96)}</g>
     <g data-place="rdStepsUp" aria-label="Down into the gorge and up the steps to the station"><ellipse class="hov" cx="124" cy="60" rx="28" ry="36" style="fill:var(--butter)" opacity=".0"/>${lab(210, 124, "Steps up to the station", "#F6E3B4", 10)}</g>`;
   // houses: white walls, iron balconies, blue pots of geraniums
-  const houses = casa(26, 160, 150, 102, {balcony: true, bougain: "l", pots: true}) + casa(26, 340, 130, 104, {balcony: true, pots: true});
+  // round 116: the lower house is Antonio's leather workshop now (a sign, a bag hanging by the door; it has an inside)
+  const cuero = `<g data-place="cuero" aria-label="The leather workshop"><ellipse class="hov" cx="91" cy="456" rx="40" ry="12" style="fill:var(--butter)"/>${casa(26, 340, 130, 104, {balcony: true, pots: true})}
+    ${sk(`<rect x="44" y="384" width="94" height="14" rx="2" style="fill:#7A3A2A"/><path d="M130 408 h12 v4 h-12z" style="fill:#2F2B28"/><path d="M134 412 q-6 2 -6 12 h20 q0 -10 -6 -12z" style="fill:#A8754F"/>`, `<rect x="44" y="384" width="94" height="14" rx="2"/><path d="M134 412 q-6 2 -6 12 h20 q0 -10 -6 -12z M134 412 q4 -8 8 0"/>`)}
+    <text x="91" y="394.5" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="7.6" fill="#F3E7C8" pointer-events="none">PIEL · UBRIQUE</text>${lab(91, 470, "Leather workshop", "#E8D3BC", 9)}</g>`;
+  const houses = casa(26, 160, 150, 102, {balcony: true, bougain: "l", pots: true}) + cuero;
   // the convent: a plain white wall, a bell gable with two bells, and the nuns' turntable hatch
   const convent = `<g data-place="convento" aria-label="The convent hatch">${shade(326, 140, 174, 104)}
     ${sk(`<rect x="326" y="140" width="174" height="104" style="fill:${C.white}"/>${tileRoof(322, 124, 182, 18).art}<path d="M384 124 V90 H424 V124z" style="fill:${C.white}"/><path d="M384 90 L404 74 L424 90z" style="fill:${C.white}"/><path d="M392 114 v-12 q5 -6 10 0 v12z M406 114 v-12 q5 -6 10 0 v12z" style="fill:#3A3A44"/><circle cx="397" cy="110" r="3" style="fill:${C.ochre}"/><circle cx="411" cy="110" r="3" style="fill:${C.ochre}"/><path d="M342 244 v-40 q14 -14 28 0 v40z" style="fill:#6B4430"/><circle cx="404" cy="216" r="14" style="fill:#A8754F"/><circle cx="404" cy="216" r="9" style="fill:#7A4A30"/>${reja(450, 170, 20, 26).art}`,
@@ -307,3 +311,5 @@ export function trainRideArt(town){
     <circle cx="30" cy="50" r="6" fill="#5A4A40"/><circle cx="58" cy="50" r="6" fill="#5A4A40"/><circle cx="102" cy="50" r="6" fill="#5A4A40"/><circle cx="130" cy="50" r="6" fill="#5A4A40"/><circle cx="57" cy="23" r="4" fill="#F2D3BC"/><circle cx="86" cy="23" r="4" fill="#C99A78"/></g></svg></div>`;
   return bank + train;
 }
+// (the interiors, art/ronda-rooms.js, draw with the same palette and plants)
+export { C as RC, orangeTree, cypress, bougain, pot };

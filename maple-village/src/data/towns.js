@@ -31,11 +31,11 @@ export const TOWNS = {
     // haggles while the market's on). act: an npcs.js act (a prop, an animation)
     acts: {
       mum: {rd_plaza: {act: "dance", at: [282, 398], hours: [[11*60, 14*60], [18*60, 22*60]]}},
-      dad: {rd_bridge: {act: "sketch", at: [452, 304], dir: -1}, rd_station: {act: "sketch", at: [130, 470], dir: -1}},
-      mama: {rd_plaza: {act: "haggle", at: [150, 222], dir: -1, hours: [[8*60, 14*60]]}},
-      gonggong: {rd_plaza: {act: "doze", at: [206, 446]}, rd_station: {act: "doze", at: [260, 494]}},
-      marcus: {rd_bridge: {act: "photo", at: [300, 120]}, rd_old: {act: "photo", at: [124, 130]}},
-      angelina: {rd_plaza: {act: "notes", at: [440, 248], dir: -1}, rd_bridge: {act: "notes", at: [300, 520]}}
+      dad: {rd_bridge: {act: "sketch", at: [452, 304], dir: -1}, rd_station: {act: "sketch", at: [130, 470], dir: -1}, rd_banos: {act: "sketch", at: [430, 380], dir: -1}},
+      mama: {rd_plaza: {act: "haggle", at: [150, 222], dir: -1, hours: [[8*60, 14*60]]}, rd_mercado: {act: "haggle", at: [170, 362], dir: -1}},
+      gonggong: {rd_plaza: {act: "doze", at: [206, 446]}, rd_station: {act: "doze", at: [260, 494]}, rd_jardin: {act: "doze", at: [380, 604]}},
+      marcus: {rd_bridge: {act: "photo", at: [300, 120]}, rd_old: {act: "photo", at: [124, 130]}, rd_banos: {act: "photo", at: [110, 330]}},
+      angelina: {rd_plaza: {act: "notes", at: [440, 248], dir: -1}, rd_bridge: {act: "notes", at: [300, 520]}, rd_cafe: {act: "notes", at: [230, 482], dir: -1}}
     },
     // a word now and then, and what they say when Mel taps them (on top of their usual chat)
     lines: {
@@ -48,6 +48,23 @@ export const TOWNS = {
       angelina: ["Everyone here talks with their hands. I'm taking notes.", "That couple at the café have been arguing for an hour and they're so happy.", "I could read in that garden all day."],
       evan: ["so HIGH", "birdies! big birdies!", "pigeons! catch it!", "Mama, hold hand"]
     },
+    // round 116: the interiors (see the playbook: every town gets four or five, through the doors on its screens).
+    // door: the outdoor place you go in by; music: each room's own live track (audio.js); party: where the family
+    // wander inside; say: a line as Mel steps in
+    rooms: {
+      rd_tapas: {door: "tapas", n: "The tapas bar", music: "rd_tapas", party: [[220, 520], [300, 540], [180, 480], [390, 520], [250, 300]],
+        say: "Inside the tapas bar: hams hanging from the beams, tiles on the walls, and everyone talking at once."},
+      rd_cafe: {door: "dulces", n: "Doña Carmen's café", music: "rd_cafe", party: [[260, 560], [300, 380], [200, 560], [420, 520], [120, 560]],
+        say: "Doña Carmen's: cool tiles, a ceiling fan turning, trays of yemas, and the smell of coffee."},
+      rd_banos: {door: "banos", n: "The Arab baths", music: "rd_banos", party: [[160, 520], [360, 520], [260, 560], [120, 360], [400, 360]],
+        say: "The Arab baths. Cool and quiet under the domes, with little star-shaped holes letting the sun in."},
+      rd_jardin: {door: "jardin", n: "The Moorish garden", music: "rd_jardin", party: [[230, 220], [290, 520], [60, 380], [460, 380], [260, 590]],
+        say: "The Moorish garden: water running down the middle, orange trees, myrtle hedges. It's ten degrees cooler in here."},
+      rd_cuero: {door: "cuero", n: "The leather workshop", music: "rd_cuero", party: [[200, 520], [320, 540], [140, 440], [400, 470]],
+        say: "The leather workshop: the smell of new leather, hides hanging on the walls, and Antonio stitching at his bench. Everything here comes from Ubrique, over the hills."},
+      rd_mercado: {door: "mercado", n: "The covered market", music: "rd_mercado", party: [[200, 420], [320, 420], [260, 530], [120, 420], [400, 440]],
+        say: "The covered market: iron columns, a glass roof, and a hundred voices haggling."}
+    },
     // places on the four screens with nothing else to do yet: a line when Mel walks up
     say: {
       alameda: "The Alameda balcony: an iron railing right on the cliff edge. Far below, the valley: olive groves, cork oaks, little white farms, and the blue mountains beyond.",
@@ -59,13 +76,18 @@ export const TOWNS = {
       mirador: "The viewpoint over the gorge. A hundred metres straight down to the river, and the waterfall roaring under the bridge.",
       jardin: "The Moorish garden: fountains, water channels and cypress hedges, cool even at midday.",
       convento: "The convent. There's a little turntable in the wall: knock, and the nuns pass out biscuits.",
+      cuero: "A leather workshop, with bags and belts in the window. A sign says: Piel de Ubrique.",
       azulejos: "Lucía's tile shop: hand-painted tiles of every view in Ronda, cork crafts and painted fans.",
       banos: "The Arab baths: low domes with star-shaped skylights, eight hundred years old.",
       puerta: "The old town gate, with its horseshoe arches. Beyond it the road winds down into the valley."
     }
   }
 };
-export const TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t]) => t.screens.map(s => [s, id])));
+export const TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t]) => [...t.screens, ...Object.keys(t.rooms || {})].map(s => [s, id])));
+// an interior of a town (round 116) -> its room entry, or null
+export const townRoom = scene => { const t = TOWNS[TOWN_SCENES[scene]]; return (t && t.rooms && t.rooms[scene]) || null; };
+// the room behind an outdoor place's door ("tapas" -> "rd_tapas")
+export const roomBehind = (town, place) => Object.keys((TOWNS[town] || {}).rooms || {}).find(r => TOWNS[town].rooms[r].door === place) || null;
 export const townOf = scene => TOWN_SCENES[scene] || null;
 
 // Places on the town screens (merged into world.js VILLAGE). bridge: a gate to another screen of the same town.
@@ -90,6 +112,12 @@ export const TOWN_PLACES = {
   banos: {scene: "rd_old", name: "The Arab baths", door: [118, 598], spot: true, mark: [118, 500], line: "The Arab baths."},
   puerta: {scene: "rd_old", name: "The old town gate", door: [330, 604], spot: true, mark: [330, 520], line: "The old town gate."},
   rdToBridge: {scene: "rd_old", name: "To the bridge", door: [504, 380], spot: true, bridge: "rd_bridge", mark: [476, 320], line: "East to Puente Nuevo and the viewpoint."},
+  // the interiors' own entries (their way out is back through the door they came in by)
+  rd_tapas: {scene: "rd_plaza", name: "The tapas bar", door: [392, 184]}, rd_cafe: {scene: "rd_plaza", name: "Doña Carmen's café", door: [424, 470]},
+  rd_mercado: {scene: "rd_plaza", name: "The covered market", door: [130, 184]}, rd_banos: {scene: "rd_old", name: "The Arab baths", door: [118, 598]},
+  rd_jardin: {scene: "rd_bridge", name: "The Moorish garden", door: [330, 432]},
+  cuero: {scene: "rd_old", name: "The leather workshop", door: [91, 466], spot: true, mark: [91, 320], line: "The leather workshop."},
+  rd_cuero: {scene: "rd_old", name: "The leather workshop", door: [91, 466]},
   rdStepsUp: {scene: "rd_old", name: "Steps up out of the gorge", door: [120, 40], spot: true, bridge: "rd_station", mark: [200, 30], line: "Down into the gorge, over the old bridge and up the steps to the new town."}
 };
 export const TOWN_BRIDGES = {rd_station: {rd_plaza: "rdToPlaza", rd_old: "rdStepsDown"}, rd_plaza: {rd_station: "rdToStation", rd_bridge: "rdBridgeN"},
@@ -97,8 +125,16 @@ export const TOWN_BRIDGES = {rd_station: {rd_plaza: "rdToPlaza", rd_old: "rdStep
 export const TOWN_ARRIVE = {"rd_station>rd_plaza": [44, 330], "rd_plaza>rd_station": [474, 300], "rd_plaza>rd_bridge": [310, 60], "rd_bridge>rd_plaza": [330, 572],
   "rd_bridge>rd_old": [476, 380], "rd_old>rd_bridge": [44, 520], "rd_station>rd_old": [130, 76], "rd_old>rd_station": [180, 566]};
 // walking areas, and what's in the way (paths.js)
-export const TOWN_BOUNDS = {rd_station: [90, 178, 506, 616], rd_plaza: [14, 180, 506, 616], rd_bridge: [14, 22, 506, 616], rd_old: [14, 36, 506, 616]};
+export const TOWN_BOUNDS = {rd_cuero: [30, 250, 490, 600], rd_tapas: [30, 250, 490, 600], rd_cafe: [30, 260, 490, 600], rd_banos: [30, 220, 490, 600], rd_jardin: [30, 176, 490, 606], rd_mercado: [30, 250, 490, 600],
+  rd_station: [90, 178, 506, 616], rd_plaza: [14, 180, 506, 616], rd_bridge: [14, 22, 506, 616], rd_old: [14, 36, 506, 616]};
 export const TOWN_OBST = {
+  // the interiors: the tables, the hedges, the stalls
+  rd_tapas: [[96, 362, 144, 392], [276, 402, 324, 432], [396, 282, 444, 312]],
+  rd_cafe: [[90, 316, 130, 340], [180, 456, 220, 480], [350, 406, 390, 430]],
+  rd_banos: [[214, 440, 306, 500]],
+  rd_jardin: [[60, 196, 214, 344], [306, 196, 460, 344], [60, 420, 214, 560], [306, 420, 460, 560], [224, 344, 296, 410]],
+  rd_cuero: [[170, 300, 350, 350]],
+  rd_mercado: [[40, 296, 156, 350], [364, 296, 480, 350], [40, 466, 136, 514]],
   rd_station: [[0, 0, 84, 640], [244, 60, 418, 160], [178, 418, 250, 474], [84, 588, 156, 640], [206, 588, 520, 640], [400, 380, 470, 440]],
   rd_plaza: [[30, 36, 228, 172], [292, 36, 488, 172], [222, 306, 298, 366], [440, 384, 520, 500], [0, 592, 296, 640], [366, 592, 520, 640], [180, 432, 232, 458], [0, 392, 60, 488], [0, 508, 74, 590]],
   rd_bridge: [[0, 0, 268, 214], [352, 0, 520, 214], [24, 292, 206, 420], [300, 470, 360, 560], [0, 214, 200, 252]],
@@ -116,10 +152,17 @@ export const TOWN_GOODS = {
   payoyo: {n: "Payoyo goat's cheese", kind: "ingredient", price: 12, sell: 4, shop: "mercado", art: ["wheel", "#F3E7C8", "#C9A27E"], what: "a mountain goat's cheese from Ronda: payoyo with membrillo at the kitchen"},
   membrillo: {n: "Membrillo", kind: "ingredient", price: 6, sell: 2, shop: "mercado", art: ["bar", "#C8643B"], what: "quince paste from Ronda: with payoyo at the kitchen, a quince bonbon filling"},
   picnic: {n: "Picnic basket", kind: "picnic", price: 18, sell: 0, shop: "mercado", art: ["tote", "#C9A27E", "#E8566C"], what: "bread, cheese, jamón and oranges: spread it out at the Alameda balcony"},
+  churros: {n: "Churros", kind: "gift", to: "family", price: 4, shop: "dulces", art: ["roll", "#E8C48E", "#C98A4A"], say: "Churros! Still warm, and sugary all over. Is there chocolate?", says: {evan: "CHURROS! Dip dip dip!"}},
   yemas: {n: "Yemas del Tajo", kind: "gift", to: "family", price: 8, shop: "dulces", art: ["box", "#F3C24A", "#FFFDF6"], say: "Yemas! Egg yolk and sugar, like little suns. From Ronda?"},
   tartaalm: {n: "Almond cake", kind: "gift", to: "family", price: 10, shop: "dulces", art: ["tart", "#E8C48E", "#FFFDF6"], say: "An almond cake, all the way from Ronda. Kettle on!"},
   pastas: {n: "Convent biscuits", kind: "gift", to: "family", price: 5, shop: "convento", art: ["disc", "#E8C48E", "#C98A4A"], say: "Biscuits made by nuns! They taste like a hundred years of practice.", says: {evan: "Biscuits from a WALL! Again!"}},
   abanico: {n: "Painted fan", kind: "gift", to: ["mum", "mama", "angelina"], price: 12, shop: "azulejos", art: ["cloth", "#C2307A", "#F3C969"], say: "A painted fan! Very elegant. Very useful in this heat."},
+  // round 116: Antonio's leather workshop in the old town, everything made in Ubrique, the leather village over the hills
+  cartera: {n: "Leather wallet", kind: "gift", to: ["dad", "darren", "marcus", "gonggong"], price: 24, shop: "cuero", art: ["box", "#8A5A3A", "#C98A4A"], say: "A leather wallet from Ubrique! Smells amazing. Feel those stitches."},
+  bolso: {n: "Leather handbag", kind: "gift", to: ["mum", "mama", "angelina"], price: 60, shop: "cuero", art: ["tote", "#7A3A2A", "#C98A4A"], say: "Oh, Mel. A Ubrique bag! This will last me forever."},
+  cinturon: {n: "Leather belt", kind: "gift", to: ["dad", "darren", "marcus", "gonggong"], price: 30, shop: "cuero", art: ["roll", "#5A3A2A", "#D9A441"], say: "A proper leather belt, hand-stitched. Very smart."},
+  libreta: {n: "Leather notebook", kind: "gift", to: ["angelina", "mum", "darren"], price: 18, shop: "cuero", art: ["box", "#A8754F", "#F3E7C8"], say: "A leather notebook! For lists. And secret lists."},
+  llavero: {n: "Leather keyring", kind: "gift", to: "family", price: 6, shop: "cuero", art: ["disc", "#C98A4A", "#D9A441"], say: "A little leather keyring, with a stamped bridge on it. Sweet!"},
   corcho: {n: "Cork coasters", kind: "gift", to: ["dad", "darren", "gonggong", "marcus"], price: 9, shop: "azulejos", art: ["disc", "#B98A5A", "#8A6A52"], say: "Cork from the cork oaks! Light as anything."}
 };
 // Lucía's painted tiles: collect all eight and they become a tiled bench by the pond at home. Some only in season.

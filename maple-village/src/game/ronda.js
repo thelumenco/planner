@@ -34,6 +34,11 @@ export function buyTile(F, id, day = dayKey()){
   F.coins -= t.price; r.tiles[id] = true; const all = Object.keys(TILES).every(k => r.tiles[k]); if (all) r.bench = true;
   return {t, all};
 }
+// round 116: a café con leche and a churro at one of Doña Carmen's marble tables
+// (or churros con chocolate: thick hot chocolate for dipping)
+export const CAFE_PRICE = 3, CAFE = {leche: {n: "Café con leche and a churro", price: 3, line: "Sit down at a marble table under the fan. Doña Carmen brings it over."},
+  choc: {n: "Churros con chocolate", price: 4, line: "A plate of hot churros and a cup of chocolate so thick the spoon stands up."}};
+export function cafeTreat(F, kind = "leche"){ const c = CAFE[kind]; if (!c || F.coins < c.price) return null; F.coins -= c.price; const r = rondaState(F); r.cafes = (r.cafes || 0) + 1; return r.cafes; }
 export function picnic(F, addInv, day = dayKey()){
   const r = rondaState(F); if (!(F.inv && F.inv.picnic > 0)) return null;
   addInv("picnic", -1); r.picnics++; r.picnicDay = day; return true;
@@ -62,9 +67,11 @@ export function tapasBarPanel(F){
   return h + shut;
 }
 export function shopPanel(F, shop){
-  const head = {dulces: ["Doña Carmen's sweet shop", "Trays of yemas like little golden suns, and almond cakes dusted with sugar. Doña Carmen learned the yemas from the nuns when she was a girl."],
+  const head = {dulces: ["Doña Carmen's café", "Trays of yemas like little golden suns, and almond cakes dusted with sugar. Doña Carmen learned the yemas from the nuns when she was a girl."],
+    cuero: ["Antonio's leather workshop", "Everything here was cut and stitched by hand in Ubrique, the leather village over the hills: wallets, bags, belts, notebooks. Antonio does the repairs himself, at the bench."],
     convento: ["The convent hatch", "A wooden turntable in the wall. You knock, say what you'd like, put your coins on it, and it turns: biscuits, from nuns you never see."]}[shop];
-  return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(head[0])}</h2><p class="sub">${esc(head[1])}</p><ul class="hlist wlist">${shopGoods(shop).map(id => goodRow(F, id)).join("")}</ul>` + shut;
+  const cafe = shop === "dulces" ? `<h3 class="ph3">At a table</h3><ul class="hlist wlist">${Object.entries(CAFE).map(([k, c]) => `<li><span class="wpic">${icon(k === "leche" ? "coffee" : "churros", 28)}</span><span class="wtxt"><b>${esc(c.n)}</b><small>${esc(c.line)}</small></span><button class="btn small primary" data-rcafe="${k}" ${F.coins >= c.price ? "" : "disabled"}>${c.price} ${coin()}</button></li>`).join("")}</ul><h3 class="ph3">To take away</h3>` : "";
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(head[0])}</h2><p class="sub">${esc(head[1])}</p>${cafe}<ul class="hlist wlist">${shopGoods(shop).map(id => goodRow(F, id)).join("")}</ul>` + shut;
 }
 const tilePic = (t, own) => `<svg viewBox="0 0 40 40" width="44" height="44" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="2" fill="${own ? "#FFFDF6" : "#EFE8DA"}" stroke="#3b3530" stroke-width="1.4"/><rect x="6" y="6" width="28" height="28" fill="none" stroke="#3E6BAE" stroke-width="2"/><circle cx="20" cy="20" r="8" fill="${t.col}" opacity="${own ? 1 : .35}"/><path d="M6 6l5 5M34 6l-5 5M6 34l5-5M34 34l-5-5" stroke="#3E6BAE" stroke-width="1.4"/></svg>`;
 export function tilePanel(F, day = dayKey()){

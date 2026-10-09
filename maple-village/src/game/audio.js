@@ -71,7 +71,26 @@ export const TRACKS = {
   ronda: {name: "A guitar in Ronda", live: true, bpm: 104, steps: 8, tone: "guitar", strum: [0, 3, 6], arp: [1, 4, 3, 2, 5, 4, 3, 5], arpVel: .05, mel: .95,
     bars: [[45, 57, 64, 69, 72, 76], [43, 55, 62, 67, 71, 74], [41, 53, 60, 65, 69, 72], [40, 52, 59, 64, 68, 71], [45, 57, 64, 69, 72, 76], [43, 55, 62, 67, 71, 74], [41, 53, 60, 65, 69, 72], [40, 52, 59, 64, 68, 71]],
     lines: [[[0, 76], [1, 77], [1.5, 76], [2, 74], [3, 72]], [[0, 74], [1, 72], [2, 71], [3, 69]], [[0, 72], [1, 71], [1.5, 72], [2, 69], [3, 68]], [[0, 77], [1, 76], [2, 74], [2.5, 72], [3, 71]],
-      [[0, 69], [.5, 71], [1, 72], [2, 76], [3, 72]], [[0, 71], [1, 74], [2, 71], [3, 67]], [[0, 69], [1, 72], [2, 69], [2.5, 67], [3, 65]], [[0, 64], [1, 65], [1.5, 64], [2, 65], [2.5, 64], [3, 68]]]}
+      [[0, 69], [.5, 71], [1, 72], [2, 76], [3, 72]], [[0, 71], [1, 74], [2, 71], [3, 67]], [[0, 69], [1, 72], [2, 69], [2.5, 67], [3, 65]], [[0, 64], [1, 65], [1.5, 64], [2, 65], [2.5, 64], [3, 68]]]},
+  // Round 116: each of Ronda's interiors has its own music (live, while Mel's inside)
+  // the tapas bar: a quick rumba on the guitar in D minor, strummed on every off-beat
+  rd_tapas: {name: "Rumba at the tapas bar", live: true, bpm: 132, steps: 8, tone: "guitar", strum: [0, 2, 3, 5, 6], arp: [1, 3, 2, 4, 5, 3, 2, 4], arpVel: .045, mel: .9,
+    bars: [[38, 50, 57, 62, 65, 69], [36, 48, 55, 60, 64, 67], [34, 46, 53, 58, 62, 65], [33, 45, 52, 57, 61, 64], [38, 50, 57, 62, 65, 69], [36, 48, 55, 60, 64, 67], [34, 46, 53, 58, 62, 65], [33, 45, 52, 57, 61, 64]]},
+  // Doña Carmen's café: a slow waltz on the electric piano, in D, like an old radio on the counter
+  rd_cafe: {name: "Café waltz", live: true, bpm: 96, steps: 6, tone: "rhodes", arp: [1, 3, 4, 3, 2, 3], arpVel: .045, mel: .7,
+    bars: [[38, 62, 66, 69, 74], [35, 62, 66, 71, 74], [43, 62, 67, 71, 74], [45, 61, 64, 67, 69, 73], [38, 62, 66, 69, 74], [43, 59, 62, 67, 71], [45, 61, 64, 69, 73], [38, 57, 62, 66, 69]]},
+  // the Arab baths: slow bells over a low drone, the flattened second of the old modes, echoing under the domes
+  rd_banos: {name: "Under the star domes", live: true, bpm: 44, steps: 8, tone: "bell", arp: [1, 2, 3, 4, 3, 2, 4, 3], arpVel: .03, mel: .35,
+    bars: [[38, 62, 63, 69, 74], [38, 62, 65, 70, 74], [38, 62, 63, 67, 74], [38, 61, 65, 69, 73]]},
+  // the Moorish garden: bright little bells like water, rippling up and down in A
+  rd_jardin: {name: "The fountain garden", live: true, bpm: 78, steps: 8, tone: "bell", arp: [1, 2, 3, 4, 5, 4, 3, 2], arpVel: .04, mel: .55, up: 12,
+    bars: [[45, 61, 64, 69, 73, 76], [42, 61, 66, 69, 73, 78], [38, 62, 66, 69, 74, 78], [40, 59, 64, 68, 71, 76]]},
+  // the leather workshop: a slow soleá on the workshop radio, in E, unhurried like the stitching
+  rd_cuero: {name: "The workshop radio", live: true, bpm: 80, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 2, 3, 4, 5, 4, 3, 2], arpVel: .04, mel: .6,
+    bars: [[40, 52, 59, 64, 68, 71], [41, 53, 60, 65, 69, 72], [43, 55, 62, 67, 71, 74], [41, 53, 60, 65, 69, 72], [45, 57, 64, 69, 72, 76], [43, 55, 62, 67, 71, 74], [41, 53, 60, 65, 69, 72], [40, 52, 59, 64, 68, 71]]},
+  // the covered market: a sunny strum in G, all major chords, for the morning bustle
+  rd_mercado: {name: "Market morning", live: true, bpm: 116, steps: 8, tone: "guitar", strum: [0, 3, 6], arp: [1, 4, 3, 2, 5, 4, 3, 5], arpVel: .05, mel: .85,
+    bars: [[43, 55, 59, 62, 67, 71], [48, 55, 60, 64, 67, 72], [50, 57, 62, 66, 69, 74], [43, 55, 59, 62, 67, 71], [40, 52, 59, 64, 67, 71], [48, 55, 60, 64, 67, 72], [50, 57, 62, 66, 69, 74], [43, 55, 59, 62, 67, 71]]}
 };
 // a live band (the night market's jazz duo) takes over from the record player while Mel's in earshot
 let live = null;

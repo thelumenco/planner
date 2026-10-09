@@ -1501,6 +1501,11 @@ Write the proposal for Mel covering every item below. Only build after she says 
 
 ### 2. Town template (once approved)
 - **Screens:** four outdoor screens (2×2) joined by gates, with their own palette and art file (`src/art/town-<id>.js`) and their own obstacles and bounds. They're not linked to Honeybrook's BRIDGES; travel is the only way in or out.
+- **Interiors (Mel, round 116): every new town gets four to five interior screens**, more if Mel asks for them (Ronda has six). You go in through the door of the matching place on an outdoor screen.
+  - **Layout:** each room's layout is ours to design: its own floor, walls, light and furniture, kept calm with a few strong pieces and plenty of floor.
+  - **People:** each room has people in it, locals and tourists with routines across the day, two to four at a time, so it never feels empty but never crowded. The family follow Mel inside.
+  - **Music:** each room has its own live track in audio.js, different from the town's street music and from every other room.
+  - **How it's built:** list the rooms in `rooms` on the town (door, name, music, party spots, the line said on entering). Add a TOWN_PLACES entry with the room's id so the Exit works, its bounds and obstacles in TOWN_BOUNDS and TOWN_OBST, and its art in `src/art/<town>-rooms.js`. Things to tap inside use `data-rdspot` (core.js `roomSpot`).
 - **Day trips only:** no accommodation. Stay as long as you like, then travel home. A trip ends when the game day ends, and Mel wakes at home.
 - **Resume:** reopening the same day puts Mel back where she was in the town (`F.where`). The trip state is saved in `F.trip`.
 
@@ -1669,3 +1674,16 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Field gate `toFarmN` at the top, at x=366, between the trees. Its label is hidden on market days because the stalls fill the top row.
   - Farm gate `toFieldH` at the bottom of the centre lane.
   - Both are in BRIDGES and ARRIVE, so routing now goes field↔farm directly.
+
+### Round 116: Ronda's interiors, the leather workshop and churros
+- **Six interiors**, each entered through its door outdoors (`TOWNS.ronda.rooms`, `townRoom`, `roomBehind`). `townOf` covers them too. Art is in art/ronda-rooms.js.
+  - The tapas bar (`rd_tapas`): hams on the beam, a tiled dado, the zinc bar to order at, barrel tables.
+  - Doña Carmen's café (`rd_cafe`): an arched window, a ceiling fan, the glass counter, marble tables. New: sit down for a café con leche and a churro (3), or churros con chocolate (4), via `cafeTreat`. Churros to take away (a family gift, 4).
+  - The Arab baths (`rd_banos`): horseshoe arches, star skylights with shafts of light, a basin. Tap "Look up" for facts.
+  - The Moorish garden (`rd_jardin`): a water channel and fountain, four myrtle beds with orange trees, tiled benches. Sit by the fountain.
+  - The covered market (`rd_mercado`): an iron and glass hall, Rafael's stall (the market panel), fruit, ham, Rocío's flowers.
+  - The leather workshop (`rd_cuero`): Mel asked for one in a blank house, so it's the lower-left house on `rd_old`, signed "PIEL · UBRIQUE". Inside are hides, a shelf of bags and Antonio's bench. The shop sells Ubrique leather: a wallet, a handbag, a belt, a notebook and a keyring, all gifts.
+- **Each room has its own live track** (audio.js): `rd_tapas` rumba, `rd_cafe` waltz, `rd_banos` bells, `rd_jardin` water bells, `rd_mercado` bright strum, `rd_cuero` slow soleá.
+- **New Ronda locals and tourists**, with routines spread over the rooms: Paco (waiter), Pepe (paper, siesta), Lola (shopping), Amina (baths guide), Joaquín (gardener), Rocío (flowers), Antonio (leather), and the tourists Ingrid, Kenji and Chloé.
+  - Doña Carmen now works inside her café, and Rafael inside the market.
+- **Inside rooms**, Mel, Evan and the villagers route round the furniture: findPath is on for town rooms.

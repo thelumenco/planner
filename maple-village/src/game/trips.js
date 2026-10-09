@@ -37,7 +37,7 @@ export function initTrips(getF){ setAway(day => { const F = getF(); return F ? a
 // near their favourite spot on that screen. Not in Honeybrook at all, including while Mel's on the train.
 export function tripSlot(F, id, day, hm, melScene){
   const t = tripOn(F, day); if (!t || !t.party.includes(id) || hm < t.from) return null;
-  const T = TOWNS[t.town], scene = townOf(melScene) === t.town ? melScene : T.arrive[0], spots = (T.spots[id] || {})[scene];
+  const T = TOWNS[t.town], scene = townOf(melScene) === t.town ? melScene : T.arrive[0], spots = (T.spots[id] || {})[scene] || ((T.rooms || {})[scene] || {}).party;   // (inside, the room's own spots)
   // at their spot doing their thing (in its hours), else strolling; the slot starts when the act starts or stops,
   // so they walk over (glide) rather than popping
   const a = ((T.acts || {})[id] || {})[scene], w = a && (a.hours ? a.hours.find(([f, e]) => hm >= f && hm < e) : [t.from, T.backTo]);

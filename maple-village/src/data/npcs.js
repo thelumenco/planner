@@ -362,7 +362,7 @@ export const NPCS = [
     id: "carmen", local: "ronda", pitch: 0.9, name: "Doña Carmen", job: "Keeps the sweet shop on Ronda's plaza",
     intro: "¡Hola, guapa! Doña Carmen. Yemas, almond cake, and sixty years of gossip. Come in, come in, out of the sun.",
     look: {skin: "#D9A47E", hair: "#E8E4DE", hairStyle: "bun", top: "#3A3430", bottom: "#3A3430", extra: "apron"},
-    routine: [slot("9:00", "14:00", "rd_plaza", [[414, 520], [424, 530], [404, 526]]), slot("17:30", "21:00", "rd_plaza", [[414, 520], [424, 530]]), slot("21:00", "22:00", "rd_plaza", [320, 290], {act: "sit"})],
+    routine: [slot("9:00", "14:00", "rd_cafe", [[336, 262], [458, 262], [400, 300]]), slot("17:30", "21:00", "rd_cafe", [[336, 262], [458, 262]]), slot("21:00", "22:00", "rd_plaza", [320, 290], {act: "sit"})],
     lines: ["Sit, sit. Have a yema. Have two.", "In my day this plaza was all donkeys. Now it's all telephones.", "The nuns taught me everything. Except patience.", "Too thin! Eat something."],
     away: "Doña Carmen's having her siesta. The shop opens again at half past five."
   },
@@ -370,7 +370,7 @@ export const NPCS = [
     id: "rafael", local: "ronda", pitch: 0.65, name: "Rafael", job: "Olive farmer, with a stall at Ronda's market",
     intro: "Rafael. Oil, almonds. My family has pressed olives in the valley for five generations. Taste. No bread, just taste.",
     look: {skin: "#B9825E", hair: "#4A4440", hairStyle: "short", top: "#7A8A5A", bottom: "#5A4A3E", extra: "cap"},
-    routine: [slot("8:00", "14:00", "rd_plaza", [[118, 214], [140, 216], [128, 222]]), slot("18:00", "20:00", "rd_plaza", [440, 296], {act: "sit", dir: -1})],
+    routine: [slot("8:00", "14:00", "rd_mercado", [312, 262], {dir: -1}), slot("18:00", "20:00", "rd_plaza", [440, 296], {act: "sit", dir: -1})],
     lines: ["Good oil, you taste it in the back of the throat. It bites a little.", "The olives don't care about your problems. That's why I like them.", "Almonds this year: small, but sweet. Like my grandmother.", "Hmph. You again. Good."],
     away: "Rafael's back at the farm in the valley. The market stall's covered up till morning."
   },
@@ -391,6 +391,76 @@ export const NPCS = [
     actLines: {guitar: ["*strums*", "Olé!", "This one's for the pigeons."]},
     away: "Manolo's guitar case is shut. He's having a coffee somewhere."
   },
+  // Round 116: the people in Ronda's interiors (local: "ronda"), so the rooms never feel empty: Paco the waiter,
+  // Pepe with his paper, Lola with her shopping, Amina who shows people round the baths, Joaquín the gardener,
+  // Rocío's flowers at the market, and three tourists doing the sights (a few in each room at a time, never a crowd)
+  {
+    id: "paco", local: "ronda", pitch: 0.75, name: "Paco", job: "Waiter at the tapas bar",
+    intro: "Paco! Sit anywhere, anywhere. The croquetas are hot, the beer is cold, and my feet are tired.",
+    look: {skin: "#C99470", hair: "#2A211D", hairStyle: "short", top: "#FFFDF6", bottom: "#2F2B28", extra: "apron"},
+    routine: [slot("9:30", "16:00", "rd_tapas", [[200, 290], [360, 270], [240, 360], [380, 400], [160, 330]]), slot("19:00", "22:30", "rd_tapas", [[200, 290], [360, 270], [240, 360], [380, 400]])],
+    lines: ["Two salmorejo, one croqueta, coming!", "In Ronda we eat late. Lunch at three, dinner at ten. Breakfast? Coffee.", "The ham's from the mountains. The pigs ate acorns all their lives. Happy pigs.", "Mind the step, guapa."],
+    away: "Paco's having his own lunch, in the kitchen, standing up."
+  },
+  {
+    id: "pepe", local: "ronda", pitch: 0.6, name: "Pepe", job: "Retired, reads the paper all over town",
+    intro: "Pepe. Eighty-one. I've read the paper in every chair in Ronda. This one's the best.",
+    look: {skin: "#C08B66", hair: "#E8E4DE", hairStyle: "short", top: "#7A6A5A", bottom: "#4A4440", extra: "cap"},
+    routine: [slot("9:00", "12:00", "rd_cafe", [80, 340], {act: "sit"}), slot("12:30", "15:00", "rd_tapas", [92, 392], {act: "sit"}), slot("17:00", "20:00", "rd_jardin", [120, 604], {act: "doze"})],
+    lines: ["The news is the same as yesterday. Only louder.", "When I was a boy we swam in the river at the bottom of the gorge. Mad.", "Sit, sit. The chair's free. The advice is free too.", "Hmm? Oh. I was resting my eyes."],
+    away: "Pepe's having his siesta. Nobody disturbs Pepe's siesta."
+  },
+  {
+    id: "lola", local: "ronda", pitch: 1.05, name: "Lola", job: "Lives above the plaza, shops every morning",
+    intro: "Lola. I live up there, the balcony with all the geraniums. You're the family from the train? Welcome!",
+    look: {skin: "#D9A47E", hair: "#3A2A22", hairStyle: "bun", top: "#C2307A", bottom: "#2F2B28", extra: "satchel"},
+    routine: [slot("8:30", "12:00", "rd_mercado", [[220, 400], [300, 440], [190, 420], [340, 380]]), slot("12:00", "13:30", "rd_cafe", [140, 342], {act: "sit", dir: -1}), slot("18:00", "20:00", "rd_tapas", [148, 394], {act: "sit", dir: -1})],
+    lines: ["Rafael's almonds, Carmen's yemas, Paco's croquetas. That's my whole diet.", "Every morning the same walk, and every morning it's beautiful.", "Don't buy the oranges at the front. The good ones are at the back.", "¡Qué niño más guapo!"],
+    away: "Lola's up on her balcony, watering the geraniums."
+  },
+  {
+    id: "amina", local: "ronda", pitch: 1.1, name: "Amina", job: "Shows people round the Arab baths",
+    intro: "Welcome to the baths! Amina. Eight hundred years old, these domes. Look up: the stars are holes in the roof.",
+    look: {skin: "#B9825E", hair: "#1E1A18", hairStyle: "long", top: "#3E8A8A", bottom: "#F3ECDD", extra: "glasses"},
+    routine: [slot("10:00", "14:00", "rd_banos", [[200, 300], [320, 300], [260, 380], [180, 420]]), slot("16:00", "19:00", "rd_banos", [[200, 300], [320, 300], [260, 380]])],
+    lines: ["Three rooms: cold, warm, hot. Like a sauna, before saunas.", "The water came up from the river on a wheel, turned by a donkey.", "Clap your hands. Hear that echo? Eight hundred years.", "The star holes kept the heat in and let the light down. Clever, no?"],
+    away: "The baths are closed for lunch. Amina's in the shade with a book."
+  },
+  {
+    id: "joaquin", local: "ronda", pitch: 0.7, name: "Joaquín", job: "Keeps the Moorish garden",
+    intro: "Joaquín. Gardener. The water does most of the work. I just tell it where to go.",
+    look: {skin: "#B07A55", hair: "#4A4440", hairStyle: "short", top: "#5E8A5A", bottom: "#6B5A44", hat: "sunhat"},
+    routine: [slot("9:00", "13:00", "rd_jardin", [214, 360], {act: "water", dir: 1}), slot("16:00", "19:00", "rd_jardin", [306, 410], {act: "water", dir: -1})],
+    lines: ["Myrtle, orange, cypress. The same plants for a thousand years. They know what they're doing.", "Listen. The water. That's the whole point of a garden like this.", "Don't pick the oranges. Bitter! For marmalade only.", "Shade, water, quiet. Stay as long as you like."],
+    away: "Joaquín's gone home for lunch. The water keeps on running."
+  },
+  {
+    id: "antonio", local: "ronda", pitch: 0.7, name: "Antonio", job: "Leatherworker from Ubrique, with a workshop in the old town",
+    intro: "Antonio. From Ubrique, over the hills: a whole village of leatherworkers. My grandfather made saddles. I make bags. Same stitch.",
+    look: {skin: "#C08B66", hair: "#3A3430", hairStyle: "short", top: "#8A5A3A", bottom: "#3A3430", extra: "apron"},
+    routine: [slot("10:00", "14:00", "rd_cuero", [262, 296], {act: "repair"}), slot("17:00", "20:00", "rd_cuero", [262, 296], {act: "repair"})],
+    lines: ["Saddle stitch: two needles, one thread. A machine can't do it.", "Smell that? Good leather smells like a library.", "This wallet will outlive both of us.", "Ubrique: two thousand people, and every one of them can sew."],
+    away: "Antonio's gone home to Ubrique for lunch. Twenty minutes of bends in the road."
+  },
+  {
+    id: "rocio", local: "ronda", pitch: 1.2, name: "Rocío", job: "Sells flowers at the covered market",
+    intro: "¡Hola! Rocío. Carnations, roses, whatever the hills give me this week. Smell!",
+    look: {skin: "#E2B590", hair: "#6A3A22", hairStyle: "curly", top: "#F3C969", bottom: "#3E6BAE", extra: "apron"},
+    routine: [slot("8:00", "14:00", "rd_mercado", [150, 500], {dir: -1})],
+    lines: ["Red carnations for love, white for luck. Yellow? Yellow's for my mother.", "Up at five, down to the valley, back by eight. Every day.", "Take one for the little boy. Free! Go on.", "The flowers in winter come from the coast. The ones in spring, from my field."],
+    away: "Rocío's stall is just empty buckets. She's sold out and gone home."
+  },
+  ...[
+    ["ingrid", "Ingrid", {skin: "#F6D9C4", hair: "#E8D27A", hairStyle: "long", top: "#7FB8E8", bottom: "#F3ECDD", hat: "sunhat"}, "On holiday from Sweden", "Ingrid, from Sweden! I came for one day. That was four days ago.",
+      [slot("10:00", "11:30", "rd_banos", [[160, 300], [340, 320], [260, 420]]), slot("11:30", "13:00", "rd_jardin", [[230, 250], [290, 520], [60, 380], [460, 380]]), slot("13:00", "15:00", "rd_tapas", [392, 312], {act: "sit"}), slot("16:00", "17:30", "rd_cafe", [340, 430], {act: "sit"}), slot("17:30", "19:00", "rd_mercado", [[220, 420], [320, 400], [260, 520]])],
+      ["It's so hot! In Sweden it's snowing. Probably.", "I've eaten six yemas today. Don't tell anyone.", "The light here! Everything glows."]],
+    ["kenji", "Kenji", {skin: "#EAC4A0", hair: "#1E1A18", hairStyle: "short", top: "#F3ECDD", bottom: "#5A6A7A", extra: "satchel"}, "Photographing his way round Spain", "Kenji. Tokyo. I have taken eleven hundred photographs of the bridge. One more.",
+      [slot("9:30", "11:00", "rd_mercado", [420, 420], {act: "photo", dir: -1}), slot("11:00", "12:30", "rd_banos", [380, 330], {act: "photo", dir: -1}), slot("13:30", "15:00", "rd_cafe", [400, 432], {act: "sit", dir: -1}), slot("15:00", "17:00", "rd_jardin", [300, 470], {act: "photo"}), slot("19:00", "21:30", "rd_tapas", [272, 432], {act: "sit"})],
+      ["The light through the star holes! Perfect.", "Smile? No, natural. Okay, smile.", "Tomorrow, Granada. Then Seville. Then... more bridges."]],
+    ["chloe", "Chloé", {skin: "#F0CBB0", hair: "#8A4A2A", hairStyle: "bob", top: "#E8566C", bottom: "#3A2E28", extra: "satchel"}, "Backpacking through Andalusia", "Chloé! From Lyon. Backpacking, sleeping very little, eating very much.",
+      [slot("10:00", "12:00", "rd_cafe", [170, 480], {act: "sit"}), slot("12:00", "13:30", "rd_mercado", [[200, 400], [330, 450], [260, 380]]), slot("14:00", "16:00", "rd_jardin", [406, 604], {act: "notes", dir: -1}), slot("16:30", "18:00", "rd_banos", [[200, 320], [330, 340], [260, 420]]), slot("18:00", "19:30", "rd_cuero", [[200, 420], [330, 440], [260, 500]]), slot("20:00", "22:00", "rd_tapas", [328, 434], {act: "sit", dir: -1})],
+      ["I'm writing a postcard to every friend I have. I have too many friends.", "The tapas! Free with a drink! France must learn.", "Have you been to the baths? So peaceful."]]
+  ].map(([id, name, look, job, intro, routine, lines]) => ({id, local: "ronda", tourist: true, pitch: .95 + (id.charCodeAt(0) % 4)*.07, name, job, intro, look, routine, lines, away: `${name}'s off seeing another bit of Ronda.`})),
   // cabin, and fishes the pool on Saturday evenings
   {
     id: "wren", pitch: 1.05, name: "Wren", job: "Honeybrook Woods' ranger",

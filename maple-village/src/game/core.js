@@ -54,8 +54,9 @@ import { vanPanel, vanBuy, VAN_MULT, bonfirePanel, releaseLanterns, grillFish, b
 import { millState, pressLeft, millPanel, startPress, collectOil } from "./mill.js";
 import { ghState, ghGrowth, bedPanel, ghPlant, ghHarvest, ghBoost, setGhCompost } from "./greenhouse.js";
 import { rondaArt, trainRideArt } from "../art/town-ronda.js";
-import { TOWNS, townOf, TOWN_BOUNDS } from "../data/towns.js";
-import { rondaPanel, rondaVisit, buyGood, buyVines, taste, buyTile, picnic as rondaPicnic, tileBench } from "./ronda.js";
+import { rondaRoomArt } from "../art/ronda-rooms.js";
+import { TOWNS, townOf, townRoom, roomBehind, TOWN_BOUNDS } from "../data/towns.js";
+import { rondaPanel, rondaVisit, buyGood, buyVines, taste, buyTile, picnic as rondaPicnic, tileBench, cafeTreat } from "./ronda.js";
 import { tripOn, inParty, buyTrip, endTrip, ticketPanel, homePanel, initTrips, nameOf as tripName, awayOn } from "./trips.js";
 import { bikeArt, taxiBoat, taxiBank, transportArt } from "../art/transport.js";
 import { bikeOn, bikeLeft, hireBike, returnBike, bikeExpired, bikePanel, STOPS as TAXI_STOPS, taxiPanel, takeTaxi } from "./transport.js";
@@ -1730,6 +1731,9 @@ function ctx(){
     if (id === "vines") { if (!buyVines(F)) return; sfx("chaching"); flash("Three Tempranillo cuttings"); speak("Rafael wraps three cuttings in damp newspaper. \"Plant them in the sun. Talk to them. They're from my grandfather's vines.\" Plant them on a trellis at home.", 7000); }
     else { const g = buyGood(F, id, addInv); if (!g) return; sfx("chaching"); flash(g.n); }
     save(); ctx(); });
+  c.querySelectorAll("[data-rcafe]").forEach(b => b.onclick = () => { if (!cafeTreat(F, b.dataset.rcafe)) return; rondaView = null; ctx(); sfx("chime"); gainXp(1); hearts(2);
+    mel.sitting = true; nodes.mel.classList.add("sit"); if (b.dataset.rcafe === "choc") speak(pick(["Dip, bite, dip again. The chocolate's so thick the churro stands up in it.", "Hot churros, crisp and sugary, and a cup of chocolate you could stand a spoon in. Heaven."]), 6000); else speak(pick(["Café con leche in a glass, a churro to dip, and the fan ticking round overhead. Bliss.", "Doña Carmen sets it down: \"Eat, eat. You're too thin.\" The churro's still hot.", "Coffee, sugar, the plaza going by outside the window. Nobody's in a rush."]), 6000);
+    if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["churro! mine!", "sugar on my nose!", "more churro please"])), 1800); save(); });
   c.querySelectorAll("[data-rtaste]").forEach(b => b.onclick = () => { const r = taste(F, b.dataset.rtaste); if (!r) return; sfx("chime"); act("cheer"); gainXp(r.fresh ? 1 : 0);
     speak(r.line + (r.fresh ? " You've got the recipe now: it's on your stove at home." : ""), 8000); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["more!", "yummy!", "Mama, can I try?"])), 1800); save(); ctx(); });
   c.querySelectorAll("[data-rtile]").forEach(b => b.onclick = () => { const r = buyTile(F, b.dataset.rtile); if (!r) return; sfx("chaching"); flash(`Tile: ${r.t.n}`);
@@ -1884,6 +1888,7 @@ function questMark(){
     // a room off another room (the garage, the home office): outdoors aim for its building; in the parent room, its door
     const inner = INNER[target.pl], bld = inner ? inner.parent : target.pl, DOOR = {garage: "gdoor", office: "officedoor", room: "mydoor", kidroom: "kiddoor", kitchen: "kdoor", cellar: "cdoor"};
     if (inner && scene === bld && DOOR[target.pl]) { const d = spotObj(scene, DOOR[target.pl]); pos = [d.x + (d.x > 260 ? 26 : -26), d.y - 120]; }
+    else if (townRoom(scene)) pos = [260, 560];   // inside a room in a town: out the door first
     else if (townOf(scene)) { const T = TOWNS[townOf(scene)], st = T.arrive[0]; pos = scene === st ? VILLAGE[T.station].mark : VILLAGE[BRIDGES[scene][nextHop(scene, st)]].mark; }   // a quest back home: the way to the train
     else if (outside() && bld === "base") pos = scene === "base" ? (() => { const v = VILLAGE[target.sp]; return v.mark || [v.door[0], v.door[1] - 64]; })() : VILLAGE[BRIDGES[scene][nextHop(scene, "base")]].mark;
     else if (outside()) pos = VILLAGE[bld].scene === scene ? VILLAGE[bld].mark : VILLAGE[BRIDGES[scene][nextHop(scene, outdoorOf(bld))]].mark;
@@ -1904,13 +1909,13 @@ function drawScene(){
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; const light = rainLevel(day) === 1; setTimeout(() => speak(light ? "A light shower today. Brollies up!" : "Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
-  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
+  $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? rondaRoomArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
   $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") : ""));   // shelves with keepsakes, and pets at home here
   if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));   // the same evening light everywhere outdoors
   if (outside() && isDusk()) nightLights();
   const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), orchard:"Ma Ma's orchard", flowers:"Ma Ma's flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", hwoods:"Honeybrook Woods", greenhouse:"The greenhouse", mill:"The old mill", scoopshop: scoopState(F).name, rd_station:"Ronda: the station", rd_plaza:"Ronda: the plaza", rd_bridge:"Ronda: Puente Nuevo", rd_old:"Ronda: the old town"};
-  $("sceneName").innerHTML = `<span>${esc(names[scene] || ROOMS[scene].name)}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
-  $("maphint").textContent = townOf(scene) ? {rd_station: "Ronda's station (trains home till 10pm) and the Alameda balcony over the valley. East: the plaza. South: steps down into the gorge.", rd_plaza: "The plaza: the market, the tapas bar, Doña Carmen's sweets. West: the station. South: over Puente Nuevo.", rd_bridge: "Puente Nuevo over the gorge, the viewpoint and the Moorish garden. North: back over the bridge. West: the old town.", rd_old: "La Ciudad: the convent hatch, the tile shop, the Arab baths. North: the gorge steps up to the station. East: the bridge."}[scene] : scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Mum's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
+  $("sceneName").innerHTML = `<span>${esc(names[scene] || (townRoom(scene) ? `${TOWNS[townOf(scene)].n}: ${townRoom(scene).n.replace(/^The /, "the ")}` : ROOMS[scene].name))}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
+  $("maphint").textContent = townRoom(scene) ? `${townRoom(scene).say} Exit at the bottom, back out the way you came.` : townOf(scene) ? {rd_station: "Ronda's station (trains home till 10pm) and the Alameda balcony over the valley. East: the plaza. South: steps down into the gorge.", rd_plaza: "The plaza: the market, the tapas bar, Doña Carmen's sweets. West: the station. South: over Puente Nuevo.", rd_bridge: "Puente Nuevo over the gorge, the viewpoint and the Moorish garden. North: back over the bridge. West: the old town.", rd_old: "La Ciudad: the convent hatch, the tile shop, the Arab baths. North: the gorge steps up to the station. East: the bridge."}[scene] : scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Mum's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Ma Ma's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Chord and Chico live here. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
 }
 // The tasting room's tables: a villager who sits down orders straight away (serveGuest: a glass from an open bottle,
 // a fresh one opened if needed, and sometimes a plate), and their table shows what they ordered. Orders are kept for
@@ -2031,7 +2036,7 @@ function lanternFlight(n){
   fx.appendChild(g); setTimeout(() => g.remove(), 20000);
 }
 // Day trips (trips.js, round 107): tickets at Honeybrook station, the train, a day in the town, the train home.
-const liveNow = () => { const town = townOf(scene); if (town) return TOWNS[town].music; const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null; return ev && ev.kind === "night" ? "jazz" : null; };
+const liveNow = () => { const room = townRoom(scene); if (room) return room.music; const town = townOf(scene); if (town) return TOWNS[town].music; const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null; return ev && ev.kind === "night" ? "jazz" : null; };
 function trainRide(text, town, then){
   const o = document.createElement("div"); o.className = "taxiride trainride"; o.innerHTML = trainRideArt(town) + `<p>${esc(text)}</p>`; $("map").appendChild(o); sfx("choo");
   setTimeout(() => { o.remove(); then(); }, 2600);
@@ -2050,9 +2055,24 @@ function tripHome(late){
     setTimeout(() => speak(`Back in Honeybrook. ${town.n} was ${pick(["unforgettable", "a proper adventure", "glorious"])}.${t && t.party.length ? ` ${partyList(t)} head${t.party.length > 1 ? "" : "s"} off home.` : ""}`, 5000), 800); });
 }
 // places on a town's screens (the gates are handled as bridges): the station, and a line for everywhere else
+// inside one of a town's rooms (round 116): the bar, the café counter and Rafael's stall open their panels; the
+// baths' skylights tell you something about them; the garden's fountain is for sitting by
+let bathFact = 0;
+const BATH_FACTS = ["Eight hundred years old: the best-kept Arab baths in Spain. The water came up from the river on a wheel turned by a donkey.",
+  "Three rooms, cold, warm and hot, like a hammam. The star-shaped holes let the light down and the steam out.",
+  "Under the floor, hot air from a furnace ran through channels, so the stones were warm under your feet.",
+  "People came to wash, but mostly to talk. Like a café, with more steam."];
+function roomSpot(id){
+  if (id === "tapas" || id === "mercado" || id === "dulces" || id === "cuero") { rondaView = id; sfx("paper", true); render(); return; }
+  if (id === "banos") { mel.dir = 1; speak(BATH_FACTS[bathFact++ % BATH_FACTS.length], 7000); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["stars! in the roof!", "echo! ECHO!", "it's dark and sparkly"])), 1600); render(); return; }
+  if (id === "jardin") { mel.sitting = true; nodes.mel.classList.add("sit"); sfx("chime"); speak(pick(["The fountain splashes, the water runs off down the channel, and the noise of the town just... stops.", "Orange blossom, myrtle, cool stone. You could sit here all afternoon.", "A sparrow drinks from the edge of the fountain. Nobody's in a hurry."]), 5500);
+    const t = tripOn(F), who = t ? t.party.filter(x => x !== "evan" && isHere(x)) : []; if (who.length) setTimeout(() => npcSay(who[0], pick(TOWNS.ronda.lines[who[0]] || ["Lovely."])), 2600); render(); return; }
+}
 function townSpot(id){
   const town = townOf(scene), T = TOWNS[town];
   if (id === "rdtrain") { railOpen = true; sfx("paper", true); render(); return; }
+  const room = roomBehind(town, id);   // round 116: the tapas bar, the café, the market, the baths and the garden have insides
+  if (room) { sfx("paper", true); setScene(room, [260, 560]); setTimeout(() => speak(T.rooms[room].say, 5000), 700); return; }
   if (["mercado", "tapas", "dulces", "convento", "azulejos"].includes(id)) { rondaView = id; sfx("paper", true); speak(T.say[id], 4000);
     if (id === "convento" && inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["Knock knock! Hello nuns!", "The wall is spinning!", "Biscuits from a WALL?"])), 1600);
     render(); return; }
@@ -2258,7 +2278,7 @@ function nextLeg(){
 // Outdoors Mel walks round buildings and the pond (paths.js); indoors she goes straight.
 function walkTo(x, y){
   const b = bounds(), to = [clamp(x, b[0], b[2]), clamp(y, b[1], b[3])];
-  const pts = outside() ? findPath(scene, [mel.x, mel.y], to, b) : [to];
+  const pts = outside() || townRoom(scene) ? findPath(scene, [mel.x, mel.y], to, b) : [to];
   const first = pts.shift(); mel.tx = first[0]; mel.ty = first[1]; mel.path = pts;
 }
 function arriveSpot(id){
@@ -3049,6 +3069,8 @@ svg.addEventListener("click", ev => {
   const vt = ev.target.closest("[data-vine]");
   if (vt && scene === "vineyard") { const [r, i] = vt.dataset.vine.split("-").map(Number), p = vineSpot(r, i);
     go("vineyard", p.x, p.y, () => { atSpot = "vine"; vyAt = {r, i}; vyView = "vine"; sfx("paper", true); render(); }); return; }
+  const rs = ev.target.closest("[data-rdspot]");
+  if (rs && townRoom(scene)) { go(scene, +rs.dataset.x, +rs.dataset.y, () => { atSpot = "rd"; roomSpot(rs.dataset.rdspot); }); return; }
   const pl = ev.target.closest("[data-place]");
   if (pl && outside()) {
     const id = pl.dataset.place, v = VILLAGE[id];
@@ -3100,7 +3122,7 @@ const EVAN_SPOTS = {rd_station:[[200,520],[300,330],[240,460],[160,420]], rd_pla
 // Evan's destination is evan.tx/ty; outdoors he follows route-finder waypoints to it (round the house, not through it)
 function evanWalk(speed, dt){
   const key = evan.tx + "," + evan.ty;
-  if (key !== evan.rk) { evan.rk = key; evan.path = outside() ? findPath(scene, [evan.x, evan.y], [evan.tx, evan.ty], bounds()) : [[evan.tx, evan.ty]]; }
+  if (key !== evan.rk) { evan.rk = key; evan.path = outside() || townRoom(scene) ? findPath(scene, [evan.x, evan.y], [evan.tx, evan.ty], bounds()) : [[evan.tx, evan.ty]]; }
   const p = evan.path && evan.path[0]; if (!p) { evan.moving = false; return true; }
   const want = [evan.tx, evan.ty]; evan.tx = p[0]; evan.ty = p[1];
   const r = stepTo(evan, speed, dt); evan.tx = want[0]; evan.ty = want[1];
@@ -3123,7 +3145,7 @@ function tickEvan(dt){
       else if (r < .5) { evan.tx = clamp(maple.x + rnd(-18, 18), b[0], b[2]); evan.ty = clamp(maple.y + rnd(2, 12), b[1], b[3]); evan.run = true; evan.target = "maple"; }
       else if (scene === "base" && F.pets.animals.length && r < .45 && r > .3) { evan.tx = 196 + rnd(-4, 6); evan.ty = 548 + rnd(-6, 6); evan.run = true; evan.target = null; const k = F.pets.animals.some(a => a.kind === "rabbit"); setTimeout(() => evanSays(pick(k ? ["bunny!", "hop hop!", "soft!"] : ["chick chick!", "cheep!", "birdie!"])), 1500); }
       else if (scene === "base" && F.fam.owned.sandpit && r < .75) { evan.tx = 236 + rnd(-10, 10); evan.ty = 530 + rnd(-3, 3); evan.run = true; evan.target = null; if (Math.random() < .4) setTimeout(() => evanSays(pick(["dig dig!", "sandcastle!", "look Mama!"])), 1500); }
-      else { const s = pick(EVAN_SPOTS[scene]); evan.tx = s[0] + rnd(-14, 14); evan.ty = s[1] + rnd(-8, 8); evan.run = Math.random() < .35; evan.target = null; }
+      else { const s = pick(EVAN_SPOTS[scene] || (townRoom(scene) || {}).party || [[260, 420]]); evan.tx = s[0] + rnd(-14, 14); evan.ty = s[1] + rnd(-8, 8); evan.run = Math.random() < .35; evan.target = null; }
       evan.wait = rnd(2.5, 6);
     } else if (evan.target && evan.wait > 1.9 && evan.wait < 2.0 + dt) {
       if (Math.random() < .5) evanSays(evan.target === "maple" ? pick(["doggy!", "fox fox!", "hi Maple!"]) : pick(["Mama!", "hehe!", "look!"]));

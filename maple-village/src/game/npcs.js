@@ -9,7 +9,7 @@ import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, cla
 import { SEA } from "../data/npcs.js";
 import { findPath, blocked } from "./paths.js";
 import { tripSlot, townLine } from "./trips.js";
-import { townOf } from "../data/towns.js";
+import { townOf, townRoom } from "../data/towns.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const ents = {};            // id -> entity (villagers and the active messenger)
@@ -36,7 +36,7 @@ const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw 
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 const routineNow = def => routineAt(def, dayKey(), sgHM());
 export function slotAt(def, day, t, live){
-  return (api && tripSlot(api.F(), def.id, day, t, live ? api.scene() : null)) || (live && supSlot(def)) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || movieSlot(def.id, day, t) || bonfireSlot(def.id, day, t) || bayMarketSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
+  return (api && tripSlot(api.F(), def.id, day, t, live ? api.scene() : null)) || (live && supSlot(def)) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || movieSlot(def.id, day, t) || bonfireSlot(def.id, day, t) || bayMarketSlot(def.id, day, t) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
     || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || shoreSlot(def.id, day, t) || iceOk(scoopSlot(def.id, day, t), def, day, t) || letSlot(def.id, day, t) || routineAt(def, day, t);
 }
 // a night-market shopper slot gives way to the wine shop: anyone due at a tasting or in the shop then goes there instead
@@ -79,7 +79,7 @@ const jitter = ([x, y]) => [x + rnd(-10, 10), y + rnd(-6, 6)];
 // (the same one Mel uses). walk() steps along them and returns true on arrival at the last one.
 function route(e, x, y){
   const s = api.scene(); e.goal = [x, y];
-  if (outdoors(s)) { const pts = findPath(s, [e.x, e.y], [x, y], api.bounds()); const f = pts.shift(); e.tx = f[0]; e.ty = f[1]; e.path = pts; }
+  if (outdoors(s) || townRoom(s)) { const pts = findPath(s, [e.x, e.y], [x, y], api.bounds()); const f = pts.shift(); e.tx = f[0]; e.ty = f[1]; e.path = pts; }
   else { e.tx = x; e.ty = y; e.path = []; }
 }
 function walk(e, speed, dt){
