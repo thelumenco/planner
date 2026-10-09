@@ -349,7 +349,8 @@ export function olivePanel(F){
   return `<span class="tape stripe" aria-hidden="true"></span><h2>The olive tree</h2>${oliveArt(o ? (ripe ? "ripe" : "growing") : "none", 150)}
     <p class="sub">${!o ? "A sunny spot by the path, waiting for an olive tree. The stall sells them." : ripe ? "Heavy with olives! Two jars' worth." : `Olives ripening: ready in about ${hrs(OLIVE*(1 - g))}.`}</p>
     ${o && !ripe ? `<span class="clbar"><i style="width:${Math.round(g*100)}%"></i></span>` : ""}
-    <div class="actions">${ripe ? `<button class="btn primary" data-vy="olives">Pick the olives</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
+    ${o ? `<p class="muted">The olive crate: ${v.oliveCrate || 0} jar${v.oliveCrate === 1 ? "" : "s"}${v.help.pick ? " (Marco and Ines put what they pick in here)" : ""}. Take them for the kitchen, gelato, or the mill.</p>` : ""}
+    <div class="actions">${ripe ? `<button class="btn primary" data-vy="olives">Pick the olives</button>` : ""}${v.oliveCrate ? `<button class="btn alt" data-vy="crate">Take the crate (${v.oliveCrate})</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export function pickOlives(F){ const v = vineState(F); if (!oliveRipe(v)) return null; v.olive.pickedAt = Date.now(); F.inv = F.inv || {}; F.inv.olives = (F.inv.olives || 0) + 2; return "Two jars of olives, into your backpack. Send them to the kitchen when you like."; }
 // api: {save, rerender, say(line), sfx, r, i}
