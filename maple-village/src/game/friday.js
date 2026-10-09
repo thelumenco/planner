@@ -33,3 +33,24 @@ export function bonfirePanel(F, family){
     <p>${done ? "The week's lanterns are already out over the sea." : n ? `<b>${n} quest${n > 1 ? "s" : ""}</b> finished this week: a paper lantern for each.` : "No quests this week. That's alright: one lantern anyway, for getting through it."}</p>
     <div class="actions">${done ? "" : `<button class="btn primary" data-fire="lanterns">Release the week's lanterns</button>`}<button class="btn alt" data-fire="sit">Sit by the fire</button></div>` + shut;
 }
+
+/* ---------- round 113: the Friday market at the bay, and movie night on the field ---------- */
+import { POOLS, GOODS as STALL_GOODS } from "../data/stall-goods.js";
+import { MARKET, NIGHT, bayKeepers } from "./tours.js";
+import { hash } from "../util.js";
+import { NPCS } from "../data/npcs.js";
+// everything the regular markets sell (gifts and treats; not produce or the pet corner), for a different mix each week
+const BAY_POOL = [...new Set([...MARKET, ...NIGHT].flatMap(s => s.items || []).concat(Object.values(POOLS).flatMap(p => Object.values(p).flat())))]
+  .filter(id => ITEMS[id] && (ITEMS[id].price || STALL_GOODS[id]) && ITEMS[id].kind !== "pet" && ITEMS[id].kind !== "seed");
+export const BAY_NAMES = ["Odds and ends", "Treats and sweets", "Seaside finds"];
+// stall k on a Friday: four things, shuffled by the date (no two stalls share one)
+export function bayStallGoods(day, k){
+  const order = BAY_POOL.map(id => [hash(day + ":bay:" + id), id]).sort((a, b) => a[0] - b[0]).map(([, id]) => id);
+  return order.slice(k*4, k*4 + 4);
+}
+export const bayKeeperName = (day, k) => (NPCS.find(n => n.id === bayKeepers(day)[k]) || {name: "Someone"}).name;
+
+// movie night: a cosy film each month (picked by the month), and popcorn
+const FILMS = ["The Lighthouse Cat", "A Picnic for Badger", "The Kite That Flew to Sea", "Lantern Festival", "Grandma's Bakery", "The Little Red Train", "Moon over the Harbour", "The Snail Who Raced", "Fox and the Fireflies", "The Orchard Mystery", "Bicycle Summer", "Snow on the Vineyard"];
+export const filmOf = day => FILMS[(+day.slice(5, 7) + +day.slice(0, 4)) % FILMS.length];
+if (!ITEMS.popcorn) ITEMS.popcorn = {n: "Popcorn", ico: "popcorn", kind: "gift", to: "family", price: 3, say: "Popcorn! Salty and sweet, the best kind."};

@@ -2664,6 +2664,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   I.thyme = [`${[[8, 8], [12, 6], [16, 9], [10, 12], [14, 13], [12, 16]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.8" ${f("#8FA88A")}/>`).join("")}`, `<path d="M12 21V7M12 12l-3-3M12 14l3-3"/>`];
   I.clams = [`<path d="M4 15a8 7 0 0 1 16 0z" ${f("#E8DCC8")}/><path d="M6 15c2 3 10 3 12 0" ${f("#C9B89A")}/>`, `<path d="M4 15a8 7 0 0 1 16 0zM12 8v7M8 9.5l2 5.5M16 9.5l-2 5.5M6 15c2 3 10 3 12 0"/>`];
   I.kite = [`<path d="M12 2l7 8-7 9-7-9z" ${f("#E8566C")}/><path d="M12 2v17M5 10h14" ${f("none")} style="stroke:#FFFDF6"/><path d="M12 19q-2 2 0 3q2 1 0 2" ${f("none")}/>`, `<path d="M12 2l7 8-7 9-7-9zM12 2v17M5 10h14M12 19q-2 2 0 3"/>`];
+  I.popcorn = [`<path d="M6 10h12l-2 11H8z" ${f("#E8566C")}/><path d="M9 10l-.6 11M12 10v11M15 10l.6 11" ${f("none")} style="stroke:#FFFDF6" stroke-width="1.6"/>${[[8, 8], [11, 6], [14, 7], [16, 9], [10, 9], [13, 9]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.2" ${f("#FFF6DC")}/>`).join("")}`, `<path d="M6 10h12l-2 11H8z"/>`];
   I.shrimp = [`<path d="M6 8c6-3 13 0 13 6s-6 7-10 5c3-1 5-3 4-5-1-3-5-3-7-6z" ${f("#F28C6A")}/><path d="M6 8l-3-3M6 8l-4 0" ${f("none")}/>`, `<path d="M6 8c6-3 13 0 13 6s-6 7-10 5c3-1 5-3 4-5-1-3-5-3-7-6zM6 8l-3-3M6 8h-4M12 9l1 3M15 10l0 3"/>`];
   var icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
   var iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;
@@ -2777,6 +2778,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     // round 112: Friday evenings at the bay (the fire pit on the beach; the fishmonger's van 5 to 10pm), and kite flying on the field
     bonfire: { scene: "bay", name: "The bonfire", door: [198, 566], spot: true, line: "A fire pit on the beach. On Friday nights there's a bonfire." },
     fishvan: { scene: "bay", name: "The fishmonger's van", door: [330, 620], spot: true, line: "Sal's fish van parks here on Friday evenings." },
+    // round 113: the Friday market at the bay (4:30 to 8) and movie night on the field (the last Friday, 7:30 to 9:30)
+    bm0: { scene: "bay", name: "Market stall", door: [300, 396], spot: true, line: "A market stall." },
+    bm1: { scene: "bay", name: "Market stall", door: [362, 396], spot: true, line: "A market stall." },
+    bm2: { scene: "bay", name: "Market stall", door: [424, 396], spot: true, line: "A market stall." },
+    kites: { scene: "bay", name: "Hiro's kites", door: [214, 450], spot: true, line: "Kites!" },
+    screen: { scene: "field", name: "The outdoor cinema", door: [150, 560], spot: true, line: "Movie night." },
+    popcorn: { scene: "field", name: "Popcorn cart", door: [262, 500], spot: true, line: "Popcorn." },
     kitefly: { scene: "field", name: "Kite flying", door: [440, 330], spot: true, line: "Open grass and a good breeze off the sea: the place to fly a kite." },
     deck: { scene: "bay", name: "The deck", door: [215, 412], spot: true, line: "The deck, looking out over the foreshore. Bring an ice cream." },
     hfreezer: { scene: "bay", name: "Honesty freezer", door: [432, 290], spot: true, line: "The honesty freezer: little cups while the shop's shut." },
@@ -5417,6 +5425,43 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var FIRE = [196, 506];
   var LOGS = { dad: [[148, 506], 1], mum: [[166, 478], 1], gonggong: [[196, 468], 1], mama: [[226, 478], -1], marcus: [[244, 506], -1], angelina: [[154, 536], 1], darren: [[238, 538], -1] };
   var BONFIRE_FAMILY = { dad: 19 * 60, mum: 19 * 60, gonggong: 19 * 60, mama: 19 * 60, marcus: 19 * 60 + 30, angelina: 19 * 60 + 30, darren: 21 * 60 + 30 };
+  var MOVIE = [19 * 60 + 30, 21 * 60 + 30];
+  var BAYMKT = [16 * 60 + 30, 20 * 60];
+  var lastFriday = (day) => {
+    const dt = /* @__PURE__ */ new Date(day + "T00:00:00Z");
+    return dt.getUTCDay() === 5 && new Date(dt.getTime() + 7 * 864e5).getUTCMonth() !== dt.getUTCMonth();
+  };
+  var movieNow = (day, hm2) => lastFriday(day) && hm2 >= MOVIE[0] && hm2 < MOVIE[1];
+  var SCREEN = [130, 436];
+  var BLANKET = {
+    mum: [96, 486],
+    dad: [124, 488],
+    mama: [152, 486],
+    gonggong: [180, 490],
+    marcus: [108, 524],
+    angelina: [136, 526],
+    darren: [168, 526],
+    lin: [212, 500],
+    opal: [236, 504],
+    theo: [214, 532],
+    hana: [240, 534]
+  };
+  function movieSlot(id, day, hm2) {
+    if (!movieNow(day, hm2) || !BLANKET[id] || awayToday(day).includes(id)) return null;
+    return { from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: id === "hana" || id === "opal" ? -1 : 1, movie: true };
+  }
+  var bayMarketNow = (day, hm2) => dow(day) === 5 && hm2 >= BAYMKT[0] && hm2 < BAYMKT[1];
+  var BAY_STALLS = [[300, 376], [362, 376], [424, 376]];
+  var KITE_SELLER = [186, 438];
+  var bayKeepers = (day) => groupFor(day + ":baymkt", 3, [], NIGHT_TOURISTS);
+  function bayMarketSlot(id, day, hm2) {
+    if (!bayMarketNow(day, hm2)) return null;
+    if (id === "hiro") return { from: BAYMKT[0], to: BAYMKT[1], scene: "bay", at: KITE_SELLER, dir: 1, act: "kites" };
+    const k = bayKeepers(day).indexOf(id);
+    if (k < 0) return null;
+    const [x, y] = BAY_STALLS[k];
+    return { from: BAYMKT[0], to: BAYMKT[1], scene: "bay", at: [x + 4, y - 10], dir: 1 };
+  }
   function bonfireSlot(id, day, hm2) {
     if (!bonfireNow(day, hm2) || awayToday(day).includes(id)) return null;
     const from = BONFIRE_FAMILY[id];
@@ -15238,7 +15283,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var routineNow = (def) => routineAt(def, dayKey(), sgHM());
   function slotAt(def, day, t2, live3) {
-    return api3 && tripSlot(api3.F(), def.id, day, t2, live3 ? api3.scene() : null) || live3 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || bonfireSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || workshopSlot(def.id, day, t2) || trainSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || iceOk(scoopSlot(def.id, day, t2), def, day, t2) || letSlot(def.id, day, t2) || routineAt(def, day, t2);
+    return api3 && tripSlot(api3.F(), def.id, day, t2, live3 ? api3.scene() : null) || live3 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || movieSlot(def.id, day, t2) || bonfireSlot(def.id, day, t2) || bayMarketSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || workshopSlot(def.id, day, t2) || trainSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || iceOk(scoopSlot(def.id, day, t2), def, day, t2) || letSlot(def.id, day, t2) || routineAt(def, day, t2);
   }
   var nightOk = (s, def, day, t2) => !s || !s.night ? s : tastingSlot(def.id, day, t2) || (routineAt(def, day, t2) || {}).scene === "wineshop" ? null : s;
   var iceOk = (s, def, day, t2) => {
@@ -16401,6 +16446,35 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       <path d="M${kx} ${ky + 22} q-8 10 0 18 q8 8 0 18" fill="none"/>${[0, 1, 2].map((i) => `<path d="M${kx - 4} ${ky + 30 + i * 12} l8 -3 l0 6z" style="fill:${["#F3C969", "#7FB8E8", "#9CC27E"][i]}"/>`).join("")}</g>
     <animateTransform attributeName="transform" type="translate" values="0 0;10 -8;-6 4;4 -12;0 0" dur="5s" repeatCount="indefinite"/></g></g>`;
   }
+  var AWN = ["#7FB8E8", "#F2A0B8", "#F3C969"];
+  function bayStallArt(k, x, y, label2) {
+    return `<g data-place="bm${k}" aria-label="${label2}"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="30" ry="9" style="fill:var(--butter)"/>
+    ${sk(
+      `<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2" style="fill:#C9A27E"/><path d="M${x - 30} ${y - 48} h60 l-4 12 h-52z" style="fill:${AWN[k % 3]}"/>${[0, 1, 2].map((i) => `<path d="M${x - 26 + i * 20} ${y - 48} h10 l-1 12 h-10z" style="fill:#FFFDF6"/>`).join("")}<path d="M${x - 26} ${y - 36} v16 M${x + 26} ${y - 36} v16" style="stroke:#8A6A52" stroke-width="2"/>${[0, 1, 2].map((i) => `<rect x="${x - 20 + i * 14}" y="${y - 26}" width="10" height="7" rx="2" style="fill:${["#E8566C", "#9CC27E", "#C9A3E0"][(i + k) % 3]}"/>`).join("")}`,
+      `<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2"/><path d="M${x - 30} ${y - 48} h60 l-4 12 h-52z"/>`
+    )}
+    ${tapeLabel(x, y + 16, label2, "#F6E3B4", 8.5)}</g>`;
+  }
+  function kiteSellerArt(x, y) {
+    return `<g data-place="kites" aria-label="Kites"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="26" ry="8" style="fill:var(--butter)"/>
+    <g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1">${[[-14, -60, "#E8566C"], [8, -70, "#7FB8E8"], [22, -52, "#F3C969"]].map(([dx, dy, c]) => `<path d="M${x + dx} ${y + dy - 10} l9 10 l-9 12 l-9 -12z" style="fill:${c}"/><path d="M${x + dx} ${y + dy + 12} L${x + 2} ${y - 18}" fill="none" stroke-width=".7"/>`).join("")}</g>
+    ${tapeLabel(x, y + 18, "Kites", "#DCEBF6", 9)}</g>`;
+  }
+  function movieArt(sx, sy, film) {
+    const scr = `<g data-place="screen" aria-label="The outdoor cinema"><ellipse class="hov" cx="${sx}" cy="${sy + 50}" rx="80" ry="14" style="fill:var(--butter)"/>
+    ${sk(`<rect x="${sx - 66}" y="${sy - 88}" width="132" height="76" style="fill:#FFFDF6"/><path d="M${sx - 70} ${sy} V${sy - 92} M${sx + 70} ${sy} V${sy - 92}" style="stroke:#8A6A52" stroke-width="4"/>`, `<rect x="${sx - 66}" y="${sy - 88}" width="132" height="76"/>`)}
+    <g pointer-events="none"><rect x="${sx - 62}" y="${sy - 84}" width="124" height="68" fill="#2E3A55"/><circle cx="${sx + 34}" cy="${sy - 70}" r="7" fill="#FFF3C4"/><path d="M${sx - 62} ${sy - 30} q30 -14 62 -4 t62 -6 V${sy - 16} H${sx - 62}z" fill="#5E7A5A"/>
+      <g><path d="M${sx - 40} ${sy - 34} q4 -8 10 -4 q4 -6 8 0 l-2 6 h-14z" fill="#E8913A"/><animateTransform attributeName="transform" type="translate" values="0 0;60 0;0 0" dur="14s" repeatCount="indefinite"/></g>
+      ${[0, 1, 2, 3].map((i) => `<circle cx="${sx - 40 + i * 24}" cy="${sy - 50 - i % 2 * 8}" r="1.6" fill="#F3E27A"><animate attributeName="opacity" values="1;.2;1" dur="${1.4 + i * 0.3}s" repeatCount="indefinite"/></circle>`).join("")}</g>
+    ${tapeLabel(sx, sy + 70, film, "#E7D9F2", 9)}</g>`;
+    const cart2 = `<g data-place="popcorn" aria-label="Popcorn cart"><ellipse class="hov" cx="262" cy="476" rx="26" ry="8" style="fill:var(--butter)"/>
+    ${sk(
+      `<rect x="244" y="440" width="36" height="30" rx="3" style="fill:#E8566C"/><rect x="246" y="420" width="32" height="22" rx="2" style="fill:#FFF6DC"/><path d="M240 420 h44 l-4 -10 h-36z" style="fill:#FFFDF6"/><circle cx="250" cy="474" r="5" style="fill:#3A3430"/><circle cx="274" cy="474" r="5" style="fill:#3A3430"/>`,
+      `<rect x="244" y="440" width="36" height="30" rx="3"/><rect x="246" y="420" width="32" height="22" rx="2"/><path d="M240 420 h44 l-4 -10 h-36z"/>`
+    )}${tapeLabel(262, 494, "Popcorn", "#F6D3DC", 9)}</g>`;
+    const blankets = [[110, 494, "#F2A0B8"], [166, 498, "#7FB8E8"], [122, 532, "#F3C969"], [226, 518, "#9CC27E"]].map(([x, y, c]) => `<rect x="${x - 26}" y="${y - 10}" width="52" height="22" rx="3" style="fill:${c};stroke:var(--line)" stroke-width="1" opacity=".9" pointer-events="none"/>`).join("");
+    return blankets + scr + cart2;
+  }
 
   // src/game/fishing.js
   var SPOTS3 = {
@@ -16640,6 +16714,15 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <p>${done ? "The week's lanterns are already out over the sea." : n ? `<b>${n} quest${n > 1 ? "s" : ""}</b> finished this week: a paper lantern for each.` : "No quests this week. That's alright: one lantern anyway, for getting through it."}</p>
     <div class="actions">${done ? "" : `<button class="btn primary" data-fire="lanterns">Release the week's lanterns</button>`}<button class="btn alt" data-fire="sit">Sit by the fire</button></div>` + shut5;
   }
+  var BAY_POOL = [...new Set([...MARKET, ...NIGHT].flatMap((s) => s.items || []).concat(Object.values(POOLS).flatMap((p) => Object.values(p).flat())))].filter((id) => ITEMS[id] && (ITEMS[id].price || GOODS[id]) && ITEMS[id].kind !== "pet" && ITEMS[id].kind !== "seed");
+  function bayStallGoods(day, k) {
+    const order2 = BAY_POOL.map((id) => [hash(day + ":bay:" + id), id]).sort((a, b) => a[0] - b[0]).map(([, id]) => id);
+    return order2.slice(k * 4, k * 4 + 4);
+  }
+  var bayKeeperName = (day, k) => (NPCS.find((n) => n.id === bayKeepers(day)[k]) || { name: "Someone" }).name;
+  var FILMS = ["The Lighthouse Cat", "A Picnic for Badger", "The Kite That Flew to Sea", "Lantern Festival", "Grandma's Bakery", "The Little Red Train", "Moon over the Harbour", "The Snail Who Raced", "Fox and the Fireflies", "The Orchard Mystery", "Bicycle Summer", "Snow on the Vineyard"];
+  var filmOf = (day) => FILMS[(+day.slice(5, 7) + +day.slice(0, 4)) % FILMS.length];
+  if (!ITEMS.popcorn) ITEMS.popcorn = { n: "Popcorn", ico: "popcorn", kind: "gift", to: "family", price: 3, say: "Popcorn! Salty and sweet, the best kind." };
 
   // src/game/mill.js
   var JARS_PER_BOTTLE = 3;
@@ -20085,7 +20168,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     townTick();
     {
-      const k = scene === "bay" ? `${bonfireNow(dayKey(), sgHM())}${vanNow(dayKey(), sgHM())}` : scene === "field" ? String(!!(S2.kite && S2.kite.until > Date.now())) : "";
+      const k = scene === "bay" ? `${bonfireNow(dayKey(), sgHM())}${vanNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : scene === "field" ? `${!!(S2.kite && S2.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}` : "";
       if (k !== lastFri) {
         lastFri = k;
         if (k) drawScene();
@@ -22131,6 +22214,8 @@ ${SIGNOFF[t2.who] || ""}`;
       h = bedPanel(F, ghBed);
     } else if (scene === "mill" && millOpen) {
       h = millPanel(F);
+    } else if (friView && scene === "bay" && (/^bm\d$/.test(friView) || friView === "kites")) {
+      h = bayMarketPanel(friView);
     } else if (friView && (scene === "bay" || scene === "field")) {
       const fam = ["dad", "mum", "gonggong", "mama", "marcus", "angelina", "darren"].filter(isHere).map((n) => NPCS.find((d) => d.id === n).name);
       h = friView === "van" ? vanPanel(F) : bonfirePanel(F, fam.length ? `${fam.join(", ").replace(/, ([^,]*)$/, " and $1")} ${fam.length > 1 ? "are" : "is"} round the fire` : "");
@@ -22569,6 +22654,9 @@ ${SIGNOFF[t2.who] || ""}`;
         shopTab === "sell" ? sell(id) : buy2(id);
       } else if (scene === "field" && fieldView) {
         buy2(id, stallPrice(id));
+        ctx();
+      } else if (scene === "bay" && friView && (/^bm\d$/.test(friView) || friView === "kites")) {
+        buy2(id, friView === "kites" ? ITEMS.kite.price : stallPrice(id));
         ctx();
       } else if (scene === "farm") plant4(selPlot, id);
     });
@@ -23144,9 +23232,15 @@ ${SIGNOFF[t2.who] || ""}`;
   }
   var isFri2 = () => (/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).getUTCDay() === 5;
   function fridayLayer(sc) {
-    if (sc === "bay") return bonfireArt(FIRE[0], FIRE[1], bonfireNow(dayKey(), sgHM())) + (vanNow(dayKey(), sgHM()) ? fishVanArt(330, 600) : "");
-    if (sc === "field") return `<g data-place="kitefly" aria-label="Kite flying"><ellipse class="hov" cx="440" cy="334" rx="30" ry="9" style="fill:var(--butter)"/><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M452 336 v-46" stroke-width="2"/><path d="M452 292 l18 4 l-2 8 l-16 2z" style="fill:#E8913A"/><path d="M458 293 v12 M464 294 v10" style="stroke:#FFFDF6" stroke-width="2"/></g>${tapeLabel(440, 352, "Kite flying", "#DCEBF6", 9)}</g>` + (S2.kite && S2.kite.until > Date.now() ? kiteArt(S2.kite.x, S2.kite.y) : "");
+    if (sc === "bay") return bonfireArt(FIRE[0], FIRE[1], bonfireNow(dayKey(), sgHM())) + (vanNow(dayKey(), sgHM()) ? fishVanArt(330, 600) : "") + (bayMarketNow(dayKey(), sgHM()) ? BAY_STALLS.map(([x, y], k) => bayStallArt(k, x, y, `${bayKeeperName(dayKey(), k)}'s stall`)).join("") + kiteSellerArt(KITE_SELLER[0] + 26, KITE_SELLER[1] + 4) : "");
+    if (sc === "field") return (movieNow(dayKey(), sgHM()) ? movieArt(SCREEN[0], SCREEN[1], filmOf(dayKey())) : "") + `<g data-place="kitefly" aria-label="Kite flying"><ellipse class="hov" cx="440" cy="334" rx="30" ry="9" style="fill:var(--butter)"/><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M452 336 v-46" stroke-width="2"/><path d="M452 292 l18 4 l-2 8 l-16 2z" style="fill:#E8913A"/><path d="M458 293 v12 M464 294 v10" style="stroke:#FFFDF6" stroke-width="2"/></g>${tapeLabel(440, 352, "Kite flying", "#DCEBF6", 9)}</g>` + (S2.kite && S2.kite.until > Date.now() ? kiteArt(S2.kite.x, S2.kite.y) : "");
     return "";
+  }
+  function bayMarketPanel(v) {
+    const kites2 = v === "kites", k = kites2 ? -1 : +v.slice(2), items = kites2 ? ["kite"] : bayStallGoods(dayKey(), k), who3 = kites2 ? "Hiro" : bayKeeperName(dayKey(), k);
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>${kites2 ? "Hiro's kites" : `${esc(who3)}'s stall`}</h2><p class="sub">${kites2 ? '"Red, blue or yellow? They all fly. The breeze off the sea does the rest." Fly yours on the field, by the river.' : "The Friday market at the bay: a different mix every week."}</p>
+    <div class="items shop">${items.map((id) => itemBtn(id, `<b>${kites2 ? ITEMS.kite.price : stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < (kites2 ? ITEMS.kite.price : stallPrice(id)), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div>
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function flyKite() {
     if (!(F.inv.kite > 0)) {
@@ -24242,6 +24336,49 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     if (id === "kitefly") {
       flyKite();
+      return;
+    }
+    if (/^bm\d$/.test(id) || id === "kites") {
+      if (!bayMarketNow(dayKey(), sgHM())) {
+        speak("The Friday market's packed away. It's on Fridays, 4:30 to 8.", 4e3);
+        render();
+        return;
+      }
+      friView = id;
+      sfx("paper", true);
+      render();
+      return;
+    }
+    if (id === "screen") {
+      if (!movieNow(dayKey(), sgHM())) {
+        render();
+        return;
+      }
+      mel.sitting = true;
+      nodes.mel.classList.add("sit");
+      sfx("paper", true);
+      gainXp(S2.movieDay !== dayKey() ? 1 : 0);
+      S2.movieDay = dayKey();
+      speak(`Movie night: "${filmOf(dayKey())}". Blankets, the dark, the whole village laughing at the same bits.`, 6e3);
+      if (evanHere() && !evanNight()) setTimeout(() => evanSays(pick(["shh Mama, it's starting!", "is it a fox? IT'S A FOX!", "popcorn please?"])), 2e3);
+      render();
+      return;
+    }
+    if (id === "popcorn") {
+      if (!movieNow(dayKey(), sgHM())) {
+        render();
+        return;
+      }
+      if (F.coins < 3) {
+        speak("Popcorn's 3 coins.", 2500);
+        return;
+      }
+      F.coins -= 3;
+      addInv("popcorn", 1);
+      sfx("pop");
+      speak("A paper cone of popcorn, still warm. (It's in your backpack: give it to someone, or Evan.)", 4500);
+      save2();
+      render();
       return;
     }
     if (id === "grove") {

@@ -98,6 +98,10 @@ export const VILLAGE = {
   // round 112: Friday evenings at the bay (the fire pit on the beach; the fishmonger's van 5 to 10pm), and kite flying on the field
   bonfire:{scene:"bay", name:"The bonfire", door:[198,566], spot:true, line:"A fire pit on the beach. On Friday nights there's a bonfire."},
   fishvan:{scene:"bay", name:"The fishmonger's van", door:[330,620], spot:true, line:"Sal's fish van parks here on Friday evenings."},
+  // round 113: the Friday market at the bay (4:30 to 8) and movie night on the field (the last Friday, 7:30 to 9:30)
+  bm0:    {scene:"bay", name:"Market stall", door:[300,396], spot:true, line:"A market stall."}, bm1: {scene:"bay", name:"Market stall", door:[362,396], spot:true, line:"A market stall."},
+  bm2:    {scene:"bay", name:"Market stall", door:[424,396], spot:true, line:"A market stall."}, kites: {scene:"bay", name:"Hiro's kites", door:[214,450], spot:true, line:"Kites!"},
+  screen: {scene:"field", name:"The outdoor cinema", door:[150,560], spot:true, line:"Movie night."}, popcorn: {scene:"field", name:"Popcorn cart", door:[262,500], spot:true, line:"Popcorn."},
   kitefly:{scene:"field", name:"Kite flying", door:[440,330], spot:true, line:"Open grass and a good breeze off the sea: the place to fly a kite."},
   deck:   {scene:"bay", name:"The deck", door:[215,412], spot:true, line:"The deck, looking out over the foreshore. Bring an ice cream."},
   hfreezer:{scene:"bay", name:"Honesty freezer", door:[432,290], spot:true, line:"The honesty freezer: little cups while the shop's shut."},

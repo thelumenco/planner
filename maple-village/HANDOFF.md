@@ -1638,3 +1638,12 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - New tapas: clams with garlic and lemon (`almejas`).
 - **Kites:** the `kite` item (Hana's Family shelf, 12 coins). The field's place `kitefly` flies it for a minute (`S.kite`, `kiteArt`), and Evan runs along.
 - **Still to come (round 113):** movie night on the field (the last Friday of the month) and a small Friday market at the bay.
+
+### Round 113: movie night and the Friday bay market
+- **Movie night** (tours.js `movieNow`: the last Friday of the month, 7:30–9:30):
+  - A screen on the field at `SCREEN` with a little film flickering on it, blankets, and a popcorn cart (places `screen` and `popcorn`; art/friday.js `movieArt`).
+  - The film is picked by the month (friday.js `filmOf`). Popcorn is a gift item.
+  - `movieSlot`: the family and a few villagers on the blankets. It comes before `bonfireSlot` in the chain.
+- **The Friday bay market** (`bayMarketNow`, Fri 4:30–8):
+  - Three stalls (`BAY_STALLS`, places `bm0`–`bm2`) kept by night-market out-of-towners (`bayKeepers`). Each has four goods from everything the regular markets sell, a new mix each week (friday.js `bayStallGoods`).
+  - Hiro sells kites on the beach (place `kites`). Buying goes through core `buy` (`bayMarketPanel`).
