@@ -59,7 +59,7 @@ import { bikeArt, taxiBoat, taxiBank, transportArt } from "../art/transport.js";
 import { bikeOn, bikeLeft, hireBike, returnBike, bikeExpired, bikePanel, STOPS as TAXI_STOPS, taxiPanel, takeTaxi } from "./transport.js";
 import { forage, rangerPanel } from "./woods.js";
 import { tellStory, storyReady, storiesHTML, applyFlags as storyFlags, storyState } from "./stories.js";
-import { fishState, fishPanel, spotIn, SPOTS as FISH_SPOTS, cast as fishCast, land as fishLand, buyRod, buyReel, addBait, markerAt, inZone, ESCAPE as FISH_ESCAPE, FISH } from "./fishing.js";
+import { fishState, fishPanel, spotIn, SPOTS as FISH_SPOTS, cast as fishCast, land as fishLand, buyRod, buyReel, addBait, markerAt, inZone, ESCAPE as FISH_ESCAPE, FISH, sellCatch } from "./fishing.js";
 import { fishSpotArt, koiArt } from "../art/fishing.js";
 import { timetablePanel, trainKey, trainHere, fmt as railTime } from "./rail.js";
 import { moodPanel, vanPick, vanClear, lookLine as vanLookLine } from "./van.js";
@@ -2021,6 +2021,7 @@ function townTick(){
 // Fishing (fishing.js): cast, wait for the bite, reel while the marker's in the green
 function fishGo(a, k){
   if (a === "view") fishSt = {...fishSt, view: k};
+  else if (a === "sell" || a === "sellall") { const g = sellCatch(F, a === "sell" ? k : null); if (!g) return; sfx("chaching"); speak(g.n > 1 ? `Sold ${g.n} to the fishmonger: ${g.coins} coins.` : `Sold to the fishmonger: ${g.coins} coin${g.coins === 1 ? "" : "s"}.`, 3500); }
   else if (a === "rod") { if (!buyRod(F)) return; sfx("chaching"); flash("A fishing rod"); speak("A proper rod! Let's see what's biting.", 3500); }
   else if (a === "reelup") { if (!buyReel(F)) return; sfx("chime"); flash("The better reel"); speak("Smooth as anything. Fish beware.", 3000); }
   else if (a === "cast") { const c = fishCast(F, fishSpot); if (typeof c === "string") return; clearTimeout(fishT); fishSt = {cast: c}; sfx("pop"); fishT = setTimeout(fishBite, Math.max(0, c.bite - Date.now())); }

@@ -17268,10 +17268,34 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       } else if (st6.msg) h += `<p class="muted">${esc(st6.msg)}</p>`;
       h += `<div class="actions"><button class="btn primary" data-fish="cast" ${s.bait > 0 ? "" : "disabled"}>${s.bait > 0 ? "Cast" : "Out of worms"}</button></div>`;
       if (!s.bait) h += `<p class="muted">No worms left. Finish a quest and you'll dig up another (three more turn up tomorrow morning anyway).</p>`;
+      h += catchHtml(F2);
       if (!s.reel) h += `<p class="muted">The better reel makes every fish easier to land (the green's wider). <button class="btn small alt" data-fish="reelup" ${F2.coins >= REEL ? "" : "disabled"}>Buy · ${REEL} ${coin6()}</button></p>`;
     }
     return h + shut7;
   }
+  var CATCH = [...new Set(Object.values(FISH).map((f2) => f2.item).filter(Boolean))];
+  if (ITEMS.fish && !ITEMS.fish.sell) ITEMS.fish.sell = 3;
+  function sellCatch(F2, id) {
+    const ids = id ? [id] : CATCH, got = { n: 0, coins: 0 };
+    ids.forEach((x) => {
+      const n = id ? Math.min(1, (F2.inv || {})[x] || 0) : (F2.inv || {})[x] || 0;
+      if (!n || !ITEMS[x] || !ITEMS[x].sell) return;
+      F2.inv[x] -= n;
+      if (F2.inv[x] <= 0) delete F2.inv[x];
+      got.n += n;
+      got.coins += n * ITEMS[x].sell;
+    });
+    if (!got.n) return null;
+    F2.coins += got.coins;
+    return got;
+  }
+  var catchHtml = (F2) => {
+    const have = CATCH.filter((x) => (F2.inv || {})[x] > 0 && ITEMS[x] && ITEMS[x].sell);
+    if (!have.length) return "";
+    const all = have.reduce((a, x) => a + F2.inv[x] * ITEMS[x].sell, 0);
+    return `<h3 class="ph3">Your catch</h3><p class="muted">The fishmonger's van takes anything you've caught (or keep it for the kitchen).</p><ul class="hlist wlist">${have.map((x) => `<li><span class="wpic">${icon(x, 26)}</span><span class="wtxt"><b>${esc(ITEMS[x].n)} ×${F2.inv[x]}</b><small>${ITEMS[x].sell} coins each</small></span><button class="btn small alt" data-fish="sell" data-k="${x}">Sell one</button></li>`).join("")}</ul>
+    <div class="actions"><button class="btn primary small" data-fish="sellall">Sell the lot · ${all} ${coin6()}</button></div>`;
+  };
   function catchLine(r) {
     const f2 = FISH[r.id];
     if (r.id === "koi") return "Too beautiful to keep. You carry it home and let it go in the pond. It'll live there now.";
@@ -23055,7 +23079,12 @@ ${SIGNOFF[t2.who] || ""}`;
   }
   function fishGo(a, k) {
     if (a === "view") fishSt = { ...fishSt, view: k };
-    else if (a === "rod") {
+    else if (a === "sell" || a === "sellall") {
+      const g = sellCatch(F, a === "sell" ? k : null);
+      if (!g) return;
+      sfx("chaching");
+      speak(g.n > 1 ? `Sold ${g.n} to the fishmonger: ${g.coins} coins.` : `Sold to the fishmonger: ${g.coins} coin${g.coins === 1 ? "" : "s"}.`, 3500);
+    } else if (a === "rod") {
       if (!buyRod(F)) return;
       sfx("chaching");
       flash("A fishing rod");

@@ -2786,7 +2786,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     F.gh.beds[0].plantedAt -= 5*3600e3; const r = g.ghHarvest(F, 0, add);
     check(r && F.inv.basil === 3 && !g.ghHarvest(F, 1, add), "the basil's ready in four hours (three bunches); the strawberries take longer");
     check(["garlic", "basil", "mint", "rosemary", "chives", "thyme"].every(h => it.CROPS[h] && it.ITEMS[h + "_seed"] && it.ITEMS[h + "_seed"].greenhouse) && it.ITEMS.gh_leek_seed && it.ITEMS.gh_leek_seed.greenhouse, "six herbs to grow, and greenhouse packets of seasonal seeds like leeks");
-    check(fi.FISH.shrimp && fi.FISH.shrimp.spot === "sea" && k.TAPAS.gambas && k.TAPAS.gambas.need.shrimp === 3 && k.TAPAS.gambas.need.garlic === 2 && k.TAPAS.gambas.need.oliveoil === 1, "shrimp from the sea, and gambas al ajillo: shrimp, garlic and olive oil"); }
+    { const G = {coins: 0, inv: {fish: 2, sardine: 3, shrimp: 1, apple: 2}}; const one = fi.sellCatch(G, "sardine"), all = fi.sellCatch(G);
+    check(one && one.coins === 2 && all && all.n === 5 && G.coins === 2 + 6 + 4 + 2 && G.inv.apple === 2 && !G.inv.fish, "selling the catch: one sardine, then the lot (everyday fish too), and nothing that isn't fish"); }
+  check(fi.FISH.shrimp && fi.FISH.shrimp.spot === "sea" && k.TAPAS.gambas && k.TAPAS.gambas.need.shrimp === 3 && k.TAPAS.gambas.need.garlic === 2 && k.TAPAS.gambas.need.oliveoil === 1, "shrimp from the sea, and gambas al ajillo: shrimp, garlic and olive oil"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`greenhouse pageerror: ${e.message}`));
   await page.addInitScript(() => { if (!/ghcoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;

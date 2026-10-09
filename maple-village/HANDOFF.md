@@ -1623,3 +1623,4 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Pressing:** tap the millstone or the press for `millPanel` (game/mill.js). 3 jars of olives make 1 bottle, up to 4 bottles a pressing, 1 hour; then "Bottle it" puts them in the backpack. Olives come from the backpack first, then the vineyard's `v.oliveCrate`.
 - **The grove:** `SHOP.grove` (300, needs the olive tree) adds four small trees in a row on the top-left terrace of the vineyard (place `grove`, `grovePanel`). 8 jars every 8 hours (`pickGrove`).
 - **Workers:** Marco and Ines (help.pick) pick the olive tree and the grove on shift into `v.oliveCrate` (`takeOliveCrate`).
+- **Round 111: selling the catch:** fishing.js `sellCatch` and `CATCH`. A "Your catch" section at every fishing spot lets you sell one or "Sell the lot", at the same prices as the market Sell tab; the everyday "fish" item now sells for 3.

@@ -123,10 +123,25 @@ export function fishPanel(F, spot, st = {}){
     else if (st.msg) h += `<p class="muted">${esc(st.msg)}</p>`;
     h += `<div class="actions"><button class="btn primary" data-fish="cast" ${s.bait > 0 ? "" : "disabled"}>${s.bait > 0 ? "Cast" : "Out of worms"}</button></div>`;
     if (!s.bait) h += `<p class="muted">No worms left. Finish a quest and you'll dig up another (three more turn up tomorrow morning anyway).</p>`;
+    h += catchHtml(F);
     if (!s.reel) h += `<p class="muted">The better reel makes every fish easier to land (the green's wider). <button class="btn small alt" data-fish="reelup" ${F.coins >= REEL ? "" : "disabled"}>Buy · ${REEL} ${coin()}</button></p>`;
   }
   return h + shut;
 }
+// Selling the catch, right at the fishing spot (round 111): the fishmonger's van takes anything you've caught, at the
+// same prices as Hana's Sell tab. CATCH: every backpack item a fish can turn into.
+export const CATCH = [...new Set(Object.values(FISH).map(f => f.item).filter(Boolean))];
+if (ITEMS.fish && !ITEMS.fish.sell) ITEMS.fish.sell = 3;   // the everyday catch (roach, perch, carp...) sells too
+export function sellCatch(F, id){
+  const ids = id ? [id] : CATCH, got = {n: 0, coins: 0};
+  ids.forEach(x => { const n = id ? Math.min(1, (F.inv || {})[x] || 0) : ((F.inv || {})[x] || 0); if (!n || !ITEMS[x] || !ITEMS[x].sell) return;
+    F.inv[x] -= n; if (F.inv[x] <= 0) delete F.inv[x]; got.n += n; got.coins += n*ITEMS[x].sell; });
+  if (!got.n) return null; F.coins += got.coins; return got;
+}
+const catchHtml = F => { const have = CATCH.filter(x => (F.inv || {})[x] > 0 && ITEMS[x] && ITEMS[x].sell); if (!have.length) return "";
+  const all = have.reduce((a, x) => a + F.inv[x]*ITEMS[x].sell, 0);
+  return `<h3 class="ph3">Your catch</h3><p class="muted">The fishmonger's van takes anything you've caught (or keep it for the kitchen).</p><ul class="hlist wlist">${have.map(x => `<li><span class="wpic">${icon(x, 26)}</span><span class="wtxt"><b>${esc(ITEMS[x].n)} ×${F.inv[x]}</b><small>${ITEMS[x].sell} coins each</small></span><button class="btn small alt" data-fish="sell" data-k="${x}">Sell one</button></li>`).join("")}</ul>
+    <div class="actions"><button class="btn primary small" data-fish="sellall">Sell the lot · ${all} ${coin()}</button></div>`; };
 export function catchLine(r){
   const f = FISH[r.id];
   if (r.id === "koi") return "Too beautiful to keep. You carry it home and let it go in the pond. It'll live there now.";
