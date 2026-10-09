@@ -1727,3 +1727,11 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Scoop Shack fridge:** each item in the fridge has "Take 1" and "All" buttons (`data-gback`, `unstockFridge`). Note that `data-gtake` is already the gelato take-away button.
 - **Cocoa Room fillings shelf:** each item has the same buttons (`data-cc="take"`, `unstockPantry`). Wine fillings stay on the shelf.
 - **Where things go:** items go back into the backpack. Flower stems aren't backpack items, so they go back onto Ma Ma's farm shop shelf. The shared helper is `takeBack` in scoop.js.
+
+### Round 120: olive oil worth pressing, and the mill's story
+- **Olive oil prices:** oil now sells for 12, up from 3. That's more than the three jars of olives it takes (worth 9). Rafael's oil in Ronda costs 14, up from 8, so you can't buy it there and sell it at home for a profit.
+- **The mill's story:** an old photograph by the mill door (`data-millspot="photo"`, `millStory` in mill.js).
+  - The mill was built in 1887 to grind flour, and fell quiet when the railway brought flour in 1912. Its sails were left turning.
+  - Tomás, a Spanish track-layer from a village near Ronda, planted an olive cutting beside it and said it would press olives one day.
+  - His initials, "T.R. 1912", are carved on the press beam.
+  - The story ends by counting the bottles Mel has pressed.

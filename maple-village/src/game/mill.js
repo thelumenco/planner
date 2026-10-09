@@ -8,6 +8,16 @@ import { icon } from "../art/icons.js";
 import { vineState } from "./vineyard.js";
 
 export const JARS_PER_BOTTLE = 3, PRESS_MAX = 4, PRESS_DUR = 1*H;
+// The mill's story (round 120), on the old photograph by the door: built for flour, kept turning for luck, and an
+// olive tree planted beside it by a Spanish railwayman from a village near Ronda, who always said it would press olives one day.
+export function millStory(F){
+  const m = millState(F);
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>The old photograph</h2><p class="sub">A brown, curling photograph in a frame by the door: the windmill with its sails new and white, a man in a flat cap leaning on the doorpost, and a young olive tree in a pot at his feet. On the back, in pencil: <i>Tomás, 1912</i>.</p>
+    <p>The mill was built in 1887 to grind Honeybrook's wheat, back when every loaf in the village started here. When the railway came in 1912, so did flour by the sack, and the millstone went quiet. The sails kept turning anyway. Nobody had the heart to stop them.</p>
+    <p>The railway brought Tomás too: a track-layer from a white village in the hills near Ronda, with an olive cutting from his grandfather's tree wrapped in a wet handkerchief in his coat pocket. He planted it beside the mill, said olives and windmills were old friends where he came from, and told anyone who'd listen that one day this mill would press olives.</p>
+    <p>His initials are still carved in the beam over the press: <b>T.R. 1912</b>. ${m.made ? `It took a hundred and some years, but it does now: ${m.made} bottle${m.made > 1 ? "s" : ""} of your oil so far.` : "It took a hundred and some years. Your first pressing will prove him right."}</p>
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
 export function millState(F){ F.mill = F.mill || {}; const m = F.mill; if (!("press" in m)) m.press = null; m.made = m.made || 0; return m; }
 export const pressLeft = m => m.press ? Math.max(0, m.press.start + m.press.dur - Date.now()) : 0;
 // olives available: the backpack, then the vineyard's olive crate

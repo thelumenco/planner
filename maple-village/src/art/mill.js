@@ -25,5 +25,9 @@ export function millArt(pressing, ready){
     ${tapeLabel(390, 522, ready ? "Oil's ready!" : "Olive press", ready ? "#F3C969" : "#F3E1A0", 10)}</g>`;
   const exit = `<g data-exit="1" aria-label="Back out to the cottage lane"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
     ${sk(`<rect x="214" y="600" width="92" height="26" rx="8" style="fill:#C9A27E"/>`, `<rect x="214" y="600" width="92" height="26" rx="8"/>`)}<text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none">Exit</text></g>`;
-  return floor + wall + jars + stone + press + exit;
+  // round 120: the old photograph by the door (the mill's story), and Tomás's initials carved in the beam
+  const photo = `<g data-millspot="photo" aria-label="An old photograph"><ellipse class="hov" cx="150" cy="104" rx="30" ry="34" style="fill:var(--butter)"/>
+    ${sk(`<rect x="128" y="72" width="44" height="58" rx="2" style="fill:#8A6A52"/><rect x="133" y="77" width="34" height="48" style="fill:#E8D3A8"/><path d="M146 118 v-24 l-6 -8 h12 l-6 8" style="fill:#B98F5E"/><path d="M144 86 l-8 -8 M148 86 l8 -8 M144 90 l-8 8 M148 90 l8 8" style="stroke:#8A6A52" stroke-width="2"/><circle cx="160" cy="112" r="4" style="fill:#7A9A4A"/>`, `<rect x="128" y="72" width="44" height="58" rx="2"/><rect x="133" y="77" width="34" height="48"/>`)}</g>`;
+  const initials = `<text x="390" y="306" text-anchor="middle" font-family="Klee One,serif" font-size="8" fill="#3A2A1E" opacity=".75" pointer-events="none">T.R. 1912</text>`;
+  return floor + wall + photo + jars + stone + press + initials + exit;
 }

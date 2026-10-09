@@ -51,7 +51,7 @@ import { greenhouseArt, GH_BED_AT } from "../art/greenhouse.js";
 import { millArt } from "../art/mill.js";
 import { bonfireArt, fishVanArt, kiteArt, bayStallArt, kiteSellerArt, movieArt } from "../art/friday.js";
 import { vanPanel, vanBuy, VAN_MULT, bonfirePanel, releaseLanterns, grillFish, bayStallGoods, bayKeeperName, filmOf } from "./friday.js";
-import { millState, pressLeft, millPanel, startPress, collectOil } from "./mill.js";
+import { millState, pressLeft, millPanel, startPress, collectOil, millStory } from "./mill.js";
 import { ghState, ghGrowth, bedPanel, ghPlant, ghHarvest, ghBoost, setGhCompost } from "./greenhouse.js";
 import { rondaArt, trainRideArt } from "../art/town-ronda.js";
 import { rondaRoomArt } from "../art/ronda-rooms.js";
@@ -1610,7 +1610,7 @@ function ctx(){
     }
     h += `</div>`;
   } else if (scene === "greenhouse" && ghBed != null) { h = bedPanel(F, ghBed);
-  } else if (scene === "mill" && millOpen) { h = millPanel(F);
+  } else if (scene === "mill" && millOpen) { h = millOpen === "story" ? millStory(F) : millPanel(F);
   } else if (friView && scene === "field" && (/^bm\d$/.test(friView) || friView === "kites")) { h = bayMarketPanel(friView);
   } else if (friView && (scene === "bay" || scene === "field" || scene === "base")) { const fam = ["dad", "mum", "gonggong", "mama", "marcus", "angelina", "darren"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
     h = friView === "van" ? vanPanel(F) : bonfirePanel(F, fam.length ? `${fam.join(", ").replace(/, ([^,]*)$/, " and $1")} ${fam.length > 1 ? "are" : "is"} round the fire` : "");
@@ -3119,6 +3119,7 @@ svg.addEventListener("click", ev => {
   const ghd = ev.target.closest("[data-gh]");
   if (ghd && scene === "farm") { go("farm", 260, 132, () => { if (owns(F, "greenhouse")) setScene("greenhouse", INNER.greenhouse.arrive); else { goalView = "greenhouse"; sfx("paper", true); speak("The old shed. With a bit of glass, it would make a lovely greenhouse...", 4000); render(); } }); return; }
   const ms = ev.target.closest("[data-millspot]");
+  if (ms && scene === "mill" && ms.dataset.millspot === "photo") { go("mill", 150, 260, () => { millOpen = "story"; atSpot = "photo"; sfx("paper", true); ctx(); }); return; }
   if (ms && scene === "mill") { go("mill", 300, 560, () => { millOpen = true; atSpot = "press"; sfx("paper", true); ctx(); }); return; }
   const gb = ev.target.closest("[data-ghbed]");
   if (gb && scene === "greenhouse") { const i = +gb.dataset.ghbed, p = GH_BED_AT[i]; go("greenhouse", p.x + p.w/2, p.y + p.h + 22, () => { ghBed = i; atSpot = "ghbed"; sfx("paper", true); ctx(); }); return; }
