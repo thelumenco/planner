@@ -1461,3 +1461,7 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
   - pastry: a tapas, "Farid's honey and pistachio pastries".
   - Game-changing flags are re-applied each render (`applyFlags`). Story items live in stall-goods.js (not sold anywhere).
 - **Tests:** "stories and the family out at the fairs" block.
+
+### Noted (Mel, after round 104): the boat travels to other towns
+- Once bought, the dolphin cruise boat (goals.js `boat`, moored at the foreshore) should also take Mel to other towns along the coast, alongside the dolphin cruise.
+- It is one of three ways to destination screens: the train (tickets at the station window), the campervan (road trips), and the boat (coastal towns). The destination screens aren't built yet; see the proposal in chat.
