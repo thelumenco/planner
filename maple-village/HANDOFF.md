@@ -1508,6 +1508,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
     - Examples: a flamenco corner with a little stage in Ronda's tapas bar; a monk with a meditation corner in a Kyoto temple.
     - Mel joins in (a short interaction or mini-moment with a result: clapping the rhythm, a breathing exercise, a lesson), and Evan can join in too, since he usually comes along.
     - Plan these in the town proposal.
+  - **Family acts are new in every town (Mel, round 121):** never reuse what the family did in an earlier town. In Ronda, Mum danced, Dad sketched, Ma Ma haggled, Gong Gong dozed, Marcus took photos, Angelina took notes, Darren counted steps and Evan chased pigeons, so none of those again. Check every earlier town's `acts` and `lines` before planning, and add new animations where needed.
   - **Shopping corners and thoughtful touches (Mel, round 117):** Mel loves shopping. Give rooms different corners that sell different things, a wide variety rather than one short list, and add small, unexpected but thoughtful touches: a free flower for Evan, a stamp on a postcard, a shop cat, the owner remembering her.
   - **People:** each room has people in it, locals and tourists with routines across the day, two to four at a time, so it never feels empty but never crowded. The family follow Mel inside.
   - **Music:** each room has its own live track in audio.js, different from the town's street music and from every other room.
