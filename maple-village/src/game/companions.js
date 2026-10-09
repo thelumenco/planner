@@ -1,6 +1,7 @@
 // Keepsakes and pets from the market stalls (data/stall-goods.js).
 //   keepsakes  little things Mel puts on a wall shelf in one of her buildings: two shelves each in the Scoop Shack,
-//              the wine shop, home, her room, and the four app houses. F.keeps = {spot: item id}; putting one where
+//              the wine shop, home, her room, the Cocoa Room and the four app houses, one in the greenhouse and the
+//              mill, and the home fridge for magnets. Town souvenirs marked keep can go up too. F.keeps = {spot: item id}; putting one where
 //              another stands sends the old one back to the backpack, and a placed one can be taken back down.
 //   pets       adopted at the market's adoption corner (Noor), then given to someone in the family, who looks after
 //              it on the screen Mel picks. F.companions = [{id, kind, name, owner, scene, spot, since, patDay, playDay}].
@@ -19,36 +20,45 @@ export const KEEP_SPOTS = {
   chord1: {scene: "chord", at: [186, 128], n: "the Chord workshop, by the pegboard"}, chord2: {scene: "chord", at: [318, 128], n: "the Chord workshop, by the window"},
   chico1: {scene: "chico", at: [336, 128], n: "Chico cottage, by the round window"}, chico2: {scene: "chico", at: [482, 128], n: "Chico cottage, far wall"},
   luna1: {scene: "luna", at: [96, 128], n: "the Luna house, left wall"}, luna2: {scene: "luna", at: [334, 128], n: "the Luna house, by the moon"},
-  ohayo1: {scene: "ohayo", at: [60, 128], n: "the Ohayo house, left wall"}, ohayo2: {scene: "ohayo", at: [322, 128], n: "the Ohayo house, by the sunrise"}
+  ohayo1: {scene: "ohayo", at: [60, 128], n: "the Ohayo house, left wall"}, ohayo2: {scene: "ohayo", at: [322, 128], n: "the Ohayo house, by the sunrise"},
+  cocoa1: {scene: "cocoa", at: [100, 128], n: "the Cocoa Room, above the bar wall"}, cocoa2: {scene: "cocoa", at: [356, 128], n: "the Cocoa Room, by the chalkboard"},
+  green1: {scene: "greenhouse", at: [64, 140], n: "the greenhouse, on the glass"},
+  mill1: {scene: "mill", at: [64, 128], n: "the old mill, by the photograph"},
+  fridge: {scene: "home", at: [328, 206], n: "home, on the fridge", only: "magnet"}   // no shelf: a magnet stuck on the fridge door
 };
-const BUILDING = {scoopshop: "The Scoop Shack", wineshop: "The wine shop", home: "Home", room: "Your room", chord: "Chord workshop", chico: "Chico cottage", luna: "Luna house", ohayo: "Ohayo house"};
+// what can go where: keepsakes, and souvenirs marked keep (towns.js), on shelves; fridge magnets only on the fridge
+export const canKeep = it => !!it && (it.kind === "keepsake" || !!it.keep);
+const fits = (it, sp) => canKeep(it) && (sp.only ? !!it[sp.only] : !it.magnet);
+const BUILDING = {scoopshop: "The Scoop Shack", wineshop: "The wine shop", home: "Home", room: "Your room", cocoa: "The Cocoa Room", greenhouse: "The greenhouse", mill: "The old mill", chord: "Chord workshop", chico: "Chico cottage", luna: "Luna house", ohayo: "Ohayo house"};
+const onWhat = sp => sp.only ? `on the fridge at ${sp.n.replace(/, .*/, "")}` : `on the shelf in ${sp.n}`;
 export const keeps = F => (F.keeps = F.keeps || {});
 // put a keepsake from the backpack on a shelf -> a line to say, or null
 export function placeKeep(F, item, spot){
-  const it = ITEMS[item], sp = KEEP_SPOTS[spot]; if (!it || it.kind !== "keepsake" || !sp || !(F.inv[item] > 0)) return null;
+  const it = ITEMS[item], sp = KEEP_SPOTS[spot]; if (!it || !sp || !fits(it, sp) || !(F.inv[item] > 0)) return null;
   const K = keeps(F), old = K[spot];
   F.inv[item]--; if (!F.inv[item]) delete F.inv[item];
   if (old) F.inv[old] = (F.inv[old] || 0) + 1;
   K[spot] = item;
-  return `${it.n} on the shelf in ${sp.n}.${old ? ` The ${ITEMS[old].n.toLowerCase()} is back in your backpack.` : ""}`;
+  return `${it.n} ${onWhat(sp)}.${old ? ` The ${ITEMS[old].n.toLowerCase()} is back in your backpack.` : ""}`;
 }
 export function takeKeep(F, spot){ const K = keeps(F), id = K[spot]; if (!id) return null; delete K[spot]; F.inv[id] = (F.inv[id] || 0) + 1; return ITEMS[id]; }
 export function keepPanel(F, item){
   const it = ITEMS[item], K = keeps(F);
-  const by = Object.keys(BUILDING).map(sc => [sc, Object.keys(KEEP_SPOTS).filter(k => KEEP_SPOTS[k].scene === sc)]);
-  return `<span class="tape stripe" aria-hidden="true"></span><h2>${esc(it ? it.n : "A keepsake")}</h2><p class="sub">${esc(it ? it.line : "")} Which shelf?</p>
-    ${by.map(([sc, ks]) => `<p class="eyebrow" style="margin:10px 0 4px">${esc(BUILDING[sc])}</p><div class="vhelp">${ks.map(k => `<button class="vhelpi" data-keepat="${k}"><span><b>${esc(KEEP_SPOTS[k].n.replace(/^[^,]+, /, "").replace(/^./, c => c.toUpperCase()))}</b><small>${K[k] ? `${esc(ITEMS[K[k]].n)} there now (it comes back to you)` : "empty shelf"}</small></span></button>`).join("")}</div>`).join("")}
+  const by = Object.keys(BUILDING).map(sc => [sc, Object.keys(KEEP_SPOTS).filter(k => KEEP_SPOTS[k].scene === sc && fits(it, KEEP_SPOTS[k]))]).filter(([, ks]) => ks.length);
+  return `<span class="tape stripe" aria-hidden="true"></span><h2>${esc(it ? it.n : "A keepsake")}</h2><p class="sub">${esc(it ? it.line || "" : "")} ${it && it.magnet ? "Where shall it go?" : "Which shelf?"}</p>
+    ${by.map(([sc, ks]) => `<p class="eyebrow" style="margin:10px 0 4px">${esc(BUILDING[sc])}</p><div class="vhelp">${ks.map(k => `<button class="vhelpi" data-keepat="${k}"><span><b>${esc(KEEP_SPOTS[k].n.replace(/^[^,]+, /, "").replace(/^./, c => c.toUpperCase()))}</b><small>${K[k] ? `${esc(ITEMS[K[k]].n)} there now (it comes back to you)` : KEEP_SPOTS[k].only ? "nothing on it yet" : "empty shelf"}</small></span></button>`).join("")}</div>`).join("")}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 // a placed keepsake's card: what it is, and take it down
 export function placedPanel(F, spot){
   const id = keeps(F)[spot], it = ITEMS[id]; if (!it) return "";
-  return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(it.n)}</h2><p class="sub">${esc(it.line)} On the shelf in ${esc(KEEP_SPOTS[spot].n)}.</p>
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(it.n)}</h2><p class="sub">${esc(it.line || "")} ${esc(onWhat(KEEP_SPOTS[spot]).replace(/^./, c => c.toUpperCase()))}.</p>
     <div class="actions"><button class="btn alt" data-keepdown="${spot}">Take it down</button><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export function keepsakesIn(F, scene){
   const K = keeps(F);
   return Object.entries(KEEP_SPOTS).filter(([, sp]) => sp.scene === scene).map(([k, sp]) => { const [x, y] = sp.at, id = K[k];
+    if (sp.only) return id ? `<g data-keep="${k}" aria-label="${esc(ITEMS[id] ? ITEMS[id].n : "")}"><svg x="${x - 8}" y="${y - 8}" width="16" height="16" viewBox="0 0 24 24" overflow="visible">${icon(id, 24).replace(/^<svg[^>]*>|<\/svg>$/g, "")}</svg></g>` : "";
     return `<g ${id ? `data-keep="${k}" aria-label="${esc(ITEMS[id] ? ITEMS[id].n : "")}"` : `pointer-events="none"`}><rect x="${x - 17}" y="${y}" width="34" height="5" rx="1.5" style="fill:#B98A5A;stroke:var(--line)" stroke-width="1"/>
       <path d="M${x - 11} ${y + 5} l3 6 M${x + 11} ${y + 5} l-3 6" style="stroke:var(--line)" stroke-width="1"/>${id ? `<svg x="${x - 13}" y="${y - 25}" width="26" height="26" viewBox="0 0 24 24" overflow="visible">${icon(id, 24).replace(/^<svg[^>]*>|<\/svg>$/g, "")}</svg>` : ""}</g>`; }).join("");
 }

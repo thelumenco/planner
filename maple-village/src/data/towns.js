@@ -324,6 +324,18 @@ export const TILES = {
 // Round 118: paint your own tile at Lucía's: a colour and a pattern, four strokes, fired in her kiln (a keepsake)
 export const PAINT = {price: 8, colours: {azul: ["cobalt blue", "#3E6BAE"], amarillo: ["saffron yellow", "#E8B13A"], verde: ["olive green", "#5E8A48"]},
   patterns: {star: "an eight-point star", flower: "a geranium flower", wave: "waves, like the river in the gorge"}};
+// souvenirs that can be kept instead of given: the backpack's gift picker offers "Keep it", and they go on a shelf
+// (companions.js KEEP_SPOTS) with this line on their card. The magnet goes on the fridge at home.
+const KEEP_LINES = {
+  abanico: "A painted fan from Ronda, red and gold.", corcho: "Cork coasters from the cork oaks outside Ronda.", encaje: "A black lace fan from the postcard stall in Ronda.",
+  cuenco: "A hand-painted bowl from Ronda, blue and yellow like the tiles.", aceitera: "A little olive dish from Ronda, with a pit for the stones.", jarra: "A painted jug from Ronda, just right for garden flowers.",
+  postal: "A postcard of the Puente Nuevo in Ronda.", iman: "A little white house with a red roof, from Ronda.",
+  cartera: "A leather wallet, hand-stitched in Ubrique.", bolso: "A leather handbag from Ubrique, via Ronda's leather workshop.", cinturon: "A hand-stitched leather belt from Ubrique.",
+  libreta: "A leather notebook from Ubrique.", llavero: "A leather keyring with the bridge stamped on it.",
+  furoshiki: "A furoshiki cloth from Kyoto, indigo and gold.", sensu: "A folding fan from Kyoto, with cranes on it.", hocho: "A Kyoto kitchen knife, folded steel."
+};
+Object.entries(KEEP_LINES).forEach(([id, line]) => Object.assign(TOWN_GOODS[id], {keep: true, line}));
+TOWN_GOODS.iman.magnet = true;
 Object.keys(PAINT.colours).forEach(c => Object.keys(PAINT.patterns).forEach(p => { TOWN_GOODS[`ptile_${c}_${p}`] = {n: "Your painted tile", kind: "keepsake", price: 0, tile: [c, p], art: ["tile", PAINT.colours[c][1], "#FFFDF6"], line: `A tile you painted yourself at Lucía's in Ronda: ${PAINT.patterns[p]}, in ${PAINT.colours[c][0]}.`}; }));
 // Round 123: the nerikiri sweets Mel makes with Mr Tanaka in Kyoto (gifts), one shape for each season
 [["sakura", "cherry blossom", "#F6C7D6"], ["ajisai", "hydrangea", "#B9A8E0"], ["momiji", "maple leaf", "#E0782E"], ["tsubaki", "camellia", "#C8432F"]].forEach(([k, n, col]) => {

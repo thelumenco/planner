@@ -77,7 +77,7 @@ import { POOLS } from "../data/stall-goods.js";
 import { cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
   pantryPanel, bonbonPanel, casePanel, stockPantry, unstockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
   sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, haveHot, packGrand, readyPot, ccUp } from "./cocoa.js";
-import { keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, OWNER_NAME, PETS, petAt } from "./companions.js";
+import { canKeep, keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, OWNER_NAME, PETS, petAt } from "./companions.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
 import { diningTable, darrenAsleep, skyWash, tapeLabel } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
@@ -1293,8 +1293,8 @@ const giftPos = w => w === "evan" ? (evanHere() ? evan : null) : w === "darren" 
 let giftPick = null;
 function giftPickHTML(id){
   const it = ITEMS[id]; if (!it || !F.inv[id]) return "";
-  return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${recipients(it).map(w => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}<button class="btn small alt" data-giveto="">Cancel</button></div>
-    <p class="muted">Anyone who isn't here gets it sent round, and their thank-you note comes to your mailbox.</p></div>`;
+  return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${recipients(it).map(w => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}${canKeep(it) ? `<button class="btn small alt" data-keepit="1">Keep it${it.magnet ? "<small> · for the fridge</small>" : "<small> · on a shelf</small>"}</button>` : ""}<button class="btn small alt" data-giveto="">Cancel</button></div>
+    <p class="muted">Anyone who isn't here gets it sent round, and their thank-you note comes to your mailbox.${canKeep(it) ? " Or keep it, and put it up somewhere of yours." : ""}</p></div>`;
 }
 function giveTo(id, w){
   giftPick = null; const it = ITEMS[id]; if (!w || !it || !F.inv[id]) { bag(); return; }
@@ -1890,6 +1890,7 @@ function bag(){
   if (hasUp(scoopState(F), "bike")) { $("bag").insertAdjacentHTML("beforeend", `<button class="btn small alt" data-deliver="1" style="grid-column:1/-1">Send an ice cream (Scoop Shack delivery)</button>`);
     $("bag").querySelector("[data-deliver]").onclick = () => { openView = null; scView = "deliver"; scSt.vpick = null; scoopNow(); ctx(); }; }
   $("bag").querySelectorAll("[data-giveto]").forEach(b => b.onclick = ev => { ev.stopPropagation(); giveTo(giftPick, b.dataset.giveto); });
+  $("bag").querySelectorAll("[data-keepit]").forEach(b => b.onclick = ev => { ev.stopPropagation(); keepItem = giftPick; giftPick = null; openView = null; render(); });   // a souvenir kept: off to the shelf chooser
   $("bag").querySelectorAll(".item").forEach(b => b.onclick = ev => { const k = ev.target.closest("[data-kit]"); if (k) { ev.stopPropagation(); toKitchen(k.dataset.kit); return; } useItem(b.dataset.id); });
   $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome gift of seeds is in here. Plant them in the garden." : "";
   $("play").innerHTML = [["pet","Pet"],["hide","Hide-and-seek"],["nap","Nap together"]].map(([k, n]) => `<button class="btn alt small" data-play="${k}">${n}</button>`).join("");

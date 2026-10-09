@@ -2279,6 +2279,26 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     colours: { azul: ["cobalt blue", "#3E6BAE"], amarillo: ["saffron yellow", "#E8B13A"], verde: ["olive green", "#5E8A48"] },
     patterns: { star: "an eight-point star", flower: "a geranium flower", wave: "waves, like the river in the gorge" }
   };
+  var KEEP_LINES = {
+    abanico: "A painted fan from Ronda, red and gold.",
+    corcho: "Cork coasters from the cork oaks outside Ronda.",
+    encaje: "A black lace fan from the postcard stall in Ronda.",
+    cuenco: "A hand-painted bowl from Ronda, blue and yellow like the tiles.",
+    aceitera: "A little olive dish from Ronda, with a pit for the stones.",
+    jarra: "A painted jug from Ronda, just right for garden flowers.",
+    postal: "A postcard of the Puente Nuevo in Ronda.",
+    iman: "A little white house with a red roof, from Ronda.",
+    cartera: "A leather wallet, hand-stitched in Ubrique.",
+    bolso: "A leather handbag from Ubrique, via Ronda's leather workshop.",
+    cinturon: "A hand-stitched leather belt from Ubrique.",
+    libreta: "A leather notebook from Ubrique.",
+    llavero: "A leather keyring with the bridge stamped on it.",
+    furoshiki: "A furoshiki cloth from Kyoto, indigo and gold.",
+    sensu: "A folding fan from Kyoto, with cranes on it.",
+    hocho: "A Kyoto kitchen knife, folded steel."
+  };
+  Object.entries(KEEP_LINES).forEach(([id, line]) => Object.assign(TOWN_GOODS[id], { keep: true, line }));
+  TOWN_GOODS.iman.magnet = true;
   Object.keys(PAINT.colours).forEach((c) => Object.keys(PAINT.patterns).forEach((p) => {
     TOWN_GOODS[`ptile_${c}_${p}`] = { n: "Your painted tile", kind: "keepsake", price: 0, tile: [c, p], art: ["tile", PAINT.colours[c][1], "#FFFDF6"], line: `A tile you painted yourself at Lucía's in Ronda: ${PAINT.patterns[p]}, in ${PAINT.colours[c][0]}.` };
   }));
@@ -18723,7 +18743,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
 
   // src/game/ronda.js
   Object.entries(TOWN_GOODS).forEach(([id, g3]) => {
-    if (!ITEMS[id]) ITEMS[id] = { n: g3.n, ico: id, kind: g3.kind, price: g3.price, sell: g3.sell, what: g3.what, ...g3.line ? { line: g3.line } : {}, ...g3.to ? { to: g3.to, say: g3.say } : {}, ...g3.says ? { says: g3.says } : {} };
+    if (!ITEMS[id]) ITEMS[id] = { n: g3.n, ico: id, kind: g3.kind, price: g3.price, sell: g3.sell, what: g3.what, ...g3.line ? { line: g3.line } : {}, ...g3.keep ? { keep: true } : {}, ...g3.magnet ? { magnet: true } : {}, ...g3.to ? { to: g3.to, say: g3.say } : {}, ...g3.says ? { says: g3.says } : {} };
   });
   var VINES = { price: 120, n: 3 };
   function rondaState(F2) {
@@ -20590,19 +20610,28 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     luna1: { scene: "luna", at: [96, 128], n: "the Luna house, left wall" },
     luna2: { scene: "luna", at: [334, 128], n: "the Luna house, by the moon" },
     ohayo1: { scene: "ohayo", at: [60, 128], n: "the Ohayo house, left wall" },
-    ohayo2: { scene: "ohayo", at: [322, 128], n: "the Ohayo house, by the sunrise" }
+    ohayo2: { scene: "ohayo", at: [322, 128], n: "the Ohayo house, by the sunrise" },
+    cocoa1: { scene: "cocoa", at: [100, 128], n: "the Cocoa Room, above the bar wall" },
+    cocoa2: { scene: "cocoa", at: [356, 128], n: "the Cocoa Room, by the chalkboard" },
+    green1: { scene: "greenhouse", at: [64, 140], n: "the greenhouse, on the glass" },
+    mill1: { scene: "mill", at: [64, 128], n: "the old mill, by the photograph" },
+    fridge: { scene: "home", at: [328, 206], n: "home, on the fridge", only: "magnet" }
+    // no shelf: a magnet stuck on the fridge door
   };
-  var BUILDING = { scoopshop: "The Scoop Shack", wineshop: "The wine shop", home: "Home", room: "Your room", chord: "Chord workshop", chico: "Chico cottage", luna: "Luna house", ohayo: "Ohayo house" };
+  var canKeep = (it) => !!it && (it.kind === "keepsake" || !!it.keep);
+  var fits = (it, sp) => canKeep(it) && (sp.only ? !!it[sp.only] : !it.magnet);
+  var BUILDING = { scoopshop: "The Scoop Shack", wineshop: "The wine shop", home: "Home", room: "Your room", cocoa: "The Cocoa Room", greenhouse: "The greenhouse", mill: "The old mill", chord: "Chord workshop", chico: "Chico cottage", luna: "Luna house", ohayo: "Ohayo house" };
+  var onWhat = (sp) => sp.only ? `on the fridge at ${sp.n.replace(/, .*/, "")}` : `on the shelf in ${sp.n}`;
   var keeps = (F2) => F2.keeps = F2.keeps || {};
   function placeKeep(F2, item, spot3) {
     const it = ITEMS[item], sp = KEEP_SPOTS[spot3];
-    if (!it || it.kind !== "keepsake" || !sp || !(F2.inv[item] > 0)) return null;
+    if (!it || !sp || !fits(it, sp) || !(F2.inv[item] > 0)) return null;
     const K3 = keeps(F2), old = K3[spot3];
     F2.inv[item]--;
     if (!F2.inv[item]) delete F2.inv[item];
     if (old) F2.inv[old] = (F2.inv[old] || 0) + 1;
     K3[spot3] = item;
-    return `${it.n} on the shelf in ${sp.n}.${old ? ` The ${ITEMS[old].n.toLowerCase()} is back in your backpack.` : ""}`;
+    return `${it.n} ${onWhat(sp)}.${old ? ` The ${ITEMS[old].n.toLowerCase()} is back in your backpack.` : ""}`;
   }
   function takeKeep(F2, spot3) {
     const K3 = keeps(F2), id = K3[spot3];
@@ -20613,21 +20642,22 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function keepPanel(F2, item) {
     const it = ITEMS[item], K3 = keeps(F2);
-    const by = Object.keys(BUILDING).map((sc) => [sc, Object.keys(KEEP_SPOTS).filter((k) => KEEP_SPOTS[k].scene === sc)]);
-    return `<span class="tape stripe" aria-hidden="true"></span><h2>${esc(it ? it.n : "A keepsake")}</h2><p class="sub">${esc(it ? it.line : "")} Which shelf?</p>
-    ${by.map(([sc, ks]) => `<p class="eyebrow" style="margin:10px 0 4px">${esc(BUILDING[sc])}</p><div class="vhelp">${ks.map((k) => `<button class="vhelpi" data-keepat="${k}"><span><b>${esc(KEEP_SPOTS[k].n.replace(/^[^,]+, /, "").replace(/^./, (c) => c.toUpperCase()))}</b><small>${K3[k] ? `${esc(ITEMS[K3[k]].n)} there now (it comes back to you)` : "empty shelf"}</small></span></button>`).join("")}</div>`).join("")}
+    const by = Object.keys(BUILDING).map((sc) => [sc, Object.keys(KEEP_SPOTS).filter((k) => KEEP_SPOTS[k].scene === sc && fits(it, KEEP_SPOTS[k]))]).filter(([, ks]) => ks.length);
+    return `<span class="tape stripe" aria-hidden="true"></span><h2>${esc(it ? it.n : "A keepsake")}</h2><p class="sub">${esc(it ? it.line || "" : "")} ${it && it.magnet ? "Where shall it go?" : "Which shelf?"}</p>
+    ${by.map(([sc, ks]) => `<p class="eyebrow" style="margin:10px 0 4px">${esc(BUILDING[sc])}</p><div class="vhelp">${ks.map((k) => `<button class="vhelpi" data-keepat="${k}"><span><b>${esc(KEEP_SPOTS[k].n.replace(/^[^,]+, /, "").replace(/^./, (c) => c.toUpperCase()))}</b><small>${K3[k] ? `${esc(ITEMS[K3[k]].n)} there now (it comes back to you)` : KEEP_SPOTS[k].only ? "nothing on it yet" : "empty shelf"}</small></span></button>`).join("")}</div>`).join("")}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function placedPanel(F2, spot3) {
     const id = keeps(F2)[spot3], it = ITEMS[id];
     if (!it) return "";
-    return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(it.n)}</h2><p class="sub">${esc(it.line)} On the shelf in ${esc(KEEP_SPOTS[spot3].n)}.</p>
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(it.n)}</h2><p class="sub">${esc(it.line || "")} ${esc(onWhat(KEEP_SPOTS[spot3]).replace(/^./, (c) => c.toUpperCase()))}.</p>
     <div class="actions"><button class="btn alt" data-keepdown="${spot3}">Take it down</button><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function keepsakesIn(F2, scene2) {
     const K3 = keeps(F2);
     return Object.entries(KEEP_SPOTS).filter(([, sp]) => sp.scene === scene2).map(([k, sp]) => {
       const [x, y] = sp.at, id = K3[k];
+      if (sp.only) return id ? `<g data-keep="${k}" aria-label="${esc(ITEMS[id] ? ITEMS[id].n : "")}"><svg x="${x - 8}" y="${y - 8}" width="16" height="16" viewBox="0 0 24 24" overflow="visible">${icon(id, 24).replace(/^<svg[^>]*>|<\/svg>$/g, "")}</svg></g>` : "";
       return `<g ${id ? `data-keep="${k}" aria-label="${esc(ITEMS[id] ? ITEMS[id].n : "")}"` : `pointer-events="none"`}><rect x="${x - 17}" y="${y}" width="34" height="5" rx="1.5" style="fill:#B98A5A;stroke:var(--line)" stroke-width="1"/>
       <path d="M${x - 11} ${y + 5} l3 6 M${x + 11} ${y + 5} l-3 6" style="stroke:var(--line)" stroke-width="1"/>${id ? `<svg x="${x - 13}" y="${y - 25}" width="26" height="26" viewBox="0 0 24 24" overflow="visible">${icon(id, 24).replace(/^<svg[^>]*>|<\/svg>$/g, "")}</svg>` : ""}</g>`;
     }).join("");
@@ -23364,8 +23394,8 @@ Then tell chat "wind down" whenever you're ready.`
   function giftPickHTML(id) {
     const it = ITEMS[id];
     if (!it || !F.inv[id]) return "";
-    return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${recipients(it).map((w) => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}<button class="btn small alt" data-giveto="">Cancel</button></div>
-    <p class="muted">Anyone who isn't here gets it sent round, and their thank-you note comes to your mailbox.</p></div>`;
+    return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${recipients(it).map((w) => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}${canKeep(it) ? `<button class="btn small alt" data-keepit="1">Keep it${it.magnet ? "<small> · for the fridge</small>" : "<small> · on a shelf</small>"}</button>` : ""}<button class="btn small alt" data-giveto="">Cancel</button></div>
+    <p class="muted">Anyone who isn't here gets it sent round, and their thank-you note comes to your mailbox.${canKeep(it) ? " Or keep it, and put it up somewhere of yours." : ""}</p></div>`;
   }
   function giveTo(id, w) {
     giftPick = null;
@@ -24939,6 +24969,13 @@ ${SIGNOFF[t2.who] || ""}`;
     $("bag").querySelectorAll("[data-giveto]").forEach((b) => b.onclick = (ev) => {
       ev.stopPropagation();
       giveTo(giftPick, b.dataset.giveto);
+    });
+    $("bag").querySelectorAll("[data-keepit]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      keepItem = giftPick;
+      giftPick = null;
+      openView = null;
+      render();
     });
     $("bag").querySelectorAll(".item").forEach((b) => b.onclick = (ev) => {
       const k = ev.target.closest("[data-kit]");

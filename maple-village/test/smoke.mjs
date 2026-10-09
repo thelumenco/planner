@@ -2147,7 +2147,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   page.on("dialog", d => { errors.push("keepsakes used a browser pop-up"); d.dismiss(); });
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { if (!/petpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
-    f.inv = {...(f.inv || {}), k_conelamp: 1, pet_puppy: 1}; f.coins = 100;
+    f.inv = {...(f.inv || {}), k_conelamp: 1, pet_puppy: 1, cuenco: 1, iman: 1}; f.coins = 100;
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-11"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
@@ -2162,6 +2162,18 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-keep="scoop1"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-keepdown]", { timeout: 15000 });
   await page.click("#ctx [data-keepdown]"); await page.waitForTimeout(400);
   check(await fox().then(f => !f.keeps.scoop1 && f.inv.k_conelamp === 1), "and comes back down into the backpack");
+  await page.click('#bag .item[data-id="cuenco"]').catch(async () => { await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="cuenco"]'); });
+  await page.waitForSelector('#bag [data-keepit]', { timeout: 15000 }); check(await page.locator('#bag [data-giveto="mum"]').count() === 1, "a Ronda souvenir can still be given away");
+  await page.click('#bag [data-keepit]'); await page.waitForSelector('#ctx [data-keepat="mill1"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-keepat="cocoa2"]').count() === 1 && await page.locator('#ctx [data-keepat="green1"]').count() === 1 && await page.locator('#ctx [data-keepat="fridge"]').count() === 0, "or kept: new shelves in the Cocoa Room, the greenhouse and the mill (and the fridge is for magnets)");
+  await page.click('#ctx [data-keepat="mill1"]'); await page.waitForTimeout(500);
+  check(await fox().then(f => f.keeps.mill1 === "cuenco" && !f.inv.cuenco), "the painted bowl goes up in the old mill");
+  await page.click('[data-open="bag"]').catch(() => {}); await page.click('#bag .item[data-id="iman"]'); await page.waitForSelector('#bag [data-keepit]', { timeout: 15000 });
+  await page.click('#bag [data-keepit]'); await page.waitForSelector('#ctx [data-keepat="fridge"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-keepat="scoop1"]').count() === 0, "the fridge magnet only goes on the fridge");
+  await page.click('#ctx [data-keepat="fridge"]'); await page.waitForTimeout(400);
+  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(900);
+  check(await fox().then(f => f.keeps.fridge === "iman") && await page.locator('#world [data-keep="fridge"]').count() === 1, "and there it is on the fridge at home");
   await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(900);
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="pet_puppy"]'); await page.waitForSelector('#ctx [data-adoptfor="evan"]', { timeout: 15000 });
   await page.click('#ctx [data-adoptfor="evan"]'); await page.waitForSelector('#ctx [data-adoptat="home"]', { timeout: 15000 });

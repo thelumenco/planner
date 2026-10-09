@@ -1811,3 +1811,11 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Marcus: a calligraphy brush.
   - Angellina: a fortune slip.
 - **Touches:** Fumiko gives Evan a rice cracker, the hall bell rings, and the pottery's wind chime tinkles.
+
+### Round 125: keep it or gift it, new shelves, the fridge magnet
+- **Keep it:** town souvenirs marked `keep` in `towns.js` (`KEEP_LINES`) show a "Keep it" button in the backpack's gift picker, next to the gift options. Tapping it opens the shelf chooser (`companions.js` `keepPanel`). This covers:
+  - Ronda: painted fan, lace fan, cork coasters, painted bowl, olive dish, jug, postcard, magnet and the leather goods.
+  - Kyoto: furoshiki, folding fan and knife.
+- **New shelves:** two in the Cocoa Room (`cocoa1`, `cocoa2`), one in the greenhouse (`green1`, on the glass) and one in the old mill (`mill1`, by the photograph).
+- **Fridge:** the `fridge` spot on the home fridge door has no shelf and takes only items flagged `magnet` (the Ronda magnet, `iman`). Magnets don't go on shelves.
+- Rule for future towns: give every non-food souvenir a `KEEP_LINES` entry. A town magnet gets `magnet: true`.

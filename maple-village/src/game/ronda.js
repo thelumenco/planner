@@ -11,7 +11,7 @@ import { TAPAS, needText } from "./kitchen.js";
 import { addCuttings, vineState } from "./vineyard.js";
 
 // the goods become ordinary items (the backpack, the kitchen, the gelato fridge, the fillings shelf, gifts)
-Object.entries(TOWN_GOODS).forEach(([id, g]) => { if (!ITEMS[id]) ITEMS[id] = {n: g.n, ico: id, kind: g.kind, price: g.price, sell: g.sell, what: g.what, ...(g.line ? {line: g.line} : {}), ...(g.to ? {to: g.to, say: g.say} : {}), ...(g.says ? {says: g.says} : {})}; });
+Object.entries(TOWN_GOODS).forEach(([id, g]) => { if (!ITEMS[id]) ITEMS[id] = {n: g.n, ico: id, kind: g.kind, price: g.price, sell: g.sell, what: g.what, ...(g.line ? {line: g.line} : {}), ...(g.keep ? {keep: true} : {}), ...(g.magnet ? {magnet: true} : {}), ...(g.to ? {to: g.to, say: g.say} : {}), ...(g.says ? {says: g.says} : {})}; });
 
 export const VINES = {price: 120, n: 3};   // three Tempranillo cuttings
 export function rondaState(F){ F.ronda = F.ronda || {}; const r = F.ronda; r.days = r.days || []; r.tiles = r.tiles || {}; r.picnics = r.picnics || 0; return r; }
