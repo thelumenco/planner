@@ -1703,3 +1703,22 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - **Market:** a spice stall, olive barrels, bread, crates.
   - **Leather workshop:** tall shelf units of bags, wallets and belts on both walls, fuller display tables, a saddle, a hat stand of satchels, boxes.
 - **TOWN_OBST updated** for all the new furniture.
+
+### Round 118: things to join in with in Ronda, shopping corners, little touches
+- **Flamenco corner in the tapas bar:** a stage in the bottom-right corner. Manolo (guitar) and the new local Rosario (dancer) play 1–3pm and 8–10pm.
+  - Tap the stage to clap the palmas: a 12-beat bulería, claps on 3, 6, 8, 10 and 12, two rounds, on a `.compas` bar.
+  - Seven or more good claps, with three or fewer stray ones, earns an Olé: Rosario twirls Mel on the stage, with hearts and XP. Mum cheers if she's there, and Evan claps along.
+  - Code: `palmasStart`, `clap`, `ole`, `showOn` in ronda.js.
+- **Tile painting at Lucía's:** in the tile shop panel, for 8 coins.
+  - Pick a colour (blue, yellow or green) and a pattern (star, flower or waves), then tap the four brush strokes in order. Lucía steadies your hand on a wrong one.
+  - The tile is fired as a keepsake (`ptile_<colour>_<pattern>`), shown with the new "tile" icon. If Evan's along he gets `etile`, his finger-painted one.
+- **Mint tea in the baths:** a low brass table with cushions, bottom right.
+  - With Amina there (10–2, 4–7), pour three glasses from high: tap Pour while the marker is in the green (reuses the `.fbar` sweep). Two good pours and Amina toasts.
+  - Evan gets a sugar cube. XP once a day.
+- **Shopping corners:** these open `shopPanel`.
+  - Market: a spice stall (saffron, smoked paprika, a spice tin set) and a ceramics corner (a painted bowl, an olive dish, a little jug).
+  - Doña Carmen's: a postcard stand (a postcard, a fridge magnet, a lace fan).
+- **Touches:**
+  - Antonio stamps an M into leather you buy, and Doña Carmen stamps your postcard.
+  - Rocío gives Evan a carnation once a day at the market, and he hands it to Mel (`clavel`).
+  - The workshop cat Piel sleeps on Antonio's counter: tap her.
