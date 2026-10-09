@@ -223,6 +223,7 @@ export function eventSlot(id, day, hm){
   const e = eventOn(day); if (!e || hm < e.from || hm >= e.to) return null;
   const st = e.stalls.find(s => s.id === id);
   if (st) return keeperSlot(st, e, day, hm);
+  { const f = familyAtEvent(id, e, day, hm); if (f) return f; }
   if (e.kind === "night") return nightShopper(id, e, day, hm);
   const mid = e.from + Math.round((e.to - e.from)/2), wave = hm < mid ? 0 : 1, half = Math.round((wave ? e.to - mid : mid - e.from)/2), start = wave ? mid : e.from;
   const crowd = groupFor(day + "ev" + wave, 4, ["pip", ...e.stalls.map(s => s.id), ...toursOn(day).flatMap(t => [t.guide, ...t.group])], [...VISITORS, ...TOURISTS, "sam", "priya"]);
@@ -230,6 +231,19 @@ export function eventSlot(id, day, hm){
   if (k >= 2 && hm >= start + half) return {from: start + half, to: wave ? e.to : mid, scene: "field", at: PICNICKERS[wave ? k : k - 2], act: "sit"};
   if (k >= 0 || id === "pip") return {from: start, to: wave ? e.to : mid, scene: "field", wander: id === "pip" ? FIELD_PLAY : FIELD_WALK};
   return null;
+}
+// Round 104: Mel's family goes to the night market and the fair too (the Sunday market they already do in their routines).
+// Night market: Tuesdays Marcus and Angellina, and Ma Ma and Gong Gong early for a look round; Thursdays Mum and Dad,
+// and Darren for an hour. The fair: everyone, in turns through the day.
+const FAMILY_EVENTS = {
+  night: {2: [["mama", 17*60 + 45, 19*60], ["gonggong", 17*60 + 45, 19*60], ["marcus", 18*60 + 30, 20*60 + 30], ["angelina", 18*60 + 30, 20*60 + 30]],
+    4: [["mum", 18*60, 20*60], ["dad", 18*60, 20*60], ["darren", 19*60, 20*60 + 30]]},
+  fair: [["mum", 10*60, 12*60], ["dad", 10*60, 12*60], ["mama", 11*60, 13*60], ["gonggong", 11*60, 13*60], ["darren", 13*60, 15*60], ["marcus", 13*60, 15*60 + 30], ["angelina", 13*60, 15*60 + 30]]
+};
+export function familyAtEvent(id, e, day, hm){
+  const list = e.kind === "night" ? (FAMILY_EVENTS.night[dow(day)] || []) : e.kind === "fair" ? FAMILY_EVENTS.fair : [];
+  const f = list.find(([who, from, to]) => who === id && hm >= from && hm < to); if (!f) return null;
+  return {from: f[1], to: f[2], scene: "field", wander: FIELD_WALK};
 }
 // Night market shoppers: mostly tourists (five a wave, two waves), plus two villagers a wave. Some browse the stalls,
 // some stand by the stage listening to the jazz, two sit on the picnic blankets with their food. These slots are
