@@ -5433,10 +5433,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   };
   var movieNow = (day, hm2) => lastFriday(day) && hm2 >= MOVIE[0] && hm2 < MOVIE[1];
   var SCREEN = [236, 128];
-  var BLANKET = { mum: [190, 210], dad: [220, 212], mama: [252, 210], gonggong: [282, 212] };
+  var BLANKET = { mum: [222, 210], dad: [252, 212], mama: [92, 502], gonggong: [178, 504] };
+  var LAWN_STROLL = [[410, 470], [450, 505], [480, 465], [430, 530], [470, 525]];
+  var STROLLERS = ["marcus", "angelina"];
   function movieSlot(id, day, hm2) {
-    if (!movieNow(day, hm2) || !BLANKET[id] || awayToday(day).includes(id)) return null;
-    return { from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: 1, movie: true };
+    if (!movieNow(day, hm2) || awayToday(day).includes(id)) return null;
+    if (STROLLERS.includes(id)) return { from: MOVIE[0], to: MOVIE[1], scene: "field", wander: LAWN_STROLL, movie: true };
+    if (!BLANKET[id]) return null;
+    return { from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: id === "gonggong" ? -1 : 1, movie: true };
   }
   var bayMarketNow = (day, hm2) => dow(day) === 5 && hm2 >= BAYMKT[0] && hm2 < BAYMKT[1];
   var BAY_STALLS = [[156, 128], [236, 128], [316, 128]];
@@ -16458,7 +16462,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       `<rect x="${cx - 18}" y="${cy - 30}" width="36" height="30" rx="3" style="fill:#E8566C"/><rect x="${cx - 16}" y="${cy - 50}" width="32" height="22" rx="2" style="fill:#FFF6DC"/><path d="M${cx - 22} ${cy - 50} h44 l-4 -10 h-36z" style="fill:#FFFDF6"/><circle cx="${cx - 12}" cy="${cy + 4}" r="5" style="fill:#3A3430"/><circle cx="${cx + 12}" cy="${cy + 4}" r="5" style="fill:#3A3430"/>`,
       `<rect x="${cx - 18}" y="${cy - 30}" width="36" height="30" rx="3"/><rect x="${cx - 16}" y="${cy - 50}" width="32" height="22" rx="2"/><path d="M${cx - 22} ${cy - 50} h44 l-4 -10 h-36z"/>`
     )}${tapeLabel(cx, cy + 24, "Popcorn", "#F6D3DC", 9)}</g>`;
-    const blankets = [[sx - 30, sy + 84, "#F2A0B8"], [sx + 30, sy + 86, "#7FB8E8"]].map(([x, y, c]) => `<rect x="${x - 26}" y="${y - 10}" width="52" height="22" rx="3" style="fill:${c};stroke:var(--line)" stroke-width="1" opacity=".9" pointer-events="none"/>`).join("");
+    const blankets = [[sx + 1, sy + 86, "#F2A0B8"]].map(([x, y, c]) => `<rect x="${x - 26}" y="${y - 10}" width="52" height="22" rx="3" style="fill:${c};stroke:var(--line)" stroke-width="1" opacity=".9" pointer-events="none"/>`).join("");
     return blankets + scr + cart2;
   }
 

@@ -318,11 +318,15 @@ export const MOVIE = [19*60 + 30, 21*60 + 30], BAYMKT = [16*60 + 30, 19*60 + 15]
 export const lastFriday = day => { const dt = new Date(day + "T00:00:00Z"); return dt.getUTCDay() === 5 && new Date(dt.getTime() + 7*864e5).getUTCMonth() !== dt.getUTCMonth(); };
 export const movieNow = (day, hm) => lastFriday(day) && hm >= MOVIE[0] && hm < MOVIE[1];
 export const SCREEN = [236, 128];   // the screen stands where the Sunday market's stalls go, along the top of the field
-// four of the family on the blankets, in one row (Mel: 3 or 4 at most, so the field stays calm)
-const BLANKET = {mum: [190, 210], dad: [220, 212], mama: [252, 210], gonggong: [282, 212]};
+// spread out over the field, not bunched at the screen (Mel): two on the blanket by the screen, two at the picnic
+// spot, and two strolling round the exercise lawn
+const BLANKET = {mum: [222, 210], dad: [252, 212], mama: [92, 502], gonggong: [178, 504]};
+const LAWN_STROLL = [[410, 470], [450, 505], [480, 465], [430, 530], [470, 525]], STROLLERS = ["marcus", "angelina"];
 export function movieSlot(id, day, hm){
-  if (!movieNow(day, hm) || !BLANKET[id] || awayToday(day).includes(id)) return null;
-  return {from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: 1, movie: true};
+  if (!movieNow(day, hm) || awayToday(day).includes(id)) return null;
+  if (STROLLERS.includes(id)) return {from: MOVIE[0], to: MOVIE[1], scene: "field", wander: LAWN_STROLL, movie: true};
+  if (!BLANKET[id]) return null;
+  return {from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: id === "gonggong" ? -1 : 1, movie: true};
 }
 export const bayMarketNow = (day, hm) => dow(day) === 5 && hm >= BAYMKT[0] && hm < BAYMKT[1];
 // (the "bay market" lives on the field now, where the Sunday market stands: Mel asked for the bay to stay calm)

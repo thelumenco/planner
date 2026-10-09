@@ -1655,5 +1655,5 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - `BAY_STALLS` along the top row, with Hiro's kites at `KITE_SELLER`.
   - Places `bm0`–`bm2` and `kites` are in the field scene.
   - The bay keeps only the van and the bonfire.
-- Movie night (`MOVIE`, 7:30 to 9:30, last Friday of the month) also uses the Sunday market spot, with the screen at `SCREEN` [236,128]. It starts 15 minutes after the market packs up, and a test checks the gap. Only four come (Mum, Dad, Ma Ma, Gong Gong), on two blankets. Mel's limit is 3 or 4 at most, and a test checks it.
+- Movie night (`MOVIE`, 7:30 to 9:30, last Friday of the month) also uses the Sunday market spot, with the screen at `SCREEN` [236,128]. It starts 15 minutes after the market packs up, and a test checks the gap. The family spread out over the field instead of bunching at the screen: Mum and Dad on the one blanket by the screen, Ma Ma and Gong Gong at the picnic spot, and Marcus and Angellina strolling round the exercise lawn (`LAWN_STROLL`). A test checks that no more than two sit near the screen.
 - Omar is now Ezra. The id stays `omar`, so saves and schedules carry on.

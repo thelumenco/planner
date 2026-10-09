@@ -53,6 +53,6 @@ export function movieArt(sx, sy, film){
   const cart = `<g data-place="popcorn" aria-label="Popcorn cart"><ellipse class="hov" cx="${cx}" cy="${cy + 6}" rx="26" ry="8" style="fill:var(--butter)"/>
     ${sk(`<rect x="${cx - 18}" y="${cy - 30}" width="36" height="30" rx="3" style="fill:#E8566C"/><rect x="${cx - 16}" y="${cy - 50}" width="32" height="22" rx="2" style="fill:#FFF6DC"/><path d="M${cx - 22} ${cy - 50} h44 l-4 -10 h-36z" style="fill:#FFFDF6"/><circle cx="${cx - 12}" cy="${cy + 4}" r="5" style="fill:#3A3430"/><circle cx="${cx + 12}" cy="${cy + 4}" r="5" style="fill:#3A3430"/>`,
       `<rect x="${cx - 18}" y="${cy - 30}" width="36" height="30" rx="3"/><rect x="${cx - 16}" y="${cy - 50}" width="32" height="22" rx="2"/><path d="M${cx - 22} ${cy - 50} h44 l-4 -10 h-36z"/>`)}${tapeLabel(cx, cy + 24, "Popcorn", "#F6D3DC", 9)}</g>`;
-  const blankets = [[sx - 30, sy + 84, "#F2A0B8"], [sx + 30, sy + 86, "#7FB8E8"]].map(([x, y, c]) => `<rect x="${x - 26}" y="${y - 10}" width="52" height="22" rx="3" style="fill:${c};stroke:var(--line)" stroke-width="1" opacity=".9" pointer-events="none"/>`).join("");
+  const blankets = [[sx + 1, sy + 86, "#F2A0B8"]].map(([x, y, c]) => `<rect x="${x - 26}" y="${y - 10}" width="52" height="22" rx="3" style="fill:${c};stroke:var(--line)" stroke-width="1" opacity=".9" pointer-events="none"/>`).join("");
   return blankets + scr + cart;
 }
