@@ -1481,3 +1481,55 @@ Not done yet: stage 3 ideas (8.5); villagers and Evan still walk in straight lin
 ### Round 105 (in progress)
 - Reopening the game puts Mel back where she was (`F.where`, written by `save()`, restored at boot) if it's the same game day. On a new day she wakes at home. Mel's room and Evan's room always start fresh.
 - Tulip bulbs are on sale autumn to spring, and sunflower seeds summer and autumn, so there are garden flowers (petal syrup, shortbread, hen treats) in every season.
+
+## DESTINATIONS PLAYBOOK (read before building any town or trip)
+Mel's rules for towns reached by boat, train and campervan. **Every new town or route starts with a detailed plan for Mel, and nothing is built until she approves it.**
+
+### 1. Plan first (required, every time)
+Write the proposal for Mel covering every item below. Only build after she says go.
+- **Inspiration and feel:** what real place it draws on (for train towns Mel names it, e.g. "inspired by Ronda / Kyoto / Provence / the English countryside"), and the mood in a line.
+- **Geography:** terrain, water, slopes, cliffs, gorges, coast and orientation. Where the sun and light fall. How the four screens join physically (for example a gorge splitting the town with a bridge across it, terraces climbing a hill, a harbour wall curling round). **It must not feel like a repackaged Honeybrook**: different ground colours, path shapes, building forms, roof styles and materials.
+- **Layout:** a sketch of the **2×2 grid** (four screens): what's on each screen, where the gates between them are, where you arrive (station, quay or parking), and walkable areas versus obstacles.
+- **Flora and fauna:** the local trees, plants, flowers and crops, and how they change with the seasons (for example cork oak, almond blossom and orange trees for Ronda; maples, moss gardens and bamboo for Kyoto). Plus birds and animals.
+- **Local goods:** three to six things you can't get in Honeybrook, each with at least one use back home (a tapas, gelato or bonbon ingredient through normal discovery, a gift, decor), with prices.
+- **Places:** a market or shops, a café or tea house, a landmark, a picnic spot, and anything special to the town.
+- **Locals:** two or three villagers, with routines and a short story arc for the story system.
+- **Souvenir collection:** what to collect and what completing it gives.
+- **Family in the town:** lines, favourite spots and acts for each family member (see section 4).
+- **Getting there:** the travel mode, the cost, and the arrival and departure flow.
+- **Balance:** what it costs, what it earns, and how it fits the in-game versus real-life balance.
+
+### 2. Town template (once approved)
+- **Screens:** four outdoor screens (2×2) joined by gates, with their own palette and art file (`src/art/town-<id>.js`) and their own obstacles and bounds. They're not linked to Honeybrook's BRIDGES; travel is the only way in or out.
+- **Day trips only:** no accommodation. Stay as long as you like, then travel home. A trip ends when the game day ends, and Mel wakes at home.
+- **Resume:** reopening the same day puts Mel back where she was in the town (`F.where`). The trip state is saved in `F.trip`.
+
+### 3. Getting there, and who comes
+- **Boat** (a big goal; Saltwick Harbour and Puffin Isle): up to **8 people** including Mel. A small fuel cost per trip. Daylight only, not on downpour days.
+- **Train** (station window tickets): **any number of family members**, but **a ticket for each person**, priced by distance.
+- **Campervan** (owned): up to **5 people including Mel**. Tap the parked van to open the roadmap; each stop is one screen with something to explore, and you choose the next stop from there. Drive home from any stop.
+- **Picking the party:** a family picker before leaving (Mum, Dad, Ma Ma, Gong Gong, Darren, Evan, Marcus, Angellina), with the cost shown per person.
+
+### 4. Family on a trip (checked against the code: works with these guards)
+- **Schedules:** add a `tripSlot` at the **top** of npcs.js `slotAt`. Party members are in the town all trip day; everyone else carries on as normal; routines resume the next day.
+- **Guards (each needs a fallback):**
+  - Orchard tours: Ma Ma, Gong Gong and Darren lead some, so substitute Farid or Mei.
+  - Mum's morning exercise class: "away today" note.
+  - Ma Ma's Sunday stall: Farid or Mei keeps it.
+  - Family dinner: if the host is away, move it to the next house.
+  - Ma Ma's tea and in-person gifts: say where they are ("Ma Ma's in <town> today"); posting a gift still works.
+  - Evan: follows Mel only if picked (`evanHere` must include town scenes); otherwise he stays home.
+  - Quests: walking to a quest spot from a town says "head home first" (`nextHop` has no route from a town).
+- **Per-town flavour** (data on the town):
+  - `familyLines[npc]`: tap and hello lines for that town.
+  - `familySpots[npc]`: favourite spot and act per screen (Dad sketching the view, Ma Ma haggling at the market, Gong Gong fishing, Evan chasing pigeons, Mum dancing to busking music, Marcus photographing, Angellina people-watching with a notebook, Darren at a flea market or hardware stall).
+  - The party follows Mel between the town's screens and settles at their favourite spots, with an occasional town-specific remark.
+- **Tests per town:** the party appears in the town; nobody in the party appears in Honeybrook; each guard works; the per-town lines show; resume mid-trip works; trip end returns home.
+
+### 5. Ideas already agreed
+- **Saltwick Harbour (boat):**
+  - Fish market: lobster, clams, onions, sea salt, seaweed. These feed tapas, and gelato and bonbons through discovery (for example sea salt dark chocolate).
+  - Also: the chandlery, a quay café, the lighthouse, picnics, locals, souvenirs.
+- **Puffin Isle (boat):** the lighthouse keeper, rock pools, seabirds, sea glass, picnics.
+- **Train towns:** commissioned by Mel by inspiration, each with a detailed plan first.
+- **Campervan:** the roadmap of single-screen stops, with stamps for stops visited.
