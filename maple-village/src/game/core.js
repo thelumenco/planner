@@ -573,7 +573,7 @@ setInterval(() => {
   if (Date.now() - lastFarm > 20000) farmNow();
   { const l = bikeExpired(F); if (l) { speak(l, 4500); save(); } }
   townTick();
-  { const k = scene === "bay" ? `${bonfireNow(dayKey(), sgHM())}${vanNow(dayKey(), sgHM())}` : scene === "field" ? `${!!(S.kite && S.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : ""; if (k !== lastFri) { lastFri = k; if (k) drawScene(); } }
+  { const k = scene === "base" ? `${bonfireNow(dayKey(), sgHM())}` : scene === "bay" ? `${vanNow(dayKey(), sgHM())}` : scene === "field" ? `${!!(S.kite && S.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : ""; if (k !== lastFri) { lastFri = k; if (k) drawScene(); } }
   if (scene === "mill") { const m = millState(F), k = m.press ? (pressLeft(m) ? "on" : "ready") : ""; if (k !== lastMill) { lastMill = k; drawScene(); if (millOpen) ctx(); } }
   if (outside() && skyKey() !== lastSky) { lastSky = skyKey(); drawScene(); }
   { const tk = outside() ? trainKey(scene) : ""; if (tk !== lastTrain) { lastTrain = tk; drawScene();   // a train coming through: draw it (it runs on from where it is)
@@ -1611,7 +1611,7 @@ function ctx(){
   } else if (scene === "greenhouse" && ghBed != null) { h = bedPanel(F, ghBed);
   } else if (scene === "mill" && millOpen) { h = millPanel(F);
   } else if (friView && scene === "field" && (/^bm\d$/.test(friView) || friView === "kites")) { h = bayMarketPanel(friView);
-  } else if (friView && (scene === "bay" || scene === "field")) { const fam = ["dad", "mum", "gonggong", "mama", "marcus", "angelina", "darren"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
+  } else if (friView && (scene === "bay" || scene === "field" || scene === "base")) { const fam = ["dad", "mum", "gonggong", "mama", "marcus", "angelina", "darren"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
     h = friView === "van" ? vanPanel(F) : bonfirePanel(F, fam.length ? `${fam.join(", ").replace(/, ([^,]*)$/, " and $1")} ${fam.length > 1 ? "are" : "is"} round the fire` : "");
   } else if (scene === "farm" && selPlot != null) {
     const p = F.plots[selPlot], i = selPlot;
@@ -1706,7 +1706,7 @@ function ctx(){
     save(); ctx(); });
   c.querySelectorAll("[data-fire]").forEach(b => b.onclick = () => {
     if (b.dataset.fire === "lanterns") { const n = releaseLanterns(F); if (n == null) return; friView = null; ctx(); lanternFlight(Math.max(1, n)); gainXp(Math.min(5, 1 + Math.floor(n/3))); sfx("chime");
-      speak(n ? `${n} paper lantern${n > 1 ? "s" : ""}, one for each quest this week, lifting off over the sea. Look at that.` : "One lantern, for getting through the week. It drifts out over the sea.", 7000);
+      speak(n ? `${n} paper lantern${n > 1 ? "s" : ""}, one for each quest this week, lifting off over the house. Look at that.` : "One lantern, for getting through the week. It drifts up over the roof.", 7000);
       if (evanHere()) setTimeout(() => evanSays(pick(["lanterns! so many!", "bye bye lanterns!", "up up up!"])), 1800);
       ["mum", "dad", "mama"].filter(isHere).slice(0, 1).forEach(id => setTimeout(() => npcSay(id, pick(["Look at all of them! You worked hard this week.", "So pretty. Well done, my girl.", "Every one of those is something you did."])), 3600));
       save(); return; }
@@ -1991,10 +1991,11 @@ function rideTaxi(to){
   const o = document.createElement("div"); o.className = "taxiride"; o.innerHTML = `${taxiBank}<div class="taxiboat">${taxiBoat}</div><p>Down the river to ${esc(s.n.replace(/^The /, "the "))}...</p>`; $("map").appendChild(o);
   setTimeout(() => { o.remove(); setScene(s.scene, s.at); setTimeout(() => speak(`The river taxi drops you at ${s.n}.`, 3500), 700); }, 2600);
 }
-// Friday evenings (round 112): the bonfire and the fish van at the bay, and a kite on the field
+// Friday evenings (round 112): the bonfire at home, the fish van at the bay, and a kite on the field
 const isFri = () => new Date(dayKey() + "T00:00:00Z").getUTCDay() === 5;
 function fridayLayer(sc){
-  if (sc === "bay") return bonfireArt(FIRE[0], FIRE[1], bonfireNow(dayKey(), sgHM())) + (vanNow(dayKey(), sgHM()) ? fishVanArt(330, 600) : "");
+  if (sc === "base") return bonfireArt(FIRE[0], FIRE[1], bonfireNow(dayKey(), sgHM()));
+  if (sc === "bay") return vanNow(dayKey(), sgHM()) ? fishVanArt(330, 600) : "";
   if (sc === "field") return (movieNow(dayKey(), sgHM()) ? movieArt(SCREEN[0], SCREEN[1], filmOf(dayKey())) : "")
     + (bayMarketNow(dayKey(), sgHM()) ? BAY_STALLS.map(([x, y], k) => bayStallArt(k, x, y, `${bayKeeperName(dayKey(), k)}'s stall`)).join("") + kiteSellerArt(KITE_SELLER[0] - 22, KITE_SELLER[1] + 4) : "") + `<g data-place="kitefly" aria-label="Kite flying"><ellipse class="hov" cx="440" cy="334" rx="30" ry="9" style="fill:var(--butter)"/><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M452 336 v-46" stroke-width="2"/><path d="M452 292 l18 4 l-2 8 l-16 2z" style="fill:#E8913A"/><path d="M458 293 v12 M464 294 v10" style="stroke:#FFFDF6" stroke-width="2"/></g>${tapeLabel(440, 352, "Kite flying", "#DCEBF6", 9)}</g>`
     + (S.kite && S.kite.until > Date.now() ? kiteArt(S.kite.x, S.kite.y) : "");
@@ -2014,7 +2015,7 @@ function flyKite(){
   if (evanHere() && !evanNight()) { evan.tx = mel.x - 40; evan.ty = mel.y + 10; evan.run = true; evan.wait = 8; [900, 4000, 8000].forEach((d, i) => setTimeout(() => evanSays(["kite! up up!", "my turn! my turn!", "it's so HIGH, Mama!"][i]), d)); }
   save(); render();
 }
-// the week's lanterns: little glowing paper lanterns rising from the fire and drifting out over the sea
+// the week's lanterns: little glowing paper lanterns rising from the fire and drifting up over the house
 function lanternFlight(n){
   const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("pointer-events", "none");
   const t0 = $("world").getCurrentTime ? $("world").getCurrentTime() : 0;   // SVG animations count from page load: start them now
@@ -2346,7 +2347,7 @@ function arriveVillageSpot(id){
   if (id === "plot3" || id === "plot4") { speak(v.line, 4000); render(); return; }
   if (id === "olive") { vyView = "olive"; sfx("paper", true); render(); return; }
   if (id === "bonfire") { if (bonfireNow(dayKey(), sgHM())) { friView = "fire"; sfx("paper", true); if (evanHere() && !evanNight()) setTimeout(() => evanSays(pick(["marshmallow! please!", "it's so warm!", "fire! big fire!"])), 1200); }
-    else speak(isFri() && sgHM() < 19*60 ? "The bonfire's lit at seven tonight. Bring the family." : "A fire pit on the sand. On Friday nights there's a bonfire here, 7 to 10.", 4500); render(); return; }
+    else speak(isFri() && sgHM() < 19*60 ? "The bonfire's lit at seven tonight. Bring the family." : "Your firepit. On Friday nights the family come round for a bonfire, 7 to 10.", 4500); render(); return; }
   if (id === "fishvan") { if (vanNow(dayKey(), sgHM())) { friView = "van"; sfx("paper", true); } else speak("Sal's fish van parks here on Friday evenings, five till ten.", 4000); render(); return; }
   if (id === "kitefly") { flyKite(); return; }
   if (/^bm\d$/.test(id) || id === "kites") { if (!bayMarketNow(dayKey(), sgHM())) { speak("The Friday market's packed away. It's on Fridays, 4:30 to 7:15, here on the field.", 4000); render(); return; } friView = id; sfx("paper", true); render(); return; }

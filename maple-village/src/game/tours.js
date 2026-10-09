@@ -300,17 +300,17 @@ export const DINNER_FROM = 18*60 + 30, DINNER_TO = 20*60;
 export const DINNER_HOSTS = ["home", "mumdad", "cottage", "marcus"];
 const HOST_FAMILY = {mumdad: ["mum", "dad"], cottage: ["mama", "gonggong"], marcus: ["marcus", "angelina"]};
 // Round 112: Friday evenings. Aperitivo hour at the wine shop (4:30 to 7), the fishmonger's van at the bay (5 to 10)
-// and the bonfire on the bay beach (7 to 10), with the family round it.
+// and the bonfire (7 to 10) at the firepit at home, with the family round it.
 export const APERITIVO = [16*60 + 30, 19*60], VAN = [17*60, 22*60], BONFIRE = [19*60, 22*60];
 const isFri = day => dow(day) === 5;
 export const aperitivoNow = (day, hm) => isFri(day) && hm >= APERITIVO[0] && hm < APERITIVO[1];
 export const vanNow = (day, hm) => isFri(day) && hm >= VAN[0] && hm < VAN[1];
 export const bonfireNow = (day, hm) => isFri(day) && hm >= BONFIRE[0] && hm < BONFIRE[1];
-// where everyone sits round the fire (the fire is at FIRE, on the grass above the beach)
-export const FIRE = [404, 350];   // on the grass between the Scoop Shack and the old shopfront, well back from the sea
-// round the fire, sitting on the grass: along the back and the sides (nobody in front of the flames)
-const LOGS = {dad: [[356, 358], 1], gonggong: [[454, 358], -1], mum: [[344, 386], 1], mama: [[466, 386], -1], marcus: [[374, 410], 1], angelina: [[436, 410], -1], darren: [[322, 404], 1]};
-const BONFIRE_FAMILY = {dad: 19*60, mum: 19*60, gonggong: 19*60, mama: 19*60, marcus: 19*60 + 30, angelina: 19*60 + 30, darren: 21*60 + 30};
+// the bonfire is the firepit at home (base scene, bottom of the garden): Mel asked for it there
+export const FIRE = [276, 608];
+// round the fire: along the back and the sides (nobody in front of the flames); Marcus and Angellina on the bench
+const LOGS = {dad: [[224, 612], 1], mum: [[242, 584], 1], mama: [[276, 572], 1], gonggong: [[310, 584], -1], marcus: [[340, 604], -1], angelina: [[364, 604], -1]};
+const BONFIRE_FAMILY = {dad: 19*60, mum: 19*60, gonggong: 19*60, mama: 19*60, marcus: 19*60 + 30, angelina: 19*60 + 30};
 // Round 113: movie night on the field, the last Friday of the month, 7:30 to 9:30 (the family's on the blankets
 // instead of round the bonfire that night); and a little Friday market on the field, 4:30 to 7:15 (a quarter of an hour before the film): three stalls with a
 // different mix every week, and Hiro selling kites on the beach.
@@ -318,8 +318,8 @@ export const MOVIE = [19*60 + 30, 21*60 + 30], BAYMKT = [16*60 + 30, 19*60 + 15]
 export const lastFriday = day => { const dt = new Date(day + "T00:00:00Z"); return dt.getUTCDay() === 5 && new Date(dt.getTime() + 7*864e5).getUTCMonth() !== dt.getUTCMonth(); };
 export const movieNow = (day, hm) => lastFriday(day) && hm >= MOVIE[0] && hm < MOVIE[1];
 export const SCREEN = [236, 128];   // the screen stands where the Sunday market's stalls go, along the top of the field
-// just the family, in one tidy row on the blankets (kept small so the field stays calm)
-const BLANKET = {mum: [146, 210], dad: [176, 212], mama: [206, 210], gonggong: [236, 212], marcus: [266, 210], angelina: [296, 212], darren: [326, 210]};
+// four of the family on the blankets, in one row (Mel: 3 or 4 at most, so the field stays calm)
+const BLANKET = {mum: [190, 210], dad: [220, 212], mama: [252, 210], gonggong: [282, 212]};
 export function movieSlot(id, day, hm){
   if (!movieNow(day, hm) || !BLANKET[id] || awayToday(day).includes(id)) return null;
   return {from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: 1, movie: true};
@@ -337,7 +337,7 @@ export function bayMarketSlot(id, day, hm){
 export function bonfireSlot(id, day, hm){
   if (!bonfireNow(day, hm) || awayToday(day).includes(id)) return null;
   const from = BONFIRE_FAMILY[id]; if (from == null || hm < from) return null;
-  const [at, dir] = LOGS[id]; return {from, to: BONFIRE[1], scene: "bay", at, act: id === "dad" ? "guitar" : "sit", dir, bonfire: true};
+  const [at, dir] = LOGS[id]; return {from, to: BONFIRE[1], scene: "base", at, act: id === "dad" ? "guitar" : "sit", dir, bonfire: true};
 }
 export const HOST_NAME = {home: "your place", mumdad: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", marcus: "Marcus and Angellina's"};
 // where each house's dining table stands: cx = centre, fy = the front edge of the table on the floor

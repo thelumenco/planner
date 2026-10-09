@@ -1,16 +1,16 @@
-// Friday evenings at the bay (round 112): the bonfire on the grass, the fishmonger's van; and the kite
+// Friday evenings (round 112): the bonfire (the firepit at home, made bigger on a Friday night), the fishmonger's van; and the kite
 // on the field. Lanterns rising over the sea are drawn by core.js (lanternFlight) when Mel releases them.
 import { ink } from "../util.js";
 import { sk, tapeLabel } from "./scenes.js";
 import { lampGlow } from "./village-extras.js";
 
+// the home firepit already has its stones (scenes.js): this adds the tap target, and on a Friday night the big flames
 export function bonfireArt(x, y, lit){
 
   const fire = lit ? lampGlow(x, y - 10, 70) + `<g pointer-events="none">${[0, 1, 2].map(i => `<path d="M${x - 12 + i*12} ${y - 2} q${-6 + i*3} -16 ${2 - i} -30 q${8 - i*2} 14 ${4} 30z" style="fill:${["#F28C28", "#F3C969", "#E8566C"][i]};stroke:var(--line)" stroke-width=".8"><animateTransform attributeName="transform" type="scale" values="1 1;1.05 1.12;.96 .94;1 1" dur="${.8 + i*.2}s" repeatCount="indefinite" additive="sum"/></path>`).join("")}
     ${[0, 1, 2, 3].map(i => `<circle cx="${x - 6 + i*4}" cy="${y - 30}" r="1.4" fill="#F3C969"><animate attributeName="cy" values="${y - 30};${y - 70}" dur="${1.6 + i*.4}s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="${1.6 + i*.4}s" repeatCount="indefinite"/></circle>`).join("")}</g>` : "";
-  return `<g data-place="bonfire" aria-label="The bonfire"><ellipse class="hov" cx="${x}" cy="${y}" rx="44" ry="18" style="fill:var(--butter)"/>
-    ${sk(`<circle cx="${x}" cy="${y}" r="16" style="fill:#B9B0A4"/><path d="M${x - 14} ${y + 2} l28 -6 M${x - 12} ${y - 6} l26 8" style="stroke:#5A4636" stroke-width="5"/>`, `<circle cx="${x}" cy="${y}" r="16"/>`)}
-    ${fire}${tapeLabel(x, y + 66, lit ? "Bonfire" : "Fire pit", "#F3C969", 10)}</g>`;
+  return `<g data-place="bonfire" aria-label="The bonfire"><ellipse class="hov" cx="${x}" cy="${y}" rx="30" ry="12" style="fill:var(--butter)"/>
+    ${fire}${lit ? tapeLabel(x, y + 22, "Bonfire", "#F3C969", 9) : ""}</g>`;
 }
 export function fishVanArt(x, y){
   return `<g data-place="fishvan" aria-label="The fishmonger's van"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="50" ry="10" style="fill:var(--butter)"/>
@@ -53,6 +53,6 @@ export function movieArt(sx, sy, film){
   const cart = `<g data-place="popcorn" aria-label="Popcorn cart"><ellipse class="hov" cx="${cx}" cy="${cy + 6}" rx="26" ry="8" style="fill:var(--butter)"/>
     ${sk(`<rect x="${cx - 18}" y="${cy - 30}" width="36" height="30" rx="3" style="fill:#E8566C"/><rect x="${cx - 16}" y="${cy - 50}" width="32" height="22" rx="2" style="fill:#FFF6DC"/><path d="M${cx - 22} ${cy - 50} h44 l-4 -10 h-36z" style="fill:#FFFDF6"/><circle cx="${cx - 12}" cy="${cy + 4}" r="5" style="fill:#3A3430"/><circle cx="${cx + 12}" cy="${cy + 4}" r="5" style="fill:#3A3430"/>`,
       `<rect x="${cx - 18}" y="${cy - 30}" width="36" height="30" rx="3"/><rect x="${cx - 16}" y="${cy - 50}" width="32" height="22" rx="2"/><path d="M${cx - 22} ${cy - 50} h44 l-4 -10 h-36z"/>`)}${tapeLabel(cx, cy + 24, "Popcorn", "#F6D3DC", 9)}</g>`;
-  const blankets = [[sx - 60, sy + 84, "#F2A0B8"], [sx, sy + 86, "#7FB8E8"], [sx + 60, sy + 84, "#F3C969"]].map(([x, y, c]) => `<rect x="${x - 26}" y="${y - 10}" width="52" height="22" rx="3" style="fill:${c};stroke:var(--line)" stroke-width="1" opacity=".9" pointer-events="none"/>`).join("");
+  const blankets = [[sx - 30, sy + 84, "#F2A0B8"], [sx + 30, sy + 86, "#7FB8E8"]].map(([x, y, c]) => `<rect x="${x - 26}" y="${y - 10}" width="52" height="22" rx="3" style="fill:${c};stroke:var(--line)" stroke-width="1" opacity=".9" pointer-events="none"/>`).join("");
   return blankets + scr + cart;
 }

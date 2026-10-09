@@ -1650,10 +1650,10 @@ Write the proposal for Mel covering every item below. Only build after she says 
 
 ### Round 114: Mel's Friday feedback, and a calm screen
 - Standing rule from Mel: new things must not crowd the screen. Aim for a calm feel: fewer props and people, labels left clear.
-- The bonfire is on the grass above the bay beach, at `FIRE` [404,350], away from the sea. It has no logs. The family sits in a loose ring (`LOGS` in tours.js) with nobody in front of the flames, and the Scoop Shack label stays clear.
+- The bonfire is the firepit at home (base scene), at `FIRE` [276,608]. Mel asked for it there. `bonfireArt` adds only the tap target, the big flames and a small label, because scenes.js already draws the stones. The family sits round it (`LOGS`), with Marcus and Angellina on the bench, and nobody stands in front of the flames. The lanterns drift up over the house. The bay keeps only Sal's van.
 - The Friday market (`BAYMKT`, 4:30 to 7:15) is on the field, where the Sunday market stands:
   - `BAY_STALLS` along the top row, with Hiro's kites at `KITE_SELLER`.
   - Places `bm0`–`bm2` and `kites` are in the field scene.
   - The bay keeps only the van and the bonfire.
-- Movie night (`MOVIE`, 7:30 to 9:30, last Friday of the month) also uses the Sunday market spot: the screen at `SCREEN` [236,128]. It starts 15 minutes after the market packs up, and a test checks the gap. Only the family come, in one tidy row on three blankets.
+- Movie night (`MOVIE`, 7:30 to 9:30, last Friday of the month) also uses the Sunday market spot, with the screen at `SCREEN` [236,128]. It starts 15 minutes after the market packs up, and a test checks the gap. Only four come (Mum, Dad, Ma Ma, Gong Gong), on two blankets. Mel's limit is 3 or 4 at most, and a test checks it.
 - Omar is now Ezra. The id stays `omar`, so saves and schedules carry on.

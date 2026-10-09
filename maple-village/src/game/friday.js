@@ -1,7 +1,7 @@
 // Friday evenings (round 112). Aperitivo hour at the wine shop is in vineyard.js (sellTick) and tours.js (who drops
 // in). Here: the fishmonger's van at the bay (5 to 10pm: worms, clams, lemons; and it buys your catch at half as much
-// again), the week's lanterns at the bonfire (one paper lantern for every quest finished this week, released over the
-// sea, once a Friday), and flying a kite on the field (any day, once you've bought one).
+// again), the week's lanterns at the bonfire at home (one paper lantern for every quest finished this week, released
+// over the house, once a Friday), and flying a kite on the field (any day, once you've bought one).
 import { esc, dayKey, prevDay } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
@@ -29,8 +29,8 @@ export const lanternsDone = (F, day = dayKey()) => (F.fri || {}).lanterns === da
 export function releaseLanterns(F, day = dayKey()){ if (lanternsDone(F, day)) return null; F.fri = Object.assign(F.fri || {}, {lanterns: day}); return weekQuests(F, day); }
 export function bonfirePanel(F, family){
   const n = weekQuests(F), done = lanternsDone(F);
-  return `<span class="tape gingham" aria-hidden="true"></span><h2>The bonfire</h2><p class="sub">Driftwood crackling on the grass above the beach, the sea going dark.${family ? ` ${esc(family)}.` : ""}</p>
-    <p>${done ? "The week's lanterns are already out over the sea." : n ? `<b>${n} quest${n > 1 ? "s" : ""}</b> finished this week: a paper lantern for each.` : "No quests this week. That's alright: one lantern anyway, for getting through it."}</p>
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>The bonfire</h2><p class="sub">The firepit at the bottom of the garden, crackling away, the river going dark.${family ? ` ${esc(family)}.` : ""}</p>
+    <p>${done ? "The week's lanterns are already up and away over the house." : n ? `<b>${n} quest${n > 1 ? "s" : ""}</b> finished this week: a paper lantern for each.` : "No quests this week. That's alright: one lantern anyway, for getting through it."}</p>
     <div class="actions">${done ? "" : `<button class="btn primary" data-fire="lanterns">Release the week's lanterns</button>`}<button class="btn alt" data-fire="sit">Sit by the fire</button></div>` + shut;
 }
 

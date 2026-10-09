@@ -95,8 +95,8 @@ export const VILLAGE = {
   toBay:  {scene:"shore", name:"Boardwalk north", door:[250,22], spot:true, bridge:"bay", mark:[290,40], line:"Up the boardwalk to the bay and the Scoop Shack."},
   toShoreB:{scene:"bay", name:"Boardwalk to the foreshore", door:[250,622], spot:true, bridge:"shore", mark:[290,560], line:"Down the boardwalk to the foreshore."},
   scoopshop:{scene:"bay", name:"The Scoop Shack", short:"the Scoop Shack", door:[386,262], mark:[386,96]},
-  // round 112: Friday evenings at the bay (the fire pit on the beach; the fishmonger's van 5 to 10pm), and kite flying on the field
-  bonfire:{scene:"bay", name:"The bonfire", door:[404,392], spot:true, line:"A fire pit on the beach. On Friday nights there's a bonfire."},
+  // round 112: Friday evenings (the bonfire at the firepit at home; the fishmonger's van at the bay, 5 to 10pm), and kite flying on the field
+  bonfire:{scene:"base", name:"The firepit", door:[250,622], spot:true, line:"Your firepit. On Friday nights there's a bonfire."},
   fishvan:{scene:"bay", name:"The fishmonger's van", door:[330,620], spot:true, line:"Sal's fish van parks here on Friday evenings."},
   // round 113: the Friday market (4:30 to 7:15) and movie night (the last Friday, 7:30 to 9:30), both on the field where the Sunday market stands
   bm0:    {scene:"field", name:"Market stall", door:[156,156], spot:true, line:"A market stall."}, bm1: {scene:"field", name:"Market stall", door:[236,156], spot:true, line:"A market stall."},

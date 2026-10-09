@@ -2847,11 +2847,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const fri = "2026-10-16", thu = "2026-10-15";
   check(t.aperitivoNow(fri, 17*60) && !t.aperitivoNow(fri, 19*60 + 5) && !t.aperitivoNow(thu, 17*60), "aperitivo hour: Fridays, 4:30 to 7");
   check(t.tastingSlot("theo", fri, 17*60 + 30) && t.tastingSlot("opal", fri, 17*60), "the tasting room fills up on a Friday afternoon");
-  check(t.bonfireSlot("dad", fri, 19*60 + 30).act === "guitar" && t.bonfireSlot("mum", fri, 20*60).scene === "bay" && !t.bonfireSlot("dad", thu, 19*60 + 30) && !t.bonfireSlot("marcus", fri, 19*60 + 10), "the bonfire, 7 to 10 on a Friday: Dad on guitar, Mum on a log, Marcus and Angellina from half seven");
+  check(t.bonfireSlot("dad", fri, 19*60 + 30).act === "guitar" && t.bonfireSlot("mum", fri, 20*60).scene === "base" && !t.bonfireSlot("dad", thu, 19*60 + 30) && !t.bonfireSlot("marcus", fri, 19*60 + 10), "the bonfire, 7 to 10 on a Friday: Dad on guitar, Mum on a log, Marcus and Angellina from half seven");
   { const F = {coins: 20, inv: {}, history: {"2026-10-12": {q: 2}, "2026-10-14": {q: 3}, "2026-10-08": {q: 9}}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
     check(fr.weekQuests(F, fri) === 5 && fr.releaseLanterns(F, fri) === 5 && fr.releaseLanterns(F, fri) === null, "five quests this week: five lanterns, released once a Friday");
     check(!!fr.vanBuy(F, "clams", add) && !!fr.vanBuy(F, "worms", add) && F.inv.clams === 1 && F.coins === 10 && F.fish.bait >= 5, "Sal's van sells clams and worms"); }
-  check(t.lastFriday("2026-10-30") && !t.lastFriday(fri) && t.movieNow("2026-10-30", 20*60) && t.movieSlot("dad", "2026-10-30", 20*60).scene === "field" && !t.movieSlot("dad", fri, 20*60), "movie night: the last Friday of the month, the family on blankets on the field");
+  check(t.lastFriday("2026-10-30") && !t.lastFriday(fri) && t.movieNow("2026-10-30", 20*60) && t.movieSlot("dad", "2026-10-30", 20*60).scene === "field" && !t.movieSlot("dad", fri, 20*60) && ["mum", "dad", "mama", "gonggong", "marcus", "angelina", "darren"].filter(id => t.movieSlot(id, "2026-10-30", 20*60)).length <= 4, "movie night: the last Friday of the month, the family on blankets on the field");
   check(t.bayMarketNow(fri, 17*60) && t.bayKeepers(fri).length === 3 && t.bayMarketSlot(t.bayKeepers(fri)[0], fri, 17*60).scene === "field" && t.bayMarketSlot("hiro", fri, 17*60).scene === "field", "the Friday market on the field: three stalls, and Hiro selling kites");
   check(!t.bayMarketNow(fri, 19*60 + 20) && t.MOVIE[0] - t.BAYMKT[1] >= 15, "the market packs up a quarter of an hour before the film starts");
   check(fr.bayStallGoods(fri, 0).length === 4 && fr.bayStallGoods(fri, 0).join() !== fr.bayStallGoods(fri, 1).join() && fr.bayStallGoods(fri, 0).join() !== fr.bayStallGoods("2026-10-23", 0).join(), "each stall has four things, a different mix every week");
@@ -2866,7 +2866,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#world .kitefly").count() === 1, "a kite of your own, flying over the field");
   await page.goto(url + "?seed=1&time=19:40&date=2026-10-16"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(1500);
-  check(await page.locator('#world [data-place="fishvan"]').count() === 1 && await page.locator('#actors .npc[data-npc="dad"].act-guitar').count() === 1, "Friday night at the bay: Sal's van, and Dad playing guitar by the bonfire");
+  check(await page.locator('#world [data-place="fishvan"]').count() === 1 && await page.locator('#world [data-place="bonfire"]').count() === 0, "Friday night at the bay: Sal's van (and no bonfire on the beach)");
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1500);
+  check(await page.locator('#actors .npc[data-npc="dad"].act-guitar').count() === 1, "and at home, Dad playing guitar by the bonfire");
   await page.locator('#world [data-place="bonfire"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-fire="lanterns"]', { timeout: 20000 });
   await page.click('#ctx [data-fire="lanterns"]'); await page.waitForTimeout(600);
   check(await page.locator("#fxLayer g").count() >= 1, "the week's lanterns lift off over the sea");
