@@ -799,6 +799,8 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 .map .rain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.35;
   background-image:repeating-linear-gradient(105deg,transparent 0 14px,rgba(120,150,190,.55) 14px 15px,transparent 15px 34px);background-size:200px 200px;animation:rainfall .55s linear infinite}
 .map .rain[hidden]{display:none}
+.map .rain.light{opacity:.2;background-size:260px 260px;animation-duration:.8s}
+#evan .welly,#evan .esleeve{display:none}#evan.raincoat .welly,#evan.raincoat .esleeve{display:inline}
 @keyframes rainfall{from{background-position:0 0}to{background-position:-40px 200px}}
 .floaty{animation:floaty 3s ease-in-out infinite;transform-box:fill-box}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
@@ -1370,6 +1372,27 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .gspec{display:inline-flex;align-items:center;gap:4px;font-size:.8rem;color:#5E5A55;flex:none}
 .gpick{margin-top:6px}
 .hlist.gprices li{gap:10px}
+
+/* round 100: fishing (fishing.js): the float, the bite, the reel bar; Mel's rod; koi in the pond */
+.fishwater{position:relative;height:54px;margin:8px 0;border-radius:14px;background:linear-gradient(#CFE3EE,#B6D2E2);overflow:hidden;border:1.5px solid var(--line)}
+.fishwater::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 22px,rgba(255,255,255,.35) 22px 34px);background-size:68px 100%;animation:fwave 3s linear infinite;opacity:.6}
+.fbob{position:absolute;left:50%;top:22px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:linear-gradient(#E8566C 50%,#FFFDF6 50%);border:1.5px solid var(--line);z-index:1;animation:fbob 1.8s ease-in-out infinite}
+.fishwater.bite .fbob{animation:fdip .35s ease-in-out infinite alternate}
+.fbang{position:absolute;left:calc(50% + 12px);top:2px;font:700 22px "Klee One",serif;color:#C2505F;z-index:1;animation:fbang .5s ease-in-out infinite alternate}
+.fbar{position:relative;height:22px;margin:10px 0;border-radius:11px;background:#F6EFE3;border:1.5px solid var(--line);overflow:hidden}
+.fzone{position:absolute;top:0;bottom:0;background:#B9D88A}
+.fmark{position:absolute;top:-2px;bottom:-2px;left:0;width:4px;margin-left:-2px;background:#2F2B28;border-radius:2px;animation:fsweep .9s linear infinite alternate}
+.fcatch{display:flex;gap:10px;align-items:center;margin:10px 0;padding:8px 10px;border-radius:12px;background:#F6EFE3}
+.fcatch .wtxt{display:flex;flex-direction:column}
+@keyframes fsweep{from{left:0}to{left:100%}}
+@keyframes fbob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+@keyframes fdip{from{transform:translateY(0)}to{transform:translateY(10px)}}
+@keyframes fbang{from{transform:scale(1)}to{transform:scale(1.25)}}
+@keyframes fwave{to{background-position:68px 0}}
+#melRod .fbobber{animation:fbob 1.8s ease-in-out infinite}#melRod.bite .fbobber{animation:fdip .35s ease-in-out infinite alternate}
+.koi{animation:koi 9s ease-in-out infinite}@keyframes koi{0%,100%{transform:translate(0,0)}25%{transform:translate(10px,3px)}50%{transform:translate(4px,-4px) scaleX(-1)}75%{transform:translate(-8px,2px) scaleX(-1)}}
+@media (prefers-reduced-motion:reduce){.fishwater::after,.fbob,.fbang,.fmark,#melRod .fbobber,.koi{animation:none}}
+.krequest{margin:6px 0 10px;padding:8px 10px;border-radius:12px;background:#FCEFF1;line-height:1.45}.krequest small{display:block;color:var(--muted,#8A8279)}.krequest .ico{vertical-align:-3px}
 </style>
 </head>
 <body>
@@ -1463,16 +1486,18 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
                 <g id="melCone" style="display:none"><path d="M9.5 -23 l3 10 l3 -10z" style="fill:#E8C48E"/><circle id="melConeTop" cx="12.5" cy="-25" r="3.6" style="fill:#F4C7CF"/></g>
                 <g id="melBow" style="display:none"><path d="M4.6 -57.5 l-5.4 -3.6 v7.2z M4.6 -57.5 l5.4 -3.6 v7.2z" style="fill:#8E2C48"/><circle cx="4.6" cy="-57.5" r="1.7" style="fill:#6E1F36"/></g>
                 <g id="melHat" style="display:none"><ellipse cx="0" cy="-55" rx="17" ry="3.8" style="fill:#F3DFA6"/><path d="M-9 -55 c0 -11 18 -11 18 0z" style="fill:#F3DFA6"/><path d="M-9 -56.5 h18" fill="none" style="stroke:#8E2C48" stroke-width="2"/></g>
+                <g id="melRod" style="display:none"><path d="M9 -22 L36 -54" fill="none" style="stroke:#8A5A3A" stroke-width="1.8"/><circle cx="13" cy="-27" r="2.4" style="fill:#F3C969" stroke-width=".8"/><path class="fline" d="M36 -54 Q40 -30 42 -6" fill="none" stroke-width=".6"/><g class="fbobber"><circle cx="42" cy="-6" r="2.4" style="fill:#E8566C" stroke-width=".7"/><path d="M39.6 -6 h4.8" style="stroke:#FFFDF6" stroke-width=".9"/></g></g>
+                <g id="melRain"></g>
               </g>
             </g></g></g>
             <!-- Evan -->
             <g class="ch" id="evan" data-ent="evan"><g class="flip"><g filter="url(#wob)">
               <ellipse cx="0" cy="0" rx="8" ry="2.8" fill="rgba(60,40,30,.18)"/>
               <g class="bob" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round">
-                <g class="legL"><rect x="-4.6" y="-11" width="4.2" height="10" rx="1.8" style="fill:var(--pants)"/><ellipse cx="-2.6" cy="-1.3" rx="3" ry="1.8" style="fill:#FFFFFF"/></g>
-                <g class="legR"><rect x="0.4" y="-11" width="4.2" height="10" rx="1.8" style="fill:var(--pants)"/><ellipse cx="2.6" cy="-1.3" rx="3" ry="1.8" style="fill:#FFFFFF"/></g>
-                <g class="armL"><rect x="-9.2" y="-20" width="3.6" height="9" rx="1.8" style="fill:var(--skin)"/></g>
-                <g class="armR"><rect x="5.6" y="-20" width="3.6" height="9" rx="1.8" style="fill:var(--skin)"/></g>
+                <g class="legL"><rect x="-4.6" y="-11" width="4.2" height="10" rx="1.8" style="fill:var(--pants)"/><ellipse cx="-2.6" cy="-1.3" rx="3" ry="1.8" style="fill:#FFFFFF"/><path class="welly" d="M-4.8 -6 h4.6 v4 h1 a2 2 0 0 1 0 2.4 h-5.6z" style="fill:#E8566C"/></g>
+                <g class="legR"><rect x="0.4" y="-11" width="4.2" height="10" rx="1.8" style="fill:var(--pants)"/><ellipse cx="2.6" cy="-1.3" rx="3" ry="1.8" style="fill:#FFFFFF"/><path class="welly" d="M0.2 -6 h4.6 v4 h1 a2 2 0 0 1 0 2.4 h-5.6z" style="fill:#E8566C"/></g>
+                <g class="armL"><rect x="-9.2" y="-20" width="3.6" height="9" rx="1.8" style="fill:var(--skin)"/><rect class="esleeve" x="-9.2" y="-20" width="3.6" height="7.4" rx="1.8" style="fill:var(--tee)"/></g>
+                <g class="armR"><rect x="5.6" y="-20" width="3.6" height="9" rx="1.8" style="fill:var(--skin)"/><rect class="esleeve" x="5.6" y="-20" width="3.6" height="7.4" rx="1.8" style="fill:var(--tee)"/></g>
                 <path d="M-6.8 -21 q6.8 -2 13.6 0 l1.6 11 h-16.8z" style="fill:var(--tee)"/>
                 <circle cx="0" cy="-28" r="8.6" style="fill:var(--skin)"/>
                 <path d="M-8.8 -28.5 c-0.5 -7.5 4 -10.5 8.8 -10.5 c5 0 9.4 3.4 8.8 10.5 c-1.8 -3 -3.6 -4 -5 -3.4 l-0.8 -2.6 l-2 2.6 l-2 -3 l-1.4 3 c-2.4 -0.6 -4.4 0.6 -6.4 3.4z" style="fill:var(--hair)"/>
@@ -1480,6 +1505,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
                 <circle cx="-3" cy="-27" r="1.2" style="fill:var(--sock)" stroke="none"/><circle cx="3" cy="-27" r="1.2" style="fill:var(--sock)" stroke="none"/>
                 <ellipse cx="-5.4" cy="-24.4" rx="1.8" ry="1.1" style="fill:var(--rose)" opacity=".8" stroke="none"/><ellipse cx="5.4" cy="-24.4" rx="1.8" ry="1.1" style="fill:var(--rose)" opacity=".8" stroke="none"/>
                 <ellipse cx="0" cy="-23.4" rx="1.4" ry="1.1" style="fill:var(--sock)" stroke="none"/>
+                <g id="evanRain"></g>
               </g>
             </g></g></g>
             <!-- Maple (small) -->
@@ -2277,6 +2303,20 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       I[k + "_ex"] = [I[k][0] + `<path d="M18 3l1 2.2 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z" ${f("#F3C33A")}/>`, I[k][1]];
     });
   }
+  {
+    const fsh = (a, b) => [`<path d="M3 12c3-4.5 9-5.5 13-2l4-3v10l-4-3c-4 3.5-10 2.5-13-2z" ${f(a)}/><path d="M9 8.4q2-2.6 4-.6" ${f(b)}/>`, `<path d="M3 12c3-4.5 9-5.5 13-2l4-3v10l-4-3c-4 3.5-10 2.5-13-2z"/><circle cx="6.8" cy="11" r=".8"/><path d="M10 9.6q1.5 2.4 0 4.8" opacity=".6"/>`];
+    I.trout = fsh("#C9D6B8", "#E8899A");
+    I.sardine = fsh("#BFD3E2", "#8FA9BF");
+    I.mackerel = fsh("#9FC0C8", "#3E6B8C");
+    I.seabream = fsh("#E3D6CF", "#D9A93A");
+    I.koi = fsh("#F3B23A", "#FFFDF6");
+    I.squid = [`<path d="M12 2c3 2 4 6 3 10H9c-1-4 0-8 3-10z" ${f("#F4C7CF")}/><path d="M9 12l-2 9M11 12l-.5 9M13 12l.5 9M15 12l2 9" ${f("none")}/>`, `<path d="M12 2c3 2 4 6 3 10H9c-1-4 0-8 3-10zM9 12l-2 9M11 12l-.5 9M13 12l.5 9M15 12l2 9"/><circle cx="11" cy="9" r=".7"/><circle cx="13" cy="9" r=".7"/>`];
+    I.octopus = [`<path d="M6 11a6 6 0 0 1 12 0v2H6z" ${f("#E8899A")}/><path d="M6 13q-2 4-4 4M9 13q-1 5-3 7M12 13v7M15 13q1 5 3 7M18 13q2 4 4 4" ${f("none")}/>`, `<path d="M6 11a6 6 0 0 1 12 0v2H6zM6 13q-2 4-4 4M9 13q-1 5-3 7M12 13v7M15 13q1 5 3 7M18 13q2 4 4 4"/><circle cx="10" cy="10" r=".8"/><circle cx="14" cy="10" r=".8"/>`];
+    I.crayfish = [`<path d="M8 9h8v7a4 4 0 0 1-8 0z" ${f("#D9614C")}/><path d="M8 10L4 6l2-2 3 4M16 10l4-4-2-2-3 4" ${f("#D9614C")}/>`, `<path d="M8 9h8v7a4 4 0 0 1-8 0zM8 10L4 6l2-2 3 4M16 10l4-4-2-2-3 4M9 13h6M9 16h6M10 20l-1 2M14 20l1 2"/>`];
+    I.boot = [`<path d="M8 3h6v11l6 3v4H8z" ${f("#5E8A5A")}/>`, `<path d="M8 3h6v11l6 3v4H8zM8 18h12M8 6h6"/>`];
+    I.seaglass = [`<path d="M6 10l5-5 7 3 1 7-6 5-6-3z" ${f("#9FD3C0")}/>`, `<path d="M6 10l5-5 7 3 1 7-6 5-6-3z"/><path d="M10 9l3 1" opacity=".6"/>`];
+    I.rod = [`<path d="M4 21L19 4" ${f("none")}/><circle cx="7" cy="17" r="2.2" ${f("#F3C969")}/>`, `<path d="M4 21L19 4M19 4v9"/><circle cx="7" cy="17" r="2.2"/><circle cx="19" cy="14" r="1.4"/>`];
+  }
   I.egg = [`<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z" ${f("#F6EBDD")}/>`, `<path d="M12 3c3.5 0 6 6 6 10a6 6 0 0 1-12 0c0-4 2.5-10 6-10z"/><path d="M9 12c0-2 .8-3.6 1.8-4.5" opacity=".6"/>`];
   I.coop = [
     `<path d="M3 11l9-7 9 7z" ${f(C.rose)}/><rect x="5" y="11" width="14" height="9" ${f(C.butter)}/><rect x="10" y="14" width="4" height="6" ${f(C.wood)}/>`,
@@ -2553,6 +2593,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     stray: { scene: "hfarm", name: "A runaway goat", door: [260, 524], spot: true, line: "A goat on the loose!" },
     fstand: { scene: "hfarm", name: "Farm stand", door: [130, 580], spot: true, mark: [130, 500], line: "The farm stand: milk, honey and eggs." },
     reno: { scene: "bay", name: "Under renovation", door: [396, 520], spot: true, line: "Boarded up for now. Coming soon: a brewery? A chocolatier?" },
+    fishriver: { scene: "base", name: "Fishing spot", door: [396, 118], spot: true, mark: [396, 70], line: "A good spot for fishing." },
+    fishlake: { scene: "field", name: "Fishing spot", door: [60, 290], spot: true, mark: [60, 236], line: "A good spot for fishing." },
+    fishsea: { scene: "shore", name: "Fishing spot", door: [204, 376], spot: true, mark: [234, 320], line: "A good spot for fishing." },
     homejetty: { scene: "base", name: "Little jetty", door: [150, 132], spot: true, line: "Your little jetty. Paddle down the river and out to the foreshore." },
     toTown: { scene: "base", name: "Bridge to town", door: [260, 114], spot: true, bridge: "village", mark: [260, 62], line: "Over the river to the town square." }
   };
@@ -3322,8 +3365,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     grape_white: { n: "White grapes", kind: "ingredient", sell: 2, what: "for gelato at the Scoop Shack, or back in the crates for wine" },
     loaf: { n: "Loaf of bread", kind: "ingredient", sell: 2, what: "baked in the wine shop's oven" },
     milk: { n: "Milk", kind: "ingredient", price: 4, tab: "deli", sell: 3, what: "for gelato at the Scoop Shack, or two make a cheese in the wine shop's kitchen press (the farm stand sells it, and Wildflower Farm's cows give it)" },
-    goatmilk: { n: "Goat's milk", kind: "ingredient", price: 5, sell: 3, what: "from Wildflower Farm's goats: for gelato at the Scoop Shack, and soon goat's cheese at the farm's dairy" },
-    yoghurt: { n: "Pot of yoghurt", kind: "ingredient", price: 5, sell: 3, what: "made in Wildflower Farm's barn: frozen yoghurt at the Scoop Shack" },
+    goatmilk: { n: "Goat's milk", kind: "ingredient", price: 5, sell: 3, what: "from Wildflower Farm's goats: for gelato at the Scoop Shack, or the kitchen's cheese press (like milk)" },
+    yoghurt: { n: "Pot of yoghurt", kind: "ingredient", price: 5, sell: 3, what: "made in Wildflower Farm's barn: frozen yoghurt at the Scoop Shack, or yoghurt with honey at the kitchen" },
     honey_lav: { n: "Jar of lavender honey", kind: "gift", to: "family", price: 9, say: "Lavender honey! It smells like the flower farm.", says: { mama: "Lavender honey? Ma Ma put in tea. So fragrant!" } },
     honey_blossom: { n: "Jar of orchard blossom honey", kind: "gift", to: "family", price: 9, say: "Orchard blossom honey, from Ma Ma's trees? That's lovely.", says: { mama: "From my trees! The bees know where the good flowers are." } },
     chz_fresh: { n: "Fresh goat's cheese", kind: "gift", to: ["darren", "mama", "gonggong", "mum", "dad", "angelina"], price: 8, say: "Fresh goat's cheese! On toast with honey. Perfect.", says: { darren: "Goat's cheese and crackers tonight. Sorted." } },
@@ -3437,6 +3480,147 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   Object.keys(CROPS).forEach((id) => {
     CROPS[id].ico = id;
   });
+
+  // src/art/people.js
+  var S = (c) => `style="fill:${c}"`;
+  function hair(style, c, k) {
+    const y = -46 * k, r = 10.6 * k;
+    switch (style) {
+      case "bun":
+        return `<circle cx="0" cy="${y - r - 3 * k}" r="${5 * k}" ${S(c)}/>` + cap(c, y, r);
+      // a bob with a straight-cut fringe (Mel's mum): the bob behind, the fringe drawn over the forehead (see fringe)
+      case "bobfringe":
+      case "bob":
+        return `<path d="M${-r - 1.2} ${y + 1} c-1 -12 5 -16 ${r + 1} -16 c7 0 ${r + 2} 4 ${r + 1.6} 16 l0 ${7 * k} l${-4 * k} 0 l0 ${-8 * k} c-4 -1 -12 -1 -16 -3 l0 ${11 * k} l${-4 * k} 0z" ${S(c)}/>`;
+      case "long":
+        return `<path d="M${-r - 1} ${y} c-1 -12 5 -16 ${r + 1} -16 c7 0 ${r + 2} 4 ${r + 1} 16 l1 ${18 * k} l${-5 * k} 0 l-1 ${-16 * k} c-4 -2 -11 -2 -15 -5 l-1 ${21 * k} l${-5 * k} 0z" ${S(c)}/>`;
+      case "spiky":
+        return `<path d="M${-r} ${y - 1} l-1 -6 l4 2 l1 -6 l4 4 l3 -6 l3 6 l4 -4 l1 6 l4 -2 l-1 6 c-4 -3 -16 -3 -22 0z" ${S(c)}/>`;
+      // short curls: a cap with little round curls all over the top
+      case "curly":
+        return cap(c, y, r) + [[-9, -3], [-6.5, -8.5], [-1.5, -11], [3.5, -10.5], [8, -7], [10, -2], [-10.4, 2], [10.4, 2]].map(([dx, dy]) => `<circle cx="${dx * k}" cy="${y + dy * k}" r="${3.3 * k}" ${S(c)}/>`).join("");
+      default:
+        return cap(c, y, r);
+    }
+  }
+  var fringe = (c, y, r, k) => `<path d="M${-r - 0.4} ${y - 2.6 * k} h${2 * r + 0.8} c0 -7 -4 -11.4 ${-r} -11.4 c-6.4 0 ${-r} 4.4 ${-r} 11.4z" ${S(c)}/>`;
+  var board = (k) => `<ellipse cx="0" cy="${-1 * k}" rx="${22 * k}" ry="${3.6 * k}" style="fill:#F3C969"/><path d="M${-18 * k} ${-1 * k} h${36 * k}" fill="none" stroke-width=".8" style="stroke:#E8566C"/>`;
+  var paddle = (k) => `<path d="M${12 * k} ${-30 * k} l${5 * k} ${32 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${16 * k} ${-2 * k} l${2 * k} ${8 * k} l${3 * k} ${-1 * k} l${-2 * k} ${-8 * k}z" ${S("#7FB8E8")}/>`;
+  var cap = (c, y, r) => `<path d="M${-r - 0.2} ${y + 1} c-1 -9 4 -14 ${r} -14 c6 0 ${r + 1} 4 ${r} 14 c-3 -4 -8 -5 -12 -4 c-3 0 -6 2 -8 4z" ${S(c)}/>`;
+  function extra(kind, look, k) {
+    const y = -46 * k, r = 10.6 * k;
+    switch (kind) {
+      case "apron":
+        return `<path d="M${-6 * k} ${-30 * k} h${12 * k} l${1.5 * k} ${15 * k} h${-15 * k}z" ${S("#FFFDF6")}/><path d="M${-5 * k} ${-31 * k} l${-2 * k} ${-5 * k} M${5 * k} ${-31 * k} l${2 * k} ${-5 * k}" fill="none"/>`;
+      case "glasses":
+        return `<circle cx="${-3.8 * k}" cy="${y + 2}" r="${2.6 * k}" fill="none" stroke-width=".9"/><circle cx="${3.8 * k}" cy="${y + 2}" r="${2.6 * k}" fill="none" stroke-width=".9"/><path d="M${-1.2 * k} ${y + 2} h${2.4 * k}" fill="none" stroke-width=".9"/>`;
+      case "cap":
+        return `<path d="M${-r} ${y - 3} c0 -8 ${r * 2} -8 ${r * 2} 0z" ${S(look.top)}/><path d="M${r - 2} ${y - 3} h${7 * k}" stroke-width="2.2" style="stroke:${look.top}"/>`;
+      case "sunhat":
+        return `<ellipse cx="0" cy="${y - 6 * k}" rx="${16 * k}" ry="${3.6 * k}" ${S("#F3DFA6")}/><path d="M${-8 * k} ${y - 6 * k} c0 -10 ${16 * k} -10 ${16 * k} 0z" ${S("#F3DFA6")}/><path d="M${-8 * k} ${y - 7.5 * k} h${16 * k}" style="stroke:var(--rose)" stroke-width="1.6"/>`;
+      case "helmet":
+        return `<path d="M${-r - 1} ${y - 1} c0 -12 ${r * 2 + 2} -12 ${r * 2 + 2} 0z" ${S("#F6E3A1")}/><path d="M${-2 * k} ${y - 11 * k} v${8 * k} M${3 * k} ${y - 11 * k} v${8 * k}" fill="none" stroke-width=".8"/>`;
+      case "tie":
+        return `<path d="M0 ${-35 * k} l${-1.6 * k} ${3 * k} l${1.6 * k} ${8 * k} l${1.6 * k} ${-8 * k}z" ${S("#C2505F")}/>`;
+      case "satchel":
+        return `<path d="M${-7 * k} ${-35 * k} l${14 * k} ${16 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><rect x="${5 * k}" y="${-22 * k}" width="${8 * k}" height="${7 * k}" rx="1.5" ${S("#C9A27E")}/>`;
+      case "bell":
+        return `<path d="M${11 * k} ${-30 * k} l${4 * k} ${-6 * k}" fill="none"/><path d="M${13 * k} ${-37 * k} c0 -5 ${6 * k} -5 ${6 * k} 0 l1 ${3 * k} h${-8 * k}z" ${S("#F3C969")}/>`;
+      // held in the right hand (hand at about (10k, -21k))
+      case "can":
+        return `<path d="M${13 * k} ${-24 * k} q${5 * k} ${-7 * k} ${10 * k} 0" fill="none"/><rect x="${11 * k}" y="${-24 * k}" width="${12 * k}" height="${9 * k}" rx="2" ${S("#9CC3E0")}/><path d="M${23 * k} ${-20 * k} l${7 * k} ${-6 * k}" fill="none" stroke-width="1.6"/><g class="drips"><circle cx="${31 * k}" cy="${-21 * k}" r="${1 * k}" ${S("var(--water)")}/><circle cx="${33 * k}" cy="${-15 * k}" r="${1 * k}" ${S("var(--water)")}/></g>`;
+      case "hammer":
+        return `<g class="tool"><path d="M${10 * k} ${-20 * k} l${6 * k} ${-14 * k}" fill="none" stroke-width="2.2" style="stroke:#8A5A3A"/><rect x="${12 * k}" y="${-38 * k}" width="${10 * k}" height="${5 * k}" rx="1" transform="rotate(24 ${17 * k} ${-35.5 * k})" ${S("var(--stone)")}/></g>`;
+      case "cone":
+        return `<path d="M${9.5 * k} ${-23 * k} l${3 * k} ${10 * k} l${3 * k} ${-10 * k}z" ${S("#E8C48E")}/><circle cx="${12.5 * k}" cy="${-25 * k}" r="${3.6 * k}" ${S(["#F4C7CF", "#C3E8B8", "#F3E27A", "#FFF6DC"][Math.round(k * 7 + (look.top || "").length) % 4])}/>`;
+      case "hoe":
+        return `<g class="tool"><path d="M${16 * k} ${-48 * k} l${-4 * k} ${46 * k}" fill="none" stroke-width="2" style="stroke:#8A5A3A"/><path d="M${12 * k} ${-2 * k} h${-8 * k} l${1 * k} ${3 * k} h${7 * k}z" ${S("var(--stone)")}/></g>`;
+      case "lantern":
+        return `<path d="M${12 * k} ${-24 * k} v${-4 * k}" fill="none"/><rect x="${9 * k}" y="${-24 * k}" width="${7 * k}" height="${9 * k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5 * k}" cy="${-19.5 * k}" r="${1.8 * k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
+    }
+    return "";
+  }
+  function batik(col, k) {
+    const flower = (x, y) => `<circle cx="${x * k}" cy="${y * k}" r="${1.5 * k}" style="fill:${col}" stroke="none"/>` + [[0, -2.6], [2.5, 0], [0, 2.6], [-2.5, 0]].map(([dx, dy]) => `<circle cx="${(x + dx) * k}" cy="${(y + dy) * k}" r="${0.8 * k}" style="fill:${col}" stroke="none"/>`).join("");
+    const leaf2 = (x, y) => `<path d="M${x * k} ${y * k} q${1.6 * k} ${-1.6 * k} ${3.2 * k} 0 q${-1.6 * k} ${1.6 * k} ${-3.2 * k} 0z" style="fill:${col}" stroke="none"/>`;
+    return `<g opacity=".85" pointer-events="none">${flower(-4, -31)}${flower(4.5, -25)}${flower(-3.5, -19)}${leaf2(1, -33)}${leaf2(-7, -25)}${leaf2(4, -18)}
+    <path d="M${-5.6 * k} ${-12 * k} h${3 * k} M${-5.6 * k} ${-8 * k} h${3 * k} M${2 * k} ${-11 * k} h${3 * k} M${2 * k} ${-6 * k} h${3 * k}" stroke-width="${1.1 * k}" style="stroke:${col}"/></g>`;
+  }
+  var BROLLY_COLS = [["#E8566C", "#FFFDF6"], ["#3E6B8C", "#F3C969"], ["#F3C969", "#E8913A"], ["#7FB8A8", "#FFFDF6"], ["#2F2B28", "#E8566C"], ["#9AA9DD", "#FFFDF6"], ["#C2505F", "#F4C7CF"], ["#5E8A5A", "#F3E7C9"], ["#F4C7CF", "#8E2C48"], ["#E3E8EC", "#3E6B8C"]];
+  var COAT_COLS = [["#F3C969", "#E8566C"], ["#E8566C", "#2F2B28"], ["#3E6B8C", "#F3C969"], ["#7FB8A8", "#2E3A70"], ["#9CC27E", "#F3C969"], ["#F4C7CF", "#9AA9DD"], ["#E8913A", "#3E6B8C"], ["#2E3A70", "#E8566C"]];
+  var BROLLY_PATS = ["solid", "stripe", "dots", "scallop", "check", "clear", "paper", "stripe", "dots"];
+  function rainGearFor(seed2, opts = {}) {
+    let h = 0;
+    for (const c of String(seed2) + "brolly") h = h * 31 + c.charCodeAt(0) | 0;
+    h = Math.abs(h);
+    const coat = opts.coat || !opts.brolly && h % 3 === 0;
+    if (coat) {
+      const [a2, b2] = COAT_COLS[(h >> 3) % COAT_COLS.length];
+      return { kind: "coat", a: a2, b: b2 };
+    }
+    const [a, b] = BROLLY_COLS[(h >> 3) % BROLLY_COLS.length];
+    return { kind: "brolly", a, b, pat: BROLLY_PATS[(h >> 7) % BROLLY_PATS.length] };
+  }
+  function brollyArt(g, k) {
+    const cx = 4 * k, cy = -64 * k, R2 = 22 * k, top = cy - 11 * k, n = 6, xs = Array.from({ length: n + 1 }, (_, i) => cx - R2 + 2 * R2 * i / n);
+    const dome = `M${cx - R2} ${cy} Q${cx - R2} ${top} ${cx} ${top} Q${cx + R2} ${top} ${cx + R2} ${cy}`;
+    const hem = g.pat === "scallop" ? xs.slice(1).map((x, i) => `Q${(xs[i] + x) / 2} ${cy + 4 * k} ${x} ${cy}`).join(" ") : `L${cx - R2} ${cy}`;
+    const alpha = g.pat === "clear" ? ` fill-opacity=".38"` : "";
+    let deco = "";
+    const clip = `M${cx - R2} ${cy} Q${cx - R2} ${top} ${cx} ${top} Q${cx + R2} ${top} ${cx + R2} ${cy}z`;
+    if (g.pat === "stripe" || g.pat === "paper") deco = xs.slice(0, n).map((x, i) => i % 2 ? `<path d="M${cx} ${top} L${x} ${cy} L${xs[i + 1]} ${cy}z" style="fill:${g.b}" stroke="none"/>` : "").join("");
+    if (g.pat === "dots") deco = [[-13, -3], [-5, -7], [4, -8], [12, -5], [-9, 1], [1, -1], [10, 1], [17, 0], [-17, 0]].map(([dx, dy]) => `<circle cx="${cx + dx * k}" cy="${cy + dy * k}" r="${1.5 * k}" style="fill:${g.b}" stroke="none"/>`).join("");
+    if (g.pat === "check") deco = [-14, -7, 0, 7, 14].map((dx) => `<path d="M${cx + dx * k} ${top} V${cy}" style="stroke:${g.b}" stroke-width="${2 * k}" opacity=".8"/>`).join("") + [-6, -2.5].map((dy) => `<path d="M${cx - R2} ${cy + dy * k} H${cx + R2}" style="stroke:${g.b}" stroke-width="${2 * k}" opacity=".8"/>`).join("");
+    if (g.pat === "scallop") deco = `<path d="M${cx - R2 + 2 * k} ${cy - 2.5 * k} H${cx + R2 - 2 * k}" style="stroke:${g.b}" stroke-width="${1.6 * k}" stroke-dasharray="${2 * k} ${2 * k}"/>`;
+    const ribs = g.pat === "paper" || g.pat === "clear" ? xs.slice(1, n).map((x) => `<path d="M${cx} ${top} L${x} ${cy}" fill="none" stroke-width=".6" opacity=".7"/>`).join("") : "";
+    const id = "bc" + Math.round(cx * 10 + R2 * 100) + (g.pat || "").length;
+    return `<g class="brolly" pointer-events="none"><path d="M${10 * k} ${-20 * k} L${cx} ${top}" fill="none" stroke-width="${1.4 * k}"/><path d="M${10 * k} ${-20 * k} q0 ${3 * k} ${-2.6 * k} ${3 * k}" fill="none" stroke-width="${1.4 * k}" style="stroke:${g.pat === "paper" ? "#8A5A3A" : "var(--line)"}"/>
+    <defs><clipPath id="${id}"><path d="${clip}"/></clipPath></defs><path d="${dome} ${hem}z" style="fill:${g.a}"${alpha}/><g clip-path="url(#${id})">${deco}</g>${ribs}<path d="${dome} ${hem}z" fill="none"/><circle cx="${cx}" cy="${top - 1.4 * k}" r="${1.4 * k}" style="fill:${g.b}"/></g>`;
+  }
+  function hoodArt(g, k, y = -46 * k, r = 10.6 * k) {
+    const R2 = r + 2.2 * k, ri = r * 0.82;
+    return `<path d="M${-R2} ${y + 5 * k} A${R2} ${R2 * 1.05} 0 0 1 ${R2} ${y + 5 * k} L${ri} ${y + 3 * k} A${ri} ${ri * 0.95} 0 0 0 ${-ri} ${y + 3 * k}z" style="fill:${g.a}"/><path d="M${-ri * 0.7} ${y - ri * 0.55} q${ri * 0.7} ${-ri * 0.4} ${ri * 1.4} 0" fill="none" stroke-width=".7" opacity=".5"/>`;
+  }
+  var coatArt = (g, k) => `<path class="rcoat" d="M${-9 * k} ${-37.4 * k} q${9 * k} ${-2.4 * k} ${18 * k} 0 l${2.6 * k} ${29 * k} h${-23.2 * k}z" style="fill:${g.a}"/><path d="M0 ${-35 * k} V${-8.6 * k}" fill="none" stroke-width=".7"/>${[-30, -23, -16].map((y) => `<rect x="${-1.6 * k}" y="${y * k}" width="${3.2 * k}" height="${1.6 * k}" rx=".6" style="fill:${g.b}" stroke-width=".5"/>`).join("")}`;
+  function personArt(look, kid2) {
+    const k = kid2 ? 0.62 : look.tall ? 1.1 : 1;
+    const legH = 13 * k, legY = -15 * k, lw = 5 * k;
+    const rain = look.rain, coat = rain && rain.kind === "coat";
+    const shoe = coat ? rain.b : "var(--sock)", sleeve = (x) => coat ? `<rect x="${x}" y="${-34 * k}" width="${4.2 * k}" height="${11 * k}" rx="2" ${S(rain.a)}/>` : "";
+    return `<g class="flip"><g filter="url(#wob)">
+    <ellipse cx="0" cy="0" rx="${11 * k}" ry="${3.5 * k}" fill="rgba(60,40,30,.18)"/>
+    <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
+      ${look.board ? board(k) : ""}
+      <g class="legL"><rect x="${-6.2 * k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
+      <g class="legR"><rect x="${1.2 * k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${0.8 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
+      <g class="armL"><rect x="${-12 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/>${sleeve(-12 * k)}</g>
+      <g class="armR"><rect x="${7.8 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/>${sleeve(7.8 * k)}</g>
+      ${look.dress ? `<path d="M${-9 * k} ${-17 * k} L${-12.5 * k} ${-5 * k} h${25 * k} L${9 * k} ${-17 * k}z" ${S(look.dress)}/>` : ""}
+      <path d="M${-8.6 * k} ${-37 * k} q${8.6 * k} ${-2.4 * k} ${17.2 * k} 0 l${1.4 * k} ${23 * k} h${-20 * k}z" ${S(look.dress || look.top)}/>
+      ${look.batik && !coat ? batik(look.batik, k) : ""}
+      ${coat ? coatArt(rain, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
+      <circle cx="0" cy="${-46 * k}" r="${10.6 * k}" ${S(look.skin)}/>
+      ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46 * k, 10.6 * k) : hair(look.hairStyle, look.hair, k)}
+      <ellipse cx="${-3.7 * k}" cy="${-44 * k}" rx="${1.2 * k}" ry="${1.6 * k}" ${S("var(--sock)")} stroke="none"/>
+      <ellipse cx="${3.7 * k}" cy="${-44 * k}" rx="${1.2 * k}" ry="${1.6 * k}" ${S("var(--sock)")} stroke="none"/>
+      <ellipse cx="${-6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
+      <ellipse cx="${6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
+      <path d="M${-1.6 * k} ${-40.4 * k} q${1.6 * k} ${1.4 * k} ${3.2 * k} 0" fill="none" stroke-width="1"/>
+      ${look.hairStyle === "bobfringe" ? fringe(look.hair, -46 * k, 10.6 * k, k) : ""}
+      ${["glasses", "cap", "sunhat", "helmet"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${look.hat && !coat ? extra(look.hat, look, k) : ""}
+      ${coat ? hoodArt(rain, k) : ""}
+      ${look.specs ? `<g fill="none" stroke-width="1" style="stroke:${look.specs}"><circle cx="${-3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><circle cx="${3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><path d="M${-1 * k} ${-44 * k} h${2 * k}"/></g>` : ""}
+      ${look.board ? paddle(k) : ""}
+      ${rain && rain.kind === "brolly" ? brollyArt(rain, k) : ""}
+      ${look.headphones ? `<path d="M${-11 * k} ${-46 * k} a${11 * k} ${12 * k} 0 0 1 ${22 * k} 0" fill="none" stroke-width="1.8" style="stroke:var(--peri2)"/><rect x="${-13.5 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/><rect x="${9 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/>` : ""}
+    </g>
+  </g></g>`;
+  }
+  var letterArt = `<g transform="translate(0 -70)"><g class="qmark"><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.3" stroke-linejoin="round">
+  <rect x="-11" y="-9" width="22" height="16" rx="2" style="fill:#FFFDF6"/><path d="M-11 -9 l11 9 l11 -9" fill="none"/><circle cx="0" cy="1" r="3" style="fill:var(--rose)"/></g></g></g>`;
 
   // src/game/van.js
   var STYLES = {
@@ -3930,8 +4114,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   function addAnimal(F2, kind) {
     const P3 = ensurePets(F2);
     if (!KINDS[kind] || roomLeft(F2) <= 0) return null;
-    const used = new Set(P3.animals.map((a2) => a2.name)), pool = KINDS[kind].names.filter((n) => !used.has(n));
-    const name = pool.length ? pool[Math.floor(Math.random() * pool.length)] : `${KINDS[kind].n} ${P3.next}`;
+    const used = new Set(P3.animals.map((a2) => a2.name)), pool2 = KINDS[kind].names.filter((n) => !used.has(n));
+    const name = pool2.length ? pool2[Math.floor(Math.random() * pool2.length)] : `${KINDS[kind].n} ${P3.next}`;
     const a = { id: "a" + P3.next++, kind, name, born: Date.now(), feeds: 0, fedDay: null, col: Math.floor(Math.random() * 4) };
     P3.animals.push(a);
     return a;
@@ -4636,9 +4820,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var dow = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
   var fmtTime = (m) => `${Math.floor(m / 60) > 12 ? Math.floor(m / 60) - 12 : Math.floor(m / 60)}${m % 60 ? ":" + String(m % 60).padStart(2, "0") : ""}${m >= 12 * 60 ? "pm" : "am"}`;
   function groupFor(seed2, n, skip = [], from = VISITORS) {
-    const pool = from.filter((v) => !skip.includes(v)), out = [];
+    const pool2 = from.filter((v) => !skip.includes(v)), out = [];
     for (let k = 0; out.length < n && k < 40; k++) {
-      const v = pool[hash(seed2 + ":" + k) % pool.length];
+      const v = pool2[hash(seed2 + ":" + k) % pool2.length];
       if (!out.includes(v)) out.push(v);
     }
     return out;
@@ -4686,8 +4870,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var STROLL = [[60, 330], [100, 380], [300, 380], [70, 250]];
   function fieldVisits(day) {
     const d = dow(day), we = d === 0 || d === 6, busy2 = [...toursOn(day).flatMap((t2) => [t2.guide, ...t2.group]), ...visitsOn(day).map((v) => v.id)];
-    const pool = (seed2) => groupFor(day + seed2, 2, [...busy2, "pip"]);
-    const [p1, p2] = pool("pic"), [s1] = groupFor(day + "swan", 1, [...busy2, "pip", p1, p2]);
+    const pool2 = (seed2) => groupFor(day + seed2, 2, [...busy2, "pip"]);
+    const [p1, p2] = pool2("pic"), [s1] = groupFor(day + "swan", 1, [...busy2, "pip", p1, p2]);
     const out = [
       { id: p1, from: 12 * 60, to: 13 * 60 + 30, at: PICNIC[0], act: "sit" },
       { id: p2, from: 12 * 60, to: 13 * 60 + 30, at: PICNIC[1], act: "sit" },
@@ -5919,9 +6103,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       p.next = t2 + timing(where)[2];
       any = true;
     });
-    const mins = Math.min(720, Math.floor((t2 - o.lastTick) / 6e4));
+    const mins = Math.min(1440, Math.floor((t2 - o.lastTick) / 6e4));
     if (mins >= 1) {
-      if (t2 - o.lastTick > 720 * 6e4) o.lastTick = t2 - 720 * 6e4;
+      if (t2 - o.lastTick > 1440 * 6e4) o.lastTick = t2 - 1440 * 6e4;
       o.lastTick += mins * 6e4;
       for (let k = mins; k > 0; k--) {
         const at = t2 - k * 6e4, m = hm2(at), d = new Date(at + off + 8 * H), we = [0, 6].includes(d.getUTCDay());
@@ -5929,7 +6113,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         if (!(mkt && mkt.kind === "market") && (m < 9 * 60 || m >= 18 * 60)) continue;
         const ids = Object.keys(o.stock).filter((x) => o.stock[x] > 0);
         if (!ids.length) break;
-        if (Math.random() < (mkt && mkt.kind === "market" ? 0.02 : 16e-4 * (we ? 1.5 : 1))) {
+        if (Math.random() < (mkt && mkt.kind === "market" ? 0.02 : 8e-3 * (we ? 1.5 : 1))) {
           const id = ids[Math.floor(Math.random() * ids.length)];
           o.stock[id]--;
           if (!o.stock[id]) delete o.stock[id];
@@ -6156,107 +6340,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       api4.rerender();
     });
   }
-
-  // src/art/people.js
-  var S = (c) => `style="fill:${c}"`;
-  function hair(style, c, k) {
-    const y = -46 * k, r = 10.6 * k;
-    switch (style) {
-      case "bun":
-        return `<circle cx="0" cy="${y - r - 3 * k}" r="${5 * k}" ${S(c)}/>` + cap(c, y, r);
-      // a bob with a straight-cut fringe (Mel's mum): the bob behind, the fringe drawn over the forehead (see fringe)
-      case "bobfringe":
-      case "bob":
-        return `<path d="M${-r - 1.2} ${y + 1} c-1 -12 5 -16 ${r + 1} -16 c7 0 ${r + 2} 4 ${r + 1.6} 16 l0 ${7 * k} l${-4 * k} 0 l0 ${-8 * k} c-4 -1 -12 -1 -16 -3 l0 ${11 * k} l${-4 * k} 0z" ${S(c)}/>`;
-      case "long":
-        return `<path d="M${-r - 1} ${y} c-1 -12 5 -16 ${r + 1} -16 c7 0 ${r + 2} 4 ${r + 1} 16 l1 ${18 * k} l${-5 * k} 0 l-1 ${-16 * k} c-4 -2 -11 -2 -15 -5 l-1 ${21 * k} l${-5 * k} 0z" ${S(c)}/>`;
-      case "spiky":
-        return `<path d="M${-r} ${y - 1} l-1 -6 l4 2 l1 -6 l4 4 l3 -6 l3 6 l4 -4 l1 6 l4 -2 l-1 6 c-4 -3 -16 -3 -22 0z" ${S(c)}/>`;
-      // short curls: a cap with little round curls all over the top
-      case "curly":
-        return cap(c, y, r) + [[-9, -3], [-6.5, -8.5], [-1.5, -11], [3.5, -10.5], [8, -7], [10, -2], [-10.4, 2], [10.4, 2]].map(([dx, dy]) => `<circle cx="${dx * k}" cy="${y + dy * k}" r="${3.3 * k}" ${S(c)}/>`).join("");
-      default:
-        return cap(c, y, r);
-    }
-  }
-  var fringe = (c, y, r, k) => `<path d="M${-r - 0.4} ${y - 2.6 * k} h${2 * r + 0.8} c0 -7 -4 -11.4 ${-r} -11.4 c-6.4 0 ${-r} 4.4 ${-r} 11.4z" ${S(c)}/>`;
-  var board = (k) => `<ellipse cx="0" cy="${-1 * k}" rx="${22 * k}" ry="${3.6 * k}" style="fill:#F3C969"/><path d="M${-18 * k} ${-1 * k} h${36 * k}" fill="none" stroke-width=".8" style="stroke:#E8566C"/>`;
-  var paddle = (k) => `<path d="M${12 * k} ${-30 * k} l${5 * k} ${32 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${16 * k} ${-2 * k} l${2 * k} ${8 * k} l${3 * k} ${-1 * k} l${-2 * k} ${-8 * k}z" ${S("#7FB8E8")}/>`;
-  var cap = (c, y, r) => `<path d="M${-r - 0.2} ${y + 1} c-1 -9 4 -14 ${r} -14 c6 0 ${r + 1} 4 ${r} 14 c-3 -4 -8 -5 -12 -4 c-3 0 -6 2 -8 4z" ${S(c)}/>`;
-  function extra(kind, look, k) {
-    const y = -46 * k, r = 10.6 * k;
-    switch (kind) {
-      case "apron":
-        return `<path d="M${-6 * k} ${-30 * k} h${12 * k} l${1.5 * k} ${15 * k} h${-15 * k}z" ${S("#FFFDF6")}/><path d="M${-5 * k} ${-31 * k} l${-2 * k} ${-5 * k} M${5 * k} ${-31 * k} l${2 * k} ${-5 * k}" fill="none"/>`;
-      case "glasses":
-        return `<circle cx="${-3.8 * k}" cy="${y + 2}" r="${2.6 * k}" fill="none" stroke-width=".9"/><circle cx="${3.8 * k}" cy="${y + 2}" r="${2.6 * k}" fill="none" stroke-width=".9"/><path d="M${-1.2 * k} ${y + 2} h${2.4 * k}" fill="none" stroke-width=".9"/>`;
-      case "cap":
-        return `<path d="M${-r} ${y - 3} c0 -8 ${r * 2} -8 ${r * 2} 0z" ${S(look.top)}/><path d="M${r - 2} ${y - 3} h${7 * k}" stroke-width="2.2" style="stroke:${look.top}"/>`;
-      case "sunhat":
-        return `<ellipse cx="0" cy="${y - 6 * k}" rx="${16 * k}" ry="${3.6 * k}" ${S("#F3DFA6")}/><path d="M${-8 * k} ${y - 6 * k} c0 -10 ${16 * k} -10 ${16 * k} 0z" ${S("#F3DFA6")}/><path d="M${-8 * k} ${y - 7.5 * k} h${16 * k}" style="stroke:var(--rose)" stroke-width="1.6"/>`;
-      case "helmet":
-        return `<path d="M${-r - 1} ${y - 1} c0 -12 ${r * 2 + 2} -12 ${r * 2 + 2} 0z" ${S("#F6E3A1")}/><path d="M${-2 * k} ${y - 11 * k} v${8 * k} M${3 * k} ${y - 11 * k} v${8 * k}" fill="none" stroke-width=".8"/>`;
-      case "tie":
-        return `<path d="M0 ${-35 * k} l${-1.6 * k} ${3 * k} l${1.6 * k} ${8 * k} l${1.6 * k} ${-8 * k}z" ${S("#C2505F")}/>`;
-      case "satchel":
-        return `<path d="M${-7 * k} ${-35 * k} l${14 * k} ${16 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><rect x="${5 * k}" y="${-22 * k}" width="${8 * k}" height="${7 * k}" rx="1.5" ${S("#C9A27E")}/>`;
-      case "bell":
-        return `<path d="M${11 * k} ${-30 * k} l${4 * k} ${-6 * k}" fill="none"/><path d="M${13 * k} ${-37 * k} c0 -5 ${6 * k} -5 ${6 * k} 0 l1 ${3 * k} h${-8 * k}z" ${S("#F3C969")}/>`;
-      // held in the right hand (hand at about (10k, -21k))
-      case "can":
-        return `<path d="M${13 * k} ${-24 * k} q${5 * k} ${-7 * k} ${10 * k} 0" fill="none"/><rect x="${11 * k}" y="${-24 * k}" width="${12 * k}" height="${9 * k}" rx="2" ${S("#9CC3E0")}/><path d="M${23 * k} ${-20 * k} l${7 * k} ${-6 * k}" fill="none" stroke-width="1.6"/><g class="drips"><circle cx="${31 * k}" cy="${-21 * k}" r="${1 * k}" ${S("var(--water)")}/><circle cx="${33 * k}" cy="${-15 * k}" r="${1 * k}" ${S("var(--water)")}/></g>`;
-      case "hammer":
-        return `<g class="tool"><path d="M${10 * k} ${-20 * k} l${6 * k} ${-14 * k}" fill="none" stroke-width="2.2" style="stroke:#8A5A3A"/><rect x="${12 * k}" y="${-38 * k}" width="${10 * k}" height="${5 * k}" rx="1" transform="rotate(24 ${17 * k} ${-35.5 * k})" ${S("var(--stone)")}/></g>`;
-      case "cone":
-        return `<path d="M${9.5 * k} ${-23 * k} l${3 * k} ${10 * k} l${3 * k} ${-10 * k}z" ${S("#E8C48E")}/><circle cx="${12.5 * k}" cy="${-25 * k}" r="${3.6 * k}" ${S(["#F4C7CF", "#C3E8B8", "#F3E27A", "#FFF6DC"][Math.round(k * 7 + (look.top || "").length) % 4])}/>`;
-      case "hoe":
-        return `<g class="tool"><path d="M${16 * k} ${-48 * k} l${-4 * k} ${46 * k}" fill="none" stroke-width="2" style="stroke:#8A5A3A"/><path d="M${12 * k} ${-2 * k} h${-8 * k} l${1 * k} ${3 * k} h${7 * k}z" ${S("var(--stone)")}/></g>`;
-      case "lantern":
-        return `<path d="M${12 * k} ${-24 * k} v${-4 * k}" fill="none"/><rect x="${9 * k}" y="${-24 * k}" width="${7 * k}" height="${9 * k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5 * k}" cy="${-19.5 * k}" r="${1.8 * k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
-    }
-    return "";
-  }
-  function batik(col, k) {
-    const flower = (x, y) => `<circle cx="${x * k}" cy="${y * k}" r="${1.5 * k}" style="fill:${col}" stroke="none"/>` + [[0, -2.6], [2.5, 0], [0, 2.6], [-2.5, 0]].map(([dx, dy]) => `<circle cx="${(x + dx) * k}" cy="${(y + dy) * k}" r="${0.8 * k}" style="fill:${col}" stroke="none"/>`).join("");
-    const leaf2 = (x, y) => `<path d="M${x * k} ${y * k} q${1.6 * k} ${-1.6 * k} ${3.2 * k} 0 q${-1.6 * k} ${1.6 * k} ${-3.2 * k} 0z" style="fill:${col}" stroke="none"/>`;
-    return `<g opacity=".85" pointer-events="none">${flower(-4, -31)}${flower(4.5, -25)}${flower(-3.5, -19)}${leaf2(1, -33)}${leaf2(-7, -25)}${leaf2(4, -18)}
-    <path d="M${-5.6 * k} ${-12 * k} h${3 * k} M${-5.6 * k} ${-8 * k} h${3 * k} M${2 * k} ${-11 * k} h${3 * k} M${2 * k} ${-6 * k} h${3 * k}" stroke-width="${1.1 * k}" style="stroke:${col}"/></g>`;
-  }
-  function personArt(look, kid2) {
-    const k = kid2 ? 0.62 : look.tall ? 1.1 : 1;
-    const legH = 13 * k, legY = -15 * k, lw = 5 * k;
-    const shoe = "var(--sock)";
-    return `<g class="flip"><g filter="url(#wob)">
-    <ellipse cx="0" cy="0" rx="${11 * k}" ry="${3.5 * k}" fill="rgba(60,40,30,.18)"/>
-    <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
-      ${look.board ? board(k) : ""}
-      <g class="legL"><rect x="${-6.2 * k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
-      <g class="legR"><rect x="${1.2 * k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${0.8 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
-      <g class="armL"><rect x="${-12 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/></g>
-      <g class="armR"><rect x="${7.8 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/></g>
-      ${look.dress ? `<path d="M${-9 * k} ${-17 * k} L${-12.5 * k} ${-5 * k} h${25 * k} L${9 * k} ${-17 * k}z" ${S(look.dress)}/>` : ""}
-      <path d="M${-8.6 * k} ${-37 * k} q${8.6 * k} ${-2.4 * k} ${17.2 * k} 0 l${1.4 * k} ${23 * k} h${-20 * k}z" ${S(look.dress || look.top)}/>
-      ${look.batik ? batik(look.batik, k) : ""}
-      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone"].includes(look.extra) ? extra(look.extra, look, k) : ""}
-      ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
-      <circle cx="0" cy="${-46 * k}" r="${10.6 * k}" ${S(look.skin)}/>
-      ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46 * k, 10.6 * k) : hair(look.hairStyle, look.hair, k)}
-      <ellipse cx="${-3.7 * k}" cy="${-44 * k}" rx="${1.2 * k}" ry="${1.6 * k}" ${S("var(--sock)")} stroke="none"/>
-      <ellipse cx="${3.7 * k}" cy="${-44 * k}" rx="${1.2 * k}" ry="${1.6 * k}" ${S("var(--sock)")} stroke="none"/>
-      <ellipse cx="${-6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
-      <ellipse cx="${6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
-      <path d="M${-1.6 * k} ${-40.4 * k} q${1.6 * k} ${1.4 * k} ${3.2 * k} 0" fill="none" stroke-width="1"/>
-      ${look.hairStyle === "bobfringe" ? fringe(look.hair, -46 * k, 10.6 * k, k) : ""}
-      ${["glasses", "cap", "sunhat", "helmet"].includes(look.extra) ? extra(look.extra, look, k) : ""}
-      ${look.hat ? extra(look.hat, look, k) : ""}
-      ${look.specs ? `<g fill="none" stroke-width="1" style="stroke:${look.specs}"><circle cx="${-3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><circle cx="${3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><path d="M${-1 * k} ${-44 * k} h${2 * k}"/></g>` : ""}
-      ${look.board ? paddle(k) : ""}
-      ${look.headphones ? `<path d="M${-11 * k} ${-46 * k} a${11 * k} ${12 * k} 0 0 1 ${22 * k} 0" fill="none" stroke-width="1.8" style="stroke:var(--peri2)"/><rect x="${-13.5 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/><rect x="${9 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/>` : ""}
-    </g>
-  </g></g>`;
-  }
-  var letterArt = `<g transform="translate(0 -70)"><g class="qmark"><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.3" stroke-linejoin="round">
-  <rect x="-11" y="-9" width="22" height="16" rx="2" style="fill:#FFFDF6"/><path d="M-11 -9 l11 9 l11 -9" fill="none"/><circle cx="0" cy="1" r="3" style="fill:var(--rose)"/></g></g></g>`;
 
   // src/art/field.js
   var W2 = `filter="url(#wob)" ${ink}`;
@@ -6662,7 +6745,22 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     guisantes: ["#B9D88A", "#7FA35A"],
     croquetas: ["#E3B04B", "#F08A3C"],
     calabaza: ["#F08A3C", "#3B3045"],
-    puerros: ["#E7EFD8", "#9CC27E"]
+    puerros: ["#E7EFD8", "#9CC27E"],
+    sardinas: ["#E3D6CF", "#8FA9BF"],
+    escabeche: ["#F3C969", "#3E6B8C"],
+    calamares: ["#F6E3A1", "#E3B04B"],
+    pulpo: ["#F3C969", "#E8899A"],
+    dorada: ["#E3D6CF", "#5E7A4E"],
+    trucha: ["#F6E3C6", "#E8899A"],
+    cangrejos: ["#D9A066", "#D9614C"],
+    huevos: ["#F3C969", "#FFF3C4"],
+    tomatoegg: ["#F6D36A", "#E8574C"],
+    yogur: ["#FFFDF6", "#C9A27E"],
+    halloumi: ["#F6F1E8", "#E3A33A"],
+    azul: ["#DCE3E8", "#C9D36A"],
+    manzana: ["#D9A066", "#D9433A"],
+    tarta: ["#E3B47A", "#9CC27E"],
+    panal: ["#F3C969", "#FFF6E0"]
   };
   function dishArt(id, s = 44, off) {
     if (String(id).startsWith("tapas:")) {
@@ -6673,6 +6771,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const plate = `<ellipse cx="24" cy="30" rx="21" ry="11" fill="#FFFDF6" ${INK3}/><ellipse cx="24" cy="29" rx="14" ry="6.5" fill="none" stroke="#E4DDD2" stroke-width="1.2"/>`;
     const F2 = {
       cheese: plate + `<path d="M12 28 l14 -10 l3 9z" fill="#F3C969" ${INK3}/><circle cx="20" cy="25" r="1.4" fill="#E3B04B"/><rect x="30" y="22" width="6" height="6" rx="1" fill="#F6E3A1" ${INK3} stroke-width="1"/><rect x="33" y="27" width="6" height="5" rx="1" fill="#FFF3C4" ${INK3} stroke-width="1"/><circle cx="16" cy="32" r="2.4" fill="#6B2A55" ${INK3} stroke-width=".8"/><circle cx="19.5" cy="33" r="2.4" fill="#6B2A55" ${INK3} stroke-width=".8"/>`,
+      farmboard: plate + `<path d="M11 29 l12 -9 l3 8z" fill="#F6E3A1" ${INK3}/><path d="M24 30 l9 -9 l5 6z" fill="#DCE3E8" ${INK3}/><circle cx="31" cy="25" r="1" fill="#6B8CA8"/><rect x="14" y="31" width="7" height="3.5" rx="1" fill="#D9944A" ${INK3} stroke-width="1"/><path d="M34 31 q3 -3 6 0 q-3 2 -6 0z" fill="#F3B23A" ${INK3} stroke-width=".8"/>`,
+      honeycake: plate + `<path d="M13 30 l11 -10 l12 7 v5 l-12 3z" fill="#E3B04B" ${INK3}/><path d="M13 30 l11 -10 l12 7 l-12 4z" fill="#F3C969" ${INK3}/><path d="M18 26 q4 2 8 0 q3 -1 6 1" fill="none" stroke="#C9853E" stroke-width="1.4"/>`,
+      shortbread: plate + [[15, 27], [24, 25], [33, 27]].map(([x, y]) => `<rect x="${x - 4}" y="${y - 3}" width="8" height="6" rx="1.2" fill="#F3DFA6" ${INK3} stroke-width="1"/><circle cx="${x}" cy="${y}" r="1.4" fill="#E86A7C"/>`).join(""),
+      bluetart: plate + `<ellipse cx="24" cy="26" rx="14" ry="7" fill="#E3B47A" ${INK3}/><ellipse cx="24" cy="25" rx="10.5" ry="4.8" fill="#5E6EB8"/>` + [[19, 24], [24, 23], [29, 25], [22, 27], [27, 27]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#3F4F9A" stroke="#3b3530" stroke-width=".6"/>`).join(""),
       bread: plate + `<path d="M11 28 q0 -9 13 -9 q13 0 13 9 v2 h-26z" fill="#D9A066" ${INK3}/><path d="M17 22 l2 5 M23 20 l1 6 M29 21 l-1 5" stroke="#9C6B3E" stroke-width="1.2"/><rect x="31" y="29" width="7" height="4" rx="1" fill="#FFF3C4" ${INK3} stroke-width="1"/>`,
       olives: `<path d="M7 24 h34 q-2 13 -17 13 q-15 0 -17 -13z" fill="#E7EFF2" ${INK3}/>` + [[16, 22], [22, 20], [28, 22], [19, 26], [26, 26], [32, 25]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3.2" ry="2.4" fill="#7FA35A" ${INK3} stroke-width=".9"/>`).join("") + `<path d="M36 18 l6 -8" stroke="#8B5E3C" stroke-width="1.6" stroke-linecap="round"/>`,
       carrotcake: plate + `<path d="M13 30 l12 -12 l11 8 v5 l-12 3z" fill="#E3A36A" ${INK3}/><path d="M13 30 l12 -12 l11 8 l-12 4z" fill="#FFF3E6" ${INK3}/><path d="M22 21 l-2 -4 M24 20 l1 -4" stroke="#7FA35A" stroke-width="1.4" stroke-linecap="round"/><path d="M21 22 l5 0 l-2.5 4z" fill="#F08A3C" stroke="#3b3530" stroke-width=".8"/>`,
@@ -6707,19 +6809,43 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     toast: ["honey toast", "honey toasts"],
     pea: ["handful of peas", "handfuls of peas"],
     pumpkin: ["pumpkin", "pumpkins"],
-    leek: ["leek", "leeks"]
+    leek: ["leek", "leeks"],
+    trout: ["rainbow trout", "rainbow trout"],
+    crayfish: ["crayfish", "crayfish"],
+    sardine: ["sardine", "sardines"],
+    mackerel: ["mackerel", "mackerel"],
+    seabream: ["sea bream", "sea bream"],
+    squid: ["squid", "squid"],
+    octopus: ["octopus", "octopuses"],
+    goatmilk: ["goat's milk", "goat's milk"],
+    yoghurt: ["pot of yoghurt", "pots of yoghurt"],
+    pear: ["pear", "pears"],
+    fig: ["fig", "figs"],
+    honeycomb: ["piece of honeycomb", "pieces of honeycomb"],
+    // groups (round 101): anything that fits, see ALT
+    farmcheese: ["farm cheese", "farm cheeses"],
+    halloumi: ["halloumi", "halloumi"],
+    bluecheese: ["Honeybrook blue", "Honeybrook blue"],
+    cheddar: ["farmhouse cheddar", "farmhouse cheddar"],
+    honey: ["jar of honey", "jars of honey"],
+    petals: ["garden flower", "garden flowers"]
   };
-  var isGood = (id) => id in GOODS2;
-  var nm2 = (id, n) => GOODS2[id] ? GOODS2[id][n === 1 ? 0 : 1] : id;
+  var GROUP_ICON = { farmcheese: "chz_cheddar", halloumi: "chz_halloumi", bluecheese: "chz_blue", cheddar: "chz_cheddar", honey: "honey", petals: "tulip" };
+  var isGood = (id) => id in GOODS2 && !GROUP_ICON[id] || /^chz_|^honey(_lav|_blossom|_cream)?$/.test(id) || id === "tulip" || id === "sunflower";
+  var nm2 = (id, n) => GOODS2[id] ? GOODS2[id][n === 1 ? 0 : 1] : ITEMS[id] ? ITEMS[id].n.toLowerCase() : id;
   var needText = (need) => Object.entries(need).map(([k, n]) => `${n} ${nm2(k, n)}`).join(" + ");
   var DISHES = {
     bread: { n: "Bread and butter", need: { loaf: 1 }, plates: 4, price: 3 },
     olives: { n: "Bowl of olives", need: { olives: 1 }, plates: 4, price: 4 },
     cheese: { n: "Cheese board", need: { cheese: 1, loaf: 1 }, plates: 4, price: 8 },
+    farmboard: { n: "Farm cheese board", need: { farmcheese: 1, loaf: 1 }, plates: 4, price: 12 },
     dumplings: { n: "Dumplings", need: { dumpling: 2 }, plates: 4, price: 6 },
     honeytoast: { n: "Honey toast soldiers", need: { toast: 1 }, plates: 3, price: 7 },
     fish: { n: "Grilled fish", need: { fish: 1 }, plates: 3, price: 8 },
-    apples: { n: "Apple slices", need: { apple: 2 }, plates: 4, price: 3 }
+    apples: { n: "Apple slices", need: { apple: 2 }, plates: 4, price: 3 },
+    honeycake: { n: "Honey cake", need: { egg: 1, honey: 1, flour: 1 }, plates: 4, price: 7 },
+    shortbread: { n: "Flower shortbread", need: { flour: 1, petals: 2 }, plates: 4, price: 5 },
+    bluetart: { n: "Blueberry tart", need: { blueberry: 3, flour: 1 }, plates: 4, price: 6 }
   };
   var TAPAS = {
     patatas: { n: "Patatas bravas", need: { potato: 2, tomato: 1 }, price: 8, seasons: ["autumn"] },
@@ -6731,13 +6857,36 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     crema: { n: "Strawberry crema", need: { strawberry: 2, milk: 1 }, price: 9, seasons: ["spring"] },
     tostas: { n: "Tomato and cheese tostas", need: { loaf: 1, tomato: 1, cheese: 1 }, price: 10, seasons: ["summer", "autumn"] },
     rellenos: { n: "Stuffed peppers", need: { pepper: 2, cheese: 1 }, price: 10, seasons: ["summer"] },
-    guisantes: { n: "Peas with mint and cheese", need: { pea: 2, cheese: 1 }, price: 8, seasons: ["spring"] },
+    guisantes: { n: "Peas with mint and cheese", need: { pea: 2, cheese: 1 }, price: 8, seasons: ["spring", "summer"] },
     croquetas: { n: "Pumpkin croquetas", need: { pumpkin: 1, egg: 1, loaf: 1 }, price: 10, seasons: ["autumn", "winter"] },
     calabaza: { n: "Roast pumpkin with olives", need: { pumpkin: 1, olives: 1 }, price: 8, seasons: ["autumn", "winter"] },
-    puerros: { n: "Leek and potato soup cups", need: { leek: 2, potato: 1 }, price: 8, seasons: ["winter"] }
+    puerros: { n: "Leek and potato soup cups", need: { leek: 2, potato: 1 }, price: 8, seasons: ["autumn", "winter"] },
+    // from the fishing spots, all year round
+    sardinas: { n: "Grilled sardines", need: { sardine: 3 }, price: 8 },
+    escabeche: { n: "Mackerel escabeche", need: { mackerel: 2, pepper: 1 }, price: 10 },
+    calamares: { n: "Fried calamari", need: { squid: 2, flour: 1 }, price: 11 },
+    pulpo: { n: "Pulpo a la gallega", need: { octopus: 1, potato: 2 }, price: 12 },
+    dorada: { n: "Sea bream with olives", need: { seabream: 1, olives: 1 }, price: 11 },
+    trucha: { n: "Trout with almond butter", need: { trout: 2, milk: 1 }, price: 10 },
+    cangrejos: { n: "Garlic crayfish on toast", need: { crayfish: 4, loaf: 1 }, price: 10 },
+    // round 101: more ways to use eggs, tomatoes, yoghurt, honey, the farm's cheeses, pears and leeks
+    huevos: { n: "Huevos rotos", need: { egg: 2, potato: 2 }, price: 9 },
+    tomatoegg: { n: "Ma Ma's tomato and egg", need: { tomato: 2, egg: 2 }, price: 8, seasons: ["summer", "autumn"] },
+    yogur: { n: "Yoghurt with honey and walnuts", need: { yoghurt: 2, honey: 1 }, price: 8 },
+    halloumi: { n: "Grilled halloumi with honey", need: { halloumi: 1, honey: 1 }, price: 11 },
+    azul: { n: "Honeybrook blue with pear", need: { bluecheese: 1, pear: 2 }, price: 11 },
+    manzana: { n: "Apple and cheddar tostas", need: { cheddar: 1, apple: 2, loaf: 1 }, price: 11 },
+    tarta: { n: "Leek and cheese tart", need: { leek: 2, cheese: 1, flour: 1 }, price: 10, seasons: ["autumn", "winter"] },
+    panal: { n: "Honeycomb with farm cheese", need: { honeycomb: 1, farmcheese: 1 }, price: 12 }
   };
   var inSeason = (id, season) => !TAPAS[id].seasons || TAPAS[id].seasons.includes(season);
   var TAPAS_PLATES = 6;
+  var ASKERS = ["Rosa", "Bastien", "Noor", "Felix", "Elena", "Mateo", "Lila", "Celeste"];
+  function requestOf(today2) {
+    const ids = Object.keys(TAPAS).filter((id) => inSeason(id, seasonOf(today2))), h = hash(today2 + "crave");
+    return { id: ids[h % ids.length], who: ASKERS[(h >> 5) % ASKERS.length] };
+  }
+  var tapasPrice = (id, today2) => Math.round(TAPAS[id].price * (requestOf(today2).id === id ? 1.5 : 1));
   var OVEN = 1 * H;
   var PRESS = 3 * H;
   function kitchenState(F2) {
@@ -6748,10 +6897,27 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (!("press" in k)) k.press = null;
     return k;
   }
-  var has = (k, need) => Object.entries(need).every(([id, n]) => (k.larder[id] || 0) >= n);
-  var use = (k, need) => Object.entries(need).forEach(([id, n]) => {
-    k.larder[id] -= n;
-    if (k.larder[id] <= 0) delete k.larder[id];
+  var ALT = {
+    cheese: (id) => id === "cheese" || /^chz_/.test(id),
+    milk: (id) => id === "milk" || id === "goatmilk",
+    farmcheese: (id) => /^chz_/.test(id),
+    halloumi: (id) => /^chz_halloumi/.test(id),
+    bluecheese: (id) => /^chz_blue/.test(id),
+    cheddar: (id) => /^chz_cheddar/.test(id),
+    honey: (id) => /^honey(_lav|_blossom|_cream)?$/.test(id),
+    petals: (id) => id === "tulip" || id === "sunflower"
+  };
+  var pool = (k, g) => ALT[g] ? Object.keys(k.larder).filter(ALT[g]).sort((a, b) => (b === g) - (a === g)) : [g];
+  var larderCount = (k, g) => pool(k, g).reduce((a, id) => a + (k.larder[id] || 0), 0);
+  var has = (k, need) => Object.entries(need).every(([id, n]) => larderCount(k, id) >= n);
+  var use = (k, need) => Object.entries(need).forEach(([g, n]) => {
+    for (const id of pool(k, g)) {
+      if (n <= 0) break;
+      const m = Math.min(n, k.larder[id] || 0);
+      k.larder[id] -= m;
+      n -= m;
+      if (k.larder[id] <= 0) delete k.larder[id];
+    }
   });
   var add = (k, id, n) => {
     k.larder[id] = (k.larder[id] || 0) + n;
@@ -6860,7 +7026,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (!k.oven && (k.larder.loaf || 0) < 3 && bake(F2)) done.push("put bread in the oven");
     let t2 = tapasToday(F2, today2);
     if (!t2) {
-      const best = Object.keys(TAPAS).filter((id) => inSeason(id, seasonOf(today2)) && has(k, TAPAS[id].need)).sort((a, b) => TAPAS[b].price - TAPAS[a].price)[0];
+      const best = Object.keys(TAPAS).filter((id) => inSeason(id, seasonOf(today2)) && has(k, TAPAS[id].need)).sort((a, b) => tapasPrice(b, today2) - tapasPrice(a, today2))[0];
       if (best) {
         chooseTapas(F2, best, today2);
         t2 = tapasToday(F2, today2);
@@ -6872,7 +7038,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     for (const id of Object.keys(DISHES)) {
       const d = DISHES[id];
       if ((v.menu[id] || 0) >= 2) continue;
-      const spare = Object.entries(d.need).every(([g, n]) => (k.larder[g] || 0) - (keep6[g] || 0) >= n);
+      const spare = Object.entries(d.need).every(([g, n]) => larderCount(k, g) - (keep6[g] || 0) >= n);
       if (spare && cookDish(F2, id)) done.push(`made ${d.n.toLowerCase()}`);
     }
     if (done.length) {
@@ -6887,7 +7053,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const ids = Object.keys(k.larder).filter((id) => k.larder[id] > 0);
     return ids.length ? `<div class="kgoods">${ids.map((id) => `<button class="kgood kbtn" data-k="take" data-id="${id}">${pic(id)}<b>${k.larder[id]}</b><small>${esc(nm2(id, k.larder[id]))}</small><em>Take one</em></button>`).join("")}</div><p class="muted">Tap one to take it back to your backpack (for the Scoop Shack, or a gift).</p>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`;
   };
-  var needList = (k, need) => Object.entries(need).map(([id, n]) => `<span class="kneed ${(k.larder[id] || 0) >= n ? "ok" : ""}">${pic(id, 22)}${n} ${esc(nm2(id, n))} <small>(${k.larder[id] || 0})</small></span>`).join("");
+  var needList = (k, need) => Object.entries(need).map(([id, n]) => `<span class="kneed ${larderCount(k, id) >= n ? "ok" : ""}">${pic(GROUP_ICON[id] || id, 22)}${n} ${esc(nm2(id, n))} <small>(${larderCount(k, id)})</small></span>`).join("");
   function larderPanel(F2) {
     const k = kitchenState(F2), bag2 = backpackGoods(F2);
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The larder</h2>${larderGrid(k)}
@@ -6904,10 +7070,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   }
   function pressPanel(F2) {
     const k = kitchenState(F2), l = left(k.press);
-    return `<span class="tape stripe" aria-hidden="true"></span><h2>The cheese press</h2><p class="sub">Two bottles of goat's milk make a little round of cheese in three hours. Milk: ${k.larder.milk || 0} · cheese in the larder: ${k.larder.cheese || 0}.</p>
+    return `<span class="tape stripe" aria-hidden="true"></span><h2>The cheese press</h2><p class="sub">Two bottles of milk (cow's or goat's) make a little round of cheese in three hours. Milk: ${larderCount(k, "milk")} · cheese in the larder: ${k.larder.cheese || 0}.</p>
     ${k.press ? l ? `<p>Pressing: ready in ${hrs2(l)}.</p><span class="clbar"><i style="width:${Math.round(100 * (1 - l / k.press.dur))}%"></i></span>` : `<p>The cheese is ready!</p>` : `<p class="muted">Empty.</p>`}
-    <div class="actions">${k.press ? l ? "" : `<button class="btn primary" data-k="cheese">Take out the cheese</button>` : `<button class="btn primary" data-k="press" ${(k.larder.milk || 0) >= 2 ? "" : "disabled"}>Press cheese</button>`}<button class="btn alt small" data-close="1">Close</button></div>
-    ${(k.larder.milk || 0) < 2 && !k.press ? `<p class="muted">Milk comes from a goat in the animal run at home (the market's Animals tab), or buy cheese ready-made on Hana's deli shelf.</p>` : ""}`;
+    <div class="actions">${k.press ? l ? "" : `<button class="btn primary" data-k="cheese">Take out the cheese</button>` : `<button class="btn primary" data-k="press" ${larderCount(k, "milk") >= 2 ? "" : "disabled"}>Press cheese</button>`}<button class="btn alt small" data-close="1">Close</button></div>
+    ${larderCount(k, "milk") < 2 && !k.press ? `<p class="muted">Milk comes from a goat in the animal run at home (the market's Animals tab), or buy cheese ready-made on Hana's deli shelf.</p>` : ""}`;
   }
   function stovePanel(F2, today2) {
     const k = kitchenState(F2), t2 = tapasToday(F2, today2), T = t2 && TAPAS[t2.id];
@@ -6915,7 +7081,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const v = vineState(F2), on = !v.help || v.help.cook !== false;
     h += `<p class="sub kcook">${on ? `Pilar runs the kitchen on her shifts (10am to 2:30pm, 4 to 9:30pm). You can still cook anything yourself.` : `Pilar's off for now. Turn her back on in the staff card at the shop counter.`}</p>${on && k.log && k.log.length ? `<ul class="klog">${k.log.map((l) => `<li>${esc(l[0].toUpperCase() + l.slice(1))}.</li>`).join("")}</ul>` : ""}`;
     h += `<section class="ktapas"><h3 class="ph3">Tapas of the day</h3>`;
-    if (t2) h += `<div class="kdish chosen">${dishArt("tapas:" + t2.id, 52)}<span><b>${esc(T.n)}</b><small>${t2.plates} plate${t2.plates === 1 ? "" : "s"} on the menu · ${T.price} coins each · needs ${needText(T.need)}</small><span class="kneeds">${needList(k, T.need)}</span></span></div>
+    {
+      const rq = requestOf(today2), R2 = TAPAS[rq.id];
+      h += `<p class="krequest">${icon("heart", 16)} <b>${esc(rq.who)}</b> has been craving <b>${esc(R2.n.toLowerCase())}</b>. Make it today's tapas and it sells for ${tapasPrice(rq.id, today2)} coins a plate instead of ${R2.price}.${t2 && t2.id === rq.id ? " It's on!" : ""} <small>Needs ${esc(needText(R2.need))}.</small></p>`;
+    }
+    if (t2) h += `<div class="kdish chosen">${dishArt("tapas:" + t2.id, 52)}<span><b>${esc(T.n)}</b><small>${t2.plates} plate${t2.plates === 1 ? "" : "s"} on the menu · ${tapasPrice(t2.id, today2)} coins each · needs ${needText(T.need)}</small><span class="kneeds">${needList(k, T.need)}</span></span></div>
       <div class="actions"><button class="btn primary" data-k="cooktapas" ${has(k, T.need) ? "" : "disabled"}>Cook a batch (${TAPAS_PLATES} plates)</button>${!t2.cooked ? `<button class="btn alt small" data-k="untapas">Pick a different dish</button>` : ""}</div>
       <p class="muted">Leftovers at closing time (10pm) go to the staff for dinner.</p>`;
     else h += `<p class="sub">Pick today's dish. It goes on the chalkboard, sells for more than the small plates and brings extra people in. <b>${SEASONS[seasonOf(today2)].n}</b> menu: ${SEASONS[seasonOf(today2)].line.toLowerCase()}.</p><div class="kdishes">${Object.keys(TAPAS).filter((id) => inSeason(id, seasonOf(today2))).map((id) => {
@@ -7149,6 +7319,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     v.cellar = v.cellar.filter((x) => x.id !== id);
     return `${c.name} is on the shelves.`;
   }
+  var winePf = (s) => Math.min(1.6, Math.pow(((STYLES2[s.type] || {}).price || 18) / Math.max(2, s.price || 1), 1.3));
   function setPrice(F2, id, p) {
     const s = vineState(F2).shelf.find((x) => x.id === id);
     if (s) s.price = Math.max(1, Math.min(999, Math.round(p) || 1));
@@ -7182,7 +7353,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       v.tapas.plates--;
       out.plates++;
       out.tapas = (out.tapas || 0) + 1;
-      out.coins += TAPAS[v.tapas.id].price;
+      out.coins += tapasPrice(v.tapas.id, gameDay);
       out.dish = "tapas:" + v.tapas.id;
       return;
     }
@@ -7205,7 +7376,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     }
     s.open--;
     if (Math.random() < 0.6) servePlate(v, opts.today, out);
-    const b = opts.tourist && Math.random() < 0.5 && (v.shelf.find((x) => x.id === s.id && x.n > 0) || v.shelf.find((x) => x.n > 0));
+    const b = opts.tourist && Math.random() < 0.5 * winePf(s) && (v.shelf.find((x) => x.id === s.id && x.n > 0) || v.shelf.find((x) => x.n > 0));
     if (b) {
       b.n--;
       out.bottle = b.name;
@@ -7227,9 +7398,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return out;
   }
   function sellTick(F2, opts = {}) {
-    const v = vineState(F2), t2 = Date.now(), mins = Math.min(720, Math.floor((t2 - v.lastTick) / 6e4));
+    const v = vineState(F2), t2 = Date.now(), mins = Math.min(1440, Math.floor((t2 - v.lastTick) / 6e4));
     if (mins < 1) return null;
-    if (t2 - v.lastTick > 720 * 6e4) v.lastTick = t2 - 720 * 6e4;
+    if (t2 - v.lastTick > 1440 * 6e4) v.lastTick = t2 - 1440 * 6e4;
     v.lastTick += mins * 6e4;
     const out = { bottles: 0, glasses: 0, plates: 0, coins: 0, toBox: !opts.serving, watered: 0, picked: 0, filled: 0, stocked: 0, mins };
     let w = null;
@@ -7271,14 +7442,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         const st6 = opts.stall && k === 1 ? 3 : 1, stock2 = v.shelf.filter((x) => x.n > 0);
         if (stock2.length && Math.random() < 0.012 * st6) {
           const b = stock2[Math.floor(Math.random() * stock2.length)];
-          b.n--;
-          out.bottles++;
-          out.coins += b.price;
-          out.market = (out.market || 0) + 1;
+          if (Math.random() < winePf(b)) {
+            b.n--;
+            out.bottles++;
+            out.coins += b.price;
+            out.market = (out.market || 0) + 1;
+          }
         }
         if (Math.random() < 8e-3 * st6) {
           const g = v.shelf.find((x) => x.open > 0) || v.shelf.find((x) => x.n > 0);
-          if (g) {
+          if (g && Math.random() < winePf(g)) {
             if (!g.open) {
               g.n--;
               g.open = GLASSES;
@@ -7294,14 +7467,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         const hst = opts.club && k === 1 ? 1.5 : 1, stock2 = v.shelf.filter((x) => x.n > 0);
         if (stock2.length && Math.random() < 0.04 * hst) {
           const b = stock2[Math.floor(Math.random() * stock2.length)];
-          b.n--;
-          out.bottles++;
-          out.coins += b.price;
-          out.club = (out.club || 0) + 1;
+          if (Math.random() < winePf(b)) {
+            b.n--;
+            out.bottles++;
+            out.coins += b.price;
+            out.club = (out.club || 0) + 1;
+          }
         }
         if (Math.random() < 0.03 * hst) {
           const g = v.shelf.find((x) => x.open > 0) || v.shelf.find((x) => x.n > 0);
-          if (g) {
+          if (g && Math.random() < winePf(g)) {
             if (!g.open) {
               g.n--;
               g.open = GLASSES;
@@ -7323,13 +7498,15 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       const plate = () => servePlate(v, gameDay, out);
       if (onShelf.length && Math.random() < 2e-3 * f2) {
         const s = onShelf[Math.floor(Math.random() * onShelf.length)];
-        s.n--;
-        out.bottles++;
-        out.coins += s.price;
+        if (Math.random() < winePf(s)) {
+          s.n--;
+          out.bottles++;
+          out.coins += s.price;
+        }
       }
       if (Math.random() < 16e-4 * f2) {
         const s = v.shelf.find((x) => x.open > 0) || v.shelf.find((x) => x.n > 0);
-        if (s) {
+        if (s && Math.random() < winePf(s)) {
           if (!s.open) {
             s.n--;
             s.open = GLASSES;
@@ -7438,7 +7615,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   function shelfPanel(F2) {
     const v = vineState(F2);
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The wine shelves</h2>
-    ${v.shelf.length ? `<ul class="hlist wlist wshelf">${v.shelf.map((s) => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${STYLES2[s.type].n} · ${s.n} on the shelf${s.open ? ` · a bottle open for tasting` : ""}</small></span><label class="wprice"><span class="sr">Price</span><input type="number" min="1" max="999" data-vyprice="${esc(s.id)}" value="${s.price}"> coins</label></li>`).join("")}</ul>` : `<p class="sub">The shelves are bare.</p>`}
+    ${v.shelf.length ? `<ul class="hlist wlist wshelf">${v.shelf.map((s) => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${STYLES2[s.type].n} · ${s.n} on the shelf${s.open ? ` · a bottle open for tasting` : ""}${s.price > STYLES2[s.type].price * 1.3 ? ` · pricey: fewer buyers` : s.price < STYLES2[s.type].price * 0.75 ? ` · a bargain: flying off` : ""}</small></span><label class="wprice"><span class="sr">Price</span><input type="number" min="1" max="999" data-vyprice="${esc(s.id)}" value="${s.price}"> coins</label></li>`).join("")}</ul>` : `<p class="sub">The shelves are bare.</p>`}
     ${fruitCrate(F2)}
     ${v.cellar.length ? `<p class="eyebrow">From the cellar</p><ul class="hlist wlist">${v.cellar.map((c) => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES2[c.type].n} · ${c.n} bottles</small></span><button class="btn small primary" data-vystock="${esc(c.id)}">Stock it</button></li>`).join("")}</ul>` : `<p class="muted">Bottled wines wait in the cellar until you stock them here.</p>`}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
@@ -8945,12 +9122,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         ) + (sl ? `<text x="${x - 14}" y="${y - 104}" font-size="11" fill="#3b3530" class="zz" pointer-events="none">z z</text>` : "");
       }
       case "curtwindow": {
-        const g = G2.F() || {}, night = G2.dusk(), shut5 = g.curtains ? g.curtains === "closed" : night || !!(G2.S && G2.S().sleep);
+        const g = G2.F() || {}, night = G2.dusk(), shut6 = g.curtains ? g.curtains === "closed" : night || !!(G2.S && G2.S().sleep);
         const cur2 = (fill2, lines, ox, delay) => `<g class="sway" style="transform-origin:${ox}px ${y - 170}px;animation-delay:-${delay}s">${sk(fill2, lines)}</g>`;
-        const curtains = shut5 ? cur2(`<path d="M${x - 50} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x - 50} ${y - 170} h50 v86 h-50z M${x - 40} ${y - 160} q4 30 0 70 M${x - 20} ${y - 164} q-4 34 0 74" opacity=".8"/>`, x - 25, 0) + cur2(`<path d="M${x} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x} ${y - 170} h50 v86 h-50z M${x + 20} ${y - 164} q4 34 0 74 M${x + 40} ${y - 160} q-4 30 0 70" opacity=".8"/>`, x + 25, 1.7) : cur2(`<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z" style="fill:var(--rose)"/>`, `<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z M${x - 50} ${y - 150} q4 30 -2 60" opacity=".8"/>`, x - 49, 0) + cur2(`<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z" style="fill:var(--rose)"/>`, `<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z M${x + 50} ${y - 150} q-4 30 2 60" opacity=".8"/>`, x + 49, 1.7);
+        const curtains = shut6 ? cur2(`<path d="M${x - 50} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x - 50} ${y - 170} h50 v86 h-50z M${x - 40} ${y - 160} q4 30 0 70 M${x - 20} ${y - 164} q-4 34 0 74" opacity=".8"/>`, x - 25, 0) + cur2(`<path d="M${x} ${y - 170} h50 v86 h-50z" style="fill:var(--rose)"/>`, `<path d="M${x} ${y - 170} h50 v86 h-50z M${x + 20} ${y - 164} q4 34 0 74 M${x + 40} ${y - 160} q-4 30 0 70" opacity=".8"/>`, x + 25, 1.7) : cur2(`<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z" style="fill:var(--rose)"/>`, `<path d="M${x - 58} ${y - 170} h18 q-6 44 4 86 h-22z M${x - 50} ${y - 150} q4 30 -2 60" opacity=".8"/>`, x - 49, 0) + cur2(`<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z" style="fill:var(--rose)"/>`, `<path d="M${x + 40} ${y - 170} h18 v86 h-22 q10 -42 4 -86z M${x + 50} ${y - 150} q-4 30 2 60" opacity=".8"/>`, x + 49, 1.7);
         return sk(
-          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4" style="fill:${night ? "#3E4673" : "var(--sky)"}"/>${night && !shut5 ? `<circle cx="${x + 18}" cy="${y - 142}" r="9" style="fill:#FFF3C4"/>` : !shut5 ? `<ellipse cx="${x - 14}" cy="${y - 120}" rx="18" ry="7" style="fill:#FFFDF6"/>` : ""}`,
-          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4"/><path d="M${x} ${y - 168} v82 M${x - 48} ${y - 128} h96" opacity="${shut5 ? 0 : 1}"/>`
+          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4" style="fill:${night ? "#3E4673" : "var(--sky)"}"/>${night && !shut6 ? `<circle cx="${x + 18}" cy="${y - 142}" r="9" style="fill:#FFF3C4"/>` : !shut6 ? `<ellipse cx="${x - 14}" cy="${y - 120}" rx="18" ry="7" style="fill:#FFFDF6"/>` : ""}`,
+          `<rect x="${x - 48}" y="${y - 168}" width="96" height="82" rx="4"/><path d="M${x} ${y - 168} v82 M${x - 48} ${y - 128} h96" opacity="${shut6 ? 0 : 1}"/>`
         ) + curtains + sk("", `<path d="M${x - 62} ${y - 172} h124" stroke-width="2.4"/><circle cx="${x - 62}" cy="${y - 172}" r="2.4"/><circle cx="${x + 62}" cy="${y - 172}" r="2.4"/>`);
       }
       case "record": {
@@ -9343,7 +9520,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     }
     return null;
   }
-  var rainyOn = (day) => [11, 12, 1].includes(+day.slice(5, 7)) && hash(day + "rain") % 100 < 34;
+  function rainLevel(day) {
+    const h = hash(day + "rain") % 100;
+    return [11, 12, 1].includes(+day.slice(5, 7)) ? h < 34 ? 2 : h < 44 ? 1 : 0 : h < 14 ? 1 : 0;
+  }
+  var rainyOn = (day) => rainLevel(day) > 0;
+  var stormyOn = (day) => rainLevel(day) === 2;
   function festivalArt(f2) {
     if (!f2) return "";
     const lanternRow = (x1, x2, y, cols) => {
@@ -13536,8 +13718,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return h;
   }
   var rand = (list2, not) => {
-    const pool = list2.length > 1 ? list2.filter((e) => e.id !== not) : list2;
-    return pool[Math.floor(Math.random() * pool.length)];
+    const pool2 = list2.length > 1 ? list2.filter((e) => e.id !== not) : list2;
+    return pool2[Math.floor(Math.random() * pool2.length)];
   };
   function wireKudos(root, api4) {
     const t2 = root.querySelector("#kText"), f2 = root.querySelector("#kFrom");
@@ -14034,6 +14216,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (act2 === "sup") look = Object.assign({}, look, { board: true, hat: null });
     const owned = api3.F().fam && api3.F().fam.owned || {};
     if (id === "darren" && act2 === "type" && owned.headphones) look = Object.assign({}, look, { headphones: true });
+    if (OUTDOOR.includes(api3.scene()) && rainyOn(dayKey()) && !look.board) look = Object.assign({}, look, { rain: rainGearFor(id, { coat: !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell"].includes(look.extra) }) });
     g.innerHTML = personArt(look, kid2) + (letter ? `<g class="letter">${letterArt}</g>` : "");
     $("actors").appendChild(g);
     return g;
@@ -14614,7 +14797,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     let rain = 0;
     for (let d = Math.floor(t0 / DAY); d <= Math.floor(now3 / DAY); d++) {
       const k = new Date(d * DAY).toISOString().slice(0, 10);
-      if (rainyOn(k)) rain += Math.max(0, Math.min(now3, (d + 1) * DAY) - Math.max(t0, d * DAY));
+      if (stormyOn(k)) rain += Math.max(0, Math.min(now3, (d + 1) * DAY) - Math.max(t0, d * DAY));
     }
     return span - rain / 2;
   }
@@ -14874,7 +15057,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return n;
   }
   function hfTick(F2) {
-    const h = hfState(F2), t2 = clock(), from = Math.max(h.at || t2, t2 - 2 * DAY), out = { coins: 0, n: 0, swarms: swarmCheck(F2) };
+    const h = hfState(F2), t2 = clock(), from = Math.max(h.at || t2, t2 - DAY), out = { coins: 0, n: 0, swarms: swarmCheck(F2) };
     for (let at = from + 6e4; at <= t2; at += 6e4) {
       const sg = new Date(at + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm2 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
       if (hm2 < 8 * 60 || hm2 >= 18 * 60) continue;
@@ -14916,7 +15099,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return p + shut2;
   }
   function hivesPanel(F2, keeper) {
-    const h = hfState(F2), full = fullHives(h), mine = myHiveFull(h), rain = rainyOn(dayKey()), n = full.length * JARS + (mine ? MY_FRAMES : 0);
+    const h = hfState(F2), full = fullHives(h), mine = myHiveFull(h), rain = stormyOn(dayKey()), n = full.length * JARS + (mine ? MY_FRAMES : 0);
     let p = `<span class="tape stripe" aria-hidden="true"></span><h2>The beehives</h2><p class="sub">Each hive fills over three days${rain ? " (slower today: it's raining, so the bees are staying in)" : ""}. Collect a full one for ${JARS} frames of comb to spin at the barn's extractor (Felix keeps the rest), but don't leave it too long: a full hive gets restless and swarms. This week the bees are on the ${honeyNow().n}. ${keeper ? "Felix lends you his bee veil." : levelOf(h) >= 1 ? "Your own veil's on its hook." : "Put on the bee veil from the hook."}</p>`;
     const row2 = (label2, f2, warn, extra2 = "") => `<li><span class="wpic">${icon("honey", 22)}</span><span class="wtxt"><b>${label2}</b><small>${f2 >= 1 ? warn ? "full, and the bees are restless: collect it soon!" : "full, heavy with honey" : `${Math.round(f2 * 100)}% full`}</small>${extra2}</span><span class="clbar" style="width:70px"><i style="width:${Math.round(f2 * 100)}%"></i></span></li>`;
     p += `<ul class="hlist wlist">${h.hives.map((_, i) => row2(`Hive ${i + 1}`, hiveFill(h, i), restless(h, i))).join("")}${h.myHive ? row2(`${esc(h.myHive.name)} <small class="muted">(yours: all ${MY_FRAMES} frames)</small>`, hiveFill(h, "mine"), restless(h, "mine")) : ""}</ul>`;
@@ -15145,6 +15328,188 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return lampDefs + ground + top + trainLayer("hlane") + trees + honeysuckle + hive2(180, 254) + clover + pen2 + bluebell + figtree + hens(436, 486) + `<g data-place="windmill" aria-label="The windmill"><ellipse class="hov" cx="458" cy="344" rx="30" ry="8" style="fill:var(--butter)"/>${windmill(458, 340)}</g>` + grazer(470, 372, "#FFFDF6", 0) + grazer(496, 352, "#D9B48A", 1) + grazer(484, 520, "#FFFDF6", 2) + van + archGate("toFarmL", 22, 560, "Wildflower Farm", 70, 520, "var(--butter)", "Gate west to Wildflower Farm") + archGate("toTownL", 280, 620, "Town square", 336, 600, "var(--peri)", "Down the station road to the town square") + streetLamp(250, 150) + streetLamp(250, 470);
   }
 
+  // src/game/fishing.js
+  var SPOTS3 = {
+    river: { scene: "base", n: "The home river", place: "fishriver", line: "The river runs quick and clear past the bridge." },
+    lake: { scene: "field", n: "The lake", place: "fishlake", line: "Still water, reeds, and the swans keeping an eye on you." },
+    sea: { scene: "shore", n: "The sea by the pier", place: "fishsea", line: "Waves on the sand, and gulls hoping you're bad at this." }
+  };
+  var spotIn = (scene2) => Object.keys(SPOTS3).find((k) => SPOTS3[k].scene === scene2) || null;
+  var FISH = {
+    roach: { n: "Roach", spot: "river", w: 34, cm: [10, 24], hard: 1, item: "fish", hint: "The river, any time at all." },
+    trout: { n: "Rainbow trout", spot: "river", w: 22, when: "day", cm: [24, 52], hard: 2, item: "trout", hint: "The river, in daylight." },
+    perch: { n: "Perch", spot: "river", w: 18, cm: [14, 34], hard: 2, item: "fish", hint: "The river, any time. Stripy." },
+    pike: { n: "Pike", spot: "river", w: 9, rain: true, cm: [50, 100], hard: 4, item: "fish", hint: "The river, when it's raining." },
+    koi: { n: "Golden koi", spot: "river", w: 3, when: "dusk", cm: [30, 60], hard: 5, item: null, rare: true, hint: "The river, at dusk. Very rare. Some say lucky." },
+    boot: { n: "Old boot", spot: "river", w: 6, cm: [26, 30], hard: 1, item: null, junk: true, hint: "The river. Not a fish, strictly." },
+    carp: { n: "Mirror carp", spot: "lake", w: 30, cm: [30, 75], hard: 3, item: "fish", hint: "The lake, any time." },
+    tench: { n: "Tench", spot: "lake", w: 18, when: "dawn", cm: [25, 50], hard: 2, item: "fish", hint: "The lake, early in the morning." },
+    rudd: { n: "Rudd", spot: "lake", w: 26, cm: [12, 26], hard: 1, item: "fish", hint: "The lake, any time. Red fins." },
+    crayfish: { n: "Crayfish", spot: "lake", w: 16, cm: [8, 15], hard: 1, item: "crayfish", hint: "The lake, at night or in the rain." },
+    eel: { n: "Eel", spot: "lake", w: 9, when: "night", cm: [40, 90], hard: 4, item: "fish", hint: "The lake, at night." },
+    sardine: { n: "Sardine", spot: "sea", w: 32, cm: [12, 20], hard: 1, item: "sardine", hint: "The sea, any time." },
+    mackerel: { n: "Mackerel", spot: "sea", w: 24, when: "day", cm: [25, 40], hard: 2, item: "mackerel", hint: "The sea, in daylight." },
+    seabream: { n: "Sea bream", spot: "sea", w: 14, cm: [25, 45], hard: 3, item: "seabream", hint: "The sea, any time. Fussy." },
+    squid: { n: "Squid", spot: "sea", w: 14, when: "night", cm: [20, 40], hard: 3, item: "squid", hint: "The sea, after dark." },
+    octopus: { n: "Octopus", spot: "sea", w: 8, rain: true, cm: [40, 80], hard: 4, item: "octopus", hint: "The sea, when it's raining." },
+    seaglass: { n: "Sea glass", spot: "sea", w: 6, cm: [2, 4], hard: 1, item: null, junk: true, hint: "The sea. Smoothed by the waves; it goes on the windowsill." }
+  };
+  var OK_WHEN = { day: (m) => m >= 7 * 60 && m < 18 * 60, dawn: (m) => m >= 5 * 60 && m < 10 * 60, dusk: (m) => m >= 18 * 60 && m < 20 * 60, night: (m) => m >= 19 * 60 || m < 6 * 60 };
+  function canBite(id, day = dayKey(), hm2 = sgHM()) {
+    const f2 = FISH[id];
+    if (f2.when && !OK_WHEN[f2.when](hm2)) return false;
+    if (f2.rain && !rainyOn(day)) return false;
+    if (id === "crayfish" && !(OK_WHEN.night(hm2) || rainyOn(day))) return false;
+    return true;
+  }
+  var fishHere = (spot, day, hm2) => Object.keys(FISH).filter((id) => FISH[id].spot === spot && canBite(id, day, hm2));
+  var ING = {
+    trout: ["Rainbow trout", 4, "with almond butter, at the kitchen"],
+    crayfish: ["Crayfish", 2, "four on toast with garlic, at the kitchen"],
+    sardine: ["Sardine", 2, "three on the grill, at the kitchen"],
+    mackerel: ["Mackerel", 3, "escabeche with peppers, at the kitchen"],
+    seabream: ["Sea bream", 5, "baked with olives, at the kitchen"],
+    squid: ["Squid", 4, "fried calamari, at the kitchen"],
+    octopus: ["Octopus", 6, "pulpo a la gallega, at the kitchen"]
+  };
+  Object.entries(ING).forEach(([id, [n, sell2, what]]) => {
+    if (!ITEMS[id]) ITEMS[id] = { n, kind: "ingredient", sell: sell2, what };
+  });
+  var ROD = 80;
+  var REEL = 400;
+  var BAIT_DAY = 3;
+  var BAIT_MAX = 20;
+  function fishState(F2) {
+    F2.fish = F2.fish || {};
+    const s = F2.fish;
+    s.caught = s.caught || {};
+    s.log = s.log || [];
+    s.koi = s.koi || 0;
+    s.bait = s.bait || 0;
+    if (s.baitDay !== dayKey()) {
+      s.baitDay = dayKey();
+      s.bait = Math.min(BAIT_MAX, s.bait + BAIT_DAY);
+    }
+    return s;
+  }
+  var addBait = (F2, n = 1) => {
+    const s = fishState(F2);
+    s.bait = Math.min(BAIT_MAX, s.bait + n);
+    return s.bait;
+  };
+  function buyRod(F2) {
+    const s = fishState(F2);
+    if (s.rod || F2.coins < ROD) return false;
+    F2.coins -= ROD;
+    s.rod = 1;
+    return true;
+  }
+  function buyReel(F2) {
+    const s = fishState(F2);
+    if (!s.rod || s.reel || F2.coins < REEL) return false;
+    F2.coins -= REEL;
+    s.reel = 1;
+    return true;
+  }
+  function pickFish(spot, day = dayKey(), hm2 = sgHM(), rng = Math.random) {
+    const ids = fishHere(spot, day, hm2), tot = ids.reduce((a, id) => a + FISH[id].w, 0);
+    let r = rng() * tot;
+    for (const id of ids) {
+      r -= FISH[id].w;
+      if (r <= 0) return id;
+    }
+    return ids[ids.length - 1];
+  }
+  var DUR = 900;
+  var markerAt = (t0, t2 = Date.now()) => {
+    const p = (t2 - t0) / DUR % 2;
+    return p < 1 ? p : 2 - p;
+  };
+  var zoneFor = (id, reel, seed2 = Math.random()) => {
+    const w = Math.max(0.1, 0.42 - FISH[id].hard * 0.06) * (reel ? 1.35 : 1);
+    return { at: Math.min(1 - w / 2, Math.max(w / 2, 0.2 + seed2 * 0.6)), width: w };
+  };
+  var inZone = (z, p) => Math.abs(p - z.at) <= z.width / 2;
+  var BITE_MIN = 2e3;
+  var BITE_MAX = 6e3;
+  var ESCAPE = 3500;
+  function cast(F2, spot, rng = Math.random) {
+    const s = fishState(F2);
+    if (!s.rod) return "rod";
+    if (s.bait <= 0) return "bait";
+    s.bait--;
+    const fish = pickFish(spot, dayKey(), sgHM(), rng);
+    return { spot, fish, bite: Date.now() + BITE_MIN + rng() * (BITE_MAX - BITE_MIN), zone: zoneFor(fish, s.reel, rng()), t0: null };
+  }
+  function land(F2, id, rng = Math.random, addInv2) {
+    const s = fishState(F2), f2 = FISH[id], cm = Math.round(f2.cm[0] + Math.pow(rng(), 1.6) * (f2.cm[1] - f2.cm[0]));
+    const c = s.caught[id] || { n: 0, best: 0 }, isNew = !c.n, best = cm > c.best;
+    s.caught = { ...s.caught, [id]: { n: c.n + 1, best: Math.max(c.best, cm) } };
+    s.log = [{ id, cm, day: dayKey() }, ...s.log].slice(0, 30);
+    if (id === "koi") s.koi = Math.min(3, s.koi + 1);
+    if (f2.item && addInv2) addInv2(f2.item, 1);
+    return { id, cm, isNew, best: best && !isNew, item: f2.item };
+  }
+  var journalCount2 = (F2) => Object.keys(fishState(F2).caught).length;
+  var coin3 = () => icon("coin", 13);
+  var shut3 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var worms = (n) => `${n} worm${n === 1 ? "" : "s"}`;
+  function fishPanel(F2, spot, st6 = {}) {
+    const s = fishState(F2), sp = SPOTS3[spot];
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(sp.n)}</h2>`;
+    h += `<div class="gchips"><button class="gchip${st6.view !== "journal" ? " on" : ""}" data-fish="view" data-k="fish"><span>Fishing</span></button><button class="gchip${st6.view === "journal" ? " on" : ""}" data-fish="view" data-k="journal"><span>Journal · ${journalCount2(F2)} of ${Object.keys(FISH).length}</span></button></div>`;
+    if (st6.view === "journal") return h + journalHtml(F2) + shut3;
+    if (!s.rod) return h + `<p class="sub">${esc(sp.line)} You'll need a rod. Gong Gong says the tackle shop's best one is 80 coins, and it'll last forever.</p><div class="actions"><button class="btn primary" data-fish="rod" ${F2.coins >= ROD ? "" : "disabled"}>Buy a rod · ${ROD} ${coin3()}</button></div>` + shut3;
+    h += `<p class="sub">${esc(sp.line)} <b>${worms(s.bait)}</b> in the bait tin. Every quest you finish digs up another.</p>`;
+    const c = st6.cast;
+    if (c && !c.t0) h += `<div class="fishwater"><span class="fbob wait"></span></div><p class="muted">The float sits on the water... wait for the bite.</p><div class="actions"><button class="btn alt" data-fish="reel">Reel in</button></div>`;
+    else if (c && c.t0) h += `<div class="fishwater bite"><span class="fbob"></span><b class="fbang">!</b></div><p><b>A bite!</b> Tap Reel when the marker's in the green.</p>
+    <div class="fbar" data-t0="${c.t0}" data-dur="${DUR}" data-at="${c.zone.at.toFixed(3)}" data-w="${c.zone.width.toFixed(3)}"><span class="fzone" style="left:${((c.zone.at - c.zone.width / 2) * 100).toFixed(1)}%;width:${(c.zone.width * 100).toFixed(1)}%"></span><span class="fmark" style="animation-delay:-${(Date.now() - c.t0) % (DUR * 2)}ms"></span></div>
+    <div class="actions"><button class="btn primary" data-fish="reel">Reel!</button></div>`;
+    else {
+      if (st6.result) {
+        const r = st6.result, f2 = FISH[r.id];
+        h += `<div class="fcatch"><span class="wpic">${icon(f2.item || r.id, 34)}</span><span class="wtxt"><b>${r.id === "boot" ? "An old boot!" : r.id === "seaglass" ? "Some sea glass!" : `${r.cm}cm ${f2.n.toLowerCase()}!`}${r.isNew ? " New in the journal." : r.best && !f2.junk ? " Your biggest yet!" : ""}</b><small>${esc(catchLine(r))}</small></span></div>`;
+      } else if (st6.msg) h += `<p class="muted">${esc(st6.msg)}</p>`;
+      h += `<div class="actions"><button class="btn primary" data-fish="cast" ${s.bait > 0 ? "" : "disabled"}>${s.bait > 0 ? "Cast" : "Out of worms"}</button></div>`;
+      if (!s.bait) h += `<p class="muted">No worms left. Finish a quest and you'll dig up another (three more turn up tomorrow morning anyway).</p>`;
+      if (!s.reel) h += `<p class="muted">The better reel makes every fish easier to land (the green's wider). <button class="btn small alt" data-fish="reelup" ${F2.coins >= REEL ? "" : "disabled"}>Buy · ${REEL} ${coin3()}</button></p>`;
+    }
+    return h + shut3;
+  }
+  function catchLine(r) {
+    const f2 = FISH[r.id];
+    if (r.id === "koi") return "Too beautiful to keep. You carry it home and let it go in the pond. It'll live there now.";
+    if (r.id === "boot") return "Somebody's old wellington. Into the bin it goes.";
+    if (r.id === "seaglass") return "A piece of sea glass, smoothed by the waves. It goes on the windowsill.";
+    return f2.item === "fish" ? "In the backpack: grill it at the kitchen, or give it to Maple." : `In the backpack: ${ING[f2.item][2]}.`;
+  }
+  function journalHtml(F2) {
+    const s = fishState(F2);
+    return Object.entries(SPOTS3).map(([k, sp]) => `<p class="eyebrow" style="margin:12px 0 4px">${esc(sp.n)}</p><ul class="hlist wlist">${Object.entries(FISH).filter(([, f2]) => f2.spot === k).map(([id, f2]) => {
+      const c = s.caught[id];
+      return c ? `<li><span class="wpic">${icon(f2.item || id, 22)}</span><span class="wtxt"><b>${esc(f2.n)}</b><small>${c.n} caught${f2.junk ? "" : ` · biggest ${c.best}cm`}${id === "koi" ? ` · ${s.koi} in the pond` : ""}</small></span></li>` : `<li class="locked"><span class="wpic">?</span><span class="wtxt"><b>???</b><small>${esc(f2.hint)}</small></span></li>`;
+    }).join("")}</ul>`).join("");
+  }
+
+  // src/art/fishing.js
+  var AT = { base: { x: 430, y: 108, side: 1, label: [436, 138] }, field: { x: 60, y: 284, side: 1, label: [60, 316] }, shore: { x: 234, y: 368, side: -1, label: [236, 336] } };
+  var PLACE = { base: "fishriver", field: "fishlake", shore: "fishsea" };
+  function fishSpotArt(scene2) {
+    const a = AT[scene2];
+    if (!a) return "";
+    const { x, y } = a, s = a.side;
+    const post = `<rect x="${x - 2}" y="${y - 30}" width="4" height="30" rx="1" style="fill:#A8754F"/><path d="M${x - 11} ${y - 30} q11 -8 22 0 q-11 8 -22 0z" style="fill:#9FC0C8"/><path d="M${x + 11 * s} ${y - 30} l${4 * s} -4 v8z" style="fill:#9FC0C8"/>`;
+    const lines = `<rect x="${x - 2}" y="${y - 30}" width="4" height="30" rx="1"/><path d="M${x - 11} ${y - 30} q11 -8 22 0 q-11 8 -22 0z M${x + 11 * s} ${y - 30} l${4 * s} -4 v8z"/><circle cx="${x - 6 * s}" cy="${y - 31}" r=".8"/>`;
+    const bucket = `<path d="M${x - 16 * s - 5} ${y - 9} h10 l-1.4 9 h-7.2z" style="fill:#BFD3E2"/>`, bl = `<path d="M${x - 16 * s - 5} ${y - 9} h10 l-1.4 9 h-7.2z M${x - 16 * s - 5} ${y - 9} q5 -6 10 0"/>`;
+    return `<g data-place="${PLACE[scene2]}" aria-label="Fishing spot"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="26" ry="8" style="fill:var(--butter)"/>${sk(post + bucket, lines + bl)}${tapeLabel(a.label[0], a.label[1], "Fishing", "#DCEBF6", 9)}</g>`;
+  }
+  function koiArt(n) {
+    if (!n) return "";
+    const P3 = [[372, 566, 0], [418, 576, 1.3], [446, 560, 2.6]];
+    return `<g pointer-events="none" filter="url(#wob)">${P3.slice(0, n).map(([x, y, d]) => `<g transform="translate(${x} ${y})"><g class="koi" style="animation-delay:-${d}s"><path d="M-7 0 q7 -5 13 0 q-6 5 -13 0z M6 0 l5 -3 v6z" style="fill:#F3B23A;stroke:var(--line)" stroke-width=".8"/><circle cx="-1" cy="-1" r="1.4" style="fill:#FFFDF6"/></g></g>`).join("")}</g>`;
+  }
+
   // src/game/scoop.js
   var OPEN = 10 * 60;
   var CLOSE = 20 * 60;
@@ -15187,6 +15552,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     corn: ["Sweetcorn", "Sweetcorn", "#F3D34A"],
     carrot: ["Carrots", "Carrot", "#F28C3A"],
     tomato: ["Tomatoes", "Tomato", "#E05A44"],
+    pea: ["Peas", "Pea and mint", "#B9D88A"],
     chocolate: ["Dark chocolate", "Chocolate", "#5A3A2A"],
     vanilla: ["Vanilla", "Vanilla", "#F6EBC8"],
     coffee: ["Coffee", "Coffee", "#8A5A3A"],
@@ -15472,7 +15838,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return { coins, fmt: fmt4, r, dipped };
   }
   function scoopTick(F2, opts = {}) {
-    const s = scoopState(F2), now3 = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now3, now3 - 2 * 864e5);
+    const s = scoopState(F2), now3 = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now3, now3 - 864e5);
     if (s.batch) {
       s.tubs[s.batch.id] = (s.tubs[s.batch.id] || 0) + TUB;
       s.batch = null;
@@ -15576,43 +15942,43 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (s.tubs[rid] <= 0) delete s.tubs[rid];
     return r;
   }
-  var coin3 = () => icon("coin", 13);
+  var coin4 = () => icon("coin", 13);
   var dot = (c) => `<span class="gdot" style="background:${c}"></span>`;
   var ingPic = (id) => id.startsWith("fl_") ? icon("bq_" + id.slice(3), 26) : icon(id, 26);
-  var shut3 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut4 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var tubList = (s) => s.recipes.filter((r) => s.tubs[r.id] > 0);
   var upBtn = `<div class="actions"><button class="btn small alt" data-gview="upgrade">Shop upgrades</button></div>`;
-  var buyBtn = (F2, price, attr, label2 = "Buy") => `<button class="btn small ${F2.coins >= price ? "primary" : "alt"}" ${attr} ${F2.coins >= price ? "" : "disabled"}>${label2} · ${price} ${coin3()}</button>`;
+  var buyBtn = (F2, price, attr, label2 = "Buy") => `<button class="btn small ${F2.coins >= price ? "primary" : "alt"}" ${attr} ${F2.coins >= price ? "" : "disabled"}>${label2} · ${price} ${coin4()}</button>`;
   function upgradePanel(F2) {
     const s = scoopState(F2);
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Shop upgrades</h2><p class="sub">Things to make ${esc(s.name)} even nicer. You have ${F2.coins} ${coin3()}.</p><ul class="hlist wlist gups">`;
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Shop upgrades</h2><p class="sub">Things to make ${esc(s.name)} even nicer. You have ${F2.coins} ${coin4()}.</p><ul class="hlist wlist gups">`;
     h += Object.entries(UPGRADES2).map(([k, u]) => `<li><span class="wtxt"><b>${esc(u.n)}</b><small>${esc(u.line)}</small></span>${s.up[k] ? `<span class="hbadge">yours</span>` : buyBtn(F2, u.price, `data-gbuy="${k}"`)}</li>`).join("");
-    return h + `</ul>` + shut3;
+    return h + `</ul>` + shut4;
   }
   function honestyPanel(F2) {
     const s = scoopState(F2);
-    if (!hasUp(s, "honesty")) return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(UPGRADES2.honesty.n)}</h2><p class="sub">${esc(UPGRADES2.honesty.line)}</p><div class="actions">${buyBtn(F2, UPGRADES2.honesty.price, 'data-gbuy="honesty"')}</div>` + shut3;
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The honesty freezer</h2><p class="sub">Little cups at ${s.prices.cup} ${coin3()} each, 7 to 10am and 8 to 10pm while the shop's shut. It takes from the same tubs as the counter.</p>`;
+    if (!hasUp(s, "honesty")) return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(UPGRADES2.honesty.n)}</h2><p class="sub">${esc(UPGRADES2.honesty.line)}</p><div class="actions">${buyBtn(F2, UPGRADES2.honesty.price, 'data-gbuy="honesty"')}</div>` + shut4;
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The honesty freezer</h2><p class="sub">Little cups at ${s.prices.cup} ${coin4()} each, 7 to 10am and 8 to 10pm while the shop's shut. It takes from the same tubs as the counter.</p>`;
     h += `<p class="muted">${s.box ? `<b>${s.box} coins</b> in the box.` : "The box is empty for now."}</p>`;
     if (s.notes.length) h += `<p class="eyebrow" style="margin:10px 0 6px">Notes left with the coins</p><ul class="hlist">${s.notes.map((n) => `<li><small>"${esc(n.t)}"</small></li>`).join("")}</ul>`;
     return h + `<div class="actions">${s.box ? `<button class="btn primary" data-gcollect="1">Collect the coins</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function dipPotsPanel(F2) {
     const s = scoopState(F2);
-    return `<span class="tape stripe" aria-hidden="true"></span><h2>The chocolate pots</h2><p class="sub">Warm dips for cones and waffles. Customers pay ${s.prices.dip} ${coin3()} extra for a dipped one (set it on the menu); more dips, more takers.</p>
-    <ul class="hlist wlist">${Object.entries(DIPS).map(([k, d]) => `<li><span class="wpic">${dot(d.col)}</span><span class="wtxt"><b>${esc(d.n)}</b><small>${d.house ? s.houseDips > 0 ? `${s.houseDips} dips left, from the Cocoa Room` : "send dark chocolate from the Cocoa Room's moulds" : s.dips[k] ? "warming in its pot" : "not yet"}</small></span>${d.house ? "" : s.dips[k] ? `<span class="hbadge">yours</span>` : buyBtn(F2, d.price, `data-gdipbuy="${k}"`)}</li>`).join("")}</ul>` + shut3;
+    return `<span class="tape stripe" aria-hidden="true"></span><h2>The chocolate pots</h2><p class="sub">Warm dips for cones and waffles. Customers pay ${s.prices.dip} ${coin4()} extra for a dipped one (set it on the menu); more dips, more takers.</p>
+    <ul class="hlist wlist">${Object.entries(DIPS).map(([k, d]) => `<li><span class="wpic">${dot(d.col)}</span><span class="wtxt"><b>${esc(d.n)}</b><small>${d.house ? s.houseDips > 0 ? `${s.houseDips} dips left, from the Cocoa Room` : "send dark chocolate from the Cocoa Room's moulds" : s.dips[k] ? "warming in its pot" : "not yet"}</small></span>${d.house ? "" : s.dips[k] ? `<span class="hbadge">yours</span>` : buyBtn(F2, d.price, `data-gdipbuy="${k}"`)}</li>`).join("")}</ul>` + shut4;
   }
   function toppingsPanel(F2) {
     const s = scoopState(F2);
-    return `<span class="tape gingham" aria-hidden="true"></span><h2>The toppings shelf</h2><p class="sub">Scattered on a dipped cone while it's still warm. ${s.prices.top} ${coin3()} extra each (set it on the menu); the more jars on the shelf, the more people go for a dipped one.</p>
-    <ul class="hlist wlist">${Object.entries(TOPPINGS).map(([k, t2]) => `<li><span class="wpic">${dot(t2.col)}</span><span class="wtxt"><b>${esc(t2.n)}</b><small>${s.tops[k] ? "on the shelf" : "not yet"}</small></span>${s.tops[k] ? `<span class="hbadge">yours</span>` : buyBtn(F2, t2.price, `data-gtopbuy="${k}"`)}</li>`).join("")}</ul>` + shut3;
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>The toppings shelf</h2><p class="sub">Scattered on a dipped cone while it's still warm. ${s.prices.top} ${coin4()} extra each (set it on the menu); the more jars on the shelf, the more people go for a dipped one.</p>
+    <ul class="hlist wlist">${Object.entries(TOPPINGS).map(([k, t2]) => `<li><span class="wpic">${dot(t2.col)}</span><span class="wtxt"><b>${esc(t2.n)}</b><small>${s.tops[k] ? "on the shelf" : "not yet"}</small></span>${s.tops[k] ? `<span class="hbadge">yours</span>` : buyBtn(F2, t2.price, `data-gtopbuy="${k}"`)}</li>`).join("")}</ul>` + shut4;
   }
   function dipBarPanel(F2, st6) {
     const s = scoopState(F2), tubs = tubList(s);
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The dip bar</h2><p class="sub">Pick a flavour, dip it, top it. Yours are free.</p>`;
-    if (!tubs.length) return h + `<p class="muted">No tubs in the display. Make some from the recipe book in the kitchen.</p>` + shut3;
+    if (!tubs.length) return h + `<p class="muted">No tubs in the display. Make some from the recipe book in the kitchen.</p>` + shut4;
     const r = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
-    if (!r) return h + `<ul class="hlist wlist">${tubs.map((x) => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops</small></span><button class="btn small primary" data-gdpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut3;
+    if (!r) return h + `<ul class="hlist wlist">${tubs.map((x) => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops</small></span><button class="btn small primary" data-gdpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut4;
     const dip = dipReady(s, st6.dip) ? st6.dip : "milk", top = st6.top && s.tops[st6.top] ? st6.top : null, fmt4 = st6.fmt === "waffle" ? "waffle" : "cone";
     const chip2 = (attr, k, on, label2, col) => `<button class="gchip${on ? " on" : ""}" ${attr}="${k}" aria-pressed="${on}">${dot(col)}<span>${esc(label2)}</span></button>`;
     h += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p>`;
@@ -15625,11 +15991,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function deliverPanel(F2, st6) {
     const s = scoopState(F2), tubs = tubList(s), hm2 = sgHM();
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Scoop Shack delivery</h2><p class="sub">Tomo pedals it round in the cool box, and a thank-you note comes back to your mailbox.</p>`;
-    if (!hasUp(s, "bike")) return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(UPGRADES2.bike.n)}</h2><p class="sub">${esc(UPGRADES2.bike.line)}</p><div class="actions">${buyBtn(F2, UPGRADES2.bike.price, 'data-gbuy="bike"')}</div>` + shut3;
-    if (!waiterOn(hm2)) return h + `<p class="muted">${hm2 >= 13 * 60 && hm2 < 13 * 60 + 45 ? "Tomo's on his lunch break till 1:45." : "Tomo's not on. Deliveries go out 10am to 6pm."}</p>` + shut3;
-    if (!tubs.length) return h + `<p class="muted">Nothing in the display to send.</p>` + shut3;
+    if (!hasUp(s, "bike")) return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(UPGRADES2.bike.n)}</h2><p class="sub">${esc(UPGRADES2.bike.line)}</p><div class="actions">${buyBtn(F2, UPGRADES2.bike.price, 'data-gbuy="bike"')}</div>` + shut4;
+    if (!waiterOn(hm2)) return h + `<p class="muted">${hm2 >= 13 * 60 && hm2 < 13 * 60 + 45 ? "Tomo's on his lunch break till 1:45." : "Tomo's not on. Deliveries go out 10am to 6pm."}</p>` + shut4;
+    if (!tubs.length) return h + `<p class="muted">Nothing in the display to send.</p>` + shut4;
     const r = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
-    if (!r) return h + `<ul class="hlist wlist">${tubs.map((x) => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops${x.dairy ? "" : " · dairy-free"}</small></span><button class="btn small primary" data-gvpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut3;
+    if (!r) return h + `<ul class="hlist wlist">${tubs.map((x) => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops${x.dairy ? "" : " · dairy-free"}</small></span><button class="btn small primary" data-gvpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut4;
     const fmt4 = FORMATS[st6.fmt] ? st6.fmt : "cone";
     h += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p><div class="gchips">${Object.keys(FORMATS).map((f2) => `<button class="gchip${f2 === fmt4 ? " on" : ""}" data-gvfmt="${f2}" aria-pressed="${f2 === fmt4}"><span>${FORMATS[f2].n}</span></button>`).join("")}</div>`;
     h += `<p class="eyebrow" style="margin:10px 0 6px">Send it to</p><div class="actions">${(st6.who || []).filter(([w]) => !r.dairy || w !== "marcus").map(([w, n]) => `<button class="btn small alt" data-gvto="${w}">${esc(n)}</button>`).join("")}</div>`;
@@ -15637,18 +16003,18 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function counterPanel2(F2, st6) {
     const s = scoopState(F2), hm2 = sgHM(), t2 = s.sold[dayKey()] || { n: 0, coins: 0 }, tubs = onDisplay(s);
-    let h = st6.cart ? `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)} cart</h2><p class="sub">At the night market till 10pm, scooping from tubs already made (no batches at the market, just serving).${st6.keeper ? " Tomo's minding it." : " Tomo's off wandering: it's on an honesty tin."} ${t2.cart ? `Sold tonight: ${t2.cart} (${t2.cartCoins} ${coin3()}).` : "Nothing sold yet tonight."} Stay and scoop, and more people stop.</p>` : `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm2) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t2.n ? `Sold today: ${t2.n} (${t2.coins} ${coin3()}).` : "Nothing sold yet today."}${st6.server ? " Sofia's behind the counter." : ""}</p>`;
-    if (st6.cart && !tubs.length) return h + `<p class="muted">Nothing to scoop: the shop's display is empty tonight.</p>` + shut3;
-    if (!tubs.length && scoopsLeft(s)) return h + `<p class="muted">Nothing in the display, but there are tubs in the freezer.</p><div class="actions"><button class="btn small primary" data-gview="freezer">Put some out</button></div>` + upBtn + shut3;
-    if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), then make more tubs from the recipe book there.</p>` + upBtn + shut3;
+    let h = st6.cart ? `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)} cart</h2><p class="sub">At the night market till 10pm, scooping from tubs already made (no batches at the market, just serving).${st6.keeper ? " Tomo's minding it." : " Tomo's off wandering: it's on an honesty tin."} ${t2.cart ? `Sold tonight: ${t2.cart} (${t2.cartCoins} ${coin4()}).` : "Nothing sold yet tonight."} Stay and scoop, and more people stop.</p>` : `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm2) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t2.n ? `Sold today: ${t2.n} (${t2.coins} ${coin4()}).` : "Nothing sold yet today."}${st6.server ? " Sofia's behind the counter." : ""}</p>`;
+    if (st6.cart && !tubs.length) return h + `<p class="muted">Nothing to scoop: the shop's display is empty tonight.</p>` + shut4;
+    if (!tubs.length && scoopsLeft(s)) return h + `<p class="muted">Nothing in the display, but there are tubs in the freezer.</p><div class="actions"><button class="btn small primary" data-gview="freezer">Put some out</button></div>` + upBtn + shut4;
+    if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), then make more tubs from the recipe book there.</p>` + upBtn + shut4;
     const pick4 = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
     if (pick4) return h + `<div class="gpick"><p class="olabel">${dot(pick4.col)} ${esc(pick4.name)}${pick4.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick4.ings.map((i) => INGR[i][0]).join(", "))} · ${s.tubs[pick4.id]} scoops left</p>
     <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick4.id)}">Have one now${st6.evan ? ", and one for Evan" : ""}</button></div>
     <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map((f2) => `<button class="btn small alt" data-gtake="${f2}">${FORMATS[f2].n}</button>`).join("")}</div>
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
     h += `<ul class="hlist wlist">${tubs.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
-    if (st6.cart) return h + `<p class="muted">Yours are free. Cups and cones at the shop's prices.</p>` + shut3;
-    return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p><div class="actions"><button class="btn small alt" data-gview="freezer">Change what's in the display</button></div>` + upBtn + shut3;
+    if (st6.cart) return h + `<p class="muted">Yours are free. Cups and cones at the shop's prices.</p>` + shut4;
+    return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p><div class="actions"><button class="btn small alt" data-gview="freezer">Change what's in the display</button></div>` + upBtn + shut4;
   }
   function menuPanel2(F2, st6) {
     const s = scoopState(F2), step2 = (k) => `<span class="gstep"><button class="btn small alt" data-gprice="${k}:-1" aria-label="Cheaper">−</button><b>${s.prices[k]}</b><button class="btn small alt" data-gprice="${k}:1" aria-label="Dearer">+</button></span>`;
@@ -15658,7 +16024,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <li><span class="wtxt"><b>Chocolate dip</b><small>extra for a dipped cone or waffle</small></span>${step2("dip")}</li><li><span class="wtxt"><b>Topping</b><small>extra for a topping on a dipped one</small></span>${step2("top")}</li>` : ""}</ul>`;
     h += s.recipes.length ? `<p class="eyebrow" style="margin:12px 0 6px">Flavours</p><ul class="hlist wlist gflav">${s.recipes.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? s.tubs[r.id] + " scoops" : "sold out"}</small></span><label class="gspec"><input type="checkbox" data-gspecial="${esc(r.id)}" ${r.special ? "checked" : ""}> special</label></li>`).join("")}</ul>` : `<p class="muted">No flavours yet: discover some at the mixing bench in the kitchen.</p>`;
     h += `<form class="row hadd" data-gname="1"><label class="sr" for="gName">Shop name</label><input id="gName" name="n" maxlength="30" value="${esc(s.name)}"><button class="btn small alt">Rename</button></form>`;
-    return h + shut3;
+    return h + shut4;
   }
   function fridgePanel2(F2, orch) {
     const s = scoopState(F2), inF = Object.keys(s.fridge).filter((id) => s.fridge[id] > 0), bag2 = backpackIngr(F2), shelf2 = farmShelf(orch);
@@ -15671,7 +16037,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       return cell(id, `${n} on her shelf`, `<span class="orbtns"><button class="btn small primary" data-gfill="farm:${id}:1">Add 1</button><button class="btn small alt" data-gfill="farm:${id}:99">All</button></span>`);
     }).join("")}</ul>`;
     if (!bag2.length && !shelf2.length) h += `<p class="muted">Nothing to add right now. Milk comes from your goats or Hana's market; fruit and flowers from the orchard.</p>`;
-    return h + shut3;
+    return h + shut4;
   }
   var scoopPic = (col) => `<svg class="gscoop" viewBox="0 0 44 44" aria-hidden="true"><path d="M14 22 l8 20 l8 -20z" fill="#E8C48E" stroke="#3A2E28" stroke-width="1.2" stroke-linejoin="round"/><path d="M16 28 l12 6 M28 28 l-12 6" stroke="#3A2E28" stroke-width=".8" opacity=".5"/><circle cx="22" cy="16" r="11" fill="${col}" stroke="#3A2E28" stroke-width="1.2"/><path d="M12 19 q3 4 6 0 q3 4 6 0 q3 4 6 0 q2 3 2 0" fill="${col}" stroke="#3A2E28" stroke-width="1.1"/><circle cx="18" cy="12" r="2.4" fill="#fff" opacity=".6"/></svg>`;
   var resultCard = (col, name, line, made) => `<div class="gresult${made ? " made" : ""}">${scoopPic(col)}<span><b>${esc(name)}</b><small>${esc(line)}</small></span></div>`;
@@ -15679,7 +16045,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const s = scoopState(F2), inF = Object.keys(s.fridge).filter((id) => s.fridge[id] > 0), sel = (st6.sel || []).filter((id) => inF.includes(id));
     const known = sel.length ? knownRecipe(s, sel) : null;
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The mixing bench</h2><p class="sub">Pick up to four things from the fridge and mix. Every combination makes a new flavour; there's no such thing as a bad one. ${s.recipes.length} discovered so far.</p>`;
-    if (!inF.length) return h + `<p class="muted">The fridge is empty. Stock it first.</p>` + shut3;
+    if (!inF.length) return h + `<p class="muted">The fridge is empty. Stock it first.</p>` + shut4;
     h += `<div class="gchips">${inF.map((id) => `<button class="gchip${sel.includes(id) ? " on" : ""}" data-gsel="${id}" aria-pressed="${sel.includes(id)}" ${!sel.includes(id) && sel.length >= 4 ? "disabled" : ""}>${ingPic(id)}<span>${esc(INGR[id][0])}</span></button>`).join("")}</div>`;
     const made = st6.made && recipeOf(s, st6.made);
     if (made && !sel.length) h += resultCard(made.col, made.name, `New flavour! ${made.dairy ? "A gelato" : "A dairy-free sorbet"}. It's in the churner: blending, then freezing, ready in an hour.`, true);
@@ -15700,11 +16066,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function recipePanel(F2) {
     const s = scoopState(F2), day = dayKey();
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The recipe book</h2><p class="sub">Every flavour you've discovered. A tub is 20 scoops, uses one of each ingredient from the fridge, and takes an hour in the churner. ${s.made[day] ? `${s.made[day]} made today.` : ""}</p>`;
-    if (!s.recipes.length) return h + `<p class="muted">No flavours yet. Discover one at the mixing bench.</p>` + shut3;
+    if (!s.recipes.length) return h + `<p class="muted">No flavours yet. Discover one at the mixing bench.</p>` + shut4;
     h += `<ul class="hlist wlist">${[...s.recipes].sort((a, b) => (s.tubs[a.id] || 0) - (s.tubs[b.id] || 0)).map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? `${s.tubs[r.id]} scoops left` : "none left"} · ${canMake(s, r) ? esc(r.ings.map((i) => INGR[i][0]).join(", ")) : "missing: " + esc(r.ings.filter((i) => !(s.fridge[i] > 0)).map((i) => INGR[i][0]).join(", "))}</small></span><button class="btn small ${canMake(s, r) ? "primary" : "alt"}" data-gmake="${esc(r.id)}" ${canMake(s, r) ? "" : "disabled"}>Make a tub</button></li>`).join("")}</ul>`;
     h += churnLine(s);
     if (s.log.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Lately</p><ul class="hlist">${s.log.map((l) => `<li><small>${esc(l)}</small></li>`).join("")}</ul>`;
-    return h + shut3;
+    return h + shut4;
   }
   function freezerPanel(F2, st6 = {}) {
     const s = scoopState(F2), ids = displayIds(s), shown = ids.map((id) => recipeOf(s, id)), rest = s.recipes.filter((r) => !ids.includes(r.id) && s.tubs[r.id] > 0);
@@ -15716,7 +16082,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     h += shown.length ? `<ul class="hlist wlist">${shown.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? `${s.tubs[r.id]} scoops` : "sold out: the slot's empty till you make more"} · ${ings(r)}</small></span><button class="btn small alt" data-gdisp="${esc(r.id)}">Take off</button></li>`).join("")}</ul>` : `<p class="muted">Empty.</p>`;
     h += `<p class="eyebrow" style="margin:12px 0 6px">Waiting in the freezer</p>`;
     h += rest.length ? `<ul class="hlist wlist">${rest.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops · ${ings(r)}</small></span><button class="btn small primary" data-gdisp="${esc(r.id)}">${ids.length < SLOTS3 ? "Put out" : "Swap in"}</button></li>`).join("")}</ul>` : `<p class="muted">Nothing else in stock.</p>`;
-    return h + shut3;
+    return h + shut4;
   }
   var RENO_LINE = `Boarded up for now, with scaffolding out front. The sign says: "Coming soon: a craft brewery? A chocolatier?" Someone's pencilled "both!!" underneath.`;
 
@@ -15727,7 +16093,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var GRIND_MIN = 120;
   var POT = 30;
   var MOULD = 10;
-  var SACK = 10;
+  var SACK = 25;
   var KINDS2 = { milk: { n: "Milk chocolate", col: "#8A5A3A" }, dark: { n: "Dark chocolate", col: "#4A2E22" }, white: { n: "White chocolate", col: "#F3E7C9" } };
   var BAR_ID = (k) => "bar_" + k;
   var HAND = { 3: [14 * 60, 18 * 60], 5: [14 * 60, 18 * 60], 6: [10 * 60, 17 * 60] };
@@ -16068,7 +16434,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
   }
   function cocoaTick(F2, opts = {}) {
-    const c = cocoaState(F2), t2 = now2(), from = Math.max(c.at || t2, t2 - 2 * 864e5), out = { coins: 0, n: 0, mins: 0, done: null, hand: { pots: 0, bars: 0, sacks: 0, spent: 0, res: 0 } };
+    const c = cocoaState(F2), t2 = now2(), from = Math.max(c.at || t2, t2 - 864e5), out = { coins: 0, n: 0, mins: 0, done: null, hand: { pots: 0, bars: 0, sacks: 0, spent: 0, res: 0 } };
     for (let at = from + 6e4; at <= t2; at += 6e4) {
       const sg = new Date(at + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm2 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
       out.mins++;
@@ -16203,42 +16569,42 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (give) F2.inv[BAR_ID(kind)] = (F2.inv[BAR_ID(kind)] || 0) + 1;
     return true;
   }
-  var coin4 = () => icon("coin", 13);
-  var shut4 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var coin5 = () => icon("coin", 13);
+  var shut5 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var dot2 = (c) => `<span class="gdot" style="background:${c}"></span>`;
   function counterPanel3(F2, st6) {
     const c = cocoaState(F2), day = dayKey(), hm2 = sgHM(), t2 = c.sold[day] || { n: 0, coins: 0 };
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${st6.cart ? "The farmers market cart. " : ""}${openOn(day, hm2, ccUp(c, "assistant")) ? "Open till 8pm." : `Closed: open 11am to 8pm, ${ccUp(c, "assistant") ? "every day" : "Tuesday to Sunday"}.`} ${t2.n || t2.bonbons ? `Sold today: ${t2.n} bar${t2.n === 1 ? "" : "s"}${t2.bonbons ? ` and ${t2.bonbons} bonbon${t2.bonbons === 1 ? "" : "s"}` : ""} (${t2.coins} ${coin4()}).` : "Nothing sold yet today."}${st6.server ? " Amara's behind the counter." : ""}</p>`;
-    h += `<ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n} bars</b><small>${c.bars[k]} on the wall · ${c.prices.bar} ${coin4()} each</small></span><span class="orbtns"><button class="btn small primary" data-cc="eat" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>Have one</button><button class="btn small alt" data-cc="give" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>To give</button></span></li>`).join("")}</ul>`;
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${st6.cart ? "The farmers market cart. " : ""}${openOn(day, hm2, ccUp(c, "assistant")) ? "Open till 8pm." : `Closed: open 11am to 8pm, ${ccUp(c, "assistant") ? "every day" : "Tuesday to Sunday"}.`} ${t2.n || t2.bonbons ? `Sold today: ${t2.n} bar${t2.n === 1 ? "" : "s"}${t2.bonbons ? ` and ${t2.bonbons} bonbon${t2.bonbons === 1 ? "" : "s"}` : ""} (${t2.coins} ${coin5()}).` : "Nothing sold yet today."}${st6.server ? " Amara's behind the counter." : ""}</p>`;
+    h += `<ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n} bars</b><small>${c.bars[k]} on the wall · ${c.prices.bar} ${coin5()} each</small></span><span class="orbtns"><button class="btn small primary" data-cc="eat" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>Have one</button><button class="btn small alt" data-cc="give" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>To give</button></span></li>`).join("")}</ul>`;
     h += `<div class="row gprices"><span>Price of a bar</span><span class="gstep"><button class="btn small alt" data-cc="price" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bar}</b><button class="btn small alt" data-cc="price" data-n="1" aria-label="Dearer">+</button></span></div>`;
     if (ccUp(c, "hotchoc")) h += `<div class="row gprices"><span>Hot chocolate${t2.hot ? ` <small class="muted">(${t2.hot} today)</small>` : ""}</span><span class="gstep"><button class="btn small alt" data-cc="hprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.hot}</b><button class="btn small alt" data-cc="hprice" data-n="1" aria-label="Dearer">+</button></span></div><div class="actions"><button class="btn small primary" data-cc="hot" ${Object.values(c.choc).some((n) => n > 0) ? "" : "disabled"}>Have a hot chocolate</button></div>`;
     if (!st6.cart) h += `<form class="row hadd" data-ccname="1"><label class="sr" for="ccName">Shop name</label><input id="ccName" maxlength="30" value="${esc(c.name)}"><button class="btn small alt">Rename</button></form>`;
-    if (st6.cart) return h + counterBonbons(F2) + `<p class="muted">Mateo sells from the shop's stock: bars, bonbons from the case${ccUp(c, "hotchoc") ? ", and hot chocolate" : ""}. More people stop while you're serving.</p>` + shut4;
-    return h + counterBonbons(F2) + planPanel(F2, st6) + `<div class="actions"><button class="btn small alt" data-cc="ups">Shop upgrades</button></div><p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut4;
+    if (st6.cart) return h + counterBonbons(F2) + `<p class="muted">Mateo sells from the shop's stock: bars, bonbons from the case${ccUp(c, "hotchoc") ? ", and hot chocolate" : ""}. More people stop while you're serving.</p>` + shut5;
+    return h + counterBonbons(F2) + planPanel(F2, st6) + `<div class="actions"><button class="btn small alt" data-cc="ups">Shop upgrades</button></div><p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut5;
   }
   function barWallPanel(F2) {
     const c = cocoaState(F2);
     return `<span class="tape stripe" aria-hidden="true"></span><h2>The bar wall</h2><p class="sub">Wrapped bars, ready to sell. ${c.made} made so far.</p>
     <ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n}</b><small>${c.bars[k]} bars</small></span></li>`).join("")}</ul>
-    <p class="muted">${Object.values(c.bars).some((n) => n) ? "Make more in the kitchen when it runs low." : "Empty! Beans to bars happens in the kitchen, through the door on the west wall."}</p>` + shut4;
+    <p class="muted">${Object.values(c.bars).some((n) => n) ? "Make more in the kitchen when it runs low." : "Empty! Beans to bars happens in the kitchen, through the door on the west wall."}</p>` + shut5;
   }
   function kitchenPanel(F2, which) {
     const c = cocoaState(F2);
     finish(c);
     const short = (k) => KINDS2[k].n.split(" ")[0].toLowerCase();
     const steps = `<p class="muted">Beans ${c.beans} · roasted ${c.roasted} · for bars ${Object.keys(KINDS2).map((k) => `${short(k)} ${c.choc[k]}`).join(", ")} · bonbon shelf ${Object.keys(KINDS2).map((k) => `${short(k)} ${c.res[k]}/${c.keep[k]}`).join(", ")}</p>`;
-    if (which === "sacks") return `<span class="tape gingham" aria-hidden="true"></span><h2>Bean sacks</h2><p class="sub">Cacao beans, ${SACK} ${coin4()} a sack. A sack makes a pot of chocolate: 30 pieces.</p>
-    <p class="olabel">${c.beans} sack${c.beans === 1 ? "" : "s"} in the kitchen</p><div class="actions"><button class="btn primary" data-cc="beans" data-n="1" ${F2.coins < SACK ? "disabled" : ""}>Buy a sack (${SACK} ${coin4()})</button><button class="btn alt" data-cc="beans" data-n="3" ${F2.coins < SACK * 3 ? "disabled" : ""}>Three (${SACK * 3} ${coin4()})</button></div>${steps}` + shut4;
+    if (which === "sacks") return `<span class="tape gingham" aria-hidden="true"></span><h2>Bean sacks</h2><p class="sub">Cacao beans, ${SACK} ${coin5()} a sack. A sack makes a pot of chocolate: 30 pieces.</p>
+    <p class="olabel">${c.beans} sack${c.beans === 1 ? "" : "s"} in the kitchen</p><div class="actions"><button class="btn primary" data-cc="beans" data-n="1" ${F2.coins < SACK ? "disabled" : ""}>Buy a sack (${SACK} ${coin5()})</button><button class="btn alt" data-cc="beans" data-n="3" ${F2.coins < SACK * 3 ? "disabled" : ""}>Three (${SACK * 3} ${coin5()})</button></div>${steps}` + shut5;
     if (which === "roaster") return `<span class="tape stripe" aria-hidden="true"></span><h2>The roaster</h2><p class="sub">${c.roast ? `Roasting a sack: ready in ${left3(c.roast.done)}.` : "Roast a sack of beans. Ten minutes, and the whole kitchen smells amazing."}</p>
-    <div class="actions"><button class="btn primary" data-cc="roast" ${c.roast || c.beans < 1 ? "disabled" : ""}>${c.beans < 1 ? "No beans: buy a sack" : "Roast a sack"}</button></div>${steps}` + shut4;
+    <div class="actions"><button class="btn primary" data-cc="roast" ${c.roast || c.beans < 1 ? "disabled" : ""}>${c.beans < 1 ? "No beans: buy a sack" : "Roast a sack"}</button></div>${steps}` + shut5;
     const gline = (g) => c["grind" + g] ? `Grinding ${KINDS2[c["grind" + g].kind].n.toLowerCase()}: ready in ${left3(c["grind" + g].done)}.` : c["ground" + g] ? `A pot of ${KINDS2[c["ground" + g]].n.toLowerCase()} is ready: temper it on the marble slab.` : "";
     if (which === "grinder") return `<span class="tape gingham" aria-hidden="true"></span><h2>The stone grinder${slots(c).length > 1 ? "s" : ""}</h2><p class="sub">${slots(c).map((g, i) => gline(g) ? (slots(c).length > 1 ? `${i ? "Second" : "First"}: ` : "") + gline(g) : "").filter(Boolean).join(" ") || "Roasted beans in, chocolate out. It takes two hours."}</p>
-    ${freeSlot2(c) === void 0 ? "" : `<div class="actions">${Object.entries(KINDS2).map(([k, d]) => `<button class="btn ${k === "milk" ? "primary" : "alt"}" data-cc="grind" data-k="${k}" ${c.roasted < 1 ? "disabled" : ""}>${dot2(d.col)} ${d.n}</button>`).join("")}</div>${c.roasted < 1 ? `<p class="muted">Roast some beans first.</p>` : ""}`}${steps}` + shut4;
+    ${freeSlot2(c) === void 0 ? "" : `<div class="actions">${Object.entries(KINDS2).map(([k, d]) => `<button class="btn ${k === "milk" ? "primary" : "alt"}" data-cc="grind" data-k="${k}" ${c.roasted < 1 ? "disabled" : ""}>${dot2(d.col)} ${d.n}</button>`).join("")}</div>${c.roasted < 1 ? `<p class="muted">Roast some beans first.</p>` : ""}`}${steps}` + shut5;
     const pot = readyPot(c) === void 0 ? null : c["ground" + readyPot(c)];
     if (which === "slab") return `<span class="tape stripe" aria-hidden="true"></span><h2>The marble slab</h2><p class="sub">${pot ? `Temper the ${KINDS2[pot].n.toLowerCase()}: spread, scrape, fold, until it shines.` : "Tempering makes chocolate snap and shine. Bring a pot from the grinder."}</p>
-    <div class="actions"><button class="btn primary" data-cc="temper" ${pot ? "" : "disabled"}>Temper it (${POT} pieces)</button></div>${steps}` + shut4;
+    <div class="actions"><button class="btn primary" data-cc="temper" ${pot ? "" : "disabled"}>Temper it (${POT} pieces)</button></div>${steps}` + shut5;
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The moulds</h2><p class="sub">${MOULD} pieces of tempered chocolate make ${MOULD} bars, straight onto the bar wall.</p>
-    <ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${dot2(d.col)}</span><span class="wtxt"><b>${d.n}</b><small>${c.choc[k]} pieces</small></span><button class="btn small primary" data-cc="mould" data-k="${k}" ${c.choc[k] < MOULD ? "disabled" : ""}>Mould ${MOULD} bars</button></li>`).join("")}</ul>${scoopSend(F2)}${steps}` + shut4;
+    <ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${dot2(d.col)}</span><span class="wtxt"><b>${d.n}</b><small>${c.choc[k]} pieces</small></span><button class="btn small primary" data-cc="mould" data-k="${k}" ${c.choc[k] < MOULD ? "disabled" : ""}>Mould ${MOULD} bars</button></li>`).join("")}</ul>${scoopSend(F2)}${steps}` + shut5;
   }
   function scoopSend(F2) {
     const c = cocoaState(F2), s = scoopState(F2), ok = c.choc.dark >= SEND;
@@ -16258,7 +16624,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const wines = wineShelf(F2);
     if (wines.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From the wine shop</p><ul class="hlist wlist">${wines.map((b) => cell("wine_" + b.type, `${esc(b.name)} · ${b.n} on the shelf`, `<button class="btn small primary" data-cc="wine" data-k="${esc(b.id)}">Open a bottle (${WINE_FILLS})</button>`)).join("")}</ul>`;
     if (!bag2.length && !shelf2.length && !wines.length) h += `<p class="muted">Nothing to add right now. Hana's deli has honey, pandan, coffee, nuts and more; Ma Ma's farm shop has fruit and flowers.</p>`;
-    return h + shut4;
+    return h + shut5;
   }
   function bonbonPanel(F2, st6) {
     const c = cocoaState(F2), inS = Object.keys(c.pantry).filter((id) => c.pantry[id] > 0 && isFilling(id)), sel = (st6.sel || []).filter((id) => inS.includes(id)), shell = KINDS2[st6.shell] ? st6.shell : "dark";
@@ -16283,17 +16649,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function casePanel(F2) {
     const c = cocoaState(F2), ids = displayIds2(c), shown = ids.map((id) => recipeOf2(c, id)), rest = c.bonbons.filter((b) => !ids.includes(b.id) && c.trays[b.id] > 0);
-    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The display case</h2><p class="sub">Up to ${CASE} flavours of bonbons, ${c.prices.bonbon} ${coin4()} each. Customers pick two to four.</p>`;
+    let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The display case</h2><p class="sub">Up to ${CASE} flavours of bonbons, ${c.prices.bonbon} ${coin5()} each. Customers pick two to four.</p>`;
     h += `<p class="eyebrow" style="margin:10px 0 6px">In the case (${shown.length} of ${CASE})</p>` + (shown.length ? `<ul class="hlist wlist">${shown.map((b) => `<li><span class="wpic">${dot2(KINDS2[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] ? c.trays[b.id] + " left" : "sold out"}</small></span><button class="btn small alt" data-cc="case" data-k="${esc(b.id)}">Take out</button></li>`).join("")}</ul>` : `<p class="muted">Empty. Make bonbons at the bonbon table in the kitchen.</p>`);
     if (rest.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Waiting in the kitchen</p><ul class="hlist wlist">${rest.map((b) => `<li><span class="wpic">${dot2(KINDS2[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id]} made</small></span><button class="btn small primary" data-cc="case" data-k="${esc(b.id)}" ${ids.length >= CASE ? "disabled" : ""}>Put in</button></li>`).join("")}</ul>`;
     const sp = specialOn(dayKey());
-    if (sp) h += `<p class="eyebrow" style="margin:12px 0 6px">Beside the case</p><p class="muted">${icon(sp.id, 20)} ${esc(sp.n)}: ${c.specials[sp.id] || 0} left, ${sp.price} ${coin4()} each, for ${esc(sp.fest)}.</p>`;
+    if (sp) h += `<p class="eyebrow" style="margin:12px 0 6px">Beside the case</p><p class="muted">${icon(sp.id, 20)} ${esc(sp.n)}: ${c.specials[sp.id] || 0} left, ${sp.price} ${coin5()} each, for ${esc(sp.fest)}.</p>`;
     h += `<div class="row gprices"><span>Price of a bonbon</span><span class="gstep"><button class="btn small alt" data-cc="bprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bonbon}</b><button class="btn small alt" data-cc="bprice" data-n="1" aria-label="Dearer">+</button></span></div>`;
-    return h + shut4;
+    return h + shut5;
   }
   function upsPanel(F2) {
-    const c = cocoaState(F2), btn = (k, u) => `<button class="btn small ${F2.coins >= u.price ? "primary" : "alt"}" data-cc="buyup" data-k="${k}" ${F2.coins >= u.price ? "" : "disabled"}>Buy · ${u.price} ${coin4()}</button>`;
-    return `<span class="tape gingham" aria-hidden="true"></span><h2>Shop upgrades</h2><p class="sub">Things to make ${esc(c.name)} even nicer. You have ${F2.coins} ${coin4()}.</p><ul class="hlist wlist gups">${Object.entries(CC_UPS).map(([k, u]) => `<li><span class="wtxt"><b>${esc(u.n)}</b><small>${esc(u.line)}</small></span>${c.up[k] ? `<span class="hbadge">yours</span>` : btn(k, u)}</li>`).join("")}</ul><div class="actions"><button class="btn alt small" data-cc="counter">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
+    const c = cocoaState(F2), btn = (k, u) => `<button class="btn small ${F2.coins >= u.price ? "primary" : "alt"}" data-cc="buyup" data-k="${k}" ${F2.coins >= u.price ? "" : "disabled"}>Buy · ${u.price} ${coin5()}</button>`;
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>Shop upgrades</h2><p class="sub">Things to make ${esc(c.name)} even nicer. You have ${F2.coins} ${coin5()}.</p><ul class="hlist wlist gups">${Object.entries(CC_UPS).map(([k, u]) => `<li><span class="wtxt"><b>${esc(u.n)}</b><small>${esc(u.line)}</small></span>${c.up[k] ? `<span class="hbadge">yours</span>` : btn(k, u)}</li>`).join("")}</ul><div class="actions"><button class="btn alt small" data-cc="counter">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function planPanel(F2, st6 = {}) {
     const c = cocoaState(F2), p = c.plan;
@@ -16524,7 +16890,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       cocoa: "The hoarding's down: The Cocoa Room is yours! Buy some beans in the kitchen and make your first bars."
     }[k];
   }
-  var coin5 = () => icon("coin", 14);
+  var coin6 = () => icon("coin", 14);
   function goalPanel(F2, k) {
     const g = GOALS[k], have = owns(F2, k), need = g.needs && !owns(F2, g.needs);
     let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(g.n)}</h2><p class="sub">${esc(g.line)}</p>`;
@@ -16532,8 +16898,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     else if (need) h += `<p class="muted">You'll need the ${esc(GOALS[g.needs].n.toLowerCase())} first.</p>`;
     else {
       const pct = Math.min(100, Math.round(100 * F2.coins / g.price));
-      h += `<div class="goalbar" role="img" aria-label="${pct}% saved"><span style="width:${pct}%"></span></div><p class="muted">${F2.coins} of ${g.price} ${coin5()} saved${F2.coins < g.price ? `: ${g.price - F2.coins} to go` : ""}.</p>
-      <div class="actions"><button class="btn primary" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>${k === "cellar" ? "Build it" : "Buy it"} (${g.price} ${coin5()})</button></div>`;
+      h += `<div class="goalbar" role="img" aria-label="${pct}% saved"><span style="width:${pct}%"></span></div><p class="muted">${F2.coins} of ${g.price} ${coin6()} saved${F2.coins < g.price ? `: ${g.price - F2.coins} to go` : ""}.</p>
+      <div class="actions"><button class="btn primary" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>${k === "cellar" ? "Build it" : "Buy it"} (${g.price} ${coin6()})</button></div>`;
     }
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -16542,7 +16908,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     h += [["walk", "Walk"], ["scooter", "Scooter"], ["car", "Car"]].map(([k, n]) => `<button class="btn small ${ride(F2) === k ? "primary" : "alt"}" data-ride="${k}" ${k !== "walk" && !owns(F2, k) ? "disabled" : ""}>${n}${k !== "walk" && !owns(F2, k) ? ` (${GOALS[k].price})` : ""}</button>`).join("") + `</div>`;
     ["scooter", "car"].filter((k) => !owns(F2, k)).forEach((k) => {
       const g = GOALS[k];
-      h += `<p class="eyebrow" style="margin-top:12px">${esc(g.n)}</p><p class="muted">${esc(g.line)} ${F2.coins} of ${g.price} ${coin5()} saved.</p><div class="actions"><button class="btn primary small" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>Buy it (${g.price} ${coin5()})</button></div>`;
+      h += `<p class="eyebrow" style="margin-top:12px">${esc(g.n)}</p><p class="muted">${esc(g.line)} ${F2.coins} of ${g.price} ${coin6()} saved.</p><div class="actions"><button class="btn primary small" data-goal="${k}" ${F2.coins < g.price ? "disabled" : ""}>Buy it (${g.price} ${coin6()})</button></div>`;
     });
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -16917,6 +17283,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var vanView = null;
   var vanSt2 = { slot: "bedding" };
+  var fishSpot = null;
+  var fishSt = {};
+  var fishT = null;
   var railOpen = false;
   var lastTrain = "";
   var lastFarm = 0;
@@ -17740,7 +18109,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       S2.doneIds.push(t2.id);
       S2.timer = null;
       sfx("chaching");
-      earn(5, "quest complete");
+      earn(QUEST_PAY, "quest complete");
       gainXp(1);
       S2.last = t2.title;
       countQuest();
@@ -17940,6 +18309,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     save2();
     refreshNotebook();
   }
+  var QUEST_PAY = 8;
   function paySub(t2, key) {
     F.subDone = F.subDone || {};
     const rec = F.subDone[t2.id] = F.subDone[t2.id] || { s: {}, at: Date.now() };
@@ -17952,7 +18322,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       if (p && p.crop && p.wateredAt && growth2(p) < 1) p.bonus = (p.bonus || 0) + QUEST_BOOST;
     });
     questBoost(F, QUEST_BOOST);
-    return 5;
+    return QUEST_PAY;
   }
   function paySunsamaSubs(list2) {
     const first = !F.subBaseline;
@@ -17978,7 +18348,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     (list2 || []).forEach((t2) => {
       if (!t2.completed || F.early[t2.id]) return;
       F.early[t2.id] = t2.day;
-      earn(5, "done early in Sunsama");
+      earn(QUEST_PAY, "done early in Sunsama");
       gainXp(1);
       countQuest();
       n++;
@@ -18017,6 +18387,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function countQuest() {
     const before = unlocked(F.totalQuests || 0).length;
     F.totalQuests = (F.totalQuests || 0) + 1;
+    addBait(F, 1);
     const now3 = unlocked(F.totalQuests);
     if (now3.length > before) {
       const u = now3[now3.length - 1];
@@ -18092,7 +18463,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       if (got.length === 1) sfx("chaching");
       const q = allTasks().find((x) => x.id === t2.id);
       if (q && q.early) F.early[t2.id] = q.early;
-      earn(5, "done in Sunsama");
+      earn(QUEST_PAY, "done in Sunsama");
       gainXp(1);
       countQuest();
       if (cur2 && cur2.id === t2.id) {
@@ -19506,6 +19877,7 @@ ${SIGNOFF[t2.who] || ""}`;
     ccView = null;
     hfView = null;
     railOpen = false;
+    fishSpot = null;
     vanView = null;
     keepItem = null;
     keepSpot = null;
@@ -19590,6 +19962,7 @@ ${SIGNOFF[t2.who] || ""}`;
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
       h = !st6 ? "" : st6.kind === "wine" ? stallMarketPanel(F, serving()) : st6.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st6.kind === "scoop" ? counterPanel2(F, { pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st6, dayKey(), sgHM()) }) : st6.kind === "cocoa" ? counterPanel3(F, { cart: true, server: isHere("mateo") }) : marketStallPanel(st6);
     } else if (railOpen && scene === "hlane") h = timetablePanel();
+    else if (fishSpot && SPOTS3[fishSpot].scene === scene) h = fishPanel(F, fishSpot, fishSt);
     else if (vanView && scene === "van") h = moodPanel(F, vanSt2);
     else if (hfView && scene === "barn") h = hfView === "extractor" ? extractorPanel(F) : hfView === "crock" ? crockPanel(F) : hfView === "press" ? pressPanel2(F, hfSt) : cavePanel(F);
     else if (hfView && scene === "hfarm") h = hfView === "house" ? farmhousePanel(F, isHere("felix")) : hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
@@ -19764,6 +20137,7 @@ ${SIGNOFF[t2.who] || ""}`;
       ctx();
       drawScene();
     });
+    if (fishSpot) c.querySelectorAll("[data-fish]").forEach((b) => b.onclick = () => fishGo(b.dataset.fish, b.dataset.k));
     c.querySelectorAll("[data-sup]").forEach((b) => b.onclick = () => {
       goalView = null;
       ctx();
@@ -19945,6 +20319,7 @@ ${SIGNOFF[t2.who] || ""}`;
       ccView = null;
       hfView = null;
       railOpen = false;
+      fishSpot = null;
       vanView = null;
       ccSt.made = null;
       keepItem = null;
@@ -20298,6 +20673,7 @@ ${SIGNOFF[t2.who] || ""}`;
     ["spring", "summer", "autumn", "winter"].forEach((k) => document.body.classList.toggle("season-" + k, k === ssn));
     const day = dayKey(), wet = outside() && rainyOn(day), fest = festivalOn(day);
     $("rain").hidden = !wet;
+    $("rain").classList.toggle("light", rainLevel(day) === 1);
     if (scene === "vineyard" && fest && fest.id === "harvest" && S2.harvestSaid !== day) {
       S2.harvestSaid = day;
       setTimeout(() => speak("It's the grape harvest! Bunting's up, and every vine gives an extra bunch this week.", 6e3), 1500);
@@ -20313,12 +20689,13 @@ ${SIGNOFF[t2.who] || ""}`;
       setTimeout(() => speak("Weekend! Home things happen here at home. Any work quests still wait in town.", 5500), 2200);
     } else if (wet && S2.rainSaid !== day) {
       S2.rainSaid = day;
-      setTimeout(() => speak("Rainy day! Perfect for cosy indoor quests.", 4500), 1500);
+      const light = rainLevel(day) === 1;
+      setTimeout(() => speak(light ? "A light shower today. Brollies up!" : "Rainy day! Perfect for cosy indoor quests.", 4500), 1500);
     }
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
     tableKey = "";
     $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "farm" ? farmArt() : roomArt(scene);
-    $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene));
+    $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene) + (scene === "base" ? koiArt(F.fish && F.fish.koi || 0) : ""));
     if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));
     if (outside() && isDusk()) nightLights();
     const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: vineyardName(F), farm: "The garden", wineshop: shopName(F), orchard: "Ma Ma's orchard", flowers: "Ma Ma's flower farm", field: "The field", shore: "The foreshore", bay: "The bay", hfarm: "Wildflower Farm", hlane: "Honeybrook station", scoopshop: scoopState(F).name };
@@ -20453,6 +20830,83 @@ ${SIGNOFF[t2.who] || ""}`;
     m.classList.toggle("hairdown", down);
     m.classList.toggle("restyled", !!(w && (w.hair || w.dress || w.top)));
   }
+  function fishGo(a, k) {
+    if (a === "view") fishSt = { ...fishSt, view: k };
+    else if (a === "rod") {
+      if (!buyRod(F)) return;
+      sfx("chaching");
+      flash("A fishing rod");
+      speak("A proper rod! Let's see what's biting.", 3500);
+    } else if (a === "reelup") {
+      if (!buyReel(F)) return;
+      sfx("chime");
+      flash("The better reel");
+      speak("Smooth as anything. Fish beware.", 3e3);
+    } else if (a === "cast") {
+      const c = cast(F, fishSpot);
+      if (typeof c === "string") return;
+      clearTimeout(fishT);
+      fishSt = { cast: c };
+      sfx("pop");
+      fishT = setTimeout(fishBite, Math.max(0, c.bite - Date.now()));
+    } else if (a === "reel") {
+      const c = fishSt.cast;
+      if (!c) return;
+      clearTimeout(fishT);
+      if (!c.t0) fishSt = { msg: "Too soon! Whatever it was swam off with the worm." };
+      else if (!inZone(c.zone, markerAt(c.t0))) {
+        fishSt = { msg: "Splash! It got away." };
+        sfx("tap");
+      } else {
+        const r = land(F, c.fish, Math.random, addInv);
+        fishSt = { result: r };
+        gainXp(r.isNew ? 2 : 1);
+        if (r.isNew || r.id === "koi") {
+          sfx("yay");
+          act("cheer");
+          [0, 300].forEach((d, i) => setTimeout(() => mprop("sparkle", mel.x + (i ? 20 : -20), mel.y - 60, 1600), d));
+        } else sfx("chime");
+        if (r.id === "koi") {
+          speak("A golden koi! It's going in the pond at home.", 5e3);
+          drawScene();
+        } else if (evanHere() && !FISH[r.id].junk) setTimeout(() => evanSays(pick(["A fish! A real fish!", "It's wiggly!", "Can I hold it?", "Big one, Mama!"])), 800);
+      }
+    }
+    save2();
+    dressMel();
+    ctx();
+  }
+  function fishBite() {
+    const c = fishSt.cast;
+    if (!c || !fishSpot) return;
+    c.t0 = Date.now();
+    sfx("chime");
+    dressMel();
+    ctx();
+    fishT = setTimeout(() => {
+      if (fishSt.cast === c) {
+        fishSt = { msg: "It nibbled the worm and slipped away while you weren't looking." };
+        dressMel();
+        ctx();
+      }
+    }, ESCAPE);
+  }
+  var MEL_BROLLY = { kind: "brolly", a: "#9AA9DD", b: "#FFFDF6", pat: "dots" };
+  var EVAN_COAT = { kind: "coat", a: "#F3C969", b: "#E8566C" };
+  var rainDressed = null;
+  function dressRain() {
+    const wet = outside() && rainyOn(dayKey()) && !($("mel") && $("mel").classList.contains("sup")), k = wet ? "y" : "";
+    if (k === rainDressed) return;
+    rainDressed = k;
+    const mr = $("melRain"), er = $("evanRain"), ev = $("evan");
+    if (mr) mr.innerHTML = wet ? brollyArt(MEL_BROLLY, 1) : "";
+    if (er) er.innerHTML = wet ? hoodArt(EVAN_COAT, 0.61, -28, 8.6) : "";
+    if (ev) {
+      ev.classList.toggle("raincoat", wet);
+      if (wet) ev.style.setProperty("--tee", EVAN_COAT.a);
+      else ev.style.removeProperty("--tee");
+    }
+  }
   function dressMel() {
     const d = F.decor || {}, show2 = (id, on) => {
       const e = $(id);
@@ -20466,11 +20920,17 @@ ${SIGNOFF[t2.who] || ""}`;
         if (cone) $("melConeTop").style.fill = S2.cone.col || "#F4C7CF";
       }
     }
+    show2("melRod", !!fishSpot && SPOTS3[fishSpot].scene === scene);
+    {
+      const r = $("melRod");
+      if (r) r.classList.toggle("bite", !!(fishSt.cast && fishSt.cast.t0));
+    }
     show2("melBow", wearing(F, "me_bow"));
     show2("melHat", wearing(F, "me_hat") && outside());
     show2("melScarf", wearing(F, "me_scarf") && !pj);
     show2("melPj", pj);
     applyWear(pj);
+    dressRain();
     const m = $("mel");
     if (m) m.style.visibility = S2.sleep && scene === "room" || cruisingNow() ? "hidden" : "";
   }
@@ -20634,6 +21094,7 @@ ${SIGNOFF[t2.who] || ""}`;
       ccView = null;
       hfView = null;
       railOpen = false;
+      fishSpot = null;
       vanView = null;
       resetScene();
       if (id === "post") fetchPost().then(() => {
@@ -20924,10 +21385,10 @@ ${SIGNOFF[t2.who] || ""}`;
       return;
     }
     if (id === "window") {
-      const shut5 = F.curtains ? F.curtains === "closed" : isDusk() || !!S2.sleep;
-      F.curtains = shut5 ? "open" : "closed";
+      const shut6 = F.curtains ? F.curtains === "closed" : isDusk() || !!S2.sleep;
+      F.curtains = shut6 ? "open" : "closed";
       sfx("paper", true);
-      speak(shut5 ? "Curtains open. Hello, sky." : "Curtains closed. Cosy.", 2500);
+      speak(shut6 ? "Curtains open. Hello, sky." : "Curtains closed. Cosy.", 2500);
       save2(true);
       return;
     }
@@ -21293,6 +21754,15 @@ ${SIGNOFF[t2.who] || ""}`;
       render();
       return;
     }
+    if (id === "fishriver" || id === "fishlake" || id === "fishsea") {
+      fishSpot = spotIn(scene);
+      fishSt = {};
+      fishState(F);
+      mel.dir = scene === "shore" ? -1 : 1;
+      sfx("paper", true);
+      render();
+      return;
+    }
     if ((id === "bluebell" || id === "figtree") && scene === "hlane") {
       const g = letGuests(dayKey())[id === "bluebell" ? 0 : 1];
       speak(`${VILLAGE[id].line}${g && g.length ? ` Staying this week: ${g.map((x) => (NPCS.find((n) => n.id === x) || {}).name).join(" and ")}.` : ""}`, 5e3);
@@ -21598,9 +22068,9 @@ ${SIGNOFF[t2.who] || ""}`;
   }
   var stallItems = (st6) => !st6.produce ? todaysGoods(st6) : Object.keys(CROPS).filter((c) => !["tulip", "sunflower"].includes(c) && ITEMS[c] && Object.values(ITEMS).some((it) => it.crop === c && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
   function todaysGoods(st6, day = dayKey()) {
-    const ev = eventOn(day), pool = [...(st6.items || []).slice(1), ...(POOLS[ev ? ev.kind : ""] || {})[st6.id] || []].filter((id) => ITEMS[id]);
+    const ev = eventOn(day), pool2 = [...(st6.items || []).slice(1), ...(POOLS[ev ? ev.kind : ""] || {})[st6.id] || []].filter((id) => ITEMS[id]);
     const n = Math.max(2, (st6.items || []).length);
-    return [...(st6.items || []).slice(0, 1), ...pool.map((id) => [hash(day + ":" + st6.id + ":" + id), id]).sort((a, b) => a[0] - b[0]).slice(0, n).map(([, id]) => id)];
+    return [...(st6.items || []).slice(0, 1), ...pool2.map((id) => [hash(day + ":" + st6.id + ":" + id), id]).sort((a, b) => a[0] - b[0]).slice(0, n).map(([, id]) => id)];
   }
   var stallPrice = (id) => ITEMS[id].price || (ITEMS[id].sell || 2) + 2;
   function marketStallPanel(st6) {
@@ -22440,7 +22910,7 @@ ${SIGNOFF[t2.who] || ""}`;
       render();
       return;
     }
-    if (rainyOn(dayKey())) {
+    if (stormyOn(dayKey())) {
       speak("Choppy and rainy out there. Better on a sunny day.", 3500);
       render();
       return;
@@ -22856,7 +23326,7 @@ ${SIGNOFF[t2.who] || ""}`;
     } else speak(pick(["Capped and back in the vault.", "Clink clink. Back in the vault it goes.", "Another handful of jewels. Lovely."]), 3e3);
   }
   var ROUTINE_STEP = 1;
-  var ROUTINE_DONE = 5;
+  var ROUTINE_DONE = 8;
   function routineCoins(r) {
     S2.rCoins = S2.rCoins || {};
     let n = 0;
