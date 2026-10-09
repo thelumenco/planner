@@ -62,6 +62,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#notebook [data-nb="w"] >> nth=1');
   check(await page.locator("#nbTitle").textContent().then(t => /0[.,]75 L/.test(t)), "water note adds a glass and a bottle (750 ml)");
   await page.fill("#nbTrack", "1000"); await page.click('#notebook [data-nb="wset"]');
+  await page.waitForFunction(() => /^1L/.test(document.getElementById("waterNote").textContent), null, { timeout: 3000 }).catch(() => {});
   check(await page.locator("#waterNote").textContent().then(t => /^1L/.test(t)), "water total can be typed in");
   await page.click('[data-track="steps"]');
   await page.fill("#nbTrack", "2500"); await page.click('#notebook [data-nb="sset"]');
