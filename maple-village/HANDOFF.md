@@ -1819,3 +1819,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **New shelves:** two in the Cocoa Room (`cocoa1`, `cocoa2`), one in the greenhouse (`green1`, on the glass) and one in the old mill (`mill1`, by the photograph).
 - **Fridge:** the `fridge` spot on the home fridge door has no shelf and takes only items flagged `magnet` (the Ronda magnet, `iman`). Magnets don't go on shelves.
 - Rule for future towns: give every non-food souvenir a `KEEP_LINES` entry. A town magnet gets `magnet: true`.
+
+### Round 126: the bamboo grove, in the right view
+- Kyoto's grove (`town-kyoto.js` `grove`) is now drawn in the same raised view as the trees. Rows of thin culms, each rooted at its own spot on the ground and about twice a maple's height (88–112px). They're drawn back to front so the near ones overlap the far ones, with joints, leaf sprays near the top and a low brushwood fence with short posts.
+- **Playbook (Mel, round 126):** tall things must stand in the scene's raised view. Root each one on the ground, size it against the trees (a maple is about 45px), and crowd stands of plants rather than drawing a few full-height stripes; those read as a wall standing upright next to things lying flat on the ground.
