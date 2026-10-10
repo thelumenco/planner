@@ -1906,3 +1906,5 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Celeste starts at 10 (11 on Mondays, after her walk in the woods).
   - Every morning a pair browse the shelves, standing, 10:00–11:15 then 11:15–12 (`BROWSE_SEATS` in tours.js). The pair can come from the night-market visitors too, because on Sundays every day tourist is busy.
   - `groupFor` no longer returns undefined from an empty pool.
+- **Notebook fix (round 130):** `refreshNotebook` runs on every render. It used to rebuild the water/steps tracker page and wipe a half-typed total. It now keeps the `#nbTrack` value and focus, like the quest page keeps `#nbAsk`. This was the real cause of the flaky "water total can be typed in" check.
+- **Farm test fix:** the `flpatch` times now come from the URL's date and time (the game clock), not the real time of day.

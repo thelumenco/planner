@@ -12662,7 +12662,15 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       const nb = page.querySelector(".nbbody");
       if (nb && !focus2) nb.scrollTop = top;
       if (fsel && !focus2) page.querySelector(fsel)?.focus({ preventScroll: true });
-    } else page.innerHTML = open.kind === "tracker" ? trackerPage(open.which) : open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
+    } else if (open.kind === "tracker") {
+      const keep6 = $("nbTrack") ? $("nbTrack").value : "", typing = document.activeElement && document.activeElement.id === "nbTrack";
+      page.innerHTML = trackerPage(open.which);
+      if ($("nbTrack") && keep6) $("nbTrack").value = keep6;
+      if (typing && $("nbTrack")) {
+        $("nbTrack").focus();
+        focus2 = false;
+      }
+    } else page.innerHTML = open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
     page.className = "nbpage" + (open.kind === "mail" && open.item.from === "crier" ? " news" : open.kind === "tracker" ? " mini" : "");
     const log = page.querySelector(".nbchat");
     if (log) log.scrollTop = log.scrollHeight;

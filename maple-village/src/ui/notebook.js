@@ -72,7 +72,11 @@ export function refreshNotebook(focus){
     if ($("nbAsk")) { $("nbAsk").value = keep; if (typing) $("nbAsk").focus(); }
     const nb = page.querySelector(".nbbody"); if (nb && !focus) nb.scrollTop = top;
     if (fsel && !focus) page.querySelector(fsel)?.focus({preventScroll: true});
-  } else page.innerHTML = open.kind === "tracker" ? trackerPage(open.which) : open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
+  } else if (open.kind === "tracker") {   // keep a half-typed water or steps total (and the cursor) when the game redraws round it
+    const keep = $("nbTrack") ? $("nbTrack").value : "", typing = document.activeElement && document.activeElement.id === "nbTrack";
+    page.innerHTML = trackerPage(open.which);
+    if ($("nbTrack") && keep) $("nbTrack").value = keep; if (typing && $("nbTrack")) { $("nbTrack").focus(); focus = false; }
+  } else page.innerHTML = open.kind === "digest" ? digestPage(open.item) : mailPage(open.item);
   page.className = "nbpage" + (open.kind === "mail" && open.item.from === "crier" ? " news" : open.kind === "tracker" ? " mini" : "");
   const log = page.querySelector(".nbchat"); if (log) log.scrollTop = log.scrollHeight;
   if (focus) (page.querySelector("[data-nb]:not([data-nb=close])") || page.querySelector("[data-nb]"))?.focus({preventScroll: true});
