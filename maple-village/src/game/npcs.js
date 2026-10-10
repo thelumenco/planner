@@ -51,7 +51,8 @@ export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.di
 const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone", fish: "rod", guitar: "guitar", sketch: "sketchbook", photo: "camera", notes: "notebook", doze: "newspaper",
   parasol: "parasol", wheel: "claycup", cranes: "crane", go: "goboard", skewer: "skewer", brush: "brush", fortune: "fortune",
   kite: "kite", pick: "tbasket", nets: "net", stack: "stone",
-  knit: "knit", bocce: "bocce", poles: "poles", row: "oar", read: "book", poem: "notebook"};   // (and these: Cinque Terre, round 134; "sunbathe" is a towel)   // (and these: Jeju, round 129; "luck" is an arm and "tandem" a bike)   // (and these: Kyoto, round 122)   // (the last five: Ronda, round 107)
+  knit: "knit", bocce: "bocce", poles: "poles", row: "oar", read: "book", poem: "notebook",
+  rummage: "hanger", binoculars: "binocs", crown: "crownw", drone: "remote", cuppa: "cuppa", footy: "footy", swirl: "wineglass", juggle: "juggle", fan: "fan", carry: "flats", feedroo: "roobag", bbq: "tongs", skim: "skim", cards: "cards", mallow: "mallow"};   // (and these: Bellbird Valley, round 144; "wave", "taichi", "crouch" and "lookup" are poses)   // (and these: Cinque Terre, round 134; "sunbathe" is a towel)   // (and these: Jeju, round 129; "luck" is an arm and "tandem" a bike)   // (and these: Kyoto, round 122)   // (the last five: Ronda, round 107)
 const outdoors = s => OUTDOOR.includes(s);
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 

@@ -344,4 +344,4 @@ export const SOURCE = {
   almond: "Ronda's market", sevilla: "Ronda's market", jamon: "Ronda's market", payoyo: "Ronda's market", membrillo: "Ronda's market",
   yuzu: "Kyoto's market", miso: "Kyoto's market", tofu: "Kyoto's market", mochi: "Kyoto's market",
   tangerine: "Jeju (or your own tangerine tree)", hallabong: "Jeju's market", omija: "Jeju's market", blackpork: "Jeju's market", abalone: "Jeju's divers' house",
-  goldensyrup: "Bellbird Valley's general store", wattleseed: "Bellbird Valley's general store", raspberry: "Bellbird Valley's berry farm"};
+  goldensyrup: "Bellbird Valley's general store", wattleseed: "Bellbird Valley's general store", raspberry: "your garden (canes from the market, once you've been to Bellbird Valley) or the berry farm"};

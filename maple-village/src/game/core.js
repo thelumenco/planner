@@ -2324,6 +2324,9 @@ function townSpot(id){
   if (room) { sfx("paper", true); setScene(room, [260, 560]); setTimeout(() => speak(T.rooms[room].say, 5000), 700); if (town === "kyoto") setTimeout(() => stampHere(room), 5800);
     // a touch (round 134): Beppe gives Evan a warm heel of focaccia (once a day)
     if (room === "ct_focacceria" && inParty(F, "evan") && !evanNight() && cinqueState(F).bread !== dayKey()) setTimeout(() => { if (scene !== "ct_focacceria" || !isHere("beppe")) return; cinqueState(F).bread = dayKey(); npcSay("beppe", "Per il piccolo! The best bit, the crusty end."); setTimeout(() => evanSays("warm bread! mmm!"), 2200); save(); }, 3200);
+    // touches (round 144): Mrs Dunn slips Evan a Freddo from the jar (once a day); Pinot the cellar dog trots in to the tasting room after you
+    if (room === "bv_store" && inParty(F, "evan") && !evanNight() && bbState(F).freddo !== dayKey()) setTimeout(() => { if (scene !== "bv_store" || !isHere("mrsdunn")) return; bbState(F).freddo = dayKey(); npcSay("mrsdunn", "Here, love. One for the little fella. Don't tell your mum. Oh, she's right there."); setTimeout(() => evanSays("a chocolate FROG! thank you!"), 2400); save(); }, 3200);
+    if (room === "bv_tasting") setTimeout(() => { if (scene !== "bv_tasting") return; speak("Pinot the cellar dog pads in behind you, sniffs your shoes, and flops down under the bar with a sigh.", 4500); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays("doggy! he's called WINE!"), 2000); }, 5600);
     // a touch (round 129): the divers give Evan a sea snail shell (once)
     if (room === "jj_haenyeo" && inParty(F, "evan") && !evanNight() && !jejuState(F).shell) setTimeout(() => { if (scene !== "jj_haenyeo" || !isHere("halmang")) return; jejuState(F).shell = true; addInv("j_shell", 1);
       npcSay("halmang", "For the little one. Listen: the sea's inside."); setTimeout(() => evanSays("I can hear it, Mama! the SEA!"), 2400); flash("A sea snail shell for Evan"); save(); }, 3200);
@@ -2775,7 +2778,7 @@ function vineTick(){
 // what a stall has out: the produce stall's vegetables and berries follow the season (the same as the seed packets at Hana's)
 // A stall's goods today: its signature item (the first in tours.js) always, plus a different handful each market day
 // from the rest of its range (data/stall-goods.js POOLS), picked by the date so the day's mix stays put
-const stallItems = st => !st.produce ? todaysGoods(st) : Object.keys(CROPS).filter(c => !["tulip", "sunflower"].includes(c) && (c !== "chickpea" || (F.towns && F.towns.cinque)) && ITEMS[c] && !CROPS[c].herb && Object.values(ITEMS).some(it => it.crop === c && !it.greenhouse && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
+const stallItems = st => !st.produce ? todaysGoods(st) : Object.keys(CROPS).filter(c => !["tulip", "sunflower"].includes(c) && (c !== "chickpea" || (F.towns && F.towns.cinque)) && (c !== "raspberry" || (F.towns && F.towns.bellbird)) && ITEMS[c] && !CROPS[c].herb && Object.values(ITEMS).some(it => it.crop === c && !it.greenhouse && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
 function todaysGoods(st, day = dayKey()){
   const ev = eventOn(day), pool = [...(st.items || []).slice(1), ...(((POOLS[ev ? ev.kind : ""] || {})[st.id]) || [])].filter(id => ITEMS[id]);
   const n = Math.max(2, (st.items || []).length);

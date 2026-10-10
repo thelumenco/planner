@@ -2039,3 +2039,54 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Mingling, not a grid (round 140b, Mel):** `discoFloor(day)` places the crowd in knots of 2–3 round 7 points (`KNOTS`). Couples go together facing each other: Mum and Dad, and Marcus and Angellina once their date night ends at 9. Positions are jittered per person.
   - About half drift between their knot and the next (`wander`). The rest stay put.
   - Each dancer has a move for the night (`DISCO_MOVES`): dance (the Ronda sway), boogie, armsup, twirl, shuffle and point, all with CSS in npcs.css.
+
+### Rounds 141–144: Bellbird Valley, the Vines (campervan day trips)
+- **The trip (141, game/bellbird.js):** step into the van on the lane, open the dashboard map (`mapPanel`), pick up to four passengers, and drive to a stop on the map.
+  - Fuel is 6 a leg plus 1 per grown-up (`fuelFor`, BFS `legs` over `BB_ROADS`).
+  - The map reveals the stops Mel has been to and those one road away (`known`). Each stop gives a passport stamp.
+  - At a stop, tap the parked van (`bvvan_<x>`) to drive on or go home. Day trips only: leave 7am–6pm, home by 10.
+  - The roads to the Coast Road, Lavender Hills and Tablelands are on the map but closed (`BB_SOON`). Those regions come later.
+- **Six stops (data/bellbird.js `BB_TOWNS`, by "van"), each two screens and three rooms:**
+  - Valley Gate: store, farm-gate shed, op shop.
+  - Balloon Lookout: coffee caravan, balloon shed, gallery café.
+  - Cellar Door: tasting room, barrel cave, Long Table.
+  - Berry Farm & Chocolaterie: Berry Barn, jam kitchen, chocolaterie.
+  - Gum Creek Sanctuary: visitor centre, platypus house, wildlife hospital.
+  - Riverside Camp: camp kitchen, camp store, canoe shed.
+- **Art:** art/bellbird-vines.js (screens), art/bellbird-rooms.js (rooms, central rdspot = room id). The campfire is lit from 5pm.
+- **Music:** 24 live tracks in audio.js: `bb_*` for the stops, room ids for the rooms.
+- **Rooms (142, game/bbrooms.js `bbRoomPanel`):**
+  - Treats to eat there (`TREATS`, `data-bb="treat:room:k"`).
+  - Shops (`BB_GOODS` merged into TOWN_GOODS, bought with `data-rbuy`). The op shop shows four treasures a day (`opshopToday`).
+  - The chocolaterie's free tasting is once a day. The long lunch is once a day.
+  - The platypus window and the camp noticeboard just speak.
+- **Kitchen:** Bellbird specials (pavlova, damper, wattleseed scones; `special: "bellbird"`). Golden syrup, wattleseed and raspberries go in the larder. Wattleseed, raspberry and golden syrup are also gelato/bonbon ingredients (scoop.js INGR).
+- **People (143, data/bb-people.js, `local: "bellbird"`):** 44 in all.
+  - Locals at every stop.
+  - The camp's travelling neighbours (`neighbour: true`): Bev and Ron, Kai and Lou, the Nguyens (Bao and Mai are kids), Hanne and Archie. They gather at the fire from 5pm (`FIRE_FOLK`).
+  - Day-trippers (`tourist: true`).
+- **Activities (143, game/bbacts.js, `data-bba`, `bbRoom`/`bbSt` in core):**
+  - The balloon ride: dawn 6–9 or golden hour 5–7. 30 for Mel, 10 for Evan, 15 for each other passenger. Burn, hold or drift to the right height for each sight, then land soft. The first flight gives a certificate keepsake.
+  - Riddling with Jono: turn every chalk mark up. This unlocks the home riddling rack.
+  - Pick your own: berries once a day.
+  - Dipping two strawberries at the chocolaterie gives `b_dipped`.
+  - Feeding Pip the joey: in order. After three days she's released.
+  - The canoe: alternate strokes.
+  - Marshmallows at the fire from 5pm: a bag gives 6; pull out at 3 for golden.
+  - The rope swing is a line, and Evan joins in.
+- **Family (144):** 19 acts, all new and never used in any earlier town, 3–4 at every stop (`acts` in each stop). Props are in people.js; CSS is at the end of npcs.css.
+  - Valley Gate: Ma Ma rummages (cardigan on a hanger), Gong Gong uses binoculars, Angellina makes a wattle crown.
+  - Balloon Lookout: Darren flies a drone, Mum waves at the balloons (dawn and golden hour), Dad has a cuppa.
+  - Cellar Door: Marcus kicks a footy, Gong Gong does tai chi (mornings), Mum swirls a glass of Pinot.
+  - Berry farm: Dad juggles strawberries, Ma Ma fans herself, Darren carries the berry flats.
+  - Gum Creek: Mum feeds the roos, Marcus crouches at the wombat hole, Angellina looks up at the koalas.
+  - Riverside Camp: Dad on the barbecue (lunch and dinner), Gong Gong skims stones, Ma Ma plays cards, Darren toasts marshmallows (from 5).
+  - **Rule for future towns:** check the test "none from the other towns" before reusing any act.
+- **Touches:** Mrs Dunn's Freddo for Evan (once a day), Pinot the cellar dog in the tasting room, Evan's butterflies in the berry rows.
+- **Home links:**
+  - The riddling rack (vineyard.js `onRack`/`riddleDays`): cellar sparkling sells for +2 a bottle per day on the rack, up to 5 days. Staff don't auto-stock racked bottles.
+  - Raspberry canes at the market seeds tab once Mel's been (crop `raspberry`).
+  - The Bellbird fridge magnet goes on the new `fridge4` spot.
+  - A sticker on the van after the first stamp.
+  - Bellbird sparkling costs 38, above Mel's best riddled bottle.
+- **Not done yet:** Pinot Noir and Chardonnay cuttings for the vineyard. New grape kinds need vineyard support.

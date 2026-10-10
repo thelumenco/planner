@@ -15,7 +15,8 @@ export const CROPS = {
   mint:{n:"Mint", ns:"bunches of mint", dur:4*H, yield:3, herb:true}, rosemary:{n:"Rosemary", ns:"sprigs of rosemary", dur:6*H, yield:3, herb:true},
   chives:{n:"Chives", ns:"bunches of chives", dur:3*H, yield:3, herb:true}, thyme:{n:"Thyme", ns:"bunches of thyme", dur:6*H, yield:3, herb:true},
   leek:{n:"Leek", ns:"leeks", dur:8*H, yield:3},
-  chickpea:{n:"Chickpeas", ns:"handfuls of chickpeas", dur:6*H, yield:3}   // round 132: for farinata (Cinque Terre)
+  chickpea:{n:"Chickpeas", ns:"handfuls of chickpeas", dur:6*H, yield:3},   // round 132: for farinata (Cinque Terre)
+  raspberry:{n:"Raspberry", ns:"punnets of raspberries", dur:24*H, yield:4}   // round 144: canes from Bellbird Valley's berry farm
 };
 export const ITEMS = {
   tulip_seed:{e:"🌷", n:"Tulip bulbs", kind:"seed", price:2, crop:"tulip", tab:"seeds", seasons:["autumn","winter","spring"]},
@@ -29,9 +30,11 @@ export const ITEMS = {
   pea_seed:{n:"Pea seeds", kind:"seed", price:3, crop:"pea", tab:"seeds", seasons:["spring"]},
   pumpkin_seed:{n:"Pumpkin seeds", kind:"seed", price:6, crop:"pumpkin", tab:"seeds", seasons:["autumn","winter"]},
   leek_seed:{n:"Leek seedlings", kind:"seed", price:4, crop:"leek", tab:"seeds", seasons:["winter"]},
+  raspberry_cane:{n:"Raspberry canes", kind:"seed", ico:"seed:raspberry", price:6, crop:"raspberry", tab:"seeds", visited:"bellbird", seasons:["spring","summer","autumn"]},
   chickpea_seed:{n:"Chickpea seeds", kind:"seed", ico:"seed:chickpea", price:4, crop:"chickpea", tab:"seeds", visited:"cinque", seasons:["spring","summer","autumn"]},
   // round 132: pine nuts at the market's deli once Mel's been to Cinque Terre (visited)
   chickpea:{n:"Chickpeas", kind:"ingredient", price:3, sell:2, what:"for farinata at the kitchen"},
+  raspberry:{n:"Raspberries", kind:"ingredient", price:3, sell:2, what:"berry pavlova at the kitchen, raspberry gelato and bonbons"},
   pinenuts:{n:"Pine nuts", kind:"ingredient", price:6, sell:3, tab:"deli", visited:"cinque", what:"for pesto (in the loft, once Nonna Pina's shown you) and pine nut gelato"},
   pepper_seed:{n:"Pepper seeds", kind:"seed", price:5, crop:"pepper", tab:"seeds", seasons:["summer"]},
   // round 109: herb seeds, for the greenhouse only (all year round, once the greenhouse is built)

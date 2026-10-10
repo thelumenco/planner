@@ -27,7 +27,11 @@ export const BB_TOWNS = {
       mama: {bg_gate: [[300, 460], [250, 420]], bg_bridge: [[380, 460], [300, 500]]}, gonggong: {bg_gate: [[230, 520], [240, 530]], bg_bridge: [[260, 520], [270, 530]]},
       darren: {bg_gate: [[380, 480], [180, 440]], bg_bridge: [[200, 360], [420, 480]]}, marcus: {bg_gate: [[420, 440], [300, 520]], bg_bridge: [[440, 380], [300, 460]]},
       angelina: {bg_gate: [[340, 520], [280, 400]], bg_bridge: [[330, 480], [420, 420]]}}),
-    acts: {}, rooms: {
+    acts: {   // round 144: what the family does here (and nowhere else)
+      mama: {bv_opshop: {act: "rummage", at: [150, 450], dir: -1}},
+      gonggong: {bg_bridge: {act: "binoculars", at: [150, 470], dir: -1}},
+      angelina: {bg_gate: {act: "crown", at: [150, 372], dir: -1}}
+    }, rooms: {
       bv_store: {door: "bvstore", n: "Dunn's General Store", music: "bv_store", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The general store: shelves to the ceiling, jars of lollies, a post office counter in the corner, and Mrs Dunn behind the till."},
       bv_shed: {door: "bvshed", n: "The farm-gate shed", music: "bv_shed", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The farm-gate shed: crates of apples, trays of eggs, honey and jam on a plank shelf, buckets of flowers, and a tin for the money."},
       bv_opshop: {door: "bvopshop", n: "The op shop", music: "bv_opshop", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The op shop: racks of cardigans, shelves of china, old records, a box of board games, and Joan and Marg drinking tea behind the counter."}},
@@ -56,7 +60,11 @@ export const BB_TOWNS = {
       mama: {bl_paddock: [[240, 470], [300, 520]], bl_valley: [[300, 360], [240, 380]]}, gonggong: {bl_paddock: [[200, 520], [210, 530]], bl_valley: [[230, 330], [240, 340]]},
       darren: {bl_paddock: [[420, 460], [330, 540]], bl_valley: [[420, 340], [180, 360]]}, marcus: {bl_paddock: [[400, 520], [280, 440]], bl_valley: [[440, 360], [300, 300]]},
       angelina: {bl_paddock: [[320, 540], [260, 430]], bl_valley: [[340, 380], [400, 320]]}}),
-    acts: {}, rooms: {
+    acts: {
+      darren: {bl_valley: {act: "drone", at: [330, 380], dir: 1}},
+      mum: {bl_paddock: {act: "wave", at: [236, 470], dir: 1, hours: [[7*60, 9*60], [17*60, 19*60]]}},
+      dad: {bl_paddock: {act: "cuppa", at: [360, 500], dir: 1}}
+    }, rooms: {
       bv_coffee: {door: "bvcoffee", n: "The coffee caravan", music: "bv_coffee", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "Inside the coffee caravan: a tiny espresso machine, a chalkboard, jars of biscuits, and fairy lights round the hatch."},
       bv_balloonshed: {door: "bvballoonshed", n: "The balloon shed", music: "bv_balloonshed", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The balloon shed: wicker baskets, burners, folded rainbow envelopes, and a big map of the valley with the flight paths pinned on it."},
       bv_gallery: {door: "bvgallery", n: "The gallery café", music: "bv_gallery", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The gallery café: paintings of the valley on every wall, a long window over the view, and the smell of scones."}},
@@ -84,7 +92,11 @@ export const BB_TOWNS = {
       mama: {bc_vines: [[260, 480], [300, 530]], bc_lawn: [[360, 440], [300, 500]]}, gonggong: {bc_vines: [[220, 540], [230, 550]], bc_lawn: [[240, 500], [250, 510]]},
       darren: {bc_vines: [[420, 460], [330, 520]], bc_lawn: [[420, 470], [200, 520]]}, marcus: {bc_vines: [[400, 530], [280, 460]], bc_lawn: [[400, 520], [330, 440]]},
       angelina: {bc_vines: [[330, 540], [260, 450]], bc_lawn: [[440, 440], [280, 470]]}}),
-    acts: {}, rooms: {
+    acts: {
+      marcus: {bc_lawn: {act: "footy", at: [384, 530], dir: -1}},
+      gonggong: {bc_vines: {act: "taichi", at: [430, 500], dir: -1, hours: [[7*60, 11*60]]}},
+      mum: {bc_lawn: {act: "swirl", at: [130, 420], dir: 1}}
+    }, rooms: {
       bv_tasting: {door: "bvtasting", n: "The tasting room", music: "bv_tasting", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The tasting room: a long timber bar, bottles in racks to the ceiling, and a window onto the vines."},
       bv_cave: {door: "bvcave", n: "The barrel cave", music: "bv_cave", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The barrel cave: cool and dim, barrels in rows, and racks of sparkling wine tilted neck-down, waiting to be turned."},
       bv_restaurant: {door: "bvrestaurant", n: "The Long Table", music: "bv_restaurant", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The Long Table: one huge table down the middle, white cloths, jugs of wildflowers, and a view of the vines."}},
@@ -107,13 +119,17 @@ export const BB_TOWNS = {
     blurb: "Pick-your-own berry rows with a café and a jam kitchen, and a big chocolaterie with free tastings and a playground.",
     arriveLine: "The Berry Farm: rows and rows of strawberries and raspberry canes, a red barn café, and from somewhere down the hill, the smell of chocolate.",
     evanArrive: ["strawberries!", "can I pick?", "I smell CHOCOLATE"],
-    evanScreen: {bb_rows: ["red ones and pink ones!", "a red barn!"], bb_choc: ["a playground!", "a chocolate house!"]},
+    evanScreen: {bb_rows: ["red ones and pink ones!", "a red barn!", "a butterfly! wait for me, butterfly!", "I nearly caught a white butterfly!"], bb_choc: ["a playground!", "a chocolate house!"]},
     hints: {bb_rows: "The berry rows: pick-your-own, the berry café, the jam kitchen, and the van. South: the chocolaterie.", bb_choc: "The chocolaterie and its playground. North: the berry rows."},
     spots: fam({mum: {bb_rows: [[300, 460], [240, 500]], bb_choc: [[260, 420], [320, 460]]}, dad: {bb_rows: [[380, 480], [260, 530]], bb_choc: [[200, 440], [380, 470]]},
       mama: {bb_rows: [[220, 470], [300, 520]], bb_choc: [[300, 480], [240, 440]]}, gonggong: {bb_rows: [[200, 540], [210, 550]], bb_choc: [[230, 500], [240, 510]]},
       darren: {bb_rows: [[420, 460], [330, 540]], bb_choc: [[420, 440], [300, 520]]}, marcus: {bb_rows: [[400, 530], [280, 450]], bb_choc: [[400, 500], [340, 420]]},
       angelina: {bb_rows: [[340, 540], [260, 440]], bb_choc: [[440, 460], [280, 520]]}}),
-    acts: {}, rooms: {
+    acts: {
+      dad: {bb_choc: {act: "juggle", at: [210, 520], dir: -1}},
+      mama: {bb_rows: {act: "fan", at: [430, 560], dir: -1}},
+      darren: {bb_rows: {act: "carry", at: [250, 566], dir: 1}}
+    }, rooms: {
       bv_berrycafe: {door: "bvberrycafe", n: "The Berry Barn café", music: "bv_berrycafe", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The Berry Barn: scones and jam and cream, berry smoothies, gingham tablecloths and a dresser of jam jars."},
       bv_jam: {door: "bvjam", n: "The jam kitchen", music: "bv_jam", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The jam kitchen: copper pots bubbling, jars cooling on the sill, and the whole room smelling of hot strawberries."},
       bv_choc: {door: "bvchoc", n: "The chocolaterie", music: "bv_choc", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The chocolaterie: counters of chocolate as far as you can see, a chocolate fountain, and free tastings. Free!"}},
@@ -141,7 +157,11 @@ export const BB_TOWNS = {
       mama: {bk_bush: [[220, 470], [300, 520]], bk_koala: [[300, 500], [240, 440]]}, gonggong: {bk_bush: [[200, 540], [210, 550]], bk_koala: [[230, 520], [240, 530]]},
       darren: {bk_bush: [[420, 460], [330, 540]], bk_koala: [[420, 440], [300, 520]]}, marcus: {bk_bush: [[400, 530], [280, 450]], bk_koala: [[400, 500], [340, 420]]},
       angelina: {bk_bush: [[340, 540], [260, 440]], bk_koala: [[440, 460], [280, 520]]}}),
-    acts: {}, rooms: {
+    acts: {
+      mum: {bk_bush: {act: "feedroo", at: [350, 440], dir: -1}},
+      marcus: {bk_bush: {act: "crouch", at: [172, 352], dir: -1}},
+      angelina: {bk_koala: {act: "lookup", at: [240, 292], dir: -1}}
+    }, rooms: {
       bv_visitor: {door: "bvvisitor", n: "The visitor centre", music: "bv_visitor", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The visitor centre: a café, a gift shop of soft toys, and a wall of photos of the animals they've saved."},
       bv_platypus: {door: "bvplatypus", n: "The platypus house", music: "bv_platypus", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The platypus house: dark and hushed, a glass wall onto the water. Something small and brown zips past."},
       bv_hospital: {door: "bvhospital", n: "The wildlife hospital", music: "bv_hospital", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The wildlife hospital: baskets of joeys in knitted pouches, a vet nurse with a bottle, and a koala with a bandaged paw."}},
@@ -170,7 +190,12 @@ export const BB_TOWNS = {
       mama: {br_park: [[220, 470], [300, 520]], br_river: [[300, 360], [240, 300]]}, gonggong: {br_park: [[200, 540], [210, 550]], br_river: [[230, 330], [240, 340]]},
       darren: {br_park: [[420, 460], [330, 540]], br_river: [[420, 300], [300, 360]]}, marcus: {br_park: [[400, 530], [280, 450]], br_river: [[400, 340], [340, 300]]},
       angelina: {br_park: [[340, 540], [260, 440]], br_river: [[440, 320], [280, 360]]}}),
-    acts: {}, rooms: {
+    acts: {
+      dad: {br_park: {act: "bbq", at: [196, 300], dir: 1, hours: [[11*60 + 30, 13*60 + 30], [17*60 + 30, 19*60 + 30]]}},
+      gonggong: {br_river: {act: "skim", at: [186, 404], dir: 1}},
+      mama: {bv_campkitchen: {act: "cards", at: [430, 520], dir: -1}},
+      darren: {br_park: {act: "mallow", at: [196, 470], dir: 1, hours: [[17*60, 22*60]]}}
+    }, rooms: {
       bv_campkitchen: {door: "bvcampkitchen", n: "The camp kitchen", music: "bv_campkitchen", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The camp kitchen: a long table, a barbecue, a sink, and a noticeboard covered in notes from other campers."},
       bv_campstore: {door: "bvcampstore", n: "The camp store", music: "bv_campstore", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The camp store: ice creams, firewood, marshmallows, maps, a rack of thongs and a very old dog asleep by the door."},
       bv_canoe: {door: "bvcanoe", n: "The canoe shed", music: "bv_canoe", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The canoe shed: red and yellow canoes, paddles on hooks, life jackets in every size, and a map of the river."}},
@@ -317,7 +342,7 @@ export const BB_GOODS = {
   b_myrtle: {n: "Lemon myrtle tea", kind: "gift", to: ["mama", "mum", "angelina", "gonggong"], price: 7, shop: "bv_gallery", art: ["box", "#9CC27E", "#F3E27A"], say: "Lemon myrtle tea! It smells more like lemon than lemons do."},
   b_pinot: {n: "Bellbird Pinot Noir", kind: "gift", to: ["dad", "mum", "darren", "marcus"], price: 18, shop: "bv_tasting", art: ["bottle", "#6B2A3A", "#F3E7C8"], say: "Pinot from the valley! Light and cherry-ish. Perfect with a roast."},
   b_chard: {n: "Bellbird Chardonnay", kind: "gift", to: ["mum", "angelina", "mama", "dad"], price: 16, shop: "bv_tasting", art: ["bottle", "#E8D88A", "#F3E7C8"], say: "Chardonnay from Bellbird Valley! Cold, with fish and chips on a Friday."},
-  b_sparkling: {n: "Bellbird sparkling", kind: "gift", to: "family", price: 22, shop: "bv_tasting", art: ["bottle", "#E8E0A0", "#2E3A34"], say: "Sparkling from the valley! Riddled by hand, they said. We'll save it for something good. Or open it now."},
+  b_sparkling: {n: "Bellbird sparkling", kind: "gift", to: "family", price: 38, shop: "bv_tasting", art: ["bottle", "#E8E0A0", "#2E3A34"], say: "Sparkling from the valley! Riddled by hand, they said. We'll save it for something good. Or open it now."},
   raspberry: {n: "Raspberries", kind: "ingredient", price: 3, sell: 2, shop: "bv_jam", art: ["apple", "#D9435A", "#7FA35A"], what: "berry pavlova at the kitchen, raspberry gelato (and pick your own in the rows outside)"},
   b_jam_rasp: {n: "Raspberry jam", kind: "gift", to: "family", price: 6, shop: "bv_jam", art: ["jar", "#C2334D", "#F3E7C8"], say: "Raspberry jam from the copper pots! Seeds and all. On scones, obviously."},
   b_jam_straw: {n: "Strawberry and rhubarb jam", kind: "gift", to: ["mama", "mum", "dad", "angelina"], price: 6, shop: "bv_jam", art: ["jar", "#E8566C", "#9CC27E"], say: "Strawberry and rhubarb! Sweet and sour. Like summer with its sleeves rolled up."},

@@ -39,7 +39,8 @@ export function campervan(x, y){
       <circle cx="${x + 46}" cy="${y-16}" r="3.4" style="fill:#F3C969"/><circle cx="${x-30}" cy="${y-4}" r="8" style="fill:#3A2E28"/><circle cx="${x + 28}" cy="${y-4}" r="8" style="fill:#3A2E28"/><circle cx="${x-30}" cy="${y-4}" r="3.4" style="fill:#FFFDF6"/><circle cx="${x + 28}" cy="${y-4}" r="3.4" style="fill:#FFFDF6"/><circle cx="${x-52}" cy="${y-22}" r="6" style="fill:#9FD3C2"/>`,
       `<path d="M${x-48} ${y-50} q0 -6 6 -6 h62 q6 0 6 6z"/><rect x="${x-50}" y="${y-50}" width="100" height="44" rx="8"/>${[-36, -14, 8].map(dx => `<rect x="${x + dx}" y="${y-46}" width="18" height="13" rx="3"/>`).join("")}<rect x="${x + 30}" y="${y-46}" width="16" height="14" rx="4"/><path d="M${x-6} ${y-28} v22"/><circle cx="${x-30}" cy="${y-4}" r="8"/><circle cx="${x + 28}" cy="${y-4}" r="8"/>`)}
     ${lit ? `<g pointer-events="none">${Array.from({length: 9}, (_, i) => `<circle class="twinkle" cx="${x-46 + i*11}" cy="${y-52 + Math.sin(i)*2}" r="1.6" fill="${lit.c === "#FFFDF6" ? "#F3C969" : lit.a}" style="animation-delay:${(i*.25).toFixed(2)}s"/>`).join("")}</g>` : ""}
-    ${tapeLabel(x, y + 20, "Campervan", "#C3E8DA", 9)}</g>`;
+    ${F.bellbird && F.bellbird.stamps && Object.keys(F.bellbird.stamps).length ? `<g pointer-events="none" aria-hidden="true"><circle cx="${x-38}" cy="${y-18}" r="7" fill="#F3E7C8" stroke="#2F2B28" stroke-width=".8"/><path d="M${x-43} ${y-16} q5 -6 10 0" fill="none" stroke="#7FA35A" stroke-width="1.4"/><circle cx="${x-38}" cy="${y-21}" r="2" fill="#E8566C"/></g>` : ""}
+    ${tapeLabel(x, y + 20, "Campervan", "#C3E8DA", 9)}</g>`;   // round 144: the Bellbird Valley sticker, after the first stamp
 }
 export function hlaneArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>

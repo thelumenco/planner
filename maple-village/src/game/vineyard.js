@@ -125,8 +125,15 @@ export function bottle(F, slot, name){
   v.cellar.push({id: "w" + Date.now().toString(36), name: nm, type: b.style, n: BOTTLES}); v.barrels[slot] = null;
   return `${BOTTLES} bottles of ${nm}, into the cellar. Stock them on the shop shelves.`;
 }
+// The riddling rack (round 144, once Jono's shown Mel how in Bellbird Valley's barrel cave): sparkling laid on it in
+// the cellar is turned a little every day, and comes off clearer and finer: 2 coins more a bottle for every day on
+// the rack, up to five days. (It stays on the rack, not auto-stocked, till Mel stocks it herself.)
+export const RIDDLE = {day: 2, max: 5};
+export const riddleDays = (c, now = Date.now()) => c && c.rack ? Math.min(RIDDLE.max, Math.floor((now - c.rack)/(24*H))) : 0;
+export const canRiddle = F => !!(F.bellbird && F.bellbird.riddle);
+export function onRack(F, id){ const c = vineState(F).cellar.find(x => x.id === id); if (!c || c.type !== "sparkling" || c.rack || !canRiddle(F)) return null; c.rack = Date.now(); return c; }
 export function stock(F, id){ const v = vineState(F), c = v.cellar.find(x => x.id === id); if (!c) return null;
-  const s = v.shelf.find(x => x.id === id); if (s) s.n += c.n; else v.shelf.push({id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES[c.type].price, open: 0});
+  const s = v.shelf.find(x => x.id === id); if (s) s.n += c.n; else v.shelf.push({id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES[c.type].price + RIDDLE.day*riddleDays(c), open: 0});
   v.cellar = v.cellar.filter(x => x.id !== id); return `${c.name} is on the shelves.`; }
 // Pricier bottles sell less often (and cheaper ones a little more), like the Scoop Shack and the Cocoa Room: each
 // style's usual price is the sweet spot. Glasses are a quarter of the bottle price and follow it.
@@ -194,7 +201,7 @@ export function sellTick(F, opts = {}){
       if (v.help.barrels) v.barrels.forEach((b, i) => { if (b) return; const spare = c => v.grapes[c] - (v.keep[c] || 0) >= PER_BATCH, st = spare("tempranillo") ? "tempranillo" : spare("red") ? "red" : spare("white") ? "white" : null;
         if (st) { v.grapes[st] -= PER_BATCH; v.barrels[i] = {style: st, start: at, dur: STYLES[st].dur, stage: 1}; out.filled++; } });
     }
-    if (w.staff && v.help.stock && v.cellar.length) { out.stocked += v.cellar.reduce((n, c) => n + c.n, 0); v.cellar.slice().forEach(c => stock(F, c.id)); }
+    if (w.staff && v.help.stock && v.cellar.length) { out.stocked += v.cellar.reduce((n, c) => n + c.n, 0); v.cellar.filter(c => !c.rack).forEach(c => stock(F, c.id)); }
     // the Sunday farmers market: the wine shop's stall at the field sells from these same shelves (Ines minds it;
     // standing at the stall yourself brings more people over, and they pay you)
     const ev = eventNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm);
@@ -289,7 +296,7 @@ export function barrelPanel(F){
       else h += `<p>${st.n} is ready to bottle!</p><label class="sr" for="vyName${i}">Name this wine</label><input id="vyName${i}" class="vyname" maxlength="30" placeholder="${esc(wineNames(F, i)[0] || "Name it")}" value="${esc(vy.name[i] || "")}"><button class="btn alt small" data-vy="suggest" data-i="${i}">Suggest a name</button><button class="btn primary small" data-vy="bottle" data-i="${i}">Bottle it</button>`; }
     h += `</div></div>`;
   });
-  h += `</div>${v.cellar.length ? `<p class="eyebrow">In the cellar</p><ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottles</small></span></li>`).join("")}</ul><p class="muted">Take them to the wine shop to stock the shelves.</p>` : ""}`;
+  h += `</div>${v.cellar.length ? `<p class="eyebrow">In the cellar</p><ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottles${c.rack ? ` · on the riddling rack, ${riddleDays(c)} day${riddleDays(c) === 1 ? "" : "s"} (+${RIDDLE.day*riddleDays(c)} a bottle${riddleDays(c) >= RIDDLE.max ? ", as fine as it gets" : ""})` : ""}</small></span>${c.type === "sparkling" && !c.rack && canRiddle(F) ? `<button class="btn small primary" data-vyrack="${esc(c.id)}">Onto the riddling rack</button>` : ""}</li>`).join("")}</ul><p class="muted">Take them to the wine shop to stock the shelves.</p>` : ""}`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 // Fruit from the orchard goes in a crate by the shelves (all of one kind from the backpack at a time)
@@ -304,7 +311,7 @@ export function shelfPanel(F){
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The wine shelves</h2>
     ${v.shelf.length ? `<ul class="hlist wlist wshelf">${v.shelf.map(s => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${STYLES[s.type].n} · ${s.n} on the shelf${s.open ? ` · a bottle open for tasting` : ""}${s.price > STYLES[s.type].price*1.3 ? ` · pricey: fewer buyers` : s.price < STYLES[s.type].price*.75 ? ` · a bargain: flying off` : ""}</small></span><label class="wprice"><span class="sr">Price</span><input type="number" min="1" max="999" data-vyprice="${esc(s.id)}" value="${s.price}"> coins</label></li>`).join("")}</ul>` : `<p class="sub">The shelves are bare.</p>`}
     ${fruitCrate(F)}
-    ${v.cellar.length ? `<p class="eyebrow">From the cellar</p><ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottles</small></span><button class="btn small primary" data-vystock="${esc(c.id)}">Stock it</button></li>`).join("")}</ul>` : `<p class="muted">Bottled wines wait in the cellar until you stock them here.</p>`}
+    ${v.cellar.length ? `<p class="eyebrow">From the cellar</p><ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottles${c.rack ? ` · riddled ${riddleDays(c)} day${riddleDays(c) === 1 ? "" : "s"}, ${STYLES[c.type].price + RIDDLE.day*riddleDays(c)} a bottle` : ""}</small></span><button class="btn small primary" data-vystock="${esc(c.id)}">Stock it</button></li>`).join("")}</ul>` : `<p class="muted">Bottled wines wait in the cellar until you stock them here.</p>`}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export function counterPanel(F, serving, staff){
@@ -394,6 +401,7 @@ export function wireVine(root, F, api){
   });
   root.querySelectorAll("[data-vybuy]").forEach(b => b.onclick = () => { const line = buy(F, b.dataset.vybuy); if (line) { api.sfx("coin"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyfruit]").forEach(b => b.onclick = () => { const line = stockFruit(F, b.dataset.vyfruit); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
+  root.querySelectorAll("[data-vyrack]").forEach(b => b.onclick = () => { const c = onRack(F, b.dataset.vyrack); if (c) { api.sfx("chime"); api.say(`${c.name}, neck-down on the riddling rack. A quarter turn a day, like Jono showed you. The longer it stays, the finer it gets.`); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vystock]").forEach(b => b.onclick = () => { const line = stock(F, b.dataset.vystock); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyhelp]").forEach(inp => inp.onchange = () => { vineState(F).help[inp.dataset.vyhelp] = inp.checked; api.save(); });
   root.querySelectorAll("[data-vyprice]").forEach(inp => inp.onchange = () => { setPrice(F, inp.dataset.vyprice, +inp.value); api.save(); });

@@ -3405,6 +3405,69 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#world [data-place="screen"]').count() === 1 && await page.locator('#actors .npc[data-npc="mum"]').count() === 1, "the last Friday: movie night on the field, Mum on a blanket");
   await page.close();
 }
+{
+  console.log("\nBellbird Valley: the Vines (rounds 141-144)");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
+  const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), ba = await import(new URL("../src/game/bbacts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
+  const kt = await import(new URL("../src/game/kitchen.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
+  const stops = bb.STOPS, T = tw.TOWNS;
+  check(stops.length === 6 && stops.every(id => T[id].by === "van" && T[id].screens.length === 2 && Object.keys(T[id].rooms).length === 3), "six Vines stops, two screens and three rooms each");
+  check(stops.every(id => Object.values(T[id].rooms).every(r => tw.TOWN_PLACES[r.door] && tw.TOWN_BOUNDS[Object.keys(T[id].rooms).find(k => T[id].rooms[k] === r)])), "every room has a door outside and walls inside");
+  const allRooms = stops.flatMap(id => Object.keys(T[id].rooms)), mus = new Set([...stops.map(id => T[id].music), ...allRooms.map(r => T[stops.find(id => T[id].rooms[r])].rooms[r].music)]);
+  check(mus.size === 24, "24 tunes: one for every stop and every room");
+  const F0 = {coins: 100, inv: {}}; check(bb.known(F0).join() === "bv_gate" && bb.fuelFor("home", "bv_gate", ["evan", "mum"]) === 7 && bb.setOff(F0, "bv_gate", ["mum", "evan"], 8*60) && F0.coins === 93 && bb.stamped(F0, "bv_gate"), "the van: only Valley Gate on the map at first; 6 a leg plus 1 a grown-up, and a stamp");
+  check(bb.known(F0).includes("bv_lookout") && bb.known(F0).includes("bv_creek") && !bb.known(F0).includes("bv_camp"), "the map reveals the stops a road away");
+  // rooms, goods, specials
+  const goods = Object.values(tw.TOWN_GOODS).filter(g => /^bv_/.test(g.shop || ""));
+  check(goods.length >= 30 && goods.every(g => !g.sell || g.sell <= g.price), "the valley's shops, and nothing sells back for more than it costs");
+  check(tw.TOWN_GOODS.b_sparkling.price > vy.STYLES.sparkling.price + vy.RIDDLE.day*vy.RIDDLE.max, "Bellbird's sparkling costs more than Mel's best-riddled bottle sells for");
+  const op1 = br.opshopToday("2026-10-12"), op2 = br.opshopToday("2026-10-13"); check(op1.length === 4 && op1.join() === br.opshopToday("2026-10-12").join() && op1.join() !== op2.join(), "the op shop: four treasures a day, different tomorrow");
+  check(["pavlova", "damper", "wattlescone"].every(id => kt.TAPAS[id].special === "bellbird" && kt.TAPAS[id].price >= 14) && !kt.knows({towns: {}}, "pavlova") && kt.knows({towns: {bellbird: "2026-10-12"}}, "pavlova"), "three Bellbird specials at the stove, once Mel's been");
+  check(it.ITEMS.raspberry_cane && it.ITEMS.raspberry_cane.visited === "bellbird" && it.CROPS.raspberry, "raspberry canes for the garden, once she's been");
+  const F1 = {coins: 50, inv: {}, bellbird: {}}; check(br.chocTaste(F1) && !br.chocTaste(F1) && br.treat(F1, "bv_coffee", "flatwhite") && F1.coins === 46, "a free chocolate tasting once a day; a flat white for 4");
+  // the people
+  const bl = np.NPCS.filter(n => n.local === "bellbird");
+  check(bl.length >= 40 && bl.filter(n => n.neighbour).length >= 10, "the valley's people, and the travelling neighbours at the camp");
+  const inRoom = r => bl.filter(n => n.routine.some(sl => sl.scene === r)).length;
+  check(allRooms.filter(r => !["bv_shed", "bv_cave"].includes(r)).every(r => inRoom(r) >= 1) && allRooms.filter(r => inRoom(r) >= 2).length >= 12, "people in the rooms (two or more in most)");
+  // the family: new acts at every stop, never repeated, and none from the earlier towns
+  const old = new Set(["ronda", "kyoto", "jeju", "cinque"].flatMap(t => Object.values(T[t].acts || {}).flatMap(a => Object.values(a).map(x => x.act))));
+  const mine = stops.flatMap(id => Object.values(T[id].acts).flatMap(a => Object.values(a).map(x => x.act)));
+  check(mine.length >= 18 && new Set(mine).size === mine.length && mine.every(a => !old.has(a)) && stops.every(id => Object.keys(T[id].acts).length >= 3), "the family: three or four new things at every stop, all different, none from the other towns");
+  // the activities
+  const F2 = {coins: 200, inv: {}, bellbird: {}}, add = (id, n) => { F2.inv[id] = (F2.inv[id] || 0) + n; };
+  check(!ba.balloonOpen(12*60) && ba.balloonOpen(7*60) && ba.balloonOpen(17*60 + 30) && ba.flightCost(["evan", "mum"]) === 55, "the balloon flies at dawn and golden hour: 30, Evan 10, others 15");
+  const fl = ba.flightStart(() => .3); fl.sights.forEach(([, want]) => { fl.alt = want; ba.flightMove(fl, "hold"); }); fl.alt = 1;
+  check(fl.seen.length === 5 && ba.flightLand(fl) === true && ba.finishFlight(F2, fl, add) && F2.inv.b_flight === 1, "a flight: every sight at the right height, a soft landing, a certificate");
+  const rd = ba.riddleStart(() => .6); while (!ba.riddleDone(rd)) ba.riddleTap(rd, rd.turns.findIndex(t => t)); check(ba.finishRiddle(F2) && vy.canRiddle(F2), "riddling with Jono, and the rack at home");
+  const V = vy.vineState(F2); V.cellar.push({id: "wfizz", name: "Cuvée Maple", type: "sparkling", n: 6}); check(vy.onRack(F2, "wfizz") && !vy.onRack(F2, "wfizz"), "sparkling onto the riddling rack");
+  V.cellar[0].rack -= 3*24*3600e3; vy.stock(F2, "wfizz"); check(V.shelf[0].price === vy.STYLES.sparkling.price + 6, "three days on the rack: 6 coins more a bottle");
+  const be = ba.berriesStart(() => .3); be.ripe.forEach((r, i) => ba.pickBerry(be, i)); check(ba.berriesDone(be) && be.oops === 0 && ba.finishBerries(F2, be, add) && F2.inv.raspberry > 0 && !ba.finishBerries(F2, be, add), "pick your own: berries once a day");
+  F2.inv.strawberry = 2; check(ba.dipBerries(F2, "dark", "sprinkles") && !F2.inv.strawberry, "dipping two strawberries in Sophie's chocolate");
+  for (let d = 0; d < 3; d++) { F2.bellbird.joeyDay = null; const j = ba.joeyStart(), early = ba.joeyDo(j, 2); if (!d) check(early === "oops", "feeding Pip before the bottle's warm: Kim stops you"); [0, 0, 0, 1, 2, 2, 2, 2, 3].forEach(i => ba.joeyDo(j, i)); const r = ba.finishJoey(F2); if (d === 2) check(ba.joeyDone(j) && r.release, "three feeds of Pip, and she goes back to the bush"); }
+  const cn = ba.canoeStart(); ["L", "R", "L", "R", "L", "R", "L", "R"].forEach(x => ba.paddle(cn, x)); check(ba.canoeDone(cn) && ba.finishCanoe(F2, cn), "a straight canoe: left, right, left, right");
+  F2.inv.mallows = 1; const bag = ba.openBag(F2); ba.toast(bag); ba.toast(bag); ba.toast(bag); check(ba.pullOut(F2, bag) === "golden" && !ba.fireLit(16*60) && ba.fireLit(17*60), "a golden marshmallow, from five");
+  // in the browser: a van trip to the camp at six, a room, the fire and the family
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`bellbird pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/bbv=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = {...(f.goals || {}), van: true}; f.coins = 300;
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=09:00&date=2026-10-12"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=09:00&date=2026-10-12&bbv=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("van")); await page.waitForTimeout(900);
+  await page.locator('#world [data-spot="vmap"]').dispatchEvent("click"); await page.waitForSelector("#ctx .bbmap", { timeout: 20000 });
+  await page.click('#ctx [data-bvpick="evan"]'); await page.click('#ctx [data-bvpick="mama"]'); await page.click('#ctx [data-bvgo="bv_gate"]'); await page.waitForTimeout(4500);
+  check(await fox().then(f => f.trip && f.trip.town === "bv_gate" && f.coins === 293), "off in the van to Valley Gate");
+  await page.evaluate(() => window.__mapleScene("bv_store")); await page.waitForTimeout(1200);
+  check(await page.locator('#actors .npc[data-npc="mrsdunn"]').count() === 1, "Mrs Dunn behind the counter at the store");
+  await page.locator('#world [data-rdspot="bv_store"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="wattleseed"]', { timeout: 20000 });
+  await page.click('#ctx [data-rbuy="wattleseed"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.inv.wattleseed === 1), "a jar of wattleseed from Mrs Dunn's shelves");
+  await page.evaluate(() => window.__mapleScene("bv_opshop")); await page.waitForTimeout(6000);
+  check(await page.locator('#actors .npc[data-npc="mama"].act-rummage').count() === 1, "Ma Ma rummaging in the op shop");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

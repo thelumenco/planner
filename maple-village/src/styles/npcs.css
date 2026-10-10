@@ -143,3 +143,47 @@
 .ch.npc.act-point:not(.walk) .armR{animation:dpoint .7s ease-in-out infinite alternate}@keyframes dpoint{from{transform:rotate(-100deg)}to{transform:rotate(-160deg)}}
 .ch.npc.act-point:not(.walk) .armL{transform:rotate(25deg)}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-boogie > g,.ch.npc.act-armsup > g,.ch.npc.act-twirl > g,.ch.npc.act-shuffle > g,.ch.npc.act-point > g,.ch.npc[class*="act-"] .armL,.ch.npc[class*="act-"] .armR{animation:none}}
+/* Bellbird Valley (round 144), all new: Ma Ma holds up a cardigan, Gong Gong's binoculars, Angellina's wattle crown,
+   Darren's drone, Mum waves at the balloons, Dad sips his coffee, Marcus bounces a footy, Gong Gong's tai chi, Mum
+   swirls her Pinot, Dad juggles strawberries, Ma Ma fans herself, Darren carries the berry flats, Mum feeds the roos,
+   Marcus peers into the wombat hole, Angellina looks up for koalas, Dad flips sausages, Gong Gong skims stones, Ma Ma
+   plays cards, Darren toasts a marshmallow */
+.ch.npc.act-rummage:not(.walk) .armR,.ch.npc.act-cuppa:not(.walk) .armR,.ch.npc.act-swirl:not(.walk) .armR{animation:sipA 2.4s ease-in-out infinite alternate}
+@keyframes sipA{from{transform:rotate(-20deg)}to{transform:rotate(-60deg)}}
+.ch.npc.act-binoculars:not(.walk) .armR,.ch.npc.act-binoculars:not(.walk) .armL{transform:rotate(-150deg)}
+.ch.npc.act-binoculars:not(.walk) .flip > g{animation:scanB 4s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes scanB{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+.ch.npc.act-crown:not(.walk) .armL,.ch.npc.act-crown:not(.walk) .armR,.ch.npc.act-cards:not(.walk) .armR{animation:typeA .7s ease-in-out infinite alternate}
+.ch.npc.act-drone:not(.walk) .armL,.ch.npc.act-drone:not(.walk) .armR{transform:rotate(-40deg)}
+.ch.npc.act-wave:not(.walk) .armR{animation:waveA .5s ease-in-out infinite alternate}
+@keyframes waveA{from{transform:rotate(-160deg)}to{transform:rotate(-125deg)}}
+.ch.npc.act-footy:not(.walk) .legR{animation:kickL .7s ease-in-out infinite alternate}
+@keyframes kickL{from{transform:rotate(0)}to{transform:rotate(-38deg)}}
+.ch.npc .ballbounce{animation:bounceB .7s ease-in-out infinite alternate}
+@keyframes bounceB{from{transform:translateY(0)}to{transform:translateY(-14px)}}
+.ch.npc.act-taichi:not(.walk) .armL{animation:taiL 3.6s ease-in-out infinite alternate}.ch.npc.act-taichi:not(.walk) .armR{animation:taiR 3.6s ease-in-out infinite alternate}
+@keyframes taiL{from{transform:rotate(20deg)}to{transform:rotate(110deg)}}@keyframes taiR{from{transform:rotate(-20deg)}to{transform:rotate(-110deg)}}
+.ch.npc.act-taichi:not(.walk) .legL{transform:rotate(14deg)}.ch.npc.act-taichi:not(.walk) .legR{transform:rotate(-14deg)}
+.ch.npc.act-juggle:not(.walk) .armL,.ch.npc.act-juggle:not(.walk) .armR{animation:typeA .35s ease-in-out infinite alternate}.ch.npc.act-juggle:not(.walk) .armR{animation-delay:.17s}
+.ch.npc .jb{animation:jug 1.05s linear infinite}.ch.npc .jb1{animation-delay:-.35s}.ch.npc .jb2{animation-delay:-.7s}
+@keyframes jug{0%{transform:translate(-8px,22px)}25%{transform:translate(-4px,-2px)}50%{transform:translate(4px,-6px)}75%{transform:translate(9px,10px)}100%{transform:translate(-8px,22px)}}
+.ch.npc.act-fan:not(.walk) .tool{animation:fanT .35s ease-in-out infinite alternate}
+@keyframes fanT{from{transform:rotate(-8deg)}to{transform:rotate(12deg)}}
+.npc.act-fan:not(.walk) .legL,.npc.act-fan:not(.walk) .legR,.npc.act-cards:not(.walk) .legL,.npc.act-cards:not(.walk) .legR,.npc.act-mallow:not(.walk) .legL,.npc.act-mallow:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
+.npc.act-fan:not(.walk) > g,.npc.act-cards:not(.walk) > g,.npc.act-mallow:not(.walk) > g{transform:translateY(7px)}
+.ch.npc.act-carry:not(.walk) .armL,.ch.npc.act-carry:not(.walk) .armR{transform:rotate(-70deg)}
+.ch.npc.act-carry:not(.walk) .flip > g{animation:cbob .8s ease-in-out infinite alternate}
+.npc.act-feedroo:not(.walk) .legL,.npc.act-feedroo:not(.walk) .legR,.npc.act-crouch:not(.walk) .legL,.npc.act-crouch:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.55)}
+.npc.act-feedroo:not(.walk) > g,.npc.act-crouch:not(.walk) > g{transform:translateY(5px)}
+.ch.npc.act-feedroo:not(.walk) .armR{animation:feedA 1.6s ease-in-out infinite alternate}
+@keyframes feedA{from{transform:rotate(-50deg)}to{transform:rotate(-80deg)}}
+.ch.npc.act-crouch:not(.walk) .flip > g{transform:rotate(14deg);transform-box:fill-box;transform-origin:50% 100%}
+.ch.npc.act-lookup:not(.walk) .armR{transform:rotate(-165deg)}
+.ch.npc.act-lookup:not(.walk) .flip > g{animation:scanB 5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+.ch.npc.act-bbq:not(.walk) .tool,.ch.npc.act-mallow:not(.walk) .tool{animation:tapT 1.2s ease-in-out infinite alternate}
+.ch.npc.act-bbq:not(.walk) .armR{animation:tapA 1.2s ease-in-out infinite alternate}
+.ch.npc .steam{animation:drip 1.6s linear infinite reverse}
+.ch.npc.act-skim:not(.walk) .armR{animation:skimA 1.8s ease-in infinite}
+@keyframes skimA{0%,60%{transform:rotate(-20deg)}80%{transform:rotate(-95deg)}100%{transform:rotate(-20deg)}}
+.ch.npc .ripples{animation:kitefly 1.8s ease-out infinite}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-rummage .armR,.ch.npc.act-cuppa .armR,.ch.npc.act-swirl .armR,.ch.npc.act-binoculars .flip > g,.ch.npc.act-crown .armL,.ch.npc.act-crown .armR,.ch.npc.act-cards .armR,.ch.npc.act-wave .armR,.ch.npc.act-footy .legR,.ch.npc .ballbounce,.ch.npc.act-taichi .armL,.ch.npc.act-taichi .armR,.ch.npc.act-juggle .armL,.ch.npc.act-juggle .armR,.ch.npc .jb,.ch.npc.act-fan .tool,.ch.npc.act-carry .flip > g,.ch.npc.act-feedroo .armR,.ch.npc.act-lookup .flip > g,.ch.npc.act-bbq .tool,.ch.npc.act-mallow .tool,.ch.npc.act-bbq .armR,.ch.npc .steam,.ch.npc.act-skim .armR,.ch.npc .ripples{animation:none}}
