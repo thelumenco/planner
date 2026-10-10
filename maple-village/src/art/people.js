@@ -77,6 +77,13 @@ function extra(kind, look, k){
   return "";
 }
 
+// Jason's shirt (round 135): white, printed with little coconut trees (a curved trunk, a fan of fronds, two coconuts)
+function palms(k){
+  const tree = (x, y, d = 1) => `<path d="M${x*k} ${y*k} q${1.2*d*k} ${-2.6*k} ${.6*d*k} ${-5.4*k}" fill="none" stroke-width="${.9*k}" style="stroke:#9A6A44"/>`
+    + [[-3, .4], [-2.4, -1.6], [0, -2.6], [2.4, -1.6], [3, .4]].map(([dx, dy]) => `<path d="M${(x + .6*d)*k} ${(y - 5.4)*k} q${dx*.5*k} ${(dy - 1)*k} ${dx*k} ${(dy + .6)*k}" fill="none" stroke-width="${.8*k}" style="stroke:#3E8A4A"/>`).join("")
+    + `<circle cx="${(x + .3*d)*k}" cy="${(y - 4.6)*k}" r="${.55*k}" style="fill:#8A5A3A" stroke="none"/>`;
+  return `<g pointer-events="none">${tree(-4.5, -26)}${tree(3.5, -30, -1)}${tree(4, -17)}${tree(-3, -15.5, -1)}</g>`;
+}
 // Batik: a little repeating motif (flowers of dots, tiny leaves) over the top and trousers. col: the motif colour.
 function batik(col, k, shirt){   // shirt: just the shirt (Jason's print shirt, round 135), not the trousers
   const flower = (x, y) => `<circle cx="${x*k}" cy="${y*k}" r="${1.5*k}" style="fill:${col}" stroke="none"/>` + [[0, -2.6], [2.5, 0], [0, 2.6], [-2.5, 0]].map(([dx, dy]) => `<circle cx="${(x + dx)*k}" cy="${(y + dy)*k}" r="${.8*k}" style="fill:${col}" stroke="none"/>`).join("");
@@ -134,11 +141,11 @@ export function personArt(look, kid){
       ${look.bike ? `<g transform="translate(0 ${7*k})">${bikeArt(look.bike === true ? "#3E6B8C" : look.bike, k)}</g>` : ""}
       <g class="legL"><rect x="${-6.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
       <g class="legR"><rect x="${1.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${.8*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
-      <g class="armL"><rect x="${-12*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/>${sleeve(-12*k)}</g>
-      <g class="armR"><rect x="${7.8*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/>${sleeve(7.8*k)}</g>
+      <g class="armL"><rect x="${-12*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/>${sleeve(-12*k)}${look.sleeves && !coat ? `<rect x="${-12*k - .4*k}" y="${-34.5*k}" width="${5*k}" height="${7*k}" rx="1.5" ${S(look.sleeves)}/>` : ""}</g>
+      <g class="armR"><rect x="${7.8*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/>${sleeve(7.8*k)}${look.sleeves && !coat ? `<rect x="${7.8*k - .4*k}" y="${-34.5*k}" width="${5*k}" height="${7*k}" rx="1.5" ${S(look.sleeves)}/>` : ""}</g>
       ${look.dress ? `<path d="M${-9*k} ${-17*k} L${-12.5*k} ${-5*k} h${25*k} L${9*k} ${-17*k}z" ${S(look.dress)}/>` : ""}
       <path d="M${-8.6*k} ${-37*k} q${8.6*k} ${-2.4*k} ${17.2*k} 0 l${1.4*k} ${23*k} h${-20*k}z" ${S(look.dress || look.top)}/>
-      ${look.batik && !coat ? batik(look.batik, k) : ""}${look.print && !coat ? batik(look.print, k, true) : ""}
+      ${look.batik && !coat ? batik(look.batik, k) : ""}${look.palms && !coat ? palms(k) : ""}
       ${coat ? coatArt(rain, k) : ""}
       ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}

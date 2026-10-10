@@ -1957,7 +1957,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Jason (Mel's request, a real friend; handle with care).**
   - He and Mel were friends from secondary school onwards. They went to Cinque Terre together in 2015: an Airbnb in Vernazza; he climbed all of Corniglia's steps; he waited on Vernazza's dark harbour with a pizza when her train came in hours late after a strike in Florence.
   - He died in 2022. Mel wants him to live on in the game: moved to Cinque Terre, in a happy relationship, enjoying life. Keep him joyful and alive in every line. Never write anything about his death in the game.
-  - **Look:** slightly tall (`tall`), neat, fair, black hair, black spectacles (`look.specs`, drawn whatever's in his hands), a print shirt (`look.print`: the batik motif on the shirt only) and chinos.
+  - **Look:** slightly tall (`tall`), neat, fair, black hair, black spectacles (`look.specs`, drawn whatever's in his hands), a white short-sleeved shirt printed with coconut trees (`look.palms`, `look.sleeves`; Mel: not batik, that's Ma Ma's) and navy chinos.
   - **Voice:** slightly formal, literary, quotes things (Wilde, Wordsworth, Shakespeare, Byron), and dry humour.
   - **His day:**
     - 8–10:30: a poem at the café in Vernazza's piazza (act `poem`, sitting).

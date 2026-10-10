@@ -7675,7 +7675,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     // together in 2015 (an Airbnb in Vernazza; he climbed every one of Corniglia's steps; he waited on the dark harbour
     // with a pizza when her train came in hours late after a strike in Florence). In the game he's moved here for good:
     // the second floor of the yellow house by the harbour, a happy life with Luca. Slightly tall, neat, fair, black
-    // hair and black spectacles, a print shirt and chinos. Speaks a little formally, quotes things, very funny.
+    // hair and black spectacles, a white short-sleeved shirt printed with coconut trees, and navy chinos. Speaks a little formally, quotes things, very funny.
     // His day: a poem at the café, a walk (he still climbs the steps), lunch at Beppe's, the beach, a gelato, and the
     // sunset on the harbour wall with Luca.
     {
@@ -7685,7 +7685,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       name: "Jason",
       job: "Lives in Vernazza now. Writes poetry, walks, watches the sunset",
       intro: "Mel. Well, well, well. I trust you came by train, and not by strike? I live here now, you know: the second floor of the yellow house by the harbour, geraniums on the balcony. Come up whenever you like. There are far fewer stairs than Corniglia.",
-      look: { skin: "#F6DCC6", hair: "#1E1A18", hairStyle: "short", top: "#2E6E8E", print: "#F3D98A", bottom: "#D9C49A", tall: true, specs: true },
+      look: { skin: "#F6DCC6", hair: "#1E1A18", hairStyle: "short", top: "#FFFDF6", palms: true, sleeves: "#FFFDF6", bottom: "#2E3A5A", tall: true, specs: true },
       routine: [
         slot("8:00", "10:30", "ct_vernazza", [332, 296], { act: "poem", dir: -1 }),
         slot("10:30", "12:30", "ct_corniglia", [[372, 420], [300, 460], [400, 380]]),
@@ -12180,6 +12180,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     }
     return "";
   }
+  function palms(k) {
+    const tree2 = (x, y, d = 1) => `<path d="M${x * k} ${y * k} q${1.2 * d * k} ${-2.6 * k} ${0.6 * d * k} ${-5.4 * k}" fill="none" stroke-width="${0.9 * k}" style="stroke:#9A6A44"/>` + [[-3, 0.4], [-2.4, -1.6], [0, -2.6], [2.4, -1.6], [3, 0.4]].map(([dx, dy]) => `<path d="M${(x + 0.6 * d) * k} ${(y - 5.4) * k} q${dx * 0.5 * k} ${(dy - 1) * k} ${dx * k} ${(dy + 0.6) * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#3E8A4A"/>`).join("") + `<circle cx="${(x + 0.3 * d) * k}" cy="${(y - 4.6) * k}" r="${0.55 * k}" style="fill:#8A5A3A" stroke="none"/>`;
+    return `<g pointer-events="none">${tree2(-4.5, -26)}${tree2(3.5, -30, -1)}${tree2(4, -17)}${tree2(-3, -15.5, -1)}</g>`;
+  }
   function batik(col, k, shirt) {
     const flower = (x, y) => `<circle cx="${x * k}" cy="${y * k}" r="${1.5 * k}" style="fill:${col}" stroke="none"/>` + [[0, -2.6], [2.5, 0], [0, 2.6], [-2.5, 0]].map(([dx, dy]) => `<circle cx="${(x + dx) * k}" cy="${(y + dy) * k}" r="${0.8 * k}" style="fill:${col}" stroke="none"/>`).join("");
     const leaf2 = (x, y) => `<path d="M${x * k} ${y * k} q${1.6 * k} ${-1.6 * k} ${3.2 * k} 0 q${-1.6 * k} ${1.6 * k} ${-3.2 * k} 0z" style="fill:${col}" stroke="none"/>`;
@@ -12235,11 +12239,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ${look.bike ? `<g transform="translate(0 ${7 * k})">${bikeArt(look.bike === true ? "#3E6B8C" : look.bike, k)}</g>` : ""}
       <g class="legL"><rect x="${-6.2 * k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
       <g class="legR"><rect x="${1.2 * k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${0.8 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
-      <g class="armL"><rect x="${-12 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/>${sleeve(-12 * k)}</g>
-      <g class="armR"><rect x="${7.8 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/>${sleeve(7.8 * k)}</g>
+      <g class="armL"><rect x="${-12 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/>${sleeve(-12 * k)}${look.sleeves && !coat ? `<rect x="${-12 * k - 0.4 * k}" y="${-34.5 * k}" width="${5 * k}" height="${7 * k}" rx="1.5" ${S(look.sleeves)}/>` : ""}</g>
+      <g class="armR"><rect x="${7.8 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/>${sleeve(7.8 * k)}${look.sleeves && !coat ? `<rect x="${7.8 * k - 0.4 * k}" y="${-34.5 * k}" width="${5 * k}" height="${7 * k}" rx="1.5" ${S(look.sleeves)}/>` : ""}</g>
       ${look.dress ? `<path d="M${-9 * k} ${-17 * k} L${-12.5 * k} ${-5 * k} h${25 * k} L${9 * k} ${-17 * k}z" ${S(look.dress)}/>` : ""}
       <path d="M${-8.6 * k} ${-37 * k} q${8.6 * k} ${-2.4 * k} ${17.2 * k} 0 l${1.4 * k} ${23 * k} h${-20 * k}z" ${S(look.dress || look.top)}/>
-      ${look.batik && !coat ? batik(look.batik, k) : ""}${look.print && !coat ? batik(look.print, k, true) : ""}
+      ${look.batik && !coat ? batik(look.batik, k) : ""}${look.palms && !coat ? palms(k) : ""}
       ${coat ? coatArt(rain, k) : ""}
       ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}

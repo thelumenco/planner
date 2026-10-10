@@ -755,13 +755,13 @@ export const NPCS = [
   // together in 2015 (an Airbnb in Vernazza; he climbed every one of Corniglia's steps; he waited on the dark harbour
   // with a pizza when her train came in hours late after a strike in Florence). In the game he's moved here for good:
   // the second floor of the yellow house by the harbour, a happy life with Luca. Slightly tall, neat, fair, black
-  // hair and black spectacles, a print shirt and chinos. Speaks a little formally, quotes things, very funny.
+  // hair and black spectacles, a white short-sleeved shirt printed with coconut trees, and navy chinos. Speaks a little formally, quotes things, very funny.
   // His day: a poem at the café, a walk (he still climbs the steps), lunch at Beppe's, the beach, a gelato, and the
   // sunset on the harbour wall with Luca.
   {
     id: "jason", local: "cinque", pitch: 0.92, name: "Jason", job: "Lives in Vernazza now. Writes poetry, walks, watches the sunset",
     intro: "Mel. Well, well, well. I trust you came by train, and not by strike? I live here now, you know: the second floor of the yellow house by the harbour, geraniums on the balcony. Come up whenever you like. There are far fewer stairs than Corniglia.",
-    look: {skin: "#F6DCC6", hair: "#1E1A18", hairStyle: "short", top: "#2E6E8E", print: "#F3D98A", bottom: "#D9C49A", tall: true, specs: true},
+    look: {skin: "#F6DCC6", hair: "#1E1A18", hairStyle: "short", top: "#FFFDF6", palms: true, sleeves: "#FFFDF6", bottom: "#2E3A5A", tall: true, specs: true},
     routine: [slot("8:00", "10:30", "ct_vernazza", [332, 296], {act: "poem", dir: -1}), slot("10:30", "12:30", "ct_corniglia", [[372, 420], [300, 460], [400, 380]]),
       slot("12:30", "14:00", "ct_focacceria", [[200, 520], [330, 540]]), slot("14:00", "16:30", "ct_monterosso", [[200, 480], [340, 470], [260, 420]]),
       slot("16:30", "18:00", "ct_gelato", [[200, 500], [330, 520]]), slot("18:00", "21:45", "ct_vernazza", [222, 418], {act: "sit", dir: -1})],
