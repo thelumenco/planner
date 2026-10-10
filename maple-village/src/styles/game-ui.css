@@ -899,3 +899,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 
 /* the stove (round 136): Local and Specials tabs; where a missing ingredient comes from */
 .ktabs{margin:6px 0 2px}.kneed .ksrc{display:block;font-size:10.5px;color:#8A7A66;font-style:italic}
+/* Bellbird Valley (round 141): the drive, the road map, the passport */
+.taxiride.vanride{background:linear-gradient(#F3E7C9 0 38%,#D9C77F 38%,#C9B46A 100%);animation-duration:3.2s}
+.bbmap{display:block;width:100%;max-width:420px;height:auto;margin:8px auto 4px}
+.bbgo{flex-wrap:wrap}
+.bbstamps{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}
+.bbstamp{border:1.5px dashed #B9A47A;border-radius:12px;padding:8px 10px;background:#FFFDF6;color:#8A7A5A}
+.bbstamp b{display:block;font-size:13px}.bbstamp small{font-size:11px}
+.bbstamp.on{border-style:solid;border-color:#C9483A;color:#2F2B28;background:#FFF6E8;transform:rotate(-1.5deg)}

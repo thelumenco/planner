@@ -12,6 +12,7 @@
 //   -----------+----------   (the gorge runs between the rows)
 //   rd_old     | rd_bridge
 
+import { BB_TOWNS, BB_PLACES, BB_BRIDGES, BB_ARRIVE, BB_BOUNDS, BB_OBST } from "./bellbird.js";
 export const TOWNS = {
   ronda: {
     n: "Ronda", by: "train", fare: 40, free: ["evan"], outFrom: 7*60, outTo: 18*60, backTo: 22*60,
@@ -315,6 +316,7 @@ export const TOWNS = {
     }
   }
 };
+Object.assign(TOWNS, BB_TOWNS);   // Bellbird Valley's stops (round 141): campervan "towns" of two screens each
 export const TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t]) => [...t.screens, ...Object.keys(t.rooms || {})].map(s => [s, id])));
 // an interior of a town (round 116) -> its room entry, or null
 export const townRoom = scene => { const t = TOWNS[TOWN_SCENES[scene]]; return (t && t.rooms && t.rooms[scene]) || null; };
@@ -498,6 +500,7 @@ export const TOWN_OBST = {
   rd_bridge: [[0, 0, 268, 214], [352, 0, 520, 214], [24, 292, 206, 420], [300, 470, 360, 560], [0, 214, 200, 252]],
   rd_old: [[0, 0, 90, 104], [160, 0, 520, 104], [26, 150, 176, 262], [326, 128, 500, 244], [26, 330, 156, 444], [300, 324, 472, 420], [36, 500, 196, 580], [270, 590, 392, 640]]
 };
+Object.assign(TOWN_PLACES, BB_PLACES); Object.assign(TOWN_BRIDGES, BB_BRIDGES); Object.assign(TOWN_ARRIVE, BB_ARRIVE); Object.assign(TOWN_BOUNDS, BB_BOUNDS); Object.assign(TOWN_OBST, BB_OBST);   // Bellbird Valley
 
 // Ronda's goods (round 107, round 3): things you can't get in Honeybrook. kind ingredient: they go to the kitchen
 // (tapas), the Scoop Shack (gelato) and the Cocoa Room (bonbon fillings) like any other; kind gift: give them to the
