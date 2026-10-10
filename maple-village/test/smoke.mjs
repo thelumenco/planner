@@ -2597,7 +2597,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await fox().then(f => f.inv.mushroom === 3 && f.woods.forageDay === "2026-10-10"), "foraging in autumn: three wild mushrooms, once a day");
   await page.locator('#world [data-place="bikeswoods"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bike="hire"]', { timeout: 15000 });
   await page.click('#ctx [data-bike="hire"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.coins === 95 && f.bike && f.bike.until > Date.now()), "a hire bike: 5 coins for an hour");
+  { const gameNow = await page.evaluate(() => Date.now() + (globalThis.__mapleOffset || 0));   // the game's clock, not the real one
+    check(await fox().then(f => f.coins === 95 && f.bike && f.bike.until > gameNow), "a hire bike: 5 coins for an hour"); }
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-place="lookout"]').dispatchEvent("click"); await page.waitForTimeout(400);
   check(await page.locator("#mel.biking").count() === 1, "Mel rides it (faster than walking, slower than the scooter)");
@@ -3030,7 +3031,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   page.on("pageerror", e => errors.push(`kite pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { if (!/kitebrush/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
-    f.inv = {...(f.inv || {}), kite: 1, brush: 1}; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+    f.inv = {...(f.inv || {}), kite: 1, brush: 1, chz_cheddar: 1, chz_brie_ex: 1, honey_lav: 1}; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-10"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-10&kitebrush=1"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(900);
@@ -3046,6 +3047,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="farmhouse"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-hf="req"]:not([disabled])', { timeout: 20000 });
   await page.click('#ctx [data-hf="req"]'); await page.waitForTimeout(500);
   check(await fox().then(f => f.hfarm.reqDone === "2026-10-10"), "and then you can tell Felix it's done");
+  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(800);
+  await page.locator('#world [data-place="market"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-shop="sell"]', { timeout: 20000 });
+  await page.click('#ctx [data-shop="sell"]'); await page.waitForSelector('#ctx .item[data-id="chz_cheddar"]', { timeout: 15000 });
+  const c0 = await fox().then(f => f.coins);
+  for (const id of ["chz_cheddar", "chz_brie_ex", "honey_lav"]) { await page.click(`#ctx .item[data-id="${id}"]`); await page.waitForTimeout(300); }
+  check(await fox().then(f => f.coins === c0 + 13 + 20 + 10 && !f.inv.chz_cheddar), "your own cheese and honey sell at the market, for more than plain produce: cheddar 13, an excellent brie 20, lavender honey 10");
   await page.close();
 }
 {

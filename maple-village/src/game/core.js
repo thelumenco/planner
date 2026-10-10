@@ -1407,7 +1407,8 @@ function buy(id, price){
 }
 function sell(id){
   const it = ITEMS[id]; if (!it || !it.sell || !F.inv[id]) return;
-  addInv(id, -1); F.coins += it.sell; flash(`Sold ${it.n.toLowerCase()} +${it.sell} coins`); speak("Fresh from the garden, sold!", 2500); save();
+  addInv(id, -1); F.coins += it.sell; flash(`Sold ${it.n.toLowerCase()} +${it.sell} coins`);
+  speak(it.crafted || id === "oliveoil" ? pick(["Made with your own hands: it fetches a good price.", "Hana holds it up to the light. \"You made this? I'll take it.\"", "Sold! Worth every minute it took."]) : "Fresh from the garden, sold!", 2500); save();
 }
 function plant(i, seedId){
   const it = ITEMS[seedId]; if (!it || !F.inv[seedId] || (F.plots[i] && F.plots[i].crop)) return;

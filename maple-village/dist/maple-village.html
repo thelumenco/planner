@@ -2402,9 +2402,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var TOWN_GOODS = {
     almond: { n: "Marcona almonds", kind: "ingredient", price: 6, sell: 2, shop: "mercado", art: ["bag", "#E8D3A8", "#C9A27E"], what: "from Ronda's market: ajo blanco and salted almonds at the kitchen, almond gelato, a praline bonbon" },
     sevilla: { n: "Seville oranges", kind: "ingredient", price: 4, sell: 1, shop: "mercado", art: ["apple", "#F28C28", "#7FA35A"], what: "from Ronda's market: orange and olive salad at the kitchen, bitter orange gelato or bonbons" },
-    // (round 120: oil sells for 12, more than the three jars of olives it takes (9); Rafael's is 14, so there's no
+    // (round 120, raised in round 130: oil sells for 16, more than the three jars of olives it takes (9); Rafael's is 18, so there's no
     // buying it in Ronda to sell at home)
-    oliveoil: { n: "Olive oil", kind: "ingredient", price: 14, sell: 12, shop: "mercado", art: ["bottle", "#B9B04A"], what: "Rafael's family oil, from Ronda: salmorejo, ajo blanco, bread with oil" },
+    oliveoil: { n: "Olive oil", kind: "ingredient", price: 18, sell: 16, shop: "mercado", art: ["bottle", "#B9B04A"], what: "Rafael's family oil, from Ronda: salmorejo, ajo blanco, bread with oil" },
     jamon: { n: "Jamón", kind: "ingredient", price: 15, sell: 5, shop: "mercado", art: ["roll", "#B5443A", "#F3E1D0"], what: "from Ronda's market: jamón croquetas at the kitchen" },
     payoyo: { n: "Payoyo goat's cheese", kind: "ingredient", price: 12, sell: 4, shop: "mercado", art: ["wheel", "#F3E7C8", "#C9A27E"], what: "a mountain goat's cheese from Ronda: payoyo with membrillo at the kitchen" },
     membrillo: { n: "Membrillo", kind: "ingredient", price: 6, sell: 2, shop: "mercado", art: ["bar", "#C8643B"], what: "quince paste from Ronda: with payoyo at the kitchen, a quince bonbon filling" },
@@ -17420,6 +17420,26 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const base = ITEMS[c.id];
     if (base && !ITEMS[c.id + "_ex"]) ITEMS[c.id + "_ex"] = { ...base, n: exName(base.n), price: (base.price || 8) + 5, say: `${base.say} And this one's extraordinary. You made this?!` };
   });
+  var CRAFTED_SELL = {
+    chz_fresh: 12,
+    chz_halloumi: 13,
+    chz_cheddar: 13,
+    chz_brie: 14,
+    chz_blue: 14,
+    chz_smoked: 14,
+    honey: 6,
+    honey_lav: 10,
+    honey_blossom: 10,
+    honey_cream: 12,
+    honeycomb: 10,
+    yoghurt: 4
+  };
+  Object.entries(CRAFTED_SELL).forEach(([id, n]) => {
+    if (!ITEMS[id]) return;
+    ITEMS[id].sell = n;
+    ITEMS[id].crafted = true;
+    if (ITEMS[id + "_ex"]) Object.assign(ITEMS[id + "_ex"], { sell: n + 6, crafted: true });
+  });
   var C_PLACE = ["Lavender Hill", "Barn Door", "Honeybrook", "Hay Loft", "Morning Mist", "Stone Wall", "Sunday", "Windmill", "Brookside", "Old Gate", "Clover Field", "Harvest", "Lantern", "Bee Hive", "Rainy Day", "Golden Hour"];
   var C_FR = { fresh: ["Petit Chèvre de Honeybrook", "Chèvre du Ruisseau", "Frais de la Ferme"], cheddar: ["Tomme de Honeybrook", "Vieux Grange", "Tomme du Moulin"], blue: ["Bleu de la Baie", "Bleu du Ruisseau", "Bleu de Honeybrook"] };
   function cheeseNames(F2, kind, seed2 = 0) {
@@ -24743,7 +24763,7 @@ ${SIGNOFF[t2.who] || ""}`;
     addInv(id, -1);
     F.coins += it.sell;
     flash(`Sold ${it.n.toLowerCase()} +${it.sell} coins`);
-    speak("Fresh from the garden, sold!", 2500);
+    speak(it.crafted || id === "oliveoil" ? pick(["Made with your own hands: it fetches a good price.", `Hana holds it up to the light. "You made this? I'll take it."`, "Sold! Worth every minute it took."]) : "Fresh from the garden, sold!", 2500);
     save2();
   }
   function plant4(i, seedId) {

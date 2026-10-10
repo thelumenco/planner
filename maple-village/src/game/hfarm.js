@@ -124,6 +124,12 @@ export function turnWheels(F){ const h = hfState(F), day = dayKey(); let n = 0; 
 // excellent wedges are their own gift items: a little dearer, a warmer thank-you
 const exName = n => n.startsWith("Wedge of ") ? n.replace("Wedge of ", "Wedge of excellent ") : "Excellent " + n[0].toLowerCase() + n.slice(1);
 Object.values(CHEESES).forEach(c => { const base = ITEMS[c.id]; if (base && !ITEMS[c.id + "_ex"]) ITEMS[c.id + "_ex"] = {...base, n: exName(base.n), price: (base.price || 8) + 5, say: `${base.say} And this one's extraordinary. You made this?!`}; });
+// Round 130 (Mel: things that take effort should fetch more at the market): Mel's own cheeses and honey can be sold
+// at the market's Sell tab, for more than plain produce, and an excellent wheel for more again. Never more than they
+// cost to buy anywhere (the farm stand's honey is 6, the market's honeycomb 10), so buying to resell never pays.
+export const CRAFTED_SELL = {chz_fresh: 12, chz_halloumi: 13, chz_cheddar: 13, chz_brie: 14, chz_blue: 14, chz_smoked: 14,
+  honey: 6, honey_lav: 10, honey_blossom: 10, honey_cream: 12, honeycomb: 10, yoghurt: 4};
+Object.entries(CRAFTED_SELL).forEach(([id, n]) => { if (!ITEMS[id]) return; ITEMS[id].sell = n; ITEMS[id].crafted = true; if (ITEMS[id + "_ex"]) Object.assign(ITEMS[id + "_ex"], {sell: n + 6, crafted: true}); });
 const C_PLACE = ["Lavender Hill", "Barn Door", "Honeybrook", "Hay Loft", "Morning Mist", "Stone Wall", "Sunday", "Windmill", "Brookside", "Old Gate", "Clover Field", "Harvest", "Lantern", "Bee Hive", "Rainy Day", "Golden Hour"];
 const C_FR = {fresh: ["Petit Chèvre de Honeybrook", "Chèvre du Ruisseau", "Frais de la Ferme"], cheddar: ["Tomme de Honeybrook", "Vieux Grange", "Tomme du Moulin"], blue: ["Bleu de la Baie", "Bleu du Ruisseau", "Bleu de Honeybrook"]};
 // suggested names for a new wheel: places on the farm, the animal it came from, and a few in French; never one in use
