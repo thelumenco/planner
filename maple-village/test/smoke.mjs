@@ -3061,6 +3061,14 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
+  { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "jason"), L = np.NPCS.find(n => n.id === "luca");
+    check(J && J.local === "cinque" && !J.tourist && J.look.specs && J.look.tall && J.look.print && J.routine.some(sl => sl.scene === "ct_vernazza" && sl.act === "poem") && J.routine.some(sl => sl.act === "sit" && sl.from >= 18*60) && L && L.routine.some(sl => sl.act === "sit" && sl.from >= 18*60) && tw.TOWN_PLACES.ctjason.scene === "ct_vernazza",
+      "Jason lives in Vernazza now (the yellow house by the harbour): a poem at the café in the morning, the sunset on the harbour with Luca");
+    const F = {met: {jason: true}, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
+    F.story = {heard: {}, day: {carmen: "2026-10-12", rafael: "2026-10-12"}, log: [], flags: {}};
+    const first = st.tellStory(F, "jason", add, "2026-10-12"), again = st.storyReady(F, "jason", "2026-10-12");
+    ["2026-10-13", "2026-10-14", "2026-10-15"].forEach(d => st.tellStory(F, "jason", add, d));
+    check(first && /2015/.test(first.lines.join(" ")) && !again && F.inv.s_poem === 1 && F.story.heard.jason === 4, "Jason tells his stories a chapter a day whenever Mel visits (even after two others that day), and the fourth is a poem for her to keep"); }
   check(cp.KEEP_SPOTS.fridge3 && cp.KEEP_SPOTS.fridge3.only === "magnet" && tw.TOWN_GOODS.c_magnet.magnet && ["c_boat", "c_plate", "c_mortar"].every(k => tw.TOWN_GOODS[k].kind === "keepsake"), "keepsakes (the boat model, the lemon plate, the mortar) and a third magnet spot on the fridge");
 }
 {
@@ -3082,7 +3090,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#ctx [data-trip]");
   await page.waitForFunction(() => /Cinque Terre/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2000);
   check(await fox().then(f => f.coins === 140 && f.trip.town === "cinque" && f.towns && f.towns.cinque) && /Corniglia/.test(await page.locator("#sceneName").textContent()) && await ids().then(a => a.includes("dad")), "off the train at Corniglia, with Dad and Evan");
-  for (const [gate, want, places] of [["ctToVernazza", "Vernazza", ["ctfocacceria", "cttower", "ctpiazza", "ctharbour"]], ["ctToMonterosso", "Monterosso", ["ctlimoni", "ctgigante", "ctbeach"]], ["ctToManarolaE", "Manarola", ["ctpesto", "ctgelato", "ctboats", "ctrocks", "ctpadlock"]], ["ctToCornigliaN", "Corniglia", ["cttrain", "ctcantina", "ctmonorail", "ctlemons"]]]) {
+  for (const [gate, want, places] of [["ctToVernazza", "Vernazza", ["ctfocacceria", "cttower", "ctpiazza", "ctharbour", "ctjason"]], ["ctToMonterosso", "Monterosso", ["ctlimoni", "ctgigante", "ctbeach"]], ["ctToManarolaE", "Manarola", ["ctpesto", "ctgelato", "ctboats", "ctrocks", "ctpadlock"]], ["ctToCornigliaN", "Corniglia", ["cttrain", "ctcantina", "ctmonorail", "ctlemons"]]]) {
     await page.locator(`#world [data-place="${gate}"]`).dispatchEvent("click");
     await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
     check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("dad")), `through the gate to ${want} (Dad follows)`);

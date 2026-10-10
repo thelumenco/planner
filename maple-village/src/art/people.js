@@ -30,6 +30,7 @@ function extra(kind, look, k){
   const y = -46*k, r = 10.6*k;
   switch (kind){
     case "apron": return `<path d="M${-6*k} ${-30*k} h${12*k} l${1.5*k} ${15*k} h${-15*k}z" ${S("#FFFDF6")}/><path d="M${-5*k} ${-31*k} l${-2*k} ${-5*k} M${5*k} ${-31*k} l${2*k} ${-5*k}" fill="none"/>`;
+    case "specs": return `<g style="stroke:#1E1A18"><rect x="${-6.6*k}" y="${y}" width="${5.4*k}" height="${3.8*k}" rx="1" fill="none" stroke-width="1.3"/><rect x="${1.2*k}" y="${y}" width="${5.4*k}" height="${3.8*k}" rx="1" fill="none" stroke-width="1.3"/><path d="M${-1.2*k} ${y + 1.4*k} h${2.4*k}" fill="none" stroke-width="1.1"/></g>`;   // Jason's black frames (round 135), whatever's in his hands
     case "glasses": return `<circle cx="${-3.8*k}" cy="${y+2}" r="${2.6*k}" fill="none" stroke-width=".9"/><circle cx="${3.8*k}" cy="${y+2}" r="${2.6*k}" fill="none" stroke-width=".9"/><path d="M${-1.2*k} ${y+2} h${2.4*k}" fill="none" stroke-width=".9"/>`;
     case "cap": return `<path d="M${-r} ${y-3} c0 -8 ${r*2} -8 ${r*2} 0z" ${S(look.top)}/><path d="M${r-2} ${y-3} h${7*k}" stroke-width="2.2" style="stroke:${look.top}"/>`;
     case "sunhat": return `<ellipse cx="0" cy="${y-6*k}" rx="${16*k}" ry="${3.6*k}" ${S("#F3DFA6")}/><path d="M${-8*k} ${y-6*k} c0 -10 ${16*k} -10 ${16*k} 0z" ${S("#F3DFA6")}/><path d="M${-8*k} ${y-7.5*k} h${16*k}" style="stroke:var(--rose)" stroke-width="1.6"/>`;
@@ -77,11 +78,11 @@ function extra(kind, look, k){
 }
 
 // Batik: a little repeating motif (flowers of dots, tiny leaves) over the top and trousers. col: the motif colour.
-function batik(col, k){
+function batik(col, k, shirt){   // shirt: just the shirt (Jason's print shirt, round 135), not the trousers
   const flower = (x, y) => `<circle cx="${x*k}" cy="${y*k}" r="${1.5*k}" style="fill:${col}" stroke="none"/>` + [[0, -2.6], [2.5, 0], [0, 2.6], [-2.5, 0]].map(([dx, dy]) => `<circle cx="${(x + dx)*k}" cy="${(y + dy)*k}" r="${.8*k}" style="fill:${col}" stroke="none"/>`).join("");
   const leaf = (x, y) => `<path d="M${x*k} ${y*k} q${1.6*k} ${-1.6*k} ${3.2*k} 0 q${-1.6*k} ${1.6*k} ${-3.2*k} 0z" style="fill:${col}" stroke="none"/>`;
   return `<g opacity=".85" pointer-events="none">${flower(-4, -31)}${flower(4.5, -25)}${flower(-3.5, -19)}${leaf(1, -33)}${leaf(-7, -25)}${leaf(4, -18)}
-    <path d="M${-5.6*k} ${-12*k} h${3*k} M${-5.6*k} ${-8*k} h${3*k} M${2*k} ${-11*k} h${3*k} M${2*k} ${-6*k} h${3*k}" stroke-width="${1.1*k}" style="stroke:${col}"/></g>`;
+    ${shirt ? "" : `<path d="M${-5.6*k} ${-12*k} h${3*k} M${-5.6*k} ${-8*k} h${3*k} M${2*k} ${-11*k} h${3*k} M${2*k} ${-6*k} h${3*k}" stroke-width="${1.1*k}" style="stroke:${col}"/>`}</g>`;
 }
 import { bikeArt } from "./transport.js";
 // Rain gear (everyone outdoors on a rainy day, each their own): an umbrella or a raincoat with a hood and wellies.
@@ -137,7 +138,7 @@ export function personArt(look, kid){
       <g class="armR"><rect x="${7.8*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/>${sleeve(7.8*k)}</g>
       ${look.dress ? `<path d="M${-9*k} ${-17*k} L${-12.5*k} ${-5*k} h${25*k} L${9*k} ${-17*k}z" ${S(look.dress)}/>` : ""}
       <path d="M${-8.6*k} ${-37*k} q${8.6*k} ${-2.4*k} ${17.2*k} 0 l${1.4*k} ${23*k} h${-20*k}z" ${S(look.dress || look.top)}/>
-      ${look.batik && !coat ? batik(look.batik, k) : ""}
+      ${look.batik && !coat ? batik(look.batik, k) : ""}${look.print && !coat ? batik(look.print, k, true) : ""}
       ${coat ? coatArt(rain, k) : ""}
       ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
@@ -150,6 +151,7 @@ export function personArt(look, kid){
       <path d="M${-1.6*k} ${-40.4*k} q${1.6*k} ${1.4*k} ${3.2*k} 0" fill="none" stroke-width="1"/>
       ${look.hairStyle === "bobfringe" ? fringe(look.hair, -46*k, 10.6*k, k) : ""}
       ${["glasses", "cap", "sunhat", "helmet"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${look.specs ? extra("specs", look, k) : ""}
       ${look.hat && !coat ? extra(look.hat, look, k) : ""}
       ${coat ? hoodArt(rain, k) : ""}
       ${look.specs ? `<g fill="none" stroke-width="1" style="stroke:${look.specs}"><circle cx="${-3.8*k}" cy="${-44*k}" r="${2.8*k}"/><circle cx="${3.8*k}" cy="${-44*k}" r="${2.8*k}"/><path d="M${-1*k} ${-44*k} h${2*k}"/></g>` : ""}

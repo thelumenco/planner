@@ -1952,3 +1952,28 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - **Recipes:** five new dishes (trofie, focaccia, farinata, stuffed anchovies, anchovy toasts), plus pine nut and limoncino gelato.
   - **Keepsakes:** the boat model, the lemon plate, the mortar, and the Cinque Terre magnet with a third fridge spot (`fridge3`).
 - **Tests:** "Cinque Terre: the five villages" (data and logic) and "Cinque Terre, by train" (the browser trip). The autumn tapas count is now 43, and the fish journal shows 23 still to find.
+
+### Round 135: Jason, and smaller houses in Cinque Terre
+- **Jason (Mel's request, a real friend; handle with care).**
+  - He and Mel were friends from secondary school onwards. They went to Cinque Terre together in 2015: an Airbnb in Vernazza; he climbed all of Corniglia's steps; he waited on Vernazza's dark harbour with a pizza when her train came in hours late after a strike in Florence.
+  - He died in 2022. Mel wants him to live on in the game: moved to Cinque Terre, in a happy relationship, enjoying life. Keep him joyful and alive in every line. Never write anything about his death in the game.
+  - **Look:** slightly tall (`tall`), neat, fair, black hair, black spectacles (`look.specs`, drawn whatever's in his hands), a print shirt (`look.print`: the batik motif on the shirt only) and chinos.
+  - **Voice:** slightly formal, literary, quotes things (Wilde, Wordsworth, Shakespeare, Byron), and dry humour.
+  - **His day:**
+    - 8–10:30: a poem at the café in Vernazza's piazza (act `poem`, sitting).
+    - 10:30–12:30: a walk in Corniglia by the steps.
+    - Lunch at the focacceria.
+    - 14:00–16:30: Monterosso.
+    - 16:30–18:00: a gelato.
+    - 18:00–21:45: the sunset on Vernazza's harbour with Luca (act `sit`).
+  - **Luca:** his partner, a local who mends the fishing boats' engines. They met when the ferry broke down outside the harbour.
+  - **His home:** the yellow house by the harbour, with its second-floor balcony (`ctjason` in Vernazza).
+  - **The pizza:** tap the harbour after 6pm while Jason's there, and he's saved Mel a slice, like 2015 (once a day).
+  - **His stories:** five chapters (data/stories.js `jason`), told a chapter a day whenever Mel visits, outside the two-a-day limit (stories.js `storyReady`).
+    - The 2015 memories, the steps, meeting Luca, then a poem for Mel (`s_poem`, a keepsake), then what happiness is.
+    - Should Mel ask for more, add chapters; don't change these.
+- **Houses (Mel: too many storeys and windows; they were small, individual, pastel, faded, with plants and laundry):** `casa` in town-cinque.js now draws little houses.
+  - **Size:** three storeys at most and two windows a floor, so four to six windows.
+  - **Colour:** faded pastel plaster with paler patches. Some shutters are closed, the rest open.
+  - **Details:** window boxes of geraniums, hanging pots, a balcony with pots on some houses, and the odd washing line.
+  - **Big boxes:** a wide one splits into houses side by side at different heights. A wide shop keeps its door and sign in a house of its own with neighbours either side. A tall one becomes a three-storey house with the green hillside (scrub) above it.

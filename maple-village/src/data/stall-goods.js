@@ -130,6 +130,7 @@ Object.assign(GOODS, {
   s_praline: G("Henri's hazelnut pralines", "family", 0, null, "Hazelnut pralines, from Henri's own recipe. Melt-in-the-mouth.", ["box", "#C98A4A"]),
   s_toast: G("Postman's toast", "family", 0, null, "Honey, butter and a pinch of sea salt. Hana's new favourite.", ["loaf", "#E3B04B"]),
   s_spoon: K("Tomás's olive-wood spoon", 0, "An olive-wood spoon Tomás Ruiz carved in 1913 from a branch of the tree by the mill. Worn smooth by four generations of soup.", ["roll", "#C9A27E"]),
+  s_poem: K("A poem from Jason", 0, "In Jason's neat hand, on cream paper: 'The late train came. The harbour lights stayed on. / The pizza cooled; I'd read my book twice through. / Some evenings are not lost, they're only long. / I'd wait again. I'd always wait for you.'", ["roll", "#FFFDF6"]),
   s_nonna: G("Nonna's fior di latte", "family", 0, null, "Just milk and sugar, the way Sofia's nonna made it in Napoli.", ["cone", "#FFF6DC"])
 });
 Object.assign(GOODS, {

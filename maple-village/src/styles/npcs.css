@@ -116,3 +116,7 @@
 .npc.act-read:not(.walk) > g,.npc.act-knit:not(.walk) > g{transform:translateY(7px)}
 .npc.act-row:not(.walk) .legL,.npc.act-row:not(.walk) .legR{visibility:hidden}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-sunbathe .bob,.ch.npc.act-knit .armL,.ch.npc.act-knit .armR,.ch.npc.act-bocce .armR,.ch.npc.act-row .armR,.ch.npc.act-bocce .tool,.ch.npc.act-poles .tool,.ch.npc.act-row .tool{animation:none}}
+/* Jason (round 135): his morning poem at a café table, sitting, pen going */
+.npc.act-poem:not(.walk) .legL,.npc.act-poem:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}.npc.act-poem:not(.walk) > g{transform:translateY(7px)}
+.ch.npc.act-poem:not(.walk) .armR{animation:tapA 1.6s ease-in-out infinite alternate}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-poem .armR{animation:none}}

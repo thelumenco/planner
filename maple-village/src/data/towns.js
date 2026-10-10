@@ -310,6 +310,7 @@ export const TOWNS = {
       ctbeach: "The beach: the only proper sandy beach in the five villages, with rows of striped umbrellas and the sea so clear you can count the pebbles.",
       ctboats: "The boats: little wooden fishing boats pulled right up into the main street on their trailers, painted every colour.",
       ctrocks: "The swimming rocks: smooth flat rocks below the houses, where everyone lies in the sun and jumps into the deep blue water.",
+      ctjason: "The yellow house by the harbour. Up on the second floor, Jason's balcony: geraniums, a little table and two chairs, a pile of books, and a pair of black spectacles folded on top. The window's open. Somebody inside is humming.",
       ctpadlock: "The lovers' path railing: hundreds of padlocks, each with two names. The sea goes on and on below."
     }
   }
@@ -423,6 +424,7 @@ export const TOWN_PLACES = {
   ctgelato: {scene: "ct_manarola", name: "The gelateria", door: [420, 352], spot: true, mark: [420, 230], line: "The gelateria."},
   ctboats: {scene: "ct_manarola", name: "The boats", door: [262, 380], spot: true, mark: [262, 300], line: "The boats."},
   ctrocks: {scene: "ct_manarola", name: "The swimming rocks", door: [110, 520], spot: true, mark: [80, 470], line: "The swimming rocks."},
+  ctjason: {scene: "ct_vernazza", name: "Jason's house", door: [478, 472], spot: true, mark: [478, 380], line: "Jason's house."},
   ctpadlock: {scene: "ct_manarola", name: "The lovers' path", door: [236, 486], spot: true, mark: [236, 430], line: "The lovers' path."},
   ctToCornigliaN: {scene: "ct_manarola", name: "To Corniglia", door: [262, 26], spot: true, bridge: "ct_corniglia", mark: [200, 30], line: "North up the coast to Corniglia."},
   ct_focacceria: {scene: "ct_vernazza", name: "The focacceria", door: [394, 196]}, ct_pesto: {scene: "ct_manarola", name: "The pesto kitchen", door: [140, 196]},

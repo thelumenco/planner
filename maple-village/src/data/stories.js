@@ -172,6 +172,14 @@ export const STORIES = {
     {lines: ["There is one sweet I make only one day a year: the first snow. White, round, a little cold. My father taught me on the day he retired."]},
     {lines: ["My daughter wants to make chocolate wagashi. Chocolate! My father would faint.", "...I tried one. It was very good. Don't tell her."]}
   ],
+  // Jason (round 135): Mel's friend, who lives in Vernazza now; told on a trip day, one a day
+  jason: [
+    {lines: ["Do you remember 2015? Your train stuck in Florence for six hours, and me on the harbour stones with a pizza going cold.", "I'd brought a book. I'd have waited all night. I very nearly did."]},
+    {lines: ["Every one of Corniglia's steps, that summer. I counted them aloud, and you pretended not to know me.", "I still climb them, most mornings. They haven't got any fewer. I've got a little more patient."]},
+    {lines: ["I met Luca when the ferry from La Spezia broke down outside the harbour. He came out in a little boat with a toolbox and a terrible joke.", "I stayed for the joke. Then for the man. Then for the view. In that order, he'll tell you. He's wrong, but I let him."]},
+    {lines: ["Every morning, the same table, an espresso, a poem. Most of them are dreadful. About one a month is all right.", "This one's all right. It's for you. Don't read it here, I'll go red. Read it on the train."], reward: "poem"},
+    {lines: ["I've decided what happiness is, Mel. A second-floor window. A harbour. Someone who brings you coffee without asking.", "And an old friend who comes to visit. I have all four today. Imagine that."]}
+  ],
   // Ronda's locals (round 107): told on a day trip (no quest needed; the two-a-day limit still holds)
   carmen: [
     {lines: ["I learned the yemas from the nuns at the convent when I was nine. They paid me in sugar."]},

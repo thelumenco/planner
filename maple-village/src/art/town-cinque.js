@@ -15,8 +15,8 @@ import { lampDefs, lampGlow } from "./village-extras.js";
 import { seasonOf } from "../data/items.js";
 
 const C = {sea: "#4F9CC4", sea2: "#7FBCD8", foam: "#EAF5FA", rock: "#9A8E80", rock2: "#7E7266", path: "#E3D6BE", path2: "#CDBEA0", slate: "#8A8C92",
-  shutter: "#4E7A5A", stone: "#C9BCA8", vine: "#6E9A44", vine2: "#86AE58", terrace: "#B9A88A", lemon: "#F3D34A", leaf: "#4E7A3A", ink: "#2F2B28",
-  houses: ["#E8B04A", "#D9734A", "#E89A9A", "#F3D98A", "#8FC0A8", "#F3E7C8", "#9FC3D9", "#E07A5F", "#F2C2A0", "#C9A2C8"]};
+  shutter: "#6A9276", stone: "#C9BCA8", vine: "#6E9A44", vine2: "#86AE58", terrace: "#B9A88A", lemon: "#F3D34A", leaf: "#4E7A3A", ink: "#2F2B28",
+  houses: ["#EFCB8E", "#E3A588", "#EDBDB8", "#F2DFA8", "#B9D6C2", "#F1E6CF", "#BFD4E2", "#E6AE96", "#F1CDB4", "#D9C2D8"]};   // faded pastels (Mel, round 135)
 const W = ink;
 const ssn = () => seasonOf(dayKey());
 const lab = (x, y, t, col = "#F6E3B4", size = 10) => tapeLabel(x, y, t, col, size);
@@ -24,15 +24,59 @@ const rnd = i => { const v = Math.sin(i*127.1 + 311.7)*43758.5453; return v - Ma
 
 /* ---------- pieces ---------- */
 const shade = (x, y, w, h, d = 10) => `<path d="M${x + w} ${y + 6} l${d} ${d*.7} V${y + h + d*.7} H${x + d} l${-d} ${-d*.7}z" style="fill:#6F7C9C" opacity=".18" pointer-events="none"/>`;
-// a tall narrow Ligurian house: painted plaster, green shutters on every window, a grey slate roof
+// a little Ligurian house (Mel, round 135: "they were quite small, three storeys max, more like individual houses"):
+// faded pastel plaster, two windows a floor at most (so four to six), green shutters, window boxes and pots on the
+// balconies, the odd washing line, a low slate roof. Big boxes are split up: a wide one into houses side by side, a
+// tall one into a house further up the hill peeking over the one in front. A shop keeps its door and sign in the middle.
 function casa(x, y, w, h, col, o = {}){
-  const cols = Math.max(1, Math.floor((w - 8)/18)), rows = Math.max(1, Math.floor((h - (o.door ? 30 : 8))/24));
-  const wins = Array.from({length: rows}, (_, r) => Array.from({length: cols}, (_, c) => { const wx = x + 6 + c*((w - 12)/cols) + ((w - 12)/cols - 12)/2, wy = y + 8 + r*24;
-    return `<rect x="${wx.toFixed(1)}" y="${wy}" width="12" height="15" style="fill:${C.shutter}"/><path d="M${(wx + 6).toFixed(1)} ${wy} v15" style="stroke:#3A5A44" stroke-width=".8"/>`; }).join("")).join("");
-  return shade(x, y, w, h) + sk(`<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:${col}"/>${wins}${o.door ? `<rect x="${x + (o.doorX || w/2) - 10}" y="${y + h - 26}" width="20" height="26" rx="2" style="fill:${o.doorCol || "#6B5444"}"/>` : ""}
-    <path d="M${x - 3} ${y + 2} L${x + w/2} ${y - 10} L${x + w + 3} ${y + 2}z" style="fill:${C.slate}"/>`,
-    `<rect x="${x}" y="${y}" width="${w}" height="${h}"/><path d="M${x - 3} ${y + 2} L${x + w/2} ${y - 10} L${x + w + 3} ${y + 2}z"/>${o.door ? `<rect x="${x + (o.doorX || w/2) - 10}" y="${y + h - 26}" width="20" height="26" rx="2"/>` : ""}`)
-    + (o.sign ? `<rect x="${x + (o.doorX || w/2) - 30}" y="${y + h - 44}" width="60" height="13" rx="2" style="fill:#FFFDF6;stroke:var(--line)" stroke-width=".8" pointer-events="none"/><text x="${x + (o.doorX || w/2)}" y="${y + h - 34}" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="8" fill="${C.ink}" pointer-events="none">${o.sign}</text>` : "");
+  const seed = Math.round(x*7 + y*13 + w);
+  if (o.door && w > 96) {   // a wide shop: the shop in the middle, a neighbour either side
+    const dx = o.doorX || w/2, sw = 84, sx = Math.max(x, Math.min(x + w - sw, x + dx - sw/2)), out = [];
+    if (sx - x >= 24) out.push(casa(x, y + 8, sx - x, h - 8, C.houses[(seed + 2) % C.houses.length]));
+    if (x + w - (sx + sw) >= 24) out.push(casa(sx + sw, y + 4, x + w - sx - sw, h - 4, C.houses[(seed + 5) % C.houses.length]));
+    return out.join("") + casa(sx, y, sw, h, col, {...o, doorX: x + dx - sx});
+  }
+  if (!o.door && w > 62) {   // a wide box: two or three little houses side by side, not all the same height
+    const n = Math.ceil(w/50), ww = w/n;
+    return Array.from({length: n}, (_, i) => { const dy = Math.round(rnd(seed + i)*12); return casa(x + i*ww, y + dy, ww - (i < n - 1 ? 1 : 0), h - dy, C.houses[(seed + i*3) % C.houses.length], {...o, solo: true}); }).join("");
+  }
+  const maxH = o.door ? 96 : 84;
+  if (h > maxH) {   // a tall box: the house, three floors, and the green hillside showing above it
+    const hf = maxH - Math.round(rnd(seed)*8), top = h - hf;
+    const scrub = `<g pointer-events="none">${sk([0, 1, 2].map(k => `<ellipse cx="${(x + w*(.2 + k*.3)).toFixed(1)}" cy="${(y + top*.55 + rnd(seed + k)*top*.3).toFixed(1)}" rx="${(w*.24).toFixed(1)}" ry="${(8 + top*.15).toFixed(1)}" style="fill:${["#9DB27A", "#8AA46A", "#A9BC86"][k]}"/>`).join(""), "")}</g>`;
+    return scrub + casa(x, y + top, w, hf, col, o);
+  }
+  return house(x, y, w, h, col, o, seed);
+}
+function house(x, y, w, h, col, o, seed){
+  const floors = Math.max(1, Math.min(3, Math.round((h - 4)/26))), fh = (h - 4)/floors, cols = w < 40 ? 1 : 2, r = i => rnd(seed + i);
+  const winX = c => x + (cols === 1 ? w/2 : w*(c ? .7 : .3)) - 6;
+  let wins = "", deco = "";
+  for (let f = 0; f < floors; f++) {
+    const ground = f === floors - 1, wy = y + 6 + f*fh + (fh - 16)/2;
+    if (ground && o.door) continue;   // the shop front: its door and sign, below
+    for (let c = 0; c < cols; c++) {
+      const wx = winX(c), shut = r(f*5 + c) < .35;   // a few shutters closed against the sun
+      wins += shut ? `<rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="12" height="16" style="fill:${C.shutter}"/><path d="M${(wx + 6).toFixed(1)} ${wy.toFixed(1)} v16" style="stroke:#4E6E58" stroke-width=".7"/>`
+        : `<rect x="${(wx - 3).toFixed(1)}" y="${wy.toFixed(1)}" width="3" height="16" style="fill:${C.shutter}"/><rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="12" height="16" style="fill:#5E6A70"/><rect x="${(wx + 12).toFixed(1)}" y="${wy.toFixed(1)}" width="3" height="16" style="fill:${C.shutter}"/>`;
+      // a window box of geraniums, or a pot hanging beside the window
+      if (!o.back && r(f*7 + c + 3) < .45) deco += `<rect x="${(wx - 1).toFixed(1)}" y="${(wy + 16).toFixed(1)}" width="14" height="3" style="fill:#A0705A"/>${[1, 5, 9, 12].map((d, k) => `<circle cx="${(wx + d).toFixed(1)}" cy="${(wy + 15).toFixed(1)}" r="1.9" style="fill:${k % 2 ? "#7FA35A" : ["#E8566C", "#F29AB0"][(seed + k) % 2]}"/>`).join("")}`;
+      else if (!o.back && r(f*11 + c) < .25) deco += `<path d="M${(wx + 18).toFixed(1)} ${(wy - 2).toFixed(1)} v5" style="stroke:#3A3430" stroke-width=".6"/><path d="M${(wx + 15).toFixed(1)} ${(wy + 3).toFixed(1)} h7 l-1 5 h-5z" style="fill:#C9805A"/><path d="M${(wx + 16).toFixed(1)} ${(wy + 7).toFixed(1)} q-1 5 -2 8 M${(wx + 19).toFixed(1)} ${(wy + 8).toFixed(1)} q0 4 1 7 M${(wx + 21).toFixed(1)} ${(wy + 7).toFixed(1)} q2 3 2 6" fill="none" style="stroke:#6E9A44" stroke-width="1.4"/>`;
+    }
+    // a little balcony on a middle floor, pots along the rail
+    if (!o.back && floors > 1 && cols === 2 && (o.balcony ? f === 0 : f === floors - 2 && r(f + 21) < .5)) { const by = wy + 17, bx1 = x + w*.18, bx2 = x + w*.82;
+      deco += `<rect x="${bx1.toFixed(1)}" y="${by.toFixed(1)}" width="${(bx2 - bx1).toFixed(1)}" height="2.5" style="fill:#8A8478"/><path d="${Array.from({length: Math.floor((bx2 - bx1)/5) + 1}, (_, k) => `M${(bx1 + k*5).toFixed(1)} ${(by - 7).toFixed(1)} v7`).join(" ")} M${bx1.toFixed(1)} ${(by - 7).toFixed(1)} H${bx2.toFixed(1)}" fill="none" style="stroke:#4A4440" stroke-width=".7"/>${[.2, .5, .8].map((t, k) => `<ellipse cx="${(bx1 + (bx2 - bx1)*t).toFixed(1)}" cy="${(by - 9).toFixed(1)}" rx="3.4" ry="3" style="fill:${k === 1 ? "#E8566C" : "#6E9A44"}"/>`).join("")}`; }
+  }
+  // the odd washing line strung across the top floor
+  if (!o.back && cols === 2 && r(31) < .35) { const ly = y + 6 + (fh - 16)/2 + 18, lx1 = winX(0) + 13, lx2 = winX(1) - 1;
+    if (lx2 - lx1 > 8) deco += `<path d="M${lx1.toFixed(1)} ${ly.toFixed(1)} Q${((lx1 + lx2)/2).toFixed(1)} ${(ly + 3).toFixed(1)} ${lx2.toFixed(1)} ${ly.toFixed(1)}" fill="none" style="stroke:#3A3430" stroke-width=".5"/>${[.3, .65].map((t, k) => `<rect x="${(lx1 + (lx2 - lx1)*t - 2.5).toFixed(1)}" y="${(ly + 1).toFixed(1)}" width="5" height="6" style="fill:${["#FFFDF6", "#9FC3D9", "#F29AB0"][(seed + k) % 3]}"/>`).join("")}`; }
+  // faded plaster: a few paler patches, and a cool haze over the houses further up the hill
+  const patina = `${[0, 1].map(k => `<ellipse cx="${(x + w*(.25 + r(40 + k)*.5)).toFixed(1)}" cy="${(y + h*(.3 + r(50 + k)*.5)).toFixed(1)}" rx="${(w*.22).toFixed(1)}" ry="${(h*.12).toFixed(1)}" style="fill:#FFFDF6" opacity=".22"/>`).join("")}${o.back ? `<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:#DCE6EE" opacity=".28"/>` : ""}`;
+  const dx = o.doorX || w/2, door = o.door ? `<rect x="${x + dx - 10}" y="${y + h - 26}" width="20" height="26" rx="2" style="fill:${o.doorCol || "#6B5444"}"/>` : "";
+  const roof = `<path d="M${x - 3} ${y + 2} L${x + w/2} ${y - 7} L${x + w + 3} ${y + 2}z" style="fill:${C.slate}"/>`;
+  return (o.back ? "" : shade(x, y, w, h)) + sk(`<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:${col}"/>${patina}${wins}${deco}${door}${roof}`,
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}"/><path d="M${x - 3} ${y + 2} L${x + w/2} ${y - 7} L${x + w + 3} ${y + 2}z"/>${o.door ? `<rect x="${x + dx - 10}" y="${y + h - 26}" width="20" height="26" rx="2"/>` : ""}`)
+    + (o.sign ? `<rect x="${x + dx - 30}" y="${y + h - 44}" width="60" height="13" rx="2" style="fill:#FFFDF6;stroke:var(--line)" stroke-width=".8" pointer-events="none"/><text x="${x + dx}" y="${y + h - 34}" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="8" fill="${C.ink}" pointer-events="none">${o.sign}</text>` : "");
 }
 // a cluster of houses stacked up a slope: back rows higher, drawn first
 const stack = (spec, seed = 0) => spec.map(([x, y, w, h], i) => casa(x, y, w, h, C.houses[(i*3 + seed) % C.houses.length])).join("");
@@ -76,7 +120,9 @@ function vernazzaScreen(){
   // the church right on the water, with its tower
   const church = `<g pointer-events="none">${sk(`<rect x="20" y="380" width="80" height="56" style="fill:#E3D6BE"/><path d="M14 382 L60 356 L106 382z" style="fill:${C.slate}"/><rect x="74" y="320" width="22" height="60" style="fill:#D9C9A8"/><path d="M70 322 L85 300 L100 322z" style="fill:${C.slate}"/><rect x="50" y="404" width="20" height="32" rx="10" style="fill:#6B5444"/>`,
     `<rect x="20" y="380" width="80" height="56"/><rect x="74" y="320" width="22" height="60"/>`)}</g>`;
-  const houses = stack([[330, 70, 46, 110], [374, 60, 52, 120], [424, 74, 44, 106], [466, 66, 50, 114], [446, 380, 70, 90], [430, 470, 86, 80]], 1)
+  const houses = stack([[330, 70, 46, 110], [374, 60, 52, 120], [424, 74, 44, 106], [466, 66, 50, 114], [430, 470, 86, 80]], 1)
+    // Jason's flat (round 135): the second floor of the yellow house by the harbour, geraniums all along the balcony
+    + place("ctjason", 478, 472, 30, 9, "Jason's house", casa(446, 386, 60, 84, "#F2DFA8", {balcony: true}) + `<g pointer-events="none">${[458, 468, 484, 494].map((x, i) => `<circle cx="${x}" cy="${i % 2 ? 406 : 404}" r="2.6" style="fill:${i % 2 ? "#F29AB0" : "#E8566C"}"/>`).join("")}</g>`, "Jason's", 404, 446, "#F6E3B4")
     + `<g data-place="ctfocacceria" aria-label="The focacceria"><ellipse class="hov" cx="394" cy="192" rx="40" ry="10" style="fill:var(--butter)"/>${casa(354, 100, 80, 90, C.houses[1], {door: true, doorX: 40, sign: "FOCACCERIA", doorCol: "#8A5A3A"})}${lab(394, 214, "Focacceria", "#FBE0B8", 10)}</g>`;
   const piazza = place("ctpiazza", 300, 356, 50, 12, "The piazza", cafeUmbrella(270, 330, "#C9483A") + cafeUmbrella(340, 320, "#3E6BAE") + cafeUmbrella(320, 410, "#2E7A5A")
     + sk(`<rect x="250" y="440" width="120" height="30" rx="3" style="fill:#D9C9A8"/>${[[270, 452, "#C9483A"], [300, 458, "#3E6BAE"], [334, 450, "#C9483A"], [352, 460, "#FFFDF6"]].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="3.4" style="fill:${c}"/>`).join("")}`, `<rect x="250" y="440" width="120" height="30" rx="3"/>`), "Piazza", 300, 490, "#F6D3DC");

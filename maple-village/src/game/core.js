@@ -2252,6 +2252,12 @@ function townSpot(id){
   if (id === "ctpadlock") { const c = cinqueState(F); if (!c.padlock && F.coins >= 3) { F.coins -= 3; c.padlock = dayKey(); sfx("chime"); gainXp(1); speak("A little brass padlock, two sets of initials scratched on with a key, clicked onto the railing over the sea. It stays there now.", 6000); drawScene(); save(); }
     else speak(c.padlock ? "Your padlock's still there, among the hundreds, catching the sun." : T.say.ctpadlock, 5000); render(); return; }
   if (id === "ctbeach" && inParty(F, "evan") && !evanNight()) { speak(T.say.ctbeach, 4500); setTimeout(() => { evanSays(pick(["a castle! for you, Mama!", "dig dig dig", "the sea is coming for my castle!"])); mprop("sparkle", mel.x + 30, mel.y - 20, 1600); }, 2000); gainXp(1); render(); return; }
+  // Jason (round 135): on the harbour in the evening he's saved Mel a slice of pizza, like the night in 2015 (once a day)
+  if (id === "ctharbour" && sgHM() >= 18*60 && isHere("jason") && cinqueState(F).pizza !== dayKey()) { cinqueState(F).pizza = dayKey(); mel.sitting = true; nodes.mel.classList.add("sit"); sfx("chime"); hearts(2);
+    speak("Jason pats the cold stones beside him and opens a pizza box. \"I saved you a slice. Some traditions ought to be kept.\" The harbour lights come on, one by one, over the dark water.", 7500);
+    setTimeout(() => npcSay("jason", pick(["Just like 2015. Except this time your train was on time. I'm almost disappointed.", "I'd have waited, you know. I always would.", "Margherita. Some things one doesn't improve upon."])), 4200);
+    if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["pizza on the rocks!", "Uncle Jason, more please!"])), 8500);
+    save(); render(); return; }
   // Jeju (round 129): Evan's rock-pool net; add a stone to a wish-tower; pat the stone grandfather's nose
   if (id === "jjpools" && inParty(F, "evan") && !evanNight()) { speak(T.say.jjpools, 5000); setTimeout(() => { evanSays(pick(["a CRAB! a tiny crab!", "Mama, a snail! it's walking!", "look in my net! LOOK!"])); mprop("sparkle", mel.x - 20, mel.y - 50, 1400); }, 2200); gainXp(1); render(); return; }
   if (id === "jjcairns") { sfx("chime"); speak(pick(["You find a flat black stone and balance it on the tallest tower. A wish for everyone at home.", "One more stone, very carefully. It wobbles, and holds."]), 4500); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays("my stone! my wish!"), 1600); render(); return; }

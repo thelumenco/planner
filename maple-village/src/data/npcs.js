@@ -751,6 +751,47 @@ export const NPCS = [
     lines: ["Close to the little ball. That's all. That's the whole game. It takes a lifetime.", "Sixty years in this piazza. I've seen everything. Twice.", "Your grandfather! Ha! He's good. Too good. I'll beat him tomorrow.", "Siesta is not lazy. Siesta is wisdom."],
     away: "Nino's home for lunch and a sleep."
   },
+  // Jason (round 135, for Mel): her friend since they were teenagers at secondary school. They came to Cinque Terre
+  // together in 2015 (an Airbnb in Vernazza; he climbed every one of Corniglia's steps; he waited on the dark harbour
+  // with a pizza when her train came in hours late after a strike in Florence). In the game he's moved here for good:
+  // the second floor of the yellow house by the harbour, a happy life with Luca. Slightly tall, neat, fair, black
+  // hair and black spectacles, a print shirt and chinos. Speaks a little formally, quotes things, very funny.
+  // His day: a poem at the café, a walk (he still climbs the steps), lunch at Beppe's, the beach, a gelato, and the
+  // sunset on the harbour wall with Luca.
+  {
+    id: "jason", local: "cinque", pitch: 0.92, name: "Jason", job: "Lives in Vernazza now. Writes poetry, walks, watches the sunset",
+    intro: "Mel. Well, well, well. I trust you came by train, and not by strike? I live here now, you know: the second floor of the yellow house by the harbour, geraniums on the balcony. Come up whenever you like. There are far fewer stairs than Corniglia.",
+    look: {skin: "#F6DCC6", hair: "#1E1A18", hairStyle: "short", top: "#2E6E8E", print: "#F3D98A", bottom: "#D9C49A", tall: true, specs: true},
+    routine: [slot("8:00", "10:30", "ct_vernazza", [332, 296], {act: "poem", dir: -1}), slot("10:30", "12:30", "ct_corniglia", [[372, 420], [300, 460], [400, 380]]),
+      slot("12:30", "14:00", "ct_focacceria", [[200, 520], [330, 540]]), slot("14:00", "16:30", "ct_monterosso", [[200, 480], [340, 470], [260, 420]]),
+      slot("16:30", "18:00", "ct_gelato", [[200, 500], [330, 520]]), slot("18:00", "21:45", "ct_vernazza", [222, 418], {act: "sit", dir: -1})],
+    hellos: ["Mel! Sit, sit. I've ordered for you already. I know your tastes.", "Ah, there you are. The day has improved considerably.", "Mel! Come and admire the view with me. I've been admiring it alone, and it's wasted on one."],
+    lines: [
+      "'To live is the rarest thing in the world. Most people exist, that is all.' Wilde. I have decided to be rare.",
+      "Three hundred and eighty-two steps up to Corniglia. I climbed every one of them in 2015, and I have been insufferable about it ever since.",
+      "Byron swam across the gulf down the coast, you know. I prefer to admire it from a café. Each to his own heroics.",
+      "Luca says my shirts frighten the fish. I say the fish have no taste.",
+      "'Shall I compare thee to a summer's day?' No. The day would only sulk.",
+      "The light does something to the houses at six o'clock. I keep trying to write it down, and the sea keeps getting there first.",
+      "Second floor, a harbour view, and a neighbour who sings Puccini, badly, at seven in the morning. Paradise has its terms.",
+      "One must have a little ritual. Mine is an espresso, a poem, and pretending I'm not watching the boats.",
+      "'The world is too much with us.' Wordsworth. Not here, though. Here the world is exactly enough.",
+      "I am told I dress 'flamboyantly'. I prefer 'legibly'. One should be able to read a man from across a piazza.",
+      "Do you remember the pizza? On the harbour stones, in the dark, after your train? Best meal of my life. Don't tell Beppe."
+    ],
+    actLines: {poem: ["Hush. A rhyme for 'harbour' is proving elusive.", "Today's poem is about a cat in a boat. It's going terribly. He won't sit still. The cat, not the poem.", "Ah, Mel. I'm on my third draft. The first two were by a lesser poet."],
+      sit: ["Watch the houses go pink. Every evening, and it never once repeats itself.", "Luca says the sunset is just the earth turning. I say so is everything worth watching.", "Stay a little. There's always a train. Well. There's usually a train."]},
+    away: "Jason's upstairs with a book. His balcony door is open, and there's music."
+  },
+  {
+    id: "luca", local: "cinque", pitch: 0.8, name: "Luca", job: "Mends the fishing boats' engines in Vernazza. Jason's partner",
+    intro: "Ciao! Luca. I fix the engines on the boats. Jason fixes my grammar. It is a fair trade. You're Mel? He talks about you all the time. The train, the pizza, the steps. Every story, the steps get more.",
+    look: {skin: "#D8A47E", hair: "#3A2A20", hairStyle: "short", top: "#F3E7C8", bottom: "#3E5E7A"},
+    routine: [slot("8:00", "13:00", "ct_vernazza", [[200, 440], [180, 470], [230, 450]]), slot("15:00", "18:00", "ct_vernazza", [[200, 440], [230, 450]]), slot("18:00", "21:45", "ct_vernazza", [246, 420], {act: "sit", dir: -1})],
+    lines: ["He writes poems about the sea. I tell him the sea is mostly diesel. He doesn't listen. Good.", "I met him when the ferry broke down outside the harbour. I came out with my toolbox. He came out with a book. He's still here.",
+      "He made me read Shakespeare. I made him eat raw anchovies. We are both braver now.", "Every evening, the harbour wall, the sunset. Ten years I lived here and never sat still. Now I sit."],
+    away: "Luca's out in a boat, fixing somebody's engine."
+  },
   // round 134: the people who keep each room busy all day (the town playbook: 2-4 people in every room)
   {
     id: "ilaria", local: "cinque", pitch: 1.08, name: "Ilaria", job: "Beppe's daughter, on the focacceria counter",
