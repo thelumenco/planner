@@ -50,7 +50,8 @@ export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
 export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
 const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone", fish: "rod", guitar: "guitar", sketch: "sketchbook", photo: "camera", notes: "notebook", doze: "newspaper",
   parasol: "parasol", wheel: "claycup", cranes: "crane", go: "goboard", skewer: "skewer", brush: "brush", fortune: "fortune",
-  kite: "kite", pick: "tbasket", nets: "net", stack: "stone"};   // (and these: Jeju, round 129; "luck" is an arm and "tandem" a bike)   // (and these: Kyoto, round 122)   // (the last five: Ronda, round 107)
+  kite: "kite", pick: "tbasket", nets: "net", stack: "stone",
+  knit: "knit", bocce: "bocce", poles: "poles", row: "oar", read: "book"};   // (and these: Cinque Terre, round 134; "sunbathe" is a towel)   // (and these: Jeju, round 129; "luck" is an arm and "tandem" a bike)   // (and these: Kyoto, round 122)   // (the last five: Ronda, round 107)
 const outdoors = s => OUTDOOR.includes(s);
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 
@@ -59,6 +60,7 @@ function makeNode(id, look, kid, letter, act){
   g.setAttribute("class", "ch npc" + (act ? " act-" + act : "")); g.dataset.npc = id; g.setAttribute("role", "button");
   if (act && PROPS[act]) look = Object.assign({}, look, {extra: PROPS[act]});
   if (act === "sup") look = Object.assign({}, look, {board: true, hat: null});
+  if (act === "sunbathe") look = Object.assign({}, look, {towel: true, hat: null});   // Cinque Terre: Mum on the Manarola rocks
   if (act === "tandem") look = Object.assign({}, look, {bike: "#C8432F"});   // Jeju: Marcus and Angellina on the coast road
   const owned = (api.F().fam && api.F().fam.owned) || {};
   if (id === "darren" && act === "type" && owned.headphones) look = Object.assign({}, look, {headphones: true});
@@ -105,7 +107,7 @@ function tickVillager(def, dt){
     if (was && slot.follow) route(e, p[0], p[1]);   // on a day trip: round things to the next spot
     else if (was) { e.tx = p[0]; e.ty = p[1]; e.path = []; }   // straight across the open field (stalls sit above the walkable area)
     // on a day trip the family come in with Mel (from just behind her) and stroll over to their favourite spot
-    else if (slot.follow && api.mel) { const b = api.bounds(); e.x = clamp(api.mel.x + rnd(-30, 30), b[0], b[2]); e.y = clamp(api.mel.y + rnd(6, 26), b[1], b[3]); route(e, p[0], p[1]); }
+    else if (slot.follow && api.mel) { const b = api.bounds(); e.x = clamp(api.mel.x + rnd(-30, 30), b[0], b[2]); e.y = clamp(api.mel.y + rnd(6, 26), b[1], b[3]); if (slot.free) { e.tx = p[0]; e.ty = p[1]; e.path = []; } else route(e, p[0], p[1]); }   // (free: rowing out to sea, straight off the beach)
   }
   // Now and then a neighbour near Mel says hello (each at most every few minutes).
   const near = Math.hypot(e.x - api.mel.x, e.y - api.mel.y) < 110;

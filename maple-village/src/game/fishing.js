@@ -37,6 +37,7 @@ export const FISH = {
   rudd: {n: "Rudd", spot: "lake", w: 26, cm: [12, 26], hard: 1, item: "fish", hint: "The lake, any time. Red fins."},
   crayfish: {n: "Crayfish", spot: "lake", w: 16, cm: [8, 15], hard: 1, item: "crayfish", hint: "The lake, at night or in the rain."},
   eel: {n: "Eel", spot: "lake", w: 9, when: "night", cm: [40, 90], hard: 4, item: "fish", hint: "The lake, at night."},
+  anchovy: {n: "Anchovy", spot: "sea", also: ["bay"], w: 26, cm: [8, 15], hard: 1, item: "anchovy", hint: "The sea, in a silver shoal, any time."},   // round 132
   sardine: {n: "Sardine", spot: "sea", also: ["bay"], w: 32, cm: [12, 20], hard: 1, item: "sardine", hint: "The sea, any time."},
   mackerel: {n: "Mackerel", spot: "sea", also: ["bay"], w: 24, when: "day", cm: [25, 40], hard: 2, item: "mackerel", hint: "The sea, in daylight."},
   seabream: {n: "Sea bream", spot: "sea", also: ["bay"], w: 14, cm: [25, 45], hard: 3, item: "seabream", hint: "The sea, any time. Fussy."},
@@ -63,6 +64,7 @@ export const fishHere = (spot, day, hm) => !spotOpen(spot, day, hm) ? [] : Objec
 const ING = {trout: ["Rainbow trout", 4, "with almond butter, at the kitchen"], crayfish: ["Crayfish", 2, "four on toast with garlic, at the kitchen"],
   sardine: ["Sardine", 2, "three on the grill, at the kitchen"], mackerel: ["Mackerel", 3, "escabeche with peppers, at the kitchen"],
   seabream: ["Sea bream", 5, "baked with olives, at the kitchen"], squid: ["Squid", 4, "fried calamari, at the kitchen"], octopus: ["Octopus", 6, "pulpo a la gallega, at the kitchen"], shrimp: ["Shrimp", 2, "gambas al ajillo with garlic and olive oil, at the kitchen"],
+  anchovy: ["Anchovy", 1, "fried and stuffed at the kitchen, or salted in the loft for weeks of flavour"],
   mullet: ["Red mullet", 6, "grill it on the bonfire at home, or Sal pays well for it"], tuna: ["Bluefin tuna", 30, "an enormous fish: Sal will pay a fortune"]};
 Object.entries(ING).forEach(([id, [n, sell, what]]) => { if (!ITEMS[id]) ITEMS[id] = {n, ico: id, kind: "ingredient", sell, what}; });
 

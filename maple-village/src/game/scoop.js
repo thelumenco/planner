@@ -54,7 +54,8 @@ export const INGR = {
   basil: ["Basil", "Basil", "#7FB86A"], rosemary: ["Rosemary", "Rosemary", "#8FA88A"], thyme: ["Thyme", "Thyme", "#9DB08A"],   // greenhouse herbs (round 109)
   almond: ["Marcona almonds", "Almond", "#E8D3A8"], sevilla: ["Seville oranges", "Bitter Orange", "#F28C28"], membrillo: ["Membrillo", "Quince", "#D98A4A"], oliveoil: ["Olive oil", "Olive Oil", "#C9C25A"],   // from Ronda (round 107)
   yuzu: ["Yuzu", "Yuzu", "#F3D34A"], hojicha: ["Hōjicha", "Hōjicha", "#A8754F"], mochi: ["Mochi", "Mochi", "#FBEFF2"], sakura: ["Sakura", "Sakura", "#F6C7D6"],   // from Kyoto (round 122)
-  hallabong: ["Hallabong", "Hallabong", "#F28C28"], omija: ["Omija berries", "Omija", "#C8324A"],   // from Jeju (round 128; tangerines come in as an orchard fruit)
+  hallabong: ["Hallabong", "Hallabong", "#F28C28"], omija: ["Omija berries", "Omija", "#C8324A"],
+  pinenuts: ["Pine nuts", "Pine Nut", "#F3E7C8"], limoncino: ["Your limoncino", "Limoncino", "#F6E27A"],   // from Cinque Terre (round 132; basil and lemon were already here)   // from Jeju (round 128; tangerines come in as an orchard fruit)
   housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
   goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
   yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)

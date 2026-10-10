@@ -106,3 +106,13 @@
 .ch.npc.act-pick:not(.walk) .armR,.ch.npc.act-stack:not(.walk) .armR{animation:tapA 1s ease-in-out infinite alternate}
 .ch.npc.act-nets:not(.walk) .armL,.ch.npc.act-nets:not(.walk) .armR{animation:typeA .5s ease-in-out infinite alternate}
 @media (prefers-reduced-motion:reduce){.ch.npc .kitefly,.ch.npc.act-luck .armR{animation:none}}
+/* Cinque Terre (round 134): Mum lies on her towel, Ma Ma knits, Gong Gong bowls, Darren plants his poles, Marcus rows, Angellina sits and reads */
+.ch.npc.act-sunbathe .flip > g{transform:translate(-26px,-8px) rotate(-86deg)}
+.ch.npc.act-sunbathe .bob{animation:cbob 3.4s ease-in-out infinite alternate}
+.ch.npc.act-knit:not(.walk) .armL,.ch.npc.act-knit:not(.walk) .armR{animation:typeA .4s ease-in-out infinite alternate}
+.ch.npc.act-bocce:not(.walk) .armR,.ch.npc.act-row:not(.walk) .armR{animation:tapA 1.3s ease-in-out infinite alternate}
+.ch.npc.act-bocce:not(.walk) .tool,.ch.npc.act-poles:not(.walk) .tool,.ch.npc.act-row:not(.walk) .tool{animation:tapT 1.3s ease-in-out infinite alternate}
+.npc.act-read:not(.walk) .legL,.npc.act-read:not(.walk) .legR,.npc.act-knit:not(.walk) .legL,.npc.act-knit:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
+.npc.act-read:not(.walk) > g,.npc.act-knit:not(.walk) > g{transform:translateY(7px)}
+.npc.act-row:not(.walk) .legL,.npc.act-row:not(.walk) .legR{visibility:hidden}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-sunbathe .bob,.ch.npc.act-knit .armL,.ch.npc.act-knit .armR,.ch.npc.act-bocce .armR,.ch.npc.act-row .armR,.ch.npc.act-bocce .tool,.ch.npc.act-poles .tool,.ch.npc.act-row .tool{animation:none}}

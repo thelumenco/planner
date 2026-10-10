@@ -257,6 +257,8 @@ const grapePic = c => `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidd
 export function barrelPanel(F){
   const v = vineState(F);
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles.</p>`;
+  // round 132: the ladder up to the drying loft, once Mel's been to Cinque Terre (game/loft.js)
+  if (F.towns && F.towns.cinque) h += `<div class="actions"><button class="btn alt small" data-loft="1">Up the ladder to the drying loft</button></div>`;
   // the grape crates: picked grapes wait here. Take some for the Scoop Shack (or put them back); Marco only fills
   // barrels from what's left over the amount Mel keeps back
   h += `<p class="eyebrow">The grape crates</p><ul class="hlist wlist orflowers grcrates">${grapeKinds(v).map(c => { const back = (F.inv || {})["grape_" + c] || 0;

@@ -1112,7 +1112,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const k = JSON.parse(localStorage.getItem("fox.fox")).kitchen; return !!k.oven && !k.larder.flour; }), "flour goes in the oven to bake");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="tapas"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-k="tapas"]').count() === 38, "the stove offers this season's tapas (38 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams, Kyoto and Jeju)");
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 43, "the stove offers this season's tapas (43 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams, Kyoto, Jeju and Cinque Terre)");
   await page.click('#ctx [data-k="tapas"][data-id="tortilla"]'); await page.waitForTimeout(200); await page.click('#ctx [data-k="cooktapas"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapasList[0].id === "tortilla" && f.vine.tapasList[0].plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
   await page.click('#ctx [data-k="dish"][data-dish="olives"]'); await page.waitForTimeout(300);
@@ -2502,7 +2502,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(got.length === 1 && ["roach", "trout", "perch", "boot"].includes(got[0]) && /New in the journal/.test(await page.locator("#ctx .fcatch").textContent()), "reel while the marker's in the green and it's landed: a river fish, new in the journal");
   check(["boot"].includes(got[0]) || (f1.inv[got[0] === "trout" ? "trout" : "fish"] || 0) >= 1, "and it's in the backpack (trout for the kitchen, others as fish)");
   await page.click('#ctx [data-fish="view"][data-k="journal"]'); await page.waitForTimeout(200);
-  check(await page.locator("#ctx li.locked").count() === 22 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, twenty-two still to find, each with a hint (the golden koi at dusk)");
+  check(await page.locator("#ctx li.locked").count() === 23 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, twenty-three still to find, each with a hint (the golden koi at dusk)");
   await page.click('#ctx [data-fish="view"][data-k="fish"]'); await page.waitForTimeout(200);
   await page.click('#ctx [data-fish="cast"]'); await page.waitForSelector("#ctx .fbar", { timeout: 9000 }); await page.waitForTimeout(3700);
   check(/slipped away/.test(await page.locator("#ctx").textContent()) && await fox().then(f => f.fish.bait === 0), "wait too long after the bite and it slips away");
@@ -3023,6 +3023,113 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="dyecloth"]').dispatchEvent("click"); await page.waitForTimeout(3500);
   check(await fox().then(f => f.inv.j_scarf === 1 && !f.jeju.dye), "three days later, the scarf's a deep rust on the washing line at home, and it's a keepsake now");
+  await page.close();
+}
+{
+  console.log("\nCinque Terre: the five villages (well, four)");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), C = tw.TOWNS.cinque;
+  check(C.screens.length === 4 && C.screens.every(sc => tw.townOf(sc) === "cinque" && sc.startsWith("ct_")) && C.arrive[0] === "ct_corniglia" && C.arrive[0] !== C.screens[0] && tw.TOWN_PLACES[C.station].scene === "ct_corniglia",
+    "Cinque Terre: four screens, and the station's at the foot of Corniglia's steps (top right this time, not top left)");
+  check(C.fare === 80 && Object.keys(tw.TOWN_PLACES).filter(k => (tw.TOWN_PLACES[k].scene || "").startsWith("ct_")).every(k => k.startsWith("ct")) && Object.keys(tw.TOWN_BRIDGES).filter(k => k.startsWith("ct_")).length === 4, "80 coins a ticket; every place starts with ct; four gates between the villages");
+  check(Object.keys(C.rooms).length === 5 && Object.values(C.rooms).every(r => r.music && tw.TOWN_PLACES[r.door]) && Object.keys(C.rooms).every(k => tw.TOWN_BOUNDS[k]), "five rooms (focacceria, pesto kitchen, cantina, gelateria, lemon shop), each with its own music");
+  { const used = new Set(["ronda", "kyoto", "jeju"].flatMap(t => Object.values(tw.TOWNS[t].acts)).flatMap(a => Object.values(a).map(x => x.act)));
+    check(Object.keys(C.acts).length === 7 && Object.values(C.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "the whole family has something to do, and none of it is what they did in Ronda, Kyoto or Jeju"); }
+  { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), ids = np.NPCS.map(n => n.id), cl = np.NPCS.filter(n => n.local === "cinque"), rooms = Object.keys(C.rooms);
+    check(new Set(ids).size === ids.length && cl.length >= 20 && cl.filter(n => n.tourist).length >= 6 && rooms.every(r => cl.filter(n => n.routine.some(sl => sl.scene === r)).length >= 2), "Cinque Terre has locals and tourists, and at least two people for every room"); }
+  { const ITEMS = (await import(new URL("../src/data/items.js", import.meta.url))).ITEMS; await import(new URL("../src/game/loft.js", import.meta.url));
+    const buys = Object.values(tw.TOWN_GOODS).filter(g => g.price > 0);
+    check(ITEMS.w_raisin.sell === 36 && tw.TOWN_GOODS.c_sciac.price > ITEMS.w_raisin.sell && tw.TOWN_GOODS.c_limoncino.price > ITEMS.limoncino.sell && tw.TOWN_GOODS.c_anchovy.price > ITEMS.anchovy_salt.sell && buys.every(g => !g.sell || g.sell <= g.price),
+      "what you make sells for less than the shop's own (raisin wine 36, Sciacchetrà 40): a sell price is never above a buy price"); }
+  const ct = await import(new URL("../src/game/cinque.js", import.meta.url)), lf = await import(new URL("../src/game/loft.js", import.meta.url));
+  const kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url)), cp = await import(new URL("../src/game/companions.js", import.meta.url));
+  const fishing = await import(new URL("../src/game/fishing.js", import.meta.url)), items = await import(new URL("../src/data/items.js", import.meta.url));
+  { const F = {coins: 100, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
+    const p = ct.pestoStart(); const wrong = ct.pestoAdd(p, 2);
+    for (let i = 0; i < 5; i++) { ct.pestoAdd(p, i); for (let j = 0; j < 3; j++) ct.pestoPound(p); }
+    check(wrong === "oops" && ct.pestoDone(p) && ct.finishPesto(F, add) && F.inv.pesto === 2 && F.coins === 94 && F.cinque.pestoLesson, "pesto with Nonna Pina: garlic, pine nuts, basil, cheese, oil, in order, pounding each one in (6 coins, two jars, and her secret)");
+    const h = ct.harvestStart(() => 0.1); const early = ct.pick(h, 0); h.riding = false; h.ripe.forEach((r, i) => ct.pick(h, i));
+    check(early === null && ct.harvestDone(h) && ct.finishHarvest(F, add) === 3 && F.inv.grape_white === 3 && F.cinque.raisin && ct.finishHarvest(F, add) === 0, "the monorail harvest: ride up, pick the ripe bunches, and Signor Bruno gives you three (once a day) and shows you raisin wine");
+    check(!ct.paintBoat(F, "pink", "white", "Evan", add) && ct.paintBoat(F, "red", "white", "Evan", add) && F.inv.c_boat === 1 && ct.boatCols(F)[0] === "#C9483A", "painting a boat with Aldo: a red hull, a white stripe, \"Evan\" on the bow, and a little model to keep");
+    const t = ct.treat(F, ct.GELATO, "basilico"); check(t && F.coins === 91 && F.cinque.treats === 1, "a basil gelato at Gianni's (3)"); }
+  { const H = 3600e3, D = 24*H, now = Date.UTC(2026, 9, 12), F = {coins: 0, inv: {grape_white: 4, grape_red: 2, lemon: 3, anchovy: 6, basil: 2, garlic: 1, pinenuts: 1, oliveoil: 1, chz_cheddar: 1}};
+    check(!lf.loftOpen(F) && !lf.startBatch(F, "lemon", now), "the drying loft opens after your first trip to Cinque Terre");
+    F.towns = {cinque: "2026-10-11"};
+    check(!lf.startBatch(F, "rack", now) && !lf.startBatch(F, "pesto", now), "raisin wine and pesto wait for their lessons (the harvest with Bruno, the mortar with Nonna Pina)");
+    F.cinque = {raisin: true, pestoLesson: true};
+    check(lf.startBatch(F, "rack", now) && !F.inv.grape_white && !F.inv.grape_red && lf.startBatch(F, "lemon", now) && lf.startBatch(F, "salt", now) && lf.startBatch(F, "pesto", now) && F.inv.pesto === 2 && !F.inv.chz_cheddar, "six bunches on the racks, lemons steeping, anchovies in salt, and pesto straight away from your own basil, garlic, oil and cheese");
+    check(!lf.collect(F, "rack", now + 2*D) && lf.collect(F, "rack", now + 3*D).cask && !lf.collect(F, "cask", now + 6*D) && lf.collect(F, "cask", now + 7*D).n === 3 && F.inv.w_raisin === 3, "three days on the racks, four in the cask: three bottles of raisin wine");
+    check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
+  check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
+  check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
+  check(cp.KEEP_SPOTS.fridge3 && cp.KEEP_SPOTS.fridge3.only === "magnet" && tw.TOWN_GOODS.c_magnet.magnet && ["c_boat", "c_plate", "c_mortar"].every(k => tw.TOWN_GOODS[k].kind === "keepsake"), "keepsakes (the boat model, the lemon plate, the mortar) and a third magnet spot on the fridge");
+}
+{
+  console.log("\nCinque Terre, by train");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`cinque pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  await page.addInitScript(() => { if (!/ctcoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 300; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&ctcoins=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
+  await page.click('#ctx [data-tickets]'); await page.waitForSelector('#ctx [data-ttown="cinque"]', { timeout: 15000 });
+  await page.click('#ctx [data-ttown="cinque"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-tpick="dad"]'); await page.click('#ctx [data-tpick="evan"]');
+  check(/160/.test(await page.locator("#ctx [data-trip]").textContent()) && /Cinque Terre/.test(await page.locator("#ctx h2").textContent()), "the ticket window offers Cinque Terre: Mel and Dad, 160 coins (Evan free)");
+  await page.click("#ctx [data-trip]");
+  await page.waitForFunction(() => /Cinque Terre/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2000);
+  check(await fox().then(f => f.coins === 140 && f.trip.town === "cinque" && f.towns && f.towns.cinque) && /Corniglia/.test(await page.locator("#sceneName").textContent()) && await ids().then(a => a.includes("dad")), "off the train at Corniglia, with Dad and Evan");
+  for (const [gate, want, places] of [["ctToVernazza", "Vernazza", ["ctfocacceria", "cttower", "ctpiazza", "ctharbour"]], ["ctToMonterosso", "Monterosso", ["ctlimoni", "ctgigante", "ctbeach"]], ["ctToManarolaE", "Manarola", ["ctpesto", "ctgelato", "ctboats", "ctrocks", "ctpadlock"]], ["ctToCornigliaN", "Corniglia", ["cttrain", "ctcantina", "ctmonorail", "ctlemons"]]]) {
+    await page.locator(`#world [data-place="${gate}"]`).dispatchEvent("click");
+    await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
+    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("dad")), `through the gate to ${want} (Dad follows)`);
+  }
+  // the monorail harvest, in the browser
+  await page.locator('#world [data-place="ctmonorail"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ct="ride"]', { timeout: 15000 });
+  await page.click('#ctx [data-ct="ride"]'); await page.waitForSelector('#ctx [data-ct="arrive"]', { timeout: 15000 });
+  await page.click('#ctx [data-ct="arrive"]'); await page.waitForSelector('#ctx .ctbunch', { timeout: 15000 });
+  const ripe = await page.locator('#ctx .ctbunch[data-ripe="1"]').evaluateAll(n => n.map(x => x.dataset.ct));
+  for (const r of ripe) { await page.click(`#ctx [data-ct="${r}"]`); await page.waitForTimeout(100); }
+  await page.click('#ctx [data-ct="harvestdone"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.cinque.raisin && f.inv.grape_white === 3), "up the terraces on the monorail, every ripe bunch picked: Signor Bruno shows you raisin wine and gives you three bunches");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  await page.evaluate(() => window.__mapleScene("ct_manarola")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="ctpesto"]').dispatchEvent("click");
+  await page.waitForFunction(() => /pesto/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 }); await page.waitForTimeout(1500);
+  check(await ids().then(a => a.includes("nonnapina") && a.includes("marta")), "inside the pesto kitchen: Nonna Pina, and Marta with the basil");
+  await page.locator('#world [data-rdspot="ct_pesto"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ct="pesto"]', { timeout: 15000 });
+  await page.click('#ctx [data-ct="pesto"]'); await page.waitForTimeout(200);
+  for (let i = 0; i < 5; i++) { await page.click(`#ctx [data-ct="padd:${i}"]`); await page.waitForTimeout(80); for (let j = 0; j < 3; j++) { await page.click('#ctx [data-ct="pound"]'); await page.waitForTimeout(60); } }
+  await page.click('#ctx [data-ct="pestodone"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.inv.pesto === 2 && f.cinque.pestoLesson && f.coins === 134), "pesto in the marble mortar, in the right order: two jars (6) and Nonna Pina's secret");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.evaluate(() => window.__mapleScene("ct_manarola")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="ctboats"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ct="hull:green"]', { timeout: 15000 });
+  await page.click('#ctx [data-ct="hull:green"]'); await page.click('#ctx [data-ct="stripe:yellow"]'); await page.click('#ctx [data-ct="bname:Maple"]'); await page.click('#ctx [data-ct="paint"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.cinque.boat && f.cinque.boat.hull === "green" && f.cinque.boat.name === "Maple" && f.inv.c_boat === 1), "painting a boat in the street: fisherman's green, a yellow stripe, \"Maple\" on the bow, and a model to keep");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  for (const [room, who] of [["ct_focacceria", "ilaria"], ["ct_cantina", "carla"], ["ct_gelato", "gianni"], ["ct_limoni", "franca"]]) {
+    await page.evaluate(r => window.__mapleScene(r), room); await page.waitForTimeout(1300);
+    check(await ids().then(a => a.includes(who)) && await page.locator(`#world [data-rdspot="${room}"]`).count() === 1, `${room}: ${who} is there, and there's something to do`);
+  }
+  await page.locator('#world [data-rdspot="ct_limoni"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="c_magnet"]', { timeout: 15000 });
+  await page.click('#ctx [data-rbuy="c_magnet"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.c_magnet === 1 && f.coins === 131), "the lemon shop: a Cinque Terre fridge magnet (3)");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.evaluate(() => window.__mapleScene("ct_corniglia")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="cttrain"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="train"]', { timeout: 15000 });
+  await page.click('#ctx [data-triphome="train"]');
+  await page.waitForFunction(() => !/Cinque Terre/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
+  check(await fox().then(f => f.trip.done), "home on the train from Corniglia");
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1200);
+  check(await page.locator("#sceneArt").evaluate(e => e.innerHTML.includes("#2E7A5A")), "the painted boat (green, like the one in Manarola) is by the jetty at home");
+  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1000);
+  await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-loft]', { timeout: 15000 });
+  await page.click('#ctx [data-loft]'); await page.waitForSelector('#ctx [data-lf="start:rack"]', { timeout: 15000 });
+  check(/drying loft/i.test(await page.locator("#ctx h2").textContent()) && await page.locator('#ctx [data-lf="start:rack"]').isDisabled(), "up the ladder in the barrel shed: the drying loft (three bunches isn't enough for the racks yet)");
   await page.close();
 }
 {

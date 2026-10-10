@@ -1490,6 +1490,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Inspiration and feel:** what real place it draws on (for train towns Mel names it, e.g. "inspired by Ronda / Kyoto / Provence / the English countryside"), and the mood in a line.
 - **Geography:** terrain, water, slopes, cliffs, gorges, coast and orientation. Where the sun and light fall. How the four screens join physically (for example a gorge splitting the town with a bridge across it, terraces climbing a hill, a harbour wall curling round). **It must not feel like a repackaged Honeybrook**: different ground colours, path shapes, building forms, roof styles and materials.
 - **Layout:** a sketch of the **2×2 grid** (four screens): what's on each screen, where the gates between them are, where you arrive (station, quay or parking), and walkable areas versus obstacles.
+- **Vary where you arrive (Mel, round 131):** the station must not always be on the top-left screen. Ronda and Kyoto arrive top left, Jeju bottom right (the stone village), Cinque Terre top right (the foot of Corniglia's steps). Pick a different corner each time.
 - **Flora and fauna:** the local trees, plants, flowers and crops, and how they change with the seasons (for example cork oak, almond blossom and orange trees for Ronda; maples, moss gardens and bamboo for Kyoto). Plus birds and animals.
 - **Local goods:** three to six things you can't get in Honeybrook, each with at least one use back home (a tapas, gelato or bonbon ingredient through normal discovery, a gift, decor), with prices.
 - **Places:** a market or shops, a café or tea house, a landmark, a picnic spot, and anything special to the town.
@@ -1508,7 +1509,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
     - Examples: a flamenco corner with a little stage in Ronda's tapas bar; a monk with a meditation corner in a Kyoto temple.
     - Mel joins in (a short interaction or mini-moment with a result: clapping the rhythm, a breathing exercise, a lesson), and Evan can join in too, since he usually comes along.
     - Plan these in the town proposal.
-  - **Family acts are new in every town (Mel, round 121):** never reuse what the family did in an earlier town. In Ronda, Mum danced, Dad sketched, Ma Ma haggled, Gong Gong dozed, Marcus took photos, Angelina took notes, Darren counted steps and Evan chased pigeons, so none of those again. Check every earlier town's `acts` and `lines` before planning, and add new animations where needed.
+  - **Family acts are new in every town (Mel, round 121):** never reuse what the family did in an earlier town. In Ronda, Mum danced, Dad sketched, Ma Ma haggled, Gong Gong dozed, Marcus took photos, Angelina took notes, Darren counted steps and Evan chased pigeons, so none of those again. Check every earlier town's `acts` and `lines` before planning, and add new animations where needed. Used so far: Ronda (dance, sketch, haggle, doze, photo, notes), Kyoto (parasol, wheel, cranes, go, skewer, brush, fortune), Jeju (kite, luck, pick, nets, stack, tandem), Cinque Terre (sunbathe, fish, knit, bocce, poles, row, read). Evan's: pigeons, koi, rock pools, sandcastle.
   - **Shopping corners and thoughtful touches (Mel, round 117):** Mel loves shopping. Give rooms different corners that sell different things, a wide variety rather than one short list, and add small, unexpected but thoughtful touches: a free flower for Evan, a stamp on a postcard, a shop cat, the owner remembering her.
   - **People:** each room has people in it, locals and tourists with routines across the day, two to four at a time, so it never feels empty but never crowded. The family follow Mel inside.
   - **Music:** each room has its own live track in audio.js, different from the town's street music and from every other room.
@@ -1915,3 +1916,39 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Hana has her own line when you sell something you made.
 - **Bike-hire test fix:** it now compares the hire's end time with the game's clock.
 - **Ferry ride fix (round 130):** `.ferryride` has its own sea-and-sky background (it was inheriting `.trainride`'s sandy ground), drifting waves and a gentle swell, and takes 6s (CSS and the `ferryRide` timeout).
+
+### Rounds 131–134: Cinque Terre (all four rounds)
+- **Plan (approved):** train only, 80 coins a head (Evan free), out 7am–3pm, home by 10pm. Screens: Vernazza (top left), Corniglia (top right, the station at the foot of the steps: you arrive here), Monterosso (bottom left), Manarola (bottom right).
+- **Files:** `art/town-cinque.js` (the four screens, the ride, and `homeBoat`), `art/cinque-rooms.js` (five rooms), `game/cinque.js` (pesto, the monorail harvest, the cantina, boat painting, gelato and focaccia), `game/loft.js` (the drying loft at home). `TOWNS.cinque` in towns.js; every place starts with `ct`.
+- **Rooms, each with its own music:** the focacceria (Beppe, Ilaria), the pesto kitchen (Nonna Pina, Marta), the cantina (Signor Bruno from 12, Signora Carla), the gelateria (Gianni, Sara from 12), the lemon shop (Franca, Enzo). Signora Lina does her shopping round them all day, and seven tourists pass through on their own routines, so every room has 2–4 people.
+- **Activities (Evan joins in):**
+  - Pesto with Nonna Pina: five ingredients in order, pounding each in (6 coins, 2 jars). It teaches pesto at home.
+  - The monorail harvest with Signor Bruno: ride up, pick only the ripe bunches. He gives 3 white grape bunches (once a day) and teaches raisin wine.
+  - Boat painting with Aldo in Manarola: a hull, a stripe and a name. You get the boat model keepsake, and the boat appears in those colours on the riverbank by the home jetty (`homeBoat` on base, from `F.towns.cinque`).
+- **Touches:**
+  - Noon bells in Vernazza.
+  - Washing lines between the houses.
+  - A ginger cat asleep in a boat.
+  - Beppe gives Evan the heel of the focaccia (once a day).
+  - A padlock on the lovers' path (3 coins).
+  - Evan's sandcastle on Monterosso beach.
+  - The winter lights over Manarola.
+- **Family acts (round 134, all new):**
+  - Mum sunbathes on her towel on the Manarola rocks (`look.towel`, lying like act-rest).
+  - Dad fishes off Vernazza's harbour.
+  - Ma Ma knits, sitting, in Corniglia and Monterosso.
+  - Gong Gong plays bocce with Nino.
+  - Darren hikes with poles.
+  - Marcus rows out to sea off Monterosso. A trip act can have `free: true`, so the person goes straight to it without pathfinding, out of bounds onto the water.
+  - Angellina reads under a beach umbrella.
+- **Home links:**
+  - **The drying loft** (`data-loft` from the barrel shed). It opens after the first visit; raisin wine and pesto also need their lessons.
+    - Raisin wine: 6 grapes, 3 days on the racks, then 4 days in the cask, for 3 bottles at 36 each.
+    - Limoncino: 3 lemons for 5 days, 2 bottles at 18.
+    - Salted anchovies: 6 anchovies for 4 days, 2 jars at 15.
+    - Pesto: instant, 2 jars at 7.
+  - **Prices:** the shop's own versions always cost more than Mel's sell for (Sciacchetrà 40, limoncino 20, anchovies 16).
+  - **New produce:** chickpeas (garden crop), anchovies (a sea and bay fish), and pine nuts at the market once you've visited (`visited: "cinque"`).
+  - **Recipes:** five new dishes (trofie, focaccia, farinata, stuffed anchovies, anchovy toasts), plus pine nut and limoncino gelato.
+  - **Keepsakes:** the boat model, the lemon plate, the mortar, and the Cinque Terre magnet with a third fridge spot (`fridge3`).
+- **Tests:** "Cinque Terre: the five villages" (data and logic) and "Cinque Terre, by train" (the browser trip). The autumn tapas count is now 43, and the fish journal shows 23 still to find.

@@ -20,6 +20,8 @@ function hair(style, c, k){
 }
 const fringe = (c, y, r, k) => `<path d="M${-r-.4} ${y-2.6*k} h${2*r+.8} c0 -7 -4 -11.4 ${-r} -11.4 c-6.4 0 ${-r} 4.4 ${-r} 11.4z" ${S(c)}/>`;
 // a paddleboard (stand-up paddling): the board under the feet and a paddle in the right hand
+// round 134, Cinque Terre: Mum's beach towel, drawn upright under her so it lies flat when she does (act-sunbathe)
+const towel = k => `<rect x="${-11*k}" y="${-64*k}" width="${22*k}" height="${68*k}" rx="2" style="fill:#3E9BC7"/>${[0, 1, 2, 3].map(i => `<path d="M${-11*k} ${(-54 + i*16)*k} h${22*k}" fill="none" stroke-width="${3*k}" style="stroke:#FFFDF6"/>`).join("")}`;
 const board = k => `<ellipse cx="0" cy="${-1*k}" rx="${22*k}" ry="${3.6*k}" style="fill:#F3C969"/><path d="M${-18*k} ${-1*k} h${36*k}" fill="none" stroke-width=".8" style="stroke:#E8566C"/>`;
 const paddle = k => `<path d="M${12*k} ${-30*k} l${5*k} ${32*k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${16*k} ${-2*k} l${2*k} ${8*k} l${3*k} ${-1*k} l${-2*k} ${-8*k}z" ${S("#7FB8E8")}/>`;
 const cap = (c, y, r) => `<path d="M${-r-.2} ${y+1} c-1 -9 4 -14 ${r} -14 c6 0 ${r+1} 4 ${r} 14 c-3 -4 -8 -5 -12 -4 c-3 0 -6 2 -8 4z" ${S(c)}/>`;
@@ -62,6 +64,13 @@ function extra(kind, look, k){
     case "tbasket": return `<path d="M${6*k} ${-24*k} h${14*k} l${-2*k} ${9*k} h${-10*k}z" ${S("#C9A27E")}/><path d="M${7*k} ${-24*k} q${6*k} ${-9*k} ${12*k} 0" fill="none" stroke-width=".9"/>${[0, 1, 2].map(i => `<circle cx="${(9 + i*4)*k}" cy="${-25*k}" r="${2.4*k}" ${S("#F29A2E")}/>`).join("")}<g class="tool"><circle cx="${14*k}" cy="${-36*k}" r="${2.6*k}" ${S("#F29A2E")}/></g>`;
     case "net": return `<path d="M${-14*k} ${-12*k} q${14*k} ${-6*k} ${30*k} 0 l${-4*k} ${12*k} h${-22*k}z" ${S("#C9B27A")}/><path d="M${-10*k} ${-10*k} l${6*k} ${10*k} M${-2*k} ${-12*k} l${6*k} ${12*k} M${6*k} ${-12*k} l${6*k} ${12*k} M${12*k} ${-11*k} l${-6*k} ${11*k} M${4*k} ${-12*k} l${-6*k} ${12*k}" fill="none" stroke-width=".5"/><g class="tool"><path d="M${10*k} ${-20*k} l${4*k} ${-6*k}" fill="none" stroke-width="1.2" style="stroke:#8A6A52"/></g>`;
     case "stone": return `<g class="tool"><ellipse cx="${13*k}" cy="${-26*k}" rx="${4*k}" ry="${2.4*k}" ${S("#5F5E64")}/></g>${[0, 1, 2].map(i => `<ellipse cx="${20*k}" cy="${(-2 - i*4)*k}" rx="${(6 - i*1.4)*k}" ry="${2.2*k}" ${S(i % 2 ? "#7A7980" : "#4A494E")}/>`).join("")}`;
+    // round 134, for Cinque Terre (never what they did in Ronda, Kyoto or Jeju): Ma Ma's knitting, Gong Gong's bocce
+    // balls, Darren's hiking poles, Marcus's little rowing boat and oar, Angellina's book (Mum's towel is look.towel)
+    case "knit": return `<circle cx="${-2*k}" cy="${-4*k}" r="${4*k}" ${S("#E8566C")}/><path d="M${-4*k} ${-6*k} q${2*k} ${3*k} ${5*k} ${1*k}" fill="none" stroke-width=".6"/><path d="M${2*k} ${-24*k} h${10*k} v${6*k} h${-10*k}z" ${S("#F2A0B8")}/><g class="tool"><path d="M${0*k} ${-28*k} L${14*k} ${-20*k} M${14*k} ${-28*k} L${0*k} ${-20*k}" fill="none" stroke-width="1" style="stroke:#C9A27E"/></g><path d="M${-1*k} ${-7*k} Q${2*k} ${-16*k} ${4*k} ${-20*k}" fill="none" stroke-width=".6" style="stroke:#E8566C"/>`;
+    case "bocce": return `<g class="tool"><circle cx="${12*k}" cy="${-20*k}" r="${3.4*k}" ${S("#C9483A")}/></g><circle cx="${30*k}" cy="${-2*k}" r="${3.2*k}" ${S("#3E6BAE")}/><circle cx="${40*k}" cy="${-4*k}" r="${3.2*k}" ${S("#C9483A")}/><circle cx="${48*k}" cy="${0*k}" r="${1.6*k}" ${S("#FFFDF6")}/>`;
+    case "poles": return `<path d="M${-10*k} ${-22*k} L${-16*k} ${0*k}" fill="none" stroke-width="1.4" style="stroke:#5F5E64"/><g class="tool"><path d="M${10*k} ${-22*k} L${17*k} ${0*k}" fill="none" stroke-width="1.4" style="stroke:#5F5E64"/></g><path d="M${-6*k} ${-37*k} h${12*k} l${2*k} ${14*k} h${-16*k}z" ${S("#2E7A5A")}/>`;
+    case "oar": return `<path d="M${-26*k} ${-15*k} h${52*k} q${-4*k} ${15*k} ${-20*k} ${15*k} h${-14*k} q${-14*k} 0 ${-18*k} ${-15*k}z" ${S("#3E6BAE")}/><path d="M${-24*k} ${-11*k} h${48*k}" fill="none" stroke-width="${2*k}" style="stroke:#F3D98A"/><g class="tool"><path d="M${10*k} ${-22*k} L${34*k} ${2*k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><ellipse cx="${36*k}" cy="${4*k}" rx="${2.4*k}" ry="${5*k}" transform="rotate(-45 ${36*k} ${4*k})" ${S("#C9A27E")}/></g>`;
+    case "book": return `<path d="M${-2*k} ${-30*k} q${7*k} ${-3*k} ${14*k} 0 v${10*k} q${-7*k} ${-3*k} ${-14*k} 0z" ${S("#FFFDF6")}/><path d="M${5*k} ${-31*k} v${10*k}" fill="none" stroke-width=".7"/><path d="M${-2*k} ${-20*k} q${7*k} ${-3*k} ${14*k} 0" fill="none" stroke-width="1.4" style="stroke:#2E7A5A"/>`;
     case "lantern": return `<path d="M${12*k} ${-24*k} v${-4*k}" fill="none"/><rect x="${9*k}" y="${-24*k}" width="${7*k}" height="${9*k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5*k}" cy="${-19.5*k}" r="${1.8*k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
   }
   return "";
@@ -120,6 +129,7 @@ export function personArt(look, kid){
     <ellipse cx="0" cy="0" rx="${11*k}" ry="${3.5*k}" fill="rgba(60,40,30,.18)"/>
     <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
       ${look.board ? board(k) : ""}
+      ${look.towel ? towel(k) : ""}
       ${look.bike ? `<g transform="translate(0 ${7*k})">${bikeArt(look.bike === true ? "#3E6B8C" : look.bike, k)}</g>` : ""}
       <g class="legL"><rect x="${-6.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
       <g class="legR"><rect x="${1.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${.8*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
@@ -129,7 +139,7 @@ export function personArt(look, kid){
       <path d="M${-8.6*k} ${-37*k} q${8.6*k} ${-2.4*k} ${17.2*k} 0 l${1.4*k} ${23*k} h${-20*k}z" ${S(look.dress || look.top)}/>
       ${look.batik && !coat ? batik(look.batik, k) : ""}
       ${coat ? coatArt(rain, k) : ""}
-      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
       <circle cx="0" cy="${-46*k}" r="${10.6*k}" ${S(look.skin)}/>
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46*k, 10.6*k) : hair(look.hairStyle, look.hair, k)}

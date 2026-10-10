@@ -675,6 +675,155 @@ export const NPCS = [
       [slot("9:30", "11:30", "jj_village", [[220, 400], [300, 480]]), slot("11:30", "13:30", "jj_dye", [[240, 460], [320, 520]]), slot("13:30", "15:30", "jj_market", [[220, 480], [300, 540]]), slot("15:30", "17:30", "jj_haenyeo", [[150, 540], [300, 560]]), slot("17:30", "19:30", "jj_farms", [[262, 420], [300, 540]])],
       ["My brother rode a pony and now he wants one. We live in a flat.", "I dyed a scarf! It's green. Mr Moon says it'll be brown. I'm confused.", "The porridge at the divers' house is green too. Everything's green and orange here."]]
   ].map(([id, name, look, job, intro, routine, lines]) => ({id, local: "jeju", tourist: true, pitch: .95 + (id.charCodeAt(0) % 4)*.07, name, job, intro, look, routine, lines, away: `${name}'s off seeing another bit of Jeju.`})),
+  // Round 133: Cinque Terre's people (local: "cinque"). Nonna Pina makes pesto; Beppe bakes the focaccia; Signor Bruno
+  // grows the vines and drives the monorail; Gianni makes gelato; Signora Franca has the lemon shop; Aldo and Piero fish
+  // and repaint their boats; Signor Rossi keeps the station; Nino plays bocce in the piazza. And tourists, walking the
+  // cliff path between the villages.
+  {
+    id: "nonnapina", local: "cinque", pitch: 0.9, name: "Nonna Pina", job: "Makes pesto in Manarola, every day since she was six",
+    intro: "Pina. Eighty-one years old, and my basil is younger than all of you. Come, come. You make pesto with me. Not with a machine. Never with a machine.",
+    look: {skin: "#E2B590", hair: "#E6E2DA", hairStyle: "bun", top: "#3E5E4A", bottom: "#2F2B28", extra: "apron"},
+    routine: [slot("9:00", "18:00", "ct_pesto", [262, 318], {dir: 1})],
+    lines: ["Young leaves only. The old ones taste of soap.", "Pound, don't grind. Gently. Like a heartbeat.", "My granddaughter lives in Milan. She buys pesto in a jar. I forgive her. Slowly.", "A little salt with the garlic. It helps. Everything needs a little help."],
+    away: "Nonna Pina's having her afternoon rest. The basil is resting too."
+  },
+  {
+    id: "beppe", local: "cinque", pitch: 0.82, name: "Beppe", job: "Bakes the focaccia in Vernazza",
+    intro: "Beppe! Up at four, oven lit by five, focaccia by six. Then I sleep in the afternoon like a cat. Try the onion one. Trust me.",
+    look: {skin: "#E2B590", hair: "#3A3430", hairStyle: "short", top: "#FFFDF6", bottom: "#5A4A3E", extra: "apron"},
+    routine: [slot("7:00", "14:00", "ct_focacceria", [[280, 300], [240, 320]]), slot("16:00", "20:00", "ct_focacceria", [[280, 300], [240, 320]])],
+    lines: ["Dimples! Press your fingers in, so the oil has somewhere to sit.", "The wood oven was my grandfather's. It's older than the church. Almost.", "Farinata: chickpeas, water, oil, salt. Four things. Perfect.", "Hot! Mind your fingers. Everyone burns their fingers. Everyone comes back."],
+    away: "Beppe's asleep upstairs. The oven's resting till four."
+  },
+  {
+    id: "bruno", local: "cinque", pitch: 0.74, name: "Signor Bruno", job: "Grows the vines on Corniglia's terraces",
+    intro: "Bruno. My terraces go up, and up, and up. Two hundred years my family carries grapes down this cliff. Now we have the monorail. Progress!",
+    look: {skin: "#C99A78", hair: "#B9B0A4", hairStyle: "short", top: "#7A8A5A", bottom: "#5A4A3E", hat: "cap"},
+    routine: [slot("8:00", "12:00", "ct_corniglia", [[320, 252], [260, 240]]), slot("12:00", "18:00", "ct_cantina", [262, 262], {dir: 1})],
+    lines: ["The sun on the sea, the sun on the rock: the grapes get it twice.", "Sciacchetrà: you dry the grapes until they're raisins. Then you wait. Then you wait more.", "The walls are dry stone. No cement. My great-great-grandfather built that one.", "Don't look down on the monorail. Or do. Everyone does."],
+    away: "Signor Bruno's up on the terraces somewhere, with his secateurs."
+  },
+  {
+    id: "gianni", local: "cinque", pitch: 1.02, name: "Gianni", job: "Makes gelato in Manarola",
+    intro: "Ciao! Gianni. Everything fresh this morning: basil from Nonna Pina, lemons from Franca, figs from my uncle. What can I give you? Everything?",
+    look: {skin: "#E2B590", hair: "#2A211D", hairStyle: "short", top: "#E89A9A", bottom: "#FFFDF6", extra: "apron"},
+    routine: [slot("10:00", "21:00", "ct_gelato", [260, 312], {dir: 1})],
+    lines: ["Basil gelato. Don't make that face. Try it.", "Two flavours in a cone is normal. Three is a celebration.", "Gelato is not ice cream. Less air. More love.", "Lemon and basil together: that's a secret. Tell nobody. Except your ice cream shop."],
+    away: "Gianni's making tomorrow's gelato in the back. Come back later!"
+  },
+  {
+    id: "franca", local: "cinque", pitch: 0.96, name: "Signora Franca", job: "Has the lemon shop in Monterosso",
+    intro: "Buongiorno! Franca. Everything in this shop is lemons, or for lemons, or smells of lemons. Here: smell this one. Che profumo!",
+    look: {skin: "#EAC4A0", hair: "#5A3A2A", hairStyle: "bob", top: "#F3D34A", bottom: "#3E6BAE"},
+    routine: [slot("9:00", "19:00", "ct_limoni", [262, 368], {dir: 1})],
+    lines: ["Limoncino: lemon peel, a little sugar, and time. Mostly time.", "The best lemons grow where they can see the sea.", "Monterosso anchovies: the best in Italy. Don't tell Vernazza.", "This plate? Painted by my cousin. Everything here is somebody's cousin."],
+    away: "The lemon shop's shutters are half down. Signora Franca's at lunch."
+  },
+  {
+    id: "aldo", local: "cinque", pitch: 0.72, name: "Aldo", job: "A fisherman in Manarola",
+    intro: "Aldo. Fisherman. Fifty years. In spring we paint the boats. Every boat a colour, so the wives see from the window who comes home.",
+    look: {skin: "#C99A78", hair: "#D6D0C6", hairStyle: "short", top: "#3E6BAE", bottom: "#5A4A3E", hat: "cap"},
+    routine: [slot("8:00", "13:00", "ct_manarola", [[230, 340], [260, 360]]), slot("15:00", "19:00", "ct_manarola", [[230, 340], [200, 360]])],
+    lines: ["Anchovies run in the spring. Silver, silver, silver, the whole sea.", "Paint it every year, or the sea eats the wood.", "My boat is blue. My wife says it's ugly. She's right. It's still blue.", "Salt the anchovies in a barrel: a layer of salt, a layer of fish. Then forget them."],
+    away: "Aldo's out on the water."
+  },
+  {
+    id: "piero", local: "cinque", pitch: 0.86, name: "Piero", job: "A fisherman, Aldo's cousin",
+    intro: "Piero. Aldo's cousin. Younger, better looking, worse at fishing. You want to paint a boat? Here, take the brush. Not that one.",
+    look: {skin: "#E2B590", hair: "#3A3430", hairStyle: "short", top: "#C9483A", bottom: "#2F2B28"},
+    routine: [slot("9:00", "13:00", "ct_manarola", [[300, 330], [280, 350]]), slot("14:00", "18:00", "ct_vernazza", [[200, 440], [240, 430]])],
+    lines: ["Red! Always red. The fish like red. I've decided.", "Aldo says I talk too much for a fisherman. The fish don't mind.", "The best focaccia is Beppe's. Don't tell Monterosso.", "In winter they light up the hill like Christmas. You must come back."],
+    away: "Piero's down at the harbour mending something."
+  },
+  {
+    id: "srossi", local: "cinque", pitch: 0.8, name: "Signor Rossi", job: "Keeps Corniglia station",
+    intro: "Rossi, stationmaster. The trains go in a tunnel, out a tunnel, in a tunnel. I keep count. Three hundred and eighty-two steps up to the village. I don't climb them. I wave.",
+    look: {skin: "#EAC4A0", hair: "#3A3430", hairStyle: "short", top: "#3E5E7A", bottom: "#2F2B28", hat: "cap"},
+    routine: [slot("7:00", "22:00", "ct_corniglia", [[380, 550], [430, 550]])],
+    lines: ["Last train to Honeybrook at ten. Run if you must. Don't run on the steps.", "The tunnels are older than my grandfather. So am I, nearly.", "Lemon? Franca gives me a bag every week. I don't even like lemons.", "From the platform you can see all five villages on a clear day. Today: four and a half."],
+    away: "Signor Rossi's in his office with an espresso."
+  },
+  {
+    id: "nino", local: "cinque", pitch: 0.68, name: "Nino", job: "Plays bocce in the piazza, every afternoon",
+    intro: "Nino. Retired. Very busy. Bocce at eleven, lunch at one, bocce at three. You play? No? Your grandfather plays, I think. I see it in his eyes.",
+    look: {skin: "#C99A78", hair: "#E6E2DA", hairStyle: "short", top: "#F3E7C8", bottom: "#5A4A3E", hat: "cap"},
+    routine: [slot("10:30", "13:00", "ct_vernazza", [270, 470], {act: "bocce", dir: 1}), slot("15:00", "19:00", "ct_vernazza", [270, 470], {act: "bocce", dir: 1})],
+    lines: ["Close to the little ball. That's all. That's the whole game. It takes a lifetime.", "Sixty years in this piazza. I've seen everything. Twice.", "Your grandfather! Ha! He's good. Too good. I'll beat him tomorrow.", "Siesta is not lazy. Siesta is wisdom."],
+    away: "Nino's home for lunch and a sleep."
+  },
+  // round 134: the people who keep each room busy all day (the town playbook: 2-4 people in every room)
+  {
+    id: "ilaria", local: "cinque", pitch: 1.08, name: "Ilaria", job: "Beppe's daughter, on the focacceria counter",
+    intro: "Ilaria. Papà bakes, I sell, and when he sleeps in the afternoon I sell what's left. There's always something left. Usually the onion.",
+    look: {skin: "#EAC4A0", hair: "#3A2A20", hairStyle: "long", top: "#F3D98A", bottom: "#5A4A3E", extra: "apron"},
+    routine: [slot("8:00", "19:00", "ct_focacceria", [[460, 420], [430, 440]])],
+    lines: ["Plain, onion or olive? Or all three. Most people say all three.", "Papà's been lighting that oven since before I was born. I'm not allowed to touch it.", "Farinata's best hot. Eat it now, here, standing up."],
+    away: "Ilaria's gone home. The focacceria shutters are down."
+  },
+  {
+    id: "marta", local: "cinque", pitch: 1.04, name: "Marta", job: "Grows the basil for Nonna Pina",
+    intro: "Marta. I grow the basil on the terrace above the kitchen. Nonna Pina checks every leaf. Every single leaf.",
+    look: {skin: "#E2B590", hair: "#5A3A2A", hairStyle: "bun", top: "#9CC27E", bottom: "#3A3430"},
+    routine: [slot("9:30", "17:30", "ct_pesto", [[120, 470], [400, 470], [440, 520]])],
+    lines: ["Pick it in the morning, before the sun gets cross with it.", "Small leaves. Nonna says the big ones are for tourists. Don't tell the tourists.", "The pine nuts come from the woods up the hill. Toast them? Never. Nonna would faint."],
+    away: "Marta's up on the basil terrace."
+  },
+  {
+    id: "carla", local: "cinque", pitch: 0.98, name: "Signora Carla", job: "Bruno's wife, keeps the cantina",
+    intro: "Carla. Bruno grows it, I sell it, and I'm the one who remembers to turn the raisins. Taste? A little glass. Very little. It's strong.",
+    look: {skin: "#C99A78", hair: "#6B5A4A", hairStyle: "bob", top: "#8A4A5A", bottom: "#3A3430"},
+    routine: [slot("9:00", "18:00", "ct_cantina", [[130, 450], [400, 470]])],
+    lines: ["Three hundred days, the raisins rest. Then they're wine. Then they're gone in an evening.", "Bruno talks to the vines. I talk to the customers. It works.", "White wine, yes, but the sweet one is our treasure."],
+    away: "Signora Carla's closed the cantina for the day."
+  },
+  {
+    id: "enzo", local: "cinque", pitch: 0.78, name: "Enzo", job: "Franca's husband, labels the limoncino",
+    intro: "Enzo. Franca does the talking. I do the labels, the corks, the boxes and the agreeing. Mostly the agreeing.",
+    look: {skin: "#EAC4A0", hair: "#9A928A", hairStyle: "short", top: "#FFFDF6", bottom: "#3E6BAE", extra: "glasses"},
+    routine: [slot("9:30", "18:30", "ct_limoni", [[120, 470], [420, 470]])],
+    lines: ["Every label straight. Franca checks.", "The soap is lemon, the towels are lemon, the plates are lemon. I dream in yellow.", "Limoncino in the freezer. Small glass. After dinner. That's the rule."],
+    away: "Enzo's gone home with Franca."
+  },
+  {
+    id: "sara", local: "cinque", pitch: 1.12, name: "Sara", job: "Gianni's niece, scooping for the summer",
+    intro: "Sara! Zio Gianni lets me scoop in the summer. I'm on my second arm muscle. Which one? Basil's the best, I promise.",
+    look: {skin: "#E2B590", hair: "#2A211D", hairStyle: "bobfringe", top: "#FFFDF6", bottom: "#E89A9A", extra: "apron"},
+    routine: [slot("12:00", "20:00", "ct_gelato", [[140, 440], [400, 440]])],
+    lines: ["Two flavours, and you can have the wafer too.", "Zio says gelato with basil is the Manarola one. I say lemon. We argue every day.", "Careful, it's melting! Lick round the edge."],
+    away: "Sara's off at the beach."
+  },
+  {
+    id: "lina", local: "cinque", pitch: 0.88, name: "Signora Lina", job: "Does her shopping round all five villages",
+    intro: "Lina. Every day I do my shopping. Bread in Vernazza, lemons in Monterosso, a gelato in Manarola. It takes all day. That's the point.",
+    look: {skin: "#E2B590", hair: "#D6D0C6", hairStyle: "bun", top: "#3E6BAE", bottom: "#2F2B28", extra: "satchel"},
+    routine: [slot("8:00", "9:30", "ct_focacceria", [[200, 540], [320, 540]]), slot("9:30", "11:00", "ct_vernazza", [[320, 420], [360, 440]]), slot("11:00", "12:30", "ct_pesto", [[200, 540], [320, 560]]),
+      slot("13:30", "15:30", "ct_limoni", [[200, 540], [320, 560]]), slot("15:30", "17:00", "ct_gelato", [[200, 520], [320, 540]]), slot("17:00", "18:30", "ct_focacceria", [[200, 540], [320, 540]])],
+    lines: ["The bread's better in Vernazza. The lemons are better in Monterosso. So I walk.", "Pina and I were at school together. She was bossy then too.", "Seventy-eight and I take the train like a teenager."],
+    away: "Signora Lina's home with her shopping."
+  },
+  ...[
+    ["hannah", "Hannah", {skin: "#F6D9C4", hair: "#C9A06A", hairStyle: "long", top: "#5E8A48", bottom: "#5A4A3E", extra: "satchel", hat: "sunhat"}, "Walking the cliff path, from Edinburgh", "Hannah, from Edinburgh! Walking all five villages in one day. We're on village two. It's eleven o'clock. It's fine.",
+      [slot("8:30", "10:30", "ct_vernazza", [[400, 330], [300, 300]]), slot("10:30", "12:30", "ct_corniglia", [[200, 420], [300, 380]]), slot("12:30", "14:00", "ct_focacceria", [[200, 520], [320, 540]]), slot("14:00", "16:00", "ct_manarola", [[262, 420], [200, 460]]), slot("16:00", "18:00", "ct_gelato", [[200, 480], [320, 500]])],
+      ["The cliff path's closed past Corniglia. We're taking the train. Don't tell my dad.", "I've had focaccia three times and it's not even lunch.", "Every corner, another postcard. I've stopped taking photos. Almost."]],
+    ["tom", "Tom", {skin: "#F2D3BC", hair: "#8A5A3A", hairStyle: "short", top: "#3E6BAE", bottom: "#5A4A3E", extra: "satchel"}, "Walking the cliff path with Hannah", "Tom. Hannah's idea, the five villages in one day. My legs voted against.",
+      [slot("8:30", "10:30", "ct_vernazza", [[420, 340], [320, 310]]), slot("10:30", "12:30", "ct_corniglia", [[220, 430], [320, 390]]), slot("12:30", "14:00", "ct_focacceria", [[220, 530], [340, 540]]), slot("14:00", "16:00", "ct_manarola", [[282, 430], [220, 470]]), slot("16:00", "18:00", "ct_gelato", [[220, 490], [340, 500]])],
+      ["Three hundred and eighty-two steps from the station. I counted every one. Out loud.", "The monorail looks terrifying. I want a go.", "Is basil gelato a dare? It feels like a dare."]],
+    ["colette", "Colette", {skin: "#F6D9C4", hair: "#2A211D", hairStyle: "bob", top: "#F3E7C8", bottom: "#3E5E7A", extra: "sketchbook", hat: "sunhat"}, "A painter from Lyon", "Colette, from Lyon. I paint. Here, I don't know where to point the brush. Everywhere is the picture.",
+      [slot("9:00", "12:00", "ct_manarola", [440, 420], {act: "sketch", dir: -1}), slot("12:00", "13:30", "ct_pesto", [[200, 540], [320, 560]]), slot("13:30", "17:00", "ct_vernazza", [400, 460], {act: "sketch", dir: -1}), slot("17:00", "19:00", "ct_limoni", [[200, 520], [320, 540]])],
+      ["The colours change every hour. The houses don't. The light does.", "I've used up all my yellow. Again.", "The fishermen let me paint their boats. Not a picture of them. The actual boats."]],
+    ["giulia", "Giulia", {skin: "#EAC4A0", hair: "#3A2A20", hairStyle: "long", top: "#E89A9A", bottom: "#FFFDF6"}, "On holiday from Milan with her family", "Giulia! From Milan. My nonna is from here, so every summer we come back and she tells everybody I'm too thin.",
+      [slot("9:30", "11:30", "ct_monterosso", [[230, 480], [300, 440]]), slot("11:30", "13:00", "ct_limoni", [[200, 520], [320, 540]]), slot("13:00", "15:00", "ct_gelato", [[200, 500], [320, 520]]), slot("15:00", "17:30", "ct_monterosso", [[180, 470], [260, 500]]), slot("17:30", "19:00", "ct_vernazza", [[300, 360], [260, 320]])],
+      ["My nonna knows Nonna Pina. Everyone's nonna knows Nonna Pina.", "The beach at Monterosso is the only proper sandy one. Fight for an umbrella.", "In Milan it's all grey. Here, look: every colour."]],
+    ["ravi", "Ravi", {skin: "#B9825E", hair: "#1E1A18", hairStyle: "short", top: "#FFFDF6", bottom: "#5A6A7A"}, "On honeymoon, from Bangalore", "Ravi! On our honeymoon. Anika planned everything. I carry the water and say 'wow'. Wow.",
+      [slot("9:00", "11:00", "ct_manarola", [[300, 460], [240, 440]]), slot("11:00", "13:00", "ct_monterosso", [[300, 470], [360, 450]]), slot("13:00", "15:00", "ct_cantina", [[200, 520], [320, 540]]), slot("15:00", "17:00", "ct_vernazza", [[320, 400], [280, 330]]), slot("17:00", "19:30", "ct_manarola", [[236, 470], [280, 460]])],
+      ["We put a padlock on the lovers' path. Anika made me write our names neatly.", "Sciacchetrà tastes like honey and apricots and a very good decision.", "Sunset from the rocks at Manarola. That's tonight's plan. That's every night's plan."]],
+    ["anika", "Anika", {skin: "#B9825E", hair: "#2A211D", hairStyle: "long", top: "#C9483A", bottom: "#FFFDF6", hat: "sunhat"}, "On honeymoon, from Bangalore", "Anika! Honeymoon. I made a spreadsheet. Ravi lost it on day one. It's been the best trip ever.",
+      [slot("9:00", "11:00", "ct_manarola", [[320, 470], [260, 450]]), slot("11:00", "13:00", "ct_monterosso", [[320, 480], [380, 460]]), slot("13:00", "15:00", "ct_cantina", [[220, 530], [340, 540]]), slot("15:00", "17:00", "ct_vernazza", [[340, 410], [300, 340]]), slot("17:00", "19:30", "ct_manarola", [[250, 480], [300, 470]])],
+      ["The colours! I want to paint our house pink. Ravi says no. We'll see.", "Pesto with Nonna Pina was the best hour of my life. Sorry, Ravi.", "The little train goes in and out of tunnels like a needle through cloth."]],
+    ["finn", "Finn", {skin: "#F6D9C4", hair: "#E8C48E", hairStyle: "short", top: "#9CC27E", bottom: "#3A3430", extra: "satchel"}, "Backpacking round Italy", "Finn! Six weeks round Italy with one rucksack and a lot of focaccia. This is my favourite stop. Don't tell Rome.",
+      [slot("9:00", "11:00", "ct_corniglia", [[300, 400], [240, 430]]), slot("11:00", "13:00", "ct_vernazza", [[300, 320], [360, 420]]), slot("13:00", "15:00", "ct_focacceria", [[200, 540], [320, 560]]), slot("15:00", "17:00", "ct_monterosso", [[200, 460], [260, 480]]), slot("17:00", "19:00", "ct_gelato", [[200, 480], [300, 500]])],
+      ["I'm sleeping in a room above a boat shed. It smells of paint and fish. I love it.", "The anchovies here are a whole different animal. A fish. A whole different fish.", "Three gelatos a day is a reasonable amount. I've checked."]]
+  ].map(([id, name, look, job, intro, routine, lines]) => ({id, local: "cinque", tourist: true, pitch: .95 + (id.charCodeAt(0) % 4)*.07, name, job, intro, look, routine, lines, away: `${name}'s off seeing another of the five villages.`})),
   // cabin, and fishes the pool on Saturday evenings
   {
     id: "wren", pitch: 1.05, name: "Wren", job: "Honeybrook Woods' ranger",

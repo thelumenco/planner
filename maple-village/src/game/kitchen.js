@@ -35,7 +35,9 @@ export const GOODS = {
   // round 122: from Kyoto
   yuzu: ["yuzu", "yuzu"], miso: ["tub of white miso", "tubs of white miso"], tofu: ["block of tofu", "blocks of tofu"], mochi: ["mochi", "mochi"], matcha: ["tin of matcha", "tins of matcha"],
   // round 128: from Jeju
-  tangerine: ["tangerine", "tangerines"], hallabong: ["hallabong", "hallabong"], omija: ["handful of omija berries", "handfuls of omija berries"], blackpork: ["piece of black pork", "pieces of black pork"], abalone: ["abalone", "abalone"]};
+  tangerine: ["tangerine", "tangerines"], hallabong: ["hallabong", "hallabong"], omija: ["handful of omija berries", "handfuls of omija berries"], blackpork: ["piece of black pork", "pieces of black pork"], abalone: ["abalone", "abalone"],
+  // round 132: from Cinque Terre (and Mel's own loft and garden)
+  pesto: ["jar of pesto", "jars of pesto"], pinenuts: ["bag of pine nuts", "bags of pine nuts"], chickpea: ["handful of chickpeas", "handfuls of chickpeas"], anchovy: ["anchovy", "anchovies"], anchovy_salt: ["jar of salted anchovies", "jars of salted anchovies"]};
 export const GROUP_ICON = {farmcheese: "chz_cheddar", halloumi: "chz_halloumi", bluecheese: "chz_blue", cheddar: "chz_cheddar", honey: "honey", petals: "tulip"};
 // Wildflower Farm's cheeses (chz_*) come in as themselves: any of them does for "cheese" in a recipe, and the farm
 // cheese board wants one; goat's milk does for milk (the press, the crema). See ALT.
@@ -110,6 +112,10 @@ Object.assign(TAPAS, {misofish: {n: "Miso-glazed fish", need: {fish: 1, miso: 1}
 // round 128: Jeju dishes (garlic from the greenhouse)
 Object.assign(TAPAS, {heukdwaeji: {n: "Black pork with tangerine glaze", need: {blackpork: 1, tangerine: 1, garlic: 1}, price: 14},
   jeonbok: {n: "Abalone with garlic butter", need: {abalone: 1, garlic: 1, milk: 1}, price: 13}, hallaomija: {n: "Hallabong with omija syrup", need: {hallabong: 1, omija: 1}, price: 9}});
+// round 132: Cinque Terre dishes (rosemary from the greenhouse, olive oil from Mel's mill, anchovies from the sea)
+Object.assign(TAPAS, {trofie: {n: "Trofie with pesto", need: {flour: 1, pesto: 1}, price: 12}, focaccia: {n: "Focaccia with rosemary", need: {flour: 1, oliveoil: 1, rosemary: 1}, price: 9},
+  farinata: {n: "Farinata", need: {chickpea: 2, oliveoil: 1}, price: 9}, acciughe: {n: "Stuffed fried anchovies", need: {anchovy: 3, loaf: 1, egg: 1}, price: 12},
+  crostini: {n: "Anchovy and lemon toasts", need: {anchovy_salt: 1, lemon: 1, loaf: 1}, price: 14}});
 Object.assign(TAPAS, {gambas: {n: "Gambas al ajillo", need: {shrimp: 3, garlic: 2, oliveoil: 1}, price: 13},
   romero: {n: "Rosemary potatoes", need: {potato: 2, rosemary: 1}, price: 9}, bruschetta: {n: "Tomato and basil bruschetta", need: {loaf: 1, tomato: 2, basil: 1}, price: 10, seasons: ["summer", "autumn"]},
   almejas: {n: "Clams with garlic and lemon", need: {clams: 4, garlic: 1, lemon: 1}, price: 12},

@@ -236,6 +236,82 @@ export const TOWNS = {
       jjdye: "The dye workshop: lengths of cloth drying in the sun, from pale green to deep rusty orange. They're dyed with green persimmon juice.",
       jjstatues: "The stone grandfathers (dol hareubang): carved from black volcanic rock, with big round eyes, hats and hands on their tummies. They keep the village safe."
     }
+  },
+  // Cinque Terre (rounds 131–134): five fishing villages on the cliffs of the Ligurian coast, painted every colour,
+  // joined by a little coastal train and cliff paths, with vineyard terraces and lemon groves above. Four of the five
+  // villages, one to a screen. The station's on the TOP RIGHT screen this time (Corniglia: at the foot of its long brick
+  // staircase); every town has it somewhere different.
+  //   ct_vernazza   | ct_corniglia   (the station, at the bottom of the steps)
+  //   --------------+---------------
+  //   ct_monterosso | ct_manarola
+  cinque: {
+    n: "Cinque Terre", by: "train", fare: 80, free: ["evan"], outFrom: 7*60, outTo: 15*60, backTo: 22*60,
+    screens: ["ct_vernazza", "ct_corniglia", "ct_monterosso", "ct_manarola"], arrive: ["ct_corniglia", [370, 548]], station: "cttrain", music: "cinque",
+    blurb: "Five fishing villages clinging to the cliffs over a very blue sea: houses painted every colour, fishing boats, vineyard terraces, lemon groves, focaccia and pesto. A long ride: trains out until 3pm.",
+    arriveLine: "Cinque Terre! The train pops out of a tunnel onto a platform over the sea. Above you, the long brick staircase climbs up to Corniglia, and the air smells of lemons and salt.",
+    evanArrive: ["SO many steps, Mama!", "the sea is SO blue", "pink house! yellow house!"],
+    evanScreen: {ct_vernazza: ["a castle tower!", "little boats!"], ct_corniglia: ["grapes up high!", "a tiny train up the hill!"], ct_monterosso: ["the BEACH!", "umbrellas! stripy!"], ct_manarola: ["boats on the street!", "houses on a rock!"]},
+    hints: {ct_vernazza: "Vernazza: the little harbour, the watchtower, the piazza and the focacceria. East: Corniglia. South: Monterosso.",
+      ct_corniglia: "Corniglia, high on the cliff: the vineyard terraces, the monorail, the cantina, and the station at the bottom of the steps (trains home till 10pm). West: Vernazza. South: Manarola.",
+      ct_monterosso: "Monterosso: the beach and its umbrellas, the old town, the giant on the rocks, the lemon shop. North: Vernazza. East: Manarola.",
+      ct_manarola: "Manarola: the houses on the rock, the boats in the street, the pesto kitchen, the gelateria, the swimming rocks. North: Corniglia. West: Monterosso."},
+    spots: {
+      mum: {ct_vernazza: [[300, 300], [360, 460]], ct_corniglia: [[260, 360], [200, 460]], ct_monterosso: [[300, 300], [380, 460]], ct_manarola: [[260, 360], [320, 470]]},
+      dad: {ct_vernazza: [[260, 330], [400, 440]], ct_corniglia: [[300, 330], [220, 420]], ct_monterosso: [[260, 330], [420, 300]], ct_manarola: [[300, 330], [240, 440]]},
+      mama: {ct_vernazza: [[330, 330], [300, 440]], ct_corniglia: [[240, 380], [300, 460]], ct_monterosso: [[330, 280], [260, 360]], ct_manarola: [[280, 380], [330, 460]]},
+      gonggong: {ct_vernazza: [[330, 380], [340, 390]], ct_corniglia: [[260, 420], [270, 430]], ct_monterosso: [[300, 330], [310, 340]], ct_manarola: [[290, 420], [300, 430]]},
+      darren: {ct_vernazza: [[400, 330], [280, 480]], ct_corniglia: [[330, 300], [200, 360]], ct_monterosso: [[420, 330], [280, 300]], ct_manarola: [[330, 300], [260, 470]]},
+      marcus: {ct_vernazza: [[420, 480], [260, 300]], ct_corniglia: [[280, 460], [340, 380]], ct_monterosso: [[440, 300], [260, 380]], ct_manarola: [[420, 480], [260, 330]]},
+      angelina: {ct_vernazza: [[440, 300], [300, 360]], ct_corniglia: [[240, 330], [300, 420]], ct_monterosso: [[300, 400], [360, 300]], ct_manarola: [[440, 330], [300, 360]]}
+    },
+    // what they do (round 134, nothing they did in Ronda, Kyoto or Jeju): Mum sunbathes on the Manarola rocks, Dad fishes
+    // off the Vernazza harbour, Ma Ma knits, Gong Gong plays bocce with Nino, Darren hikes with poles, Marcus rows,
+    // Angellina reads under a beach umbrella. (Evan's sandcastle is core.js, on Monterosso beach.)
+    acts: {
+      mum: {ct_manarola: {act: "sunbathe", at: [24, 528]}},
+      dad: {ct_vernazza: {act: "fish", at: [214, 392], dir: -1}},
+      mama: {ct_corniglia: {act: "knit", at: [404, 318], dir: -1}, ct_monterosso: {act: "knit", at: [430, 300], dir: -1}},
+      gonggong: {ct_vernazza: {act: "bocce", at: [350, 500], dir: -1}},
+      darren: {ct_corniglia: {act: "poles", at: [196, 400]}, ct_vernazza: {act: "poles", at: [210, 290], dir: -1}},
+      marcus: {ct_monterosso: {act: "row", at: [370, 600], dir: -1, free: true}},
+      angelina: {ct_monterosso: {act: "read", at: [152, 474], dir: -1}}
+    },
+    // round 132: the five interiors, behind the doors in Vernazza, Corniglia, Monterosso and Manarola
+    rooms: {
+      ct_focacceria: {door: "ctfocacceria", n: "The focacceria", music: "ct_focacceria", party: [[200, 560], [330, 560], [120, 520], [420, 540]],
+        say: "The focacceria: the wood oven roaring at the back, trays of focaccia glistening with oil and salt, and a queue out of the door."},
+      ct_pesto: {door: "ctpesto", n: "The pesto kitchen", music: "ct_pesto", party: [[200, 560], [330, 560], [120, 540], [420, 540]],
+        say: "The pesto kitchen: a long marble table, mortars in a row, bunches of basil hanging from the beams, and the whole room smelling green."},
+      ct_cantina: {door: "ctcantina", n: "The cantina", music: "ct_cantina", party: [[200, 560], [330, 560], [120, 540], [420, 540]],
+        say: "The cantina: cool and dim, barrels along the walls, and racks of grapes drying slowly into raisins for the sweet wine."},
+      ct_gelato: {door: "ctgelato", n: "The gelateria", music: "ct_gelato", party: [[200, 540], [330, 560], [120, 520], [420, 520]],
+        say: "The gelateria: a long glass counter of gelato in every colour, basil green and lemon yellow and fig purple, and little stools by the window."},
+      ct_limoni: {door: "ctlimoni", n: "The lemon shop", music: "ct_limoni", party: [[200, 540], [330, 560], [120, 540], [420, 540]],
+        say: "The lemon shop: crates of lemons, bottles of limoncino glowing yellow, lemon soap, linen with lemons on, painted plates, and tins of anchovies."}
+    },
+    lines: {
+      mum: ["Every house a different colour, so the fishermen could find theirs from the sea. That's the story.", "I'm going to lie on those rocks and not move until dinner.", "Lemons the size of my fist! Look!"],
+      dad: ["They built those terraces by hand. Thousands of miles of dry stone walls, over a thousand years.", "The tide doesn't come in much here. Good fishing off the wall.", "I'd paint this. If I painted. Which I don't. Any more."],
+      mama: ["The nonnas here sit and knit and watch everybody. Ma Ma understands this completely.", "Basil this big! Ma Ma's basil never this big.", "So many steps. Ma Ma counted, then Ma Ma stopped counting."],
+      gonggong: ["Old men playing bocce. Gong Gong knows this game. Gong Gong is good at this game.", "Quiet in the afternoon. Everybody sleeping. Very civilised.", "The little train goes in a tunnel, out a tunnel, in a tunnel. Gong Gong likes it."],
+      darren: ["The cliff path's a proper hike. Two hours, they said. I said one.", "Focaccia for breakfast. Focaccia for lunch. That's the plan.", "Three hundred and eighty-two steps up from the station. I counted. Mel, don't."],
+      marcus: ["Zeh, they pull the boats right up into the street. Into the STREET.", "I'm renting a rowing boat. How hard can it be. Don't answer that.", "The water's so clear you can see the fish."],
+      angelina: ["I've found the perfect umbrella and I'm never leaving it.", "Everything here tastes of lemon and sunshine.", "The houses look like a box of crayons someone dropped down a cliff."],
+      evan: ["boats! boats!", "the sea is BLUE", "steps steps steps", "ice cream?"]
+    },
+    say: {
+      cttower: "The watchtower: a round stone tower on the rocks, built a thousand years ago to watch for pirates. Now it watches for ferries.",
+      ctpiazza: "The piazza: café umbrellas, the church right on the water, old men playing bocce, and everyone eating focaccia.",
+      ctharbour: "The little harbour: fishing boats painted blue and red and green, nosed up on the slipway, and kids jumping off the harbour wall.",
+      ctterraces: "The vineyard terraces: narrow stripes of vines held up by dry stone walls, climbing straight up the cliff. Every grape is carried down by hand, or on the little monorail.",
+      ctmonorail: "The monorail: a tiny rack train on one rail that putters up the terraces, carrying crates of grapes.",
+      ctlemons: "The lemon grove: knobbly old trees heavy with lemons, under nets to keep the wind off.",
+      ctgigante: "The giant: a huge stone figure carved into the rocks at the end of the beach, holding up a terrace that's long gone. He looks a bit tired.",
+      ctbeach: "The beach: the only proper sandy beach in the five villages, with rows of striped umbrellas and the sea so clear you can count the pebbles.",
+      ctboats: "The boats: little wooden fishing boats pulled right up into the main street on their trailers, painted every colour.",
+      ctrocks: "The swimming rocks: smooth flat rocks below the houses, where everyone lies in the sun and jumps into the deep blue water.",
+      ctpadlock: "The lovers' path railing: hundreds of padlocks, each with two names. The sea goes on and on below."
+    }
   }
 };
 export const TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t]) => [...t.screens, ...Object.keys(t.rooms || {})].map(s => [s, id])));
@@ -324,6 +400,35 @@ export const TOWN_PLACES = {
   jj_cafe: {scene: "jj_village", name: "The stone-house café", door: [112, 186]}, jj_market: {scene: "jj_harbour", name: "The market hall", door: [396, 190]},
   jj_dye: {scene: "jj_village", name: "The dye workshop", door: [410, 352]},
   jjToVillageE: {scene: "jj_harbour", name: "To the village", door: [504, 400], spot: true, bridge: "jj_village", mark: [476, 340], line: "East up into the stone village."},
+  // Cinque Terre (round 131): every id starts with ct
+  cttrain: {scene: "ct_corniglia", name: "Corniglia station", door: [384, 540], spot: true, mark: [400, 450], line: "Corniglia's station, down by the sea. Trains home to Honeybrook until 10pm."},
+  ctcantina: {scene: "ct_corniglia", name: "The cantina", door: [112, 352], spot: true, mark: [112, 230], line: "The cantina."},
+  ctmonorail: {scene: "ct_corniglia", name: "The monorail", door: [330, 244], spot: true, mark: [380, 120], line: "The monorail."},
+  ctterraces: {scene: "ct_corniglia", name: "The vineyard terraces", door: [200, 210], spot: true, mark: [160, 80], line: "The vineyard terraces."},
+  ctlemons: {scene: "ct_corniglia", name: "The lemon grove", door: [440, 330], spot: true, mark: [460, 250], line: "The lemon grove."},
+  ctToVernazza: {scene: "ct_corniglia", name: "To Vernazza", door: [16, 440], spot: true, bridge: "ct_vernazza", mark: [40, 380], line: "West along the cliff path to Vernazza."},
+  ctToManarola: {scene: "ct_corniglia", name: "To Manarola", door: [160, 612], spot: true, bridge: "ct_manarola", mark: [160, 540], line: "South along the coast to Manarola."},
+  ctfocacceria: {scene: "ct_vernazza", name: "The focacceria", door: [394, 196], spot: true, mark: [394, 60], line: "The focacceria."},
+  cttower: {scene: "ct_vernazza", name: "The watchtower", door: [150, 262], spot: true, mark: [110, 120], line: "The watchtower."},
+  ctpiazza: {scene: "ct_vernazza", name: "The piazza", door: [300, 360], spot: true, mark: [300, 280], line: "The piazza."},
+  ctharbour: {scene: "ct_vernazza", name: "The harbour", door: [190, 470], spot: true, mark: [110, 470], line: "The harbour."},
+  ctToCorniglia: {scene: "ct_vernazza", name: "To Corniglia", door: [504, 340], spot: true, bridge: "ct_corniglia", mark: [476, 280], line: "East along the cliff path to Corniglia."},
+  ctToMonterosso: {scene: "ct_vernazza", name: "To Monterosso", door: [330, 612], spot: true, bridge: "ct_monterosso", mark: [330, 540], line: "South along the coast to Monterosso."},
+  ctlimoni: {scene: "ct_monterosso", name: "The lemon shop", door: [396, 196], spot: true, mark: [396, 60], line: "The lemon shop."},
+  ctgigante: {scene: "ct_monterosso", name: "The giant", door: [440, 440], spot: true, mark: [470, 380], line: "The giant."},
+  ctbeach: {scene: "ct_monterosso", name: "The beach", door: [230, 470], spot: true, mark: [200, 520], line: "The beach."},
+  ctToVernazzaN: {scene: "ct_monterosso", name: "To Vernazza", door: [300, 26], spot: true, bridge: "ct_vernazza", mark: [240, 30], line: "North up the coast to Vernazza."},
+  ctToManarolaE: {scene: "ct_monterosso", name: "To Manarola", door: [504, 330], spot: true, bridge: "ct_manarola", mark: [476, 270], line: "East along the coast to Manarola."},
+  ctpesto: {scene: "ct_manarola", name: "The pesto kitchen", door: [140, 196], spot: true, mark: [140, 60], line: "The pesto kitchen."},
+  ctgelato: {scene: "ct_manarola", name: "The gelateria", door: [420, 352], spot: true, mark: [420, 230], line: "The gelateria."},
+  ctboats: {scene: "ct_manarola", name: "The boats", door: [262, 380], spot: true, mark: [262, 300], line: "The boats."},
+  ctrocks: {scene: "ct_manarola", name: "The swimming rocks", door: [110, 520], spot: true, mark: [80, 470], line: "The swimming rocks."},
+  ctpadlock: {scene: "ct_manarola", name: "The lovers' path", door: [236, 486], spot: true, mark: [236, 430], line: "The lovers' path."},
+  ctToCornigliaN: {scene: "ct_manarola", name: "To Corniglia", door: [262, 26], spot: true, bridge: "ct_corniglia", mark: [200, 30], line: "North up the coast to Corniglia."},
+  ct_focacceria: {scene: "ct_vernazza", name: "The focacceria", door: [394, 196]}, ct_pesto: {scene: "ct_manarola", name: "The pesto kitchen", door: [140, 196]},
+  ct_cantina: {scene: "ct_corniglia", name: "The cantina", door: [112, 352]}, ct_gelato: {scene: "ct_manarola", name: "The gelateria", door: [420, 352]},
+  ct_limoni: {scene: "ct_monterosso", name: "The lemon shop", door: [396, 196]},
+  ctToMonterossoW: {scene: "ct_manarola", name: "To Monterosso", door: [16, 330], spot: true, bridge: "ct_monterosso", mark: [40, 270], line: "West along the coast to Monterosso."},
   rdStepsUp: {scene: "rd_old", name: "Steps up out of the gorge", door: [120, 40], spot: true, bridge: "rd_station", mark: [200, 30], line: "Down into the gorge, over the old bridge and up the steps to the new town."}
 };
 export const TOWN_BRIDGES = {rd_station: {rd_plaza: "rdToPlaza", rd_old: "rdStepsDown"}, rd_plaza: {rd_station: "rdToStation", rd_bridge: "rdBridgeN"},
@@ -331,21 +436,37 @@ export const TOWN_BRIDGES = {rd_station: {rd_plaza: "rdToPlaza", rd_old: "rdStep
   kt_station: {kt_lane: "ktToLane", kt_river: "ktToRiver"}, kt_lane: {kt_station: "ktToStation", kt_temple: "ktStepsDown"},
   kt_temple: {kt_lane: "ktStepsUp", kt_river: "ktToRiverW"}, kt_river: {kt_station: "ktToStationN", kt_temple: "ktToTemple"},
   jj_shore: {jj_farms: "jjToFarms", jj_harbour: "jjToHarbour"}, jj_farms: {jj_shore: "jjToShore", jj_village: "jjToVillage"},
-  jj_harbour: {jj_shore: "jjToShoreN", jj_village: "jjToVillageE"}, jj_village: {jj_farms: "jjToFarmsN", jj_harbour: "jjToHarbourW"}};
+  jj_harbour: {jj_shore: "jjToShoreN", jj_village: "jjToVillageE"}, jj_village: {jj_farms: "jjToFarmsN", jj_harbour: "jjToHarbourW"},
+  ct_vernazza: {ct_corniglia: "ctToCorniglia", ct_monterosso: "ctToMonterosso"}, ct_corniglia: {ct_vernazza: "ctToVernazza", ct_manarola: "ctToManarola"},
+  ct_monterosso: {ct_vernazza: "ctToVernazzaN", ct_manarola: "ctToManarolaE"}, ct_manarola: {ct_corniglia: "ctToCornigliaN", ct_monterosso: "ctToMonterossoW"}};
 export const TOWN_ARRIVE = {"rd_station>rd_plaza": [44, 330], "rd_plaza>rd_station": [474, 300], "rd_plaza>rd_bridge": [310, 60], "rd_bridge>rd_plaza": [330, 572],
   "rd_bridge>rd_old": [476, 380], "rd_old>rd_bridge": [44, 520], "rd_station>rd_old": [130, 76], "rd_old>rd_station": [180, 566],
   "kt_station>kt_lane": [44, 300], "kt_lane>kt_station": [474, 300], "kt_station>kt_river": [300, 76], "kt_river>kt_station": [330, 576],
   "kt_lane>kt_temple": [150, 80], "kt_temple>kt_lane": [330, 576], "kt_temple>kt_river": [474, 520], "kt_river>kt_temple": [44, 380],
   "jj_shore>jj_farms": [44, 330], "jj_farms>jj_shore": [474, 330], "jj_shore>jj_harbour": [300, 70], "jj_harbour>jj_shore": [300, 572],
-  "jj_farms>jj_village": [262, 84], "jj_village>jj_farms": [262, 572], "jj_harbour>jj_village": [44, 400], "jj_village>jj_harbour": [474, 400]};
+  "jj_farms>jj_village": [262, 84], "jj_village>jj_farms": [262, 572], "jj_harbour>jj_village": [44, 400], "jj_village>jj_harbour": [474, 400],
+  "ct_vernazza>ct_corniglia": [44, 440], "ct_corniglia>ct_vernazza": [474, 340], "ct_vernazza>ct_monterosso": [300, 70], "ct_monterosso>ct_vernazza": [330, 572],
+  "ct_corniglia>ct_manarola": [262, 70], "ct_manarola>ct_corniglia": [160, 572], "ct_monterosso>ct_manarola": [44, 330], "ct_manarola>ct_monterosso": [474, 330]};
 // walking areas, and what's in the way (paths.js)
-export const TOWN_BOUNDS = {jj_haenyeo: [30, 250, 490, 600], jj_shed: [30, 250, 490, 600], jj_cafe: [30, 250, 490, 600], jj_market: [30, 240, 490, 600], jj_dye: [30, 250, 490, 600],
+export const TOWN_BOUNDS = {ct_focacceria: [30, 250, 490, 600], ct_pesto: [30, 250, 490, 600], ct_cantina: [30, 250, 490, 600], ct_gelato: [30, 250, 490, 600], ct_limoni: [30, 250, 490, 600],
+  ct_vernazza: [14, 200, 506, 616], ct_corniglia: [14, 200, 506, 600], ct_monterosso: [14, 26, 506, 540], ct_manarola: [14, 26, 506, 616],
+  jj_haenyeo: [30, 250, 490, 600], jj_shed: [30, 250, 490, 600], jj_cafe: [30, 250, 490, 600], jj_market: [30, 240, 490, 600], jj_dye: [30, 250, 490, 600],
   jj_shore: [14, 200, 506, 616], jj_farms: [14, 190, 506, 616], jj_harbour: [14, 26, 506, 616], jj_village: [14, 40, 506, 590],
   kt_tea: [30, 250, 490, 600], kt_hall: [30, 250, 490, 600], kt_sweets: [30, 260, 490, 600], kt_market: [30, 240, 490, 600], kt_pottery: [30, 250, 490, 600],
   kt_station: [140, 178, 506, 616], kt_lane: [14, 180, 506, 616], kt_temple: [14, 40, 506, 616], kt_river: [14, 40, 506, 616],
   rd_cuero: [30, 250, 490, 600], rd_tapas: [30, 250, 490, 600], rd_cafe: [30, 260, 490, 600], rd_banos: [30, 220, 490, 600], rd_jardin: [30, 176, 490, 606], rd_mercado: [30, 250, 490, 600],
   rd_station: [90, 178, 506, 616], rd_plaza: [14, 180, 506, 616], rd_bridge: [14, 22, 506, 616], rd_old: [14, 36, 506, 616]};
 export const TOWN_OBST = {
+  // Cinque Terre: the houses, the sea, the tower and the church; the terraces, the cantina, the station; the old town and
+  // the sea; the houses on the rock and the harbour water
+  // Cinque Terre's rooms (round 132): the oven and counter; the marble table; the barrels and racks; the counter; the shelves
+  ct_focacceria: [[300, 230, 500, 330], [30, 250, 110, 420], [180, 420, 340, 470]], ct_pesto: [[140, 330, 380, 400], [30, 250, 90, 420], [430, 250, 490, 420]],
+  ct_cantina: [[30, 250, 110, 500], [410, 250, 490, 500], [180, 280, 340, 330]], ct_gelato: [[120, 230, 400, 300], [40, 470, 120, 510], [400, 470, 480, 510]],
+  ct_limoni: [[30, 250, 100, 500], [420, 250, 490, 500], [180, 380, 340, 430]],
+  ct_vernazza: [[0, 0, 240, 250], [330, 60, 510, 180], [0, 500, 170, 640], [430, 380, 520, 560]],
+  ct_corniglia: [[0, 0, 520, 190], [30, 240, 196, 340], [300, 440, 510, 530], [0, 600, 120, 640]],
+  ct_monterosso: [[30, 60, 230, 180], [330, 60, 490, 180], [0, 560, 520, 640], [470, 400, 520, 480]],
+  ct_manarola: [[40, 60, 240, 180], [330, 60, 520, 180], [330, 230, 510, 340], [0, 560, 200, 640], [310, 440, 520, 640]],
   // Jeju: the crater, the divers' house, the rock pools; the orchards, the shed, the paddock; the sea, the ferry, the
   // lighthouses, the market; the café, the dye workshop, the station and the rails
   // Jeju's rooms (round 128): the stove and the porridge table; the sorting table; the café tables; the four stalls; the tubs
@@ -483,6 +604,30 @@ Object.assign(TOWN_GOODS, {
 Object.assign(KEEP_LINES, {j_magnet: "A tiny stone grandfather holding a tangerine, from Jeju.", j_tote: "A tote bag dyed with green persimmons in Jeju.", j_shirt: "A galot shirt, dyed with persimmons in Jeju."});
 ["j_magnet", "j_tote", "j_shirt"].forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
 TOWN_GOODS.j_magnet.magnet = true;
+// Cinque Terre's goods (round 132), by room: the focacceria, the pesto kitchen, the cantina, the gelateria, the lemon
+// shop. Pesto, pine nuts and chickpeas are kitchen ingredients; Mel can make her own pesto, limoncino, salted anchovies
+// and raisin wine at home once she's learned how (game/loft.js), and those sell for more (the slow ones most). Buying
+// the shop's own is always dearer than selling hers (Sciacchetrà 40 over her raisin wine's 36, limoncino 20 over 18,
+// anchovies 16 over 15): a sell price is never above a buy price.
+Object.assign(TOWN_GOODS, {
+  c_focaccia: {n: "Focaccia", kind: "gift", to: "family", price: 4, shop: "ct_focacceria", art: ["box", "#E8C27A", "#C9A24A"], say: "Focaccia from Vernazza! Salty, oily, still warm. I'm having it now. Sorry."},
+  chickpea: {n: "Chickpeas", kind: "ingredient", price: 3, sell: 2, shop: "ct_focacceria", art: ["disc", "#E8D3A0", "#C9B07A"], what: "for farinata at the kitchen (grow your own: chickpea seeds at the market)"},
+  pinenuts: {n: "Pine nuts", kind: "ingredient", price: 6, sell: 3, shop: "ct_pesto", art: ["jar", "#F3E7C8", "#C9A27E"], what: "for pesto (yours, in the loft, once Nonna Pina's shown you) and pine nut gelato"},
+  pesto: {n: "Jar of pesto", kind: "ingredient", price: 8, sell: 7, shop: "ct_pesto", art: ["jar", "#5E8A3A", "#F3E7C8"], what: "trofie with pesto at the kitchen"},
+  c_mortar: {n: "Little marble mortar", kind: "keepsake", price: 18, shop: "ct_pesto", art: ["disc", "#E6E2DA", "#8A8478"], line: "A little white marble mortar and a wooden pestle, from Nonna Pina's kitchen in Manarola. Pesto's made by hand or not at all."},
+  c_sciac: {n: "Bottle of Sciacchetrà", kind: "gift", to: ["dad", "gonggong", "mum", "darren"], price: 40, shop: "ct_cantina", art: ["bottle", "#C98A2E", "#5A3A2E"], say: "Sciacchetrà! The sweet wine from the dried grapes. A tiny glass after dinner. Just a tiny one."},
+  c_white: {n: "Cinque Terre white", kind: "gift", to: ["dad", "mum", "marcus", "angelina"], price: 14, shop: "ct_cantina", art: ["bottle", "#E8E0A0", "#4E7A5A"], say: "Wine from the terraces! Grown on a cliff, carried down by hand. You can taste the sea."},
+  c_limoncino: {n: "Limoncino", kind: "gift", to: ["mum", "mama", "angelina", "darren"], price: 20, shop: "ct_limoni", art: ["bottle", "#F3D34A", "#FFFDF6"], say: "Limoncino from Monterosso! Ice cold, in a tiny glass. It tastes like sunshine."},
+  c_soap: {n: "Lemon soap", kind: "gift", to: "family", price: 5, shop: "ct_limoni", art: ["box", "#F3E7A0", "#F3D34A"], say: "Lemon soap! The whole bathroom smells like Italy now."},
+  c_linen: {n: "Linen tea towel", kind: "gift", to: ["mum", "mama", "dad"], price: 8, shop: "ct_limoni", art: ["cloth", "#FFFDF6", "#F3D34A"], say: "A linen tea towel with lemons on it. Too nice to dry dishes with. I'll dry dishes with it."},
+  c_anchovy: {n: "Monterosso anchovies in oil", kind: "gift", to: ["dad", "gonggong", "marcus"], price: 16, shop: "ct_limoni", art: ["box", "#9FC3D9", "#C9A27E"], say: "Monterosso anchovies! The best in Italy, they say. On toast, with butter."},
+  c_plate: {n: "Ceramic lemon plate", kind: "keepsake", price: 12, shop: "ct_limoni", art: ["disc", "#3E6BAE", "#F3D34A"], line: "A hand-painted plate from Monterosso, blue and yellow, with lemons and leaves all round the rim."},
+  c_magnet: {n: "Cinque Terre fridge magnet", kind: "gift", to: "family", price: 3, shop: "ct_limoni", art: ["disc", "#E89A9A", "#4F9CC4"], say: "A tiny stack of coloured houses over a blue sea. For the fridge!"},
+  c_boat: {n: "Your painted boat (model)", kind: "keepsake", price: 0, art: ["box", "#3E6BAE", "#F3D98A"], line: "A little model of the fishing boat you helped paint in Manarola, with its name on the side in Evan's letters."}
+});
+Object.assign(KEEP_LINES, {c_magnet: "A tiny stack of coloured houses over a blue sea, from Cinque Terre.", c_linen: "A linen tea towel with lemons on it, from Monterosso."});
+["c_magnet", "c_linen"].forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
+TOWN_GOODS.c_magnet.magnet = true;
 Object.keys(PAINT.colours).forEach(c => Object.keys(PAINT.patterns).forEach(p => { TOWN_GOODS[`ptile_${c}_${p}`] = {n: "Your painted tile", kind: "keepsake", price: 0, tile: [c, p], art: ["tile", PAINT.colours[c][1], "#FFFDF6"], line: `A tile you painted yourself at Lucía's in Ronda: ${PAINT.patterns[p]}, in ${PAINT.colours[c][0]}.`}; }));
 // Round 123: the nerikiri sweets Mel makes with Mr Tanaka in Kyoto (gifts), one shape for each season
 [["sakura", "cherry blossom", "#F6C7D6"], ["ajisai", "hydrangea", "#B9A8E0"], ["momiji", "maple leaf", "#E0782E"], ["tsubaki", "camellia", "#C8432F"]].forEach(([k, n, col]) => {

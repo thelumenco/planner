@@ -886,3 +886,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   background:repeating-linear-gradient(170deg,transparent 0 26px,rgba(234,245,250,.7) 26px 28px,transparent 28px 60px);animation:fwaves 6s linear both}
 @keyframes fwaves{from{background-position:0 0}to{background-position:-240px 0}}
 @media (prefers-reduced-motion:reduce){.ferryride .taxiboat,.ferryride .taxiboat svg,.ferryride::after{animation:none}}
+/* Cinque Terre (round 133): Nonna Pina's mortar filling up, the monorail climbing, the vine of bunches */
+.ctmortar{position:relative;width:90px;height:70px;margin:8px auto;border:1.6px solid var(--line);border-top:none;border-radius:0 0 45px 45px;background:#FFFDF6;overflow:hidden}
+.ctmortar span{position:absolute;left:0;right:0;bottom:0;background:#6E9A44;transition:height .25s}
+.ctride{position:relative;height:60px;margin:10px 0;border-radius:10px;background:linear-gradient(160deg,#B9CC8E,#86AE58);border:1.4px solid var(--line);overflow:hidden}
+.ctride span{position:absolute;left:4%;bottom:6px;width:30px;height:16px;border-radius:4px;background:#C9483A;border:1.2px solid var(--line);animation:ctclimb 3.5s ease-in-out forwards}
+@keyframes ctclimb{to{left:84%;bottom:38px}}
+.ctvines{display:grid;grid-template-columns:repeat(3,auto);justify-content:center;gap:8px;margin:10px 0}
+.ctbunch{background:#E3EED2;border:1.4px solid var(--line);border-radius:12px;padding:4px;cursor:pointer}
+.ctbunch.done{opacity:.4}
+@media (prefers-reduced-motion:reduce){.ctride span{animation:none;left:84%;bottom:38px}}

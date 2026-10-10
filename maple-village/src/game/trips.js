@@ -26,7 +26,8 @@ export const canReturn = (town, hm = sgHM()) => hm < TOWNS[town].backTo;
 export function buyTrip(F, town, party, hm = sgHM(), by = "train"){
   const t = TOWNS[town]; if (!t || !canLeave(town, hm) || tripOn(F) || (by === "ferry" && !t.ferry)) return null;
   party = FAMILY.filter(id => party.includes(id)); const cost = fareFor(town, party, by); if (F.coins < cost) return null;
-  F.coins -= cost; F.trip = {town, day: dayKey(), party, from: hm, by}; return {cost, town: t, by};
+  F.coins -= cost; F.trip = {town, day: dayKey(), party, from: hm, by}; F.towns = {...(F.towns || {}), [town]: F.towns && F.towns[town] || dayKey()};   // F.towns: where Mel's been (first visit), round 132
+  return {cost, town: t, by};
 }
 export function endTrip(F){ if (F.trip && !F.trip.done) F.trip.done = true; }
 
@@ -42,7 +43,7 @@ export function tripSlot(F, id, day, hm, melScene){
   // at their spot doing their thing (in its hours), else strolling; the slot starts when the act starts or stops,
   // so they walk over (glide) rather than popping
   const a = ((T.acts || {})[id] || {})[scene], w = a && (a.hours ? a.hours.find(([f, e]) => hm >= f && hm < e) : [t.from, T.backTo]);
-  if (w) return {from: Math.max(t.from, w[0]), to: w[1], scene, at: a.at, act: a.act, dir: a.dir, follow: true, glide: true, trip: true};
+  if (w) return {from: Math.max(t.from, w[0]), to: w[1], scene, at: a.at, act: a.act, dir: a.dir, free: a.free, follow: true, glide: true, trip: true};
   const ended = a && a.hours ? Math.max(t.from, ...a.hours.map(([, e]) => e).filter(e => e <= hm)) : t.from;
   return {from: ended, to: T.backTo, scene, wander: spots || [[260, 400], [300, 360]], follow: true, glide: true, trip: true};
 }

@@ -82,6 +82,26 @@ export const TRACKS = {
   jeju: {name: "Gayageum by the sea", live: true, bpm: 80, steps: 8, tone: "guitar", arp: [1, 2, 3, 5, 4, 3, 2, 4], arpVel: .045, mel: .65,
     bars: [[38, 50, 57, 62, 64, 69], [40, 52, 59, 64, 66, 71], [47, 59, 62, 66, 69, 71], [45, 57, 62, 64, 69, 71], [38, 50, 57, 62, 66, 69], [40, 52, 57, 64, 69, 71], [47, 54, 59, 62, 66, 71], [38, 50, 57, 62, 64, 69]],
     lines: [[[0, 74], [1, 76], [2, 74], [3, 69]], [[0, 71], [2, 69], [3, 66]], [[0, 69], [1, 71], [2, 74], [3, 71]], [[0, 76], [1, 74], [3, 71]], [[0, 74], [2, 78], [3, 76]], [[0, 74], [1, 71], [2, 69]], [[0, 66], [2, 69], [3, 64]], [[0, 62], [2, 64], [3, 62]]]},
+  // live, all over Cinque Terre (round 131): a mandolin (guitar tone, quick tremolo-ish arpeggios) in a sunny D major,
+  // a lilting 6/8 like a Ligurian folk song
+  cinque: {name: "Mandolin on the harbour", live: true, bpm: 96, steps: 6, tone: "guitar", arp: [1, 3, 5, 3, 4, 2], arpVel: .05, mel: .7, up: 12,
+    bars: [[38, 50, 57, 62, 66, 69], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 69, 73], [38, 50, 57, 62, 66, 69], [47, 59, 62, 66, 71, 74], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 67, 69], [38, 50, 57, 62, 66, 74]]},
+  // Round 132: Cinque Terre's interiors, each its own
+  // the focacceria: a bustling accordion-ish rhodes waltz, the oven roaring
+  ct_focacceria: {name: "Morning at the oven", live: true, bpm: 120, steps: 6, tone: "rhodes", strum: [0], arp: [1, 3, 4, 3, 5, 3], arpVel: .045, mel: .7,
+    bars: [[43, 55, 59, 62, 67], [38, 50, 57, 62, 66], [40, 52, 55, 59, 64], [43, 55, 59, 62, 67]]},
+  // the pesto kitchen: a slow, warm guitar, a nonna humming
+  ct_pesto: {name: "Nonna's kitchen", live: true, bpm: 70, steps: 8, tone: "guitar", arp: [1, 3, 2, 4, 3, 5, 4, 2], arpVel: .042, mel: .55,
+    bars: [[45, 57, 60, 64, 69], [41, 53, 57, 60, 65], [43, 55, 59, 62, 67], [40, 52, 56, 59, 64]]},
+  // the cantina: low and cool, a slow piano in the dim
+  ct_cantina: {name: "In the cool of the cantina", live: true, bpm: 56, steps: 8, tone: "piano", arp: [1, 0, 2, 0, 3, 0, 4, 0], arpVel: .035, mel: .4,
+    bars: [[38, 50, 57, 62, 65], [34, 46, 53, 58, 62], [36, 48, 55, 60, 64], [33, 45, 52, 57, 61]]},
+  // the gelateria: a bright, bouncy music-box bell
+  ct_gelato: {name: "Three scoops", live: true, bpm: 116, steps: 6, tone: "bell", arp: [1, 3, 5, 4, 3, 2], arpVel: .04, mel: .65, up: 12,
+    bars: [[48, 60, 64, 67, 72], [53, 60, 65, 69, 72], [55, 59, 62, 67, 71], [48, 60, 64, 67, 76]]},
+  // the lemon shop: a sunny mandolin strum in A major
+  ct_limoni: {name: "Lemons on the terrace", live: true, bpm: 104, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 2, 3, 5, 3, 2, 4, 3], arpVel: .05, mel: .8,
+    bars: [[45, 57, 61, 64, 69], [50, 57, 62, 66, 69], [52, 56, 59, 64, 68], [45, 57, 61, 64, 73]]},
   // Round 128: Jeju's interiors, each its own
   // the divers' house: slow waves, low bells, a song you could hold your breath to
   jj_haenyeo: {name: "Breath of the sea", live: true, bpm: 46, steps: 8, tone: "bell", arp: [1, 0, 2, 0, 3, 0, 2, 0], arpVel: .03, mel: .35,
