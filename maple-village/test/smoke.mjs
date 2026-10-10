@@ -2022,7 +2022,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   page.on("pageerror", e => errors.push(`farm life pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { const m = /flpatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
-    const h = f.hfarm = f.hfarm || {}, now = Date.now() + (globalThis.__mapleOffset || 0);
+    const q = new URLSearchParams(location.search), qt = (q.get("time") || "").padStart(5, "0");   // the game's clock (?date&time), not the real one: the real time of day mustn't matter
+    const h = f.hfarm = f.hfarm || {}, now = q.get("date") && q.get("time") ? Date.parse(`${q.get("date")}T${qt}:00+08:00`) : Date.now() + (globalThis.__mapleOffset || 0);
     if (m[1] === "start") { h.since = "2026-10-01"; f.inv = {...(f.inv || {}), egg: 3}; }
     if (m[1] === "trust") { h.trust = 38; }
     if (m[1] === "swarm") { h.hives = [now - 6*864e5, now, now, now, now]; }
