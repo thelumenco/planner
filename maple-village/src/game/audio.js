@@ -91,6 +91,63 @@ export const TRACKS = {
   // a lilting 6/8 like a Ligurian folk song
   cinque: {name: "Mandolin on the harbour", live: true, bpm: 96, steps: 6, tone: "guitar", arp: [1, 3, 5, 3, 4, 2], arpVel: .05, mel: .7, up: 12,
     bars: [[38, 50, 57, 62, 66, 69], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 69, 73], [38, 50, 57, 62, 66, 69], [47, 59, 62, 66, 71, 74], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 67, 69], [38, 50, 57, 62, 66, 74]]},
+  // Round 142: Bellbird Valley (the Vines), live everywhere, every stop and every room its own
+  // Valley Gate: a front-porch acoustic guitar in G, easy and open, with bellbird pings up top
+  bb_vines: {name: "Down the valley road", live: true, bpm: 92, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 3, 2, 4, 3, 5, 4, 2], arpVel: .048, mel: .7,
+    bars: [[43, 55, 59, 62, 67, 71], [48, 55, 60, 64, 67, 72], [43, 55, 59, 62, 67, 74], [50, 57, 62, 66, 69, 74], [40, 52, 55, 59, 64, 67], [48, 55, 60, 64, 67, 72], [50, 57, 62, 66, 69, 72], [43, 55, 59, 62, 67, 71]],
+    lines: [[[0, 79], [2, 76], [3, 74]], [[0, 76], [2, 72]], [[0, 74], [1, 76], [2, 79]], [[0, 78], [2, 74]], [[0, 76], [2, 79], [3, 76]], [[0, 72], [2, 76]], [[0, 74], [1, 72], [2, 69]], [[0, 71], [2, 67]]]},
+  // Balloon Lookout: slow rising bells, like burners and lift-off, in D
+  bb_lookout: {name: "Rising at dawn", live: true, bpm: 58, steps: 8, tone: "bell", arp: [1, 2, 3, 4, 5, 4, 3, 2], arpVel: .035, mel: .45, up: 12,
+    bars: [[38, 50, 57, 62, 66, 69], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 69, 73], [47, 59, 62, 66, 71, 74]]},
+  // the Cellar Door: a lazy afternoon piano in F, long lunches and a dog asleep in the sun
+  bb_cellar: {name: "Afternoon among the vines", live: true, bpm: 68, steps: 8, tone: "piano", arp: [1, 3, 2, 4, 3, 5, 4, 3], arpVel: .04, mel: .55,
+    bars: [[41, 53, 57, 60, 65, 69], [46, 53, 58, 62, 65, 70], [36, 48, 55, 58, 64, 67], [41, 53, 57, 60, 65, 72]]},
+  // the berry farm: a bouncy rhodes in C, buckets swinging
+  bb_berry: {name: "Pick your own", live: true, bpm: 112, steps: 8, tone: "rhodes", strum: [0, 4], arp: [1, 3, 2, 3, 4, 3, 2, 3], arpVel: .046, mel: .75,
+    bars: [[48, 60, 64, 67, 72], [53, 60, 65, 69, 72], [55, 59, 62, 67, 71], [48, 60, 64, 67, 76]]},
+  // Gum Creek: hushed bush, sparse guitar in E minor and long gaps, kookaburras off somewhere
+  bb_creek: {name: "Under the gums", live: true, bpm: 60, steps: 8, tone: "guitar", arp: [1, 0, 3, 0, 2, 0, 4, 0], arpVel: .036, mel: .45,
+    bars: [[40, 52, 55, 59, 64], [36, 48, 55, 60, 64], [43, 55, 59, 62, 67], [38, 50, 57, 62, 66]]},
+  // Riverside Camp: a campfire strum in A, everyone singing along badly
+  bb_camp: {name: "Round the campfire", live: true, bpm: 100, steps: 6, tone: "guitar", strum: [0, 3], arp: [1, 3, 5, 3, 4, 2], arpVel: .05, mel: .75,
+    bars: [[45, 57, 61, 64, 69], [50, 57, 62, 66, 69], [52, 56, 59, 64, 68], [45, 57, 61, 64, 73]]},
+  // the rooms
+  bv_store: {name: "Mrs Dunn's wireless", live: true, bpm: 104, steps: 8, tone: "rhodes", strum: [0, 4], arp: [1, 2, 3, 2, 4, 3, 2, 3], arpVel: .042, mel: .65,
+    bars: [[43, 55, 59, 62, 67], [48, 55, 60, 64, 67], [50, 57, 62, 66, 69], [43, 55, 59, 62, 71]]},
+  bv_shed: {name: "The honesty tin", live: true, bpm: 84, steps: 6, tone: "guitar", arp: [1, 3, 2, 4, 3, 2], arpVel: .04, mel: .55,
+    bars: [[50, 57, 62, 66, 69], [43, 55, 59, 62, 67], [45, 57, 61, 64, 69], [50, 57, 62, 66, 74]]},
+  bv_opshop: {name: "Something old", live: true, bpm: 76, steps: 6, tone: "piano", arp: [1, 3, 4, 2, 3, 5], arpVel: .038, mel: .5,
+    bars: [[46, 58, 62, 65, 70], [41, 53, 57, 60, 65], [43, 55, 58, 62, 67], [39, 51, 58, 63, 67]]},
+  bv_coffee: {name: "First light, flat white", live: true, bpm: 96, steps: 8, tone: "rhodes", arp: [1, 3, 2, 4, 3, 5, 4, 2], arpVel: .042, mel: .6,
+    bars: [[45, 57, 60, 64, 69], [41, 53, 57, 60, 65], [43, 55, 59, 62, 67], [40, 52, 56, 59, 64]]},
+  bv_balloonshed: {name: "Up, up", live: true, bpm: 88, steps: 8, tone: "bell", arp: [1, 2, 3, 4, 5, 3, 4, 5], arpVel: .036, mel: .55, up: 12,
+    bars: [[50, 62, 66, 69, 74], [55, 62, 67, 71, 74], [57, 61, 64, 69, 73], [50, 62, 66, 69, 78]]},
+  bv_gallery: {name: "Watercolours", live: true, bpm: 64, steps: 8, tone: "piano", arp: [1, 3, 5, 3, 2, 4, 3, 2], arpVel: .036, mel: .45,
+    bars: [[40, 52, 59, 64, 68], [45, 57, 61, 64, 69], [42, 54, 61, 66, 69], [47, 59, 63, 66, 71]]},
+  bv_tasting: {name: "A little glass of Pinot", live: true, bpm: 72, steps: 6, tone: "guitar", arp: [1, 3, 5, 4, 3, 2], arpVel: .04, mel: .55,
+    bars: [[41, 53, 57, 60, 65], [38, 50, 57, 62, 65], [46, 53, 58, 62, 65], [36, 48, 55, 60, 64]]},
+  bv_cave: {name: "A quarter turn", live: true, bpm: 52, steps: 8, tone: "bell", arp: [1, 0, 3, 0, 2, 0, 4, 0], arpVel: .028, mel: .35,
+    bars: [[36, 48, 55, 60, 63], [32, 44, 51, 56, 60], [34, 46, 53, 58, 62], [31, 43, 50, 55, 59]]},
+  bv_restaurant: {name: "The long table", live: true, bpm: 80, steps: 8, tone: "piano", strum: [0], arp: [1, 3, 2, 4, 3, 5, 4, 3], arpVel: .042, mel: .6,
+    bars: [[43, 55, 59, 62, 67], [40, 52, 55, 59, 64], [36, 48, 55, 60, 64], [38, 50, 57, 62, 66]]},
+  bv_berrycafe: {name: "Jam first", live: true, bpm: 108, steps: 6, tone: "bell", arp: [1, 3, 5, 4, 3, 2], arpVel: .04, mel: .65, up: 12,
+    bars: [[53, 65, 69, 72, 77], [58, 65, 70, 74, 77], [48, 60, 64, 67, 72], [53, 65, 69, 72, 81]]},
+  bv_jam: {name: "Copper pots", live: true, bpm: 92, steps: 8, tone: "rhodes", strum: [0, 4], arp: [1, 2, 3, 4, 3, 2, 4, 3], arpVel: .044, mel: .6,
+    bars: [[47, 59, 62, 66, 71], [52, 59, 64, 67, 71], [54, 58, 61, 66, 70], [47, 59, 62, 66, 74]]},
+  bv_choc: {name: "Melted", live: true, bpm: 70, steps: 8, tone: "piano", arp: [1, 3, 2, 4, 3, 5, 4, 2], arpVel: .038, mel: .5,
+    bars: [[39, 51, 58, 63, 67], [44, 56, 60, 63, 68], [46, 58, 62, 65, 70], [41, 53, 60, 63, 68]]},
+  bv_visitor: {name: "Soft toys", live: true, bpm: 100, steps: 6, tone: "bell", arp: [1, 2, 3, 5, 4, 3], arpVel: .038, mel: .6, up: 12,
+    bars: [[48, 60, 64, 67, 72], [45, 57, 60, 64, 69], [41, 53, 60, 65, 69], [43, 55, 62, 67, 71]]},
+  bv_platypus: {name: "Bubbles by the reeds", live: true, bpm: 44, steps: 8, tone: "bell", arp: [1, 0, 0, 3, 0, 2, 0, 0], arpVel: .026, mel: .3,
+    bars: [[38, 50, 57, 64, 69], [43, 55, 62, 66, 71], [36, 48, 55, 64, 67], [38, 50, 57, 62, 69]]},
+  bv_hospital: {name: "Joeys in pouches", live: true, bpm: 62, steps: 6, tone: "guitar", arp: [1, 3, 2, 4, 3, 2], arpVel: .034, mel: .45,
+    bars: [[43, 55, 59, 62, 67], [40, 52, 59, 64, 67], [36, 48, 55, 60, 64], [38, 50, 57, 62, 66]]},
+  bv_campkitchen: {name: "Who's for a cuppa", live: true, bpm: 94, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 3, 2, 3, 1, 4, 2, 3], arpVel: .044, mel: .65,
+    bars: [[45, 57, 61, 64, 69], [50, 57, 62, 66, 69], [45, 57, 61, 64, 69], [52, 56, 59, 64, 68]]},
+  bv_campstore: {name: "Forgot the matches", live: true, bpm: 110, steps: 8, tone: "rhodes", arp: [1, 3, 2, 4, 3, 2, 4, 5], arpVel: .042, mel: .7,
+    bars: [[40, 52, 56, 59, 64], [45, 57, 61, 64, 69], [47, 59, 63, 66, 71], [40, 52, 56, 59, 68]]},
+  bv_canoe: {name: "Paddles on hooks", live: true, bpm: 86, steps: 6, tone: "guitar", arp: [1, 3, 5, 4, 2, 3], arpVel: .042, mel: .6,
+    bars: [[38, 50, 57, 62, 66], [43, 55, 59, 62, 67], [45, 57, 61, 64, 69], [38, 50, 57, 62, 69]]},
   // Round 132: Cinque Terre's interiors, each its own
   // the focacceria: a bustling accordion-ish rhodes waltz, the oven roaring
   ct_focacceria: {name: "Morning at the oven", live: true, bpm: 120, steps: 6, tone: "rhodes", strum: [0], arp: [1, 3, 4, 3, 5, 3], arpVel: .045, mel: .7,

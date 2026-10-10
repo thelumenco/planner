@@ -12,7 +12,7 @@
 //   -----------+----------   (the gorge runs between the rows)
 //   rd_old     | rd_bridge
 
-import { BB_TOWNS, BB_PLACES, BB_BRIDGES, BB_ARRIVE, BB_BOUNDS, BB_OBST } from "./bellbird.js";
+import { BB_TOWNS, BB_PLACES, BB_BRIDGES, BB_ARRIVE, BB_BOUNDS, BB_OBST, BB_GOODS, BB_KEEP } from "./bellbird.js";
 export const TOWNS = {
   ronda: {
     n: "Ronda", by: "train", fare: 40, free: ["evan"], outFrom: 7*60, outTo: 18*60, backTo: 22*60,
@@ -633,6 +633,10 @@ Object.assign(TOWN_GOODS, {
 Object.assign(KEEP_LINES, {c_magnet: "A tiny stack of coloured houses over a blue sea, from Cinque Terre.", c_linen: "A linen tea towel with lemons on it, from Monterosso."});
 ["c_magnet", "c_linen"].forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
 TOWN_GOODS.c_magnet.magnet = true;
+// Bellbird Valley's goods (round 142: data/bellbird.js)
+Object.assign(TOWN_GOODS, BB_GOODS); Object.assign(KEEP_LINES, BB_KEEP);
+Object.keys(BB_KEEP).forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
+TOWN_GOODS.b_magnet.magnet = true;
 Object.keys(PAINT.colours).forEach(c => Object.keys(PAINT.patterns).forEach(p => { TOWN_GOODS[`ptile_${c}_${p}`] = {n: "Your painted tile", kind: "keepsake", price: 0, tile: [c, p], art: ["tile", PAINT.colours[c][1], "#FFFDF6"], line: `A tile you painted yourself at Lucía's in Ronda: ${PAINT.patterns[p]}, in ${PAINT.colours[c][0]}.`}; }));
 // Round 123: the nerikiri sweets Mel makes with Mr Tanaka in Kyoto (gifts), one shape for each season
 [["sakura", "cherry blossom", "#F6C7D6"], ["ajisai", "hydrangea", "#B9A8E0"], ["momiji", "maple leaf", "#E0782E"], ["tsubaki", "camellia", "#C8432F"]].forEach(([k, n, col]) => {

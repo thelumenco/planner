@@ -119,7 +119,8 @@ const TAPAS_COL = {almejas: ["#F3E7C8", "#9DB08A"], gambas: ["#E8704C", "#F3C969
   carrots: ["#F08A3C", "#7FA35A"], crema: ["#F6E3C6", "#E8574C"], tostas: ["#D9A066", "#F6A23A"], rellenos: ["#C9433A", "#F3C969"],
   guisantes: ["#B9D88A", "#7FA35A"], croquetas: ["#E3B04B", "#F08A3C"], calabaza: ["#F08A3C", "#3B3045"], puerros: ["#E7EFD8", "#9CC27E"],
   sardinas: ["#E3D6CF", "#8FA9BF"], escabeche: ["#F3C969", "#3E6B8C"], calamares: ["#F6E3A1", "#E3B04B"], pulpo: ["#F3C969", "#E8899A"], dorada: ["#E3D6CF", "#5E7A4E"], trucha: ["#F6E3C6", "#E8899A"], cangrejos: ["#D9A066", "#D9614C"],
-  huevos: ["#F3C969", "#FFF3C4"], tomatoegg: ["#F6D36A", "#E8574C"], yogur: ["#FFFDF6", "#C9A27E"], halloumi: ["#F6F1E8", "#E3A33A"], azul: ["#DCE3E8", "#C9D36A"], manzana: ["#D9A066", "#D9433A"], tarta: ["#E3B47A", "#9CC27E"], panal: ["#F3C969", "#FFF6E0"], ajo: ["#F3C969", "#7FA35A"], setas: ["#D9A066", "#C98A4A"], castanas: ["#8A5A3A", "#F3C969"]};
+  huevos: ["#F3C969", "#FFF3C4"], tomatoegg: ["#F6D36A", "#E8574C"], yogur: ["#FFFDF6", "#C9A27E"], halloumi: ["#F6F1E8", "#E3A33A"], azul: ["#DCE3E8", "#C9D36A"], manzana: ["#D9A066", "#D9433A"], tarta: ["#E3B47A", "#9CC27E"], panal: ["#F3C969", "#FFF6E0"], ajo: ["#F3C969", "#7FA35A"], setas: ["#D9A066", "#C98A4A"], castanas: ["#8A5A3A", "#F3C969"],
+  pavlova: ["#FFFDF6", "#D9435A"], damper: ["#E3C08A", "#E8A83A"], wattlescone: ["#C9A06A", "#8A5A3A"]};
 export function dishArt(id, s = 44, off){
   // the tapas of the day come in a little terracotta cazuela
   if (String(id).startsWith("tapas:")) { const [a, b] = TAPAS_COL[id.slice(6)] || ["#E86A5C", "#F3C969"];
