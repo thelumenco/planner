@@ -1989,3 +1989,6 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Carrots with olives went from 6 to 7, and Honeybrook blue with pear from 11 to 12.
   - Renamed: "Trout with brown butter" (it never used almonds) and "Yoghurt with honey".
 - **Where to get things:** the `SOURCE` map gives each ingredient's source. A recipe card shows it in small italics under any ingredient you're short of. The test checks that every recipe ingredient has a source, so add one when you add an ingredient.
+- **Scoop Shack news (round 136, Mel: "feels like I'm not getting anything"):** `scoopNews` in scoop.js runs from core `scoopNow` every 20s.
+  - **Low display:** while the shop's open, a heads-up when the display is down to its last 5 scoops (`LOW_SCOOPS`), and another when it's run dry (nobody can buy). Each fires once a day and resets when the display is restocked.
+  - **Takings:** after 8pm, a note with the day's ice creams and coins, and the time the display ran out if it did (`sold[day].outAt`, recorded in `saleMinute`). If Mel wasn't around, it gives yesterday's instead.

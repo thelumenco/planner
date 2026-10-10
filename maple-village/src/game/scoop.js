@@ -225,7 +225,8 @@ export const priceOf = (s, fmt, r) => s.prices[fmt] + (r && r.special ? s.prices
 const DEFAULT = 4 + 4 + 6 + 7;
 function saleMinute(s, day, hm, opts){
   const box = !openNow(hm) && hasUp(s, "honesty") && honestyOpen(hm); if (!openNow(hm) && !box) return null;
-  const stocked = onDisplay(s); if (!stocked.length) return null;
+  const stocked = onDisplay(s);
+  if (!stocked.length) { if (!box) { const t = s.sold[day] = s.sold[day] || {n: 0, coins: 0}; if (t.outAt == null) t.outAt = hm; } return null; }   // (when the display ran dry, for the evening note)
   const d = new Date(day + "T00:00:00Z").getUTCDay(), we = d === 0 || d === 6, night = (d === 2 || d === 4) && hm >= 17*60 + 30;
   const glow = hasUp(s, "neon") && hm >= 17*60 ? 1.3 : 1;
   if (box) {   // the honesty freezer: cups only, and the coins go in its box
@@ -453,3 +454,23 @@ export function freezerPanel(F, st = {}){
   return h + shut;
 }
 export const RENO_LINE = "Boarded up for now, with scaffolding out front. The sign says: \"Coming soon: a craft brewery? A chocolatier?\" Someone's pencilled \"both!!\" underneath.";
+// Round 136 (Mel: "feels like I'm not getting anything"): a heads-up when the display's down to its last few scoops
+// (and when it's run dry), and the day's takings once the shop shuts at 8 (or yesterday's, if Mel wasn't around).
+// -> a list of lines to say. State: s.warned ("day:low" | "day:out"), s.reported (the last day told).
+export const LOW_SCOOPS = 5;
+const hmTxt = m => `${((Math.floor(m/60) + 11) % 12) + 1}${m % 60 ? ":" + String(m % 60).padStart(2, "0") : ""}${m < 12*60 ? "am" : "pm"}`;
+const dayBefore = day => new Date(Date.parse(day + "T00:00:00Z") - 864e5).toISOString().slice(0, 10);
+export function scoopNews(s, day, hm){
+  const out = [], left = onDisplay(s).reduce((a, r) => a + (s.tubs[r.id] || 0), 0);
+  if (openNow(hm) && s.recipes.length) {
+    if (left > LOW_SCOOPS) s.warned = null;
+    else if (left > 0 && s.warned !== day + ":low" && s.warned !== day + ":out") { s.warned = day + ":low"; out.push(`${s.name}'s display is down to its last ${left} scoop${left === 1 ? "" : "s"}. Time to churn another tub?`); }
+    else if (!left && s.warned !== day + ":out") { s.warned = day + ":out"; out.push(`${s.name} has run out of ice cream on display, so nobody can buy any. Churn a tub, or put another flavour out from the freezer.`); }
+  }
+  const report = d => { const t = s.sold[d]; s.reported = d; if (!t || !t.n) return null;
+    return `${d === day ? "Today" : "Yesterday"} ${s.name.replace(/^The /, "the ")} sold ${t.n} ice cream${t.n === 1 ? "" : "s"}: ${t.coins} coins${t.outAt != null ? `. It ran out at ${hmTxt(t.outAt)}, so there's more to be had with fuller tubs` : ""}.`; };
+  if (hm >= CLOSE && s.reported !== day) { const r = report(day); if (r) out.push(r); }
+  else if (hm < CLOSE && s.reported && s.reported < dayBefore(day)) { const r = report(dayBefore(day)); if (r) out.push(r); }
+  else if (!s.reported) s.reported = dayBefore(day);
+  return out;
+}

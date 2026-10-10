@@ -2234,6 +2234,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   // Scoop Shack upgrades: buy them from the catalogue; the dip station's room (dips and toppings to buy, make a dipped
   // one to give), the honesty freezer's coin box filling while the shop's shut, and the delivery bike
   console.log("\nScoop Shack upgrades");
+  { const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), s = sc.scoopState({}), d = "2026-10-10";
+    s.recipes = [{id: "m", ings: ["mango"], name: "Mango Sorbet", col: "#F8D59A"}]; s.tubs = {m: 4};
+    const low = sc.scoopNews(s, d, 12*60), again = sc.scoopNews(s, d, 12*60 + 5); s.tubs = {}; const out = sc.scoopNews(s, d, 13*60);
+    s.sold[d] = {n: 40, coins: 190, outAt: 15*60}; const eve = sc.scoopNews(s, d, 20*60 + 10), eve2 = sc.scoopNews(s, d, 21*60);
+    check(/last 4 scoops/.test(low.join(" ")) && !again.length && /run out/.test(out.join(" ")) && /sold 40 ice creams: 190 coins\. It ran out at 3pm/.test(eve.join(" ")) && !eve2.length,
+      "the Scoop Shack says when its display is running low or empty, and tells you the day's takings when it shuts (once)"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => { errors.push(`scoopup pageerror: ${e.message}`); console.log("PAGEERR", e.stack.slice(0, 600)); });
   page.on("dialog", d => { errors.push("the upgrades used a browser pop-up"); d.dismiss(); });
