@@ -1977,3 +1977,15 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - **Colour:** faded pastel plaster with paler patches. Some shutters are closed, the rest open.
   - **Details:** window boxes of geraniums, hanging pots, a balcony with pots on some houses, and the odd washing line.
   - **Big boxes:** a wide one splits into houses side by side at different heights. A wide shop keeps its door and sign in a house of its own with neighbours either side. A tall one becomes a three-storey house with the green hillside (scrub) above it.
+
+### Round 136: Local and Specials tapas, priced by what they cost
+- **Two tabs at the stove (Mel):** Local (anything from Honeybrook) and Specials.
+  - **Specials** are the 16 trip dishes: Ronda 5, Kyoto 3, Jeju 3, Cinque Terre 5. They're in `SPECIALS` in kitchen.js, which sets `special: town` and the price on each.
+  - A town's specials show up once Mel has been there (`beenTo`: `F.towns[town]` or that town's own state). Ronda's still need tasting.
+  - Specials are never the "craving" request.
+- **Pricing rule:** one batch is 6 plates, so it earns 6 × the plate price.
+  - Every batch earns at least twice its ingredients' cost, buying everything at the cheapest place. For fish and forage, cost means what they sell for.
+  - Specials are 14–17 a plate, so they're always dearer than any local dish (local tops out at 13).
+  - Carrots with olives went from 6 to 7, and Honeybrook blue with pear from 11 to 12.
+  - Renamed: "Trout with brown butter" (it never used almonds) and "Yoghurt with honey".
+- **Where to get things:** the `SOURCE` map gives each ingredient's source. A recipe card shows it in small italics under any ingredient you're short of. The test checks that every recipe ingredient has a source, so add one when you add an ingredient.

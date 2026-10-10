@@ -896,3 +896,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .ctbunch{background:#E3EED2;border:1.4px solid var(--line);border-radius:12px;padding:4px;cursor:pointer}
 .ctbunch.done{opacity:.4}
 @media (prefers-reduced-motion:reduce){.ctride span{animation:none;left:84%;bottom:38px}}
+
+/* the stove (round 136): Local and Specials tabs; where a missing ingredient comes from */
+.ktabs{margin:6px 0 2px}.kneed .ksrc{display:block;font-size:10.5px;color:#8A7A66;font-style:italic}

@@ -70,7 +70,7 @@ export const TAPAS = {
   pancon: {n: "Pan con tomate", need: {loaf: 1, tomato: 2}, price: 7, seasons: ["summer", "autumn"]},
   pimientos: {n: "Pimientos asados", need: {pepper: 3}, price: 7, seasons: ["summer"]},
   fritters: {n: "Corn fritters", need: {corn: 2, egg: 1}, price: 7, seasons: ["summer", "autumn"]},
-  carrots: {n: "Carrots with olives", need: {carrot: 2, olives: 1}, price: 6, seasons: ["spring", "autumn", "winter"]},
+  carrots: {n: "Carrots with olives", need: {carrot: 2, olives: 1}, price: 7, seasons: ["spring", "autumn", "winter"]},
   crema: {n: "Strawberry crema", need: {strawberry: 2, milk: 1}, price: 9, seasons: ["spring"]},
   tostas: {n: "Tomato and cheese tostas", need: {loaf: 1, tomato: 1, cheese: 1}, price: 10, seasons: ["summer", "autumn"]},
   rellenos: {n: "Stuffed peppers", need: {pepper: 2, cheese: 1}, price: 10, seasons: ["summer"]},
@@ -84,14 +84,14 @@ export const TAPAS = {
   calamares: {n: "Fried calamari", need: {squid: 2, flour: 1}, price: 11},
   pulpo: {n: "Pulpo a la gallega", need: {octopus: 1, potato: 2}, price: 12},
   dorada: {n: "Sea bream with olives", need: {seabream: 1, olives: 1}, price: 11},
-  trucha: {n: "Trout with almond butter", need: {trout: 2, milk: 1}, price: 10},
+  trucha: {n: "Trout with brown butter", need: {trout: 2, milk: 1}, price: 10},
   cangrejos: {n: "Garlic crayfish on toast", need: {crayfish: 4, loaf: 1}, price: 10},
   // round 101: more ways to use eggs, tomatoes, yoghurt, honey, the farm's cheeses, pears and leeks
   huevos: {n: "Huevos rotos", need: {egg: 2, potato: 2}, price: 9},
   tomatoegg: {n: "Ma Ma's tomato and egg", need: {tomato: 2, egg: 2}, price: 8, seasons: ["summer", "autumn"]},
-  yogur: {n: "Yoghurt with honey and walnuts", need: {yoghurt: 2, honey: 1}, price: 8},
+  yogur: {n: "Yoghurt with honey", need: {yoghurt: 2, honey: 1}, price: 8},
   halloumi: {n: "Grilled halloumi with honey", need: {halloumi: 1, honey: 1}, price: 11},
-  azul: {n: "Honeybrook blue with pear", need: {bluecheese: 1, pear: 2}, price: 11},
+  azul: {n: "Honeybrook blue with pear", need: {bluecheese: 1, pear: 2}, price: 12},
   manzana: {n: "Apple and cheddar tostas", need: {cheddar: 1, apple: 2, loaf: 1}, price: 11},
   tarta: {n: "Leek and cheese tart", need: {leek: 2, cheese: 1, flour: 1}, price: 10, seasons: ["autumn", "winter"]},
   panal: {n: "Honeycomb with farm cheese", need: {honeycomb: 1, farmcheese: 1}, price: 12},
@@ -121,13 +121,13 @@ Object.assign(TAPAS, {gambas: {n: "Gambas al ajillo", need: {shrimp: 3, garlic: 
   almejas: {n: "Clams with garlic and lemon", need: {clams: 4, garlic: 1, lemon: 1}, price: 12},
   cebollino: {n: "Chive omelette", need: {egg: 2, chives: 1}, price: 8}, tomillo: {n: "Roast pumpkin with thyme", need: {pumpkin: 1, thyme: 1}, price: 9, seasons: ["autumn", "winter"]}});
 // a tapas Mel can cook: the Ronda ones once she's tasted them there
-export const knows = (F, id) => !TAPAS[id].learn || !!(F.learned && F.learned[id]);
+export const knows = (F, id) => TAPAS[id].learn ? !!(F.learned && F.learned[id]) : !TAPAS[id].special || beenTo(F, TAPAS[id].special);   // Ronda's: tasted there; the other specials: once Mel's been
 export const inSeason = (id, season) => !TAPAS[id].seasons || TAPAS[id].seasons.includes(season);
 export const TAPAS_PLATES = 6, TAPAS_MAX = 3;   // round 108: up to three tapas a day
 // The chef's request: each day someone in town has a craving for one of the season's tapas. Make it the tapas of the
 // day and it sells for half as much again (a reason to cook something different each day).
 const ASKERS = ["Rosa", "Bastien", "Noor", "Felix", "Elena", "Mateo", "Lila", "Celeste"];
-export function requestOf(today){ const ids = Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today)) && !TAPAS[id].learn), h = hash(today + "crave"); return {id: ids[h % ids.length], who: ASKERS[(h >> 5) % ASKERS.length]}; }
+export function requestOf(today){ const ids = Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today)) && !TAPAS[id].learn && !TAPAS[id].special), h = hash(today + "crave"); return {id: ids[h % ids.length], who: ASKERS[(h >> 5) % ASKERS.length]}; }
 export const tapasPrice = (id, today) => Math.round(TAPAS[id].price*(requestOf(today).id === id ? 1.5 : 1));
 const OVEN = 1*H, PRESS = 3*H;
 const KP = {};   // which of the stove's fold-out sections are open (kept across redraws)
@@ -241,7 +241,7 @@ const pic = (id, s = 34) => icon(id, s);
 const larderGrid = k => { const ids = Object.keys(k.larder).filter(id => k.larder[id] > 0);
   return ids.length ? `<div class="kgoods">${ids.map(id => `<div class="kgoodw"><button class="kgood kbtn" data-k="take" data-id="${id}">${pic(id)}<b>${k.larder[id]}</b><small>${esc(nm(id, k.larder[id]))}</small><em>Take one</em></button>
       <span class="kkeep" title="Pilar leaves these alone"><button class="btn small alt" data-k="keep" data-id="${id}" data-n="-1" aria-label="Keep fewer back">−</button><span>${k.keep[id] ? `keep ${k.keep[id]}` : heldNew(k, id) ? `new: held ${Math.max(1, Math.ceil((k.fresh[id].until - Date.now())/60e3))}m` : "keep 0"}</span><button class="btn small alt" data-k="keep" data-id="${id}" data-n="1" aria-label="Keep one more back">+</button></span></div>`).join("")}</div><p class="muted">Tap one to take it back to your backpack (for the Scoop Shack, or a gift). <b>Keep</b>: how many Pilar must leave alone (say, flowers you're saving for petal syrup). You can still use them yourself. Anything you've just brought in, she leaves for 15 minutes, so you've time to decide.</p>` : `<p class="muted">Empty. Send ingredients here from your backpack.</p>`; };
-const needList = (k, need) => Object.entries(need).map(([id, n]) => `<span class="kneed ${larderCount(k, id) >= n ? "ok" : ""}">${pic(GROUP_ICON[id] || id, 22)}${n} ${esc(nm(id, n))} <small>(${larderCount(k, id)})</small></span>`).join("");
+const needList = (k, need) => Object.entries(need).map(([id, n]) => `<span class="kneed ${larderCount(k, id) >= n ? "ok" : ""}">${pic(GROUP_ICON[id] || id, 22)}${n} ${esc(nm(id, n))} <small>(${larderCount(k, id)})</small>${larderCount(k, id) < n && SOURCE[id] ? `<small class="ksrc">from ${esc(SOURCE[id])}</small>` : ""}</span>`).join("");
 export function larderPanel(F){
   const k = kitchenState(F), bag = backpackGoods(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The larder</h2>${larderGrid(k)}
@@ -276,8 +276,11 @@ export function stovePanel(F, today){
   list.forEach(t => { const T = TAPAS[t.id]; h += `<div class="kdish chosen">${dishArt("tapas:" + t.id, 52)}<span><b>${esc(T.n)}</b><small>${t.plates} plate${t.plates === 1 ? "" : "s"} on the menu · ${tapasPrice(t.id, today)} coins each · needs ${needText(T.need)}</small><span class="kneeds">${needList(k, T.need)}</span></span></div>
       <div class="actions"><button class="btn primary small" data-k="cooktapas" data-id="${t.id}" ${has(k, T.need) ? "" : "disabled"}>Cook a batch (${TAPAS_PLATES} plates)</button>${!t.cooked ? `<button class="btn alt small" data-k="untapas" data-id="${t.id}">Take it off</button>` : ""}</div>`; });
   if (list.length) h += `<p class="muted">Leftovers at closing time (10pm) go to the staff for dinner.</p>`;
-  const chooser = (ids, act, on = []) => `<div class="kdishes">${ids.map(id => { const d = TAPAS[id], ok = has(k, d.need);
-      return `<button class="kdish ${ok ? "ok" : ""}${on.includes(id) ? " chosen" : ""}" data-k="${act}" data-id="${id}" aria-pressed="${on.includes(id)}">${dishArt("tapas:" + id, 46)}<span><b>${esc(d.n)}${on.includes(id) ? " ✓" : ""}</b><small>${d.price} coins a plate</small><span class="kneeds">${needList(k, d.need)}</span></span></button>`; }).join("")}</div>`;
+  // two tabs (round 136): Local dishes, and Specials from the trips (each says where it's from)
+  const tab = KP.tab === "specials" ? "specials" : "local", tabbed = ids => ids.filter(id => !!TAPAS[id].special === (tab === "specials"));
+  const tabs = `<div class="gchips ktabs" role="tablist">${[["local", "Local"], ["specials", "Specials"]].map(([t, n]) => `<button class="gchip${tab === t ? " on" : ""}" data-k="ktab" data-id="${t}" role="tab" aria-selected="${tab === t}">${n}</button>`).join("")}</div>`;
+  const chooser = (all, act, on = []) => { const ids = tabbed(all); return tabs + (ids.length ? "" : `<p class="muted">${tab === "specials" ? "Specials are dishes from your trips: travel to Ronda, Kyoto, Jeju or Cinque Terre to learn some." : "Nothing local in season right now."}</p>`) + `<div class="kdishes">${ids.map(id => { const d = TAPAS[id], ok = has(k, d.need);
+      return `<button class="kdish ${ok ? "ok" : ""}${on.includes(id) ? " chosen" : ""}" data-k="${act}" data-id="${id}" aria-pressed="${on.includes(id)}">${dishArt("tapas:" + id, 46)}<span><b>${esc(d.n)}${on.includes(id) ? " ✓" : ""}</b><small>${d.special ? `Special from ${TOWN_NAME[d.special]} · ` : ""}${d.price} coins a plate</small><span class="kneeds">${needList(k, d.need)}</span></span></button>`; }).join("")}</div>`; };
   if (list.length < TAPAS_MAX) h += `<p class="sub">${list.length ? `Add another (${list.length} of ${TAPAS_MAX})` : "Pick today's dish"}: it goes on the chalkboard, sells for more than the small plates and brings extra people in. <b>${SEASONS[seasonOf(today)].n}</b> menu: ${SEASONS[seasonOf(today)].line.toLowerCase()}.</p>${chooser(Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today)) && knows(F, id) && !list.some(t => t.id === id)), "tapas")}`;
   h += `<details class="kplan" data-kp="plan"${KP.plan ? " open" : ""}><summary><b>Plan tomorrow's tapas</b> <small>${plan.length ? plan.map(x => esc(TAPAS[x].n)).join(", ") : `up to ${TAPAS_MAX}, they go on the chalkboard first thing`}</small></summary>${chooser(Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(tomorrow)) && knows(F, id)), "plantapas", plan)}</details>`;
   // Pilar's list: what she may make on her own
@@ -303,8 +306,35 @@ export function wireKitchen(root, F, api){
     else if (k === "cooktapas") line = cookTapas(F, api.today, id);
     else if (k === "plantapas") line = planTapas(F, id, nextDay(api.today));
     else if (k === "keep") { const n = setKeep(F, id, +b.dataset.n); api.save(); api.rerender(); return; }
+    else if (k === "ktab") { KP.tab = id; api.rerender(); return; }
     else if (k === "pilarno") { const kk = kitchenState(F); if (kk.pilarNo[id]) delete kk.pilarNo[id]; else kk.pilarNo[id] = true; api.save(); api.rerender(); return; }
     if (line) { api.sfx(k === "send" || k === "sendall" ? "paper" : "chime"); api.say(line); api.save(); }
     api.rerender();
   });
 }
+// Round 136 (Mel): the tapas from her trips are SPECIALS, in their own tab at the stove, and always dearer than any local
+// dish (14-17 a plate, by what the ingredients cost). A town's specials appear once she's been there (Ronda's still
+// need tasting at the tapas bar). Every batch (6 plates) earns well over what its ingredients cost: at least twice
+// for local dishes, buying everything at the cheapest place.
+export const SPECIALS = {salmorejo: ["ronda", 17], ajoblanco: ["ronda", 17], croqjamon: ["ronda", 16], payoyo: ["ronda", 15], naranjas: ["ronda", 17],
+  misofish: ["kyoto", 14], hiyayakko: ["kyoto", 14], mochihoney: ["kyoto", 15], heukdwaeji: ["jeju", 15], jeonbok: ["jeju", 15], hallaomija: ["jeju", 15],
+  trofie: ["cinque", 14], focaccia: ["cinque", 16], farinata: ["cinque", 16], acciughe: ["cinque", 14], crostini: ["cinque", 16]};
+Object.entries(SPECIALS).forEach(([id, [town, price]]) => Object.assign(TAPAS[id], {special: town, price}));
+export const TOWN_NAME = {ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre"};
+export const beenTo = (F, town) => !!((F.towns && F.towns[town]) || F[town]);   // (F.towns from round 132; a town's own state for earlier trips)
+// where each ingredient comes from, shown on the recipe cards (Mel: "where do I get almonds? squid?")
+export const SOURCE = {
+  potato: "garden or Clara's stall", tomato: "garden or Clara's stall", pepper: "garden or Clara's stall", corn: "garden or Clara's stall", carrot: "garden or Clara's stall",
+  strawberry: "garden or Clara's stall", pea: "garden or Clara's stall", pumpkin: "garden or Clara's stall", leek: "garden or Clara's stall", chickpea: "your garden (or Cinque Terre)",
+  garlic: "greenhouse", basil: "greenhouse", chives: "greenhouse", rosemary: "greenhouse", thyme: "greenhouse", mint: "greenhouse",
+  egg: "the farm gate", milk: "the farm gate", honey: "the farm gate or market", honeycomb: "the market", yoghurt: "the market or farm",
+  cheese: "the market deli", flour: "the market deli", olives: "the market deli", loaf: "the oven (1 flour makes 2)",
+  farmcheese: "your farm's cheese", halloumi: "your farm's cheese", bluecheese: "your farm's cheese", cheddar: "your farm's cheese",
+  apple: "the orchard", pear: "the orchard", lemon: "Ma Ma's lemon tree or the Friday fish van", fish: "the market or fishing",
+  sardine: "the sea or bay", mackerel: "the sea or bay, daytime", squid: "the sea, at night", octopus: "the sea, on rainy days", seabream: "the sea or bay",
+  trout: "the river, daytime", crayfish: "the lake", shrimp: "the sea, at dawn", anchovy: "the sea or bay", clams: "the Friday fish van at the bay",
+  wildgarlic: "the woods in spring", mushroom: "the woods in autumn", chestnut: "the woods in winter",
+  oliveoil: "your olive mill (or Ronda)", anchovy_salt: "your drying loft", pesto: "your drying loft (or Cinque Terre)", pinenuts: "the market, once you've been to Cinque Terre",
+  almond: "Ronda's market", sevilla: "Ronda's market", jamon: "Ronda's market", payoyo: "Ronda's market", membrillo: "Ronda's market",
+  yuzu: "Kyoto's market", miso: "Kyoto's market", tofu: "Kyoto's market", mochi: "Kyoto's market",
+  tangerine: "Jeju (or your own tangerine tree)", hallabong: "Jeju's market", omija: "Jeju's market", blackpork: "Jeju's market", abalone: "Jeju's divers' house"};

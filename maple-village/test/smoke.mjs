@@ -1112,7 +1112,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const k = JSON.parse(localStorage.getItem("fox.fox")).kitchen; return !!k.oven && !k.larder.flour; }), "flour goes in the oven to bake");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="tapas"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-k="tapas"]').count() === 43, "the stove offers this season's tapas (43 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams, Kyoto, Jeju and Cinque Terre)");
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 32 && await page.locator('#ctx [data-k="ktab"][data-id="local"]').first().getAttribute("aria-selected") === "true", "the stove's Local tab offers this season's local tapas (32 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams)");
+  check(/from the market deli|from the farm gate|from the garden/.test(await page.locator("#ctx").innerText()), "each missing ingredient says where to get it");
+  await page.locator('#ctx [data-k="ktab"][data-id="specials"]').first().click(); await page.waitForTimeout(200);
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 0 && /travel to Ronda, Kyoto, Jeju or Cinque Terre/.test(await page.locator("#ctx").innerText()), "the Specials tab is empty until you've travelled: specials come from the trips");
+  await page.locator('#ctx [data-k="ktab"][data-id="local"]').first().click(); await page.waitForTimeout(200);
   await page.click('#ctx [data-k="tapas"][data-id="tortilla"]'); await page.waitForTimeout(200); await page.click('#ctx [data-k="cooktapas"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapasList[0].id === "tortilla" && f.vine.tapasList[0].plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
   await page.click('#ctx [data-k="dish"][data-dish="olives"]'); await page.waitForTimeout(300);
@@ -3060,6 +3064,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(!lf.collect(F, "rack", now + 2*D) && lf.collect(F, "rack", now + 3*D).cask && !lf.collect(F, "cask", now + 6*D) && lf.collect(F, "cask", now + 7*D).n === 3 && F.inv.w_raisin === 3, "three days on the racks, four in the cask: three bottles of raisin wine");
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
+  { const T = kit.TAPAS, local = Object.keys(T).filter(id => !T[id].special), sp = Object.keys(T).filter(id => T[id].special), maxLocal = Math.max(...local.map(id => T[id].price));
+    check(sp.length === 16 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
+      "the 16 dishes from the trips are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
+    check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "jason"), L = np.NPCS.find(n => n.id === "luca");
     check(J && J.local === "cinque" && !J.tourist && J.look.specs && J.look.tall && J.look.palms && J.routine.some(sl => sl.scene === "ct_vernazza" && sl.act === "poem") && J.routine.some(sl => sl.act === "sit" && sl.from >= 18*60) && L && L.routine.some(sl => sl.act === "sit" && sl.from >= 18*60) && tw.TOWN_PLACES.ctjason.scene === "ct_vernazza",
