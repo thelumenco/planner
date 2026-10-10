@@ -428,11 +428,30 @@ export function letSlot(id, day, hm){
 export const DISCO_FROM = 20*60, DISCO_TO = 23*60 + 30;
 export const discoOn = day => dow(day) === 6, discoNow = (day, hm) => discoOn(day) && hm >= DISCO_FROM && hm < DISCO_TO;
 const DISCO_POOL = ["hana", "juniper", "bo", "opal", "theo", "marco", "ines", "farid", "mei", "felix", "elena", "amara", "mateo", "lila", "noor", "wren", "sofia", "tomo", "mum", "dad", "marcus", "angelina"];
-export const DISCO_SPOTS = [[200, 340], [260, 340], [320, 340], [380, 340], [440, 340], [170, 390], [230, 390], [290, 390], [350, 390], [410, 390], [470, 390], [220, 440], [280, 440], [340, 440], [400, 440], [260, 500]];
+// Not a grid (Mel: "they should be mingling"): little knots of two or three round the floor, couples together facing
+// each other (Mum and Dad; Marcus and Angellina once their date night's over at 9), each with their own move. About
+// half drift between their knot and the next one now and then; the rest stay put and dance.
+export const DISCO_MOVES = ["dance", "boogie", "armsup", "twirl", "shuffle", "point"];
+const KNOTS = [[215, 350], [345, 340], [455, 395], [190, 435], [315, 425], [420, 470], [265, 505]];
+const COUPLES = [["mum", "dad"], ["marcus", "angelina"]];
 export const discoCrowd = day => discoOn(day) ? [...groupFor(day + ":disco", 11, [], DISCO_POOL), ...groupFor(day + ":discot", 5, [], NIGHT_TOURISTS)] : [];
+const floorCache = {};
+// who stands where tonight -> {id: {at, dir, move, drift}}
+export function discoFloor(day){
+  if (floorCache[day]) return floorCache[day];
+  const crowd = discoCrowd(day), out = {}, left = crowd.slice(), knots = KNOTS.map(() => []);
+  let k = hash(day) % KNOTS.length; const nextKnot = () => { k = (k + 1 + (hash(day + k) % 2)) % KNOTS.length; return k; };
+  COUPLES.forEach(([a, b]) => { if (left.includes(a) && left.includes(b)) { const n = nextKnot(); knots[n].push(a, b); left.splice(left.indexOf(a), 1); left.splice(left.indexOf(b), 1); } });
+  left.forEach(id => { let n = nextKnot(); for (let t = 0; t < KNOTS.length && knots[n].length >= 3; t++) n = (n + 1) % KNOTS.length; knots[n].push(id); });
+  knots.forEach((ids, n) => { const [cx, cy] = KNOTS[n];
+    ids.forEach((id, i) => { const h = hash(day + ":" + id), ang = (i/ids.length)*Math.PI*2 + (h % 7)*.3, r = ids.length === 1 ? 0 : 20 + (h % 9);
+      const at = [Math.round(cx + Math.cos(ang)*r*1.3), Math.round(cy + Math.sin(ang)*r*.6)];
+      out[id] = {at, dir: at[0] <= cx ? 1 : -1, move: DISCO_MOVES[h % DISCO_MOVES.length], drift: ids.length > 1 && !COUPLES.some(c => c.includes(id)) && h % 2 === 0 ? KNOTS[(n + 1) % KNOTS.length] : null}; }); });
+  return (floorCache[day] = out);
+}
 export function discoSlot(id, day, hm){
-  if (!discoNow(day, hm)) return null; const i = discoCrowd(day).indexOf(id); if (i < 0) return null;
-  return {from: DISCO_FROM, to: DISCO_TO, scene: "cellar", at: DISCO_SPOTS[i], act: "dance", dir: i % 2 ? -1 : 1, disco: true};
+  if (!discoNow(day, hm)) return null; const f = discoFloor(day)[id]; if (!f) return null;
+  return {from: DISCO_FROM, to: DISCO_TO, scene: "cellar", ...(f.drift ? {wander: [f.at, f.at, f.drift]} : {at: f.at, dir: f.dir}), act: f.move, disco: true};
 }
 export function clubSlot(id, day, hm){
   if (!wineClubNow(day, hm) || !clubMembers(day).includes(id)) return null;

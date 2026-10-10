@@ -3248,8 +3248,14 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   console.log("\nSaturday disco night at the cellar door");
   { const t = await import(new URL("../src/game/tours.js", import.meta.url)), sat = "2026-10-10", fri = "2026-10-09", crowd = t.discoCrowd(sat);
     check(t.discoNow(sat, 21*60) && !t.discoNow(sat, 19*60) && !t.discoNow(fri, 21*60) && !t.discoNow(sat, 23*60 + 40), "disco night is Saturdays, 8 to 11:30pm");
-    check(crowd.length === 16 && !crowd.some(id => ["mama", "gonggong", "okada", "lin", "celeste", "pilar"].includes(id)) && crowd.filter(id => t.NIGHT_TOURISTS.includes(id)).length === 5 && t.discoSlot(crowd[0], sat, 21*60).act === "dance",
+    check(crowd.length === 16 && !crowd.some(id => ["mama", "gonggong", "okada", "lin", "celeste", "pilar"].includes(id)) && crowd.filter(id => t.NIGHT_TOURISTS.includes(id)).length === 5 && crowd.every(id => t.DISCO_MOVES.includes(t.discoSlot(id, sat, 21*60).act)),
       "a packed floor: most of the village (not Ma Ma, Gong Gong, Mr Okada or Lin, nor anyone working) and five tourists, all dancing"); }
+  { const t = await import(new URL("../src/game/tours.js", import.meta.url)), days = ["2026-10-10", "2026-10-17", "2026-10-24", "2026-10-31"];
+    const moves = new Set(days.flatMap(d => Object.values(t.discoFloor(d)).map(f => f.move))), spots = Object.values(t.discoFloor(days[0])).map(f => f.at), drifters = Object.values(t.discoFloor(days[0])).filter(f => f.drift).length;
+    const xs = new Set(spots.map(([x]) => x)), couple = days.map(d => t.discoFloor(d)).find(f => f.mum && f.dad);
+    check(moves.size >= 5 && xs.size >= 12 && drifters >= 3 && (!couple || (Math.hypot(couple.mum.at[0] - couple.dad.at[0], couple.mum.at[1] - couple.dad.at[1]) < 70 && couple.mum.dir !== couple.dad.dir)),
+      `not a grid: knots of two or three, ${moves.size} different moves, some drifting between knots, and Mum and Dad dance together facing each other`);
+    check(t.dateSlot("marcus", "2026-10-10", 20*60) && !t.discoSlot("marcus", "2026-10-10", 20*60)?.date, "Marcus and Angellina keep their date night (7:30 to 9) and come on to the disco after"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`disco pageerror: ${e.message}`));
   await page.addInitScript(() => { if (!/dcpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = {...(f.goals || {}), cellar: true};
@@ -3257,7 +3263,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?reset=1&seed=1&time=21:00&date=2026-10-10"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=21:00&date=2026-10-10&dcpatch=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(2500);
-  const dancers = await page.locator("#actors .npc.act-dance").count();
+  const dancers = await page.locator("#actors .npc").evaluateAll(n => n.filter(x => /act-(dance|boogie|armsup|twirl|shuffle|point)\b/.test(x.getAttribute("class"))).length);
   check(await page.locator("#sceneArt .disco .dball").count() === 1 && dancers >= 12, `the glitter ball's out and the floor's packed (${dancers} dancing)`);
   await page.goto(url + "?seed=1&time=17:00&date=2026-10-10"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(1500);

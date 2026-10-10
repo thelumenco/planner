@@ -2036,3 +2036,6 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **What you see and hear:** `discoArt` (art/disco.js) puts a dim wash, a glitter ball on a string, sweeping colour beams, pulsing floor spots and glints over the cellar art. A live "disco" track plays (audio.js: 120bpm, octave bass).
 - **Sales:** in sellTick, bottles at 7% a minute and glasses at 9% a minute. With Mel at the tasting bar (`opts.disco`), that's half as much again. The money goes to the till, and a flash shows when Mel's there.
 - **Nudges:** the day list says "Disco night at the cellar door, 8 to 11:30pm". There's a heads-up from 3pm, a line when Mel walks in, and Evan has his own lines.
+- **Mingling, not a grid (round 140b, Mel):** `discoFloor(day)` places the crowd in knots of 2–3 round 7 points (`KNOTS`). Couples go together facing each other: Mum and Dad, and Marcus and Angellina once their date night ends at 9. Positions are jittered per person.
+  - About half drift between their knot and the next (`wander`). The rest stay put.
+  - Each dancer has a move for the night (`DISCO_MOVES`): dance (the Ronda sway), boogie, armsup, twirl, shuffle and point, all with CSS in npcs.css.

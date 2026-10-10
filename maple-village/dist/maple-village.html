@@ -605,6 +605,23 @@ button.subname[aria-expanded="true"]::after{content:"▴"}
 .disco .dspot{animation:dspot 1.2s ease-in-out infinite alternate}@keyframes dspot{from{opacity:.15}to{opacity:.6}}
 .disco .dglint{transform-box:fill-box;transform-origin:50% 50%;animation:dglint 1s ease-in-out infinite}@keyframes dglint{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.disco .dfacets,.disco .dbeam,.disco .dspot,.disco .dglint{animation:none}}
+/* disco moves (round 140b): everyone has their own. boogie bounces with pumping arms, armsup waves both hands in the
+   air, twirl spins round, shuffle side-steps, point does the disco point; "dance" is the Ronda sway */
+.ch.npc.act-boogie:not(.walk) > g,.ch.npc.act-armsup:not(.walk) > g,.ch.npc.act-twirl:not(.walk) > g,.ch.npc.act-shuffle:not(.walk) > g,.ch.npc.act-point:not(.walk) > g{transform-box:fill-box;transform-origin:50% 100%}
+.ch.npc.act-boogie:not(.walk) > g{animation:dboog .38s ease-in-out infinite alternate}@keyframes dboog{from{transform:translateY(0)}to{transform:translateY(-4px)}}
+.ch.npc.act-boogie:not(.walk) .armL{animation:dpumpL .38s ease-in-out infinite alternate}.ch.npc.act-boogie:not(.walk) .armR{animation:dpumpR .38s ease-in-out infinite alternate-reverse}
+@keyframes dpumpL{from{transform:rotate(30deg)}to{transform:rotate(95deg)}}@keyframes dpumpR{from{transform:rotate(-30deg)}to{transform:rotate(-95deg)}}
+.ch.npc.act-armsup:not(.walk) > g{animation:dsway 1s ease-in-out infinite alternate}@keyframes dsway{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+.ch.npc.act-armsup:not(.walk) .armL{animation:dupL .5s ease-in-out infinite alternate}.ch.npc.act-armsup:not(.walk) .armR{animation:dupR .5s ease-in-out infinite alternate}
+@keyframes dupL{from{transform:rotate(140deg)}to{transform:rotate(170deg)}}@keyframes dupR{from{transform:rotate(-140deg)}to{transform:rotate(-170deg)}}
+.ch.npc.act-twirl:not(.walk) > g{animation:dtwirl 1.6s ease-in-out infinite}@keyframes dtwirl{0%,40%{transform:scaleX(1)}55%{transform:scaleX(-1) translateY(-2px)}70%,100%{transform:scaleX(1)}}
+.ch.npc.act-twirl:not(.walk) .armL{animation:exL .8s ease-in-out infinite alternate}
+.ch.npc.act-shuffle:not(.walk) > g{animation:dshuf .9s ease-in-out infinite alternate}@keyframes dshuf{0%{transform:translateX(-5px)}50%{transform:translateX(0) translateY(-2px)}100%{transform:translateX(5px)}}
+.ch.npc.act-shuffle:not(.walk) .armL,.ch.npc.act-shuffle:not(.walk) .armR{animation:tapA .45s ease-in-out infinite alternate}
+.ch.npc.act-point:not(.walk) > g{animation:dsway .7s ease-in-out infinite alternate}
+.ch.npc.act-point:not(.walk) .armR{animation:dpoint .7s ease-in-out infinite alternate}@keyframes dpoint{from{transform:rotate(-100deg)}to{transform:rotate(-160deg)}}
+.ch.npc.act-point:not(.walk) .armL{transform:rotate(25deg)}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-boogie > g,.ch.npc.act-armsup > g,.ch.npc.act-twirl > g,.ch.npc.act-shuffle > g,.ch.npc.act-point > g,.ch.npc[class*="act-"] .armL,.ch.npc[class*="act-"] .armR{animation:none}}
 
 /* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
 :root{--mapw:max(300px,min(980px,calc((100dvh - 196px)*520/640 + 26px)))}
@@ -6379,13 +6396,47 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var discoOn = (day) => dow(day) === 6;
   var discoNow = (day, hm2) => discoOn(day) && hm2 >= DISCO_FROM && hm2 < DISCO_TO;
   var DISCO_POOL = ["hana", "juniper", "bo", "opal", "theo", "marco", "ines", "farid", "mei", "felix", "elena", "amara", "mateo", "lila", "noor", "wren", "sofia", "tomo", "mum", "dad", "marcus", "angelina"];
-  var DISCO_SPOTS = [[200, 340], [260, 340], [320, 340], [380, 340], [440, 340], [170, 390], [230, 390], [290, 390], [350, 390], [410, 390], [470, 390], [220, 440], [280, 440], [340, 440], [400, 440], [260, 500]];
+  var DISCO_MOVES = ["dance", "boogie", "armsup", "twirl", "shuffle", "point"];
+  var KNOTS = [[215, 350], [345, 340], [455, 395], [190, 435], [315, 425], [420, 470], [265, 505]];
+  var COUPLES = [["mum", "dad"], ["marcus", "angelina"]];
   var discoCrowd = (day) => discoOn(day) ? [...groupFor(day + ":disco", 11, [], DISCO_POOL), ...groupFor(day + ":discot", 5, [], NIGHT_TOURISTS)] : [];
+  var floorCache = {};
+  function discoFloor(day) {
+    if (floorCache[day]) return floorCache[day];
+    const crowd = discoCrowd(day), out = {}, left5 = crowd.slice(), knots = KNOTS.map(() => []);
+    let k = hash(day) % KNOTS.length;
+    const nextKnot = () => {
+      k = (k + 1 + hash(day + k) % 2) % KNOTS.length;
+      return k;
+    };
+    COUPLES.forEach(([a, b]) => {
+      if (left5.includes(a) && left5.includes(b)) {
+        const n = nextKnot();
+        knots[n].push(a, b);
+        left5.splice(left5.indexOf(a), 1);
+        left5.splice(left5.indexOf(b), 1);
+      }
+    });
+    left5.forEach((id) => {
+      let n = nextKnot();
+      for (let t2 = 0; t2 < KNOTS.length && knots[n].length >= 3; t2++) n = (n + 1) % KNOTS.length;
+      knots[n].push(id);
+    });
+    knots.forEach((ids, n) => {
+      const [cx, cy] = KNOTS[n];
+      ids.forEach((id, i) => {
+        const h = hash(day + ":" + id), ang = i / ids.length * Math.PI * 2 + h % 7 * 0.3, r = ids.length === 1 ? 0 : 20 + h % 9;
+        const at = [Math.round(cx + Math.cos(ang) * r * 1.3), Math.round(cy + Math.sin(ang) * r * 0.6)];
+        out[id] = { at, dir: at[0] <= cx ? 1 : -1, move: DISCO_MOVES[h % DISCO_MOVES.length], drift: ids.length > 1 && !COUPLES.some((c) => c.includes(id)) && h % 2 === 0 ? KNOTS[(n + 1) % KNOTS.length] : null };
+      });
+    });
+    return floorCache[day] = out;
+  }
   function discoSlot(id, day, hm2) {
     if (!discoNow(day, hm2)) return null;
-    const i = discoCrowd(day).indexOf(id);
-    if (i < 0) return null;
-    return { from: DISCO_FROM, to: DISCO_TO, scene: "cellar", at: DISCO_SPOTS[i], act: "dance", dir: i % 2 ? -1 : 1, disco: true };
+    const f2 = discoFloor(day)[id];
+    if (!f2) return null;
+    return { from: DISCO_FROM, to: DISCO_TO, scene: "cellar", ...f2.drift ? { wander: [f2.at, f2.at, f2.drift] } : { at: f2.at, dir: f2.dir }, act: f2.move, disco: true };
   }
   function clubSlot(id, day, hm2) {
     if (!wineClubNow(day, hm2) || !clubMembers(day).includes(id)) return null;

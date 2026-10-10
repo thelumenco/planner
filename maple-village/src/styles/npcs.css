@@ -126,3 +126,20 @@
 .disco .dspot{animation:dspot 1.2s ease-in-out infinite alternate}@keyframes dspot{from{opacity:.15}to{opacity:.6}}
 .disco .dglint{transform-box:fill-box;transform-origin:50% 50%;animation:dglint 1s ease-in-out infinite}@keyframes dglint{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.disco .dfacets,.disco .dbeam,.disco .dspot,.disco .dglint{animation:none}}
+/* disco moves (round 140b): everyone has their own. boogie bounces with pumping arms, armsup waves both hands in the
+   air, twirl spins round, shuffle side-steps, point does the disco point; "dance" is the Ronda sway */
+.ch.npc.act-boogie:not(.walk) > g,.ch.npc.act-armsup:not(.walk) > g,.ch.npc.act-twirl:not(.walk) > g,.ch.npc.act-shuffle:not(.walk) > g,.ch.npc.act-point:not(.walk) > g{transform-box:fill-box;transform-origin:50% 100%}
+.ch.npc.act-boogie:not(.walk) > g{animation:dboog .38s ease-in-out infinite alternate}@keyframes dboog{from{transform:translateY(0)}to{transform:translateY(-4px)}}
+.ch.npc.act-boogie:not(.walk) .armL{animation:dpumpL .38s ease-in-out infinite alternate}.ch.npc.act-boogie:not(.walk) .armR{animation:dpumpR .38s ease-in-out infinite alternate-reverse}
+@keyframes dpumpL{from{transform:rotate(30deg)}to{transform:rotate(95deg)}}@keyframes dpumpR{from{transform:rotate(-30deg)}to{transform:rotate(-95deg)}}
+.ch.npc.act-armsup:not(.walk) > g{animation:dsway 1s ease-in-out infinite alternate}@keyframes dsway{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+.ch.npc.act-armsup:not(.walk) .armL{animation:dupL .5s ease-in-out infinite alternate}.ch.npc.act-armsup:not(.walk) .armR{animation:dupR .5s ease-in-out infinite alternate}
+@keyframes dupL{from{transform:rotate(140deg)}to{transform:rotate(170deg)}}@keyframes dupR{from{transform:rotate(-140deg)}to{transform:rotate(-170deg)}}
+.ch.npc.act-twirl:not(.walk) > g{animation:dtwirl 1.6s ease-in-out infinite}@keyframes dtwirl{0%,40%{transform:scaleX(1)}55%{transform:scaleX(-1) translateY(-2px)}70%,100%{transform:scaleX(1)}}
+.ch.npc.act-twirl:not(.walk) .armL{animation:exL .8s ease-in-out infinite alternate}
+.ch.npc.act-shuffle:not(.walk) > g{animation:dshuf .9s ease-in-out infinite alternate}@keyframes dshuf{0%{transform:translateX(-5px)}50%{transform:translateX(0) translateY(-2px)}100%{transform:translateX(5px)}}
+.ch.npc.act-shuffle:not(.walk) .armL,.ch.npc.act-shuffle:not(.walk) .armR{animation:tapA .45s ease-in-out infinite alternate}
+.ch.npc.act-point:not(.walk) > g{animation:dsway .7s ease-in-out infinite alternate}
+.ch.npc.act-point:not(.walk) .armR{animation:dpoint .7s ease-in-out infinite alternate}@keyframes dpoint{from{transform:rotate(-100deg)}to{transform:rotate(-160deg)}}
+.ch.npc.act-point:not(.walk) .armL{transform:rotate(25deg)}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-boogie > g,.ch.npc.act-armsup > g,.ch.npc.act-twirl > g,.ch.npc.act-shuffle > g,.ch.npc.act-point > g,.ch.npc[class*="act-"] .armL,.ch.npc[class*="act-"] .armR{animation:none}}
