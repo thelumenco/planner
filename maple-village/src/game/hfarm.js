@@ -127,7 +127,8 @@ Object.values(CHEESES).forEach(c => { const base = ITEMS[c.id]; if (base && !ITE
 // Round 130 (Mel: things that take effort should fetch more at the market): Mel's own cheeses and honey can be sold
 // at the market's Sell tab, for more than plain produce, and an excellent wheel for more again. Never more than they
 // cost to buy anywhere (the farm stand's honey is 6, the market's honeycomb 10), so buying to resell never pays.
-export const CRAFTED_SELL = {chz_fresh: 12, chz_halloumi: 13, chz_cheddar: 13, chz_brie: 14, chz_blue: 14, chz_smoked: 14,
+// Tiered by time (Mel): the longer a cheese ripens in the cave, the more it fetches: 9 + 2 a day (fresh 11 ... blue 21).
+export const CRAFTED_SELL = {...Object.fromEntries(Object.values(CHEESES).map(c => [c.id, 9 + 2*c.days])),
   honey: 6, honey_lav: 10, honey_blossom: 10, honey_cream: 12, honeycomb: 10, yoghurt: 4};
 Object.entries(CRAFTED_SELL).forEach(([id, n]) => { if (!ITEMS[id]) return; ITEMS[id].sell = n; ITEMS[id].crafted = true; if (ITEMS[id + "_ex"]) Object.assign(ITEMS[id + "_ex"], {sell: n + 6, crafted: true}); });
 const C_PLACE = ["Lavender Hill", "Barn Door", "Honeybrook", "Hay Loft", "Morning Mist", "Stone Wall", "Sunday", "Windmill", "Brookside", "Old Gate", "Clover Field", "Harvest", "Lantern", "Bee Hive", "Rainy Day", "Golden Hour"];

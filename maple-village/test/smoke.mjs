@@ -3052,7 +3052,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-shop="sell"]'); await page.waitForSelector('#ctx .item[data-id="chz_cheddar"]', { timeout: 15000 });
   const c0 = await fox().then(f => f.coins);
   for (const id of ["chz_cheddar", "chz_brie_ex", "honey_lav"]) { await page.click(`#ctx .item[data-id="${id}"]`); await page.waitForTimeout(300); }
-  check(await fox().then(f => f.coins === c0 + 13 + 20 + 10 && !f.inv.chz_cheddar), "your own cheese and honey sell at the market, for more than plain produce: cheddar 13, an excellent brie 20, lavender honey 10");
+  check(await fox().then(f => f.coins === c0 + 17 + 21 + 10 && !f.inv.chz_cheddar), "your own cheese and honey sell at the market, tiered by how long they ripen: cheddar (4 days) 17, an excellent brie (3 days) 21, lavender honey 10");
   await page.close();
 }
 {

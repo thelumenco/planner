@@ -1909,7 +1909,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Notebook fix (round 130):** `refreshNotebook` runs on every render. It used to rebuild the water/steps tracker page and wipe a half-typed total. It now keeps the `#nbTrack` value and focus, like the quest page keeps `#nbAsk`. This was the real cause of the flaky "water total can be typed in" check.
 - **Farm test fix:** the `flpatch` times now come from the URL's date and time (the game clock), not the real time of day.
 - **Crafted goods sell at the market (Mel, round 130):**
-  - `CRAFTED_SELL` (hfarm.js) gives Mel's cheeses 12–14 (an excellent one +6) and her honey: lavender and blossom 10, creamed 12, honeycomb 10, wildflower 6 (the farm stand sells it for 6). Yoghurt is 4.
+  - `CRAFTED_SELL` (hfarm.js) gives Mel's cheeses a price tiered by ripening time, 9 + 2 a day (fresh 11, halloumi 13, brie 15, cheddar 17, smoked 19, blue 21; an excellent one +6) and her honey: lavender and blossom 10, creamed 12, honeycomb 10, wildflower 6 (the farm stand sells it for 6). Yoghurt is 4.
   - Olive oil now sells for 16, and Rafael's costs 18.
   - Rule: a sell price is never above any buy price, so buying to resell never pays.
   - Hana has her own line when you sell something you made.

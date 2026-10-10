@@ -17421,12 +17421,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (base && !ITEMS[c.id + "_ex"]) ITEMS[c.id + "_ex"] = { ...base, n: exName(base.n), price: (base.price || 8) + 5, say: `${base.say} And this one's extraordinary. You made this?!` };
   });
   var CRAFTED_SELL = {
-    chz_fresh: 12,
-    chz_halloumi: 13,
-    chz_cheddar: 13,
-    chz_brie: 14,
-    chz_blue: 14,
-    chz_smoked: 14,
+    ...Object.fromEntries(Object.values(CHEESES).map((c) => [c.id, 9 + 2 * c.days])),
     honey: 6,
     honey_lav: 10,
     honey_blossom: 10,
