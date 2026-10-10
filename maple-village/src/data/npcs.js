@@ -169,7 +169,7 @@ export const NPCS = [
     id: "celeste", pitch: 1.05, name: "Celeste", job: "Runs the wine shop counter",
     intro: "Bienvenue! I'm Celeste. I mind the counter, pour the tastings and write the chalkboard. Your wines sell themselves, honestly. I just smile.",
     look: {skin: "#B9835F", hair: "#231C19", hairStyle: "bun", top: "#8E2C48", bottom: "#2F2B28", extra: "apron"},
-    routine: [slot("9:00", "10:45", "hwoods", [[132, 590], [180, 560], [100, 600]], {dow: [1]}), slot("11:00", "15:00", "wineshop", [372, 286]), slot("15:00", "15:30", "vineyard", [[300, 260], [440, 270], [360, 300]]), slot("15:30", "21:30", "wineshop", [372, 286])],
+    routine: [slot("9:00", "10:45", "hwoods", [[132, 590], [180, 560], [100, 600]], {dow: [1]}), slot("10:00", "15:00", "wineshop", [372, 286]), slot("15:00", "15:30", "vineyard", [[300, 260], [440, 270], [360, 300]]), slot("15:30", "21:30", "wineshop", [372, 286])],
     lines: ["The honesty box is very honest today.", "Someone asked who makes these. I said a very busy lady.", "Evenings are the best. Everyone wants a glass.", "If the shelves are full, I'm happy."],
     away: "Celeste's not on. The honesty box minds the shop."
   },

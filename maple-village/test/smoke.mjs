@@ -1214,6 +1214,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
 {
   // Staff: Marco and Ines pick and fill barrels, Celeste stocks the shelves, Pilar runs the kitchen; renaming; diners' tables
   console.log("\nstaff, names and the tasting room tables");
+  { const tr = await import(new URL("../src/game/tours.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url)), cel = np.NPCS.find(n => n.id === "celeste");
+    const days = ["2026-10-10", "2026-10-11", "2026-10-12", "2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16"];
+    check(days.every(d => tr.touristTastings(d).filter(x => x.act === "browse" && x.from <= 650 && x.to > 650 && x.id).length === 2) && cel.routine.some(sl => sl.scene === "wineshop" && sl.from === 600),
+      "the wine shop opens at 10: Celeste's at the counter and a pair are browsing the shelves at 10:50, every day of the week"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`staff pageerror: ${e.message}`));
   await page.addInitScript(() => { const q = location.search; if (!/staffpatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;

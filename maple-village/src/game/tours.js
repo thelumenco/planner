@@ -24,7 +24,7 @@ export const fmtTime = m => `${Math.floor(m/60) > 12 ? Math.floor(m/60) - 12 : M
 // a few villagers picked by the day and the tour (no one twice in a group)
 function groupFor(seed, n, skip = [], from = VISITORS){
   const pool = from.filter(v => !skip.includes(v)), out = [];
-  for (let k = 0; out.length < n && k < 40; k++) { const v = pool[hash(seed + ":" + k) % pool.length]; if (!out.includes(v)) out.push(v); }
+  for (let k = 0; pool.length && out.length < n && k < 40; k++) { const v = pool[hash(seed + ":" + k) % pool.length]; if (!out.includes(v)) out.push(v); }
   return out;
 }
 // The day's tours: [{i, from, to, guide, group: [ids]}]
@@ -115,17 +115,20 @@ const TASTINGS = [
 const TOURIST_SEATS = [[12*60, 13*60, [SEAT.d, SEAT.e]], [13*60, 14*60, [SEAT.a, SEAT.b]], [14*60 + 30, 15*60 + 30, [SEAT.a, SEAT.b]], [16*60, 17*60, [SEAT.c, SEAT.f]],
   [17*60, 17*60 + 45, [SEAT.d, SEAT.e]], [20*60 + 30, 21*60 + 45, [SEAT.b, SEAT.f]]];
 const WEEKEND_SEATS = [[11*60, 12*60, [SEAT.d, SEAT.e]], [16*60 + 30, 17*60 + 30, [SEAT.d, SEAT.e]]];
+// round 130: the shop opens at 10, and every morning a pair come in to browse the shelves before lunch (standing, not
+// at the tasting tables: it's a bit early for a glass)
+const BROWSE_SEATS = [[10*60, 11*60 + 15, [[106, 300], [164, 312]], "browse"], [11*60 + 15, 12*60, [[126, 306], [76, 316]], "browse"]];
 export function touristTastings(day){
   const d = dow(day), busy = toursOn(day).flatMap(t => t.group), out = [];
   const ev = eventOn(day), stallKeepers = ev ? ev.stalls.map(x => x.id) : [];
-  [...TOURIST_SEATS, ...(d === 0 || d === 6 ? WEEKEND_SEATS : [])].forEach(([from, to, seats], k) =>
-    groupFor(day + "tt" + k, 2, [...busy, ...stallKeepers], TOURISTS).forEach((id, j) => out.push({id, from, to, at: seats[j]})));
+  [...TOURIST_SEATS, ...(d === 0 || d === 6 ? WEEKEND_SEATS : []), ...BROWSE_SEATS].forEach(([from, to, seats, act], k) =>
+    groupFor(day + "tt" + k, 2, [...busy, ...stallKeepers], act ? [...TOURISTS, ...NIGHT_TOURISTS] : TOURISTS).forEach((id, j) => out.push({id, from, to, at: seats[j], act})));   // (the morning browsers can be night-market folk too: on Sundays every day tourist's busy)
   return out;
 }
 export function tastingSlot(id, day, hm){
   const d = dow(day), we = d === 0 || d === 6;
   const v = [...TASTINGS, ...touristTastings(day)].find(x => x.id === id && hm >= x.from && hm < x.to && (!x.days || (x.days === "we") === we) && (!x.dow || x.dow.includes(d)));
-  return v ? {from: v.from, to: v.to, scene: "wineshop", at: v.at, act: "sit"} : null;
+  return v ? {from: v.from, to: v.to, scene: "wineshop", at: v.at, act: v.act === "browse" ? null : "sit"} : null;
 }
 
 // Tourist families at the vineyard playground: the kids run between the swings, slide, seesaw and roundabout while a

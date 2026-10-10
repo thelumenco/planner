@@ -144,7 +144,7 @@ function cartMinute(s, day, hm, opts){
   if (!cartOn(day, hm)) return null;
   const stocked = onDisplay(s); if (!stocked.length) return null;
   const price = s.prices.cup + s.prices.cone, pf = Math.pow(8/Math.max(2, price), 1.3);
-  if (Math.random() >= .03*pf*(opts.cart ? 1.6 : 1)) return null;
+  if (Math.random() >= .05*pf*(opts.cart ? 1.6 : 1)) return null;   // (round 130: busier, Mel asked)
   const fmt = Math.random() < .45 ? "cup" : "cone", r = stocked[Math.floor(Math.random()*stocked.length)];
   s.tubs[r.id]--; if (s.tubs[r.id] <= 0) delete s.tubs[r.id];
   let coins = priceOf(s, fmt, r); if (fmt === "cone" && hasUp(s, "dip") && Math.random() < .3) coins += s.prices.dip;
@@ -228,13 +228,13 @@ function saleMinute(s, day, hm, opts){
   const d = new Date(day + "T00:00:00Z").getUTCDay(), we = d === 0 || d === 6, night = (d === 2 || d === 4) && hm >= 17*60 + 30;
   const glow = hasUp(s, "neon") && hm >= 17*60 ? 1.3 : 1;
   if (box) {   // the honesty freezer: cups only, and the coins go in its box
-    if (Math.random() >= .012*(we ? 1.3 : 1)*(night ? 1.4 : 1)*glow) return null;
+    if (Math.random() >= .024*(we ? 1.3 : 1)*(night ? 1.4 : 1)*glow) return null;
     const r = stocked[Math.floor(Math.random()*stocked.length)]; s.tubs[r.id]--; if (s.tubs[r.id] <= 0) delete s.tubs[r.id];
     let coins = s.prices.cup; if (Math.random() < .15) { coins++; s.notes = [{t: NOTES[Math.floor(Math.random()*NOTES.length)], day}, ...s.notes].slice(0, 4); }
     s.box += coins; const t = s.sold[day] = s.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; return {coins, box: true, fmt: "cup", r};
   }
   const price = s.prices.cup + s.prices.cone + s.prices.float + s.prices.waffle, pf = Math.pow(DEFAULT/Math.max(4, price), 1.3);
-  const p = .035*(we ? 1.5 : 1)*(night ? 1.4 : 1)*(hm >= 14*60 && hm < 17*60 ? 1.25 : 1)*pf*(opts.serving ? 1.5 : 1)*glow*(waiterOn(hm) ? 1.2 : 1);
+  const p = .07*(we ? 1.5 : 1)*(night ? 1.4 : 1)*(hm >= 14*60 && hm < 17*60 ? 1.25 : 1)*pf*(opts.serving ? 1.5 : 1)*glow*(waiterOn(hm) ? 1.2 : 1);
   if (Math.random() >= p) return null;
   let x = Math.random(), fmt = "cone"; for (const [f, w] of FMT_W) { if ((x -= w) < 0) { fmt = f; break; } }
   const r = stocked[Math.floor(Math.random()*stocked.length)];

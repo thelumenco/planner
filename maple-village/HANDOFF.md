@@ -1893,3 +1893,16 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Rub the stone grandfathers' noses; add a stone to the wish-towers.
   - Ma Ma brings home a tangerine sapling (`F.jeju.sapling`), which unlocks tangerine trees in the orchard.
   - A second fridge-magnet spot (`fridge2`).
+
+### Round 130: fixes (kite, farm brush), a busier Scoop Shack, the wine shop opens at 10
+- **Kite:** a `toy` is never used up. The kite flies on the field; anywhere else Maple says to take it there, and it stays in the backpack.
+- **Farm brush:** the backpack Brush at Wildflower Farm brushes the next animal in the nearer paddock (`brushNearest`), so it counts for Felix's ask.
+- **Farmhouse ask:** while the button is greyed out, it says what's still to do (`requestLeft`).
+- **Scoop Shack (Mel: "too slow"):** sales chances doubled.
+  - Counter: .035 to .07 a minute.
+  - Honesty freezer: .012 to .024.
+  - Night-market cart: .03 to .05.
+- **Wine shop (Mel: "nobody at 10:50"):**
+  - Celeste starts at 10 (11 on Mondays, after her walk in the woods).
+  - Every morning a pair browse the shelves, standing, 10:00–11:15 then 11:15–12 (`BROWSE_SEATS` in tours.js). The pair can come from the night-market visitors too, because on Sundays every day tourist is busy.
+  - `groupFor` no longer returns undefined from an empty pool.
