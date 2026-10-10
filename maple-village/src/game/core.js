@@ -64,6 +64,8 @@ import { bellbirdArt, vanRideArt } from "../art/bellbird-vines.js";
 import { BB_NAMES, BB_EVAN } from "../data/bellbird.js";
 import { mapPanel as bbMapPanel, passportPanel as bbPassport, setOff as bbSetOff, driveOn as bbDriveOn, homeFuel as bbHomeFuel, bbState } from "./bellbird.js";
 import { bbRoomPanel, treat as bbTreat, chocTaste, watchWater, NOTES as BB_NOTES } from "./bbrooms.js";
+import * as BBA from "./bbacts.js";
+import { FIRE_FOLK } from "../data/bb-people.js";
 import { loftPanel, startBatch, collect as loftCollect, loftState } from "./loft.js";
 import { cinqueRoomArt } from "../art/cinque-rooms.js";
 import { bellbirdRoomArt } from "../art/bellbird-rooms.js";
@@ -1525,7 +1527,7 @@ function showPanel(hasCtx, skin){
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
   if (kid.open) { kid.open = null; stopKidGame(); ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1578,7 +1580,10 @@ function ctx(){
     : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, {swap: scSt.swap});
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
   else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "cocoa" ? ccCounterPanel(F, {cart: true, server: isHere("mateo")}) : marketStallPanel(st); }
-  else if (bbRoom && townRoom(scene) && TOWNS[townOf(scene)].by === "van") h = bbRoomPanel(F, bbRoom, {evan: inParty(F, "evan") && !evanNight(), party: !!(tripOn(F) && tripOn(F).party.length)});
+  else if (bbRoom && townOf(scene) && TOWNS[townOf(scene)].by === "van") { const evanOn = inParty(F, "evan") && !evanNight(), tp = tripOn(F) ? tripOn(F).party : [];
+    h = bbRoom === "balloon" ? BBA.balloonPanel(F, bbSt.flight, {hm: sgHM(), party: tp}) : bbRoom === "riddle" ? BBA.riddlePanel(F, bbSt.riddle) : bbRoom === "berries" ? BBA.berriesPanel(F, bbSt.berries, evanOn)
+      : bbRoom === "dip" ? BBA.dipPanel(F, bbSt.dip, evanOn) : bbRoom === "joey" ? BBA.joeyPanel(F, bbSt.joey, evanOn) : bbRoom === "canoe" ? BBA.canoePanel(F, bbSt.canoe, evanOn, bbSt.paid)
+      : bbRoom === "fire" ? BBA.firePanel(F, bbSt.bag, {hm: sgHM(), folk: FIRE_FOLK.some(isHere)}) : bbRoomPanel(F, bbRoom, {evan: evanOn, party: !!tp.length}); }
   else if (bvView) h = bvView === "passport" ? bbPassport(F) : bbMapPanel(F, {pick: tripPick, ownsVan: owns(F, "van")});
   else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick, tripTown);
   else if (railOpen === "ferry" && scene === "shore") h = ticketPanel(F, tripPick, "jeju", sgHM(), "ferry");   // round 127: the Jeju ferry from the jetty
@@ -1805,6 +1810,46 @@ function ctx(){
       ev(k === "babycino" ? ["a coffee for ME!", "froth moustache!"] : k === "freddo" ? ["a chocolate FROG!", "ribbit! chomp!"] : k === "icypole" ? ["it's dripping!", "my tongue is red!"] : ["yummy!", "can I have some?", "mmm, Mama"]); }
     else if (a === "choc") { if (!chocTaste(F)) return; sfx("chime"); gainXp(1); hearts(2); speak("Sophie sets down a little dish: dark, milk, white, and one speckled with wattleseed, nutty and toasty. \"The wattleseed's from the bush out the back,\" she says.", 6500); ev(["one for me? one for ME?", "chocolate! for free!", "the brown one, Mama!"]); }
     save(); ctx(); });
+  // Bellbird Valley's activities (round 143: bbacts.js)
+  c.querySelectorAll("[data-bba]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.bba.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); }, tp = tripOn(F) ? tripOn(F).party : [];
+    if (a === "open") { bbRoom = v; bbSt = {}; sfx("paper", true); }
+    // the balloon
+    else if (a === "fly") { const cost = BBA.flightCost(tp); if (!BBA.balloonOpen(sgHM()) || F.coins < cost) return; F.coins -= cost; bbSt.flight = BBA.flightStart(); sfx("chaching"); speak("The burner roars, the basket creaks, and the ground just... lets go. Gus grins. \"Here we go.\"", 5000); ev(["we're FLYING!", "Mama, the cars are tiny!", "hold my hand, hold it"], 2200); save(); }
+    else if (a === "burn" || a === "hold" || a === "drift") { const st = bbSt.flight; if (!st) return; if (st.i >= st.sights.length) { if (a === "drift") st.alt = Math.max(1, st.alt - 1); sfx("tap"); }
+      else { const ok = BBA.flightMove(st, a); sfx(a === "burn" ? "pop" : "tap"); if (ok) { gainXp(0); ev(["look, LOOK!", "kangaroos! tiny ones!", "wow", "I can see our van!"], 400); } } }
+    else if (a === "land") { const st = bbSt.flight; if (!st || BBA.flightLand(st) == null) return; sfx(st.soft ? "chime" : "tap"); ev(st.soft ? ["we landed! like a feather!"] : ["BUMP! again again!"], 800); }
+    else if (a === "flown") { const st = bbSt.flight; if (!st || !st.landed) return; const cert = BBA.finishFlight(F, st, addInv); bbSt = {}; gainXp(2); hearts(3); act("cheer"); if (cert) flash("A flight certificate"); speak(`Gus pops a bottle of sparkling and pours little cups for everyone${evanOn ? " (apple juice for Evan)" : ""}. ${cert ? "He signs a certificate for you: you've flown over Bellbird Valley." : "\"Back again! You're a regular.\""}`, 7000); save(); }
+    // riddling
+    else if (a === "riddle") { bbSt.riddle = BBA.riddleStart(); sfx("paper", true); ev(["twist twist!", "can I do one?"], 1200); }
+    else if (a === "turn") { if (!bbSt.riddle || !BBA.riddleTap(bbSt.riddle, +v)) return; sfx("tap"); }
+    else if (a === "riddled") { if (!bbSt.riddle || !BBA.riddleDone(bbSt.riddle)) return; const first = BBA.finishRiddle(F); bbSt = {}; sfx("chime"); gainXp(2); hearts(2);
+      speak(first ? "Jono claps. \"You've got the wrist for it.\" He draws you a plan of a riddling rack on a napkin. Back home, there's one in your wine cellar now: lay your sparkling on it, and the longer it's riddled the more it sells for." : "Every mark pointing up. Jono nods. \"Same time tomorrow?\"", 7500); ev(["I turned one! the little one!", "clink clink"], 2000); save(); }
+    // berries and dipping
+    else if (a === "pick") { bbSt.berries = BBA.berriesStart(); sfx("paper", true); ev(["one for me, one for the basket", "a big one!"], 1400); }
+    else if (a === "berry") { const r = BBA.pickBerry(bbSt.berries, +v); if (!r) return; sfx(r === "ok" ? "tap" : "paper", true); if (r === "unripe" && Math.random() < .5) ev(["that one's white, Mama!", "not ready!"], 300); }
+    else if (a === "picked") { if (!bbSt.berries || !BBA.berriesDone(bbSt.berries)) return; const got = BBA.finishBerries(F, bbSt.berries, addInv); bbSt = {}; sfx("chime"); gainXp(1); hearts(2);
+      if (got) { flash(`${got.rasp} raspberries, ${got.straw} strawberries`); speak("A basket of berries, warm from the sun. Pay at the gate by the weight: Shaz waves you through. \"First basket's on the house.\"", 6000); } else speak("Another basket! These ones are for eating, right here, right now.", 4500);
+      ev(["my hands are RED", "I only ate a few. Some. Lots."], 1800); save(); }
+    else if (a === "choc" || a === "top") { bbSt.dip = {...(bbSt.dip || {}), [a]: v}; sfx("tap"); }
+    else if (a === "dip") { const d = bbSt.dip || {}; if (!BBA.dipBerries(F, d.choc, d.top)) return; addInv("b_dipped", 1); bbSt = {}; sfx("chime"); gainXp(1); hearts(2); flash("Chocolate-dipped strawberries");
+      speak(`Into the ${d.choc} chocolate, a twirl, ${d.top === "none" ? "and nothing else: perfect as they are" : `and a roll in ${BBA.DIP.tops[d.top].toLowerCase()}`}. Sophie boxes them up with a ribbon.`, 6000); ev(["can I lick the spoon?", "chocolate on my nose!"], 1800); save(); }
+    // the joey
+    else if (a === "joey") { bbSt.joey = BBA.joeyStart(); sfx("paper", true); ev(["she's SO small", "hello baby kangaroo"], 1400); }
+    else if (a === "jstep") { const r = BBA.joeyDo(bbSt.joey, +v); if (!r) return; sfx(r === "ok" ? "tap" : "paper", true); }
+    else if (a === "fed") { if (!bbSt.joey || !BBA.joeyDone(bbSt.joey)) return; const r = BBA.finishJoey(F); bbSt = {}; sfx("chime"); gainXp(r.again ? 1 : 2); hearts(3);
+      speak(r.again ? "Pip's already had her feed today, so Kim lets you give her a cuddle instead. She smells of milk and hay." : r.release ? "Kim smiles. \"That's her third feed with you, and she's strong now. Jack's taking her back to the mob at the creek this week.\" Pip sticks her head out of her pouch and sniffs your hand, like she's saying goodbye." : `Pip drains the bottle, does a hiccup, and falls asleep in her pouch. Kim writes your name in the feeding book. (${r.feeds} of ${BBA.JOEY.RELEASE} feeds before she goes home to the bush.)`, 7500);
+      ev(["she hiccupped!", "night night Pip", "can we take her home? no? okay"], 2200); save(); }
+    // the canoe
+    else if (a === "canoe") { if (!bbSt.paid) { if (F.coins < BBA.CANOE.price) return; F.coins -= BBA.CANOE.price; bbSt.paid = true; sfx("chaching"); } bbSt.canoe = BBA.canoeStart(); ev(["I'm a pirate!", "row row row!"], 1400); save(); }
+    else if (a === "paddle") { if (!bbSt.canoe || BBA.paddle(bbSt.canoe, v) == null) return; sfx("tap"); }
+    else if (a === "canoed") { if (!bbSt.canoe || !BBA.canoeDone(bbSt.canoe)) return; const straight = BBA.finishCanoe(F, bbSt.canoe); bbSt = {}; sfx("chime"); gainXp(2); hearts(2);
+      speak(straight ? "Round the bend, smooth as anything, and there: a flash of blue on a dead branch. A kingfisher! It dives, comes up with a tiny fish, and is gone." : "You zigzag round the bend, bump the bank, and get the giggles. A kingfisher watches from a branch, unimpressed.", 7000); ev(["a blue bird! a BLUE bird!", "again, Mama!"], 2400); save(); }
+    // marshmallows
+    else if (a === "bag") { const st = BBA.openBag(F); if (!st) return; bbSt.bag = st; sfx("paper", true); const who = FIRE_FOLK.filter(isHere); if (who.length) setTimeout(() => npcSay(who[0], pick(["Here, take my good stick. It's the long one.", "Not too close! Patience.", "Golden. Not black. Golden."])), 1200); save(); }
+    else if (a === "toast") { const r = BBA.toast(bbSt.bag); if (!r) return; sfx(r === "burnt" ? "pop" : "tap"); if (r === "burnt") ev(["it's ON FIRE!", "blow it out!"], 300); }
+    else if (a === "pull") { const r = BBA.pullOut(F, bbSt.bag); if (!r) return; sfx(r === "golden" ? "chime" : "tap"); if (r === "golden") { mprop("sparkle", mel.x, mel.y - 50, 1000); ev(["give me that one!", "gooey!", "mmmm"], 400); } save(); }
+    else if (a === "mdone") { bbSt = {}; gainXp(1); hearts(2); const who = FIRE_FOLK.filter(isHere); who.slice(0, 2).forEach((id, i) => setTimeout(() => npcSay(id, pick(NPCS.find(n => n.id === id).lines)), 800 + i*2600)); }
+    ctx(); });
   c.querySelectorAll("[data-ct]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.ct.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); };
     if (a === "pesto") { ctSt = {pesto: pestoStart()}; sfx("paper", true); ev(["bash bash bash!", "it smells green, Mama!", "my pesto!"], 1200); }
     else if (a === "padd") { const r = pestoAdd(ctSt.pesto, +v); sfx(r === "ok" ? "tap" : "paper", true); }
@@ -1905,7 +1950,7 @@ function ctx(){
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
   c.querySelectorAll("[data-fair]").forEach(b => b.onclick = () => fairActivity(b.dataset.fair));
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
@@ -2232,7 +2277,7 @@ let kyotoView = null, ktSt = {};
 let jejuView = null, jjSt = {};
 let loftView = false;   // round 132: the drying loft over the barrel shed (loft.js)
 let cinqueView = null, ctSt = {};
-let bbRoom = null;   // round 142: Bellbird Valley's room panels (bbrooms.js)
+let bbRoom = null, bbSt = {};   // round 142: Bellbird Valley's room panels (bbrooms.js) and, round 143, its activities (bbacts.js)
 let bvView = null;   // round 141: Bellbird Valley's road map ("map") and passport ("passport")   // round 132: Cinque Terre's room panels and activities (cinque.js)
 function stampHere(place){ const s = ktStamp(F, place); if (!s) return; sfx("chime"); flash(`Stamp: ${s.n}`); gainXp(1);
   if (s.full) setTimeout(() => speak("The stamp book's full! Eight ink stamps from round Kyoto. Back home, there's a little stone lantern by the pond now.", 6500), 1200); save(); }
@@ -2267,6 +2312,12 @@ function roomSpot(id){
 function townSpot(id){
   const town = townOf(scene), T = TOWNS[town];
   if (id === T.station && T.by === "van") { bvView = "map"; sfx("paper", true); render(); return; }   // round 141: the campervan's road map
+  // round 143: Bellbird Valley's activities out of doors: the balloons, the berry rows, the canoes, the campfire; and the rope swing
+  const bbOut = {bvballoons: "balloon", bvberries: "berries", bvcanoe: "canoe", bvfire: "fire"}[id];
+  if (T.by === "van" && bbOut) { bbRoom = bbOut; bbSt = {}; sfx("paper", true); speak(T.say[id] || "", 4000); render(); return; }
+  if (id === "bvswing") { speak(T.say[id] || "The rope swing: a fat rope with a knot at the bottom, hanging off a river red gum over the swimming hole.", 4000); sfx("chime"); gainXp(1);
+    setTimeout(() => { speak(pick(["You grab the rope, run, and swing out over the water... and let go. SPLASH. It's freezing! It's wonderful!", "Out, out, out over the river, and back again. You chicken out of letting go. Next time.", "You swing, let go at the very top, and hit the water with a whoop that sends the cockatoos up."]), 6000); mprop("sparkle", mel.x + 30, mel.y - 40, 1400); }, 1800);
+    if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["MY turn! hold me, Mama!", "WHEEEEEE!", "again! AGAIN!"])), 4200); save(); render(); return; }
   if (id === T.station) { railOpen = true; sfx("paper", true); render(); return; }
   if (T.ferry && id === T.ferry.pier) { railOpen = "ferry"; sfx("paper", true); render(); return; }   // Jeju: the ferry home
   const room = roomBehind(town, id);   // round 116: the tapas bar, the café, the market, the baths and the garden have insides
@@ -2433,7 +2484,7 @@ function setScene(id, at){
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
     scView = null; scSt.pick = null; scSt.dpick = null; evanSeat = null;
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;

@@ -5,6 +5,7 @@
 // {..., wander:[[x,y],...]} strolls between points. Outside every slot the NPC is off-screen (home, asleep).
 // `react` lines fire once a day when their condition is true (see npcs.js REACTIONS).
 
+import { BB_PEOPLE } from "./bb-people.js";
 const hm = s => { const [h, m] = s.split(":").map(Number); return h*60 + (m || 0); };
 // opts: {look: clothes for this slot (over the usual look), dow: [0-6] (only on those days, 0 = Sunday), days: "wd" | "we" (weekdays / weekends only), act: what they're doing (Darren's props + lines), dir: facing}
 // Gong Gong's going-out clothes: a pressed shirt and long trousers (no berms)
@@ -1003,7 +1004,8 @@ export const NPCS = [
     actLines: {type: ["Highlighting everything. That's how studying works, right?", "Footnotes. So many footnotes.", "Nearly done this essay."], water: ["Helping Mei with the flowers. Good study break.", "Plants are very calming. That's actual research."], sup: ["I'm standing! I'm standing!", "Look, a dolphin!"]},
     away: "Angellina's studying somewhere quiet.",
     react: {quests3: "Three already? That's real momentum.", lunch: "Brain food time!"}
-  }
+  },
+  ...BB_PEOPLE   // round 143: Bellbird Valley (data/bb-people.js)
 ];
 
 // Agent NPCs: one per automation. `from` on a mail item picks the messenger (unknown -> postie).

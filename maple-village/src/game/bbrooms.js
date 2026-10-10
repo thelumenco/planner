@@ -2,7 +2,7 @@
 // shops sell TOWN_GOODS (bought with the shared data-rbuy buttons); the cafés have things to eat or drink there and
 // then (data-bb="treat:<room>:<k>"); a few rooms are just for looking (the platypus window, the noticeboard). The op
 // shop's treasures change every day: four out of the box at a time. The chocolaterie has a free tasting once a day.
-// The things to join in with (the balloon, riddling, berries and chocolate, the joeys, the canoe) come in round 143.
+// The things to join in with (the balloon, riddling, dipping, the joeys, the canoe: bbacts.js) open from here too.
 // State: F.bellbird.{treats, choc (day of the last free tasting), platypus (sightings), lunch (day)}
 import { esc, dayKey } from "../util.js";
 import { icon } from "../art/icons.js";
@@ -57,20 +57,20 @@ export function bbRoomPanel(F, room, o = {}){
     case "bv_opshop": { const today = opshopToday();
       return head(room, `Joan and Marg run the op shop on Tuesdays and every other day they feel like it. The money goes to the bush fire brigade. New things come in every day.`, "stripe") + listOf(F, today, "Today's treasures") + `<p class="muted">Different things tomorrow. "You never know what's coming in," says Marg. "Last week, a canoe."</p>` + shut; }
     case "bv_coffee": return head(room, `Rosie's coffee caravan opens at dawn for the balloon crowd. The chalkboard has three things on it, and they're all good.`) + treats(F, room) + listOf(F, shopGoods(room), "To take home") + shut;
-    case "bv_balloonshed": return head(room, `Rosie's dad Gus flies the balloons: dawn, and the golden hour before sunset. The baskets are taller than Evan.`, "stripe") + listOf(F, shopGoods(room), "From the shop") + shut;
+    case "bv_balloonshed": return head(room, `Rosie's dad Gus flies the balloons: dawn, and the golden hour before sunset. The baskets are taller than Evan.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:balloon">A balloon ride</button></div>` + listOf(F, shopGoods(room), "From the shop") + shut;
     case "bv_gallery": return head(room, `Paintings of the valley by local artists, a long window over the real thing, and scones that come out every twenty minutes.`) + treats(F, room) + listOf(F, shopGoods(room), "To take home") + shut;
     case "bv_tasting": return head(room, `Kel's family have grown grapes here for three generations. Pinot the cellar dog is asleep under the bar, as usual.`, "stripe") + treats(F, room, "A tasting") + listOf(F, shopGoods(room), "Bottles to take home") + shut;
-    case "bv_cave": return head(room, `The barrel cave, dug into the hill. Racks of sparkling wine stand tilted neck-down in the cool, waiting for someone to give each bottle a little turn.`, "stripe") + shut;
+    case "bv_cave": return head(room, `The barrel cave, dug into the hill. Racks of sparkling wine stand tilted neck-down in the cool, waiting for someone to give each bottle a little turn.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:riddle">Help Jono turn the bottles</button></div>` + shut;
     case "bv_restaurant": { const t = TREATS[room].lunch, done = bbState(F).lunch === dayKey();
       return head(room, `One long table for everyone, under the window onto the vines. No menu: whatever's good today.`) + `<h3 class="ph3">${esc(t[0])} · ${t[1]} ${coin()}</h3><p class="muted">${esc(t[2])}${o.party ? " Everyone you came with squeezes in." : ""}</p><div class="actions"><button class="btn primary" data-bb="treat:${room}:lunch" ${F.coins >= t[1] && !done ? "" : "disabled"}>${done ? "You've had lunch here today" : "A long lunch, please"}</button></div>` + shut; }
     case "bv_berrycafe": return head(room, `Gingham everywhere, jam on every table, and a queue for scones that goes out of the door on Sundays.`) + treats(F, room) + shut;
     case "bv_jam": return head(room, `Shaz stirs the copper pots with a paddle as long as an oar. The jars cool on the windowsill, lids popping one by one.`) + listOf(F, shopGoods(room), "From the jam kitchen") + shut;
     case "bv_choc": { const free = chocFree(F);
-      return head(room, `Sophie runs the chocolaterie. The fountain never stops. Neither do the free tastings.`, "stripe") + `<h3 class="ph3">Free tasting</h3><p class="muted">${free ? "A little dish of buttons: dark, milk, white, and one with wattleseed." : "You've had your free tasting today. (Sophie pretends not to notice you looking.)"}</p><div class="actions"><button class="btn primary" data-bb="choc" ${free ? "" : "disabled"}>A free tasting</button></div>` + treats(F, room) + listOf(F, shopGoods(room), "To take home") + shut; }
+      return head(room, `Sophie runs the chocolaterie. The fountain never stops. Neither do the free tastings.`, "stripe") + `<h3 class="ph3">Free tasting</h3><p class="muted">${free ? "A little dish of buttons: dark, milk, white, and one with wattleseed." : "You've had your free tasting today. (Sophie pretends not to notice you looking.)"}</p><div class="actions"><button class="btn primary" data-bb="choc" ${free ? "" : "disabled"}>A free tasting</button><button class="btn alt" data-bba="open:dip">Dip strawberries</button></div>` + treats(F, room) + listOf(F, shopGoods(room), "To take home") + shut; }
     case "bv_visitor": return head(room, `The visitor centre at Gum Creek: a café counter, a wall of photos of every animal they've saved, and a shelf of soft toys.`) + treats(F, room) + listOf(F, shopGoods(room), "The gift shop") + shut;
-    case "bv_hospital": return head(room, `Dr Mira and her nurses look after the animals that come in hurt: hit by cars, caught in fences, fallen out of pouches. Most of them go home to the bush.`) + listOf(F, shopGoods(room), "Help a joey") + `<p class="muted">The money buys milk, pouches and the vet's time.</p>` + shut;
+    case "bv_hospital": return head(room, `Dr Mira and her nurses look after the animals that come in hurt: hit by cars, caught in fences, fallen out of pouches. Most of them go home to the bush.`) + `<div class="actions"><button class="btn primary" data-bba="open:joey">Help feed a joey</button></div>` + listOf(F, shopGoods(room), "Help a joey") + `<p class="muted">The money buys milk, pouches and the vet's time.</p>` + shut;
     case "bv_campstore": return head(room, `The camp store sells everything a camper forgot: firewood, ice, thongs, marshmallows. An old kelpie is asleep across the doorway.`) + treats(F, room) + listOf(F, shopGoods(room), "Off the shelves") + shut;
-    case "bv_canoe": return head(room, `Canoes for hire, paddles on hooks, and life jackets in every size down to "very small".`, "stripe") + shut;
+    case "bv_canoe": return head(room, `Canoes for hire, paddles on hooks, and life jackets in every size down to "very small".`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:canoe">Take a canoe out</button></div>` + shut;
     default: return "";
   }
 }

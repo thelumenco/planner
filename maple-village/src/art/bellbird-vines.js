@@ -2,7 +2,7 @@
 // white-trunked river gums with blue-green crowns, yellow wattle, vine rows following the hills, corrugated-iron roofs
 // and timber verandas, red-brown earth tracks. Nothing like Honeybrook's palette. Calm on purpose: detail round the
 // edges, a clear middle. See data/bellbird.js for the places and the stops.
-import { dayKey } from "../util.js";
+import { dayKey, sgHM } from "../util.js";
 import { sk, tapeLabel } from "./scenes.js";
 import { lampDefs } from "./village-extras.js";
 import { seasonOf } from "../data/items.js";
@@ -209,7 +209,7 @@ function parkScreen(){
     + `<g pointer-events="none"><rect x="54" y="198" width="14" height="12" fill="#FFFDF6" stroke="#3a2e28" stroke-width=".6"/></g>`, "Camp kitchen", 110, 276, "#F6E3B4");
   const vans = place("bvvans", 330, 330, 80, 14, "The other campervans", kombi(280, 314, "#E07A5F", "#F3EAD6") + caravan(380, 314, "#3E6B8C") + kombi(470, 310, "#9CC27E", "#FFFDF6")
     + `<g pointer-events="none"><path d="M240 262 L330 254" stroke="#5A4636" stroke-width=".8"/>${[0, 1, 2, 3].map(i => `<rect x="${250 + i*20}" y="${258 - i*.8}" width="9" height="${9 + (i % 2)*3}" fill="${["#FFFDF6", "#9FC3D9", "#E89A9A", "#F3D98A"][i]}" stroke="#3a2e28" stroke-width=".6"/>`).join("")}<circle cx="402" cy="300" r="3" fill="#C9A27E"/></g>`, "Other campervans", 380, 346, "#C3E8DA");
-  const fire = place("bvfire", 280, 460, 36, 10, "The fire rings", fireRing(280, 450, false) + campChair(250, 450, "#3E6B8C") + campChair(310, 452, "#E8566C") + campChair(280, 476, "#9CC27E") + fireRing(420, 540, false) + campChair(400, 540, "#F3C969"), "Fire rings", 280, 494, "#FBE0B8");
+  const fire = place("bvfire", 280, 460, 36, 10, "The fire rings", fireRing(280, 450, sgHM() >= 17*60) + campChair(250, 450, "#3E6B8C") + campChair(310, 452, "#E8566C") + campChair(280, 476, "#9CC27E") + fireRing(420, 540, false) + campChair(400, 540, "#F3C969"), "Fire rings", 280, 494, "#FBE0B8");
   const store = place("bvcampstore", 430, 470, 40, 10, "The camp store", shed(392, 404, 86, 54, {sign: "CAMP STORE", roof: C.red, wall: "#F3EAD6", door: "#3E6B8C"}), "Camp store", 430, 486, "#F6E3B4");
   const road = track("M150 640 Q150 580 200 540 Q260 500 300 520 Q300 580 300 640 M200 540 Q140 400 110 270", 22);
   const trees = gum(36, 360, 1.1, 0) + gum(220, 220, 1, 1) + gum(490, 210, 1.1, 2) + gum(40, 610, 1, 1) + gum(490, 610, 1, 0);

@@ -906,4 +906,15 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .bbstamps{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}
 .bbstamp{border:1.5px dashed #B9A47A;border-radius:12px;padding:8px 10px;background:#FFFDF6;color:#8A7A5A}
 .bbstamp b{display:block;font-size:13px}.bbstamp small{font-size:11px}
+/* round 143: Bellbird Valley activities */
+.bbsky{display:flex;flex-direction:column-reverse;gap:4px;margin:10px auto;width:120px;padding:6px;border-radius:12px;background:linear-gradient(#CFE3EA,#F6E3B4)}
+.bbalt{height:34px;border-bottom:1px dashed #9AB0B8;display:flex;align-items:center;justify-content:center}.bbalt.on{background:#FFFDF680;border-radius:8px}
+.bbrack{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0;padding:10px;border-radius:12px;background:#5A4A3E}
+.bbbottle{background:none;border:0;padding:4px;border-radius:50%;cursor:pointer;min-height:44px}.bbbottle:focus-visible{outline:2px solid var(--butter)}
+.bbberries{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0;padding:10px;border-radius:12px;background:#CFE0A8}
+.bbberry{background:#FFFDF6aa;border:1px solid #B9C98A;border-radius:10px;padding:6px;min-height:44px;cursor:pointer}.bbberry.got{opacity:.55}
+.bbsteps{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.bbriver{position:relative;height:40px;margin:10px 0;border-radius:12px;background:linear-gradient(#7FAFC0,#9CC4D0)}.bbriver span{position:absolute;top:12px;transform:translateX(-50%);transition:left .3s}
+.bbmallow{display:flex;justify-content:center;margin:10px 0}.bbmallow span{width:34px;height:26px;border-radius:9px;border:1.5px solid #2F2B28;background:#FFFDF6;transition:background .3s}
+.bbmallow .h1{background:#FBF1D8}.bbmallow .h2{background:#F3D9A0}.bbmallow .h3{background:#D9A05A}.bbmallow .h4{background:#3A2E28}
 .bbstamp.on{border-style:solid;border-color:#C9483A;color:#2F2B28;background:#FFF6E8;transform:rotate(-1.5deg)}

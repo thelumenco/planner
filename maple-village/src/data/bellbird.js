@@ -330,6 +330,9 @@ export const BB_GOODS = {
   b_adopt: {n: "Adopt-a-joey certificate", kind: "keepsake", price: 10, shop: "bv_hospital", art: ["tile", "#FFFDF6", "#C98A5A"], line: "A certificate from the wildlife hospital at Gum Creek: you helped care for a joey called Pip. There's a photo of her, ears first, in a knitted pouch."},
   mallows: {n: "Marshmallows", kind: "ingredient", price: 3, sell: 1, shop: "bv_campstore", art: ["box", "#FFFDF6", "#F4C7CF"], what: "toast them on the campfire at Riverside Camp, from 5pm"},
   b_thongs: {n: "A pair of thongs", kind: "gift", to: ["marcus", "darren", "dad"], price: 5, shop: "bv_campstore", art: ["sock", "#4F9CC4", "#F3C969"], say: "Thongs! Flip flops, we'd say. Flip, flop, flip, flop. Perfect."},
+  // made or earned (round 143): the balloon flight certificate, strawberries dipped at the chocolaterie
+  b_flight: {n: "Balloon flight certificate", kind: "keepsake", price: 0, art: ["tile", "#FFFDF6", "#E8566C"], line: "A certificate from Gus at Balloon Lookout: you flew over Bellbird Valley in a hot air balloon. Signed, with a little drawing of the red-striped balloon."},
+  b_dipped: {n: "Chocolate-dipped strawberries", kind: "gift", to: "family", price: 0, art: ["box", "#5A3A2A", "#E8566C"], say: "You dipped these yourself? In real chocolate? I'm not sharing. Okay, one."},
   // the op shop's treasures (four out each day: opshopToday)
   b_teacup: {n: "Violet teacup", kind: "keepsake", price: 6, shop: "bv_opshop", op: true, art: ["disc", "#FFFDF6", "#9A7AB8"], line: "A bone china teacup with violets round the rim and a tiny chip on the saucer, from the op shop in Bellbird Valley. Joan said it was her mother's kind."},
   b_record: {n: "A record of bush ballads", kind: "keepsake", price: 5, shop: "bv_opshop", op: true, art: ["disc", "#2E2A28", "#E8566C"], line: "An old record of bush ballads from the op shop, crackly and cheerful. Songs about droving, rain, and a dog on a tuckerbox."},
