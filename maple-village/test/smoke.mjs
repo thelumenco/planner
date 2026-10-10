@@ -3217,6 +3217,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await fox().then(f => f.scoop.asked && f.scoop.asked.ids.includes(who)), `tap someone (${who}) and Mel offers them an ice cream`);
   await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(2000);
   check(await fox().then(f => !f.scoop.trolley && f.scoop.tubs.pandan + f.scoop.tubs["mango+milk"] >= 60), "wheel it back into the shop and it's put away, the unsold scoops back in the freezer");
+  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__mapleOrder()); await page.waitForTimeout(800);
+  const rode = await page.locator("#actors .rideby .bikeArt").count(); await page.waitForTimeout(7000);
+  check(rode === 1 && await page.locator("#actors .rideby").count() === 0, "an order goes out while Mel's in the square: Tomo pedals past on the mint bike with the cool box, and is gone");
   await page.close();
 }
 {

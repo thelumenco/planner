@@ -241,3 +241,18 @@ export function daySchedule(id, day){
   }
   return (schedCache[ck] = out.filter(x => x.scene));
 }
+// Tomo on the mint delivery bike (round 138): when an order goes out and Mel's outdoors in Honeybrook, he pedals
+// across the screen with the cool box on the back, waves, and is gone. Not a villager entity (no taps, no routine).
+export function rideBy(look, y, dir = Math.random() < .5 ? 1 : -1, ms = 6500){
+  const host = $("actors"); if (!host || host.querySelector(".rideby")) return null;
+  const g = document.createElementNS(NS, "g"); g.setAttribute("class", "ch npc walk rideby"); g.setAttribute("pointer-events", "none");
+  g.innerHTML = personArt(Object.assign({}, look, {bike: "#7FC8B4", extra: "helmet", hat: null}), false);
+  const box = document.createElementNS(NS, "g"); box.innerHTML = `<g style="stroke:var(--line)" stroke-width="1"><rect x="-24" y="-20" width="13" height="11" rx="2" style="fill:#7FC8B4"/><rect x="-24" y="-20" width="13" height="3" rx="1.5" style="fill:#FFFDF6"/><path d="M-20 -14 l1.5 4 l1.5 -4z" style="fill:#E8C48E"/><circle cx="-18.5" cy="-15" r="1.6" style="fill:#F4C7CF"/></g>`;
+  g.firstElementChild.appendChild(box.firstElementChild);
+  host.appendChild(g);
+  const x0 = dir > 0 ? -50 : 570, x1 = dir > 0 ? 570 : -50, t0 = performance.now();
+  g.firstElementChild.setAttribute("transform", `scale(${dir} 1)`);
+  const step = now => { const k = Math.min(1, (now - t0)/ms), x = x0 + (x1 - x0)*k, bob = Math.sin(k*40)*.6;
+    g.setAttribute("transform", `translate(${x.toFixed(1)} ${(y + bob).toFixed(1)})`); if (k < 1 && g.isConnected) requestAnimationFrame(step); else g.remove(); };
+  requestAnimationFrame(step); return g;
+}

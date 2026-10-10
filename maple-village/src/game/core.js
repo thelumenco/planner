@@ -39,7 +39,7 @@ import { attachKudos, kudosPanel, wireKudos, kv, addKudos, kudosCount } from "./
 import { loadDesk, deskPanel, wireDesk } from "./desk.js";
 import { kid, kidPanel, wireKid, stopKidGame, SNACKS, snackPic, EVAN_TAPS, pickSay } from "./kid.js";
 import { addReminder, cancelReminder, upcoming as upcomingReminders, dueNow, fmtWhen } from "./reminders.js";
-import { initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos, daySchedule } from "./npcs.js";
+import { rideBy, initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos, daySchedule } from "./npcs.js";
 import { dishArt, glassArt } from "../art/wine.js";
 import { fieldArt, stallFront } from "../art/field.js";
 import { shoreArt } from "../art/shore.js";
@@ -2704,6 +2704,8 @@ function orderNote(orders, shop, till){
   const o = orders[orders.length - 1], names = ORDER_WHO.map(id => NPCS.find(n => n.id === id)).filter(Boolean), who = names.length ? pick(names).name : "A neighbour";
   const where = o.picnic ? ` to a picnic on ${pick(["the field", "the foreshore", "the edge of the woods"])}` : pick([" to their door", " to the town square", " round to the lane", ""]);
   sfx("coin"); flash(`${shop} order: ${who}, ${o.what}${where} (+${o.coins}${till ? " in the till" : ""})`);
+  // and Tomo pedals past on the mint bike, if Mel's outdoors in Honeybrook (round 138)
+  if (outside() && !townOf(scene) && !sup) { const t = NPCS.find(n => n.id === "tomo"), b = bounds(); if (t) rideBy(t.look, Math.max(b[1] + 20, Math.min(b[3] - 10, mel.y + (mel.y + 70 < b[3] ? 70 : -60)))); }
 }
 // the ice cream trolley (round 137): put it away (unsold scoops back in the freezer, unless they've melted)
 function trolleyHome(){ const r = returnTrolley(F); if (!r) return; sfx(r.melted ? "paper" : "chime");
@@ -3132,6 +3134,7 @@ function playground(id){
 setTimeout(vineTick, 3000);
 // dev builds only (the stub sets the flag): test scripts jump straight to a scene
 if (window.__mapleDevStub) window.__mapleScene = id => setScene(id, OUTDOOR.includes(id) ? [260, 330] : INNER[id] ? INNER[id].arrive : [260, 596]);
+if (window.__mapleDevStub) window.__mapleOrder = (shop = "The Scoop Shack") => { S.orderAt = 0; orderNote([{shop: "scoop", coins: 6, what: "a cone of mango"}], shop, false); };   // tests: an order note, and Tomo riding past
 /* ---------- The bank ---------- */
 function vaultPoured(j, nowFull){
   if (nowFull) { sfx("yay"); flash(`${j.label} is full!`); speak(`Your ${j.label} vault is full! Look at it sparkle. That's ${vaultMoney(j.amount, j.cur)} saved.`, 7000, true); setTimeout(checkTrophies, 500); }

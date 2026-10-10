@@ -2010,3 +2010,14 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - **Winery** (2% a minute, in sellTick): one or two tapas or small plates, and/or a bottle. 45% of these are picnic orders. The coins go to the till (box) like the winery's other sales.
   - Every order uses real stock and adds a 2-coin fee.
   - Core `orderNote` flashes one order at most every 2.5 minutes, naming a villager and the place. It stays quiet if Mel's been away 30+ minutes. Scoop Shack deliveries show in the evening note.
+
+### Round 138: Tomo rides past with the deliveries
+- When an order note shows (core `orderNote`) and Mel is outdoors in Honeybrook, Tomo pedals across the screen. He rides the mint bike in a yellow helmet, with the ice cream cool box on the back (npcs.js `rideBy`, about 6.5s, a pointer-events-free `.rideby` node in #actors; one at a time).
+- His path runs about 70px below Mel, or 60 above if she's near the bottom of the screen, so he stays clear of the crowd round her.
+- Tests can trigger an order and the ride with `window.__mapleOrder()` (dev stub only).
+- **Still open, as listed to Mel:**
+  - Evening takings notes for the Cocoa Room and the winery.
+  - Sending tapas or bonbons to the family by bike.
+  - Sofia making a fresh tub when the display runs out (Mel skipped this so far).
+  - A drying rack you can see by the barrel shed while raisins dry.
+  - More Jason, if Mel shares memories.
