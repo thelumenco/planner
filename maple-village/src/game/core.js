@@ -59,6 +59,7 @@ import { rondaRoomArt } from "../art/ronda-rooms.js";
 import { kyotoArt } from "../art/town-kyoto.js";
 import { jejuArt, ferryRideArt, wishTower } from "../art/town-jeju.js";
 import { cinqueArt, homeBoat, dryingRack } from "../art/town-cinque.js";
+import { discoArt } from "../art/disco.js";
 import { loftPanel, startBatch, collect as loftCollect, loftState } from "./loft.js";
 import { cinqueRoomArt } from "../art/cinque-rooms.js";
 import { cinquePanel, cinqueState, treat as ctTreat, GELATO, FOCACCIA, pestoStart, pestoAdd, pestoPound, pestoDone, finishPesto, harvestStart, pick as ctPick, harvestDone, finishHarvest, TASTE, paintBoat, boatCols } from "./cinque.js";
@@ -90,7 +91,7 @@ import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpe
 import { diningTable, darrenAsleep, skyWash, tapeLabel } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
-import { aperitivoNow, bonfireNow, vanNow, FIRE, movieNow, bayMarketNow, BAY_STALLS, KITE_SELLER, SCREEN, lastFriday, tourNow, eventNow, eventOn, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned, workshopGroup, letGuests } from "./tours.js";
+import { discoNow, discoOn, DISCO_FROM, aperitivoNow, bonfireNow, vanNow, FIRE, movieNow, bayMarketNow, BAY_STALLS, KITE_SELLER, SCREEN, lastFriday, tourNow, eventNow, eventOn, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned, workshopGroup, letGuests } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), cleanDone:false, wipe:false, order:[], doneIds:[], extra:[], tweaks:{}, firstStep:{}, stalls:{}, arrived:{},
@@ -1073,6 +1074,7 @@ function villageCalendar(){
     if (ev) list.push(`${ev.name}, ${hhmm(ev.from)} to ${hhmm(ev.to)} on the field${ev.kind === "market" ? ` (our wine stall's there${F.cocoa && F.cocoa.up && F.cocoa.up.cart ? `, and ${cocoaState(F).name}'s chocolate cart` : ""})` : ev.kind === "night" ? ` (with a jazz duo, and the cart from ${scoopState(F).name})` : ""}`);
     if (F.cocoa && F.cocoa.up && F.cocoa.up.workshop && new Date(k + "T00:00:00Z").getUTCDay() === 6) list.push(`Bonbon workshop at ${cocoaState(F).name}, 2 to 4pm`);
     if (owns(F, "cellar") && wineClubOn(k)) list.push(`Wine club at the cellar door, 6 to 9pm`);
+    if (owns(F, "cellar") && discoOn(k)) list.push(`Disco night at the cellar door, 8 to 11:30pm`);
     if (dn) list.push(`Family dinner at ${HOST_NAME[dn.host]}, 6:30pm`);
     fests.filter(x => x.k === k).forEach(x => list.push(`${x.f.name}!`));
     if (list.length) days.push({k, list});
@@ -2022,7 +2024,7 @@ function drawScene(){
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
   $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
-  $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") + (F.towns && F.towns.cinque ? homeBoat(206, 150, ...boatCols(F)) : "") : "") + (scene === "vineyard" && F.loft && F.loft.rack ? dryingRack(188, 226) : "") + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));   // shelves with keepsakes, and pets at home here
+  $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") + (F.towns && F.towns.cinque ? homeBoat(206, 150, ...boatCols(F)) : "") : "") + (scene === "vineyard" && F.loft && F.loft.rack ? dryingRack(188, 226) : "") + (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM()) ? discoArt() : "") + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));   // shelves with keepsakes, and pets at home here
   if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));   // the same evening light everywhere outdoors
   if (outside() && isDusk()) nightLights();
   const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), orchard:"Ma Ma's orchard", flowers:"Ma Ma's flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", hwoods:"Honeybrook Woods", greenhouse:"The greenhouse", mill:"The old mill", scoopshop: scoopState(F).name, ct_vernazza:"Cinque Terre: Vernazza", ct_corniglia:"Cinque Terre: Corniglia", ct_monterosso:"Cinque Terre: Monterosso", ct_manarola:"Cinque Terre: Manarola", jj_shore:"Jeju: Seongsan", jj_farms:"Jeju: the tangerine farms", jj_harbour:"Jeju: the harbour", jj_village:"Jeju: the stone village", kt_station:"Kyoto: the station", kt_lane:"Kyoto: Higashiyama", kt_temple:"Kyoto: the temple", kt_river:"Kyoto: the river", rd_station:"Ronda: the station", rd_plaza:"Ronda: the plaza", rd_bridge:"Ronda: Puente Nuevo", rd_old:"Ronda: the old town"};
@@ -2149,7 +2151,7 @@ function lanternFlight(n){
   fx.appendChild(g); setTimeout(() => g.remove(), 20000);
 }
 // Day trips (trips.js, round 107): tickets at Honeybrook station, the train, a day in the town, the train home.
-const liveNow = () => { const room = townRoom(scene); if (room) return room.music; const town = townOf(scene); if (town) return TOWNS[town].music; const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null; return ev && ev.kind === "night" ? "jazz" : null; };
+const liveNow = () => { if (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM())) return "disco"; const room = townRoom(scene); if (room) return room.music; const town = townOf(scene); if (town) return TOWNS[town].music; const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null; return ev && ev.kind === "night" ? "jazz" : null; };
 function trainRide(text, town, then){
   const o = document.createElement("div"); o.className = "taxiride trainride"; o.innerHTML = trainRideArt(town) + `<p>${esc(text)}</p>`; $("map").appendChild(o); sfx("choo");
   setTimeout(() => { o.remove(); then(); }, 2600);
@@ -2419,6 +2421,10 @@ function setScene(id, at){
     if (id === "scoopshop" && trolleyOn(F)) setTimeout(trolleyHome, 900);   // wheeling the trolley back in puts it away
     if (id === "cocoa" && evanHere() && ccUp(cocoaState(F), "fountain")) setTimeout(() => evanSays(pick(["THE FOUNTAIN!! Can I put my hand in? Just one finger?", "Mama, it's a chocolate waterfall!", "Can we dip a strawberry? Pleeease?"])), 1400);
     if (id === "wineshop" && aperitivoNow(dayKey(), sgHM()) && S.aperoSaid !== dayKey()) { S.aperoSaid = dayKey(); setTimeout(() => speak("Friday aperitivo hour! The whole village is knocking off for a glass and a plate. Stand behind the counter: they tip.", 6000), 1200); }
+    // round 140: Saturday disco night (a nudge during the day, and the floor's packed when Mel walks in)
+    { const m = sgHM(); if (owns(F, "cellar") && discoOn(dayKey()) && m >= 15*60 && m < 23*60 && S.discoSaid !== dayKey() && id !== "cellar") { S.discoSaid = dayKey();
+      setTimeout(() => speak(m < DISCO_FROM ? "It's Saturday: disco night at the cellar door from 8! The glitter ball's coming out." : "Disco night's in full swing at the cellar door! Can you hear it from here?", 6000), 3200); } }
+    if (id === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM())) setTimeout(() => { speak("Disco night! The glitter ball's spinning, the lights are flashing, and the whole floor's dancing. Stand at the tasting bar to pour: they're thirsty.", 6500); if (evanHere()) setTimeout(() => evanSays(pick(["SPARKLY BALL! dance dance!", "Mama, dance with me!", "I'm doing my robot dance!"])), 2600); }, 1200);
     if (id === "cellar" && wineClubNow(dayKey(), sgHM())) setTimeout(() => speak("The wine club's here! Glasses clinking, everyone talking at once. Tap the tasting bar to host.", 5000), 1200);
     if (id === "marcus" && evanHere()) setTimeout(() => { evanSays(pick(["Uncle Marcus! Can I play Mario?", "Can we watch Spiderman? Pleeease?", "Game! Game! Can I play the game?"])); if (isHere("marcus")) setTimeout(() => npcSay("marcus", "Ha! Ask your mum, little man. Zeh? One level?"), 2200); }, 1500);
     if (id === "wineshop" && isHere("marcus") && isHere("angelina") && sgHM() >= 19*60 + 30 && S.dateSaid !== dayKey()) { S.dateSaid = dayKey(); setTimeout(() => speak("Marcus and Angellina are on a date night at the middle table. Act natural.", 5000), 1600); }
@@ -2651,7 +2657,7 @@ function orchardTick(){
   save(scene === "orchard" || scene === "flowers");
 }
 function vineTick(){
-  const out = sellTick(F, {serving: scene === "wineshop" && serving(), stall: scene === "field" && serving(), club: scene === "cellar" && wineClubNow(dayKey(), sgHM()), harvest: (festivalOn(dayKey()) || {}).id === "harvest"});
+  const out = sellTick(F, {serving: scene === "wineshop" && serving(), stall: scene === "field" && serving(), club: scene === "cellar" && wineClubNow(dayKey(), sgHM()), disco: scene === "cellar" && atSpot === "flight" && discoNow(dayKey(), sgHM()), harvest: (festivalOn(dayKey()) || {}).id === "harvest"});
   // Pilar runs the kitchen on her shifts (tells Mel what she's done only while Mel's in there with her)
   if (whereIs("pilar") === "kitchen") { const done = cookTick(F, dayKey()); if (done.length) { save(); if (scene === "kitchen" && !quietNow() && $("panel").hidden) speak(cookLine(done), 5500); } }
   // at closing, leftover tapas of the day go to the staff for dinner
@@ -2663,6 +2669,7 @@ function vineTick(){
   const typing = !!(document.activeElement && document.activeElement.closest && document.activeElement.closest(".vyname, [data-vyprice]"));
   if (out.coins && serving()) { sfx("coin"); flash(`+${out.coins} coins from the wine shop`); }
   else if (out.coins && out.club && scene === "cellar") { sfx("coin"); flash(`+${out.coins} coins: the wine club`); }
+  else if (out.coins && out.disco && scene === "cellar") { sfx("coin"); flash(`+${out.coins} coins: disco night (in the till)`); }
   else if (out.mins >= 30 && out.coins) setTimeout(() => speak(`While you were away, villagers bought ${out.bottles ? `${out.bottles} bottle${out.bottles > 1 ? "s" : ""}` : ""}${out.bottles && out.glasses ? " and " : ""}${out.glasses ? `${out.glasses} glass${out.glasses > 1 ? "es" : ""}` : ""} of your wine. ${vineState(F).box} coins are waiting in the honesty box.`, 6500), 2500);
   if (typing) persist("fox"); else save(scene === "vineyard" || scene === "wineshop");
 }

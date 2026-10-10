@@ -599,6 +599,12 @@ button.subname[aria-expanded="true"]::after{content:"▴"}
 .npc.act-poem:not(.walk) .legL,.npc.act-poem:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}.npc.act-poem:not(.walk) > g{transform:translateY(7px)}
 .ch.npc.act-poem:not(.walk) .armR{animation:tapA 1.6s ease-in-out infinite alternate}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-poem .armR{animation:none}}
+/* Saturday disco night in the cellar (round 140): the glitter ball's facets shimmer, beams and floor spots flash */
+.disco .dfacets{animation:dshim .8s steps(2) infinite}@keyframes dshim{50%{opacity:.55}}
+.disco .dbeam{animation:dbeam 1.6s ease-in-out infinite alternate}@keyframes dbeam{from{opacity:.05}to{opacity:.3}}
+.disco .dspot{animation:dspot 1.2s ease-in-out infinite alternate}@keyframes dspot{from{opacity:.15}to{opacity:.6}}
+.disco .dglint{transform-box:fill-box;transform-origin:50% 50%;animation:dglint 1s ease-in-out infinite}@keyframes dglint{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.disco .dfacets,.disco .dbeam,.disco .dspot,.disco .dglint{animation:none}}
 
 /* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
 :root{--mapw:max(300px,min(980px,calc((100dvh - 196px)*520/640 + 26px)))}
@@ -6368,6 +6374,19 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (k === 1 && hm2 >= 14 * 60 && hm2 < 15 * 60 + 30) return { from: 14 * 60, to: 15 * 60 + 30, scene: "hwoods", wander: [[200, 318], [330, 420], [440, 510], [300, 300]] };
     return null;
   }
+  var DISCO_FROM = 20 * 60;
+  var DISCO_TO = 23 * 60 + 30;
+  var discoOn = (day) => dow(day) === 6;
+  var discoNow = (day, hm2) => discoOn(day) && hm2 >= DISCO_FROM && hm2 < DISCO_TO;
+  var DISCO_POOL = ["hana", "juniper", "bo", "opal", "theo", "marco", "ines", "farid", "mei", "felix", "elena", "amara", "mateo", "lila", "noor", "wren", "sofia", "tomo", "mum", "dad", "marcus", "angelina"];
+  var DISCO_SPOTS = [[200, 340], [260, 340], [320, 340], [380, 340], [440, 340], [170, 390], [230, 390], [290, 390], [350, 390], [410, 390], [470, 390], [220, 440], [280, 440], [340, 440], [400, 440], [260, 500]];
+  var discoCrowd = (day) => discoOn(day) ? [...groupFor(day + ":disco", 11, [], DISCO_POOL), ...groupFor(day + ":discot", 5, [], NIGHT_TOURISTS)] : [];
+  function discoSlot(id, day, hm2) {
+    if (!discoNow(day, hm2)) return null;
+    const i = discoCrowd(day).indexOf(id);
+    if (i < 0) return null;
+    return { from: DISCO_FROM, to: DISCO_TO, scene: "cellar", at: DISCO_SPOTS[i], act: "dance", dir: i % 2 ? -1 : 1, disco: true };
+  }
   function clubSlot(id, day, hm2) {
     if (!wineClubNow(day, hm2) || !clubMembers(day).includes(id)) return null;
     return { from: CLUB_FROM, to: CLUB_TO, scene: "cellar", wander: CLUB_WALK, club: true };
@@ -10713,6 +10732,31 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
           }
         }
       }
+      if (F2.goals && F2.goals.cellar && discoNow(new Date(at + off + 6 * H).toISOString().slice(0, 10), hm2)) {
+        const hst = opts.disco && k === 1 ? 1.5 : 1, stock2 = v.shelf.filter((x) => x.n > 0);
+        if (stock2.length && Math.random() < 0.07 * hst) {
+          const b = stock2[Math.floor(Math.random() * stock2.length)];
+          if (Math.random() < winePf(b)) {
+            b.n--;
+            out.bottles++;
+            out.coins += b.price;
+            out.disco = (out.disco || 0) + 1;
+          }
+        }
+        if (Math.random() < 0.09 * hst) {
+          const g5 = v.shelf.find((x) => x.open > 0) || v.shelf.find((x) => x.n > 0);
+          if (g5 && Math.random() < winePf(g5)) {
+            if (!g5.open) {
+              g5.n--;
+              g5.open = GLASSES;
+            }
+            g5.open--;
+            out.glasses++;
+            out.coins += Math.max(1, Math.round(g5.price / 4));
+            out.disco = (out.disco || 0) + 1;
+          }
+        }
+      }
       if (hm2 < 10 * 60 || hm2 >= 22 * 60) continue;
       const onShelf = v.shelf.filter((s) => s.n > 0), open2 = v.shelf.find((s) => s.open > 0);
       const crate5 = Object.keys(v.fruit).filter((id) => v.fruit[id] > 0);
@@ -13291,6 +13335,20 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     rain: { name: "Rain on the roof", mood: "Just rain, no music", rain: true, col: "#9CB4C9" },
     // live, not a record: the night market's jazz duo (keys and double bass) in F, swung. walk: the bass line, a note a
     // beat; the keys comp on the "and" of 2 and on 4, with a loose top line over it
+    // live, not a record (round 140): Saturday disco night in the cellar. Four on the floor at 120, octave-bouncing bass,
+    // bright stabs on the offbeats, Am7 to D9 and round again
+    disco: {
+      name: "Disco night",
+      live: true,
+      bpm: 120,
+      steps: 8,
+      tone: "rhodes",
+      comp: true,
+      arpVel: 0.055,
+      mel: 0.8,
+      bars: [[45, 60, 64, 67, 72], [38, 57, 60, 64, 66], [45, 60, 64, 67, 72], [43, 59, 62, 67, 71]],
+      walk: [[33, 45, 33, 45], [38, 50, 38, 50], [33, 45, 33, 45], [31, 43, 31, 43]]
+    },
     jazz: {
       name: "The night market duo",
       live: true,
@@ -18869,7 +18927,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var routineNow = (def) => routineAt(def, dayKey(), sgHM());
   function slotAt(def, day, t2, live3) {
-    return api3 && tripSlot(api3.F(), def.id, day, t2, live3 ? api3.scene() : null) || live3 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || movieSlot(def.id, day, t2) || bonfireSlot(def.id, day, t2) || bayMarketSlot(def.id, day, t2) || workshopSlot(def.id, day, t2) || trainSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || iceOk(scoopSlot(def.id, day, t2), def, day, t2) || letSlot(def.id, day, t2) || routineAt(def, day, t2);
+    return api3 && tripSlot(api3.F(), def.id, day, t2, live3 ? api3.scene() : null) || live3 && supSlot(def) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || cellarBuilt() && discoSlot(def.id, day, t2) || movieSlot(def.id, day, t2) || bonfireSlot(def.id, day, t2) || bayMarketSlot(def.id, day, t2) || workshopSlot(def.id, day, t2) || trainSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || iceOk(scoopSlot(def.id, day, t2), def, day, t2) || letSlot(def.id, day, t2) || routineAt(def, day, t2);
   }
   var nightOk = (s, def, day, t2) => !s || !s.night ? s : tastingSlot(def.id, day, t2) || (routineAt(def, day, t2) || {}).scene === "wineshop" ? null : s;
   var iceOk = (s, def, day, t2) => {
@@ -21712,6 +21770,24 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function rondaRoomArt(scene2) {
     return scene2 === "rd_tapas" ? tapasRoom() : scene2 === "rd_cafe" ? cafeRoom() : scene2 === "rd_banos" ? banosRoom() : scene2 === "rd_jardin" ? jardinRoom() : scene2 === "rd_cuero" ? cueroRoom() : mercadoRoom();
+  }
+
+  // src/art/disco.js
+  var BEAMS = [["#F29AB0", 150, 380], ["#7FD3E8", 400, 360], ["#F3D34A", 230, 470], ["#B9A8E8", 330, 480], ["#9CE0A8", 470, 450], ["#F6A65A", 110, 460]];
+  function discoArt() {
+    const bx = 360, by = 150;
+    const facets = Array.from({ length: 7 }, (_, r) => Array.from({ length: 7 }, (_2, c) => {
+      const x = bx - 21 + c * 6, y = by - 21 + r * 6;
+      return Math.hypot(x + 3 - bx, y + 3 - by) < 22 ? `<rect x="${x}" y="${y}" width="5.4" height="5.4" style="fill:${(r + c) % 3 ? "#D9DDE6" : "#FFFFFF"}"/>` : "";
+    }).join("")).join("");
+    return `<g class="disco" pointer-events="none">
+    <rect width="520" height="640" style="fill:#2A2240" opacity=".32"/>
+    ${BEAMS.map(([col, x, y], i) => `<path class="dbeam" style="fill:${col};animation-delay:-${(i * 0.37).toFixed(2)}s" d="M${bx} ${by} L${x - 34} ${y} L${x + 34} ${y}z" opacity=".22"/>`).join("")}
+    ${BEAMS.map(([col, x, y], i) => `<ellipse class="dspot" style="fill:${col};animation-delay:-${(i * 0.53).toFixed(2)}s" cx="${x}" cy="${y}" rx="40" ry="12" opacity=".45"/>`).join("")}
+    <path d="M${bx} 0 V${by - 22}" style="stroke:#3A3430" stroke-width="1.2"/>
+    <g class="dball"><circle cx="${bx}" cy="${by}" r="22" style="fill:#BFC6D3;stroke:var(--line)" stroke-width="1.2"/><g class="dfacets">${facets}</g><circle cx="${bx - 8}" cy="${by - 8}" r="5" style="fill:#FFFFFF" opacity=".9"/></g>
+    ${[[bx - 40, by + 10], [bx + 36, by - 6], [bx + 10, by + 34], [bx - 26, by - 30]].map(([x, y], i) => `<path class="dglint" style="animation-delay:-${i * 0.4}s" d="M${x} ${y - 6} l1.6 4.4 l4.4 1.6 l-4.4 1.6 l-1.6 4.4 l-1.6 -4.4 l-4.4 -1.6 l4.4 -1.6z" fill="#FFF6C8"/>`).join("")}
+  </g>`;
   }
 
   // src/game/loft.js
@@ -25688,6 +25764,7 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
       if (ev) list5.push(`${ev.name}, ${hhmm(ev.from)} to ${hhmm(ev.to)} on the field${ev.kind === "market" ? ` (our wine stall's there${F.cocoa && F.cocoa.up && F.cocoa.up.cart ? `, and ${cocoaState(F).name}'s chocolate cart` : ""})` : ev.kind === "night" ? ` (with a jazz duo, and the cart from ${scoopState(F).name})` : ""}`);
       if (F.cocoa && F.cocoa.up && F.cocoa.up.workshop && (/* @__PURE__ */ new Date(k + "T00:00:00Z")).getUTCDay() === 6) list5.push(`Bonbon workshop at ${cocoaState(F).name}, 2 to 4pm`);
       if (owns2(F, "cellar") && wineClubOn(k)) list5.push(`Wine club at the cellar door, 6 to 9pm`);
+      if (owns2(F, "cellar") && discoOn(k)) list5.push(`Disco night at the cellar door, 8 to 11:30pm`);
       if (dn) list5.push(`Family dinner at ${HOST_NAME[dn.host]}, 6:30pm`);
       fests.filter((x) => x.k === k).forEach((x) => list5.push(`${x.f.name}!`));
       if (list5.length) days.push({ k, list: list5 });
@@ -28050,7 +28127,7 @@ ${SIGNOFF[t2.who] || ""}`;
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
     tableKey = "";
     $("sceneArt").innerHTML = scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : rondaRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
-    $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt(F.fish && F.fish.koi || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") + (F.towns && F.towns.cinque ? homeBoat(206, 150, ...boatCols(F)) : "") : "") + (scene === "vineyard" && F.loft && F.loft.rack ? dryingRack(188, 226) : "") + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));
+    $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt(F.fish && F.fish.koi || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") + (F.towns && F.towns.cinque ? homeBoat(206, 150, ...boatCols(F)) : "") : "") + (scene === "vineyard" && F.loft && F.loft.rack ? dryingRack(188, 226) : "") + (scene === "cellar" && owns2(F, "cellar") && discoNow(dayKey(), sgHM()) ? discoArt() : "") + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));
     if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));
     if (outside() && isDusk()) nightLights();
     const names = { village: "Town square", base: "Home base", lane: "Makers' Lane", vineyard: vineyardName(F), farm: "The garden", wineshop: shopName(F), orchard: "Ma Ma's orchard", flowers: "Ma Ma's flower farm", field: "The field", shore: "The foreshore", bay: "The bay", hfarm: "Wildflower Farm", hlane: "Honeybrook station", hwoods: "Honeybrook Woods", greenhouse: "The greenhouse", mill: "The old mill", scoopshop: scoopState(F).name, ct_vernazza: "Cinque Terre: Vernazza", ct_corniglia: "Cinque Terre: Corniglia", ct_monterosso: "Cinque Terre: Monterosso", ct_manarola: "Cinque Terre: Manarola", jj_shore: "Jeju: Seongsan", jj_farms: "Jeju: the tangerine farms", jj_harbour: "Jeju: the harbour", jj_village: "Jeju: the stone village", kt_station: "Kyoto: the station", kt_lane: "Kyoto: Higashiyama", kt_temple: "Kyoto: the temple", kt_river: "Kyoto: the river", rd_station: "Ronda: the station", rd_plaza: "Ronda: the plaza", rd_bridge: "Ronda: Puente Nuevo", rd_old: "Ronda: the old town" };
@@ -28283,6 +28360,7 @@ ${SIGNOFF[t2.who] || ""}`;
     setTimeout(() => g5.remove(), 2e4);
   }
   var liveNow = () => {
+    if (scene === "cellar" && owns2(F, "cellar") && discoNow(dayKey(), sgHM())) return "disco";
     const room = townRoom(scene);
     if (room) return room.music;
     const town = townOf(scene);
@@ -29063,6 +29141,17 @@ ${SIGNOFF[t2.who] || ""}`;
         S2.aperoSaid = dayKey();
         setTimeout(() => speak("Friday aperitivo hour! The whole village is knocking off for a glass and a plate. Stand behind the counter: they tip.", 6e3), 1200);
       }
+      {
+        const m = sgHM();
+        if (owns2(F, "cellar") && discoOn(dayKey()) && m >= 15 * 60 && m < 23 * 60 && S2.discoSaid !== dayKey() && id !== "cellar") {
+          S2.discoSaid = dayKey();
+          setTimeout(() => speak(m < DISCO_FROM ? "It's Saturday: disco night at the cellar door from 8! The glitter ball's coming out." : "Disco night's in full swing at the cellar door! Can you hear it from here?", 6e3), 3200);
+        }
+      }
+      if (id === "cellar" && owns2(F, "cellar") && discoNow(dayKey(), sgHM())) setTimeout(() => {
+        speak("Disco night! The glitter ball's spinning, the lights are flashing, and the whole floor's dancing. Stand at the tasting bar to pour: they're thirsty.", 6500);
+        if (evanHere()) setTimeout(() => evanSays(pick(["SPARKLY BALL! dance dance!", "Mama, dance with me!", "I'm doing my robot dance!"])), 2600);
+      }, 1200);
       if (id === "cellar" && wineClubNow(dayKey(), sgHM())) setTimeout(() => speak("The wine club's here! Glasses clinking, everyone talking at once. Tap the tasting bar to host.", 5e3), 1200);
       if (id === "marcus" && evanHere()) setTimeout(() => {
         evanSays(pick(["Uncle Marcus! Can I play Mario?", "Can we watch Spiderman? Pleeease?", "Game! Game! Can I play the game?"]));
@@ -30076,7 +30165,7 @@ ${SIGNOFF[t2.who] || ""}`;
     save2(scene === "orchard" || scene === "flowers");
   }
   function vineTick() {
-    const out = sellTick(F, { serving: scene === "wineshop" && serving(), stall: scene === "field" && serving(), club: scene === "cellar" && wineClubNow(dayKey(), sgHM()), harvest: (festivalOn(dayKey()) || {}).id === "harvest" });
+    const out = sellTick(F, { serving: scene === "wineshop" && serving(), stall: scene === "field" && serving(), club: scene === "cellar" && wineClubNow(dayKey(), sgHM()), disco: scene === "cellar" && atSpot === "flight" && discoNow(dayKey(), sgHM()), harvest: (festivalOn(dayKey()) || {}).id === "harvest" });
     if (whereIs("pilar") === "kitchen") {
       const done = cookTick(F, dayKey());
       if (done.length) {
@@ -30105,6 +30194,9 @@ ${SIGNOFF[t2.who] || ""}`;
     } else if (out.coins && out.club && scene === "cellar") {
       sfx("coin");
       flash(`+${out.coins} coins: the wine club`);
+    } else if (out.coins && out.disco && scene === "cellar") {
+      sfx("coin");
+      flash(`+${out.coins} coins: disco night (in the till)`);
     } else if (out.mins >= 30 && out.coins) setTimeout(() => speak(`While you were away, villagers bought ${out.bottles ? `${out.bottles} bottle${out.bottles > 1 ? "s" : ""}` : ""}${out.bottles && out.glasses ? " and " : ""}${out.glasses ? `${out.glasses} glass${out.glasses > 1 ? "es" : ""}` : ""} of your wine. ${vineState(F).box} coins are waiting in the honesty box.`, 6500), 2500);
     if (typing) persist("fox");
     else save2(scene === "vineyard" || scene === "wineshop");

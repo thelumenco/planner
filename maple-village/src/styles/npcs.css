@@ -120,3 +120,9 @@
 .npc.act-poem:not(.walk) .legL,.npc.act-poem:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}.npc.act-poem:not(.walk) > g{transform:translateY(7px)}
 .ch.npc.act-poem:not(.walk) .armR{animation:tapA 1.6s ease-in-out infinite alternate}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-poem .armR{animation:none}}
+/* Saturday disco night in the cellar (round 140): the glitter ball's facets shimmer, beams and floor spots flash */
+.disco .dfacets{animation:dshim .8s steps(2) infinite}@keyframes dshim{50%{opacity:.55}}
+.disco .dbeam{animation:dbeam 1.6s ease-in-out infinite alternate}@keyframes dbeam{from{opacity:.05}to{opacity:.3}}
+.disco .dspot{animation:dspot 1.2s ease-in-out infinite alternate}@keyframes dspot{from{opacity:.15}to{opacity:.6}}
+.disco .dglint{transform-box:fill-box;transform-origin:50% 50%;animation:dglint 1s ease-in-out infinite}@keyframes dglint{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.disco .dfacets,.disco .dbeam,.disco .dspot,.disco .dglint{animation:none}}

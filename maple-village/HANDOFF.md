@@ -2027,3 +2027,12 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Takings at closing:** the Cocoa Room at 8 (`cocoaNews`, `c.reported`) and the winery at 10 (`wineNews`, `v.reported`). The winery note counts orders sent out by bike (`v.today.deliv`).
 - **The drying rack:** cane racks of amber and purple bunches drawn beside the barrel shed while `F.loft.rack` is set (`dryingRack` in town-cinque.js).
 - **Sofia does NOT make tubs (Mel: "I want to be the one to make the fresh tubs").** Don't automate tub-making.
+
+### Round 140: Saturday disco nights at the cellar door
+- **When and who:** once the cellar door is built, every Saturday 8–11:30pm (`discoNow` in tours.js; `discoSlot` in npcs `slotAt`, right after the wine club).
+  - 11 villagers from `DISCO_POOL` plus 5 night tourists, all dancing on fixed spots (`DISCO_SPOTS`, act "dance").
+  - Left out: Ma Ma, Gong Gong, Mr Okada and Lin (older), and staff on shift (Celeste, Pilar).
+  - Date night (Marcus and Angellina, until 9) and family dinners take priority, so they come on afterwards.
+- **What you see and hear:** `discoArt` (art/disco.js) puts a dim wash, a glitter ball on a string, sweeping colour beams, pulsing floor spots and glints over the cellar art. A live "disco" track plays (audio.js: 120bpm, octave bass).
+- **Sales:** in sellTick, bottles at 7% a minute and glasses at 9% a minute. With Mel at the tasting bar (`opts.disco`), that's half as much again. The money goes to the till, and a flash shows when Mel's there.
+- **Nudges:** the day list says "Disco night at the cellar door, 8 to 11:30pm". There's a heads-up from 3pm, a line when Mel walks in, and Evan has his own lines.

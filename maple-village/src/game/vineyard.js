@@ -6,7 +6,7 @@
 import { esc, plain, H, now } from "../util.js";
 import { NPCS } from "../data/npcs.js";
 import { ITEMS } from "../data/items.js";
-import { eventNow, wineClubNow, aperitivoNow } from "./tours.js";
+import { eventNow, wineClubNow, aperitivoNow, discoNow } from "./tours.js";
 import { icon } from "../art/icons.js";
 import { DISHES, TAPAS, tapasPrice } from "./kitchen.js";
 import { bikeOwned, DELIVERY } from "./scoop.js";
@@ -206,6 +206,11 @@ export function sellTick(F, opts = {}){
     if (F.goals && F.goals.cellar && wineClubNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm)) { const hst = opts.club && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
       if (stock.length && Math.random() < .04*hst) { const b = stock[Math.floor(Math.random()*stock.length)]; if (Math.random() < winePf(b)) { b.n--; out.bottles++; out.coins += b.price; out.club = (out.club || 0) + 1; } }
       if (Math.random() < .03*hst) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g && Math.random() < winePf(g)) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.club = (out.club || 0) + 1; } } }
+    // Saturday disco night in the cellar (round 140): a packed floor, thirsty dancers, bottles and glasses flying off
+    // the shelves; with Mel there behind the tasting bar, half as much again
+    if (F.goals && F.goals.cellar && discoNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm)) { const hst = opts.disco && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
+      if (stock.length && Math.random() < .07*hst) { const b = stock[Math.floor(Math.random()*stock.length)]; if (Math.random() < winePf(b)) { b.n--; out.bottles++; out.coins += b.price; out.disco = (out.disco || 0) + 1; } }
+      if (Math.random() < .09*hst) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g && Math.random() < winePf(g)) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.disco = (out.disco || 0) + 1; } } }
     if (hm < 10*60 || hm >= 22*60) continue;
     const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); const crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0);
     if (!onShelf.length && !open && !platesLeft(v) && !crate.length) continue;

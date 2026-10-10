@@ -422,6 +422,18 @@ export function letSlot(id, day, hm){
   if (k === 1 && hm >= 14*60 && hm < 15*60 + 30) return {from: 14*60, to: 15*60 + 30, scene: "hwoods", wander: [[200, 318], [330, 420], [440, 510], [300, 300]]};
   return null;
 }
+// Disco night (round 140, Mel): every Saturday once the cellar door is built, 8 to 11:30pm. The disco ball comes out,
+// the lights flash, the music's on, and the floor's packed: most of the village (not Ma Ma, Gong Gong, Mr Okada or Lin,
+// who'd rather be in bed, nor whoever's working) and a handful of tourists, all dancing. Wine sells much faster.
+export const DISCO_FROM = 20*60, DISCO_TO = 23*60 + 30;
+export const discoOn = day => dow(day) === 6, discoNow = (day, hm) => discoOn(day) && hm >= DISCO_FROM && hm < DISCO_TO;
+const DISCO_POOL = ["hana", "juniper", "bo", "opal", "theo", "marco", "ines", "farid", "mei", "felix", "elena", "amara", "mateo", "lila", "noor", "wren", "sofia", "tomo", "mum", "dad", "marcus", "angelina"];
+export const DISCO_SPOTS = [[200, 340], [260, 340], [320, 340], [380, 340], [440, 340], [170, 390], [230, 390], [290, 390], [350, 390], [410, 390], [470, 390], [220, 440], [280, 440], [340, 440], [400, 440], [260, 500]];
+export const discoCrowd = day => discoOn(day) ? [...groupFor(day + ":disco", 11, [], DISCO_POOL), ...groupFor(day + ":discot", 5, [], NIGHT_TOURISTS)] : [];
+export function discoSlot(id, day, hm){
+  if (!discoNow(day, hm)) return null; const i = discoCrowd(day).indexOf(id); if (i < 0) return null;
+  return {from: DISCO_FROM, to: DISCO_TO, scene: "cellar", at: DISCO_SPOTS[i], act: "dance", dir: i % 2 ? -1 : 1, disco: true};
+}
 export function clubSlot(id, day, hm){
   if (!wineClubNow(day, hm) || !clubMembers(day).includes(id)) return null;
   return {from: CLUB_FROM, to: CLUB_TO, scene: "cellar", wander: CLUB_WALK, club: true};

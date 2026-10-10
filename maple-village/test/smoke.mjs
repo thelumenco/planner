@@ -3245,6 +3245,26 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  console.log("\nSaturday disco night at the cellar door");
+  { const t = await import(new URL("../src/game/tours.js", import.meta.url)), sat = "2026-10-10", fri = "2026-10-09", crowd = t.discoCrowd(sat);
+    check(t.discoNow(sat, 21*60) && !t.discoNow(sat, 19*60) && !t.discoNow(fri, 21*60) && !t.discoNow(sat, 23*60 + 40), "disco night is Saturdays, 8 to 11:30pm");
+    check(crowd.length === 16 && !crowd.some(id => ["mama", "gonggong", "okada", "lin", "celeste", "pilar"].includes(id)) && crowd.filter(id => t.NIGHT_TOURISTS.includes(id)).length === 5 && t.discoSlot(crowd[0], sat, 21*60).act === "dance",
+      "a packed floor: most of the village (not Ma Ma, Gong Gong, Mr Okada or Lin, nor anyone working) and five tourists, all dancing"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`disco pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/dcpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = {...(f.goals || {}), cellar: true};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=21:00&date=2026-10-10"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=21:00&date=2026-10-10&dcpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(2500);
+  const dancers = await page.locator("#actors .npc.act-dance").count();
+  check(await page.locator("#sceneArt .disco .dball").count() === 1 && dancers >= 12, `the glitter ball's out and the floor's packed (${dancers} dancing)`);
+  await page.goto(url + "?seed=1&time=17:00&date=2026-10-10"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(1500);
+  check(await page.locator("#sceneArt .disco").count() === 0, "before 8 the cellar's its usual calm self");
+  await page.close();
+}
+{
   console.log("\nPilar's list, keeping things back, and more tapas");
   const k = await import(new URL("../src/game/kitchen.js", import.meta.url)), day = "2026-10-14", F = {coins: 0, inv: {}};
   const kk = k.kitchenState(F); Object.assign(kk.larder, {tulip: 2, flour: 3, potato: 4, egg: 4, tomato: 4, loaf: 2});

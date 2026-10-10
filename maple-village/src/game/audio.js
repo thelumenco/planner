@@ -62,6 +62,11 @@ export const TRACKS = {
   rain: {name: "Rain on the roof", mood: "Just rain, no music", rain: true, col: "#9CB4C9"},
   // live, not a record: the night market's jazz duo (keys and double bass) in F, swung. walk: the bass line, a note a
   // beat; the keys comp on the "and" of 2 and on 4, with a loose top line over it
+  // live, not a record (round 140): Saturday disco night in the cellar. Four on the floor at 120, octave-bouncing bass,
+  // bright stabs on the offbeats, Am7 to D9 and round again
+  disco: {name: "Disco night", live: true, bpm: 120, steps: 8, tone: "rhodes", comp: true, arpVel: .055, mel: .8,
+    bars: [[45, 60, 64, 67, 72], [38, 57, 60, 64, 66], [45, 60, 64, 67, 72], [43, 59, 62, 67, 71]],
+    walk: [[33, 45, 33, 45], [38, 50, 38, 50], [33, 45, 33, 45], [31, 43, 31, 43]]},
   jazz: {name: "The night market duo", live: true, bpm: 112, steps: 8, tone: "piano", swing: .17, comp: true, arpVel: .05, mel: .9,
     bars: [[43, 58, 62, 65, 69], [36, 58, 62, 64, 67], [41, 57, 60, 64, 67], [38, 57, 60, 65, 69], [43, 58, 62, 65, 70], [36, 58, 62, 64, 69], [41, 57, 64, 67, 72], [36, 58, 64, 67, 70]],
     walk: [[43, 45, 46, 47], [48, 46, 45, 43], [41, 43, 45, 46], [38, 40, 41, 42], [43, 46, 50, 48], [48, 47, 46, 45], [41, 45, 48, 45], [36, 38, 40, 42]]},
