@@ -235,7 +235,7 @@ export function sellTick(F, opts = {}){
   v.sold += out.bottles; v.glasses += out.glasses;
   const day = new Date(t + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
   ["picked", "filled", "stocked"].forEach(x => { v.today[x] = (v.today[x] || 0) + out[x]; });
-  v.today.plates = (v.today.plates || 0) + out.plates; v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
+  v.today.plates = (v.today.plates || 0) + out.plates; v.today.deliv = (v.today.deliv || 0) + (out.deliv || 0); v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
   return out;
 }
 
@@ -392,4 +392,10 @@ export function wireVine(root, F, api){
   root.querySelectorAll("[data-vystock]").forEach(b => b.onclick = () => { const line = stock(F, b.dataset.vystock); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyhelp]").forEach(inp => inp.onchange = () => { vineState(F).help[inp.dataset.vyhelp] = inp.checked; api.save(); });
   root.querySelectorAll("[data-vyprice]").forEach(inp => inp.onchange = () => { setPrice(F, inp.dataset.vyprice, +inp.value); api.save(); });
+}
+// the day's takings once the winery shuts at 10 (round 139): -> a line, or null. v.reported
+export function wineNews(F, day, hm){
+  const v = vineState(F), t = v.today; if (hm < 22*60 || v.reported === day) return null; v.reported = day; if (!t || t.day !== day || !t.coins) return null;
+  const bits = [t.bottles ? `${t.bottles} bottle${t.bottles === 1 ? "" : "s"}` : "", t.glasses ? `${t.glasses} glass${t.glasses === 1 ? "" : "es"}` : "", t.plates ? `${t.plates} plate${t.plates === 1 ? "" : "s"}` : ""].filter(Boolean);
+  return `Today ${shopName(F).replace(/^The /, "the ")} sold ${bits.length ? bits.join(", ").replace(/, ([^,]*)$/, " and $1") : "a little"}: ${t.coins} coins${t.deliv ? `, with ${t.deliv} order${t.deliv === 1 ? "" : "s"} out by bike` : ""}. It's in the till.`;
 }

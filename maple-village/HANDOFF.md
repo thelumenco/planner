@@ -2021,3 +2021,9 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Sofia making a fresh tub when the display runs out (Mel skipped this so far).
   - A drying rack you can see by the barrel shed while raisins dry.
   - More Jason, if Mel shares memories.
+
+### Round 139: the bike takes bonbons and tapas, every shop reports at closing, the drying rack
+- **Sending by bike (bikesend.js):** the delivery panel (`deliverMore` in core) also offers things from the other shops, when Tomo's on: a box of 4 bonbons and bars from the Cocoa Room (if Mel owns it), and plates of today's tapas and small plates from the winery. Each one uses real stock and sends a thank-you note (`dlv_bonbons`, `dlv_tapas`, `bar_*`). The bag button now reads "Send something by delivery bike".
+- **Takings at closing:** the Cocoa Room at 8 (`cocoaNews`, `c.reported`) and the winery at 10 (`wineNews`, `v.reported`). The winery note counts orders sent out by bike (`v.today.deliv`).
+- **The drying rack:** cane racks of amber and purple bunches drawn beside the barrel shed while `F.loft.rack` is set (`dryingRack` in town-cinque.js).
+- **Sofia does NOT make tubs (Mel: "I want to be the one to make the fresh tubs").** Don't automate tub-making.

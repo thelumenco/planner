@@ -218,3 +218,6 @@ export const cinqueRide = () => `<svg class="taxibank" viewBox="0 0 600 90" pres
   ${[150, 340, 540].map(x => `<path d="M${x} 60 q20 -26 40 0z" fill="#2F2B28"/>`).join("")}</g></svg>`;
 // round 134: the little painted boat by the home jetty, after a trip to Cinque Terre (Mel asked)
 export const homeBoat = (x, y, col = "#3E6BAE", stripe = "#F3D98A") => gozzo(x, y, col, stripe, "land", 1);
+// the cane drying rack by Mel's barrel shed (round 139): out while six bunches dry to raisins for the raisin wine
+export const dryingRack = (x, y) => `<g pointer-events="none"><ellipse cx="${x + 20}" cy="${y + 2}" rx="26" ry="4" fill="#6F7C9C" opacity=".18"/>${sk(`<path d="M${x} ${y} L${x + 6} ${y - 44} L${x + 12} ${y} M${x + 28} ${y} L${x + 34} ${y - 44} L${x + 40} ${y}" style="stroke:#8A6A52" stroke-width="2.4" fill="none"/>${[-36, -24, -12].map(dy => `<path d="M${x + 2} ${y + dy} H${x + 38}" style="stroke:#C9A27E" stroke-width="2"/>`).join("")}`
+  + [-36, -24, -12].map((dy, r) => [6, 15, 24, 33].map((dx, i) => `<g>${[[0, 3], [-2, 5.5], [2, 5.5], [0, 8]].map(([a, b2]) => `<circle cx="${x + dx + a}" cy="${y + dy + b2}" r="1.9" style="fill:${(r + i) % 2 ? "#9A6A3A" : "#C9A24A"}"/>`).join("")}</g>`).join("")).join(""), `<path d="M${x} ${y} L${x + 6} ${y - 44} L${x + 12} ${y} M${x + 28} ${y} L${x + 34} ${y - 44} L${x + 40} ${y}"/>`)}</g>`;

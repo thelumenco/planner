@@ -406,3 +406,9 @@ function giveSpecials(c){
   const have = Object.values(SPECIALS).filter(x => c.specials[x.id] > 0); if (!have.length) return "";
   return `<div class="actions">${have.map(x => `<button class="btn small alt" data-cc="takesp" data-k="${x.id}">${icon(x.id, 18)} ${esc(x.n)} to give (${c.specials[x.id]})</button>`).join("")}</div>`;
 }
+// the day's takings once the Cocoa Room shuts at 8 (round 139, like the Scoop Shack's): -> a line, or null. c.reported
+export function cocoaNews(c, day, hm){
+  if (hm < CLOSE || c.reported === day) return null; c.reported = day; const s = c.sold[day]; if (!s || !s.coins) return null;
+  const bits = [s.n ? `${s.n} bar${s.n === 1 ? "" : "s"}` : "", s.bonbons ? `${s.bonbons} bonbon${s.bonbons === 1 ? "" : "s"}` : "", s.hot ? `${s.hot} hot chocolate${s.hot === 1 ? "" : "s"}` : ""].filter(Boolean);
+  return `Today ${c.name.replace(/^The /, "the ")} sold ${bits.length ? bits.join(", ").replace(/, ([^,]*)$/, " and $1") : "chocolates"}: ${s.coins} coins${s.deliv ? `, ${s.deliv} of them delivered by bike` : ""}.`;
+}

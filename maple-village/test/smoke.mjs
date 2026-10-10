@@ -3224,6 +3224,27 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  console.log("\nthe bike takes bonbons and tapas too, and every shop says its takings at closing");
+  { const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), d = "2026-10-12";
+    const c = cc.cocoaState({}); c.sold[d] = {n: 3, coins: 40, bonbons: 6, deliv: 2}; const early = cc.cocoaNews(c, d, 19*60), eve = cc.cocoaNews(c, d, 20*60 + 5), again = cc.cocoaNews(c, d, 21*60);
+    check(!early && /sold 3 bars and 6 bonbons: 40 coins, 2 of them delivered by bike/.test(eve) && !again, "the Cocoa Room tells you the day's takings when it shuts at 8 (once)");
+    const F = {}; const v = vy.vineState(F); v.today = {day: d, bottles: 2, glasses: 5, plates: 9, coins: 120, deliv: 3};
+    check(/sold 2 bottles, 5 glasses and 9 plates: 120 coins, with 3 orders out by bike/.test(vy.wineNews(F, d, 22*60 + 5) || "") && !vy.wineNews(F, d, 23*60), "and the winery at 10"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`bikesend pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/bspatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.scoop = {up: {bike: 1}, recipes: [], tubs: {}}; f.goals = {...(f.goals || {}), cocoa: true}; f.cocoa = {bars: {milk: 3, dark: 0, white: 0}};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-12"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-12&bspatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="dbike"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gvother="bar:milk"]', { timeout: 15000 });
+  await page.click('#ctx [data-gvother="bar:milk"]'); await page.waitForSelector('#ctx [data-gvto="mum"]', { timeout: 15000 }); await page.click('#ctx [data-gvto="mum"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.cocoa.bars.milk === 2 && f.thanks.some(t => t.who === "mum" && t.item === "bar_milk")), "from the delivery bike: a milk chocolate bar off the Cocoa Room's wall, pedalled round to Mum (a thank-you note to come)");
+  await page.close();
+}
+{
   console.log("\nPilar's list, keeping things back, and more tapas");
   const k = await import(new URL("../src/game/kitchen.js", import.meta.url)), day = "2026-10-14", F = {coins: 0, inv: {}};
   const kk = k.kitchenState(F); Object.assign(kk.larder, {tulip: 2, flour: 3, potato: 4, egg: 4, tomato: 4, loaf: 2});
