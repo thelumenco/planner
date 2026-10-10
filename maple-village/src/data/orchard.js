@@ -23,8 +23,12 @@ export const TREES = {
   pear:      {n: "Pear tree", fruit: "pear", fn: ["pear", "pears"], seasons: ["autumn"], price: 30, yield: 4, sell: 4, col: "#C9D36A"},
   fig:       {n: "Fig tree", fruit: "fig", fn: ["fig", "figs"], seasons: ["autumn"], price: 35, yield: 3, sell: 5, col: "#7A4A6E"},
   orange:    {n: "Orange tree", fruit: "orange", fn: ["orange", "oranges"], seasons: ["winter"], price: 25, yield: 4, sell: 3, col: "#F08A3C"},
-  persimmon: {n: "Persimmon tree", fruit: "persimmon", fn: ["persimmon", "persimmons"], seasons: ["winter"], price: 35, yield: 3, sell: 5, col: "#E8743B"}
+  persimmon: {n: "Persimmon tree", fruit: "persimmon", fn: ["persimmon", "persimmons"], seasons: ["winter"], price: 35, yield: 3, sell: 5, col: "#E8743B"},
+  // round 129: Ma Ma brings a sapling home from Jeju (if she went); only then can the orchard grow them (unlock)
+  tangerine: {n: "Tangerine tree", fruit: "tangerine", fn: ["tangerine", "tangerines"], seasons: ["autumn", "winter"], price: 30, yield: 4, sell: 3, col: "#F29A2E", unlock: "jeju"}
 };
+// a tree that has to be unlocked first (the tangerine: F.jeju.sapling)
+export const treeOpen = (F, C) => !C || !C.unlock || !!(F && F.jeju && F.jeju.sapling);
 // bush: grows on a bush (top row of the flower farm) rather than in a bed. stem: what one stem fetches at the shop.
 export const FLOWERS = {
   tulip:      {n: "Tulips", one: "tulip", seasons: ["spring"], price: 6, col: "#E86A7C"},

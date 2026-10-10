@@ -24,7 +24,8 @@ export const KEEP_SPOTS = {
   cocoa1: {scene: "cocoa", at: [100, 128], n: "the Cocoa Room, above the bar wall"}, cocoa2: {scene: "cocoa", at: [356, 128], n: "the Cocoa Room, by the chalkboard"},
   green1: {scene: "greenhouse", at: [64, 140], n: "the greenhouse, on the glass"},
   mill1: {scene: "mill", at: [64, 128], n: "the old mill, by the photograph"},
-  fridge: {scene: "home", at: [328, 206], n: "home, on the fridge", only: "magnet"}   // no shelf: a magnet stuck on the fridge door
+  fridge: {scene: "home", at: [328, 206], n: "home, on the fridge", only: "magnet"},   // no shelf: a magnet stuck on the fridge door
+  fridge2: {scene: "home", at: [344, 226], n: "home, on the fridge (lower)", only: "magnet"}   // round 129: room for Jeju's magnet too
 };
 // what can go where: keepsakes, and souvenirs marked keep (towns.js), on shelves; fridge magnets only on the fridge
 export const canKeep = it => !!it && (it.kind === "keepsake" || !!it.keep);

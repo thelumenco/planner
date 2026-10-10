@@ -49,7 +49,8 @@ export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && s
 export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
 export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
 const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone", fish: "rod", guitar: "guitar", sketch: "sketchbook", photo: "camera", notes: "notebook", doze: "newspaper",
-  parasol: "parasol", wheel: "claycup", cranes: "crane", go: "goboard", skewer: "skewer", brush: "brush", fortune: "fortune"};   // (and these: Kyoto, round 122)   // (the last five: Ronda, round 107)
+  parasol: "parasol", wheel: "claycup", cranes: "crane", go: "goboard", skewer: "skewer", brush: "brush", fortune: "fortune",
+  kite: "kite", pick: "tbasket", nets: "net", stack: "stone"};   // (and these: Jeju, round 129; "luck" is an arm and "tandem" a bike)   // (and these: Kyoto, round 122)   // (the last five: Ronda, round 107)
 const outdoors = s => OUTDOOR.includes(s);
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 
@@ -58,6 +59,7 @@ function makeNode(id, look, kid, letter, act){
   g.setAttribute("class", "ch npc" + (act ? " act-" + act : "")); g.dataset.npc = id; g.setAttribute("role", "button");
   if (act && PROPS[act]) look = Object.assign({}, look, {extra: PROPS[act]});
   if (act === "sup") look = Object.assign({}, look, {board: true, hat: null});
+  if (act === "tandem") look = Object.assign({}, look, {bike: "#C8432F"});   // Jeju: Marcus and Angellina on the coast road
   const owned = (api.F().fam && api.F().fam.owned) || {};
   if (id === "darren" && act === "type" && owned.headphones) look = Object.assign({}, look, {headphones: true});
   // a rainy day outdoors: everyone has their own brolly or raincoat (a coat if their right hand's busy or they're on a board)

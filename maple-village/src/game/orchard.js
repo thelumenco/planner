@@ -8,7 +8,7 @@
 // today: {day, sold, coins}, tea}; potted flowers placed around the village live in F.pots {spot: flower id}.
 import { esc, H, now, hash } from "../util.js";
 import { ITEMS, seasonOf, SEASONS } from "../data/items.js";
-import { TREES, FLOWERS, TREE_GROW, TREE_FIRST, TREE_AGAIN, BED_GROW, BED_AGAIN, BUSH_GROW, BUSH_AGAIN, BED_YIELD, BUSH_YIELD,
+import { TREES, treeOpen, FLOWERS, TREE_GROW, TREE_FIRST, TREE_AGAIN, BED_GROW, BED_AGAIN, BUSH_GROW, BUSH_AGAIN, BED_YIELD, BUSH_YIELD,
   BOUQUET_STEMS, POT_STEMS, STEM_PRICE, BOUQUET_PRICE, POT_PRICE, POT_SPOTS } from "../data/orchard.js";
 import { icon } from "../art/icons.js";
 import { treePic, flowerPic } from "../art/orchard.js";
@@ -41,7 +41,7 @@ export function stateOf(where, p, today){
 // Plant in a spot (an empty one, or one whose plant has faded with the season). -> line for Maple, or null
 export function plant(F, where, i, id, today){
   const o = orchState(F), list = o[SPOTS[where]], C = cat(where)[id];
-  if (!C || !list || i < 0 || i >= list.length || !C.seasons.includes(seasonOf(today))) return null;
+  if (!C || !list || i < 0 || i >= list.length || !C.seasons.includes(seasonOf(today)) || (where === "tree" && !treeOpen(F, C))) return null;
   if (where !== "tree" && !!C.bush !== (where === "bush")) return null;
   const st = stateOf(where, list[i], today); if (st.stage !== "empty" && st.stage !== "faded") return null;
   if (F.coins < C.price) return null;
@@ -121,7 +121,7 @@ export function spotPanel(F, where, i, today){
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>${title}</h2>`;
   const pic = p ? (where === "tree" ? treePic(p.k, st.stage, 120) : flowerPic(p.k, st.stage, where === "bush", 120)) : "";
   if (st.stage === "empty" || st.stage === "faded") {
-    const opts = Object.keys(cat(where)).filter(id => cat(where)[id].seasons.includes(season) && (where === "tree" || !!cat(where)[id].bush === (where === "bush")));
+    const opts = Object.keys(cat(where)).filter(id => cat(where)[id].seasons.includes(season) && (where === "tree" ? treeOpen(F, cat(where)[id]) : !!cat(where)[id].bush === (where === "bush")));
     h += (st.stage === "faded" ? `<div class="orpic">${pic}</div><p class="sub">The ${nameOf(where, p.k).toLowerCase()} ${where === "tree" ? "has" : "have"} had their season. Plant something for ${SEASONS[season].n.toLowerCase()}.</p>`
       : `<p class="sub">An empty spot. What shall we plant? ${SEASONS[season].n} ${where === "tree" ? "saplings" : where === "bush" ? "bushes" : "seedlings"}, from Ma Ma's stall:</p>`);
     h += `<div class="items shop">${opts.map(id => { const C = cat(where)[id], off = F.coins < C.price;
@@ -168,7 +168,7 @@ export function shopPanel(F, today, tab, market){
   if (tab === "plant") {
     for (const where of ["tree", "bush", "bed"]) {
       const free = o[SPOTS[where]].filter(p => { const st = stateOf(where, p, today).stage; return st === "empty" || st === "faded"; }).length;
-      const opts = Object.keys(cat(where)).filter(id => cat(where)[id].seasons.includes(season) && (where === "tree" || !!cat(where)[id].bush === (where === "bush")));
+      const opts = Object.keys(cat(where)).filter(id => cat(where)[id].seasons.includes(season) && (where === "tree" ? treeOpen(F, cat(where)[id]) : !!cat(where)[id].bush === (where === "bush")));
       h += `<h3 class="ph3">${where === "tree" ? "Fruit trees" : where === "bush" ? "Flower bushes" : "Flower seedlings"} <small class="muted">${free} free spot${free === 1 ? "" : "s"}${where === "tree" ? " in the orchard" : " at the flower farm"}</small></h3>`;
       h += `<div class="items shop">${opts.map(id => { const C = cat(where)[id], off = !free || F.coins < C.price;
         return `<button class="item" data-or="plantany" data-where="${where}" data-k="${id}" ${off ? "disabled" : ""}><span class="e">${where === "tree" ? treePic(id, "ripe", 44, off) : flowerPic(id, "ripe", where === "bush", 44, off)}</span><span class="n">${esc(C.n)}</span><span class="c"><b>${C.price}</b> ${icon("coin", 13)}</span><span class="d">${where === "tree" ? `${C.yield} ${C.fn[1]} a day` : `${where === "bush" ? BUSH_YIELD : BED_YIELD} stems a picking`}</span></button>`; }).join("")}</div>`;

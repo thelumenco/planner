@@ -1849,3 +1849,47 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Music:** `jeju`, a gayageum in D pentatonic.
 - **Wish-tower (Mel):** in Honeybrook Woods by the river, not at home (`wishtower`). One stone a day, from 3 up to 9 (`F.wish = {n, day}`); Evan cheers.
 - **For now:** the divers' house, packing shed, market, café and dye workshop just say a line ("opens soon"). `acts` and `rooms` are empty until rounds 2–4.
+
+### Rounds 128–130: Jeju's goods, rooms, people, activities and family
+- **Goods** (TOWN_GOODS, bought with the shared `data-rbuy`):
+  - **Market hall (`jj_market`):** tangerines, hallabong, omija berries, Jeju black pork, tangerine chocolates; a stone-grandfather keepsake (`j_hareubang`); the Jeju fridge magnet (`j_magnet`, magnet).
+  - **Divers' house (`jj_haenyeo`):** abalone; a diver's float keepsake (`j_tewak`).
+  - **Packing shed (`jj_shed`):** a box of tangerines, tangerine marmalade.
+  - **Café (`jj_cafe`):** green tea from the slopes, tangerine cake.
+  - **Dye workshop (`jj_dye`):** persimmon-dyed tote, galot shirt.
+  - The magnet, tote and shirt are keep-or-gift (`KEEP_LINES`).
+- **Tangerines are a real orchard fruit:**
+  - `TREES.tangerine` (autumn and winter, `unlock: "jeju"`), gated by `treeOpen(F, C)`, which checks `F.jeju.sapling`.
+  - That makes the fruit item, its icon, tangerine gelato and the bonbon filling automatic.
+  - New INGR: hallabong, omija. New kitchen GOODS: tangerine, hallabong, omija, blackpork, abalone.
+  - New TAPAS: black pork with tangerine glaze, abalone with garlic butter, hallabong with omija syrup. The autumn tapas test now counts 38.
+- **Five rooms** (`TOWNS.jeju.rooms`, art/jeju-rooms.js, each with its own live track `jj_*` in audio.js):
+  - divers' house (stove and porridge pot, wetsuits, nets, floats)
+  - packing shed (sorting table, crates, ladder, radio)
+  - café (sea window, low tables, bookshelf)
+  - market hall (four stalls, bulbs, the slow-post box)
+  - dye workshop (cloth on the beams, drying rack, tubs)
+- **Activities** (game/jeju.js, `data-jj`):
+  - **Breath song (free):** dive, then "come up and whistle" while the depth gauge (`.jjdepth`) is in the green (`DIVE` LO .62 to HI .9 of 3.2s). Three dives; two good ones get an abalone (once a day).
+  - **Tangerine sorting:** small, medium or large into Mr Ko's crates, 8 against a 30s clock (`.jjtang[data-size]`). Six right gets a bag of 3–4 tangerines (once a day).
+  - **Persimmon dye (12):** four steps in order. Then `F.jeju.dye = {from}` and the scarf hangs on the home washing line (`dyeCloth`, `data-rdspot="dyecloth"` on base, the one rdspot outside a town room). It darkens over 3 days, then `takeDye` gives the `j_scarf` keepsake.
+  - **Also:** café drinks (`cafe:*`), abalone porridge (9), and the slow-post box (2). A postcard to yourself or the family arrives in the mailbox 14 days later (`slowMail`).
+- **People** (local "jeju"):
+  - Locals: Halmang Kim (diver, 74), Seo-yeon (learning to dive), Mr Ko (tangerines), Ha-eun (café), Mi-ok (tangerine stall), Mrs Boo (omija), Mr Moon (dye), Captain Oh (ferry), Mr Kang (nets), Mr Hyun (station).
+  - Tourists: Ji-ho and Min-ji (honeymoon), Takeshi (cycling), Bronwyn (Olle trail), Lukas (geology), Mei-li.
+  - Every room has at least two people across the day.
+- **Family acts in Jeju** (new props in people.js; a test checks they're new against Ronda and Kyoto):
+  - Mum: a kite.
+  - Dad: pats the stone grandfather's nose (`luck`, an arm animation).
+  - Ma Ma: picks tangerines into a basket.
+  - Gong Gong: mends nets next to Mr Kang.
+  - Darren: stacks a wish-tower stone.
+  - Marcus and Angellina: a tandem on the coast road (`tandem` puts them on red bikes).
+  - Evan: nets crabs at the rock pools (with Evan along, tapping the pools).
+- **Touches:**
+  - Halmang gives Evan a sea snail shell (`j_shell`, once).
+  - Arriving before 8am, the sun's coming up over Seongsan.
+  - The radio in the shed and the café's sea window are tappable.
+  - Rub the stone grandfathers' noses; add a stone to the wish-towers.
+  - Ma Ma brings home a tangerine sapling (`F.jeju.sapling`), which unlocks tangerine trees in the orchard.
+  - A second fridge-magnet spot (`fridge2`).

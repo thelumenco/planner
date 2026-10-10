@@ -97,3 +97,12 @@
 .ch.npc.act-sketch:not(.walk) .tool{animation:tapT .6s ease-in-out infinite alternate}
 .npc.act-doze:not(.walk) .legL,.npc.act-doze:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}.npc.act-doze:not(.walk) > g{transform:translateY(7px)}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-guitar .tool,.ch.npc.act-dance > g,.ch.npc.act-dance .armL,.ch.npc.act-dance .armR,.ch.npc.act-haggle .armR,.ch.npc.act-sketch .tool{animation:none}}
+/* Jeju (round 129): Mum's kite tugs on its string, Dad pats the stone grandfather's nose, Ma Ma picks, Gong Gong mends, Darren stacks */
+.ch.npc .kitefly{transform-box:fill-box;transform-origin:0% 100%;animation:kitefly 3.2s ease-in-out infinite alternate}
+@keyframes kitefly{from{transform:rotate(-4deg)}to{transform:rotate(5deg)}}
+.ch.npc.act-luck:not(.walk) .armR{animation:luckA 1.2s ease-in-out infinite alternate}
+@keyframes luckA{from{transform:rotate(-150deg)}to{transform:rotate(-128deg)}}
+.ch.npc.act-pick:not(.walk) .tool,.ch.npc.act-stack:not(.walk) .tool{animation:tapT 1s ease-in-out infinite alternate}
+.ch.npc.act-pick:not(.walk) .armR,.ch.npc.act-stack:not(.walk) .armR{animation:tapA 1s ease-in-out infinite alternate}
+.ch.npc.act-nets:not(.walk) .armL,.ch.npc.act-nets:not(.walk) .armR{animation:typeA .5s ease-in-out infinite alternate}
+@media (prefers-reduced-motion:reduce){.ch.npc .kitefly,.ch.npc.act-luck .armR{animation:none}}

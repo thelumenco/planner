@@ -869,3 +869,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .ktbreath span{width:50px;height:50px;border-radius:50%;background:radial-gradient(#FFF6D8,#E8D3A8);border:2px solid var(--line);animation-name:ktbreath;animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-fill-mode:both}
 @keyframes ktbreath{0%{transform:scale(1)}50%{transform:scale(2.6)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.ktpulse span,.ktbreath span{animation-duration:0s!important}}
+/* Jeju (round 128): the divers' depth gauge, and Mr Ko's tangerine */
+.jjdepth{position:relative;height:22px;margin:10px 0;border-radius:11px;background:linear-gradient(90deg,#BFE0F2,#3E7CC0);border:1.4px solid var(--line);overflow:hidden}
+.jjdepth .jjzone{position:absolute;top:0;bottom:0;background:rgba(126,186,104,.75);border-left:1.4px dashed var(--line);border-right:1.4px dashed var(--line)}
+.jjdepth .jjfill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(47,43,40,.35);animation-name:jjdive;animation-timing-function:linear;animation-fill-mode:forwards}
+@keyframes jjdive{from{width:0}to{width:100%}}
+.jjtang{display:flex;justify-content:center;margin:8px 0}
+@media (prefers-reduced-motion:reduce){.jjdepth .jjfill{animation-duration:3200ms !important}}

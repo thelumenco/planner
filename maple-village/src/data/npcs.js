@@ -571,6 +571,110 @@ export const NPCS = [
       [slot("9:30", "11:30", "kt_tea", [260, 300], {act: "sit"}), slot("11:30", "13:30", "kt_market", [[220, 470], [320, 520]]), slot("13:30", "15:30", "kt_lane", [[260, 540], [320, 300]]), slot("15:30", "17:30", "kt_temple", [[240, 400], [300, 560]]), slot("17:30", "19:30", "kt_river", [[180, 500], [320, 270]])],
       ["Mum's in the pottery buying a seventh teapot. Send help.", "The koi in the temple pond are bigger than my cat.", "I didn't think anywhere could be this quiet and this busy at once."]]
   ].map(([id, name, look, job, intro, routine, lines]) => ({id, local: "kyoto", tourist: true, pitch: .95 + (id.charCodeAt(0) % 4)*.07, name, job, intro, look, routine, lines, away: `${name}'s off seeing another bit of Kyoto.`})),
+  // Round 129: Jeju's people (local: "jeju"). Halmang Kim is a diver (haenyeo), seventy-four, and Seo-yeon is learning
+  // from her; Mr Ko grows tangerines; Ha-eun keeps the café in her grandmother's house; Mi-ok and Mrs Boo have stalls at
+  // the market; Mr Moon dyes cloth with green persimmons; Captain Oh runs the ferry; Mr Kang mends nets by the harbour;
+  // Mr Hyun keeps the station. And six tourists, so the rooms and the trail never feel empty.
+  {
+    id: "halmang", local: "jeju", pitch: 0.9, name: "Halmang Kim", job: "A haenyeo diver, seventy-four, diving since she was fifteen",
+    intro: "Kim. Everyone calls me Halmang: grandma. Sixty years in the sea, and it still surprises me. You want to learn the breath song?",
+    look: {skin: "#D9A57E", hair: "#B9B0A4", hairStyle: "curly", top: "#2F2B28", bottom: "#2F2B28"},
+    routine: [slot("8:00", "12:00", "jj_shore", [[300, 250], [360, 250]], {dir: -1}), slot("12:00", "18:00", "jj_haenyeo", [250, 262], {act: "sit"})],
+    lines: ["Breathe like the sea. In slowly, out slowly. Then dive.", "When we come up, we whistle. Fweee! So the others know we're alive.", "Never take the small ones. The sea is a field: you leave some for next year.", "My knees are old. Under the water, I'm twenty."],
+    away: "Halmang's resting. Even the sea has a tide out."
+  },
+  {
+    id: "seoyeon", local: "jeju", pitch: 1.12, name: "Seo-yeon", job: "Learning to dive from Halmang Kim",
+    intro: "Seo-yeon! I was an accountant in Seoul. Now I'm the youngest diver in the village, by forty years. Halmang says I breathe too loud.",
+    look: {skin: "#EAC4A0", hair: "#1E1A18", hairStyle: "long", top: "#3E7CC0", bottom: "#2F2B28"},
+    routine: [slot("8:00", "12:00", "jj_shore", [[440, 300], [400, 280]]), slot("13:00", "17:00", "jj_haenyeo", [[380, 390], [300, 400]])],
+    lines: ["Two minutes, I can hold my breath now. Halmang can do three. At seventy-four.", "There used to be thousands of divers here. Now there are a few hundred. I'm going to be one.", "The porridge is the best part. Don't tell Halmang I said that.", "Spreadsheets were safer. This is better."],
+    away: "Seo-yeon's out practising in the shallows."
+  },
+  {
+    id: "mrko", local: "jeju", pitch: 0.78, name: "Mr Ko", job: "Grows tangerines, the fourth generation",
+    intro: "Ko. My great-grandfather planted the first trees here. The walls keep the wind off. The wind makes them sweet. You see? Everything helps.",
+    look: {skin: "#C99A78", hair: "#3A3430", hairStyle: "short", top: "#5E8A48", bottom: "#5A4A3E", hat: "cap"},
+    routine: [slot("8:00", "12:00", "jj_shed", [260, 326], {dir: 1}), slot("12:00", "14:00", "jj_farms", [[150, 300], [220, 330]]), slot("14:00", "18:00", "jj_shed", [260, 326], {dir: 1})],
+    lines: ["Small ones are the sweetest. Everyone wants the big ones. Strange people.", "Hallabong, that's the one with the top-knot. Like a little hat.", "The trees don't care about you. Care about them anyway.", "Sort, sort, sort. December is a long month."],
+    away: "Mr Ko's out in the orchard, talking to the trees."
+  },
+  {
+    id: "haeun", local: "jeju", pitch: 1.08, name: "Ha-eun", job: "Runs the café in her grandmother's stone house",
+    intro: "Welcome! I'm Ha-eun. This was my grandmother's house: she'd hate the coffee machine and love the view. Sit anywhere!",
+    look: {skin: "#EAC4A0", hair: "#3A2A20", hairStyle: "bob", top: "#F3ECDD", bottom: "#5E7A8A", extra: "apron"},
+    routine: [slot("9:00", "19:00", "jj_cafe", [300, 262], {dir: -1})],
+    lines: ["The tangerine latte sounds strange. Trust me.", "My grandmother dried persimmons on that beam. I hang plants there now.", "Every table has the sea in the window. I made sure.", "Omija means five flavours. The sixth is the view."],
+    away: "The café's closed. Ha-eun's walking the coast path."
+  },
+  {
+    id: "miok", local: "jeju", pitch: 1.0, name: "Mi-ok", job: "Sells tangerines and sweets at the market",
+    intro: "Mi-ok! Here, take a tangerine. Everybody gets one. That's the rule. My rule.",
+    look: {skin: "#D9A57E", hair: "#2A211D", hairStyle: "curly", top: "#F29A2E", bottom: "#3A3430", extra: "apron"},
+    routine: [slot("8:00", "18:00", "jj_market", [440, 316], {dir: -1})],
+    lines: ["Tangerine chocolate! Tangerine jelly! Tangerine tangerines!", "You look tired. Have a tangerine.", "My husband grows them, I sell them, my son eats them. Family business.", "The hallabong are good this week. Feel how heavy."],
+    away: "Mi-ok's stall is covered with a cloth. Back tomorrow!"
+  },
+  {
+    id: "mrsboo", local: "jeju", pitch: 0.86, name: "Mrs Boo", job: "Sells omija and tea by the scoop",
+    intro: "Boo. Omija, five flavours: sweet, sour, salty, bitter, spicy. Like life. One scoop or two?",
+    look: {skin: "#C99A78", hair: "#D6D0C6", hairStyle: "bun", top: "#C8324A", bottom: "#5A4A3E"},
+    routine: [slot("8:00", "17:00", "jj_market", [80, 446], {dir: 1})],
+    lines: ["Omija tea in summer, cold. In winter, hot. All year, good.", "This green tea grew on the mountain. You can taste the clouds.", "Young people want everything sweet. Life isn't only sweet.", "Two scoops. You look like a two-scoop person."],
+    away: "Mrs Boo's gone home for her nap."
+  },
+  {
+    id: "jaewon", local: "jeju", pitch: 0.8, name: "Mr Moon", job: "Dyes cloth with green persimmons (galot)",
+    intro: "Moon Jae-won. My hands? Persimmon juice. They've been orange for thirty years. The cloth starts green, and the sun finishes it.",
+    look: {skin: "#C99A78", hair: "#3A3430", hairStyle: "short", top: "#B26A36", bottom: "#9E5A2E"},
+    routine: [slot("9:00", "18:00", "jj_dye", [200, 412], {dir: 1})],
+    lines: ["Galot doesn't hold dirt. Farmers loved it. Their wives loved it more.", "Three days of sun. Every day, a different colour.", "Crush, soak, wring, sun. That's all. That's everything.", "The green persimmons must be picked in August. Not before, not after."],
+    away: "Mr Moon's turning the cloth out in the sun."
+  },
+  {
+    id: "captoh", local: "jeju", pitch: 0.74, name: "Captain Oh", job: "Captains the ferry to Honeybrook",
+    intro: "Oh. Captain Oh. I've crossed to Honeybrook four thousand times. I still look for the dolphins every time.",
+    look: {skin: "#D9A57E", hair: "#3A3430", hairStyle: "short", top: "#FFFDF6", bottom: "#2E3A5A", hat: "cap"},
+    routine: [slot("7:00", "22:00", "jj_harbour", [[240, 420], [260, 440]])],
+    lines: ["The last ferry's at ten. I don't wait. Well. I wait a bit.", "The horse lighthouses: red on the left coming in, white on the right.", "Squid boats go out at dusk. All those lights on the sea: like a city.", "Calm crossing today. Tell the little one to look for dolphins."],
+    away: "Captain Oh's ferry is out on the water."
+  },
+  {
+    id: "mrkang", local: "jeju", pitch: 0.7, name: "Mr Kang", job: "Mends fishing nets by the harbour",
+    intro: "Kang. Nets. Fifty years of nets. Sit, if you like. The gulls will keep you company.",
+    look: {skin: "#C99A78", hair: "#D6D0C6", hairStyle: "short", top: "#5E7A8A", bottom: "#5A4A3E", hat: "cap"},
+    routine: [slot("9:00", "17:00", "jj_harbour", [300, 480], {act: "nets", dir: 1})],
+    lines: ["A net with a hole catches nothing. A man with a hole in his day catches up.", "Your grandfather? He mends a good knot. Tell him to come back.", "Squid tonight. You can smell it in the wind.", "Pass me that needle. Thank you."],
+    away: "Mr Kang's gone for lunch: grilled mackerel, every day."
+  },
+  {
+    id: "mrhyun", local: "jeju", pitch: 0.82, name: "Mr Hyun", job: "Keeps Jeju station",
+    intro: "Hyun, stationmaster! The sea bridge is the longest in the country. I check every train across it myself. Well. I wave at them.",
+    look: {skin: "#EAC4A0", hair: "#3A3430", hairStyle: "short", top: "#3E7CC0", bottom: "#2F2B28", hat: "cap"},
+    routine: [slot("7:00", "22:00", "jj_village", [[440, 584], [380, 584]])],
+    lines: ["Last train to Honeybrook at ten. Not one minute after.", "On a clear day you can see Hallasan from the platform. Today: clouds. Tomorrow: maybe.", "The stone grandfathers watch the station too. Very reliable.", "Tangerine? Mi-ok gave me forty."],
+    away: "Mr Hyun's in the ticket office with the kettle on."
+  },
+  ...[
+    ["jiho", "Ji-ho", {skin: "#EAC4A0", hair: "#1E1A18", hairStyle: "short", top: "#FFFDF6", bottom: "#3E5E7A"}, "On honeymoon from Seoul", "Ji-ho! From Seoul, on our honeymoon. Everyone comes to Jeju on honeymoon. My parents did. Their parents did.",
+      [slot("9:00", "11:00", "jj_shore", [[260, 320], [420, 460]]), slot("11:00", "13:00", "jj_cafe", [380, 520], {act: "sit"}), slot("13:00", "15:00", "jj_farms", [[262, 360], [300, 520]]), slot("15:00", "17:00", "jj_market", [[220, 470], [320, 520]]), slot("17:00", "19:00", "jj_village", [[240, 320], [300, 420]])],
+      ["My wife wants a photo with every stone grandfather on the island. There are forty-five.", "We climbed the crater for the sunrise. It was cloudy. Worth it.", "Have you tried the black pork? Twice? Good."]],
+    ["minji", "Min-ji", {skin: "#F2D3BC", hair: "#2A211D", hairStyle: "long", top: "#F2A0B8", bottom: "#FFFDF6", hat: "sunhat"}, "On honeymoon from Seoul", "Min-ji! We're on honeymoon. Ji-ho's carrying all the tangerines. That's marriage.",
+      [slot("9:00", "11:00", "jj_shore", [[280, 330], [440, 470]]), slot("11:00", "13:00", "jj_cafe", [420, 520], {act: "sit"}), slot("13:00", "15:00", "jj_farms", [[282, 370], [320, 520]]), slot("15:00", "17:00", "jj_dye", [[300, 460], [360, 520]]), slot("17:00", "19:00", "jj_village", [[260, 330], [320, 430]])],
+      ["I want a persimmon dress. Mr Moon says three days. We fly home tomorrow!", "The divers are so strong. I want to be like that at seventy.", "Everything here is orange. My new favourite colour."]],
+    ["takeshi", "Takeshi", {skin: "#EAC4A0", hair: "#1E1A18", hairStyle: "short", top: "#E8B13A", bottom: "#2F2B28", hat: "helmet"}, "Cycling round the whole island", "Takeshi, from Osaka! I'm cycling round the island. Two hundred and thirty kilometres. Day three. My legs have opinions.",
+      [slot("9:00", "11:00", "jj_harbour", [[300, 300], [420, 480]]), slot("11:00", "13:00", "jj_market", [[300, 520], [200, 480]]), slot("13:00", "15:00", "jj_shed", [[200, 540], [320, 540]]), slot("15:00", "17:00", "jj_shore", [[420, 340], [300, 520]]), slot("17:00", "19:00", "jj_cafe", [110, 516], {act: "sit"})],
+      ["The coast road has a stamp booth every twenty kilometres. I've got eleven.", "Headwind. Always headwind. How is it headwind both ways?", "Tangerine juice is a sports drink. I've decided."]],
+    ["bronwyn", "Bronwyn", {skin: "#F6D9C4", hair: "#C9A06A", hairStyle: "bob", top: "#5E8A48", bottom: "#8A6A52", extra: "satchel", hat: "sunhat"}, "Walking the Olle trail, from Brisbane", "Bronwyn, from Brisbane! I'm walking the Olle trail: follow the blue and orange ribbons. Twenty-seven routes. I'm on route seven. Ish.",
+      [slot("8:30", "10:30", "jj_farms", [[262, 300], [300, 460]]), slot("10:30", "12:30", "jj_shed", [[140, 520], [380, 530]]), slot("12:30", "14:30", "jj_haenyeo", [[200, 540], [320, 560]]), slot("14:30", "16:30", "jj_shore", [[260, 300], [440, 440]]), slot("16:30", "18:30", "jj_dye", [[240, 480], [340, 470]])],
+      ["Follow the ribbons. Blue goes forward, orange goes back. Or the other way. Look, I'm here, aren't I.", "Mr Ko let me sort tangerines. He said I'm 'acceptable'. Highest praise.", "The divers whistled at me. I whistled back. Now we're friends."]],
+    ["lukas", "Lukas", {skin: "#F6D9C4", hair: "#8A5A3A", hairStyle: "short", top: "#3E5E7A", bottom: "#5A4A3E", extra: "satchel", hat: "glasses"}, "A geology student from Munich", "Lukas, from Munich. I'm studying the crater. It's a tuff cone, from an eruption under the sea. Sorry. I get excited.",
+      [slot("8:30", "11:00", "jj_shore", [[230, 260], [180, 300]]), slot("11:00", "13:00", "jj_market", [[260, 520], [200, 400]]), slot("13:00", "15:00", "jj_village", [[230, 260], [300, 300]]), slot("15:00", "17:00", "jj_cafe", [430, 376], {act: "sit"}), slot("17:00", "19:00", "jj_harbour", [[300, 260], [400, 400]])],
+      ["Every black stone here was once lava. Every single one. Even the grandfathers.", "The walls have gaps on purpose: the wind goes through, the walls stay up.", "I've taken eight hundred photos of rocks. My mother is worried."]],
+    ["meili", "Mei-li", {skin: "#F2D3BC", hair: "#1E1A18", hairStyle: "bobfringe", top: "#F3D34A", bottom: "#5E7A8A"}, "On holiday with her family, from Taipei", "Mei-li! From Taipei, with my parents and my little brother. He's somewhere. Probably eating.",
+      [slot("9:30", "11:30", "jj_village", [[220, 400], [300, 480]]), slot("11:30", "13:30", "jj_dye", [[240, 460], [320, 520]]), slot("13:30", "15:30", "jj_market", [[220, 480], [300, 540]]), slot("15:30", "17:30", "jj_haenyeo", [[150, 540], [300, 560]]), slot("17:30", "19:30", "jj_farms", [[262, 420], [300, 540]])],
+      ["My brother rode a pony and now he wants one. We live in a flat.", "I dyed a scarf! It's green. Mr Moon says it'll be brown. I'm confused.", "The porridge at the divers' house is green too. Everything's green and orange here."]]
+  ].map(([id, name, look, job, intro, routine, lines]) => ({id, local: "jeju", tourist: true, pitch: .95 + (id.charCodeAt(0) % 4)*.07, name, job, intro, look, routine, lines, away: `${name}'s off seeing another bit of Jeju.`})),
   // cabin, and fishes the pool on Saturday evenings
   {
     id: "wren", pitch: 1.05, name: "Wren", job: "Honeybrook Woods' ranger",

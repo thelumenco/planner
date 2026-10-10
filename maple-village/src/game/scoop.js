@@ -42,7 +42,7 @@ export const FORMATS = {cup: {n: "Cup", p: 4}, cone: {n: "Cone", p: 4}, float: {
 const FMT_W = [["cup", .34], ["cone", .4], ["float", .1], ["waffle", .16]];
 
 // What can go into a flavour: [display name, the word used in flavour names, colour]
-const FRUIT_COL = {cherry: "#C2334D", lemon: "#F3E27A", peach: "#F5B08A", mango: "#F3B33A", apple: "#B9D98A", pear: "#D9E39A", fig: "#8C5A7A", orange: "#F39A3A", persimmon: "#E8823A"};
+const FRUIT_COL = {cherry: "#C2334D", lemon: "#F3E27A", peach: "#F5B08A", mango: "#F3B33A", apple: "#B9D98A", pear: "#D9E39A", fig: "#8C5A7A", orange: "#F39A3A", persimmon: "#E8823A", tangerine: "#F29A2E"};
 export const INGR = {
   milk: ["Milk", "Milk", "#FFFBEF"], honey: ["Honey", "Honey", "#F3C969"], egg: ["Egg", "Custard", "#F6E3A1"], olives: ["Olives", "Olive", "#9DAF6A"],
   strawberry: ["Strawberries", "Strawberry", "#E8566C"], blueberry: ["Blueberries", "Blueberry", "#5E6EB8"], pumpkin: ["Pumpkin", "Pumpkin", "#E8913A"],
@@ -54,6 +54,7 @@ export const INGR = {
   basil: ["Basil", "Basil", "#7FB86A"], rosemary: ["Rosemary", "Rosemary", "#8FA88A"], thyme: ["Thyme", "Thyme", "#9DB08A"],   // greenhouse herbs (round 109)
   almond: ["Marcona almonds", "Almond", "#E8D3A8"], sevilla: ["Seville oranges", "Bitter Orange", "#F28C28"], membrillo: ["Membrillo", "Quince", "#D98A4A"], oliveoil: ["Olive oil", "Olive Oil", "#C9C25A"],   // from Ronda (round 107)
   yuzu: ["Yuzu", "Yuzu", "#F3D34A"], hojicha: ["Hōjicha", "Hōjicha", "#A8754F"], mochi: ["Mochi", "Mochi", "#FBEFF2"], sakura: ["Sakura", "Sakura", "#F6C7D6"],   // from Kyoto (round 122)
+  hallabong: ["Hallabong", "Hallabong", "#F28C28"], omija: ["Omija berries", "Omija", "#C8324A"],   // from Jeju (round 128; tangerines come in as an orchard fruit)
   housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
   goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
   yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)

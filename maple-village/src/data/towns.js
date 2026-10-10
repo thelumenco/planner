@@ -187,10 +187,31 @@ export const TOWNS = {
       marcus: {jj_shore: [[420, 560], [220, 300]], jj_farms: [[300, 260], [200, 480]], jj_harbour: [[440, 300], [260, 560]], jj_village: [[300, 480], [220, 400]]},
       angelina: {jj_shore: [[440, 300], [280, 360]], jj_farms: [[240, 300], [300, 520]], jj_harbour: [[360, 400], [300, 260]], jj_village: [[240, 440], [300, 300]]}
     },
-    // what they do comes in round 4 (all new: Mum's kite, Dad and the stone grandfather, Ma Ma picking tangerines,
-    // Gong Gong mending nets, Darren's wish-tower, Marcus and Angellina's tandem, Evan's rock-pool net)
-    acts: {},
-    rooms: {},
+    // what they do (round 129, nothing they did in Ronda or Kyoto): Mum flies a kite, Dad pats the stone grandfather's
+    // nose for luck, Ma Ma picks tangerines, Gong Gong mends nets with Mr Kang, Darren builds a wish-tower, Marcus and
+    // Angellina ride a tandem along the coast road. (Evan's rock-pool net is core.js, at the rock pools.)
+    acts: {
+      mum: {jj_shore: {act: "kite", at: [330, 300], dir: -1}, jj_farms: {act: "kite", at: [300, 380]}},
+      dad: {jj_village: {act: "luck", at: [238, 124], dir: -1}},
+      mama: {jj_farms: {act: "pick", at: [150, 290], dir: -1}, jj_shed: {act: "pick", at: [140, 520]}},
+      gonggong: {jj_harbour: {act: "nets", at: [352, 500], dir: -1}},
+      darren: {jj_farms: {act: "stack", at: [176, 540], dir: -1}},
+      marcus: {jj_shore: {act: "tandem", at: [400, 330], dir: -1}, jj_harbour: {act: "tandem", at: [400, 340], dir: 1}},
+      angelina: {jj_shore: {act: "tandem", at: [440, 336], dir: -1}, jj_harbour: {act: "tandem", at: [440, 346], dir: 1}}
+    },
+    // round 128: the five interiors, behind the doors on the shore, the farms, the harbour and the village
+    rooms: {
+      jj_haenyeo: {door: "jjhaenyeo", n: "The divers' house", music: "jj_haenyeo", party: [[200, 560], [330, 560], [120, 520], [420, 540]],
+        say: "The divers' house: a stone room warm from the stove, wetsuits and nets hung round the walls, orange floats stacked to the ceiling, and a pot of abalone porridge bubbling."},
+      jj_shed: {door: "jjshed", n: "The packing shed", music: "jj_shed", party: [[200, 560], [330, 560], [120, 540], [420, 540]],
+        say: "The packing shed: crates of tangerines everywhere, the sorting table down the middle, a radio playing, and the sweet sharp smell of peel."},
+      jj_cafe: {door: "jjcafe", n: "The stone-house café", music: "jj_cafe", party: [[200, 540], [330, 560], [120, 520], [420, 520]],
+        say: "The café: black stone walls, old wooden beams, low tables by a window full of sea, and a counter piled with tangerines."},
+      jj_market: {door: "jjmarket", n: "The market hall", music: "jj_market", party: [[200, 480], [320, 480], [260, 560], [140, 420]],
+        say: "The market hall: four stalls under strings of bulbs, grilled fish, sesame, seaweed hanging in sheets, and everyone offering you a tangerine."},
+      jj_dye: {door: "jjdye", n: "The dye workshop", music: "jj_dye", party: [[200, 560], [330, 560], [120, 540], [420, 540]],
+        say: "The dye workshop: tubs of crushed green persimmon, cloth hung from every beam in every shade from pale green to rust, and Mr Moon with orange hands."}
+    },
     lines: {
       mum: ["The wind here! Hold on to your hat, Mel. Hold on to Evan.", "Black stone walls everywhere, with gaps in them. So the wind goes through and they never fall down. Clever.", "I'd like to see the sunrise from that crater. Not at five in the morning, though."],
       dad: ["Every one of those walls is dry stone. No mortar. Just balance.", "Look at the rope on those roofs, tied down in a net against the wind.", "The divers are out. Seventy years old, some of them, and they hold their breath for two minutes."],
@@ -203,16 +224,16 @@ export const TOWNS = {
     },
     say: {
       jjcone: "Seongsan, the sunrise peak: a crater left by an eruption under the sea, five thousand years ago, now a great green bowl with grass on the rim. People climb it in the dark to watch the sun come up out of the sea.",
-      jjhaenyeo: "The divers' house: low black stone walls, a thatched roof, wetsuits drying on a line and orange floats stacked by the door. The haenyeo eat here after a dive. (Its door opens soon.)",
+      jjhaenyeo: "The divers' house: low black stone walls, a thatched roof, wetsuits drying on a line and orange floats stacked by the door. The haenyeo eat here after a dive.",
       jjpools: "The rock pools: black rock full of little pools, with sea snails, tiny crabs and green weed waving. The tide's going out.",
       jjorchard: "The tangerine orchards: rows of little trees heavy with fruit, each field behind a low black stone wall to keep the wind off.",
-      jjshed: "The packing shed: blue roof, crates stacked up, and the sweet smell of tangerines. (Its doors open soon.)",
+      jjshed: "The packing shed: blue roof, crates stacked up, and the sweet smell of tangerines.",
       jjponies: "Jeju ponies: small, sturdy and shaggy, grazing in the stone-walled field. They've lived on the island for hundreds of years.",
       jjcairns: "The wish-towers: little piles of black stones along the trail. Everyone who walks by adds one and makes a wish.",
-      jjmarket: "The market hall: the smell of grilled fish and sesame, stalls of dried seaweed, tangerines and chocolate. (Its stalls open soon.)",
+      jjmarket: "The market hall: the smell of grilled fish and sesame, stalls of dried seaweed, tangerines and chocolate.",
       jjlights: "The horse lighthouses: two little lighthouses shaped like Jeju ponies, one red and one white, guarding the harbour mouth.",
-      jjcafe: "The stone-house café: an old black stone house with a tangerine painted on the door. (It opens soon.)",
-      jjdye: "The dye workshop: lengths of cloth drying in the sun, from pale green to deep rusty orange. They're dyed with green persimmon juice. (Its door opens soon.)",
+      jjcafe: "The stone-house café: an old black stone house with a tangerine painted on the door.",
+      jjdye: "The dye workshop: lengths of cloth drying in the sun, from pale green to deep rusty orange. They're dyed with green persimmon juice.",
       jjstatues: "The stone grandfathers (dol hareubang): carved from black volcanic rock, with big round eyes, hats and hands on their tummies. They keep the village safe."
     }
   }
@@ -299,6 +320,9 @@ export const TOWN_PLACES = {
   jjlights: {scene: "jj_harbour", name: "The horse lighthouses", door: [150, 560], spot: true, mark: [100, 480], line: "The horse lighthouses."},
   jjmarket: {scene: "jj_harbour", name: "The market hall", door: [396, 190], spot: true, mark: [396, 60], line: "The market hall."},
   jjToShoreN: {scene: "jj_harbour", name: "To the shore", door: [300, 26], spot: true, bridge: "jj_shore", mark: [240, 30], line: "North up the coast to the shore and the crater."},
+  jj_haenyeo: {scene: "jj_shore", name: "The divers' house", door: [404, 190]}, jj_shed: {scene: "jj_farms", name: "The packing shed", door: [396, 186]},
+  jj_cafe: {scene: "jj_village", name: "The stone-house café", door: [112, 186]}, jj_market: {scene: "jj_harbour", name: "The market hall", door: [396, 190]},
+  jj_dye: {scene: "jj_village", name: "The dye workshop", door: [410, 352]},
   jjToVillageE: {scene: "jj_harbour", name: "To the village", door: [504, 400], spot: true, bridge: "jj_village", mark: [476, 340], line: "East up into the stone village."},
   rdStepsUp: {scene: "rd_old", name: "Steps up out of the gorge", door: [120, 40], spot: true, bridge: "rd_station", mark: [200, 30], line: "Down into the gorge, over the old bridge and up the steps to the new town."}
 };
@@ -315,7 +339,8 @@ export const TOWN_ARRIVE = {"rd_station>rd_plaza": [44, 330], "rd_plaza>rd_stati
   "jj_shore>jj_farms": [44, 330], "jj_farms>jj_shore": [474, 330], "jj_shore>jj_harbour": [300, 70], "jj_harbour>jj_shore": [300, 572],
   "jj_farms>jj_village": [262, 84], "jj_village>jj_farms": [262, 572], "jj_harbour>jj_village": [44, 400], "jj_village>jj_harbour": [474, 400]};
 // walking areas, and what's in the way (paths.js)
-export const TOWN_BOUNDS = {jj_shore: [14, 200, 506, 616], jj_farms: [14, 190, 506, 616], jj_harbour: [14, 26, 506, 616], jj_village: [14, 40, 506, 590],
+export const TOWN_BOUNDS = {jj_haenyeo: [30, 250, 490, 600], jj_shed: [30, 250, 490, 600], jj_cafe: [30, 250, 490, 600], jj_market: [30, 240, 490, 600], jj_dye: [30, 250, 490, 600],
+  jj_shore: [14, 200, 506, 616], jj_farms: [14, 190, 506, 616], jj_harbour: [14, 26, 506, 616], jj_village: [14, 40, 506, 590],
   kt_tea: [30, 250, 490, 600], kt_hall: [30, 250, 490, 600], kt_sweets: [30, 260, 490, 600], kt_market: [30, 240, 490, 600], kt_pottery: [30, 250, 490, 600],
   kt_station: [140, 178, 506, 616], kt_lane: [14, 180, 506, 616], kt_temple: [14, 40, 506, 616], kt_river: [14, 40, 506, 616],
   rd_cuero: [30, 250, 490, 600], rd_tapas: [30, 250, 490, 600], rd_cafe: [30, 260, 490, 600], rd_banos: [30, 220, 490, 600], rd_jardin: [30, 176, 490, 606], rd_mercado: [30, 250, 490, 600],
@@ -323,6 +348,11 @@ export const TOWN_BOUNDS = {jj_shore: [14, 200, 506, 616], jj_farms: [14, 190, 5
 export const TOWN_OBST = {
   // Jeju: the crater, the divers' house, the rock pools; the orchards, the shed, the paddock; the sea, the ferry, the
   // lighthouses, the market; the café, the dye workshop, the station and the rails
+  // Jeju's rooms (round 128): the stove and the porridge table; the sorting table; the café tables; the four stalls; the tubs
+  jj_haenyeo: [[300, 300, 470, 360], [30, 260, 100, 420], [420, 430, 490, 520], [466, 232, 514, 390], [40, 455, 100, 510]],
+  jj_shed: [[150, 340, 370, 400], [30, 470, 110, 560], [420, 470, 500, 560], [24, 250, 64, 400], [462, 250, 504, 440], [120, 220, 170, 340]],
+  jj_cafe: [[80, 330, 140, 362], [380, 330, 440, 362], [80, 470, 140, 502], [380, 470, 440, 502]],
+  jj_market: [[30, 250, 130, 300], [390, 250, 490, 300], [30, 380, 130, 430], [390, 380, 490, 430]], jj_dye: [[150, 330, 250, 380], [300, 330, 400, 380], [30, 460, 100, 540], [24, 240, 116, 430], [416, 290, 490, 342]],
   jj_shore: [[0, 0, 256, 214], [330, 70, 486, 180], [24, 380, 190, 520], [0, 214, 60, 640]],
   jj_farms: [[20, 50, 264, 270], [320, 60, 476, 176], [330, 420, 506, 572], [60, 500, 120, 540]],
   jj_harbour: [[0, 0, 150, 330], [0, 450, 190, 640], [0, 330, 110, 450], [314, 66, 486, 180], [190, 610, 520, 640]],
@@ -429,6 +459,30 @@ const KEEP_LINES = {
 };
 Object.entries(KEEP_LINES).forEach(([id, line]) => Object.assign(TOWN_GOODS[id], {keep: true, line}));
 TOWN_GOODS.iman.magnet = true;
+// Jeju's goods (round 128), by room: the market hall, the divers' house, the packing shed, the café, the dye workshop.
+// Tangerines are a real orchard fruit (data/orchard.js TREES.tangerine), so they also make gelato and bonbons.
+Object.assign(TOWN_GOODS, {
+  tangerine: {n: "Tangerines", kind: "food", price: 4, sell: 3, shop: "jj_market", art: ["apple", "#F29A2E", "#4E7A3A"], what: "Jeju's sweet little tangerines: gelato, bonbons, black pork with tangerine glaze"},
+  hallabong: {n: "Hallabong", kind: "ingredient", price: 7, sell: 4, shop: "jj_market", art: ["apple", "#F28C28", "#5E8A3A"], what: "the big tangerine with the bumpy top-knot: gelato, bonbons, hallabong with omija syrup"},
+  omija: {n: "Omija berries", kind: "ingredient", price: 6, sell: 3, shop: "jj_market", art: ["jar", "#C8324A", "#F3ECDD"], what: "five-flavour berries (sweet, sour, salty, bitter, spicy): gelato, bonbons, hallabong with omija"},
+  blackpork: {n: "Jeju black pork", kind: "ingredient", price: 9, sell: 5, shop: "jj_market", art: ["box", "#C9877A", "#3A3430"], what: "from the island's black pigs: black pork with tangerine glaze at the kitchen"},
+  j_choco: {n: "Tangerine chocolates", kind: "gift", to: "family", price: 8, shop: "jj_market", art: ["box", "#F29A2E", "#5A3A2A"], say: "Chocolates shaped like little tangerines! Is it orange inside? It IS."},
+  j_hareubang: {n: "Stone grandfather", kind: "keepsake", price: 12, shop: "jj_market", art: ["disc", "#5F5E64", "#7A7980"], line: "A little stone grandfather (dol hareubang) carved from Jeju's black volcanic rock: hat, big eyes, hands on his tummy. He keeps the house safe."},
+  j_magnet: {n: "Jeju fridge magnet", kind: "gift", to: "family", price: 3, shop: "jj_market", art: ["disc", "#F29A2E", "#4A494E"], say: "A tiny stone grandfather holding a tangerine. For the fridge!"},
+  abalone: {n: "Abalone", kind: "ingredient", price: 10, sell: 6, shop: "jj_haenyeo", art: ["disc", "#8A9A8A", "#C9B8C8"], what: "brought up by the divers: abalone with garlic butter at the kitchen"},
+  j_tewak: {n: "Diver's float", kind: "keepsake", price: 10, shop: "jj_haenyeo", art: ["disc", "#F08A2E", "#3A3430"], line: "An orange diving float (tewak) from the divers' house in Jeju. The divers rest on them between dives, and tie their nets underneath."},
+  j_shell: {n: "Sea snail shell", kind: "keepsake", price: 0, art: ["disc", "#E6D3B8", "#B98A5A"], line: "A spiral sea snail shell from the divers in Jeju. Halmang Kim gave it to Evan. Hold it to your ear."},
+  j_box: {n: "A box of tangerines", kind: "gift", to: ["mama", "gonggong", "mum", "dad"], price: 10, shop: "jj_shed", art: ["box", "#C9A27E", "#F29A2E"], say: "A whole box of Jeju tangerines! The leaves still on. These will be gone by Tuesday."},
+  j_jam: {n: "Tangerine marmalade", kind: "gift", to: ["mama", "dad", "darren"], price: 6, shop: "jj_shed", art: ["jar", "#F29A2E", "#FFFDF6"], say: "Tangerine marmalade! On toast. On everything."},
+  j_tea: {n: "Green tea from the slopes", kind: "gift", to: ["mama", "gonggong", "angelina"], price: 9, shop: "jj_cafe", art: ["box", "#5E8A48", "#F3ECDD"], say: "Green tea from the fields under Hallasan. Gong Gong will make it properly."},
+  j_cake: {n: "Tangerine cake", kind: "gift", to: "family", price: 7, shop: "jj_cafe", art: ["box", "#F3D9A8", "#F29A2E"], say: "A tangerine pound cake from the stone-house café. Still a little warm."},
+  j_tote: {n: "Persimmon-dyed tote", kind: "gift", to: ["mum", "angelina", "mama"], price: 18, shop: "jj_dye", art: ["tote", "#B26A36", "#D9A66A"], say: "A tote bag dyed with green persimmons! It smells like sunshine."},
+  j_shirt: {n: "Galot shirt", kind: "gift", to: ["dad", "gonggong", "marcus"], price: 24, shop: "jj_dye", art: ["cloth", "#9E5A2E", "#C9874A"], say: "A galot shirt, the old Jeju farmers' shirt dyed with persimmons. Cool in summer, and it never shows the dirt."},
+  j_scarf: {n: "Your persimmon scarf", kind: "keepsake", price: 0, art: ["cloth", "#9E5A2E", "#D9A66A"], line: "The scarf you dyed with green persimmons at Mr Moon's workshop in Jeju, darkened in the sun on your own washing line."}
+});
+Object.assign(KEEP_LINES, {j_magnet: "A tiny stone grandfather holding a tangerine, from Jeju.", j_tote: "A tote bag dyed with green persimmons in Jeju.", j_shirt: "A galot shirt, dyed with persimmons in Jeju."});
+["j_magnet", "j_tote", "j_shirt"].forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
+TOWN_GOODS.j_magnet.magnet = true;
 Object.keys(PAINT.colours).forEach(c => Object.keys(PAINT.patterns).forEach(p => { TOWN_GOODS[`ptile_${c}_${p}`] = {n: "Your painted tile", kind: "keepsake", price: 0, tile: [c, p], art: ["tile", PAINT.colours[c][1], "#FFFDF6"], line: `A tile you painted yourself at Lucía's in Ronda: ${PAINT.patterns[p]}, in ${PAINT.colours[c][0]}.`}; }));
 // Round 123: the nerikiri sweets Mel makes with Mr Tanaka in Kyoto (gifts), one shape for each season
 [["sakura", "cherry blossom", "#F6C7D6"], ["ajisai", "hydrangea", "#B9A8E0"], ["momiji", "maple leaf", "#E0782E"], ["tsubaki", "camellia", "#C8432F"]].forEach(([k, n, col]) => {

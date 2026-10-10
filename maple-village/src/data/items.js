@@ -251,7 +251,7 @@ export const YAY = ["Quest complete! ✨", "Look at you go!", "Done! Happy fox w
 // (give one to anybody in the village) and potted flowers (set one in a pot spot: home, the wine shop, your room).
 const capi = s => s[0].toUpperCase() + s.slice(1);
 const FRUIT_SAY = {cherry: "Cherries! I'll save you the stones.", lemon: "A lemon? *sniff* *sneeze* Fresh!", peach: "Fuzzy and sweet. Ma Ma grew this!", mango: "Mango! Sticky chin, happy fox.",
-  apple: "Crunchy! Thank you", pear: "A juicy pear. Drip, drip.", fig: "A fig! Fancy.", orange: "Peel it for me? Please?", persimmon: "Persimmon! Like eating a little sunset."};
+  apple: "Crunchy! Thank you", pear: "A juicy pear. Drip, drip.", fig: "A fig! Fancy.", orange: "Peel it for me? Please?", persimmon: "Persimmon! Like eating a little sunset.", tangerine: "A tangerine! Easy to peel. Here, half for you."};
 Object.values(TREES).forEach(t => { const it = ITEMS[t.fruit] = ITEMS[t.fruit] || {n: capi(t.fn[0]), kind: "food", say: FRUIT_SAY[t.fruit] || "Fruit from Ma Ma's orchard!"}; it.fruit = true; it.sell = it.sell || t.sell; });
 Object.keys(FLOWERS).forEach(id => { const f = FLOWERS[id];
   ITEMS["bq_" + id] = {n: `Bouquet of ${f.n.toLowerCase()}`, kind: "bouquet", flower: id};

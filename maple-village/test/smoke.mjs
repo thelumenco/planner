@@ -1109,7 +1109,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const k = JSON.parse(localStorage.getItem("fox.fox")).kitchen; return !!k.oven && !k.larder.flour; }), "flour goes in the oven to bake");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="tapas"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-k="tapas"]').count() === 35, "the stove offers this season's tapas (35 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams and Kyoto)");
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 38, "the stove offers this season's tapas (38 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams, Kyoto and Jeju)");
   await page.click('#ctx [data-k="tapas"][data-id="tortilla"]'); await page.waitForTimeout(200); await page.click('#ctx [data-k="cooktapas"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapasList[0].id === "tortilla" && f.vine.tapasList[0].plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
   await page.click('#ctx [data-k="dish"][data-dish="olives"]'); await page.waitForTimeout(300);
@@ -2933,6 +2933,87 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const w1 = await fox().then(f => f.wish && f.wish.n);
   await page.locator('#world [data-place="wishtower"]').dispatchEvent("click"); await page.waitForTimeout(800);
   check(w1 === 4 && await fox().then(f => f.wish.n === 4), "the wish-tower by the river in the woods: one stone a day, and it grows");
+  await page.close();
+}
+{
+  console.log("\nJeju's rooms, people and things to do");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), J = tw.TOWNS.jeju;
+  const jj = await import(new URL("../src/game/jeju.js", import.meta.url)), orch = await import(new URL("../src/data/orchard.js", import.meta.url));
+  const kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url)), cp = await import(new URL("../src/game/companions.js", import.meta.url));
+  check(Object.keys(J.rooms).length === 5 && Object.values(J.rooms).every(r => r.music && tw.TOWN_PLACES[r.door] && tw.TOWN_BOUNDS[Object.keys(J.rooms).find(k => J.rooms[k] === r)]), "five rooms behind Jeju's doors, each with its own music");
+  { const used = new Set([...Object.values(tw.TOWNS.ronda.acts), ...Object.values(tw.TOWNS.kyoto.acts)].flatMap(a => Object.values(a).map(x => x.act)));
+    check(Object.keys(J.acts).length === 7 && Object.values(J.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "the family all have something to do in Jeju, and none of it is what they did in Ronda or Kyoto"); }
+  { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), jl = np.NPCS.filter(n => n.local === "jeju"), rooms = Object.keys(J.rooms);
+    check(jl.length >= 15 && jl.filter(n => n.tourist).length >= 6 && rooms.every(r => jl.filter(n => n.routine.some(sl => sl.scene === r)).length >= 2), "Jeju has locals and tourists, and at least two people for every room"); }
+  { const F = {coins: 100, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
+    const d = jj.diveStart(); for (let i = 1; i <= 3; i++) { jj.descend(d, 1e4*i); jj.surface(d, 1e4*i + jj.DIVE.MS*.75); }
+    const e = jj.diveStart(); jj.descend(e, 5000); jj.surface(e, 5300);
+    check(d.done && d.good === 3 && e.last === "soon" && jj.diveReward(F, d, add, "2026-11-12") && F.inv.abalone === 1 && !jj.diveReward(F, d, add, "2026-11-12"), "the breath song: come up in the green three times, and Halmang gives you an abalone (once a day)");
+    const st = jj.sortStart(() => 0, 0); for (let i = 0; i < 8; i++) jj.sortTap(st, "small", 1000 + i);
+    check(st.done && st.good === 8 && jj.sortReward(F, st, add, "2026-11-12") === 4 && F.inv.tangerine === 4, "sorting tangerines with Mr Ko: eight right, and a bag of four to take home");
+    check(jj.dyeScarf(F, "2026-11-12") && jj.takeDye(F, add, "2026-11-13").left === 2 && jj.takeDye(F, add, "2026-11-15").ready && F.inv.j_scarf === 1 && F.coins === 88, "the persimmon scarf: 12 coins, then three days on the washing line and it's a keepsake");
+    const at = jj.slowPost(F, "me", "2026-11-12"); check(at === "2026-11-26" && jj.slowMail(F, "2026-11-25").length === 0 && jj.slowMail(F, "2026-11-26").length === 1, "the slow-post box: a postcard to yourself turns up two weeks later");
+    check(!orch.treeOpen(F, orch.TREES.tangerine) && orch.treeOpen({jeju: {sapling: true}}, orch.TREES.tangerine) && orch.treeOpen(F, orch.TREES.apple), "tangerine trees grow in the orchard once Ma Ma's brought a sapling home from Jeju"); }
+  check(["heukdwaeji", "jeonbok", "hallaomija"].every(k => kit.TAPAS[k]) && ["hallabong", "omija", "tangerine"].every(k => sc.INGR[k]), "Jeju's ingredients: three new dishes at the kitchen, and tangerine, hallabong and omija gelato");
+  check(cp.KEEP_SPOTS.fridge2 && cp.KEEP_SPOTS.fridge2.only === "magnet" && tw.TOWN_GOODS.j_magnet.magnet && ["j_hareubang", "j_tewak", "j_shell", "j_scarf"].every(k => tw.TOWN_GOODS[k].kind === "keepsake"), "keepsakes from Jeju, and a second magnet spot on the fridge");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`jeju rooms pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  await page.addInitScript(() => { if (!/jjtrip/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 300; f.trip = {town: "jeju", day: "2026-11-12", party: ["mama", "evan"], from: 600, by: "ferry"};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=13:00&date=2026-11-12"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=13:00&date=2026-11-12&jjtrip=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("jj_shore")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="jjhaenyeo"]').dispatchEvent("click");
+  await page.waitForFunction(() => /divers/.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 }); await page.waitForTimeout(4800);
+  check(await ids().then(a => a.includes("halmang") && a.includes("seoyeon")) && await fox().then(f => f.inv.j_shell === 1), "inside the divers' house: Halmang Kim and Seo-yeon, and Halmang gives Evan a sea snail shell");
+  await page.locator('#world [data-rdspot="jj_haenyeo"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-jj="dive"]', { timeout: 15000 });
+  await page.click('#ctx [data-jj="dive"]'); await page.waitForTimeout(300);
+  for (let i = 0; i < 3; i++) {
+    await page.evaluate(() => new Promise(res => { document.querySelector('#ctx [data-jj="down"]').click(); setTimeout(() => { const b = document.querySelector('#ctx [data-jj="up"]'); if (b) b.click(); res(); }, 2450); }));
+    await page.waitForTimeout(300);
+  }
+  check(await fox().then(f => f.inv.abalone === 1 && f.jeju.dives === 1), "the breath song in the browser: dive, come up whistling, an abalone from Halmang");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  for (const [room, who] of [["jj_shed", "takeshi"], ["jj_cafe", "haeun"], ["jj_market", "miok"], ["jj_dye", "jaewon"]]) {
+    await page.evaluate(r => window.__mapleScene(r), room); await page.waitForTimeout(1300);
+    check(await ids().then(a => a.includes(who)) && await page.locator(`#world [data-rdspot="${room}"]`).count() === 1, `${room}: ${who} is there, and there's something to do`);
+  }
+  await page.evaluate(() => window.__mapleScene("jj_shed")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-rdspot="jj_shed"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-jj="sort"]', { timeout: 15000 });
+  await page.click('#ctx [data-jj="sort"]'); await page.waitForTimeout(300);
+  for (let i = 0; i < 8; i++) { const size = await page.locator("#ctx .jjtang").getAttribute("data-size"); await page.click(`#ctx [data-jj="crate:${size}"]`); await page.waitForTimeout(120); }
+  check(await fox().then(f => f.inv.tangerine === 4), "sorting with Mr Ko's crates: all eight right, four tangerines");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.evaluate(() => window.__mapleScene("jj_cafe")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-rdspot="jj_cafe"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-jj="cafe:ade"]', { timeout: 15000 });
+  await page.click('#ctx [data-jj="cafe:ade"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.coins === 295 && f.jeju.treats === 1), "a hallabong ade at the café (5), and Evan gets a juice");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.evaluate(() => window.__mapleScene("jj_market")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-rdspot="jj_market"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="j_magnet"]', { timeout: 15000 });
+  await page.click('#ctx [data-rbuy="j_magnet"]'); await page.waitForTimeout(300); await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.locator('#world [data-rdspot="jjpost"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-jj="post:me"]', { timeout: 15000 });
+  await page.click('#ctx [data-jj="post:me"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.j_magnet === 1 && f.coins === 290 && f.jeju.post.length === 1), "the market: a Jeju fridge magnet (3), and a postcard in the slow-post box (2)");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.evaluate(() => window.__mapleScene("jj_dye")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-rdspot="jj_dye"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-jj="dyego"]', { timeout: 15000 });
+  await page.click('#ctx [data-jj="dyego"]'); for (const st of [0, 1, 2, 3]) await page.click(`#ctx [data-jj="dstep:${st}"]`);
+  await page.click('#ctx [data-jj="dyedone"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.jeju.dye && f.jeju.dye.from === "2026-11-12" && f.coins === 278), "dyeing with Mr Moon: crush, soak, wring, sun (12), and the scarf comes home to dry");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.evaluate(() => window.__mapleScene("jj_harbour")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="jjpier"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="ferry"]', { timeout: 15000 });
+  await page.click('#ctx [data-triphome="ferry"]');
+  await page.waitForFunction(() => !/Jeju/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
+  check(await fox().then(f => f.trip.done && f.jeju.sapling) && /foreshore|shore/i.test(await page.locator("#sceneName").textContent()), "home on the ferry to the foreshore jetty, and Ma Ma's brought a tangerine sapling for the orchard");
+  await page.goto(url + "?seed=1&time=10:00&date=2026-11-15"); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-rdspot="dyecloth"]').dispatchEvent("click"); await page.waitForTimeout(3500);
+  check(await fox().then(f => f.inv.j_scarf === 1 && !f.jeju.dye), "three days later, the scarf's a deep rust on the washing line at home, and it's a keepsake now");
   await page.close();
 }
 {
