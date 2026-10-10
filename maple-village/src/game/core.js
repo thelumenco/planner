@@ -72,7 +72,7 @@ import { fishState, fishPanel, spotIn, SPOTS as FISH_SPOTS, cast as fishCast, la
 import { fishSpotArt, koiArt } from "../art/fishing.js";
 import { timetablePanel, trainKey, trainHere, fmt as railTime } from "./rail.js";
 import { moodPanel, vanPick, vanClear, lookLine as vanLookLine } from "./van.js";
-import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush, milkOne, milkHerd, collectHives, buyStand, giveName, fullHives,
+import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush, brushNearest, milkOne, milkHerd, collectHives, buyStand, giveName, fullHives,
   extractorPanel, crockPanel, pressPanel as hfPressPanel, cavePanel as hfCavePanel, spinFrames, makeYoghurt, pressCheese, takeWheel, cheeseNames, CHEESES as HF_CHEESES,
   gainTrust, muckOut, latchGate, catchGoat, nameHive, creamHoney, cutComb, turnWheels, finishRequest, stockShelf, hfTick, farmhousePanel, LEVELS as HF_LEVELS, MOODS as HF_MOODS } from "./hfarm.js";
 import { scoopState, scoopTick, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, unstockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
@@ -1216,6 +1216,12 @@ function useItem(id){
   if (it.kind === "pet") { adoptItem = id; adoptSt = {}; openView = null; render(); return; }
   if (it.kind === "ingredient") { toKitchen(id); return; }
   if (it.kind === "feed") { if (openView) { openView = null; ctx(); } speak("That's for the animals. Off to the run!", 3000); walkToPlace("animal run"); return; }
+  // a toy (the kite) is never used up: fly it on the field, and anywhere else it stays in the backpack (round 130)
+  if (it.kind === "toy") { if (id === "kite" && scene === "field") { if (openView) { openView = null; ctx(); } flyKite(); } else speak(id === "kite" ? "Kites need open grass and a breeze: take it to the field by the river." : "Let's save that for later.", 4000); return; }
+  // the brush at Wildflower Farm brushes the animals (the next one in the nearer paddock), and counts for Felix's ask
+  if (id === "brush" && scene === "hfarm") { const herd = mel.x < 260 ? "cows" : "goats", an = brushNearest(F, herd); if (openView) { openView = null; ctx(); }
+    if (!an) { speak(`Everyone in the ${herd === "cows" ? "cow" : "goat"} paddock's been brushed today. Very glossy.`, 4000); render(); return; }
+    act("brush", it); sfx("chime"); gainXp(1); farmTrust(1); mprop("heart", mel.x, mel.y - 60, 1600); speak(an.line, 3500); save(); render(); return; }
   if (it.kind === "tool") {
     act(it.act, it); speak(it.say, 4000);
     if (!F.cool[id] || Date.now() - F.cool[id] > 20*M) { F.cool[id] = Date.now(); gainXp(1); }

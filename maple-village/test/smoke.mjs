@@ -62,7 +62,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#notebook [data-nb="w"] >> nth=1');
   check(await page.locator("#nbTitle").textContent().then(t => /0[.,]75 L/.test(t)), "water note adds a glass and a bottle (750 ml)");
   await page.fill("#nbTrack", "1000"); await page.click('#notebook [data-nb="wset"]');
-  await page.waitForFunction(() => /^1L/.test(document.getElementById("waterNote").textContent), null, { timeout: 3000 }).catch(() => {});
+  await page.waitForFunction(() => /^1L/.test(document.getElementById("waterNote").textContent), null, { timeout: 3000 }).catch(async () => {   // (on a busy machine the notebook can redraw under the typing: once more)
+    await page.fill("#nbTrack", "1000"); await page.click('#notebook [data-nb="wset"]'); await page.waitForTimeout(800); });
   check(await page.locator("#waterNote").textContent().then(t => /^1L/.test(t)), "water total can be typed in");
   await page.click('[data-track="steps"]');
   await page.fill("#nbTrack", "2500"); await page.click('#notebook [data-nb="sset"]');
@@ -3014,6 +3015,30 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="dyecloth"]').dispatchEvent("click"); await page.waitForTimeout(3500);
   check(await fox().then(f => f.inv.j_scarf === 1 && !f.jeju.dye), "three days later, the scarf's a deep rust on the washing line at home, and it's a keepsake now");
+  await page.close();
+}
+{
+  console.log("\nthe kite and the farm brush (round 130 fixes)");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`kite pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/kitebrush/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.inv = {...(f.inv || {}), kite: 1, brush: 1}; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-10"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-10&kitebrush=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(900);
+  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="kite"]'); await page.waitForTimeout(600);
+  check(await fox().then(f => f.inv.kite === 1), "using the kite away from the field doesn't use it up (it stays in the backpack)");
+  await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="farmhouse"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-hf="req"]', { timeout: 20000 });
+  check(/Still to brush: Daisy, Buttercup and Mochi/.test(await page.locator("#ctx").innerText()) && await page.locator('#ctx [data-hf="req"]').isDisabled(), "Felix's ask says what's still to do while the button's greyed out");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.locator('#world [data-place="cows"]').dispatchEvent("click"); await page.waitForTimeout(3500); await page.click("#ctx [data-close]").catch(() => {});
+  for (let i = 0; i < 3; i++) { await page.click('[data-open="bag"]').catch(() => {}); await page.click('#bag .item[data-id="brush"]'); await page.waitForTimeout(500); }
+  check(await fox().then(f => ["daisy", "buttercup", "mochi"].every(k => f.hfarm.brushed[k] === "2026-10-10") && f.inv.brush === 1), "the brush from the backpack brushes the cows at the farm, and it's still in the backpack");
+  await page.locator('#world [data-place="farmhouse"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-hf="req"]:not([disabled])', { timeout: 20000 });
+  await page.click('#ctx [data-hf="req"]'); await page.waitForTimeout(500);
+  check(await fox().then(f => f.hfarm.reqDone === "2026-10-10"), "and then you can tell Felix it's done");
   await page.close();
 }
 {

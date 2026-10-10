@@ -170,6 +170,19 @@ export function requestReady(F, day = dayKey()){
   if (r.act === "milkall") return [...COWS, ...GOATS].every(a => h.milked[a.id] === day);
   return r.act === "hive";
 }
+// what's left of today's ask (so a greyed-out button says why): "" when it's ready or done
+export function requestLeft(F, day = dayKey()){
+  const h = hfState(F), r = requestToday(day), inv = F.inv || {}; if (h.reqDone === day || requestReady(F, day)) return "";
+  const names = l => l.map(a => a.n).join(", ").replace(/, ([^,]*)$/, " and $1");
+  if (r.need) return `Still to find: ${Object.entries(r.need).filter(([k, n]) => (inv[k] || 0) < n).map(([k, n]) => `${n - (inv[k] || 0)} more ${giveName(k)}`).join(", ")}.`;
+  if (r.act === "brush") { const l = COWS.filter(a => h.brushed[a.id] !== day); return `Still to brush: ${names(l)} (the Brush buttons in the cow paddock).`; }
+  if (r.act === "milkall") { const l = [...COWS, ...GOATS].filter(a => h.milked[a.id] !== day); return `Still to milk: ${names(l)} (milking's 6 to 10 in the morning).`; }
+  if (r.act === "muck") return `Still to muck out: ${["cows", "goats"].filter(k => h.mucked[k] !== day).map(k => `the ${k}' stalls`).join(" and ")}.`;
+  if (r.act === "turn") return "Still to do: turn the wheels in the cheese cave.";
+  return "";
+}
+// the backpack brush at the farm (round 130): brushes the next animal in the nearer paddock, the same as its Brush button
+export function brushNearest(F, herd){ const h = hfState(F), day = dayKey(), a = HERDS[herd].list.find(x => h.brushed[x.id] !== day); return a ? brush(F, a.id) : null; }
 export function finishRequest(F){ const h = hfState(F), day = dayKey(), r = requestToday(day); if (!requestReady(F, day)) return null;
   if (r.need) { const inv = F.inv; Object.entries(r.need).forEach(([k, n]) => { inv[k] -= n; if (!inv[k]) delete inv[k]; }); }
   h.reqDone = day; return r; }
@@ -231,7 +244,8 @@ export function farmhousePanel(F, here){
   let p = `<span class="tape gingham" aria-hidden="true"></span><h2>The farmhouse</h2><p class="sub">The kettle's on, and there's a chalkboard by the door.</p>`;
   p += `<p class="olabel">You're their ${LEVELS[lv].n.toLowerCase()}</p><span class="clbar"><i style="width:${pct}%"></i></span><p class="muted">${next ? `${next.at - h.trust} more trust to become their ${next.n.toLowerCase()}: ${next.gives}.` : "Partners, officially. Elena's had a sign made."} Every bit of help counts: feeding, brushing, mucking out, milking, the hives, turning the cheese.</p>`;
   p += `<p class="eyebrow" style="margin:12px 0 6px">${who} asks</p><p>"${esc(r.ask)}"</p>`;
-  p += done ? `<p class="muted">Done today. ${who} is very grateful.</p>` : `<div class="actions"><button class="btn primary small" data-hf="req" ${ready && (r.act !== "hive" || here) ? "" : "disabled"}>${r.need ? "Hand them over" : r.act === "hive" ? (here ? `Help ${who}` : `${who}'s not here just now`) : "Tell them it's done"}</button></div>`;
+  const left = done ? "" : requestLeft(F);
+  p += done ? `<p class="muted">Done today. ${who} is very grateful.</p>` : `${left ? `<p class="muted">${esc(left)}</p>` : ""}<div class="actions"><button class="btn primary small" data-hf="req" ${ready && (r.act !== "hive" || here) ? "" : "disabled"}>${r.need ? "Hand them over" : r.act === "hive" ? (here ? `Help ${who}` : `${who}'s not here just now`) : "Tell them it's done"}</button></div>`;
   if (lv >= 1) p += `<p class="eyebrow" style="margin:12px 0 6px">What you've earned</p><ul class="hlist">${LEVELS.slice(1, lv + 1).map(x => `<li><small><b>${x.n}:</b> ${esc(x.gives)}</small></li>`).join("")}</ul>`;
   return p + shut;
 }
