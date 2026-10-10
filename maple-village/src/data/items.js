@@ -29,7 +29,7 @@ export const ITEMS = {
   pea_seed:{n:"Pea seeds", kind:"seed", price:3, crop:"pea", tab:"seeds", seasons:["spring"]},
   pumpkin_seed:{n:"Pumpkin seeds", kind:"seed", price:6, crop:"pumpkin", tab:"seeds", seasons:["autumn","winter"]},
   leek_seed:{n:"Leek seedlings", kind:"seed", price:4, crop:"leek", tab:"seeds", seasons:["winter"]},
-  chickpea_seed:{n:"Chickpea seeds", kind:"seed", ico:"seed:chickpea", price:4, crop:"chickpea", tab:"seeds", seasons:["spring","summer","autumn"]},
+  chickpea_seed:{n:"Chickpea seeds", kind:"seed", ico:"seed:chickpea", price:4, crop:"chickpea", tab:"seeds", visited:"cinque", seasons:["spring","summer","autumn"]},
   // round 132: pine nuts at the market's deli once Mel's been to Cinque Terre (visited)
   chickpea:{n:"Chickpeas", kind:"ingredient", price:3, sell:2, what:"for farinata at the kitchen"},
   pinenuts:{n:"Pine nuts", kind:"ingredient", price:6, sell:3, tab:"deli", visited:"cinque", what:"for pesto (in the loft, once Nonna Pina's shown you) and pine nut gelato"},

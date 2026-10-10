@@ -4048,7 +4048,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     pea_seed: { n: "Pea seeds", kind: "seed", price: 3, crop: "pea", tab: "seeds", seasons: ["spring"] },
     pumpkin_seed: { n: "Pumpkin seeds", kind: "seed", price: 6, crop: "pumpkin", tab: "seeds", seasons: ["autumn", "winter"] },
     leek_seed: { n: "Leek seedlings", kind: "seed", price: 4, crop: "leek", tab: "seeds", seasons: ["winter"] },
-    chickpea_seed: { n: "Chickpea seeds", kind: "seed", ico: "seed:chickpea", price: 4, crop: "chickpea", tab: "seeds", seasons: ["spring", "summer", "autumn"] },
+    chickpea_seed: { n: "Chickpea seeds", kind: "seed", ico: "seed:chickpea", price: 4, crop: "chickpea", tab: "seeds", visited: "cinque", seasons: ["spring", "summer", "autumn"] },
     // round 132: pine nuts at the market's deli once Mel's been to Cinque Terre (visited)
     chickpea: { n: "Chickpeas", kind: "ingredient", price: 3, sell: 2, what: "for farinata at the kitchen" },
     pinenuts: { n: "Pine nuts", kind: "ingredient", price: 6, sell: 3, tab: "deli", visited: "cinque", what: "for pesto (in the loft, once Nonna Pina's shown you) and pine nut gelato" },
@@ -29733,7 +29733,7 @@ ${SIGNOFF[t2.who] || ""}`;
     if (typing) persist("fox");
     else save2(scene === "vineyard" || scene === "wineshop");
   }
-  var stallItems = (st6) => !st6.produce ? todaysGoods(st6) : Object.keys(CROPS).filter((c) => !["tulip", "sunflower"].includes(c) && ITEMS[c] && !CROPS[c].herb && Object.values(ITEMS).some((it) => it.crop === c && !it.greenhouse && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
+  var stallItems = (st6) => !st6.produce ? todaysGoods(st6) : Object.keys(CROPS).filter((c) => !["tulip", "sunflower"].includes(c) && (c !== "chickpea" || F.towns && F.towns.cinque) && ITEMS[c] && !CROPS[c].herb && Object.values(ITEMS).some((it) => it.crop === c && !it.greenhouse && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
   function todaysGoods(st6, day = dayKey()) {
     const ev = eventOn(day), pool2 = [...(st6.items || []).slice(1), ...(POOLS[ev ? ev.kind : ""] || {})[st6.id] || []].filter((id) => ITEMS[id]);
     const n = Math.max(2, (st6.items || []).length);
