@@ -258,6 +258,7 @@ export function scoopTick(F, opts = {}){
     const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     const sale = saleMinute(s, day, hm, opts); if (sale && sale.box) out.box += sale.coins; else if (sale) { out.coins += sale.coins; out.n++; }
     const cs = cartMinute(s, day, hm, opts); if (cs) { out.coins += cs.coins; out.n++; out.cart = (out.cart || 0) + cs.coins; }
+    const dv = deliverMinute(s, day, hm); if (dv) { out.coins += dv.coins; (out.orders = out.orders || []).push(dv); }
     out.mins++;
   }
   if (out.mins || !s.at) s.at = from + out.mins*60000;
@@ -386,7 +387,7 @@ export function counterPanel(F, st){
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
   h += `<ul class="hlist wlist">${tubs.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
   if (st.cart) return h + `<p class="muted">Yours are free. Cups and cones at the shop's prices.</p>` + shut;
-  return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p><div class="actions"><button class="btn small alt" data-gview="freezer">Change what's in the display</button></div>` + upBtn + shut;
+  return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p><div class="actions"><button class="btn small alt" data-gview="freezer">Change what's in the display</button><button class="btn small alt" data-gview="trolley">${s.trolley ? "The trolley" : "Load the trolley"}</button></div>` + upBtn + shut;
 }
 export function menuPanel(F, st){
   const s = scoopState(F), step = k => `<span class="gstep"><button class="btn small alt" data-gprice="${k}:-1" aria-label="Cheaper">−</button><b>${s.prices[k]}</b><button class="btn small alt" data-gprice="${k}:1" aria-label="Dearer">+</button></span>`;
@@ -467,10 +468,80 @@ export function scoopNews(s, day, hm){
     else if (left > 0 && s.warned !== day + ":low" && s.warned !== day + ":out") { s.warned = day + ":low"; out.push(`${s.name}'s display is down to its last ${left} scoop${left === 1 ? "" : "s"}. Time to churn another tub?`); }
     else if (!left && s.warned !== day + ":out") { s.warned = day + ":out"; out.push(`${s.name} has run out of ice cream on display, so nobody can buy any. Churn a tub, or put another flavour out from the freezer.`); }
   }
-  const report = d => { const t = s.sold[d]; s.reported = d; if (!t || !t.n) return null;
-    return `${d === day ? "Today" : "Yesterday"} ${s.name.replace(/^The /, "the ")} sold ${t.n} ice cream${t.n === 1 ? "" : "s"}: ${t.coins} coins${t.outAt != null ? `. It ran out at ${hmTxt(t.outAt)}, so there's more to be had with fuller tubs` : ""}.`; };
+  const report = d => { const t = s.sold[d]; s.reported = d; if (!t || !(t.n || t.trolley || t.deliv)) return null;
+    const when = d === day ? "Today" : "Yesterday", trol = (t.trolley ? `${t.n ? " And y" : `${when} y`}our trolley sold ${t.trolley}: ${t.trolleyCoins} coins.` : "") + (t.deliv ? ` Tomo delivered ${t.deliv} more on the bike: ${t.delivCoins} coins.` : "");
+    return (t.n ? `${when} ${s.name.replace(/^The /, "the ")} sold ${t.n} ice cream${t.n === 1 ? "" : "s"}: ${t.coins} coins${t.outAt != null ? `. It ran out at ${hmTxt(t.outAt)}, so there's more to be had with fuller tubs` : ""}.` : "") + trol; };
   if (hm >= CLOSE && s.reported !== day) { const r = report(day); if (r) out.push(r); }
   else if (hm < CLOSE && s.reported && s.reported < dayBefore(day)) { const r = report(dayBefore(day)); if (r) out.push(r); }
   else if (!s.reported) s.reported = dayBefore(day);
   return out;
+}
+
+/* ---------- the ice cream trolley (round 137, Mel's idea) ---------- */
+// Load up to three flavours, ten scoops each, from the shop's tubs, and push it round Honeybrook: tap people to sell
+// them a cup or a cone (never floats or waffles out and about). It's heavy, so Mel walks slower (70% full, back to
+// normal as it empties), and she can't ride or drive with it. The ice packs last two hours: wheel it back into the
+// shop in time and what's left goes back in the freezer; leave it too long and the leftovers melt.
+// Each person buys at most once a day. On top of the shop's own sales. State: s.trolley = {tubs: {id: n}, at, n, coins,
+// told}, s.asked = {day, ids: []}
+export const TROLLEY = {flavours: 3, scoops: 10, ms: 2*3600e3};
+export const trolleyOn = F => !!(F.scoop && F.scoop.trolley);
+export const trolleyLeft = s => s.trolley ? Object.values(s.trolley.tubs).reduce((a, n) => a + n, 0) : 0;
+export const trolleyMelted = (s, t = clock()) => !!s.trolley && t - s.trolley.at > TROLLEY.ms;
+// the walking pace with the trolley (1 = normal): 0.7 full, back to 1 when it's empty
+export const trolleyPace = F => { const s = F.scoop; if (!s || !s.trolley) return 1; return .7 + .3*(1 - Math.min(1, trolleyLeft(s)/(TROLLEY.flavours*TROLLEY.scoops))); };
+export function loadTrolley(F, ids, t = clock()){
+  const s = scoopState(F); if (s.trolley) return null;
+  const pick = [...new Set(ids)].filter(id => recipeOf(s, id) && s.tubs[id] > 0).slice(0, TROLLEY.flavours); if (!pick.length) return null;
+  const tubs = {}; pick.forEach(id => { const n = Math.min(TROLLEY.scoops, s.tubs[id]); tubs[id] = n; s.tubs[id] -= n; if (s.tubs[id] <= 0) delete s.tubs[id]; });
+  s.trolley = {tubs, at: t, n: 0, coins: 0}; return s.trolley;
+}
+// wheel it back -> {back, melted, n, coins}
+export function returnTrolley(F, t = clock()){
+  const s = scoopState(F), tr = s.trolley; if (!tr) return null;
+  const melted = trolleyMelted(s, t), left = trolleyLeft(s);
+  if (!melted) Object.entries(tr.tubs).forEach(([id, n]) => { if (n > 0) s.tubs[id] = (s.tubs[id] || 0) + n; });
+  s.trolley = null; return {back: melted ? 0 : left, melted: melted ? left : 0, n: tr.n, coins: tr.coins};
+}
+// someone's tapped: do they want one? -> null (asked already today, nothing left, melted), {no: true}, or the sale
+// {coins, items: [[fmt, name]]}. o: {kid, family, rainy, season, hm}
+export function trolleySell(F, id, day, o = {}){
+  const s = scoopState(F), tr = s.trolley; if (!tr || trolleyMelted(s) || !trolleyLeft(s)) return null;
+  if (!s.asked || s.asked.day !== day) s.asked = {day, ids: []}; if (s.asked.ids.includes(id)) return null; s.asked.ids.push(id);
+  const p = (o.kid ? .9 : .55)*({summer: 1.25, spring: 1.05, autumn: .9, winter: .6}[o.season] || 1)*(o.rainy ? .5 : 1)*(o.hm >= 13*60 && o.hm < 18*60 ? 1.2 : 1);
+  if (Math.random() >= Math.min(.95, p)) return {no: true};
+  const two = trolleyLeft(s) >= 2 && Math.random() < (o.family ? .35 : .2), items = []; let coins = 0;
+  for (let i = 0; i < (two ? 2 : 1); i++) { const ids = Object.keys(tr.tubs).filter(k => tr.tubs[k] > 0); if (!ids.length) break;
+    const rid = ids[Math.floor(Math.random()*ids.length)], r = recipeOf(s, rid), fmt = Math.random() < .55 ? "cone" : "cup";
+    tr.tubs[rid]--; coins += priceOf(s, fmt, r); items.push([fmt, r ? r.name : "ice cream"]); }
+  if (o.family && Math.random() < .5) coins++;   // family round it up
+  tr.n += items.length; tr.coins += coins; F.coins += coins;
+  const t = s.sold[day] = s.sold[day] || {n: 0, coins: 0}; t.trolley = (t.trolley || 0) + items.length; t.trolleyCoins = (t.trolleyCoins || 0) + coins;
+  return {coins, items};
+}
+// the trolley panel (from the shop counter): pick up to three flavours to load, or what's on it now
+export function trolleyPanel(F, st = {}){
+  const s = scoopState(F), tr = s.trolley, sel = st.sel || [];
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The ice cream trolley</h2><p class="sub">A little pink push-trolley with a cool box: up to ${TROLLEY.flavours} flavours, ${TROLLEY.scoops} scoops each. Cups and cones only. It's heavy, so you'll walk a bit slower, and the ice packs last two hours.</p>`;
+  if (tr) return h + `<ul class="hlist wlist">${Object.entries(tr.tubs).map(([id, n]) => { const r = recipeOf(s, id); return `<li><span class="wpic">${dot(r ? r.col : "#EEE")}</span><span class="wtxt"><b>${esc(r ? r.name : id)}</b><small>${n} scoop${n === 1 ? "" : "s"} left</small></span></li>`; }).join("")}</ul>
+    <p class="muted">${trolleyMelted(s) ? "The ice packs have given up: what's left has melted." : `Sold so far: ${tr.n} (${tr.coins} ${coin()}).`} Tap people outdoors to offer them one.</p><div class="actions"><button class="btn small primary" data-gtrolley="back">Put it away</button><button class="btn alt small" data-close="1">Close</button></div>`;
+  const have = s.recipes.filter(r => s.tubs[r.id] > 0);
+  if (!have.length) return h + `<p class="muted">No tubs to load: make some in the kitchen first.</p>` + shut;
+  return h + `<p class="eyebrow" style="margin:8px 0 6px">Pick up to ${TROLLEY.flavours} (${sel.length} chosen)</p><div class="gchips">${have.map(r => `<button class="gchip${sel.includes(r.id) ? " on" : ""}" data-gtsel="${esc(r.id)}" aria-pressed="${sel.includes(r.id)}">${dot(r.col)} ${esc(r.name)} <small>(${s.tubs[r.id]})</small></button>`).join("")}</div>
+    <div class="actions"><button class="btn primary" data-gtrolley="go" ${sel.length ? "" : "disabled"}>Load up and head out</button><button class="btn alt small" data-close="1">Close</button></div>`;
+}
+
+/* ---------- delivery orders (round 137): the bike earns for all three shops ---------- */
+// Once the Scoop Shack has its delivery bike, villagers order from wherever they are while a shop's open, and Tomo
+// pedals it round: a cup or a cone from the Scoop Shack's display (never floats or waffles: they'd melt), chocolates
+// from the Cocoa Room's case and wall, and tapas, small plates and bottles from the winery (picnics too). Each order
+// uses real stock and pays the shop's price plus a delivery fee. On top of the shops' own sales.
+export const DELIVERY = {fee: 2, scoop: .022, cocoa: .018, winery: .02};
+export const bikeOwned = F => !!(F.scoop && F.scoop.up && F.scoop.up.bike);
+function deliverMinute(s, day, hm){
+  if (!hasUp(s, "bike") || !openNow(hm) || Math.random() >= DELIVERY.scoop) return null;
+  const stocked = onDisplay(s); if (!stocked.length) return null;
+  const r = stocked[Math.floor(Math.random()*stocked.length)], fmt = Math.random() < .55 ? "cone" : "cup"; s.tubs[r.id]--; if (s.tubs[r.id] <= 0) delete s.tubs[r.id];
+  const coins = priceOf(s, fmt, r) + DELIVERY.fee, t = s.sold[day] = s.sold[day] || {n: 0, coins: 0}; t.deliv = (t.deliv || 0) + 1; t.delivCoins = (t.delivCoins || 0) + coins;
+  return {shop: "scoop", coins, what: `a ${fmt} of ${r.name.replace(/ (Gelato|Sorbet)$/, "").toLowerCase()}`};
 }

@@ -1992,3 +1992,21 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Scoop Shack news (round 136, Mel: "feels like I'm not getting anything"):** `scoopNews` in scoop.js runs from core `scoopNow` every 20s.
   - **Low display:** while the shop's open, a heads-up when the display is down to its last 5 scoops (`LOW_SCOOPS`), and another when it's run dry (nobody can buy). Each fires once a day and resets when the display is restocked.
   - **Takings:** after 8pm, a note with the day's ice creams and coins, and the time the display ran out if it did (`sold[day].outAt`, recorded in `saleMinute`). If Mel wasn't around, it gives yesterday's instead.
+
+### Round 137: the ice cream trolley, and the delivery bike's orders for all three shops
+- **The trolley (Mel's idea; scoop.js `TROLLEY`, `loadTrolley`, `trolleySell`, `returnTrolley`, `trolleyPanel`):**
+  - **Loading:** from the Scoop Shack counter, "Load the trolley": up to 3 flavours, 10 scoops each, taken from the shop's tubs.
+  - **Pushing it:** a pink push-cart (no parasol), drawn in front of Mel outdoors in Honeybrook (`#mel.trolley .rideTrolley`). It's heavy, so pace is 0.7 when full, back to 1 as it empties (`trolleyPace`, in goals `rideSpeed`). No bike or car with it (`ride` returns walk).
+  - **Selling:** tap someone outdoors in Honeybrook and they're offered one (core `trolleyOffer`, before `tapNpc`). Each person is offered at most once a day (`s.asked`).
+    - Chance: 55%, kids 90%. Summer ×1.25, winter ×0.6, rain ×0.5, afternoons ×1.2.
+    - Sometimes they buy two. Family sometimes round the price up.
+    - Cups and cones only, at the shop's prices. The coins go straight to Mel.
+  - **Ice packs:** they last 2 hours, then the leftovers melt and Mel is told once.
+  - **Putting it away:** wheeling it back into the Scoop Shack puts it away, with unsold scoops back in the freezer.
+  - Trolley sales count on top of the shop's own sales, and show in the evening takings note.
+- **Delivery orders (scoop.js `DELIVERY`, `bikeOwned`):** once the Scoop Shack owns the bike, villagers order from wherever they are while each shop is open.
+  - **Scoop Shack** (`deliverMinute`, 2.2% a minute): a cup or a cone from the display.
+  - **Cocoa Room** (2% a minute, in cocoaTick): bonbons or a bar.
+  - **Winery** (2% a minute, in sellTick): one or two tapas or small plates, and/or a bottle. 45% of these are picnic orders. The coins go to the till (box) like the winery's other sales.
+  - Every order uses real stock and adds a 2-coin fee.
+  - Core `orderNote` flashes one order at most every 2.5 minutes, naming a villager and the place. It stays quiet if Mel's been away 30+ minutes. Scoop Shack deliveries show in the evening note.

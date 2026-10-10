@@ -3185,6 +3185,41 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  console.log("\nthe ice cream trolley, and the delivery bike's orders");
+  { const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), g = await import(new URL("../src/game/goals.js", import.meta.url)), F = {coins: 0}, s = sc.scoopState(F);
+    s.recipes = ["a", "b", "c", "d"].map(id => ({id, ings: [], name: id.toUpperCase() + " Gelato", col: "#FFF"})); s.tubs = {a: 20, b: 5, c: 20, d: 20};
+    const tr = sc.loadTrolley(F, ["a", "b", "c", "d"]);
+    check(tr && Object.keys(tr.tubs).length === 3 && tr.tubs.a === 10 && tr.tubs.b === 5 && s.tubs.a === 10 && !s.tubs.b && g.ride(F) === "walk" && sc.trolleyPace(F) < .8, "the trolley takes three flavours, ten scoops each, from the shop's tubs; Mel walks slower pushing it, and can't ride");
+    const rnd = Math.random; Math.random = () => .1; const r = sc.trolleySell(F, "hana", "2026-10-12", {season: "summer", hm: 14*60}), again = sc.trolleySell(F, "hana", "2026-10-12", {}); Math.random = rnd;
+    check(r && r.items.length && r.items.every(([f]) => f === "cup" || f === "cone") && F.coins === r.coins && again === null, "tap someone and they buy a cup or a cone (never floats or waffles), once a day each, and the coins come to Mel");
+    const back = sc.returnTrolley(F); check(back.back === 25 - r.items.length && back.n === r.items.length, "wheel it back in time and what's left goes back in the freezer");
+    sc.loadTrolley(F, ["c"]); s.trolley.at -= 3*3600e3; check(sc.trolleyMelted(s) && sc.trolleySell(F, "theo", "2026-10-12", {}) === null && sc.returnTrolley(F).melted === 10, "after two hours the ice packs give up: no more sales, and the leftovers melt");
+    s.up.bike = 1; s.display = ["d"]; s.at = Date.now() - 60e3; const off = globalThis.__mapleOffset; globalThis.__mapleOffset = Date.parse("2026-10-12T04:00:00Z") - Date.now();
+    Math.random = () => .001; const out = sc.scoopTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
+    check(out.orders && out.orders[0].shop === "scoop" && /^a (cup|cone) of /.test(out.orders[0].what) && out.orders[0].coins >= sc.DELIVERY.fee + 1, "with the bike, villagers order a cup or a cone from wherever they are (shop price + a delivery fee)"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`trolley pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/trpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.scoop = {recipes: [{id: "mango+milk", ings: ["mango", "milk"], name: "Mango Gelato", col: "#F8D59A", dairy: true}, {id: "pandan", ings: ["pandan"], name: "Pandan Sorbet", col: "#9CC27E"}], tubs: {"mango+milk": 40, pandan: 40}};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=14:00&date=2026-10-12"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=14:00&date=2026-10-12&trpatch=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(800);
+  await page.locator('#world [data-spot="gcounter"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gview="trolley"]', { timeout: 15000 });
+  await page.click('#ctx [data-gview="trolley"]'); await page.waitForSelector('#ctx [data-gtsel]', { timeout: 15000 });
+  await page.click('#ctx [data-gtsel="mango+milk"]'); await page.click('#ctx [data-gtsel="pandan"]'); await page.click('#ctx [data-gtrolley="go"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.scoop.trolley && f.scoop.trolley.tubs["mango+milk"] === 10 && f.scoop.trolley.tubs.pandan === 10 && f.scoop.tubs.pandan === 30), "at the counter: load the trolley with two flavours, ten scoops each");
+  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(1500);
+  check(await page.locator("#mel").evaluate(e => e.classList.contains("trolley")), "out in the square, Mel's pushing the little pink trolley");
+  const who = await page.locator("#actors .npc").first().getAttribute("data-npc");
+  await page.locator(`#actors .npc[data-npc="${who}"]`).dispatchEvent("click"); await page.waitForTimeout(600);
+  check(await fox().then(f => f.scoop.asked && f.scoop.asked.ids.includes(who)), `tap someone (${who}) and Mel offers them an ice cream`);
+  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(2000);
+  check(await fox().then(f => !f.scoop.trolley && f.scoop.tubs.pandan + f.scoop.tubs["mango+milk"] >= 60), "wheel it back into the shop and it's put away, the unsold scoops back in the freezer");
+  await page.close();
+}
+{
   console.log("\nPilar's list, keeping things back, and more tapas");
   const k = await import(new URL("../src/game/kitchen.js", import.meta.url)), day = "2026-10-14", F = {coins: 0, inv: {}};
   const kk = k.kitchenState(F); Object.assign(kk.larder, {tulip: 2, flour: 3, potato: 4, egg: 4, tomato: 4, loaf: 2});

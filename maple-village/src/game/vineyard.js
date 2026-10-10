@@ -9,6 +9,7 @@ import { ITEMS } from "../data/items.js";
 import { eventNow, wineClubNow, aperitivoNow } from "./tours.js";
 import { icon } from "../art/icons.js";
 import { DISHES, TAPAS, tapasPrice } from "./kitchen.js";
+import { bikeOwned, DELIVERY } from "./scoop.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
 
 export const GROW = 8*H;                                     // a watered vine ripens in 8 hours
@@ -213,6 +214,13 @@ export function sellTick(F, opts = {}){
     const gameDay = new Date(at + off + 6*H).toISOString().slice(0, 10);   // the game's day (it turns over at 2am)
     const apero = aperitivoNow(gameDay, hm); if (apero) out.apero = true;   // Friday aperitivo hour: busier, and everyone wants a plate
     const plate = () => servePlate(v, gameDay, out);
+    // a delivery order (round 137): with the Scoop Shack's bike, Tomo takes tapas, small plates and a bottle round to
+    // people's homes and picnics (the field, the woods, the foreshore), plus a delivery fee
+    if (bikeOwned(F) && Math.random() < DELIVERY.winery) { const c0 = out.coins, p0 = out.plates, bits = [];
+      for (let i = Math.random() < .45 ? 2 : 1; i > 0; i--) { const d0 = out.plates; plate(); if (out.plates > d0) bits.push(out.dish); }
+      if (onShelf.length && (Math.random() < .3 || !bits.length)) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; if (s.n > 0) { s.n--; out.bottles++; out.coins += s.price; bits.push("bottle"); } }
+      if (bits.length) { out.coins += DELIVERY.fee; const dish = id => id === "bottle" ? "a bottle of wine" : /^tapas:/.test(id) ? (TAPAS[id.slice(6)] || {n: "tapas"}).n.toLowerCase() : (DISHES[id] || {n: "a small plate"}).n.toLowerCase();
+        (out.orders = out.orders || []).push({shop: "winery", coins: out.coins - c0, picnic: Math.random() < .45, what: bits.map(dish).join(" and ")}); out.deliv = (out.deliv || 0) + 1; } }
     if (onShelf.length && Math.random() < .002*f) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; if (Math.random() < winePf(s)) { s.n--; out.bottles++; out.coins += s.price; } }
     if (Math.random() < .0016*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
       const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s && Math.random() < winePf(s)) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); if (Math.random() < (apero ? .9 : .6)) plate(); } }

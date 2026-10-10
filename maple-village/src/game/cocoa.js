@@ -33,7 +33,7 @@
 // often while Mel's serving too). Takings go straight to Mel. Mel can have a bar or take one to give.
 import { esc, dayKey, sgHM, hash } from "../util.js";
 import { icon } from "../art/icons.js";
-import { INGR, farmShelf, scoopState, hasUp, takeBack } from "./scoop.js";
+import { INGR, farmShelf, scoopState, hasUp, takeBack, bikeOwned, DELIVERY } from "./scoop.js";
 import { wineClubNow } from "./tours.js";
 import { festivalOn, rainyOn } from "../art/village-extras.js";
 
@@ -243,6 +243,9 @@ export function cocoaTick(F, opts = {}){
       if (shown.length || k) { sellTo(c, day, out, {}); s.club = (s.club || 0) + 1; out.club = (out.club || 0) + 1; }
     }
     if (!openOn(day, hm, ccUp(c, "assistant"))) continue;
+    // a delivery order (round 137): with the Scoop Shack's bike, Tomo takes chocolates round, plus a delivery fee
+    if (bikeOwned(F) && Math.random() < DELIVERY.cocoa) { const b0 = out.bonbons || 0, got = sellTo(c, day, out, {box: true});
+      if (got) { const s = c.sold[day]; s.coins += DELIVERY.fee; out.coins += DELIVERY.fee; s.deliv = (s.deliv || 0) + 1; (out.orders = out.orders || []).push({shop: "cocoa", coins: got + DELIVERY.fee, what: (out.bonbons || 0) > b0 ? "a box of bonbons" : "a chocolate bar"}); continue; } }
     if (ccUp(c, "hotchoc") && hotMinute(c, day, hm, opts, out)) continue;
     const sp = specialOn(day);
     if (sp && c.specials[sp.id] > 0 && Math.random() < .012*(new Date(day + "T00:00:00Z").getUTCDay() % 6 === 0 ? 1.4 : 1)) {   // the festival special, beside the case
