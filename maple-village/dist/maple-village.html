@@ -622,6 +622,50 @@ button.subname[aria-expanded="true"]::after{content:"▴"}
 .ch.npc.act-point:not(.walk) .armR{animation:dpoint .7s ease-in-out infinite alternate}@keyframes dpoint{from{transform:rotate(-100deg)}to{transform:rotate(-160deg)}}
 .ch.npc.act-point:not(.walk) .armL{transform:rotate(25deg)}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-boogie > g,.ch.npc.act-armsup > g,.ch.npc.act-twirl > g,.ch.npc.act-shuffle > g,.ch.npc.act-point > g,.ch.npc[class*="act-"] .armL,.ch.npc[class*="act-"] .armR{animation:none}}
+/* Bellbird Valley (round 144), all new: Ma Ma holds up a cardigan, Gong Gong's binoculars, Angellina's wattle crown,
+   Darren's drone, Mum waves at the balloons, Dad sips his coffee, Marcus bounces a footy, Gong Gong's tai chi, Mum
+   swirls her Pinot, Dad juggles strawberries, Ma Ma fans herself, Darren carries the berry flats, Mum feeds the roos,
+   Marcus peers into the wombat hole, Angellina looks up for koalas, Dad flips sausages, Gong Gong skims stones, Ma Ma
+   plays cards, Darren toasts a marshmallow */
+.ch.npc.act-rummage:not(.walk) .armR,.ch.npc.act-cuppa:not(.walk) .armR,.ch.npc.act-swirl:not(.walk) .armR{animation:sipA 2.4s ease-in-out infinite alternate}
+@keyframes sipA{from{transform:rotate(-20deg)}to{transform:rotate(-60deg)}}
+.ch.npc.act-binoculars:not(.walk) .armR,.ch.npc.act-binoculars:not(.walk) .armL{transform:rotate(-150deg)}
+.ch.npc.act-binoculars:not(.walk) .flip > g{animation:scanB 4s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes scanB{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+.ch.npc.act-crown:not(.walk) .armL,.ch.npc.act-crown:not(.walk) .armR,.ch.npc.act-cards:not(.walk) .armR{animation:typeA .7s ease-in-out infinite alternate}
+.ch.npc.act-drone:not(.walk) .armL,.ch.npc.act-drone:not(.walk) .armR{transform:rotate(-40deg)}
+.ch.npc.act-wave:not(.walk) .armR{animation:waveA .5s ease-in-out infinite alternate}
+@keyframes waveA{from{transform:rotate(-160deg)}to{transform:rotate(-125deg)}}
+.ch.npc.act-footy:not(.walk) .legR{animation:kickL .7s ease-in-out infinite alternate}
+@keyframes kickL{from{transform:rotate(0)}to{transform:rotate(-38deg)}}
+.ch.npc .ballbounce{animation:bounceB .7s ease-in-out infinite alternate}
+@keyframes bounceB{from{transform:translateY(0)}to{transform:translateY(-14px)}}
+.ch.npc.act-taichi:not(.walk) .armL{animation:taiL 3.6s ease-in-out infinite alternate}.ch.npc.act-taichi:not(.walk) .armR{animation:taiR 3.6s ease-in-out infinite alternate}
+@keyframes taiL{from{transform:rotate(20deg)}to{transform:rotate(110deg)}}@keyframes taiR{from{transform:rotate(-20deg)}to{transform:rotate(-110deg)}}
+.ch.npc.act-taichi:not(.walk) .legL{transform:rotate(14deg)}.ch.npc.act-taichi:not(.walk) .legR{transform:rotate(-14deg)}
+.ch.npc.act-juggle:not(.walk) .armL,.ch.npc.act-juggle:not(.walk) .armR{animation:typeA .35s ease-in-out infinite alternate}.ch.npc.act-juggle:not(.walk) .armR{animation-delay:.17s}
+.ch.npc .jb{animation:jug 1.05s linear infinite}.ch.npc .jb1{animation-delay:-.35s}.ch.npc .jb2{animation-delay:-.7s}
+@keyframes jug{0%{transform:translate(-8px,22px)}25%{transform:translate(-4px,-2px)}50%{transform:translate(4px,-6px)}75%{transform:translate(9px,10px)}100%{transform:translate(-8px,22px)}}
+.ch.npc.act-fan:not(.walk) .tool{animation:fanT .35s ease-in-out infinite alternate}
+@keyframes fanT{from{transform:rotate(-8deg)}to{transform:rotate(12deg)}}
+.npc.act-fan:not(.walk) .legL,.npc.act-fan:not(.walk) .legR,.npc.act-cards:not(.walk) .legL,.npc.act-cards:not(.walk) .legR,.npc.act-mallow:not(.walk) .legL,.npc.act-mallow:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
+.npc.act-fan:not(.walk) > g,.npc.act-cards:not(.walk) > g,.npc.act-mallow:not(.walk) > g{transform:translateY(7px)}
+.ch.npc.act-carry:not(.walk) .armL,.ch.npc.act-carry:not(.walk) .armR{transform:rotate(-70deg)}
+.ch.npc.act-carry:not(.walk) .flip > g{animation:cbob .8s ease-in-out infinite alternate}
+.npc.act-feedroo:not(.walk) .legL,.npc.act-feedroo:not(.walk) .legR,.npc.act-crouch:not(.walk) .legL,.npc.act-crouch:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.55)}
+.npc.act-feedroo:not(.walk) > g,.npc.act-crouch:not(.walk) > g{transform:translateY(5px)}
+.ch.npc.act-feedroo:not(.walk) .armR{animation:feedA 1.6s ease-in-out infinite alternate}
+@keyframes feedA{from{transform:rotate(-50deg)}to{transform:rotate(-80deg)}}
+.ch.npc.act-crouch:not(.walk) .flip > g{transform:rotate(14deg);transform-box:fill-box;transform-origin:50% 100%}
+.ch.npc.act-lookup:not(.walk) .armR{transform:rotate(-165deg)}
+.ch.npc.act-lookup:not(.walk) .flip > g{animation:scanB 5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+.ch.npc.act-bbq:not(.walk) .tool,.ch.npc.act-mallow:not(.walk) .tool{animation:tapT 1.2s ease-in-out infinite alternate}
+.ch.npc.act-bbq:not(.walk) .armR{animation:tapA 1.2s ease-in-out infinite alternate}
+.ch.npc .steam{animation:drip 1.6s linear infinite reverse}
+.ch.npc.act-skim:not(.walk) .armR{animation:skimA 1.8s ease-in infinite}
+@keyframes skimA{0%,60%{transform:rotate(-20deg)}80%{transform:rotate(-95deg)}100%{transform:rotate(-20deg)}}
+.ch.npc .ripples{animation:kitefly 1.8s ease-out infinite}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-rummage .armR,.ch.npc.act-cuppa .armR,.ch.npc.act-swirl .armR,.ch.npc.act-binoculars .flip > g,.ch.npc.act-crown .armL,.ch.npc.act-crown .armR,.ch.npc.act-cards .armR,.ch.npc.act-wave .armR,.ch.npc.act-footy .legR,.ch.npc .ballbounce,.ch.npc.act-taichi .armL,.ch.npc.act-taichi .armR,.ch.npc.act-juggle .armL,.ch.npc.act-juggle .armR,.ch.npc .jb,.ch.npc.act-fan .tool,.ch.npc.act-carry .flip > g,.ch.npc.act-feedroo .armR,.ch.npc.act-lookup .flip > g,.ch.npc.act-bbq .tool,.ch.npc.act-mallow .tool,.ch.npc.act-bbq .armR,.ch.npc .steam,.ch.npc.act-skim .armR,.ch.npc .ripples{animation:none}}
 
 /* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
 :root{--mapw:max(300px,min(980px,calc((100dvh - 196px)*520/640 + 26px)))}
@@ -1969,7 +2013,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         marcus: { bg_gate: [[420, 440], [300, 520]], bg_bridge: [[440, 380], [300, 460]] },
         angelina: { bg_gate: [[340, 520], [280, 400]], bg_bridge: [[330, 480], [420, 420]] }
       }),
-      acts: {},
+      acts: {
+        // round 144: what the family does here (and nowhere else)
+        mama: { bv_opshop: { act: "rummage", at: [150, 450], dir: -1 } },
+        gonggong: { bg_bridge: { act: "binoculars", at: [150, 470], dir: -1 } },
+        angelina: { bg_gate: { act: "crown", at: [150, 372], dir: -1 } }
+      },
       rooms: {
         bv_store: { door: "bvstore", n: "Dunn's General Store", music: "bv_store", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The general store: shelves to the ceiling, jars of lollies, a post office counter in the corner, and Mrs Dunn behind the till." },
         bv_shed: { door: "bvshed", n: "The farm-gate shed", music: "bv_shed", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The farm-gate shed: crates of apples, trays of eggs, honey and jam on a plank shelf, buckets of flowers, and a tin for the money." },
@@ -2017,7 +2066,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         marcus: { bl_paddock: [[400, 520], [280, 440]], bl_valley: [[440, 360], [300, 300]] },
         angelina: { bl_paddock: [[320, 540], [260, 430]], bl_valley: [[340, 380], [400, 320]] }
       }),
-      acts: {},
+      acts: {
+        darren: { bl_valley: { act: "drone", at: [330, 380], dir: 1 } },
+        mum: { bl_paddock: { act: "wave", at: [236, 470], dir: 1, hours: [[7 * 60, 9 * 60], [17 * 60, 19 * 60]] } },
+        dad: { bl_paddock: { act: "cuppa", at: [360, 500], dir: 1 } }
+      },
       rooms: {
         bv_coffee: { door: "bvcoffee", n: "The coffee caravan", music: "bv_coffee", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "Inside the coffee caravan: a tiny espresso machine, a chalkboard, jars of biscuits, and fairy lights round the hatch." },
         bv_balloonshed: { door: "bvballoonshed", n: "The balloon shed", music: "bv_balloonshed", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The balloon shed: wicker baskets, burners, folded rainbow envelopes, and a big map of the valley with the flight paths pinned on it." },
@@ -2064,7 +2117,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         marcus: { bc_vines: [[400, 530], [280, 460]], bc_lawn: [[400, 520], [330, 440]] },
         angelina: { bc_vines: [[330, 540], [260, 450]], bc_lawn: [[440, 440], [280, 470]] }
       }),
-      acts: {},
+      acts: {
+        marcus: { bc_lawn: { act: "footy", at: [384, 530], dir: -1 } },
+        gonggong: { bc_vines: { act: "taichi", at: [430, 500], dir: -1, hours: [[7 * 60, 11 * 60]] } },
+        mum: { bc_lawn: { act: "swirl", at: [130, 420], dir: 1 } }
+      },
       rooms: {
         bv_tasting: { door: "bvtasting", n: "The tasting room", music: "bv_tasting", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The tasting room: a long timber bar, bottles in racks to the ceiling, and a window onto the vines." },
         bv_cave: { door: "bvcave", n: "The barrel cave", music: "bv_cave", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The barrel cave: cool and dim, barrels in rows, and racks of sparkling wine tilted neck-down, waiting to be turned." },
@@ -2101,7 +2158,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       blurb: "Pick-your-own berry rows with a café and a jam kitchen, and a big chocolaterie with free tastings and a playground.",
       arriveLine: "The Berry Farm: rows and rows of strawberries and raspberry canes, a red barn café, and from somewhere down the hill, the smell of chocolate.",
       evanArrive: ["strawberries!", "can I pick?", "I smell CHOCOLATE"],
-      evanScreen: { bb_rows: ["red ones and pink ones!", "a red barn!"], bb_choc: ["a playground!", "a chocolate house!"] },
+      evanScreen: { bb_rows: ["red ones and pink ones!", "a red barn!", "a butterfly! wait for me, butterfly!", "I nearly caught a white butterfly!"], bb_choc: ["a playground!", "a chocolate house!"] },
       hints: { bb_rows: "The berry rows: pick-your-own, the berry café, the jam kitchen, and the van. South: the chocolaterie.", bb_choc: "The chocolaterie and its playground. North: the berry rows." },
       spots: fam({
         mum: { bb_rows: [[300, 460], [240, 500]], bb_choc: [[260, 420], [320, 460]] },
@@ -2112,7 +2169,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         marcus: { bb_rows: [[400, 530], [280, 450]], bb_choc: [[400, 500], [340, 420]] },
         angelina: { bb_rows: [[340, 540], [260, 440]], bb_choc: [[440, 460], [280, 520]] }
       }),
-      acts: {},
+      acts: {
+        dad: { bb_choc: { act: "juggle", at: [210, 520], dir: -1 } },
+        mama: { bb_rows: { act: "fan", at: [430, 560], dir: -1 } },
+        darren: { bb_rows: { act: "carry", at: [250, 566], dir: 1 } }
+      },
       rooms: {
         bv_berrycafe: { door: "bvberrycafe", n: "The Berry Barn café", music: "bv_berrycafe", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The Berry Barn: scones and jam and cream, berry smoothies, gingham tablecloths and a dresser of jam jars." },
         bv_jam: { door: "bvjam", n: "The jam kitchen", music: "bv_jam", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The jam kitchen: copper pots bubbling, jars cooling on the sill, and the whole room smelling of hot strawberries." },
@@ -2159,7 +2220,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         marcus: { bk_bush: [[400, 530], [280, 450]], bk_koala: [[400, 500], [340, 420]] },
         angelina: { bk_bush: [[340, 540], [260, 440]], bk_koala: [[440, 460], [280, 520]] }
       }),
-      acts: {},
+      acts: {
+        mum: { bk_bush: { act: "feedroo", at: [350, 440], dir: -1 } },
+        marcus: { bk_bush: { act: "crouch", at: [172, 352], dir: -1 } },
+        angelina: { bk_koala: { act: "lookup", at: [240, 292], dir: -1 } }
+      },
       rooms: {
         bv_visitor: { door: "bvvisitor", n: "The visitor centre", music: "bv_visitor", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The visitor centre: a café, a gift shop of soft toys, and a wall of photos of the animals they've saved." },
         bv_platypus: { door: "bvplatypus", n: "The platypus house", music: "bv_platypus", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The platypus house: dark and hushed, a glass wall onto the water. Something small and brown zips past." },
@@ -2207,7 +2272,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         marcus: { br_park: [[400, 530], [280, 450]], br_river: [[400, 340], [340, 300]] },
         angelina: { br_park: [[340, 540], [260, 440]], br_river: [[440, 320], [280, 360]] }
       }),
-      acts: {},
+      acts: {
+        dad: { br_park: { act: "bbq", at: [196, 300], dir: 1, hours: [[11 * 60 + 30, 13 * 60 + 30], [17 * 60 + 30, 19 * 60 + 30]] } },
+        gonggong: { br_river: { act: "skim", at: [186, 404], dir: 1 } },
+        mama: { bv_campkitchen: { act: "cards", at: [430, 520], dir: -1 } },
+        darren: { br_park: { act: "mallow", at: [196, 470], dir: 1, hours: [[17 * 60, 22 * 60]] } }
+      },
       rooms: {
         bv_campkitchen: { door: "bvcampkitchen", n: "The camp kitchen", music: "bv_campkitchen", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The camp kitchen: a long table, a barbecue, a sink, and a noticeboard covered in notes from other campers." },
         bv_campstore: { door: "bvcampstore", n: "The camp store", music: "bv_campstore", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The camp store: ice creams, firewood, marshmallows, maps, a rack of thongs and a very old dog asleep by the door." },
@@ -2437,7 +2507,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     b_myrtle: { n: "Lemon myrtle tea", kind: "gift", to: ["mama", "mum", "angelina", "gonggong"], price: 7, shop: "bv_gallery", art: ["box", "#9CC27E", "#F3E27A"], say: "Lemon myrtle tea! It smells more like lemon than lemons do." },
     b_pinot: { n: "Bellbird Pinot Noir", kind: "gift", to: ["dad", "mum", "darren", "marcus"], price: 18, shop: "bv_tasting", art: ["bottle", "#6B2A3A", "#F3E7C8"], say: "Pinot from the valley! Light and cherry-ish. Perfect with a roast." },
     b_chard: { n: "Bellbird Chardonnay", kind: "gift", to: ["mum", "angelina", "mama", "dad"], price: 16, shop: "bv_tasting", art: ["bottle", "#E8D88A", "#F3E7C8"], say: "Chardonnay from Bellbird Valley! Cold, with fish and chips on a Friday." },
-    b_sparkling: { n: "Bellbird sparkling", kind: "gift", to: "family", price: 22, shop: "bv_tasting", art: ["bottle", "#E8E0A0", "#2E3A34"], say: "Sparkling from the valley! Riddled by hand, they said. We'll save it for something good. Or open it now." },
+    b_sparkling: { n: "Bellbird sparkling", kind: "gift", to: "family", price: 38, shop: "bv_tasting", art: ["bottle", "#E8E0A0", "#2E3A34"], say: "Sparkling from the valley! Riddled by hand, they said. We'll save it for something good. Or open it now." },
     raspberry: { n: "Raspberries", kind: "ingredient", price: 3, sell: 2, shop: "bv_jam", art: ["apple", "#D9435A", "#7FA35A"], what: "berry pavlova at the kitchen, raspberry gelato (and pick your own in the rows outside)" },
     b_jam_rasp: { n: "Raspberry jam", kind: "gift", to: "family", price: 6, shop: "bv_jam", art: ["jar", "#C2334D", "#F3E7C8"], say: "Raspberry jam from the copper pots! Seeds and all. On scones, obviously." },
     b_jam_straw: { n: "Strawberry and rhubarb jam", kind: "gift", to: ["mama", "mum", "dad", "angelina"], price: 6, shop: "bv_jam", art: ["jar", "#E8566C", "#9CC27E"], say: "Strawberry and rhubarb! Sweet and sour. Like summer with its sleeves rolled up." },
@@ -4613,8 +4683,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     chives: { n: "Chives", ns: "bunches of chives", dur: 3 * H, yield: 3, herb: true },
     thyme: { n: "Thyme", ns: "bunches of thyme", dur: 6 * H, yield: 3, herb: true },
     leek: { n: "Leek", ns: "leeks", dur: 8 * H, yield: 3 },
-    chickpea: { n: "Chickpeas", ns: "handfuls of chickpeas", dur: 6 * H, yield: 3 }
+    chickpea: { n: "Chickpeas", ns: "handfuls of chickpeas", dur: 6 * H, yield: 3 },
     // round 132: for farinata (Cinque Terre)
+    raspberry: { n: "Raspberry", ns: "punnets of raspberries", dur: 24 * H, yield: 4 }
+    // round 144: canes from Bellbird Valley's berry farm
   };
   var ITEMS = {
     tulip_seed: { e: "🌷", n: "Tulip bulbs", kind: "seed", price: 2, crop: "tulip", tab: "seeds", seasons: ["autumn", "winter", "spring"] },
@@ -4628,9 +4700,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     pea_seed: { n: "Pea seeds", kind: "seed", price: 3, crop: "pea", tab: "seeds", seasons: ["spring"] },
     pumpkin_seed: { n: "Pumpkin seeds", kind: "seed", price: 6, crop: "pumpkin", tab: "seeds", seasons: ["autumn", "winter"] },
     leek_seed: { n: "Leek seedlings", kind: "seed", price: 4, crop: "leek", tab: "seeds", seasons: ["winter"] },
+    raspberry_cane: { n: "Raspberry canes", kind: "seed", ico: "seed:raspberry", price: 6, crop: "raspberry", tab: "seeds", visited: "bellbird", seasons: ["spring", "summer", "autumn"] },
     chickpea_seed: { n: "Chickpea seeds", kind: "seed", ico: "seed:chickpea", price: 4, crop: "chickpea", tab: "seeds", visited: "cinque", seasons: ["spring", "summer", "autumn"] },
     // round 132: pine nuts at the market's deli once Mel's been to Cinque Terre (visited)
     chickpea: { n: "Chickpeas", kind: "ingredient", price: 3, sell: 2, what: "for farinata at the kitchen" },
+    raspberry: { n: "Raspberries", kind: "ingredient", price: 3, sell: 2, what: "berry pavlova at the kitchen, raspberry gelato and bonbons" },
     pinenuts: { n: "Pine nuts", kind: "ingredient", price: 6, sell: 3, tab: "deli", visited: "cinque", what: "for pesto (in the loft, once Nonna Pina's shown you) and pine nut gelato" },
     pepper_seed: { n: "Pepper seeds", kind: "seed", price: 5, crop: "pepper", tab: "seeds", seasons: ["summer"] },
     // round 109: herb seeds, for the greenhouse only (all year round, once the greenhouse is built)
@@ -10684,7 +10758,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     abalone: "Jeju's divers' house",
     goldensyrup: "Bellbird Valley's general store",
     wattleseed: "Bellbird Valley's general store",
-    raspberry: "Bellbird Valley's berry farm"
+    raspberry: "your garden (canes from the market, once you've been to Bellbird Valley) or the berry farm"
   };
 
   // src/game/scoop.js
@@ -11650,12 +11724,21 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     v.barrels[slot3] = null;
     return `${BOTTLES} bottles of ${nm3}, into the cellar. Stock them on the shop shelves.`;
   }
+  var RIDDLE = { day: 2, max: 5 };
+  var riddleDays = (c, now3 = Date.now()) => c && c.rack ? Math.min(RIDDLE.max, Math.floor((now3 - c.rack) / (24 * H))) : 0;
+  var canRiddle = (F2) => !!(F2.bellbird && F2.bellbird.riddle);
+  function onRack(F2, id) {
+    const c = vineState(F2).cellar.find((x) => x.id === id);
+    if (!c || c.type !== "sparkling" || c.rack || !canRiddle(F2)) return null;
+    c.rack = Date.now();
+    return c;
+  }
   function stock(F2, id) {
     const v = vineState(F2), c = v.cellar.find((x) => x.id === id);
     if (!c) return null;
     const s = v.shelf.find((x) => x.id === id);
     if (s) s.n += c.n;
-    else v.shelf.push({ id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES2[c.type].price, open: 0 });
+    else v.shelf.push({ id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES2[c.type].price + RIDDLE.day * riddleDays(c), open: 0 });
     v.cellar = v.cellar.filter((x) => x.id !== id);
     return `${c.name} is on the shelves.`;
   }
@@ -11789,7 +11872,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       }
       if (w.staff && v.help.stock && v.cellar.length) {
         out.stocked += v.cellar.reduce((n, c) => n + c.n, 0);
-        v.cellar.slice().forEach((c) => stock(F2, c.id));
+        v.cellar.filter((c) => !c.rack).forEach((c) => stock(F2, c.id));
       }
       const ev = eventNow(new Date(at2 + off + 6 * H).toISOString().slice(0, 10), hm3);
       if (ev && ev.wine) {
@@ -12006,7 +12089,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       }
       h += `</div></div>`;
     });
-    h += `</div>${v.cellar.length ? `<p class="eyebrow">In the cellar</p><ul class="hlist wlist">${v.cellar.map((c) => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES2[c.type].n} · ${c.n} bottles</small></span></li>`).join("")}</ul><p class="muted">Take them to the wine shop to stock the shelves.</p>` : ""}`;
+    h += `</div>${v.cellar.length ? `<p class="eyebrow">In the cellar</p><ul class="hlist wlist">${v.cellar.map((c) => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES2[c.type].n} · ${c.n} bottles${c.rack ? ` · on the riddling rack, ${riddleDays(c)} day${riddleDays(c) === 1 ? "" : "s"} (+${RIDDLE.day * riddleDays(c)} a bottle${riddleDays(c) >= RIDDLE.max ? ", as fine as it gets" : ""})` : ""}</small></span>${c.type === "sparkling" && !c.rack && canRiddle(F2) ? `<button class="btn small primary" data-vyrack="${esc(c.id)}">Onto the riddling rack</button>` : ""}</li>`).join("")}</ul><p class="muted">Take them to the wine shop to stock the shelves.</p>` : ""}`;
     return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function stockFruit(F2, id) {
@@ -12027,7 +12110,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The wine shelves</h2>
     ${v.shelf.length ? `<ul class="hlist wlist wshelf">${v.shelf.map((s) => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${STYLES2[s.type].n} · ${s.n} on the shelf${s.open ? ` · a bottle open for tasting` : ""}${s.price > STYLES2[s.type].price * 1.3 ? ` · pricey: fewer buyers` : s.price < STYLES2[s.type].price * 0.75 ? ` · a bargain: flying off` : ""}</small></span><label class="wprice"><span class="sr">Price</span><input type="number" min="1" max="999" data-vyprice="${esc(s.id)}" value="${s.price}"> coins</label></li>`).join("")}</ul>` : `<p class="sub">The shelves are bare.</p>`}
     ${fruitCrate(F2)}
-    ${v.cellar.length ? `<p class="eyebrow">From the cellar</p><ul class="hlist wlist">${v.cellar.map((c) => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES2[c.type].n} · ${c.n} bottles</small></span><button class="btn small primary" data-vystock="${esc(c.id)}">Stock it</button></li>`).join("")}</ul>` : `<p class="muted">Bottled wines wait in the cellar until you stock them here.</p>`}
+    ${v.cellar.length ? `<p class="eyebrow">From the cellar</p><ul class="hlist wlist">${v.cellar.map((c) => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES2[c.type].n} · ${c.n} bottles${c.rack ? ` · riddled ${riddleDays(c)} day${riddleDays(c) === 1 ? "" : "s"}, ${STYLES2[c.type].price + RIDDLE.day * riddleDays(c)} a bottle` : ""}</small></span><button class="btn small primary" data-vystock="${esc(c.id)}">Stock it</button></li>`).join("")}</ul>` : `<p class="muted">Bottled wines wait in the cellar until you stock them here.</p>`}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function counterPanel2(F2, serving2, staff) {
@@ -12188,6 +12271,15 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       if (line) {
         api4.sfx("paper");
         api4.say(line);
+        api4.save();
+        api4.rerender();
+      }
+    });
+    root.querySelectorAll("[data-vyrack]").forEach((b) => b.onclick = () => {
+      const c = onRack(F2, b.dataset.vyrack);
+      if (c) {
+        api4.sfx("chime");
+        api4.say(`${c.name}, neck-down on the riddling rack. A quarter turn a day, like Jono showed you. The longer it stays, the finer it gets.`);
         api4.save();
         api4.rerender();
       }
@@ -14211,6 +14303,42 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         return `<path d="M${-26 * k} ${-15 * k} h${52 * k} q${-4 * k} ${15 * k} ${-20 * k} ${15 * k} h${-14 * k} q${-14 * k} 0 ${-18 * k} ${-15 * k}z" ${S("#3E6BAE")}/><path d="M${-24 * k} ${-11 * k} h${48 * k}" fill="none" stroke-width="${2 * k}" style="stroke:#F3D98A"/><g class="tool"><path d="M${10 * k} ${-22 * k} L${34 * k} ${2 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><ellipse cx="${36 * k}" cy="${4 * k}" rx="${2.4 * k}" ry="${5 * k}" transform="rotate(-45 ${36 * k} ${4 * k})" ${S("#C9A27E")}/></g>`;
       case "book":
         return `<path d="M${-2 * k} ${-30 * k} q${7 * k} ${-3 * k} ${14 * k} 0 v${10 * k} q${-7 * k} ${-3 * k} ${-14 * k} 0z" ${S("#FFFDF6")}/><path d="M${5 * k} ${-31 * k} v${10 * k}" fill="none" stroke-width=".7"/><path d="M${-2 * k} ${-20 * k} q${7 * k} ${-3 * k} ${14 * k} 0" fill="none" stroke-width="1.4" style="stroke:#2E7A5A"/>`;
+      // round 144, for Bellbird Valley (never what they did in Ronda, Kyoto, Jeju or Cinque Terre): Ma Ma's op-shop
+      // cardigan on a hanger, Gong Gong's binoculars, Angellina's wattle crown, Darren's drone, Dad's takeaway coffee,
+      // Marcus's footy, Mum's glass of Pinot, Dad's juggled strawberries, Ma Ma's paper fan, Darren's berry flats, Mum's
+      // bag of roo pellets, Dad's barbecue tongs (and the grill), Gong Gong's skimming stone, Ma Ma's cards, Darren's
+      // marshmallow on a stick (Mum's wave, Gong Gong's tai chi, Marcus at the wombat hole, Angellina looking up at the
+      // koalas: arms and poses only, npcs.css)
+      case "hanger":
+        return `<g class="tool"><path d="M${10 * k} ${-22 * k} v${-16 * k}" fill="none" stroke-width="1.2" style="stroke:#8A8478"/><path d="M${10 * k} ${-40 * k} q${2 * k} ${-3 * k} ${-1 * k} ${-4 * k}" fill="none" stroke-width="1.1"/><path d="M${2 * k} ${-36 * k} l${8 * k} ${-4 * k} l${8 * k} ${4 * k} v${14 * k} h${-16 * k}z" ${S("#C98A9A")}/><path d="M${10 * k} ${-36 * k} v${14 * k}" fill="none" stroke-width=".7"/></g>`;
+      case "binocs":
+        return `<g class="tool"><rect x="${2 * k}" y="${y - 1 * k}" width="${5 * k}" height="${7 * k}" rx="${1.6 * k}" ${S("#3A3430")}/><rect x="${8 * k}" y="${y - 1 * k}" width="${5 * k}" height="${7 * k}" rx="${1.6 * k}" ${S("#3A3430")}/><path d="M${7 * k} ${y + 2 * k} h${1 * k}" stroke-width="1.4"/></g>`;
+      case "crownw":
+        return `<path d="M${-11 * k} ${y - 6 * k} q${11 * k} ${-6 * k} ${22 * k} 0" fill="none" stroke-width="${1.6 * k}" style="stroke:#6E8A4A"/>${[-9, -5, -1, 3, 7, 10].map((x, i) => `<circle cx="${x * k}" cy="${y - 6 * k - (i % 2 ? 2.4 * k : 1.2 * k) + Math.abs(x) * 0.12 * k}" r="${1.8 * k}" fill="#F2CF3A" stroke="#B8932A" stroke-width=".5"/>`).join("")}<g class="tool"><circle cx="${12 * k}" cy="${-22 * k}" r="${2 * k}" fill="#F2CF3A" stroke="#B8932A" stroke-width=".5"/></g>`;
+      case "remote":
+        return `<rect x="${2 * k}" y="${-26 * k}" width="${12 * k}" height="${7 * k}" rx="${2 * k}" ${S("#5F5E64")}/><circle cx="${5 * k}" cy="${-22.5 * k}" r="${1.2 * k}" fill="#3A3430"/><circle cx="${11 * k}" cy="${-22.5 * k}" r="${1.2 * k}" fill="#3A3430"/><g class="kitefly"><g transform="translate(${30 * k} ${-92 * k})"><rect x="${-6 * k}" y="${-2 * k}" width="${12 * k}" height="${4 * k}" rx="${1.4 * k}" ${S("#3A3430")}/><path d="M${-12 * k} ${-4 * k} h${8 * k} M${4 * k} ${-4 * k} h${8 * k}" stroke-width="1.2" style="stroke:#8A8478"/><path d="M${-8 * k} ${-4 * k} v${2 * k} M${8 * k} ${-4 * k} v${2 * k}" stroke-width="1"/><circle cx="0" cy="${2.4 * k}" r="${1.2 * k}" fill="#E8566C"/></g></g>`;
+      case "cuppa":
+        return `<g class="tool"><path d="M${8 * k} ${-30 * k} h${8 * k} l${-1 * k} ${10 * k} h${-6 * k}z" ${S("#FFFDF6")}/><rect x="${8 * k}" y="${-32 * k}" width="${8 * k}" height="${2.4 * k}" rx="1" ${S("#5A3A2A")}/><rect x="${8.6 * k}" y="${-27 * k}" width="${6.8 * k}" height="${3 * k}" fill="#C9A27E" stroke="none"/></g>`;
+      case "footy":
+        return `<g class="ballbounce"><ellipse cx="${18 * k}" cy="${-6 * k}" rx="${5 * k}" ry="${3.2 * k}" transform="rotate(-30 ${18 * k} ${-6 * k})" ${S("#B5503A")}/><path d="M${16 * k} ${-6 * k} h${4 * k}" stroke-width=".8" style="stroke:#FFFDF6"/></g>`;
+      case "wineglass":
+        return `<g class="tool"><path d="M${9 * k} ${-34 * k} h${7 * k} q0 ${6 * k} ${-3.5 * k} ${7 * k} q${-3.5 * k} ${-1 * k} ${-3.5 * k} ${-7 * k}z" ${S("#FFFDF6")}/><path d="M${9.6 * k} ${-31 * k} h${5.8 * k} q${-0.6 * k} ${3 * k} ${-2.9 * k} ${3.6 * k} q${-2.3 * k} ${-0.6 * k} ${-2.9 * k} ${-3.6 * k}z" fill="#7A2E3A" stroke="none"/><path d="M${12.5 * k} ${-27 * k} v${5 * k} M${10 * k} ${-22 * k} h${5 * k}" fill="none" stroke-width="1"/></g>`;
+      case "juggle":
+        return `<g class="juggle">${[0, 1, 2].map((i) => `<g class="jb jb${i}"><path d="M${-3 * k} ${-44 * k} c${-3 * k} ${-1 * k} ${-3 * k} ${-6 * k} 0 ${-6 * k} c${3 * k} 0 ${3 * k} ${5 * k} 0 ${6 * k}z" fill="#E8566C" stroke="#2F2B28" stroke-width=".6"/></g>`).join("")}</g>`;
+      case "fan":
+        return `<g class="tool"><path d="M${10 * k} ${-22 * k} l${-6 * k} ${-12 * k} a${13 * k} ${13 * k} 0 0 1 ${13 * k} ${-2 * k}z" ${S("#F4C7CF")}/><path d="M${10 * k} ${-22 * k} l${-2 * k} ${-14 * k} M${10 * k} ${-22 * k} l${2 * k} ${-14 * k} M${10 * k} ${-22 * k} l${5 * k} ${-13 * k}" fill="none" stroke-width=".6"/></g>`;
+      case "flats":
+        return `${[0, 1, 2].map((i) => `<rect x="${-12 * k}" y="${(-26 - i * 5) * k}" width="${24 * k}" height="${4.4 * k}" rx="1" ${S("#C9A27E")}/>${[0, 1, 2, 3, 4].map((j) => `<circle cx="${(-9 + j * 4.6) * k}" cy="${(-27 - i * 5) * k}" r="${1.7 * k}" fill="${(i + j) % 2 ? "#E8566C" : "#C2334D"}"/>`).join("")}`).join("")}`;
+      case "roobag":
+        return `<g class="tool"><path d="M${8 * k} ${-24 * k} h${8 * k} l${-1 * k} ${7 * k} h${-6 * k}z" ${S("#E6DBC0")}/>${[0, 1, 2].map((i) => `<circle cx="${(18 + i * 3) * k}" cy="${(-14 + i * 2) * k}" r="${1 * k}" fill="#8A6A3A"/>`).join("")}</g>`;
+      case "tongs":
+        return `<g class="tool"><path d="M${10 * k} ${-22 * k} l${12 * k} ${-6 * k} M${10 * k} ${-21 * k} l${12 * k} ${-3 * k}" fill="none" stroke-width="1.3" style="stroke:#8A8478"/></g><rect x="${14 * k}" y="${-14 * k}" width="${20 * k}" height="${6 * k}" rx="1" ${S("#3A3430")}/><path d="M${16 * k} ${-8 * k} l${-2 * k} ${8 * k} M${32 * k} ${-8 * k} l${2 * k} ${8 * k}" stroke-width="1.2"/>${[0, 1, 2].map((i) => `<rect x="${(17 + i * 5.6) * k}" y="${-17 * k}" width="${4.4 * k}" height="${3 * k}" rx="${1.4 * k}" fill="#B5503A" stroke="#2F2B28" stroke-width=".6"/>`).join("")}<g class="steam"><path d="M${20 * k} ${-20 * k} q${-2 * k} ${-4 * k} 0 ${-8 * k} M${27 * k} ${-20 * k} q${2 * k} ${-4 * k} 0 ${-8 * k}" fill="none" stroke-width=".8" style="stroke:#B9B0A4"/></g>`;
+      case "skim":
+        return `<g class="tool"><ellipse cx="${13 * k}" cy="${-22 * k}" rx="${3.4 * k}" ry="${1.8 * k}" ${S("#8A8478")}/></g><g class="ripples"><ellipse cx="${34 * k}" cy="${2 * k}" rx="${4 * k}" ry="${1.2 * k}" fill="none" stroke-width=".8" style="stroke:#FFFDF6"/><ellipse cx="${46 * k}" cy="${3 * k}" rx="${3 * k}" ry="${1 * k}" fill="none" stroke-width=".8" style="stroke:#FFFDF6"/></g>`;
+      case "cards":
+        return `<g class="tool">${[-12, 0, 12].map((r2, i) => `<rect x="${8 * k}" y="${-30 * k}" width="${5 * k}" height="${7 * k}" rx=".8" transform="rotate(${r2} ${10 * k} ${-22 * k})" fill="${i === 1 ? "#FFFDF6" : "#F6F1E8"}" stroke="#2F2B28" stroke-width=".5"/>`).join("")}</g><rect x="${-18 * k}" y="${-2 * k}" width="${8 * k}" height="${3 * k}" rx=".6" fill="#C9483A" stroke="#2F2B28" stroke-width=".5"/>`;
+      case "mallow":
+        return `<g class="tool"><path d="M${10 * k} ${-22 * k} L${36 * k} ${-34 * k}" fill="none" stroke-width="1.2" style="stroke:#8A6A3A"/><rect x="${35 * k}" y="${-38 * k}" width="${5 * k}" height="${4.4 * k}" rx="${1.4 * k}" fill="#F3D9A0" stroke="#2F2B28" stroke-width=".6"/></g>`;
       case "lantern":
         return `<path d="M${12 * k} ${-24 * k} v${-4 * k}" fill="none"/><rect x="${9 * k}" y="${-24 * k}" width="${7 * k}" height="${9 * k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5 * k}" cy="${-19.5 * k}" r="${1.8 * k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
     }
@@ -14281,7 +14409,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       <path d="M${-8.6 * k} ${-37 * k} q${8.6 * k} ${-2.4 * k} ${17.2 * k} 0 l${1.4 * k} ${23 * k} h${-20 * k}z" ${S(look.dress || look.top)}/>
       ${look.batik && !coat ? batik(look.batik, k) : ""}${look.palms && !coat ? palms(k) : ""}
       ${coat ? coatArt(rain, k) : ""}
-      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book", "hanger", "remote", "cuppa", "footy", "wineglass", "juggle", "fan", "flats", "roobag", "tongs", "skim", "cards", "mallow"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
       <circle cx="0" cy="${-46 * k}" r="${10.6 * k}" ${S(look.skin)}/>
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46 * k, 10.6 * k) : hair(look.hairStyle, look.hair, k)}
@@ -14291,7 +14419,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       <ellipse cx="${6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
       <path d="M${-1.6 * k} ${-40.4 * k} q${1.6 * k} ${1.4 * k} ${3.2 * k} 0" fill="none" stroke-width="1"/>
       ${look.hairStyle === "bobfringe" ? fringe(look.hair, -46 * k, 10.6 * k, k) : ""}
-      ${["glasses", "cap", "sunhat", "helmet"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["glasses", "cap", "sunhat", "helmet", "binocs", "crownw"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.specs ? extra("specs", look, k) : ""}
       ${look.hat && !coat ? extra(look.hat, look, k) : ""}
       ${coat ? hoodArt(rain, k) : ""}
@@ -20377,7 +20505,22 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     poles: "poles",
     row: "oar",
     read: "book",
-    poem: "notebook"
+    poem: "notebook",
+    rummage: "hanger",
+    binoculars: "binocs",
+    crown: "crownw",
+    drone: "remote",
+    cuppa: "cuppa",
+    footy: "footy",
+    swirl: "wineglass",
+    juggle: "juggle",
+    fan: "fan",
+    carry: "flats",
+    feedroo: "roobag",
+    bbq: "tongs",
+    skim: "skim",
+    cards: "cards",
+    mallow: "mallow"
   };
   var outdoors = (s) => OUTDOOR.includes(s);
   var isHere = (id) => {
@@ -21493,6 +21636,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       `<path d="M${x - 48} ${y - 50} q0 -6 6 -6 h62 q6 0 6 6z"/><rect x="${x - 50}" y="${y - 50}" width="100" height="44" rx="8"/>${[-36, -14, 8].map((dx) => `<rect x="${x + dx}" y="${y - 46}" width="18" height="13" rx="3"/>`).join("")}<rect x="${x + 30}" y="${y - 46}" width="16" height="14" rx="4"/><path d="M${x - 6} ${y - 28} v22"/><circle cx="${x - 30}" cy="${y - 4}" r="8"/><circle cx="${x + 28}" cy="${y - 4}" r="8"/>`
     )}
     ${lit2 ? `<g pointer-events="none">${Array.from({ length: 9 }, (_, i) => `<circle class="twinkle" cx="${x - 46 + i * 11}" cy="${y - 52 + Math.sin(i) * 2}" r="1.6" fill="${lit2.c === "#FFFDF6" ? "#F3C969" : lit2.a}" style="animation-delay:${(i * 0.25).toFixed(2)}s"/>`).join("")}</g>` : ""}
+    ${F2.bellbird && F2.bellbird.stamps && Object.keys(F2.bellbird.stamps).length ? `<g pointer-events="none" aria-hidden="true"><circle cx="${x - 38}" cy="${y - 18}" r="7" fill="#F3E7C8" stroke="#2F2B28" stroke-width=".8"/><path d="M${x - 43} ${y - 16} q5 -6 10 0" fill="none" stroke="#7FA35A" stroke-width="1.4"/><circle cx="${x - 38}" cy="${y - 21}" r="2" fill="#E8566C"/></g>` : ""}
     ${tapeLabel(x, y + 20, "Campervan", "#C3E8DA", 9)}</g>`;
   }
   function hlaneArt() {
@@ -23725,9 +23869,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     h += done ? `<p class="sub">The field's coming up. Gus says: "Low and gentle, now." Let some air out, and bring her down.</p><div class="actions"><button class="btn alt" data-bba="drift">Let some air out</button><button class="btn primary" data-bba="land">Land</button></div>` : `<p class="sub">Coming up: ${esc(next[0].toLowerCase())}. ${["Lower is better for that.", "Low-ish, Gus says.", "A bit higher.", "Right up high for this one."][next[1] - 1]} You're at ${["treetop height", "low", "middling", "right up high"][st6.alt - 1]}.</p><div class="actions"><button class="btn primary" data-bba="burn">Burner (up)</button><button class="btn alt" data-bba="hold">Hold steady</button><button class="btn alt" data-bba="drift">Drift (down)</button></div>`;
     return h + `<p class="muted">${st6.seen.length} seen so far.</p>`;
   }
-  var RIDDLE = { N: 8 };
+  var RIDDLE2 = { N: 8 };
   var riddleStart = (rng = Math.random) => {
-    const turns = Array.from({ length: RIDDLE.N }, () => Math.floor(rng() * 4));
+    const turns = Array.from({ length: RIDDLE2.N }, () => Math.floor(rng() * 4));
     if (turns.every((t2) => !t2)) turns[0] = 2;
     return { turns, taps: 0 };
   };
@@ -31184,6 +31328,18 @@ ${SIGNOFF[t2.who] || ""}`;
         setTimeout(() => evanSays("warm bread! mmm!"), 2200);
         save2();
       }, 3200);
+      if (room === "bv_store" && inParty(F, "evan") && !evanNight() && bbState(F).freddo !== dayKey()) setTimeout(() => {
+        if (scene !== "bv_store" || !isHere("mrsdunn")) return;
+        bbState(F).freddo = dayKey();
+        npcSay("mrsdunn", "Here, love. One for the little fella. Don't tell your mum. Oh, she's right there.");
+        setTimeout(() => evanSays("a chocolate FROG! thank you!"), 2400);
+        save2();
+      }, 3200);
+      if (room === "bv_tasting") setTimeout(() => {
+        if (scene !== "bv_tasting") return;
+        speak("Pinot the cellar dog pads in behind you, sniffs your shoes, and flops down under the bar with a sigh.", 4500);
+        if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays("doggy! he's called WINE!"), 2e3);
+      }, 5600);
       if (room === "jj_haenyeo" && inParty(F, "evan") && !evanNight() && !jejuState(F).shell) setTimeout(() => {
         if (scene !== "jj_haenyeo" || !isHere("halmang")) return;
         jejuState(F).shell = true;
@@ -32801,7 +32957,7 @@ ${SIGNOFF[t2.who] || ""}`;
     if (typing) persist("fox");
     else save2(scene === "vineyard" || scene === "wineshop");
   }
-  var stallItems = (st6) => !st6.produce ? todaysGoods(st6) : Object.keys(CROPS).filter((c) => !["tulip", "sunflower"].includes(c) && (c !== "chickpea" || F.towns && F.towns.cinque) && ITEMS[c] && !CROPS[c].herb && Object.values(ITEMS).some((it) => it.crop === c && !it.greenhouse && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
+  var stallItems = (st6) => !st6.produce ? todaysGoods(st6) : Object.keys(CROPS).filter((c) => !["tulip", "sunflower"].includes(c) && (c !== "chickpea" || F.towns && F.towns.cinque) && (c !== "raspberry" || F.towns && F.towns.bellbird) && ITEMS[c] && !CROPS[c].herb && Object.values(ITEMS).some((it) => it.crop === c && !it.greenhouse && (!it.seasons || it.seasons.includes(seasonOf(dayKey())))));
   function todaysGoods(st6, day = dayKey()) {
     const ev = eventOn(day), pool2 = [...(st6.items || []).slice(1), ...(POOLS[ev ? ev.kind : ""] || {})[st6.id] || []].filter((id) => ITEMS[id]);
     const n = Math.max(2, (st6.items || []).length);
