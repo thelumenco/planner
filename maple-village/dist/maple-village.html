@@ -30068,6 +30068,7 @@ ${SIGNOFF[t2.who] || ""}`;
     if (!r) return false;
     if (r.no) {
       npcSay(id, pick(["Not today, thanks!", "Ooh, tempting. Maybe later!", "I've just had lunch, sorry!", "Not for me, but it looks lovely."]));
+      save2();
       return true;
     }
     const what = r.items.map(([f2, n]) => `a ${f2} of ${n.replace(/ (Gelato|Sorbet)$/, "").toLowerCase()}`).join(" and ");

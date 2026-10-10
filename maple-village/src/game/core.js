@@ -2712,7 +2712,7 @@ function trolleyHome(){ const r = returnTrolley(F); if (!r) return; sfx(r.melted
 function trolleyOffer(id){
   const def = NPCS.find(n => n.id === id), fam = FAMILY_ALL.includes(id); if (!def && !fam) return false;
   const r = trolleySell(F, id, dayKey(), {kid: !!(def && def.kid) || id === "evan", family: fam, rainy: rainyOn(dayKey()), season: seasonOf(dayKey()), hm: sgHM()}); if (!r) return false;
-  if (r.no) { npcSay(id, pick(["Not today, thanks!", "Ooh, tempting. Maybe later!", "I've just had lunch, sorry!", "Not for me, but it looks lovely."])); return true; }
+  if (r.no) { npcSay(id, pick(["Not today, thanks!", "Ooh, tempting. Maybe later!", "I've just had lunch, sorry!", "Not for me, but it looks lovely."])); save(); return true; }
   const what = r.items.map(([f, n]) => `a ${f} of ${n.replace(/ (Gelato|Sorbet)$/, "").toLowerCase()}`).join(" and ");
   npcSay(id, pick([`Yes please! ${what[0].toUpperCase() + what.slice(1)}.`, `Oh, perfect timing. ${what[0].toUpperCase() + what.slice(1)}, please!`, `Go on then: ${what}.`]));
   sfx("coin"); flash(`+${r.coins} coins: the trolley`); save(); return true;

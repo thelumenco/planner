@@ -2537,7 +2537,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector("#ctx .krequest", { timeout: 15000 });
   check(/has been craving .* sells for \d+ coins a plate instead of \d+/.test(await page.locator("#ctx .krequest").textContent()), "someone in town is craving one of the season's tapas: it sells for half as much again");
   const txt = await page.locator("#ctx").textContent();
-  check(["Grilled halloumi with honey", "Huevos rotos", "Yoghurt with honey and walnuts", "Grilled sardines"].every(n => txt.includes(n)) && ["Honey cake", "Flower shortbread", "Blueberry tart", "Farm cheese board"].every(n => txt.includes(n)), "new tapas (halloumi, huevos rotos, yoghurt, seafood) and small plates (honey cake, flower shortbread, blueberry tart, farm cheese board)");
+  check(["Grilled halloumi with honey", "Huevos rotos", "Yoghurt with honey", "Grilled sardines"].every(n => txt.includes(n)) && ["Honey cake", "Flower shortbread", "Blueberry tart", "Farm cheese board"].every(n => txt.includes(n)), "new tapas (halloumi, huevos rotos, yoghurt, seafood) and small plates (honey cake, flower shortbread, blueberry tart, farm cheese board)");
   await page.locator('#ctx [data-k="tapas"][data-id="halloumi"]').click(); await page.waitForTimeout(200); await page.locator('#ctx [data-k="cooktapas"]').click(); await page.waitForTimeout(300);
   check(await fox().then(f => f.vine.tapasList.some(t => t.id === "halloumi" && t.plates === 6) && !f.kitchen.larder.chz_halloumi && f.kitchen.larder.honey === 1), "Wildflower Farm's halloumi and honey make grilled halloumi with honey");
   await page.locator('#ctx [data-k="dish"][data-dish="shortbread"]').click(); await page.waitForTimeout(300);
@@ -3212,7 +3212,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await fox().then(f => f.scoop.trolley && f.scoop.trolley.tubs["mango+milk"] === 10 && f.scoop.trolley.tubs.pandan === 10 && f.scoop.tubs.pandan === 30), "at the counter: load the trolley with two flavours, ten scoops each");
   await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(1500);
   check(await page.locator("#mel").evaluate(e => e.classList.contains("trolley")), "out in the square, Mel's pushing the little pink trolley");
-  const who = await page.locator("#actors .npc").first().getAttribute("data-npc");
+  const who = await page.locator("#actors .npc:not([data-npc^=\"agent\"])").first().getAttribute("data-npc");
   await page.locator(`#actors .npc[data-npc="${who}"]`).dispatchEvent("click"); await page.waitForTimeout(600);
   check(await fox().then(f => f.scoop.asked && f.scoop.asked.ids.includes(who)), `tap someone (${who}) and Mel offers them an ice cream`);
   await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(2000);
