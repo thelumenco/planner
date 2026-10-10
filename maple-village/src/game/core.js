@@ -2127,7 +2127,7 @@ const partyList = t => t.party.map(tripName).join(", ").replace(/, ([^,]*)$/, " 
 // the ferry crossing (round 127: Jeju): longer than the train, and the sea has dolphins in it
 function ferryRide(text, home, then){
   const o = document.createElement("div"); o.className = "taxiride trainride ferryride"; o.innerHTML = ferryRideArt(home) + `<p>${esc(text)}</p>`; $("map").appendChild(o); sfx("honk");
-  setTimeout(() => { o.remove(); then(); }, 3400);
+  setTimeout(() => { o.remove(); then(); }, 6000);   // (a slow crossing: 6s, the CSS .ferryride matches)
 }
 function startTrip(town, by = "train"){
   const r = buyTrip(F, town, tripPick, sgHM(), by); if (!r) return;

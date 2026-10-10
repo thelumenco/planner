@@ -1464,6 +1464,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 @keyframes jjdive{from{width:0}to{width:100%}}
 .jjtang{display:flex;justify-content:center;margin:8px 0}
 @media (prefers-reduced-motion:reduce){.jjdepth .jjfill{animation-duration:3200ms !important}}
+/* the Jeju ferry crossing (round 130 fix): open sea below the horizon, not the train's sandy ground; slower, with a gentle swell */
+.taxiride.ferryride{background:linear-gradient(#BFE0F2 0 38%,#7FB6D6 38%,#5E9CC4 100%);animation-duration:6s}
+.ferryride .taxiboat{animation:tglide 6s ease-in-out both}
+.ferryride .taxiboat svg{animation:fswell 1.6s ease-in-out infinite alternate}
+@keyframes fswell{from{transform:translateY(0) rotate(-1.2deg)}to{transform:translateY(-4px) rotate(1.2deg)}}
+.ferryride .taxibank{animation-duration:6s}
+.ferryride::after{content:"";position:absolute;left:0;right:0;top:46%;bottom:0;z-index:-1;pointer-events:none;opacity:.55;
+  background:repeating-linear-gradient(170deg,transparent 0 26px,rgba(234,245,250,.7) 26px 28px,transparent 28px 60px);animation:fwaves 6s linear both}
+@keyframes fwaves{from{background-position:0 0}to{background-position:-240px 0}}
+@media (prefers-reduced-motion:reduce){.ferryride .taxiboat,.ferryride .taxiboat svg,.ferryride::after{animation:none}}
 </style>
 </head>
 <body>
@@ -26583,7 +26593,7 @@ ${SIGNOFF[t2.who] || ""}`;
     setTimeout(() => {
       o.remove();
       then();
-    }, 3400);
+    }, 6e3);
   }
   function startTrip(town, by = "train") {
     const r = buyTrip(F, town, tripPick, sgHM(), by);

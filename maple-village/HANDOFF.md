@@ -1914,3 +1914,4 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Rule: a sell price is never above any buy price, so buying to resell never pays.
   - Hana has her own line when you sell something you made.
 - **Bike-hire test fix:** it now compares the hire's end time with the game's clock.
+- **Ferry ride fix (round 130):** `.ferryride` has its own sea-and-sky background (it was inheriting `.trainride`'s sandy ground), drifting waves and a gentle swell, and takes 6s (CSS and the `ferryRide` timeout).
