@@ -25,7 +25,7 @@ export const TL_TOWNS = {
     evanScreen: {tf_top: ["the clouds are BELOW us", "a pie shop!"], tf_pool: ["the waterfall is SO loud", "a rainbow! in the water!"]},
     hints: {tf_top: "Misty Falls: the lookout, the Range Café, the ranger station and the van. Down the path: the falls.", tf_pool: "The waterfall and the swimming hole, the sunny rock and the gallery. Up the path: back to the top."},
     spots: famSpots({tf_top: [[250, 420], [330, 450], [220, 500], [380, 400], [180, 430], [300, 520]], tf_pool: [[200, 380], [330, 380], [260, 460], [420, 420], [160, 560], [360, 560]]}),
-    acts: {}, rooms: {
+    acts: {gonggong: {tf_top: {act: "flask", at: [232, 262], dir: 1}}, marcus: {tf_pool: {act: "wade", at: [330, 330], dir: -1}}}, rooms: {
       bv_tcafe: room("bvtcafe", "The Range Café", "The Range Café: a wood stove, a glass case of pies and vanilla slices, scones under tea towels, and a window full of mist."),
       bv_tranger: room("bvtranger", "The ranger station", "The ranger station: a big map of the tableland, a jar of seed pods, a stuffed cassowary (old, very serious), and the swimming hole's rules in big letters."),
       bv_tgallery: room("bvtgallery", "The Mistfall gallery", "The gallery: paintings of the falls in every season, carved timber birds, and a potter's wheel in the corner, still wet.")},
@@ -50,7 +50,7 @@ export const TL_TOWNS = {
     evanScreen: {tk_shore: ["the water is so blue", "a turtle! I saw a turtle!"], tk_fig: ["the tree has CURTAINS", "a kangaroo in the TREE!"]},
     hints: {tk_shore: "Crater Lake: the lake, the jetty, the boat shed, the Lake House and the van. East: the curtain fig.", tk_fig: "The rainforest boardwalk: the giant curtain fig, the tree-kangaroo, and the wood-turner's shop. West: back to the lake."},
     spots: famSpots({tk_shore: [[220, 460], [320, 470], [260, 520], [400, 520], [180, 500], [360, 580]], tk_fig: [[200, 420], [320, 440], [260, 520], [420, 480], [160, 560], [380, 560]]}),
-    acts: {}, rooms: {
+    acts: {angelina: {tk_shore: {act: "ducks", at: [190, 470], dir: -1}}, darren: {tk_shore: {act: "frisbee", at: [380, 480], dir: -1}}}, rooms: {
       bv_tboat: room("bvtboat", "The boat shed", "The boat shed: kayaks in racks, paddles on hooks, life jackets in every size, and a chalkboard of who's out on the water."),
       bv_tlake: room("bvtlake", "The Lake House", "The Lake House: big windows onto the water, pancakes and hot chocolate, and a fireplace with armchairs nobody ever wants to leave."),
       bv_tturner: room("bvtturner", "The wood-turner's shop", "The wood-turner's shop: a lathe humming, shavings curling on the floor, and shelves of bowls in red cedar and silky oak.")},
@@ -75,7 +75,7 @@ export const TL_TOWNS = {
     evanScreen: {tr_street: ["the jars go up to the sky!", "bread! I smell bread!"], tr_creek: ["the platypus! where is he?", "a wooden bridge!"]},
     hints: {tr_street: "Willow Bend: the main street, the bakehouse, the lolly shop, the book barn, the old horse trough and the van. East: the creek.", tr_creek: "The creek: the wooden bridge, the platypus platform and the picnic park. West: back to the main street."},
     spots: famSpots({tr_street: [[220, 420], [320, 440], [260, 520], [400, 500], [180, 480], [360, 560]], tr_creek: [[160, 300], [360, 300], [380, 480], [140, 480], [400, 560], [160, 560]]}),
-    acts: {}, rooms: {
+    acts: {mum: {tr_creek: {act: "hush", at: [196, 326], dir: 1}}, mama: {tr_street: {act: "lollybag", at: [340, 420], dir: -1}}}, rooms: {
       bv_tbakery: room("bvtbakery", "The Willow Bend bakehouse", "The bakehouse: a big old wood oven, loaves on racks, lamingtons and finger buns in the case, and flour on everything."),
       bv_tlolly: room("bvtlolly", "Jarrah's lolly shop", "The lolly shop: jars to the ceiling on every wall, a sliding ladder, paper bags, and a scale that goes ding."),
       bv_tbooks: room("bvtbooks", "The book barn", "The book barn: a tall old barn of second-hand books, armchairs between the shelves, a ladder, and a cat asleep on the poetry.")},
@@ -100,7 +100,7 @@ export const TL_TOWNS = {
     evanScreen: {td_yard: ["a milkshake shop!", "a big tank of milk!"], td_paddock: ["the calf licked me!", "the cows are SO big"]},
     hints: {td_yard: "Greenhill Dairy: the milking shed, the cheese room, the farm shop and the van. Up the lane: the paddock.", td_paddock: "The paddock: the herd, the calf pen and the windmill. Down the lane: back to the yard."},
     spots: famSpots({td_yard: [[220, 360], [300, 380], [260, 460], [200, 520], [330, 540], [260, 300]], td_paddock: [[160, 420], [260, 470], [200, 540], [330, 520], [440, 560], [100, 520]]}),
-    acts: {}, rooms: {
+    acts: {dad: {td_yard: {act: "pail", at: [210, 340], dir: 1}}, gonggong: {td_paddock: {act: "fence", at: [312, 414], dir: 1}}}, rooms: {
       bv_tmilk: room("bvtmilk", "The milking shed", "The milking shed: a long concrete pit, cups on hoses, a radio playing country music, and the cows walking in on their own, one by one."),
       bv_tcheese: room("bvtcheese", "The cheese room", "The cheese room: white tiles, a big steel vat, cheeses on timber shelves turning gold, and everyone in hairnets."),
       bv_tshop: room("bvtshop", "The farm shop", "The farm shop and café: a fridge of milk in glass bottles, a cheese counter, and milkshakes so thick the straw stands up.")},
@@ -125,7 +125,7 @@ export const TL_TOWNS = {
     evanScreen: {tm_shed: ["the machine goes CRACK", "tiny lime balls! pop pop!"], tm_grove: ["the nuts fall on the blanket!", "can I shake the tree?"]},
     hints: {tm_shed: "Nutwood Farm: the cracking shed, the farm café, the finger lime hedge and the van. West: the macadamia grove.", tm_grove: "The macadamia grove: shake the trees onto the tarps, and the packing shed. East: back to the cracking shed."},
     spots: famSpots({tm_shed: [[220, 360], [300, 400], [160, 420], [420, 380], [260, 480], [120, 520]], tm_grove: [[200, 420], [320, 420], [260, 500], [420, 500], [140, 460], [360, 580]]}),
-    acts: {}, rooms: {
+    acts: {marcus: {tm_grove: {act: "shake", at: [300, 414], dir: -1}}, mama: {tm_shed: {act: "crack", at: [160, 320], dir: 1}}}, rooms: {
       bv_tcrack: room("bvtcrack", "The cracking shed", "The cracking shed: the old cracker clattering away, nuts rattling down a chute, shells flying, and sacks of kernels by the door."),
       bv_tnutcafe: room("bvtnutcafe", "The Nutwood café", "The farm café: macadamia slice, finger-lime soda, a long table on the verandah, and a view down the rows."),
       bv_tpack: room("bvtpack", "The packing shed", "The packing shed: a sorting table, scales, paper bags of nuts with hand-written labels, and boxes of finger limes going to Sydney.")},
@@ -150,7 +150,7 @@ export const TL_TOWNS = {
     evanScreen: {tg_station: ["choo choo! CHOO CHOO!", "the train has a face! no it doesn't"], tg_street: ["gold! is there gold?", "an old pub with lace"]},
     hints: {tg_station: "Kingsreef: the old station, the steam train, the ticket office museum and the van. Down the hill: the main street.", tg_street: "The main street: the Royal Hotel, the antique shop and the creek for gold panning. Up the hill: back to the station."},
     spots: famSpots({tg_station: [[220, 380], [320, 400], [260, 460], [400, 440], [180, 520], [360, 540]], tg_street: [[200, 360], [320, 380], [260, 420], [400, 400], [140, 420], [360, 300]]}),
-    acts: {}, rooms: {
+    acts: {darren: {tg_street: {act: "pan", at: [230, 534], dir: 1}}, dad: {tg_station: {act: "guard", at: [400, 262], dir: -1, hours: [[9*60, 16*60]]}}, angelina: {tg_street: {act: "sip", at: [150, 300], dir: 1}}}, rooms: {
       bv_tticket: room("bvtticket", "The ticket office museum", "The old ticket office: brass ticket punches, a telegraph key, lanterns, photos of the gold diggings, and a ticket window that still works."),
       bv_tpub: room("bvtpub", "The Royal Hotel", "The Royal Hotel: pressed-tin ceiling, a long cedar bar, a piano, and a photo of the biggest nugget ever found here, held up by a man with a magnificent moustache."),
       bv_tantique: room("bvtantique", "Nugget & Co. antiques", "The antique shop: everything from everywhere, teacups and lanterns and a rocking horse, a gramophone, and a bell on the door.")},

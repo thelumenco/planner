@@ -222,3 +222,28 @@
 .fwork{animation:fworkA 2.4s ease-out infinite;transform-box:fill-box;transform-origin:50% 50%;opacity:0}
 @keyframes fworkA{0%{opacity:0;transform:scale(.2)}20%{opacity:1}70%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.15)}}
 @media (prefers-reduced-motion:reduce){.fwork{animation:none;opacity:1}}
+
+/* round 160, the Tablelands' family acts (never done anywhere before): Gong Gong's thermos at the lookout, Marcus wading
+   under the falls, Angellina feeding the ducks, Darren's frisbee, Mum's "shh" at the platypus platform, Ma Ma's bag of
+   lollies, Dad with the milk pail, Gong Gong leaning on the calf-pen rail, Marcus shaking a macadamia branch, Ma Ma
+   cracking nuts on a stone, Darren panning for gold, Dad waving the guard's flag, Angellina's sarsaparilla */
+.ch.npc.act-flask:not(.walk) .armR,.ch.npc.act-sip:not(.walk) .armR{animation:sipA 2.8s ease-in-out infinite alternate}
+.ch.npc.act-wade:not(.walk) .armL{animation:wadeL 3s ease-in-out infinite alternate}.ch.npc.act-wade:not(.walk) .armR{animation:wadeR 3s ease-in-out infinite alternate}
+@keyframes wadeL{from{transform:rotate(40deg)}to{transform:rotate(70deg)}}@keyframes wadeR{from{transform:rotate(-40deg)}to{transform:rotate(-70deg)}}
+.ch.npc.act-ducks:not(.walk) .armR,.ch.npc.act-ducks:not(.walk) .tool{animation:feedA 1.8s ease-in-out infinite alternate}
+.ch.npc.act-frisbee:not(.walk) .armR,.ch.npc.act-frisbee:not(.walk) .tool{animation:skimA 2.6s ease-in infinite}
+.ch.npc.act-hush:not(.walk) .armR{transform:rotate(-140deg)}
+.ch.npc.act-lollybag:not(.walk) .armR{transform:rotate(-35deg)}.ch.npc.act-lollybag:not(.walk) .armL{animation:sipL 2.4s ease-in-out infinite alternate}
+@keyframes sipL{from{transform:rotate(20deg)}to{transform:rotate(120deg)}}
+.ch.npc.act-pail:not(.walk) .armR{transform:rotate(-6deg)}
+.ch.npc.act-fence:not(.walk) .armR,.ch.npc.act-fence:not(.walk) .armL{transform:rotate(-75deg)}
+.ch.npc.act-shake:not(.walk) .armR{transform:rotate(-165deg)}.ch.npc.act-shake:not(.walk) .armL{transform:rotate(165deg)}
+.ch.npc.act-shake:not(.walk) .tool{animation:shakeB .5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 50%}
+@keyframes shakeB{from{transform:translateX(-2px) rotate(-2deg)}to{transform:translateX(2px) rotate(2deg)}}
+.npc.act-crack:not(.walk) .legL,.npc.act-crack:not(.walk) .legR,.npc.act-pan:not(.walk) .legL,.npc.act-pan:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.45)}
+.npc.act-crack:not(.walk) > g,.npc.act-pan:not(.walk) > g{transform:translateY(6px)}
+.ch.npc.act-crack:not(.walk) .armR,.ch.npc.act-crack:not(.walk) .tool{animation:countA .7s ease-in-out infinite alternate}
+.ch.npc.act-pan:not(.walk) .armR,.ch.npc.act-pan:not(.walk) .armL{transform:rotate(-50deg)}.ch.npc.act-pan:not(.walk) .tool{animation:panS 1.6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 50%}
+@keyframes panS{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+.ch.npc.act-guard:not(.walk) .armR{animation:guardA 2s ease-in-out infinite alternate}
+@keyframes guardA{from{transform:rotate(-150deg)}to{transform:rotate(-170deg)}}

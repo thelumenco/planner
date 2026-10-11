@@ -3559,6 +3559,76 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  console.log("\nThe Tablelands (rounds 157-160)");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
+  const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), ta = await import(new URL("../src/game/tlacts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
+  const kt = await import(new URL("../src/game/kitchen.js", import.meta.url)), hf = await import(new URL("../src/game/hfarm.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url));
+  const T = tw.TOWNS, stops = bb.STOPS.filter(id => bb.regionOf(id) === "tablelands");
+  check(stops.length === 6 && stops.every(id => T[id].by === "van" && T[id].screens.length === 2 && Object.keys(T[id].rooms).length === 3), "six Tablelands stops, two screens and three rooms each");
+  check(stops.every(id => Object.values(T[id].rooms).every(r => tw.TOWN_PLACES[r.door])) && Object.values(tw.TOWN_PLACES).filter(p => p.bridge && /^t[fkrdmg]_/.test(p.scene)).length === 12, "every room has a door outside, and every stop's two screens join up");
+  { const F = {coins: 500, bellbird: {stamps: {bv_gate: "x"}}}; const before = bb.known(F).includes("bv_falls"); F.bellbird.stamps.bv_lookout = "x";
+    const m = bb.mapPanel(F, {region: "tablelands", ownsVan: true, hm: 600}), v = bb.mapPanel(F, {region: "vines", ownsVan: true, hm: 600});
+    check(!before && bb.known(F).includes("bv_falls") && /data-bvregion="tablelands"/.test(m) && /Misty Falls/.test(m) && /Up the range to the Tablelands/.test(v) && bb.legs("home", "bv_falls") === 3 && !/Tablelands \(soon\)/.test(v), "up the range from Balloon Lookout: the Tablelands get their own page on the map");
+    check(/The Tablelands/.test(bb.passportPanel(F)), "and their own page in the passport"); }
+  const goods = Object.entries(tw.TOWN_GOODS).filter(([, g]) => stops.some(id => Object.keys(T[id].rooms).includes(g.shop)));
+  check(goods.length >= 20 && goods.every(([, g]) => !g.sell || g.sell <= g.price) && tw.TOWN_GOODS.macadamia && tw.TOWN_GOODS.fingerlime, "the Tablelands' shops (macadamias and finger limes too), and nothing sells back for more than it costs");
+  check(sc.INGR.macadamia && sc.INGR.fingerlime && ["macslice", "flprawns", "lamington"].every(id => kt.TAPAS[id] && kt.TAPAS[id].special === "tablelands") && kt.beenTo({bellbird: {stamps: {bv_dairy: "x"}}}, "tablelands"), "macadamia and finger lime gelato and bonbons, and three Tablelands specials at the stove once you've been");
+  check(stops.every(id => Object.keys(T[id].rooms).every(r => br.bbRoomPanel({coins: 50, inv: {}}, r).length > 50)), "every Tablelands room has its panel");
+  // the people
+  const tl = np.NPCS.filter(n => /^tl/.test(n.id)), rooms = stops.flatMap(id => Object.keys(T[id].rooms));
+  check(tl.length >= 30 && tl.every(n => n.local === "bellbird") && new Set(np.NPCS.map(n => n.id)).size === np.NPCS.length, "the Tablelands' people, and no one twice");
+  check(rooms.filter(r => tl.some(n => n.routine.some(sl => sl.scene === r))).length >= 16, "people in the Tablelands rooms");
+  // the family: new acts at every stop, none from any earlier town (the Vines and the Coast Road included)
+  const old = new Set([...["ronda", "kyoto", "jeju", "cinque"], ...bb.STOPS.filter(id => bb.regionOf(id) !== "tablelands")].flatMap(t => Object.values(T[t].acts || {}).flatMap(a => Object.values(a).map(x => x.act))));
+  const mine = stops.flatMap(id => Object.values(T[id].acts).flatMap(a => Object.values(a).map(x => x.act)));
+  check(mine.length >= 12 && new Set(mine).size === mine.length && mine.every(a => !old.has(a)) && stops.every(id => Object.keys(T[id].acts).length >= 2), "the family: new things at every Tablelands stop, all different, none from anywhere before");
+  // the activities
+  const F = {coins: 300, inv: {b_goldpan: 1}, bellbird: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, o = (hm, rng) => ({hm, addInv: add, evan: true, rng});
+  let st = {}; ta.tlAct(F, "swim", st, "swimin", null, o(10*60)); ["falls", "float", "veil"].forEach(k => ta.tlAct(F, "swim", st, "swim", k)); const inStill = !st.t.out && st.t.cold === 3; ta.tlAct(F, "swim", st, "swim", "out");
+  check(inStill && st.t.out && ta.tlAct(F, "swim", st, "swimdone").close && F.bellbird.tl.swims === 1, "a swim in the falls: the falls, a float, behind the veil, and out");
+  st = {}; check(!ta.tlAct(F, "swim", st, "swimin", null, o(19*60)), "no swimming after five");
+  st = {}; ta.tlAct(F, "kayak", st, "kayakgo", null, o(10*60, () => .1)); while (!ta.kayakDone(st.t)) ta.tlAct(F, "kayak", st, "steer", String(st.t.at[st.t.leg]));
+  check(st.t.seen.length === 6 && F.coins === 300 - ta.kayakCost(true) && ta.tlAct(F, "kayak", st, "kayakdone").close && F.bellbird.tl.kayaks === 1, "once round Crater Lake in a kayak (16 with Evan), steering for whatever shows itself");
+  st = {}; ta.tlAct(F, "platypus", st, "platygo", null, o(7*60, () => .1)); ta.tlAct(F, "platypus", st, "platy", st.t.rings[0] ? "look" : "wait"); const before = st.t.seen; const nothing = {round: 0, rings: [false], seen: 0, gone: false};
+  check(ta.platyDo(nothing, "look") === "gone" && nothing.gone && ta.platyOdds(7*60) > ta.platyOdds(12*60), "the platypus: look at the wrong moment and she's gone; better at dawn and dusk");
+  st = {}; ta.tlAct(F, "calves", st, "calvesgo", null, o(10*60, () => .3)); const hungriest = st.t.calves.map((c, i) => [c.hunger, i]).sort((a, b) => b[0] - a[0])[0][1];
+  check(ta.calfFeed(st.t, hungriest) === "right" && ta.calfFeed(st.t, st.t.calves.map((c, i) => [c.hunger, i]).filter(([, i]) => !st.t.fed.includes(i)).sort((a, b) => a[0] - b[0])[0][1]) === "wrong", "the calves: hungriest first");
+  st = {}; check(!ta.tlAct(F, "milking", st, "milkgo", null, o(10*60)), "milking's at three, not before");
+  ta.tlAct(F, "milking", st, "milkgo", null, o(15*60, () => .5)); while (!ta.milkDone(st.t)) { const i = st.t.cows.map((c, k) => [c.tag, k]).filter(([, k]) => !st.t.in.includes(k)).sort((a, b) => a[0] - b[0])[0][1]; ta.tlAct(F, "milking", st, "cow", String(i)); }
+  ta.tlAct(F, "milking", st, "milkdone", null, o(15*60)); check(F.inv.milk === 2 && new Set(st.t ? [] : [1]).size === 1, "the cows come in by ear tag, and Bill sends you off with two bottles of milk");
+  st = {}; ta.tlAct(F, "cheese", st, "lessongo"); check(ta.tlAct(F, "cheese", st, "step", "cut").sfx === "tap" && st.t.wrong === 1, "Meg's lesson: steps in the wrong order don't count");
+  ["warm", "culture", "cut", "stir", "press"].forEach(k => ta.tlAct(F, "cheese", st, "step", k)); ta.tlAct(F, "cheese", st, "lessondone");
+  check(ta.knowsHavarti(F) && hf.cheesesFor(hf.hfState(F)).some(([k]) => k === "havarti") && !hf.cheesesFor(hf.hfState({})).some(([k]) => k === "havarti"), "and then Tableland havarti is yours to make at home in Elena's cheese press");
+  st = {}; ta.tlAct(F, "shake", st, "shakego"); for (let i = 0; i < 4; i++) ta.tlAct(F, "shake", st, "shk", "gentle"); ta.tlAct(F, "shake", st, "shakedone", null, o(10*60));
+  check(F.inv.macadamia === 2 && !ta.tlAct(F, "shake", {}, "shakego"), "shaking a macadamia tree with Pete: two bags of nuts, once a day");
+  st = {}; ta.tlAct(F, "pan", st, "pango"); ta.tlAct(F, "pan", st, "pan", "scoop"); for (let i = 0; i < 4; i++) ta.tlAct(F, "pan", st, "pan", "swirl"); ta.tlAct(F, "pan", st, "pan", "look"); ta.tlAct(F, "pan", st, "pandone", null, o(10*60));
+  const p2 = ta.panStart(); ta.panDo(p2, "scoop"); ta.panDo(p2, "swirl"); check(F.inv.b_goldfleck === 1 && ta.panDo(p2, "look") === "gravel" && !ta.tlAct({inv: {}, bellbird: {}}, "pan", {}, "pango"), "gold panning: four swirls and a fleck for the tiny bottle (and you need a pan)");
+  st = {}; ta.tlAct(F, "steam", st, "steamgo", null, o(10*60, () => .3)); while (!ta.steamDone(st.t)) ta.tlAct(F, "steam", st, "steam", st.t.cross.includes(st.t.leg) ? "whistle" : "look");
+  check(st.t.whistled === 2 && ta.tlAct(F, "steam", st, "steamdone", null, o(10*60)).close && F.inv.b_steamticket === 1 && !ta.tlAct(F, "steam", {}, "steamgo", null, o(17*60)), "the steam train: whistle at the crossings, a punched ticket to keep; she runs 9 to 4");
+  // in the browser: the family at Misty Falls, and a swim from the falls
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`tablelands pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/tlv=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = {...(f.goals || {}), van: true}; f.coins = 300;
+    f.bellbird = {stamps: {bv_gate: "2026-10-01", bv_lookout: "2026-10-01"}}; f.trip = {town: "bv_falls", day: "2026-10-12", party: ["gonggong", "marcus", "evan"], from: 7*60, by: "van"};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&tlv=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("tf_top")); await page.waitForTimeout(7000);
+  check(await page.locator('#actors .npc[data-npc="gonggong"].act-flask').count() === 1 && await page.locator('#world [data-place="bvtview"]').count() === 1, "Misty Falls: Gong Gong with his thermos at the lookout");
+  await page.evaluate(() => window.__mapleScene("tf_pool")); await page.waitForTimeout(6000);
+  check(await page.locator('#actors .npc[data-npc="marcus"].act-wade').count() === 1 && await page.locator('#actors .npc[data-npc="tlkirra"]').count() === 1, "the swimming hole: Marcus wading by the falls, and Kirra the ranger");
+  await page.locator('#world [data-place="bvtfalls"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bba="tl:swimin"]', { timeout: 20000 });
+  await page.click('#ctx [data-bba="tl:swimin"]'); for (const k of ["falls", "float", "veil", "out"]) await page.click(`#ctx [data-bba="tl:swim.${k}"]`);
+  await page.click('#ctx [data-bba="tl:swimdone"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.bellbird.tl && f.bellbird.tl.swims === 1), "a swim in the falls, all the way through");
+  await page.evaluate(() => window.__mapleScene("bv_tcafe")); await page.waitForTimeout(900);
+  await page.locator('#world [data-rdspot="bv_tcafe"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="b_rosella"]', { timeout: 20000 });
+  await page.click('#ctx [data-rbuy="b_rosella"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.b_rosella === 1 && f.coins === 294), "the Range Café: a jar of rosella jam to take home");
+  await page.close();
+}
+{
   console.log("\nThe terrace and the Sunday long lunch (round 146)");
   const lu = await import(new URL("../src/game/lunch.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
   const sun = "2026-10-11", ids = new Set(np.NPCS.map(n => n.id)), bk = lu.bookingsFor(sun), seats = lu.seatsTaken(bk);

@@ -2243,10 +2243,26 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Tomo has an evening slot at the bay, 18:00–22:00.
   - The bike's wording (the upgrade, the shop board, the panel title "Delivery bike") now names all three shops.
 
+### Rounds 157–160: the Tablelands (Bellbird's third region)
+- **Data (data/tablelands.js):** six more van stops, `region: "tablelands"`, ids `bv_*` (places `bvt*`, rooms `bv_t*`) so the Bellbird plumbing works unchanged. data/bellbird.js merges them in.
+  - Misty Falls `bv_falls` (tf_top / tf_pool), Crater Lake `bv_crater` (tk_shore | tk_fig), Willow Bend `bv_town` (tr_street | tr_creek), Greenhill Dairy `bv_dairy` (td_paddock / td_yard, park in the yard), Nutwood Farm `bv_nuts` (tm_grove | tm_shed, park by the shed), Kingsreef `bv_gold` (tg_station / tg_street).
+  - The road: up the range from Balloon Lookout (`TL_ROADS`, `bv_lookout`–`bv_falls`). `BB_SOON` now only has the Lavender Hills.
+  - Map: `BB_MAPS.tablelands = TL_MAP`, `REGIONS` (vines, coast, tablelands) drives the tabs and the passport. The Vines page draws "Up the range to the Tablelands (next page)" once Misty Falls is known.
+- **Art:** art/tablelands.js (12 screens; mist before 10, a rainbow over the pool 9–3, the dairy windmill spins: `.tlspin`) and art/tablelands-rooms.js (18 rooms). Music: 24 tracks in audio.js (`bb_falls` … `bb_gold`, then the room ids).
+- **Goods (`TL_GOODS`) and treats (bbrooms.js):** rosella jam, a plush cassowary, the falls painting, a cedar bowl, lamingtons, lollies, a book of bush poems, Greenhill vintage, a milk bottle, macadamia brittle, a rose teacup, a railway lantern, the magnet, and more.
+  - New ingredients: `macadamia` (cracking shed) and `fingerlime` (packing shed): scoop.js INGR (gelato and bonbons), kitchen units, `SOURCE`.
+  - Specials (`special: "tablelands"`, `beenTo` via the stamps): macslice, flprawns, lamington.
+- **People (data/tl-people.js):** 34, ids `tl*`, `local: "bellbird"`. Kirra the ranger, Maureen, Ruth, Doug (the daily swimmer), Lachlan, Priya, Old Joe, Hannah, Jarrah, Gwen (and Pages the cat), Stan, Bill, Meg, Rosa, Noah, Pete, Ana, Leilani, Clive (the driver), Fred (the guard), Sheila, Dot, Old Mac, and day-trippers.
+- **Activities (game/tlacts.js):** one panel (`tlPanel`) and one action (`tlAct`, `data-bba="tl:<verb>.<arg>"`) for all nine. Opened with `open:<kind>` from rooms or outdoor places (core `bbOut`: bvtfalls swim, bvtplatypus, bvtcalves, bvttrees shake, bvtpanning pan, bvttrain steam).
+  - swim (8–5, cold meter), kayak (12, +4 Evan), platypus (look on rings, wait otherwise; odds higher at dawn and dusk), calves (hungriest first), milking (2:30–5, by ear tag; 2 milk once a day), cheese (30, the steps in order; learns havarti), shake (gentle or big; macadamias once a day), pan (needs `b_goldpan`; four swirls; first fleck `b_goldfleck`), steam (9–4, 8 + 2 Evan; whistle at crossings; first ride `b_steamticket`).
+  - State: `F.bellbird.tl`.
+- **Home link: Tableland havarti** (hfarm.js `CHEESES.havarti`, `learn: true`): shows at Elena's press only once `F.hfarm.learnt.havarti`. Item `chz_havarti` (and `_ex`). Also fixed a latent crash: cheese name suggestions for kinds with no French names (`C_FR` fallback).
+- **Family acts (round 160), new everywhere:** Gong Gong's thermos at the lookout (flask), Marcus wading by the falls (wade), Angellina feeding the ducks (ducks), Darren's frisbee, Mum's "shh" at the platypus platform (hush, a pose), Ma Ma's bag of lollies (lollybag), Dad's milk pail (pail), Gong Gong leaning on the calf-pen rail (fence), Marcus shaking a macadamia branch (shake), Ma Ma cracking nuts on a stone (crack), Darren panning (pan), Dad's guard's flag at the station (guard, 9–4), Angellina's sarsaparilla (sip). Props in people.js, PROPS in npcs.js, poses at the end of npcs.css.
+- **Touches:** Jarrah slips Evan a raspberry lolly; Pages the cat asleep on the poetry; Old Mac keeps your first fleck in a tiny bottle; Fred punches your ticket.
+
 ## NEXT UP (Mel, after round 156)
-- **Order:** finish the campervan map first. Two closed roads are signposted on the Vines page (`BB_SOON` in data/bellbird.js):
-  1. **The Lavender Hills** (from `bv_camp`).
-  2. **The Tablelands** (from `bv_lookout`, up the range).
+- **Order:** finish the campervan map first. The Tablelands are done (rounds 157–160); one closed road is left on the Vines page (`BB_SOON` in data/bellbird.js):
+  1. **The Lavender Hills** (from `bv_camp`). Proposed stops (Mel hasn't approved yet): the lavender farm and still, a hilltop village market, a perfumery (blend a scent), a honey farm by sunflowers, a river with an old stone bridge, a goat-cheese farm with a chapel lookout.
   - Each region is four rounds, like the Coast Road. Day trips only, and family acts are unique per stop. Plan each region with Mel before building.
 - **Then, before 20 November** (the in-game dates follow the real calendar, so this has to land before mulled wine season starts):
   - **The Christmas market on the field**, late November to Christmas Eve, evenings:
