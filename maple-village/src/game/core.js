@@ -1586,7 +1586,7 @@ function ctx(){
     : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, {swap: scSt.swap});
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
   else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "cocoa" ? ccCounterPanel(F, {cart: true, server: isHere("mateo")}) : marketStallPanel(st); }
-  else if (lunchView === "book" && (scene === "terrace" || scene === "wineshop")) h = lunchBookPanel(F, id => NPCS.find(n => n.id === id) ? NPCS.find(n => n.id === id).name : id, {terrace: !!vineState(F).terrace, shelf: shelfStock(vineState(F))});
+  else if (lunchView === "book" && scene === "terrace") h = lunchBookPanel(F, id => NPCS.find(n => n.id === id) ? NPCS.find(n => n.id === id).name : id, {terrace: !!vineState(F).terrace, shelf: shelfStock(vineState(F))});
   else if (lunchView === "table" && scene === "terrace") h = lunchTablePanel();
   else if (bbRoom && townOf(scene) && TOWNS[townOf(scene)].by === "van") { const evanOn = inParty(F, "evan") && !evanNight(), tp = tripOn(F) ? tripOn(F).party : [];
     h = bbRoom === "balloon" ? BBA.balloonPanel(F, bbSt.flight, {hm: sgHM(), party: tp}) : bbRoom === "riddle" ? BBA.riddlePanel(F, bbSt.riddle) : bbRoom === "berries" ? BBA.berriesPanel(F, bbSt.berries, evanOn)
@@ -2646,7 +2646,6 @@ function arriveSpot(id){
   if (id === "kdoor") { setScene("kitchen", INNER.kitchen.arrive); return; }
   // round 146: the glass doors out to the terrace, and the bookings book on the counter
   if (id === "tdoor") { if (vineState(F).terrace) setScene("terrace", [72, 456]); else speak("Glass doors onto a bare patch of gravel. Darren could build a terrace out here: it's at the vineyard stall.", 5000); return; }
-  if (id === "bkbook") { lunchView = "book"; sfx("paper", true); render(); return; }
   if (id === "gkdoor") { setScene("scoopkitchen", INNER.scoopkitchen.arrive); return; }
   if (scene === "scoopshop" && id === "gtables") { sitAt(SHOP_SEATS); return; }
   if (id === "ckdoor") { setScene("cocoakitchen", INNER.cocoakitchen.arrive); return; }

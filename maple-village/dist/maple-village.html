@@ -4483,9 +4483,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ] },
     // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
     // and the tasting room's little tables
-    wineshop: { name: "The wine shop", wall: "#F4E6D6", trim: "#8E2C48", noBoard: true, pos: { S: [92, 238], C: [330, 318], H: [206, 318], T: [340, 520], K: [480, 390], M: [465, 128], Z: [40, 400], G: [480, 556], B: [446, 300] }, stations: [
+    wineshop: { name: "The wine shop", wall: "#F4E6D6", trim: "#8E2C48", noBoard: true, pos: { S: [92, 238], C: [330, 318], H: [206, 318], T: [340, 520], K: [480, 390], M: [465, 128], Z: [40, 400], G: [480, 556] }, stations: [
       ["tdoor", "Terrace", "G", "glassdoor", null, "The glass doors out to the terrace.", 0],
-      ["bkbook", "Bookings book", "B", "bookingbook", null, "The bookings book for the Sunday long lunch.", 30],
       ["menu", "Menu", "M", "chalkmenu", null, "The chalkboard: today's menu.", 44],
       ["kdoor", "Kitchen", "K", "kitchendoor", null, "Into the kitchen.", 0],
       ["cdoor", "Cellar door", "Z", "cellardoor", null, "The cellar door: barrel racks, a tasting bar and your wine wall.", 0],
@@ -10009,7 +10008,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return { sunday: sun2, list: all.slice(0, n), all: all.length };
   }
   var seatsTaken = (list5) => list5.reduce((n, b) => n + b.size, 0);
-  var SEATS = [0, 1, 2, 3, 4, 5].flatMap((i) => [[226, 330 + i * 44, 1], [294, 330 + i * 44, -1]]);
+  var SEATS = [0, 1, 2, 3, 4, 5].flatMap((i) => [[214, 334 + i * 44, 1], [306, 334 + i * 44, -1]]);
   var seatCache = {};
   function seating(sunday) {
     if (seatCache[sunday]) return seatCache[sunday];
@@ -29426,7 +29425,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (fieldView && scene === "field") {
       const st6 = stallAt(dayKey(), sgHM(), +fieldView.slice(-1));
       h = !st6 ? "" : st6.kind === "wine" ? stallMarketPanel(F, serving()) : st6.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st6.kind === "scoop" ? counterPanel(F, { pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st6, dayKey(), sgHM()) }) : st6.kind === "cocoa" ? counterPanel3(F, { cart: true, server: isHere("mateo") }) : marketStallPanel(st6);
-    } else if (lunchView === "book" && (scene === "terrace" || scene === "wineshop")) h = bookPanel2(F, (id) => NPCS.find((n) => n.id === id) ? NPCS.find((n) => n.id === id).name : id, { terrace: !!vineState(F).terrace, shelf: shelfStock(vineState(F)) });
+    } else if (lunchView === "book" && scene === "terrace") h = bookPanel2(F, (id) => NPCS.find((n) => n.id === id) ? NPCS.find((n) => n.id === id).name : id, { terrace: !!vineState(F).terrace, shelf: shelfStock(vineState(F)) });
     else if (lunchView === "table" && scene === "terrace") h = lunchTablePanel();
     else if (bbRoom && townOf(scene) && TOWNS[townOf(scene)].by === "van") {
       const evanOn = inParty(F, "evan") && !evanNight(), tp = tripOn(F) ? tripOn(F).party : [];
@@ -32573,12 +32572,6 @@ ${SIGNOFF[t2.who] || ""}`;
     if (id === "tdoor") {
       if (vineState(F).terrace) setScene("terrace", [72, 456]);
       else speak("Glass doors onto a bare patch of gravel. Darren could build a terrace out here: it's at the vineyard stall.", 5e3);
-      return;
-    }
-    if (id === "bkbook") {
-      lunchView = "book";
-      sfx("paper", true);
-      render();
       return;
     }
     if (id === "gkdoor") {

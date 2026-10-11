@@ -2109,7 +2109,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Music: a live track called "terrace".
 - **Sunday long lunch (game/lunch.js):** every Sunday 12–3 once the terrace is built.
   - `bookingsFor(sunday)` books 9–11 seats from `PARTIES` (villagers, tourists and families, no market stall keepers), sometimes a birthday, plus one family pair rotating weekly (Ma Ma and Gong Gong arrive at 1:15, after the market).
-  - The bookings book (station `bkbook` on the wine shop counter, and the terrace lectern) shows next Sunday, filling up Monday to Saturday (`bookOpen`). It also gives a rough bottle estimate against shelf stock.
+  - The bookings book (the lectern by the terrace doors; round 147 took the one off the wine shop counter) shows next Sunday, filling up Monday to Saturday (`bookOpen`). It also gives a rough bottle estimate against shelf stock.
   - Guests sit at `SEATS` via `lunchSlot` in npcs `slotAt` (right after the trip and SUP slots).
 - **Sales (vineyard.js sellTick):** seated guests order whole bottles at about seated/2 per hour, weighted to dearer bottles (price^1.5), plus plates.
   - Mel on the terrace counts as hosting (`opts.lunch`): orders run 1.5 times faster, 15% tips, and the money is paid to her.

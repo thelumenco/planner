@@ -1,7 +1,7 @@
 // The Sunday long lunch on the terrace (round 146, Mel). Once the wine shop has its terrace, every Sunday from 12 to 3
 // one long table on the alfresco terrace fills up with people who've booked: villagers, families up for the day,
 // tourists, now and then a birthday, and one lot of Mel's own family (a different pair each week). The bookings book
-// (on the wine shop counter, and on the lectern by the terrace door) shows who's coming next Sunday, filling up as
+// (on the lectern by the terrace doors) shows who's coming next Sunday, filling up as
 // the week goes on: so Mel can stock the shelves to suit. At lunch the tables order whole bottles (a pair gets
 // through about one an hour, and they go for the dearer bottles) and plates from the kitchen; with Mel out on the
 // terrace hosting, they order faster and tip. The art is art/terrace.js; sales are in vineyard.js sellTick.
@@ -45,7 +45,7 @@ export function bookOpen(day = dayKey()){ const sun = nextSunday(day), all = boo
 export const seatsTaken = list => list.reduce((n, b) => n + b.size, 0);
 
 // the long table runs down the middle of the terrace: six chairs down each side, everyone facing in
-export const SEATS = [0, 1, 2, 3, 4, 5].flatMap(i => [[226, 330 + i*44, 1], [294, 330 + i*44, -1]]);
+export const SEATS = [0, 1, 2, 3, 4, 5].flatMap(i => [[214, 334 + i*44, 1], [306, 334 + i*44, -1]]);   // on the chairs (art/terrace.js), facing in
 const seatCache = {};
 export function seating(sunday){
   if (seatCache[sunday]) return seatCache[sunday];
