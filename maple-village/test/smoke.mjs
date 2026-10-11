@@ -2381,8 +2381,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(here.filter(n => ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy", "rafe"].includes(n)).length >= 4, "and tourists out shopping");
   check(await page.locator('#world [data-place="jazzhat"]').count() === 1 && await page.locator('#world [data-place="exlawn"]').count() === 0, "a jazz stage on the lawn (the exercise mats packed away), with a hat for tips");
   const c0 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
-  await page.locator('#world [data-place="jazzhat"]').dispatchEvent("click"); await page.waitForTimeout(4000);
-  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins) === c0 - 2, "two coins in the band's hat");
+  await page.locator('#world [data-place="jazzhat"]').dispatchEvent("click");
+  await page.waitForFunction(c => JSON.parse(localStorage.getItem("fox.fox")).coins !== c, c0, { timeout: 15000 }).catch(() => {});   // Mel walks over to the hat first
+  { const c1 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins); check(c1 === c0 - 2, `two coins in the band's hat (${c0} -> ${c1})`); }
   await page.locator('#world [data-place="mstall0"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="friedchicken"]', { timeout: 15000 });
   const yunToday = await page.locator("#ctx .item[data-id]").evaluateAll(n => n.map(x => x.dataset.id));
   check(yunToday.length >= 4, `the Taiwanese snack stall sells its fried chicken and a few more things tonight (${yunToday.join(", ")})`);
