@@ -31,10 +31,14 @@ export function millArt(pressing, ready, cr = {}){
   const initials = `<text x="390" y="306" text-anchor="middle" font-family="Klee One,serif" font-size="8" fill="#3A2A1E" opacity=".75" pointer-events="none">T.R. 1912</text>`;
   // round 154: the workbench and the shop went upstairs; wooden stairs up the left wall instead
   // (round 155, Mel: smaller, on the right) a narrow flight against the right wall, below the press, going up
-  const X = 352;
-  const stairs = `<g data-millspot="stairs" aria-label="Up the stairs: the Mill Shop, the workbench and the tasting table"><ellipse class="hov" cx="${X + 26}" cy="604" rx="34" ry="10" style="fill:var(--butter)"/>
-    ${sk(`<rect x="${X + 46}" y="538" width="8" height="66" style="fill:#7A5638"/>${[0, 1, 2, 3].map(i => `<rect x="${X + i*6}" y="${590 - i*15}" width="${46 - i*6}" height="9" rx="1" style="fill:${i % 2 ? "#A8754F" : "#B9875E"}"/><rect x="${X + i*6}" y="${599 - i*15}" width="${46 - i*6}" height="5" style="fill:#7A5638"/>`).join("")}<path d="M${X - 2} 600 L${X + 22} 540" style="stroke:#5A3A2A" stroke-width="2"/>${[0, 1, 2].map(i => `<path d="M${X + 2 + i*8} ${590 - i*20} v-14" style="stroke:#5A3A2A" stroke-width="1.5"/>`).join("")}`,
-      `${[0, 1, 2, 3].map(i => `<rect x="${X + i*6}" y="${590 - i*15}" width="${46 - i*6}" height="9" rx="1"/>`).join("")}`)}
-    ${tapeLabel(X + 24, 622, "Upstairs", "#F3E1A0", 9)}</g>`;
-  return floor + wall + photo + jars + stone + press + initials + stairs + exit;
+  // (round 155, Mel: "a side view of wooden stairs") seen side-on: six treads rising to the right over a solid
+  // stringer, a handrail on turned balusters, and a newel post at the foot
+  const X = 336, B = 612, RW = 19, RH = 15, N = 6, top = B - N*RH, prof = `M${X} ${B} ${Array.from({length: N}, (_, k) => `V${B - (k + 1)*RH} H${X + (k + 1)*RW}`).join(" ")} V${B} Z`;
+  const stairs = `<g data-millspot="stairs" aria-label="Up the stairs: the Mill Shop, the workbench and the tasting table"><ellipse class="hov" cx="${X + 56}" cy="${B - 4}" rx="66" ry="12" style="fill:var(--butter)"/>
+    ${sk(`<path d="${prof}" style="fill:#8A6340"/>${Array.from({length: N}, (_, k) => `<rect x="${X + k*RW - 1}" y="${B - (k + 1)*RH - 2}" width="${RW + 3}" height="4" rx="1" style="fill:#B9875E"/>`).join("")}
+      ${Array.from({length: N}, (_, k) => `<path d="M${X + k*RW + RW/2} ${B - (k + 1)*RH - 2} V${B - (k + 1)*RH - 30}" style="stroke:#6B4A2E" stroke-width="2"/>`).join("")}
+      <path d="M${X + 2} ${B - 44} L${X + N*RW + 2} ${top - 32}" style="stroke:#5A3A2A" stroke-width="3.5" stroke-linecap="round"/><rect x="${X - 2}" y="${B - 50}" width="7" height="50" rx="1.5" style="fill:#6B4A2E"/><circle cx="${X + 1.5}" cy="${B - 52}" r="4" style="fill:#5A3A2A"/>`,
+      `<path d="${prof}"/><path d="M${X + 2} ${B - 44} L${X + N*RW + 2} ${top - 32}"/>`)}
+    ${tapeLabel(X + 30, 628, "Upstairs", "#F3E1A0", 9)}</g>`;
+  return floor + wall + photo + jars + stone + stairs + press + initials + exit;
 }
