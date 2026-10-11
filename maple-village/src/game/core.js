@@ -74,6 +74,7 @@ import { terraceArt } from "../art/terrace.js";
 import { coastArt } from "../art/coast.js";
 import { coastRoomArt } from "../art/coast-rooms.js";
 import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } from "./lunch.js";
+import { mullPanel, mullStart, mullTick, mullState, mulledSeason, MULL, ADDS as MULL_ADDS } from "./mulled.js";
 import { occasionOn, occasionNow, OCC, weddingOn, WED, dancingNow, triviaPanel, triviaStart, triviaAnswer, triviaNext, finishTrivia, TEAM_NAMES, QUIZ, paintPanel, paintStart, paintStep, paintDone, finishPaint, PAINT_PRICE, PAINT_SUBJECTS, comingUpHTML, mothersDay } from "./occasions.js";
 import { cinquePanel, cinqueState, treat as ctTreat, GELATO, FOCACCIA, pestoStart, pestoAdd, pestoPound, pestoDone, finishPesto, harvestStart, pick as ctPick, harvestDone, finishHarvest, TASTE, paintBoat, boatCols } from "./cinque.js";
 import { jejuRoomArt, dyeCloth } from "../art/jeju-rooms.js";
@@ -1090,6 +1091,7 @@ function villageCalendar(){
     if (owns(F, "cellar") && discoOn(k)) list.push(`Disco night at the cellar door, 8 to 11:30pm`);
     if (vineState(F).terrace && new Date(k + "T00:00:00Z").getUTCDay() === 0) list.push(`${mothersDay(k) ? "Mother's Day long lunch" : "Sunday long lunch"} on the terrace, 12 to 3pm (${bookingsFor(k).reduce((n, b) => n + b.size, 0)} booked)`);
     if (vineState(F).terrace) { const oc = occasionOn(k), w = oc === "wedding" && weddingOn(k), hm2 = m => hhmm(m % (24*60)); if (oc) list.push(w ? `A wedding on the terrace: ${w.couple}, 2 to 7pm` : `${OCC[oc].n} on the terrace, ${hm2(OCC[oc].from)} to ${hm2(OCC[oc].to)}`); }
+    if (k.slice(5) === "11-20") list.push("Mulled wine season starts: the big pot's on in the wine shop kitchen, till Boxing Day");   // round 153
     if (dn) list.push(`Family dinner at ${HOST_NAME[dn.host]}, 6:30pm`);
     fests.filter(x => x.k === k).forEach(x => list.push(`${x.f.name}!`));
     if (list.length) days.push({k, list});
@@ -1630,6 +1632,7 @@ function ctx(){
   else if (petView && companions(F).some(c => c.id === petView)) { const c = companions(F).find(c => c.id === petView); h = petPanel(F, c, !!giftPos(c.owner)); }
   else if (orView === "tea" && scene === "cottage") h = teaPanel(F, dayKey(), isHere("mama"));
   else if (orView && (scene === "orchard" || scene === "flowers")) h = orView === "shop" ? shopPanel(F, dayKey(), orTab) : orView === "tours" ? tourBoard(F, dayKey(), sgHM()) : spotPanel(F, orAt.where, orAt.i, dayKey());
+  else if (kView === "mull" && scene === "kitchen") h = mullPanel(F, vineState(F), mullSt);   // round 153: mulled wine
   else if (kView && scene === "kitchen") h = kView === "oven" ? ovenPanel(F) : kView === "press" ? pressPanel(F) : kView === "stove" ? stovePanel(F, dayKey()) : larderPanel(F);
   else if (loftView && scene === "vineyard") h = loftPanel(F);
   else if (vyView && (scene === "vineyard" || scene === "wineshop" || scene === "cellar")) h = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F)
@@ -1837,6 +1840,13 @@ function ctx(){
     save(); ctx(); });
   c.querySelectorAll("[data-newstab]").forEach(b => b.onclick = () => { newsTab = b.dataset.newstab; sfx("tap"); ctx(); });
   // round 152: the terrace's bookings book tabs, trivia night and sip and paint (occasions.js)
+  // round 153: the mulling pot (mulled.js)
+  c.querySelectorAll("[data-mull]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.mull.split(":"), st = mullSt;
+    if (a === "base") { st.base = v; sfx("tap"); }
+    else if (a === "add") { st.adds = st.adds || []; if (st.adds.includes(v)) st.adds = st.adds.filter(x => x !== v); else if (st.adds.length < MULL.max) st.adds.push(v); sfx("tap"); }
+    else if (a === "go" || a === "again") { const vs = vineState(F), adds = a === "again" ? (mullState(F).recipes.find(r => r.id === v) || {adds: []}).adds : st.adds || [], base = a === "again" ? (vs.shelf.find(x => x.n > 0 && MULL.base.includes(x.type)) || {}).id : st.base;
+      const r = mullStart(F, vs, base, adds, dayKey()); speak(r.msg, 5000); if (r.recipe) { sfx("chime"); gainXp(r.fresh ? 2 : 1); if (r.fresh) flash(`New mulled wine: ${r.recipe.name}`); mullSt = {}; if (isHere("pilar")) setTimeout(() => npcSay("pilar", pick(["Mmm, the whole kitchen smells like Christmas.", "Low heat! Never let it boil.", "Save me a cup, eh?"])), 1800); save(); } }
+    ctx(); });
   c.querySelectorAll("[data-lbtab]").forEach(b => b.onclick = () => { lunchView = b.dataset.lbtab; sfx("tap"); ctx(); });
   c.querySelectorAll("[data-trv]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.trv.split(":");
     if (a === "join") { if ((occasionNow(dayKey(), sgHM()) || {}).kind !== "trivia" || F.coins < QUIZ.entry) return; F.coins -= QUIZ.entry; trvSt = triviaStart(dayKey(), TEAM_NAMES[+v]); sfx("chaching"); if (isHere("amara")) npcSay("amara", "Round one! Eyes on the screen, phones in pockets."); save(); }
@@ -2350,7 +2360,7 @@ let kyotoView = null, ktSt = {};
 let jejuView = null, jjSt = {};
 let loftView = false;   // round 132: the drying loft over the barrel shed (loft.js)
 let cinqueView = null, ctSt = {};
-let lunchView = null, occView = null, trvSt = null, pntSt = null;   // round 152: occView "trivia" or "paint" on the terrace (occasions.js)
+let lunchView = null, occView = null, trvSt = null, pntSt = null, mullSt = {};   // round 152: occView "trivia" or "paint" on the terrace (occasions.js)
    // round 146: the bookings book ("book") and the long table ("table") on the terrace
 let bbRoom = null, bbSt = {};   // round 142: Bellbird Valley's room panels (bbrooms.js) and, round 143, its activities (bbacts.js)
 let bvView = null, bvRegion = null;   // round 148: which page of the road map (vines, coast)   // round 141: Bellbird Valley's road map ("map") and passport ("passport")   // round 132: Cinque Terre's room panels and activities (cinque.js)
@@ -2878,6 +2888,7 @@ function terraceMoments(){
 }
 function vineTick(){
   terraceMoments();
+  { const done = mullTick(F); if (done) { save(); if (scene === "kitchen" && !quietNow()) speak(`The mulled wine's ready: ten cups of ${done.name}. Celeste's taking the pot out front.`, 5000); else flash(`Mulled wine ready: ${done.name}`); } }   // round 153
   const out = sellTick(F, {serving: scene === "wineshop" && serving(), stall: scene === "field" && serving(), club: scene === "cellar" && wineClubNow(dayKey(), sgHM()), lunch: scene === "terrace" && (lunchNow(dayKey(), sgHM()) || !!occasionNow(dayKey(), sgHM())), disco: scene === "cellar" && atSpot === "flight" && discoNow(dayKey(), sgHM()), harvest: (festivalOn(dayKey()) || {}).id === "harvest"});
   // Pilar runs the kitchen on her shifts (tells Mel what she's done only while Mel's in there with her)
   if (whereIs("pilar") === "kitchen") { const done = cookTick(F, dayKey()); if (done.length) { save(); if (scene === "kitchen" && !quietNow() && $("panel").hidden) speak(cookLine(done), 5500); } }

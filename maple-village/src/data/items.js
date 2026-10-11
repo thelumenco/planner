@@ -281,6 +281,15 @@ Object.assign(ITEMS, {kite: {n: "Kite", kind: "toy", price: 12, tab: "family", w
 Object.assign(ITEMS, {garlic: {n: "Garlic", kind: "ingredient", sell: 1, what: "from the greenhouse: gambas, garlicky tapas"}, basil: {n: "Basil", kind: "ingredient", sell: 1, what: "from the greenhouse: bruschetta, basil gelato, a bonbon filling"},
   rosemary: {n: "Rosemary", kind: "ingredient", sell: 1, what: "from the greenhouse: rosemary potatoes, a rosemary bonbon, gelato"}, chives: {n: "Chives", kind: "ingredient", sell: 1, what: "from the greenhouse: a chive omelette"},
   thyme: {n: "Thyme", kind: "ingredient", sell: 1, what: "from the greenhouse: roast tapas, thyme and lemon gelato"}});
+// round 153: the spices, on Hana's market shelves (items.js picks these up)
+Object.assign(ITEMS, {
+  sp_cinnamon: {n: "Cinnamon sticks", kind: "ingredient", price: 2, sell: 1, tab: "deli", what: "for mulled wine (late November to Boxing Day), in the wine shop kitchen's big pot"},
+  sp_clove: {n: "Whole cloves", kind: "ingredient", price: 2, sell: 1, tab: "deli", what: "for mulled wine, in the wine shop kitchen's big pot"},
+  sp_anise: {n: "Star anise", kind: "ingredient", price: 3, sell: 1, tab: "deli", what: "for mulled wine, in the wine shop kitchen's big pot"},
+  sp_cardamom: {n: "Cardamom pods", kind: "ingredient", price: 3, sell: 1, tab: "deli", what: "for mulled wine, in the wine shop kitchen's big pot"},
+  sp_ginger: {n: "Fresh ginger", kind: "ingredient", price: 2, sell: 1, tab: "deli", what: "for mulled wine, in the wine shop kitchen's big pot"}
+});
 export const itemIco = id => ITEMS[id] && ITEMS[id].kind === "seed" ? "seed:" + ITEMS[id].crop : id;
 Object.keys(ITEMS).forEach(id => { ITEMS[id].ico = itemIco(id); });
 Object.keys(CROPS).forEach(id => { CROPS[id].ico = id; });
+

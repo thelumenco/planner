@@ -12,6 +12,7 @@ import { icon } from "../art/icons.js";
 import { DISHES, TAPAS, tapasPrice } from "./kitchen.js";
 import { bikeOwned, DELIVERY } from "./scoop.js";
 import { occasionNow, OCC } from "./occasions.js";
+import { mulledSeason, sellCup, mullState } from "./mulled.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
 
 export const GROW = 8*H;                                     // a watered vine ripens in 8 hours
@@ -253,6 +254,7 @@ export function sellTick(F, opts = {}){
         else if (stock.length && Math.random() < oc.guests/2/60*oc.drink*host) { const w8 = stock.map(x => Math.pow(x.price, 1.5)*(fizz && x.type === "sparkling" ? 6 : 1)), tot = w8.reduce((a, b) => a + b, 0); let r = Math.random()*tot, i = 0; while (r > w8[i] && i < stock.length - 1) { r -= w8[i]; i++; }
           const b = stock[i]; b.n--; out.bottles++; out.coins += b.price; out.occB = (out.occB || 0) + 1; if (opts.lunch) out.lunchTips = (out.lunchTips || 0) + Math.max(1, Math.round(b.price*.15)); }
         if (oc.food && Math.random() < oc.guests/60*.5*host) { const p0 = out.plates; servePlate(v, lday, out); if (out.plates > p0) out.occP = (out.occP || 0) + 1; }
+        if (mulledSeason(lday) && (F.mull || {}).cups > 0 && Math.random() < oc.guests/60*.25*host) { const c = sellCup(F); if (c) { out.coins += c; out.mulled = (out.mulled || 0) + 1; } }
         out.occ = oc.kind; } }
     if (hm < 10*60 || hm >= 22*60) continue;
     const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); const crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0);
@@ -262,6 +264,8 @@ export function sellTick(F, opts = {}){
     const gameDay = new Date(at + off + 6*H).toISOString().slice(0, 10);   // the game's day (it turns over at 2am)
     const apero = aperitivoNow(gameDay, hm); if (apero) out.apero = true;   // Friday aperitivo hour: busier, and everyone wants a plate
     const plate = () => servePlate(v, gameDay, out);
+    // round 153: mulled wine by the cup, late November to Boxing Day, while there's some in the pot
+    if (mulledSeason(gameDay) && (F.mull || {}).cups > 0 && Math.random() < .012*f) { const c = sellCup(F); if (c) { out.coins += c; out.mulled = (out.mulled || 0) + 1; } }
     // a delivery order (round 137): with the Scoop Shack's bike, Tomo takes tapas, small plates and a bottle round to
     // people's homes and picnics (the field, the woods, the foreshore), plus a delivery fee
     if (bikeOwned(F) && Math.random() < DELIVERY.winery) { const c0 = out.coins, p0 = out.plates, bits = [];
@@ -284,7 +288,7 @@ export function sellTick(F, opts = {}){
   v.sold += out.bottles; v.glasses += out.glasses;
   const day = new Date(t + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
   ["picked", "filled", "stocked"].forEach(x => { v.today[x] = (v.today[x] || 0) + out[x]; });
-  v.today.plates = (v.today.plates || 0) + out.plates; v.today.deliv = (v.today.deliv || 0) + (out.deliv || 0); v.today.lunchB = (v.today.lunchB || 0) + (out.lunchB || 0); v.today.occB = (v.today.occB || 0) + (out.occB || 0); v.today.occP = (v.today.occP || 0) + (out.occP || 0); if (out.occ) v.today.occ = out.occ; v.today.lunchP = (v.today.lunchP || 0) + (out.lunchP || 0); v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
+  v.today.plates = (v.today.plates || 0) + out.plates; v.today.deliv = (v.today.deliv || 0) + (out.deliv || 0); v.today.lunchB = (v.today.lunchB || 0) + (out.lunchB || 0); v.today.occB = (v.today.occB || 0) + (out.occB || 0); v.today.mulled = (v.today.mulled || 0) + (out.mulled || 0); v.today.occP = (v.today.occP || 0) + (out.occP || 0); if (out.occ) v.today.occ = out.occ; v.today.lunchP = (v.today.lunchP || 0) + (out.lunchP || 0); v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
   return out;
 }
 
@@ -451,5 +455,5 @@ export function wireVine(root, F, api){
 export function wineNews(F, day, hm){
   const v = vineState(F), t = v.today; if (hm < 22*60 || v.reported === day) return null; v.reported = day; if (!t || t.day !== day || !t.coins) return null;
   const bits = [t.bottles ? `${t.bottles} bottle${t.bottles === 1 ? "" : "s"}` : "", t.glasses ? `${t.glasses} glass${t.glasses === 1 ? "" : "es"}` : "", t.plates ? `${t.plates} plate${t.plates === 1 ? "" : "s"}` : ""].filter(Boolean);
-  return `Today ${shopName(F).replace(/^The /, "the ")} sold ${bits.length ? bits.join(", ").replace(/, ([^,]*)$/, " and $1") : "a little"}: ${t.coins} coins${t.deliv ? `, with ${t.deliv} order${t.deliv === 1 ? "" : "s"} out by bike` : ""}${t.lunchB || t.lunchP ? `. The Sunday lunch on the terrace: ${t.lunchB || 0} bottle${t.lunchB === 1 ? "" : "s"} and ${t.lunchP || 0} plate${t.lunchP === 1 ? "" : "s"}` : ""}${t.occ && (t.occB || t.occP) ? `. ${OCC[t.occ].n} on the terrace: ${t.occB || 0} ${t.occ === "paint" ? "glass" : "bottle"}${t.occB === 1 ? "" : t.occ === "paint" ? "es" : "s"}${t.occP ? ` and ${t.occP} plate${t.occP === 1 ? "" : "s"}` : ""}` : ""}. It's in the till.`;
+  return `Today ${shopName(F).replace(/^The /, "the ")} sold ${bits.length ? bits.join(", ").replace(/, ([^,]*)$/, " and $1") : "a little"}: ${t.coins} coins${t.deliv ? `, with ${t.deliv} order${t.deliv === 1 ? "" : "s"} out by bike` : ""}${t.lunchB || t.lunchP ? `. The Sunday lunch on the terrace: ${t.lunchB || 0} bottle${t.lunchB === 1 ? "" : "s"} and ${t.lunchP || 0} plate${t.lunchP === 1 ? "" : "s"}` : ""}${t.mulled ? `. ${t.mulled} cup${t.mulled === 1 ? "" : "s"} of mulled wine` : ""}${t.occ && (t.occB || t.occP) ? `. ${OCC[t.occ].n} on the terrace: ${t.occB || 0} ${t.occ === "paint" ? "glass" : "bottle"}${t.occB === 1 ? "" : t.occ === "paint" ? "es" : "s"}${t.occP ? ` and ${t.occP} plate${t.occP === 1 ? "" : "s"}` : ""}` : ""}. It's in the till.`;
 }

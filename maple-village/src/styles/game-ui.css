@@ -946,3 +946,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .trvans .btn.wrong{opacity:.55;text-decoration:line-through}
 .pntcanvas{display:flex;justify-content:center;margin:10px 0}
 .pntcol span{display:inline-block;width:28px;height:20px;border-radius:5px;border:1px solid #2F2B28}
+/* round 153: the mulling pot */
+.mulldot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;border:1px solid #2F2B28;vertical-align:-1px}
+.mullsw{display:inline-flex;gap:2px;vertical-align:-1px}.mullsw i{width:9px;height:9px;border-radius:50%;border:1px solid #2F2B28}

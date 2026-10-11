@@ -327,7 +327,8 @@ export const ROOMS = {
     ["tasting","Tasting room","T","cafetables",null,"The tasting room.",34]]},
   // The kitchen behind the wine shop: oven (bread from flour), larder (ingredients sent from the backpack), cheese
   // press (goat's milk into cheese) and the stove, where the small plates and the tapas of the day are cooked
-  kitchen: {name:"The kitchen", wall:"#F2EBDD", trim:"#7FA36E", noBoard:true, pos:{O:[110,262], L:[410,262], P:[262,470], C:[110,500]}, stations:[
+  kitchen: {name:"The kitchen", wall:"#F2EBDD", trim:"#7FA36E", noBoard:true, pos:{O:[110,262], L:[410,262], P:[262,470], C:[110,500], X:[420,520]}, stations:[
+    ["mull","Mulling pot","X","mullpot",null,"The big copper pot. Mulled wine, from late November to Boxing Day.",30],
     ["oven","Oven","O","oven",null,"The bread oven. Flour in, loaves out.",30],
     ["larder","Larder","L","larder",null,"The larder. Everything you've sent to the kitchen.",30],
     ["stove","Stove","P","stove",null,"The stove. Small plates and today's tapas.",30],
