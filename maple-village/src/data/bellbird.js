@@ -14,6 +14,7 @@
 //   Riverside Camp     bv_camp:    br_park / br_river
 
 import { CR_TOWNS, CR_PLACES, CR_BRIDGES, CR_ARRIVE, CR_BOUNDS, CR_OBST, CR_EVAN, CR_MAP, CR_ROADS, CR_NAMES, CR_GOODS, CR_KEEP } from "./coast.js";
+import { LV_TOWNS, LV_PLACES, LV_BRIDGES, LV_ARRIVE, LV_BOUNDS, LV_OBST, LV_EVAN, LV_MAP, LV_ROADS, LV_NAMES, LV_GOODS, LV_KEEP } from "./lavender.js";
 import { TL_TOWNS, TL_PLACES, TL_BRIDGES, TL_ARRIVE, TL_BOUNDS, TL_OBST, TL_EVAN, TL_MAP, TL_ROADS, TL_NAMES, TL_GOODS, TL_KEEP } from "./tablelands.js";
 const VAN = {by: "van", fare: 0, free: ["evan"], outFrom: 7*60, outTo: 18*60, backTo: 22*60};
 const fam = (spots) => spots;   // (readability)
@@ -230,7 +231,7 @@ export const BB_EVAN = {bg_gate: [[240, 470], [320, 430], [200, 560]], bg_bridge
 // Honeybrook (bottom left, off the edge of the valley). Roads to the other regions are signposted, but closed for now.
 export const BB_MAP = {home: [26, 214], bv_gate: [86, 170], bv_lookout: [120, 70], bv_cellar: [228, 50], bv_creek: [150, 200], bv_berry: [256, 150], bv_camp: [320, 214]};
 export const BB_ROADS = [["home", "bv_gate"], ["bv_gate", "bv_lookout"], ["bv_lookout", "bv_cellar"], ["bv_gate", "bv_creek"], ["bv_creek", "bv_berry"], ["bv_cellar", "bv_berry"], ["bv_berry", "bv_camp"]];
-export const BB_SOON = [["bv_camp", [350, 150], "To the Lavender Hills"]];   // (the Tablelands opened in round 157)
+export const BB_SOON = [];   // (the Tablelands opened in round 157, the Lavender Hills in round 161: the whole valley)
 
 // the places on each stop's screens (the gates between a stop's two screens are bridges)
 export const BB_PLACES = {
@@ -383,6 +384,10 @@ Object.assign(BB_GOODS, CR_GOODS); Object.assign(BB_KEEP, CR_KEEP);
 Object.assign(BB_TOWNS, TL_TOWNS); Object.assign(BB_PLACES, TL_PLACES); Object.assign(BB_BRIDGES, TL_BRIDGES); Object.assign(BB_ARRIVE, TL_ARRIVE);
 Object.assign(BB_BOUNDS, TL_BOUNDS); Object.assign(BB_OBST, TL_OBST); Object.assign(BB_EVAN, TL_EVAN); Object.assign(BB_NAMES, TL_NAMES); BB_ROADS.push(...TL_ROADS);
 Object.assign(BB_GOODS, TL_GOODS); Object.assign(BB_KEEP, TL_KEEP);
-export const BB_MAPS = {vines: BB_MAP, coast: CR_MAP, tablelands: TL_MAP};
-export const REGION_N = {vines: "The Vines", coast: "The Coast Road", tablelands: "The Tablelands"};
-export const REGIONS = ["vines", "coast", "tablelands"];
+// round 161: the Lavender Hills (data/lavender.js), past Riverside Camp
+Object.assign(BB_TOWNS, LV_TOWNS); Object.assign(BB_PLACES, LV_PLACES); Object.assign(BB_BRIDGES, LV_BRIDGES); Object.assign(BB_ARRIVE, LV_ARRIVE);
+Object.assign(BB_BOUNDS, LV_BOUNDS); Object.assign(BB_OBST, LV_OBST); Object.assign(BB_EVAN, LV_EVAN); Object.assign(BB_NAMES, LV_NAMES); BB_ROADS.push(...LV_ROADS);
+Object.assign(BB_GOODS, LV_GOODS); Object.assign(BB_KEEP, LV_KEEP);
+export const BB_MAPS = {vines: BB_MAP, coast: CR_MAP, tablelands: TL_MAP, lavender: LV_MAP};
+export const REGION_N = {vines: "The Vines", coast: "The Coast Road", tablelands: "The Tablelands", lavender: "The Lavender Hills"};
+export const REGIONS = ["vines", "coast", "tablelands", "lavender"];
