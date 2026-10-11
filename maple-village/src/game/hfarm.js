@@ -113,11 +113,13 @@ export const CHEESES = {
   // Elena's to teach, once Mel's her apprentice (level 2)
   brie: {n: "Barn brie", milk: "milk", need: 3, days: 3, wedges: 5, id: "chz_brie", col: "#FFF6E0", words: ["Brie", "Soft White", "Bloomy"], lvl: 2},
   halloumi: {n: "Goat's halloumi", milk: "goatmilk", need: 3, days: 2, wedges: 5, id: "chz_halloumi", col: "#F6F1E8", words: ["Halloumi", "Squeaky", "Grilling"], lvl: 2},
-  smoked: {n: "Smoked farmhouse", milk: "milk", need: 3, days: 5, wedges: 6, id: "chz_smoked", col: "#D9944A", words: ["Smoked", "Applewood", "Oak Smoked"], lvl: 2}
+  smoked: {n: "Smoked farmhouse", milk: "milk", need: 3, days: 5, wedges: 6, id: "chz_smoked", col: "#D9944A", words: ["Smoked", "Applewood", "Oak Smoked"], lvl: 2},
+  // round 159: Meg's, from Greenhill Dairy in the Tablelands, once she's taught Mel (tlacts.js: h.learnt.havarti)
+  havarti: {n: "Tableland havarti", milk: "milk", need: 3, days: 3, wedges: 5, id: "chz_havarti", col: "#F6E7B0", words: ["Havarti", "Creamy", "Tableland"], learn: true}
 };
 export const CAVE = 6;
 export const caveSize = h => levelOf(h) >= 3 ? 9 : CAVE;
-export const cheesesFor = h => Object.entries(CHEESES).filter(([, c]) => !c.lvl || levelOf(h) >= c.lvl);
+export const cheesesFor = h => Object.entries(CHEESES).filter(([k, c]) => (!c.lvl || levelOf(h) >= c.lvl) && (!c.learn || (h.learnt || {})[k]));
 // the cut, by how faithfully the wheel was turned while it aged
 export const quality = w => { const r = (w.turns || 0)/Math.max(1, CHEESES[w.kind].days); return r >= .75 ? "excellent" : r >= .35 ? "good" : "rustic"; };
 export function turnWheels(F){ const h = hfState(F), day = dayKey(); let n = 0; h.cave.forEach(w => { if (caveLeft(w) && w.lastTurn !== day) { w.turns = (w.turns || 0) + 1; w.lastTurn = day; n++; } }); return n; }
@@ -132,7 +134,7 @@ export const CRAFTED_SELL = {...Object.fromEntries(Object.values(CHEESES).map(c 
   honey: 6, honey_lav: 10, honey_blossom: 10, honey_cream: 12, honeycomb: 10, yoghurt: 4};
 Object.entries(CRAFTED_SELL).forEach(([id, n]) => { if (!ITEMS[id]) return; ITEMS[id].sell = n; ITEMS[id].crafted = true; if (ITEMS[id + "_ex"]) Object.assign(ITEMS[id + "_ex"], {sell: n + 6, crafted: true}); });
 const C_PLACE = ["Lavender Hill", "Barn Door", "Honeybrook", "Hay Loft", "Morning Mist", "Stone Wall", "Sunday", "Windmill", "Brookside", "Old Gate", "Clover Field", "Harvest", "Lantern", "Bee Hive", "Rainy Day", "Golden Hour"];
-const C_FR = {fresh: ["Petit Chèvre de Honeybrook", "Chèvre du Ruisseau", "Frais de la Ferme"], cheddar: ["Tomme de Honeybrook", "Vieux Grange", "Tomme du Moulin"], blue: ["Bleu de la Baie", "Bleu du Ruisseau", "Bleu de Honeybrook"]};
+const C_FR = {fresh: ["Petit Chèvre de Honeybrook", "Chèvre du Ruisseau", "Frais de la Ferme"], cheddar: ["Tomme de Honeybrook", "Vieux Grange", "Tomme du Moulin"], blue: ["Bleu de la Baie", "Bleu du Ruisseau", "Bleu de Honeybrook"], havarti: ["Havarti de Honeybrook", "Crème du Plateau", "Havarti du Moulin"]};
 // suggested names for a new wheel: places on the farm, the animal it came from, and a few in French; never one in use
 export function cheeseNames(F, kind, seed = 0){
   const h = hfState(F), c = CHEESES[kind]; if (!c) return [];
@@ -140,14 +142,14 @@ export function cheeseNames(F, kind, seed = 0){
   const sd = Math.floor(seed) + h.names.length*31 + Object.keys(CHEESES).indexOf(kind)*7;
   for (let k = 0; out.length < 12 && k < 200; k++) {
     const w = c.words[(sd + k) % c.words.length], a = from[(sd + k*3) % from.length].n, kind3 = k % 3;
-    const nm = kind3 === 0 ? `${C_PLACE[(sd + k*5) % C_PLACE.length]} ${w}` : kind3 === 1 ? `${a}'s ${C_PLACE[(sd + k*7 + 2) % C_PLACE.length]} ${w}` : C_FR[kind][(sd + k) % C_FR[kind].length];
+    const nm = kind3 === 0 ? `${C_PLACE[(sd + k*5) % C_PLACE.length]} ${w}` : kind3 === 1 ? `${a}'s ${C_PLACE[(sd + k*7 + 2) % C_PLACE.length]} ${w}` : (C_FR[kind] || [`${C_PLACE[(sd + k*3) % C_PLACE.length]} ${c.n.split(" ").pop()}`])[(sd + k) % (C_FR[kind] || [0]).length];
     if (!used.has(nm.toLowerCase()) && !out.includes(nm)) out.push(nm);
   }
   return out;
 }
 export const caveLeft = w => Math.max(0, w.done - clock());
 export function pressCheese(F, kind, name){
-  const h = hfState(F), c = CHEESES[kind], inv = F.inv || {}; if (!c || (c.lvl && levelOf(h) < c.lvl) || h.cave.length >= caveSize(h) || (inv[c.milk] || 0) < c.need) return null;
+  const h = hfState(F), c = CHEESES[kind], inv = F.inv || {}; if (!c || (c.lvl && levelOf(h) < c.lvl) || (c.learn && !(h.learnt || {})[kind]) || h.cave.length >= caveSize(h) || (inv[c.milk] || 0) < c.need) return null;
   inv[c.milk] -= c.need; if (!inv[c.milk]) delete inv[c.milk];
   const nm = String(name || "").replace(/[<>&"]/g, "").trim().slice(0, 30) || cheeseNames(F, kind, clock()/864e5)[0] || c.n, t = clock();
   const w = {kind, name: nm, start: t, done: t + c.days*864e5}; h.cave.push(w); h.names = [...h.names, nm].slice(-60); return w;
