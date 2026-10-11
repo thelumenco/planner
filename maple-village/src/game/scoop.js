@@ -134,7 +134,7 @@ export function buyUpgrade(F, k){
   return {honesty: "The honesty freezer's out front, full of little cups. It sells from 7 to 10am and 8 to 10pm while the shop's shut.",
     awning: "The striped awning's up over the deck, fairy lights and all. Wait till you see it at dusk.",
     neon: "The neon cone's on the wall by the door. It switches on at 5pm.",
-    bike: "A mint delivery bike, parked by the shop. Send an ice cream from your backpack any time the shop's open.",
+    bike: "A mint delivery bike, parked by the shop. Send an ice cream from your backpack any time the shop's open. Villagers' orders come in while Tomo's on, 10am to 6pm.",
     dip: "The chocolate dip station's open! Through the new door on the shop's east wall."}[k];
 }
 export function buyDip(F, k){ const s = scoopState(F), d = DIPS[k]; if (!d || d.house || s.dips[k] || F.coins < d.price) return false; F.coins -= d.price; s.dips[k] = 1; return true; }
@@ -539,12 +539,16 @@ export function trolleyPanel(F, st = {}){
 // uses real stock and pays the shop's price plus a delivery fee. On top of the shops' own sales.
 export const DELIVERY = {fee: 2, scoop: .045, cocoa: .036, winery: .04};   // doubled (Mel: "Tomo doesn't seem to be delivering much"): about two to three an hour from each shop, when there's stock
 export const bikeOwned = F => !!(F.scoop && F.scoop.up && F.scoop.up.bike);
+// round 155 (Mel: "I'm getting delivery orders even when it's outside of delivery bike hours"): orders only come in
+// while Tomo's on shift, 10am to 6pm, whichever shop they're from
+export const DELIV_HOURS = [10*60, 18*60];
+export const deliveryHours = hm => hm >= DELIV_HOURS[0] && hm < DELIV_HOURS[1];
 // round 152 (Mel: "the mint bike is like permanently outside the shop"): after each order Tomo's out on the bike for
 // twenty minutes, and it's gone from beside the shop (a little chalkboard says so)
 export const BIKE_TRIP = 20*60000;
 export const bikeAway = (s, t = Date.now() + (globalThis.__mapleOffset || 0)) => !!(s && s.bikeOut && t - s.bikeOut >= 0 && t - s.bikeOut < BIKE_TRIP);
 function deliverMinute(s, day, hm){
-  if (!hasUp(s, "bike") || !openNow(hm) || Math.random() >= DELIVERY.scoop) return null;
+  if (!hasUp(s, "bike") || !openNow(hm) || !deliveryHours(hm) || Math.random() >= DELIVERY.scoop) return null;
   const stocked = onDisplay(s); if (!stocked.length) return null;
   const r = stocked[Math.floor(Math.random()*stocked.length)], fmt = Math.random() < .55 ? "cone" : "cup"; s.tubs[r.id]--; if (s.tubs[r.id] <= 0) delete s.tubs[r.id];
   const coins = priceOf(s, fmt, r) + DELIVERY.fee, t = s.sold[day] = s.sold[day] || {n: 0, coins: 0}; t.deliv = (t.deliv || 0) + 1; t.delivCoins = (t.delivCoins || 0) + coins;

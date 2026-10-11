@@ -1,6 +1,6 @@
 // The greenhouse (round 109): outside, a little glass house at the back of the garden (in place of the old shed);
 // inside, a brick floor, glass walls and roof panes, six raised beds of herbs, a potting bench with terracotta pots,
-// a watering can, and the misters overhead.
+// a watering can, and the misters overhead. Round 155: a row of herb pots on wooden staging along the glass.
 import { ink } from "../util.js";
 import { sk, tapeLabel } from "./scenes.js";
 import { iconAt } from "./icons.js";
@@ -17,6 +17,24 @@ export function ghOutside(x, y, owned){
     ${tapeLabel(x, y + 16, "Greenhouse", "#C3E8DA", 10)}</g>`;
 }
 
+// round 155: six terracotta herb pots on the staging along the glass (x: the pot's middle, y: its base)
+export const GH_POT_AT = [92, 156, 220, 284, 348, 412].map(x => ({x, y: 186}));
+const HERB_LOOK = {basil: {col: "#5FAE4A", leaf: "round"}, mint: {col: "#6DBE7A", leaf: "round"}, thyme: {col: "#7E9A5A", leaf: "tiny"},
+  rosemary: {col: "#55785A", leaf: "needle"}, chives: {col: "#5E9A44", leaf: "blade"}};
+const herb = (crop, g, x, y) => { const L = HERB_LOOK[crop] || HERB_LOOK.basil, k = .45 + .55*g, n = g < .34 ? 3 : g < 1 ? 5 : 7, out = [];
+  for (let j = 0; j < n; j++) { const a = (j - (n - 1)/2)/((n - 1)/2 || 1), dx = a*18*k, top = y - (16 + 14*(1 - Math.abs(a)*.5))*k;
+    if (L.leaf === "blade" || L.leaf === "needle") out.push(`<path d="M${x + dx*.4} ${y} Q${x + dx*.8} ${(y + top)/2} ${x + dx} ${top}" style="fill:none;stroke:${L.col}" stroke-width="${L.leaf === "blade" ? 2.4 : 2}" stroke-linecap="round"/>${L.leaf === "needle" ? [.3, .55, .8].map(t => `<path d="M${x + dx*(.4 + .6*t) - 3} ${y + (top - y)*t + 2} l3 -3 l3 3" style="fill:none;stroke:${L.col}" stroke-width="1.2"/>`).join("") : g >= 1 && j % 3 === 1 ? `<circle cx="${x + dx}" cy="${top - 2}" r="2.6" style="fill:#B48AD8"/>` : ""}`);
+    else out.push(`<path d="M${x + dx*.3} ${y} L${x + dx} ${top + 4}" style="stroke:#4E7A3E" stroke-width="1.2"/><ellipse cx="${x + dx}" cy="${top + 2}" rx="${(L.leaf === "tiny" ? 3.4 : 6)*k}" ry="${(L.leaf === "tiny" ? 2.4 : 4)*k}" style="fill:${L.col}"/>${L.leaf === "tiny" ? `<ellipse cx="${x + dx*.7}" cy="${(y + top)/2}" rx="${3*k}" ry="${2*k}" style="fill:${L.col}"/>` : ""}`); }
+  return out.join(""); };
+function potsArt(pots, growth){
+  const staging = sk(`<rect x="60" y="186" width="386" height="9" rx="2" style="fill:#C9A27E"/>${[70, 252, 436].map(x => `<rect x="${x - 3}" y="195" width="6" height="20" style="fill:#B08A6A"/>`).join("")}`, `<rect x="60" y="186" width="386" height="9" rx="2"/><path d="M67 195 v20 M249 195 v20 M433 195 v20"/>`);
+  return staging + GH_POT_AT.map((p, i) => { const b = pots[i], g = b ? growth(b) : 0;
+    return `<g data-ghpot="${i}" aria-label="Herb pot ${i + 1}${b ? `: ${CROPS[b.crop].n}` : ""}"><ellipse class="hov" cx="${p.x}" cy="${p.y - 18}" rx="29" ry="34" style="fill:var(--butter)"/>
+      ${b ? `<g filter="url(#wob)">${herb(b.crop, g, p.x, p.y - 24)}</g>` : ""}
+      ${sk(`<path d="M${p.x - 17} ${p.y - 26} h34 l-4 26 h-26z" style="fill:#C8643B"/><rect x="${p.x - 19}" y="${p.y - 30}" width="38" height="7" rx="2" style="fill:#D97A50"/><ellipse cx="${p.x}" cy="${p.y - 29}" rx="15" ry="2.4" style="fill:#5E4433"/>`, `<path d="M${p.x - 17} ${p.y - 23} l4 23 h26 l4 -23"/><rect x="${p.x - 19}" y="${p.y - 30}" width="38" height="7" rx="2"/>`)}
+      ${b && g >= 1 ? iconAt("sparkle", p.x + 20, p.y - 52, 14) : ""}${tapeLabel(p.x, p.y + 20, b ? CROPS[b.crop].n : "Empty pot", b ? "#C3E8DA" : "#F3E1A0", 8)}</g>`; }).join("");
+}
+
 // the beds inside: two rows of three
 export const GH_BED_AT = [[90, 250], [215, 250], [340, 250], [90, 420], [215, 420], [340, 420]].map(([x, y]) => ({x, y, w: 100, h: 70}));
 const plant = (crop, g, cx, cy) => {
@@ -24,17 +42,17 @@ const plant = (crop, g, cx, cy) => {
   if (g < 1) return [-26, 0, 26].map(dx => `<path d="M${cx + dx} ${cy} v-16" style="stroke:#5E8A4A" stroke-width="1.4"/><ellipse cx="${cx + dx - 6}" cy="${cy - 12}" rx="6" ry="3" style="fill:#6FAE58"/><ellipse cx="${cx + dx + 6}" cy="${cy - 16}" rx="6" ry="3" style="fill:#7FB86A"/>`).join("");
   return [-28, 0, 28].map(dx => iconAt(crop, cx + dx, cy - 14, 26)).join("");
 };
-export function greenhouseArt(beds, growth){
+export function greenhouseArt(beds, growth, pots = []){
   const floor = `<rect width="520" height="640" style="fill:#E7DCCB"/>${Array.from({length: 16}, (_, r) => Array.from({length: 9}, (_, c) => `<rect x="${c*60 - (r % 2)*30}" y="${150 + r*30}" width="60" height="30" style="fill:none;stroke:#D2C3AC" stroke-width="1"/>`).join("")).join("")}`;
   // the glass back wall and roof, with the misters along a pipe
   const glass = `<g pointer-events="none"><rect x="0" y="0" width="520" height="150" style="fill:#DCEFF7"/>${Array.from({length: 9}, (_, i) => `<path d="M${i*65} 0 V150" style="stroke:#FFFDF6" stroke-width="4"/><path d="M${i*65} 0 V150" style="stroke:var(--line)" stroke-width="1"/>`).join("")}
     <path d="M0 75 H520" style="stroke:#FFFDF6" stroke-width="4"/><path d="M0 75 H520 M0 150 H520" style="stroke:var(--line)" stroke-width="1"/>
     ${[40, 300, 440].map(x => `<ellipse cx="${x}" cy="${40 + (x % 3)*8}" rx="${30 + x % 20}" ry="14" style="fill:#FFFDF6" opacity=".5"/>`).join("")}
-    <path d="M30 168 H490" style="stroke:#9AA3A8" stroke-width="3"/>${[100, 220, 340, 460].map(x => `<g><path d="M${x} 168 v6" style="stroke:#9AA3A8" stroke-width="2"/><path d="M${x - 6} 182 l6 -8 l6 8" style="fill:none;stroke:#CFE8F4" stroke-width="1.4" stroke-dasharray="2 3"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="1.4s" repeatCount="indefinite"/></path></g>`).join("")}</g>`;
+    <path d="M30 112 H490" style="stroke:#9AA3A8" stroke-width="3"/>${[88, 232, 376, 460].map(x => `<g><path d="M${x} 112 v6" style="stroke:#9AA3A8" stroke-width="2"/><path d="M${x - 6} 126 l6 -8 l6 8" style="fill:none;stroke:#CFE8F4" stroke-width="1.4" stroke-dasharray="2 3"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="1.4s" repeatCount="indefinite"/></path></g>`).join("")}</g>`;
   // the potting bench along the right, terracotta pots, and the watering can
   const bench = `<g pointer-events="none">${sk(`<rect x="452" y="200" width="56" height="300" rx="3" style="fill:#C9A27E"/>${[230, 280, 330, 380, 430].map(y => `<path d="M464 ${y} h20 l-3 16 h-14z" style="fill:#C8643B"/><circle cx="474" cy="${y - 4}" r="7" style="fill:${y % 100 ? "#7FB86A" : "#6FAE58"}"/>`).join("")}<path d="M460 520 h26 v18 h-26z" style="fill:#9CC3E0"/><path d="M486 524 l14 -10" style="stroke:#9CC3E0" stroke-width="3"/>`,
     `<rect x="452" y="200" width="56" height="300" rx="3"/><path d="M460 520 h26 v18 h-26z"/>`)}</g>`;
-  let h = floor + glass + bench;
+  let h = floor + glass + bench + potsArt(pots, growth);
   GH_BED_AT.forEach((p, i) => { const b = beds[i], g = b ? growth(b) : 0;
     h += `<g data-ghbed="${i}" aria-label="Bed ${i + 1}"><rect class="hov" x="${p.x - 6}" y="${p.y - 6}" width="${p.w + 12}" height="${p.h + 12}" rx="10" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="4" style="fill:#A8754F"/><rect x="${p.x + 6}" y="${p.y + 6}" width="${p.w - 12}" height="${p.h - 12}" rx="3" style="fill:#7A5A44"/>

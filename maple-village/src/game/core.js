@@ -48,12 +48,12 @@ import { bayArt, DECK_SEATS } from "../art/bay.js";
 import { hfarmArt } from "../art/hfarm.js";
 import { hlaneArt } from "../art/hlane.js";
 import { hwoodsArt } from "../art/hwoods.js";
-import { greenhouseArt, GH_BED_AT } from "../art/greenhouse.js";
+import { greenhouseArt, GH_BED_AT, GH_POT_AT } from "../art/greenhouse.js";
 import { millArt } from "../art/mill.js";
 import { bonfireArt, fishVanArt, kiteArt, bayStallArt, kiteSellerArt, movieArt } from "../art/friday.js";
 import { vanPanel, vanBuy, VAN_MULT, bonfirePanel, releaseLanterns, grillFish, bayStallGoods, bayKeeperName, filmOf } from "./friday.js";
 import { millState, pressLeft, millPanel, startPress, collectOil, millStory } from "./mill.js";
-import { ghState, ghGrowth, bedPanel, ghPlant, ghHarvest, ghBoost, setGhCompost } from "./greenhouse.js";
+import { ghState, ghGrowth, bedPanel, ghPlant, ghHarvest, ghBoost, setGhTools, herbPotPanel, potPlant, potClip, potDig, ghRipe } from "./greenhouse.js";
 import { rondaArt, trainRideArt } from "../art/town-ronda.js";
 import { rondaRoomArt } from "../art/ronda-rooms.js";
 import { kyotoArt } from "../art/town-kyoto.js";
@@ -305,7 +305,11 @@ function growth(p){ if (!p || !p.crop || !p.wateredAt) return 0; return clamp((D
 const SHED = {
   can:       {n: "Big watering can", price: 60, ico: "wateringCan", what: "Waters every thirsty plot in one go."},
   compost:   {n: "Compost bin", price: 150, ico: "compost", what: "Everything grows a quarter faster."},
-  sprinkler: {n: "Sprinkler", price: 300, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."}
+  sprinkler: {n: "Sprinkler", price: 300, ico: "sprinkler", what: "New seeds water themselves the moment you plant them."},
+  // round 155 (Mel): three more, each working on every plot at once
+  seeder:     {n: "Auto seeder", price: 350, ico: "seeder", what: "One tap sows every empty plot, and it re-sows each plot after picking."},
+  fertiliser: {n: "Fertiliser", price: 250, ico: "fertiliser", what: "One more of everything you pick, in the garden and the greenhouse."},
+  harvester:  {n: "Auto harvester", price: 450, ico: "harvester", what: "Anything ripe in the garden or greenhouse comes straight into your backpack."}
 };
 // keepsakes and pets (companions.js): the keepsake being placed, a placed one's shelf, the pet being adopted (and for
 // whom), and the pet whose card is open
@@ -594,6 +598,7 @@ setInterval(() => {
   if (scene === "kidroom" && evanNight() && !kid.sleep) { kid.sleep = true; kid.open = null; stopKidGame(); ctx(); drawScene(); }
   const due = dueNow(F); if (due.length) { chime(); act("nudge"); speak(`Reminder: ${due.map(r => r.text).join(", and ")}.`, 9000, true); save(); }
   if (S.day !== dayKey()) { S = freshToday(); say = null; save(true); speak(defaultLine()); syncSunsama(); return; }
+  harvesterTick();
   const rc = readyCount();
   if (rc > lastReady) { speak(rc === 1 ? "Psst… something in the garden is ready!" : `${rc} crops ready in the garden!`, 5000); if (scene === "farm") drawScene(); }
   lastReady = rc;
@@ -1443,20 +1448,39 @@ function sell(id){
   addInv(id, -1); F.coins += it.sell; flash(`Sold ${it.n.toLowerCase()} +${it.sell} coins`);
   speak(it.crafted || id === "oliveoil" ? pick(["Made with your own hands: it fetches a good price.", "Hana holds it up to the light. \"You made this? I'll take it.\"", "Sold! Worth every minute it took."]) : "Fresh from the garden, sold!", 2500); save();
 }
+const sowOne = (i, seedId) => { const it = ITEMS[seedId]; addInv(seedId, -1); F.plots[i] = {crop:it.crop, seed: seedId, plantedAt:Date.now(), wateredAt: F.tools.sprinkler ? Date.now() : null, bonus:0}; };
 function plant(i, seedId){
   const it = ITEMS[seedId]; if (!it || !F.inv[seedId] || (F.plots[i] && F.plots[i].crop)) return;
-  addInv(seedId, -1); F.gift = false; F.plots[i] = {crop:it.crop, plantedAt:Date.now(), wateredAt: F.tools.sprinkler ? Date.now() : null, bonus:0};
-  speak(F.tools.sprinkler ? `${CROPS[it.crop].n} planted, and the sprinkler's on it!` : `${CROPS[it.crop].n} planted! Now give it some water.`, 3500); save(true);
+  F.gift = false; sowOne(i, seedId); let n = 1;
+  if (F.tools.seeder) F.plots.forEach((p, j) => { if (j !== i && !(p && p.crop) && F.inv[seedId] > 0) { sowOne(j, seedId); n++; } });   // the auto seeder: every empty plot
+  const what = n > 1 ? `The seeder's sown ${CROPS[it.crop].n.toLowerCase()} in ${n} plots` : `${CROPS[it.crop].n} planted`;
+  speak(F.tools.sprinkler ? `${what}, and the sprinkler's on it!` : `${what}! Now give ${n > 1 ? "them" : "it"} some water.`, 3500); save(true);
 }
 function waterPlot(i){ const p = F.plots[i]; if (!p || !p.crop || p.wateredAt) return;
   const all = F.tools.can ? F.plots.map((q, j) => q && q.crop && !q.wateredAt ? j : -1).filter(j => j >= 0) : [i];
   all.forEach(j => { F.plots[j].wateredAt = Date.now(); mprop("drop", PLOTS[j].x + 50, PLOTS[j].y + 10); });
   speak(all.length > 1 ? `Big can! ${all.length} plots watered at once.` : "Watered! Growing starts now. Finished quests speed it up.", 4000); save(true); }
+// pick plot i (the fertiliser adds one more; the auto seeder sows it again if there's a seed for it) -> {crop, n, again}
+function pickPlot(i){
+  const p = F.plots[i], C = CROPS[p.crop], n = (C.yield || 1) + (F.tools.fertiliser ? 1 : 0);
+  addInv(p.crop, n); F.plots[i] = null; gainXp(1); S.harvested = (S.harvested || 0) + 1; F.harvestTotal = (F.harvestTotal || 0) + 1;
+  const seed = F.tools.seeder && (p.seed && F.inv[p.seed] > 0 ? p.seed : Object.keys(F.inv).find(id => F.inv[id] > 0 && ITEMS[id] && ITEMS[id].kind === "seed" && !ITEMS[id].greenhouse && ITEMS[id].crop === p.crop));
+  if (seed) sowOne(i, seed);
+  return {crop: p.crop, n, again: !!seed};
+}
 function harvest(i){
   const p = F.plots[i]; if (!p || !p.crop || growth(p) < 1) return;
-  const C = CROPS[p.crop], n = C.yield || 1;
-  addInv(p.crop, n); F.plots[i] = null; gainXp(1); S.harvested = (S.harvested || 0) + 1; F.harvestTotal = (F.harvestTotal || 0) + 1; mprop(CROPS[p.crop].ico, PLOTS[i].x + 50, PLOTS[i].y + 20, 1900); act("cheer");
-  speak(n > 1 ? `Harvested ${n} ${C.ns || C.n.toLowerCase()}! They're in your backpack.` : `Harvested a ${C.n.toLowerCase()}! It's in your backpack.`, 4000); save(true);
+  const C = CROPS[p.crop], r = pickPlot(i), n = r.n; mprop(CROPS[p.crop].ico, PLOTS[i].x + 50, PLOTS[i].y + 20, 1900); act("cheer");
+  speak((n > 1 ? `Harvested ${n} ${C.ns || C.n.toLowerCase()}! They're in your backpack.` : `Harvested a ${C.n.toLowerCase()}! It's in your backpack.`) + (r.again ? " The seeder's sown it again." : ""), 4000); save(true);
+}
+// round 155: the auto harvester brings in anything ripe, in the garden and under the glass
+function harvesterTick(){
+  if (!F.tools.harvester) return; const got = {};
+  F.plots.forEach((p, i) => { if (p && p.crop && growth(p) >= 1) { const r = pickPlot(i); got[r.crop] = (got[r.crop] || 0) + r.n; } });
+  if (F.goals && F.goals.greenhouse) ghRipe(F, addInv).forEach(r => { got[r.crop] = (got[r.crop] || 0) + r.n; });
+  const k = Object.keys(got); if (!k.length) return; save();
+  const list = k.map(c => `${got[c]} ${CROPS[c].ns || CROPS[c].n.toLowerCase()}`).join(", ");
+  flash(`The harvester brought in ${list}`); if (scene === "farm" || scene === "greenhouse") { drawScene(); if (!quietNow()) speak(`The auto harvester's been round: ${list}, into your backpack.`, 4500); }
 }
 
 /* =================== UI =================== */
@@ -1675,7 +1699,7 @@ function ctx(){
       if (shopTab === "family") h += `<p class="muted" style="grid-column:1/-1">Little treats go in your backpack: give them in person from there. Keepsakes go straight home and stay forever.</p>`;
     }
     h += `</div>`;
-  } else if (scene === "greenhouse" && ghBed != null) { h = bedPanel(F, ghBed);
+  } else if (scene === "greenhouse" && ghBed != null) { h = typeof ghBed === "string" ? herbPotPanel(F, +ghBed.slice(1)) : bedPanel(F, ghBed);
   } else if (scene === "millup" && millOpen === "tasting") { h = tastePanel(F, tstSt, {on: tastingNow(dayKey(), sgHM()) != null && owns(F, "millshop"), done: craftState(F).tasted === dayKey() && !tstSt});
   } else if (scene === "millup" && millOpen === "workshop") { h = workshopPanel(F, {on: workshopNow(dayKey(), sgHM()) && owns(F, "millshop")});
   } else if ((scene === "mill" || scene === "millup") && millOpen) { h = millOpen === "story" ? millStory(F) : millOpen === "bench" ? millBenchPanel(F, mcSt, {shop: owns(F, "millshop"), ines: owns(F, "mill")}) : millOpen === "shop" ? millShopPanel() : millPanel(F);
@@ -1687,7 +1711,7 @@ function ctx(){
     h = `<span class="tape stripe" aria-hidden="true"></span><h2>Plot ${i + 1}</h2>`;
     if (!p || !p.crop) {
       const seeds = Object.keys(F.inv).filter(id => ITEMS[id] && ITEMS[id].kind === "seed" && !ITEMS[id].greenhouse);   // greenhouse packets only grow under glass
-      h += seeds.length ? `<p class="sub">Pick seeds to plant.</p><div class="items">${seeds.map(id => itemBtn(id, `${dur(CROPS[ITEMS[id].crop].dur)} to grow`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("")}</div>`
+      h += seeds.length ? `<p class="sub">${F.tools.seeder && F.plots.filter(q => !(q && q.crop)).length > 1 ? "Pick seeds: the auto seeder sows every empty plot at once." : "Pick seeds to plant."}</p><div class="items">${seeds.map(id => itemBtn(id, `${dur(CROPS[ITEMS[id].crop].dur)} to grow`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("")}</div>`
         : `<p class="sub">No seeds in your backpack. The market sells them.</p>`;
     } else {
       const g = growth(p), cr = CROPS[p.crop];
@@ -1787,8 +1811,10 @@ function ctx(){
     mel.sitting = true; nodes.mel.classList.add("sit"); friView = null; ctx(); sfx("paper", true); speak(pick(["The fire pops and crackles. Nobody needs to say anything.", "Warm on your face, cool on your back. Friday.", "Sparks going up into the dark. The week's done."]), 4500); });
   c.querySelectorAll("[data-mill]").forEach(b => b.onclick = () => { const l = b.dataset.mill === "press" ? startPress(F, +b.dataset.n) : collectOil(F, addInv);
     if (l) { sfx(b.dataset.mill === "press" ? "crunch" : "chime"); if (b.dataset.mill !== "press") { gainXp(1); act("cheer"); } speak(l, 4500); save(true); } ctx(); });
-  c.querySelectorAll("[data-gh]").forEach(b => b.onclick = () => { const i = +b.dataset.i;
-    if (b.dataset.gh === "plant") { const l = ghPlant(F, i, b.dataset.id, addInv); if (l) { sfx("pop"); speak(l, 3500); F.gift = false; } }
+  c.querySelectorAll("[data-gh]").forEach(b => b.onclick = () => { const i = +b.dataset.i, gh = b.dataset.gh;
+    if (gh === "plant" || gh === "pplant") { const l = (gh === "plant" ? ghPlant : potPlant)(F, i, b.dataset.id, addInv); if (l) { sfx("pop"); speak(l, 3500); F.gift = false; } }
+    else if (gh === "dig") { const l = potDig(F, i); if (l) { sfx("paper", true); speak(l, 3500); } }
+    else if (gh === "clip") { const r = potClip(F, i, addInv); if (r) { gainXp(1); act("cheer"); sfx("chime"); speak(r.line, 4000); const p = GH_POT_AT[i]; mprop(r.crop, p.x, p.y - 30, 1900); ghBed = null; } }
     else { const r = ghHarvest(F, i, addInv); if (r) { gainXp(1); act("cheer"); sfx("chime"); speak(r.line, 4000); const p = GH_BED_AT[i]; mprop(r.crop, p.x + 50, p.y + 20, 1900); ghBed = null; } }
     save(true); ctx(); });
   c.querySelectorAll("[data-tickets]").forEach(b => b.onclick = () => { railOpen = "tickets"; sfx("paper", true); ctx(); });
@@ -2184,7 +2210,7 @@ function drawScene(){
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; const light = rainLevel(day) === 1; setTimeout(() => speak(light ? "A light shower today. Brollies up!" : "Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
-  $("sceneArt").innerHTML = scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), {shop: owns(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F))}) : roomArt(scene);
+  $("sceneArt").innerHTML = scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), {shop: owns(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F))}) : roomArt(scene);
   $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") : "") + (scene === "shore" && F.towns && F.towns.cinque ? homeBoat(204, 380, ...boatCols(F)) : "") + (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM()) ? discoArt() : "") + vanSleeper() + vanCrateArt() + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));   // shelves with keepsakes, and pets at home here
   if ((outside() || scene === "terrace") && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));   // (round 153: the terrace too, Mel)   // the same evening light everywhere outdoors
   if ((outside() || scene === "terrace") && isDusk()) nightLights();
@@ -3650,6 +3676,8 @@ svg.addEventListener("click", ev => {
     go("millup", at[0], at[1], () => { millOpen = k; atSpot = k; if (k === "tasting") tstSt = null; sfx("paper", true); ctx(); }); return; }
   if (ms && scene === "mill") { go("mill", 300, 560, () => { millOpen = true; atSpot = "press"; sfx("paper", true); ctx(); }); return; }
   const gb = ev.target.closest("[data-ghbed]");
+  const gpt = ev.target.closest("[data-ghpot]");   // round 155: the herb pots along the glass
+  if (gpt && scene === "greenhouse") { const i = +gpt.dataset.ghpot, p = GH_POT_AT[i]; go("greenhouse", p.x, 226, () => { ghBed = "p" + i; atSpot = "ghbed"; sfx("paper", true); ctx(); }); return; }
   if (gb && scene === "greenhouse") { const i = +gb.dataset.ghbed, p = GH_BED_AT[i]; go("greenhouse", p.x + p.w/2, p.y + p.h + 22, () => { ghBed = i; atSpot = "ghbed"; sfx("paper", true); ctx(); }); return; }
   const pt = ev.target.closest("[data-plot]");
   if (pt) { const i = +pt.dataset.plot, p = PLOTS[i]; go("farm", p.x + p.w/2, p.y + p.h + 18, () => { selPlot = i; atSpot = "plot"; ctx(); const s = F.plots[i]; speak(!s || !s.crop ? "Empty plot. What shall we grow?" : !s.wateredAt ? "Thirsty seeds!" : growth(s) >= 1 ? "Ready to pick!" : "Growing nicely.", 3000); }); return; }
@@ -3875,7 +3903,7 @@ initNpcs({sfx, story: id => tellStory(F, id, addInv), storyReady: id => !!storyR
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();
 initTrips(() => F);
-setGhCompost(() => !!(F.tools || {}).compost);
+setGhTools(() => F.tools || {});
 // Pick up where Mel left off (round 105): the same game day, back on the screen she closed the game on (a new day, she
 // wakes up at home as usual). F.where is kept by save().
 { const w = !globalThis.__mapleNoResume && F.where, ok = w && w.day === dayKey() && w.scene && w.scene !== scene && (OUTDOOR.includes(w.scene) || ROOMS[w.scene] || INNER[w.scene] || VILLAGE[w.scene]) && !["kidroom", "room"].includes(w.scene) && (!townOf(w.scene) || !!tripOn(F));

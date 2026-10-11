@@ -10,7 +10,7 @@ import { ITEMS } from "../data/items.js";
 import { eventNow, wineClubNow, aperitivoNow, discoNow } from "./tours.js";
 import { icon } from "../art/icons.js";
 import { DISHES, TAPAS, tapasPrice } from "./kitchen.js";
-import { bikeOwned, DELIVERY } from "./scoop.js";
+import { bikeOwned, DELIVERY, deliveryHours } from "./scoop.js";
 import { occasionNow, OCC } from "./occasions.js";
 import { mulledSeason, sellCup, mullState } from "./mulled.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
@@ -270,7 +270,7 @@ export function sellTick(F, opts = {}){
     if (mulledSeason(gameDay) && (F.mull || {}).cups > 0 && Math.random() < .012*f) { const c = sellCup(F); if (c) { out.coins += c; out.mulled = (out.mulled || 0) + 1; } }
     // a delivery order (round 137): with the Scoop Shack's bike, Tomo takes tapas, small plates and a bottle round to
     // people's homes and picnics (the field, the woods, the foreshore), plus a delivery fee
-    if (bikeOwned(F) && Math.random() < DELIVERY.winery) { const c0 = out.coins, p0 = out.plates, bits = [];
+    if (bikeOwned(F) && deliveryHours(hm) && Math.random() < DELIVERY.winery) { const c0 = out.coins, p0 = out.plates, bits = [];
       for (let i = Math.random() < .45 ? 2 : 1; i > 0; i--) { const d0 = out.plates; plate(); if (out.plates > d0) bits.push(out.dish); }
       if (onShelf.length && (Math.random() < .3 || !bits.length)) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; if (s.n > 0) { s.n--; out.bottles++; out.coins += s.price; bits.push("bottle"); } }
       if (bits.length) { out.coins += DELIVERY.fee; const dish = id => id === "bottle" ? "a bottle of wine" : /^tapas:/.test(id) ? (TAPAS[id.slice(6)] || {n: "tapas"}).n.toLowerCase() : (DISHES[id] || {n: "a small plate"}).n.toLowerCase();

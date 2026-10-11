@@ -2224,3 +2224,17 @@ Write the proposal for Mel covering every item below. Only build after she says 
     - Mel can help once a day: tips, plus Hazel suggests a mix Mel hasn't made.
   - **Browsers:** the weekend visitors browse upstairs.
   - **Scheduling:** `millSlot` sits early in npcs `slotAt` (right after the terrace's occasions).
+- **Later fixes (Mel):** the stairs are a small side-view wooden flight under the press (`art/mill.js`, X 336), labelled "Upstairs". Coins from sales Mel doesn't serve are described as going to "the honesty box", not "the till".
+
+### Round 155: herb pots, three new shed tools, delivery hours
+- **Herb pots (greenhouse.js, art/greenhouse.js):**
+  - Six terracotta pots on wooden staging along the glass (`GH_POT_AT`, `data-ghpot`; panel `herbPotPanel`, opened with `ghBed = "p<i>"`).
+  - `POT_HERBS` (basil, mint, rosemary, chives, thyme) go only in pots: `ghPlant`/`ghSeeds` refuse them; garlic stays a bed crop.
+  - Plant once (`potPlant`), then `potClip` takes the leaves. The plant stays and regrows in `REGROW` (half) the time. `potDig` empties a pot to change herb.
+  - The misters moved up onto the glass (y 112).
+- **Shed (`SHED` in core.js):** each tool works on every plot at once.
+  - `seeder` (350): one tap sows every empty plot with that seed. `pickPlot` re-sows after a harvest (garden and beds), using the plot's `seed`.
+  - `fertiliser` (250): +1 on every harvest, in the garden, beds and pots.
+  - `harvester` (450): `harvesterTick` (main 1s tick) picks every ripe plot, plus `ghRipe` under the glass.
+  - The greenhouse reads the tools through `setGhTools`, which replaced `setGhCompost`.
+- **Delivery orders:** only during Tomo's shift (`DELIV_HOURS` 10:00–18:00, `deliveryHours(hm)` in scoop.js), for the Scoop Shack, the Cocoa Room and the winery. Before this, the winery's ran till 10pm.

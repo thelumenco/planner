@@ -235,7 +235,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#pclose");
   await page.locator('#world [data-place="shed"]').dispatchEvent("click");
   await page.waitForFunction(() => /Darren's shed/.test(document.querySelector("#ctx").textContent), null, { timeout: 15000 });
-  check(await page.locator("#ctx [data-tool]").count() === 3, "the shed sells three garden tools");
+  check(await page.locator("#ctx [data-tool]").count() === 6 && await page.locator('#ctx [data-tool="harvester"]').count() === 1, "the shed sells six garden tools (the auto seeder, fertiliser and auto harvester too)");
   await page.click('#ctx [data-close]');
   await page.goto(url + "?seed=1&nosample=1&time=20:15&date=2026-10-05");
   await page.waitForTimeout(900);
@@ -3202,7 +3202,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     sc.loadTrolley(F, ["c"]); s.trolley.at -= 3*3600e3; check(sc.trolleyMelted(s) && sc.trolleySell(F, "theo", "2026-10-12", {}) === null && sc.returnTrolley(F).melted === 10, "after two hours the ice packs give up: no more sales, and the leftovers melt");
     s.up.bike = 1; s.display = ["d"]; s.at = Date.now() - 60e3; const off = globalThis.__mapleOffset; globalThis.__mapleOffset = Date.parse("2026-10-12T04:00:00Z") - Date.now();
     Math.random = () => .001; const out = sc.scoopTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
-    check(out.orders && out.orders[0].shop === "scoop" && /^a (cup|cone) of /.test(out.orders[0].what) && out.orders[0].coins >= sc.DELIVERY.fee + 1, "with the bike, villagers order a cup or a cone from wherever they are (shop price + a delivery fee)"); }
+    check(out.orders && out.orders[0].shop === "scoop" && /^a (cup|cone) of /.test(out.orders[0].what) && out.orders[0].coins >= sc.DELIVERY.fee + 1, "with the bike, villagers order a cup or a cone from wherever they are (shop price + a delivery fee)");
+    s.at = Date.now() - 60e3; globalThis.__mapleOffset = Date.parse("2026-10-12T11:00:00Z") - Date.now(); Math.random = () => .001; const late = sc.scoopTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
+    check(!(late && late.orders && late.orders.length) && sc.deliveryHours(17*60 + 59) && !sc.deliveryHours(18*60) && !sc.deliveryHours(9*60 + 59), "no delivery orders once Tomo's shift is over (10am to 6pm), even with the shop still open at 7pm"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`trolley pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
@@ -3299,10 +3301,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
 {
   console.log("\nthe greenhouse, herbs and gambas");
   { const g = await import(new URL("../src/game/greenhouse.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), k = await import(new URL("../src/game/kitchen.js", import.meta.url)), fi = await import(new URL("../src/game/fishing.js", import.meta.url));
-    const F = {inv: {basil_seed: 1, gh_strawberry_seed: 1}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; if (F.inv[id] <= 0) delete F.inv[id]; };
-    check(!!g.ghPlant(F, 0, "basil_seed", add) && !!g.ghPlant(F, 1, "gh_strawberry_seed", add) && !F.inv.basil_seed, "basil and out-of-season strawberries planted in the greenhouse beds");
-    F.gh.beds[0].plantedAt -= 5*3600e3; const r = g.ghHarvest(F, 0, add);
-    check(r && F.inv.basil === 3 && !g.ghHarvest(F, 1, add), "the basil's ready in four hours (three bunches); the strawberries take longer");
+    const F = {inv: {garlic_seed: 1, basil_seed: 1, gh_strawberry_seed: 1}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; if (F.inv[id] <= 0) delete F.inv[id]; };
+    check(!g.ghPlant(F, 0, "basil_seed", add) && !g.ghSeeds(F).includes("basil_seed") && !!g.ghPlant(F, 0, "garlic_seed", add) && !!g.ghPlant(F, 1, "gh_strawberry_seed", add), "garlic and out-of-season strawberries planted in the greenhouse beds (the leafy herbs go in the pots)");
+    F.gh.beds[0].plantedAt -= 9*3600e3; const r = g.ghHarvest(F, 0, add);
+    check(r && F.inv.garlic === 4 && !F.gh.beds[0] && !g.ghHarvest(F, 1, add), "the garlic's ready in eight hours (four bulbs); the strawberries take longer");
+    // round 155: the herb pots along the glass: plant once, clip, and it grows back in half the time
+    check(g.potSeeds(F).join() === "basil_seed" && !!g.potPlant(F, 0, "basil_seed", add) && !F.inv.basil_seed && F.gh.pots[0].crop === "basil" && !g.potClip(F, 0, add), "basil potted up by the glass");
+    F.gh.pots[0].plantedAt -= 4*3600e3 + 1000; const c1 = g.potClip(F, 0, add);
+    check(c1 && F.inv.basil === 3 && F.gh.pots[0] && F.gh.pots[0].crop === "basil" && F.gh.pots[0].clips === 1 && g.ghGrowth(F.gh.pots[0]) < .01, "clip it: three bunches of basil, and the plant stays in its pot (no replanting)");
+    F.gh.pots[0].plantedAt -= 2*3600e3 + 1000; check(g.ghGrowth(F.gh.pots[0]) >= 1 && !!g.potClip(F, 0, add) && F.inv.basil === 6, "it grows back in half the time (two hours for basil), ready to clip again");
+    g.setGhTools(() => ({fertiliser: true, seeder: true})); F.inv.garlic_seed = 1; g.ghPlant(F, 2, "garlic_seed", add); F.gh.beds[2].plantedAt -= 9*3600e3; F.inv.garlic_seed = 1; const r2 = g.ghHarvest(F, 2, add);
+    check(r2 && r2.n === 5 && r2.again && F.gh.beds[2] && F.gh.beds[2].crop === "garlic" && !F.inv.garlic_seed, "with the fertiliser one more of everything; the seeder sows a bed again after picking");
+    F.gh.pots[1] = {crop: "mint", plantedAt: Date.now() - 5*3600e3, bonus: 0}; F.gh.beds[2].plantedAt -= 9*3600e3; const ripe = g.ghRipe(F, add); g.setGhTools(() => ({}));
+    check(ripe.length === 2 && F.gh.pots[1] && F.inv.mint === 4, "the auto harvester picks everything ripe under the glass, clipping the pots");
     check(["garlic", "basil", "mint", "rosemary", "chives", "thyme"].every(h => it.CROPS[h] && it.ITEMS[h + "_seed"] && it.ITEMS[h + "_seed"].greenhouse) && it.ITEMS.gh_leek_seed && it.ITEMS.gh_leek_seed.greenhouse, "six herbs to grow, and greenhouse packets of seasonal seeds like leeks");
     { const G = {coins: 0, inv: {fish: 2, sardine: 3, shrimp: 1, apple: 2}}; const one = fi.sellCatch(G, "sardine"), all = fi.sellCatch(G);
     check(one && one.coins === 2 && all && all.n === 5 && G.coins === 2 + 6 + 4 + 2 && G.inv.apple === 2 && !G.inv.fish, "selling the catch: one sardine, then the lot (everyday fish too), and nothing that isn't fish"); }
@@ -3310,7 +3321,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`greenhouse pageerror: ${e.message}`));
   await page.addInitScript(() => { if (!/ghcoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
-    f.coins = 500; f.inv = Object.assign(f.inv || {}, {garlic_seed: 1}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+    f.coins = 500; f.inv = Object.assign(f.inv || {}, {garlic_seed: 1, basil_seed: 1, tomato_seed: 2}); f.tools = {harvester: true, seeder: true, fertiliser: true};
+    f.plots = f.plots || []; f.plots[0] = {crop: "tomato", seed: "tomato_seed", plantedAt: Date.now() - 7*3600e3, wateredAt: Date.now() - 7*3600e3, bonus: 0}; f.plots[1] = null; f.plots[2] = null; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-14"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-14&ghcoins=1"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("farm")); await page.waitForTimeout(900);
@@ -3321,6 +3333,16 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-ghbed="0"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gh="plant"][data-id="garlic_seed"]', { timeout: 15000 });
   await page.click('#ctx [data-gh="plant"][data-id="garlic_seed"]'); await page.waitForTimeout(400);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.gh && f.gh.beds[0] && f.gh.beds[0].crop === "garlic"; }), "through the glass door: garlic planted in the first bed");
+  await page.click('#ctx [data-close]').catch(() => {}); await page.waitForTimeout(300);
+  check(await page.locator('#world [data-ghpot]').count() === 6, "six herb pots in a row along the glass");
+  await page.locator('#world [data-ghpot="0"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gh="pplant"][data-id="basil_seed"]', { timeout: 15000 });
+  await page.click('#ctx [data-gh="pplant"][data-id="basil_seed"]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.gh.pots[0] && f.gh.pots[0].crop === "basil"; }) && await page.locator('#world [data-ghpot="0"]').getAttribute("aria-label").then(l => /Basil/.test(l)), "basil planted in the first herb pot");
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.inv.tomato === 4 && f.plots[0] && f.plots[0].crop === "tomato" && f.inv.tomato_seed === 1; }), "the auto harvester brought the ripe tomatoes in (fertiliser: four), and the seeder sowed the plot again");
+  await page.evaluate(() => window.__mapleScene("farm")); await page.waitForTimeout(900);
+  await page.locator('#world [data-plot="1"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="tomato_seed"]', { timeout: 15000 });
+  await page.click('#ctx .item[data-id="tomato_seed"]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.plots[1] && f.plots[1].crop === "tomato" && !f.inv.tomato_seed; }), "with the auto seeder, one tap sows every empty plot it has seeds for");
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.coins <= 100 && f.goals && f.goals.greenhouse; }), "the greenhouse cost 400 coins");
   await page.close();
 }
@@ -3344,9 +3366,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   v.buy(F, "olive"); v.buy(F, "grove");
   check(!!vs.grove && F.coins === 999 - 150 - 300, "the olive grove: four more trees for 300 coins");
   vs.grove.planted -= 9*3600e3;
-  check(!!v.pickGrove(F) && F.inv.olives === 8 && !v.pickGrove(F), "picking the grove: eight jars of olives, then it needs eight hours");
+  check(!!v.pickGrove(F) && F.inv.olives === 12 && !v.pickGrove(F), "picking the grove: twelve jars of olives, then it needs six hours");
   vs.oliveCrate = 6;
-  check(!!v.takeOliveCrate(F) && F.inv.olives === 14 && !vs.oliveCrate, "taking the olive crate the vineyard hands filled");
+  check(!!v.takeOliveCrate(F) && F.inv.olives === 18 && !vs.oliveCrate, "taking the olive crate the vineyard hands filled");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`mill pageerror: ${e.message}`));
   await page.addInitScript(() => { if (!/millp/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
