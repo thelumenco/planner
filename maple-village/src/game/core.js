@@ -1700,8 +1700,8 @@ function ctx(){
     }
     h += `</div>`;
   } else if (scene === "greenhouse" && ghBed != null) { h = typeof ghBed === "string" ? herbPotPanel(F, +ghBed.slice(1)) : bedPanel(F, ghBed);
-  } else if (scene === "millup" && millOpen === "tasting") { h = tastePanel(F, tstSt, {on: tastingNow(dayKey(), sgHM()) != null && owns(F, "millshop"), done: craftState(F).tasted === dayKey() && !tstSt});
-  } else if (scene === "millup" && millOpen === "workshop") { h = workshopPanel(F, {on: workshopNow(dayKey(), sgHM()) && owns(F, "millshop")});
+  } else if (scene === "millup" && millOpen === "tasting") { h = tastePanel(F, tstSt, {on: tastingNow(dayKey(), sgHM()) != null && owns(F, "millshop"), shop: owns(F, "millshop"), done: craftState(F).tasted === dayKey() && !tstSt});
+  } else if (scene === "millup" && millOpen === "workshop") { h = workshopPanel(F, {on: workshopNow(dayKey(), sgHM()) && owns(F, "millshop"), shop: owns(F, "millshop")});
   } else if ((scene === "mill" || scene === "millup") && millOpen) { h = millOpen === "story" ? millStory(F) : millOpen === "bench" ? millBenchPanel(F, mcSt, {shop: owns(F, "millshop"), ines: owns(F, "mill")}) : millOpen === "shop" ? millShopPanel() : millPanel(F);
   } else if (friView && scene === "field" && (/^bm\d$/.test(friView) || friView === "kites")) { h = bayMarketPanel(friView);
   } else if (friView && (scene === "bay" || scene === "field" || scene === "base")) { const fam = ["dad", "mum", "gonggong", "mama", "marcus", "angelina", "darren"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
@@ -2944,8 +2944,8 @@ function millUpInfo(){ const c = craftState(F), cnt = k => Object.entries(c.stor
 let mcSt = {tab: "oil"};
 function millShopPanel(){
   const c = craftState(F), t = c.sold[dayKey()] || {n: 0, coins: 0}, open = owns(F, "millshop");
-  if (!open) return `<span class="tape gingham" aria-hidden="true"></span><h2>The ground floor</h2><p class="sub">Dust sheets over a long-forgotten counter, and shelves along the wall. It'd make a lovely little shop for your oils and soaps. Hazel, who made soap for forty years, has already said she'd run it.</p>
-    ${owns(F, "mill") ? `<div class="actions"><button class="btn primary" data-goal="millshop" ${F.coins >= GOALS.millshop.price ? "" : "disabled"}>Open the Mill Shop · ${GOALS.millshop.price} ${icon("coin", 13)}</button></div>` : ""}<p class="muted">Until then, the wine shop sells a little from a "from the mill" shelf by its counter.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  if (!open) return `<span class="tape gingham" aria-hidden="true"></span><h2>Upstairs at the mill</h2><p class="sub">Dust sheets over a long-forgotten counter, and shelves all round the walls. It'd make a lovely little shop for your oils and soaps, with olive oil tastings at the long table and soap workshops in the corner. Hazel, who made soap for forty years, has already said she'd run it.</p>
+    ${owns(F, "mill") ? `<div class="actions"><button class="btn primary" data-goal="millshop" ${F.coins >= GOALS.millshop.price ? "" : "disabled"}>Open the Mill Shop · ${GOALS.millshop.price} ${icon("coin", 13)}</button></div>` : ""}<p class="muted">Until then, there are no tastings or workshops, and the wine shop sells a little from a "from the mill" shelf by its counter.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The Mill Shop</h2><p class="sub">${isHere("hazel") ? "Hazel's behind the counter, wrapping soap in brown paper." : "Shut just now: Hazel opens 10 to 5, every day but Monday."} ${storeCount(c)} things on the shelves. Today: ${t.n} sold, ${t.coins} coins.</p>
     <p class="muted">Make more at the workbench upstairs; the shelves fill as things finish steeping, curing and warming.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }

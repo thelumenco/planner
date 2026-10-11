@@ -22932,6 +22932,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   ITEMS.t_glass = { n: "A cobalt tasting glass", kind: "keepsake", price: 0, ico: "olives", line: "A little cobalt-blue tasting glass from your first olive oil tasting upstairs at the mill. Blue so the colour can't fool you: you taste with your nose and your tongue, Tomi says. Like that afternoon in Córdoba." };
   function tastePanel(F2, st6, o = {}) {
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The tasting table</h2>`;
+    if (o.shop === false) return h3 + `<p class="sub">A long table under dust sheets. Once the Mill Shop opens, Tomi will run olive oil tastings here: every day at 11, and at 3 at the weekend. Afterwards, people buy more oil.</p>` + shut7;
     if (!o.on) return h3 + `<p class="sub">Olive oil tastings at the long table: every day at 11, and at 3 at the weekend. Tomi pours, everyone tastes, and after, they buy.${craftState(F2).tastings ? ` You've sat in on ${craftState(F2).tastings}.` : ""}</p>` + shut7;
     if (o.done) return h3 + `<p class="sub">You've tasted today. The bread's all gone and the glasses are in the sink.</p>` + shut7;
     if (!st6) return h3 + `<p class="sub">Bottles down the middle, a little cobalt glass at every place, a board of bread and saucers for dipping. Tomi: "Warm the glass in your hand. Smell first. Then a sip, and suck in some air over it. Tell me what you get."</p><div class="actions"><button class="btn primary" data-tst="sit">Take a seat</button></div>` + shut7;
@@ -22947,7 +22948,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function workshopPanel(F2, o = {}) {
     const c = craftState(F2), today2 = dayKey();
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The workshop corner</h2>`;
-    if (!o.on) return h3 + `<p class="sub">Soap-making workshops, Wednesdays and Saturdays, 2 to 4: Hazel teaches five at a time, and they take their bars home. ${WORKSHOP2.fee} a ticket, to the till.</p>` + shut7;
+    if (o.shop === false) return h3 + `<p class="sub">An empty corner by the window. Once the Mill Shop opens, Hazel will teach soap-making here on Wednesdays and Saturdays, 2 to 4: five people at ${WORKSHOP2.fee} coins a ticket.</p>` + shut7;
+    if (!o.on) return h3 + `<p class="sub">Soap-making workshops, Wednesdays and Saturdays, 2 to 4: Hazel teaches five at a time, and they take their bars home. ${WORKSHOP2.fee} coins a ticket, paid to you at 4.</p>` + shut7;
     if ((c.helped || "") === today2) return h3 + `<p class="sub">You've helped today. Hazel's got it from here.</p>` + shut7;
     return h3 + `<p class="sub">Hazel's at the head of the table, five day-trippers in aprons, everyone stirring. "Gently! Like you're tucking it in." Lend a hand?</p><div class="actions"><button class="btn primary" data-tst="help">Help Hazel</button></div>` + shut7;
   }
@@ -29330,7 +29332,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     van: { n: "Campervan", price: 3800, where: "hlane", line: "A cream-and-mint vintage campervan with a pop-top roof, parked at its spot on the cottage lane. A little home from home: do it up inside, sleep under the stars, and one day, road trips." },
     greenhouse: { n: "Greenhouse", price: 400, where: "farm", line: "The old shed at the back of the garden, rebuilt in glass. Grow herbs all year (garlic, basil, mint, rosemary, chives, thyme), and anything out of season from Hana's greenhouse seed packets." },
     mill: { n: "The old mill", price: 350, where: "hlane", line: "Open up the old windmill on the cottage lane as an olive mill: a millstone, a press and clay jars. Three jars of olives make a bottle of your own olive oil." },
-    millshop: { n: "The Mill Shop", price: 1200, where: "hlane", needs: "mill", line: "The ground floor of the old mill, opened up as a little shop: your infused oils, soaps and lotions on the shelves, and Hazel behind the counter, every day but Monday." },
+    millshop: { n: "The Mill Shop", price: 1200, where: "hlane", needs: "mill", line: "Upstairs at the old mill, opened up as a little shop, with tastings and soap workshops: your infused oils, soaps and lotions on the shelves, and Hazel behind the counter, every day but Monday." },
     cellar: { n: "Cellar door", price: 2500, where: "wineshop", line: "A cellar door extension off the wine shop: barrel racks, a tasting bar and a wall of every wine you've made. Visitors love a cellar door, and once a month it hosts the wine club." }
   };
   var owns2 = (F2, k) => !!(F2.goals && F2.goals[k]);
@@ -32683,9 +32685,9 @@ ${SIGNOFF[t2.who] || ""}`;
     } else if (scene === "greenhouse" && ghBed != null) {
       h3 = typeof ghBed === "string" ? herbPotPanel(F, +ghBed.slice(1)) : bedPanel(F, ghBed);
     } else if (scene === "millup" && millOpen === "tasting") {
-      h3 = tastePanel(F, tstSt, { on: tastingNow(dayKey(), sgHM()) != null && owns2(F, "millshop"), done: craftState(F).tasted === dayKey() && !tstSt });
+      h3 = tastePanel(F, tstSt, { on: tastingNow(dayKey(), sgHM()) != null && owns2(F, "millshop"), shop: owns2(F, "millshop"), done: craftState(F).tasted === dayKey() && !tstSt });
     } else if (scene === "millup" && millOpen === "workshop") {
-      h3 = workshopPanel(F, { on: workshopNow(dayKey(), sgHM()) && owns2(F, "millshop") });
+      h3 = workshopPanel(F, { on: workshopNow(dayKey(), sgHM()) && owns2(F, "millshop"), shop: owns2(F, "millshop") });
     } else if ((scene === "mill" || scene === "millup") && millOpen) {
       h3 = millOpen === "story" ? millStory(F) : millOpen === "bench" ? benchPanel2(F, mcSt, { shop: owns2(F, "millshop"), ines: owns2(F, "mill") }) : millOpen === "shop" ? millShopPanel() : millPanel(F);
     } else if (friView && scene === "field" && (/^bm\d$/.test(friView) || friView === "kites")) {
@@ -36895,8 +36897,8 @@ ${SIGNOFF[t2.who] || ""}`;
   var mcSt = { tab: "oil" };
   function millShopPanel() {
     const c = craftState(F), t2 = c.sold[dayKey()] || { n: 0, coins: 0 }, open2 = owns2(F, "millshop");
-    if (!open2) return `<span class="tape gingham" aria-hidden="true"></span><h2>The ground floor</h2><p class="sub">Dust sheets over a long-forgotten counter, and shelves along the wall. It'd make a lovely little shop for your oils and soaps. Hazel, who made soap for forty years, has already said she'd run it.</p>
-    ${owns2(F, "mill") ? `<div class="actions"><button class="btn primary" data-goal="millshop" ${F.coins >= GOALS.millshop.price ? "" : "disabled"}>Open the Mill Shop · ${GOALS.millshop.price} ${icon("coin", 13)}</button></div>` : ""}<p class="muted">Until then, the wine shop sells a little from a "from the mill" shelf by its counter.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+    if (!open2) return `<span class="tape gingham" aria-hidden="true"></span><h2>Upstairs at the mill</h2><p class="sub">Dust sheets over a long-forgotten counter, and shelves all round the walls. It'd make a lovely little shop for your oils and soaps, with olive oil tastings at the long table and soap workshops in the corner. Hazel, who made soap for forty years, has already said she'd run it.</p>
+    ${owns2(F, "mill") ? `<div class="actions"><button class="btn primary" data-goal="millshop" ${F.coins >= GOALS.millshop.price ? "" : "disabled"}>Open the Mill Shop · ${GOALS.millshop.price} ${icon("coin", 13)}</button></div>` : ""}<p class="muted">Until then, there are no tastings or workshops, and the wine shop sells a little from a "from the mill" shelf by its counter.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The Mill Shop</h2><p class="sub">${isHere("hazel") ? "Hazel's behind the counter, wrapping soap in brown paper." : "Shut just now: Hazel opens 10 to 5, every day but Monday."} ${storeCount(c)} things on the shelves. Today: ${t2.n} sold, ${t2.coins} coins.</p>
     <p class="muted">Make more at the workbench upstairs; the shelves fill as things finish steeping, curing and warming.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }

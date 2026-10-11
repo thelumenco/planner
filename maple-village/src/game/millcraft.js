@@ -176,6 +176,7 @@ export function finishTaste(F, st, addInv){ const c = craftState(F); c.tasted = 
 ITEMS.t_glass = {n: "A cobalt tasting glass", kind: "keepsake", price: 0, ico: "olives", line: "A little cobalt-blue tasting glass from your first olive oil tasting upstairs at the mill. Blue so the colour can't fool you: you taste with your nose and your tongue, Tomi says. Like that afternoon in Córdoba."};
 export function tastePanel(F, st, o = {}){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The tasting table</h2>`;
+  if (o.shop === false) return h + `<p class="sub">A long table under dust sheets. Once the Mill Shop opens, Tomi will run olive oil tastings here: every day at 11, and at 3 at the weekend. Afterwards, people buy more oil.</p>` + shut;
   if (!o.on) return h + `<p class="sub">Olive oil tastings at the long table: every day at 11, and at 3 at the weekend. Tomi pours, everyone tastes, and after, they buy.${craftState(F).tastings ? ` You've sat in on ${craftState(F).tastings}.` : ""}</p>` + shut;
   if (o.done) return h + `<p class="sub">You've tasted today. The bread's all gone and the glasses are in the sink.</p>` + shut;
   if (!st) return h + `<p class="sub">Bottles down the middle, a little cobalt glass at every place, a board of bread and saucers for dipping. Tomi: "Warm the glass in your hand. Smell first. Then a sip, and suck in some air over it. Tell me what you get."</p><div class="actions"><button class="btn primary" data-tst="sit">Take a seat</button></div>` + shut;
@@ -189,7 +190,8 @@ export function tastePanel(F, st, o = {}){
 export function workshopPanel(F, o = {}){
   const c = craftState(F), today = dayKey();
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The workshop corner</h2>`;
-  if (!o.on) return h + `<p class="sub">Soap-making workshops, Wednesdays and Saturdays, 2 to 4: Hazel teaches five at a time, and they take their bars home. ${WORKSHOP.fee} a ticket, to the till.</p>` + shut;
+  if (o.shop === false) return h + `<p class="sub">An empty corner by the window. Once the Mill Shop opens, Hazel will teach soap-making here on Wednesdays and Saturdays, 2 to 4: five people at ${WORKSHOP.fee} coins a ticket.</p>` + shut;
+  if (!o.on) return h + `<p class="sub">Soap-making workshops, Wednesdays and Saturdays, 2 to 4: Hazel teaches five at a time, and they take their bars home. ${WORKSHOP.fee} coins a ticket, paid to you at 4.</p>` + shut;
   if ((c.helped || "") === today) return h + `<p class="sub">You've helped today. Hazel's got it from here.</p>` + shut;
   return h + `<p class="sub">Hazel's at the head of the table, five day-trippers in aprons, everyone stirring. "Gently! Like you're tucking it in." Lend a hand?</p><div class="actions"><button class="btn primary" data-tst="help">Help Hazel</button></div>` + shut;
 }
@@ -229,4 +231,4 @@ export function cratePanel(F, v){
   h += `<p class="eyebrow" style="margin:10px 0 6px">From the wine shop</p>${wines.length ? `<ul class="hlist wlist">${wines.map(s => `<li><span class="wtxt"><b>${esc(s.name)}</b><small>${s.n} on the shelf · ${s.price} a bottle</small></span><button class="btn small alt" data-crate="w:${s.id}" ${n < VAN_CRATE.max ? "" : "disabled"}>Pack 1</button></li>`).join("")}</ul>` : `<p class="muted">No bottles on the wine shop's shelves.</p>`}`;
   return h + shut;
 }
-export const MILLSHOP_LINE = "The ground floor of the old mill, opened up as a little shop: shelves of your infused oils, stacks of soap, jars of lotion, and Hazel behind the counter.";
+export const MILLSHOP_LINE = "Upstairs at the old mill, opened up as a little shop: shelves of your infused oils, stacks of soap, jars of lotion, and Hazel behind the counter.";
