@@ -162,10 +162,21 @@ export const NPCS = [
     intro: "Hi! I'm Ines. Summers here, winters dreaming about here. I'm in charge of the trellises, and of telling Marco to take a break.",
     look: {skin: "#E8B996", hair: "#7A3B22", hairStyle: "long", top: "#F3C969", bottom: "#5E6E8C"},
     routine: [slot("9:00", "13:00", "vineyard", [[262, 440], [340, 490], [418, 390], [230, 420], [450, 470]], {act: "farm"}),
+      slot("14:00", "17:30", "mill", [[300, 520], [300, 250]], {needs: "mill"}),   // round 153: afternoons at the mill, pressing the crate and infusing oil (millcraft.js)
       slot("14:00", "17:30", "vineyard", [[262, 490], [340, 390], [418, 440], [190, 430]], {act: "water"})],
     lines: ["The rosé grapes are my favourite. Don't tell the others.", "Sun's out, vines are happy.", "Every trellis in this row, I tied myself.", "Smell that? That's next year's wine."],
     actLines: {water: ["Just watering. We'll pick the ripe ones.", "Hydrated vines, happy vines."], farm: ["Tidying the trellis.", "Pruning a little. Shh, it doesn't hurt."]},
     away: "Ines is off for the day."
+  },
+  // round 153: Hazel runs the Mill Shop (once Mel's opened it): every day but Monday, 10 to 5, behind the counter
+  // downstairs. She made soap for forty years, and has opinions about lavender
+  {
+    id: "hazel", pitch: .95, name: "Hazel", job: "Runs the Mill Shop",
+    intro: "Hazel. I made soap for forty years, in a shed behind my house. Now I get to sell yours. Lavender and honey, that's the one. Trust me.",
+    look: {skin: "#F2D3BC", hair: "#D6D0C6", hairStyle: "bun", top: "#9CAA6A", bottom: "#5A4A3E", extra: "apron"},
+    routine: [slot("9:30", "10:00", "hlane", [[300, 300], [360, 320]], {needs: "millshop", dow: [0, 2, 3, 4, 5, 6]}), slot("10:00", "17:00", "mill", [130, 470], {needs: "millshop", dow: [0, 2, 3, 4, 5, 6], dir: 1})],
+    lines: ["Lavender and honey. Every time.", "Smell that one. Go on. Rosemary and lemon: clears your head right out.", "A good soap needs a day to cure. Patience, like wine.", "Rose for the mums, rosemary for the dads. I've never been wrong."],
+    away: "Hazel's gone home. The Mill Shop's shut."
   },
   // The wine shop's assistant: while she's behind the counter, more customers come in (coins go in the honesty box)
   {

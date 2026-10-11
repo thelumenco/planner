@@ -17,6 +17,7 @@ export const GOALS = {
   van: {n: "Campervan", price: 3800, where: "hlane", line: "A cream-and-mint vintage campervan with a pop-top roof, parked at its spot on the cottage lane. A little home from home: do it up inside, sleep under the stars, and one day, road trips."},
   greenhouse: {n: "Greenhouse", price: 400, where: "farm", line: "The old shed at the back of the garden, rebuilt in glass. Grow herbs all year (garlic, basil, mint, rosemary, chives, thyme), and anything out of season from Hana's greenhouse seed packets."},
   mill: {n: "The old mill", price: 350, where: "hlane", line: "Open up the old windmill on the cottage lane as an olive mill: a millstone, a press and clay jars. Three jars of olives make a bottle of your own olive oil."},
+  millshop: {n: "The Mill Shop", price: 1200, where: "hlane", needs: "mill", line: "The ground floor of the old mill, opened up as a little shop: your infused oils, soaps and lotions on the shelves, and Hazel behind the counter, every day but Monday."},
   cellar: {n: "Cellar door", price: 2500, where: "wineshop", line: "A cellar door extension off the wine shop: barrel racks, a tasting bar and a wall of every wine you've made. Visitors love a cellar door, and once a month it hosts the wine club."}
 };
 export const owns = (F, k) => !!(F.goals && F.goals[k]);
@@ -34,7 +35,8 @@ export function buyGoal(F, k){
     boat: "Your dolphin cruise boat is moored at the end of the jetty. Take everyone out!",
     cellar: "The cellar door is open! Through the new door on the wine shop's west wall.",
     van: "The campervan's yours! Parked at its spot on the lane, keys in your pocket. Hop in and do it up.",
-    cocoa: "The hoarding's down: The Cocoa Room is yours! Buy some beans in the kitchen and make your first bars."}[k];
+    cocoa: "The hoarding's down: The Cocoa Room is yours! Buy some beans in the kitchen and make your first bars.",
+    millshop: "The Mill Shop is open! Shelves downstairs, a little counter, and Hazel's already rearranging the soap."}[k];
 }
 
 const coin = () => icon("coin", 14);

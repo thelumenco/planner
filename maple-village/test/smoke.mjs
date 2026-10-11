@@ -3576,6 +3576,47 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  console.log("\nMulled wine, and the mill workshop and shop (round 153)");
+  const ml = await import(new URL("../src/game/mulled.js", import.meta.url)), mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
+  const go = await import(new URL("../src/game/goals.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url)), tw = await import(new URL("../src/data/towns.js", import.meta.url));
+  check(ml.mulledSeason("2026-11-20") && ml.mulledSeason("2026-12-26") && !ml.mulledSeason("2026-11-19") && !ml.mulledSeason("2026-12-27"), "mulled wine season: 20 November to Boxing Day");
+  check(["sp_cinnamon", "sp_clove", "sp_anise", "sp_cardamom", "sp_ginger"].every(id => it.ITEMS[id] && it.ITEMS[id].tab === "deli" && it.ITEMS[id].sell <= it.ITEMS[id].price), "spices on Hana's deli shelf");
+  { const F = {inv: {orange: 1, sp_cinnamon: 1, sp_clove: 1}}, v = {shelf: [{id: "r", name: "Red", type: "red", n: 2}, {id: "w", name: "White", type: "white", n: 2}]};
+    check(!ml.mullStart(F, v, "w", ["orange", "sp_cinnamon"], "2026-11-25").recipe && ml.mullStart(F, v, "r", ["orange", "sp_cinnamon", "sp_clove"], "2026-11-25").recipe.name === "The Classic" && v.shelf[0].n === 1 && !F.inv.orange, "a pot of mulled wine: a bottle of red and three things to mull it with (a named mix)");
+    const r = ml.mullTick(F, Date.now() + ml.MULL.dur + 1000); check(r && F.mull.cups === 10 && F.mull.price === 7 && ml.sellCup(F) === 7 && F.mull.cups === 9, "half an hour later: ten cups, 7 coins each"); }
+  { const F = {inv: {oliveoil: 3, rosemary: 1, garlic: 1, goatmilk: 3, bq_lavender: 2, honey: 1}};
+    const o = mc.craft(F, "oil", null, ["rosemary", "garlic"]), s = mc.craft(F, "soap", "goatmilk", ["bq_lavender", "honey"]), l = mc.craft(F, "lotion", null, ["bq_lavender"]);
+    check(o.fresh && s.fresh && l.fresh && /Garlic & Rosemary olive oil/.test(o.recipe.name) && /goat's milk soap/.test(s.recipe.name), "the workbench: an infused oil, a goat's milk soap and a lotion, each a new named mix");
+    const done = mc.craftDone(F, Date.now() + 25*3600e3); check(done.length === 3 && mc.storeCount(F.craft) === 2 + 6 + 3, "steeped, cured and warmed: onto the mill's shelves");
+    mc.registerCraft(F); const oil = it.ITEMS[mc.itemId(o.recipe)]; check(oil && oil.sell > tw.TOWN_GOODS.oliveoil.sell && oil.sell <= oil.price, "infused oil sells for more than plain oil (and never back for more than it costs)");
+    check(mc.takeFromStore(F, mc.itemId(s.recipe), 1) === 1 && F.inv[mc.itemId(s.recipe)] === 1, "take a bar of soap for yourself"); }
+  { const F = {inv: {rosemary: 2}, craft: {}}, m = {press: null}, v = {oliveCrate: 6}; mc.craftState(F).recipes.push({id: "oil_rosemary", kind: "oil", base: null, adds: ["rosemary"], name: "Rosemary olive oil"}); mc.toBasket(F, "rosemary");
+    const a = mc.inesStep(F, m, v), b = mc.inesStep(F, m, v, Date.now() + 3601e3);
+    check(a.started === 2 && v.oliveCrate === 0 && b.pressed === 2 && b.infused === "Rosemary olive oil" && F.craft.basket.rosemary === 1, "Ines presses the olive crate into the mill's bottles, and infuses oil from the herb basket"); }
+  { const F = {craft: {store: {mc_x: 5}}}; it.ITEMS.mc_x = {n: "x", price: 8}; const real = Math.random; Math.random = () => .001;
+    const shop = mc.craftSellMinute(F, "2026-10-13", 11*60, "shop"), monday = mc.craftSellMinute(F, "2026-10-12", 11*60, "shop"), ws = mc.craftSellMinute(F, "2026-10-12", 11*60, "wineshop"); Math.random = real;
+    check(shop === 8 && monday === 0 && ws === 8 && F.craft.store.mc_x === 3, "the Mill Shop sells all day (shut Mondays); before it opens, the wine shop's mill shelf sells a little"); }
+  check(go.GOALS.millshop && go.GOALS.millshop.needs === "mill" && np.NPCS.some(n => n.id === "hazel" && n.routine.some(sl => sl.scene === "mill" && sl.needs === "millshop")) && np.NPCS.find(n => n.id === "ines").routine.some(sl => sl.scene === "mill" && sl.needs === "mill"), "the Mill Shop goal, Hazel at the counter, Ines at the press");
+  // in the browser: the workbench at the mill
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`mill workshop pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/mcw=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 2000; f.goals = {...(f.goals || {}), mill: 1};
+    f.inv = {...(f.inv || {}), oliveoil: 2, rosemary: 1, goatmilk: 2, bq_lavender: 1};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=15:00&date=2026-10-13"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=15:00&date=2026-10-13&mcw=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("mill")); await page.waitForTimeout(3500);
+  check(await page.locator('#actors .npc[data-npc="ines"]').count() === 1 && await page.locator('#world [data-millspot="bench"]').count() === 1, "Ines at the mill in the afternoon; the workbench upstairs");
+  await page.locator('#world [data-millspot="bench"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-mc="add:rosemary"]', { timeout: 20000 });
+  await page.click('#ctx [data-mc="add:rosemary"]'); await page.click('#ctx [data-mc="make"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.craft && f.craft.steep.length === 1 && f.craft.recipes[0].name === "Rosemary olive oil" && !f.inv.oliveoil), "Mel steeps her first infused oil: Rosemary olive oil");
+  await page.click("#ctx [data-close]"); await page.locator('#world [data-millspot="shop"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="millshop"]', { timeout: 20000 });
+  await page.click('#ctx [data-goal="millshop"]'); await page.waitForTimeout(600);
+  check(await fox().then(f => f.goals.millshop && f.coins === 800), "the Mill Shop opens downstairs (1200)");
+  await page.close();
+}
+{
   console.log("\nThe terrace's week: weddings, trivia, sip and paint, and the special days (round 152)");
   const oc = await import(new URL("../src/game/occasions.js", import.meta.url)), lu = await import(new URL("../src/game/lunch.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url));
   const np = await import(new URL("../src/data/npcs.js", import.meta.url)), tp = await import(new URL("../src/data/terrace-people.js", import.meta.url)), ids = new Set(np.NPCS.map(n => n.id));

@@ -2161,3 +2161,26 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - **Sip and paint:** Thursdays 2 to 4pm. Dad teaches and six villagers paint at easels. Tap the spare easel: 12 coins, three layers in chosen colours. The painting keepsakes are `p_view`, `p_cypress` and `p_still`.
   - **Special days:** Valentine's (couples, candles), Christmas Day lunch (the family, crackers, a tree), New Year's Eve (dancing, balloons, a countdown and fireworks at midnight), and Mother's Day (lunch.js `mothers` booking).
   - **How it fits in:** `occasionSlot` sits in npcs `slotAt` right after `lunchSlot`. The art is `occasionDecor` (drawn above the sails). Sales are in vineyard sellTick: sparkling is favoured at weddings and NYE, paint night sells glasses, and Mel there counts as hosting (faster, tips). The music turns to "disco" while dancing. The bookings book has tabs: Sunday lunch / Coming up. The Gazette's Events list includes the occasions. `terraceMoments()` gives the first dance, the bouquet and the countdown.
+
+### Round 153: mulled wine, the mill workshop, and the Mill Shop
+- **Mulled wine (game/mulled.js):** 20 November to Boxing Day (`mulledSeason`).
+  - Where: a copper pot in the wine shop kitchen (station "mull", art "mullpot", pos X).
+  - Making it: one of Mel's reds off the shelf (red, tempranillo or pinot) plus 2–3 `ADDS`. The spices are `sp_*` on Hana's deli shelf (items.js); the fruit and honey come from the backpack.
+  - Recipes: each new mix is named (`SPECIAL` names like "The Classic", otherwise "X & Y"), then can be made again.
+  - Output: half an hour, then 10 cups at 4 + the number of adds each. Cups sell in vineyard sellTick (wine shop footfall, and terrace occasions).
+  - State: `F.mull`. `mullTick` runs in vineTick. The calendar flags the 20th.
+- **Mill workshop (game/millcraft.js):** the workbench upstairs in the mill (millspot "bench"). Tabs: Oils, Soaps, Lotions, Shelves, Herb basket.
+  - **Oils:** 2 olive oil + 1–2 herbs or fruits, 6 hours, makes 2 bottles.
+  - **Soaps:** goat's milk ×2 or olive oil ×1, + 1–2 add-ins, cures a day, makes 6 bars.
+  - **Lotions:** goat's milk + olive oil + 1 scent, 1 hour, makes 3 jars.
+  - **Ingredients:** lavender and rose are Ma Ma's bouquets (`bq_lavender`, `bq_rose`); herbs come from the greenhouse.
+  - **Recipes as items:** each recipe becomes an item `mc_<id>` via `registerCraft` (sells for more than plain oil).
+  - **Shelves:** finished goods go to `F.craft.store` (the mill's shelves), and Mel can take some.
+- **Ines:** an afternoon slot at the mill (`needs: "mill"`).
+  - `inesStep` presses the olive crate (≥3) into the mill's own bottles (`c.oil`), and infuses from the herb basket using found recipes.
+  - Mel's manual pressing still goes to her backpack.
+- **The Mill Shop:**
+  - Goal `millshop` (1200, needs mill), bought at the dusty ground floor counter (millspot "shop").
+  - Hazel (new villager, ex-soap-maker) runs it 10 to 5, every day but Monday.
+  - `craftSellMinute` sells from the store: about 5%/min while open. Before it opens, the wine shop's "from the mill" shelf sells about 0.8%/min.
+  - `millTick` in vineTick catches up minute by minute, and coins go straight to Mel.
