@@ -2505,8 +2505,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     b_balloon: { n: "Balloon model", kind: "keepsake", price: 12, shop: "bv_balloonshed", art: ["globe", "#E8566C"], line: "A little striped hot air balloon with a wicker basket, from the balloon shed at Bellbird Valley. It turns slowly when the window's open." },
     b_print: { n: "A print of the valley", kind: "keepsake", price: 14, shop: "bv_gallery", art: ["tile", "#9CC27E", "#CFE3EA"], line: "A print of a painting from the gallery café: the whole of Bellbird Valley at dawn, balloons rising over the vines." },
     b_myrtle: { n: "Lemon myrtle tea", kind: "gift", to: ["mama", "mum", "angelina", "gonggong"], price: 7, shop: "bv_gallery", art: ["box", "#9CC27E", "#F3E27A"], say: "Lemon myrtle tea! It smells more like lemon than lemons do." },
-    b_pinot: { n: "Bellbird Pinot Noir", kind: "gift", to: ["dad", "mum", "darren", "marcus"], price: 18, shop: "bv_tasting", art: ["bottle", "#6B2A3A", "#F3E7C8"], say: "Pinot from the valley! Light and cherry-ish. Perfect with a roast." },
-    b_chard: { n: "Bellbird Chardonnay", kind: "gift", to: ["mum", "angelina", "mama", "dad"], price: 16, shop: "bv_tasting", art: ["bottle", "#E8D88A", "#F3E7C8"], say: "Chardonnay from Bellbird Valley! Cold, with fish and chips on a Friday." },
+    b_pinot: { n: "Bellbird Pinot Noir", kind: "gift", to: ["dad", "mum", "darren", "marcus"], price: 26, shop: "bv_tasting", art: ["bottle", "#6B2A3A", "#F3E7C8"], say: "Pinot from the valley! Light and cherry-ish. Perfect with a roast." },
+    b_chard: { n: "Bellbird Chardonnay", kind: "gift", to: ["mum", "angelina", "mama", "dad"], price: 24, shop: "bv_tasting", art: ["bottle", "#E8D88A", "#F3E7C8"], say: "Chardonnay from Bellbird Valley! Cold, with fish and chips on a Friday." },
     b_sparkling: { n: "Bellbird sparkling", kind: "gift", to: "family", price: 38, shop: "bv_tasting", art: ["bottle", "#E8E0A0", "#2E3A34"], say: "Sparkling from the valley! Riddled by hand, they said. We'll save it for something good. Or open it now." },
     raspberry: { n: "Raspberries", kind: "ingredient", price: 3, sell: 2, shop: "bv_jam", art: ["apple", "#D9435A", "#7FA35A"], what: "berry pavlova at the kitchen, raspberry gelato (and pick your own in the rows outside)" },
     b_jam_rasp: { n: "Raspberry jam", kind: "gift", to: "family", price: 6, shop: "bv_jam", art: ["jar", "#C2334D", "#F3E7C8"], say: "Raspberry jam from the copper pots! Seeds and all. On scones, obviously." },
@@ -3849,6 +3849,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   I.grape_red = grapes("#7A2E5A");
   I.grape_white = grapes("#C9D98A");
   I.grape_tempranillo = grapes("#3A2050");
+  I.grape_pinot = grapes("#4A2A4E");
+  I.grape_chardonnay = grapes("#D9D27A");
   I.loaf = [`<path d="M4 15c0-6 4-8 8-8s8 2 8 8v4H4z" ${f("#D9A066")}/>`, `<path d="M4 15c0-6 4-8 8-8s8 2 8 8v4H4zM9 9l1 4M13 8l1 4M17 9l-1 4"/>`];
   I.ic_cup = [`<path d="M6 12h12l-1.6 8h-8.8z" ${f("#F4C7CF")}/><path d="M7 12c0-4 2.5-6 5-6s5 2 5 6z" ${f("#FFF6DC")}/>`, `<path d="M6 12h12l-1.6 8h-8.8zM7 12c0-4 2.5-6 5-6s5 2 5 6"/><path d="M14 6l3-3"/>`];
   I.ic_cone = [`<path d="M8 11h8l-4 11z" ${f("#E8C48E")}/><circle cx="12" cy="8.5" r="4.5" ${f("#F4C7CF")}/>`, `<path d="M8 11h8l-4 11zM9.5 14l4 3M14.5 14l-4 3"/><circle cx="12" cy="8.5" r="4.5"/>`];
@@ -4107,6 +4109,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       if (!I[id]) I[id] = (S3[sh] || S3.box)(a, b);
     });
     I.wine_tempranillo = S3.bottle("#5A1630");
+    I.wine_pinot = S3.bottle("#8A2E3E");
+    I.wine_chardonnay = S3.bottle("#E8C96A");
   }
   I.garlic = [`<path d="M12 4c1 3 6 5 6 10a6 5 0 0 1-12 0c0-5 5-7 6-10z" ${f("#F6F1E8")}/><path d="M12 4v-2" ${f("none")}/>`, `<path d="M12 4c1 3 6 5 6 10a6 5 0 0 1-12 0c0-5 5-7 6-10zM12 9v10M9 10c-1 3-1 6 0 9M15 10c1 3 1 6 0 9" /><path d="M12 4v-2"/>`];
   I.basil = [`<ellipse cx="8" cy="13" rx="5" ry="3.4" transform="rotate(-30 8 13)" ${f("#5E9A4A")}/><ellipse cx="16" cy="13" rx="5" ry="3.4" transform="rotate(30 16 13)" ${f("#6FAE58")}/><ellipse cx="12" cy="8" rx="3.4" ry="5" ${f("#7FB86A")}/>`, `<path d="M12 21v-9"/><ellipse cx="8" cy="13" rx="5" ry="3.4" transform="rotate(-30 8 13)"/><ellipse cx="16" cy="13" rx="5" ry="3.4" transform="rotate(30 16 13)"/><ellipse cx="12" cy="8" rx="3.4" ry="5"/>`];
@@ -5087,6 +5091,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     grape_red: { n: "Red grapes", kind: "ingredient", sell: 2, what: "for gelato at the Scoop Shack, or back in the crates for wine" },
     grape_white: { n: "White grapes", kind: "ingredient", sell: 2, what: "for gelato at the Scoop Shack, or back in the crates for wine" },
     grape_tempranillo: { n: "Tempranillo grapes", kind: "ingredient", sell: 3, what: "for gelato at the Scoop Shack, or back in the crates for wine" },
+    grape_pinot: { n: "Pinot Noir grapes", kind: "ingredient", sell: 3, what: "for gelato at the Scoop Shack, or back in the crates for wine" },
+    grape_chardonnay: { n: "Chardonnay grapes", kind: "ingredient", sell: 3, what: "for gelato at the Scoop Shack, or back in the crates for wine" },
     loaf: { n: "Loaf of bread", kind: "ingredient", sell: 2, what: "baked in the wine shop's oven" },
     milk: { n: "Milk", kind: "ingredient", price: 4, tab: "deli", sell: 3, what: "for gelato at the Scoop Shack, or two make a cheese in the wine shop's kitchen press (the farm stand sells it, and Wildflower Farm's cows give it)" },
     goatmilk: { n: "Goat's milk", kind: "ingredient", price: 5, sell: 3, what: "from Wildflower Farm's goats: for gelato at the Scoop Shack, or the kitchen's cheese press (like milk)" },
@@ -9941,7 +9947,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 
   // src/art/wine.js
   var INK3 = `stroke="#3b3530" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"`;
-  var ripeCol = (kind) => kind === "red" ? "#6B2A55" : kind === "tempranillo" ? "#3A2050" : "#C9D66A";
+  var ripeCol = (kind) => kind === "red" ? "#6B2A55" : kind === "tempranillo" ? "#3A2050" : kind === "pinot" ? "#4A2A4E" : kind === "chardonnay" ? "#D9D27A" : "#C9D66A";
   var leaf = (x, y, s, rot, fill2) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"><path d="M0 7 C-2 4 -9 7 -11 1 C-12 -3 -8 -5 -6 -4 C-9 -8 -5 -12 -2 -9 C-1 -13 1 -13 2 -9 C5 -12 9 -8 6 -4 C8 -5 12 -3 11 1 C9 7 2 4 0 7Z" fill="${fill2}" ${INK3} stroke-width="${(1.3 / s).toFixed(2)}"/><path d="M0 6 V-8 M0 0 L-7 -4 M0 0 L7 -4" fill="none" stroke="#3b3530" stroke-width="${(0.8 / s).toFixed(2)}" opacity=".55"/></g>`;
   function bunch(x, y, col, r, n = 13) {
     const rows2 = [4, 3, 3, 2, 1];
@@ -9970,7 +9976,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const nL = vn.wateredAt ? 5 + Math.round(g6 * 3) : 4;
     h += leaves.slice(0, nL).map(([x, y, s, r], i) => leaf(x, y + droop * (i % 2 ? 0.4 : 0.2), s, r + (thirsty ? i % 2 ? 18 : -18 : 0), i % 2 ? lf2 : lf)).join("");
     if (vn.wateredAt) {
-      const ripe = g6 >= 1, col = ripe ? ripeCol(vn.v) : g6 > 0.6 ? vn.v === "red" || vn.v === "tempranillo" ? "#9A6A86" : "#B9CF7A" : "#A9C98A", r = 3.4 + Math.min(1, g6) * 1.4, n = 6 + Math.round(Math.min(1, g6) * 7);
+      const ripe = g6 >= 1, col = ripe ? ripeCol(vn.v) : g6 > 0.6 ? vn.v === "red" || vn.v === "tempranillo" || vn.v === "pinot" ? "#9A6A86" : "#B9CF7A" : "#A9C98A", r = 3.4 + Math.min(1, g6) * 1.4, n = 6 + Math.round(Math.min(1, g6) * 7);
       if (g6 > 0.15) h += bunch(66, 74, col, r, n) + bunch(106, 76, col, r, n);
       else h += `<circle cx="66" cy="78" r="2.6" fill="#E9F0C8" ${INK3}/><circle cx="70" cy="81" r="2.6" fill="#E9F0C8" ${INK3}/><circle cx="106" cy="80" r="2.6" fill="#E9F0C8" ${INK3}/>`;
       if (ripe) h += `<g class="twinkle"><path d="M140 84 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" ${INK3} stroke-width="1"/></g>`;
@@ -10003,7 +10009,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   }
   function bottleArt(type, h, tilt2) {
     const glass = type === "red" ? "#2F4A33" : type === "sparkling" ? "#4E6B44" : type === "rose" ? "#F4D6DC" : "#C9DCA8";
-    const wine = { red: "#7A1F3D", rose: "#E98AA0", white: "#E8D57A", sparkling: "#F3E7B0", tempranillo: "#5A1630" }[type] || "#7A1F3D";
+    const wine = { red: "#7A1F3D", rose: "#E98AA0", white: "#E8D57A", sparkling: "#F3E7B0", tempranillo: "#5A1630", pinot: "#8A2E3E", chardonnay: "#E8C96A" }[type] || "#7A1F3D";
     const body2 = type === "white" ? "M12 2 h6 v18 q6 8 6 18 v34 a3 3 0 0 1 -3 3 h-12 a3 3 0 0 1 -3 -3 v-34 q0 -10 6 -18z" : "M12 2 h6 v14 q8 4 8 12 v44 a3 3 0 0 1 -3 3 h-16 a3 3 0 0 1 -3 -3 v-44 q0 -8 8 -12z";
     const clear2 = type === "rose" || type === "white";
     const inner = `<path d="${body2}" fill="${glass}" ${INK3}/>${clear2 ? `<path d="M7 40 h16 v31 a2 2 0 0 1 -2 2 h-12 a2 2 0 0 1 -2 -2z" fill="${wine}" opacity=".9"/>` : ""}
@@ -10014,7 +10020,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return `<svg class="vybottle" viewBox="0 0 30 76" width="${Math.round(h * 30 / 76)}" height="${h}" aria-hidden="true">${inner}</svg>`;
   }
   var glassArt = (type, h = 34) => {
-    const wine = { red: "#7A1F3D", rose: "#E98AA0", white: "#E8D57A", sparkling: "#F3E7B0", tempranillo: "#5A1630" }[type] || "#7A1F3D";
+    const wine = { red: "#7A1F3D", rose: "#E98AA0", white: "#E8D57A", sparkling: "#F3E7B0", tempranillo: "#5A1630", pinot: "#8A2E3E", chardonnay: "#E8C96A" }[type] || "#7A1F3D";
     return `<svg class="vybottle" viewBox="0 0 24 40" width="${Math.round(h * 0.6)}" height="${h}" aria-hidden="true"><path d="M5 4 h14 q1 14 -7 17 q-8 -3 -7 -17z" fill="#F4F8FA" ${INK3}/><path d="M5.6 10 h12.8 q-.6 10 -6.4 11 q-5.8 -1 -6.4 -11z" fill="${wine}"/>${type === "sparkling" ? `<circle cx="10" cy="15" r=".9" fill="#FFFDF6"/><circle cx="13" cy="13" r=".7" fill="#FFFDF6"/>` : ""}<path d="M12 21 v13 M6 36 h12" fill="none" ${INK3}/></svg>`;
   };
   function oliveTree(x, y, sc, state) {
@@ -10822,6 +10828,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     grape_red: ["Red grapes", "Red Grape", "#7A2E5A"],
     grape_white: ["White grapes", "White Grape", "#C9D98A"],
     grape_tempranillo: ["Tempranillo grapes", "Tempranillo", "#3A2050"],
+    grape_pinot: ["Pinot Noir grapes", "Pinot Noir", "#4A2A4E"],
+    grape_chardonnay: ["Chardonnay grapes", "Chardonnay", "#D9D27A"],
     basil: ["Basil", "Basil", "#7FB86A"],
     rosemary: ["Rosemary", "Rosemary", "#8FA88A"],
     thyme: ["Thyme", "Thyme", "#9DB08A"],
@@ -11518,14 +11526,20 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     white: { n: "White", grape: "white", dur: 8 * H, price: 16, col: "#E8D57A" },
     sparkling: { n: "Sparkling", grape: "white", dur: 8 * H, dur2: 5 * H, price: 26, col: "#F3E7B0" },
     // round 107: from Rafael's cuttings in Ronda. A deep Spanish red: longer in the barrel, dearer on the shelf
-    tempranillo: { n: "Tempranillo", grape: "tempranillo", dur: 12 * H, price: 28, col: "#5A1630" }
+    tempranillo: { n: "Tempranillo", grape: "tempranillo", dur: 12 * H, price: 28, col: "#5A1630" },
+    // round 145: from Kel's cuttings in Bellbird Valley. A light, cherry-ish Pinot Noir and a buttery Chardonnay
+    pinot: { n: "Pinot Noir", grape: "pinot", dur: 11 * H, price: 24, col: "#8A2E3E" },
+    chardonnay: { n: "Chardonnay", grape: "chardonnay", dur: 9 * H, price: 22, col: "#E8C96A" }
   };
-  var grapeKinds = (v) => ["red", "white", ...v.tempra ? ["tempranillo"] : []];
-  var GRAPE_N = { red: "Red", white: "White", tempranillo: "Tempranillo" };
+  var grapeKinds = (v) => ["red", "white", ...v.tempra ? ["tempranillo"] : [], ...v.pinot ? ["pinot"] : [], ...v.chard ? ["chardonnay"] : []];
+  var GRAPE_N = { red: "Red", white: "White", tempranillo: "Tempranillo", pinot: "Pinot Noir", chardonnay: "Chardonnay" };
+  var FLAG = { tempranillo: "tempra", pinot: "pinot", chardonnay: "chard" };
+  var gName = (k) => k === "red" || k === "white" ? k : GRAPE_N[k];
+  var hasGrape = (v, k) => !FLAG[k] || !!v[FLAG[k]];
   function addCuttings(F2, kind, n) {
     const v = vineState(F2);
     v.cuttings[kind] = (v.cuttings[kind] || 0) + n;
-    if (kind === "tempranillo") v.tempra = true;
+    if (FLAG[kind]) v[FLAG[kind]] = true;
   }
   var SHOP = {
     cut_red: { n: "Red grape vine", price: 20, say: "A red grape cutting. Plant it on a trellis." },
@@ -11580,7 +11594,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     v.fruit = v.fruit || {};
     v.help = Object.assign({ cook: true, pick: true, barrels: true, stock: true, fetch: false }, v.help || {});
     v.names = v.names || {};
-    ["tempranillo"].forEach((k) => {
+    ["tempranillo", "pinot", "chardonnay"].forEach((k) => {
       v.cuttings[k] = v.cuttings[k] || 0;
       v.grapes[k] = v.grapes[k] || 0;
       v.keep[k] = v.keep[k] || 0;
@@ -11703,8 +11717,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   }
   var W_PLACE = ["Jetty Sunset", "Dolphin Bay", "Lantern Night", "Low Tide", "Sea Breeze", "Golden Hour", "Swan Lake", "Porch Swing", "First Light", "Rainy Window", "Orchard Hill", "Wildflower", "Night Market", "Paddleboard", "Harvest Moon", "Morning Mist", "Kite Day", "Sunday Picnic", "Firefly", "Boardwalk", "Lighthouse", "Monsoon", "Frangipani", "Hammock"];
   var W_WHO = ["Maple's", "Evan's", "Ma Ma's", "Gong Gong's", "Ah Gong's", "Ah Ma's", "Darren's", "Marco's", "Ines's", "Grandpa's Porch"];
-  var W_WORD = { tempranillo: ["Tempranillo", "Reserva", "Crianza", "Tinto"], red: ["Red", "Reserve", "Rouge", "Old Vine"], rose: ["Rosé", "Blush", "Pink"], white: ["White", "Blanc", "Crisp"], sparkling: ["Bubbles", "Fizz", "Brut", "Sparkle"] };
-  var W_FR = { tempranillo: ["Puente Nuevo", "Tajo Reserva", "Viña Ronda", "Bodega Maple"], red: ["Château Maple", "Clos de la Baie", "Domaine du Lac", "Grand Cru Evan"], rose: ["Rosé de la Jetée", "Vie en Rose", "Clos des Cygnes"], white: ["Blanc de la Baie", "Domaine des Lanternes", "Clos du Matin"], sparkling: ["Cuvée Maple", "Crémant de la Baie", "Pétillant du Lac"] };
+  var W_WORD = { pinot: ["Pinot", "Pinot Noir", "Reserve", "Cherry Hill"], chardonnay: ["Chardonnay", "Chardy", "Golden", "Reserve"], tempranillo: ["Tempranillo", "Reserva", "Crianza", "Tinto"], red: ["Red", "Reserve", "Rouge", "Old Vine"], rose: ["Rosé", "Blush", "Pink"], white: ["White", "Blanc", "Crisp"], sparkling: ["Bubbles", "Fizz", "Brut", "Sparkle"] };
+  var W_FR = { pinot: ["Bellbird Ridge", "Gum Creek Pinot", "Kel's Row"], chardonnay: ["Wattle Hill", "Balloon Lookout", "Riverside Chardonnay"], tempranillo: ["Puente Nuevo", "Tajo Reserva", "Viña Ronda", "Bodega Maple"], red: ["Château Maple", "Clos de la Baie", "Domaine du Lac", "Grand Cru Evan"], rose: ["Rosé de la Jetée", "Vie en Rose", "Clos des Cygnes"], white: ["Blanc de la Baie", "Domaine des Lanternes", "Clos du Matin"], sparkling: ["Cuvée Maple", "Crémant de la Baie", "Pétillant du Lac"] };
   function wineNames(F2, slot3) {
     const v = vineState(F2), b = v.barrels[slot3];
     if (!b) return [];
@@ -11862,7 +11876,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         }
         if (v.help.barrels) v.barrels.forEach((b, i) => {
           if (b) return;
-          const spare = (c) => v.grapes[c] - (v.keep[c] || 0) >= PER_BATCH, st6 = spare("tempranillo") ? "tempranillo" : spare("red") ? "red" : spare("white") ? "white" : null;
+          const spare = (c) => v.grapes[c] - (v.keep[c] || 0) >= PER_BATCH, st6 = spare("tempranillo") ? "tempranillo" : spare("pinot") ? "pinot" : spare("chardonnay") ? "chardonnay" : spare("red") ? "red" : spare("white") ? "white" : null;
           if (st6) {
             v.grapes[st6] -= PER_BATCH;
             v.barrels[i] = { style: st6, start: at2, dur: STYLES2[st6].dur, stage: 1 };
@@ -12048,13 +12062,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (!row7.trellis) return h + `<p class="sub">This row needs a trellis before vines can climb it. The vineyard stall sells them.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
     if (!vn) return h + `<p class="sub">An empty spot on the trellis. What shall we plant?</p><div class="actions">${grapeKinds(v).map((k) => `<button class="btn ${v.cuttings[k] ? "primary" : "alt"} small" data-vy="plant" data-k="${k}" ${v.cuttings[k] ? "" : "disabled"}>${GRAPE_N[k]} vine (${v.cuttings[k]})</button>`).join("")}<button class="btn alt small" data-close="1">Close</button></div>${!v.cuttings.red && !v.cuttings.white ? `<p class="muted">No cuttings left: the stall has more.</p>` : ""}`;
     const g6 = growth(vn);
-    return h + `<p class="sub">A ${vn.v} grape vine. ${!vn.wateredAt ? "Thirsty! Water it and it starts fruiting." : g6 >= 1 ? "Heavy with ripe grapes!" : `Ripening: ready in about ${hrs3(GROW2 * (1 - g6))}.`}</p>
+    return h + `<p class="sub">A ${vn.v === "red" || vn.v === "white" ? vn.v + " grape" : GRAPE_N[vn.v] || vn.v} vine. ${!vn.wateredAt ? "Thirsty! Water it and it starts fruiting." : g6 >= 1 ? "Heavy with ripe grapes!" : `Ripening: ready in about ${hrs3(GROW2 * (1 - g6))}.`}</p>
     ${vn.wateredAt ? `<span class="clbar"><i style="width:${Math.round(g6 * 100)}%"></i></span>` : ""}
     <div class="actions">${!vn.wateredAt ? `<button class="btn primary small" data-vy="water">Water the row</button>` : g6 >= 1 ? `<button class="btn primary small" data-vy="harvest">Pick the grapes</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function stallPanel(F2) {
     const v = vineState(F2);
-    return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F2.coins} coins. Cuttings: ${v.cuttings.red} red, ${v.cuttings.white} white${v.tempra ? `, ${v.cuttings.tempranillo} Tempranillo` : ""}. Grapes: ${v.grapes.red} red, ${v.grapes.white} white${v.tempra ? `, ${v.grapes.tempranillo} Tempranillo` : ""} bunches.</p>
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F2.coins} coins. Cuttings: ${grapeKinds(v).map((k) => `${v.cuttings[k]} ${gName(k)}`).join(", ")}. Grapes: ${grapeKinds(v).map((k) => `${v.grapes[k]} ${gName(k)}`).join(", ")} bunches.</p>
     <div class="items shop">${Object.keys(SHOP).map((id) => {
       const it = SHOP[id], price = shopPrice(v, id), have = id === "grove" && !!v.grove || id === "trellis" && v.rows.every((r) => r.trellis) || id === "barrel" && v.barrels.length >= 3 || id === "olive" && !!v.olive || id === "terrace" && !!v.terrace, off = have || F2.coins < price;
       return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c">${have ? "owned" : `<b>${price}</b> coins`}</span>${id === "terrace" ? `<span class="d">a third more customers</span>` : ""}</button>`;
@@ -12062,7 +12076,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   var vy = { name: {} };
-  var grapePic = (c) => `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2" fill="${c === "red" ? "#7A2E5A" : c === "tempranillo" ? "#3A2050" : "#C9D98A"}" stroke="#3A2E28" stroke-width="1"/>`).join("")}<path d="M12 5 V2" stroke="#3A2E28" stroke-width="1.2"/></svg>`;
+  var GRAPE_COL = { red: "#7A2E5A", white: "#C9D98A", tempranillo: "#3A2050", pinot: "#4A2A4E", chardonnay: "#D9D27A" };
+  var grapePic = (c) => `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2" fill="${GRAPE_COL[c] || "#C9D98A"}" stroke="#3A2E28" stroke-width="1"/>`).join("")}<path d="M12 5 V2" stroke="#3A2E28" stroke-width="1.2"/></svg>`;
   function barrelPanel(F2) {
     const v = vineState(F2);
     let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles.</p>`;
@@ -12077,7 +12092,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     v.barrels.forEach((b, i) => {
       const ph = !b ? "empty" : barrelLeft(b) ? b.style === "sparkling" && b.stage === 2 ? "bubbles" : "ferment" : b.style === "sparkling" && b.stage === 1 ? "await2" : "ready";
       h += `<div class="vbarrel">${barrelPic(ph, b ? STYLES2[b.style].col : "", b ? STYLES2[b.style].n : "")}<div class="vbody"><b>Barrel ${i + 1}</b>${b ? stageStrip(b.style, ph) : ""}`;
-      if (!b) h += `<p class="muted">Empty.</p><div class="vbtns">${Object.keys(STYLES2).filter((k) => k !== "tempranillo" || v.tempra).map((k) => {
+      if (!b) h += `<p class="muted">Empty.</p><div class="vbtns">${Object.keys(STYLES2).filter((k) => hasGrape(v, STYLES2[k].grape)).map((k) => {
         const st6 = STYLES2[k], ok = v.grapes[st6.grape] >= PER_BATCH;
         return `<button class="btn small ${ok ? "alt" : "alt"}" data-vy="fill" data-i="${i}" data-k="${k}" ${ok ? "" : "disabled"}>${st6.n}</button>`;
       }).join("")}</div>`;
@@ -12329,7 +12344,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   };
   function vineArt(vn, x, y) {
     if (!vn) return sk(`<ellipse cx="${x}" cy="${y}" rx="12" ry="4" style="fill:#B08A6A"/>`, `<ellipse cx="${x}" cy="${y}" rx="12" ry="4"/><path d="M${x - 4} ${y - 1} q4 -3 8 0" opacity=".5"/>`);
-    const g6 = growth(vn), ripe = g6 >= 1, col = vn.v === "red" ? "#6B2A55" : vn.v === "tempranillo" ? "#3A2050" : "#B9CF6A", unripe = "#A9C98A";
+    const g6 = growth(vn), ripe = g6 >= 1, col = vn.v === "red" ? "#6B2A55" : vn.v === "tempranillo" ? "#3A2050" : vn.v === "pinot" ? "#4A2A4E" : vn.v === "chardonnay" ? "#D9D27A" : "#B9CF6A", unripe = "#A9C98A";
     const leaf2 = (lx, ly, r) => `<path d="M${lx} ${ly} q${-r} ${-r * 0.4} ${-r * 0.5} ${-r} q${r * 0.5} ${r * 0.1} ${r * 0.5} ${r} q${r * 0.1} ${-r * 0.7} ${r * 0.6} ${-r * 0.9} q${-r * 0.1} ${r * 0.6} ${-r * 0.6} ${r * 0.9}z" style="fill:var(--moss)"/>`;
     const n = vn.wateredAt ? 3 + Math.round(g6 * 3) : 2;
     let leaves = "";
@@ -19817,7 +19832,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var TRAY = 12;
   var CASE = 6;
   var NOT_FILLING = ["milk", "goatmilk", "yoghurt", "egg", "olives", "corn", "carrot", "tomato", "housechoc", "pea"];
-  var WINE_FILL = { wine_red: ["Red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Rosé", "Rosé", "#E98AA0"], wine_white: ["White wine", "White Wine", "#E8D57A"], wine_sparkling: ["Sparkling wine", "Bubbly", "#F3E7B0"] };
+  var WINE_FILL = { wine_red: ["Red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Rosé", "Rosé", "#E98AA0"], wine_white: ["White wine", "White Wine", "#E8D57A"], wine_sparkling: ["Sparkling wine", "Bubbly", "#F3E7B0"], wine_pinot: ["Pinot Noir", "Pinot", "#8A2E3E"], wine_chardonnay: ["Chardonnay", "Chardonnay", "#E8C96A"] };
   var WINE_FILLS = 4;
   var FL = (id) => INGR[id] || WINE_FILL[id];
   var isFilling = (id) => id in INGR && !NOT_FILLING.includes(id) || id in WINE_FILL;
@@ -23729,8 +23744,20 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     F2.coins -= t2[1];
     const s = bbState(F2);
     s.treats = (s.treats || 0) + 1;
+    if (k === "flight") s.tasted = true;
     return t2;
   }
+  var CUTTINGS = { price: 90, n: 3, kinds: { pinot: "Pinot Noir", chardonnay: "Chardonnay" } };
+  function buyCuttings(F2, kind) {
+    if (!CUTTINGS.kinds[kind] || !bbState(F2).tasted || F2.coins < CUTTINGS.price) return null;
+    F2.coins -= CUTTINGS.price;
+    addCuttings(F2, kind, CUTTINGS.n);
+    return CUTTINGS.kinds[kind];
+  }
+  var cuttingsList = (F2) => {
+    const v = vineState(F2), tasted = bbState(F2).tasted;
+    return `<h3 class="ph3">Cuttings from Kel's vines</h3>${tasted ? `<ul class="hlist wlist">${Object.entries(CUTTINGS.kinds).map(([k, n]) => `<li><span class="wpic">${icon("grape_" + k, 28)}</span><span class="wtxt"><b>${n} cuttings (${CUTTINGS.n})</b><small>${k === "pinot" ? "From the row Kel's grandad planted. Light, cherry-ish red." : "From the vines on the hill. Peaches, toast, a bit of butter."} Plant them on a trellis at home.${v.cuttings[k] ? ` (${v.cuttings[k]} at home to plant)` : ""}</small></span><button class="btn small primary" data-bb="cut:${k}" ${F2.coins >= CUTTINGS.price ? "" : "disabled"}>${CUTTINGS.price} ${coin9()}</button></li>`).join("")}</ul>` : `<p class="muted">"Have a taste first," says Kel. "Then if you like it, I'll cut you some to take home."</p>`}`;
+  };
   var treats = (F2, room, title = "Here and now") => {
     const m = TREATS[room];
     return m ? `<h3 class="ph3">${esc(title)}</h3><ul class="hlist wlist">${Object.entries(m).map(([k, [n, p, l]]) => `<li><span class="wtxt"><b>${esc(n)}</b><small>${esc(l)}</small></span><button class="btn small primary" data-bb="treat:${room}:${k}" ${F2.coins >= p ? "" : "disabled"}>${p} ${coin9()}</button></li>`).join("")}</ul>` : "";
@@ -23778,7 +23805,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       case "bv_gallery":
         return head(room, `Paintings of the valley by local artists, a long window over the real thing, and scones that come out every twenty minutes.`) + treats(F2, room) + listOf(F2, shopGoods(room), "To take home") + shut9;
       case "bv_tasting":
-        return head(room, `Kel's family have grown grapes here for three generations. Pinot the cellar dog is asleep under the bar, as usual.`, "stripe") + treats(F2, room, "A tasting") + listOf(F2, shopGoods(room), "Bottles to take home") + shut9;
+        return head(room, `Kel's family have grown grapes here for three generations. Pinot the cellar dog is asleep under the bar, as usual.`, "stripe") + treats(F2, room, "A tasting") + listOf(F2, shopGoods(room), "Bottles to take home") + cuttingsList(F2) + shut9;
       case "bv_cave":
         return head(room, `The barrel cave, dug into the hill. Racks of sparkling wine stand tilted neck-down in the cool, waiting for someone to give each bottle a little turn.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:riddle">Help Jono turn the bottles</button></div>` + shut9;
       case "bv_restaurant": {
@@ -24065,7 +24092,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var loftOpen = (F2) => !!(F2.towns && F2.towns.cinque);
   var canRaisin = (F2) => !!ct(F2).raisin;
   var canPesto = (F2) => !!ct(F2).pestoLesson;
-  var GRAPES = ["grape_red", "grape_white", "grape_tempranillo"];
+  var GRAPES = ["grape_red", "grape_white", "grape_tempranillo", "grape_pinot", "grape_chardonnay"];
   var grapesHave = (inv) => GRAPES.reduce((n, k) => n + (inv[k] || 0), 0);
   var cheeseOf = (inv) => ["cheese", ...Object.keys(inv).filter((k) => /^chz_/.test(k))].find((k) => inv[k] > 0);
   var take = (inv, k, n) => {
@@ -28832,6 +28859,20 @@ ${SIGNOFF[t2.who] || ""}`;
       save2(true);
       return;
     }
+    if (it.kind === "pet" && !KINDS[it.pet]) {
+      F.coins -= price;
+      addInv(id, 1);
+      sfx("chaching");
+      adoptItem = id;
+      adoptSt = {};
+      fieldView = null;
+      friView = null;
+      openView = null;
+      speak(it.say, 3500);
+      save2();
+      render();
+      return;
+    }
     if (it.kind === "pet") {
       const a = addAnimal(F, it.pet);
       if (!a) {
@@ -29210,7 +29251,7 @@ ${SIGNOFF[t2.who] || ""}`;
         h += Object.keys(ITEMS).filter((id) => ITEMS[id].tab === shopTab && inSeasonNow(id) && (!ITEMS[id].needs || owns2(F, ITEMS[id].needs)) && (!ITEMS[id].visited || (F.towns || {})[ITEMS[id].visited]) && (!ITEMS[id].ghOf || !inSeasonNow(ITEMS[id].ghOf))).map((id) => {
           const it = ITEMS[id], locked = it.need && S2.earned < it.need, owned = it.kind === "keep" ? F.fam.owned[id] : it.kind === "tool" && F.inv[id];
           const extra2 = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)} · ${CROPS[it.crop].yield || 1} a harvest` : it.to ? ` · for ${giftNames(it.to)}` : "";
-          if (it.kind === "pet") {
+          if (it.kind === "pet" && KINDS[it.pet]) {
             const full = roomLeft(F) <= 0;
             return itemBtn(id, full ? "the run is full" : `<b>${it.price}</b> ${icon("coin", 13)}`, full || F.coins < it.price);
           }
@@ -29652,6 +29693,13 @@ ${SIGNOFF[t2.who] || ""}`;
           who3.slice(0, 3).forEach((id, i) => setTimeout(() => npcSay(id, pick(["Pass the bread down? Thank you, love.", "This lamb. I'm not talking for a minute.", "We should do this every Sunday.", "Look at the view. Look at it!"])), 2400 + i * 2400));
         }
         ev(k === "babycino" ? ["a coffee for ME!", "froth moustache!"] : k === "freddo" ? ["a chocolate FROG!", "ribbit! chomp!"] : k === "icypole" ? ["it's dripping!", "my tongue is red!"] : ["yummy!", "can I have some?", "mmm, Mama"]);
+      } else if (a === "cut") {
+        const n = buyCuttings(F, room);
+        if (!n) return;
+        sfx("chaching");
+        gainXp(1);
+        flash(`Three ${n} cuttings`);
+        speak(`Kel snips three ${n} cuttings, wraps them in damp newspaper and a bit of hessian. "Full sun, a good drink, and talk to them now and then." Plant them on a trellis at home.`, 7e3);
       } else if (a === "choc") {
         if (!chocTaste(F)) return;
         sfx("chime");
