@@ -44,6 +44,6 @@ export function millPanel(F){
   if (m.press) h += left ? `<p>Pressing ${m.press.n} bottle${m.press.n > 1 ? "s" : ""}: ready in ${mins(left)}.</p><span class="clbar"><i style="width:${Math.round(100*(1 - left/m.press.dur))}%"></i></span>`
     : `<p><b>The oil's ready!</b></p><div class="actions"><button class="btn primary" data-mill="collect">Bottle it (${m.press.n})</button></div>`;
   else h += can ? `<div class="actions">${[1, can].filter((n, i, a) => a.indexOf(n) === i).map(n => `<button class="btn ${n === can ? "primary" : "alt"}" data-mill="press" data-n="${n}">Press ${n} bottle${n > 1 ? "s" : ""} (${n*JARS_PER_BOTTLE} jars)</button>`).join("")}</div>`
-    : `<p class="muted">Not enough olives for a bottle yet. Your olive tree (and the grove, from the vineyard stall) give jars every eight hours; Elena sells them at the Sunday market too.</p>`;
+    : `<p class="muted">Not enough olives for a bottle yet. Your olive tree (and the grove, from the vineyard stall) give jars every six hours; Elena sells them at the Sunday market too.</p>`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }

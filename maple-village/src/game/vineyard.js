@@ -31,21 +31,22 @@ const gName = k => k === "red" || k === "white" ? k : GRAPE_N[k];
 export const hasGrape = (v, k) => !FLAG[k] || !!v[FLAG[k]];
 export function addCuttings(F, kind, n){ const v = vineState(F); v.cuttings[kind] = (v.cuttings[kind] || 0) + n; if (FLAG[kind]) v[FLAG[kind]] = true; }
 export const SHOP = {cut_red: {n: "Red grape vine", price: 20, say: "A red grape cutting. Plant it on a trellis."}, cut_white: {n: "White grape vine", price: 20, say: "A white grape cutting. Plant it on a trellis."},
-  grove: {n: "Olive grove (4 trees)", price: 300, needs: "olive", say: "Four young olive trees, planted in a neat row along the top terrace. Eight more jars every picking."},
-  olive: {n: "Olive tree", price: 150, say: "An olive tree, planted by the path. Olives in about eight hours."}, trellis: {n: "Trellis (one row)", price: 80, say: "A new trellis row, ready for three vines."}, barrel: {n: "Oak barrel", price: 150, say: "Another barrel for the cellar."}, terrace: {n: "Shop terrace", price: 600, say: "Tables and a vine-covered pergola outside the wine shop. More people stop for a glass."}};
+  grove: {n: "Olive grove (4 trees)", price: 300, needs: "olive", say: "Four young olive trees, planted in a neat row along the top terrace. Twelve more jars every picking."},
+  grove2: {n: "Second grove row (4 more trees)", price: 500, needs: "grove", say: "Four more olive trees along the top terrace. Twice the olives from the grove, every picking."},
+  olive: {n: "Olive tree", price: 150, say: "An olive tree, planted by the path. Olives in about six hours."}, trellis: {n: "Trellis (one row)", price: 80, say: "A new trellis row, ready for three vines."}, barrel: {n: "Oak barrel", price: 150, say: "Another barrel for the cellar."}, terrace: {n: "Shop terrace", price: 600, say: "Tables and a vine-covered pergola outside the wine shop. More people stop for a glass."}};
 const BUNCHES = 3, PER_BATCH = 3, BOTTLES = 6, GLASSES = 5;
 // the tapas of the day (round 108: up to three a day): v.tapasList = [{day, id, plates, cooked}]
 export const tapasOn = (v, day) => (v.tapasList || []).filter(t => t && t.day === day && TAPAS[t.id]);
 export const platesLeft = v => Object.values(v.menu || {}).reduce((a, n) => a + n, 0) + (v.tapasList || []).reduce((a, t) => a + (t.plates || 0), 0);
 // the olive tree (bought at the stall, planted by the path): ripe every 8 hours, two jars of olives a picking
-export const OLIVE = 8*H;
+export const OLIVE = 6*H;   // (round 154, Mel: "not enough": every six hours now, and more a picking)
 export const oliveRipe = v => !!v.olive && Date.now() - (v.olive.pickedAt || v.olive.planted) >= OLIVE;
 // round 110: the olive grove (four more trees along the top terrace, bought at the stall), ripe on the same 8 hours,
 // eight jars a picking. Marco and Ines pick the tree and the grove on their shifts (with the grapes) into the olive
 // crate (v.oliveCrate), which Mel empties into her backpack at the grove, or the mill takes from directly.
-export const GROVE_JARS = 8;
+export const GROVE_JARS = 12, TREE_JARS = 3;
 export const groveRipe = v => !!v.grove && Date.now() - (v.grove.pickedAt || v.grove.planted) >= OLIVE;
-export function pickGrove(F){ const v = vineState(F); if (!groveRipe(v)) return null; v.grove.pickedAt = Date.now(); F.inv = F.inv || {}; F.inv.olives = (F.inv.olives || 0) + GROVE_JARS; return `${GROVE_JARS} jars of olives from the grove, into your backpack.`; }
+export function pickGrove(F){ const v = vineState(F); if (!groveRipe(v)) return null; v.grove.pickedAt = Date.now(); F.inv = F.inv || {}; F.inv.olives = (F.inv.olives || 0) + GROVE_JARS*(v.grove2 ? 2 : 1); return `${GROVE_JARS} jars of olives from the grove, into your backpack.`; }
 export function takeOliveCrate(F){ const v = vineState(F), n = v.oliveCrate || 0; if (!n) return null; v.oliveCrate = 0; F.inv = F.inv || {}; F.inv.olives = (F.inv.olives || 0) + n; return `${n} jar${n > 1 ? "s" : ""} of olives from the crate, into your backpack.`; }
 export function vineState(F){
   F.vine = F.vine || {};
@@ -92,6 +93,7 @@ export function buy(F, id){
   if (id === "terrace") { if (v.terrace) return "The terrace is already out front."; v.terrace = true; }
   else if (id === "olive") { if (v.olive) return "You've an olive tree already. One's plenty."; v.olive = {planted: Date.now(), pickedAt: 0}; }
   else if (id === "grove") { if (v.grove) return "The grove's already planted."; if (!v.olive) return "Plant the first olive tree by the path, then the grove."; v.grove = {planted: Date.now(), pickedAt: 0}; }
+  else if (id === "grove2") { if (v.grove2) return "Both grove rows are planted."; if (!v.grove) return "Plant the first grove row, then the second."; v.grove2 = Date.now(); }
   else if (id === "trellis") { const r = v.rows.find(x => !x.trellis); if (!r) return "Every row has a trellis already."; r.trellis = true; }
   else if (id === "barrel") { if (v.barrels.length >= maxBarrels(F)) return v.barrels.length >= BARRELS.shed + BARRELS.cellar ? "Every rack's full: eighteen barrels, six in the shed and twelve in the cellar." : "The shed's full: six barrels. Open the cellar door and its racks take twelve more.";
     v.barrels.push(null); if (v.barrels.length > BARRELS.shed) { F.coins -= price; return "Another oak barrel, rolled down onto the racks in the cellar."; } }
@@ -216,8 +218,8 @@ export function sellTick(F, opts = {}){
     if (w.workers) {
       if (v.help.pick) v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && vn.wateredAt && at - vn.wateredAt >= GROW) { const n = BUNCHES + (opts.harvest ? 1 : 0); v.grapes[vn.v] += n; vn.wateredAt = null; out.picked += n; } }));
       v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && !vn.wateredAt) { vn.wateredAt = at; out.watered++; } }));
-      if (v.help.pick) { if (v.olive && at - (v.olive.pickedAt || v.olive.planted) >= OLIVE) { v.olive.pickedAt = at; v.oliveCrate = (v.oliveCrate || 0) + 2; out.olives = (out.olives || 0) + 2; }
-        if (v.grove && at - (v.grove.pickedAt || v.grove.planted) >= OLIVE) { v.grove.pickedAt = at; v.oliveCrate = (v.oliveCrate || 0) + GROVE_JARS; out.olives = (out.olives || 0) + GROVE_JARS; } }
+      if (v.help.pick) { if (v.olive && at - (v.olive.pickedAt || v.olive.planted) >= OLIVE) { v.olive.pickedAt = at; v.oliveCrate = (v.oliveCrate || 0) + TREE_JARS; out.olives = (out.olives || 0) + TREE_JARS; }
+        if (v.grove && at - (v.grove.pickedAt || v.grove.planted) >= OLIVE) { v.grove.pickedAt = at; const n = GROVE_JARS*(v.grove2 ? 2 : 1); v.oliveCrate = (v.oliveCrate || 0) + n; out.olives = (out.olives || 0) + n; } }
       if (v.help.barrels) v.barrels.forEach((b, i) => { if (b) return; const spare = c => v.grapes[c] - (v.keep[c] || 0) >= PER_BATCH, st = spare("tempranillo") ? "tempranillo" : spare("pinot") ? "pinot" : spare("chardonnay") ? "chardonnay" : spare("red") ? "red" : spare("white") ? "white" : null;
         if (st) { v.grapes[st] -= PER_BATCH; v.barrels[i] = {style: st, start: at, dur: STYLES[st].dur, stage: 1}; out.filled++; } });
     }
@@ -310,7 +312,7 @@ export function vinePanel(F, r, i){
 export function stallPanel(F){
   const v = vineState(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F.coins} coins. Cuttings: ${grapeKinds(v).map(k => `${v.cuttings[k]} ${gName(k)}`).join(", ")}. Grapes: ${grapeKinds(v).map(k => `${v.grapes[k]} ${gName(k)}`).join(", ")} bunches.</p>
-    <div class="items shop">${Object.keys(SHOP).map(id => { const it = SHOP[id], price = shopPrice(v, id), have = (id === "grove" && !!v.grove) || (id === "trellis" && v.rows.every(r => r.trellis)) || (id === "barrel" && v.barrels.length >= maxBarrels(F)) || (id === "olive" && !!v.olive) || (id === "terrace" && !!v.terrace), off = have || F.coins < price;
+    <div class="items shop">${Object.keys(SHOP).map(id => { const it = SHOP[id], price = shopPrice(v, id), have = (id === "grove" && !!v.grove) || (id === "grove2" && (!!v.grove2 || !v.grove)) || (id === "trellis" && v.rows.every(r => r.trellis)) || (id === "barrel" && v.barrels.length >= maxBarrels(F)) || (id === "olive" && !!v.olive) || (id === "terrace" && !!v.terrace), off = have || F.coins < price;
       return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c">${have ? "owned" : `<b>${price}</b> coins`}</span>${id === "terrace" ? `<span class="d">a third more customers</span>` : ""}</button>`; }).join("")}</div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
@@ -420,7 +422,7 @@ export function olivePanel(F){
     ${o ? `<p class="muted">The olive crate: ${v.oliveCrate || 0} jar${v.oliveCrate === 1 ? "" : "s"}${v.help.pick ? " (Marco and Ines put what they pick in here)" : ""}. Take them for the kitchen, gelato, or the mill.</p>` : ""}
     <div class="actions">${ripe ? `<button class="btn primary" data-vy="olives">Pick the olives</button>` : ""}${v.oliveCrate ? `<button class="btn alt" data-vy="crate">Take the crate (${v.oliveCrate})</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
 }
-export function pickOlives(F){ const v = vineState(F); if (!oliveRipe(v)) return null; v.olive.pickedAt = Date.now(); F.inv = F.inv || {}; F.inv.olives = (F.inv.olives || 0) + 2; return "Two jars of olives, into your backpack. Send them to the kitchen when you like."; }
+export function pickOlives(F){ const v = vineState(F); if (!oliveRipe(v)) return null; v.olive.pickedAt = Date.now(); F.inv = F.inv || {}; F.inv.olives = (F.inv.olives || 0) + TREE_JARS; return "Three jars of olives, into your backpack. Send them to the kitchen when you like."; }
 // api: {save, rerender, say(line), sfx, r, i}
 export function wireVine(root, F, api){
   root.querySelectorAll(".vyname").forEach(inp => inp.oninput = () => { vy.name[+inp.id.slice(6)] = inp.value; });

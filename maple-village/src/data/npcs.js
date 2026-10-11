@@ -173,7 +173,12 @@ export const NPCS = [
     id: "tomi", pitch: 1.1, name: "Tomi", job: "Works the press at the old mill (Ines's little brother)",
     intro: "Tomi. Ines's brother, the one named after the great-great-grandfather. So the mill's sort of a family thing. I press, I steep, I sweep up the olive stones.",
     look: {skin: "#E8B996", hair: "#5A2E1A", hairStyle: "spiky", top: "#7FA35A", bottom: "#4F5A6A", extra: "apron"},
-    routine: [slot("9:30", "10:00", "hlane", [[300, 300], [240, 320]], {needs: "mill", dow: [1, 2, 3, 4, 5, 6]}), slot("10:00", "17:00", "mill", [[300, 520], [300, 250], [380, 520]], {needs: "mill", dow: [1, 2, 3, 4, 5, 6]})],
+    // round 154: his week. Before the mill opened he helped Ines on the vines; Sundays off: football on the field,
+    // then the Scoop Shack; Wednesday and Friday evenings at the wine shop, Tuesdays down at the bay with Ines
+    routine: [slot("9:30", "10:00", "hlane", [[300, 300], [240, 320]], {needs: "mill", dow: [1, 2, 3, 4, 5, 6]}), slot("10:00", "17:00", "mill", [[300, 520], [300, 250], [380, 520]], {needs: "mill", dow: [1, 2, 3, 4, 5, 6]}),
+      slot("10:00", "16:00", "vineyard", [[262, 440], [340, 490], [418, 390]], {act: "farm", dow: [1, 2, 3, 4, 5, 6]}),
+      slot("9:00", "11:00", "field", [[200, 420], [260, 400], [320, 430]], {act: "footy", dow: [0]}), slot("13:00", "15:00", "bay", [[180, 420], [240, 430], [300, 420]], {dow: [0]}),
+      slot("18:00", "20:00", "wineshop", [[300, 500], [360, 520]], {dow: [3, 5]}), slot("18:00", "19:30", "bay", [[180, 420], [300, 420]], {dow: [2]})],
     lines: ["Three jars to a bottle. Every time. The stone doesn't lie.", "Rosemary oil's steeping. Six hours. I count.", "T.R. 1912. Ines thinks I carved it. I didn't. Probably.", "Smell that? Green and peppery. That's a good pressing."],
     away: "Tomi's finished at the mill for the day."
   },
@@ -183,7 +188,15 @@ export const NPCS = [
     id: "hazel", pitch: .95, name: "Hazel", job: "Runs the Mill Shop",
     intro: "Hazel. I made soap for forty years, in a shed behind my house. Now I get to sell yours. Lavender and honey, that's the one. Trust me.",
     look: {skin: "#F2D3BC", hair: "#D6D0C6", hairStyle: "bun", top: "#9CAA6A", bottom: "#5A4A3E", extra: "apron"},
-    routine: [slot("9:30", "10:00", "hlane", [[300, 300], [360, 320]], {needs: "millshop", dow: [0, 2, 3, 4, 5, 6]}), slot("10:00", "17:00", "mill", [130, 470], {needs: "millshop", dow: [0, 2, 3, 4, 5, 6], dir: 1})],
+    // round 154: a whole week in the village. Early walks in the woods; Sunday mornings at the market with Grace, her
+    // granddaughter (who's staying with her), before opening up; Mondays, with the shop shut, lavender and roses from Ma
+    // Ma's flower farm and lunch in the square; a glass at the wine shop on Friday evenings
+    routine: [slot("7:00", "8:30", "hwoods", [[100, 330], [200, 318], [300, 300]], {dow: [1, 2, 3, 4, 5, 6]}),
+      slot("8:00", "10:00", "field", [[356, 160], [380, 170]], {dow: [0]}),
+      slot("9:30", "10:00", "hlane", [[300, 300], [360, 320]], {needs: "millshop", dow: [0, 2, 3, 4, 5, 6]}), slot("10:00", "17:00", "mill", [130, 470], {needs: "millshop", dow: [0, 2, 3, 4, 5, 6], dir: 1}),
+      slot("10:00", "12:00", "flowers", [[160, 300], [260, 380], [210, 300]], {dow: [1]}), slot("12:00", "13:30", "village", [[362, 372], [392, 360]], {dow: [1]}),
+      slot("10:00", "12:00", "village", [[362, 372], [340, 380]]), slot("14:00", "16:00", "orchard", [[160, 330], [260, 420]]),
+      slot("18:00", "20:00", "wineshop", [[300, 500], [360, 520]], {dow: [5]})],
     lines: ["Lavender and honey. Every time.", "Smell that one. Go on. Rosemary and lemon: clears your head right out.", "A good soap needs a day to cure. Patience, like wine.", "Rose for the mums, rosemary for the dads. I've never been wrong."],
     away: "Hazel's gone home. The Mill Shop's shut."
   },
@@ -1033,6 +1046,10 @@ export const NPCS = [
 ];
 
 // Agent NPCs: one per automation. `from` on a mail item picks the messenger (unknown -> postie).
+// round 154: Grace, staying the season with her gran Hazel, has a week too (her Sunday stall comes from tours.js)
+{ const g = NPCS.find(n => n.id === "grace"); if (g) g.routine = [slot("9:00", "10:30", "village", [[362, 372], [392, 360], [340, 380]], {dow: [1, 2, 3, 4, 5, 6]}),
+  slot("11:00", "12:00", "hlane", [[250, 300], [300, 320]], {dow: [1, 2, 3, 4, 5, 6]}),
+  slot("14:00", "16:00", "shore", [[214, 300], [200, 380], [220, 520]], {dow: [1, 3, 5]}), slot("14:00", "16:00", "cocoa", [[200, 450], [320, 470]], {dow: [2, 4, 6]})]; }
 export const AGENTS = {
   crier:    {name: "Rosa the town crier", skill: "morning-briefing", look: {skin: "#EDC6A6", hair: "#8A3B2A", hairStyle: "bun", top: "#C2505F", bottom: "#3A2E28", extra: "bell"}, hello: "Hear ye! Your morning briefing!", helloTown: "Hear ye! Your paper's still in your letterbox, so I've brought the news to town!"},
   runner:   {name: "Kip, the library runner", skill: "book-digest", look: {skin: "#D8A882", hair: "#2A211D", hairStyle: "spiky", top: "#7C9F6C", bottom: "#5E5A55", extra: "satchel"}, hello: "Today's book digest, hot off the shelf!"},

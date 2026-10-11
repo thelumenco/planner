@@ -122,7 +122,7 @@ export function vineyardArt(){
     : sk(`<ellipse cx="250" cy="252" rx="16" ry="5" style="fill:#9C7A5C"/>`, `<ellipse cx="250" cy="252" rx="16" ry="5"/><path d="M262 252 v-18 M256 236 h14 v8 h-14z"/>`)}${tapeLabel(250, 276, "Olive tree", "var(--sage)", 10)}</g>`;
   // round 110: the olive grove, four small trees in a neat row along the top terrace (bought at the stall)
   const gv = v.grove, gripe = gv && Date.now() - (gv.pickedAt || gv.planted) >= 8*3600e3;
-  const grove = gv ? `<g data-place="grove" aria-label="The olive grove"><ellipse class="hov" cx="125" cy="92" rx="100" ry="12" style="fill:var(--butter)"/><g filter="url(#wob)">${[50, 100, 150, 200].map(x => oliveTree(x, 92, .62, gripe ? "ripe" : "growing")).join("")}</g>${tapeLabel(125, 110, "Olive grove", "var(--sage)", 10)}</g>` : "";
+  const grove = gv ? `<g data-place="grove" aria-label="The olive grove"><ellipse class="hov" cx="125" cy="92" rx="100" ry="12" style="fill:var(--butter)"/><g filter="url(#wob)">${v.grove2 ? [75, 125, 175, 225].map(x => oliveTree(x, 74, .5, gripe ? "ripe" : "growing")).join("") : ""}${[50, 100, 150, 200].map(x => oliveTree(x, 92, .62, gripe ? "ripe" : "growing")).join("")}</g>${tapeLabel(125, 110, "Olive grove", "var(--sage)", 10)}</g>` : "";
   // the cane drying rack (round 139), tucked in behind the olive tree (Mel)
   const rack = (G.F().loft || {}).rack ? dryingRack(206, 240) : "";
   return lampDefs + ground + gate + lgate + grove + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + rack + olive
