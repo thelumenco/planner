@@ -3528,6 +3528,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   for (let w = 0; w < 5; w++) { for (let i = 0; i < 3; i++) await page.click('#ctx [data-bba="spaddle"]'); await page.click('#ctx [data-bba="popup"]'); }
   await page.click('#ctx [data-bba="surfed"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.coins === 280 && f.inv.b_surfphoto === 1 && f.bellbird.surfs === 1), "a surf lesson with Jet (20 with Evan), five waves ridden, and the photo");
+  await page.goto(url + "?seed=1&time=20:30&date=2026-10-12"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("cw_beach")); await page.waitForTimeout(2500);
+  check(await page.locator("#sceneArt .zzz").count() === 1 && !(await page.locator("#evan").isVisible()) && /tuck him into the back of the van/.test(await page.locator("#speech").textContent()), "after eight, Evan's tucked up asleep in the van");
   await page.close();
 }
 {

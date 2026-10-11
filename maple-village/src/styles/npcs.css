@@ -214,3 +214,7 @@
 .ch.npc .perch{animation:scanB 3s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
 .ch.npc.act-quoits:not(.walk) .armR{animation:skimA 2.2s ease-in infinite}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-yoga .armL,.ch.npc.act-yoga .armR,.ch.npc.act-paint .armR,.ch.npc.act-paint .tool,.ch.npc.act-postcard .armR,.ch.npc.act-postcard .tool,.ch.npc.act-shells .armR,.ch.npc.act-count .armL,.ch.npc .gullhop,.ch.npc.act-shelter .armR,.ch.npc.act-shelter .armL,.ch.npc .perch,.ch.npc.act-quoits .armR{animation:none}}
+/* round 152: Evan asleep in the campervan at night on a trip */
+.zzz text{animation:zzzF 3s ease-in-out infinite;opacity:0}
+@keyframes zzzF{0%{opacity:0;transform:translateY(4px)}30%{opacity:1}100%{opacity:0;transform:translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){.zzz text{animation:none;opacity:1}}

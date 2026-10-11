@@ -79,7 +79,7 @@ import { jejuRoomArt, dyeCloth } from "../art/jeju-rooms.js";
 import { jejuPanel, jejuState, diveStart, descend, surface, diveReward, JUK, sortStart, sortTap, sortReward, cafeTreat as jjCafe, slowPost, slowMail, DYE, dyeScarf, dyeDays, takeDye } from "./jeju.js";
 import { kyotoRoomArt } from "../art/kyoto-rooms.js";
 import { kyotoPanel, kyotoState, stamp as ktStamp, rentYukata, yukataOn, YUKATA, whiskStart, whisk, froth, TEA, sitStart, breathe, calm, drawFortune, makeNerikiri, seasonShape, centre as ktCentre, throwCup, NERI } from "./kyoto.js";
-import { TOWNS, townOf, townRoom, roomBehind, TOWN_BOUNDS } from "../data/towns.js";
+import { TOWNS, townOf, townRoom, roomBehind, TOWN_BOUNDS, TOWN_PLACES } from "../data/towns.js";
 import { rondaPanel, rondaVisit, buyGood, buyVines, taste, buyTile, picnic as rondaPicnic, tileBench, cafeTreat, showOn, palmasStart, palmasEnd, clap, ole, paintTile, pour, TEA_GLASSES, rondaState } from "./ronda.js";
 import { tripOn, inParty, buyTrip, endTrip, ticketPanel, homePanel, initTrips, nameOf as tripName, awayOn } from "./trips.js";
 import { bikeArt, taxiBoat, taxiBank, transportArt } from "../art/transport.js";
@@ -2129,7 +2129,7 @@ function drawScene(){
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
   $("sceneArt").innerHTML = scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
-  $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") : "") + (scene === "shore" && F.towns && F.towns.cinque ? homeBoat(204, 380, ...boatCols(F)) : "") + (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM()) ? discoArt() : "") + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));   // shelves with keepsakes, and pets at home here
+  $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") : "") + (scene === "shore" && F.towns && F.towns.cinque ? homeBoat(204, 380, ...boatCols(F)) : "") + (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM()) ? discoArt() : "") + vanSleeper() + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));   // shelves with keepsakes, and pets at home here
   if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));   // the same evening light everywhere outdoors
   if (outside() && isDusk()) nightLights();
   const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), terrace:"The terrace", orchard:"Ma Ma's orchard", flowers:"Ma Ma's flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", hwoods:"Honeybrook Woods", greenhouse:"The greenhouse", mill:"The old mill", scoopshop: scoopState(F).name, ct_vernazza:"Cinque Terre: Vernazza", ct_corniglia:"Cinque Terre: Corniglia", ct_monterosso:"Cinque Terre: Monterosso", ct_manarola:"Cinque Terre: Manarola", ...Object.fromEntries(Object.entries(BB_NAMES).map(([k, v]) => [k, "Bellbird Valley: " + v])), jj_shore:"Jeju: Seongsan", jj_farms:"Jeju: the tangerine farms", jj_harbour:"Jeju: the harbour", jj_village:"Jeju: the stone village", kt_station:"Kyoto: the station", kt_lane:"Kyoto: Higashiyama", kt_temple:"Kyoto: the temple", kt_river:"Kyoto: the river", rd_station:"Ronda: the station", rd_plaza:"Ronda: the plaza", rd_bridge:"Ronda: Puente Nuevo", rd_old:"Ronda: the old town"};
@@ -2287,10 +2287,21 @@ function vanGo(stop){
     setTimeout(() => speak(`${T.arriveLine}${!on && t.party.length ? ` ${partyList(t)} climb${t.party.length > 1 ? "" : "s"} out behind you.` : ""} ${!on || (r && r.first) ? "A new stamp in the passport!" : ""}`.trim(), 7000), 700);
     if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(T.evanArrive || ["are we there?"])), 3400); });
 }
+// round 152 (Mel): on a campervan trip, from Evan's bedtime (8pm) he's curled up asleep in the back of the van under a
+// blanket, a little face in the first window and some floating z's
+const evanInVan = () => { const t = tripOn(F), T = t && TOWNS[t.town]; return !!(T && T.by === "van" && t.party.includes("evan") && evanNight() && townOf(scene) === t.town); };
+function vanSleeper(){
+  if (!evanInVan()) return ""; const T = TOWNS[tripOn(F).town], st = TOWN_PLACES[T.station]; if (!st || st.scene !== scene) return "";
+  const [x, y] = st.door, wx = x - 27, wy = y - 40;
+  return `<g pointer-events="none" aria-hidden="true"><circle cx="${wx}" cy="${wy}" r="4.6" fill="#F2D3BC" stroke="#2F2B28" stroke-width=".8"/><path d="M${wx - 4.6} ${wy - 1} q4.6 -6 9.2 0" fill="#2A2420"/><path d="M${wx - 2.6} ${wy + .6} q1 .8 2 0 M${wx + .8} ${wy + .6} q1 .8 2 0" fill="none" stroke="#2F2B28" stroke-width=".7"/>
+    <path d="M${wx - 8} ${wy + 6.4} q8 -4 16 0 v1.6 h-16z" fill="#E8A0B4" stroke="#2F2B28" stroke-width=".6"/>
+    <g class="zzz">${[0, 1, 2].map(i => `<text x="${wx + 8 + i*5}" y="${wy - 6 - i*6}" font-family="Klee One,serif" font-size="${6 + i*1.6}" fill="#FFFDF6" stroke="#2F2B28" stroke-width=".4" style="animation-delay:${i*.6}s">z</text>`).join("")}</g></g>`;
+}
 function vanHome(late){
   const t = tripOn(F); if (!t) return; const cost = Math.min(F.coins, bbHomeFuel(F)); F.coins -= cost; endTrip(F); bvView = null; ctx(); save(true);
   vanRide(late ? "The long drive home in the dark, everyone sleepy..." : "Home along the valley road to Honeybrook...", () => { setScene("hlane", VILLAGE.van.door);
-    setTimeout(() => speak(`Back home in the lane. Bellbird Valley was ${pick(["glorious", "a proper adventure", "just lovely"])}.${t.party.length ? ` ${partyList(t)} head${t.party.length > 1 ? "" : "s"} off home.` : ""}`, 5000), 800); });
+    const sleepy = t.party.includes("evan") && evanNight();
+    setTimeout(() => speak(`Back home in the lane. Bellbird Valley was ${pick(["glorious", "a proper adventure", "just lovely"])}.${sleepy ? " Evan slept the whole way, and doesn't stir when you carry him in to bed." : ""}${t.party.length ? ` ${partyList(t)} head${t.party.length > 1 ? "" : "s"} off home.` : ""}`, 5000), 800); });
 }
 function tripHome(late, by){
   const t = tripOn(F), town = t ? TOWNS[t.town] : TOWNS[townOf(scene) || "ronda"]; endTrip(F); railOpen = false; kyotoView = null; ctx();
@@ -2367,7 +2378,7 @@ function roomSpot(id){
 }
 function townSpot(id){
   const town = townOf(scene), T = TOWNS[town];
-  if (id === T.station && T.by === "van") { bvView = "map"; sfx("paper", true); render(); return; }   // round 141: the campervan's road map
+  if (id === T.station && T.by === "van") { bvView = "map"; sfx("paper", true); if (evanInVan()) speak(pick(["Evan's fast asleep in the back, one arm flung out, under the pink blanket.", "Shh. Evan's asleep in the van, snoring very softly.", "Evan's curled up in the back with his toy, fast asleep."]), 4500); render(); return; }   // round 141: the campervan's road map
   // round 143: Bellbird Valley's activities out of doors: the balloons, the berry rows, the canoes, the campfire; and the rope swing
   const bbOut = {bvballoons: "balloon", bvberries: "berries", bvcanoe: "canoe", bvfire: "fire", bvsurf: "surf", bvwhales: "whales", bvboats: "pots", bvpenguins: "penguins", bvnippers: "nippers"}[id];
   // round 150: the king parrots at Koala Cove, with a scoop of seed from the park store
@@ -2436,6 +2447,7 @@ function townSpot(id){
 let townSaid = 0;
 function townTick(){
   const town = townOf(scene); if (!town) return;
+  if (evanInVan() && S.vanBed !== dayKey()) { S.vanBed = dayKey(); speak("Evan's yawning his head off. You tuck him into the back of the van under his blanket; he's asleep before you've closed the door.", 6000); drawScene(); }
   if (sgHM() >= TOWNS[town].backTo && TOWNS[town].by === "van" && !document.querySelector(".trainride")) { speak("It's getting late: everyone in the van, time to drive home.", 3500); vanHome(true); return; }
   if (sgHM() >= TOWNS[town].backTo && !document.querySelector(".trainride")) { const t0 = tripOn(F); speak(`That's the last ${t0 && t0.by === "ferry" ? "ferry" : "train"}! Everyone on, quick.`, 3500); tripHome(true); return; }
   if (scene === "ct_vernazza" && sgHM() >= 12*60 && sgHM() < 12*60 + 5 && S.ctBells !== dayKey()) { S.ctBells = dayKey(); sfx("chime"); speak("Noon: the church bells ring out over the harbour, and the whole of Vernazza stops for lunch.", 5000); }   // round 134
