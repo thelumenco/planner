@@ -70,6 +70,7 @@ import { loftPanel, startBatch, collect as loftCollect, loftState } from "./loft
 import { cinqueRoomArt } from "../art/cinque-rooms.js";
 import { bellbirdRoomArt } from "../art/bellbird-rooms.js";
 import { terraceArt } from "../art/terrace.js";
+import { coastArt } from "../art/coast.js";
 import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } from "./lunch.js";
 import { cinquePanel, cinqueState, treat as ctTreat, GELATO, FOCACCIA, pestoStart, pestoAdd, pestoPound, pestoDone, finishPesto, harvestStart, pick as ctPick, harvestDone, finishHarvest, TASTE, paintBoat, boatCols } from "./cinque.js";
 import { jejuRoomArt, dyeCloth } from "../art/jeju-rooms.js";
@@ -1592,7 +1593,7 @@ function ctx(){
     h = bbRoom === "balloon" ? BBA.balloonPanel(F, bbSt.flight, {hm: sgHM(), party: tp}) : bbRoom === "riddle" ? BBA.riddlePanel(F, bbSt.riddle) : bbRoom === "berries" ? BBA.berriesPanel(F, bbSt.berries, evanOn)
       : bbRoom === "dip" ? BBA.dipPanel(F, bbSt.dip, evanOn) : bbRoom === "joey" ? BBA.joeyPanel(F, bbSt.joey, evanOn) : bbRoom === "canoe" ? BBA.canoePanel(F, bbSt.canoe, evanOn, bbSt.paid)
       : bbRoom === "fire" ? BBA.firePanel(F, bbSt.bag, {hm: sgHM(), folk: FIRE_FOLK.some(isHere)}) : bbRoomPanel(F, bbRoom, {evan: evanOn, party: !!tp.length}); }
-  else if (bvView) h = bvView === "passport" ? bbPassport(F) : bbMapPanel(F, {pick: tripPick, ownsVan: owns(F, "van")});
+  else if (bvView) h = bvView === "passport" ? bbPassport(F) : bbMapPanel(F, {pick: tripPick, ownsVan: owns(F, "van"), region: bvRegion});
   else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick, tripTown);
   else if (railOpen === "ferry" && scene === "shore") h = ticketPanel(F, tripPick, "jeju", sgHM(), "ferry");   // round 127: the Jeju ferry from the jetty
   else if (railOpen && scene === "hlane") h = timetablePanel(dayKey(), sgHM(), true);
@@ -1773,6 +1774,7 @@ function ctx(){
   c.querySelectorAll("[data-bvpick]").forEach(b => b.onclick = () => { const id = b.dataset.bvpick; tripPick = tripPick.includes(id) ? tripPick.filter(x => x !== id) : tripPick.length < 4 ? [...tripPick, id] : tripPick; sfx("tap"); ctx(); });
   c.querySelectorAll("[data-bvgo]").forEach(b => b.onclick = () => vanGo(b.dataset.bvgo));
   c.querySelectorAll("[data-bvhome]").forEach(b => b.onclick = () => vanHome(false));
+  c.querySelectorAll("[data-bvregion]").forEach(b => b.onclick = () => { bvRegion = b.dataset.bvregion; sfx("paper", true); ctx(); });
   c.querySelectorAll("[data-bvpass]").forEach(b => b.onclick = () => { bvView = "passport"; sfx("paper", true); ctx(); });
   c.querySelectorAll("[data-ttown]").forEach(b => b.onclick = () => { tripTown = b.dataset.ttown; sfx("tap"); ctx(); });
   c.querySelectorAll("[data-tpick]").forEach(b => b.onclick = () => { const id = b.dataset.tpick; tripPick = tripPick.includes(id) ? tripPick.filter(x => x !== id) : [...tripPick, id]; sfx("tap"); ctx(); });
@@ -2096,7 +2098,7 @@ function drawScene(){
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; const light = rainLevel(day) === 1; setTimeout(() => speak(light ? "A light shower today. Brollies up!" : "Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
-  $("sceneArt").innerHTML = scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
+  $("sceneArt").innerHTML = scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
   $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") + (F.towns && F.towns.cinque ? homeBoat(206, 150, ...boatCols(F)) : "") : "") + (scene === "vineyard" && F.loft && F.loft.rack ? dryingRack(188, 226) : "") + (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM()) ? discoArt() : "") + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));   // shelves with keepsakes, and pets at home here
   if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));   // the same evening light everywhere outdoors
   if (outside() && isDusk()) nightLights();
@@ -2288,7 +2290,7 @@ let loftView = false;   // round 132: the drying loft over the barrel shed (loft
 let cinqueView = null, ctSt = {};
 let lunchView = null;   // round 146: the bookings book ("book") and the long table ("table") on the terrace
 let bbRoom = null, bbSt = {};   // round 142: Bellbird Valley's room panels (bbrooms.js) and, round 143, its activities (bbacts.js)
-let bvView = null;   // round 141: Bellbird Valley's road map ("map") and passport ("passport")   // round 132: Cinque Terre's room panels and activities (cinque.js)
+let bvView = null, bvRegion = null;   // round 148: which page of the road map (vines, coast)   // round 141: Bellbird Valley's road map ("map") and passport ("passport")   // round 132: Cinque Terre's room panels and activities (cinque.js)
 function stampHere(place){ const s = ktStamp(F, place); if (!s) return; sfx("chime"); flash(`Stamp: ${s.n}`); gainXp(1);
   if (s.full) setTimeout(() => speak("The stamp book's full! Eight ink stamps from round Kyoto. Back home, there's a little stone lantern by the pond now.", 6500), 1200); save(); }
 const homeLantern = (x, y) => `<g pointer-events="none" class="homelantern"><g style="stroke:var(--line)" stroke-width="1.3" stroke-linejoin="round"><rect x="${x-4}" y="${y-22}" width="8" height="22" fill="#B9B0A4"/><path d="M${x-12} ${y-22} h24 l-4 -6 h-16z" fill="#CFC6B8"/><rect x="${x-8}" y="${y-38}" width="16" height="10" fill="#E6DED0"/><rect x="${x-4}" y="${y-36}" width="8" height="6" fill="#F6D98A"/><path d="M${x-14} ${y-38} q14 -12 28 0z" fill="#B9B0A4"/><circle cx="${x}" cy="${y-48}" r="2.5" fill="#B9B0A4"/></g><circle cx="${x}" cy="${y-33}" r="14" fill="#F6D98A" opacity=".18"/></g>`;

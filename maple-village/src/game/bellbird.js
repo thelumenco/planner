@@ -9,7 +9,7 @@
 import { esc, dayKey, sgHM } from "../util.js";
 import { icon } from "../art/icons.js";
 import { TOWNS } from "../data/towns.js";
-import { BB_MAP, BB_ROADS, BB_SOON } from "../data/bellbird.js";
+import { BB_MAPS, BB_ROADS, BB_SOON, REGION_N } from "../data/bellbird.js";
 import { FAMILY, nameOf, tripOn } from "./trips.js";
 
 export const VAN_SEATS = 5, LEG = 6;
@@ -44,17 +44,21 @@ export const homeFuel = F => { const t = tripOn(F); return t ? fuelFor(t.town, "
 const fmt = m => `${Math.floor(m/60) % 12 || 12}${m % 60 ? ":" + String(m % 60).padStart(2, "0") : ""}${m < 12*60 ? "am" : "pm"}`;
 const coin = () => icon("coin", 13);
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
-function mapSvg(F, at){
-  const k = new Set(known(F)), st = bbState(F).stamps, show = id => id === "home" || k.has(id);
-  const P = BB_MAP, roads = BB_ROADS.filter(([a, b]) => show(a) && show(b));
+// which page of the map a stop is on (round 148: the Coast Road has its own page)
+export const regionOf = stop => (TOWNS[stop] || {}).region || "vines";
+export const regionsKnown = F => [...new Set(known(F).map(regionOf))];
+function mapSvg(F, at, region = "vines"){
+  const k = new Set(known(F)), st = bbState(F).stamps, P = BB_MAPS[region], show = id => id === "home" || (k.has(id) && P[id]);
+  const roads = BB_ROADS.filter(([a, b]) => show(a) && show(b)), coast = region === "coast";
   const pine = (x, y, s = 1) => `<g><path d="M${x} ${y} v-${6*s}" stroke="#7A5A3A" stroke-width="1.2"/><ellipse cx="${x}" cy="${y - 9*s}" rx="${5*s}" ry="${6*s}" fill="#8FAE7A" stroke="#4A5A3A" stroke-width=".7"/></g>`;
   let h = `<svg class="bbmap" viewBox="0 0 360 240" role="img" aria-label="The road map of Bellbird Valley"><rect width="360" height="240" rx="10" fill="#F6EDD5" stroke="#B9A47A" stroke-width="1.5"/>
-    <path d="M0 190 Q60 160 120 180 T240 170 T360 180 V240 H0z" fill="#E6DDB0" opacity=".7"/><path d="M0 70 Q80 40 150 60 T300 40 T360 50" fill="none" stroke="#C9C08A" stroke-width="8" opacity=".5"/>
+    ${coast ? `<path d="M0 222 Q60 200 120 214 T240 206 T360 200 V240 H0z" fill="#9FC9D9"/><path d="M20 228 q8 -4 16 0 M140 226 q8 -4 16 0 M260 222 q8 -4 16 0" fill="none" stroke="#FFFDF6" stroke-width="1.2"/><path d="M0 214 Q60 192 120 206 T240 198 T360 192" fill="none" stroke="#E8D9A8" stroke-width="5"/>` : `<path d="M0 190 Q60 160 120 180 T240 170 T360 180 V240 H0z" fill="#E6DDB0" opacity=".7"/>`}<path d="M0 70 Q80 40 150 60 T300 40 T360 50" fill="none" stroke="#C9C08A" stroke-width="8" opacity=".5"/>
     ${[[60, 120], [180, 120], [300, 100], [200, 230], [40, 60], [330, 60]].map(([x, y]) => pine(x, y)).join("")}`;
   // the roads to the other regions: signposted, closed for now
-  h += BB_SOON.filter(([from]) => k.has(from)).map(([from, [x, y], label]) => { const [fx, fy] = P[from]; return `<path d="M${fx} ${fy} L${x} ${y}" stroke="#B9A47A" stroke-width="2" stroke-dasharray="2 4" fill="none"/><text x="${x}" y="${y + (y < 30 ? 12 : -4)}" text-anchor="middle" font-size="7.5" fill="#8A7A5A" font-style="italic">${esc(label)} (soon)</text>`; }).join("");
+  if (!coast && k.has("bv_breakwater")) h += `<path d="M${P.bv_gate[0]} ${P.bv_gate[1]} L60 236" stroke="#C9785A" stroke-width="3" stroke-dasharray="5 4" fill="none"/><text x="96" y="234" text-anchor="middle" font-size="7.5" fill="#3B6E8C" font-style="italic">To the Coast Road (next page)</text>`;
+  h += BB_SOON.filter(([from]) => k.has(from) && P[from]).map(([from, [x, y], label]) => { const [fx, fy] = P[from]; return `<path d="M${fx} ${fy} L${x} ${y}" stroke="#B9A47A" stroke-width="2" stroke-dasharray="2 4" fill="none"/><text x="${x}" y="${y + (y < 30 ? 12 : -4)}" text-anchor="middle" font-size="7.5" fill="#8A7A5A" font-style="italic">${esc(label)} (soon)</text>`; }).join("");
   h += roads.map(([a, b]) => `<path d="M${P[a][0]} ${P[a][1]} Q${(P[a][0] + P[b][0])/2 + 8} ${(P[a][1] + P[b][1])/2 - 10} ${P[b][0]} ${P[b][1]}" stroke="#C9785A" stroke-width="3" fill="none" stroke-linecap="round"/>`).join("");
-  h += [...k].map(id => { const [x, y] = P[id], seen = !!st[id], here = at === id;
+  h += [...k].filter(id => P[id]).map(id => { const [x, y] = P[id], seen = !!st[id], here = at === id;
     return `<g><circle cx="${x}" cy="${y}" r="${here ? 9 : 7}" fill="${seen ? "#F3C969" : "#FFFDF6"}" stroke="#5A4636" stroke-width="1.4" ${seen ? "" : 'stroke-dasharray="2 2"'}/>${seen ? `<path d="M${x - 3} ${y} l2 2.4 l4.4 -5" fill="none" stroke="#5A4636" stroke-width="1.4"/>` : `<text x="${x}" y="${y + 3}" text-anchor="middle" font-size="8" font-weight="700" fill="#5A4636">?</text>`}
       <text x="${x}" y="${y + 19}" text-anchor="middle" font-size="9" font-weight="700" fill="#3B3530" font-family="Klee One,serif">${esc(TOWNS[id].n)}</text>${here ? `<text x="${x}" y="${y - 13}" text-anchor="middle" font-size="8" fill="#C9483A">you're here</text>` : ""}</g>`; }).join("");
   h += `<g><circle cx="${P.home[0]}" cy="${P.home[1]}" r="7" fill="#9CC27E" stroke="#5A4636" stroke-width="1.4"/><text x="${P.home[0] + 2}" y="${P.home[1] - 11}" text-anchor="middle" font-size="9" font-weight="700" fill="#3B3530" font-family="Klee One,serif">Honeybrook</text></g></svg>`;
@@ -64,25 +68,27 @@ function mapSvg(F, at){
 export function mapPanel(F, o = {}){
   const t = tripOn(F), at = t && t.by === "van" ? t.town : null, hm = o.hm != null ? o.hm : sgHM(), st = bbState(F);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Bellbird Valley</h2><p class="sub">${at ? `Parked at ${esc(TOWNS[at].n)}. Drive on, or head home.` : "The road map on the dashboard. The valley's an hour down the road: vines, kangaroos, balloons and berries."} Stamps: ${Object.keys(st.stamps).length} of ${STOPS.length}.</p>`;
-  h += mapSvg(F, at) + `<div class="actions"><button class="btn small alt" data-bvpass="1">The passport (${Object.keys(st.stamps).length} stamps)</button></div>`;
+  const regions = regionsKnown(F), region = regions.includes(o.region) ? o.region : at ? regionOf(at) : "vines", inR = id => regionOf(id) === region;
+  if (regions.length > 1) h += `<div class="gchips bbtabs">${["vines", "coast"].filter(r => regions.includes(r)).map(r => `<button class="gchip${r === region ? " on" : ""}" data-bvregion="${r}" aria-pressed="${r === region}">${esc(REGION_N[r])}</button>`).join("")}</div>`;
+  h += mapSvg(F, at, region) + `<div class="actions"><button class="btn small alt" data-bvpass="1">The passport (${Object.keys(st.stamps).length} stamps)</button></div>`;
   if (!at) {
     if (t) return h + `<p class="muted">You're already out on a day trip today.</p>` + shut;
     if (!o.ownsVan) return h + shut;
     const pick = (o.pick || []).filter(id => FAMILY.includes(id)).slice(0, VAN_SEATS - 1);
     h += `<p class="eyebrow" style="margin:10px 0 6px">Who's coming? (${pick.length + 1} of ${VAN_SEATS} seats, you included)</p><div class="gchips">${FAMILY.map(id => `<button class="gchip${pick.includes(id) ? " on" : ""}" data-bvpick="${id}" aria-pressed="${pick.includes(id)}" ${!pick.includes(id) && pick.length >= VAN_SEATS - 1 ? "disabled" : ""}>${esc(nameOf(id))}</button>`).join("")}</div>`;
     if (!canSet(hm)) return h + `<p class="muted">Too ${hm < 7*60 ? "early" : "late"} to set off: day trips leave between 7am and 6pm (and you're home by 10).</p>` + shut;
-    h += `<p class="eyebrow" style="margin:12px 0 6px">Where to?</p><div class="actions bbgo">${known(F).map(s => { const c = fuelFor("home", s, pick); return `<button class="btn small ${F.coins >= c ? "primary" : "alt"}" data-bvgo="${s}" ${F.coins >= c ? "" : "disabled"}>${esc(TOWNS[s].n)} · ${c} ${coin()}</button>`; }).join("")}</div><p class="muted">Fuel: ${LEG} coins a leg, plus 1 for each grown-up passenger. Home by ${fmt(TOWNS.bv_gate.backTo)}.</p>`;
+    h += `<p class="eyebrow" style="margin:12px 0 6px">Where to?</p><div class="actions bbgo">${known(F).filter(inR).map(s => { const c = fuelFor("home", s, pick); return `<button class="btn small ${F.coins >= c ? "primary" : "alt"}" data-bvgo="${s}" ${F.coins >= c ? "" : "disabled"}>${esc(TOWNS[s].n)} · ${c} ${coin()}</button>`; }).join("")}</div><p class="muted">Fuel: ${LEG} coins a leg, plus 1 for each grown-up passenger. Home by ${fmt(TOWNS.bv_gate.backTo)}.</p>`;
     return h + shut;
   }
   if (t.party.length) h += `<p class="muted">With you: ${t.party.map(nameOf).join(", ").replace(/, ([^,]*)$/, " and $1")}.</p>`;
-  const others = known(F).filter(s => s !== at);
+  const others = known(F).filter(s => s !== at && inR(s));
   h += `<p class="eyebrow" style="margin:10px 0 6px">Drive on to</p><div class="actions bbgo">${others.map(s => { const c = fuelFor(at, s, t.party); return `<button class="btn small ${F.coins >= c ? "primary" : "alt"}" data-bvgo="${s}" ${F.coins >= c && hm < TOWNS[s].backTo ? "" : "disabled"}>${esc(TOWNS[s].n)}${stamped(F, s) ? "" : " (new!)"} · ${c} ${coin()}</button>`; }).join("")}</div>`;
   h += `<div class="actions"><button class="btn primary" data-bvhome="1">Drive home to Honeybrook · ${homeFuel(F)} ${coin()}</button></div><p class="muted">Home by ${fmt(TOWNS[at].backTo)} at the latest.</p>`;
   return h + shut;
 }
 // the passport: a stamp for every stop
 export function passportPanel(F){
-  const st = bbState(F).stamps;
-  return `<span class="tape gingham" aria-hidden="true"></span><h2>Bellbird Valley passport</h2><p class="sub">${Object.keys(st).length} of ${STOPS.length} stamps. More of the valley to come: the Coast Road, the Lavender Hills and the Tablelands.</p>
-    <div class="bbstamps">${STOPS.map(s => `<div class="bbstamp${st[s] ? " on" : ""}"><b>${esc(TOWNS[s].n)}</b><small>${st[s] ? `stamped ${esc(st[s])}` : "not yet"}</small></div>`).join("")}</div>` + shut;
+  const st = bbState(F).stamps, page = r => `<h3 class="ph3">${esc(REGION_N[r])}</h3><div class="bbstamps">${STOPS.filter(s => regionOf(s) === r).map(s => `<div class="bbstamp${st[s] ? " on" : ""}"><b>${esc(TOWNS[s].n)}</b><small>${st[s] ? `stamped ${esc(st[s])}` : "not yet"}</small></div>`).join("")}</div>`;
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>Bellbird Valley passport</h2><p class="sub">${Object.keys(st).length} of ${STOPS.length} stamps. More of the valley to come: the Lavender Hills and the Tablelands.</p>
+    ${page("vines")}${page("coast")}` + shut;
 }

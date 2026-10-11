@@ -244,3 +244,5 @@ export function vanRideArt(){
     <circle cx="30" cy="56" r="8" fill="#3A2E28"/><circle cx="86" cy="56" r="8" fill="#3A2E28"/><circle cx="30" cy="56" r="3.4" fill="#FFFDF6"/><circle cx="86" cy="56" r="3.4" fill="#FFFDF6"/></g></svg></div>`;
   return bank + van;
 }
+// round 148: the Coast Road's screens (art/coast.js) share these
+export { C as BBC, lab as bbLab, place as bbPlace, gate as bbGate, gum as bbGum, shed as bbShed, track as bbTrack, fence as bbFence, myVan as bbVan, kombi as bbKombi, caravan as bbCaravan, campChair as bbChair, picnicTable as bbTable, koala as bbKoala, flowers as bbFlowers, rnd as bbRnd };
