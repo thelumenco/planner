@@ -239,5 +239,28 @@ export const LV_ROADS = [["bv_camp", "bv_lavender"], ["bv_lavender", "bv_hilltow
 export const LV_NAMES = {hv_rows: "Lavender Ridge", hv_still: "Lavender Ridge: the farmyard", hm_square: "Montrose", hm_lanes: "Montrose: the lanes",
   hp_street: "Rosehill", hp_garden: "Rosehill: the perfumer's garden", hs_hives: "Sunflower Hill", hs_fields: "Sunflower Hill: the fields",
   hb_bridge: "The Old Bridge", hb_bank: "The Old Bridge: the riverbank", hc_goats: "Chapel Hill", hc_chapel: "Chapel Hill: the chapel"};
-export const LV_GOODS = {};
+// Round 162: what the Lavender Hills' rooms sell (TOWN_GOODS, by room; merged in data/bellbird.js). Sunflower honey
+// goes in the gelato and the bonbons; the lavender itself you pick at Lavender Ridge (game/lvacts.js: bunches, for the
+// mill and the gelato). Your own perfume, Evan's maze certificate and the chapel's little medal are keepsakes you earn.
+export const LV_GOODS = {
+  b_lavoil: {n: "Lavender oil in a blue bottle", kind: "gift", to: ["mum", "mama", "angelina"], price: 9, shop: "bv_hshop", art: ["bottle", "#3E6B8C", "#9A7CC8"], say: "Lavender oil from the still! One drop on the pillow and I'll sleep like a baby."},
+  b_lavbags: {n: "Little lavender bags", kind: "gift", to: "family", price: 4, shop: "bv_hshop", art: ["bag", "#E6DCF3", "#9A7CC8"], say: "Lavender bags for the drawers! Everything's going to smell like Provence."},
+  b_lavbunch: {n: "A dried lavender bunch", kind: "keepsake", price: 5, shop: "bv_hstill", art: ["sticks", "#9A7CC8"], line: "A bunch of lavender from Lavender Ridge, tied with raffia, hung upside down to dry. The whole room smells of it."},
+  b_fougasse: {n: "A fougasse", kind: "gift", to: "family", price: 4, shop: "bv_hboul", art: ["loaf", "#D9A05A"], say: "A fougasse! Bread shaped like a leaf, with olives and rosemary. Tear and share. Or don't share."},
+  b_nougat: {n: "A slab of nougat", kind: "gift", to: ["mama", "darren", "gonggong", "evan"], price: 6, shop: "bv_hnougat", art: ["box", "#FFFDF6", "#D9A05A"], say: "White nougat with almonds and lavender honey! Chewy. Gooey. Gone."},
+  b_calissons: {n: "A box of calissons", kind: "gift", to: ["mum", "angelina", "dad"], price: 8, shop: "bv_hnougat", art: ["box", "#F3E7B0", "#C8643B"], say: "Calissons! Little diamond sweets of almond and melon, iced white. So pretty I almost can't eat them. Almost."},
+  b_savon: {n: "A block of Provence soap", kind: "gift", to: "family", price: 5, shop: "bv_hsavon", art: ["soap", "#E6DCF3"], say: "Real olive oil soap from Rosehill, with lavender! It's stamped and everything."},
+  b_soapstamp: {n: "A wooden soap stamp", kind: "keepsake", price: 9, shop: "bv_hsavon", art: ["sticks", "#B98A5E"], line: "An old wooden soap stamp from the soap maker at Rosehill, carved with a little sprig of lavender. Mel stamps her own soaps with it now."},
+  b_glassbird: {n: "A blown-glass bird", kind: "keepsake", price: 14, shop: "bv_hglass", art: ["bird", "#9FD3C2"], line: "A little blue-green bird blown from glass by Luc at Rosehill. It catches the morning light on the windowsill."},
+  b_scentbottle: {n: "A tiny glass scent bottle", kind: "gift", to: ["angelina", "mum", "mama"], price: 10, shop: "bv_hglass", art: ["bottle", "#B79BDC", "#F3C969"], say: "A tiny glass bottle, hand-blown, with a glass stopper like a flower! For perfume. Or just for looking at."},
+  honey_sun: {n: "Sunflower honey", kind: "ingredient", price: 7, sell: 4, shop: "bv_hhoney", art: ["jar", "#E3B04B", "#F3C93A"], what: "golden and creamy, from Sunflower Hill: for gelato and bonbons"},
+  b_honeypot: {n: "A pot of honey with a dipper", kind: "gift", to: "family", price: 8, shop: "bv_hhoney", art: ["jar", "#F3D98A", "#8A6A42"], say: "Honey with a little wooden dipper! Drizzle, drizzle. On toast. On everything."},
+  b_candle: {n: "A beeswax candle", kind: "gift", to: ["mum", "mama", "angelina", "gonggong"], price: 6, shop: "bv_hcandle", art: ["candle", "#F3D98A"], say: "A beeswax candle! It smells like honey when it burns. For the dinner table."},
+  b_tapenade: {n: "A jar of tapenade", kind: "gift", to: ["dad", "darren", "gonggong", "marcus"], price: 6, shop: "bv_hepicerie", art: ["jar", "#4A4A3A", "#9DAF6A"], say: "Tapenade! Olives, capers, a bit of anchovy. On a cracker with a glass of something. Bliss."},
+  b_picnic: {n: "A little picnic basket", kind: "keepsake", price: 15, shop: "bv_hepicerie", art: ["tote", "#C9A06A"], line: "A wicker picnic basket from the épicerie by the Old Bridge, with a gingham lining. For every picnic from now on."},
+  b_chevre: {n: "A goat's cheese in a chestnut leaf", kind: "gift", to: ["dad", "mama", "gonggong", "darren", "angelina"], price: 7, shop: "bv_hfromage", art: ["wheel", "#FFF8EC", "#7A5A3A"], say: "A little goat's cheese wrapped in a chestnut leaf and tied with raffia! Like a present. It is a present."},
+  b_myperfume: {n: "Your own perfume", kind: "keepsake", price: 0, art: ["bottle", "#E8A0B4", "#F3C969"], line: "A little bottle of the perfume you blended yourself at the perfumery in Rosehill, with your own name for it on the label in the perfumer's handwriting."},
+  b_mazecert: {n: "Evan's sunflower maze certificate", kind: "keepsake", price: 0, art: ["tile", "#F3C93A", "#5E8A3A"], line: "A certificate from Sunflower Hill: Evan found the middle of the sunflower maze, with a sunflower stamp and Odile's signature."},
+  b_bellmedal: {n: "A little chapel bell", kind: "keepsake", price: 0, art: ["bell", "#C9A24A"], line: "A tiny brass bell from the chapel of Saint Anne on Chapel Hill, for ringing the bell at sunset. It tinkles when the door opens."}
+};
 export const LV_KEEP = {};
