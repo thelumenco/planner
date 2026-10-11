@@ -3472,6 +3472,42 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#actors .npc[data-npc="mama"].act-rummage').count() === 1, "Ma Ma rummaging in the op shop");
   await page.close();
 }
+{
+  console.log("\nThe terrace and the Sunday long lunch (round 146)");
+  const lu = await import(new URL("../src/game/lunch.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
+  const sun = "2026-10-11", ids = new Set(np.NPCS.map(n => n.id)), bk = lu.bookingsFor(sun), seats = lu.seatsTaken(bk);
+  check(lu.lunchOn(sun) && !lu.lunchOn("2026-10-12") && lu.nextSunday("2026-10-14") === "2026-10-18" && lu.nextSunday(sun) === sun, "every Sunday; the book shows the coming one");
+  check(seats >= 9 && seats <= lu.LUNCH.seats && bk.filter(b => b.family).length === 1 && bk.every(b => b.ids.every(id => ids.has(id))) && new Set(bk.flatMap(b => b.ids)).size === seats, "nine to twelve booked, one lot of the family, no one twice");
+  const fams = ["2026-10-11", "2026-10-18", "2026-10-25"].map(d => lu.bookingsFor(d).find(b => b.family).ids.join()); check(new Set(fams).size === 3, "a different pair of the family each week");
+  check(lu.bookOpen("2026-10-12").list.length < lu.bookOpen("2026-10-17").list.length && lu.bookOpen("2026-10-17").list.length === lu.bookingsFor("2026-10-18").length, "the book fills up through the week");
+  const g = bk.find(b => !b.family), sl = lu.lunchSlot(g.ids[0], sun, 12*60 + 45, true);
+  check(sl && sl.scene === "terrace" && sl.act === "sit" && !lu.lunchSlot(g.ids[0], sun, 12*60 + 45, false) && !lu.lunchSlot(g.ids[0], sun, 15*60 + 5, true), "booked guests sit at the long table 12 to 3 (once there's a terrace)");
+  const mm = lu.bookingsFor("2026-10-25").find(b => b.ids.includes("mama")); check(!mm || mm.at >= 13*60, "Ma Ma comes after her market stall shuts");
+  // sales: a pair gets through about a bottle an hour, the dearer ones more
+  const F = {coins: 0, inv: {}, vine: {terrace: true}}; const v = vy.vineState(F); v.shelf = [{id: "a", name: "House red", type: "red", n: 40, price: 18, open: 0}, {id: "b", name: "Reserva", type: "tempranillo", n: 40, price: 28, open: 0}];
+  const realNow = Date.now, t0 = Date.parse("2026-10-11T07:00:00Z"); Date.now = () => t0; v.lastTick = t0 - 180*60000; const out = vy.sellTick(F, {}); Date.now = realNow;
+  check(out && out.lunchB >= 6 && out.lunchB <= 30 && v.today.lunchB === out.lunchB, `three hours of lunch: ${out && out.lunchB} bottles to the table`);
+  check(80 - v.shelf.reduce((n, x) => n + x.n, 0) >= out.lunchB, "the bottles come off the shelves");
+  // in the browser: through the glass doors, the book, the long table, and back
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`terrace pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/terr=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.vine = f.vine || {}; f.vine.terrace = true;
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=12:40&date=2026-10-11"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=12:40&date=2026-10-11&terr=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1000);
+  await page.locator('#world [data-spot="tdoor"]').dispatchEvent("click"); await page.waitForFunction(() => /terrace/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(2500);
+  check(await page.locator("#world .billow").count() === 3 && await page.locator("#world .tcurtain").count() === 4, "out through the glass doors: canvas sails billowing, curtains swaying");
+  check(await page.locator("#actors .npc.act-sit").count() >= 9, "Sunday lunch: the long table's full");
+  await page.locator('#world [data-tspot="book"]').dispatchEvent("click"); await page.waitForSelector("#ctx .lunchbook", { timeout: 20000 });
+  check(/seats booked/.test(await page.locator("#ctx").innerText()), "the bookings book on its lectern");
+  await page.click('#ctx [data-close]'); await page.locator('#world [data-exit="vineyard"]').dispatchEvent("click"); await page.waitForTimeout(4000);
+  check(/vineyard/i.test(await page.locator("#sceneName").textContent()) || await page.locator('#world [data-place="terrace"]').count() === 1, "down the steps to the vineyard");
+  await page.locator('#world [data-place="terrace"]').dispatchEvent("click"); await page.waitForFunction(() => /terrace/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }).catch(() => {});
+  check(/terrace/i.test(await page.locator("#sceneName").textContent()), "and back up by tapping the little terrace");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

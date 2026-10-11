@@ -918,3 +918,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .bbmallow{display:flex;justify-content:center;margin:10px 0}.bbmallow span{width:34px;height:26px;border-radius:9px;border:1.5px solid #2F2B28;background:#FFFDF6;transition:background .3s}
 .bbmallow .h1{background:#FBF1D8}.bbmallow .h2{background:#F3D9A0}.bbmallow .h3{background:#D9A05A}.bbmallow .h4{background:#3A2E28}
 .bbstamp.on{border-style:solid;border-color:#C9483A;color:#2F2B28;background:#FFF6E8;transform:rotate(-1.5deg)}
+/* round 146: the terrace: canvas sails billowing overhead, linen curtains swaying on the posts; the bookings book */
+.map .billow{transform-box:fill-box;transform-origin:50% 0;animation:billow 5.5s ease-in-out infinite alternate}
+@keyframes billow{0%{transform:scaleY(1) skewX(0)}50%{transform:scaleY(1.08) skewX(-1.5deg)}100%{transform:scaleY(.96) skewX(1.5deg)}}
+.map .tcurtain{animation:tsway 4.2s ease-in-out infinite alternate}
+@keyframes tsway{from{transform:rotate(-3deg) skewY(1deg)}to{transform:rotate(4deg) skewY(-1deg)}}
+.lunchbook li{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:baseline}.lunchbook li small{grid-column:2;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.map .billow,.map .tcurtain{animation:none}}

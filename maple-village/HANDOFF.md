@@ -2097,3 +2097,20 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Also added:** grape colours, grape items, gelato ingredients, loft grapes, bonbon wine fillings and wine-name ideas.
 - **Marco's barrel fill priority:** Tempranillo, then Pinot, then Chardonnay, then red, then white.
 - **Kel's own bottles:** now 26 (Pinot) and 24 (Chardonnay), above what Mel's sell for.
+
+### Round 146: the terrace screen, and the Sunday long lunch (bookings book)
+- **The terrace scene (`terrace`):** a VILLAGE building on the vineyard (door [490,226]), not INNER. Art is art/terrace.js.
+  - It needs `F.vine.terrace` (bought at the vineyard stall).
+  - Three ways in: tap the little terrace on the vineyard (`data-place="terrace"`), use the wine shop's glass doors (station `tdoor`, pos G bottom-right, art "glassdoor"), or walk up the steps.
+  - Two ways out: the glass doors on the terrace's left wall (`data-exit="1"`, back to the wine shop), or the steps at the bottom (`data-exit="vineyard"`, and walking off the bottom).
+  - Bounds and obstacles live in towns.js (`TOWN_BOUNDS.terrace`, `TOWN_OBST.terrace`).
+  - What's drawn: a Provence view (lavender rows, cypresses, olives, a stone mas), a pergola with wisteria and festoon lights, three canvas sails (`.billow`), four linen curtains on the posts (`.tcurtain`), and a long table down the middle with 6 chairs a side. The table is laid on Sundays 11:30–3:30.
+  - Spots (`data-tspot`): book (lectern), table, view.
+  - Music: a live track called "terrace".
+- **Sunday long lunch (game/lunch.js):** every Sunday 12–3 once the terrace is built.
+  - `bookingsFor(sunday)` books 9–11 seats from `PARTIES` (villagers, tourists and families, no market stall keepers), sometimes a birthday, plus one family pair rotating weekly (Ma Ma and Gong Gong arrive at 1:15, after the market).
+  - The bookings book (station `bkbook` on the wine shop counter, and the terrace lectern) shows next Sunday, filling up Monday to Saturday (`bookOpen`). It also gives a rough bottle estimate against shelf stock.
+  - Guests sit at `SEATS` via `lunchSlot` in npcs `slotAt` (right after the trip and SUP slots).
+- **Sales (vineyard.js sellTick):** seated guests order whole bottles at about seated/2 per hour, weighted to dearer bottles (price^1.5), plus plates.
+  - Mel on the terrace counts as hosting (`opts.lunch`): orders run 1.5 times faster, 15% tips, and the money is paid to her.
+  - The day is tracked in `v.today.lunchB` and `lunchP`. Mel gets a flash on the terrace, a line in the 10pm closing report, and a day-list nudge with the booked count.

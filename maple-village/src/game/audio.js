@@ -91,6 +91,10 @@ export const TRACKS = {
   // a lilting 6/8 like a Ligurian folk song
   cinque: {name: "Mandolin on the harbour", live: true, bpm: 96, steps: 6, tone: "guitar", arp: [1, 3, 5, 3, 4, 2], arpVel: .05, mel: .7, up: 12,
     bars: [[38, 50, 57, 62, 66, 69], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 69, 73], [38, 50, 57, 62, 66, 69], [47, 59, 62, 66, 71, 74], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 67, 69], [38, 50, 57, 62, 66, 74]]},
+  // Round 146: the wine shop's terrace: a lazy Provençal waltz, an accordion-ish rhodes and a guitar under canvas
+  terrace: {name: "Long lunch under the canvas", live: true, bpm: 88, steps: 6, tone: "rhodes", strum: [0], arp: [1, 3, 5, 4, 3, 2], arpVel: .045, mel: .65,
+    bars: [[45, 57, 60, 64, 69], [50, 57, 62, 65, 69], [43, 55, 59, 62, 67], [48, 55, 60, 64, 67], [41, 53, 57, 60, 65], [46, 53, 58, 62, 65], [40, 52, 56, 59, 64], [45, 57, 60, 64, 72]],
+    lines: [[[0, 76], [2, 74], [4, 72]], [[0, 74], [3, 77]], [[0, 71], [2, 72], [4, 74]], [[0, 76], [3, 72]], [[0, 69], [2, 72], [4, 77]], [[0, 74], [3, 70]], [[0, 71], [2, 68], [4, 71]], [[0, 69], [3, 64]]]},
   // Round 142: Bellbird Valley (the Vines), live everywhere, every stop and every room its own
   // Valley Gate: a front-porch acoustic guitar in G, easy and open, with bellbird pings up top
   bb_vines: {name: "Down the valley road", live: true, bpm: 92, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 3, 2, 4, 3, 5, 4, 2], arpVel: .048, mel: .7,

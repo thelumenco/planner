@@ -500,6 +500,8 @@ export const TOWN_OBST = {
   rd_bridge: [[0, 0, 268, 214], [352, 0, 520, 214], [24, 292, 206, 420], [300, 470, 360, 560], [0, 214, 200, 252]],
   rd_old: [[0, 0, 90, 104], [160, 0, 520, 104], [26, 150, 176, 262], [326, 128, 500, 244], [26, 330, 156, 444], [300, 324, 472, 420], [36, 500, 196, 580], [270, 590, 392, 640]]
 };
+// round 146: the wine shop's terrace isn't a town, but it walks like one of their rooms (bounds, the long table)
+TOWN_BOUNDS.terrace = [52, 226, 470, 612]; TOWN_OBST.terrace = [[236, 300, 284, 580], [400, 280, 472, 340], [424, 520, 472, 592], [62, 330, 92, 372], [196, 320, 226, 578], [294, 320, 324, 578]];
 Object.assign(TOWN_PLACES, BB_PLACES); Object.assign(TOWN_BRIDGES, BB_BRIDGES); Object.assign(TOWN_ARRIVE, BB_ARRIVE); Object.assign(TOWN_BOUNDS, BB_BOUNDS); Object.assign(TOWN_OBST, BB_OBST);   // Bellbird Valley
 
 // Ronda's goods (round 107, round 3): things you can't get in Honeybrook. kind ingredient: they go to the kitchen

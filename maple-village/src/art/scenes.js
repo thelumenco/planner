@@ -370,6 +370,12 @@ export function furn(kind, x, y){
     // the home office door on the living room's west wall, below Mel's
     case "officedoor": return sk(`<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:#9CC27E"/><path d="M${x-36} ${y-80} l20 6 v12 l-20 -6z" style="fill:#FFFDF6"/>`,
       `<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z"/><circle cx="${x-17}" cy="${y-42}" r="1.8"/><path d="M${x-36} ${y-80} l20 6 v12 l-20 -6z"/><path d="M${x-32} ${y-74} h10" opacity=".6"/>`);
+    // round 146: the glass doors out to the terrace (bottom of the east wall), and the bookings book on the counter's end
+    case "glassdoor": { const on = !!((G.F().vine || {}).terrace);
+      return sk(`<path d="M${x+40} ${y-96} L${x+12} ${y-84} L${x+12} ${y+12} L${x+40} ${y+22}z" style="fill:${on ? "#CFE3EA" : "#E8D9C0"}" opacity=".9"/><path d="M${x+26} ${y-90} V${y+17} M${x+12} ${y-36} L${x+40} ${y-44}" style="stroke:#FFFDF6" stroke-width="2.4"/><path d="M${x+16} ${y-70} l8 -4 M${x+16} ${y-56} l12 -6" style="stroke:#FFFFFF" stroke-width="1.6" opacity=".8"/>${on ? `<path d="M${x+30} ${y-30} q4 -10 8 -2" style="fill:none;stroke:#9CC27E" stroke-width="3"/>` : ""}`,
+        `<path d="M${x+40} ${y-96} L${x+12} ${y-84} L${x+12} ${y+12} L${x+40} ${y+22}z"/>`); }
+    case "bookingbook": return sk(`<path d="M${x-12} ${y-10} q6 -4 12 0 q6 -4 12 0 v10 q-6 -4 -12 0 q-6 -4 -12 0z" style="fill:#FFFDF6"/><path d="M${x} ${y-10} v10" style="stroke:#8E2C48" stroke-width="1"/><path d="M${x-9} ${y-6} h6 M${x+3} ${y-6} h6 M${x-9} ${y-3} h5" style="stroke:#B9B0A4" stroke-width=".8"/><path d="M${x+11} ${y-12} l3 8" style="stroke:#8E2C48" stroke-width="1.6"/>`,
+        `<path d="M${x-12} ${y-10} q6 -4 12 0 q6 -4 12 0 v10 q-6 -4 -12 0 q-6 -4 -12 0z"/>`);
     case "cellardoor": { const built = !!((G.F().goals || {}).cellar);
       return sk(`<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:${built ? "#6B3A2A" : "#E8D9C0"}"/>${built ? `<path d="M${x-36} ${y-80} q8 -10 18 -4 v12 l-18 -4z" style="fill:#F3C969"/>` : `<rect x="${x-38}" y="${y-62}" width="24" height="14" transform="rotate(-4 ${x-26} ${y-55})" style="fill:#FFFDF6"/>`}`,
         `<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" ${built ? "" : `stroke-dasharray="4 4"`}/>${built ? `<circle cx="${x-17}" cy="${y-42}" r="1.8"/>` : `<path d="M${x-34} ${y-56} h14" opacity=".6"/>`}`); }

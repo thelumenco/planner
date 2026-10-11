@@ -39,6 +39,7 @@ export const VILLAGE = {
   toBaseV:{scene:"vineyard", name:"Gate home", door:[22,300], spot:true, bridge:"base", mark:[30,250], line:"Back over the footbridge, home."},
   toLaneV:{scene:"vineyard", name:"Path to Makers' Lane", door:[290,16], spot:true, bridge:"lane", mark:[330,40], line:"Up the path to Makers' Lane."},
   wineshop:{scene:"vineyard", name:"Wine shop", short:"the wine shop", door:[390,222], mark:[390,96]},
+  terrace:{scene:"vineyard", name:"The terrace", short:"the terrace", door:[490,226]},   // round 146: the wine shop's alfresco terrace (once it's built)
   barrels:{scene:"vineyard", name:"Barrel shed", door:[112,238], spot:true, mark:[112,130], line:"The barrel shed. Grapes go in, wine comes out. Eventually."},
   vinestall:{scene:"vineyard", name:"Vineyard stall", door:[90,452], spot:true, line:"Cuttings, trellises and barrels."},
   pswing: {scene:"vineyard", name:"Swings", door:[110,594], spot:true, line:"The swings. Wheee!"},
@@ -315,7 +316,9 @@ export const ROOMS = {
     ["counter","Counter","C","bankcounter",null,"Opal's counter. Your passbook's here.",30]]},
   // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
   // and the tasting room's little tables
-  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,238], C:[330,318], H:[206,318], T:[340,520], K:[480,390], M:[465,128], Z:[40,400]}, stations:[
+  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,238], C:[330,318], H:[206,318], T:[340,520], K:[480,390], M:[465,128], Z:[40,400], G:[480,556], B:[446,300]}, stations:[
+    ["tdoor","Terrace","G","glassdoor",null,"The glass doors out to the terrace.",0],
+    ["bkbook","Bookings book","B","bookingbook",null,"The bookings book for the Sunday long lunch.",30],
     ["menu","Menu","M","chalkmenu",null,"The chalkboard: today's menu.",44],
     ["kdoor","Kitchen","K","kitchendoor",null,"Into the kitchen.",0],
     ["cdoor","Cellar door","Z","cellardoor",null,"The cellar door: barrel racks, a tasting bar and your wine wall.",0],
