@@ -460,9 +460,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(300);
   await page.locator('#world [data-place="news"]').dispatchEvent("click");
   await page.waitForFunction(() => /Good news/.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
-  check(await page.locator('#ctx [data-newstab="wins"][aria-selected="true"]').count() === 1 && await page.locator("#ctx .hlist.gnews.world").count() === 0, "the good news board opens on your wins, in tabs");
+  check(await page.locator('#ctx [data-newstab="wins"][aria-selected="true"]').count() === 1 && await page.locator("#ctx .hlist.gnews.world").count() === 0 && await page.locator("#ctx").textContent().then(t => /Chord added 2 studios/.test(t)), "the good news board opens on your wins, in tabs");
   await page.click('#ctx [data-newstab="news"]');
-  check(await page.locator("#ctx .hlist.gnews.world li").count() === 1 && await page.locator("#ctx").textContent().then(t => /Chord added 2 studios/.test(t)), "the good news board shows the world's good news and your wins");
+  check(await page.locator("#ctx .hlist.gnews.world li").count() === 1, "the good news board shows the world's good news on its own tab");
   await page.click('#ctx [data-newstab="events"]');
   { const t = await page.locator("#ctx").textContent();
     check(/Night market/.test(t) && /Night market, 5:30pm to 10pm/.test(t) && /Sunday farmers market/.test(t) && /Deepavali/.test(t) && /Family dinner at/.test(t), "the good news board pins up the village calendar: markets, the night market, family dinners and festivals coming up"); }
@@ -3415,11 +3415,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
   const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), ba = await import(new URL("../src/game/bbacts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
   const kt = await import(new URL("../src/game/kitchen.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
-  const stops = bb.STOPS, T = tw.TOWNS;
+  const stops = bb.STOPS.filter(id => bb.regionOf(id) === "vines"), T = tw.TOWNS;
   check(stops.length === 6 && stops.every(id => T[id].by === "van" && T[id].screens.length === 2 && Object.keys(T[id].rooms).length === 3), "six Vines stops, two screens and three rooms each");
   check(stops.every(id => Object.values(T[id].rooms).every(r => tw.TOWN_PLACES[r.door] && tw.TOWN_BOUNDS[Object.keys(T[id].rooms).find(k => T[id].rooms[k] === r)])), "every room has a door outside and walls inside");
   const allRooms = stops.flatMap(id => Object.keys(T[id].rooms)), mus = new Set([...stops.map(id => T[id].music), ...allRooms.map(r => T[stops.find(id => T[id].rooms[r])].rooms[r].music)]);
-  check(mus.size === 24, "24 tunes: one for every stop and every room");
+  check(mus.size === 24 && new Set(bb.STOPS.flatMap(id => [tw.TOWNS[id].music, ...Object.values(tw.TOWNS[id].rooms).map(r => r.music)])).size === 48, "24 tunes: one for every stop and every room");
   const F0 = {coins: 100, inv: {}}; check(bb.known(F0).join() === "bv_gate" && bb.fuelFor("home", "bv_gate", ["evan", "mum"]) === 7 && bb.setOff(F0, "bv_gate", ["mum", "evan"], 8*60) && F0.coins === 93 && bb.stamped(F0, "bv_gate"), "the van: only Valley Gate on the map at first; 6 a leg plus 1 a grown-up, and a stamp");
   check(bb.known(F0).includes("bv_lookout") && bb.known(F0).includes("bv_creek") && !bb.known(F0).includes("bv_camp"), "the map reveals the stops a road away");
   // rooms, goods, specials
@@ -3475,6 +3475,59 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await fox().then(f => f.inv.wattleseed === 1), "a jar of wattleseed from Mrs Dunn's shelves");
   await page.evaluate(() => window.__mapleScene("bv_opshop")); await page.waitForTimeout(6000);
   check(await page.locator('#actors .npc[data-npc="mama"].act-rummage').count() === 1, "Ma Ma rummaging in the op shop");
+  await page.close();
+}
+{
+  console.log("\nThe Coast Road (rounds 148-150)");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
+  const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), ca = await import(new URL("../src/game/cracts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
+  const kt = await import(new URL("../src/game/kitchen.js", import.meta.url)), T = tw.TOWNS, stops = bb.STOPS.filter(id => bb.regionOf(id) === "coast");
+  check(stops.length === 6 && stops.every(id => T[id].by === "van" && T[id].screens.length === 2 && Object.keys(T[id].rooms).length === 3), "six Coast Road stops, two screens and three rooms each");
+  check(stops.every(id => T[id].screens.some(s => /sea|surf|wave|beach|cove|wharf|mouth|cliff/.test(JSON.stringify(T[id].say) + s))), "the sea at every stop");
+  check(stops.every(id => Object.values(T[id].rooms).every(r => tw.TOWN_PLACES[r.door])), "every coast room has a door outside");
+  const goods = Object.values(tw.TOWN_GOODS).filter(g => stops.some(id => Object.keys(T[id].rooms).includes(g.shop)));
+  check(goods.length >= 15 && goods.every(g => !g.sell || g.sell <= g.price), "the coast's shops, and nothing sells back for more than it costs");
+  check(["crayroll", "scalloppie", "spsquid"].every(id => kt.TAPAS[id] && kt.TAPAS[id].special === "coast"), "three Coast Road specials at the stove");
+  // the people: two to four in the rooms at busy times, neighbours at the caravan park
+  const cr = np.NPCS.filter(n => /^cr/.test(n.id)), rooms = stops.flatMap(id => Object.keys(T[id].rooms));
+  check(cr.length >= 30 && cr.every(n => n.local === "bellbird") && cr.filter(n => n.neighbour).length >= 6 && new Set(np.NPCS.map(n => n.id)).size === np.NPCS.length, "the Coast Road's people, the travelling neighbours, and no one twice");
+  check(rooms.filter(r => cr.some(n => n.routine.some(sl => sl.scene === r))).length >= 15, "people in the coast rooms");
+  // the family: new acts at every stop, never repeated, none from any earlier town (the Vines included)
+  const old = new Set([...["ronda", "kyoto", "jeju", "cinque"], ...bb.STOPS.filter(id => bb.regionOf(id) === "vines")].flatMap(t => Object.values(T[t].acts || {}).flatMap(a => Object.values(a).map(x => x.act))));
+  const mine = stops.flatMap(id => Object.values(T[id].acts).flatMap(a => Object.values(a).map(x => x.act)));
+  check(mine.length >= 12 && new Set(mine).size === mine.length && mine.every(a => !old.has(a)) && stops.every(id => Object.keys(T[id].acts).length >= 2), "the family: new things at every coast stop, all different, none from any earlier town");
+  // the activities
+  const F = {coins: 200, inv: {}, bellbird: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
+  const sf = ca.surfStart(); while (!ca.surfDone(sf)) { ca.surfDo(sf, "paddle"); ca.surfDo(sf, "paddle"); ca.surfDo(sf, "paddle"); ca.surfDo(sf, "pop"); }
+  check(sf.rides === 5 && ca.surfCost(true) === 20 && ca.finishSurf(F, sf, add) && F.inv.b_surfphoto === 1 && !ca.finishSurf(F, sf, add), "a surf lesson: pop up as the wave peaks; a photo of your first wave");
+  const early = ca.surfStart(); ca.surfDo(early, "pop"); const late = ca.surfStart(); [1, 2, 3, 4].forEach(() => ca.surfDo(late, "paddle")); check(early.last === "early" && late.last === "dumped", "too soon and it rolls past; too late and it dumps you");
+  check(ca.whaleSeason("2026-10-12") && !ca.whaleSeason("2026-01-12") && ca.whaleStart("2026-01-12").whales === false, "humpbacks May to November, dolphins the rest of the year");
+  let wr = 0; const wh = ca.whaleStart("2026-10-12", () => (wr = (wr + .37) % 1)); wh.at.forEach(i => ca.whaleLook(wh, i)); check(ca.whaleDone(wh) && wh.seen.length === 3 && ca.finishWhales(F, wh, add) && F.inv.b_whalecard === 1, "whales from the lighthouse balcony, and Win's sighting card");
+  const gl = ca.glowStart(() => .5); check(!ca.glowOpen(17*60) && ca.glowOpen(18*60) && ca.glowCount(gl, 0) === null, "glow-worms from 6pm, and only once your eyes have adjusted");
+  [0, 1, 2].forEach(() => ca.glowWait(gl)); gl.lit.forEach((_, i) => ca.glowCount(gl, i)); check(ca.glowDone(gl) && ca.finishGlow(F, gl).n === ca.glowTotal(gl) && F.bellbird.glow > 0, "counting the glow-worms");
+  const pt = ca.potsStart(() => .5); while (!ca.potsDone(pt)) { const p = ca.potHaul(pt); if (p && p.what !== "empty") ca.potChoose(pt, ca.potKeepable(p)); }
+  check(pt.right === pt.pots.filter(p => p.what !== "empty").length && ca.finishPots(F, pt, add) === 2 && F.inv.crayfish === 2 && ca.finishPots(F, pt, add) === 0, "cray pots with Mags: keep the big ones, back with the small and the berried; two crays, once a day");
+  check(!ca.potKeepable({what: "berried", mm: 130}) && !ca.potKeepable({what: "cray", mm: 90}) && ca.potKeepable({what: "cray", mm: 110}), "the gauge, and the mums with eggs go back");
+  const pg = ca.pengStart(true, () => .1); while (!ca.pengDone(pg)) ca.pengDo(pg, pg.squeal[pg.round] ? "shush" : "still", () => .5); check(!ca.pengOpen(17*60) && ca.pengOpen(18*60 + 30) && pg.fright === 0 && ca.finishPeng(F, pg) === pg.here && pg.here > 0, "the penguin parade at dusk: stay still, and shush Evan in time");
+  const nip = ca.nipStart(() => .1); while (!ca.nipDone(nip)) ca.nipDo(nip, nip.wave[nip.leg] ? "duck" : "cheer"); const nr = ca.finishNip(F, nip, add);
+  check(nr.place === 1 && nr.medal && F.inv.b_nipmedal === 1 && !ca.finishNip(F, nip, add).medal, "Nippers: Evan wins, and his first medal");
+  // in the browser: the family at Breakwater, Jet's surf lesson
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`coast pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/crv=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = {...(f.goals || {}), van: true}; f.coins = 300;
+    f.bellbird = {stamps: {bv_gate: "2026-10-01"}}; f.trip = {town: "bv_breakwater", day: "2026-10-12", party: ["mum", "marcus", "evan"], from: 7*60, by: "van"};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&crv=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("cw_beach")); await page.waitForTimeout(7000);
+  check(await page.locator('#actors .npc[data-npc="marcus"].act-bodyboard').count() === 1 && await page.locator('#actors .npc[data-npc="mum"].act-yoga').count() === 1 && await page.locator('#actors .npc[data-npc="crjet"]').count() === 1, "Breakwater: Marcus with his bodyboard, Mum's beach yoga, and Jet teaching");
+  await page.evaluate(() => window.__mapleScene("bv_surfshop")); await page.waitForTimeout(900);
+  await page.locator('#world [data-rdspot="bv_surfshop"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bba="open:surf"]', { timeout: 20000 });
+  await page.click('#ctx [data-bba="open:surf"]'); await page.click('#ctx [data-bba="surf"]'); await page.waitForTimeout(300);
+  for (let w = 0; w < 5; w++) { for (let i = 0; i < 3; i++) await page.click('#ctx [data-bba="spaddle"]'); await page.click('#ctx [data-bba="popup"]'); }
+  await page.click('#ctx [data-bba="surfed"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.coins === 280 && f.inv.b_surfphoto === 1 && f.bellbird.surfs === 1), "a surf lesson with Jet (20 with Evan), five waves ridden, and the photo");
   await page.close();
 }
 {

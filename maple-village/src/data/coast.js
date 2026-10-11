@@ -25,7 +25,10 @@ export const CR_TOWNS = {
     evanScreen: {cw_beach: ["sand! sand everywhere!", "a surfboard! standing up!"], cw_street: ["chips! I smell chips!", "a seagull took that man's chip!"]},
     hints: {cw_beach: "Breakwater: the surf beach, the surf shop and the van. East: the main street.", cw_street: "The main street: fish and chips, the bakery, the Norfolk pines and the esplanade. West: back to the beach."},
     spots: famSpots({cw_beach: [[250, 420], [330, 400], [220, 480], [380, 330], [180, 400], [300, 470]], cw_street: [[220, 380], [320, 400], [260, 450], [180, 330], [380, 340], [300, 330]]}),
-    acts: {}, rooms: {
+    acts: {   // round 150: what the family does here (and nowhere else)
+      marcus: {cw_beach: {act: "bodyboard", at: [220, 300], dir: 1}},
+      mum: {cw_beach: {act: "yoga", at: [96, 400], dir: 1, hours: [[7*60, 11*60], [16*60, 18*60 + 30]]}}
+    }, rooms: {
       bv_surfshop: room("bvsurfshop", "Swell Surf Shop", "The surf shop: boards in racks to the ceiling, wetsuits on hangers, a wall of photos of big waves, and a dog asleep on a pile of towels."),
       bv_chippy: room("bvchippy", "The Golden Gull", "The fish and chip shop: a hissing fryer, a chalkboard of today's catch, butcher's paper, and salt and vinegar on every table."),
       bv_bakery: room("bvbakery", "Crumb & Co. bakery", "The bakery: pies in the warmer, vanilla slices, cinnamon scrolls, and a queue of sandy surfers out the door.")},
@@ -50,7 +53,10 @@ export const CR_TOWNS = {
     evanScreen: {cl_light: ["the lighthouse has a red hat!", "a little house!"], cl_cliff: ["the sea is way down there!", "is that a whale? IS IT?"]},
     hints: {cl_light: "Lighthouse Point: the lighthouse, the keeper's cottage tearoom and the van. South: the cliff walk.", cl_cliff: "The cliff walk: the whale lookout, the heath and the gift shop. North: back to the lighthouse."},
     spots: famSpots({cl_light: [[260, 420], [320, 470], [220, 380], [300, 340], [380, 430], [200, 470]], cl_cliff: [[200, 380], [260, 440], [180, 300], [300, 300], [220, 520], [280, 560]]}),
-    acts: {}, rooms: {
+    acts: {
+      gonggong: {cl_cliff: {act: "telescope", at: [262, 372], dir: 1}},
+      angelina: {cl_light: {act: "paint", at: [240, 430], dir: 1}}
+    }, rooms: {
       bv_lighthouse: room("bvlighthouse", "Inside the lighthouse", "Inside the lighthouse: a spiral of iron stairs going up and up, round windows, and at the top the great glass lens and a balcony right round."),
       bv_tearoom: room("bvtearoom", "The keeper's cottage tearoom", "The keeper's cottage, now a tearoom: lace curtains, a ship in a bottle, scones on the dresser, and the old logbooks on a shelf."),
       bv_giftshop: room("bvgiftshop", "The Point gift shop", "The gift shop: lighthouse models, shell wind chimes, postcards and tea towels, and the sound of the sea through the open door.")},
@@ -74,7 +80,10 @@ export const CR_TOWNS = {
     evanScreen: {cg_ferns: ["the trees go up to the sky!", "a fern like an umbrella!"], cg_cove: ["a waterfall on the beach!", "a secret beach, Mama!"]},
     hints: {cg_ferns: "Fern Gully: the tree ferns, the treetop walk, the ranger's hut, the mushroom café and the van. South: down to the hidden cove.", cg_cove: "The hidden cove: the waterfall onto the sand, the glow-worm grotto in the cliff, and the sea. North: back up to the ferns."},
     spots: famSpots({cg_ferns: [[260, 430], [320, 470], [220, 500], [300, 400], [380, 470], [200, 440]], cg_cove: [[260, 300], [320, 340], [220, 380], [300, 260], [380, 360], [200, 320]]}),
-    acts: {}, rooms: {
+    acts: {
+      dad: {cg_ferns: {act: "macro", at: [220, 520], dir: -1}},
+      darren: {cg_ferns: {act: "count", at: [350, 380], dir: -1}}
+    }, rooms: {
       bv_rangerhut: room("bvrangerhut", "The ranger's hut", "The ranger's hut: maps and pinned-up leaves, a jar of lost things, a lyrebird feather, and the treetop-walk tickets."),
       bv_mushcafe: room("bvmushcafe", "The Toadstool café", "The Toadstool café: mismatched chairs, mushroom soup and toasted sandwiches, and a wood stove that's always lit."),
       bv_grotto: room("bvgrotto", "The glow-worm grotto", "The glow-worm grotto: a low overhang in the cliff, cool and dripping. In the dark, the ceiling is speckled with tiny blue-green stars.")},
@@ -99,7 +108,10 @@ export const CR_TOWNS = {
     evanScreen: {ch_wharf: ["a boat with a cage!", "fishies in the water!"], ch_cottages: ["little houses!", "a tiny beach!"]},
     hints: {ch_wharf: "Fisher's Harbour: the wharf and the boats, the co-op and the van. East: the cottages.", ch_cottages: "The cottages along the bay: the old pub, the smokehouse and a little beach. West: back to the wharf."},
     spots: famSpots({ch_wharf: [[200, 300], [260, 320], [380, 300], [440, 330], [300, 280], [180, 340]], ch_cottages: [[200, 340], [300, 380], [380, 340], [260, 450], [160, 400], [420, 400]]}),
-    acts: {}, rooms: {
+    acts: {
+      darren: {ch_wharf: {act: "chips", at: [380, 330], dir: 1}},
+      mama: {ch_wharf: {act: "prawns", at: [310, 470], dir: -1, hours: [[7*60, 13*60]]}}
+    }, rooms: {
       bv_coop: room("bvcoop", "The fishermen's co-op", "The co-op: tubs of ice, crayfish waving their feelers, prawns, scallops and flathead, and a scale that clanks."),
       bv_pub: room("bvpub", "The Anchor Hotel", "The Anchor: an old pub with a fire, a dartboard, a ship's wheel over the bar, and photos of every big catch since 1920."),
       bv_smokehouse: room("bvsmokehouse", "The smokehouse", "The smokehouse: rows of fish turning gold in the smoke, the smell of woodchips, and jars of smoked trout pâté.")},
@@ -124,7 +136,10 @@ export const CR_TOWNS = {
     evanScreen: {cs_lookout: ["the rocks are in the WATER", "they're so big!"], cs_beach: ["the giant rocks are so close!", "penguins live here!"]},
     hints: {cs_lookout: "The Sisters: the boardwalk lookout, the kiosk and the van. Down the steps: the beach.", cs_beach: "The beach below the cliffs: the surf club, the penguin hide, and the stacks right there. Up the steps: the lookout."},
     spots: famSpots({cs_lookout: [[220, 330], [300, 360], [360, 320], [260, 390], [180, 360], [420, 360]], cs_beach: [[200, 300], [260, 360], [320, 280], [220, 400], [380, 380], [300, 410]]}),
-    acts: {}, rooms: {
+    acts: {
+      mama: {cs_beach: {act: "shells", at: [300, 392], dir: -1}},
+      dad: {cs_beach: {act: "shelter", at: [170, 330], dir: 1}}
+    }, rooms: {
       bv_kiosk: room("bvkiosk", "The lookout kiosk", "The kiosk: hot chips, coffee, ice creams, a rack of postcards of the Sisters at sunset, and a map of the shipwrecks."),
       bv_slsc: room("bvslsc", "The surf club", "The surf lifesaving club: red and yellow everywhere, rescue boards on the wall, a honour board of every patrol, and a canteen."),
       bv_hide: room("bvhide", "The penguin hide", "The penguin hide: a low timber shelter in the dunes, benches, a long window onto the beach, and a sign: no torches, no flash, whisper.")},
@@ -148,7 +163,11 @@ export const CR_TOWNS = {
     evanScreen: {cc_park: ["a parrot on that man's head!", "the koala's asleep"], cc_mouth: ["the river goes into the sea!", "Nippers! I want to do Nippers!"]},
     hints: {cc_park: "Koala Cove: the caravan park, the king parrots, the koala gums, the park store, the laundry café and the van. East: the river mouth.", cc_mouth: "The river mouth: the beach, Nippers on the sand, and the rec hall. West: back to the park."},
     spots: famSpots({cc_park: [[260, 420], [320, 460], [220, 480], [300, 380], [380, 470], [200, 400]], cc_mouth: [[220, 360], [300, 380], [380, 340], [260, 430], [180, 420], [420, 420]]}),
-    acts: {}, rooms: {
+    acts: {
+      mum: {cc_park: {act: "parrot", at: [236, 440], dir: 1}},
+      gonggong: {cc_park: {act: "quoits", at: [300, 540], dir: 1}},
+      angelina: {cc_mouth: {act: "postcard", at: [300, 320], dir: 1}}
+    }, rooms: {
       bv_parkstore: room("bvparkstore", "The park store", "The park store: milk, bread, bait, icy poles, bird seed for the parrots (one scoop only!), and a lost-property box full of thongs."),
       bv_laundry: room("bvlaundry", "The laundry café", "The laundry café: washing machines along one wall, a coffee machine on the other, a book swap shelf, and the best banana bread on the coast."),
       bv_rechall: room("bvrechall", "The rec hall", "The rec hall: a ping-pong table, a piano, jigsaws, and a board of everyone's high scores on the old pinball machine.")},

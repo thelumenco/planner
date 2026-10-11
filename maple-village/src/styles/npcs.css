@@ -187,3 +187,30 @@
 @keyframes skimA{0%,60%{transform:rotate(-20deg)}80%{transform:rotate(-95deg)}100%{transform:rotate(-20deg)}}
 .ch.npc .ripples{animation:kitefly 1.8s ease-out infinite}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-rummage .armR,.ch.npc.act-cuppa .armR,.ch.npc.act-swirl .armR,.ch.npc.act-binoculars .flip > g,.ch.npc.act-crown .armL,.ch.npc.act-crown .armR,.ch.npc.act-cards .armR,.ch.npc.act-wave .armR,.ch.npc.act-footy .legR,.ch.npc .ballbounce,.ch.npc.act-taichi .armL,.ch.npc.act-taichi .armR,.ch.npc.act-juggle .armL,.ch.npc.act-juggle .armR,.ch.npc .jb,.ch.npc.act-fan .tool,.ch.npc.act-carry .flip > g,.ch.npc.act-feedroo .armR,.ch.npc.act-lookup .flip > g,.ch.npc.act-bbq .tool,.ch.npc.act-mallow .tool,.ch.npc.act-bbq .armR,.ch.npc .steam,.ch.npc.act-skim .armR,.ch.npc .ripples{animation:none}}
+/* round 150, the Coast Road's family acts (never done anywhere before): Marcus with his bodyboard, Mum's beach yoga
+   (tree pose, breathing), Gong Gong at the coin telescope, Angellina painting, Dad crouched with his macro lens, Darren
+   counting the treetop steps, Darren guarding his chips from a gull, Ma Ma's bag of prawns, Ma Ma beachcombing, Dad
+   building a driftwood shelter, Mum with a king parrot on her arm, Gong Gong pitching quoits, Angellina writing postcards */
+.ch.npc.act-bodyboard:not(.walk) .armR{transform:rotate(-12deg)}
+.ch.npc.act-yoga:not(.walk) .armL,.ch.npc.act-yoga:not(.walk) .armR{animation:yogaA 4s ease-in-out infinite alternate}
+.ch.npc.act-yoga:not(.walk) .armL{animation-name:yogaL}
+@keyframes yogaA{from{transform:rotate(-150deg)}to{transform:rotate(-172deg)}}@keyframes yogaL{from{transform:rotate(150deg)}to{transform:rotate(172deg)}}
+.ch.npc.act-yoga:not(.walk) .legR{transform:rotate(-55deg) translateY(-4px)}
+.ch.npc.act-telescope:not(.walk) .armR,.ch.npc.act-telescope:not(.walk) .armL{transform:rotate(-100deg)}
+.ch.npc.act-paint:not(.walk) .armR,.ch.npc.act-paint:not(.walk) .tool,.ch.npc.act-postcard:not(.walk) .armR,.ch.npc.act-postcard:not(.walk) .tool{animation:paintA 1.4s ease-in-out infinite alternate}
+@keyframes paintA{from{transform:rotate(-30deg)}to{transform:rotate(-55deg)}}
+.npc.act-macro:not(.walk) .legL,.npc.act-macro:not(.walk) .legR,.npc.act-shells:not(.walk) .legL,.npc.act-shells:not(.walk) .legR,.npc.act-postcard:not(.walk) .legL,.npc.act-postcard:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.45)}
+.npc.act-macro:not(.walk) > g,.npc.act-shells:not(.walk) > g,.npc.act-postcard:not(.walk) > g{transform:translateY(6px)}
+.ch.npc.act-macro:not(.walk) .armR,.ch.npc.act-macro:not(.walk) .armL{transform:rotate(-60deg)}
+.ch.npc.act-shells:not(.walk) .armR{animation:feedA 2s ease-in-out infinite alternate}
+.ch.npc.act-count:not(.walk) .armL{animation:countA 1.1s ease-in-out infinite alternate}
+@keyframes countA{from{transform:rotate(130deg)}to{transform:rotate(160deg)}}
+.ch.npc.act-chips:not(.walk) .armR{transform:rotate(-60deg)}
+.ch.npc .gullhop{animation:gullH 2.4s ease-in-out infinite}
+@keyframes gullH{0%,70%,100%{transform:translate(0,0)}80%{transform:translate(-5px,-6px)}90%{transform:translate(-8px,0)}}
+.ch.npc.act-prawns:not(.walk) .armR{transform:rotate(-30deg)}
+.ch.npc.act-shelter:not(.walk) .armR,.ch.npc.act-shelter:not(.walk) .armL{animation:sipA 2.6s ease-in-out infinite alternate}
+.ch.npc.act-parrot:not(.walk) .armR{transform:rotate(-90deg)}
+.ch.npc .perch{animation:scanB 3s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+.ch.npc.act-quoits:not(.walk) .armR{animation:skimA 2.2s ease-in infinite}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-yoga .armL,.ch.npc.act-yoga .armR,.ch.npc.act-paint .armR,.ch.npc.act-paint .tool,.ch.npc.act-postcard .armR,.ch.npc.act-postcard .tool,.ch.npc.act-shells .armR,.ch.npc.act-count .armL,.ch.npc .gullhop,.ch.npc.act-shelter .armR,.ch.npc.act-shelter .armL,.ch.npc .perch,.ch.npc.act-quoits .armR{animation:none}}

@@ -2114,3 +2114,34 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Sales (vineyard.js sellTick):** seated guests order whole bottles at about seated/2 per hour, weighted to dearer bottles (price^1.5), plus plates.
   - Mel on the terrace counts as hosting (`opts.lunch`): orders run 1.5 times faster, 15% tips, and the money is paid to her.
   - The day is tracked in `v.today.lunchB` and `lunchP`. Mel gets a flash on the terrace, a line in the 10pm closing report, and a day-list nudge with the booked count.
+
+### Rounds 148–151: the Coast Road (Bellbird's second region), tabs, Tomo's orders
+- **Data (data/coast.js):** six more van stops, `region: "coast"`. They keep the `bv_` prefix (stops `bv_breakwater`, rooms `bv_*`, places `bv*`) so all the Bellbird plumbing works unchanged. data/bellbird.js merges them in, and `BB_MAPS = {vines, coast}` gives each region its own map page (tabs `data-bvregion`, passport grouped by region).
+  - Breakwater (surf beach | main street), Lighthouse Point (lighthouse / cliff walk), Fern Gully (ferns / hidden cove with waterfall), Fisher's Harbour (wharf | cottages), The Sisters (lookout / beach), Koala Cove (caravan park | river mouth). The sea shows at every stop.
+  - Art: art/coast.js (12 screens) and art/coast-rooms.js (18 rooms). Music: 24 tracks in audio.js.
+  - Rooms, treats and shops: game/bbrooms.js, coast cases.
+  - Specials: crayroll, scalloppie, spsquid (`special: "coast"`). Heath honey goes into gelato.
+- **People (data/cr-people.js):** 31 people.
+  - Locals: Jet, Pippa, Bree, Win, Hamish, Tash, Rowan, Mags, Davo, Lorraine, Kev, Ned, Sunny, Ari, Jade, Fay, Reg, Dimi.
+  - Caravan-park neighbours: Gloria and Bernie, the Kapoors, Lachie and Mitch.
+  - Day-trippers.
+- **Activities (game/cracts.js), opened by `data-bba="open:<x>"` from a room or an outdoor spot (townSpot `bbOut`):**
+  - surf: Jet, any time, 15, plus 5 for Evan. Pop up at phase 3. Photo keepsake `b_surfphoto`.
+  - whales: lighthouse balcony. Humpbacks May–Nov, dolphins otherwise. Sighting card `b_whalecard`.
+  - glow: from 18:00. Wait 3, then count.
+  - pots: Mags, 6–13. Keep only crays over the 105mm gauge; berried females go back. 2 crayfish once a day.
+  - penguins: 18–21. Stay still, shush Evan when he's about to squeal.
+  - nippers: 9–12, Evan only. Duck under the waves. Medal `b_nipmedal`.
+  - King parrots: `bvparrots`, uses a `b_seed` from the park store.
+- **Family acts (round 151), new everywhere:**
+  - Breakwater: Marcus bodyboard, Mum yoga (mornings and late afternoon).
+  - Lighthouse Point: Gong Gong at the coin telescope, Angellina paints.
+  - Fern Gully: Dad macro photos of fungi, Darren counts the treetop steps.
+  - Fisher's Harbour: Darren's chips vs a gull, Ma Ma's prawns off the boat (mornings).
+  - The Sisters: Ma Ma beachcombs shells, Dad builds a driftwood shelter.
+  - Koala Cove: Mum with a parrot on her arm, Gong Gong quoits, Angellina writing postcards.
+  - Props are in PROPS (npcs.js) and people.js `extra()`; poses are in npcs.css.
+- **Tabs (Mel):**
+  - The Gazette: Your wins / Events / In the world (`newsTab`, `data-newstab`; feeds.js `goodNewsHTML(wins, cal, tab)`).
+  - The heart panel: Who's where (first, the default) / Maple / Stories / Family (`friendTab`, `data-ftab`). The title follows the tab (`#friendTitle`).
+- **Tomo's delivery orders:** DELIVERY rates doubled (scoop .045, cocoa .036, winery .04 a minute while open and stocked). The Gazette's wins say how many he delivered today.
