@@ -197,3 +197,5 @@ const ROOMS = {bv_store: storeRoom, bv_shed: shedRoom, bv_opshop: opshopRoom, bv
   bv_tasting: tastingRoom, bv_cave: caveRoom, bv_restaurant: restaurantRoom, bv_berrycafe: berryCafeRoom, bv_jam: jamRoom, bv_choc: chocRoom,
   bv_visitor: visitorRoom, bv_platypus: platypusRoom, bv_hospital: hospitalRoom, bv_campkitchen: campKitchenRoom, bv_campstore: campStoreRoom, bv_canoe: canoeRoom};
 export const bellbirdRoomArt = scene => (ROOMS[scene] || storeRoom)();
+// round 148: the Coast Road's rooms (art/coast-rooms.js) share these
+export { lab as rLab, g as rG, spot as rSpot, hovE as rHov, exit as rExit, wall as rWall, floor as rFloor, win as rWin, shelfUnit as rShelf, jars as rJars, balls as rBalls, bottlesF as rBottles, counter as rCounter, table as rTable, chair as rChair, plant as rPlant, crateOf as rCrate, frame as rFrame, signText as rSign };

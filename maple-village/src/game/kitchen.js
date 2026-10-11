@@ -39,7 +39,9 @@ export const GOODS = {
   // round 132: from Cinque Terre (and Mel's own loft and garden)
   pesto: ["jar of pesto", "jars of pesto"], pinenuts: ["bag of pine nuts", "bags of pine nuts"], chickpea: ["handful of chickpeas", "handfuls of chickpeas"], anchovy: ["anchovy", "anchovies"], anchovy_salt: ["jar of salted anchovies", "jars of salted anchovies"],
   // round 142: from Bellbird Valley
-  goldensyrup: ["tin of golden syrup", "tins of golden syrup"], wattleseed: ["jar of wattleseed", "jars of wattleseed"], raspberry: ["punnet of raspberries", "punnets of raspberries"]};
+  goldensyrup: ["tin of golden syrup", "tins of golden syrup"], wattleseed: ["jar of wattleseed", "jars of wattleseed"], raspberry: ["punnet of raspberries", "punnets of raspberries"],
+  // round 149: from the Coast Road
+  scallop: ["scallop", "scallops"]};
 export const GROUP_ICON = {farmcheese: "chz_cheddar", halloumi: "chz_halloumi", bluecheese: "chz_blue", cheddar: "chz_cheddar", honey: "honey", petals: "tulip"};
 // Wildflower Farm's cheeses (chz_*) come in as themselves: any of them does for "cheese" in a recipe, and the farm
 // cheese board wants one; goat's milk does for milk (the press, the crema). See ALT.
@@ -121,6 +123,9 @@ Object.assign(TAPAS, {trofie: {n: "Trofie with pesto", need: {flour: 1, pesto: 1
 // round 142: Bellbird Valley's (eggs and milk from the farm gate, flour from the deli)
 Object.assign(TAPAS, {pavlova: {n: "Berry pavlova", need: {egg: 2, raspberry: 2, milk: 1}, price: 12}, damper: {n: "Damper with golden syrup", need: {flour: 1, milk: 1, goldensyrup: 1}, price: 10},
   wattlescone: {n: "Wattleseed scones", need: {flour: 1, wattleseed: 1, milk: 1}, price: 11}});
+// round 149: the Coast Road's (crayfish off Mags's boat or from the lake, scallops from the co-op, squid from the sea at night)
+Object.assign(TAPAS, {crayroll: {n: "Crayfish roll", need: {crayfish: 2, loaf: 1, lemon: 1}, price: 13}, scalloppie: {n: "Scallop pie", need: {scallop: 2, flour: 1, milk: 1}, price: 12},
+  spsquid: {n: "Salt and pepper squid with lemon aioli", need: {squid: 1, egg: 1, lemon: 1}, price: 11}});
 Object.assign(TAPAS, {gambas: {n: "Gambas al ajillo", need: {shrimp: 3, garlic: 2, oliveoil: 1}, price: 13},
   romero: {n: "Rosemary potatoes", need: {potato: 2, rosemary: 1}, price: 9}, bruschetta: {n: "Tomato and basil bruschetta", need: {loaf: 1, tomato: 2, basil: 1}, price: 10, seasons: ["summer", "autumn"]},
   almejas: {n: "Clams with garlic and lemon", need: {clams: 4, garlic: 1, lemon: 1}, price: 12},
@@ -324,10 +329,11 @@ export function wireKitchen(root, F, api){
 export const SPECIALS = {salmorejo: ["ronda", 17], ajoblanco: ["ronda", 17], croqjamon: ["ronda", 16], payoyo: ["ronda", 15], naranjas: ["ronda", 17],
   misofish: ["kyoto", 14], hiyayakko: ["kyoto", 14], mochihoney: ["kyoto", 15], heukdwaeji: ["jeju", 15], jeonbok: ["jeju", 15], hallaomija: ["jeju", 15],
   trofie: ["cinque", 14], focaccia: ["cinque", 16], farinata: ["cinque", 16], acciughe: ["cinque", 14], crostini: ["cinque", 16],
-  pavlova: ["bellbird", 16], damper: ["bellbird", 14], wattlescone: ["bellbird", 15]};
+  pavlova: ["bellbird", 16], damper: ["bellbird", 14], wattlescone: ["bellbird", 15],
+  crayroll: ["coast", 17], scalloppie: ["coast", 16], spsquid: ["coast", 15]};
 Object.entries(SPECIALS).forEach(([id, [town, price]]) => Object.assign(TAPAS[id], {special: town, price}));
-export const TOWN_NAME = {ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre", bellbird: "Bellbird Valley"};
-export const beenTo = (F, town) => !!((F.towns && F.towns[town]) || F[town]);   // (F.towns from round 132; a town's own state for earlier trips)
+export const TOWN_NAME = {ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre", bellbird: "Bellbird Valley", coast: "the Coast Road"};
+export const beenTo = (F, town) => town === "coast" ? !!(F.bellbird && F.bellbird.stamps && Object.keys(F.bellbird.stamps).some(s => /^bv_(breakwater|lighthouse|gully|harbour|sisters|cove)$/.test(s))) : !!((F.towns && F.towns[town]) || F[town]);   // (the Coast Road: once she's stamped a stop there)   // (F.towns from round 132; a town's own state for earlier trips)
 // where each ingredient comes from, shown on the recipe cards (Mel: "where do I get almonds? squid?")
 export const SOURCE = {
   potato: "garden or Clara's stall", tomato: "garden or Clara's stall", pepper: "garden or Clara's stall", corn: "garden or Clara's stall", carrot: "garden or Clara's stall",
@@ -344,4 +350,4 @@ export const SOURCE = {
   almond: "Ronda's market", sevilla: "Ronda's market", jamon: "Ronda's market", payoyo: "Ronda's market", membrillo: "Ronda's market",
   yuzu: "Kyoto's market", miso: "Kyoto's market", tofu: "Kyoto's market", mochi: "Kyoto's market",
   tangerine: "Jeju (or your own tangerine tree)", hallabong: "Jeju's market", omija: "Jeju's market", blackpork: "Jeju's market", abalone: "Jeju's divers' house",
-  goldensyrup: "Bellbird Valley's general store", wattleseed: "Bellbird Valley's general store", raspberry: "your garden (canes from the market, once you've been to Bellbird Valley) or the berry farm"};
+  goldensyrup: "Bellbird Valley's general store", wattleseed: "Bellbird Valley's general store", scallop: "the co-op at Fisher's Harbour (the Coast Road)", raspberry: "your garden (canes from the market, once you've been to Bellbird Valley) or the berry farm"};

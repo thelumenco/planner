@@ -2349,7 +2349,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     cs_lookout: [[340, 130, 460, 230]],
     cs_beach: [[70, 150, 190, 250], [350, 240, 450, 296], [0, 0, 420, 176]],
     cc_park: [[70, 150, 190, 250], [330, 150, 450, 250]],
-    cc_mouth: [[340, 150, 460, 250], [0, 240, 150, 300]]
+    cc_mouth: [[340, 150, 460, 250], [0, 240, 150, 300]],
+    // the rooms (round 149): the counter (or the stair, the ping-pong table, the benches) and the furniture round the edges
+    ...Object.fromEntries(["bv_surfshop", "bv_chippy", "bv_bakery", "bv_tearoom", "bv_giftshop", "bv_rangerhut", "bv_mushcafe", "bv_coop", "bv_pub", "bv_smokehouse", "bv_kiosk", "bv_slsc", "bv_parkstore", "bv_laundry"].map((r) => [r, [[140, 222, 380, 300], [40, 430, 130, 500], [396, 440, 490, 505]]])),
+    bv_lighthouse: [[196, 236, 324, 364], [40, 440, 110, 500], [420, 440, 480, 500]],
+    bv_grotto: [[30, 500, 140, 540], [400, 482, 500, 518]],
+    bv_hide: [[60, 420, 220, 436], [300, 420, 460, 436]],
+    bv_rechall: [[170, 290, 350, 380], [46, 486, 120, 520], [400, 470, 480, 530]]
   };
   var CR_EVAN = {
     cw_beach: [[240, 320], [320, 300], [200, 420]],
@@ -2381,6 +2387,26 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     cc_park: "Koala Cove",
     cc_mouth: "Koala Cove: the river mouth"
   };
+  var CR_GOODS = {
+    b_wax: { n: "A block of surf wax", kind: "gift", to: ["marcus", "darren", "dad"], price: 4, shop: "bv_surfshop", art: ["box", "#F3E7B0", "#4F9CC4"], say: "Surf wax! Smells like coconut. I'm putting it on everything. Even the ironing board." },
+    b_rashie: { n: "A little rash vest", kind: "gift", to: ["evan", "angelina"], price: 12, shop: "bv_surfshop", art: ["tee", "#4F9CC4"], say: "A rash vest with a wave on it! For the beach. I'm wearing it now." },
+    b_sourdough: { n: "A sourdough loaf", kind: "gift", to: "family", price: 5, shop: "bv_bakery", art: ["box", "#D9A05A", "#F3E7C8"], say: "A crusty sourdough from the coast. Still warm. Who's got butter?" },
+    b_shortbread: { n: "Keeper's shortbread", kind: "gift", to: ["mama", "gonggong", "mum"], price: 6, shop: "bv_tearoom", art: ["box", "#F3E7B0", "#C8432F"], say: "Shortbread in a tin with a lighthouse on it! Melts in the mouth." },
+    b_lhmodel: { n: "Lighthouse model", kind: "keepsake", price: 14, shop: "bv_giftshop", art: ["bottle", "#FFFDF6", "#C8432F"], line: "A little white lighthouse with a red cap, from the gift shop at Lighthouse Point. The light inside really comes on." },
+    b_chime: { n: "Shell wind chime", kind: "keepsake", price: 10, shop: "bv_giftshop", art: ["bell", "#F4C7CF"], line: "A wind chime of shells and sea glass from Lighthouse Point. It sounds like the beach when the window's open." },
+    b_crmagnet: { n: "Coast Road fridge magnet", kind: "gift", to: "family", price: 3, shop: "bv_giftshop", art: ["disc", "#4F93B4", "#FFFDF6"], say: "A tiny lighthouse and a wave. For the fridge!" },
+    b_teatowel: { n: "Coast Road tea towel", kind: "gift", to: ["mum", "mama", "dad"], price: 7, shop: "bv_giftshop", art: ["cloth", "#FFFDF6", "#4F93B4"], say: "A tea towel with a map of the whole Coast Road! I'll never dry a dish with it." },
+    b_birdguide: { n: "A pocket guide to rainforest birds", kind: "gift", to: ["gonggong", "dad", "angelina"], price: 8, shop: "bv_rangerhut", art: ["box", "#7FA35A", "#C8432F"], say: "A bird guide! The lyrebird's on page twelve. I'm going to find one." },
+    honey_heath: { n: "Coastal heath honey", kind: "ingredient", price: 7, sell: 4, shop: "bv_mushcafe", art: ["jar", "#E3B04B", "#9DAA78"], what: "for gelato and bonbons: floral and a bit wild, from the hives on the heath" },
+    scallop: { n: "Scallops", kind: "ingredient", price: 7, sell: 4, shop: "bv_coop", art: ["disc", "#F3E7C8", "#E8913A"], what: "scallop pies at the kitchen (a Coast Road special)" },
+    b_pate: { n: "Smoked trout pâté", kind: "gift", to: ["dad", "gonggong", "darren", "mum"], price: 8, shop: "bv_smokehouse", art: ["jar", "#E3B47A", "#8A5A3A"], say: "Smoked trout pâté! On crackers, with a squeeze of lemon. Gone in a minute." },
+    b_smoked: { n: "A whole smoked trout", kind: "gift", to: ["gonggong", "mama", "dad"], price: 10, shop: "bv_smokehouse", art: ["fish", "#D9A05A"], say: "A smoked trout, golden all over. Gong Gong is very happy." },
+    b_postcard: { n: "A postcard of the Sisters", kind: "gift", to: "family", price: 2, shop: "bv_kiosk", art: ["box", "#E8913A", "#4F93B4"], say: "A postcard of those rocks at sunset! I'm putting it on the fridge." },
+    b_penguin: { n: "Plush little penguin", kind: "gift", to: ["evan", "angelina", "mama"], price: 9, shop: "bv_kiosk", art: ["plush", "#4E6E8C"], say: "A little penguin! Blue and white and very small. Like the real ones!" },
+    b_cap: { n: "A Nippers cap", kind: "gift", to: ["evan"], price: 5, shop: "bv_slsc", art: ["beanie", "#E8566C"], say: "A Nippers cap! Red and yellow! I'm a lifesaver now, Mama!" },
+    b_seed: { n: "A scoop of bird seed", kind: "ingredient", price: 2, sell: 1, shop: "bv_parkstore", art: ["box", "#E3B04B", "#C9A86A"], what: "for the king parrots at Koala Cove: hold out your arm" }
+  };
+  var CR_KEEP = { b_crmagnet: "A tiny lighthouse and a wave, from the Coast Road.", b_teatowel: "A tea towel with a map of the whole Coast Road." };
 
   // src/data/bellbird.js
   var VAN2 = { by: "van", fare: 0, free: ["evan"], outFrom: 7 * 60, outTo: 18 * 60, backTo: 22 * 60 };
@@ -2940,6 +2966,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   Object.assign(BB_EVAN, CR_EVAN);
   Object.assign(BB_NAMES, CR_NAMES);
   BB_ROADS.push(...CR_ROADS);
+  Object.assign(BB_GOODS, CR_GOODS);
+  Object.assign(BB_KEEP, CR_KEEP);
   var BB_MAPS = { vines: BB_MAP, coast: CR_MAP };
   var REGION_N = { vines: "The Vines", coast: "The Coast Road" };
 
@@ -3802,6 +3830,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   Object.assign(KEEP_LINES, BB_KEEP);
   Object.keys(BB_KEEP).forEach((id) => Object.assign(TOWN_GOODS[id], { keep: true, line: KEEP_LINES[id] }));
   TOWN_GOODS.b_magnet.magnet = true;
+  TOWN_GOODS.b_crmagnet.magnet = true;
   Object.keys(PAINT.colours).forEach((c) => Object.keys(PAINT.patterns).forEach((p) => {
     TOWN_GOODS[`ptile_${c}_${p}`] = { n: "Your painted tile", kind: "keepsake", price: 0, tile: [c, p], art: ["tile", PAINT.colours[c][1], "#FFFDF6"], line: `A tile you painted yourself at Lucía's in Ronda: ${PAINT.patterns[p]}, in ${PAINT.colours[c][0]}.` };
   }));
@@ -10583,7 +10612,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     castanas: ["#8A5A3A", "#F3C969"],
     pavlova: ["#FFFDF6", "#D9435A"],
     damper: ["#E3C08A", "#E8A83A"],
-    wattlescone: ["#C9A06A", "#8A5A3A"]
+    wattlescone: ["#C9A06A", "#8A5A3A"],
+    crayroll: ["#E8D3A8", "#C8432F"],
+    scalloppie: ["#E3B47A", "#F3E7C8"],
+    spsquid: ["#F3E7B0", "#9DAA78"]
   };
   function dishArt(id, s = 44, off) {
     if (String(id).startsWith("tapas:")) {
@@ -10699,7 +10731,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     // round 142: from Bellbird Valley
     goldensyrup: ["tin of golden syrup", "tins of golden syrup"],
     wattleseed: ["jar of wattleseed", "jars of wattleseed"],
-    raspberry: ["punnet of raspberries", "punnets of raspberries"]
+    raspberry: ["punnet of raspberries", "punnets of raspberries"],
+    // round 149: from the Coast Road
+    scallop: ["scallop", "scallops"]
   };
   var GROUP_ICON = { farmcheese: "chz_cheddar", halloumi: "chz_halloumi", bluecheese: "chz_blue", cheddar: "chz_cheddar", honey: "honey", petals: "tulip" };
   var isGood = (id) => id in GOODS2 && !GROUP_ICON[id] || /^chz_|^honey(_lav|_blossom|_cream)?$/.test(id) || id === "tulip" || id === "sunflower";
@@ -10786,6 +10820,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     pavlova: { n: "Berry pavlova", need: { egg: 2, raspberry: 2, milk: 1 }, price: 12 },
     damper: { n: "Damper with golden syrup", need: { flour: 1, milk: 1, goldensyrup: 1 }, price: 10 },
     wattlescone: { n: "Wattleseed scones", need: { flour: 1, wattleseed: 1, milk: 1 }, price: 11 }
+  });
+  Object.assign(TAPAS, {
+    crayroll: { n: "Crayfish roll", need: { crayfish: 2, loaf: 1, lemon: 1 }, price: 13 },
+    scalloppie: { n: "Scallop pie", need: { scallop: 2, flour: 1, milk: 1 }, price: 12 },
+    spsquid: { n: "Salt and pepper squid with lemon aioli", need: { squid: 1, egg: 1, lemon: 1 }, price: 11 }
   });
   Object.assign(TAPAS, {
     gambas: { n: "Gambas al ajillo", need: { shrimp: 3, garlic: 2, oliveoil: 1 }, price: 13 },
@@ -11186,11 +11225,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     crostini: ["cinque", 16],
     pavlova: ["bellbird", 16],
     damper: ["bellbird", 14],
-    wattlescone: ["bellbird", 15]
+    wattlescone: ["bellbird", 15],
+    crayroll: ["coast", 17],
+    scalloppie: ["coast", 16],
+    spsquid: ["coast", 15]
   };
   Object.entries(SPECIALS).forEach(([id, [town, price]]) => Object.assign(TAPAS[id], { special: town, price }));
-  var TOWN_NAME = { ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre", bellbird: "Bellbird Valley" };
-  var beenTo = (F2, town) => !!(F2.towns && F2.towns[town] || F2[town]);
+  var TOWN_NAME = { ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre", bellbird: "Bellbird Valley", coast: "the Coast Road" };
+  var beenTo = (F2, town) => town === "coast" ? !!(F2.bellbird && F2.bellbird.stamps && Object.keys(F2.bellbird.stamps).some((s) => /^bv_(breakwater|lighthouse|gully|harbour|sisters|cove)$/.test(s))) : !!(F2.towns && F2.towns[town] || F2[town]);
   var SOURCE = {
     potato: "garden or Clara's stall",
     tomato: "garden or Clara's stall",
@@ -11258,6 +11300,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     abalone: "Jeju's divers' house",
     goldensyrup: "Bellbird Valley's general store",
     wattleseed: "Bellbird Valley's general store",
+    scallop: "the co-op at Fisher's Harbour (the Coast Road)",
     raspberry: "your garden (canes from the market, once you've been to Bellbird Valley) or the berry farm"
   };
 
@@ -11346,6 +11389,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     wattleseed: ["Wattleseed", "Wattleseed", "#8A5A3A"],
     raspberry: ["Raspberries", "Raspberry", "#D9435A"],
     goldensyrup: ["Golden syrup", "Golden Syrup", "#E8A83A"],
+    honey_heath: ["Coastal heath honey", "Heath Honey", "#E3B04B"],
     // from Bellbird Valley (round 142)
     housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
     goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
@@ -13150,9 +13194,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       `<path d="M440 496 l6 -70 M480 496 l-6 -70" style="stroke:#8A6A52" stroke-width="5"/><rect x="432" y="412" width="56" height="12" style="fill:#C9A27E"/><path d="M432 412 v-16 M488 412 v-16 M432 398 h56" style="stroke:#8A6A52" stroke-width="2.4"/><path d="M428 398 L460 370 L492 398z" style="fill:#B5443A"/><path d="M446 496 l4 -10 M450 486 h20 M454 476 h12 M458 466 h4" style="stroke:#8A6A52" stroke-width="2"/>`,
       `<rect x="432" y="412" width="56" height="12"/><path d="M428 398 L460 370 L492 398z"/>`
     )}${tapeLabel(460, 520, "Lookout", "#F3E1A0", 10)}</g>`;
-    const bench3 = `<g pointer-events="none">${sk(`<rect x="224" y="456" width="44" height="7" rx="2" style="fill:#C9A27E"/><rect x="228" y="463" width="4" height="10" style="fill:#8A6A52"/><rect x="260" y="463" width="4" height="10" style="fill:#8A6A52"/>`, `<rect x="224" y="456" width="44" height="7" rx="2"/>`)}</g>`;
+    const bench4 = `<g pointer-events="none">${sk(`<rect x="224" y="456" width="44" height="7" rx="2" style="fill:#C9A27E"/><rect x="228" y="463" width="4" height="10" style="fill:#8A6A52"/><rect x="260" y="463" width="4" height="10" style="fill:#8A6A52"/>`, `<rect x="224" y="456" width="44" height="7" rx="2"/>`)}</g>`;
     const trees = [[30, 150, 0.9], [70, 230, 0.8], [500, 170, 0.9], [492, 330, 0.8], [40, 640, 0.9], [500, 640, 0.85], [200, 640, 0.7]].map(([x, y, s]) => tree(x, y, s)).join("") + [[96, 120, 1], [370, 150, 0.9], [150, 200, 0.8], [480, 250, 0.9], [240, 400, 0.9], [400, 360, 0.8], [60, 300, 0.7], [220, 520, 0.8], [400, 560, 0.9], [500, 450, 0.7], [300, 610, 0.75], [160, 420, 0.7]].map(([x, y, s]) => pine(x, y, s)).join("");
-    return lampDefs + ground3 + top + trainLayer("hwoods") + hill + brookDown + fall + pool2 + trees + cabin + bikeRack("bikeswoods", 478, 330) + forage2 + lookout + bench3 + fishSpotArt("hwoods") + taxiStop("taxiwoods", 156, 262, "hwoods") + archGate("toLaneW", 22, 330, "Cottage lane", 66, 300, "var(--butter)", "West to the cottage lane and the station") + archGate("toMakersW", 330, 620, "Makers' Lane", 390, 600, "var(--peri)", "Down the hill to Makers' Lane") + streetLamp(330, 330);
+    return lampDefs + ground3 + top + trainLayer("hwoods") + hill + brookDown + fall + pool2 + trees + cabin + bikeRack("bikeswoods", 478, 330) + forage2 + lookout + bench4 + fishSpotArt("hwoods") + taxiStop("taxiwoods", 156, 262, "hwoods") + archGate("toLaneW", 22, 330, "Cottage lane", 66, 300, "var(--butter)", "West to the cottage lane and the station") + archGate("toMakersW", 330, 620, "Makers' Lane", 390, 600, "var(--peri)", "Down the hill to Makers' Lane") + streetLamp(330, 330);
   }
 
   // src/art/greenhouse.js
@@ -13181,11 +13225,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     <path d="M0 75 H520" style="stroke:#FFFDF6" stroke-width="4"/><path d="M0 75 H520 M0 150 H520" style="stroke:var(--line)" stroke-width="1"/>
     ${[40, 300, 440].map((x) => `<ellipse cx="${x}" cy="${40 + x % 3 * 8}" rx="${30 + x % 20}" ry="14" style="fill:#FFFDF6" opacity=".5"/>`).join("")}
     <path d="M30 168 H490" style="stroke:#9AA3A8" stroke-width="3"/>${[100, 220, 340, 460].map((x) => `<g><path d="M${x} 168 v6" style="stroke:#9AA3A8" stroke-width="2"/><path d="M${x - 6} 182 l6 -8 l6 8" style="fill:none;stroke:#CFE8F4" stroke-width="1.4" stroke-dasharray="2 3"><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="1.4s" repeatCount="indefinite"/></path></g>`).join("")}</g>`;
-    const bench3 = `<g pointer-events="none">${sk(
+    const bench4 = `<g pointer-events="none">${sk(
       `<rect x="452" y="200" width="56" height="300" rx="3" style="fill:#C9A27E"/>${[230, 280, 330, 380, 430].map((y) => `<path d="M464 ${y} h20 l-3 16 h-14z" style="fill:#C8643B"/><circle cx="474" cy="${y - 4}" r="7" style="fill:${y % 100 ? "#7FB86A" : "#6FAE58"}"/>`).join("")}<path d="M460 520 h26 v18 h-26z" style="fill:#9CC3E0"/><path d="M486 524 l14 -10" style="stroke:#9CC3E0" stroke-width="3"/>`,
       `<rect x="452" y="200" width="56" height="300" rx="3"/><path d="M460 520 h26 v18 h-26z"/>`
     )}</g>`;
-    let h = floor2 + glass + bench3;
+    let h = floor2 + glass + bench4;
     GH_BED_AT.forEach((p, i) => {
       const b = beds[i], g8 = b ? growth3(b) : 0;
       h += `<g data-ghbed="${i}" aria-label="Bed ${i + 1}"><rect class="hov" x="${p.x - 6}" y="${p.y - 6}" width="${p.w + 12}" height="${p.h + 12}" rx="10" style="fill:var(--butter)"/>
@@ -15238,6 +15282,285 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       mel: 0.7,
       up: 12,
       bars: [[38, 50, 57, 62, 66, 69], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 69, 73], [38, 50, 57, 62, 66, 69], [47, 59, 62, 66, 71, 74], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 67, 69], [38, 50, 57, 62, 66, 74]]
+    },
+    // Round 149: the Coast Road, every stop and every room its own
+    bb_breakwater: {
+      name: "Out past the break",
+      live: true,
+      bpm: 104,
+      steps: 8,
+      tone: "guitar",
+      strum: [0, 4],
+      arp: [1, 3, 2, 4, 3, 5, 4, 2],
+      arpVel: 0.05,
+      mel: 0.75,
+      bars: [[45, 57, 61, 64, 69], [50, 57, 62, 66, 69], [52, 56, 59, 64, 68], [45, 57, 61, 64, 73], [42, 54, 57, 61, 66], [50, 57, 62, 66, 69], [52, 56, 59, 64, 71], [45, 57, 61, 64, 69]],
+      lines: [[[0, 76], [2, 73], [3, 71]], [[0, 74], [2, 78]], [[0, 76], [1, 74], [2, 71]], [[0, 69], [2, 73]], [[0, 73], [2, 76], [3, 78]], [[0, 74], [2, 69]], [[0, 71], [1, 73], [2, 76]], [[0, 73], [2, 69]]]
+    },
+    bb_lighthouse: {
+      name: "Keeper of the light",
+      live: true,
+      bpm: 60,
+      steps: 8,
+      tone: "bell",
+      arp: [1, 0, 3, 0, 5, 0, 4, 0],
+      arpVel: 0.034,
+      mel: 0.45,
+      up: 12,
+      bars: [[40, 52, 59, 64, 67], [45, 57, 60, 64, 69], [43, 55, 59, 62, 67], [47, 59, 62, 66, 71]]
+    },
+    bb_gully: {
+      name: "Under the tree ferns",
+      live: true,
+      bpm: 56,
+      steps: 8,
+      tone: "piano",
+      arp: [1, 3, 2, 4, 3, 5, 4, 3],
+      arpVel: 0.034,
+      mel: 0.4,
+      bars: [[38, 50, 57, 62, 65], [41, 53, 57, 60, 65], [36, 48, 55, 60, 64], [43, 55, 58, 62, 67]]
+    },
+    bb_harbour: {
+      name: "Cray boats at dawn",
+      live: true,
+      bpm: 88,
+      steps: 6,
+      tone: "guitar",
+      strum: [0, 3],
+      arp: [1, 3, 5, 3, 4, 2],
+      arpVel: 0.046,
+      mel: 0.7,
+      bars: [[43, 55, 59, 62, 67], [48, 55, 60, 64, 67], [50, 57, 62, 66, 69], [43, 55, 59, 62, 71]]
+    },
+    bb_sisters: {
+      name: "Where the Sisters stand",
+      live: true,
+      bpm: 64,
+      steps: 8,
+      tone: "rhodes",
+      arp: [1, 2, 3, 5, 4, 3, 2, 4],
+      arpVel: 0.038,
+      mel: 0.5,
+      bars: [[41, 53, 60, 64, 69], [46, 53, 58, 62, 65], [43, 55, 58, 62, 67], [48, 55, 60, 64, 72]]
+    },
+    bb_cove: {
+      name: "King parrots",
+      live: true,
+      bpm: 96,
+      steps: 8,
+      tone: "rhodes",
+      strum: [0, 4],
+      arp: [1, 3, 2, 3, 4, 3, 2, 3],
+      arpVel: 0.044,
+      mel: 0.7,
+      bars: [[48, 60, 64, 67, 72], [45, 57, 60, 64, 69], [41, 53, 60, 65, 69], [43, 55, 62, 67, 71]]
+    },
+    bv_surfshop: {
+      name: "Board wax",
+      live: true,
+      bpm: 112,
+      steps: 8,
+      tone: "guitar",
+      strum: [0, 4],
+      arp: [1, 2, 3, 2, 4, 3, 2, 3],
+      arpVel: 0.046,
+      mel: 0.75,
+      bars: [[40, 52, 56, 59, 64], [45, 57, 61, 64, 69], [47, 59, 63, 66, 71], [40, 52, 56, 59, 68]]
+    },
+    bv_chippy: {
+      name: "Salt and vinegar",
+      live: true,
+      bpm: 116,
+      steps: 6,
+      tone: "rhodes",
+      strum: [0],
+      arp: [1, 3, 4, 3, 5, 3],
+      arpVel: 0.044,
+      mel: 0.7,
+      bars: [[48, 60, 64, 67, 72], [53, 60, 65, 69, 72], [55, 59, 62, 67, 71], [48, 60, 64, 67, 76]]
+    },
+    bv_bakery: {
+      name: "Four in the morning",
+      live: true,
+      bpm: 78,
+      steps: 8,
+      tone: "piano",
+      arp: [1, 3, 2, 4, 3, 5, 4, 2],
+      arpVel: 0.04,
+      mel: 0.55,
+      bars: [[43, 55, 59, 62, 67], [48, 55, 60, 64, 67], [45, 57, 60, 64, 69], [50, 57, 62, 66, 69]]
+    },
+    bv_lighthouse: {
+      name: "A hundred and twenty-eight steps",
+      live: true,
+      bpm: 70,
+      steps: 8,
+      tone: "bell",
+      arp: [1, 2, 3, 4, 5, 4, 3, 2],
+      arpVel: 0.036,
+      mel: 0.5,
+      up: 12,
+      bars: [[38, 50, 57, 62, 66], [43, 55, 59, 62, 67], [45, 57, 61, 64, 69], [47, 59, 62, 66, 71]]
+    },
+    bv_tearoom: {
+      name: "Lace curtains",
+      live: true,
+      bpm: 66,
+      steps: 6,
+      tone: "piano",
+      arp: [1, 3, 5, 4, 3, 2],
+      arpVel: 0.036,
+      mel: 0.45,
+      bars: [[46, 58, 62, 65, 70], [41, 53, 57, 60, 65], [43, 55, 58, 62, 67], [39, 51, 58, 63, 67]]
+    },
+    bv_giftshop: {
+      name: "Shells on a string",
+      live: true,
+      bpm: 92,
+      steps: 6,
+      tone: "bell",
+      arp: [1, 3, 5, 4, 3, 2],
+      arpVel: 0.036,
+      mel: 0.55,
+      up: 12,
+      bars: [[50, 62, 66, 69, 74], [55, 62, 67, 71, 74], [57, 61, 64, 69, 73], [50, 62, 66, 69, 78]]
+    },
+    bv_rangerhut: {
+      name: "Lyrebird",
+      live: true,
+      bpm: 72,
+      steps: 8,
+      tone: "guitar",
+      arp: [1, 3, 2, 4, 3, 2, 4, 5],
+      arpVel: 0.038,
+      mel: 0.5,
+      bars: [[40, 52, 59, 64, 67], [43, 55, 59, 62, 67], [38, 50, 57, 62, 66], [45, 57, 60, 64, 69]]
+    },
+    bv_mushcafe: {
+      name: "The wood stove",
+      live: true,
+      bpm: 74,
+      steps: 8,
+      tone: "rhodes",
+      arp: [1, 3, 2, 4, 3, 5, 4, 3],
+      arpVel: 0.04,
+      mel: 0.5,
+      bars: [[45, 57, 60, 64, 69], [41, 53, 57, 60, 65], [43, 55, 59, 62, 67], [40, 52, 56, 59, 64]]
+    },
+    bv_grotto: {
+      name: "Little blue stars",
+      live: true,
+      bpm: 44,
+      steps: 8,
+      tone: "bell",
+      arp: [1, 0, 0, 3, 0, 2, 0, 0],
+      arpVel: 0.026,
+      mel: 0.3,
+      bars: [[40, 52, 59, 64, 71], [45, 57, 64, 69, 76], [43, 55, 62, 67, 74], [40, 52, 59, 64, 69]]
+    },
+    bv_coop: {
+      name: "On ice",
+      live: true,
+      bpm: 100,
+      steps: 8,
+      tone: "guitar",
+      strum: [0, 4],
+      arp: [1, 3, 2, 3, 1, 4, 2, 3],
+      arpVel: 0.044,
+      mel: 0.65,
+      bars: [[50, 57, 62, 66, 69], [43, 55, 59, 62, 67], [45, 57, 61, 64, 69], [50, 57, 62, 66, 74]]
+    },
+    bv_pub: {
+      name: "Last orders at the Anchor",
+      live: true,
+      bpm: 96,
+      steps: 6,
+      tone: "piano",
+      strum: [0, 3],
+      arp: [1, 3, 5, 3, 4, 2],
+      arpVel: 0.046,
+      mel: 0.7,
+      bars: [[43, 55, 59, 62, 67], [48, 55, 60, 64, 67], [50, 57, 62, 66, 69], [43, 55, 59, 62, 71]]
+    },
+    bv_smokehouse: {
+      name: "Woodsmoke",
+      live: true,
+      bpm: 58,
+      steps: 8,
+      tone: "guitar",
+      arp: [1, 0, 3, 0, 2, 0, 4, 0],
+      arpVel: 0.034,
+      mel: 0.4,
+      bars: [[38, 50, 57, 62, 65], [34, 46, 53, 58, 62], [36, 48, 55, 60, 64], [33, 45, 52, 57, 61]]
+    },
+    bv_kiosk: {
+      name: "Shipwreck coast",
+      live: true,
+      bpm: 84,
+      steps: 8,
+      tone: "rhodes",
+      arp: [1, 3, 2, 4, 3, 5, 4, 2],
+      arpVel: 0.04,
+      mel: 0.55,
+      bars: [[41, 53, 57, 60, 65], [46, 53, 58, 62, 65], [36, 48, 55, 58, 64], [41, 53, 57, 60, 69]]
+    },
+    bv_slsc: {
+      name: "On patrol",
+      live: true,
+      bpm: 112,
+      steps: 8,
+      tone: "rhodes",
+      strum: [0, 4],
+      arp: [1, 2, 3, 4, 3, 2, 4, 3],
+      arpVel: 0.046,
+      mel: 0.7,
+      bars: [[47, 59, 62, 66, 71], [52, 59, 64, 67, 71], [54, 58, 61, 66, 70], [47, 59, 62, 66, 74]]
+    },
+    bv_hide: {
+      name: "Home at dusk",
+      live: true,
+      bpm: 46,
+      steps: 8,
+      tone: "bell",
+      arp: [1, 0, 2, 0, 3, 0, 2, 0],
+      arpVel: 0.028,
+      mel: 0.32,
+      bars: [[38, 50, 57, 64, 69], [43, 55, 62, 66, 71], [36, 48, 55, 64, 67], [38, 50, 57, 62, 69]]
+    },
+    bv_parkstore: {
+      name: "One scoop only",
+      live: true,
+      bpm: 104,
+      steps: 6,
+      tone: "bell",
+      arp: [1, 2, 3, 5, 4, 3],
+      arpVel: 0.038,
+      mel: 0.6,
+      up: 12,
+      bars: [[48, 60, 64, 67, 72], [45, 57, 60, 64, 69], [41, 53, 60, 65, 69], [43, 55, 62, 67, 71]]
+    },
+    bv_laundry: {
+      name: "Spin cycle",
+      live: true,
+      bpm: 90,
+      steps: 8,
+      tone: "rhodes",
+      arp: [1, 3, 2, 4, 3, 2, 4, 5],
+      arpVel: 0.042,
+      mel: 0.6,
+      bars: [[45, 57, 61, 64, 69], [50, 57, 62, 66, 69], [52, 56, 59, 64, 68], [45, 57, 61, 64, 73]]
+    },
+    bv_rechall: {
+      name: "High score",
+      live: true,
+      bpm: 120,
+      steps: 8,
+      tone: "bell",
+      arp: [1, 3, 5, 3, 4, 2, 5, 3],
+      arpVel: 0.04,
+      mel: 0.7,
+      up: 12,
+      bars: [[48, 60, 64, 67, 72], [53, 60, 65, 69, 72], [55, 59, 62, 67, 71], [48, 60, 64, 67, 76]]
     },
     // Round 146: the wine shop's terrace: a lazy Provençal waltz, an accordion-ish rhodes and a guitar under canvas
     terrace: {
@@ -21482,7 +21805,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       `${[0, 1, 2].map((i) => `<path d="M${202 + i * 9} 474 q-4 -20 2 -38 q6 18 2 38z"/>`).join("")}<path d="M198 474 v-24 M234 474 v-24"/><rect x="196" y="452" width="40" height="5" rx="2"/>`
     )}
     ${tapeLabel(214, 418, "Paddleboards", "var(--sky)", 10)}</g>`;
-    const bench3 = `<g data-place="dolphins" aria-label="Boardwalk bench: watch for dolphins"><ellipse class="hov" cx="214" cy="256" rx="30" ry="9" style="fill:var(--butter)"/>
+    const bench4 = `<g data-place="dolphins" aria-label="Boardwalk bench: watch for dolphins"><ellipse class="hov" cx="214" cy="256" rx="30" ry="9" style="fill:var(--butter)"/>
     ${sk(`<rect x="192" y="238" width="44" height="7" rx="2" style="fill:var(--wood)"/><rect x="192" y="228" width="44" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="192" y="238" width="44" height="7" rx="2"/><rect x="192" y="228" width="44" height="6" rx="2"/><path d="M196 245 v9 M232 245 v9 M196 234 v4 M232 234 v4"/>`)}
     ${tapeLabel(214, 276, "Dolphin bench", "var(--peri)", 10)}</g>`;
     const mumdad = house(
@@ -21519,7 +21842,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       ${tapeLabel(168, 588, "Dolphin cruise", "var(--peri)", 10)}</g>` : `<g data-place="boat" aria-label="The mooring: save up for a dolphin cruise boat"><ellipse class="hov" cx="206" cy="552" rx="26" ry="8" style="fill:var(--butter)"/>
       ${sk(`<rect x="200" y="512" width="8" height="34" style="fill:var(--wood)"/><rect x="178" y="512" width="52" height="18" rx="2" style="fill:#FFFDF6"/>`, `<rect x="200" y="512" width="8" height="34"/><rect x="178" y="512" width="52" height="18" rx="2"/><path d="M186 521 h36" opacity=".55"/>`)}
       ${tapeLabel(168, 588, "Boat mooring", "var(--peri)", 10)}</g>`;
-    return lampDefs + ground3 + sea2 + jetty + ferry + boat2 + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench3 + rack + mumdad + marcus + archGate("toFieldS", 500, 292, "The field", 446, 320, "var(--peri)", "Gate to the field") + archGate("toBay", 250, 30, "The bay", 312, 26, "var(--blush)", "Up the boardwalk to the bay and the Scoop Shack") + archGate("toFlowersS", 250, 616, "Flower farm", 326, 606, "var(--blush)", "Gate to the flower farm");
+    return lampDefs + ground3 + sea2 + jetty + ferry + boat2 + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench4 + rack + mumdad + marcus + archGate("toFieldS", 500, 292, "The field", 446, 320, "var(--peri)", "Gate to the field") + archGate("toBay", 250, 30, "The bay", 312, 26, "var(--blush)", "Up the boardwalk to the bay and the Scoop Shack") + archGate("toFlowersS", 250, 616, "Flower farm", 326, 606, "var(--blush)", "Gate to the flower farm");
   }
 
   // src/art/bay.js
@@ -23612,10 +23935,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       `<rect x="326" y="140" width="174" height="104"/>${tileRoof(322, 124, 182, 18).lines}<path d="M384 124 V90 L404 74 L424 90 V124"/><path d="M342 244 v-40 q14 -14 28 0 v40z"/><circle cx="404" cy="216" r="14"/><path d="M395 216 h18 M404 207 v18" stroke-width=".8"/>${reja(450, 170, 20, 26).lines}`
     )}
     ${lab4(410, 270, "Convent hatch", "#E7D9F2", 10)}</g>`;
-    const tiles3 = ["#3E6BAE", "#F3C969", "#2E8B8B", "#E8913A", "#3E6BAE", "#C2307A"];
+    const tiles4 = ["#3E6BAE", "#F3C969", "#2E8B8B", "#E8913A", "#3E6BAE", "#C2307A"];
     const tileShop = `<g data-place="azulejos" aria-label="Lucía's tile shop">${shade5(300, 324, 172, 96)}
     ${sk(
-      `<rect x="300" y="324" width="172" height="96" style="fill:${C5.white}"/>${tileRoof(296, 306, 180, 20).art}<rect x="370" y="372" width="30" height="48" style="fill:#3E6BAE"/><path d="M374 420 v-40 q11 -11 22 0 v40z" style="fill:#7A4A30"/>${tiles3.map((c, i) => `<rect x="${314 + i % 3 * 15}" y="${342 + Math.floor(i / 3) * 15}" width="12" height="12" style="fill:#FFFDF6"/><circle cx="${320 + i % 3 * 15}" cy="${348 + Math.floor(i / 3) * 15}" r="3.6" style="fill:${c}"/>`).join("")}${tiles3.map((c, i) => `<rect x="${414 + i % 3 * 15}" y="${342 + Math.floor(i / 3) * 15}" width="12" height="12" style="fill:${c}"/><path d="M${414 + i % 3 * 15} ${342 + Math.floor(i / 3) * 15} l12 12" style="stroke:#FFFDF6" stroke-width="1.4"/>`).join("")}`,
+      `<rect x="300" y="324" width="172" height="96" style="fill:${C5.white}"/>${tileRoof(296, 306, 180, 20).art}<rect x="370" y="372" width="30" height="48" style="fill:#3E6BAE"/><path d="M374 420 v-40 q11 -11 22 0 v40z" style="fill:#7A4A30"/>${tiles4.map((c, i) => `<rect x="${314 + i % 3 * 15}" y="${342 + Math.floor(i / 3) * 15}" width="12" height="12" style="fill:#FFFDF6"/><circle cx="${320 + i % 3 * 15}" cy="${348 + Math.floor(i / 3) * 15}" r="3.6" style="fill:${c}"/>`).join("")}${tiles4.map((c, i) => `<rect x="${414 + i % 3 * 15}" y="${342 + Math.floor(i / 3) * 15}" width="12" height="12" style="fill:${c}"/><path d="M${414 + i % 3 * 15} ${342 + Math.floor(i / 3) * 15} l12 12" style="stroke:#FFFDF6" stroke-width="1.4"/>`).join("")}`,
       `<rect x="300" y="324" width="172" height="96"/>${tileRoof(296, 306, 180, 20).lines}<path d="M374 420 v-40 q11 -11 22 0 v40z"/>`
     )}
     <rect x="352" y="332" width="68" height="12" rx="2" style="fill:#3E6BAE;stroke:var(--line)" stroke-width="1"/><text x="386" y="341" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="7.8" fill="#FFFDF6" pointer-events="none">AZULEJOS</text>
@@ -23824,7 +24147,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       `<rect x="210" y="70" width="190" height="6"/><rect x="210" y="128" width="190" height="6"/>${[0, 1, 2, 3].map((i) => `<path d="M${222 + i * 46} 70 q-4 -26 16 -26 q20 0 16 26z"/>`).join("")}`
     )}
     ${sk(`<path d="M480 34 v120" style="stroke:#7A5638" stroke-width="3"/>${[0, 1, 2, 3].map((i) => `<path d="M${470 - i * 4} ${44 + i * 4} v${90 - i * 8}" style="stroke:${["#3A2A22", "#7A3A2A", "#A8754F", "#C98A4A"][i]}" stroke-width="5"/>`).join("")}`, `<path d="M480 34 v120"/>`)}`;
-    const bench3 = `<g pointer-events="none">${sk(
+    const bench4 = `<g pointer-events="none">${sk(
       `<rect x="170" y="300" width="180" height="16" rx="2" style="fill:#8A5A3A"/><path d="M178 316 v34 M342 316 v34" style="stroke:#6B4430" stroke-width="5"/><rect x="196" y="288" width="60" height="12" rx="2" style="fill:#C98A4A"/><rect x="300" y="290" width="22" height="8" rx="2" style="fill:#5A3A2A"/><circle cx="276" cy="294" r="5" style="fill:#F3E7C8"/>`,
       `<rect x="170" y="300" width="180" height="16" rx="2"/><rect x="196" y="288" width="60" height="12" rx="2"/>`
     )}</g>`;
@@ -23863,7 +24186,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       `<ellipse class="hov" cx="470" cy="192" rx="18" ry="8" style="fill:var(--butter)"/>`,
       sk(`<ellipse cx="470" cy="188" rx="14" ry="7" style="fill:#3A3430"/><circle cx="458" cy="183" r="6" style="fill:#3A3430"/><path d="M454 179 l1 -6 l3 4 M460 178 l2 -5 l2 5" style="fill:#3A3430"/><path d="M484 190 q8 2 6 -6" style="fill:none;stroke:#3A3430" stroke-width="3"/>`, `<ellipse cx="470" cy="188" rx="14" ry="7"/><circle cx="458" cy="183" r="6"/>`) + `<text x="478" y="176" font-family="Klee One,serif" font-size="9" fill="#8A7A6A" pointer-events="none">z<animate attributeName="opacity" values="0;1;0" dur="2.4s" repeatCount="indefinite"/></text>`
     );
-    return floor2 + wall3 + lamp2(140, 80, "#F3C969") + lamp2(380, 90, "#F3C969") + bench3 + counter2 + cat3 + unit(24, 0) + unit(474, 3) + wallets + bags + saddle + hatstand + boxes + exit("#7A5638");
+    return floor2 + wall3 + lamp2(140, 80, "#F3C969") + lamp2(380, 90, "#F3C969") + bench4 + counter2 + cat3 + unit(24, 0) + unit(474, 3) + wallets + bags + saddle + hatstand + boxes + exit("#7A5638");
   }
   function mercadoRoom() {
     const floor2 = tiles(170, 52, 40, "#E6DCCB", "#DCD0BC", "#C4B79F");
@@ -24307,7 +24630,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     bv_berrycafe: { scones: ["Scones with jam and cream", 4, "Jam first, then cream. Or cream first. The Berry Barn takes no sides."], smoothie: ["A berry smoothie", 4, "Strawberries, raspberries, blueberries and yoghurt, bright pink, with a paper straw."], pav: ["A slice of pavlova", 5, "Crisp outside, marshmallowy inside, heaped with cream and berries."] },
     bv_choc: { hotchoc: ["A hot chocolate", 4, "Thick, dark, in a little cup with a spoon, because it's nearly pudding."], rocky: ["Rocky road", 3, "Chocolate, marshmallows, raspberry lollies, coconut. Glorious chaos."] },
     bv_visitor: { pie: ["A pie with sauce", 4, "A meat pie from the warmer, tomato sauce on top. You eat it out of the paper bag."] },
-    bv_campstore: { icypole: ["An icy pole", 2, "A raspberry one, already melting down your wrist."] }
+    bv_campstore: { icypole: ["An icy pole", 2, "A raspberry one, already melting down your wrist."] },
+    // the Coast Road (round 149)
+    bv_chippy: { fishchips: ["Fish and chips", 9, "Flake in golden batter and a mountain of chips, wrapped in paper. You eat them on the sea wall, fending off gulls."], potcake: ["A potato cake", 2, "A slice of potato in batter, fried crisp, salted. The most Australian thing there is."], calamari: ["Calamari rings", 7, "Crisp, tender, with a wedge of lemon."] },
+    bv_bakery: { scroll: ["A cinnamon scroll", 3, "Still warm, sticky, swirled, the icing going glossy."], pasty: ["A pasty", 4, "Flaky pastry, peppery vegetables, crimped along the top. Gone in five bites."], neenish: ["A neenish tart", 3, "Half pink, half chocolate, cream inside. Very old-fashioned. Perfect."] },
+    bv_tearoom: { devon: ["A Devonshire tea", 5, "Two scones, jam, cream, and a pot of tea, with the sea in the window."], pot: ["A pot of tea", 3, "In a china pot with roses on it, strong and hot. Win pours."] },
+    bv_mushcafe: { soup: ["Mushroom soup", 5, "Thick, earthy, with crusty bread and a swirl of cream. Warms you right through."], toastie: ["A toasted sandwich", 4, "Cheese and tomato, crisp from the wood stove."] },
+    bv_pub: { parma: ["A chicken parma and chips", 10, "A schnitzel the size of the plate, ham, sauce and cheese on top, chips underneath. The Anchor's famous for it."], squash: ["A lemon squash", 3, "Fizzy, sweet, sour, very cold."] },
+    bv_kiosk: { hotchips: ["Hot chips", 4, "Salty, hot, in a paper cone, eaten at the railing with the wind in your hair."], icecream: ["An ice cream", 3, "Vanilla in a cone, melting fast in the sea breeze."] },
+    bv_slsc: { sizzle: ["A sausage sizzle", 3, "A snag in white bread with onions and sauce. For the club."], juice: ["A frozen juice stick", 2, "Blue. Just blue. Evan's tongue will be blue for an hour."] },
+    bv_laundry: { bananabread: ["Banana bread", 4, "Thick, toasted, with butter. The best on the coast, everyone says, and they're right."], longblack: ["A long black", 4, "Strong, hot, while the washing goes round."] }
   };
   function treat(F2, room2, k) {
     const t2 = (TREATS[room2] || {})[k];
@@ -24397,6 +24729,43 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         return head(room2, `Dr Mira and her nurses look after the animals that come in hurt: hit by cars, caught in fences, fallen out of pouches. Most of them go home to the bush.`) + `<div class="actions"><button class="btn primary" data-bba="open:joey">Help feed a joey</button></div>` + listOf(F2, shopGoods(room2), "Help a joey") + `<p class="muted">The money buys milk, pouches and the vet's time.</p>` + shut10;
       case "bv_campstore":
         return head(room2, `The camp store sells everything a camper forgot: firewood, ice, thongs, marshmallows. An old kelpie is asleep across the doorway.`) + treats(F2, room2) + listOf(F2, shopGoods(room2), "Off the shelves") + shut10;
+      // the Coast Road (round 149)
+      case "bv_surfshop":
+        return head(room2, `Jet runs the surf shop and the lessons. Boards to hire, wax to buy, and a dog called Gromit asleep on the towels.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:surf">A surf lesson</button></div>` + listOf(F2, shopGoods(room2), "From the shop") + shut10;
+      case "bv_chippy":
+        return head(room2, `The Golden Gull: fish straight off the boats at the harbour, chips cut every morning, and a sign: DON'T FEED THE GULLS (they bite).`) + treats(F2, room2) + shut10;
+      case "bv_bakery":
+        return head(room2, `Crumb & Co.: up at four, ovens hot by five, and a queue of sandy surfers by seven.`) + treats(F2, room2) + listOf(F2, shopGoods(room2), "To take home") + shut10;
+      case "bv_lighthouse":
+        return head(room2, `A hundred and twenty-eight iron steps up to the lamp and the balcony. Win's great-grandfather kept this light for forty years.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:whales">Up to the balcony: whale watching</button></div>` + shut10;
+      case "bv_tearoom":
+        return head(room2, `The keeper's cottage, now Win's tearoom: the old logbooks on the shelf, a ship in a bottle, and scones that come out every half hour.`) + treats(F2, room2) + listOf(F2, shopGoods(room2), "To take home") + shut10;
+      case "bv_giftshop":
+        return head(room2, `The gift shop in the old signal house. Everything's got a lighthouse on it, except the things with whales.`, "stripe") + listOf(F2, shopGoods(room2), "From the shelves") + shut10;
+      case "bv_rangerhut":
+        return head(room2, `Tash the ranger looks after the gully: the walks, the treetop walk, the creek and the glow-worms. "Leave only footprints," says the sign.`) + listOf(F2, shopGoods(room2), "From the hut") + shut10;
+      case "bv_mushcafe":
+        return head(room2, `The Toadstool café: a wood stove, mismatched chairs, and soup made from whatever's good. The honey's from the hives on the heath.`) + treats(F2, room2) + listOf(F2, shopGoods(room2), "To take home") + shut10;
+      case "bv_grotto":
+        return head(room2, `Torches off. Let your eyes get used to it. Then, slowly, the ceiling of the overhang lights up: hundreds of tiny blue-green stars.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:glow">Count the glow-worms</button></div>` + shut10;
+      case "bv_coop":
+        return head(room2, `The fishermen's co-op: whatever came in this morning, on ice. Mags brings her crays in here, if she hasn't promised them to someone.`) + listOf(F2, shopGoods(room2), "Fresh today") + `<div class="actions"><button class="btn alt" data-bba="open:pots">Help Mags with the cray pots</button></div>` + shut10;
+      case "bv_pub":
+        return head(room2, `The Anchor: a fire in winter, the doors open in summer, a dartboard, and a ship's wheel over the bar. The parma's famous up and down the coast.`, "stripe") + treats(F2, room2) + shut10;
+      case "bv_smokehouse":
+        return head(room2, `Rows of fish going gold in the smoke, and the smell of woodchips. Old Ned's family have smoked fish here since 1890.`) + listOf(F2, shopGoods(room2), "From the smokehouse") + shut10;
+      case "bv_kiosk":
+        return head(room2, `The lookout kiosk: hot chips, coffee, and a map of every ship wrecked on this coast (there are a lot).`) + treats(F2, room2) + listOf(F2, shopGoods(room2), "To take home") + shut10;
+      case "bv_slsc":
+        return head(room2, `The surf lifesaving club: volunteers on patrol every weekend since 1932. The canteen helps pay for the rescue boards.`, "stripe") + treats(F2, room2) + listOf(F2, shopGoods(room2), "For little lifesavers") + `<div class="actions"><button class="btn alt" data-bba="open:nippers">Nippers for Evan</button></div>` + shut10;
+      case "bv_hide":
+        return head(room2, `A low timber hide in the dunes, a long window onto the beach. The penguins come home at dusk, after a day fishing at sea.`) + `<div class="actions"><button class="btn primary" data-bba="open:penguins">Watch for the penguins</button></div>` + shut10;
+      case "bv_parkstore":
+        return head(room2, `The park store sells a bit of everything, and one scoop of bird seed a go: "The parrots'd eat the whole bag and then the bag," says Fay.`) + listOf(F2, shopGoods(room2), "Off the shelves") + shut10;
+      case "bv_laundry":
+        return head(room2, `The laundry café: washing machines on one side, a coffee machine on the other, a book-swap shelf, and banana bread the whole coast talks about.`) + treats(F2, room2) + `<p class="muted">The book-swap shelf: take one, leave one. Someone's left a very battered copy of a sailing book.</p>` + shut10;
+      case "bv_rechall":
+        return head(room2, `The rec hall: ping-pong, a piano nobody's tuned since 1987, jigsaws with pieces missing, and the pinball high scores (the top one's been there for years).`, "stripe") + `<div class="actions"><button class="btn primary" data-bb="pingpong">A game of ping-pong</button></div>` + shut10;
       case "bv_canoe":
         return head(room2, `Canoes for hire, paddles on hooks, and life jackets in every size down to "very small".`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:canoe">Take a canoe out</button></div>` + shut10;
       default:
@@ -24961,9 +25330,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function campKitchenRoom() {
     const back = wall2("#C9C2B4") + g3(sk(`<rect x="160" y="30" width="200" height="140" style="fill:#C9A27E"/>`, `<rect x="160" y="30" width="200" height="140"/>`) + Array.from({ length: 9 }, (_, i) => `<rect x="${172 + i % 3 * 62}" y="${40 + Math.floor(i / 3) * 42}" width="52" height="34" fill="${["#FFFDF6", "#F3E7A0", "#F4C7CF", "#BFD4E2"][i % 4]}" stroke="#3a2e28" stroke-width=".6" transform="rotate(${(i % 3 - 1) * 3} ${198 + i % 3 * 62} ${57 + Math.floor(i / 3) * 42})"/><circle cx="${198 + i % 3 * 62}" cy="${43 + Math.floor(i / 3) * 42}" r="2.4" fill="#E8566C"/>`).join("")) + g3(sk(`<rect x="20" y="60" width="110" height="110" rx="3" style="fill:#9EA4AC"/><rect x="30" y="70" width="90" height="40" style="fill:#5A5A60"/>`, `<rect x="20" y="60" width="110" height="110" rx="3"/>`)) + g3(sk(`<rect x="390" y="90" width="110" height="80" rx="3" style="fill:#B9BEC4"/><ellipse cx="445" cy="104" rx="30" ry="8" style="fill:#9EA4AC"/>`, ``));
-    const board2 = spot3("bv_campkitchen", 260, 280, "The noticeboard", hovE3(260, 270, 110, 16), lab8(260, 196, "The noticeboard", "#F6E3B4"));
+    const board3 = spot3("bv_campkitchen", 260, 280, "The noticeboard", hovE3(260, 270, 110, 16), lab8(260, 196, "The noticeboard", "#F6E3B4"));
     const edges = g3(sk(`<rect x="100" y="380" width="320" height="60" rx="4" style="fill:#B98A5E"/><rect x="100" y="452" width="320" height="10" rx="3" style="fill:#A0754E"/><rect x="100" y="360" width="320" height="10" rx="3" style="fill:#A0754E"/>`, `<rect x="100" y="380" width="320" height="60" rx="4"/>`)) + g3(`<rect x="160" y="392" width="26" height="18" rx="3" fill="#E8566C" stroke="#3a2e28" stroke-width=".6"/><circle cx="300" cy="404" r="9" fill="#FFFDF6" stroke="#3a2e28" stroke-width=".6"/><rect x="340" y="390" width="12" height="22" rx="3" fill="#9FD3E8" stroke="#3a2e28" stroke-width=".6"/>`) + plant4(40, 600, 0.8) + plant4(480, 600, 0.8);
-    return floor(200, "#C9C2B4", "flat") + back + edges + board2 + exit3("#6B5444");
+    return floor(200, "#C9C2B4", "flat") + back + edges + board3 + exit3("#6B5444");
   }
   function campStoreRoom() {
     const back = wall2("#F3EAD6", { boards: true }) + shelfUnit(20, 30, 170, 160, 4, jars2(8, ["#E8566C", "#9FD3E8", "#F3C969", "#9CC27E"])) + shelfUnit(330, 30, 170, 160, 4, balls(6, ["#FFFDF6", "#F4C7CF", "#C9A27E"], 5)) + g3(sk(`<rect x="210" y="40" width="100" height="70" style="fill:#F6EDD5"/><path d="M220 90 q20 -30 40 -10 t40 -10" fill="none" style="stroke:#4F7F90" stroke-width="3"/>`, `<rect x="210" y="40" width="100" height="70"/>`));
@@ -25124,8 +25493,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const water = g5(`<path d="M0 500 H520 V640 H0z" style="fill:${C8.sand}"/>`) + sea("M0 548 Q260 530 520 548 V640 H0z", [[80, 590, 60], [320, 600, 80]]) + surfLine(556, 0, 520) + g5(`<path d="M0 498 H520" stroke="#B9A88A" stroke-width="6"/>${Array.from({ length: 14 }, (_, i) => `<rect x="${10 + i * 38}" y="486" width="4" height="14" fill="#B9A88A"/>`).join("")}`);
     const chippy = place4("bvchippy", 140, 230, 46, 10, "The Golden Gull", cottage(70, 130, 140, 96, "#F3E7B0", "#3E6B8C", { sign: "THE GOLDEN GULL", wins: [26, 114], door: "#3E6B8C" }) + awning2(66, 186, 148, "#3E6B8C"), "Fish and chips", 140, 252, "#C3DDF3");
     const bakery = place4("bvbakery", 390, 230, 46, 10, "Crumb & Co.", cottage(320, 130, 140, 96, "#F4C7CF", "#8A5A3A", { sign: "CRUMB & CO.", wins: [26, 114], door: "#8A5A3A" }) + awning2(316, 186, 148, "#C8432F"), "Bakery", 390, 252, "#F6D3DC");
-    const bench3 = place4("bvbench", 260, 430, 34, 9, "The bench under the pines", sk(`<rect x="232" y="412" width="56" height="6" rx="2" style="fill:#B98A5E"/><rect x="232" y="402" width="56" height="5" rx="2" style="fill:#B98A5E"/><path d="M238 418 v10 M282 418 v10" style="stroke:#6B5444" stroke-width="2"/>`, `<rect x="232" y="402" width="56" height="16"/>`) + gullStand(300, 432) + gullStand(222, 440), "Bench", 260, 452, "#F6E3B4");
-    return lampDefs + ground2() + water + road + norfolk(30, 330, 1.1) + norfolk(490, 330, 1.1) + norfolk(250, 340, 0.9) + chippy + bakery + bench3 + gull(200, 520) + gull(430, 510) + gate5("bvToBeach", 16, 400, "The beach", 60, 368, "West, back to the beach");
+    const bench4 = place4("bvbench", 260, 430, 34, 9, "The bench under the pines", sk(`<rect x="232" y="412" width="56" height="6" rx="2" style="fill:#B98A5E"/><rect x="232" y="402" width="56" height="5" rx="2" style="fill:#B98A5E"/><path d="M238 418 v10 M282 418 v10" style="stroke:#6B5444" stroke-width="2"/>`, `<rect x="232" y="402" width="56" height="16"/>`) + gullStand(300, 432) + gullStand(222, 440), "Bench", 260, 452, "#F6E3B4");
+    return lampDefs + ground2() + water + road + norfolk(30, 330, 1.1) + norfolk(490, 330, 1.1) + norfolk(250, 340, 0.9) + chippy + bakery + bench4 + gull(200, 520) + gull(430, 510) + gate5("bvToBeach", 16, 400, "The beach", 60, 368, "West, back to the beach");
   }
   function lightScreen() {
     const water = sea("M0 0 H520 V96 Q380 110 260 100 Q120 92 0 110z", [[60, 40, 70], [260, 30, 90], [420, 60, 60]]);
@@ -25233,6 +25602,152 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     cc_mouth: mouthScreen
   };
   var coastArt = (scene2) => (SCREENS2[scene2] || beachScreen)();
+
+  // src/art/coast-rooms.js
+  var board2 = (x, y, col, h = 120) => g3(sk(`<ellipse cx="${x}" cy="${y}" rx="11" ry="${h / 2}" style="fill:${col}"/><path d="M${x} ${y - h / 2 + 8} V${y + h / 2 - 8}" style="stroke:#FFFDF6" stroke-width="1.4"/>`, `<ellipse cx="${x}" cy="${y}" rx="11" ry="${h / 2}"/>`));
+  var seaWin = (x, y, w, h) => win(x, y, w, h, "water");
+  var tiles3 = (col, line) => g3(`<rect width="520" height="200" fill="${col}"/>${Array.from({ length: 14 }, (_, i) => `<path d="M0 ${12 + i * 14} H520" stroke="${line}" stroke-width="1"/>`).join("")}${Array.from({ length: 26 }, (_, i) => `<path d="M${i * 20} 0 V200" stroke="${line}" stroke-width="1"/>`).join("")}<rect y="0" width="520" height="12" fill="#3E6B8C"/>`);
+  var bench3 = (x, y, w = 120, col = "#8A6A52") => g3(sk(`<rect x="${x}" y="${y}" width="${w}" height="16" rx="3" style="fill:${col}"/>`, `<rect x="${x}" y="${y}" width="${w}" height="16" rx="3"/>`));
+  var fishShapes = (x, y, n, col = "#D9A05A") => g3(Array.from({ length: n }, (_, i) => `<path d="M${x + i * 22} ${y} q8 -6 16 0 q-8 6 -16 0z M${x + i * 22 + 16} ${y} l5 -4 v8z" fill="${col}" stroke="#3a2e28" stroke-width=".6"/>`).join(""));
+  function surfshopRoom() {
+    const back = wall2("#BFE3DA", { boards: true, trim: "#3E6B8C" }) + ["#E8566C", "#F3C969", "#4F9CC4", "#FFFDF6", "#9CC27E", "#C9A2C8"].map((c, i) => board2(40 + i * 30, 110, c)).join("") + g3(sk(`<rect x="320" y="40" width="180" height="8" style="fill:#8A6A52"/>`, ``) + [0, 1, 2, 3].map((i) => `<path d="M${336 + i * 42} 48 v6 l-14 10 v80 h28 v-80 l-14 -10z" fill="${["#2F2B28", "#3E5A6E", "#2F2B28", "#5A3A6E"][i]}" stroke="#3a2e28" stroke-width=".8"/>`).join(""));
+    const ctr = spot3("bv_surfshop", 260, 330, "The counter", hovE3(260, 320, 110, 16), sk(counter(150, 250, 220, "#3E6B8C", "#9FD3C2"), `<rect x="150" y="250" width="220" height="46" rx="4"/>`) + g3([0, 1, 2, 3].map((i) => `<rect x="${176 + i * 18}" y="234" width="14" height="10" rx="2" fill="${["#F3E7B0", "#F4C7CF", "#BFE3DA", "#F3E7B0"][i]}" stroke="#3a2e28" stroke-width=".6"/>`).join("") + `<rect x="300" y="226" width="34" height="22" rx="3" fill="#C9A24A" stroke="#3a2e28" stroke-width=".8"/>`) + lab8(260, 346, "Boards and lessons", "#C3E8DA"));
+    const edges = board2(60, 500, "#F3C969", 100) + board2(86, 504, "#E8566C", 100) + board2(112, 508, "#4F9CC4", 100) + g3(`<ellipse cx="450" cy="520" rx="40" ry="14" fill="#E8D3A8" stroke="#3a2e28" stroke-width=".8"/><ellipse cx="450" cy="510" rx="16" ry="9" fill="#C98A4A" stroke="#3a2e28" stroke-width=".8"/><circle cx="462" cy="504" r="5" fill="#C98A4A" stroke="#3a2e28" stroke-width=".8"/>`) + plant4(470, 600, 0.9);
+    return floor(200, "#D9C7A0") + back + edges + ctr + exit3("#3E6B8C");
+  }
+  function chippyRoom() {
+    const back = tiles3("#F2F6F8", "#D6E2E8") + g3(sk(`<rect x="40" y="30" width="170" height="130" style="fill:#2F3A34"/>`, `<rect x="40" y="30" width="170" height="130"/>`)) + signText(125, 54, "TODAY'S CATCH", "#FFFDF6", "#2F3A34", 9) + g3(`<text x="60" y="84" font-size="9" font-family="Klee One,serif" fill="#FFFDF6">flake · 9</text><text x="60" y="104" font-size="9" font-family="Klee One,serif" fill="#FFFDF6">whiting · 10</text><text x="60" y="124" font-size="9" font-family="Klee One,serif" fill="#FFFDF6">potato cakes · 2</text><text x="60" y="144" font-size="9" font-family="Klee One,serif" fill="#FFFDF6">calamari · 7</text>`) + seaWin(300, 40, 180, 110);
+    const ctr = spot3("bv_chippy", 260, 330, "The counter", hovE3(260, 320, 110, 16), sk(counter(150, 250, 220, "#C9D6DE", "#E6EEF2"), `<rect x="150" y="250" width="220" height="46" rx="4"/>`) + g3(`<rect x="170" y="222" width="70" height="26" rx="3" fill="#9AA0A8" stroke="#3a2e28" stroke-width=".8"/><rect x="176" y="216" width="26" height="10" fill="#F3D98A" stroke="#3a2e28" stroke-width=".6"/><rect x="208" y="216" width="26" height="10" fill="#F3D98A" stroke="#3a2e28" stroke-width=".6"/><rect x="280" y="232" width="60" height="16" fill="#F6F1E2" stroke="#3a2e28" stroke-width=".6"/>`) + lab8(260, 346, "Fish and chips", "#C3DDF3"));
+    const edges = table3(90, 470, 70, "#F4C7CF") + chair2(50, 480) + chair2(130, 480) + table3(430, 470, 70, "#F4C7CF") + chair2(390, 480) + chair2(470, 480) + g3(`<rect x="84" y="456" width="5" height="10" fill="#FFFDF6" stroke="#3a2e28" stroke-width=".5"/><rect x="92" y="456" width="5" height="10" fill="#7A4A3A" stroke="#3a2e28" stroke-width=".5"/>`) + plant4(40, 600, 0.8);
+    return floor(200, "#E6E2DA", "flags") + back + edges + ctr + exit3("#3E6B8C");
+  }
+  function bakeryRoom() {
+    const back = wall2("#F6E7D0", { trim: "#8A5A3A" }) + shelfUnit(20, 30, 200, 160, 3, (x, y, w, r) => Array.from({ length: 5 }, (_, i) => `<ellipse cx="${x + 18 + i * (w / 5)}" cy="${y - 6}" rx="16" ry="7" fill="${["#D9A05A", "#C98A4A", "#E3B47A"][(i + r) % 3]}" stroke="#3a2e28" stroke-width=".6"/>`).join("")) + seaWin(300, 40, 180, 110);
+    const ctr = spot3("bv_bakery", 260, 330, "The glass counter", hovE3(260, 320, 110, 16), sk(counter(150, 250, 220, "#FFFDF6", "#E6DCC6"), `<rect x="150" y="250" width="220" height="46" rx="4"/>`) + g3(`<rect x="156" y="258" width="208" height="30" fill="#CFE3EA" opacity=".6"/>${[0, 1, 2, 3, 4].map((i) => `<ellipse cx="${178 + i * 40}" cy="276" rx="14" ry="7" fill="${i % 2 ? "#E8C07A" : "#F3E7B0"}" stroke="#3a2e28" stroke-width=".6"/>`).join("")}`) + lab8(260, 346, "Pies and slices", "#FBE0B8"));
+    const edges = table3(90, 480, 60) + chair2(56, 490) + chair2(124, 490) + table3(430, 480, 60) + chair2(396, 490) + chair2(464, 490) + plant4(470, 600, 0.9) + crateOf(60, 590, ["#E3B47A", "#D9A05A"]);
+    return floor(200, "#C9A27E") + back + edges + ctr + exit3("#8A5A3A");
+  }
+  function lighthouseRoom() {
+    const back = g3(`<rect width="520" height="640" fill="#F2EEE6"/><path d="M0 200 Q260 240 520 200 V0 H0z" fill="#FFFDF6"/>`) + [80, 260, 440].map((x) => g3(sk(`<circle cx="${x}" cy="90" r="34" style="fill:#7FB8D0"/><path d="M${x - 34} 100 Q${x} 90 ${x + 34} 100" style="fill:none;stroke:#FFFDF6" stroke-width="2"/>`, `<circle cx="${x}" cy="90" r="34"/>`))).join("");
+    const stair = spot3("bv_lighthouse", 260, 380, "The stairs to the top", hovE3(260, 372, 70, 14), sk(`<circle cx="260" cy="300" r="64" style="fill:#E6DED0"/>${Array.from({ length: 12 }, (_, i) => {
+      const a = i / 12 * Math.PI * 2;
+      return `<path d="M260 300 L${260 + Math.cos(a) * 62} ${300 + Math.sin(a) * 62}" style="stroke:#5A4636" stroke-width="3"/>`;
+    }).join("")}<circle cx="260" cy="300" r="10" style="fill:#5A4636"/>`, `<circle cx="260" cy="300" r="64"/>`) + lab8(260, 392, "Up to the lamp", "#F6D3DC"));
+    const edges = g3(sk(`<rect x="40" y="440" width="70" height="60" rx="3" style="fill:#8A6A52"/><path d="M48 450 h54 M48 462 h54" style="stroke:#F3E7C8" stroke-width="2"/>`, `<rect x="40" y="440" width="70" height="60" rx="3"/>`)) + g3(`<text x="75" y="486" text-anchor="middle" font-size="7" fill="#F3E7C8">LOGBOOK</text>`) + g3(sk(`<path d="M420 500 l20 -60 h20 l20 60z" style="fill:#F3E7B0"/>${[0, 1, 2, 3].map((i) => `<path d="M${428 + i * 4} ${490 - i * 12} h${44 - i * 8}" style="stroke:#C9A24A" stroke-width="2"/>`).join("")}`, `<path d="M420 500 l20 -60 h20 l20 60z"/>`)) + plant4(60, 600, 0.8);
+    return floor(200, "#B9AE9E", "flags") + back + edges + stair + exit3("#3E7A5A");
+  }
+  function tearoomRoom() {
+    const back = wall2("#F6F0E6", { trim: "#C8432F" }) + seaWin(200, 40, 120, 100) + g3(`<path d="M196 36 q30 30 0 110 M324 36 q-30 30 0 110" fill="#FFFDF6" stroke="#E6DCC6" stroke-width="1.2" opacity=".9"/>`) + shelfUnit(20, 30, 150, 160, 3, jars2(6, ["#FFFDF6", "#BFD4E2", "#F4C7CF"])) + g3(sk(`<rect x="370" y="80" width="110" height="40" rx="4" style="fill:#CFE3EA"/><path d="M386 110 l20 -18 v18z M406 110 l14 -24 v24z" style="fill:#FFFDF6"/><path d="M380 112 h90" style="stroke:#8A5A3A" stroke-width="2"/>`, `<rect x="370" y="80" width="110" height="40" rx="4"/>`));
+    const ctr = spot3("bv_tearoom", 260, 330, "The dresser", hovE3(260, 320, 110, 16), sk(counter(160, 250, 200, "#8A5A3A", "#C9A27E"), `<rect x="160" y="250" width="200" height="46" rx="4"/>`) + g3(`${[0, 1, 2].map((i) => `<ellipse cx="${200 + i * 40}" cy="244" rx="12" ry="5" fill="#E3B47A" stroke="#3a2e28" stroke-width=".6"/><circle cx="${200 + i * 40}" cy="240" r="3" fill="#C2334D"/>`).join("")}<path d="M310 240 q10 -14 20 0z" fill="#FFFDF6" stroke="#3a2e28" stroke-width=".7"/>`) + lab8(260, 346, "Devonshire tea", "#FBE0B8"));
+    const edges = table3(90, 470, 60, "#FFFDF6") + chair2(56, 480) + chair2(124, 480) + table3(430, 470, 60, "#FFFDF6") + chair2(396, 480) + chair2(464, 480) + plant4(470, 600, 0.9) + plant4(50, 600, 0.7);
+    return floor(200, "#B9825E") + back + edges + ctr + exit3("#C8432F");
+  }
+  function giftshopRoom() {
+    const back = wall2("#EAF2F4", { trim: "#3E6B8C" }) + shelfUnit(20, 30, 150, 160, 3, (x, y, w, r) => Array.from({ length: 4 }, (_, i) => `<path d="M${x + 10 + i * 34} ${y} l5 -26 h6 l5 26z" fill="#FFFDF6" stroke="#3a2e28" stroke-width=".6"/><rect x="${x + 14 + i * 34}" y="${y - 32}" width="10" height="6" fill="#C8432F"/>`).join("")) + g3([0, 1, 2, 3, 4].map((i) => `<path d="M${220 + i * 24} 20 v${40 + i % 2 * 14}" stroke="#8A7A66"/>${[0, 1, 2].map((k) => `<circle cx="${220 + i * 24}" cy="${62 + i % 2 * 14 + k * 8}" r="3" fill="${["#FFFDF6", "#F4C7CF", "#BFD4E2"][k]}" stroke="#3a2e28" stroke-width=".5"/>`).join("")}`).join("")) + seaWin(360, 40, 130, 100);
+    const ctr = spot3("bv_giftshop", 260, 330, "The counter", hovE3(260, 320, 110, 16), sk(counter(160, 250, 200, "#3E6B8C", "#BFD4E2"), `<rect x="160" y="250" width="200" height="46" rx="4"/>`) + g3(`<rect x="300" y="226" width="34" height="22" rx="3" fill="#C9A24A" stroke="#3a2e28" stroke-width=".8"/>`) + lab8(260, 346, "Lighthouse things", "#C3DDF3"));
+    const edges = g3(sk(`<rect x="40" y="430" width="60" height="110" rx="3" style="fill:#C9A27E"/>${[0, 1, 2, 3].map((i) => `<rect x="${46 + i % 2 * 26}" y="${440 + Math.floor(i / 2) * 44}" width="22" height="34" fill="${["#F4C7CF", "#BFD4E2", "#F3E7B0", "#C3E8B8"][i]}"/>`).join("")}`, `<rect x="40" y="430" width="60" height="110" rx="3"/>`)) + crateOf(440, 480, ["#FFFDF6", "#E6DED0"]) + plant4(470, 600, 0.8);
+    return floor(200, "#D9CDB4") + back + edges + ctr + exit3("#3E6B8C");
+  }
+  function rangerRoom() {
+    const back = wall2("#C9B49A", { boards: true, trim: "#4E6A4A" }) + frame(30, 40, 150, 110, "#E8E0C8", "#9DB27A") + g3(`<path d="M50 120 q40 -40 110 -20" stroke="#4E7A9A" stroke-width="2" fill="none"/>`) + g3([0, 1, 2, 3, 4, 5].map((i) => `<path d="M${220 + i % 3 * 40} ${50 + Math.floor(i / 3) * 50} q12 -16 24 0 q-12 16 -24 0z" fill="${["#7FA35A", "#C98A3A", "#9DB27A"][i % 3]}" stroke="#3a2e28" stroke-width=".6"/>`).join("")) + g3(`<path d="M380 40 q30 60 10 130" stroke="#8A6A52" stroke-width="3" fill="none"/><path d="M386 60 q20 4 28 20 M388 90 q22 4 30 20 M388 120 q20 4 26 20" stroke="#8A6A52" stroke-width="1.4" fill="none"/>`);
+    const ctr = spot3("bv_rangerhut", 260, 330, "The ranger's desk", hovE3(260, 320, 110, 16), sk(counter(160, 250, 200, "#6B5444", "#9A7656"), `<rect x="160" y="250" width="200" height="46" rx="4"/>`) + g3(`<rect x="300" y="222" width="24" height="26" rx="4" fill="#CFE3EA" stroke="#3a2e28" stroke-width=".8" opacity=".8"/>`) + lab8(260, 346, "Maps and tickets", "#DCEBC8"));
+    const edges = g3(sk(`<rect x="40" y="470" width="80" height="16" style="fill:#8A6A52"/>${[0, 1, 2].map((i) => `<path d="M${50 + i * 24} 470 v-24 h14 v24" style="fill:#5A4636"/>`).join("")}`, `<rect x="40" y="470" width="80" height="16"/>`)) + crateOf(450, 480, ["#9DB27A", "#7FA35A"]) + plant4(470, 600, 1) + plant4(50, 600, 0.9);
+    return floor(200, "#9A7F62") + back + edges + ctr + exit3("#4E6A4A");
+  }
+  function mushcafeRoom() {
+    const back = wall2("#F3E7C8", { trim: C_RED }) + g3(sk(`<rect x="30" y="60" width="90" height="120" rx="4" style="fill:#3A3430"/><rect x="46" y="110" width="58" height="40" rx="3" style="fill:#E8913A"/><path d="M60 60 v-50 h22 v50" style="fill:#3A3430"/>`, `<rect x="30" y="60" width="90" height="120" rx="4"/>`)) + shelfUnit(150, 30, 160, 150, 3, jars2(6, ["#C98A4A", "#E3B47A", "#7FA35A"])) + g3([[360, 70], [420, 110], [470, 60]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="20" ry="11" fill="${C_RED}" stroke="#3a2e28" stroke-width=".8"/><circle cx="${x - 6}" cy="${y - 2}" r="2.6" fill="#FFFDF6"/><circle cx="${x + 6}" cy="${y - 4}" r="2" fill="#FFFDF6"/><rect x="${x - 5}" y="${y + 6}" width="10" height="14" fill="#FFFDF6" stroke="#3a2e28" stroke-width=".6"/>`).join(""));
+    const ctr = spot3("bv_mushcafe", 260, 330, "The counter", hovE3(260, 320, 110, 16), sk(counter(160, 250, 200, "#8A5A3A", "#C9A27E"), `<rect x="160" y="250" width="200" height="46" rx="4"/>`) + g3(`<ellipse cx="200" cy="244" rx="16" ry="6" fill="#C98A4A" stroke="#3a2e28" stroke-width=".6"/><rect x="300" y="226" width="30" height="20" rx="3" fill="#E8E0C8" stroke="#3a2e28" stroke-width=".6"/>`) + lab8(260, 346, "Soup of the day", "#F6D3DC"));
+    const edges = table3(90, 470, 60, "#E8D3A8") + chair2(56, 480, "#7FA35A") + chair2(124, 480, C_RED) + table3(430, 470, 60, "#E8D3A8") + chair2(396, 480, "#E3B04B") + chair2(464, 480, "#7FA35A") + plant4(470, 600) + plant4(50, 600, 0.8);
+    return floor(200, "#8A6A52") + back + edges + ctr + exit3(C_RED);
+  }
+  var C_RED = "#C8432F";
+  function grottoRoom() {
+    const back = g3(`<rect width="520" height="640" fill="#1E2422"/><path d="M0 0 H520 V260 Q400 300 260 280 Q120 300 0 260z" fill="#2E3632"/>${Array.from({ length: 60 }, (_, i) => {
+      const x = i * 97 % 520, y = 20 + i * 53 % 230;
+      return `<circle cx="${x}" cy="${y}" r="${1 + i % 3 * 0.5}" fill="#9FF0D8" class="twinkle" style="animation-delay:${i % 7 * 0.4}s"/>`;
+    }).join("")}`);
+    const look = spot3("bv_grotto", 260, 380, "Look up", hovE3(260, 372, 90, 14), lab8(260, 386, "Look up (torches off)", "#C3E8DA"));
+    const edges = g3(`<ellipse cx="80" cy="520" rx="60" ry="20" fill="#3A403C"/><ellipse cx="450" cy="500" rx="50" ry="18" fill="#3A403C"/><ellipse cx="260" cy="560" rx="80" ry="14" fill="#2A4A50" opacity=".8"/>`);
+    return back + edges + look + exit3("#3A3430");
+  }
+  function coopRoom() {
+    const back = wall2("#C9CED2", { trim: "#3E6B8C" }) + g3(Array.from({ length: 26 }, (_, i) => `<path d="M${i * 20} 12 V200" stroke="#B5BBC0" stroke-width="2"/>`).join("")) + g3(sk(`<rect x="360" y="40" width="130" height="90" style="fill:#FFFDF6"/>`, `<rect x="360" y="40" width="130" height="90"/>`)) + signText(425, 60, "TODAY", "#FFFDF6", "#3E6B8C", 9) + g3(`<text x="372" y="84" font-size="8" font-family="Klee One,serif" fill="#3B3530">crays · 28</text><text x="372" y="100" font-size="8" font-family="Klee One,serif" fill="#3B3530">prawns · 6</text><text x="372" y="116" font-size="8" font-family="Klee One,serif" fill="#3B3530">scallops · 7</text>`) + fishShapes(40, 80, 6, "#9FC3D9") + g3(`<path d="M30 70 H180" stroke="#8A7A66"/>`);
+    const ctr = spot3("bv_coop", 260, 330, "The ice tubs", hovE3(260, 320, 110, 16), sk(counter(150, 250, 220, "#9AA0A8", "#E6EEF2"), `<rect x="150" y="250" width="220" height="46" rx="4"/>`) + g3(`<rect x="156" y="246" width="208" height="12" fill="#FFFFFF" opacity=".8"/>${[0, 1, 2].map((i) => `<path d="M${176 + i * 30} 244 q10 -10 20 0" fill="#C8432F" stroke="#3a2e28" stroke-width=".7"/><path d="M${180 + i * 30} 238 l-6 -8 M${192 + i * 30} 238 l6 -8" stroke="#C8432F" stroke-width="1.2"/>`).join("")}<rect x="300" y="222" width="40" height="24" rx="3" fill="#D9A05A" stroke="#3a2e28" stroke-width=".8"/>`) + lab8(260, 346, "Fresh off the boats", "#C3DDF3"));
+    const edges = g3(sk(`<rect x="40" y="460" width="80" height="40" rx="4" style="fill:#4F93B4"/><rect x="400" y="460" width="80" height="40" rx="4" style="fill:#E8913A"/>`, `<rect x="40" y="460" width="80" height="40" rx="4"/><rect x="400" y="460" width="80" height="40" rx="4"/>`)) + g3(`<path d="M50 470 h60 M410 470 h60" stroke="#FFFFFF" stroke-width="3" opacity=".7"/>`) + crateOf(80, 580, ["#C8432F", "#C8432F"]);
+    return floor(200, "#B9BEC4", "flat") + back + edges + ctr + exit3("#3E6B8C");
+  }
+  function pubRoom() {
+    const back = wall2("#7A4A3A", { boards: true, trim: "#3E2A20" }) + shelfUnit(150, 30, 220, 150, 3, bottlesF(10, ["#7A1F3D", "#E8D57A", "#5A7A3A", "#C98A4A"])) + g3(sk(`<rect x="30" y="60" width="90" height="120" style="fill:#3A3430"/><path d="M50 180 q25 -40 50 0z" style="fill:#E8913A"/>`, `<rect x="30" y="60" width="90" height="120"/>`)) + g3(`<circle cx="440" cy="80" r="30" fill="#2F2B28" stroke="#C9A24A" stroke-width="4"/><circle cx="440" cy="80" r="16" fill="#C8432F"/><circle cx="440" cy="80" r="5" fill="#F3E7C8"/>`) + g3(`<circle cx="260" cy="20" r="0"/>`);
+    const ctr = spot3("bv_pub", 260, 330, "The bar", hovE3(260, 320, 110, 16), sk(counter(140, 250, 240, "#5A3A2A", "#9A6A42"), `<rect x="140" y="250" width="240" height="46" rx="4"/>`) + g3(`${[0, 1, 2].map((i) => `<rect x="${200 + i * 30}" y="222" width="6" height="26" fill="#C9A24A" stroke="#3a2e28" stroke-width=".6"/><circle cx="${203 + i * 30}" cy="220" r="4" fill="#2F2B28"/>`).join("")}<circle cx="320" cy="236" r="14" fill="none" stroke="#8A6A52" stroke-width="4"/>${Array.from({ length: 8 }, (_, i) => {
+      const a = i / 8 * Math.PI * 2;
+      return `<path d="M320 236 L${320 + Math.cos(a) * 20} ${236 + Math.sin(a) * 20}" stroke="#8A6A52" stroke-width="2"/>`;
+    }).join("")}`) + lab8(260, 346, "The bar", "#FBE0B8"));
+    const edges = table3(90, 470, 60, "#9A6A42") + chair2(56, 480, "#5A3A2A") + chair2(124, 480, "#5A3A2A") + table3(430, 470, 60, "#9A6A42") + chair2(396, 480, "#5A3A2A") + chair2(464, 480, "#5A3A2A") + g3(`<rect x="440" y="560" width="50" height="40" rx="6" fill="#8A6A52" stroke="#3a2e28" stroke-width=".8"/>`);
+    return floor(200, "#6B4A36") + back + edges + ctr + exit3("#3E2A20");
+  }
+  function smokehouseRoom() {
+    const back = g3(`<rect width="520" height="200" fill="#A89880"/>${Array.from({ length: 8 }, (_, i) => `<path d="M0 ${20 + i * 24} H520" stroke="#988870" stroke-width="2"/>`).join("")}`) + [40, 90, 140].map((y) => g3(`<path d="M30 ${y} H490" stroke="#5A4636" stroke-width="3"/>`) + fishShapes(40, y + 12, 20, ["#D9A05A", "#C98A3A", "#E3B47A"][y % 3])).join("") + g3(`<path d="M100 0 q-20 40 0 80 q20 40 0 80" stroke="#E6DED0" stroke-width="18" fill="none" opacity=".25"/><path d="M400 0 q-20 40 0 80 q20 40 0 80" stroke="#E6DED0" stroke-width="18" fill="none" opacity=".25"/>`);
+    const ctr = spot3("bv_smokehouse", 260, 330, "The counter", hovE3(260, 320, 110, 16), sk(counter(160, 250, 200, "#6B5444", "#9A7656"), `<rect x="160" y="250" width="200" height="46" rx="4"/>`) + g3([0, 1, 2, 3].map((i) => `<rect x="${186 + i * 36}" y="230" width="20" height="18" rx="3" fill="#E3D6BE" stroke="#3a2e28" stroke-width=".6"/><rect x="${186 + i * 36}" y="228" width="20" height="5" fill="#8A5A3A"/>`).join("")) + lab8(260, 346, "Smoked trout", "#F6E3B4"));
+    const edges = crateOf(70, 470, ["#8A6A52", "#6B5444"]) + crateOf(70, 530, ["#8A6A52", "#6B5444"]) + g3(`<rect x="410" y="450" width="70" height="90" rx="3" fill="#7A6A5A" stroke="#3a2e28" stroke-width=".8"/><rect x="420" y="500" width="50" height="20" fill="#E8913A"/>`);
+    return floor(200, "#8A7A6A", "flags") + back + edges + ctr + exit3("#5A4636");
+  }
+  function kioskRoom() {
+    const back = wall2("#F3E7C8", { trim: "#3E6B8C" }) + g3(sk(`<rect x="30" y="30" width="190" height="140" style="fill:#E8E0C8"/><path d="M50 120 q50 -60 150 -40" style="stroke:#4E7A9A" stroke-width="2" fill="none"/>`, `<rect x="30" y="30" width="190" height="140"/>`) + [[80, 90], [130, 70], [170, 110]].map(([x, y]) => `<path d="M${x - 6} ${y} l12 0 M${x} ${y - 6} l0 12" stroke="#C8432F" stroke-width="2"/>`).join("")) + signText(125, 46, "SHIPWRECKS", "#FFFDF6", "#3E6B8C", 9) + seaWin(300, 40, 190, 110);
+    const ctr = spot3("bv_kiosk", 260, 330, "The hatch", hovE3(260, 320, 110, 16), sk(counter(150, 250, 220, "#3E6B8C", "#9FC3D9"), `<rect x="150" y="250" width="220" height="46" rx="4"/>`) + g3(`<rect x="170" y="226" width="40" height="22" rx="3" fill="#E6EEF2" stroke="#3a2e28" stroke-width=".7"/><rect x="290" y="224" width="30" height="24" rx="3" fill="#9AA0A8" stroke="#3a2e28" stroke-width=".7"/>`) + lab8(260, 346, "Chips and coffee", "#C3DDF3"));
+    const edges = g3(sk(`<rect x="40" y="420" width="50" height="130" rx="3" style="fill:#C9A27E"/>${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="${46 + i % 2 * 20}" y="${430 + Math.floor(i / 2) * 38}" width="16" height="30" fill="${["#E8913A", "#9FC3D9", "#F3D34A"][i % 3]}"/>`).join("")}`, `<rect x="40" y="420" width="50" height="130" rx="3"/>`)) + table3(430, 480, 60) + chair2(396, 490) + chair2(464, 490) + plant4(470, 600, 0.8);
+    return floor(200, "#D9C7A0") + back + edges + ctr + exit3("#3E6B8C");
+  }
+  function slscRoom() {
+    const back = g3(`<rect width="520" height="200" fill="#F3D34A"/><rect width="520" height="100" fill="#C8432F"/><rect y="0" width="520" height="12" fill="#3E2A20"/>`) + [40, 100].map((x) => board2(x, 110, "#C8432F", 150)).join("") + board2(160, 110, "#F3D34A", 150) + g3(sk(`<rect x="320" y="30" width="170" height="140" style="fill:#5A3A2A"/>`, `<rect x="320" y="30" width="170" height="140"/>`) + Array.from({ length: 7 }, (_, i) => `<path d="M336 ${56 + i * 16} h138" stroke="#E8C33A" stroke-width="1.4"/>`).join("")) + signText(405, 44, "HONOUR BOARD", "#F3D34A", "#5A3A2A", 9);
+    const ctr = spot3("bv_slsc", 260, 330, "The canteen", hovE3(260, 320, 110, 16), sk(counter(150, 250, 220, "#C8432F", "#F3D34A"), `<rect x="150" y="250" width="220" height="46" rx="4"/>`) + g3(`<rect x="300" y="226" width="34" height="22" rx="3" fill="#E6EEF2" stroke="#3a2e28" stroke-width=".8"/>`) + lab8(260, 346, "The canteen", "#F6D3DC"));
+    const edges = g3(sk(`<rect x="40" y="440" width="90" height="30" rx="14" style="fill:#F3D34A"/><rect x="400" y="440" width="90" height="30" rx="14" style="fill:#C8432F"/>`, `<rect x="40" y="440" width="90" height="30" rx="14"/><rect x="400" y="440" width="90" height="30" rx="14"/>`)) + bench3(60, 560, 100) + plant4(470, 600, 0.8);
+    return floor(200, "#C9B79A") + back + edges + ctr + exit3("#C8432F");
+  }
+  function hideRoom() {
+    const back = g3(`<rect width="520" height="640" fill="#5A4A3A"/><rect width="520" height="200" fill="#6B5A44"/>${Array.from({ length: 10 }, (_, i) => `<path d="M0 ${20 + i * 18} H520" stroke="#5A4A3A" stroke-width="2"/>`).join("")}`) + g3(sk(`<rect x="30" y="60" width="460" height="100" style="fill:#3E5A6E"/><path d="M30 130 Q260 116 490 130 V160 H30z" style="fill:#EAD7A8"/><path d="M30 120 Q260 108 490 120" style="stroke:#FFFDF6;fill:none" stroke-width="3"/>`, `<rect x="30" y="60" width="460" height="100"/>`));
+    const look = spot3("bv_hide", 260, 330, "The long window", hovE3(260, 320, 140, 16), lab8(260, 330, "Watch the beach (whisper)", "#DCEBC8"));
+    const edges = bench3(60, 420, 160, "#3E2A20") + bench3(300, 420, 160, "#3E2A20") + g3(`<rect x="30" y="520" width="60" height="50" rx="3" fill="#3E2A20"/><text x="60" y="550" text-anchor="middle" font-size="7" fill="#F3E7C8">NO FLASH</text>`);
+    return back + edges + look + exit3("#3E2A20");
+  }
+  function parkstoreRoom() {
+    const back = wall2("#F3EAD6", { boards: true, trim: "#3E6B8C" }) + shelfUnit(20, 30, 200, 160, 3, jars2(9, ["#E8913A", "#9FC3D9", "#F3D34A", "#E8566C"])) + g3(sk(`<rect x="300" y="40" width="190" height="130" rx="4" style="fill:#BFE3EE"/><rect x="310" y="50" width="170" height="110" style="fill:#E6F4F8"/>`, `<rect x="300" y="40" width="190" height="130" rx="4"/>`) + [0, 1, 2].map((i) => `<rect x="320" y="${62 + i * 34}" width="150" height="4" fill="#B7C9CF"/>${[0, 1, 2, 3].map((k) => `<rect x="${326 + k * 36}" y="${48 + i * 34}" width="14" height="14" rx="3" fill="${["#E8566C", "#F3C969", "#9CC27E", "#C9A2C8"][(i + k) % 4]}"/>`).join("")}`).join(""));
+    const ctr = spot3("bv_parkstore", 260, 330, "The counter", hovE3(260, 320, 110, 16), sk(counter(150, 250, 220, "#8A6A52", "#C9A27E"), `<rect x="150" y="250" width="220" height="46" rx="4"/>`) + g3(`<rect x="170" y="222" width="30" height="26" rx="3" fill="#C9A86A" stroke="#3a2e28" stroke-width=".8"/><circle cx="185" cy="220" r="5" fill="#E3B04B"/><rect x="300" y="226" width="34" height="22" rx="3" fill="#C9A24A" stroke="#3a2e28" stroke-width=".8"/>`) + lab8(260, 346, "Bait, bread and bird seed", "#C3DDF3"));
+    const edges = crateOf(70, 470, ["#E3B04B", "#C8432F"]) + g3(`<rect x="400" y="440" width="90" height="70" rx="4" fill="#C9C2B4" stroke="#3a2e28" stroke-width=".8"/><text x="445" y="480" text-anchor="middle" font-size="7" fill="#3B3530">LOST THONGS</text>${[0, 1, 2].map((i) => `<ellipse cx="${416 + i * 26}" cy="498" rx="8" ry="4" fill="${["#4F9CC4", "#E8566C", "#F3D34A"][i]}"/>`).join("")}`) + plant4(470, 600, 0.9);
+    return floor(200, "#C9A27E") + back + edges + ctr + exit3("#3E6B8C");
+  }
+  function laundryRoom() {
+    const back = wall2("#DCEFF0", { trim: "#E8566C" }) + g3([0, 1, 2].map((i) => sk(`<rect x="${30 + i * 70}" y="80" width="60" height="100" rx="4" style="fill:#FFFDF6"/><circle cx="${60 + i * 70}" cy="136" r="20" style="fill:#BFD4E2"/><circle cx="${60 + i * 70}" cy="136" r="12" style="fill:#9FC3D9"/>`, `<rect x="${30 + i * 70}" y="80" width="60" height="100" rx="4"/><circle cx="${60 + i * 70}" cy="136" r="20"/>`)).join("")) + shelfUnit(320, 30, 170, 150, 3, (x, y, w, r) => Array.from({ length: 7 }, (_, i) => `<rect x="${x + i * (w / 7)}" y="${y - 20}" width="${w / 7 - 3}" height="20" fill="${["#E8566C", "#9FC3D9", "#F3D34A", "#9CC27E", "#C9A2C8"][(i + r) % 5]}"/>`).join("")) + signText(405, 26, "BOOK SWAP", "#FFFDF6", "#E8566C", 8);
+    const ctr = spot3("bv_laundry", 260, 330, "The coffee counter", hovE3(260, 320, 110, 16), sk(counter(150, 250, 220, "#E8566C", "#F4C7CF"), `<rect x="150" y="250" width="220" height="46" rx="4"/>`) + g3(`<rect x="170" y="220" width="44" height="28" rx="3" fill="#9AA0A8" stroke="#3a2e28" stroke-width=".8"/><rect x="290" y="232" width="50" height="14" rx="3" fill="#E3B47A" stroke="#3a2e28" stroke-width=".6"/>`) + lab8(260, 346, "Coffee and banana bread", "#F6D3DC"));
+    const edges = table3(90, 470, 60) + chair2(56, 480, "#9FC3D9") + chair2(124, 480, "#E8566C") + g3(`<rect x="400" y="450" width="80" height="40" rx="4" fill="#C9A86A" stroke="#3a2e28" stroke-width=".8"/>${[0, 1, 2].map((i) => `<rect x="${408 + i * 24}" y="${440}" width="20" height="12" fill="${["#F4C7CF", "#FFFDF6", "#BFD4E2"][i]}" stroke="#3a2e28" stroke-width=".5"/>`).join("")}`) + plant4(470, 600, 0.9);
+    return floor(200, "#D9DDD2", "flags") + back + edges + ctr + exit3("#E8566C");
+  }
+  function rechallRoom() {
+    const back = wall2("#E6E2DA", { trim: "#3E6B8C" }) + g3(sk(`<rect x="30" y="40" width="110" height="140" rx="6" style="fill:#3E2A50"/><rect x="42" y="56" width="86" height="60" style="fill:#F3D34A"/>`, `<rect x="30" y="40" width="110" height="140" rx="6"/>`)) + signText(85, 136, "PINBALL", "#F3D34A", "#3E2A50", 8) + g3(sk(`<rect x="180" y="40" width="150" height="120" style="fill:#2F3A34"/>`, `<rect x="180" y="40" width="150" height="120"/>`) + Array.from({ length: 6 }, (_, i) => `<path d="M196 ${68 + i * 14} h118" stroke="#FFFDF6" stroke-width="1" opacity=".7"/>`).join("")) + signText(255, 56, "HIGH SCORES", "#FFFDF6", "#2F3A34", 8) + g3(sk(`<rect x="370" y="80" width="120" height="100" style="fill:#3A3430"/>${Array.from({ length: 10 }, (_, i) => `<rect x="${376 + i * 11}" y="150" width="9" height="24" style="fill:#FFFDF6"/>`).join("")}`, `<rect x="370" y="80" width="120" height="100"/>`));
+    const ctr = spot3("bv_rechall", 260, 400, "The ping-pong table", hovE3(260, 392, 90, 14), sk(`<rect x="170" y="290" width="180" height="90" rx="3" style="fill:#3E7A5A"/><path d="M260 290 v90 M170 335 h180" style="stroke:#FFFDF6" stroke-width="2"/><path d="M170 335 h180" style="stroke:#2F2B28" stroke-width="4"/>`, `<rect x="170" y="290" width="180" height="90" rx="3"/>`) + lab8(260, 404, "Ping-pong", "#C3E8DA"));
+    const edges = table3(80, 500, 60, "#E8D3A8") + chair2(46, 510) + chair2(114, 510) + g3(`<rect x="400" y="470" width="80" height="60" rx="4" fill="#C9A86A" stroke="#3a2e28" stroke-width=".8"/><text x="440" y="504" text-anchor="middle" font-size="7" fill="#3B3530">JIGSAWS</text>`);
+    return floor(200, "#C9A27E") + back + edges + ctr + exit3("#3E6B8C");
+  }
+  var ROOMS3 = {
+    bv_surfshop: surfshopRoom,
+    bv_chippy: chippyRoom,
+    bv_bakery: bakeryRoom,
+    bv_lighthouse: lighthouseRoom,
+    bv_tearoom: tearoomRoom,
+    bv_giftshop: giftshopRoom,
+    bv_rangerhut: rangerRoom,
+    bv_mushcafe: mushcafeRoom,
+    bv_grotto: grottoRoom,
+    bv_coop: coopRoom,
+    bv_pub: pubRoom,
+    bv_smokehouse: smokehouseRoom,
+    bv_kiosk: kioskRoom,
+    bv_slsc: slscRoom,
+    bv_hide: hideRoom,
+    bv_parkstore: parkstoreRoom,
+    bv_laundry: laundryRoom,
+    bv_rechall: rechallRoom
+  };
+  var coastRoomArt = (scene2) => (ROOMS3[scene2] || surfshopRoom)();
 
   // src/game/cinque.js
   function cinqueState(F2) {
@@ -26623,8 +27138,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     // round 129: room for Jeju's magnet too
     fridge3: { scene: "home", at: [326, 230], n: "home, on the fridge (by the handle)", only: "magnet" },
     // round 134: and Cinque Terre's
-    fridge4: { scene: "home", at: [344, 204], n: "home, on the fridge (top corner)", only: "magnet" }
+    fridge4: { scene: "home", at: [344, 204], n: "home, on the fridge (top corner)", only: "magnet" },
     // round 142: and Bellbird Valley's
+    fridge5: { scene: "home", at: [312, 214], n: "home, on the fridge (by the freezer door)", only: "magnet" }
+    // round 149: and the Coast Road's
   };
   var canKeep = (it) => !!it && (it.kind === "keepsake" || !!it.keep);
   var fits = (it, sp) => canKeep(it) && (sp.only ? !!it[sp.only] : !it.magnet);
@@ -30508,6 +31025,11 @@ ${SIGNOFF[t2.who] || ""}`;
           who3.slice(0, 3).forEach((id, i) => setTimeout(() => npcSay(id, pick(["Pass the bread down? Thank you, love.", "This lamb. I'm not talking for a minute.", "We should do this every Sunday.", "Look at the view. Look at it!"])), 2400 + i * 2400));
         }
         ev(k === "babycino" ? ["a coffee for ME!", "froth moustache!"] : k === "freddo" ? ["a chocolate FROG!", "ribbit! chomp!"] : k === "icypole" ? ["it's dripping!", "my tongue is red!"] : ["yummy!", "can I have some?", "mmm, Mama"]);
+      } else if (a === "pingpong") {
+        sfx("tap");
+        gainXp(1);
+        speak(pick(["Ping. Pong. Ping. Pong. A rally of twenty-two! Then you hit it into the piano.", "You win 11 to 9. Evan claims he won. Nobody argues.", "A long, ridiculous rally, both of you laughing. The ball ends up under the pinball machine."]), 5500);
+        ev(["my turn! my turn!", "PING! PONG!", "I hit it, Mama!"]);
       } else if (a === "cut") {
         const n = buyCuttings(F, room2);
         if (!n) return;
@@ -31626,7 +32148,7 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
     tableKey = "";
-    $("sceneArt").innerHTML = scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
+    $("sceneArt").innerHTML = scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F))) : roomArt(scene);
     $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt(F.fish && F.fish.koi || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") + (F.towns && F.towns.cinque ? homeBoat(206, 150, ...boatCols(F)) : "") : "") + (scene === "vineyard" && F.loft && F.loft.rack ? dryingRack(188, 226) : "") + (scene === "cellar" && owns2(F, "cellar") && discoNow(dayKey(), sgHM()) ? discoArt() : "") + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));
     if (outside() && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));
     if (outside() && isDusk()) nightLights();

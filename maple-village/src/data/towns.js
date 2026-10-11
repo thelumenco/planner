@@ -638,7 +638,7 @@ TOWN_GOODS.c_magnet.magnet = true;
 // Bellbird Valley's goods (round 142: data/bellbird.js)
 Object.assign(TOWN_GOODS, BB_GOODS); Object.assign(KEEP_LINES, BB_KEEP);
 Object.keys(BB_KEEP).forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
-TOWN_GOODS.b_magnet.magnet = true;
+TOWN_GOODS.b_magnet.magnet = true; TOWN_GOODS.b_crmagnet.magnet = true;
 Object.keys(PAINT.colours).forEach(c => Object.keys(PAINT.patterns).forEach(p => { TOWN_GOODS[`ptile_${c}_${p}`] = {n: "Your painted tile", kind: "keepsake", price: 0, tile: [c, p], art: ["tile", PAINT.colours[c][1], "#FFFDF6"], line: `A tile you painted yourself at Lucía's in Ronda: ${PAINT.patterns[p]}, in ${PAINT.colours[c][0]}.`}; }));
 // Round 123: the nerikiri sweets Mel makes with Mr Tanaka in Kyoto (gifts), one shape for each season
 [["sakura", "cherry blossom", "#F6C7D6"], ["ajisai", "hydrangea", "#B9A8E0"], ["momiji", "maple leaf", "#E0782E"], ["tsubaki", "camellia", "#C8432F"]].forEach(([k, n, col]) => {

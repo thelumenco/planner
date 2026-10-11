@@ -13,7 +13,7 @@
 //   Gum Creek          bv_creek:   bk_bush | bk_koala
 //   Riverside Camp     bv_camp:    br_park / br_river
 
-import { CR_TOWNS, CR_PLACES, CR_BRIDGES, CR_ARRIVE, CR_BOUNDS, CR_OBST, CR_EVAN, CR_MAP, CR_ROADS, CR_NAMES } from "./coast.js";
+import { CR_TOWNS, CR_PLACES, CR_BRIDGES, CR_ARRIVE, CR_BOUNDS, CR_OBST, CR_EVAN, CR_MAP, CR_ROADS, CR_NAMES, CR_GOODS, CR_KEEP } from "./coast.js";
 const VAN = {by: "van", fare: 0, free: ["evan"], outFrom: 7*60, outTo: 18*60, backTo: 22*60};
 const fam = (spots) => spots;   // (readability)
 
@@ -377,5 +377,6 @@ export const BB_KEEP = {b_magnet: "A tiny campervan on a road through the vines,
 // Valley Gate). The road map has a page per region (BB_MAPS).
 Object.assign(BB_TOWNS, CR_TOWNS); Object.assign(BB_PLACES, CR_PLACES); Object.assign(BB_BRIDGES, CR_BRIDGES); Object.assign(BB_ARRIVE, CR_ARRIVE);
 Object.assign(BB_BOUNDS, CR_BOUNDS); Object.assign(BB_OBST, CR_OBST); Object.assign(BB_EVAN, CR_EVAN); Object.assign(BB_NAMES, CR_NAMES); BB_ROADS.push(...CR_ROADS);
+Object.assign(BB_GOODS, CR_GOODS); Object.assign(BB_KEEP, CR_KEEP);
 export const BB_MAPS = {vines: BB_MAP, coast: CR_MAP};
 export const REGION_N = {vines: "The Vines", coast: "The Coast Road"};

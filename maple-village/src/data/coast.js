@@ -232,7 +232,12 @@ export const CR_OBST = {
   cg_ferns: [[60, 150, 180, 250], [350, 150, 470, 250]], cg_cove: [[0, 0, 100, 250], [330, 130, 470, 236]],
   ch_wharf: [[0, 380, 280, 640], [340, 380, 520, 640], [180, 130, 320, 230]], ch_cottages: [[70, 110, 210, 230], [340, 120, 460, 230]],
   cs_lookout: [[340, 130, 460, 230]], cs_beach: [[70, 150, 190, 250], [350, 240, 450, 296], [0, 0, 420, 176]],
-  cc_park: [[70, 150, 190, 250], [330, 150, 450, 250]], cc_mouth: [[340, 150, 460, 250], [0, 240, 150, 300]]
+  cc_park: [[70, 150, 190, 250], [330, 150, 450, 250]], cc_mouth: [[340, 150, 460, 250], [0, 240, 150, 300]],
+  // the rooms (round 149): the counter (or the stair, the ping-pong table, the benches) and the furniture round the edges
+  ...Object.fromEntries(["bv_surfshop", "bv_chippy", "bv_bakery", "bv_tearoom", "bv_giftshop", "bv_rangerhut", "bv_mushcafe", "bv_coop", "bv_pub", "bv_smokehouse", "bv_kiosk", "bv_slsc", "bv_parkstore", "bv_laundry"]
+    .map(r => [r, [[140, 222, 380, 300], [40, 430, 130, 500], [396, 440, 490, 505]]])),
+  bv_lighthouse: [[196, 236, 324, 364], [40, 440, 110, 500], [420, 440, 480, 500]], bv_grotto: [[30, 500, 140, 540], [400, 482, 500, 518]],
+  bv_hide: [[60, 420, 220, 436], [300, 420, 460, 436]], bv_rechall: [[170, 290, 350, 380], [46, 486, 120, 520], [400, 470, 480, 530]]
 };
 export const CR_EVAN = {cw_beach: [[240, 320], [320, 300], [200, 420]], cw_street: [[200, 380], [320, 420], [260, 470]], cl_light: [[260, 420], [320, 470], [220, 380]], cl_cliff: [[200, 380], [260, 440], [240, 300]],
   cg_ferns: [[260, 430], [320, 470], [220, 500]], cg_cove: [[240, 300], [320, 340], [200, 380]], ch_wharf: [[200, 300], [300, 320], [310, 480]], ch_cottages: [[200, 360], [300, 420], [260, 460]],
@@ -243,3 +248,27 @@ export const CR_ROADS = [["bv_gate", "bv_breakwater"], ["bv_breakwater", "bv_lig
 export const CR_NAMES = {cw_beach: "Breakwater", cw_street: "Breakwater: the main street", cl_light: "Lighthouse Point", cl_cliff: "Lighthouse Point: the cliff walk",
   cg_ferns: "Fern Gully", cg_cove: "Fern Gully: the hidden cove", ch_wharf: "Fisher's Harbour", ch_cottages: "Fisher's Harbour: the cottages",
   cs_lookout: "The Sisters", cs_beach: "The Sisters: the beach", cc_park: "Koala Cove", cc_mouth: "Koala Cove: the river mouth"};
+
+// Round 149: what the coast's rooms sell (TOWN_GOODS, by room; merged in data/bellbird.js). Scallops and coastal heath
+// honey go in the larder (the scallop pie special; heath honey in the gelato); the crayfish for the crayfish roll
+// comes off Mags's boat (or the lake at home). The magnet has its own spot on the fridge.
+export const CR_GOODS = {
+  b_wax: {n: "A block of surf wax", kind: "gift", to: ["marcus", "darren", "dad"], price: 4, shop: "bv_surfshop", art: ["box", "#F3E7B0", "#4F9CC4"], say: "Surf wax! Smells like coconut. I'm putting it on everything. Even the ironing board."},
+  b_rashie: {n: "A little rash vest", kind: "gift", to: ["evan", "angelina"], price: 12, shop: "bv_surfshop", art: ["tee", "#4F9CC4"], say: "A rash vest with a wave on it! For the beach. I'm wearing it now."},
+  b_sourdough: {n: "A sourdough loaf", kind: "gift", to: "family", price: 5, shop: "bv_bakery", art: ["box", "#D9A05A", "#F3E7C8"], say: "A crusty sourdough from the coast. Still warm. Who's got butter?"},
+  b_shortbread: {n: "Keeper's shortbread", kind: "gift", to: ["mama", "gonggong", "mum"], price: 6, shop: "bv_tearoom", art: ["box", "#F3E7B0", "#C8432F"], say: "Shortbread in a tin with a lighthouse on it! Melts in the mouth."},
+  b_lhmodel: {n: "Lighthouse model", kind: "keepsake", price: 14, shop: "bv_giftshop", art: ["bottle", "#FFFDF6", "#C8432F"], line: "A little white lighthouse with a red cap, from the gift shop at Lighthouse Point. The light inside really comes on."},
+  b_chime: {n: "Shell wind chime", kind: "keepsake", price: 10, shop: "bv_giftshop", art: ["bell", "#F4C7CF"], line: "A wind chime of shells and sea glass from Lighthouse Point. It sounds like the beach when the window's open."},
+  b_crmagnet: {n: "Coast Road fridge magnet", kind: "gift", to: "family", price: 3, shop: "bv_giftshop", art: ["disc", "#4F93B4", "#FFFDF6"], say: "A tiny lighthouse and a wave. For the fridge!"},
+  b_teatowel: {n: "Coast Road tea towel", kind: "gift", to: ["mum", "mama", "dad"], price: 7, shop: "bv_giftshop", art: ["cloth", "#FFFDF6", "#4F93B4"], say: "A tea towel with a map of the whole Coast Road! I'll never dry a dish with it."},
+  b_birdguide: {n: "A pocket guide to rainforest birds", kind: "gift", to: ["gonggong", "dad", "angelina"], price: 8, shop: "bv_rangerhut", art: ["box", "#7FA35A", "#C8432F"], say: "A bird guide! The lyrebird's on page twelve. I'm going to find one."},
+  honey_heath: {n: "Coastal heath honey", kind: "ingredient", price: 7, sell: 4, shop: "bv_mushcafe", art: ["jar", "#E3B04B", "#9DAA78"], what: "for gelato and bonbons: floral and a bit wild, from the hives on the heath"},
+  scallop: {n: "Scallops", kind: "ingredient", price: 7, sell: 4, shop: "bv_coop", art: ["disc", "#F3E7C8", "#E8913A"], what: "scallop pies at the kitchen (a Coast Road special)"},
+  b_pate: {n: "Smoked trout pâté", kind: "gift", to: ["dad", "gonggong", "darren", "mum"], price: 8, shop: "bv_smokehouse", art: ["jar", "#E3B47A", "#8A5A3A"], say: "Smoked trout pâté! On crackers, with a squeeze of lemon. Gone in a minute."},
+  b_smoked: {n: "A whole smoked trout", kind: "gift", to: ["gonggong", "mama", "dad"], price: 10, shop: "bv_smokehouse", art: ["fish", "#D9A05A"], say: "A smoked trout, golden all over. Gong Gong is very happy."},
+  b_postcard: {n: "A postcard of the Sisters", kind: "gift", to: "family", price: 2, shop: "bv_kiosk", art: ["box", "#E8913A", "#4F93B4"], say: "A postcard of those rocks at sunset! I'm putting it on the fridge."},
+  b_penguin: {n: "Plush little penguin", kind: "gift", to: ["evan", "angelina", "mama"], price: 9, shop: "bv_kiosk", art: ["plush", "#4E6E8C"], say: "A little penguin! Blue and white and very small. Like the real ones!"},
+  b_cap: {n: "A Nippers cap", kind: "gift", to: ["evan"], price: 5, shop: "bv_slsc", art: ["beanie", "#E8566C"], say: "A Nippers cap! Red and yellow! I'm a lifesaver now, Mama!"},
+  b_seed: {n: "A scoop of bird seed", kind: "ingredient", price: 2, sell: 1, shop: "bv_parkstore", art: ["box", "#E3B04B", "#C9A86A"], what: "for the king parrots at Koala Cove: hold out your arm"}
+};
+export const CR_KEEP = {b_crmagnet: "A tiny lighthouse and a wave, from the Coast Road.", b_teatowel: "A tea towel with a map of the whole Coast Road."};
