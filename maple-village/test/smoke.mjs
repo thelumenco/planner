@@ -158,6 +158,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#pclose");
   check(await page.locator("#panel").isHidden(), "closing the board returns to the map");
   await page.click('[data-open="friend"]');
+  check(await page.locator('#friendView [data-ftab="where"][aria-selected="true"]').count() === 1 && await page.locator("#friendView details.whowhere").count() > 0, "the heart panel opens on who's where, in tabs");
+  await page.click('#friendView [data-ftab="maple"]');
   check(await page.locator("#friendView .hearts .ico").count() === 5, "friendship has its own corner icon and drawn hearts");
   await page.click("#pclose");
 
@@ -458,9 +460,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(300);
   await page.locator('#world [data-place="news"]').dispatchEvent("click");
   await page.waitForFunction(() => /Good news/.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
+  check(await page.locator('#ctx [data-newstab="wins"][aria-selected="true"]').count() === 1 && await page.locator("#ctx .hlist.gnews.world").count() === 0, "the good news board opens on your wins, in tabs");
+  await page.click('#ctx [data-newstab="news"]');
   check(await page.locator("#ctx .hlist.gnews.world li").count() === 1 && await page.locator("#ctx").textContent().then(t => /Chord added 2 studios/.test(t)), "the good news board shows the world's good news and your wins");
+  await page.click('#ctx [data-newstab="events"]');
   { const t = await page.locator("#ctx").textContent();
-    check(/Village calendar/.test(t) && /Night market, 5:30pm to 10pm/.test(t) && /Sunday farmers market/.test(t) && /Deepavali/.test(t) && /Family dinner at/.test(t), "the good news board pins up the village calendar: markets, the night market, family dinners and festivals coming up"); }
+    check(/Night market/.test(t) && /Night market, 5:30pm to 10pm/.test(t) && /Sunday farmers market/.test(t) && /Deepavali/.test(t) && /Family dinner at/.test(t), "the good news board pins up the village calendar: markets, the night market, family dinners and festivals coming up"); }
   await page.screenshot({ path: join(shots, "good-news.png") });
   await page.click("#pclose");
   await page.locator('#world [data-place="toLane"]').dispatchEvent("click");

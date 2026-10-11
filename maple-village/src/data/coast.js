@@ -269,6 +269,9 @@ export const CR_GOODS = {
   b_postcard: {n: "A postcard of the Sisters", kind: "gift", to: "family", price: 2, shop: "bv_kiosk", art: ["box", "#E8913A", "#4F93B4"], say: "A postcard of those rocks at sunset! I'm putting it on the fridge."},
   b_penguin: {n: "Plush little penguin", kind: "gift", to: ["evan", "angelina", "mama"], price: 9, shop: "bv_kiosk", art: ["plush", "#4E6E8C"], say: "A little penguin! Blue and white and very small. Like the real ones!"},
   b_cap: {n: "A Nippers cap", kind: "gift", to: ["evan"], price: 5, shop: "bv_slsc", art: ["beanie", "#E8566C"], say: "A Nippers cap! Red and yellow! I'm a lifesaver now, Mama!"},
+  b_surfphoto: {n: "Photo of your first wave", kind: "keepsake", price: 0, art: ["tile", "#9CC4D0", "#F3C969"], line: "You on your very first wave at Breakwater: arms out, knees bent, mouth wide open. Jet printed it at the surf shop."},
+  b_whalecard: {n: "Whale sighting card", kind: "keepsake", price: 0, art: ["tile", "#FFFDF6", "#4E6E8C"], line: "A card from the lighthouse at Lighthouse Point, stamped with a little humpback and the date, and signed by Win: you saw whales from the balcony."},
+  b_nipmedal: {n: "Evan's Nippers medal", kind: "keepsake", price: 0, art: ["disc", "#F3C969", "#E8566C"], line: "Evan's first Nippers medal, on a red and yellow ribbon, from Coach Dimi at Koala Cove. He wanted to wear it in the bath."},
   b_seed: {n: "A scoop of bird seed", kind: "ingredient", price: 2, sell: 1, shop: "bv_parkstore", art: ["box", "#E3B04B", "#C9A86A"], what: "for the king parrots at Koala Cove: hold out your arm"}
 };
 export const CR_KEEP = {b_crmagnet: "A tiny lighthouse and a wave, from the Coast Road.", b_teatowel: "A tea towel with a map of the whole Coast Road."};

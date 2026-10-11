@@ -65,6 +65,7 @@ import { BB_NAMES, BB_EVAN } from "../data/bellbird.js";
 import { mapPanel as bbMapPanel, passportPanel as bbPassport, setOff as bbSetOff, driveOn as bbDriveOn, homeFuel as bbHomeFuel, bbState } from "./bellbird.js";
 import { bbRoomPanel, treat as bbTreat, chocTaste, watchWater, NOTES as BB_NOTES, buyCuttings as bbCuttings } from "./bbrooms.js";
 import * as BBA from "./bbacts.js";
+import * as CRA from "./cracts.js";
 import { FIRE_FOLK } from "../data/bb-people.js";
 import { loftPanel, startBatch, collect as loftCollect, loftState } from "./loft.js";
 import { cinqueRoomArt } from "../art/cinque-rooms.js";
@@ -145,7 +146,7 @@ let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot
 // In-game UI: the quest note pinned on the map (open, or slim while walking) and the panel over the map.
 // The note starts folded when the village opens; it only pops open on step changes after the first few seconds.
 let qnOpen = false, qnQuietUntil = Date.now() + 5000, qnKey = "", openView = null, shopClosed = false;
-let homeView = null, postOpen = false, healthOpen = false, newsOpen = false, calTab = "today";   // "chores" (the cleaning cupboard) or "fridge" while one is open at home
+let homeView = null, postOpen = false, healthOpen = false, newsOpen = false, calTab = "today", friendTab = "where", newsTab = "wins";   // "chores" (the cleaning cupboard) or "fridge" while one is open at home
 
 // Cloud saves wait until the cloud copy has loaded once (synced). Without that, a save made in the first moments after
 // opening (from a blank or stale copy in this browser) would overwrite the real save: phone and laptop each keep their
@@ -1593,7 +1594,9 @@ function ctx(){
   else if (bbRoom && townOf(scene) && TOWNS[townOf(scene)].by === "van") { const evanOn = inParty(F, "evan") && !evanNight(), tp = tripOn(F) ? tripOn(F).party : [];
     h = bbRoom === "balloon" ? BBA.balloonPanel(F, bbSt.flight, {hm: sgHM(), party: tp}) : bbRoom === "riddle" ? BBA.riddlePanel(F, bbSt.riddle) : bbRoom === "berries" ? BBA.berriesPanel(F, bbSt.berries, evanOn)
       : bbRoom === "dip" ? BBA.dipPanel(F, bbSt.dip, evanOn) : bbRoom === "joey" ? BBA.joeyPanel(F, bbSt.joey, evanOn) : bbRoom === "canoe" ? BBA.canoePanel(F, bbSt.canoe, evanOn, bbSt.paid)
-      : bbRoom === "fire" ? BBA.firePanel(F, bbSt.bag, {hm: sgHM(), folk: FIRE_FOLK.some(isHere)}) : bbRoomPanel(F, bbRoom, {evan: evanOn, party: !!tp.length}); }
+      : bbRoom === "fire" ? BBA.firePanel(F, bbSt.bag, {hm: sgHM(), folk: FIRE_FOLK.some(isHere)})
+      : bbRoom === "surf" ? CRA.surfPanel(F, bbSt.surf, evanOn, bbSt.paid) : bbRoom === "whales" ? CRA.whalePanel(F, bbSt.whale, evanOn) : bbRoom === "glow" ? CRA.glowPanel(F, bbSt.glow, {hm: sgHM(), evan: evanOn})
+      : bbRoom === "pots" ? CRA.potsPanel(F, bbSt.pots, {hm: sgHM(), evan: evanOn}) : bbRoom === "penguins" ? CRA.pengPanel(F, bbSt.peng, {hm: sgHM(), evan: evanOn}) : bbRoom === "nippers" ? CRA.nipPanel(F, bbSt.nip, {hm: sgHM(), evan: evanOn}) : bbRoomPanel(F, bbRoom, {evan: evanOn, party: !!tp.length}); }
   else if (bvView) h = bvView === "passport" ? bbPassport(F) : bbMapPanel(F, {pick: tripPick, ownsVan: owns(F, "van"), region: bvRegion});
   else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick, tripTown);
   else if (railOpen === "ferry" && scene === "shore") h = ticketPanel(F, tripPick, "jeju", sgHM(), "ferry");   // round 127: the Jeju ferry from the jetty
@@ -1628,7 +1631,7 @@ function ctx(){
   else if (lettersOpen && (scene === "room" || scene === "base")) h = lettersPanel(!!sampleCap);
   else if (postOpen && scene === "post") h = postPanel();
   else if (healthOpen && APP_IDS.includes(scene)) h = healthOpen === "reactions" ? reactionsPanel() : healthOpen === "hellos" ? helloPanel() : healthPanel(scene);
-  else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar());
+  else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar(), newsTab);
   else if (scene === "market" && !shopClosed) {
     const tabs = [["seeds","Seeds"],["treats","Treats"],["deli","Deli"],["care","Care"],["family","Family"],["animals","Animals"],["home","Home"],["me","Me & my room"],["sell","Sell"]];
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
@@ -1823,6 +1826,7 @@ function ctx(){
     else if (a === "cut") { const n = bbCuttings(F, room); if (!n) return; sfx("chaching"); gainXp(1); flash(`Three ${n} cuttings`); speak(`Kel snips three ${n} cuttings, wraps them in damp newspaper and a bit of hessian. "Full sun, a good drink, and talk to them now and then." Plant them on a trellis at home.`, 7000); }
     else if (a === "choc") { if (!chocTaste(F)) return; sfx("chime"); gainXp(1); hearts(2); speak("Sophie sets down a little dish: dark, milk, white, and one speckled with wattleseed, nutty and toasty. \"The wattleseed's from the bush out the back,\" she says.", 6500); ev(["one for me? one for ME?", "chocolate! for free!", "the brown one, Mama!"]); }
     save(); ctx(); });
+  c.querySelectorAll("[data-newstab]").forEach(b => b.onclick = () => { newsTab = b.dataset.newstab; sfx("tap"); ctx(); });
   // Bellbird Valley's activities (round 143: bbacts.js)
   c.querySelectorAll("[data-bba]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.bba.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); }, tp = tripOn(F) ? tripOn(F).party : [];
     if (a === "open") { bbRoom = v; bbSt = {}; sfx("paper", true); }
@@ -1862,6 +1866,27 @@ function ctx(){
     else if (a === "toast") { const r = BBA.toast(bbSt.bag); if (!r) return; sfx(r === "burnt" ? "pop" : "tap"); if (r === "burnt") ev(["it's ON FIRE!", "blow it out!"], 300); }
     else if (a === "pull") { const r = BBA.pullOut(F, bbSt.bag); if (!r) return; sfx(r === "golden" ? "chime" : "tap"); if (r === "golden") { mprop("sparkle", mel.x, mel.y - 50, 1000); ev(["give me that one!", "gooey!", "mmmm"], 400); } save(); }
     else if (a === "mdone") { bbSt = {}; gainXp(1); hearts(2); const who = FIRE_FOLK.filter(isHere); who.slice(0, 2).forEach((id, i) => setTimeout(() => npcSay(id, pick(NPCS.find(n => n.id === id).lines)), 800 + i*2600)); }
+    // the Coast Road's (round 150: cracts.js)
+    else if (a === "surf") { if (!bbSt.paid) { const cost = CRA.surfCost(evanOn); if (F.coins < cost) return; F.coins -= cost; bbSt.paid = true; sfx("chaching"); } bbSt.surf = CRA.surfStart(); if (isHere("crjet")) npcSay("crjet", "Chest up, look at the beach, not your feet. Here comes one!"); ev(["I'm a SURFER!", "the water's cold, Mama!", "Jet's holding my board"], 1600); save(); }
+    else if (a === "spaddle" || a === "popup") { const st = bbSt.surf; if (!st) return; const r = CRA.surfDo(st, a === "spaddle" ? "paddle" : "pop"); if (!r) return; sfx(r === "ride" ? "chime" : r === "dumped" ? "pop" : "tap"); if (r === "ride") { mprop("sparkle", mel.x, mel.y - 50, 900); ev(["MAMA YOU'RE STANDING!", "woooo!", "do it again!"], 300); } }
+    else if (a === "surfed") { const st = bbSt.surf; if (!st || !CRA.surfDone(st)) return; const photo = CRA.finishSurf(F, st, addInv); bbSt = {}; gainXp(2); hearts(2); act("cheer"); if (photo) flash("A photo of your first wave"); speak(photo ? "Jet's mate on the sand got a photo of you on your first wave: arms out, mouth wide open. Jet prints it at the shop for you." : "Wetsuit off, towel on, sand everywhere. The best kind of tired.", 6000); save(); }
+    else if (a === "whales") { bbSt.whale = CRA.whaleStart(dayKey()); sfx("paper", true); ev(["where? WHERE?", "I see a wave!"], 1400); }
+    else if (a === "look") { const st = bbSt.whale; if (!st) return; const r = CRA.whaleLook(st, +v); if (!r) return; sfx(r === "sea" ? "tap" : "chime"); if (r !== "sea") ev(st.whales ? ["A WHALE! a real one!", "it's SO big", "it waved its tail at me!"] : ["dolphins! hello dolphins!", "they're jumping!"], 300); }
+    else if (a === "whaled") { const st = bbSt.whale; if (!st || !CRA.whaleDone(st)) return; const card = CRA.finishWhales(F, st, addInv); bbSt = {}; gainXp(st.seen.length ? 2 : 1); hearts(st.seen.length ? 2 : 1); if (card) flash("A whale sighting card"); if (card) speak("Win stamps a sighting card for you, with the date and a little humpback, and writes what you saw in the lighthouse log.", 6000); save(); }
+    else if (a === "glow") { if (!CRA.glowOpen(sgHM())) return; bbSt.glow = CRA.glowStart(); sfx("paper", true); }
+    else if (a === "gwait") { if (!bbSt.glow || CRA.glowWait(bbSt.glow) == null) return; sfx("tap"); if (bbSt.glow.wait >= CRA.GLOW.WAIT) ev(["(whispering) stars... inside...", "(whispering) Mama, they're glowing"], 600); }
+    else if (a === "gcount") { if (!bbSt.glow || CRA.glowCount(bbSt.glow, +v) == null) return; sfx("tap"); }
+    else if (a === "glowed") { const st = bbSt.glow; if (!st || !CRA.glowDone(st)) return; const r = CRA.finishGlow(F, st); bbSt = {}; gainXp(2); hearts(2); speak(`Back out into the evening, blinking. ${r.n} glow-worms.${r.best ? " Your best count yet." : ""} Tash says that's a good night for it.`, 5000); save(); }
+    else if (a === "pots") { if (!CRA.potsOpen(sgHM())) return; bbSt.pots = CRA.potsStart(); sfx("paper", true); ev(["a boat! we're on a BOAT!", "the bait smells YUCKY"], 1400); }
+    else if (a === "haul") { if (!bbSt.pots || !CRA.potHaul(bbSt.pots)) return; sfx("tap"); if (bbSt.pots.last !== "empty") ev(["it's waving at me!", "big claws! BIG CLAWS!", "can I hold it? no thank you"], 500); }
+    else if (a === "keep") { if (!bbSt.pots || CRA.potChoose(bbSt.pots, v === "1") == null) return; sfx("tap"); }
+    else if (a === "potted") { const st = bbSt.pots; if (!st || !CRA.potsDone(st)) return; const n = CRA.finishPots(F, st, addInv); bbSt = {}; gainXp(2); hearts(2); if (n) flash(`${n} crayfish from Mags`); speak(n ? `Mags wraps two crays in wet newspaper for you: "For a crayfish roll. Lemon, butter, soft bun. Nothing else." (Crayfish rolls are on the kitchen's specials now.)` : "Mags gives you a wave from the wheelhouse. \"Same time tomorrow, deckhand.\"", 7000); save(); }
+    else if (a === "peng") { if (!CRA.pengOpen(sgHM())) return; bbSt.peng = CRA.pengStart(evanOn); sfx("paper", true); }
+    else if (a === "pstill" || a === "pshush") { if (!bbSt.peng || CRA.pengDo(bbSt.peng, a === "pstill" ? "still" : "shush") == null) return; }
+    else if (a === "penged") { const st = bbSt.peng; if (!st || !CRA.pengDone(st)) return; const n = CRA.finishPeng(F, st); bbSt = {}; gainXp(2); hearts(3); sfx("chime"); speak(`${n} little penguins home for the night. Outside, the stars are out over the Sisters.`, 5000); ev(["can we come back tomorrow?", "goodnight penguins", "I was SO quiet"], 2200); save(); }
+    else if (a === "nip") { if (!evanOn || !CRA.nipOpen(sgHM())) return; bbSt.nip = CRA.nipStart(); sfx("paper", true); if (isHere("crdimi")) npcSay("crdimi", "On your marks... get set... GO!"); }
+    else if (a === "ncheer" || a === "nduck") { if (!bbSt.nip || CRA.nipDo(bbSt.nip, a === "ncheer" ? "cheer" : "duck") == null) return; sfx("tap"); }
+    else if (a === "nipped") { const st = bbSt.nip; if (!st || !CRA.nipDone(st)) return; const r = CRA.finishNip(F, st, addInv); bbSt = {}; gainXp(2); hearts(3); act("cheer"); if (r.medal) flash("Evan's Nippers medal"); speak(r.medal ? "Coach Dimi hangs a medal round Evan's neck: his first Nippers. He won't take it off. Not even in the bath, he says." : "Hot chips on the surf club balcony, Evan still in his cap.", 6500); ev(["I'm a LIFESAVER!", "did you see me, Mama?", "I dived for the flag!"], 1800); save(); }
     ctx(); });
   c.querySelectorAll("[data-ct]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.ct.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); };
     if (a === "pesto") { ctSt = {pesto: pestoStart()}; sfx("paper", true); ev(["bash bash bash!", "it smells green, Mama!", "my pesto!"], 1200); }
@@ -2341,7 +2366,14 @@ function townSpot(id){
   const town = townOf(scene), T = TOWNS[town];
   if (id === T.station && T.by === "van") { bvView = "map"; sfx("paper", true); render(); return; }   // round 141: the campervan's road map
   // round 143: Bellbird Valley's activities out of doors: the balloons, the berry rows, the canoes, the campfire; and the rope swing
-  const bbOut = {bvballoons: "balloon", bvberries: "berries", bvcanoe: "canoe", bvfire: "fire"}[id];
+  const bbOut = {bvballoons: "balloon", bvberries: "berries", bvcanoe: "canoe", bvfire: "fire", bvsurf: "surf", bvwhales: "whales", bvboats: "pots", bvpenguins: "penguins", bvnippers: "nippers"}[id];
+  // round 150: the king parrots at Koala Cove, with a scoop of seed from the park store
+  if (id === "bvparrots") { const evanOn = inParty(F, "evan") && !evanNight();
+    if (!((F.inv || {}).b_seed > 0)) { speak("The king parrots eye you from the fence: red heads, green wings. They'd come to your arm for a scoop of seed (the park store has it, 2 coins).", 5000); render(); return; }
+    addInv("b_seed", -1); const s = bbState(F); s.parrots = (s.parrots || 0) + 1; sfx("chime"); gainXp(1); hearts(2); mel.dir = 1;
+    speak("You hold out your arm with seed in your palm and stand very still. A flash of red and green, and a king parrot lands, heavy and warm, and starts cracking seeds. Then another, on your shoulder.", 6500);
+    if (evanOn) setTimeout(() => { speak("One hops onto Evan's head. He goes completely still, eyes enormous, grinning.", 4500); evanSays(pick(["it's on my HEAD!", "its feet are tickly!", "don't move, Mama, don't move"])); }, 4200);
+    mprop("sparkle", mel.x + 20, mel.y - 60, 1400); save(); render(); return; }
   if (T.by === "van" && bbOut) { bbRoom = bbOut; bbSt = {}; sfx("paper", true); speak(T.say[id] || "", 4000); render(); return; }
   if (id === "bvswing") { speak(T.say[id] || "The rope swing: a fat rope with a knot at the bottom, hanging off a river red gum over the swimming hole.", 4000); sfx("chime"); gainXp(1);
     setTimeout(() => { speak(pick(["You grab the rope, run, and swing out over the water... and let go. SPLASH. It's freezing! It's wonderful!", "Out, out, out over the river, and back again. You chicken out of letting go. Next time.", "You swing, let go at the very top, and hit the water with a whoop that sends the cockatoos up."]), 6000); mprop("sparkle", mel.x + 30, mel.y - 40, 1400); }, 1800);
@@ -2458,7 +2490,7 @@ function render(redraw){
   if (redraw) drawScene();
   const L = level(), next = LEVELS[L+1];
   $("title").firstChild.textContent = `${F.name}'s village`;
-  $("trayName").textContent = F.name; if (document.activeElement !== $("paperNameIn")) $("paperNameIn").placeholder = paperName(); $("friendName").textContent = F.name;
+  $("trayName").textContent = F.name; if (document.activeElement !== $("paperNameIn")) $("paperNameIn").placeholder = paperName();
   const d = new Date(now() + 6*H);
   $("dateLine").textContent = d.toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long", timeZone:"UTC"}) + (F.streak >= 2 && F.lastActive === dayKey() ? ` · ${F.streak} cosy days in a row` : "");
   $("coins").textContent = F.coins;
@@ -2471,13 +2503,18 @@ function render(redraw){
   pose();
   if (!speechLock) $("speech").textContent = plain(say ? say.line : defaultLine());
   const span = next ? next.xp - LEVELS[L].xp : 1, into = next ? F.xp - LEVELS[L].xp : 1, filled = Math.round(Math.min(1, into/span)*5);
-  $("friendBody").innerHTML = `<p class="hearts" aria-label="${filled} of 5 hearts to next level">${Array.from({length: 5}, (_, i) => icon("heart", 22, i < filled ? "" : "faint")).join("")}</p>
+  // the heart panel, in tabs (Mel): who's where first (the one she looks at most), then Maple, stories, family
+  const ftabs = [["where", "Who's where"], ["maple", esc(F.name)], ["stories", "Stories"], ["family", "Family"]], noHead = h => h.replace(/^\s*<h3 class="ph3">[^<]*<\/h3>/, "");
+  $("friendTitle").textContent = {where: "Who's where today", maple: `Friendship with ${F.name}`, stories: "Stories so far", family: "Family"}[friendTab];
+  const fbody = friendTab === "where" ? noHead(whosWhereHTML()) : friendTab === "stories" ? noHead(storiesHTML(F, Object.fromEntries(NPCS.map(n => [n.id, n.name]))))
+    : friendTab === "family" ? `<p class="muted">${icon("heart", 14)} Gifts for Evan: ${F.fam.gifts.evan} · for Darren: ${F.fam.gifts.darren}. Every third gift, they give you something back. Treats and keepsakes are in the market's Family tab.</p>`
+    : `<p class="hearts" aria-label="${filled} of 5 hearts to next level">${Array.from({length: 5}, (_, i) => icon("heart", 22, i < filled ? "" : "faint")).join("")}</p>
     <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed!"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>
     <h3 class="ph3">Village upgrades</h3>
     <p class="muted">${F.totalQuests || 0} quests finished so far. ${(() => { const nx = nextUpgrade(F.totalQuests || 0); return nx ? `Next at ${nx.at}: ${esc(nx.name)}.` : "Every upgrade unlocked!"; })()}</p>
     <ul class="uplist">${UPGRADES.map(u => `<li class="${(F.totalQuests || 0) >= u.at ? "got" : ""}">${icon((F.totalQuests || 0) >= u.at ? "sparkle" : "clock", 16)} <span>${esc(u.name)}</span> <small>${u.at}</small></li>`).join("")}</ul>`;
-  $("friendBody").insertAdjacentHTML("beforeend", whosWhereHTML() + storiesHTML(F, Object.fromEntries(NPCS.map(n => [n.id, n.name]))));
-  $("friendBody").insertAdjacentHTML("beforeend", `<h3 class="ph3">Family</h3><p class="muted">${icon("heart", 14)} Gifts for Evan: ${F.fam.gifts.evan} · for Darren: ${F.fam.gifts.darren}. Every third gift, they give you something back. Treats and keepsakes are in the market's Family tab.</p>`);
+  $("friendBody").innerHTML = `<div class="tabs" role="tablist">${ftabs.map(([k, n]) => `<button role="tab" data-ftab="${k}" aria-selected="${k === friendTab}">${n}</button>`).join("")}</div>` + fbody;
+  $("friendBody").querySelectorAll("[data-ftab]").forEach(b => b.onclick = () => { friendTab = b.dataset.ftab; sfx("tap"); render(); });
   renderEvanHold();
   const all = allTasks(), rem = remaining(), cur = (phase() === "task" && rem[0]) ? rem[0].id : null;
   $("logSum").textContent = all.length ? `All quests · ${rem.length} left` : "All quests";
@@ -2754,7 +2791,7 @@ function arriveVillageSpot(id){
   if (id === "swing") { evan.tx = 112 + rnd(-4, 4); evan.ty = 302; evan.run = true; evan.wait = 6; setTimeout(() => evanSays(pick(["wheee!", "push me!", "higher!"])), 900); speak(v.line, 3500); render(); return; }
   if (id === "letterbox" && lettersArrived().length) { lettersOpen = true; lv.mode = "home"; sfx("paper"); speak("Post! Letters for you.", 3000); render(); return; }
   if (id === "letterbox") { const p = paperWaiting(); if (p) { sfx("paper"); openMail(p); } else speak(`Nothing in the letterbox. ${paperName()} comes each morning.`, 3800); render(); return; }
-  if (id === "news") { newsOpen = true; const g = goodNews(), fresh = g && F.goodRead !== g.at; if (g) F.goodRead = g.at; sfx("paper"); speak(fresh ? "Pancake the village dog wags hello. Fresh good news this morning!" : "Pancake opens one eye, thumps a sleepy tail, and goes back to napping.", 4500); save(true); return; }
+  if (id === "news") { newsOpen = true; newsTab = "wins"; const g = goodNews(), fresh = g && F.goodRead !== g.at; if (g) F.goodRead = g.at; sfx("paper"); speak(fresh ? "Pancake the village dog wags hello. Fresh good news this morning!" : "Pancake opens one eye, thumps a sleepy tail, and goes back to napping.", 4500); save(true); return; }
   if (id === "cacao") { const c = cocoaState(F), h = Math.max(1, Math.round(((c.treeAt || Date.now()) + 2*864e5 - Date.now() - (globalThis.__mapleOffset || 0))/36e5));
     speak(`Ma Ma's cacao tree, heavy with pods. She picks them and sends a sack of beans to the Cocoa Room's kitchen every two days: the next in about ${h} hour${h === 1 ? "" : "s"}.`, 5500); if (isHere("mama")) setTimeout(() => npcSay("mama", pick(["Ma Ma talk to it every morning. That's why so many pods!", "Chocolate tree! Who knew can grow here?"])), 1500); render(); return; }
   if (id === "shed") { shedOpen = true; speak(v.line, 3800); render(); return; }
