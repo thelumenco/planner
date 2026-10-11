@@ -11,6 +11,7 @@ import { eventNow, wineClubNow, aperitivoNow, discoNow } from "./tours.js";
 import { icon } from "../art/icons.js";
 import { DISHES, TAPAS, tapasPrice } from "./kitchen.js";
 import { bikeOwned, DELIVERY } from "./scoop.js";
+import { occasionNow, OCC } from "./occasions.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
 
 export const GROW = 8*H;                                     // a watered vine ripens in 8 hours
@@ -243,7 +244,16 @@ export function sellTick(F, opts = {}){
       if (seated) { const host = opts.lunch && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
         if (stock.length && Math.random() < seated/2/60*host) { const w8 = stock.map(x => Math.pow(x.price, 1.5)), tot = w8.reduce((a, b) => a + b, 0); let r = Math.random()*tot, i = 0; while (r > w8[i] && i < stock.length - 1) { r -= w8[i]; i++; }
           const b = stock[i]; b.n--; out.bottles++; out.coins += b.price; out.lunchB = (out.lunchB || 0) + 1; if (opts.lunch) out.lunchTips = (out.lunchTips || 0) + Math.max(1, Math.round(b.price*.15)); }
-        if (Math.random() < seated/60*.8*host) { const p0 = out.plates; servePlate(v, lday, out); if (out.plates > p0) out.lunchP = (out.lunchP || 0) + 1; } } }
+        if (Math.random() < seated/60*.8*host) { const p0 = out.plates; servePlate(v, lday, out); if (out.plates > p0) out.lunchP = (out.lunchP || 0) + 1; } }
+      // round 152: the terrace's other occasions (game/occasions.js): a wedding (sparkling by the case), trivia night,
+      // sip and paint (glasses), Valentine's, Christmas lunch, New Year's Eve. Mel out there hosting: faster, and tips
+      const oc = occasionNow(lday, hm);
+      if (oc) { const host = opts.lunch && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0), fizz = oc.kind === "wedding" || oc.kind === "nye";
+        if (oc.glasses) { if (Math.random() < oc.guests/60*oc.drink*host) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.occB = (out.occB || 0) + 1; } } }
+        else if (stock.length && Math.random() < oc.guests/2/60*oc.drink*host) { const w8 = stock.map(x => Math.pow(x.price, 1.5)*(fizz && x.type === "sparkling" ? 6 : 1)), tot = w8.reduce((a, b) => a + b, 0); let r = Math.random()*tot, i = 0; while (r > w8[i] && i < stock.length - 1) { r -= w8[i]; i++; }
+          const b = stock[i]; b.n--; out.bottles++; out.coins += b.price; out.occB = (out.occB || 0) + 1; if (opts.lunch) out.lunchTips = (out.lunchTips || 0) + Math.max(1, Math.round(b.price*.15)); }
+        if (oc.food && Math.random() < oc.guests/60*.5*host) { const p0 = out.plates; servePlate(v, lday, out); if (out.plates > p0) out.occP = (out.occP || 0) + 1; }
+        out.occ = oc.kind; } }
     if (hm < 10*60 || hm >= 22*60) continue;
     const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); const crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0);
     if (!onShelf.length && !open && !platesLeft(v) && !crate.length) continue;
@@ -274,7 +284,7 @@ export function sellTick(F, opts = {}){
   v.sold += out.bottles; v.glasses += out.glasses;
   const day = new Date(t + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
   ["picked", "filled", "stocked"].forEach(x => { v.today[x] = (v.today[x] || 0) + out[x]; });
-  v.today.plates = (v.today.plates || 0) + out.plates; v.today.deliv = (v.today.deliv || 0) + (out.deliv || 0); v.today.lunchB = (v.today.lunchB || 0) + (out.lunchB || 0); v.today.lunchP = (v.today.lunchP || 0) + (out.lunchP || 0); v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
+  v.today.plates = (v.today.plates || 0) + out.plates; v.today.deliv = (v.today.deliv || 0) + (out.deliv || 0); v.today.lunchB = (v.today.lunchB || 0) + (out.lunchB || 0); v.today.occB = (v.today.occB || 0) + (out.occB || 0); v.today.occP = (v.today.occP || 0) + (out.occP || 0); if (out.occ) v.today.occ = out.occ; v.today.lunchP = (v.today.lunchP || 0) + (out.lunchP || 0); v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
   return out;
 }
 
@@ -441,5 +451,5 @@ export function wireVine(root, F, api){
 export function wineNews(F, day, hm){
   const v = vineState(F), t = v.today; if (hm < 22*60 || v.reported === day) return null; v.reported = day; if (!t || t.day !== day || !t.coins) return null;
   const bits = [t.bottles ? `${t.bottles} bottle${t.bottles === 1 ? "" : "s"}` : "", t.glasses ? `${t.glasses} glass${t.glasses === 1 ? "" : "es"}` : "", t.plates ? `${t.plates} plate${t.plates === 1 ? "" : "s"}` : ""].filter(Boolean);
-  return `Today ${shopName(F).replace(/^The /, "the ")} sold ${bits.length ? bits.join(", ").replace(/, ([^,]*)$/, " and $1") : "a little"}: ${t.coins} coins${t.deliv ? `, with ${t.deliv} order${t.deliv === 1 ? "" : "s"} out by bike` : ""}${t.lunchB || t.lunchP ? `. The Sunday lunch on the terrace: ${t.lunchB || 0} bottle${t.lunchB === 1 ? "" : "s"} and ${t.lunchP || 0} plate${t.lunchP === 1 ? "" : "s"}` : ""}. It's in the till.`;
+  return `Today ${shopName(F).replace(/^The /, "the ")} sold ${bits.length ? bits.join(", ").replace(/, ([^,]*)$/, " and $1") : "a little"}: ${t.coins} coins${t.deliv ? `, with ${t.deliv} order${t.deliv === 1 ? "" : "s"} out by bike` : ""}${t.lunchB || t.lunchP ? `. The Sunday lunch on the terrace: ${t.lunchB || 0} bottle${t.lunchB === 1 ? "" : "s"} and ${t.lunchP || 0} plate${t.lunchP === 1 ? "" : "s"}` : ""}${t.occ && (t.occB || t.occP) ? `. ${OCC[t.occ].n} on the terrace: ${t.occB || 0} ${t.occ === "paint" ? "glass" : "bottle"}${t.occB === 1 ? "" : t.occ === "paint" ? "es" : "s"}${t.occP ? ` and ${t.occP} plate${t.occP === 1 ? "" : "s"}` : ""}` : ""}. It's in the till.`;
 }

@@ -2145,3 +2145,19 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - The Gazette: Your wins / Events / In the world (`newsTab`, `data-newstab`; feeds.js `goodNewsHTML(wins, cal, tab)`).
   - The heart panel: Who's where (first, the default) / Maple / Stories / Family (`friendTab`, `data-ftab`). The title follows the tab (`#friendTitle`).
 - **Tomo's delivery orders:** DELIVERY rates doubled (scoop .045, cocoa .036, winery .04 a minute while open and stocked). The Gazette's wins say how many he delivered today.
+
+### Round 152: Mel's fixes, Evan's van bedtime, and the terrace's week
+- **Fixes:**
+  - **Mint bike:** after each delivery order (from any shop, or a gift sent by bike), `F.scoop.bikeOut` is set. For `BIKE_TRIP` (20 min) the bike is gone from the bay, with a chalkboard ("Out on a delivery!") in its spot. scoop.js has `bikeAway`; the art is in bay.js.
+  - **Barrels** (vineyard.js `BARRELS`, `maxBarrels`, `shopPrice`): 6 in the barrel shed (150, then 75 more each), plus 12 more on the cellar's barrel racks once `F.goals.cellar` (250 each). The shed art shows 3 in front and 3 behind. The cellar's "racks" station opens the barrel panel, which splits shed and cellar.
+  - **Drying rack:** drawn in vineyardArt before the olive tree, so it sits behind it.
+  - **Painted boat:** the Cinque Terre boat is now on the foreshore sand (scene "shore").
+- **Evan's van bedtime:** on a campervan trip, from 8pm (`evanNight`), `evanInVan()` is true.
+  - A face, blanket and floating z's show in the van window (`vanSleeper`, drawn on the van's screen).
+  - A tuck-in line is said once, the van tap gets a sleepy line, and the drive home says he slept all the way.
+- **The terrace's week (game/occasions.js; people in data/terrace-people.js):**
+  - **Weddings:** the 2nd Saturday every month, plus the 4th Saturday from October to March, 2 to 7pm. Four out-of-town couples (8 people each, `local: "wedding"`) take turns. The day runs: ceremony at the flower arch, wedding breakfast, first dance at 5, dancing, bouquet at 6:30 (half the time Mel catches it: `t_bouquet`).
+  - **Trivia:** Wednesdays 7 to 9pm. Amara hosts, three village teams play, and Darren and Angellina sit with Mel. Tap the screen to join: 10 coins, 5 rounds of 4 (answers shuffled nightly), and the pot is 50.
+  - **Sip and paint:** Thursdays 2 to 4pm. Dad teaches and six villagers paint at easels. Tap the spare easel: 12 coins, three layers in chosen colours. The painting keepsakes are `p_view`, `p_cypress` and `p_still`.
+  - **Special days:** Valentine's (couples, candles), Christmas Day lunch (the family, crackers, a tree), New Year's Eve (dancing, balloons, a countdown and fireworks at midnight), and Mother's Day (lunch.js `mothers` booking).
+  - **How it fits in:** `occasionSlot` sits in npcs `slotAt` right after `lunchSlot`. The art is `occasionDecor` (drawn above the sails). Sales are in vineyard sellTick: sparkling is favoured at weddings and NYE, paint night sells glasses, and Mel there counts as hosting (faster, tips). The music turns to "disco" while dancing. The bookings book has tabs: Sunday lunch / Coming up. The Gazette's Events list includes the occasions. `terraceMoments()` gives the first dance, the bouquet and the countdown.

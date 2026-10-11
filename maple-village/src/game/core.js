@@ -74,6 +74,7 @@ import { terraceArt } from "../art/terrace.js";
 import { coastArt } from "../art/coast.js";
 import { coastRoomArt } from "../art/coast-rooms.js";
 import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } from "./lunch.js";
+import { occasionOn, occasionNow, OCC, weddingOn, WED, dancingNow, triviaPanel, triviaStart, triviaAnswer, triviaNext, finishTrivia, TEAM_NAMES, QUIZ, paintPanel, paintStart, paintStep, paintDone, finishPaint, PAINT_PRICE, PAINT_SUBJECTS, comingUpHTML, mothersDay } from "./occasions.js";
 import { cinquePanel, cinqueState, treat as ctTreat, GELATO, FOCACCIA, pestoStart, pestoAdd, pestoPound, pestoDone, finishPesto, harvestStart, pick as ctPick, harvestDone, finishHarvest, TASTE, paintBoat, boatCols } from "./cinque.js";
 import { jejuRoomArt, dyeCloth } from "../art/jeju-rooms.js";
 import { jejuPanel, jejuState, diveStart, descend, surface, diveReward, JUK, sortStart, sortTap, sortReward, cafeTreat as jjCafe, slowPost, slowMail, DYE, dyeScarf, dyeDays, takeDye } from "./jeju.js";
@@ -1087,7 +1088,8 @@ function villageCalendar(){
     if (F.cocoa && F.cocoa.up && F.cocoa.up.workshop && new Date(k + "T00:00:00Z").getUTCDay() === 6) list.push(`Bonbon workshop at ${cocoaState(F).name}, 2 to 4pm`);
     if (owns(F, "cellar") && wineClubOn(k)) list.push(`Wine club at the cellar door, 6 to 9pm`);
     if (owns(F, "cellar") && discoOn(k)) list.push(`Disco night at the cellar door, 8 to 11:30pm`);
-    if (vineState(F).terrace && new Date(k + "T00:00:00Z").getUTCDay() === 0) list.push(`Sunday long lunch on the terrace, 12 to 3pm (${bookingsFor(k).reduce((n, b) => n + b.size, 0)} booked)`);
+    if (vineState(F).terrace && new Date(k + "T00:00:00Z").getUTCDay() === 0) list.push(`${mothersDay(k) ? "Mother's Day long lunch" : "Sunday long lunch"} on the terrace, 12 to 3pm (${bookingsFor(k).reduce((n, b) => n + b.size, 0)} booked)`);
+    if (vineState(F).terrace) { const oc = occasionOn(k), w = oc === "wedding" && weddingOn(k), hm2 = m => hhmm(m % (24*60)); if (oc) list.push(w ? `A wedding on the terrace: ${w.couple}, 2 to 7pm` : `${OCC[oc].n} on the terrace, ${hm2(OCC[oc].from)} to ${hm2(OCC[oc].to)}`); }
     if (dn) list.push(`Family dinner at ${HOST_NAME[dn.host]}, 6:30pm`);
     fests.filter(x => x.k === k).forEach(x => list.push(`${x.f.name}!`));
     if (list.length) days.push({k, list});
@@ -1539,7 +1541,7 @@ function showPanel(hasCtx, skin){
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
   if (kid.open) { kid.open = null; stopKidGame(); ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1592,7 +1594,11 @@ function ctx(){
     : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, {swap: scSt.swap});
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
   else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "cocoa" ? ccCounterPanel(F, {cart: true, server: isHere("mateo")}) : marketStallPanel(st); }
-  else if (lunchView === "book" && scene === "terrace") h = lunchBookPanel(F, id => NPCS.find(n => n.id === id) ? NPCS.find(n => n.id === id).name : id, {terrace: !!vineState(F).terrace, shelf: shelfStock(vineState(F))});
+  else if ((lunchView === "book" || lunchView === "coming") && scene === "terrace") { const tabs = `<div class="tabs" role="tablist"><button role="tab" data-lbtab="book" aria-selected="${lunchView === "book"}">Sunday lunch</button><button role="tab" data-lbtab="coming" aria-selected="${lunchView === "coming"}">Coming up</button></div>`;
+    h = lunchView === "book" ? lunchBookPanel(F, id => NPCS.find(n => n.id === id) ? NPCS.find(n => n.id === id).name : id, {terrace: !!vineState(F).terrace, shelf: shelfStock(vineState(F))}).replace("</h2>", "</h2>" + tabs)
+      : `<span class="tape gingham" aria-hidden="true"></span><h2>The bookings book</h2>${tabs}<p class="sub">What's on at the terrace: weddings pencilled in weeks ahead, trivia on Wednesdays, sip and paint on Thursdays, and the special days.</p>${comingUpHTML(dayKey(), !!vineState(F).terrace)}<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`; }
+  else if (occView === "trivia" && scene === "terrace") { const t = F.terraceEv || {}; h = triviaPanel(F, trvSt, {on: (occasionNow(dayKey(), sgHM()) || {}).kind === "trivia", played: t.trivia === dayKey() && !trvSt ? t.quizLine : null}); }
+  else if (occView === "paint" && scene === "terrace") h = paintPanel(F, pntSt, {on: (occasionNow(dayKey(), sgHM()) || {}).kind === "paint", painted: (F.terraceEv || {}).painted === dayKey() && !pntSt});
   else if (lunchView === "table" && scene === "terrace") h = lunchTablePanel();
   else if (bbRoom && townOf(scene) && TOWNS[townOf(scene)].by === "van") { const evanOn = inParty(F, "evan") && !evanNight(), tp = tripOn(F) ? tripOn(F).party : [];
     h = bbRoom === "balloon" ? BBA.balloonPanel(F, bbSt.flight, {hm: sgHM(), party: tp}) : bbRoom === "riddle" ? BBA.riddlePanel(F, bbSt.riddle) : bbRoom === "berries" ? BBA.berriesPanel(F, bbSt.berries, evanOn)
@@ -1830,6 +1836,21 @@ function ctx(){
     else if (a === "choc") { if (!chocTaste(F)) return; sfx("chime"); gainXp(1); hearts(2); speak("Sophie sets down a little dish: dark, milk, white, and one speckled with wattleseed, nutty and toasty. \"The wattleseed's from the bush out the back,\" she says.", 6500); ev(["one for me? one for ME?", "chocolate! for free!", "the brown one, Mama!"]); }
     save(); ctx(); });
   c.querySelectorAll("[data-newstab]").forEach(b => b.onclick = () => { newsTab = b.dataset.newstab; sfx("tap"); ctx(); });
+  // round 152: the terrace's bookings book tabs, trivia night and sip and paint (occasions.js)
+  c.querySelectorAll("[data-lbtab]").forEach(b => b.onclick = () => { lunchView = b.dataset.lbtab; sfx("tap"); ctx(); });
+  c.querySelectorAll("[data-trv]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.trv.split(":");
+    if (a === "join") { if ((occasionNow(dayKey(), sgHM()) || {}).kind !== "trivia" || F.coins < QUIZ.entry) return; F.coins -= QUIZ.entry; trvSt = triviaStart(dayKey(), TEAM_NAMES[+v]); sfx("chaching"); if (isHere("amara")) npcSay("amara", "Round one! Eyes on the screen, phones in pockets."); save(); }
+    else if (a === "ans") { const ok = trvSt && triviaAnswer(trvSt, +v); if (ok == null) return; sfx(ok ? "chime" : "tap"); if (ok && Math.random() < .3) { const who = pick(["darren", "angelina"]); if (isHere(who)) npcSay(who, pick(["Yes! Knew it.", "Write it down, write it down!", "Team genius."])); } }
+    else if (a === "next") { if (!trvSt) return; triviaNext(trvSt); sfx("paper", true); if (trvSt.q === 0 && !trvSt.done && isHere("amara")) npcSay("amara", `Round ${trvSt.r + 1}: ${trvSt.rounds[trvSt.r].n}!`); }
+    else if (a === "end" || a === "tie") { if (!trvSt || !trvSt.done) return; const r = finishTrivia(F, trvSt, a === "tie" ? +v : null); trvSt = null; gainXp(r.win ? 3 : 2); hearts(r.win ? 3 : 2); sfx(r.win ? "chaching" : "chime"); if (r.win) { act("cheer"); flash(`Trivia winners! +${r.pot}`); }
+      speak(a === "tie" ? (r.win ? "128! Spot on. The jar's yours." : "It's 128. So close! The other lot take it.") : r.win ? `Amara reads it out: "And the winners, with ${r.score}..." Darren jumps up and knocks his chair over.` : `${r.score} out of 20. Angellina's already planning next week's tactics.`, 6000); save(); }
+    ctx(); });
+  c.querySelectorAll("[data-pnt]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.pnt.split(":");
+    if (a === "sub") { if ((occasionNow(dayKey(), sgHM()) || {}).kind !== "paint" || F.coins < PAINT_PRICE) return; F.coins -= PAINT_PRICE; pntSt = paintStart(v); sfx("chaching"); if (isHere("dad")) npcSay("dad", pick(["Big brush first. Don't be shy with it.", "Background, then the middle, then the bit you love.", "There are no mistakes. Only happy little hills."])); save(); }
+    else if (a === "col") { if (!pntSt || paintStep(pntSt, +v) == null) return; sfx("tap"); }
+    else if (a === "done") { if (!pntSt || !paintDone(pntSt)) return; const got = finishPaint(F, pntSt, addInv), n = PAINT_SUBJECTS[pntSt.subject].n.toLowerCase(); pntSt = null; gainXp(2); hearts(2); sfx("chime"); if (got) flash("Your painting");
+      speak(got ? `You carry ${n} home, still a bit wet. It's a keepsake now: it can go on a wall at home.` : `Another go at ${n}. Better than the last, Dad says, and he means it.`, 6000); save(); }
+    ctx(); });
   // Bellbird Valley's activities (round 143: bbacts.js)
   c.querySelectorAll("[data-bba]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.bba.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); }, tp = tripOn(F) ? tripOn(F).party : [];
     if (a === "open") { bbRoom = v; bbSt = {}; sfx("paper", true); }
@@ -1991,7 +2012,7 @@ function ctx(){
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-next]").forEach(b => b.onclick = ev => { ev.stopPropagation(); doNext(b.dataset.next); });
   c.querySelectorAll("[data-fair]").forEach(b => b.onclick = () => fairActivity(b.dataset.fair));
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
@@ -2256,7 +2277,7 @@ function lanternFlight(n){
   fx.appendChild(g); setTimeout(() => g.remove(), 20000);
 }
 // Day trips (trips.js, round 107): tickets at Honeybrook station, the train, a day in the town, the train home.
-const liveNow = () => { if (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM())) return "disco"; if (scene === "terrace") return "terrace"; const room = townRoom(scene); if (room) return room.music; const town = townOf(scene); if (town) return TOWNS[town].music; const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null; return ev && ev.kind === "night" ? "jazz" : null; };
+const liveNow = () => { if (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM())) return "disco"; if (scene === "terrace") return vineState(F).terrace && dancingNow(dayKey(), sgHM()) ? "disco" : "terrace"; const room = townRoom(scene); if (room) return room.music; const town = townOf(scene); if (town) return TOWNS[town].music; const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null; return ev && ev.kind === "night" ? "jazz" : null; };
 function trainRide(text, town, then){
   const o = document.createElement("div"); o.className = "taxiride trainride"; o.innerHTML = trainRideArt(town) + `<p>${esc(text)}</p>`; $("map").appendChild(o); sfx("choo");
   setTimeout(() => { o.remove(); then(); }, 2600);
@@ -2329,7 +2350,8 @@ let kyotoView = null, ktSt = {};
 let jejuView = null, jjSt = {};
 let loftView = false;   // round 132: the drying loft over the barrel shed (loft.js)
 let cinqueView = null, ctSt = {};
-let lunchView = null;   // round 146: the bookings book ("book") and the long table ("table") on the terrace
+let lunchView = null, occView = null, trvSt = null, pntSt = null;   // round 152: occView "trivia" or "paint" on the terrace (occasions.js)
+   // round 146: the bookings book ("book") and the long table ("table") on the terrace
 let bbRoom = null, bbSt = {};   // round 142: Bellbird Valley's room panels (bbrooms.js) and, round 143, its activities (bbacts.js)
 let bvView = null, bvRegion = null;   // round 148: which page of the road map (vines, coast)   // round 141: Bellbird Valley's road map ("map") and passport ("passport")   // round 132: Cinque Terre's room panels and activities (cinque.js)
 function stampHere(place){ const s = ktStamp(F, place); if (!s) return; sfx("chime"); flash(`Stamp: ${s.n}`); gainXp(1);
@@ -2337,6 +2359,11 @@ function stampHere(place){ const s = ktStamp(F, place); if (!s) return; sfx("chi
 const homeLantern = (x, y) => `<g pointer-events="none" class="homelantern"><g style="stroke:var(--line)" stroke-width="1.3" stroke-linejoin="round"><rect x="${x-4}" y="${y-22}" width="8" height="22" fill="#B9B0A4"/><path d="M${x-12} ${y-22} h24 l-4 -6 h-16z" fill="#CFC6B8"/><rect x="${x-8}" y="${y-38}" width="16" height="10" fill="#E6DED0"/><rect x="${x-4}" y="${y-36}" width="8" height="6" fill="#F6D98A"/><path d="M${x-14} ${y-38} q14 -12 28 0z" fill="#B9B0A4"/><circle cx="${x}" cy="${y-48}" r="2.5" fill="#B9B0A4"/></g><circle cx="${x}" cy="${y-33}" r="14" fill="#F6D98A" opacity=".18"/></g>`;
 // the terrace (round 146): the bookings book on its lectern, the long table, the view over the lavender
 function terraceSpot(id){
+  // round 152: the occasions' spots
+  if (id === "screen") { occView = "trivia"; trvSt = null; sfx("paper", true); render(); return; }
+  if (id === "easel") { occView = "paint"; pntSt = null; sfx("paper", true); render(); return; }
+  if (id === "arch") { const w = weddingOn(dayKey()), hm = sgHM(); if (!w) return;
+    speak(hm < WED.ceremony[0] ? `The arch is ready: roses, lavender and olive leaves. ${w.couple} are getting married here at two.` : hm < WED.ceremony[1] ? `${w.couple} say their vows under the arch. Someone's grandmother is crying already. So is Maple, a bit.` : hm < WED.first[0] ? `The wedding breakfast. ${w.couple}, ${w.from}, and the whole terrace raising a glass.` : hm < WED.dancing[0] ? `Their first dance, under the festoon lights. Everyone's gone quiet.` : `Everyone's up dancing. The arch is losing petals, and nobody minds.`, 5500); render(); return; }
   if (id === "book") { lunchView = "book"; sfx("paper", true); render(); return; }
   if (id === "table") { if (lunchNow(dayKey(), sgHM())) { lunchView = "table"; sfx("paper", true); render(); return; }
     speak(new Date(dayKey() + "T00:00:00Z").getUTCDay() === 0 && sgHM() < LUNCH.from ? "Pilar's laying the long table: white linen, jugs of lavender, the good glasses. Lunch is at twelve." : pick(["The long table, under the canvas. On Sundays it seats twelve, and nobody leaves before three.", "Linen folded, a jug of lavender in the middle. It's waiting for Sunday.", "You straighten a chair. The canvas lifts and settles overhead, like the terrace is breathing."]), 5500); render(); return; }
@@ -2567,7 +2594,7 @@ function setScene(id, at){
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
     scView = null; scSt.pick = null; scSt.dpick = null; evanSeat = null;
-    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; resetNpcs();
+    scene = id; cam.snap = true; atSpot = null; boardOpen = false; shelfOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; resetNpcs();
     if (id === "post") fetchPost().then(() => { if (scene === "post") drawScene(); });
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
@@ -2840,8 +2867,18 @@ function orchardTick(){
   if (picked && (scene === "orchard" || scene === "flowers")) { drawScene(); if (isHere("mama") && !quietNow()) npcSay("mama", pick(["Picked these for the shop. So sweet this year.", "Look, so many! Ma Ma's back is aching, but worth it.", "Fresh from the tree. Take some home for Evan."])); }
   save(scene === "orchard" || scene === "flowers");
 }
+// round 152: moments on the terrace while Mel's out there: the first dance, the bouquet, the New Year countdown
+function terraceMoments(){
+  if (scene !== "terrace" || !vineState(F).terrace || quietNow()) return; const day = dayKey(), hm = sgHM(), oc = occasionOn(day), t = F.terraceEv = F.terraceEv || {};
+  if (oc === "wedding" && hm >= WED.first[0] && hm < WED.first[1] && S.firstDance !== day) { S.firstDance = day; const w = weddingOn(day); speak(`The music changes. ${w.couple}'s first dance, under the festoon lights, and the whole terrace goes quiet.`, 6000); drawScene(); }
+  if (oc === "wedding" && hm >= WED.bouquet && hm < WED.bouquet + 30 && S.bouquet !== day) { S.bouquet = day; const caught = Math.random() < .5;
+    if (caught) { if (!(F.inv || {}).t_bouquet) { addInv("t_bouquet", 1); flash("A wedding bouquet"); } act("cheer"); sfx("chime"); speak("\"Ready? One, two, THREE!\" The bouquet sails over everyone's heads... and lands right in your arms. The whole terrace cheers.", 7000); }
+    else speak("The bouquet toss! It sails over everyone's heads and the flower girl catches it, and runs off shrieking with joy.", 6000); save(); }
+  if (oc === "nye" && (hm >= 23*60 + 59 || hm < 5) && S.newYear !== day) { S.newYear = day; sfx("chime"); act("cheer"); speak("Ten! Nine! Eight! ... Three! Two! One! HAPPY NEW YEAR! Fireworks over the vines, and everyone hugging everyone.", 8000); drawScene(); }
+}
 function vineTick(){
-  const out = sellTick(F, {serving: scene === "wineshop" && serving(), stall: scene === "field" && serving(), club: scene === "cellar" && wineClubNow(dayKey(), sgHM()), lunch: scene === "terrace" && lunchNow(dayKey(), sgHM()), disco: scene === "cellar" && atSpot === "flight" && discoNow(dayKey(), sgHM()), harvest: (festivalOn(dayKey()) || {}).id === "harvest"});
+  terraceMoments();
+  const out = sellTick(F, {serving: scene === "wineshop" && serving(), stall: scene === "field" && serving(), club: scene === "cellar" && wineClubNow(dayKey(), sgHM()), lunch: scene === "terrace" && (lunchNow(dayKey(), sgHM()) || !!occasionNow(dayKey(), sgHM())), disco: scene === "cellar" && atSpot === "flight" && discoNow(dayKey(), sgHM()), harvest: (festivalOn(dayKey()) || {}).id === "harvest"});
   // Pilar runs the kitchen on her shifts (tells Mel what she's done only while Mel's in there with her)
   if (whereIs("pilar") === "kitchen") { const done = cookTick(F, dayKey()); if (done.length) { save(); if (scene === "kitchen" && !quietNow() && $("panel").hidden) speak(cookLine(done), 5500); } }
   // at closing, leftover tapas of the day go to the staff for dinner

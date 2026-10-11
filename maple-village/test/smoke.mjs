@@ -3574,6 +3574,51 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(/terrace/i.test(await page.locator("#sceneName").textContent()), "and back up by tapping the little terrace");
   await page.close();
 }
+{
+  console.log("\nThe terrace's week: weddings, trivia, sip and paint, and the special days (round 152)");
+  const oc = await import(new URL("../src/game/occasions.js", import.meta.url)), lu = await import(new URL("../src/game/lunch.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url));
+  const np = await import(new URL("../src/data/npcs.js", import.meta.url)), tp = await import(new URL("../src/data/terrace-people.js", import.meta.url)), ids = new Set(np.NPCS.map(n => n.id));
+  check(oc.occasionOn("2026-10-14") === "trivia" && oc.occasionOn("2026-10-15") === "paint" && oc.occasionOn("2026-10-12") === null, "trivia on Wednesdays, sip and paint on Thursdays");
+  check(oc.occasionOn("2026-10-10") === "wedding" && oc.occasionOn("2026-10-24") === "wedding" && oc.occasionOn("2026-07-25") !== "wedding" && oc.occasionOn("2026-07-11") === "wedding", "weddings: the second Saturday every month, and the fourth in wedding season");
+  check(oc.occasionOn("2026-12-25") === "christmas" && oc.occasionOn("2026-12-31") === "nye" && oc.occasionOn("2027-02-14") === "valentine" && oc.mothersDay("2027-05-09") && !oc.mothersDay("2027-05-16"), "Christmas Day, New Year's Eve, Valentine's and Mother's Day");
+  check(tp.WEDDINGS.every(w => w.ids.length === 8 && w.ids.every(id => ids.has(id))) && new Set(tp.WEDDINGS.flatMap(w => w.ids)).size === 32, "four wedding parties from out of town, eight each");
+  check(!!oc.occasionNow("2026-12-31", 15) && !oc.occasionNow("2026-12-31", 45) && !!oc.occasionNow("2026-12-31", 21*60), "New Year's Eve runs on past midnight");
+  const sl = oc.occasionSlot("wd_tom", "2026-10-24", 14*60 + 10, true), dn = oc.occasionSlot("wd_tom", "2026-10-24", 18*60, true);
+  check(sl && sl.scene === "terrace" && sl.at[1] === 280 && dn && ["dance", "boogie", "armsup", "twirl", "shuffle"].includes(dn.act) && !oc.occasionSlot("wd_tom", "2026-10-24", 14*60, false), "the couple under the arch at two, everyone dancing after five (and only once there's a terrace)");
+  check(oc.occasionSlot("amara", "2026-10-14", 19*60 + 30, true).act === "point" && oc.occasionSlot("dad", "2026-10-15", 14*60 + 30, true).act === "point" && oc.occasionSlot("juniper", "2026-10-15", 14*60 + 30, true).act === "paint", "Amara runs the quiz; Dad teaches the painting");
+  const md = lu.bookingsFor("2027-05-09"); check(md[0].mothers && md[0].ids.includes("mum") && md[0].ids.includes("mama") && lu.seatsTaken(md) <= 12, "Mother's Day: the whole family at the long lunch, Mum and Ma Ma guests of honour");
+  const cu = oc.comingUp("2026-10-12"); check(cu.some(e => /wedding of/.test(e.n)) && cu.some(e => e.n === "Trivia night") && cu.every(e => e.day >= "2026-10-12"), "the bookings book: what's coming up");
+  // trivia: twenty questions, all with three answers; a perfect score wins the pot
+  const qz = oc.quizFor("2026-10-14"); check(qz.length === 5 && qz.every(r => r.qs.length === 4 && r.qs.every(q => q[1].length === 3 && q[2] >= 0 && q[2] < 3)), "trivia: five rounds of four, three answers each");
+  const st = oc.triviaStart("2026-10-14", "Mel's Marvels"); while (!st.done) { oc.triviaAnswer(st, st.rounds[st.r].qs[st.q][2]); oc.triviaNext(st); }
+  const F = {coins: 0, inv: {}}; const r = oc.finishTrivia(F, st); check(st.score === 20 && r.win && F.coins === r.pot && r.pot === oc.QUIZ.entry*4 + oc.QUIZ.house, "twenty out of twenty: the winners take the pot");
+  // sip and paint: three layers, and the painting to keep
+  const ps = oc.paintStart("view"); [0, 1, 2].forEach(i => oc.paintStep(ps, i)); const G = {inv: {}}, add = (id, n) => { G.inv[id] = (G.inv[id] || 0) + n; };
+  check(oc.paintDone(ps) && oc.finishPaint(G, ps, add) === "p_view" && G.inv.p_view === 1 && !oc.finishPaint(G, ps, add), "sip and paint: three layers, and your painting comes home");
+  // sales: a wedding afternoon sells sparkling
+  { const W = {coins: 0, inv: {}, vine: {terrace: true}}, v = vy.vineState(W); v.shelf = [{id: "s", name: "Cuvée", type: "sparkling", n: 40, price: 24, open: 0}, {id: "r", name: "House red", type: "red", n: 40, price: 24, open: 0}];
+    const realNow = Date.now, t0 = Date.parse("2026-10-24T11:00:00Z"); Date.now = () => t0; v.lastTick = t0 - 300*60000; const out = vy.sellTick(W, {}); Date.now = realNow;
+    check(out && out.occB >= 6 && 40 - v.shelf[0].n > 40 - v.shelf[1].n, `a wedding on the terrace: ${out && out.occB} bottles, mostly sparkling`); }
+  // in the browser: trivia on a Wednesday night, the book's Coming up page
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`terrace week pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/tw=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 100; f.vine = {...(f.vine || {}), terrace: true};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=19:20&date=2026-10-14"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=19:20&date=2026-10-14&tw=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("terrace")); await page.waitForTimeout(5000);
+  check(await page.locator('#actors .npc[data-npc="amara"].act-point').count() === 1 && await page.locator('#actors .npc[data-npc="darren"].act-sit').count() === 1 && await page.locator('#world [data-tspot="screen"]').count() === 1, "Wednesday night: Amara on the microphone, teams at the table, the screen up");
+  await page.locator('#world [data-tspot="screen"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-trv^="join"]', { timeout: 20000 });
+  await page.click('#ctx [data-trv="join:0"]'); await page.waitForTimeout(300);
+  for (let i = 0; i < 20; i++) { await page.click('#ctx [data-trv^="ans"] >> nth=0'); await page.click('#ctx [data-trv="next"]'); }
+  await page.waitForSelector('#ctx [data-trv="end"], #ctx [data-trv^="tie"]', { timeout: 10000 }); await page.click('#ctx [data-trv="end"], #ctx [data-trv^="tie"] >> nth=0'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.terraceEv && f.terraceEv.trivia === "2026-10-14" && f.terraceEv.quizzes === 1 && f.coins <= 100 - 10 + 50), "Mel plays trivia: ten coins in the jar, twenty questions, the scores read out");
+  await page.locator('#world [data-tspot="book"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-lbtab="coming"]', { timeout: 20000 });
+  await page.click('#ctx [data-lbtab="coming"]'); await page.waitForTimeout(300);
+  check(/wedding of/i.test(await page.locator("#ctx").textContent()), "the bookings book's Coming up page shows the weddings booked in");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

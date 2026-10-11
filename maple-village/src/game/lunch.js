@@ -30,8 +30,12 @@ const cache = {};
 export function bookingsFor(sunday){
   if (cache[sunday]) return cache[sunday];
   const out = [], used = new Set(), take = p => { if (p.ids.some(id => used.has(id))) return false; p.ids.forEach(id => used.add(id)); out.push({...p, size: p.ids.length}); return true; };
-  take(FAMILY_TURNS[weekNo(sunday) % FAMILY_TURNS.length]);
-  if (hash(sunday + ":bday") % 3 === 0) take(BIRTHDAY);
+  // round 152: Mother's Day (the second Sunday in May): the whole family, Mum and Ma Ma guests of honour, and the
+  // village's families round the rest of the table
+  const mday = sunday.slice(5, 7) === "05" && +sunday.slice(8) >= 8 && +sunday.slice(8) <= 14;
+  if (mday) take({ids: ["mum", "mama", "dad", "gonggong", "marcus", "angelina", "darren"], family: true, mothers: true});
+  else take(FAMILY_TURNS[weekNo(sunday) % FAMILY_TURNS.length]);
+  if (!mday && hash(sunday + ":bday") % 3 === 0) take(BIRTHDAY);
   const order = PARTIES.map((p, i) => [hash(sunday + ":" + i), p]).sort((a, b) => a[0] - b[0]).map(([, p]) => p);
   const want = 9 + hash(sunday) % 3;   // nine to eleven seats taken
   for (const p of order) { if (out.reduce((n, b) => n + b.size, 0) + p.ids.length > Math.min(want + 1, LUNCH.seats)) continue; take(p); if (out.reduce((n, b) => n + b.size, 0) >= want) break; }
@@ -66,7 +70,7 @@ const pretty = d => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", {day:
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 export function bookPanel(F, nameOf, opts = {}){
   const day = opts.day || dayKey(), {sunday, list, all} = bookOpen(day), seats = seatsTaken(list), shelf = opts.shelf || 0;
-  const label = b => b.birthday ? `Birthday lunch for ${nameOf(b.ids[2] || b.ids[0])}` : b.family ? `${b.ids.map(nameOf).join(" and ")} (family!)` : b.ids.length === 1 ? nameOf(b.ids[0]) : `${nameOf(b.ids[0])} and ${b.ids.length === 2 ? nameOf(b.ids[1]) : `${b.ids.length - 1} more`}`;
+  const label = b => b.mothers ? "The whole family, for Mother's Day (Mum and Ma Ma are guests of honour)" : b.birthday ? `Birthday lunch for ${nameOf(b.ids[2] || b.ids[0])}` : b.family ? `${b.ids.map(nameOf).join(" and ")} (family!)` : b.ids.length === 1 ? nameOf(b.ids[0]) : `${nameOf(b.ids[0])} and ${b.ids.length === 2 ? nameOf(b.ids[1]) : `${b.ids.length - 1} more`}`;
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The bookings book</h2><p class="sub">Sunday long lunch on the terrace, ${pretty(sunday)}, 12 to 3. ${seats} of ${LUNCH.seats} seats booked${list.length < all ? " so far: more will ring this week" : ""}.</p>`;
   if (!opts.terrace) return h + `<p class="muted">You'll need the terrace first: Darren can build it, from the vineyard stall.</p>` + shut;
   h += `<ul class="hlist lunchbook">${list.map(b => `<li><b>${fmt(b.at)}</b><span>${esc(label(b))}</span><small>${b.size} ${b.size === 1 ? "seat" : "seats"}${b.from ? ` · ${esc(b.from)}` : ""}</small></li>`).join("")}</ul>`;

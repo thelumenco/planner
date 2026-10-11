@@ -7,6 +7,7 @@
 
 import { BB_PEOPLE } from "./bb-people.js";
 import { CR_PEOPLE } from "./cr-people.js";
+import { WEDDING_PEOPLE } from "./terrace-people.js";
 const hm = s => { const [h, m] = s.split(":").map(Number); return h*60 + (m || 0); };
 // opts: {look: clothes for this slot (over the usual look), dow: [0-6] (only on those days, 0 = Sunday), days: "wd" | "we" (weekdays / weekends only), act: what they're doing (Darren's props + lines), dir: facing}
 // Gong Gong's going-out clothes: a pressed shirt and long trousers (no berms)
@@ -1007,7 +1008,8 @@ export const NPCS = [
     react: {quests3: "Three already? That's real momentum.", lunch: "Brain food time!"}
   },
   ...BB_PEOPLE,   // round 143: Bellbird Valley (data/bb-people.js)
-  ...CR_PEOPLE    // round 150: the Coast Road (data/cr-people.js)
+  ...CR_PEOPLE,   // round 150: the Coast Road (data/cr-people.js)
+  ...WEDDING_PEOPLE   // round 152: the wedding parties on the terrace (data/terrace-people.js)
 ];
 
 // Agent NPCs: one per automation. `from` on a mail item picks the messenger (unknown -> postie).
