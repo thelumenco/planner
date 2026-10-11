@@ -3675,6 +3675,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=19:20&date=2026-10-14&tw=1"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("terrace")); await page.waitForTimeout(5000);
   check(await page.locator('#actors .npc[data-npc="amara"].act-point').count() === 1 && await page.locator('#actors .npc[data-npc="darren"].act-sit').count() === 1 && await page.locator('#world [data-tspot="screen"]').count() === 1, "Wednesday night: Amara on the microphone, teams at the table, the screen up");
+  check(await page.locator("#sceneArt rect.dusk").count() === 1 && await page.locator("#sceneArt .nglow").count() >= 8, "the terrace gets the evening light like everywhere outdoors, and its fairy lights, rattan lamps and candles glow");
   await page.locator('#world [data-tspot="screen"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-trv^="join"]', { timeout: 20000 });
   await page.click('#ctx [data-trv="join:0"]'); await page.waitForTimeout(300);
   for (let i = 0; i < 20; i++) { await page.click('#ctx [data-trv^="ans"] >> nth=0'); await page.click('#ctx [data-trv="next"]'); }

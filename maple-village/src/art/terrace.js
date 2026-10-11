@@ -45,6 +45,24 @@ function occasionDecor(kind, day, hm, F){
     return g(balloons + fw); }
   return "";
 }
+// round 153 (Mel): light for the evenings. Fairy lights strung across the pergola in three swags, candles in glass jars
+// down the long table and on the wall, and woven rattan pendants hanging from the beams (and a rattan floor lantern by
+// the doors). From six they're lit: the glowing bits are .nglow, so core.js redraws them above the dusk wash.
+function terraceLights(hm){
+  const lit = hm >= 18*60 || hm < 6*60, glow = s => lit ? `<g class="nglow">${s}</g>` : s;
+  const swag = (y, sag) => { const pts = Array.from({length: 19}, (_, i) => { const t = i/18, x = 48 + t*424; return [x, y + Math.sin(t*Math.PI)*sag]; });
+    return `<path d="M48 ${y} Q260 ${y + sag*2} 472 ${y}" fill="none" stroke="#5A4A3A" stroke-width=".8"/>` + glow(pts.map(([x, yy], i) => `${lit ? `<circle cx="${x.toFixed(1)}" cy="${(yy + 3).toFixed(1)}" r="5" fill="#FFE3A3" opacity=".35"/>` : ""}<circle cx="${x.toFixed(1)}" cy="${(yy + 3).toFixed(1)}" r="2" fill="${lit ? (i % 3 ? "#FFE9A8" : "#FFD27A") : "#F3EEE2"}" stroke="#5A4A3A" stroke-width=".4"/>`).join("")); };
+  const candle = (x, y, s = 1) => `<rect x="${x - 4*s}" y="${y - 10*s}" width="${8*s}" height="${10*s}" rx="${2*s}" fill="#E8F1F3" fill-opacity=".7" stroke="#2F2B28" stroke-width=".6"/><rect x="${x - 2*s}" y="${y - 7*s}" width="${4*s}" height="${6*s}" rx=".6" fill="#FFFDF6"/>`
+    + (lit ? glow(`<circle cx="${x}" cy="${y - 8*s}" r="${9*s}" fill="#FFD27A" opacity=".3"/><path class="flick" d="M${x} ${y - 13*s} q${-2*s} ${3*s} 0 ${5*s} q${2*s} ${-2*s} 0 ${-5*s}z" fill="#FFB347"/>`) : "");
+  const rattan = (x, y, s = 1) => `<path d="M${x} 216 V${y - 22*s}" stroke="#5A4A3A" stroke-width=".8"/><path d="M${x - 16*s} ${y} Q${x - 16*s} ${y - 22*s} ${x} ${y - 22*s} Q${x + 16*s} ${y - 22*s} ${x + 16*s} ${y}z" fill="#C9A26A" stroke="#7A5638" stroke-width="1"/>`
+    + `<path d="M${x - 12*s} ${y - 6*s} h${24*s} M${x - 9*s} ${y - 12*s} h${18*s} M${x - 5*s} ${y - 18*s} h${10*s} M${x} ${y - 22*s} v${22*s} M${x - 8*s} ${y - 20*s} l${-4*s} ${20*s} M${x + 8*s} ${y - 20*s} l${4*s} ${20*s}" stroke="#8A6A42" stroke-width=".7" fill="none"/>`
+    + (lit ? glow(`<ellipse cx="${x}" cy="${y + 4*s}" rx="${30*s}" ry="${16*s}" fill="#FFD27A" opacity=".32"/><ellipse cx="${x}" cy="${y}" rx="${12*s}" ry="${3*s}" fill="#FFE9A8"/>`) : "");
+  const floorLantern = (x, y) => `<path d="M${x - 10} ${y} l2 -30 h16 l2 30z" fill="#C9A26A" stroke="#7A5638" stroke-width="1"/>${[0, 1, 2, 3].map(i => `<path d="M${x - 9 + i*0.6} ${y - 7 - i*7} h${18 - i*1.2}" stroke="#8A6A42" stroke-width=".7"/>`).join("")}<path d="M${x - 6} ${y - 30} q6 -8 12 0" fill="none" stroke="#7A5638" stroke-width="1.2"/>`
+    + (lit ? glow(`<ellipse cx="${x}" cy="${y - 12}" rx="22" ry="20" fill="#FFD27A" opacity=".3"/><rect x="${x - 4}" y="${y - 20}" width="8" height="10" rx="2" fill="#FFE9A8"/>`) : "");
+  return `<g pointer-events="none">${swag(300, 14)}${swag(420, 16)}${swag(540, 14)}
+    ${[330, 400, 470, 540].map((y, i) => candle(i % 2 ? 262 : 258, y)).join("")}${[150, 330].map(x => candle(x, 182, .9)).join("")}
+    ${rattan(150, 300)}${rattan(370, 300)}${floorLantern(110, 470)}${floorLantern(430, 600)}</g>`;
+}
 export function terraceArt(F = {}){
   const day = dayKey(), hm = sgHM(), sunday = new Date(day + "T00:00:00Z").getUTCDay() === 0, evening = hm >= 18*60 || hm < 6*60, occ = occasionOn(day);
   // laid for Sunday lunch, the wedding breakfast, Valentine's and Christmas
@@ -95,5 +113,5 @@ export function terraceArt(F = {}){
   const labels = tapeLabel(80, 392, "Bookings", "#E6DDF2", 9) + tapeLabel(352, 596, "The long table", "#FBF0D6", 9) + tapeLabel(300, 168, "The view", "#E6DDF2", 9);
   // round 152: Mother's Day: jugs of pink roses down the table
   const mum = sunday && mothersDay(day) && hm >= 11*60 ? g([380, 470, 540].map(y => `<rect x="256" y="${y - 10}" width="8" height="10" rx="2" fill="#FFFDF6" stroke="${C.ink}" stroke-width=".8"/>${[-4, 0, 4].map(d => `<circle cx="${260 + d}" cy="${y - 14 - Math.abs(d)/2}" r="3" fill="${roseC[(y + d) % 2]}"/>`).join("")}`).join("")) : "";
-  return view + wall + floor + shop + side + chairs + table + mum + tableSpot + book + view2 + steps + pergola + sails + drapes + occasionDecor(occ, day, hm, F) + labels;
+  return view + wall + floor + shop + side + chairs + table + mum + tableSpot + book + view2 + steps + pergola + sails + drapes + terraceLights(hm) + occasionDecor(occ, day, hm, F) + labels;
 }
