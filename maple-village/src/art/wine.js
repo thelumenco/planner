@@ -2,7 +2,7 @@
 // fermentation stage, wine bottles by style, and little icons for the stall. Hand-drawn like the rest of the village:
 // ink outlines, the shared #wob wobble filter, panel colours (panels are always light).
 const INK = `stroke="#3b3530" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"`;
-const ripeCol = kind => kind === "red" ? "#6B2A55" : kind === "tempranillo" ? "#3A2050" : "#C9D66A";
+const ripeCol = kind => kind === "red" ? "#6B2A55" : kind === "tempranillo" ? "#3A2050" : kind === "pinot" ? "#4A2A4E" : kind === "chardonnay" ? "#D9D27A" : "#C9D66A";
 
 // a five-pointed vine leaf centred on (x, y), size s, turned by `rot` degrees
 const leaf = (x, y, s, rot, fill) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"><path d="M0 7 C-2 4 -9 7 -11 1 C-12 -3 -8 -5 -6 -4 C-9 -8 -5 -12 -2 -9 C-1 -13 1 -13 2 -9 C5 -12 9 -8 6 -4 C8 -5 12 -3 11 1 C9 7 2 4 0 7Z" fill="${fill}" ${INK} stroke-width="${(1.3/s).toFixed(2)}"/><path d="M0 6 V-8 M0 0 L-7 -4 M0 0 L7 -4" fill="none" stroke="#3b3530" stroke-width="${(.8/s).toFixed(2)}" opacity=".55"/></g>`;
@@ -31,7 +31,7 @@ export function vineCloseup(vn, g, trellis){
   const nL = vn.wateredAt ? 5 + Math.round(g*3) : 4;
   h += leaves.slice(0, nL).map(([x, y, s, r], i) => leaf(x, y + droop*(i % 2 ? .4 : .2), s, r + (thirsty ? (i % 2 ? 18 : -18) : 0), i % 2 ? lf2 : lf)).join("");
   if (vn.wateredAt) {
-    const ripe = g >= 1, col = ripe ? ripeCol(vn.v) : g > .6 ? (vn.v === "red" || vn.v === "tempranillo" ? "#9A6A86" : "#B9CF7A") : "#A9C98A", r = 3.4 + Math.min(1, g)*1.4, n = 6 + Math.round(Math.min(1, g)*7);
+    const ripe = g >= 1, col = ripe ? ripeCol(vn.v) : g > .6 ? (vn.v === "red" || vn.v === "tempranillo" || vn.v === "pinot" ? "#9A6A86" : "#B9CF7A") : "#A9C98A", r = 3.4 + Math.min(1, g)*1.4, n = 6 + Math.round(Math.min(1, g)*7);
     if (g > .15) h += bunch(66, 74, col, r, n) + bunch(106, 76, col, r, n);
     else h += `<circle cx="66" cy="78" r="2.6" fill="#E9F0C8" ${INK}/><circle cx="70" cy="81" r="2.6" fill="#E9F0C8" ${INK}/><circle cx="106" cy="80" r="2.6" fill="#E9F0C8" ${INK}/>`;   // tiny flowers first
     if (ripe) h += `<g class="twinkle"><path d="M140 84 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" ${INK} stroke-width="1"/></g>`;
@@ -74,7 +74,7 @@ export function stageStrip(style, phase){
 // A wine bottle by style, `h` pixels tall. Optional (x, y) offset places it inside another drawing (with a tilt).
 export function bottleArt(type, h, tilt){
   const glass = type === "red" ? "#2F4A33" : type === "sparkling" ? "#4E6B44" : type === "rose" ? "#F4D6DC" : "#C9DCA8";
-  const wine = {red: "#7A1F3D", rose: "#E98AA0", white: "#E8D57A", sparkling: "#F3E7B0", tempranillo: "#5A1630"}[type] || "#7A1F3D";
+  const wine = {red: "#7A1F3D", rose: "#E98AA0", white: "#E8D57A", sparkling: "#F3E7B0", tempranillo: "#5A1630", pinot: "#8A2E3E", chardonnay: "#E8C96A"}[type] || "#7A1F3D";
   const body = type === "white" ? "M12 2 h6 v18 q6 8 6 18 v34 a3 3 0 0 1 -3 3 h-12 a3 3 0 0 1 -3 -3 v-34 q0 -10 6 -18z"   // a tall, slim flute
     : "M12 2 h6 v14 q8 4 8 12 v44 a3 3 0 0 1 -3 3 h-16 a3 3 0 0 1 -3 -3 v-44 q0 -8 8 -12z";                                 // shouldered bottle
   const clear = type === "rose" || type === "white";
@@ -86,7 +86,7 @@ export function bottleArt(type, h, tilt){
   return `<svg class="vybottle" viewBox="0 0 30 76" width="${Math.round(h*30/76)}" height="${h}" aria-hidden="true">${inner}</svg>`;
 }
 // a glass of wine, for the tasting room
-export const glassArt = (type, h = 34) => { const wine = {red: "#7A1F3D", rose: "#E98AA0", white: "#E8D57A", sparkling: "#F3E7B0", tempranillo: "#5A1630"}[type] || "#7A1F3D";
+export const glassArt = (type, h = 34) => { const wine = {red: "#7A1F3D", rose: "#E98AA0", white: "#E8D57A", sparkling: "#F3E7B0", tempranillo: "#5A1630", pinot: "#8A2E3E", chardonnay: "#E8C96A"}[type] || "#7A1F3D";
   return `<svg class="vybottle" viewBox="0 0 24 40" width="${Math.round(h*.6)}" height="${h}" aria-hidden="true"><path d="M5 4 h14 q1 14 -7 17 q-8 -3 -7 -17z" fill="#F4F8FA" ${INK}/><path d="M5.6 10 h12.8 q-.6 10 -6.4 11 q-5.8 -1 -6.4 -11z" fill="${wine}"/>${type === "sparkling" ? `<circle cx="10" cy="15" r=".9" fill="#FFFDF6"/><circle cx="13" cy="13" r=".7" fill="#FFFDF6"/>` : ""}<path d="M12 21 v13 M6 36 h12" fill="none" ${INK}/></svg>`; };
 
 // The olive tree: state "none" (an empty spot), "growing" or "ripe" (black olives among the silver leaves)

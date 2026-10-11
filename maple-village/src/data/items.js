@@ -180,6 +180,8 @@ export const ITEMS = {
   grape_red:{n:"Red grapes", kind:"ingredient", sell:2, what:"for gelato at the Scoop Shack, or back in the crates for wine"},
   grape_white:{n:"White grapes", kind:"ingredient", sell:2, what:"for gelato at the Scoop Shack, or back in the crates for wine"},
   grape_tempranillo:{n:"Tempranillo grapes", kind:"ingredient", sell:3, what:"for gelato at the Scoop Shack, or back in the crates for wine"},
+  grape_pinot:{n:"Pinot Noir grapes", kind:"ingredient", sell:3, what:"for gelato at the Scoop Shack, or back in the crates for wine"},
+  grape_chardonnay:{n:"Chardonnay grapes", kind:"ingredient", sell:3, what:"for gelato at the Scoop Shack, or back in the crates for wine"},
   loaf:{n:"Loaf of bread", kind:"ingredient", sell:2, what:"baked in the wine shop's oven"},
   milk:{n:"Milk", kind:"ingredient", price:4, tab:"deli", sell:3, what:"for gelato at the Scoop Shack, or two make a cheese in the wine shop's kitchen press (the farm stand sells it, and Wildflower Farm's cows give it)"},
   goatmilk:{n:"Goat's milk", kind:"ingredient", price:5, sell:3, what:"from Wildflower Farm's goats: for gelato at the Scoop Shack, or the kitchen's cheese press (like milk)"},

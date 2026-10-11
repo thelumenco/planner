@@ -3446,6 +3446,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   F2.inv.strawberry = 2; check(ba.dipBerries(F2, "dark", "sprinkles") && !F2.inv.strawberry, "dipping two strawberries in Sophie's chocolate");
   for (let d = 0; d < 3; d++) { F2.bellbird.joeyDay = null; const j = ba.joeyStart(), early = ba.joeyDo(j, 2); if (!d) check(early === "oops", "feeding Pip before the bottle's warm: Kim stops you"); [0, 0, 0, 1, 2, 2, 2, 2, 3].forEach(i => ba.joeyDo(j, i)); const r = ba.finishJoey(F2); if (d === 2) check(ba.joeyDone(j) && r.release, "three feeds of Pip, and she goes back to the bush"); }
   const cn = ba.canoeStart(); ["L", "R", "L", "R", "L", "R", "L", "R"].forEach(x => ba.paddle(cn, x)); check(ba.canoeDone(cn) && ba.finishCanoe(F2, cn), "a straight canoe: left, right, left, right");
+  // Kel's cuttings (round 145): Pinot Noir and Chardonnay at home
+  const F3 = {coins: 300, inv: {}, bellbird: {}}; check(!br.buyCuttings(F3, "pinot") && br.treat(F3, "bv_tasting", "flight") && br.buyCuttings(F3, "pinot") === "Pinot Noir" && br.buyCuttings(F3, "chardonnay") && F3.coins === 300 - 6 - 180, "after a tasting, Kel's Pinot Noir and Chardonnay cuttings (90 for three)");
+  { const v3 = vy.vineState(F3); check(v3.cuttings.pinot === 3 && v3.cuttings.chardonnay === 3 && vy.grapeKinds(v3).includes("pinot") && vy.grapeKinds(v3).includes("chardonnay") && vy.STYLES.pinot.grape === "pinot" && vy.STYLES.chardonnay.price > vy.STYLES.white.price, "they grow on the trellis and make their own wines");
+    check(tw.TOWN_GOODS.b_pinot.price > vy.STYLES.pinot.price && tw.TOWN_GOODS.b_chard.price > vy.STYLES.chardonnay.price, "Kel's bottles cost more than Mel's own sell for"); }
   F2.inv.mallows = 1; const bag = ba.openBag(F2); ba.toast(bag); ba.toast(bag); ba.toast(bag); check(ba.pullOut(F2, bag) === "golden" && !ba.fireLit(16*60) && ba.fireLit(17*60), "a golden marshmallow, from five");
   // in the browser: a van trip to the camp at six, a room, the fire and the family
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

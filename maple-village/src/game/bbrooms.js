@@ -9,6 +9,7 @@ import { icon } from "../art/icons.js";
 import { TOWNS, TOWN_GOODS } from "../data/towns.js";
 import { BB_OPSHOP } from "../data/bellbird.js";
 import { bbState } from "./bellbird.js";
+import { addCuttings, vineState } from "./vineyard.js";
 
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 const coin = () => icon("coin", 13);
@@ -35,7 +36,13 @@ export const TREATS = {
   bv_visitor: {pie: ["A pie with sauce", 4, "A meat pie from the warmer, tomato sauce on top. You eat it out of the paper bag."]},
   bv_campstore: {icypole: ["An icy pole", 2, "A raspberry one, already melting down your wrist."]}
 };
-export function treat(F, room, k){ const t = (TREATS[room] || {})[k]; if (!t || F.coins < t[1]) return null; F.coins -= t[1]; const s = bbState(F); s.treats = (s.treats || 0) + 1; return t; }
+export function treat(F, room, k){ const t = (TREATS[room] || {})[k]; if (!t || F.coins < t[1]) return null; F.coins -= t[1]; const s = bbState(F); s.treats = (s.treats || 0) + 1; if (k === "flight") s.tasted = true; return t; }
+// Kel's cuttings (round 145): after a tasting, three Pinot Noir or three Chardonnay cuttings to plant on a trellis at
+// home (vineyard.js grows them, and makes Pinot Noir and Chardonnay in the barrels)
+export const CUTTINGS = {price: 90, n: 3, kinds: {pinot: "Pinot Noir", chardonnay: "Chardonnay"}};
+export function buyCuttings(F, kind){ if (!CUTTINGS.kinds[kind] || !bbState(F).tasted || F.coins < CUTTINGS.price) return null; F.coins -= CUTTINGS.price; addCuttings(F, kind, CUTTINGS.n); return CUTTINGS.kinds[kind]; }
+const cuttingsList = F => { const v = vineState(F), tasted = bbState(F).tasted;
+  return `<h3 class="ph3">Cuttings from Kel's vines</h3>${tasted ? `<ul class="hlist wlist">${Object.entries(CUTTINGS.kinds).map(([k, n]) => `<li><span class="wpic">${icon("grape_" + k, 28)}</span><span class="wtxt"><b>${n} cuttings (${CUTTINGS.n})</b><small>${k === "pinot" ? "From the row Kel's grandad planted. Light, cherry-ish red." : "From the vines on the hill. Peaches, toast, a bit of butter."} Plant them on a trellis at home.${v.cuttings[k] ? ` (${v.cuttings[k]} at home to plant)` : ""}</small></span><button class="btn small primary" data-bb="cut:${k}" ${F.coins >= CUTTINGS.price ? "" : "disabled"}>${CUTTINGS.price} ${coin()}</button></li>`).join("")}</ul>` : `<p class="muted">"Have a taste first," says Kel. "Then if you like it, I'll cut you some to take home."</p>`}`; };
 const treats = (F, room, title = "Here and now") => { const m = TREATS[room]; return m ? `<h3 class="ph3">${esc(title)}</h3><ul class="hlist wlist">${Object.entries(m).map(([k, [n, p, l]]) => `<li><span class="wtxt"><b>${esc(n)}</b><small>${esc(l)}</small></span><button class="btn small primary" data-bb="treat:${room}:${k}" ${F.coins >= p ? "" : "disabled"}>${p} ${coin()}</button></li>`).join("")}</ul>` : ""; };
 
 // the chocolaterie's free tasting (once a day)
@@ -59,7 +66,7 @@ export function bbRoomPanel(F, room, o = {}){
     case "bv_coffee": return head(room, `Rosie's coffee caravan opens at dawn for the balloon crowd. The chalkboard has three things on it, and they're all good.`) + treats(F, room) + listOf(F, shopGoods(room), "To take home") + shut;
     case "bv_balloonshed": return head(room, `Rosie's dad Gus flies the balloons: dawn, and the golden hour before sunset. The baskets are taller than Evan.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:balloon">A balloon ride</button></div>` + listOf(F, shopGoods(room), "From the shop") + shut;
     case "bv_gallery": return head(room, `Paintings of the valley by local artists, a long window over the real thing, and scones that come out every twenty minutes.`) + treats(F, room) + listOf(F, shopGoods(room), "To take home") + shut;
-    case "bv_tasting": return head(room, `Kel's family have grown grapes here for three generations. Pinot the cellar dog is asleep under the bar, as usual.`, "stripe") + treats(F, room, "A tasting") + listOf(F, shopGoods(room), "Bottles to take home") + shut;
+    case "bv_tasting": return head(room, `Kel's family have grown grapes here for three generations. Pinot the cellar dog is asleep under the bar, as usual.`, "stripe") + treats(F, room, "A tasting") + listOf(F, shopGoods(room), "Bottles to take home") + cuttingsList(F) + shut;
     case "bv_cave": return head(room, `The barrel cave, dug into the hill. Racks of sparkling wine stand tilted neck-down in the cool, waiting for someone to give each bottle a little turn.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:riddle">Help Jono turn the bottles</button></div>` + shut;
     case "bv_restaurant": { const t = TREATS[room].lunch, done = bbState(F).lunch === dayKey();
       return head(room, `One long table for everyone, under the window onto the vines. No menu: whatever's good today.`) + `<h3 class="ph3">${esc(t[0])} · ${t[1]} ${coin()}</h3><p class="muted">${esc(t[2])}${o.party ? " Everyone you came with squeezes in." : ""}</p><div class="actions"><button class="btn primary" data-bb="treat:${room}:lunch" ${F.coins >= t[1] && !done ? "" : "disabled"}>${done ? "You've had lunch here today" : "A long lunch, please"}</button></div>` + shut; }

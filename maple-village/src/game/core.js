@@ -63,7 +63,7 @@ import { discoArt } from "../art/disco.js";
 import { bellbirdArt, vanRideArt } from "../art/bellbird-vines.js";
 import { BB_NAMES, BB_EVAN } from "../data/bellbird.js";
 import { mapPanel as bbMapPanel, passportPanel as bbPassport, setOff as bbSetOff, driveOn as bbDriveOn, homeFuel as bbHomeFuel, bbState } from "./bellbird.js";
-import { bbRoomPanel, treat as bbTreat, chocTaste, watchWater, NOTES as BB_NOTES } from "./bbrooms.js";
+import { bbRoomPanel, treat as bbTreat, chocTaste, watchWater, NOTES as BB_NOTES, buyCuttings as bbCuttings } from "./bbrooms.js";
 import * as BBA from "./bbacts.js";
 import { FIRE_FOLK } from "../data/bb-people.js";
 import { loftPanel, startBatch, collect as loftCollect, loftState } from "./loft.js";
@@ -1808,6 +1808,7 @@ function ctx(){
     if (a === "treat") { if (room === "bv_restaurant" && bbState(F).lunch === dayKey()) return; const t = bbTreat(F, room, k); if (!t) return; sfx(k === "flight" ? "chime" : "slurp"); gainXp(1); hearts(2); speak(`${t[0]}. ${t[2]}`, 6500);
       if (room === "bv_restaurant") { bbState(F).lunch = dayKey(); const tr = tripOn(F), who = tr ? tr.party.filter(x => x !== "evan" && isHere(x)) : []; who.slice(0, 3).forEach((id, i) => setTimeout(() => npcSay(id, pick(["Pass the bread down? Thank you, love.", "This lamb. I'm not talking for a minute.", "We should do this every Sunday.", "Look at the view. Look at it!"])), 2400 + i*2400)); }
       ev(k === "babycino" ? ["a coffee for ME!", "froth moustache!"] : k === "freddo" ? ["a chocolate FROG!", "ribbit! chomp!"] : k === "icypole" ? ["it's dripping!", "my tongue is red!"] : ["yummy!", "can I have some?", "mmm, Mama"]); }
+    else if (a === "cut") { const n = bbCuttings(F, room); if (!n) return; sfx("chaching"); gainXp(1); flash(`Three ${n} cuttings`); speak(`Kel snips three ${n} cuttings, wraps them in damp newspaper and a bit of hessian. "Full sun, a good drink, and talk to them now and then." Plant them on a trellis at home.`, 7000); }
     else if (a === "choc") { if (!chocTaste(F)) return; sfx("chime"); gainXp(1); hearts(2); speak("Sophie sets down a little dish: dark, milk, white, and one speckled with wattleseed, nutty and toasty. \"The wattleseed's from the bush out the back,\" she says.", 6500); ev(["one for me? one for ME?", "chocolate! for free!", "the brown one, Mama!"]); }
     save(); ctx(); });
   // Bellbird Valley's activities (round 143: bbacts.js)

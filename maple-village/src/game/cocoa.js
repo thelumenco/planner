@@ -108,7 +108,7 @@ export const SHELL = 6, TRAY = 12, CASE = 6;
 // what can go in a bonbon: the gelato fridge's ingredients, minus the savoury ones
 const NOT_FILLING = ["milk", "goatmilk", "yoghurt", "egg", "olives", "corn", "carrot", "tomato", "housechoc", "pea"];
 // and wine from Mel's own bottles: one bottle off the wine shop shelf makes 4 fillings
-export const WINE_FILL = {wine_red: ["Red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Rosé", "Rosé", "#E98AA0"], wine_white: ["White wine", "White Wine", "#E8D57A"], wine_sparkling: ["Sparkling wine", "Bubbly", "#F3E7B0"]};
+export const WINE_FILL = {wine_red: ["Red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Rosé", "Rosé", "#E98AA0"], wine_white: ["White wine", "White Wine", "#E8D57A"], wine_sparkling: ["Sparkling wine", "Bubbly", "#F3E7B0"], wine_pinot: ["Pinot Noir", "Pinot", "#8A2E3E"], wine_chardonnay: ["Chardonnay", "Chardonnay", "#E8C96A"]};
 export const WINE_FILLS = 4;
 const FL = id => INGR[id] || WINE_FILL[id];
 export const isFilling = id => (id in INGR && !NOT_FILLING.includes(id)) || id in WINE_FILL;

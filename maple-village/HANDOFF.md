@@ -2090,3 +2090,10 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - A sticker on the van after the first stamp.
   - Bellbird sparkling costs 38, above Mel's best riddled bottle.
 - **Not done yet:** Pinot Noir and Chardonnay cuttings for the vineyard. New grape kinds need vineyard support.
+
+### Round 145: Pinot Noir and Chardonnay cuttings from Bellbird Valley
+- **Where to get them:** after a tasting flight in the tasting room (`bbState.tasted`), Kel sells three cuttings of each kind for 90 (`buyCuttings` in bbrooms.js, `data-bb="cut:<kind>"`).
+- **At the vineyard:** grape kinds `pinot` (flag `v.pinot`) and `chardonnay` (flag `v.chard`) via `addCuttings`/`hasGrape`. Wine styles: Pinot Noir (11h, 24) and Chardonnay (9h, 22).
+- **Also added:** grape colours, grape items, gelato ingredients, loft grapes, bonbon wine fillings and wine-name ideas.
+- **Marco's barrel fill priority:** Tempranillo, then Pinot, then Chardonnay, then red, then white.
+- **Kel's own bottles:** now 26 (Pinot) and 24 (Chardonnay), above what Mel's sell for.
