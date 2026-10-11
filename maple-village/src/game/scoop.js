@@ -103,7 +103,7 @@ export const UPGRADES = {
   honesty: {n: "Honesty freezer", price: 400, line: "A little freezer out front with pre-scooped cups and a wooden coin box. It sells while the shop's shut (7 to 10am, 8 to 10pm), and the coins wait in the box for you."},
   awning: {n: "Striped awning and fairy lights", price: 250, line: "A pink striped awning over the deck, strung with fairy lights that glow in the evenings. Customers linger, and leave tips."},
   neon: {n: "Neon cone sign", price: 350, line: "A pink neon cone by the door. It glows from 5pm, so more people find you in the evenings."},
-  bike: {n: "Delivery bike", price: 800, line: "A mint delivery bike with a cool box. Tomo pedals ice creams round to the family from anywhere (send one from your backpack), and a cone from the shop can be sent round without melting."},
+  bike: {n: "Delivery bike", price: 800, line: "A mint delivery bike with a cool box, for all three shops. From 10am to 10pm Tomo pedals villagers' orders round: ice creams from here, chocolates from the Cocoa Room, tapas, small plates and bottles from the winery (late-night suppers too). And you can send something to the family from anywhere."},
   dip: {n: "Chocolate dip station", price: 500, line: "A little room off the shop: warm pots of chocolate and a shelf of toppings. Cones and waffles can be dipped and topped (customers pay a bit extra), and you can make your own. Comes with milk chocolate and rainbow sprinkles; more dips and toppings to buy."}
 };
 export const DIPS = {
@@ -134,7 +134,7 @@ export function buyUpgrade(F, k){
   return {honesty: "The honesty freezer's out front, full of little cups. It sells from 7 to 10am and 8 to 10pm while the shop's shut.",
     awning: "The striped awning's up over the deck, fairy lights and all. Wait till you see it at dusk.",
     neon: "The neon cone's on the wall by the door. It switches on at 5pm.",
-    bike: "A mint delivery bike, parked by the shop. Send an ice cream from your backpack any time the shop's open. Villagers' orders come in while Tomo's on, 10am to 6pm.",
+    bike: "A mint delivery bike, parked by the shop. Villagers order from the Scoop Shack, the Cocoa Room and the winery, 10am to 10pm (late-night suppers from the winery), and Tomo pedals it round.",
     dip: "The chocolate dip station's open! Through the new door on the shop's east wall."}[k];
 }
 export function buyDip(F, k){ const s = scoopState(F), d = DIPS[k]; if (!d || d.house || s.dips[k] || F.coins < d.price) return false; F.coins -= d.price; s.dips[k] = 1; return true; }
@@ -363,10 +363,10 @@ export function dipBarPanel(F, st){
 // the delivery bike: pick a flavour and a type, then who it's for (st.who: [[id, name]] from the game)
 export function deliverPanel(F, st){
   const s = scoopState(F), tubs = tubList(s), hm = sgHM();
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Scoop Shack delivery</h2><p class="sub">Tomo pedals it round in the cool box, and a thank-you note comes back to your mailbox.</p>`;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Delivery bike</h2><p class="sub">Ice creams, chocolates, tapas: Tomo pedals it round in the cool box, and a thank-you note comes back to your mailbox.</p>`;
   if (!hasUp(s, "bike")) return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(UPGRADES.bike.n)}</h2><p class="sub">${esc(UPGRADES.bike.line)}</p><div class="actions">${buyBtn(F, UPGRADES.bike.price, 'data-gbuy="bike"')}</div>` + shut;
-  if (!waiterOn(hm)) return h + `<p class="muted">${hm >= 13*60 && hm < 13*60 + 45 ? "Tomo's on his lunch break till 1:45." : "Tomo's not on. Deliveries go out 10am to 6pm."}</p>` + shut;
-  if (!tubs.length) return h + `<p class="muted">Nothing in the display to send.</p>` + shut;
+  if (!riderOn(hm)) return h + `<p class="muted">${hm >= 13*60 && hm < 13*60 + 45 ? "Tomo's on his lunch break till 1:45." : "The bike's parked up for the night. Deliveries go out 10am to 10pm."}</p>` + shut;
+  if (!tubs.length) return h + `<p class="muted">No ice cream in the display to send.</p>` + shut;
   const r = st.pick && s.tubs[st.pick] > 0 ? recipeOf(s, st.pick) : null;
   if (!r) return h + `<ul class="hlist wlist">${tubs.map(x => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops${x.dairy ? "" : " · dairy-free"}</small></span><button class="btn small primary" data-gvpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut;
   const fmt = FORMATS[st.fmt] ? st.fmt : "cone";
@@ -540,9 +540,12 @@ export function trolleyPanel(F, st = {}){
 export const DELIVERY = {fee: 2, scoop: .045, cocoa: .036, winery: .04};   // doubled (Mel: "Tomo doesn't seem to be delivering much"): about two to three an hour from each shop, when there's stock
 export const bikeOwned = F => !!(F.scoop && F.scoop.up && F.scoop.up.bike);
 // round 155 (Mel: "I'm getting delivery orders even when it's outside of delivery bike hours"): orders only come in
-// while Tomo's on shift, 10am to 6pm, whichever shop they're from
-export const DELIV_HOURS = [10*60, 18*60];
+// during the bike's hours, whichever shop they're from. Then (Mel: "late night suppers"): 10am to 10pm. Tomo waits
+// tables till 6, then it's just the bike; the Scoop Shack and the Cocoa Room shut at 8, so after that it's the
+// winery's suppers (tapas, small plates, a bottle)
+export const DELIV_HOURS = [10*60, 22*60];
 export const deliveryHours = hm => hm >= DELIV_HOURS[0] && hm < DELIV_HOURS[1];
+export const riderOn = hm => deliveryHours(hm) && !(hm >= 13*60 && hm < 13*60 + 45);   // Tomo's out on the bike (not on his lunch)
 // round 152 (Mel: "the mint bike is like permanently outside the shop"): after each order Tomo's out on the bike for
 // twenty minutes, and it's gone from beside the shop (a little chalkboard says so)
 export const BIKE_TRIP = 20*60000;

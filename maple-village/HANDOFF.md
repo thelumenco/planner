@@ -2237,4 +2237,8 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - `fertiliser` (250): +1 on every harvest, in the garden, beds and pots.
   - `harvester` (450): `harvesterTick` (main 1s tick) picks every ripe plot, plus `ghRipe` under the glass.
   - The greenhouse reads the tools through `setGhTools`, which replaced `setGhCompost`.
-- **Delivery orders:** only during Tomo's shift (`DELIV_HOURS` 10:00–18:00, `deliveryHours(hm)` in scoop.js), for the Scoop Shack, the Cocoa Room and the winery. Before this, the winery's ran till 10pm.
+- **Delivery orders:** only during the bike's hours, `DELIV_HOURS` 10:00–22:00 (`deliveryHours(hm)` in scoop.js), for all three shops.
+  - The Scoop Shack and the Cocoa Room shut at 8, so after that it's the winery's late-night suppers.
+  - `riderOn` (those hours minus Tomo's lunch) gates Mel's own sends to the family, replacing `waiterOn`.
+  - Tomo has an evening slot at the bay, 18:00–22:00.
+  - The bike's wording (the upgrade, the shop board, the panel title "Delivery bike") now names all three shops.

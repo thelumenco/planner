@@ -3203,8 +3203,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     s.up.bike = 1; s.display = ["d"]; s.at = Date.now() - 60e3; const off = globalThis.__mapleOffset; globalThis.__mapleOffset = Date.parse("2026-10-12T04:00:00Z") - Date.now();
     Math.random = () => .001; const out = sc.scoopTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
     check(out.orders && out.orders[0].shop === "scoop" && /^a (cup|cone) of /.test(out.orders[0].what) && out.orders[0].coins >= sc.DELIVERY.fee + 1, "with the bike, villagers order a cup or a cone from wherever they are (shop price + a delivery fee)");
-    s.at = Date.now() - 60e3; globalThis.__mapleOffset = Date.parse("2026-10-12T11:00:00Z") - Date.now(); Math.random = () => .001; const late = sc.scoopTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
-    check(!(late && late.orders && late.orders.length) && sc.deliveryHours(17*60 + 59) && !sc.deliveryHours(18*60) && !sc.deliveryHours(9*60 + 59), "no delivery orders once Tomo's shift is over (10am to 6pm), even with the shop still open at 7pm"); }
+    s.at = Date.now() - 60e3; globalThis.__mapleOffset = Date.parse("2026-10-12T14:30:00Z") - Date.now(); Math.random = () => .001; const late = sc.scoopTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
+    check(!(late && late.orders && late.orders.length) && sc.deliveryHours(21*60 + 59) && !sc.deliveryHours(22*60) && !sc.deliveryHours(9*60 + 59) && sc.riderOn(20*60) && !sc.riderOn(13*60 + 10), "delivery orders run 10am to 10pm (late-night suppers), and none come in after"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`trolley pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));

@@ -98,7 +98,7 @@ import { moodPanel, vanPick, vanClear, lookLine as vanLookLine } from "./van.js"
 import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush, brushNearest, milkOne, milkHerd, collectHives, buyStand, giveName, fullHives,
   extractorPanel, crockPanel, pressPanel as hfPressPanel, cavePanel as hfCavePanel, spinFrames, makeYoghurt, pressCheese, takeWheel, cheeseNames, CHEESES as HF_CHEESES,
   gainTrust, muckOut, latchGate, catchGoat, nameHive, creamHoney, cutComb, turnWheels, finishRequest, stockShelf, hfTick, farmhousePanel, LEVELS as HF_LEVELS, MOODS as HF_MOODS } from "./hfarm.js";
-import { waiterOn, scoopState, scoopTick, scoopNews, trolleyPanel, loadTrolley, returnTrolley, trolleySell, trolleyOn, trolleyMelted, TROLLEY, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, unstockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
+import { waiterOn, riderOn, scoopState, scoopTick, scoopNews, trolleyPanel, loadTrolley, returnTrolley, trolleySell, trolleyOn, trolleyMelted, TROLLEY, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, unstockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaNews, cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
   pantryPanel, bonbonPanel, casePanel, stockPantry, unstockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
@@ -3104,7 +3104,7 @@ function haveIceCream(rid){
 const deliverTo = () => FAMILY_ALL.map(w => [w, GIFT_NAME[w]]);
 // round 139: the delivery panel also offers bonbons, bars and tapas from the other shops (bikesend.js)
 function deliverMore(h){
-  const s = scoopState(F); if (!hasUp(s, "bike") || !waiterOn(sgHM()) || scSt.vpick) return h;
+  const s = scoopState(F); if (!hasUp(s, "bike") || !riderOn(sgHM()) || scSt.vpick) return h;
   const opts = sendOptions(F, dayKey(), owns(F, "cocoa"));
   if (scSt.vother && opts.some(o => o.k === scSt.vother)) return `<span class="tape gingham" aria-hidden="true"></span><h2>Delivery</h2><p class="sub">Tomo pedals it round in the cool box, and a thank-you note comes back to your mailbox.</p>` + sendMorePanel(opts, scSt.vother, deliverTo()) + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   const more = sendMorePanel(opts), shut = /<div class="actions"><button class="btn alt small" data-close="1">Close<\/button><\/div>$/;

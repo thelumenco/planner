@@ -935,12 +935,13 @@ export const NPCS = [
     away: "Sofia's finished for the day. The counter's closed."
   },
   {
-    id: "tomo", pitch: 0.8, name: "Tomo", job: "Serves on the deck and in the Scoop Shack (and does the deliveries)",
+    id: "tomo", pitch: 0.8, name: "Tomo", job: "Serves on the deck and in the Scoop Shack, and rides the delivery bike for all three shops (till 10pm)",
     intro: "Tomo. I carry the cones to the tables, I wipe the tables, I chat. Give me a bike and I'll deliver too.",
     look: {skin: "#D9A882", hair: "#1F1A17", hairStyle: "short", top: "#FFFDF6", bottom: "#5E5A55", extra: "apron"},
     routine: [slot("10:00", "11:30", "scoopshop", [[200, 440], [380, 450], [140, 560], [300, 560]], {act: "cone"}), slot("11:30", "13:00", "bay", [[150, 440], [230, 440], [200, 312], [262, 380]], {act: "cone"}),
       slot("13:00", "13:45", "bay", [222, 352], {act: "sit"}), slot("13:45", "15:30", "scoopshop", [[200, 440], [380, 450], [140, 560], [300, 560]], {act: "cone"}),
-      slot("15:30", "18:00", "bay", [[150, 440], [230, 440], [200, 312], [262, 380]], {act: "cone"})],
+      slot("15:30", "18:00", "bay", [[150, 440], [230, 440], [200, 312], [262, 380]], {act: "cone"}),
+      slot("18:00", "22:00", "bay", [[262, 380], [300, 400]])],   // round 155: evenings, just the bike (late-night suppers)
     lines: ["Table four wants another round. Table four always wants another round.", "Best view in the village, this deck.", "Napkins! Who needs napkins?", "I dream in pistachio."],
     actLines: {cone: ["Two cones for the deck, coming through!", "Mind the drips!", "Anyone for a waffle?", "Enjoy! Don't let the gulls see."]},
     away: "Tomo's off for the day."
