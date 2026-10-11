@@ -3485,6 +3485,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const kt = await import(new URL("../src/game/kitchen.js", import.meta.url)), T = tw.TOWNS, stops = bb.STOPS.filter(id => bb.regionOf(id) === "coast");
   check(stops.length === 6 && stops.every(id => T[id].by === "van" && T[id].screens.length === 2 && Object.keys(T[id].rooms).length === 3), "six Coast Road stops, two screens and three rooms each");
   check(stops.every(id => T[id].screens.some(s => /sea|surf|wave|beach|cove|wharf|mouth|cliff/.test(JSON.stringify(T[id].say) + s))), "the sea at every stop");
+  { const tr = await import(new URL("../src/game/trips.js", import.meta.url)), tk = tr.ticketPanel({coins: 100, inv: {}}, [], "ronda", 9*60, "train");
+    check(/Kyoto/.test(tk) && !/Breakwater|Valley Gate|Koala Cove/.test(tk), "the train's ticket list has the train towns only (the campervan stops are on the van's map)"); }
   check(stops.every(id => Object.values(T[id].rooms).every(r => tw.TOWN_PLACES[r.door])), "every coast room has a door outside");
   const goods = Object.values(tw.TOWN_GOODS).filter(g => stops.some(id => Object.keys(T[id].rooms).includes(g.shop)));
   check(goods.length >= 15 && goods.every(g => !g.sell || g.sell <= g.price), "the coast's shops, and nothing sells back for more than it costs");
