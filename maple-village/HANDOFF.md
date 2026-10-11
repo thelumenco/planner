@@ -2242,3 +2242,21 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - `riderOn` (those hours minus Tomo's lunch) gates Mel's own sends to the family, replacing `waiterOn`.
   - Tomo has an evening slot at the bay, 18:00–22:00.
   - The bike's wording (the upgrade, the shop board, the panel title "Delivery bike") now names all three shops.
+
+## NEXT UP (Mel, after round 156)
+- **Order:** finish the campervan map first. Two closed roads are signposted on the Vines page (`BB_SOON` in data/bellbird.js):
+  1. **The Lavender Hills** (from `bv_camp`).
+  2. **The Tablelands** (from `bv_lookout`, up the range).
+  - Each region is four rounds, like the Coast Road. Day trips only, and family acts are unique per stop. Plan each region with Mel before building.
+- **Then, before 20 November** (the in-game dates follow the real calendar, so this has to land before mulled wine season starts):
+  - **The Christmas market on the field**, late November to Christmas Eve, evenings:
+    - Wooden stalls and fairy lights.
+    - Mel's own stall: she picks what goes on it each evening (mill soaps and oils, honey, wine).
+    - A Cocoa Room gift-box stall, a gelato stand, and Ma Ma's wreaths.
+    - Mulled wine by the cup.
+    - A carol singalong, and Evan meets Santa.
+  - **Gift hampers and the post office:**
+    - A packing table where Mel packs her own things into hampers (oils, soaps, bonbons, honey, wine).
+    - Penny posts them to villagers and to people further afield, and thank-you letters come back.
+    - Hampers sell at the Christmas market too.
+- Also suggested and not yet picked: an olive harvest day with olio nuovo (November), and Evan's own garden patch with a pumpkin competition at the fair.
