@@ -67,6 +67,7 @@ import { bbRoomPanel, treat as bbTreat, chocTaste, watchWater, NOTES as BB_NOTES
 import * as BBA from "./bbacts.js";
 import * as CRA from "./cracts.js";
 import * as TLA from "./tlacts.js";
+import * as LVA from "./lvacts.js";
 import { FIRE_FOLK } from "../data/bb-people.js";
 import { loftPanel, startBatch, collect as loftCollect, loftState } from "./loft.js";
 import { cinqueRoomArt } from "../art/cinque-rooms.js";
@@ -1639,7 +1640,7 @@ function ctx(){
       : bbRoom === "dip" ? BBA.dipPanel(F, bbSt.dip, evanOn) : bbRoom === "joey" ? BBA.joeyPanel(F, bbSt.joey, evanOn) : bbRoom === "canoe" ? BBA.canoePanel(F, bbSt.canoe, evanOn, bbSt.paid)
       : bbRoom === "fire" ? BBA.firePanel(F, bbSt.bag, {hm: sgHM(), folk: FIRE_FOLK.some(isHere)})
       : bbRoom === "surf" ? CRA.surfPanel(F, bbSt.surf, evanOn, bbSt.paid) : bbRoom === "whales" ? CRA.whalePanel(F, bbSt.whale, evanOn) : bbRoom === "glow" ? CRA.glowPanel(F, bbSt.glow, {hm: sgHM(), evan: evanOn})
-      : bbRoom === "pots" ? CRA.potsPanel(F, bbSt.pots, {hm: sgHM(), evan: evanOn}) : bbRoom === "penguins" ? CRA.pengPanel(F, bbSt.peng, {hm: sgHM(), evan: evanOn}) : bbRoom === "nippers" ? CRA.nipPanel(F, bbSt.nip, {hm: sgHM(), evan: evanOn}) : TLA.TL_KINDS.includes(bbRoom) ? TLA.tlPanel(F, bbRoom, bbSt, {hm: sgHM(), evan: evanOn}) : bbRoomPanel(F, bbRoom, {evan: evanOn, party: !!tp.length}); }
+      : bbRoom === "pots" ? CRA.potsPanel(F, bbSt.pots, {hm: sgHM(), evan: evanOn}) : bbRoom === "penguins" ? CRA.pengPanel(F, bbSt.peng, {hm: sgHM(), evan: evanOn}) : bbRoom === "nippers" ? CRA.nipPanel(F, bbSt.nip, {hm: sgHM(), evan: evanOn}) : TLA.TL_KINDS.includes(bbRoom) ? TLA.tlPanel(F, bbRoom, bbSt, {hm: sgHM(), evan: evanOn}) : LVA.LV_KINDS.includes(bbRoom) ? LVA.lvPanel(F, bbRoom, bbSt, {hm: sgHM(), evan: evanOn}) : bbRoomPanel(F, bbRoom, {evan: evanOn, party: !!tp.length}); }
   else if (bvView) h = bvView === "passport" ? bbPassport(F) : bbMapPanel(F, {pick: tripPick, ownsVan: owns(F, "van"), region: bvRegion});
   else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick, tripTown);
   else if (railOpen === "ferry" && scene === "shore") h = ticketPanel(F, tripPick, "jeju", sgHM(), "ferry");   // round 127: the Jeju ferry from the jetty
@@ -1977,7 +1978,7 @@ function ctx(){
     else if (a === "nip") { if (!evanOn || !CRA.nipOpen(sgHM())) return; bbSt.nip = CRA.nipStart(); sfx("paper", true); if (isHere("crdimi")) npcSay("crdimi", "On your marks... get set... GO!"); }
     else if (a === "ncheer" || a === "nduck") { if (!bbSt.nip || CRA.nipDo(bbSt.nip, a === "ncheer" ? "cheer" : "duck") == null) return; sfx("tap"); }
     // the Tablelands' (round 159: tlacts.js): one action for them all
-    else if (a === "tl") { const [verb, arg] = v.split("."), r = TLA.tlAct(F, bbRoom, bbSt, verb, arg, {evan: evanOn, hm: sgHM(), addInv}); if (!r) return;
+    else if (a === "tl" || a === "lv") { const [verb, arg] = v.split("."), r = (a === "tl" ? TLA.tlAct : LVA.lvAct)(F, bbRoom, bbSt, verb, arg, {evan: evanOn, hm: sgHM(), addInv}); if (!r) return;   // (round 163: and the Lavender Hills', lvacts.js)
       if (r.sfx) sfx(r.sfx); if (r.evan) ev(r.evan, 900); if (r.xp) gainXp(r.xp); if (r.hearts) hearts(r.hearts); if (r.flash) flash(r.flash); if (r.say) speak(r.say, 5500); if (r.close) { bbRoom = null; bbSt = {}; act("cheer"); } save(true); }
     else if (a === "nipped") { const st = bbSt.nip; if (!st || !CRA.nipDone(st)) return; const r = CRA.finishNip(F, st, addInv); bbSt = {}; gainXp(2); hearts(3); act("cheer"); if (r.medal) flash("Evan's Nippers medal"); speak(r.medal ? "Coach Dimi hangs a medal round Evan's neck: his first Nippers. He won't take it off. Not even in the bath, he says." : "Hot chips on the surf club balcony, Evan still in his cap.", 6500); ev(["I'm a LIFESAVER!", "did you see me, Mama?", "I dived for the flag!"], 1800); save(); }
     ctx(); });
@@ -2482,7 +2483,7 @@ function townSpot(id){
   const town = townOf(scene), T = TOWNS[town];
   if (id === T.station && T.by === "van") { bvView = "map"; sfx("paper", true); if (evanInVan()) speak(pick(["Evan's fast asleep in the back, one arm flung out, under the pink blanket.", "Shh. Evan's asleep in the van, snoring very softly.", "Evan's curled up in the back with his toy, fast asleep."]), 4500); render(); return; }   // round 141: the campervan's road map
   // round 143: Bellbird Valley's activities out of doors: the balloons, the berry rows, the canoes, the campfire; and the rope swing
-  const bbOut = {bvballoons: "balloon", bvberries: "berries", bvcanoe: "canoe", bvfire: "fire", bvsurf: "surf", bvwhales: "whales", bvboats: "pots", bvpenguins: "penguins", bvnippers: "nippers", bvtfalls: "swim", bvtplatypus: "platypus", bvtcalves: "calves", bvttrees: "shake", bvtpanning: "pan", bvttrain: "steam"}[id];
+  const bbOut = {bvballoons: "balloon", bvberries: "berries", bvcanoe: "canoe", bvfire: "fire", bvsurf: "surf", bvwhales: "whales", bvboats: "pots", bvpenguins: "penguins", bvnippers: "nippers", bvtfalls: "swim", bvtplatypus: "platypus", bvtcalves: "calves", bvttrees: "shake", bvtpanning: "pan", bvttrain: "steam", bvhrows: "harvest", bvhpiste: "petanque", bvhhives: "bees", bvhmaze: "maze", bvhbridge: "sticks", bvhsunset: "bell"}[id];
   // round 150: the king parrots at Koala Cove, with a scoop of seed from the park store
   if (id === "bvparrots") { const evanOn = inParty(F, "evan") && !evanNight();
     if (!((F.inv || {}).b_seed > 0)) { speak("The king parrots eye you from the fence: red heads, green wings. They'd come to your arm for a scoop of seed (the park store has it, 2 coins).", 5000); render(); return; }

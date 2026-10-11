@@ -25,7 +25,7 @@ export const LV_TOWNS = {
     evanScreen: {hv_rows: ["the bees are on every flower!", "purple, purple, purple!"], hv_still: ["a big copper pot!", "steam! it's cooking flowers!"]},
     hints: {hv_rows: "Lavender Ridge: the lavender rows and the van. Down the lane: the still, the farm shop and the tea room.", hv_still: "The farmyard: the copper still, the farm shop, the tea room. Up the lane: back to the rows."},
     spots: famSpots({hv_rows: [[250, 420], [330, 450], [220, 500], [380, 400], [180, 430], [300, 520]], hv_still: [[220, 360], [300, 380], [260, 460], [200, 520], [330, 540], [260, 300]]}),
-    acts: {}, rooms: {
+    acts: {mum: {hv_rows: {act: "armful", at: [240, 440], dir: 1}}, darren: {hv_rows: {act: "bee", at: [340, 480], dir: -1}}}, rooms: {
       bv_hstill: room("bvhstill", "The distillery", "The distillery: a great copper still bubbling, glass bottles catching the golden oil, and the whole shed smelling of lavender so strongly your eyes water."),
       bv_hshop: room("bvhshop", "The lavender farm shop", "The farm shop: bunches hanging from the beams, little bags of dried flowers, oil in blue bottles, soaps, and a shelf of lavender honey."),
       bv_htea: room("bvhtea", "The Lavender Ridge tea room", "The tea room: lace curtains, a view down the rows, lavender scones, and lavender lemonade in tall glasses.")},
@@ -49,7 +49,7 @@ export const LV_TOWNS = {
     evanScreen: {hm_square: ["the men are throwing balls!", "a fountain with a fish!"], hm_lanes: ["steps! so many steps!", "a tiny door!"]},
     hints: {hm_square: "Montrose: the square, the fountain, the pétanque piste, the boulangerie, the nougat shop, the café and the van. East: the lanes.", hm_lanes: "The lanes: the old washhouse, the steps up to the ramparts. West: back to the square."},
     spots: famSpots({hm_square: [[220, 400], [320, 420], [260, 520], [180, 460], [360, 560], [300, 300]], hm_lanes: [[200, 380], [300, 420], [380, 380], [260, 500], [160, 520], [420, 520]]}),
-    acts: {}, rooms: {
+    acts: {gonggong: {hm_square: {act: "baguette", at: [200, 440], dir: 1}}, marcus: {hm_square: {act: "accordion", at: [330, 320], dir: -1}}}, rooms: {
       bv_hboul: room("bvhboul", "La Boulangerie", "The boulangerie: baskets of baguettes standing up like umbrellas, fougasse shaped like leaves, tarts in the window, and a bell on the door."),
       bv_hnougat: room("bvhnougat", "The nougat shop", "The nougat shop: great slabs of white nougat studded with almonds, little calissons in rows, and Madame cutting slices with a big knife."),
       bv_hcafe: room("bvhcafe", "Café de la Place", "The café: little round tables, wicker chairs, a zinc bar, citron pressé, and everyone watching the pétanque through the window.")},
@@ -75,7 +75,7 @@ export const LV_TOWNS = {
     evanScreen: {hp_street: ["the glass is ON FIRE", "soap that looks like cake!"], hp_garden: ["roses bigger than my face!", "a bee in the rose!"]},
     hints: {hp_street: "Rosehill: the perfumery, the soap maker, the glassblower and the van. Up the steps: the flower garden.", hp_garden: "The perfumer's garden: the roses, the jasmine and the tuberose. Down the steps: back to the street."},
     spots: famSpots({hp_street: [[220, 360], [300, 380], [260, 460], [200, 520], [330, 540], [260, 300]], hp_garden: [[200, 450], [320, 470], [260, 540], [420, 520], [140, 520], [380, 300]]}),
-    acts: {}, rooms: {
+    acts: {angelina: {hp_garden: {act: "sniff", at: [200, 460], dir: 1}}, mama: {hp_street: {act: "spritz", at: [220, 330], dir: 1}}}, rooms: {
       bv_hperfume: room("bvhperfume", "The perfumery", "The perfumery: the perfumer's organ, a curved desk of hundreds of little brown bottles in rows, paper strips for smelling, and old copper stills in the corner."),
       bv_hsavon: room("bvhsavon", "The soap maker", "The soap maker's: blocks of soap stacked like bricks, olive, lavender and rose, a big wooden stamp, and soap cut fresh while you watch."),
       bv_hglass: room("bvhglass", "The glassblower", "The glassblower's: the furnace roaring orange, Luc turning a glowing blob on a long pipe, and shelves of little coloured bottles catching the light.")},
@@ -99,7 +99,7 @@ export const LV_TOWNS = {
     evanScreen: {hs_hives: ["the bees live in the boxes!", "honey! honey!"], hs_fields: ["I'm lost in the sunflowers!", "they're all looking at the sun!"]},
     hints: {hs_hives: "Sunflower Hill: the hives, the honey house, the candle shop and the van. West: the sunflower fields.", hs_fields: "The sunflower fields: the maze, and the farmhouse kitchen. East: back to the hives."},
     spots: famSpots({hs_hives: [[220, 360], [300, 400], [160, 420], [420, 380], [260, 480], [120, 520]], hs_fields: [[200, 420], [320, 420], [260, 500], [420, 500], [140, 460], [360, 580]]}),
-    acts: {}, rooms: {
+    acts: {dad: {hs_hives: {act: "beesuit", at: [320, 440], dir: -1}}, marcus: {hs_fields: {act: "sunflower", at: [380, 560], dir: -1}}}, rooms: {
       bv_hhoney: room("bvhhoney", "The honey house", "The honey house: the extractor spinning, honey running gold into buckets, frames of comb against the window, and jars of every shade from pale lemon to dark amber."),
       bv_hcandle: room("bvhcandle", "The beeswax candle shop", "The candle shop: candles rolled from sheets of honeycomb wax, dipped tapers hanging in pairs, and the warm smell of beeswax and honey."),
       bv_hkitchen: room("bvhkitchen", "The farmhouse kitchen", "The farmhouse kitchen: a long scrubbed table, a stove, bunches of herbs, honey cake under a cloth, and Odile's lunch for whoever's there.")},
@@ -123,7 +123,7 @@ export const LV_TOWNS = {
     evanScreen: {hb_bridge: ["sticks! I need sticks!", "a duck under the bridge!"], hb_bank: ["ice cream! ICE CREAM!", "the wheel goes round and round"]},
     hints: {hb_bridge: "The Old Bridge: the bridge over the river, the willow and its swing, and the van. East: the riverbank.", hb_bank: "The riverbank: the meadow, the old mill restaurant, the épicerie and the ice-cream shop. West: back to the bridge."},
     spots: famSpots({hb_bridge: [[220, 400], [320, 420], [260, 520], [400, 500], [180, 460], [360, 560]], hb_bank: [[200, 420], [320, 440], [260, 520], [420, 480], [140, 500], [380, 560]]}),
-    acts: {}, rooms: {
+    acts: {darren: {hb_bank: {act: "float", at: [180, 612], dir: 1}}, gonggong: {hb_bank: {act: "picnic", at: [380, 480], dir: -1}}}, rooms: {
       bv_hepicerie: room("bvhepicerie", "L'Épicerie", "The épicerie: cheeses and saucisson hanging, olives in tubs, jars of tapenade, picnic baskets ready to go, and a bicycle parked against the counter."),
       bv_hglace: room("bvhglace", "Glacier du Pont", "The ice-cream shop: a long glass case of gelato in swirls, lavender, honey, apricot and melon, and a little bench outside in the shade."),
       bv_hmill: room("bvhmill", "Le Vieux Moulin", "The old mill, now a restaurant: the great wheel turning outside the window, stone walls, white tablecloths, and the sound of water under the floor.")},
@@ -148,7 +148,7 @@ export const LV_TOWNS = {
     evanScreen: {hc_goats: ["the baby goat jumped!", "ding ding ding, the goats!"], hc_chapel: ["we're on top of the world!", "the sun is going down!"]},
     hints: {hc_goats: "Chapel Hill: the goats, the fromagerie, the farm bistro and the van. East: up to the chapel.", hc_chapel: "The hilltop: the little chapel, the cypresses, and the sunset bench. West: back down to the goats."},
     spots: famSpots({hc_goats: [[220, 460], [320, 480], [260, 540], [400, 520], [160, 500], [360, 580]], hc_chapel: [[180, 380], [340, 380], [260, 460], [420, 460], [140, 500], [380, 540]]}),
-    acts: {}, rooms: {
+    acts: {dad: {hc_goats: {act: "goat", at: [350, 450], dir: 1}}, mama: {hc_chapel: {act: "candle", at: [200, 300], dir: 1}}, mum: {hc_chapel: {act: "heart", at: [330, 330], dir: 1}}}, rooms: {
       bv_hfromage: room("bvhfromage", "The fromagerie", "The fromagerie: little goat's cheeses on straw mats, some rolled in herbs, some wrapped in chestnut leaves and tied with raffia, and Céline in her white apron."),
       bv_hbistro: room("bvhbistro", "The farm bistro", "The farm bistro: one long table under a vine, warm goat's cheese on toast, salad from the garden, and a view all the way to the lavender."),
       bv_hchapel: room("bvhchapel", "The chapel of Saint Anne", "The chapel: cool and dim, whitewashed walls, a few wooden benches, candles flickering, a little painted ceiling of stars, and the bell rope hanging by the door.")},

@@ -2260,11 +2260,24 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Family acts (round 160), new everywhere:** Gong Gong's thermos at the lookout (flask), Marcus wading by the falls (wade), Angellina feeding the ducks (ducks), Darren's frisbee, Mum's "shh" at the platypus platform (hush, a pose), Ma Ma's bag of lollies (lollybag), Dad's milk pail (pail), Gong Gong leaning on the calf-pen rail (fence), Marcus shaking a macadamia branch (shake), Ma Ma cracking nuts on a stone (crack), Darren panning (pan), Dad's guard's flag at the station (guard, 9–4), Angellina's sarsaparilla (sip). Props in people.js, PROPS in npcs.js, poses at the end of npcs.css.
 - **Touches:** Jarrah slips Evan a raspberry lolly; Pages the cat asleep on the poetry; Old Mac keeps your first fleck in a tiny bottle; Fred punches your ticket.
 
+### Rounds 161–164: the Lavender Hills (Bellbird's fourth and last region)
+- **Data (data/lavender.js):** six van stops, `region: "lavender"`, places `bvh*`, rooms `bv_h*`. The road comes in from Riverside Camp (`LV_ROADS`, `bv_camp`–`bv_lavender`). `BB_SOON` is now empty: all four regions are open (24 stops).
+  - Lavender Ridge `bv_lavender` (hv_rows / hv_still), Montrose `bv_hilltown` (hm_square | hm_lanes), Rosehill `bv_perfume` (hp_garden / hp_street, park in the street), Sunflower Hill `bv_honey` (hs_fields | hs_hives, park by the hives), The Old Bridge `bv_bridge` (hb_bridge | hb_bank), Chapel Hill `bv_chapel` (hc_goats | hc_chapel).
+  - Map: `BB_MAPS.lavender`, `REGIONS` gains "lavender". The Vines page draws "To the Lavender Hills (next page)" once Lavender Ridge is known.
+- **Art:** art/lavender.js (12 screens; `stoneHouse` helper: limestone walls, terracotta roofs, blue shutters; cypresses, olives, plane trees; the sky goes gold after 5:30, with a sunset on Chapel Hill) and art/lavender-rooms.js (18 rooms). Music: 24 tracks (`bb_lavender` … `bb_chapel`, then the room ids).
+- **Goods (`LV_GOODS`) and treats:** lavender oil and bags, a dried bunch, fougasse, nougat, calissons, Provence soap, a soap stamp, a glass bird, a scent bottle, `honey_sun` (sunflower honey: INGR for gelato and bonbons), a honey pot, beeswax candles, tapenade, a picnic basket, a goat's cheese in a chestnut leaf.
+  - Specials (`special: "lavender"`): madeleines (honey_lav), chevretart (chz_fresh), ratatouille.
+- **People (data/lv-people.js):** 30, ids `lv*`. Émile and Margaux, Hélène, Monsieur Bernard, Madame Roux, Paul, Pagnol and Fernand (pétanque), Madame Arnaud the perfumer, Josette, Luc, Odile and Mathis, Brigitte, Nadia, Sylvie, Jean-Marc, Céline, Théo, Père Gaston, and day-trippers.
+- **Activities (game/lvacts.js):** the same one-panel, one-action pattern as tlacts.js, with `data-bba="lv:<verb>.<arg>"`. core.js's `tl` handler takes `lv` too. Outdoor places: bvhrows harvest, bvhpiste petanque, bvhhives bees, bvhmaze maze, bvhbridge sticks, bvhsunset bell.
+  - harvest (cut only the deep-purple bushes; 2 `bq_lavender` once a day), petanque (3 ends vs Pagnol), scent (20; top, heart and base notes; named blends in `F.bellbird.lv.scents`; first bottle `b_myperfume`), bees (smoke before lifting; `honey_sun` once a day), maze (Evan's `b_mazecert`), sticks (Pooh-sticks vs Dad), bell (a candle any time; bell rope 5:30–8:30pm, five strokes, `b_bellmedal`), banon (25; four steps; learns banon).
+- **Home link: banon** (hfarm.js `CHEESES.banon`, goat's milk, `learn: true`, `F.hfarm.learnt.banon`), item `chz_banon`.
+- **Family acts (round 164), new everywhere:** Mum's armful of lavender, a bee after Darren, Gong Gong's baguette, Marcus's accordion, Angellina smelling a perfume strip, Ma Ma's scent spray, Dad in a beekeeper's veil, Marcus's giant sunflower, Darren on a rubber ring in the river, Gong Gong's picnic rug, Ma Ma's candle at the chapel, Dad and a goat kid, Mum's hand on her heart at the sunset.
+- **Touches:** Madame Roux's cube of nougat for Evan, Odile feeds whoever's there at noon, Père Gaston's bell, the perfumer writing your blend's name on the label.
+
 ## NEXT UP (Mel, after round 156)
-- **Order:** finish the campervan map first. The Tablelands are done (rounds 157–160); one closed road is left on the Vines page (`BB_SOON` in data/bellbird.js):
-  1. **The Lavender Hills** (from `bv_camp`). Proposed stops (Mel hasn't approved yet): the lavender farm and still, a hilltop village market, a perfumery (blend a scent), a honey farm by sunflowers, a river with an old stone bridge, a goat-cheese farm with a chapel lookout.
+- **The campervan map is finished:** the Tablelands (rounds 157–160) and the Lavender Hills (161–164) are built, so all four regions are open.
   - Each region is four rounds, like the Coast Road. Day trips only, and family acts are unique per stop. Plan each region with Mel before building.
-- **Then, before 20 November** (the in-game dates follow the real calendar, so this has to land before mulled wine season starts):
+- **Next, before 20 November** (the in-game dates follow the real calendar, so this has to land before mulled wine season starts):
   - **The Christmas market on the field**, late November to Christmas Eve, evenings:
     - Wooden stalls and fairy lights.
     - Mel's own stall: she picks what goes on it each evening (mill soaps and oils, honey, wine).

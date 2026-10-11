@@ -3629,6 +3629,68 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  console.log("\nThe Lavender Hills (rounds 161-164)");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
+  const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), la = await import(new URL("../src/game/lvacts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
+  const kt = await import(new URL("../src/game/kitchen.js", import.meta.url)), hf = await import(new URL("../src/game/hfarm.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url));
+  const T = tw.TOWNS, stops = bb.STOPS.filter(id => bb.regionOf(id) === "lavender");
+  check(stops.length === 6 && bb.STOPS.length === 24 && stops.every(id => T[id].by === "van" && T[id].screens.length === 2 && Object.keys(T[id].rooms).length === 3), "six Lavender Hills stops, two screens and three rooms each: the whole valley, 24 stops");
+  check(stops.every(id => Object.values(T[id].rooms).every(r => tw.TOWN_PLACES[r.door])) && Object.values(tw.TOWN_PLACES).filter(p => p.bridge && /^h[vmpsbc]_/.test(p.scene)).length === 12, "every room has a door outside, and every stop's two screens join up");
+  { const F = {coins: 500, bellbird: {stamps: {bv_gate: "x", bv_creek: "x", bv_berry: "x"}}}; const before = bb.known(F).includes("bv_lavender"); F.bellbird.stamps.bv_camp = "x";
+    const m = bb.mapPanel(F, {region: "lavender", ownsVan: true, hm: 600}), v = bb.mapPanel(F, {region: "vines", ownsVan: true, hm: 600});
+    check(!before && bb.known(F).includes("bv_lavender") && /data-bvregion="lavender"/.test(m) && /Lavender Ridge/.test(m) && /To the Lavender Hills \(next page\)/.test(v) && !/\(soon\)/.test(v) && bb.legs("home", "bv_lavender") === 5, "past Riverside Camp: the Lavender Hills get their own page, and no closed roads are left");
+    check(/The Lavender Hills/.test(bb.passportPanel(F)) && /The whole valley/.test(bb.passportPanel(F)), "and their own page in the passport"); }
+  const goods = Object.entries(tw.TOWN_GOODS).filter(([, g]) => stops.some(id => Object.keys(T[id].rooms).includes(g.shop)));
+  check(goods.length >= 15 && goods.every(([, g]) => !g.sell || g.sell <= g.price) && tw.TOWN_GOODS.honey_sun && sc.INGR.honey_sun, "the Lavender Hills' shops (sunflower honey for the gelato), and nothing sells back for more than it costs");
+  check(["madeleines", "chevretart", "ratatouille"].every(id => kt.TAPAS[id] && kt.TAPAS[id].special === "lavender") && kt.beenTo({bellbird: {stamps: {bv_honey: "x"}}}, "lavender") && !kt.beenTo({bellbird: {stamps: {bv_gate: "x"}}}, "lavender"), "three Lavender Hills specials at the stove once you've been");
+  check(stops.every(id => Object.keys(T[id].rooms).every(r => br.bbRoomPanel({coins: 50, inv: {}}, r).length > 50)), "every Lavender Hills room has its panel");
+  const lv = np.NPCS.filter(n => /^lv/.test(n.id)), rooms = stops.flatMap(id => Object.keys(T[id].rooms));
+  check(lv.length >= 28 && lv.every(n => n.local === "bellbird") && new Set(np.NPCS.map(n => n.id)).size === np.NPCS.length, "the Lavender Hills' people, and no one twice");
+  check(rooms.filter(r => lv.some(n => n.routine.some(sl => sl.scene === r))).length >= 16, "people in the Lavender Hills rooms");
+  const old = new Set([...["ronda", "kyoto", "jeju", "cinque"], ...bb.STOPS.filter(id => bb.regionOf(id) !== "lavender")].flatMap(t => Object.values(T[t].acts || {}).flatMap(a => Object.values(a).map(x => x.act))));
+  const mine = stops.flatMap(id => Object.values(T[id].acts).flatMap(a => Object.values(a).map(x => x.act)));
+  check(mine.length >= 12 && new Set(mine).size === mine.length && mine.every(a => !old.has(a)) && stops.every(id => Object.keys(T[id].acts).length >= 2), "the family: new things at every Lavender Hills stop, all different, none from anywhere before");
+  // the activities
+  const F = {coins: 300, inv: {}, bellbird: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, o = (hm, rng) => ({hm: hm || 10*60, addInv: add, evan: true, rng: rng || (() => .3)});
+  let st = {}; la.lvAct(F, "harvest", st, "cutgo", null, o()); const pale = st.t.ready.indexOf(false); check(la.harvestCut(st.t, pale) === "green" && st.t.wrong === 1, "the harvest: cutting a pale bush doesn't count");
+  st.t.ready.forEach((r, i) => r && la.lvAct(F, "harvest", st, "cut", String(i))); la.lvAct(F, "harvest", st, "cutdone", null, o());
+  check(F.inv.bq_lavender === 2 && !la.lvAct(F, "harvest", {}, "cutgo", null, o()), "two bunches of lavender, once a day");
+  st = {}; la.lvAct(F, "petanque", st, "petgo", null, o()); while (!la.petDone(st.t)) la.lvAct(F, "petanque", st, "pet", ["short", "middle", "long"][st.t.jack[st.t.end]], o(600, () => .9));
+  check(st.t.mine === 3 && la.lvAct(F, "petanque", st, "petdone").close && F.bellbird.lv.wins === 1, "pétanque with Pagnol: right on the jack every end, and you beat him");
+  st = {}; la.lvAct(F, "scent", st, "scentgo", null, o()); ["bergamot", "rose", "vanilla"].forEach(n => la.lvAct(F, "scent", st, "note", n, o()));
+  check(st.t.name === "Garden Party" && st.t.fresh && F.inv.b_myperfume === 1 && F.coins === 280, "blending a perfume: top, heart and base, a name, and your first bottle to keep");
+  la.lvAct(F, "scent", st, "scentdone"); st = {}; la.lvAct(F, "scent", st, "scentgo", null, o()); ["bergamot", "rose", "vanilla"].forEach(n => la.lvAct(F, "scent", st, "note", n, o()));
+  check(!st.t.fresh && F.inv.b_myperfume === 1 && F.bellbird.lv.scents.length === 1, "the same blend again is one you know");
+  st = {}; la.lvAct(F, "bees", st, "beesgo", null, o()); la.lvAct(F, "bees", st, "bee", "lift"); check(st.t.calm === 2, "lift a frame without smoke and the bees get cross");
+  while (!la.beesDone(st.t)) { la.lvAct(F, "bees", st, "bee", "smoke"); la.lvAct(F, "bees", st, "bee", "lift"); } la.lvAct(F, "bees", st, "beesdone", null, o());
+  check(F.inv.honey_sun === 1 && !la.lvAct(F, "bees", {}, "beesgo", null, o()), "the hives with Mathis: a jar of sunflower honey, once a day");
+  st = {}; la.lvAct(F, "maze", st, "mazego", null, o()); while (!la.mazeDone(st.t)) la.lvAct(F, "maze", st, "turn", ["left", "straight", "right"][st.t.path[st.t.at]]); la.lvAct(F, "maze", st, "mazedone", null, o());
+  check(F.inv.b_mazecert === 1, "the sunflower maze: Evan finds the middle, and his certificate");
+  st = {}; la.lvAct(F, "sticks", st, "sticksgo", null, o()); for (let i = 0; i < 3; i++) la.lvAct(F, "sticks", st, "stick", "fat", o(600, () => .1)); check(st.t.mine === 3 && la.lvAct(F, "sticks", st, "sticksdone").close, "Pooh-sticks off the Old Bridge, best of three against Dad");
+  st = {}; check(!la.lvAct(F, "bell", st, "bellgo", null, o(12*60)) && la.lvAct(F, "bell", st, "candle").hearts === 1, "a candle any time; the bell only at sunset");
+  la.lvAct(F, "bell", st, "bellgo", null, o(18*60)); while (!la.bellDone(st.t)) la.lvAct(F, "bell", st, "bell", st.t.down[st.t.i] ? "pull" : "wait"); la.lvAct(F, "bell", st, "belldone", null, o(18*60));
+  check(F.inv.b_bellmedal === 1, "ringing the chapel bell at sunset: five strokes, and Père Gaston's little bell");
+  st = {}; la.lvAct(F, "banon", st, "banongo"); ["soak", "wrap", "tie", "rest"].forEach(k => la.lvAct(F, "banon", st, "bstep", k)); la.lvAct(F, "banon", st, "banondone");
+  check(la.knowsBanon(F) && hf.cheesesFor(hf.hfState(F)).some(([k]) => k === "banon") && !hf.cheesesFor(hf.hfState({})).some(([k]) => k === "banon"), "Céline's banon lesson: then it's yours to make at home in Elena's cheese press");
+  // in the browser: the family at Lavender Ridge, and the harvest from the rows
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`lavender pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/lvv=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = {...(f.goals || {}), van: true}; f.coins = 300;
+    f.bellbird = {stamps: {bv_gate: "2026-10-01", bv_camp: "2026-10-01"}}; f.trip = {town: "bv_lavender", day: "2026-10-12", party: ["mum", "darren", "evan"], from: 7*60, by: "van"};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&lvv=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("hv_rows")); await page.waitForTimeout(7000);
+  check(await page.locator('#actors .npc[data-npc="mum"].act-armful').count() === 1 && await page.locator('#actors .npc[data-npc="darren"].act-bee').count() === 1 && await page.locator('#actors .npc[data-npc="lvemile"]').count() === 1, "Lavender Ridge: Mum with an armful of lavender, a bee after Darren, and Émile in the rows");
+  await page.locator('#world [data-place="bvhrows"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bba="lv:cutgo"]', { timeout: 20000 });
+  await page.click('#ctx [data-bba="lv:cutgo"]'); await page.waitForTimeout(200);
+  for (let i = 0; i < 6; i++) { const b = page.locator(`#ctx [data-bba="lv:cut.${i}"]`); if (await b.count() && /deep purple/.test(await page.locator("#ctx li").nth(i).innerText())) await b.click(); }
+  await page.click('#ctx [data-bba="lv:cutdone"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.bq_lavender === 2 && f.bellbird.lv.cut === "2026-10-12"), "the lavender harvest with Émile, two bunches to take home");
+  await page.close();
+}
+{
   console.log("\nThe terrace and the Sunday long lunch (round 146)");
   const lu = await import(new URL("../src/game/lunch.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
   const sun = "2026-10-11", ids = new Set(np.NPCS.map(n => n.id)), bk = lu.bookingsFor(sun), seats = lu.seatsTaken(bk);

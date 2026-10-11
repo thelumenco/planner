@@ -115,7 +115,9 @@ export const CHEESES = {
   halloumi: {n: "Goat's halloumi", milk: "goatmilk", need: 3, days: 2, wedges: 5, id: "chz_halloumi", col: "#F6F1E8", words: ["Halloumi", "Squeaky", "Grilling"], lvl: 2},
   smoked: {n: "Smoked farmhouse", milk: "milk", need: 3, days: 5, wedges: 6, id: "chz_smoked", col: "#D9944A", words: ["Smoked", "Applewood", "Oak Smoked"], lvl: 2},
   // round 159: Meg's, from Greenhill Dairy in the Tablelands, once she's taught Mel (tlacts.js: h.learnt.havarti)
-  havarti: {n: "Tableland havarti", milk: "milk", need: 3, days: 3, wedges: 5, id: "chz_havarti", col: "#F6E7B0", words: ["Havarti", "Creamy", "Tableland"], learn: true}
+  havarti: {n: "Tableland havarti", milk: "milk", need: 3, days: 3, wedges: 5, id: "chz_havarti", col: "#F6E7B0", words: ["Havarti", "Creamy", "Tableland"], learn: true},
+  // round 163: Céline's, from Chapel Hill in the Lavender Hills (lvacts.js: h.learnt.banon)
+  banon: {n: "Banon in chestnut leaves", milk: "goatmilk", need: 3, days: 4, wedges: 4, id: "chz_banon", col: "#8A6A42", words: ["Banon", "Chestnut Leaf", "Wrapped"], learn: true}
 };
 export const CAVE = 6;
 export const caveSize = h => levelOf(h) >= 3 ? 9 : CAVE;

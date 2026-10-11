@@ -247,3 +247,27 @@
 @keyframes panS{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
 .ch.npc.act-guard:not(.walk) .armR{animation:guardA 2s ease-in-out infinite alternate}
 @keyframes guardA{from{transform:rotate(-150deg)}to{transform:rotate(-170deg)}}
+
+/* round 164, the Lavender Hills' family acts (never done anywhere before): Mum's armful of lavender, Darren and the bee,
+   Gong Gong's baguette, Marcus on the accordion, Angellina smelling a perfume strip, Ma Ma's scent spray, Dad in the
+   beekeeper's veil, Marcus with a giant sunflower, Darren on a rubber ring, Gong Gong's picnic, Ma Ma's candle, Dad and
+   a goat kid, Mum's hand on her heart at the sunset */
+.ch.npc.act-armful:not(.walk) .armR,.ch.npc.act-armful:not(.walk) .armL{transform:rotate(-70deg)}
+.ch.npc.act-bee:not(.walk) .armR{animation:swatA .5s ease-in-out infinite alternate}@keyframes swatA{from{transform:rotate(-120deg)}to{transform:rotate(-160deg)}}
+.ch.npc.act-bee .perch{animation:beeB 1.2s ease-in-out infinite;transform-box:fill-box}@keyframes beeB{0%{transform:translate(0,0)}25%{transform:translate(-14px,4px)}50%{transform:translate(-4px,-6px)}75%{transform:translate(6px,2px)}100%{transform:translate(0,0)}}
+.ch.npc.act-baguette:not(.walk) .armL{transform:rotate(40deg)}
+.ch.npc.act-accordion:not(.walk) .armR{animation:accR 1s ease-in-out infinite alternate}.ch.npc.act-accordion:not(.walk) .armL{animation:accL 1s ease-in-out infinite alternate}
+.ch.npc.act-accordion:not(.walk) .tool{animation:accT 1s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 50%}
+@keyframes accR{from{transform:rotate(-50deg)}to{transform:rotate(-80deg)}}@keyframes accL{from{transform:rotate(50deg)}to{transform:rotate(80deg)}}@keyframes accT{from{transform:scaleX(.8)}to{transform:scaleX(1.15)}}
+.ch.npc.act-sniff:not(.walk) .armR{transform:rotate(-150deg)}
+.ch.npc.act-spritz:not(.walk) .armR{transform:rotate(-70deg)}.ch.npc.act-spritz .perch{animation:scanB 1.4s ease-in-out infinite alternate;transform-box:fill-box}
+.ch.npc.act-beesuit:not(.walk) .armR{animation:feedA 2.4s ease-in-out infinite alternate}
+.ch.npc.act-sunflower:not(.walk) .armR{transform:rotate(-20deg)}
+.ch.npc.act-float:not(.walk) .legL,.ch.npc.act-float:not(.walk) .legR{opacity:0}.ch.npc.act-float:not(.walk) > g{animation:floatB 3s ease-in-out infinite alternate}
+@keyframes floatB{from{transform:translateY(8px)}to{transform:translateY(11px)}}
+.ch.npc.act-float:not(.walk) .armR{transform:rotate(-120deg)}.ch.npc.act-float:not(.walk) .armL{transform:rotate(120deg)}
+.npc.act-picnic:not(.walk) .legL,.npc.act-picnic:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.45)}
+.npc.act-picnic:not(.walk) > g{transform:translateY(6px)}.ch.npc.act-picnic:not(.walk) .armR{animation:sipA 3s ease-in-out infinite alternate}
+.ch.npc.act-candle:not(.walk) .armR{transform:rotate(-55deg)}
+.ch.npc.act-goat:not(.walk) .armR{animation:feedA 2s ease-in-out infinite alternate}.ch.npc.act-goat .perch{animation:gullH 3s ease-in-out infinite}
+.ch.npc.act-heart:not(.walk) .armR{transform:rotate(-125deg)}.ch.npc.act-heart:not(.walk) .armL{transform:rotate(125deg)}

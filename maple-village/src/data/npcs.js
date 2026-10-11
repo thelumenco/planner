@@ -8,6 +8,7 @@
 import { BB_PEOPLE } from "./bb-people.js";
 import { CR_PEOPLE } from "./cr-people.js";
 import { TL_PEOPLE } from "./tl-people.js";
+import { LV_PEOPLE } from "./lv-people.js";
 import { WEDDING_PEOPLE } from "./terrace-people.js";
 import { MILL_PEOPLE } from "./mill-people.js";
 const hm = s => { const [h, m] = s.split(":").map(Number); return h*60 + (m || 0); };
@@ -1046,6 +1047,7 @@ export const NPCS = [
   ...BB_PEOPLE,   // round 143: Bellbird Valley (data/bb-people.js)
   ...CR_PEOPLE,   // round 150: the Coast Road (data/cr-people.js)
   ...TL_PEOPLE,   // round 159: the Tablelands (data/tl-people.js)
+  ...LV_PEOPLE,   // round 163: the Lavender Hills (data/lv-people.js)
   ...WEDDING_PEOPLE,   // round 152: the wedding parties on the terrace (data/terrace-people.js)
   ...MILL_PEOPLE   // round 154: the mill's own day-trippers (data/mill-people.js)
 ];
