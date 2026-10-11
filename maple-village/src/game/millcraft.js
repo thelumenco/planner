@@ -84,12 +84,14 @@ export function inesStep(F, m, v, t = Date.now()){
   return did;
 }
 // what sells, and how fast: the Mill Shop all day while Hazel's in; before that, a little from the wine shop's shelf
+// where: "shop" (the Mill Shop: busier at weekends, when the day-trippers walk up the lane), "wineshop" (its little mill
+// shelf), "market" (the crate on Mel's wine stall at the Sunday market), "grace" (Grace's soap stall stocks Mel's soaps)
 export function craftSellMinute(F, day, hm, where){
-  const c = craftState(F), ids = Object.keys(c.store).filter(id => c.store[id] > 0 && ITEMS[id]); if (!ids.length) return 0;
-  const shopOpen = where === "shop" && hm >= SHOPKEEP.from && hm < SHOPKEEP.to && !SHOPKEEP.closed.includes(new Date(day + "T00:00:00Z").getUTCDay());
-  const p = shopOpen ? .05 : where === "wineshop" && hm >= 10*60 && hm < 21*60 ? .008 : 0; if (!p || Math.random() >= p) return 0;
+  const c = craftState(F), ids = Object.keys(c.store).filter(id => c.store[id] > 0 && ITEMS[id] && (where !== "grace" || ITEMS[id].mill === "soap")); if (!ids.length) return 0;
+  const dw = new Date(day + "T00:00:00Z").getUTCDay(), we = dw === 0 || dw === 6, shopOpen = where === "shop" && hm >= SHOPKEEP.from && hm < SHOPKEEP.to && !SHOPKEEP.closed.includes(dw);
+  const p = shopOpen ? .05*(we ? 1.5 : 1) : where === "wineshop" && hm >= 10*60 && hm < 21*60 ? .008 : where === "market" ? .02 : where === "grace" ? .015 : 0; if (!p || Math.random() >= p) return 0;
   const id = ids[Math.floor(Math.random()*ids.length)], price = ITEMS[id].price; c.store[id]--; if (!c.store[id]) delete c.store[id];
-  const s = c.sold[day] = c.sold[day] || {n: 0, coins: 0}; s.n++; s.coins += price; return price;
+  const s = c.sold[day] = c.sold[day] || {n: 0, coins: 0}; s.n++; s.coins += price; if (where === "market" || where === "grace") s[where] = (s[where] || 0) + 1; return price;
 }
 
 /* ---------- the workbench panel ---------- */
@@ -124,4 +126,45 @@ export function benchPanel(F, st = {}, o = {}){
   return h + `<div class="actions"><button class="btn primary" data-mc="make" ${ready ? "" : "disabled"}>${ready ? (c.recipes.some(r => r.id === keyOf(tab, tab === "soap" ? base : null, pick)) ? `Make ${esc(craftName(tab, base, pick))}` : "Try something new") : "Make it"}</button></div>` + shut;
 }
 const HERB_OF = kind => Object.keys(HERB).filter(a => HERB[a][kind]);
+// the weekend day-trippers who walk up the cottage lane to the Mill Shop (npcs.js): three of the out-of-towners, an hour
+// each, never one who's on a farm tour or a stall that day (tours.js passes who's busy)
+export const MILL_VISITS = [[11*60, 12*60], [13*60, 14*60], [15*60, 16*60]];
+export function millVisitSlot(id, day, hm, open, tourists, busy = []){
+  const dw = new Date(day + "T00:00:00Z").getUTCDay(); if (!open || (dw !== 0 && dw !== 6) || !tourists.includes(id) || busy.includes(id)) return null;
+  const pool = tourists.filter(t => !busy.includes(t)), h = [...day].reduce((a, ch) => (a*31 + ch.charCodeAt(0)) >>> 0, 7), who = MILL_VISITS.map((_, i) => pool[(h + i*3) % pool.length]);
+  const i = who.indexOf(id); if (i < 0) return null; const [from, to] = MILL_VISITS[i]; if (hm < from || hm >= to) return null;
+  return {from, to, scene: "mill", wander: [[180, 560], [260, 540], [420, 568]], millvisit: true};
+}
+
+/* ---------- the pop-up crate in the campervan ---------- */
+// Mel packs a crate at the van's fold-down table: things off the mill's shelves and bottles off the wine shop's shelves
+// (up to two dozen). On a campervan trip, with the crate out by the van, passers-by buy from it while she's at the stop.
+export const VAN_CRATE = {max: 24, p: .04};
+export function vanCrate(F){ const c = craftState(F); c.van = c.van || {items: {}, wine: []}; return c.van; }
+export const crateCount = vc => Object.values(vc.items).reduce((a, b) => a + b, 0) + vc.wine.reduce((a, w) => a + w.n, 0);
+export function packCrate(F, v, key, n = 1){
+  const vc = vanCrate(F), c = craftState(F), room = VAN_CRATE.max - crateCount(vc); n = Math.min(n, room); if (n < 1) return 0;
+  if (key.startsWith("w:")) { const s = v.shelf.find(x => x.id === key.slice(2)); if (!s || s.n < 1) return 0; n = Math.min(n, s.n); s.n -= n; const w = vc.wine.find(x => x.sid === s.id); if (w) w.n += n; else vc.wine.push({sid: s.id, name: s.name, type: s.type, price: s.price, n}); return n; }
+  n = Math.min(n, c.store[key] || 0); if (!n) return 0; c.store[key] -= n; if (!c.store[key]) delete c.store[key]; vc.items[key] = (vc.items[key] || 0) + n; return n;
+}
+export function unpackCrate(F, v){ const vc = vanCrate(F), c = craftState(F);
+  Object.entries(vc.items).forEach(([id, n]) => { c.store[id] = (c.store[id] || 0) + n; }); vc.items = {};
+  vc.wine.forEach(w => { const s = v.shelf.find(x => x.id === w.sid); if (s) s.n += w.n; else v.shelf.push({id: w.sid, name: w.name, type: w.type, price: w.price, n: w.n, open: 0}); }); vc.wine = []; }
+// a minute at a campervan stop with the crate out: maybe a passer-by buys something -> {coins, what} or null
+export function vanSellMinute(F){
+  const vc = vanCrate(F), opts = [...Object.keys(vc.items).filter(id => vc.items[id] > 0 && ITEMS[id]).map(id => ({id})), ...vc.wine.filter(w => w.n > 0).map(w => ({w}))];
+  if (!opts.length || Math.random() >= VAN_CRATE.p) return null; const o = opts[Math.floor(Math.random()*opts.length)];
+  if (o.w) { o.w.n--; const what = `a bottle of ${o.w.name}`; vc.wine = vc.wine.filter(w => w.n > 0); return {coins: o.w.price, what}; }
+  vc.items[o.id]--; if (!vc.items[o.id]) delete vc.items[o.id]; return {coins: ITEMS[o.id].price, what: ITEMS[o.id].n.replace(/^A (bar|jar|bottle) of /i, (m, k) => `a ${k} of `)};
+}
+export function cratePanel(F, v){
+  const vc = vanCrate(F), c = craftState(F), n = crateCount(vc);
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The pop-up crate</h2><p class="sub">A wooden crate and a little chalkboard. Pack it here; on a campervan trip it goes out by the van, and passers-by buy while you're at the stop. ${n} of ${VAN_CRATE.max} packed.</p>`;
+  const packed = [...Object.entries(vc.items).map(([id, k]) => `${k} ${esc(ITEMS[id] ? ITEMS[id].n.replace(/^A (bar|jar|bottle) of /i, "").toLowerCase() : id)}`), ...vc.wine.map(w => `${w.n} ${esc(w.name)}`)];
+  if (packed.length) h += `<p class="muted">In the crate: ${packed.join(", ")}.</p><div class="actions"><button class="btn small alt" data-crate="unpack">Unpack it all</button></div>`;
+  const mill = Object.keys(c.store).filter(id => c.store[id] > 0 && ITEMS[id]), wines = v.shelf.filter(s => s.n > 0);
+  h += `<p class="eyebrow" style="margin:10px 0 6px">From the mill's shelves</p>${mill.length ? `<ul class="hlist wlist">${mill.map(id => `<li><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${c.store[id]} on the shelf · ${ITEMS[id].price} each</small></span><button class="btn small alt" data-crate="${id}" ${n < VAN_CRATE.max ? "" : "disabled"}>Pack 1</button></li>`).join("")}</ul>` : `<p class="muted">Nothing on the mill's shelves just now.</p>`}`;
+  h += `<p class="eyebrow" style="margin:10px 0 6px">From the wine shop</p>${wines.length ? `<ul class="hlist wlist">${wines.map(s => `<li><span class="wtxt"><b>${esc(s.name)}</b><small>${s.n} on the shelf · ${s.price} a bottle</small></span><button class="btn small alt" data-crate="w:${s.id}" ${n < VAN_CRATE.max ? "" : "disabled"}>Pack 1</button></li>`).join("")}</ul>` : `<p class="muted">No bottles on the wine shop's shelves.</p>`}`;
+  return h + shut;
+}
 export const MILLSHOP_LINE = "The ground floor of the old mill, opened up as a little shop: shelves of your infused oils, stacks of soap, jars of lotion, and Hazel behind the counter.";

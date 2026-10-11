@@ -2184,3 +2184,14 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - Hazel (new villager, ex-soap-maker) runs it 10 to 5, every day but Monday.
   - `craftSellMinute` sells from the store: about 5%/min while open. Before it opens, the wine shop's "from the mill" shelf sells about 0.8%/min.
   - `millTick` in vineTick catches up minute by minute, and coins go straight to Mel.
+- **Selling it further (round 153, part 2):**
+  - **Weekend visitors:** Saturday and Sunday, 3 of the out-of-towners walk up to the Mill Shop for an hour each (11, 1 and 3; `millVisitSlot` in npcs `slotAt`, skipping anyone touring or keeping a stall). Shop sales are ×1.5 at weekends.
+  - **Sunday market:**
+    - Mel's wine stall carries a mill crate (`craftSellMinute(..., "market")`).
+    - Grace (now Hazel's granddaughter) stocks Mel's soaps only (`"grace"`).
+    - Elena sends people up the lane.
+    - Notes show on the stall panels.
+  - **Pop-up crate in the campervan:**
+    - Pack it at the van's fold-down table (vtable → `cratePanel`), up to 24: mill store items and wine shelf bottles.
+    - On a van trip, while Mel's at the stop (before 8pm), passers-by buy (`vanSellMinute`, 4%/min) and a crate with a "For sale" board stands by the van (`vanCrateArt`).
+    - Unpack returns everything.

@@ -164,7 +164,7 @@ export const MARKET = [{id: "elena", at: 0, short: "Cheese", n: "Cheese and oliv
   {id: "clara", at: 2, short: "Produce", n: "Fresh produce", items: [], produce: true, col: "#9CC27E", line: "Picked yesterday, whatever's in season. Have a look!"},
   {id: "ines", at: 3, kind: "wine", short: "Our wines", n: "Our wine stall", items: [], col: "#8E2C48", line: "Tastings and bottles, straight from the shop's shelves."},
   {id: "mama", at: 4, kind: "orchard", short: "Ma Ma's", n: "Ma Ma's fruit and flowers", items: [], col: "#E8566C", line: "Fresh from the orchard this morning. Come, take some!"},
-  {id: "grace", at: 5, short: "Soap", n: "Handmade soap", items: ["soap_lav", "soap_rose", "soap_duck", "scrub", "crown"], col: "#C9A3E0", line: "All made by hand, in small batches. Smell the lavender!"},
+  {id: "grace", at: 5, short: "Soap", n: "Handmade soap", items: ["soap_lav", "soap_rose", "soap_duck", "scrub", "crown"], col: "#C9A3E0", line: "All made by hand, in small batches. Gran taught me. Smell the lavender!"},
   {id: "ben", at: 6, short: "Craft beer", n: "Craft beer", items: ["paleale", "stout"], col: "#D9A441", line: "Brewed in my shed. Well, the shed's quite big."},
   {id: "dev", at: 7, short: "Bakery", n: "Bakery", items: ["kaya", "currypuff", "flour"], col: "#C98A4A", line: "Still warm! Kaya buns and curry puffs."},
   // Noor's pet adoption corner, on the grass by the river (place 8): a little pen of animals looking for homes

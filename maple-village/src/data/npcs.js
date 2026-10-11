@@ -278,7 +278,7 @@ export const NPCS = [
     ["dev", "Dev", {skin: "#A8754F", hair: "#1F1A17", hairStyle: "short", top: "#F3E7B0", bottom: "#4A5568", hat: "cap"}, "Food blogger, just passing through"],
     ["rosa", "Rosa", {skin: "#D9A882", hair: "#2A211D", hairStyle: "long", top: "#C2505F", bottom: "#3E4A43", extra: "satchel"}, "Wine lover on a tasting trip"],
     ["bastien", "Bastien", {skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#6E9FD6", bottom: "#8A6A52", extra: "glasses"}, "Retired, touring the countryside"],
-    ["grace", "Grace", {skin: "#C99A78", hair: "#2A211D", hairStyle: "long", top: "#F4C7CF", bottom: "#5E6E8C", hat: "sunhat"}, "Visiting her sister for the week"],
+    ["grace", "Grace", {skin: "#C99A78", hair: "#2A211D", hairStyle: "long", top: "#F4C7CF", bottom: "#5E6E8C", hat: "sunhat"}, "Makes soap, like her gran Hazel (and sells it at the Sunday market)"],
     ["hiro", "Hiro", {skin: "#EAC4A4", hair: "#231C19", hairStyle: "spiky", top: "#3E6B8C", bottom: "#2F2B28", extra: "satchel"}, "Here for the farm tours"]
   ].map(([id, name, look, job]) => ({id, pitch: .9 + (id.charCodeAt(0) % 5)*.08, name, job, tourist: true, look, routine: [],
     intro: `Hi! I'm ${name}. ${job}. What a lovely place this is!`,

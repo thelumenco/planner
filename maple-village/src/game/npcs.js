@@ -7,6 +7,8 @@ import { OUTDOOR } from "../data/world.js";
 import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
 import { lunchSlot } from "./lunch.js";
 import { occasionSlot } from "./occasions.js";
+import { toursOn, visitsOn, eventOn, TOURISTS } from "./tours.js";
+import { millVisitSlot } from "./millcraft.js";
 import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dinnerSlot, dateSlot, clubSlot, discoSlot, scoopSlot, workshopSlot, trainSlot, letSlot, bonfireSlot, movieSlot, bayMarketSlot } from "./tours.js";
 import { SEA } from "../data/npcs.js";
 import { findPath, blocked } from "./paths.js";
@@ -38,7 +40,7 @@ const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw 
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 const routineNow = def => routineAt(def, dayKey(), sgHM());
 export function slotAt(def, day, t, live){
-  return (api && tripSlot(api.F(), def.id, day, t, live ? api.scene() : null)) || (live && supSlot(def)) || lunchSlot(def.id, day, t, terraceBuilt()) || occasionSlot(def.id, day, t, terraceBuilt()) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || (cellarBuilt() && discoSlot(def.id, day, t)) || movieSlot(def.id, day, t) || bonfireSlot(def.id, day, t) || bayMarketSlot(def.id, day, t) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
+  return (api && tripSlot(api.F(), def.id, day, t, live ? api.scene() : null)) || (live && supSlot(def)) || lunchSlot(def.id, day, t, terraceBuilt()) || occasionSlot(def.id, day, t, terraceBuilt()) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || (cellarBuilt() && discoSlot(def.id, day, t)) || movieSlot(def.id, day, t) || bonfireSlot(def.id, day, t) || bayMarketSlot(def.id, day, t) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || (TOURISTS.includes(def.id) && millVisitSlot(def.id, day, t, millShopOpen(), TOURISTS, busyOn(day))) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
     || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || shoreSlot(def.id, day, t) || iceOk(scoopSlot(def.id, day, t), def, day, t) || letSlot(def.id, day, t) || routineAt(def, day, t);
 }
 // a night-market shopper slot gives way to the wine shop: anyone due at a tasting or in the shop then goes there instead
@@ -46,6 +48,8 @@ const nightOk = (s, def, day, t) => !s || !s.night ? s : tastingSlot(def.id, day
 // an ice cream at the Scoop Shack: only for someone who isn't busy (no routine then, or just out and about)
 const iceOk = (s, def, day, t) => { if (!s) return null; const r = routineAt(def, day, t); return !r || ["village", "lane", "field", "shore", "bay", "orchard", "flowers", "base", "vineyard"].includes(r.scene) ? s : null; };
 const terraceBuilt = () => !!(api && api.F().vine && api.F().vine.terrace);   // the wine shop's terrace (round 146: the Sunday long lunch)
+const millShopOpen = () => !!(api && api.F().goals && api.F().goals.millshop);   // round 153: weekend day-trippers walk up to the Mill Shop
+const busyCache = {}; const busyOn = day => busyCache[day] || (busyCache[day] = [...toursOn(day).flatMap(t => [t.guide, ...t.group]), ...visitsOn(day).map(v => v.id), ...((eventOn(day) || {}).stalls || []).map(x => x.id)]);
 const cellarBuilt = () => !!(api && api.F().goals && api.F().goals.cellar);   // the wine club meets in the cellar door
 const slotNow = def => slotAt(def, dayKey(), sgHM(), true);
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };

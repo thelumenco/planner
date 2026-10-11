@@ -3608,6 +3608,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     const mull = {cost: Math.max(...ml.MULL.base.map(t => vy.STYLES[t].price)) + worst(Object.keys(ml.ADDS), 3), got: ml.MULL.cups*ml.cupPrice([1, 2, 3])};
     check([oil, soap, lot, mull].every(x => x.got > x.cost) && [oil, soap, lot].every(x => x.sell >= x.cost), `every recipe pays: oil ${oil.cost}→${oil.got}, soap ${soap.cost}→${soap.got}, lotion ${lot.cost}→${lot.got}, mulled wine ${mull.cost}→${mull.got}`); }
   check(go.GOALS.millshop && go.GOALS.millshop.needs === "mill" && np.NPCS.some(n => n.id === "hazel" && n.routine.some(sl => sl.scene === "mill" && sl.needs === "millshop")) && np.NPCS.find(n => n.id === "tomi").routine.some(sl => sl.scene === "mill" && sl.needs === "mill") && !np.NPCS.find(n => n.id === "ines").routine.some(sl => sl.scene === "mill"), "the Mill Shop goal, Hazel at the counter, Tomi at the press (Ines stays on the vines)");
+  // the Sunday market: a mill crate on Mel's wine stall, and Grace (Hazel's granddaughter) stocks Mel's soaps
+  { const F = {craft: {store: {mc_s: 4, mc_o: 4}}}; it.ITEMS.mc_s = {n: "A bar of x soap", price: 8, mill: "soap"}; it.ITEMS.mc_o = {n: "A bottle of x oil", price: 28, mill: "oil"}; const real = Math.random; Math.random = () => .001;
+    const g = [0, 1, 2, 3, 4].map(() => mc.craftSellMinute(F, "2026-10-18", 9*60, "grace")), m = mc.craftSellMinute(F, "2026-10-18", 9*60, "market"), sat = mc.craftSellMinute(F, "2026-10-17", 11*60, "shop"); Math.random = real;
+    check(g.slice(0, 4).every(x => x === 8) && g[4] === 0 && F.craft.store.mc_o === 2 && m === 28 && sat === 28 && F.craft.sold["2026-10-18"].grace === 4, "Grace sells Mel's soaps (only the soaps) at the Sunday market; the wine stall's mill crate sells too"); }
+  check(np.NPCS.find(n => n.id === "grace").job.includes("Hazel"), "Grace is Hazel's granddaughter");
+  { const tours = await import(new URL("../src/game/tours.js", import.meta.url)), sat = "2026-10-17", ids = tours.TOURISTS, hits = ids.filter(id => [11*60 + 10, 13*60 + 10, 15*60 + 10].some(t => mc.millVisitSlot(id, sat, t, true, ids, [])));
+    check(hits.length >= 2 && !ids.some(id => mc.millVisitSlot(id, "2026-10-14", 11*60 + 10, true, ids, [])) && !ids.some(id => mc.millVisitSlot(id, sat, 11*60 + 10, false, ids, [])), "weekend day-trippers walk up the lane to the Mill Shop (once it's open)"); }
+  // the pop-up crate in the campervan
+  { const F = {craft: {store: {mc_s: 3}}}, v = {shelf: [{id: "w1", name: "House red", type: "red", n: 2, price: 18}]};
+    check(mc.packCrate(F, v, "mc_s", 2) === 2 && mc.packCrate(F, v, "w:w1", 5) === 2 && mc.crateCount(mc.vanCrate(F)) === 4 && v.shelf[0].n === 0 && F.craft.store.mc_s === 1, "pack the pop-up crate: soaps off the mill's shelves, bottles off the wine shop's");
+    const real = Math.random; Math.random = () => .001; const sold = [0, 1, 2, 3, 4].map(() => mc.vanSellMinute(F)); Math.random = real;
+    check(sold.slice(0, 4).every(r => r && r.coins > 0) && !sold[4] && mc.crateCount(mc.vanCrate(F)) === 0, "passers-by buy from the crate at a campervan stop");
+    mc.packCrate(F, v, "mc_s", 1); mc.unpackCrate(F, v); check(F.craft.store.mc_s === 1 && !mc.crateCount(mc.vanCrate(F)), "unpack it and it all goes back"); }
   // in the browser: the workbench at the mill
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`mill workshop pageerror: ${e.message}`));
