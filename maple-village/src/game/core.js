@@ -1412,6 +1412,9 @@ function buy(id, price){
     F.coins -= it.price; F.fam.owned[id] = true; sfx("chaching"); flash(`${it.n} delivered home`); speak(it.say, 5000);
     resetNpcs(); save(true); return;
   }
+  // a pet from Noor's adoption corner (a kitten, a puppy...) isn't a run animal: it goes to someone in the family, and
+  // Mel picks who and where it lives (companions.js). Only chicks, bunnies and goats from the market go in the run.
+  if (it.kind === "pet" && !KINDS[it.pet]) { F.coins -= price; addInv(id, 1); sfx("chaching"); adoptItem = id; adoptSt = {}; fieldView = null; friView = null; openView = null; speak(it.say, 3500); save(); render(); return; }
   if (it.kind === "pet") {
     const a = addAnimal(F, it.pet); if (!a) { speak("The run's full. Darren can make it bigger: tap the run at home.", 4000); return; }
     F.coins -= it.price; sfx("chaching"); flash(`${a.name} the ${KINDS[it.pet].n.toLowerCase()} is in the run at home`); speak(`${it.say} I'll call it ${a.name}.`, 5000); save(true); return;
@@ -1638,7 +1641,7 @@ function ctx(){
       h += Object.keys(ITEMS).filter(id => ITEMS[id].tab === shopTab && inSeasonNow(id) && (!ITEMS[id].needs || owns(F, ITEMS[id].needs)) && (!ITEMS[id].visited || ((F.towns || {})[ITEMS[id].visited])) && (!ITEMS[id].ghOf || !inSeasonNow(ITEMS[id].ghOf))).map(id => {
         const it = ITEMS[id], locked = it.need && S.earned < it.need, owned = it.kind === "keep" ? F.fam.owned[id] : it.kind === "tool" && F.inv[id];
         const extra = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)} · ${CROPS[it.crop].yield || 1} a harvest` : it.to ? ` · for ${giftNames(it.to)}` : "";
-        if (it.kind === "pet") { const full = roomLeft(F) <= 0; return itemBtn(id, full ? "the run is full" : `<b>${it.price}</b> ${icon("coin", 13)}`, full || F.coins < it.price); }
+        if (it.kind === "pet" && KINDS[it.pet]) { const full = roomLeft(F) <= 0; return itemBtn(id, full ? "the run is full" : `<b>${it.price}</b> ${icon("coin", 13)}`, full || F.coins < it.price); }
         return itemBtn(id, locked ? `earn ${it.need} today` : owned ? (it.kind === "keep" ? "at home" : "owned") : `<b>${it.price}</b> ${icon("coin", 13)}${extra}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
       }).join("");
       if (shopTab === "animals") h += `<p class="muted" style="grid-column:1/-1">Chicks, bunnies and goats go straight to the run at home (${F.pets.animals.length} of ${["2", "4", "6", "8"][F.pets.run]} there now). Each eats once a day (grown hens come for breakfast, lunch and dinner, with an egg each time): a bag of feed is one meal, and bunnies love a garden carrot too. Upgrade the run from the run itself.</p>`;
