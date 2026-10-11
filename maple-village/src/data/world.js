@@ -205,7 +205,8 @@ export const INNER = {
   // the chocolate dip station (an upgrade), through the door on the shop's east wall
   scoopdip: {parent: "scoopshop", door: [456, 410], arrive: [70, 450], exit: [34, 440]},
   // the Cocoa Room's kitchen, through the door on the shop's west wall
-  cocoakitchen: {parent: "cocoa", door: [64, 400], arrive: [450, 440], exit: [486, 440]}
+  cocoakitchen: {parent: "cocoa", door: [64, 400], arrive: [450, 440], exit: [486, 440]},
+  millup: {parent: "mill", door: [110, 500], arrive: [96, 520], exit: [70, 584]}   // round 154: upstairs in the old mill (the shop, the workbench, tastings)
 };
 export const WORK = ["hall","chord","fresh","chico","luna","ohayo","post","home"];
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};

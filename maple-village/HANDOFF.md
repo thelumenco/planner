@@ -2195,3 +2195,32 @@ Write the proposal for Mel covering every item below. Only build after she says 
     - Pack it at the van's fold-down table (vtable → `cratePanel`), up to 24: mill store items and wine shelf bottles.
     - On a van trip, while Mel's at the stop (before 8pm), passers-by buy (`vanSellMinute`, 4%/min) and a crate with a "For sale" board stands by the van (`vanCrateArt`).
     - Unpack returns everything.
+
+### Round 154: upstairs at the mill, more olives, new mixes, whole weeks for the mill's people
+- **Olives:**
+  - `OLIVE` is now 6h. The tree gives `TREE_JARS` 3; the grove gives `GROVE_JARS` 12.
+  - The stall sells `grove2` (500, needs grove), which doubles the grove (a second, staggered row of trees).
+- **New soap and lotion mixes** (millcraft `HERB`):
+  - Fruit: strawberry, blueberry, apple.
+  - Ma Ma's flowers: `bq_sweetpea`, `bq_camellia`, `bq_heather`.
+- **Weeks for the mill's people:**
+  - **Hazel:** woods walks; Sunday mornings at the market with Grace; Mondays at the flower farm and the square; Friday evenings at the wine shop; the shop upstairs.
+  - **Tomi:** helps on the vines until the mill opens; Sunday football and the Scoop Shack; Wednesday and Friday evenings at the wine shop; Tuesday evenings at the bay.
+  - **Grace:** staying with her gran. The square, then the lane in the mornings; the foreshore or the Cocoa Room in the afternoons.
+- **Upstairs (`millup`, INNER under `mill`; art/millup.js):**
+  - Reached by the wooden stairs on the ground floor (millspot "stairs").
+  - **Downstairs** keeps only the millstone, the press, the jars and the photograph.
+  - **Upstairs, round the edges:**
+    - Shelves filled from `F.craft.store`: oils on the back wall, soaps on the left, lotions on the right.
+    - Hazel's counter (millspot "shop") at the top of the stairs.
+    - The workbench and curing rack under the window.
+  - **Upstairs, in the middle:**
+    - The tasting table ("tasting"): bottles down the centre, cobalt glasses, bread and saucers.
+    - The workshop corner ("workshop").
+  - **Tastings:** 11 daily, plus 3pm at weekends, 45 min. Tomi leads four of the mill's own day-trippers (data/mill-people.js, 10 of them, `local: "millvisit"`).
+    - For an hour after, oils sell first and twice as fast.
+    - Mel can sit in (`tastePanel`): pick notes per glass and compare with Tomi's. The first time gives the cobalt glass keepsake (`t_glass`).
+  - **Workshops:** Wednesday and Saturday, 2 to 4. Hazel and five visitors; 5 × 15 goes to the till at 4.
+    - Mel can help once a day: tips, plus Hazel suggests a mix Mel hasn't made.
+  - **Browsers:** the weekend visitors browse upstairs.
+  - **Scheduling:** `millSlot` sits early in npcs `slotAt` (right after the terrace's occasions).

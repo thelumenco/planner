@@ -3607,14 +3607,23 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     const lot = {cost: val("goatmilk") + val("oliveoil") + worst(herbs("lotion"), 1), got: C.lotionPer*K.lotion.price, sell: C.lotionPer*K.lotion.sell};
     const mull = {cost: Math.max(...ml.MULL.base.map(t => vy.STYLES[t].price)) + worst(Object.keys(ml.ADDS), 3), got: ml.MULL.cups*ml.cupPrice([1, 2, 3])};
     check([oil, soap, lot, mull].every(x => x.got > x.cost) && [oil, soap, lot].every(x => x.sell >= x.cost), `every recipe pays: oil ${oil.cost}→${oil.got}, soap ${soap.cost}→${soap.got}, lotion ${lot.cost}→${lot.got}, mulled wine ${mull.cost}→${mull.got}`); }
-  check(go.GOALS.millshop && go.GOALS.millshop.needs === "mill" && np.NPCS.some(n => n.id === "hazel" && n.routine.some(sl => sl.scene === "mill" && sl.needs === "millshop")) && np.NPCS.find(n => n.id === "tomi").routine.some(sl => sl.scene === "mill" && sl.needs === "mill") && !np.NPCS.find(n => n.id === "ines").routine.some(sl => sl.scene === "mill"), "the Mill Shop goal, Hazel at the counter, Tomi at the press (Ines stays on the vines)");
+  check(go.GOALS.millshop && go.GOALS.millshop.needs === "mill" && np.NPCS.some(n => n.id === "hazel" && n.routine.some(sl => sl.scene === "millup" && sl.needs === "millshop")) && np.NPCS.find(n => n.id === "tomi").routine.some(sl => sl.scene === "mill" && sl.needs === "mill") && !np.NPCS.find(n => n.id === "ines").routine.some(sl => sl.scene === "mill"), "the Mill Shop goal, Hazel at the counter, Tomi at the press (Ines stays on the vines)");
   // the Sunday market: a mill crate on Mel's wine stall, and Grace (Hazel's granddaughter) stocks Mel's soaps
   { const F = {craft: {store: {mc_s: 4, mc_o: 4}}}; it.ITEMS.mc_s = {n: "A bar of x soap", price: 8, mill: "soap"}; it.ITEMS.mc_o = {n: "A bottle of x oil", price: 28, mill: "oil"}; const real = Math.random; Math.random = () => .001;
     const g = [0, 1, 2, 3, 4].map(() => mc.craftSellMinute(F, "2026-10-18", 9*60, "grace")), m = mc.craftSellMinute(F, "2026-10-18", 9*60, "market"), sat = mc.craftSellMinute(F, "2026-10-17", 11*60, "shop"); Math.random = real;
     check(g.slice(0, 4).every(x => x === 8) && g[4] === 0 && F.craft.store.mc_o === 2 && m === 28 && sat === 28 && F.craft.sold["2026-10-18"].grace === 4, "Grace sells Mel's soaps (only the soaps) at the Sunday market; the wine stall's mill crate sells too"); }
   check(np.NPCS.find(n => n.id === "grace").job.includes("Hazel"), "Grace is Hazel's granddaughter");
-  { const tours = await import(new URL("../src/game/tours.js", import.meta.url)), sat = "2026-10-17", ids = tours.TOURISTS, hits = ids.filter(id => [11*60 + 10, 13*60 + 10, 15*60 + 10].some(t => mc.millVisitSlot(id, sat, t, true, ids, [])));
-    check(hits.length >= 2 && !ids.some(id => mc.millVisitSlot(id, "2026-10-14", 11*60 + 10, true, ids, [])) && !ids.some(id => mc.millVisitSlot(id, sat, 11*60 + 10, false, ids, [])), "weekend day-trippers walk up the lane to the Mill Shop (once it's open)"); }
+  { const tours = await import(new URL("../src/game/tours.js", import.meta.url)), sat = "2026-10-17", ids = tours.TOURISTS, hits = ids.filter(id => [12*60 + 10, 13*60 + 40, 16*60 + 10].some(t => mc.millVisitSlot(id, sat, t, true, ids, [])));
+    check(hits.length >= 2 && !ids.some(id => mc.millVisitSlot(id, "2026-10-14", 12*60 + 10, true, ids, [])) && !ids.some(id => mc.millVisitSlot(id, sat, 12*60 + 10, false, ids, [])), "weekend day-trippers walk up the lane to the Mill Shop (once it's open)"); }
+  // upstairs: tastings (Tomi and four day-trippers at 11, and at 3 at weekends), soap workshops (Hazel and five, Wed and Sat)
+  { const T = ["aiko", "ben", "clara", "dev", "rosa", "bastien", "grace", "hiro"], sat = "2026-10-17", at11 = T.map(id => mc.millSlot(id, sat, 11*60 + 10, true, T, [])).filter(Boolean);
+    check(mc.millSlot("tomi", sat, 11*60 + 10, true, T, []).scene === "millup" && at11.length === 4 && at11.every(x => x.act === "sit") && mc.tastingTimes(sat).length === 2 && mc.tastingTimes("2026-10-13").length === 1, "olive oil tastings: Tomi and four day-trippers at the long table (twice on weekends)");
+    check(mc.millSlot("hazel", sat, 14*60 + 30, true, T, []).workshop && T.filter(id => (mc.millSlot(id, sat, 14*60 + 30, true, T, []) || {}).workshop).length === 5 && !mc.workshopNow("2026-10-13", 14*60 + 30), "soap workshops: Hazel and five, Wednesdays and Saturdays");
+    const F = {craft: {recipes: [{id: "oil_rosemary", kind: "oil", adds: ["rosemary"], name: "Rosemary olive oil"}]}, inv: {}}, st = mc.tasteStart(F); st.oils.forEach(o => { o.notes.forEach(n => mc.tastePick(st, n)); mc.tasteNext(st); });
+    const add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }; check(mc.tasteDone(st) && st.score === st.oils.reduce((a, o) => a + o.notes.length, 0) && mc.finishTaste(F, st, add) && F.inv.t_glass === 1, "Mel at a tasting: name the notes in each glass, and keep the cobalt glass");
+    const G = {craft: {store: {mc_o: 3, mc_s: 3}}}; it.ITEMS.mc_o = {n: "o", price: 28, mill: "oil"}; it.ITEMS.mc_s = {n: "s", price: 8, mill: "soap"}; const real = Math.random; Math.random = () => .07;
+    const after = mc.craftSellMinute(G, "2026-10-13", 11*60 + 50, "shop"), quiet = mc.craftSellMinute(G, "2026-10-13", 14*60, "shop"); Math.random = real;
+    check(after === 28 && quiet === 0, "after a tasting, the oils fly off the shelves"); }
   // the pop-up crate in the campervan
   { const F = {craft: {store: {mc_s: 3}}}, v = {shelf: [{id: "w1", name: "House red", type: "red", n: 2, price: 18}]};
     check(mc.packCrate(F, v, "mc_s", 2) === 2 && mc.packCrate(F, v, "w:w1", 5) === 2 && mc.crateCount(mc.vanCrate(F)) === 4 && v.shelf[0].n === 0 && F.craft.store.mc_s === 1, "pack the pop-up crate: soaps off the mill's shelves, bottles off the wine shop's");
@@ -3631,13 +3640,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?reset=1&seed=1&time=15:00&date=2026-10-13"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=15:00&date=2026-10-13&mcw=1"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("mill")); await page.waitForTimeout(3500);
-  check(await page.locator('#actors .npc[data-npc="tomi"]').count() === 1 && await page.locator('#world [data-millspot="bench"]').count() === 1, "Tomi at the mill; the workbench upstairs");
+  check(await page.locator('#actors .npc[data-npc="tomi"]').count() === 1 && await page.locator('#world [data-millspot="stairs"]').count() === 1, "Tomi at the press; wooden stairs up");
+  await page.locator('#world [data-millspot="stairs"]').dispatchEvent("click"); await page.waitForFunction(() => /upstairs/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(800);
+  check(await page.locator('#world [data-millspot="bench"]').count() === 1 && await page.locator('#world [data-millspot="tasting"]').count() === 1 && await page.locator('#world [data-millspot="workshop"]').count() === 1, "upstairs: the workbench, the tasting table and the workshop corner");
   await page.locator('#world [data-millspot="bench"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-mc="add:rosemary"]', { timeout: 20000 });
   await page.click('#ctx [data-mc="add:rosemary"]'); await page.click('#ctx [data-mc="make"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.craft && f.craft.steep.length === 1 && f.craft.recipes[0].name === "Rosemary olive oil" && !f.inv.oliveoil), "Mel steeps her first infused oil: Rosemary olive oil");
   await page.click("#ctx [data-close]"); await page.locator('#world [data-millspot="shop"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="millshop"]', { timeout: 20000 });
   await page.click('#ctx [data-goal="millshop"]'); await page.waitForTimeout(600);
-  check(await fox().then(f => f.goals.millshop && f.coins === 800), "the Mill Shop opens downstairs (1200)");
+  check(await fox().then(f => f.goals.millshop && f.coins === 800), "the Mill Shop opens upstairs (1200)");
   await page.close();
 }
 {

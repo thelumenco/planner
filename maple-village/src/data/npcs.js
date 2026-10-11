@@ -8,6 +8,7 @@
 import { BB_PEOPLE } from "./bb-people.js";
 import { CR_PEOPLE } from "./cr-people.js";
 import { WEDDING_PEOPLE } from "./terrace-people.js";
+import { MILL_PEOPLE } from "./mill-people.js";
 const hm = s => { const [h, m] = s.split(":").map(Number); return h*60 + (m || 0); };
 // opts: {look: clothes for this slot (over the usual look), dow: [0-6] (only on those days, 0 = Sunday), days: "wd" | "we" (weekdays / weekends only), act: what they're doing (Darren's props + lines), dir: facing}
 // Gong Gong's going-out clothes: a pressed shirt and long trousers (no berms)
@@ -193,7 +194,7 @@ export const NPCS = [
     // Ma's flower farm and lunch in the square; a glass at the wine shop on Friday evenings
     routine: [slot("7:00", "8:30", "hwoods", [[100, 330], [200, 318], [300, 300]], {dow: [1, 2, 3, 4, 5, 6]}),
       slot("8:00", "10:00", "field", [[356, 160], [380, 170]], {dow: [0]}),
-      slot("9:30", "10:00", "hlane", [[300, 300], [360, 320]], {needs: "millshop", dow: [0, 2, 3, 4, 5, 6]}), slot("10:00", "17:00", "mill", [130, 470], {needs: "millshop", dow: [0, 2, 3, 4, 5, 6], dir: 1}),
+      slot("9:30", "10:00", "hlane", [[300, 300], [360, 320]], {needs: "millshop", dow: [0, 2, 3, 4, 5, 6]}), slot("10:00", "17:00", "millup", [214, 500], {needs: "millshop", dow: [0, 2, 3, 4, 5, 6], dir: 1}),
       slot("10:00", "12:00", "flowers", [[160, 300], [260, 380], [210, 300]], {dow: [1]}), slot("12:00", "13:30", "village", [[362, 372], [392, 360]], {dow: [1]}),
       slot("10:00", "12:00", "village", [[362, 372], [340, 380]]), slot("14:00", "16:00", "orchard", [[160, 330], [260, 420]]),
       slot("18:00", "20:00", "wineshop", [[300, 500], [360, 520]], {dow: [5]})],
@@ -1042,7 +1043,8 @@ export const NPCS = [
   },
   ...BB_PEOPLE,   // round 143: Bellbird Valley (data/bb-people.js)
   ...CR_PEOPLE,   // round 150: the Coast Road (data/cr-people.js)
-  ...WEDDING_PEOPLE   // round 152: the wedding parties on the terrace (data/terrace-people.js)
+  ...WEDDING_PEOPLE,   // round 152: the wedding parties on the terrace (data/terrace-people.js)
+  ...MILL_PEOPLE   // round 154: the mill's own day-trippers (data/mill-people.js)
 ];
 
 // Agent NPCs: one per automation. `from` on a mail item picks the messenger (unknown -> postie).
