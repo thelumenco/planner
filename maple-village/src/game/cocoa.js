@@ -245,7 +245,7 @@ export function cocoaTick(F, opts = {}){
     if (!openOn(day, hm, ccUp(c, "assistant"))) continue;
     // a delivery order (round 137): with the Scoop Shack's bike, Tomo takes chocolates round, plus a delivery fee
     if (bikeOwned(F) && Math.random() < DELIVERY.cocoa) { const b0 = out.bonbons || 0, got = sellTo(c, day, out, {box: true});
-      if (got) { const s = c.sold[day]; s.coins += DELIVERY.fee; out.coins += DELIVERY.fee; s.deliv = (s.deliv || 0) + 1; (out.orders = out.orders || []).push({shop: "cocoa", coins: got + DELIVERY.fee, what: (out.bonbons || 0) > b0 ? "a box of bonbons" : "a chocolate bar"}); continue; } }
+      if (got) { const s = c.sold[day]; s.coins += DELIVERY.fee; out.coins += DELIVERY.fee; s.deliv = (s.deliv || 0) + 1; (out.orders = out.orders || []).push({shop: "cocoa", coins: got + DELIVERY.fee, what: (out.bonbons || 0) > b0 ? "a box of bonbons" : "a chocolate bar"}); scoopState(F).bikeOut = at; continue; } }
     if (ccUp(c, "hotchoc") && hotMinute(c, day, hm, opts, out)) continue;
     const sp = specialOn(day);
     if (sp && c.specials[sp.id] > 0 && Math.random() < .012*(new Date(day + "T00:00:00Z").getUTCDay() % 6 === 0 ? 1.4 : 1)) {   // the festival special, beside the case

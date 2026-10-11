@@ -259,7 +259,7 @@ export function scoopTick(F, opts = {}){
     const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     const sale = saleMinute(s, day, hm, opts); if (sale && sale.box) out.box += sale.coins; else if (sale) { out.coins += sale.coins; out.n++; }
     const cs = cartMinute(s, day, hm, opts); if (cs) { out.coins += cs.coins; out.n++; out.cart = (out.cart || 0) + cs.coins; }
-    const dv = deliverMinute(s, day, hm); if (dv) { out.coins += dv.coins; (out.orders = out.orders || []).push(dv); }
+    const dv = deliverMinute(s, day, hm); if (dv) { out.coins += dv.coins; (out.orders = out.orders || []).push(dv); s.bikeOut = at; }
     out.mins++;
   }
   if (out.mins || !s.at) s.at = from + out.mins*60000;
@@ -539,6 +539,10 @@ export function trolleyPanel(F, st = {}){
 // uses real stock and pays the shop's price plus a delivery fee. On top of the shops' own sales.
 export const DELIVERY = {fee: 2, scoop: .045, cocoa: .036, winery: .04};   // doubled (Mel: "Tomo doesn't seem to be delivering much"): about two to three an hour from each shop, when there's stock
 export const bikeOwned = F => !!(F.scoop && F.scoop.up && F.scoop.up.bike);
+// round 152 (Mel: "the mint bike is like permanently outside the shop"): after each order Tomo's out on the bike for
+// twenty minutes, and it's gone from beside the shop (a little chalkboard says so)
+export const BIKE_TRIP = 20*60000;
+export const bikeAway = (s, t = Date.now() + (globalThis.__mapleOffset || 0)) => !!(s && s.bikeOut && t - s.bikeOut >= 0 && t - s.bikeOut < BIKE_TRIP);
 function deliverMinute(s, day, hm){
   if (!hasUp(s, "bike") || !openNow(hm) || Math.random() >= DELIVERY.scoop) return null;
   const stocked = onDisplay(s); if (!stocked.length) return null;

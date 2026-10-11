@@ -3151,8 +3151,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-triphome="train"]');
   await page.waitForFunction(() => !/Cinque Terre/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
   check(await fox().then(f => f.trip.done), "home on the train from Corniglia");
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1200);
-  check(await page.locator("#sceneArt").evaluate(e => e.innerHTML.includes("#2E7A5A")), "the painted boat (green, like the one in Manarola) is by the jetty at home");
+  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1200);
+  check(await page.locator("#sceneArt").evaluate(e => e.innerHTML.includes("#2E7A5A")), "the painted boat (green, like the one in Manarola) is pulled up on the foreshore sand");
   await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1000);
   await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-loft]', { timeout: 15000 });
   await page.click('#ctx [data-loft]'); await page.waitForSelector('#ctx [data-lf="start:rack"]', { timeout: 15000 });
@@ -3546,6 +3546,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const realNow = Date.now, t0 = Date.parse("2026-10-11T07:00:00Z"); Date.now = () => t0; v.lastTick = t0 - 180*60000; const out = vy.sellTick(F, {}); Date.now = realNow;
   check(out && out.lunchB >= 6 && out.lunchB <= 30 && v.today.lunchB === out.lunchB, `three hours of lunch: ${out && out.lunchB} bottles to the table`);
   check(80 - v.shelf.reduce((n, x) => n + x.n, 0) >= out.lunchB, "the bottles come off the shelves");
+  { const B = {coins: 9999, inv: {}, goals: {}}, bv = vy.vineState(B); let spent = 0; for (let i = 0; i < 8; i++) { const c = B.coins; vy.buy(B, "barrel"); spent += c - B.coins; }
+    check(bv.barrels.length === 6 && spent === 150 + 225 + 300 + 375 + 450 && vy.maxBarrels(B) === 6, "barrels: up to six in the shed (150, then 75 more each)");
+    B.goals.cellar = 1; for (let i = 0; i < 15; i++) vy.buy(B, "barrel"); check(bv.barrels.length === 18 && vy.shopPrice(bv, "barrel") === vy.BARRELS.cellarPrice, "and twelve more on the cellar's racks once the cellar door's open"); }
   { const G = {coins: 0, inv: {}}, gv = vy.vineState(G); gv.cuttings.pinot = 1; gv.pinot = true; vy.plantVine(G, 0, 0, "red");
     check(vy.uprootVine(G, 0, 0) && !gv.rows[0].vines[0] && gv.cuttings.red === 1 && vy.plantVine(G, 0, 0, "pinot") && gv.rows[0].vines[0].v === "pinot", "dig a vine up (the cutting goes back in the box) and plant a different grape in its place"); }
   // in the browser: through the glass doors, the book, the long table, and back

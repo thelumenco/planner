@@ -3,6 +3,7 @@
 // a chocolatier?). The boardwalk runs down to the foreshore gate at the bottom.
 import { ink } from "../util.js";
 import { sk, tapeLabel, house, flowers, artCtx } from "./scenes.js";
+import { bikeAway } from "../game/scoop.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
 import { archGate } from "./orchard.js";
 import { track, brook, trainLayer, RAIL_Y } from "./railway.js";
@@ -31,6 +32,10 @@ const honestyFreezer = () => `<g data-place="hfreezer" aria-label="Honesty freez
     `<rect x="414" y="268" width="44" height="28" rx="4"/><rect x="418" y="264" width="36" height="6" rx="2"/><rect x="440" y="252" width="14" height="12" rx="2"/><path d="M443 255 h8"/><rect x="420" y="276" width="20" height="10" rx="2"/>`)}
   <text x="430" y="284" text-anchor="middle" font-family="Klee One,serif" font-size="5.5" fill="#C2505F" pointer-events="none">honesty</text>
 </g>${tapeLabel(452, 306, "Honesty freezer", "var(--card)", 8)}</g>`;
+// round 152: while Tomo's out on a delivery, a chalkboard where the bike usually leans
+const bikeOutSign = () => `<g data-place="dbike" aria-label="Out on a delivery"><g transform="translate(-186 -56)"><ellipse class="hov" cx="482" cy="340" rx="28" ry="7" style="fill:var(--butter)"/>
+  ${sk(`<path d="M470 338 l8 -34 h12 l8 34" style="fill:none;stroke:#8A6A52" stroke-width="2.4"/><rect x="472" y="304" width="24" height="22" rx="2" style="fill:#3A4A44"/>`, `<rect x="472" y="304" width="24" height="22" rx="2"/>`)}
+  <text x="484" y="313" text-anchor="middle" font-family="Klee One,serif" font-size="5.4" fill="#FFFDF6">Out on a</text><text x="484" y="320" text-anchor="middle" font-family="Klee One,serif" font-size="5.4" fill="#FFFDF6">delivery!</text></g></g>`;
 const bike = () => `<g data-place="dbike" aria-label="Delivery bike"><g transform="translate(-186 -56)"><ellipse class="hov" cx="482" cy="340" rx="28" ry="7" style="fill:var(--butter)"/>
   ${sk(`<circle cx="468" cy="330" r="9" style="fill:none"/><circle cx="496" cy="330" r="9" style="fill:none"/><path d="M468 330 l10 -16 h12 l6 16 M478 314 l-4 -6 M490 314 l2 -8 h6" fill="none" style="stroke:#7FCBB4" stroke-width="3"/><rect x="458" y="302" width="18" height="12" rx="2" style="fill:#F2A0B8"/>`,
     `<circle cx="468" cy="330" r="9"/><circle cx="496" cy="330" r="9"/><rect x="458" y="302" width="18" height="12" rx="2"/><path d="M462 308 h10" opacity=".6"/>`)}
@@ -92,7 +97,7 @@ export function bayArt(){
     ${ccUps.window ? `<g pointer-events="none">${sk(`<path d="M346 494 h24 M350 486 h16 M354 478 h8" style="stroke:#F3C969" stroke-width="2"/>`, `<path d="M358 494 v-18"/>`)}${[0, 1, 2, 3, 4, 5].map(i => `<circle class="twinkle" cx="${339 + i*7.6}" cy="${465 + (i % 2)*2}" r="1.3" fill="#F3C969" style="animation-delay:${(i*.3).toFixed(1)}s"/>`).join("")}${[[352, 491], [364, 491], [355, 483], [361, 483], [358, 475]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${["#4A2E22", "#C2505F", "#8A5A3A", "#F3E7C9", "#4A2E22"][i]}" stroke="#3A2E28" stroke-width=".6"/>`).join("")}</g>` : ""}
     ${G.F && ((G.F().story || {}).flags || {}).sign ? `<g pointer-events="none">${sk(`<path d="M466 448 h28" style="stroke:#3A2E28" stroke-width="2"/><rect x="468" y="456" width="44" height="24" rx="3" style="fill:#A8754F"/>`, `<path d="M474 448 v8 M506 448 v8"/><rect x="468" y="456" width="44" height="24" rx="3"/>`)}<text x="490" y="466" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="6.4" fill="#FFF3D6">Marchand</text><text x="490" y="475" text-anchor="middle" font-family="Klee One,serif" font-size="5.4" fill="#FFF3D6">&amp; Fille · 1962</text></g>` : ""}
     ${tapeLabel(396, 540, ccName.replace(/[<&>"]/g, "").slice(0, 24), "#E8D3BC", 10)}</g>`;
-  return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17*60, 6*60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? bike() : "") + deck + (cc ? cocoa : reno)
+  return lampDefs + ground + sea + [[272, 250], [272, 470]].map(([x, y]) => streetLamp(x, y)).join("") + shop + sign + (up.neon ? neon(lit(17*60, 6*60)) : "") + (up.honesty ? honestyFreezer() : "") + (up.bike ? (bikeAway(sc) ? bikeOutSign() : bike()) : "") + deck + (cc ? cocoa : reno)
     + archGate("toFarmB", 500, 374, "Wildflower Farm", 466, 404, "#F3E1A0", "Gate east to Wildflower Farm")
     + archGate("toShoreB", 250, 616, "Foreshore", 314, 604, "var(--sky)", "Boardwalk to the foreshore");
 }

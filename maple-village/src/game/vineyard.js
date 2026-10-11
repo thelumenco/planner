@@ -80,15 +80,19 @@ export const barrelLeft = b => b ? Math.max(0, b.start + b.dur - Date.now()) : 0
 export const shelfStock = v => v.shelf.reduce((n, s) => n + s.n, 0);
 
 /* ---------- actions (return a line for Maple, or null) ---------- */
-// the second barrel costs 150, the third 300
-export const shopPrice = (v, id) => id === "barrel" ? 150*Math.max(1, v.barrels.length) : SHOP[id].price;
+// round 152 (Mel: "3 is too few"): up to six in the barrel shed (the second 150, then 75 more each: 450 for the sixth),
+// and once the cellar door's open, twelve more on its barrel racks (250 each)
+export const BARRELS = {shed: 6, cellar: 12, cellarPrice: 250};
+export const maxBarrels = F => BARRELS.shed + (F && F.goals && F.goals.cellar ? BARRELS.cellar : 0);
+export const shopPrice = (v, id) => id === "barrel" ? (v.barrels.length >= BARRELS.shed ? BARRELS.cellarPrice : 150 + 75*Math.max(0, v.barrels.length - 1)) : SHOP[id].price;
 export function buy(F, id){
   const v = vineState(F), it = SHOP[id], price = it ? shopPrice(v, id) : 0; if (!it || F.coins < price) return null;
   if (id === "terrace") { if (v.terrace) return "The terrace is already out front."; v.terrace = true; }
   else if (id === "olive") { if (v.olive) return "You've an olive tree already. One's plenty."; v.olive = {planted: Date.now(), pickedAt: 0}; }
   else if (id === "grove") { if (v.grove) return "The grove's already planted."; if (!v.olive) return "Plant the first olive tree by the path, then the grove."; v.grove = {planted: Date.now(), pickedAt: 0}; }
   else if (id === "trellis") { const r = v.rows.find(x => !x.trellis); if (!r) return "Every row has a trellis already."; r.trellis = true; }
-  else if (id === "barrel") { if (v.barrels.length >= 3) return "The cellar's full: three barrels is the most it holds."; v.barrels.push(null); }
+  else if (id === "barrel") { if (v.barrels.length >= maxBarrels(F)) return v.barrels.length >= BARRELS.shed + BARRELS.cellar ? "Every rack's full: eighteen barrels, six in the shed and twelve in the cellar." : "The shed's full: six barrels. Open the cellar door and its racks take twelve more.";
+    v.barrels.push(null); if (v.barrels.length > BARRELS.shed) { F.coins -= price; return "Another oak barrel, rolled down onto the racks in the cellar."; } }
   else v.cuttings[id === "cut_red" ? "red" : "white"]++;
   F.coins -= price; return it.say;
 }
@@ -254,7 +258,7 @@ export function sellTick(F, opts = {}){
       for (let i = Math.random() < .45 ? 2 : 1; i > 0; i--) { const d0 = out.plates; plate(); if (out.plates > d0) bits.push(out.dish); }
       if (onShelf.length && (Math.random() < .3 || !bits.length)) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; if (s.n > 0) { s.n--; out.bottles++; out.coins += s.price; bits.push("bottle"); } }
       if (bits.length) { out.coins += DELIVERY.fee; const dish = id => id === "bottle" ? "a bottle of wine" : /^tapas:/.test(id) ? (TAPAS[id.slice(6)] || {n: "tapas"}).n.toLowerCase() : (DISHES[id] || {n: "a small plate"}).n.toLowerCase();
-        (out.orders = out.orders || []).push({shop: "winery", coins: out.coins - c0, picnic: Math.random() < .45, what: bits.map(dish).join(" and ")}); out.deliv = (out.deliv || 0) + 1; } }
+        (out.orders = out.orders || []).push({shop: "winery", coins: out.coins - c0, picnic: Math.random() < .45, what: bits.map(dish).join(" and ")}); out.deliv = (out.deliv || 0) + 1; if (F.scoop) F.scoop.bikeOut = at + off; } }
     if (onShelf.length && Math.random() < .002*f) { const s = onShelf[Math.floor(Math.random()*onShelf.length)]; if (Math.random() < winePf(s)) { s.n--; out.bottles++; out.coins += s.price; } }
     if (Math.random() < .0016*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
       const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s && Math.random() < winePf(s)) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); if (Math.random() < (apero ? .9 : .6)) plate(); } }
@@ -292,7 +296,7 @@ export function vinePanel(F, r, i){
 export function stallPanel(F){
   const v = vineState(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F.coins} coins. Cuttings: ${grapeKinds(v).map(k => `${v.cuttings[k]} ${gName(k)}`).join(", ")}. Grapes: ${grapeKinds(v).map(k => `${v.grapes[k]} ${gName(k)}`).join(", ")} bunches.</p>
-    <div class="items shop">${Object.keys(SHOP).map(id => { const it = SHOP[id], price = shopPrice(v, id), have = (id === "grove" && !!v.grove) || (id === "trellis" && v.rows.every(r => r.trellis)) || (id === "barrel" && v.barrels.length >= 3) || (id === "olive" && !!v.olive) || (id === "terrace" && !!v.terrace), off = have || F.coins < price;
+    <div class="items shop">${Object.keys(SHOP).map(id => { const it = SHOP[id], price = shopPrice(v, id), have = (id === "grove" && !!v.grove) || (id === "trellis" && v.rows.every(r => r.trellis)) || (id === "barrel" && v.barrels.length >= maxBarrels(F)) || (id === "olive" && !!v.olive) || (id === "terrace" && !!v.terrace), off = have || F.coins < price;
       return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c">${have ? "owned" : `<b>${price}</b> coins`}</span>${id === "terrace" ? `<span class="d">a third more customers</span>` : ""}</button>`; }).join("")}</div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
@@ -313,6 +317,7 @@ export function barrelPanel(F){
     <p class="muted">Grapes you take go in your backpack (for gelato at the Scoop Shack).${v.help.barrels ? " Marco fills empty barrels only from bunches beyond what you keep back." : ""}</p><div class="vbarrels">`;
   v.barrels.forEach((b, i) => {
     const ph = !b ? "empty" : barrelLeft(b) ? (b.style === "sparkling" && b.stage === 2 ? "bubbles" : "ferment") : b.style === "sparkling" && b.stage === 1 ? "await2" : "ready";
+    if (i === BARRELS.shed) h += `</div><p class="eyebrow">On the racks in the cellar</p><div class="vbarrels">`;
     h += `<div class="vbarrel">${barrelPic(ph, b ? STYLES[b.style].col : "", b ? STYLES[b.style].n : "")}<div class="vbody"><b>Barrel ${i + 1}</b>${b ? stageStrip(b.style, ph) : ""}`;
     if (!b) h += `<p class="muted">Empty.</p><div class="vbtns">${Object.keys(STYLES).filter(k => hasGrape(v, STYLES[k].grape)).map(k => { const st = STYLES[k], ok = v.grapes[st.grape] >= PER_BATCH; return `<button class="btn small ${ok ? "alt" : "alt"}" data-vy="fill" data-i="${i}" data-k="${k}" ${ok ? "" : "disabled"}>${st.n}</button>`; }).join("")}</div>`;
     else { const left = barrelLeft(b), st = STYLES[b.style];

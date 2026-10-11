@@ -6,6 +6,7 @@ import { streetLamp, lampDefs, bunting, festivalOn } from "./village-extras.js";
 import { growth, barrelLeft, shelfStock, STYLES, vineyardName, shopName } from "../game/vineyard.js";
 import { oliveTree } from "./wine.js";
 import { potsIn } from "./orchard.js";
+import { dryingRack } from "./town-cinque.js";
 
 // a name on a tape label: "The" dropped, kept short enough to sit on the map
 const tag = n => { const t = n.replace(/^the\s+/i, ""), c = t[0].toUpperCase() + t.slice(1); return esc(c.length > 16 ? c.slice(0, 15) + "…" : c); };
@@ -38,14 +39,16 @@ function rowArt(row, r){
 }
 // the barrel shed: an open-fronted timber shed, one barrel per barrel owned (chalk ticks while it ferments)
 function shedArt(v){
-  const bx = [78, 112, 146], bar = (x, b) => { const ready = b && !barrelLeft(b) && !(b.style === "sparkling" && b.stage === 1);
-    return sk(`<ellipse cx="${x}" cy="${206}" rx="14" ry="18" style="fill:#A8754F"/>`, `<ellipse cx="${x}" cy="206" rx="14" ry="18"/><path d="M${x-13} 198 h26 M${x-13} 214 h26" style="stroke:#5C4A3E" stroke-width="2"/>`)
-      + (b ? `<circle cx="${x}" cy="206" r="4.5" fill="${STYLES[b.style].col}" stroke="#3a2e28" stroke-width=".8"/>` : "")
-      + (ready ? `<g class="twinkle" pointer-events="none"><path d="M${x+10} 186 l2 -5 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2z" fill="#FFE38A"/></g>` : ""); };
+  // round 152: up to six, three along the front and three stacked behind (the cellar's racks hold the rest)
+  const bx = [78, 112, 146, 78, 112, 146], by = [212, 212, 212, 188, 188, 188], bar = (x, b, y = 206) => { const ready = b && !barrelLeft(b) && !(b.style === "sparkling" && b.stage === 1);
+    return sk(`<ellipse cx="${x}" cy="${y}" rx="14" ry="15" style="fill:#A8754F"/>`, `<ellipse cx="${x}" cy="${y}" rx="14" ry="15"/><path d="M${x-13} ${y - 7} h26 M${x-13} ${y + 7} h26" style="stroke:#5C4A3E" stroke-width="2"/>`)
+      + (b ? `<circle cx="${x}" cy="${y}" r="4.5" fill="${STYLES[b.style].col}" stroke="#3a2e28" stroke-width=".8"/>` : "")
+      + (ready ? `<g class="twinkle" pointer-events="none"><path d="M${x+10} ${y - 20} l2 -5 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2z" fill="#FFE38A"/></g>` : ""); };
+  const shed = v.barrels.slice(0, 6).map((b, i) => [i, b]), order = [...shed.filter(([i]) => i >= 3), ...shed.filter(([i]) => i < 3)];   // back row first
   return `<g data-place="barrels" aria-label="Barrel shed"><ellipse class="hov" cx="112" cy="234" rx="70" ry="10" style="fill:var(--butter)"/>
     ${sk(`<path d="M44 160 L112 126 L180 160z" style="fill:#B4553F"/><rect x="52" y="160" width="120" height="68" style="fill:#7B5A42"/><rect x="60" y="168" width="104" height="60" style="fill:#5C4535"/>`,
       `<path d="M44 160 L112 126 L180 160z"/><path d="M60 152 l10 -5 M84 140 l10 -5 M130 140 l10 5 M154 152 l10 5" opacity=".5"/><rect x="52" y="160" width="120" height="68"/><path d="M52 228 h120"/>`)}
-    ${v.barrels.map((b, i) => bar(bx[i], b)).join("")}
+    ${order.map(([i, b]) => bar(bx[i], b, by[i])).join("")}
     ${tapeLabel(112, 252, "Barrel shed", "var(--peach)", 11)}</g>`;
 }
 function shopArt(v){
@@ -120,7 +123,9 @@ export function vineyardArt(){
   // round 110: the olive grove, four small trees in a neat row along the top terrace (bought at the stall)
   const gv = v.grove, gripe = gv && Date.now() - (gv.pickedAt || gv.planted) >= 8*3600e3;
   const grove = gv ? `<g data-place="grove" aria-label="The olive grove"><ellipse class="hov" cx="125" cy="92" rx="100" ry="12" style="fill:var(--butter)"/><g filter="url(#wob)">${[50, 100, 150, 200].map(x => oliveTree(x, 92, .62, gripe ? "ripe" : "growing")).join("")}</g>${tapeLabel(125, 110, "Olive grove", "var(--sage)", 10)}</g>` : "";
-  return lampDefs + ground + gate + lgate + grove + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + olive
+  // the cane drying rack (round 139), tucked in behind the olive tree (Mel)
+  const rack = (G.F().loft || {}).rack ? dryingRack(206, 240) : "";
+  return lampDefs + ground + gate + lgate + grove + [[176, 286], [470, 286]].map(([x, y]) => streetLamp(x, y)).join("") + rack + olive
     + shedArt(v) + shopArt(v) + potsIn("vineyard") + stallArt() + sign + v.rows.map((row, r) => rowArt(row, r)).join("") + playArt()
     // the shop terrace (bought at the stall): a vine-covered pergola and two little tables beside the shop
     + (v.terrace ? `<g data-place="terrace" aria-label="The terrace"><ellipse class="hov" cx="490" cy="214" rx="28" ry="9" style="fill:var(--butter)"/></g>` : "") + (v.terrace ? sk(`<path d="M466 132 h48 l-4 -10 h-40z" style="fill:#9CC27E"/><ellipse cx="478" cy="196" rx="11" ry="4" style="fill:#FFFDF6"/><ellipse cx="502" cy="206" rx="11" ry="4" style="fill:#FFFDF6"/><circle cx="474" cy="128" r="2.4" style="fill:#6B2A55"/><circle cx="500" cy="128" r="2.4" style="fill:#6B2A55"/>`,
