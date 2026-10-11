@@ -94,6 +94,7 @@ button{cursor:pointer}
 .twinkle:nth-child(2n){animation-delay:.8s}.twinkle:nth-child(3n){animation-delay:1.5s}
 @keyframes tw{0%,100%{opacity:1}50%{opacity:.35}}
 .steam{animation:steam 3s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.tlspin{transform-box:fill-box;transform-origin:center;animation:spinr 6s linear infinite}   /* round 157: the dairy's windmill */
 @keyframes steam{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:.8;transform:translateY(-3px)}}
 .p-food{animation:feed 2.2s ease-in forwards}
 @keyframes feed{0%{left:40%;top:92%;opacity:0}15%{opacity:1}55%{left:65%;top:66%;transform:translate(-50%,-50%) scale(1)}100%{left:65%;top:66%;transform:translate(-50%,-50%) scale(0);opacity:0}}
@@ -114,7 +115,7 @@ button{cursor:pointer}
 .p-fort{animation:fort 5s ease forwards;font-size:clamp(70px,22vw,120px)}
 @keyframes fort{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}15%,85%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){
-  #fTail,#fBody,#fHead,.eyesOpen,.twinkle,.steam,#napBody{animation:none!important}
+  #fTail,#fBody,#fHead,.eyesOpen,.twinkle,.steam,.tlspin,#napBody{animation:none!important}
   .fox-cheer #foxAll,.fox-ball #foxAll,.fox-brush #foxAll,.fox-bath #foxAll,.fox-yarn #foxAll,.fox-hide #foxAll{animation-duration:.01s!important}
 }
 
