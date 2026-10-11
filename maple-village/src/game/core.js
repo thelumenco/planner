@@ -2970,7 +2970,7 @@ function vineTick(){
   if (out.coins && serving()) { sfx("coin"); flash(`+${out.coins} coins from the wine shop`); }
   else if (out.coins && out.club && scene === "cellar") { sfx("coin"); flash(`+${out.coins} coins: the wine club`); }
   else if (out.coins && out.lunchB && scene === "terrace") { sfx("coin"); flash(`+${out.coins} coins: ${out.lunchB === 1 ? "a bottle" : `${out.lunchB} bottles`} to the long table${out.tips ? ` (${out.tips} in tips)` : ""}`); }
-  else if (out.coins && out.disco && scene === "cellar") { sfx("coin"); flash(`+${out.coins} coins: disco night (in the till)`); }
+  else if (out.coins && out.disco && scene === "cellar") { sfx("coin"); flash(`+${out.coins} coins: disco night (in the wine shop's honesty box)`); }
   else if (out.mins >= 30 && out.coins) setTimeout(() => speak(`While you were away, villagers bought ${out.bottles ? `${out.bottles} bottle${out.bottles > 1 ? "s" : ""}` : ""}${out.bottles && out.glasses ? " and " : ""}${out.glasses ? `${out.glasses} glass${out.glasses > 1 ? "es" : ""}` : ""} of your wine. ${vineState(F).box} coins are waiting in the honesty box.`, 6500), 2500);
   if (typing) persist("fox"); else save(scene === "vineyard" || scene === "wineshop");
 }
@@ -3017,7 +3017,7 @@ function orderNote(orders, shop, till){
   if (!orders || !orders.length || Date.now() - (S.orderAt || 0) < 150000) return; S.orderAt = Date.now();
   const o = orders[orders.length - 1], names = ORDER_WHO.map(id => NPCS.find(n => n.id === id)).filter(Boolean), who = names.length ? pick(names).name : "A neighbour";
   const where = o.picnic ? ` to a picnic on ${pick(["the field", "the foreshore", "the edge of the woods"])}` : pick([" to their door", " to the town square", " round to the lane", ""]);
-  sfx("coin"); flash(`${shop} order: ${who}, ${o.what}${where} (+${o.coins}${till ? " in the till" : ""})`);
+  sfx("coin"); flash(`${shop} order: ${who}, ${o.what}${where} (+${o.coins}${till ? " in the honesty box" : ""})`);
   // and Tomo pedals past on the mint bike, if Mel's outdoors in Honeybrook (round 138)
   if (outside() && !townOf(scene) && !sup) { const t = NPCS.find(n => n.id === "tomo"), b = bounds(); if (t) rideBy(t.look, Math.max(b[1] + 20, Math.min(b[3] - 10, mel.y + (mel.y + 70 < b[3] ? 70 : -60)))); }
 }
