@@ -94,7 +94,15 @@ export function buy(F, id){
 }
 export function plantVine(F, r, i, kind){
   const v = vineState(F), row = v.rows[r]; if (!row || !row.trellis || row.vines[i] || !(v.cuttings[kind] > 0)) return null;
-  v.cuttings[kind]--; row.vines[i] = {v: kind, planted: Date.now(), wateredAt: null}; return `A ${kind} vine, planted. Give it some water.`;
+  v.cuttings[kind]--; row.vines[i] = {v: kind, planted: Date.now(), wateredAt: null}; return `A ${gName(kind)} vine, planted. Give it some water.`;
+}
+// dig a vine up (round 147, Mel): the cutting goes back in the box to plant somewhere else (another kind can go in
+// its place); if it was ripe, its grapes are picked first
+export function uprootVine(F, r, i){
+  const v = vineState(F), row = v.rows[r], vn = row && row.vines[i]; if (!vn) return null;
+  const ripe = growth(vn) >= 1 ? BUNCHES : 0; if (ripe) v.grapes[vn.v] += ripe;
+  v.cuttings[vn.v] = (v.cuttings[vn.v] || 0) + 1; row.vines[i] = null;
+  return `You dig the ${gName(vn.v)} vine up carefully, roots and all, and wrap it in damp sacking: the cutting's back in the box to plant again.${ripe ? ` (You picked its ${ripe} ripe bunches first.)` : ""}`;
 }
 export function waterVines(F, r){ const v = vineState(F), row = v.rows[r]; let n = 0; (row ? row.vines : []).forEach(vn => { if (vn && !vn.wateredAt) { vn.wateredAt = Date.now(); n++; } }); return n ? `Watered ${n} vine${n > 1 ? "s" : ""}. Ripe in about six hours.` : null; }
 export function harvestVine(F, r, i, opts = {}){
@@ -278,7 +286,8 @@ export function vinePanel(F, r, i){
   const g = growth(vn);
   return h + `<p class="sub">A ${vn.v === "red" || vn.v === "white" ? vn.v + " grape" : GRAPE_N[vn.v] || vn.v} vine. ${!vn.wateredAt ? "Thirsty! Water it and it starts fruiting." : g >= 1 ? "Heavy with ripe grapes!" : `Ripening: ready in about ${hrs(GROW*(1 - g))}.`}</p>
     ${vn.wateredAt ? `<span class="clbar"><i style="width:${Math.round(g*100)}%"></i></span>` : ""}
-    <div class="actions">${!vn.wateredAt ? `<button class="btn primary small" data-vy="water">Water the row</button>` : g >= 1 ? `<button class="btn primary small" data-vy="harvest">Pick the grapes</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
+    <div class="actions">${!vn.wateredAt ? `<button class="btn primary small" data-vy="water">Water the row</button>` : g >= 1 ? `<button class="btn primary small" data-vy="harvest">Pick the grapes</button>` : ""}<button class="btn alt small" data-vy="uproot">Dig it up</button><button class="btn alt small" data-close="1">Close</button></div>
+    <p class="muted">Digging it up puts the cutting back in your box, so you can plant a different grape here${g >= 1 ? " (its ripe grapes are picked first)" : ""}.</p>`;
 }
 export function stallPanel(F){
   const v = vineState(F);
@@ -400,6 +409,7 @@ export function wireVine(root, F, api){
     const k = b.dataset.vy, i = +b.dataset.i; let line = null;
     if (k === "plant") line = plantVine(F, api.r, api.i, b.dataset.k);
     else if (k === "water") { line = waterVines(F, api.r); if (line) api.sfx("tap"); }
+    else if (k === "uproot") { line = uprootVine(F, api.r, api.i); if (line) api.sfx("paper"); }
     else if (k === "harvest") { line = harvestVine(F, api.r, api.i, {harvest: api.harvest}); if (line) api.sfx("coin"); }
     else if (k === "fill") { line = fillBarrel(F, i, b.dataset.k); if (line) api.sfx("paper"); }
     else if (k === "takegr") { const v = vineState(F), c = b.dataset.k, n = Math.min(+b.dataset.n, v.grapes[c]); if (n > 0) { v.grapes[c] -= n; F.inv = F.inv || {}; F.inv["grape_" + c] = (F.inv["grape_" + c] || 0) + n; line = `${n} bunch${n > 1 ? "es" : ""} of ${c} grapes into your backpack.`; api.sfx("paper"); } }

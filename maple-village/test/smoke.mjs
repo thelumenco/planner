@@ -3488,6 +3488,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const realNow = Date.now, t0 = Date.parse("2026-10-11T07:00:00Z"); Date.now = () => t0; v.lastTick = t0 - 180*60000; const out = vy.sellTick(F, {}); Date.now = realNow;
   check(out && out.lunchB >= 6 && out.lunchB <= 30 && v.today.lunchB === out.lunchB, `three hours of lunch: ${out && out.lunchB} bottles to the table`);
   check(80 - v.shelf.reduce((n, x) => n + x.n, 0) >= out.lunchB, "the bottles come off the shelves");
+  { const G = {coins: 0, inv: {}}, gv = vy.vineState(G); gv.cuttings.pinot = 1; gv.pinot = true; vy.plantVine(G, 0, 0, "red");
+    check(vy.uprootVine(G, 0, 0) && !gv.rows[0].vines[0] && gv.cuttings.red === 1 && vy.plantVine(G, 0, 0, "pinot") && gv.rows[0].vines[0].v === "pinot", "dig a vine up (the cutting goes back in the box) and plant a different grape in its place"); }
   // in the browser: through the glass doors, the book, the long table, and back
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`terrace pageerror: ${e.message}`));
