@@ -248,5 +248,35 @@ export const TL_ROADS = [["bv_lookout", "bv_falls"], ["bv_falls", "bv_crater"], 
 export const TL_NAMES = {tf_top: "Misty Falls", tf_pool: "Misty Falls: the swimming hole", tk_shore: "Crater Lake", tk_fig: "Crater Lake: the curtain fig",
   tr_street: "Willow Bend", tr_creek: "Willow Bend: the creek", td_yard: "Greenhill Dairy", td_paddock: "Greenhill Dairy: the paddock",
   tm_shed: "Nutwood Farm", tm_grove: "Nutwood Farm: the macadamia grove", tg_station: "Kingsreef", tg_street: "Kingsreef: the main street"};
-export const TL_GOODS = {};
-export const TL_KEEP = {};
+// Round 158: what the Tablelands' rooms sell (TOWN_GOODS, by room; merged in data/bellbird.js). Macadamias and finger
+// limes go in the larder, the gelato and the bonbons (new, from Nutwood Farm); the gold pan is for the creek at
+// Kingsreef; the gold fleck and the steam train ticket are keepsakes you earn there (game/tlacts.js).
+export const TL_GOODS = {
+  b_rosella: {n: "A jar of rosella jam", kind: "gift", to: ["mama", "mum", "gonggong"], price: 6, shop: "bv_tcafe", art: ["jar", "#B8243A", "#F3E7C8"], say: "Rosella jam! Ruby red and a bit tart, like rhubarb and raspberries. On scones, tomorrow morning."},
+  b_cassowary: {n: "A plush cassowary", kind: "gift", to: ["evan", "angelina", "mama"], price: 9, shop: "bv_tranger", art: ["plush", "#2F2B28"], say: "A cassowary! Black and fluffy with a blue neck and a little helmet. Evan's named it Boss."},
+  b_seedpod: {n: "A rainforest seed pod", kind: "keepsake", price: 3, shop: "bv_tranger", art: ["wedge", "#8A6A42", "#C9A06A"], line: "A big woody seed pod from the rainforest floor at Misty Falls, split open like a little boat. The ranger said keep it, there are plenty."},
+  b_fallsprint: {n: "A painting of the falls", kind: "keepsake", price: 18, shop: "bv_tgallery", art: ["tile", "#CFE8F0", "#7FA868"], line: "A small painting of Misty Falls in the morning mist, from the gallery by the swimming hole. The rainbow's in it."},
+  b_claybird: {n: "A clay kingfisher", kind: "gift", to: ["mum", "mama", "angelina"], price: 10, shop: "bv_tgallery", art: ["bird", "#3E86AE"], say: "A little clay kingfisher, bright blue and orange! It's going on the windowsill where it can see the garden."},
+  b_lakecap: {n: "A Crater Lake cap", kind: "gift", to: ["dad", "darren", "marcus"], price: 6, shop: "bv_tboat", art: ["beanie", "#3E86AE"], say: "A cap with a little kayak on it! Very sporty. I'll wear it to the shops."},
+  b_cedarbowl: {n: "A red cedar bowl", kind: "gift", to: ["mum", "mama", "dad"], price: 16, shop: "bv_tturner", art: ["bowl", "#A8574A"], say: "A bowl turned from red cedar! Feel how smooth. It's going on the table, for fruit. Only the good fruit."},
+  b_spoon: {n: "A silky oak spoon", kind: "gift", to: "family", price: 5, shop: "bv_tturner", art: ["sticks", "#C9A06A"], say: "A wooden spoon, carved from silky oak. Look at the grain! Too nice to stir with. I'll stir with it anyway."},
+  b_lamingtons: {n: "A box of lamingtons", kind: "gift", to: "family", price: 6, shop: "bv_tbakery", art: ["box", "#8A5A3A", "#F6F1E8"], say: "Lamingtons! Sponge, chocolate and coconut. I'm having one now and the rest after dinner. Maybe."},
+  b_lollies: {n: "A paper bag of lollies", kind: "gift", to: ["evan", "mama", "darren"], price: 3, shop: "bv_tlolly", art: ["bag", "#F3C969", "#E8566C"], say: "A whole bag of lollies! Snakes, raspberries, freckles and a musk stick. Sharing. Probably."},
+  b_freckles: {n: "A jar of chocolate freckles", kind: "gift", to: ["angelina", "mum", "gonggong"], price: 5, shop: "bv_tlolly", art: ["jar", "#5A3A2A", "#F4C7CF"], say: "Freckles! Little chocolate buttons with hundreds and thousands. Exactly like when I was small."},
+  b_oldbook: {n: "A second-hand book", kind: "gift", to: ["angelina", "gonggong", "dad", "mum"], price: 4, shop: "bv_tbooks", art: ["box", "#3E6B8C", "#E8D9B8"], say: "An old book with someone's name written inside the cover, from 1962. I love it already."},
+  b_bushpoems: {n: "A book of bush poems", kind: "keepsake", price: 6, shop: "bv_tbooks", art: ["box", "#A8443A", "#C9A24A"], line: "A battered little book of bush poems from the book barn at Willow Bend: droving and drought and rain on a tin roof. Someone's pressed a wattle flower in it."},
+  b_cheddar: {n: "A wheel of Greenhill vintage", kind: "gift", to: ["dad", "gonggong", "mama", "darren"], price: 11, shop: "bv_tcheese", art: ["wheel", "#F3D98A", "#C9A24A"], say: "A little wheel of vintage cheddar from the dairy! Sharp enough to make your eyes water. Perfect."},
+  b_milkbottle: {n: "A glass milk bottle", kind: "keepsake", price: 3, shop: "bv_tshop", art: ["bottle", "#FFFDF6", "#3E86AE"], line: "An old glass milk bottle from Greenhill Dairy, with a cow on it in blue. Mel keeps a few wildflowers in it."},
+  b_cowtowel: {n: "A cow-print tea towel", kind: "gift", to: ["mum", "mama"], price: 6, shop: "bv_tshop", art: ["cloth", "#FFFDF6", "#2F2B28"], say: "A cow-print tea towel! Black and white patches. It moos when you fold it. (It doesn't.)"},
+  macadamia: {n: "Macadamias", kind: "ingredient", price: 6, sell: 3, shop: "bv_tcrack", art: ["bag", "#E8D9B8", "#8A6A42"], what: "fresh-cracked from Nutwood Farm: macadamia gelato, a bonbon filling, macadamia honey slice"},
+  b_brittle: {n: "Macadamia brittle", kind: "gift", to: "family", price: 6, shop: "bv_tnutcafe", art: ["box", "#E3B04B", "#E8D9B8"], say: "Macadamia brittle! Golden and crunchy and full of nuts. My teeth are worried. I'm not."},
+  fingerlime: {n: "Finger limes", kind: "ingredient", price: 5, sell: 2, shop: "bv_tpack", art: ["tube", "#9CC45A", "#C9A0C0"], what: "little native limes full of pearls: finger-lime sorbet, prawns with finger lime"},
+  b_macbag: {n: "A bag of roasted macadamias", kind: "gift", to: ["dad", "darren", "gonggong", "marcus"], price: 7, shop: "bv_tpack", art: ["bag", "#D9C49A", "#8A6A42"], say: "Roasted macadamias, salted! The best nut. Don't argue. I'm not sharing. I'm sharing a bit."},
+  b_tlmagnet: {n: "Tablelands fridge magnet", kind: "gift", to: "family", price: 3, shop: "bv_tticket", art: ["disc", "#3E6A4E", "#F3C969"], say: "A little steam train and a waterfall. For the fridge!"},
+  b_teacup: {n: "A rose teacup", kind: "gift", to: ["angelina", "mum", "mama"], price: 8, shop: "bv_tantique", art: ["cup", "#F4C7CF", "#FFFDF6"], say: "A bone china teacup with roses on it, from the antique shop! It's even got its saucer. Tea, now."},
+  b_lantern: {n: "An old railway lantern", kind: "keepsake", price: 16, shop: "bv_tantique", art: ["lantern", "#B8443A", "#F3E3A0"], line: "A red railway lantern from Nugget & Co. in Kingsreef, from the old line. It still lights, with a candle inside."},
+  b_goldpan: {n: "A gold pan", kind: "ingredient", price: 4, sell: 2, shop: "bv_tantique", art: ["plate", "#8A7A6A", "#B9AE9E"], what: "a shallow tin pan for the creek at Kingsreef: swirl, and look for the glint"},
+  b_goldfleck: {n: "A gold fleck in a tiny bottle", kind: "keepsake", price: 0, art: ["bottle", "#E6F2F4", "#F3C969"], line: "A real fleck of gold from the creek at Kingsreef, panned by you (and Evan, he says), in a tiny glass bottle with a cork."},
+  b_steamticket: {n: "A steam train ticket", kind: "keepsake", price: 0, art: ["tile", "#F3E7C8", "#A8443A"], line: "A little card ticket from the Kingsreef steam train, punched by the guard: Kingsreef to Gold Creek Siding and back."}
+};
+export const TL_KEEP = {b_tlmagnet: "A little steam train and a waterfall, from the Tablelands."};
