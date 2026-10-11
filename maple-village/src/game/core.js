@@ -2900,7 +2900,7 @@ function millShopPanel(){
 }
 function millTick(){
   const c = craftState(F), done = craftDone(F); if (done.length) { save(); const msg = done.map(d => `${d.n} ${d.recipe.name.toLowerCase()}`).join(", "); if (scene === "mill" && !quietNow()) speak(`Ready, and onto the shelves: ${msg}.`, 5000); else flash(`At the mill: ${msg}`); }
-  if (owns(F, "mill") && whereIs("ines") === "mill") { const d = inesStep(F, millState(F), vineState(F)); if (d.started || d.pressed || d.infused) { save(); if (scene === "mill" && isHere("ines") && !quietNow()) npcSay("ines", d.infused ? `${d.infused}, steeping. My great-great-grandfather would be proud.` : d.started ? "The crate was full, so in they go. An hour under the stone." : "Bottled! Onto the shelf with them."); } }
+  if (owns(F, "mill") && whereIs("tomi") === "mill") { const d = inesStep(F, millState(F), vineState(F)); if (d.started || d.pressed || d.infused) { save(); if (scene === "mill" && isHere("tomi") && !quietNow()) npcSay("tomi", d.infused ? `${d.infused}, steeping. Six hours. I'll count.` : d.started ? "The crate was full, so in they go. An hour under the stone." : "Bottled! Onto the shelf with them."); } }
   // sales, minute by minute since the last look (at most a day): the Mill Shop, or the wine shop's little shelf
   const now = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(c.at || now, now - 864e5); let coins = 0, n = 0;
   for (let at = from + 60000; at <= now; at += 60000) { const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();

@@ -2176,8 +2176,8 @@ Write the proposal for Mel covering every item below. Only build after she says 
   - **Ingredients:** lavender and rose are Ma Ma's bouquets (`bq_lavender`, `bq_rose`); herbs come from the greenhouse.
   - **Recipes as items:** each recipe becomes an item `mc_<id>` via `registerCraft` (sells for more than plain oil).
   - **Shelves:** finished goods go to `F.craft.store` (the mill's shelves), and Mel can take some.
-- **Ines:** an afternoon slot at the mill (`needs: "mill"`).
-  - `inesStep` presses the olive crate (≥3) into the mill's own bottles (`c.oil`), and infuses from the herb basket using found recipes.
+- **Tomi** (new villager, Ines's little brother): at the mill 10 to 5, every day but Sunday (`needs: "mill"`). Ines stays on the vines.
+  - `inesStep` (Tomi's step; the name is historical) presses the olive crate (≥3) into the mill's own bottles (`c.oil`), and infuses from the herb basket using found recipes.
   - Mel's manual pressing still goes to her backpack.
 - **The Mill Shop:**
   - Goal `millshop` (1200, needs mill), bought at the dusty ground floor counter (millspot "shop").

@@ -162,11 +162,20 @@ export const NPCS = [
     intro: "Hi! I'm Ines. Summers here, winters dreaming about here. I'm in charge of the trellises, and of telling Marco to take a break.",
     look: {skin: "#E8B996", hair: "#7A3B22", hairStyle: "long", top: "#F3C969", bottom: "#5E6E8C"},
     routine: [slot("9:00", "13:00", "vineyard", [[262, 440], [340, 490], [418, 390], [230, 420], [450, 470]], {act: "farm"}),
-      slot("14:00", "17:30", "mill", [[300, 520], [300, 250]], {needs: "mill"}),   // round 153: afternoons at the mill, pressing the crate and infusing oil (millcraft.js)
       slot("14:00", "17:30", "vineyard", [[262, 490], [340, 390], [418, 440], [190, 430]], {act: "water"})],
     lines: ["The rosé grapes are my favourite. Don't tell the others.", "Sun's out, vines are happy.", "Every trellis in this row, I tied myself.", "Smell that? That's next year's wine."],
     actLines: {water: ["Just watering. We'll pick the ripe ones.", "Hydrated vines, happy vines."], farm: ["Tidying the trellis.", "Pruning a little. Shh, it doesn't hurt."]},
     away: "Ines is off for the day."
+  },
+  // round 153: Tomi, Ines's little brother (named after Tomás, who planted the olive by the mill in 1912), works the
+  // mill once it's open: presses the olive crate and steeps the infused oils, 10 to 5, every day but Sunday
+  {
+    id: "tomi", pitch: 1.1, name: "Tomi", job: "Works the press at the old mill (Ines's little brother)",
+    intro: "Tomi. Ines's brother, the one named after the great-great-grandfather. So the mill's sort of a family thing. I press, I steep, I sweep up the olive stones.",
+    look: {skin: "#E8B996", hair: "#5A2E1A", hairStyle: "spiky", top: "#7FA35A", bottom: "#4F5A6A", extra: "apron"},
+    routine: [slot("9:30", "10:00", "hlane", [[300, 300], [240, 320]], {needs: "mill", dow: [1, 2, 3, 4, 5, 6]}), slot("10:00", "17:00", "mill", [[300, 520], [300, 250], [380, 520]], {needs: "mill", dow: [1, 2, 3, 4, 5, 6]})],
+    lines: ["Three jars to a bottle. Every time. The stone doesn't lie.", "Rosemary oil's steeping. Six hours. I count.", "T.R. 1912. Ines thinks I carved it. I didn't. Probably.", "Smell that? Green and peppery. That's a good pressing."],
+    away: "Tomi's finished at the mill for the day."
   },
   // round 153: Hazel runs the Mill Shop (once Mel's opened it): every day but Monday, 10 to 5, behind the counter
   // downstairs. She made soap for forty years, and has opinions about lavender

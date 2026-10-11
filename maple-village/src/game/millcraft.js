@@ -9,7 +9,7 @@
 // greenhouse, lavender and roses from Ma Ma's flower farm (her bouquets); fruit from the orchard.
 // What's made goes onto the mill's shelves (the store). Until the Mill Shop's open the wine shop sells a little of it
 // from a "from the mill" shelf by the counter; once it's open, Hazel sells it all day downstairs. Mel can take things
-// for herself or to give away. And Ines, in the afternoons, presses whatever's in the olive crate into the mill's own
+// for herself or to give away. And Tomi (Ines's little brother), at the mill 10 to 5 but Sundays, presses whatever's in the olive crate into the mill's own
 // bottles, and infuses oil from the herb basket (Mel leaves herbs there) using the recipes Mel's found.
 // State: F.craft = {recipes: [{id, kind, base, adds, name}], steep: [{id, start, dur}], cure: [{id, start, dur}],
 //   pot: {id, start, dur} | null, store: {itemId: n}, basket: {herb: n}, oil: n (the mill's own plain bottles), sold}
@@ -24,7 +24,7 @@ export const HERB = {
   raspberry: {n: "Raspberries", col: "#C2334D", soap: true}, honey: {n: "Honey", col: "#E3B04B", soap: true, lotion: true},
   bq_lavender: {n: "Lavender", col: "#A68FCB", oil: true, soap: true, lotion: true}, bq_rose: {n: "Rose", col: "#E8A0B4", soap: true, lotion: true}
 };
-export const KINDS = {oil: {n: "Infused oils", max: 2, price: 26, sell: 22}, soap: {n: "Soaps", max: 2, price: 8, sell: 6}, lotion: {n: "Lotions", max: 1, price: 14, sell: 11}};
+export const KINDS = {oil: {n: "Infused oils", max: 2, price: 28, sell: 24}, soap: {n: "Soaps", max: 2, price: 8, sell: 6}, lotion: {n: "Lotions", max: 1, price: 16, sell: 13}};   // (every recipe sells for more than its ingredients cost: smoke test)
 export function craftState(F){ F.craft = F.craft || {}; const c = F.craft; c.recipes = c.recipes || []; c.steep = c.steep || []; c.cure = c.cure || []; if (!("pot" in c)) c.pot = null;
   c.store = c.store || {}; c.basket = c.basket || {}; c.oil = c.oil || 0; c.sold = c.sold || {}; return c; }
 const keyOf = (kind, base, adds) => `${kind}_${base ? base + "_" : ""}${[...adds].sort().join("-")}`;
@@ -39,7 +39,7 @@ export function registerCraft(F){ craftState(F).recipes.forEach(r => { const k =
     say: r.kind === "oil" ? `Your own ${r.name.toLowerCase()}! On bread, tonight. Thank you!` : r.kind === "soap" ? `Handmade ${r.name.toLowerCase()}? It smells beautiful.` : `${r.name}! My hands needed this. Thank you.`}; }); }
 const have = (F, id) => (F.inv || {})[id] || 0;
 const take = (F, id, n = 1) => { F.inv[id] -= n; if (F.inv[id] <= 0) delete F.inv[id]; };
-// plain oil for infusing: the backpack first, then the mill's own bottles (Ines's pressing)
+// plain oil for infusing: the backpack first, then the mill's own bottles (Tomi's pressing)
 const oilHave = (F, c) => have(F, "oliveoil") + c.oil;
 const useOil = (F, c, n) => { const a = Math.min(n, have(F, "oliveoil")); if (a) take(F, "oliveoil", a); c.oil -= n - a; };
 // make something: kind oil|soap|lotion, base (soap: goatmilk|oliveoil), adds from the backpack -> {recipe, fresh, msg}
@@ -71,8 +71,8 @@ export const storeCount = c => Object.values(c.store).reduce((a, b) => a + b, 0)
 export function takeFromStore(F, id, n = 1){ const c = craftState(F), k = Math.min(n, c.store[id] || 0); if (!k) return 0; c.store[id] -= k; if (!c.store[id]) delete c.store[id]; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + k; return k; }
 export function toBasket(F, herb, n = 99){ const c = craftState(F), k = Math.min(n, have(F, herb)); if (!HERB[herb] || !k) return 0; take(F, herb, k); c.basket[herb] = (c.basket[herb] || 0) + k; return k; }
 
-/* ---------- Ines at the press, and Hazel at the shop (both on the clock) ---------- */
-// Ines (afternoons, once the mill's open): presses the olive crate into the mill's bottles, and starts an infusion
+/* ---------- Tomi at the press, and Hazel at the shop (both on the clock) ---------- */
+// Tomi (10 to 5, not Sundays, once the mill's open): presses the olive crate into the mill's bottles, and starts an infusion
 // from the herb basket when there's oil and a free jar (a recipe Mel's found, the one with the most herbs to hand)
 export const PRESSER = {from: 14*60, to: 17*60 + 30}, SHOPKEEP = {from: 10*60, to: 17*60, closed: [1]};
 export function inesStep(F, m, v, t = Date.now()){
@@ -104,9 +104,9 @@ export function benchPanel(F, st = {}, o = {}){
     return h + `<p class="sub">Everything made, on the mill's shelves. ${o.shop ? "Hazel sells from here, downstairs." : "The wine shop sells a little of it from a shelf by the counter: open the Mill Shop downstairs to sell it all day."} Take some for yourself, or to give away.</p>
       ${ids.length ? `<ul class="hlist wlist">${ids.map(id => `<li><span class="wtxt"><b>${esc(ITEMS[id] ? ITEMS[id].n : id)}</b><small>${c.store[id]} on the shelf · ${ITEMS[id] ? ITEMS[id].price : "?"} coins each</small></span><button class="btn small alt" data-mc="takeit:${id}">Take one</button></li>`).join("")}</ul>` : `<p class="muted">Nothing on the shelves yet.</p>`}
       ${c.steep.length || c.cure.length || c.pot ? `<p class="eyebrow" style="margin:10px 0 6px">On the go</p><ul class="hlist wlist">${jobs(c.steep, "steeping")}${jobs(c.cure, "curing")}${c.pot ? jobs([c.pot], "warming") : ""}</ul>` : ""}
-      <p class="muted">Plain oil in the mill: ${c.oil} bottle${c.oil === 1 ? "" : "s"}${o.ines ? " (Ines presses the olive crate in the afternoons)" : ""}.</p>` + shut; }
+      <p class="muted">Plain oil in the mill: ${c.oil} bottle${c.oil === 1 ? "" : "s"}${o.ines ? " (Tomi presses the olive crate while he's in)" : ""}.</p>` + shut; }
   if (tab === "basket") { const herbs = Object.keys(HERB).filter(a => HERB[a].oil), inBag = herbs.filter(a => have(F, a));
-    return h + `<p class="sub">Leave herbs here and Ines will infuse oil with them in the afternoons, using the oils you've worked out. ${Object.keys(c.basket).length ? `In the basket: ${Object.entries(c.basket).map(([a, n]) => `${n} ${esc(nm(a).toLowerCase())}`).join(", ")}.` : "The basket's empty."}</p>
+    return h + `<p class="sub">Leave herbs here and Tomi will infuse oil with them while he's in, using the oils you've worked out. ${Object.keys(c.basket).length ? `In the basket: ${Object.entries(c.basket).map(([a, n]) => `${n} ${esc(nm(a).toLowerCase())}`).join(", ")}.` : "The basket's empty."}</p>
       ${inBag.length ? `<div class="actions">${inBag.map(a => `<button class="btn small alt" data-mc="basket:${a}">${dots([a])} Put in ${have(F, a)} ${esc(nm(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">No herbs in your backpack: rosemary, garlic, basil, thyme and chives from the greenhouse; lemons and oranges from Ma Ma's orchard; lavender from her flower farm.</p>`}` + shut; }
   const ok = HERB_OF(tab), base = st.base || "goatmilk", pick = st.adds || [];
   const busy = tab === "oil" ? c.steep.length >= CRAFT.jars : tab === "soap" ? c.cure.length >= CRAFT.rack : !!c.pot;
