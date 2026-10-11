@@ -537,7 +537,7 @@ export function trolleyPanel(F, st = {}){
 // pedals it round: a cup or a cone from the Scoop Shack's display (never floats or waffles: they'd melt), chocolates
 // from the Cocoa Room's case and wall, and tapas, small plates and bottles from the winery (picnics too). Each order
 // uses real stock and pays the shop's price plus a delivery fee. On top of the shops' own sales.
-export const DELIVERY = {fee: 2, scoop: .022, cocoa: .018, winery: .02};
+export const DELIVERY = {fee: 2, scoop: .045, cocoa: .036, winery: .04};   // doubled (Mel: "Tomo doesn't seem to be delivering much"): about two to three an hour from each shop, when there's stock
 export const bikeOwned = F => !!(F.scoop && F.scoop.up && F.scoop.up.bike);
 function deliverMinute(s, day, hm){
   if (!hasUp(s, "bike") || !openNow(hm) || Math.random() >= DELIVERY.scoop) return null;

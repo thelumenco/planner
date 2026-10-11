@@ -1103,6 +1103,9 @@ function myWins(){
   if (y && y.q) w.push(`${y.q} quest${y.q > 1 ? "s" : ""} finished yesterday`);
   if (F.streak >= 2) w.push(`${F.streak} cosy days in a row with ${F.name}`);
   if (S.harvested) w.push(`${S.harvested} harvest${S.harvested > 1 ? "s" : ""} from the garden today`);
+  if (F.scoop && F.scoop.up && F.scoop.up.bike) { const sg = new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8*H).toISOString().slice(0, 10), v = vineState(F);
+    const n = (((scoopState(F).sold || {})[sg] || {}).deliv || 0) + (((cocoaState(F).sold || {})[sg] || {}).deliv || 0) + (v.today && v.today.day === sg ? v.today.deliv || 0 : 0);
+    if (n) w.push(`Tomo delivered ${n} order${n > 1 ? "s" : ""} on the bike today`); }
   APP_IDS.forEach(a => { const h = health(a); if (h && h.status === "green") w.push(`${APP_NAME[a]}: all checks green last night`); });
   if (ST.chord && ST.chord.users) w.push(`Chord is home to ${ST.chord.users} ${ST.chord.label || "studios"}`);
   if (ST.chico && ST.chico.users) w.push(`${ST.chico.users} ${ST.chico.label || "families"} use Chico`);
