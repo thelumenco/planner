@@ -2312,3 +2312,4 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - mulled.js: `m.rack` (the spice rack beside the pot, shown all year, even off-season): `toRack`; the pot takes from the backpack first, then the rack. storage.js can send spices there ("rack"); the pot panel gets the "At home, waiting" line.
 - Mulled wine itself still starts on 20 November (Mel's season: late November to Boxing Day).
 - Round 170: the bench's Basket tab lists each thing in the basket (icon, count) with Take 1 / All (`fromBasket`, data-mc="unbasket:id:n").
+- Round 171: the spice rack lists each spice with Take 1 / All (`fromRack`, data-mull="unrack:id:n").

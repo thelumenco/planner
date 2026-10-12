@@ -14655,9 +14655,18 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     m.rack[id] = (m.rack[id] || 0) + k;
     return k;
   }
+  function fromRack(F2, id, n = 99) {
+    const m = mullState(F2), k = Math.min(n, m.rack[id] || 0);
+    if (!k) return 0;
+    m.rack[id] -= k;
+    if (m.rack[id] <= 0) delete m.rack[id];
+    F2.inv = F2.inv || {};
+    F2.inv[id] = (F2.inv[id] || 0) + k;
+    return k;
+  }
   var rackHTML = (F2, m) => {
     const on = Object.keys(m.rack).filter((a) => m.rack[a] > 0), bag2 = Object.keys(ADDS).filter((a) => ADDS[a].spice && (F2.inv || {})[a] > 0);
-    return `<p class="eyebrow" style="margin:12px 0 6px">The spice rack</p><p class="muted">${on.length ? on.map((a) => `${m.rack[a]} ${esc(ADDS[a].n.toLowerCase())}`).join(", ") + "." : "Empty jars, for now."}</p>` + (bag2.length ? `<div class="actions">${bag2.map((a) => `<button class="btn small alt" data-mull="rack:${a}">Put ${F2.inv[a]} ${esc(ADDS[a].n.toLowerCase())} on the rack</button>`).join("")}</div>` : "");
+    return `<p class="eyebrow" style="margin:12px 0 6px">The spice rack</p>${on.length ? `<ul class="hlist wlist">${on.map((a) => `<li><span class="wpic">${icon(a, 28)}</span><span class="wtxt"><b>${esc(ADDS[a].n)}</b><small>${m.rack[a]} on the rack</small></span><span class="orbtns"><button class="btn small alt" data-mull="unrack:${a}:1">Take 1</button><button class="btn small alt" data-mull="unrack:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">Empty jars, for now.</p>`}` + (bag2.length ? `<p class="eyebrow" style="margin:10px 0 6px">From your backpack</p><div class="actions">${bag2.map((a) => `<button class="btn small alt" data-mull="rack:${a}">Put ${F2.inv[a]} ${esc(ADDS[a].n.toLowerCase())} on the rack</button>`).join("")}</div>` : "");
   };
   var keyOf2 = (adds) => [...adds].sort().join("+");
   var SPECIAL = {
@@ -37248,6 +37257,13 @@ ${SIGNOFF[t2.who] || ""}`;
       if (a === "base") {
         st6.base = v;
         sfx("tap");
+      } else if (a === "unrack") {
+        const k = fromRack(F, v, +b.dataset.mull.split(":")[2] || 99);
+        if (k) {
+          sfx("paper", true);
+          flash(`${k} back into your backpack`);
+          save2();
+        }
       } else if (a === "rack") {
         const k = toRack(F, v);
         if (k) {

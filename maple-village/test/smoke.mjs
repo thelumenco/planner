@@ -3883,6 +3883,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(ml.toRack(F, "sp_clove") === 1 && !F.inv.sp_clove && /spice rack/.test(ml.mullPanel(F, v, {}, "2026-10-12")), "the rack's there all year, even before the season");
     const r = ml.mullStart(F, v, "r", ["sp_cinnamon", "sp_clove", "orange"], "2026-11-21");
     check(r.recipe && r.recipe.name === "The Classic" && F.mull.rack.sp_cinnamon === 1 && !F.mull.rack.sp_clove, "in season, the pot takes spices off the rack: " + (r.recipe ? r.recipe.name : r.msg));
+    check(/data-mull="unrack:sp_cinnamon:1"/.test(ml.mullPanel(F, v, {}, "2026-10-12")) && ml.fromRack(F, "sp_cinnamon") === 1 && F.inv.sp_cinnamon === 1 && !F.mull.rack.sp_cinnamon, "the rack lists its spices, and they can be taken back");
     check(["sp_cinnamon", "sp_clove", "sp_anise", "sp_cardamom", "sp_ginger"].every(id => !/sparkle|M12 2l2/.test(ic.icon(id)) && ic.icon(id) !== ic.icon("nope_x")), "every spice has its own drawing"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`storage pageerror: ${e.message}`));

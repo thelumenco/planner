@@ -84,7 +84,7 @@ import { craftState, craft as millCraft, craftDone, registerCraft, benchPanel as
 import { storePanel, putAway, takeOut, sendOff, storedCount, placeFor, homeNote, SHOPS as STORE_SHOPS, storeState } from "./storage.js";
 import { millUpArt } from "../art/millup.js";
 import { tastePanel, tasteStart, tastePick, tasteNext, tasteDone, finishTaste, tastingNow, workshopNow, workshopPanel, helpWorkshop, WORKSHOP } from "./millcraft.js";
-import { mullPanel, mullStart, mullTick, mullState, mulledSeason, MULL, ADDS as MULL_ADDS, toRack } from "./mulled.js";
+import { mullPanel, mullStart, mullTick, mullState, mulledSeason, MULL, ADDS as MULL_ADDS, toRack, fromRack } from "./mulled.js";
 import { occasionOn, occasionNow, OCC, weddingOn, WED, dancingNow, triviaPanel, triviaStart, triviaAnswer, triviaNext, finishTrivia, TEAM_NAMES, QUIZ, paintPanel, paintStart, paintStep, paintDone, finishPaint, PAINT_PRICE, PAINT_SUBJECTS, comingUpHTML, mothersDay } from "./occasions.js";
 import { cinquePanel, cinqueState, treat as ctTreat, GELATO, FOCACCIA, pestoStart, pestoAdd, pestoPound, pestoDone, finishPesto, harvestStart, pick as ctPick, harvestDone, finishHarvest, TASTE, paintBoat, boatCols } from "./cinque.js";
 import { jejuRoomArt, dyeCloth } from "../art/jeju-rooms.js";
@@ -1911,6 +1911,7 @@ function ctx(){
   // round 153: the mulling pot (mulled.js)
   c.querySelectorAll("[data-mull]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.mull.split(":"), st = mullSt;
     if (a === "base") { st.base = v; sfx("tap"); }
+    else if (a === "unrack") { const k = fromRack(F, v, +b.dataset.mull.split(":")[2] || 99); if (k) { sfx("paper", true); flash(`${k} back into your backpack`); save(); } }
     else if (a === "rack") { const k = toRack(F, v); if (k) { sfx("paper", true); flash(`${k} ${MULL_ADDS[v].n.toLowerCase()}, onto the spice rack`); save(); } }
     else if (a === "add") { st.adds = st.adds || []; if (st.adds.includes(v)) st.adds = st.adds.filter(x => x !== v); else if (st.adds.length < MULL.max) st.adds.push(v); sfx("tap"); }
     else if (a === "go" || a === "again") { const vs = vineState(F), adds = a === "again" ? (mullState(F).recipes.find(r => r.id === v) || {adds: []}).adds : st.adds || [], base = a === "again" ? (vs.shelf.find(x => x.n > 0 && MULL.base.includes(x.type)) || {}).id : st.base;

@@ -6,6 +6,7 @@
 // the terrace's occasions (Christmas lunch, New Year's Eve), and the more that's in it, the more a cup costs.
 // State: F.mull = {recipes: [{id, adds, name, col}], pot: {id, start, dur} | null, cups, cupId, price, made}
 import { esc, dayKey } from "../util.js";
+import { icon } from "../art/icons.js";
 
 export const MULL = {cups: 10, dur: 30*60000, base: ["red", "tempranillo", "pinot"], min: 2, max: 3};
 export const ADDS = {
@@ -22,9 +23,10 @@ export const rackable = id => !!ADDS[id];
 const got = (F, m, a) => ((F.inv || {})[a] || 0) + (m.rack[a] || 0);
 const use = (F, m, a) => { if ((F.inv || {})[a] > 0) { F.inv[a]--; if (F.inv[a] <= 0) delete F.inv[a]; } else { m.rack[a]--; if (m.rack[a] <= 0) delete m.rack[a]; } };
 export function toRack(F, id, n = 99){ const m = mullState(F), k = Math.min(n, (F.inv || {})[id] || 0); if (!rackable(id) || !k) return 0; F.inv[id] -= k; if (F.inv[id] <= 0) delete F.inv[id]; m.rack[id] = (m.rack[id] || 0) + k; return k; }
+export function fromRack(F, id, n = 99){ const m = mullState(F), k = Math.min(n, m.rack[id] || 0); if (!k) return 0; m.rack[id] -= k; if (m.rack[id] <= 0) delete m.rack[id]; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + k; return k; }
 const rackHTML = (F, m) => { const on = Object.keys(m.rack).filter(a => m.rack[a] > 0), bag = Object.keys(ADDS).filter(a => ADDS[a].spice && (F.inv || {})[a] > 0);
-  return `<p class="eyebrow" style="margin:12px 0 6px">The spice rack</p><p class="muted">${on.length ? on.map(a => `${m.rack[a]} ${esc(ADDS[a].n.toLowerCase())}`).join(", ") + "." : "Empty jars, for now."}</p>`
-    + (bag.length ? `<div class="actions">${bag.map(a => `<button class="btn small alt" data-mull="rack:${a}">Put ${F.inv[a]} ${esc(ADDS[a].n.toLowerCase())} on the rack</button>`).join("")}</div>` : ""); };
+  return `<p class="eyebrow" style="margin:12px 0 6px">The spice rack</p>${on.length ? `<ul class="hlist wlist">${on.map(a => `<li><span class="wpic">${icon(a, 28)}</span><span class="wtxt"><b>${esc(ADDS[a].n)}</b><small>${m.rack[a]} on the rack</small></span><span class="orbtns"><button class="btn small alt" data-mull="unrack:${a}:1">Take 1</button><button class="btn small alt" data-mull="unrack:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">Empty jars, for now.</p>`}`
+    + (bag.length ? `<p class="eyebrow" style="margin:10px 0 6px">From your backpack</p><div class="actions">${bag.map(a => `<button class="btn small alt" data-mull="rack:${a}">Put ${F.inv[a]} ${esc(ADDS[a].n.toLowerCase())} on the rack</button>`).join("")}</div>` : ""); };
 const keyOf = adds => [...adds].sort().join("+");
 const SPECIAL = {"orange+sp_cinnamon+sp_clove": "The Classic", "apple+sp_cinnamon+sp_ginger": "Apple Pie", "honey+lemon+sp_ginger": "Hot Toddy Mull", "orange+sp_anise+sp_cardamom": "Spice Market",
   "raspberry+sp_cinnamon": "Winter Berry", "honey+orange+sp_clove": "Golden Hour", "apple+honey+sp_cinnamon": "Grandma's Kitchen", "lemon+sp_anise": "Starlight"};
