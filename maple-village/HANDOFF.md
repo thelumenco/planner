@@ -2303,3 +2303,6 @@ Write the proposal for Mel covering every item below. Only build after she says 
 
 ## Round 167: every honey at the mill
 - millcraft.js `HERB` gains honey_lav, honey_blossom, honey_cream, honeycomb (soap only), honey_sun, honey_heath, euchoney: soaps and lotions, never oils. storage.js only offers the herb basket for oil herbs (Tomi only infuses oils).
+
+## Round 168: the mill's basket holds anything the bench uses
+- millcraft.js: `basketable(id)` = any HERB or goat's milk. The bench (`craft`, bench panel counts) takes from the backpack first, then `c.basket` (`got`/`use`). Tomi still only infuses oils from it. Tab renamed "Basket"; storage.js sends anything basketable there ("the mill's basket").

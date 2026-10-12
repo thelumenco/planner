@@ -1905,7 +1905,7 @@ function ctx(){
     else if (a === "make" || a === "again") { const r0 = a === "again" ? craftState(F).recipes.find(r => r.id === v) : null, kind = r0 ? r0.kind : mcSt.tab, base = r0 ? r0.base : mcSt.base || "goatmilk", adds = r0 ? r0.adds : mcSt.adds || [];
       const r = millCraft(F, kind, kind === "soap" ? base : null, adds); speak(r.msg, 5000); if (r.recipe) { sfx("chime"); gainXp(r.fresh ? 2 : 1); if (r.fresh) flash(`New: ${r.recipe.name}`); mcSt = {tab: kind}; save(); drawScene(); } }
     else if (a === "takeit") { if (takeFromStore(F, v, 1)) { sfx("tap"); save(); } }
-    else if (a === "basket") { const k = toBasket(F, v); if (k) { sfx("paper", true); speak(`${k} into the herb basket. Ines will put them to good use.`, 3500); save(); } }
+    else if (a === "basket") { const k = toBasket(F, v); if (k) { sfx("paper", true); speak(`${k} into the mill's basket, ready for the bench.`, 3500); save(); } }
     ctx(); });
   // round 153: the mulling pot (mulled.js)
   c.querySelectorAll("[data-mull]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.mull.split(":"), st = mullSt;

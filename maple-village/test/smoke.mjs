@@ -3869,6 +3869,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(sg.takeOut(F, "fridge", "raspberry", 2) === 2 && F.inv.raspberry === 2 && F.storage.fridge.raspberry === 3, "take some back out");
     check(sg.sendOff(F, "fridge", "raspberry", "scoop") === 3 && F.scoop.fridge.raspberry === 3 && !F.storage.fridge.raspberry && F.inv.raspberry === 2, "send the rest to the Scoop Shack fridge: the backpack's untouched");
     check(sg.shopsFor("raspberry", () => false).map(s => s.k).join() === "scoop,kitchen" && sg.shopsFor("raspberry", () => true).some(s => s.k === "cocoa"), "only shops Mel owns, and that use it, are offered"); }
+  { const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), F = {inv: {honey_lav: 1, goatmilk: 2}, goals: {mill: 1}};
+    sg.putAway(F, "fridge", "honey_lav"); sg.putAway(F, "fridge", "goatmilk");
+    check(sg.shopsFor("honey_lav", () => true).some(s => s.k === "basket") && sg.shopsFor("goatmilk", () => true).some(s => s.k === "basket"), "honey and goat's milk can go to the mill's basket");
+    sg.sendOff(F, "fridge", "honey_lav", "basket"); sg.sendOff(F, "fridge", "goatmilk", "basket");
+    const r = mc.craft(F, "soap", "goatmilk", ["honey_lav"]);
+    check(r.recipe && r.recipe.name === "Lavender honey goat's milk soap" && !F.craft.basket.honey_lav && !F.craft.basket.goatmilk, "the bench makes soap straight from the basket: " + (r.recipe ? r.recipe.name : r.msg)); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`storage pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));

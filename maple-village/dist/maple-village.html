@@ -24588,13 +24588,13 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       }
       if (!openOn(day, hm6, ccUp(c, "assistant"))) continue;
       if (bikeOwned(F2) && deliveryHours(hm6) && Math.random() < DELIVERY.cocoa) {
-        const b0 = out.bonbons || 0, got2 = sellTo(c, day, out, { box: true });
-        if (got2) {
+        const b0 = out.bonbons || 0, got3 = sellTo(c, day, out, { box: true });
+        if (got3) {
           const s = c.sold[day];
           s.coins += DELIVERY.fee;
           out.coins += DELIVERY.fee;
           s.deliv = (s.deliv || 0) + 1;
-          (out.orders = out.orders || []).push({ shop: "cocoa", coins: got2 + DELIVERY.fee, what: (out.bonbons || 0) > b0 ? "a box of bonbons" : "a chocolate bar" });
+          (out.orders = out.orders || []).push({ shop: "cocoa", coins: got3 + DELIVERY.fee, what: (out.bonbons || 0) > b0 ? "a box of bonbons" : "a chocolate bar" });
           scoopState(F2).bikeOut = at2;
           continue;
         }
@@ -24614,8 +24614,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       const d = sg.getUTCDay(), we = d === 0 || d === 6, pf = Math.pow(6 / Math.max(2, c.prices.bar), 1.3);
       const busy2 = (ccUp(c, "window") ? 1.2 : 1) * (ccUp(c, "assistant") ? 1.1 : 1);
       if (Math.random() >= 0.03 * (we ? 1.4 : 1) * (hm6 >= 15 * 60 && hm6 < 18 * 60 ? 1.2 : 1) * (opts.serving ? 1.5 : 1) * pf * busy2) continue;
-      const got = sellTo(c, day, out, { box: ccUp(c, "wrap") });
-      if (got && ccUp(c, "fountain") && Math.random() < 0.25) {
+      const got2 = sellTo(c, day, out, { box: ccUp(c, "wrap") });
+      if (got2 && ccUp(c, "fountain") && Math.random() < 0.25) {
         c.sold[day].coins++;
         c.sold[day].tips = (c.sold[day].tips || 0) + 1;
         out.coins++;
@@ -24953,6 +24953,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (F2.inv[id] <= 0) delete F2.inv[id];
   };
   var oilHave = (F2, c) => have(F2, "oliveoil") + c.oil;
+  var basketable = (id) => !!HERB[id] || id === "goatmilk";
+  var got = (F2, c, id) => have(F2, id) + (c.basket[id] || 0);
+  var use2 = (F2, c, id, n = 1) => {
+    const a = Math.min(n, have(F2, id));
+    if (a) take(F2, id, a);
+    if (n - a) {
+      c.basket[id] -= n - a;
+      if (c.basket[id] <= 0) delete c.basket[id];
+    }
+  };
   var useOil = (F2, c, n) => {
     const a = Math.min(n, have(F2, "oliveoil"));
     if (a) take(F2, "oliveoil", a);
@@ -24962,8 +24972,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const c = craftState(F2), K3 = KINDS3[kind];
     adds = [...new Set(adds)].filter((a) => HERB[a] && HERB[a][kind]);
     if (!K3 || !adds.length || adds.length > K3.max) return { msg: kind === "lotion" ? "One scent for a lotion." : "One or two things to go in." };
-    const pool2 = src === "basket" ? c.basket : F2.inv || {};
-    if (adds.some((a) => !(pool2[a] > 0))) return { msg: "You're missing something for that." };
+    if (adds.some((a) => !((src === "basket" ? c.basket[a] || 0 : got(F2, c, a)) > 0))) return { msg: "You're missing something for that." };
     if (kind === "oil") {
       if (c.steep.length >= CRAFT.jars) return { msg: "All three steeping jars are full." };
       if (oilHave(F2, c) < CRAFT.oilPer) return { msg: "You'll need two bottles of olive oil (press some downstairs)." };
@@ -24971,13 +24980,13 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       base = null;
     } else if (kind === "soap") {
       if (c.cure.length >= CRAFT.rack) return { msg: "The curing rack's full." };
-      if (base === "goatmilk" ? have(F2, "goatmilk") < 2 : oilHave(F2, c) < 1) return { msg: base === "goatmilk" ? "You'll need two goat's milk, from Wildflower Farm." : "You'll need a bottle of olive oil." };
-      if (base === "goatmilk") take(F2, "goatmilk", 2);
+      if (base === "goatmilk" ? got(F2, c, "goatmilk") < 2 : oilHave(F2, c) < 1) return { msg: base === "goatmilk" ? "You'll need two goat's milk, from Wildflower Farm." : "You'll need a bottle of olive oil." };
+      if (base === "goatmilk") use2(F2, c, "goatmilk", 2);
       else useOil(F2, c, 1);
     } else {
       if (c.pot) return { msg: "There's a lotion in the pot already." };
-      if (have(F2, "goatmilk") < 1 || oilHave(F2, c) < 1) return { msg: "A lotion needs a goat's milk and a bottle of olive oil." };
-      take(F2, "goatmilk");
+      if (got(F2, c, "goatmilk") < 1 || oilHave(F2, c) < 1) return { msg: "A lotion needs a goat's milk and a bottle of olive oil." };
+      use2(F2, c, "goatmilk");
       useOil(F2, c, 1);
       base = null;
     }
@@ -24985,7 +24994,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       if (src === "basket") {
         c.basket[a]--;
         if (c.basket[a] <= 0) delete c.basket[a];
-      } else take(F2, a);
+      } else use2(F2, c, a);
     });
     const id = keyOf4(kind, base, adds);
     let r = c.recipes.find((x) => x.id === id), fresh2 = false;
@@ -25031,7 +25040,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function toBasket(F2, herb2, n = 99) {
     const c = craftState(F2), k = Math.min(n, have(F2, herb2));
-    if (!HERB[herb2] || !k) return 0;
+    if (!basketable(herb2) || !k) return 0;
     take(F2, herb2, k);
     c.basket[herb2] = (c.basket[herb2] || 0) + k;
     return k;
@@ -25101,7 +25110,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   function benchPanel2(F2, st6 = {}, o = {}) {
     const c = craftState(F2), tab = st6.tab || "oil", K3 = KINDS3[tab] || null;
-    let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The workbench</h2><div class="tabs" role="tablist">${[["oil", "Oils"], ["soap", "Soaps"], ["lotion", "Lotions"], ["shelves", "Shelves"], ["basket", "Herb basket"]].map(([k, n]) => `<button role="tab" data-mc="tab:${k}" aria-selected="${k === tab}">${n}</button>`).join("")}</div>`;
+    let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The workbench</h2><div class="tabs" role="tablist">${[["oil", "Oils"], ["soap", "Soaps"], ["lotion", "Lotions"], ["shelves", "Shelves"], ["basket", "Basket"]].map(([k, n]) => `<button role="tab" data-mc="tab:${k}" aria-selected="${k === tab}">${n}</button>`).join("")}</div>`;
     const jobs = (list5, what) => list5.map((j) => {
       const r = c.recipes.find((x) => x.id === j.id) || { name: "?" };
       return `<li><span class="wtxt"><b>${esc(r.name)}</b><small>${what} · ready in ${mins(left4(j))}</small></span></li>`;
@@ -25114,9 +25123,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       <p class="muted">Plain oil in the mill: ${c.oil} bottle${c.oil === 1 ? "" : "s"}${o.ines ? " (Tomi presses the olive crate while he's in)" : ""}.</p>` + shut7;
     }
     if (tab === "basket") {
-      const herbs = Object.keys(HERB).filter((a) => HERB[a].oil), inBag2 = herbs.filter((a) => have(F2, a));
-      return h3 + `<p class="sub">Leave herbs here and Tomi will infuse oil with them while he's in, using the oils you've worked out. ${Object.keys(c.basket).length ? `In the basket: ${Object.entries(c.basket).map(([a, n]) => `${n} ${esc(nm3(a).toLowerCase())}`).join(", ")}.` : "The basket's empty."}</p>
-      ${inBag2.length ? `<div class="actions">${inBag2.map((a) => `<button class="btn small alt" data-mc="basket:${a}">${dots2([a])} Put in ${have(F2, a)} ${esc(nm3(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">No herbs in your backpack: rosemary, garlic, basil, thyme and chives from the greenhouse; lemons and oranges from Ma Ma's orchard; lavender from her flower farm.</p>`}` + shut7;
+      const herbs = [...Object.keys(HERB), "goatmilk"], inBag2 = herbs.filter((a) => have(F2, a)), bn = (a) => a === "goatmilk" ? "Goat's milk" : nm3(a);
+      return h3 + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk. The bench takes from it as well as your backpack, and Tomi infuses oil with the herbs while he's in, using the oils you've worked out. ${Object.keys(c.basket).length ? `In the basket: ${Object.entries(c.basket).map(([a, n]) => `${n} ${esc(bn(a).toLowerCase())}`).join(", ")}.` : "The basket's empty."}</p>
+      ${inBag2.length ? `<div class="actions">${inBag2.map((a) => `<button class="btn small alt" data-mc="basket:${a}">${a === "goatmilk" ? "" : dots2([a])} Put in ${have(F2, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack: rosemary, garlic, basil, thyme and chives from the greenhouse; lemons and oranges from Ma Ma's orchard; lavender from her flower farm.</p>`}` + shut7;
     }
     const ok = HERB_OF(tab), base = st6.base || "goatmilk", pick5 = st6.adds || [];
     const busy2 = tab === "oil" ? c.steep.length >= CRAFT.jars : tab === "soap" ? c.cure.length >= CRAFT.rack : !!c.pot;
@@ -25125,13 +25134,13 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (now3.length) h3 += `<ul class="hlist wlist">${jobs(now3, tab === "oil" ? "steeping" : tab === "soap" ? "curing" : "warming")}</ul>`;
     const known2 = c.recipes.filter((r) => r.kind === tab);
     if (known2.length) h3 += `<p class="eyebrow" style="margin:10px 0 6px">Make one you know</p><ul class="hlist wlist">${known2.map((r) => {
-      const can = !busy2 && r.adds.every((a) => have(F2, a));
+      const can = !busy2 && r.adds.every((a) => got(F2, c, a));
       return `<li><span class="wtxt"><b>${esc(r.name)}</b><small>${dots2(r.adds)} ${ITEMS[itemId2(r)] ? ITEMS[itemId2(r)].price : ""} coins each</small></span><button class="btn small ${can ? "primary" : "alt"}" data-mc="again:${r.id}" ${can ? "" : "disabled"}>Make</button></li>`;
     }).join("")}</ul>`;
     if (busy2) return h3 + `<p class="muted">${tab === "oil" ? "All three jars are steeping." : tab === "soap" ? "The rack's full of curing soap." : "The lotion pot's on."}</p>` + shut7;
-    if (tab === "soap") h3 += `<p class="eyebrow" style="margin:10px 0 6px">The base</p><div class="gchips">${[["goatmilk", `Goat's milk (${have(F2, "goatmilk")})`], ["oliveoil", `Olive oil (${oilHave(F2, c)})`]].map(([k, n]) => `<button class="gchip${base === k ? " on" : ""}" data-mc="base:${k}" aria-pressed="${base === k}">${esc(n)}</button>`).join("")}</div>`;
-    const inBag = ok.filter((a) => have(F2, a));
-    h3 += `<p class="eyebrow" style="margin:10px 0 6px">${tab === "lotion" ? "The scent (one)" : "What goes in (one or two)"}</p>${inBag.length ? `<div class="gchips">${inBag.map((a) => `<button class="gchip${pick5.includes(a) ? " on" : ""}" data-mc="add:${a}" aria-pressed="${pick5.includes(a)}"><i class="mulldot" style="background:${HERB[a].col}"></i>${esc(nm3(a))} (${have(F2, a)})</button>`).join("")}</div>` : `<p class="muted">Nothing for these in your backpack yet: ${ok.map((a) => nm3(a).toLowerCase()).join(", ")}.</p>`}`;
+    if (tab === "soap") h3 += `<p class="eyebrow" style="margin:10px 0 6px">The base</p><div class="gchips">${[["goatmilk", `Goat's milk (${got(F2, c, "goatmilk")})`], ["oliveoil", `Olive oil (${oilHave(F2, c)})`]].map(([k, n]) => `<button class="gchip${base === k ? " on" : ""}" data-mc="base:${k}" aria-pressed="${base === k}">${esc(n)}</button>`).join("")}</div>`;
+    const inBag = ok.filter((a) => got(F2, c, a));
+    h3 += `<p class="eyebrow" style="margin:10px 0 6px">${tab === "lotion" ? "The scent (one)" : "What goes in (one or two)"}</p>${inBag.length ? `<div class="gchips">${inBag.map((a) => `<button class="gchip${pick5.includes(a) ? " on" : ""}" data-mc="add:${a}" aria-pressed="${pick5.includes(a)}"><i class="mulldot" style="background:${HERB[a].col}"></i>${esc(nm3(a))} (${got(F2, c, a)})</button>`).join("")}</div>` : `<p class="muted">Nothing for these in your backpack or the basket yet: ${ok.map((a) => nm3(a).toLowerCase()).join(", ")}.</p>`}`;
     const ready = pick5.length >= 1 && pick5.length <= K3.max;
     return h3 + `<div class="actions"><button class="btn primary" data-mc="make" ${ready ? "" : "disabled"}>${ready ? c.recipes.some((r) => r.id === keyOf4(tab, tab === "soap" ? base : null, pick5)) ? `Make ${esc(craftName(tab, base, pick5))}` : "Try something new" : "Make it"}</button></div>` + shut7;
   }
@@ -26633,8 +26642,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return !!(F2 && F2.goals && F2.goals.van);
   };
   function campervan(x, y) {
-    const F2 = artCtx().F(), use2 = F2.van && F2.van.use || {}, st6 = (k) => {
-      const m = /^van_\w+?_(\w+)$/.exec(use2[k] || "");
+    const F2 = artCtx().F(), use3 = F2.van && F2.van.use || {}, st6 = (k) => {
+      const m = /^van_\w+?_(\w+)$/.exec(use3[k] || "");
       return m && STYLES[m[1]];
     };
     const cur2 = st6("curtains"), lit2 = st6("lights");
@@ -26951,18 +26960,18 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var CATCH = [...new Set(Object.values(FISH).map((f2) => f2.item).filter(Boolean))];
   if (ITEMS.fish && !ITEMS.fish.sell) ITEMS.fish.sell = 3;
   function sellCatch(F2, id, mult = 1) {
-    const ids = id ? [id] : CATCH, got = { n: 0, coins: 0 };
+    const ids = id ? [id] : CATCH, got2 = { n: 0, coins: 0 };
     ids.forEach((x) => {
       const n = id ? Math.min(1, (F2.inv || {})[x] || 0) : (F2.inv || {})[x] || 0;
       if (!n || !ITEMS[x] || !ITEMS[x].sell) return;
       F2.inv[x] -= n;
       if (F2.inv[x] <= 0) delete F2.inv[x];
-      got.n += n;
-      got.coins += Math.round(n * ITEMS[x].sell * mult);
+      got2.n += n;
+      got2.coins += Math.round(n * ITEMS[x].sell * mult);
     });
-    if (!got.n) return null;
-    F2.coins += got.coins;
-    return got;
+    if (!got2.n) return null;
+    F2.coins += got2.coins;
+    return got2;
   }
   var catchHtml = (F2, mult = 1) => {
     const have2 = CATCH.filter((x) => (F2.inv || {})[x] > 0 && ITEMS[x] && ITEMS[x].sell);
@@ -28973,8 +28982,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     let h3 = tape() + `<h2>Pick your own</h2>`;
     if (!st6) return h3 + `<p class="sub">A little basket each, and the rows to yourselves. Red ones only: the white and green ones aren't ready.${bbState(F2).picked === dayKey() ? " (You've picked today: what's in the basket now is for eating.)" : ""}</p><div class="actions"><button class="btn primary" data-bba="pick">Grab a basket</button></div>` + shut14;
     h3 += `<p class="sub">Tap the ripe ones.${evan2 ? ` Evan's "helping". Half of his are going straight in.` : ""}</p><div class="bbberries">${st6.ripe.map((r, i) => {
-      const got = st6.picked.includes(i), straw = st6.kind[i] === "straw", col = r ? straw ? "#E8566C" : "#C2334D" : straw ? "#F3F0DA" : "#D9E3B0";
-      return `<button class="bbberry${got ? " got" : ""}" data-bba="berry:${i}" ${got ? "disabled" : ""} aria-label="${r ? "ripe" : "not ripe"} ${straw ? "strawberry" : "raspberry"}"><svg viewBox="0 0 30 30" width="30" height="30">${straw ? `<path d="M15 27 C6 20 5 11 9 8 h12 c4 3 3 12 -6 19z" fill="${col}" stroke="#2F2B28" stroke-width="1.2"/><path d="M9 8 l3 -4 l3 3 l3 -3 l3 4z" fill="#7FA35A" stroke="#2F2B28" stroke-width="1"/>` : `${[[11, 12], [17, 12], [14, 17], [10, 18], [18, 18], [14, 23]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4.2" fill="${col}" stroke="#2F2B28" stroke-width=".9"/>`).join("")}<path d="M11 7 l3 -3 l3 3" fill="none" stroke="#7FA35A" stroke-width="1.6"/>`}${got ? `<path d="M6 15 l6 6 l12 -12" fill="none" stroke="#5E8A48" stroke-width="3"/>` : ""}</svg></button>`;
+      const got2 = st6.picked.includes(i), straw = st6.kind[i] === "straw", col = r ? straw ? "#E8566C" : "#C2334D" : straw ? "#F3F0DA" : "#D9E3B0";
+      return `<button class="bbberry${got2 ? " got" : ""}" data-bba="berry:${i}" ${got2 ? "disabled" : ""} aria-label="${r ? "ripe" : "not ripe"} ${straw ? "strawberry" : "raspberry"}"><svg viewBox="0 0 30 30" width="30" height="30">${straw ? `<path d="M15 27 C6 20 5 11 9 8 h12 c4 3 3 12 -6 19z" fill="${col}" stroke="#2F2B28" stroke-width="1.2"/><path d="M9 8 l3 -4 l3 3 l3 -3 l3 4z" fill="#7FA35A" stroke="#2F2B28" stroke-width="1"/>` : `${[[11, 12], [17, 12], [14, 17], [10, 18], [18, 18], [14, 23]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4.2" fill="${col}" stroke="#2F2B28" stroke-width=".9"/>`).join("")}<path d="M11 7 l3 -3 l3 3" fill="none" stroke="#7FA35A" stroke-width="1.6"/>`}${got2 ? `<path d="M6 15 l6 6 l12 -12" fill="none" stroke="#5E8A48" stroke-width="3"/>` : ""}</svg></button>`;
     }).join("")}</div>`;
     return h3 + (berriesDone(st6) ? `<div class="actions"><button class="btn primary" data-bba="picked">Basket's full</button></div>` : `<p class="muted">${st6.picked.length} picked${st6.oops ? `, ${st6.oops} put back` : ""}.</p>`);
   }
@@ -31597,7 +31606,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     { k: "scoop", n: "the Scoop Shack fridge", ok: (id) => isIngr(id), go: (F2, id, n) => stockFridge(F2, id, n, "bag") },
     { k: "cocoa", n: "the Cocoa Room's fillings shelf", own: "cocoa", ok: (id) => isFilling(id), go: (F2, id, n) => stockPantry(F2, id, n, "bag") },
     { k: "kitchen", n: "the wine shop's larder", ok: (id) => isGood(id), go: (F2, id, n) => sendToKitchen(F2, id, n, false) },
-    { k: "basket", n: "the mill's herb basket", own: "mill", ok: (id) => !!(HERB[id] && HERB[id].oil), go: (F2, id, n) => toBasket(F2, id, n) },
+    { k: "basket", n: "the mill's basket", own: "mill", ok: (id) => basketable(id), go: (F2, id, n) => toBasket(F2, id, n) },
     {
       k: "millshelf",
       n: "the mill's shelves",
@@ -31642,8 +31651,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function homeNote(F2, shop, owns3) {
     const sh = SHOPS.find((s) => s.k === shop);
     if (!sh) return "";
-    const got = ["fridge", "shelf"].flatMap((w) => Object.entries(storeState(F2)[w]).filter(([id, n]) => n > 0 && ITEMS[id] && sh.ok(id)).map(([id, n]) => `${n} ${nm4(id).toLowerCase()}`));
-    return got.length ? `<p class="muted">At home, waiting: ${esc(got.slice(0, 6).join(", "))}${got.length > 6 ? "…" : ""}. Send them from the fridge or the garage shelf.</p>` : "";
+    const got2 = ["fridge", "shelf"].flatMap((w) => Object.entries(storeState(F2)[w]).filter(([id, n]) => n > 0 && ITEMS[id] && sh.ok(id)).map(([id, n]) => `${n} ${nm4(id).toLowerCase()}`));
+    return got2.length ? `<p class="muted">At home, waiting: ${esc(got2.slice(0, 6).join(", "))}${got2.length > 6 ? "…" : ""}. Send them from the fridge or the garage shelf.</p>` : "";
   }
 
   // src/art/millup.js
@@ -34888,7 +34897,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var sun = { busy: false, at: 0, error: null, added: 0 };
   function creditDone(tasks, quiet) {
-    const ids = new Set(allTasks().map((t2) => t2.id)), cur2 = phase() === "task" ? remaining()[0] : null, got = [];
+    const ids = new Set(allTasks().map((t2) => t2.id)), cur2 = phase() === "task" ? remaining()[0] : null, got2 = [];
     (tasks || []).forEach((t2) => {
       if (!t2 || !t2.completed || !ids.has(t2.id) || S2.doneIds.includes(t2.id)) return;
       if (F.early[t2.id]) {
@@ -34896,8 +34905,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         return;
       }
       S2.doneIds.push(t2.id);
-      got.push(t2);
-      if (got.length === 1) sfx("chaching");
+      got2.push(t2);
+      if (got2.length === 1) sfx("chaching");
       const q = allTasks().find((x) => x.id === t2.id);
       if (q && q.early) F.early[t2.id] = q.early;
       earn(QUEST_PAY, "done in Sunsama");
@@ -34908,11 +34917,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         S2.firstStep[t2.id] = false;
       }
     });
-    if (got.length && !quiet) {
+    if (got2.length && !quiet) {
       act("cheer");
-      speak(got.length === 1 ? `You already did “${got[0].title}” in Sunsama! Counted.` : `${got.length} quests already done in Sunsama! Counted.`, 5e3);
+      speak(got2.length === 1 ? `You already did “${got2[0].title}” in Sunsama! Counted.` : `${got2.length} quests already done in Sunsama! Counted.`, 5e3);
     }
-    return got.length;
+    return got2.length;
   }
   var markSunsamaDone = () => creditDone(P9 && P9.day === dayKey() && Array.isArray(P9.tasks) ? P9.tasks : [], true);
   async function syncSunsama(manual) {
@@ -36246,20 +36255,20 @@ ${SIGNOFF[t2.who] || ""}`;
   }
   function harvesterTick() {
     if (!F.tools.harvester) return;
-    const got = {};
+    const got2 = {};
     F.plots.forEach((p, i) => {
       if (p && p.crop && growth2(p) >= 1) {
         const r = pickPlot(i);
-        got[r.crop] = (got[r.crop] || 0) + r.n;
+        got2[r.crop] = (got2[r.crop] || 0) + r.n;
       }
     });
     if (F.goals && F.goals.greenhouse) ghRipe(F, addInv).forEach((r) => {
-      got[r.crop] = (got[r.crop] || 0) + r.n;
+      got2[r.crop] = (got2[r.crop] || 0) + r.n;
     });
-    const k = Object.keys(got);
+    const k = Object.keys(got2);
     if (!k.length) return;
     save2();
-    const list5 = k.map((c) => `${got[c]} ${CROPS[c].ns || CROPS[c].n.toLowerCase()}`).join(", ");
+    const list5 = k.map((c) => `${got2[c]} ${CROPS[c].ns || CROPS[c].n.toLowerCase()}`).join(", ");
     flash(`The harvester brought in ${list5}`);
     if (scene === "farm" || scene === "greenhouse") {
       drawScene();
@@ -37182,7 +37191,7 @@ ${SIGNOFF[t2.who] || ""}`;
         const k = toBasket(F, v);
         if (k) {
           sfx("paper", true);
-          speak(`${k} into the herb basket. Ines will put them to good use.`, 3500);
+          speak(`${k} into the mill's basket, ready for the bench.`, 3500);
           save2();
         }
       }
@@ -37319,13 +37328,13 @@ ${SIGNOFF[t2.who] || ""}`;
         sfx("tap");
       } else if (a === "done") {
         if (!pntSt || !paintDone(pntSt)) return;
-        const got = finishPaint(F, pntSt, addInv), n = PAINT_SUBJECTS[pntSt.subject].n.toLowerCase();
+        const got2 = finishPaint(F, pntSt, addInv), n = PAINT_SUBJECTS[pntSt.subject].n.toLowerCase();
         pntSt = null;
         gainXp(2);
         hearts(2);
         sfx("chime");
-        if (got) flash("Your painting");
-        speak(got ? `You carry ${n} home, still a bit wet. It's a keepsake now: it can go on a wall at home.` : `Another go at ${n}. Better than the last, Dad says, and he means it.`, 6e3);
+        if (got2) flash("Your painting");
+        speak(got2 ? `You carry ${n} home, still a bit wet. It's a keepsake now: it can go on a wall at home.` : `Another go at ${n}. Better than the last, Dad says, and he means it.`, 6e3);
         save2();
       }
       ctx();
@@ -37405,13 +37414,13 @@ ${SIGNOFF[t2.who] || ""}`;
         if (r === "unripe" && Math.random() < 0.5) ev(["that one's white, Mama!", "not ready!"], 300);
       } else if (a === "picked") {
         if (!bbSt.berries || !berriesDone(bbSt.berries)) return;
-        const got = finishBerries(F, bbSt.berries, addInv);
+        const got2 = finishBerries(F, bbSt.berries, addInv);
         bbSt = {};
         sfx("chime");
         gainXp(1);
         hearts(2);
-        if (got) {
-          flash(`${got.rasp} raspberries, ${got.straw} strawberries`);
+        if (got2) {
+          flash(`${got2.rasp} raspberries, ${got2.straw} strawberries`);
           speak(`A basket of berries, warm from the sun. Pay at the gate by the weight: Shaz waves you through. "First basket's on the house."`, 6e3);
         } else speak("Another basket! These ones are for eating, right here, right now.", 4500);
         ev(["my hands are RED", "I only ate a few. Some. Lots."], 1800);
@@ -37777,9 +37786,9 @@ ${SIGNOFF[t2.who] || ""}`;
         sfx(r === "ok" ? "chime" : "paper", true);
         if (r === "ok") ev(["fweee!", "FWEEEEE!", "I whistled too, Mama!"], 600);
         if (d.done) {
-          const got = diveReward(F, d, addInv);
+          const got2 = diveReward(F, d, addInv);
           gainXp(d.good >= 2 ? 2 : 1);
-          if (got) {
+          if (got2) {
             flash("Abalone from Halmang Kim");
             hearts(3);
           }
@@ -40955,9 +40964,9 @@ ${SIGNOFF[t2.who] || ""}`;
     let coins = 0, n = 0;
     for (let at2 = from + 6e4; at2 <= now3; at2 += 6e4) {
       const sg = new Date(at2 + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm6 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
-      const got = craftSellMinute(F, day, hm6, owns2(F, "millshop") ? "shop" : vineState(F).shelf ? "wineshop" : null);
-      if (got) {
-        coins += got;
+      const got2 = craftSellMinute(F, day, hm6, owns2(F, "millshop") ? "shop" : vineState(F).shelf ? "wineshop" : null);
+      if (got2) {
+        coins += got2;
         n++;
       }
       const ev = eventNow(day, hm6);
@@ -41385,16 +41394,16 @@ ${SIGNOFF[t2.who] || ""}`;
         const s = cocoaState(F);
         s.prices.bonbon = Math.max(1, Math.min(20, s.prices.bonbon + n));
       } else if (a === "fill") {
-        const got = stockPantry(F, k, n, b.dataset.src, orchState(F));
-        if (got) {
+        const got2 = stockPantry(F, k, n, b.dataset.src, orchState(F));
+        if (got2) {
           sfx("tap");
-          flash(`+${got} on the fillings shelf`);
+          flash(`+${got2} on the fillings shelf`);
         }
       } else if (a === "take") {
-        const got = unstockPantry(F, k, n, orchState(F));
-        if (got) {
+        const got2 = unstockPantry(F, k, n, orchState(F));
+        if (got2) {
           sfx("tap");
-          flash(got.to === "bag" ? `${got.n} back into your backpack` : `${got.n} back to Ma Ma's shelf`);
+          flash(got2.to === "bag" ? `${got2.n} back into your backpack` : `${got2.n} back to Ma Ma's shelf`);
         }
       } else if (a === "shell") {
         ccSt.shell = k;
@@ -41419,16 +41428,16 @@ ${SIGNOFF[t2.who] || ""}`;
         if (!toggleDisplay(cocoaState(F), k)) return;
         sfx("tap");
       } else if (a === "scoop") {
-        const got = sendScoop(F, k);
-        if (!got) return;
+        const got2 = sendScoop(F, k);
+        if (!got2) return;
         sfx("paper", true);
         gainXp(1);
-        speak(k === "dip" ? `${got} dips of house-made dark, off to the Scoop Shack's dip station. Cones dipped in it sell for more.` : `${got} bars of Cocoa Room chocolate, into the Scoop Shack's gelato fridge. Try it at the mixing bench!`, 5e3);
+        speak(k === "dip" ? `${got2} dips of house-made dark, off to the Scoop Shack's dip station. Cones dipped in it sell for more.` : `${got2} bars of Cocoa Room chocolate, into the Scoop Shack's gelato fridge. Try it at the mixing bench!`, 5e3);
       } else if (a === "wine") {
-        const got = wineToPantry(F, k);
-        if (!got) return;
+        const got2 = wineToPantry(F, k);
+        if (!got2) return;
         sfx("tap");
-        flash(`${got.wine}: 4 fillings on the shelf`);
+        flash(`${got2.wine}: 4 fillings on the shelf`);
       } else if (a === "pair") {
         const w = packPairing(F, k);
         if (!w) return;
@@ -41784,17 +41793,17 @@ ${SIGNOFF[t2.who] || ""}`;
       render();
     };
     c.querySelectorAll("[data-gback]").forEach((b) => b.onclick = () => {
-      const [id, n] = b.dataset.gback.split(":"), got = unstockFridge(F, id, +n, orchState(F));
-      if (!got) return;
+      const [id, n] = b.dataset.gback.split(":"), got2 = unstockFridge(F, id, +n, orchState(F));
+      if (!got2) return;
       sfx("tap");
-      flash(got.to === "bag" ? `${got.n} back into your backpack` : `${got.n} back to Ma Ma's shelf`);
+      flash(got2.to === "bag" ? `${got2.n} back into your backpack` : `${got2.n} back to Ma Ma's shelf`);
       re();
     });
     c.querySelectorAll("[data-gfill]").forEach((b) => b.onclick = () => {
-      const [from, id, n] = b.dataset.gfill.split(":"), got = stockFridge(F, id, +n, from, orchState(F));
-      if (!got) return;
+      const [from, id, n] = b.dataset.gfill.split(":"), got2 = stockFridge(F, id, +n, from, orchState(F));
+      if (!got2) return;
       sfx("tap");
-      flash(`+${got} into the fridge`);
+      flash(`+${got2} into the fridge`);
       re();
     });
     c.querySelectorAll("[data-gsel]").forEach((b) => b.onclick = () => {
