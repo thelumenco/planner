@@ -2322,3 +2322,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
 ## Round 175: olive oil in the mill's basket, every honey a filling
 - millcraft.js: `basketable` includes oliveoil; `toBasket`/`fromBasket` move it to/from `c.oil` (the mill's own plain bottles, which the bench and Tomi already use). The Basket tab lists "Plain olive oil" first.
 - scoop.js INGR gains honey_cream, honeycomb, euchoney (so they're gelato ingredients and bonbon fillings too); kitchen.js SOURCE has them.
+
+## Round 176: bonbon moulds
+- art/moulds.js `mouldPath(shape, x, y, r)`: dome, heart, square, shell (with `shellRibs`), star. Used by cocoa.js `bonbonPic`/`bonbonMini` and the display case (scenes.js "bonboncase").
+- cocoa.js: `MOULDS`, CC_UPS m_heart/m_square/m_shell/m_star (60 each; the dome comes with the shop), `mouldsOwned`, `shapedName`. `makeBonbons(F, shell, fills, shape)`: a tray in another mould sets `r.shape` and renames (`r.base` keeps the original). Same price whatever the shape. Panel chips are data-cc="bshape" ("mould" already moulds bars). STYLE's "Heart" is now "Cream" for new bonbons.

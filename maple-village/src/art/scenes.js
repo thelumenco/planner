@@ -1,5 +1,6 @@
 // SVG scene builders: village, interiors, garden. Generated strings, hand-drawn look via #wob / #marker / #wash.
 // Scene builders read live game state through the `G` context set by core (setArtContext).
+import { mouldPath } from "./moulds.js";
 import { ink, sgHM } from "../util.js";
 import { VILLAGE, ROOMS, stationsOf, MAPLE_BED } from "../data/world.js";
 import { CROPS, PLOTS } from "../data/items.js";
@@ -449,7 +450,7 @@ export function furn(kind, x, y){
         `<rect x="${x-50}" y="${y-110}" width="100" height="110" rx="3"/><path d="M${x-44} ${y-72} h88 M${x-44} ${y-40} h88"/>`); }
     case "bonboncase": { const c = G.cocoa ? G.cocoa() : {bonbons: [], trays: {}}, ids = Array.isArray(c.display) ? c.display : (c.bonbons || []).filter(b => (c.trays || {})[b.id] > 0).map(b => b.id), shells = {milk: "#8A5A3A", dark: "#4A2E22", white: "#F3E7C9"};
       const shown = ids.map(id => (c.bonbons || []).find(b => b.id === id)).filter(b => b && (c.trays || {})[b.id] > 0).slice(0, 6);
-      return sk(`<rect x="${x-48}" y="${y-96}" width="96" height="96" rx="4" style="fill:#8A5A3A"/><rect x="${x-42}" y="${y-90}" width="84" height="58" rx="2" style="fill:#EAF6FA"/>${[0, 1].map(r => `<rect x="${x-40}" y="${y-62 + r*28 - 28}" width="80" height="3" style="fill:#FFFDF6"/>`).join("")}${shown.map((b, i) => [0, 1, 2].map(k => `<rect x="${x-38 + (i % 3)*26 + k*7}" y="${y-84 + Math.floor(i/3)*28}" width="6" height="6" rx="2" style="fill:${shells[b.shell]};stroke:${b.col}" stroke-width="1"/>`).join("")).join("")}`,
+      return sk(`<rect x="${x-48}" y="${y-96}" width="96" height="96" rx="4" style="fill:#8A5A3A"/><rect x="${x-42}" y="${y-90}" width="84" height="58" rx="2" style="fill:#EAF6FA"/>${[0, 1].map(r => `<rect x="${x-40}" y="${y-62 + r*28 - 28}" width="80" height="3" style="fill:#FFFDF6"/>`).join("")}${shown.map((b, i) => [0, 1, 2].map(k => `<path d="${mouldPath(b.shape || "dome", x-35 + (i % 3)*26 + k*7, y-81 + Math.floor(i/3)*28, 3.2)}" style="fill:${shells[b.shell]};stroke:${b.col}" stroke-width="1"/>`).join("")).join("")}`,
         `<rect x="${x-48}" y="${y-96}" width="96" height="96" rx="4"/><rect x="${x-42}" y="${y-90}" width="84" height="58" rx="2"/><path d="M${x-48} ${y-24} h96" opacity=".5"/>`); }
     case "pantry": return sk(`<rect x="${x-34}" y="${y-110}" width="68" height="110" rx="3" style="fill:#C9A27E"/>${[0, 1, 2].map(r => [0, 1, 2].map(i => `<rect x="${x-26 + i*20}" y="${y-100 + r*34}" width="14" height="22" rx="3" style="fill:${["#F3C969", "#7FB86A", "#E8566C", "#8A5A3A", "#F4C7CF", "#B98A5A", "#9FD3C2", "#C9A3E0", "#F3B33A"][r*3 + i]}"/>`).join("")).join("")}`,
       `<rect x="${x-34}" y="${y-110}" width="68" height="110" rx="3"/><path d="M${x-34} ${y-74} h68 M${x-34} ${y-40} h68"/>`);

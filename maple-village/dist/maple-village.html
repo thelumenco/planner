@@ -6750,9 +6750,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     it.sell = it.sell || t2.sell;
   });
   Object.keys(FLOWERS).forEach((id) => {
-    const f2 = FLOWERS[id];
-    ITEMS["bq_" + id] = { n: `Bouquet of ${f2.n.toLowerCase()}`, kind: "bouquet", flower: id };
-    ITEMS["pot_" + id] = { n: `Potted ${f2.n.toLowerCase()}`, kind: "pot", flower: id };
+    const f3 = FLOWERS[id];
+    ITEMS["bq_" + id] = { n: `Bouquet of ${f3.n.toLowerCase()}`, kind: "bouquet", flower: id };
+    ITEMS["pot_" + id] = { n: `Potted ${f3.n.toLowerCase()}`, kind: "pot", flower: id };
   });
   Object.entries(GOODS).forEach(([id, g10]) => {
     if (!ITEMS[id]) ITEMS[id] = g10;
@@ -6786,6 +6786,27 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   Object.keys(CROPS).forEach((id) => {
     CROPS[id].ico = id;
   });
+
+  // src/art/moulds.js
+  var f2 = (n) => +n.toFixed(2);
+  function mouldPath(shape2, x, y, r) {
+    if (shape2 === "heart") return `M${f2(x)} ${f2(y + r)} Q${f2(x - r * 1.35)} ${f2(y - r * 0.1)} ${f2(x - r * 0.6)} ${f2(y - r * 0.8)} Q${f2(x - r * 0.15)} ${f2(y - r * 1.05)} ${f2(x)} ${f2(y - r * 0.4)} Q${f2(x + r * 0.15)} ${f2(y - r * 1.05)} ${f2(x + r * 0.6)} ${f2(y - r * 0.8)} Q${f2(x + r * 1.35)} ${f2(y - r * 0.1)} ${f2(x)} ${f2(y + r)}Z`;
+    if (shape2 === "square") {
+      const k = r * 0.85, c = r * 0.3;
+      return `M${f2(x - k + c)} ${f2(y - k)} H${f2(x + k - c)} Q${f2(x + k)} ${f2(y - k)} ${f2(x + k)} ${f2(y - k + c)} V${f2(y + k - c)} Q${f2(x + k)} ${f2(y + k)} ${f2(x + k - c)} ${f2(y + k)} H${f2(x - k + c)} Q${f2(x - k)} ${f2(y + k)} ${f2(x - k)} ${f2(y + k - c)} V${f2(y - k + c)} Q${f2(x - k)} ${f2(y - k)} ${f2(x - k + c)} ${f2(y - k)}Z`;
+    }
+    if (shape2 === "shell") return `M${f2(x)} ${f2(y + r)} L${f2(x - r)} ${f2(y - r * 0.15)} Q${f2(x - r * 0.9)} ${f2(y - r * 1.1)} ${f2(x)} ${f2(y - r)} Q${f2(x + r * 0.9)} ${f2(y - r * 1.1)} ${f2(x + r)} ${f2(y - r * 0.15)}Z`;
+    if (shape2 === "star") {
+      let d = "";
+      for (let i = 0; i < 10; i++) {
+        const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r * 1.05;
+        d += `${i ? "L" : "M"}${f2(x + rr * Math.cos(a))} ${f2(y + rr * Math.sin(a))} `;
+      }
+      return d + "Z";
+    }
+    return `M${f2(x - r)} ${f2(y + r * 0.65)} Q${f2(x - r)} ${f2(y - r)} ${f2(x)} ${f2(y - r)} Q${f2(x + r)} ${f2(y - r)} ${f2(x + r)} ${f2(y + r * 0.65)}Z`;
+  }
+  var shellRibs = (x, y, r) => [-0.55, 0, 0.55].map((t2) => `M${f2(x)} ${f2(y + r * 0.9)} L${f2(x + t2 * r)} ${f2(y - r * 0.8)}`).join(" ");
 
   // src/game/van.js
   var STYLES = {
@@ -6867,7 +6888,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 
   // src/art/interiors.js
   var VAN_COLS = Object.fromEntries(Object.entries(STYLES).map(([k, v]) => [k, v.a]));
-  var rows = (n, f2) => Array.from({ length: n }, (_, i) => f2(i)).join("");
+  var rows = (n, f3) => Array.from({ length: n }, (_, i) => f3(i)).join("");
   var wallBase = (wall3, trim) => `<rect width="520" height="150" style="fill:${wall3}"/><rect y="138" width="520" height="12" style="fill:${trim}" opacity=".9"/>`;
   var skirting = `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.6" fill="none"><path d="M0 150 H520"/></g>`;
   var plant = (x, y, s = 1) => sk(
@@ -6988,7 +7009,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     },
     // Evan's room: a sunny yellow wall of little dinosaurs, a soft mint carpet, a road play mat, bunting and a train picture
     kidroom: () => {
-      const dino = (x, y, c, f2) => `<path transform="translate(${x} ${y}) scale(${f2 ? -0.9 : 0.9} .9)" d="M-12 6 q-2 -10 6 -12 q2 -8 9 -7 q5 1 4 6 q-1 3 -5 3 q2 5 1 10 h-4 v-3 h-5 v3z M-12 6 q-6 -2 -9 -6 q5 1 9 0" style="fill:${c}"/>`;
+      const dino = (x, y, c, f3) => `<path transform="translate(${x} ${y}) scale(${f3 ? -0.9 : 0.9} .9)" d="M-12 6 q-2 -10 6 -12 q2 -8 9 -7 q5 1 4 6 q-1 3 -5 3 q2 5 1 10 h-4 v-3 h-5 v3z M-12 6 q-6 -2 -9 -6 q5 1 9 0" style="fill:${c}"/>`;
       return `<rect width="520" height="640" style="fill:#DDEBD5"/>
     <g style="fill:#CFE0C4" opacity=".8">${rows(9, (r) => rows(14, (i) => `<circle cx="${i * 38 + r % 2 * 19 + 10}" cy="${178 + r * 52}" r="1.8"/>`))}</g>
     ${sk(
@@ -7521,11 +7542,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       const a = i / n * Math.PI * 2, k = 1 + (rnd2(seed2 + "b", i) - 0.5) * 0.22;
       return [x + Math.cos(a) * r * sq * k, y + Math.sin(a) * r * k];
     });
-    const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2], f2 = (v) => v.toFixed(1);
-    let d = `M${mid(pts[n - 1], pts[0]).map(f2).join(" ")}`;
+    const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2], f3 = (v) => v.toFixed(1);
+    let d = `M${mid(pts[n - 1], pts[0]).map(f3).join(" ")}`;
     pts.forEach((p, i) => {
       const m = mid(p, pts[(i + 1) % n]);
-      d += ` Q${f2(p[0])} ${f2(p[1])} ${f2(m[0])} ${f2(m[1])}`;
+      d += ` Q${f3(p[0])} ${f3(p[1])} ${f3(m[0])} ${f3(m[1])}`;
     });
     return `<path d="${d}z" fill="${color}" opacity=".88"/>`;
   };
@@ -7610,12 +7631,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var nextUpgrade = (n) => UPGRADES.find((u) => n < u.at) || null;
   var bunting = (x1, y1, x2, y2, cols) => {
     const n = Math.max(3, Math.round((x2 - x1) / 12)), mid = (y1 + y2) / 2 + 8;
-    let f2 = "";
+    let f3 = "";
     for (let i = 0; i < n; i++) {
       const t2 = (i + 0.5) / n, x = x1 + (x2 - x1) * t2, y = (1 - t2) * (1 - t2) * y1 + 2 * (1 - t2) * t2 * mid + t2 * t2 * y2;
-      f2 += `<path d="M${x - 4} ${y} l4 8 l4 -8z" style="fill:${cols[i % cols.length]}"/>`;
+      f3 += `<path d="M${x - 4} ${y} l4 8 l4 -8z" style="fill:${cols[i % cols.length]}"/>`;
     }
-    return sk(f2, `<path d="M${x1} ${y1} Q${(x1 + x2) / 2} ${mid} ${x2} ${y2}"/>${f2.replace(/ style="[^"]*"/g, "")}`);
+    return sk(f3, `<path d="M${x1} ${y1} Q${(x1 + x2) / 2} ${mid} ${x2} ${y2}"/>${f3.replace(/ style="[^"]*"/g, "")}`);
   };
   var lampGlow = (x, y, r = 30) => `<g class="lglow" pointer-events="none"><circle cx="${x}" cy="${y}" r="${r}" fill="url(#lampg)"/><circle class="flick" cx="${x}" cy="${y}" r="${(r * 0.42).toFixed(1)}" fill="#FFE3A3" opacity=".22"/></g>`;
   var lampDefs = `<defs><radialGradient id="lampg"><stop offset="0" stop-color="#FFD98A" stop-opacity=".55"/><stop offset=".45" stop-color="#FFC66B" stop-opacity=".2"/><stop offset="1" stop-color="#FFC66B" stop-opacity="0"/></radialGradient></defs>`;
@@ -7677,9 +7698,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var dayNum = (k) => Date.parse(k + "T00:00:00Z") / 864e5;
   function festivalOn(day) {
     const d = dayNum(day);
-    for (const f2 of FESTIVALS) for (const k of f2.dates) {
+    for (const f3 of FESTIVALS) for (const k of f3.dates) {
       const x = dayNum(k);
-      if (d >= x - f2.before && d <= x + f2.after) return f2;
+      if (d >= x - f3.before && d <= x + f3.after) return f3;
     }
     return null;
   }
@@ -7689,8 +7710,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   }
   var rainyOn = (day) => rainLevel(day) > 0;
   var stormyOn = (day) => rainLevel(day) === 2;
-  function festivalArt(f2) {
-    if (!f2) return "";
+  function festivalArt(f3) {
+    if (!f3) return "";
     const lanternRow = (x1, x2, y, cols) => {
       let s = "";
       const n = 6;
@@ -7700,7 +7721,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       }
       return `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M${x1} ${y - 6} Q${(x1 + x2) / 2} ${y + 6} ${x2} ${y - 6}" fill="none"/>${s}</g>`;
     };
-    switch (f2.id) {
+    switch (f3.id) {
       case "cny":
         return lanternRow(196, 324, 262, ["#D9433A", "#E8574C"]) + lanternRow(30, 140, 176, ["#D9433A"]) + lanternRow(380, 490, 176, ["#D9433A"]);
       case "midautumn":
@@ -8260,9 +8281,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var WATCH = [[180, 556], [346, 560], [60, 560], [420, 548]];
   function familyVisits(day) {
     const d = dow(day), we = d === 0 || d === 6, h3 = hash(day), fam2 = (k) => FAMILIES[(h3 + k) % FAMILIES.length], out = [];
-    const add2 = (f2, from, to, scene2 = "vineyard") => {
-      out.push({ id: f2.parent, from, to, scene: scene2, wander: scene2 === "vineyard" ? WATCH : FIELD_WALK });
-      f2.kids.forEach((k) => out.push({ id: k, from, to, scene: scene2, wander: scene2 === "vineyard" ? PLAY : FIELD_PLAY }));
+    const add2 = (f3, from, to, scene2 = "vineyard") => {
+      out.push({ id: f3.parent, from, to, scene: scene2, wander: scene2 === "vineyard" ? WATCH : FIELD_WALK });
+      f3.kids.forEach((k) => out.push({ id: k, from, to, scene: scene2, wander: scene2 === "vineyard" ? PLAY : FIELD_PLAY }));
     };
     if (we) {
       add2(fam2(0), 10 * 60, 12 * 60);
@@ -8435,8 +8456,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       if (g10) return g10;
     }
     {
-      const f2 = familyAtEvent(id, e, day, hm6);
-      if (f2) return f2;
+      const f3 = familyAtEvent(id, e, day, hm6);
+      if (f3) return f3;
     }
     if (e.kind === "night" || e.kind === "xmas") return nightShopper(id, e, day, hm6);
     const mid = e.from + Math.round((e.to - e.from) / 2), wave = hm6 < mid ? 0 : 1, half = Math.round((wave ? e.to - mid : mid - e.from) / 2), start = wave ? mid : e.from;
@@ -8466,9 +8487,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   };
   function familyAtEvent(id, e, day, hm6) {
     const list5 = e.kind === "night" || e.kind === "xmas" ? FAMILY_EVENTS[e.kind][dow(day)] || [] : e.kind === "fair" ? FAMILY_EVENTS.fair : [];
-    const f2 = list5.find(([who3, from, to]) => who3 === id && hm6 >= from && hm6 < to);
-    if (!f2) return null;
-    return { from: f2[1], to: f2[2], scene: "field", wander: FIELD_WALK };
+    const f3 = list5.find(([who3, from, to]) => who3 === id && hm6 >= from && hm6 < to);
+    if (!f3) return null;
+    return { from: f3[1], to: f3[2], scene: "field", wander: FIELD_WALK };
   }
   function nightShopper(id, e, day, hm6) {
     const mid = e.from + (e.to - e.from) / 2, wave = hm6 < mid ? 0 : 1, from = wave ? mid : e.from, to = wave ? e.to : mid;
@@ -8565,9 +8586,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   function dinnerSeat(host, who3) {
     const t2 = DINING[host];
     if (!t2) return null;
-    const b = BACK.indexOf(who3), f2 = FRONT.indexOf(who3);
+    const b = BACK.indexOf(who3), f3 = FRONT.indexOf(who3);
     if (b >= 0) return [t2.cx - 120 + b * 60, t2.fy - 24];
-    if (f2 >= 0) return [t2.cx - 90 + f2 * 60, t2.fy + 18];
+    if (f3 >= 0) return [t2.cx - 90 + f3 * 60, t2.fy + 18];
     return null;
   }
   function dinnerOn(day) {
@@ -8689,9 +8710,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   }
   function discoSlot(id, day, hm6) {
     if (!discoNow(day, hm6)) return null;
-    const f2 = discoFloor(day)[id];
-    if (!f2) return null;
-    return { from: DISCO_FROM, to: DISCO_TO, scene: "cellar", ...f2.drift ? { wander: [f2.at, f2.at, f2.drift] } : { at: f2.at, dir: f2.dir }, act: f2.move, disco: true };
+    const f3 = discoFloor(day)[id];
+    if (!f3) return null;
+    return { from: DISCO_FROM, to: DISCO_TO, scene: "cellar", ...f3.drift ? { wander: [f3.at, f3.at, f3.drift] } : { at: f3.at, dir: f3.dir }, act: f3.move, disco: true };
   }
   function clubSlot(id, day, hm6) {
     if (!wineClubNow(day, hm6) || !clubMembers(day).includes(id)) return null;
@@ -13646,8 +13667,8 @@ ${r.n}`;
   });
   var FRESH_HOLD = 15 * 6e4;
   var heldNew = (k, id) => {
-    const f2 = k.fresh && k.fresh[id];
-    return f2 && f2.until > Date.now() ? f2.n : 0;
+    const f3 = k.fresh && k.fresh[id];
+    return f3 && f3.until > Date.now() ? f3.n : 0;
   };
   var spareOf = (k, id) => Math.max(0, (k.larder[id] || 0) - Math.max(k.keep[id] || 0, heldNew(k, id)));
   var spareCount = (k, g10) => pool(k, g10).reduce((a, id) => a + spareOf(k, id), 0);
@@ -14183,7 +14204,7 @@ ${r.n}`;
     honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],
     // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)
     ...Object.fromEntries(Object.values(TREES).map((t2) => [t2.fruit, [t2.fruit[0].toUpperCase() + t2.fruit.slice(1), t2.fruit[0].toUpperCase() + t2.fruit.slice(1), FRUIT_COL[t2.fruit] || "#F3C969"]])),
-    ...Object.fromEntries(Object.entries(FLOWERS).map(([id, f2]) => ["fl_" + id, [f2.n, f2.n.replace(/s$/, "").replace(/ie$/, "y").replace("Sweet pea", "Sweet Pea"), f2.col || "#F4C7CF"]]))
+    ...Object.fromEntries(Object.entries(FLOWERS).map(([id, f3]) => ["fl_" + id, [f3.n, f3.n.replace(/s$/, "").replace(/ie$/, "y").replace("Sweet pea", "Sweet Pea"), f3.col || "#F4C7CF"]]))
   };
   var isIngr = (id) => id in INGR;
   var isDairy = (ings) => ings.includes("milk") || ings.includes("goatmilk") || ings.includes("yoghurt");
@@ -14318,14 +14339,14 @@ ${r.n}`;
   ];
   var GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"];
   var SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
-  var POETIC = ["Dolphin Bay", "Jetty Sunset", "Ma Ma's Garden", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Evan's Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
+  var POETIC2 = ["Dolphin Bay", "Jetty Sunset", "Ma Ma's Garden", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Evan's Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
   function nameFor(ings) {
     const dairy = isDairy(ings), flav = ings.filter((i) => i !== "milk"), h3 = hash(ings.join("+"));
     if (!flav.length) return "Fior di Latte";
     const style = (dairy ? GELATO : SORBET)[h3 % (dairy ? GELATO.length : SORBET.length)];
     if (flav.length === 1) return `${word(flav[0])} ${style}`;
     if (flav.length === 2) return `${word(flav[0])} & ${word(flav[1])} ${style}`;
-    return `${POETIC[h3 % POETIC.length]} ${style}`;
+    return `${POETIC2[h3 % POETIC2.length]} ${style}`;
   }
   var blend = (ings) => {
     const cs = ings.map((i) => INGR[i][2]).filter((c) => c !== "#FFFBEF");
@@ -14438,9 +14459,9 @@ ${r.n}`;
     const p = 0.07 * (we ? 1.5 : 1) * (night ? 1.4 : 1) * (hm6 >= 14 * 60 && hm6 < 17 * 60 ? 1.25 : 1) * pf * (opts.serving ? 1.5 : 1) * glow * (waiterOn(hm6) ? 1.2 : 1);
     if (Math.random() >= p) return null;
     let x = Math.random(), fmt7 = "cone";
-    for (const [f2, w] of FMT_W) {
+    for (const [f3, w] of FMT_W) {
       if ((x -= w) < 0) {
-        fmt7 = f2;
+        fmt7 = f3;
         break;
       }
     }
@@ -14619,7 +14640,7 @@ ${r.n}`;
     const dip = dipReady(s, st6.dip) ? st6.dip : "milk", top = st6.top && s.tops[st6.top] ? st6.top : null, fmt7 = st6.fmt === "waffle" ? "waffle" : "cone";
     const chip2 = (attr, k, on, label2, col) => `<button class="gchip${on ? " on" : ""}" ${attr}="${k}" aria-pressed="${on}">${dot(col)}<span>${esc(label2)}</span></button>`;
     h3 += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p>`;
-    h3 += `<p class="eyebrow" style="margin:10px 0 6px">On a</p><div class="gchips">${["cone", "waffle"].map((f2) => chip2("data-gdfmt", f2, f2 === fmt7, FORMATS[f2].n, "#E8C48E")).join("")}</div>`;
+    h3 += `<p class="eyebrow" style="margin:10px 0 6px">On a</p><div class="gchips">${["cone", "waffle"].map((f3) => chip2("data-gdfmt", f3, f3 === fmt7, FORMATS[f3].n, "#E8C48E")).join("")}</div>`;
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">Dipped in</p><div class="gchips">${Object.keys(DIPS).filter((k) => dipReady(s, k)).map((k) => chip2("data-gddip", k, k === dip, DIPS[k].n, DIPS[k].col)).join("")}</div>`;
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">Topped with</p><div class="gchips">${chip2("data-gdtop", "none", !top, "Nothing", "#FFFDF6")}${Object.keys(TOPPINGS).filter((k) => s.tops[k]).map((k) => chip2("data-gdtop", k, k === top, TOPPINGS[k].n, TOPPINGS[k].col)).join("")}</div>`;
     h3 += `<p class="muted">${esc(dipName(r, fmt7, dip, top))}</p>`;
@@ -14634,7 +14655,7 @@ ${r.n}`;
     const r = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
     if (!r) return h3 + `<ul class="hlist wlist">${tubs2.map((x) => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops${x.dairy ? "" : " · dairy-free"}</small></span><button class="btn small primary" data-gvpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut4;
     const fmt7 = FORMATS[st6.fmt] ? st6.fmt : "cone";
-    h3 += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p><div class="gchips">${Object.keys(FORMATS).map((f2) => `<button class="gchip${f2 === fmt7 ? " on" : ""}" data-gvfmt="${f2}" aria-pressed="${f2 === fmt7}"><span>${FORMATS[f2].n}</span></button>`).join("")}</div>`;
+    h3 += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p><div class="gchips">${Object.keys(FORMATS).map((f3) => `<button class="gchip${f3 === fmt7 ? " on" : ""}" data-gvfmt="${f3}" aria-pressed="${f3 === fmt7}"><span>${FORMATS[f3].n}</span></button>`).join("")}</div>`;
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">Send it to</p><div class="actions">${(st6.who || []).filter(([w]) => !r.dairy || w !== "marcus").map(([w, n]) => `<button class="btn small alt" data-gvto="${w}">${esc(n)}</button>`).join("")}</div>`;
     return h3 + `<div class="actions"><button class="btn alt small" data-gvback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -14647,7 +14668,7 @@ ${r.n}`;
     const pick5 = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
     if (pick5) return h3 + `<div class="gpick"><p class="olabel">${dot(pick5.col)} ${esc(pick5.name)}${pick5.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick5.ings.map((i) => INGR[i][0]).join(", "))} · ${s.tubs[pick5.id]} scoops left</p>
     <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick5.id)}">Have one now${st6.evan ? ", and one for Evan" : ""}</button></div>
-    <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map((f2) => `<button class="btn small alt" data-gtake="${f2}">${FORMATS[f2].n}</button>`).join("")}</div>
+    <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map((f3) => `<button class="btn small alt" data-gtake="${f3}">${FORMATS[f3].n}</button>`).join("")}</div>
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
     h3 += `<ul class="hlist wlist">${tubs2.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
     if (st6.cart) return h3 + `<p class="muted">Yours are free. Cups and cones at the shop's prices.</p>` + shut4;
@@ -14656,7 +14677,7 @@ ${r.n}`;
   function menuPanel(F2, st6) {
     const s = scoopState(F2), step2 = (k) => `<span class="gstep"><button class="btn small alt" data-gprice="${k}:-1" aria-label="Cheaper">−</button><b>${s.prices[k]}</b><button class="btn small alt" data-gprice="${k}:1" aria-label="Dearer">+</button></span>`;
     let h3 = `<span class="tape stripe" aria-hidden="true"></span><h2>The menu</h2><p class="sub">Prices by type. A flavour marked special costs a little extra.</p>
-    <ul class="hlist wlist gprices">${Object.keys(FORMATS).map((f2) => `<li><span class="wtxt"><b>${FORMATS[f2].n}</b><small>${f2 === "float" ? "a scoop in a fizzy float" : f2 === "waffle" ? "a scoop on a warm waffle" : "one scoop"}</small></span>${step2(f2)}</li>`).join("")}
+    <ul class="hlist wlist gprices">${Object.keys(FORMATS).map((f3) => `<li><span class="wtxt"><b>${FORMATS[f3].n}</b><small>${f3 === "float" ? "a scoop in a fizzy float" : f3 === "waffle" ? "a scoop on a warm waffle" : "one scoop"}</small></span>${step2(f3)}</li>`).join("")}
     <li><span class="wtxt"><b>Special surcharge</b><small>added to anything in a special flavour</small></span>${step2("special")}</li>${hasUp(s, "dip") ? `
     <li><span class="wtxt"><b>Chocolate dip</b><small>extra for a dipped cone or waffle</small></span>${step2("dip")}</li><li><span class="wtxt"><b>Topping</b><small>extra for a topping on a dipped one</small></span>${step2("top")}</li>` : ""}</ul>`;
     h3 += s.recipes.length ? `<p class="eyebrow" style="margin:12px 0 6px">Flavours</p><ul class="hlist wlist gflav">${s.recipes.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? s.tubs[r.id] + " scoops" : "sold out"}</small></span><label class="gspec"><input type="checkbox" data-gspecial="${esc(r.id)}" ${r.special ? "checked" : ""}> special</label></li>`).join("")}</ul>` : `<p class="muted">No flavours yet: discover some at the mixing bench in the kitchen.</p>`;
@@ -15827,12 +15848,12 @@ ${r.n}`;
       const crate5 = Object.keys(v.fruit).filter((id) => v.fruit[id] > 0);
       if (!onShelf.length && !open2 && !platesLeft(v) && !crate5.length) continue;
       const food = Object.keys(v.menu).filter((id) => v.menu[id] > 0 && DISHES[id]), tap = tapasOn(v, new Date(at2 + off + 6 * H).toISOString().slice(0, 10)).some((t3) => t3.plates > 0);
-      const f2 = (aperitivoNow(new Date(at2 + off + 6 * H).toISOString().slice(0, 10), hm6) ? 1.6 : 1) * footfall(hm6, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1) * (F2.goals && F2.goals.cellar ? 1.15 : 1);
+      const f3 = (aperitivoNow(new Date(at2 + off + 6 * H).toISOString().slice(0, 10), hm6) ? 1.6 : 1) * footfall(hm6, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1) * (F2.goals && F2.goals.cellar ? 1.15 : 1);
       const gameDay = new Date(at2 + off + 6 * H).toISOString().slice(0, 10);
       const apero = aperitivoNow(gameDay, hm6);
       if (apero) out.apero = true;
       const plate = () => servePlate(v, gameDay, out);
-      if (mulledSeason(gameDay) && (F2.mull || {}).cups > 0 && Math.random() < 0.012 * f2) {
+      if (mulledSeason(gameDay) && (F2.mull || {}).cups > 0 && Math.random() < 0.012 * f3) {
         const c = sellCup(F2);
         if (c) {
           out.coins += c;
@@ -15874,7 +15895,7 @@ ${r.n}`;
           if (F2.scoop) F2.scoop.bikeOut = at2 + off;
         }
       }
-      if (onShelf.length && Math.random() < 2e-3 * f2) {
+      if (onShelf.length && Math.random() < 2e-3 * f3) {
         const s = onShelf[Math.floor(Math.random() * onShelf.length)];
         if (Math.random() < winePf(s)) {
           s.n--;
@@ -15882,7 +15903,7 @@ ${r.n}`;
           out.coins += s.price;
         }
       }
-      if (Math.random() < 16e-4 * f2) {
+      if (Math.random() < 16e-4 * f3) {
         const s = v.shelf.find((x) => x.open > 0) || v.shelf.find((x) => x.n > 0);
         if (s && Math.random() < winePf(s)) {
           if (!s.open) {
@@ -15895,8 +15916,8 @@ ${r.n}`;
           if (Math.random() < (apero ? 0.9 : 0.6)) plate();
         }
       }
-      if (Math.random() < (apero ? 5e-3 : 16e-4) * f2) plate();
-      if (crate5.length && Math.random() < 18e-4 * f2) {
+      if (Math.random() < (apero ? 5e-3 : 16e-4) * f3) plate();
+      if (crate5.length && Math.random() < 18e-4 * f3) {
         const id = crate5[Math.floor(Math.random() * crate5.length)];
         v.fruit[id]--;
         if (!v.fruit[id]) delete v.fruit[id];
@@ -16272,16 +16293,16 @@ ${r.n}`;
     const floors = Math.max(1, Math.min(3, Math.round((h3 - 4) / 26))), fh = (h3 - 4) / floors, cols = w < 40 ? 1 : 2, r = (i) => rnd3(seed2 + i);
     const winX = (c) => x + (cols === 1 ? w / 2 : w * (c ? 0.7 : 0.3)) - 6;
     let wins = "", deco = "";
-    for (let f2 = 0; f2 < floors; f2++) {
-      const ground5 = f2 === floors - 1, wy = y + 6 + f2 * fh + (fh - 16) / 2;
+    for (let f3 = 0; f3 < floors; f3++) {
+      const ground5 = f3 === floors - 1, wy = y + 6 + f3 * fh + (fh - 16) / 2;
       if (ground5 && o.door) continue;
       for (let c = 0; c < cols; c++) {
-        const wx = winX(c), shut26 = r(f2 * 5 + c) < 0.35;
+        const wx = winX(c), shut26 = r(f3 * 5 + c) < 0.35;
         wins += shut26 ? `<rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="12" height="16" style="fill:${C2.shutter}"/><path d="M${(wx + 6).toFixed(1)} ${wy.toFixed(1)} v16" style="stroke:#4E6E58" stroke-width=".7"/>` : `<rect x="${(wx - 3).toFixed(1)}" y="${wy.toFixed(1)}" width="3" height="16" style="fill:${C2.shutter}"/><rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="12" height="16" style="fill:#5E6A70"/><rect x="${(wx + 12).toFixed(1)}" y="${wy.toFixed(1)}" width="3" height="16" style="fill:${C2.shutter}"/>`;
-        if (!o.back && r(f2 * 7 + c + 3) < 0.45) deco += `<rect x="${(wx - 1).toFixed(1)}" y="${(wy + 16).toFixed(1)}" width="14" height="3" style="fill:#A0705A"/>${[1, 5, 9, 12].map((d, k) => `<circle cx="${(wx + d).toFixed(1)}" cy="${(wy + 15).toFixed(1)}" r="1.9" style="fill:${k % 2 ? "#7FA35A" : ["#E8566C", "#F29AB0"][(seed2 + k) % 2]}"/>`).join("")}`;
-        else if (!o.back && r(f2 * 11 + c) < 0.25) deco += `<path d="M${(wx + 18).toFixed(1)} ${(wy - 2).toFixed(1)} v5" style="stroke:#3A3430" stroke-width=".6"/><path d="M${(wx + 15).toFixed(1)} ${(wy + 3).toFixed(1)} h7 l-1 5 h-5z" style="fill:#C9805A"/><path d="M${(wx + 16).toFixed(1)} ${(wy + 7).toFixed(1)} q-1 5 -2 8 M${(wx + 19).toFixed(1)} ${(wy + 8).toFixed(1)} q0 4 1 7 M${(wx + 21).toFixed(1)} ${(wy + 7).toFixed(1)} q2 3 2 6" fill="none" style="stroke:#6E9A44" stroke-width="1.4"/>`;
+        if (!o.back && r(f3 * 7 + c + 3) < 0.45) deco += `<rect x="${(wx - 1).toFixed(1)}" y="${(wy + 16).toFixed(1)}" width="14" height="3" style="fill:#A0705A"/>${[1, 5, 9, 12].map((d, k) => `<circle cx="${(wx + d).toFixed(1)}" cy="${(wy + 15).toFixed(1)}" r="1.9" style="fill:${k % 2 ? "#7FA35A" : ["#E8566C", "#F29AB0"][(seed2 + k) % 2]}"/>`).join("")}`;
+        else if (!o.back && r(f3 * 11 + c) < 0.25) deco += `<path d="M${(wx + 18).toFixed(1)} ${(wy - 2).toFixed(1)} v5" style="stroke:#3A3430" stroke-width=".6"/><path d="M${(wx + 15).toFixed(1)} ${(wy + 3).toFixed(1)} h7 l-1 5 h-5z" style="fill:#C9805A"/><path d="M${(wx + 16).toFixed(1)} ${(wy + 7).toFixed(1)} q-1 5 -2 8 M${(wx + 19).toFixed(1)} ${(wy + 8).toFixed(1)} q0 4 1 7 M${(wx + 21).toFixed(1)} ${(wy + 7).toFixed(1)} q2 3 2 6" fill="none" style="stroke:#6E9A44" stroke-width="1.4"/>`;
       }
-      if (!o.back && floors > 1 && cols === 2 && (o.balcony ? f2 === 0 : f2 === floors - 2 && r(f2 + 21) < 0.5)) {
+      if (!o.back && floors > 1 && cols === 2 && (o.balcony ? f3 === 0 : f3 === floors - 2 && r(f3 + 21) < 0.5)) {
         const by = wy + 17, bx1 = x + w * 0.18, bx2 = x + w * 0.82;
         deco += `<rect x="${bx1.toFixed(1)}" y="${by.toFixed(1)}" width="${(bx2 - bx1).toFixed(1)}" height="2.5" style="fill:#8A8478"/><path d="${Array.from({ length: Math.floor((bx2 - bx1) / 5) + 1 }, (_, k) => `M${(bx1 + k * 5).toFixed(1)} ${(by - 7).toFixed(1)} v7`).join(" ")} M${bx1.toFixed(1)} ${(by - 7).toFixed(1)} H${bx2.toFixed(1)}" fill="none" style="stroke:#4A4440" stroke-width=".7"/>${[0.2, 0.5, 0.8].map((t2, k) => `<ellipse cx="${(bx1 + (bx2 - bx1) * t2).toFixed(1)}" cy="${(by - 9).toFixed(1)}" rx="3.4" ry="3" style="fill:${k === 1 ? "#E8566C" : "#6E9A44"}"/>`).join("")}`;
       }
@@ -16850,17 +16871,17 @@ ${r.n}`;
   var fillOf = (j) => j && j.goal > 0 ? Math.max(0, Math.min(1, (j.amount || 0) / j.goal)) : 0;
   var isFull = (j) => !!j && j.goal > 0 && (j.amount || 0) >= j.goal;
   var money = (n, cur2 = "$") => `${cur2}${Math.round(Number(n) || 0).toLocaleString("en-GB")}`;
-  function setupJar(slot6, f2) {
+  function setupJar(slot6, f3) {
     let j = jarAt(slot6);
     if (!j) {
       j = { id: "v" + Date.now().toString(36), slot: slot6, amount: 0, log: [], fills: 0 };
       V2.jars.push(j);
     }
-    j.label = plain(String(f2.label || "Savings")).trim().slice(0, 24) || "Savings";
-    j.goal = Math.max(1, Math.round(Number(f2.goal) || 0));
-    j.step = Math.max(1, Math.round(Number(f2.step) || 100));
-    j.color = JEWELS.some((x) => x[0] === f2.color) ? f2.color : "ruby";
-    j.cur = String(f2.cur || "$").slice(0, 3);
+    j.label = plain(String(f3.label || "Savings")).trim().slice(0, 24) || "Savings";
+    j.goal = Math.max(1, Math.round(Number(f3.goal) || 0));
+    j.step = Math.max(1, Math.round(Number(f3.step) || 100));
+    j.color = JEWELS.some((x) => x[0] === f3.color) ? f3.color : "ruby";
+    j.cur = String(f3.cur || "$").slice(0, 3);
     j.deleted = false;
     touch(j);
     return j;
@@ -16918,8 +16939,8 @@ ${r.n}`;
     }
     return (h3 >>> 0) % 1e3 / 1e3;
   };
-  var shade2 = (hex, f2) => {
-    const n = parseInt(hex.slice(1), 16), c = [n >> 16, n >> 8 & 255, n & 255].map((v) => Math.round(f2 > 0 ? v + (255 - v) * f2 : v * (1 + f2)));
+  var shade2 = (hex, f3) => {
+    const n = parseInt(hex.slice(1), 16), c = [n >> 16, n >> 8 & 255, n & 255].map((v) => Math.round(f3 > 0 ? v + (255 - v) * f3 : v * (1 + f3)));
     return "#" + c.map((v) => v.toString(16).padStart(2, "0")).join("");
   };
   var gem = (x, y, s, c, seed2, i) => {
@@ -16927,8 +16948,8 @@ ${r.n}`;
     return k ? `<path d="M${x - s} ${y} l${s * 0.5} ${-s * 0.7} h${s} l${s * 0.5} ${s * 0.7} l${-s} ${s * 0.9}z" fill="${c}"/><path d="M${x - s} ${y} h${s * 2} l${-s} ${s * 0.9}z" fill="${dk}"/><path d="M${x - s * 0.5} ${y - s * 0.7} h${s} l${-s * 0.5} ${s * 0.7}z" fill="${lt}"/>` : `<path d="M${x} ${y - s} l${s * 0.8} ${s} l${-s * 0.8} ${s * 0.8} l${-s * 0.8} ${-s * 0.8}z" fill="${c}"/><path d="M${x} ${y - s} l${s * 0.8} ${s} h${-s * 0.8}z" fill="${lt}"/><path d="M${x - s * 0.8} ${y} h${s * 0.8} v${s * 0.8}z" fill="${dk}"/>`;
   };
   function jarArt2(j, w, h3, opts = {}) {
-    const c = colOf(j && j.color), f2 = opts.fill != null ? opts.fill : fillOf(j), seed2 = j && j.id || "new";
-    const L2 = w * 0.1, R2 = w * 0.9, T = h3 * 0.09, B = h3 * 0.97, inner = [L2 + 3, R2 - 3], topY = T + 10, fillTop = B - 6 - (B - 6 - topY) * f2;
+    const c = colOf(j && j.color), f3 = opts.fill != null ? opts.fill : fillOf(j), seed2 = j && j.id || "new";
+    const L2 = w * 0.1, R2 = w * 0.9, T = h3 * 0.09, B = h3 * 0.97, inner = [L2 + 3, R2 - 3], topY = T + 10, fillTop = B - 6 - (B - 6 - topY) * f3;
     const body2 = `M${L2 + 2} ${T + 6} q-3 ${h3 * 0.04} -2.4 ${h3 * 0.1} q1 ${(B - T) * 0.38} -.4 ${(B - T) * 0.78} q.4 ${h3 * 0.05} ${w * 0.08} ${h3 * 0.06} q${(R2 - L2) * 0.42} 1.2 ${(R2 - L2) * 0.84 - w * 0.16} -.2 q${w * 0.07} -.6 ${w * 0.07} ${-h3 * 0.06} q-.9 ${-(B - T) * 0.4} .3 ${-(B - T) * 0.8} q.2 ${-h3 * 0.06} -2.4 ${-h3 * 0.09}z`;
     let gems = "";
     const s = Math.max(4, w * 0.075), rowH = s * 1.35, cols = Math.max(3, Math.floor((inner[1] - inner[0]) / (s * 1.9)));
@@ -16960,12 +16981,12 @@ ${r.n}`;
   function vaultPanel() {
     const j = jarAt(bv.slot), h3 = `<span class="tape gingham" aria-hidden="true"></span>`;
     if (!j || bv.mode === "setup") {
-      const f2 = bv.form || { label: j ? j.label : "", goal: j ? j.goal : "", step: j ? j.step : 100, color: j ? j.color : JEWELS[bv.slot % JEWELS.length][0], cur: j ? j.cur : "$" };
+      const f3 = bv.form || { label: j ? j.label : "", goal: j ? j.goal : "", step: j ? j.step : 100, color: j ? j.color : JEWELS[bv.slot % JEWELS.length][0], cur: j ? j.cur : "$" };
       return h3 + `<h2>${j ? "Change this vault" : "Set up vault " + (bv.slot + 1)}</h2><p class="sub">A savings goal, kept as jewels.</p>
-      <form id="vForm" class="vform"><label class="muted" for="vLabel">Label</label><input id="vLabel" maxlength="24" placeholder="e.g. Japan trip" value="${esc(f2.label)}">
-      <div class="vrow"><span><label class="muted" for="vGoal">Goal</label><input id="vGoal" type="number" inputmode="numeric" min="1" step="1" placeholder="2000" value="${esc(String(f2.goal))}"></span>
-      <span><label class="muted" for="vStep">Markers every</label><select id="vStep">${[10, 20, 50, 100, 200, 500, 1e3].map((v) => `<option value="${v}"${+f2.step === v ? " selected" : ""}>${v}</option>`).join("")}</select></span></div>
-      <p class="muted" style="margin:8px 0 4px">Jewels</p><div class="vswatch" role="radiogroup" aria-label="Jewel colour">${JEWELS.map(([k, n, c]) => `<button type="button" class="vsw${f2.color === k ? " on" : ""}" data-vcol="${k}" role="radio" aria-checked="${f2.color === k}" aria-label="${n}" title="${n}"><svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true">${gem(10, 9, 7, c, k, 1)}</svg></button>`).join("")}</div>
+      <form id="vForm" class="vform"><label class="muted" for="vLabel">Label</label><input id="vLabel" maxlength="24" placeholder="e.g. Japan trip" value="${esc(f3.label)}">
+      <div class="vrow"><span><label class="muted" for="vGoal">Goal</label><input id="vGoal" type="number" inputmode="numeric" min="1" step="1" placeholder="2000" value="${esc(String(f3.goal))}"></span>
+      <span><label class="muted" for="vStep">Markers every</label><select id="vStep">${[10, 20, 50, 100, 200, 500, 1e3].map((v) => `<option value="${v}"${+f3.step === v ? " selected" : ""}>${v}</option>`).join("")}</select></span></div>
+      <p class="muted" style="margin:8px 0 4px">Jewels</p><div class="vswatch" role="radiogroup" aria-label="Jewel colour">${JEWELS.map(([k, n, c]) => `<button type="button" class="vsw${f3.color === k ? " on" : ""}" data-vcol="${k}" role="radio" aria-checked="${f3.color === k}" aria-label="${n}" title="${n}"><svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true">${gem(10, 9, 7, c, k, 1)}</svg></button>`).join("")}</div>
       <div class="actions"><button class="btn primary" type="submit">${j ? "Save" : "Set it up"}</button><button class="btn alt small" type="button" data-vb="${j ? "back" : "close"}">${j ? "Back" : "Not now"}</button>${j ? `<button class="btn alt small" type="button" data-vb="remove">Remove this vault</button>` : ""}</div></form>`;
     }
     const full = isFull(j);
@@ -16991,12 +17012,12 @@ ${r.n}`;
     const form = root.querySelector("#vForm");
     if (form) form.onsubmit = (ev) => {
       ev.preventDefault();
-      const f2 = readForm(root);
-      if (!(Number(f2.goal) > 0)) {
+      const f3 = readForm(root);
+      if (!(Number(f3.goal) > 0)) {
         root.querySelector("#vGoal").focus();
         return;
       }
-      setupJar(bv.slot, f2);
+      setupJar(bv.slot, f3);
       bv.form = null;
       bv.mode = "jar";
       api4.sfx("chime");
@@ -17082,8 +17103,8 @@ ${r.n}`;
     let k = 0;
     const grow = setInterval(() => {
       k++;
-      const f2 = from + (to - from) * (k / steps);
-      svg3.innerHTML = jarArt2(res.jar, 120, 290, { id: "big", fill: f2, cap: false });
+      const f3 = from + (to - from) * (k / steps);
+      svg3.innerHTML = jarArt2(res.jar, 120, 290, { id: "big", fill: f3, cap: false });
       if (k >= steps) {
         clearInterval(grow);
         setTimeout(() => {
@@ -17347,10 +17368,10 @@ ${r.n}`;
   var diningTable = (x, y) => sk(
     `<rect x="${x - 150}" y="${y - 40}" width="300" height="28" rx="4" style="fill:#D9B48A"/><rect x="${x - 150}" y="${y - 14}" width="300" height="8" rx="2" style="fill:#B98A5A"/>
     <path d="M${x - 40} ${y - 36} h80 l-4 20 h-72z" style="fill:#FFFDF6" opacity=".85"/>
-    ${[0, 1, 2, 3, 4].map((b) => `<ellipse cx="${x - 120 + b * 60}" cy="${y - 33}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("")}${[0, 1, 2, 3].map((f2) => `<ellipse cx="${x - 90 + f2 * 60}" cy="${y - 19}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("")}
+    ${[0, 1, 2, 3, 4].map((b) => `<ellipse cx="${x - 120 + b * 60}" cy="${y - 33}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("")}${[0, 1, 2, 3].map((f3) => `<ellipse cx="${x - 90 + f3 * 60}" cy="${y - 19}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("")}
     <ellipse cx="${x}" cy="${y - 27}" rx="16" ry="6" style="fill:#F3C969"/><circle cx="${x - 8}" cy="${y - 29}" r="3" style="fill:#E8566C"/><circle cx="${x + 6}" cy="${y - 28}" r="3" style="fill:#9CC27E"/><rect x="${x + 44}" y="${y - 36}" width="6" height="12" rx="2" style="fill:#8FB3E8"/><rect x="${x - 52}" y="${y - 34}" width="6" height="10" rx="2" style="fill:#F2A0B8"/>`,
     `<rect x="${x - 150}" y="${y - 40}" width="300" height="28" rx="4"/><rect x="${x - 150}" y="${y - 14}" width="300" height="8" rx="2"/><path d="M${x - 140} ${y - 6} v6 M${x + 140} ${y - 6} v6"/>
-    ${[0, 1, 2, 3, 4].map((b) => `<ellipse cx="${x - 120 + b * 60}" cy="${y - 33}" rx="9" ry="3.6"/>`).join("")}${[0, 1, 2, 3].map((f2) => `<ellipse cx="${x - 90 + f2 * 60}" cy="${y - 19}" rx="9" ry="3.6"/>`).join("")}<ellipse cx="${x}" cy="${y - 27}" rx="16" ry="6"/>`
+    ${[0, 1, 2, 3, 4].map((b) => `<ellipse cx="${x - 120 + b * 60}" cy="${y - 33}" rx="9" ry="3.6"/>`).join("")}${[0, 1, 2, 3].map((f3) => `<ellipse cx="${x - 90 + f3 * 60}" cy="${y - 19}" rx="9" ry="3.6"/>`).join("")}<ellipse cx="${x}" cy="${y - 27}" rx="16" ry="6"/>`
   );
   function furn(kind, x, y) {
     const W22 = "var(--wood)";
@@ -17494,7 +17515,7 @@ ${r.n}`;
       // the big family dining table (seats nine: five along the back, four along the front), with its chairs; the
       // table itself is also drawn among the people (diningTable, core.js) so those sitting behind it show waist up
       case "dining": {
-        const back = [0, 1, 2, 3, 4].map((b) => x - 120 + b * 60), front = [0, 1, 2, 3].map((f2) => x - 90 + f2 * 60);
+        const back = [0, 1, 2, 3, 4].map((b) => x - 120 + b * 60), front = [0, 1, 2, 3].map((f3) => x - 90 + f3 * 60);
         return sk(
           `${back.map((cx) => `<rect x="${cx - 10}" y="${y - 66}" width="20" height="26" rx="4" style="fill:#B98A5A"/>`).join("")}${front.map((cx) => `<rect x="${cx - 10}" y="${y + 4}" width="20" height="12" rx="3" style="fill:#B98A5A"/>`).join("")}`,
           `${back.map((cx) => `<rect x="${cx - 10}" y="${y - 66}" width="20" height="26" rx="4"/><path d="M${cx - 6} ${y - 58} h12" opacity=".5"/>`).join("")}${front.map((cx) => `<rect x="${cx - 10}" y="${y + 4}" width="20" height="12" rx="3"/><path d="M${cx - 8} ${y + 16} v8 M${cx + 8} ${y + 16} v8"/>`).join("")}`
@@ -17675,7 +17696,7 @@ ${r.n}`;
         const c = G2.cocoa ? G2.cocoa() : { bonbons: [], trays: {} }, ids = Array.isArray(c.display) ? c.display : (c.bonbons || []).filter((b) => (c.trays || {})[b.id] > 0).map((b) => b.id), shells = { milk: "#8A5A3A", dark: "#4A2E22", white: "#F3E7C9" };
         const shown = ids.map((id) => (c.bonbons || []).find((b) => b.id === id)).filter((b) => b && (c.trays || {})[b.id] > 0).slice(0, 6);
         return sk(
-          `<rect x="${x - 48}" y="${y - 96}" width="96" height="96" rx="4" style="fill:#8A5A3A"/><rect x="${x - 42}" y="${y - 90}" width="84" height="58" rx="2" style="fill:#EAF6FA"/>${[0, 1].map((r) => `<rect x="${x - 40}" y="${y - 62 + r * 28 - 28}" width="80" height="3" style="fill:#FFFDF6"/>`).join("")}${shown.map((b, i) => [0, 1, 2].map((k) => `<rect x="${x - 38 + i % 3 * 26 + k * 7}" y="${y - 84 + Math.floor(i / 3) * 28}" width="6" height="6" rx="2" style="fill:${shells[b.shell]};stroke:${b.col}" stroke-width="1"/>`).join("")).join("")}`,
+          `<rect x="${x - 48}" y="${y - 96}" width="96" height="96" rx="4" style="fill:#8A5A3A"/><rect x="${x - 42}" y="${y - 90}" width="84" height="58" rx="2" style="fill:#EAF6FA"/>${[0, 1].map((r) => `<rect x="${x - 40}" y="${y - 62 + r * 28 - 28}" width="80" height="3" style="fill:#FFFDF6"/>`).join("")}${shown.map((b, i) => [0, 1, 2].map((k) => `<path d="${mouldPath(b.shape || "dome", x - 35 + i % 3 * 26 + k * 7, y - 81 + Math.floor(i / 3) * 28, 3.2)}" style="fill:${shells[b.shell]};stroke:${b.col}" stroke-width="1"/>`).join("")).join("")}`,
           `<rect x="${x - 48}" y="${y - 96}" width="96" height="96" rx="4"/><rect x="${x - 42}" y="${y - 90}" width="84" height="58" rx="2"/><path d="M${x - 48} ${y - 24} h96" opacity=".5"/>`
         );
       }
@@ -18307,20 +18328,20 @@ ${r.n}`;
     const per = st6.per > 0 ? st6.per : 10, users = Math.floor(st6.users), n = Math.min(cols * rows2, Math.ceil(users / per));
     const tier = GARDEN_TIERS.reduce((t2, [min, k]) => users >= min ? k : t2, "daisy");
     const cols4 = key === "chord" ? ["#F3C969", "#FFFDF6", "#C3CDEE"] : key === "luna" ? ["#B9A6E8", "#C3CDEE", "#FFFDF6"] : key === "ohayo" ? ["#F2A65A", "#F3C969", "#FFFDF6"] : ["#EFA3A6", "#F4C7CF", "#FFFDF6"];
-    let f2 = "";
+    let f3 = "";
     for (let i = 0; i < n; i++) {
       const cx = x + 4 + i % cols * gap + Math.floor(i / cols) % 2 * gap / 2, cy = y + 10 + Math.floor(i / cols) * gap, c = cols4[i % 3];
-      f2 += `<g class="bloom"><path d="M${cx} ${cy} v${tier === "sunflower" ? -9 : -6}" style="stroke:var(--moss2)" stroke-width="1.2"/>`;
-      if (tier === "daisy") f2 += `<circle cx="${cx}" cy="${cy - 7}" r="2.6" style="fill:${c}"/><circle cx="${cx}" cy="${cy - 7}" r="1" fill="#F3C969"/>`;
-      else if (tier === "tulip") f2 += `<path d="M${cx - 3} ${cy - 9} q3 -6 6 0 q-1 4 -3 4 q-2 0 -3 -4z" style="fill:${c}" stroke="var(--line)" stroke-width=".6"/>`;
-      else f2 += `<circle cx="${cx}" cy="${cy - 11}" r="4.2" fill="#F3C969" stroke="var(--line)" stroke-width=".6"/><circle cx="${cx}" cy="${cy - 11}" r="1.8" fill="#8A5A3A"/>`;
-      f2 += `</g>`;
+      f3 += `<g class="bloom"><path d="M${cx} ${cy} v${tier === "sunflower" ? -9 : -6}" style="stroke:var(--moss2)" stroke-width="1.2"/>`;
+      if (tier === "daisy") f3 += `<circle cx="${cx}" cy="${cy - 7}" r="2.6" style="fill:${c}"/><circle cx="${cx}" cy="${cy - 7}" r="1" fill="#F3C969"/>`;
+      else if (tier === "tulip") f3 += `<path d="M${cx - 3} ${cy - 9} q3 -6 6 0 q-1 4 -3 4 q-2 0 -3 -4z" style="fill:${c}" stroke="var(--line)" stroke-width=".6"/>`;
+      else f3 += `<circle cx="${cx}" cy="${cy - 11}" r="4.2" fill="#F3C969" stroke="var(--line)" stroke-width=".6"/><circle cx="${cx}" cy="${cy - 11}" r="1.8" fill="#8A5A3A"/>`;
+      f3 += `</g>`;
     }
     const w = cols * gap, signX = x + w / 2 + (key === "chord" ? 26 : 0), signY = y + rows2 * gap + 10;
     const tree2 = users >= 500 ? `<g filter="url(#wob)" ${ink}><rect x="${x + w - 6}" y="${y + 4}" width="4" height="12" style="fill:var(--wood)"/><circle cx="${x + w - 4}" cy="${y}" r="9" style="fill:#F4C7CF"/><circle cx="${x + w - 10}" cy="${y + 4}" r="6" style="fill:#EFA3A6"/></g>` : "";
     const sparkle = users >= 1e3 ? `<g class="twinkle">${iconAt("sparkle", x - 2, y - 2, 12)}${iconAt("sparkle", x + w + 2, y + rows2 * gap - 4, 11)}</g>` : "";
     const label2 = `${users.toLocaleString()} ${st6.label || (key === "chord" ? "studios" : key === "chico" ? "families" : "users")}`;
-    return `<g data-ugarden="${key}" aria-label="${label2}">${f2}${tree2}${sparkle}
+    return `<g data-ugarden="${key}" aria-label="${label2}">${f3}${tree2}${sparkle}
     ${tapeLabel(signX, signY, label2, key === "chord" ? "var(--sage)" : "var(--blush)", 10)}</g>`;
   }
 
@@ -20356,7 +20377,7 @@ ${r.n}`;
   var rhodesWave = null;
   var guitarWave = null;
   function note(freq, t2, dur4, vel) {
-    const o = ac.createOscillator(), g10 = ac.createGain(), f2 = ac.createBiquadFilter(), tone = cur().tone;
+    const o = ac.createOscillator(), g10 = ac.createGain(), f3 = ac.createBiquadFilter(), tone = cur().tone;
     if (!bellWave) {
       bellWave = ac.createPeriodicWave(new Float32Array([0, 1, 0, 0.35, 0, 0.12, 0, 0.05]), new Float32Array(8));
       rhodesWave = ac.createPeriodicWave(new Float32Array([0, 1, 0.25, 0.12, 0.02]), new Float32Array(5));
@@ -20364,18 +20385,18 @@ ${r.n}`;
     if (!guitarWave) guitarWave = ac.createPeriodicWave(new Float32Array([0, 1, 0.7, 0.5, 0.38, 0.26, 0.18, 0.12, 0.08, 0.05]), new Float32Array(10));
     o.setPeriodicWave(tone === "bell" ? bellWave : tone === "rhodes" ? rhodesWave : tone === "guitar" ? guitarWave : pianoWave);
     o.frequency.value = freq;
-    f2.type = "lowpass";
-    f2.frequency.value = Math.min(4200, 900 + freq * 2.2);
+    f3.type = "lowpass";
+    f3.frequency.value = Math.min(4200, 900 + freq * 2.2);
     g10.gain.setValueAtTime(0, t2);
     g10.gain.linearRampToValueAtTime(vel, t2 + (tone === "guitar" ? 3e-3 : 6e-3));
     if (tone === "guitar") {
-      f2.frequency.setValueAtTime(Math.min(5200, 1600 + freq * 4), t2);
-      f2.frequency.exponentialRampToValueAtTime(Math.max(500, freq * 1.6), t2 + 0.35);
+      f3.frequency.setValueAtTime(Math.min(5200, 1600 + freq * 4), t2);
+      f3.frequency.exponentialRampToValueAtTime(Math.max(500, freq * 1.6), t2 + 0.35);
       dur4 = Math.min(dur4, 1.6);
     }
     g10.gain.exponentialRampToValueAtTime(vel * (tone === "guitar" ? 0.22 : 0.35), t2 + (tone === "guitar" ? 0.16 : 0.25));
     g10.gain.exponentialRampToValueAtTime(1e-4, t2 + dur4);
-    o.connect(f2).connect(g10).connect(musicBus);
+    o.connect(f3).connect(g10).connect(musicBus);
     o.start(t2);
     o.stop(t2 + dur4 + 0.05);
   }
@@ -20444,12 +20465,12 @@ ${r.n}`;
         d[i] = last2 * 3.2 + (Math.random() < 4e-4 ? (Math.random() - 0.5) * 0.8 : 0);
       }
     }
-    const src = ac.createBufferSource(), f2 = ac.createBiquadFilter();
+    const src = ac.createBufferSource(), f3 = ac.createBiquadFilter();
     src.buffer = buf;
     src.loop = true;
-    f2.type = "lowpass";
-    f2.frequency.value = 1400;
-    src.connect(f2).connect(musicBus);
+    f3.type = "lowpass";
+    f3.frequency.value = 1400;
+    src.connect(f3).connect(musicBus);
     src.start();
     rainSrc = src;
     timerId = setInterval(() => {
@@ -20550,21 +20571,21 @@ ${r.n}`;
     // paper: a handful of tiny filtered crackles
     paper(t2, soft) {
       for (let i = 0; i < (soft ? 5 : 9); i++) {
-        const s = noise(0.03), f2 = ac.createBiquadFilter(), g10 = ac.createGain(), at2 = t2 + i * (0.018 + Math.random() * 0.03);
-        f2.type = "bandpass";
-        f2.frequency.value = 1800 + Math.random() * 3500;
-        f2.Q.value = 1.4;
+        const s = noise(0.03), f3 = ac.createBiquadFilter(), g10 = ac.createGain(), at2 = t2 + i * (0.018 + Math.random() * 0.03);
+        f3.type = "bandpass";
+        f3.frequency.value = 1800 + Math.random() * 3500;
+        f3.Q.value = 1.4;
         g10.gain.setValueAtTime((soft ? 0.12 : 0.2) * (0.5 + Math.random()), at2);
         g10.gain.exponentialRampToValueAtTime(1e-4, at2 + 0.03 + Math.random() * 0.03);
-        s.connect(f2).connect(g10).connect(sfxBus);
+        s.connect(f3).connect(g10).connect(sfxBus);
         s.start(at2);
       }
     },
     // purr: rumbling low noise, pulsing ~24 times a second, swelling in and out
     purr(t2) {
-      const s = noise(1.8), f2 = ac.createBiquadFilter(), g10 = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain();
-      f2.type = "lowpass";
-      f2.frequency.value = 260;
+      const s = noise(1.8), f3 = ac.createBiquadFilter(), g10 = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain();
+      f3.type = "lowpass";
+      f3.frequency.value = 260;
       lfo.frequency.value = 24;
       lg.gain.value = 0.5;
       lfo.connect(lg).connect(g10.gain);
@@ -20572,19 +20593,19 @@ ${r.n}`;
       g10.gain.linearRampToValueAtTime(0.55, t2 + 0.3);
       g10.gain.linearRampToValueAtTime(0.45, t2 + 1.2);
       g10.gain.linearRampToValueAtTime(0, t2 + 1.75);
-      s.connect(f2).connect(g10).connect(sfxBus);
+      s.connect(f3).connect(g10).connect(sfxBus);
       s.start(t2);
       lfo.start(t2);
       lfo.stop(t2 + 1.8);
     },
     // cha-ching: a quick register clunk then two bright bells
     chaching(t2) {
-      const s = noise(0.08), f2 = ac.createBiquadFilter(), g10 = ac.createGain();
-      f2.type = "highpass";
-      f2.frequency.value = 2500;
+      const s = noise(0.08), f3 = ac.createBiquadFilter(), g10 = ac.createGain();
+      f3.type = "highpass";
+      f3.frequency.value = 2500;
       g10.gain.setValueAtTime(0.35, t2);
       g10.gain.exponentialRampToValueAtTime(1e-4, t2 + 0.08);
-      s.connect(f2).connect(g10).connect(sfxBus);
+      s.connect(f3).connect(g10).connect(sfxBus);
       s.start(t2);
       bell(1568, t2 + 0.07, 1.1, 0.22);
       bell(2093, t2 + 0.17, 1.4, 0.2);
@@ -20593,10 +20614,10 @@ ${r.n}`;
       bell(2349, t2, 0.7, 0.12);
     },
     bowl(t2) {
-      [220, 550].forEach((f2, i) => {
+      [220, 550].forEach((f3, i) => {
         const o = ac.createOscillator(), g10 = ac.createGain();
         o.type = "sine";
-        o.frequency.value = f2;
+        o.frequency.value = f3;
         g10.gain.setValueAtTime(0, t2);
         g10.gain.linearRampToValueAtTime(i ? 0.05 : 0.16, t2 + 0.02);
         g10.gain.exponentialRampToValueAtTime(1e-4, t2 + 3.2);
@@ -20616,52 +20637,52 @@ ${r.n}`;
     babble(t2, pitch = 1) {
       const n = 3 + Math.floor(Math.random() * 3);
       for (let i = 0; i < n; i++) {
-        const o = ac.createOscillator(), f2 = ac.createBiquadFilter(), g10 = ac.createGain(), at2 = t2 + i * 0.075;
+        const o = ac.createOscillator(), f3 = ac.createBiquadFilter(), g10 = ac.createGain(), at2 = t2 + i * 0.075;
         o.type = "square";
         o.frequency.value = 330 * pitch * Math.pow(2, [0, 2, 4, 7, 9][Math.floor(Math.random() * 5)] / 12);
-        f2.type = "lowpass";
-        f2.frequency.value = 1400;
+        f3.type = "lowpass";
+        f3.frequency.value = 1400;
         g10.gain.setValueAtTime(0, at2);
         g10.gain.linearRampToValueAtTime(0.07, at2 + 0.01);
         g10.gain.exponentialRampToValueAtTime(1e-4, at2 + 0.065);
-        o.connect(f2).connect(g10).connect(sfxBus);
+        o.connect(f3).connect(g10).connect(sfxBus);
         o.start(at2);
         o.stop(at2 + 0.08);
       }
     },
     // Evan's room: playful, soft sounds for the toddler games
     pop(t2) {
-      const s = noise(0.06), f2 = ac.createBiquadFilter(), g10 = ac.createGain();
-      f2.type = "bandpass";
-      f2.frequency.value = 1800;
+      const s = noise(0.06), f3 = ac.createBiquadFilter(), g10 = ac.createGain();
+      f3.type = "bandpass";
+      f3.frequency.value = 1800;
       g10.gain.setValueAtTime(0.35, t2);
       g10.gain.exponentialRampToValueAtTime(1e-4, t2 + 0.07);
-      s.connect(f2).connect(g10).connect(sfxBus);
+      s.connect(f3).connect(g10).connect(sfxBus);
       s.start(t2);
     },
     crack(t2) {
       for (let i = 0; i < 3; i++) {
-        const s = noise(0.025), f2 = ac.createBiquadFilter(), g10 = ac.createGain(), at2 = t2 + i * 0.05;
-        f2.type = "highpass";
-        f2.frequency.value = 2200;
+        const s = noise(0.025), f3 = ac.createBiquadFilter(), g10 = ac.createGain(), at2 = t2 + i * 0.05;
+        f3.type = "highpass";
+        f3.frequency.value = 2200;
         g10.gain.setValueAtTime(0.18, at2);
         g10.gain.exponentialRampToValueAtTime(1e-4, at2 + 0.03);
-        s.connect(f2).connect(g10).connect(sfxBus);
+        s.connect(f3).connect(g10).connect(sfxBus);
         s.start(at2);
       }
     },
     roar(t2) {
-      const o = ac.createOscillator(), f2 = ac.createBiquadFilter(), g10 = ac.createGain();
+      const o = ac.createOscillator(), f3 = ac.createBiquadFilter(), g10 = ac.createGain();
       o.type = "sawtooth";
       o.frequency.setValueAtTime(260, t2);
       o.frequency.linearRampToValueAtTime(420, t2 + 0.15);
       o.frequency.exponentialRampToValueAtTime(180, t2 + 0.5);
-      f2.type = "lowpass";
-      f2.frequency.value = 900;
+      f3.type = "lowpass";
+      f3.frequency.value = 900;
       g10.gain.setValueAtTime(0, t2);
       g10.gain.linearRampToValueAtTime(0.09, t2 + 0.05);
       g10.gain.exponentialRampToValueAtTime(1e-4, t2 + 0.55);
-      o.connect(f2).connect(g10).connect(sfxBus);
+      o.connect(f3).connect(g10).connect(sfxBus);
       o.start(t2);
       o.stop(t2 + 0.6);
     },
@@ -20681,50 +20702,50 @@ ${r.n}`;
     },
     choo(t2) {
       for (let i = 0; i < 4; i++) {
-        const s = noise(0.12), f2 = ac.createBiquadFilter(), g10 = ac.createGain(), at2 = t2 + i * 0.22;
-        f2.type = "bandpass";
-        f2.frequency.value = 700;
+        const s = noise(0.12), f3 = ac.createBiquadFilter(), g10 = ac.createGain(), at2 = t2 + i * 0.22;
+        f3.type = "bandpass";
+        f3.frequency.value = 700;
         g10.gain.setValueAtTime(0.2, at2);
         g10.gain.exponentialRampToValueAtTime(1e-4, at2 + 0.12);
-        s.connect(f2).connect(g10).connect(sfxBus);
+        s.connect(f3).connect(g10).connect(sfxBus);
         s.start(at2);
       }
     },
     vroom(t2) {
-      const o = ac.createOscillator(), f2 = ac.createBiquadFilter(), g10 = ac.createGain();
+      const o = ac.createOscillator(), f3 = ac.createBiquadFilter(), g10 = ac.createGain();
       o.type = "sawtooth";
       o.frequency.setValueAtTime(70, t2);
       o.frequency.exponentialRampToValueAtTime(220, t2 + 0.7);
-      f2.type = "lowpass";
-      f2.frequency.value = 600;
+      f3.type = "lowpass";
+      f3.frequency.value = 600;
       g10.gain.setValueAtTime(0.08, t2);
       g10.gain.exponentialRampToValueAtTime(1e-4, t2 + 0.8);
-      o.connect(f2).connect(g10).connect(sfxBus);
+      o.connect(f3).connect(g10).connect(sfxBus);
       o.start(t2);
       o.stop(t2 + 0.85);
     },
     honk(t2) {
       [0, 0.2].forEach((d) => {
-        const o = ac.createOscillator(), f2 = ac.createBiquadFilter(), g10 = ac.createGain();
+        const o = ac.createOscillator(), f3 = ac.createBiquadFilter(), g10 = ac.createGain();
         o.type = "square";
         o.frequency.value = 440;
-        f2.type = "lowpass";
-        f2.frequency.value = 1200;
+        f3.type = "lowpass";
+        f3.frequency.value = 1200;
         g10.gain.setValueAtTime(0.05, t2 + d);
         g10.gain.exponentialRampToValueAtTime(1e-4, t2 + d + 0.14);
-        o.connect(f2).connect(g10).connect(sfxBus);
+        o.connect(f3).connect(g10).connect(sfxBus);
         o.start(t2 + d);
         o.stop(t2 + d + 0.15);
       });
     },
     crunch(t2) {
       for (let i = 0; i < 4; i++) {
-        const s = noise(0.04), f2 = ac.createBiquadFilter(), g10 = ac.createGain(), at2 = t2 + i * 0.09;
-        f2.type = "bandpass";
-        f2.frequency.value = 2600;
+        const s = noise(0.04), f3 = ac.createBiquadFilter(), g10 = ac.createGain(), at2 = t2 + i * 0.09;
+        f3.type = "bandpass";
+        f3.frequency.value = 2600;
         g10.gain.setValueAtTime(0.16, at2);
         g10.gain.exponentialRampToValueAtTime(1e-4, at2 + 0.04);
-        s.connect(f2).connect(g10).connect(sfxBus);
+        s.connect(f3).connect(g10).connect(sfxBus);
         s.start(at2);
       }
     },
@@ -20743,12 +20764,12 @@ ${r.n}`;
       for (let i = 0; i < 16; i++) bell(1800 + Math.random() * 1600, t2 + i * 0.06 + Math.random() * 0.03, 0.35, 0.025);
     },
     cap(t2) {
-      const s = noise(0.06), f2 = ac.createBiquadFilter(), g10 = ac.createGain();
-      f2.type = "lowpass";
-      f2.frequency.value = 700;
+      const s = noise(0.06), f3 = ac.createBiquadFilter(), g10 = ac.createGain();
+      f3.type = "lowpass";
+      f3.frequency.value = 700;
       g10.gain.setValueAtTime(0.4, t2);
       g10.gain.exponentialRampToValueAtTime(1e-4, t2 + 0.09);
-      s.connect(f2).connect(g10).connect(sfxBus);
+      s.connect(f3).connect(g10).connect(sfxBus);
       s.start(t2);
       bell(1320, t2 + 0.05, 0.5, 0.03);
     },
@@ -21162,9 +21183,9 @@ Quests finished today: ${S3.doneIds.length}`;
     }
   }
   function trap(ev) {
-    const f2 = [...$("notebook").querySelectorAll("button:not([disabled]),a[href],input:not([disabled])")];
-    if (!f2.length) return;
-    const first = f2[0], last2 = f2[f2.length - 1];
+    const f3 = [...$("notebook").querySelectorAll("button:not([disabled]),a[href],input:not([disabled])")];
+    if (!f3.length) return;
+    const first = f3[0], last2 = f3[f3.length - 1];
     if (ev.shiftKey && document.activeElement === first) {
       ev.preventDefault();
       last2.focus();
@@ -21476,9 +21497,9 @@ Quests finished today: ${S3.doneIds.length}`;
     while (open2.size) {
       let cur2 = null, cf = Infinity;
       for (const i of open2) {
-        const f2 = g10.get(i) + dist(pts[i], to);
-        if (f2 < cf) {
-          cf = f2;
+        const f3 = g10.get(i) + dist(pts[i], to);
+        if (f3 < cf) {
+          cf = f3;
           cur2 = i;
         }
       }
@@ -21739,7 +21760,7 @@ Quests finished today: ${S3.doneIds.length}`;
     if (tab === "wins") h3 += wins.length ? `<ul class="hlist gnews">${wins.map((w) => `<li><span>${esc(w)}</span></li>`).join("")}</ul>` : `<p class="muted">Your wins show up here as the day goes on.</p>`;
     if (tab === "events" && !cal) h3 += `<p class="muted">A quiet fortnight in the village.</p>`;
     if (tab === "events" && cal) {
-      if (cal.fests.length) h3 += `<ul class="hlist gnews vcal fests">${cal.fests.map((f2) => `<li><span><b>${esc(f2.name)}</b><small>${esc(f2.when)} · ${esc(f2.until)}</small></span></li>`).join("")}</ul>`;
+      if (cal.fests.length) h3 += `<ul class="hlist gnews vcal fests">${cal.fests.map((f3) => `<li><span><b>${esc(f3.name)}</b><small>${esc(f3.when)} · ${esc(f3.until)}</small></span></li>`).join("")}</ul>`;
       h3 += cal.days.length ? `<ul class="hlist gnews vcal">${cal.days.map((d2) => `<li><span><b>${esc(d2.when)}</b>${d2.list.map((x) => `<small>${esc(x)}</small>`).join("")}</span></li>`).join("")}</ul>` : `<p class="muted">A quiet fortnight in the village.</p>`;
     }
     if (tab === "news") h3 += world.length ? `<ul class="hlist gnews world">${world.map((x) => `<li><span>${/^https:\/\//.test(x.link || "") ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(clean2(x.title))}</a>` : esc(clean2(x.title))}${x.summary ? `<small>${esc(clean2(x.summary))}</small>` : ""}${x.source ? `<small class="src">${esc(clean2(x.source))}</small>` : ""}</span></li>`).join("")}</ul>` : `<p class="muted">The morning's good news hasn't arrived yet.</p>`;
@@ -22231,14 +22252,14 @@ Quests finished today: ${S3.doneIds.length}`;
     on("[data-hcard]", "click", (el) => {
       const c = focus && focus.cards[focus.i];
       if (!c) return;
-      const f2 = focus, i = f2.i;
+      const f3 = focus, i = f3.i;
       if (el.dataset.hcard === "done") {
         setDone(c.kind, c.id, true);
         offerUndo(c.kind, c.id, () => {
-          if (focus === f2) f2.i = i;
+          if (focus === f3) f3.i = i;
         });
       }
-      f2.i++;
+      f3.i++;
       api2.changed();
     });
     on("[data-hback]", "click", () => {
@@ -23060,8 +23081,8 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       st3.editing = true;
       rerender();
     });
-    const f2 = root.querySelector("#rvForm");
-    if (f2) f2.onsubmit = (ev) => {
+    const f3 = root.querySelector("#rvForm");
+    if (f3) f3.onsubmit = (ev) => {
       ev.preventDefault();
       const v = Math.max(0, Math.round(Number(root.querySelector("#rvIn").value) || 0));
       F2.revTarget = v || null;
@@ -23074,11 +23095,11 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   // src/game/myroom.js
   var JKEY = "fox.journal";
   var SKEY = "fox.scratch";
-  var load3 = (k, f2) => {
+  var load3 = (k, f3) => {
     try {
-      return Object.assign(f2(), JSON.parse(localStorage.getItem(k)) || {});
+      return Object.assign(f3(), JSON.parse(localStorage.getItem(k)) || {});
     } catch {
-      return f2();
+      return f3();
     }
   };
   var J = load3(JKEY, () => ({ entries: [], updatedAt: 0 }));
@@ -23583,12 +23604,12 @@ ${e.text}`, { modelTier: "default", cache: false });
       return h3 + `<h2>${open2 ? `From you, ${esc(shortWhen(e.at))}` : "A sealed letter"}</h2>${open2 ? `<div class="lletter mine">${para(e.text)}</div>` : `<p class="muted">Sealed until ${esc(longDate(e.deliver))}. No peeking.</p>`}
       <div class="actions">${open2 ? `<button class="btn alt small" data-lt="journal" data-id="${esc(e.id)}" ${e.journaled ? "disabled" : ""}>${e.journaled ? "In your journal" : "Save to my journal"}</button>` : ""}<button class="btn alt small" data-lt="home">Back</button></div>`;
     }
-    const u = universe(), f2 = future(), now3 = Date.now(), news = arrived();
+    const u = universe(), f3 = future(), now3 = Date.now(), news = arrived();
     h3 += `<h2>Letters</h2><p class="sub">Write to the universe, or to the you of later on.</p>
     <div class="vmenu"><button class="btn primary" data-lt="universe">Dear Universe…</button><button class="btn alt" data-lt="future">Dear future me…</button></div>`;
     if (news.length) h3 += `<p class="eyebrow" style="margin-top:14px">Arrived</p><ul class="hlist lnew">${news.map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${e.kind === "universe" ? "A letter from the universe" : "A letter from your past self"}</b><small>${e.kind === "universe" ? "in reply to " + esc(shortWhen(e.at)) : "written " + esc(shortWhen(e.at))}</small></span><span class="hbadge now">new</span></li>`).join("")}</ul>`;
     if (u.length) h3 += `<p class="eyebrow" style="margin-top:14px">Pen pals with the universe</p><ul class="hlist">${u.slice().reverse().slice(0, 12).map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${esc(e.text.split("\n")[0].slice(0, 60))}</b><small>${esc(shortWhen(e.at))} · ${e.reply && e.reply.due <= now3 ? "answered" : "on its way"}</small></span></li>`).join("")}</ul>`;
-    if (f2.length) h3 += `<p class="eyebrow" style="margin-top:14px">To future me</p><ul class="hlist">${f2.slice().reverse().map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${e.deliver <= dayKey() ? esc(e.text.split("\n")[0].slice(0, 60)) : "Sealed"}</b><small>written ${esc(shortWhen(e.at))} · ${e.deliver <= dayKey() ? "arrived " : "arrives "}${esc(longDate(e.deliver))}</small></span></li>`).join("")}</ul>`;
+    if (f3.length) h3 += `<p class="eyebrow" style="margin-top:14px">To future me</p><ul class="hlist">${f3.slice().reverse().map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${e.deliver <= dayKey() ? esc(e.text.split("\n")[0].slice(0, 60)) : "Sealed"}</b><small>written ${esc(shortWhen(e.at))} · ${e.deliver <= dayKey() ? "arrived " : "arrives "}${esc(longDate(e.deliver))}</small></span></li>`).join("")}</ul>`;
     return h3 + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function wireLetters(root, api4) {
@@ -24354,20 +24375,20 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return pool2[Math.floor(Math.random() * pool2.length)];
   };
   function wireKudos(root, api4) {
-    const t2 = root.querySelector("#kText"), f2 = root.querySelector("#kFrom");
+    const t2 = root.querySelector("#kText"), f3 = root.querySelector("#kFrom");
     if (t2) {
       t2.oninput = () => {
         kv.draft = t2.value;
       };
       if (!kv.draft) setTimeout(() => t2.focus(), 60);
     }
-    if (f2) f2.oninput = () => {
-      kv.from = f2.value;
+    if (f3) f3.oninput = () => {
+      kv.from = f3.value;
     };
     const form = root.querySelector("#kForm");
     if (form) form.onsubmit = (ev) => {
       ev.preventDefault();
-      const e = addKudos(t2.value, f2.value);
+      const e = addKudos(t2.value, f3.value);
       if (!e) {
         t2.focus();
         return;
@@ -24808,8 +24829,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     supply: { n: "Supply deal with the Scoop Shack", price: 250, line: "Every morning, 10 pieces of loose dark chocolate go to the Scoop Shack's gelato fridge on their own (when there are 10 spare)." },
     workshop: { n: "Weekend workshops", price: 700, line: "Saturday afternoons, 2 to 4: a class of six makes their own bonbons at the tables, and pays 8 coins each." },
     assistant: { n: "Second assistant", price: 500, line: "Lila joins the team. The shop opens on Mondays too, and it's a little busier with two behind the counter." },
-    cart: { n: "Farmers market cart", price: 400, line: "A little chocolate cart for the Sunday farmers market, 8 to 1. Mateo runs it, selling bars, bonbons and hot chocolate." }
+    cart: { n: "Farmers market cart", price: 400, line: "A little chocolate cart for the Sunday farmers market, 8 to 1. Mateo runs it, selling bars, bonbons and hot chocolate." },
+    // round 176: moulds for the bonbon table (the dome comes with the shop). Same price whatever the shape
+    m_heart: { n: "Heart moulds", price: 60, line: "A tray of little heart moulds for the bonbon table." },
+    m_square: { n: "Square moulds", price: 60, line: "Neat square moulds, for bonbons that stack in a box." },
+    m_shell: { n: "Seashell moulds", price: 60, line: "Scallop-shell moulds, ridges and all. Very Honeybrook bay." },
+    m_star: { n: "Star moulds", price: 60, line: "Five-pointed star moulds. Christmas, sorted." }
   };
+  var MOULDS = { dome: { n: "Dome", word: "" }, heart: { n: "Heart", word: "Heart" }, square: { n: "Square", word: "Square" }, shell: { n: "Seashell", word: "Shell" }, star: { n: "Star", word: "Star" } };
+  var mouldsOwned = (c) => Object.keys(MOULDS).filter((k) => k === "dome" || ccUp(c, "m_" + k));
+  var shapedName = (base, shape2) => !shape2 || shape2 === "dome" ? base : `${base.replace(/ (Truffle|Bonbon|Praline|Ganache|Heart|Cream)$/, "")} ${MOULDS[shape2].word}`;
   var ccUp = (c, k) => !!(c.up && c.up[k]);
   function buyCcUp(F2, k) {
     const c = cocoaState(F2), u = CC_UPS[k];
@@ -24828,7 +24857,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       workshop: "Weekend workshops are on: Saturdays, 2 to 4, at the tables.",
       assistant: "Lila starts Monday! The shop's open seven days now.",
       cart: "The chocolate cart's ready for Sunday's farmers market. Mateo's thrilled."
-    }[k];
+    }[k] || `${u.n}, on the shelf by the bonbon table. Pick them when you make a tray.`;
   }
   var cartOn2 = (day, hm6) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() === 0 && hm6 >= 8 * 60 && hm6 < 13 * 60;
   var WORKSHOP = 6;
@@ -24933,14 +24962,13 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var FL = (id) => INGR[id] || WINE_FILL[id];
   var isFilling = (id) => id in INGR && !NOT_FILLING.includes(id) || id in WINE_FILL;
   var fillName = (id) => FL(id)[0];
-  var STYLE = ["Truffle", "Bonbon", "Praline", "Ganache", "Heart"];
-  var POETIC2 = ["Jetty Sunset", "Lantern Night", "Ma Ma's Garden", "Sea Breeze", "First Light", "Golden Hour", "Low Tide", "Porch Swing", "Maple's Secret", "Night Market"];
+  var STYLE = ["Truffle", "Bonbon", "Praline", "Ganache", "Cream"];
   var keyOf3 = (shell, fills) => [shell, ...[...new Set(fills)].sort()].join("+");
   function bonbonName(shell, fills) {
-    const f2 = [...new Set(fills)].sort(), h3 = hash(keyOf3(shell, f2)), style = STYLE[h3 % STYLE.length], sh = shell[0].toUpperCase() + shell.slice(1);
-    if (f2.length === 1) return `${sh} ${FL(f2[0])[1]} ${style}`;
-    if (h3 % 3 === 0) return `${POETIC2[h3 % POETIC2.length]} ${style}`;
-    return `${FL(f2[0])[1]} & ${FL(f2[1])[1]} ${style}`;
+    const f3 = [...new Set(fills)].sort(), h3 = hash(keyOf3(shell, f3)), style = STYLE[h3 % STYLE.length], sh = shell[0].toUpperCase() + shell.slice(1);
+    if (f3.length === 1) return `${sh} ${FL(f3[0])[1]} ${style}`;
+    if (h3 % 3 === 0) return `${POETIC[h3 % POETIC.length]} ${style}`;
+    return `${FL(f3[0])[1]} & ${FL(f3[1])[1]} ${style}`;
   }
   var recipeOf2 = (c, id) => c.bonbons.find((b) => b.id === id);
   var knownBonbon = (c, shell, fills) => recipeOf2(c, keyOf3(shell, fills));
@@ -24950,22 +24978,28 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     c.res[k] -= r0;
     c.choc[k] -= n - r0;
   }
-  var canMakeBonbon = (c, shell, fills) => shellChoc(c, shell) >= SHELL && fills.length >= 1 && fills.every((f2) => (c.pantry[f2] || 0) >= 1);
-  function makeBonbons(F2, shell, fills) {
+  var canMakeBonbon = (c, shell, fills) => shellChoc(c, shell) >= SHELL && fills.length >= 1 && fills.every((f3) => (c.pantry[f3] || 0) >= 1);
+  function makeBonbons(F2, shell, fills, shape2) {
     const c = cocoaState(F2);
     fills = [...new Set(fills)].filter(isFilling).slice(0, 2);
     if (!KINDS2[shell] || !fills.length || !canMakeBonbon(c, shell, fills)) return null;
     takeChoc(c, shell, SHELL);
-    fills.forEach((f2) => {
-      c.pantry[f2]--;
-      if (c.pantry[f2] <= 0) delete c.pantry[f2];
+    fills.forEach((f3) => {
+      c.pantry[f3]--;
+      if (c.pantry[f3] <= 0) delete c.pantry[f3];
     });
     let r = knownBonbon(c, shell, fills), isNew = false;
+    const sh = shape2 && mouldsOwned(c).includes(shape2) ? shape2 : null;
     if (!r) {
       isNew = true;
       r = { id: keyOf3(shell, fills), shell, fills: [...fills].sort(), name: bonbonName(shell, fills), col: FL([...fills].sort()[0])[2], found: Date.now() };
       c.bonbons.push(r);
       if (Array.isArray(c.display) && c.display.length < CASE) c.display = [...c.display, r.id];
+    }
+    if (sh && sh !== (r.shape || "dome")) {
+      r.base = r.base || r.name;
+      r.shape = sh;
+      r.name = shapedName(r.base, sh);
     }
     c.trays[r.id] = (c.trays[r.id] || 0) + TRAY;
     return { r, isNew };
@@ -25065,8 +25099,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var SPECIAL_IDS = Object.values(SPECIALS2).map((x) => x.id);
   var specialOn = (day) => {
-    const f2 = festivalOn(day);
-    return f2 && SPECIALS2[f2.id] ? { ...SPECIALS2[f2.id], fest: f2.name } : null;
+    const f3 = festivalOn(day);
+    return f3 && SPECIALS2[f3.id] ? { ...SPECIALS2[f3.id], fest: f3.name } : null;
   };
   function makeSpecial(F2) {
     const c = cocoaState(F2), sp = specialOn(dayKey());
@@ -25331,8 +25365,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <div class="actions"><button class="btn small alt" data-cc="scoop" data-k="fridge" ${ok ? "" : "disabled"}>To the gelato fridge</button>${hasUp(s, "dip") ? `<button class="btn small alt" data-cc="scoop" data-k="dip" ${ok ? "" : "disabled"}>To the dip station</button>` : ""}</div>`;
   }
   var ingPic2 = (id) => id.startsWith("fl_") ? icon("bq_" + id.slice(3), 26) : icon(id, 26);
-  var bonbonPic = (shell, col) => `<svg class="gscoop" viewBox="0 0 44 44" aria-hidden="true"><rect x="8" y="12" width="28" height="24" rx="7" fill="${KINDS2[shell].col}" stroke="#3A2E28" stroke-width="1.2"/><path d="M12 20 q5 -6 10 0 q5 6 10 0" fill="none" stroke="${col}" stroke-width="3" stroke-linecap="round"/><circle cx="15" cy="16" r="2" fill="#fff" opacity=".5"/></svg>`;
-  var card4 = (shell, col, name, line, made) => `<div class="gresult${made ? " made" : ""}">${bonbonPic(shell, col)}<span><b>${esc(name)}</b><small>${esc(line)}</small></span></div>`;
+  var bonbonPic = (shell, col, shape2 = "dome") => `<svg class="gscoop" viewBox="0 0 44 44" aria-hidden="true"><path d="${mouldPath(shape2, 22, 23, 14)}" fill="${KINDS2[shell].col}" stroke="#3A2E28" stroke-width="1.2" stroke-linejoin="round"/>${shape2 === "shell" ? `<path d="${shellRibs(22, 23, 14)}" fill="none" stroke="${col}" stroke-width="1.6" stroke-linecap="round"/>` : `<path d="M14 22 q4 -5 8 0 q4 5 8 0" fill="none" stroke="${col}" stroke-width="2.6" stroke-linecap="round"/>`}<circle cx="16" cy="17" r="1.8" fill="#fff" opacity=".5"/></svg>`;
+  var bonbonMini = (b) => `<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="${mouldPath(b.shape || "dome", 12, 12.5, 8)}" fill="${KINDS2[b.shell].col}" stroke="${b.col}" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+  var card4 = (shell, col, name, line, made, shape2) => `<div class="gresult${made ? " made" : ""}">${bonbonPic(shell, col, shape2)}<span><b>${esc(name)}</b><small>${esc(line)}</small></span></div>`;
   function pantryPanel(F2, orch) {
     const c = cocoaState(F2), inS = Object.keys(c.pantry).filter((id) => c.pantry[id] > 0), bag2 = backpackFillings(F2), shelf3 = farmFillings(orch);
     const cell = (id, n, extra3) => `<li><span class="wpic">${ingPic2(id)}</span><span class="wtxt"><b>${esc(fillName(id))}</b><small>${n}</small></span>${extra3 || ""}</li>`;
@@ -25349,15 +25384,18 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const c = cocoaState(F2), inS = Object.keys(c.pantry).filter((id) => c.pantry[id] > 0 && isFilling(id)), sel = (st6.sel || []).filter((id) => inS.includes(id)), shell = KINDS2[st6.shell] ? st6.shell : "dark";
     let h3 = `<span class="tape stripe" aria-hidden="true"></span><h2>The bonbon table</h2><p class="sub">A shell (${SHELL} pieces of chocolate) and one or two fillings make a tray of ${TRAY}. Every new pairing is a new bonbon. ${c.bonbons.length} discovered so far.</p>`;
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">Shell</p><div class="gchips">${Object.entries(KINDS2).map(([k, d]) => `<button class="gchip${k === shell ? " on" : ""}" data-cc="shell" data-k="${k}" aria-pressed="${k === shell}">${dot2(d.col)}<span>${d.n.split(" ")[0]} (${shellChoc(c, k)})</span></button>`).join("")}</div>`;
+    const owned = mouldsOwned(c), mould2 = owned.includes(st6.mould) ? st6.mould : null;
+    h3 += `<p class="eyebrow" style="margin:10px 0 6px">Mould</p><div class="gchips">${owned.map((k) => `<button class="gchip${k === (mould2 || "dome") ? " on" : ""}" data-cc="bshape" data-k="${k}" aria-pressed="${k === (mould2 || "dome")}">${bonbonMini({ shape: k, shell, col: "#F3C969" })}<span>${MOULDS[k].n}</span></button>`).join("")}</div>${owned.length < 5 ? `<p class="muted">More moulds (heart, square, seashell, star) in the shop upgrades.</p>` : ""}`;
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">Fillings</p>` + (inS.length ? `<div class="gchips">${inS.map((id) => `<button class="gchip${sel.includes(id) ? " on" : ""}" data-cc="sel" data-k="${id}" aria-pressed="${sel.includes(id)}" ${!sel.includes(id) && sel.length >= 2 ? "disabled" : ""}>${ingPic2(id)}<span>${esc(fillName(id))}</span></button>`).join("")}</div>` : `<p class="muted">The fillings shelf is empty. Stock it first.</p>`);
     const made = st6.made && recipeOf2(c, st6.made), known2 = sel.length ? knownBonbon(c, shell, sel) : null;
-    if (made && !sel.length) h3 += card4(made.shell, made.col, made.name, st6.isNew ? "A new bonbon! The first tray's ready for the display case." : "Another tray of twelve, ready for the display case.", true);
-    else if (sel.length) h3 += card4(shell, FL([...sel].sort()[0])[2], known2 ? known2.name : bonbonName(shell, sel), known2 ? "You know this one. Make another tray?" : "Something new!");
+    const shape2 = mould2 || known2 && known2.shape || "dome";
+    if (made && !sel.length) h3 += card4(made.shell, made.col, made.name, st6.isNew ? "A new bonbon! The first tray's ready for the display case." : "Another tray of twelve, ready for the display case.", true, made.shape);
+    else if (sel.length) h3 += card4(shell, FL([...sel].sort()[0])[2], shapedName(known2 ? known2.base || known2.name : bonbonName(shell, sel), shape2), known2 ? (known2.shape || "dome") !== shape2 ? `You know this one. A tray in the ${MOULDS[shape2].n.toLowerCase()} mould makes it a ${MOULDS[shape2].n.toLowerCase()} from now on.` : "You know this one. Make another tray?" : "Something new!", false, shape2);
     const ok = sel.length && canMakeBonbon(c, shell, sel);
     h3 += `<div class="actions"><button class="btn primary" data-cc="bonbon" ${ok ? "" : "disabled"}>${known2 ? "Make another tray" : "Make it"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
     if (sel.length && shellChoc(c, shell) < SHELL) h3 += `<p class="muted">Not enough ${KINDS2[shell].n.toLowerCase()}: temper some more first, or raise its bonbon shelf target at the counter so Mateo makes some.</p>`;
     h3 += specialCard(c);
-    if (c.bonbons.length) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map((b) => `<li><span class="wpic">${dot2(KINDS2[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS2[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span><button class="btn small alt" data-cc="again" data-k="${esc(b.id)}" ${canMakeBonbon(c, b.shell, b.fills) ? "" : "disabled"}>Another tray</button></li>`).join("")}</ul>`;
+    if (c.bonbons.length) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map((b) => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS2[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span><button class="btn small alt" data-cc="again" data-k="${esc(b.id)}" ${canMakeBonbon(c, b.shell, b.fills) ? "" : "disabled"}>Another tray</button></li>`).join("")}</ul>`;
     return h3;
   }
   function specialCard(c) {
@@ -25369,8 +25407,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function casePanel(F2) {
     const c = cocoaState(F2), ids = displayIds2(c), shown = ids.map((id) => recipeOf2(c, id)), rest = c.bonbons.filter((b) => !ids.includes(b.id) && c.trays[b.id] > 0);
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The display case</h2><p class="sub">Up to ${CASE} flavours of bonbons, ${c.prices.bonbon} ${coin3()} each. Customers pick two to four.</p>`;
-    h3 += `<p class="eyebrow" style="margin:10px 0 6px">In the case (${shown.length} of ${CASE})</p>` + (shown.length ? `<ul class="hlist wlist">${shown.map((b) => `<li><span class="wpic">${dot2(KINDS2[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] ? c.trays[b.id] + " left" : "sold out"}</small></span><button class="btn small alt" data-cc="case" data-k="${esc(b.id)}">Take out</button></li>`).join("")}</ul>` : `<p class="muted">Empty. Make bonbons at the bonbon table in the kitchen.</p>`);
-    if (rest.length) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Waiting in the kitchen</p><ul class="hlist wlist">${rest.map((b) => `<li><span class="wpic">${dot2(KINDS2[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id]} made</small></span><button class="btn small primary" data-cc="case" data-k="${esc(b.id)}" ${ids.length >= CASE ? "disabled" : ""}>Put in</button></li>`).join("")}</ul>`;
+    h3 += `<p class="eyebrow" style="margin:10px 0 6px">In the case (${shown.length} of ${CASE})</p>` + (shown.length ? `<ul class="hlist wlist">${shown.map((b) => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] ? c.trays[b.id] + " left" : "sold out"}</small></span><button class="btn small alt" data-cc="case" data-k="${esc(b.id)}">Take out</button></li>`).join("")}</ul>` : `<p class="muted">Empty. Make bonbons at the bonbon table in the kitchen.</p>`);
+    if (rest.length) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Waiting in the kitchen</p><ul class="hlist wlist">${rest.map((b) => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id]} made</small></span><button class="btn small primary" data-cc="case" data-k="${esc(b.id)}" ${ids.length >= CASE ? "disabled" : ""}>Put in</button></li>`).join("")}</ul>`;
     const sp = specialOn(dayKey());
     if (sp) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Beside the case</p><p class="muted">${icon(sp.id, 20)} ${esc(sp.n)}: ${c.specials[sp.id] || 0} left, ${sp.price} ${coin3()} each, for ${esc(sp.fest)}.</p>`;
     h3 += `<div class="row gprices"><span>Price of a bonbon</span><span class="gstep"><button class="btn small alt" data-cc="bprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bonbon}</b><button class="btn small alt" data-cc="bprice" data-n="1" aria-label="Dearer">+</button></span></div>`;
@@ -25965,8 +26003,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return t2 ? t2.party.filter((id) => id !== "evan") : [];
   };
   var fareFor = (town, party, by = "train") => {
-    const t2 = TOWNS[town], f2 = by === "ferry" && t2.ferry ? t2.ferry.fare : t2.fare;
-    return f2 * (1 + party.filter((id) => !t2.free.includes(id)).length);
+    const t2 = TOWNS[town], f3 = by === "ferry" && t2.ferry ? t2.ferry.fare : t2.fare;
+    return f3 * (1 + party.filter((id) => !t2.free.includes(id)).length);
   };
   var canLeave = (town, hm6 = sgHM()) => hm6 >= TOWNS[town].outFrom && hm6 < TOWNS[town].outTo;
   function buyTrip(F2, town, party, hm6 = sgHM(), by = "train") {
@@ -25993,7 +26031,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const t2 = tripOn(F2, day);
     if (!t2 || !t2.party.includes(id) || hm6 < t2.from) return null;
     const T = TOWNS[t2.town], scene2 = townOf(melScene) === t2.town ? melScene : t2.by === "ferry" && T.ferry ? T.ferry.arrive[0] : T.arrive[0], spots = (T.spots[id] || {})[scene2] || ((T.rooms || {})[scene2] || {}).party;
-    const a = ((T.acts || {})[id] || {})[scene2], w = a && (a.hours ? a.hours.find(([f2, e]) => hm6 >= f2 && hm6 < e) : [t2.from, T.backTo]);
+    const a = ((T.acts || {})[id] || {})[scene2], w = a && (a.hours ? a.hours.find(([f3, e]) => hm6 >= f3 && hm6 < e) : [t2.from, T.backTo]);
     if (w) return { from: Math.max(t2.from, w[0]), to: w[1], scene: scene2, at: a.at, act: a.act, dir: a.dir, free: a.free, follow: true, glide: true, trip: true };
     const ended = a && a.hours ? Math.max(t2.from, ...a.hours.map(([, e]) => e).filter((e) => e <= hm6)) : t2.from;
     return { from: ended, to: T.backTo, scene: scene2, wander: spots || [[260, 400], [300, 360]], follow: true, glide: true, trip: true };
@@ -26207,9 +26245,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     e.goal = [x, y];
     if (outdoors(s) || townRoom(s)) {
       const pts = findPath(s, [e.x, e.y], [x, y], api3.bounds());
-      const f2 = pts.shift();
-      e.tx = f2[0];
-      e.ty = f2[1];
+      const f3 = pts.shift();
+      e.tx = f3[0];
+      e.ty = f3[1];
       e.path = pts;
     } else {
       e.tx = x;
@@ -27094,7 +27132,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function hivesPanel(F2, keeper) {
     const h3 = hfState(F2), full = fullHives(h3), mine = myHiveFull(h3), rain = stormyOn(dayKey()), n = full.length * JARS + (mine ? MY_FRAMES : 0);
     let p = `<span class="tape stripe" aria-hidden="true"></span><h2>The beehives</h2><p class="sub">Each hive fills over three days${rain ? " (slower today: it's raining, so the bees are staying in)" : ""}. Collect a full one for ${JARS} frames of comb to spin at the barn's extractor (Felix keeps the rest), but don't leave it too long: a full hive gets restless and swarms. This week the bees are on the ${honeyNow().n}. ${keeper ? "Felix lends you his bee veil." : levelOf(h3) >= 1 ? "Your own veil's on its hook." : "Put on the bee veil from the hook."}</p>`;
-    const row7 = (label2, f2, warn, extra3 = "") => `<li><span class="wpic">${icon("honey", 22)}</span><span class="wtxt"><b>${label2}</b><small>${f2 >= 1 ? warn ? "full, and the bees are restless: collect it soon!" : "full, heavy with honey" : `${Math.round(f2 * 100)}% full`}</small>${extra3}</span><span class="clbar" style="width:70px"><i style="width:${Math.round(f2 * 100)}%"></i></span></li>`;
+    const row7 = (label2, f3, warn, extra3 = "") => `<li><span class="wpic">${icon("honey", 22)}</span><span class="wtxt"><b>${label2}</b><small>${f3 >= 1 ? warn ? "full, and the bees are restless: collect it soon!" : "full, heavy with honey" : `${Math.round(f3 * 100)}% full`}</small>${extra3}</span><span class="clbar" style="width:70px"><i style="width:${Math.round(f3 * 100)}%"></i></span></li>`;
     p += `<ul class="hlist wlist">${h3.hives.map((_, i) => row7(`Hive ${i + 1}`, hiveFill(h3, i), restless(h3, i))).join("")}${h3.myHive ? row7(`${esc(h3.myHive.name)} <small class="muted">(yours: all ${MY_FRAMES} frames)</small>`, hiveFill(h3, "mine"), restless(h3, "mine")) : ""}</ul>`;
     if (h3.myHive) p += `<form class="row hadd" data-hfname="1"><label class="sr" for="hfHive">Name your hive</label><input id="hfHive" maxlength="24" value="${esc(h3.myHive.name)}"><button class="btn small alt">Rename</button></form>`;
     if (h3.swarms) p += `<p class="muted">${h3.swarms} swarm${h3.swarms === 1 ? "" : "s"} so far. Felix says every beekeeper has a few.</p>`;
@@ -27178,9 +27216,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <ellipse cx="13" cy="-7" rx="5" ry="4" style="fill:${g10.col}"/><path d="M11 -10 q-1 -6 -5 -6 M14 -10 q0 -6 -3 -7" style="fill:none;stroke:#8A6A52" stroke-width="1.6"/><path d="M15 -4 l1 4 l-2 0z" style="fill:#E8D3BC"/><circle cx="14" cy="-8" r=".9" style="fill:#3A2E28"/><path d="M-12 -2 l-4 -4" />
     <animateTransform attributeName="transform" type="translate" values="0 0; 0 0; 0 -6; 0 0; 0 0" keyTimes="0; .8; .85; .9; 1" dur="${6 + k}s" begin="${k * 0.9}s" repeatCount="indefinite"/></g></g>`;
   }
-  var hive = (x, y, col, f2, k) => `<g ${W7} stroke-width="1.1"><rect x="${x - 11}" y="${y - 28}" width="22" height="9" style="fill:${col}"/><rect x="${x - 11}" y="${y - 19}" width="22" height="9" style="fill:${col}"/><rect x="${x - 11}" y="${y - 10}" width="22" height="10" style="fill:${col}"/>
+  var hive = (x, y, col, f3, k) => `<g ${W7} stroke-width="1.1"><rect x="${x - 11}" y="${y - 28}" width="22" height="9" style="fill:${col}"/><rect x="${x - 11}" y="${y - 19}" width="22" height="9" style="fill:${col}"/><rect x="${x - 11}" y="${y - 10}" width="22" height="10" style="fill:${col}"/>
   <path d="M${x - 14} ${y - 28} h28 l-3 -6 h-22z" style="fill:#F6EEE4"/><rect x="${x - 4}" y="${y - 3}" width="8" height="2" style="fill:#3A2E28"/>
-  ${f2 >= 1 ? `<rect x="${x - 3}" y="${y - 44}" width="6" height="6" rx="1" style="fill:#F3C33A"/>` : ""}</g>
+  ${f3 >= 1 ? `<rect x="${x - 3}" y="${y - 44}" width="6" height="6" rx="1" style="fill:#F3C33A"/>` : ""}</g>
   ${[0, 1, 2].map((i) => `<circle r="1.5" style="fill:#3A2E28"><animateMotion dur="${3 + i + k * 0.3}s" repeatCount="indefinite" path="M${x} ${y - 14} q${8 + i * 4} -${10 + i * 3} ${16 - i * 6} -${4 + i} t-${12} ${8}"/></circle>`).join("")}`;
   var HIVE_COLS = ["#F3C969", "#9FD3C2", "#F4C7CF", "#C3CDEE", "#F6EEE4"];
   function hfarmArt() {
@@ -27454,9 +27492,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var OK_WHEN = { day: (m) => m >= 7 * 60 && m < 18 * 60, dawn: (m) => m >= 5 * 60 && m < 10 * 60, dusk: (m) => m >= 18 * 60 && m < 20 * 60, night: (m) => m >= 19 * 60 || m < 6 * 60 };
   function canBite(id, day = dayKey(), hm6 = sgHM()) {
-    const f2 = FISH[id];
-    if (f2.when && !OK_WHEN[f2.when](hm6)) return false;
-    if (f2.rain && !rainyOn(day)) return false;
+    const f3 = FISH[id];
+    if (f3.when && !OK_WHEN[f3.when](hm6)) return false;
+    if (f3.rain && !rainyOn(day)) return false;
     if (id === "crayfish" && !(OK_WHEN.night(hm6) || rainyOn(day))) return false;
     return true;
   }
@@ -27545,13 +27583,13 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return { spot: spot6, fish, bite: Date.now() + BITE_MIN + rng() * (BITE_MAX - BITE_MIN), zone: zoneFor(fish, s.reel, rng()), t0: null };
   }
   function land(F2, id, rng = Math.random, addInv2) {
-    const s = fishState(F2), f2 = FISH[id], cm = Math.round(f2.cm[0] + Math.pow(rng(), 1.6) * (f2.cm[1] - f2.cm[0]));
+    const s = fishState(F2), f3 = FISH[id], cm = Math.round(f3.cm[0] + Math.pow(rng(), 1.6) * (f3.cm[1] - f3.cm[0]));
     const c = s.caught[id] || { n: 0, best: 0 }, isNew = !c.n, best = cm > c.best;
     s.caught = { ...s.caught, [id]: { n: c.n + 1, best: Math.max(c.best, cm) } };
     s.log = [{ id, cm, day: dayKey() }, ...s.log].slice(0, 30);
     if (id === "koi") s.koi = Math.min(3, s.koi + 1);
-    if (f2.item && addInv2) addInv2(f2.item, 1);
-    return { id, cm, isNew, best: best && !isNew, item: f2.item };
+    if (f3.item && addInv2) addInv2(f3.item, 1);
+    return { id, cm, isNew, best: best && !isNew, item: f3.item };
   }
   var journalCount2 = (F2) => Object.keys(fishState(F2).caught).length;
   var coin6 = () => icon("coin", 13);
@@ -27571,8 +27609,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <div class="actions"><button class="btn primary" data-fish="reel">Reel!</button></div>`;
     else {
       if (st6.result) {
-        const r = st6.result, f2 = FISH[r.id];
-        h3 += `<div class="fcatch"><span class="wpic">${icon(f2.item || r.id, 34)}</span><span class="wtxt"><b>${r.id === "boot" ? "An old boot!" : r.id === "seaglass" ? "Some sea glass!" : `${r.cm}cm ${f2.n.toLowerCase()}!`}${r.isNew ? " New in the journal." : r.best && !f2.junk ? " Your biggest yet!" : ""}</b><small>${esc(catchLine(r))}</small></span></div>`;
+        const r = st6.result, f3 = FISH[r.id];
+        h3 += `<div class="fcatch"><span class="wpic">${icon(f3.item || r.id, 34)}</span><span class="wtxt"><b>${r.id === "boot" ? "An old boot!" : r.id === "seaglass" ? "Some sea glass!" : `${r.cm}cm ${f3.n.toLowerCase()}!`}${r.isNew ? " New in the journal." : r.best && !f3.junk ? " Your biggest yet!" : ""}</b><small>${esc(catchLine(r))}</small></span></div>`;
       } else if (st6.msg) h3 += `<p class="muted">${esc(st6.msg)}</p>`;
       h3 += `<div class="actions"><button class="btn primary" data-fish="cast" ${s.bait > 0 ? "" : "disabled"}>${s.bait > 0 ? "Cast" : "Out of worms"}</button></div>`;
       if (!s.bait) h3 += `<p class="muted">No worms left. Finish a quest and you'll dig up another (three more turn up tomorrow morning anyway).</p>`;
@@ -27581,7 +27619,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     return h3 + shut11;
   }
-  var CATCH = [...new Set(Object.values(FISH).map((f2) => f2.item).filter(Boolean))];
+  var CATCH = [...new Set(Object.values(FISH).map((f3) => f3.item).filter(Boolean))];
   if (ITEMS.fish && !ITEMS.fish.sell) ITEMS.fish.sell = 3;
   function sellCatch(F2, id, mult = 1) {
     const ids = id ? [id] : CATCH, got3 = { n: 0, coins: 0 };
@@ -27605,17 +27643,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <div class="actions"><button class="btn primary small" data-fish="sellall">Sell the lot · ${all} ${coin6()}</button></div>`;
   };
   function catchLine(r) {
-    const f2 = FISH[r.id];
+    const f3 = FISH[r.id];
     if (r.id === "koi") return "Too beautiful to keep. You carry it home and let it go in the pond. It'll live there now.";
     if (r.id === "boot") return "Somebody's old wellington. Into the bin it goes.";
     if (r.id === "seaglass") return "A piece of sea glass, smoothed by the waves. It goes on the windowsill.";
-    return f2.item === "fish" ? "In the backpack: grill it at the kitchen, or give it to Maple." : `In the backpack: ${ING[f2.item][2]}.`;
+    return f3.item === "fish" ? "In the backpack: grill it at the kitchen, or give it to Maple." : `In the backpack: ${ING[f3.item][2]}.`;
   }
   function journalHtml(F2) {
     const s = fishState(F2);
-    return Object.entries(SPOTS3).map(([k, sp]) => `<p class="eyebrow" style="margin:12px 0 4px">${esc(sp.n)}</p><ul class="hlist wlist">${Object.entries(FISH).filter(([, f2]) => f2.spot === k).map(([id, f2]) => {
+    return Object.entries(SPOTS3).map(([k, sp]) => `<p class="eyebrow" style="margin:12px 0 4px">${esc(sp.n)}</p><ul class="hlist wlist">${Object.entries(FISH).filter(([, f3]) => f3.spot === k).map(([id, f3]) => {
       const c = s.caught[id];
-      return c ? `<li><span class="wpic">${icon(f2.item || id, 22)}</span><span class="wtxt"><b>${esc(f2.n)}</b><small>${c.n} caught${f2.junk ? "" : ` · biggest ${c.best}cm`}${id === "koi" ? ` · ${s.koi} in the pond` : ""}</small></span></li>` : `<li class="locked"><span class="wpic">?</span><span class="wtxt"><b>???</b><small>${esc(f2.hint)}</small></span></li>`;
+      return c ? `<li><span class="wpic">${icon(f3.item || id, 22)}</span><span class="wtxt"><b>${esc(f3.n)}</b><small>${c.n} caught${f3.junk ? "" : ` · biggest ${c.best}cm`}${id === "koi" ? ` · ${s.koi} in the pond` : ""}</small></span></li>` : `<li class="locked"><span class="wpic">?</span><span class="wtxt"><b>???</b><small>${esc(f3.hint)}</small></span></li>`;
     }).join("")}</ul>`).join("");
   }
 
@@ -28122,7 +28160,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function choga(x, y, w, h3, o = {}) {
     const roofH = h3 * 0.75, rx = x - 8, rw2 = w + 16;
-    const net = Array.from({ length: Math.floor(rw2 / 12) }, (_, i) => `<path d="M${rx + 6 + i * 12} ${y - roofH + 6} q-2 ${roofH * 0.5} 0 ${roofH - 4}" style="stroke:${C4.rope}" stroke-width="1"/>`).join("") + [0.3, 0.6].map((f2) => `<path d="M${rx + 4} ${y - roofH + roofH * f2 + 4} q${rw2 / 2 - 4} -4 ${rw2 - 8} 0" style="fill:none;stroke:${C4.rope}" stroke-width="1"/>`).join("");
+    const net = Array.from({ length: Math.floor(rw2 / 12) }, (_, i) => `<path d="M${rx + 6 + i * 12} ${y - roofH + 6} q-2 ${roofH * 0.5} 0 ${roofH - 4}" style="stroke:${C4.rope}" stroke-width="1"/>`).join("") + [0.3, 0.6].map((f3) => `<path d="M${rx + 4} ${y - roofH + roofH * f3 + 4} q${rw2 / 2 - 4} -4 ${rw2 - 8} 0" style="fill:none;stroke:${C4.rope}" stroke-width="1"/>`).join("");
     const stones = Array.from({ length: Math.floor(w * h3 / 260) }, (_, i) => `<ellipse cx="${x + 6 + rnd5(i + x) * (w - 12)}" cy="${y + 6 + rnd5(i + y) * (h3 - 12)}" rx="${4 + rnd5(i * 3) * 3}" ry="${3 + rnd5(i * 5) * 2}" style="fill:${C4.basalt3}" opacity=".7"/>`).join("");
     const dx = o.doorX || w / 2;
     return shade4(x, y, w, h3) + sk(
@@ -31281,7 +31319,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var surfLine = (y, x1 = 0, x2 = 520) => g5(`<path d="M${x1} ${y} ${Array.from({ length: Math.ceil((x2 - x1) / 40) }, (_, i) => `q10 -6 20 0 t20 0`).join(" ")}" fill="none" stroke="${C8.foam}" stroke-width="3" stroke-linecap="round" opacity=".9"/>`);
   var ground2 = (col) => `<rect width="520" height="640" style="fill:${col || C8.grass}"/><g filter="url(#wash)" opacity=".5"><ellipse cx="140" cy="460" rx="160" ry="90" style="fill:${C8.grass2}"/><ellipse cx="400" cy="560" rx="140" ry="70" style="fill:${C8.heath2}"/></g>`;
   var norfolk = (x, y, s = 1) => g5(sk(`<path d="M${x} ${y} v${-90 * s}" style="stroke:#6B5444" stroke-width="${3 * s}"/>${[0, 1, 2, 3, 4, 5].map((i) => `<path d="M${x - (28 - i * 4) * s} ${y - (20 + i * 13) * s} q${(28 - i * 4) * s} ${-8 * s} ${(56 - i * 8) * s} 0" style="fill:none;stroke:${C8.pine}" stroke-width="${6 * s}" stroke-linecap="round"/>`).join("")}`, ``));
-  var heathBush = (x, y, s = 1, f2 = "#B9A2DC") => g5(`<ellipse cx="${x}" cy="${y}" rx="${16 * s}" ry="${9 * s}" style="fill:${C8.heath}"/><ellipse cx="${x + 8 * s}" cy="${y - 4 * s}" rx="${10 * s}" ry="${7 * s}" style="fill:${C8.heath2}"/>${[[-6, -4], [4, -8], [10, -2]].map(([dx, dy]) => `<circle cx="${x + dx * s}" cy="${y + dy * s}" r="${1.8 * s}" fill="${f2}"/>`).join("")}`);
+  var heathBush = (x, y, s = 1, f3 = "#B9A2DC") => g5(`<ellipse cx="${x}" cy="${y}" rx="${16 * s}" ry="${9 * s}" style="fill:${C8.heath}"/><ellipse cx="${x + 8 * s}" cy="${y - 4 * s}" rx="${10 * s}" ry="${7 * s}" style="fill:${C8.heath2}"/>${[[-6, -4], [4, -8], [10, -2]].map(([dx, dy]) => `<circle cx="${x + dx * s}" cy="${y + dy * s}" r="${1.8 * s}" fill="${f3}"/>`).join("")}`);
   var gull = (x, y) => g5(`<path d="M${x - 6} ${y} q3 -4 6 0 q3 -4 6 0" fill="none" stroke="${C8.ink}" stroke-width="1.2"/>`);
   var gullStand = (x, y) => g5(sk(`<ellipse cx="${x}" cy="${y - 6}" rx="6" ry="4" style="fill:#FFFDF6"/><circle cx="${x + 5}" cy="${y - 10}" r="2.6" style="fill:#FFFDF6"/><path d="M${x + 7} ${y - 10} l3 1" style="stroke:#E8A83A" stroke-width="1.4"/><path d="M${x - 5} ${y - 7} q4 -2 8 0" style="fill:#B9BEC4"/>`, `<ellipse cx="${x}" cy="${y - 6}" rx="6" ry="4"/>`) + `<path d="M${x - 1} ${y - 2} v3 M${x + 2} ${y - 2} v3" stroke="#E8A83A" stroke-width="1"/>`);
   var surfboard = (x, y, col, rot = 0) => g5(sk(`<ellipse cx="${x}" cy="${y}" rx="5" ry="22" transform="rotate(${rot} ${x} ${y})" style="fill:${col}"/><path d="M${x} ${y - 18} v36" transform="rotate(${rot} ${x} ${y})" style="stroke:#FFFDF6" stroke-width="1"/>`, `<ellipse cx="${x}" cy="${y}" rx="5" ry="22" transform="rotate(${rot} ${x} ${y})"/>`));
@@ -32507,7 +32545,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var lowTable = (x, y, w = 70) => g8(sk(`<rect x="${x - w / 2}" y="${y - 10}" width="${w}" height="14" rx="3" style="fill:#8A6A52"/><rect x="${x - w / 2 + 4}" y="${y + 4}" width="5" height="8" style="fill:#6B5444"/><rect x="${x + w / 2 - 9}" y="${y + 4}" width="5" height="8" style="fill:#6B5444"/>`, `<rect x="${x - w / 2}" y="${y - 10}" width="${w}" height="14" rx="3"/>`));
   var cushion = (x, y, col = "#5E7A8A") => g8(sk(`<rect x="${x - 13}" y="${y - 6}" width="26" height="11" rx="4" style="fill:${col}"/>`, `<rect x="${x - 13}" y="${y - 6}" width="26" height="11" rx="4"/>`));
   var seaWindow2 = (x, y, w, h3) => g8(sk(
-    `<rect x="${x}" y="${y}" width="${w}" height="${h3}" style="fill:#7FB6D6"/><path d="M${x} ${y + h3 * 0.62} H${x + w}" style="stroke:#A7D0E6" stroke-width="2"/><path d="M${x + w * 0.6} ${y + h3 * 0.6} q${w * 0.12} ${-h3 * 0.4} ${w * 0.3} ${-h3 * 0.42} q${w * 0.08} ${h3 * 0.1} ${w * 0.06} ${h3 * 0.42}z" style="fill:#8FB46A"/>${[0.2, 0.45].map((f2) => `<path d="M${x + w * f2} ${y + h3 * 0.8} q4 -3 8 0 q4 3 8 0" style="fill:none;stroke:#EAF5FA" stroke-width="1.2"/>`).join("")}`,
+    `<rect x="${x}" y="${y}" width="${w}" height="${h3}" style="fill:#7FB6D6"/><path d="M${x} ${y + h3 * 0.62} H${x + w}" style="stroke:#A7D0E6" stroke-width="2"/><path d="M${x + w * 0.6} ${y + h3 * 0.6} q${w * 0.12} ${-h3 * 0.4} ${w * 0.3} ${-h3 * 0.42} q${w * 0.08} ${h3 * 0.1} ${w * 0.06} ${h3 * 0.42}z" style="fill:#8FB46A"/>${[0.2, 0.45].map((f3) => `<path d="M${x + w * f3} ${y + h3 * 0.8} q4 -3 8 0 q4 3 8 0" style="fill:none;stroke:#EAF5FA" stroke-width="1.2"/>`).join("")}`,
     `<rect x="${x}" y="${y}" width="${w}" height="${h3}"/><path d="M${x + w / 2} ${y} V${y + h3}"/>`
   ));
   function haenyeoRoom() {
@@ -33327,17 +33365,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function forage(F2, addInv2, day = dayKey()) {
     const w = woodsState(F2);
     if (w.forageDay === day) return null;
-    const f2 = FORAGE[seasonOf(day)], n = f2.n + (f2.id === "mushroom" && rainyOn(day) ? 1 : 0);
+    const f3 = FORAGE[seasonOf(day)], n = f3.n + (f3.id === "mushroom" && rainyOn(day) ? 1 : 0);
     w.forageDay = day;
-    addInv2(f2.id, n);
-    return { id: f2.id, n, line: f2.line };
+    addInv2(f3.id, n);
+    return { id: f3.id, n, line: f3.line };
   }
   var shut25 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   function rangerPanel(F2, wrenHere, day = dayKey()) {
-    const f2 = FORAGE[seasonOf(day)], it = ITEMS[f2.id];
+    const f3 = FORAGE[seasonOf(day)], it = ITEMS[f3.id];
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The ranger's cabin</h2><p class="sub">${wrenHere ? "Wren's in, kettle on." : "Wren's out on the trails; the noticeboard's by the door."} Honeybrook Woods: the waterfall, the pool, and every tree from here to Makers' Lane.</p>`;
     h3 += `<h3 class="ph3">On the noticeboard</h3><ul class="hlist wlist">
-    <li><span class="wpic">${icon(f2.id, 26)}</span><span class="wtxt"><b>In season: ${esc(it.n.toLowerCase())}</b><small>At the foraging patch, once a day.${f2.id === "mushroom" ? " One more after rain." : ""} For ${esc(NEW[f2.id][2])}.${foragedToday(F2, day) ? " (You've been today.)" : ""}</small></span></li>
+    <li><span class="wpic">${icon(f3.id, 26)}</span><span class="wtxt"><b>In season: ${esc(it.n.toLowerCase())}</b><small>At the foraging patch, once a day.${f3.id === "mushroom" ? " One more after rain." : ""} For ${esc(NEW[f3.id][2])}.${foragedToday(F2, day) ? " (You've been today.)" : ""}</small></span></li>
     <li><span class="wpic">${icon("trout", 26)}</span><span class="wtxt"><b>The waterfall pool</b><small>Brown trout, grayling (daytime) and minnows. Bring a rod and worms.</small></span></li>
     <li><span class="wpic">${icon("bike", 26)}</span><span class="wtxt"><b>Bike hire</b><small>By the cabin, at the station and in the town square. An hour for 5 coins.</small></span></li>
     <li><span class="wpic">${icon("taxi", 26)}</span><span class="wtxt"><b>The river taxi</b><small>From the pool down to Makers' Lane, home, the lake and the sea, 7am to 9pm. The quick way to Ma Ma's.</small></span></li></ul>`;
@@ -33670,10 +33708,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
   };
   function applyFlags(F2) {
-    const f2 = storyState(F2).flags;
-    if (f2.koi && FISH.koi) FISH.koi.w = 7;
-    if (f2.oilcake && !TAPAS.tortaaceite) TAPAS.tortaaceite = { n: "Ines's abuela's olive oil cake", need: { oliveoil: 1, flour: 1, egg: 1 }, price: 12 };
-    if (f2.pastry && !TAPAS.pasteles) TAPAS.pasteles = { n: "Farid's honey and pistachio pastries", need: { honey: 1, flour: 1 }, price: 9 };
+    const f3 = storyState(F2).flags;
+    if (f3.koi && FISH.koi) FISH.koi.w = 7;
+    if (f3.oilcake && !TAPAS.tortaaceite) TAPAS.tortaaceite = { n: "Ines's abuela's olive oil cake", need: { oliveoil: 1, flour: 1, egg: 1 }, price: 12 };
+    if (f3.pastry && !TAPAS.pasteles) TAPAS.pasteles = { n: "Farid's honey and pistachio pastries", need: { honey: 1, flour: 1 }, price: 9 };
   }
   function tellStory(F2, id, addInv2, day = dayKey()) {
     const r = storyReady(F2, id, day);
@@ -33861,16 +33899,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var ink2 = `style="stroke:var(--line)" stroke-width="1.2" stroke-linejoin="round"`;
   function petArt(kind, x, y) {
-    const c = PETS[kind].col, f2 = (col) => `style="fill:${col};stroke:var(--line)" stroke-width="1.2" stroke-linejoin="round"`, eye = (ex, ey) => `<circle cx="${ex}" cy="${ey}" r="1.1" fill="#2F2B28"/>`;
+    const c = PETS[kind].col, f3 = (col) => `style="fill:${col};stroke:var(--line)" stroke-width="1.2" stroke-linejoin="round"`, eye = (ex, ey) => `<circle cx="${ex}" cy="${ey}" r="1.1" fill="#2F2B28"/>`;
     const body2 = {
-      kitten: `<ellipse cx="0" cy="-7" rx="9" ry="6" ${f2(c)}/><circle cx="7" cy="-14" r="5.5" ${f2(c)}/><path d="M3 -18 l1 -5 l3 3z M9 -19 l2 -4 l1 5z" ${f2(c)}/><path d="M-9 -8 q-6 -6 -3 -12" fill="none" ${ink2}/>${eye(6, -14)}${eye(9.5, -14)}`,
-      puppy: `<ellipse cx="0" cy="-7" rx="10" ry="6" ${f2(c)}/><circle cx="8" cy="-14" r="6" ${f2(c)}/><ellipse cx="4" cy="-14" rx="2.4" ry="4.5" ${f2("#8A5A3A")}/><path d="M-10 -9 q-5 -4 -4 -9" fill="none" ${ink2}/>${eye(8, -15)}${eye(11.5, -15)}<circle cx="13.5" cy="-12.5" r="1.2" fill="#2F2B28"/>`,
-      bunny: `<ellipse cx="0" cy="-7" rx="8" ry="6" ${f2(c)}/><circle cx="6" cy="-13" r="5" ${f2(c)}/><ellipse cx="4" cy="-22" rx="1.8" ry="5" ${f2(c)}/><ellipse cx="8" cy="-22" rx="1.8" ry="5" ${f2(c)}/><circle cx="-8" cy="-8" r="2.5" ${f2("#FFFDF6")}/>${eye(7, -13)}`,
-      hamster: `<ellipse cx="0" cy="-6" rx="8" ry="6.5" ${f2(c)}/><circle cx="-4" cy="-11" r="2" ${f2(c)}/><circle cx="4" cy="-11" r="2" ${f2(c)}/><ellipse cx="0" cy="-4" rx="4.5" ry="3" style="fill:#FFFDF6"/>${eye(-2.5, -7)}${eye(2.5, -7)}`,
-      goldfish: `<ellipse cx="0" cy="-10" rx="10" ry="10" style="fill:#DCEBF2;stroke:var(--line)" stroke-width="1.2" opacity=".9"/><path d="M-3 -10 q4 -4 8 0 q-4 4 -8 0z M-3 -10 l-4 -3 v6z" ${f2(c)}/><rect x="-8" y="-21" width="16" height="3" rx="1" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1"/>`,
-      budgie: `<path d="M-4 0 v-6 M2 0 v-6" ${ink2}/><ellipse cx="0" cy="-11" rx="6" ry="7.5" ${f2(c)}/><circle cx="1" cy="-18" r="4" ${f2("#F3E07A")}/><path d="M4 -17 l3 1 l-3 1z" style="fill:#F2A65A"/><path d="M-5 -6 l-5 6" ${ink2}/>${eye(2, -19)}`,
-      tortoise: `<path d="M-11 -3 q0 -12 11 -12 q11 0 11 12z" ${f2(c)}/><path d="M-5 -10 l5 -3 l5 3 M-7 -5 h14" fill="none" ${ink2} opacity=".6"/><ellipse cx="13" cy="-6" rx="4" ry="3" ${f2("#B9D98A")}/>${eye(14, -7)}`,
-      duckling: `<ellipse cx="0" cy="-6" rx="7" ry="5.5" ${f2(c)}/><circle cx="5" cy="-13" r="4.5" ${f2(c)}/><path d="M9 -13 l4 1 l-4 1.5z" style="fill:#F2A65A;stroke:var(--line)" stroke-width=".8"/>${eye(6, -14)}`
+      kitten: `<ellipse cx="0" cy="-7" rx="9" ry="6" ${f3(c)}/><circle cx="7" cy="-14" r="5.5" ${f3(c)}/><path d="M3 -18 l1 -5 l3 3z M9 -19 l2 -4 l1 5z" ${f3(c)}/><path d="M-9 -8 q-6 -6 -3 -12" fill="none" ${ink2}/>${eye(6, -14)}${eye(9.5, -14)}`,
+      puppy: `<ellipse cx="0" cy="-7" rx="10" ry="6" ${f3(c)}/><circle cx="8" cy="-14" r="6" ${f3(c)}/><ellipse cx="4" cy="-14" rx="2.4" ry="4.5" ${f3("#8A5A3A")}/><path d="M-10 -9 q-5 -4 -4 -9" fill="none" ${ink2}/>${eye(8, -15)}${eye(11.5, -15)}<circle cx="13.5" cy="-12.5" r="1.2" fill="#2F2B28"/>`,
+      bunny: `<ellipse cx="0" cy="-7" rx="8" ry="6" ${f3(c)}/><circle cx="6" cy="-13" r="5" ${f3(c)}/><ellipse cx="4" cy="-22" rx="1.8" ry="5" ${f3(c)}/><ellipse cx="8" cy="-22" rx="1.8" ry="5" ${f3(c)}/><circle cx="-8" cy="-8" r="2.5" ${f3("#FFFDF6")}/>${eye(7, -13)}`,
+      hamster: `<ellipse cx="0" cy="-6" rx="8" ry="6.5" ${f3(c)}/><circle cx="-4" cy="-11" r="2" ${f3(c)}/><circle cx="4" cy="-11" r="2" ${f3(c)}/><ellipse cx="0" cy="-4" rx="4.5" ry="3" style="fill:#FFFDF6"/>${eye(-2.5, -7)}${eye(2.5, -7)}`,
+      goldfish: `<ellipse cx="0" cy="-10" rx="10" ry="10" style="fill:#DCEBF2;stroke:var(--line)" stroke-width="1.2" opacity=".9"/><path d="M-3 -10 q4 -4 8 0 q-4 4 -8 0z M-3 -10 l-4 -3 v6z" ${f3(c)}/><rect x="-8" y="-21" width="16" height="3" rx="1" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1"/>`,
+      budgie: `<path d="M-4 0 v-6 M2 0 v-6" ${ink2}/><ellipse cx="0" cy="-11" rx="6" ry="7.5" ${f3(c)}/><circle cx="1" cy="-18" r="4" ${f3("#F3E07A")}/><path d="M4 -17 l3 1 l-3 1z" style="fill:#F2A65A"/><path d="M-5 -6 l-5 6" ${ink2}/>${eye(2, -19)}`,
+      tortoise: `<path d="M-11 -3 q0 -12 11 -12 q11 0 11 12z" ${f3(c)}/><path d="M-5 -10 l5 -3 l5 3 M-7 -5 h14" fill="none" ${ink2} opacity=".6"/><ellipse cx="13" cy="-6" rx="4" ry="3" ${f3("#B9D98A")}/>${eye(14, -7)}`,
+      duckling: `<ellipse cx="0" cy="-6" rx="7" ry="5.5" ${f3(c)}/><circle cx="5" cy="-13" r="4.5" ${f3(c)}/><path d="M9 -13 l4 1 l-4 1.5z" style="fill:#F2A65A;stroke:var(--line)" stroke-width=".8"/>${eye(6, -14)}`
     }[kind];
     return `<g transform="translate(${x} ${y})"><ellipse cx="0" cy="0" rx="10" ry="2.6" fill="rgba(60,40,30,.16)"/><g class="petbob">${body2}</g></g>`;
   }
@@ -33978,12 +34016,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     updatedAt: 0
   });
   var freshFox = () => ({ name: "Maple", xp: 0, days: 0, streak: 0, lastActive: null, coins: null, inv: null, plots: null, cool: {}, met: {}, gifts: {}, mailRead: {}, digest: { read: {}, lastAt: 0, mine: [] }, updatedAt: 0 });
-  var load7 = (k, f2) => {
+  var load7 = (k, f3) => {
     try {
       const v = JSON.parse(localStorage.getItem(k));
-      return v ? Object.assign(f2(), v) : f2();
+      return v ? Object.assign(f3(), v) : f3();
     } catch {
-      return f2();
+      return f3();
     }
   };
   var S2 = load7("fox.today", freshToday);
@@ -34513,8 +34551,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (jn) jn.onkeydown = (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        const f2 = c.querySelector("#jcForm");
-        if (f2) f2.requestSubmit ? f2.requestSubmit() : f2.onsubmit(e);
+        const f3 = c.querySelector("#jcForm");
+        if (f3) f3.requestSubmit ? f3.requestSubmit() : f3.onsubmit(e);
       }
     };
     c.querySelectorAll("[data-sw]").forEach((b) => b.onclick = () => {
@@ -34565,8 +34603,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         jv.customWarn = "";
         jv.added = "";
         if (jv.adding) setTimeout(() => {
-          const f2 = c.querySelector("#jcForm");
-          if (f2) f2.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          const f3 = c.querySelector("#jcForm");
+          if (f3) f3.scrollIntoView({ block: "nearest", behavior: "smooth" });
         }, 30);
       } else if (k === "place") {
         const j = makeJar(jv.blobs, jv.note);
@@ -34711,12 +34749,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }, 0);
   }, true);
   $("undoBtn").onclick = () => {
-    const f2 = undoFn;
+    const f3 = undoFn;
     undoFn = null;
     clearTimeout(undoT);
     $("undoBar").hidden = true;
-    if (f2) {
-      f2();
+    if (f3) {
+      f3();
       sfx("paper", true);
     }
   };
@@ -36123,7 +36161,7 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
       const n = Math.round((Date.parse(k + "T00:00:00Z") - Date.parse(today2 + "T00:00:00Z")) / 864e5);
       return n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`;
     };
-    const fests = FESTIVALS.flatMap((f2) => f2.dates.map((k) => ({ f: f2, k, from: addD(k, -f2.before), to: addD(k, f2.after) }))).filter((x) => x.to >= today2 && x.k <= addD(today2, FEST_DAYS)).sort((a, b) => a.k.localeCompare(b.k));
+    const fests = FESTIVALS.flatMap((f3) => f3.dates.map((k) => ({ f: f3, k, from: addD(k, -f3.before), to: addD(k, f3.after) }))).filter((x) => x.to >= today2 && x.k <= addD(today2, FEST_DAYS)).sort((a, b) => a.k.localeCompare(b.k));
     const days = [];
     for (let i = 0; i < CAL_DAYS; i++) {
       const k = addD(today2, i), dn = dinnerOn(k), list5 = [];
@@ -36218,9 +36256,9 @@ Then tell chat "wind down" whenever you're ready.`
     let soon = null;
     for (let i = 1, d = fri; i <= 14; i++) {
       d = new Date(Date.parse(d + "T00:00:00Z") + 864e5).toISOString().slice(0, 10);
-      const f2 = festivalOn(d);
-      if (f2) {
-        soon = f2;
+      const f3 = festivalOn(d);
+      if (f3) {
+        soon = f3;
         break;
       }
     }
@@ -37701,11 +37739,11 @@ ${SIGNOFF[t2.who] || ""}`;
         speak("The coin drops into the wooden box. Jōshin bows, smiling.", 3500);
         save2();
       } else if (a === "fortune") {
-        const f2 = drawFortune(F);
-        if (!f2) return;
-        ktSt = { fortune: f2 };
+        const f3 = drawFortune(F);
+        if (!f3) return;
+        ktSt = { fortune: f3 };
         sfx("paper", true);
-        speak(f2[0] === "Bad luck" ? "Bad luck! You tie the slip to the rack and leave it there. Already feeling better." : `${f2[0]}! ${f2[1]}`, 5e3);
+        speak(f3[0] === "Bad luck" ? "Bad luck! You tie the slip to the rack and leave it there. Already feeling better." : `${f3[0]}! ${f3[1]}`, 5e3);
         save2();
       } else if (a === "shape") {
         ktSt = { neri: { shape: v, step: 0 } };
@@ -39476,7 +39514,7 @@ ${SIGNOFF[t2.who] || ""}`;
   function applyWear(pj) {
     const m = $("mel");
     if (!m) return;
-    const yk = !pj && townOf(scene) === "kyoto" && yukataOn(F), w = yk ? { dress: `${YUKATA.cols[yk][1]} maxi`, shoes: "tan" } : pj ? null : wearToday(), c = (f2, fb) => colourOf(w[f2], fb);
+    const yk = !pj && townOf(scene) === "kyoto" && yukataOn(F), w = yk ? { dress: `${YUKATA.cols[yk][1]} maxi`, shoes: "tan" } : pj ? null : wearToday(), c = (f3, fb) => colourOf(w[f3], fb);
     {
       const e = $("evan");
       if (e) {
@@ -42024,7 +42062,7 @@ ${SIGNOFF[t2.who] || ""}`;
       save2();
       return true;
     }
-    const what = r.items.map(([f2, n]) => `a ${f2} of ${n.replace(/ (Gelato|Sorbet)$/, "").toLowerCase()}`).join(" and ");
+    const what = r.items.map(([f3, n]) => `a ${f3} of ${n.replace(/ (Gelato|Sorbet)$/, "").toLowerCase()}`).join(" and ");
     npcSay(id, pick([`Yes please! ${what[0].toUpperCase() + what.slice(1)}.`, `Oh, perfect timing. ${what[0].toUpperCase() + what.slice(1)}, please!`, `Go on then: ${what}.`]));
     sfx("coin");
     flash(`+${r.coins} coins: the trolley`);
@@ -42280,11 +42318,14 @@ ${SIGNOFF[t2.who] || ""}`;
       } else if (a === "shell") {
         ccSt.shell = k;
         ccSt.made = null;
+      } else if (a === "bshape") {
+        ccSt.mould = k;
+        ccSt.made = null;
       } else if (a === "sel") {
         ccSt.made = null;
         ccSt.sel = ccSt.sel.includes(k) ? ccSt.sel.filter((x) => x !== k) : [...ccSt.sel, k].slice(0, 2);
       } else if (a === "bonbon" || a === "again") {
-        const r0 = a === "again" ? recipeOf2(cocoaState(F), k) : null, out = r0 ? makeBonbons(F, r0.shell, r0.fills) : makeBonbons(F, ccSt.shell, ccSt.sel);
+        const r0 = a === "again" ? recipeOf2(cocoaState(F), k) : null, out = r0 ? makeBonbons(F, r0.shell, r0.fills, ccSt.mould || r0.shape) : makeBonbons(F, ccSt.shell, ccSt.sel, ccSt.mould);
         if (!out) return;
         ccSt.sel = [];
         ccSt.made = out.r.id;
@@ -44413,15 +44454,15 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     }
   });
   $("hestiaFile").onchange = (e) => {
-    const f2 = e.target.files && e.target.files[0];
-    if (!f2) return;
+    const f3 = e.target.files && e.target.files[0];
+    if (!f3) return;
     const r = new FileReader();
     r.onload = () => {
       const msg = importHestia(String(r.result));
       $("hestiaNote").textContent = msg;
       speak(/^Imported/.test(msg) ? "Hestia's lists are in the house now!" : msg, 4500);
     };
-    r.readAsText(f2);
+    r.readAsText(f3);
     e.target.value = "";
   };
   setStallOwned(() => ({ cocoa: owns2(F, "cocoa"), millshop: owns2(F, "millshop"), cc_cart: !!(F.cocoa && F.cocoa.up && F.cocoa.up.cart), cc_workshop: !!(F.cocoa && F.cocoa.up && F.cocoa.up.workshop) }));

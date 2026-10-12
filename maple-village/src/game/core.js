@@ -3246,8 +3246,9 @@ function wireCocoa(c){
     else if (a === "fill") { const got = stockPantry(F, k, n, b.dataset.src, orchState(F)); if (got) { sfx("tap"); flash(`+${got} on the fillings shelf`); } }
     else if (a === "take") { const got = unstockPantry(F, k, n, orchState(F)); if (got) { sfx("tap"); flash(got.to === "bag" ? `${got.n} back into your backpack` : `${got.n} back to Ma Ma's shelf`); } }
     else if (a === "shell") { ccSt.shell = k; ccSt.made = null; }
+    else if (a === "bshape") { ccSt.mould = k; ccSt.made = null; }   // round 176: the bonbon moulds (not "mould", which moulds bars)
     else if (a === "sel") { ccSt.made = null; ccSt.sel = ccSt.sel.includes(k) ? ccSt.sel.filter(x => x !== k) : [...ccSt.sel, k].slice(0, 2); }
-    else if (a === "bonbon" || a === "again") { const r0 = a === "again" ? bonbonOf(cocoaState(F), k) : null, out = r0 ? makeBonbons(F, r0.shell, r0.fills) : makeBonbons(F, ccSt.shell, ccSt.sel); if (!out) return;
+    else if (a === "bonbon" || a === "again") { const r0 = a === "again" ? bonbonOf(cocoaState(F), k) : null, out = r0 ? makeBonbons(F, r0.shell, r0.fills, ccSt.mould || r0.shape) : makeBonbons(F, ccSt.shell, ccSt.sel, ccSt.mould); if (!out) return;
       ccSt.sel = []; ccSt.made = out.r.id; ccSt.isNew = out.isNew; sfx("chime"); act("cheer"); gainXp(out.isNew ? 2 : 1);
       if (out.isNew) { [0, 250, 500].forEach((t, k2) => setTimeout(() => mprop("sparkle", mel.x + (k2 - 1)*22, mel.y - 60, 1600), t)); speak(`A new bonbon: ${out.r.name}! Twelve of them, ready for the display case.`, 5000); }
       else flash(`Another tray of ${out.r.name}`); }

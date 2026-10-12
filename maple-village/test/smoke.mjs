@@ -3966,6 +3966,16 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#ctx [data-xh="start:big"]').count() === 1, "Penny's hamper table at the post office, in the season");
   await page.close();
 }
+{
+  console.log("\nBonbon moulds (round 176)");
+  const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {coins: 200, goals: {cocoa: 1}}, c = cc.cocoaState(F); c.choc.dark = 50; c.pantry.honey = 4; c.pantry.raspberry = 2;
+  check(cc.mouldsOwned(c).join() === "dome" && cc.buyCcUp(F, "m_heart") && F.coins === 140 && cc.mouldsOwned(c).includes("heart"), "the dome to start; heart moulds from the shop upgrades");
+  const a = cc.makeBonbons(F, "dark", ["honey"]), a0 = a.r.shape, price = c.prices.bonbon, b = cc.makeBonbons(F, "dark", ["honey"], "heart");
+  check(!a0 && b.r.shape === "heart" && / Heart$/.test(b.r.name) && c.trays[b.r.id] === 24 && c.prices.bonbon === price, "a tray in the heart mould makes the flavour a heart (same price): " + b.r.name);
+  check(!cc.makeBonbons(F, "dark", ["raspberry"], "star").r.shape, "no star moulds yet, so a dome");
+  check(cc.makeBonbons(F, "dark", ["honey"], "dome").r.name === b.r.base, "back in the dome, back to its old name");
+  check(/data-cc="bshape"/.test(cc.bonbonPanel(F, {})), "the moulds are on the bonbon table");
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

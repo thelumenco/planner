@@ -33,6 +33,7 @@
 // often while Mel's serving too). Takings go straight to Mel. Mel can have a bar or take one to give.
 import { esc, dayKey, sgHM, hash } from "../util.js";
 import { icon } from "../art/icons.js";
+import { mouldPath, shellRibs } from "../art/moulds.js";
 import { INGR, farmShelf, scoopState, hasUp, takeBack, bikeOwned, DELIVERY, deliveryHours } from "./scoop.js";
 import { wineClubNow, xmasOn, XMAS_FROM, XMAS_TO } from "./tours.js";
 import { festivalOn, rainyOn } from "../art/village-extras.js";
@@ -53,8 +54,18 @@ export const CC_UPS = {
   supply: {n: "Supply deal with the Scoop Shack", price: 250, line: "Every morning, 10 pieces of loose dark chocolate go to the Scoop Shack's gelato fridge on their own (when there are 10 spare)."},
   workshop: {n: "Weekend workshops", price: 700, line: "Saturday afternoons, 2 to 4: a class of six makes their own bonbons at the tables, and pays 8 coins each."},
   assistant: {n: "Second assistant", price: 500, line: "Lila joins the team. The shop opens on Mondays too, and it's a little busier with two behind the counter."},
-  cart: {n: "Farmers market cart", price: 400, line: "A little chocolate cart for the Sunday farmers market, 8 to 1. Mateo runs it, selling bars, bonbons and hot chocolate."}
+  cart: {n: "Farmers market cart", price: 400, line: "A little chocolate cart for the Sunday farmers market, 8 to 1. Mateo runs it, selling bars, bonbons and hot chocolate."},
+  // round 176: moulds for the bonbon table (the dome comes with the shop). Same price whatever the shape
+  m_heart: {n: "Heart moulds", price: 60, line: "A tray of little heart moulds for the bonbon table."},
+  m_square: {n: "Square moulds", price: 60, line: "Neat square moulds, for bonbons that stack in a box."},
+  m_shell: {n: "Seashell moulds", price: 60, line: "Scallop-shell moulds, ridges and all. Very Honeybrook bay."},
+  m_star: {n: "Star moulds", price: 60, line: "Five-pointed star moulds. Christmas, sorted."}
 };
+// the bonbon moulds: dome to start with, the others from the shop upgrades. A flavour takes the shape of the mould its
+// last tray was made in; the name follows ("Dark Honey Truffle" in a heart mould is "Dark Honey Heart")
+export const MOULDS = {dome: {n: "Dome", word: ""}, heart: {n: "Heart", word: "Heart"}, square: {n: "Square", word: "Square"}, shell: {n: "Seashell", word: "Shell"}, star: {n: "Star", word: "Star"}};
+export const mouldsOwned = c => Object.keys(MOULDS).filter(k => k === "dome" || ccUp(c, "m_" + k));
+export const shapedName = (base, shape) => !shape || shape === "dome" ? base : `${base.replace(/ (Truffle|Bonbon|Praline|Ganache|Heart|Cream)$/, "")} ${MOULDS[shape].word}`;
 export const ccUp = (c, k) => !!(c.up && c.up[k]);
 export function buyCcUp(F, k){
   const c = cocoaState(F), u = CC_UPS[k]; if (!u || c.up[k] || F.coins < u.price) return null;
@@ -63,7 +74,7 @@ export function buyCcUp(F, k){
     grinder2: "A second stone grinder, rumbling away beside the first.", wrap: "The wrapping station's set up: ribbons, tissue, boxes in every size.",
     tree: "A cacao tree in Ma Ma's orchard! She says she'll talk to it every morning.", fountain: "The chocolate fountain's flowing. Evan is going to lose his mind.",
     supply: "Done: the Scoop Shack gets 10 pieces of your dark chocolate every morning, when there's enough spare.", workshop: "Weekend workshops are on: Saturdays, 2 to 4, at the tables.",
-    assistant: "Lila starts Monday! The shop's open seven days now.", cart: "The chocolate cart's ready for Sunday's farmers market. Mateo's thrilled."}[k];
+    assistant: "Lila starts Monday! The shop's open seven days now.", cart: "The chocolate cart's ready for Sunday's farmers market. Mateo's thrilled."}[k] || `${u.n}, on the shelf by the bonbon table. Pick them when you make a tray.`;
 }
 export const cartOn = (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() === 0 && hm >= 8*60 && hm < 13*60;   // the Sunday farmers market
 export const workshopOn = (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() === 6 && hm >= 14*60 && hm < 16*60;
@@ -113,7 +124,7 @@ export const WINE_FILLS = 4;
 const FL = id => INGR[id] || WINE_FILL[id];
 export const isFilling = id => (id in INGR && !NOT_FILLING.includes(id)) || id in WINE_FILL;
 export const fillName = id => FL(id)[0];
-const STYLE = ["Truffle", "Bonbon", "Praline", "Ganache", "Heart"], POETIC = ["Jetty Sunset", "Lantern Night", "Ma Ma's Garden", "Sea Breeze", "First Light", "Golden Hour", "Low Tide", "Porch Swing", "Maple's Secret", "Night Market"];
+const STYLE = ["Truffle", "Bonbon", "Praline", "Ganache", "Cream"]   // (round 176: "Heart" is a mould now), POETIC = ["Jetty Sunset", "Lantern Night", "Ma Ma's Garden", "Sea Breeze", "First Light", "Golden Hour", "Low Tide", "Porch Swing", "Maple's Secret", "Night Market"];
 const keyOf = (shell, fills) => [shell, ...[...new Set(fills)].sort()].join("+");
 export function bonbonName(shell, fills){
   const f = [...new Set(fills)].sort(), h = hash(keyOf(shell, f)), style = STYLE[h % STYLE.length], sh = shell[0].toUpperCase() + shell.slice(1);
@@ -127,13 +138,15 @@ export const shellChoc = (c, k) => c.res[k] + c.choc[k];   // the bonbon shelf, 
 function takeChoc(c, k, n){ const r0 = Math.min(n, c.res[k]); c.res[k] -= r0; c.choc[k] -= n - r0; }
 export const canMakeBonbon = (c, shell, fills) => shellChoc(c, shell) >= SHELL && fills.length >= 1 && fills.every(f => (c.pantry[f] || 0) >= 1);
 // a tray of 12: discovers a new bonbon, or makes another tray of a known one
-export function makeBonbons(F, shell, fills){
+export function makeBonbons(F, shell, fills, shape){
   const c = cocoaState(F); fills = [...new Set(fills)].filter(isFilling).slice(0, 2);
   if (!KINDS[shell] || !fills.length || !canMakeBonbon(c, shell, fills)) return null;
   takeChoc(c, shell, SHELL); fills.forEach(f => { c.pantry[f]--; if (c.pantry[f] <= 0) delete c.pantry[f]; });
   let r = knownBonbon(c, shell, fills), isNew = false;
+  const sh = shape && mouldsOwned(c).includes(shape) ? shape : null;
   if (!r) { isNew = true; r = {id: keyOf(shell, fills), shell, fills: [...fills].sort(), name: bonbonName(shell, fills), col: FL([...fills].sort()[0])[2], found: Date.now()}; c.bonbons.push(r);
     if (Array.isArray(c.display) && c.display.length < CASE) c.display = [...c.display, r.id]; }
+  if (sh && sh !== (r.shape || "dome")) { r.base = r.base || r.name; r.shape = sh; r.name = shapedName(r.base, sh); }   // round 176: made in a different mould
   c.trays[r.id] = (c.trays[r.id] || 0) + TRAY;
   return {r, isNew};
 }
@@ -334,8 +347,9 @@ function scoopSend(F){
 
 /* ---------- bonbon panels ---------- */
 const ingPic = id => id.startsWith("fl_") ? icon("bq_" + id.slice(3), 26) : icon(id, 26);
-const bonbonPic = (shell, col) => `<svg class="gscoop" viewBox="0 0 44 44" aria-hidden="true"><rect x="8" y="12" width="28" height="24" rx="7" fill="${KINDS[shell].col}" stroke="#3A2E28" stroke-width="1.2"/><path d="M12 20 q5 -6 10 0 q5 6 10 0" fill="none" stroke="${col}" stroke-width="3" stroke-linecap="round"/><circle cx="15" cy="16" r="2" fill="#fff" opacity=".5"/></svg>`;
-const card = (shell, col, name, line, made) => `<div class="gresult${made ? " made" : ""}">${bonbonPic(shell, col)}<span><b>${esc(name)}</b><small>${esc(line)}</small></span></div>`;
+const bonbonPic = (shell, col, shape = "dome") => `<svg class="gscoop" viewBox="0 0 44 44" aria-hidden="true"><path d="${mouldPath(shape, 22, 23, 14)}" fill="${KINDS[shell].col}" stroke="#3A2E28" stroke-width="1.2" stroke-linejoin="round"/>${shape === "shell" ? `<path d="${shellRibs(22, 23, 14)}" fill="none" stroke="${col}" stroke-width="1.6" stroke-linecap="round"/>` : `<path d="M14 22 q4 -5 8 0 q4 5 8 0" fill="none" stroke="${col}" stroke-width="2.6" stroke-linecap="round"/>`}<circle cx="16" cy="17" r="1.8" fill="#fff" opacity=".5"/></svg>`;
+const bonbonMini = b => `<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="${mouldPath(b.shape || "dome", 12, 12.5, 8)}" fill="${KINDS[b.shell].col}" stroke="${b.col}" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+const card = (shell, col, name, line, made, shape) => `<div class="gresult${made ? " made" : ""}">${bonbonPic(shell, col, shape)}<span><b>${esc(name)}</b><small>${esc(line)}</small></span></div>`;
 export function pantryPanel(F, orch){
   const c = cocoaState(F), inS = Object.keys(c.pantry).filter(id => c.pantry[id] > 0), bag = backpackFillings(F), shelf = farmFillings(orch);
   const cell = (id, n, extra) => `<li><span class="wpic">${ingPic(id)}</span><span class="wtxt"><b>${esc(fillName(id))}</b><small>${n}</small></span>${extra || ""}</li>`;
@@ -352,15 +366,18 @@ export function bonbonPanel(F, st){
   const c = cocoaState(F), inS = Object.keys(c.pantry).filter(id => c.pantry[id] > 0 && isFilling(id)), sel = (st.sel || []).filter(id => inS.includes(id)), shell = KINDS[st.shell] ? st.shell : "dark";
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The bonbon table</h2><p class="sub">A shell (${SHELL} pieces of chocolate) and one or two fillings make a tray of ${TRAY}. Every new pairing is a new bonbon. ${c.bonbons.length} discovered so far.</p>`;
   h += `<p class="eyebrow" style="margin:10px 0 6px">Shell</p><div class="gchips">${Object.entries(KINDS).map(([k, d]) => `<button class="gchip${k === shell ? " on" : ""}" data-cc="shell" data-k="${k}" aria-pressed="${k === shell}">${dot(d.col)}<span>${d.n.split(" ")[0]} (${shellChoc(c, k)})</span></button>`).join("")}</div>`;
+  const owned = mouldsOwned(c), mould = owned.includes(st.mould) ? st.mould : null;
+  h += `<p class="eyebrow" style="margin:10px 0 6px">Mould</p><div class="gchips">${owned.map(k => `<button class="gchip${k === (mould || "dome") ? " on" : ""}" data-cc="bshape" data-k="${k}" aria-pressed="${k === (mould || "dome")}">${bonbonMini({shape: k, shell, col: "#F3C969"})}<span>${MOULDS[k].n}</span></button>`).join("")}</div>${owned.length < 5 ? `<p class="muted">More moulds (heart, square, seashell, star) in the shop upgrades.</p>` : ""}`;
   h += `<p class="eyebrow" style="margin:10px 0 6px">Fillings</p>` + (inS.length ? `<div class="gchips">${inS.map(id => `<button class="gchip${sel.includes(id) ? " on" : ""}" data-cc="sel" data-k="${id}" aria-pressed="${sel.includes(id)}" ${!sel.includes(id) && sel.length >= 2 ? "disabled" : ""}>${ingPic(id)}<span>${esc(fillName(id))}</span></button>`).join("")}</div>` : `<p class="muted">The fillings shelf is empty. Stock it first.</p>`);
   const made = st.made && recipeOf(c, st.made), known = sel.length ? knownBonbon(c, shell, sel) : null;
-  if (made && !sel.length) h += card(made.shell, made.col, made.name, st.isNew ? "A new bonbon! The first tray's ready for the display case." : "Another tray of twelve, ready for the display case.", true);
-  else if (sel.length) h += card(shell, FL([...sel].sort()[0])[2], known ? known.name : bonbonName(shell, sel), known ? "You know this one. Make another tray?" : "Something new!");
+  const shape = mould || (known && known.shape) || "dome";
+  if (made && !sel.length) h += card(made.shell, made.col, made.name, st.isNew ? "A new bonbon! The first tray's ready for the display case." : "Another tray of twelve, ready for the display case.", true, made.shape);
+  else if (sel.length) h += card(shell, FL([...sel].sort()[0])[2], shapedName(known ? known.base || known.name : bonbonName(shell, sel), shape), known ? (known.shape || "dome") !== shape ? `You know this one. A tray in the ${MOULDS[shape].n.toLowerCase()} mould makes it a ${MOULDS[shape].n.toLowerCase()} from now on.` : "You know this one. Make another tray?" : "Something new!", false, shape);
   const ok = sel.length && canMakeBonbon(c, shell, sel);
   h += `<div class="actions"><button class="btn primary" data-cc="bonbon" ${ok ? "" : "disabled"}>${known ? "Make another tray" : "Make it"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
   if (sel.length && shellChoc(c, shell) < SHELL) h += `<p class="muted">Not enough ${KINDS[shell].n.toLowerCase()}: temper some more first, or raise its bonbon shelf target at the counter so Mateo makes some.</p>`;
   h += specialCard(c);
-  if (c.bonbons.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map(b => `<li><span class="wpic">${dot(KINDS[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span><button class="btn small alt" data-cc="again" data-k="${esc(b.id)}" ${canMakeBonbon(c, b.shell, b.fills) ? "" : "disabled"}>Another tray</button></li>`).join("")}</ul>`;
+  if (c.bonbons.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map(b => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span><button class="btn small alt" data-cc="again" data-k="${esc(b.id)}" ${canMakeBonbon(c, b.shell, b.fills) ? "" : "disabled"}>Another tray</button></li>`).join("")}</ul>`;
   return h;
 }
 function specialCard(c){
@@ -372,8 +389,8 @@ function specialCard(c){
 export function casePanel(F){
   const c = cocoaState(F), ids = displayIds(c), shown = ids.map(id => recipeOf(c, id)), rest = c.bonbons.filter(b => !ids.includes(b.id) && c.trays[b.id] > 0);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The display case</h2><p class="sub">Up to ${CASE} flavours of bonbons, ${c.prices.bonbon} ${coin()} each. Customers pick two to four.</p>`;
-  h += `<p class="eyebrow" style="margin:10px 0 6px">In the case (${shown.length} of ${CASE})</p>` + (shown.length ? `<ul class="hlist wlist">${shown.map(b => `<li><span class="wpic">${dot(KINDS[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] ? c.trays[b.id] + " left" : "sold out"}</small></span><button class="btn small alt" data-cc="case" data-k="${esc(b.id)}">Take out</button></li>`).join("")}</ul>` : `<p class="muted">Empty. Make bonbons at the bonbon table in the kitchen.</p>`);
-  if (rest.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Waiting in the kitchen</p><ul class="hlist wlist">${rest.map(b => `<li><span class="wpic">${dot(KINDS[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id]} made</small></span><button class="btn small primary" data-cc="case" data-k="${esc(b.id)}" ${ids.length >= CASE ? "disabled" : ""}>Put in</button></li>`).join("")}</ul>`;
+  h += `<p class="eyebrow" style="margin:10px 0 6px">In the case (${shown.length} of ${CASE})</p>` + (shown.length ? `<ul class="hlist wlist">${shown.map(b => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] ? c.trays[b.id] + " left" : "sold out"}</small></span><button class="btn small alt" data-cc="case" data-k="${esc(b.id)}">Take out</button></li>`).join("")}</ul>` : `<p class="muted">Empty. Make bonbons at the bonbon table in the kitchen.</p>`);
+  if (rest.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Waiting in the kitchen</p><ul class="hlist wlist">${rest.map(b => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id]} made</small></span><button class="btn small primary" data-cc="case" data-k="${esc(b.id)}" ${ids.length >= CASE ? "disabled" : ""}>Put in</button></li>`).join("")}</ul>`;
   const sp = specialOn(dayKey()); if (sp) h += `<p class="eyebrow" style="margin:12px 0 6px">Beside the case</p><p class="muted">${icon(sp.id, 20)} ${esc(sp.n)}: ${c.specials[sp.id] || 0} left, ${sp.price} ${coin()} each, for ${esc(sp.fest)}.</p>`;
   h += `<div class="row gprices"><span>Price of a bonbon</span><span class="gstep"><button class="btn small alt" data-cc="bprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bonbon}</b><button class="btn small alt" data-cc="bprice" data-n="1" aria-label="Dearer">+</button></span></div>`;
   return h + shut;
