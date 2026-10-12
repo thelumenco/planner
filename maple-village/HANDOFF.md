@@ -2326,3 +2326,12 @@ Write the proposal for Mel covering every item below. Only build after she says 
 ## Round 176: bonbon moulds
 - art/moulds.js `mouldPath(shape, x, y, r)`: dome, heart, square, shell (with `shellRibs`), star. Used by cocoa.js `bonbonPic`/`bonbonMini` and the display case (scenes.js "bonboncase").
 - cocoa.js: `MOULDS`, CC_UPS m_heart/m_square/m_shell/m_star (60 each; the dome comes with the shop), `mouldsOwned`, `shapedName`. `makeBonbons(F, shell, fills, shape)`: a tray in another mould sets `r.shape` and renames (`r.base` keeps the original). Same price whatever the shape. Panel chips are data-cc="bshape" ("mould" already moulds bars). STYLE's "Heart" is now "Cream" for new bonbons.
+
+## Round 177: Mateo works days
+- npcs.js: Mateo is in the Cocoa Room kitchen Tuesday to Saturday 9:30–4:30 (cocoa.js `HAND` matches, so he runs the bar line on those shifts); evening classes at the poly Monday and Tuesday 6–9 (off the map), home with his books after; other evenings on the Honeysuckle porch. The Sunday cart and the Christmas market stall still take him (event slots win).
+
+## FUTURE (Mel, not started): a public release
+- A separate build of the game for anyone: not tied to Mel's connectors (Sunsama, Gmail, Google Calendar, Notion, Chord, Zapier, Hestia, Ohayo stats) and without her family or friends (no Darren, Evan, Ma Ma, Jason...).
+- New players make their own: name and look, their own household and family (or none), their own pet. The village, shops, trips and seasons stay.
+- The real-life parts (quests from Sunsama, Hestia chores, water and steps) become optional in-game routines, with no accounts needed. Time zone set by the player, not Singapore.
+- Approach when it's time: a build flag (`node build.mjs --public`) and a "who's who" data layer, so the personal version keeps working unchanged. Plan it with Mel first.

@@ -338,13 +338,17 @@ export const NPCS = [
     intro: "Hi, I'm Amara! I wrap, I sell, and I sneak the broken bits. Don't tell.",
     lines: ["The dark one's flying off the wall today.", "Someone bought six bars. Six!", "It smells like heaven in here, all day long.", "I told a tourist you make it from the bean. They nearly cried."],
     hellos: ["Hi Mel! The wall's looking good.", "Boss! Want a taste?"], away: "Amara's off. The Cocoa Room's quiet."},
-  // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep), a student working part-time: Wed and Fri 2-6, Sat 10-5
+  // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep): Tuesday to Saturday 9:30-4:30, evening classes Mon and Tue
   {id: "mateo", pitch: .95, name: "Mateo", job: "Kitchen hand at the Cocoa Room",
     look: {skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#F6F2EA", bottom: "#4A2E22", extra: "apron"},
-    routine: [slot("20:30", "22:00", "honeysuckle", [300, 470], {act: "sit"}), slot("08:00", "09:30", "hlane", [[200, 320], [236, 450], [330, 180]]), slot("19:00", "22:00", "hlane", [186, 298], {act: "sit"}),   // home: Honeysuckle, with Lila
-      slot("14:00", "18:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [3, 5], needs: "cocoa"}),
-      slot("10:00", "17:00", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [6], needs: "cocoa"})],
-    intro: "Hola! I'm Mateo. I study food science at the poly, and on Wednesdays, Fridays and Saturdays I keep the bars coming here. The bonbons are all yours, boss.",
+    // round 177 (Mel: "can he only study at night, during evening classes, and work at my shop during the day"): Tuesday to
+    // Saturday 9:30 to 4:30 in the kitchen; food science at the poly on Monday and Tuesday evenings (off the map, 6 to 9),
+    // then home to his textbooks
+    routine: [slot("08:30", "09:15", "hlane", [[200, 320], [236, 450], [330, 180]]),
+      slot("09:30", "16:30", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [2, 3, 4, 5, 6], needs: "cocoa"}),
+      slot("21:15", "22:30", "honeysuckle", [300, 470], {act: "read", dow: [1, 2]}),
+      slot("17:00", "20:30", "hlane", [186, 298], {act: "sit", dow: [0, 3, 4, 5, 6]}), slot("20:30", "22:30", "honeysuckle", [300, 470], {act: "sit", dow: [0, 3, 4, 5, 6]})],   // home: Honeysuckle, with Lila
+    intro: "Hola! I'm Mateo. I'm in your kitchen Tuesday to Saturday, and I study food science at the poly on Monday and Tuesday nights. The bonbons are all yours, boss.",
     lines: ["Your bonbon shelf is full. I didn't touch a crumb!", "Exams next week. Tempering is very calming.", "My lecturer says I'm the only one who's ground beans by hand.", "The grinder's singing today.", "Forty dark bars on the wall. A personal best.", "I bought beans this morning. Don't worry, I kept to your budget."],
     hellos: ["Morning, boss! Roaster's warm.", "Hi Mel! Smell that?"], away: "Mateo's gone home. The kitchen's quiet."},
   // Lila, the Cocoa Room's second assistant (cocoa.js upgrade "assistant"): Mondays (Amara's day off) and weekend afternoons
