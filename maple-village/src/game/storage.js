@@ -12,6 +12,7 @@ import { isIngr, stockFridge } from "./scoop.js";
 import { isFilling, stockPantry } from "./cocoa.js";
 import { isGood, sendToKitchen } from "./kitchen.js";
 import { toBasket, craftState, basketable } from "./millcraft.js";
+import { toRack } from "./mulled.js";
 
 export const PLACES = {fridge: "the fridge", shelf: "the garage shelf"};
 const FRIDGE_KINDS = ["food", "ingredient", "flower", "bouquet"];
@@ -36,6 +37,7 @@ export const SHOPS = [
   {k: "scoop", n: "the Scoop Shack fridge", ok: id => isIngr(id), go: (F, id, n) => stockFridge(F, id, n, "bag")},
   {k: "cocoa", n: "the Cocoa Room's fillings shelf", own: "cocoa", ok: id => isFilling(id), go: (F, id, n) => stockPantry(F, id, n, "bag")},
   {k: "kitchen", n: "the wine shop's larder", ok: id => isGood(id), go: (F, id, n) => sendToKitchen(F, id, n, false)},
+  {k: "rack", n: "the spice rack by the mulling pot", ok: id => /^sp_/.test(id), go: (F, id, n) => toRack(F, id, n)},
   {k: "basket", n: "the mill's basket", own: "mill", ok: id => basketable(id), go: (F, id, n) => toBasket(F, id, n)},
   {k: "millshelf", n: "the mill's shelves", own: "mill", ok: id => !!(ITEMS[id] && ITEMS[id].mill),
     go: (F, id, n) => { const k = Math.min(n, F.inv[id] || 0); if (!k) return 0; F.inv[id] -= k; if (F.inv[id] <= 0) delete F.inv[id]; const c = craftState(F); c.store[id] = (c.store[id] || 0) + k; return k; }}

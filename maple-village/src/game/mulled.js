@@ -15,7 +15,16 @@ export const ADDS = {
 };
 // the season: 20 November to 26 December
 export const mulledSeason = (day = dayKey()) => { const md = day.slice(5); return md >= "11-20" && md <= "12-26"; };
-export function mullState(F){ F.mull = F.mull || {}; const m = F.mull; m.recipes = m.recipes || []; if (!("pot" in m)) m.pot = null; m.cups = m.cups || 0; m.made = m.made || 0; return m; }
+export function mullState(F){ F.mull = F.mull || {}; const m = F.mull; m.recipes = m.recipes || []; if (!("pot" in m)) m.pot = null; m.cups = m.cups || 0; m.made = m.made || 0; m.rack = m.rack || {}; return m; }
+// round 169: the spice rack beside the pot. Spices (and anything else that mulls) wait here all year; the pot takes
+// from the backpack first, then the rack
+export const rackable = id => !!ADDS[id];
+const got = (F, m, a) => ((F.inv || {})[a] || 0) + (m.rack[a] || 0);
+const use = (F, m, a) => { if ((F.inv || {})[a] > 0) { F.inv[a]--; if (F.inv[a] <= 0) delete F.inv[a]; } else { m.rack[a]--; if (m.rack[a] <= 0) delete m.rack[a]; } };
+export function toRack(F, id, n = 99){ const m = mullState(F), k = Math.min(n, (F.inv || {})[id] || 0); if (!rackable(id) || !k) return 0; F.inv[id] -= k; if (F.inv[id] <= 0) delete F.inv[id]; m.rack[id] = (m.rack[id] || 0) + k; return k; }
+const rackHTML = (F, m) => { const on = Object.keys(m.rack).filter(a => m.rack[a] > 0), bag = Object.keys(ADDS).filter(a => ADDS[a].spice && (F.inv || {})[a] > 0);
+  return `<p class="eyebrow" style="margin:12px 0 6px">The spice rack</p><p class="muted">${on.length ? on.map(a => `${m.rack[a]} ${esc(ADDS[a].n.toLowerCase())}`).join(", ") + "." : "Empty jars, for now."}</p>`
+    + (bag.length ? `<div class="actions">${bag.map(a => `<button class="btn small alt" data-mull="rack:${a}">Put ${F.inv[a]} ${esc(ADDS[a].n.toLowerCase())} on the rack</button>`).join("")}</div>` : ""); };
 const keyOf = adds => [...adds].sort().join("+");
 const SPECIAL = {"orange+sp_cinnamon+sp_clove": "The Classic", "apple+sp_cinnamon+sp_ginger": "Apple Pie", "honey+lemon+sp_ginger": "Hot Toddy Mull", "orange+sp_anise+sp_cardamom": "Spice Market",
   "raspberry+sp_cinnamon": "Winter Berry", "honey+orange+sp_clove": "Golden Hour", "apple+honey+sp_cinnamon": "Grandma's Kitchen", "lemon+sp_anise": "Starlight"};
@@ -31,8 +40,8 @@ export function mullStart(F, v, baseId, adds, day = dayKey()){
   if (m.pot || m.cups > 0) return {msg: m.pot ? "The pot's already on." : "There's still mulled wine in the pot: let it sell first."};
   if (adds.length < MULL.min || adds.length > MULL.max) return {msg: "Two or three things to mull it with."};
   const base = v.shelf.find(s => s.id === baseId); if (!isBase(base)) return {msg: "Pick one of your reds off the shelves."};
-  if (adds.some(a => !((F.inv || {})[a] > 0))) return {msg: "You're missing something for that."};
-  base.n--; adds.forEach(a => { F.inv[a]--; if (F.inv[a] <= 0) delete F.inv[a]; });
+  if (adds.some(a => !(got(F, m, a) > 0))) return {msg: "You're missing something for that."};
+  base.n--; adds.forEach(a => use(F, m, a));
   const id = keyOf(adds); let r = m.recipes.find(x => x.id === id), fresh = false;
   if (!r) { fresh = true; r = {id, adds: [...adds].sort(), name: mullName(adds), found: day}; m.recipes.push(r); }
   m.pot = {id, start: Date.now(), dur: MULL.dur, base: base.name};
@@ -47,16 +56,17 @@ const swatch = adds => `<span class="mullsw">${adds.map(a => `<i style="backgrou
 export function mullPanel(F, v, st = {}, day = dayKey()){
   const m = mullState(F);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The mulling pot</h2>`;
-  if (!mulledSeason(day)) return h + `<p class="sub">The big copper pot, scrubbed and waiting on the back of the stove. Mulled wine season starts on the 20th of November and runs till Boxing Day. Pick up some spices at Hana's market before then: cinnamon, cloves, star anise, cardamom, ginger.</p>${m.recipes.length ? `<p class="muted">Your mulled wines so far: ${m.recipes.map(r => esc(r.name)).join(", ")}.</p>` : ""}` + shut;
+  if (!mulledSeason(day)) return h + `<p class="sub">The big copper pot, scrubbed and waiting on the back of the stove. Mulled wine season starts on the 20th of November and runs till Boxing Day. Pick up some spices at Hana's market before then (cinnamon, cloves, star anise, cardamom, ginger) and keep them on the rack here.</p>${rackHTML(F, m)}${m.recipes.length ? `<p class="muted">Your mulled wines so far: ${m.recipes.map(r => esc(r.name)).join(", ")}.</p>` : ""}` + shut;
   if (m.pot) { const left = potLeft(m); return h + `<p class="sub">${esc((m.recipes.find(r => r.id === m.pot.id) || {}).name || "Mulled wine")} is mulling: the whole kitchen smells of Christmas. Ready in ${Math.max(1, Math.ceil(left/60000))} minutes.</p><span class="clbar"><i style="width:${Math.round(100*(1 - left/m.pot.dur))}%"></i></span>` + shut; }
   if (m.cups > 0) { const r = m.recipes.find(x => x.id === m.cupId) || {name: "Mulled wine", adds: []}; return h + `<p class="sub">${m.cups} cups of ${esc(r.name)} left in the pot, ${m.price} coins a cup. Celeste ladles it out at the counter, and out on the terrace.</p>` + shut; }
-  const reds = v.shelf.filter(isBase), have = Object.keys(ADDS).filter(a => (F.inv || {})[a] > 0), pick = st.adds || [];
+  const reds = v.shelf.filter(isBase), have = Object.keys(ADDS).filter(a => got(F, m, a) > 0), pick = st.adds || [];
   h += `<p class="sub">A bottle of your red, and two or three things to mull it with. Half an hour on a low heat, then ten cups.</p>`;
-  if (m.recipes.length) h += `<p class="eyebrow" style="margin:10px 0 6px">Make one you know</p><ul class="hlist wlist">${m.recipes.map(r => { const ok = r.adds.every(a => (F.inv || {})[a] > 0) && reds.length;
+  if (m.recipes.length) h += `<p class="eyebrow" style="margin:10px 0 6px">Make one you know</p><ul class="hlist wlist">${m.recipes.map(r => { const ok = r.adds.every(a => got(F, m, a) > 0) && reds.length;
     return `<li><span class="wtxt"><b>${esc(r.name)}</b><small>${swatch(r.adds)} ${r.adds.map(a => esc(ADDS[a].n)).join(", ")} · ${cupPrice(r.adds)} a cup</small></span><button class="btn small ${ok ? "primary" : "alt"}" data-mull="again:${r.id}" ${ok ? "" : "disabled"}>Mull it</button></li>`; }).join("")}</ul>`;
   if (!reds.length) return h + `<p class="muted">You'll need a bottle of red on the shelves for the base: Merlot-ish house red, Tempranillo or Pinot.</p>` + shut;
   h += `<p class="eyebrow" style="margin:10px 0 6px">The wine</p><div class="gchips">${reds.map(s => `<button class="gchip${st.base === s.id ? " on" : ""}" data-mull="base:${s.id}" aria-pressed="${st.base === s.id}">${esc(s.name)} (${s.n})</button>`).join("")}</div>`;
-  h += `<p class="eyebrow" style="margin:10px 0 6px">Mull it with (two or three)</p>${have.length ? `<div class="gchips">${have.map(a => `<button class="gchip${pick.includes(a) ? " on" : ""}" data-mull="add:${a}" aria-pressed="${pick.includes(a)}"><i class="mulldot" style="background:${ADDS[a].col}"></i>${esc(ADDS[a].n)} (${F.inv[a]})</button>`).join("")}</div>` : `<p class="muted">Nothing to mull with yet: spices from Hana's market; oranges, lemons and apples from Ma Ma's orchard; raspberries; honey from the farm.</p>`}`;
+  h += `<p class="eyebrow" style="margin:10px 0 6px">Mull it with (two or three)</p>${have.length ? `<div class="gchips">${have.map(a => `<button class="gchip${pick.includes(a) ? " on" : ""}" data-mull="add:${a}" aria-pressed="${pick.includes(a)}"><i class="mulldot" style="background:${ADDS[a].col}"></i>${esc(ADDS[a].n)} (${got(F, m, a)})</button>`).join("")}</div>` : `<p class="muted">Nothing to mull with yet: spices from Hana's market; oranges, lemons and apples from Ma Ma's orchard; raspberries; honey from the farm.</p>`}`;
+  h += rackHTML(F, m);
   const ready = st.base && pick.length >= MULL.min && pick.length <= MULL.max, known = ready && m.recipes.some(r => r.id === keyOf(pick));
   return h + `<div class="actions"><button class="btn primary" data-mull="go" ${ready ? "" : "disabled"}>${ready ? (known ? `Mull ${esc(mullName(pick))} again` : "Into the pot: something new") : "Into the pot"}</button></div>` + shut;
 }

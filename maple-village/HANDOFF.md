@@ -2306,3 +2306,8 @@ Write the proposal for Mel covering every item below. Only build after she says 
 
 ## Round 168: the mill's basket holds anything the bench uses
 - millcraft.js: `basketable(id)` = any HERB or goat's milk. The bench (`craft`, bench panel counts) takes from the backpack first, then `c.basket` (`got`/`use`). Tomi still only infuses oils from it. Tab renamed "Basket"; storage.js sends anything basketable there ("the mill's basket").
+
+## Round 169: spices
+- icons.js: drawings for sp_cinnamon, sp_clove, sp_anise, sp_cardamom, sp_ginger.
+- mulled.js: `m.rack` (the spice rack beside the pot, shown all year, even off-season): `toRack`; the pot takes from the backpack first, then the rack. storage.js can send spices there ("rack"); the pot panel gets the "At home, waiting" line.
+- Mulled wine itself still starts on 20 November (Mel's season: late November to Boxing Day).

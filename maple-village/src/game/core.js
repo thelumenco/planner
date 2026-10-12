@@ -84,7 +84,7 @@ import { craftState, craft as millCraft, craftDone, registerCraft, benchPanel as
 import { storePanel, putAway, takeOut, sendOff, storedCount, placeFor, homeNote, SHOPS as STORE_SHOPS, storeState } from "./storage.js";
 import { millUpArt } from "../art/millup.js";
 import { tastePanel, tasteStart, tastePick, tasteNext, tasteDone, finishTaste, tastingNow, workshopNow, workshopPanel, helpWorkshop, WORKSHOP } from "./millcraft.js";
-import { mullPanel, mullStart, mullTick, mullState, mulledSeason, MULL, ADDS as MULL_ADDS } from "./mulled.js";
+import { mullPanel, mullStart, mullTick, mullState, mulledSeason, MULL, ADDS as MULL_ADDS, toRack } from "./mulled.js";
 import { occasionOn, occasionNow, OCC, weddingOn, WED, dancingNow, triviaPanel, triviaStart, triviaAnswer, triviaNext, finishTrivia, TEAM_NAMES, QUIZ, paintPanel, paintStart, paintStep, paintDone, finishPaint, PAINT_PRICE, PAINT_SUBJECTS, comingUpHTML, mothersDay } from "./occasions.js";
 import { cinquePanel, cinqueState, treat as ctTreat, GELATO, FOCACCIA, pestoStart, pestoAdd, pestoPound, pestoDone, finishPesto, harvestStart, pick as ctPick, harvestDone, finishHarvest, TASTE, paintBoat, boatCols } from "./cinque.js";
 import { jejuRoomArt, dyeCloth } from "../art/jeju-rooms.js";
@@ -1796,7 +1796,7 @@ function ctx(){
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
   }
   // round 166: a shop's stocking panel mentions what's waiting in storage at home that it could use
-  { const hn = scView === "fridge" && SCOOP_IN.includes(scene) ? "scoop" : ccView === "pantry" && COCOA_IN.includes(scene) ? "cocoa" : kView === "larder" && scene === "kitchen" ? "kitchen" : null, note = hn ? homeNote(F, hn) : "";
+  { const hn = scView === "fridge" && SCOOP_IN.includes(scene) ? "scoop" : ccView === "pantry" && COCOA_IN.includes(scene) ? "cocoa" : kView === "larder" && scene === "kitchen" ? "kitchen" : kView === "mull" && scene === "kitchen" ? "rack" : null, note = hn ? homeNote(F, hn) : "";
     if (note) { const i = h.lastIndexOf('<div class="actions">'); h = i < 0 ? h + note : h.slice(0, i) + note + h.slice(i); } }
   c.innerHTML = h;
   if (kid.open && scene === "kidroom") wireKid(c, kid.open, {eat: id => { kid.open = null; ctx(); kidEat(id); }, close: () => { kid.open = null; stopKidGame(); ctx(); }});
@@ -1910,6 +1910,7 @@ function ctx(){
   // round 153: the mulling pot (mulled.js)
   c.querySelectorAll("[data-mull]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.mull.split(":"), st = mullSt;
     if (a === "base") { st.base = v; sfx("tap"); }
+    else if (a === "rack") { const k = toRack(F, v); if (k) { sfx("paper", true); flash(`${k} ${MULL_ADDS[v].n.toLowerCase()}, onto the spice rack`); save(); } }
     else if (a === "add") { st.adds = st.adds || []; if (st.adds.includes(v)) st.adds = st.adds.filter(x => x !== v); else if (st.adds.length < MULL.max) st.adds.push(v); sfx("tap"); }
     else if (a === "go" || a === "again") { const vs = vineState(F), adds = a === "again" ? (mullState(F).recipes.find(r => r.id === v) || {adds: []}).adds : st.adds || [], base = a === "again" ? (vs.shelf.find(x => x.n > 0 && MULL.base.includes(x.type)) || {}).id : st.base;
       const r = mullStart(F, vs, base, adds, dayKey()); speak(r.msg, 5000); if (r.recipe) { sfx("chime"); gainXp(r.fresh ? 2 : 1); if (r.fresh) flash(`New mulled wine: ${r.recipe.name}`); mullSt = {}; if (isHere("pilar")) setTimeout(() => npcSay("pilar", pick(["Mmm, the whole kitchen smells like Christmas.", "Low heat! Never let it boil.", "Save me a cup, eh?"])), 1800); save(); } }
