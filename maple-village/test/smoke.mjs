@@ -3877,6 +3877,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(r.recipe && r.recipe.name === "Lavender honey goat's milk soap" && !F.craft.basket.honey_lav && !F.craft.basket.goatmilk, "the bench makes soap straight from the basket: " + (r.recipe ? r.recipe.name : r.msg));
     mc.toBasket(F, "honey_lav"); F.inv.basil = 3; mc.toBasket(F, "basil"); const bp = mc.benchPanel(F, {tab: "basket"});
     check(/data-mc="unbasket:basil:1"/.test(bp) && mc.fromBasket(F, "basil", 2) === 2 && F.inv.basil === 2 && F.craft.basket.basil === 1, "the basket lists what's in it, and things can be taken back out"); }
+  { const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {inv: {oliveoil: 3}};
+    check(mc.toBasket(F, "oliveoil") === 3 && F.craft.oil === 3 && /Plain olive oil/.test(mc.benchPanel(F, {tab: "basket"})) && mc.fromBasket(F, "oliveoil", 1) === 1 && F.inv.oliveoil === 1 && F.craft.oil === 2, "olive oil goes in the mill's basket, with the mill's own bottles (and comes back out)");
+    check(["honey", "honey_lav", "honey_blossom", "honey_cream", "honeycomb", "honey_sun", "honey_heath", "euchoney"].every(cc.isFilling), "every honey is a bonbon filling"); }
   { const ml = await import(new URL("../src/game/mulled.js", import.meta.url)), ic = await import(new URL("../src/art/icons.js", import.meta.url));
     const F = {inv: {sp_cinnamon: 2, sp_clove: 1, orange: 1}}, v = {shelf: [{id: "r", name: "Red", type: "red", n: 1}]};
     sg.putAway(F, "fridge", "sp_cinnamon"); check(sg.sendOff(F, "fridge", "sp_cinnamon", "rack") === 2 && F.mull.rack.sp_cinnamon === 2, "spices go from home to the spice rack by the mulling pot");

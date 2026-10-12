@@ -2318,3 +2318,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - **Posting** (`RECIPS`): family (10 min), villagers (30 min, half of them pin an order for another), trip friends once their stop's stamped (Kel, Win, Kirra, Madame Arnaud: next day, with a keepsake). Letters via `hamperMail` in the mailbox; gifts and orders via `collectReplies` (1s tick). Times use the game clock (Date.now() + __mapleOffset).
 - **Orders** from 1 December: two a day plus villagers' (`ordersOn`, `fits`, `fillOrder` pays the hamper's full price).
 - **Round 174:** carols Fridays 19:00–19:40 (`CAROL_SONGS`, villagers round the tree with song sheets, act "carol"); Santa's grotto weekend evenings 17–20 (`GROTTO_AT`, `grottoVisit`: a wish, a small present, a photo keepsake once a year; needs Evan); Christmas Eve lantern walk 20:15–21:00 (act "lantern", Mel joins from the tree and keeps a lantern once a year). Calendar lists them all.
+
+## Round 175: olive oil in the mill's basket, every honey a filling
+- millcraft.js: `basketable` includes oliveoil; `toBasket`/`fromBasket` move it to/from `c.oil` (the mill's own plain bottles, which the bench and Tomi already use). The Basket tab lists "Plain olive oil" first.
+- scoop.js INGR gains honey_cream, honeycomb, euchoney (so they're gelato ingredients and bonbon fillings too); kitchen.js SOURCE has them.
