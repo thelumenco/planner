@@ -151,9 +151,11 @@ I.gulamelaka = [`<path d="M5 9h14v9H5z" ${f("#9A5A2E")}/><ellipse cx="12" cy="9"
 I.sesame = [`<path d="M4 12h16c0 5-3.6 8-8 8s-8-3-8-8z" ${f("#FFFDF6")}/>${[[8, 12], [11, 11], [14, 12], [10, 14], [13, 14]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="1" ry="1.6" ${f("#2F2B28")}/>`).join("")}`, `<path d="M4 12h16c0 5-3.6 8-8 8s-8-3-8-8zM4 12h16"/>`];
 I.mint = [`<ellipse cx="9" cy="12" rx="4" ry="6" transform="rotate(-25 9 12)" ${f("#9FD3B2")}/><ellipse cx="15" cy="11" rx="4" ry="6" transform="rotate(25 15 11)" ${f("#7FB86A")}/>`, `<ellipse cx="9" cy="12" rx="4" ry="6" transform="rotate(-25 9 12)"/><ellipse cx="15" cy="11" rx="4" ry="6" transform="rotate(25 15 11)"/><path d="M12 21v-6"/>`];
 // round 173: hampers (a wicker basket, a red bow)
-const hamperIco = big => [`<path d="M${big ? 2 : 4} 11h${big ? 20 : 16}l-2 10H${big ? 4 : 6}z" ${f("#C9A27E")}/>${big ? `<rect x="5" y="7" width="4" height="5" ${f("#9CC27E")}/><rect x="15" y="6" width="4" height="6" ${f("#7A1F3D")}/>` : ""}<rect x="9.5" y="${big ? 5 : 7}" width="5" height="${big ? 7 : 5}" rx="1" ${f("#F3C969")}/><path d="M12 11l-3-3 3 1 3-1z" ${f("#C8432F")}/>`,
+const hamperIco = (big, bow = "#C8432F") => [`<path d="M${big ? 2 : 4} 11h${big ? 20 : 16}l-2 10H${big ? 4 : 6}z" ${f("#C9A27E")}/>${big ? `<rect x="5" y="7" width="4" height="5" ${f("#9CC27E")}/><rect x="15" y="6" width="4" height="6" ${f("#7A1F3D")}/>` : ""}<rect x="9.5" y="${big ? 5 : 7}" width="5" height="${big ? 7 : 5}" rx="1" ${f("#F3C969")}/><path d="M12 11l-3-3 3 1 3-1z" ${f(bow)}/>`,
   `<path d="M${big ? 2 : 4} 11h${big ? 20 : 16}l-2 10H${big ? 4 : 6}zM${big ? 5 : 6} 14h${big ? 14 : 12}M${big ? 6 : 7} 17h${big ? 12 : 10}M${big ? 3 : 5} 11q9 -12 ${big ? 18 : 14} 0"/><path d="M12 11l-3-3 3 1 3-1z"/>`];
 I.hamper_small = hamperIco(false); I.hamper_big = hamperIco(true);
+// round 184: Valentine's (a pink bow) and Mother's Day (a lilac bow)
+I.hamper_small_v = hamperIco(false, "#E8566C"); I.hamper_big_v = hamperIco(true, "#E8566C"); I.hamper_small_m = hamperIco(false, "#9A7CC8"); I.hamper_big_m = hamperIco(true, "#9A7CC8");
 // round 180: the wine and chocolate pairing box: a teal gift box (not the hamper's wicker), a bottle standing in it, four
 // bonbons in a row, a gold ribbon round the front with a big bow
 I.pairbox = [`<rect x="4.6" y="1.4" width="2.6" height="2.2" rx=".4" ${f("#F3C969")}/><path d="M4.9 3.6h2v3.6l1.8 2V16H3.1V9.2l1.8-2z" ${f("#7A1F3D")}/><rect x="3.7" y="9.6" width="4.4" height="3.4" rx=".5" ${f("#FFFDF6")}/>`

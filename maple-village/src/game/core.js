@@ -81,7 +81,7 @@ import { lavenderRoomArt } from "../art/lavender-rooms.js";
 import { tablelandsRoomArt } from "../art/tablelands-rooms.js";
 import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } from "./lunch.js";
 import { craftState, craft as millCraft, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, fromBasket, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
-import { xmasState, TREATS, treatsHTML, mulledStallPanel, treePanel, treeLit, countdownDue, myStallPanel as xmStallPanel, putOut, takeBack as xmTakeBack, putWine, takeWine, stallSellMinute, registerHampers, hamperPanel, packStart, packAdd, packWine, packRemove, packTie, singCarol, lanternWalk, grottoPanel, grottoVisit, sendHamper, hamperMail, collectReplies, fillOrder } from "./xmas.js";
+import { hamperSeason, xmasState, TREATS, treatsHTML, mulledStallPanel, treePanel, treeLit, countdownDue, myStallPanel as xmStallPanel, putOut, takeBack as xmTakeBack, putWine, takeWine, stallSellMinute, registerHampers, hamperPanel, packStart, packAdd, packWine, packRemove, packTie, singCarol, lanternWalk, grottoPanel, grottoVisit, sendHamper, hamperMail, collectReplies, fillOrder } from "./xmas.js";
 import { giftPanel, giftSellMinute, keeperOn as giftKeeperOn, putOutPairs, takeBackPair } from "./giftshop.js";
 import * as PP from "./paperie.js";
 import { setPaperArtF } from "../art/paperie-room.js";
@@ -113,7 +113,7 @@ import { waiterOn, riderOn, scoopState, scoopTick, scoopNews, trolleyPanel, load
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaNews, cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
   pantryPanel, bonbonPanel, casePanel, onDisplay as ccOnDisplay, stockPantry, unstockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
-  sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, haveHot, packGrand, readyPot, ccUp, emptyVending } from "./cocoa.js";
+  sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, haveHot, packGrand, readyPot, ccUp, emptyVending, pickAdd, pickFill } from "./cocoa.js";
 import { canKeep, keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, OWNER_NAME, PETS, petAt } from "./companions.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
 import { diningTable, darrenAsleep, skyWash, tapeLabel } from "../art/scenes.js";
@@ -1655,7 +1655,7 @@ function ctx(){
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
   else if (fieldView === "xtree" && scene === "field") h = treePanel(F, dayKey(), sgHM());
   else if (fieldView === "xgrotto" && scene === "field") h = grottoPanel(F, dayKey(), sgHM(), {evan: evanHere()});
-  else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "cocoa" ? ccCounterPanel(F, {cart: true, xmas: !!st.xmas, server: isHere("mateo")}) : st.kind === "mulled" ? mulledStallPanel(F, {keeper: isHere("celeste") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "mine" ? xmStallPanel(F, vineState(F), {day: dayKey(), here: atSpot === fieldView, hazel: st.id === "hazel" && isHere("hazel") && !keeperAway(st, dayKey(), sgHM())}) : marketStallPanel(st); }
+  else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "cocoa" ? ccCounterPanel(F, {cart: true, xmas: !!st.xmas, server: isHere("mateo"), pk: ccSt.pk}) : st.kind === "mulled" ? mulledStallPanel(F, {keeper: isHere("celeste") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "mine" ? xmStallPanel(F, vineState(F), {day: dayKey(), here: atSpot === fieldView, hazel: st.id === "hazel" && isHere("hazel") && !keeperAway(st, dayKey(), sgHM())}) : marketStallPanel(st); }
   else if ((lunchView === "book" || lunchView === "coming") && scene === "terrace") { const tabs = `<div class="tabs" role="tablist"><button role="tab" data-lbtab="book" aria-selected="${lunchView === "book"}">Sunday lunch</button><button role="tab" data-lbtab="coming" aria-selected="${lunchView === "coming"}">Coming up</button></div>`;
     h = lunchView === "book" ? lunchBookPanel(F, id => NPCS.find(n => n.id === id) ? NPCS.find(n => n.id === id).name : id, {terrace: !!vineState(F).terrace, shelf: shelfStock(vineState(F))}).replace("</h2>", "</h2>" + tabs)
       : `<span class="tape gingham" aria-hidden="true"></span><h2>The bookings book</h2>${tabs}<p class="sub">What's on at the terrace: weddings pencilled in weeks ahead, trivia on Wednesdays, sip and paint on Thursdays, and the special days.</p>${comingUpHTML(dayKey(), !!vineState(F).terrace)}<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`; }
@@ -1687,7 +1687,7 @@ function ctx(){
   else if (hfView && scene === "barn") h = hfView === "extractor" ? extractorPanel(F) : hfView === "crock" ? crockPanel(F) : hfView === "press" ? hfPressPanel(F, hfSt) : hfCavePanel(F);
   else if (hfView && scene === "hfarm") h = hfView === "house" ? farmhousePanel(F, isHere("felix")) : hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
   else if (orView === "pot" && potItem) h = potPanel(F, potItem);
-  else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara"), hand: isHere("mateo")}) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccView === "ups" ? ccUpsPanel(F) : ccKitchenPanel(F, ccView);
+  else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara"), hand: isHere("mateo"), pk: ccSt.pk}) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccView === "ups" ? ccUpsPanel(F) : ccKitchenPanel(F, ccView);
   else if (keepItem && F.inv[keepItem]) h = keepPanel(F, keepItem);
   else if (keepSpot) h = placedPanel(F, keepSpot);
   else if (adoptItem && F.inv[adoptItem]) h = adoptPanel(F, adoptItem, adoptSt);
@@ -1704,7 +1704,7 @@ function ctx(){
   else if (routOpen && scene === "room") h = routinesPanel();
   else if (lettersOpen && (scene === "room" || scene === "base")) h = lettersPanel(!!sampleCap);
   else if (fieldView && scene === "giftshop") h = giftPanel(F, fieldView, giftOpts());   // round 178
-  else if (fieldView === "hampers" && scene === "post") h = hamperPanel(F, vineState(F), {day: dayKey(), pick: xmPick});   // round 173
+  else if (fieldView === "hampers" && scene === "post") h = hamperPanel(F, vineState(F), {day: dayKey(), pick: xmPick, season: hamperSeason(dayKey()) || "xmas"});   // round 173
   else if (postOpen && scene === "post") h = postPanel();
   else if (healthOpen && APP_IDS.includes(scene)) h = healthOpen === "reactions" ? reactionsPanel() : healthOpen === "hellos" ? helloPanel() : healthPanel(scene);
   else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar(), newsTab);
@@ -2138,7 +2138,7 @@ function ctx(){
     if (a === "put") k = putOut(F, id, +n || 99); else if (a === "take") k = xmTakeBack(F, id); else if (a === "wine") k = putWine(F, v, id); else if (a === "unwine") k = takeWine(F, v, id);
     if (k) { sfx("paper", true); flash(a === "put" || a === "wine" ? `${k} onto your stall` : `${k} back`); save(true); } ctx(); });
   c.querySelectorAll("[data-xh]").forEach(b => b.onclick = () => { const i = b.dataset.xh.indexOf(":"), a = i < 0 ? b.dataset.xh : b.dataset.xh.slice(0, i), v0 = i < 0 ? "" : b.dataset.xh.slice(i + 1), v = vineState(F);
-    if (a === "start") { if (packStart(F, v0)) sfx("coin"); }
+    if (a === "start") { if (packStart(F, v0, hamperSeason(dayKey()) || "xmas")) sfx("coin"); }
     else if (a === "add") { if (packAdd(F, v0)) sfx("tap"); }
     else if (a === "wine") { if (packWine(F, v, v0)) sfx("tap"); }
     else if (a === "out") { if (packRemove(F, v, +v0)) sfx("tap"); }
@@ -2147,7 +2147,7 @@ function ctx(){
     else if (a === "fill") { const [oid, hid] = v0.split("|"), pay = fillOrder(F, oid, hid, dayKey()); if (pay) { sfx("coin"); gainXp(2); flash(`+${pay}: a hamper order`); speak("Penny takes the hamper and the envelope of coins, and crosses the order off. \"They'll be thrilled.\"", 5000); } }
     else if (a === "tie") { const hp = packTie(F); if (hp) { sfx("chime"); hearts(2); gainXp(2); flash(`${hp.name} hamper`); speak(`Penny ties a fat red bow on top and writes the tag: "${hp.name}". It's in your backpack.`, 5500); } }
     save(true); ctx(); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ppView = null; bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ppView = null; ccSt.pk = null; bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
@@ -2863,7 +2863,7 @@ function arriveSpot(id){
   if (scene === "ohayo" && (id === "reactions" || id === "hellos")) { healthOpen = id; sfx("paper"); render(); return; }   // Ohayo's reactions board and hello chart
   if (id === "pobox") { postOpen = true; sfx("paper"); render(); fetchPost().then(() => { ctx(); drawScene(); }); return; }
   if (id === "board" && outside()) { openView = "quests"; speak("All of today's quests!", 3500); render(); return; }
-  if (scene === "post" && id === "hampers") { if (!xmasOn(dayKey())) { speak("Penny's hamper table comes out on the 20th of November.", 3500); render(); return; } fieldView = "hampers"; sfx("paper", true); render(); return; }
+  if (scene === "post" && id === "hampers") { if (!hamperSeason(dayKey())) { speak("Penny's hamper table comes out three times a year: Valentine's (from the 1st of February), Mother's Day (from the 1st of May) and Christmas (from the 20th of November).", 5000); render(); return; } fieldView = "hampers"; sfx("paper", true); render(); return; }
   if (id === "board") { boardOpen = true; speak(outside() ? "All of today's quests!" : "Here's what needs doing in here.", 3500); render(); return; }
   if (ph === "clean" && scene === "garage" && id === "cupboard" && !S.wipe) { setSay("Wet wipes live here. Grab one!"); render(); return; }
   // Hestia: the cupboard holds the chores, the fridge the pantry and shopping list (not quests)
@@ -3304,6 +3304,15 @@ function wireCocoa(c){
     else if (a === "special") { const sp = makeSpecial(F); if (!sp) return; sfx("chime"); act("cheer"); gainXp(2); [0, 250].forEach((t, i) => setTimeout(() => mprop("sparkle", mel.x + (i ? 20 : -20), mel.y - 60, 1500), t)); speak(`${sp.make} ${sp.n.toLowerCase()}${sp.make > 1 && !/s$/.test(sp.n) ? "s" : ""} for ${sp.fest}! They'll sell beside the display case.`, 5000); }
     else if (a === "takesp") { if (!takeSpecial(F, k)) return; sfx("chime"); flash(`${ITEMS[k].n} in your backpack`); }
     else if (a === "eatbb") { const bb = eatBonbon(F, k); if (!bb) return; sfx("chime"); mprop("heart", mel.x, mel.y - 60, 1600); speak(`${bb.name}. Oh, that's good.`, 3500); if (evanHere() && eatBonbon(F, k)) setTimeout(() => evanSays(pick(["chocolate!!", "another one!", "mmm!"])), 900); }
+    // round 184: choose the bonbons for a box or a pairing box
+    else if (a === "pkopen") { ccSt.pk = k.startsWith("pair:") ? {kind: "pair", k: k.slice(5), size: 4, sel: {}} : {kind: k, size: n, sel: {}}; sfx("paper", true); }
+    else if (a === "pkadd" || a === "pksub") { if (ccSt.pk) pickAdd(F, ccSt.pk, k, a === "pkadd" ? 1 : -1); }
+    else if (a === "pkfill") { if (ccSt.pk) pickFill(F, ccSt.pk); }
+    else if (a === "pkcancel") ccSt.pk = null;
+    else if (a === "pkgo") { const pk = ccSt.pk; if (!pk) return; let done = false;
+      if (pk.kind === "pair") { const w = packPairing(F, pk.k, pk.sel); if (w) { done = true; flash(`Pairing box with ${w}, in your backpack`); speak("A bottle and the four bonbons you chose, ribboned together. Tap it in your backpack to choose who it's for.", 4500); } }
+      else { const id = pk.kind === "grand" ? packGrand(F, pk.sel) : packBox(F, pk.size, pk.sel); if (id) { done = true; flash(`${ITEMS[id].n} in your backpack`); speak("Your picks, packed with a ribbon and in your backpack. Tap it there to choose who it's for.", 4500); } }
+      if (!done) return; ccSt.pk = null; sfx("paper", true); }
     else if (a === "box") { const id = packBox(F, n); if (!id) return; sfx("paper", true); flash(`${ITEMS[id].n} in your backpack`); speak("Packed with a ribbon and in your backpack. Tap it there to choose who it's for.", 4500); }
     else if (a === "eat" || a === "give") { if (!takeBar(F, k, a === "give")) return; sfx("chime");
       if (a === "give") { flash(`${CC_KINDS[k].n} bar in your backpack`); speak("Wrapped and in your backpack. Tap it there to choose who it's for.", 4000); }

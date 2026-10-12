@@ -1,7 +1,7 @@
 // SVG scene builders: village, interiors, garden. Generated strings, hand-drawn look via #wob / #marker / #wash.
 // Scene builders read live game state through the `G` context set by core (setArtContext).
 import { mouldPath } from "./moulds.js";
-import { ink, sgHM } from "../util.js";
+import { ink, sgHM, dayKey } from "../util.js";
 import { VILLAGE, ROOMS, stationsOf, MAPLE_BED } from "../data/world.js";
 import { CROPS, PLOTS } from "../data/items.js";
 import { roomShell } from "./interiors.js";
@@ -568,9 +568,10 @@ export function furn(kind, x, y){
     case "wineshelf": { const n = G.vine ? Math.min(18, G.vineStock()) : 0; let b = "";
       for (let r = 0; r < 3; r++) for (let i = 0; i < 6; i++) { const k = r*6 + i; b += k < n ? `<rect x="${x-36 + i*12.5}" y="${y-86 + r*28}" width="7" height="20" rx="2.5" style="fill:${k % 3 === 1 ? "#9DBF8A" : "#5B2338"}"/>` : ""; }
       return sk(`<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3" style="fill:#8B5E3C"/>${b}`, `<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3"/><path d="M${x-44} ${y-68} h88 M${x-44} ${y-40} h88 M${x-44} ${y-12} h88"/>`); }
-    case "hampertable": return sk(`<rect x="${x-44}" y="${y-30}" width="88" height="10" rx="2" style="fill:#C9A27E"/><path d="M${x-38} ${y-20} v20 M${x+38} ${y-20} v20" style="stroke:#7A5638" stroke-width="4"/>
-        ${[[-24, "#C9A27E", 16], [4, "#B98A5A", 20], [28, "#C9A27E", 14]].map(([dx, c, w]) => `<path d="M${x+dx-w/2} ${y-40} h${w} l-2 10 h-${w-4}z" style="fill:${c}"/><path d="M${x+dx-3} ${y-40} l3 -3 3 3z" style="fill:#C8432F"/>`).join("")}`,
-        `<rect x="${x-44}" y="${y-30}" width="88" height="10" rx="2"/>${[[-24, 16], [4, 20], [28, 14]].map(([dx, w]) => `<path d="M${x+dx-w/2} ${y-40} h${w} l-2 10 h-${w-4}z M${x+dx-w/2} ${y-40} q${w/2} -12 ${w} 0"/>`).join("")}`);
+    case "hampertable": { const md = dayKey().slice(5), bow = md >= "02-01" && md <= "02-14" ? "#E8566C" : md >= "05-01" && md <= "05-14" ? "#9A7CC8" : "#C8432F";   // round 184: the bows match the season
+      return sk(`<rect x="${x-44}" y="${y-30}" width="88" height="10" rx="2" style="fill:#C9A27E"/><path d="M${x-38} ${y-20} v20 M${x+38} ${y-20} v20" style="stroke:#7A5638" stroke-width="4"/>
+        ${[[-24, "#C9A27E", 16], [4, "#B98A5A", 20], [28, "#C9A27E", 14]].map(([dx, c, w]) => `<path d="M${x+dx-w/2} ${y-40} h${w} l-2 10 h-${w-4}z" style="fill:${c}"/><path d="M${x+dx-3} ${y-40} l3 -3 3 3z" style="fill:${bow}"/>`).join("")}`,
+        `<rect x="${x-44}" y="${y-30}" width="88" height="10" rx="2"/>${[[-24, 16], [4, 20], [28, 14]].map(([dx, w]) => `<path d="M${x+dx-w/2} ${y-40} h${w} l-2 10 h-${w-4}z M${x+dx-w/2} ${y-40} q${w/2} -12 ${w} 0"/>`).join("")}`); }
     case "millcrate": { const m = (G.millCrate && G.millCrate()) || {oil: 0, soap: 0, lotion: 0}, b = [];   // the wine shop's crate from the mill, filled from the mill's own shelves
       for (let i = 0; i < Math.min(4, m.oil); i++) b.push(`<rect x="${x-16 + i*8}" y="${y-44}" width="6" height="18" rx="2.5" fill="${["#B9B04A", "#8FA34A", "#C9B84A", "#7FA35A"][i]}" stroke="#3a2e28" stroke-width=".6"/><rect x="${x-15 + i*8}" y="${y-48}" width="4" height="5" fill="#5A3A2A"/>`);
       for (let i = 0; i < Math.min(2, m.soap); i++) b.push(`<rect x="${x+12}" y="${y-31 - i*6}" width="11" height="5" rx="2" fill="${["#E8C9D8", "#F3E1A0"][i]}" stroke="#3a2e28" stroke-width=".6"/>`);

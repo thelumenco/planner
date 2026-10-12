@@ -1864,8 +1864,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#world [data-spot="barwall"]').count() === 1 && await page.locator('#world [data-spot="ckdoor"]').count() === 1, "the shop front: the bar wall, the counter, the kitchen door");
   await tap("ccounter", '#ctx [data-cc="give"][data-k="dark"]'); await page.click('#ctx [data-cc="give"][data-k="dark"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.bar_dark === 1), "a dark chocolate bar to give (dairy-free, so even for Marcus)");
-  await page.click('#ctx [data-cc="box"][data-n="4"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.inv.box4d === 1), "a gift box of four bonbons from the display case (all dark, so dairy-free)");
+  await page.click('#ctx [data-cc="pkopen"][data-k="box"][data-n="4"]'); await page.waitForSelector('#ctx [data-cc="pkadd"]', {timeout: 15000});
+  const pickId = await page.locator('#ctx [data-cc="pkadd"]').first().getAttribute("data-k"), before = await fox().then(f => f.cocoa.trays[pickId]);
+  for (let i = 0; i < 2; i++) { await page.locator('#ctx [data-cc="pkadd"]').first().click(); await page.waitForTimeout(150); }
+  check(await page.locator('#ctx [data-cc="pkgo"]').isDisabled() && /2 of 4 chosen/.test(await page.locator("#ctx").textContent()), "choose the bonbons for a box: two of the first flavour, and it won't pack till there are four");
+  await page.click('#ctx [data-cc="pkfill"]'); await page.waitForTimeout(150); await page.click('#ctx [data-cc="pkgo"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.box4d === 1 && before - f.cocoa.trays[pickId] >= 2), "a gift box of four bonbons from the display case, the ones Mel chose (all dark, so dairy-free)");
   await page.click("#ctx [data-close]").catch(() => {});
   await tap("case", '#ctx [data-cc="case"]');
   check(await page.locator('#ctx [data-cc="case"]').count() === 2, "the display case shows the bonbons");
@@ -1902,7 +1906,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(!!wb, `a wine bonbon (${wb && wb.name})`);
   await page.click("#ctx [data-close]").catch(() => {});
   await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
-  await tap("ccounter", '#ctx [data-cc="pair"][data-k="wtest"]'); await page.click('#ctx [data-cc="pair"][data-k="wtest"]'); await page.waitForTimeout(300);
+  await tap("ccounter", '#ctx [data-cc="pkopen"][data-k="pair:wtest"]'); await page.click('#ctx [data-cc="pkopen"][data-k="pair:wtest"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-cc="pkfill"]'); await page.waitForTimeout(150); await page.click('#ctx [data-cc="pkgo"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.pairbox === 1 && f.vine.shelf[0].n === 1), "a wine pairing box: a bottle and four bonbons, to give");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=12:00&date=2026-11-05&ccpatch=fest"); await page.waitForTimeout(900);
@@ -1926,7 +1931,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await fox().then(f => Object.keys(f.cocoa.up).length === 11 && f.coins === 10000 - 4850), "all eleven bought, the vending machine too (4850 coins)");
   await page.click('#ctx [data-cc="counter"]'); await page.waitForSelector('#ctx [data-cc="hot"]', { timeout: 15000 }); await page.click('#ctx [data-cc="hot"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.choc.milk === 39), "the hot chocolate bar: Mel has a cup (one piece of chocolate)");
-  await page.click('#ctx [data-cc="grand"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-cc="pkopen"][data-k="grand"]'); await page.waitForTimeout(300); await page.click('#ctx [data-cc="pkfill"]'); await page.waitForTimeout(150); await page.click('#ctx [data-cc="pkgo"]'); await page.waitForTimeout(300);
   check(await fox().then(f => (f.inv.box16 || 0) + (f.inv.box16d || 0) === 1), "the gift wrapping station packs a grand box of 16");
   check(await page.locator("#fore").innerHTML().then(h => /q18 6 36 0/.test(h)), "a chocolate fountain on the counter");
   await page.click("#ctx [data-close]").catch(() => {});
@@ -4064,6 +4069,23 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const f2 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   check(f2.paperie.soak && f2.paperie.scraps === 2 && /2\. Soak/.test(await page.locator("#ctx .ppstep.now").textContent()), "tear two bundles into the tub: the steps along the top move on to Soak");
   await page.close();
+}
+{
+  console.log("\nHampers for Valentine's and Mother's Day (round 184)");
+  const xm = await import(new URL("../src/game/xmas.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url));
+  check(xm.hamperSeason("2027-02-10") === "valentine" && xm.hamperSeason("2027-05-09") === "mothers" && xm.mothersDay(2027) === 9 && !xm.hamperSeason("2027-05-10") && xm.hamperSeason("2026-12-01") === "xmas" && !xm.hamperSeason("2026-10-12"),
+    "Penny's hamper table: Valentine's (1-14 Feb), Mother's Day (1 May to the second Sunday), Christmas");
+  const F = {coins: 100, inv: {cc_box: 0, soap_lav: 3}};
+  check(xm.packStart(F, "small", "mothers") && F.xmas.pack.season === "mothers", "a Mother's Day basket");
+  const hp = {id: "h", size: "small", season: "valentine", items: []};
+  check(xm.hamperIco(hp) === "hamper_small_v" && xm.hamperIco({...hp, season: "mothers", size: "big"}) === "hamper_big_m" && xm.hamperIco({size: "big"}) === "hamper_big", "a pink bow for Valentine's, lilac for Mother's Day, red for Christmas");
+  const its = await import(new URL("../src/data/items.js", import.meta.url)); its.ITEMS.mc_testsoap = {n: "Test soap", mill: "soap", kind: "gift"};   // (mill soaps register when they're made)
+  check(xm.seasonName(["mc_testsoap", "mc_testsoap", "mc_testsoap"], "small", "mothers") === "Mum's Pamper" && /Valentine|Sweetheart|Roses/.test(xm.seasonName(["soap_lav"], "small", "valentine")), "and their own names: Mum's Pamper, Be My Valentine...");
+  const G = {coins: 0, inv: {}, goals: {cocoa: 1}}, c = cc.cocoaState(G);
+  c.bonbons.push({id: "a", shell: "dark", fills: [], name: "A"}, {id: "b", shell: "milk", fills: [], name: "B"}); c.trays = {a: 6, b: 6}; c.display = ["a", "b"];
+  const pk = {kind: "box", size: 4, sel: {}};
+  check(cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && !cc.pickAdd(G, pk, "b", 1) && cc.packBox(G, 4, pk.sel) === "box4d" && c.trays.a === 2 && c.trays.b === 6, "choose four dark ones: exactly those come out of the case");
+  check(cc.packBox(G, 4, {a: 1}) === null && c.trays.a === 2, "a choice that doesn't add up packs nothing");
 }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }

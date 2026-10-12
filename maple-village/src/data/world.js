@@ -260,7 +260,7 @@ export const ROOMS = {
     ["hellos","Hello chart","H","hellochart",null,"How many people are waiting, and how many watched.",30],
     ["status","Health sign","E","healthohayo",null,"Last night's Ohayo bug check."]]},
   post:  {name:"Post office", wall:"#E3EEF5", trim:"var(--sky)", pos:{A:[260,340], B:[436,258], C:[400,530], D:[110,216], E:[72,440], F:[150,560]}, stations:[
-    ["hampers","Hamper table","F","hampertable",null,"Penny's hamper table: baskets, straw and red ribbon. 20 November to Christmas Eve.",30],
+    ["hampers","Hamper table","F","hampertable",null,"Penny's hamper table: baskets, straw and ribbon. Out for Valentine's, Mother's Day and Christmas.",30],
     ["counter","Sorting counter","A","counter",/email|inbox|reply|message|dm|respond/,"Letters in, letters out."],
     ["cabinet","Filing cabinet","B","cabinet",/admin|file|doc|contract|tax|form|organi/,"A place for everything."],
     ["scales","Stamps & scales","C","scales",/invoice|pay|bill|stripe|account|bank|receipt|expense|price/,"Weigh it, stamp it, send it."],

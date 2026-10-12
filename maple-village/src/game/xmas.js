@@ -95,6 +95,23 @@ export function myStallPanel(F, v, o = {}){
 // F.xmas.hampers = [{id, size, items: [id | {wine, type, price}], name}]; F.xmas.pack = {size, items}
 export const BASKETS = {small: {n: "Small basket", holds: 3, price: 4}, big: {n: "Big basket", holds: 6, price: 8}};
 const catOf = x => typeof x === "object" ? "wine" : /^chz_/.test(x) ? "cheese" : HONEYS.includes(x) || /^bar_|^box/.test(x) ? "sweet" : ITEMS[x] && ITEMS[x].mill === "oil" ? "oil" : ITEMS[x] && ITEMS[x].mill ? "pamper" : "other";
+// round 184 (Mel: "yes to hampers for Mother's Day and Valentine's"): Penny's hamper table comes out three times a
+// year: Valentine's (the 1st to the 14th of February), Mother's Day (the 1st of May to the second Sunday) and Christmas
+export const mothersDay = y => { const dw = new Date(Date.UTC(y, 4, 1)).getUTCDay(); return 1 + (7 - dw) % 7 + 7; };
+export function hamperSeason(day){
+  if (xmasOn(day)) return "xmas"; const md = day.slice(5);
+  if (md >= "02-01" && md <= "02-14") return "valentine";
+  if (md >= "05-01" && md <= `05-${String(mothersDay(+day.slice(0, 4))).padStart(2, "0")}`) return "mothers";
+  return null;
+}
+export const SEASON = {xmas: {bow: "red ribbon", ico: ""}, valentine: {bow: "pink ribbon and a paper heart", ico: "_v"}, mothers: {bow: "lilac ribbon and a sprig of lavender", ico: "_m"}};
+export const hamperIco = hp => `hamper_${hp.size === "big" ? "big" : "small"}${(SEASON[hp.season] || SEASON.xmas).ico}`;
+export function seasonName(items, size, season){
+  const base = hamperName(items, size), cats = [...new Set(items.map(catOf))];
+  if (season === "valentine") return cats.length === 1 && cats[0] === "sweet" ? "The Sweetheart" : cats.includes("wine") ? "Wine and Roses" : "Be My Valentine";
+  if (season === "mothers") return cats.length === 1 && cats[0] === "pamper" ? "Mum's Pamper" : base === "The Grand Honeybrook" ? "The Grand Mother's Day" : "For Mum, With Love";
+  return base;
+}
 export function hamperName(items, size){
   const cats = [...new Set(items.map(catOf))];
   if (size === "big" && cats.length >= 4) return "The Grand Honeybrook";
@@ -109,25 +126,26 @@ export const hamperValue = (items, size) => { const b = BASKETS[size].price, buy
 export const hamperGood = id => stallGood(id) && !(ITEMS[id] && ITEMS[id].hamper);
 const xname = x => typeof x === "object" ? `a bottle of ${x.wine}` : (ITEMS[x] ? ITEMS[x].n : x);
 export function registerHampers(F){ (xmasState(F).hampers || []).forEach(hp => { const v = hamperValue(hp.items, hp.size);
-  ITEMS[hp.id] = {n: `${hp.name} hamper`, kind: "gift", to: "family", hamper: true, price: v.price, sell: v.sell, ico: hp.size === "big" ? "hamper_big" : "hamper_small",
+  ITEMS[hp.id] = {n: `${hp.name} hamper`, kind: "gift", to: "family", hamper: true, price: v.price, sell: v.sell, ico: hamperIco(hp),
     what: hp.items.map(xname).join(", "), say: `A hamper! ${hp.items.length === 3 ? "Three" : "Six"} things you made, tied up with a ribbon. Look at all this!`}; }); }
 // the basket being packed: choose a size, add things from the backpack (or a bottle off the shelves), then tie it up
-export function packStart(F, size){ if (!BASKETS[size] || F.coins < BASKETS[size].price) return false; const x = xmasState(F); if (x.pack) return false; F.coins -= BASKETS[size].price; x.pack = {size, items: []}; return true; }
+export function packStart(F, size, season = "xmas"){ if (!BASKETS[size] || F.coins < BASKETS[size].price) return false; const x = xmasState(F); if (x.pack) return false; F.coins -= BASKETS[size].price; x.pack = {size, items: [], season}; return true; }
 export function packAdd(F, id){ const x = xmasState(F), pk = x.pack; if (!pk || pk.items.length >= BASKETS[pk.size].holds || !hamperGood(id) || !((F.inv || {})[id] > 0)) return false; F.inv[id]--; if (F.inv[id] <= 0) delete F.inv[id]; pk.items.push(id); return true; }
 export function packWine(F, v, shelfId){ const x = xmasState(F), pk = x.pack, b = v.shelf.find(s => s.id === shelfId); if (!pk || pk.items.length >= BASKETS[pk.size].holds || !b || !(b.n > 0)) return false; b.n--; pk.items.push({wine: b.name, type: b.type, price: b.price, shelf: b.id}); return true; }
 export function packRemove(F, v, i){ const x = xmasState(F), pk = x.pack; if (!pk || !pk.items[i]) return false; const it = pk.items.splice(i, 1)[0];
   if (typeof it === "object") { const b = v.shelf.find(s => s.id === it.shelf); if (b) b.n++; else v.shelf.push({id: it.shelf, name: it.wine, type: it.type, n: 1, price: it.price, open: 0}); } else { F.inv = F.inv || {}; F.inv[it] = (F.inv[it] || 0) + 1; } return true; }
 export function packTie(F){ const x = xmasState(F), pk = x.pack; if (!pk || pk.items.length !== BASKETS[pk.size].holds) return null;
-  x.hampers = x.hampers || []; x.made = (x.made || 0) + 1; const hp = {id: "hamper_" + x.made, size: pk.size, items: pk.items, name: hamperName(pk.items, pk.size)}; x.hampers.push(hp); x.pack = null;
+  x.hampers = x.hampers || []; x.made = (x.made || 0) + 1; const season = pk.season || "xmas", hp = {id: "hamper_" + x.made, size: pk.size, items: pk.items, season, name: seasonName(pk.items, pk.size, season)}; x.hampers.push(hp); x.pack = null;
   registerHampers(F); F.inv = F.inv || {}; F.inv[hp.id] = 1; return hp; }
 export function hamperPanel(F, v, o = {}){
   const x = xmasState(F), pk = x.pack;
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The hamper table</h2>`;
-  if (!pk) return h + `<p class="sub">Penny's set up a table by the window: wicker baskets, straw, red ribbon and gift tags. "Pick a basket, fill it with things you've made, and I'll tie the bow."</p>
+  const sea = o.season || "xmas";
+  if (!pk) return h + `<p class="sub">${sea === "valentine" ? `Penny's table is out again for Valentine's: wicker baskets, pink tissue, paper hearts. "For your sweetheart? Or yourself. I won't tell."` : sea === "mothers" ? `Penny's table is out for Mother's Day: wicker baskets, lilac ribbon, sprigs of dried lavender. "Something for your mum, love? Or your ma ma?"` : `Penny's set up a table by the window: wicker baskets, straw, red ribbon and gift tags. "Pick a basket, fill it with things you've made, and I'll tie the bow."`}</p>
     <div class="actions">${Object.entries(BASKETS).map(([k, b]) => `<button class="btn ${F.coins >= b.price ? "primary" : "alt"}" data-xh="start:${k}" ${F.coins >= b.price ? "" : "disabled"}>${esc(b.n)}: ${b.holds} things · ${b.price} ${icon("coin", 13)}</button>`).join("")}</div>
-    <p class="muted">A packed hamper makes a lovely gift, sells from your stall at the Christmas market, and Penny will post one for you.</p>` + postHTML(F, o) + shut;
+    <p class="muted">A packed hamper makes a lovely gift${sea === "xmas" ? ", sells from your stall at the Christmas market," : ""} and Penny will post one for you.</p>` + postHTML(F, o) + shut;
   const holds = BASKETS[pk.size].holds, val = hamperValue(pk.items, pk.size);
-  h += `<p class="sub">${esc(BASKETS[pk.size].n)}: ${pk.items.length} of ${holds} in.${pk.items.length ? ` So far it's shaping up as ${esc(hamperName(pk.items, pk.size))}, worth ${val.sell} coins.` : ""}</p>`;
+  h += `<p class="sub">${esc(BASKETS[pk.size].n)}: ${pk.items.length} of ${holds} in.${pk.items.length ? ` So far it's shaping up as ${esc(seasonName(pk.items, pk.size, pk.season || "xmas"))}, worth ${val.sell} coins.` : ""}</p>`;
   if (pk.items.length) h += `<ul class="hlist wlist">${pk.items.map((it, i) => `<li><span class="wpic">${icon(typeof it === "object" ? "wine_" + (["red", "rose", "white", "sparkling"].includes(it.type) ? it.type : "red") : (ITEMS[it] || {}).ico || it, 28)}</span><span class="wtxt"><b>${esc(typeof it === "object" ? it.wine : ITEMS[it].n)}</b></span><button class="btn small alt" data-xh="out:${i}">Take out</button></li>`).join("")}</ul>`;
   if (pk.items.length < holds) { const bag = Object.keys(F.inv || {}).filter(id => F.inv[id] > 0 && hamperGood(id)), bottles = (v.shelf || []).filter(b => b.n > 0);
     h += bag.length || bottles.length ? `<p class="eyebrow" style="margin:10px 0 6px">Add from your backpack</p><div class="actions">${bag.map(id => `<button class="btn small alt" data-xh="add:${id}">${icon(ITEMS[id].ico || id, 16)} ${esc(ITEMS[id].n)} (${F.inv[id]})</button>`).join("")}${bottles.map(b => `<button class="btn small alt" data-xh="wine:${b.id}">A bottle of ${esc(b.name)} (${b.n})</button>`).join("")}</div>`
@@ -180,7 +198,9 @@ export const RECIPS = [
   {id: "lvarnaud", n: "Madame Arnaud at Rosehill", kind: "friend", stop: "bv_perfume", gift: "b_lavbunch", sign: "Avec affection, Madame Arnaud", body: i => `Chère Mel,\n\nYour hamper arrived at Rosehill. The ${i}: magnifique. I send you a bunch of our lavender, dried in the old barn. Put it under your pillow.`}];
 export const recipsFor = F => RECIPS.filter(r => r.kind !== "friend" || !!(F.bellbird && F.bellbird.stamps && F.bellbird.stamps[r.stop]));
 const FAM_NOTE = {
-  mumdad: (i, hp) => `Dear Mel,\n\nThe hamper came this morning! Dad had the ${i} open before I'd even read the tag. We're saving the rest for Christmas Eve, if he lets us.\n\nLove, Mum and Dad xx`,
+  mumdad: (i, hp) => hp.season === "mothers" ? `Dear Mel,\n\nA Mother's Day hamper! Lilac ribbon and everything. I've put the ${i} by my bed and told Dad it's mine, all mine. You're a good girl. The best.\n\nLove, Mum xx (Dad says hello too)`
+    : hp.season === "valentine" ? `Dear Mel,\n\nA Valentine's hamper for your old mum and dad! Dad's pretending it was his idea. We had the ${i} with a cup of tea, like teenagers.\n\nLove, Mum and Dad xx`
+    : `Dear Mel,\n\nThe hamper came this morning! Dad had the ${i} open before I'd even read the tag. We're saving the rest for Christmas Eve, if he lets us.\n\nLove, Mum and Dad xx`,
   mamagg: (i, hp) => `Ah girl,\n\nSo big, the basket! Gong Gong carried it in like a trophy. Ma Ma is keeping the ${i} for when you all come over. You work too hard, you know. Thank you, thank you.\n\nMa Ma (and Gong Gong)`,
   marcusang: (i, hp) => `Zeh!\n\nThe ${hp.name} hamper arrived. Angie has claimed the ${i}${hp.items.some(x => /^chz_/.test(x)) ? " (and the cheese, obviously, she says it's for my own good)" : ""}. I've claimed the basket. Thank you, seriously.\n\nMarcus and Angellina`};
 const firstName = hp => { const it = hp.items.find(x => typeof x === "string") || hp.items[0]; return (typeof it === "object" ? `bottle of ${it.wine}` : (ITEMS[it] || {n: "treats"}).n).replace(/^(A|An) /, "").toLowerCase(); };
@@ -193,7 +213,7 @@ export function sendHamper(F, id, to, now){
 }
 export function hamperMail(F, now){
   return (xmasState(F).replies || []).filter(p => p.at <= now).map(p => { const r = RECIPS.find(x => x.id === p.to) || {n: "someone"}, hp = (xmasState(F).hampers || []).find(h => h.id === p.hamper) || {name: "Honeybrook", items: []}, i = firstName(hp);
-    const body = r.kind === "family" ? FAM_NOTE[r.id](i, hp) : r.kind === "friend" ? `${r.body(i)}\n\n${r.sign}` : `Dear Mel,\n\nWhat a lovely surprise on my doorstep! The ${i} is already open. Merry Christmas to you and yours!${p.order ? "\n\nP.S. Could you make one for my sister? I've pinned a note up at the post office." : ""}\n\n${r.n}`;
+    const body = r.kind === "family" ? FAM_NOTE[r.id](i, hp) : r.kind === "friend" ? `${r.body(i)}\n\n${r.sign}` : `Dear Mel,\n\nWhat a lovely surprise on my doorstep! The ${i} is already open. ${hp.season === "valentine" ? "Happy Valentine's!" : hp.season === "mothers" ? "Happy Mother's Day to you, too!" : "Merry Christmas to you and yours!"}${p.order ? "\n\nP.S. Could you make one for my sister? I've pinned a note up at the post office." : ""}\n\n${r.n}`;
     return {id: p.id, from: "postie", at: p.at, title: r.kind === "friend" ? `A postcard from ${r.n.replace(/ at .*$/, "")}` : `Thank you from ${r.n}`, body}; });
 }
 // arrived replies whose little something (friends) or new order (villagers) hasn't been handed over yet
@@ -221,7 +241,7 @@ function postHTML(F, o){
   if (orders.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Orders pinned up by the table</p><ul class="hlist wlist">${orders.map(od => { const fit = mine.find(hp => fits(hp, od));
     return `<li><span class="wtxt"><b>${esc(orderText(od))}</b><small>${fit ? `Your ${esc(fit.name.replace(/^The /, ""))} hamper would do` : "Nothing packed that fits yet"}</small></span>${fit ? `<button class="btn small primary" data-xh="fill:${od.id}|${fit.id}">Fill it</button>` : ""}</li>`; }).join("")}</ul>`;
   if (!mine.length) return h;
-  h += `<p class="eyebrow" style="margin:12px 0 6px">Post a hamper</p><div class="actions">${mine.map(hp => `<button class="btn small ${pick && pick.id === hp.id ? "primary" : "alt"}" data-xh="pick:${hp.id}">${icon(hp.size === "big" ? "hamper_big" : "hamper_small", 16)} ${esc(hp.name)}</button>`).join("")}</div>`;
+  h += `<p class="eyebrow" style="margin:12px 0 6px">Post a hamper</p><div class="actions">${mine.map(hp => `<button class="btn small ${pick && pick.id === hp.id ? "primary" : "alt"}" data-xh="pick:${hp.id}">${icon(hamperIco(hp), 16)} ${esc(hp.name)}</button>`).join("")}</div>`;
   if (pick) h += `<p class="muted">Where to? Penny weighs it and sticks on the stamps.</p><div class="actions">${recipsFor(F).map(r => `<button class="btn small alt" data-xh="send:${r.id}">${esc(r.n)}</button>`).join("")}</div>`;
   return h;
 }

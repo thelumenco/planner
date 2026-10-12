@@ -175,15 +175,29 @@ export const unstockPantry = (F, id, n, orch) => id.startsWith("wine_") ? null :
 // gift boxes from what's on display: 4 or 9 bonbons, packed in turn from each flavour. All dark shells (dairy-free)
 // makes a box Marcus can have too
 export const caseCount = c => onDisplay(c).reduce((a, b) => a + c.trays[b.id], 0);
-function pick(c, size){   // size bonbons from the case, in turn from each flavour; true if every shell was dark
+// size bonbons from the case: the ones Mel chose (sel: {id: n}, round 184), else in turn from each flavour; true if
+// every shell was dark, null if the choice doesn't add up
+function pick(c, size, sel){
+  if (sel) { const ids = Object.keys(sel).filter(id => sel[id] > 0);
+    if (ids.reduce((a, id) => a + sel[id], 0) !== size || ids.some(id => !(c.trays[id] >= sel[id]))) return null;
+    ids.forEach(id => { c.trays[id] -= sel[id]; }); return ids.every(id => (c.bonbons.find(b => b.id === id) || {}).shell === "dark"); }
   const shown = onDisplay(c); let i = 0, dark = true;
   for (let k = 0; k < size; i++) { const b = shown[i % shown.length]; if (!(c.trays[b.id] > 0)) continue; c.trays[b.id]--; if (b.shell !== "dark") dark = false; k++; if (i > 200) break; }
   return dark;
 }
-export function packBox(F, size){
+export function packBox(F, size, sel){
   const c = cocoaState(F); if (caseCount(c) < size) return null;
-  const id = `box${size}${pick(c, size) ? "d" : ""}`; F.inv[id] = (F.inv[id] || 0) + 1; return id;
+  const d = pick(c, size, sel); if (d === null) return null;
+  const id = `box${size}${d ? "d" : ""}`; F.inv[id] = (F.inv[id] || 0) + 1; return id;
 }
+// round 184 (Mel: "why can't I choose the specific bonbons when making a gift box or pairing box?"): the picker.
+// pk = {kind: "box" | "grand" | "pair", size, k (the bottle's shelf id, for a pair), sel: {id: n}}
+export const pickTotal = sel => Object.values(sel || {}).reduce((a, n) => a + n, 0);
+export function pickAdd(F, pk, id, d){ const c = cocoaState(F), cur = pk.sel[id] || 0, n = cur + d;
+  if (n < 0 || n > (c.trays[id] || 0) || (d > 0 && pickTotal(pk.sel) >= pk.size) || !onDisplay(c).some(b => b.id === id)) return false; pk.sel[id] = n; if (!n) delete pk.sel[id]; return true; }
+export function pickFill(F, pk){ const c = cocoaState(F), shown = onDisplay(c); let i = 0;
+  while (pickTotal(pk.sel) < pk.size && i < 400) { const b = shown[i % shown.length]; i++; if (!b) break; if ((pk.sel[b.id] || 0) < c.trays[b.id]) pk.sel[b.id] = (pk.sel[b.id] || 0) + 1; }
+  return pickTotal(pk.sel) === pk.size; }
 // the wine shop's shelf (vineyard.js F.vine.shelf): bottles Mel can open for fillings or pair with bonbons
 export const wineShelf = F => ((F.vine && F.vine.shelf) || []).filter(b => b.n > 0 && WINE_FILL["wine_" + b.type]);
 export function wineToPantry(F, shelfId){
@@ -191,9 +205,9 @@ export function wineToPantry(F, shelfId){
   b.n--; const id = "wine_" + b.type; c.pantry[id] = (c.pantry[id] || 0) + WINE_FILLS; return {id, wine: b.name};
 }
 // a pairing box: a bottle of Mel's wine and 4 bonbons from the case, ribboned together (gift "pairbox")
-export function packPairing(F, shelfId){
+export function packPairing(F, shelfId, sel){
   const c = cocoaState(F), b = wineShelf(F).find(x => x.id === shelfId); if (!b || caseCount(c) < 4) return null;
-  b.n--; pick(c, 4); F.inv.pairbox = (F.inv.pairbox || 0) + 1;
+  if (pick(c, 4, sel) === null) return null; b.n--; F.inv.pairbox = (F.inv.pairbox || 0) + 1;
   c.pairVals = [...(c.pairVals || []), (b.price || 0) + 4*c.prices.bonbon];   // what each packed box is worth in the gift shop: the bottle plus 4 bonbons
   return b.name;
 }
@@ -307,7 +321,7 @@ function hotMinute(c, day, hm, opts, out){
 }
 export function haveHot(F){ const c = cocoaState(F), k = ["milk", "dark", "white"].find(x => c.choc[x] > 0); if (!ccUp(c, "hotchoc") || !k) return null; c.choc[k]--; return k; }
 // a grand box of 16 (gift wrapping station): from the case like the others
-export function packGrand(F){ const c = cocoaState(F); if (!ccUp(c, "wrap") || caseCount(c) < BOX16) return null; const id = pick(c, BOX16) ? "box16d" : "box16"; F.inv[id] = (F.inv[id] || 0) + 1; return id; }
+export function packGrand(F, sel){ const c = cocoaState(F); if (!ccUp(c, "wrap") || caseCount(c) < BOX16) return null; const d = pick(c, BOX16, sel); if (d === null) return null; const id = d ? "box16d" : "box16"; F.inv[id] = (F.inv[id] || 0) + 1; return id; }
 // a bar for Mel: eaten now, or into the backpack to give (a gift item, bar_<kind>)
 export function takeBar(F, kind, give){ const c = cocoaState(F); if (!(c.bars[kind] > 0)) return false; c.bars[kind]--; if (give) F.inv[BAR_ID(kind)] = (F.inv[BAR_ID(kind)] || 0) + 1; return true; }
 
@@ -322,8 +336,8 @@ export function counterPanel(F, st){
   if (ccUp(c, "hotchoc")) h += `<div class="row gprices"><span>Hot chocolate${t.hot ? ` <small class="muted">(${t.hot} today)</small>` : ""}</span><span class="gstep"><button class="btn small alt" data-cc="hprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.hot}</b><button class="btn small alt" data-cc="hprice" data-n="1" aria-label="Dearer">+</button></span></div><div class="actions"><button class="btn small primary" data-cc="hot" ${Object.values(c.choc).some(n => n > 0) ? "" : "disabled"}>Have a hot chocolate</button></div>`;
   if (!st.cart) h += `<form class="row hadd" data-ccname="1"><label class="sr" for="ccName">Shop name</label><input id="ccName" maxlength="30" value="${esc(c.name)}"><button class="btn small alt">Rename</button></form>`;
   if (ccUp(c, "vending") && !st.cart && !st.xmas) h += `<div class="row gprices"><span>Vending machine by the door${t.vending ? ` <small class="muted">(${t.vending} today)</small>` : ""}</span><span><b>${c.vend || 0}</b> ${coin()} <button class="btn small alt" data-cc="vendbox" ${c.vend ? "" : "disabled"}>Empty it</button></span></div>`;
-  if (st.cart) return h + counterBonbons(F) + `<p class="muted">Mateo sells from the shop's stock: bars, bonbons from the case${ccUp(c, "hotchoc") ? ", and hot chocolate" : ""}. More people stop while you're serving.</p>` + shut;
-  return h + counterBonbons(F) + planPanel(F, st) + `<div class="actions"><button class="btn small alt" data-cc="ups">Shop upgrades</button></div><p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut;
+  if (st.cart) return h + counterBonbons(F, st.pk) + `<p class="muted">Mateo sells from the shop's stock: bars, bonbons from the case${ccUp(c, "hotchoc") ? ", and hot chocolate" : ""}. More people stop while you're serving.</p>` + shut;
+  return h + counterBonbons(F, st.pk) + planPanel(F, st) + `<div class="actions"><button class="btn small alt" data-cc="ups">Shop upgrades</button></div><p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut;
 }
 export function barWallPanel(F){
   const c = cocoaState(F);
@@ -423,14 +437,19 @@ export function planPanel(F, st = {}){
   return h;
 }
 // the counter's bonbon part: have one from the case, or pack a gift box of 4 or 9
-export function counterBonbons(F){
+export function counterBonbons(F, pk){
   const c = cocoaState(F), shown = onDisplay(c), have = shown.reduce((a, b) => a + c.trays[b.id], 0); if (!c.bonbons.length) return giveSpecials(c);
+  if (pk) { const n = pickTotal(pk.sel), wine = pk.kind === "pair" && wineShelf(F).find(b => b.id === pk.k);
+    return `<p class="eyebrow" style="margin:12px 0 6px">${pk.kind === "pair" ? `Four bonbons to go with ${esc(wine ? wine.name : "the wine")}` : `Choose ${pk.size} for the ${pk.kind === "grand" ? "grand box" : "box"}`}</p><p class="muted">${n} of ${pk.size} chosen. Tap + for each one you want in.</p>
+      <ul class="hlist wlist">${shown.map(b => { const k = pk.sel[b.id] || 0; return `<li><span class="wpic">${dot(KINDS[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] - k} more in the case</small></span><span class="gstep"><button class="btn small alt" data-cc="pksub" data-k="${esc(b.id)}" aria-label="One fewer" ${k ? "" : "disabled"}>−</button><b>${k}</b><button class="btn small alt" data-cc="pkadd" data-k="${esc(b.id)}" aria-label="One more" ${n < pk.size && k < c.trays[b.id] ? "" : "disabled"}>+</button></span></li>`; }).join("")}</ul>
+      <div class="actions"><button class="btn small primary" data-cc="pkgo" ${n === pk.size ? "" : "disabled"}>Pack it</button>${n < pk.size ? `<button class="btn small alt" data-cc="pkfill">Fill the rest for me</button>` : ""}<button class="btn small alt" data-cc="pkcancel">Cancel</button></div>`;
+  }
   return `<p class="eyebrow" style="margin:12px 0 6px">Bonbons</p>${shown.length ? `<div class="gchips">${shown.map(b => `<button class="gchip" data-cc="eatbb" data-k="${esc(b.id)}">${dot(KINDS[b.shell].col)}<span>${esc(b.name)}</span></button>`).join("")}</div>` : `<p class="muted">The display case is empty.</p>`}
-    <div class="actions"><button class="btn small alt" data-cc="box" data-n="4" ${have >= 4 ? "" : "disabled"}>Gift box of 4</button><button class="btn small alt" data-cc="box" data-n="9" ${have >= 9 ? "" : "disabled"}>Gift box of 9</button>${ccUp(c, "wrap") ? `<button class="btn small alt" data-cc="grand" ${have >= BOX16 ? "" : "disabled"}>Grand box of 16</button>` : ""}</div>${pairing(F, have)}${giveSpecials(c)}`;
+    <div class="actions"><button class="btn small alt" data-cc="pkopen" data-k="box" data-n="4" ${have >= 4 ? "" : "disabled"}>Gift box of 4</button><button class="btn small alt" data-cc="pkopen" data-k="box" data-n="9" ${have >= 9 ? "" : "disabled"}>Gift box of 9</button>${ccUp(c, "wrap") ? `<button class="btn small alt" data-cc="pkopen" data-k="grand" data-n="${BOX16}" ${have >= BOX16 ? "" : "disabled"}>Grand box of 16</button>` : ""}</div>${pairing(F, have)}${giveSpecials(c)}`;
 }
 function pairing(F, have){
   const wines = wineShelf(F).slice(0, 4); if (!wines.length) return "";
-  return `<p class="eyebrow" style="margin:12px 0 6px">Wine pairing box</p><p class="muted">A bottle from the wine shop and 4 bonbons from the case, to give, or to put out in the gift shop.</p><div class="actions">${wines.map(b => `<button class="btn small alt" data-cc="pair" data-k="${esc(b.id)}" ${have >= 4 ? "" : "disabled"}>With ${esc(b.name)}</button>`).join("")}</div>`;
+  return `<p class="eyebrow" style="margin:12px 0 6px">Wine pairing box</p><p class="muted">A bottle from the wine shop and 4 bonbons from the case, to give, or to put out in the gift shop.</p><div class="actions">${wines.map(b => `<button class="btn small alt" data-cc="pkopen" data-k="pair:${esc(b.id)}" data-n="4" ${have >= 4 ? "" : "disabled"}>With ${esc(b.name)}</button>`).join("")}</div>`;
 }
 function giveSpecials(c){
   const have = Object.values(SPECIALS).filter(x => c.specials[x.id] > 0); if (!have.length) return "";
