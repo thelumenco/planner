@@ -2346,3 +2346,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - Gift shop wine corner (`gwine`): "Put out 1 / All" and "Take 1 back" (`data-gp`, wired in core.js under the ctx render). Out boxes live in `F.giftshop.pairs` (one price each).
 - `giftSellMinute`: when boxes are out, a sale is a pairing box 12% of the time, 35% in `pairSeason` (Feb 1-14, May 1-14, Dec 1-24). Sells for exactly its parts, no markup. Till shows "N pairing boxes".
 - Test block "Pairing boxes in the gift shop (round 179)".
+
+## Round 180: pairing-box icon, Mateo on Mondays
+- icons.js `I.pairbox`: a teal gift box (deliberately not the hamper's wicker) with a burgundy bottle standing in it, four bonbons in a row, a gold ribbon and bow on the front.
+- Mateo works Monday to Saturday 9:30-4:30 (cocoa.js `HAND` gains 1; npcs.js routine dow [1..6]). Evening classes Mon/Tue unchanged.

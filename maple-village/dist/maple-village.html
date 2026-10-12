@@ -5362,6 +5362,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   ];
   I.hamper_small = hamperIco(false);
   I.hamper_big = hamperIco(true);
+  I.pairbox = [
+    `<rect x="4.6" y="1.4" width="2.6" height="2.2" rx=".4" ${f("#F3C969")}/><path d="M4.9 3.6h2v3.6l1.8 2V16H3.1V9.2l1.8-2z" ${f("#7A1F3D")}/><rect x="3.7" y="9.6" width="4.4" height="3.4" rx=".5" ${f("#FFFDF6")}/><path d="M2.6 12.8h18.8l.6 1.8H2z" ${f("#1F3F43")}/>` + [[10.3, "#5A3424", "#F3C969"], [13.6, "#F2A0B8", "#FFFDF6"], [16.9, "#8A4A2A", "#E8D2A8"], [20.1, "#E8D2A8", "#8A4A2A"]].map(([x, c, d]) => `<circle cx="${x}" cy="12" r="1.85" ${f(c)}/><path d="M${x - 1} 11.4q1 -.8 2 0" style="fill:none;stroke:${d};stroke-width:.6"/>`).join("") + `<rect x="2" y="14.6" width="20" height="7" rx=".8" ${f("#2F6F73")}/><rect x="2" y="17.3" width="20" height="1.5" ${f("#F3C969")}/><rect x="14.3" y="14.6" width="1.5" height="7" ${f("#F3C969")}/><path d="M15 18c-1.6-2.6-4.4-2.4-3.6.2.3 1 2 1 3.6-.2zM15 18c1.6-2.6 4.4-2.4 3.6.2-.3 1-2 1-3.6-.2zM14.6 18.4l-1.6 3.4 1-.4.6 1zM15.4 18.4l1.6 3.4-1-.4-.6 1z" ${f("#F6D27A")}/><circle cx="15" cy="18" r=".9" ${f("#E0A83A")}/>`,
+    `<path d="M4.6 1.4h2.6v2.2H4.6zM4.9 3.6h2v3.6l1.8 2v3.6M3.1 12.8V9.2l1.8-2V3.6M3.7 9.6h4.4v3.4H3.7z"/>` + [10.3, 13.6, 16.9, 20.1].map((x) => `<path d="M${x - 1.85} 12.4a1.85 1.85 0 0 1 3.7 0"/>`).join("") + `<path d="M2.6 12.8h18.8l.6 1.8M2.6 12.8L2 14.6"/><rect x="2" y="14.6" width="20" height="7" rx=".8"/><path d="M15 18c-1.6-2.6-4.4-2.4-3.6.2.3 1 2 1 3.6-.2zM15 18c1.6-2.6 4.4-2.4 3.6.2-.3 1-2 1-3.6-.2zM14.6 18.4l-1.6 3.4M15.4 18.4l1.6 3.4"/>`
+  ];
   I.xm_chestnut = [`<path d="M6 10l6 12 6-12z" ${f("#F3E7C9")}/>${[[9, 9], [12, 7.5], [15, 9], [10.5, 11.5], [13.5, 11.5]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="2.2" ry="1.9" ${f("#8A4A2A")}/>`).join("")}`, `<path d="M6 10l6 12 6-12z"/>${[[9, 9], [12, 7.5], [15, 9]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="2.2" ry="1.9"/>`).join("")}<path class="smoke" d="M12 5q-2-2 0-4" opacity=".6"/>`];
   I.xm_hotchoc = [`<path d="M5 9h12v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" ${f("#F2A0B8")}/><ellipse cx="11" cy="9" rx="6" ry="1.6" ${f("#6A3A2A")}/>`, `<path d="M5 9h12v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM17 11h1.5a2 2 0 0 1 0 4H17"/><ellipse cx="11" cy="9" rx="6" ry="1.6"/><path class="smoke" d="M9 6q-2-2 0-4M13 6q-2-2 0-4" opacity=".6"/>`];
   I.xm_hotchoc_m = [`<path d="M5 9h12v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" ${f("#F2A0B8")}/><ellipse cx="11" cy="9" rx="6" ry="1.6" ${f("#6A3A2A")}/>${[[9, 8], [12, 7.4], [14, 8.4]].map(([x, y]) => `<rect x="${x - 1.3}" y="${y - 1.3}" width="2.6" height="2.6" rx=".6" ${f("#FFFDF6")}/>`).join("")}`, `<path d="M5 9h12v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM17 11h1.5a2 2 0 0 1 0 4H17"/><ellipse cx="11" cy="9" rx="6" ry="1.6"/>`];
@@ -10883,25 +10887,25 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       hellos: ["Hi Mel! The wall's looking good.", "Boss! Want a taste?"],
       away: "Amara's off. The Cocoa Room's quiet."
     },
-    // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep): Tuesday to Saturday 9:30-4:30, evening classes Mon and Tue
+    // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep): Monday to Saturday 9:30-4:30, evening classes Mon and Tue
     {
       id: "mateo",
       pitch: 0.95,
       name: "Mateo",
       job: "Kitchen hand at the Cocoa Room",
       look: { skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#F6F2EA", bottom: "#4A2E22", extra: "apron" },
-      // round 177 (Mel: "can he only study at night, during evening classes, and work at my shop during the day"): Tuesday to
-      // Saturday 9:30 to 4:30 in the kitchen; food science at the poly on Monday and Tuesday evenings (off the map, 6 to 9),
+      // round 177 (Mel: "can he only study at night, during evening classes, and work at my shop during the day"), round 180
+      // (Mel: "Mateo needs to work mondays"): Monday to Saturday 9:30 to 4:30 in the kitchen; food science at the poly on Monday and Tuesday evenings (off the map, 6 to 9),
       // then home to his textbooks
       routine: [
         slot5("08:30", "09:15", "hlane", [[200, 320], [236, 450], [330, 180]]),
-        slot5("09:30", "16:30", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], { dow: [2, 3, 4, 5, 6], needs: "cocoa" }),
+        slot5("09:30", "16:30", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], { dow: [1, 2, 3, 4, 5, 6], needs: "cocoa" }),
         slot5("21:15", "22:30", "honeysuckle", [300, 470], { act: "read", dow: [1, 2] }),
         slot5("17:00", "20:30", "hlane", [186, 298], { act: "sit", dow: [0, 3, 4, 5, 6] }),
         slot5("20:30", "22:30", "honeysuckle", [300, 470], { act: "sit", dow: [0, 3, 4, 5, 6] })
       ],
       // home: Honeysuckle, with Lila
-      intro: "Hola! I'm Mateo. I'm in your kitchen Tuesday to Saturday, and I study food science at the poly on Monday and Tuesday nights. The bonbons are all yours, boss.",
+      intro: "Hola! I'm Mateo. I'm in your kitchen Monday to Saturday, and I study food science at the poly on Monday and Tuesday nights. The bonbons are all yours, boss.",
       lines: ["Your bonbon shelf is full. I didn't touch a crumb!", "Exams next week. Tempering is very calming.", "My lecturer says I'm the only one who's ground beans by hand.", "The grinder's singing today.", "Forty dark bars on the wall. A personal best.", "I bought beans this morning. Don't worry, I kept to your budget."],
       hellos: ["Morning, boss! Roaster's warm.", "Hi Mel! Smell that?"],
       away: "Mateo's gone home. The kitchen's quiet."
@@ -24876,7 +24880,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var SACK = 25;
   var KINDS2 = { milk: { n: "Milk chocolate", col: "#8A5A3A" }, dark: { n: "Dark chocolate", col: "#4A2E22" }, white: { n: "White chocolate", col: "#F3E7C9" } };
   var BAR_ID = (k) => "bar_" + k;
-  var HAND = { 2: [9 * 60 + 30, 16 * 60 + 30], 3: [9 * 60 + 30, 16 * 60 + 30], 4: [9 * 60 + 30, 16 * 60 + 30], 5: [9 * 60 + 30, 16 * 60 + 30], 6: [9 * 60 + 30, 16 * 60 + 30] };
+  var HAND = { 1: [9 * 60 + 30, 16 * 60 + 30], 2: [9 * 60 + 30, 16 * 60 + 30], 3: [9 * 60 + 30, 16 * 60 + 30], 4: [9 * 60 + 30, 16 * 60 + 30], 5: [9 * 60 + 30, 16 * 60 + 30], 6: [9 * 60 + 30, 16 * 60 + 30] };
   var WALL = 40;
   var now2 = () => Date.now() + (globalThis.__mapleOffset || 0);
   var openOn = (day, hm6, mon) => (mon || (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() !== 1) && hm6 >= OPEN2 && hm6 < CLOSE2;
@@ -25483,7 +25487,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function planPanel(F2, st6 = {}) {
     const c = cocoaState(F2), p = c.plan;
     const step2 = (a, k, v, label2) => `<div class="row gprices"><span>${label2}</span><span class="gstep"><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="-1" aria-label="Less">−</button><b>${v}</b><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="1" aria-label="More">+</button></span></div>`;
-    let h3 = `<p class="eyebrow" style="margin:14px 0 6px">Kitchen plan</p><p class="muted">${p.on ? `Mateo runs the bar line on his shifts (Tuesday to Saturday, 9:30 to 4:30; he studies in the evenings)${st6.hand ? " (he's in the kitchen now)" : ""}. The bonbon shelf fills first and he never moulds it into bars.` : "Mateo's paused: the kitchen only runs when you work it."}</p>`;
+    let h3 = `<p class="eyebrow" style="margin:14px 0 6px">Kitchen plan</p><p class="muted">${p.on ? `Mateo runs the bar line on his shifts (Monday to Saturday, 9:30 to 4:30; he studies in the evenings)${st6.hand ? " (he's in the kitchen now)" : ""}. The bonbon shelf fills first and he never moulds it into bars.` : "Mateo's paused: the kitchen only runs when you work it."}</p>`;
     h3 += `<div class="actions"><button class="btn small ${p.on ? "alt" : "primary"}" data-cc="plan" data-k="on">${p.on ? "Pause Mateo" : "Mateo, back to work"}</button></div>`;
     h3 += Object.entries(KINDS2).map(([k, d]) => step2("keep", k, c.keep[k], `${dot2(d.col)} Keep for bonbons: ${d.n.split(" ")[0].toLowerCase()} <small class="muted">(${c.res[k]} there)</small>`)).join("");
     h3 += `<div class="row gprices"><span>Auto-buy beans</span><button class="btn small ${p.buy ? "primary" : "alt"}" data-cc="plan" data-k="buy" aria-pressed="${p.buy}">${p.buy ? "On" : "Off"}</button></div>`;

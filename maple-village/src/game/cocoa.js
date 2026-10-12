@@ -9,7 +9,7 @@
 //           a tray of 12 bonbons. Every new combination is a discovery with its own name; known ones make another tray.
 //           Up to 6 flavours sit in the shop's display case (customers buy 2-4 at a time); Mel can have one, or pack a
 //           gift box of 4 or 9 from what's on display.
-// Mateo, the kitchen hand (Tuesday to Saturday, 9:30 to 4:30; evening classes on Mondays and Tuesdays), keeps the bar line going on his own: he roasts, grinds,
+// Mateo, the kitchen hand (Monday to Saturday, 9:30 to 4:30; evening classes on Mondays and Tuesdays), keeps the bar line going on his own: he roasts, grinds,
 // tempers and moulds whenever a station's free. Tempered chocolate goes onto the bonbon shelf first (c.res), up to
 // Mel's targets (c.keep); only what's beyond that becomes bars (Mel's own pots stay loose: bars or bonbons, her call), so the bonbon chocolate is never moulded. He uses the
 // sacks in the kitchen (leaving c.plan.hold of them alone) and, with auto-buy on, orders a sack when they run out,
@@ -41,7 +41,7 @@ import { festivalOn, rainyOn } from "../art/village-extras.js";
 export const OPEN = 11*60, CLOSE = 20*60, ROAST_MIN = 10, GRIND_MIN = 120, POT = 30, MOULD = 10, SACK = 25;
 export const KINDS = {milk: {n: "Milk chocolate", col: "#8A5A3A"}, dark: {n: "Dark chocolate", col: "#4A2E22"}, white: {n: "White chocolate", col: "#F3E7C9"}};
 export const BAR_ID = k => "bar_" + k;
-export const HAND = {2: [9*60 + 30, 16*60 + 30], 3: [9*60 + 30, 16*60 + 30], 4: [9*60 + 30, 16*60 + 30], 5: [9*60 + 30, 16*60 + 30], 6: [9*60 + 30, 16*60 + 30]}, WALL = 40;   // Mateo's shifts by weekday; he stops moulding a kind at 40 bars on the wall
+export const HAND = {1: [9*60 + 30, 16*60 + 30], 2: [9*60 + 30, 16*60 + 30], 3: [9*60 + 30, 16*60 + 30], 4: [9*60 + 30, 16*60 + 30], 5: [9*60 + 30, 16*60 + 30], 6: [9*60 + 30, 16*60 + 30]}, WALL = 40;   // Mateo's shifts by weekday; he stops moulding a kind at 40 bars on the wall
 const now = () => Date.now() + (globalThis.__mapleOffset || 0);
 export const openOn = (day, hm, mon) => (mon || new Date(day + "T00:00:00Z").getUTCDay() !== 1) && hm >= OPEN && hm < CLOSE;
 export const CC_UPS = {
@@ -406,7 +406,7 @@ export function upsPanel(F){
 export function planPanel(F, st = {}){
   const c = cocoaState(F), p = c.plan;
   const step = (a, k, v, label) => `<div class="row gprices"><span>${label}</span><span class="gstep"><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="-1" aria-label="Less">−</button><b>${v}</b><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="1" aria-label="More">+</button></span></div>`;
-  let h = `<p class="eyebrow" style="margin:14px 0 6px">Kitchen plan</p><p class="muted">${p.on ? `Mateo runs the bar line on his shifts (Tuesday to Saturday, 9:30 to 4:30; he studies in the evenings)${st.hand ? " (he's in the kitchen now)" : ""}. The bonbon shelf fills first and he never moulds it into bars.` : "Mateo's paused: the kitchen only runs when you work it."}</p>`;
+  let h = `<p class="eyebrow" style="margin:14px 0 6px">Kitchen plan</p><p class="muted">${p.on ? `Mateo runs the bar line on his shifts (Monday to Saturday, 9:30 to 4:30; he studies in the evenings)${st.hand ? " (he's in the kitchen now)" : ""}. The bonbon shelf fills first and he never moulds it into bars.` : "Mateo's paused: the kitchen only runs when you work it."}</p>`;
   h += `<div class="actions"><button class="btn small ${p.on ? "alt" : "primary"}" data-cc="plan" data-k="on">${p.on ? "Pause Mateo" : "Mateo, back to work"}</button></div>`;
   h += Object.entries(KINDS).map(([k, d]) => step("keep", k, c.keep[k], `${dot(d.col)} Keep for bonbons: ${d.n.split(" ")[0].toLowerCase()} <small class="muted">(${c.res[k]} there)</small>`)).join("");
   h += `<div class="row gprices"><span>Auto-buy beans</span><button class="btn small ${p.buy ? "primary" : "alt"}" data-cc="plan" data-k="buy" aria-pressed="${p.buy}">${p.buy ? "On" : "Off"}</button></div>`;

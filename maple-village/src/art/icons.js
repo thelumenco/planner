@@ -152,6 +152,16 @@ I.mint = [`<ellipse cx="9" cy="12" rx="4" ry="6" transform="rotate(-25 9 12)" ${
 const hamperIco = big => [`<path d="M${big ? 2 : 4} 11h${big ? 20 : 16}l-2 10H${big ? 4 : 6}z" ${f("#C9A27E")}/>${big ? `<rect x="5" y="7" width="4" height="5" ${f("#9CC27E")}/><rect x="15" y="6" width="4" height="6" ${f("#7A1F3D")}/>` : ""}<rect x="9.5" y="${big ? 5 : 7}" width="5" height="${big ? 7 : 5}" rx="1" ${f("#F3C969")}/><path d="M12 11l-3-3 3 1 3-1z" ${f("#C8432F")}/>`,
   `<path d="M${big ? 2 : 4} 11h${big ? 20 : 16}l-2 10H${big ? 4 : 6}zM${big ? 5 : 6} 14h${big ? 14 : 12}M${big ? 6 : 7} 17h${big ? 12 : 10}M${big ? 3 : 5} 11q9 -12 ${big ? 18 : 14} 0"/><path d="M12 11l-3-3 3 1 3-1z"/>`];
 I.hamper_small = hamperIco(false); I.hamper_big = hamperIco(true);
+// round 180: the wine and chocolate pairing box: a teal gift box (not the hamper's wicker), a bottle standing in it, four
+// bonbons in a row, a gold ribbon round the front with a big bow
+I.pairbox = [`<rect x="4.6" y="1.4" width="2.6" height="2.2" rx=".4" ${f("#F3C969")}/><path d="M4.9 3.6h2v3.6l1.8 2V16H3.1V9.2l1.8-2z" ${f("#7A1F3D")}/><rect x="3.7" y="9.6" width="4.4" height="3.4" rx=".5" ${f("#FFFDF6")}/>`
+  + `<path d="M2.6 12.8h18.8l.6 1.8H2z" ${f("#1F3F43")}/>`
+  + [[10.3, "#5A3424", "#F3C969"], [13.6, "#F2A0B8", "#FFFDF6"], [16.9, "#8A4A2A", "#E8D2A8"], [20.1, "#E8D2A8", "#8A4A2A"]].map(([x, c, d]) => `<circle cx="${x}" cy="12" r="1.85" ${f(c)}/><path d="M${x - 1} 11.4q1 -.8 2 0" style="fill:none;stroke:${d};stroke-width:.6"/>`).join("")
+  + `<rect x="2" y="14.6" width="20" height="7" rx=".8" ${f("#2F6F73")}/><rect x="2" y="17.3" width="20" height="1.5" ${f("#F3C969")}/><rect x="14.3" y="14.6" width="1.5" height="7" ${f("#F3C969")}/>`
+  + `<path d="M15 18c-1.6-2.6-4.4-2.4-3.6.2.3 1 2 1 3.6-.2zM15 18c1.6-2.6 4.4-2.4 3.6.2-.3 1-2 1-3.6-.2zM14.6 18.4l-1.6 3.4 1-.4.6 1zM15.4 18.4l1.6 3.4-1-.4-.6 1z" ${f("#F6D27A")}/><circle cx="15" cy="18" r=".9" ${f("#E0A83A")}/>`,
+  `<path d="M4.6 1.4h2.6v2.2H4.6zM4.9 3.6h2v3.6l1.8 2v3.6M3.1 12.8V9.2l1.8-2V3.6M3.7 9.6h4.4v3.4H3.7z"/>`
+  + [10.3, 13.6, 16.9, 20.1].map(x => `<path d="M${x - 1.85} 12.4a1.85 1.85 0 0 1 3.7 0"/>`).join("")
+  + `<path d="M2.6 12.8h18.8l.6 1.8M2.6 12.8L2 14.6"/><rect x="2" y="14.6" width="20" height="7" rx=".8"/><path d="M15 18c-1.6-2.6-4.4-2.4-3.6.2.3 1 2 1 3.6-.2zM15 18c1.6-2.6 4.4-2.4 3.6.2-.3 1-2 1-3.6-.2zM14.6 18.4l-1.6 3.4M15.4 18.4l1.6 3.4"/>`];
 // round 172: the Christmas market's treats (eaten on the spot)
 I.xm_chestnut = [`<path d="M6 10l6 12 6-12z" ${f("#F3E7C9")}/>${[[9, 9], [12, 7.5], [15, 9], [10.5, 11.5], [13.5, 11.5]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="2.2" ry="1.9" ${f("#8A4A2A")}/>`).join("")}`, `<path d="M6 10l6 12 6-12z"/>${[[9, 9], [12, 7.5], [15, 9]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="2.2" ry="1.9"/>`).join("")}<path class="smoke" d="M12 5q-2-2 0-4" opacity=".6"/>`];
 I.xm_hotchoc = [`<path d="M5 9h12v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" ${f("#F2A0B8")}/><ellipse cx="11" cy="9" rx="6" ry="1.6" ${f("#6A3A2A")}/>`, `<path d="M5 9h12v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM17 11h1.5a2 2 0 0 1 0 4H17"/><ellipse cx="11" cy="9" rx="6" ry="1.6"/><path class="smoke" d="M9 6q-2-2 0-4M13 6q-2-2 0-4" opacity=".6"/>`];
