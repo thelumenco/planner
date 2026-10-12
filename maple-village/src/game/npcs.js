@@ -7,7 +7,10 @@ import { OUTDOOR } from "../data/world.js";
 import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
 import { lunchSlot } from "./lunch.js";
 import { occasionSlot } from "./occasions.js";
-import { toursOn, visitsOn, eventOn, keepersOn, TOURISTS } from "./tours.js";
+import { toursOn, visitsOn, eventOn, keepersOn, TOURISTS, NIGHT_TOURISTS } from "./tours.js";
+import { browseSlot } from "./browse.js";
+import { openOn as cocoaOpen, OPEN as CC_OPEN, CLOSE as CC_CLOSE } from "./cocoa.js";
+import { keeperOn as giftOpen, GIFT_HOURS } from "./giftshop.js";
 import { millSlot } from "./millcraft.js";
 import { MILL_VISITORS } from "../data/mill-people.js";
 import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dinnerSlot, dateSlot, clubSlot, discoSlot, scoopSlot, workshopSlot, trainSlot, letSlot, bonfireSlot, movieSlot, bayMarketSlot } from "./tours.js";
@@ -42,7 +45,17 @@ const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw 
 const routineNow = def => routineAt(def, dayKey(), sgHM());
 export function slotAt(def, day, t, live){
   return (api && tripSlot(api.F(), def.id, day, t, live ? api.scene() : null)) || (live && supSlot(def)) || lunchSlot(def.id, day, t, terraceBuilt()) || occasionSlot(def.id, day, t, terraceBuilt()) || millSlot(def.id, day, t, millShopOpen(), MILL_VISITORS, []) || dinnerSlot(def.id, day, t) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || (cellarBuilt() && discoSlot(def.id, day, t)) || movieSlot(def.id, day, t) || bonfireSlot(def.id, day, t) || bayMarketSlot(def.id, day, t) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
-    || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || shoreSlot(def.id, day, t) || iceOk(scoopSlot(def.id, day, t), def, day, t) || letSlot(def.id, day, t) || routineAt(def, day, t);
+    || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || iceOk(shopSlot(def.id, day, t), def, day, t) || shoreSlot(def.id, day, t) || iceOk(scoopSlot(def.id, day, t), def, day, t) || letSlot(def.id, day, t) || routineAt(def, day, t);
+}
+// round 181: shoppers you can see in the Cocoa Room (day tourists) and the gift shop (the night-market folk, by day)
+const some = o => Object.values(o || {}).some(n => n > 0);
+function shopSlot(id, day, t){
+  if (!api) return null; const F = api.F(), g = F.goals || {};
+  if (g.cocoa && TOURISTS.includes(id)) { const c = F.cocoa || {};
+    return browseSlot(id, day, t, {shop: "cocoa", open: cocoaOpen(day, t, !!(c.up || {}).assistant), from: CC_OPEN, to: CC_CLOSE, pool: TOURISTS.filter(x => !busyOn(day).includes(x)), stock: some(c.bars) || some(c.trays)}); }
+  if (g.giftshop && NIGHT_TOURISTS.includes(id)) { const c = F.cocoa || {}, v = F.vine || {};
+    return browseSlot(id, day, t, {shop: "giftshop", open: giftOpen(day, t), from: GIFT_HOURS.from, to: GIFT_HOURS.to, pool: NIGHT_TOURISTS.filter(x => !busyOn(day).includes(x)), stock: (g.cocoa && (some(c.bars) || some(c.trays))) || some((F.craft || {}).store) || (v.shelf || []).some(b => b.n > 0) || ((F.giftshop || {}).pairs || []).length > 0}); }
+  return null;
 }
 // a night-market shopper slot gives way to the wine shop: anyone due at a tasting or in the shop then goes there instead
 const nightOk = (s, def, day, t) => !s || !s.night ? s : tastingSlot(def.id, day, t) || (routineAt(def, day, t) || {}).scene === "wineshop" ? null : s;
@@ -63,7 +76,7 @@ const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone", fish: 
   rummage: "hanger", binoculars: "binocs", crown: "crownw", drone: "remote", cuppa: "cuppa", footy: "footy", swirl: "wineglass", juggle: "juggle", fan: "fan", carry: "flats", feedroo: "roobag", bbq: "tongs", skim: "skim", cards: "cards", mallow: "mallow",
   bodyboard: "bodyboard", yoga: "yogamat", telescope: "telescope", paint: "easel", macro: "macrocam", count: "clicker", chips: "chipbox", prawns: "prawnbag", shells: "shellpail", shelter: "driftwood", parrot: "parrot", quoits: "quoit", postcard: "postcard",
   flask: "thermos", wade: "wadewater", ducks: "ducks", frisbee: "frisbee", lollybag: "lollybag", pail: "milkpail", fence: "fencerail", shake: "branch", crack: "nutstone", pan: "goldpan", guard: "guardflag", sip: "sarsbottle",
-  armful: "armful", bee: "beebuzz", baguette: "baguette", accordion: "accordion", sniff: "sniffstrip", spritz: "atomiser", beesuit: "beeveil", sunflower: "bigflower", float: "ring", picnic: "rug", candle: "candlelit", goat: "kid", lantern: "xlantern", carol: "songsheet"};   // round 164: the Lavender Hills ("heart" is a pose)   // round 160: the Tablelands ("hush" is a pose)   // round 150: the Coast Road   // (and these: Bellbird Valley, round 144; "wave", "taichi", "crouch" and "lookup" are poses)   // (and these: Cinque Terre, round 134; "sunbathe" is a towel)   // (and these: Jeju, round 129; "luck" is an arm and "tandem" a bike)   // (and these: Kyoto, round 122)   // (the last five: Ronda, round 107)
+  armful: "armful", bee: "beebuzz", baguette: "baguette", accordion: "accordion", sniff: "sniffstrip", spritz: "atomiser", beesuit: "beeveil", sunflower: "bigflower", float: "ring", picnic: "rug", candle: "candlelit", goat: "kid", lantern: "xlantern", carol: "songsheet", shopbag: "shopbag"};   // round 164: the Lavender Hills ("heart" is a pose)   // round 160: the Tablelands ("hush" is a pose)   // round 150: the Coast Road   // (and these: Bellbird Valley, round 144; "wave", "taichi", "crouch" and "lookup" are poses)   // (and these: Cinque Terre, round 134; "sunbathe" is a towel)   // (and these: Jeju, round 129; "luck" is an arm and "tandem" a bike)   // (and these: Kyoto, round 122)   // (the last five: Ronda, round 107)
 const outdoors = s => OUTDOOR.includes(s);
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 

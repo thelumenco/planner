@@ -2350,3 +2350,10 @@ Write the proposal for Mel covering every item below. Only build after she says 
 ## Round 180: pairing-box icon, Mateo on Mondays
 - icons.js `I.pairbox`: a teal gift box (deliberately not the hamper's wicker) with a burgundy bottle standing in it, four bonbons in a row, a gold ribbon and bow on the front.
 - Mateo works Monday to Saturday 9:30-4:30 (cocoa.js `HAND` gains 1; npcs.js routine dow [1..6]). Evening classes Mon/Tue unchanged.
+
+## Round 181: shoppers you can see
+- game/browse.js: `browseVisits(shop, day, from, to, pool)` (one may start every 25 min, about 3 windows in 5, sometimes a pair; never overlapping) and `browseSlot` (door 1 min → look 5 → look 4 → till 3 → out with act `shopbag` 1; bare shelves: look then leave empty-handed). Spots in `BROWSE` for `cocoa` and `giftshop`.
+- npcs.js `shopSlot`: day TOURISTS shop in the Cocoa Room (while `openOn`, incl. Mondays with Lila), NIGHT_TOURISTS in the gift shop (Posy's hours). Sits after tastings in `slotAt`, behind `iceOk` (only for someone not busy elsewhere).
+- Mill upstairs: `millSlot` now has weekday browsers too (`MILL_WEEKDAY` 12:00 and 15:00, after the 11am tasting), not Mondays; the last 8 minutes of a visit carry a bag.
+- people.js prop `shopbag` (kraft carrier, twine handles, pink tissue).
+- Why the Cocoa Room looked dead (Mel's report): it's shut on Mondays unless the Second assistant (Lila) is bought, and sales never showed anyone walking in.

@@ -166,7 +166,7 @@ export const tastingTimes = day => [...TASTE.at, ...(weekend(day) ? TASTE.weeken
 export const tastingNow = (day, hm) => tastingTimes(day).find(t => hm >= t && hm < t + TASTE.dur);
 export const tastingJustDone = (day, hm) => tastingTimes(day).some(t => hm >= t + TASTE.dur && hm < t + TASTE.dur + TASTE.boost);
 export const workshopNow = (day, hm) => WORKSHOP.dow.includes(new Date(day + "T00:00:00Z").getUTCDay()) && hm >= WORKSHOP.from && hm < WORKSHOP.to;
-export const MILL_VISITS = [[12*60, 13*60], [13*60 + 30, 14*60 + 30], [16*60, 17*60]];
+export const MILL_VISITS = [[12*60, 13*60], [13*60 + 30, 14*60 + 30], [16*60, 17*60]], MILL_WEEKDAY = [[12*60, 12*60 + 45], [15*60, 15*60 + 45]];
 const hsh = s => [...s].reduce((a, ch) => (a*31 + ch.charCodeAt(0)) >>> 0, 7);
 const pickN = (pool, n, seed) => { const out = []; for (let k = 0; out.length < Math.min(n, pool.length) && k < 60; k++) { const v = pool[hsh(seed + ":" + k) % pool.length]; if (!out.includes(v)) out.push(v); } return out; };
 const TASTE_SEATS = [0, 1, 2, 3].flatMap(i => [[191 + i*46, 300, 1], [191 + i*46, 420, -1]]);
@@ -178,9 +178,12 @@ export function millSlot(id, day, hm, open, tourists, busy = []){
     const k = pickN(pool, TASTE.size, day + "taste" + t0).indexOf(id); if (k >= 0) { const [x, y, d] = TASTE_SEATS[[0, 3, 4, 7][k]]; return {from: w[0], to: w[1], scene: "millup", at: [x, y], dir: d, act: "sit", tasting: true}; } }
   if (workshopNow(day, hm)) { const w = [WORKSHOP.from, WORKSHOP.to]; if (id === "hazel") return {from: w[0], to: w[1], scene: "millup", at: [410, 508], dir: -1, act: "point", workshop: true};
     const k = pickN(pool, WORKSHOP.size, day + "work").indexOf(id); if (k >= 0) { const [x, y, d] = WORK_SEATS[k]; return {from: w[0], to: w[1], scene: "millup", at: [x, y], dir: d, act: "sit", workshop: true}; } }
-  if (!weekend(day) || !tourists.includes(id)) return null;
-  const who = MILL_VISITS.map((_, i) => pool[(hsh(day) + i*3) % pool.length]), i = who.indexOf(id); if (i < 0) return null; const [from, to] = MILL_VISITS[i]; if (hm < from || hm >= to) return null;
-  return {from, to, scene: "millup", wander: [[100, 300], [100, 440], [440, 320], [300, 480], [150, 250]], millvisit: true};
+  const dw = new Date(day + "T00:00:00Z").getUTCDay(); if (!tourists.includes(id) || SHOPKEEP.closed.includes(dw)) return null;
+  const visits = weekend(day) ? MILL_VISITS : MILL_WEEKDAY;   // round 181: weekday browsers too, fewer
+  const who = visits.map((_, i) => pool[(hsh(day) + i*3) % pool.length]), i = who.indexOf(id); if (i < 0) return null; const [from, to] = visits[i]; if (hm < from || hm >= to) return null;
+  const wander = [[100, 300], [100, 440], [440, 320], [300, 480], [150, 250]];
+  if (hm >= to - 8) return {from: to - 8, to, scene: "millup", wander, millvisit: true, act: "shopbag"};   // out with a paper bag
+  return {from, to: to - 8, scene: "millup", wander, millvisit: true};
 }
 // kept for the earlier tests' sake: the browsing visits on their own
 export const millVisitSlot = (id, day, hm, open, tourists, busy = []) => { const s = millSlot(id, day, hm, open, tourists, busy); return s && s.millvisit ? s : null; };

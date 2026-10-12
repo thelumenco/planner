@@ -3769,7 +3769,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(g.slice(0, 4).every(x => x === 8) && g[4] === 0 && F.craft.store.mc_o === 2 && m === 28 && sat === 28 && F.craft.sold["2026-10-18"].grace === 4, "Grace sells Mel's soaps (only the soaps) at the Sunday market; the wine stall's mill crate sells too"); }
   check(np.NPCS.find(n => n.id === "grace").job.includes("Hazel"), "Grace is Hazel's granddaughter");
   { const tours = await import(new URL("../src/game/tours.js", import.meta.url)), sat = "2026-10-17", ids = tours.TOURISTS, hits = ids.filter(id => [12*60 + 10, 13*60 + 40, 16*60 + 10].some(t => mc.millVisitSlot(id, sat, t, true, ids, [])));
-    check(hits.length >= 2 && !ids.some(id => mc.millVisitSlot(id, "2026-10-14", 12*60 + 10, true, ids, [])) && !ids.some(id => mc.millVisitSlot(id, sat, 12*60 + 10, false, ids, [])), "weekend day-trippers walk up the lane to the Mill Shop (once it's open)"); }
+    check(hits.length >= 2 && !ids.some(id => mc.millVisitSlot(id, "2026-10-14", 13*60 + 10, true, ids, [])) && ids.some(id => mc.millVisitSlot(id, "2026-10-14", 12*60 + 10, true, ids, [])) && !ids.some(id => mc.millVisitSlot(id, "2026-10-12", 12*60 + 10, true, ids, [])) && !ids.some(id => mc.millVisitSlot(id, sat, 12*60 + 10, false, ids, [])), "day-trippers walk up the lane to the Mill Shop (once it's open): three at weekends, two on weekdays, none on Mondays"); }
   // upstairs: tastings (Tomi and four day-trippers at 11, and at 3 at weekends), soap workshops (Hazel and five, Wed and Sat)
   { const T = ["aiko", "ben", "clara", "dev", "rosa", "bastien", "grace", "hiro"], sat = "2026-10-17", at11 = T.map(id => mc.millSlot(id, sat, 11*60 + 10, true, T, [])).filter(Boolean);
     check(mc.millSlot("tomi", sat, 11*60 + 10, true, T, []).scene === "millup" && at11.length === 4 && at11.every(x => x.act === "sit") && mc.tastingTimes(sat).length === 2 && mc.tastingTimes("2026-10-13").length === 1, "olive oil tastings: Tomi and four day-trippers at the long table (twice on weekends)");
@@ -4002,6 +4002,16 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(gs.pairSeason("2026-02-10") && gs.pairSeason("2026-12-20") && !gs.pairSeason("2026-10-14"), "busier before Valentine's, Mother's Day and Christmas");
   const real = Math.random; Math.random = () => .01; const got = gs.giftSellMinute(F, "2026-10-14", 11*60, "keeper", o); Math.random = real;
   check(got === 18 + 4*c.prices.bonbon && !F.giftshop.pairs.length && F.giftshop.sold["2026-10-14"].pair === 1 && /pairing boxes/.test(gs.giftPanel(F, "gtill", {...o, hm: 11*60})), "it sells as a box, for no more than its parts");
+}
+{
+  console.log("\nShoppers you can see (round 181)");
+  const br = await import(new URL("../src/game/browse.js", import.meta.url)), pool = ["a", "b", "c", "d", "e", "f"], day = "2026-10-13";
+  const vs = br.browseVisits("cocoa", day, 11*60, 20*60, pool);
+  check(vs.length >= 6 && vs.every((v, i) => v.ids.length <= 2 && (!i || v.from - vs[i - 1].from >= 25)) && JSON.stringify(vs) === JSON.stringify(br.browseVisits("cocoa", day, 11*60, 20*60, pool)), `a shopper or two every so often, never overlapping (${vs.length} visits)`);
+  const v = vs[0], id = v.ids[0], o = {shop: "cocoa", open: true, from: 11*60, to: 20*60, pool, stock: true}, at = m => br.browseSlot(id, day, v.from + m, o);
+  check(at(0).scene === "cocoa" && at(3).at && at(8).at && at(11).at === br.BROWSE.cocoa.till[0] && at(13).act === "shopbag", "in the door, at the case, at the shelf, at the counter, out with a paper bag");
+  check(!br.browseSlot(id, day, v.from + 13, {...o, stock: false}).act && br.browseSlot(id, day, v.from + 11, {...o, stock: false}).at === br.BROWSE.cocoa.door, "bare shelves: they look and leave empty-handed");
+  check(!br.browseSlot(id, day, v.from + 3, {...o, open: false}) && !at(20), "nobody when it's shut, or between visits");
 }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
