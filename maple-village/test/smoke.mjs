@@ -1921,7 +1921,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   // the upgrades catalogue: all ten, then what they do
   await at("12:00", "&ccpatch=ups"); await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
   await tap("ccounter", '#ctx [data-cc="ups"]'); await page.click('#ctx [data-cc="ups"]'); await page.waitForSelector('#ctx [data-cc="buyup"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-cc="buyup"]').count() === 14, "the Cocoa Room's catalogue lists fourteen upgrades (four of them bonbon moulds)");
+  check(await page.locator('#ctx [data-cc="buyup"]').count() === 15, "the Cocoa Room's catalogue lists fifteen upgrades (four of them bonbon moulds)");
   for (let i = 0; i < 10; i++) { const b = page.locator('#ctx [data-cc="buyup"]').first(); if (!(await b.count())) break; await b.click(); await page.waitForTimeout(250); }
   check(await fox().then(f => Object.keys(f.cocoa.up).length === 10 && f.coins === 10000 - 4450), "all ten bought (4450 coins)");
   await page.click('#ctx [data-cc="counter"]'); await page.waitForSelector('#ctx [data-cc="hot"]', { timeout: 15000 }); await page.click('#ctx [data-cc="hot"]'); await page.waitForTimeout(300);
@@ -4012,6 +4012,17 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(at(0).scene === "cocoa" && at(3).at && at(8).at && at(11).at === br.BROWSE.cocoa.till[0] && at(13).act === "shopbag", "in the door, at the case, at the shelf, at the counter, out with a paper bag");
   check(!br.browseSlot(id, day, v.from + 13, {...o, stock: false}).act && br.browseSlot(id, day, v.from + 11, {...o, stock: false}).at === br.BROWSE.cocoa.door, "bare shelves: they look and leave empty-handed");
   check(!br.browseSlot(id, day, v.from + 3, {...o, open: false}) && !at(20), "nobody when it's shut, or between visits");
+}
+{
+  console.log("\nThe Cocoa Room's honesty box (round 182)");
+  const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {coins: 400, goals: {cocoa: 1}}, c = cc.cocoaState(F);
+  c.bars.dark = 10; c.plan.on = false; check(cc.buyCcUp(F, "honesty") && F.coins === 100, "the honesty box, 300 coins from the catalogue");
+  const off = globalThis.__mapleOffset, rnd = Math.random, mon = Date.parse("2026-10-12T04:00:00Z");   // Monday noon: the shop's shut
+  c.at = mon - 30*60e3; globalThis.__mapleOffset = mon - Date.now(); Math.random = () => .005; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
+  check(c.bars.dark < 10 && c.box > 0 && F.coins === 100, `shut on Monday: bars sell from the honesty box, and the coins wait in it (${10 - c.bars.dark} sold, ${c.box} coins)`);
+  const box = c.box; check(cc.emptyHonesty(F) === box && F.coins === 100 + box && !c.box, "empty it at the counter");
+  const late = Date.parse("2026-10-12T15:00:00Z"); c.at = late - 30*60e3; globalThis.__mapleOffset = late - Date.now(); Math.random = () => .005; const b0 = c.bars.dark; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
+  check(c.bars.dark === b0, "nothing after 10pm");
 }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }

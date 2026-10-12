@@ -2357,3 +2357,6 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - Mill upstairs: `millSlot` now has weekday browsers too (`MILL_WEEKDAY` 12:00 and 15:00, after the 11am tasting), not Mondays; the last 8 minutes of a visit carry a bag.
 - people.js prop `shopbag` (kraft carrier, twine handles, pink tissue).
 - Why the Cocoa Room looked dead (Mel's report): it's shut on Mondays unless the Second assistant (Lila) is bought, and sales never showed anyone walking in.
+
+## Round 182: the Cocoa Room's honesty box
+- CC_UPS `honesty` (300). While the shop's shut (9am-10pm when `openOn` is false: before 11, after 8, Mondays without Lila) a bar sells about once every two hours (.008/min) into `c.box`; 12% of buyers are a coin short. Counter panel row "Honesty box by the door" with Empty it (`data-cc="honestybox"`, `emptyHonesty`). Drawn on the bay left of the shopfront (bay.js). The catalogue now lists 15 upgrades.

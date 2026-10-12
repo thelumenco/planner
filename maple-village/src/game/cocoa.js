@@ -54,6 +54,7 @@ export const CC_UPS = {
   supply: {n: "Supply deal with the Scoop Shack", price: 250, line: "Every morning, 10 pieces of loose dark chocolate go to the Scoop Shack's gelato fridge on their own (when there are 10 spare)."},
   workshop: {n: "Weekend workshops", price: 700, line: "Saturday afternoons, 2 to 4: a class of six makes their own bonbons at the tables, and pays 8 coins each."},
   assistant: {n: "Second assistant", price: 500, line: "Lila joins the team. The shop opens on Mondays too, and it's a little busier with two behind the counter."},
+  honesty: {n: "Honesty box", price: 300, line: "A little shelf of bars by the door with a wooden coin box. While the shop's shut (mornings before 11, evenings till 10, and all day Mondays without Lila), passers-by help themselves to a bar and leave the coins. Slower than Amara, and now and then someone's a coin short."},
   cart: {n: "Farmers market cart", price: 400, line: "A little chocolate cart for the Sunday farmers market, 8 to 1. Mateo runs it, selling bars, bonbons and hot chocolate."},
   // round 176: moulds for the bonbon table (the dome comes with the shop). Same price whatever the shape
   m_heart: {n: "Heart moulds", price: 60, line: "A tray of little heart moulds for the bonbon table."},
@@ -74,8 +75,10 @@ export function buyCcUp(F, k){
     grinder2: "A second stone grinder, rumbling away beside the first.", wrap: "The wrapping station's set up: ribbons, tissue, boxes in every size.",
     tree: "A cacao tree in Ma Ma's orchard! She says she'll talk to it every morning.", fountain: "The chocolate fountain's flowing. Evan is going to lose his mind.",
     supply: "Done: the Scoop Shack gets 10 pieces of your dark chocolate every morning, when there's enough spare.", workshop: "Weekend workshops are on: Saturdays, 2 to 4, at the tables.",
-    assistant: "Lila starts Monday! The shop's open seven days now.", cart: "The chocolate cart's ready for Sunday's farmers market. Mateo's thrilled."}[k] || `${u.n}, on the shelf by the bonbon table. Pick them when you make a tray.`;
+    assistant: "Lila starts Monday! The shop's open seven days now.", honesty: "The honesty box is up by the door: a shelf of bars, a wooden coin box, and a sign Evan helped paint.", cart: "The chocolate cart's ready for Sunday's farmers market. Mateo's thrilled."}[k] || `${u.n}, on the shelf by the bonbon table. Pick them when you make a tray.`;
 }
+// the honesty box's coins, into Mel's pocket -> how many
+export function emptyHonesty(F){ const c = cocoaState(F), n = c.box || 0; c.box = 0; F.coins += n; return n; }
 export const cartOn = (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() === 0 && hm >= 8*60 && hm < 13*60;   // the Sunday farmers market
 export const workshopOn = (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() === 6 && hm >= 14*60 && hm < 16*60;
 export const WORKSHOP = 6, WORKSHOP_FEE = 8, TREE_EVERY = 2*864e5, BOX16 = 16;
@@ -259,7 +262,12 @@ export function cocoaTick(F, opts = {}){
       const shown = onDisplay(c), k = Object.keys(KINDS).find(x => c.bars[x] > 0), s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0};
       if (shown.length || k) { sellTo(c, day, out, {}); s.club = (s.club || 0) + 1; out.club = (out.club || 0) + 1; }
     }
-    if (!openOn(day, hm, ccUp(c, "assistant"))) continue;
+    if (!openOn(day, hm, ccUp(c, "assistant"))) {   // round 182: the honesty box sells bars while the shop's shut, into its own coin box
+      if (ccUp(c, "honesty") && hm >= 9*60 && hm < 22*60 && Math.random() < .008) { const st = Object.keys(KINDS).filter(k => c.bars[k] > 0);
+        if (st.length) { const k = st[Math.floor(Math.random()*st.length)], paid = Math.random() < .12 ? c.prices.bar - 1 : c.prices.bar, s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0};
+          c.bars[k]--; c.box = (c.box || 0) + Math.max(0, paid); s.honesty = (s.honesty || 0) + 1; out.honesty = (out.honesty || 0) + 1; } }
+      continue;
+    }
     // a delivery order (round 137): with the Scoop Shack's bike, Tomo takes chocolates round, plus a delivery fee
     if (bikeOwned(F) && deliveryHours(hm) && Math.random() < DELIVERY.cocoa) { const b0 = out.bonbons || 0, got = sellTo(c, day, out, {box: true});
       if (got) { const s = c.sold[day]; s.coins += DELIVERY.fee; out.coins += DELIVERY.fee; s.deliv = (s.deliv || 0) + 1; (out.orders = out.orders || []).push({shop: "cocoa", coins: got + DELIVERY.fee, what: (out.bonbons || 0) > b0 ? "a box of bonbons" : "a chocolate bar"}); scoopState(F).bikeOut = at; continue; } }
@@ -313,6 +321,7 @@ export function counterPanel(F, st){
   h += `<div class="row gprices"><span>Price of a bar</span><span class="gstep"><button class="btn small alt" data-cc="price" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bar}</b><button class="btn small alt" data-cc="price" data-n="1" aria-label="Dearer">+</button></span></div>`;
   if (ccUp(c, "hotchoc")) h += `<div class="row gprices"><span>Hot chocolate${t.hot ? ` <small class="muted">(${t.hot} today)</small>` : ""}</span><span class="gstep"><button class="btn small alt" data-cc="hprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.hot}</b><button class="btn small alt" data-cc="hprice" data-n="1" aria-label="Dearer">+</button></span></div><div class="actions"><button class="btn small primary" data-cc="hot" ${Object.values(c.choc).some(n => n > 0) ? "" : "disabled"}>Have a hot chocolate</button></div>`;
   if (!st.cart) h += `<form class="row hadd" data-ccname="1"><label class="sr" for="ccName">Shop name</label><input id="ccName" maxlength="30" value="${esc(c.name)}"><button class="btn small alt">Rename</button></form>`;
+  if (ccUp(c, "honesty") && !st.cart && !st.xmas) h += `<div class="row gprices"><span>Honesty box by the door${t.honesty ? ` <small class="muted">(${t.honesty} today)</small>` : ""}</span><span><b>${c.box || 0}</b> ${coin()} <button class="btn small alt" data-cc="honestybox" ${c.box ? "" : "disabled"}>Empty it</button></span></div>`;
   if (st.cart) return h + counterBonbons(F) + `<p class="muted">Mateo sells from the shop's stock: bars, bonbons from the case${ccUp(c, "hotchoc") ? ", and hot chocolate" : ""}. More people stop while you're serving.</p>` + shut;
   return h + counterBonbons(F) + planPanel(F, st) + `<div class="actions"><button class="btn small alt" data-cc="ups">Shop upgrades</button></div><p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut;
 }

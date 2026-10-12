@@ -111,7 +111,7 @@ import { waiterOn, riderOn, scoopState, scoopTick, scoopNews, trolleyPanel, load
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaNews, cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
   pantryPanel, bonbonPanel, casePanel, onDisplay as ccOnDisplay, stockPantry, unstockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
-  sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, haveHot, packGrand, readyPot, ccUp } from "./cocoa.js";
+  sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, haveHot, packGrand, readyPot, ccUp, emptyHonesty } from "./cocoa.js";
 import { canKeep, keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, OWNER_NAME, PETS, petAt } from "./companions.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
 import { diningTable, darrenAsleep, skyWash, tapeLabel } from "../art/scenes.js";
@@ -3240,7 +3240,8 @@ function cocoaNow(){
 function wireCocoa(c){
   const re = () => { save(); ctx(); drawScene(); };
   c.querySelectorAll("[data-cc]").forEach(b => b.onclick = () => { const k = b.dataset.k, n = +b.dataset.n, a = b.dataset.cc;
-    if (a === "beans") { if (buyBeans(F, n)) { sfx("coin"); flash(`${n} sack${n > 1 ? "s" : ""} of cacao beans`); } }
+    if (a === "honestybox") { const got = emptyHonesty(F); if (got) { sfx("coin"); flash(`+${got} coins from the honesty box`); if (Math.random() < .3) speak("A note in the coin box: \"Took a dark one. Best chocolate on the bay!\"", 4500); } }
+    else if (a === "beans") { if (buyBeans(F, n)) { sfx("coin"); flash(`${n} sack${n > 1 ? "s" : ""} of cacao beans`); } }
     else if (a === "roast") { if (startRoast(F)) { sfx("paper", true); speak("Beans in the roaster. Ten minutes, and the whole kitchen will smell of chocolate.", 4000); } }
     else if (a === "grind") { if (startGrind(F, k)) { sfx("paper", true); speak(`${CC_KINDS[k].n} in the stone grinder. It'll be ready in two hours.`, 4000); } }
     else if (a === "temper") { const kk = ccTemper(F); if (kk) { sfx("chime"); act("cheer"); gainXp(1); speak(`Spread, scrape, fold... it shines! 30 pieces of ${CC_KINDS[kk].n.toLowerCase()}.`, 4500); } }
