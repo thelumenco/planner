@@ -159,6 +159,7 @@ function timerBlock(){
     <button class="tbtn" data-htctl="${timer.pausedLeft != null ? "play" : "pause"}" aria-label="${timer.pausedLeft != null ? "Resume" : "Pause"}">${icon(timer.pausedLeft != null ? "play" : "pause", 18)}</button>
     <button class="tbtn" data-htctl="stop" aria-label="Stop the timer">${icon("reset", 18)}</button></div>`;
 }
+export const setFridgeTab = t => { view.fridge = t; };   // round 166: the game's "Stored" tab sits beside these two
 export function hestiaPanel(which){
   tidy();
   if (which === "fridge") return fridgePanel();

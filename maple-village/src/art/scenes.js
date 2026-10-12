@@ -553,10 +553,11 @@ export function furn(kind, x, y){
       for (let r = 0; r < 3; r++) for (let i = 0; i < 6; i++) { const k = r*6 + i; b += k < n ? `<rect x="${x-36 + i*12.5}" y="${y-86 + r*28}" width="7" height="20" rx="2.5" style="fill:${k % 3 === 1 ? "#9DBF8A" : "#5B2338"}"/>` : ""; }
       return sk(`<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3" style="fill:#8B5E3C"/>${b}`, `<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3"/><path d="M${x-44} ${y-68} h88 M${x-44} ${y-40} h88 M${x-44} ${y-12} h88"/>`); }
     case "millcrate": { const m = (G.millCrate && G.millCrate()) || {oil: 0, soap: 0, lotion: 0}, b = [];   // the wine shop's crate from the mill, filled from the mill's own shelves
-      for (let i = 0; i < Math.min(4, m.oil); i++) b.push(`<rect x="${x-20 + i*9}" y="${y-48}" width="7" height="20" rx="2.5" fill="${["#B9B04A", "#8FA34A", "#C9B84A", "#7FA35A"][i]}" stroke="#3a2e28" stroke-width=".6"/><rect x="${x-18.5 + i*9}" y="${y-52}" width="4" height="5" fill="#5A3A2A"/>`);
-      for (let i = 0; i < Math.min(2, m.soap); i++) b.push(`<rect x="${x+16}" y="${y-32 - i*7}" width="13" height="6" rx="2" fill="${["#E8C9D8", "#F3E1A0"][i]}" stroke="#3a2e28" stroke-width=".6"/>`);
-      for (let i = 0; i < Math.min(2, m.lotion); i++) b.push(`<ellipse cx="${x-26 + i*0}" cy="${y-34 - i*8}" rx="4" ry="4.5" fill="#FFFDF6" stroke="#3a2e28" stroke-width=".6"/>`);
-      return b.join("") + sk(`<rect x="${x-32}" y="${y-30}" width="64" height="30" rx="2" style="fill:#C9A27E"/>`, `<rect x="${x-32}" y="${y-30}" width="64" height="30" rx="2"/><path d="M${x-32} ${y-15} h64"/>`); }
+      for (let i = 0; i < Math.min(4, m.oil); i++) b.push(`<rect x="${x-16 + i*8}" y="${y-44}" width="6" height="18" rx="2.5" fill="${["#B9B04A", "#8FA34A", "#C9B84A", "#7FA35A"][i]}" stroke="#3a2e28" stroke-width=".6"/><rect x="${x-15 + i*8}" y="${y-48}" width="4" height="5" fill="#5A3A2A"/>`);
+      for (let i = 0; i < Math.min(2, m.soap); i++) b.push(`<rect x="${x+12}" y="${y-31 - i*6}" width="11" height="5" rx="2" fill="${["#E8C9D8", "#F3E1A0"][i]}" stroke="#3a2e28" stroke-width=".6"/>`);
+      for (let i = 0; i < Math.min(2, m.lotion); i++) b.push(`<ellipse cx="${x-21}" cy="${y-31 - i*7}" rx="3.5" ry="4" fill="#FFFDF6" stroke="#3a2e28" stroke-width=".6"/>`);
+      return b.join("") + sk(`<rect x="${x-26}" y="${y-26}" width="52" height="26" rx="2" style="fill:#C9A27E"/>`, `<rect x="${x-26}" y="${y-26}" width="52" height="26" rx="2"/>`)
+        + `<text x="${x}" y="${y-10}" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="8" fill="#5A3A2A" pointer-events="none">from the mill</text>`; }
     case "winecounter": return `<rect x="${x-92}" y="${y-48}" width="184" height="48" fill="transparent"/>`;
     case "chalkmenu": return `<rect x="${x-36}" y="${y-84}" width="72" height="84" fill="transparent"/>`;   // the chalkboard is painted on the wall (interiors.js)
     case "honestybox": { const n = G.vine ? G.vine().box : 0;
@@ -735,7 +736,7 @@ export function roomArt(id){
   st.forEach(s => {
     if (s.kind === "millcrate" && !(G.millCrate && G.millCrate())) return;   // the crate's only there once there's a mill, and till its own shop opens
     // a pedestal's sign names the trophy standing on it (an empty one has no sign)
-    const nm = s.kind === "pedestal" ? ((G.ped && G.ped(s.x, s.y)) || {}).label || "" : s.kind === "vaultjar" ? (() => { const j = G.vault && G.vault(s.x); return j ? j.label : "Empty"; })() : s.name;
+    const nm = s.kind === "millcrate" ? "" : s.kind === "pedestal" ? ((G.ped && G.ped(s.x, s.y)) || {}).label || "" : s.kind === "vaultjar" ? (() => { const j = G.vault && G.vault(s.x); return j ? j.label : "Empty"; })() : s.name;
     h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? (s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm, "var(--card)") : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm.length > 10 ? nm.slice(0, 9) + "…" : nm, "var(--card)", 9.5) : (s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm.length > 15 ? nm.slice(0, 14).trim() + "…" : nm, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)"))) : ""}</g>`;
   });
   if (id === "kidroom") {

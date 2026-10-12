@@ -2292,5 +2292,11 @@ Write the proposal for Mel covering every item below. Only build after she says 
 
 ## Round 165: the mill bench, and the wine shop's crate
 - The upstairs workbench (art/millup.js) is drawn in thin bars, so taps between its legs fell through to the floor and Mel just walked. The bench group now has a transparent hit rect (x 244–458, y 184–294).
-- The wine shop's "from the mill" sales (craftSellMinute "wineshop", till the Mill Shop is bought) now have something to see: station `mcrate` (slot W, kind `millcrate`) beside the counter, drawn only while `G.millCrate()` is set (mill owned, Mill Shop not). It shows bottles, soaps and jars from the mill's store; tapping it opens `wineCratePanel` (millcraft.js): stock, prices, today's sales.
+- The wine shop's "from the mill" sales (craftSellMinute "wineshop", till the Mill Shop is bought) now have something to see: station `mcrate` (slot W, kind `millcrate`) beside the wine shelves (slot W [164,232], "from the mill" written on the crate, no tape label), drawn only while `G.millCrate()` is set (mill owned, Mill Shop not). It shows bottles, soaps and jars from the mill's store; tapping it opens `wineCratePanel` (millcraft.js): stock, prices, today's sales.
 - Tomi needs no hiring: he comes with the mill and presses the olive crate into the mill's oil Mon–Sat 10–5.
+
+## Round 166: storage at home
+- `src/game/storage.js`: `F.storage = {fridge, shelf}`. `placeFor(id)`: food/ingredient/flower/bouquet (or isIngr/isGood, not mill goods) → "fridge"; anything else with an ITEMS entry → "shelf"; tools, pets and "use" items never.
+- `putAway`, `takeOut`, `sendOff(F, where, id, shop)`. `SHOPS`: scoop (stockFridge), cocoa (stockPantry, needs cocoa), kitchen (sendToKitchen), basket (toBasket, needs mill), millshelf (craft store, needs mill). `sendOff` lends the backpack for a moment and calls the shop's own "from bag" function; whatever the shop won't take stays stored. Instant (Tomo on the bike).
+- The fridge: Hestia's panel (real pantry + shopping list) gets a third tab "Stored (n)" (`homeView = "stored"`; `setFridgeTab` in hestia.js switches back). The garage's existing "Storage" station `gshelf` opens `homeView = "shelf"`.
+- `homeNote(F, shop)`: a line in the Scoop Shack fridge, Cocoa Room fillings shelf and wine shop larder panels saying what's waiting at home.

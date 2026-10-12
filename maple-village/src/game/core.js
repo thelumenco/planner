@@ -18,7 +18,7 @@ import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked } from "./paths.js";
 import { fetchPost, postPanel, postCount } from "./postbox.js";
 import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML, ohayoHellos, reactionsPanel, helloPanel } from "./feeds.js";
-import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, hestiaCounts, importHestia, chatLastDone, lastDueCount, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
+import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, setFridgeTab, hestiaCounts, importHestia, chatLastDone, lastDueCount, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
 import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, scatterTreat, roomLeft, hungry, hungryCount, KINDS } from "./pets.js";
 import { wardrobePanel, newOutfit, outfitsToday, wearing, ACCESSORIES } from "./wardrobe.js";
 import { colourOf } from "../art/garments.js";
@@ -81,6 +81,7 @@ import { lavenderRoomArt } from "../art/lavender-rooms.js";
 import { tablelandsRoomArt } from "../art/tablelands-rooms.js";
 import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } from "./lunch.js";
 import { craftState, craft as millCraft, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
+import { storePanel, putAway, takeOut, sendOff, storedCount, placeFor, homeNote, SHOPS as STORE_SHOPS, storeState } from "./storage.js";
 import { millUpArt } from "../art/millup.js";
 import { tastePanel, tasteStart, tastePick, tasteNext, tasteDone, finishTaste, tastingNow, workshopNow, workshopPanel, helpWorkshop, WORKSHOP } from "./millcraft.js";
 import { mullPanel, mullStart, mullTick, mullState, mulledSeason, MULL, ADDS as MULL_ADDS } from "./mulled.js";
@@ -1609,6 +1610,19 @@ async function renderCal(fresh){
     const restore = await cancelReminder(F, b.dataset.rem, () => save()); renderCal();
     if (restore) undoable("Reminder cancelled", async () => { await restore(); renderCal(); }); });
 }
+/* ---------- storage at home (round 166, game/storage.js): the fridge's "Stored" tab, and the garage shelf ---------- */
+function storedTab(on){ const n = storedCount(F, "fridge"); return `<button role="tab" data-ftab="stored" aria-selected="${on}">Stored${n ? ` (${n})` : ""}</button>`; }
+const fridgeHead = () => `<span class="tape stripe" aria-hidden="true"></span><h2>The fridge</h2><div class="tabs" role="tablist"><button role="tab" data-ftab="stock" aria-selected="false">What we have</button><button role="tab" data-ftab="shop" aria-selected="false">Shopping list</button>${storedTab(true)}</div>`;
+function wireStorage(c){
+  c.querySelectorAll("[data-ftab]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const t = b.dataset.ftab; if (t === "stored") { homeView = "stored"; if (storedCount(F, "fridge") && Math.random() < .25) speak("Maple sniffs at the fridge door. Hopeful.", 3000); } else { setFridgeTab(t); homeView = "fridge"; } sfx("tap"); ctx(); });
+  const where = homeView === "shelf" ? "shelf" : "fridge";
+  c.querySelectorAll("[data-st]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const a = b.dataset.st, id = b.dataset.id, n = +b.dataset.n || 99; let line = "";
+    if (a === "put") { const k = putAway(F, where, id, n); if (k) line = `${k} ${ITEMS[id].n.toLowerCase()}, put away.`; }
+    else if (a === "putall") { const ids = Object.keys(F.inv || {}).filter(x => placeFor(x) === where), k = ids.reduce((t, x) => t + putAway(F, where, x), 0); if (k) line = `${k} thing${k > 1 ? "s" : ""}, put away in ${where === "shelf" ? "the garage" : "the fridge"}.`; }
+    else if (a === "take") { const k = takeOut(F, where, id, n); if (k) line = `${k} ${ITEMS[id].n.toLowerCase()}, into your backpack.`; }
+    else if (a === "send") { const sh = STORE_SHOPS.find(x => x.k === b.dataset.to), k = sendOff(F, where, id, b.dataset.to); if (k) line = `Tomo's on his way: ${k} ${ITEMS[id].n.toLowerCase()} to ${sh.n}.`; else line = `${sh.n[0].toUpperCase() + sh.n.slice(1)} can't take any more of those.`; }
+    if (!line) return; sfx(a === "send" ? "chime" : "paper"); flash(line); save(); ctx(); });
+}
 function itemBtn(id, label, disabled, extra){
   const it = ITEMS[id];
   return `<button class="item" data-id="${id}" ${disabled ? "disabled" : ""}><span class="e">${icon(it.ico, 34)}</span><span class="n">${esc(it.n)}</span><span class="c">${label}</span>${extra || ""}</button>`;
@@ -1620,7 +1634,8 @@ function ctx(){
   if (vaultView && bv.pouring && !$("panel").hidden && !openView) return;   // never interrupt jewels mid-pour
   c.dataset.kid = kid.open && scene === "kidroom" ? kid.open : "";
   if (kid.open && scene === "kidroom") h = kidPanel(kid.open);
-  else if (homeView && (scene === "home" || scene === "garage")) h = hestiaPanel(homeView);
+  else if (homeView && (scene === "home" || scene === "garage")) h = homeView === "shelf" ? storePanel(F, "shelf", {owns: k => owns(F, k)}) : homeView === "stored" ? fridgeHead("stored") + storePanel(F, "fridge", {owns: k => owns(F, k)})
+    : homeView === "fridge" ? hestiaPanel("fridge").replace("</button></div>", `</button>${storedTab(false)}</div>`) : hestiaPanel(homeView);
   else if (deskOpen && scene === "office") h = deskPanel();
   else if (vaultView && scene === "bank") h = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
   else if (reviewOpen && scene === "hall") h = reviewPanel(F, reviewCtx());
@@ -1780,9 +1795,13 @@ function ctx(){
         : `<p class="sub">No quests ${outside() ? "today yet" : "in here today"}.</p>`}
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
   }
+  // round 166: a shop's stocking panel mentions what's waiting in storage at home that it could use
+  { const hn = scView === "fridge" && SCOOP_IN.includes(scene) ? "scoop" : ccView === "pantry" && COCOA_IN.includes(scene) ? "cocoa" : kView === "larder" && scene === "kitchen" ? "kitchen" : null, note = hn ? homeNote(F, hn) : "";
+    if (note) { const i = h.lastIndexOf('<div class="actions">'); h = i < 0 ? h + note : h.slice(0, i) + note + h.slice(i); } }
   c.innerHTML = h;
   if (kid.open && scene === "kidroom") wireKid(c, kid.open, {eat: id => { kid.open = null; ctx(); kidEat(id); }, close: () => { kid.open = null; stopKidGame(); ctx(); }});
-  if (homeView && (scene === "home" || scene === "garage")) wireHestia(c, homeView);
+  if (homeView && (scene === "home" || scene === "garage") && homeView !== "shelf" && homeView !== "stored") wireHestia(c, homeView);
+  if (homeView && (scene === "home" || scene === "garage")) wireStorage(c);
   if (deskOpen && scene === "office") wireDesk(c, () => ctx());
   if (reviewOpen && scene === "hall") wireReview(c, F, {save: () => save(), rerender: () => ctx(), say: l => speak(l, 5000, true), sfx, canSend: !rvw.noMcp, today: dayKey(), coins: n => { F.coins += n; S.earned = (S.earned || 0) + n; flash(`+${n} coins: weekly review`); }});
   if (kView && scene === "kitchen") wireKitchen(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, today: dayKey()});
@@ -2069,7 +2088,7 @@ function ctx(){
     if (trophyView === "affirm") { F.affirm = F.affirm || {}; wireAffirm(c, F.affirm, (F.affirm.day === dayKey() && F.affirm.items && F.affirm.items.length) ? F.affirm.items : dailyAffirmations(), {save: () => save(), undoable, rerender: () => ctx(), fresh: freshAffirmations}); } }
   if (kudosOpen && scene === "trophy") wireKudos(c, {rerender: () => { ctx(); drawScene(); }, undoable, done: () => { sfx("chime"); hearts(2); speak("Pinned up. That's a keeper.", 3000); }});
   c.querySelectorAll("[data-postfresh]").forEach(b => b.onclick = () => { fetchPost(true).then(() => { ctx(); drawScene(); }); ctx(); });
-  showPanel(!!h, homeView === "fridge" && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
+  showPanel(!!h, (homeView === "fridge" || homeView === "stored") && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
   c.querySelectorAll("[data-shop]").forEach(b => b.onclick = () => { shopTab = b.dataset.shop; ctx(); });
   c.querySelectorAll("[data-decor]").forEach(b => b.onclick = () => decorClick(b.dataset.decor));
   c.querySelectorAll(".item[data-id]").forEach(b => b.onclick = () => {
@@ -2796,6 +2815,7 @@ function arriveSpot(id){
   // Hestia: the cupboard holds the chores, the fridge the pantry and shopping list (not quests)
   if ((scene === "home" || scene === "garage") && (id === "cupboard" || id === "fridge") && !(ph === "task" && placeOf(remaining()[0]) === scene && spotOf(remaining()[0]) === id && !S.arrived[remaining()[0].id])) {
     homeView = id === "fridge" ? "fridge" : "chores"; sfx(id === "fridge" ? "tap" : "paper"); render(); return; }
+  if (scene === "garage" && id === "gshelf") { homeView = "shelf"; sfx("paper", true); render(); return; }
   if (ph === "task") {
     const t = remaining()[0];
     if (placeOf(t) === scene && spotOf(t) === id && !S.arrived[t.id]) { S.arrived[t.id] = true; setSay(`Here at the ${spotObj(scene, id).name.toLowerCase()}. First tiny step…`); save(); return; }

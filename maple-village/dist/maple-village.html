@@ -5974,7 +5974,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ] },
     // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
     // and the tasting room's little tables
-    wineshop: { name: "The wine shop", wall: "#F4E6D6", trim: "#8E2C48", noBoard: true, pos: { S: [92, 238], C: [330, 318], H: [206, 318], T: [340, 520], K: [480, 390], M: [465, 128], Z: [40, 400], G: [480, 556], W: [456, 318] }, stations: [
+    wineshop: { name: "The wine shop", wall: "#F4E6D6", trim: "#8E2C48", noBoard: true, pos: { S: [92, 238], C: [330, 318], H: [206, 318], T: [340, 520], K: [480, 390], M: [465, 128], Z: [40, 400], G: [480, 556], W: [164, 232] }, stations: [
       ["tdoor", "Terrace", "G", "glassdoor", null, "The glass doors out to the terrace.", 0],
       ["menu", "Menu", "M", "chalkmenu", null, "The chalkboard: today's menu.", 44],
       ["kdoor", "Kitchen", "K", "kitchendoor", null, "Into the kitchen.", 0],
@@ -14946,18 +14946,18 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     const used = new Set([...v.cellar, ...v.shelf].map((x) => x.name.toLowerCase())), st6 = b.style, seed2 = Math.floor(b.start || 0) + slot6 * 7919, out = [];
     for (let k = 0; out.length < 12 && k < 200; k++) {
       const kind = k % 3, w = W_WORD[st6][(seed2 + k) % W_WORD[st6].length];
-      const nm4 = kind === 0 ? `${W_PLACE[(seed2 + k * 5) % W_PLACE.length]} ${w}` : kind === 1 ? `${W_WHO[(seed2 + k * 3) % W_WHO.length]} ${W_PLACE[(seed2 + k * 7 + 3) % W_PLACE.length]}` : W_FR[st6][(seed2 + k) % W_FR[st6].length] + (k > 8 ? ` ${(/* @__PURE__ */ new Date()).getFullYear()}` : "");
-      if (!used.has(nm4.toLowerCase()) && !out.includes(nm4)) out.push(nm4);
+      const nm5 = kind === 0 ? `${W_PLACE[(seed2 + k * 5) % W_PLACE.length]} ${w}` : kind === 1 ? `${W_WHO[(seed2 + k * 3) % W_WHO.length]} ${W_PLACE[(seed2 + k * 7 + 3) % W_PLACE.length]}` : W_FR[st6][(seed2 + k) % W_FR[st6].length] + (k > 8 ? ` ${(/* @__PURE__ */ new Date()).getFullYear()}` : "");
+      if (!used.has(nm5.toLowerCase()) && !out.includes(nm5)) out.push(nm5);
     }
     return out;
   }
   function bottle(F2, slot6, name) {
     const v = vineState(F2), b = v.barrels[slot6];
     if (!b || barrelLeft(b) || b.style === "sparkling" && b.stage !== 2) return null;
-    const nm4 = plain(String(name || "")).trim().slice(0, 30) || wineNames(F2, slot6)[0] || `Maple's ${STYLES2[b.style].n}`;
-    v.cellar.push({ id: "w" + Date.now().toString(36), name: nm4, type: b.style, n: BOTTLES });
+    const nm5 = plain(String(name || "")).trim().slice(0, 30) || wineNames(F2, slot6)[0] || `Maple's ${STYLES2[b.style].n}`;
+    v.cellar.push({ id: "w" + Date.now().toString(36), name: nm5, type: b.style, n: BOTTLES });
     v.barrels[slot6] = null;
-    return `${BOTTLES} bottles of ${nm4}, into the cellar. Stock them on the shop shelves.`;
+    return `${BOTTLES} bottles of ${nm5}, into the cellar. Stock them on the shop shelves.`;
   }
   var RIDDLE = { day: 2, max: 5 };
   var riddleDays = (c, now3 = Date.now()) => c && c.rack ? Math.min(RIDDLE.max, Math.floor((now3 - c.rack) / (24 * H))) : 0;
@@ -17320,10 +17320,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       }
       case "millcrate": {
         const m = G2.millCrate && G2.millCrate() || { oil: 0, soap: 0, lotion: 0 }, b = [];
-        for (let i = 0; i < Math.min(4, m.oil); i++) b.push(`<rect x="${x - 20 + i * 9}" y="${y - 48}" width="7" height="20" rx="2.5" fill="${["#B9B04A", "#8FA34A", "#C9B84A", "#7FA35A"][i]}" stroke="#3a2e28" stroke-width=".6"/><rect x="${x - 18.5 + i * 9}" y="${y - 52}" width="4" height="5" fill="#5A3A2A"/>`);
-        for (let i = 0; i < Math.min(2, m.soap); i++) b.push(`<rect x="${x + 16}" y="${y - 32 - i * 7}" width="13" height="6" rx="2" fill="${["#E8C9D8", "#F3E1A0"][i]}" stroke="#3a2e28" stroke-width=".6"/>`);
-        for (let i = 0; i < Math.min(2, m.lotion); i++) b.push(`<ellipse cx="${x - 26 + i * 0}" cy="${y - 34 - i * 8}" rx="4" ry="4.5" fill="#FFFDF6" stroke="#3a2e28" stroke-width=".6"/>`);
-        return b.join("") + sk(`<rect x="${x - 32}" y="${y - 30}" width="64" height="30" rx="2" style="fill:#C9A27E"/>`, `<rect x="${x - 32}" y="${y - 30}" width="64" height="30" rx="2"/><path d="M${x - 32} ${y - 15} h64"/>`);
+        for (let i = 0; i < Math.min(4, m.oil); i++) b.push(`<rect x="${x - 16 + i * 8}" y="${y - 44}" width="6" height="18" rx="2.5" fill="${["#B9B04A", "#8FA34A", "#C9B84A", "#7FA35A"][i]}" stroke="#3a2e28" stroke-width=".6"/><rect x="${x - 15 + i * 8}" y="${y - 48}" width="4" height="5" fill="#5A3A2A"/>`);
+        for (let i = 0; i < Math.min(2, m.soap); i++) b.push(`<rect x="${x + 12}" y="${y - 31 - i * 6}" width="11" height="5" rx="2" fill="${["#E8C9D8", "#F3E1A0"][i]}" stroke="#3a2e28" stroke-width=".6"/>`);
+        for (let i = 0; i < Math.min(2, m.lotion); i++) b.push(`<ellipse cx="${x - 21}" cy="${y - 31 - i * 7}" rx="3.5" ry="4" fill="#FFFDF6" stroke="#3a2e28" stroke-width=".6"/>`);
+        return b.join("") + sk(`<rect x="${x - 26}" y="${y - 26}" width="52" height="26" rx="2" style="fill:#C9A27E"/>`, `<rect x="${x - 26}" y="${y - 26}" width="52" height="26" rx="2"/>`) + `<text x="${x}" y="${y - 10}" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="8" fill="#5A3A2A" pointer-events="none">from the mill</text>`;
       }
       case "winecounter":
         return `<rect x="${x - 92}" y="${y - 48}" width="184" height="48" fill="transparent"/>`;
@@ -17638,11 +17638,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     }
     st6.forEach((s) => {
       if (s.kind === "millcrate" && !(G2.millCrate && G2.millCrate())) return;
-      const nm4 = s.kind === "pedestal" ? (G2.ped && G2.ped(s.x, s.y) || {}).label || "" : s.kind === "vaultjar" ? (() => {
+      const nm5 = s.kind === "millcrate" ? "" : s.kind === "pedestal" ? (G2.ped && G2.ped(s.x, s.y) || {}).label || "" : s.kind === "vaultjar" ? (() => {
         const j = G2.vault && G2.vault(s.x);
         return j ? j.label : "Empty";
       })() : s.name;
-      h3 += `<g data-spot="${s.id}" aria-label="${s.name || (nm4 ? "Trophy: " + nm4 : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm4 ? s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm4, "var(--card)") : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm4.length > 10 ? nm4.slice(0, 9) + "…" : nm4, "var(--card)", 9.5) : s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm4.length > 15 ? nm4.slice(0, 14).trim() + "…" : nm4, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm4.length > 24 ? nm4.slice(0, 23) + "…" : nm4, "var(--card)") : ""}</g>`;
+      h3 += `<g data-spot="${s.id}" aria-label="${s.name || (nm5 ? "Trophy: " + nm5 : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm5 ? s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm5, "var(--card)") : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm5.length > 10 ? nm5.slice(0, 9) + "…" : nm5, "var(--card)", 9.5) : s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm5.length > 15 ? nm5.slice(0, 14).trim() + "…" : nm5, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm5.length > 24 ? nm5.slice(0, 23) + "…" : nm5, "var(--card)") : ""}</g>`;
     });
     if (id === "kidroom") {
       const k = G2.kid ? G2.kid() : {};
@@ -20371,9 +20371,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       if (next) subOpen.add(next.key);
     }
     const row7 = (x) => {
-      const op = subOpen.has(x.key), has2 = x.info && x.info.length, nm4 = `${esc(x.title)}${x.est ? ` <small>${esc(x.est)}</small>` : ""}${x === next ? ` <em>up next</em>` : ""}`;
+      const op = subOpen.has(x.key), has2 = x.info && x.info.length, nm5 = `${esc(x.title)}${x.est ? ` <small>${esc(x.est)}</small>` : ""}${x === next ? ` <em>up next</em>` : ""}`;
       return `<li class="sub${x.done ? " done" : ""}${x === next ? " upnext" : ""}"><button class="subtick" data-nb="sub" data-k="${esc(x.key)}" role="checkbox" aria-checked="${x.done}" aria-label="${esc(x.title)}"></button>
-      <div class="subtxt">${has2 ? `<button class="subname" data-nb="subopen" data-k="${esc(x.key)}" aria-expanded="${op}">${nm4}</button>` : `<span class="subname">${nm4}</span>`}
+      <div class="subtxt">${has2 ? `<button class="subname" data-nb="subopen" data-k="${esc(x.key)}" aria-expanded="${op}">${nm5}</button>` : `<span class="subname">${nm5}</span>`}
       ${has2 && op ? `<ul class="subinfo">${x.info.map((l) => `<li>${linkify(l)}</li>`).join("")}</ul>` : ""}</div></li>`;
     };
     return `<div class="nbsubs"><p class="nblbl">Subtasks <span class="subcount">${done.length} of ${list5.length} done</span></p>
@@ -21448,6 +21448,9 @@ Quests finished today: ${S3.doneIds.length}`;
     <button class="tbtn" data-htctl="${timer.pausedLeft != null ? "play" : "pause"}" aria-label="${timer.pausedLeft != null ? "Resume" : "Pause"}">${icon(timer.pausedLeft != null ? "play" : "pause", 18)}</button>
     <button class="tbtn" data-htctl="stop" aria-label="Stop the timer">${icon("reset", 18)}</button></div>`;
   }
+  var setFridgeTab = (t2) => {
+    view.fridge = t2;
+  };
   function hestiaPanel(which) {
     tidy();
     if (which === "fridge") return fridgePanel2();
@@ -22788,7 +22791,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   }
   var dots = (days) => `<span class="rvdots">${days.map((d, i) => `<i class="${d === true ? "on" : d === false ? "off" : "na"}" title="${WD2[i]}">${WD2[i]}</i>`).join("")}</span>`;
   function reviewPanel(F2, c) {
-    const w = gather(c), rev = (F2.reviews || {})[w.ws], nm4 = nextMonday(c.today), fri = (/* @__PURE__ */ new Date(c.today + "T00:00:00Z")).getUTCDay() === 5;
+    const w = gather(c), rev = (F2.reviews || {})[w.ws], nm5 = nextMonday(c.today), fri = (/* @__PURE__ */ new Date(c.today + "T00:00:00Z")).getUTCDay() === 5;
     if (!rw.draft || rw.draft.ws !== w.ws) rw.draft = { ws: w.ws, p: rev ? rev.priorities.slice() : ["", "", ""] };
     let h3 = `<span class="tape dots" aria-hidden="true"></span><h2>Your week in the village</h2>
     <p class="sub">${fmtDay(w.days[0])} to ${fmtDay(w.days[6])}${fri ? ". Happy Friday! Here's everything you did." : ". The week so far."}</p><div class="rvgrid">`;
@@ -22806,7 +22809,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     h3 += `</div>` + card3("This week's objectives", I2.goal, !c.canSend ? `<p class="rvnote">Connect Sunsama to see your weekly objectives here.</p>` : rw.objErr && !ob ? `<p class="rvnote">Couldn't reach Sunsama just now.</p>` : !ob ? `<p class="rvnote">Fetching them from Sunsama…</p>` : !ob.length ? `<p class="rvnote">No weekly objectives set in Sunsama this week.</p>` : `<ul class="rvobj">${ob.map((o) => `<li class="${o.done ? "done" : ""}"><span class="rvtick" aria-hidden="true"></span>${esc(o.title)}</li>`).join("")}</ul><p class="rvnote">${ob.filter((o) => o.done).length} of ${ob.length} done${ob.every((o) => o.done) ? ". Every one! That's a rosette in the courtyard." : "."}</p>`, "sky wide");
     const sent = rev && rev.sent && rev.sent.some(Boolean);
     h3 += `<section class="rvcard rvnext"><span class="rvtape butter" aria-hidden="true"></span><h3>${I2.star}Next week's three priorities</h3>
-    <p class="rvnote">Week of ${fmtDay(nm4)}. ${c.canSend ? "They go to Sunsama as next week's weekly objectives." : "Saved here (Sunsama isn't connected)."}</p>
+    <p class="rvnote">Week of ${fmtDay(nm5)}. ${c.canSend ? "They go to Sunsama as next week's weekly objectives." : "Saved here (Sunsama isn't connected)."}</p>
     <ol class="rvprio">${[0, 1, 2].map((i) => {
       const ok = rev && rev.sent && rev.sent[i];
       return `<li><label class="sr" for="rvP${i}">Priority ${i + 1}</label><input id="rvP${i}" class="rvp" data-i="${i}" maxlength="120" placeholder="${["The one that matters most", "Then this", "And this"][i]}" value="${esc(rw.draft.p[i] || "")}" ${ok ? "disabled" : ""}>${ok ? `<span class="rvok" title="In Sunsama">in Sunsama</span>` : ""}</li>`;
@@ -22827,7 +22830,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
         api4.rerender();
         return;
       }
-      const ws = weekStart(api4.today), nm4 = nextMonday(api4.today), pr = rw.draft.p.map((x) => plain(String(x || "")).trim().slice(0, 120));
+      const ws = weekStart(api4.today), nm5 = nextMonday(api4.today), pr = rw.draft.p.map((x) => plain(String(x || "")).trim().slice(0, 120));
       if (!pr.some(Boolean)) {
         api4.say("Pop in at least one priority for next week first.");
         return;
@@ -22837,7 +22840,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       if (api4.canSend) {
         rw.sending = true;
         api4.rerender();
-        for (let i = 0; i < 3; i++) if (pr[i] && !rev.sent[i]) rev.sent[i] = await createObjective(pr[i], nm4);
+        for (let i = 0; i < 3; i++) if (pr[i] && !rev.sent[i]) rev.sent[i] = await createObjective(pr[i], nm5);
         rw.sending = false;
       }
       if (first) api4.coins(15);
@@ -26311,8 +26314,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const sd = Math.floor(seed2) + h3.names.length * 31 + Object.keys(CHEESES).indexOf(kind) * 7;
     for (let k = 0; out.length < 12 && k < 200; k++) {
       const w = c.words[(sd + k) % c.words.length], a = from[(sd + k * 3) % from.length].n, kind3 = k % 3;
-      const nm4 = kind3 === 0 ? `${C_PLACE[(sd + k * 5) % C_PLACE.length]} ${w}` : kind3 === 1 ? `${a}'s ${C_PLACE[(sd + k * 7 + 2) % C_PLACE.length]} ${w}` : (C_FR[kind] || [`${C_PLACE[(sd + k * 3) % C_PLACE.length]} ${c.n.split(" ").pop()}`])[(sd + k) % (C_FR[kind] || [0]).length];
-      if (!used.has(nm4.toLowerCase()) && !out.includes(nm4)) out.push(nm4);
+      const nm5 = kind3 === 0 ? `${C_PLACE[(sd + k * 5) % C_PLACE.length]} ${w}` : kind3 === 1 ? `${a}'s ${C_PLACE[(sd + k * 7 + 2) % C_PLACE.length]} ${w}` : (C_FR[kind] || [`${C_PLACE[(sd + k * 3) % C_PLACE.length]} ${c.n.split(" ").pop()}`])[(sd + k) % (C_FR[kind] || [0]).length];
+      if (!used.has(nm5.toLowerCase()) && !out.includes(nm5)) out.push(nm5);
     }
     return out;
   }
@@ -26322,10 +26325,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!c || c.lvl && levelOf(h3) < c.lvl || c.learn && !(h3.learnt || {})[kind] || h3.cave.length >= caveSize(h3) || (inv[c.milk] || 0) < c.need) return null;
     inv[c.milk] -= c.need;
     if (!inv[c.milk]) delete inv[c.milk];
-    const nm4 = String(name || "").replace(/[<>&"]/g, "").trim().slice(0, 30) || cheeseNames(F2, kind, clock2() / 864e5)[0] || c.n, t2 = clock2();
-    const w = { kind, name: nm4, start: t2, done: t2 + c.days * 864e5 };
+    const nm5 = String(name || "").replace(/[<>&"]/g, "").trim().slice(0, 30) || cheeseNames(F2, kind, clock2() / 864e5)[0] || c.n, t2 = clock2();
+    const w = { kind, name: nm5, start: t2, done: t2 + c.days * 864e5 };
     h3.cave.push(w);
-    h3.names = [...h3.names, nm4].slice(-60);
+    h3.names = [...h3.names, nm5].slice(-60);
     return w;
   }
   function takeWheel(F2, i) {
@@ -31551,6 +31554,90 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var tablelandsRoomArt = (scene2) => (ROOMS5[scene2] || cafeRoom3)();
 
+  // src/game/storage.js
+  var FRIDGE_KINDS = ["food", "ingredient", "flower", "bouquet"];
+  var NEVER = ["tool", "pet", "use"];
+  function storeState(F2) {
+    F2.storage = F2.storage || {};
+    const s = F2.storage;
+    s.fridge = s.fridge || {};
+    s.shelf = s.shelf || {};
+    return s;
+  }
+  var storable = (id) => !!ITEMS[id] && !NEVER.includes(ITEMS[id].kind);
+  var placeFor = (id) => !storable(id) ? null : (FRIDGE_KINDS.includes(ITEMS[id].kind) || isIngr(id) || isGood(id)) && !ITEMS[id].mill ? "fridge" : "shelf";
+  var storedCount = (F2, where) => Object.values(storeState(F2)[where]).reduce((a, b) => a + b, 0);
+  function putAway(F2, where, id, n = 99) {
+    const have2 = (F2.inv || {})[id] || 0, k = Math.min(n, have2);
+    if (!k || placeFor(id) !== where) return 0;
+    F2.inv[id] -= k;
+    if (F2.inv[id] <= 0) delete F2.inv[id];
+    const s = storeState(F2)[where];
+    s[id] = (s[id] || 0) + k;
+    return k;
+  }
+  function takeOut(F2, where, id, n = 99) {
+    const s = storeState(F2)[where], k = Math.min(n, s[id] || 0);
+    if (!k) return 0;
+    s[id] -= k;
+    if (!s[id]) delete s[id];
+    F2.inv = F2.inv || {};
+    F2.inv[id] = (F2.inv[id] || 0) + k;
+    return k;
+  }
+  var SHOPS = [
+    { k: "scoop", n: "the Scoop Shack fridge", ok: (id) => isIngr(id), go: (F2, id, n) => stockFridge(F2, id, n, "bag") },
+    { k: "cocoa", n: "the Cocoa Room's fillings shelf", own: "cocoa", ok: (id) => isFilling(id), go: (F2, id, n) => stockPantry(F2, id, n, "bag") },
+    { k: "kitchen", n: "the wine shop's larder", ok: (id) => isGood(id), go: (F2, id, n) => sendToKitchen(F2, id, n, false) },
+    { k: "basket", n: "the mill's herb basket", own: "mill", ok: (id) => !!HERB[id], go: (F2, id, n) => toBasket(F2, id, n) },
+    {
+      k: "millshelf",
+      n: "the mill's shelves",
+      own: "mill",
+      ok: (id) => !!(ITEMS[id] && ITEMS[id].mill),
+      go: (F2, id, n) => {
+        const k = Math.min(n, F2.inv[id] || 0);
+        if (!k) return 0;
+        F2.inv[id] -= k;
+        if (F2.inv[id] <= 0) delete F2.inv[id];
+        const c = craftState(F2);
+        c.store[id] = (c.store[id] || 0) + k;
+        return k;
+      }
+    }
+  ];
+  var shopsFor = (id, owns3) => SHOPS.filter((s) => (!s.own || owns3(s.own)) && s.ok(id));
+  function sendOff(F2, where, id, shop, n = 99) {
+    const sh = SHOPS.find((s) => s.k === shop), st6 = storeState(F2)[where], k = Math.min(n, st6[id] || 0);
+    if (!sh || !k || !sh.ok(id)) return 0;
+    F2.inv = F2.inv || {};
+    const before = F2.inv[id] || 0;
+    F2.inv[id] = before + k;
+    const sent = sh.go(F2, id, k) || 0;
+    if (before) F2.inv[id] = before;
+    else delete F2.inv[id];
+    st6[id] -= sent;
+    if (!st6[id]) delete st6[id];
+    return sent;
+  }
+  var nm4 = (id) => ITEMS[id] ? ITEMS[id].n : id;
+  function storePanel(F2, where, o = {}) {
+    const s = storeState(F2)[where], ids = Object.keys(s).filter((id) => s[id] > 0 && ITEMS[id]).sort((a, b) => nm4(a).localeCompare(nm4(b)));
+    const bag2 = Object.keys(F2.inv || {}).filter((id) => F2.inv[id] > 0 && placeFor(id) === where).sort((a, b) => nm4(a).localeCompare(nm4(b)));
+    const cell = (id, sub, btns) => `<li><span class="wpic">${icon(ITEMS[id].ico, 30)}</span><span class="wtxt"><b>${esc(nm4(id))}</b><small>${sub}</small></span><span class="orbtns">${btns}</span></li>`;
+    let h3 = where === "fridge" ? `<p class="sub">Food, ingredients and flowers keep in here as long as you like. Take them out, or send them to a shop: Tomo drops them off on the bike.</p>` : `<span class="tape gingham" aria-hidden="true"></span><h2>The storage shelf</h2><p class="sub">Next to the boxes labelled "Christmas" and "misc": soaps, oils, gifts, seeds, anything that isn't for the fridge. Take them out, or send them to a shop.</p>`;
+    h3 += ids.length ? `<ul class="hlist wlist orflowers">${ids.map((id) => cell(id, `${s[id]} stored`, `<button class="btn small alt" data-st="take" data-id="${id}" data-n="1">Take 1</button><button class="btn small alt" data-st="take" data-id="${id}" data-n="99">All</button>` + shopsFor(id, o.owns).map((sh) => `<button class="btn small primary" data-st="send" data-id="${id}" data-to="${sh.k}">To ${esc(sh.n.replace(/^the /, ""))}</button>`).join(""))).join("")}</ul>` : `<p class="muted">Nothing stored yet.</p>`;
+    if (bag2.length) h3 += `<p class="eyebrow" style="margin:12px 0 6px">From your backpack</p><ul class="hlist wlist orflowers">${bag2.map((id) => cell(id, `${F2.inv[id]} with you`, `<button class="btn small primary" data-st="put" data-id="${id}" data-n="1">Put away 1</button><button class="btn small alt" data-st="put" data-id="${id}" data-n="99">All</button>`)).join("")}</ul>
+    <div class="actions"><button class="btn small alt" data-st="putall">Put everything away</button></div>`;
+    return h3 + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function homeNote(F2, shop, owns3) {
+    const sh = SHOPS.find((s) => s.k === shop);
+    if (!sh) return "";
+    const got = ["fridge", "shelf"].flatMap((w) => Object.entries(storeState(F2)[w]).filter(([id, n]) => n > 0 && ITEMS[id] && sh.ok(id)).map(([id, n]) => `${n} ${nm4(id).toLowerCase()}`));
+    return got.length ? `<p class="muted">At home, waiting: ${esc(got.slice(0, 6).join(", "))}${got.length > 6 ? "…" : ""}. Send them from the fridge or the garage shelf.</p>` : "";
+  }
+
   // src/art/millup.js
   var OIL = ["#B9B04A", "#9FB04A", "#C9B84A", "#A8A040"];
   var SOAP = ["#E8D5C4", "#C9B3E3", "#F4C7CF", "#FFF3D6", "#D9E8C4"];
@@ -32175,7 +32262,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function bookHtml(F2) {
     const k = kyotoState(F2), n = stampCount(F2);
     return `<h3 class="ph3">Your stamp book · ${n}/8</h3><p class="muted">Ink seal stamps from round Kyoto: walk up to each place and it's stamped in.${k.lantern ? " The book's full: there's a stone lantern by your pond at home." : " Fill the book and there'll be a little stone lantern by your pond at home."}</p>
-    <div class="tilegrid">${Object.entries(STAMPS).map(([s, [nm4]]) => `<div class="tile${k.stamps[s] ? " own" : ""}">${stampPic(s, !!k.stamps[s])}<b>${esc(nm4)}</b></div>`).join("")}</div>`;
+    <div class="tilegrid">${Object.entries(STAMPS).map(([s, [nm5]]) => `<div class="tile${k.stamps[s] ? " own" : ""}">${stampPic(s, !!k.stamps[s])}<b>${esc(nm5)}</b></div>`).join("")}</div>`;
   }
   var YUKATA = { price: 15, cols: { indigo: ["Indigo with white flowers", "indigo"], red: ["Red with gold fans", "crimson"], sky: ["Pale blue with goldfish", "pale blue"] } };
   var yukataOn = (F2, day = dayKey()) => {
@@ -32191,7 +32278,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function yukataPanel(F2, evanToo) {
     const on = yukataOn(F2);
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The yukata shop</h2><p class="sub">Rows of cotton summer kimonos, an obi sash to go with each, and wooden sandals. Wear one round Kyoto for the day; bring it back on your way to the train.</p>`;
-    h3 += on ? `<p><b>You're wearing the ${esc(YUKATA.cols[on][0].toLowerCase())} today.</b>${evanToo ? " Evan's in his little jinbei, very pleased with himself." : ""}</p>` : `<h3 class="ph3">Rent one for the day · ${YUKATA.price} ${coin16()}</h3><ul class="hlist wlist">${Object.entries(YUKATA.cols).map(([k, [nm4]]) => `<li><span class="wtxt"><b>${esc(nm4)}</b><small>${evanToo ? "Evan gets a matching jinbei, free." : "With an obi and sandals."}</small></span><button class="btn small primary" data-kt="yukata:${k}" ${F2.coins >= YUKATA.price ? "" : "disabled"}>Wear it</button></li>`).join("")}</ul>`;
+    h3 += on ? `<p><b>You're wearing the ${esc(YUKATA.cols[on][0].toLowerCase())} today.</b>${evanToo ? " Evan's in his little jinbei, very pleased with himself." : ""}</p>` : `<h3 class="ph3">Rent one for the day · ${YUKATA.price} ${coin16()}</h3><ul class="hlist wlist">${Object.entries(YUKATA.cols).map(([k, [nm5]]) => `<li><span class="wtxt"><b>${esc(nm5)}</b><small>${evanToo ? "Evan gets a matching jinbei, free." : "With an obi and sandals."}</small></span><button class="btn small primary" data-kt="yukata:${k}" ${F2.coins >= YUKATA.price ? "" : "disabled"}>Wear it</button></li>`).join("")}</ul>`;
     return h3 + list4(F2, "ktyukata", "And to take home") + shut21;
   }
   var TEA = { price: 10, BEAT: 560, WHISKS: 8, WINDOW: 150, COUNT_IN: 1200 };
@@ -32479,7 +32566,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const s = st6.paint || {}, n = rondaState(F2).painted || 0;
     let h3 = `<h3 class="ph3">Paint your own tile · ${PAINT.price} ${coin17()}</h3>`;
     if (!s.c || !s.p) return h3 + `<p class="muted">Lucía sits you at her table with a brush.${n ? ` (You've painted ${n} so far.)` : ""} Pick a colour and a pattern:</p>
-    <div class="gchips">${Object.entries(PAINT.colours).map(([k, [nm4, col]]) => `<button class="gchip${s.c === k ? " on" : ""}" data-rpaint="c:${k}"><span style="color:${col}">●</span> <span>${esc(nm4)}</span></button>`).join("")}</div>
+    <div class="gchips">${Object.entries(PAINT.colours).map(([k, [nm5, col]]) => `<button class="gchip${s.c === k ? " on" : ""}" data-rpaint="c:${k}"><span style="color:${col}">●</span> <span>${esc(nm5)}</span></button>`).join("")}</div>
     <div class="gchips">${Object.keys(PAINT.patterns).map((k) => `<button class="gchip${s.p === k ? " on" : ""}" data-rpaint="p:${k}"><span>${k === "star" ? "Star" : k === "flower" ? "Flower" : "Waves"}</span></button>`).join("")}</div>`;
     const step2 = s.step || 0;
     if (step2 < 4) return h3 + `<div class="paintrow">${paintPic(s.c, s.p, step2, 76)}<div><p class="muted">${step2 ? `Stroke ${step2} done. ` : ""}Now stroke ${step2 + 1} of 4: tap it.${s.oops ? " (Lucía steadies your hand: that one comes later.)" : ""}</p>
@@ -36412,6 +36499,51 @@ ${SIGNOFF[t2.who] || ""}`;
       });
     });
   }
+  function storedTab(on) {
+    const n = storedCount(F, "fridge");
+    return `<button role="tab" data-ftab="stored" aria-selected="${on}">Stored${n ? ` (${n})` : ""}</button>`;
+  }
+  var fridgeHead = () => `<span class="tape stripe" aria-hidden="true"></span><h2>The fridge</h2><div class="tabs" role="tablist"><button role="tab" data-ftab="stock" aria-selected="false">What we have</button><button role="tab" data-ftab="shop" aria-selected="false">Shopping list</button>${storedTab(true)}</div>`;
+  function wireStorage(c) {
+    c.querySelectorAll("[data-ftab]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      const t2 = b.dataset.ftab;
+      if (t2 === "stored") {
+        homeView = "stored";
+        if (storedCount(F, "fridge") && Math.random() < 0.25) speak("Maple sniffs at the fridge door. Hopeful.", 3e3);
+      } else {
+        setFridgeTab(t2);
+        homeView = "fridge";
+      }
+      sfx("tap");
+      ctx();
+    });
+    const where = homeView === "shelf" ? "shelf" : "fridge";
+    c.querySelectorAll("[data-st]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      const a = b.dataset.st, id = b.dataset.id, n = +b.dataset.n || 99;
+      let line = "";
+      if (a === "put") {
+        const k = putAway(F, where, id, n);
+        if (k) line = `${k} ${ITEMS[id].n.toLowerCase()}, put away.`;
+      } else if (a === "putall") {
+        const ids = Object.keys(F.inv || {}).filter((x) => placeFor(x) === where), k = ids.reduce((t2, x) => t2 + putAway(F, where, x), 0);
+        if (k) line = `${k} thing${k > 1 ? "s" : ""}, put away in ${where === "shelf" ? "the garage" : "the fridge"}.`;
+      } else if (a === "take") {
+        const k = takeOut(F, where, id, n);
+        if (k) line = `${k} ${ITEMS[id].n.toLowerCase()}, into your backpack.`;
+      } else if (a === "send") {
+        const sh = SHOPS.find((x) => x.k === b.dataset.to), k = sendOff(F, where, id, b.dataset.to);
+        if (k) line = `Tomo's on his way: ${k} ${ITEMS[id].n.toLowerCase()} to ${sh.n}.`;
+        else line = `${sh.n[0].toUpperCase() + sh.n.slice(1)} can't take any more of those.`;
+      }
+      if (!line) return;
+      sfx(a === "send" ? "chime" : "paper");
+      flash(line);
+      save2();
+      ctx();
+    });
+  }
   function itemBtn(id, label2, disabled, extra3) {
     const it = ITEMS[id];
     return `<button class="item" data-id="${id}" ${disabled ? "disabled" : ""}><span class="e">${icon(it.ico, 34)}</span><span class="n">${esc(it.n)}</span><span class="c">${label2}</span>${extra3 || ""}</button>`;
@@ -36423,7 +36555,7 @@ ${SIGNOFF[t2.who] || ""}`;
     if (vaultView && bv.pouring && !$("panel").hidden && !openView) return;
     c.dataset.kid = kid.open && scene === "kidroom" ? kid.open : "";
     if (kid.open && scene === "kidroom") h3 = kidPanel(kid.open);
-    else if (homeView && (scene === "home" || scene === "garage")) h3 = hestiaPanel(homeView);
+    else if (homeView && (scene === "home" || scene === "garage")) h3 = homeView === "shelf" ? storePanel(F, "shelf", { owns: (k) => owns2(F, k) }) : homeView === "stored" ? fridgeHead("stored") + storePanel(F, "fridge", { owns: (k) => owns2(F, k) }) : homeView === "fridge" ? hestiaPanel("fridge").replace("</button></div>", `</button>${storedTab(false)}</div>`) : hestiaPanel(homeView);
     else if (deskOpen && scene === "office") h3 = deskPanel();
     else if (vaultView && scene === "bank") h3 = vaultView === "overview" ? bankOverview(isHere("opal")) : vaultPanel();
     else if (reviewOpen && scene === "hall") h3 = reviewPanel(F, reviewCtx());
@@ -36590,6 +36722,13 @@ ${SIGNOFF[t2.who] || ""}`;
       }).join("")}</ul>` : `<p class="sub">No quests ${outside() ? "today yet" : "in here today"}.</p>`}
       <div class="actions"><button class="btn alt small" data-close="1">Close board</button></div>`;
     }
+    {
+      const hn = scView === "fridge" && SCOOP_IN.includes(scene) ? "scoop" : ccView === "pantry" && COCOA_IN.includes(scene) ? "cocoa" : kView === "larder" && scene === "kitchen" ? "kitchen" : null, note2 = hn ? homeNote(F, hn) : "";
+      if (note2) {
+        const i = h3.lastIndexOf('<div class="actions">');
+        h3 = i < 0 ? h3 + note2 : h3.slice(0, i) + note2 + h3.slice(i);
+      }
+    }
     c.innerHTML = h3;
     if (kid.open && scene === "kidroom") wireKid(c, kid.open, { eat: (id) => {
       kid.open = null;
@@ -36600,7 +36739,8 @@ ${SIGNOFF[t2.who] || ""}`;
       stopKidGame();
       ctx();
     } });
-    if (homeView && (scene === "home" || scene === "garage")) wireHestia(c, homeView);
+    if (homeView && (scene === "home" || scene === "garage") && homeView !== "shelf" && homeView !== "stored") wireHestia(c, homeView);
+    if (homeView && (scene === "home" || scene === "garage")) wireStorage(c);
     if (deskOpen && scene === "office") wireDesk(c, () => ctx());
     if (reviewOpen && scene === "hall") wireReview(c, F, { save: () => save2(), rerender: () => ctx(), say: (l) => speak(l, 5e3, true), sfx, canSend: !rw.noMcp, today: dayKey(), coins: (n) => {
       F.coins += n;
@@ -37989,7 +38129,7 @@ ${SIGNOFF[t2.who] || ""}`;
       });
       ctx();
     });
-    showPanel(!!h3, homeView === "fridge" && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
+    showPanel(!!h3, (homeView === "fridge" || homeView === "stored") && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
     c.querySelectorAll("[data-shop]").forEach((b) => b.onclick = () => {
       shopTab = b.dataset.shop;
       ctx();
@@ -38892,9 +39032,9 @@ ${SIGNOFF[t2.who] || ""}`;
     }
   }
   function lunchTablePanel() {
-    const hm6 = sgHM(), list5 = bookingsFor(dayKey()).filter((b) => hm6 >= b.at), nm4 = (id) => (NPCS.find((n) => n.id === id) || { name: id }).name, t2 = vineState(F).today || {};
+    const hm6 = sgHM(), list5 = bookingsFor(dayKey()).filter((b) => hm6 >= b.at), nm5 = (id) => (NPCS.find((n) => n.id === id) || { name: id }).name, t2 = vineState(F).today || {};
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The Sunday long lunch</h2><p class="sub">${seatedAt(dayKey(), hm6)} at the table under the canvas. You're out here hosting, so they're ordering faster (and they tip).</p>
-    <ul class="hlist lunchbook">${list5.map((b) => `<li><span>${esc(b.ids.map(nm4).join(", ").replace(/, ([^,]*)$/, " and $1"))}</span><small>${b.family ? "family!" : b.birthday ? "a birthday" : `${b.size} ${b.size === 1 ? "seat" : "seats"}`}</small></li>`).join("")}</ul>
+    <ul class="hlist lunchbook">${list5.map((b) => `<li><span>${esc(b.ids.map(nm5).join(", ").replace(/, ([^,]*)$/, " and $1"))}</span><small>${b.family ? "family!" : b.birthday ? "a birthday" : `${b.size} ${b.size === 1 ? "seat" : "seats"}`}</small></li>`).join("")}</ul>
     <p class="muted">So far today: ${t2.lunchB || 0} bottles and ${t2.lunchP || 0} plates to the table. ${shelfStock(vineState(F))} bottles left on the shelves.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function roomSpot(id) {
@@ -40005,6 +40145,12 @@ ${SIGNOFF[t2.who] || ""}`;
     if ((scene === "home" || scene === "garage") && (id === "cupboard" || id === "fridge") && !(ph === "task" && placeOf(remaining()[0]) === scene && spotOf(remaining()[0]) === id && !S2.arrived[remaining()[0].id])) {
       homeView = id === "fridge" ? "fridge" : "chores";
       sfx(id === "fridge" ? "tap" : "paper");
+      render();
+      return;
+    }
+    if (scene === "garage" && id === "gshelf") {
+      homeView = "shelf";
+      sfx("paper", true);
       render();
       return;
     }
@@ -41337,9 +41483,9 @@ ${SIGNOFF[t2.who] || ""}`;
       ctx();
       drawScene();
     };
-    const nm4 = c.querySelector("#hfName");
-    if (nm4) nm4.oninput = () => {
-      hfSt.name = nm4.value;
+    const nm5 = c.querySelector("#hfName");
+    if (nm5) nm5.oninput = () => {
+      hfSt.name = nm5.value;
     };
     const hn = c.querySelector("[data-hfname]");
     if (hn) hn.onsubmit = (e) => {

@@ -3859,6 +3859,34 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(/wedding of/i.test(await page.locator("#ctx").textContent()), "the bookings book's Coming up page shows the weddings booked in");
   await page.close();
 }
+{
+  console.log("\nStorage at home: the fridge and the garage shelf (round 166)");
+  const sg = await import(new URL("../src/game/storage.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
+  check(sg.placeFor("raspberry") === "fridge" && sg.placeFor("flour") === "fridge" && sg.placeFor("balloon") === "shelf" && sg.placeFor("tulip_seed") === "shelf" && !Object.keys(it.ITEMS).some(id => ["tool", "pet"].includes(it.ITEMS[id].kind) && sg.placeFor(id)), "food and flowers go in the fridge; everything else on the garage shelf; tools and pets stay out");
+  { const F = {inv: {raspberry: 5, balloon: 1}};
+    check(sg.putAway(F, "fridge", "raspberry", 99) === 5 && !F.inv.raspberry && sg.putAway(F, "fridge", "balloon") === 0 && F.storage.fridge.raspberry === 5, "put away: raspberries into the fridge (a balloon doesn't fit)");
+    check(sg.takeOut(F, "fridge", "raspberry", 2) === 2 && F.inv.raspberry === 2 && F.storage.fridge.raspberry === 3, "take some back out");
+    check(sg.sendOff(F, "fridge", "raspberry", "scoop") === 3 && F.scoop.fridge.raspberry === 3 && !F.storage.fridge.raspberry && F.inv.raspberry === 2, "send the rest to the Scoop Shack fridge: the backpack's untouched");
+    check(sg.shopsFor("raspberry", () => false).map(s => s.k).join() === "scoop,kitchen" && sg.shopsFor("raspberry", () => true).some(s => s.k === "cocoa"), "only shops Mel owns, and that use it, are offered"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`storage pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/stg=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.inv = {...(f.inv || {}), raspberry: 5, balloon: 1};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=15:00&date=2026-10-13"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=15:00&date=2026-10-13&stg=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(1500);
+  await page.locator('#world [data-spot="fridge"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ftab="stored"]', { timeout: 20000 });
+  check(await page.locator('#ctx [data-hfr="shop"]').count() === 1, "the fridge keeps its pantry and shopping list, with a Stored tab beside them");
+  await page.click('#ctx [data-ftab="stored"]'); await page.waitForSelector('#ctx [data-st="putall"]', { timeout: 20000 }); await page.click('#ctx [data-st="putall"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-st="send"][data-id="raspberry"][data-to="scoop"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => !f.inv.raspberry && f.inv.balloon === 1 && f.scoop.fridge.raspberry === 5 && !f.storage.fridge.raspberry), "in the browser: raspberries into the fridge, then off to the Scoop Shack");
+  await page.evaluate(() => window.__mapleScene("garage")); await page.waitForTimeout(1500);
+  await page.locator('#world [data-spot="gshelf"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-st="put"][data-id="balloon"]', { timeout: 20000 });
+  await page.click('#ctx [data-st="put"][data-id="balloon"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => !f.inv.balloon && f.storage.shelf.balloon === 1), "the garage shelf takes the rest");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");
