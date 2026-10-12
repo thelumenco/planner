@@ -3447,7 +3447,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(stops.length === 6 && stops.every(id => T[id].by === "van" && T[id].screens.length === 2 && Object.keys(T[id].rooms).length === 3), "six Vines stops, two screens and three rooms each");
   check(stops.every(id => Object.values(T[id].rooms).every(r => tw.TOWN_PLACES[r.door] && tw.TOWN_BOUNDS[Object.keys(T[id].rooms).find(k => T[id].rooms[k] === r)])), "every room has a door outside and walls inside");
   const allRooms = stops.flatMap(id => Object.keys(T[id].rooms)), mus = new Set([...stops.map(id => T[id].music), ...allRooms.map(r => T[stops.find(id => T[id].rooms[r])].rooms[r].music)]);
-  check(mus.size === 24 && new Set(bb.STOPS.flatMap(id => [tw.TOWNS[id].music, ...Object.values(tw.TOWNS[id].rooms).map(r => r.music)])).size === 96, "24 tunes: one for every stop and every room (96 across the whole valley)");
+  check(mus.size === 24 && new Set(bb.STOPS.flatMap(id => [tw.TOWNS[id].music, ...Object.entries(tw.TOWNS[id].rooms).filter(([k]) => k !== "bv_hpaper").map(([, r]) => r.music)])).size === 96, "24 tunes: one for every stop and every room (96 across the whole valley)");
   const F0 = {coins: 100, inv: {}}; check(bb.known(F0).join() === "bv_gate" && bb.fuelFor("home", "bv_gate", ["evan", "mum"]) === 7 && bb.setOff(F0, "bv_gate", ["mum", "evan"], 8*60) && F0.coins === 93 && bb.stamped(F0, "bv_gate"), "the van: only Valley Gate on the map at first; 6 a leg plus 1 a grown-up, and a stamp");
   check(bb.known(F0).includes("bv_lookout") && bb.known(F0).includes("bv_creek") && !bb.known(F0).includes("bv_camp"), "the map reveals the stops a road away");
   // rooms, goods, specials
@@ -3578,7 +3578,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const goods = Object.entries(tw.TOWN_GOODS).filter(([, g]) => stops.some(id => Object.keys(T[id].rooms).includes(g.shop)));
   check(goods.length >= 20 && goods.every(([, g]) => !g.sell || g.sell <= g.price) && tw.TOWN_GOODS.macadamia && tw.TOWN_GOODS.fingerlime, "the Tablelands' shops (macadamias and finger limes too), and nothing sells back for more than it costs");
   check(sc.INGR.macadamia && sc.INGR.fingerlime && ["macslice", "flprawns", "lamington"].every(id => kt.TAPAS[id] && kt.TAPAS[id].special === "tablelands") && kt.beenTo({bellbird: {stamps: {bv_dairy: "x"}}}, "tablelands"), "macadamia and finger lime gelato and bonbons, and three Tablelands specials at the stove once you've been");
-  check(stops.every(id => Object.keys(T[id].rooms).every(r => br.bbRoomPanel({coins: 50, inv: {}}, r).length > 50)), "every Tablelands room has its panel");
+  check(stops.every(id => Object.keys(T[id].rooms).filter(r => r !== "bv_hpaper").every(r => br.bbRoomPanel({coins: 50, inv: {}}, r).length > 50)), "every Tablelands room has its panel");
   // the people
   const tl = np.NPCS.filter(n => /^tl/.test(n.id)), rooms = stops.flatMap(id => Object.keys(T[id].rooms));
   check(tl.length >= 30 && tl.every(n => n.local === "bellbird") && new Set(np.NPCS.map(n => n.id)).size === np.NPCS.length, "the Tablelands' people, and no one twice");
@@ -3639,7 +3639,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), la = await import(new URL("../src/game/lvacts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
   const kt = await import(new URL("../src/game/kitchen.js", import.meta.url)), hf = await import(new URL("../src/game/hfarm.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url));
   const T = tw.TOWNS, stops = bb.STOPS.filter(id => bb.regionOf(id) === "lavender");
-  check(stops.length === 6 && bb.STOPS.length === 24 && stops.every(id => T[id].by === "van" && T[id].screens.length === 2 && Object.keys(T[id].rooms).length === 3), "six Lavender Hills stops, two screens and three rooms each: the whole valley, 24 stops");
+  check(stops.length === 6 && bb.STOPS.length === 24 && stops.every(id => T[id].by === "van" && T[id].screens.length === 2 && Object.keys(T[id].rooms).filter(k => k !== "bv_hpaper").length === 3), "six Lavender Hills stops, two screens and three rooms each: the whole valley, 24 stops");
   check(stops.every(id => Object.values(T[id].rooms).every(r => tw.TOWN_PLACES[r.door])) && Object.values(tw.TOWN_PLACES).filter(p => p.bridge && /^h[vmpsbc]_/.test(p.scene)).length === 12, "every room has a door outside, and every stop's two screens join up");
   { const F = {coins: 500, bellbird: {stamps: {bv_gate: "x", bv_creek: "x", bv_berry: "x"}}}; const before = bb.known(F).includes("bv_lavender"); F.bellbird.stamps.bv_camp = "x";
     const m = bb.mapPanel(F, {region: "lavender", ownsVan: true, hm: 600}), v = bb.mapPanel(F, {region: "vines", ownsVan: true, hm: 600});
@@ -3648,7 +3648,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const goods = Object.entries(tw.TOWN_GOODS).filter(([, g]) => stops.some(id => Object.keys(T[id].rooms).includes(g.shop)));
   check(goods.length >= 15 && goods.every(([, g]) => !g.sell || g.sell <= g.price) && tw.TOWN_GOODS.honey_sun && sc.INGR.honey_sun, "the Lavender Hills' shops (sunflower honey for the gelato), and nothing sells back for more than it costs");
   check(["madeleines", "chevretart", "ratatouille"].every(id => kt.TAPAS[id] && kt.TAPAS[id].special === "lavender") && kt.beenTo({bellbird: {stamps: {bv_honey: "x"}}}, "lavender") && !kt.beenTo({bellbird: {stamps: {bv_gate: "x"}}}, "lavender"), "three Lavender Hills specials at the stove once you've been");
-  check(stops.every(id => Object.keys(T[id].rooms).every(r => br.bbRoomPanel({coins: 50, inv: {}}, r).length > 50)), "every Lavender Hills room has its panel");
+  check(stops.every(id => Object.keys(T[id].rooms).filter(r => r !== "bv_hpaper").every(r => br.bbRoomPanel({coins: 50, inv: {}}, r).length > 50)), "every Lavender Hills room has its panel (Mel's paperie in Montrose has its own stations)");
   const lv = np.NPCS.filter(n => /^lv/.test(n.id)), rooms = stops.flatMap(id => Object.keys(T[id].rooms));
   check(lv.length >= 28 && lv.every(n => n.local === "bellbird") && new Set(np.NPCS.map(n => n.id)).size === np.NPCS.length, "the Lavender Hills' people, and no one twice");
   check(rooms.filter(r => lv.some(n => n.routine.some(sl => sl.scene === r))).length >= 16, "people in the Lavender Hills rooms");
