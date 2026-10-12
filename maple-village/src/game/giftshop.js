@@ -3,13 +3,13 @@
 // chocolates and a gift corner. A goal (800 coins), through a new door in the wine shop's bottom-left corner. Posy keeps
 // it, 10 to 6, every day but Monday. Everything on its shelves is shared stock: the Cocoa Room's display case and bar
 // wall, the mill's shelves, the wine shop's bottles. A sale here is one fewer there.
-// State: F.gift = {sold: {day: {n, coins, bonbon, bar, mill, wine}}}
+// State: F.giftshop = {sold: {day: {n, coins, bonbon, bar, mill, wine}}}
 import { esc } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
 
 export const GIFT_HOURS = {from: 10*60, to: 18*60, closed: [1]};
-export const giftState = F => { F.gift = F.gift || {}; F.gift.sold = F.gift.sold || {}; return F.gift; };
+export const giftState = F => { F.giftshop = F.giftshop || {}; F.giftshop.sold = F.giftshop.sold || {}; return F.giftshop; };   // (F.gift is the welcome seeds)
 const dowOf = day => new Date(day + "T00:00:00Z").getUTCDay();
 export const keeperOn = (day, hm) => hm >= GIFT_HOURS.from && hm < GIFT_HOURS.to && !GIFT_HOURS.closed.includes(dowOf(day));
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
