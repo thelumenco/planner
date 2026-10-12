@@ -119,7 +119,7 @@ export function paperTick(F, here, t = now()){
 }
 
 // seeded paper grows: a seeded sheet or tag planted in a garden plot comes up as wildflowers in two days
-CROPS.wildflower = {n: "Wildflowers", ns: "bunches of wildflowers", dur: 48*3600e3, yield: 3};
+CROPS.wildflower = {n: "Wildflowers", ns: "bunches of wildflowers", dur: 48*3600e3, yield: 3, ico: "wildflower"};
 ITEMS.wildflower = {n: "Wildflowers", kind: "flower", sell: 3, ico: "wildflower", say: "Wildflowers! Cornflowers, poppies, a daisy. From the seed paper?"};
 for (const col of Object.keys(COLOURS)) Object.assign(ITEMS[sheetId(col, "seeds")], {crop: "wildflower", plantable: true});
 // and family who get a gift with a seeded tag plant it: two days later, a letter about the flowers
