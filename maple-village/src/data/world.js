@@ -202,7 +202,7 @@ export const INNER = {
   garage: {parent: "home", door: [456, 340], arrive: [70, 450], exit: [34, 440]},
   office: {parent: "home", door: [64, 512], arrive: [450, 450], exit: [486, 440]},
   cellar: {parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430]},
-  giftshop: {parent: "wineshop", door: [64, 540], arrive: [450, 440], exit: [486, 440]},   // round 178
+  giftshop: {parent: "wineshop", door: [64, 556], arrive: [450, 440], exit: [486, 440]},   // round 178
   // the Scoop Shack's kitchen, through the door on the shop's west wall; its own way back is the door on its east wall
   scoopkitchen: {parent: "scoopshop", door: [64, 400], arrive: [450, 440], exit: [486, 440]},
   // the chocolate dip station (an upgrade), through the door on the shop's east wall
@@ -321,7 +321,7 @@ export const ROOMS = {
     ["counter","Counter","C","bankcounter",null,"Opal's counter. Your passbook's here.",30]]},
   // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
   // and the tasting room's little tables
-  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,238], C:[330,318], H:[206,318], T:[340,520], K:[480,390], M:[465,128], Z:[40,400], G:[480,556], W:[182,232], Y:[40,540]}, stations:[
+  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,238], C:[330,318], H:[206,318], T:[340,520], K:[480,390], M:[465,128], Z:[40,400], G:[480,556], W:[182,232], Y:[40,556]}, stations:[
     ["tdoor","Terrace","G","glassdoor",null,"The glass doors out to the terrace.",0],
     ["menu","Menu","M","chalkmenu",null,"The chalkboard: today's menu.",44],
     ["kdoor","Kitchen","K","kitchendoor",null,"Into the kitchen.",0],
