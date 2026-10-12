@@ -2,9 +2,9 @@
 // soaps, all mixed with berries, fruits and herbs"). At the workbench upstairs in the old mill, beside the press:
 //   infused oils: two bottles of olive oil and one or two herbs or fruits (rosemary, garlic, basil, thyme, chives,
 //     lemon, orange, lavender) steep for six hours: two bottles worth half as much again as plain oil.
-//   soaps: goat's milk (two) or olive oil (one) and one or two add-ins (lavender, rose, honey, rosemary, mint, thyme,
+//   soaps: goat's milk (two) or olive oil (one) and one or two add-ins (lavender, rose, every honey, rosemary, mint, thyme,
 //     orange, lemon, raspberries); a day curing on the rack, then six bars.
-//   lotions: goat's milk, olive oil and one scent (lavender, rose, honey, orange, lemon, mint): an hour, three jars.
+//   lotions: goat's milk, olive oil and one scent (lavender, rose, every honey but comb, orange, lemon, mint): an hour, three jars.
 // Like the gelato flavours, every new mix is found once and named, then made again. Herbs come from the garden and the
 // greenhouse, lavender and roses from Ma Ma's flower farm (her bouquets); fruit from the orchard.
 // What's made goes onto the mill's shelves (the store). Until the Mill Shop's open the wine shop sells a little of it
@@ -25,7 +25,12 @@ export const HERB = {
   bq_lavender: {n: "Lavender", col: "#A68FCB", oil: true, soap: true, lotion: true}, bq_rose: {n: "Rose", col: "#E8A0B4", soap: true, lotion: true},
   // round 154 (Mel): more fruit from the garden and orchard, and more of Ma Ma's flowers
   strawberry: {n: "Strawberry", col: "#E8566C", soap: true, lotion: true}, blueberry: {n: "Blueberry", col: "#5A6AB8", soap: true}, apple: {n: "Apple", col: "#9CC27E", soap: true},
-  bq_sweetpea: {n: "Sweet pea", col: "#E8B4D8", soap: true, lotion: true}, bq_camellia: {n: "Camellia", col: "#E86A8A", soap: true, lotion: true}, bq_heather: {n: "Heather", col: "#B07AB8", soap: true}
+  bq_sweetpea: {n: "Sweet pea", col: "#E8B4D8", soap: true, lotion: true}, bq_camellia: {n: "Camellia", col: "#E86A8A", soap: true, lotion: true}, bq_heather: {n: "Heather", col: "#B07AB8", soap: true},
+  // round 167 (Mel: "honey should also be an ingredient in the mill stuff"): every honey, from the hives and the trips
+  honey_lav: {n: "Lavender honey", col: "#C9A3E0", soap: true, lotion: true}, honey_blossom: {n: "Blossom honey", col: "#F3C9A0", soap: true, lotion: true},
+  honey_cream: {n: "Creamed honey", col: "#F3E1A0", soap: true, lotion: true}, honeycomb: {n: "Honeycomb", col: "#E8B04A", soap: true},
+  honey_sun: {n: "Sunflower honey", col: "#F3C93A", soap: true, lotion: true}, honey_heath: {n: "Heath honey", col: "#C9A060", soap: true, lotion: true},
+  euchoney: {n: "Eucalyptus honey", col: "#C98A2E", soap: true, lotion: true}
 };
 export const KINDS = {oil: {n: "Infused oils", max: 2, price: 28, sell: 24}, soap: {n: "Soaps", max: 2, price: 8, sell: 6}, lotion: {n: "Lotions", max: 1, price: 16, sell: 13}};   // (every recipe sells for more than its ingredients cost: smoke test)
 export function craftState(F){ F.craft = F.craft || {}; const c = F.craft; c.recipes = c.recipes || []; c.steep = c.steep || []; c.cure = c.cure || []; if (!("pot" in c)) c.pot = null;

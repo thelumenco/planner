@@ -2300,3 +2300,6 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - `putAway`, `takeOut`, `sendOff(F, where, id, shop)`. `SHOPS`: scoop (stockFridge), cocoa (stockPantry, needs cocoa), kitchen (sendToKitchen), basket (toBasket, needs mill), millshelf (craft store, needs mill). `sendOff` lends the backpack for a moment and calls the shop's own "from bag" function; whatever the shop won't take stays stored. Instant (Tomo on the bike).
 - The fridge: Hestia's panel (real pantry + shopping list) gets a third tab "Stored (n)" (`homeView = "stored"`; `setFridgeTab` in hestia.js switches back). The garage's existing "Storage" station `gshelf` opens `homeView = "shelf"`.
 - `homeNote(F, shop)`: a line in the Scoop Shack fridge, Cocoa Room fillings shelf and wine shop larder panels saying what's waiting at home.
+
+## Round 167: every honey at the mill
+- millcraft.js `HERB` gains honey_lav, honey_blossom, honey_cream, honeycomb (soap only), honey_sun, honey_heath, euchoney: soaps and lotions, never oils. storage.js only offers the herb basket for oil herbs (Tomi only infuses oils).

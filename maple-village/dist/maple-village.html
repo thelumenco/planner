@@ -24900,7 +24900,15 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     apple: { n: "Apple", col: "#9CC27E", soap: true },
     bq_sweetpea: { n: "Sweet pea", col: "#E8B4D8", soap: true, lotion: true },
     bq_camellia: { n: "Camellia", col: "#E86A8A", soap: true, lotion: true },
-    bq_heather: { n: "Heather", col: "#B07AB8", soap: true }
+    bq_heather: { n: "Heather", col: "#B07AB8", soap: true },
+    // round 167 (Mel: "honey should also be an ingredient in the mill stuff"): every honey, from the hives and the trips
+    honey_lav: { n: "Lavender honey", col: "#C9A3E0", soap: true, lotion: true },
+    honey_blossom: { n: "Blossom honey", col: "#F3C9A0", soap: true, lotion: true },
+    honey_cream: { n: "Creamed honey", col: "#F3E1A0", soap: true, lotion: true },
+    honeycomb: { n: "Honeycomb", col: "#E8B04A", soap: true },
+    honey_sun: { n: "Sunflower honey", col: "#F3C93A", soap: true, lotion: true },
+    honey_heath: { n: "Heath honey", col: "#C9A060", soap: true, lotion: true },
+    euchoney: { n: "Eucalyptus honey", col: "#C98A2E", soap: true, lotion: true }
   };
   var KINDS3 = { oil: { n: "Infused oils", max: 2, price: 28, sell: 24 }, soap: { n: "Soaps", max: 2, price: 8, sell: 6 }, lotion: { n: "Lotions", max: 1, price: 16, sell: 13 } };
   function craftState(F2) {
@@ -31589,7 +31597,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     { k: "scoop", n: "the Scoop Shack fridge", ok: (id) => isIngr(id), go: (F2, id, n) => stockFridge(F2, id, n, "bag") },
     { k: "cocoa", n: "the Cocoa Room's fillings shelf", own: "cocoa", ok: (id) => isFilling(id), go: (F2, id, n) => stockPantry(F2, id, n, "bag") },
     { k: "kitchen", n: "the wine shop's larder", ok: (id) => isGood(id), go: (F2, id, n) => sendToKitchen(F2, id, n, false) },
-    { k: "basket", n: "the mill's herb basket", own: "mill", ok: (id) => !!HERB[id], go: (F2, id, n) => toBasket(F2, id, n) },
+    { k: "basket", n: "the mill's herb basket", own: "mill", ok: (id) => !!(HERB[id] && HERB[id].oil), go: (F2, id, n) => toBasket(F2, id, n) },
     {
       k: "millshelf",
       n: "the mill's shelves",
