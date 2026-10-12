@@ -2,6 +2,7 @@
 // terracotta tiles, blue shutters, copper, lavender. Like the other regions' rooms (art/bellbird-rooms.js, whose
 // helpers these share): busy round the edges, the middle of the floor clear, one thing in the middle of the back to tap.
 import { sk } from "./scenes.js";
+import { paperRoomArt } from "./paperie-room.js";
 import { rLab as lab, rG as g, rSpot as spot, rHov as hovE, rExit as exit, rWall as wall, rFloor as floor, rWin as win, rShelf as shelfUnit, rJars as jars, rBottles as bottlesF, rCounter as counter, rTable as table, rChair as chair, rPlant as plant, rCrate as crateOf, rFrame as frame, rSign as signText } from "./bellbird-rooms.js";
 
 const O = `stroke="#3a2e28" stroke-width=".6"`;
@@ -144,7 +145,7 @@ function chapelRoom(){
   return floor(200, "#E8D9B8", "flags") + back + pews + rope + altar + exit("#8A7A62");
 }
 
-const ROOMS = {bv_hstill: stillRoom, bv_hshop: lavShopRoom, bv_htea: teaRoom, bv_hboul: boulRoom, bv_hnougat: nougatRoom, bv_hcafe: cafeRoom,
+const ROOMS = {bv_hpaper: paperRoomArt, bv_hstill: stillRoom, bv_hshop: lavShopRoom, bv_htea: teaRoom, bv_hboul: boulRoom, bv_hnougat: nougatRoom, bv_hcafe: cafeRoom,
   bv_hperfume: perfumeRoom, bv_hsavon: savonRoom, bv_hglass: glassRoom, bv_hhoney: honeyRoom, bv_hcandle: candleRoom, bv_hkitchen: kitchenRoom,
   bv_hepicerie: epicerieRoom, bv_hglace: glaceRoom, bv_hmill: millRoom, bv_hfromage: fromageRoom, bv_hbistro: bistroRoom, bv_hchapel: chapelRoom};
 export const lavenderRoomArt = scene => (ROOMS[scene] || stillRoom)();

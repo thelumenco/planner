@@ -52,7 +52,9 @@ export const LV_TOWNS = {
     acts: {gonggong: {hm_square: {act: "baguette", at: [200, 440], dir: 1}}, marcus: {hm_square: {act: "accordion", at: [330, 320], dir: -1}}}, rooms: {
       bv_hboul: room("bvhboul", "La Boulangerie", "The boulangerie: baskets of baguettes standing up like umbrellas, fougasse shaped like leaves, tarts in the window, and a bell on the door."),
       bv_hnougat: room("bvhnougat", "The nougat shop", "The nougat shop: great slabs of white nougat studded with almonds, little calissons in rows, and Madame cutting slices with a big knife."),
-      bv_hcafe: room("bvhcafe", "Café de la Place", "The café: little round tables, wicker chairs, a zinc bar, citron pressé, and everyone watching the pétanque through the window.")},
+      bv_hcafe: room("bvhcafe", "Café de la Place", "The café: little round tables, wicker chairs, a zinc bar, citron pressé, and everyone watching the pétanque through the window."),
+      // round 183: Mel's paperie (goals.js "paperie"), up in the lanes: empty and for sale until she buys it
+      bv_hpaper: room("bvhpaper", "The paperie", "The paperie: stone walls, a long drying line, a vat by the back wall, and paper in every colour on the shelves.")},
     lines: {mum: ["Everything's the colour of honey here.", "Those blue shutters! I want blue shutters."],
       dad: ["These walls are seven hundred years old. Seven hundred.", "From the ramparts you can see the lavender, the sunflowers and the river."],
       mama: ["A baguette. Ma Ma will carry it. Ma Ma will eat the end.", "Nougat! Ma Ma's teeth say no. Ma Ma says yes."],
@@ -181,6 +183,7 @@ export const LV_PLACES = {
   bvhpiste: P("hm_square", "The pétanque piste", [400, 540], [400, 490], "The pétanque piste."),
   bvhToLanes: P("hm_square", "Up into the lanes", [504, 400], [476, 340], "East into the lanes.", {bridge: "hm_lanes"}),
   bvhramparts: P("hm_lanes", "The ramparts", [300, 262], [300, 150], "The ramparts."), bvhlavoir: P("hm_lanes", "The old washhouse", [140, 440], [140, 370], "The washhouse."),
+  bvhpaper: P("hm_lanes", "The paperie", [415, 252], [415, 120], "The shop with the green door."),
   bvhToSquare: P("hm_lanes", "Back down to the square", [16, 400], [44, 340], "West to the square.", {bridge: "hm_square"}),
   bvvan_perfume: P("hp_street", "The campervan", [130, 560], [130, 470], "Your campervan."),
   bvhperfume: P("hp_street", "The perfumery", [105, 252], [105, 140], "The perfumery."), bvhsavon: P("hp_street", "The soap maker", [415, 252], [415, 140], "The soap maker."),
@@ -228,7 +231,8 @@ export const LV_OBST = {
   // the rooms (round 162): the counter (or the organ, the furnace, the extractor) and the furniture round the edges
   ...Object.fromEntries(["bv_hstill", "bv_hshop", "bv_htea", "bv_hboul", "bv_hnougat", "bv_hcafe", "bv_hperfume", "bv_hsavon", "bv_hglass", "bv_hhoney", "bv_hcandle", "bv_hkitchen", "bv_hepicerie", "bv_hglace", "bv_hmill", "bv_hfromage", "bv_hbistro"]
     .map(r => [r, [[140, 222, 380, 300], [40, 430, 130, 500], [396, 440, 490, 505]]])),
-  bv_hchapel: [[120, 380, 220, 420], [300, 380, 400, 420], [210, 200, 310, 300]]
+  bv_hchapel: [[120, 380, 220, 420], [300, 380, 400, 420], [210, 200, 310, 300]],
+  bv_hpaper: [[200, 215, 320, 290], [30, 290, 116, 348], [30, 405, 120, 462], [404, 278, 494, 350], [410, 362, 490, 466], [34, 500, 186, 560]]
 };
 export const LV_EVAN = {hv_rows: [[260, 420], [320, 470], [220, 500]], hv_still: [[220, 360], [300, 400], [260, 460]], hm_square: [[220, 420], [320, 440], [260, 520]], hm_lanes: [[200, 380], [300, 420], [260, 500]],
   hp_street: [[220, 360], [300, 400], [260, 460]], hp_garden: [[200, 450], [320, 470], [260, 540]], hs_hives: [[220, 380], [300, 420], [160, 440]], hs_fields: [[200, 440], [320, 440], [260, 520]],

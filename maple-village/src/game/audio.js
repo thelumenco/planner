@@ -217,6 +217,8 @@ export const TRACKS = {
     bars: [[45, 57, 60, 64, 69], [50, 57, 62, 65, 69], [43, 55, 59, 62, 67], [48, 55, 60, 64, 67]]},
   bv_hcafe: {name: "Wicker chairs", live: true, bpm: 108, steps: 6, tone: "rhodes", strum: [0, 3], arp: [1, 3, 5, 3, 4, 2], arpVel: .04, mel: .55,
     bars: [[43, 55, 59, 62, 67], [48, 55, 60, 64, 67], [50, 57, 62, 66, 69], [43, 55, 59, 62, 71]]},
+  bv_hpaper: {name: "Deckle edges", live: true, bpm: 72, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 3, 2, 4, 3, 5, 4, 2], arpVel: .035, mel: .5,   // round 183: the paperie
+    bars: [[45, 57, 60, 64, 69], [41, 53, 57, 60, 65], [43, 55, 59, 62, 67], [40, 52, 55, 59, 64]]},
   bv_hperfume: {name: "Heart notes", live: true, bpm: 58, steps: 8, tone: "bell", arp: [1, 2, 3, 4, 5, 4, 3, 2], arpVel: .04, mel: .55, up: 12,
     bars: [[41, 53, 60, 64, 69], [46, 53, 58, 62, 65], [43, 55, 58, 62, 67], [48, 55, 60, 64, 72]]},
   bv_hsavon: {name: "Stamped with a sprig", live: true, bpm: 84, steps: 8, tone: "rhodes", arp: [1, 3, 2, 4, 3, 2, 4, 5], arpVel: .04, mel: .55,

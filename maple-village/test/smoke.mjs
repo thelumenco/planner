@@ -4024,6 +4024,47 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const late = Date.parse("2026-10-12T15:00:00Z"); c.at = late - 30*60e3; globalThis.__mapleOffset = late - Date.now(); Math.random = () => .005; const b0 = c.bars.dark; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
   check(c.bars.dark === b0, "nothing after 10pm");
 }
+{
+  console.log("\nThe paperie in Montrose (round 183)");
+  const pp = await import(new URL("../src/game/paperie.js", import.meta.url)), go = await import(new URL("../src/game/goals.js", import.meta.url)), ic = await import(new URL("../src/art/paper-icons.js", import.meta.url));
+  const it = await import(new URL("../src/data/items.js", import.meta.url));
+  check(go.GOALS.paperie && go.GOALS.paperie.price === 1500 && go.GOALS.paperie.where === "hm_lanes", "the paperie in Montrose: a 1,500-coin goal, up in the lanes");
+  const ids = Object.keys(pp.COLOURS).flatMap(c => Object.keys(pp.ADDS).map(a => pp.sheetId(c, a)));
+  check(ids.length === 28 && ids.every(id => it.ITEMS[id] && it.ITEMS[id].paper && it.ITEMS[id].price >= 5) && ids.every(id => ic.paperIcon(id) && ic.paperIcon("ppulp" + id.slice(2)) && ic.paperIcon("ppwet" + id.slice(2)) && ic.paperIcon("pppress" + id.slice(2))) && ic.paperIcon("ppscraps") && ic.paperIcon("ppsoak"),
+    "28 papers (four colours, seven add-ins), each with its own picture at every step");
+  const F = {coins: 100, inv: {bq_lavender: 1}, goals: {cocoa: 1, mill: 1}, scoop: {}, vine: {shelf: []}}, p = pp.paperState(F), t0 = Date.parse("2026-10-13T03:00:00Z");
+  p.scrapDay = "2026-10-11";
+  check(pp.homeShops(F).length === 4 && pp.scrapsWaiting(F, "2026-10-13") === 8 && pp.collectScraps(F, "2026-10-13") === 8 && p.scraps === 8 && pp.scrapsWaiting(F, "2026-10-13") === 0, "each shop at home saves a bundle of scraps a day; they come up in the van");
+  check(pp.startSoak(F, t0) && p.scraps === 6 && !pp.beat(F, "blush", t0 + 60e3) && !pp.startSoak(F, t0), "two bundles into the tub: not soft yet, and one batch at a time");
+  check(pp.beat(F, "blush", t0 + 16*60e3) && F.coins === 98 && p.pulp.col === "blush" && pp.batchIcon(F, t0 + 16*60e3) === "ppulp_blush_none", "beaten into blush pulp (2 coins of pigment): the picture's a basin of pink");
+  check(pp.addIn(F, "lavender") === "bag" && !F.inv.bq_lavender && F.coins === 98 && pp.batchIcon(F) === "ppulp_blush_lavender" && pp.addIn(F, "gold") === null, "lavender from the backpack, stirred through: flecks in the picture; one add-in a batch");
+  check(pp.pull(F) && p.wet.n === 6 && pp.batchIcon(F) === "ppwet_blush_lavender" && pp.startPress(F, t0 + 20*60e3) && !pp.hang(F, t0 + 21*60e3) && pp.hang(F, t0 + 26*60e3), "six wet sheets pulled, pressed for five minutes, hung on the line");
+  check(pp.takeDown(F, t0 + 27*60e3) === 0 && pp.takeDown(F, t0 + 26*60e3 + 864e5) === 6 && p.stock.pp_blush_lavender === 6, "dry by the same time tomorrow: six sheets onto the shelves");
+  check(pp.toBag(F, "pp_blush_lavender") === 1 && F.inv.pp_blush_lavender === 1 && pp.toShelf(F, "pp_blush_lavender") === 1 && p.stock.pp_blush_lavender === 6, "a sheet into the backpack (a gift), and back");
+  const rnd = Math.random; Math.random = () => .01; pp.paperTick(F, true, t0); const sold = pp.paperTick(F, true, t0 + 10*60e3); const none = pp.paperTick(F, false, t0 + 60*60e3); Math.random = rnd;
+  check(sold.coins > 0 && sold.coins === sold.n*it.ITEMS.pp_blush_lavender.price && none.coins === 0, `it sells while Mel's in Montrose, at the sheet's price (${sold.n} for ${sold.coins}), and not when she's away`);
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => { errors.push(`paperie pageerror: ${e.message}`); console.log("PAGEERR", e.stack.slice(0, 600)); });
+  await page.addInitScript(() => { const m = /pppatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 2000;
+    if (m[1] === "own") { f.goals = {...(f.goals || {}), paperie: 1}; f.paperie = {scraps: 4, scrapDay: "2026-10-13", line: [], stock: {}, sold: {}}; }
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-13"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-13&pppatch=buy"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("hm_lanes")); await page.waitForTimeout(800);
+  check(await page.locator('#world [data-place="bvhpaper"]').count() === 1 && /À VENDRE/.test(await page.locator("#world").innerHTML()), "Montrose's lanes: the shop with the green door, À VENDRE");
+  await page.evaluate(() => window.__mapleScene("bv_hpaper")); await page.waitForTimeout(800);
+  await page.locator('#world [data-rdspot="pp_buy"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="paperie"]', {timeout: 15000});
+  await page.click('#ctx [data-goal="paperie"]'); await page.waitForTimeout(800);
+  const f1 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  check(f1.goals.paperie && f1.coins === 500 && f1.paperie.scraps === 4, "buy it at the board: 1,500 coins, and a first box of scraps from home");
+  await page.evaluate(() => window.__mapleScene("bv_hpaper")); await page.waitForTimeout(800);
+  check(await page.locator('#world [data-rdspot^="pp_"]').count() === 8, "inside: the scrap bin, tub, vat, add-in jars, press, drying line, shelves and till");
+  await page.locator('#world [data-rdspot="pp_scrap"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-pp="tear"]', {timeout: 15000});
+  await page.click('#ctx [data-pp="tear"]'); await page.waitForTimeout(500);
+  const f2 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  check(f2.paperie.soak && f2.paperie.scraps === 2 && /2\. Soak/.test(await page.locator("#ctx .ppstep.now").textContent()), "tear two bundles into the tub: the steps along the top move on to Soak");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

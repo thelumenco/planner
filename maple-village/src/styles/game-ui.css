@@ -949,3 +949,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 /* round 153: the mulling pot */
 .mulldot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;border:1px solid #2F2B28;vertical-align:-1px}
 .mullsw{display:inline-flex;gap:2px;vertical-align:-1px}.mullsw i{width:9px;height:9px;border-radius:50%;border:1px solid #2F2B28}
+
+/* round 183: the paperie's steps, and the batch's picture */
+.ppstrip{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 4px}
+.ppstep{font-size:.72rem;padding:2px 7px;border-radius:999px;background:#EFE9DF;color:#8A8279}
+.ppstep.done{background:#DCE7D2;color:#4E6A3E}
+.ppstep.now{background:#F3D9A0;color:#5A3E1A;font-weight:600}
+.ppbatch{display:flex;justify-content:center;margin:2px 0 6px}
