@@ -16,7 +16,7 @@ export const RIBBONS = {gingham: {n: "Gingham ribbon", price: 4}, velvet: {n: "V
 export const REEL = 4, STAMP_SET = 40, TAGS_PER_SHEET = 4;
 export const STAMPS = {bee: "Bees", grape: "Grapes", olive: "Olive sprigs", star: "Stars", heart: "Hearts"};
 ITEMS.tag_plain = {n: "Paper gift tag", kind: "use", ico: "tag_plain", what: "Cut from your own handmade paper."};
-ITEMS.tag_seeded = {n: "Seeded gift tag", kind: "use", ico: "tag_seeded", what: "Cut from seeded paper: plant it and wildflowers come up."};
+ITEMS.tag_seeded = {n: "Seeded gift tag", kind: "use", ico: "tag_seeded", crop: "wildflower", plantable: true, what: "Cut from seeded paper: plant it and wildflowers come up."};
 for (const [k, r] of Object.entries(RIBBONS)) ITEMS["rb_" + k] = {n: `${r.n} (one bow)`, kind: "use", ico: "rb_" + k, what: "Enough for one bow."};
 
 export const wrappable = id => { const it = ITEMS[id]; return !!it && it.kind === "gift" && !it.wrapped && !it.paper; };

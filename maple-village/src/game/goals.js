@@ -20,6 +20,7 @@ export const GOALS = {
   millshop: {n: "The Mill Shop", price: 1200, where: "hlane", needs: "mill", line: "Upstairs at the old mill, opened up as a little shop, with tastings and soap workshops: your infused oils, soaps and lotions on the shelves, and Hazel behind the counter, every day but Monday."},
   giftshop: {n: "The gift shop", price: 800, where: "wineshop", line: "A little gift shop through a new door in the wine shop's corner: a case of your bonbons, a shelf of bars, the mill's oils and soaps, a corner of your wines. Posy runs it, and it all sells from the same stock as your other shops."},
   paperie: {n: "The paperie in Montrose", price: 1500, where: "hm_lanes", line: "The empty shop with the green door, up in Montrose's lanes: a paperie of your own. A vat, a press and a drying line in the back, shelves of handmade paper in the front. You make every sheet yourself, from scraps your shops save up for you. It opens while you're in Montrose."},
+  paperkeeper: {n: "Lise keeps the paperie", price: 600, where: "bv_hpaper", needs: "paperie", line: "Lise from the lanes keeps your paperie open while you're home: 10 till 5, closed Mondays, 12 coins for each day she opens. She takes the dry sheets off the line and runs the Saturday card class."},
   cellar: {n: "Cellar door", price: 2500, where: "wineshop", line: "A cellar door extension off the wine shop: barrel racks, a tasting bar and a wall of every wine you've made. Visitors love a cellar door, and once a month it hosts the wine club."}
 };
 export const owns = (F, k) => !!(F.goals && F.goals[k]);
@@ -36,6 +37,7 @@ export function buyGoal(F, k){
     car: "A cream convertible! Roof down, Maple in the back, Evan waving at everyone. You'll drive between screens from now on.",
     boat: "Your dolphin cruise boat is moored at the end of the jetty. Take everyone out!",
     cellar: "The cellar door is open! Through the new door on the wine shop's west wall.",
+    paperkeeper: "Lise starts tomorrow! She's already rearranged the ribbon rack by colour.",
     paperie: "The paperie's yours! The À VENDRE board's down and PAPETERIE is up over the green door. Start with the scrap bin.",
     giftshop: "The gift shop's open! Through the new door in the wine shop's corner. Posy's already rearranging the bonbon case.",
     van: "The campervan's yours! Parked at its spot on the lane, keys in your pocket. Hop in and do it up.",

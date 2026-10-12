@@ -156,6 +156,9 @@ const hamperIco = (big, bow = "#C8432F") => [`<path d="M${big ? 2 : 4} 11h${big 
   `<path d="M${big ? 2 : 4} 11h${big ? 20 : 16}l-2 10H${big ? 4 : 6}zM${big ? 5 : 6} 14h${big ? 14 : 12}M${big ? 6 : 7} 17h${big ? 12 : 10}M${big ? 3 : 5} 11q9 -12 ${big ? 18 : 14} 0"/><path d="M12 11l-3-3 3 1 3-1z"/>`];
 I.hamper_small = hamperIco(false); I.hamper_big = hamperIco(true);
 // round 184: Valentine's (a pink bow) and Mother's Day (a lilac bow)
+// round 186: wildflowers, grown from seeded paper (cornflowers, poppies, a daisy)
+I.wildflower = [`<path d="M8 21q1 -7 0 -12M12 21q0 -8 1 -13M16 21q-1 -6 1 -10" style="fill:none;stroke:#6FA05A;stroke-width:1.2"/><circle cx="8" cy="8" r="2.6" ${f("#E8566C")}/><circle cx="8" cy="8" r=".9" ${f("#2F2B28")}/>${[0, 72, 144, 216, 288].map(a => `<ellipse cx="13" cy="5.4" rx="1" ry="1.8" transform="rotate(${a} 13 7)" ${f("#7FA8D8")}/>`).join("")}<circle cx="13" cy="7" r=".8" ${f("#F3C969")}/>${[0, 60, 120, 180, 240, 300].map(a => `<ellipse cx="17" cy="9" rx=".7" ry="1.6" transform="rotate(${a} 17 10.6)" ${f("#FFFDF6")}/>`).join("")}<circle cx="17" cy="10.6" r=".9" ${f("#F3C969")}/>`,
+  `<circle cx="8" cy="8" r="2.6"/><circle cx="13" cy="7" r="2.4"/><circle cx="17" cy="10.6" r="2.2"/><path d="M6 21h12"/>`];
 I.hamper_small_v = hamperIco(false, "#E8566C"); I.hamper_big_v = hamperIco(true, "#E8566C"); I.hamper_small_m = hamperIco(false, "#9A7CC8"); I.hamper_big_m = hamperIco(true, "#9A7CC8");
 // round 180: the wine and chocolate pairing box: a teal gift box (not the hamper's wicker), a bottle standing in it, four
 // bonbons in a row, a gold ribbon round the front with a big bow

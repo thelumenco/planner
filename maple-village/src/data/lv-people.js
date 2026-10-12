@@ -35,6 +35,11 @@ export const LV_PEOPLE = [
     "Marco. I'm cycling every village in the hills. Two down. Many to go.", "Marco's out on the road.", {tourist: true}),
 
   /* ---------- Montrose ---------- */
+  // round 186: Lise keeps Mel's paperie (goals.js "paperkeeper") in the lanes
+  P("lvlise", "Lise", "Keeps your paperie in Montrose", {skin: "#F2D3BC", hair: "#3A2A22", hairStyle: "bobfringe", top: "#C6D6B2", bottom: "#5A4A3E", extra: "apron"},
+    [slot("10:00", "17:00", "bv_hpaper", [110, 488], {dir: 1, dow: [0, 2, 3, 4, 5, 6], needs: "paperkeeper"})],
+    ["The seeded paper sells out first. People like a gift that grows.", "A man bought ten sheets of ink blue. For love letters, he said.", "I've hung the new batch. The sage is my favourite.", "Saturday's class is full again!"],
+    "Lise. I'll mind the paperie for you. And I promise not to use all the gold flecks.", "Lise has gone home. The sign says fermé."),
   P("lvbernard", "Monsieur Bernard", "Bakes at the boulangerie", {skin: "#F2D3BC", hair: "#E6E2DA", hairStyle: "short", top: "#FFFDF6", bottom: "#3E6B8C", extra: "apron"},
     [slot("6:00", "13:00", "bv_hboul", DESK, {dir: -1}), slot("13:00", "15:00", "hm_square", [180, 420], {act: "doze", dir: 1})],
     ["The baguette must sing when you squeeze it. Listen.", "Fifty-one years. I have never missed a morning.", "Fougasse: shaped like a leaf, so it bakes fast and crisp."],
@@ -56,11 +61,11 @@ export const LV_PEOPLE = [
     ["Pagnol cheats. He doesn't, but he must.", "Forty years we play. Forty years he wins.", "One day. One day, Pagnol."],
     "Fernand. I play pétanque with Pagnol. I lose to Pagnol. It is a tradition.", "Fernand has gone home to sulk."),
   P("lvfamily1", "Claire", "On holiday in the hills with her family", {skin: "#F2D3BC", hair: "#E8C48E", hairStyle: "bob", top: "#9FD3C2", bottom: "#FFFDF6", hat: "sunhat"},
-    [slot("9:30", "11:30", "hm_square", [[240, 420], [300, 460]]), slot("11:30", "13:00", "bv_hboul", IN), slot("13:00", "16:00", "hm_lanes", [[200, 380], [300, 420]])],
+    [slot("14:00", "16:00", "bv_hpaper", [200, 410], {act: "cards", dow: [6], needs: "paperie", dir: 1}), slot("9:30", "11:30", "hm_square", [[240, 420], [300, 460]]), slot("11:30", "13:00", "bv_hboul", IN), slot("13:00", "16:00", "hm_lanes", [[200, 380], [300, 420]])],
     ["The children want to climb every step in Montrose.", "Croissants for breakfast, lunch and tea. Holiday rules.", "From the ramparts you can see three villages!"],
     "Claire. We're here for the summer. The kids have gone completely French.", "Claire's back at the gîte.", {tourist: true}),
   P("lvfamily2", "Léo", "On holiday (and very good at climbing steps)", {skin: "#F2D3BC", hair: "#E8C48E", hairStyle: "spiky", top: "#E8913A", bottom: "#3E6B8C"},
-    [slot("9:30", "11:30", "hm_square", [[260, 440], [320, 480]]), slot("11:30", "13:00", "bv_hboul", IN), slot("13:00", "16:00", "hm_lanes", [[240, 400], [320, 440]])],
+    [slot("14:00", "16:00", "bv_hpaper", [320, 410], {act: "cards", dow: [6], needs: "paperie", dir: -1}), slot("9:30", "11:30", "hm_square", [[260, 440], [320, 480]]), slot("11:30", "13:00", "bv_hboul", IN), slot("13:00", "16:00", "hm_lanes", [[240, 400], [320, 440]])],
     ["I counted ninety-three steps to the top!", "The fish in the fountain spits water!", "Can I play the ball game with the old men?"],
     "I'm Léo! I'm eight! I know how to say croissant properly!", "Léo's at the gîte.", {tourist: true, kid: true}),
 
@@ -78,11 +83,11 @@ export const LV_PEOPLE = [
     ["Glass is just sand that's had a very hot day.", "Turn, turn, breathe. Never stop turning.", "The perfume bottles are for Madame Arnaud. The birds are for me."],
     "Luc. Glassblower. Stand back a little. It's hot.", "Luc's furnace is banked for the night."),
   P("lvanniv1", "Ruth", "On her fortieth anniversary trip", {skin: "#F6D9C4", hair: "#E6E2DA", hairStyle: "bob", top: "#E8A0B4", bottom: "#FFFDF6"},
-    [slot("10:00", "12:00", "hp_garden", [[200, 460], [320, 480]]), slot("12:00", "14:00", "bv_hperfume", IN), slot("14:00", "16:00", "hp_street", [[220, 360], [300, 400]])],
+    [slot("14:00", "16:00", "bv_hpaper", [200, 470], {act: "cards", dow: [6], needs: "paperie", dir: 1}), slot("10:00", "12:00", "hp_garden", [[200, 460], [320, 480]]), slot("12:00", "14:00", "bv_hperfume", IN), slot("14:00", "16:00", "hp_street", [[220, 360], [300, 400]])],
     ["Forty years married. He still buys me roses.", "We came here on our honeymoon. Nothing's changed. Except us.", "He's making me a perfume. He won't tell me what's in it."],
     "Ruth. Forty years married this week. We came back to where it started.", "Ruth's having a rest.", {tourist: true}),
   P("lvanniv2", "Alan", "On his fortieth anniversary trip", {skin: "#E8C4A0", hair: "#C9C3BA", hairStyle: "short", top: "#7FA8C8", bottom: "#5A4A3E", hat: "sunhat"},
-    [slot("10:00", "12:00", "hp_garden", [[240, 480], [360, 500]]), slot("12:00", "14:00", "bv_hperfume", IN), slot("14:00", "16:00", "hp_street", [[260, 380], [320, 420]])],
+    [slot("14:00", "16:00", "bv_hpaper", [320, 470], {act: "cards", dow: [6], needs: "paperie", dir: -1}), slot("10:00", "12:00", "hp_garden", [[240, 480], [360, 500]]), slot("12:00", "14:00", "bv_hperfume", IN), slot("14:00", "16:00", "hp_street", [[260, 380], [320, 420]])],
     ["Rose at the heart. That's all I'll say.", "Forty years. Best decision I ever made, and I've made some good ones.", "Don't tell Ruth about the perfume."],
     "Alan. Forty years. I'm making her a perfume. Shh.", "Alan's having a rest.", {tourist: true}),
 

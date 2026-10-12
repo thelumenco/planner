@@ -4107,6 +4107,22 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const rnd = Math.random; Math.random = () => .01; const got = gs.giftSellMinute(F, "2026-10-14", 11*60, "keeper", {cocoa: null, onDisplay: () => [], store: {}, v: {shelf: []}}); Math.random = rnd;
   check(got === W.price && !F.giftshop.wrapped.length && F.giftshop.sold["2026-10-14"].wrap === 1, "and it sells as wrapped, at its own price");
 }
+{
+  console.log("\nThe paperie, round 3: Lise, the card class, the seasons, seeds that grow (round 186)");
+  const pp = await import(new URL("../src/game/paperie.js", import.meta.url)), go = await import(new URL("../src/game/goals.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), wr = await import(new URL("../src/game/wrap.js", import.meta.url)), np = await import(new URL("../src/data/lv-people.js", import.meta.url));
+  check(go.GOALS.paperkeeper && go.GOALS.paperkeeper.needs === "paperie" && np.LV_PEOPLE.some(n => n.id === "lvlise" && n.routine[0].scene === "bv_hpaper" && n.routine[0].needs === "paperkeeper"), "Lise keeps the paperie (600 coins, once it's yours)");
+  check(pp.keeperIn("2026-10-14", 11*60) && !pp.keeperIn("2026-10-12", 11*60) && !pp.keeperIn("2026-10-14", 18*60) && pp.paperSeason("2026-12-10") && !pp.paperSeason("2026-10-14"), "10 till 5, closed Mondays; December's a gift season");
+  const F = {coins: 1000, goals: {paperie: 1}, inv: {}}, p = pp.paperState(F), wed = Date.parse("2026-10-14T03:00:00Z");   // Wednesday 11am
+  p.stock = {pp_blush_rose: 10}; p.at = wed - 60*60e3; let rnd = Math.random; Math.random = () => .99; let out = pp.paperTick(F, false, wed); Math.random = rnd;
+  check(out.coins === 0 && out.wage === 0 && p.stock.pp_blush_rose === 10, "no keeper, and Mel's away: the paperie's shut");
+  F.goals.paperkeeper = 1; p.line = [{col: "sage", add: "seeds", n: 6, done: wed - 1}]; p.at = wed - 60*60e3; Math.random = () => .01; out = pp.paperTick(F, false, wed); Math.random = rnd;
+  check(out.wage === pp.WAGE && out.coins > 0 && out.down === 6 && p.stock.pp_sage_seeds >= 0 && F.coins === 1000 - pp.WAGE + out.coins, `with Lise: she opens (her wage, ${pp.WAGE}), sells while Mel's home (${out.coins} coins), and takes the dry sheets down`);
+  const sat = Date.parse("2026-10-17T08:00:00Z"); p.stock = {pp_blush_rose: 6}; p.at = sat - 5*60e3; Math.random = () => .99; out = pp.paperTick(F, false, sat); Math.random = rnd;
+  check(out.cls === pp.CLASS.size*pp.CLASS.fee && p.stock.pp_blush_rose === 2 && p.classDay === "2026-10-17", "Saturday's card class: four people, four sheets, 32 coins");
+  check(it.CROPS.wildflower && it.ITEMS.pp_sage_seeds.plantable && it.ITEMS.pp_sage_seeds.crop === "wildflower" && it.ITEMS.tag_seeded.plantable && it.ITEMS.wildflower.kind === "flower", "seeded paper and seeded tags plant in the garden and come up as wildflowers");
+  const G = {coins: 100, inv: {box4: 1, pp_blush_none: 1, tag_seeded: 1}, goals: {paperie: 1}}, id = wr.wrapIt(G, {item: "box4", paper: "pp_blush_none", tag: "seeded"}), t0 = Date.now();
+  check(pp.bloomFor(G, id, "mum", t0) && !pp.bloomMail(G, t0 + 864e5).length && pp.bloomMail(G, t0 + 2*864e5 + 1).length === 1 && /front step/.test(pp.bloomMail(G, t0 + 3*864e5)[0].body), "a gift with a seeded tag: two days later Mum writes about the flowers by her front step");
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

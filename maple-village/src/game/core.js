@@ -1150,7 +1150,7 @@ const WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday
 let localCache = {key: "", items: []};
 const dayKeyAt = ms => new Date(ms + 6*H).toISOString().slice(0, 10);   // same 2am reset as dayKey()
 function localMail(){
-  const day = dayKey(), hm = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm/10)}:${S.doneIds.length}:${S.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}:${thanksMail().length}:${slowMail(F).length}`;
+  const day = dayKey(), hm = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm/10)}:${S.doneIds.length}:${S.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}:${thanksMail().length}:${slowMail(F).length}:${PP.bloomMail(F).length}`;
   if (key === localCache.key) return localCache.items;
   const out = [], wd = new Date(day + "T00:00:00Z").getUTCDay();
   if ((wd === 5 && hm >= 900) || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
@@ -1158,7 +1158,7 @@ function localMail(){
   const routineWind = (MAIL.items || []).some(m => m && m.from === "winddown" && m.at && dayKeyAt(m.at) === day);
   if (hm >= 1080 && !routineWind && (S.cleanDone || S.doneIds.length)) out.push({id: "wind-" + day, from: "winddown", at: sgAt(day, 18), pond: true,
     title: "Time to close the day", body: "Meet me at the pond. Each of today's wins gets a lantern on the water.\nThen tell chat \"wind down\" whenever you're ready."});
-  out.push(...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__mapleOffset || 0)));   // round 129: Jeju's slow-post postcards, two weeks on
+  out.push(...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__mapleOffset || 0)), ...PP.bloomMail(F));   // round 129: Jeju's slow-post postcards, two weeks on
   return (localCache = {key, items: out}).items;
 }
 const allMail = () => [...(MAIL.items || []), ...localMail()];
@@ -1363,7 +1363,7 @@ function giveTo(id, w){
   if (w === "near") { giveBouquet(id); bag(); return; }
   if (giftPos(w)) { if (it.kind === "bouquet") bouquetTo(id, w); else giveGift(id, w); bag(); return; }
   if (it.gel && !hasUp(scoopState(F), "bike")) { speak(`It'd melt on the way! Give it to ${GIFT_NAME[w]} in person, or get the Scoop Shack a delivery bike.`, 4500); bag(); return; }
-  addInv(id, -1); F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1; gainXp(1);
+  addInv(id, -1); F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1; gainXp(1); PP.bloomFor(F, id, w);
   F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
   sfx("chime"); flash(`Sent to ${GIFT_NAME[w]}`); speak(`Wrapped up and sent to ${GIFT_NAME[w]}. Watch your mailbox for a thank-you note.`, 4500); save(); bag();
 }
@@ -1393,12 +1393,12 @@ function giveGift(id, chosen){
   const say = w => (it.says && it.says[w]) || it.say;
   if (FOLKS.includes(to)) {
     const p = npcPos(to); if (!p) { speak(`${GIFT_NAME[to]}'s not here. Give it to ${to === "dad" || to === "marcus" ? "him" : "her"} in person!`, 3500); return; }
-    addInv(id, -1); F.fam.gifts[to] = (F.fam.gifts[to] || 0) + 1;
+    addInv(id, -1); F.fam.gifts[to] = (F.fam.gifts[to] || 0) + 1; PP.bloomFor(F, id, to);
     showMap(); npcSay(to, say(to)); burst(p.x, p.y - 20); sfx("chime"); flash(`${GIFT_NAME[to]} loved the ${it.n.toLowerCase()}`); gainXp(1); save(); return;
   }
   if (to === "evan") {
     if (!evanHere()) { speak("Evan's at home. Give it to him there!", 3500); return; }
-    addInv(id, -1); const n = ++F.fam.gifts.evan;
+    addInv(id, -1); const n = ++F.fam.gifts.evan; PP.bloomFor(F, id, "evan");
     evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; evan.wait = 5;
     showMap(); evanSays(say("evan")); burst(evan.x, evan.y); sfx("chime"); flash(`Evan loved the ${it.n.toLowerCase()}!`);
     if (id === "icecream" || id === "storybook") S.evanHold = {k: id, until: Date.now() + 3*M};
@@ -1411,7 +1411,7 @@ function giveGift(id, chosen){
     // whichever grandparent is nearest (both live in the cottage in the orchard)
     const here = (g ? [g] : ["mama", "gonggong"]).map(g => [g, npcPos(g)]).filter(([, p]) => p).sort((a, b) => Math.hypot(a[1].x - mel.x, a[1].y - mel.y) - Math.hypot(b[1].x - mel.x, b[1].y - mel.y))[0];
     if (!here) { const w = whereIs("mama"); speak(`Ma Ma and Gong Gong aren't here. ${w === "cottage" ? "They're home in the cottage" : w ? "Ma Ma's out at the " + ({orchard: "orchard", flowers: "flower farm", village: "town square", vineyard: "vineyard", base: "house", field: "field"}[w] || w) : "Try the orchard"}. Give it to them in person!`, 4500); return; }
-    const [gp, p] = here; addInv(id, -1); F.fam.gifts[gp] = (F.fam.gifts[gp] || 0) + 1;
+    const [gp, p] = here; addInv(id, -1); F.fam.gifts[gp] = (F.fam.gifts[gp] || 0) + 1; PP.bloomFor(F, id, "grands");
     showMap(); npcSay(gp, say(gp) + (gp === "mama" ? " I love you." : "")); burst(p.x, p.y - 20); sfx("chime"); flash(`${gp === "mama" ? "Ma Ma" : "Gong Gong"} loved the ${it.n.toLowerCase()}`);
   } else {
     if (!isHere("darren")) { const w = whereIs("darren"); speak(w ? `Darren's ${DARREN_AT[w] || "around"} right now. Give it to him there!` : "Darren's not around right now.", 4000); return; }
@@ -1663,7 +1663,7 @@ function ctx(){
   else if (occView === "trivia" && scene === "terrace") { const t = F.terraceEv || {}; h = triviaPanel(F, trvSt, {on: (occasionNow(dayKey(), sgHM()) || {}).kind === "trivia", played: t.trivia === dayKey() && !trvSt ? t.quizLine : null}); }
   else if (occView === "paint" && scene === "terrace") h = paintPanel(F, pntSt, {on: (occasionNow(dayKey(), sgHM()) || {}).kind === "paint", painted: (F.terraceEv || {}).painted === dayKey() && !pntSt});
   else if (lunchView === "table" && scene === "terrace") h = lunchTablePanel();
-  else if (ppView && scene === "bv_hpaper") h = ppView === "pp_rack" ? WR.rackPanel(F) : ppView === "pp_wrap" ? WR.wrapPanel(F, wrSt, {where: "paperie"}) : PP.paperPanel(F, ppView, {day: dayKey(), came: ppCame});   // round 183, 185
+  else if (ppView && scene === "bv_hpaper") h = ppView === "pp_rack" ? WR.rackPanel(F) : ppView === "pp_wrap" ? WR.wrapPanel(F, wrSt, {where: "paperie"}) : PP.paperPanel(F, ppView, {day: dayKey(), came: ppCame, lise: isHere("lvlise")});   // round 183, 185
   else if (fieldView === "gwrap" && scene === "giftshop") h = WR.wrapPanel(F, wrSt, {where: "giftshop", table: giftState(F).wrapped});   // round 185
   else if (bbRoom && townOf(scene) && TOWNS[townOf(scene)].by === "van") { const evanOn = inParty(F, "evan") && !evanNight(), tp = tripOn(F) ? tripOn(F).party : [];
     h = bbRoom === "balloon" ? BBA.balloonPanel(F, bbSt.flight, {hm: sgHM(), party: tp}) : bbRoom === "riddle" ? BBA.riddlePanel(F, bbSt.riddle) : bbRoom === "berries" ? BBA.berriesPanel(F, bbSt.berries, evanOn)
@@ -1748,7 +1748,7 @@ function ctx(){
     const p = F.plots[selPlot], i = selPlot;
     h = `<span class="tape stripe" aria-hidden="true"></span><h2>Plot ${i + 1}</h2>`;
     if (!p || !p.crop) {
-      const seeds = Object.keys(F.inv).filter(id => ITEMS[id] && ITEMS[id].kind === "seed" && !ITEMS[id].greenhouse);   // greenhouse packets only grow under glass
+      const seeds = Object.keys(F.inv).filter(id => ITEMS[id] && (ITEMS[id].kind === "seed" || ITEMS[id].plantable) && !ITEMS[id].greenhouse);   // greenhouse packets only grow under glass; seeded paper (round 186) grows wildflowers
       h += seeds.length ? `<p class="sub">${F.tools.seeder && F.plots.filter(q => !(q && q.crop)).length > 1 ? "Pick seeds: the auto seeder sows every empty plot at once." : "Pick seeds to plant."}</p><div class="items">${seeds.map(id => itemBtn(id, `${dur(CROPS[ITEMS[id].crop].dur)} to grow`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("")}</div>`
         : `<p class="sub">No seeds in your backpack. The market sells them.</p>`;
     } else {
@@ -3226,12 +3226,12 @@ function deliverMore(h){
 }
 function deliver(w){
   if (scSt.vother) { const id = takeSend(F, scSt.vother, dayKey()); if (!id) return; const it = ITEMS[id] || {n: "present"};
-    F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1; gainXp(1); F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
+    F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1; gainXp(1); PP.bloomFor(F, id, w); F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
     scoopState(F).bikeOut = Date.now() + (globalThis.__mapleOffset || 0); sfx("chime"); flash(`On its way to ${GIFT_NAME[w]}`); speak(`Tomo's pedalling ${/^[aeiou]/i.test(it.n) ? "an" : "a"} ${it.n.toLowerCase()} over to ${GIFT_NAME[w]} in the cool box. Watch your mailbox for a thank-you note.`, 5000);
     scSt.vother = null; scView = null; save(); ctx(); render(); return; }
   const it = takeAway(F, scSt.vpick, FORMATS[scSt.vfmt] ? scSt.vfmt : "cone"); if (!it) return;
   const id = Object.keys(ITEMS).find(k => ITEMS[k] === it);
-  addInv(id, -1); F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1; gainXp(1);
+  addInv(id, -1); F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1; gainXp(1); PP.bloomFor(F, id, w);
   F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
   scoopState(F).bikeOut = Date.now() + (globalThis.__mapleOffset || 0); sfx("chime"); flash(`On its way to ${GIFT_NAME[w]}`); speak(`Tomo's pedalling a ${it.n.toLowerCase()} over to ${GIFT_NAME[w]} in the cool box. Watch your mailbox for a thank-you note.`, 5000);
   scSt.vpick = null; scView = null; save(); ctx(); render();
@@ -3240,7 +3240,9 @@ function deliver(w){
 // round 183: the paperie sells while Mel's in Montrose; scraps from home come up in the van when she walks in
 function paperNow(){
   if (!owns(F, "paperie")) return; const here = townOf(scene) === "bv_hilltown", out = PP.paperTick(F, here);
-  if (out.coins) { save(); if (scene === "bv_hpaper") { sfx("coin"); flash(`+${out.coins}: ${out.n} sheet${out.n === 1 ? "" : "s"} of paper`); if (ppView) ctx(); drawScene(); } }
+  if (out.cls && here) setTimeout(() => speak(`The card class is done: four little cards drying on the big table, and ${out.cls} coins in the tin.`, 5000), 800);
+  if (out.coins || out.wage || out.down) { save(); if (scene === "bv_hpaper") { if (out.coins) { sfx("coin"); flash(`+${out.coins}: ${out.n ? `${out.n} sheet${out.n === 1 ? "" : "s"} of paper` : "the paperie"}`); } if (ppView) ctx(); drawScene(); }
+    else if (!here && out.coins > 20 && Date.now() - (S.paperSaid || 0) > 3600e3) { S.paperSaid = Date.now(); setTimeout(() => speak(`A note from Lise: the paperie took ${out.coins} coins${out.wage ? ` (her wage, ${out.wage}, already out)` : ""}.`, 5000), 2500); } }
 }
 // round 185: wrapping (the paperie's ribbon rack, the gift shop's wrapping table)
 function wireWrap(c){

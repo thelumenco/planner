@@ -15,7 +15,7 @@
 // in Montrose (she turns the sign round); a keeper, the class and the seasonal rushes come later.
 // State: F.paperie = {scraps, scrapDay, soak: {done}, soaked, pulp: {col, add}, wet: {col, add, n}, press: {col, add,
 // n, done}, line: [{col, add, n, done}], stock: {id: n}, sold: {day: {n, coins}}, at, made}
-import { ITEMS } from "../data/items.js";
+import { ITEMS, CROPS } from "../data/items.js";
 import { esc } from "../util.js";
 import { icon } from "../art/icons.js";
 
@@ -86,18 +86,51 @@ export function takeDown(F, t = now()){
 export function toBag(F, id, n = 1){ const p = paperState(F), k = Math.min(n, p.stock[id] || 0); if (!k) return 0; p.stock[id] -= k; if (!p.stock[id]) delete p.stock[id]; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + k; return k; }
 export function toShelf(F, id, n = 99){ const p = paperState(F), k = Math.min(n, (F.inv || {})[id] || 0); if (!k || !ITEMS[id] || !ITEMS[id].paper) return 0; F.inv[id] -= k; if (F.inv[id] <= 0) delete F.inv[id]; p.stock[id] = (p.stock[id] || 0) + k; return k; }
 
-// the shop sells while Mel's in Montrose: catch up minute by minute since the last look (here = she's in town)
+// round 3 (round 186): Lise keeps the shop when Mel's away (10 to 5, closed Mondays; a goal, "paperkeeper"), for a wage
+// each day she opens. She takes dry sheets off the line onto the shelves too. Saturdays 2 to 4 there's a card-making
+// class (four people, four sheets off the shelves, 8 coins each) if Lise or Mel is there to run it. And the shop's
+// busier in the gift seasons: the fortnight before Valentine's, early May (Mother's Day) and December.
+export const KEEP = {from: 10*60, to: 17*60, closed: [1]}, WAGE = 12, CLASS = {dow: 6, from: 14*60, to: 16*60, size: 4, fee: 8};
+const dowOf = day => new Date(day + "T00:00:00Z").getUTCDay();
+export const keeperHired = F => !!(F.goals && F.goals.paperkeeper);
+export const keeperIn = (day, hm) => hm >= KEEP.from && hm < KEEP.to && !KEEP.closed.includes(dowOf(day));
+export const paperSeason = day => { const md = day.slice(5); return (md >= "02-01" && md <= "02-14") || (md >= "05-01" && md <= "05-14") || (md >= "12-01" && md <= "12-24"); };
+export const classOn = (day, hm) => dowOf(day) === CLASS.dow && hm >= CLASS.from && hm < CLASS.to;
+const sheetsIn = p => Object.values(p.stock).reduce((a, n) => a + n, 0);
+function takeSheets(p, n){ let k = 0; while (k < n) { const ids = Object.keys(p.stock).filter(id => p.stock[id] > 0); if (!ids.length) break; const id = ids[k % ids.length]; p.stock[id]--; if (!p.stock[id]) delete p.stock[id]; k++; } return k; }
+
+// minute by minute since the last look (at most two days): here = Mel's in Montrose
 export function paperTick(F, here, t = now()){
-  const p = paperState(F), out = {n: 0, coins: 0};
-  if (!here || !p.at) { p.at = t; return out; }
-  for (let at = p.at + M; at <= t; at += M) {
-    const ids = Object.keys(p.stock).filter(id => p.stock[id] > 0); if (!ids.length || Math.random() >= .05) continue;
+  const p = paperState(F), out = {n: 0, coins: 0, wage: 0, cls: 0, down: 0}, kept = keeperHired(F);
+  if (!p.at || (!here && !kept)) { p.at = t; return out; }
+  for (let at = Math.max(p.at, t - 2*864e5) + M; at <= t; at += M) {
+    const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
+    const lise = kept && keeperIn(day, hm), open = here || lise, s = () => (p.sold[day] = p.sold[day] || {n: 0, coins: 0});
+    if (lise && p.wageDay !== day) { p.wageDay = day; F.coins -= WAGE; s().wage = WAGE; out.wage += WAGE; }
+    if (lise) { const d = takeDown(F, at); if (d) out.down += d; }
+    if (open && dowOf(day) === CLASS.dow && hm === CLASS.to - 1 && p.classDay !== day && sheetsIn(p) >= CLASS.size) {   // the class finishes: four cards made, four fees
+      p.classDay = day; takeSheets(p, CLASS.size); const fee = CLASS.size*CLASS.fee; s().cls = fee; s().coins += fee; out.coins += fee; out.cls += fee; }
+    if (!open) continue;
+    const ids = Object.keys(p.stock).filter(id => p.stock[id] > 0); if (!ids.length || Math.random() >= (here ? .05 : .03)*(paperSeason(day) ? 2 : 1)) continue;
     const id = ids[Math.floor(Math.random()*ids.length)], k = Math.min(p.stock[id], Math.random() < .3 ? 2 : 1), coins = k*ITEMS[id].price;
-    p.stock[id] -= k; if (!p.stock[id]) delete p.stock[id];
-    const day = new Date(at + 8*3600e3).toISOString().slice(0, 10), s = p.sold[day] = p.sold[day] || {n: 0, coins: 0}; s.n += k; s.coins += coins; out.n += k; out.coins += coins;
+    p.stock[id] -= k; if (!p.stock[id]) delete p.stock[id]; s().n += k; s().coins += coins; out.n += k; out.coins += coins;
   }
   p.at = t; F.coins += out.coins; return out;
 }
+
+// seeded paper grows: a seeded sheet or tag planted in a garden plot comes up as wildflowers in two days
+CROPS.wildflower = {n: "Wildflowers", ns: "bunches of wildflowers", dur: 48*3600e3, yield: 3};
+ITEMS.wildflower = {n: "Wildflowers", kind: "flower", sell: 3, ico: "wildflower", say: "Wildflowers! Cornflowers, poppies, a daisy. From the seed paper?"};
+for (const col of Object.keys(COLOURS)) Object.assign(ITEMS[sheetId(col, "seeds")], {crop: "wildflower", plantable: true});
+// and family who get a gift with a seeded tag plant it: two days later, a letter about the flowers
+export function bloomFor(F, id, who, at = now()){ const it = ITEMS[id]; if (!it || !it.wrapped) return false;
+  const w = (paperState(F).wraps || []).find(r => r.id === id); if (!w || w.tag !== "seeded") return false;
+  const p = paperState(F); p.blooms = [...(p.blooms || []), {who, at: at + 2*864e5, id: `bloom-${who}-${at}`}].slice(-20); return true; }
+const BLOOM = {mum: "Dear Mel,\n\nThat little seed tag! I planted it by the front step like you said, and look: cornflowers and two poppies, already. Dad waters them every morning and pretends he isn't.\n\nLove, Mum xx",
+  dad: "Mel,\n\nThe tag came up. Poppies. I've drawn them twice.\n\nLove, Dad", marcus: "Zeh,\n\nAngie planted your seed tag in the window box. It's a tiny meadow now. The neighbours are jealous.\n\nMarcus",
+  angelina: "Hi Mel!\n\nThe seed tag grew!! Little blue flowers in my window box. I talk to them while I study.\n\nLove, Angellina", grands: "Ah girl,\n\nGong Gong planted the paper with the seeds next to Ma Ma's herbs. Now there are flowers! Pretty pretty. Ma Ma puts some by the altar.\n\nMa Ma (and Gong Gong)",
+  evan: "Dear Mama,\n\nMY FLOWERS CAME UP. Papa helped. They are blue and red and one is yellow.\n\nLove, Evan (Darren held the pencil)", darren: "Mel,\n\nThe seed tag from the present came up by the back door. Wildflowers. I didn't kill them. Proud of me?\n\nD"};
+export const bloomMail = (F, t = now()) => (paperState(F).blooms || []).filter(b => b.at <= t).map(b => ({id: b.id, from: "postie", at: b.at, title: "The seed tag came up", body: BLOOM[b.who] || BLOOM.mum}));
 
 /* ---------- panels ---------- */
 const coin = () => icon("coin", 13), shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
@@ -164,7 +197,10 @@ export function paperPanel(F, spot, o = {}){
       + (bag.length ? `<p class="eyebrow" style="margin:12px 0 6px">In your backpack</p><ul class="hlist wlist">${bag.map(id => `<li><span class="wpic">${icon(id, 30)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${F.inv[id]} with you</small></span><span class="orbtns">${btn("shelf", "Put back", true, id, "alt")}</span></li>`).join("")}</ul>` : "") + shut;
   }
   // the till
-  const d = o.day && p.sold[o.day];
-  return `<span class="tape gingham" aria-hidden="true"></span><h2>The paperie</h2><p class="sub">The sign on the door says <i>ouvert</i> while you're in Montrose. Browsers come in off the lane and take a sheet or two.</p>
-    <p class="muted">${d ? `Sold today: ${d.n} sheet${d.n === 1 ? "" : "s"}, ${d.coins} coins.` : "Nothing sold yet today."} ${p.made ? `${p.made} sheets made so far.` : ""}</p>` + shut;
+  const d = o.day && p.sold[o.day], kept = keeperHired(F);
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>The paperie</h2><p class="sub">${o.lise ? "Lise's at the till, folding a stack of tissue into little fans." : kept ? "Lise keeps the shop 10 till 5 (closed Mondays) and takes the dry sheets off the line." : "The sign on the door says <i>ouvert</i> while you're in Montrose. Browsers come in off the lane and take a sheet or two."}</p>
+    <p class="muted">${d ? `Today: ${d.n} sheet${d.n === 1 ? "" : "s"} sold${d.cls ? `, the card class (${d.cls} coins)` : ""}, ${d.coins} coins${d.wage ? `; Lise's wage ${d.wage}` : ""}.` : "Nothing sold yet today."} ${p.made ? `${p.made} sheets made so far.` : ""}</p>
+    ${paperSeason(o.day || "") ? `<p class="muted">It's a gift season: people are buying paper for cards and wrapping, twice as many as usual.</p>` : ""}
+    <p class="eyebrow" style="margin:12px 0 6px">Saturday card class</p><p class="muted">Saturdays 2 to 4: four people make cards at the big table, ${CLASS.fee} ${coin()} each, with four of your sheets. It runs if ${kept ? "Lise" : "you"}${kept ? " (or you)" : ""} ${kept ? "is" : "are"} here and there are four sheets on the shelves.</p>
+    ${kept ? "" : `<p class="eyebrow" style="margin:12px 0 6px">A keeper</p><p class="muted">Lise from the lanes could keep the shop while you're home: 10 till 5, closed Mondays, ${WAGE} ${coin()} for each day she opens. She'll sell slower than you, but she'll sell.</p><div class="actions"><button class="btn small primary" data-goal="paperkeeper" ${F.coins >= 600 ? "" : "disabled"}>Hire Lise (600 ${coin()})</button></div>`}` + shut;
 }
