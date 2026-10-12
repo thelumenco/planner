@@ -1921,7 +1921,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   // the upgrades catalogue: all ten, then what they do
   await at("12:00", "&ccpatch=ups"); await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
   await tap("ccounter", '#ctx [data-cc="ups"]'); await page.click('#ctx [data-cc="ups"]'); await page.waitForSelector('#ctx [data-cc="buyup"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-cc="buyup"]').count() === 10, "the Cocoa Room's catalogue lists ten upgrades");
+  check(await page.locator('#ctx [data-cc="buyup"]').count() === 14, "the Cocoa Room's catalogue lists fourteen upgrades (four of them bonbon moulds)");
   for (let i = 0; i < 10; i++) { const b = page.locator('#ctx [data-cc="buyup"]').first(); if (!(await b.count())) break; await b.click(); await page.waitForTimeout(250); }
   check(await fox().then(f => Object.keys(f.cocoa.up).length === 10 && f.coins === 10000 - 4450), "all ten bought (4450 coins)");
   await page.click('#ctx [data-cc="counter"]'); await page.waitForSelector('#ctx [data-cc="hot"]', { timeout: 15000 }); await page.click('#ctx [data-cc="hot"]'); await page.waitForTimeout(300);
