@@ -80,7 +80,7 @@ import { lavenderArt } from "../art/lavender.js";
 import { lavenderRoomArt } from "../art/lavender-rooms.js";
 import { tablelandsRoomArt } from "../art/tablelands-rooms.js";
 import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } from "./lunch.js";
-import { craftState, craft as millCraft, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
+import { craftState, craft as millCraft, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, fromBasket, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
 import { storePanel, putAway, takeOut, sendOff, storedCount, placeFor, homeNote, SHOPS as STORE_SHOPS, storeState } from "./storage.js";
 import { millUpArt } from "../art/millup.js";
 import { tastePanel, tasteStart, tastePick, tasteNext, tasteDone, finishTaste, tastingNow, workshopNow, workshopPanel, helpWorkshop, WORKSHOP } from "./millcraft.js";
@@ -1905,6 +1905,7 @@ function ctx(){
     else if (a === "make" || a === "again") { const r0 = a === "again" ? craftState(F).recipes.find(r => r.id === v) : null, kind = r0 ? r0.kind : mcSt.tab, base = r0 ? r0.base : mcSt.base || "goatmilk", adds = r0 ? r0.adds : mcSt.adds || [];
       const r = millCraft(F, kind, kind === "soap" ? base : null, adds); speak(r.msg, 5000); if (r.recipe) { sfx("chime"); gainXp(r.fresh ? 2 : 1); if (r.fresh) flash(`New: ${r.recipe.name}`); mcSt = {tab: kind}; save(); drawScene(); } }
     else if (a === "takeit") { if (takeFromStore(F, v, 1)) { sfx("tap"); save(); } }
+    else if (a === "unbasket") { const [id, n] = v.split(":"), k = fromBasket(F, id, +n || 99); if (k) { sfx("paper", true); flash(`${k} back into your backpack`); save(); } }
     else if (a === "basket") { const k = toBasket(F, v); if (k) { sfx("paper", true); speak(`${k} into the mill's basket, ready for the bench.`, 3500); save(); } }
     ctx(); });
   // round 153: the mulling pot (mulled.js)

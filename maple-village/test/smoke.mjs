@@ -3874,7 +3874,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(sg.shopsFor("honey_lav", () => true).some(s => s.k === "basket") && sg.shopsFor("goatmilk", () => true).some(s => s.k === "basket"), "honey and goat's milk can go to the mill's basket");
     sg.sendOff(F, "fridge", "honey_lav", "basket"); sg.sendOff(F, "fridge", "goatmilk", "basket");
     const r = mc.craft(F, "soap", "goatmilk", ["honey_lav"]);
-    check(r.recipe && r.recipe.name === "Lavender honey goat's milk soap" && !F.craft.basket.honey_lav && !F.craft.basket.goatmilk, "the bench makes soap straight from the basket: " + (r.recipe ? r.recipe.name : r.msg)); }
+    check(r.recipe && r.recipe.name === "Lavender honey goat's milk soap" && !F.craft.basket.honey_lav && !F.craft.basket.goatmilk, "the bench makes soap straight from the basket: " + (r.recipe ? r.recipe.name : r.msg));
+    mc.toBasket(F, "honey_lav"); F.inv.basil = 3; mc.toBasket(F, "basil"); const bp = mc.benchPanel(F, {tab: "basket"});
+    check(/data-mc="unbasket:basil:1"/.test(bp) && mc.fromBasket(F, "basil", 2) === 2 && F.inv.basil === 2 && F.craft.basket.basil === 1, "the basket lists what's in it, and things can be taken back out"); }
   { const ml = await import(new URL("../src/game/mulled.js", import.meta.url)), ic = await import(new URL("../src/art/icons.js", import.meta.url));
     const F = {inv: {sp_cinnamon: 2, sp_clove: 1, orange: 1}}, v = {shelf: [{id: "r", name: "Red", type: "red", n: 1}]};
     sg.putAway(F, "fridge", "sp_cinnamon"); check(sg.sendOff(F, "fridge", "sp_cinnamon", "rack") === 2 && F.mull.rack.sp_cinnamon === 2, "spices go from home to the spice rack by the mulling pot");

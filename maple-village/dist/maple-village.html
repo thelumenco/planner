@@ -25065,6 +25065,15 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     F2.inv[id] = (F2.inv[id] || 0) + k;
     return k;
   }
+  function fromBasket(F2, id, n = 99) {
+    const c = craftState(F2), k = Math.min(n, c.basket[id] || 0);
+    if (!k) return 0;
+    c.basket[id] -= k;
+    if (c.basket[id] <= 0) delete c.basket[id];
+    F2.inv = F2.inv || {};
+    F2.inv[id] = (F2.inv[id] || 0) + k;
+    return k;
+  }
   function toBasket(F2, herb2, n = 99) {
     const c = craftState(F2), k = Math.min(n, have(F2, herb2));
     if (!basketable(herb2) || !k) return 0;
@@ -25151,8 +25160,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     if (tab === "basket") {
       const herbs = [...Object.keys(HERB), "goatmilk"], inBag2 = herbs.filter((a) => have(F2, a)), bn = (a) => a === "goatmilk" ? "Goat's milk" : nm3(a);
-      return h3 + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk. The bench takes from it as well as your backpack, and Tomi infuses oil with the herbs while he's in, using the oils you've worked out. ${Object.keys(c.basket).length ? `In the basket: ${Object.entries(c.basket).map(([a, n]) => `${n} ${esc(bn(a).toLowerCase())}`).join(", ")}.` : "The basket's empty."}</p>
-      ${inBag2.length ? `<div class="actions">${inBag2.map((a) => `<button class="btn small alt" data-mc="basket:${a}">${a === "goatmilk" ? "" : dots2([a])} Put in ${have(F2, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack: rosemary, garlic, basil, thyme and chives from the greenhouse; lemons and oranges from Ma Ma's orchard; lavender from her flower farm.</p>`}` + shut7;
+      return h3 + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk. The bench takes from it as well as your backpack, and Tomi infuses oil with the herbs while he's in, using the oils you've worked out.</p>
+      <p class="eyebrow" style="margin:10px 0 6px">In the basket</p>${Object.keys(c.basket).some((a) => c.basket[a] > 0) ? `<ul class="hlist wlist">${Object.keys(c.basket).filter((a) => c.basket[a] > 0).map((a) => `<li><span class="wpic">${icon((ITEMS[a] || {}).ico || a, 28)}</span><span class="wtxt"><b>${esc(bn(a))}</b><small>${c.basket[a]} in the basket</small></span><span class="orbtns"><button class="btn small alt" data-mc="unbasket:${a}:1">Take 1</button><button class="btn small alt" data-mc="unbasket:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">The basket's empty.</p>`}
+      <p class="eyebrow" style="margin:10px 0 6px">From your backpack</p>
+      ${inBag2.length ? `<div class="actions">${inBag2.map((a) => `<button class="btn small alt" data-mc="basket:${a}">${a === "goatmilk" ? "" : dots2([a])} Put in ${have(F2, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack. Herbs come from the greenhouse, fruit from Ma Ma's orchard and the garden, flowers from her flower farm, honey from your hives and goat's milk from Wildflower Farm.</p>`}` + shut7;
     }
     const ok = HERB_OF(tab), base = st6.base || "goatmilk", pick5 = st6.adds || [];
     const busy2 = tab === "oil" ? c.steep.length >= CRAFT.jars : tab === "soap" ? c.cure.length >= CRAFT.rack : !!c.pot;
@@ -37213,6 +37224,13 @@ ${SIGNOFF[t2.who] || ""}`;
       } else if (a === "takeit") {
         if (takeFromStore(F, v, 1)) {
           sfx("tap");
+          save2();
+        }
+      } else if (a === "unbasket") {
+        const [id, n] = v.split(":"), k = fromBasket(F, id, +n || 99);
+        if (k) {
+          sfx("paper", true);
+          flash(`${k} back into your backpack`);
           save2();
         }
       } else if (a === "basket") {

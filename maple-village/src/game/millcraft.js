@@ -15,6 +15,7 @@
 //   pot: {id, start, dur} | null, store: {itemId: n}, basket: {herb: n}, oil: n (the mill's own plain bottles), sold}
 import { esc, dayKey } from "../util.js";
 import { ITEMS } from "../data/items.js";
+import { icon } from "../art/icons.js";
 
 export const CRAFT = {steep: 6*3600e3, cure: 24*3600e3, lotion: 3600e3, jars: 3, rack: 3, oilPer: 2, soapPer: 6, lotionPer: 3};
 export const HERB = {
@@ -82,6 +83,7 @@ export function craftDone(F, t = Date.now()){
 }
 export const storeCount = c => Object.values(c.store).reduce((a, b) => a + b, 0);
 export function takeFromStore(F, id, n = 1){ const c = craftState(F), k = Math.min(n, c.store[id] || 0); if (!k) return 0; c.store[id] -= k; if (!c.store[id]) delete c.store[id]; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + k; return k; }
+export function fromBasket(F, id, n = 99){ const c = craftState(F), k = Math.min(n, c.basket[id] || 0); if (!k) return 0; c.basket[id] -= k; if (c.basket[id] <= 0) delete c.basket[id]; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + k; return k; }
 export function toBasket(F, herb, n = 99){ const c = craftState(F), k = Math.min(n, have(F, herb)); if (!basketable(herb) || !k) return 0; take(F, herb, k); c.basket[herb] = (c.basket[herb] || 0) + k; return k; }
 
 /* ---------- Tomi at the press, and Hazel at the shop (both on the clock) ---------- */
@@ -131,8 +133,10 @@ export function benchPanel(F, st = {}, o = {}){
       ${c.steep.length || c.cure.length || c.pot ? `<p class="eyebrow" style="margin:10px 0 6px">On the go</p><ul class="hlist wlist">${jobs(c.steep, "steeping")}${jobs(c.cure, "curing")}${c.pot ? jobs([c.pot], "warming") : ""}</ul>` : ""}
       <p class="muted">Plain oil in the mill: ${c.oil} bottle${c.oil === 1 ? "" : "s"}${o.ines ? " (Tomi presses the olive crate while he's in)" : ""}.</p>` + shut; }
   if (tab === "basket") { const herbs = [...Object.keys(HERB), "goatmilk"], inBag = herbs.filter(a => have(F, a)), bn = a => a === "goatmilk" ? "Goat's milk" : nm(a);
-    return h + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk. The bench takes from it as well as your backpack, and Tomi infuses oil with the herbs while he's in, using the oils you've worked out. ${Object.keys(c.basket).length ? `In the basket: ${Object.entries(c.basket).map(([a, n]) => `${n} ${esc(bn(a).toLowerCase())}`).join(", ")}.` : "The basket's empty."}</p>
-      ${inBag.length ? `<div class="actions">${inBag.map(a => `<button class="btn small alt" data-mc="basket:${a}">${a === "goatmilk" ? "" : dots([a])} Put in ${have(F, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack: rosemary, garlic, basil, thyme and chives from the greenhouse; lemons and oranges from Ma Ma's orchard; lavender from her flower farm.</p>`}` + shut; }
+    return h + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk. The bench takes from it as well as your backpack, and Tomi infuses oil with the herbs while he's in, using the oils you've worked out.</p>
+      <p class="eyebrow" style="margin:10px 0 6px">In the basket</p>${Object.keys(c.basket).some(a => c.basket[a] > 0) ? `<ul class="hlist wlist">${Object.keys(c.basket).filter(a => c.basket[a] > 0).map(a => `<li><span class="wpic">${icon((ITEMS[a] || {}).ico || a, 28)}</span><span class="wtxt"><b>${esc(bn(a))}</b><small>${c.basket[a]} in the basket</small></span><span class="orbtns"><button class="btn small alt" data-mc="unbasket:${a}:1">Take 1</button><button class="btn small alt" data-mc="unbasket:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">The basket's empty.</p>`}
+      <p class="eyebrow" style="margin:10px 0 6px">From your backpack</p>
+      ${inBag.length ? `<div class="actions">${inBag.map(a => `<button class="btn small alt" data-mc="basket:${a}">${a === "goatmilk" ? "" : dots([a])} Put in ${have(F, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack. Herbs come from the greenhouse, fruit from Ma Ma's orchard and the garden, flowers from her flower farm, honey from your hives and goat's milk from Wildflower Farm.</p>`}` + shut; }
   const ok = HERB_OF(tab), base = st.base || "goatmilk", pick = st.adds || [];
   const busy = tab === "oil" ? c.steep.length >= CRAFT.jars : tab === "soap" ? c.cure.length >= CRAFT.rack : !!c.pot;
   h += `<p class="sub">${tab === "oil" ? `Two bottles of olive oil and one or two herbs or fruits, steeped for six hours: two bottles of infused oil. You've ${oilHave(F, c)} bottle${oilHave(F, c) === 1 ? "" : "s"} of plain oil (backpack and mill).` : tab === "soap" ? `Goat's milk (two) or olive oil (one), and one or two things to go in. A day on the curing rack: six bars.` : `A goat's milk, a bottle of olive oil and one scent. An hour in the little pot: three jars.`}</p>`;
