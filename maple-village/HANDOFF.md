@@ -2340,3 +2340,9 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - Goal `giftshop` (800, goals.js), door station `giftdoor` (slot Y [40,556], level with the terrace door) in the wine shop's bottom-left; INNER.giftshop, ROOMS.giftshop (gcase bonboncase, gbars giftbars, gmill giftmill, gwine wineshelf, gtill gifttill). Exit door on the east wall back to the wine shop.
 - game/giftshop.js: everything is shared stock (Cocoa Room display trays and bar wall, the mill's store, the wine shop's shelf). `giftSellMinute` mode mel .08 / keeper .05 (Posy 10–6, closed Mondays), run in core millTick's minute loop; tally `F.giftshop.sold[day]`. Once owned, the wine shop's mill crate goes and the gift shop sells the mill goods instead.
 - Posy (npcs.js) keeps it. Later (planned, not built): gallery wall for sip-and-paint paintings, local makers on consignment, small imports from trips (relationship-based and slow, never a money tap).
+
+## Round 179: pairing boxes sell in the gift shop
+- Mel packs them herself at the bonbon table, as before (cocoa.js `packPairing`: a bottle + 4 bonbons → `inv.pairbox`). Each pack also pushes its worth (bottle price + 4 × bonbon price) onto `cocoa.pairVals` (trimmed to the backpack count when used; older boxes fall back to 18 + 4 bonbons).
+- Gift shop wine corner (`gwine`): "Put out 1 / All" and "Take 1 back" (`data-gp`, wired in core.js under the ctx render). Out boxes live in `F.giftshop.pairs` (one price each).
+- `giftSellMinute`: when boxes are out, a sale is a pairing box 12% of the time, 35% in `pairSeason` (Feb 1-14, May 1-14, Dec 1-24). Sells for exactly its parts, no markup. Till shows "N pairing boxes".
+- Test block "Pairing boxes in the gift shop (round 179)".

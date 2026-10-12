@@ -190,7 +190,9 @@ export function wineToPantry(F, shelfId){
 // a pairing box: a bottle of Mel's wine and 4 bonbons from the case, ribboned together (gift "pairbox")
 export function packPairing(F, shelfId){
   const c = cocoaState(F), b = wineShelf(F).find(x => x.id === shelfId); if (!b || caseCount(c) < 4) return null;
-  b.n--; pick(c, 4); F.inv.pairbox = (F.inv.pairbox || 0) + 1; return b.name;
+  b.n--; pick(c, 4); F.inv.pairbox = (F.inv.pairbox || 0) + 1;
+  c.pairVals = [...(c.pairVals || []), (b.price || 0) + 4*c.prices.bonbon];   // what each packed box is worth in the gift shop: the bottle plus 4 bonbons
+  return b.name;
 }
 
 /* ---------- the Scoop Shack's house chocolate ---------- */
@@ -419,7 +421,7 @@ export function counterBonbons(F){
 }
 function pairing(F, have){
   const wines = wineShelf(F).slice(0, 4); if (!wines.length) return "";
-  return `<p class="eyebrow" style="margin:12px 0 6px">Wine pairing box</p><p class="muted">A bottle from the wine shop and 4 bonbons from the case, to give.</p><div class="actions">${wines.map(b => `<button class="btn small alt" data-cc="pair" data-k="${esc(b.id)}" ${have >= 4 ? "" : "disabled"}>With ${esc(b.name)}</button>`).join("")}</div>`;
+  return `<p class="eyebrow" style="margin:12px 0 6px">Wine pairing box</p><p class="muted">A bottle from the wine shop and 4 bonbons from the case, to give, or to put out in the gift shop.</p><div class="actions">${wines.map(b => `<button class="btn small alt" data-cc="pair" data-k="${esc(b.id)}" ${have >= 4 ? "" : "disabled"}>With ${esc(b.name)}</button>`).join("")}</div>`;
 }
 function giveSpecials(c){
   const have = Object.values(SPECIALS).filter(x => c.specials[x.id] > 0); if (!have.length) return "";

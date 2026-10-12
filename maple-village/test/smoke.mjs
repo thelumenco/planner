@@ -3989,6 +3989,20 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(gs.giftSellMinute(F, "2026-10-14", 11*60, null, o) === 0, "shut, it sells nothing");
   check(/shared stock/.test(gs.giftPanel(F, "gtill", {...o, day: "2026-10-14", hm: 11*60, keeper: true})) && /Dark Honey Heart|Nothing in the Cocoa Room/.test(gs.giftPanel(F, "gcase", {...o, day: "2026-10-14"})), "the till and the bonbon case panels");
 }
+{
+  console.log("\nPairing boxes in the gift shop (round 179)");
+  const gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url));
+  const F = {goals: {cocoa: 1, vineyard: 1}, inv: {}, vine: {shelf: [{id: "w", name: "Red", type: "red", n: 3, price: 18}]}}, c = cc.cocoaState(F);
+  c.bonbons.push({id: "b1", shell: "dark", fills: ["honey"], name: "Dark Honey Heart", col: "#F3C969"}); c.trays.b1 = 8; c.display = ["b1"];
+  check(cc.packPairing(F, "w") && F.inv.pairbox === 1 && c.pairVals[0] === 18 + 4*c.prices.bonbon, "a packed box is worth its bottle plus 4 bonbons");
+  const o = {F, day: "2026-10-14", cocoa: c, onDisplay: cc.onDisplay, store: {}, v: F.vine};
+  check(/data-gp="put"/.test(gs.giftPanel(F, "gwine", o)), "the wine corner offers to put it out");
+  check(gs.putOutPairs(F, c, 1) === 1 && !F.inv.pairbox && F.giftshop.pairs[0] === 18 + 4*c.prices.bonbon, "put out, at the price of what went into it");
+  check(gs.takeBackPair(F, c) === 1 && F.inv.pairbox === 1 && !F.giftshop.pairs.length && gs.putOutPairs(F, c) === 1, "and taken back, and out again");
+  check(gs.pairSeason("2026-02-10") && gs.pairSeason("2026-12-20") && !gs.pairSeason("2026-10-14"), "busier before Valentine's, Mother's Day and Christmas");
+  const real = Math.random; Math.random = () => .01; const got = gs.giftSellMinute(F, "2026-10-14", 11*60, "keeper", o); Math.random = real;
+  check(got === 18 + 4*c.prices.bonbon && !F.giftshop.pairs.length && F.giftshop.sold["2026-10-14"].pair === 1 && /pairing boxes/.test(gs.giftPanel(F, "gtill", {...o, hm: 11*60})), "it sells as a box, for no more than its parts");
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");
