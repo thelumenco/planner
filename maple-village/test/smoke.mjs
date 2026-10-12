@@ -3976,6 +3976,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(cc.makeBonbons(F, "dark", ["honey"], "dome").r.name === b.r.base, "back in the dome, back to its old name");
   check(/data-cc="bshape"/.test(cc.bonbonPanel(F, {})), "the moulds are on the bonbon table");
 }
+{
+  console.log("\nThe gift shop (round 178)");
+  const gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), go = await import(new URL("../src/game/goals.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url));
+  check(go.GOALS.giftshop && go.GOALS.giftshop.price === 800 && np.NPCS.some(n => n.id === "posy" && n.routine.some(r => r.scene === "giftshop" && r.needs === "giftshop")), "the gift shop (800 coins), with Posy at the till");
+  check(gs.keeperOn("2026-10-14", 11*60) && !gs.keeperOn("2026-10-12", 11*60) && !gs.keeperOn("2026-10-14", 19*60), "Posy's in 10 till 6, every day but Monday");
+  const F = {goals: {cocoa: 1}}, c = cc.cocoaState(F); c.bars.dark = 1; c.bonbons.push({id: "b1", shell: "dark", fills: ["honey"], name: "Dark Honey Heart", col: "#F3C969"}); c.trays.b1 = 2; c.display = ["b1"];
+  const store = {mc_x: 1}, v = {shelf: [{id: "w", name: "Red", type: "red", n: 1, price: 18}]}, o = {cocoa: c, onDisplay: cc.onDisplay, store, v};
+  const real = Math.random; let k = 0; Math.random = () => (k++ % 2 ? .99 : .01); let coins = 0; for (let i = 0; i < 12; i++) coins += gs.giftSellMinute(F, "2026-10-14", 11*60, "keeper", o); Math.random = real;
+  const left = gs.stockOf(o);
+  check(coins > 0 && F.giftshop.sold["2026-10-14"].n >= 1 && (c.trays.b1 < 2 || c.bars.dark < 1 || !store.mc_x || v.shelf[0].n < 1), "it sells from the same stock: the Cocoa Room's trays and bars, the mill's shelves, the wine shop's bottles");
+  check(gs.giftSellMinute(F, "2026-10-14", 11*60, null, o) === 0, "shut, it sells nothing");
+  check(/shared stock/.test(gs.giftPanel(F, "gtill", {...o, day: "2026-10-14", hm: 11*60, keeper: true})) && /Dark Honey Heart|Nothing in the Cocoa Room/.test(gs.giftPanel(F, "gcase", {...o, day: "2026-10-14"})), "the till and the bonbon case panels");
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");
