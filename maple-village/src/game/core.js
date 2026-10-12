@@ -80,7 +80,7 @@ import { lavenderArt } from "../art/lavender.js";
 import { lavenderRoomArt } from "../art/lavender-rooms.js";
 import { tablelandsRoomArt } from "../art/tablelands-rooms.js";
 import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } from "./lunch.js";
-import { craftState, craft as millCraft, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, fromBasket, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
+import { craftState, craft as millCraft, renderWax, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, fromBasket, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
 import { hamperSeason, xmasState, TREATS, treatsHTML, mulledStallPanel, treePanel, treeLit, countdownDue, myStallPanel as xmStallPanel, putOut, takeBack as xmTakeBack, putWine, takeWine, stallSellMinute, registerHampers, hamperPanel, packStart, packAdd, packWine, packRemove, packTie, singCarol, lanternWalk, grottoPanel, grottoVisit, sendHamper, hamperMail, collectReplies, fillOrder } from "./xmas.js";
 import { giftPanel, giftSellMinute, keeperOn as giftKeeperOn, putOutPairs, takeBackPair, putWrapped, giftState } from "./giftshop.js";
 import * as PP from "./paperie.js";
@@ -1925,9 +1925,11 @@ function ctx(){
   c.querySelectorAll("[data-mc]").forEach(b => b.onclick = () => { const i = b.dataset.mc.indexOf(":"), a = i < 0 ? b.dataset.mc : b.dataset.mc.slice(0, i), v = i < 0 ? "" : b.dataset.mc.slice(i + 1);
     if (a === "tab") { mcSt = {tab: v}; sfx("tap"); }
     else if (a === "base") { mcSt.base = v; sfx("tap"); }
+    else if (a === "dye") { mcSt.dye = v || null; sfx("tap"); }   // round 187: a flower for the colour
+    else if (a === "render") { const k = renderWax(F); if (k) { sfx("chime"); speak(`The comb melts down in the little pan, honey on the bottom, gold wax on top. ${k} blocks of beeswax.`, 4500); save(); } }
     else if (a === "add") { const max = (CRAFT_KINDS[mcSt.tab] || {max: 1}).max; mcSt.adds = mcSt.adds || []; if (mcSt.adds.includes(v)) mcSt.adds = mcSt.adds.filter(x => x !== v); else { if (mcSt.adds.length >= max) mcSt.adds.shift(); mcSt.adds.push(v); } sfx("tap"); }
     else if (a === "make" || a === "again") { const r0 = a === "again" ? craftState(F).recipes.find(r => r.id === v) : null, kind = r0 ? r0.kind : mcSt.tab, base = r0 ? r0.base : mcSt.base || "goatmilk", adds = r0 ? r0.adds : mcSt.adds || [];
-      const r = millCraft(F, kind, kind === "soap" ? base : null, adds); speak(r.msg, 5000); if (r.recipe) { sfx("chime"); gainXp(r.fresh ? 2 : 1); if (r.fresh) flash(`New: ${r.recipe.name}`); mcSt = {tab: kind}; save(); drawScene(); } }
+      const r = millCraft(F, kind, kind === "soap" ? base : null, adds, "bag", r0 ? r0.dye || null : mcSt.dye || null); speak(r.msg, 5000); if (r.recipe) { sfx("chime"); gainXp(r.fresh ? 2 : 1); if (r.fresh) flash(`New: ${r.recipe.name}`); mcSt = {tab: kind}; save(); drawScene(); } }
     else if (a === "takeit") { if (takeFromStore(F, v, 1)) { sfx("tap"); save(); } }
     else if (a === "unbasket") { const [id, n] = v.split(":"), k = fromBasket(F, id, +n || 99); if (k) { sfx("paper", true); flash(`${k} back into your backpack`); save(); } }
     else if (a === "basket") { const k = toBasket(F, v); if (k) { sfx("paper", true); speak(`${k} into the mill's basket, ready for the bench.`, 3500); save(); } }

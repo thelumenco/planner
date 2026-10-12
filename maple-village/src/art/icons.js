@@ -1,5 +1,6 @@
 import { TOWN_GOODS } from "../data/towns.js";
 import { paperIcon, wrapIcon } from "./paper-icons.js";
+import { lipIcon } from "./lip-icons.js";
 import { TREES, FLOWERS } from "../data/orchard.js";
 import { GOODS } from "../data/stall-goods.js";
 // Hand-drawn icon set (ink outline + marker fill, same look as the map). No emoji anywhere in the game.
@@ -118,7 +119,8 @@ const art = name => {
       `<path d="M5 3h14l-1 18H6zM5 6.5h14"/><path d="M7 4.8h1.5M10 4.8h1.5M13 4.8h1.5" stroke-dasharray="1 1"/><g transform="translate(7 8) scale(.42)" stroke-width="2.6">${inner[1]}</g>`];
   }
   if (!I[name] && name.startsWith("pp")) { const pi = paperIcon(name); if (pi) return pi; }
-  if (!I[name] && /^(wrp_|rb_|tag_|stamp_)/.test(name)) { const wi = wrapIcon(name); if (wi) return wi; }   // round 185: wrapping   // round 183: the paperie's batch at every step
+  if (!I[name] && /^(wrp_|rb_|tag_|stamp_)/.test(name)) { const wi = wrapIcon(name); if (wi) return wi; }   // round 185: wrapping
+  if (!I[name] && /^(balm_|lipoil_|beeswax$)/.test(name)) { const li = lipIcon(name); if (li) return li; }   // round 187: lip balms and oils   // round 183: the paperie's batch at every step
   return I[name] || I.sparkle;
 };
 const body = name => { const [a, l] = art(name); return `<g filter="url(#markerS)">${a}</g><g filter="url(#wobS)" fill="none" stroke="var(--line)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">${l}</g>`; };

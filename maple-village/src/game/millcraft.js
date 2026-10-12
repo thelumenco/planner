@@ -16,8 +16,9 @@
 import { esc, dayKey } from "../util.js";
 import { ITEMS } from "../data/items.js";
 import { icon } from "../art/icons.js";
+import { FLOWERS } from "../data/orchard.js";
 
-export const CRAFT = {steep: 6*3600e3, cure: 24*3600e3, lotion: 3600e3, jars: 3, rack: 3, oilPer: 2, soapPer: 6, lotionPer: 3};
+export const CRAFT = {steep: 6*3600e3, cure: 24*3600e3, lotion: 3600e3, jars: 3, rack: 3, oilPer: 2, soapPer: 6, lotionPer: 3, balm: 3600e3, balmPer: 4, lipoil: 24*3600e3, lipoilPer: 3, rollers: 2, waxPer: 2};
 export const HERB = {
   rosemary: {n: "Rosemary", col: "#6E8A5A", oil: true, soap: true}, garlic: {n: "Garlic", col: "#EDE6D0", oil: true}, basil: {n: "Basil", col: "#4E8A4E", oil: true},
   thyme: {n: "Thyme", col: "#8AA06A", oil: true, soap: true}, chives: {n: "Chives", col: "#5E9A4A", oil: true}, mint: {n: "Mint", col: "#7FCBA4", soap: true, lotion: true},
@@ -33,16 +34,34 @@ export const HERB = {
   honey_sun: {n: "Sunflower honey", col: "#F3C93A", soap: true, lotion: true}, honey_heath: {n: "Heath honey", col: "#C9A060", soap: true, lotion: true},
   euchoney: {n: "Eucalyptus honey", col: "#C98A2E", soap: true, lotion: true}
 };
-export const KINDS = {oil: {n: "Infused oils", max: 2, price: 28, sell: 24}, soap: {n: "Soaps", max: 2, price: 8, sell: 6}, lotion: {n: "Lotions", max: 1, price: 16, sell: 13}};   // (every recipe sells for more than its ingredients cost: smoke test)
+export const KINDS = {oil: {n: "Infused oils", max: 2, price: 28, sell: 24}, soap: {n: "Soaps", max: 2, price: 8, sell: 6}, lotion: {n: "Lotions", max: 1, price: 16, sell: 13},
+  balm: {n: "Lip balms", max: 1, price: 6, sell: 5}, lipoil: {n: "Lip oils", max: 1, price: 10, sell: 8}};
+// round 187 (Mel: "can lip balms and lip oils be part of the mill shop offers... and they can be dyed by the flowers I have"):
+//   beeswax  melted down from honeycomb at the bench (one comb, two blocks), or a block from Sunflower Hill's honey house
+//   balm     a block of beeswax, a bottle of olive oil and one flavour, and if she likes a flower for the colour: an hour
+//            setting in the tins, four tins
+//   lip oil  a bottle of olive oil, one flavour and (if she likes) a flower: a day steeping in the rollers, three bottles
+// The dye is a stem of any flower from Ma Ma's flower farm (its shed), or a tulip or sunflower from Mel's garden; the
+// tin's lid and the oil take its colour.
+for (const a of ["honey", "honey_lav", "honey_blossom", "honey_cream", "honey_sun", "honey_heath", "euchoney", "mint", "orange", "lemon", "bq_lavender", "bq_rose", "strawberry", "bq_sweetpea", "bq_camellia"]) if (HERB[a]) Object.assign(HERB[a], {balm: true, lipoil: true});
+if (HERB.raspberry) HERB.raspberry.lipoil = true;
+ITEMS.beeswax = Object.assign(ITEMS.beeswax || {}, {n: "A block of beeswax", kind: "ingredient", ico: "beeswax", price: 4, sell: 2});
+export const dyeHave = (F, d) => (((F.orch || {}).stock || {})["stem:" + d] || 0) + ((F.inv || {})[d] && ITEMS[d] && ITEMS[d].kind === "flower" ? F.inv[d] : 0);
+const useDye = (F, d) => { if ((F.inv || {})[d] > 0 && ITEMS[d] && ITEMS[d].kind === "flower") { F.inv[d]--; if (!F.inv[d]) delete F.inv[d]; return; } F.orch.stock["stem:" + d]--; if (F.orch.stock["stem:" + d] <= 0) delete F.orch.stock["stem:" + d]; };
+const capW = w => w[0].toUpperCase() + w.slice(1);   // (every recipe sells for more than its ingredients cost: smoke test)
 export function craftState(F){ F.craft = F.craft || {}; const c = F.craft; c.recipes = c.recipes || []; c.steep = c.steep || []; c.cure = c.cure || []; if (!("pot" in c)) c.pot = null;
   c.store = c.store || {}; c.basket = c.basket || {}; c.oil = c.oil || 0; c.sold = c.sold || {}; return c; }
-const keyOf = (kind, base, adds) => `${kind}_${base ? base + "_" : ""}${[...adds].sort().join("-")}`;
+const keyOf = (kind, base, adds, dye) => `${kind}_${base ? base + "_" : ""}${[...adds].sort().join("-")}${dye ? "~" + dye : ""}`;
 const nm = a => HERB[a].n;
-export function craftName(kind, base, adds){ const a = [...adds].sort().map(nm), list = a.length === 2 ? `${a[0]} & ${a[1]}` : a[0];
+export function craftName(kind, base, adds, dye){ const a = [...adds].sort().map(nm), list = a.length === 2 ? `${a[0]} & ${a[1]}` : a[0];
+  if (kind === "balm" || kind === "lipoil") return `${dye && FLOWERS[dye] ? `${capW(FLOWERS[dye].one)}-tinted ${list.toLowerCase()}` : list} ${kind === "balm" ? "lip balm" : "lip oil"}`;
   return kind === "oil" ? `${list} olive oil` : kind === "lotion" ? `${list} hand lotion` : `${list} ${base === "goatmilk" ? "goat's milk" : "olive oil"} soap`; }
 export const itemId = r => "mc_" + r.id;
 // each recipe is an item: something to keep, give, or sell (the gelato's way, scoop.js registerItems)
 export function registerCraft(F){ craftState(F).recipes.forEach(r => { const k = KINDS[r.kind], extra = Math.max(0, r.adds.length - 1);
+  if (r.kind === "balm" || r.kind === "lipoil") { const b = r.kind === "balm"; ITEMS[itemId(r)] = {n: `${b ? "A tin" : "A bottle"} of ${r.name.toLowerCase()}`, kind: "gift", to: ["mum", "angelina", "mama"], crafted: true, mill: r.kind,
+    price: k.price + (r.dye ? 1 : 0), sell: k.sell + (r.dye ? 1 : 0), ico: `${r.kind}_${r.dye || "none"}`,
+    say: b ? `Lip balm! ${r.dye ? "And it's tinted, so pretty. " : ""}It smells like ${HERB[r.adds[0]] ? HERB[r.adds[0]].n.toLowerCase() : "honey"}.` : `A lip oil! ${r.dye ? "Look at the colour. " : ""}It's going straight in my handbag.`}; return; }
   ITEMS[itemId(r)] = {n: r.kind === "soap" ? `A bar of ${r.name.toLowerCase()}` : r.kind === "lotion" ? `A jar of ${r.name.toLowerCase()}` : `A bottle of ${r.name.toLowerCase()}`, kind: "gift", to: "family", crafted: true, mill: r.kind,
     price: k.price + extra*2, sell: k.sell + extra*2, ico: r.kind === "oil" ? "olives" : r.kind === "soap" ? "soap_oat" : "honey",
     say: r.kind === "oil" ? `Your own ${r.name.toLowerCase()}! On bread, tonight. Thank you!` : r.kind === "soap" ? `Handmade ${r.name.toLowerCase()}? It smells beautiful.` : `${r.name}! My hands needed this. Thank you.`}; }); }
@@ -52,24 +71,32 @@ const take = (F, id, n = 1) => { F.inv[id] -= n; if (F.inv[id] <= 0) delete F.in
 const oilHave = (F, c) => have(F, "oliveoil") + c.oil;
 // round 168: the mill's basket holds anything the bench uses (herbs, fruit, flowers, honey, goat's milk); the bench
 // takes from the backpack first, then the basket. (Tomi still only infuses oils from it.)
-export const basketable = id => !!HERB[id] || id === "goatmilk" || id === "oliveoil";   // (olive oil goes in with the mill's own bottles, round 175)
+export const basketable = id => !!HERB[id] || id === "goatmilk" || id === "oliveoil" || id === "beeswax";   // (olive oil goes in with the mill's own bottles, round 175)
 const got = (F, c, id) => have(F, id) + (c.basket[id] || 0);
 const use = (F, c, id, n = 1) => { const a = Math.min(n, have(F, id)); if (a) take(F, id, a); if (n - a) { c.basket[id] -= n - a; if (c.basket[id] <= 0) delete c.basket[id]; } };
 const useOil = (F, c, n) => { const a = Math.min(n, have(F, "oliveoil")); if (a) take(F, "oliveoil", a); c.oil -= n - a; };
 // make something: kind oil|soap|lotion, base (soap: goatmilk|oliveoil), adds from the backpack -> {recipe, fresh, msg}
-export function craft(F, kind, base, adds, src = "bag"){
+// round 187: melt honeycomb down into beeswax -> blocks made
+export function renderWax(F){ const c = craftState(F); if (!(got(F, c, "honeycomb") > 0)) return 0; use(F, c, "honeycomb"); F.inv = F.inv || {}; F.inv.beeswax = (F.inv.beeswax || 0) + CRAFT.waxPer; return CRAFT.waxPer; }
+export function craft(F, kind, base, adds, src = "bag", dye = null){
   const c = craftState(F), K = KINDS[kind]; adds = [...new Set(adds)].filter(a => HERB[a] && HERB[a][kind]);
+  if (dye && (!FLOWERS[dye] || !(kind === "balm" || kind === "lipoil"))) dye = null;
   if (!K || !adds.length || adds.length > K.max) return {msg: kind === "lotion" ? "One scent for a lotion." : "One or two things to go in."};
   if (adds.some(a => !((src === "basket" ? c.basket[a] || 0 : got(F, c, a)) > 0))) return {msg: "You're missing something for that."};
   if (kind === "oil") { if (c.steep.length >= CRAFT.jars) return {msg: "All three steeping jars are full."}; if (oilHave(F, c) < CRAFT.oilPer) return {msg: "You'll need two bottles of olive oil (press some downstairs)."}; useOil(F, c, CRAFT.oilPer); base = null; }
   else if (kind === "soap") { if (c.cure.length >= CRAFT.rack) return {msg: "The curing rack's full."}; if (base === "goatmilk" ? got(F, c, "goatmilk") < 2 : oilHave(F, c) < 1) return {msg: base === "goatmilk" ? "You'll need two goat's milk, from Wildflower Farm." : "You'll need a bottle of olive oil."}; if (base === "goatmilk") use(F, c, "goatmilk", 2); else useOil(F, c, 1); }
+  else if (kind === "balm") { if (c.balm) return {msg: "There's a tray of balm setting already."}; if (got(F, c, "beeswax") < 1 || oilHave(F, c) < 1) return {msg: "A lip balm needs a block of beeswax (melt down some honeycomb) and a bottle of olive oil."};
+    if (dye && !(dyeHave(F, dye) > 0)) return {msg: "No stems of that flower left."}; use(F, c, "beeswax"); useOil(F, c, 1); base = null; }
+  else if (kind === "lipoil") { c.lipoil = c.lipoil || []; if (c.lipoil.length >= CRAFT.rollers) return {msg: "Both roller trays are steeping."}; if (oilHave(F, c) < 1) return {msg: "A lip oil needs a bottle of olive oil."};
+    if (dye && !(dyeHave(F, dye) > 0)) return {msg: "No stems of that flower left."}; useOil(F, c, 1); base = null; }
   else { if (c.pot) return {msg: "There's a lotion in the pot already."}; if (got(F, c, "goatmilk") < 1 || oilHave(F, c) < 1) return {msg: "A lotion needs a goat's milk and a bottle of olive oil."}; use(F, c, "goatmilk"); useOil(F, c, 1); base = null; }
   adds.forEach(a => { if (src === "basket") { c.basket[a]--; if (c.basket[a] <= 0) delete c.basket[a]; } else use(F, c, a); });
-  const id = keyOf(kind, base, adds); let r = c.recipes.find(x => x.id === id), fresh = false;
-  if (!r) { fresh = true; r = {id, kind, base, adds: [...adds].sort(), name: craftName(kind, base, adds), found: dayKey()}; c.recipes.push(r); registerCraft(F); }
-  const job = {id, start: Date.now(), dur: kind === "oil" ? CRAFT.steep : kind === "soap" ? CRAFT.cure : CRAFT.lotion};
-  if (kind === "oil") c.steep.push(job); else if (kind === "soap") c.cure.push(job); else c.pot = job;
-  const when = kind === "oil" ? "steeping: ready in six hours" : kind === "soap" ? "on the curing rack for a day" : "warming in the little pot: an hour";
+  if (dye) useDye(F, dye);
+  const id = keyOf(kind, base, adds, dye); let r = c.recipes.find(x => x.id === id), fresh = false;
+  if (!r) { fresh = true; r = {id, kind, base, adds: [...adds].sort(), ...(dye ? {dye} : {}), name: craftName(kind, base, adds, dye), found: dayKey()}; c.recipes.push(r); registerCraft(F); }
+  const job = {id, start: Date.now(), dur: kind === "oil" ? CRAFT.steep : kind === "soap" ? CRAFT.cure : kind === "balm" ? CRAFT.balm : kind === "lipoil" ? CRAFT.lipoil : CRAFT.lotion};
+  if (kind === "oil") c.steep.push(job); else if (kind === "soap") c.cure.push(job); else if (kind === "balm") c.balm = job; else if (kind === "lipoil") c.lipoil.push(job); else c.pot = job;
+  const when = kind === "oil" ? "steeping: ready in six hours" : kind === "soap" ? "on the curing rack for a day" : kind === "balm" ? "poured into the tins to set: an hour" : kind === "lipoil" ? "steeping in the rollers: ready tomorrow" : "warming in the little pot: an hour";
   return {recipe: r, fresh, msg: fresh ? `Something new: ${r.name}! It's ${when}.` : `${r.name} again: ${when}.`};
 }
 const left = (j, t = Date.now()) => Math.max(0, j.start + j.dur - t);
@@ -79,6 +106,8 @@ export function craftDone(F, t = Date.now()){
   c.steep = c.steep.filter(j => left(j, t) ? true : (put(j, CRAFT.oilPer), false));
   c.cure = c.cure.filter(j => left(j, t) ? true : (put(j, CRAFT.soapPer), false));
   if (c.pot && !left(c.pot, t)) { put(c.pot, CRAFT.lotionPer); c.pot = null; }
+  if (c.balm && !left(c.balm, t)) { put(c.balm, CRAFT.balmPer); c.balm = null; }
+  if (c.lipoil) c.lipoil = c.lipoil.filter(j => left(j, t) ? true : (put(j, CRAFT.lipoilPer), false));
   return out;
 }
 export const storeCount = c => Object.values(c.store).reduce((a, b) => a + b, 0);
@@ -127,7 +156,7 @@ const dots = adds => `<span class="mullsw">${adds.map(a => `<i style="background
 const mins = ms => { const m = Math.max(1, Math.ceil(ms/60000)); return m >= 60 ? `${Math.floor(m/60)}h ${m % 60}m` : `${m}m`; };
 export function benchPanel(F, st = {}, o = {}){
   const c = craftState(F), tab = st.tab || "oil", K = KINDS[tab] || null;
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The workbench</h2><div class="tabs" role="tablist">${[["oil", "Oils"], ["soap", "Soaps"], ["lotion", "Lotions"], ["shelves", "Shelves"], ["basket", "Basket"]].map(([k, n]) => `<button role="tab" data-mc="tab:${k}" aria-selected="${k === tab}">${n}</button>`).join("")}</div>`;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The workbench</h2><div class="tabs" role="tablist">${[["oil", "Oils"], ["soap", "Soaps"], ["lotion", "Lotions"], ["balm", "Lip balms"], ["lipoil", "Lip oils"], ["shelves", "Shelves"], ["basket", "Basket"]].map(([k, n]) => `<button role="tab" data-mc="tab:${k}" aria-selected="${k === tab}">${n}</button>`).join("")}</div>`;
   const jobs = (list, what) => list.map(j => { const r = c.recipes.find(x => x.id === j.id) || {name: "?"}; return `<li><span class="wtxt"><b>${esc(r.name)}</b><small>${what} · ready in ${mins(left(j))}</small></span></li>`; }).join("");
   if (tab === "shelves") { const ids = Object.keys(c.store);
     return h + `<p class="sub">Everything made, on the mill's shelves. ${o.shop ? "Hazel sells from here, downstairs." : "The wine shop sells a little of it from a shelf by the counter: open the Mill Shop downstairs to sell it all day."} Take some for yourself, or to give away.</p>
@@ -140,7 +169,23 @@ export function benchPanel(F, st = {}, o = {}){
       <p class="eyebrow" style="margin:10px 0 6px">From your backpack</p>
       ${inBag.length ? `<div class="actions">${inBag.map(a => `<button class="btn small alt" data-mc="basket:${a}">${HERB[a] ? dots([a]) : ""} Put in ${have(F, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack. Herbs come from the greenhouse, fruit from Ma Ma's orchard and the garden, flowers from her flower farm, honey from your hives and goat's milk from Wildflower Farm.</p>`}` + shut; }
   const ok = HERB_OF(tab), base = st.base || "goatmilk", pick = st.adds || [];
-  const busy = tab === "oil" ? c.steep.length >= CRAFT.jars : tab === "soap" ? c.cure.length >= CRAFT.rack : !!c.pot;
+  const lip = tab === "balm" || tab === "lipoil", rollers = c.lipoil || [];
+  const busy = tab === "oil" ? c.steep.length >= CRAFT.jars : tab === "soap" ? c.cure.length >= CRAFT.rack : tab === "balm" ? !!c.balm : tab === "lipoil" ? rollers.length >= CRAFT.rollers : !!c.pot;
+  if (lip) { const wax = got(F, c, "beeswax"), comb = got(F, c, "honeycomb");
+    h += `<p class="sub">${tab === "balm" ? `A block of beeswax, a bottle of olive oil and one flavour, set in tins for an hour: four tins. You've ${wax} block${wax === 1 ? "" : "s"} of beeswax and ${oilHave(F, c)} of olive oil.` : `A bottle of olive oil and one flavour, steeped in the rollers for a day: three little bottles. You've ${oilHave(F, c)} bottle${oilHave(F, c) === 1 ? "" : "s"} of olive oil.`} Add a flower for colour, if you like.</p>`
+      + (tab === "balm" && comb ? `<div class="actions"><button class="btn small alt" data-mc="render">Melt down a honeycomb (${comb}): ${CRAFT.waxPer} blocks of beeswax</button></div>` : tab === "balm" && !wax ? `<p class="muted">No beeswax: melt down honeycomb from your hives here, or buy a block at the honey house on Sunflower Hill.</p>` : "");
+    const nowL = tab === "balm" ? (c.balm ? [c.balm] : []) : rollers; if (nowL.length) h += `<ul class="hlist wlist">${jobs(nowL, tab === "balm" ? "setting" : "steeping")}</ul>`;
+    const known = c.recipes.filter(r => r.kind === tab);
+    if (known.length) h += `<p class="eyebrow" style="margin:10px 0 6px">Make one you know</p><ul class="hlist wlist">${known.map(r => { const can = !busy && r.adds.every(a => got(F, c, a)) && (!r.dye || dyeHave(F, r.dye) > 0) && oilHave(F, c) >= 1 && (tab !== "balm" || got(F, c, "beeswax") >= 1);
+      return `<li><span class="wpic">${icon(`${tab}_${r.dye || "none"}`, 28)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${dots(r.adds)} ${ITEMS[itemId(r)] ? ITEMS[itemId(r)].price : ""} coins each</small></span><button class="btn small ${can ? "primary" : "alt"}" data-mc="again:${r.id}" ${can ? "" : "disabled"}>Make</button></li>`; }).join("")}</ul>`;
+    if (busy) return h + `<p class="muted">${tab === "balm" ? "A tray of balm's setting." : "Both roller trays are steeping."}</p>` + shut;
+    const pick = st.adds || [], dye = st.dye || null, flav = HERB_OF(tab).filter(a => got(F, c, a)), dyes = Object.keys(FLOWERS).filter(d => dyeHave(F, d) > 0);
+    h += `<div class="ppbatch">${icon(`${tab}_${dye || "none"}`, 64)}</div>`;
+    h += `<p class="eyebrow" style="margin:10px 0 6px">The flavour (one)</p>${flav.length ? `<div class="gchips">${flav.map(a => `<button class="gchip${pick.includes(a) ? " on" : ""}" data-mc="add:${a}" aria-pressed="${pick.includes(a)}"><i class="mulldot" style="background:${HERB[a].col}"></i><span>${esc(nm(a))}</span></button>`).join("")}</div>` : `<p class="muted">No flavours with you: honey, mint, orange, lemon, lavender, rose, strawberries...</p>`}`;
+    h += `<p class="eyebrow" style="margin:10px 0 6px">The colour (a flower, if you like)</p><div class="gchips"><button class="gchip${!dye ? " on" : ""}" data-mc="dye:" aria-pressed="${!dye}"><span>None</span></button>${dyes.map(d => `<button class="gchip${dye === d ? " on" : ""}" data-mc="dye:${d}" aria-pressed="${dye === d}"><i class="mulldot" style="background:${FLOWERS[d].col}"></i><span>${esc(capW(FLOWERS[d].one))} (${dyeHave(F, d)})</span></button>`).join("")}</div>${dyes.length ? "" : `<p class="muted">Stems from Ma Ma's flower farm (in its shed) or tulips and sunflowers from your garden make the colours.</p>`}`;
+    const ready = pick.length === 1;
+    return h + `<div class="actions"><button class="btn primary" data-mc="make" ${ready ? "" : "disabled"}>${ready ? (c.recipes.some(r => r.id === keyOf(tab, null, pick, dye)) ? `Make ${esc(craftName(tab, null, pick, dye))}` : "Try something new") : "Make it"}</button></div>` + shut;
+  }
   h += `<p class="sub">${tab === "oil" ? `Two bottles of olive oil and one or two herbs or fruits, steeped for six hours: two bottles of infused oil. You've ${oilHave(F, c)} bottle${oilHave(F, c) === 1 ? "" : "s"} of plain oil (backpack and mill).` : tab === "soap" ? `Goat's milk (two) or olive oil (one), and one or two things to go in. A day on the curing rack: six bars.` : `A goat's milk, a bottle of olive oil and one scent. An hour in the little pot: three jars.`}</p>`;
   const now = tab === "oil" ? c.steep : tab === "soap" ? c.cure : c.pot ? [c.pot] : [];
   if (now.length) h += `<ul class="hlist wlist">${jobs(now, tab === "oil" ? "steeping" : tab === "soap" ? "curing" : "warming")}</ul>`;

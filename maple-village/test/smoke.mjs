@@ -4123,6 +4123,22 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const G = {coins: 100, inv: {box4: 1, pp_blush_none: 1, tag_seeded: 1}, goals: {paperie: 1}}, id = wr.wrapIt(G, {item: "box4", paper: "pp_blush_none", tag: "seeded"}), t0 = Date.now();
   check(pp.bloomFor(G, id, "mum", t0) && !pp.bloomMail(G, t0 + 864e5).length && pp.bloomMail(G, t0 + 2*864e5 + 1).length === 1 && /front step/.test(pp.bloomMail(G, t0 + 3*864e5)[0].body), "a gift with a seeded tag: two days later Mum writes about the flowers by her front step");
 }
+{
+  console.log("\nLip balms and lip oils, dyed with Mel's flowers (round 187)");
+  const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), tw = await import(new URL("../src/data/towns.js", import.meta.url)), li = await import(new URL("../src/art/lip-icons.js", import.meta.url));
+  const F = {coins: 50, goals: {mill: 1}, inv: {honeycomb: 1, oliveoil: 3, honey: 2, mint: 1, tulip: 1}, orch: {stock: {"stem:dahlia": 2}}};
+  check(mc.renderWax(F) === 2 && F.inv.beeswax === 2 && !F.inv.honeycomb && tw.TOWN_GOODS.beeswax && tw.TOWN_GOODS.beeswax.shop === "bv_hhoney", "beeswax: melt a honeycomb down into two blocks at the bench (or buy a block at Sunflower Hill's honey house)");
+  check(mc.dyeHave(F, "dahlia") === 2 && mc.dyeHave(F, "tulip") === 1 && mc.dyeHave(F, "rose") === 0, "the colours: stems in the flower farm's shed, or tulips from the garden");
+  const b = mc.craft(F, "balm", null, ["honey"], "bag", "dahlia");
+  check(b.recipe && b.fresh && b.recipe.name === "Dahlia-tinted honey lip balm" && F.inv.beeswax === 1 && F.inv.oliveoil === 2 && F.orch.stock["stem:dahlia"] === 1 && F.craft.balm, "a Dahlia-tinted honey lip balm: wax, oil, honey and a dahlia, setting for an hour");
+  const B = it.ITEMS[mc.itemId(b.recipe)];
+  check(B && B.ico === "balm_dahlia" && B.price === mc.KINDS.balm.price + 1 && B.sell <= B.price && B.mill === "balm" && li.lipIcon("balm_dahlia") && li.lipIcon("lipoil_none") && li.lipIcon("beeswax"), "a tin with a dahlia-red lid, a coin more for the colour");
+  check(/one at a time|setting already/.test(mc.craft(F, "balm", null, ["mint"]).msg), "one tray of balm at a time");
+  const o = mc.craft(F, "lipoil", null, ["mint"], "bag", "tulip");
+  check(o.recipe && o.recipe.name === "Tulip-tinted mint lip oil" && !F.inv.tulip && F.craft.lipoil.length === 1 && it.ITEMS[mc.itemId(o.recipe)].ico === "lipoil_tulip", "a Tulip-tinted mint lip oil, steeping in the rollers");
+  const done = mc.craftDone(F, Date.now() + 2*864e5);
+  check(F.craft.store[mc.itemId(b.recipe)] === 4 && F.craft.store[mc.itemId(o.recipe)] === 3 && !F.craft.balm && !F.craft.lipoil.length && done.length === 2, "four tins and three bottles onto the mill's shelves");
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");
