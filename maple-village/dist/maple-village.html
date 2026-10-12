@@ -18629,6 +18629,9 @@ ${r.n}`;
         return `<g class="tool"><circle cx="${12 * k}" cy="${-22 * k}" r="${1.6 * k}" ${S("#E8D3A8")}/></g>${[[24, -3, 1], [34, -1, 1]].map(([x, y2, d]) => `<ellipse cx="${x * k}" cy="${y2 * k}" rx="${5 * k}" ry="${3.2 * k}" ${S("#9A8E70")}/><circle cx="${(x - 4 * d) * k}" cy="${(y2 - 3) * k}" r="${2.2 * k}" ${S("#3E6A4E")}/><path d="M${(x - 6.4 * d) * k} ${(y2 - 3) * k} l${-2 * d * k} ${0.6 * k}" stroke-width="${1.2 * k}" style="stroke:#E8A83A"/>`).join("")}${[18, 21, 28].map((x) => `<circle cx="${x * k}" cy="${-1 * k}" r="${0.8 * k}" ${S("#E8D3A8")} stroke="none"/>`).join("")}`;
       case "frisbee":
         return `<g class="tool"><ellipse cx="${16 * k}" cy="${-33 * k}" rx="${7 * k}" ry="${2.4 * k}" ${S("#E8566C")}/><path d="M${11 * k} ${-33 * k} h${10 * k}" stroke-width=".6" style="stroke:#FFFDF6"/></g>`;
+      // round 181: a shopper's paper carrier bag, twine handles, a twist of tissue on top
+      case "shopbag":
+        return `<g class="tool"><path d="M${7 * k} ${-24 * k} h${10 * k} l${1 * k} ${12 * k} h${-12 * k}z" ${S("#D9B98C")}/><path d="M${9 * k} ${-24 * k} q${3 * k} ${-6 * k} ${6 * k} 0" fill="none" stroke-width="${0.8 * k}"/><path d="M${10 * k} ${-25 * k} l${2 * k} ${-3 * k} l${2 * k} ${3 * k}" ${S("#F2A0B8")}/></g>`;
       case "lollybag":
         return `<g class="tool"><path d="M${7 * k} ${-27 * k} h${9 * k} l${-1 * k} ${10 * k} h${-7 * k}z" ${S("#FFFDF6")}/><path d="M${8 * k} ${-24 * k} h${7 * k} M${8.4 * k} ${-21 * k} h${6.4 * k}" stroke-width="${1.4 * k}" style="stroke:#E8566C"/></g><circle cx="${-11 * k}" cy="${-30 * k}" r="${1.6 * k}" ${S("#9FD3C2")}/>`;
       case "milkpail":
@@ -18748,7 +18751,7 @@ ${r.n}`;
       <path d="M${-8.6 * k} ${-37 * k} q${8.6 * k} ${-2.4 * k} ${17.2 * k} 0 l${1.4 * k} ${23 * k} h${-20 * k}z" ${S(look.dress || look.top)}/>
       ${look.batik && !coat ? batik(look.batik, k) : ""}${look.palms && !coat ? palms(k) : ""}
       ${coat ? coatArt(rain, k) : ""}
-      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book", "hanger", "remote", "cuppa", "footy", "wineglass", "juggle", "fan", "flats", "roobag", "tongs", "skim", "cards", "mallow", "bodyboard", "yogamat", "telescope", "easel", "macrocam", "clicker", "chipbox", "prawnbag", "shellpail", "driftwood", "parrot", "quoit", "postcard", "thermos", "wadewater", "ducks", "frisbee", "lollybag", "milkpail", "fencerail", "branch", "nutstone", "goldpan", "guardflag", "sarsbottle", "armful", "beebuzz", "baguette", "accordion", "sniffstrip", "atomiser", "beeveil", "bigflower", "ring", "rug", "candlelit", "kid"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book", "hanger", "remote", "cuppa", "footy", "wineglass", "juggle", "fan", "flats", "roobag", "shopbag", "tongs", "skim", "cards", "mallow", "bodyboard", "yogamat", "telescope", "easel", "macrocam", "clicker", "chipbox", "prawnbag", "shellpail", "driftwood", "parrot", "quoit", "postcard", "thermos", "wadewater", "ducks", "frisbee", "lollybag", "milkpail", "fencerail", "branch", "nutstone", "goldpan", "guardflag", "sarsbottle", "armful", "beebuzz", "baguette", "accordion", "sniffstrip", "atomiser", "beeveil", "bigflower", "ring", "rug", "candlelit", "kid"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
       <circle cx="0" cy="${-46 * k}" r="${10.6 * k}" ${S(look.skin)}/>
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46 * k, 10.6 * k) : hair(look.hairStyle, look.hair, k)}
@@ -25580,6 +25583,161 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return `<p class="eyebrow" style="margin:14px 0 6px">Or from your other shops</p><ul class="hlist wlist">${opts.map((o) => `<li><span class="wtxt"><b>${esc(o.n)}</b><small>${esc(o.sub)}</small></span><button class="btn small primary" data-gvother="${esc(o.k)}">Choose</button></li>`).join("")}</ul>`;
   }
 
+  // src/game/browse.js
+  var VISIT = 14;
+  var EVERY2 = 25;
+  var BROWSE = {
+    cocoa: { door: [300, 586], look: [[430, 362], [130, 330], [380, 350], [170, 340]], till: [[300, 410], [258, 418]] },
+    giftshop: { door: [478, 476], look: [[120, 330], [262, 330], [414, 330], [180, 520]], till: [[300, 540], [256, 548]] }
+  };
+  function browseVisits(shop, day, from, to, pool2) {
+    const out = [];
+    for (let t2 = from + 5, k = 0; t2 + VISIT <= to; t2 += EVERY2, k++) {
+      const h3 = hash(shop + day + k);
+      if (h3 % 10 >= 6) continue;
+      const n = h3 % 7 === 0 ? 2 : 1, ids = [];
+      for (let i = 0; ids.length < n && i < pool2.length; i++) {
+        const id = pool2[(h3 + i * 5) % pool2.length];
+        if (!ids.includes(id)) ids.push(id);
+      }
+      out.push({ from: t2, ids, look: h3 % 4, look2: (h3 >> 3) % 4 });
+    }
+    return out;
+  }
+  function browseSlot(id, day, hm6, o) {
+    const sh = BROWSE[o.shop];
+    if (!sh || !o.open) return null;
+    const v = browseVisits(o.shop, day, o.from, o.to, o.pool).find((x) => x.ids.includes(id) && hm6 >= x.from && hm6 < x.from + VISIT);
+    if (!v) return null;
+    const j = v.ids.indexOf(id), m = hm6 - v.from, base = { scene: o.shop, glide: true, browse: true };
+    if (m < 1) return { ...base, from: v.from, to: v.from + 1, at: sh.door };
+    if (m < 6) return { ...base, from: v.from + 1, to: v.from + 6, at: sh.look[(v.look + j) % sh.look.length], dir: -1 };
+    if (m < 10) return { ...base, from: v.from + 6, to: v.from + 10, at: sh.look[(v.look2 + j + 1) % sh.look.length], dir: 1 };
+    if (!o.stock) return { ...base, from: v.from + 10, to: v.from + VISIT, at: sh.door };
+    if (m < 13) return { ...base, from: v.from + 10, to: v.from + 13, at: sh.till[j % sh.till.length], dir: -1 };
+    return { ...base, from: v.from + 13, to: v.from + VISIT, at: sh.door, act: "shopbag" };
+  }
+
+  // src/game/giftshop.js
+  var GIFT_HOURS = { from: 10 * 60, to: 18 * 60, closed: [1] };
+  var giftState = (F2) => {
+    F2.giftshop = F2.giftshop || {};
+    F2.giftshop.sold = F2.giftshop.sold || {};
+    F2.giftshop.pairs = F2.giftshop.pairs || [];
+    return F2.giftshop;
+  };
+  var dowOf2 = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+  var keeperOn = (day, hm6) => hm6 >= GIFT_HOURS.from && hm6 < GIFT_HOURS.to && !GIFT_HOURS.closed.includes(dowOf2(day));
+  var shut8 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  function stockOf(o) {
+    const c = o.cocoa, bon = c ? (o.onDisplay(c) || []).filter((b) => c.trays[b.id] > 0) : [], bars2 = c ? Object.keys(c.bars).filter((k) => c.bars[k] > 0) : [];
+    const mill = Object.keys(o.store || {}).filter((id) => o.store[id] > 0 && ITEMS[id]), wine = ((o.v || {}).shelf || []).filter((b) => b.n > 0);
+    return { bon, bars: bars2, mill, wine };
+  }
+  var pairSeason = (day) => {
+    const md3 = day.slice(5);
+    return md3 >= "02-01" && md3 <= "02-14" || md3 >= "05-01" && md3 <= "05-14" || md3 >= "12-01" && md3 <= "12-24";
+  };
+  var boxVal = (F2, c) => {
+    const v = c && c.pairVals || [];
+    const have2 = (F2.inv || {}).pairbox || 0;
+    if (v.length > have2) v.splice(0, v.length - have2);
+    return v.length ? v.pop() : 18 + 4 * (c && c.prices.bonbon || 4);
+  };
+  function putOutPairs(F2, c, n = 99) {
+    const k = Math.min(n, (F2.inv || {}).pairbox || 0);
+    if (!k) return 0;
+    for (let i = 0; i < k; i++) {
+      giftState(F2).pairs.push(boxVal(F2, c));
+      F2.inv.pairbox--;
+    }
+    if (F2.inv.pairbox <= 0) delete F2.inv.pairbox;
+    return k;
+  }
+  function takeBackPair(F2, c) {
+    const g10 = giftState(F2);
+    if (!g10.pairs.length) return 0;
+    const val = g10.pairs.pop();
+    if (c) {
+      const have2 = (F2.inv || {}).pairbox || 0;
+      c.pairVals = [...have2 ? (c.pairVals || []).slice(-have2) : [], val];
+    }
+    F2.inv.pairbox = (F2.inv.pairbox || 0) + 1;
+    return 1;
+  }
+  function giftSellMinute(F2, day, hm6, mode, o) {
+    if (!mode) return 0;
+    const p = mode === "mel" ? 0.08 : 0.05;
+    if (Math.random() >= p) return 0;
+    const g10 = giftState(F2);
+    if (g10.pairs.length && Math.random() < (pairSeason(day) ? 0.35 : 0.12)) {
+      const coins2 = g10.pairs.shift(), t3 = g10.sold[day] = g10.sold[day] || { n: 0, coins: 0 };
+      t3.n++;
+      t3.coins += coins2;
+      t3.pair = (t3.pair || 0) + 1;
+      return coins2;
+    }
+    const s = stockOf(o), kinds = [s.bon.length && "bonbon", s.bars.length && "bar", s.mill.length && "mill", s.wine.length && "wine"].filter(Boolean);
+    if (!kinds.length) return 0;
+    const k = kinds[Math.floor(Math.random() * kinds.length)], any = (a) => a[Math.floor(Math.random() * a.length)];
+    let coins = 0;
+    if (k === "bonbon") {
+      const b = any(s.bon), n = Math.min(c2(o).trays[b.id], 2 + Math.floor(Math.random() * 3));
+      o.cocoa.trays[b.id] -= n;
+      coins = n * o.cocoa.prices.bonbon;
+    } else if (k === "bar") {
+      const kk = any(s.bars);
+      o.cocoa.bars[kk]--;
+      coins = o.cocoa.prices.bar;
+    } else if (k === "mill") {
+      const id = any(s.mill);
+      o.store[id]--;
+      if (!o.store[id]) delete o.store[id];
+      coins = ITEMS[id].price;
+    } else {
+      const b = any(s.wine);
+      b.n--;
+      coins = b.price;
+    }
+    const t2 = giftState(F2).sold[day] = giftState(F2).sold[day] || { n: 0, coins: 0 };
+    t2.n++;
+    t2.coins += coins;
+    t2[k] = (t2[k] || 0) + 1;
+    return coins;
+  }
+  var c2 = (o) => o.cocoa;
+  function pairsHTML(o) {
+    const g10 = giftState(o.F), have2 = (o.F.inv || {}).pairbox || 0;
+    if (!g10.pairs.length && !have2) return `<p class="muted">Pairing boxes go here too: pack them at the Cocoa Room's bonbon table (a bottle and 4 bonbons), then bring them in.</p>`;
+    const lo = Math.min(...g10.pairs), hi = Math.max(...g10.pairs), price = g10.pairs.length ? lo === hi ? `${lo} each` : `${lo} to ${hi} each` : "";
+    return `<p class="eyebrow" style="margin:12px 0 6px">Pairing boxes</p><ul class="hlist wlist"><li><span class="wpic">${icon("pairbox", 30)}</span><span class="wtxt"><b>Wine and chocolate pairing box</b><small>${g10.pairs.length ? `${g10.pairs.length} out · ${price}` : "None out yet"}${have2 ? ` · ${have2} in your backpack` : ""}</small></span><span class="orbtns">` + (have2 ? `<button class="btn small primary" data-gp="put" data-n="1">Put out 1</button>${have2 > 1 ? `<button class="btn small alt" data-gp="put" data-n="99">All</button>` : ""}` : "") + (g10.pairs.length ? `<button class="btn small alt" data-gp="take">Take 1 back</button>` : "") + `</span></li></ul>` + (pairSeason(o.day) ? `<p class="muted">People are buying these for someone special this time of year.</p>` : "");
+  }
+  var PANEL = {
+    gcase: (o) => {
+      const s = stockOf(o);
+      return `<h2>The bonbon case</h2><p class="sub">A little glass case on the counter end, filled from the Cocoa Room's own display: the same trays, so what sells here is gone there too.${o.cocoa ? ` ${o.cocoa.prices.bonbon} coins a bonbon.` : ""}</p>` + (!o.cocoa ? `<p class="muted">Empty: there's no Cocoa Room to fill it from yet.</p>` : s.bon.length ? `<ul class="hlist wlist">${s.bon.map((b) => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${o.cocoa.trays[b.id]} left in the trays</small></span></li>`).join("")}</ul>` : `<p class="muted">Nothing in the Cocoa Room's display case right now. Make a tray at the bonbon table.</p>`);
+    },
+    gbars: (o) => {
+      const s = stockOf(o);
+      return `<h2>The chocolate shelf</h2><p class="sub">Bars from the Cocoa Room's wall, stood up in a row.${o.cocoa ? ` ${o.cocoa.prices.bar} coins a bar.` : ""}</p>` + (!o.cocoa ? `<p class="muted">Empty: no Cocoa Room yet.</p>` : s.bars.length ? `<ul class="hlist wlist">${s.bars.map((k) => `<li><span class="wpic">${icon("bar_" + k, 26)}</span><span class="wtxt"><b>${esc(k[0].toUpperCase() + k.slice(1))} chocolate</b><small>${o.cocoa.bars[k]} on the wall</small></span></li>`).join("")}</ul>` : `<p class="muted">The bar wall's bare. Mateo moulds more on his shifts.</p>`);
+    },
+    gmill: (o) => {
+      const s = stockOf(o);
+      return `<h2>From the mill</h2><p class="sub">Oils, soaps and lotions, off the same shelves as the mill.</p>` + (s.mill.length ? `<ul class="hlist wlist">${s.mill.map((id) => `<li><span class="wpic">${icon(ITEMS[id].ico || id, 26)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${o.store[id]} on the shelves · ${ITEMS[id].price} each</small></span></li>`).join("")}</ul>` : `<p class="muted">Nothing on the mill's shelves just now. Make some at the workbench upstairs at the mill.</p>`);
+    },
+    gwine: (o) => {
+      const s = stockOf(o);
+      return `<h2>The wine corner</h2><p class="sub">A few of your bottles, from the wine shop's own shelves, for people who want one to take home.</p>` + pairsHTML(o) + (s.wine.length ? `<ul class="hlist wlist">${s.wine.map((b) => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${b.n} on the shelves · ${b.price} each</small></span></li>`).join("")}</ul>` : `<p class="muted">The wine shelves are empty.</p>`);
+    }
+  };
+  function giftPanel(F2, spot6, o) {
+    const day = o.day, t2 = giftState(F2).sold[day] || { n: 0, coins: 0 };
+    if (PANEL[spot6]) return `<span class="tape gingham" aria-hidden="true"></span>` + PANEL[spot6](o) + shut8;
+    const open2 = keeperOn(day, o.hm);
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>The gift shop</h2><p class="sub">${o.here ? "You're behind the till. People browse longer when you're chatting." : o.keeper ? `Posy's at the till, rearranging the bonbon case for the third time today.` : open2 ? "Nobody's at the till." : "Shut for now: Posy opens 10 till 6, every day but Monday. Stand behind the till yourself and it's open."}</p>
+    <p class="muted">${t2.n ? `Sold today: ${t2.n}, for ${t2.coins} coins (${["bonbon", "bar", "mill", "wine", "pair"].filter((k) => t2[k]).map((k) => `${t2[k]} ${{ bonbon: "bonbon boxes", bar: "bars", mill: "from the mill", wine: "bottles", pair: "pairing boxes" }[k]}`).join(", ")}).` : "Nothing sold yet today."} Everything here is shared stock: the Cocoa Room's display case and bar wall, the mill's shelves, the wine shop's bottles.</p>` + shut8;
+  }
+
   // src/game/millcraft.js
   var CRAFT = { steep: 6 * 36e5, cure: 24 * 36e5, lotion: 36e5, jars: 3, rack: 3, oilPer: 2, soapPer: 6, lotionPer: 3 };
   var HERB = {
@@ -25811,7 +25969,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (where === "market" || where === "grace") s[where] = (s[where] || 0) + 1;
     return price;
   }
-  var shut8 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut9 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   function crateMix(F2) {
     const c = craftState(F2), m = { oil: 0, soap: 0, lotion: 0 };
     for (const [id, n] of Object.entries(c.store)) {
@@ -25825,7 +25983,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     let h3 = `<h2>From the mill</h2><p class="sub">A wooden crate by the counter, filled from the mill's shelves. Customers pick a little from it while the wine shop's open, 10 till 9. Make more at the workbench upstairs in the mill.</p>`;
     h3 += ids.length ? `<ul class="bujo">${ids.map((id) => `<li>${c.store[id]} × ${esc(ITEMS[id].n)} · ${ITEMS[id].price} each</li>`).join("")}</ul>` : `<p class="muted">Empty for now. Oils, soaps and lotions you make at the mill land here.</p>`;
     h3 += `<p class="muted">${s.n ? `Sold today: ${s.n}, for ${s.coins} coins.` : "Nothing sold yet today."} Once the Mill Shop opens, Hazel sells it all at the mill instead, and much faster.</p>`;
-    return h3 + shut8;
+    return h3 + shut9;
   }
   var dots2 = (adds) => `<span class="mullsw">${adds.map((a) => `<i style="background:${HERB[a].col}"></i>`).join("")}</span>`;
   var mins = (ms) => {
@@ -25844,14 +26002,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       return h3 + `<p class="sub">Everything made, on the mill's shelves. ${o.shop ? "Hazel sells from here, downstairs." : "The wine shop sells a little of it from a shelf by the counter: open the Mill Shop downstairs to sell it all day."} Take some for yourself, or to give away.</p>
       ${ids.length ? `<ul class="hlist wlist">${ids.map((id) => `<li><span class="wtxt"><b>${esc(ITEMS[id] ? ITEMS[id].n : id)}</b><small>${c.store[id]} on the shelf · ${ITEMS[id] ? ITEMS[id].price : "?"} coins each</small></span><button class="btn small alt" data-mc="takeit:${id}">Take one</button></li>`).join("")}</ul>` : `<p class="muted">Nothing on the shelves yet.</p>`}
       ${c.steep.length || c.cure.length || c.pot ? `<p class="eyebrow" style="margin:10px 0 6px">On the go</p><ul class="hlist wlist">${jobs(c.steep, "steeping")}${jobs(c.cure, "curing")}${c.pot ? jobs([c.pot], "warming") : ""}</ul>` : ""}
-      <p class="muted">Plain oil in the mill: ${c.oil} bottle${c.oil === 1 ? "" : "s"}${o.ines ? " (Tomi presses the olive crate while he's in)" : ""}.</p>` + shut8;
+      <p class="muted">Plain oil in the mill: ${c.oil} bottle${c.oil === 1 ? "" : "s"}${o.ines ? " (Tomi presses the olive crate while he's in)" : ""}.</p>` + shut9;
     }
     if (tab === "basket") {
       const herbs = [...Object.keys(HERB), "goatmilk", "oliveoil"], inBag2 = herbs.filter((a) => have(F2, a)), bn = (a) => a === "goatmilk" ? "Goat's milk" : a === "oliveoil" ? "Olive oil" : nm3(a);
       return h3 + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk, olive oil. The bench takes from it as well as your backpack, and Tomi infuses oil with the herbs while he's in, using the oils you've worked out.</p>
       <p class="eyebrow" style="margin:10px 0 6px">In the basket</p>${Object.keys(c.basket).some((a) => c.basket[a] > 0) || c.oil > 0 ? `<ul class="hlist wlist">${(c.oil > 0 ? ["oliveoil"] : []).concat(Object.keys(c.basket).filter((a) => c.basket[a] > 0)).map((a) => `<li><span class="wpic">${icon((ITEMS[a] || {}).ico || a, 28)}</span><span class="wtxt"><b>${esc(a === "oliveoil" ? "Plain olive oil" : bn(a))}</b><small>${a === "oliveoil" ? `${c.oil} bottle${c.oil === 1 ? "" : "s"} (yours and Tomi's pressing)` : `${c.basket[a]} in the basket`}</small></span><span class="orbtns"><button class="btn small alt" data-mc="unbasket:${a}:1">Take 1</button><button class="btn small alt" data-mc="unbasket:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">The basket's empty.</p>`}
       <p class="eyebrow" style="margin:10px 0 6px">From your backpack</p>
-      ${inBag2.length ? `<div class="actions">${inBag2.map((a) => `<button class="btn small alt" data-mc="basket:${a}">${HERB[a] ? dots2([a]) : ""} Put in ${have(F2, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack. Herbs come from the greenhouse, fruit from Ma Ma's orchard and the garden, flowers from her flower farm, honey from your hives and goat's milk from Wildflower Farm.</p>`}` + shut8;
+      ${inBag2.length ? `<div class="actions">${inBag2.map((a) => `<button class="btn small alt" data-mc="basket:${a}">${HERB[a] ? dots2([a]) : ""} Put in ${have(F2, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack. Herbs come from the greenhouse, fruit from Ma Ma's orchard and the garden, flowers from her flower farm, honey from your hives and goat's milk from Wildflower Farm.</p>`}` + shut9;
     }
     const ok = HERB_OF(tab), base = st6.base || "goatmilk", pick5 = st6.adds || [];
     const busy2 = tab === "oil" ? c.steep.length >= CRAFT.jars : tab === "soap" ? c.cure.length >= CRAFT.rack : !!c.pot;
@@ -25863,12 +26021,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       const can = !busy2 && r.adds.every((a) => got2(F2, c, a));
       return `<li><span class="wtxt"><b>${esc(r.name)}</b><small>${dots2(r.adds)} ${ITEMS[itemId2(r)] ? ITEMS[itemId2(r)].price : ""} coins each</small></span><button class="btn small ${can ? "primary" : "alt"}" data-mc="again:${r.id}" ${can ? "" : "disabled"}>Make</button></li>`;
     }).join("")}</ul>`;
-    if (busy2) return h3 + `<p class="muted">${tab === "oil" ? "All three jars are steeping." : tab === "soap" ? "The rack's full of curing soap." : "The lotion pot's on."}</p>` + shut8;
+    if (busy2) return h3 + `<p class="muted">${tab === "oil" ? "All three jars are steeping." : tab === "soap" ? "The rack's full of curing soap." : "The lotion pot's on."}</p>` + shut9;
     if (tab === "soap") h3 += `<p class="eyebrow" style="margin:10px 0 6px">The base</p><div class="gchips">${[["goatmilk", `Goat's milk (${got2(F2, c, "goatmilk")})`], ["oliveoil", `Olive oil (${oilHave(F2, c)})`]].map(([k, n]) => `<button class="gchip${base === k ? " on" : ""}" data-mc="base:${k}" aria-pressed="${base === k}">${esc(n)}</button>`).join("")}</div>`;
     const inBag = ok.filter((a) => got2(F2, c, a));
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">${tab === "lotion" ? "The scent (one)" : "What goes in (one or two)"}</p>${inBag.length ? `<div class="gchips">${inBag.map((a) => `<button class="gchip${pick5.includes(a) ? " on" : ""}" data-mc="add:${a}" aria-pressed="${pick5.includes(a)}"><i class="mulldot" style="background:${HERB[a].col}"></i>${esc(nm3(a))} (${got2(F2, c, a)})</button>`).join("")}</div>` : `<p class="muted">Nothing for these in your backpack or the basket yet: ${ok.map((a) => nm3(a).toLowerCase()).join(", ")}.</p>`}`;
     const ready = pick5.length >= 1 && pick5.length <= K3.max;
-    return h3 + `<div class="actions"><button class="btn primary" data-mc="make" ${ready ? "" : "disabled"}>${ready ? c.recipes.some((r) => r.id === keyOf4(tab, tab === "soap" ? base : null, pick5)) ? `Make ${esc(craftName(tab, base, pick5))}` : "Try something new" : "Make it"}</button></div>` + shut8;
+    return h3 + `<div class="actions"><button class="btn primary" data-mc="make" ${ready ? "" : "disabled"}>${ready ? c.recipes.some((r) => r.id === keyOf4(tab, tab === "soap" ? base : null, pick5)) ? `Make ${esc(craftName(tab, base, pick5))}` : "Try something new" : "Make it"}</button></div>` + shut9;
   }
   var HERB_OF = (kind) => Object.keys(HERB).filter((a) => HERB[a][kind]);
   var TASTE = { at: [11 * 60], weekend: [15 * 60], dur: 45, size: 4, boost: 60 };
@@ -25882,6 +26040,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var tastingJustDone = (day, hm6) => tastingTimes(day).some((t2) => hm6 >= t2 + TASTE.dur && hm6 < t2 + TASTE.dur + TASTE.boost);
   var workshopNow = (day, hm6) => WORKSHOP2.dow.includes((/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay()) && hm6 >= WORKSHOP2.from && hm6 < WORKSHOP2.to;
   var MILL_VISITS = [[12 * 60, 13 * 60], [13 * 60 + 30, 14 * 60 + 30], [16 * 60, 17 * 60]];
+  var MILL_WEEKDAY = [[12 * 60, 12 * 60 + 45], [15 * 60, 15 * 60 + 45]];
   var hsh = (s) => [...s].reduce((a, ch) => a * 31 + ch.charCodeAt(0) >>> 0, 7);
   var pickN = (pool2, n, seed2) => {
     const out = [];
@@ -25914,12 +26073,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         return { from: w[0], to: w[1], scene: "millup", at: [x, y], dir: d, act: "sit", workshop: true };
       }
     }
-    if (!weekend(day) || !tourists.includes(id)) return null;
-    const who3 = MILL_VISITS.map((_, i2) => pool2[(hsh(day) + i2 * 3) % pool2.length]), i = who3.indexOf(id);
+    const dw = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+    if (!tourists.includes(id) || SHOPKEEP.closed.includes(dw)) return null;
+    const visits = weekend(day) ? MILL_VISITS : MILL_WEEKDAY;
+    const who3 = visits.map((_, i2) => pool2[(hsh(day) + i2 * 3) % pool2.length]), i = who3.indexOf(id);
     if (i < 0) return null;
-    const [from, to] = MILL_VISITS[i];
+    const [from, to] = visits[i];
     if (hm6 < from || hm6 >= to) return null;
-    return { from, to, scene: "millup", wander: [[100, 300], [100, 440], [440, 320], [300, 480], [150, 250]], millvisit: true };
+    const wander = [[100, 300], [100, 440], [440, 320], [300, 480], [150, 250]];
+    if (hm6 >= to - 8) return { from: to - 8, to, scene: "millup", wander, millvisit: true, act: "shopbag" };
+    return { from, to: to - 8, scene: "millup", wander, millvisit: true };
   }
   var NOTES2 = ["Fruity", "Grassy", "Peppery", "Bitter", "Almond", "Tomato leaf", "Herby", "Citrus", "Floral", "Garlicky"];
   var ADD_NOTE = { rosemary: "Herby", thyme: "Herby", basil: "Herby", chives: "Herby", lemon: "Citrus", orange: "Citrus", bq_lavender: "Floral", garlic: "Garlicky" };
@@ -25959,10 +26122,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   ITEMS.t_glass = { n: "A cobalt tasting glass", kind: "keepsake", price: 0, ico: "olives", line: "A little cobalt-blue tasting glass from your first olive oil tasting upstairs at the mill. Blue so the colour can't fool you: you taste with your nose and your tongue, Tomi says. Like that afternoon in Córdoba." };
   function tastePanel(F2, st6, o = {}) {
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The tasting table</h2>`;
-    if (o.shop === false) return h3 + `<p class="sub">A long table under dust sheets. Once the Mill Shop opens, Tomi will run olive oil tastings here: every day at 11, and at 3 at the weekend. Afterwards, people buy more oil.</p>` + shut8;
-    if (!o.on) return h3 + `<p class="sub">Olive oil tastings at the long table: every day at 11, and at 3 at the weekend. Tomi pours, everyone tastes, and after, they buy.${craftState(F2).tastings ? ` You've sat in on ${craftState(F2).tastings}.` : ""}</p>` + shut8;
-    if (o.done) return h3 + `<p class="sub">You've tasted today. The bread's all gone and the glasses are in the sink.</p>` + shut8;
-    if (!st6) return h3 + `<p class="sub">Bottles down the middle, a little cobalt glass at every place, a board of bread and saucers for dipping. Tomi: "Warm the glass in your hand. Smell first. Then a sip, and suck in some air over it. Tell me what you get."</p><div class="actions"><button class="btn primary" data-tst="sit">Take a seat</button></div>` + shut8;
+    if (o.shop === false) return h3 + `<p class="sub">A long table under dust sheets. Once the Mill Shop opens, Tomi will run olive oil tastings here: every day at 11, and at 3 at the weekend. Afterwards, people buy more oil.</p>` + shut9;
+    if (!o.on) return h3 + `<p class="sub">Olive oil tastings at the long table: every day at 11, and at 3 at the weekend. Tomi pours, everyone tastes, and after, they buy.${craftState(F2).tastings ? ` You've sat in on ${craftState(F2).tastings}.` : ""}</p>` + shut9;
+    if (o.done) return h3 + `<p class="sub">You've tasted today. The bread's all gone and the glasses are in the sink.</p>` + shut9;
+    if (!st6) return h3 + `<p class="sub">Bottles down the middle, a little cobalt glass at every place, a board of bread and saucers for dipping. Tomi: "Warm the glass in your hand. Smell first. Then a sip, and suck in some air over it. Tell me what you get."</p><div class="actions"><button class="btn primary" data-tst="sit">Take a seat</button></div>` + shut9;
     if (tasteDone(st6)) {
       const max = st6.oils.reduce((a, x) => a + x.notes.length, 0);
       return h3 + `<p class="sub">${st6.score >= max - 2 ? `Tomi raises his glass to you. "You've got the nose. Seriously."` : st6.score >= max / 2 ? `"Not bad at all," Tomi says. "The pepper's the hardest to name."` : '"It takes years," Tomi says kindly. "I still argue with Ines about bitter."'} You found ${st6.score} of ${max} notes. Around the table, everyone's reaching for their purses: bottles for the road.</p><div class="actions"><button class="btn primary" data-tst="done">Mop up the last of the bread</button></div>`;
@@ -25975,10 +26138,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function workshopPanel(F2, o = {}) {
     const c = craftState(F2), today2 = dayKey();
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The workshop corner</h2>`;
-    if (o.shop === false) return h3 + `<p class="sub">An empty corner by the window. Once the Mill Shop opens, Hazel will teach soap-making here on Wednesdays and Saturdays, 2 to 4: five people at ${WORKSHOP2.fee} coins a ticket.</p>` + shut8;
-    if (!o.on) return h3 + `<p class="sub">Soap-making workshops, Wednesdays and Saturdays, 2 to 4: Hazel teaches five at a time, and they take their bars home. ${WORKSHOP2.fee} coins a ticket, paid to you at 4.</p>` + shut8;
-    if ((c.helped || "") === today2) return h3 + `<p class="sub">You've helped today. Hazel's got it from here.</p>` + shut8;
-    return h3 + `<p class="sub">Hazel's at the head of the table, five day-trippers in aprons, everyone stirring. "Gently! Like you're tucking it in." Lend a hand?</p><div class="actions"><button class="btn primary" data-tst="help">Help Hazel</button></div>` + shut8;
+    if (o.shop === false) return h3 + `<p class="sub">An empty corner by the window. Once the Mill Shop opens, Hazel will teach soap-making here on Wednesdays and Saturdays, 2 to 4: five people at ${WORKSHOP2.fee} coins a ticket.</p>` + shut9;
+    if (!o.on) return h3 + `<p class="sub">Soap-making workshops, Wednesdays and Saturdays, 2 to 4: Hazel teaches five at a time, and they take their bars home. ${WORKSHOP2.fee} coins a ticket, paid to you at 4.</p>` + shut9;
+    if ((c.helped || "") === today2) return h3 + `<p class="sub">You've helped today. Hazel's got it from here.</p>` + shut9;
+    return h3 + `<p class="sub">Hazel's at the head of the table, five day-trippers in aprons, everyone stirring. "Gently! Like you're tucking it in." Lend a hand?</p><div class="actions"><button class="btn primary" data-tst="help">Help Hazel</button></div>` + shut9;
   }
   var UNMADE = [["soap", "goatmilk", ["bq_lavender", "honey"]], ["soap", "oliveoil", ["rosemary", "lemon"]], ["soap", "goatmilk", ["strawberry", "bq_sweetpea"]], ["lotion", null, ["bq_camellia"]], ["soap", "goatmilk", ["blueberry", "bq_heather"]], ["oil", null, ["garlic", "chives"]], ["soap", "oliveoil", ["orange", "thyme"]]];
   function helpWorkshop(F2) {
@@ -26052,7 +26215,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const mill = Object.keys(c.store).filter((id) => c.store[id] > 0 && ITEMS[id]), wines = v.shelf.filter((s) => s.n > 0);
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">From the mill's shelves</p>${mill.length ? `<ul class="hlist wlist">${mill.map((id) => `<li><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${c.store[id]} on the shelf · ${ITEMS[id].price} each</small></span><button class="btn small alt" data-crate="${id}" ${n < VAN_CRATE.max ? "" : "disabled"}>Pack 1</button></li>`).join("")}</ul>` : `<p class="muted">Nothing on the mill's shelves just now.</p>`}`;
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">From the wine shop</p>${wines.length ? `<ul class="hlist wlist">${wines.map((s) => `<li><span class="wtxt"><b>${esc(s.name)}</b><small>${s.n} on the shelf · ${s.price} a bottle</small></span><button class="btn small alt" data-crate="w:${s.id}" ${n < VAN_CRATE.max ? "" : "disabled"}>Pack 1</button></li>`).join("")}</ul>` : `<p class="muted">No bottles on the wine shop's shelves.</p>`}`;
-    return h3 + shut8;
+    return h3 + shut9;
   }
 
   // src/game/trips.js
@@ -26106,25 +26269,25 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const town = townOf(scene2), t2 = town && TOWNS[town];
     return t2 && t2.lines[id] ? t2.lines[id] : null;
   };
-  var shut9 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut10 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin4 = () => icon("coin", 13);
   function ticketPanel(F2, pick5, town = "ronda", hm6 = sgHM(), by = "train") {
     const t2 = TOWNS[town], party = FAMILY.filter((id) => pick5.includes(id)), cost = fareFor(town, party, by), open2 = canLeave(town, hm6), on = tripOn(F2), boat2 = by === "ferry", fare = boat2 ? t2.ferry.fare : t2.fare, ride2 = boat2 ? "ferry" : "train";
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>${boat2 ? "The ferry" : "Tickets"} to ${esc(t2.n)}</h2>${boat2 ? "" : `<div class="gchips">${Object.entries(TOWNS).filter(([, x]) => x.by !== "van").map(([k, x]) => `<button class="gchip${k === town ? " on" : ""}" data-ttown="${k}" aria-pressed="${k === town}"><span>${esc(x.n)}</span></button>`).join("")}</div>`}<p class="sub">${esc(boat2 ? "Across the sea to Jeju: a slower crossing than the train over the sea bridge, but there are dolphins. Come home by ferry or by train, whichever you like." : t2.blurb)}</p>
     <p class="muted">${fare} ${coin4()} return a person (Evan ${boat2 ? "sails" : "rides"} free). ${boat2 ? "Ferries" : "Trains"} out ${fmt4(t2.outFrom)} to ${fmt4(t2.outTo)}; the last ${ride2} home leaves ${esc(t2.n)} at ${fmt4(t2.backTo)}. A day trip: you'll be home tonight.</p>`;
-    if (on) return h3 + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: go again tomorrow.</p>` + shut9;
-    if (!open2) return h3 + `<p><b>${hm6 < t2.outFrom ? `The first ${ride2} to ${esc(t2.n)} is at ${fmt4(t2.outFrom)}.` : `That's the last ${ride2} to ${esc(t2.n)} gone for today. Tomorrow!`}</b></p>` + shut9;
+    if (on) return h3 + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: go again tomorrow.</p>` + shut10;
+    if (!open2) return h3 + `<p><b>${hm6 < t2.outFrom ? `The first ${ride2} to ${esc(t2.n)} is at ${fmt4(t2.outFrom)}.` : `That's the last ${ride2} to ${esc(t2.n)} gone for today. Tomorrow!`}</b></p>` + shut10;
     h3 += `<h3 class="ph3">Who's coming?</h3><div class="trippicks">${FAMILY.map((id) => `<button class="tpick${party.includes(id) ? " on" : ""}" data-tpick="${id}" aria-pressed="${party.includes(id)}"><b>${esc(nameOf2(id))}</b><small>${t2.free.includes(id) ? "free" : `${fare} ${coin4()}`}</small></button>`).join("")}</div>`;
     h3 += `<p class="muted">${party.length ? `You${party.map((id) => ", " + esc(nameOf2(id))).join("").replace(/, ([^,]*)$/, " and $1")}: ${party.filter((id) => !t2.free.includes(id)).length + 1} ticket${party.filter((id) => !t2.free.includes(id)).length ? "s" : ""}.` : "Just you (and Maple, who rides in your bag)."} They'll take the day off from whatever they usually do.</p>`;
     h3 += `<div class="actions"><button class="btn primary" data-trip="${town}" data-by="${by}" ${F2.coins >= cost ? "" : "disabled"}>Buy tickets and go · ${cost} ${coin4()}</button></div>`;
-    return h3 + shut9;
+    return h3 + shut10;
   }
   function homePanel(F2, town, hm6 = sgHM(), by = "train") {
     const t2 = TOWNS[town], on = tripOn(F2), boat2 = by === "ferry";
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(t2.n)} ${boat2 ? "ferry pier" : "station"}</h2><p class="sub">${boat2 ? "Ferries home to Honeybrook's foreshore jetty" : "Trains home to Honeybrook"} whenever you're ready, until ${fmt4(t2.backTo)}.</p>`;
     if (on && on.party.length) h3 += `<p class="muted">With you today: ${on.party.map(nameOf2).join(", ").replace(/, ([^,]*)$/, " and $1")}.</p>`;
     h3 += `<div class="actions"><button class="btn primary" data-triphome="${by}">Take the ${boat2 ? "ferry" : "train"} home</button></div>`;
-    return h3 + shut9;
+    return h3 + shut10;
   }
 
   // src/game/npcs.js
@@ -26147,14 +26310,28 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!base || base.scene !== "shore") return null;
     return { from: sup2.from, to: sup2.from + 999, scene: "shore", wander: SEA, act: "sup", free: true, glide: true };
   }
-  var dowOf2 = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+  var dowOf3 = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
   var routineAt = (def, day, t2) => {
-    const dw = dowOf2(day), we = dw === 0 || dw === 6, owned = Object.assign({}, api3 && api3.F().fam && api3.F().fam.owned || {}, api3 && api3.F().goals || {}, ...Object.keys(api3 && api3.F().cocoa && api3.F().cocoa.up || {}).map((k) => ({ ["cc_" + k]: 1 })));
+    const dw = dowOf3(day), we = dw === 0 || dw === 6, owned = Object.assign({}, api3 && api3.F().fam && api3.F().fam.owned || {}, api3 && api3.F().goals || {}, ...Object.keys(api3 && api3.F().cocoa && api3.F().cocoa.up || {}).map((k) => ({ ["cc_" + k]: 1 })));
     return def.routine.find((s) => t2 >= s.from && t2 < s.to && (!s.days || s.days === "we" === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null;
   };
   var routineNow = (def) => routineAt(def, dayKey(), sgHM());
   function slotAt(def, day, t2, live3) {
-    return api3 && tripSlot(api3.F(), def.id, day, t2, live3 ? api3.scene() : null) || live3 && supSlot(def) || lunchSlot(def.id, day, t2, terraceBuilt()) || occasionSlot(def.id, day, t2, terraceBuilt()) || millSlot(def.id, day, t2, millShopOpen(), MILL_VISITORS, []) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || cellarBuilt() && discoSlot(def.id, day, t2) || movieSlot(def.id, day, t2) || bonfireSlot(def.id, day, t2) || bayMarketSlot(def.id, day, t2) || workshopSlot(def.id, day, t2) || trainSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || shoreSlot(def.id, day, t2) || iceOk(scoopSlot(def.id, day, t2), def, day, t2) || letSlot(def.id, day, t2) || routineAt(def, day, t2);
+    return api3 && tripSlot(api3.F(), def.id, day, t2, live3 ? api3.scene() : null) || live3 && supSlot(def) || lunchSlot(def.id, day, t2, terraceBuilt()) || occasionSlot(def.id, day, t2, terraceBuilt()) || millSlot(def.id, day, t2, millShopOpen(), MILL_VISITORS, []) || dinnerSlot(def.id, day, t2) || dateSlot(def.id, day, t2) || cellarBuilt() && clubSlot(def.id, day, t2) || cellarBuilt() && discoSlot(def.id, day, t2) || movieSlot(def.id, day, t2) || bonfireSlot(def.id, day, t2) || bayMarketSlot(def.id, day, t2) || workshopSlot(def.id, day, t2) || trainSlot(def.id, day, t2) || nightOk(eventSlot(def.id, day, t2), def, day, t2) || tourSlot(def.id, day, t2) || classSlot(def.id, day, t2) || familySlot(def.id, day, t2) || visitSlot(def.id, day, t2) || fieldSlot(def.id, day, t2) || tastingSlot(def.id, day, t2) || iceOk(shopSlot(def.id, day, t2), def, day, t2) || shoreSlot(def.id, day, t2) || iceOk(scoopSlot(def.id, day, t2), def, day, t2) || letSlot(def.id, day, t2) || routineAt(def, day, t2);
+  }
+  var some = (o) => Object.values(o || {}).some((n) => n > 0);
+  function shopSlot(id, day, t2) {
+    if (!api3) return null;
+    const F2 = api3.F(), g10 = F2.goals || {};
+    if (g10.cocoa && TOURISTS.includes(id)) {
+      const c = F2.cocoa || {};
+      return browseSlot(id, day, t2, { shop: "cocoa", open: openOn(day, t2, !!(c.up || {}).assistant), from: OPEN2, to: CLOSE2, pool: TOURISTS.filter((x) => !busyOn(day).includes(x)), stock: some(c.bars) || some(c.trays) });
+    }
+    if (g10.giftshop && NIGHT_TOURISTS.includes(id)) {
+      const c = F2.cocoa || {}, v = F2.vine || {};
+      return browseSlot(id, day, t2, { shop: "giftshop", open: keeperOn(day, t2), from: GIFT_HOURS.from, to: GIFT_HOURS.to, pool: NIGHT_TOURISTS.filter((x) => !busyOn(day).includes(x)), stock: g10.cocoa && (some(c.bars) || some(c.trays)) || some((F2.craft || {}).store) || (v.shelf || []).some((b) => b.n > 0) || ((F2.giftshop || {}).pairs || []).length > 0 });
+    }
+    return null;
   }
   var nightOk = (s, def, day, t2) => !s || !s.night ? s : tastingSlot(def.id, day, t2) || (routineAt(def, day, t2) || {}).scene === "wineshop" ? null : s;
   var iceOk = (s, def, day, t2) => {
@@ -26164,6 +26341,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var terraceBuilt = () => !!(api3 && api3.F().vine && api3.F().vine.terrace);
   var millShopOpen = () => !!(api3 && api3.F().goals && api3.F().goals.millshop);
+  var busyCache = {};
+  var busyOn = (day) => busyCache[day] || (busyCache[day] = [...toursOn(day).flatMap((t2) => [t2.guide, ...t2.group]), ...visitsOn(day).map((v) => v.id), ...keepersOn(day)]);
   var cellarBuilt = () => !!(api3 && api3.F().goals && api3.F().goals.cellar);
   var slotNow = (def) => slotAt(def, dayKey(), sgHM(), true);
   var whereIs = (id) => {
@@ -26260,7 +26439,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     candle: "candlelit",
     goat: "kid",
     lantern: "xlantern",
-    carol: "songsheet"
+    carol: "songsheet",
+    shopbag: "shopbag"
   };
   var outdoors = (s) => OUTDOOR.includes(s);
   var isHere = (id) => {
@@ -27181,7 +27361,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     F2.inv[id] = (F2.inv[id] || 0) + 1;
     return true;
   }
-  var shut10 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut11 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin5 = () => icon("coin", 13);
   var NAMES = { milk: "milk", goatmilk: "goat's milk", honey: "honey", egg: "eggs" };
   function herdPanel(F2, herd, keeper) {
@@ -27193,7 +27373,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       const m = moodOf(h3, a.id, day);
       return `<li><span class="wpic"><span class="gdot" style="background:${a.col}"></span></span><span class="wtxt"><b>${esc(a.n)} <small class="muted">· ${MOODS[m]}</small></b><small>${h3.fed[a.id] === day ? "fed" : wellFed(h3, a.id, day) ? "fed yesterday" : "hungry"} · ${h3.brushed[a.id] === day ? "brushed" : "unbrushed"} · ${h3.milked[a.id] === day ? "milked" : "not milked"}</small></span><span class="orbtns"><button class="btn small alt" data-hf="brush" data-k="${a.id}" ${h3.brushed[a.id] === day ? "disabled" : ""}>Brush</button><button class="btn small primary" data-hf="milk" data-herd="${herd}" data-k="${a.id}" ${milkingNow() && h3.milked[a.id] !== day ? "" : "disabled"}>Milk</button></span></li>`;
     }).join("")}</ul>`;
-    return p + shut10;
+    return p + shut11;
   }
   function hivesPanel(F2, keeper) {
     const h3 = hfState(F2), full = fullHives(h3), mine = myHiveFull(h3), rain = stormyOn(dayKey()), n = full.length * JARS + (mine ? MY_FRAMES : 0);
@@ -27208,12 +27388,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const h3 = hfState(F2), partner = levelOf(h3) >= 3;
     let p = `<span class="tape gingham" aria-hidden="true"></span><h2>The farm stand</h2><p class="sub">Fresh from the farm, an honesty tin for the coins. You have ${F2.coins} ${coin5()}.</p>`;
     p += `<ul class="hlist wlist">${Object.entries(STAND).map(([id, pr]) => `<li><span class="wpic">${icon(id, 24)}</span><span class="wtxt"><b>${id === "egg" ? "Fresh eggs" : id === "honey" ? "Wildflower honey" : id === "goatmilk" ? "Goat's milk" : "Milk"}</b><small>${pr} ${coin5()} · ${(F2.inv || {})[id] || 0} in your backpack</small></span><button class="btn small primary" data-hf="buy" data-k="${id}" ${F2.coins >= pr ? "" : "disabled"}>Buy</button></li>`).join("")}</ul>`;
-    if (!partner) return p + `<p class="muted">One day, when you're Felix and Elena's partner, there'll be a shelf here for your own cheese and honey.</p>` + shut10;
+    if (!partner) return p + `<p class="muted">One day, when you're Felix and Elena's partner, there'll be a shelf here for your own cheese and honey.</p>` + shut11;
     const on = Object.keys(h3.shelf).filter((k) => h3.shelf[k] > 0), mine = sellables(F2), t2 = h3.sold[dayKey()];
     p += `<p class="eyebrow" style="margin:12px 0 6px">Your shelf</p><p class="muted">Passers-by buy from it, 8 to 6, at full price. ${t2 ? `Sold today: ${t2.n} (${t2.coins} ${coin5()}).` : ""}</p>`;
     p += on.length ? `<ul class="hlist wlist">${on.map((id) => `<li><span class="wpic">${icon(id, 22)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${h3.shelf[id]} on the shelf · ${shelfPrice(id)} ${coin5()}</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty.</p>`;
     if (mine.length) p += `<ul class="hlist wlist">${mine.map((id) => `<li><span class="wpic">${icon(id, 22)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${F2.inv[id]} with you</small></span><span class="orbtns"><button class="btn small primary" data-hf="shelf" data-k="${id}" data-n="1">Put 1 out</button><button class="btn small alt" data-hf="shelf" data-k="${id}" data-n="99">All</button></span></li>`).join("")}</ul>`;
-    return p + shut10;
+    return p + shut11;
   }
   function farmhousePanel(F2, here) {
     const h3 = hfState(F2), lv2 = levelOf(h3), next = LEVELS2[lv2 + 1], r = requestToday(), done = h3.reqDone === dayKey(), ready = requestReady(F2);
@@ -27224,7 +27404,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const left6 = done ? "" : requestLeft(F2);
     p += done ? `<p class="muted">Done today. ${who3} is very grateful.</p>` : `${left6 ? `<p class="muted">${esc(left6)}</p>` : ""}<div class="actions"><button class="btn primary small" data-hf="req" ${ready && (r.act !== "hive" || here) ? "" : "disabled"}>${r.need ? "Hand them over" : r.act === "hive" ? here ? `Help ${who3}` : `${who3}'s not here just now` : "Tell them it's done"}</button></div>`;
     if (lv2 >= 1) p += `<p class="eyebrow" style="margin:12px 0 6px">What you've earned</p><ul class="hlist">${LEVELS2.slice(1, lv2 + 1).map((x) => `<li><small><b>${x.n}:</b> ${esc(x.gives)}</small></li>`).join("")}</ul>`;
-    return p + shut10;
+    return p + shut11;
   }
   var giveName = (id) => NAMES[id] || id;
   var dur2 = (ms) => {
@@ -27259,7 +27439,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       const c = CHEESES[w.kind], left6 = caveLeft(w), q = quality(w);
       return `<li><span class="wpic"><span class="gdot" style="background:${c.col}"></span></span><span class="wtxt"><b>${esc(w.name)}</b><small>${esc(c.n)} · ${left6 ? `ripe in ${dur2(left6)} · turned ${w.turns || 0}× · ${QW[q]}` : `ripe! ${q === "excellent" ? "Excellent." : q === "good" ? "A good one." : "A bit rustic."}`}</small></span>${left6 ? `<span class="clbar" style="width:70px"><i style="width:${Math.round(100 * (1 - left6 / (c.days * 864e5)))}%"></i></span>` : `<button class="btn small primary" data-hf="wheel" data-k="${i}">Cut it</button>`}</li>`;
     }).join("")}</ul>` : `<p class="muted">Empty shelves. Press a wheel at the cheese press.</p>`;
-    return p + shut10;
+    return p + shut11;
   }
 
   // src/art/hfarm.js
@@ -27659,14 +27839,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var journalCount2 = (F2) => Object.keys(fishState(F2).caught).length;
   var coin6 = () => icon("coin", 13);
-  var shut11 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut12 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var worms = (n) => `${n} worm${n === 1 ? "" : "s"}`;
   function fishPanel(F2, spot6, st6 = {}) {
     const s = fishState(F2), sp = SPOTS3[spot6];
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(sp.n)}</h2>`;
     h3 += `<div class="gchips"><button class="gchip${st6.view !== "journal" ? " on" : ""}" data-fish="view" data-k="fish"><span>Fishing</span></button><button class="gchip${st6.view === "journal" ? " on" : ""}" data-fish="view" data-k="journal"><span>Journal · ${journalCount2(F2)} of ${Object.keys(FISH).length}</span></button></div>`;
-    if (st6.view === "journal") return h3 + journalHtml(F2) + shut11;
-    if (!s.rod) return h3 + `<p class="sub">${esc(sp.line)} You'll need a rod. Gong Gong says the tackle shop's best one is 80 coins, and it'll last forever.</p><div class="actions"><button class="btn primary" data-fish="rod" ${F2.coins >= ROD ? "" : "disabled"}>Buy a rod · ${ROD} ${coin6()}</button></div>` + shut11;
+    if (st6.view === "journal") return h3 + journalHtml(F2) + shut12;
+    if (!s.rod) return h3 + `<p class="sub">${esc(sp.line)} You'll need a rod. Gong Gong says the tackle shop's best one is 80 coins, and it'll last forever.</p><div class="actions"><button class="btn primary" data-fish="rod" ${F2.coins >= ROD ? "" : "disabled"}>Buy a rod · ${ROD} ${coin6()}</button></div>` + shut12;
     h3 += `<p class="sub">${esc(sp.line)} <b>${worms(s.bait)}</b> in the bait tin. Every quest you finish digs up another.</p>`;
     const c = st6.cast;
     if (c && !c.t0) h3 += `<div class="fishwater"><span class="fbob wait"></span></div><p class="muted">The float sits on the water... wait for the bite.</p><div class="actions"><button class="btn alt" data-fish="reel">Reel in</button></div>`;
@@ -27683,7 +27863,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       h3 += catchHtml(F2, spot6 === "bay" ? 1.5 : 1);
       if (!s.reel) h3 += `<p class="muted">The better reel makes every fish easier to land (the green's wider). <button class="btn small alt" data-fish="reelup" ${F2.coins >= REEL ? "" : "disabled"}>Buy · ${REEL} ${coin6()}</button></p>`;
     }
-    return h3 + shut11;
+    return h3 + shut12;
   }
   var CATCH = [...new Set(Object.values(FISH).map((f3) => f3.item).filter(Boolean))];
   if (ITEMS.fish && !ITEMS.fish.sell) ITEMS.fish.sell = 3;
@@ -27746,14 +27926,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     addInv2(id, 1);
     return `${g10.n === "Clams" ? "A bag of clams" : "A lemon"}, into your backpack.`;
   }
-  var shut12 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut13 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin7 = () => icon("coin", 13);
   function vanPanel(F2) {
     const have2 = CATCH.filter((x) => (F2.inv || {})[x] > 0 && ITEMS[x] && ITEMS[x].sell), all = have2.reduce((a, x) => a + Math.round(F2.inv[x] * ITEMS[x].sell * VAN_MULT), 0);
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The fishmonger's van</h2><p class="sub">Friday evenings at the bay, five till ten. Ice, a striped awning, and a man called Sal who's been doing this for forty years.</p>`;
     h3 += `<h3 class="ph3">Buy</h3><ul class="hlist wlist">${Object.entries(VAN_GOODS).map(([id, g10]) => `<li><span class="wpic">${icon(id === "worms" ? "rod" : id, 26)}</span><span class="wtxt"><b>${esc(g10.n)}</b><small>${esc(g10.line)}</small></span><button class="btn small primary" data-salvan="${id}" ${F2.coins >= g10.price ? "" : "disabled"}>${g10.price} ${coin7()}</button></li>`).join("")}</ul>`;
     h3 += `<h3 class="ph3">Sell your catch</h3>` + (have2.length ? `<p class="muted">Sal pays half as much again on a Friday.</p><ul class="hlist wlist">${have2.map((x) => `<li><span class="wpic">${icon(x, 26)}</span><span class="wtxt"><b>${esc(ITEMS[x].n)} ×${F2.inv[x]}</b><small>${Math.round(ITEMS[x].sell * VAN_MULT * 10) / 10} coins each</small></span></li>`).join("")}</ul><div class="actions"><button class="btn primary small" data-salvan="sellall">Sell the lot · ${all} ${coin7()}</button></div>` : `<p class="muted">Nothing in your backpack to sell. Catch something and come back: Sal pays well on a Friday.</p>`);
-    return h3 + shut12;
+    return h3 + shut13;
   }
   function weekQuests(F2, day = dayKey()) {
     let n = 0, d = day;
@@ -27792,7 +27972,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The bonfire</h2><p class="sub">The firepit at the bottom of the garden, crackling away, the river going dark.${family ? ` ${esc(family)}.` : ""}</p>
     <p>${done ? "The week's lanterns are already up and away over the house." : n ? `<b>${n} quest${n > 1 ? "s" : ""}</b> finished this week: a paper lantern for each.` : "No quests this week. That's alright: one lantern anyway, for getting through it."}</p>
     <p class="muted">${grilled ? "The fish are eaten. Just the smell of the grill left, and happy faces." : fish ? `${fish} fish in your backpack for the grill.` : "Nothing to grill. Sal's van at the bay sells sardines, or catch some at sunset."}</p>
-    <div class="actions">${done ? "" : `<button class="btn primary" data-fire="lanterns">Release the week's lanterns</button>`}${!grilled && fish ? `<button class="btn primary" data-fire="grill">Grill the fish</button>` : ""}<button class="btn alt" data-fire="sit">Sit by the fire</button></div>` + shut12;
+    <div class="actions">${done ? "" : `<button class="btn primary" data-fire="lanterns">Release the week's lanterns</button>`}${!grilled && fish ? `<button class="btn primary" data-fire="grill">Grill the fish</button>` : ""}<button class="btn alt" data-fire="sit">Sit by the fire</button></div>` + shut13;
   }
   var BAY_POOL = [...new Set([...MARKET, ...NIGHT].flatMap((s) => s.items || []).concat(Object.values(POOLS).flatMap((p) => Object.values(p).flat())))].filter((id) => ITEMS[id] && (ITEMS[id].price || GOODS[id]) && ITEMS[id].kind !== "pet" && ITEMS[id].kind !== "seed");
   function bayStallGoods(day, k) {
@@ -29269,7 +29449,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var fmt5 = (m) => `${Math.floor(m / 60) % 12 || 12}${m % 60 ? ":" + String(m % 60).padStart(2, "0") : ""}${m < 12 * 60 ? "am" : "pm"}`;
   var coin8 = () => icon("coin", 13);
-  var shut13 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut14 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var regionOf = (stop) => (TOWNS[stop] || {}).region || "vines";
   var regionsKnown = (F2) => [...new Set(known(F2).map(regionOf))];
   function mapSvg(F2, at2, region = "vines") {
@@ -29302,16 +29482,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (regions.length > 1) h3 += `<div class="gchips bbtabs">${REGIONS.filter((r) => regions.includes(r)).map((r) => `<button class="gchip${r === region ? " on" : ""}" data-bvregion="${r}" aria-pressed="${r === region}">${esc(REGION_N[r])}</button>`).join("")}</div>`;
     h3 += mapSvg(F2, at2, region) + `<div class="actions"><button class="btn small alt" data-bvpass="1">The passport (${Object.keys(st6.stamps).length} stamps)</button></div>`;
     if (!at2) {
-      if (t2) return h3 + `<p class="muted">You're already out on a day trip today.</p>` + shut13;
-      if (!o.ownsVan) return h3 + shut13;
+      if (t2) return h3 + `<p class="muted">You're already out on a day trip today.</p>` + shut14;
+      if (!o.ownsVan) return h3 + shut14;
       const pick5 = (o.pick || []).filter((id) => FAMILY.includes(id)).slice(0, VAN_SEATS - 1);
       h3 += `<p class="eyebrow" style="margin:10px 0 6px">Who's coming? (${pick5.length + 1} of ${VAN_SEATS} seats, you included)</p><div class="gchips">${FAMILY.map((id) => `<button class="gchip${pick5.includes(id) ? " on" : ""}" data-bvpick="${id}" aria-pressed="${pick5.includes(id)}" ${!pick5.includes(id) && pick5.length >= VAN_SEATS - 1 ? "disabled" : ""}>${esc(nameOf2(id))}</button>`).join("")}</div>`;
-      if (!canSet(hm6)) return h3 + `<p class="muted">Too ${hm6 < 7 * 60 ? "early" : "late"} to set off: day trips leave between 7am and 6pm (and you're home by 10).</p>` + shut13;
+      if (!canSet(hm6)) return h3 + `<p class="muted">Too ${hm6 < 7 * 60 ? "early" : "late"} to set off: day trips leave between 7am and 6pm (and you're home by 10).</p>` + shut14;
       h3 += `<p class="eyebrow" style="margin:12px 0 6px">Where to?</p><div class="actions bbgo">${known(F2).filter(inR).map((s) => {
         const c = fuelFor("home", s, pick5);
         return `<button class="btn small ${F2.coins >= c ? "primary" : "alt"}" data-bvgo="${s}" ${F2.coins >= c ? "" : "disabled"}>${esc(TOWNS[s].n)} · ${c} ${coin8()}</button>`;
       }).join("")}</div><p class="muted">Fuel: ${LEG} coins a leg, plus 1 for each grown-up passenger. Home by ${fmt5(TOWNS.bv_gate.backTo)}.</p>`;
-      return h3 + shut13;
+      return h3 + shut14;
     }
     if (t2.party.length) h3 += `<p class="muted">With you: ${t2.party.map(nameOf2).join(", ").replace(/, ([^,]*)$/, " and $1")}.</p>`;
     const others = known(F2).filter((s) => s !== at2 && inR(s));
@@ -29320,16 +29500,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       return `<button class="btn small ${F2.coins >= c ? "primary" : "alt"}" data-bvgo="${s}" ${F2.coins >= c && hm6 < TOWNS[s].backTo ? "" : "disabled"}>${esc(TOWNS[s].n)}${stamped(F2, s) ? "" : " (new!)"} · ${c} ${coin8()}</button>`;
     }).join("")}</div>`;
     h3 += `<div class="actions"><button class="btn primary" data-bvhome="1">Drive home to Honeybrook · ${homeFuel(F2)} ${coin8()}</button></div><p class="muted">Home by ${fmt5(TOWNS[at2].backTo)} at the latest.</p>`;
-    return h3 + shut13;
+    return h3 + shut14;
   }
   function passportPanel(F2) {
     const st6 = bbState(F2).stamps, page = (r) => `<h3 class="ph3">${esc(REGION_N[r])}</h3><div class="bbstamps">${STOPS.filter((s) => regionOf(s) === r).map((s) => `<div class="bbstamp${st6[s] ? " on" : ""}"><b>${esc(TOWNS[s].n)}</b><small>${st6[s] ? `stamped ${esc(st6[s])}` : "not yet"}</small></div>`).join("")}</div>`;
     return `<span class="tape gingham" aria-hidden="true"></span><h2>Bellbird Valley passport</h2><p class="sub">${Object.keys(st6).length} of ${STOPS.length} stamps. The whole valley: the Vines, the Coast Road, the Tablelands and the Lavender Hills.</p>
-    ${REGIONS.map(page).join("")}` + shut13;
+    ${REGIONS.map(page).join("")}` + shut14;
   }
 
   // src/game/bbrooms.js
-  var shut14 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut15 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin9 = () => icon("coin", 13);
   var head = (room4, sub, tape5 = "gingham") => `<span class="tape ${tape5}" aria-hidden="true"></span><h2>${esc(TOWNS[Object.keys(TOWNS).find((t2) => TOWNS[t2].rooms && TOWNS[t2].rooms[room4])].rooms[room4].n)}</h2><p class="sub">${sub}</p>`;
   var row2 = (F2, id) => {
@@ -29439,161 +29619,161 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const evan2 = !!o.evan;
     switch (room4) {
       case "bv_store":
-        return head(room4, `Mrs Dunn has run the store for forty years. There's a post office counter, a jar of Freddos, and a fly screen door that bangs.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "Off the shelves") + (evan2 ? `<p class="muted">Mrs Dunn keeps an eye on the little one and the Freddo jar.</p>` : "") + shut14;
+        return head(room4, `Mrs Dunn has run the store for forty years. There's a post office counter, a jar of Freddos, and a fly screen door that bangs.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "Off the shelves") + (evan2 ? `<p class="muted">Mrs Dunn keeps an eye on the little one and the Freddo jar.</p>` : "") + shut15;
       case "bv_shed":
-        return head(room4, `No one minds the shed: everything has a price on a bit of cardboard, and the money goes in the honesty tin. Mel counts out the right coins, carefully.`) + treats(F2, room4, "From the honesty box") + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `No one minds the shed: everything has a price on a bit of cardboard, and the money goes in the honesty tin. Mel counts out the right coins, carefully.`) + treats(F2, room4, "From the honesty box") + listOf(F2, shopGoods(room4), "To take home") + shut15;
       case "bv_opshop": {
         const today2 = opshopToday();
-        return head(room4, `Joan and Marg run the op shop on Tuesdays and every other day they feel like it. The money goes to the bush fire brigade. New things come in every day.`, "stripe") + listOf(F2, today2, "Today's treasures") + `<p class="muted">Different things tomorrow. "You never know what's coming in," says Marg. "Last week, a canoe."</p>` + shut14;
+        return head(room4, `Joan and Marg run the op shop on Tuesdays and every other day they feel like it. The money goes to the bush fire brigade. New things come in every day.`, "stripe") + listOf(F2, today2, "Today's treasures") + `<p class="muted">Different things tomorrow. "You never know what's coming in," says Marg. "Last week, a canoe."</p>` + shut15;
       }
       case "bv_coffee":
-        return head(room4, `Rosie's coffee caravan opens at dawn for the balloon crowd. The chalkboard has three things on it, and they're all good.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `Rosie's coffee caravan opens at dawn for the balloon crowd. The chalkboard has three things on it, and they're all good.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut15;
       case "bv_balloonshed":
-        return head(room4, `Rosie's dad Gus flies the balloons: dawn, and the golden hour before sunset. The baskets are taller than Evan.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:balloon">A balloon ride</button></div>` + listOf(F2, shopGoods(room4), "From the shop") + shut14;
+        return head(room4, `Rosie's dad Gus flies the balloons: dawn, and the golden hour before sunset. The baskets are taller than Evan.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:balloon">A balloon ride</button></div>` + listOf(F2, shopGoods(room4), "From the shop") + shut15;
       case "bv_gallery":
-        return head(room4, `Paintings of the valley by local artists, a long window over the real thing, and scones that come out every twenty minutes.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `Paintings of the valley by local artists, a long window over the real thing, and scones that come out every twenty minutes.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut15;
       case "bv_tasting":
-        return head(room4, `Kel's family have grown grapes here for three generations. Pinot the cellar dog is asleep under the bar, as usual.`, "stripe") + treats(F2, room4, "A tasting") + listOf(F2, shopGoods(room4), "Bottles to take home") + cuttingsList(F2) + shut14;
+        return head(room4, `Kel's family have grown grapes here for three generations. Pinot the cellar dog is asleep under the bar, as usual.`, "stripe") + treats(F2, room4, "A tasting") + listOf(F2, shopGoods(room4), "Bottles to take home") + cuttingsList(F2) + shut15;
       case "bv_cave":
-        return head(room4, `The barrel cave, dug into the hill. Racks of sparkling wine stand tilted neck-down in the cool, waiting for someone to give each bottle a little turn.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:riddle">Help Jono turn the bottles</button></div>` + shut14;
+        return head(room4, `The barrel cave, dug into the hill. Racks of sparkling wine stand tilted neck-down in the cool, waiting for someone to give each bottle a little turn.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:riddle">Help Jono turn the bottles</button></div>` + shut15;
       case "bv_restaurant": {
         const t2 = TREATS2[room4].lunch, done = bbState(F2).lunch === dayKey();
-        return head(room4, `One long table for everyone, under the window onto the vines. No menu: whatever's good today.`) + `<h3 class="ph3">${esc(t2[0])} · ${t2[1]} ${coin9()}</h3><p class="muted">${esc(t2[2])}${o.party ? " Everyone you came with squeezes in." : ""}</p><div class="actions"><button class="btn primary" data-bb="treat:${room4}:lunch" ${F2.coins >= t2[1] && !done ? "" : "disabled"}>${done ? "You've had lunch here today" : "A long lunch, please"}</button></div>` + shut14;
+        return head(room4, `One long table for everyone, under the window onto the vines. No menu: whatever's good today.`) + `<h3 class="ph3">${esc(t2[0])} · ${t2[1]} ${coin9()}</h3><p class="muted">${esc(t2[2])}${o.party ? " Everyone you came with squeezes in." : ""}</p><div class="actions"><button class="btn primary" data-bb="treat:${room4}:lunch" ${F2.coins >= t2[1] && !done ? "" : "disabled"}>${done ? "You've had lunch here today" : "A long lunch, please"}</button></div>` + shut15;
       }
       case "bv_berrycafe":
-        return head(room4, `Gingham everywhere, jam on every table, and a queue for scones that goes out of the door on Sundays.`) + treats(F2, room4) + shut14;
+        return head(room4, `Gingham everywhere, jam on every table, and a queue for scones that goes out of the door on Sundays.`) + treats(F2, room4) + shut15;
       case "bv_jam":
-        return head(room4, `Shaz stirs the copper pots with a paddle as long as an oar. The jars cool on the windowsill, lids popping one by one.`) + listOf(F2, shopGoods(room4), "From the jam kitchen") + shut14;
+        return head(room4, `Shaz stirs the copper pots with a paddle as long as an oar. The jars cool on the windowsill, lids popping one by one.`) + listOf(F2, shopGoods(room4), "From the jam kitchen") + shut15;
       case "bv_choc": {
         const free = chocFree(F2);
-        return head(room4, `Sophie runs the chocolaterie. The fountain never stops. Neither do the free tastings.`, "stripe") + `<h3 class="ph3">Free tasting</h3><p class="muted">${free ? "A little dish of buttons: dark, milk, white, and one with wattleseed." : "You've had your free tasting today. (Sophie pretends not to notice you looking.)"}</p><div class="actions"><button class="btn primary" data-bb="choc" ${free ? "" : "disabled"}>A free tasting</button><button class="btn alt" data-bba="open:dip">Dip strawberries</button></div>` + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `Sophie runs the chocolaterie. The fountain never stops. Neither do the free tastings.`, "stripe") + `<h3 class="ph3">Free tasting</h3><p class="muted">${free ? "A little dish of buttons: dark, milk, white, and one with wattleseed." : "You've had your free tasting today. (Sophie pretends not to notice you looking.)"}</p><div class="actions"><button class="btn primary" data-bb="choc" ${free ? "" : "disabled"}>A free tasting</button><button class="btn alt" data-bba="open:dip">Dip strawberries</button></div>` + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut15;
       }
       case "bv_visitor":
-        return head(room4, `The visitor centre at Gum Creek: a café counter, a wall of photos of every animal they've saved, and a shelf of soft toys.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "The gift shop") + shut14;
+        return head(room4, `The visitor centre at Gum Creek: a café counter, a wall of photos of every animal they've saved, and a shelf of soft toys.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "The gift shop") + shut15;
       case "bv_hospital":
-        return head(room4, `Dr Mira and her nurses look after the animals that come in hurt: hit by cars, caught in fences, fallen out of pouches. Most of them go home to the bush.`) + `<div class="actions"><button class="btn primary" data-bba="open:joey">Help feed a joey</button></div>` + listOf(F2, shopGoods(room4), "Help a joey") + `<p class="muted">The money buys milk, pouches and the vet's time.</p>` + shut14;
+        return head(room4, `Dr Mira and her nurses look after the animals that come in hurt: hit by cars, caught in fences, fallen out of pouches. Most of them go home to the bush.`) + `<div class="actions"><button class="btn primary" data-bba="open:joey">Help feed a joey</button></div>` + listOf(F2, shopGoods(room4), "Help a joey") + `<p class="muted">The money buys milk, pouches and the vet's time.</p>` + shut15;
       case "bv_campstore":
-        return head(room4, `The camp store sells everything a camper forgot: firewood, ice, thongs, marshmallows. An old kelpie is asleep across the doorway.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "Off the shelves") + shut14;
+        return head(room4, `The camp store sells everything a camper forgot: firewood, ice, thongs, marshmallows. An old kelpie is asleep across the doorway.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "Off the shelves") + shut15;
       // the Coast Road (round 149)
       case "bv_surfshop":
-        return head(room4, `Jet runs the surf shop and the lessons. Boards to hire, wax to buy, and a dog called Gromit asleep on the towels.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:surf">A surf lesson</button></div>` + listOf(F2, shopGoods(room4), "From the shop") + shut14;
+        return head(room4, `Jet runs the surf shop and the lessons. Boards to hire, wax to buy, and a dog called Gromit asleep on the towels.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:surf">A surf lesson</button></div>` + listOf(F2, shopGoods(room4), "From the shop") + shut15;
       case "bv_chippy":
-        return head(room4, `The Golden Gull: fish straight off the boats at the harbour, chips cut every morning, and a sign: DON'T FEED THE GULLS (they bite).`) + treats(F2, room4) + shut14;
+        return head(room4, `The Golden Gull: fish straight off the boats at the harbour, chips cut every morning, and a sign: DON'T FEED THE GULLS (they bite).`) + treats(F2, room4) + shut15;
       case "bv_bakery":
-        return head(room4, `Crumb & Co.: up at four, ovens hot by five, and a queue of sandy surfers by seven.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `Crumb & Co.: up at four, ovens hot by five, and a queue of sandy surfers by seven.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut15;
       case "bv_lighthouse":
-        return head(room4, `A hundred and twenty-eight iron steps up to the lamp and the balcony. Win's great-grandfather kept this light for forty years.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:whales">Up to the balcony: whale watching</button></div>` + shut14;
+        return head(room4, `A hundred and twenty-eight iron steps up to the lamp and the balcony. Win's great-grandfather kept this light for forty years.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:whales">Up to the balcony: whale watching</button></div>` + shut15;
       case "bv_tearoom":
-        return head(room4, `The keeper's cottage, now Win's tearoom: the old logbooks on the shelf, a ship in a bottle, and scones that come out every half hour.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `The keeper's cottage, now Win's tearoom: the old logbooks on the shelf, a ship in a bottle, and scones that come out every half hour.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut15;
       case "bv_giftshop":
-        return head(room4, `The gift shop in the old signal house. Everything's got a lighthouse on it, except the things with whales.`, "stripe") + listOf(F2, shopGoods(room4), "From the shelves") + shut14;
+        return head(room4, `The gift shop in the old signal house. Everything's got a lighthouse on it, except the things with whales.`, "stripe") + listOf(F2, shopGoods(room4), "From the shelves") + shut15;
       case "bv_rangerhut":
-        return head(room4, `Tash the ranger looks after the gully: the walks, the treetop walk, the creek and the glow-worms. "Leave only footprints," says the sign.`) + listOf(F2, shopGoods(room4), "From the hut") + shut14;
+        return head(room4, `Tash the ranger looks after the gully: the walks, the treetop walk, the creek and the glow-worms. "Leave only footprints," says the sign.`) + listOf(F2, shopGoods(room4), "From the hut") + shut15;
       case "bv_mushcafe":
-        return head(room4, `The Toadstool café: a wood stove, mismatched chairs, and soup made from whatever's good. The honey's from the hives on the heath.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `The Toadstool café: a wood stove, mismatched chairs, and soup made from whatever's good. The honey's from the hives on the heath.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut15;
       case "bv_grotto":
-        return head(room4, `Torches off. Let your eyes get used to it. Then, slowly, the ceiling of the overhang lights up: hundreds of tiny blue-green stars.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:glow">Count the glow-worms</button></div>` + shut14;
+        return head(room4, `Torches off. Let your eyes get used to it. Then, slowly, the ceiling of the overhang lights up: hundreds of tiny blue-green stars.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:glow">Count the glow-worms</button></div>` + shut15;
       case "bv_coop":
-        return head(room4, `The fishermen's co-op: whatever came in this morning, on ice. Mags brings her crays in here, if she hasn't promised them to someone.`) + listOf(F2, shopGoods(room4), "Fresh today") + `<div class="actions"><button class="btn alt" data-bba="open:pots">Help Mags with the cray pots</button></div>` + shut14;
+        return head(room4, `The fishermen's co-op: whatever came in this morning, on ice. Mags brings her crays in here, if she hasn't promised them to someone.`) + listOf(F2, shopGoods(room4), "Fresh today") + `<div class="actions"><button class="btn alt" data-bba="open:pots">Help Mags with the cray pots</button></div>` + shut15;
       case "bv_pub":
-        return head(room4, `The Anchor: a fire in winter, the doors open in summer, a dartboard, and a ship's wheel over the bar. The parma's famous up and down the coast.`, "stripe") + treats(F2, room4) + shut14;
+        return head(room4, `The Anchor: a fire in winter, the doors open in summer, a dartboard, and a ship's wheel over the bar. The parma's famous up and down the coast.`, "stripe") + treats(F2, room4) + shut15;
       case "bv_smokehouse":
-        return head(room4, `Rows of fish going gold in the smoke, and the smell of woodchips. Old Ned's family have smoked fish here since 1890.`) + listOf(F2, shopGoods(room4), "From the smokehouse") + shut14;
+        return head(room4, `Rows of fish going gold in the smoke, and the smell of woodchips. Old Ned's family have smoked fish here since 1890.`) + listOf(F2, shopGoods(room4), "From the smokehouse") + shut15;
       case "bv_kiosk":
-        return head(room4, `The lookout kiosk: hot chips, coffee, and a map of every ship wrecked on this coast (there are a lot).`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `The lookout kiosk: hot chips, coffee, and a map of every ship wrecked on this coast (there are a lot).`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut15;
       case "bv_slsc":
-        return head(room4, `The surf lifesaving club: volunteers on patrol every weekend since 1932. The canteen helps pay for the rescue boards.`, "stripe") + treats(F2, room4) + listOf(F2, shopGoods(room4), "For little lifesavers") + `<div class="actions"><button class="btn alt" data-bba="open:nippers">Nippers for Evan</button></div>` + shut14;
+        return head(room4, `The surf lifesaving club: volunteers on patrol every weekend since 1932. The canteen helps pay for the rescue boards.`, "stripe") + treats(F2, room4) + listOf(F2, shopGoods(room4), "For little lifesavers") + `<div class="actions"><button class="btn alt" data-bba="open:nippers">Nippers for Evan</button></div>` + shut15;
       case "bv_hide":
-        return head(room4, `A low timber hide in the dunes, a long window onto the beach. The penguins come home at dusk, after a day fishing at sea.`) + `<div class="actions"><button class="btn primary" data-bba="open:penguins">Watch for the penguins</button></div>` + shut14;
+        return head(room4, `A low timber hide in the dunes, a long window onto the beach. The penguins come home at dusk, after a day fishing at sea.`) + `<div class="actions"><button class="btn primary" data-bba="open:penguins">Watch for the penguins</button></div>` + shut15;
       case "bv_parkstore":
-        return head(room4, `The park store sells a bit of everything, and one scoop of bird seed a go: "The parrots'd eat the whole bag and then the bag," says Fay.`) + listOf(F2, shopGoods(room4), "Off the shelves") + shut14;
+        return head(room4, `The park store sells a bit of everything, and one scoop of bird seed a go: "The parrots'd eat the whole bag and then the bag," says Fay.`) + listOf(F2, shopGoods(room4), "Off the shelves") + shut15;
       case "bv_laundry":
-        return head(room4, `The laundry café: washing machines on one side, a coffee machine on the other, a book-swap shelf, and banana bread the whole coast talks about.`) + treats(F2, room4) + `<p class="muted">The book-swap shelf: take one, leave one. Someone's left a very battered copy of a sailing book.</p>` + shut14;
+        return head(room4, `The laundry café: washing machines on one side, a coffee machine on the other, a book-swap shelf, and banana bread the whole coast talks about.`) + treats(F2, room4) + `<p class="muted">The book-swap shelf: take one, leave one. Someone's left a very battered copy of a sailing book.</p>` + shut15;
       case "bv_rechall":
-        return head(room4, `The rec hall: ping-pong, a piano nobody's tuned since 1987, jigsaws with pieces missing, and the pinball high scores (the top one's been there for years).`, "stripe") + `<div class="actions"><button class="btn primary" data-bb="pingpong">A game of ping-pong</button></div>` + shut14;
+        return head(room4, `The rec hall: ping-pong, a piano nobody's tuned since 1987, jigsaws with pieces missing, and the pinball high scores (the top one's been there for years).`, "stripe") + `<div class="actions"><button class="btn primary" data-bb="pingpong">A game of ping-pong</button></div>` + shut15;
       // the Tablelands (round 158)
       case "bv_tcafe":
-        return head(room4, `The Range Café at the top of the hundred bends: the stove always lit, pumpkin scones every half hour, and the mist pressing at the windows.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `The Range Café at the top of the hundred bends: the stove always lit, pumpkin scones every half hour, and the mist pressing at the windows.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut15;
       case "bv_tranger":
-        return head(room4, `Ranger Kirra looks after the falls and the forest. "Swim at your own risk," says the sign. "It's very cold," she says. "That's the risk."`, "stripe") + listOf(F2, shopGoods(room4), "From the station") + `<div class="actions"><button class="btn primary" data-bba="open:swim">Swim in the falls</button></div>` + shut14;
+        return head(room4, `Ranger Kirra looks after the falls and the forest. "Swim at your own risk," says the sign. "It's very cold," she says. "That's the risk."`, "stripe") + listOf(F2, shopGoods(room4), "From the station") + `<div class="actions"><button class="btn primary" data-bba="open:swim">Swim in the falls</button></div>` + shut15;
       case "bv_tgallery":
-        return head(room4, `Local artists paint the falls in every season. Ruth throws pots in the corner and doesn't mind you watching.`) + listOf(F2, shopGoods(room4), "From the walls and shelves") + shut14;
+        return head(room4, `Local artists paint the falls in every season. Ruth throws pots in the corner and doesn't mind you watching.`) + listOf(F2, shopGoods(room4), "From the walls and shelves") + shut15;
       case "bv_tboat":
-        return head(room4, `Lachlan hires the kayaks. "Once round the lake takes about an hour. Watch for turtles. Don't race the ducks, you'll lose."`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:kayak">Paddle round the lake</button></div>` + listOf(F2, shopGoods(room4), "From the shed") + shut14;
+        return head(room4, `Lachlan hires the kayaks. "Once round the lake takes about an hour. Watch for turtles. Don't race the ducks, you'll lose."`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:kayak">Paddle round the lake</button></div>` + listOf(F2, shopGoods(room4), "From the shed") + shut15;
       case "bv_tlake":
-        return head(room4, `The Lake House: big windows onto the still water, a fire, deep armchairs, and pancakes all day.`) + treats(F2, room4) + shut14;
+        return head(room4, `The Lake House: big windows onto the still water, a fire, deep armchairs, and pancakes all day.`) + treats(F2, room4) + shut15;
       case "bv_tturner":
-        return head(room4, `Old Joe turns bowls from fallen rainforest timber: red cedar, silky oak, black bean. "Never cut one down," he says. "The forest gives me plenty."`) + listOf(F2, shopGoods(room4), "From the shelves") + shut14;
+        return head(room4, `Old Joe turns bowls from fallen rainforest timber: red cedar, silky oak, black bean. "Never cut one down," he says. "The forest gives me plenty."`) + listOf(F2, shopGoods(room4), "From the shelves") + shut15;
       case "bv_tbakery":
-        return head(room4, `The Willow Bend bakehouse has had its wood oven since 1911. Bread's out at six; the lamingtons at nine.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `The Willow Bend bakehouse has had its wood oven since 1911. Bread's out at six; the lamingtons at nine.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut15;
       case "bv_tlolly":
-        return head(room4, `Jarrah's lolly shop: jars to the ceiling, a sliding ladder, and paper bags filled by the scoop. Jarrah remembers everyone's favourite.`, "stripe") + treats(F2, room4) + listOf(F2, shopGoods(room4), "By the bag") + (o.evan ? `<p class="muted">Jarrah slips a raspberry lolly into Evan's hand. "On the house, mate."</p>` : "") + shut14;
+        return head(room4, `Jarrah's lolly shop: jars to the ceiling, a sliding ladder, and paper bags filled by the scoop. Jarrah remembers everyone's favourite.`, "stripe") + treats(F2, room4) + listOf(F2, shopGoods(room4), "By the bag") + (o.evan ? `<p class="muted">Jarrah slips a raspberry lolly into Evan's hand. "On the house, mate."</p>` : "") + shut15;
       case "bv_tbooks":
-        return head(room4, `The book barn: two floors of second-hand books, armchairs between the shelves, and Pages the cat asleep on the poetry, as usual.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "From the shelves") + shut14;
+        return head(room4, `The book barn: two floors of second-hand books, armchairs between the shelves, and Pages the cat asleep on the poetry, as usual.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "From the shelves") + shut15;
       case "bv_tmilk":
-        return head(room4, `Milking's at three: the cows walk in by themselves, one by one, each to her own place. Bill's radio is always on the country station.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:milking">Help with the milking</button></div>` + shut14;
+        return head(room4, `Milking's at three: the cows walk in by themselves, one by one, each to her own place. Bill's radio is always on the country station.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:milking">Help with the milking</button></div>` + shut15;
       case "bv_tcheese":
-        return head(room4, `Meg makes the dairy's cheeses: a vintage cheddar, a soft white one, and her Tableland havarti, creamy and buttery, with little holes.`) + listOf(F2, shopGoods(room4), "From the shelves") + `<div class="actions"><button class="btn alt" data-bba="open:cheese">Learn to make Meg's havarti</button></div>` + shut14;
+        return head(room4, `Meg makes the dairy's cheeses: a vintage cheddar, a soft white one, and her Tableland havarti, creamy and buttery, with little holes.`) + listOf(F2, shopGoods(room4), "From the shelves") + `<div class="actions"><button class="btn alt" data-bba="open:cheese">Learn to make Meg's havarti</button></div>` + shut15;
       case "bv_tshop":
-        return head(room4, `The farm shop: milk in glass bottles, the dairy's cheeses, and milkshakes so thick you need a spoon.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `The farm shop: milk in glass bottles, the dairy's cheeses, and milkshakes so thick you need a spoon.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut15;
       case "bv_tcrack":
-        return head(room4, `Pete's cracker is seventy years old and clatters like a train. In go the nuts, out come the kernels, and the shells go on the garden.`, "stripe") + listOf(F2, shopGoods(room4), "Fresh-cracked") + shut14;
+        return head(room4, `Pete's cracker is seventy years old and clatters like a train. In go the nuts, out come the kernels, and the shells go on the garden.`, "stripe") + listOf(F2, shopGoods(room4), "Fresh-cracked") + shut15;
       case "bv_tnutcafe":
-        return head(room4, `The Nutwood café: long tables on the verandah, a view down the rows, and everything with macadamias in it.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `The Nutwood café: long tables on the verandah, a view down the rows, and everything with macadamias in it.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut15;
       case "bv_tpack":
-        return head(room4, `Ana packs the nuts by hand and the finger limes into little boxes for the city restaurants. "Squeeze one," she says. "Go on."`) + listOf(F2, shopGoods(room4), "From the packing shed") + shut14;
+        return head(room4, `Ana packs the nuts by hand and the finger limes into little boxes for the city restaurants. "Squeeze one," she says. "Go on."`) + listOf(F2, shopGoods(room4), "From the packing shed") + shut15;
       case "bv_tticket":
-        return head(room4, `The old ticket office is a little museum now: brass punches, a telegraph key, lanterns, and photos of the gold diggings. The window still sells tickets for the steam train.`, "stripe") + listOf(F2, shopGoods(room4), "From the window") + `<div class="actions"><button class="btn primary" data-bba="open:steam">A ride on the steam train</button></div>` + shut14;
+        return head(room4, `The old ticket office is a little museum now: brass punches, a telegraph key, lanterns, and photos of the gold diggings. The window still sells tickets for the steam train.`, "stripe") + listOf(F2, shopGoods(room4), "From the window") + `<div class="actions"><button class="btn primary" data-bba="open:steam">A ride on the steam train</button></div>` + shut15;
       case "bv_tpub":
-        return head(room4, `The Royal Hotel: pressed tin ceiling, a cedar bar a hundred years old, and a photo of the biggest nugget ever found in the creek.`) + treats(F2, room4) + shut14;
+        return head(room4, `The Royal Hotel: pressed tin ceiling, a cedar bar a hundred years old, and a photo of the biggest nugget ever found in the creek.`) + treats(F2, room4) + shut15;
       case "bv_tantique":
-        return head(room4, `Nugget & Co.: Dot has everything from everywhere, and gold pans by the door. "There's still gold in that creek," she says. "Just not much."`) + listOf(F2, shopGoods(room4), "Curios and treasures") + shut14;
+        return head(room4, `Nugget & Co.: Dot has everything from everywhere, and gold pans by the door. "There's still gold in that creek," she says. "Just not much."`) + listOf(F2, shopGoods(room4), "Curios and treasures") + shut15;
       // the Lavender Hills (round 162)
       case "bv_hstill":
-        return head(room4, `Émile's grandfather built the still. Two hours of steam through a copper pot full of flowers, and out drips a thread of golden oil.`, "stripe") + listOf(F2, shopGoods(room4), "From the distillery") + `<div class="actions"><button class="btn primary" data-bba="open:harvest">Help with the harvest</button></div>` + shut14;
+        return head(room4, `Émile's grandfather built the still. Two hours of steam through a copper pot full of flowers, and out drips a thread of golden oil.`, "stripe") + listOf(F2, shopGoods(room4), "From the distillery") + `<div class="actions"><button class="btn primary" data-bba="open:harvest">Help with the harvest</button></div>` + shut15;
       case "bv_hshop":
-        return head(room4, `The farm shop: everything lavender, from oil to honey to little bags for the drawers. Bunches hang from every beam.`) + listOf(F2, shopGoods(room4), "From the farm") + shut14;
+        return head(room4, `The farm shop: everything lavender, from oil to honey to little bags for the drawers. Bunches hang from every beam.`) + listOf(F2, shopGoods(room4), "From the farm") + shut15;
       case "bv_htea":
-        return head(room4, `The tea room: lace at the windows, a view down the rows, and lavender in the scones, the lemonade and the honey.`) + treats(F2, room4) + shut14;
+        return head(room4, `The tea room: lace at the windows, a view down the rows, and lavender in the scones, the lemonade and the honey.`) + treats(F2, room4) + shut15;
       case "bv_hboul":
-        return head(room4, `The boulangerie: Monsieur Bernard has been baking here since he was fourteen. Baguettes at seven, croissants at eight, gone by ten.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut14;
+        return head(room4, `The boulangerie: Monsieur Bernard has been baking here since he was fourteen. Baguettes at seven, croissants at eight, gone by ten.`) + treats(F2, room4) + listOf(F2, shopGoods(room4), "To take home") + shut15;
       case "bv_hnougat":
-        return head(room4, `Madame Roux makes the nougat in copper pans behind the shop: honey, almonds, egg whites, and a lot of stirring.`, "stripe") + listOf(F2, shopGoods(room4), "From the shop") + (o.evan ? `<p class="muted">Madame Roux gives Evan a little cube of nougat on the end of her knife. "Pour le petit."</p>` : "") + shut14;
+        return head(room4, `Madame Roux makes the nougat in copper pans behind the shop: honey, almonds, egg whites, and a lot of stirring.`, "stripe") + listOf(F2, shopGoods(room4), "From the shop") + (o.evan ? `<p class="muted">Madame Roux gives Evan a little cube of nougat on the end of her knife. "Pour le petit."</p>` : "") + shut15;
       case "bv_hcafe":
-        return head(room4, `Café de la Place: the zinc bar, the wicker chairs, and the best view in town of the pétanque.`) + treats(F2, room4) + `<div class="actions"><button class="btn alt" data-bba="open:petanque">A game of pétanque in the square</button></div>` + shut14;
+        return head(room4, `Café de la Place: the zinc bar, the wicker chairs, and the best view in town of the pétanque.`) + treats(F2, room4) + `<div class="actions"><button class="btn alt" data-bba="open:petanque">A game of pétanque in the square</button></div>` + shut15;
       case "bv_hperfume":
-        return head(room4, `Madame Arnaud's perfumer's organ: hundreds of little brown bottles in a curve, top notes at the top, the deep ones at the bottom.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:scent">Blend your own perfume</button></div>` + shut14;
+        return head(room4, `Madame Arnaud's perfumer's organ: hundreds of little brown bottles in a curve, top notes at the top, the deep ones at the bottom.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:scent">Blend your own perfume</button></div>` + shut15;
       case "bv_hsavon":
-        return head(room4, `The soap maker: big blocks of olive oil soap, cut while you watch and stamped with a lavender sprig.`) + listOf(F2, shopGoods(room4), "From the shelves") + shut14;
+        return head(room4, `The soap maker: big blocks of olive oil soap, cut while you watch and stamped with a lavender sprig.`) + listOf(F2, shopGoods(room4), "From the shelves") + shut15;
       case "bv_hglass":
-        return head(room4, `Luc blows the perfumery's bottles, and little birds when he feels like it. The furnace never goes out.`, "stripe") + listOf(F2, shopGoods(room4), "From the shelves") + shut14;
+        return head(room4, `Luc blows the perfumery's bottles, and little birds when he feels like it. The furnace never goes out.`, "stripe") + listOf(F2, shopGoods(room4), "From the shelves") + shut15;
       case "bv_hhoney":
-        return head(room4, `The honey house: Odile and Mathis spin the frames and the honey runs gold. Lavender honey in July, sunflower in August.`) + listOf(F2, shopGoods(room4), "From the honey house") + `<div class="actions"><button class="btn alt" data-bba="open:bees">Suit up and help Mathis with the hives</button></div>` + shut14;
+        return head(room4, `The honey house: Odile and Mathis spin the frames and the honey runs gold. Lavender honey in July, sunflower in August.`) + listOf(F2, shopGoods(room4), "From the honey house") + `<div class="actions"><button class="btn alt" data-bba="open:bees">Suit up and help Mathis with the hives</button></div>` + shut15;
       case "bv_hcandle":
-        return head(room4, `Beeswax candles rolled from sheets of honeycomb wax, or dipped by hand, twenty times each.`) + listOf(F2, shopGoods(room4), "From the shelves") + shut14;
+        return head(room4, `Beeswax candles rolled from sheets of honeycomb wax, or dipped by hand, twenty times each.`) + listOf(F2, shopGoods(room4), "From the shelves") + shut15;
       case "bv_hkitchen":
-        return head(room4, `Odile's farmhouse kitchen: whoever's there at noon gets fed. Today, ratatouille.`) + treats(F2, room4) + shut14;
+        return head(room4, `Odile's farmhouse kitchen: whoever's there at noon gets fed. Today, ratatouille.`) + treats(F2, room4) + shut15;
       case "bv_hepicerie":
-        return head(room4, `The épicerie by the bridge: cheeses, saucisson, olives, and baskets packed for picnics on the meadow.`) + listOf(F2, shopGoods(room4), "From the shelves") + shut14;
+        return head(room4, `The épicerie by the bridge: cheeses, saucisson, olives, and baskets packed for picnics on the meadow.`) + listOf(F2, shopGoods(room4), "From the shelves") + shut15;
       case "bv_hglace":
-        return head(room4, `Glacier du Pont: Sylvie makes every flavour from what's growing nearby. The lavender one is pale purple.`) + treats(F2, room4) + shut14;
+        return head(room4, `Glacier du Pont: Sylvie makes every flavour from what's growing nearby. The lavender one is pale purple.`) + treats(F2, room4) + shut15;
       case "bv_hmill":
-        return head(room4, `Le Vieux Moulin: the old mill wheel still turns outside the window, and the river runs under the floor.`, "stripe") + treats(F2, room4) + shut14;
+        return head(room4, `Le Vieux Moulin: the old mill wheel still turns outside the window, and the river runs under the floor.`, "stripe") + treats(F2, room4) + shut15;
       case "bv_hfromage":
-        return head(room4, `Céline makes the goat's cheeses: fresh ones, ones rolled in herbs, and her banon, wrapped in chestnut leaves and tied with raffia.`) + listOf(F2, shopGoods(room4), "From the dairy") + `<div class="actions"><button class="btn alt" data-bba="open:banon">Learn to wrap a banon</button></div>` + shut14;
+        return head(room4, `Céline makes the goat's cheeses: fresh ones, ones rolled in herbs, and her banon, wrapped in chestnut leaves and tied with raffia.`) + listOf(F2, shopGoods(room4), "From the dairy") + `<div class="actions"><button class="btn alt" data-bba="open:banon">Learn to wrap a banon</button></div>` + shut15;
       case "bv_hbistro":
-        return head(room4, `The farm bistro: one long table under the vine, the farm's own cheese, and the lavender in the distance.`) + treats(F2, room4) + shut14;
+        return head(room4, `The farm bistro: one long table under the vine, the farm's own cheese, and the lavender in the distance.`) + treats(F2, room4) + shut15;
       case "bv_hchapel":
-        return head(room4, `The chapel of Saint Anne: tiny and cool, a painted ceiling of stars, candles at the altar, and the bell rope by the door. At sunset someone rings the bell.`) + `<div class="actions"><button class="btn primary" data-bba="open:bell">Light a candle, and ring the bell</button></div>` + shut14;
+        return head(room4, `The chapel of Saint Anne: tiny and cool, a painted ceiling of stars, candles at the altar, and the bell rope by the door. At sunset someone rings the bell.`) + `<div class="actions"><button class="btn primary" data-bba="open:bell">Light a candle, and ring the bell</button></div>` + shut15;
       case "bv_canoe":
-        return head(room4, `Canoes for hire, paddles on hooks, and life jackets in every size down to "very small".`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:canoe">Take a canoe out</button></div>` + shut14;
+        return head(room4, `Canoes for hire, paddles on hooks, and life jackets in every size down to "very small".`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:canoe">Take a canoe out</button></div>` + shut15;
       default:
         return "";
     }
   }
 
   // src/game/bbacts.js
-  var shut15 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut16 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin10 = () => icon("coin", 13);
   var BALLOON_SVG = `<svg viewBox="0 0 30 36" width="26" height="31"><path d="M15 2 C4 2 2 12 6 18 L11 25 h8 L24 18 C28 12 26 2 15 2z" fill="#E8566C" stroke="#2F2B28" stroke-width="1.2"/><path d="M15 2 C11 8 11 18 13 25 M15 2 C19 8 19 18 17 25" fill="none" stroke="#F3C969" stroke-width="2"/><rect x="11" y="28" width="8" height="6" rx="1" fill="#C9A27E" stroke="#2F2B28" stroke-width="1"/><path d="M11 25 v3 M19 25 v3" stroke="#2F2B28"/></svg>`;
   var CANOE_SVG = `<svg viewBox="0 0 44 16" width="44" height="16"><path d="M2 7 Q22 15 42 7 Q22 11 2 7z" fill="#C9433A" stroke="#2F2B28" stroke-width="1.2"/><circle cx="16" cy="5" r="2.4" fill="#2F2B28"/><circle cx="26" cy="5" r="2" fill="#5A3A2A"/></svg>`;
@@ -29646,8 +29826,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     let h3 = tape("stripe") + `<h2>A balloon ride with Gus</h2>`;
     if (!st6) {
       h3 += `<p class="sub">Up before the sun, or in the golden hour before it sets: the burner roars, the basket lifts, and the whole valley opens out below.</p>`;
-      if (!balloonOpen(hm6)) return h3 + `<p class="muted">Gus only flies at dawn (6 to 9) and in the golden hour (5 to 7), when the air is still. Come back then.</p>` + shut15;
-      return h3 + `<p class="muted">${cost} coins: ${BALLOON.price} for you${party.length ? `, and ${party.map((id) => id === "evan" ? `${BALLOON.evan} for Evan` : BALLOON.seat).join(", ")} for the others` : ""}.</p><div class="actions"><button class="btn primary" data-bba="fly" ${F2.coins >= cost ? "" : "disabled"}>Up we go · ${cost} ${coin10()}</button></div>` + shut15;
+      if (!balloonOpen(hm6)) return h3 + `<p class="muted">Gus only flies at dawn (6 to 9) and in the golden hour (5 to 7), when the air is still. Come back then.</p>` + shut16;
+      return h3 + `<p class="muted">${cost} coins: ${BALLOON.price} for you${party.length ? `, and ${party.map((id) => id === "evan" ? `${BALLOON.evan} for Evan` : BALLOON.seat).join(", ")} for the others` : ""}.</p><div class="actions"><button class="btn primary" data-bba="fly" ${F2.coins >= cost ? "" : "disabled"}>Up we go · ${cost} ${coin10()}</button></div>` + shut16;
     }
     if (st6.landed) return h3 + `<p class="sub">${st6.soft ? "A gentle bump, a little skid through the grass, and you're down." : "Bump! Bounce! The basket tips over on its side and everyone tumbles out, laughing."} You saw ${st6.seen.length} of ${st6.sights.length} things from just the right height.</p>${st6.seen.length ? `<ul class="hlist">${st6.seen.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}<div class="actions"><button class="btn primary" data-bba="flown">Champagne breakfast!</button></div>`;
     const done = st6.i >= st6.sights.length, next = done ? null : st6.sights[st6.i];
@@ -29676,7 +29856,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function riddlePanel(F2, st6) {
     let h3 = tape("stripe") + `<h2>Riddling with Jono</h2>`;
-    if (!st6) return h3 + `<p class="sub">The sparkling sits neck-down in the A-frame racks, and every day each bottle gets a quarter turn and a little tap, so the yeast slides down into the neck. Jono's chalked a mark on every base: turn each one till its mark points straight up.</p><div class="actions"><button class="btn primary" data-bba="riddle">Have a go</button></div>${bbState(F2).riddle ? `<p class="muted">You know how now: there's a riddling rack in your own wine cellar at home.</p>` : ""}` + shut15;
+    if (!st6) return h3 + `<p class="sub">The sparkling sits neck-down in the A-frame racks, and every day each bottle gets a quarter turn and a little tap, so the yeast slides down into the neck. Jono's chalked a mark on every base: turn each one till its mark points straight up.</p><div class="actions"><button class="btn primary" data-bba="riddle">Have a go</button></div>${bbState(F2).riddle ? `<p class="muted">You know how now: there's a riddling rack in your own wine cellar at home.</p>` : ""}` + shut16;
     h3 += `<p class="sub">Tap a bottle to give it a quarter turn. All the chalk marks pointing up.</p><div class="bbrack">${st6.turns.map((t2, i) => `<button class="bbbottle" data-bba="turn:${i}" aria-label="Bottle ${i + 1}, mark at ${["12", "3", "6", "9"][t2]} o'clock"><svg viewBox="0 0 40 40" width="40" height="40"><circle cx="20" cy="20" r="16" fill="#3E5A3A" stroke="#2F2B28" stroke-width="1.6"/><circle cx="20" cy="20" r="7" fill="#2E3A2A"/><g transform="rotate(${t2 * 90} 20 20)"><path d="M20 5 v8" stroke="#FFFDF6" stroke-width="3" stroke-linecap="round"/></g></svg></button>`).join("")}</div>`;
     return h3 + (riddleDone(st6) ? `<div class="actions"><button class="btn primary" data-bba="riddled">All turned!</button></div>` : `<p class="muted">${st6.turns.filter((t2) => !t2).length} of ${st6.turns.length} pointing up.</p>`);
   }
@@ -29708,7 +29888,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function berriesPanel(F2, st6, evan2) {
     let h3 = tape() + `<h2>Pick your own</h2>`;
-    if (!st6) return h3 + `<p class="sub">A little basket each, and the rows to yourselves. Red ones only: the white and green ones aren't ready.${bbState(F2).picked === dayKey() ? " (You've picked today: what's in the basket now is for eating.)" : ""}</p><div class="actions"><button class="btn primary" data-bba="pick">Grab a basket</button></div>` + shut15;
+    if (!st6) return h3 + `<p class="sub">A little basket each, and the rows to yourselves. Red ones only: the white and green ones aren't ready.${bbState(F2).picked === dayKey() ? " (You've picked today: what's in the basket now is for eating.)" : ""}</p><div class="actions"><button class="btn primary" data-bba="pick">Grab a basket</button></div>` + shut16;
     h3 += `<p class="sub">Tap the ripe ones.${evan2 ? ` Evan's "helping". Half of his are going straight in.` : ""}</p><div class="bbberries">${st6.ripe.map((r, i) => {
       const got3 = st6.picked.includes(i), straw = st6.kind[i] === "straw", col = r ? straw ? "#E8566C" : "#C2334D" : straw ? "#F3F0DA" : "#D9E3B0";
       return `<button class="bbberry${got3 ? " got" : ""}" data-bba="berry:${i}" ${got3 ? "disabled" : ""} aria-label="${r ? "ripe" : "not ripe"} ${straw ? "strawberry" : "raspberry"}"><svg viewBox="0 0 30 30" width="30" height="30">${straw ? `<path d="M15 27 C6 20 5 11 9 8 h12 c4 3 3 12 -6 19z" fill="${col}" stroke="#2F2B28" stroke-width="1.2"/><path d="M9 8 l3 -4 l3 3 l3 -3 l3 4z" fill="#7FA35A" stroke="#2F2B28" stroke-width="1"/>` : `${[[11, 12], [17, 12], [14, 17], [10, 18], [18, 18], [14, 23]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4.2" fill="${col}" stroke="#2F2B28" stroke-width=".9"/>`).join("")}<path d="M11 7 l3 -3 l3 3" fill="none" stroke="#7FA35A" stroke-width="1.6"/>`}${got3 ? `<path d="M6 15 l6 6 l12 -12" fill="none" stroke="#5E8A48" stroke-width="3"/>` : ""}</svg></button>`;
@@ -29730,7 +29910,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return tape("stripe") + `<h2>Dipping with Sophie</h2><p class="sub">Two strawberries on little forks, into the warm chocolate, a twirl, and something on top while it's wet. ${DIP.price} coins for the chocolate (you bring the berries: you've got ${have2}).</p>
     <p class="eyebrow" style="margin:10px 0 6px">Chocolate</p><div class="gchips">${Object.entries(DIP.choc).map(([k, n]) => `<button class="gchip${st6.choc === k ? " on" : ""}" data-bba="choc:${k}" aria-pressed="${st6.choc === k}">${esc(n)}</button>`).join("")}</div>
     <p class="eyebrow" style="margin:10px 0 6px">On top</p><div class="gchips">${Object.entries(DIP.tops).map(([k, n]) => `<button class="gchip${st6.top === k ? " on" : ""}" data-bba="top:${k}" aria-pressed="${st6.top === k}">${esc(n)}</button>`).join("")}</div>
-    ${evan2 ? `<p class="muted">Evan gets the spoon to lick after.</p>` : ""}<div class="actions"><button class="btn primary" data-bba="dip" ${ok && st6.choc && st6.top ? "" : "disabled"}>Dip!</button></div>${have2 < DIP.need ? `<p class="muted">You'll need strawberries: pick your own in the rows outside.</p>` : ""}` + shut15;
+    ${evan2 ? `<p class="muted">Evan gets the spoon to lick after.</p>` : ""}<div class="actions"><button class="btn primary" data-bba="dip" ${ok && st6.choc && st6.top ? "" : "disabled"}>Dip!</button></div>${have2 < DIP.need ? `<p class="muted">You'll need strawberries: pick your own in the rows outside.</p>` : ""}` + shut16;
   }
   var JOEY = { STEPS: ["Warm the bottle", "Tuck her into her pouch", "Feed her, slowly", "Back in her basket"], WARM: 3, FEED: 4, RELEASE: 3 };
   var joeyStart = () => ({ step: 0, warm: 0, feed: 0, oops: false });
@@ -29765,7 +29945,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function joeyPanel(F2, st6, evan2) {
     const feeds = bbState(F2).joey || 0;
     let h3 = tape() + `<h2>Feeding Pip</h2>`;
-    if (!st6) return h3 + `<p class="sub">Pip's an orphaned eastern grey joey, about the size of a loaf of bread, all ears and legs. Kim's handing you her bottle.${feeds >= JOEY.RELEASE ? " (Pip's gone back to the bush now, with her mob! This is her friend Clover, just in.)" : feeds ? ` You've fed her ${feeds} time${feeds === 1 ? "" : "s"}.` : ""}</p><div class="actions"><button class="btn primary" data-bba="joey">Feed her</button></div>` + shut15;
+    if (!st6) return h3 + `<p class="sub">Pip's an orphaned eastern grey joey, about the size of a loaf of bread, all ears and legs. Kim's handing you her bottle.${feeds >= JOEY.RELEASE ? " (Pip's gone back to the bush now, with her mob! This is her friend Clover, just in.)" : feeds ? ` You've fed her ${feeds} time${feeds === 1 ? "" : "s"}.` : ""}</p><div class="actions"><button class="btn primary" data-bba="joey">Feed her</button></div>` + shut16;
     h3 += `<p class="sub">${st6.oops ? 'Kim gently stops you: "Not yet, love. One thing at a time."' : st6.step === 0 ? `Warm the bottle in the jug (${st6.warm} of ${JOEY.WARM}).` : st6.step === 2 ? `She's sucking! Hold it steady (${st6.feed} of ${JOEY.FEED}).` : "Good. What's next?"}${evan2 ? " Evan's holding his breath so he doesn't scare her." : ""}</p>`;
     h3 += `<div class="bbsteps">${JOEY.STEPS.map((n, i) => `<button class="btn ${i < st6.step ? "alt" : "primary"} small" data-bba="jstep:${i}" ${i < st6.step ? "disabled" : ""}>${i < st6.step ? "✓ " : ""}${esc(n)}</button>`).join("")}</div>`;
     return h3 + (joeyDone(st6) ? `<div class="actions"><button class="btn primary" data-bba="fed">Night night, Pip</button></div>` : "");
@@ -29788,7 +29968,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function canoePanel(F2, st6, evan2, paid) {
     let h3 = tape("stripe") + `<h2>A canoe down the river</h2>`;
-    if (!st6) return h3 + `<p class="sub">Bodhi pushes you off from the bank. The river's slow and green, with gums leaning over it from both sides.${evan2 ? " Evan's in the middle, in the very small life jacket." : ""}</p><div class="actions"><button class="btn primary" data-bba="canoe" ${paid || F2.coins >= CANOE.price ? "" : "disabled"}>Hire a canoe · ${CANOE.price} ${coin10()}</button></div>` + shut15;
+    if (!st6) return h3 + `<p class="sub">Bodhi pushes you off from the bank. The river's slow and green, with gums leaning over it from both sides.${evan2 ? " Evan's in the middle, in the very small life jacket." : ""}</p><div class="actions"><button class="btn primary" data-bba="canoe" ${paid || F2.coins >= CANOE.price ? "" : "disabled"}>Hire a canoe · ${CANOE.price} ${coin10()}</button></div>` + shut16;
     const n = st6.strokes.length;
     h3 += `<p class="sub">${n ? st6.last && st6.strokes.length > 1 && st6.strokes[n - 1] === st6.strokes[n - 2] ? "Whoa, you're going round in a circle! Swap sides." : "Gliding. The water drips off the paddle." : "Paddle on one side, then the other, to go straight."} (${n} of ${CANOE.STROKES})</p><div class="bbriver" aria-hidden="true"><span style="left:${10 + n / CANOE.STROKES * 78}%">${CANOE_SVG}</span></div>`;
     return h3 + (canoeDone(st6) ? `<div class="actions"><button class="btn primary" data-bba="canoed">Round the bend</button></div>` : `<div class="actions"><button class="btn primary" data-bba="paddle:L">Left</button><button class="btn primary" data-bba="paddle:R">Right</button></div>`);
@@ -29819,17 +29999,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function firePanel(F2, st6, o) {
     let h3 = tape() + `<h2>The campfire</h2>`;
-    if (!fireLit(o.hm)) return h3 + `<p class="sub">The fire rings are cold. Wal lights the big one at five, and everyone drifts over with a chair.</p>` + shut15;
+    if (!fireLit(o.hm)) return h3 + `<p class="sub">The fire rings are cold. Wal lights the big one at five, and everyone drifts over with a chair.</p>` + shut16;
     if (!st6) {
       const bags2 = (F2.inv || {}).mallows || 0;
-      return h3 + `<p class="sub">The fire's crackling, the chairs are out, and ${o.folk ? "the neighbours shuffle round to make room." : "it's just you and the stars."}${bags2 ? "" : " You'll need a bag of marshmallows from the camp store."}</p><div class="actions"><button class="btn primary" data-bba="bag" ${bags2 ? "" : "disabled"}>Open a bag of marshmallows (${bags2})</button></div>` + shut15;
+      return h3 + `<p class="sub">The fire's crackling, the chairs are out, and ${o.folk ? "the neighbours shuffle round to make room." : "it's just you and the stars."}${bags2 ? "" : " You'll need a bag of marshmallows from the camp store."}</p><div class="actions"><button class="btn primary" data-bba="bag" ${bags2 ? "" : "disabled"}>Open a bag of marshmallows (${bags2})</button></div>` + shut16;
     }
     if (st6.left <= 0) return h3 + `<p class="sub">The bag's empty. ${st6.golden} golden, ${st6.burnt} black. ${st6.golden >= 4 ? `Archie nods. "You've done this before."` : st6.burnt >= 3 ? `Archie laughs. "Charcoal's good for the teeth, they say."` : "Sticky fingers all round."}</p><div class="actions"><button class="btn primary" data-bba="mdone">Lovely</button></div>`;
     return h3 + `<p class="sub">${st6.heat === 0 ? "A fresh marshmallow on the stick. Hold it over the coals." : st6.heat < MALLOW.GOLD ? "It's going soft and pale. A bit longer..." : st6.heat === MALLOW.GOLD ? "Golden brown! Pull it out now!" : "It's on fire! Blow it out, quick!"} (${st6.left} left in the bag)</p><div class="bbmallow" aria-hidden="true"><span class="h${Math.min(st6.heat, 4)}"></span></div><div class="actions"><button class="btn primary" data-bba="toast">Hold it over</button><button class="btn alt" data-bba="pull" ${st6.heat ? "" : "disabled"}>Pull it out</button></div>`;
   }
 
   // src/game/cracts.js
-  var shut16 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut17 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin11 = () => icon("coin", 13);
   var tape2 = (t2 = "gingham") => `<span class="tape ${t2}" aria-hidden="true"></span>`;
   var WAVE_SVG = `<svg viewBox="0 0 60 24" width="60" height="24"><path d="M2 22 C14 22 18 4 34 4 C46 4 50 14 44 16 C40 17 38 12 42 11" fill="none" stroke="#2F6F8C" stroke-width="3" stroke-linecap="round"/><path d="M2 22 C16 22 20 8 34 8" fill="none" stroke="#FFFDF6" stroke-width="2" stroke-linecap="round"/></svg>`;
@@ -29870,7 +30050,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function surfPanel(F2, st6, evan2, paid) {
     let h3 = tape2("stripe") + `<h2>A surf lesson with Jet</h2>`;
-    if (!st6) return h3 + `<p class="sub">First on the sand: lie on the board, paddle, and pop up onto your feet. Then out into the little waves between the flags.${evan2 ? " Evan gets a soft foam board and Jet holding the tail, in the whitewash where it's only up to his knees." : ""}</p><p class="muted">${surfCost(evan2)} coins with the board and wetsuit${evan2 ? ` (${SURF.evan} of it for Evan)` : ""}. ${bbState(F2).surfs ? `You've had ${bbState(F2).surfs} lesson${bbState(F2).surfs === 1 ? "" : "s"}.` : ""}</p><div class="actions"><button class="btn primary" data-bba="surf" ${paid || F2.coins >= surfCost(evan2) ? "" : "disabled"}>Out we go · ${surfCost(evan2)} ${coin11()}</button></div>` + shut16;
+    if (!st6) return h3 + `<p class="sub">First on the sand: lie on the board, paddle, and pop up onto your feet. Then out into the little waves between the flags.${evan2 ? " Evan gets a soft foam board and Jet holding the tail, in the whitewash where it's only up to his knees." : ""}</p><p class="muted">${surfCost(evan2)} coins with the board and wetsuit${evan2 ? ` (${SURF.evan} of it for Evan)` : ""}. ${bbState(F2).surfs ? `You've had ${bbState(F2).surfs} lesson${bbState(F2).surfs === 1 ? "" : "s"}.` : ""}</p><div class="actions"><button class="btn primary" data-bba="surf" ${paid || F2.coins >= surfCost(evan2) ? "" : "disabled"}>Out we go · ${surfCost(evan2)} ${coin11()}</button></div>` + shut17;
     if (surfDone(st6)) return h3 + `<p class="sub">${st6.rides >= 3 ? `Jet's whooping from the shallows. "Look at you! You're a surfer!"` : st6.rides ? "You stood up! Wobbly, brief, and absolutely glorious." : `Lots of wipeouts and a mouthful of sea. Jet laughs: "Everyone's first go. Next time."`} ${st6.rides} of ${SURF.WAVES} waves ridden.${evan2 ? " Evan rode his foam board all the way to the sand, on his tummy, then on his knees, then for one second on his feet." : ""}</p><div class="actions"><button class="btn primary" data-bba="surfed">Back to the sand</button></div>`;
     const msg = { paddle: ["Paddle, paddle...", "The wave's lifting behind you...", "It's picking you up! NOW!"][st6.phase - 1], ride: "You pop up, and you're standing! The wave carries you right in. Then back out for the next.", early: "Up too soon: the wave rolls past under you. Back out.", dumped: "Too late! The wave dumps you, board and all. Up you come, laughing." }[st6.last] || "A set's coming. Lie on the board and start paddling.";
     h3 += `<p class="sub">${esc(msg)} (wave ${st6.wave + 1} of ${SURF.WAVES})</p><div class="crsurf" aria-hidden="true"><span class="w p${st6.phase}">${WAVE_SVG}</span><span class="b">${BOARD_SVG}</span></div>`;
@@ -29912,7 +30092,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function whalePanel(F2, st6, evan2) {
     const season = whaleSeason(dayKey());
     let h3 = tape2("stripe") + `<h2>Whale watching</h2>`;
-    if (!st6) return h3 + `<p class="sub">Up all hundred and twenty-eight steps, out onto the balcony round the lamp, and the whole ocean's in front of you. ${season ? "It's whale season: the humpbacks are passing, mums and calves heading south." : "The humpbacks are away (they pass from May to November), but the dolphins are here all year."} Win hands you the big binoculars.${evan2 ? " Evan's got the little ones, upside down." : ""}</p><div class="actions"><button class="btn primary" data-bba="whales">Look out to sea</button></div>` + shut16;
+    if (!st6) return h3 + `<p class="sub">Up all hundred and twenty-eight steps, out onto the balcony round the lamp, and the whole ocean's in front of you. ${season ? "It's whale season: the humpbacks are passing, mums and calves heading south." : "The humpbacks are away (they pass from May to November), but the dolphins are here all year."} Win hands you the big binoculars.${evan2 ? " Evan's got the little ones, upside down." : ""}</p><div class="actions"><button class="btn primary" data-bba="whales">Look out to sea</button></div>` + shut17;
     if (whaleDone(st6)) return h3 + `<p class="sub">${st6.seen.length ? `You saw: ${st6.seen.map((s) => s.split("!")[0].split(",")[0].toLowerCase()).join("; ")}.` : "Just sea, and more sea, and a container ship very far away. They're out there, though. Win says come back in an hour."}</p>${st6.seen.length ? `<ul class="hlist">${st6.seen.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}<div class="actions"><button class="btn primary" data-bba="whaled">Back down the steps</button></div>`;
     h3 += `<p class="sub">Sweep the binoculars across the water: tap a stretch of sea to look there. ${WHALES.LOOKS - st6.looked.length} looks left before your arms get tired.</p>`;
     h3 += `<div class="crsea">${Array.from({ length: WHALES.SECTORS }, (_, i) => {
@@ -29945,8 +30125,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function glowPanel(F2, st6, o) {
     let h3 = tape2() + `<h2>The glow-worm grotto</h2>`;
-    if (!glowOpen(o.hm)) return h3 + `<p class="sub">In the daylight it's just a damp, mossy overhang with a drippy fern curtain. The glow-worms only show once it's dark: Tash brings people down from six.</p>` + shut16;
-    if (!st6) return h3 + `<p class="sub">Down the steps by the waterfall, under the dripping overhang. Tash whispers: "Torches off. Give your eyes a minute. And no loud voices, they'll switch off."${o.evan ? " Evan's holding your hand very tightly." : ""}</p><div class="actions"><button class="btn primary" data-bba="glow">Torches off</button></div>` + shut16;
+    if (!glowOpen(o.hm)) return h3 + `<p class="sub">In the daylight it's just a damp, mossy overhang with a drippy fern curtain. The glow-worms only show once it's dark: Tash brings people down from six.</p>` + shut17;
+    if (!st6) return h3 + `<p class="sub">Down the steps by the waterfall, under the dripping overhang. Tash whispers: "Torches off. Give your eyes a minute. And no loud voices, they'll switch off."${o.evan ? " Evan's holding your hand very tightly." : ""}</p><div class="actions"><button class="btn primary" data-bba="glow">Torches off</button></div>` + shut17;
     if (st6.wait < GLOW.WAIT) return h3 + `<p class="sub">${["Pitch black. You can hear the waterfall, and your own breathing.", "Something faint... or is it your eyes playing tricks?", "There. And there. Little blue-green pinpricks, coming out one by one."][st6.wait]}</p><div class="crcave dim${st6.wait}" aria-hidden="true"></div><div class="actions"><button class="btn primary" data-bba="gwait">Wait a little longer</button></div>`;
     if (glowDone(st6)) return h3 + `<p class="sub">${glowTotal(st6)} glow-worms, give or take. Tash says there are thousands further in, where nobody goes. It looks like the night sky has come down to sit on the rocks.</p><div class="actions"><button class="btn primary" data-bba="glowed">Tiptoe back out</button></div>`;
     h3 += `<p class="sub">Tap each patch of the ceiling to count its lights.</p><div class="crcave lit">${st6.lit.map((n, i) => {
@@ -30000,8 +30180,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function potsPanel(F2, st6, o) {
     let h3 = tape2("stripe") + `<h2>Cray pots with Mags</h2>`;
     if (!st6) {
-      if (!potsOpen(o.hm)) return h3 + `<p class="sub">Mags goes out at first light and she's back and done by lunch. Come in the morning and she'll take you out to her pots.</p>` + shut16;
-      return h3 + `<p class="sub">Out in the bay in Mags's little boat, the Molly B. Five floats bobbing: five pots on the bottom. She hands you the brass gauge: "Under it, back it goes. And any mum with eggs under her tail goes back too, whatever her size."${o.evan ? " Evan's in a life jacket, in charge of the bait bucket. He's thrilled and appalled." : ""}${bbState(F2).pots === dayKey() ? " (You've had your crays today: this one's for the fun of it.)" : ""}</p><div class="actions"><button class="btn primary" data-bba="pots">Out to the pots</button></div>` + shut16;
+      if (!potsOpen(o.hm)) return h3 + `<p class="sub">Mags goes out at first light and she's back and done by lunch. Come in the morning and she'll take you out to her pots.</p>` + shut17;
+      return h3 + `<p class="sub">Out in the bay in Mags's little boat, the Molly B. Five floats bobbing: five pots on the bottom. She hands you the brass gauge: "Under it, back it goes. And any mum with eggs under her tail goes back too, whatever her size."${o.evan ? " Evan's in a life jacket, in charge of the bait bucket. He's thrilled and appalled." : ""}${bbState(F2).pots === dayKey() ? " (You've had your crays today: this one's for the fun of it.)" : ""}</p><div class="actions"><button class="btn primary" data-bba="pots">Out to the pots</button></div>` + shut17;
     }
     if (potsDone(st6)) return h3 + `<p class="sub">${st6.right === st6.pots.length ? `Mags nods slowly. "You'd make a deckhand."` : st6.right >= st6.pots.length - 1 ? '"Nearly perfect," says Mags. "Better than Davo his first week."' : `"You'll get the hang of the gauge," Mags says, and checks the crays you kept, just in case.`} Back to the wharf with the gulls following.</p><div class="actions"><button class="btn primary" data-bba="potted">Tie up at the wharf</button></div>`;
     const p = st6.pots[st6.i], say3 = { kept: "Into the tank! A beauty.", back: "Over the side, and off she scoots backwards. Good call.", small: 'Mags shakes her head: "Under the gauge, love. Back he goes." Over the side.', berried: '"See those eggs under her tail? She stays." Mags lowers her back in, gently.', big: `"That one was over the gauge!" Too late: it's off. Mags laughs. "Next one."`, empty: "Empty. Just a bit of weed and a cranky crab, who goes back." }[st6.last];
@@ -30035,8 +30215,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function pengPanel(F2, st6, o) {
     let h3 = tape2() + `<h2>The penguin parade</h2>`;
-    if (!pengOpen(o.hm)) return h3 + `<p class="sub">The little penguins are out at sea all day, fishing. They come home across the beach just after sunset: the hide opens at six. Back then.</p>` + shut16;
-    if (!st6) return h3 + `<p class="sub">Into the hide, onto the long bench, and the window onto the sand. No torches, no cameras, and not a peep: they're shy. The sun's going down behind the Sisters.${o.evan ? " Evan has promised to be quieter than a mouse. He's practising." : ""}</p><div class="actions"><button class="btn primary" data-bba="peng">Settle in</button></div>` + shut16;
+    if (!pengOpen(o.hm)) return h3 + `<p class="sub">The little penguins are out at sea all day, fishing. They come home across the beach just after sunset: the hide opens at six. Back then.</p>` + shut17;
+    if (!st6) return h3 + `<p class="sub">Into the hide, onto the long bench, and the window onto the sand. No torches, no cameras, and not a peep: they're shy. The sun's going down behind the Sisters.${o.evan ? " Evan has promised to be quieter than a mouse. He's practising." : ""}</p><div class="actions"><button class="btn primary" data-bba="peng">Settle in</button></div>` + shut17;
     if (pengDone(st6)) return h3 + `<p class="sub">${st6.here} little penguins waddled home up the beach, flippers out, chattering, and disappeared into their burrows in the dunes.${st6.fright ? " A couple of groups scuttled back into the sea first, but they'll try again later." : " Not one of them was frightened."}${o.evan ? ' Evan whispers: "Goodnight, penguins."' : ""}</p><div class="actions"><button class="btn primary" data-bba="penged">Tiptoe out</button></div>`;
     const lights = ["The sun's touching the sea.", "Pink sky. Something moves at the edge of the water...", "A little huddle of penguins, standing in the shallows, deciding.", "They're coming! Up the sand, in a line, flippers out.", "More, and more. One falls over and gets straight back up.", "Nearly dark. The last few hurry past right under the window."][st6.round];
     const was = { still: "They pass right by. You hold your breath.", shushed: "A finger to your lips; Evan clamps his hands over his mouth, eyes huge. The penguins keep coming.", squeal: '"PENGUINS!" squeaks Evan. The whole group turns and scurries back into the waves.', fidget: "The bench creaks. Three penguins freeze, then hop back into the sea." }[st6.last];
@@ -30070,9 +30250,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function nipPanel(F2, st6, o) {
     let h3 = tape2("stripe") + `<h2>Nippers</h2>`;
-    if (!o.evan) return h3 + `<p class="sub">Little lifesavers, five to thirteen, in red and yellow caps, racing to the flags. Coach Dimi says Evan can join in any morning: bring him along.</p>` + shut16;
-    if (!nipOpen(o.hm)) return h3 + `<p class="sub">Nippers is on in the mornings, nine till twelve, at the river mouth beach. Coach Dimi says bring Evan back then.</p>` + shut16;
-    if (!st6) return h3 + `<p class="sub">Coach Dimi pulls a red and yellow cap down over Evan's ears and lines him up with the under-sixes. "Run to the water, out round the buoy, back up the sand, and dive for a flag. Parents cheer. Loudly."${bbState(F2).nippers || 0 ? ` (Evan's done Nippers ${bbState(F2).nippers} time${bbState(F2).nippers === 1 ? "" : "s"}.)` : ""}</p><div class="actions"><button class="btn primary" data-bba="nip">On your marks...</button></div>` + shut16;
+    if (!o.evan) return h3 + `<p class="sub">Little lifesavers, five to thirteen, in red and yellow caps, racing to the flags. Coach Dimi says Evan can join in any morning: bring him along.</p>` + shut17;
+    if (!nipOpen(o.hm)) return h3 + `<p class="sub">Nippers is on in the mornings, nine till twelve, at the river mouth beach. Coach Dimi says bring Evan back then.</p>` + shut17;
+    if (!st6) return h3 + `<p class="sub">Coach Dimi pulls a red and yellow cap down over Evan's ears and lines him up with the under-sixes. "Run to the water, out round the buoy, back up the sand, and dive for a flag. Parents cheer. Loudly."${bbState(F2).nippers || 0 ? ` (Evan's done Nippers ${bbState(F2).nippers} time${bbState(F2).nippers === 1 ? "" : "s"}.)` : ""}</p><div class="actions"><button class="btn primary" data-bba="nip">On your marks...</button></div>` + shut17;
     if (nipDone(st6)) {
       const place5 = nipPlace(st6);
       return h3 + `<p class="sub">${["Evan's first! He's holding the flag over his head and running in circles.", "Second! He dived for the flag and got a mouthful of sand, and he doesn't care at all.", "Third! He's beaming. Coach Dimi high-fives him.", "He came in last, smiling the whole way, and stopped to show a shell to the girl next to him."][place5 - 1]}</p><div class="actions"><button class="btn primary" data-bba="nipped">Hot chips at the surf club</button></div>`;
@@ -30084,7 +30264,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
 
   // src/game/tlacts.js
   var TL_KINDS = ["swim", "kayak", "platypus", "calves", "milking", "cheese", "shake", "pan", "steam"];
-  var shut17 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut18 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin12 = () => icon("coin", 13);
   var tape3 = (t2 = "gingham") => `<span class="tape ${t2}" aria-hidden="true"></span>`;
   var btn = (verb, label2, primary = true, off = false) => `<button class="btn ${primary ? "primary" : "alt"}" data-bba="tl:${verb}" ${off ? "disabled" : ""}>${esc(label2)}</button>`;
@@ -30270,66 +30450,66 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     switch (kind) {
       case "swim": {
         let h3 = tape3("stripe") + `<h2>A swim in the falls</h2>`;
-        if (!swimOpen(hm6)) return h3 + `<p class="sub">Swimming's from 8 till 5, while Kirra's about. The pool's dark and still now.</p>` + shut17;
-        if (!t2) return h3 + `<p class="sub">Eleven degrees, says Kirra's sign. A round dark pool, ferns all round, and the falls pouring in at the far side.${evan2 ? " Evan's going to paddle in the shallows on the warm rock, with his feet in." : ""}${s.swims ? ` You've swum here ${s.swims} time${s.swims > 1 ? "s" : ""}.` : ""}</p><div class="actions">${btn("swimin", "In you go")}</div>` + shut17;
+        if (!swimOpen(hm6)) return h3 + `<p class="sub">Swimming's from 8 till 5, while Kirra's about. The pool's dark and still now.</p>` + shut18;
+        if (!t2) return h3 + `<p class="sub">Eleven degrees, says Kirra's sign. A round dark pool, ferns all round, and the falls pouring in at the far side.${evan2 ? " Evan's going to paddle in the shallows on the warm rock, with his feet in." : ""}${s.swims ? ` You've swum here ${s.swims} time${s.swims > 1 ? "s" : ""}.` : ""}</p><div class="actions">${btn("swimin", "In you go")}</div>` + shut18;
         if (t2.out) return h3 + `<p class="sub">${t2.cold >= SWIM.COLD ? "Teeth chattering, you scramble out onto the sunny rock, laughing, wrapped in a towel." : "Out onto the warm rock, tingling all over, wrapped in a towel."} ${t2.done.length >= 3 ? "The falls, the float, behind the veil: you did the lot." : ""}</p><div class="actions">${btn("swimdone", "Get dressed")}</div>`;
         return h3 + `<p class="sub">${esc(t2.last ? SWIM_DO[t2.last] || "" : "In! The cold hits like a slap, then it's wonderful.")}</p><p class="muted">Cold: ${"●".repeat(t2.cold)}${"○".repeat(SWIM.COLD - t2.cold)}</p><div class="actions">${["falls", "float", "veil"].filter((k) => !t2.done.includes(k)).map((k) => btn("swim." + k, { falls: "Swim to the falls", float: "Float and look up", veil: "Duck under the veil" }[k])).join("")}${btn("swim.out", "Get out", false)}</div>`;
       }
       case "kayak": {
         let h3 = tape3("stripe") + `<h2>Once round the lake</h2>`;
-        if (!t2) return h3 + `<p class="sub">A red kayak, a paddle, and the whole round lake.${evan2 ? " Evan's in the front seat with a tiny paddle, steering, he says." : ""} Steer towards whatever shows itself.</p><div class="actions"><button class="btn primary" data-bba="tl:kayakgo" ${F2.coins >= kayakCost(evan2) || st6.paid ? "" : "disabled"}>Push off · ${kayakCost(evan2)} ${coin12()}</button></div>` + shut17;
+        if (!t2) return h3 + `<p class="sub">A red kayak, a paddle, and the whole round lake.${evan2 ? " Evan's in the front seat with a tiny paddle, steering, he says." : ""} Steer towards whatever shows itself.</p><div class="actions"><button class="btn primary" data-bba="tl:kayakgo" ${F2.coins >= kayakCost(evan2) || st6.paid ? "" : "disabled"}>Push off · ${kayakCost(evan2)} ${coin12()}</button></div>` + shut18;
         if (kayakDone(t2)) return h3 + `<p class="sub">Back at the boat shed, arms aching. ${t2.seen.length ? `You saw: ${t2.seen.map((x) => esc(x.toLowerCase())).join("; ")}.` : "A quiet lap: the lake kept its secrets today."}</p><div class="actions">${btn("kayakdone", "Climb out")}</div>`;
         const msg = t2.last ? t2.last === "miss" ? "Just ripples where you looked. Something splashed the other way." : `${t2.last}!` : "Out onto the still water. Somewhere a splash.";
         return h3 + `<p class="sub">${esc(msg)} (stretch ${t2.leg + 1} of ${KAYAK.LEGS})</p><div class="actions">${btn("steer.0", "Left, by the reeds")}${btn("steer.1", "Straight ahead")}${btn("steer.2", "Right, under the trees")}</div><p class="muted">${t2.seen.length} seen so far.</p>`;
       }
       case "platypus": {
         let h3 = tape3() + `<h2>The platypus platform</h2>`;
-        if (!t2) return h3 + `<p class="sub">Be very still. Watch the water by the far bank. When you see rings spreading on the water, look closer. When there's nothing, wait. ${hm6 < 9 * 60 || hm6 >= 17 * 60 ? "Dawn and dusk are her busy times: good timing." : "Middle of the day: she might be asleep in her burrow, but you never know."}${s.platypus ? ` You've seen her ${s.platypus} time${s.platypus > 1 ? "s" : ""}.` : ""}</p><div class="actions">${btn("platygo", "Watch the water")}</div>` + shut17;
+        if (!t2) return h3 + `<p class="sub">Be very still. Watch the water by the far bank. When you see rings spreading on the water, look closer. When there's nothing, wait. ${hm6 < 9 * 60 || hm6 >= 17 * 60 ? "Dawn and dusk are her busy times: good timing." : "Middle of the day: she might be asleep in her burrow, but you never know."}${s.platypus ? ` You've seen her ${s.platypus} time${s.platypus > 1 ? "s" : ""}.` : ""}</p><div class="actions">${btn("platygo", "Watch the water")}</div>` + shut18;
         if (platyDone(t2)) return h3 + `<p class="sub">${t2.gone ? "A creak of the boards, a splash, and she's gone. Maybe next time." : t2.seen ? `You saw her ${t2.seen} time${t2.seen > 1 ? "s" : ""}: a little brown back, a duck's bill, a flick of a tail, and then just rings on the water.` : "Nothing but leaves floating by. She's somewhere downstream."}</p><div class="actions">${btn("platydone", "Tiptoe off")}</div>`;
         const rings = t2.rings[t2.round];
         return h3 + `<p class="sub">${rings ? "Rings on the water by the far bank, spreading..." : "The creek slides by. Nothing. A leaf turns over."}${evan2 ? ` <i>(Evan's whispering, which is very loud.)</i>` : ""}</p><div class="actions">${btn("platy.look", "Look closer")}${btn("platy.wait", "Stay still", false)}</div>`;
       }
       case "calves": {
         let h3 = tape3() + `<h2>Feeding the calves</h2>`;
-        if (!t2) return h3 + `<p class="sub">Noah has four warm bottles. "Hungriest first," he says. "You can tell: they bump hardest."${evan2 ? " Evan holds the bottom of the bottle with you." : ""}</p><div class="actions">${btn("calvesgo", "Fill the bottles")}</div>` + shut17;
+        if (!t2) return h3 + `<p class="sub">Noah has four warm bottles. "Hungriest first," he says. "You can tell: they bump hardest."${evan2 ? " Evan holds the bottom of the bottle with you." : ""}</p><div class="actions">${btn("calvesgo", "Fill the bottles")}</div>` + shut18;
         if (calvesDone(t2)) return h3 + `<p class="sub">${t2.wrong ? `All fed, all sleepy, though ${t2.wrong === 1 ? "one" : "a couple"} got a bit cross waiting.` : "Perfect: hungriest first, and four very full, very happy calves."} Buttercup licks your hand all the way up to the elbow.</p><div class="actions">${btn("calvesdone", "Wipe your hands")}</div>`;
         const bump = (n) => ["nuzzling gently", "nudging the rail", "bumping the rail", "BUMPING HARD and bellowing"][n - 1];
         return h3 + `<ul class="hlist wlist">${t2.calves.map((c, i) => `<li><span class="wtxt"><b>${esc(c.n)}</b><small>${t2.fed.includes(i) ? "full and sleepy" : bump(c.hunger)}</small></span>${t2.fed.includes(i) ? "" : `<button class="btn small primary" data-bba="tl:calf.${i}">Feed</button>`}</li>`).join("")}</ul>`;
       }
       case "milking": {
         let h3 = tape3("stripe") + `<h2>The milking</h2>`;
-        if (!milkOpen(hm6)) return h3 + `<p class="sub">Milking's at three: come back from half past two. The shed's hosed down and quiet, and Bill's radio is playing to nobody.</p>` + shut17;
-        if (!t2) return h3 + `<p class="sub">"They come in by their ear tags," says Bill. "Lowest number first. Open the gate for the right one."${s.milked === dayKey() ? " (You've helped today already: Bill's glad of the hand anyway.)" : ""}</p><div class="actions">${btn("milkgo", "Open the yard gate")}</div>` + shut17;
+        if (!milkOpen(hm6)) return h3 + `<p class="sub">Milking's at three: come back from half past two. The shed's hosed down and quiet, and Bill's radio is playing to nobody.</p>` + shut18;
+        if (!t2) return h3 + `<p class="sub">"They come in by their ear tags," says Bill. "Lowest number first. Open the gate for the right one."${s.milked === dayKey() ? " (You've helped today already: Bill's glad of the hand anyway.)" : ""}</p><div class="actions">${btn("milkgo", "Open the yard gate")}</div>` + shut18;
         if (milkDone(t2)) return h3 + `<p class="sub">All six in, cups on, and the milk running silver down the pipes. ${t2.wrong ? "A couple of cows tried to push in, but Bill laughed it off." : `"You're a natural," says Bill.`}</p><div class="actions">${btn("milkdone", "Wash up")}</div>`;
         return h3 + `<ul class="hlist wlist">${t2.cows.map((c, i) => `<li><span class="wtxt"><b>${esc(c.n)}</b><small>ear tag ${c.tag}${t2.in.includes(i) ? " · in her bail" : ""}</small></span>${t2.in.includes(i) ? "" : `<button class="btn small primary" data-bba="tl:cow.${i}">Let her in</button>`}</li>`).join("")}</ul>`;
       }
       case "cheese": {
         let h3 = tape3() + `<h2>Meg's cheese lesson</h2>`;
-        if (knowsHavarti(F2) && !t2) return h3 + `<p class="sub">You know Meg's havarti now. Make it at home with Elena's cheese press: three bottles of milk, three days in the cave.</p>` + shut17;
-        if (!t2) return h3 + `<p class="sub">Meg teaches her Tableland havarti: creamy, buttery, little holes. Five steps, in the right order. Then it's yours to make at home in Elena's cheese press.</p><div class="actions"><button class="btn primary" data-bba="tl:lessongo" ${F2.coins >= CHEESE_LESSON.price ? "" : "disabled"}>Hairnet on · ${CHEESE_LESSON.price} ${coin12()}</button></div>` + shut17;
+        if (knowsHavarti(F2) && !t2) return h3 + `<p class="sub">You know Meg's havarti now. Make it at home with Elena's cheese press: three bottles of milk, three days in the cave.</p>` + shut18;
+        if (!t2) return h3 + `<p class="sub">Meg teaches her Tableland havarti: creamy, buttery, little holes. Five steps, in the right order. Then it's yours to make at home in Elena's cheese press.</p><div class="actions"><button class="btn primary" data-bba="tl:lessongo" ${F2.coins >= CHEESE_LESSON.price ? "" : "disabled"}>Hairnet on · ${CHEESE_LESSON.price} ${coin12()}</button></div>` + shut18;
         if (lessonDone(t2)) return h3 + `<p class="sub">${esc(STEP_SAY.press)} ${t2.wrong ? `"A wobble or two," says Meg, "but that's how you learn."` : `"Perfect," says Meg. "You've done this before." You haven't.`}</p><div class="actions">${btn("lessondone", "Take off the hairnet")}</div>`;
         const opts = CHEESE_LESSON.steps.slice().sort((a, b) => (a.charCodeAt(1) * 7 + t2.at) % 5 - (b.charCodeAt(1) * 7 + t2.at) % 5);
         return h3 + `<p class="sub">${t2.at ? esc(STEP_SAY[CHEESE_LESSON.steps[t2.at - 1]]) : "The milk's in the vat. What first?"} ${t2.last === "wrong" ? '<i>Meg shakes her head, smiling: "Not yet."</i>' : ""}</p><div class="actions">${opts.map((k) => btn("step." + k, STEP_N[k], true)).join("")}</div>`;
       }
       case "shake": {
         let h3 = tape3() + `<h2>Shake a macadamia tree</h2>`;
-        if (s.shaken === dayKey() && !t2) return h3 + `<p class="sub">You've shaken a tree today. "Leave some for tomorrow," says Pete. "The tree's not going anywhere."</p>` + shut17;
-        if (!t2) return h3 + `<p class="sub">Pete's spread the tarp. "Gentle shakes bring down the ripe ones. Shake too hard and you get green ones too, and they're no good."${evan2 ? " Evan's holding the bucket. Mostly." : ""}</p><div class="actions">${btn("shakego", "Grab a branch")}</div>` + shut17;
+        if (s.shaken === dayKey() && !t2) return h3 + `<p class="sub">You've shaken a tree today. "Leave some for tomorrow," says Pete. "The tree's not going anywhere."</p>` + shut18;
+        if (!t2) return h3 + `<p class="sub">Pete's spread the tarp. "Gentle shakes bring down the ripe ones. Shake too hard and you get green ones too, and they're no good."${evan2 ? " Evan's holding the bucket. Mostly." : ""}</p><div class="actions">${btn("shakego", "Grab a branch")}</div>` + shut18;
         if (shakeDone(t2)) return h3 + `<p class="sub">Raked up off the tarp: ${t2.ripe} ripe ones${t2.green ? `, and ${t2.green} green ones Pete tuts at` : ""}. He cracks you a bag's worth in the old machine.</p><div class="actions">${btn("shakedone", `Take ${shakeBags(t2)} bag${shakeBags(t2) > 1 ? "s" : ""} of macadamias`)}</div>`;
         const said = { some: "A gentle shake: a patter of round nuts on the tarp.", lots: "A big shake: nuts raining down! Ripe ones, luckily.", green: "A big shake, and down come green ones too. Pete winces." }[t2.last] || "Hold the branch. Gentle, or big?";
         return h3 + `<p class="sub">${esc(said)} (shake ${t2.n + 1} of ${SHAKE.N})</p><div class="actions">${btn("shk.gentle", "A gentle shake")}${btn("shk.big", "A big shake", false)}</div>`;
       }
       case "pan": {
         let h3 = tape3() + `<h2>Panning for gold</h2>`;
-        if (!t2) return (F2.inv || {}).b_goldpan ? h3 + `<p class="sub">Old Mac squats beside you. "Scoop some gravel. Swirl it, gently, about four times, and the light stuff washes over the edge. Gold's heavy. It stays."${s.flecks ? ` You've found ${s.flecks} fleck${s.flecks > 1 ? "s" : ""}.` : ""}</p><div class="actions">${btn("pango", "Into the creek")}</div>` + shut17 : h3 + `<p class="sub">You'll need a gold pan: Dot sells them at Nugget & Co., by the door.</p>` + shut17;
+        if (!t2) return (F2.inv || {}).b_goldpan ? h3 + `<p class="sub">Old Mac squats beside you. "Scoop some gravel. Swirl it, gently, about four times, and the light stuff washes over the edge. Gold's heavy. It stays."${s.flecks ? ` You've found ${s.flecks} fleck${s.flecks > 1 ? "s" : ""}.` : ""}</p><div class="actions">${btn("pango", "Into the creek")}</div>` + shut18 : h3 + `<p class="sub">You'll need a gold pan: Dot sells them at Nugget & Co., by the door.</p>` + shut18;
         if (t2.result) return h3 + `<p class="sub">${{ gold: "There! In the black sand at the bottom of the pan: a glint. A real fleck of gold, tiny and bright.", gravel: "Still too much gravel to see anything. Swirl a bit more next time.", washed: `You swirled so long the pan's empty. "Washed it out," says Mac. "Gently does it."` }[t2.result]}</p><div class="actions">${btn("pandone", "Rinse the pan")}</div>`;
         if (!t2.scooped) return h3 + `<p class="sub">Cold water round your ankles. Gravel and sand under the surface.${evan2 ? " Evan's found a very important rock." : ""}</p><div class="actions">${btn("pan.scoop", "Scoop some gravel")}</div>`;
         return h3 + `<p class="sub">${t2.swirls ? `Swirl ${t2.swirls}: the sand slides round and over the lip.` : "A pan full of gravel and water."}</p><div class="actions">${btn("pan.swirl", "Swirl")}${btn("pan.look", "Tip off and look", false)}</div>`;
       }
       case "steam": {
         let h3 = tape3("stripe") + `<h2>The steam train</h2>`;
-        if (!steamOpen(hm6)) return h3 + `<p class="sub">The train runs from 9 to 4. She's resting now, ticking as she cools.</p>` + shut17;
-        if (!t2) return h3 + `<p class="sub">The 10.15 (and every hour after) to Gold Creek Siding and back. Clive's on the footplate, Fred punches the tickets. "Pull the whistle at the crossings," says Clive. "Not before."${evan2 ? " Evan's beside himself." : ""}</p><div class="actions"><button class="btn primary" data-bba="tl:steamgo" ${F2.coins >= steamCost(evan2) ? "" : "disabled"}>All aboard · ${steamCost(evan2)} ${coin12()}</button></div>` + shut17;
+        if (!steamOpen(hm6)) return h3 + `<p class="sub">The train runs from 9 to 4. She's resting now, ticking as she cools.</p>` + shut18;
+        if (!t2) return h3 + `<p class="sub">The 10.15 (and every hour after) to Gold Creek Siding and back. Clive's on the footplate, Fred punches the tickets. "Pull the whistle at the crossings," says Clive. "Not before."${evan2 ? " Evan's beside himself." : ""}</p><div class="actions"><button class="btn primary" data-bba="tl:steamgo" ${F2.coins >= steamCost(evan2) ? "" : "disabled"}>All aboard · ${steamCost(evan2)} ${coin12()}</button></div>` + shut18;
         if (steamDone(t2)) return h3 + `<p class="sub">Back into Kingsreef in a cloud of steam. ${t2.whistled === t2.cross.length ? "Every crossing whistled, right on time. Clive gives you a thumbs up from the cab." : t2.whistled ? "A whistle or two right on time." : "You were so busy looking, you forgot the whistle. Clive did it for you."}</p><div class="actions">${btn("steamdone", "Climb down")}</div>`;
         const c = t2.cross.includes(t2.leg);
         return h3 + `<p class="sub">${c ? "A road crossing ahead! A little white gate, and a farmer waiting in a ute." : esc(t2.views[t2.leg % t2.views.length])}.</p><div class="actions">${btn("steam.whistle", "Pull the whistle")}${btn("steam.look", "Look out of the window", false)}</div>`;
@@ -30517,7 +30697,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
 
   // src/game/lvacts.js
   var LV_KINDS = ["harvest", "petanque", "scent", "bees", "maze", "sticks", "bell", "banon"];
-  var shut18 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut19 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin13 = () => icon("coin", 13);
   var tape4 = (t2 = "gingham") => `<span class="tape ${t2}" aria-hidden="true"></span>`;
   var btn2 = (verb, label2, primary = true, off = false) => `<button class="btn ${primary ? "primary" : "alt"}" data-bba="lv:${verb}" ${off ? "disabled" : ""}>${esc(label2)}</button>`;
@@ -30659,14 +30839,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     switch (kind) {
       case "harvest": {
         let h3 = tape4("stripe") + `<h2>The lavender harvest</h2>`;
-        if (s.cut === dayKey() && !t2) return h3 + `<p class="sub">You've helped with the harvest today. Émile's still is full and bubbling, and the whole farm smells of it.</p>` + shut18;
-        if (!t2) return h3 + `<p class="sub">Émile hands you a curved sickle. "Only the bushes in full flower: deep purple, buzzing with bees. The pale ones, leave for next week."${evan2 ? " Evan's holding the basket." : ""}</p><div class="actions">${btn2("cutgo", "Start cutting")}</div>` + shut18;
+        if (s.cut === dayKey() && !t2) return h3 + `<p class="sub">You've helped with the harvest today. Émile's still is full and bubbling, and the whole farm smells of it.</p>` + shut19;
+        if (!t2) return h3 + `<p class="sub">Émile hands you a curved sickle. "Only the bushes in full flower: deep purple, buzzing with bees. The pale ones, leave for next week."${evan2 ? " Evan's holding the basket." : ""}</p><div class="actions">${btn2("cutgo", "Start cutting")}</div>` + shut19;
         if (harvestDone(t2)) return h3 + `<p class="sub">${t2.wrong ? 'A pale one or two in the basket. Émile shrugs: "Next time."' : 'Only the ripe ones. "Parfait," says Émile.'} Into the copper still they go, and out drips a thread of golden oil. Émile ties two bunches for you with raffia.</p><div class="actions">${btn2("cutdone", "Take the bunches")}</div>`;
         return h3 + `<ul class="hlist wlist">${t2.ready.map((r, i) => `<li><span class="wtxt"><b>Bush ${i + 1}</b><small>${t2.cut.includes(i) ? "cut" : r ? "deep purple, humming with bees" : "pale, still opening"}</small></span>${t2.cut.includes(i) ? "" : `<button class="btn small primary" data-bba="lv:cut.${i}">Cut</button>`}</li>`).join("")}</ul>`;
       }
       case "petanque": {
         let h3 = tape4() + `<h2>Pétanque with Monsieur Pagnol</h2>`;
-        if (!t2) return h3 + `<p class="sub">Pagnol tosses the little wooden jack down the gravel. "Three ends. Nearest the jack wins each one. Bend the knees, and let it go like a feather."${s.games ? ` You've played ${s.games}, won ${s.wins || 0}.` : ""}</p><div class="actions">${btn2("petgo", "Pick up a boule")}</div>` + shut18;
+        if (!t2) return h3 + `<p class="sub">Pagnol tosses the little wooden jack down the gravel. "Three ends. Nearest the jack wins each one. Bend the knees, and let it go like a feather."${s.games ? ` You've played ${s.games}, won ${s.wins || 0}.` : ""}</p><div class="actions">${btn2("petgo", "Pick up a boule")}</div>` + shut19;
         if (petDone(t2)) return h3 + `<p class="sub">${t2.mine > t2.his ? "You beat Pagnol! The old men cheer. Fernand is delighted. Pagnol demands a rematch tomorrow." : t2.mine === t2.his ? "A draw! Pagnol says it doesn't count." : "Pagnol wins, as always, and shakes your hand very graciously."} (${t2.mine} to ${t2.his})</p><div class="actions">${btn2("petdone", "Shake hands")}</div>`;
         const said = { kiss: "Your boule rolls right up and kisses the jack! Point to you.", near: "Closer than Pagnol's! Point to you.", far: "Pagnol's is closer. He twirls his moustache." }[t2.last] || "The jack's down the gravel. How hard?";
         return h3 + `<p class="sub">${esc(said)} (end ${t2.end + 1} of ${PET.ENDS}: the jack looks ${["near", "in the middle", "a long way off"][t2.jack[t2.end]]})</p><div class="actions">${btn2("pet.short", "Short and gentle")}${btn2("pet.middle", "Middle")}${btn2("pet.long", "Long")}</div>`;
@@ -30674,41 +30854,41 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       case "scent": {
         let h3 = tape4("stripe") + `<h2>Blend your own perfume</h2>`;
         const known2 = s.scents.length ? `<p class="muted">Your perfumes: ${s.scents.map((x) => esc(x.name)).join(", ")}.</p>` : "";
-        if (!t2) return h3 + `<p class="sub">Madame Arnaud sits you at the organ. "A top note, to say hello. A heart note, the real you. A base note, the one that stays."${evan2 ? " Evan is smelling everything and sneezing." : ""}</p>${known2}<div class="actions"><button class="btn primary" data-bba="lv:scentgo" ${F2.coins >= SCENT.price ? "" : "disabled"}>Sit at the organ · ${SCENT.price} ${coin13()}</button></div>` + shut18;
+        if (!t2) return h3 + `<p class="sub">Madame Arnaud sits you at the organ. "A top note, to say hello. A heart note, the real you. A base note, the one that stays."${evan2 ? " Evan is smelling everything and sneezing." : ""}</p>${known2}<div class="actions"><button class="btn primary" data-bba="lv:scentgo" ${F2.coins >= SCENT.price ? "" : "disabled"}>Sit at the organ · ${SCENT.price} ${coin13()}</button></div>` + shut19;
         if (t2.done) return h3 + `<p class="sub">${t2.fresh ? `A new perfume: <b>${esc(t2.name)}</b>! Madame Arnaud writes the name on a label in her curly handwriting.` : `<b>${esc(t2.name)}</b> again: one of yours.`} ${t2.first ? "She pours it into a little bottle for you to keep." : ""}</p><div class="actions">${btn2("scentdone", "Thank Madame Arnaud")}</div>`;
         const stage2 = !t2.top ? "top" : !t2.heart ? "heart" : "base";
         return h3 + `<p class="sub">${{ top: "First, the top note: bright, it's what you smell first.", heart: "Now the heart: the middle, the one that lasts an afternoon.", base: "And the base: deep, the one still there tomorrow." }[stage2]}</p><div class="actions">${Object.entries(NOTES4[stage2]).map(([k, n]) => btn2(`note.${k}`, n)).join("")}</div>`;
       }
       case "bees": {
         let h3 = tape4("stripe") + `<h2>The hives with Mathis</h2>`;
-        if (s.hives === dayKey() && !t2) return h3 + `<p class="sub">You've been in the hives today. The bees have had enough of visitors, says Mathis.</p>` + shut18;
-        if (!t2) return h3 + `<p class="sub">Into the white suit and the veil. Mathis hands you the smoker. "A little puff before you lift each frame. It calms them."${evan2 ? " Evan watches from behind the fence in a tiny veil of his own." : ""}</p><div class="actions">${btn2("beesgo", "Suit up")}</div>` + shut18;
+        if (s.hives === dayKey() && !t2) return h3 + `<p class="sub">You've been in the hives today. The bees have had enough of visitors, says Mathis.</p>` + shut19;
+        if (!t2) return h3 + `<p class="sub">Into the white suit and the veil. Mathis hands you the smoker. "A little puff before you lift each frame. It calms them."${evan2 ? " Evan watches from behind the fence in a tiny veil of his own." : ""}</p><div class="actions">${btn2("beesgo", "Suit up")}</div>` + shut19;
         if (beesDone(t2)) return h3 + `<p class="sub">${t2.calm <= 0 ? `The buzzing rises, and Mathis says it's time to close up. "They're cross today. Not your fault."` : `${t2.lifted} frames of capped honey, golden and heavy.`} He gives you a jar from yesterday's spin.</p><div class="actions">${btn2("beesdone", "Take off the veil")}</div>`;
         return h3 + `<p class="sub">${t2.last === "buzz" ? "Bzzzz! You lifted it without smoke. The bees are cross." : t2.last === "frame" ? "Up comes a frame, thick with honeycomb and slow, calm bees." : t2.smoked ? "A puff of cool smoke drifts over the frames." : "The lid's off. Thousands of bees, humming."} (frame ${t2.frame + 1} of ${BEES.FRAMES})</p><p class="muted">Calm: ${"●".repeat(t2.calm)}${"○".repeat(3 - t2.calm)}</p><div class="actions">${btn2("bee.smoke", "A puff of smoke", false)}${btn2("bee.lift", "Lift the frame")}</div>`;
       }
       case "maze": {
         let h3 = tape4() + `<h2>The sunflower maze</h2>`;
-        if (!t2) return h3 + `<p class="sub">Paths cut through sunflowers taller than Dad. Somewhere in the middle there's a bench and a little bell.${evan2 ? " Evan's leading. Of course he is." : ""}</p><div class="actions">${btn2("mazego", "In you go")}</div>` + shut18;
+        if (!t2) return h3 + `<p class="sub">Paths cut through sunflowers taller than Dad. Somewhere in the middle there's a bench and a little bell.${evan2 ? " Evan's leading. Of course he is." : ""}</p><div class="actions">${btn2("mazego", "In you go")}</div>` + shut19;
         if (mazeDone(t2)) return h3 + `<p class="sub">The middle! A little clearing, a bench, and a bell on a post. Ring, ring!${evan2 ? " Evan rings it about forty times." : ""} ${t2.wrong ? `(Only ${t2.wrong} dead end${t2.wrong > 1 ? "s" : ""}.)` : "Not one wrong turn!"}</p><div class="actions">${btn2("mazedone", "Find the way out")}</div>`;
         return h3 + `<p class="sub">${t2.last === "dead" ? "A dead end! Just sunflowers, all staring at you. Back you go." : t2.at ? "On you go, the sunflowers closing in overhead..." : "Sunflowers on every side. Which way?"} (turn ${t2.at + 1})</p><div class="actions">${btn2("turn.left", "Left")}${btn2("turn.straight", "Straight on")}${btn2("turn.right", "Right")}</div>`;
       }
       case "sticks": {
         let h3 = tape4() + `<h2>Pooh-sticks off the Old Bridge</h2>`;
-        if (!t2) return h3 + `<p class="sub">Everyone picks a stick, drops it off the upstream side at the same moment, and runs to the other side to see whose comes out first. Dad says he's never lost. Best of three.</p><div class="actions">${btn2("sticksgo", "Find a stick")}</div>` + shut18;
+        if (!t2) return h3 + `<p class="sub">Everyone picks a stick, drops it off the upstream side at the same moment, and runs to the other side to see whose comes out first. Dad says he's never lost. Best of three.</p><div class="actions">${btn2("sticksgo", "Find a stick")}</div>` + shut19;
         if (sticksDone(t2)) return h3 + `<p class="sub">${t2.mine > t2.dads ? "You win! Dad demands a recount. There is no recount in Pooh-sticks." : "Dad wins, and does a little dance on the bridge."} (${t2.mine} to ${t2.dads})${evan2 ? " Evan's stick got stuck in the weeds and he declared it the winner anyway." : ""}</p><div class="actions">${btn2("sticksdone", "Back over the bridge")}</div>`;
         return h3 + `<p class="sub">${t2.last === "won" ? "Yours pops out first!" : t2.last === "lost" ? `Dad's pops out first. "Undefeated!"` : "Pick your stick."} (race ${t2.round + 1} of ${STICKS.ROUNDS})</p><div class="actions">${Object.entries(STICK_N).map(([k, n]) => btn2(`stick.${k}`, n)).join("")}</div>`;
       }
       case "bell": {
         let h3 = tape4("stripe") + `<h2>The chapel of Saint Anne</h2>`;
-        if (!t2) return h3 + `<p class="sub">Light a candle, for anyone, for no reason at all.${bellOpen(hm6) ? ` And it's nearly sunset: Père Gaston holds out the bell rope. "Pull when it swings back down to you. Five strokes."` : " From half past five, someone rings the bell for the sunset."}</p><div class="actions">${btn2("candle", "Light a candle", false)}${bellOpen(hm6) ? btn2("bellgo", "Take the bell rope") : ""}</div>` + shut18;
+        if (!t2) return h3 + `<p class="sub">Light a candle, for anyone, for no reason at all.${bellOpen(hm6) ? ` And it's nearly sunset: Père Gaston holds out the bell rope. "Pull when it swings back down to you. Five strokes."` : " From half past five, someone rings the bell for the sunset."}</p><div class="actions">${btn2("candle", "Light a candle", false)}${bellOpen(hm6) ? btn2("bellgo", "Take the bell rope") : ""}</div>` + shut19;
         if (bellDone(t2)) return h3 + `<p class="sub">${t2.rung >= BELL.STROKES ? "Dong. Dong. Dong. Dong. Dong. Out over the hill, over the goats, over the lavender. Outside, everyone's gone quiet, watching the sun go down." : "The rope runs out of swing. A few good dongs, and the sun goes down anyway, orange and gold."}</p><div class="actions">${btn2("belldone", "Go out to watch the sunset")}</div>`;
         const down = t2.down[t2.i];
         return h3 + `<p class="sub">${down ? "The rope swings back down to your hands..." : "The rope's up, swinging away from you..."} ${t2.last === "dong" ? "DONG!" : t2.last === "early" ? "Too soon: the rope jerks, nothing." : ""}</p><p class="muted">${t2.rung} of ${BELL.STROKES} rung.</p><div class="actions">${btn2("bell.pull", "Pull")}${btn2("bell.wait", "Wait", false)}</div>`;
       }
       case "banon": {
         let h3 = tape4() + `<h2>Céline's banon</h2>`;
-        if (knowsBanon(F2) && !t2) return h3 + `<p class="sub">You know how to wrap a banon now. Make it at home in Elena's cheese press: three bottles of goat's milk, four days in the cave.</p>` + shut18;
-        if (!t2) return h3 + `<p class="sub">Céline's banon: a little goat's cheese wrapped in chestnut leaves and tied with raffia. Four steps, in the right order. Then it's yours to make at home.</p><div class="actions"><button class="btn primary" data-bba="lv:banongo" ${F2.coins >= BANON.price ? "" : "disabled"}>Roll up your sleeves · ${BANON.price} ${coin13()}</button></div>` + shut18;
+        if (knowsBanon(F2) && !t2) return h3 + `<p class="sub">You know how to wrap a banon now. Make it at home in Elena's cheese press: three bottles of goat's milk, four days in the cave.</p>` + shut19;
+        if (!t2) return h3 + `<p class="sub">Céline's banon: a little goat's cheese wrapped in chestnut leaves and tied with raffia. Four steps, in the right order. Then it's yours to make at home.</p><div class="actions"><button class="btn primary" data-bba="lv:banongo" ${F2.coins >= BANON.price ? "" : "disabled"}>Roll up your sleeves · ${BANON.price} ${coin13()}</button></div>` + shut19;
         if (t2.at >= BANON.steps.length) return h3 + `<p class="sub">${esc(B_SAY.rest)} ${t2.wrong ? '"A little out of order," says Céline, "but it will taste the same."' : '"Like my mother," says Céline, which is the best thing she can say.'}</p><div class="actions">${btn2("banondone", "Wash your hands")}</div>`;
         const opts = BANON.steps.slice().sort((a, b) => (a.charCodeAt(1) * 5 + t2.at) % 4 - (b.charCodeAt(1) * 5 + t2.at) % 4);
         return h3 + `<p class="sub">${t2.at ? esc(B_SAY[BANON.steps[t2.at - 1]]) : "A basket of dry chestnut leaves, a roll of raffia, and little rounds of fresh cheese. What first?"} ${t2.last === "wrong" ? '<i>Céline smiles: "Not yet."</i>' : ""}</p><div class="actions">${opts.map((k) => btn2("bstep." + k, B_N[k])).join("")}</div>`;
@@ -30968,7 +31148,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return { id, n };
   }
   var hrs4 = (ms) => ms >= DAY2 ? `${Math.ceil(ms / DAY2)} day${Math.ceil(ms / DAY2) === 1 ? "" : "s"}` : `${Math.max(1, Math.ceil(ms / H))} hour${Math.ceil(ms / H) === 1 ? "" : "s"}`;
-  var shut19 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut20 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   function row3(F2, k, title, pic3, body2) {
     return `<li><span class="wpic">${icon(pic3, 28)}</span><span class="wtxt"><b>${esc(title)}</b><small>${body2}</small></span>`;
   }
@@ -30995,7 +31175,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       const m = missing(F2, "pesto");
       h3 += row3(F2, "pesto", "Pesto at the mortar", "pesto", canPesto(F2) ? `Basil 2, garlic 1, pine nuts, olive oil and a bit of cheese: 2 jars, right now.${m.length ? ` You need ${m.join(", ")}.` : ""}` : "Make pesto with Nonna Pina in Manarola first, and she'll lend you her secret.") + (canPesto(F2) ? `<button class="btn small primary" data-lf="start:pesto" ${m.length ? "disabled" : ""}>Pound it</button>` : "") + `</li>`;
     }
-    return h3 + `</ul>` + shut19;
+    return h3 + `</ul>` + shut20;
   }
 
   // src/art/cinque-rooms.js
@@ -32298,126 +32478,6 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     bv_tantique: antiqueRoom
   };
   var tablelandsRoomArt = (scene2) => (ROOMS5[scene2] || cafeRoom3)();
-
-  // src/game/giftshop.js
-  var GIFT_HOURS = { from: 10 * 60, to: 18 * 60, closed: [1] };
-  var giftState = (F2) => {
-    F2.giftshop = F2.giftshop || {};
-    F2.giftshop.sold = F2.giftshop.sold || {};
-    F2.giftshop.pairs = F2.giftshop.pairs || [];
-    return F2.giftshop;
-  };
-  var dowOf3 = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
-  var keeperOn = (day, hm6) => hm6 >= GIFT_HOURS.from && hm6 < GIFT_HOURS.to && !GIFT_HOURS.closed.includes(dowOf3(day));
-  var shut20 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
-  function stockOf(o) {
-    const c = o.cocoa, bon = c ? (o.onDisplay(c) || []).filter((b) => c.trays[b.id] > 0) : [], bars2 = c ? Object.keys(c.bars).filter((k) => c.bars[k] > 0) : [];
-    const mill = Object.keys(o.store || {}).filter((id) => o.store[id] > 0 && ITEMS[id]), wine = ((o.v || {}).shelf || []).filter((b) => b.n > 0);
-    return { bon, bars: bars2, mill, wine };
-  }
-  var pairSeason = (day) => {
-    const md3 = day.slice(5);
-    return md3 >= "02-01" && md3 <= "02-14" || md3 >= "05-01" && md3 <= "05-14" || md3 >= "12-01" && md3 <= "12-24";
-  };
-  var boxVal = (F2, c) => {
-    const v = c && c.pairVals || [];
-    const have2 = (F2.inv || {}).pairbox || 0;
-    if (v.length > have2) v.splice(0, v.length - have2);
-    return v.length ? v.pop() : 18 + 4 * (c && c.prices.bonbon || 4);
-  };
-  function putOutPairs(F2, c, n = 99) {
-    const k = Math.min(n, (F2.inv || {}).pairbox || 0);
-    if (!k) return 0;
-    for (let i = 0; i < k; i++) {
-      giftState(F2).pairs.push(boxVal(F2, c));
-      F2.inv.pairbox--;
-    }
-    if (F2.inv.pairbox <= 0) delete F2.inv.pairbox;
-    return k;
-  }
-  function takeBackPair(F2, c) {
-    const g10 = giftState(F2);
-    if (!g10.pairs.length) return 0;
-    const val = g10.pairs.pop();
-    if (c) {
-      const have2 = (F2.inv || {}).pairbox || 0;
-      c.pairVals = [...have2 ? (c.pairVals || []).slice(-have2) : [], val];
-    }
-    F2.inv.pairbox = (F2.inv.pairbox || 0) + 1;
-    return 1;
-  }
-  function giftSellMinute(F2, day, hm6, mode, o) {
-    if (!mode) return 0;
-    const p = mode === "mel" ? 0.08 : 0.05;
-    if (Math.random() >= p) return 0;
-    const g10 = giftState(F2);
-    if (g10.pairs.length && Math.random() < (pairSeason(day) ? 0.35 : 0.12)) {
-      const coins2 = g10.pairs.shift(), t3 = g10.sold[day] = g10.sold[day] || { n: 0, coins: 0 };
-      t3.n++;
-      t3.coins += coins2;
-      t3.pair = (t3.pair || 0) + 1;
-      return coins2;
-    }
-    const s = stockOf(o), kinds = [s.bon.length && "bonbon", s.bars.length && "bar", s.mill.length && "mill", s.wine.length && "wine"].filter(Boolean);
-    if (!kinds.length) return 0;
-    const k = kinds[Math.floor(Math.random() * kinds.length)], any = (a) => a[Math.floor(Math.random() * a.length)];
-    let coins = 0;
-    if (k === "bonbon") {
-      const b = any(s.bon), n = Math.min(c2(o).trays[b.id], 2 + Math.floor(Math.random() * 3));
-      o.cocoa.trays[b.id] -= n;
-      coins = n * o.cocoa.prices.bonbon;
-    } else if (k === "bar") {
-      const kk = any(s.bars);
-      o.cocoa.bars[kk]--;
-      coins = o.cocoa.prices.bar;
-    } else if (k === "mill") {
-      const id = any(s.mill);
-      o.store[id]--;
-      if (!o.store[id]) delete o.store[id];
-      coins = ITEMS[id].price;
-    } else {
-      const b = any(s.wine);
-      b.n--;
-      coins = b.price;
-    }
-    const t2 = giftState(F2).sold[day] = giftState(F2).sold[day] || { n: 0, coins: 0 };
-    t2.n++;
-    t2.coins += coins;
-    t2[k] = (t2[k] || 0) + 1;
-    return coins;
-  }
-  var c2 = (o) => o.cocoa;
-  function pairsHTML(o) {
-    const g10 = giftState(o.F), have2 = (o.F.inv || {}).pairbox || 0;
-    if (!g10.pairs.length && !have2) return `<p class="muted">Pairing boxes go here too: pack them at the Cocoa Room's bonbon table (a bottle and 4 bonbons), then bring them in.</p>`;
-    const lo = Math.min(...g10.pairs), hi = Math.max(...g10.pairs), price = g10.pairs.length ? lo === hi ? `${lo} each` : `${lo} to ${hi} each` : "";
-    return `<p class="eyebrow" style="margin:12px 0 6px">Pairing boxes</p><ul class="hlist wlist"><li><span class="wpic">${icon("pairbox", 30)}</span><span class="wtxt"><b>Wine and chocolate pairing box</b><small>${g10.pairs.length ? `${g10.pairs.length} out · ${price}` : "None out yet"}${have2 ? ` · ${have2} in your backpack` : ""}</small></span><span class="orbtns">` + (have2 ? `<button class="btn small primary" data-gp="put" data-n="1">Put out 1</button>${have2 > 1 ? `<button class="btn small alt" data-gp="put" data-n="99">All</button>` : ""}` : "") + (g10.pairs.length ? `<button class="btn small alt" data-gp="take">Take 1 back</button>` : "") + `</span></li></ul>` + (pairSeason(o.day) ? `<p class="muted">People are buying these for someone special this time of year.</p>` : "");
-  }
-  var PANEL = {
-    gcase: (o) => {
-      const s = stockOf(o);
-      return `<h2>The bonbon case</h2><p class="sub">A little glass case on the counter end, filled from the Cocoa Room's own display: the same trays, so what sells here is gone there too.${o.cocoa ? ` ${o.cocoa.prices.bonbon} coins a bonbon.` : ""}</p>` + (!o.cocoa ? `<p class="muted">Empty: there's no Cocoa Room to fill it from yet.</p>` : s.bon.length ? `<ul class="hlist wlist">${s.bon.map((b) => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${o.cocoa.trays[b.id]} left in the trays</small></span></li>`).join("")}</ul>` : `<p class="muted">Nothing in the Cocoa Room's display case right now. Make a tray at the bonbon table.</p>`);
-    },
-    gbars: (o) => {
-      const s = stockOf(o);
-      return `<h2>The chocolate shelf</h2><p class="sub">Bars from the Cocoa Room's wall, stood up in a row.${o.cocoa ? ` ${o.cocoa.prices.bar} coins a bar.` : ""}</p>` + (!o.cocoa ? `<p class="muted">Empty: no Cocoa Room yet.</p>` : s.bars.length ? `<ul class="hlist wlist">${s.bars.map((k) => `<li><span class="wpic">${icon("bar_" + k, 26)}</span><span class="wtxt"><b>${esc(k[0].toUpperCase() + k.slice(1))} chocolate</b><small>${o.cocoa.bars[k]} on the wall</small></span></li>`).join("")}</ul>` : `<p class="muted">The bar wall's bare. Mateo moulds more on his shifts.</p>`);
-    },
-    gmill: (o) => {
-      const s = stockOf(o);
-      return `<h2>From the mill</h2><p class="sub">Oils, soaps and lotions, off the same shelves as the mill.</p>` + (s.mill.length ? `<ul class="hlist wlist">${s.mill.map((id) => `<li><span class="wpic">${icon(ITEMS[id].ico || id, 26)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${o.store[id]} on the shelves · ${ITEMS[id].price} each</small></span></li>`).join("")}</ul>` : `<p class="muted">Nothing on the mill's shelves just now. Make some at the workbench upstairs at the mill.</p>`);
-    },
-    gwine: (o) => {
-      const s = stockOf(o);
-      return `<h2>The wine corner</h2><p class="sub">A few of your bottles, from the wine shop's own shelves, for people who want one to take home.</p>` + pairsHTML(o) + (s.wine.length ? `<ul class="hlist wlist">${s.wine.map((b) => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${b.n} on the shelves · ${b.price} each</small></span></li>`).join("")}</ul>` : `<p class="muted">The wine shelves are empty.</p>`);
-    }
-  };
-  function giftPanel(F2, spot6, o) {
-    const day = o.day, t2 = giftState(F2).sold[day] || { n: 0, coins: 0 };
-    if (PANEL[spot6]) return `<span class="tape gingham" aria-hidden="true"></span>` + PANEL[spot6](o) + shut20;
-    const open2 = keeperOn(day, o.hm);
-    return `<span class="tape gingham" aria-hidden="true"></span><h2>The gift shop</h2><p class="sub">${o.here ? "You're behind the till. People browse longer when you're chatting." : o.keeper ? `Posy's at the till, rearranging the bonbon case for the third time today.` : open2 ? "Nobody's at the till." : "Shut for now: Posy opens 10 till 6, every day but Monday. Stand behind the till yourself and it's open."}</p>
-    <p class="muted">${t2.n ? `Sold today: ${t2.n}, for ${t2.coins} coins (${["bonbon", "bar", "mill", "wine", "pair"].filter((k) => t2[k]).map((k) => `${t2[k]} ${{ bonbon: "bonbon boxes", bar: "bars", mill: "from the mill", wine: "bottles", pair: "pairing boxes" }[k]}`).join(", ")}).` : "Nothing sold yet today."} Everything here is shared stock: the Cocoa Room's display case and bar wall, the mill's shelves, the wine shop's bottles.</p>` + shut20;
-  }
 
   // src/game/storage.js
   var FRIDGE_KINDS = ["food", "ingredient", "flower", "bouquet"];
