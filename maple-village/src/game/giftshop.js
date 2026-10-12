@@ -12,7 +12,9 @@ import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
 
 export const GIFT_HOURS = {from: 10*60, to: 18*60, closed: [1]};
-export const giftState = F => { F.giftshop = F.giftshop || {}; F.giftshop.sold = F.giftshop.sold || {}; F.giftshop.pairs = F.giftshop.pairs || []; return F.giftshop; };   // (F.gift is the welcome seeds)
+export const giftState = F => { F.giftshop = F.giftshop || {}; F.giftshop.sold = F.giftshop.sold || {}; F.giftshop.pairs = F.giftshop.pairs || []; F.giftshop.wrapped = F.giftshop.wrapped || []; return F.giftshop; };
+// round 185: a gift Mel wrapped, out on the wrapping table to sell (at its own price: the gift plus the paper, ribbon and tag)
+export function putWrapped(F, id){ const inv = F.inv || {}; if (!(inv[id] > 0) || !ITEMS[id] || !ITEMS[id].wrapped) return false; inv[id]--; if (inv[id] <= 0) delete inv[id]; giftState(F).wrapped.push(id); return true; }   // (F.gift is the welcome seeds)
 const dowOf = day => new Date(day + "T00:00:00Z").getUTCDay();
 export const keeperOn = (day, hm) => hm >= GIFT_HOURS.from && hm < GIFT_HOURS.to && !GIFT_HOURS.closed.includes(dowOf(day));
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
@@ -41,6 +43,9 @@ export function takeBackPair(F, c){
 export function giftSellMinute(F, day, hm, mode, o){
   if (!mode) return 0; const p = mode === "mel" ? .08 : .05; if (Math.random() >= p) return 0;
   const g = giftState(F);
+  if (g.wrapped.length && Math.random() < (pairSeason(day) ? .3 : .12)) {   // a wrapped gift off the table
+    const id = g.wrapped.shift(), coins = (ITEMS[id] || {price: 6}).price, t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.wrap = (t.wrap || 0) + 1; return coins;
+  }
   if (g.pairs.length && Math.random() < (pairSeason(day) ? .35 : .12)) {
     const coins = g.pairs.shift(), t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.pair = (t.pair || 0) + 1; return coins;
   }
@@ -80,5 +85,5 @@ export function giftPanel(F, spot, o){
   // the till
   const open = keeperOn(day, o.hm);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The gift shop</h2><p class="sub">${o.here ? "You're behind the till. People browse longer when you're chatting." : o.keeper ? `Posy's at the till, rearranging the bonbon case for the third time today.` : open ? "Nobody's at the till." : "Shut for now: Posy opens 10 till 6, every day but Monday. Stand behind the till yourself and it's open."}</p>
-    <p class="muted">${t.n ? `Sold today: ${t.n}, for ${t.coins} coins (${["bonbon", "bar", "mill", "wine", "pair"].filter(k => t[k]).map(k => `${t[k]} ${{bonbon: "bonbon boxes", bar: "bars", mill: "from the mill", wine: "bottles", pair: "pairing boxes"}[k]}`).join(", ")}).` : "Nothing sold yet today."} Everything here is shared stock: the Cocoa Room's display case and bar wall, the mill's shelves, the wine shop's bottles.</p>` + shut;
+    <p class="muted">${t.n ? `Sold today: ${t.n}, for ${t.coins} coins (${["bonbon", "bar", "mill", "wine", "pair", "wrap"].filter(k => t[k]).map(k => `${t[k]} ${{bonbon: "bonbon boxes", bar: "bars", mill: "from the mill", wine: "bottles", pair: "pairing boxes", wrap: "wrapped gifts"}[k]}`).join(", ")}).` : "Nothing sold yet today."} Everything here is shared stock: the Cocoa Room's display case and bar wall, the mill's shelves, the wine shop's bottles.</p>` + shut;
 }

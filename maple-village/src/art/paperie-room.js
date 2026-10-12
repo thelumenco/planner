@@ -61,5 +61,9 @@ export function paperRoomArt(){
   // the till, by the door: a bell, and the sign turned to ouvert
   const till = spot("pp_till", 206, 548, "The till", hovE(110, 560, 70, 10), sk(`<rect x="40" y="516" width="140" height="40" rx="4" style="fill:#5E7A4E"/><rect x="36" y="510" width="148" height="10" rx="3" style="fill:#C9A27E"/>`, `<rect x="40" y="516" width="140" height="40" rx="4"/>`)
     + g(`<path d="M70 508 q6 -12 12 0z" fill="#E0A83A" ${O}/><rect x="120" y="494" width="44" height="14" rx="2" fill="#FFFDF6" ${O}/><text x="142" y="504" text-anchor="middle" font-family="Klee One,serif" font-size="8" fill="#5E7A4E">ouvert</text>`) + lab(110, 578, "Till", "#F6E3B4"));
-  return floor(200, "#C9A27E") + stoneWall() + sign(260, 32, "PAPETERIE", "#FFFDF6", "#5E7A4E", 11) + shelf + line + vat + scrap + tub + adds + press + till + exit("#5E7A4E");
+  // round 185: the ribbon rack by the door, right: spools of ribbon, a tray of stamps, tags on a hook
+  const rack = spot("pp_rack", 368, 548, "The ribbon rack", hovE(446, 572, 46, 8), sk(`<rect x="404" y="500" width="84" height="60" rx="3" style="fill:#8A6A52"/><path d="M408 520 h76" style="stroke:#6B5444" stroke-width="3"/>`, `<rect x="404" y="500" width="84" height="60" rx="3"/>`)
+    + g(["#C8432F", "#7A1F3D", "#C9A27E", "#E8566C"].map((c, i) => `<circle cx="${418 + i*20}" cy="512" r="7" fill="${c}" ${O}/><circle cx="${418 + i*20}" cy="512" r="2.4" fill="#FFFDF6"/>`).join("") + `<rect x="412" y="530" width="34" height="14" rx="2" fill="#C9A27E" ${O}/>${[0, 1, 2, 3].map(i => `<rect x="${415 + i*8}" y="526" width="5" height="6" rx="1" fill="#8A6A42"/>`).join("")}${[0, 1, 2].map(i => `<path d="M${458 + i*9} 528 l3 -3 h4 v12 h-7z" fill="${i === 1 ? "#C6D6B2" : "#EFE6D2"}" ${O}/>`).join("")}`)
+    + lab(446, 580, "Ribbons & tags", "#F4C7CF"));
+  return floor(200, "#C9A27E") + stoneWall() + sign(260, 32, "PAPETERIE", "#FFFDF6", "#5E7A4E", 11) + shelf + line + vat + scrap + tub + adds + press + till + rack + exit("#5E7A4E");
 }

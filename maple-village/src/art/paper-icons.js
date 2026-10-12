@@ -49,3 +49,35 @@ export function paperIcon(name){
     `<rect x="4" y="11" width="16" height="8"/><path d="M4 13h16M4 15h16M4 17h16"/><rect x="3" y="7" width="18" height="3" rx=".5"/><path d="M12 7V3M9 3h6"/>`];
   return [`<path d="${deckle(4, 4.5, 20, 19.5, s)}" ${f(COL[col])}/>${flecks(add, 6, 6.5, 12, 11)}`, `<path d="${deckle(4, 4.5, 20, 19.5, s)}"/>`];
 }
+
+/* ---------- round 185: wrapping ---------- */
+// ribbons (a spool), tags, stamps, and a wrapped parcel that builds up layer by layer as Mel picks each thing:
+//   wrp_<col>_<add>_<stamp>_<ribbon>_<tag>   ("none" for anything not chosen yet)
+export const RIBBON_COL = {gingham: "#C8432F", velvet: "#7A1F3D", twine: "#C9A27E"};
+const STAMP_INK = {natural: "#8A6A42", blush: "#B24A5E", sage: "#4E6A3E", ink: "#2F3B73"};
+// a tiny stamp motif at (x, y)
+function motif(k, x, y, c){
+  if (k === "bee") return `<ellipse cx="${x}" cy="${y}" rx="1.3" ry=".9" fill="${c}"/><ellipse cx="${x - .4}" cy="${y - 1}" rx=".7" ry=".5" fill="none" stroke="${c}" stroke-width=".35"/><ellipse cx="${x + .6}" cy="${y - 1}" rx=".7" ry=".5" fill="none" stroke="${c}" stroke-width=".35"/>`;
+  if (k === "grape") return [[0, 0], [1, 0], [.5, .9], [-.5, .9], [0, 1.8]].map(([dx, dy]) => `<circle cx="${x + dx - .5}" cy="${y + dy - 1}" r=".55" fill="${c}"/>`).join("");
+  if (k === "olive") return `<path d="M${x - 1.6} ${y + 1.2} L${x + 1.6} ${y - 1.2}" stroke="${c}" stroke-width=".35"/><ellipse cx="${x - .5}" cy="${y - .7}" rx=".9" ry=".4" transform="rotate(-35 ${x - .5} ${y - .7})" fill="${c}"/><ellipse cx="${x + .5}" cy="${y + .5}" rx=".9" ry=".4" transform="rotate(-35 ${x + .5} ${y + .5})" fill="${c}"/>`;
+  if (k === "star") return `<path d="M${x} ${y - 1.4}l.4 1h1l-.8 .6l.3 1l-.9 -.6l-.9 .6l.3 -1l-.8 -.6h1z" fill="${c}"/>`;
+  if (k === "heart") return `<path d="M${x} ${y + 1.1}l-1.2 -1.2a.7 .7 0 0 1 1.2 -.8a.7 .7 0 0 1 1.2 .8z" fill="${c}"/>`;
+  return "";
+}
+export function wrapIcon(name){
+  if (/^rb_/.test(name)) { const c = RIBBON_COL[name.slice(3)] || "#C8432F", gingham = name === "rb_gingham";
+    return [`<rect x="6" y="5" width="12" height="14" rx="2" ${f("#E8DCC8")}/><rect x="8" y="7" width="8" height="10" ${f(c)}/>${gingham ? [0, 1, 2].map(i => `<rect x="${8 + (i % 2)*4}" y="${7 + i*3.4}" width="4" height="3.4" fill="#FFFDF6" opacity=".8"/>`).join("") : ""}<path d="M16 12q4 2 2 8" style="fill:none;stroke:${c};stroke-width:1.6"/>`,
+      `<rect x="6" y="5" width="12" height="14" rx="2"/><path d="M6 7h12M6 17h12"/>`]; }
+  if (name === "tag_plain" || name === "tag_seeded") return [`<path d="M7 9l5 -5h7v15h-12z" ${f(name === "tag_seeded" ? "#C6D6B2" : "#EFE6D2")}/>${name === "tag_seeded" ? [[11, 11], [14, 14], [12, 16], [16, 10]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx=".8" ry=".45" ${f("#5A4632")}/>`).join("") : ""}`,
+    `<path d="M7 9l5 -5h7v15h-12z"/><circle cx="12" cy="7.5" r="1"/><path d="M12 6.5q-4 -4 -8 -2"/>`];
+  if (/^stamp_/.test(name)) { const k = name.slice(6); return [`<rect x="7" y="12" width="10" height="7" rx="1" ${f("#C9A27E")}/><rect x="9" y="4" width="6" height="8" rx="2" ${f("#8A6A42")}/><g transform="translate(12 15.5) scale(1.6) translate(-12 -15.5)">${motif(k, 12, 15.5, "#3A2E28")}</g>`, `<rect x="7" y="12" width="10" height="7" rx="1"/><rect x="9" y="4" width="6" height="8" rx="2"/>`]; }
+  const m = name.match(/^wrp_([a-z]+)_([a-z]+)_([a-z]+)_([a-z]+)_([a-z]+)$/); if (!m || !COL[m[1]]) return null;
+  const [, col, add, stamp, ribbon, tag] = m, rc = RIBBON_COL[ribbon];
+  let a = `<rect x="3.5" y="8" width="15" height="12" rx="1" ${f(COL[col])}/><path d="M3.5 8l2 -2h15l-2 2z" ${f(WET[col])}/><path d="M18.5 8l2 -2v12l-2 2z" ${f(WET[col])}/>${flecks(add, 5, 9.5, 12, 9, 6)}`;
+  if (stamp !== "none") a += [[6.5, 11], [12, 10.5], [15.5, 14.5], [7, 17], [11.5, 16]].map(([x, y]) => motif(stamp, x, y, STAMP_INK[col])).join("");
+  if (rc) a += `<rect x="10" y="8" width="2.4" height="12" ${f(rc)}/><rect x="3.5" y="12.8" width="15" height="2.2" ${f(rc)}/><path d="M12 6l3 -2l2.2 0l1 .5l-1.2 1.3z" ${f(rc)}/>${ribbon === "gingham" ? `<rect x="10" y="9.5" width="1.2" height="1.2" fill="#FFFDF6"/><rect x="11.2" y="11" width="1.2" height="1.2" fill="#FFFDF6"/><rect x="5" y="12.8" width="1.2" height="1.1" fill="#FFFDF6"/><rect x="15" y="13.9" width="1.2" height="1.1" fill="#FFFDF6"/>` : ""}`
+    + `<path d="M11.2 7.5q-3 -4 -5 -1.5q1.6 2.4 5 1.5zM11.2 7.5q3 -4 5 -1.5q-1.6 2.4 -5 1.5z" ${f(rc)}/><circle cx="11.2" cy="7.5" r="1" ${f(rc)}/>`;
+  if (tag !== "none") a += `<path d="M18.5 15l2 -1.6h2.4v4.4h-2.4z" ${f(tag === "seeded" ? "#C6D6B2" : "#FFFDF6")}/>${tag === "seeded" ? `<circle cx="21.6" cy="15.4" r=".4" fill="#5A4632"/><circle cx="21" cy="16.6" r=".4" fill="#5A4632"/>` : ""}`;
+  const l = `<rect x="3.5" y="8" width="15" height="12" rx="1"/><path d="M3.5 8l2 -2h15l-2 2M18.5 8l2 -2v12l-2 2"/>${rc ? `<path d="M11.2 7.5q-3 -4 -5 -1.5q1.6 2.4 5 1.5zM11.2 7.5q3 -4 5 -1.5q-1.6 2.4 -5 1.5z"/>` : ""}${tag !== "none" ? `<path d="M18.5 15l2 -1.6h2.4v4.4h-2.4z"/><circle cx="20.9" cy="15.5" r=".45"/>` : ""}`;
+  return [a, l];
+}

@@ -4063,7 +4063,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const f1 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   check(f1.goals.paperie && f1.coins === 500 && f1.paperie.scraps === 4, "buy it at the board: 1,500 coins, and a first box of scraps from home");
   await page.evaluate(() => window.__mapleScene("bv_hpaper")); await page.waitForTimeout(800);
-  check(await page.locator('#world [data-rdspot^="pp_"]').count() === 8, "inside: the scrap bin, tub, vat, add-in jars, press, drying line, shelves and till");
+  check(await page.locator('#world [data-rdspot^="pp_"]').count() === 9, "inside: the scrap bin, tub, vat, add-in jars, press, drying line, shelves, till and ribbon rack");
   await page.locator('#world [data-rdspot="pp_scrap"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-pp="tear"]', {timeout: 15000});
   await page.click('#ctx [data-pp="tear"]'); await page.waitForTimeout(500);
   const f2 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
@@ -4086,6 +4086,26 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const pk = {kind: "box", size: 4, sel: {}};
   check(cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && !cc.pickAdd(G, pk, "b", 1) && cc.packBox(G, 4, pk.sel) === "box4d" && c.trays.a === 2 && c.trays.b === 6, "choose four dark ones: exactly those come out of the case");
   check(cc.packBox(G, 4, {a: 1}) === null && c.trays.a === 2, "a choice that doesn't add up packs nothing");
+}
+{
+  console.log("\nWrapping with handmade paper (paperie round 2, round 185)");
+  const wr = await import(new URL("../src/game/wrap.js", import.meta.url)), gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), ic = await import(new URL("../src/art/paper-icons.js", import.meta.url));
+  const F = {coins: 100, inv: {pairbox: 1, pp_blush_lavender: 1, pp_sage_seeds: 1}, goals: {paperie: 1, giftshop: 1}};
+  check(wr.buyReel(F, "gingham") && F.inv.rb_gingham === 4 && F.coins === 96 && wr.buyStamps(F) && F.coins === 56 && !wr.buyStamps(F), "the ribbon rack: a reel of gingham (four bows), and the stamp set (once)");
+  check(wr.cutTags(F, "pp_sage_seeds") === 4 && F.inv.tag_seeded === 4 && !F.inv.pp_sage_seeds, "a seeded sheet cut into four seeded gift tags");
+  const w = {item: "pairbox"};
+  check(wr.previewIco(F, w) === it.ITEMS.pairbox.ico && wr.previewIco(F, {...w, paper: "pp_blush_lavender"}) === "wrp_blush_lavender_none_none_none" && wr.previewIco(F, {...w, paper: "pp_blush_lavender", stamp: "heart", ribbon: "gingham", tag: "seeded"}) === "wrp_blush_lavender_heart_gingham_seeded",
+    "the parcel's picture builds up: the gift, then the paper, the stamp, the bow, the tag");
+  check(["wrp_blush_lavender_none_none_none", "wrp_blush_lavender_heart_gingham_seeded", "wrp_ink_gold_star_velvet_plain", "rb_twine", "tag_plain", "stamp_olive"].every(n => ic.wrapIcon(n)), "and every layer has its drawing");
+  const id = wr.wrapIt(F, {item: "pairbox", paper: "pp_blush_lavender", stamp: "heart", ribbon: "gingham", tag: "seeded"});
+  check(id === "wr_1" && F.inv.wr_1 === 1 && !F.inv.pairbox && !F.inv.pp_blush_lavender && F.inv.rb_gingham === 3 && F.inv.tag_seeded === 3, "wrapped: the gift, the sheet, a bow and a tag used up; one parcel in the backpack");
+  const W = it.ITEMS.wr_1;
+  check(W.wrapped && W.inner === "pairbox" && W.price === it.ITEMS.pairbox.price + 5 && /seed tag/.test(W.say) && W.to === it.ITEMS.pairbox.to && /blush paper/.test(W.n), "it's a gift for the same people, a few coins more, and they love the seed tag");
+  delete it.ITEMS.wr_1; wr.registerWraps(F); check(it.ITEMS.wr_1 && it.ITEMS.wr_1.ico === "wrp_blush_lavender_heart_gingham_seeded", "it's remembered after a reload");
+  check(!wr.wrapIt(F, {item: "wr_1", paper: "pp_sage_seeds"}) && !wr.wrapIt(F, {item: "box4", paper: "pp_blush_lavender"}), "no wrapping a parcel twice, or without the paper");
+  check(gs.putWrapped(F, "wr_1") && !F.inv.wr_1 && F.giftshop.wrapped[0] === "wr_1", "out on the gift shop's wrapping table");
+  const rnd = Math.random; Math.random = () => .01; const got = gs.giftSellMinute(F, "2026-10-14", 11*60, "keeper", {cocoa: null, onDisplay: () => [], store: {}, v: {shelf: []}}); Math.random = rnd;
+  check(got === W.price && !F.giftshop.wrapped.length && F.giftshop.sold["2026-10-14"].wrap === 1, "and it sells as wrapped, at its own price");
 }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }

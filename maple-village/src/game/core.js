@@ -82,8 +82,9 @@ import { tablelandsRoomArt } from "../art/tablelands-rooms.js";
 import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } from "./lunch.js";
 import { craftState, craft as millCraft, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, fromBasket, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
 import { hamperSeason, xmasState, TREATS, treatsHTML, mulledStallPanel, treePanel, treeLit, countdownDue, myStallPanel as xmStallPanel, putOut, takeBack as xmTakeBack, putWine, takeWine, stallSellMinute, registerHampers, hamperPanel, packStart, packAdd, packWine, packRemove, packTie, singCarol, lanternWalk, grottoPanel, grottoVisit, sendHamper, hamperMail, collectReplies, fillOrder } from "./xmas.js";
-import { giftPanel, giftSellMinute, keeperOn as giftKeeperOn, putOutPairs, takeBackPair } from "./giftshop.js";
+import { giftPanel, giftSellMinute, keeperOn as giftKeeperOn, putOutPairs, takeBackPair, putWrapped, giftState } from "./giftshop.js";
 import * as PP from "./paperie.js";
+import * as WR from "./wrap.js";
 import { setPaperArtF } from "../art/paperie-room.js";
 import { storePanel, putAway, takeOut, sendOff, storedCount, placeFor, homeNote, SHOPS as STORE_SHOPS, storeState } from "./storage.js";
 import { millUpArt } from "../art/millup.js";
@@ -1662,7 +1663,8 @@ function ctx(){
   else if (occView === "trivia" && scene === "terrace") { const t = F.terraceEv || {}; h = triviaPanel(F, trvSt, {on: (occasionNow(dayKey(), sgHM()) || {}).kind === "trivia", played: t.trivia === dayKey() && !trvSt ? t.quizLine : null}); }
   else if (occView === "paint" && scene === "terrace") h = paintPanel(F, pntSt, {on: (occasionNow(dayKey(), sgHM()) || {}).kind === "paint", painted: (F.terraceEv || {}).painted === dayKey() && !pntSt});
   else if (lunchView === "table" && scene === "terrace") h = lunchTablePanel();
-  else if (ppView && scene === "bv_hpaper") h = PP.paperPanel(F, ppView, {day: dayKey(), came: ppCame});   // round 183
+  else if (ppView && scene === "bv_hpaper") h = ppView === "pp_rack" ? WR.rackPanel(F) : ppView === "pp_wrap" ? WR.wrapPanel(F, wrSt, {where: "paperie"}) : PP.paperPanel(F, ppView, {day: dayKey(), came: ppCame});   // round 183, 185
+  else if (fieldView === "gwrap" && scene === "giftshop") h = WR.wrapPanel(F, wrSt, {where: "giftshop", table: giftState(F).wrapped});   // round 185
   else if (bbRoom && townOf(scene) && TOWNS[townOf(scene)].by === "van") { const evanOn = inParty(F, "evan") && !evanNight(), tp = tripOn(F) ? tripOn(F).party : [];
     h = bbRoom === "balloon" ? BBA.balloonPanel(F, bbSt.flight, {hm: sgHM(), party: tp}) : bbRoom === "riddle" ? BBA.riddlePanel(F, bbSt.riddle) : bbRoom === "berries" ? BBA.berriesPanel(F, bbSt.berries, evanOn)
       : bbRoom === "dip" ? BBA.dipPanel(F, bbSt.dip, evanOn) : bbRoom === "joey" ? BBA.joeyPanel(F, bbSt.joey, evanOn) : bbRoom === "canoe" ? BBA.canoePanel(F, bbSt.canoe, evanOn, bbSt.paid)
@@ -1818,6 +1820,7 @@ function ctx(){
   if (homeView && (scene === "home" || scene === "garage") && homeView !== "shelf" && homeView !== "stored") wireHestia(c, homeView);
   if (homeView && (scene === "home" || scene === "garage")) wireStorage(c);
   if (ppView && scene === "bv_hpaper") wirePaper(c);
+  if ((ppView && scene === "bv_hpaper") || (fieldView === "gwrap" && scene === "giftshop")) wireWrap(c);
   if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gp]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const cc = owns(F, "cocoa") ? cocoaState(F) : null;   // round 179
     if (b.dataset.gp === "put") { const k = putOutPairs(F, cc, +b.dataset.n || 1); if (k) { sfx("paper", true); flash(`${k} pairing box${k > 1 ? "es" : ""} out in the wine corner`); } }
     else if (takeBackPair(F, cc)) { sfx("paper", true); flash("A pairing box, back in your backpack"); }
@@ -2493,7 +2496,7 @@ let loftView = false;   // round 132: the drying loft over the barrel shed (loft
 let cinqueView = null, ctSt = {};
 let lunchView = null, occView = null, trvSt = null, pntSt = null, mullSt = {};   // round 152: occView "trivia" or "paint" on the terrace (occasions.js)
    // round 146: the bookings book ("book") and the long table ("table") on the terrace
-let bbRoom = null, bbSt = {}, ppView = null, ppCame = 0;   // round 183: the paperie's station panels (paperie.js)
+let bbRoom = null, bbSt = {}, ppView = null, ppCame = 0, wrSt = {};   // wrSt: the gift being wrapped (round 185)   // round 183: the paperie's station panels (paperie.js)
    // round 142: Bellbird Valley's room panels (bbrooms.js) and, round 143, its activities (bbacts.js)
 let bvView = null, bvRegion = null;   // round 148: which page of the road map (vines, coast)   // round 141: Bellbird Valley's road map ("map") and passport ("passport")   // round 132: Cinque Terre's room panels and activities (cinque.js)
 function stampHere(place){ const s = ktStamp(F, place); if (!s) return; sfx("chime"); flash(`Stamp: ${s.n}`); gainXp(1);
@@ -2527,7 +2530,7 @@ function roomSpot(id){
     if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(seen ? pick(["a DUCK-BEAVER!", "she's swimming! she's SWIMMING!", "platypus, platypus!"]) : "shhh. she's shy, Mama"), 2600); if (seen) gainXp(1); save(); render(); return; }
   if (id === "bv_campkitchen") { speak(`A note on the noticeboard: "${pick(BB_NOTES)}"`, 6500); render(); return; }
   if (id === "pp_buy") { goalView = "paperie"; sfx("paper", true); render(); return; }   // round 183: the paperie
-  if (id.startsWith("pp_")) { ppView = id; paperNow(); sfx("paper", true); render(); return; }
+  if (id.startsWith("pp_")) { ppView = id; if (id === "pp_rack") wrSt = {}; paperNow(); sfx("paper", true); render(); return; }
   if (id.startsWith("bv_")) { bbRoom = id; sfx("paper", true); render(); return; }
   // Cinque Terre (round 132): each room's panel
   if (id === "ct_focacceria" || id === "ct_pesto" || id === "ct_cantina" || id === "ct_gelato" || id === "ct_limoni") { cinqueView = id; ctSt = {}; sfx("paper", true); render(); return; }
@@ -2672,6 +2675,7 @@ function render(redraw){
   registerItems(F);   // each discovered gelato flavour is a gift item (one per type) in the backpack
   registerCraft(F);   // round 153: and each oil, soap and lotion Mel's worked out at the mill
   registerHampers(F);   // round 173: and each hamper she's packed
+  WR.registerWraps(F);   // round 185: and every gift she's wrapped
   setLive(liveNow());   // the jazz duo at the night market, the guitar in Ronda: live, over the record player
   $("evan").style.display = evanHere() ? "" : "none";
   creditEarly(); dressMel();
@@ -2836,7 +2840,7 @@ function arriveSpot(id){
   if (id === "gdoor") { setScene("garage", INNER.garage.arrive); return; }
   if (id === "officedoor") { setScene("office", INNER.office.arrive); return; }
   if (id === "giftdoor") { if (owns(F, "giftshop")) setScene("giftshop", INNER.giftshop.arrive); else { goalView = "giftshop"; sfx("paper", true); render(); } return; }   // round 178
-  if (scene === "giftshop" && ["gcase", "gbars", "gmill", "gwine", "gtill"].includes(id)) { fieldView = id; sfx("paper", true); if (id === "gtill" && isHere("posy")) npcSay("posy", pick(["Morning! The bonbons are walking out the door.", "I'll mind it. Go have a wander.", "Somebody asked if we do gift wrap. I said yes. Do we?"])); render(); return; }
+  if (scene === "giftshop" && ["gcase", "gbars", "gmill", "gwine", "gtill", "gwrap"].includes(id)) { if (id === "gwrap") wrSt = {}; fieldView = id; sfx("paper", true); if (id === "gtill" && isHere("posy")) npcSay("posy", pick(["Morning! The bonbons are walking out the door.", "I'll mind it. Go have a wander.", "Somebody asked if we do gift wrap. I said yes. Do we?"])); render(); return; }
   if (id === "cdoor") { if (owns(F, "cellar")) setScene("cellar", INNER.cellar.arrive); else { goalView = "cellar"; sfx("paper", true); render(); } return; }
   if (scene === "garage" && (id === "scooter" || id === "car")) { goalView = owns(F, id) ? "garagepick" : id; sfx("paper", true); render(); return; }
   if (scene === "cellar" && id === "flight" && owns(F, "cellar") && wineClubNow(dayKey(), sgHM())) {   // hosting the wine club
@@ -3237,6 +3241,20 @@ function deliver(w){
 function paperNow(){
   if (!owns(F, "paperie")) return; const here = townOf(scene) === "bv_hilltown", out = PP.paperTick(F, here);
   if (out.coins) { save(); if (scene === "bv_hpaper") { sfx("coin"); flash(`+${out.coins}: ${out.n} sheet${out.n === 1 ? "" : "s"} of paper`); if (ppView) ctx(); drawScene(); } }
+}
+// round 185: wrapping (the paperie's ribbon rack, the gift shop's wrapping table)
+function wireWrap(c){
+  c.querySelectorAll("[data-wr]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.wr.split(/:(.*)/s); let say = null;
+    if (a === "reel") { if (WR.buyReel(F, v)) { sfx("coin"); flash(`A reel of ${WR.RIBBONS[v].n.toLowerCase()}: ${WR.REEL} bows`); } }
+    else if (a === "stamps") { if (WR.buyStamps(F)) { sfx("chaching"); say = "A wooden tray of rubber stamps: bees, grapes, olive sprigs, stars and hearts. And a pot of ink that matches whatever paper you use."; } }
+    else if (a === "tags") { const n = WR.cutTags(F, v); if (n) { sfx("paper", true); flash(`${n} ${/_seeds$/.test(v) ? "seeded " : ""}gift tags`); } }
+    else if (a === "open") { ppView = "pp_wrap"; sfx("paper", true); }
+    else if (a === "rack") { ppView = "pp_rack"; }
+    else if (["item", "paper", "stamp", "ribbon", "tag"].includes(a)) { wrSt[a] = v && wrSt[a] !== v ? v : null; sfx("tap"); }
+    else if (a === "go") { const id = WR.wrapIt(F, wrSt); if (id) { sfx("chime"); gainXp(1); act("cheer"); [0, 250].forEach((t, i) => setTimeout(() => mprop("sparkle", mel.x + (i ? 18 : -18), mel.y - 60, 1400), t));
+      say = `Folded, creased, ${wrSt.stamp ? "stamped, " : ""}${wrSt.ribbon ? "tied with a bow, " : ""}${wrSt.tag ? "tagged, " : ""}done. It's in your backpack: tap it there to choose who it's for.`; wrSt = {}; } }
+    else if (a === "put") { if (putWrapped(F, v)) { sfx("paper", true); flash("Out on the wrapping table"); } }
+    if (say) speak(say, 5000); save(); ctx(); drawScene(); });
 }
 function wirePaper(c){
   c.querySelectorAll("[data-pp]").forEach(b => b.onclick = () => { const a = b.dataset.pp, k = b.dataset.k; let say = null;
