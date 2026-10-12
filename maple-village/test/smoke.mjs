@@ -1922,8 +1922,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await at("12:00", "&ccpatch=ups"); await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
   await tap("ccounter", '#ctx [data-cc="ups"]'); await page.click('#ctx [data-cc="ups"]'); await page.waitForSelector('#ctx [data-cc="buyup"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-cc="buyup"]').count() === 15, "the Cocoa Room's catalogue lists fifteen upgrades (four of them bonbon moulds)");
-  for (let i = 0; i < 10; i++) { const b = page.locator('#ctx [data-cc="buyup"]').first(); if (!(await b.count())) break; await b.click(); await page.waitForTimeout(250); }
-  check(await fox().then(f => Object.keys(f.cocoa.up).length === 10 && f.coins === 10000 - 4450), "all ten bought (4450 coins)");
+  for (let i = 0; i < 11; i++) { const b = page.locator('#ctx [data-cc="buyup"]').first(); if (!(await b.count())) break; await b.click(); await page.waitForTimeout(250); }
+  check(await fox().then(f => Object.keys(f.cocoa.up).length === 11 && f.coins === 10000 - 4850), "all eleven bought, the vending machine too (4850 coins)");
   await page.click('#ctx [data-cc="counter"]'); await page.waitForSelector('#ctx [data-cc="hot"]', { timeout: 15000 }); await page.click('#ctx [data-cc="hot"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.choc.milk === 39), "the hot chocolate bar: Mel has a cup (one piece of chocolate)");
   await page.click('#ctx [data-cc="grand"]'); await page.waitForTimeout(300);
