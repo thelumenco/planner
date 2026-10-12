@@ -2,7 +2,8 @@
 // spot, a little football pitch and benches. The lake's river runs out south-east and on into the orchard's top
 // right corner, then east into the river at home.
 import { ink, sgHM } from "../util.js";
-import { eventNow, STALL_SPOTS, STAGE } from "../game/tours.js";
+import { eventNow, STALL_SPOTS, STAGE, XMAS_TREE, xmasOn, GROTTO_AT, grottoNow } from "../game/tours.js";
+import { treeLit } from "../game/xmas.js";
 import { sk, tapeLabel, tree, flowers, artCtx, skyWash } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
 import { archGate } from "./orchard.js";
@@ -21,7 +22,9 @@ const ripples = pts => pts.map(([x, y]) => `<path class="ripple" d="M${x} ${y} q
 
 // a market stall: striped awning in its colour, a table of goods. The table (and what's on it) is also drawn as a
 // depth-sorted prop among the people (stallFront), so a keeper standing behind it shows from the waist up.
-const goods = (i, x, y, s) => s.kind === "wine" ? [-16, -7, 2, 11].map((dx, k) => `<path d="M${x + dx} ${y-24} h5 l-.5 -9 h-4z" style="fill:${k % 2 ? "#E98AA0" : "#5B2338"}"/>`).join("")
+const goods = (i, x, y, s) => s.kind === "mulled" ? `<path d="M${x-14} ${y-24} h14 v-14 a7 3 0 0 0 -14 0z" style="fill:#B87333"/><path d="M${x-7} ${y-41} v-3" style="stroke:var(--line)"/>${[6, 13].map(dx => `<path d="M${x + dx} ${y-24} h5 l-.6 -7 h-3.8z" style="fill:#FFFDF6"/>`).join("")}`
+  : s.kind === "mine" ? [[-16, "#5B2338"], [-9, "#9DBF8A"], [-2, "#B9B04A"]].map(([dx, c]) => `<path d="M${x + dx} ${y-24} h5 l-.5 -9 h-4z" style="fill:${c}"/>`).join("") + `<rect x="${x + 6}" y="${y-31}" width="13" height="7" rx="1" style="fill:#E8C9D8"/><circle cx="${x + 12.5}" cy="${y-34}" r="2.6" style="fill:#F3C969"/>`
+  : s.kind === "wine" ? [-16, -7, 2, 11].map((dx, k) => `<path d="M${x + dx} ${y-24} h5 l-.5 -9 h-4z" style="fill:${k % 2 ? "#E98AA0" : "#5B2338"}"/>`).join("")
   : [[-14, -26], [-5, -27], [4, -26], [13, -27]].map(([dx, dy], k) => `<circle cx="${x + dx}" cy="${y + dy}" r="3.2" style="fill:${(s.kind === "orchard" ? ["#D9433A", "#E8566C", "#F3C969", "#C9A3E0"] : ["#E8566C", "#F3C969", "#9CC27E", "#C98A4A"])[(k + i) % 4]}"/>`).join("");
 const table = (i, x, y, s) => { const w = s.kind === "wine" ? 24 : 23;
   return sk(`<rect x="${x-w}" y="${y-22}" width="${w*2}" height="22" rx="2" style="fill:${s.kind === "wine" ? "#8B5E3C" : "#C9A27E"}"/>${goods(i, x, y, s)}`, `<rect x="${x-w}" y="${y-22}" width="${w*2}" height="22" rx="2"/>`); };
@@ -59,8 +62,12 @@ const stall = (i, x, y, s) => { if (s.kind === "scoop") return cart(i, x, y, s);
   ${crate(x - 17, y + 6)}
   ${sk(`<path d="M${x-hw} ${y-40} h${hw*2} l-4 12 h-${hw*2 - 8}z" style="fill:${col}"/>${wine ? "" : [0, 1, 2].map(k => `<path d="M${x-22 + k*16} ${y-40} l-2 12 h6 l2 -12z" style="fill:#FFFDF6"/>`).join("")}`,
     `<path d="M${x-hw} ${y-40} h${hw*2} l-4 12 h-${hw*2 - 8}z M${x-hw+3} ${y-28} v6 M${x+hw-3} ${y-28} v6"/>`)}
+  ${s.xmas ? garland(x - hw, x + hw, y - 28) : ""}
   ${table(i, x, y, s)}
-  ${tapeLabel(x, y + (i % 2 ? 30 : 16), wine ? "Our wines" : s.short, wine ? "#E8B4C0" : "var(--card)", 9)}</g>`; };
+  ${tapeLabel(x, y + (i % 2 ? 30 : 16), wine ? "Our wines" : s.short, wine ? "#E8B4C0" : s.kind === "mine" ? "#F3E1A0" : "var(--card)", 9)}</g>`; };
+// round 172: a fir garland along a Christmas stall's awning, red berries and warm bulbs in it
+const garland = (x1, x2, y) => `<g pointer-events="none"><path d="M${x1} ${y} ${Array.from({length: 6}, (_, k) => `Q${x1 + (x2 - x1)*(k + .5)/6} ${y + 6} ${x1 + (x2 - x1)*(k + 1)/6} ${y}`).join(" ")}" fill="none" style="stroke:#4F7A4A" stroke-width="4" stroke-linecap="round"/>
+  ${Array.from({length: 6}, (_, k) => `<circle cx="${x1 + (x2 - x1)*(k + .5)/6}" cy="${y + 4.5}" r="1.6" style="fill:${k % 2 ? "#C8432F" : "#FFE9A8"}"/>`).join("")}</g>`;
 // a second picnic blanket on market and fair days, for shoppers enjoying what they bought
 const blanket2 = () => `<g pointer-events="none">${sk(`<path d="M176 474 l50 -5 l7 22 l-50 5z" style="fill:#7FB8E8"/>${[0, 1].map(k => `<path d="M${186 + k*18} ${473 - k*2} l7 22" style="stroke:#FFFDF6" stroke-width="4"/>`).join("")}`, `<path d="M176 474 l50 -5 l7 22 l-50 5z"/>`)}</g>`;
 // the fair's kites, bobbing over the lake
@@ -95,6 +102,32 @@ function stage(){
     ${bulbs(sag(x - 66, x + 66, y - 68, 6, 7), 2)}<path d="M${x - 66} ${y - 68} Q${x} ${y - 56} ${x + 66} ${y - 68} M${x - 66} ${y - 68} v48 M${x + 66} ${y - 68} v48" fill="none" style="stroke:var(--line)" stroke-width=".9" opacity=".7"/></g>
     ${hat(x - 30, y + 20)}`;
 }
+// The Christmas tree on the exercise lawn: tiers of fir, baubles, a gold star; after half past five, lights twinkling
+// all over it. Presents underneath. Lanterns on posts along the paths.
+function xmasTree(lit){
+  const [x, y] = XMAS_TREE, tiers = [[0, 46, 34], [-26, 38, 30], [-50, 28, 26], [-70, 18, 22]];
+  const pts = [[-30, -12], [-14, -6], [4, -10], [22, -8], [34, -14], [-20, -36], [-4, -32], [14, -38], [26, -34], [-12, -58], [6, -60], [18, -56], [-4, -80], [8, -78]];
+  return `<g data-place="xtree" aria-label="The Christmas tree"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="56" ry="12" style="fill:var(--butter)"/>
+    ${sk(`<rect x="${x - 6}" y="${y - 12}" width="12" height="14" style="fill:#7A5638"/>${tiers.map(([dy, hw, h]) => `<path d="M${x - hw} ${y - 10 + dy} L${x} ${y - 10 + dy - h - 14} L${x + hw} ${y - 10 + dy}z" style="fill:${dy % 2 ? "#3F6A3F" : "#4F7A4A"}"/>`).join("")}
+      ${[[-30, 0, "#C8432F", 14, 10], [28, 2, "#F3C969", 12, 9], [-4, 4, "#7FB8E8", 16, 8]].map(([dx, dy, c, w, h]) => `<rect x="${x + dx - w/2}" y="${y + dy - h}" width="${w}" height="${h}" rx="1.5" style="fill:${c}"/><path d="M${x + dx} ${y + dy - h} v${h} M${x + dx - w/2} ${y + dy - h/2} h${w}" style="stroke:#FFFDF6" stroke-width="1.4"/>`).join("")}`,
+      `${tiers.map(([dy, hw, h]) => `<path d="M${x - hw} ${y - 10 + dy} L${x} ${y - 10 + dy - h - 14} L${x + hw} ${y - 10 + dy}z"/>`).join("")}<rect x="${x - 6}" y="${y - 12}" width="12" height="14"/>`)}
+    ${[[-22, -18, "#C8432F"], [18, -24, "#F3C969"], [-8, -46, "#7FB8E8"], [20, -50, "#C8432F"], [-16, -68, "#F3C969"]].map(([dx, dy, c]) => `<circle cx="${x + dx}" cy="${y + dy}" r="3.2" style="fill:${c};stroke:var(--line)" stroke-width=".7"/>`).join("")}
+    ${lit ? bulbs(pts.map(([dx, dy]) => [x + dx, y + dy]), 1) : ""}
+    <path d="M${x} ${y - 112} l3 6 6 .6 -4.6 4 1.4 6 -5.8 -3.2 -5.8 3.2 1.4 -6 -4.6 -4 6 -.6z" style="fill:#F3C969;stroke:var(--line)" stroke-width=".9"/>${lit ? `<circle cx="${x}" cy="${y - 103}" r="12" style="fill:#FFE9A8" opacity=".35"/>` : ""}
+    ${tapeLabel(x, y + 24, "Christmas tree", "#F3E1A0", 10)}</g>`;
+}
+// round 174: Santa's grotto, a little hut with snow painted on the roof; Santa in the window when it's open
+function grotto(open){
+  const [x, y] = GROTTO_AT;
+  return `<g data-place="xgrotto" aria-label="Santa's grotto"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="38" ry="9" style="fill:var(--butter)"/>
+    ${sk(`<rect x="${x - 28}" y="${y - 34}" width="56" height="34" style="fill:#A8754F"/><path d="M${x - 34} ${y - 32} L${x} ${y - 58} L${x + 34} ${y - 32}z" style="fill:#7A1F3D"/><path d="M${x - 30} ${y - 35} L${x} ${y - 55} L${x + 30} ${y - 35} q-4 5 -8 1 q-4 5 -8 1 q-4 5 -8 1 q-4 5 -8 1 q-4 5 -8 1 q-4 5 -8 1 q-4 5 -8 1z" style="fill:#FFFDF6"/>
+      <rect x="${x - 8}" y="${y - 22}" width="16" height="22" rx="1.5" style="fill:#5A3A2A"/><rect x="${x + 12}" y="${y - 26}" width="11" height="10" rx="1" style="fill:${open ? "#FFE9A8" : "#9FB8C9"}"/>`,
+      `<rect x="${x - 28}" y="${y - 34}" width="56" height="34"/><path d="M${x - 34} ${y - 32} L${x} ${y - 58} L${x + 34} ${y - 32}z"/><rect x="${x - 8}" y="${y - 22}" width="16" height="22" rx="1.5"/><rect x="${x + 12}" y="${y - 26}" width="11" height="10" rx="1"/>`)}
+    ${open ? `<circle cx="${x + 17.5}" cy="${y - 22}" r="3" style="fill:#F2D3BC"/><path d="M${x + 14.5} ${y - 21} q3 5 6 0z" style="fill:#FFFDF6"/><path d="M${x + 14.5} ${y - 24} l3 -4 l3 4z" style="fill:#C8432F"/>` : ""}
+    ${tapeLabel(x, y + 20, "Santa's grotto", "#F4C7CF", 9)}</g>`;
+}
+const LANTERNS = [[278, 600], [242, 540], [278, 470], [242, 414], [176, 404], [104, 380], [62, 340], [112, 206], [180, 202], [302, 202], [440, 202]];
+const lanterns = lit => `<g pointer-events="none">${LANTERNS.map(([x, y]) => `<path d="M${x} ${y} v-22" style="stroke:var(--line)" stroke-width="1.6"/>${lit ? `<circle cx="${x}" cy="${y - 26}" r="9" style="fill:#FFE9A8" opacity=".35"/>` : ""}<rect x="${x - 4}" y="${y - 31}" width="8" height="9" rx="1.5" style="fill:${lit ? "#FFE9A8" : "#E8D3A6"};stroke:var(--line)" stroke-width=".9"/><path d="M${x - 5} ${y - 31} h10" style="stroke:var(--line)" stroke-width="1.4"/>`).join("")}</g>`;
 export function fieldArt(){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="160" cy="520" rx="170" ry="90" style="fill:var(--grass2)"/><ellipse cx="460" cy="460" rx="90" ry="140" style="fill:var(--grass2)"/></g>
@@ -118,7 +151,7 @@ export function fieldArt(){
       `<path d="M86 452 l58 -6 l8 26 l-58 6z"/><rect x="156" y="452" width="24" height="16" rx="3"/><path d="M158 452 q10 -12 20 0"/>`)}
     ${tapeLabel(130, 508, "Picnic spot", "var(--blush)", 11)}</g>`;
   const ev0 = eventNow(artCtx().day(), sgHM()), night = !!ev0 && ev0.kind === "night";
-  const pitch = `<g data-place="pitch" aria-label="Football pitch"><ellipse class="hov" cx="150" cy="590" rx="80" ry="12" style="fill:var(--butter)"/>
+  const pitch = xmasOn(artCtx().day()) ? "" : `<g data-place="pitch" aria-label="Football pitch"><ellipse class="hov" cx="150" cy="590" rx="80" ry="12" style="fill:var(--butter)"/>
     <g ${W} fill="none" opacity=".75"><rect x="66" y="530" width="168" height="56" rx="4" style="stroke:#FFFDF6" stroke-width="2.4"/><path d="M150 530 v56" style="stroke:#FFFDF6" stroke-width="2"/><circle cx="150" cy="558" r="10" style="stroke:#FFFDF6" stroke-width="2"/></g>
     ${sk(`<circle cx="176" cy="566" r="5" style="fill:#FFFDF6"/>`, `<path d="M62 544 v28 h-10 v-28z M238 544 v28 h10 v-28z"/><circle cx="176" cy="566" r="5"/><path d="M174 563 l3 2 l-1 3" opacity=".6"/>`)}
     ${tapeLabel(150, 612, "Football pitch", "var(--butter)", 11)}</g>`;
@@ -142,11 +175,13 @@ export function fieldArt(){
     ${tapeLabel(332, 614, "Orchard", "var(--sage)", 11)}</g>`;
   // market and fair days: stalls in a row along the top under the bunting, a second picnic blanket, kites at the fair
   const ev = eventNow(artCtx().day(), sgHM());
-  const event = ev ? (ev.kind === "night" ? fairyLights() : bunting) + ev.stalls.map(s => stall(s.at, STALL_SPOTS[s.at][0], STALL_SPOTS[s.at][1], s)).join("") + (ev.kind === "night" ? stage() : blanket2() + (ev.kind === "fair" ? kites : ""))
+  const xm = ev && ev.kind === "xmas", season = xmasOn(artCtx().day()), lit = season && treeLit(artCtx().day(), sgHM(), artCtx().F && artCtx().F());
+  const xtree = season ? xmasTree(lit) + grotto(grottoNow(artCtx().day(), sgHM())) : "";   // round 172: up all season, lit from half past five till eleven
+  const event = ev ? (ev.kind === "night" || xm ? fairyLights() : bunting) + (xm ? lanterns(true) : "") + ev.stalls.map(s => stall(s.at, STALL_SPOTS[s.at][0], STALL_SPOTS[s.at][1], s)).join("") + (ev.kind === "night" ? stage() : xm ? "" : blanket2() + (ev.kind === "fair" ? kites : ""))
     + tapeLabel(260, 30, ev.name, "var(--butter)", 12) : "";
   // the evening light (as on every outdoor screen), under the market so the fairy lights glow
   const dark = skyWash(sgHM());
-  return lampDefs + ground + swans + dark + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + lawn + toTown + toFarm + toOrchard + event
+  return lampDefs + ground + swans + dark + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + lawn + xtree + toTown + toFarm + toOrchard + event
     + archGate("toShoreF", 20, 292, "Foreshore", 52, 332, "var(--sky)", "Gate to the foreshore");
 }
 // The river's stretch through the top right of Ma Ma's orchard (from the lake, on east to home)

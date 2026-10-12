@@ -2277,17 +2277,7 @@ Write the proposal for Mel covering every item below. Only build after she says 
 ## NEXT UP (Mel, after round 156)
 - **The campervan map is finished:** the Tablelands (rounds 157–160) and the Lavender Hills (161–164) are built, so all four regions are open.
   - Each region is four rounds, like the Coast Road. Day trips only, and family acts are unique per stop. Plan each region with Mel before building.
-- **Next, before 20 November** (the in-game dates follow the real calendar, so this has to land before mulled wine season starts):
-  - **The Christmas market on the field**, late November to Christmas Eve, evenings:
-    - Wooden stalls and fairy lights.
-    - Mel's own stall: she picks what goes on it each evening (mill soaps and oils, honey, wine).
-    - A Cocoa Room gift-box stall, a gelato stand, and Ma Ma's wreaths.
-    - Mulled wine by the cup.
-    - A carol singalong, and Evan meets Santa.
-  - **Gift hampers and the post office:**
-    - A packing table where Mel packs her own things into hampers (oils, soaps, bonbons, honey, wine).
-    - Penny posts them to villagers and to people further afield, and thank-you letters come back.
-    - Hampers sell at the Christmas market too.
+- **Done (rounds 172–174):** the Christmas market and gift hampers. See their section below.
 - Also suggested and not yet picked: an olive harvest day with olio nuovo (November), and Evan's own garden patch with a pumpkin competition at the fair.
 
 ## Round 165: the mill bench, and the wine shop's crate
@@ -2313,3 +2303,18 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - Mulled wine itself still starts on 20 November (Mel's season: late November to Boxing Day).
 - Round 170: the bench's Basket tab lists each thing in the basket (icon, count) with Take 1 / All (`fromBasket`, data-mc="unbasket:id:n").
 - Round 171: the spice rack lists each spice with Take 1 / All (`fromRack`, data-mull="unrack:id:n").
+
+## Rounds 172–174: the Christmas market and gift hampers
+- **Events per time of day** (game/tours.js): `eventsOn(day)` lists every field event that day; `eventOn(day, hm)` is the one at that time (no hm: the day's first); `keepersOn(day)` everyone keeping a stall. On season Sundays the farmers market (8–1) and the Christmas market (5–9) both happen.
+- **The Christmas market** (`xmasOn`: 20 Nov to 24 Dec, 17:00–21:00, `XMAS`): replaces the night market and the fair; the Friday field market and last-Friday film are off in the season (`bayMarketNow`, `movieNow`). Eight stalls (all `xmas: true`, every item out every evening):
+  - Ma Ma's wreaths, Hana's gingerbread and ornaments, Hiro's wooden toys (goods in data/stall-goods.js, `xm_*`, with icon shapes in icons.js).
+  - Dev's chestnuts and Sofia's hot chocolate: `treats`, eaten on the spot (xmas.js `TREATS`, data-xtreat).
+  - `mulled`: Celeste ladles cups from Mel's pot (sells .06/min at the market in vineyard.js sellTick); Mel can have a cup on the house.
+  - `cocoa`: the Cocoa Room's stall (needs the Cocoa Room, not the cart), sells in cocoaTick; panel `{xmas: true}`.
+  - `mine` (place 2): Mel's own stall, Hazel minds it once the Mill Shop's open (standing() swaps the keeper).
+- **The tree** on the football pitch (`XMAS_TREE`, pitch hidden in the season), up all season, lit 17:30–23:00 (`treeLit`). The first night it waits for the countdown (`countdownDue`, core `treeCountdown`, `F.xmas.lit[year]`), the village gathered round it 17:15–17:40 (`lightingSlot`). Lanterns along the paths while the market's on.
+- **Mel's stall** (xmas.js): up to 6 kinds (`stallGood`: mill goods, hive honeys, chz_*, Cocoa Room bars/boxes, hampers) plus bottles off the wine shelves; sells at `worth` (sell ≤ price); `stallSellMinute` mode mel .1 / hazel .05 / tin .02, run in core millTick's minute loop.
+- **Hampers** at Penny's hamper table in the post office (station `hampers`, slot F, only drawn in season): small 3 / big 6 (`BASKETS`), `packStart/packAdd/packWine/packRemove/packTie`, named by contents (`hamperName`), registered as items `hamper_N` (`registerHampers` at load), `hamperValue` sell ≤ price.
+- **Posting** (`RECIPS`): family (10 min), villagers (30 min, half of them pin an order for another), trip friends once their stop's stamped (Kel, Win, Kirra, Madame Arnaud: next day, with a keepsake). Letters via `hamperMail` in the mailbox; gifts and orders via `collectReplies` (1s tick). Times use the game clock (Date.now() + __mapleOffset).
+- **Orders** from 1 December: two a day plus villagers' (`ordersOn`, `fits`, `fillOrder` pays the hamper's full price).
+- **Round 174:** carols Fridays 19:00–19:40 (`CAROL_SONGS`, villagers round the tree with song sheets, act "carol"); Santa's grotto weekend evenings 17–20 (`GROTTO_AT`, `grottoVisit`: a wish, a small present, a photo keepsake once a year; needs Evan); Christmas Eve lantern walk 20:15–21:00 (act "lantern", Mel joins from the tree and keeps a lantern once a year). Calendar lists them all.

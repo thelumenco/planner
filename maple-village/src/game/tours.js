@@ -31,7 +31,7 @@ function groupFor(seed, n, skip = [], from = VISITORS){
 export function toursOn(day){
   const d = dow(day), out = [];
   // groups are a mix: a couple of villagers and one or two out-of-towners
-  const ev = eventOn(day), keepers = ev ? ev.stalls.map(x => x.id) : [];
+  const keepers = keepersOn(day);
   const away = awayToday(day), guides = GUIDES.filter(g => !keepers.includes(g) && !away.includes(g));
   if (d === 0 || d === 6) WEEKEND.forEach(([from, to], i) => { const guide = guides[(hash(day) + i) % guides.length], t = 1 + (hash(day + "t" + i) % 2);
     out.push({i, from, to, guide, group: [...groupFor(day + ":" + i, 3 + (hash(day + "n" + i) % 2) - t), ...groupFor(day + ":t" + i, t, keepers, TOURISTS)]}); });
@@ -120,7 +120,7 @@ const WEEKEND_SEATS = [[11*60, 12*60, [SEAT.d, SEAT.e]], [16*60 + 30, 17*60 + 30
 const BROWSE_SEATS = [[10*60, 11*60 + 15, [[106, 300], [164, 312]], "browse"], [11*60 + 15, 12*60, [[126, 306], [76, 316]], "browse"]];
 export function touristTastings(day){
   const d = dow(day), busy = toursOn(day).flatMap(t => t.group), out = [];
-  const ev = eventOn(day), stallKeepers = ev ? ev.stalls.map(x => x.id) : [];
+  const stallKeepers = keepersOn(day);
   [...TOURIST_SEATS, ...(d === 0 || d === 6 ? WEEKEND_SEATS : []), ...BROWSE_SEATS].forEach(([from, to, seats, act], k) =>
     groupFor(day + "tt" + k, 2, [...busy, ...stallKeepers], act ? [...TOURISTS, ...NIGHT_TOURISTS] : TOURISTS).forEach((id, j) => out.push({id, from, to, at: seats[j], act})));   // (the morning browsers can be night-market folk too: on Sundays every day tourist's busy)
   return out;
@@ -141,7 +141,7 @@ export function familyVisits(day){
     f.kids.forEach(k => out.push({id: k, from, to, scene, wander: scene === "vineyard" ? PLAY : FIELD_PLAY})); };
   if (we) { add(fam(0), 10*60, 12*60); add(fam(1), 10*60 + 30, 12*60 + 30); add(fam(2), 12*60 + 45, 14*60 + 45); add(fam(3), 15*60, 17*60 + 30); add(fam(0), 15*60 + 30, 17*60 + 30);
     // on market and fair days, a couple of the families go to the field first
-    const ev = eventOn(day); if (ev) { out.splice(0, out.length); add(fam(0), ev.from, ev.from + 120, "field"); add(fam(1), ev.from + 60, ev.from + 180, "field");
+    const ev = eventsOn(day).find(e => e.kind !== "xmas"); if (ev) { out.splice(0, out.length); add(fam(0), ev.from, ev.from + 120, "field"); add(fam(1), ev.from + 60, ev.from + 180, "field");
       add(fam(2), 12*60 + 45, 14*60 + 45); add(fam(3), 15*60, 17*60 + 30); } }
   else add(fam(0), 15*60 + 30, 17*60);
   return out;
@@ -194,17 +194,41 @@ export const NIGHT = [{id: "yun", at: 0, short: "Taiwan eats", n: "Taiwanese str
 let ownedNow = () => ({});
 export const setStallOwned = fn => { ownedNow = fn; };
 const standing = (list, day) => { const o = ownedNow(), away = awayToday(day);
-  return list.filter(s => !s.needs || o[s.needs]).map(s => s.id === "mama" && away.includes("mama") ? {...s, id: "mei", line: "Ma Ma's away for the day, so I'm minding her stall. Same fruit, same prices!"} : s); };
+  return list.filter(s => !s.needs || o[s.needs]).map(s => s.id === "mama" && away.includes("mama") ? {...s, id: "mei", line: "Ma Ma's away for the day, so I'm minding her stall. Same fruit, same prices!"}
+    : s.kind === "mine" && o.millshop ? {...s, id: "hazel", line: "I'm minding Mel's stall. Everything here, she made."} : s); };   // round 173: with the Mill Shop open, Hazel minds Mel's Christmas stall
 export const NIGHT_TOURISTS = ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy", "rafe"];
 export const STAGE = {x: 452, y: 462}, STAGE_WATCH = [[404, 560], [446, 566], [492, 536], [508, 562], [426, 590]];
 function lastSaturday(day){ const dt = new Date(day + "T00:00:00Z"); if (dt.getUTCDay() !== 6) return false; const n = new Date(dt.getTime() + 7*864e5); return n.getUTCMonth() !== dt.getUTCMonth(); }
-export function eventOn(day){
-  if (dow(day) === 0) return {kind: "market", name: "Sunday farmers market", from: 8*60, to: 13*60, stalls: standing(MARKET, day), wine: true};
-  if (lastSaturday(day)) return {kind: "fair", name: "Field fair", from: 10*60, to: 16*60, stalls: FAIR, wine: false};
-  if (dow(day) === 2 || dow(day) === 4) return {kind: "night", name: "Night market", from: 17*60 + 30, to: 22*60, stalls: NIGHT, wine: false};
-  return null;
+// Round 172 (Mel: "let's do Christmas markets and gift hampers"): the Christmas market, every evening 5 to 9 from 20
+// November to Christmas Eve. On those days it takes the place of the night market and the fair; the Sunday morning
+// farmers market carries on. Wooden stalls under garlands, the big tree on the football pitch, up all season (lit at half past five;
+// the first night the whole village counts it down), lanterns along the paths.
+// at: 0-7 along the top as ever; Mel's own stall is place 2. kind: "mine" (Mel's: game/xmas.js), "mulled" (cups from
+// her pot, Celeste ladling), "cocoa" (the Cocoa Room's cart, once it's hers), the rest are ordinary stalls (treats:
+// eaten on the spot, game/xmas.js)
+export const xmasOn = day => { const md = day.slice(5); return md >= "11-20" && md <= "12-24"; };
+export const XMAS_FROM = 17*60, XMAS_TO = 21*60, XMAS_LIT = 17*60 + 30, XMAS_TREE = [184, 600];
+export const XMAS = [{id: "mama", at: 0, short: "Wreaths", n: "Ma Ma's wreaths and winter flowers", items: ["xm_wreath", "xm_bouquet", "xm_mistletoe"], col: "#4F7A4A", line: "Holly from the orchard hedge, ivy from the back fence. Ma Ma makes them all by hand!"},
+  {id: "hana", at: 1, short: "Gingerbread", n: "Hana's gingerbread and ornaments", items: ["xm_ginger", "xm_bauble", "xm_star", "xm_angel"], col: "#C8432F", line: "Gingerbread people, iced this afternoon. And ornaments for your tree!"},
+  {id: "mel", at: 2, kind: "mine", short: "Mel's stall", n: "Your stall", items: [], col: "#8E2C48", line: ""},
+  {id: "celeste", at: 3, kind: "mulled", short: "Mulled wine", n: "Mulled wine", items: [], col: "#7A1F3D", line: "Mind, it's hot! Cinnamon on top?"},
+  {id: "hiro", at: 4, short: "Wooden toys", n: "Wooden toys", items: ["xm_train", "xm_horse", "xm_yoyo", "xm_ark"], col: "#7FB8E8", line: "Every one carved and painted in my workshop. No batteries, ever."},
+  {id: "dev", at: 5, short: "Chestnuts", n: "Roast chestnuts", items: [], treats: ["xm_chestnut"], col: "#8A5A3A", line: "Hot chestnuts! Mind your fingers, they're straight off the coals."},
+  {id: "sofia", at: 6, short: "Hot chocolate", n: "The Scoop Shack's hot chocolate", items: [], treats: ["xm_hotchoc", "xm_hotchoc_m"], col: "#F2A0B8", line: "The Scoop Shack's winter stand! Marshmallows on top?"},
+  {id: "mateo", at: 7, kind: "cocoa", needs: "cocoa", short: "Cocoa Room", n: "The Cocoa Room's Christmas stall", items: [], col: "#8A5A3A", line: "Gift boxes for Christmas! Bonbons and bars, all from the Cocoa Room."}].map(st => ({...st, xmas: true}));
+// every event on the field that day, in time order: [{kind, name, from, to, stalls}]
+export function eventsOn(day){
+  const out = [], x = xmasOn(day);
+  if (dow(day) === 0) out.push({kind: "market", name: "Sunday farmers market", from: 8*60, to: 13*60, stalls: standing(MARKET, day), wine: true});
+  if (!x && lastSaturday(day)) out.push({kind: "fair", name: "Field fair", from: 10*60, to: 16*60, stalls: FAIR, wine: false});
+  if (!x && (dow(day) === 2 || dow(day) === 4)) out.push({kind: "night", name: "Night market", from: 17*60 + 30, to: 22*60, stalls: NIGHT, wine: false});
+  if (x) out.push({kind: "xmas", name: "Christmas market", from: XMAS_FROM, to: XMAS_TO, stalls: standing(XMAS, day), wine: false});
+  return out;
 }
-export const eventNow = (day, hm) => { const e = eventOn(day); return e && hm >= e.from && hm < e.to ? e : null; };
+// the event at the field at a given time (or, without one, the day's first); everyone who keeps a stall that day
+export function eventOn(day, hm){ const l = eventsOn(day); return hm == null ? l[0] || null : l.find(e => hm >= e.from && hm < e.to) || null; }
+export const keepersOn = day => eventsOn(day).flatMap(e => e.stalls.map(s => s.id));
+export const eventNow = (day, hm) => eventOn(day, hm);
 // the stall standing in place i right now (or null)
 export const stallAt = (day, hm, i) => { const e = eventNow(day, hm); return e ? e.stalls.find(s => s.at === i) || null : null; };
 // shoppers at the event: villagers drifting between the stalls along the top in two waves; in each wave two of them
@@ -216,7 +240,7 @@ const PICNICKERS = [[106, 468], [138, 464], [198, 486], [230, 482]];
 // runs on an honesty tin while they're away). The first half hour everyone's setting up behind their stall.
 const POSES = ["behind", "behind", "front", "sit", "chat", "wander"], POSE_LEN = 30;
 export function keeperPose(st, day, hm){
-  const e = eventOn(day); if (!e || hm < e.from || hm >= e.to) return null;
+  const e = eventOn(day, hm); if (!e || hm < e.from || hm >= e.to) return null;
   const k = Math.floor((hm - e.from)/POSE_LEN);
   return {k, pose: k === 0 ? "behind" : POSES[hash(day + ":" + st.id + ":" + k) % POSES.length], from: e.from + k*POSE_LEN, to: Math.min(e.to, e.from + (k + 1)*POSE_LEN)};
 }
@@ -231,12 +255,31 @@ function keeperSlot(st, e, day, hm){
   if (pose === "chat") { const side = k % 2 ? 1 : -1; return {...base, at: [Math.max(30, Math.min(490, x + side*30)), y + 48], dir: -side}; }
   return {...base, wander: FIELD_WALK};
 }
+// round 172: the first night of the Christmas market, everyone gathers round the tree from 5:15 for the lighting
+const TREE_RING = [[112, 570], [118, 604], [92, 546], [72, 588], [134, 636], [52, 618], [300, 560], [300, 600], [96, 630], [316, 630]];
+const LIGHTERS = ["mum", "dad", "mama", "gonggong", "darren", "marcus", "angelina", "hana", "okada", "juniper", "bo", "lin", "pip", "opal", "theo"];
+// round 174: carols by the tree on Friday evenings at 7, Santa's grotto on weekend evenings, and on Christmas Eve a
+// lantern walk round the field to close the market
+export const CAROLS = [19*60, 19*60 + 40], GROTTO = [17*60, 20*60], GROTTO_AT = [64, 548], LANTERN_WALK = [20*60 + 15, 21*60];
+export const carolsNow = (day, hm) => xmasOn(day) && dow(day) === 5 && hm >= CAROLS[0] && hm < CAROLS[1];
+export const grottoOn = day => xmasOn(day) && (dow(day) === 0 || dow(day) === 6);
+export const grottoNow = (day, hm) => grottoOn(day) && hm >= GROTTO[0] && hm < GROTTO[1];
+export const lanternWalkNow = (day, hm) => day.slice(5) === "12-24" && hm >= LANTERN_WALK[0] && hm < LANTERN_WALK[1];
+const WALK_ROUTE = [[278, 600], [242, 540], [278, 470], [242, 414], [176, 404], [104, 380], [62, 340], [112, 206], [180, 202], [302, 202], [440, 202]];
+function lightingSlot(id, e, day, hm){
+  if (e.kind === "xmas" && carolsNow(day, hm)) { const k = LIGHTERS.filter(x => !e.stalls.some(s => s.id === x)).indexOf(id); if (k >= 0 && k < TREE_RING.length) return {from: CAROLS[0], to: CAROLS[1], scene: "field", at: TREE_RING[k], dir: TREE_RING[k][0] < XMAS_TREE[0] ? 1 : -1, act: "carol"}; }
+  if (e.kind === "xmas" && lanternWalkNow(day, hm)) { const k = [...LIGHTERS, ...NIGHT_TOURISTS].indexOf(id); if (k >= 0) return {from: LANTERN_WALK[0], to: LANTERN_WALK[1], scene: "field", wander: WALK_ROUTE, act: "lantern"}; }
+  if (e.kind !== "xmas" || day.slice(5) !== "11-20" || hm < XMAS_FROM + 15 || hm >= XMAS_LIT + 10) return null;
+  const k = LIGHTERS.filter(x => !e.stalls.some(s => s.id === x)).indexOf(id); if (k < 0 || k >= TREE_RING.length) return null;
+  return {from: XMAS_FROM + 15, to: XMAS_LIT + 10, scene: "field", at: TREE_RING[k], dir: TREE_RING[k][0] < XMAS_TREE[0] ? 1 : -1};
+}
 export function eventSlot(id, day, hm){
-  const e = eventOn(day); if (!e || hm < e.from || hm >= e.to) return null;
+  const e = eventOn(day, hm); if (!e || hm < e.from || hm >= e.to) return null;
   const st = e.stalls.find(s => s.id === id);
   if (st) return keeperSlot(st, e, day, hm);
+  { const g = lightingSlot(id, e, day, hm); if (g) return g; }
   { const f = familyAtEvent(id, e, day, hm); if (f) return f; }
-  if (e.kind === "night") return nightShopper(id, e, day, hm);
+  if (e.kind === "night" || e.kind === "xmas") return nightShopper(id, e, day, hm);
   const mid = e.from + Math.round((e.to - e.from)/2), wave = hm < mid ? 0 : 1, half = Math.round((wave ? e.to - mid : mid - e.from)/2), start = wave ? mid : e.from;
   const crowd = groupFor(day + "ev" + wave, 4, ["pip", ...e.stalls.map(s => s.id), ...toursOn(day).flatMap(t => [t.guide, ...t.group])], [...VISITORS, ...TOURISTS, "sam", "priya"]);
   const k = crowd.indexOf(id);
@@ -250,10 +293,15 @@ export function eventSlot(id, day, hm){
 const FAMILY_EVENTS = {
   night: {2: [["mama", 17*60 + 45, 19*60], ["gonggong", 17*60 + 45, 19*60], ["marcus", 18*60 + 30, 20*60 + 30], ["angelina", 18*60 + 30, 20*60 + 30]],
     4: [["mum", 18*60, 20*60], ["dad", 18*60, 20*60], ["darren", 19*60, 20*60 + 30]]},
+  // round 172: the Christmas market, a few of the family most evenings (not the dinner nights, Wednesday and Sunday,
+  // when they're round the table by 6:30)
+  xmas: {1: [["mum", 17*60 + 15, 18*60 + 45], ["dad", 17*60 + 15, 18*60 + 45]], 2: [["marcus", 18*60, 20*60], ["angelina", 18*60, 20*60]],
+    3: [["darren", 17*60, 18*60 + 15]], 4: [["mama", 17*60 + 15, 18*60 + 30], ["gonggong", 17*60 + 15, 18*60 + 30]], 5: [["darren", 18*60 + 30, 20*60 + 30], ["mum", 18*60 + 30, 20*60], ["dad", 18*60 + 30, 20*60]],
+    6: [["mama", 17*60, 19*60], ["gonggong", 17*60, 19*60], ["marcus", 18*60, 20*60 + 30], ["angelina", 18*60, 20*60 + 30], ["darren", 18*60 + 30, 20*60 + 30]], 0: [["darren", 17*60, 18*60 + 15]]},
   fair: [["mum", 10*60, 12*60], ["dad", 10*60, 12*60], ["mama", 11*60, 13*60], ["gonggong", 11*60, 13*60], ["darren", 13*60, 15*60], ["marcus", 13*60, 15*60 + 30], ["angelina", 13*60, 15*60 + 30]]
 };
 export function familyAtEvent(id, e, day, hm){
-  const list = e.kind === "night" ? (FAMILY_EVENTS.night[dow(day)] || []) : e.kind === "fair" ? FAMILY_EVENTS.fair : [];
+  const list = e.kind === "night" || e.kind === "xmas" ? (FAMILY_EVENTS[e.kind][dow(day)] || []) : e.kind === "fair" ? FAMILY_EVENTS.fair : [];
   const f = list.find(([who, from, to]) => who === id && hm >= from && hm < to); if (!f) return null;
   return {from: f[1], to: f[2], scene: "field", wander: FIELD_WALK};
 }
@@ -292,7 +340,7 @@ const SUP_SEA = [[60, 190], [104, 250], [70, 330], [112, 400], [64, 560], [118, 
 export function shoreSlot(id, day, hm){
   if (!TOURISTS.includes(id)) return null;
   const we = [0, 6].includes(dow(day)), from = we ? 9*60 : 7*60, to = we ? 12*60 : 8*60 + 30; if (hm < from || hm >= to) return null;
-  const e = eventOn(day), busy = [...(e ? e.stalls.map(s => s.id) : []), ...toursOn(day).flatMap(t => t.group)];
+  const busy = [...keepersOn(day), ...toursOn(day).flatMap(t => t.group)];
   return groupFor(day + ":sup", we ? 2 : 1, busy, TOURISTS).includes(id) ? {from, to, scene: "shore", wander: SUP_SEA, act: "sup", free: true} : null;
 }
 
@@ -319,7 +367,7 @@ const BONFIRE_FAMILY = {dad: 19*60, mum: 19*60, gonggong: 19*60, mama: 19*60, ma
 // different mix every week, and Hiro selling kites on the beach.
 export const MOVIE = [19*60 + 30, 21*60 + 30], BAYMKT = [16*60 + 30, 19*60 + 15];   // the market packs up a quarter of an hour before the film
 export const lastFriday = day => { const dt = new Date(day + "T00:00:00Z"); return dt.getUTCDay() === 5 && new Date(dt.getTime() + 7*864e5).getUTCMonth() !== dt.getUTCMonth(); };
-export const movieNow = (day, hm) => lastFriday(day) && hm >= MOVIE[0] && hm < MOVIE[1];
+export const movieNow = (day, hm) => lastFriday(day) && !xmasOn(day) && hm >= MOVIE[0] && hm < MOVIE[1];   // (not in the Christmas market's season: its stalls have the top of the field)
 export const SCREEN = [236, 128];   // the screen stands where the Sunday market's stalls go, along the top of the field
 // spread out over the field, not bunched at the screen (Mel): two on the blanket by the screen, two at the picnic
 // spot, and two strolling round the exercise lawn
@@ -331,7 +379,7 @@ export function movieSlot(id, day, hm){
   if (!BLANKET[id]) return null;
   return {from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: id === "gonggong" ? -1 : 1, movie: true};
 }
-export const bayMarketNow = (day, hm) => dow(day) === 5 && hm >= BAYMKT[0] && hm < BAYMKT[1];
+export const bayMarketNow = (day, hm) => dow(day) === 5 && !xmasOn(day) && hm >= BAYMKT[0] && hm < BAYMKT[1];
 // (the "bay market" lives on the field now, where the Sunday market stands: Mel asked for the bay to stay calm)
 export const BAY_STALLS = [[156, 128], [236, 128], [316, 128]], KITE_SELLER = [396, 150];
 export const bayKeepers = day => groupFor(day + ":baymkt", 3, [], NIGHT_TOURISTS);

@@ -155,6 +155,25 @@ Object.assign(GOODS, {
   pet_tortoise: P("Tortoise", 22, "A slow, wise little tortoise, looking for a home.", ["tortoise", "#7FA35A"], "tortoise"),
   pet_duckling: P("Duckling", 12, "A fluffy yellow duckling, looking for a home.", ["duck", "#F3D34A"], "duckling")
 });
+// round 172: the Christmas market (20 November to Christmas Eve, game/tours.js XMAS). Ma Ma's wreaths, Hana's
+// gingerbread and tree ornaments, Hiro's wooden toys. (The chestnuts and hot chocolate are treats, eaten on the spot:
+// game/xmas.js TREATS.) Ornaments and wreaths are keepsakes: a shelf, or the tree at home
+Object.assign(GOODS, {
+  xm_wreath: K("Holly wreath", 12, "A wreath Ma Ma made at her Christmas market stall: holly from the orchard hedge, ivy from the back fence, a red ribbon. She tied the bow twice to get it right.", ["ring", "#4F7A4A", "#C8432F"]),
+  xm_bouquet: G("Winter bouquet", "family", 8, "market", "Winter flowers from Ma Ma! Red and white, with a sprig of pine.", ["bouquet", "#C8432F", "#FFFDF6"], {mama: "Aiyo, you buy Ma Ma's own flowers back? Silly girl. Thank you."}),
+  xm_mistletoe: K("Sprig of mistletoe", 4, "A sprig of mistletoe from Ma Ma's stall, tied with red thread. Darren keeps hanging it in doorways.", ["sprig", "#7FA35A", "#FFFDF6"]),
+  xm_ginger: G("Gingerbread person", ["evan", "darren", "mama", "gonggong", "mum", "dad", "angelina", "marcus"], 3, "market", "A gingerbread person, iced by Hana! Which leg first?", ["ginger", "#C98A4A", "#FFFDF6"], {evan: "GINGERBREAD MAN! I'm eating his head first."}),
+  xm_bauble: K("Glass bauble", 5, "A glass bauble from Hana's Christmas stall, deep red with a gold band. It catches the fairy lights.", ["bauble", "#C8432F", "#F3C969"]),
+  xm_star: K("Straw star", 4, "A star woven from straw, the old way, from Hana's Christmas stall. It's for the top of the tree, or a window.", ["star", "#F3D98A"]),
+  xm_angel: K("Felt angel", 6, "A little felt angel with a gold halo, sewn by Hana's aunt. Her wings are slightly different sizes. That's the charm.", ["angel", "#FFFDF6", "#F3C969"]),
+  xm_train: G("Wooden train", "evan", 14, "market", "A wooden train! Three carriages and a funnel.", ["train", "#C8432F", "#7FB8E8"], {evan: "CHOO CHOO! It has a FUNNEL! I'm the driver."}),
+  xm_horse: G("Little rocking horse", "evan", 18, "market", "A little rocking horse, painted dapple grey.", ["horse", "#E6DDF2", "#C8432F"], {evan: "Giddy-up! Neigh! It ROCKS, Mama!"}),
+  xm_yoyo: G("Painted yo-yo", ["evan", "marcus", "darren"], 4, "market", "A painted wooden yo-yo!", ["yoyo", "#F3C969", "#E8566C"], {evan: "It goes down and it comes UP! Again!", marcus: "Walk the dog. Watch. ...okay, watch again."}),
+  // round 174: keepsakes from the grotto and the Christmas Eve lantern walk (not for sale anywhere)
+  xm_santaphoto: K("Evan's photo with Santa", 0, "Evan on Santa's knee in the grotto on the field, holding his present with both hands, very serious. Pip the elf is photobombing in the corner.", ["tile", "#C8432F", "#FFFDF6"]),
+  xm_lantern: K("A paper lantern from the Christmas Eve walk", 0, "The paper lantern you carried round the field on Christmas Eve, the whole village walking together in the dark, the tree lit up at the end. The candle's burnt down to a stub. You kept it anyway.", ["lantern", "#FFE9A8"]),
+  xm_ark: G("Noah's ark", "evan", 22, "market", "A wooden ark, with animals two by two!", ["ark", "#A8754F", "#9CC27E"], {evan: "Two giraffes! Two elephants! Two... what's this one? A DUCK!"})
+});
 // what else each stall keeps in its pool, besides the items in tours.js (keyed by stall keeper)
 export const POOLS = {
   market: {noor: ["pet_puppy", "pet_bunny", "pet_hamster", "pet_goldfish", "pet_budgie", "pet_tortoise", "pet_duckling"], elena: ["cheddar", "olivejar", "figjam", "crackers", "goatcheese"], felix: ["k_honeypot", "lavhoney", "honeysticks", "lipbalm", "beewraps", "honeylemon", "mead"],

@@ -7,7 +7,7 @@ import { OUTDOOR } from "../data/world.js";
 import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
 import { lunchSlot } from "./lunch.js";
 import { occasionSlot } from "./occasions.js";
-import { toursOn, visitsOn, eventOn, TOURISTS } from "./tours.js";
+import { toursOn, visitsOn, eventOn, keepersOn, TOURISTS } from "./tours.js";
 import { millSlot } from "./millcraft.js";
 import { MILL_VISITORS } from "../data/mill-people.js";
 import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dinnerSlot, dateSlot, clubSlot, discoSlot, scoopSlot, workshopSlot, trainSlot, letSlot, bonfireSlot, movieSlot, bayMarketSlot } from "./tours.js";
@@ -50,7 +50,7 @@ const nightOk = (s, def, day, t) => !s || !s.night ? s : tastingSlot(def.id, day
 const iceOk = (s, def, day, t) => { if (!s) return null; const r = routineAt(def, day, t); return !r || ["village", "lane", "field", "shore", "bay", "orchard", "flowers", "base", "vineyard"].includes(r.scene) ? s : null; };
 const terraceBuilt = () => !!(api && api.F().vine && api.F().vine.terrace);   // the wine shop's terrace (round 146: the Sunday long lunch)
 const millShopOpen = () => !!(api && api.F().goals && api.F().goals.millshop);   // round 153: weekend day-trippers walk up to the Mill Shop
-const busyCache = {}; const busyOn = day => busyCache[day] || (busyCache[day] = [...toursOn(day).flatMap(t => [t.guide, ...t.group]), ...visitsOn(day).map(v => v.id), ...((eventOn(day) || {}).stalls || []).map(x => x.id)]);
+const busyCache = {}; const busyOn = day => busyCache[day] || (busyCache[day] = [...toursOn(day).flatMap(t => [t.guide, ...t.group]), ...visitsOn(day).map(v => v.id), ...keepersOn(day)]);
 const cellarBuilt = () => !!(api && api.F().goals && api.F().goals.cellar);   // the wine club meets in the cellar door
 const slotNow = def => slotAt(def, dayKey(), sgHM(), true);
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };
@@ -63,7 +63,7 @@ const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone", fish: 
   rummage: "hanger", binoculars: "binocs", crown: "crownw", drone: "remote", cuppa: "cuppa", footy: "footy", swirl: "wineglass", juggle: "juggle", fan: "fan", carry: "flats", feedroo: "roobag", bbq: "tongs", skim: "skim", cards: "cards", mallow: "mallow",
   bodyboard: "bodyboard", yoga: "yogamat", telescope: "telescope", paint: "easel", macro: "macrocam", count: "clicker", chips: "chipbox", prawns: "prawnbag", shells: "shellpail", shelter: "driftwood", parrot: "parrot", quoits: "quoit", postcard: "postcard",
   flask: "thermos", wade: "wadewater", ducks: "ducks", frisbee: "frisbee", lollybag: "lollybag", pail: "milkpail", fence: "fencerail", shake: "branch", crack: "nutstone", pan: "goldpan", guard: "guardflag", sip: "sarsbottle",
-  armful: "armful", bee: "beebuzz", baguette: "baguette", accordion: "accordion", sniff: "sniffstrip", spritz: "atomiser", beesuit: "beeveil", sunflower: "bigflower", float: "ring", picnic: "rug", candle: "candlelit", goat: "kid"};   // round 164: the Lavender Hills ("heart" is a pose)   // round 160: the Tablelands ("hush" is a pose)   // round 150: the Coast Road   // (and these: Bellbird Valley, round 144; "wave", "taichi", "crouch" and "lookup" are poses)   // (and these: Cinque Terre, round 134; "sunbathe" is a towel)   // (and these: Jeju, round 129; "luck" is an arm and "tandem" a bike)   // (and these: Kyoto, round 122)   // (the last five: Ronda, round 107)
+  armful: "armful", bee: "beebuzz", baguette: "baguette", accordion: "accordion", sniff: "sniffstrip", spritz: "atomiser", beesuit: "beeveil", sunflower: "bigflower", float: "ring", picnic: "rug", candle: "candlelit", goat: "kid", lantern: "xlantern", carol: "songsheet"};   // round 164: the Lavender Hills ("heart" is a pose)   // round 160: the Tablelands ("hush" is a pose)   // round 150: the Coast Road   // (and these: Bellbird Valley, round 144; "wave", "taichi", "crouch" and "lookup" are poses)   // (and these: Cinque Terre, round 134; "sunbathe" is a towel)   // (and these: Jeju, round 129; "luck" is an arm and "tandem" a bike)   // (and these: Kyoto, round 122)   // (the last five: Ronda, round 107)
 const outdoors = s => OUTDOOR.includes(s);
 export const isHere = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return !!(s && s.scene === api.scene()); };
 

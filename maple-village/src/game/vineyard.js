@@ -268,6 +268,8 @@ export function sellTick(F, opts = {}){
     const plate = () => servePlate(v, gameDay, out);
     // round 153: mulled wine by the cup, late November to Boxing Day, while there's some in the pot
     if (mulledSeason(gameDay) && (F.mull || {}).cups > 0 && Math.random() < .012*f) { const c = sellCup(F); if (c) { out.coins += c; out.mulled = (out.mulled || 0) + 1; } }
+    // round 172: and at the Christmas market, Celeste ladling it out at the stall (busier than the shop counter)
+    { const xm = eventNow(gameDay, hm); if (xm && xm.kind === "xmas" && (F.mull || {}).cups > 0 && Math.random() < .06) { const c = sellCup(F); if (c) { out.coins += c; out.mulled = (out.mulled || 0) + 1; out.mulledMkt = (out.mulledMkt || 0) + 1; } } }
     // a delivery order (round 137): with the Scoop Shack's bike, Tomo takes tapas, small plates and a bottle round to
     // people's homes and picnics (the field, the woods, the foreshore), plus a delivery fee
     if (bikeOwned(F) && deliveryHours(hm) && Math.random() < DELIVERY.winery) { const c0 = out.coins, p0 = out.plates, bits = [];

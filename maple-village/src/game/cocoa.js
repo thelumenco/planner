@@ -34,7 +34,7 @@
 import { esc, dayKey, sgHM, hash } from "../util.js";
 import { icon } from "../art/icons.js";
 import { INGR, farmShelf, scoopState, hasUp, takeBack, bikeOwned, DELIVERY, deliveryHours } from "./scoop.js";
-import { wineClubNow } from "./tours.js";
+import { wineClubNow, xmasOn, XMAS_FROM, XMAS_TO } from "./tours.js";
 import { festivalOn, rainyOn } from "../art/village-extras.js";
 
 export const OPEN = 11*60, CLOSE = 20*60, ROAST_MIN = 10, GRIND_MIN = 120, POT = 30, MOULD = 10, SACK = 25;
@@ -237,6 +237,8 @@ export function cocoaTick(F, opts = {}){
     if (ccUp(c, "tree") && at - (c.treeAt || at) >= TREE_EVERY) { c.treeAt = at; c.beans++; out.tree = (out.tree || 0) + 1; }
     if (ccUp(c, "supply") && hm >= 9*60 && c.supplyDay !== day && c.choc.dark >= SEND) { c.supplyDay = day; c.choc.dark -= SEND; const sc = scoopState(F); sc.fridge.housechoc = (sc.fridge.housechoc || 0) + TO_FRIDGE; out.supply = (out.supply || 0) + TO_FRIDGE; }
     if (ccUp(c, "workshop") && hm === 16*60 && new Date(day + "T00:00:00Z").getUTCDay() === 6 && c.workDay !== day) { c.workDay = day; const fee = WORKSHOP*WORKSHOP_FEE, s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0}; s.workshop = fee; s.coins += fee; out.coins += fee; out.workshop = fee; }
+    // round 172: the Cocoa Room's Christmas market stall, every evening of the season (no cart needed: it's a stall)
+    if (xmasOn(day) && hm >= XMAS_FROM && hm < XMAS_TO && Math.random() < .04*(opts.cart ? 1.6 : 1)) { const r = sellTo(c, day, out, {hot: true}); if (r) { const s = c.sold[day]; s.cart = (s.cart || 0) + 1; out.cart = (out.cart || 0) + r; } }
     if (ccUp(c, "cart") && cartOn(day, hm) && Math.random() < .03*(opts.cart ? 1.6 : 1)) { const r = sellTo(c, day, out, {hot: true}); if (r) { const s = c.sold[day]; s.cart = (s.cart || 0) + 1; out.cart = (out.cart || 0) + r; } }
     if (F.goals && F.goals.cellar && wineClubNow(day, hm) && Math.random() < .04) {   // wine club night: members pick up chocolates at the cellar door
       const shown = onDisplay(c), k = Object.keys(KINDS).find(x => c.bars[x] > 0), s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0};
@@ -291,7 +293,7 @@ const coin = () => icon("coin", 13), shut = `<div class="actions"><button class=
 const dot = c => `<span class="gdot" style="background:${c}"></span>`;
 export function counterPanel(F, st){
   const c = cocoaState(F), day = dayKey(), hm = sgHM(), t = c.sold[day] || {n: 0, coins: 0};
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${st.cart ? "The farmers market cart. " : ""}${openOn(day, hm, ccUp(c, "assistant")) ? "Open till 8pm." : `Closed: open 11am to 8pm, ${ccUp(c, "assistant") ? "every day" : "Tuesday to Sunday"}.`} ${t.n || t.bonbons ? `Sold today: ${t.n} bar${t.n === 1 ? "" : "s"}${t.bonbons ? ` and ${t.bonbons} bonbon${t.bonbons === 1 ? "" : "s"}` : ""} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Amara's behind the counter." : ""}</p>`;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${st.xmas ? "The Christmas market stall, under a garland: gift boxes stacked high. Open till 9pm. " : st.cart ? "The farmers market cart. " : ""}${st.xmas ? "" : openOn(day, hm, ccUp(c, "assistant")) ? "Open till 8pm." : `Closed: open 11am to 8pm, ${ccUp(c, "assistant") ? "every day" : "Tuesday to Sunday"}.`} ${t.n || t.bonbons ? `Sold today: ${t.n} bar${t.n === 1 ? "" : "s"}${t.bonbons ? ` and ${t.bonbons} bonbon${t.bonbons === 1 ? "" : "s"}` : ""} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Amara's behind the counter." : ""}</p>`;
   h += `<ul class="hlist wlist">${Object.entries(KINDS).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n} bars</b><small>${c.bars[k]} on the wall · ${c.prices.bar} ${coin()} each</small></span><span class="orbtns"><button class="btn small primary" data-cc="eat" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>Have one</button><button class="btn small alt" data-cc="give" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>To give</button></span></li>`).join("")}</ul>`;
   h += `<div class="row gprices"><span>Price of a bar</span><span class="gstep"><button class="btn small alt" data-cc="price" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bar}</b><button class="btn small alt" data-cc="price" data-n="1" aria-label="Dearer">+</button></span></div>`;
   if (ccUp(c, "hotchoc")) h += `<div class="row gprices"><span>Hot chocolate${t.hot ? ` <small class="muted">(${t.hot} today)</small>` : ""}</span><span class="gstep"><button class="btn small alt" data-cc="hprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.hot}</b><button class="btn small alt" data-cc="hprice" data-n="1" aria-label="Dearer">+</button></span></div><div class="actions"><button class="btn small primary" data-cc="hot" ${Object.values(c.choc).some(n => n > 0) ? "" : "disabled"}>Have a hot chocolate</button></div>`;

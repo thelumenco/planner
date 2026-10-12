@@ -68,6 +68,8 @@ export const VILLAGE = {
   picnic: {scene:"field", name:"Picnic spot", door:[140,484], spot:true, line:"A blanket and a basket. Perfect for lunch outside."},
   // market and fair days: the stalls (who's behind each one comes from tours.js) and the wine shop's own stall
   jazzhat:{scene:"field", name:"Jazz stage", door:[424,494], spot:true, line:"The little stage on the pitch. Night market nights, there's a jazz duo."},
+  xgrotto:{scene:"field", name:"Santa's grotto", door:[96,580], spot:true, line:"Santa's grotto. Weekend evenings in the Christmas season."},
+  xtree:{scene:"field", name:"The Christmas tree", door:[184,630], spot:true, line:"The village Christmas tree, on the football pitch."},
   mstall0:{scene:"field", name:"Stall", door:[36,164], spot:true, line:"A market stall."},
   mstall1:{scene:"field", name:"Stall", door:[96,164], spot:true, line:"A market stall."},
   mstall2:{scene:"field", name:"Stall", door:[156,164], spot:true, line:"A market stall."},
@@ -256,7 +258,8 @@ export const ROOMS = {
     ["reactions","Reactions board","R","reactboard",null,"What people sent back from their hellos.",34],
     ["hellos","Hello chart","H","hellochart",null,"How many people are waiting, and how many watched.",30],
     ["status","Health sign","E","healthohayo",null,"Last night's Ohayo bug check."]]},
-  post:  {name:"Post office", wall:"#E3EEF5", trim:"var(--sky)", pos:{A:[260,340], B:[436,258], C:[400,530], D:[110,216], E:[72,440]}, stations:[
+  post:  {name:"Post office", wall:"#E3EEF5", trim:"var(--sky)", pos:{A:[260,340], B:[436,258], C:[400,530], D:[110,216], E:[72,440], F:[150,560]}, stations:[
+    ["hampers","Hamper table","F","hampertable",null,"Penny's hamper table: baskets, straw and red ribbon. 20 November to Christmas Eve.",30],
     ["counter","Sorting counter","A","counter",/email|inbox|reply|message|dm|respond/,"Letters in, letters out."],
     ["cabinet","Filing cabinet","B","cabinet",/admin|file|doc|contract|tax|form|organi/,"A place for everything."],
     ["scales","Stamps & scales","C","scales",/invoice|pay|bill|stripe|account|bank|receipt|expense|price/,"Weigh it, stamp it, send it."],

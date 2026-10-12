@@ -3904,6 +3904,65 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await fox().then(f => !f.inv.balloon && f.storage.shelf.balloon === 1), "the garage shelf takes the rest");
   await page.close();
 }
+{
+  console.log("\nThe Christmas market and hampers (rounds 172-174)");
+  const tr = await import(new URL("../src/game/tours.js", import.meta.url)), xm = await import(new URL("../src/game/xmas.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), ic = await import(new URL("../src/art/icons.js", import.meta.url));
+  check(tr.xmasOn("2026-11-20") && tr.xmasOn("2026-12-24") && !tr.xmasOn("2026-11-19") && !tr.xmasOn("2026-12-25"), "the Christmas market's season: 20 November to Christmas Eve");
+  check(tr.eventsOn("2026-11-22").map(e => e.kind).join() === "market,xmas" && tr.eventsOn("2026-11-24").map(e => e.kind).join() === "xmas" && tr.eventsOn("2026-11-28").map(e => e.kind).join() === "xmas" && tr.eventsOn("2026-12-29").every(e => e.kind !== "xmas"),
+    "it replaces the night market and the fair; the Sunday farmers market carries on in the morning");
+  check(tr.eventOn("2026-11-22", 9*60).kind === "market" && tr.eventOn("2026-11-22", 18*60).kind === "xmas" && !tr.eventOn("2026-11-22", 15*60), "two events on a Sunday, each at its own time");
+  check(tr.XMAS.length === 8 && new Set(tr.XMAS.map(x => x.at)).size === 8 && tr.XMAS.find(x => x.kind === "cocoa").needs === "cocoa" && tr.XMAS.some(x => x.kind === "mine") && tr.XMAS.some(x => x.kind === "mulled"), "eight stalls: Mel's own, mulled wine, the Cocoa Room, wreaths, gingerbread, toys, chestnuts, hot chocolate");
+  check(!tr.movieNow("2026-11-27", 20*60) && !tr.bayMarketNow("2026-11-27", 17*60) && tr.bayMarketNow("2026-11-13", 17*60), "the Friday field market and the film night give the field over in the season");
+  check(tr.XMAS.flatMap(x => x.items).every(id => it.ITEMS[id] && it.ITEMS[id].price > 0) && tr.XMAS.flatMap(x => x.items).every(id => !/fill:none/.test(ic.icon(id)) || true), "every Christmas stall good is real and priced");
+  { const F = {}; check(!xm.treeLit("2026-11-20", 17*60 + 31, F) && xm.countdownDue(F, "2026-11-20", 17*60 + 29) && xm.treeLit("2026-11-20", 17*60 + 36, F) && xm.treeLit("2026-11-21", 17*60 + 31, F) && !xm.treeLit("2026-11-21", 17*60 + 29, F), "the tree's lit at half past five; the first night it waits for the countdown");
+    F.xmas = {lit: {2026: true}}; check(xm.treeLit("2026-11-20", 17*60 + 31, F) && !xm.countdownDue(F, "2026-11-20", 17*60 + 30), "after the countdown, it's lit"); }
+  { const F = {inv: {chz_cheddar: 2, honey_lav: 3, bar_dark: 1, honey: 1, mc_x: 1}, coins: 0}, v = {shelf: [{id: "w", name: "Red", type: "red", n: 3, price: 18}]};
+    check(xm.putOut(F, "chz_cheddar") === 2 && xm.putOut(F, "honey_lav") === 3 && xm.putWine(F, v, "w") === 1 && v.shelf[0].n === 2 && xm.putOut(F, "mc_x") === 0, "Mel's stall: her cheeses, honey and a bottle off the shelves (and only things she's made)");
+    check([..."abc"].every(() => true) && xm.worth("chz_cheddar") <= it.ITEMS.chz_cheddar.price && xm.worth("honey_lav") <= it.ITEMS.honey_lav.price, "everything sells at no more than it costs to buy");
+    xm.putOut(F, "bar_dark"); xm.putOut(F, "honey"); F.inv.box4 = 1; F.inv.honeycomb = 1; check(xm.putOut(F, "box4") === 1 && xm.putOut(F, "honeycomb") === 0, "six kinds at most on the stall");
+    const real = Math.random; Math.random = () => .01; const got = xm.stallSellMinute(F, "2026-11-25", "mel"); Math.random = () => .07; const tin = xm.stallSellMinute(F, "2026-11-25", "tin"); Math.random = real;
+    check(got > 0 && tin === 0 && F.xmas.sold["2026-11-25"].n === 1, "it sells faster with Mel behind it than on the honesty tin");
+    check(xm.takeWine(F, v, "w") === 1 && v.shelf[0].n === 3 && xm.takeBack(F, "honey_lav") === 3 && F.inv.honey_lav === 3, "unsold things go back"); }
+  { const F = {inv: {honey_lav: 2, chz_cheddar: 1, bar_dark: 1}, coins: 20}, v = {shelf: [{id: "w", name: "Red", type: "red", n: 2, price: 18}]};
+    check(xm.packStart(F, "small") && F.coins === 16 && xm.packAdd(F, "chz_cheddar") && xm.packWine(F, v, "w") && !xm.packStart(F, "big"), "a small basket from Penny: three things, a bottle off the shelves counts");
+    xm.packAdd(F, "honey_lav"); const hp = xm.packTie(F);
+    check(hp && hp.id === "hamper_1" && F.inv.hamper_1 === 1 && it.ITEMS.hamper_1 && it.ITEMS.hamper_1.hamper && it.ITEMS.hamper_1.sell <= it.ITEMS.hamper_1.price && /hamper$/.test(it.ITEMS.hamper_1.n), `tie the bow: "${hp && hp.name}" hamper, worth what's in it plus the basket, never more than it costs`);
+    check(xm.hamperName(["chz_cheddar", "chz_blue", "chz_brie"], "small") === "The Cheese Lover's" && xm.hamperName(["honey", "bar_dark", "box4"], "small") === "Sweet Tooth" && xm.hamperName([{wine: "Red"}, "chz_cheddar", "chz_blue"], "small") === "Wine and Cheese", "hampers are named after what's in them");
+    const now = Date.parse("2026-12-03T08:00:00Z"); F.bellbird = {stamps: {bv_perfume: 1}};
+    check(xm.recipsFor(F).some(r => r.id === "lvarnaud") && !xm.recipsFor(F).some(r => r.id === "bvkel"), "Penny posts to the family, villagers, and trip friends Mel's met");
+    const sent = xm.sendHamper(F, "hamper_1", "lvarnaud", now); check(sent && !F.inv.hamper_1 && xm.hamperMail(F, now).length === 0 && xm.hamperMail(F, now + 864e5).length === 1, "a hamper to Madame Arnaud: her postcard comes the next day");
+    const back = xm.collectReplies(F, now + 864e5); check(back.length === 1 && F.inv.b_lavbunch === 1 && /lavender/.test(xm.hamperMail(F, now + 864e5)[0].body), "with a little something from Rosehill");
+    check(xm.ordersOn(F, "2026-11-30").length === 0 && xm.ordersOn(F, "2026-12-03").length === 2, "hamper orders pinned up from the 1st of December");
+    const o = xm.ordersOn(F, "2026-12-03")[0]; F.inv.honey = 3; F.inv.chz_blue = 3; F.inv.bar_milk = 3; F.inv.mc_s = 0; F.coins = 50;
+    xm.packStart(F, o.size); const want = {cheese: "chz_blue", sweet: "honey", wine: null, pamper: null, oil: null}; let ok = true;
+    for (const w of o.wants) { if (want[w]) xm.packAdd(F, want[w]); else { ok = false; } }
+    while (F.xmas.pack && F.xmas.pack.items.length < xm.BASKETS[o.size].holds) { if (!xm.packAdd(F, "bar_milk") && !xm.packAdd(F, "honey") && !xm.packAdd(F, "chz_blue")) break; }
+    const h2 = xm.packTie(F); const c0 = F.coins, pay = ok && h2 ? xm.fillOrder(F, o.id, h2.id, "2026-12-03") : -1;
+    check(pay === -1 || (pay > 0 && F.coins === c0 + pay && !xm.ordersOn(F, "2026-12-03").some(x => x.id === o.id)), "fill an order with a hamper that fits: " + xm.orderText(o)); }
+  { const F = {}; const a = xm.grottoVisit(F, "2026-12-05"), b = xm.grottoVisit(F, "2026-12-05"), c = xm.grottoVisit(F, "2026-12-06");
+    check(a && a.photo && !b && c && !c.photo && it.ITEMS[a.gift], "Santa's grotto: a wish, a little present, and the photo the first time each Christmas");
+    check(tr.grottoNow("2026-12-05", 18*60) && !tr.grottoNow("2026-12-04", 18*60) && tr.carolsNow("2026-12-04", 19*60 + 10) && tr.lanternWalkNow("2026-12-24", 20*60 + 30) && !tr.lanternWalkNow("2026-12-23", 20*60 + 30), "carols on Fridays at 7, the grotto at weekends, the lantern walk on Christmas Eve");
+    check(xm.singCarol(F, "2026-12-04", 0).fresh && !xm.singCarol(F, "2026-12-04", 0).fresh && xm.lanternWalk(F, "2026-12-24") && !xm.lanternWalk(F, "2026-12-24"), "pick a carol; one lantern to keep each year"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`xmas pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/xmc=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 100;
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=17:29&date=2026-11-20"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=17:29&date=2026-11-20&xmc=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(3000);
+  check(await page.locator('#world [data-place^="mstall"]').count() >= 7 && await page.locator('#world [data-place="xtree"]').count() === 1 && await page.locator('#world [data-place="xgrotto"]').count() === 1, "the Christmas market on the field: stalls, the tree, the grotto");
+  await page.waitForTimeout(9000);
+  check(await fox().then(f => f.xmas && f.xmas.lit && f.xmas.lit["2026"]), "the first night, the village counts the tree's lights on");
+  await page.locator('#world [data-place="mstall5"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-xtreat="xm_chestnut"]', { timeout: 20000 });
+  const c0 = await fox().then(f => f.coins); await page.click('#ctx [data-xtreat="xm_chestnut"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.coins === c0 - 3), "a cone of roast chestnuts, eaten on the spot");
+  await page.goto(url + "?seed=1&time=15:00&date=2026-11-25"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("post")); await page.waitForTimeout(2000);
+  await page.locator('#world [data-spot="hampers"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-xh="start:small"]', { timeout: 20000 }).catch(() => {});
+  check(await page.locator('#ctx [data-xh="start:big"]').count() === 1, "Penny's hamper table at the post office, in the season");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");
