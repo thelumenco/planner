@@ -317,7 +317,7 @@ export const ROOMS = {
     ["counter","Counter","C","bankcounter",null,"Opal's counter. Your passbook's here.",30]]},
   // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
   // and the tasting room's little tables
-  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,238], C:[330,318], H:[206,318], T:[340,520], K:[480,390], M:[465,128], Z:[40,400], G:[480,556]}, stations:[
+  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,238], C:[330,318], H:[206,318], T:[340,520], K:[480,390], M:[465,128], Z:[40,400], G:[480,556], W:[456,318]}, stations:[
     ["tdoor","Terrace","G","glassdoor",null,"The glass doors out to the terrace.",0],
     ["menu","Menu","M","chalkmenu",null,"The chalkboard: today's menu.",44],
     ["kdoor","Kitchen","K","kitchendoor",null,"Into the kitchen.",0],
@@ -325,6 +325,7 @@ export const ROOMS = {
     ["wshelf","Wine shelves","S","wineshelf",null,"Your wines, waiting for customers.",30],
     ["wcounter","Counter","C","winecounter",null,"Behind the counter. Customers come more often while you serve.",-34],
     ["hbox","Honesty box","H","honestybox",null,"The honesty box.",30],
+    ["mcrate","From the mill","W","millcrate",null,"A crate from the mill: oils, soaps and lotions, till the Mill Shop opens.",30],
     ["tasting","Tasting room","T","cafetables",null,"The tasting room.",34]]},
   // The kitchen behind the wine shop: oven (bread from flour), larder (ingredients sent from the backpack), cheese
   // press (goat's milk into cheese) and the stove, where the small plates and the tapas of the day are cooked

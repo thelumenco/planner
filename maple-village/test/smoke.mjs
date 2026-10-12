@@ -3798,6 +3798,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#actors .npc[data-npc="tomi"]').count() === 1 && await page.locator('#world [data-millspot="stairs"]').count() === 1, "Tomi at the press; wooden stairs up");
   await page.locator('#world [data-millspot="stairs"]').dispatchEvent("click"); await page.waitForFunction(() => /upstairs/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(800);
   check(await page.locator('#world [data-millspot="bench"]').count() === 1 && await page.locator('#world [data-millspot="tasting"]').count() === 1 && await page.locator('#world [data-millspot="workshop"]').count() === 1, "upstairs: the workbench, the tasting table and the workshop corner");
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
+  check(await page.locator('#world [data-spot="mcrate"]').count() === 1, "till the Mill Shop opens, a crate from the mill sits by the wine shop's counter");
+  await page.locator('#world [data-spot="mcrate"]').dispatchEvent("click"); await page.waitForFunction(() => /From the mill/.test(document.querySelector("#ctx").textContent), null, { timeout: 20000 }).catch(() => {});
+  check(/From the mill/.test(await page.locator("#ctx").textContent()), "tap the crate: what's in it and what's sold today");
+  await page.evaluate(() => window.__mapleScene("millup")); await page.waitForTimeout(2500);
+  { const bb = await page.locator('#world [data-millspot="bench"]').boundingBox(), hit = await page.evaluate(([x, y]) => !!document.elementFromPoint(x, y)?.closest('[data-millspot="bench"]'), [Math.min(bb.x + bb.width/2, page.viewportSize().width - 20), bb.y + bb.height/2]);
+    check(hit, "a tap anywhere on the workbench lands on it, not the floor between its legs"); }
   await page.locator('#world [data-millspot="bench"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-mc="add:rosemary"]', { timeout: 20000 });
   await page.click('#ctx [data-mc="add:rosemary"]'); await page.click('#ctx [data-mc="make"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.craft && f.craft.steep.length === 1 && f.craft.recipes[0].name === "Rosemary olive oil" && !f.inv.oliveoil), "Mel steeps her first infused oil: Rosemary olive oil");

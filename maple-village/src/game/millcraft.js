@@ -100,6 +100,15 @@ export function craftSellMinute(F, day, hm, where){
 
 /* ---------- the workbench panel ---------- */
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+// the crate by the wine shop's counter (till the Mill Shop opens): it holds whatever's on the mill's shelves
+export function crateMix(F){ const c = craftState(F), m = {oil: 0, soap: 0, lotion: 0}; for (const [id, n] of Object.entries(c.store)) { const k = ITEMS[id] && ITEMS[id].mill; if (k in m) m[k] += n; } return m; }
+export function wineCratePanel(F, day){
+  const c = craftState(F), ids = Object.keys(c.store).filter(id => c.store[id] > 0 && ITEMS[id]), s = c.sold[day] || {};
+  let h = `<h2>From the mill</h2><p class="sub">A wooden crate by the counter, filled from the mill's shelves. Customers pick a little from it while the wine shop's open, 10 till 9. Make more at the workbench upstairs in the mill.</p>`;
+  h += ids.length ? `<ul class="bujo">${ids.map(id => `<li>${c.store[id]} × ${esc(ITEMS[id].n)} · ${ITEMS[id].price} each</li>`).join("")}</ul>` : `<p class="muted">Empty for now. Oils, soaps and lotions you make at the mill land here.</p>`;
+  h += `<p class="muted">${s.n ? `Sold today: ${s.n}, for ${s.coins} coins.` : "Nothing sold yet today."} Once the Mill Shop opens, Hazel sells it all at the mill instead, and much faster.</p>`;
+  return h + shut;
+}
 const dots = adds => `<span class="mullsw">${adds.map(a => `<i style="background:${HERB[a].col}"></i>`).join("")}</span>`;
 const mins = ms => { const m = Math.max(1, Math.ceil(ms/60000)); return m >= 60 ? `${Math.floor(m/60)}h ${m % 60}m` : `${m}m`; };
 export function benchPanel(F, st = {}, o = {}){

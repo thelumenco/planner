@@ -5974,7 +5974,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ] },
     // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
     // and the tasting room's little tables
-    wineshop: { name: "The wine shop", wall: "#F4E6D6", trim: "#8E2C48", noBoard: true, pos: { S: [92, 238], C: [330, 318], H: [206, 318], T: [340, 520], K: [480, 390], M: [465, 128], Z: [40, 400], G: [480, 556] }, stations: [
+    wineshop: { name: "The wine shop", wall: "#F4E6D6", trim: "#8E2C48", noBoard: true, pos: { S: [92, 238], C: [330, 318], H: [206, 318], T: [340, 520], K: [480, 390], M: [465, 128], Z: [40, 400], G: [480, 556], W: [456, 318] }, stations: [
       ["tdoor", "Terrace", "G", "glassdoor", null, "The glass doors out to the terrace.", 0],
       ["menu", "Menu", "M", "chalkmenu", null, "The chalkboard: today's menu.", 44],
       ["kdoor", "Kitchen", "K", "kitchendoor", null, "Into the kitchen.", 0],
@@ -5982,6 +5982,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["wshelf", "Wine shelves", "S", "wineshelf", null, "Your wines, waiting for customers.", 30],
       ["wcounter", "Counter", "C", "winecounter", null, "Behind the counter. Customers come more often while you serve.", -34],
       ["hbox", "Honesty box", "H", "honestybox", null, "The honesty box.", 30],
+      ["mcrate", "From the mill", "W", "millcrate", null, "A crate from the mill: oils, soaps and lotions, till the Mill Shop opens.", 30],
       ["tasting", "Tasting room", "T", "cafetables", null, "The tasting room.", 34]
     ] },
     // The kitchen behind the wine shop: oven (bread from flour), larder (ingredients sent from the backpack), cheese
@@ -17317,6 +17318,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         }
         return sk(`<rect x="${x - 44}" y="${y - 96}" width="88" height="96" rx="3" style="fill:#8B5E3C"/>${b}`, `<rect x="${x - 44}" y="${y - 96}" width="88" height="96" rx="3"/><path d="M${x - 44} ${y - 68} h88 M${x - 44} ${y - 40} h88 M${x - 44} ${y - 12} h88"/>`);
       }
+      case "millcrate": {
+        const m = G2.millCrate && G2.millCrate() || { oil: 0, soap: 0, lotion: 0 }, b = [];
+        for (let i = 0; i < Math.min(4, m.oil); i++) b.push(`<rect x="${x - 20 + i * 9}" y="${y - 48}" width="7" height="20" rx="2.5" fill="${["#B9B04A", "#8FA34A", "#C9B84A", "#7FA35A"][i]}" stroke="#3a2e28" stroke-width=".6"/><rect x="${x - 18.5 + i * 9}" y="${y - 52}" width="4" height="5" fill="#5A3A2A"/>`);
+        for (let i = 0; i < Math.min(2, m.soap); i++) b.push(`<rect x="${x + 16}" y="${y - 32 - i * 7}" width="13" height="6" rx="2" fill="${["#E8C9D8", "#F3E1A0"][i]}" stroke="#3a2e28" stroke-width=".6"/>`);
+        for (let i = 0; i < Math.min(2, m.lotion); i++) b.push(`<ellipse cx="${x - 26 + i * 0}" cy="${y - 34 - i * 8}" rx="4" ry="4.5" fill="#FFFDF6" stroke="#3a2e28" stroke-width=".6"/>`);
+        return b.join("") + sk(`<rect x="${x - 32}" y="${y - 30}" width="64" height="30" rx="2" style="fill:#C9A27E"/>`, `<rect x="${x - 32}" y="${y - 30}" width="64" height="30" rx="2"/><path d="M${x - 32} ${y - 15} h64"/>`);
+      }
       case "winecounter":
         return `<rect x="${x - 92}" y="${y - 48}" width="184" height="48" fill="transparent"/>`;
       case "chalkmenu":
@@ -17629,6 +17637,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       h3 += `<g pointer-events="none"><rect x="434" y="50" width="62" height="72" rx="2" fill="#3E4A43"/><text x="465" y="64" text-anchor="middle" font-family="Klee One,serif" font-size="9" fill="#F3C969">Tapas today</text>${lines.slice(0, 4).map((l, i) => `<text x="465" y="${80 + i * 12}" text-anchor="middle" font-family="Klee One,serif" font-size="9" fill="#F6EFE3">${l.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text>`).join("")}</g>`;
     }
     st6.forEach((s) => {
+      if (s.kind === "millcrate" && !(G2.millCrate && G2.millCrate())) return;
       const nm4 = s.kind === "pedestal" ? (G2.ped && G2.ped(s.x, s.y) || {}).label || "" : s.kind === "vaultjar" ? (() => {
         const j = G2.vault && G2.vault(s.x);
         return j ? j.label : "Empty";
@@ -25059,6 +25068,21 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return price;
   }
   var shut7 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  function crateMix(F2) {
+    const c = craftState(F2), m = { oil: 0, soap: 0, lotion: 0 };
+    for (const [id, n] of Object.entries(c.store)) {
+      const k = ITEMS[id] && ITEMS[id].mill;
+      if (k in m) m[k] += n;
+    }
+    return m;
+  }
+  function wineCratePanel(F2, day) {
+    const c = craftState(F2), ids = Object.keys(c.store).filter((id) => c.store[id] > 0 && ITEMS[id]), s = c.sold[day] || {};
+    let h3 = `<h2>From the mill</h2><p class="sub">A wooden crate by the counter, filled from the mill's shelves. Customers pick a little from it while the wine shop's open, 10 till 9. Make more at the workbench upstairs in the mill.</p>`;
+    h3 += ids.length ? `<ul class="bujo">${ids.map((id) => `<li>${c.store[id]} × ${esc(ITEMS[id].n)} · ${ITEMS[id].price} each</li>`).join("")}</ul>` : `<p class="muted">Empty for now. Oils, soaps and lotions you make at the mill land here.</p>`;
+    h3 += `<p class="muted">${s.n ? `Sold today: ${s.n}, for ${s.coins} coins.` : "Nothing sold yet today."} Once the Mill Shop opens, Hazel sells it all at the mill instead, and much faster.</p>`;
+    return h3 + shut7;
+  }
   var dots2 = (adds) => `<span class="mullsw">${adds.map((a) => `<i style="background:${HERB[a].col}"></i>`).join("")}</span>`;
   var mins = (ms) => {
     const m = Math.max(1, Math.ceil(ms / 6e4));
@@ -31548,7 +31572,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       const k = Math.floor(i / 4), j = i % 4, yy = 230 + k * 58;
       return round ? `<ellipse cx="${x + 5 + j * 8}" cy="${yy - 5}" rx="3.6" ry="5" fill="${cols[i % cols.length]}" stroke="#3a2e28" stroke-width=".6"/>` : `<rect x="${x + 2 + j % 2 * 16}" y="${yy - 7 - Math.floor(j / 2) * 7}" width="14" height="6.5" rx="2" fill="${cols[i % cols.length]}" stroke="#3a2e28" stroke-width=".6"/>`;
     }).join("")}</g>`;
-    const bench4 = `<g data-millspot="bench" aria-label="The workbench: oils, soaps and lotions"><ellipse class="hov" cx="400" cy="262" rx="60" ry="10" style="fill:var(--butter)"/>
+    const bench4 = `<g data-millspot="bench" aria-label="The workbench: oils, soaps and lotions"><rect x="244" y="184" width="214" height="110" fill="transparent"/><ellipse class="hov" cx="400" cy="262" rx="60" ry="10" style="fill:var(--butter)"/>
     ${sk(
       `<rect x="340" y="222" width="110" height="12" rx="2" style="fill:#A8754F"/><path d="M346 234 v24 M444 234 v24" style="stroke:#7A5638" stroke-width="4"/>${[0, 1, 2].map((i) => `<rect x="${352 + i * 16}" y="${i < (cr.steep || 0) ? 200 : 206}" width="12" height="${i < (cr.steep || 0) ? 22 : 16}" rx="3" style="fill:${i < (cr.steep || 0) ? "#B9B04A" : "#E3EEF0"}"/>`).join("")}<ellipse cx="420" cy="218" rx="14" ry="4" style="fill:#C9A27E"/><path d="M410 218 q10 -12 20 0" style="fill:#7FA35A"/>`,
       `<rect x="340" y="222" width="110" height="12" rx="2"/>`
@@ -33286,7 +33310,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }, ped: (x, y) => {
     const i = stationsOf("trophy").filter((s) => s.kind === "pedestal").findIndex((s) => s.x === x && s.y === y);
     return i < 0 ? null : onPedestals(F)[i] || null;
-  }, kid: () => ({ sleep: kid.sleep || evanNight() }) });
+  }, kid: () => ({ sleep: kid.sleep || evanNight() }), millCrate: () => owns2(F, "mill") && !owns2(F, "millshop") ? crateMix(F) : null });
   function isDusk() {
     const t2 = sgHM();
     return t2 >= 19 * 60 || t2 < 6 * 60;
@@ -36449,7 +36473,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (kView === "mull" && scene === "kitchen") h3 = mullPanel(F, vineState(F), mullSt);
     else if (kView && scene === "kitchen") h3 = kView === "oven" ? ovenPanel(F) : kView === "press" ? pressPanel(F) : kView === "stove" ? stovePanel(F, dayKey()) : larderPanel(F);
     else if (loftView && scene === "vineyard") h3 = loftPanel(F);
-    else if (vyView && (scene === "vineyard" || scene === "wineshop" || scene === "cellar")) h3 = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F) : vyView === "shelf" ? shelfPanel(F) : vyView === "menu" ? menuPanel2(F, dayKey()) : vyView === "counter" ? counterPanel2(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter((n) => n.id !== "celeste" && isHere(n.id)).map((n) => n.name), dayKey());
+    else if (vyView && (scene === "vineyard" || scene === "wineshop" || scene === "cellar")) h3 = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F) : vyView === "mcrate" ? wineCratePanel(F, dayKey()) : vyView === "shelf" ? shelfPanel(F) : vyView === "menu" ? menuPanel2(F, dayKey()) : vyView === "counter" ? counterPanel2(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter((n) => n.id !== "celeste" && isHere(n.id)).map((n) => n.name), dayKey());
     else if (kudosOpen && scene === "trophy") h3 = kudosPanel();
     else if (trophyView && scene === "trophy") h3 = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : trophyView === "affirm" ? affirmPanel(F.affirm, affirmBusy, !!sampleCap) : trophyView === "fountain" ? fountainPanel(!!sampleCap) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
     else if (routOpen && scene === "room") h3 = routinesPanel();
@@ -40131,7 +40155,7 @@ ${SIGNOFF[t2.who] || ""}`;
       return;
     }
     if (scene === "wineshop") {
-      vyView = { wshelf: "shelf", wcounter: "counter", hbox: "box", tasting: "tasting", menu: "menu" }[id] || null;
+      vyView = { wshelf: "shelf", wcounter: "counter", hbox: "box", tasting: "tasting", menu: "menu", mcrate: "mcrate" }[id] || null;
       if (vyView) {
         sfx("paper", true);
         if (id === "wcounter") {
@@ -40718,7 +40742,7 @@ ${SIGNOFF[t2.who] || ""}`;
   function millShopPanel() {
     const c = craftState(F), t2 = c.sold[dayKey()] || { n: 0, coins: 0 }, open2 = owns2(F, "millshop");
     if (!open2) return `<span class="tape gingham" aria-hidden="true"></span><h2>Upstairs at the mill</h2><p class="sub">Dust sheets over a long-forgotten counter, and shelves all round the walls. It'd make a lovely little shop for your oils and soaps, with olive oil tastings at the long table and soap workshops in the corner. Hazel, who made soap for forty years, has already said she'd run it.</p>
-    ${owns2(F, "mill") ? `<div class="actions"><button class="btn primary" data-goal="millshop" ${F.coins >= GOALS.millshop.price ? "" : "disabled"}>Open the Mill Shop · ${GOALS.millshop.price} ${icon("coin", 13)}</button></div>` : ""}<p class="muted">Until then, there are no tastings or workshops, and the wine shop sells a little from a "from the mill" shelf by its counter.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+    ${owns2(F, "mill") ? `<div class="actions"><button class="btn primary" data-goal="millshop" ${F.coins >= GOALS.millshop.price ? "" : "disabled"}>Open the Mill Shop · ${GOALS.millshop.price} ${icon("coin", 13)}</button></div>` : ""}<p class="muted">Until then, there are no tastings or workshops, and the wine shop sells a little from a "from the mill" crate by its counter.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The Mill Shop</h2><p class="sub">${isHere("hazel") ? "Hazel's behind the counter, wrapping soap in brown paper." : "Shut just now: Hazel opens 10 to 5, every day but Monday."} ${storeCount(c)} things on the shelves. Today: ${t2.n} sold, ${t2.coins} coins.</p>
     <p class="muted">Make more at the workbench upstairs; the shelves fill as things finish steeping, curing and warming.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
