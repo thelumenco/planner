@@ -185,6 +185,17 @@ export const NPCS = [
     lines: ["Three jars to a bottle. Every time. The stone doesn't lie.", "Rosemary oil's steeping. Six hours. I count.", "T.R. 1912. Ines thinks I carved it. I didn't. Probably.", "Smell that? Green and peppery. That's a good pressing."],
     away: "Tomi's finished at the mill for the day."
   },
+  // round 178: Posy keeps the gift shop behind the wine shop, 10 to 6, every day but Monday (giftshop.js)
+  {
+    id: "posy", pitch: 1.2, name: "Posy", job: "Runs the gift shop at the winery",
+    intro: "Posy! I used to work in a cellar door gift shop up in the hills, the kind with tea towels and fudge. This is better: everything here, you made.",
+    look: {skin: "#F2C9A8", hair: "#C8643C", hairStyle: "bob", top: "#C9A3E0", bottom: "#4F5A6A", extra: "apron"},
+    routine: [slot("09:45", "10:00", "wineshop", [[120, 520], [60, 560]], {needs: "giftshop", dow: [0, 2, 3, 4, 5, 6]}),
+      slot("10:00", "18:00", "giftshop", [[300, 520], [180, 380], [380, 380]], {needs: "giftshop", dow: [0, 2, 3, 4, 5, 6]}),
+      slot("10:00", "12:00", "village", [[330, 380], [300, 400]], {dow: [1]}), slot("18:30", "20:00", "wineshop", [[300, 500], [360, 520]], {dow: [5, 6]})],
+    lines: ["The honey heart bonbons go first. Every time.", "Someone bought three bars just for the box they come in.", "I've moved the soaps next to the wine. People sniff, then buy both.", "Tea towels. One day. Trust me."],
+    away: "Posy's gone home. The gift shop's shut."
+  },
   // round 153: Hazel runs the Mill Shop (once Mel's opened it): every day but Monday, 10 to 5, behind the counter
   // downstairs. She made soap for forty years, and has opinions about lavender
   {

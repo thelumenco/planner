@@ -377,6 +377,21 @@ export function furn(kind, x, y){
         `<path d="M${x+40} ${y-96} L${x+12} ${y-84} L${x+12} ${y+12} L${x+40} ${y+22}z"/>`); }
     case "bookingbook": return sk(`<path d="M${x-12} ${y-10} q6 -4 12 0 q6 -4 12 0 v10 q-6 -4 -12 0 q-6 -4 -12 0z" style="fill:#FFFDF6"/><path d="M${x} ${y-10} v10" style="stroke:#8E2C48" stroke-width="1"/><path d="M${x-9} ${y-6} h6 M${x+3} ${y-6} h6 M${x-9} ${y-3} h5" style="stroke:#B9B0A4" stroke-width=".8"/><path d="M${x+11} ${y-12} l3 8" style="stroke:#8E2C48" stroke-width="1.6"/>`,
         `<path d="M${x-12} ${y-10} q6 -4 12 0 q6 -4 12 0 v10 q-6 -4 -12 0 q-6 -4 -12 0z"/>`);
+    // round 178: the gift shop's door (bottom left of the wine shop), and its shelves and till
+    case "giftdoor": { const built = !!((G.F().goals || {}).giftshop);
+      return sk(`<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:${built ? "#C9A3E0" : "#EDE3F2"}"/>${built ? `<path d="M${x-34} ${y-84} l16 5 v12 l-16 -5z" style="fill:#FFFDF6"/><circle cx="${x-26}" cy="${y-74}" r="2.6" style="fill:#C8432F"/>` : `<rect x="${x-38}" y="${y-62}" width="24" height="14" transform="rotate(-4 ${x-26} ${y-55})" style="fill:#FFFDF6"/>`}`,
+        `<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" ${built ? "" : `stroke-dasharray="4 4"`}/>${built ? `<circle cx="${x-17}" cy="${y-42}" r="1.8"/>` : `<path d="M${x-34} ${y-56} h14" opacity=".6"/>`}`); }
+    case "giftbars": { const c = G.cocoa ? G.cocoa() : {bars: {}}, cols = {milk: "#8A5A3A", dark: "#4A2E22", white: "#F3E7C9"}, row = Object.keys(cols).flatMap(k => Array.from({length: Math.min(4, (c.bars || {})[k] || 0)}, () => k));
+      return sk(`<rect x="${x-46}" y="${y-92}" width="92" height="92" rx="3" style="fill:#C9A27E"/><rect x="${x-46}" y="${y-58}" width="92" height="5" style="fill:#8A5A3A"/><rect x="${x-46}" y="${y-28}" width="92" height="5" style="fill:#8A5A3A"/>${row.slice(0, 12).map((k, i) => `<rect x="${x-40 + (i % 6)*14}" y="${y-84 + Math.floor(i/6)*30}" width="10" height="22" rx="1.5" style="fill:${cols[k]}"/><rect x="${x-40 + (i % 6)*14}" y="${y-72 + Math.floor(i/6)*30}" width="10" height="7" style="fill:#E8D3A6"/>`).join("")}`,
+        `<rect x="${x-46}" y="${y-92}" width="92" height="92" rx="3"/>`); }
+    case "giftmill": { const m = (G.giftMill && G.giftMill()) || {oil: 0, soap: 0, lotion: 0};
+      return sk(`<rect x="${x-46}" y="${y-92}" width="92" height="92" rx="3" style="fill:#E3D5C0"/><rect x="${x-46}" y="${y-58}" width="92" height="5" style="fill:#A8754F"/><rect x="${x-46}" y="${y-28}" width="92" height="5" style="fill:#A8754F"/>
+        ${Array.from({length: Math.min(6, m.oil)}, (_, i) => `<rect x="${x-40 + i*14}" y="${y-84}" width="8" height="24" rx="3" style="fill:${["#B9B04A", "#8FA34A", "#C9B84A"][i % 3]}"/><rect x="${x-38 + i*14}" y="${y-90}" width="4" height="6" style="fill:#5A3A2A"/>`).join("")}
+        ${Array.from({length: Math.min(6, m.soap)}, (_, i) => `<rect x="${x-40 + i*14}" y="${y-44}" width="12" height="9" rx="2" style="fill:${["#E8C9D8", "#F3E1A0", "#C9DDB0"][i % 3]}"/>`).join("")}${Array.from({length: Math.min(6, m.lotion)}, (_, i) => `<ellipse cx="${x-34 + i*14}" cy="${y-38}" rx="0" ry="0"/>`).join("")}`,
+        `<rect x="${x-46}" y="${y-92}" width="92" height="92" rx="3"/>`); }
+    case "gifttill": return sk(`<rect x="${x-60}" y="${y-36}" width="120" height="36" rx="3" style="fill:#C9A3E0"/><rect x="${x-60}" y="${y-40}" width="120" height="6" rx="2" style="fill:#8A6A9A"/><rect x="${x+20}" y="${y-56}" width="26" height="16" rx="2" style="fill:#5F5E64"/>
+        ${[[-44, "#F3E1A0"], [-30, "#E8C9D8"], [-16, "#9CC27E"]].map(([dx, c]) => `<rect x="${x+dx}" y="${y-52}" width="12" height="12" rx="1.5" style="fill:${c}"/><path d="M${x+dx} ${y-46} h12 M${x+dx+6} ${y-52} v12" style="stroke:#C8432F" stroke-width="1.2"/>`).join("")}`,
+        `<rect x="${x-60}" y="${y-36}" width="120" height="36" rx="3"/><rect x="${x+20}" y="${y-56}" width="26" height="16" rx="2"/>`);
     case "cellardoor": { const built = !!((G.F().goals || {}).cellar);
       return sk(`<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:${built ? "#6B3A2A" : "#E8D9C0"}"/>${built ? `<path d="M${x-36} ${y-80} q8 -10 18 -4 v12 l-18 -4z" style="fill:#F3C969"/>` : `<rect x="${x-38}" y="${y-62}" width="24" height="14" transform="rotate(-4 ${x-26} ${y-55})" style="fill:#FFFDF6"/>`}`,
         `<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" ${built ? "" : `stroke-dasharray="4 4"`}/>${built ? `<circle cx="${x-17}" cy="${y-42}" r="1.8"/>` : `<path d="M${x-34} ${y-56} h14" opacity=".6"/>`}`); }
@@ -778,9 +793,9 @@ export function roomArt(id){
     return h;
   }
   // the home office and the garage: their doors (not a mat) lead back into the living room
-  if (id === "office" || id === "garage" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoakitchen") { const e = id !== "garage" && id !== "scoopdip", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx = e ? 486 : 34, sk2 = id === "scoopkitchen" || id === "scoopdip" || id === "cocoakitchen";
+  if (id === "office" || id === "garage" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoakitchen" || id === "giftshop") { const e = id !== "garage" && id !== "scoopdip", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx = e ? 486 : 34, sk2 = id === "scoopkitchen" || id === "scoopdip" || id === "cocoakitchen" || id === "giftshop";
     h += `<g data-exit="1" aria-label="${sk2 ? "Back to the shop" : "Back to the living room"}"><ellipse class="hov" cx="${hx}" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>
-      ${sk(`<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z" style="fill:${sk2 ? "#E3F2EC" : "#F8EED8"}"/>`, `<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z"/><circle cx="${e ? 497 : 23}" cy="384" r="1.8"/>`)}${tapeLabel(e ? 456 : 64, sk2 ? 478 : 296, sk2 ? "The shop" : "Living room", "var(--card)", 11)}</g>`;
+      ${sk(`<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z" style="fill:${sk2 ? "#E3F2EC" : "#F8EED8"}"/>`, `<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z"/><circle cx="${e ? 497 : 23}" cy="384" r="1.8"/>`)}${tapeLabel(e ? 456 : 64, sk2 ? 478 : 296, id === "giftshop" ? "Wine shop" : sk2 ? "The shop" : "Living room", "var(--card)", 11)}</g>`;
     return h; }
   h += `<g data-exit="1" aria-label="Exit"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
     ${sk(`<rect x="214" y="600" width="92" height="26" rx="8" style="fill:${r.trim}"/>`, `<rect x="214" y="600" width="92" height="26" rx="8"/><path d="M222 606 h76 M222 620 h76" stroke-dasharray="3 4" opacity=".6"/>`)}

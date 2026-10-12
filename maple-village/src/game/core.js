@@ -82,6 +82,7 @@ import { tablelandsRoomArt } from "../art/tablelands-rooms.js";
 import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } from "./lunch.js";
 import { craftState, craft as millCraft, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, fromBasket, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
 import { xmasState, TREATS, treatsHTML, mulledStallPanel, treePanel, treeLit, countdownDue, myStallPanel as xmStallPanel, putOut, takeBack as xmTakeBack, putWine, takeWine, stallSellMinute, registerHampers, hamperPanel, packStart, packAdd, packWine, packRemove, packTie, singCarol, lanternWalk, grottoPanel, grottoVisit, sendHamper, hamperMail, collectReplies, fillOrder } from "./xmas.js";
+import { giftPanel, giftSellMinute, keeperOn as giftKeeperOn } from "./giftshop.js";
 import { storePanel, putAway, takeOut, sendOff, storedCount, placeFor, homeNote, SHOPS as STORE_SHOPS, storeState } from "./storage.js";
 import { millUpArt } from "../art/millup.js";
 import { tastePanel, tasteStart, tastePick, tasteNext, tasteDone, finishTaste, tastingNow, workshopNow, workshopPanel, helpWorkshop, WORKSHOP } from "./millcraft.js";
@@ -109,7 +110,7 @@ import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush,
 import { waiterOn, riderOn, scoopState, scoopTick, scoopNews, trolleyPanel, loadTrolley, returnTrolley, trolleySell, trolleyOn, trolleyMelted, TROLLEY, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, unstockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaNews, cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
-  pantryPanel, bonbonPanel, casePanel, stockPantry, unstockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
+  pantryPanel, bonbonPanel, casePanel, onDisplay as ccOnDisplay, stockPantry, unstockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
   sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, haveHot, packGrand, readyPot, ccUp } from "./cocoa.js";
 import { canKeep, keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, OWNER_NAME, PETS, petAt } from "./companions.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
@@ -152,7 +153,7 @@ function migrate(){
   ["halfway", "tread", "npcSaid"].forEach(k => { if (!S[k]) S[k] = {}; });
 }
 migrate();
-setArtContext({cocoa: () => cocoaState(F), ohayo: () => ohayoHellos(), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf(), kudos: () => kudosCount(), vault: x => { const i = [70, 165, 260, 355, 450].indexOf(x); return i < 0 ? null : jarAt(i); }, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, kid: () => ({sleep: kid.sleep || evanNight()}), millCrate: () => owns(F, "mill") && !owns(F, "millshop") ? crateMix(F) : null, xmasSeason: () => xmasOn(dayKey())});
+setArtContext({cocoa: () => cocoaState(F), ohayo: () => ohayoHellos(), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf(), kudos: () => kudosCount(), vault: x => { const i = [70, 165, 260, 355, 450].indexOf(x); return i < 0 ? null : jarAt(i); }, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, kid: () => ({sleep: kid.sleep || evanNight()}), millCrate: () => owns(F, "mill") && !owns(F, "millshop") && !owns(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), xmasSeason: () => xmasOn(dayKey())});
 function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
@@ -1697,6 +1698,7 @@ function ctx(){
   else if (trophyView && scene === "trophy") h = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : trophyView === "affirm" ? affirmPanel(F.affirm, affirmBusy, !!sampleCap) : trophyView === "fountain" ? fountainPanel(!!sampleCap) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
   else if (routOpen && scene === "room") h = routinesPanel();
   else if (lettersOpen && (scene === "room" || scene === "base")) h = lettersPanel(!!sampleCap);
+  else if (fieldView && scene === "giftshop") h = giftPanel(F, fieldView, giftOpts());   // round 178
   else if (fieldView === "hampers" && scene === "post") h = hamperPanel(F, vineState(F), {day: dayKey(), pick: xmPick});   // round 173
   else if (postOpen && scene === "post") h = postPanel();
   else if (healthOpen && APP_IDS.includes(scene)) h = healthOpen === "reactions" ? reactionsPanel() : healthOpen === "hellos" ? helloPanel() : healthPanel(scene);
@@ -2818,6 +2820,8 @@ function arriveSpot(id){
     speak(m >= 23*60 || m < 6*60 + 30 ? `Shh. ${who} are fast asleep. See them in the morning.` : `${who}'s bedroom. Private! The door stays shut.`, 4000); render(); return; }
   if (id === "gdoor") { setScene("garage", INNER.garage.arrive); return; }
   if (id === "officedoor") { setScene("office", INNER.office.arrive); return; }
+  if (id === "giftdoor") { if (owns(F, "giftshop")) setScene("giftshop", INNER.giftshop.arrive); else { goalView = "giftshop"; sfx("paper", true); render(); } return; }   // round 178
+  if (scene === "giftshop" && ["gcase", "gbars", "gmill", "gwine", "gtill"].includes(id)) { fieldView = id; sfx("paper", true); if (id === "gtill" && isHere("posy")) npcSay("posy", pick(["Morning! The bonbons are walking out the door.", "I'll mind it. Go have a wander.", "Somebody asked if we do gift wrap. I said yes. Do we?"])); render(); return; }
   if (id === "cdoor") { if (owns(F, "cellar")) setScene("cellar", INNER.cellar.arrive); else { goalView = "cellar"; sfx("paper", true); render(); } return; }
   if (scene === "garage" && (id === "scooter" || id === "car")) { goalView = owns(F, id) ? "garagepick" : id; sfx("paper", true); render(); return; }
   if (scene === "cellar" && id === "flight" && owns(F, "cellar") && wineClubNow(dayKey(), sgHM())) {   // hosting the wine club
@@ -3031,11 +3035,13 @@ function millTick(){
   { const day = dayKey(), hm = sgHM(); if (owns(F, "millshop") && WORKSHOP.dow.includes(new Date(day + "T00:00:00Z").getUTCDay()) && hm >= WORKSHOP.to && c.workshopPaid !== day) {   // round 154: the workshop's tickets
     c.workshopPaid = day; const fee = WORKSHOP.fee*WORKSHOP.size; F.coins += fee; save(); if (scene === "millup") { sfx("coin"); flash(`+${fee}: the soap workshop`); } } }
   // sales, minute by minute since the last look (at most a day): the Mill Shop, or the wine shop's little shelf
-  const now = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(c.at || now, now - 864e5); let coins = 0, n = 0, xcoins = 0, xn = 0;
+  const now = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(c.at || now, now - 864e5); let coins = 0, n = 0, xcoins = 0, xn = 0, gcoins = 0, gn = 0;
   for (let at = from + 60000; at <= now; at += 60000) { const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
-    const got = craftSellMinute(F, day, hm, owns(F, "millshop") ? "shop" : vineState(F).shelf ? "wineshop" : null); if (got) { coins += got; n++; }
+    const got = craftSellMinute(F, day, hm, owns(F, "millshop") ? "shop" : owns(F, "giftshop") ? null : vineState(F).shelf ? "wineshop" : null); if (got) { coins += got; n++; }
+    if (owns(F, "giftshop")) { const g = giftSellMinute(F, day, hm, at + 60000 > now && scene === "giftshop" && atSpot === "gtill" ? "mel" : giftKeeperOn(day, hm) ? "keeper" : null, giftOpts()); if (g) { gcoins += g; gn++; } }
     const ev = eventNow(day, hm); if (ev && ev.kind === "market") ["market", "grace"].forEach(w => { const g = craftSellMinute(F, day, hm, w); if (g) { coins += g; n++; } });
     if (ev && ev.kind === "xmas") { const g = stallSellMinute(F, day, at + 60000 > now && scene === "field" && /^mstall\d$/.test(atSpot || "") && (stallAt(day, hm, +atSpot.slice(-1)) || {}).kind === "mine" ? "mel" : owns(F, "millshop") ? "hazel" : "tin"); if (g) { xcoins += g; xn++; } } }
+  if (gcoins) { F.coins += gcoins; save(); if (scene === "giftshop") { sfx("coin"); flash(`+${gcoins}: the gift shop`); } else if (gn > 2) setTimeout(() => speak(`The gift shop sold ${gn} thing${gn > 1 ? "s" : ""} while you were away: ${gcoins} coins.`, 5000), 4500); }
   if (xcoins) { F.coins += xcoins; save(); if (scene === "field") { sfx("coin"); flash(`+${xcoins}: your Christmas stall`); } else if (xn > 2) setTimeout(() => speak(`Your stall at the Christmas market sold ${xn} thing${xn > 1 ? "s" : ""} while you were away: ${xcoins} coins.`, 5000), 3500); }
   c.at = from + Math.floor((now - from)/60000)*60000; if (coins) { F.coins += coins; save(); if (scene === "mill" || scene === "millup" || scene === "wineshop") { sfx("coin"); flash(`+${coins}: ${owns(F, "millshop") ? "the Mill Shop" : "the mill shelf at the wine shop"}`); } else if (n > 2) setTimeout(() => speak(`While you were away, ${owns(F, "millshop") ? "Hazel sold" : "the wine shop sold"} ${n} thing${n > 1 ? "s" : ""} from the mill: ${coins} coins.`, 5000), 3000); }
 }
@@ -3092,6 +3098,8 @@ function treeCountdown(){
   setTimeout(() => { drawScene(); sfx("chime"); hearts(3); gainXp(2); speak("The lights come on all at once: hundreds of them, warm white, right up to the star. The whole field goes \"ooh\". Christmas has started.", 7000, true);
     if (isHere("gonggong")) setTimeout(() => npcSay("gonggong", "The star is crooked. Every year, crooked."), 2600); if (evanHere()) setTimeout(() => evanSays("SO SPARKLY!"), 1200); }, 7200);
 }
+// round 178: the gift shop's shared stock, from the other shops
+const giftOpts = () => ({cocoa: owns(F, "cocoa") ? cocoaState(F) : null, onDisplay: ccOnDisplay, store: craftState(F).store, v: vineState(F), day: dayKey(), hm: sgHM(), here: scene === "giftshop" && atSpot === "gtill", keeper: isHere("posy")});
 // a treat at the Christmas market, eaten on the spot (and one for Evan if he's here); "mulled": a cup of Mel's own
 function xmasTreat(id){
   if (id === "mulled") { const m = F.mull || {}; if (!(m.cups > 0)) return; m.cups--; sfx("chime"); hearts(2); speak(pick(["A paper cup of your own mulled wine, warm through your gloves. Not bad, if you say so yourself.", "Cinnamon, orange, and the red from your own vines. The whole market smells like this."]), 5000); save(); ctx(); return; }

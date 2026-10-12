@@ -202,6 +202,7 @@ export const INNER = {
   garage: {parent: "home", door: [456, 340], arrive: [70, 450], exit: [34, 440]},
   office: {parent: "home", door: [64, 512], arrive: [450, 450], exit: [486, 440]},
   cellar: {parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430]},
+  giftshop: {parent: "wineshop", door: [64, 540], arrive: [450, 440], exit: [486, 440]},   // round 178
   // the Scoop Shack's kitchen, through the door on the shop's west wall; its own way back is the door on its east wall
   scoopkitchen: {parent: "scoopshop", door: [64, 400], arrive: [450, 440], exit: [486, 440]},
   // the chocolate dip station (an upgrade), through the door on the shop's east wall
@@ -320,11 +321,12 @@ export const ROOMS = {
     ["counter","Counter","C","bankcounter",null,"Opal's counter. Your passbook's here.",30]]},
   // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
   // and the tasting room's little tables
-  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,238], C:[330,318], H:[206,318], T:[340,520], K:[480,390], M:[465,128], Z:[40,400], G:[480,556], W:[182,232]}, stations:[
+  wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,238], C:[330,318], H:[206,318], T:[340,520], K:[480,390], M:[465,128], Z:[40,400], G:[480,556], W:[182,232], Y:[40,540]}, stations:[
     ["tdoor","Terrace","G","glassdoor",null,"The glass doors out to the terrace.",0],
     ["menu","Menu","M","chalkmenu",null,"The chalkboard: today's menu.",44],
     ["kdoor","Kitchen","K","kitchendoor",null,"Into the kitchen.",0],
     ["cdoor","Cellar door","Z","cellardoor",null,"The cellar door: barrel racks, a tasting bar and your wine wall.",0],
+    ["giftdoor","Gift shop","Y","giftdoor",null,"Through to the gift shop.",0],
     ["wshelf","Wine shelves","S","wineshelf",null,"Your wines, waiting for customers.",30],
     ["wcounter","Counter","C","winecounter",null,"Behind the counter. Customers come more often while you serve.",-34],
     ["hbox","Honesty box","H","honestybox",null,"The honesty box.",30],
@@ -434,6 +436,13 @@ export const ROOMS = {
     ["scooter","Scooter","S","scooterbay",null,"The scooter's spot.",30],
     ["car","Car","C","carbay",null,"The car's spot.",30]]},
   // the cellar door (a big goal): Mel's wine wall, the tasting bar, barrel racks, a high table
+  // round 178: the gift shop, through the wine shop's bottom-left door (game/giftshop.js): shared stock from the other shops
+  giftshop: {name:"The gift shop", wall:"#F6EEE6", trim:"#C9A3E0", noBoard:true, pos:{A:[110,262], B:[262,262], C:[414,262], D:[110,500], E:[300,470]}, stations:[
+    ["gcase","Bonbon case","A","bonboncase",null,"A little case of bonbons, from the Cocoa Room's trays.",36],
+    ["gbars","Chocolate shelf","B","giftbars",null,"Bars from the Cocoa Room's wall.",34],
+    ["gmill","From the mill","C","giftmill",null,"Oils, soaps and lotions from the mill.",34],
+    ["gwine","Wine corner","D","wineshelf",null,"A few of your bottles to take home.",30],
+    ["gtill","Till","E","gifttill",null,"The till. Stand here and it's open.",30]]},
   cellar: {name:"The cellar door", wall:"#E9DCCB", trim:"#6B3A2A", noBoard:true, pos:{W:[130,262], B:[340,262], R:[140,500], T:[360,500]}, stations:[
     ["winewall","Wine wall","W","winewall",null,"A bottle of every wine you've made. It's getting full.",36],
     ["flight","Tasting bar","B","tastebar",null,"The tasting bar. Pour yourself a flight (and on the first Friday of the month, host the wine club).",34],

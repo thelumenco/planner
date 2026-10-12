@@ -2335,3 +2335,8 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - New players make their own: name and look, their own household and family (or none), their own pet. The village, shops, trips and seasons stay.
 - The real-life parts (quests from Sunsama, Hestia chores, water and steps) become optional in-game routines, with no accounts needed. Time zone set by the player, not Singapore.
 - Approach when it's time: a build flag (`node build.mjs --public`) and a "who's who" data layer, so the personal version keeps working unchanged. Plan it with Mel first.
+
+## Round 178: the gift shop
+- Goal `giftshop` (800, goals.js), door station `giftdoor` (slot Y [40,540]) in the wine shop's bottom-left; INNER.giftshop, ROOMS.giftshop (gcase bonboncase, gbars giftbars, gmill giftmill, gwine wineshelf, gtill gifttill). Exit door on the east wall back to the wine shop.
+- game/giftshop.js: everything is shared stock (Cocoa Room display trays and bar wall, the mill's store, the wine shop's shelf). `giftSellMinute` mode mel .08 / keeper .05 (Posy 10–6, closed Mondays), run in core millTick's minute loop; tally `F.gift.sold[day]`. Once owned, the wine shop's mill crate goes and the gift shop sells the mill goods instead.
+- Posy (npcs.js) keeps it. Later (planned, not built): gallery wall for sip-and-paint paintings, local makers on consignment, small imports from trips (relationship-based and slow, never a money tap).
