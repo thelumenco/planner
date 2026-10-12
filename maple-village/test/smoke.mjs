@@ -4014,15 +4014,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(!br.browseSlot(id, day, v.from + 3, {...o, open: false}) && !at(20), "nobody when it's shut, or between visits");
 }
 {
-  console.log("\nThe Cocoa Room's honesty box (round 182)");
-  const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {coins: 400, goals: {cocoa: 1}}, c = cc.cocoaState(F);
-  c.bars.dark = 10; c.plan.on = false; check(cc.buyCcUp(F, "honesty") && F.coins === 100, "the honesty box, 300 coins from the catalogue");
+  console.log("\nThe Cocoa Room's vending machine (round 182)");
+  const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {coins: 500, goals: {cocoa: 1}}, c = cc.cocoaState(F);
+  c.bars.dark = 10; c.plan.on = false; check(cc.buyCcUp(F, "vending") && F.coins === 100, "the vending machine, 400 coins from the catalogue");
   const off = globalThis.__mapleOffset, rnd = Math.random, mon = Date.parse("2026-10-12T04:00:00Z");   // Monday noon: the shop's shut
   c.at = mon - 30*60e3; globalThis.__mapleOffset = mon - Date.now(); Math.random = () => .005; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
-  check(c.bars.dark < 10 && c.box > 0 && F.coins === 100, `shut on Monday: bars sell from the honesty box, and the coins wait in it (${10 - c.bars.dark} sold, ${c.box} coins)`);
-  const box = c.box; check(cc.emptyHonesty(F) === box && F.coins === 100 + box && !c.box, "empty it at the counter");
-  const late = Date.parse("2026-10-12T15:00:00Z"); c.at = late - 30*60e3; globalThis.__mapleOffset = late - Date.now(); Math.random = () => .005; const b0 = c.bars.dark; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
-  check(c.bars.dark === b0, "nothing after 10pm");
+  check(c.bars.dark < 10 && c.vend === (10 - c.bars.dark)*c.prices.bar && F.coins === 100, `shut on Monday: bars sell from the machine at the full price, and the coins wait in it (${10 - c.bars.dark} sold, ${c.vend} coins)`);
+  const box = c.vend; check(cc.emptyVending(F) === box && F.coins === 100 + box && !c.vend, "empty it at the counter");
+  const late = Date.parse("2026-10-12T15:30:00Z"); c.at = late - 20*60e3; globalThis.__mapleOffset = late - Date.now(); Math.random = () => .005; const b0 = c.bars.dark; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
+  check(c.bars.dark === b0, "nothing after 11 at night");
 }
 {
   console.log("\nThe paperie in Montrose (round 183)");

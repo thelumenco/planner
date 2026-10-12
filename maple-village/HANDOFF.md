@@ -2358,8 +2358,8 @@ Write the proposal for Mel covering every item below. Only build after she says 
 - people.js prop `shopbag` (kraft carrier, twine handles, pink tissue).
 - Why the Cocoa Room looked dead (Mel's report): it's shut on Mondays unless the Second assistant (Lila) is bought, and sales never showed anyone walking in.
 
-## Round 182: the Cocoa Room's honesty box
-- CC_UPS `honesty` (300). While the shop's shut (9am-10pm when `openOn` is false: before 11, after 8, Mondays without Lila) a bar sells about once every two hours (.008/min) into `c.box`; 12% of buyers are a coin short. Counter panel row "Honesty box by the door" with Empty it (`data-cc="honestybox"`, `emptyHonesty`). Drawn on the bay left of the shopfront (bay.js). The catalogue now lists 15 upgrades.
+## Round 182: the Cocoa Room's vending machine
+- CC_UPS `vending` (400; Mel swapped the honesty box idea for a vending machine). While the shop's shut (7am-11pm when `openOn` is false: before 11, after 8, Mondays without Lila) a bar sells about once every two hours (.008/min) at the full bar price into `c.vend`. Counter panel row "Vending machine by the door" with Empty it (`data-cc="vendbox"`, `emptyVending`). Drawn on the bay left of the shopfront (bay.js): glass front, rows of bars, a light on top. The catalogue now lists 15 upgrades.
 
 ## Round 183: the paperie in Montrose (round 1 of 3)
 - Goal `paperie` (1,500, where hm_lanes). The shop with the green door in Montrose's lanes (place `bvhpaper`, art/lavender.js lanesScreen) reads À VENDRE, then PAPETERIE. It's a Lavender Hills room, `bv_hpaper` (data/lavender.js rooms + LV_OBST), so the van party follows Mel in.
