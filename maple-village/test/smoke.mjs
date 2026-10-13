@@ -4166,8 +4166,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   console.log("\nThe address book: post gifts and letters to people met on trips (round 190)");
   await import(new URL("../src/game/ronda.js", import.meta.url)); const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
   const T = Date.UTC(2026, 9, 14, 3), D = 864e5;
-  const F = {coins: 10, inv: {box4: 2}, met: {lvemile: true, lvpainter: true, jason: true, hana: true}};
-  check(bk.canAdd(F, "lvemile") && !bk.canAdd(F, "lvpainter") && !bk.canAdd(F, "jason") && !bk.canAdd(F, "hana") && !bk.canAdd(F, "lvmargaux"), "only people met on a trip, not day-trippers, not village folk");
+  const F = {coins: 10, inv: {box4: 2}, met: {lvemile: true, lvpainter: true, hana: true}};
+  check(bk.canAdd(F, "lvemile") && !bk.canAdd(F, "lvpainter") && !bk.canAdd(F, "hana") && !bk.canAdd(F, "lvmargaux") && bk.canAdd({met: {jason: true}}, "jason"), "only people met on a trip, not day-trippers, not village folk (Jason and Luca too, round 192)");
   check(bk.addable(F).join() === "lvemile" && bk.addContact(F, "lvemile", "2026-10-14") && bk.contacts(F).join() === "lvemile" && !bk.addable(F).length, "added to the book when Mel wants");
   check(!!bk.postTo(F, "lvemile", {}, T).err && !bk.postTo(F, "lvemile", {open: "Thinking of you"}, T).err && F.coins === 10, "a letter needs a few words, and it's free");
   const e = bk.postTo(F, "lvemile", {item: "box4"}, T);
@@ -4178,10 +4178,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(Object.keys(bk.PEN).every(id => bk.person(id) && !bk.person(id).tourist) && Object.values(bk.PEN).every(p => !p.back || it.ITEMS[p.back]), "every voice belongs to a real local, and anything tucked in is a real thing");
   const G = {coins: 0, inv: {box4: 1}, met: {carmen: true}}; bk.addContact(G, "carmen", "d");
   check(!!bk.postTo(G, "carmen", {item: "box4"}, T).err && bk.postage("carmen") === 8, "abroad costs 8, and there's no posting without the coins");
-  const r = bk.postTo(G, "carmen", {text: "Hola!"}, T); check(!r.err && /P\.S\./.test(bk.replyBody(r)), "someone with no voice yet writes back with a P.S. from her own lines");
+  const r = bk.postTo(G, "carmen", {text: "Hola!"}, T), keep = bk.PEN.carmen; delete bk.PEN.carmen; const plain = bk.replyBody(r); bk.PEN.carmen = keep;
+  check(!r.err && /P\.S\./.test(plain) && bk.replyBody(r).includes(keep.sign), "Carmen writes back in her own voice (and anyone without one would send a P.S. from their own lines)");
   bk.removeContact(F, "lvemile"); check(!bk.contacts(F).length, "and Mel can take someone out again");
   const vans = (await import(new URL("../src/data/npcs.js", import.meta.url))).NPCS.filter(p => p.local === "bellbird" && !p.tourist);
   check(vans.every(p => bk.PEN[p.id]), "round 191: every campervan local and neighbour has a voice of their own (" + vans.length + ")");
+  const abroad = (await import(new URL("../src/data/npcs.js", import.meta.url))).NPCS.filter(p => ["ronda", "kyoto", "jeju", "cinque"].includes(p.local) && !p.tourist);
+  check(abroad.every(p => bk.PEN[p.id]), "round 192: and everyone in Ronda, Kyoto, Jeju and Cinque Terre too (" + abroad.length + ")");
+  const J = {coins: 20, inv: {box4: 1}, met: {jason: true}}; bk.addContact(J, "jason", "d"); const je = bk.postTo(J, "jason", {item: "box4"}, T), jb = bk.replyBody(je);
+  check(!je.err && je.at === T + 3*D && /^My dear Mel,/.test(jb) && jb.includes("yellow house by the harbour") && /\nP\.S\. /.test(jb) && jb.split("\n\n").length >= 6 && /;/.test(jb), "Jason writes back at length, semicolons and all, with a P.S.");
 }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }

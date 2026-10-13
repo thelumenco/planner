@@ -4889,6 +4889,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     c_soap: { n: "Lemon soap", kind: "gift", to: "family", price: 5, shop: "ct_limoni", art: ["box", "#F3E7A0", "#F3D34A"], say: "Lemon soap! The whole bathroom smells like Italy now." },
     c_linen: { n: "Linen tea towel", kind: "gift", to: ["mum", "mama", "dad"], price: 8, shop: "ct_limoni", art: ["cloth", "#FFFDF6", "#F3D34A"], say: "A linen tea towel with lemons on it. Too nice to dry dishes with. I'll dry dishes with it." },
     c_anchovy: { n: "Monterosso anchovies in oil", kind: "gift", to: ["dad", "gonggong", "marcus"], price: 16, shop: "ct_limoni", art: ["box", "#9FC3D9", "#C9A27E"], say: "Monterosso anchovies! The best in Italy, they say. On toast, with butter." },
+    // round 192: tucked into Jason's letters now and then (never sold)
+    c_jpoem: { n: "A poem from Jason", kind: "keepsake", price: 0, art: ["tile", "#FFFDF6", "#2E3A5A"], line: "A poem in Jason's neat black hand, on paper from the stationer by the harbour, folded twice. Something about the houses going pink at six o'clock. It rhymes 'harbour' with 'arbour', and he's very pleased about it." },
     c_plate: { n: "Ceramic lemon plate", kind: "keepsake", price: 12, shop: "ct_limoni", art: ["disc", "#3E6BAE", "#F3D34A"], line: "A hand-painted plate from Monterosso, blue and yellow, with lemons and leaves all round the rim." },
     c_magnet: { n: "Cinque Terre fridge magnet", kind: "gift", to: "family", price: 3, shop: "ct_limoni", art: ["disc", "#E89A9A", "#4F9CC4"], say: "A tiny stack of coloured houses over a blue sea. For the fridge!" },
     c_boat: { n: "Your painted boat (model)", kind: "keepsake", price: 0, art: ["box", "#3E6BAE", "#F3D98A"], line: "A little model of the fishing boat you helped paint in Manarola, with its name on the side in Evan's letters." }
@@ -34538,13 +34540,626 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
   };
 
+  // src/data/pen-jl.js
+  var PEN_JL = {
+    jason: {
+      own: true,
+      dear: "My dear Mel,",
+      sign: "Ever yours, from the yellow house by the harbour,\nJason",
+      open: [
+        "Forgive my presumption in replying so promptly; I have always held that a letter left unanswered is a door left swinging, and the wind off this harbour is not kind to doors.",
+        "I write this on the balcony, with the geraniums for an audience; they are a severe crowd, but in all these years they have never once interrupted.",
+        "Your envelope arrived on Tuesday, carried up two flights by the postman, who regards me, I think, as a sort of local weather: frequent, unavoidable, and occasionally pleasant.",
+        "It is a quarter past six, the houses have gone pink, and I have abandoned a perfectly good poem in order to write to you; consider yourself flattered, and the poem consoled."
+      ],
+      food: "The {it} lasted precisely one evening. I had intended to ration it, as a sensible man would; but sense has never been my strongest suit, and Luca, who maintains that he does not care for sweet things, was discovered at midnight with the lid in one hand and no remorse whatsoever.",
+      drink: "We opened the {it} on the harbour wall at six, when the houses go pink; it was, I am obliged to report, rather better than the sunset, and the sunset has had considerably more practice.",
+      made: "The {it} now has pride of place on the shelf beside my Wilde; it is the only thing in the flat that is both useful and beautiful, which is more than can be said for me before my first espresso.",
+      flower: "The flowers survived the journey with more grace than I have ever survived a train; they are in the blue jug on the windowsill, and the neighbour who sings Puccini has twice stopped mid-aria to admire them, which is twice more than he has stopped for anything else.",
+      other: "The {it} arrived in perfect order, which is more than one can say for the Italian postal service in general; I have put it where I can see it from my desk, and it has already improved my poetry, or at least my mood, which in my case amounts to the same thing.",
+      letter: "Your letter came this morning, and I read it twice: once quickly, as one eats farinata, standing up and burning one's fingers; and once slowly, with an espresso, as it deserved.",
+      news: [
+        "Luca has now repaired every engine in the harbour and has begun, somewhat alarmingly, on the coffee machine at the café. Beppe watches him the way one watches a man defusing a bomb; the espresso, I must admit, has never been better.",
+        "I have finished the poem about the cat who rides in the fishing boats. He remains unimpressed, as critics so often are; but the fishermen have asked for a copy to pin up by the nets, and I count that as publication.",
+        "I climbed to Corniglia again last week: all three hundred and eighty-two steps. I mention this only in passing, and I intend to go on mentioning it in passing for the rest of the year.",
+        "The tourists have thinned and the town has exhaled. In the mornings now there is only the sea, the bells, and an old man in the piazza who has been losing at bocce since before I was born, and intends to go on losing with tremendous dignity.",
+        "We have taken to swimming at Monterosso before lunch. Luca swims like a fish; I swim like a man reciting Byron, which is to say slowly, and with a great deal of commentary.",
+        "I have decided that a harbour is merely a departure gate with better manners: everyone who leaves it means to come back, and most of them, sooner or later, do. I offer this as a hint, and not at all a subtle one."
+      ],
+      ps: [
+        "P.S. Come back soon. The view, as I have told you more than once, is wasted on one.",
+        "P.S. Luca says to tell you that the steps grow fewer every time I tell the story. He is wrong, of course; they grow more.",
+        "P.S. 'We are all in the gutter, but some of us are looking at the stars.' Wilde, again. I find I am mostly looking at the harbour, which is the same thing with better lighting.",
+        "P.S. There is always a train. Well. There is usually a train."
+      ],
+      back: "c_jpoem",
+      backNote: "I have folded a poem in with this; it is about the houses at six o'clock, and it rhymes 'harbour' with 'arbour', for which I refuse to apologise."
+    },
+    luca: {
+      sign: "Ciao, Luca",
+      food: "Jason said we would share it. We did share it. He had more. I let him win, it is good for the marriage.",
+      drink: "We drank it on the harbour wall with the sunset. Jason made a speech about it. The wine was shorter than the speech.",
+      made: "Jason took it to the bathroom and says it is his now. I am allowed to look at it.",
+      flower: "Jason put them in the blue jug and moved the jug four times. Now they are by the window. They are happy there, he says.",
+      other: "It is on the shelf, next to my good spanner. This is the most important shelf in the house.",
+      letter: "Your letter came. Jason read it to me out loud with all the voices. Then I read it myself, to check. He added things.",
+      news: ["Three engines this week and one ferry. The ferry was the easy one. The fishermen pay me in anchovies, so we are rich in anchovies.", "Jason is writing at the café every morning. He says it's a poem. The waiter says it's a long poem. Everybody is very proud of him."],
+      back: "c_anchovy",
+      backNote: "Some anchovies from the boys at the harbour. On toast, with butter. Jason says this is not a recipe. It is the best recipe."
+    }
+  };
+
+  // src/data/pen-rk.js
+  var PEN_RK = {
+    /* ---------- Ronda ---------- */
+    carmen: {
+      sign: "Un beso, Doña Carmen (the sweet shop on the plaza)",
+      food: "I ate one with my coffee and hid the rest from the nuns' recipe book. They would want to know your secrets.",
+      drink: "I shall have a little glass after the evening shop, in my chair by the door, watching the whole plaza go by.",
+      made: "Very pretty. It sits on the counter beside the yemas, and everyone asks who sent it. I tell them, of course.",
+      flower: "In a jug on the counter, guapa, where the sun comes in. The shop has never looked so smart.",
+      other: "Sixty years behind this counter and still people surprise me. It sits where I can see it from my chair.",
+      letter: "Your letter came all the way over the sea to my little shop. I read it out loud to Lola, slowly, twice.",
+      news: ["I made a new almond cake this week, a little lighter. Pepe ate three slices and called it too light.", "The plaza is full of telephones again. I still prefer the donkeys, but I keep that to myself. Mostly."],
+      back: "yemas",
+      backNote: "A little box of yemas, like small suns. Eat one at once, and share the rest. Or don't."
+    },
+    rafael: {
+      sign: "Rafael, the olive stall",
+      food: "I tasted it slowly, like oil. No bread. It was good. You have taste.",
+      drink: "I will open it at the farm, on the step, when the sun goes behind the valley. That is the right time.",
+      made: "Made by hand. You can tell. Like oil from a good press.",
+      flower: "They are on the kitchen table at the farm. The whole house smells of them. I did not complain. Much.",
+      other: "Hmph. A parcel, for me. I have put it on the shelf by the old press. It looks well there.",
+      letter: "A letter, from across the sea, to an olive farmer. I read it at the stall between customers. Then again at home.",
+      news: ["The olives are fat this year. Five generations, and my grandfather would still find something to grumble about.", "The almonds were small again, but very sweet. People come back for them. That is enough."],
+      back: "almond",
+      backNote: "Some almonds from the valley. Small, but sweet. Taste one plain first."
+    },
+    lucia: {
+      sign: "Hola from the tile shop, Lucía",
+      food: "I ate it on the bridge at five o'clock, when everything goes gold. It tasted even better up there.",
+      drink: "I am saving it for the evening I finish view number two hundred and twenty. Not long now.",
+      made: "Handmade and lovely. It sits on my shelf between the blue tiles and the yellow ones, as if it belongs.",
+      flower: "I painted one of them onto a tile before they could fade. The rest are in a jar on the window.",
+      other: "It is on the shelf above the kiln now, where the light is kindest. Careful, I tell everyone, that one's mine.",
+      letter: "Your letter came while a tile was drying, so I read it with blue on my fingers. Sorry about the smudge.",
+      news: ["Two hundred and nineteen views now. The newest is the gorge in the morning mist, all soft grey.", "I tried a green from the olive trees this month. Blue and yellow are still my favourites, but don't tell them."],
+      back: null,
+      backNote: ""
+    },
+    manolo: {
+      sign: "Olé, Manolo (by the fountain)",
+      food: "I ate it by the fountain between songs. The pigeons watched me the whole time. They didn't get any.",
+      drink: "I will have a glass after the last song at the tapas bar, when Paloma's feet are resting and mine are too.",
+      made: "Made by hand. Like a good guitar: wood, a bit of patience, a bit of heart.",
+      flower: "I tucked one into my guitar strap. People tipped more. I think it was the flower, not the playing.",
+      other: "It sits in my guitar case now, next to the spare strings. The safest place I have.",
+      letter: "Your letter came all that way, over the sea. I read it by the fountain and played something slow for it.",
+      news: ["I learned a new bulería this month. Forty songs and four now. The pigeons approve.", "A whole coach of people clapped on twelve last Sunday. Twelve. I nearly dropped the guitar."],
+      back: null,
+      backNote: ""
+    },
+    paco: {
+      sign: "Paco, the tapas bar (feet still tired)",
+      food: "I ate it standing up in the kitchen, the way I eat everything. It was very good, guapa.",
+      drink: "I will have a glass after the late shift, at ten past midnight, with my feet up on a chair.",
+      made: "It is on the shelf behind the bar, next to the good sherry. Nobody is allowed to touch it.",
+      flower: "In a glass on the corner table. Two salmorejo, one croqueta, and some flowers, coming.",
+      other: "Nobody sends the waiter a present. Somebody did. I told the whole kitchen.",
+      letter: "Your letter came at three, in the middle of lunch. I read it between tables, one line at a time.",
+      news: ["The croquetas are still hot and the beer is still cold. My feet are still tired. Some things never change.", "We have a new salmorejo bowl, very big. People order it just to look at it."],
+      back: null,
+      backNote: ""
+    },
+    pepe: {
+      sign: "Pepe (from a good chair)",
+      food: "I ate it with the morning paper at Carmen's. It was better than the news. Most things are.",
+      drink: "I will have a little glass in the garden, in the evening, before I rest my eyes.",
+      made: "Very fine. I keep it by my reading chair at home. It is a better chair now.",
+      flower: "In a cup on the café table. Carmen says it is the first time I have brought anything but a newspaper.",
+      other: "Eighty-one years old and a parcel in the post. I have put it next to my paper, where the important things go.",
+      letter: "Your letter came across the sea, and I read it in every chair in Ronda. It was good in all of them.",
+      news: ["The news is the same as last month. Only louder. I read it anyway.", "I have found a new chair in the Moorish garden, in the shade. Joaquín pretends not to notice me."],
+      back: "postal",
+      backNote: "A postcard of the bridge, from Carmen's stand. I wrote on the back. My handwriting is terrible."
+    },
+    lola: {
+      sign: "Besos, Lola (the balcony with the geraniums)",
+      food: "I ate it on my balcony, among the geraniums, with the whole plaza below. Delicious.",
+      drink: "I will open it on a warm night and have a glass at the tapas bar with it. Paco will want some.",
+      made: "So pretty. It sits on the balcony shelf, and the neighbours lean out to look at it.",
+      flower: "Flowers for me, who has a balcony full of them. I put them right in the middle. They are the stars now.",
+      other: "I have put it on the shelf by the door, so I see it every morning on my way to the market.",
+      letter: "Your letter came all the way over the sea. I read it on my morning walk, at Rafael's stall, with an almond.",
+      news: ["The geraniums have gone mad this year. Red all down the wall. People take photographs.", "Every morning the same walk, and every morning it's beautiful. Still true."],
+      back: "sevilla",
+      backNote: "Some Seville oranges, from the back of the stall. The good ones are always at the back."
+    },
+    amina: {
+      sign: "With warm wishes, Amina (the Arab baths)",
+      food: "I ate it in the shade by the baths, with my book. A very good lunch, eight hundred years in the making. Almost.",
+      drink: "I am saving it for a cool evening, when the baths are closed and the stars come through the roof.",
+      made: "Beautifully made. I keep it on my desk at the entrance, and visitors ask if it is eight hundred years old.",
+      flower: "In a little bowl in the warm room, where the light comes down through the star holes. They glow.",
+      other: "It sits on my desk by the door now. Clever, no? I think it is the nicest thing on it.",
+      letter: "Your letter came from very far away. I read it in the cold room, and every line echoed a little.",
+      news: ["A school group clapped in the hot room all at once. The echo went on for a long time. They loved it.", "I have learned more about the water wheel. The donkey had a name, I think. I am still looking for it."],
+      back: null,
+      backNote: ""
+    },
+    joaquin: {
+      sign: "Joaquín, the Moorish garden",
+      food: "I ate it by the long pool, in the shade of the cypress. The water kept me company.",
+      drink: "I will have a glass in the evening, when the garden is quiet and the water is louder.",
+      made: "Made with patience. Like a garden. It sits in the little hut by the myrtles now.",
+      flower: "Flowers for a gardener. I put them by the fountain, where the water could hear them.",
+      other: "Very kind. I have put it on the shelf in my hut, beside the old watering can.",
+      letter: "Your letter came all that way, across the water. I read it in the shade and listened to the fountain.",
+      news: ["The orange trees are heavy this year. Bitter still. Lola makes marmalade with what I give her.", "I cleared the old channel by the cypress. The water runs straight now. It is very pleased with itself."],
+      back: null,
+      backNote: ""
+    },
+    paloma: {
+      sign: "¡Olé! Paloma",
+      food: "I ate it before the evening show, for energy. Then I danced better. I'm sure of it.",
+      drink: "I'm saving it for after the eight o'clock show, with my feet up and Manolo still playing quietly.",
+      made: "So beautiful. I keep it in the dressing room, by the mirror, for luck before I go on.",
+      flower: "I wore one in my hair for the show. ¡Venga! The whole bar clapped in the right places.",
+      other: "It sits in the dressing room now, by my shoes. That is the most important shelf I have.",
+      letter: "Your letter came from over the sea, and I read it in the dressing room between shows. Twice.",
+      news: ["I have a new dress for the show, red with white spots. It spins very well.", "Manolo learned a new bulería. I learned a new step for it. We are both very proud."],
+      back: null,
+      backNote: ""
+    },
+    antonio: {
+      sign: "Antonio, the leather workshop",
+      food: "I ate it at the bench, carefully, well away from the leather. Very good.",
+      drink: "I will open it at home in Ubrique, after the twenty minutes of bends in the road.",
+      made: "Made by hand, the slow way. I looked at the stitches first. Good stitches.",
+      flower: "In a jar on the workbench. The workshop smells of leather and roses now. Like a library with a garden.",
+      other: "It sits on the shelf above my needles, where only the good things go.",
+      letter: "Your letter came over the sea and over the hills. I read it at the bench, with the saddle stitch half done.",
+      news: ["I made a bag this month with my grandfather's old stitch. Same stitch, same two needles.", "A young man from Ubrique is learning at the bench with me. His stitches are getting straighter."],
+      back: "llavero",
+      backNote: "A little keyring, with the bridge stamped on it. Saddle stitched. It will last."
+    },
+    rocio: {
+      sign: "¡Hola! Rocío, the flower stall",
+      food: "I ate it on the way back from the valley, at eight in the morning, with the buckets in the back.",
+      drink: "I'm saving it for a Sunday, when the stall is shut and I can sleep past five.",
+      made: "So pretty. It sits on the stall, among the carnations, and people ask if it is for sale. No.",
+      flower: "Flowers for the flower seller. I laughed. Then I put them in my best bucket, at the front.",
+      other: "It sits by my till now, between the buckets. A very nice surprise for a flower seller.",
+      letter: "Your letter came all the way over the sea. I read it at the stall, with my hands still wet from the buckets.",
+      news: ["The carnations in my field came up early this year. Red ones, white ones, and a lot of yellow.", "Up at five, down to the valley, back by eight. Same as always. I like it."],
+      back: "clavel",
+      backNote: "A red carnation from my field, pressed so it survives the post. Red is for love."
+    },
+    /* ---------- Kyoto ---------- */
+    sachiko: {
+      sign: "With quiet regards, Sachiko (the tea house on the lane)",
+      food: "I had it with a bowl of tea, slowly, in the quiet hour before the first guest.",
+      drink: "I will save it for an evening in the garden, when the water has stopped singing in the kettle.",
+      made: "Something made with care. I have set it in the alcove beside the scroll for this season.",
+      flower: "I arranged one in the alcove, alone, as the tea room likes. The others I placed by the door.",
+      other: "Thank you for your kindness. It rests in the alcove now, where guests will see it and wonder.",
+      letter: "Your letter crossed a whole sea to reach this little room. I read it slowly, with a bowl of tea.",
+      news: ["I have changed the scroll for the season. It says 'falling leaves' now. It suits the garden.", "A young guest turned the bowl twice without being told. I was very pleased."],
+      back: "matcha",
+      backNote: "A little matcha from the tea house. Whisk it slowly. There is no hurry."
+    },
+    joshin: {
+      sign: "Breathing in and out, Jōshin",
+      food: "I ate it in the garden after morning prayers. A monk should not have favourites. I have one now.",
+      drink: "I'm saving it for a festival night. Monks are allowed one glass. I asked. Twice.",
+      made: "Beautifully made. It sits by my cushion in the hall, and reminds me to breathe.",
+      flower: "I put them by the bell. Everyone who rings it smiles a little more than usual.",
+      other: "It sits by my cushion in the hall now. My teacher looked at it for a long time and then laughed.",
+      letter: "Your letter came all the way across the sea. I read it in the hall, then breathed in, and breathed out.",
+      news: ["I laughed during meditation again. A visitor laughed too. My teacher says that counts as practice.", "I rang the bell very gently this month. It was still very loud. Some things are just loud."],
+      back: "hojicha",
+      backNote: "A packet of hōjicha, the roasted tea we drink after sitting. Breathe first, then sip."
+    },
+    tanaka: {
+      sign: "Tanaka, wagashi, the fourth generation",
+      food: "I tried it slowly, as I try a new sweet. It tasted like a season I have not visited yet.",
+      drink: "I will save it for the evening the maple sweets are finished, and the shop is quiet.",
+      made: "Made with warm hands, I think. You can tell. It sits by the sweet moulds now.",
+      flower: "I looked at them for a long time. Tomorrow's sweet may be one of these. We'll see.",
+      other: "Very kind. It sits on the shelf where my great-grandfather kept his first moulds.",
+      letter: "Your letter came all the way across the sea. I read it in the shop, with the white bean paste resting.",
+      news: ["This month's sweet is a camellia, deep red. People buy it to look at, and then eat it anyway.", "I made a new maple leaf with a little chestnut inside. Patient hands. It was worth the wait."],
+      back: "wagashibox",
+      backNote: "A small box of the season's sweets. They are only sugar. They forgive the post."
+    },
+    fumiko: {
+      sign: "Fumiko, pickles, forty years",
+      food: "I ate it at the stall between customers. Then I gave a little to the tofu man. He says thank you too.",
+      drink: "I'll have a glass with my supper, with a pickle on the side. Everything is better with a pickle.",
+      made: "So pretty. It sits on the stall next to the purple pickles, and the tea lady is very jealous.",
+      flower: "In a pickle jar at the front of the stall. The whole market came to look. Very efficient.",
+      other: "The whole market knows about it already. It sits by my scales, where everyone can see.",
+      letter: "Your letter came all the way across the sea, and the whole market wanted to know what it said. I told them.",
+      news: ["I have a new pickle, yuzu and radish. People make a face, then buy two jars.", "The knife man has a new apron. The whole market talked about it for a week."],
+      back: "tsukemono",
+      backNote: "A jar of my pickles. Purple, yellow, and one green one that is still a mystery."
+    },
+    ishida: {
+      sign: "Ishida, the pottery on the lane",
+      food: "I ate it by the kiln while it cooled. Slowly. Clay teaches you that.",
+      drink: "I will save it for the night after a good firing. The kiln and I will both rest.",
+      made: "Honest work. It sits on the shelf with my best cups, the wonky ones.",
+      flower: "I put them in a vase I thought had failed. With flowers in it, it is my favourite now.",
+      other: "Thank you. It sits on the shelf by the wheel, where I look when I need to slow down.",
+      letter: "Your letter came all the way across the sea. I read it with clay on my hands. The paper is a little grey now.",
+      news: ["The kiln gave me a blue this month that I did not ask for. I am keeping it.", "I mended an old cup with gold. It is better than it was before."],
+      back: null,
+      backNote: ""
+    },
+    mori: {
+      sign: "Mori, under the maples",
+      food: "I ate it at the Go board, between moves. My opponent was too busy watching me to win.",
+      drink: "I will have a glass at home, after supper, with the board set up for tomorrow.",
+      made: "Well made. It sits beside my bowl of black stones. They get along.",
+      flower: "I put one on the corner of the board. It made the game more polite.",
+      other: "Very kind. It sits by the Go board under its cloth, waiting for me each morning.",
+      letter: "Your letter came all the way across the sea. I read it under the maples, then played a very good game.",
+      news: ["The maples are turning red now. I win more in autumn. I do not know why.", "A young man watched for a whole week before he asked to play. He is patient. He will be good."],
+      back: null,
+      backNote: ""
+    },
+    kato: {
+      sign: "Kato, the station (on time)",
+      food: "I ate it on the bench at lunch, between the 12:40 and the 1:05. Both on time.",
+      drink: "I'll save it for my day off, which comes on time, like the trams.",
+      made: "Very neat work. I keep it in the station office, by the timetable, where I look most.",
+      flower: "In a cup on the ticket window. Passengers say good morning to them.",
+      other: "Thirty-one years at this station and a parcel in my name. It sits by the timetable now.",
+      letter: "Your letter came all the way across the sea, and it arrived on time. I approve.",
+      news: ["The trams were never late this month. Not once. I am a little proud.", "I walked through the bamboo grove early on my day off, before the crowds. Still the best time."],
+      back: null,
+      backNote: ""
+    },
+    ren: {
+      sign: "Best legs in Kyoto, Ren",
+      food: "I ate it at the top of the hill, after the thousandth climb of the day. Best fuel there is.",
+      drink: "I'm saving it for the end of maple season, when my calves finally get a holiday.",
+      made: "It's tucked in the rickshaw, by the seat. Every passenger asks about it. Good story, I tell them.",
+      flower: "I tied them to the front of the rickshaw. I'm in even more photos now.",
+      other: "It rides in the rickshaw with me now, up and down the lane all day. It's seen everything.",
+      letter: "Your letter came all the way across the sea. I read it at the top of the lane, getting my breath back.",
+      news: ["Maple season is here. Everyone wants a photo, and I'm in most of them, as usual.", "I found a new story about the pagoda this month. Sachiko-san told it to me over tea."],
+      back: null,
+      backNote: ""
+    },
+    haru: {
+      sign: "Haru, from the gravel garden",
+      food: "I ate it under the eaves, with a cup of tea, looking at the waves I raked this morning.",
+      drink: "I will have it on a still evening, when the wind and the cats have gone quiet.",
+      made: "Made slowly, I think. Like moss. It sits beside my rake now, under the eaves.",
+      flower: "I put them by the koi pond. The koi came to look, then decided they were not lunch.",
+      other: "Thank you. It rests under the eaves, beside my tea cup. Sit, look, don't think.",
+      letter: "Your letter came all the way across the sea. I read it on the veranda, and the gravel stayed perfect the whole time.",
+      news: ["The moss by the third rock has grown a little. A very little. I noticed.", "A cat walked straight across the sea this morning. I raked it again. Then again tomorrow."],
+      back: null,
+      backNote: ""
+    }
+  };
+
+  // src/data/pen-jc.js
+  var PEN_JC = {
+    /* ---------- Jeju ---------- */
+    halmang: {
+      sign: "Halmang Kim, from the divers' house",
+      food: "I ate it by the stove after the morning dive, still in my wetsuit. Sweet things taste better when you're cold.",
+      drink: "I will have a little cup in the evening, when the tide is out and so am I.",
+      made: "Made slowly, with care. Like a good breath. It sits by the floats now, where I can see it.",
+      flower: "Flowers from the land, for a woman of the sea. I put them in the window, facing the water.",
+      other: "Sixty years of diving, and the sea never once sent me a parcel. You did.",
+      letter: "Your letter came all the way across the sea. I read it on the black rocks, between dives, slowly. Like breathing.",
+      news: ["The water is getting colder. We dive shorter now, and laugh longer by the stove.", "Seo-yeon held her breath for two minutes and ten seconds. I told her it was too loud. She was very pleased."],
+      back: null,
+      backNote: ""
+    },
+    seoyeon: {
+      sign: "Seo-yeon (still breathing too loud, apparently)",
+      food: "I ate it after practice, sitting on a float in the shallows. Don't tell Halmang it was before the porridge.",
+      drink: "I'm saving it for the day I make three minutes. It might be a while. It's on the shelf, waiting patiently.",
+      made: "It's on the windowsill in my little room. It smells much nicer than wetsuits, which is most things.",
+      flower: "I've put them in a jar by the door of the divers' house. Halmang pretended not to notice, then moved them into the light.",
+      other: "In Seoul I got parcels full of paperwork. This is much, much better.",
+      letter: "Your letter came across the sea, and I read it on the rocks with my mask still on my head. Halmang read it over my shoulder.",
+      news: ["Two minutes and ten seconds now. Halmang says good, which from Halmang is a parade.", "I found my first abalone on my own last week. I whistled so hard the whole shore turned round."],
+      back: null,
+      backNote: ""
+    },
+    mrko: {
+      sign: "Ko, from the orchard",
+      food: "I ate it in the packing shed, between crates. Sweet. Not as sweet as a small tangerine, but close.",
+      drink: "I will open it in December, when the sorting is done. December is a long month. It needs something at the end.",
+      made: "Made by hand. Like a stone wall. I put it on the shelf in the shed, out of the wind.",
+      flower: "I put them on the sorting table. The tangerines didn't mind. The trees were a little jealous.",
+      other: "Very kind. I showed it to the trees. They didn't care. I did.",
+      letter: "Your letter came across the sea, and I read it in the orchard, sitting on the wall. The wind tried to take it. I held on.",
+      news: ["The fruit is colouring now. The wind came hard this month, so they will be very sweet.", "I planted two young trees by the far wall. My great-grandfather's trees are watching them."],
+      back: "hallabong",
+      backNote: "A hallabong from the orchard, the one with the little hat. Feel how heavy."
+    },
+    haeun: {
+      sign: "Love from the stone-house café, Ha-eun",
+      food: "I had it at the window table after closing, with the sea going pink. My grandmother would have hidden it in the rice jar.",
+      drink: "I'm keeping it for a quiet evening, when the café's swept and the view is all mine.",
+      made: "It's on the beam where my grandmother dried persimmons, next to the plants. It looks like it's always been there.",
+      flower: "They're on the window table, so they have the sea too. Every table gets the sea. I made sure.",
+      other: "I've put it on the counter by the tangerines, and everyone asks where it came from. Far away, I tell them.",
+      letter: "Your letter came across the sea and found its way to my grandmother's door. I read it with my first coffee, at the window.",
+      news: ["I've added a hallabong tea to the menu. People make the same face they made at the tangerine latte. Then they come back.", "A little girl drew the café for me, with a cat on the roof. We don't have a cat. It's on the wall anyway."],
+      back: "j_cake",
+      backNote: "A tangerine cake from this morning's oven. It travels well. Mostly."
+    },
+    miok: {
+      sign: "Mi-ok (the tangerine stall, by the door)",
+      food: "I ate it at the stall, and everybody who walked past got a bit. That's the rule. My rule.",
+      drink: "It's under the stall, behind the hallabong. My husband keeps asking what it's for. A good day, I tell him.",
+      made: "It's on the stall now, next to the tangerine jelly. Three people tried to buy it. Not for sale.",
+      flower: "I put them in a crate on the stall, with the tangerines round them. Orange and pink. Very nice.",
+      other: "Somebody gave me something, for once. I didn't know what to do. I gave them a tangerine.",
+      letter: "Your letter came across the sea, and I read it at the stall between customers. I gave the postman a tangerine.",
+      news: ["The hallabong came in early this year. Heavy, heavy. Everyone wants to hold one.", "Mr Hyun at the station has eaten all forty tangerines. I've given him forty more."],
+      back: "j_choco",
+      backNote: "Tangerine chocolates from the stall. Is it orange inside? It is."
+    },
+    mrsboo: {
+      sign: "Mrs Boo, omija and tea",
+      food: "Sweet. Very sweet. I ate it with a cup of bitter tea, so it was balanced. Five flavours, you see.",
+      drink: "I will drink it in winter, warm, by the window. All year, good. But winter, better.",
+      made: "Made with patience. Patience is a flavour too. I keep it by my scoops.",
+      flower: "They are on the stall between the omija and the green tea. Now the stall has a sixth flavour.",
+      other: "Kind. I am not used to kind from far away. I am getting used to it.",
+      letter: "Your letter came across the sea. I read it with a cup of omija. Sweet, sour, salty, bitter, spicy. Like a letter.",
+      news: ["The new green tea came down from the mountain. You can taste the clouds, more than ever.", "A young man asked for omija with sugar. I gave him two scoops and no sugar. He came back."],
+      back: "omija",
+      backNote: "A scoop of omija berries. Two scoops. You are a two-scoop person."
+    },
+    jaewon: {
+      sign: "Moon Jae-won, with orange hands",
+      food: "I ate it in the yard, with the cloth drying. My hands left orange marks on the paper. They leave marks on everything.",
+      drink: "I will open it at the end of a three-day sun, when the cloth is finished and so am I.",
+      made: "Made by hand. I can tell. Hands always tell. Mine, especially.",
+      flower: "I hung them from a beam with the cloth. Now the workshop has green, rust and pink.",
+      other: "I put it on the bench where the cloth is folded. It watches the sun with me.",
+      letter: "Your letter came across the sea. I read it in the yard, and now it has an orange thumbprint on it. Sorry.",
+      news: ["The August persimmons were good this year. Very green, very strong. The cloth went deep rust.", "A girl dyed her first scarf here last week. Green when she left. Brown by now, I hope."],
+      back: null,
+      backNote: ""
+    },
+    captoh: {
+      sign: "Captain Oh, the Honeybrook ferry",
+      food: "I ate it in the wheelhouse on the morning crossing. Calm sea. Good breakfast.",
+      drink: "It's stowed under the chart table. I'll have it on a night with no crossing. There aren't many.",
+      made: "It's on the shelf in the wheelhouse, beside the binoculars. It's crossed to Honeybrook twice already.",
+      flower: "They're in a cup by the wheel. The passengers think the ferry's gone fancy.",
+      other: "Four thousand crossings, and this is the first time something came across for me.",
+      letter: "Your letter came across the sea. It may have come on my own ferry. I read it at the wheel, on a very calm crossing.",
+      news: ["Dolphins on Tuesday, a whole pod, off the red lighthouse. I slowed down. I'm allowed.", "The squid boats are out every night now. Coming in at dusk is like sailing into a city."],
+      back: null,
+      backNote: ""
+    },
+    mrkang: {
+      sign: "Kang, by the harbour",
+      food: "Ate it on the harbour wall, mending. The gulls watched. They got nothing.",
+      drink: "It's in my net bag. A quiet evening, the squid boats lit up. Then.",
+      made: "Made carefully. Good knots in it, I think. I can tell.",
+      flower: "They're in a bucket by the nets. The fishermen laughed. Then they looked at them for a long time.",
+      other: "Fifty years of nets, and nobody posted me anything. Now somebody has.",
+      letter: "Your letter came across the sea. I read it on the wall, with the needle in my teeth.",
+      news: ["Squid every night this month. You can smell it in the wind.", "Mended a net with a hole you could row through. Took three days. It catches again."],
+      back: null,
+      backNote: ""
+    },
+    mrhyun: {
+      sign: "Hyun, stationmaster, Jeju station",
+      food: "I ate it in the ticket office with the kettle on, between the eight-fifteen and the eight-forty. Very punctual.",
+      drink: "It's on the shelf in the ticket office. I'll have it after the last train at ten. Not one minute before.",
+      made: "It's on the ticket counter now. Everyone buying a ticket gets to admire it. Free of charge.",
+      flower: "They're in the station window, facing the sea bridge. The trains slow down to look. I may be imagining that.",
+      other: "Something for the stationmaster. I waved at it, the way I wave at the trains.",
+      letter: "Your letter came across the sea bridge on the morning train. I checked it in myself. On time.",
+      news: ["We could see Hallasan from the platform four days running. A record. I wrote it in the book.", "Mi-ok gave me forty more tangerines. I have started giving them to the train drivers."],
+      back: "j_magnet",
+      backNote: "A little magnet from the market: a stone grandfather holding a tangerine. Very reliable, like the trains."
+    },
+    /* ---------- Cinque Terre ---------- */
+    nonnapina: {
+      sign: "Nonna Pina, Manarola",
+      food: "I ate it after the afternoon rest, slowly, with a little coffee. Good. Not pesto, but good.",
+      drink: "I keep it for Sunday, after lunch. Everything good is for Sunday.",
+      made: "Made by hand. Not with a machine. You see? You were listening.",
+      flower: "I put them in the kitchen, by the basil. Marta says the basil is jealous. The basil is never jealous. It is basil.",
+      other: "Eighty-one years, and still people surprise me. It sits by my mortar now.",
+      letter: "Your letter came all the way from over the sea, and I read it at the marble table, with my glasses on. Twice.",
+      news: ["The basil is very good this month. Young leaves, sweet, no soap. Marta is learning.", "My granddaughter came from Milan and made pesto with me. By hand. I said nothing. I was very pleased."],
+      back: "pesto",
+      backNote: "A jar of pesto, made this morning. Pounded, not ground. Gently. Like a heartbeat."
+    },
+    beppe: {
+      sign: "Beppe, la focacceria, Vernazza",
+      food: "I ate it at six in the morning with the focaccia coming out. A sweet thing at that hour is a little secret.",
+      drink: "I keep it for an evening when I wake up from my afternoon sleep and don't have to light the oven. Rare. Very rare.",
+      made: "Made with the hands, like focaccia. Dimples and all. I respect this.",
+      flower: "They're on the counter by the onion focaccia. The queue smells them first, then the bread.",
+      other: "It's on the shelf above the oven, where my grandfather kept the salt. Safe and warm.",
+      letter: "Your letter came from across the sea, and I read it at five in the morning with flour on my fingers. Sorry about the thumbprint.",
+      news: ["The oven had a cough last week. I talked to it nicely. Now it roars again.", "I tried a focaccia with a little lemon on top. Ilaria says it's too clever. It sold out."],
+      back: "c_focaccia",
+      backNote: "A piece of this morning's focaccia, the plain one. Warm it a little. Mind your fingers."
+    },
+    bruno: {
+      sign: "Bruno, from the terraces",
+      food: "I ate it on the top terrace with my secateurs beside me. The view was the same as always. Perfect.",
+      drink: "Somebody else's wine. I will taste it very carefully, and say nothing to Carla.",
+      made: "Made by hand, the slow way. Like a dry stone wall. No cement. I put it in the cantina.",
+      flower: "I put them on the monorail and sent them down to Carla. They arrived. Most things do.",
+      other: "It's on the shelf in the cantina, between the barrels. It looks very serious there.",
+      letter: "Your letter came from across the sea, up the steps, up the terraces. I read it at the top, sitting on the wall.",
+      news: ["The harvest is in. Every crate came down on the monorail, and only one went down too fast.", "The grapes for the Sciacchetrà are drying now. Then we wait. Then we wait more."],
+      back: null,
+      backNote: ""
+    },
+    gianni: {
+      sign: "Ciao! Gianni (the gelateria, Manarola)",
+      food: "I ate it in one go, behind the counter. Then I thought: gelato? Maybe. I'm working on it.",
+      drink: "I'm keeping it for the end of summer, when the last cone's gone and I can finally sit down.",
+      made: "It's by the till now, next to the wafers. Everyone asks. I say: from a friend who likes basil.",
+      flower: "They're in a glass on the counter, with the gelato in every colour behind them. Like a painting.",
+      other: "Everything at once. That's how I like my presents and my cones.",
+      letter: "Your letter came from across the sea. I read it at the counter with a spoon of lemon. For concentration.",
+      news: ["Fig gelato is back. My uncle's figs are perfect this year. Purple, sticky, wonderful.", "Sara and I still argue every day, lemon or basil. The customers have started picking sides."],
+      back: null,
+      backNote: ""
+    },
+    franca: {
+      sign: "Un abbraccio, Franca (the lemon shop)",
+      food: "I ate it at the counter, with the shop smelling of lemons, so it tasted a little of lemons too. Che bello.",
+      drink: "I put it in the cool corner beside the limoncino. Enzo has been told not to touch it. Enzo agreed.",
+      made: "It's on the shelf next to the lemon soap, and I'm sorry to say it smells even better.",
+      flower: "In a jug by the painted plates. Che profumo! Not lemons, for once, and I love them.",
+      other: "In the window now, so all of Monterosso can see. Everything here is somebody's cousin, and this is from my friend.",
+      letter: "Buongiorno, Mel! Your letter came from across the sea, and I read it by the door, in the sun, with a lemon in my other hand.",
+      news: ["The lemons by the sea came in enormous this month. Che profumo, the whole street.", "My cousin painted a new set of plates, with little boats this time. Enzo says boats are not lemons. I let him say it."],
+      back: "c_soap",
+      backNote: "A bar of the lemon soap. Smell it before you open the paper. Che profumo."
+    },
+    aldo: {
+      sign: "Aldo, Manarola",
+      food: "Ate it on the boat, coming in. The sea was flat. A good morning.",
+      drink: "It's in the boat shed. One evening, on the slipway, watching the light go.",
+      made: "Made carefully. Like a good coat of paint. It lasts.",
+      flower: "In a bucket by the boats. My wife saw them from the window. She knows whose they are.",
+      other: "Fifty years, and the sea brings me fish. The post brought me this. Better.",
+      letter: "Your letter came from across the sea. I read it on the slipway, between the boats.",
+      news: ["The anchovies came early. Silver, the whole sea. A good barrel.", "My boat is still blue. My wife still says it's ugly. Still blue."],
+      back: null,
+      backNote: ""
+    },
+    piero: {
+      sign: "Piero (the red boat, obviously)",
+      food: "I ate it on the harbour wall while Aldo did all the work. He says that's normal.",
+      drink: "I'm keeping it for when I catch more than Aldo. So, a special occasion. A very special occasion.",
+      made: "It's in the boat shed, on the shelf by the red paint. It's the best thing in there, after the red.",
+      flower: "They're in a bait tin on my boat, cleaned out first. The fish seem to like them. Or I've decided they do.",
+      other: "Aldo got nothing in the post. I've mentioned it to him. Several times.",
+      letter: "Your letter came from across the sea, and I read it out loud on the harbour wall. Aldo says I talk too much even in writing.",
+      news: ["I painted the boat again. Red. Redder than before. The fish are delighted.", "Beppe gave me the end of the onion focaccia. Still the best. Don't tell Monterosso."],
+      back: null,
+      backNote: ""
+    },
+    srossi: {
+      sign: "Rossi, stationmaster, Corniglia",
+      food: "I ate it in my office with an espresso, between a tunnel and a tunnel. Very civilised.",
+      drink: "It's in the office cupboard. I'll open it after the ten o'clock train, sitting down, not on the steps.",
+      made: "It's on my desk beside the timetable. It is much nicer to look at than the timetable.",
+      flower: "They're in the station window, facing the sea. Four and a half villages can see them on a clear day.",
+      other: "Something for the stationmaster. I counted it in, like a train. On time.",
+      letter: "Your letter came from across the sea, out of a tunnel and into my hands. I read it on the platform with an espresso.",
+      news: ["We had five whole villages from the platform on Thursday. Not four and a half. Five. I wrote it down.", "Franca has started giving me two bags of lemons a week. I have not told her. I am too polite."],
+      back: "lemon",
+      backNote: "A lemon from Franca's bag. I have many. Please, take it. Take another."
+    },
+    nino: {
+      sign: "Nino, in the piazza",
+      food: "I ate it at the café in the piazza, between bocce at eleven and bocce at three. Perfect timing.",
+      drink: "I'm keeping it for the evening I win every game. Sixty years, and it hasn't come yet. Soon.",
+      made: "It's on the café table where I sit. My friends are very jealous. Good.",
+      flower: "I put one in my buttonhole for bocce. I played very well. Coincidence? I don't think so.",
+      other: "Sixty years in this piazza, and I've seen everything. Now I've seen this.",
+      letter: "Your letter came from across the sea. I read it on the bench in the piazza, after lunch, before my sleep.",
+      news: ["Close to the little ball. Still the whole game. I'm getting better. I think.", "Siesta every day this month, and not one missed. Wisdom, you see."],
+      back: null,
+      backNote: ""
+    },
+    ilaria: {
+      sign: "Ilaria, on the counter",
+      food: "I ate it at the counter while Papà was asleep upstairs. There's always something left. This time it was mine.",
+      drink: "I'm keeping it for a summer evening on the harbour wall, after the shutters come down.",
+      made: "It's by the till now, next to the farinata. Everyone asks where it's from. I say: a friend over the sea.",
+      flower: "They're on the counter in a jar. Papà says they're in the way. He moved them somewhere better.",
+      other: "Something for me, and not for the shop. That never happens. I like it very much.",
+      letter: "Your letter came from across the sea, and I read it at the counter in the quiet after lunch, with a piece of onion focaccia.",
+      news: ["Papà is still not letting me touch the oven. I've been allowed to sweep in front of it. Progress.", "The onion focaccia sold out three days running. Nobody believes me."],
+      back: null,
+      backNote: ""
+    },
+    marta: {
+      sign: "Marta, from the basil terrace",
+      food: "I ate it on the terrace in the morning, before the sun got cross. Nonna Pina didn't see. I think.",
+      drink: "I'm keeping it for the end of the season, when the last basil's picked and the terrace can rest.",
+      made: "It's on the shelf in the shed by the terrace, beside the watering can. It smells better than everything else in there.",
+      flower: "I put them on the terrace with the basil. Nonna Pina checked every petal. Every single petal.",
+      other: "Nonna Pina inspected it like a leaf, and said it was good. That's the highest praise there is.",
+      letter: "Your letter came from across the sea, and I read it on the basil terrace, early, with the dew still on.",
+      news: ["Nonna Pina passed every leaf this week. Every single one. I didn't know what to do with myself.", "We went up to the woods for pine nuts. Nobody toasted them. Nobody fainted."],
+      back: "pinenuts",
+      backNote: "A little jar of pine nuts from the woods above the village. Don't toast them."
+    },
+    carla: {
+      sign: "Carla, the cantina, Corniglia",
+      food: "I had it in the cantina, among the barrels, very slowly. Small amounts. Like the sweet wine.",
+      drink: "Bruno says he will taste it. I say I will taste it. We will see who gets to the cork first.",
+      made: "It's on the cantina counter now. In the dark it glows a little, like the barrels.",
+      flower: "They're in a jar on the counter. In a room of barrels and raisins, they're the brightest thing.",
+      other: "Bruno talks to the vines. I talked to this, and it listened very nicely.",
+      letter: "Your letter came from across the sea, and I read it in the cool of the cantina, while I turned the raisins.",
+      news: ["The grapes for the sweet wine are on the racks now. I turn them every day. Bruno says he helps.", "A couple from far away bought six bottles of the white. They said they could taste the sea."],
+      back: "c_white",
+      backNote: "A bottle of the white from our terraces. Grown on a cliff, carried down. Taste the sea."
+    },
+    enzo: {
+      sign: "Enzo (labels, corks, boxes, agreeing)",
+      food: "I ate it in the back room, among the boxes, quietly. Franca was talking to customers. She didn't notice.",
+      drink: "It's in the freezer next to the limoncino. Small glass, after dinner. That's the rule.",
+      made: "It's on my bench with the labels. I keep it very straight. Franca checks.",
+      flower: "I put them on the counter. Not yellow. Franca looked at them for a long time, and then she agreed with me.",
+      other: "I don't often get something. I mostly do the boxes. It was very nice to open one.",
+      letter: "Your letter came from across the sea, and Franca let me read it first. That's never happened before.",
+      news: ["Six hundred labels this month. All straight. Franca checked.", "Franca bought a new lemon tablecloth. I dream in yellow. Now I eat in yellow too."],
+      back: "c_limoncino",
+      backNote: "A bottle of limoncino. I did the label myself. It's very straight."
+    },
+    sara: {
+      sign: "Sara (scooping, every day, both arms)",
+      food: "I ate it on the stool by the window on my break. Zio Gianni wanted some. I said lemon or basil first. He said basil.",
+      drink: "I'm keeping it for the end of summer, when I stop scooping and my arms can rest.",
+      made: "It's on the shelf by the wafers. Zio says it makes the shop look grown up.",
+      flower: "They're in a glass on the counter. One is yellow, so lemon is winning.",
+      other: "A present, for me, not for the shop. I showed everyone in the queue.",
+      letter: "Your letter came all the way from across the sea, and I read it on my break with a cone. Lemon, obviously.",
+      news: ["Zio says I'm the fastest scooper he's ever had. He's only had me.", "We're still arguing about lemon or basil. The tourists have started voting."],
+      back: null,
+      backNote: ""
+    },
+    lina: {
+      sign: "Lina, doing her rounds",
+      food: "I ate it on the train between Vernazza and Monterosso. In a tunnel, out a tunnel. Delicious every time.",
+      drink: "I put it in my satchel for the evening. It's done all five villages with me today.",
+      made: "It's in my satchel now, coming with me on my rounds. Bread, lemons, gelato and this.",
+      flower: "I carried them round all five villages before I put them in water. Everyone said good morning to them.",
+      other: "I showed it to Pina in Manarola. She said it was very nice. Pina doesn't say that.",
+      letter: "Your letter came from across the sea, and I read it on the train to Monterosso. I missed my stop. I got off at the next one. It's all walking.",
+      news: ["Seventy-eight, and I did all five villages on Tuesday. On foot, the whole way.", "Pina is still bossy. Some things never change, and I'm glad of it."],
+      back: null,
+      backNote: ""
+    }
+  };
+
   // src/game/contacts.js
   var D3 = 24 * 60 * 60 * 1e3;
-  var PEN = { ...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL };
+  var PEN = { ...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL, ...PEN_JL, ...PEN_RK, ...PEN_JC };
   var REGIONS2 = { bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre" };
   var POSTAGE = { bellbird: 2, coast: 2, tablelands: 4, lavender: 4, ronda: 8, kyoto: 8, jeju: 8, cinque: 8 };
   var DAYS3 = { 2: 1, 4: 2, 8: 3 };
-  var HELD = ["jason", "luca"];
+  var HELD = [];
   var REGION = {};
   [[BB_PEOPLE, "bellbird"], [CR_PEOPLE, "coast"], [TL_PEOPLE, "tablelands"], [LV_PEOPLE, "lavender"]].forEach(([list5, r]) => list5.forEach((p) => {
     REGION[p.id] = r;
@@ -34618,12 +35233,32 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var nm4 = (id) => {
     const it = ITEMS[id];
-    return it ? it.n.replace(/^(A|An|The) /, "").replace(/^./, (c) => c.toLowerCase()) : "present";
+    if (!it) return "present";
+    const n = it.n.replace(/^(A|An|The) /, "");
+    return /^\S+ [A-Z]/.test(n) ? n : n.replace(/^./, (c) => c.toLowerCase());
   };
   function replyBody(e) {
     const d = DEF[e.to], p = PEN[e.to], h3 = hash(e.id), first = (d.name || "").split(" ")[0];
     const fill2 = (s) => String(s || "").replace(/\{it\}/g, e.item ? nm4(e.item) : "letter");
     let body2;
+    if (p && p.own) {
+      const two = [p.news[h3 % p.news.length], p.news[(h3 + 1 + (h3 >> 3) % (p.news.length - 1)) % p.news.length]];
+      body2 = `${p.dear || "Dear Mel,"}
+
+${p.open[h3 % p.open.length]}
+
+${fill2(e.item ? p[giftKind(e.item)] || p.other : p.letter)}
+
+${two.join("\n\n")}`;
+      if (e.back && ITEMS[e.back]) body2 += `
+
+${p.backNote}`;
+      return `${body2}
+
+${p.sign}
+
+${p.ps[(h3 >> 2) % p.ps.length]}`;
+    }
     if (e.item) {
       const k = giftKind(e.item), line = p ? fill2(p[k] || p.other) : "";
       body2 = `Dear Mel,

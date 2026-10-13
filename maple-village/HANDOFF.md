@@ -2422,3 +2422,12 @@ plus her own words; campervan neighbours can be added too.
 - `data/pen-cr.js` (26: Coast Road locals and the eight travelling neighbours) and `data/pen-tl.js` (22 Tablelands locals), merged into `PEN` in contacts.js.
   All 102 campervan locals and neighbours now write back in their own voice (test "round 191" in the round 190 block).
 - Still to do (round 3): Ronda, Kyoto, Jeju, Cinque Terre; ask Mel about Jason and Luca first.
+
+## Round 192: address book voices abroad, and Jason and Luca
+- `data/pen-rk.js` (21: Ronda, Kyoto), `data/pen-jc.js` (25: Jeju, Cinque Terre), `data/pen-jl.js` (Jason and Luca, written for Mel).
+  Every trip local (150) now writes back in their own voice. `HELD` is empty: Mel wants Jason and Luca in the book.
+- Jason's letters are long-form (`own: true`): `dear`, one of `open`, his own gift/letter line (no "Thank you for the…" prefix),
+  two of `news`, sign, then a `ps`. Mel: "purple prose... semicolons... not pompous... lucid, literary... 'forgive my
+  presumption'... dry wit". Keep him joyful; his "departure gate" line is about harbours, never about death.
+- `towns.js` `c_jpoem`: a keepsake poem he folds in now and then (no shop, never sold).
+- `nm()` keeps place names capitalised ("Cinque Terre white").
