@@ -6,7 +6,6 @@
 // and then with a little something from their stop tucked in. Someone with no voice written yet writes a plain thank-you
 // with a P.S. from their own lines.
 // State: F.book = {ids: {id: dayAdded}, sent: [{id, to, item, open, text, at, back, got}]}
-// Jason and Luca are held out for now (Mel to decide, Cinque Terre's round).
 import { esc, now, hash } from "../util.js";
 import { ITEMS } from "../data/items.js";
 import { NPCS } from "../data/npcs.js";
@@ -18,14 +17,15 @@ import { PEN_LV } from "../data/pen-lv.js";
 import { PEN_BB } from "../data/pen-bb.js";
 import { PEN_CR } from "../data/pen-cr.js";
 import { PEN_TL } from "../data/pen-tl.js";
+import { PEN_JL } from "../data/pen-jl.js";
 
 const D = 24*60*60*1000;
-export const PEN = {...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL};   // round 191: the Coast Road and the Tablelands
+export const PEN = {...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL, ...PEN_JL};   // round 191: the Coast Road and the Tablelands
 export const REGIONS = {bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre"};
 // what a parcel costs to post, and how many days the reply takes (a letter's free)
 export const POSTAGE = {bellbird: 2, coast: 2, tablelands: 4, lavender: 4, ronda: 8, kyoto: 8, jeju: 8, cinque: 8};
 const DAYS = {2: 1, 4: 2, 8: 3};
-const HELD = ["jason", "luca"];
+const HELD = [];   // (round 192: Jason and Luca are in, with Mel's blessing)
 const REGION = {};
 [[BB_PEOPLE, "bellbird"], [CR_PEOPLE, "coast"], [TL_PEOPLE, "tablelands"], [LV_PEOPLE, "lavender"]].forEach(([list, r]) => list.forEach(p => { REGION[p.id] = r; }));
 NPCS.forEach(p => { if (["ronda", "kyoto", "jeju", "cinque"].includes(p.local)) REGION[p.id] = p.local; });
@@ -74,12 +74,19 @@ export function giftKind(id){
   if (/^(box|bar_|bonbon|choc|honey|jam|cake|cookie|tart|biscuit|pairbox|hamper)/.test(id) || /chocolate|bonbon|honey|jam|cake|biscuit|cookie|tart|nougat|fudge|bread|cheese|pie/i.test(it.n || "")) return "food";
   return "other";
 }
-const nm = id => { const it = ITEMS[id]; return it ? it.n.replace(/^(A|An|The) /, "").replace(/^./, c => c.toLowerCase()) : "present"; };
+// the gift's name, lower-cased to sit mid-sentence, but not a place name ("Cinque Terre white", "Provence soap")
+const nm = id => { const it = ITEMS[id]; if (!it) return "present"; const n = it.n.replace(/^(A|An|The) /, ""); return /^\S+ [A-Z]/.test(n) ? n : n.replace(/^./, c => c.toLowerCase()); };
 // the reply, in their own voice
 export function replyBody(e){
   const d = DEF[e.to], p = PEN[e.to], h = hash(e.id), first = (d.name || "").split(" ")[0];
   const fill = s => String(s || "").replace(/\{it\}/g, e.item ? nm(e.item) : "letter");
   let body;
+  if (p && p.own) {   // round 192: Jason writes long letters: an opening, his own lines, two bits of news, a P.S.
+    const two = [p.news[h % p.news.length], p.news[(h + 1 + (h >> 3) % (p.news.length - 1)) % p.news.length]];
+    body = `${p.dear || "Dear Mel,"}\n\n${p.open[h % p.open.length]}\n\n${fill(e.item ? (p[giftKind(e.item)] || p.other) : p.letter)}\n\n${two.join("\n\n")}`;
+    if (e.back && ITEMS[e.back]) body += `\n\n${p.backNote}`;
+    return `${body}\n\n${p.sign}\n\n${p.ps[(h >> 2) % p.ps.length]}`;
+  }
   if (e.item) {
     const k = giftKind(e.item), line = p ? fill(p[k] || p.other) : "";
     body = `Dear Mel,\n\nThank you for the ${nm(e.item)}! ${line || "It made my whole week, truly."}`;

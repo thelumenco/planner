@@ -629,6 +629,8 @@ Object.assign(TOWN_GOODS, {
   c_soap: {n: "Lemon soap", kind: "gift", to: "family", price: 5, shop: "ct_limoni", art: ["box", "#F3E7A0", "#F3D34A"], say: "Lemon soap! The whole bathroom smells like Italy now."},
   c_linen: {n: "Linen tea towel", kind: "gift", to: ["mum", "mama", "dad"], price: 8, shop: "ct_limoni", art: ["cloth", "#FFFDF6", "#F3D34A"], say: "A linen tea towel with lemons on it. Too nice to dry dishes with. I'll dry dishes with it."},
   c_anchovy: {n: "Monterosso anchovies in oil", kind: "gift", to: ["dad", "gonggong", "marcus"], price: 16, shop: "ct_limoni", art: ["box", "#9FC3D9", "#C9A27E"], say: "Monterosso anchovies! The best in Italy, they say. On toast, with butter."},
+  // round 192: tucked into Jason's letters now and then (never sold)
+  c_jpoem: {n: "A poem from Jason", kind: "keepsake", price: 0, art: ["tile", "#FFFDF6", "#2E3A5A"], line: "A poem in Jason's neat black hand, on paper from the stationer by the harbour, folded twice. Something about the houses going pink at six o'clock. It rhymes 'harbour' with 'arbour', and he's very pleased about it."},
   c_plate: {n: "Ceramic lemon plate", kind: "keepsake", price: 12, shop: "ct_limoni", art: ["disc", "#3E6BAE", "#F3D34A"], line: "A hand-painted plate from Monterosso, blue and yellow, with lemons and leaves all round the rim."},
   c_magnet: {n: "Cinque Terre fridge magnet", kind: "gift", to: "family", price: 3, shop: "ct_limoni", art: ["disc", "#E89A9A", "#4F9CC4"], say: "A tiny stack of coloured houses over a blue sea. For the fridge!"},
   c_boat: {n: "Your painted boat (model)", kind: "keepsake", price: 0, art: ["box", "#3E6BAE", "#F3D98A"], line: "A little model of the fishing boat you helped paint in Manarola, with its name on the side in Evan's letters."}
