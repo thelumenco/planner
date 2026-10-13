@@ -58,10 +58,10 @@ export function postTo(F, to, {item = null, open = "", text = ""} = {}, at = now
     const cost = postage(to); if ((F.coins || 0) < cost) return {err: `Postage is ${cost} coins.`};
     F.coins -= cost; F.inv[item]--; if (F.inv[item] <= 0) delete F.inv[item];
   } else if (!open && !String(text).trim()) return {err: "Write a few words first."};
-  const days = DAYS[postage(to)] || 2, p = PEN[to], h = hash(to + at);
-  const e = {id: `post-${to}-${at}`, to, item: item || null, open, text: String(text).trim().slice(0, 400), at: at + days*D,
+  const days = DAYS[postage(to)] || 2, p = PEN[to], b = bookState(F), h = hash(to + at + b.sent.length);
+  const e = {id: `post-${to}-${at}-${b.sent.length}`, to, item: item || null, open, text: String(text).trim().slice(0, 400), at: at + days*D,
     back: item && p && p.back && ITEMS[p.back] && h % 5 === 0 ? p.back : null};   // about one parcel in five comes back with a little something
-  const b = bookState(F); b.sent = [...b.sent, e].slice(-60); return e;
+  b.sent = [...b.sent, e].slice(-60); return e;
 }
 // what kind of thing a gift is, for which thank-you line they write
 export function giftKind(id){
@@ -98,19 +98,20 @@ export const onTheWay = (F, t = now()) => bookState(F).sent.filter(e => e.at > t
 const lastTo = (F, id) => { const s = bookState(F).sent.filter(e => e.to === id); return s[s.length - 1]; };
 
 /* ---------- the book, in the mail tab ---------- */
+const ROW = "display:flex;align-items:center;gap:10px";
 // st = {open: id being written to, letter: {open, text}, more: show the met list}
 export function bookHTML(F, st, t = now()){
   const list = contacts(F), add = addable(F), way = onTheWay(F, t);
   let h = `<h2 style="margin-top:18px">Address book</h2><p class="muted">People you've met on your travels. Post them a letter (free) or a gift from your backpack (tap it there, then "By post"). Replies come back in a day or three.${way ? ` ${way} on the way.` : ""}</p>`;
   h += list.length ? `<ul class="qlist book">${list.map(id => { const d = DEF[id], l = lastTo(F, id);
-    return `<li><span></span><span class="wtxt"><b>${esc(d.name)}</b><small>${esc(d.job || "")} · ${REGIONS[REGION[id]]}${l ? ` · last: ${l.item ? nm(l.item) : "a letter"}` : ""}</small></span><span class="orbtns"><button class="btn small alt" data-bk="write:${id}">Write</button><button class="btn small alt" data-bk="del:${id}" aria-label="Take ${esc(d.name)} out of your address book">×</button></span></li>`
+    return `<li style="${ROW}"><span class="wtxt" style="flex:1"><b>${esc(d.name)}</b><small>${esc(d.job || "")} · ${REGIONS[REGION[id]]}${l ? ` · last: ${l.item ? nm(l.item) : "a letter"}` : ""}</small></span><span class="orbtns" style="display:flex;gap:6px;flex-shrink:0"><button class="btn small alt" data-bk="write:${id}">Write</button><button class="btn small alt" data-bk="del:${id}" aria-label="Take ${esc(d.name)} out of your address book">×</button></span></li>`
       + (st.open === id ? writeHTML(id, st.letter || {}) : ""); }).join("")}</ul>` : `<p class="muted">Nobody yet.</p>`;
-  if (add.length) h += st.more ? `<p class="eyebrow" style="margin:12px 0 6px">Met on your travels</p><ul class="qlist book">${add.sort((a, b) => DEF[a].name.localeCompare(DEF[b].name)).map(id => `<li><span></span><span class="wtxt"><b>${esc(DEF[id].name)}</b><small>${esc(DEF[id].job || "")} · ${REGIONS[REGION[id]]}</small></span><span class="orbtns"><button class="btn small alt" data-bk="add:${id}">Add</button></span></li>`).join("")}</ul><div class="actions"><button class="btn small alt" data-bk="less">Hide</button></div>`
+  if (add.length) h += st.more ? `<p class="eyebrow" style="margin:12px 0 6px">Met on your travels</p><ul class="qlist book">${add.sort((a, b) => DEF[a].name.localeCompare(DEF[b].name)).map(id => `<li style="${ROW}"><span class="wtxt" style="flex:1"><b>${esc(DEF[id].name)}</b><small>${esc(DEF[id].job || "")} · ${REGIONS[REGION[id]]}</small></span><span class="orbtns" style="flex-shrink:0"><button class="btn small alt" data-bk="add:${id}">Add</button></span></li>`).join("")}</ul><div class="actions"><button class="btn small alt" data-bk="less">Hide</button></div>`
     : `<div class="actions"><button class="btn small alt" data-bk="more">Add someone you've met (${add.length})</button></div>`;
   return h;
 }
 function writeHTML(id, l){
-  return `<li class="bkwrite"><div style="grid-column:1/-1"><p class="muted">A letter to ${esc(DEF[id].name)}. Start with one of these, add your own words, or both.</p>
+  return `<li class="bkwrite" style="display:block"><div><p class="muted">A letter to ${esc(DEF[id].name)}. Start with one of these, add your own words, or both.</p>
     <div class="gchips">${OPENINGS.map(o => `<button class="gchip${l.open === o ? " on" : ""}" data-bk="open:${esc(o)}">${esc(o)}</button>`).join("")}</div>
     <textarea id="bkText" maxlength="400" rows="3" placeholder="Your own words (optional)" style="width:100%;margin-top:8px">${esc(l.text || "")}</textarea>
     <div class="actions"><button class="btn small primary" data-bk="send:${id}">Post it (free)</button><button class="btn small alt" data-bk="cancel">Cancel</button></div></div></li>`;

@@ -4164,7 +4164,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
 }
 {
   console.log("\nThe address book: post gifts and letters to people met on trips (round 190)");
-  const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
+  await import(new URL("../src/game/ronda.js", import.meta.url)); const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
   const T = Date.UTC(2026, 9, 14, 3), D = 864e5;
   const F = {coins: 10, inv: {box4: 2}, met: {lvemile: true, lvpainter: true, jason: true, hana: true}};
   check(bk.canAdd(F, "lvemile") && !bk.canAdd(F, "lvpainter") && !bk.canAdd(F, "jason") && !bk.canAdd(F, "hana") && !bk.canAdd(F, "lvmargaux"), "only people met on a trip, not day-trippers, not village folk");

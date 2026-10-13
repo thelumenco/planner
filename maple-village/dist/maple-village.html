@@ -2072,6 +2072,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
           <h2 id="mailSum">Letters</h2>
           <ul class="qlist mail" id="mailList"></ul>
           <p class="muted">Notes from your helpers. A messenger runs each new one over to you.</p>
+          <div id="bookBox"></div>
         </div>
       </section>
     </div>
@@ -15762,18 +15763,18 @@ ${r.n}`;
     const used = new Set([...v.cellar, ...v.shelf].map((x) => x.name.toLowerCase())), st6 = b.style, seed2 = Math.floor(b.start || 0) + slot6 * 7919, out = [];
     for (let k = 0; out.length < 12 && k < 200; k++) {
       const kind = k % 3, w = W_WORD[st6][(seed2 + k) % W_WORD[st6].length];
-      const nm5 = kind === 0 ? `${W_PLACE[(seed2 + k * 5) % W_PLACE.length]} ${w}` : kind === 1 ? `${W_WHO[(seed2 + k * 3) % W_WHO.length]} ${W_PLACE[(seed2 + k * 7 + 3) % W_PLACE.length]}` : W_FR[st6][(seed2 + k) % W_FR[st6].length] + (k > 8 ? ` ${(/* @__PURE__ */ new Date()).getFullYear()}` : "");
-      if (!used.has(nm5.toLowerCase()) && !out.includes(nm5)) out.push(nm5);
+      const nm6 = kind === 0 ? `${W_PLACE[(seed2 + k * 5) % W_PLACE.length]} ${w}` : kind === 1 ? `${W_WHO[(seed2 + k * 3) % W_WHO.length]} ${W_PLACE[(seed2 + k * 7 + 3) % W_PLACE.length]}` : W_FR[st6][(seed2 + k) % W_FR[st6].length] + (k > 8 ? ` ${(/* @__PURE__ */ new Date()).getFullYear()}` : "");
+      if (!used.has(nm6.toLowerCase()) && !out.includes(nm6)) out.push(nm6);
     }
     return out;
   }
   function bottle(F2, slot6, name) {
     const v = vineState(F2), b = v.barrels[slot6];
     if (!b || barrelLeft(b) || b.style === "sparkling" && b.stage !== 2) return null;
-    const nm5 = plain(String(name || "")).trim().slice(0, 30) || wineNames(F2, slot6)[0] || `Maple's ${STYLES2[b.style].n}`;
-    v.cellar.push({ id: "w" + Date.now().toString(36), name: nm5, type: b.style, n: BOTTLES });
+    const nm6 = plain(String(name || "")).trim().slice(0, 30) || wineNames(F2, slot6)[0] || `Maple's ${STYLES2[b.style].n}`;
+    v.cellar.push({ id: "w" + Date.now().toString(36), name: nm6, type: b.style, n: BOTTLES });
     v.barrels[slot6] = null;
-    return `${BOTTLES} bottles of ${nm5}, into the cellar. Stock them on the shop shelves.`;
+    return `${BOTTLES} bottles of ${nm6}, into the cellar. Stock them on the shop shelves.`;
   }
   var RIDDLE = { day: 2, max: 5 };
   var riddleDays = (c, now5 = Date.now()) => c && c.rack ? Math.min(RIDDLE.max, Math.floor((now5 - c.rack) / (24 * H))) : 0;
@@ -17390,10 +17391,10 @@ ${r.n}`;
   }
   var flowers = (pts) => pts.map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="2.6" style="fill:${c}"/><circle cx="${x}" cy="${y}" r="1" fill="#FFF6D8"/>`).join("");
   function villageArt() {
-    const D3 = VILLAGE;
+    const D4 = VILLAGE;
     const ground5 = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="120" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="420" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="200" cy="560" rx="80" ry="40" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M250 300 C226 250 ${D3.hall.door[0]} 236 ${D3.hall.door[0]} ${D3.hall.door[1]} M276 298 C300 250 ${D3.bank.door[0]} 232 ${D3.bank.door[0]} ${D3.bank.door[1]} M220 320 C180 330 120 350 ${D3.fresh.door[0]} ${D3.fresh.door[1]} M260 322 C200 380 120 430 ${D3.news.door[0]} ${D3.news.door[1]} M260 322 C320 380 410 420 ${D3.post.door[0]} ${D3.post.door[1]} M290 316 C350 290 400 250 ${D3.toLane.door[0]} ${D3.toLane.door[1]} M260 322 L260 ${D3.toBase.door[1]} M260 540 C290 560 310 570 ${D3.bench.door[0]} ${D3.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M250 300 C226 250 ${D4.hall.door[0]} 236 ${D4.hall.door[0]} ${D4.hall.door[1]} M276 298 C300 250 ${D4.bank.door[0]} 232 ${D4.bank.door[0]} ${D4.bank.door[1]} M220 320 C180 330 120 350 ${D4.fresh.door[0]} ${D4.fresh.door[1]} M260 322 C200 380 120 430 ${D4.news.door[0]} ${D4.news.door[1]} M260 322 C320 380 410 420 ${D4.post.door[0]} ${D4.post.door[1]} M290 316 C350 290 400 250 ${D4.toLane.door[0]} ${D4.toLane.door[1]} M260 322 L260 ${D4.toBase.door[1]} M260 540 C290 560 310 570 ${D4.bench.door[0]} ${D4.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
     ${flowers([[30, 262, "#EFA3A6"], [44, 270, "#F3C969"], [60, 214, "#C3CDEE"], [300, 214, "#EFA3A6"], [488, 270, "#F3C969"], [300, 448, "#EFA3A6"], [214, 450, "#C3CDEE"], [470, 540, "#C3CDEE"], [20, 430, "#F3C969"], [505, 380, "#EFA3A6"]])}
     ${tree(26, 96, 1.05)}${tree(494, 96, 1.05)}${tree(24, 350, 0.9)}${tree(498, 330, 0.9)}${tree(504, 520, 0.85)}${tree(190, 470, 0.8)}${tree(330, 470, 0.8)}
@@ -17471,7 +17472,7 @@ ${r.n}`;
     ${tapeLabel(132, 146, "Paddleboards", "var(--sky)", 10)}</g>`;
   }
   function baseArt() {
-    const D3 = VILLAGE;
+    const D4 = VILLAGE;
     const grown = (G2.F().plots || []).filter((p) => p && p.crop).length;
     const sprouts = Array.from({ length: Math.min(6, grown) }, (_, i) => {
       const x = 58 + i % 3 * 44, y = 430 + Math.floor(i / 3) * 24;
@@ -17483,7 +17484,7 @@ ${r.n}`;
     <g filter="url(#wob)">${waterBand(40, 98)}<path d="M478 94 C470 180 500 300 474 420 C464 470 468 510 452 540" fill="none" style="stroke:var(--water)" stroke-width="14" stroke-linecap="round"/></g>
     ${ripples2([[60, 66], [150, 78], [350, 62], [420, 80]])}${ducks(76, false, 20)}
     <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 44 Q65 36 130 43 T260 42 T390 44 T520 40 M0 100 Q65 104 130 95 T260 98 T390 96 T520 102"/></g>
-    <g filter="url(#wob)"><path d="M260 112 L260 ${D3.home.door[1]} M260 326 C200 360 130 420 ${D3.farm.door[0]} ${D3.farm.door[1]} M260 326 C290 420 300 500 ${D3.pond.door[0]} ${D3.pond.door[1]} M266 312 C330 300 390 290 ${D3.shed.door[0]} ${D3.shed.door[1]} M254 318 C200 320 150 320 ${D3.swing.door[0]} ${D3.swing.door[1]} M290 500 C270 552 240 566 ${D3.run.door[0]} ${D3.run.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M260 112 L260 ${D4.home.door[1]} M260 326 C200 360 130 420 ${D4.farm.door[0]} ${D4.farm.door[1]} M260 326 C290 420 300 500 ${D4.pond.door[0]} ${D4.pond.door[1]} M266 312 C330 300 390 290 ${D4.shed.door[0]} ${D4.shed.door[1]} M254 318 C200 320 150 320 ${D4.swing.door[0]} ${D4.swing.door[1]} M290 500 C270 552 240 566 ${D4.run.door[0]} ${D4.run.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
       <ellipse cx="260" cy="322" rx="44" ry="20" style="fill:var(--path)"/></g>
     ${flowers([[30, 140, "#EFA3A6"], [44, 150, "#F3C969"], [200, 140, "#C3CDEE"], [330, 150, "#EFA3A6"], [488, 180, "#F3C969"], [214, 410, "#EFA3A6"], [200, 470, "#C3CDEE"], [160, 600, "#F3C969"], [176, 612, "#EFA3A6"], [300, 620, "#C3CDEE"], [24, 520, "#F3C969"], [372, 600, "#EFA3A6"], [400, 170, "#C3CDEE"]])}
     ${tree(26, 370, 0.9)}${tree(500, 610, 0.9)}${tree(26, 620, 0.95)}${tree(360, 180, 0.8)}`;
@@ -17560,10 +17561,10 @@ ${r.n}`;
       if (!h3) return "";
       return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h3.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L2[h3.status]}"/></g>`;
     };
-    const D3 = VILLAGE;
+    const D4 = VILLAGE;
     const ground5 = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D3.chico.door[0]} ${D3.chico.door[1]} M150 336 L${D3.chord.door[0]} ${D3.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D3.luna.door[0]} ${D3.luna.door[1]} M262 420 C300 470 340 500 ${D3.ohayo.door[0]} ${D3.ohayo.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D4.chico.door[0]} ${D4.chico.door[1]} M150 336 L${D4.chord.door[0]} ${D4.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D4.luna.door[0]} ${D4.luna.door[1]} M262 420 C300 470 340 500 ${D4.ohayo.door[0]} ${D4.ohayo.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[40, 200, "#EFA3A6"], [60, 214, "#F3C969"], [480, 330, "#C3CDEE"], [300, 420, "#EFA3A6"], [200, 600, "#F3C969"], [90, 560, "#C3CDEE"], [460, 600, "#EFA3A6"], [330, 250, "#F3C969"]])}
     ${tree(70, 120, 1)}${tree(220, 80, 0.9)}${tree(490, 110, 1)}${tree(40, 620, 0.95)}${tree(490, 620, 0.9)}${tree(470, 430, 0.85)}${tree(60, 440, 0.9)}`;
     const gate6 = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
@@ -18510,11 +18511,11 @@ ${r.n}`;
     st6.forEach((s) => {
       if (s.kind === "millcrate" && !(G2.millCrate && G2.millCrate())) return;
       if (s.kind === "hampertable" && !(G2.xmasSeason && G2.xmasSeason())) return;
-      const nm5 = s.kind === "millcrate" ? "" : s.kind === "pedestal" ? (G2.ped && G2.ped(s.x, s.y) || {}).label || "" : s.kind === "vaultjar" ? (() => {
+      const nm6 = s.kind === "millcrate" ? "" : s.kind === "pedestal" ? (G2.ped && G2.ped(s.x, s.y) || {}).label || "" : s.kind === "vaultjar" ? (() => {
         const j = G2.vault && G2.vault(s.x);
         return j ? j.label : "Empty";
       })() : s.name;
-      h3 += `<g data-spot="${s.id}" aria-label="${s.name || (nm5 ? "Trophy: " + nm5 : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm5 ? s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm5, "var(--card)") : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm5.length > 10 ? nm5.slice(0, 9) + "…" : nm5, "var(--card)", 9.5) : s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm5.length > 15 ? nm5.slice(0, 14).trim() + "…" : nm5, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm5.length > 24 ? nm5.slice(0, 23) + "…" : nm5, "var(--card)") : ""}</g>`;
+      h3 += `<g data-spot="${s.id}" aria-label="${s.name || (nm6 ? "Trophy: " + nm6 : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm6 ? s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm6, "var(--card)") : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm6.length > 10 ? nm6.slice(0, 9) + "…" : nm6, "var(--card)", 9.5) : s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm6.length > 15 ? nm6.slice(0, 14).trim() + "…" : nm6, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm6.length > 24 ? nm6.slice(0, 23) + "…" : nm6, "var(--card)") : ""}</g>`;
     });
     if (id === "kidroom") {
       const k = G2.kid ? G2.kid() : {};
@@ -21264,9 +21265,9 @@ ${r.n}`;
       if (next) subOpen.add(next.key);
     }
     const row7 = (x) => {
-      const op = subOpen.has(x.key), has2 = x.info && x.info.length, nm5 = `${esc(x.title)}${x.est ? ` <small>${esc(x.est)}</small>` : ""}${x === next ? ` <em>up next</em>` : ""}`;
+      const op = subOpen.has(x.key), has2 = x.info && x.info.length, nm6 = `${esc(x.title)}${x.est ? ` <small>${esc(x.est)}</small>` : ""}${x === next ? ` <em>up next</em>` : ""}`;
       return `<li class="sub${x.done ? " done" : ""}${x === next ? " upnext" : ""}"><button class="subtick" data-nb="sub" data-k="${esc(x.key)}" role="checkbox" aria-checked="${x.done}" aria-label="${esc(x.title)}"></button>
-      <div class="subtxt">${has2 ? `<button class="subname" data-nb="subopen" data-k="${esc(x.key)}" aria-expanded="${op}">${nm5}</button>` : `<span class="subname">${nm5}</span>`}
+      <div class="subtxt">${has2 ? `<button class="subname" data-nb="subopen" data-k="${esc(x.key)}" aria-expanded="${op}">${nm6}</button>` : `<span class="subname">${nm6}</span>`}
       ${has2 && op ? `<ul class="subinfo">${x.info.map((l) => `<li>${linkify(l)}</li>`).join("")}</ul>` : ""}</div></li>`;
     };
     return `<div class="nbsubs"><p class="nblbl">Subtasks <span class="subcount">${done.length} of ${list5.length} done</span></p>
@@ -23684,7 +23685,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   }
   var dots = (days) => `<span class="rvdots">${days.map((d, i) => `<i class="${d === true ? "on" : d === false ? "off" : "na"}" title="${WD2[i]}">${WD2[i]}</i>`).join("")}</span>`;
   function reviewPanel(F2, c) {
-    const w = gather(c), rev = (F2.reviews || {})[w.ws], nm5 = nextMonday(c.today), fri = (/* @__PURE__ */ new Date(c.today + "T00:00:00Z")).getUTCDay() === 5;
+    const w = gather(c), rev = (F2.reviews || {})[w.ws], nm6 = nextMonday(c.today), fri = (/* @__PURE__ */ new Date(c.today + "T00:00:00Z")).getUTCDay() === 5;
     if (!rw.draft || rw.draft.ws !== w.ws) rw.draft = { ws: w.ws, p: rev ? rev.priorities.slice() : ["", "", ""] };
     let h3 = `<span class="tape dots" aria-hidden="true"></span><h2>Your week in the village</h2>
     <p class="sub">${fmtDay(w.days[0])} to ${fmtDay(w.days[6])}${fri ? ". Happy Friday! Here's everything you did." : ". The week so far."}</p><div class="rvgrid">`;
@@ -23702,7 +23703,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     h3 += `</div>` + card3("This week's objectives", I2.goal, !c.canSend ? `<p class="rvnote">Connect Sunsama to see your weekly objectives here.</p>` : rw.objErr && !ob ? `<p class="rvnote">Couldn't reach Sunsama just now.</p>` : !ob ? `<p class="rvnote">Fetching them from Sunsama…</p>` : !ob.length ? `<p class="rvnote">No weekly objectives set in Sunsama this week.</p>` : `<ul class="rvobj">${ob.map((o) => `<li class="${o.done ? "done" : ""}"><span class="rvtick" aria-hidden="true"></span>${esc(o.title)}</li>`).join("")}</ul><p class="rvnote">${ob.filter((o) => o.done).length} of ${ob.length} done${ob.every((o) => o.done) ? ". Every one! That's a rosette in the courtyard." : "."}</p>`, "sky wide");
     const sent = rev && rev.sent && rev.sent.some(Boolean);
     h3 += `<section class="rvcard rvnext"><span class="rvtape butter" aria-hidden="true"></span><h3>${I2.star}Next week's three priorities</h3>
-    <p class="rvnote">Week of ${fmtDay(nm5)}. ${c.canSend ? "They go to Sunsama as next week's weekly objectives." : "Saved here (Sunsama isn't connected)."}</p>
+    <p class="rvnote">Week of ${fmtDay(nm6)}. ${c.canSend ? "They go to Sunsama as next week's weekly objectives." : "Saved here (Sunsama isn't connected)."}</p>
     <ol class="rvprio">${[0, 1, 2].map((i) => {
       const ok = rev && rev.sent && rev.sent[i];
       return `<li><label class="sr" for="rvP${i}">Priority ${i + 1}</label><input id="rvP${i}" class="rvp" data-i="${i}" maxlength="120" placeholder="${["The one that matters most", "Then this", "And this"][i]}" value="${esc(rw.draft.p[i] || "")}" ${ok ? "disabled" : ""}>${ok ? `<span class="rvok" title="In Sunsama">in Sunsama</span>` : ""}</li>`;
@@ -23723,7 +23724,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
         api4.rerender();
         return;
       }
-      const ws = weekStart(api4.today), nm5 = nextMonday(api4.today), pr = rw.draft.p.map((x) => plain(String(x || "")).trim().slice(0, 120));
+      const ws = weekStart(api4.today), nm6 = nextMonday(api4.today), pr = rw.draft.p.map((x) => plain(String(x || "")).trim().slice(0, 120));
       if (!pr.some(Boolean)) {
         api4.say("Pop in at least one priority for next week first.");
         return;
@@ -23733,7 +23734,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       if (api4.canSend) {
         rw.sending = true;
         api4.rerender();
-        for (let i = 0; i < 3; i++) if (pr[i] && !rev.sent[i]) rev.sent[i] = await createObjective(pr[i], nm5);
+        for (let i = 0; i < 3; i++) if (pr[i] && !rev.sent[i]) rev.sent[i] = await createObjective(pr[i], nm6);
         rw.sending = false;
       }
       if (first) api4.coins(15);
@@ -27657,8 +27658,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const sd = Math.floor(seed2) + h3.names.length * 31 + Object.keys(CHEESES).indexOf(kind) * 7;
     for (let k = 0; out.length < 12 && k < 200; k++) {
       const w = c.words[(sd + k) % c.words.length], a = from[(sd + k * 3) % from.length].n, kind3 = k % 3;
-      const nm5 = kind3 === 0 ? `${C_PLACE[(sd + k * 5) % C_PLACE.length]} ${w}` : kind3 === 1 ? `${a}'s ${C_PLACE[(sd + k * 7 + 2) % C_PLACE.length]} ${w}` : (C_FR[kind] || [`${C_PLACE[(sd + k * 3) % C_PLACE.length]} ${c.n.split(" ").pop()}`])[(sd + k) % (C_FR[kind] || [0]).length];
-      if (!used.has(nm5.toLowerCase()) && !out.includes(nm5)) out.push(nm5);
+      const nm6 = kind3 === 0 ? `${C_PLACE[(sd + k * 5) % C_PLACE.length]} ${w}` : kind3 === 1 ? `${a}'s ${C_PLACE[(sd + k * 7 + 2) % C_PLACE.length]} ${w}` : (C_FR[kind] || [`${C_PLACE[(sd + k * 3) % C_PLACE.length]} ${c.n.split(" ").pop()}`])[(sd + k) % (C_FR[kind] || [0]).length];
+      if (!used.has(nm6.toLowerCase()) && !out.includes(nm6)) out.push(nm6);
     }
     return out;
   }
@@ -27668,10 +27669,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!c || c.lvl && levelOf(h3) < c.lvl || c.learn && !(h3.learnt || {})[kind] || h3.cave.length >= caveSize(h3) || (inv[c.milk] || 0) < c.need) return null;
     inv[c.milk] -= c.need;
     if (!inv[c.milk]) delete inv[c.milk];
-    const nm5 = String(name || "").replace(/[<>&"]/g, "").trim().slice(0, 30) || cheeseNames(F2, kind, clock2() / 864e5)[0] || c.n, t2 = clock2();
-    const w = { kind, name: nm5, start: t2, done: t2 + c.days * 864e5 };
+    const nm6 = String(name || "").replace(/[<>&"]/g, "").trim().slice(0, 30) || cheeseNames(F2, kind, clock2() / 864e5)[0] || c.n, t2 = clock2();
+    const w = { kind, name: nm6, start: t2, done: t2 + c.days * 864e5 };
     h3.cave.push(w);
-    h3.names = [...h3.names, nm5].slice(-60);
+    h3.names = [...h3.names, nm6].slice(-60);
     return w;
   }
   function takeWheel(F2, i) {
@@ -33271,6 +33272,824 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var tablelandsRoomArt = (scene2) => (ROOMS5[scene2] || cafeRoom3)();
 
+  // src/data/pen-lv.js
+  var PEN_LV = {
+    /* ---------- Lavender Ridge ---------- */
+    lvemile: {
+      sign: "Émile, from the still",
+      food: "I ate it on the bench at the top of the rows, with the bees for company. They wanted some too.",
+      drink: "I will open it in the evening, when the still has gone quiet and the hill is cool.",
+      made: "Made by hand, the slow way. That is the only way worth anything.",
+      flower: "Flowers for a flower farmer. Margaux laughed, but I put them in the window all the same.",
+      other: "I have put it on the shelf above the still, where my grandfather kept his good things.",
+      letter: "Your letter came while I was cutting the far rows. I read it twice, sitting in the lavender.",
+      news: ["The last of the harvest is in. The still ran for nine days without a single complaint.", "The rows are cut back now and resting. Lavender is patient. So am I, mostly."],
+      back: "b_lavbunch",
+      backNote: "A dried bunch from the far rows, to hang over your door."
+    },
+    lvmargaux: {
+      sign: "Bisous, Margaux",
+      food: "I hid it under the counter so Papa wouldn't find it. He found it.",
+      drink: "We shared it after closing, with the door open and the whole hill smelling of lavender.",
+      made: "I have put it on the shop shelf for a day, just to show everyone what good taste you have.",
+      flower: "Something that isn't lavender, for once. I love them, and the shop is very jealous.",
+      other: "It sits by the till now, and I tell every customer it came from a friend far away.",
+      letter: "The postman brought your letter to the farm shop, and I read it between customers.",
+      news: ["Papa gave away free bunches to a whole coach of tourists. He grumbled the entire time.", "We have a new lavender soap, a little stronger. I keep one in every drawer."],
+      back: "b_lavbags",
+      backNote: "Little lavender bags for your drawers. Papa tied the ribbons himself, very badly."
+    },
+    lvhelene: {
+      sign: "With love from the tea room, Hélène",
+      food: "I had it with a pot of tea at the best window on the hill. The view was free, as always.",
+      drink: "I have saved it for a quiet afternoon, when the scones are done and the room is empty.",
+      made: "It is on the little shelf by the door now, between the teapots. It looks very at home.",
+      flower: "They are in a jug on the window table, and everyone who sits there asks about them.",
+      other: "Such a kind thought. I keep it by the till, where I can see it while I pour.",
+      letter: "Your letter arrived with the morning milk, and I read it with my first cup of tea.",
+      news: ["I have tried a scone with a little honey from Sunflower Hill. Only a little.", "The lemonade is still pink, and the children still think it is magic."],
+      back: null,
+      backNote: ""
+    },
+    /* ---------- Montrose ---------- */
+    lvlise: {
+      sign: "Lise, from your paperie",
+      food: "I ate it behind the counter, carefully, so not a crumb went near the good paper.",
+      drink: "I have put it by for Saturday, after the class has gone home and the lanes are quiet.",
+      made: "Handmade things always find each other. It sits on the shelf with the seeded paper now.",
+      flower: "I pressed one between two sheets of the sage paper. The rest are in a jar by the window.",
+      other: "I have set it in the window of your paperie, so the whole lane can admire it.",
+      letter: "Your letter came on paper I recognised. I may have smiled at that for some time.",
+      news: ["The seeded paper sold out again. I have hung a new batch, and the sage is still my favourite.", "Saturday's class was full, and one little girl made a card for her teacher with all the gold flecks."],
+      back: "k_crane",
+      backNote: "Some paper cranes, folded from the offcuts. They turn nicely in a breeze."
+    },
+    lvbernard: {
+      sign: "Bernard, la boulangerie",
+      food: "I ate it on my bench in the square after the morning bake. Very good. Not as good as bread, but very good.",
+      drink: "I will have a glass with my supper, and then sleep very well before the four o'clock start.",
+      made: "Made with the hands, like bread. I respect this very much.",
+      flower: "I have put them in the shop window, between the baguettes. The queue approves.",
+      other: "It is on the shelf behind the counter now, where the flour cannot reach it. Mostly.",
+      letter: "Your letter came after the morning rush. I read it with a croissant, which is how all letters should be read.",
+      news: ["Fifty-one years and still I have not missed a morning. The oven is older than me and just as stubborn.", "The fougasse sold out before nine on Saturday. I have started making two batches."],
+      back: "b_fougasse",
+      backNote: "A fougasse from this morning's oven. It was warm when it left."
+    },
+    lvroux: {
+      sign: "Madame Roux, nougat de Montrose",
+      food: "I ate it slowly, between stirs. Do not tell anyone a nougat maker likes other sweets.",
+      drink: "I have saved it for a Tuesday. Tuesdays deserve something nice, like calissons.",
+      made: "A thing made carefully, by someone patient. I know how much stirring that takes.",
+      flower: "They sit on the counter beside the big slab of nougat, and the shop smells like a garden.",
+      other: "Very kind. It sits by my big knife now, where I look every day.",
+      letter: "Your letter arrived in the middle of a batch, so I read it one stir at a time.",
+      news: ["The almonds from my brother came in this week, the best yet.", "I made calissons for a wedding in the square. And a few extra, for Tuesday."],
+      back: "b_calissons",
+      backNote: "A little box of calissons, the almond ones you liked."
+    },
+    lvpaul: {
+      sign: "Paul, Café de la Place",
+      food: "I ate it at the corner table, watching the pétanque. Pagnol won, naturally.",
+      drink: "I will pour a glass for myself after closing. Sugar on the side, as always.",
+      made: "It is behind the bar now, and every regular has asked about it. You are the gossip of the village.",
+      flower: "They are on the outside tables. Inside is for the rain, and flowers deserve the square.",
+      other: "It sits by the coffee machine now, so I see it every time I make an espresso.",
+      letter: "Your letter came with the morning papers, and I read it outside under the plane trees.",
+      news: ["Pagnol has still not lost since March. Fernand says next week. Fernand always says next week.", "The plane trees are turning gold, and we moved two tables into the sun."],
+      back: null,
+      backNote: ""
+    },
+    lvpagnol: {
+      sign: "Pagnol, champion of Montrose",
+      food: "I ate it before my game. Then I won. Coincidence? Perhaps not.",
+      drink: "I will share it with Fernand, to console him. He will need consoling.",
+      made: "Fine work. Steady hands. You would make a good pétanque player.",
+      flower: "I put them on the bench by the piste. Fernand says they are for his victory. Fernand dreams.",
+      other: "I keep it in my pocket with my lucky boule cloth. It is lucky now too.",
+      letter: "Paul brought your letter out to the piste. I read it between throws and still won.",
+      news: ["Still unbeaten since March. Fernand came very close on Thursday. Very close, for Fernand.", "We have a new player, a young man of seventy. He bends the knees beautifully."],
+      back: null,
+      backNote: ""
+    },
+    lvfernand: {
+      sign: "Fernand (who will beat Pagnol one day)",
+      food: "I ate it on the bench while Pagnol practised. It was the best part of my afternoon.",
+      drink: "I am saving it for the day I beat Pagnol. So perhaps I will drink it this year.",
+      made: "Very fine. It is the nicest thing anyone has given me since I started losing.",
+      flower: "I have put them by the piste for luck. I need luck. Pagnol does not, apparently.",
+      other: "It sits on my mantelpiece now, next to the space where a trophy will one day go.",
+      letter: "Your letter came, and for one whole afternoon I did not think about pétanque at all. Almost.",
+      news: ["I lost by one point on Thursday. One point. Pagnol says it was more. Pagnol counts badly.", "I have new boules. Shinier. They have not helped, but they look wonderful."],
+      back: null,
+      backNote: ""
+    },
+    /* ---------- Rosehill ---------- */
+    lvarnaud: {
+      sign: "Madame Arnaud, parfumeuse",
+      food: "I tasted it slowly, the way I smell a perfume: the top, the heart, and then the base.",
+      drink: "I have let it rest a little, as one rests the nose. I will open it this evening in the garden.",
+      made: "I smelled it first, of course. A good, honest scent, made by careful hands.",
+      flower: "I could not help myself: I smelled every one before I put them in water. Beautiful notes.",
+      other: "It sits at the organ now, among the little bottles. It belongs there.",
+      letter: "Your letter came on a quiet morning, and I read it in the rose garden among the bees.",
+      news: ["The roses gave a second flowering this autumn, small and very sweet.", "I am teaching my daughter the organ, one row of bottles at a time."],
+      back: "b_scentbottle",
+      backNote: "A tiny glass bottle from Luc, for a scent of your own one day."
+    },
+    lvjosette: {
+      sign: "Josette, la savonnerie",
+      food: "I ate it in the shop doorway, with the soap curing on the shelves behind me.",
+      drink: "I have put it by the window to share with Luc after work. He is always thirsty after the furnace.",
+      made: "I turned it over and over in my hands. Good work. You can always tell when it is real.",
+      flower: "They sit on the counter and the whole shop smells of them, which is saying something in a soap shop.",
+      other: "It sits on the shelf with my mother's stamp now. I am very fond of it.",
+      letter: "Your letter came while I was cutting a new block, so I read it with olive oil on my thumbs.",
+      news: ["Émile sent down a sack of this year's lavender, and the new batch is curing beautifully.", "I have cut more soap this summer than any year before. My arms are very strong now."],
+      back: "b_savon",
+      backNote: "A block of our soap, stamped this week."
+    },
+    lvluc: {
+      sign: "Luc, at the furnace",
+      food: "I ate it on the step outside the workshop, where it's cooler. Thank you for feeding me.",
+      drink: "I will drink it when the furnace is banked for the night. Glassblowing is thirsty work.",
+      made: "Made by hand, turned with patience. I know that feeling well.",
+      flower: "I blew a little vase for them. The flowers are the only part I didn't make.",
+      other: "It sits on the sill where the light comes in, next to my glass birds.",
+      letter: "Your letter came while the furnace was hot, so I read it standing well back, as I tell everyone to.",
+      news: ["I made a new flock of birds this month, pale green and blue. They look like the sea.", "Madame Arnaud ordered fifty perfume bottles. I am turning, turning, turning."],
+      back: "b_glassbird",
+      backNote: "A little glass bird. It came out of the fire smiling, so it is yours."
+    },
+    /* ---------- Sunflower Hill ---------- */
+    lvodile: {
+      sign: "Odile, from the hives",
+      food: "I put it on the kitchen table at noon, and whoever was there had some. That is the rule.",
+      drink: "We opened it at lunch, all round the long table. It went very quickly.",
+      made: "A careful thing, made slowly. The bees would approve, and they are hard to please.",
+      flower: "I put them in a jar by the hives. The bees were very excited. So was I.",
+      other: "It sits on the kitchen windowsill, where I see it when I wash up.",
+      letter: "Your letter came at lunchtime. I read it out to the bees afterwards. They like news.",
+      news: ["The sunflower honey came in thick and golden this year. The bees decided well.", "Lunch has grown so busy we have added two chairs at the end of the table."],
+      back: "b_honeypot",
+      backNote: "A pot of our honey, with a dipper."
+    },
+    lvmathis: {
+      sign: "Mathis (and two million bees)",
+      food: "I ate it after a hot morning at the hives. It was much better than a bee suit.",
+      drink: "I drank it in the shade of the sunflowers, with my veil off at last.",
+      made: "It's lovely. Maman says I should learn to make things like that. I'm learning hives first.",
+      flower: "The bees found them before I did. I let them have a look, then put them in water.",
+      other: "I keep it in my pocket at the hives. The bees haven't minded so far.",
+      letter: "Your letter came while I was at the far hives. I read it on the walk back, smoke and all.",
+      news: ["We have thirty-two hives now. Two new ones, painted blue.", "I lifted a frame all by myself this week, gently. They were only worried."],
+      back: "honeysticks",
+      backNote: "Some honey sticks from the honey house. Bite the end and slurp."
+    },
+    lvcandle: {
+      sign: "Brigitte, the candle shop",
+      food: "I ate it while the wax was cooling, and only got a little honey on the tapers.",
+      drink: "I will open it at dinner, by the light of one of my own candles. The best way.",
+      made: "Handmade, and it shows. I hung it near the tapers so it could keep them company.",
+      flower: "They are on my workbench, and the room smells of flowers and warm beeswax.",
+      other: "It sits in the window among the candles now, catching the light.",
+      letter: "Your letter came while I was dipping. Twenty-one dips that day: I was daydreaming about it.",
+      news: ["Odile's hives gave so much wax this year I've started rolling little honeycomb candles.", "The shop smells of honey from morning to night. I never tire of it."],
+      back: "b_candle",
+      backNote: "A beeswax candle, poured from this summer's wax."
+    },
+    /* ---------- The Old Bridge ---------- */
+    lvnadia: {
+      sign: "Nadia, l'épicerie du pont",
+      food: "I took it down to the meadow for my own picnic. The best table in Provence.",
+      drink: "I packed it in a basket and drank it by the river, under the willow.",
+      made: "It sits on the counter by the cheeses now, and customers keep asking where to buy one.",
+      flower: "They're in a jug on the counter, next to the tomatoes. It looks like a painting.",
+      other: "I've put it on the shelf above the till, where I can see it all day.",
+      letter: "Your letter came with the bread delivery, and I read it on the bridge in the sunshine.",
+      news: ["We've had picnickers on the meadow every fine day this autumn.", "I won at pooh-sticks on Sunday, from the middle of the bridge. Always the middle."],
+      back: "b_tapenade",
+      backNote: "A jar of tapenade from the shelf by the door."
+    },
+    lvsylvie: {
+      sign: "Sylvie, Glacier du Pont",
+      food: "I am already wondering if it would work as a gelato. Everything does, if you're patient.",
+      drink: "I drank it on the step of the shop, with a scoop of the pale purple one. Two flavours: that's the minimum.",
+      made: "So pretty I almost put it in the window with the cones. I kept it for myself instead.",
+      flower: "I am very tempted to make a flavour from them. For now they are just in a jar by the counter.",
+      other: "It's on the shelf above the freezer now, where it stays cool and lovely.",
+      letter: "Your letter came on a warm afternoon, and I read it between scoops.",
+      news: ["I made a fig and honey flavour this autumn, with Odile's honey. It sold out in two days.", "The pale purple one is still the favourite. I told you so."],
+      back: null,
+      backNote: ""
+    },
+    lvjeanmarc: {
+      sign: "Jean-Marc, Le Vieux Moulin",
+      food: "I tasted it in the kitchen while the wheel turned. A cook always tastes properly.",
+      drink: "I'll pour a glass at the window table after service, and listen to the river under the floor.",
+      made: "Good, careful work. I've put it in the dining room where everyone can see it.",
+      flower: "They're on the window table now, by the wheel. Guests keep asking for that seat.",
+      other: "It sits on the kitchen shelf, between the copper pans. It looks very fine there.",
+      letter: "Your letter came during lunch service, so I read it after, by the window, with the wheel for company.",
+      news: ["The trout have been running well upstream. Almost too fresh, as I always say.", "The wheel had a new paddle fitted. It sounds exactly the same, which is how I like it."],
+      back: "flour",
+      backNote: "A bag of flour, ground at the old mill. Enough for two good loaves."
+    },
+    /* ---------- Chapel Hill ---------- */
+    lvceline: {
+      sign: "Céline, the goats and I",
+      food: "I ate it on the rock above the goats, and only had to share a little with the bold one.",
+      drink: "I will open it with Théo under the vine. Fresh or aged? Both, always both.",
+      made: "Wrapped as carefully as a banon. I can see you were paying attention.",
+      flower: "I had to keep them high up, away from the goats. Twenty-two opinions, and all of them hungry.",
+      other: "It sits in the fromagerie window, beside the cheeses on their straw mats.",
+      letter: "Your letter came during the morning milking. I read it in the dairy with the door open to the hill.",
+      news: ["Three new kids this season. They leap off every rock on the hill.", "My banon took a ribbon at the market in the valley. Maman's recipe, of course."],
+      back: "b_chevre",
+      backNote: "A little chèvre in a chestnut leaf. The goats insisted."
+    },
+    lvtheo: {
+      sign: "Théo, under the vine",
+      food: "I warmed it up a little, as I do everything. Then I ate it under the vine.",
+      drink: "We poured it at the long table at sunset, with the lanterns on. Then we all went up to the chapel.",
+      made: "Simple and good, like the best food. I have hung it under the pergola where everyone sits.",
+      flower: "I put them down the middle of the long table. They made the whole bistro look like a wedding.",
+      other: "It sits on the bar by the lanterns. My sister says I'm showing off. I am.",
+      letter: "Your letter arrived just before service. I read it twice before the first guests came up the hill.",
+      news: ["We've lit the lanterns earlier now the evenings are shorter. It's even prettier.", "My sister's new cheese is on the menu, warm, with honey and thyme. Three things. Perfect."],
+      back: "thyme",
+      backNote: "A sprig of wild thyme from the hillside. Put it on everything warm."
+    },
+    lvgaston: {
+      sign: "With blessings, Père Gaston",
+      food: "I ate it on the bench by the cypresses, slowly, which is how I do most things now.",
+      drink: "I will take a small glass at sunset, after the bell, while the valley goes quiet.",
+      made: "A thing made by hand carries a little of the maker in it. I have put it in the chapel porch.",
+      flower: "I put them by the candles in Saint Anne. The little chapel has not looked so bright in years.",
+      other: "I keep it on the windowsill of the chapel, where the evening light finds it.",
+      letter: "Your letter came up the hill with the postman, puffing. I read it in the cool of the chapel.",
+      news: ["A young visitor rang the bell at sunset last week, and the whole hill went quiet, as it should.", "I have repainted three of the stars on the chapel ceiling. Only a few hundred to go."],
+      back: "k_bell",
+      backNote: "A little brass bell, for your door. A small echo of ours at sunset."
+    }
+  };
+
+  // src/data/pen-bb.js
+  var PEN_BB = {
+    /* ---------- Valley Gate ---------- */
+    mrsdunn: {
+      sign: "Yours, Pat Dunn (Mrs Dunn to the kids)",
+      food: "I've hidden them under the counter so the customers don't get ideas. One with my cuppa at three, after the post goes.",
+      drink: "That's going in the good cupboard, next to the Christmas sherry. Don't tell anyone where the key is.",
+      made: "It's on the shelf behind the till where I can see it. Three people have asked if it's for sale. It is not.",
+      flower: "They're in a jar by the register and the whole shop smells of them. Even the fly screen's stopped banging.",
+      other: "Forty years behind this counter and nobody's ever posted me a present. Well. Now somebody has.",
+      letter: "A real letter, with a stamp and everything. I read it twice at the counter and let the bread man wait.",
+      news: ["The Freddos have gone up again. I've written to someone about it.", "Les brought the first Granny Smiths in this week, so it must be getting cold."],
+      back: "b_lamington",
+      backNote: "A lamington from the counter, wrapped twice. Coconut gets everywhere, love, so open it over the sink."
+    },
+    bvles: {
+      sign: "Cheers, Les",
+      food: "Ate it sitting on the shed step with the bellbirds going. Can't think of a better spot.",
+      drink: "I'll have it on the verandah when the last of the apples are in. That's a promise.",
+      made: "Very nice. I've put it on the shelf in the shed where the honesty tin lives. Folk will think I've gone fancy.",
+      flower: "Put them in a bucket by the honesty box. Somebody left an extra dollar, thinking they were for sale.",
+      other: "Didn't expect that. I've told the gums about it. They're good listeners.",
+      letter: "Got your letter. Read it under the big gum at lunch. It was good to hear from you.",
+      news: ["Pink Ladies are nearly done. Granny Smiths next, when it turns.", "Honesty tin was a dollar over last week. Folk are good, mostly."],
+      back: "b_apples",
+      backNote: "A few Pink Ladies off the good tree. One for the drive, one for later."
+    },
+    bvjoan: {
+      sign: "With love, Joan (and Marg says hello)",
+      food: "Marg and I had it with a pot of tea behind the counter and didn't share it with a single customer.",
+      drink: "We'll open it at the brigade Christmas do. I'll say it's from a friend on the road, and it is.",
+      made: "I've put it in the window with a little card that says Not For Sale. Marg says that's the best advertising there is.",
+      flower: "They're in a green glass vase that came in last Tuesday. They look as if they were made for each other.",
+      other: "I've never had a parcel at the op shop that wasn't a donation. I had to tell Marg it wasn't for sorting.",
+      letter: "Your letter came on a Tuesday, which is the best day for it. I read it between rows, knit one, purl one.",
+      news: ["I'm knitting tea cosies for the brigade stall. Eleven so far, and not one of them matches.", "Marg found a box of old postcards in a donation. We've been reading them all week instead of working."],
+      back: "b_brooch",
+      backNote: "A little wattle brooch that came in on Tuesday. I thought of you straight away, so it never went on the shelf."
+    },
+    bvmarg: {
+      sign: "Cheers, Marg",
+      food: "Gone in a morning, I'm afraid. Joan had half and says she didn't.",
+      drink: "It's sitting on the sorting table where I can keep an eye on it. Joan keeps trying to put a price sticker on it.",
+      made: "Everything's been someone's treasure once, and now this is mine. It's not going in any box.",
+      flower: "In a jug on the sorting table. Makes the old records smell lovely.",
+      other: "You'd not believe what comes into the op shop, but this is the first thing that came in just for me.",
+      letter: "Your letter came in with a box of donations, would you believe. I nearly sorted it.",
+      news: ["We had a box come in with a rocking horse and forty teaspoons. Don't ask.", "Joan's on tea cosies. I've told her the brigade can only use so many."],
+      back: "b_kooka",
+      backNote: "A china kookaburra from the shelf, mid-laugh. Small chip on his tail, but he doesn't mind."
+    },
+    /* ---------- Balloon Lookout ---------- */
+    bvrosie: {
+      sign: "Love, Rosie (from the coffee caravan)",
+      food: "Had it with the first cup after the dawn flight. Dad got one bite. He says it was a small one.",
+      drink: "It's in the caravan fridge, behind the milk. Golden hour on Sunday, I reckon.",
+      made: "It's sitting on the hatch ledge so I see it every time I hand out a flat white.",
+      flower: "In a mug on the counter. Customers keep asking if they come with the coffee.",
+      other: "You're definitely a flat white person, and a very kind one. Thank you.",
+      letter: "Read your letter between the dawn rush and the second one. Made the whole morning.",
+      news: ["Dad took the red-striped balloon up three dawns in a row last week. Not a breath of wind.", "We've got a new roast from the farm up the road. It's chocolatey. You'd like it."],
+      back: "b_beans",
+      backNote: "Some of the new beans, roasted up the road. Grind them fresh and think of the balloons."
+    },
+    bvgus: {
+      sign: "Fair winds, Gus",
+      food: "Took it up in the basket at dawn. Best breakfast I've had at two thousand feet.",
+      drink: "I'll save it for a still evening when we land somewhere soft. There's a tradition about that.",
+      made: "It's hanging in the balloon shed by the burner tools. Gives the old place a bit of class.",
+      flower: "Rosie put them on the coffee caravan. The balloon crowd thinks we've gone posh.",
+      other: "Thirty-one years flying and I've never had a parcel come to the shed. It's a good day.",
+      letter: "Your letter came on a no-fly morning, all fog. Best thing that could have happened to it.",
+      news: ["Wind's been from the north all month. We drift over the Cellar Door and Kel waves a bottle at us.", "Patched the red-striped envelope this week. She's flying better than ever."],
+      back: null,
+      backNote: ""
+    },
+    bvtilly: {
+      sign: "Warmly, Tilly (paint on my fingers, sorry)",
+      food: "I ate it between scone batches with the valley out the window. That's the best way to eat anything.",
+      drink: "I'll have a glass while I paint the evening light. It changes every ten minutes, so I'll need a while.",
+      made: "I've put it on the windowsill in the gallery, where the morning light falls. It looks lovely there.",
+      flower: "I've already started painting them. They'll be gone before I finish, but that's half the fun.",
+      other: "It's on the shelf by my brushes. It makes me smile every time I reach for the blue.",
+      letter: "Your letter came on a foggy morning, so I read it twice and painted the fog. Somebody might buy it this time.",
+      news: ["Autumn's come into the vines. Everything's gold and rust and I can't paint fast enough.", "Ivy says the window table has never been so popular. I think it's the scones."],
+      back: "b_print",
+      backNote: "A print of the valley at dawn, balloons and all. It's the one people do buy."
+    },
+    bvivy: {
+      sign: "Cheers, Ivy (window table's yours)",
+      food: "Shared it out in the kitchen at closing. There's a right answer to who got the last bit, and it was me.",
+      drink: "It's in the café fridge with my name on it in big letters. Tilly's been warned.",
+      made: "I keep it in my apron pocket on shifts. It's seen a lot of jam and cream already.",
+      flower: "They're on the window table. Best view in the valley, best flowers in the valley.",
+      other: "That's going straight on the shelf by the till. Tilly says it suits the place.",
+      letter: "Your letter was waiting on the window table when I came in. Read it with a scone, jam first.",
+      news: ["Tilly's painting the vines going gold. She burnt a tray of scones because of it.", "We've had three proposals at the window table this month. It's the view."],
+      back: "b_myrtle",
+      backNote: "A little box of lemon myrtle tea from the café. It smells more like lemon than lemons do."
+    },
+    /* ---------- The Cellar Door ---------- */
+    bvkel: {
+      sign: "Cheers, Kel (and Pinot the dog)",
+      food: "Had it with a glass of the Pinot after a long day in the rows. They got on very well.",
+      drink: "Tasted it properly, swirl and all. Good drop. Don't tell my grandad's vines I said so.",
+      made: "It's up on the tasting room shelf next to the medals. Fits right in.",
+      flower: "In a jug on the tasting bar. Pinot the dog sniffed every single one.",
+      other: "Pinot the dog wanted the wrapping. I let him have it. Thank you, truly.",
+      letter: "Read your letter out in the vines at lunch. Pinot the dog sat on my foot the whole time.",
+      news: ["Budburst's started on the Pinot. Fussy as ever, but looking good.", "Gus floated over yesterday at dawn. I waved a bottle at him, as you do."],
+      back: null,
+      backNote: ""
+    },
+    bvjono: {
+      sign: "From down in the cave, Jono",
+      food: "Ate it on a barrel in the cave. Cold and quiet and very good.",
+      drink: "It's racked with the rest down here. I'll give it a quarter turn every morning with the others.",
+      made: "It's on the ledge by the cave door. The bottles don't talk back, but I think they like it.",
+      flower: "They're in a jar by the racks. First flowers that cave's ever seen.",
+      other: "Took it down into the cave to open in the quiet. Very nice. Thank you.",
+      letter: "Your letter came down into the cave with me. Read it by the lamp, between turns.",
+      news: ["Twelve hundred and forty bottles on the racks now. Still turning every one.", "Bought a jumper for the cave at last. Haven't worn it yet."],
+      back: null,
+      backNote: ""
+    },
+    bvmick: {
+      sign: "All the best, Mick (Long Table kitchen)",
+      food: "Had a taste between the lamb and the pav. Good stuff. Might borrow the idea.",
+      drink: "Splashed a bit in the lamb gravy and drank the rest. That's how you know it's good.",
+      made: "It's pinned up in the kitchen by the pav recipe, which is the highest honour in there.",
+      flower: "Bec put them down the middle of the Long Table. Lunch looked like a wedding.",
+      other: "Didn't need to, but I'm chuffed you did. Thanks.",
+      letter: "Read your letter while the lamb was in. Low and slow, plenty of time.",
+      news: ["Lamb's still going in at six every morning. Some things you don't change.", "The bloke next door's got the first broad beans in, so that's next week's menu sorted."],
+      back: null,
+      backNote: ""
+    },
+    bvbec: {
+      sign: "Love, Bec (there's always room)",
+      food: "We passed it down the Long Table and everyone had a bit. That's how we do things here.",
+      drink: "Poured a little for everyone at the end of the long lunch. Nobody left before three.",
+      made: "It's sitting on the end of the Long Table, where you sat. We keep your chair.",
+      flower: "Down the middle of the table in jam jars. Mick says it's the prettiest it's ever looked.",
+      other: "There's always room for one more, and now there's room for this too.",
+      letter: "Read your letter out at staff lunch. Mick pretended he wasn't listening.",
+      news: ["Long lunch went till five last Sunday. A new record.", "We've added another trestle to the table. It's longer than ever."],
+      back: null,
+      backNote: ""
+    },
+    /* ---------- Berry Farm & Chocolaterie ---------- */
+    bvshaz: {
+      sign: "Cheers, Shaz (mind the pots)",
+      food: "Had it with a cuppa while the jam was setting. Perfect timing, and the jam wrinkled on the saucer first go.",
+      drink: "That'll go down a treat once the last batch is jarred. A ripper of a present.",
+      made: "It's on the windowsill in the jam kitchen, well away from the spitting pots.",
+      flower: "They're in a copper jug by the stove. Nothing else gets the colour right.",
+      other: "That's a ripper. Thank you, love. It's made my whole week.",
+      letter: "Your letter got a bit of jam on it. That's how you know I read it in the kitchen.",
+      news: ["Strawberries are flowering early this year. Pick your own will open soon.", "I've tried a raspberry and lemon myrtle jam. It's a ripper, if I say so myself."],
+      back: "b_jam_straw",
+      backNote: "A jar of strawberry and rhubarb from the copper pots. Scones not included, but Dee would say they should be."
+    },
+    bvsophie: {
+      sign: "Sweetly, Sophie (the chocolaterie)",
+      food: "I tasted it like I taste chocolate: slowly, eyes shut. It passed with honours.",
+      drink: "I'm going to pair it with the dark wattleseed. I think they'll be very happy together.",
+      made: "It's on the shelf by the tempering slab, where it's cool and safe. It's lovely.",
+      flower: "They're on the counter beside the free tastings. Now the free tastings come with a view.",
+      other: "That's so thoughtful. It's sitting by the fountain, which is the place of honour.",
+      letter: "Your letter came on a tempering day, so I read it with chocolate on my thumbs. Sorry about the envelope.",
+      news: ["I'm trying a raspberry from Shaz's rows with dark chocolate. Very nearly there.", "The fountain's still going. I've stopped asking what's in the pipes."],
+      back: "b_freckles",
+      backNote: "A little bag of freckles, fresh this week. Hundreds and thousands on everything."
+    },
+    bvdee: {
+      sign: "Love, Dee (the Berry Barn)",
+      food: "Had it with a fresh scone, warm from the oven. I don't judge, I just eat.",
+      drink: "It's in the barn fridge next to the cream. I'll have a glass when the last tray's out.",
+      made: "It's hanging by the oven so I see it every time the scones come out.",
+      flower: "In a jar on the counter with Shaz's jam. The customers think it's a new range.",
+      other: "That's lovely. I'm keeping it right by the scone tins.",
+      letter: "Got your letter between batches. Read it while the scones rose.",
+      news: ["Scones out every twenty minutes still, and the pav's still for sharing, officially.", "The cream man's got a new cow called Daisy. The cream's even better, if you can believe it."],
+      back: null,
+      backNote: ""
+    },
+    bvlani: {
+      sign: "Cheers, Lani (still saving for the car)",
+      food: "I ate it in the rows on my break. Didn't eat a single berry for a whole ten minutes.",
+      drink: "I'm saving it for when I get the car. That might take a while, so it'll be well aged.",
+      made: "It's in my locker at the barn. Everyone's jealous.",
+      flower: "They're in a punnet on my windowsill. They smell way better than strawberry juice.",
+      other: "Thank you, that's so nice. It's going in the car fund jar for luck.",
+      letter: "Read your letter in the raspberry rows. Got a bit of juice on it, sorry.",
+      news: ["The car fund's at forty-two dollars. I've eaten most of my wages again.", "Raspberry canes are leafing up. They'll be coming off in your hand by summer."],
+      back: null,
+      backNote: ""
+    },
+    /* ---------- Gum Creek Sanctuary ---------- */
+    bvjack: {
+      sign: "Stay on the paths, Ranger Jack",
+      food: "Had it on my rounds, sitting on a log by the koala walk. The kookaburra laughed at me the whole time.",
+      drink: "Keeping it for a quiet night at the ranger hut, when the wombats are out.",
+      made: "It's on the desk in the ranger hut, next to the map. Looks right at home.",
+      flower: "Noor put them in the visitor centre. Bruce the wombat tried to eat one.",
+      other: "That was good of you. Bruce the wombat sends his regards. Probably.",
+      letter: "Read your letter on my rounds. Had to keep my voice down near the koalas, so I read it in my head.",
+      news: ["Three new joeys out of the pouch this month. Wobbly legs and big ears.", "Bruce the wombat's dug a new burrow right by the boardwalk. He's very proud."],
+      back: null,
+      backNote: ""
+    },
+    bvmira: {
+      sign: "Warmly, Dr Mira (Gum Creek wildlife hospital)",
+      food: "Eaten between feeds, which round here means in very small bites over a whole day. Lovely.",
+      drink: "I'll have it on my first night off. I've put it somewhere the joeys can't reach.",
+      made: "It's on the shelf in the hospital office. Kim says it makes the place look loved.",
+      flower: "They're in the hospital window, where the recovering ones can see them. It's good for everyone.",
+      other: "Thank you, it's so thoughtful. It's brightened up the whole ward.",
+      letter: "I read your letter at the two o'clock feed with a joey in my lap. She seemed to like it too.",
+      news: ["That koala with the sore paw went back up her tree. Most of them go home. That's the best bit.", "We've had a run of baby possums this spring. Tiny noses everywhere."],
+      back: null,
+      backNote: ""
+    },
+    bvkim: {
+      sign: "Love, Kim (and Pip)",
+      food: "I ate it on my break with Pip asleep down my jumper. She didn't get any, she's on milk.",
+      drink: "It's in the staff fridge behind the joey bottles. Feeding's at ten, two and six, so I'll find a gap.",
+      made: "I've tucked it next to Pip's pink pouch on the shelf. She's very interested in it.",
+      flower: "They're on the feeding bench. Pip sniffed them and sneezed. It was the cutest thing.",
+      other: "Pip says thank you. Well, she wriggled, which I've decided means thank you.",
+      letter: "Read your letter to Pip at the six o'clock feed. She fell asleep halfway, which is a compliment.",
+      news: ["Pip's out of the pouch for longer every day now. She hops like a spring.", "We've got two new joeys in. One likes a blue pouch. The other likes my jumper."],
+      back: "b_roo",
+      backNote: "A little plush kangaroo from Noor's shop, with a joey in her pouch. She looks a bit like Pip, ears first."
+    },
+    bvnoor: {
+      sign: "Warm wishes, Noor (Gum Creek visitor centre)",
+      food: "Shared it with the café team. It was gone faster than the plush wombats.",
+      drink: "I'll save it for the end of the season. We'll toast all the animals on the wall.",
+      made: "It's on the counter next to the gift shop till. People keep asking where to buy one.",
+      flower: "They're under the photo wall, beneath all the animals that went home. It looks lovely.",
+      other: "Thank you. It's sitting in the visitor centre window for everyone to enjoy.",
+      letter: "Your letter's pinned up by the photo wall. It belongs with the happy things.",
+      news: ["The plush wombat sold out again. I've ordered a whole box.", "Six more photos on the wall this month. Six more that went home."],
+      back: "b_magnet",
+      backNote: "A fridge magnet from the shop: a little campervan on the road through the vines. That's you."
+    },
+    bvdoug: {
+      sign: "Patiently yours, Doug (the platypus window)",
+      food: "Had it on my bench by the window. She came up just as I finished. Good timing all round.",
+      drink: "I'll save it for a quiet evening. Patience is a virtue, after all.",
+      made: "I keep it on the bench by the window. It's a nice thing to look at while I wait.",
+      flower: "In a jar on the windowsill. The platypus didn't notice, but I did.",
+      other: "Eight years at that window and this is the first parcel I've had there. I gasped, same as with her.",
+      letter: "Read your letter at the window. She surfaced twice while I did. I think she approved.",
+      news: ["Saw her nine hundred and thirty times now. Still gasp, every time.", "There's a second platypus down by the reeds, we think. Patience. We'll see."],
+      back: null,
+      backNote: ""
+    },
+    /* ---------- Riverside Camp ---------- */
+    bvwal: {
+      sign: "Cheers, Wal (Riverside Camp)",
+      food: "Had it by the fire after the campers turned in. Blue had the crumbs.",
+      drink: "Saving it for a cold night by the fire. Firewood's five a bag, but this one's on me.",
+      made: "It's up behind the counter at the camp store. Blue sleeps under it.",
+      flower: "In a billy can on the store counter. Brightens the place right up.",
+      other: "Didn't need to, but much appreciated. It's in the store, where I can see it.",
+      letter: "Read your letter on the store step with Blue snoring beside me. Good to hear from you.",
+      news: ["River's up a bit after the rain. Rope swing's still good.", "Blue's turned seventeen. Still asleep in the doorway, still earning it."],
+      back: "mallows",
+      backNote: "A bag of marshmallows from the store, for your next campfire. Patience, and don't let them catch."
+    },
+    bvbodhi: {
+      sign: "Paddle on, Bodhi",
+      food: "Ate it on the jetty with my feet in the river. Best office in the world, best lunch.",
+      drink: "Saving it for a sunset paddle. Life jacket on, safety first.",
+      made: "It's in the canoe shed, hanging by the paddles. Looks rad.",
+      flower: "In a bucket on the jetty. The ducks keep coming over to check them out.",
+      other: "Legend. Thank you. It's in the canoe shed, nice and dry.",
+      letter: "Read your letter in a canoe, drifting. Nearly dropped it in the river. Didn't.",
+      news: ["Painted all the canoes over winter. The yellow one's the favourite now.", "The river's running nice and full. Hold on, let go at the top."],
+      back: null,
+      backNote: ""
+    },
+    /* ---------- the travelling neighbours (on the road, letters reach them at a campsite down the road) ---------- */
+    bvbev: {
+      sign: "Lots of love, Bev (and Ron, and Biscuit)",
+      food: "We had it with a cuppa outside the caravan. I had to hide the last bit from Biscuit.",
+      drink: "We're saving it for the next big campfire. Ron says he'll stay awake for it.",
+      made: "It's in the caravan cupboard with my knitting. Everything special goes in there.",
+      flower: "They're in a jar on the caravan table, bouncing along with us down every dirt road.",
+      other: "What a lovely surprise at the camp office. Ron carried it back like it was treasure.",
+      letter: "Your letter caught up with us at the camp down the road. I read it out to Ron and Biscuit.",
+      news: ["We're at a little camp by a river now. Scones Saturday, as always.", "I finished Ron's beanie. He's already lost it once."],
+      back: null,
+      backNote: ""
+    },
+    bvron: {
+      sign: "Cheers, Ron (Bev's husband, Biscuit's driver)",
+      food: "Bev says I can have half. Biscuit says he can have half. I got a quarter. Very nice quarter.",
+      drink: "Good drop. I'll have it at the end of a long drive, when Bev's done the planning.",
+      made: "It's on the dash. Bev's been telling everyone at camp who sent it.",
+      flower: "Bev put them in a jar on the table. They've survived three dirt roads so far.",
+      other: "Thanks very much. Bev says I should write more. This is me writing more.",
+      letter: "Got your letter at the camp office. Bev read it first, which is how things go.",
+      news: ["Caught nothing again this morning. Lovely morning for it though.", "Biscuit pinched a sausage off a bloke at the new camp. We've apologised."],
+      back: null,
+      backNote: ""
+    },
+    bvkai: {
+      sign: "Peace, Kai (and Matilda the Kombi)",
+      food: "We ate it in the Kombi with the doors open and the sea down the hill. Cosmic.",
+      drink: "We'll have it the night we finally find a wave. Could be a while.",
+      made: "It's on the Kombi dash, stuck down with a bit of duct tape. Matilda approves.",
+      flower: "In a cup on the Kombi dash. They wobble on every hill, which is a lot of hills.",
+      other: "Legend. It's riding up front with us now.",
+      letter: "Got your letter at a camp down the road. I wrote a song about it. It's about the beach.",
+      news: ["Matilda made it up the big hill without stopping. First time ever.", "We finally found a wave. Small one. Still counts."],
+      back: null,
+      backNote: ""
+    },
+    bvlou: {
+      sign: "Love, Lou (and Kai, and Matilda)",
+      food: "We ate it at a lookout while Kai fixed Matilda. Perfect timing, really.",
+      drink: "We're saving it for the night we finish the lap. Or the night Matilda behaves.",
+      made: "It's in the little shelf above the bed, with our swapped books. It's in good company.",
+      flower: "I pressed one in the book I'm reading. The rest are on the dash.",
+      other: "Thank you. Plans are for people with working Kombis, but presents are for everyone.",
+      letter: "Your letter found us at a camp down the road. I read it by the river with my feet in.",
+      news: ["Swapped a book at the last camp and got a good one. Never know what you'll find.", "We've stopped making plans again. It's working."],
+      back: null,
+      backNote: ""
+    },
+    bvtuan: {
+      sign: "Best wishes, Tuan Nguyen (and family)",
+      food: "We shared it at the camp kitchen table. Everyone wanted the recipe.",
+      drink: "I'm saving it for a cooking night. Pho at the camp kitchen, of course. It must be done.",
+      made: "It's in the car, in the glovebox. The kids keep checking it's still there.",
+      flower: "Linh put them in a cup at the camp table. The kids say our tent is the fanciest one.",
+      other: "Thank you. The kids are very impressed we got a parcel at a campsite.",
+      letter: "Your letter found us at a camp down the road. The kids made me read it twice.",
+      news: ["Pho in a camp kitchen again. Still possible. Still necessary.", "The kids want to live in a tent forever. We're thinking about it. Not really."],
+      back: null,
+      backNote: ""
+    },
+    bvlinh: {
+      sign: "Warmly, Linh Nguyen",
+      food: "I had a piece with a book by the river. It was bliss. The kids got a piece each, eventually.",
+      drink: "We'll have it on the last night of the holiday. Tuan says that's the rule.",
+      made: "It's on top of my book pile in the tent. I see it every morning.",
+      flower: "In a cup at the camp table. Mai added a gumnut to the arrangement.",
+      other: "So kind of you. It made our camp feel a bit more like home.",
+      letter: "Your letter came at the camp down the road. I read it by the river, no wifi needed.",
+      news: ["I baked another lemon cake for the new camp. It went in three minutes.", "Still no wifi. Still nobody's complained."],
+      back: null,
+      backNote: ""
+    },
+    bvbao: {
+      sign: "From Bao (I'm eight)",
+      food: "I ate it on the rope swing. Nearly. Mum said not on the rope swing.",
+      drink: "Dad says it's a grown-up one, so I'm guarding it.",
+      made: "I put it in my backpack with my yabby bucket. It's safe there.",
+      flower: "Mum put them in a cup. I said they look like fireworks.",
+      other: "THANK YOU. I showed everyone at the camp. Mai too.",
+      letter: "I got a letter! I've never had my own letter. Mum helped me read the long words.",
+      news: ["The new camp has a rope swing too. I did it ten times.", "I caught a yabby. It didn't pinch me this time."],
+      back: null,
+      backNote: ""
+    },
+    bvmai: {
+      sign: "From Mai (better at the swing)",
+      food: "I ate mine slowly so Bao would be jealous. He was.",
+      drink: "Mum said it's for grown-ups, so I'm keeping it safe with my gumnuts.",
+      made: "I keep it in my gumnut tin. It's the best thing in there.",
+      flower: "I put a gumnut in with them. Now they're the best flowers.",
+      other: "Thank you! I'm braver than Bao and I got a present. Well, we both did.",
+      letter: "I got a letter with my name on. I read it all by myself.",
+      news: ["I have fifty-three gumnuts now.", "Marshmallow toasting is still at five. I'm the best at it."],
+      back: null,
+      backNote: ""
+    },
+    bvhanne: {
+      sign: "Hej hej, Hanne (still pedalling)",
+      food: "I ate it at the top of a very big hill. In Denmark we would call it a mountain.",
+      drink: "It's riding in my pannier, very carefully. I'll open it at the next campfire.",
+      made: "It's tucked in my sketchbook, so it comes with me every kilometre.",
+      flower: "I pressed one in my sketchbook and drew the rest. They are in two places now.",
+      other: "Tak, thank you. My bike is a bit heavier and my heart is a bit lighter.",
+      letter: "Your letter waited for me at a camp down the road. I read it with a cup of tea and very tired legs.",
+      news: ["Twelve thousand kilometres now. My legs are made of wood and also iron.", "I drew a kookaburra this week. He laughed at the drawing. Fair enough."],
+      back: null,
+      backNote: ""
+    },
+    bvarchie: {
+      sign: "Safe travels, Archie (and the old Land Cruiser)",
+      food: "Had it by the fire with a cuppa. Reminded me of a night on the Nullarbor. Good night, that one.",
+      drink: "I'll open it under the stars somewhere quiet. Plenty of those out here.",
+      made: "It's on the dash of the old Land Cruiser. She's been eleven years without decoration. She deserves it.",
+      flower: "In a tin mug on the bonnet. The old girl looks quite smart.",
+      other: "Thank you. Eleven years on the road and this is a first. Look after that van of yours.",
+      letter: "Your letter caught me up at a camp down the road. Read it by the fire. Patience, and don't let it catch.",
+      news: ["Took a new road this month, which is saying something after eleven years.", "Best campfire I've had in a while last night. Nearly as good as the Nullarbor."],
+      back: null,
+      backNote: ""
+    }
+  };
+
+  // src/game/contacts.js
+  var D3 = 24 * 60 * 60 * 1e3;
+  var PEN = { ...PEN_LV, ...PEN_BB };
+  var REGIONS2 = { bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre" };
+  var POSTAGE = { bellbird: 2, coast: 2, tablelands: 4, lavender: 4, ronda: 8, kyoto: 8, jeju: 8, cinque: 8 };
+  var DAYS3 = { 2: 1, 4: 2, 8: 3 };
+  var HELD = ["jason", "luca"];
+  var REGION = {};
+  [[BB_PEOPLE, "bellbird"], [CR_PEOPLE, "coast"], [TL_PEOPLE, "tablelands"], [LV_PEOPLE, "lavender"]].forEach(([list5, r]) => list5.forEach((p) => {
+    REGION[p.id] = r;
+  }));
+  NPCS.forEach((p) => {
+    if (["ronda", "kyoto", "jeju", "cinque"].includes(p.local)) REGION[p.id] = p.local;
+  });
+  var DEF = {};
+  NPCS.forEach((p) => {
+    if (REGION[p.id]) DEF[p.id] = p;
+  });
+  var person2 = (id) => DEF[id];
+  var regionOf2 = (id) => REGION[id];
+  var canAdd = (F2, id) => !!(DEF[id] && (F2.met || {})[id] && !DEF[id].tourist && !HELD.includes(id));
+  var bookState = (F2) => {
+    F2.book = F2.book || {};
+    F2.book.ids = F2.book.ids || {};
+    F2.book.sent = F2.book.sent || [];
+    return F2.book;
+  };
+  var inBook2 = (F2, id) => !!bookState(F2).ids[id];
+  function addContact(F2, id, day) {
+    if (!canAdd(F2, id) || inBook2(F2, id)) return false;
+    bookState(F2).ids[id] = day;
+    return true;
+  }
+  function removeContact(F2, id) {
+    const b = bookState(F2);
+    if (!b.ids[id]) return false;
+    delete b.ids[id];
+    return true;
+  }
+  var contacts = (F2) => Object.keys(bookState(F2).ids).filter((id) => DEF[id]).sort((a, b) => Object.keys(REGIONS2).indexOf(REGION[a]) - Object.keys(REGIONS2).indexOf(REGION[b]) || DEF[a].name.localeCompare(DEF[b].name));
+  var addable = (F2) => Object.keys(F2.met || {}).filter((id) => canAdd(F2, id) && !inBook2(F2, id));
+  var postage = (id) => POSTAGE[REGION[id]] || 4;
+  var postable = (it) => !!it && (it.kind === "gift" || it.kind === "bouquet");
+  var OPENINGS = ["Thinking of you", "Thank you for the day", "I keep thinking about your", "Guess what happened at home", "Just saying hello"];
+  function postTo(F2, to, { item = null, open: open2 = "", text = "" } = {}, at2 = now()) {
+    if (!inBook2(F2, to)) return { err: "Not in your address book." };
+    const it = item && ITEMS[item];
+    if (item) {
+      if (!postable(it) || !((F2.inv || {})[item] > 0)) return { err: "That can't go in the post." };
+      if (it.gel) return { err: "It'd melt on the way." };
+      const cost = postage(to);
+      if ((F2.coins || 0) < cost) return { err: `Postage is ${cost} coins.` };
+      F2.coins -= cost;
+      F2.inv[item]--;
+      if (F2.inv[item] <= 0) delete F2.inv[item];
+    } else if (!open2 && !String(text).trim()) return { err: "Write a few words first." };
+    const days = DAYS3[postage(to)] || 2, p = PEN[to], b = bookState(F2), h3 = hash(to + at2 + b.sent.length);
+    const e = {
+      id: `post-${to}-${at2}-${b.sent.length}`,
+      to,
+      item: item || null,
+      open: open2,
+      text: String(text).trim().slice(0, 400),
+      at: at2 + days * D3,
+      back: item && p && p.back && ITEMS[p.back] && h3 % 5 === 0 ? p.back : null
+    };
+    b.sent = [...b.sent, e].slice(-60);
+    return e;
+  }
+  function giftKind(id) {
+    const it = ITEMS[id] || {};
+    if (it.wrapped && it.inner) return giftKind(it.inner);
+    if (it.kind === "bouquet") return "flower";
+    if (it.wine || /^(wb_|wine|bottle|mulled|cider|sparkl)/.test(id)) return "drink";
+    if (/^(pp_|tag_|card|soap|oil|lotion|balm_|lipoil|candle|sachet|wrp_|bath|scrub)/.test(id) || /soap|oil|lotion|balm|candle|paper|card/i.test(it.n || "")) return "made";
+    if (/^(box|bar_|bonbon|choc|honey|jam|cake|cookie|tart|biscuit|pairbox|hamper)/.test(id) || /chocolate|bonbon|honey|jam|cake|biscuit|cookie|tart|nougat|fudge|bread|cheese|pie/i.test(it.n || "")) return "food";
+    return "other";
+  }
+  var nm4 = (id) => {
+    const it = ITEMS[id];
+    return it ? it.n.replace(/^(A|An|The) /, "").replace(/^./, (c) => c.toLowerCase()) : "present";
+  };
+  function replyBody(e) {
+    const d = DEF[e.to], p = PEN[e.to], h3 = hash(e.id), first = (d.name || "").split(" ")[0];
+    const fill2 = (s) => String(s || "").replace(/\{it\}/g, e.item ? nm4(e.item) : "letter");
+    let body2;
+    if (e.item) {
+      const k = giftKind(e.item), line = p ? fill2(p[k] || p.other) : "";
+      body2 = `Dear Mel,
+
+Thank you for the ${nm4(e.item)}! ${line || "It made my whole week, truly."}`;
+    } else body2 = `Dear Mel,
+
+${p ? fill2(p.letter) : "Your letter came this morning, and I read it twice."}`;
+    if (p && p.news && p.news.length) body2 += `
+
+${p.news[h3 % p.news.length]}`;
+    else if (d.lines && d.lines.length) body2 += `
+
+P.S. ${d.lines[h3 % d.lines.length]}`;
+    if (e.back && ITEMS[e.back]) body2 += `
+
+${p.backNote || `I've tucked in a little ${nm4(e.back)}.`}`;
+    return `${body2}
+
+${p ? p.sign : `Warmly, ${first}`}`;
+  }
+  var bookMail = (F2, t2 = now()) => bookState(F2).sent.filter((e) => e.at <= t2 && DEF[e.to]).map((e) => ({
+    id: e.id,
+    from: "postie",
+    at: e.at,
+    title: `${e.item ? "Thank you" : "A letter"} from ${DEF[e.to].name}${e.back && ITEMS[e.back] ? " (with something tucked in)" : ""}`,
+    body: replyBody(e)
+  }));
+  function collectBack(F2, t2 = now()) {
+    const got3 = [];
+    bookState(F2).sent.forEach((e) => {
+      if (e.back && !e.got && e.at <= t2 && ITEMS[e.back]) {
+        e.got = 1;
+        F2.inv = F2.inv || {};
+        F2.inv[e.back] = (F2.inv[e.back] || 0) + 1;
+        got3.push({ who: DEF[e.to] ? DEF[e.to].name : "", item: e.back });
+      }
+    });
+    return got3;
+  }
+  var onTheWay = (F2, t2 = now()) => bookState(F2).sent.filter((e) => e.at > t2).length;
+  var lastTo = (F2, id) => {
+    const s = bookState(F2).sent.filter((e) => e.to === id);
+    return s[s.length - 1];
+  };
+  var ROW = "display:flex;align-items:center;gap:10px";
+  function bookHTML(F2, st6, t2 = now()) {
+    const list5 = contacts(F2), add2 = addable(F2), way = onTheWay(F2, t2);
+    let h3 = `<h2 style="margin-top:18px">Address book</h2><p class="muted">People you've met on your travels. Post them a letter (free) or a gift from your backpack (tap it there, then "By post"). Replies come back in a day or three.${way ? ` ${way} on the way.` : ""}</p>`;
+    h3 += list5.length ? `<ul class="qlist book">${list5.map((id) => {
+      const d = DEF[id], l = lastTo(F2, id);
+      return `<li style="${ROW}"><span class="wtxt" style="flex:1"><b>${esc(d.name)}</b><small>${esc(d.job || "")} · ${REGIONS2[REGION[id]]}${l ? ` · last: ${l.item ? nm4(l.item) : "a letter"}` : ""}</small></span><span class="orbtns" style="display:flex;gap:6px;flex-shrink:0"><button class="btn small alt" data-bk="write:${id}">Write</button><button class="btn small alt" data-bk="del:${id}" aria-label="Take ${esc(d.name)} out of your address book">×</button></span></li>` + (st6.open === id ? writeHTML(id, st6.letter || {}) : "");
+    }).join("")}</ul>` : `<p class="muted">Nobody yet.</p>`;
+    if (add2.length) h3 += st6.more ? `<p class="eyebrow" style="margin:12px 0 6px">Met on your travels</p><ul class="qlist book">${add2.sort((a, b) => DEF[a].name.localeCompare(DEF[b].name)).map((id) => `<li style="${ROW}"><span class="wtxt" style="flex:1"><b>${esc(DEF[id].name)}</b><small>${esc(DEF[id].job || "")} · ${REGIONS2[REGION[id]]}</small></span><span class="orbtns" style="flex-shrink:0"><button class="btn small alt" data-bk="add:${id}">Add</button></span></li>`).join("")}</ul><div class="actions"><button class="btn small alt" data-bk="less">Hide</button></div>` : `<div class="actions"><button class="btn small alt" data-bk="more">Add someone you've met (${add2.length})</button></div>`;
+    return h3;
+  }
+  function writeHTML(id, l) {
+    return `<li class="bkwrite" style="display:block"><div><p class="muted">A letter to ${esc(DEF[id].name)}. Start with one of these, add your own words, or both.</p>
+    <div class="gchips">${OPENINGS.map((o) => `<button class="gchip${l.open === o ? " on" : ""}" data-bk="open:${esc(o)}">${esc(o)}</button>`).join("")}</div>
+    <textarea id="bkText" maxlength="400" rows="3" placeholder="Your own words (optional)" style="width:100%;margin-top:8px">${esc(l.text || "")}</textarea>
+    <div class="actions"><button class="btn small primary" data-bk="send:${id}">Post it (free)</button><button class="btn small alt" data-bk="cancel">Cancel</button></div></div></li>`;
+  }
+
   // src/game/wrap.js
   var RIBBONS = { gingham: { n: "Gingham ribbon", price: 4 }, velvet: { n: "Velvet ribbon", price: 6 }, twine: { n: "Garden twine", price: 2 } };
   var REEL2 = 4;
@@ -33479,11 +34298,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!st6[id]) delete st6[id];
     return sent;
   }
-  var nm4 = (id) => ITEMS[id] ? ITEMS[id].n : id;
+  var nm5 = (id) => ITEMS[id] ? ITEMS[id].n : id;
   function storePanel(F2, where, o = {}) {
-    const s = storeState(F2)[where], ids = Object.keys(s).filter((id) => s[id] > 0 && ITEMS[id]).sort((a, b) => nm4(a).localeCompare(nm4(b)));
-    const bag2 = Object.keys(F2.inv || {}).filter((id) => F2.inv[id] > 0 && placeFor(id) === where).sort((a, b) => nm4(a).localeCompare(nm4(b)));
-    const cell = (id, sub, btns) => `<li><span class="wpic">${icon(ITEMS[id].ico, 30)}</span><span class="wtxt"><b>${esc(nm4(id))}</b><small>${sub}</small></span><span class="orbtns">${btns}</span></li>`;
+    const s = storeState(F2)[where], ids = Object.keys(s).filter((id) => s[id] > 0 && ITEMS[id]).sort((a, b) => nm5(a).localeCompare(nm5(b)));
+    const bag2 = Object.keys(F2.inv || {}).filter((id) => F2.inv[id] > 0 && placeFor(id) === where).sort((a, b) => nm5(a).localeCompare(nm5(b)));
+    const cell = (id, sub, btns) => `<li><span class="wpic">${icon(ITEMS[id].ico, 30)}</span><span class="wtxt"><b>${esc(nm5(id))}</b><small>${sub}</small></span><span class="orbtns">${btns}</span></li>`;
     let h3 = where === "fridge" ? `<p class="sub">Food, ingredients and flowers keep in here as long as you like. Take them out, or send them to a shop: Tomo drops them off on the bike.</p>` : `<span class="tape gingham" aria-hidden="true"></span><h2>The storage shelf</h2><p class="sub">Next to the boxes labelled "Christmas" and "misc": soaps, oils, gifts, seeds, anything that isn't for the fridge. Take them out, or send them to a shop.</p>`;
     h3 += ids.length ? `<ul class="hlist wlist orflowers">${ids.map((id) => cell(id, `${s[id]} stored`, `<button class="btn small alt" data-st="take" data-id="${id}" data-n="1">Take 1</button><button class="btn small alt" data-st="take" data-id="${id}" data-n="99">All</button>` + shopsFor(id, o.owns).map((sh) => `<button class="btn small primary" data-st="send" data-id="${id}" data-to="${sh.k}">To ${esc(sh.n.replace(/^the /, ""))}</button>`).join(""))).join("")}</ul>` : `<p class="muted">Nothing stored yet.</p>`;
     if (bag2.length) h3 += `<p class="eyebrow" style="margin:12px 0 6px">From your backpack</p><ul class="hlist wlist orflowers">${bag2.map((id) => cell(id, `${F2.inv[id]} with you`, `<button class="btn small primary" data-st="put" data-id="${id}" data-n="1">Put away 1</button><button class="btn small alt" data-st="put" data-id="${id}" data-n="99">All</button>`)).join("")}</ul>
@@ -33493,7 +34312,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function homeNote(F2, shop, owns3) {
     const sh = SHOPS.find((s) => s.k === shop);
     if (!sh) return "";
-    const got3 = ["fridge", "shelf"].flatMap((w) => Object.entries(storeState(F2)[w]).filter(([id, n]) => n > 0 && ITEMS[id] && sh.ok(id)).map(([id, n]) => `${n} ${nm4(id).toLowerCase()}`));
+    const got3 = ["fridge", "shelf"].flatMap((w) => Object.entries(storeState(F2)[w]).filter(([id, n]) => n > 0 && ITEMS[id] && sh.ok(id)).map(([id, n]) => `${n} ${nm5(id).toLowerCase()}`));
     return got3.length ? `<p class="muted">At home, waiting: ${esc(got3.slice(0, 6).join(", "))}${got3.length > 6 ? "…" : ""}. Send them from the fridge or the garage shelf.</p>` : "";
   }
 
@@ -34121,7 +34940,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function bookHtml(F2) {
     const k = kyotoState(F2), n = stampCount(F2);
     return `<h3 class="ph3">Your stamp book · ${n}/8</h3><p class="muted">Ink seal stamps from round Kyoto: walk up to each place and it's stamped in.${k.lantern ? " The book's full: there's a stone lantern by your pond at home." : " Fill the book and there'll be a little stone lantern by your pond at home."}</p>
-    <div class="tilegrid">${Object.entries(STAMPS2).map(([s, [nm5]]) => `<div class="tile${k.stamps[s] ? " own" : ""}">${stampPic(s, !!k.stamps[s])}<b>${esc(nm5)}</b></div>`).join("")}</div>`;
+    <div class="tilegrid">${Object.entries(STAMPS2).map(([s, [nm6]]) => `<div class="tile${k.stamps[s] ? " own" : ""}">${stampPic(s, !!k.stamps[s])}<b>${esc(nm6)}</b></div>`).join("")}</div>`;
   }
   var YUKATA = { price: 15, cols: { indigo: ["Indigo with white flowers", "indigo"], red: ["Red with gold fans", "crimson"], sky: ["Pale blue with goldfish", "pale blue"] } };
   var yukataOn = (F2, day = dayKey()) => {
@@ -34137,7 +34956,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function yukataPanel(F2, evanToo) {
     const on = yukataOn(F2);
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The yukata shop</h2><p class="sub">Rows of cotton summer kimonos, an obi sash to go with each, and wooden sandals. Wear one round Kyoto for the day; bring it back on your way to the train.</p>`;
-    h3 += on ? `<p><b>You're wearing the ${esc(YUKATA.cols[on][0].toLowerCase())} today.</b>${evanToo ? " Evan's in his little jinbei, very pleased with himself." : ""}</p>` : `<h3 class="ph3">Rent one for the day · ${YUKATA.price} ${coin18()}</h3><ul class="hlist wlist">${Object.entries(YUKATA.cols).map(([k, [nm5]]) => `<li><span class="wtxt"><b>${esc(nm5)}</b><small>${evanToo ? "Evan gets a matching jinbei, free." : "With an obi and sandals."}</small></span><button class="btn small primary" data-kt="yukata:${k}" ${F2.coins >= YUKATA.price ? "" : "disabled"}>Wear it</button></li>`).join("")}</ul>`;
+    h3 += on ? `<p><b>You're wearing the ${esc(YUKATA.cols[on][0].toLowerCase())} today.</b>${evanToo ? " Evan's in his little jinbei, very pleased with himself." : ""}</p>` : `<h3 class="ph3">Rent one for the day · ${YUKATA.price} ${coin18()}</h3><ul class="hlist wlist">${Object.entries(YUKATA.cols).map(([k, [nm6]]) => `<li><span class="wtxt"><b>${esc(nm6)}</b><small>${evanToo ? "Evan gets a matching jinbei, free." : "With an obi and sandals."}</small></span><button class="btn small primary" data-kt="yukata:${k}" ${F2.coins >= YUKATA.price ? "" : "disabled"}>Wear it</button></li>`).join("")}</ul>`;
     return h3 + list4(F2, "ktyukata", "And to take home") + shut25;
   }
   var TEA = { price: 10, BEAT: 560, WHISKS: 8, WINDOW: 150, COUNT_IN: 1200 };
@@ -34425,7 +35244,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const s = st6.paint || {}, n = rondaState(F2).painted || 0;
     let h3 = `<h3 class="ph3">Paint your own tile · ${PAINT.price} ${coin19()}</h3>`;
     if (!s.c || !s.p) return h3 + `<p class="muted">Lucía sits you at her table with a brush.${n ? ` (You've painted ${n} so far.)` : ""} Pick a colour and a pattern:</p>
-    <div class="gchips">${Object.entries(PAINT.colours).map(([k, [nm5, col]]) => `<button class="gchip${s.c === k ? " on" : ""}" data-rpaint="c:${k}"><span style="color:${col}">●</span> <span>${esc(nm5)}</span></button>`).join("")}</div>
+    <div class="gchips">${Object.entries(PAINT.colours).map(([k, [nm6, col]]) => `<button class="gchip${s.c === k ? " on" : ""}" data-rpaint="c:${k}"><span style="color:${col}">●</span> <span>${esc(nm6)}</span></button>`).join("")}</div>
     <div class="gchips">${Object.keys(PAINT.patterns).map((k) => `<button class="gchip${s.p === k ? " on" : ""}" data-rpaint="p:${k}"><span>${k === "star" ? "Star" : k === "flower" ? "Flower" : "Waves"}</span></button>`).join("")}</div>`;
     const step2 = s.step || 0;
     if (step2 < 4) return h3 + `<div class="paintrow">${paintPic(s.c, s.p, step2, 76)}<div><p class="muted">${step2 ? `Stroke ${step2} done. ` : ""}Now stroke ${step2 + 1} of 4: tap it.${s.oops ? " (Lucía steadies your hand: that one comes later.)" : ""}</p>
@@ -37407,7 +38226,7 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
   var localCache = { key: "", items: [] };
   var dayKeyAt = (ms) => new Date(ms + 6 * H).toISOString().slice(0, 10);
   function localMail() {
-    const day = dayKey(), hm6 = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm6 / 10)}:${S2.doneIds.length}:${S2.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}:${thanksMail().length}:${slowMail(F).length}:${bloomMail(F).length}`;
+    const day = dayKey(), hm6 = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm6 / 10)}:${S2.doneIds.length}:${S2.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}:${thanksMail().length}:${slowMail(F).length}:${bloomMail(F).length}:${bookMail(F).length}`;
     if (key === localCache.key) return localCache.items;
     const out = [], wd = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
     if (wd === 5 && hm6 >= 900 || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
@@ -37421,7 +38240,7 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
       body: `Meet me at the pond. Each of today's wins gets a lantern on the water.
 Then tell chat "wind down" whenever you're ready.`
     });
-    out.push(...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__mapleOffset || 0)), ...bloomMail(F));
+    out.push(...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__mapleOffset || 0)), ...bloomMail(F), ...bookMail(F));
     return (localCache = { key, items: out }).items;
   }
   var allMail = () => [...MAIL.items || [], ...localMail()];
@@ -37536,12 +38355,63 @@ Then tell chat "wind down" whenever you're ready.`
     $("mailBadge").textContent = unread;
     if (!items.length) {
       $("mailList").innerHTML = `<li><span></span><span class="muted">No letters yet.</span></li>`;
+      bookCard();
       return;
     }
     $("mailSum").textContent = unread ? `Letters · ${unread} new` : "Letters";
     $("mailList").innerHTML = items.map((m, i) => `<li class="${F.mailRead[m.id] ? "" : "unread"}"><span class="pl">${icon(F.mailRead[m.id] ? "letterOpen" : "letter", 22)}</span>
     <button class="open" data-mail="${i}"><span class="t">${esc(m.title || "A note")}</span><br><small>${esc(agentName(m.from))}${m.at ? " · " + new Date(m.at).toLocaleString("en-GB", { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Singapore" }) : ""}</small></button><span></span></li>`).join("");
     $("mailList").querySelectorAll("[data-mail]").forEach((b) => b.onclick = () => openMail(items[+b.dataset.mail]));
+    bookCard();
+  }
+  var bkSt = {};
+  function bookCard() {
+    const box = $("bookBox");
+    if (!box) return;
+    collectBack(F).forEach((g10) => flash(`${g10.who} tucked ${ITEMS[g10.item].n.toLowerCase()} in with their letter`));
+    if (box.contains(document.activeElement) && document.activeElement.id === "bkText") return;
+    box.innerHTML = bookHTML(F, bkSt);
+    const txt = box.querySelector("#bkText");
+    if (txt) txt.oninput = () => {
+      bkSt.letter = { ...bkSt.letter || {}, text: txt.value };
+    };
+    box.querySelectorAll("[data-bk]").forEach((b) => b.onclick = () => {
+      const [a, v] = b.dataset.bk.split(/:(.*)/s);
+      if (a === "more") bkSt.more = true;
+      else if (a === "less") bkSt.more = false;
+      else if (a === "add") {
+        if (addContact(F, v, dayKey())) {
+          sfx("paper", true);
+          flash(`${person2(v).name}, in your address book`);
+        }
+      } else if (a === "del") {
+        if (bkSt.del === v) {
+          removeContact(F, v);
+          bkSt = {};
+          flash("Taken out of your address book");
+        } else {
+          bkSt.del = v;
+          flash("Tap × again to take them out");
+        }
+      } else if (a === "write") {
+        bkSt = { open: bkSt.open === v ? null : v, letter: {} };
+      } else if (a === "cancel") bkSt = {};
+      else if (a === "open") {
+        bkSt.letter = { ...bkSt.letter || {}, open: bkSt.letter && bkSt.letter.open === v ? "" : v };
+      } else if (a === "send") {
+        const l = bkSt.letter || {}, r = postTo(F, v, { open: l.open, text: l.text });
+        if (r.err) {
+          flash(r.err);
+          return;
+        }
+        sfx("chime");
+        flash(`Posted to ${person2(v).name}`);
+        speak(`Off it goes to ${REGIONS2[regionOf2(v)]}. Watch your mailbox for a reply.`, 4e3);
+        bkSt = {};
+      }
+      save2();
+      bookCard();
+    });
   }
   function facts() {
     const hm6 = sgHM(), t2 = phase() === "task" ? remaining()[0] : null, sp = t2 ? spotOf(t2) : null, pl = t2 ? placeOf(t2) : null;
@@ -37586,11 +38456,13 @@ Then tell chat "wind down" whenever you're ready.`
     }
     if (it.kind === "gift") {
       giftPick = giftPick === id ? null : id;
+      postPick = false;
       bag();
       return;
     }
     if (it.kind === "bouquet") {
       giftPick = giftPick === id ? null : id;
+      postPick = false;
       bag();
       return;
     }
@@ -37796,10 +38668,12 @@ Then tell chat "wind down" whenever you're ready.`
   var giftNames = (to) => to === "grands" ? "Ma Ma or Gong Gong" : to === "family" ? "the family" : giftWho(to).map((g10) => GIFT_NAME[g10]).join(giftWho(to).length > 2 ? ", " : " or ").replace(/, ([^,]*)$/, " or $1");
   var giftPos = (w) => w === "evan" ? evanHere() ? evan : null : w === "darren" ? isHere("darren") ? npcPos("darren") : null : npcPos(w);
   var giftPick = null;
+  var postPick = false;
+  var postPickHTML = (it) => `<p style="margin-top:10px"><b>Post it to…</b></p><div class="actions">${contacts(F).map((id) => `<button class="btn small alt" data-postto="${id}" ${F.coins >= postage(id) && !it.gel ? "" : "disabled"}>${esc(person2(id).name)}<small> · ${postage(id)} coins</small></button>`).join("")}</div>${it.gel ? `<p class="muted">Ice cream would melt in the post.</p>` : ""}`;
   function giftPickHTML(id) {
     const it = ITEMS[id];
     if (!it || !F.inv[id]) return "";
-    return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${recipients(it).map((w) => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}${canKeep(it) ? `<button class="btn small alt" data-keepit="1">Keep it${it.magnet ? "<small> · for the fridge</small>" : "<small> · on a shelf</small>"}</button>` : ""}<button class="btn small alt" data-giveto="">Cancel</button></div>
+    return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${recipients(it).map((w) => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}${canKeep(it) ? `<button class="btn small alt" data-keepit="1">Keep it${it.magnet ? "<small> · for the fridge</small>" : "<small> · on a shelf</small>"}</button>` : ""}${contacts(F).length ? `<button class="btn small alt" data-bypost="1">By post…</button>` : ""}<button class="btn small alt" data-giveto="">Cancel</button></div>${postPick ? postPickHTML(it) : ""}
     <p class="muted">Anyone who isn't here gets it sent round, and their thank-you note comes to your mailbox.${canKeep(it) ? " Or keep it, and put it up somewhere of yours." : ""}</p></div>`;
   }
   function giveTo(id, w) {
@@ -40550,6 +41424,26 @@ ${SIGNOFF[t2.who] || ""}`;
       ev.stopPropagation();
       giveTo(giftPick, b.dataset.giveto);
     });
+    $("bag").querySelectorAll("[data-bypost]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      postPick = !postPick;
+      bag();
+    });
+    $("bag").querySelectorAll("[data-postto]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      const to = b.dataset.postto, r = postTo(F, to, { item: giftPick });
+      if (r.err) {
+        flash(r.err);
+        return;
+      }
+      postPick = false;
+      giftPick = null;
+      sfx("chime");
+      flash(`Posted to ${person2(to).name}`);
+      speak(`Wrapped in brown paper and off to ${REGIONS2[regionOf2(to)]}. Watch your mailbox for a thank-you.`, 4500);
+      save2();
+      bag();
+    });
     $("bag").querySelectorAll("[data-keepit]").forEach((b) => b.onclick = (ev) => {
       ev.stopPropagation();
       keepItem = giftPick;
@@ -41145,9 +42039,9 @@ ${SIGNOFF[t2.who] || ""}`;
     }
   }
   function lunchTablePanel() {
-    const hm6 = sgHM(), list5 = bookingsFor(dayKey()).filter((b) => hm6 >= b.at), nm5 = (id) => (NPCS.find((n) => n.id === id) || { name: id }).name, t2 = vineState(F).today || {};
+    const hm6 = sgHM(), list5 = bookingsFor(dayKey()).filter((b) => hm6 >= b.at), nm6 = (id) => (NPCS.find((n) => n.id === id) || { name: id }).name, t2 = vineState(F).today || {};
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The Sunday long lunch</h2><p class="sub">${seatedAt(dayKey(), hm6)} at the table under the canvas. You're out here hosting, so they're ordering faster (and they tip).</p>
-    <ul class="hlist lunchbook">${list5.map((b) => `<li><span>${esc(b.ids.map(nm5).join(", ").replace(/, ([^,]*)$/, " and $1"))}</span><small>${b.family ? "family!" : b.birthday ? "a birthday" : `${b.size} ${b.size === 1 ? "seat" : "seats"}`}</small></li>`).join("")}</ul>
+    <ul class="hlist lunchbook">${list5.map((b) => `<li><span>${esc(b.ids.map(nm6).join(", ").replace(/, ([^,]*)$/, " and $1"))}</span><small>${b.family ? "family!" : b.birthday ? "a birthday" : `${b.size} ${b.size === 1 ? "seat" : "seats"}`}</small></li>`).join("")}</ul>
     <p class="muted">So far today: ${t2.lunchB || 0} bottles and ${t2.lunchP || 0} plates to the table. ${shelfStock(vineState(F))} bottles left on the shelves.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function roomSpot(id) {
@@ -43935,9 +44829,9 @@ ${SIGNOFF[t2.who] || ""}`;
       ctx();
       drawScene();
     };
-    const nm5 = c.querySelector("#hfName");
-    if (nm5) nm5.oninput = () => {
-      hfSt.name = nm5.value;
+    const nm6 = c.querySelector("#hfName");
+    if (nm6) nm6.oninput = () => {
+      hfSt.name = nm6.value;
     };
     const hn = c.querySelector("[data-hfname]");
     if (hn) hn.onsubmit = (e) => {

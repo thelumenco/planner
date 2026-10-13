@@ -2403,3 +2403,17 @@ then needed a walk to the gift shop and "Put out", and Tempranillo bottles never
 - `giftshop.js` wine corner: "Pair it" on each bottle opens a 4-bonbon picker (`data-gs` `pair`, `padd`, `psub`, `pfill`, `pgo`, `pcancel`);
   "Pack and put out" packs it and puts it straight on the display. Picker state `gsPk` in `core.js` (cleared on close).
 - Test block "round 189".
+
+## Round 190: the address book (contacts round 1)
+Mel: "People I meet on travels, can I add them to a contact list... mail them gifts and letters. They then come back
+with a thank you note in line with their character". Mel chose: letters free, parcels cost postage; ready-made openings
+plus her own words; campervan neighbours can be added too.
+- `game/contacts.js`: who can be added (`canAdd`: met on a trip, not `tourist`; Jason and Luca held for the Cinque Terre round),
+  `addContact`/`removeContact`, `postTo` (parcels: `POSTAGE` 2 Bellbird/Coast, 4 Tablelands/Lavender, 8 abroad; reply in 1/2/3 days;
+  about one in five tucks in their `back` item), `giftKind`, `replyBody`, `bookMail` (into `localMail`), `collectBack`, `bookHTML`.
+- Voices: `data/pen-lv.js` (21 Lavender Hills locals), `data/pen-bb.js` (33 Bellbird Valley locals and neighbours). Fields: sign, food,
+  drink, made, flower, other, letter, news[2], back, backNote. `back` may be a region good (`b_...`), registered into ITEMS by ronda.js.
+  Anyone without a voice yet writes a plain thank-you with a P.S. from their own `lines`.
+- UI: the address book sits under Letters in the mail tab (`#bookBox`, `data-bk`); the backpack's gift chooser has "By post…" (`data-bypost`, `data-postto`).
+- State: `F.book = {ids: {id: dayAdded}, sent: [...]}`. Test block "round 190".
+- Still to do: voices for the Coast Road and Tablelands (round 2), Ronda, Kyoto, Jeju, Cinque Terre (round 3; ask Mel about Jason and Luca).

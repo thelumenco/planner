@@ -1,3 +1,4 @@
+// (back: things from their own stops are registered from the region's goods at runtime, see ronda.js)
 // Letter voices for the Lavender Hills' people (round 190): how each one writes back when Mel posts them a gift or a letter.
 export const PEN_LV = {
   /* ---------- Lavender Ridge ---------- */
@@ -9,7 +10,7 @@ export const PEN_LV = {
     other: "I have put it on the shelf above the still, where my grandfather kept his good things.",
     letter: "Your letter came while I was cutting the far rows. I read it twice, sitting in the lavender.",
     news: ["The last of the harvest is in. The still ran for nine days without a single complaint.", "The rows are cut back now and resting. Lavender is patient. So am I, mostly."],
-    back: "bq_lavender", backNote: "A bunch from the far rows, cut in the morning when the oil is strongest."},
+    back: "b_lavbunch", backNote: "A dried bunch from the far rows, to hang over your door."},
   lvmargaux: {sign: "Bisous, Margaux",
     food: "I hid it under the counter so Papa wouldn't find it. He found it.",
     drink: "We shared it after closing, with the door open and the whole hill smelling of lavender.",
@@ -18,7 +19,7 @@ export const PEN_LV = {
     other: "It sits by the till now, and I tell every customer it came from a friend far away.",
     letter: "The postman brought your letter to the farm shop, and I read it between customers.",
     news: ["Papa gave away free bunches to a whole coach of tourists. He grumbled the entire time.", "We have a new lavender soap, a little stronger. I keep one in every drawer."],
-    back: "honey_lav", backNote: "A jar of our lavender honey, from the shelf by the window. Stir it into your tea."},
+    back: "b_lavbags", backNote: "Little lavender bags for your drawers. Papa tied the ribbons himself, very badly."},
   lvhelene: {sign: "With love from the tea room, Hélène",
     food: "I had it with a pot of tea at the best window on the hill. The view was free, as always.",
     drink: "I have saved it for a quiet afternoon, when the scones are done and the room is empty.",
@@ -27,7 +28,7 @@ export const PEN_LV = {
     other: "Such a kind thought. I keep it by the till, where I can see it while I pour.",
     letter: "Your letter arrived with the morning milk, and I read it with my first cup of tea.",
     news: ["I have tried a scone with a little honey from Sunflower Hill. Only a little.", "The lemonade is still pink, and the children still think it is magic."],
-    back: "pinklemonade", backNote: "A bottle of our pink lemonade. The colour is from the flowers, I promise."},
+    back: null, backNote: ""},
 
   /* ---------- Montrose ---------- */
   lvlise: {sign: "Lise, from your paperie",
@@ -47,7 +48,7 @@ export const PEN_LV = {
     other: "It is on the shelf behind the counter now, where the flour cannot reach it. Mostly.",
     letter: "Your letter came after the morning rush. I read it with a croissant, which is how all letters should be read.",
     news: ["Fifty-one years and still I have not missed a morning. The oven is older than me and just as stubborn.", "The fougasse sold out before nine on Saturday. I have started making two batches."],
-    back: "croissant", backNote: "A croissant from this morning's bake. Warm it a little in the oven before you eat it."},
+    back: "b_fougasse", backNote: "A fougasse from this morning's oven. It was warm when it left."},
   lvroux: {sign: "Madame Roux, nougat de Montrose",
     food: "I ate it slowly, between stirs. Do not tell anyone a nougat maker likes other sweets.",
     drink: "I have saved it for a Tuesday. Tuesdays deserve something nice, like calissons.",
@@ -56,7 +57,7 @@ export const PEN_LV = {
     other: "Very kind. It sits by my big knife now, where I look every day.",
     letter: "Your letter arrived in the middle of a batch, so I read it one stir at a time.",
     news: ["The almonds from my brother came in this week, the best yet.", "I made calissons for a wedding in the square. And a few extra, for Tuesday."],
-    back: "lavhoney", backNote: "Lavender honey, the same I put in the nougat. Nothing else. Well, sugar."},
+    back: "b_calissons", backNote: "A little box of calissons, the almond ones you liked."},
   lvpaul: {sign: "Paul, Café de la Place",
     food: "I ate it at the corner table, watching the pétanque. Pagnol won, naturally.",
     drink: "I will pour a glass for myself after closing. Sugar on the side, as always.",
@@ -65,7 +66,7 @@ export const PEN_LV = {
     other: "It sits by the coffee machine now, so I see it every time I make an espresso.",
     letter: "Your letter came with the morning papers, and I read it outside under the plane trees.",
     news: ["Pagnol has still not lost since March. Fernand says next week. Fernand always says next week.", "The plane trees are turning gold, and we moved two tables into the sun."],
-    back: "lemon", backNote: "A lemon from the café crate. Squeeze it yourself, sugar on the side. That's the rule."},
+    back: null, backNote: ""},
   lvpagnol: {sign: "Pagnol, champion of Montrose",
     food: "I ate it before my game. Then I won. Coincidence? Perhaps not.",
     drink: "I will share it with Fernand, to console him. He will need consoling.",
@@ -94,7 +95,7 @@ export const PEN_LV = {
     other: "It sits at the organ now, among the little bottles. It belongs there.",
     letter: "Your letter came on a quiet morning, and I read it in the rose garden among the bees.",
     news: ["The roses gave a second flowering this autumn, small and very sweet.", "I am teaching my daughter the organ, one row of bottles at a time."],
-    back: "soap_rose", backNote: "A rose soap. Josette made it with a little of my rose. Smell it before you use it."},
+    back: "b_scentbottle", backNote: "A tiny glass bottle from Luc, for a scent of your own one day."},
   lvjosette: {sign: "Josette, la savonnerie",
     food: "I ate it in the shop doorway, with the soap curing on the shelves behind me.",
     drink: "I have put it by the window to share with Luc after work. He is always thirsty after the furnace.",
@@ -103,7 +104,7 @@ export const PEN_LV = {
     other: "It sits on the shelf with my mother's stamp now. I am very fond of it.",
     letter: "Your letter came while I was cutting a new block, so I read it with olive oil on my thumbs.",
     news: ["Émile sent down a sack of this year's lavender, and the new batch is curing beautifully.", "I have cut more soap this summer than any year before. My arms are very strong now."],
-    back: "soap_lav", backNote: "A lavender soap from the new batch, stamped with my mother's stamp."},
+    back: "b_savon", backNote: "A block of our soap, stamped this week."},
   lvluc: {sign: "Luc, at the furnace",
     food: "I ate it on the step outside the workshop, where it's cooler. Thank you for feeding me.",
     drink: "I will drink it when the furnace is banked for the night. Glassblowing is thirsty work.",
@@ -112,7 +113,7 @@ export const PEN_LV = {
     other: "It sits on the sill where the light comes in, next to my glass birds.",
     letter: "Your letter came while the furnace was hot, so I read it standing well back, as I tell everyone to.",
     news: ["I made a new flock of birds this month, pale green and blue. They look like the sea.", "Madame Arnaud ordered fifty perfume bottles. I am turning, turning, turning."],
-    back: "k_seaglass", backNote: "A jar of sea glass. It is glass the sea has finished slowly, much slower than me."},
+    back: "b_glassbird", backNote: "A little glass bird. It came out of the fire smiling, so it is yours."},
 
   /* ---------- Sunflower Hill ---------- */
   lvodile: {sign: "Odile, from the hives",
@@ -123,7 +124,7 @@ export const PEN_LV = {
     other: "It sits on the kitchen windowsill, where I see it when I wash up.",
     letter: "Your letter came at lunchtime. I read it out to the bees afterwards. They like news.",
     news: ["The sunflower honey came in thick and golden this year. The bees decided well.", "Lunch has grown so busy we have added two chairs at the end of the table."],
-    back: "honeycomb", backNote: "A piece of honeycomb from the hives. You chew the wax, like a sweet."},
+    back: "b_honeypot", backNote: "A pot of our honey, with a dipper."},
   lvmathis: {sign: "Mathis (and two million bees)",
     food: "I ate it after a hot morning at the hives. It was much better than a bee suit.",
     drink: "I drank it in the shade of the sunflowers, with my veil off at last.",
@@ -141,7 +142,7 @@ export const PEN_LV = {
     other: "It sits in the window among the candles now, catching the light.",
     letter: "Your letter came while I was dipping. Twenty-one dips that day: I was daydreaming about it.",
     news: ["Odile's hives gave so much wax this year I've started rolling little honeycomb candles.", "The shop smells of honey from morning to night. I never tire of it."],
-    back: "beecandle", backNote: "A beeswax candle for your dinner table. The whole house will smell of honey."},
+    back: "b_candle", backNote: "A beeswax candle, poured from this summer's wax."},
 
   /* ---------- The Old Bridge ---------- */
   lvnadia: {sign: "Nadia, l'épicerie du pont",
@@ -152,7 +153,7 @@ export const PEN_LV = {
     other: "I've put it on the shelf above the till, where I can see it all day.",
     letter: "Your letter came with the bread delivery, and I read it on the bridge in the sunshine.",
     news: ["We've had picnickers on the meadow every fine day this autumn.", "I won at pooh-sticks on Sunday, from the middle of the bridge. Always the middle."],
-    back: "olivejar", backNote: "A jar of our marinated olives, for your next picnic."},
+    back: "b_tapenade", backNote: "A jar of tapenade from the shelf by the door."},
   lvsylvie: {sign: "Sylvie, Glacier du Pont",
     food: "I am already wondering if it would work as a gelato. Everything does, if you're patient.",
     drink: "I drank it on the step of the shop, with a scoop of the pale purple one. Two flavours: that's the minimum.",
@@ -181,7 +182,7 @@ export const PEN_LV = {
     other: "It sits in the fromagerie window, beside the cheeses on their straw mats.",
     letter: "Your letter came during the morning milking. I read it in the dairy with the door open to the hill.",
     news: ["Three new kids this season. They leap off every rock on the hill.", "My banon took a ribbon at the market in the valley. Maman's recipe, of course."],
-    back: "goatcheese", backNote: "A little goat's cheese, rolled in herbs from the hill."},
+    back: "b_chevre", backNote: "A little chèvre in a chestnut leaf. The goats insisted."},
   lvtheo: {sign: "Théo, under the vine",
     food: "I warmed it up a little, as I do everything. Then I ate it under the vine.",
     drink: "We poured it at the long table at sunset, with the lanterns on. Then we all went up to the chapel.",
