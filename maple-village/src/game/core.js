@@ -82,6 +82,7 @@ import { tablelandsRoomArt } from "../art/tablelands-rooms.js";
 import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } from "./lunch.js";
 import { craftState, craft as millCraft, renderWax, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, fromBasket, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
 import { hamperSeason, xmasState, TREATS, treatsHTML, mulledStallPanel, treePanel, treeLit, countdownDue, myStallPanel as xmStallPanel, putOut, takeBack as xmTakeBack, putWine, takeWine, stallSellMinute, registerHampers, hamperPanel, packStart, packAdd, packWine, packRemove, packTie, singCarol, lanternWalk, grottoPanel, grottoVisit, sendHamper, hamperMail, collectReplies, fillOrder } from "./xmas.js";
+import * as BK from "./contacts.js";
 import { giftPanel, giftSellMinute, keeperOn as giftKeeperOn, putOutPairs, takeBackPair, putWrapped, giftState, takeBottle, registerBottles } from "./giftshop.js";
 import * as PP from "./paperie.js";
 import * as WR from "./wrap.js";
@@ -1150,7 +1151,7 @@ const WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday
 let localCache = {key: "", items: []};
 const dayKeyAt = ms => new Date(ms + 6*H).toISOString().slice(0, 10);   // same 2am reset as dayKey()
 function localMail(){
-  const day = dayKey(), hm = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm/10)}:${S.doneIds.length}:${S.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}:${thanksMail().length}:${slowMail(F).length}:${PP.bloomMail(F).length}`;
+  const day = dayKey(), hm = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm/10)}:${S.doneIds.length}:${S.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}:${thanksMail().length}:${slowMail(F).length}:${PP.bloomMail(F).length}:${BK.bookMail(F).length}`;
   if (key === localCache.key) return localCache.items;
   const out = [], wd = new Date(day + "T00:00:00Z").getUTCDay();
   if ((wd === 5 && hm >= 900) || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
@@ -1158,7 +1159,7 @@ function localMail(){
   const routineWind = (MAIL.items || []).some(m => m && m.from === "winddown" && m.at && dayKeyAt(m.at) === day);
   if (hm >= 1080 && !routineWind && (S.cleanDone || S.doneIds.length)) out.push({id: "wind-" + day, from: "winddown", at: sgAt(day, 18), pond: true,
     title: "Time to close the day", body: "Meet me at the pond. Each of today's wins gets a lantern on the water.\nThen tell chat \"wind down\" whenever you're ready."});
-  out.push(...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__mapleOffset || 0)), ...PP.bloomMail(F));   // round 129: Jeju's slow-post postcards, two weeks on
+  out.push(...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__mapleOffset || 0)), ...PP.bloomMail(F), ...BK.bookMail(F));   // round 129: Jeju's slow-post postcards, two weeks on
   return (localCache = {key, items: out}).items;
 }
 const allMail = () => [...(MAIL.items || []), ...localMail()];
@@ -1234,11 +1235,30 @@ function mailCard(){
   const items = allMail().filter(m => m && m.id).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 20);
   const unread = items.filter(m => !F.mailRead[m.id]).length;
   $("mailBadge").hidden = !unread; $("mailBadge").textContent = unread;
-  if (!items.length) { $("mailList").innerHTML = `<li><span></span><span class="muted">No letters yet.</span></li>`; return; }
+  if (!items.length) { $("mailList").innerHTML = `<li><span></span><span class="muted">No letters yet.</span></li>`; bookCard(); return; }
   $("mailSum").textContent = unread ? `Letters · ${unread} new` : "Letters";
   $("mailList").innerHTML = items.map((m, i) => `<li class="${F.mailRead[m.id] ? "" : "unread"}"><span class="pl">${icon(F.mailRead[m.id] ? "letterOpen" : "letter", 22)}</span>
     <button class="open" data-mail="${i}"><span class="t">${esc(m.title || "A note")}</span><br><small>${esc(agentName(m.from))}${m.at ? " · " + new Date(m.at).toLocaleString("en-GB", {weekday:"short", hour:"numeric", minute:"2-digit", timeZone:"Asia/Singapore"}) : ""}</small></button><span></span></li>`).join("");
   $("mailList").querySelectorAll("[data-mail]").forEach(b => b.onclick = () => openMail(items[+b.dataset.mail]));
+  bookCard();
+}
+// round 190: the address book, under the letters
+let bkSt = {};
+function bookCard(){
+  const box = $("bookBox"); if (!box) return;
+  BK.collectBack(F).forEach(g => flash(`${g.who} tucked ${ITEMS[g.item].n.toLowerCase()} in with their letter`));
+  if (box.contains(document.activeElement) && document.activeElement.id === "bkText") return;   // don't wipe a letter mid-sentence
+  box.innerHTML = BK.bookHTML(F, bkSt);
+  const txt = box.querySelector("#bkText"); if (txt) txt.oninput = () => { bkSt.letter = {...(bkSt.letter || {}), text: txt.value}; };
+  box.querySelectorAll("[data-bk]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.bk.split(/:(.*)/s);
+    if (a === "more") bkSt.more = true; else if (a === "less") bkSt.more = false;
+    else if (a === "add") { if (BK.addContact(F, v, dayKey())) { sfx("paper", true); flash(`${BK.person(v).name}, in your address book`); } }
+    else if (a === "del") { if (bkSt.del === v) { BK.removeContact(F, v); bkSt = {}; flash("Taken out of your address book"); } else { bkSt.del = v; flash("Tap × again to take them out"); } }
+    else if (a === "write") { bkSt = {open: bkSt.open === v ? null : v, letter: {}}; }
+    else if (a === "cancel") bkSt = {};
+    else if (a === "open") { bkSt.letter = {...(bkSt.letter || {}), open: bkSt.letter && bkSt.letter.open === v ? "" : v}; }
+    else if (a === "send") { const l = bkSt.letter || {}, r = BK.postTo(F, v, {open: l.open, text: l.text}); if (r.err) { flash(r.err); return; } sfx("chime"); flash(`Posted to ${BK.person(v).name}`); speak(`Off it goes to ${BK.REGIONS[BK.regionOf(v)]}. Watch your mailbox for a reply.`, 4000); bkSt = {}; }
+    save(); bookCard(); });
 }
 
 /* =================== NPC FACTS (for reactions) =================== */
@@ -1262,8 +1282,8 @@ function decorClick(id){
 function useItem(id){
   const it = ITEMS[id]; if (!it || !F.inv[id]) return;
   if (it.kind === "seed") { speak("Seeds go in the garden. Tap a plot there!", 3500); return; }
-  if (it.kind === "gift") { giftPick = giftPick === id ? null : id; bag(); return; }
-  if (it.kind === "bouquet") { giftPick = giftPick === id ? null : id; bag(); return; }   // choose who it's for, like a gift
+  if (it.kind === "gift") { giftPick = giftPick === id ? null : id; postPick = false; bag(); return; }
+  if (it.kind === "bouquet") { giftPick = giftPick === id ? null : id; postPick = false; bag(); return; }   // choose who it's for, like a gift
   if (it.kind === "pot") { potItem = id; orView = "pot"; openView = null; render(); return; }
   if (it.kind === "keepsake") { keepItem = id; openView = null; render(); return; }
   if (it.kind === "pet") { adoptItem = id; adoptSt = {}; openView = null; render(); return; }
@@ -1352,10 +1372,12 @@ const giftNames = to => to === "grands" ? "Ma Ma or Gong Gong" : to === "family"
 const giftPos = w => w === "evan" ? (evanHere() ? evan : null) : w === "darren" ? (isHere("darren") ? npcPos("darren") : null) : npcPos(w);
 // Tapping a gift in the backpack opens a little chooser of who it suits. Someone here gets it in person; anyone else
 // gets it sent round, and their thank-you note arrives in the mailbox a little later (F.thanks).
-let giftPick = null;
+let giftPick = null, postPick = false;
+// round 190: post it to someone in the address book (postage by how far; their reply comes in a day or three)
+const postPickHTML = it => `<p style="margin-top:10px"><b>Post it to…</b></p><div class="actions">${BK.contacts(F).map(id => `<button class="btn small alt" data-postto="${id}" ${F.coins >= BK.postage(id) && !it.gel ? "" : "disabled"}>${esc(BK.person(id).name)}<small> · ${BK.postage(id)} coins</small></button>`).join("")}</div>${it.gel ? `<p class="muted">Ice cream would melt in the post.</p>` : ""}`;
 function giftPickHTML(id){
   const it = ITEMS[id]; if (!it || !F.inv[id]) return "";
-  return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${recipients(it).map(w => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}${canKeep(it) ? `<button class="btn small alt" data-keepit="1">Keep it${it.magnet ? "<small> · for the fridge</small>" : "<small> · on a shelf</small>"}</button>` : ""}<button class="btn small alt" data-giveto="">Cancel</button></div>
+  return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${recipients(it).map(w => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}${canKeep(it) ? `<button class="btn small alt" data-keepit="1">Keep it${it.magnet ? "<small> · for the fridge</small>" : "<small> · on a shelf</small>"}</button>` : ""}${BK.contacts(F).length ? `<button class="btn small alt" data-bypost="1">By post…</button>` : ""}<button class="btn small alt" data-giveto="">Cancel</button></div>${postPick ? postPickHTML(it) : ""}
     <p class="muted">Anyone who isn't here gets it sent round, and their thank-you note comes to your mailbox.${canKeep(it) ? " Or keep it, and put it up somewhere of yours." : ""}</p></div>`;
 }
 function giveTo(id, w){
@@ -2229,6 +2251,9 @@ function bag(){
   if (hasUp(scoopState(F), "bike")) { $("bag").insertAdjacentHTML("beforeend", `<button class="btn small alt" data-deliver="1" style="grid-column:1/-1">Send something by delivery bike</button>`);
     $("bag").querySelector("[data-deliver]").onclick = () => { openView = null; scView = "deliver"; scSt.vpick = null; scSt.vother = null; scoopNow(); ctx(); }; }
   $("bag").querySelectorAll("[data-giveto]").forEach(b => b.onclick = ev => { ev.stopPropagation(); giveTo(giftPick, b.dataset.giveto); });
+  $("bag").querySelectorAll("[data-bypost]").forEach(b => b.onclick = ev => { ev.stopPropagation(); postPick = !postPick; bag(); });
+  $("bag").querySelectorAll("[data-postto]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const to = b.dataset.postto, r = BK.postTo(F, to, {item: giftPick}); if (r.err) { flash(r.err); return; }
+    postPick = false; giftPick = null; sfx("chime"); flash(`Posted to ${BK.person(to).name}`); speak(`Wrapped in brown paper and off to ${BK.REGIONS[BK.regionOf(to)]}. Watch your mailbox for a thank-you.`, 4500); save(); bag(); });
   $("bag").querySelectorAll("[data-keepit]").forEach(b => b.onclick = ev => { ev.stopPropagation(); keepItem = giftPick; giftPick = null; openView = null; render(); });   // a souvenir kept: off to the shelf chooser
   $("bag").querySelectorAll(".item").forEach(b => b.onclick = ev => { const k = ev.target.closest("[data-kit]"); if (k) { ev.stopPropagation(); toKitchen(k.dataset.kit); return; } useItem(b.dataset.id); });
   $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome gift of seeds is in here. Plant them in the garden." : "";

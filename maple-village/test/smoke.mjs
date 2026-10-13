@@ -4162,6 +4162,25 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const w = cc.packPairing(F, pk.k, pk.sel), k = gs.putOutPairs(F, c, 1);
   check(w === "Ronda Red" && k === 1 && !F.inv.pairbox && gs.giftState(F).pairs[0] === 28 + 4*c.prices.bonbon && F.vine.shelf[0].n === 1 && c.trays.a === 2, "packed and straight out on the display, at the bottle plus four bonbons");
 }
+{
+  console.log("\nThe address book: post gifts and letters to people met on trips (round 190)");
+  const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
+  const T = Date.UTC(2026, 9, 14, 3), D = 864e5;
+  const F = {coins: 10, inv: {box4: 2}, met: {lvemile: true, lvpainter: true, jason: true, hana: true}};
+  check(bk.canAdd(F, "lvemile") && !bk.canAdd(F, "lvpainter") && !bk.canAdd(F, "jason") && !bk.canAdd(F, "hana") && !bk.canAdd(F, "lvmargaux"), "only people met on a trip, not day-trippers, not village folk");
+  check(bk.addable(F).join() === "lvemile" && bk.addContact(F, "lvemile", "2026-10-14") && bk.contacts(F).join() === "lvemile" && !bk.addable(F).length, "added to the book when Mel wants");
+  check(!!bk.postTo(F, "lvemile", {}, T).err && !bk.postTo(F, "lvemile", {open: "Thinking of you"}, T).err && F.coins === 10, "a letter needs a few words, and it's free");
+  const e = bk.postTo(F, "lvemile", {item: "box4"}, T);
+  check(!e.err && F.coins === 6 && F.inv.box4 === 1 && e.at === T + 2*D, "a parcel to the Lavender Hills: 4 coins postage, the reply in two days");
+  check(!bk.bookMail(F, T + D).length && bk.bookMail(F, T + 2*D).length === 2, "replies arrive when they're due");
+  const m = bk.bookMail(F, T + 2*D).find(x => x.id === e.id);
+  check(/Thank you for the/.test(m.body) && m.body.includes(bk.PEN.lvemile.sign) && m.title.includes("Émile"), "a thank-you in Émile's own voice, signed his way");
+  check(Object.keys(bk.PEN).every(id => bk.person(id) && !bk.person(id).tourist) && Object.values(bk.PEN).every(p => !p.back || it.ITEMS[p.back]), "every voice belongs to a real local, and anything tucked in is a real thing");
+  const G = {coins: 0, inv: {box4: 1}, met: {carmen: true}}; bk.addContact(G, "carmen", "d");
+  check(!!bk.postTo(G, "carmen", {item: "box4"}, T).err && bk.postage("carmen") === 8, "abroad costs 8, and there's no posting without the coins");
+  const r = bk.postTo(G, "carmen", {text: "Hola!"}, T); check(!r.err && /P\.S\./.test(bk.replyBody(r)), "someone with no voice yet writes back with a P.S. from her own lines");
+  bk.removeContact(F, "lvemile"); check(!bk.contacts(F).length, "and Mel can take someone out again");
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

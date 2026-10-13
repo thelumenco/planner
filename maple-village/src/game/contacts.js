@@ -1,0 +1,117 @@
+// The address book (round 190, Mel: "People I meet on travels, can I add them to a contact list in the game if I want,
+// so I can mail them gifts and letters. They then come back with a thank you note in line with their character").
+// Anyone Mel's met on a trip (F.met), but not the day-trippers (tourist: true), can go in the book if she wants; the
+// campervan neighbours too. From the gift chooser she posts a gift ("By post"): parcels cost postage by how far
+// (POSTAGE), letters are free. A reply comes back in a day or three, in that person's own voice (data/pen-*.js), and now
+// and then with a little something from their stop tucked in. Someone with no voice written yet writes a plain thank-you
+// with a P.S. from their own lines.
+// State: F.book = {ids: {id: dayAdded}, sent: [{id, to, item, open, text, at, back, got}]}
+// Jason and Luca are held out for now (Mel to decide, Cinque Terre's round).
+import { esc, now, hash } from "../util.js";
+import { ITEMS } from "../data/items.js";
+import { NPCS } from "../data/npcs.js";
+import { BB_PEOPLE } from "../data/bb-people.js";
+import { CR_PEOPLE } from "../data/cr-people.js";
+import { TL_PEOPLE } from "../data/tl-people.js";
+import { LV_PEOPLE } from "../data/lv-people.js";
+import { PEN_LV } from "../data/pen-lv.js";
+import { PEN_BB } from "../data/pen-bb.js";
+
+const D = 24*60*60*1000;
+export const PEN = {...PEN_LV, ...PEN_BB};
+export const REGIONS = {bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre"};
+// what a parcel costs to post, and how many days the reply takes (a letter's free)
+export const POSTAGE = {bellbird: 2, coast: 2, tablelands: 4, lavender: 4, ronda: 8, kyoto: 8, jeju: 8, cinque: 8};
+const DAYS = {2: 1, 4: 2, 8: 3};
+const HELD = ["jason", "luca"];
+const REGION = {};
+[[BB_PEOPLE, "bellbird"], [CR_PEOPLE, "coast"], [TL_PEOPLE, "tablelands"], [LV_PEOPLE, "lavender"]].forEach(([list, r]) => list.forEach(p => { REGION[p.id] = r; }));
+NPCS.forEach(p => { if (["ronda", "kyoto", "jeju", "cinque"].includes(p.local)) REGION[p.id] = p.local; });
+const DEF = {}; NPCS.forEach(p => { if (REGION[p.id]) DEF[p.id] = p; });
+export const person = id => DEF[id];
+export const regionOf = id => REGION[id];
+// who can go in the book: met on a trip, not a day-tripper
+export const canAdd = (F, id) => !!(DEF[id] && (F.met || {})[id] && !DEF[id].tourist && !HELD.includes(id));
+export const bookState = F => { F.book = F.book || {}; F.book.ids = F.book.ids || {}; F.book.sent = F.book.sent || []; return F.book; };
+export const inBook = (F, id) => !!bookState(F).ids[id];
+export function addContact(F, id, day){ if (!canAdd(F, id) || inBook(F, id)) return false; bookState(F).ids[id] = day; return true; }
+export function removeContact(F, id){ const b = bookState(F); if (!b.ids[id]) return false; delete b.ids[id]; return true; }
+export const contacts = F => Object.keys(bookState(F).ids).filter(id => DEF[id]).sort((a, b) => Object.keys(REGIONS).indexOf(REGION[a]) - Object.keys(REGIONS).indexOf(REGION[b]) || DEF[a].name.localeCompare(DEF[b].name));
+// people met on trips who could be added (for the book's "met on your travels" list)
+export const addable = F => Object.keys(F.met || {}).filter(id => canAdd(F, id) && !inBook(F, id));
+export const postage = id => POSTAGE[REGION[id]] || 4;
+export const postable = it => !!it && (it.kind === "gift" || it.kind === "bouquet");
+
+// the ready-made openings for a letter (Mel can add her own lines below)
+export const OPENINGS = ["Thinking of you", "Thank you for the day", "I keep thinking about your", "Guess what happened at home", "Just saying hello"];
+const OPEN_TXT = {"Thinking of you": "I was thinking of you today, and wanted to say hello.", "Thank you for the day": "Thank you for such a lovely day when I visited.",
+  "I keep thinking about your": "I keep thinking about your little corner of the world.", "Guess what happened at home": "I've got news from home to tell you.", "Just saying hello": "Just a little note to say hello."};
+export const openingText = o => OPEN_TXT[o] || "";
+
+// post a gift (item) or a letter (item null, with an opening and/or her own words). Returns the entry, or a reason.
+export function postTo(F, to, {item = null, open = "", text = ""} = {}, at = now()){
+  if (!inBook(F, to)) return {err: "Not in your address book."};
+  const it = item && ITEMS[item];
+  if (item) {
+    if (!postable(it) || !((F.inv || {})[item] > 0)) return {err: "That can't go in the post."};
+    if (it.gel) return {err: "It'd melt on the way."};
+    const cost = postage(to); if ((F.coins || 0) < cost) return {err: `Postage is ${cost} coins.`};
+    F.coins -= cost; F.inv[item]--; if (F.inv[item] <= 0) delete F.inv[item];
+  } else if (!open && !String(text).trim()) return {err: "Write a few words first."};
+  const days = DAYS[postage(to)] || 2, p = PEN[to], h = hash(to + at);
+  const e = {id: `post-${to}-${at}`, to, item: item || null, open, text: String(text).trim().slice(0, 400), at: at + days*D,
+    back: item && p && p.back && ITEMS[p.back] && h % 5 === 0 ? p.back : null};   // about one parcel in five comes back with a little something
+  const b = bookState(F); b.sent = [...b.sent, e].slice(-60); return e;
+}
+// what kind of thing a gift is, for which thank-you line they write
+export function giftKind(id){
+  const it = ITEMS[id] || {}; if (it.wrapped && it.inner) return giftKind(it.inner);
+  if (it.kind === "bouquet") return "flower";
+  if (it.wine || /^(wb_|wine|bottle|mulled|cider|sparkl)/.test(id)) return "drink";
+  if (/^(pp_|tag_|card|soap|oil|lotion|balm_|lipoil|candle|sachet|wrp_|bath|scrub)/.test(id) || /soap|oil|lotion|balm|candle|paper|card/i.test(it.n || "")) return "made";
+  if (/^(box|bar_|bonbon|choc|honey|jam|cake|cookie|tart|biscuit|pairbox|hamper)/.test(id) || /chocolate|bonbon|honey|jam|cake|biscuit|cookie|tart|nougat|fudge|bread|cheese|pie/i.test(it.n || "")) return "food";
+  return "other";
+}
+const nm = id => { const it = ITEMS[id]; return it ? it.n.replace(/^(A|An|The) /, "").replace(/^./, c => c.toLowerCase()) : "present"; };
+// the reply, in their own voice
+export function replyBody(e){
+  const d = DEF[e.to], p = PEN[e.to], h = hash(e.id), first = (d.name || "").split(" ")[0];
+  const fill = s => String(s || "").replace(/\{it\}/g, e.item ? nm(e.item) : "letter");
+  let body;
+  if (e.item) {
+    const k = giftKind(e.item), line = p ? fill(p[k] || p.other) : "";
+    body = `Dear Mel,\n\nThank you for the ${nm(e.item)}! ${line || "It made my whole week, truly."}`;
+  } else body = `Dear Mel,\n\n${p ? fill(p.letter) : "Your letter came this morning, and I read it twice."}`;
+  if (p && p.news && p.news.length) body += `\n\n${p.news[h % p.news.length]}`;
+  else if (d.lines && d.lines.length) body += `\n\nP.S. ${d.lines[h % d.lines.length]}`;
+  if (e.back && ITEMS[e.back]) body += `\n\n${p.backNote || `I've tucked in a little ${nm(e.back)}.`}`;
+  return `${body}\n\n${p ? p.sign : `Warmly, ${first}`}`;
+}
+export const bookMail = (F, t = now()) => bookState(F).sent.filter(e => e.at <= t && DEF[e.to]).map(e => ({id: e.id, from: "postie", at: e.at,
+  title: `${e.item ? "Thank you" : "A letter"} from ${DEF[e.to].name}${e.back && ITEMS[e.back] ? " (with something tucked in)" : ""}`, body: replyBody(e)}));
+// a reply's tucked-in thing goes into the backpack once it's arrived
+export function collectBack(F, t = now()){
+  const got = []; bookState(F).sent.forEach(e => { if (e.back && !e.got && e.at <= t && ITEMS[e.back]) { e.got = 1; F.inv = F.inv || {}; F.inv[e.back] = (F.inv[e.back] || 0) + 1; got.push({who: DEF[e.to] ? DEF[e.to].name : "", item: e.back}); } });
+  return got;
+}
+export const onTheWay = (F, t = now()) => bookState(F).sent.filter(e => e.at > t).length;
+const lastTo = (F, id) => { const s = bookState(F).sent.filter(e => e.to === id); return s[s.length - 1]; };
+
+/* ---------- the book, in the mail tab ---------- */
+// st = {open: id being written to, letter: {open, text}, more: show the met list}
+export function bookHTML(F, st, t = now()){
+  const list = contacts(F), add = addable(F), way = onTheWay(F, t);
+  let h = `<h2 style="margin-top:18px">Address book</h2><p class="muted">People you've met on your travels. Post them a letter (free) or a gift from your backpack (tap it there, then "By post"). Replies come back in a day or three.${way ? ` ${way} on the way.` : ""}</p>`;
+  h += list.length ? `<ul class="qlist book">${list.map(id => { const d = DEF[id], l = lastTo(F, id);
+    return `<li><span></span><span class="wtxt"><b>${esc(d.name)}</b><small>${esc(d.job || "")} · ${REGIONS[REGION[id]]}${l ? ` · last: ${l.item ? nm(l.item) : "a letter"}` : ""}</small></span><span class="orbtns"><button class="btn small alt" data-bk="write:${id}">Write</button><button class="btn small alt" data-bk="del:${id}" aria-label="Take ${esc(d.name)} out of your address book">×</button></span></li>`
+      + (st.open === id ? writeHTML(id, st.letter || {}) : ""); }).join("")}</ul>` : `<p class="muted">Nobody yet.</p>`;
+  if (add.length) h += st.more ? `<p class="eyebrow" style="margin:12px 0 6px">Met on your travels</p><ul class="qlist book">${add.sort((a, b) => DEF[a].name.localeCompare(DEF[b].name)).map(id => `<li><span></span><span class="wtxt"><b>${esc(DEF[id].name)}</b><small>${esc(DEF[id].job || "")} · ${REGIONS[REGION[id]]}</small></span><span class="orbtns"><button class="btn small alt" data-bk="add:${id}">Add</button></span></li>`).join("")}</ul><div class="actions"><button class="btn small alt" data-bk="less">Hide</button></div>`
+    : `<div class="actions"><button class="btn small alt" data-bk="more">Add someone you've met (${add.length})</button></div>`;
+  return h;
+}
+function writeHTML(id, l){
+  return `<li class="bkwrite"><div style="grid-column:1/-1"><p class="muted">A letter to ${esc(DEF[id].name)}. Start with one of these, add your own words, or both.</p>
+    <div class="gchips">${OPENINGS.map(o => `<button class="gchip${l.open === o ? " on" : ""}" data-bk="open:${esc(o)}">${esc(o)}</button>`).join("")}</div>
+    <textarea id="bkText" maxlength="400" rows="3" placeholder="Your own words (optional)" style="width:100%;margin-top:8px">${esc(l.text || "")}</textarea>
+    <div class="actions"><button class="btn small primary" data-bk="send:${id}">Post it (free)</button><button class="btn small alt" data-bk="cancel">Cancel</button></div></div></li>`;
+}
