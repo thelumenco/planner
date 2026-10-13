@@ -4139,6 +4139,18 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const done = mc.craftDone(F, Date.now() + 2*864e5);
   check(F.craft.store[mc.itemId(b.recipe)] === 4 && F.craft.store[mc.itemId(o.recipe)] === 3 && !F.craft.balm && !F.craft.lipoil.length && done.length === 2, "four tins and three bottles onto the mill's shelves");
 }
+{
+  console.log("\nTake from the gift shop, and shop-bought wrapping paper (round 188)");
+  const gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), wr = await import(new URL("../src/game/wrap.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), ic = await import(new URL("../src/art/paper-icons.js", import.meta.url));
+  const F = {coins: 20, inv: {}, goals: {giftshop: 1}}, v = {shelf: [{id: "w1", name: "Merlot-ish", type: "red", n: 2, price: 18}]};
+  const bid = gs.takeBottle(F, v, "w1");
+  check(bid === "wb_w1" && F.inv.wb_w1 === 1 && v.shelf[0].n === 1 && it.ITEMS.wb_w1.kind === "gift" && it.ITEMS.wb_w1.price === 18, "a bottle off the gift shop's wine corner, into the backpack as a gift");
+  delete it.ITEMS.wb_w1; gs.registerBottles(F); check(!!it.ITEMS.wb_w1, "and it's remembered after a reload");
+  check(wr.buyPaper(F, "kraft") && F.inv.gw_kraft === 1 && F.coins === 19 && wr.buyPaper(F, "gold") && F.coins === 16 && wr.buyTags(F) === 4 && F.coins === 14, "kraft (1) and gold (3) wrapping paper, and a pack of tags (2), no paperie needed");
+  check(["gw_kraft", "gw_gold", "gw_red", "gw_green", "wrp_gold_none_none_none_none", "wrp_kraft_none_star_twine_plain"].every(n => ic.wrapIcon(n)), "each paper has its drawing, wrapped or not");
+  const id = wr.wrapIt(F, {item: "wb_w1", paper: "gw_gold", tag: "plain"});
+  check(id && !F.inv.gw_gold && it.ITEMS[id].price === 18 + 1 + 1 && /gold paper/.test(it.ITEMS[id].n) && it.ITEMS[id].ico === "wrp_gold_none_none_none_plain", "a bottle wrapped in gold paper with a tag: a coin or two more (handmade paper's worth more)");
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

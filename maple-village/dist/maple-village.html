@@ -4917,8 +4917,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 
   // src/art/paper-icons.js
   var f = (c) => `style="fill:${c}"`;
-  var COL = { natural: "#EFE6D2", blush: "#F2C4C4", sage: "#C6D6B2", ink: "#9DB4D0" };
-  var WET = { natural: "#D9CDB2", blush: "#DDA6A8", sage: "#A9BE94", ink: "#7E98B8" };
+  var COL = { natural: "#EFE6D2", blush: "#F2C4C4", sage: "#C6D6B2", ink: "#9DB4D0", kraft: "#C9A27E", gold: "#E3B84A", red: "#C8432F", green: "#4E7A4E" };
+  var WET = { natural: "#D9CDB2", blush: "#DDA6A8", sage: "#A9BE94", ink: "#7E98B8", kraft: "#A8835E", gold: "#C4962E", red: "#9E2F22", green: "#355A35" };
   var rnd2 = (seed2, i) => {
     const x = Math.sin(seed2 * 12.9898 + i * 78.233) * 43758.5453;
     return x - Math.floor(x);
@@ -4970,7 +4970,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return [`<path d="${deckle(4, 4.5, 20, 19.5, s)}" ${f(COL[col])}/>${flecks(add2, 6, 6.5, 12, 11)}`, `<path d="${deckle(4, 4.5, 20, 19.5, s)}"/>`];
   }
   var RIBBON_COL = { gingham: "#C8432F", velvet: "#7A1F3D", twine: "#C9A27E" };
-  var STAMP_INK = { natural: "#8A6A42", blush: "#B24A5E", sage: "#4E6A3E", ink: "#2F3B73" };
+  var STAMP_INK = { natural: "#8A6A42", blush: "#B24A5E", sage: "#4E6A3E", ink: "#2F3B73", kraft: "#5A3A22", gold: "#7A5A1A", red: "#FFFDF6", green: "#FFFDF6" };
   function motif(k, x, y, c) {
     if (k === "bee") return `<ellipse cx="${x}" cy="${y}" rx="1.3" ry=".9" fill="${c}"/><ellipse cx="${x - 0.4}" cy="${y - 1}" rx=".7" ry=".5" fill="none" stroke="${c}" stroke-width=".35"/><ellipse cx="${x + 0.6}" cy="${y - 1}" rx=".7" ry=".5" fill="none" stroke="${c}" stroke-width=".35"/>`;
     if (k === "grape") return [[0, 0], [1, 0], [0.5, 0.9], [-0.5, 0.9], [0, 1.8]].map(([dx, dy]) => `<circle cx="${x + dx - 0.5}" cy="${y + dy - 1}" r=".55" fill="${c}"/>`).join("");
@@ -4991,6 +4991,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       `<path d="M7 9l5 -5h7v15h-12z" ${f(name === "tag_seeded" ? "#C6D6B2" : "#EFE6D2")}/>${name === "tag_seeded" ? [[11, 11], [14, 14], [12, 16], [16, 10]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx=".8" ry=".45" ${f("#5A4632")}/>`).join("") : ""}`,
       `<path d="M7 9l5 -5h7v15h-12z"/><circle cx="12" cy="7.5" r="1"/><path d="M12 6.5q-4 -4 -8 -2"/>`
     ];
+    if (/^gw_/.test(name)) {
+      const c = COL[name.slice(3)];
+      if (!c) return null;
+      return [
+        `<path d="M4 6h13l3 3v10H4z" ${f(c)}/><path d="M17 6v3h3z" ${f(WET[name.slice(3)])}/>${name === "gw_gold" ? `<path d="M8 10l.6 1.2l1.2 .6l-1.2 .6l-.6 1.2l-.6 -1.2l-1.2 -.6l1.2 -.6zM14 14l.5 1l1 .5l-1 .5l-.5 1l-.5 -1l-1 -.5l1 -.5z" ${f("#FFF3C4")}/>` : name === "gw_kraft" ? `<path d="M6 10h10M6 13h11M6 16h9" style="stroke:#A8835E;stroke-width:.5"/>` : ""}`,
+        `<path d="M4 6h13l3 3v10H4zM17 6v3h3"/>`
+      ];
+    }
     if (/^stamp_/.test(name)) {
       const k = name.slice(6);
       return [`<rect x="7" y="12" width="10" height="7" rx="1" ${f("#C9A27E")}/><rect x="9" y="4" width="6" height="8" rx="2" ${f("#8A6A42")}/><g transform="translate(12 15.5) scale(1.6) translate(-12 -15.5)">${motif(k, 12, 15.5, "#3A2E28")}</g>`, `<rect x="7" y="12" width="10" height="7" rx="1"/><rect x="9" y="4" width="6" height="8" rx="2"/>`];
@@ -4999,6 +5007,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (!m || !COL[m[1]]) return null;
     const [, col, add2, stamp3, ribbon, tag2] = m, rc = RIBBON_COL[ribbon];
     let a = `<rect x="3.5" y="8" width="15" height="12" rx="1" ${f(COL[col])}/><path d="M3.5 8l2 -2h15l-2 2z" ${f(WET[col])}/><path d="M18.5 8l2 -2v12l-2 2z" ${f(WET[col])}/>${flecks(add2, 5, 9.5, 12, 9, 6)}`;
+    if (col === "gold") a += `<path d="M7 11l.5 1l1 .5l-1 .5l-.5 1l-.5 -1l-1 -.5l1 -.5zM15 16l.5 1l1 .5l-1 .5l-.5 1l-.5 -1l-1 -.5l1 -.5z" ${f("#FFF3C4")}/>`;
     if (stamp3 !== "none") a += [[6.5, 11], [12, 10.5], [15.5, 14.5], [7, 17], [11.5, 16]].map(([x, y]) => motif(stamp3, x, y, STAMP_INK[col])).join("");
     if (rc) a += `<rect x="10" y="8" width="2.4" height="12" ${f(rc)}/><rect x="3.5" y="12.8" width="15" height="2.2" ${f(rc)}/><path d="M12 6l3 -2l2.2 0l1 .5l-1.2 1.3z" ${f(rc)}/>${ribbon === "gingham" ? `<rect x="10" y="9.5" width="1.2" height="1.2" fill="#FFFDF6"/><rect x="11.2" y="11" width="1.2" height="1.2" fill="#FFFDF6"/><rect x="5" y="12.8" width="1.2" height="1.1" fill="#FFFDF6"/><rect x="15" y="13.9" width="1.2" height="1.1" fill="#FFFDF6"/>` : ""}<path d="M11.2 7.5q-3 -4 -5 -1.5q1.6 2.4 5 1.5zM11.2 7.5q3 -4 5 -1.5q-1.6 2.4 -5 1.5z" ${f(rc)}/><circle cx="11.2" cy="7.5" r="1" ${f(rc)}/>`;
     if (tag2 !== "none") a += `<path d="M18.5 15l2 -1.6h2.4v4.4h-2.4z" ${f(tag2 === "seeded" ? "#C6D6B2" : "#FFFDF6")}/>${tag2 === "seeded" ? `<circle cx="21.6" cy="15.4" r=".4" fill="#5A4632"/><circle cx="21" cy="16.6" r=".4" fill="#5A4632"/>` : ""}`;
@@ -5454,7 +5463,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       const pi = paperIcon(name);
       if (pi) return pi;
     }
-    if (!I[name] && /^(wrp_|rb_|tag_|stamp_)/.test(name)) {
+    if (!I[name] && /^(wrp_|rb_|tag_|stamp_|gw_)/.test(name)) {
       const wi = wrapIcon(name);
       if (wi) return wi;
     }
@@ -25941,6 +25950,29 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     F2.inv.pairbox = (F2.inv.pairbox || 0) + 1;
     return 1;
   }
+  function takeBottle(F2, v, shelfId) {
+    const b = ((v || {}).shelf || []).find((x) => x.id === shelfId && x.n > 0);
+    if (!b) return null;
+    b.n--;
+    const id = "wb_" + b.id, g10 = giftState(F2);
+    g10.bottles = g10.bottles || {};
+    g10.bottles[id] = { name: b.name, type: b.type, price: b.price };
+    registerBottles(F2);
+    F2.inv = F2.inv || {};
+    F2.inv[id] = (F2.inv[id] || 0) + 1;
+    return id;
+  }
+  function registerBottles(F2) {
+    for (const [id, b] of Object.entries((F2.giftshop || {}).bottles || {})) ITEMS[id] = {
+      n: `A bottle of ${b.name}`,
+      kind: "gift",
+      to: ["mum", "dad", "darren", "marcus", "angelina", "gonggong"],
+      price: b.price,
+      ico: "wine_" + (["red", "rose", "white", "sparkling"].includes(b.type) ? b.type : "red"),
+      say: `Your own ${b.name}! We'll open it this weekend.`,
+      wine: true
+    };
+  }
   function giftSellMinute(F2, day, hm6, mode, o) {
     if (!mode) return 0;
     const p = mode === "mel" ? 0.08 : 0.05;
@@ -25998,19 +26030,19 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var PANEL = {
     gcase: (o) => {
       const s = stockOf(o);
-      return `<h2>The bonbon case</h2><p class="sub">A little glass case on the counter end, filled from the Cocoa Room's own display: the same trays, so what sells here is gone there too.${o.cocoa ? ` ${o.cocoa.prices.bonbon} coins a bonbon.` : ""}</p>` + (!o.cocoa ? `<p class="muted">Empty: there's no Cocoa Room to fill it from yet.</p>` : s.bon.length ? `<ul class="hlist wlist">${s.bon.map((b) => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${o.cocoa.trays[b.id]} left in the trays</small></span></li>`).join("")}</ul>` : `<p class="muted">Nothing in the Cocoa Room's display case right now. Make a tray at the bonbon table.</p>`);
+      return `<h2>The bonbon case</h2><p class="sub">A little glass case on the counter end, filled from the Cocoa Room's own display: the same trays, so what sells here is gone there too.${o.cocoa ? ` ${o.cocoa.prices.bonbon} coins a bonbon.` : ""}</p>` + (!o.cocoa ? `<p class="muted">Empty: there's no Cocoa Room to fill it from yet.</p>` : s.bon.length ? `<ul class="hlist wlist">${s.bon.map((b) => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${o.cocoa.trays[b.id]} left in the trays</small></span><span class="orbtns"><button class="btn small alt" data-gs="eat:${esc(b.id)}">Have one</button><button class="btn small alt" data-gs="box:${esc(b.id)}" ${o.cocoa.trays[b.id] >= 4 ? "" : "disabled"}>Box of 4</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing in the Cocoa Room's display case right now. Make a tray at the bonbon table.</p>`);
     },
     gbars: (o) => {
       const s = stockOf(o);
-      return `<h2>The chocolate shelf</h2><p class="sub">Bars from the Cocoa Room's wall, stood up in a row.${o.cocoa ? ` ${o.cocoa.prices.bar} coins a bar.` : ""}</p>` + (!o.cocoa ? `<p class="muted">Empty: no Cocoa Room yet.</p>` : s.bars.length ? `<ul class="hlist wlist">${s.bars.map((k) => `<li><span class="wpic">${icon("bar_" + k, 26)}</span><span class="wtxt"><b>${esc(k[0].toUpperCase() + k.slice(1))} chocolate</b><small>${o.cocoa.bars[k]} on the wall</small></span></li>`).join("")}</ul>` : `<p class="muted">The bar wall's bare. Mateo moulds more on his shifts.</p>`);
+      return `<h2>The chocolate shelf</h2><p class="sub">Bars from the Cocoa Room's wall, stood up in a row.${o.cocoa ? ` ${o.cocoa.prices.bar} coins a bar.` : ""}</p>` + (!o.cocoa ? `<p class="muted">Empty: no Cocoa Room yet.</p>` : s.bars.length ? `<ul class="hlist wlist">${s.bars.map((k) => `<li><span class="wpic">${icon("bar_" + k, 26)}</span><span class="wtxt"><b>${esc(k[0].toUpperCase() + k.slice(1))} chocolate</b><small>${o.cocoa.bars[k]} on the wall</small></span><span class="orbtns"><button class="btn small alt" data-gs="bar:${k}">Take one</button></span></li>`).join("")}</ul>` : `<p class="muted">The bar wall's bare. Mateo moulds more on his shifts.</p>`);
     },
     gmill: (o) => {
       const s = stockOf(o);
-      return `<h2>From the mill</h2><p class="sub">Oils, soaps and lotions, off the same shelves as the mill.</p>` + (s.mill.length ? `<ul class="hlist wlist">${s.mill.map((id) => `<li><span class="wpic">${icon(ITEMS[id].ico || id, 26)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${o.store[id]} on the shelves · ${ITEMS[id].price} each</small></span></li>`).join("")}</ul>` : `<p class="muted">Nothing on the mill's shelves just now. Make some at the workbench upstairs at the mill.</p>`);
+      return `<h2>From the mill</h2><p class="sub">Oils, soaps and lotions, off the same shelves as the mill.</p>` + (s.mill.length ? `<ul class="hlist wlist">${s.mill.map((id) => `<li><span class="wpic">${icon(ITEMS[id].ico || id, 26)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${o.store[id]} on the shelves · ${ITEMS[id].price} each</small></span><span class="orbtns"><button class="btn small alt" data-gs="mill:${id}">Take one</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing on the mill's shelves just now. Make some at the workbench upstairs at the mill.</p>`);
     },
     gwine: (o) => {
       const s = stockOf(o);
-      return `<h2>The wine corner</h2><p class="sub">A few of your bottles, from the wine shop's own shelves, for people who want one to take home.</p>` + pairsHTML(o) + (s.wine.length ? `<ul class="hlist wlist">${s.wine.map((b) => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${b.n} on the shelves · ${b.price} each</small></span></li>`).join("")}</ul>` : `<p class="muted">The wine shelves are empty.</p>`);
+      return `<h2>The wine corner</h2><p class="sub">A few of your bottles, from the wine shop's own shelves, for people who want one to take home.</p>` + pairsHTML(o) + (s.wine.length ? `<ul class="hlist wlist">${s.wine.map((b) => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${b.n} on the shelves · ${b.price} each</small></span><span class="orbtns"><button class="btn small alt" data-gs="wine:${esc(b.id)}">Take one</button></span></li>`).join("")}</ul>` : `<p class="muted">The wine shelves are empty.</p>`);
     }
   };
   function giftPanel(F2, spot6, o) {
@@ -33235,6 +33267,27 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   ITEMS.tag_plain = { n: "Paper gift tag", kind: "use", ico: "tag_plain", what: "Cut from your own handmade paper." };
   ITEMS.tag_seeded = { n: "Seeded gift tag", kind: "use", ico: "tag_seeded", crop: "wildflower", plantable: true, what: "Cut from seeded paper: plant it and wildflowers come up." };
   for (const [k, r] of Object.entries(RIBBONS)) ITEMS["rb_" + k] = { n: `${r.n} (one bow)`, kind: "use", ico: "rb_" + k, what: "Enough for one bow." };
+  var STORE_PAPER = { kraft: { n: "Kraft", price: 1 }, red: { n: "Red", price: 2 }, green: { n: "Green", price: 2 }, gold: { n: "Gold", price: 3 } };
+  for (const [k, p] of Object.entries(STORE_PAPER)) ITEMS["gw_" + k] = { n: `A sheet of ${p.n.toLowerCase()} wrapping paper`, kind: "use", wrapPaper: true, ico: "gw_" + k, price: p.price, what: "Shop-bought wrapping paper, for wrapping a gift." };
+  var isPaper = (id) => !!ITEMS[id] && !!(ITEMS[id].paper || ITEMS[id].wrapPaper);
+  var paperOf = (id) => /^gw_/.test(id) ? { col: id.slice(3), add: "none", store: true } : (([, col, add2]) => ({ col, add: add2 }))(id.split("_"));
+  var paperN = (col) => (COLOURS2[col] || STORE_PAPER[col] || { n: col }).n.toLowerCase();
+  function buyPaper(F2, k, n = 1) {
+    const p = STORE_PAPER[k];
+    if (!p || F2.coins < p.price * n) return 0;
+    F2.coins -= p.price * n;
+    F2.inv = F2.inv || {};
+    F2.inv["gw_" + k] = (F2.inv["gw_" + k] || 0) + n;
+    return n;
+  }
+  var TAG_PACK = { n: 4, price: 2 };
+  function buyTags(F2) {
+    if (F2.coins < TAG_PACK.price) return 0;
+    F2.coins -= TAG_PACK.price;
+    F2.inv = F2.inv || {};
+    F2.inv.tag_plain = (F2.inv.tag_plain || 0) + TAG_PACK.n;
+    return TAG_PACK.n;
+  }
   var wrappable = (id) => {
     const it = ITEMS[id];
     return !!it && it.kind === "gift" && !it.wrapped && !it.paper;
@@ -33242,23 +33295,23 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var wrapIco = (w) => `wrp_${w.col || "natural"}_${w.add || "none"}_${w.stamp || "none"}_${w.ribbon || "none"}_${w.tag || "none"}`;
   var previewIco = (F2, w) => {
     if (!w.paper) return w.item ? ITEMS[w.item].ico || w.item : "wrp_natural_none_none_none_none";
-    const [, col, add2] = w.paper.split("_");
+    const { col, add: add2 } = paperOf(w.paper);
     return wrapIco({ ...w, col, add: add2 });
   };
   var wrapLine = (w) => w.tag === "seeded" ? "And a seed tag! I'm planting it in the garden." : w.stamp ? "And the paper! Did you stamp this yourself?" : "And the paper! Did you make this?";
   function defineWrap(r) {
     const inner = ITEMS[r.inner];
     if (!inner) return;
-    const extra3 = 2 + (r.ribbon ? 1 : 0) + (r.tag ? 1 : 0) + (r.stamp ? 1 : 0);
+    const extra3 = (r.store ? 1 : 2) + (r.ribbon ? 1 : 0) + (r.tag ? 1 : 0) + (r.stamp ? 1 : 0);
     ITEMS[r.id] = {
-      n: `${inner.n.replace(/^(A|An) /, "")}, wrapped in ${COLOURS2[r.col].n.toLowerCase()} paper`,
+      n: `${inner.n.replace(/^(A|An) /, "")}, wrapped in ${paperN(r.col)} paper`,
       kind: "gift",
       wrapped: true,
       inner: r.inner,
       to: inner.to,
       price: (inner.price || 5) + extra3,
       ico: wrapIco(r),
-      what: `${inner.n}, in your own ${COLOURS2[r.col].n.toLowerCase()} paper${r.add !== "none" ? ` ${ADDS2[r.add].word}` : ""}${r.stamp ? `, stamped with ${STAMPS[r.stamp].toLowerCase()}` : ""}${r.ribbon ? `, a ${RIBBONS[r.ribbon].n.toLowerCase()} bow` : ""}${r.tag ? `, a ${r.tag} tag` : ""}.`,
+      what: `${inner.n}, in ${r.store ? "" : "your own "}${paperN(r.col)} paper${r.add !== "none" ? ` ${ADDS2[r.add].word}` : ""}${r.stamp ? `, stamped with ${STAMPS[r.stamp].toLowerCase()}` : ""}${r.ribbon ? `, a ${RIBBONS[r.ribbon].n.toLowerCase()} bow` : ""}${r.tag ? `, a ${r.tag} tag` : ""}.`,
       say: `${inner.say || "For me? Thank you!"} ${wrapLine(r)}`,
       ...inner.says ? { says: Object.fromEntries(Object.entries(inner.says).map(([k, v]) => [k, `${v} ${wrapLine(r)}`])) } : {}
     };
@@ -33268,7 +33321,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function wrapIt(F2, w) {
     const p = paperState(F2), inv = F2.inv || {};
-    if (!w.item || !wrappable(w.item) || !(inv[w.item] > 0) || !w.paper || !(inv[w.paper] > 0) || !ITEMS[w.paper] || !ITEMS[w.paper].paper) return null;
+    if (!w.item || !wrappable(w.item) || !(inv[w.item] > 0) || !w.paper || !(inv[w.paper] > 0) || !isPaper(w.paper)) return null;
     if (w.stamp && (!p.stamps || !STAMPS[w.stamp])) return null;
     if (w.ribbon && !(inv["rb_" + w.ribbon] > 0)) return null;
     if (w.tag && !(inv["tag_" + w.tag] > 0)) return null;
@@ -33280,8 +33333,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     use4(w.paper);
     if (w.ribbon) use4("rb_" + w.ribbon);
     if (w.tag) use4("tag_" + w.tag);
-    const [, col, add2] = w.paper.split("_"), id = "wr_" + (p.wrapN = (p.wrapN || 0) + 1);
-    const r = { id, inner: w.item, col, add: add2, stamp: w.stamp || null, ribbon: w.ribbon || null, tag: w.tag || null };
+    const { col, add: add2, store } = paperOf(w.paper), id = "wr_" + (p.wrapN = (p.wrapN || 0) + 1);
+    const r = { id, inner: w.item, col, add: add2, ...store ? { store: true } : {}, stamp: w.stamp || null, ribbon: w.ribbon || null, tag: w.tag || null };
     p.wraps = [...p.wraps || [], r];
     defineWrap(r);
     inv[id] = 1;
@@ -33325,17 +33378,19 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <div class="actions"><button class="btn primary small" data-wr="open">Wrap a gift</button></div>` + shut22;
   }
   function wrapPanel(F2, w, o = {}) {
-    const p = paperState(F2), gifts = bagOf(F2, wrappable), sheets = bagOf(F2, (id) => ITEMS[id].paper);
+    const p = paperState(F2), gifts = bagOf(F2, wrappable), sheets = bagOf(F2, isPaper);
     let h3 = `<span class="tape stripe" aria-hidden="true"></span><h2>${o.where === "giftshop" ? "The wrapping table" : "Wrap a gift"}</h2><p class="sub">Pick the gift, then your paper, a stamp, a ribbon and a tag. The parcel changes as you go.</p>
     <div class="ppbatch">${icon(previewIco(F2, w), 84)}</div>`;
     h3 += `<p class="eyebrow" style="margin:8px 0 6px">1. The gift</p>${gifts.length ? `<div class="gchips">${gifts.map((id) => chip2(w.item === id, "item:" + id, ITEMS[id].ico || id, ITEMS[id].n)).join("")}</div>` : `<p class="muted">Nothing to wrap in your backpack: bonbon boxes, pairing boxes, hampers, bars, soaps, cheeses...</p>`}`;
-    h3 += `<p class="eyebrow" style="margin:10px 0 6px">2. Paper</p>${sheets.length ? `<div class="gchips">${sheets.map((id) => chip2(w.paper === id, "paper:" + id, id, ITEMS[id].n)).join("")}</div>` : `<p class="muted">No handmade paper with you: take some sheets off the paperie's shelves.</p>`}`;
+    h3 += `<p class="eyebrow" style="margin:10px 0 6px">2. Paper</p>${sheets.length ? `<div class="gchips">${sheets.map((id) => chip2(w.paper === id, "paper:" + id, id, ITEMS[id].n)).join("")}</div>` : `<p class="muted">No paper with you: buy a sheet below${o.where === "giftshop" ? "" : ", or take handmade sheets off the paperie's shelves"}.</p>`}`;
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">3. A stamp</p>${p.stamps ? `<div class="gchips">${chip2(!w.stamp, "stamp:", "", "None")}${Object.entries(STAMPS).map(([k, n]) => chip2(w.stamp === k, "stamp:" + k, "stamp_" + k, n)).join("")}</div>` : `<p class="muted">No stamps yet: a set's on the ribbon rack at the paperie.</p>`}`;
     const rb = Object.keys(RIBBONS).filter((k) => (F2.inv || {})["rb_" + k] > 0);
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">4. A ribbon</p><div class="gchips">${chip2(!w.ribbon, "ribbon:", "", "None")}${rb.map((k) => chip2(w.ribbon === k, "ribbon:" + k, "rb_" + k, `${RIBBONS[k].n} (${F2.inv["rb_" + k]})`)).join("")}</div>`;
     const tg = ["plain", "seeded"].filter((k) => (F2.inv || {})["tag_" + k] > 0);
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">5. A tag</p><div class="gchips">${chip2(!w.tag, "tag:", "", "None")}${tg.map((k) => chip2(w.tag === k, "tag:" + k, "tag_" + k, `${k === "seeded" ? "Seeded" : "Paper"} tag (${F2.inv["tag_" + k]})`)).join("")}</div>`;
     h3 += `<div class="actions"><button class="btn primary" data-wr="go" ${w.item && w.paper ? "" : "disabled"}>Wrap it</button>${o.where === "paperie" ? `<button class="btn small alt" data-wr="rack">Back to the ribbon rack</button>` : ""}</div>`;
+    if (o.where === "giftshop" || o.where === "paperie") h3 += `<p class="eyebrow" style="margin:12px 0 6px">Wrapping supplies</p><ul class="hlist wlist">${Object.entries(STORE_PAPER).map(([k, sp]) => `<li><span class="wpic">${icon("gw_" + k, 26)}</span><span class="wtxt"><b>${sp.n} wrapping paper</b><small>${sp.price} ${coin15()} a sheet${(F2.inv || {})["gw_" + k] ? ` · ${F2.inv["gw_" + k]} with you` : ""}</small></span><span class="orbtns"><button class="btn small alt" data-wr="paperbuy:${k}" ${F2.coins >= sp.price ? "" : "disabled"}>Buy a sheet</button></span></li>`).join("")}
+    ${o.where === "giftshop" ? Object.entries(RIBBONS).map(([k, r]) => `<li><span class="wpic">${icon("rb_" + k, 26)}</span><span class="wtxt"><b>${esc(r.n)}</b><small>A reel: ${REEL2} bows · ${r.price} ${coin15()}</small></span><span class="orbtns"><button class="btn small alt" data-wr="reel:${k}" ${F2.coins >= r.price ? "" : "disabled"}>Buy a reel</button></span></li>`).join("") + `<li><span class="wpic">${icon("tag_plain", 26)}</span><span class="wtxt"><b>Gift tags</b><small>A pack of ${TAG_PACK.n} · ${TAG_PACK.price} ${coin15()}</small></span><span class="orbtns"><button class="btn small alt" data-wr="tagbuy" ${F2.coins >= TAG_PACK.price ? "" : "disabled"}>Buy a pack</button></span></li>` : ""}</ul>`;
     if (o.where === "giftshop") {
       const mine = bagOf(F2, (id) => ITEMS[id].wrapped), out = o.table || [];
       h3 += `<p class="eyebrow" style="margin:12px 0 6px">On the table to sell${out.length ? ` (${out.length})` : ""}</p>${out.length ? `<div class="gchips">${out.map((id) => ITEMS[id] ? `<span class="gchip">${icon(ITEMS[id].ico, 20)}<span>${esc(ITEMS[id].n)} · ${ITEMS[id].price}</span></span>` : "").join("")}</div>` : `<p class="muted">Nothing out yet.</p>`}
@@ -38573,6 +38628,42 @@ ${SIGNOFF[t2.who] || ""}`;
     if (homeView && (scene === "home" || scene === "garage")) wireStorage(c);
     if (ppView && scene === "bv_hpaper") wirePaper(c);
     if (ppView && scene === "bv_hpaper" || fieldView === "gwrap" && scene === "giftshop") wireWrap(c);
+    if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gs]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      const [a, v] = b.dataset.gs.split(/:(.*)/s), cc = owns2(F, "cocoa") ? cocoaState(F) : null;
+      if (a === "eat" && cc) {
+        const bb = eatBonbon(F, v);
+        if (bb) {
+          sfx("chime");
+          mprop("heart", mel.x, mel.y - 60, 1600);
+          speak(`${bb.name}. Oh, that's good.`, 3500);
+        }
+      } else if (a === "box" && cc) {
+        const id = packBox(F, 4, { [v]: 4 });
+        if (id) {
+          sfx("paper", true);
+          flash(`${ITEMS[id].n} in your backpack`);
+        }
+      } else if (a === "bar" && cc) {
+        if (takeBar(F, v, true)) {
+          sfx("chime");
+          flash(`${KINDS2[v].n} bar in your backpack`);
+        }
+      } else if (a === "mill") {
+        if (takeFromStore(F, v, 1)) {
+          sfx("paper", true);
+          flash(`${ITEMS[v].n} in your backpack`);
+        }
+      } else if (a === "wine") {
+        const id = takeBottle(F, vineState(F), v);
+        if (id) {
+          sfx("paper", true);
+          flash(`${ITEMS[id].n} in your backpack`);
+        }
+      }
+      save2();
+      ctx();
+    });
     if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gp]").forEach((b) => b.onclick = (ev) => {
       ev.stopPropagation();
       const cc = owns2(F, "cocoa") ? cocoaState(F) : null;
@@ -41555,6 +41646,7 @@ ${SIGNOFF[t2.who] || ""}`;
     registerItems(F);
     registerCraft(F);
     registerHampers(F);
+    registerBottles(F);
     registerWraps(F);
     setLive(liveNow());
     $("evan").style.display = evanHere() ? "" : "none";
@@ -43475,6 +43567,16 @@ ${SIGNOFF[t2.who] || ""}`;
         if (putWrapped(F, v)) {
           sfx("paper", true);
           flash("Out on the wrapping table");
+        }
+      } else if (a === "paperbuy") {
+        if (buyPaper(F, v)) {
+          sfx("coin");
+          flash(`A sheet of ${STORE_PAPER[v].n.toLowerCase()} wrapping paper`);
+        }
+      } else if (a === "tagbuy") {
+        if (buyTags(F)) {
+          sfx("coin");
+          flash(`${TAG_PACK.n} gift tags`);
         }
       }
       if (say3) speak(say3, 5e3);

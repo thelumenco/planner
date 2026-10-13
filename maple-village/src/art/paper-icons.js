@@ -7,8 +7,8 @@
 //   pp_<col>_<add>           a dry sheet with torn deckle edges and its flecks
 // Every icon is [fills, ink lines], like the rest of icons.js.
 const f = c => `style="fill:${c}"`;
-export const COL = {natural: "#EFE6D2", blush: "#F2C4C4", sage: "#C6D6B2", ink: "#9DB4D0"};
-export const WET = {natural: "#D9CDB2", blush: "#DDA6A8", sage: "#A9BE94", ink: "#7E98B8"};
+export const COL = {natural: "#EFE6D2", blush: "#F2C4C4", sage: "#C6D6B2", ink: "#9DB4D0", kraft: "#C9A27E", gold: "#E3B84A", red: "#C8432F", green: "#4E7A4E"};   // (the last four: shop-bought wrapping paper, round 188)
+export const WET = {natural: "#D9CDB2", blush: "#DDA6A8", sage: "#A9BE94", ink: "#7E98B8", kraft: "#A8835E", gold: "#C4962E", red: "#9E2F22", green: "#355A35"};
 const rnd = (seed, i) => { const x = Math.sin(seed*12.9898 + i*78.233)*43758.5453; return x - Math.floor(x); };
 const seedOf = s => [...s].reduce((a, c) => a + c.charCodeAt(0), 0);
 
@@ -54,7 +54,7 @@ export function paperIcon(name){
 // ribbons (a spool), tags, stamps, and a wrapped parcel that builds up layer by layer as Mel picks each thing:
 //   wrp_<col>_<add>_<stamp>_<ribbon>_<tag>   ("none" for anything not chosen yet)
 export const RIBBON_COL = {gingham: "#C8432F", velvet: "#7A1F3D", twine: "#C9A27E"};
-const STAMP_INK = {natural: "#8A6A42", blush: "#B24A5E", sage: "#4E6A3E", ink: "#2F3B73"};
+const STAMP_INK = {natural: "#8A6A42", blush: "#B24A5E", sage: "#4E6A3E", ink: "#2F3B73", kraft: "#5A3A22", gold: "#7A5A1A", red: "#FFFDF6", green: "#FFFDF6"};
 // a tiny stamp motif at (x, y)
 function motif(k, x, y, c){
   if (k === "bee") return `<ellipse cx="${x}" cy="${y}" rx="1.3" ry=".9" fill="${c}"/><ellipse cx="${x - .4}" cy="${y - 1}" rx=".7" ry=".5" fill="none" stroke="${c}" stroke-width=".35"/><ellipse cx="${x + .6}" cy="${y - 1}" rx=".7" ry=".5" fill="none" stroke="${c}" stroke-width=".35"/>`;
@@ -70,10 +70,14 @@ export function wrapIcon(name){
       `<rect x="6" y="5" width="12" height="14" rx="2"/><path d="M6 7h12M6 17h12"/>`]; }
   if (name === "tag_plain" || name === "tag_seeded") return [`<path d="M7 9l5 -5h7v15h-12z" ${f(name === "tag_seeded" ? "#C6D6B2" : "#EFE6D2")}/>${name === "tag_seeded" ? [[11, 11], [14, 14], [12, 16], [16, 10]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx=".8" ry=".45" ${f("#5A4632")}/>`).join("") : ""}`,
     `<path d="M7 9l5 -5h7v15h-12z"/><circle cx="12" cy="7.5" r="1"/><path d="M12 6.5q-4 -4 -8 -2"/>`];
+  if (/^gw_/.test(name)) { const c = COL[name.slice(3)]; if (!c) return null;   // a sheet of shop-bought wrapping paper, curling at the corner
+    return [`<path d="M4 6h13l3 3v10H4z" ${f(c)}/><path d="M17 6v3h3z" ${f(WET[name.slice(3)])}/>${name === "gw_gold" ? `<path d="M8 10l.6 1.2l1.2 .6l-1.2 .6l-.6 1.2l-.6 -1.2l-1.2 -.6l1.2 -.6zM14 14l.5 1l1 .5l-1 .5l-.5 1l-.5 -1l-1 -.5l1 -.5z" ${f("#FFF3C4")}/>` : name === "gw_kraft" ? `<path d="M6 10h10M6 13h11M6 16h9" style="stroke:#A8835E;stroke-width:.5"/>` : ""}`,
+      `<path d="M4 6h13l3 3v10H4zM17 6v3h3"/>`]; }
   if (/^stamp_/.test(name)) { const k = name.slice(6); return [`<rect x="7" y="12" width="10" height="7" rx="1" ${f("#C9A27E")}/><rect x="9" y="4" width="6" height="8" rx="2" ${f("#8A6A42")}/><g transform="translate(12 15.5) scale(1.6) translate(-12 -15.5)">${motif(k, 12, 15.5, "#3A2E28")}</g>`, `<rect x="7" y="12" width="10" height="7" rx="1"/><rect x="9" y="4" width="6" height="8" rx="2"/>`]; }
   const m = name.match(/^wrp_([a-z]+)_([a-z]+)_([a-z]+)_([a-z]+)_([a-z]+)$/); if (!m || !COL[m[1]]) return null;
   const [, col, add, stamp, ribbon, tag] = m, rc = RIBBON_COL[ribbon];
   let a = `<rect x="3.5" y="8" width="15" height="12" rx="1" ${f(COL[col])}/><path d="M3.5 8l2 -2h15l-2 2z" ${f(WET[col])}/><path d="M18.5 8l2 -2v12l-2 2z" ${f(WET[col])}/>${flecks(add, 5, 9.5, 12, 9, 6)}`;
+  if (col === "gold") a += `<path d="M7 11l.5 1l1 .5l-1 .5l-.5 1l-.5 -1l-1 -.5l1 -.5zM15 16l.5 1l1 .5l-1 .5l-.5 1l-.5 -1l-1 -.5l1 -.5z" ${f("#FFF3C4")}/>`;
   if (stamp !== "none") a += [[6.5, 11], [12, 10.5], [15.5, 14.5], [7, 17], [11.5, 16]].map(([x, y]) => motif(stamp, x, y, STAMP_INK[col])).join("");
   if (rc) a += `<rect x="10" y="8" width="2.4" height="12" ${f(rc)}/><rect x="3.5" y="12.8" width="15" height="2.2" ${f(rc)}/><path d="M12 6l3 -2l2.2 0l1 .5l-1.2 1.3z" ${f(rc)}/>${ribbon === "gingham" ? `<rect x="10" y="9.5" width="1.2" height="1.2" fill="#FFFDF6"/><rect x="11.2" y="11" width="1.2" height="1.2" fill="#FFFDF6"/><rect x="5" y="12.8" width="1.2" height="1.1" fill="#FFFDF6"/><rect x="15" y="13.9" width="1.2" height="1.1" fill="#FFFDF6"/>` : ""}`
     + `<path d="M11.2 7.5q-3 -4 -5 -1.5q1.6 2.4 5 1.5zM11.2 7.5q3 -4 5 -1.5q-1.6 2.4 -5 1.5z" ${f(rc)}/><circle cx="11.2" cy="7.5" r="1" ${f(rc)}/>`;

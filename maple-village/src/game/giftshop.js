@@ -39,6 +39,15 @@ export function takeBackPair(F, c){
   if (c) { const have = (F.inv || {}).pairbox || 0; c.pairVals = [...(have ? (c.pairVals || []).slice(-have) : []), val]; }
   F.inv.pairbox = (F.inv.pairbox || 0) + 1; return 1;
 }
+// round 188 (Mel: "I can click the bonbon case and the wine shelves but I cannot take one"): Mel takes things off the
+// gift shop's displays, from the same shared stock. A bottle becomes a gift of its own (registered from F.giftshop.bottles).
+export function takeBottle(F, v, shelfId){
+  const b = ((v || {}).shelf || []).find(x => x.id === shelfId && x.n > 0); if (!b) return null;
+  b.n--; const id = "wb_" + b.id, g = giftState(F); g.bottles = g.bottles || {}; g.bottles[id] = {name: b.name, type: b.type, price: b.price}; registerBottles(F);
+  F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; return id;
+}
+export function registerBottles(F){ for (const [id, b] of Object.entries((F.giftshop || {}).bottles || {})) ITEMS[id] = {n: `A bottle of ${b.name}`, kind: "gift", to: ["mum", "dad", "darren", "marcus", "angelina", "gonggong"], price: b.price,
+  ico: "wine_" + (["red", "rose", "white", "sparkling"].includes(b.type) ? b.type : "red"), say: `Your own ${b.name}! We'll open it this weekend.`, wine: true}; }
 // one minute of trade: mode "mel" (she's at the till), "keeper" (Posy's in), else shut -> coins
 export function giftSellMinute(F, day, hm, mode, o){
   if (!mode) return 0; const p = mode === "mel" ? .08 : .05; if (Math.random() >= p) return 0;
@@ -70,14 +79,14 @@ function pairsHTML(o){
 }
 const PANEL = {
   gcase: o => { const s = stockOf(o); return `<h2>The bonbon case</h2><p class="sub">A little glass case on the counter end, filled from the Cocoa Room's own display: the same trays, so what sells here is gone there too.${o.cocoa ? ` ${o.cocoa.prices.bonbon} coins a bonbon.` : ""}</p>`
-    + (!o.cocoa ? `<p class="muted">Empty: there's no Cocoa Room to fill it from yet.</p>` : s.bon.length ? `<ul class="hlist wlist">${s.bon.map(b => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${o.cocoa.trays[b.id]} left in the trays</small></span></li>`).join("")}</ul>` : `<p class="muted">Nothing in the Cocoa Room's display case right now. Make a tray at the bonbon table.</p>`); },
+    + (!o.cocoa ? `<p class="muted">Empty: there's no Cocoa Room to fill it from yet.</p>` : s.bon.length ? `<ul class="hlist wlist">${s.bon.map(b => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${o.cocoa.trays[b.id]} left in the trays</small></span><span class="orbtns"><button class="btn small alt" data-gs="eat:${esc(b.id)}">Have one</button><button class="btn small alt" data-gs="box:${esc(b.id)}" ${o.cocoa.trays[b.id] >= 4 ? "" : "disabled"}>Box of 4</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing in the Cocoa Room's display case right now. Make a tray at the bonbon table.</p>`); },
   gbars: o => { const s = stockOf(o); return `<h2>The chocolate shelf</h2><p class="sub">Bars from the Cocoa Room's wall, stood up in a row.${o.cocoa ? ` ${o.cocoa.prices.bar} coins a bar.` : ""}</p>`
-    + (!o.cocoa ? `<p class="muted">Empty: no Cocoa Room yet.</p>` : s.bars.length ? `<ul class="hlist wlist">${s.bars.map(k => `<li><span class="wpic">${icon("bar_" + k, 26)}</span><span class="wtxt"><b>${esc(k[0].toUpperCase() + k.slice(1))} chocolate</b><small>${o.cocoa.bars[k]} on the wall</small></span></li>`).join("")}</ul>` : `<p class="muted">The bar wall's bare. Mateo moulds more on his shifts.</p>`); },
+    + (!o.cocoa ? `<p class="muted">Empty: no Cocoa Room yet.</p>` : s.bars.length ? `<ul class="hlist wlist">${s.bars.map(k => `<li><span class="wpic">${icon("bar_" + k, 26)}</span><span class="wtxt"><b>${esc(k[0].toUpperCase() + k.slice(1))} chocolate</b><small>${o.cocoa.bars[k]} on the wall</small></span><span class="orbtns"><button class="btn small alt" data-gs="bar:${k}">Take one</button></span></li>`).join("")}</ul>` : `<p class="muted">The bar wall's bare. Mateo moulds more on his shifts.</p>`); },
   gmill: o => { const s = stockOf(o); return `<h2>From the mill</h2><p class="sub">Oils, soaps and lotions, off the same shelves as the mill.</p>`
-    + (s.mill.length ? `<ul class="hlist wlist">${s.mill.map(id => `<li><span class="wpic">${icon(ITEMS[id].ico || id, 26)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${o.store[id]} on the shelves · ${ITEMS[id].price} each</small></span></li>`).join("")}</ul>` : `<p class="muted">Nothing on the mill's shelves just now. Make some at the workbench upstairs at the mill.</p>`); },
+    + (s.mill.length ? `<ul class="hlist wlist">${s.mill.map(id => `<li><span class="wpic">${icon(ITEMS[id].ico || id, 26)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${o.store[id]} on the shelves · ${ITEMS[id].price} each</small></span><span class="orbtns"><button class="btn small alt" data-gs="mill:${id}">Take one</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing on the mill's shelves just now. Make some at the workbench upstairs at the mill.</p>`); },
   gwine: o => { const s = stockOf(o); return `<h2>The wine corner</h2><p class="sub">A few of your bottles, from the wine shop's own shelves, for people who want one to take home.</p>`
     + pairsHTML(o)
-    + (s.wine.length ? `<ul class="hlist wlist">${s.wine.map(b => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${b.n} on the shelves · ${b.price} each</small></span></li>`).join("")}</ul>` : `<p class="muted">The wine shelves are empty.</p>`); }
+    + (s.wine.length ? `<ul class="hlist wlist">${s.wine.map(b => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${b.n} on the shelves · ${b.price} each</small></span><span class="orbtns"><button class="btn small alt" data-gs="wine:${esc(b.id)}">Take one</button></span></li>`).join("")}</ul>` : `<p class="muted">The wine shelves are empty.</p>`); }
 };
 export function giftPanel(F, spot, o){
   const day = o.day, t = giftState(F).sold[day] || {n: 0, coins: 0};

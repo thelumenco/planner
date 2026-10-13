@@ -82,7 +82,7 @@ import { tablelandsRoomArt } from "../art/tablelands-rooms.js";
 import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } from "./lunch.js";
 import { craftState, craft as millCraft, renderWax, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, fromBasket, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
 import { hamperSeason, xmasState, TREATS, treatsHTML, mulledStallPanel, treePanel, treeLit, countdownDue, myStallPanel as xmStallPanel, putOut, takeBack as xmTakeBack, putWine, takeWine, stallSellMinute, registerHampers, hamperPanel, packStart, packAdd, packWine, packRemove, packTie, singCarol, lanternWalk, grottoPanel, grottoVisit, sendHamper, hamperMail, collectReplies, fillOrder } from "./xmas.js";
-import { giftPanel, giftSellMinute, keeperOn as giftKeeperOn, putOutPairs, takeBackPair, putWrapped, giftState } from "./giftshop.js";
+import { giftPanel, giftSellMinute, keeperOn as giftKeeperOn, putOutPairs, takeBackPair, putWrapped, giftState, takeBottle, registerBottles } from "./giftshop.js";
 import * as PP from "./paperie.js";
 import * as WR from "./wrap.js";
 import { setPaperArtF } from "../art/paperie-room.js";
@@ -1821,6 +1821,13 @@ function ctx(){
   if (homeView && (scene === "home" || scene === "garage")) wireStorage(c);
   if (ppView && scene === "bv_hpaper") wirePaper(c);
   if ((ppView && scene === "bv_hpaper") || (fieldView === "gwrap" && scene === "giftshop")) wireWrap(c);
+  if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gs]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const [a, v] = b.dataset.gs.split(/:(.*)/s), cc = owns(F, "cocoa") ? cocoaState(F) : null;   // round 188: take from the displays
+    if (a === "eat" && cc) { const bb = eatBonbon(F, v); if (bb) { sfx("chime"); mprop("heart", mel.x, mel.y - 60, 1600); speak(`${bb.name}. Oh, that's good.`, 3500); } }
+    else if (a === "box" && cc) { const id = packBox(F, 4, {[v]: 4}); if (id) { sfx("paper", true); flash(`${ITEMS[id].n} in your backpack`); } }
+    else if (a === "bar" && cc) { if (takeBar(F, v, true)) { sfx("chime"); flash(`${CC_KINDS[v].n} bar in your backpack`); } }
+    else if (a === "mill") { if (takeFromStore(F, v, 1)) { sfx("paper", true); flash(`${ITEMS[v].n} in your backpack`); } }
+    else if (a === "wine") { const id = takeBottle(F, vineState(F), v); if (id) { sfx("paper", true); flash(`${ITEMS[id].n} in your backpack`); } }
+    save(); ctx(); });
   if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gp]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const cc = owns(F, "cocoa") ? cocoaState(F) : null;   // round 179
     if (b.dataset.gp === "put") { const k = putOutPairs(F, cc, +b.dataset.n || 1); if (k) { sfx("paper", true); flash(`${k} pairing box${k > 1 ? "es" : ""} out in the wine corner`); } }
     else if (takeBackPair(F, cc)) { sfx("paper", true); flash("A pairing box, back in your backpack"); }
@@ -2677,6 +2684,7 @@ function render(redraw){
   registerItems(F);   // each discovered gelato flavour is a gift item (one per type) in the backpack
   registerCraft(F);   // round 153: and each oil, soap and lotion Mel's worked out at the mill
   registerHampers(F);   // round 173: and each hamper she's packed
+  registerBottles(F);   // round 188: bottles taken from the gift shop's wine corner
   WR.registerWraps(F);   // round 185: and every gift she's wrapped
   setLive(liveNow());   // the jazz duo at the night market, the guitar in Ronda: live, over the record player
   $("evan").style.display = evanHere() ? "" : "none";
@@ -3258,6 +3266,8 @@ function wireWrap(c){
     else if (a === "go") { const id = WR.wrapIt(F, wrSt); if (id) { sfx("chime"); gainXp(1); act("cheer"); [0, 250].forEach((t, i) => setTimeout(() => mprop("sparkle", mel.x + (i ? 18 : -18), mel.y - 60, 1400), t));
       say = `Folded, creased, ${wrSt.stamp ? "stamped, " : ""}${wrSt.ribbon ? "tied with a bow, " : ""}${wrSt.tag ? "tagged, " : ""}done. It's in your backpack: tap it there to choose who it's for.`; wrSt = {}; } }
     else if (a === "put") { if (putWrapped(F, v)) { sfx("paper", true); flash("Out on the wrapping table"); } }
+    else if (a === "paperbuy") { if (WR.buyPaper(F, v)) { sfx("coin"); flash(`A sheet of ${WR.STORE_PAPER[v].n.toLowerCase()} wrapping paper`); } }   // round 188
+    else if (a === "tagbuy") { if (WR.buyTags(F)) { sfx("coin"); flash(`${WR.TAG_PACK.n} gift tags`); } }
     if (say) speak(say, 5000); save(); ctx(); drawScene(); });
 }
 function wirePaper(c){

@@ -119,7 +119,7 @@ const art = name => {
       `<path d="M5 3h14l-1 18H6zM5 6.5h14"/><path d="M7 4.8h1.5M10 4.8h1.5M13 4.8h1.5" stroke-dasharray="1 1"/><g transform="translate(7 8) scale(.42)" stroke-width="2.6">${inner[1]}</g>`];
   }
   if (!I[name] && name.startsWith("pp")) { const pi = paperIcon(name); if (pi) return pi; }
-  if (!I[name] && /^(wrp_|rb_|tag_|stamp_)/.test(name)) { const wi = wrapIcon(name); if (wi) return wi; }   // round 185: wrapping
+  if (!I[name] && /^(wrp_|rb_|tag_|stamp_|gw_)/.test(name)) { const wi = wrapIcon(name); if (wi) return wi; }   // round 185: wrapping
   if (!I[name] && /^(balm_|lipoil_|beeswax$)/.test(name)) { const li = lipIcon(name); if (li) return li; }   // round 187: lip balms and oils   // round 183: the paperie's batch at every step
   return I[name] || I.sparkle;
 };
