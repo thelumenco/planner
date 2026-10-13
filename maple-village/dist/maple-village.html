@@ -26761,7 +26761,20 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var busyCache = {};
   var busyOn = (day) => busyCache[day] || (busyCache[day] = [...toursOn(day).flatMap((t2) => [t2.guide, ...t2.group]), ...visitsOn(day).map((v) => v.id), ...keepersOn(day)]);
   var cellarBuilt = () => !!(api3 && api3.F().goals && api3.F().goals.cellar);
-  var slotNow = (def) => slotAt(def, dayKey(), sgHM(), true);
+  var slotCache = {};
+  var slotKey = "";
+  var clearSlots = () => {
+    slotCache = {};
+    slotKey = "";
+  };
+  var slotNow = (def) => {
+    const sup2 = api3 && api3.sup && api3.sup(), k = `${dayKey()}|${sgHM()}|${api3 ? api3.scene() : ""}|${sup2 ? sup2.from : ""}`;
+    if (k !== slotKey) {
+      slotCache = {};
+      slotKey = k;
+    }
+    return def.id in slotCache ? slotCache[def.id] : slotCache[def.id] = slotAt(def, dayKey(), sgHM(), true);
+  };
   var whereIs = (id) => {
     const d = NPCS.find((n) => n.id === id), s = d && slotNow(d);
     return s ? s.scene : null;
@@ -37397,6 +37410,7 @@ ${p ? p.sign : `Warmly, ${first}`}`;
     Object.keys(F.history).sort().slice(0, -21).forEach((k) => delete F.history[k]);
   }
   var save2 = (redraw) => {
+    clearSlots();
     F.where = { scene, x: Math.round(mel.x), y: Math.round(mel.y), day: dayKey() };
     noteHistory();
     persist("today");
@@ -45941,7 +45955,8 @@ ${SIGNOFF[t2.who] || ""}`;
         ccSt.made = null;
       } else if (a === "sel") {
         ccSt.made = null;
-        ccSt.sel = ccSt.sel.includes(k) ? ccSt.sel.filter((x) => x !== k) : [...ccSt.sel, k].slice(0, 2);
+        const pan = cocoaState(F).pantry, cur2 = (ccSt.sel || []).filter((x) => pan[x] > 0);
+        ccSt.sel = cur2.includes(k) ? cur2.filter((x) => x !== k) : [...cur2, k].slice(0, 2);
       } else if (a === "bonbon" || a === "again") {
         const r0 = a === "again" ? recipeOf2(cocoaState(F), k) : null, out = r0 ? makeBonbons(F, r0.shell, r0.fills, ccSt.mould || r0.shape) : makeBonbons(F, ccSt.shell, ccSt.sel, ccSt.mould);
         if (!out) return;
@@ -47824,7 +47839,14 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     }
   });
   function bubbleAt(el, ex, ey, off, forceBelow) {
-    if (el.hidden) return;
+    if (el.hidden) {
+      el.__at = "";
+      return;
+    }
+    const at2 = `${Math.round(ex)},${Math.round(ey)},${off},${forceBelow ? 1 : 0},${cam.s},${Math.round(cam.ox)},${Math.round(cam.oy)},${cam.top}`, txt = el.innerHTML;
+    if (el.__at === at2 && el.__txt === txt) return;
+    el.__at = at2;
+    el.__txt = txt;
     const wrap2 = $("map"), cw = wrap2.clientWidth, sc = cam.s;
     const bw = el.offsetWidth, bh = el.offsetHeight, px = ex * sc + cam.ox, py = (ey - off) * sc + cam.oy;
     const left7 = clamp(px, bw / 2 + 2, cw - bw / 2 - 2);

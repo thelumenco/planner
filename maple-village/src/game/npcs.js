@@ -65,7 +65,14 @@ const terraceBuilt = () => !!(api && api.F().vine && api.F().vine.terrace);   //
 const millShopOpen = () => !!(api && api.F().goals && api.F().goals.millshop);   // round 153: weekend day-trippers walk up to the Mill Shop
 const busyCache = {}; const busyOn = day => busyCache[day] || (busyCache[day] = [...toursOn(day).flatMap(t => [t.guide, ...t.group]), ...visitsOn(day).map(v => v.id), ...keepersOn(day)]);
 const cellarBuilt = () => !!(api && api.F().goals && api.F().goals.cellar);   // the wine club meets in the cellar door
-const slotNow = def => slotAt(def, dayKey(), sgHM(), true);
+// Where someone should be right now. Working it out walks every tour, visit, tasting and class, so it's kept for the
+// rest of the game minute (round 193: it was over half the frame time, and Mel felt the game hang). Anything Mel does
+// that saves the game clears it, so a change still shows at once.
+let slotCache = {}, slotKey = "";
+export const clearSlots = () => { slotCache = {}; slotKey = ""; };
+const slotNow = def => { const sup = api && api.sup && api.sup(), k = `${dayKey()}|${sgHM()}|${api ? api.scene() : ""}|${sup ? sup.from : ""}`;
+  if (k !== slotKey) { slotCache = {}; slotKey = k; }
+  return def.id in slotCache ? slotCache[def.id] : (slotCache[def.id] = slotAt(def, dayKey(), sgHM(), true)); };
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };
 export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
 export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }

@@ -40,7 +40,7 @@ import { loadDesk, deskPanel, wireDesk } from "./desk.js";
 import { kid, kidPanel, wireKid, stopKidGame, SNACKS, snackPic, EVAN_TAPS, pickSay } from "./kid.js";
 import { addReminder, cancelReminder, upcoming as upcomingReminders, dueNow, fmtWhen } from "./reminders.js";
 import { sendOptions, takeSend, sendMorePanel } from "./bikesend.js";
-import { rideBy, initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos, daySchedule } from "./npcs.js";
+import { rideBy, initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos, daySchedule, clearSlots } from "./npcs.js";
 import { dishArt, glassArt } from "../art/wine.js";
 import { fieldArt, stallFront } from "../art/field.js";
 import { shoreArt } from "../art/shore.js";
@@ -211,7 +211,7 @@ function noteHistory(){
   F.history[S.day] = {q: S.doneIds.length, steps: S.steps || 0, water: S.waterMl || 0, harvest: S.harvested || 0, coins: S.earned || 0, chats: (S.chats || []).slice(0, 12)};
   Object.keys(F.history).sort().slice(0, -21).forEach(k => delete F.history[k]);
 }
-const save = (redraw) => { F.where = {scene, x: Math.round(mel.x), y: Math.round(mel.y), day: dayKey()}; noteHistory(); persist("today"); persist("fox"); render(redraw); };
+const save = (redraw) => { clearSlots(); F.where = {scene, x: Math.round(mel.x), y: Math.round(mel.y), day: dayKey()}; noteHistory(); persist("today"); persist("fox"); render(redraw); };
 
 async function initDb(){
   if (!window.claude || !claude.use) return;
@@ -3354,7 +3354,8 @@ function wireCocoa(c){
     else if (a === "take") { const got = unstockPantry(F, k, n, orchState(F)); if (got) { sfx("tap"); flash(got.to === "bag" ? `${got.n} back into your backpack` : `${got.n} back to Ma Ma's shelf`); } }
     else if (a === "shell") { ccSt.shell = k; ccSt.made = null; }
     else if (a === "bshape") { ccSt.mould = k; ccSt.made = null; }   // round 176: the bonbon moulds (not "mould", which moulds bars)
-    else if (a === "sel") { ccSt.made = null; ccSt.sel = ccSt.sel.includes(k) ? ccSt.sel.filter(x => x !== k) : [...ccSt.sel, k].slice(0, 2); }
+    else if (a === "sel") { ccSt.made = null; const pan = cocoaState(F).pantry, cur = (ccSt.sel || []).filter(x => pan[x] > 0);   // round 193: a filling that's run out no longer holds one of the two places
+      ccSt.sel = cur.includes(k) ? cur.filter(x => x !== k) : [...cur, k].slice(0, 2); }
     else if (a === "bonbon" || a === "again") { const r0 = a === "again" ? bonbonOf(cocoaState(F), k) : null, out = r0 ? makeBonbons(F, r0.shell, r0.fills, ccSt.mould || r0.shape) : makeBonbons(F, ccSt.shell, ccSt.sel, ccSt.mould); if (!out) return;
       ccSt.sel = []; ccSt.made = out.r.id; ccSt.isNew = out.isNew; sfx("chime"); act("cheer"); gainXp(out.isNew ? 2 : 1);
       if (out.isNew) { [0, 250, 500].forEach((t, k2) => setTimeout(() => mprop("sparkle", mel.x + (k2 - 1)*22, mel.y - 60, 1600), t)); speak(`A new bonbon: ${out.r.name}! Twelve of them, ready for the display case.`, 5000); }
@@ -3991,7 +3992,10 @@ addEventListener("resize", () => { cam.snap = true; measureHud(); });
 // overflow:hidden boxes can still be scrolled by focus or scrollIntoView; keep the map pinned
 $("map").addEventListener("scroll", () => { const m = $("map"); if (m.scrollLeft || m.scrollTop) { m.scrollLeft = 0; m.scrollTop = 0; } });
 function bubbleAt(el, ex, ey, off, forceBelow){
-  if (el.hidden) return;
+  if (el.hidden) { el.__at = ""; return; }
+  // round 193: only re-measure when something's moved or the words changed (measuring every frame made the game stutter)
+  const at = `${Math.round(ex)},${Math.round(ey)},${off},${forceBelow ? 1 : 0},${cam.s},${Math.round(cam.ox)},${Math.round(cam.oy)},${cam.top}`, txt = el.innerHTML;
+  if (el.__at === at && el.__txt === txt) return; el.__at = at; el.__txt = txt;
   const wrap = $("map"), cw = wrap.clientWidth, sc = cam.s;
   const bw = el.offsetWidth, bh = el.offsetHeight, px = ex*sc + cam.ox, py = (ey - off)*sc + cam.oy;
   const left = clamp(px, bw/2 + 2, cw - bw/2 - 2);
