@@ -2417,3 +2417,8 @@ plus her own words; campervan neighbours can be added too.
 - UI: the address book sits under Letters in the mail tab (`#bookBox`, `data-bk`); the backpack's gift chooser has "By post…" (`data-bypost`, `data-postto`).
 - State: `F.book = {ids: {id: dayAdded}, sent: [...]}`. Test block "round 190".
 - Still to do: voices for the Coast Road and Tablelands (round 2), Ronda, Kyoto, Jeju, Cinque Terre (round 3; ask Mel about Jason and Luca).
+
+## Round 191: address book voices for the Coast Road and the Tablelands
+- `data/pen-cr.js` (26: Coast Road locals and the eight travelling neighbours) and `data/pen-tl.js` (22 Tablelands locals), merged into `PEN` in contacts.js.
+  All 102 campervan locals and neighbours now write back in their own voice (test "round 191" in the round 190 block).
+- Still to do (round 3): Ronda, Kyoto, Jeju, Cinque Terre; ask Mel about Jason and Luca first.

@@ -16,9 +16,11 @@ import { TL_PEOPLE } from "../data/tl-people.js";
 import { LV_PEOPLE } from "../data/lv-people.js";
 import { PEN_LV } from "../data/pen-lv.js";
 import { PEN_BB } from "../data/pen-bb.js";
+import { PEN_CR } from "../data/pen-cr.js";
+import { PEN_TL } from "../data/pen-tl.js";
 
 const D = 24*60*60*1000;
-export const PEN = {...PEN_LV, ...PEN_BB};
+export const PEN = {...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL};   // round 191: the Coast Road and the Tablelands
 export const REGIONS = {bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre"};
 // what a parcel costs to post, and how many days the reply takes (a letter's free)
 export const POSTAGE = {bellbird: 2, coast: 2, tablelands: 4, lavender: 4, ronda: 8, kyoto: 8, jeju: 8, cinque: 8};

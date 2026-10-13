@@ -33941,9 +33941,606 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
   };
 
+  // src/data/pen-cr.js
+  var PEN_CR = {
+    /* ---------- Breakwater ---------- */
+    crjet: {
+      sign: "Catch you in the water, Jet",
+      food: "Ate it on the sand between lessons, board under one arm. Best fuel there is.",
+      drink: "Saving it for a glassy evening when the last lesson's packed up. I'll toast the little peelers.",
+      made: "It's on the counter at the surf shop, next to the wax. Everyone who comes in has a sniff.",
+      flower: "They're in a bucket by the rental boards. Gives the place a bit of colour, besides all the blue.",
+      other: "Well, that's a first. Usually the only parcels here are full of leg ropes.",
+      letter: "Read your letter sitting on my board out the back, waiting for a set. Nearly missed a good one.",
+      news: ["Had a lady of seventy stand up on her third go last week. Grinned all the way to the sand.", "The sea's been in a good mood all month. Little peelers, every morning."],
+      back: "b_wax",
+      backNote: "A block of the coconut wax from the shop. Rub it on in circles, and stand up quick."
+    },
+    crpippa: {
+      sign: "Salt and vinegar, Pippa (the Golden Gull)",
+      food: "Had it on the sea wall on my break, keeping one eye on the gulls. They didn't get a crumb.",
+      drink: "It's in the cool room behind the gummy. I'll have a glass the night the fryer gets a rest.",
+      made: "It's up by the chalkboard where I write the day's catch. Brightens the whole shop.",
+      flower: "In a jug on the counter, well away from the fryer. The shop smells of salt and roses now.",
+      other: "Nobody posts a fish and chip shop a present. Somebody did. I'm quite chuffed.",
+      letter: "Your letter came with the morning delivery off the boats. I read it before I lit the fryer.",
+      news: ["Gummy's been running beautifully off the boats. Still the best. Don't tell the flake.", "I went fishing on my day off and caught nothing at all. Bought my tea at my own shop."],
+      back: null,
+      backNote: ""
+    },
+    crbree: {
+      sign: "Love from Bree (up at four, as always)",
+      food: "Had it at five in the morning with the pies in. A treat at that hour feels like a secret.",
+      drink: "Saving it for a Sunday, which is the only day I sleep past four.",
+      made: "It's on the shelf above the mixer, where my nan's recipe card lives. Good company for it.",
+      flower: "They're in a jar by the vanilla slices. The surfers walk in sandy and leave smiling.",
+      other: "I've been baking for other people since I was fifteen. It's lovely to get something back.",
+      letter: "Your letter came while the scrolls were proving. I read it with flour on my hands, sorry about the thumbprint.",
+      news: ["I tried a new pie this month, scallop with a bit of curry. Gone by nine every day.", "The neenish tarts are still half pink, half chocolate. Nan would be pleased."],
+      back: "b_sourdough",
+      backNote: "A sourdough loaf from this morning's bake. Crust like a drum. Good butter, please."
+    },
+    /* ---------- Lighthouse Point ---------- */
+    crwin: {
+      sign: "With warm regards, Win (from the tearoom at Lighthouse Point)",
+      food: "I had it with a pot of tea at the window, watching for spouts. Great-grandad would have approved.",
+      drink: "I've put it by for a still evening on the lighthouse balcony. A hundred and twenty-eight steps, and worth every one.",
+      made: "It sits on the shelf beside the logbooks. I think it suits them.",
+      flower: "They're on the tearoom table nearest the window. The visitors keep asking if I grew them on the cliff.",
+      other: "In forty years of logbooks, Great-grandad never wrote down a parcel like this. I've written it in mine.",
+      letter: "Your letter arrived on a grey morning, and I read it with the scones in the oven. It brightened the whole point.",
+      news: ["The southern rights came in close last week, a mother and calf. I counted the blows from the balcony.", "I've been reading the 1903 logbook again. Two ships a day, and every one of them noted in his small, neat hand."],
+      back: "b_shortbread",
+      backNote: "A tin of the keeper's shortbread, made on Tuesday. The lighthouse on the lid was my idea."
+    },
+    crhamish: {
+      sign: "All the best, Hamish (the signal house)",
+      food: "I had it at the counter between visitors. Very civilised. The dog had the crumbs.",
+      drink: "It's on the shelf under the counter, next to the spare batteries. I'll open it at the end of the season.",
+      made: "I've put it in the window with a little card that says Not For Sale. Three people have tried to buy it.",
+      flower: "They're in a jar next to the wind chimes. The whole shop smells like a garden now.",
+      other: "I sell gifts all day long. It's very nice, for once, to receive one.",
+      letter: "Your letter came with the new postcards. I read it standing up at the counter, which is how I read everything.",
+      news: ["The lighthouse models are flying out the door. I've had to reorder the batteries twice.", "Took the dog along the cliff on Sunday and we saw a whale. He wasn't very impressed."],
+      back: "b_teatowel",
+      backNote: "A tea towel with the whole Coast Road on it. You'll never use it, and that's quite all right."
+    },
+    /* ---------- Fern Gully ---------- */
+    crtash: {
+      sign: "See you on the tracks, Tash (Fern Gully ranger)",
+      food: "Ate it on the treetop walk at lunch. A currawong watched every bite.",
+      drink: "It's in the ranger hut fridge, behind the first aid kit. A quiet one after a long day on the tracks.",
+      made: "It's on the shelf in the hut beside the bird guides. A bit of colour among all the green.",
+      flower: "They're on the hut counter. A lyrebird came right up to the window to have a look, I swear.",
+      other: "Rangers don't get many parcels. Mostly lost hats and the odd snake report. This was much nicer.",
+      letter: "Your letter came on a wet morning, and I read it in the hut while the rain dripped off the ferns.",
+      news: ["Heard a lyrebird doing a camera shutter last week. Somebody's been taking a lot of photos.", "The glow-worms have been brilliant this month. Torches off, eyes up, and there they are."],
+      back: "b_birdguide",
+      backNote: "A pocket guide to the rainforest birds. The lyrebird's on page twelve. Listen for the chainsaw."
+    },
+    crrowan: {
+      sign: "Soup's on, Rowan (the Toadstool)",
+      food: "I had it by the old stove with a cup of tea. It's been lit since 1974, so it's always warm.",
+      drink: "It's on the shelf above the stove, where the good things go. I'll open it when the ferns are dripping.",
+      made: "It's on the counter next to the soup pot. Folk keep asking where I found it.",
+      flower: "In a jar on the middle table. They look very happy among all the green.",
+      other: "Nobody posts anything to the Toadstool but mushroom orders. This made my week.",
+      letter: "Your letter came through the ferns with the bread delivery. I read it while the soup simmered.",
+      news: ["The mushroom farm up the hill had a bumper week. I've been making soup by the bucket.", "The hives on the heath are humming. The honey's coming in darker this season, more like wildflowers than ever."],
+      back: "honey_heath",
+      backNote: "A jar of heath honey from the hives on the cliffs. It tastes like a windy day in spring."
+    },
+    /* ---------- Fisher's Harbour ---------- */
+    crmags: {
+      sign: "Fair seas, Mags (and Sea Biscuit)",
+      food: "Ate it on the deck coming back in, with the gulls following. Davo got a corner.",
+      drink: "It's in the wheelhouse, wedged in tight. I'll have it the day we land a full catch.",
+      made: "It's in the wheelhouse beside Dad's old compass. Sea Biscuit's never looked so posh.",
+      flower: "They're in a bait bucket on the wharf, washed out first, I promise. The old fellas think I've gone soft.",
+      other: "Out at four, back by ten, and a parcel waiting at the co-op. Best catch of the week.",
+      letter: "Your letter came while I was mending pots on the wharf. I read it twice and then got back to the knots.",
+      news: ["Good season so far. The little ones go back, and there's plenty of big ones.", "Gave Sea Biscuit a new coat of blue. She's the brightest boat in the harbour now."],
+      back: "scallop",
+      backNote: "A few scallops from the co-op, packed on ice. Quick in a hot pan, nothing more."
+    },
+    crdavo: {
+      sign: "Cheers, Davo",
+      food: "Mags let me have it all to myself. That's never happened before.",
+      drink: "I'll take it to the Anchor on darts night. Might help my aim. Probably won't.",
+      made: "It's hanging up in the shed by the bait buckets. Makes the whole place smell better, which is saying something.",
+      flower: "Put them in a jar on the boat. Mags pretended not to notice, then moved them out of the spray.",
+      other: "Don't tell Mags, but this is the best thing that's happened to me all year.",
+      letter: "Got your letter at the co-op. Read it on the wharf with a pie. Good day, that one.",
+      news: ["Darts on Thursday. Still terrible. Hit the board twice, though.", "Mags says I'm getting quicker with the pots. She said it once, but I heard it."],
+      back: null,
+      backNote: ""
+    },
+    crlorraine: {
+      sign: "All the best from the Anchor, Lorraine",
+      food: "Had it in the back office with the books and a pot of tea. The books went much quicker.",
+      drink: "That's going behind the bar on the top shelf, where Kev can see it and can't reach it.",
+      made: "It's on the mantel over the fire, next to the photo of the big cray from 1953.",
+      flower: "In a vase on the bar. Kev's said three times that they're very nice. That's a lot for Kev.",
+      other: "Twenty years behind this bar and I don't think anyone's posted me a present. Thank you, love.",
+      letter: "Your letter came with the beer order. I read it by the fire before we opened, with nobody asking for anything.",
+      news: ["A couple drove three hours for the parma last Saturday. I gave them extra chips for the effort.", "Kev's paid his tab. All of it. We had a little ceremony."],
+      back: null,
+      backNote: ""
+    },
+    crkev: {
+      sign: "Yours, Kev (end of the bar)",
+      food: "Had it with my lemonade at the end of the bar. Didn't share. Lorraine noticed.",
+      drink: "I'll keep it for a good story night. I've got plenty of those left.",
+      made: "It's on my bit of the bar. Lorraine says if I'm going to sit here forever, it might as well look nice.",
+      flower: "Lorraine put them on the bar. I've told everyone they're mine. Which they are.",
+      other: "Fifty years on this coast and that's the first parcel with my name on. Very decent of you.",
+      letter: "Your letter came to the Anchor. Lorraine read it out to the whole bar. I didn't mind a bit.",
+      news: ["Told the storm of '74 to a young fella on Tuesday. He stayed for the whole thing. Good listener.", "Lorraine's parma is still the best in the state. I check every week, to be sure."],
+      back: null,
+      backNote: ""
+    },
+    crned: {
+      sign: "Low and slow, Ned (the smokehouse)",
+      food: "Had it with a cup of tea while the red gum smouldered. A sweet thing goes well with smoke.",
+      drink: "It's on the shelf in the cottage. My wife and I will have it on a cool evening.",
+      made: "It's in the cottage now. My wife says it's far too nice for the smokehouse, and she's right.",
+      flower: "My wife put them on the kitchen table. They've a whiff of smoke about them now. Everything does.",
+      other: "We've had the smokehouse since 1890 and I'm not sure anyone's ever posted us a thank you. Well, thank you.",
+      letter: "Your letter came on a smoking day. I read it on the bench outside while the trout took their time.",
+      news: ["Good run of trout this month. The racks have been full every morning.", "My wife's tried a pâté with a bit of dill. I'm told I'm not allowed an opinion."],
+      back: "b_pate",
+      backNote: "A jar of my wife's trout pâté. On crackers, a squeeze of lemon, and don't tell her I said it was good."
+    },
+    /* ---------- The Sisters ---------- */
+    crsunny: {
+      sign: "Hot chips and a view, Sunny",
+      food: "Had it at sunset with a coffee, leaning on the kiosk hatch. Couldn't think of a better spot.",
+      drink: "Saving it for a clear evening when the Sisters go pink. That's the best time for anything.",
+      made: "It's up next to the shipwreck map. It's the nicest thing in the kiosk now.",
+      flower: "They're in a cup on the counter. Everyone at sunset asks about them before they ask for chips.",
+      other: "I hand out chips to strangers all day. Getting a parcel back from one felt very nice.",
+      letter: "Your letter came in the afternoon lull. I read it with the view and a coffee, and it was lovely.",
+      news: ["We had a sunset last week that went purple for twenty minutes. Nobody bought a single chip.", "Somebody spotted a pod of dolphins past the third stack. Everyone ran to the rail."],
+      back: "b_postcard",
+      backNote: "A postcard of the Sisters at sunset, from the rack by the hatch. Put it somewhere you'll see it."
+    },
+    crari: {
+      sign: "Swim between the flags, Ari",
+      food: "Shared it round the clubhouse after patrol. Everyone said thanks, then asked who you were.",
+      drink: "It's in the club fridge with a note on it. Nobody touches a thing with a note on it.",
+      made: "It's on the shelf under the honour board. Looks good up there among the old trophies.",
+      flower: "They're in a jug by the rescue boards. The clubhouse has never smelled so nice.",
+      other: "We're volunteers. We don't get thanked often. This one meant a lot.",
+      letter: "Your letter came while I was on the tower. Read it between scans of the water, a line at a time.",
+      news: ["Quiet patrols this month, everyone between the flags. That's the best kind.", "We've got new rescue boards from the sausage sizzle money. Every snag counts."],
+      back: null,
+      backNote: ""
+    },
+    crjade: {
+      sign: "See you at the club, Jade",
+      food: "Had it at the canteen between sausages. Kept it well away from the onions.",
+      drink: "It's going to the club's end of season night. I'll say it's from a friend of the surf club, because you are.",
+      made: "It's on the canteen counter next to the snag tongs. Classed the whole place up.",
+      flower: "They're on the canteen counter. A little kid asked if they came with the sausage.",
+      other: "Grandma's name's on the honour board, and now there's a parcel with mine on it. Good week.",
+      letter: "Your letter came on canteen morning. I read it between sausages and got sauce on the corner.",
+      news: ["Watched the penguins come in at dusk on Wednesday. Forty of them, all in a hurry.", "Sold more snags last weekend than ever. That's another rescue board, nearly."],
+      back: "b_cap",
+      backNote: "A Nippers cap from the canteen, red and yellow, for the next little lifesaver you know."
+    },
+    /* ---------- Koala Cove ---------- */
+    crfay: {
+      sign: "Love, Fay (the park store)",
+      food: "Had it on the store step with a cuppa. A parrot tried for a bit. One bit. That's the rule.",
+      drink: "Reg and I will have it on the deck one evening when the park's gone quiet.",
+      made: "It's behind the counter next to the lost-property box. Nobody's allowed to claim it.",
+      flower: "In a jar on the counter. The parrots keep looking at them, so I've moved them inside a bit.",
+      other: "Forty years at this store and I've sent off plenty of parcels for campers. This is the first one for me.",
+      letter: "Your letter came in with the bread order. I read it between the milk and the bird seed.",
+      news: ["Same families back again this summer. One lot's been coming since their kids were in nappies.", "The lost-property box has eleven odd thongs in it. Not one pair."],
+      back: "b_seed",
+      backNote: "A scoop of bird seed for the parrots. One scoop. They have no manners, so hold on tight."
+    },
+    crreg: {
+      sign: "Cheers, Reg (and the banana bread)",
+      food: "Had it with a long black while the washing went round. Civilisation, that is.",
+      drink: "Fay and I will have it on the deck, in the deckchairs, when the park's asleep.",
+      made: "It's on the shelf above the coffee machine. The book swap folk keep admiring it.",
+      flower: "They're on the counter by the banana bread. They both look very good, if I say so.",
+      other: "I make the banana bread. Fay runs the park. Neither of us has been posted a present in years. Thank you.",
+      letter: "Your letter came on a quiet morning. I read it in a deckchair while three machines went round.",
+      news: ["The banana bread's sold out by eleven most days. I've started making two extra loaves.", "Somebody left a very good book in the swap. I've been reading it under the counter."],
+      back: null,
+      backNote: ""
+    },
+    crdimi: {
+      sign: "Caps on, Coach Dimi",
+      food: "Had it on the beach after Nippers with the flags still out. Shared it with the parents' helpers.",
+      drink: "That's for the end of season barbecue. I'll make a little speech. Short one, I promise.",
+      made: "It's in the rec hall by the whistle board. The kids think it's a prize. Maybe it is.",
+      flower: "They're in a bucket at the rec hall. The little ones want to give them out as medals.",
+      other: "The Nippers get medals. The coach gets sand in his shoes. This is a very nice change.",
+      letter: "Your letter came on a Nippers morning. I read it at the water's edge with my whistle in my teeth.",
+      news: ["Beach flags on Saturday, twenty kids, one whistle. Everyone ran, nobody fell over. Nearly nobody.", "Two of the older ones have started helping with the little five-year-olds. Proud coach."],
+      back: null,
+      backNote: ""
+    },
+    /* ---------- the travelling neighbours (on the road, letters reach them at a camp down the road) ---------- */
+    crgloria: {
+      sign: "With love, Gloria (and Bernie, and the Airstream)",
+      food: "We had it with a cup of tea under the Airstream awning. Bernie got the bigger half, because he asked nicely.",
+      drink: "We're saving it for the next sunset by the water. Bernie says he'll polish the glasses.",
+      made: "It's on the little shelf by the door, where it catches the light. Bernie had to put up a rail so it won't rattle.",
+      flower: "They're in a jar on the fold-out table, bouncing along every road with us.",
+      other: "What a lovely thing to collect from a camp office. I carried it back like a birthday.",
+      letter: "Your letter found us at a camp down the road. I read it aloud to Bernie, and he only fell asleep at the end.",
+      news: ["We're up the coast now at a camp with a book swap twice the size. I've read four already.", "The roads have been kind lately, long and quiet. Bernie says the Airstream's never purred so well."],
+      back: null,
+      backNote: ""
+    },
+    crbernie: {
+      sign: "Cheers, Bernie (the Airstream's mechanic)",
+      food: "Gloria let me have the first piece, which is unheard of. Very nice it was.",
+      drink: "I'll open it after the next long drive, once she's parked up and level.",
+      made: "I've screwed a little hook in by the door for it. Six years building that van and this is the finishing touch.",
+      flower: "Gloria put them on the table. No parrots at this camp, so they're safe for once.",
+      other: "Thank you. Don't often get post on the road. Gloria made me read the label twice.",
+      letter: "Your letter caught up with us at a camp down the road. I read it in my chair with my hat on. No parrot.",
+      news: ["Fished at a river mouth up the road. Caught nothing. Still a perfect morning.", "The road north's been smooth. Had a grease and oil change in a little town, and she's running sweet."],
+      back: null,
+      backNote: ""
+    },
+    crraj: {
+      sign: "From Raj and the lap crew",
+      food: "We split it four ways at a picnic table. Om counted the pieces to be sure it was fair.",
+      drink: "We'll open it the night we finish the lap. Meena's put it somewhere even I can't find.",
+      made: "It's on the dashboard, wedged in with the maps. It's been through three towns already.",
+      flower: "They're in a cup in the cup holder. Meena says they're the best navigator we've had.",
+      other: "Thank you. Post on the road feels like a little bit of home turning up.",
+      letter: "Your letter caught up with us at a camp down the road. We read it out at dinner, with interruptions.",
+      news: ["We're further up the coast now. New town, new playground, and yes, it's the best one yet.", "I've been practising ping-pong in secret. The rematch is next Tuesday."],
+      back: null,
+      backNote: ""
+    },
+    crmeena: {
+      sign: "Warmly, Meena (navigator)",
+      food: "I had mine with a coffee on laundry day, which is every fourth day. It made the waiting very pleasant.",
+      drink: "It's tucked in the van cupboard for a quiet night once the kids are asleep.",
+      made: "It's in the drawer with the maps and the school books. It makes the drawer smell lovely.",
+      flower: "They're on the fold-out table. Om counts the petals and Tia counts the stems.",
+      other: "What a nice surprise at the camp office. The kids were very jealous until they saw their names on it too.",
+      letter: "Your letter found us at a camp down the road. I read it in the laundry while the machine went round.",
+      news: ["We've reached the halfway mark, we think. Raj has drawn a line on the map to prove it.", "The road's been lovely this week, all coast and gum trees. School in the car is going well, mostly."],
+      back: null,
+      backNote: ""
+    },
+    crtia: {
+      sign: "From Tia (Nipper, age nine)",
+      food: "I ate mine after swimming. Om asked for a bite and I gave him a small one.",
+      drink: "Mum says it's for grown-ups, so I'm keeping it safe for her.",
+      made: "I keep it in my special box with my beach flags ribbon. It's the best thing in there.",
+      flower: "I put one behind my ear and the rest in a cup. A parrot nearly ate them!",
+      other: "Thank you! I'm going to show everyone at the new beach.",
+      letter: "I got a letter with my name on it. I read it out loud in the van, twice.",
+      news: ["The new camp has a beach with flags. I've been practising my starts.", "I can swim to the second buoy now. Dad came too, but slower."],
+      back: null,
+      backNote: ""
+    },
+    crom: {
+      sign: "From Om (koala counter)",
+      food: "I ate it slowly so it would last. It lasted a long time.",
+      drink: "It's for Mum and Dad. I'm guarding it.",
+      made: "I keep it next to my koala notebook. It's very nice.",
+      flower: "They're in a cup. I counted them. There are lots.",
+      other: "Thank you. I'm six and I got a parcel. That's very good.",
+      letter: "I got a letter. Mum helped with the long words. I knew most of them.",
+      news: ["Fifty-one koalas now. Two were awake.", "We saw a koala on a fence post on the road. That counts. Dad says it counts."],
+      back: null,
+      backNote: ""
+    },
+    crlachie: {
+      sign: "Cheers, Lachie (and Mitch, who says hi)",
+      food: "Ate it on the tailgate after a surf. Mitch tried to steal it. He failed.",
+      drink: "Saving it for a night with a fire and the guitar out. That's the plan. Well, no plan.",
+      made: "It's up on the dash of the ute, next to the tide chart. Keeps us company up the coast.",
+      flower: "Stuck them in a jar on the roof rack. Mitch said they'd blow off. They haven't yet.",
+      other: "Didn't expect post, mate. Picked it up at the camp office and grinned the whole way back to the tent.",
+      letter: "Your letter caught up with us at a camp down the road. Read it in the rooftop tent with the trees right there.",
+      news: ["Found a little point break up the road. Didn't tell anyone. Not even you, sorry.", "Still no plan. Still the best plan. Banana bread up here's not as good as Reg's, though."],
+      back: null,
+      backNote: ""
+    },
+    crmitch: {
+      sign: "Later, Mitch (the better surfer)",
+      food: "Ate it before Lachie woke up. He'll never know. Don't tell him.",
+      drink: "Keeping it in the esky till we find a beach worth celebrating. Shouldn't be long.",
+      made: "It's in the ute's glovebox, safe from Lachie and the parrots.",
+      flower: "Lachie put them on the roof rack. Gotta admit, the ute's never looked so good.",
+      other: "Good on you. Post at a campsite. Felt like a proper traveller for a second.",
+      letter: "Your letter found us at a camp down the road. I read it in the deckchair before Lachie could.",
+      news: ["Caught the best wave of the trip again this week. Lachie missed it again.", "Road north's all dirt and gum trees for a bit. A wombat held us up for ten minutes. Fair enough."],
+      back: null,
+      backNote: ""
+    }
+  };
+
+  // src/data/pen-tl.js
+  var PEN_TL = {
+    /* ---------- Misty Falls ---------- */
+    tlkirra: {
+      sign: "Look after yourself, Kirra (Misty Falls)",
+      food: "Ate it on the rock by the pool on my lunch break. A whipbird kept me company and got nothing.",
+      drink: "That's for a cool night after the last walkers have gone, with the frogs going in the creek.",
+      made: "It's on the desk at the ranger hut now, next to the seed pods and the cassowary poster.",
+      flower: "In a jar on the hut windowsill. They look lovely against all that green.",
+      other: "Didn't expect a parcel at the hut. I've put it where I'll see it every morning before the track.",
+      letter: "Your letter came up with the supplies. I read it on the rock by the pool while the mist lifted.",
+      news: ["We had a cassowary and her chick cross the car park last week. Everyone gave them room, good as gold.", "The falls are running full after the rain. You can hear them from the café now."],
+      back: "b_seedpod",
+      backNote: "A seed pod off the forest floor, split like a little boat. There are plenty, so keep it."
+    },
+    tlmaureen: {
+      sign: "Love, Maureen (Range Café)",
+      food: "Had it with my cuppa after the lunch rush, feet up for once. Don't tell the scones.",
+      drink: "It's up on the shelf behind the pies. I'll have a glass when the mist comes in on a Sunday.",
+      made: "I've put it by the till where the regulars can admire it. They've all asked who it's from.",
+      flower: "They're on the counter in a milk jug, between the scones and the pie warmer. Smells better than the coffee.",
+      other: "A parcel, all the way up those hundred bends. Well, aren't I spoilt.",
+      letter: "Your letter came with the bread delivery. I read it between batches of scones and burnt nothing, for once.",
+      news: ["Pumpkin scones are still every half hour. I've started a date one on Fridays. It's going well.", "The mist sat on the range for three whole days. Nobody minded, they just ordered more pie."],
+      back: "b_rosella",
+      backNote: "A jar of my rosella jam. It's lovely on a scone, so it's a shame you've no scone. Make one."
+    },
+    tlruth: {
+      sign: "Warmly, Ruth (the gallery at the falls)",
+      food: "I ate it sitting by the wheel, with clay on my fingers. It was worth the mess.",
+      drink: "I'll open it some evening when the light goes gold on the falls. That's when I paint best.",
+      made: "It's on the shelf above the wheel, where the good glazes live. It's in fine company.",
+      flower: "I've put them in one of my own jugs and painted them this morning instead of the falls. The falls will wait.",
+      other: "It's sitting on the gallery windowsill. The colours sit very nicely with the forest outside.",
+      letter: "Your letter came on a misty morning, so I read it twice and painted a little less.",
+      news: ["I've a new blue glaze from the creek clay. It came out of the kiln the colour of a kingfisher.", "The falls had a rainbow in them all last week. I painted it seven times and never got it right."],
+      back: "b_claybird",
+      backNote: "A little clay kingfisher from the kiln. His tail's a touch crooked. I like him better for it."
+    },
+    /* ---------- Crater Lake ---------- */
+    tllachlan: {
+      sign: "See you on the water, Lachlan",
+      food: "Had it on the jetty at lunch with my feet in the lake. A turtle came up to see. Not sharing.",
+      drink: "I'll save it for a still evening when the lake goes like glass. Best seat in the house.",
+      made: "It's up in the boat shed by the paddles. Makes the place look a lot less like a boat shed.",
+      flower: "Put them in a bucket on the jetty. The ducks have been very interested.",
+      other: "Cheers for that. It's sitting on the counter in the boat shed where all the kayakers can see it.",
+      letter: "Got your letter on a quiet morning. Read it in a kayak out in the middle. Best place to read anything.",
+      news: ["Counted eleven turtles on one lap last week. A record. I've told everyone.", "Raced the ducks again. Lost again. I'm starting to think they cheat."],
+      back: null,
+      backNote: ""
+    },
+    tlpriya: {
+      sign: "With love from the Lake House, Priya",
+      food: "I had it by the fire with a hot chocolate and the best window in the Tablelands. Nobody was in a hurry.",
+      drink: "It's waiting for a cold night when the fire's going and the lake has gone dark blue.",
+      made: "I've put it on the mantel above the fire, next to the old clock. It looks as though it's always been there.",
+      flower: "They're on the window table, and they make the lake look even bluer. I didn't think that was possible.",
+      other: "Such a thoughtful parcel. It sits by the pancake griddle, where I can see it all day.",
+      letter: "Your letter came on a rainy afternoon. I read it by the fire with a pot of tea, slowly.",
+      news: ["We've started lemon and sugar pancakes with a little lake honey on Sundays. Only a little.", "The lake was a sort of green blue all last week. I've never seen that shade before."],
+      back: null,
+      backNote: ""
+    },
+    tljoe: {
+      sign: "All the best, Old Joe",
+      food: "Had it at the bench with a mug of tea and the lathe switched off. Rare thing, that.",
+      drink: "I'll have it on the step of an evening, with the shavings swept and the forest going quiet.",
+      made: "Somebody made that with care. You can always tell. It's on the shelf with my best bowls.",
+      flower: "In a black bean bowl, with a bit of water. Never thought to use a bowl for flowers. Sixty years, still learning.",
+      other: "Put it on the shelf by the lathe. Smells of cedar in here, so it'll smell of cedar too, soon.",
+      letter: "Your letter came while I was roughing out a silky oak bowl. I stopped the lathe to read it. That says something.",
+      news: ["A big red cedar limb came down in the storm. Enough for a dozen bowls, and the tree's none the worse.", "Turned a black bean bowl last week with a grain like a river. I've not sold it. Can't."],
+      back: "b_spoon",
+      backNote: "A little spoon from a silky oak offcut. Too nice to stir with, folk say. Stir with it anyway."
+    },
+    /* ---------- Willow Bend ---------- */
+    tlhannah: {
+      sign: "Floury love, Hannah (the bakehouse)",
+      food: "Somebody else's baking, for once. I ate it at four in the morning while the oven warmed up. Perfect.",
+      drink: "It's on the top shelf, away from the flour. I'll open it on my day off, if I ever take one.",
+      made: "I've put it on the windowsill by the old oven. It's already got a little flour on it, sorry.",
+      flower: "They're in a jug on the counter by the lamingtons. The queue at five to nine loved them.",
+      other: "A parcel at the bakehouse that isn't flour. I opened it with floury hands. It survived.",
+      letter: "Your letter came at about ten, when the rush is over. I read it with a vanilla slice. Well, half of one.",
+      news: ["The old oven had its birthday. I baked it a loaf. It baked it back, in a manner of speaking.", "We sold out of lamingtons by half past nine on Saturday. A new record for the bakehouse."],
+      back: "b_lamingtons",
+      backNote: "A box of lamingtons, still fresh when they left. Coconut everywhere, so open them over a plate."
+    },
+    tljarrah: {
+      sign: "Sweet as, Jarrah (lolly shop)",
+      food: "Gone in one go, and I own a lolly shop. That's the highest praise I've got.",
+      drink: "It's on the shelf next to the musk sticks. I'll have it some quiet evening after I've counted the jars.",
+      made: "It's sitting on the counter between the sherbet and the snakes. Brightest thing in the shop.",
+      flower: "In a big empty lolly jar on the counter. The kids think they're a new flavour.",
+      other: "A parcel for the lolly man. I'll remember this one, the way I remember everybody's favourite.",
+      letter: "Your letter came on a busy Saturday. I read it behind the jars between scoops and grinned the whole time.",
+      news: ["Got a new jar in: sour green apples. Jar two hundred and one. I know it by heart already.", "A girl came back after ten years and I still knew her favourite. Raspberries. She nearly cried laughing."],
+      back: "b_lollies",
+      backNote: "A paper bag of lollies. I picked them from what I remember you looked at longest."
+    },
+    tlgwen: {
+      sign: "Yours, Gwen (and Pages, who sends nothing)",
+      food: "I had it in the reading chair with a cup of tea and a very old novel. Pages watched every bite.",
+      drink: "It's on the shelf behind the poetry, which seems right. I'll open it some winter evening.",
+      made: "I've propped it on the counter by the till. Pages sat on it within the hour, which means he approves.",
+      flower: "They're in a teapot on the counter, between the Dickens and the cookbooks. The barn smells of summer.",
+      other: "How kind. It's on the counter now. Pages has inspected it and found it acceptable, after a nap.",
+      letter: "Your letter arrived tucked between two book catalogues. It was much the better read.",
+      news: ["Someone donated forty boxes of old paperbacks. Pages has claimed the top one as a bed.", "I found a pressed wattle flower in a book of bush poems. I've left it there for the next reader."],
+      back: null,
+      backNote: ""
+    },
+    tlstan: {
+      sign: "Cheers, Stan (and Bluey)",
+      food: "Ate it on the bench this morning. Bluey had the crumbs. He's retired, but not from crumbs.",
+      drink: "I'll have a glass on the verandah some still evening, and keep an eye out for the platypus.",
+      made: "Very nice. It's on the mantel at home, where the good things go. There's room for it.",
+      flower: "Put them in a jar on the kitchen table. Brightens the place up. Bluey's sniffed every one.",
+      other: "Didn't expect that. Showed it to Bluey. He wagged, which is a lot for a retired dog.",
+      letter: "Your letter came and I read it on my bench outside the bakehouse. Hannah brought me a cuppa to go with it.",
+      news: ["Saw the platypus at dusk on Tuesday, clear as day. Bluey slept through it.", "Town's still the same. Bench is still the same. Good."],
+      back: null,
+      backNote: ""
+    },
+    /* ---------- Greenhill Dairy ---------- */
+    tlbill: {
+      sign: "Cheers, Bill (and the girls)",
+      food: "Had it on the gate after the morning milking. Daisy came over to see what all the fuss was.",
+      drink: "That's going on the verandah some evening after milking, with the girls grazing down the hill.",
+      made: "Meg's put it on the dresser in the farmhouse. I'm not allowed to touch it with milking hands.",
+      flower: "Meg put them in a milk can on the kitchen table. Daisy tried to eat one through the window.",
+      other: "Fourth generation on this farm, and I reckon that's the first parcel for me that wasn't a part for the tractor.",
+      letter: "Got your letter after the three o'clock milking. Read it leaning on the gate while the girls lined up.",
+      news: ["Three new calves this month, all girls. They've all got names already. Noah saw to that.", "Daisy's still the boss. One of the young ones tried her luck last week. It didn't go well for her."],
+      back: null,
+      backNote: ""
+    },
+    tlmeg: {
+      sign: "Love, Meg (from the cheese room)",
+      food: "I had it with a slice of Havarti, which is how I eat most things. It worked beautifully.",
+      drink: "It's in the cool room next to the wheels. It'll be just right with a bit of the vintage on a quiet night.",
+      made: "It's on the shelf in the cheese room, by the window. I look at it every time I turn the wheels.",
+      flower: "In a jar on the farmhouse table. Bill pretends not to notice them, and then he smells them.",
+      other: "That was kind. It's on the kitchen dresser now, where the good things live.",
+      letter: "Your letter came while I was turning the wheels. I finished the row first, then read it twice.",
+      news: ["The new vintage is ready. Sharp enough to make your eyes water, which is the whole idea.", "I taught a whole school group to make curds last week. Noah helped, very loudly."],
+      back: "b_cheddar",
+      backNote: "A little wheel of the new vintage. Let it sit out a bit before you cut it. Cheese is patient."
+    },
+    tlrosa: {
+      sign: "Love, Rosa (farm shop, Greenhill)",
+      food: "Had it with a chocolate malted at the end of the day. Best combination going, honestly.",
+      drink: "It's in the shop fridge behind the milk, with a note on it that says Rosa's. Mum's orders.",
+      made: "It's on the counter by the till now. Mum says it makes the shop look grown up.",
+      flower: "In one of the old glass milk bottles on the counter. Customers keep trying to buy them.",
+      other: "A parcel just for me, not the shop. Dad asked if it was for him. It wasn't.",
+      letter: "Your letter came with the morning post. I read it behind the counter while the milkshake machine whirred.",
+      news: ["We've started a honey and cinnamon milkshake. So thick the straw stands up, still.", "Dad tried to run the shop for an afternoon. Mum says never again."],
+      back: null,
+      backNote: ""
+    },
+    tlnoah: {
+      sign: "From Noah (and Buttercup)",
+      food: "I had some and Buttercup tried to lick it. She's not allowed. Calves have milk.",
+      drink: "Mum says it's a grown-up drink so it's in the top cupboard. I'm keeping it for when I have two hundred cows.",
+      made: "It's on my windowsill so I can see it when I wake up to feed the calves.",
+      flower: "I put them in the calf shed but Buttercup ate one. Mum put the rest in the kitchen.",
+      other: "I got a parcel! It's on my shelf next to my toy tractor.",
+      letter: "I got a letter! Mum helped me read the long words. I read it to the calves too.",
+      news: ["We've got three new calves. I named them Clover, Pickle and Moo.", "Buttercup still sucks my fingers. Dad says she's nearly too big for it."],
+      back: null,
+      backNote: ""
+    },
+    /* ---------- Nutwood Farm ---------- */
+    tlpete: {
+      sign: "Cheers, Pete (Nutwood Farm)",
+      food: "Ate it in the rows at smoko, sitting on an upturned bucket. Can't think of a better table.",
+      drink: "I'll have it on the verandah when the last of the nuts are in. That's my reward.",
+      made: "It's on the shelf in the cracking shed. Bit quieter than the cracker. Better looking, too.",
+      flower: "Ana put them in a jar on the packing bench. Smells better than nut husks, I'll give them that.",
+      other: "Forty years of macadamias and nobody's ever posted me anything but invoices. This is better.",
+      letter: "Got your letter on a wet morning, no shaking the trees. Read it in the cracking shed with a cuppa.",
+      news: ["Biggest drop we've had in years. The tarps were full by ten.", "The old cracker threw a belt on Tuesday. Fixed it with a bit of patience and a lot of muttering."],
+      back: null,
+      backNote: ""
+    },
+    tlana: {
+      sign: "With love from the packing shed, Ana",
+      food: "I ate it on the packing bench at lunch. A little finger lime squeezed over it would have been perfect.",
+      drink: "It's in the shed fridge next to the finger limes. A few pearls in a glass of it on a warm night, I think.",
+      made: "I've put it up on the shelf by the scales. It makes the packing shed look like a proper shop.",
+      flower: "They're in a jar on the packing bench, and the whole shed smells of them instead of limes.",
+      other: "What a kind thing. It sits by the scales now, and I smile at it between boxes.",
+      letter: "Your letter came on a busy packing day. I read it at lunch, sitting by the finger lime hedge.",
+      news: ["The pink finger limes have come in. They look like little jewels. A restaurant asked for all of them.", "I only got pricked by the hedge twice this week. That's a record."],
+      back: "fingerlime",
+      backNote: "A few finger limes from the hedge. Squeeze one and look at the little pearls. Lovely on anything."
+    },
+    tlleilani: {
+      sign: "Love, Leilani (Nutwood café)",
+      food: "I had it on the verandah with a finger-lime soda, watching the rows. Breathe, I told myself. So I did.",
+      drink: "It's in the café fridge with a sign that says Not On The Menu. I'll have it on the verandah at sunset.",
+      made: "It's on the café counter next to the macadamia slice. The two of them look very pleased with themselves.",
+      flower: "They're on the verandah table in a jar. Everyone sits at that table now.",
+      other: "Such a lovely thought. It's sitting on the counter, where I can see it while I cut the slice.",
+      letter: "Your letter came on a slow afternoon. I read it on the verandah, with the rows rustling.",
+      news: ["We've a new macadamia and wattleseed slice. I didn't think anything could beat the old one. It might.", "The finger-lime soda has a pink version now. It fizzes and pops twice as much."],
+      back: "b_brittle",
+      backNote: "Some macadamia brittle from the café, wrapped up tight. Golden and crunchy. Mind your teeth."
+    },
+    /* ---------- Kingsreef ---------- */
+    tlclive: {
+      sign: "Full steam, Clive",
+      food: "Ate it in the cab between runs, with my hands still black from the coal. Best lunch I've had all week.",
+      drink: "I'll save it for the end of the season, when she's cleaned and put to bed in the shed.",
+      made: "It's on the shelf in the engine shed, next to my old whistle cord. She'd approve.",
+      flower: "Fred put them in a bucket on the platform. The passengers thought it was a special occasion.",
+      other: "Fifty years of steam and that's the first parcel I've had that wasn't a gasket. Thank you.",
+      letter: "Your letter came on the morning run. I read it at Gold Creek Siding while she took on water.",
+      news: ["She's had her boiler checked and passed with flying colours. Not bad for a 1924 engine.", "A young lad pulled the whistle last week and nearly jumped out of his boots. Made my day."],
+      back: null,
+      backNote: ""
+    },
+    tlfred: {
+      sign: "All aboard, Fred (guard)",
+      food: "Ate it in the guard's van on the run back from Gold Creek Siding. Kept a crumb for the ticket box.",
+      drink: "That's in my locker at the station. I'll have it when the last train's in and the flag's folded.",
+      made: "It's on the ticket office counter now. Everyone gets a look while I punch their ticket.",
+      flower: "Put them in a bucket on the platform. Clive pretends he didn't stop to smell them. He did.",
+      other: "A parcel for the guard. Punched it, out of habit. Only a little hole.",
+      letter: "Your letter came on the 10.15. I read it in the guard's van, which is the best place for a letter.",
+      news: ["We had a full train every day of the school holidays. I've punched so many tickets my thumb's tired.", "Clive let me pull the whistle on my birthday. First time in thirty years. Loud."],
+      back: "b_tlmagnet",
+      backNote: "A little magnet from the ticket office, a steam train and a waterfall. For your fridge."
+    },
+    tlsheila: {
+      sign: "Cheers, Sheila (the Royal)",
+      food: "Had it behind the bar before opening, with a sarsaparilla. Lovely way to start the day.",
+      drink: "It's going behind the bar on the top shelf, under the big nugget photo. A place of honour, that.",
+      made: "I've put it by the old piano where everyone can see it. Even the regulars noticed, and they notice nothing.",
+      flower: "They're on the bar in an old beer jug. The Royal hasn't looked that pretty since the gold rush.",
+      other: "That's going up behind the bar, next to the photos. It'll be part of the Royal's story now.",
+      letter: "Your letter came with the brewery delivery. I read it at the bar in the quiet before opening.",
+      news: ["Someone played the piano on Saturday night and every key worked. First time in years.", "Sarsaparilla's still the bestseller. The kids order one, then the grown-ups order two."],
+      back: null,
+      backNote: ""
+    },
+    tldot: {
+      sign: "Yours, Dot (Nugget & Co.)",
+      food: "I had it with a cup of tea from a 1920s teapot, which is how everything should be eaten.",
+      drink: "It's in the glass cabinet next to the old decanters. Not for sale, of course. Well. No.",
+      made: "It's on the counter by the gramophone. Three people have asked how much. I've said it's got a story.",
+      flower: "In a cut-glass vase from an auction, on the counter. The whole shop smells like a garden party.",
+      other: "Everything here's got a story, and now this has one too. A good one, and true.",
+      letter: "Your letter came the day I got back from an auction. I read it in the rocking chair by the window.",
+      news: ["I found a box of old railway tickets at an auction. Fred's been through every one.", "The rocking horse is still not for sale. A man offered twice. Still no. Well. Maybe."],
+      back: "b_teacup",
+      backNote: "A rose teacup from the shelf, with its saucer. Bone china. It's had a long life of tea and has plenty left."
+    },
+    tlmac: {
+      sign: "Keep your eye out for the glint, Old Mac",
+      food: "Ate it on the creek bank with my pan drying in the sun. Better than any gold I found that day.",
+      drink: "I'll have it at the Royal some evening, sitting in my corner. Sheila will keep it for me.",
+      made: "It's on the shelf in my hut, next to the pea-sized nugget from 1987. Good company for it.",
+      flower: "Stuck them in a jar on the creek bank where I pan. Gave the morning a bit of colour.",
+      other: "Didn't expect that. Sixty years in this creek, and I reckon that's the best thing that's come down it.",
+      letter: "Got your letter at the Royal at lunch. Read it twice. Patience, see. Works on letters too.",
+      news: ["Found three flecks in one pan on Thursday. Not the brother of my nugget, but a cousin, maybe.", "The creek's up after the rain. Brings new gravel down. Good for panning."],
+      back: null,
+      backNote: ""
+    }
+  };
+
   // src/game/contacts.js
   var D3 = 24 * 60 * 60 * 1e3;
-  var PEN = { ...PEN_LV, ...PEN_BB };
+  var PEN = { ...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL };
   var REGIONS2 = { bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre" };
   var POSTAGE = { bellbird: 2, coast: 2, tablelands: 4, lavender: 4, ronda: 8, kyoto: 8, jeju: 8, cinque: 8 };
   var DAYS3 = { 2: 1, 4: 2, 8: 3 };

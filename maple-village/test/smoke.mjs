@@ -4180,6 +4180,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(!!bk.postTo(G, "carmen", {item: "box4"}, T).err && bk.postage("carmen") === 8, "abroad costs 8, and there's no posting without the coins");
   const r = bk.postTo(G, "carmen", {text: "Hola!"}, T); check(!r.err && /P\.S\./.test(bk.replyBody(r)), "someone with no voice yet writes back with a P.S. from her own lines");
   bk.removeContact(F, "lvemile"); check(!bk.contacts(F).length, "and Mel can take someone out again");
+  const vans = (await import(new URL("../src/data/npcs.js", import.meta.url))).NPCS.filter(p => p.local === "bellbird" && !p.tourist);
+  check(vans.every(p => bk.PEN[p.id]), "round 191: every campervan local and neighbour has a voice of their own (" + vans.length + ")");
 }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
