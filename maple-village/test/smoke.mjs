@@ -4188,6 +4188,14 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const J = {coins: 20, inv: {box4: 1}, met: {jason: true}}; bk.addContact(J, "jason", "d"); const je = bk.postTo(J, "jason", {item: "box4"}, T), jb = bk.replyBody(je);
   check(!je.err && je.at === T + 3*D && /^My dear Mel,/.test(jb) && jb.includes("yellow house by the harbour") && /\nP\.S\. /.test(jb) && jb.split("\n\n").length >= 6 && /;/.test(jb), "Jason writes back at length, semicolons and all, with a P.S.");
 }
+{
+  console.log("\nEvery two-filling bonbon has a name (round 194: mint and pear crashed the bonbon table)");
+  const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url));
+  const ids = Object.keys(sc.INGR).filter(cc.isFilling); let bad = [];
+  for (const sh of ["dark", "milk", "white"]) for (const a of ids) for (const b of ids) if (a < b) { try { const n = cc.bonbonName(sh, [a, b]); if (!n || /undefined/.test(n)) bad.push(sh + ":" + a + "+" + b); } catch (e) { bad.push(sh + ":" + a + "+" + b + " " + e.message); } }
+  check(!bad.length, "named every pairing of " + ids.length + " fillings in all three shells" + (bad.length ? ": " + bad.slice(0, 3).join(", ") : ""));
+  check(/\S/.test(cc.bonbonName("white", ["mint", "pear"])), "white chocolate, mint and pear: " + cc.bonbonName("white", ["mint", "pear"]));
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

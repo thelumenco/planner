@@ -14571,14 +14571,14 @@ ${r.n}`;
   ];
   var GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"];
   var SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
-  var POETIC2 = ["Dolphin Bay", "Jetty Sunset", "Ma Ma's Garden", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Evan's Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
+  var POETIC = ["Dolphin Bay", "Jetty Sunset", "Ma Ma's Garden", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Evan's Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
   function nameFor(ings) {
     const dairy = isDairy(ings), flav = ings.filter((i) => i !== "milk"), h3 = hash(ings.join("+"));
     if (!flav.length) return "Fior di Latte";
     const style = (dairy ? GELATO : SORBET)[h3 % (dairy ? GELATO.length : SORBET.length)];
     if (flav.length === 1) return `${word(flav[0])} ${style}`;
     if (flav.length === 2) return `${word(flav[0])} & ${word(flav[1])} ${style}`;
-    return `${POETIC2[h3 % POETIC2.length]} ${style}`;
+    return `${POETIC[h3 % POETIC.length]} ${style}`;
   }
   var blend = (ings) => {
     const cs = ings.map((i) => INGR[i][2]).filter((c) => c !== "#FFFBEF");
@@ -25257,11 +25257,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var isFilling = (id) => id in INGR && !NOT_FILLING.includes(id) || id in WINE_FILL;
   var fillName = (id) => FL(id)[0];
   var STYLE = ["Truffle", "Bonbon", "Praline", "Ganache", "Cream"];
+  var POETIC2 = ["Jetty Sunset", "Lantern Night", "Ma Ma's Garden", "Sea Breeze", "First Light", "Golden Hour", "Low Tide", "Porch Swing", "Maple's Secret", "Night Market"];
   var keyOf3 = (shell, fills) => [shell, ...[...new Set(fills)].sort()].join("+");
   function bonbonName(shell, fills) {
     const f5 = [...new Set(fills)].sort(), h3 = hash(keyOf3(shell, f5)), style = STYLE[h3 % STYLE.length], sh = shell[0].toUpperCase() + shell.slice(1);
     if (f5.length === 1) return `${sh} ${FL(f5[0])[1]} ${style}`;
-    if (h3 % 3 === 0) return `${POETIC[h3 % POETIC.length]} ${style}`;
+    if (h3 % 3 === 0) return `${POETIC2[h3 % POETIC2.length]} ${style}`;
     return `${FL(f5[0])[1]} & ${FL(f5[1])[1]} ${style}`;
   }
   var recipeOf2 = (c, id) => c.bonbons.find((b) => b.id === id);

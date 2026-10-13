@@ -2438,3 +2438,9 @@ Mel: "Sometimes when I try to add more than 1 filling to a bonbon, I can't selec
 - Stutter: `slotNow` (npcs.js) walked every tour, visit, tasting and class for every villager every frame (about 75% of the frame loop when idle).
   It's now cached per game minute and scene (`clearSlots`, called from `save()` so Mel's own changes show at once).
   `bubbleAt` only re-measures a speech bubble when it's moved or its words changed. Idle frame cost: about 2.6s of 3.5s down to 0.45s.
+
+## Round 194: mint and pear
+Mel: "white chocolate... seashell shape and mint and then I wanted to add pear but it wouldn't let me". Round 176's comment
+about the heart mould sat mid-line in cocoa.js and swallowed the `POETIC` names, so `bonbonName` threw for about a third of
+two-filling pairings: the bonbon table stopped redrawing (and the error mid-render is likely the "hang" too). Fixed, with a
+test naming every pairing of every filling in all three shells.

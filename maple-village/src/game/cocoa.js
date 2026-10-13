@@ -127,7 +127,9 @@ export const WINE_FILLS = 4;
 const FL = id => INGR[id] || WINE_FILL[id];
 export const isFilling = id => (id in INGR && !NOT_FILLING.includes(id)) || id in WINE_FILL;
 export const fillName = id => FL(id)[0];
-const STYLE = ["Truffle", "Bonbon", "Praline", "Ganache", "Cream"]   // (round 176: "Heart" is a mould now), POETIC = ["Jetty Sunset", "Lantern Night", "Ma Ma's Garden", "Sea Breeze", "First Light", "Golden Hour", "Low Tide", "Porch Swing", "Maple's Secret", "Night Market"];
+// (round 176: "Heart" is a mould now. Round 194: this comment used to sit mid-line and hid POETIC, so a third of
+// two-filling bonbons crashed the bonbon table when they were named)
+const STYLE = ["Truffle", "Bonbon", "Praline", "Ganache", "Cream"], POETIC = ["Jetty Sunset", "Lantern Night", "Ma Ma's Garden", "Sea Breeze", "First Light", "Golden Hour", "Low Tide", "Porch Swing", "Maple's Secret", "Night Market"];
 const keyOf = (shell, fills) => [shell, ...[...new Set(fills)].sort()].join("+");
 export function bonbonName(shell, fills){
   const f = [...new Set(fills)].sort(), h = hash(keyOf(shell, f)), style = STYLE[h % STYLE.length], sh = shell[0].toUpperCase() + shell.slice(1);
