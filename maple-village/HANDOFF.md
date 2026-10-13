@@ -2431,3 +2431,10 @@ plus her own words; campervan neighbours can be added too.
   presumption'... dry wit". Keep him joyful; his "departure gate" line is about harbours, never about death.
 - `towns.js` `c_jpoem`: a keepsake poem he folds in now and then (no shop, never sold).
 - `nm()` keeps place names capitalised ("Cinque Terre white").
+
+## Round 193: bonbon fillings and the stutter
+Mel: "Sometimes when I try to add more than 1 filling to a bonbon, I can't select anything else. Then I come out and the game hangs for a bit".
+- Fillings: `ccSt.sel` kept a filling that had since run out; it was hidden but still held one of the two places. The `sel` handler in core.js now drops run-out fillings first.
+- Stutter: `slotNow` (npcs.js) walked every tour, visit, tasting and class for every villager every frame (about 75% of the frame loop when idle).
+  It's now cached per game minute and scene (`clearSlots`, called from `save()` so Mel's own changes show at once).
+  `bubbleAt` only re-measures a speech bubble when it's moved or its words changed. Idle frame cost: about 2.6s of 3.5s down to 0.45s.
