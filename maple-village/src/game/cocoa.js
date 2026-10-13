@@ -205,8 +205,11 @@ export function wineToPantry(F, shelfId){
   b.n--; const id = "wine_" + b.type; c.pantry[id] = (c.pantry[id] || 0) + WINE_FILLS; return {id, wine: b.name};
 }
 // a pairing box: a bottle of Mel's wine and 4 bonbons from the case, ribboned together (gift "pairbox")
+// round 189 (Mel: "I'm supposed to be able to pack them and put them in the gift shop"): any bottle on the shelf pairs,
+// Tempranillo too (wineShelf above is only the ones that can be opened for a filling)
+export const pairShelf = F => ((F.vine && F.vine.shelf) || []).filter(b => b.n > 0);
 export function packPairing(F, shelfId, sel){
-  const c = cocoaState(F), b = wineShelf(F).find(x => x.id === shelfId); if (!b || caseCount(c) < 4) return null;
+  const c = cocoaState(F), b = pairShelf(F).find(x => x.id === shelfId); if (!b || caseCount(c) < 4) return null;
   if (pick(c, 4, sel) === null) return null; b.n--; F.inv.pairbox = (F.inv.pairbox || 0) + 1;
   c.pairVals = [...(c.pairVals || []), (b.price || 0) + 4*c.prices.bonbon];   // what each packed box is worth in the gift shop: the bottle plus 4 bonbons
   return b.name;
@@ -439,7 +442,7 @@ export function planPanel(F, st = {}){
 // the counter's bonbon part: have one from the case, or pack a gift box of 4 or 9
 export function counterBonbons(F, pk){
   const c = cocoaState(F), shown = onDisplay(c), have = shown.reduce((a, b) => a + c.trays[b.id], 0); if (!c.bonbons.length) return giveSpecials(c);
-  if (pk) { const n = pickTotal(pk.sel), wine = pk.kind === "pair" && wineShelf(F).find(b => b.id === pk.k);
+  if (pk) { const n = pickTotal(pk.sel), wine = pk.kind === "pair" && pairShelf(F).find(b => b.id === pk.k);
     return `<p class="eyebrow" style="margin:12px 0 6px">${pk.kind === "pair" ? `Four bonbons to go with ${esc(wine ? wine.name : "the wine")}` : `Choose ${pk.size} for the ${pk.kind === "grand" ? "grand box" : "box"}`}</p><p class="muted">${n} of ${pk.size} chosen. Tap + for each one you want in.</p>
       <ul class="hlist wlist">${shown.map(b => { const k = pk.sel[b.id] || 0; return `<li><span class="wpic">${dot(KINDS[b.shell].col)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] - k} more in the case</small></span><span class="gstep"><button class="btn small alt" data-cc="pksub" data-k="${esc(b.id)}" aria-label="One fewer" ${k ? "" : "disabled"}>−</button><b>${k}</b><button class="btn small alt" data-cc="pkadd" data-k="${esc(b.id)}" aria-label="One more" ${n < pk.size && k < c.trays[b.id] ? "" : "disabled"}>+</button></span></li>`; }).join("")}</ul>
       <div class="actions"><button class="btn small primary" data-cc="pkgo" ${n === pk.size ? "" : "disabled"}>Pack it</button>${n < pk.size ? `<button class="btn small alt" data-cc="pkfill">Fill the rest for me</button>` : ""}<button class="btn small alt" data-cc="pkcancel">Cancel</button></div>`;
@@ -448,8 +451,8 @@ export function counterBonbons(F, pk){
     <div class="actions"><button class="btn small alt" data-cc="pkopen" data-k="box" data-n="4" ${have >= 4 ? "" : "disabled"}>Gift box of 4</button><button class="btn small alt" data-cc="pkopen" data-k="box" data-n="9" ${have >= 9 ? "" : "disabled"}>Gift box of 9</button>${ccUp(c, "wrap") ? `<button class="btn small alt" data-cc="pkopen" data-k="grand" data-n="${BOX16}" ${have >= BOX16 ? "" : "disabled"}>Grand box of 16</button>` : ""}</div>${pairing(F, have)}${giveSpecials(c)}`;
 }
 function pairing(F, have){
-  const wines = wineShelf(F).slice(0, 4); if (!wines.length) return "";
-  return `<p class="eyebrow" style="margin:12px 0 6px">Wine pairing box</p><p class="muted">A bottle from the wine shop and 4 bonbons from the case, to give, or to put out in the gift shop.</p><div class="actions">${wines.map(b => `<button class="btn small alt" data-cc="pkopen" data-k="pair:${esc(b.id)}" data-n="4" ${have >= 4 ? "" : "disabled"}>With ${esc(b.name)}</button>`).join("")}</div>`;
+  const wines = pairShelf(F); if (!wines.length) return !F.vine ? "" : `<p class="eyebrow" style="margin:12px 0 6px">Wine pairing box</p><p class="muted">No bottles on the wine shop's shelves to pair. Bottle some at the cellar first.</p>`;
+  return `<p class="eyebrow" style="margin:12px 0 6px">Wine pairing box</p><p class="muted">A bottle from the wine shop and 4 bonbons from the case, to give. You can also pack them in the gift shop's wine corner, straight onto the display.</p><div class="actions">${wines.map(b => `<button class="btn small alt" data-cc="pkopen" data-k="pair:${esc(b.id)}" data-n="4" ${have >= 4 ? "" : "disabled"}>With ${esc(b.name)}</button>`).join("")}</div>`;
 }
 function giveSpecials(c){
   const have = Object.values(SPECIALS).filter(x => c.specials[x.id] > 0); if (!have.length) return "";

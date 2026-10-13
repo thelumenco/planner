@@ -4,6 +4,7 @@
 // it, 10 to 6, every day but Monday. Everything on its shelves is shared stock: the Cocoa Room's display case and bar
 // wall, the mill's shelves, the wine shop's bottles. A sale here is one fewer there.
 // State: F.giftshop = {sold: {day: {n, coins, bonbon, bar, mill, wine, pair}}, pairs: [price, ...]}
+// Round 189: they can also be packed in the wine corner itself ("Pair it" on a bottle), straight onto the display.
 // Pairing boxes (round 179, Mel: "yes please"): Mel packs them herself at the bonbon table (a bottle and 4 bonbons), then
 // puts them out in the wine corner. Each one sells for what went into it, no more: the bottle's price plus 4 bonbons.
 // They go now and then, more often in the weeks before Valentine's, Mother's Day and Christmas.
@@ -67,10 +68,20 @@ export function giftSellMinute(F, day, hm, mode, o){
   const t = giftState(F).sold[day] = giftState(F).sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t[k] = (t[k] || 0) + 1; return coins;
 }
 const c2 = o => o.cocoa;
+const caseOf = o => o.cocoa ? o.onDisplay(o.cocoa).reduce((a, b) => a + (o.cocoa.trays[b.id] || 0), 0) : 0;
 
+// round 189: pack a pairing box right here, choosing the 4 bonbons, and it goes straight out on the display
+function pickerHTML(o){
+  const pk = o.pk, c = o.cocoa, b = ((o.v || {}).shelf || []).find(x => x.id === pk.k), shown = o.onDisplay(c), n = Object.values(pk.sel).reduce((a, x) => a + x, 0);
+  return `<p class="eyebrow" style="margin:12px 0 6px">Four bonbons to go with ${esc(b ? b.name : "the wine")}</p><p class="muted">${n} of 4 chosen. It goes straight out in the wine corner once it's packed.</p>
+    <ul class="hlist wlist">${shown.map(x => { const k = pk.sel[x.id] || 0; return `<li><span class="wtxt"><b>${esc(x.name)}</b><small>${c.trays[x.id] - k} more in the case</small></span><span class="gstep"><button class="btn small alt" data-gs="psub:${esc(x.id)}" aria-label="One fewer" ${k ? "" : "disabled"}>−</button><b>${k}</b><button class="btn small alt" data-gs="padd:${esc(x.id)}" aria-label="One more" ${n < 4 && k < c.trays[x.id] ? "" : "disabled"}>+</button></span></li>`; }).join("")}</ul>
+    <div class="actions"><button class="btn small primary" data-gs="pgo" ${n === 4 ? "" : "disabled"}>Pack and put out</button>${n < 4 ? `<button class="btn small alt" data-gs="pfill">Fill the rest for me</button>` : ""}<button class="btn small alt" data-gs="pcancel">Cancel</button></div>`;
+}
 function pairsHTML(o){
   const g = giftState(o.F), have = (o.F.inv || {}).pairbox || 0;
-  if (!g.pairs.length && !have) return `<p class="muted">Pairing boxes go here too: pack them at the Cocoa Room's bonbon table (a bottle and 4 bonbons), then bring them in.</p>`;
+  if (o.pk && o.cocoa) return pickerHTML(o);
+  const caseN = o.cocoa ? o.onDisplay(o.cocoa).reduce((a, b) => a + (o.cocoa.trays[b.id] || 0), 0) : 0;
+  if (!g.pairs.length && !have) return `<p class="eyebrow" style="margin:12px 0 6px">Pairing boxes</p><p class="muted">${!o.cocoa ? "Pairing boxes need bonbons from the Cocoa Room." : caseN < 4 ? "Pairing boxes need 4 bonbons in the Cocoa Room's display case. Make a tray at the bonbon table." : "Tap \u201cPair it\u201d on a bottle below to pack a box with 4 bonbons, and it goes out on the display."}</p>`;
   const lo = Math.min(...g.pairs), hi = Math.max(...g.pairs), price = g.pairs.length ? (lo === hi ? `${lo} each` : `${lo} to ${hi} each`) : "";
   return `<p class="eyebrow" style="margin:12px 0 6px">Pairing boxes</p><ul class="hlist wlist"><li><span class="wpic">${icon("pairbox", 30)}</span><span class="wtxt"><b>Wine and chocolate pairing box</b><small>${g.pairs.length ? `${g.pairs.length} out · ${price}` : "None out yet"}${have ? ` · ${have} in your backpack` : ""}</small></span><span class="orbtns">`
     + (have ? `<button class="btn small primary" data-gp="put" data-n="1">Put out 1</button>${have > 1 ? `<button class="btn small alt" data-gp="put" data-n="99">All</button>` : ""}` : "")
@@ -86,7 +97,7 @@ const PANEL = {
     + (s.mill.length ? `<ul class="hlist wlist">${s.mill.map(id => `<li><span class="wpic">${icon(ITEMS[id].ico || id, 26)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${o.store[id]} on the shelves · ${ITEMS[id].price} each</small></span><span class="orbtns"><button class="btn small alt" data-gs="mill:${id}">Take one</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing on the mill's shelves just now. Make some at the workbench upstairs at the mill.</p>`); },
   gwine: o => { const s = stockOf(o); return `<h2>The wine corner</h2><p class="sub">A few of your bottles, from the wine shop's own shelves, for people who want one to take home.</p>`
     + pairsHTML(o)
-    + (s.wine.length ? `<ul class="hlist wlist">${s.wine.map(b => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${b.n} on the shelves · ${b.price} each</small></span><span class="orbtns"><button class="btn small alt" data-gs="wine:${esc(b.id)}">Take one</button></span></li>`).join("")}</ul>` : `<p class="muted">The wine shelves are empty.</p>`); }
+    + (s.wine.length ? `<ul class="hlist wlist">${s.wine.map(b => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${b.n} on the shelves · ${b.price} each</small></span><span class="orbtns">${o.cocoa && !o.pk ? `<button class="btn small alt" data-gs="pair:${esc(b.id)}" ${caseOf(o) >= 4 ? "" : "disabled"}>Pair it</button>` : ""}<button class="btn small alt" data-gs="wine:${esc(b.id)}">Take one</button></span></li>`).join("")}</ul>` : `<p class="muted">The wine shelves are empty.</p>`); }
 };
 export function giftPanel(F, spot, o){
   const day = o.day, t = giftState(F).sold[day] || {n: 0, coins: 0};

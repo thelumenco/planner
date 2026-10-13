@@ -4151,6 +4151,17 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const id = wr.wrapIt(F, {item: "wb_w1", paper: "gw_gold", tag: "plain"});
   check(id && !F.inv.gw_gold && it.ITEMS[id].price === 18 + 1 + 1 && /gold paper/.test(it.ITEMS[id].n) && it.ITEMS[id].ico === "wrp_gold_none_none_none_plain", "a bottle wrapped in gold paper with a tag: a coin or two more (handmade paper's worth more)");
 }
+{
+  console.log("\nPairing boxes packed in the gift shop's wine corner, Tempranillo too (round 189)");
+  const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), gs = await import(new URL("../src/game/giftshop.js", import.meta.url));
+  const F = {coins: 0, inv: {}, goals: {giftshop: 1, cocoa: 1}, cocoa: {bars: {}, trays: {a: 6}, bonbons: [{id: "a", shell: "dark", fills: ["honey"], name: "Dark Honey Heart"}], display: ["a"]},
+    vine: {shelf: [{id: "w2", name: "Ronda Red", type: "tempranillo", n: 2, price: 28}]}};
+  const c = cc.cocoaState(F), pk = {kind: "pair", k: "w2", size: 4, sel: {}};
+  check(cc.pairShelf(F).length === 1 && !cc.wineShelf(F).length, "a Tempranillo pairs, though it can't be opened for a filling");
+  check(cc.pickAdd(F, pk, "a", 1) && cc.pickFill(F, pk) && pk.sel.a === 4, "four bonbons chosen in the wine corner");
+  const w = cc.packPairing(F, pk.k, pk.sel), k = gs.putOutPairs(F, c, 1);
+  check(w === "Ronda Red" && k === 1 && !F.inv.pairbox && gs.giftState(F).pairs[0] === 28 + 4*c.prices.bonbon && F.vine.shelf[0].n === 1 && c.trays.a === 2, "packed and straight out on the display, at the bottle plus four bonbons");
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

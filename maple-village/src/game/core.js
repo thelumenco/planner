@@ -1827,6 +1827,11 @@ function ctx(){
     else if (a === "bar" && cc) { if (takeBar(F, v, true)) { sfx("chime"); flash(`${CC_KINDS[v].n} bar in your backpack`); } }
     else if (a === "mill") { if (takeFromStore(F, v, 1)) { sfx("paper", true); flash(`${ITEMS[v].n} in your backpack`); } }
     else if (a === "wine") { const id = takeBottle(F, vineState(F), v); if (id) { sfx("paper", true); flash(`${ITEMS[id].n} in your backpack`); } }
+    else if (a === "pair" && cc) { gsPk = {kind: "pair", k: v, size: 4, sel: {}}; sfx("paper", true); }   // round 189: pack a pairing box here
+    else if ((a === "padd" || a === "psub") && gsPk) pickAdd(F, gsPk, v, a === "padd" ? 1 : -1);
+    else if (a === "pfill" && gsPk) pickFill(F, gsPk);
+    else if (a === "pcancel") gsPk = null;
+    else if (a === "pgo" && gsPk && cc) { const w = packPairing(F, gsPk.k, gsPk.sel); if (w) { putOutPairs(F, cc, 1); gsPk = null; sfx("paper", true); flash(`A pairing box with ${w}, out in the wine corner`); } }
     save(); ctx(); });
   if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gp]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const cc = owns(F, "cocoa") ? cocoaState(F) : null;   // round 179
     if (b.dataset.gp === "put") { const k = putOutPairs(F, cc, +b.dataset.n || 1); if (k) { sfx("paper", true); flash(`${k} pairing box${k > 1 ? "es" : ""} out in the wine corner`); } }
@@ -2159,7 +2164,7 @@ function ctx(){
     else if (a === "fill") { const [oid, hid] = v0.split("|"), pay = fillOrder(F, oid, hid, dayKey()); if (pay) { sfx("coin"); gainXp(2); flash(`+${pay}: a hamper order`); speak("Penny takes the hamper and the envelope of coins, and crosses the order off. \"They'll be thrilled.\"", 5000); } }
     else if (a === "tie") { const hp = packTie(F); if (hp) { sfx("chime"); hearts(2); gainXp(2); flash(`${hp.name} hamper`); speak(`Penny ties a fat red bow on top and writes the tag: "${hp.name}". It's in your backpack.`, 5500); } }
     save(true); ctx(); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { ppView = null; ccSt.pk = null; bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { gsPk = null; ppView = null; ccSt.pk = null; bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   if (jarsOpen && scene === "room") wireJars(c);
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
@@ -3128,7 +3133,8 @@ function treeCountdown(){
     if (isHere("gonggong")) setTimeout(() => npcSay("gonggong", "The star is crooked. Every year, crooked."), 2600); if (evanHere()) setTimeout(() => evanSays("SO SPARKLY!"), 1200); }, 7200);
 }
 // round 178: the gift shop's shared stock, from the other shops
-const giftOpts = () => ({F, cocoa: owns(F, "cocoa") ? cocoaState(F) : null, onDisplay: ccOnDisplay, store: craftState(F).store, v: vineState(F), day: dayKey(), hm: sgHM(), here: scene === "giftshop" && atSpot === "gtill", keeper: isHere("posy")});
+const giftOpts = () => ({F, cocoa: owns(F, "cocoa") ? cocoaState(F) : null, onDisplay: ccOnDisplay, store: craftState(F).store, v: vineState(F), day: dayKey(), hm: sgHM(), here: scene === "giftshop" && atSpot === "gtill", keeper: isHere("posy"), pk: fieldView === "gwine" ? gsPk : null});
+let gsPk = null;   // round 189: a pairing box being packed in the gift shop's wine corner
 // a treat at the Christmas market, eaten on the spot (and one for Evan if he's here); "mulled": a cup of Mel's own
 function xmasTreat(id){
   if (id === "mulled") { const m = F.mull || {}; if (!(m.cups > 0)) return; m.cups--; sfx("chime"); hearts(2); speak(pick(["A paper cup of your own mulled wine, warm through your gloves. Not bad, if you say so yourself.", "Cinnamon, orange, and the red from your own vines. The whole market smells like this."]), 5000); save(); ctx(); return; }

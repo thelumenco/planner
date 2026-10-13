@@ -2394,3 +2394,12 @@ Write the proposal for Mel covering every item below. Only build after she says 
 ## Round 188: take from the gift shop; shop-bought wrapping paper
 - Gift shop displays have buttons (`data-gs`, wired in core.js): bonbon case "Have one" / "Box of 4" (that flavour, `packBox(F, 4, {id: 4})`), chocolate shelf and mill shelf "Take one" (`takeBar`, `takeFromStore`), wine corner "Take one" (`takeBottle` → gift item `wb_<shelf id>`, kept in `F.giftshop.bottles`, `registerBottles` in render).
 - wrap.js `STORE_PAPER` kraft 1 / red 2 / green 2 / gold 3 → items `gw_<k>` (`wrapPaper: true`, `isPaper`), bought at the gift shop's wrapping table (also ribbon reels and a pack of 4 plain tags for 2: `buyTags`) and at the paperie's wrap panel. A wrap in shop paper is marked `store` and adds 1 coin (handmade adds 2). paper-icons.js COL/WET/STAMP_INK gain kraft, gold, red, green; `gw_*` sheet icons; gold paper sparkles.
+
+## Round 189: pairing boxes packed in the gift shop
+Mel: "I'm supposed to be able to pack them and put them in the gift shop". Packing only lived at the Cocoa Room counter,
+then needed a walk to the gift shop and "Put out", and Tempranillo bottles never showed (the pairing list used
+`wineShelf`, which is only the wines that can be opened for a filling).
+- `cocoa.js` `pairShelf(F)`: any bottle on the wine shop's shelf. `packPairing` and the counter's pairing list use it (all bottles, not the first 4).
+- `giftshop.js` wine corner: "Pair it" on each bottle opens a 4-bonbon picker (`data-gs` `pair`, `padd`, `psub`, `pfill`, `pgo`, `pcancel`);
+  "Pack and put out" packs it and puts it straight on the display. Picker state `gsPk` in `core.js` (cleared on close).
+- Test block "round 189".
