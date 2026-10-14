@@ -2424,7 +2424,7 @@ function applyWear(pj){
   const long = !!(w && w.bottom && !w.dress && !/short|skirt|skort|mini/i.test(w.bottom));
   m.querySelectorAll(".otrouser").forEach(e => fill(e, long ? c("bottom", "#2F2B28") : null));
   // trousers: the hips run straight on into the legs (no shorts hem drawn across them)
-  { const hips = $("oHips"), sides = $("oHipSides"); if (hips) hips.style.display = long ? "none" : ""; if (sides) sides.style.display = "none"; }   // trousers: the legs start up under the shirt and meet in the middle, so each side is one unbroken line
+  { const hips = $("oHips"), sides = $("oHipSides"); if (hips) { hips.setAttribute("d", long ? "M-1.4 -23.5 h2.8 v8.6 h-2.8z" : "M-8.6 -23 h17.2 l1 9.5 h-8 l-1.6 -3 l-1.6 3 h-8z"); hips.style.stroke = long ? "none" : ""; hips.style.display = ""; } if (sides) sides.style.display = "none"; }   // trousers: the legs start up under the shirt and meet in the middle, so each side is one unbroken line; a small patch over the middle keeps the seam to below the crotch
   const bag = $("oBag"); bag.style.display = w && w.bag ? "" : "none"; if (w && w.bag) bag.querySelector("rect").style.fill = c("bag", "#2F2B28");
   const ear = $("oEar"); ear.style.display = w && w.jewellery ? "" : "none";
   if (w && w.jewellery) ear.querySelectorAll("circle").forEach(e => e.style.fill = /silver|platinum|white gold/i.test(w.jewellery) ? "#BFC3CA" : /pearl/i.test(w.jewellery) ? "#F6F1E8" : "#D9A93A");
