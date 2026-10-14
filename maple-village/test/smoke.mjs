@@ -140,6 +140,7 @@ try {
   check(QB.addTask(F, "   ") === null && QB.addTask(F, "x".repeat(300)).title.length === 120, "empty tasks aren't pinned, long ones are trimmed");
   const priced = Object.keys(ITEMS).filter(id => ITEMS[id].sell > 0 && ITEMS[id].price > 0);
   check(priced.every(id => QB.payEach(id) <= ITEMS[id].price), "a request never pays more for something than a shop's own price for it");
+  check(Object.keys(ITEMS).filter(id => ITEMS[id].tab && ITEMS[id].price > 0 && ITEMS[id].sell > 0).every(id => ITEMS[id].sell <= ITEMS[id].price), "nothing Hana sells fetches more back at the market than it costs");
   check(Object.keys(ITEMS).filter(id => ITEMS[id].sell > 0).every(id => QB.payEach(id) >= ITEMS[id].sell || ITEMS[id].price), "and pays at least what the market would");
   const G = {inv: {}}, people = Object.keys(QB.ASKERS).map(id => ({id, name: id[0].toUpperCase() + id.slice(1)}));
   const day = "2026-10-14", posted = QB.refreshRequests(G, people, day);

@@ -19,7 +19,7 @@ export const TREES = {
   lemon:     {n: "Lemon tree", fruit: "lemon", fn: ["lemon", "lemons"], seasons: ["spring", "winter"], price: 25, yield: 3, sell: 3, col: "#F3D34A"},
   peach:     {n: "Peach tree", fruit: "peach", fn: ["peach", "peaches"], seasons: ["summer"], price: 30, yield: 3, sell: 5, col: "#F4A67A"},
   mango:     {n: "Mango tree", fruit: "mango", fn: ["mango", "mangoes"], seasons: ["summer"], price: 40, yield: 3, sell: 6, col: "#F2B33D"},
-  apple:     {n: "Apple tree", fruit: "apple", fn: ["apple", "apples"], seasons: ["autumn"], price: 25, yield: 4, sell: 3, col: "#D9433A"},
+  apple:     {n: "Apple tree", fruit: "apple", fn: ["apple", "apples"], seasons: ["autumn"], price: 25, yield: 4, sell: 2, col: "#D9433A"},
   pear:      {n: "Pear tree", fruit: "pear", fn: ["pear", "pears"], seasons: ["autumn"], price: 30, yield: 4, sell: 4, col: "#C9D36A"},
   fig:       {n: "Fig tree", fruit: "fig", fn: ["fig", "figs"], seasons: ["autumn"], price: 35, yield: 3, sell: 5, col: "#7A4A6E"},
   orange:    {n: "Orange tree", fruit: "orange", fn: ["orange", "oranges"], seasons: ["winter"], price: 25, yield: 4, sell: 3, col: "#F08A3C"},
