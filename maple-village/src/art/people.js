@@ -203,6 +203,7 @@ export function hoodArt(g, k, y = -46*k, r = 10.6*k){
 // the coat itself over the top: longer, with toggles in the trim colour
 const coatArt = (g, k) => `<path class="rcoat" d="M${-9*k} ${-37.4*k} q${9*k} ${-2.4*k} ${18*k} 0 l${2.6*k} ${29*k} h${-23.2*k}z" style="fill:${g.a}"/><path d="M0 ${-35*k} V${-8.6*k}" fill="none" stroke-width=".7"/>${[-30, -23, -16].map(y => `<rect x="${-1.6*k}" y="${y*k}" width="${3.2*k}" height="${1.6*k}" rx=".6" style="fill:${g.b}" stroke-width=".5"/>`).join("")}`;
 
+// (round 203: trouser legs start up under the top, so their rounded corners don't notch the outline at the waist)
 export function personArt(look, kid){
   const k = kid ? 0.62 : look.tall ? 1.1 : 1;
   const legH = 13*k, legY = -15*k, lw = 5*k;
@@ -214,8 +215,8 @@ export function personArt(look, kid){
       ${look.board ? board(k) : ""}
       ${look.towel ? towel(k) : ""}
       ${look.bike ? `<g transform="translate(0 ${7*k})">${bikeArt(look.bike === true ? "#3E6B8C" : look.bike, k)}</g>` : ""}
-      <g class="legL"><rect x="${-6.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
-      <g class="legR"><rect x="${1.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${.8*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
+      <g class="legL"><rect x="${-6.2*k}" y="${look.shorts ? legY : legY - 3*k}" width="${lw}" height="${look.shorts ? legH : legH + 3*k}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
+      <g class="legR"><rect x="${1.2*k}" y="${look.shorts ? legY : legY - 3*k}" width="${lw}" height="${look.shorts ? legH : legH + 3*k}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${.8*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
       <g class="armL"><rect x="${-12*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/>${sleeve(-12*k)}${look.sleeves && !coat ? `<rect x="${-12*k - .4*k}" y="${-34.5*k}" width="${5*k}" height="${7*k}" rx="1.5" ${S(look.sleeves)}/>` : ""}</g>
       <g class="armR"><rect x="${7.8*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/>${sleeve(7.8*k)}${look.sleeves && !coat ? `<rect x="${7.8*k - .4*k}" y="${-34.5*k}" width="${5*k}" height="${7*k}" rx="1.5" ${S(look.sleeves)}/>` : ""}</g>
       ${look.dress ? `<path d="M${-9*k} ${-17*k} L${-12.5*k} ${-5*k} h${25*k} L${9*k} ${-17*k}z" ${S(look.dress)}/>` : ""}

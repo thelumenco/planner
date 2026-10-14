@@ -2665,7 +2665,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(2800);
   check(await page.locator('#actors .npc[data-npc="celeste"].story').count() === 1, "a quest done today: Celeste has a chapter ready (the little … over her head)");
   await page.locator('#actors .npc[data-npc="celeste"]').dispatchEvent("click"); await page.waitForTimeout(600);
-  check(/smelled chocolate again/.test(await page.locator("#npcSay").textContent()), "she tells it in her bubbles: the old chocolatier was her family's");
+  { const said = []; for (let i = 0; i < 12 && !said.some(t => /smelled chocolate again/.test(t)); i++) { said.push(await page.locator("#npcSay").textContent()); await page.waitForTimeout(800); }
+    check(said.some(t => /smelled chocolate again/.test(t)) && !/smelled chocolate again/.test(said[0]), "she tells it in her bubbles, first reminding Mel where she'd got to (round 203): the old chocolatier was her family's"); }
   const f1 = await fox();
   check(f1.story.heard.celeste === 5 && f1.inv.s_recipebook === 1 && f1.inv.s_praline === 2, "and gives Mel Henri's recipe book and his pralines");
   await page.waitForTimeout(12000);
