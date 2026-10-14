@@ -1,4 +1,4 @@
-// Shoppers you can see (round 181, Mel: "can the browsing customers appear at the gift shop and mill shop too"). The
+// Shoppers you can see (round 181: browsing customers at the gift shop and mill shop too). The
 // Cocoa Room and the gift shop always sold in the background, with nobody walking in; now a shopper comes through the
 // door every so often while the shop's open: looks at the case, looks at the shelf, goes to the counter, and walks out
 // with a little paper bag. If the shelves are bare they look, shrug, and leave empty-handed (a hint to restock).

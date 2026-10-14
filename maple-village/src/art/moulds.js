@@ -1,4 +1,4 @@
-// Bonbon moulds (round 176, Mel: "can I cut shapes for the bonbons"): the outline of a bonbon in each mould, centred
+// Bonbon moulds (round 176: shapes cut for the bonbons): the outline of a bonbon in each mould, centred
 // on (x, y), about r across from the middle. Used by the bonbon panels (game/cocoa.js) and the display case (scenes.js).
 const f = n => +n.toFixed(2);
 export function mouldPath(shape, x, y, r){

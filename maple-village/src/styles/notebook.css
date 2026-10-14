@@ -60,7 +60,7 @@ body.nb-open{overflow:hidden}
   .nbactions .btn{padding:6px 12px;font-size:.82rem}}
 @media (prefers-reduced-motion:reduce){.notebook,.nbpage{animation:none}}
 
-/* floating "Do task" chip on the map when Mel is at the quest's spot */
+/* floating "Do task" chip on the map when the player is at the quest's spot */
 .dotask{position:absolute;left:50%;bottom:14px;transform:translateX(-50%) rotate(-1deg);z-index:4;box-shadow:0 10px 20px -12px rgba(46,58,112,.6);animation:pop2 .35s ease}
 .dotask[hidden]{display:none}
 

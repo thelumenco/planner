@@ -5,7 +5,7 @@
 // A cast: the float sits, then bobs (a bite, 2 to 6 seconds later); tap Reel while the marker's in the green to land
 // it. Harder fish have a narrower green; the better reel (an upgrade) widens it. Miss, or wait too long, and it's gone.
 // Catches go in the backpack (most are kitchen ingredients for the new seafood tapas; river and lake fish are "fish",
-// the grilled fish small plate, or a treat for Maple), and in the journal: how many, and the biggest.
+// the grilled fish small plate, or a treat for the pet), and in the journal: how many, and the biggest.
 // A golden koi isn't kept: it goes in the home pond, where it stays (up to three).
 // State in F.fish = {rod, reel, bait, baitDay, caught: {id: {n, best}}, koi, log: [{id, cm, day}]}.
 import { esc, dayKey, sgHM } from "../util.js";

@@ -6,7 +6,7 @@
 .map [data-ugarden]{cursor:pointer}
 .bloom{transform-box:fill-box;transform-origin:50% 100%;animation:grow .6s ease-out}
 @media (prefers-reduced-motion:reduce){.bloom{animation:none}}
-/* Darren at work: typing arms, a tapping hammer, a rocking hoe, a dripping can */
+/* villagers at work: typing arms, a tapping hammer, a rocking hoe, a dripping can */
 .ch.npc.act-type .armL,.ch.npc.act-type .armR{animation:typeA .22s ease-in-out infinite alternate}
 .ch.npc.act-type .armR{animation-delay:.11s}
 @keyframes typeA{from{transform:rotate(-55deg)}to{transform:rotate(-40deg)}}
@@ -18,12 +18,12 @@
 .ch.npc.act-farm:not(.walk) .tool{animation:tapT 1.1s ease-in-out infinite alternate}
 .ch.npc .drips{animation:drip 1s linear infinite}
 @keyframes drip{from{transform:translateY(-2px);opacity:1}to{transform:translateY(6px);opacity:0}}
-/* Evan's swing sways */
+/* the swings sway */
 .map .swing{transform-box:view-box;transform-origin:112px 254px;animation:sway 3s ease-in-out infinite}
 .map .pswing{transform-box:view-box;animation:sway 2.6s ease-in-out infinite}
 @keyframes sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-type .armL,.ch.npc.act-type .armR,.ch.npc .tool,.ch.npc .drips,.map .swing,.map .pswing{animation:none}}
-/* Darren resting in the hammock */
+/* resting in the hammock */
 .ch.npc.act-rest .flip > g{transform:translate(-20px,-6px) rotate(-84deg)}
 .ch.npc.act-rest .bob{animation:cbob 2.6s ease-in-out infinite alternate}
 /* the animal run: chicks peck, bunnies hop; Pancake the dog wags at fresh good news */
@@ -56,14 +56,14 @@
 .map .dbob{animation:dbob 1.6s ease-in-out infinite}
 @keyframes dbob{0%,100%{translate:0 0}50%{translate:0 -1.5px}}
 @media (prefers-reduced-motion:reduce){.map .sway,.map .ducks,.map .dbob{animation:none}.map .ducks{display:none}}
-/* the foreshore: paddleboarders bob on the water (board drawn under the feet; Mel and Evan get theirs from core.js) */
+/* the foreshore: paddleboarders bob on the water (board drawn under the feet; the player gets theirs from core.js) */
 .supboard{display:none}
 .ch.sup .supboard{display:inline}
 .ch.sup .legL,.ch.sup .legR,.ch.sup .armL,.ch.sup .armR,.npc.act-sup .legL,.npc.act-sup .legR,.npc.act-sup .armL,.npc.act-sup .armR{animation:none !important}
 .ch.sup > .flip > g > ellipse:first-child,.npc.act-sup > .flip > g > ellipse:first-child{display:none}
 .ch.sup .bob,.npc.act-sup .bob{animation:supbob 2.4s ease-in-out infinite alternate}
 @keyframes supbob{from{transform:translateY(-.5px) rotate(-1deg)}to{transform:translateY(1.5px) rotate(1deg)}}
-/* exercise: Mum leading her class on the exercise lawn, the class (and Mel) following along */
+/* exercise: Hana leading her class on the exercise lawn, the class (and the player) following along */
 .ch.npc.act-exercise:not(.walk) .armL,.ch.npc.act-lead:not(.walk) .armL,#mel.exercise .armL{animation:exL .7s ease-in-out infinite alternate}
 .ch.npc.act-exercise:not(.walk) .armR,.ch.npc.act-lead:not(.walk) .armR,#mel.exercise .armR{animation:exR .7s ease-in-out infinite alternate}
 .ch.npc.act-exercise:not(.walk) .bob,.ch.npc.act-lead:not(.walk) .bob,#mel.exercise .bob{animation:exB .7s ease-in-out infinite alternate}
@@ -80,24 +80,23 @@
 .map .cruising{animation:cruise 45s ease-in-out forwards}
 @keyframes cruise{0%{transform:translate(0,0)}25%{transform:translate(30px,-170px)}50%{transform:translate(10px,-330px)}75%{transform:translate(34px,-150px)}100%{transform:translate(0,0)}}
 @media (prefers-reduced-motion:reduce){.map .moored,.map .cruising{animation:none}}
-/* how Mel gets about once she owns them: the scooter under her feet, the car round her (garage, game/goals.js) */
+/* how the player gets about once they own them: the scooter under their feet, the car round them (garage, game/goals.js) */
 .rideScoot,.rideCar,.rideBike,.rideTrolley{display:none}#mel.trolley .rideTrolley{display:inline}#mel.biking .rideBike{display:inline}
 .bikeWheel{transform-box:fill-box;transform-origin:50% 50%}#mel.biking .bikeWheel,.npc.walk .bikeWheel{animation:bspin .5s linear infinite}@keyframes bspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){#mel.biking .bikeWheel,.npc.walk .bikeWheel{animation:none}}
 #mel.scoot .rideScoot,#mel.drive .rideCar{display:inline}
 #mel.scoot .legL,#mel.scoot .legR,#mel.scoot .armL,#mel.scoot .armR{animation:none !important}
 #mel.drive .legL,#mel.drive .legR{visibility:hidden}
-#mel .carEvan{display:none}#mel.withEvan .carEvan{display:inline}#mel .bikeEvan{display:none}#mel.withEvan .bikeEvan{display:inline}
 
 .storycue{display:none}.npc.story .storycue{display:inline}.npc.story .storycue > g{animation:cuebob 1.6s ease-in-out infinite}@keyframes cuebob{50%{transform:translateY(-3px)}}@media (prefers-reduced-motion:reduce){.npc.story .storycue > g{animation:none}}
-/* round 107, Ronda: Manolo's strumming, Mum dancing, Ma Ma haggling, Gong Gong dozing behind his paper, sketching */
+/* round 107, Ronda: Manolo's strumming, Hana dancing, Farid haggling, Mei dozing behind her paper, sketching */
 .ch.npc.act-guitar:not(.walk) .tool{animation:strum .28s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 50%}@keyframes strum{to{transform:rotate(-6deg)}}
 .ch.npc.act-dance:not(.walk) > g{animation:dance 1.1s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}@keyframes dance{25%{transform:rotate(-8deg) translateY(-2px)}50%{transform:rotate(0) translateY(0)}75%{transform:rotate(8deg) translateY(-2px)}}
 .ch.npc.act-dance:not(.walk) .armL{animation:exL .55s ease-in-out infinite alternate}.ch.npc.act-dance:not(.walk) .armR,.ch.npc.act-haggle:not(.walk) .armR{animation:exR .55s ease-in-out infinite alternate}
 .ch.npc.act-sketch:not(.walk) .tool{animation:tapT .6s ease-in-out infinite alternate}
 .npc.act-doze:not(.walk) .legL,.npc.act-doze:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}.npc.act-doze:not(.walk) > g{transform:translateY(7px)}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-guitar .tool,.ch.npc.act-dance > g,.ch.npc.act-dance .armL,.ch.npc.act-dance .armR,.ch.npc.act-haggle .armR,.ch.npc.act-sketch .tool{animation:none}}
-/* Jeju (round 129): Mum's kite tugs on its string, Dad pats the stone grandfather's nose, Ma Ma picks, Gong Gong mends, Darren stacks */
+/* Jeju (round 129): Hana's kite tugs on its string, Theo pats the stone grandfather's nose, Farid picks, Mei mends, Bo stacks */
 .ch.npc .kitefly{transform-box:fill-box;transform-origin:0% 100%;animation:kitefly 3.2s ease-in-out infinite alternate}
 @keyframes kitefly{from{transform:rotate(-4deg)}to{transform:rotate(5deg)}}
 .ch.npc.act-luck:not(.walk) .armR{animation:luckA 1.2s ease-in-out infinite alternate}
@@ -106,7 +105,7 @@
 .ch.npc.act-pick:not(.walk) .armR,.ch.npc.act-stack:not(.walk) .armR{animation:tapA 1s ease-in-out infinite alternate}
 .ch.npc.act-nets:not(.walk) .armL,.ch.npc.act-nets:not(.walk) .armR{animation:typeA .5s ease-in-out infinite alternate}
 @media (prefers-reduced-motion:reduce){.ch.npc .kitefly,.ch.npc.act-luck .armR{animation:none}}
-/* Cinque Terre (round 134): Mum lies on her towel, Ma Ma knits, Gong Gong bowls, Darren plants his poles, Marcus rows, Angellina sits and reads */
+/* Cinque Terre (round 134): Hana lies on her towel, Farid knits, Mei bowls, Bo plants his poles, Tomi rows, Posy sits and reads */
 .ch.npc.act-sunbathe .flip > g{transform:translate(-26px,-8px) rotate(-86deg)}
 .ch.npc.act-sunbathe .bob{animation:cbob 3.4s ease-in-out infinite alternate}
 .ch.npc.act-knit:not(.walk) .armL,.ch.npc.act-knit:not(.walk) .armR{animation:typeA .4s ease-in-out infinite alternate}
@@ -116,7 +115,7 @@
 .npc.act-read:not(.walk) > g,.npc.act-knit:not(.walk) > g{transform:translateY(7px)}
 .npc.act-row:not(.walk) .legL,.npc.act-row:not(.walk) .legR{visibility:hidden}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-sunbathe .bob,.ch.npc.act-knit .armL,.ch.npc.act-knit .armR,.ch.npc.act-bocce .armR,.ch.npc.act-row .armR,.ch.npc.act-bocce .tool,.ch.npc.act-poles .tool,.ch.npc.act-row .tool{animation:none}}
-/* Jason (round 135): his morning poem at a café table, sitting, pen going */
+/* Ornella (round 135): her morning poem at a café table, sitting, pen going */
 .npc.act-poem:not(.walk) .legL,.npc.act-poem:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}.npc.act-poem:not(.walk) > g{transform:translateY(7px)}
 .ch.npc.act-poem:not(.walk) .armR{animation:tapA 1.6s ease-in-out infinite alternate}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-poem .armR{animation:none}}
@@ -143,11 +142,11 @@
 .ch.npc.act-point:not(.walk) .armR{animation:dpoint .7s ease-in-out infinite alternate}@keyframes dpoint{from{transform:rotate(-100deg)}to{transform:rotate(-160deg)}}
 .ch.npc.act-point:not(.walk) .armL{transform:rotate(25deg)}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-boogie > g,.ch.npc.act-armsup > g,.ch.npc.act-twirl > g,.ch.npc.act-shuffle > g,.ch.npc.act-point > g,.ch.npc[class*="act-"] .armL,.ch.npc[class*="act-"] .armR{animation:none}}
-/* Bellbird Valley (round 144), all new: Ma Ma holds up a cardigan, Gong Gong's binoculars, Angellina's wattle crown,
-   Darren's drone, Mum waves at the balloons, Dad sips his coffee, Marcus bounces a footy, Gong Gong's tai chi, Mum
-   swirls her Pinot, Dad juggles strawberries, Ma Ma fans herself, Darren carries the berry flats, Mum feeds the roos,
-   Marcus peers into the wombat hole, Angellina looks up for koalas, Dad flips sausages, Gong Gong skims stones, Ma Ma
-   plays cards, Darren toasts a marshmallow */
+/* Bellbird Valley (round 144), all new: Farid holds up a cardigan, Mei's binoculars, Posy's wattle crown,
+   Bo's drone, Hana waves at the balloons, Theo sips his coffee, Tomi bounces a footy, Mei's tai chi, Hana
+   swirls her Pinot, Theo juggles strawberries, Farid fans himself, Bo carries the berry flats, Hana feeds the roos,
+   Tomi peers into the wombat hole, Posy looks up for koalas, Theo flips sausages, Mei skims stones, Farid
+   plays cards, Bo toasts a marshmallow */
 .ch.npc.act-rummage:not(.walk) .armR,.ch.npc.act-cuppa:not(.walk) .armR,.ch.npc.act-swirl:not(.walk) .armR{animation:sipA 2.4s ease-in-out infinite alternate}
 @keyframes sipA{from{transform:rotate(-20deg)}to{transform:rotate(-60deg)}}
 .ch.npc.act-binoculars:not(.walk) .armR,.ch.npc.act-binoculars:not(.walk) .armL{transform:rotate(-150deg)}
@@ -187,10 +186,10 @@
 @keyframes skimA{0%,60%{transform:rotate(-20deg)}80%{transform:rotate(-95deg)}100%{transform:rotate(-20deg)}}
 .ch.npc .ripples{animation:kitefly 1.8s ease-out infinite}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-rummage .armR,.ch.npc.act-cuppa .armR,.ch.npc.act-swirl .armR,.ch.npc.act-binoculars .flip > g,.ch.npc.act-crown .armL,.ch.npc.act-crown .armR,.ch.npc.act-cards .armR,.ch.npc.act-wave .armR,.ch.npc.act-footy .legR,.ch.npc .ballbounce,.ch.npc.act-taichi .armL,.ch.npc.act-taichi .armR,.ch.npc.act-juggle .armL,.ch.npc.act-juggle .armR,.ch.npc .jb,.ch.npc.act-fan .tool,.ch.npc.act-carry .flip > g,.ch.npc.act-feedroo .armR,.ch.npc.act-lookup .flip > g,.ch.npc.act-bbq .tool,.ch.npc.act-mallow .tool,.ch.npc.act-bbq .armR,.ch.npc .steam,.ch.npc.act-skim .armR,.ch.npc .ripples{animation:none}}
-/* round 150, the Coast Road's family acts (never done anywhere before): Marcus with his bodyboard, Mum's beach yoga
-   (tree pose, breathing), Gong Gong at the coin telescope, Angellina painting, Dad crouched with his macro lens, Darren
-   counting the treetop steps, Darren guarding his chips from a gull, Ma Ma's bag of prawns, Ma Ma beachcombing, Dad
-   building a driftwood shelter, Mum with a king parrot on her arm, Gong Gong pitching quoits, Angellina writing postcards */
+/* round 150, the Coast Road's villager acts (never done anywhere before): Tomi with his bodyboard, Hana's beach yoga
+   (tree pose, breathing), Mei at the coin telescope, Posy painting, Theo crouched with his macro lens, Bo
+   counting the treetop steps, Bo guarding his chips from a gull, Farid's bag of prawns, Farid beachcombing, Theo
+   building a driftwood shelter, Hana with a king parrot on her arm, Mei pitching quoits, Posy writing postcards */
 .ch.npc.act-bodyboard:not(.walk) .armR{transform:rotate(-12deg)}
 .ch.npc.act-yoga:not(.walk) .armL,.ch.npc.act-yoga:not(.walk) .armR{animation:yogaA 4s ease-in-out infinite alternate}
 .ch.npc.act-yoga:not(.walk) .armL{animation-name:yogaL}
@@ -214,19 +213,15 @@
 .ch.npc .perch{animation:scanB 3s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
 .ch.npc.act-quoits:not(.walk) .armR{animation:skimA 2.2s ease-in infinite}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-yoga .armL,.ch.npc.act-yoga .armR,.ch.npc.act-paint .armR,.ch.npc.act-paint .tool,.ch.npc.act-postcard .armR,.ch.npc.act-postcard .tool,.ch.npc.act-shells .armR,.ch.npc.act-count .armL,.ch.npc .gullhop,.ch.npc.act-shelter .armR,.ch.npc.act-shelter .armL,.ch.npc .perch,.ch.npc.act-quoits .armR{animation:none}}
-/* round 152: Evan asleep in the campervan at night on a trip */
-.zzz text{animation:zzzF 3s ease-in-out infinite;opacity:0}
-@keyframes zzzF{0%{opacity:0;transform:translateY(4px)}30%{opacity:1}100%{opacity:0;transform:translateY(-6px)}}
-@media (prefers-reduced-motion:reduce){.zzz text{animation:none;opacity:1}}
 /* round 152: New Year's Eve fireworks over the terrace */
 .fwork{animation:fworkA 2.4s ease-out infinite;transform-box:fill-box;transform-origin:50% 50%;opacity:0}
 @keyframes fworkA{0%{opacity:0;transform:scale(.2)}20%{opacity:1}70%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.15)}}
 @media (prefers-reduced-motion:reduce){.fwork{animation:none;opacity:1}}
 
-/* round 160, the Tablelands' family acts (never done anywhere before): Gong Gong's thermos at the lookout, Marcus wading
-   under the falls, Angellina feeding the ducks, Darren's frisbee, Mum's "shh" at the platypus platform, Ma Ma's bag of
-   lollies, Dad with the milk pail, Gong Gong leaning on the calf-pen rail, Marcus shaking a macadamia branch, Ma Ma
-   cracking nuts on a stone, Darren panning for gold, Dad waving the guard's flag, Angellina's sarsaparilla */
+/* round 160, the Tablelands' villager acts (never done anywhere before): Mei's thermos at the lookout, Tomi wading
+   under the falls, Posy feeding the ducks, Bo's frisbee, Hana's "shh" at the platypus platform, Farid's bag of
+   lollies, Theo with the milk pail, Mei leaning on the calf-pen rail, Tomi shaking a macadamia branch, Farid
+   cracking nuts on a stone, Bo panning for gold, Theo waving the guard's flag, Posy's sarsaparilla */
 .ch.npc.act-flask:not(.walk) .armR,.ch.npc.act-sip:not(.walk) .armR{animation:sipA 2.8s ease-in-out infinite alternate}
 .ch.npc.act-wade:not(.walk) .armL{animation:wadeL 3s ease-in-out infinite alternate}.ch.npc.act-wade:not(.walk) .armR{animation:wadeR 3s ease-in-out infinite alternate}
 @keyframes wadeL{from{transform:rotate(40deg)}to{transform:rotate(70deg)}}@keyframes wadeR{from{transform:rotate(-40deg)}to{transform:rotate(-70deg)}}
@@ -248,10 +243,10 @@
 .ch.npc.act-guard:not(.walk) .armR{animation:guardA 2s ease-in-out infinite alternate}
 @keyframes guardA{from{transform:rotate(-150deg)}to{transform:rotate(-170deg)}}
 
-/* round 164, the Lavender Hills' family acts (never done anywhere before): Mum's armful of lavender, Darren and the bee,
-   Gong Gong's baguette, Marcus on the accordion, Angellina smelling a perfume strip, Ma Ma's scent spray, Dad in the
-   beekeeper's veil, Marcus with a giant sunflower, Darren on a rubber ring, Gong Gong's picnic, Ma Ma's candle, Dad and
-   a goat kid, Mum's hand on her heart at the sunset */
+/* round 164, the Lavender Hills' villager acts (never done anywhere before): Hana's armful of lavender, Bo and the bee,
+   Mei's baguette, Tomi on the accordion, Posy smelling a perfume strip, Farid's scent spray, Theo in the
+   beekeeper's veil, Tomi with a giant sunflower, Bo on a rubber ring, Mei's picnic, Farid's candle, Theo and
+   a goat kid, Hana's hand on her heart at the sunset */
 .ch.npc.act-armful:not(.walk) .armR,.ch.npc.act-armful:not(.walk) .armL{transform:rotate(-70deg)}
 .ch.npc.act-bee:not(.walk) .armR{animation:swatA .5s ease-in-out infinite alternate}@keyframes swatA{from{transform:rotate(-120deg)}to{transform:rotate(-160deg)}}
 .ch.npc.act-bee .perch{animation:beeB 1.2s ease-in-out infinite;transform-box:fill-box}@keyframes beeB{0%{transform:translate(0,0)}25%{transform:translate(-14px,4px)}50%{transform:translate(-4px,-6px)}75%{transform:translate(6px,2px)}100%{transform:translate(0,0)}}

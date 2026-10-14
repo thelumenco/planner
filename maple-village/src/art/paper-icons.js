@@ -1,4 +1,4 @@
-// The paperie's icons (round 183): the batch's own picture at every step, so the look changes as Mel adds each thing.
+// The paperie's icons (round 183): the batch's own picture at every step, so the look changes as each thing goes in.
 //   ppscraps                 a tied bundle of scraps (a wine label, a chocolate wrapper, a receipt)
 //   ppsoak                   the tub, torn bits floating
 //   ppulp_<col>_<add>        a basin of pulp in its colour, the add-in flecked through
@@ -51,7 +51,7 @@ export function paperIcon(name){
 }
 
 /* ---------- round 185: wrapping ---------- */
-// ribbons (a spool), tags, stamps, and a wrapped parcel that builds up layer by layer as Mel picks each thing:
+// ribbons (a spool), tags, stamps, and a wrapped parcel that builds up layer by layer as each thing is picked:
 //   wrp_<col>_<add>_<stamp>_<ribbon>_<tag>   ("none" for anything not chosen yet)
 export const RIBBON_COL = {gingham: "#C8432F", velvet: "#7A1F3D", twine: "#C9A27E"};
 const STAMP_INK = {natural: "#8A6A42", blush: "#B24A5E", sage: "#4E6A3E", ink: "#2F3B73", kraft: "#5A3A22", gold: "#7A5A1A", red: "#FFFDF6", green: "#FFFDF6"};

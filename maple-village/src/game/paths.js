@@ -1,6 +1,6 @@
-// Walking around things outdoors: Mel goes round buildings, the pond, the garden fence and so on instead of
+// Walking around things outdoors: the player goes round buildings, the pond, the garden fence and so on instead of
 // straight through them. Each outdoor scene has a list of blocked rectangles; a coarse grid of open points is
-// searched with A*, then the route is pulled tight so she walks in natural straight runs.
+// searched with A*, then the route is pulled tight so they walk in natural straight runs.
 import { TOWN_OBST } from "../data/towns.js";
 const OBST = {
   village: [[100, 40, 240, 172], [322, 64, 438, 168], [27, 246, 143, 350], [377, 380, 493, 484],

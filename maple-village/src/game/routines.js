@@ -1,6 +1,6 @@
-// My routines: a noticeboard on the wall of Mel's room. Two kinds of routine:
+// My routines: a noticeboard on the wall of your room. Two kinds of routine:
 //   checklist: a list ticked off each day (morning routine), fresh every morning
-//   weekly:    one step per weekday (beauty routine), today's step up top
+//   weekly:    one step per weekday (a self-care week), today's step up top
 // A private per-user doc ("routines"): lists merge by id (newest change wins, a removed list stays as a marker),
 // ticks are kept per day and per item with a timestamp, so two devices never undo each other.
 import { esc, plain, dayKey } from "../util.js";
@@ -8,12 +8,12 @@ import { esc, plain, dayKey } from "../util.js";
 const KEY = "fox.routines";
 export const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const DAY_NAMES = {mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday"};
-// Mel's beauty week (from her)
-const BEAUTY = {mon: "Pore extraction", tue: "Retinol", wed: "Hair mask", thu: "Nail care", fri: "Pore pad or lactic acid", sat: "Body scrub", sun: "Air shot micro-needling + face mask"};
+// the default beauty week
+const BEAUTY = {mon: "Face mask", tue: "Hair mask", wed: "Nail care", thu: "A long bath", fri: "Stretch for ten minutes", sat: "Body scrub", sun: "An early night"};
 const uid = p => p + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36);
 const seed = () => ({lists: [
   {id: "morning", name: "Morning routine", kind: "checklist", at: 1, items: ["Big glass of water", "Make the bed", "Wash face and skincare", "Get dressed (peek at the wardrobe)", "Vitamins"].map((t, i) => ({id: "m" + i, text: t}))},
-  {id: "beauty", name: "Beauty routine", kind: "weekly", at: 1, days: BEAUTY}
+  {id: "beauty", name: "Self-care week", kind: "weekly", at: 1, days: BEAUTY}
 ], ticks: {}, updatedAt: 0});
 const load = () => { try { const r = JSON.parse(localStorage.getItem(KEY)); return r && Array.isArray(r.lists) ? Object.assign({ticks: {}}, r) : seed(); } catch { return seed(); } };
 let R = load(), ref = null, chain = Promise.resolve(), onChange = () => {};
@@ -30,7 +30,7 @@ export function attachRoutines(col, changed){
   onChange = changed; ref = col.doc("routines");
   ref.onSnapshot(snap => { if (!snap.exists) { push(); return; } R = merge(R, JSON.parse(JSON.stringify(snap.data() || {}))); keep(); fillBeauty(); onChange(); }, () => {});
 }
-// one time: the board was first seeded with an empty beauty routine; fill in Mel's week (never over her own edits)
+// one time: the board was first seeded with an empty beauty routine; fill in the default week (never over the player's own edits)
 function fillBeauty(){
   if (R.beautyFilled) return; const b = R.lists.find(l => l.id === "beauty" && !l.deleted);
   R.beautyFilled = true;
@@ -46,7 +46,7 @@ export const todayKey = () => DAYS[(new Date(dayKey() + "T00:00:00Z").getUTCDay(
 const tickOf = (listId, itemId, day = dayKey()) => { const t = ((R.ticks || {})[day] || {})[listId + ":" + itemId]; return !!(t && t.on); };
 function setTick(listId, itemId, on){ const d = dayKey(); R.ticks = R.ticks || {}; R.ticks[d] = R.ticks[d] || {}; R.ticks[d][listId + ":" + itemId] = {on, at: Date.now()}; commit(); }
 const touch = l => { l.at = Date.now(); commit(); };
-// today's beauty-style step (for Maple's morning mention): [{list, text, done}]
+// today's beauty-style step (for the pet's morning mention): [{list, text, done}]
 export function todaysSteps(){ const k = todayKey(); return lists().filter(l => l.kind === "weekly" && l.days && l.days[k]).map(l => ({name: l.name, text: l.days[k], done: tickOf(l.id, k)})); }
 export const checklistLeft = () => lists().filter(l => l.kind === "checklist").reduce((n, l) => n + l.items.filter(i => !tickOf(l.id, i.id)).length, 0);
 

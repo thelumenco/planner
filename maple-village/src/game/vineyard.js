@@ -82,7 +82,7 @@ export const growth = vn => vn && vn.wateredAt ? Math.min(1, (Date.now() - vn.wa
 export const barrelLeft = b => b ? Math.max(0, b.start + b.dur - Date.now()) : 0;
 export const shelfStock = v => v.shelf.reduce((n, s) => n + s.n, 0);
 
-/* ---------- actions (return a line for Maple, or null) ---------- */
+/* ---------- actions (return a line for the pet, or null) ---------- */
 // round 152 ("3 is too few"): up to six in the barrel shed (the second 150, then 75 more each: 450 for the sixth),
 // and once the cellar door's open, twelve more on its barrel racks (250 each)
 export const BARRELS = {shed: 6, cellar: 12, cellarPrice: 250};

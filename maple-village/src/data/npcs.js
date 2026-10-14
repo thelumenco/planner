@@ -1,6 +1,6 @@
-// Village NPCs (light-touch neighbours) and agent NPCs (Mel's automations as messengers). All original characters.
+// Village NPCs (light-touch neighbours) and agent NPCs (automations as messengers). All original characters.
 //
-// Town folk live in the town square ("village"); Darren stays at home base ("base", "home", "farm").
+// Town folk live in the town square ("village"); some stay at home base ("base", "home", "farm").
 // Routine slots use local minutes-since-midnight: {from, to, scene, at:[x,y]} stands still,
 // {..., wander:[[x,y],...]} strolls between points. Outside every slot the NPC is off-screen (home, asleep).
 // `react` lines fire once a day when their condition is true (see npcs.js REACTIONS).
@@ -12,8 +12,8 @@ import { LV_PEOPLE } from "./lv-people.js";
 import { WEDDING_PEOPLE } from "./terrace-people.js";
 import { MILL_PEOPLE } from "./mill-people.js";
 const hm = s => { const [h, m] = s.split(":").map(Number); return h*60 + (m || 0); };
-// opts: {look: clothes for this slot (over the usual look), dow: [0-6] (only on those days, 0 = Sunday), days: "wd" | "we" (weekdays / weekends only), act: what they're doing (Darren's props + lines), dir: facing}
-// Gong Gong's going-out clothes: a pressed shirt and long trousers (no berms)
+// opts: {look: clothes for this slot (over the usual look), dow: [0-6] (only on those days, 0 = Sunday), days: "wd" | "we" (weekdays / weekends only), act: what they're doing (props + lines), dir: facing}
+// going-out clothes: a pressed shirt and long trousers (no berms)
 const OUT = {top: "#DCE7F2", bottom: "#4A4F5C", shorts: false};
 // the foreshore: a walk along the boardwalk and the sand, and the sea (for paddleboarders, who go straight across)
 const SHORE_WALK = [[226, 180], [240, 300], [300, 312], [430, 300], [236, 420], [226, 560], [300, 580]];
@@ -162,7 +162,7 @@ export const NPCS = [
     lines: ["Old Wilf's labels were all hand-drawn. Little grapes in the corner. I've kept one.", "The honey heart bonbons go first. Every time.", "Someone bought three bars just for the box they come in.", "I've moved the soaps next to the wine. People sniff, then buy both.", "Tea towels. One day. Trust me."],
     away: "Posy's gone home. The gift shop's shut."
   },
-  // round 153: Hazel runs the Mill Shop (once Mel's opened it): every day but Monday, 10 to 5, behind the counter
+  // round 153: Hazel runs the Mill Shop (once you've opened it): every day but Monday, 10 to 5, behind the counter
   // downstairs. She made soap for forty years, and has opinions about lavender
   {
     id: "hazel", pitch: .95, name: "Hazel", job: "Runs the Mill Shop",
@@ -189,7 +189,7 @@ export const NPCS = [
     lines: ["The honesty box is very honest today.", "Someone asked who makes these. I said a very busy lady.", "Evenings are the best. Everyone wants a glass.", "If the shelves are full, I'm happy."],
     away: "Celeste's not on. The honesty box minds the shop."
   },
-  // The orchard's two workers: Farid looks after the fruit trees, Mei the flower farm (both help Ma Ma, and take turns
+  // The orchard's two workers: Farid looks after the fruit trees, Mei the flower farm (they take turns
   // leading the weekend tours)
   {
     id: "farid", pitch: 0.85, name: "Farid", job: "Works the fruit orchard",
@@ -213,7 +213,7 @@ export const NPCS = [
     actLines: {guide: ["These beds bloom again every day or so. Isn't that lovely?", "That one's my favourite. Don't tell the others.", "Bouquets at the farm shop, if anyone's feeling romantic."], water: ["Gentle on the petals.", "Morning water, happy flowers."], farm: ["Deadheading. Snip, snip.", "Cutting a few for the shop."]},
     away: "Mei's finished for the day."
   },
-  // Out-of-towners: day trippers who only ever turn up at the wine shop (tastings, a bottle to take home) and Ma Ma's
+  // Out-of-towners: day trippers who only ever turn up at the wine shop (tastings, a bottle to take home) and Farid's
   // orchard (farm tours, fruit and flowers from the farm shop). No routine of their own: tours.js says when they come.
   ...[["aiko", "Aiko", {skin: "#F0D2B6", hair: "#2B2320", hairStyle: "bob", top: "#F6A23A", bottom: "#3F4A6B", hat: "sunhat"}, "Visiting from the city"],
     ["ben", "Ben", {skin: "#E8C4A0", hair: "#B5562E", hairStyle: "short", top: "#6E9FD6", bottom: "#5E5A55", extra: "satchel"}, "Here on a cycling holiday"],
@@ -258,7 +258,7 @@ export const NPCS = [
     intro: "I'm Elena. Cows, goats, and soon a proper cheese cave in the barn. The cheese at my market stall? Aged right here.",
     lines: ["Wilf used to bring {pet} up to see the goats. Daisy pretended not to care. She cared.", "Daisy's the boss of the paddock. Mochi just pretends.", "Milking at six. The goats prefer six-fifteen.", "A good cheese takes patience. So does a good goat.", "Pepper ate my notebook again."],
     hellos: ["Hi! Grab a bucket.", "Morning! Hay's in the barn."], away: "Elena's done for the day. Even the goats are asleep."},
-  // Amara serves at the Cocoa Room's counter (once Mel opens it, goals.js "cocoa"), Tuesday to Sunday
+  // Amara serves at the Cocoa Room's counter (once you open it, goals.js "cocoa"), Tuesday to Sunday
   {id: "amara", pitch: 1.15, name: "Amara", job: "Serves at the Cocoa Room",
     look: {skin: "#A8754F", hair: "#1F1A17", hairStyle: "bun", top: "#8A5A3A", bottom: "#F3E7C9", extra: "apron"},
     routine: [slot("10:45", "20:15", "cocoa", [300, 268], {dow: [0, 2, 3, 4, 5, 6], needs: "cocoa"})],
@@ -268,8 +268,8 @@ export const NPCS = [
   // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep): Monday to Saturday 9:30-4:30, evening classes Mon and Tue
   {id: "mateo", pitch: .95, name: "Mateo", job: "Kitchen hand at the Cocoa Room",
     look: {skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#F6F2EA", bottom: "#4A2E22", extra: "apron"},
-    // round 177 (Mel: "can he only study at night, during evening classes, and work at my shop during the day"), round 180
-    // (Mel: "Mateo needs to work mondays"): Monday to Saturday 9:30 to 4:30 in the kitchen; food science at the poly on Monday and Tuesday evenings (off the map, 6 to 9),
+    // round 177 (he studies at night, at evening classes, and works at your shop during the day), round 180
+    // (he works Mondays too): Monday to Saturday 9:30 to 4:30 in the kitchen; food science at the poly on Monday and Tuesday evenings (off the map, 6 to 9),
     // then home to his textbooks
     routine: [slot("08:30", "09:15", "hlane", [[200, 320], [236, 450], [330, 180]]),
       slot("09:30", "16:30", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [1, 2, 3, 4, 5, 6], needs: "cocoa"}),
@@ -327,9 +327,9 @@ export const NPCS = [
     away: `${name}'s gone home.`})),
   // The wine shop's cook: on her shifts she runs the kitchen from whatever's in the larder (see cookTick)
   // Honeybrook Woods' ranger (round 103): cycles up from Makers' Lane in the morning, walks the trails, keeps the
-  // Round 107: Ronda's locals (local: "ronda"). They're only ever on Ronda's screens, so Mel meets them on a day trip.
+  // Round 107: Ronda's locals (local: "ronda"). They're only ever on Ronda's screens, so you meet them on a day trip.
   // Doña Carmen keeps the sweet shop (and knew Pilar's mother); Rafael sells his family's oil and almonds at the market
-  // (and, once he trusts Mel, Tempranillo cuttings); Lucía paints the tiles; Manolo busks by the fountain.
+  // (and, once he trusts you, Tempranillo cuttings); Lucía paints the tiles; Manolo busks by the fountain.
   {
     id: "carmen", local: "ronda", pitch: 0.9, name: "Doña Carmen", job: "Keeps the sweet shop on Ronda's plaza",
     intro: "¡Hola, guapa! Doña Carmen. Yemas, almond cake, and sixty years of gossip. Come in, come in, out of the sun.",

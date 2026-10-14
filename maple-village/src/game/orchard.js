@@ -38,7 +38,7 @@ export function stateOf(where, p, today){
   if (t < p.next) { const from = p.picked || p.at + grow; return {stage: "budding", g: Math.min(1, (t - from)/Math.max(1, p.next - from)), left: p.next - t}; }
   return {stage: "ripe", g: 1, left: 0};
 }
-// Plant in a spot (an empty one, or one whose plant has faded with the season). -> line for Maple, or null
+// Plant in a spot (an empty one, or one whose plant has faded with the season). -> line for the pet, or null
 export function plant(F, where, i, id, today){
   const o = orchState(F), list = o[SPOTS[where]], C = cat(where)[id];
   if (!C || !list || i < 0 || i >= list.length || !C.seasons.includes(seasonOf(today)) || (where === "tree" && !treeOpen(F, C))) return null;

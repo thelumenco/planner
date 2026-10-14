@@ -1,6 +1,6 @@
 // The campervan (a big goal, goals.js "van", 3800): a cream-and-mint vintage van with a pop-top roof, parked at its
 // spot on the cottage lane. It doesn't drive around town; it's a little home from home, and later it goes on road
-// trips (off the map, to destinations of their own). Inside, Mel does it up from the mood board: six things to dress,
+// trips (off the map, to destinations of their own). Inside, you do it up from the mood board: six things to dress,
 // each in one of six styles (the same styles the cottages will use). State in F.van = {owned: [itemId], use: {slot: itemId}}.
 import { esc } from "../util.js";
 import { icon } from "../art/icons.js";

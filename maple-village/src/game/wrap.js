@@ -1,7 +1,7 @@
-// Wrapping (paperie round 2, round 185; Mel: "as I add each item, the icon, the look changes"). Wrap any gift from
-// the backpack in a sheet of Mel's own handmade paper, then (if she likes) stamp it, tie a ribbon and add a tag; the
+// Wrapping (paperie round 2, round 185: the icon's look changes as each item goes on). Wrap any gift from
+// the backpack in a sheet of your own handmade paper, then (if you like) stamp it, tie a ribbon and add a tag; the
 // parcel's picture builds up with every choice (art/paper-icons.js wrapIcon). Supplies come from the ribbon rack at the
-// paperie in Montrose: ribbon reels (4 bows each), a set of rubber stamps (once), and tags cut from her own sheets (a
+// paperie in Montrose: ribbon reels (4 bows each), a set of rubber stamps (once), and tags cut from your own sheets (a
 // seeded sheet makes seeded tags). She wraps at the ribbon rack, or at the wrapping table in the gift shop, where
 // wrapped gifts can also go out on the table to sell (a few coins more than unwrapped: the paper, ribbon and tag).
 // A wrapped gift is its own item ("wr_<n>", registered from F.paperie.wraps on load) that remembers what's inside;
@@ -19,7 +19,7 @@ ITEMS.tag_plain = {n: "Paper gift tag", kind: "use", ico: "tag_plain", what: "Cu
 ITEMS.tag_seeded = {n: "Seeded gift tag", kind: "use", ico: "tag_seeded", crop: "wildflower", plantable: true, what: "Cut from seeded paper: plant it and wildflowers come up."};
 for (const [k, r] of Object.entries(RIBBONS)) ITEMS["rb_" + k] = {n: `${r.n} (one bow)`, kind: "use", ico: "rb_" + k, what: "Enough for one bow."};
 
-// round 188 (Mel: "there is no gift wrapping until I have my paperie"): shop-bought wrapping paper, from the gift shop's
+// round 188 (gift wrapping before the paperie opens): shop-bought wrapping paper, from the gift shop's
 // wrapping table (or the paperie's rack): kraft, gold, red and green, a sheet at a time. Handmade paper is worth more.
 export const STORE_PAPER = {kraft: {n: "Kraft", price: 1}, red: {n: "Red", price: 2}, green: {n: "Green", price: 2}, gold: {n: "Gold", price: 3}};
 for (const [k, p] of Object.entries(STORE_PAPER)) ITEMS["gw_" + k] = {n: `A sheet of ${p.n.toLowerCase()} wrapping paper`, kind: "use", wrapPaper: true, ico: "gw_" + k, price: p.price, what: "Shop-bought wrapping paper, for wrapping a gift."};

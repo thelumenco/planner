@@ -232,5 +232,5 @@ export function ferryRideArt(home){
     <rect x="96" y="2" width="10" height="12" fill="${C.orange}"/><circle cx="58" cy="21" r="4" fill="#F2D3BC"/><circle cx="74" cy="21" r="4" fill="#C99A78"/></g></svg></div>`;
   return bank + boat;
 }
-// The wish-tower in Honeybrook Woods, by the river (Mel, round 127): it grows a stone for each wish (up to nine)
+// The wish-tower in Honeybrook Woods, by the river (round 127): it grows a stone for each wish (up to nine)
 export const wishTower = (x, y, n) => `<g data-place="wishtower" aria-label="The wish-tower">${`<ellipse class="hov" cx="${x}" cy="${y + 4}" rx="18" ry="6" style="fill:var(--butter)"/>`}${cairn(x, y, Math.max(3, Math.min(9, n)), 1.25)}</g>`;

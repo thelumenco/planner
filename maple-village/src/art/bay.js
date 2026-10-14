@@ -1,5 +1,5 @@
 // The bay, north of the foreshore up the boardwalk: the sea and sand carry on up the west side, then The Scoop Shack
-// (Mel's ice cream shop) with its deck looking out over the water, and a shopfront under renovation (a craft brewery?
+// (your ice cream shop) with its deck looking out over the water, and a shopfront under renovation (a craft brewery?
 // a chocolatier?). The boardwalk runs down to the foreshore gate at the bottom.
 import { ink, LOC } from "../util.js";
 import { sk, tapeLabel, house, flowers, artCtx } from "./scenes.js";

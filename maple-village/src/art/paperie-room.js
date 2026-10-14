@@ -1,7 +1,7 @@
-// The paperie in Montrose (round 183): one room, the shop at the front and the paper-making along the edges, so Mel
+// The paperie in Montrose (round 183): one room, the shop at the front and the paper-making along the edges, so the player
 // walks the steps round the room. Everything shows where the batch is up to: torn scraps in the bin, bits floating in
 // the tub, the vat's pulp in its colour (flecked with the add-in), the stack in the press, sheets pegged on the line
-// (darker while damp), and the shelves stacked in the colours she's made. Before it's hers: an empty shop, dust
+// (darker while damp), and the shelves stacked in the colours you've made. Before it's yours: an empty shop, dust
 // sheets, and an À VENDRE board to tap.
 import { LOC } from "../util.js";
 import { sk } from "./scenes.js";

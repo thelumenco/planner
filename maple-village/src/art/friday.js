@@ -1,5 +1,5 @@
 // Friday evenings (round 112): the bonfire (the firepit at home, made bigger on a Friday night), the fishmonger's van; and the kite
-// on the field. Lanterns rising over the sea are drawn by core.js (lanternFlight) when Mel releases them.
+// on the field. Lanterns rising over the sea are drawn by core.js (lanternFlight) when the player releases them.
 import { ink } from "../util.js";
 import { sk, tapeLabel } from "./scenes.js";
 import { lampGlow } from "./village-extras.js";
@@ -19,7 +19,7 @@ export function fishVanArt(x, y){
     <text x="${x - 6}" y="${y - 30}" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="7.4" fill="#3E6BAE" pointer-events="none">SAL'S FISH</text>
     ${tapeLabel(x, y + 20, "Fishmonger", "#C3DDF3", 10)}</g>`;
 }
-// a kite up in the sky over the field: the string runs down to where Mel's standing (sx, sy)
+// a kite up in the sky over the field: the string runs down to where the player's standing (sx, sy)
 export function kiteArt(sx, sy){
   const kx = sx - 70, ky = sy - 190;
   return `<g pointer-events="none" class="kitefly"><path d="M${sx + 6} ${sy - 40} Q${sx - 40} ${sy - 140} ${kx} ${ky + 20}" fill="none" style="stroke:#3b3530" stroke-width=".8"/>

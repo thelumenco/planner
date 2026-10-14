@@ -51,7 +51,7 @@ export const VILLAGE = {
   pround: {scene:"vineyard", name:"Roundabout", door:[188,598], spot:true, line:"The roundabout. Round and round and round!"},
   pseesaw:{scene:"vineyard", name:"Seesaw", door:[410,600], spot:true, line:"The seesaw. Up, down, up, down."},
   toOrchard:{scene:"base", name:"Gate to the orchard", door:[26,180], spot:true, bridge:"orchard", mark:[40,120], line:"Along the path to the orchard."},
-  // Ma Ma's orchard, west of home: fruit trees, the farm shop and her cottage; her flower farm is further west
+  // Farid's orchard, west of home: fruit trees, the farm shop and his cottage; Mei's flower farm is further west
   toBaseO:{scene:"orchard", name:"Gate home", door:[498,278], spot:true, bridge:"base", mark:[490,226], line:"Back along the path, home."},
   toFlowers:{scene:"orchard", name:"Gate to the flower farm", door:[22,278], spot:true, bridge:"flowers", mark:[30,226], line:"Through the arch to the flower farm."},
   cottage:{scene:"orchard", name:"Farid and Mei's cottage", short:"Farid and Mei's cottage", door:[132,228], mark:[132,96]},
@@ -99,7 +99,7 @@ export const VILLAGE = {
   boat:   {scene:"shore", name:"Cruise boat", door:[206,550], spot:true, line:"The mooring at the end of the jetty."},
   dolphins:{scene:"shore", name:"Boardwalk bench", door:[214,262], spot:true, line:"A bench looking out to sea. Dolphins come by most mornings."},
   exlawn: {scene:"field", name:"Exercise lawn", door:[452,430], spot:true, line:"The exercise lawn. Hana's class is here most mornings at 8."},
-  // the bay, north of the foreshore up the boardwalk: Mel's ice cream shop (The Scoop Shack) and its deck, and a
+  // the bay, north of the foreshore up the boardwalk: your ice cream shop (The Scoop Shack) and its deck, and a
   // shopfront under renovation
   toBay:  {scene:"shore", name:"Boardwalk north", door:[250,22], spot:true, bridge:"bay", mark:[290,40], line:"Up the boardwalk to the bay and the Scoop Shack."},
   toShoreB:{scene:"bay", name:"Boardwalk to the foreshore", door:[250,622], spot:true, bridge:"shore", mark:[290,560], line:"Down the boardwalk to the foreshore."},
@@ -169,9 +169,9 @@ Object.assign(VILLAGE, TOWN_PLACES);   // the towns' places and gates (towns.js)
 VILLAGE.base = {scene:"(base)", name:"Home base", short:"home base"};
 // Saturday or Sunday, on the local clock
 export const isWeekend = () => [0, 6].includes(new Date(now() + LOC()).getUTCDay());
-// bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
+// bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where the player steps off on the other side
 export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField", hlane:"toStationV"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL", hwoods:"toWoodsM"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF", hfarm:"toFarmN"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl"}, shore:{field:"toFieldS", flowers:"toFlowersS", bay:"toBay"}, bay:{shore:"toShoreB", hfarm:"toFarmB"}, hfarm:{bay:"toBayF", hlane:"hfEast", field:"toFieldH"}, hlane:{hfarm:"toFarmL", village:"toTownL", hwoods:"toWoodsL"}, hwoods:{hlane:"toLaneW", lane:"toMakersW"}, ...TOWN_BRIDGES};
-// where Mel steps off, by "from>to"
+// where the player steps off, by "from>to"
 export const ARRIVE = {"field>hfarm":[260,592], "hfarm>field":[366,76], "village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184], "field>shore":[470,304], "shore>field":[56,300], "flowers>shore":[250,590], "shore>flowers":[56,190], "shore>bay":[250,590], "bay>shore":[250,96], "bay>hfarm":[60,284], "hfarm>bay":[462,374], "hfarm>hlane":[60,560], "hlane>hfarm":[462,560], "hlane>village":[281,170], "village>hlane":[280,590], "hlane>hwoods":[60,330], "hwoods>hlane":[462,186], "lane>hwoods":[330,590], "hwoods>lane":[330,170], ...TOWN_ARRIVE};
 // the next outdoor screen on the way from one to another (screens form a little chain: base - village - lane)
 export function nextHop(from, to){
@@ -181,9 +181,9 @@ export function nextHop(from, to){
   return null;
 }
 export const outdoorOf = s => OUTDOOR.includes(s) ? s : INNER[s] ? outdoorOf(INNER[s].parent) : (VILLAGE[s] ? VILLAGE[s].scene : "village");
-// Rooms inside another room: Mel's room is through the west door of the house, Evan's through the lower east door (the garage is the upper one).
-// door: where Mel steps into the parent room; arrive: where she steps into the inner room; exit: the inner room's
-// own door (on the opposite wall), where she walks to leave.
+// Rooms inside another room: your room is through the west door of the house, the guest room through the lower east door (the garage is the upper one).
+// door: where the player steps into the parent room; arrive: where they step into the inner room; exit: the inner room's
+// own door (on the opposite wall), where they walk to leave.
 export const INNER = {
   room: {parent: "home", door: [64, 340], arrive: [456, 400], exit: [486, 410]},
   kidroom: {parent: "home", door: [456, 512], arrive: [70, 420], exit: [34, 410]},
@@ -210,7 +210,7 @@ export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,5
 // picked for a quest (the market counter, the library's digest shelf).
 // Tall pieces (shelves, boards, cabinets, the phone booth) and wall desks stand against the back wall, which meets
 // the floor at y≈165: their front edge sits at 165 + their height. Tables, sofas and baskets stay out on the floor.
-// station: [id, name, slot, furniture, keyword regex, line, standDy?]  (standDy: where Mel stands, relative to the front edge; default +42)
+// station: [id, name, slot, furniture, keyword regex, line, standDy?]  (standDy: where the player stands, relative to the front edge; default +42)
 export const ROOMS = {
   hall:  {name:"Town hall", wall:"#E6E9F5", trim:"var(--peri)", pos:{A:[448,262], B:[110,258], C:[420,474], D:[316,266], E:[118,474], R:[40,362], W:[268,420]}, stations:[
     ["trophydoor","Courtyard","R","trophydoor",null,"Out to the courtyard: trophies, a notice board, a bench in the sun.",0],
@@ -252,8 +252,8 @@ export const ROOMS = {
     ["scales","Stamps & scales","C","scales",/invoice|pay|bill|stripe|account|bank|receipt|expense|price/,"Weigh it, stamp it, send it."],
     ["ledge","Writing ledge","D","desk",/./,"A tidy little ledge for odd jobs."],
     ["pobox","Post box","E","pobox",null,"Your post box: unread mail from your work inbox."]]},
-  // Evan's door is on the east wall (opposite Mel's), so Darren's desk sits where the laundry was and the basket
-  // moved down beside the cleaning cupboard: the walk from the exit to either door stays clear.
+  // the guest room's door is on the east wall (opposite yours), and the basket sits down beside the cleaning
+  // cupboard: the walk from the exit to either door stays clear.
   // the living room: the family dining table in the middle, the sofa, kitchen and fridge along the back, and four doors:
   // Your room (left, top), the home office (left, below it), the garage (right, top), the guest room (right, below it)
   home:  {name:"Home", wall:"#F8EED8", trim:"var(--butter)", pos:{X:[260,452], C:[130,250], B:[436,228], H:[334,250], R:[40,330], K:[480,512], O:[40,512], Q:[480,330]}, stations:[
@@ -265,13 +265,13 @@ export const ROOMS = {
     ["gdoor","Garage","Q","garagedoor",null,"Through to the garage.",0],
     ["fridge","Fridge","H","fridge",null,"The fridge: what we have, and the shopping list."],
     ["dine","Dining table","X","dining:home",null,"The round table. Squeeze in: there's always room for one more.",44]]},
-  // the home office, through the lower door on the living room's west wall: Mel's desk, Darren's desk, the treadmill
+  // the home office, through the lower door on the living room's west wall: your desk, the spare desk, the treadmill
   office: {name:"Home office", wall:"#EEF1E6", trim:"var(--sage)", noBoard:true, pos:{A:[140,262], K:[300,261], G:[420,330], F:[120,540]}, stations:[
     ["desk","Home desk","A","desk",/./,"Your own little desk."],
     ["obooks","Bookshelf","K","bookcase",null,"Files, notebooks, and one surviving plant.",34],
     ["office","Spare desk","G","office",null,"The spare desk. A good place for a guest to write postcards."],
     ["treadmill","Treadmill","F","treadmill",null,"1.2 and go. A gentle walk.",-12]]},
-  // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
+  // Your own room, through the door on the west wall of the house. Just you (and the pet): no quests, no visitors.
   room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[262,300], W:[262,206], B:[72,262], E:[62,396], C:[66,500], D:[434,556], J:[260,594], N:[406,132]}, stations:[
     ["routines","My routines","N","routineboard",null,"Your routines, pinned up.",74],
     ["bed","Bed","A","bed",null,"Your bed. Fluffy pillows, cool sheets."],
@@ -304,7 +304,7 @@ export const ROOMS = {
     ["vault0","","V0","vaultjar",null,"",40], ["vault1","","V1","vaultjar",null,"",40], ["vault2","","V2","vaultjar",null,"",40],
     ["vault3","","V3","vaultjar",null,"",40], ["vault4","","V4","vaultjar",null,"",40],
     ["counter","Counter","C","bankcounter",null,"Opal's counter. Your passbook's here.",30]]},
-  // The wine shop in the vineyard: shelves of Mel's wines, the counter (stand behind it to serve), the honesty box
+  // The wine shop in the vineyard: shelves of your wines, the counter (stand behind it to serve), the honesty box
   // and the tasting room's little tables
   wineshop: {name:"The wine shop", wall:"#F4E6D6", trim:"#8E2C48", noBoard:true, pos:{S:[92,238], C:[330,318], H:[206,318], T:[340,520], K:[480,390], M:[465,128], Z:[40,400], G:[480,556], W:[182,232], Y:[40,556]}, stations:[
     ["tdoor","Terrace","G","glassdoor",null,"The glass doors out to the terrace.",0],
@@ -325,14 +325,14 @@ export const ROOMS = {
     ["larder","Larder","L","larder",null,"The larder. Everything you've sent to the kitchen.",30],
     ["stove","Stove","P","stove",null,"The stove. Small plates and today's tapas.",30],
     ["press","Cheese press","C","cheesepress",null,"The cheese press. Goat's milk in, cheese out.",30]]},
-  // Ma Ma's cottage in the orchard: one cosy room with her bed, the TV, a little kitchenette and the tea table
+  // Farid's cottage in the orchard: one cosy room with his bed, the TV, a little kitchenette and the tea table
   cottage: {name:"Farid and Mei's cottage", wall:"#F6E7D7", trim:"#C2505F", noBoard:true, pos:{R:[40,330], T:[420,250], K:[276,262], C:[110,560], X:[320,470]}, stations:[
     ["bedroom","Bedroom","R","bedroomdoor",null,"Farid and Mei's rooms. Two doors, two very different kinds of tidy.",0],
     ["tv","TV","T","tv",null,"Her dramas. Nobody touches the remote.",30],
     ["kitchenette","Kitchenette","K","kitchenette",null,"The kettle's always warm in here.",30],
     ["tea","Tea table","C","teatable",null,"Tea and cake with Farid, at three.",34],
     ["dine","Dining table","X","dining:cottage",null,"Farid's farmhouse table. He cooks for twenty, every time.",44]]},
-  // Mum and Dad's house on the foreshore: Dad's piano, double bass and easel, Mum's exercise mat, the kitchen table
+  // Hana and Theo's house on the foreshore: Theo's piano, double bass and easel, Hana's exercise mat, the kitchen table
   hanatheo: {name:"Hana and Theo's", wall:"#EAF2F5", trim:"#3E6B8C", noBoard:true, pos:{P:[112,250], B:[232,262], E:[376,290], Y:[110,392], X:[270,500], R:[480,330]}, stations:[
     ["bedroom","Bedroom","R","bedroomdoor",null,"Hana and Theo's room.",0],
     ["piano","Piano","P","piano",null,"Theo's piano. He's been working on the same song all week.",42],
@@ -340,7 +340,7 @@ export const ROOMS = {
     ["easel","Easel","E","easel",null,"Theo's sketches: the jetty, the dolphins, and Hana (twice).",34],
     ["mat","Hana's mat","Y","yogamat",null,"Hana's mat. Pilates, Zumba, Piloxing: she does them all.",26],
     ["dine","Dining table","X","dining:hanatheo",null,"The glass table, with cushions on every chair. There's always food on it. Take some home.",44]]},
-  // Marcus and Angellina's: the games corner, Angellina's study desk and psychology books, the sofa
+  // Tomi and Posy's: the games corner, Posy's study desk and psychology books, the sofa
   // Auntie Lin and Juniper share the little green cottage by the flower-farm gate (Ada and Idris have their old houses
   // on Makers' Lane for the shops): seed trays and a telescope, one sofa, two cushions, one teapot
   linjun: {name:"Lin and Juniper's", wall:"#F2F5EA", trim:"#5E8A48", noBoard:true, pos:{S:[120,262], T:[420,262], B:[270,262], P:[130,520], X:[360,470], R:[480,340]}, stations:[
@@ -421,7 +421,7 @@ export const ROOMS = {
     ["grinder","Stone grinder","G","grinder",null,"The stone grinder: roasted beans in, chocolate out.",30],
     ["slab","Marble slab","M","slab",null,"The marble slab, for tempering.",30],
     ["moulds","Moulds","O","moulds",null,"Bar moulds.",30]]},
-  // the garage (a big goal): Darren's workbench, storage, the scooter and the car once they're bought
+  // the garage (a big goal): the workbench, storage, the scooter and the car once they're bought
   garage: {name:"The garage", wall:"#E3E6EA", trim:"#8FA3B8", noBoard:true, pos:{W:[130,250], E:[300,262], K:[436,261], C:[310,480], D:[120,566], S:[440,566]}, stations:[
     ["gbench","Workbench","W","bench",null,"Your tools, all hung up on the wall. Mostly.",34],
     ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Hestia's chores live in here."],
@@ -429,7 +429,7 @@ export const ROOMS = {
     ["laundry","Laundry corner","D","laundry",/fold|laundry|clothes|wash|iron/,"Fold, stack, done."],
     ["scooter","Scooter","S","scooterbay",null,"The scooter's spot.",30],
     ["car","Car","C","carbay",null,"The car's spot.",30]]},
-  // the cellar door (a big goal): Mel's wine wall, the tasting bar, barrel racks, a high table
+  // the cellar door (a big goal): your wine wall, the tasting bar, barrel racks, a high table
   // round 178: the gift shop, through the wine shop's bottom-left door (game/giftshop.js): shared stock from the other shops
   giftshop: {name:"The gift shop", wall:"#F6EEE6", trim:"#C9A3E0", noBoard:true, pos:{A:[110,262], B:[262,262], C:[414,262], D:[110,500], E:[300,470], F:[320,592], G:[262,150], H:[446,594], I:[176,600]}, stations:[
     ["gcase","Bonbon case","A","bonboncase",null,"A little case of bonbons, from the Cocoa Room's trays.",36],
@@ -449,7 +449,7 @@ export const ROOMS = {
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };
-// Maple's basket sits beside Mel's bed, wherever the bed is
+// the pet's basket sits beside your bed, wherever the bed is
 export const MAPLE_BED = [ROOMS.room.pos.A[0] + 110, ROOMS.room.pos.A[1] + 6];
 export function stationsOf(scene){
   const r = ROOMS[scene]; if (!r) return [];

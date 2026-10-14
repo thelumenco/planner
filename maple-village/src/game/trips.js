@@ -35,8 +35,8 @@ export function endTrip(F){ if (F.trip && !F.trip.done) F.trip.done = true; }
 // (a getter: the save can be swapped for a fresher copy from the cloud)
 export function initTrips(getF){ setAway(day => { const F = getF(); return F ? awayOn(F, day) : []; }); }
 
-// A party member's slot while the trip's on: wherever Mel is in the town (or the station, if she's not there yet),
-// near their favourite spot on that screen. Not in Honeybrook at all, including while Mel's on the train.
+// A party member's slot while the trip's on: wherever the player is in the town (or the station, if they're not there yet),
+// near their favourite spot on that screen. Not in Honeybrook at all, including while the player's on the train.
 export function tripSlot(F, id, day, hm, melScene){
   const t = tripOn(F, day); if (!t || !t.party.includes(id) || hm < t.from) return null;
   const T = TOWNS[t.town], scene = townOf(melScene) === t.town ? melScene : t.by === "ferry" && T.ferry ? T.ferry.arrive[0] : T.arrive[0], spots = (T.spots[id] || {})[scene] || ((T.rooms || {})[scene] || {}).party;   // (inside, the room's own spots)

@@ -70,7 +70,7 @@ const torii = (x, y, w = 40, h = 46, col = C.vermilion) => sk(`<rect x="${x - w/
 const gate = (id, x, y, label, lx, ly, aria, col = "#F6E3B4") => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="26" ry="20" style="fill:var(--butter)"/>
   ${sk(`<rect x="${x - 18}" y="${y - 30}" width="6" height="40" style="fill:${C.timber2}"/><rect x="${x + 12}" y="${y - 30}" width="6" height="40" style="fill:${C.timber2}"/><path d="M${x - 26} ${y - 30} q26 -10 52 0 v5 h-52z" style="fill:${C.roof}"/>`,
     `<rect x="${x - 18}" y="${y - 30}" width="6" height="40"/><rect x="${x + 12}" y="${y - 30}" width="6" height="40"/><path d="M${x - 26} ${y - 30} q26 -10 52 0 v5 h-52z"/>`)}${lab(lx, ly, label, col, 11)}</g>`;
-// a place with a tap target and a label (the round-1 spots: a line when Mel walks up)
+// a place with a tap target and a label (the round-1 spots: a line when the player walks up)
 const place = (id, x, y, rx, ry, aria, body, label, lx, ly, col) => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>${body}${label ? lab(lx, ly, label, col, 10) : ""}</g>`;
 // stone flags for a lane
 const flags = (pts, w = 40) => `<g filter="url(#wob)"><path d="${pts}" fill="none" style="stroke:${C.stone}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/><path d="${pts}" fill="none" style="stroke:${C.stone2}" stroke-width="${w - 4}" stroke-dasharray="10 12" stroke-linecap="butt" opacity=".35"/></g>`;

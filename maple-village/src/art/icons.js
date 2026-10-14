@@ -133,7 +133,7 @@ I.sprinkler = [`<circle cx="12" cy="17" r="3" ${f(C.stone)}/>`, `<circle cx="12"
 I.seeder = [`<path d="M7 5h10l-2 7h-6z" ${f(C.water)}/><circle cx="12" cy="17" r="3.5" ${f(C.wood)}/>`, `<path d="M7 5h10l-2 7h-6zM12 12v1.5M15 12l5 -8"/><circle cx="12" cy="17" r="3.5"/><circle cx="12" cy="17" r=".6"/><circle cx="5" cy="20" r=".6"/><circle cx="7.5" cy="21" r=".6"/>`];
 I.fertiliser = [`<path d="M6 7c0-2 12-2 12 0l1 12c0 2-14 2-14 0z" ${f("#E8D9B8")}/><path d="M9 12c1-2 5-2 6 0c-1 2-5 2-6 0z" ${f(C.moss)}/>`, `<path d="M6 7c0-2 12-2 12 0l1 12c0 2-14 2-14 0zM6 7c2 1 10 1 12 0M12 12v3M9 12c1-2 5-2 6 0c-1 2-5 2-6 0z"/>`];
 I.harvester = [`<path d="M4 9h16l-2 7h-12z" ${f(C.wood)}/><circle cx="7" cy="9" r="2" ${f("#D9433F")}/><circle cx="11" cy="8" r="2" ${f(C.moss)}/><circle cx="15" cy="9" r="2" ${f("#E8913A")}/>`, `<path d="M4 9h16l-2 7h-12zM20 9l2 -4M6 12h12"/><circle cx="8" cy="19" r="2"/><circle cx="16" cy="19" r="2"/>`];
-// gifts for Marcus and Angellina (Hana's Family tab)
+// gifts for Tomi and Posy
 I.protbar = [`<rect x="3" y="9" width="18" height="7" rx="2" ${f("#9CC27E")}/><rect x="8" y="9" width="8" height="7" ${f("#FFFDF6")}/>`, `<rect x="3" y="9" width="18" height="7" rx="2"/><path d="M8 9v7M16 9v7M10 12.5h4"/>`];
 I.jerky = [`<path d="M5 5c4-1 9 0 12 3s3 9 1 11-9 0-12-3-4-10-1-11z" ${f("#9A4A32")}/>`, `<path d="M5 5c4-1 9 0 12 3s3 9 1 11-9 0-12-3-4-10-1-11z"/><path d="M8 9c2 1 4 3 5 6M11 7c2 1 4 3 5 6" opacity=".6"/>`];
 I.chickenbox = [`<rect x="3" y="8" width="18" height="11" rx="2" ${f("#2F2B28")}/><rect x="5" y="10" width="7" height="7" rx="1" ${f("#FFFDF6")}/><rect x="13" y="10" width="6" height="7" rx="1" ${f("#E8A65A")}/>`, `<rect x="3" y="8" width="18" height="11" rx="2"/><rect x="5" y="10" width="7" height="7" rx="1"/><rect x="13" y="10" width="6" height="7" rx="1"/>`];
@@ -210,7 +210,7 @@ I.tanghulu = [`${[6, 10, 14].map(y => `<circle cx="12" cy="${y}" r="3" ${f("#E85
 I.eggwaffle = [`<path d="M5 5c6-2 12 1 14 6s-2 9-7 9-8-3-8-8 0-6 1-7z" ${f("#F3C969")}/>`, `<path d="M5 5c6-2 12 1 14 6s-2 9-7 9-8-3-8-8 0-6 1-7z"/>${[[8, 9], [12, 8], [15, 11], [9, 13], [13, 14], [11, 17]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.4"/>`).join("")}`];
 I.sugarcane = [`<path d="M7 6h10l-1.2 14H8.2z" ${f("#D8E8A8")}/>`, `<path d="M7 6h10l-1.2 14H8.2zM12 6l3-4"/><path d="M5 20l3-16M4 9h3M4 14h3" stroke="#7FA35A"/>`];
 I.grassjelly = [`<path d="M7 7h10l-1.2 13H8.2z" ${f("#3A3230")}/><path d="M7.5 10h9" ${f("#FFFDF6")}/>`, `<path d="M7 7h10l-1.2 13H8.2zM6.5 7h11M13 7l2-5"/>`];
-// gifts for Evan and Darren
+// more gift icons
 I.icecream = [`<path d="M8.5 11h7L12 21z" ${f("#E8C48E")}/><circle cx="12" cy="8.5" r="4" ${f(C.blush)}/><circle cx="9.5" cy="10" r="2.4" ${f(C.paper)}/>`, `<path d="M8.5 11h7L12 21zM10 13.5l3.6 3M14 13.5l-3.4 3"/><path d="M8.2 10.6A4 4 0 1 1 15.8 10.6"/><circle cx="9.5" cy="10" r="2.4"/>`];
 I.balloon = [`<ellipse cx="12" cy="9" rx="5.5" ry="6.5" ${f("#E8574C")}/>`, `<ellipse cx="12" cy="9" rx="5.5" ry="6.5"/><path d="M11 15.5h2l-1 1.5zM12 17c-1 1.5 1 2.5 0 5"/><path d="M9.5 6.5c.5-1.2 1.4-1.8 2.4-2" opacity=".6"/>`];
 I.wand = [`<circle cx="15" cy="7" r="4" ${f("#D8ECF6")}/><circle cx="7" cy="6" r="2" ${f("#D8ECF6")}/>`, `<circle cx="15" cy="7" r="4"/><circle cx="15" cy="7" r="2.2"/><path d="M12.5 10l-6 10"/><circle cx="7" cy="6" r="2"/><circle cx="19.5" cy="14" r="1.3"/>`];
@@ -280,7 +280,7 @@ I.coop = [`<path d="M3 11l9-7 9 7z" ${f(C.rose)}/><rect x="5" y="11" width="14" 
   `<path d="M3 11l9-7 9 7"/><rect x="5" y="11" width="14" height="9"/><rect x="10" y="14" width="4" height="6"/><path d="M14 20l5 2.5"/>`];
 I.dog = [`<ellipse cx="10" cy="15" rx="7" ry="4.5" ${f("#E3B07A")}/><circle cx="17" cy="10" r="4" ${f("#E3B07A")}/><path d="M14.5 7.5c-1.5 0-2.5 2-2 4.5 1.2-.3 2-1.5 2-4.5z" ${f("#A9744A")}/>`,
   `<ellipse cx="10" cy="15" rx="7" ry="4.5"/><circle cx="17" cy="10" r="4"/><path d="M14.5 7.5c-1.5 0-2.5 2-2 4.5 1.2-.3 2-1.5 2-4.5zM3.5 13c-1.5-1-2-2.5-1.5-4M6 19v2.5M13 19v2.5"/><circle cx="18" cy="9.4" r=".7"/><path d="M21 11h.1"/>`];
-// Mel's room and things she wears
+// your room and things you wear
 I.mirror = [`<ellipse cx="12" cy="10" rx="6.5" ry="7.5" ${f("#DCE8F4")}/><rect x="5" y="18" width="14" height="3" rx="1" ${f(C.wood)}/>`, `<ellipse cx="12" cy="10" rx="6.5" ry="7.5"/><path d="M12 17.5v1M5 18h14v3H5zM9.5 7.5l3-3" />`];
 I.throw = [`<path d="M4 6h16v13H4z" ${f(C.blush)}/>`, `<path d="M4 6h16v13H4zM8 6v13M12 6v13M16 6v13M4 19l-1 2M8 19l-1 2M12 19l-1 2M16 19l-1 2M20 19l-1 2"/>`];
 I.candle = [`<rect x="9" y="10" width="6" height="11" rx="1.5" ${f(C.paper)}/><path d="M12 9c-2-2.5-1.5-4.5 0-6.5 1.5 2 2 4 0 6.5z" ${f("#F6A23A")}/>`, `<rect x="9" y="10" width="6" height="11" rx="1.5"/><path d="M12 9c-2-2.5-1.5-4.5 0-6.5 1.5 2 2 4 0 6.5zM12 10v-1"/>`];
@@ -289,7 +289,7 @@ I.scarf = [`<path d="M5 6c4 3 10 3 14 0l-1 4c-4 2-8 2-12 0z" ${f(C.peri2)}/><pat
 I.sunhat = [`<ellipse cx="12" cy="15" rx="10" ry="3.5" ${f("#F3DFA6")}/><path d="M7 15c0-7 10-7 10 0z" ${f("#F3DFA6")}/>`, `<ellipse cx="12" cy="15" rx="10" ry="3.5"/><path d="M7 15c0-7 10-7 10 0z"/><path d="M7 13.5h10" stroke-width="2" style="stroke:#8E2C48"/>`];
 I.pyjamas = [`<path d="M6 4h12l2 6-3 1v10H7V11l-3-1z" ${f("#3B4A86")}/>`, `<path d="M6 4h12l2 6-3 1v10H7V11l-3-1zM12 5v16M10 4l2 3 2-3"/><circle cx="12" cy="10" r=".6"/><circle cx="12" cy="14" r=".6"/>`];
 I.base = I.sprout;   // quests outdoors at home base
-// Gifts for Ma Ma and Gong Gong: nyonya kueh, a mooncake, bird's nest, chicken essence
+// Gifts for Farid and Mei: nyonya kueh, a mooncake, bird's nest, chicken essence
 I.kuehlapis = [`<rect x="5" y="8" width="14" height="11" rx="1.5" ${f("#E8566C")}/>${[10.5, 13, 15.5].map(y => `<rect x="5" y="${y}" width="14" height="1.3" ${f("#F6E3C6")}/>`).join("")}`, `<rect x="5" y="8" width="14" height="11" rx="1.5"/><path d="M5 10.5h14M5 13h14M5 15.5h14" opacity=".5"/>`];
 I.ondeh = [`<circle cx="8" cy="14" r="4" ${f("#7FB069")}/><circle cx="16" cy="14" r="4" ${f("#7FB069")}/><circle cx="12" cy="8.5" r="4" ${f("#7FB069")}/>${[[7, 13], [15, 13], [11, 7.5]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".7" ${f(C.paper)}/>`).join("")}`, `<circle cx="8" cy="14" r="4"/><circle cx="16" cy="14" r="4"/><circle cx="12" cy="8.5" r="4"/>`];
 I.angku = [`<path d="M4 13c0-4 4-7 8-7s8 3 8 7-4 6-8 6-8-2-8-6z" ${f("#E8434E")}/><path d="M4 18h16" ${f("none")}/>`, `<path d="M4 13c0-4 4-7 8-7s8 3 8 7-4 6-8 6-8-2-8-6z"/><path d="M8 12q4-3 8 0M9 15q3 2 6 0" opacity=".6"/><path d="M3 19.5h18"/>`];
@@ -414,7 +414,7 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
   Object.entries(TOWN_GOODS).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   // round 196: the makers' shelf in the gift shop (game/gallery.js)
   [["mk_cards", "tile", "#FFFDF6", "#F4C7CF"], ["mk_spoon", "disc", "#C9A27E", "#8A5A3A"], ["mk_pettoy", "tile", "#C3CDEE", "#F4C7CF"], ["mk_bird", "bird", "#C9A27E"], ["mk_honeybutter", "jar", "#F3D98A", "#FFFDF6"], ["mk_wraps", "cloth", "#F6E3A1", "#9EBE8C"]].forEach(([id, sh, a, b]) => { if (!I[id]) I[id] = (S[sh] || S.box)(a, b); });
-  // round 132: what Mel makes in the loft (game/loft.js)
+  // round 132: what you make in the loft (game/loft.js)
   [["w_raisin", "bottle", "#C98A2E", "#5A3A2E"], ["limoncino", "bottle", "#F3D34A", "#FFFDF6"], ["anchovy_salt", "jar", "#9FC3D9", "#F3ECDD"]].forEach(([id, sh, a, b]) => { if (!I[id]) I[id] = (S[sh] || S.box)(a, b); });
   I.wine_tempranillo = S.bottle("#5A1630"); I.wine_pinot = S.bottle("#8A2E3E"); I.wine_chardonnay = S.bottle("#E8C96A");
 }

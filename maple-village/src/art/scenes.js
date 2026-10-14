@@ -788,7 +788,7 @@ export function roomArt(id){
     return h;
   }
   if (id === "room") {
-    // Maple's bed (she sleeps in it while you're in here), the door back to the house on the east wall, and night
+    // the pet's bed (it sleeps in it while you're in here), the door back to the house on the east wall, and night
     const sl = G.S && G.S().sleep;
     const cosy = !!(G.F().decor || {}).bed;   // the market's "cosy bed" upgrades the pet basket: plush rim, cushion and a heart
     const [mx, my] = MAPLE_BED;

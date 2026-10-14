@@ -266,7 +266,7 @@ export const PEP = ["You don't have to feel ready. You just have to open it.", "
   "You've done harder things than this before lunch.", "Start messy. Tidy later. That's allowed.", "I'll be right here. Go on."];
 export const YAY = ["Quest complete! ✨", "Look at you go!", "Done! Happy {kind} wiggle.", "Quest done. Proud of you, properly."];
 
-// From the orchard and flower farm: fruit (food Maple can eat, or stock for the wine shop's fruit crate), bouquets
+// From the orchard and flower farm: fruit (food the pet can eat, or stock for the wine shop's fruit crate), bouquets
 // (give one to anybody in the village) and potted flowers (set one in a pot spot: home, the wine shop, your room).
 const capi = s => s[0].toUpperCase() + s.slice(1);
 const FRUIT_SAY = {cherry: "Cherries! I'll save you the stones.", lemon: "A lemon? *sniff* *sneeze* Fresh!", peach: "Fuzzy and sweet. Farid grew this!", mango: "Mango! Sticky chin, happy {kind}.",

@@ -1,12 +1,12 @@
 // The orchard (fruit trees) and the flower farm (flower beds and bushes), west of home through the gate at the top
-// left. Mel buys and plants; Ma Ma waters, tends and picks. Everything is seasonal: a tree or flower only lives in its
+// left. The player buys and plants; Farid waters, tends and picks. Everything is seasonal: a tree or flower only lives in its
 // own seasons, and when the season turns it fades and the spot needs replanting (storybook seasons, see items.js).
 //   Trees:   a sapling grows for a day, its first fruit ripens 12 hours later, then there's fruit again every day.
 //   Beds:    seedlings grow for 12 hours, flower, are cut, and bloom again 16 hours later.
 //   Bushes:  grow for a day, flower, and bloom again every day.
-// Ma Ma picks whatever's ripe between 7am and 7pm and puts it in the farm shop. Villagers buy from the shop (Ma Ma
-// keeps the takings in a tin and hands them over when Mel visits), and Mel can take anything for herself: fruit,
-// bouquets (3 stems) and potted flowers (2 stems). If the shop's out, she can buy them for a few coins.
+// Farid picks whatever's ripe between 7am and 7pm and puts it in the farm shop. Villagers buy from the shop (Farid
+// keeps the takings in a tin and hands them over when you visit), and you can take anything for yourself: fruit,
+// bouquets (3 stems) and potted flowers (2 stems). If the shop's out, you can buy them for a few coins.
 import { H } from "../util.js";
 
 export const TREE_GROW = 24*H, TREE_FIRST = 12*H, TREE_AGAIN = 24*H;
@@ -24,7 +24,7 @@ export const TREES = {
   fig:       {n: "Fig tree", fruit: "fig", fn: ["fig", "figs"], seasons: ["autumn"], price: 35, yield: 3, sell: 5, col: "#7A4A6E"},
   orange:    {n: "Orange tree", fruit: "orange", fn: ["orange", "oranges"], seasons: ["winter"], price: 25, yield: 4, sell: 3, col: "#F08A3C"},
   persimmon: {n: "Persimmon tree", fruit: "persimmon", fn: ["persimmon", "persimmons"], seasons: ["winter"], price: 35, yield: 3, sell: 5, col: "#E8743B"},
-  // round 129: Ma Ma brings a sapling home from Jeju (if she went); only then can the orchard grow them (unlock)
+  // round 129: Farid brings a sapling home from Jeju (if he went); only then can the orchard grow them (unlock)
   tangerine: {n: "Tangerine tree", fruit: "tangerine", fn: ["tangerine", "tangerines"], seasons: ["autumn", "winter"], price: 30, yield: 4, sell: 3, col: "#F29A2E", unlock: "jeju"}
 };
 // a tree that has to be unlocked first (the tangerine: F.jeju.sapling)
@@ -52,7 +52,7 @@ export const BED_YIELD = 3, BUSH_YIELD = 4;
 export const TREE_ROWS = [372, 462, 552], TREE_XS = [110, 210, 310, 410];
 export const BUSH_Y = 236, BED_ROWS = [340, 428, 516], FLOWER_XS = [110, 210, 310, 410];
 
-// Spots a potted flower can go (Mel picks one when she places a pot from her backpack)
+// Spots a potted flower can go (the player picks one when placing a pot from the backpack)
 export const POT_SPOTS = {
   window: {n: "the window box at home", scene: "base"},
   basket: {n: "the hanging basket by your door", scene: "base"},

@@ -67,7 +67,7 @@ function squareScreen(){
 }
 function lanesScreen(){
   const fronts = [[30, "#F3E3C3", "#C8643B"], [130, "#E8D9B8", "#3E6B8C"], [460, "#E8D9B8", "#E8A0B4"]].map(([x, wall, door]) => stoneHouse(x, 130, 70, 100, {wall, door, wins: [35], arch: true, doorX: 35})).join("")
-    // round 183: the shop with the green door: À VENDRE, then Mel's paperie, with sheets in the window
+    // round 183: the shop with the green door: À VENDRE, then your paperie, with sheets in the window
     + place("bvhpaper", 415, 252, 40, 10, "The paperie", stoneHouse(380, 130, 70, 100, {wall: "#F3D9C0", door: "#5E7A4E", wins: [35], arch: true, doorX: 35, sign: paperOwned() ? "PAPETERIE" : "À VENDRE"})
       + (paperOwned() ? g(`<rect x="366" y="160" width="10" height="13" fill="#F2C4C4" stroke="#3a2e28" stroke-width=".5"/><rect x="368" y="176" width="10" height="13" fill="#C6D6B2" stroke="#3a2e28" stroke-width=".5"/>`) : ""));
   const ramparts = place("bvhramparts", 300, 262, 46, 10, "The ramparts", g(sk(`<rect x="240" y="200" width="120" height="50" style="fill:#D9C49A"/>${[0, 1, 2, 3, 4].map(i => `<rect x="${242 + i*24}" y="188" width="14" height="14" style="fill:#D9C49A"/>`).join("")}`, `<rect x="240" y="200" width="120" height="50"/>`) + `<path d="M240 220 h120 M240 236 h120" stroke="#C4B48E" stroke-width="1.4"/>`), "Ramparts", 300, 284, "#F6E3B4");

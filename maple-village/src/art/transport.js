@@ -1,5 +1,5 @@
 // Getting about: bike hire racks (game/transport.js) and the river taxi's stops (a little jetty with a striped post),
-// plus the bicycle itself, drawn under Mel or a villager.
+// plus the bicycle itself, drawn under the player or a villager.
 import { sk, tapeLabel } from "./scenes.js";
 
 

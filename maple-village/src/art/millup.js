@@ -1,6 +1,6 @@
-// Upstairs in the old mill (round 154, Mel: "a more detailed second floor: the shop and the workbench, shelves round
-// the walls lined with my products, a corner for workshops, and olive oil tastings like the one I had in Córdoba:
-// bottles down the middle of a long table, little coloured glasses, bread to dip"). Up the wooden stairs from the
+// Upstairs in the old mill (round 154: a more detailed second floor: the shop and the workbench, shelves round
+// the walls lined with your products, a corner for workshops, and olive oil tastings: bottles down the middle of a
+// long table, little coloured glasses, bread to dip). Up the wooden stairs from the
 // press. Whitewashed walls and the old beams; shelves all round the walls filled from the mill's actual stock (oils on
 // the back wall, soaps down the left, lotions down the right); Hazel's counter at the top of the stairs; the workbench
 // and curing rack under the little round window; the tasting table in the middle (cobalt glasses at every place, a

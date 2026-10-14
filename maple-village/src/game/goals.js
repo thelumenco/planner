@@ -2,7 +2,7 @@
 import { bikeOn } from "./transport.js";
 import { trolleyPace } from "./scoop.js";
 //   scooter  gets the player from screen to screen faster (kept in the garage, through the living room's east door)
-//   car      faster still: a cream convertible with room for you and Maple
+//   car      faster still: a cream convertible with room for you and the pet
 //   boat     a dolphin cruise boat moored at the jetty on the foreshore
 //   cellar   a cellar door extension off the wine shop: barrel racks, a tasting bar, the player's wine wall (and a few more visitors)
 // Owned goals live in F.goals; how the player gets about (walk / scooter / car) in F.ride.
@@ -66,7 +66,7 @@ export function garagePanel(F){
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 // The paddleboard jetties: at the foreshore, a paddle about with the dolphins or paddle up the river home; at home,
-// paddle down the river and out to the foreshore (Maple comes too)
+// paddle down the river and out to the foreshore (the pet comes too)
 export function jettyPanel(where, _unused){
   const fam = "Your pet hops on the front of your board.";
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${where === "shore" ? "The paddleboards" : "Your little jetty"}</h2>`;

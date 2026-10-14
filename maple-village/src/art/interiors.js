@@ -97,8 +97,8 @@ const SHELLS = {
     ${skirting}
     ${sk(`<rect x="416" y="340" width="44" height="30" style="fill:#D9B893"/><rect x="424" y="314" width="30" height="26" style="fill:#E8D3B0"/>`, `<rect x="416" y="340" width="44" height="30"/><path d="M438 340 v30 M416 355 h44" opacity=".6"/><rect x="424" y="314" width="30" height="26"/><path d="M439 314 v26" opacity=".6"/>`)}`,
 
-  // Home: warm planks, plus whatever Mel has bought at the market's Home tab (wallpaper, rug, lamp, plant, painting).
-// Maple's cosy bed lives in Mel's room now; Evan's toys in his. The plant sits by the treadmill, clear of both doors.
+  // Home: warm planks, plus whatever you've bought at the market's Home tab (wallpaper, rug, lamp, plant, painting).
+// The pet's cosy bed lives in your room now. The plant sits by the treadmill, clear of both doors.
   home: () => { const d = (artCtx() && artCtx().F().decor) || {};
     return `<rect width="520" height="640" style="fill:#EBDDC6"/>
     <g opacity=".5" style="stroke:#D9C6A8" stroke-width="1.2">${rows(12, i => `<path d="M0 ${170 + i*40} H520"/>`)}${rows(24, i => `<path d="M${(i*97 + (i%3)*40) % 520} ${170 + (i%12)*40} v40"/>`)}</g>
@@ -112,7 +112,7 @@ const SHELLS = {
     ${sk(`<rect x="60" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/><rect x="390" y="34" width="70" height="58" rx="30" style="fill:var(--sky)"/>`, `<rect x="60" y="34" width="70" height="58" rx="30"/><path d="M95 34 v58 M60 66 h70"/><rect x="390" y="34" width="70" height="58" rx="30"/><path d="M425 34 v58 M390 66 h70"/>`)}
     ${skirting}`; },
 
-  // Mel's room: soft carpet, lilac wall with tiny hearts, and whatever she's bought for it in the market
+  // Your room: soft carpet, lilac wall with tiny hearts, and whatever you've bought for it in the market
   room: () => { const d = (artCtx() && artCtx().F().decor) || {};
     return `<rect width="520" height="640" style="fill:#E9DCE2"/>
     <g style="fill:#DCCAD3" opacity=".7">${rows(9, r => rows(14, i => `<circle cx="${i*38 + (r % 2)*19 + 10}" cy="${172 + r*52}" r="1.6"/>`))}</g>
@@ -127,7 +127,6 @@ const SHELLS = {
     ${d.r_vanity ? sk(`<rect x="38" y="584" width="70" height="12" rx="2" style="fill:var(--wood)"/><ellipse cx="73" cy="558" rx="20" ry="26" style="fill:#DCE8F4"/>`, `<rect x="38" y="584" width="70" height="12" rx="2"/><path d="M46 596 v16 M100 596 v16"/><ellipse cx="73" cy="558" rx="20" ry="26"/><path d="M64 544 l8 -8" opacity=".6"/>`) : ""}
     ${skirting}`; },
 
-  // Evan's room: a sunny yellow wall of little dinosaurs, a soft mint carpet, a road play mat, bunting and a train picture
   // the guest room: a soft green room with a floral-dot wallpaper, a striped rug, and a window over the garden
   kidroom: () => `<rect width="520" height="640" style="fill:#DCE6D4"/>
     <g style="fill:#C8D8BC" opacity=".8">${rows(9, r => rows(14, i => `<circle cx="${i*38 + (r % 2)*19 + 10}" cy="${178 + r*52}" r="2.2"/>`))}</g>
@@ -244,8 +243,8 @@ const SHELLS = {
     ${sk(`<path d="M360 40 h130" /><path d="M376 40 q-6 18 0 26 q6 -8 0 -26z M408 40 q-6 18 0 26 q6 -8 0 -26z M440 40 q-6 18 0 26 q6 -8 0 -26z M472 40 q-6 18 0 26 q6 -8 0 -26z" style="fill:#7FA35A"/>`, `<path d="M360 40 h130"/><path d="M376 40 q-6 18 0 26 q6 -8 0 -26z M408 40 q-6 18 0 26 q6 -8 0 -26z M440 40 q-6 18 0 26 q6 -8 0 -26z M472 40 q-6 18 0 26 q6 -8 0 -26z"/>`)}
     ${plant(490, 610, .9)}`,
 
-  // Ma Ma's cottage: warm wooden boards, flowery wallpaper, a window onto the orchard with lace curtains, family
-  // photos on the wall (Mel, Evan), a wall calendar, a crocheted rug by the tea table
+  // Farid's cottage: warm wooden boards, flowery wallpaper, a window onto the orchard with lace curtains,
+  // photos on the wall, a wall calendar, a crocheted rug by the tea table
   cottage: () => `<rect width="520" height="640" style="fill:#C9A27E"/>
     <g opacity=".4" style="stroke:#A7825F" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}${rows(30, i => `<path d="M${(i*71) % 520} ${170 + (i % 13)*36} v36"/>`)}</g>
     <rect width="520" height="150" style="fill:#F6E7D7"/>${wallpaper("flower")}<rect y="138" width="520" height="12" style="fill:#C2505F" opacity=".9"/>${skirting}
@@ -272,7 +271,7 @@ const SHELLS = {
     ${sk(`<path d="M138 40 h24 l-4 10 h-16z M188 24 h24 l-4 10 h-16z" style="fill:#F3C969"/>`, `<path d="M138 40 h24 l-4 10 h-16z M188 24 h24 l-4 10 h-16z"/>`)}
     ${plant(30, 610, 1.1)}${plant(490, 610, 1)}`,
 
-  // Mum and Dad's on the foreshore: pale timber, a big window onto the sea, Dad's framed sketches and a music stand
+  // Hana and Theo's on the foreshore: pale timber, a big window onto the sea, Theo's framed sketches and a music stand
   hanatheo: () => `<rect width="520" height="640" style="fill:#D8C3A0"/>
     <g opacity=".4" style="stroke:#B9A27E" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}${rows(30, i => `<path d="M${(i*83) % 520} ${170 + (i % 13)*36} v36"/>`)}</g>
     ${wallBase("#EAF2F5", "#3E6B8C")}${skirting}
@@ -281,7 +280,7 @@ const SHELLS = {
       `<rect x="30" y="34" width="40" height="32" rx="2"/><path d="M36 58 q8 -14 16 -4 q6 -10 12 2" opacity=".7"/><rect x="84" y="28" width="34" height="44" rx="2"/><circle cx="101" cy="44" r="7" opacity=".7"/><path d="M92 64 q9 -8 18 0" opacity=".7"/><rect x="200" y="40" width="44" height="34" rx="2"/><path d="M206 66 l10 -14 l8 8 l8 -12 l8 18" opacity=".7"/>`)}
     <g filter="url(#wob)">${[96, 70, 44].map((rx, i) => `<ellipse cx="300" cy="420" rx="${rx}" ry="${rx*.42}" style="fill:${["#BFE0EE", "#FFFDF6", "#E8B4C0"][i]}" opacity=".75"/>`).join("")}</g>
     ${plant(490, 610, 1)}${plant(24, 610, .85)}`,
-  // Marcus and Angellina's: soft lilac walls, a gallery wall (their engagement photo), fairy lights, a plant shelf
+  // Tomi and Posy's: soft lilac walls, a gallery wall (their engagement photo), fairy lights, a plant shelf
   tomiposy: () => `<rect width="520" height="640" style="fill:#CDB59A"/>
     <g opacity=".4" style="stroke:#AE9578" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}${rows(30, i => `<path d="M${(i*59) % 520} ${170 + (i % 13)*36} v36"/>`)}</g>
     ${wallBase("#F3ECF7", "#8E5B9A")}${skirting}

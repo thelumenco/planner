@@ -235,7 +235,7 @@ details[open] summary::after{content:"–"}
 .speech[hidden]{display:none}
 /* speech bubbles stay cream paper with dark ink, in dark mode too */
 .speech{--card:#FFFDF6;--ink:#2F2B28;--soft:#8A8279;--navy:#2F3B73;--edge:rgba(120,104,84,.13)}
-#speech,#npcSay,#evanSay{pointer-events:auto;cursor:pointer}
+#speech,#npcSay{pointer-events:auto;cursor:pointer}
 .ch .legL,.ch .legR,.ch .armL,.ch .armR{transform-box:fill-box;transform-origin:50% 0}
 .ch.walk .legL,.ch.walk .armR{animation:swingA .3s ease-in-out infinite alternate}
 .ch.walk .legR,.ch.walk .armL{animation:swingB .3s ease-in-out infinite alternate}

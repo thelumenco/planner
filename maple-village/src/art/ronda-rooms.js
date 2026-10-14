@@ -35,7 +35,7 @@ const barrel = (x, y) => `<g pointer-events="none">${sk(`<path d="M${x - 18} ${y
 // a hanging lamp from the top edge
 const lamp = (x, len, col = "#F6D98A") => `<g pointer-events="none"><path d="M${x} 0 v${len}" style="stroke:#3A3430" stroke-width="1"/><path d="M${x - 9} ${len + 8} q9 -14 18 0z" style="fill:#3A3430"/><circle cx="${x}" cy="${len + 10}" r="4" style="fill:${col}"/><circle cx="${x}" cy="${len + 14}" r="22" style="fill:${col}" opacity=".18"/></g>`;
 
-// edge pieces (round 117, Mel: "more details around the edges"): the middle of each room stays clear, the walls fill up
+// edge pieces (round 117: more details around the edges): the middle of each room stays clear, the walls fill up
 const g = s => `<g pointer-events="none">${s}</g>`;
 // a big potted plant (a palm or a fig) for a corner
 const palm = (x, y) => g(sk(`<path d="M${x - 11} ${y - 18} h22 l-3 18 h-16z" style="fill:#C8643B"/>${[-50, -20, 10, 40, 70].map(a => `<path d="M${x} ${y - 20} q${Math.sin(a*Math.PI/180)*20} -26 ${Math.sin(a*Math.PI/180)*34} -${30 + Math.abs(a)/6}" style="fill:none;stroke:#4F7A3E" stroke-width="6" stroke-linecap="round"/>`).join("")}`, `<path d="M${x - 11} ${y - 18} h22 l-3 18 h-16z"/>`));

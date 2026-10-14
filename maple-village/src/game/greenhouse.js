@@ -3,7 +3,7 @@
 // greenhouse seed packets Hana sells out of season. The misters keep the beds damp, so nothing needs watering.
 // Herbs go to the kitchen (gambas, rosemary potatoes, bruschetta, chive omelette, pumpkin with thyme), the Scoop
 // Shack (basil, mint, rosemary, thyme gelato) and the Cocoa Room (bonbon fillings).
-// Round 155 (Mel): the leafy herbs (basil, mint, rosemary, chives, thyme) live in a row of terracotta pots along the
+// Round 155: the leafy herbs (basil, mint, rosemary, chives, thyme) live in a row of terracotta pots along the
 // glass instead. Plant once; harvesting only takes the leaves and clippings, so the plant stays and grows back (in
 // half the time it took to start). Garlic is a bulb, so it stays in the beds.
 // State: F.gh = {beds: [{crop, seed, plantedAt, bonus} | null] x6, pots: [{crop, plantedAt, bonus, clips, re} | null] x6}

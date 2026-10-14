@@ -1,4 +1,4 @@
-// Sending more than ice cream by the delivery bike (round 139, Mel): from the Scoop Shack's delivery panel, Tomo can
+// Sending more than ice cream by the delivery bike (round 139): from the Scoop Shack's delivery panel, Tomo can
 // also take the family a box of bonbons or a chocolate bar from the Cocoa Room, or a plate of today's tapas or a small
 // plate from the winery. Each uses real stock, and a thank-you note comes back like the ice creams.
 import { esc } from "../util.js";

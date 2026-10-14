@@ -30,8 +30,8 @@ export function millArt(pressing, ready, cr = {}){
     ${sk(`<rect x="128" y="72" width="44" height="58" rx="2" style="fill:#8A6A52"/><rect x="133" y="77" width="34" height="48" style="fill:#E8D3A8"/><path d="M146 118 v-24 l-6 -8 h12 l-6 8" style="fill:#B98F5E"/><path d="M144 86 l-8 -8 M148 86 l8 -8 M144 90 l-8 8 M148 90 l8 8" style="stroke:#8A6A52" stroke-width="2"/><circle cx="160" cy="112" r="4" style="fill:#7A9A4A"/>`, `<rect x="128" y="72" width="44" height="58" rx="2"/><rect x="133" y="77" width="34" height="48"/>`)}</g>`;
   const initials = `<text x="390" y="306" text-anchor="middle" font-family="Klee One,serif" font-size="8" fill="#3A2A1E" opacity=".75" pointer-events="none">T.R. 1912</text>`;
   // round 154: the workbench and the shop went upstairs; wooden stairs up the left wall instead
-  // (round 155, Mel: smaller, on the right) a narrow flight against the right wall, below the press, going up
-  // (round 155, Mel: "a side view of wooden stairs") seen side-on: six treads rising to the right over a solid
+  // (round 155: smaller, on the right) a narrow flight against the right wall, below the press, going up
+  // (round 155: a side view of wooden stairs) seen side-on: six treads rising to the right over a solid
   // stringer, a handrail on turned balusters, and a newel post at the foot
   const X = 336, B = 612, RW = 19, RH = 15, N = 6, top = B - N*RH, prof = `M${X} ${B} ${Array.from({length: N}, (_, k) => `V${B - (k + 1)*RH} H${X + (k + 1)*RW}`).join(" ")} V${B} Z`;
   const stairs = `<g data-millspot="stairs" aria-label="Up the stairs: the Mill Shop, the workbench and the tasting table"><ellipse class="hov" cx="${X + 56}" cy="${B - 4}" rx="66" ry="12" style="fill:var(--butter)"/>

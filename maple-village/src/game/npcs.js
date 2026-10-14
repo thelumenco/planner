@@ -23,7 +23,7 @@ import { townOf, townRoom } from "../data/towns.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const ents = {};            // id -> entity (villagers and the active messenger)
-let api = null, storyT = null;             // see core: scene(), bounds(), mel, evan, F(), S(), save(), facts(), bubble(), openMail(), unreadMail(), evanSays(), gift()
+let api = null, storyT = null;             // see core: scene(), bounds(), mel, F(), S(), save(), facts(), bubble(), openMail(), unreadMail(), gift()
 let courier = null;         // the messenger currently on screen
 let sayer = null, sayT = null;
 const greeted = new Set();  // messengers say hello once, then just tag along quietly
@@ -260,7 +260,7 @@ export function tickNpcs(dt){
     if (e.kind === "npc") e.node.classList.toggle("walk", e.moving);
   });
   const el = $("npcSay");
-  // Next to the player, Maple's bubble owns the space above, so a neighbour's bubble drops below their feet.
+  // Next to the player, the pet's bubble owns the space above, so a neighbour's bubble drops below their feet.
   if (sayer && !el.hidden) api.bubble(el, sayer.x, sayer.y, sayer.kind === "npc" && sayer.def.kid ? 44 : 70, Math.hypot(sayer.x - api.mel.x, sayer.y - api.mel.y) < 90);
 }
 export const npcActors = () => Object.values(ents).map(e => [e.node, e]);

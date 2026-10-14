@@ -1,4 +1,4 @@
-// Lip balms and lip oils (round 187): the tin's lid and the oil take the colour of the flower Mel dyed them with.
+// Lip balms and lip oils (round 187): the tin's lid and the oil take the colour of the flower they were dyed with.
 //   balm_<flower | none>     a little round tin, the lid in the flower's colour, a cream balm inside the rim
 //   lipoil_<flower | none>   a slim roller bottle, the oil tinted the flower's colour (golden if undyed)
 //   beeswax                  a block of beeswax

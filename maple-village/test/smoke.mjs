@@ -197,14 +197,14 @@ if (want("\nhome base: the paper, the shed and the office")) try {
   await page.waitForTimeout(1200);
   await page.screenshot({ path: join(shots, "home-base.png") });
   await page.click('[data-open="settings"]');
-  await page.fill("#paperNameIn", "The Maple Gazette");
+  await page.fill("#paperNameIn", "The Willow Gazette");
   await page.click("#paperSave");
   await page.click("#pclose");
   await page.goto(url + "?seed=1&time=12:45&date=2026-10-10"); await page.waitForTimeout(1200);   // a Saturday: the weekend paper's out
   check(await page.locator("#paperIn").isVisible(), "the weekend paper is sticking out of the letterbox at home");
   await page.locator('#world [data-place="letterbox"]').dispatchEvent("click");
   await page.waitForSelector("#nbPage.news .nmast", { timeout: 15000 });
-  check(await page.locator("#nbTitle").textContent() === "The Maple Gazette", "tapping the letterbox opens the paper, under the name chosen in Settings");
+  check(await page.locator("#nbTitle").textContent() === "The Willow Gazette", "tapping the letterbox opens the paper, under the name chosen in Settings");
   await page.click('#notebook [data-nb="thanks"]');
   await page.waitForTimeout(300);
   check(await page.locator("#paperIn").isHidden(), "once read, the letterbox is empty");
@@ -341,7 +341,7 @@ if (want("\nsaving")) try {
   const k = Object.keys(localStorage).find(k => /^stub:.*\/fox$/.test(k)); const f = JSON.parse(localStorage.getItem(k));
   f.coins = 77; f.inv = Object.assign(f.inv || {}, {carrot: 3}); f.updatedAt = Date.now() - 3600e3; localStorage.setItem(k, JSON.stringify(f));
   Object.keys(localStorage).filter(k => /^fox\./.test(k)).forEach(k => localStorage.removeItem(k)); });
-  await page.goto(url + "?seed=1&nosample=1&sunsama=1&dblag=2000&time=10:30&date=2026-10-05");
+  await page.goto(url + "?seed=1&nosample=1&dblag=2000&time=10:30&date=2026-10-05");
   await page.waitForTimeout(4000);
   const st = await page.evaluate(() => { const k = Object.keys(localStorage).find(k => /^stub:.*\/fox$/.test(k)); return JSON.parse(localStorage.getItem(k)); });
   check(st.coins >= 77 && st.inv.carrot === 3, `a fresh browser loads the cloud save instead of overwriting it (coins ${st.coins})`);
@@ -481,8 +481,8 @@ if (want("\nmy routines")) try {
   await page.click("#ctx .rcheck li >> nth=0"); await page.click("#ctx .rcheck li >> nth=0"); await page.waitForTimeout(200);
   const coins1 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
   check(coins1 - coins0 === (steps - 1) + 8, `each routine step earns a coin and finishing the routine earns an 8-coin bonus, once a day (+${coins1 - coins0})`);
-  await page.click('#ctx [data-rt="sel"]:has-text("Beauty")'); await page.click('#ctx [data-rt="edit"]');
-  check(await page.locator('#ctx [data-day="sun"]').inputValue() === "Air shot micro-needling + face mask", "your beauty week is already on the board");
+  await page.click('#ctx [data-rt="sel"]:has-text("Self-care")'); await page.click('#ctx [data-rt="edit"]');
+  check(await page.locator('#ctx [data-day="sun"]').inputValue() === "An early night", "your self-care week is already on the board");
   await page.click("#ctx .rpaste summary");
   await page.fill("#rtPaste", "Mon: double cleanse\nTue - hair mask\nWednesday: exfoliate\nThu: sheet mask\nFri. nails\nSun: rest");
   await page.click('#ctx [data-rt="paste"]'); await page.waitForTimeout(150);
@@ -748,12 +748,12 @@ if (want("\nstaff, names and the tasting room tables")) try {
   check(await page.locator('#ctx [data-vyhelp]').count() === 5 && await page.locator('#ctx [data-vyhelp="fetch"]').isChecked() === false, "the staff card at the counter has a tick for each helper (fetching from the backpack is off to start)");
   await page.locator('#ctx [data-vyhelp="cook"]').uncheck();
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.help.cook === false), "unticking Pilar sends her home");
-  await page.fill("#vyNameV", "Bay Hill Vines"); await page.fill("#vyNameS", "Hill & Maple's Cellar"); await page.click('#ctx [data-vy="names"]'); await page.waitForTimeout(300);
-  check(/Hill &amp; Maple|Hill & Maple/.test(await page.locator("#sceneName").textContent()), "the wine shop can be renamed");
+  await page.fill("#vyNameV", "Bay Hill Vines"); await page.fill("#vyNameS", "Hill & Willow's Cellar"); await page.click('#ctx [data-vy="names"]'); await page.waitForTimeout(300);
+  check(/Hill &amp; Willow|Hill & Willow/.test(await page.locator("#sceneName").textContent()), "the wine shop can be renamed");
   await page.screenshot({ path: join(shots, "staff-card.png") });
   await page.click('#ctx [data-close]');
   await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(700);
-  check(/Bay Hill Vines/.test(await page.locator("#sceneName").textContent()) && /Hill &amp; Maple|Hill & Maple/.test(await page.locator("#sceneArt").innerHTML()), "and the vineyard too, with the new names on the map");
+  check(/Bay Hill Vines/.test(await page.locator("#sceneName").textContent()) && /Hill &amp; Willow|Hill & Willow/.test(await page.locator("#sceneArt").innerHTML()), "and the vineyard too, with the new names on the map");
   await page.goto(url + "?seed=1&time=19:05&date=2026-10-08"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
   check(await page.locator('#actors [data-npc="farid"].act-sit').count() === 1 && await page.locator('#actors [data-npc="mei"].act-sit').count() === 1 && await page.locator("#actors .act-sit").count() >= 4, "after work Farid and Mei come in for a tasting too");
@@ -1261,7 +1261,7 @@ if (want("\nthe Cocoa Room")) try {
     if (m[1] === "rewind") f.cocoa.at = 1;
     const trays = () => f.cocoa.bonbons.forEach(b => { f.cocoa.trays[b.id] = 12; });
     if (m[1] === "links" || m[1] === "fest" || m[1] === "club") { Object.assign(f.cocoa, {choc: {milk: 40, dark: 40, white: 40}, plan: {...f.cocoa.plan, on: false}}); trays(); }
-    if (m[1] === "links") { f.scoop = {...(f.scoop || {}), up: {...((f.scoop || {}).up || {}), dip: 1}}; f.vine = {...(f.vine || {}), shelf: [{id: "wtest", name: "Maple's Red", type: "red", n: 3, price: 18, open: 0}]}; }
+    if (m[1] === "links") { f.scoop = {...(f.scoop || {}), up: {...((f.scoop || {}).up || {}), dip: 1}}; f.vine = {...(f.vine || {}), shelf: [{id: "wtest", name: "Willow's Red", type: "red", n: 3, price: 18, open: 0}]}; }
     if (m[1] === "club") { f.goals.cellar = 1; f.cocoa.at = Date.parse("2026-11-06T10:00:00Z"); f.cocoa.bars = {milk: 40, dark: 40, white: 40}; }   // well stocked, so the day's shoppers can't sell out before the club arrives
     if (m[1] === "ups") { f.coins = 10000; Object.assign(f.cocoa, {choc: {milk: 40, dark: 40, white: 40}, bars: {milk: 10, dark: 10, white: 10}, roasted: 2, grind: null, ground: null, grind2: null, ground2: null, up: {}, plan: {...f.cocoa.plan, on: false}}); trays(); }
     if (m[1] === "upsrun") { const t0 = +(/t0=(\d+)/.exec(location.search) || [])[1]; Object.assign(f.cocoa, {at: t0, treeAt: t0 - 3*864e5, beans: 0, choc: {milk: 40, dark: 40, white: 40}, bars: {milk: 20, dark: 20, white: 20}}); trays(); }
@@ -2447,7 +2447,7 @@ if (want("\nCinque Terre: the five villages (well, four)")) try {
     check(wrong === "oops" && ct.pestoDone(p) && ct.finishPesto(F, add) && F.inv.pesto === 2 && F.coins === 94 && F.cinque.pestoLesson, "pesto with Nonna Pina: garlic, pine nuts, basil, cheese, oil, in order, pounding each one in (6 coins, two jars, and her secret)");
     const h = ct.harvestStart(() => 0.1); const early = ct.pick(h, 0); h.riding = false; h.ripe.forEach((r, i) => ct.pick(h, i));
     check(early === null && ct.harvestDone(h) && ct.finishHarvest(F, add) === 3 && F.inv.grape_white === 3 && F.cinque.raisin && ct.finishHarvest(F, add) === 0, "the monorail harvest: ride up, pick the ripe bunches, and Signor Bruno gives you three (once a day) and shows you raisin wine");
-    check(!ct.paintBoat(F, "pink", "white", "Stella", add) && !ct.paintBoat(F, "red", "white", "Evan", add) && ct.paintBoat(F, "red", "white", "Stella", add) && F.inv.c_boat === 1 && ct.boatCols(F)[0] === "#C9483A", "painting a boat with Aldo: a red hull, a white stripe, \"Stella\" on the bow, and a little model to keep");
+    check(!ct.paintBoat(F, "pink", "white", "Stella", add) && !ct.paintBoat(F, "red", "white", "Bartholomew", add) && ct.paintBoat(F, "red", "white", "Stella", add) && F.inv.c_boat === 1 && ct.boatCols(F)[0] === "#C9483A", "painting a boat with Aldo: a red hull, a white stripe, \"Stella\" on the bow, and a little model to keep");
     const t = ct.treat(F, ct.GELATO, "basilico"); check(t && F.coins === 91 && F.cinque.treats === 1, "a basil gelato at Gianni's (3)"); }
   { const H = 3600e3, D = 24*H, now = Date.UTC(2026, 9, 12), F = {coins: 0, inv: {grape_white: 4, grape_red: 2, lemon: 3, anchovy: 6, basil: 2, garlic: 1, pinenuts: 1, oliveoil: 1, chz_cheddar: 1}};
     check(!lf.loftOpen(F) && !lf.startBatch(F, "lemon", now), "the drying loft opens after your first trip to Cinque Terre");
@@ -2850,7 +2850,7 @@ if (want("\nBellbird Valley: the Vines (rounds 141-144)")) try {
   const fl = ba.flightStart(() => .3); fl.sights.forEach(([, want]) => { fl.alt = want; ba.flightMove(fl, "hold"); }); fl.alt = 1;
   check(fl.seen.length === 5 && ba.flightLand(fl) === true && ba.finishFlight(F2, fl, add) && F2.inv.b_flight === 1, "a flight: every sight at the right height, a soft landing, a certificate");
   const rd = ba.riddleStart(() => .6); while (!ba.riddleDone(rd)) ba.riddleTap(rd, rd.turns.findIndex(t => t)); check(ba.finishRiddle(F2) && vy.canRiddle(F2), "riddling with Jono, and the rack at home");
-  const V = vy.vineState(F2); V.cellar.push({id: "wfizz", name: "Cuvée Maple", type: "sparkling", n: 6}); check(vy.onRack(F2, "wfizz") && !vy.onRack(F2, "wfizz"), "sparkling onto the riddling rack");
+  const V = vy.vineState(F2); V.cellar.push({id: "wfizz", name: "Cuvée Willow", type: "sparkling", n: 6}); check(vy.onRack(F2, "wfizz") && !vy.onRack(F2, "wfizz"), "sparkling onto the riddling rack");
   V.cellar[0].rack -= 3*24*3600e3; vy.stock(F2, "wfizz"); check(V.shelf[0].price === vy.STYLES.sparkling.price + 6, "three days on the rack: 6 coins more a bottle");
   const be = ba.berriesStart(() => .3); be.ripe.forEach((r, i) => ba.pickBerry(be, i)); check(ba.berriesDone(be) && be.oops === 0 && ba.finishBerries(F2, be, add) && F2.inv.raspberry > 0 && !ba.finishBerries(F2, be, add), "pick your own: berries once a day");
   F2.inv.strawberry = 2; check(ba.dipBerries(F2, "dark", "sprinkles") && !F2.inv.strawberry, "dipping two strawberries in Sophie's chocolate");

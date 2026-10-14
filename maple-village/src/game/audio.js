@@ -41,7 +41,7 @@ GESTURES.forEach(t => document.addEventListener(t, onGesture, true));
 
 /* ---------- music ---------- */
 const N = n => 440*Math.pow(2, (n - 69)/12);               // MIDI note -> Hz
-// The records on Mel's record player: each is a little piece composed here, played live. bars: [bass, chord tones...]
+// The records on your record player: each is a little piece composed here, played live. bars: [bass, chord tones...]
 // steps = eighth notes per bar (6 for the waltz), arp = which chord tone each eighth plays, tone = the instrument.
 export const TRACKS = {
   piano: {name: "Morning piano", mood: "Soft and hopeful", bpm: 64, steps: 8, tone: "piano", col: "var(--butter)",
@@ -352,7 +352,7 @@ export const TRACKS = {
   // the pottery: soft rain-like plucks, the wheel turning
   kt_pottery: {name: "The wheel turns", live: true, bpm: 66, steps: 8, tone: "rhodes", arp: [1, 2, 3, 4, 3, 2, 4, 5], arpVel: .04, mel: .5,
     bars: [[41, 60, 65, 69, 72], [43, 59, 62, 67, 71], [38, 57, 62, 65, 69], [40, 59, 64, 67, 72]]},
-  // Round 116: each of Ronda's interiors has its own music (live, while Mel's inside)
+  // Round 116: each of Ronda's interiors has its own music (live, while you're inside)
   // the tapas bar: a quick rumba on the guitar in D minor, strummed on every off-beat
   rd_tapas: {name: "Rumba at the tapas bar", live: true, bpm: 132, steps: 8, tone: "guitar", strum: [0, 2, 3, 5, 6], arp: [1, 3, 2, 4, 5, 3, 2, 4], arpVel: .045, mel: .9,
     bars: [[38, 50, 57, 62, 65, 69], [36, 48, 55, 60, 64, 67], [34, 46, 53, 58, 62, 65], [33, 45, 52, 57, 61, 64], [38, 50, 57, 62, 65, 69], [36, 48, 55, 60, 64, 67], [34, 46, 53, 58, 62, 65], [33, 45, 52, 57, 61, 64]]},
@@ -372,7 +372,7 @@ export const TRACKS = {
   rd_mercado: {name: "Market morning", live: true, bpm: 116, steps: 8, tone: "guitar", strum: [0, 3, 6], arp: [1, 4, 3, 2, 5, 4, 3, 5], arpVel: .05, mel: .85,
     bars: [[43, 55, 59, 62, 67, 71], [48, 55, 60, 64, 67, 72], [50, 57, 62, 66, 69, 74], [43, 55, 59, 62, 67, 71], [40, 52, 59, 64, 67, 71], [48, 55, 60, 64, 67, 72], [50, 57, 62, 66, 69, 74], [43, 55, 59, 62, 67, 71]]}
 };
-// a live band (the night market's jazz duo) takes over from the record player while Mel's in earshot
+// a live band (the night market's jazz duo) takes over from the record player while you're in earshot
 let live = null;
 const cur = () => (live && TRACKS[live]) || TRACKS[settings.track] || TRACKS.piano;
 export function setLive(id){
@@ -494,7 +494,7 @@ const FX = {
       o.type = "square"; o.frequency.value = 330*pitch*Math.pow(2, [0, 2, 4, 7, 9][Math.floor(Math.random()*5)]/12); f.type = "lowpass"; f.frequency.value = 1400;
       g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(.07, at + .01); g.gain.exponentialRampToValueAtTime(.0001, at + .065);
       o.connect(f).connect(g).connect(sfxBus); o.start(at); o.stop(at + .08); } },
-  // Evan's room: playful, soft sounds for the toddler games
+  // playful, soft sounds: pops, toots, honks and cheers
   pop(t){ const s = noise(.06), f = ac.createBiquadFilter(), g = ac.createGain(); f.type = "bandpass"; f.frequency.value = 1800; g.gain.setValueAtTime(.35, t); g.gain.exponentialRampToValueAtTime(.0001, t + .07); s.connect(f).connect(g).connect(sfxBus); s.start(t); },
   crack(t){ for (let i = 0; i < 3; i++) { const s = noise(.025), f = ac.createBiquadFilter(), g = ac.createGain(), at = t + i*.05; f.type = "highpass"; f.frequency.value = 2200; g.gain.setValueAtTime(.18, at); g.gain.exponentialRampToValueAtTime(.0001, at + .03); s.connect(f).connect(g).connect(sfxBus); s.start(at); } },
   roar(t){ const o = ac.createOscillator(), f = ac.createBiquadFilter(), g = ac.createGain(); o.type = "sawtooth"; o.frequency.setValueAtTime(260, t); o.frequency.linearRampToValueAtTime(420, t + .15); o.frequency.exponentialRampToValueAtTime(180, t + .5);
